@@ -1,0 +1,181 @@
+/*
+ * GameInstSet.cpp
+ *
+ *  Created on: Jun 28, 2011
+ *      Author: 100397561
+ */
+
+#include "GameInstSet.h"
+#include "../util/settools.h"
+#include <cstring>
+#include <cstdio>
+
+GameInst* const GAMEINST_TOMBSTONE = (GameInst*)1;
+
+static bool valid_inst(GameInst* inst){
+	return inst > GAMEINST_TOMBSTONE;
+}
+
+GameInstSet::GameInstSet(int w, int h, int capacity) {
+	grid_w = w/REGION_SIZE+1, grid_h = h/REGION_SIZE+1;
+	next_id = 1;
+	unit_amnt = 0;
+	unit_capacity = capacity;
+	unit_set = new InstState[unit_capacity];
+	memset(unit_set, 0, unit_capacity*sizeof(InstState));
+	unit_grid = new int[grid_w*grid_h];
+	memset(unit_grid, 0, grid_w*grid_h*sizeof(int));
+}
+GameInstSet::~GameInstSet(){
+	delete[] unit_grid;
+	delete[] unit_set;
+	for (int i = 0; i < deallocation_list.size(); i++){
+		delete deallocation_list[i];
+	}
+}
+struct GameInstSetFunctions {//Helper class
+	typedef GameInstSet::InstState V;
+	static bool isNull(const V& v) {
+		return v.inst == NULL;
+	}
+	static bool isRemoved(const V& v) {
+		return v.inst == GAMEINST_TOMBSTONE;
+	}
+	static void remove(V& v) {
+		v.inst = GAMEINST_TOMBSTONE;
+	}
+	static bool equal(const V& v1, int obj_id) {
+		return valid_inst(v1.inst) && v1.inst->id == obj_id;
+	}
+	static bool equal(const V& v1, GameInst* inst) {
+		return v1.inst == inst;
+	}
+	static bool equal(const V& v1, const V& v2) {
+		return v1.inst == v2.inst;
+	}
+	static size_t hash(const V& v) {
+		return (size_t)v.inst->id;
+	}
+	static size_t hash(GameInst* inst) {
+		return (size_t)inst->id;
+	}
+	static size_t hash(obj_id id) {
+		return (size_t)id;
+	}
+};
+
+void GameInstSet::reallocate_hashset_(){
+	unit_capacity *=2;
+	InstState* old_set = unit_set, *new_set = new InstState[unit_capacity];
+	for (int i = 0; i < unit_capacity; i++){
+		new_set[i].inst->id = 0;
+	}
+
+	tset_add_all<GameInstSetFunctions> (old_set, unit_capacity/2, new_set, unit_capacity);
+	unit_set = new_set;
+
+	//Fix pointers for grid
+	for (int i = 0; i < unit_capacity; i++){
+		if (new_set[i].inst->id <= 0)
+			continue;
+		InstState*& uprev = new_set[i].prev_in_grid;
+		if (uprev)
+			uprev = tset_find<GameInstSetFunctions> (uprev->inst->id, unit_set, unit_capacity);
+		InstState*& unext = new_set[i].next_in_grid;
+		if (unext)
+			unext = tset_find<GameInstSetFunctions> (unext->inst->id, unit_set, unit_capacity);
+	}
+
+
+	delete[] old_set;
+
+}
+static inline int get_xyind(const Coord& c, int grid_w){
+	return (c.y/GameInstSet::REGION_SIZE)*grid_w+c.x/GameInstSet::REGION_SIZE;
+}
+void GameInstSet::remove(GameInst* inst){
+	if (inst->destroyed) return;
+	inst->destroyed = true;
+	InstState* state = tset_find<GameInstSetFunctions> (inst->id, unit_set, unit_capacity);
+	/*
+	InstState* is = tset_find<GameInstSetFunctions> (id, unit_set, unit_capacity);
+	int& start_id = unit_grid[get_xyind(Coord(inst->x,inst->y), grid_w)];
+	if (start_id == inst->id)
+		start_id = state->next_in_grid->inst->id;
+	InstState*& next = state->next_in_grid;
+	InstState*& prev = state->prev_in_grid;
+	prev->next_in_grid = next;
+	next->prev_in_grid = prev;*/
+	this->unit_amnt--;
+	state->inst = GAMEINST_TOMBSTONE;
+	deallocation_list.push_back(inst);
+}
+obj_id GameInstSet::add(GameInst* inst){
+	InstState* unit_state;
+	Coord c(inst->x, inst->y);
+	InstState* data = unit_set;
+
+	//TODO: better error
+	if (inst->id != 0) printf("Adding instance with id not 0!");
+
+	inst->id = next_id++;
+
+	if (tset_should_resize(unit_amnt, unit_capacity))
+		this->reallocate_hashset_();
+
+	if (tset_add<GameInstSetFunctions> (inst, data, unit_capacity))
+		unit_amnt++;
+
+	int& unit_id = unit_grid[get_xyind(c,grid_w)];
+	if (unit_id){
+		unit_state = tset_find<GameInstSetFunctions> (unit_id, unit_set, unit_capacity);
+		while (unit_state->next_in_grid != NULL){
+			unit_state = unit_state->next_in_grid;
+		}
+		unit_state->next_in_grid = data;
+	} else {
+		unit_id = data->inst->id;
+		unit_state = NULL;
+	}
+
+	data->prev_in_grid = unit_state;
+	data->next_in_grid = NULL;
+
+	return inst->id;
+}
+void GameInstSet::step(GameState* gs){
+	for (int i = 0; i < deallocation_list.size(); i++){
+		delete deallocation_list[i];
+	}
+	deallocation_list.clear();
+	for (int i = 0; i < unit_capacity; i++){
+		GameInst* inst = unit_set[i].inst;
+		if (valid_inst(inst))
+			inst->step(gs);
+	}
+}
+GameInst* GameInstSet::get_by_id(int id){
+	InstState* is = tset_find<GameInstSetFunctions> (id, unit_set, unit_capacity);
+	if (is) return is->inst;
+	return NULL;
+}
+
+std::vector<GameInst*> GameInstSet::to_vector(){
+	std::vector<GameInst*> ret( size(), NULL );
+	for (int i = 0, j = 0; i < unit_capacity; i++){
+		GameInst* inst = unit_set[i].inst;
+		if (valid_inst(inst)) ret[j++] = inst;
+	}
+	return ret;
+}
+GameInst* GameInstSet::get_by_coord(const Coord& c){
+	int start_id = unit_grid[get_xyind(c, grid_w)];
+	if (!start_id) return NULL;
+	InstState* ptr = tset_find<GameInstSetFunctions> (start_id, unit_set, unit_capacity);
+	for (;;) {
+		if (ptr->inst->x == c.x && ptr->inst->y == c.y)
+			return ptr->inst;
+		ptr = ptr->next_in_grid;
+		if (ptr == NULL) return NULL;
+	}
+}

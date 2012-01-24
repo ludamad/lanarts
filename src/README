@@ -1,0 +1,10 @@
+Authors: Adam Domurad, Pat Goebel
+
+Lanarts trunk
+
+Dependencies:
+    SDL
+    SDL_opengl
+    
+Installation:
+    run cmake on the src directory then use the generated makefile.
