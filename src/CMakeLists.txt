@@ -1,6 +1,7 @@
 cmake_minimum_required( VERSION 2.8 )
 PROJECT(LanARTS)
 FIND_PACKAGE(SDL REQUIRED)
+FIND_PACKAGE(SDL_image REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
@@ -8,7 +9,6 @@ set( CMAKE_BUILD_TYPE Debug)
 include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
 
 set( lanarts_src
-
 	combat_logic/Item.cpp
 	
 	data/tile_data.cpp
@@ -101,6 +101,7 @@ add_executable( lanarts
 target_link_libraries( lanarts
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}
+			${SDLIMAGE_LIBRARY}
 			${SDLMAIN_LIBRARY}
 			${FREETYPE_LIBRARIES}
 			)
