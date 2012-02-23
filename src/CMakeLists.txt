@@ -8,13 +8,19 @@ set( CMAKE_BUILD_TYPE Debug)
 include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
 
 set( lanarts_src
+
+	combat_logic/Item.cpp
+	
 	data/tile_data.cpp
+	data/sprite_data.cpp
 	
 	display/display.cpp
 	display/GLImage.cpp
 	
 	fov/fov.cpp
 	fov/impl/permissive-fov.cc
+	
+	pathfind/pathfind.cpp
 	
 	main.cpp
 	
@@ -37,13 +43,17 @@ set( lanarts_src
 	world/objects/PlayerInst.cpp
 	world/objects/EnemyInst.cpp
 	world/objects/BulletInst.cpp
+	world/objects/TestInst.cpp
 
 	world/objects/GameInst.cpp
 	)
 
 set( lanarts_include
+	combat_logic/Item.h
+	
 	data/game_data.h
 	data/monster_entry.h
+	data/sprite_data.h
 	data/tile_data.h
 	
 	display/display.h
@@ -54,6 +64,8 @@ set( lanarts_include
 	fov/impl/permissive-fov-cpp.h
 	
 	logic/Stats.h
+	
+	pathfind/pathfind.h
 	
 	procedural/mtwist.h
 	procedural/pathfind.h
@@ -78,6 +90,7 @@ set( lanarts_include
 	world/objects/PlayerInst.h
 	world/objects/EnemyInst.h
 	world/objects/BulletInst.h
+	world/objects/TestInst.h
 )
 
 add_executable( lanarts
