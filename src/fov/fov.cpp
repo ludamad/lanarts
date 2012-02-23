@@ -7,13 +7,30 @@
 
 #include "fov.h"
 #include <cmath>
+#include <cstdlib>
+#include "../world/GameState.h"
+#include "../data/tile_data.h"
+
+
 using namespace std;
 
-fov::fov(GameState *gs, int radius, int ptx, int pty, int sub_squares) :
-		gs(gs), radius(radius), ptx(ptx), pty(pty), sub_squares(
-				sub_squares), m(radius * sub_squares, radius * sub_squares,
+/*fov::fov(GameState *gs, int radius, int ptx, int pty, int sub_squares) :
+			gs(gs), radius(radius), ptx(ptx), pty(pty), sub_squares(sub_squares),
+		{
+
+}
+*/
+fov::fov(int radius, int sub_squares):
+		gs(NULL), radius(radius), sub_squares(sub_squares),
+		m(radius * sub_squares, radius * sub_squares,
 				radius * sub_squares, radius * sub_squares) {
 	radsub = radius * sub_squares;
+	int dim = radsub * 2 + 1;
+	sight_mask = new char[dim * dim];
+}
+void fov::calculate(GameState* gs, int ptx, int pty){
+	this->gs = gs;
+	this->ptx = ptx, this->pty = pty;
 	for (int y = -radsub; y <= radsub; y++) {
 		for (int x = -radsub; x <= radsub; x++) {
 			if (x * x + y * y < radsub * radsub)
@@ -24,7 +41,6 @@ fov::fov(GameState *gs, int radius, int ptx, int pty, int sub_squares) :
 	}
 
 	int dim = radsub * 2 + 1;
-	sight_mask = new char[dim * dim];
 	memset(sight_mask, 0, dim * dim);
 	permissive::fov(0, 0, m, *this);
 }
@@ -36,14 +52,13 @@ fov::~fov() {
 int fov::isBlocked(short destX, short destY) {
 	GameTiles & tiles = gs->tile_grid();
 	int px = ptx + destX, py = pty + destY;
-	int half = TILE_SIZE/sub_squares/2;
 	px = (px)/sub_squares; py = (py)/sub_squares;
 	bool outof = (px < 0 || py < 0 || px >= tiles.tile_width()
 			|| py >= tiles.tile_height());
 	if (outof)
 		return false;
 
-	return (tiles.get(px, py) == 1);
+	return (tiles.get(px, py) <= TILE_STONE_WALL);
 }
 
 void fov::visit(short destX, short destY) {

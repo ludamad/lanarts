@@ -40,7 +40,7 @@ bool tset_add(const K& val, V*& data, size_t entryn) {
 		//Wrap if past end
 		index = tsetNextIndex(index) & (entryn - 1);
 		V* entry = data + index;
-		if (D::isNull(*entry)) {
+		if (D::isNull(*entry) || index == start) {
 			*tomb = val;
 			data = tomb;
 			return true;
@@ -49,6 +49,21 @@ bool tset_add(const K& val, V*& data, size_t entryn) {
 			data = entry;
 			return false;
 		}
+	}
+}
+template<class D, class V, class K>
+bool tset_add_noequal(const K& val, V*& data, size_t entryn) {
+	size_t start = D::hash(val) & (entryn - 1);
+	size_t index = start;
+	for (;;) {
+		V* entry = data + index;
+		if (D::isNull(*entry) || D::isRemoved(*entry)) {
+			*entry = val;
+			data = entry;
+			return true;
+		}
+		//Wrap if past end
+		index = tsetNextIndex(index) & (entryn - 1);
 	}
 }
 template<class D, class V, class K>

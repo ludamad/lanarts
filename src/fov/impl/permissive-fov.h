@@ -116,20 +116,20 @@ typedef enum
 /* of the functions. */
 
 /* Create a mask of the proper dimensions initialized to allow visits
-/* of every square. The origin is the player. */
+/ of every square. The origin is the player. */
 /* mask -- a pointer to an uninitialized permissiveMaskT */
 /* north, south, east, west -- The distance in the given direction
-/*                             from the origin which will be
-/*                             visited. A value of 0 means that only
-/*                             the row (or column) of the origin will
-/*                             be visited. A value of 1 means that the
-/*                             origin row (or column) and the one
-/*                             adjascent to it in the direction
-/*                             specified will be visited,
-/*                             etc. Quadrant I is northeast, Quadrant
-/*                             II is northwest, Quadrant III is
-/*                             southwest, and Quadrant IV is
-/*                             southeast. */
+/                             from the origin which will be
+/                             visited. A value of 0 means that only
+/                             the row (or column) of the origin will
+/                             be visited. A value of 1 means that the
+/                             origin row (or column) and the one
+/                             adjascent to it in the direction
+/                             specified will be visited,
+/                             etc. Quadrant I is northeast, Quadrant
+/                             II is northwest, Quadrant III is
+/                             southwest, and Quadrant IV is
+/                             southeast. */
 /* result -- A value representing why it failed. */
 permissiveErrorT initPermissiveMask(permissiveMaskT * mask, int north,
                                     int south, int east, int west);

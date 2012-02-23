@@ -8,13 +8,15 @@
 #ifndef DISPLAY_H_
 #define DISPLAY_H_
 #include "../world/GameView.h"
+#include "../util/draw_util.h"
 
 struct GLImage;
 int power_of_two(int input);
 
 void gl_set_drawing_area(int x, int y, int w, int h);
 void init_sdl_gl(bool fullscreen, int w, int h);
-void image_display(GLImage* img, int x, int y);
+void image_display(GLImage* img, int x, int y, const Colour& c = Colour(255,255,255));
+
 inline void image_display(const GameView& view, GLImage* img, int x, int y){
 	image_display(img, x - view.x, y - view.y);
 }

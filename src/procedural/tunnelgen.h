@@ -76,6 +76,7 @@ bool TunnelGen<width, change_odds>::generate_x(Pos p, bool right, int depth,
 			Sqr& sqr = s.at(ip.x, ip.y + i);
 			sqr.perimeter = true;
 			sqr.passable = false;
+			sqr.marking = width == 1 ? SMALL_CORRIDOR : LARGE_CORRIDOR;
 			sqr.roomID = 0;
 		}
 		generated = generate_y(newpos, down, depth - 1, TURN_PERIMETER);
@@ -83,8 +84,9 @@ bool TunnelGen<width, change_odds>::generate_x(Pos p, bool right, int depth,
 		s.at(ip).perimeter = true;
 		for (int i = 0; i < width; i++) {
 			Sqr& sqr = s.at(p.x, p.y + i);
-			sqr.passable = true;
 			sqr.perimeter = false;
+			sqr.passable = true;
+			sqr.marking = width == 1 ? SMALL_CORRIDOR : LARGE_CORRIDOR;
 			sqr.roomID = 0;
 		}
 		s.at(ip.x, ip.y + width + 1).perimeter = true;
@@ -161,6 +163,7 @@ bool TunnelGen<width, change_odds>::generate_y(Pos p, bool down, int depth,
 			Sqr& sqr = s.at(ip.x + i, ip.y);
 			sqr.perimeter = true;
 			sqr.passable = false;
+			sqr.marking = width == 1 ? SMALL_CORRIDOR : LARGE_CORRIDOR;
 			sqr.roomID = 0;
 		}
 		generated = generate_x(newpos, right, depth - 1, TURN_PERIMETER);
@@ -168,8 +171,9 @@ bool TunnelGen<width, change_odds>::generate_y(Pos p, bool down, int depth,
 		s.at(ip).perimeter = true;
 		for (int i = 0; i < width; i++) {
 			Sqr& sqr = s.at(p.x + i, p.y);
-			sqr.passable = true;
 			sqr.perimeter = false;
+			sqr.passable = true;
+			sqr.marking = width == 1 ? SMALL_CORRIDOR : LARGE_CORRIDOR;
 			sqr.roomID = 0;
 		}
 		s.at(ip.x + width + 1, ip.y).perimeter = true;

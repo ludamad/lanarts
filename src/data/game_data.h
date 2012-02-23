@@ -9,10 +9,12 @@
 #define GAME_DATA_H_
 
 #include "tile_data.h"
+#include "sprite_data.h"
 
 
-void init_game_data(){
+inline void init_game_data(){
 	init_tile_data();
+	init_sprite_data();
 }
 
 

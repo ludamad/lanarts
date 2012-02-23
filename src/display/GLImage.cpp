@@ -8,6 +8,7 @@
 #include "GLImage.h"
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <SDL_image.h>
 #include <GL/glu.h>
 
 
@@ -15,8 +16,8 @@ void init_GL_Image(GLImage* img, const char* fname){
 	SDL_Surface *image;
 	GLfloat texcoord[4];
 
-	/* Load the image (could use SDL_image library here) */
-	image = SDL_LoadBMP(fname);
+	/* Load the image using SDL_image library */
+	image = IMG_Load(fname);
 	if ( image == NULL ) {
 		printf("Image '%s' could not be loaded\n", fname);
 		return;

@@ -14,3 +14,7 @@ GameInst::~GameInst() {
 void GameInst::step(GameState* gs){	}
 
 void GameInst::draw(GameState* gs){ }
+
+void GameInst::init(GameState* gs){
+
+}

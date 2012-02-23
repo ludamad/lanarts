@@ -30,6 +30,10 @@ set( lanarts_src
 	world/GameTiles.cpp
 	world/GameView.cpp
 	world/GameHud.cpp
+	
+	world/controllers/MonsterController.cpp
+	world/controllers/PlayerController.cpp
+	
 	world/objects/PlayerInst.cpp
 	world/objects/EnemyInst.cpp
 	world/objects/BulletInst.cpp
@@ -65,11 +69,15 @@ set( lanarts_include
 	world/GameTiles.h
 	world/GameView.h
 	world/GameHud.h
+	
+	world/controllers/MonsterController.h
+	world/controllers/PlayerController.h
+	
+	world/objects/GameInst.h
+	
 	world/objects/PlayerInst.h
 	world/objects/EnemyInst.h
 	world/objects/BulletInst.h
-
-	world/objects/GameInst.h
 )
 
 add_executable( lanarts

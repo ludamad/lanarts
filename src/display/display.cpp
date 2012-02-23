@@ -25,11 +25,11 @@ int power_of_two(int input) {
 	}
 	return value;
 }
-void image_display(GLImage* img, int x, int y) {
+void image_display(GLImage* img, int x, int y, const Colour& c) {
 	int x2 = x + img->width, y2 = y + img->height;
 	glBindTexture(GL_TEXTURE_2D, img->texture);
 	glBegin(GL_QUADS);
-	glColor4ub(255, 255, 255, 255);
+	glColor4ub(c.r, c.g, c.b, c.a);
 
 	//Draw our four points, clockwise.
 	glTexCoord2f(0, 0);
@@ -45,6 +45,8 @@ void image_display(GLImage* img, int x, int y) {
 	glVertex2i(x, y2);
 
 	glEnd();
+
+	glBindTexture(GL_TEXTURE_2D, NULL);
 }
 
 void image_display_parts(GLImage* img, int x, int y, int sub_parts,
@@ -59,6 +61,7 @@ void image_display_parts(GLImage* img, int x, int y, int sub_parts,
 		image_display(img,x,y);
 		return;
 	}
+	glColor4ub(255, 255, 255, 255);
 	int xincr = img->width / sub_parts, yincr = img->height / sub_parts;
 	float tex_xincr = img->texw / sub_parts, tex_yincr = img->texh / sub_parts;
 	for (int ysub = 0; ysub < sub_parts; ysub++) {
@@ -66,7 +69,6 @@ void image_display_parts(GLImage* img, int x, int y, int sub_parts,
 			if (!*flags)
 				continue;
 			glBindTexture(GL_TEXTURE_2D, img->texture);
-			glColor4ub(255, 255, 255, 255);
 			glBegin(GL_QUADS);
 			float tsx = tex_xincr * xsub, tex = tsx + tex_xincr;
 			float tsy = tex_yincr * ysub, tey = tsy + tex_yincr;
@@ -88,6 +90,8 @@ void image_display_parts(GLImage* img, int x, int y, int sub_parts,
 //			glTexCoord2f(0, img->texh);
 			glTexCoord2f(tsx, tey);
 			glVertex2i(sx, ey);
+
+			glBindTexture(GL_TEXTURE_2D, NULL);
 	glEnd();
 		}
 	}
@@ -171,7 +175,7 @@ void gl_set_drawing_area(int x, int y, int w, int h) {
 	//glOrtho(0.0, (GLdouble)w, 0.0, (GLdouble)h, 0.0, 1.0);
 
 	/* This allows alpha blending of 2D textures with the scene */
-	glDisable(GL_BLEND);
+	glEnable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_DEPTH_TEST);
 	//glDisable(GL_CULL_FACE);

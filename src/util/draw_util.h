@@ -21,16 +21,19 @@ struct Colour {
 
 void gl_draw_circle(float x, float y, float radius,
     const Colour& colour = Colour(0,0,0) );
-void gl_draw_rectangle(float x, float y, float w, float h,
+void gl_draw_rectangle(int x, int y, int w, int h,
     const Colour& colour = Colour(0,0,0) );
 inline void gl_draw_circle(const GameView& view, float x, float y, float radius,
     const Colour& colour = Colour(0,0,0) ){
 	gl_draw_circle(x-view.x,y-view.y,radius,colour);
 }
-inline void gl_draw_rectangle(const GameView& view, float x, float y, float w, float h,
+inline void gl_draw_rectangle(const GameView& view, int x, int y, int w, int h,
     const Colour& colour = Colour(0,0,0)) {
 	gl_draw_rectangle(x-view.x,y-view.y,w,h,colour);
 }
+
+void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
+		char* flags, const Colour& colour = Colour(0, 0, 0));
 
 //Will print out text at window coordinates x,y, using the font ft_font.
 //The current modelview matrix will also be applied to the text.

@@ -19,33 +19,47 @@ using namespace std;
 const float DEG2RAD = 3.14159 / 180;
 
 void gl_draw_circle(float x, float y, float radius, const Colour& clr) {
-	glDisable(GL_TEXTURE_2D);
 	glBegin(GL_POLYGON);
-	glColor4ub(clr.r, clr.g, clr.b, 255);
+	glColor4ub(clr.r, clr.g, clr.b, clr.a);
 	for (int i = 0; i < 360; i++) {
 		float degInRad = i * DEG2RAD;
 		glVertex2f(x + cos(degInRad) * radius, y + sin(degInRad) * radius);
 	}
 
 	glEnd();
-	glEnable(GL_TEXTURE_2D);
 }
-void gl_draw_rectangle(float x, float y, float w, float h, const Colour& clr) {
-	glDisable(GL_TEXTURE_2D);
+void gl_draw_rectangle(int x, int y, int w, int h, const Colour& clr) {
+	int x2 = x + w, y2 = y + h;
+
 	glBegin(GL_QUADS);
-
-	glColor3ub(clr.r, clr.g, clr.b);
-
+	glColor4ub(clr.r, clr.g, clr.b, clr.a);
 	//Draw our four points, clockwise.
 	glVertex2i(x, y);
+	glVertex2i(x2, y);
+	glVertex2i(x2, y2);
+	glVertex2i(x, y2);
 
-	glVertex2i(x + w, y);
-
-	glVertex2i(x + w, y + h);
-
-	glVertex2i(x, y + h);
 	glEnd();
-	glEnable(GL_TEXTURE_2D);
+}
+
+void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
+		char* flags, const Colour& clr){
+	glBegin(GL_QUADS);
+	int xincr = w / sub_parts, yincr = h / sub_parts;
+	for (int ysub = 0; ysub < sub_parts; ysub++) {
+		for (int xsub = 0; xsub < sub_parts; xsub++, flags++) {
+			glColor4ub(clr.r, clr.g, clr.b, clr.a);
+			if (*flags)continue;
+			int sx = x+xincr * xsub, ex = sx + xincr;
+			int sy = y+yincr * ysub, ey = sy + yincr;
+			//Draw our four points, clockwise.
+			glVertex2i(sx, sy);
+			glVertex2i(ex, sy);
+			glVertex2i(ex, ey);
+			glVertex2i(sx, ey);
+		}
+	}
+	glEnd();
 }
 
 ///So while glRasterPos won't let us set the raster position using

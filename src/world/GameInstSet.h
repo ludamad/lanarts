@@ -18,8 +18,6 @@ class GameState;
 //Deallocates destroyed objects at end of step.
 //Use instance IDs to refer to objects in enemy memory.
 
-typedef int obj_id;
-
 class GameInstSet {
 public:
 	enum {
@@ -36,6 +34,7 @@ public:
 	//Returns NULL if no unit found
 	GameInst* get_by_id(int id);
 	GameInst* get_by_coord(const Coord& c);
+	int object_radius_test(GameInst* obj, GameInst** objs = NULL, int obj_cap = 0, col_filter f = NULL, int x=-1, int y=-1, int radius=-1);
 
 	size_t size(){ return unit_amnt; }
 	std::vector<GameInst*> to_vector();
@@ -53,6 +52,8 @@ private:
 			prev_in_grid = NULL;
 		}
 	};
+	void update_instance(InstState* state, GameInst* inst);
+
 	friend class GameInstSetFunctions;
 	//Destroyed objects marked for deletion
 	std::vector<GameInst*> deallocation_list;

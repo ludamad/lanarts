@@ -1,10 +1,3 @@
-/*
- * BulletInst.h
- *
- *  Created on: 2011-11-11
- *      Author: 100397561
- */
-
 #ifndef BULLETINST_H_
 #define BULLETINST_H_
 
@@ -20,8 +13,5 @@ public:
 private:
 	float rx, ry, vx, vy;
 };
-
-
-
 
 #endif /* BULLETINST_H_ */

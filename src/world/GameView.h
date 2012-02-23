@@ -13,6 +13,9 @@ struct GameView {
 	GameView(int x, int y, int width, int height, int world_width, int world_height) :
 		x(x), y(y), width(width), height(height), world_width(world_width), world_height(world_height){ }
 
+	bool within_view(int xx, int yy, int w, int h){
+		return xx >= x && yy >= y && xx + w <= x + width && yy + h <= y + height;
+	}
 	void move_towards(int px, int py);
 	void center_on(int px, int py){ move_towards(px - width/2, py - height/2); }
 	void sharp_center_on(int px, int py);
