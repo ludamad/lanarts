@@ -7,7 +7,7 @@
 
 #include "GameInstSet.h"
 #include "../util/settools.h"
-#include <Cstring>
+#include <cstring>
 #include <cstdio>
 
 GameInst* const GAMEINST_TOMBSTONE = (GameInst*) 1;
