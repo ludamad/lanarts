@@ -25,6 +25,7 @@ void PlayerController::pre_step(GameState* gs) {
 }
 
 void PlayerController::register_player(obj_id player) {
+	local_player = player;
 	pids.push_back(player);
 	fovs.push_back(new fov(7, VISION_SUBSQRS));
 }
@@ -67,4 +68,9 @@ bool PlayerController::seen_by_player(GameState* gs, int pindex,
 		}
 	}
 	return false;
+}
+
+void PlayerController::clear(){
+	pids.clear();
+	fovs.clear();
 }

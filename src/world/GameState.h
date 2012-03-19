@@ -37,7 +37,7 @@ public:
 	void remove_instance(GameInst* inst);
 
 	/* COLLISION METHODS */
-	bool tile_radius_test(int x, int y, int rad);
+	bool tile_radius_test(int x, int y, int rad, bool issolid = true, int ttype = -1);
 	/* Check whether intersects a solid object */
 	bool solid_radius_test(int x, int y, int rad);
 	bool tile_line_test(int x, int y, int w, int h);
@@ -108,6 +108,9 @@ public:
 	MTwist& rng() {
 		return mtwist;
 	}
+	void set_generate_flag(){ gennextstep = true; }
+
+	void generate_level();
 
 private:
 	void restart();
@@ -116,6 +119,7 @@ private:
 	int frame_n;
 	obj_id player;
 	fov pfov;
+	bool gennextstep;
 
 	//Game world components
 	GameTiles tiles;

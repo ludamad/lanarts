@@ -24,7 +24,7 @@ public:
 	void pre_draw(GameState* gs);
 	//Called after object drawing
 	void post_draw(GameState* gs);
-	GameTiles(int width, int height, bool gen_level = true);
+	GameTiles(int width, int height);
 	~GameTiles(){
 		delete[] tiles;
 		delete[] seen_tiles;

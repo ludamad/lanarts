@@ -12,7 +12,9 @@ enum {
 	NORMAL = 1,
 	SMALL_CORRIDOR = 2,
 	LARGE_CORRIDOR = 3,
-	DOOR = 4
+	DOOR = 4,
+	STAIR_UP = 5,
+	STAIR_DOWN = 6
 
 };
 struct Sqr {

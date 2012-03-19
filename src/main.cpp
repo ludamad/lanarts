@@ -59,21 +59,10 @@ int main(int argc, char** argv) {
 		return 0;
 	}
 	init_system(false, windoww, windowh);
-	int px,py,ex,ey;
-	RoomgenSettings& rs = gs->tile_grid().room_settings();
-	time_t t;
-	time(&t);
+	gs->generate_level();
 
-	random_location(rs, t, px, py);
-	player = gs->add_instance(
-			new PlayerInst(px*32+16,py*32+16));
-	for (int i = 0; i < 25; i++){
-		random_location(rs, t+i, ex, ey);
-		enemy = gs->add_instance( new EnemyInst(ex*32+16,ey*32+16));
-	}
 //	gs->add_instance( new TestInst(0,0));
 
-	gs->window_view().sharp_center_on(px*32+16,py*32+16);
 	for (int i = 0; cont; i++) {
 		cont = gs->step();
 		gs->draw();

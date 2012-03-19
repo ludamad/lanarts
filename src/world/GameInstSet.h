@@ -38,6 +38,7 @@ public:
 
 	size_t size(){ return unit_amnt; }
 	std::vector<GameInst*> to_vector();
+	void clear();
 private:
 	void reallocate_hashset_();
 

@@ -29,13 +29,18 @@ enum {
 	TILE_MARBLE_4 = 15,
 	TILE_MARBLE_5 = 16,
 	TILE_MARBLE_6 = 17,
-	TILE_CORRIDOR_FLOOR = 18
+	TILE_CORRIDOR_FLOOR = 18,
+	TILE_STAIR_UP = 19,
+	TILE_STAIR_DOWN = 20
 };
 
 struct TileEntry {
 	const char* name;
-	GLImage img;
-	TileEntry(const char* name, const char* fname) : name(name), img(fname){}
+	GLImage img; 
+	bool solid;
+	TileEntry(const char* name, const char* fname, bool solid = false) 
+		: name(name), img(fname), solid(solid){}
+
 	void init(){
 		printf("Loading tile '%s'\n", img.filename);
 		init_GL_Image(&img, img.filename);

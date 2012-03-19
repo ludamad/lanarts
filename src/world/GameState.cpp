@@ -12,6 +12,8 @@
 #include <SDL_opengl.h>
 #include <cstring>
 #include "../data/tile_data.h"
+#include "objects/EnemyInst.h"
+#include "objects/PlayerInst.h"
 
 GameState::GameState(int width, int height, int vieww, int viewh, int hudw) :
 		world_width(width), world_height(height), pfov(7, VISION_SUBSQRS), tiles(width / TILE_SIZE,
@@ -20,6 +22,7 @@ GameState::GameState(int width, int height, int vieww, int viewh, int hudw) :
 	memset(key_states, 0, sizeof(key_states));
 	init_font(&pfont, "res/arial.ttf", 10);
 	player = 0;
+	gennextstep = false;
 }
 
 GameState::~GameState() {
@@ -69,6 +72,10 @@ int GameState::handle_event(SDL_Event *event) {
 bool GameState::step() {
 	SDL_Event event;
 	const int sub_sqrs = VISION_SUBSQRS;
+	
+	if (gennextstep)
+		generate_level();
+	
 	GameInst* player = this->player_obj();
 	if (player)
 		pfov.calculate(this, player->last_x*sub_sqrs/TILE_SIZE, player->last_y*sub_sqrs/TILE_SIZE);
@@ -157,7 +164,7 @@ static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
 //game_id GameState::collides_with(){
 //}
 
-bool GameState::tile_radius_test(int x, int y, int rad) {
+bool GameState::tile_radius_test(int x, int y, int rad, bool issolid,int ttype) {
 	int w = world_width / TILE_SIZE, h = world_height / TILE_SIZE;
 	//(rad*2) **2 area
 	//should test x, y positions filling in circle
@@ -173,7 +180,10 @@ bool GameState::tile_radius_test(int x, int y, int rad) {
 
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			if (tiles.get(xx, yy) <= TILE_STONE_WALL) {
+			int tile = tiles.get(xx, yy);
+			bool istype = (tile == ttype || ttype == -1);
+			bool solidmatch = (game_tile_data[tile].solid == issolid);
+			if (solidmatch && istype) {
 				int offset = TILE_SIZE / 2; //To and from center
 				int cx = int(xx * TILE_SIZE) + offset;
 				int cy = int(yy * TILE_SIZE) + offset;
@@ -223,4 +233,27 @@ bool GameState::object_visible_test(GameInst* obj) {
 		}
 	}
 	return false;
+}
+
+void GameState::generate_level(){
+	int px,py,ex,ey;
+	
+	inst_set.clear();
+	tiles.generate_level();
+	
+	player_controller().clear();
+	monster_controller().clear();
+	
+	RoomgenSettings& rs = tile_grid().room_settings();
+	time_t t;
+	time(&t);
+
+	random_location(rs, t, px, py);
+	add_instance(new PlayerInst(px*32+16,py*32+16));
+	for (int i = 0; i < 25; i++){
+		random_location(rs, t+i, ex, ey);
+		add_instance( new EnemyInst(ex*32+16,ey*32+16));
+	}
+	window_view().sharp_center_on(px*32+16,py*32+16);
+	gennextstep = false;
 }

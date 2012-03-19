@@ -92,6 +92,8 @@ void GameTiles::post_draw(GameState* gs) {
 }
 
 void GameTiles::generate_level() {
+	memset(tiles, 0, width * height * sizeof(int));
+	memset(seen_tiles, 0, width * height);
 	int start_x = width/4, start_y = height/4;
 	int end_x = width - start_x, end_y = height - start_y;
 	int gen_width = width/2, gen_height = height/2;
@@ -110,7 +112,10 @@ void GameTiles::generate_level() {
 				tiles[ind] = TILE_FLOOR;
 				if (s.roomID){
 //					if (s.marking)
-//						tiles[ind] = TILE_MESH_0+s.marking;
+					if ((mt.genrand_int31() % 150) == 0){
+						tiles[ind] = TILE_STAIR_DOWN;
+					}
+// 					tiles[ind] = TILE_MESH_0+s.marking;
 				} else if (s.marking == SMALL_CORRIDOR){
 					tiles[ind] = TILE_CORRIDOR_FLOOR;
 				}
@@ -127,14 +132,11 @@ void GameTiles::generate_level() {
 	}
 	//for (int i = 0; i < 80; i++) printf("-");
 }
-GameTiles::GameTiles(int width, int height, bool gen_level) :
+GameTiles::GameTiles(int width, int height) :
 		width(width), height(height), rs(width/2, height/2,-1,5, 1) {
 	seen_tiles = new char[width * height];
 	tiles = new int[width * height];
 	memset(tiles, 0, width * height * sizeof(int));
 	memset(seen_tiles, 0, width * height);
-
-	if (gen_level)
-		generate_level();
 }
 

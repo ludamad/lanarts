@@ -22,6 +22,7 @@ public:
 	void pre_step(GameState* gs);
 	void register_enemy(obj_id monster) { mids.push_back(monster); }
 
+	void clear();
 public:
 	//vector of paths to player instances
 	std::vector<PathInfo> paths;

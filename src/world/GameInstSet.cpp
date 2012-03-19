@@ -315,3 +315,16 @@ int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 	}
 	return obj_n;
 }
+
+void GameInstSet::clear(){
+	for (int i = 0; i < unit_capacity; i++) {
+		GameInst* inst = unit_set[i].inst;
+		if (valid_inst(inst)) {
+			delete inst;
+		}
+	}
+	next_id = 1;
+	unit_amnt = 0;
+	memset(unit_set, 0, unit_capacity * sizeof(InstState));
+	memset(unit_grid, 0, grid_w * grid_h * sizeof(int));
+}

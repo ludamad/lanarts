@@ -15,6 +15,7 @@ public:
 	PlayerController();
 	~PlayerController();
 	void pre_step(GameState* gs);
+	void clear();
 
 	void register_player(obj_id player);
 	void remove_player(obj_id player);

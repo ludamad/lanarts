@@ -122,3 +122,9 @@ void MonsterController::pre_step(GameState* gs) {
 	std::sort(eois.begin(), eois.end());
 	set_monster_headings(gs, paths, eois);
 }
+
+
+void MonsterController::clear(){
+	paths.clear();
+	mids.clear();
+}

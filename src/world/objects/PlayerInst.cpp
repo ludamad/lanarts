@@ -4,6 +4,7 @@
 #include "../../util/draw_util.h"
 #include "../GameState.h"
 #include "../../data/sprite_data.h"
+#include "../../data/tile_data.h"
 #include "../../display/display.h"
 
 PlayerInst::~PlayerInst() {
@@ -33,6 +34,11 @@ void PlayerInst::step(GameState* gs){
 	if (gs->key_press_state(SDLK_LEFT) || gs->key_press_state(SDLK_a)){
 		if (!gs->tile_radius_test(x-4, y, RADIUS))
 		x -= 4;
+	}
+	if (gs->key_press_state(SDLK_c)){
+		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN)){
+			gs->set_generate_flag();
+		}
 	}
 
 	base_stats.step();
