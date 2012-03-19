@@ -42,16 +42,23 @@ void gl_draw_rectangle(int x, int y, int w, int h, const Colour& clr) {
 	glEnd();
 }
 
+void gl_draw_hpbar(const GameView& view, const Stats& s, int x, int y, int w, int h,
+		const Colour& front, const Colour& back) {
+	int hp_width = (w * s.hp) / s.max_hp;
+	gl_draw_rectangle(view, x, y, w, h, back);
+	gl_draw_rectangle(view, x, y, hp_width, h, front);
+}
 void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
-		char* flags, const Colour& clr){
+		char* flags, const Colour& clr) {
 	glBegin(GL_QUADS);
 	int xincr = w / sub_parts, yincr = h / sub_parts;
 	for (int ysub = 0; ysub < sub_parts; ysub++) {
 		for (int xsub = 0; xsub < sub_parts; xsub++, flags++) {
 			glColor4ub(clr.r, clr.g, clr.b, clr.a);
-			if (*flags)continue;
-			int sx = x+xincr * xsub, ex = sx + xincr;
-			int sy = y+yincr * ysub, ey = sy + yincr;
+			if (*flags)
+				continue;
+			int sx = x + xincr * xsub, ex = sx + xincr;
+			int sy = y + yincr * ysub, ey = sy + yincr;
 			//Draw our four points, clockwise.
 			glVertex2i(sx, sy);
 			glVertex2i(ex, sy);

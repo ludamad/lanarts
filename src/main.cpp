@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
 	random_location(rs, t, px, py);
 	player = gs->add_instance(
 			new PlayerInst(px*32+16,py*32+16));
-	for (int i = 0; i < 50; i++){
+	for (int i = 0; i < 25; i++){
 		random_location(rs, t+i, ex, ey);
 		enemy = gs->add_instance( new EnemyInst(ex*32+16,ey*32+16));
 	}

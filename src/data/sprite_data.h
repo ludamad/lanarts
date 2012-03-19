@@ -21,8 +21,7 @@ enum {
 	SPR_BOOK = 5,
 	SPR_GLOVES = 6,
 	SPR_GOLD = 7,
-	SPR_SCROLL = 8,
-
+	SPR_SCROLL = 8
 };
 struct SpriteEntry {
 	const char* name;

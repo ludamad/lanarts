@@ -357,5 +357,6 @@ void random_location(RoomgenSettings& rs, int seed, int& x, int& y) {
 		ind = y * rs.w + x;
 	} while (rs.sqrs[ind].roomID == 0 || !rs.sqrs[ind].passable
 			|| rs.sqrs[ind].is_corner);
+	x += rs.w/2, y += rs.h/2;
 }
 

@@ -36,7 +36,7 @@ struct RoomgenSettings{
 	int padding;
 	int max_tunnels;
 	int min_room_size, max_room_size;
-	RoomgenSettings(int w, int h, int seed = -1, int room_number = 90, int padding = 2,
+	RoomgenSettings(int w, int h, int seed = -1, int room_number = 90, int padding = 1,
 			int max_tunnels = 20, int minr = 4, int maxr = 30) :
 		sqrs(new Sqr[w*h]), itemgen(), w(w), h(h), seed(seed),
 		room_number(room_number), padding(padding), max_tunnels(max_tunnels),

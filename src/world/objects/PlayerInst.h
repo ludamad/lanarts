@@ -10,7 +10,7 @@ class PlayerInst : public GameInst {
 public:
 	enum {RADIUS = 10, VISION_SUBSQRS = 1};
 	PlayerInst(int x, int y) :
-		GameInst(x,y, RADIUS), base_stats(100,100){}
+		GameInst(x,y, RADIUS), base_stats(100,100,5){}
 	virtual ~PlayerInst();
 	virtual void init(GameState* gs);
 	virtual void step(GameState* gs);

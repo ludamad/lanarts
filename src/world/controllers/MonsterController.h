@@ -16,14 +16,15 @@ class MonsterController {
 public:
 	MonsterController();
 	~MonsterController();
+
+	const std::vector<obj_id>& monster_ids(){ return mids;}
+
 	void pre_step(GameState* gs);
 	void register_enemy(obj_id monster) { mids.push_back(monster); }
 
-	const std::vector<obj_id>& monster_ids(){ return mids;}
+public:
 	//vector of paths to player instances
-private:
 	std::vector<PathInfo> paths;
-	void set_behaviours(GameState* gs);
 	//vector of monster ids
 	std::vector<obj_id> mids;
 };

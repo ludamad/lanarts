@@ -70,7 +70,7 @@ void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
 	GameTiles& tile = gs->tile_grid();
 
 	//Use a temporary 'GameView' object to make use of its helper methods
-	GameView view(0, 0, radius, radius, gs->width(), gs->height());
+	GameView view(0, 0, radius * 2, radius * 2, gs->width(), gs->height());
 	view.sharp_center_on(ox, oy);
 
 	view.min_tile_within(min_tilex, min_tiley);
@@ -91,11 +91,12 @@ void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
 			node->open = true;
 			node->dx = 0;
 			node->dy = 0;
+			node->marked = false;
 			node->distance = 0;
 		}
 	}
-	int tx = ox / TILE_SIZE, ty = oy / TILE_SIZE;
-	floodfill(path, w, h, tx - min_tilex, ty - min_tiley);
+	int tx = ox / TILE_SIZE - min_tilex, ty = oy / TILE_SIZE - min_tiley;
+	floodfill(path, w, h, tx, ty);
 	path_x = tx, path_y = ty;
 }
 
@@ -185,12 +186,20 @@ void PathInfo::point_to_local_min(int sx, int sy) {
 	int dx = 0, dy = 0;
 	int min_distance = HUGE_DISTANCE;
 
-	for (int yy = miny; yy <= maxy; yy++) {
-		for (int xx = minx; xx <= maxx; xx++) {
-			PathingNode* p = get(xx, yy);
-			if (!p->solid && p->distance < min_distance) {
-				dx = xx - sx, dy = yy - sy;
-				min_distance = p->distance;
+	if (!fixed_node->marked) {
+		for (int yy = miny; yy <= maxy; yy++) {
+			for (int xx = minx; xx <= maxx; xx++) {
+				if (sx == xx && sy == yy)
+					continue;
+				PathingNode* p = get(xx, yy);
+				if (p->solid)
+					continue;
+				int dist = p->distance
+						+ (abs(xx - sx) == abs(yy - sy) ? 140 : 100);
+				if (dist < min_distance) {
+					dx = xx - sx, dy = yy - sy;
+					min_distance = dist;
+				}
 			}
 		}
 	}
@@ -203,37 +212,52 @@ void PathInfo::point_to_local_min(int sx, int sy) {
 //	}
 }
 
-
-void PathInfo::fix_distances(int sx, int sy){
+void PathInfo::fix_distances(int sx, int sy) {
 	PathingNode* fixed_node = get(sx, sy);
 
-	int minx = squish(sx - 2, 0, width()), miny = squish(sy - 2, 0, height());
-	int maxx = squish(sx + 2, 0, width()), maxy = squish(sy + 2, 0, height());
+	int minx = squish(sx - 1, 0, width()), miny = squish(sy - 1, 0, height());
+	int maxx = squish(sx + 1, 0, width()), maxy = squish(sy + 1, 0, height());
 
-	int dx = 0, dy = 0;
-	int min_distance = HUGE_DISTANCE;
+	int min_distance = fixed_node->distance;
+	if (fixed_node->marked)
+		return;
 
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
+			if (sx == xx && sy == yy)
+				continue;
 			PathingNode* p = get(xx, yy);
-			if (!p->solid && p->distance < min_distance) {
-				dx = xx - sx, dy = yy - sy;
+			if (p->solid)
+				continue;
+			int dist = p->distance + (abs(xx - sx) == abs(yy - sy) ? 140 : 100);
+			if (dist < min_distance) {
+				min_distance = dist;
 			}
 		}
 	}
-	fixed_node->dx = dx;
-	fixed_node->dy = dy;
-
+	fixed_node->distance = min_distance;
 }
-void PathInfo::stake_claim_from(int x, int y) {
-	x -= start_x, y -= start_y;
+void PathInfo::adjust_for_claims(int x, int y) {
+	x = x / TILE_SIZE - start_x, y = y / TILE_SIZE - start_y;
+	if (x < 0 || x >= width() || y < 0 || y >= height())
+		return;
+	int minx = squish(x - 1, 0, width()), miny = squish(y - 1, 0, height());
+	int maxx = squish(x + 1, 0, width()), maxy = squish(y + 1, 0, height());
+	for (int yy = miny; yy <= maxy; yy++) {
+		for (int xx = minx; xx <= maxx; xx++) {
+			this->point_to_local_min(xx, yy);
+		}
+	}
+}
+void PathInfo::stake_claim(int x, int y) {
+	x = x / TILE_SIZE - start_x, y = y / TILE_SIZE - start_y;
 	if (x < 0 || x >= width() || y < 0 || y >= height())
 		return;
 
 	PathingNode* start_node = get(x, y);
 	x += start_node->dx, y += start_node->dy;
 	//Don't claim the player's square
-	if (x == path_x && y == path_y){
+	if (x == path_x && y == path_y) {
 		//Backtrack, and stake our current square
 		x -= start_node->dx, y -= start_node->dy;
 	}
@@ -241,20 +265,23 @@ void PathInfo::stake_claim_from(int x, int y) {
 
 	//Make distance some arbitrarily large number
 	stake_node->distance = HUGE_DISTANCE;
-	stake_node->solid = true;
+	stake_node->marked = true;
+//	stake_node->solid = true;
 
 	int minx = squish(x - 1, 0, width()), miny = squish(y - 1, 0, height());
 	int maxx = squish(x + 1, 0, width()), maxy = squish(y + 1, 0, height());
-
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			if (xx == x && yy == y)
-				continue;
+			this->fix_distances(xx, yy);
+		}
+	}
+	for (int yy = miny; yy <= maxy; yy++) {
+		for (int xx = minx; xx <= maxx; xx++) {
 			this->point_to_local_min(xx, yy);
 		}
 	}
 
-	stake_node->solid = false;
+//	stake_node->solid = false;
 }
 
 void PathInfo::draw(GameState* gs) {
@@ -268,11 +295,16 @@ void PathInfo::draw(GameState* gs) {
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
 			PathingNode* node = &path[y * w + x];
-			if (!node->solid)
+			if (false && !node->solid)
 				gl_printf(gs->primary_font(), Colour(255, 255, 255),
 						(x + start_x) * TILE_SIZE - view.x,
 						(y + start_y) * TILE_SIZE - view.y, "%d,%d", node->dx,
 						node->dy);
+			if (!node->solid)
+				gl_printf(gs->primary_font(), Colour(255, 255, 255),
+						(x + start_x) * TILE_SIZE - view.x,
+						(y + start_y) * TILE_SIZE - view.y, "%d",
+						node->distance);
 		}
 	}
 }

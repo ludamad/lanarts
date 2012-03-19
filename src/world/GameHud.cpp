@@ -108,6 +108,7 @@ void GameHud::draw(GameState* gs) {
 		//player = state->get_instance(0);
 	}
 	draw_minimap(gs, 20, 64);
+	gl_printf(gs->primary_font(), Colour(255,255,255),_width/2-15,10,"Lanarts");
 }
 
 GameHud::GameHud(int x, int y, int width, int height) :

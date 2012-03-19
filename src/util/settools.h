@@ -105,6 +105,8 @@ V* tset_find(const K& key, V* data, size_t entryn) {
 		}
 		//Wrap if past end
 		index = tsetNextIndex(index) & (entryn - 1);
+		if (index == start)
+			return NULL;
 	}
 }
 inline bool tset_should_resize(size_t amnt, size_t entryn) {

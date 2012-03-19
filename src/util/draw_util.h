@@ -7,6 +7,7 @@
 #include <freetype/freetype.h>
 #include <string>
 #include "font_util.h"
+#include "../combat_logic/Stats.h"
 #include "../world/GameView.h"
 
 struct Colour {
@@ -31,6 +32,8 @@ inline void gl_draw_rectangle(const GameView& view, int x, int y, int w, int h,
     const Colour& colour = Colour(0,0,0)) {
 	gl_draw_rectangle(x-view.x,y-view.y,w,h,colour);
 }
+void gl_draw_hpbar(const GameView& view, const Stats& s, int x, int y, int w, int h,
+		const Colour& front = Colour(0,255,0), const Colour& back = Colour(255,0,0));
 
 void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 		char* flags, const Colour& colour = Colour(0, 0, 0));

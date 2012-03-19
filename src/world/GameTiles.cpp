@@ -50,8 +50,10 @@ void GameTiles::post_draw(GameState* gs) {
 	if (max_tiley >= height)
 		max_tiley = height - 1;
 	const int sub_sqrs = VISION_SUBSQRS;
+	const std::vector<fov*>& vf = gs->player_controller().player_fovs();
+	if (vf.size() < 1) return;
 
-	fov& f = gs->player_fov();
+	fov& f = *vf[0];
 
 	char matches[sub_sqrs * sub_sqrs];
 	for (int y = min_tiley; y <= max_tiley; y++) {
@@ -90,14 +92,20 @@ void GameTiles::post_draw(GameState* gs) {
 }
 
 void GameTiles::generate_level() {
+	int start_x = width/4, start_y = height/4;
+	int end_x = width - start_x, end_y = height - start_y;
+	int gen_width = width/2, gen_height = height/2;
 	generate_random_level(rs);
 	MTwist mt(~rs.seed);
+	memset(tiles, 0, sizeof(int)*width*height);
 
-	for (int y = 0; y < height; y++) {
-		for (int x = 0; x < width; x++) {
-			int ind = y * width + x;
+	for (int y = start_y; y < end_y; y++) {
+		for (int x = start_x; x < end_x; x++) {
+			int ind = y*width+x;
+			int rs_ind = (y-start_y) * rs.w + (x-start_x);
+
 			//printf(sqr[ind].passable ? "-" : "X");
-			Sqr& s = rs.sqrs[ind];
+			Sqr& s = rs.sqrs[rs_ind];
 			if (s.passable) {
 				tiles[ind] = TILE_FLOOR;
 				if (s.roomID){
@@ -120,7 +128,7 @@ void GameTiles::generate_level() {
 	//for (int i = 0; i < 80; i++) printf("-");
 }
 GameTiles::GameTiles(int width, int height, bool gen_level) :
-		width(width), height(height), rs(width, height) {
+		width(width), height(height), rs(width/2, height/2,-1,5, 1) {
 	seen_tiles = new char[width * height];
 	tiles = new int[width * height];
 	memset(tiles, 0, width * height * sizeof(int));

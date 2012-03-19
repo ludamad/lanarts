@@ -46,11 +46,18 @@ int GameState::handle_event(SDL_Event *event) {
 		key_states[event->key.keysym.sym] = 0;
 		break;
 	}
-	case SDL_MOUSEBUTTONUP: {
+	case SDL_MOUSEBUTTONDOWN: {
 		if (event->button.button == SDL_BUTTON_LEFT)
 			left_click = true;
 		else if (event->button.button == SDL_BUTTON_RIGHT)
 			right_click = true;
+		break;
+	}
+	case SDL_MOUSEBUTTONUP: {
+		if (event->button.button == SDL_BUTTON_LEFT)
+			left_click = false;
+		else if (event->button.button == SDL_BUTTON_RIGHT)
+			right_click = false;
 		break;
 	}
 	case SDL_QUIT:
@@ -68,7 +75,6 @@ bool GameState::step() {
 
 	//std::vector<GameInst*> safe_copy = inst_set.to_vector();
 	//memset(key_states, 0, sizeof(key_states));
-	left_click = false, right_click = false;
 	SDL_GetMouseState(&mousex, &mousey);
 	while (SDL_PollEvent(&event)) {
 		if (handle_event(&event))

@@ -27,13 +27,12 @@ struct PathCoord {
 };
 
 struct PathingNode {
-	bool solid;
-	bool open;
+	bool solid, open, marked;
 	int dx, dy, distance;
 	PathingNode() {
 	}
 	PathingNode(bool solid, bool open, int dx, int dy, int dist) :
-			solid(solid), open(open), dx(dx), dy(dy), distance(dist) {
+			solid(solid), open(open), marked(false), dx(dx), dy(dy), distance(dist) {
 	}
 };
 
@@ -46,7 +45,9 @@ public:
 	int height() { return h; }
 	void interpolated_direction(int x, int y, int w, int h, float speed, float& vx, float& vy);
 	PathingNode* get(int x, int y) { return &path[w*y+x]; }
-	void stake_claim_from(int x, int y);
+	void stake_claim(int x, int y);
+	//Call before 'interpolated_direction'
+	void adjust_for_claims(int x, int y);
 	void draw(GameState* gs);
 private:
 	void point_to_local_min(int sx, int sy);
