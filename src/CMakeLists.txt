@@ -25,8 +25,12 @@ set( lanarts_src
 	
 	main.cpp
 	
+	procedural/featuregen.cpp
+	procedural/GeneratedLevel.cpp
+	procedural/levelgen.cpp
 	procedural/mtwist.cpp
-	procedural/roomgen.cpp
+	procedural/pathfind.cpp
+	procedural/tunnelgen.cpp
 	
 	util/draw_util.cpp
 	util/font_util.cpp
@@ -69,9 +73,11 @@ set( lanarts_include
 	
 	pathfind/pathfind.h
 	
+	procedural/featuregen.h
+	procedural/GeneratedLevel.h
+	procedural/levelgen.h
 	procedural/mtwist.h
 	procedural/pathfind.h
-	procedural/roomgen.h
 	procedural/tunnelgen.h
 	
 	util/draw_util.h
