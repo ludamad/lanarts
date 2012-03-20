@@ -11,6 +11,7 @@ include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE
 set( lanarts_src
 	combat_logic/Item.cpp
 	
+	data/enemy_data.cpp
 	data/tile_data.cpp
 	data/sprite_data.cpp
 	data/dungeon_data.cpp
@@ -25,6 +26,7 @@ set( lanarts_src
 	
 	main.cpp
 	
+	procedural/enemygen.cpp
 	procedural/featuregen.cpp
 	procedural/GeneratedLevel.cpp
 	procedural/itemgen.cpp
@@ -47,6 +49,7 @@ set( lanarts_src
 	
 	world/objects/PlayerInst.cpp
 	world/objects/EnemyInst.cpp
+	world/objects/ItemInst.cpp
 	world/objects/BulletInst.cpp
 	world/objects/TestInst.cpp
 
@@ -56,8 +59,8 @@ set( lanarts_src
 set( lanarts_include
 	combat_logic/Item.h
 	
+	data/enemy_data.h
 	data/game_data.h
-	data/monster_entry.h
 	data/sprite_data.h
 	data/dungeon_data.h
 	data/tile_data.h
@@ -73,6 +76,7 @@ set( lanarts_include
 	
 	pathfind/pathfind.h
 	
+	procedural/enemygen.h
 	procedural/featuregen.h
 	procedural/GeneratedLevel.h
 	procedural/itemgen.h
