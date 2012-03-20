@@ -1,5 +1,0 @@
-- Draw black on top of tiles to hide enemies [DONE]
-- Use tiles for player [DONE]
-- Fix graphical glitch where darkness is misaligned with tiles [DONE]
-- Add stat overview
-- Add gameplay in the form of firing shots at enemies

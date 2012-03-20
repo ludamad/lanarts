@@ -9,7 +9,7 @@
 #define GAMETILES_H_
 
 #include <cstring>
-#include "../procedural/roomgen.h"
+#include "../procedural/GeneratedLevel.h"
 
 static const int TILE_SIZE = 32;
 class GameState;
@@ -31,13 +31,12 @@ public:
 	}
 	int tile_width(){ return width; }
 	int tile_height(){ return height; }
-	void generate_level();
-	RoomgenSettings& room_settings(){ return rs; }
+	/* Takes a fully generated level as input*/
+	void generate_tiles(MTwist& mt, GeneratedLevel& level);
 private:
 	char* seen_tiles;
 	int* tiles;
 	int width, height;
-	RoomgenSettings rs;
 };
 
 

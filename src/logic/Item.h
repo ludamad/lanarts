@@ -12,8 +12,8 @@
 class Item {
 
 public:
-	Item();
-	~Item();
+	Item(){}
+	~Item(){}
 };
 
 #endif /* ITEM_H_ */

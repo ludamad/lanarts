@@ -87,7 +87,7 @@ void GameHud::draw_minimap(GameState* gs, int subx, int suby) {
 			iter += 4;
 		}
 	}
-	GameInst* inst = gs->get_instance(gs->player_id());
+	GameInst* inst = gs->get_instance(gs->local_playerid());
 	int arr_x = (inst->x / TILE_SIZE), arr_y = (inst->y / TILE_SIZE);
 	fill_buff2d(minimap_arr, tilew, tileh, arr_x - arr_x % 2, arr_y - arr_y % 2,
 			Colour(255, 180, 99), 2, 2);
@@ -100,7 +100,7 @@ void GameHud::draw_minimap(GameState* gs, int subx, int suby) {
 void GameHud::draw(GameState* gs) {
 	gl_set_drawing_area(x, y, _width, _height);
 
-	GameInst* player_inst = gs->get_instance(gs->player_id());
+	GameInst* player_inst = gs->get_instance(gs->local_playerid());
 	gl_draw_rectangle(0, 0, _width, _height, bg_colour);
 	if (player_inst)
 		draw_player_stats((PlayerInst*) player_inst, 32, 32);
@@ -108,7 +108,7 @@ void GameHud::draw(GameState* gs) {
 		//player = state->get_instance(0);
 	}
 	draw_minimap(gs, 20, 64);
-	gl_printf(gs->primary_font(), Colour(255,255,255),_width/2-15,10,"Lanarts");
+	gl_printf(gs->primary_font(), Colour(255,255,255),_width/2-15,10,"Level %d", gs->branch_level());
 }
 
 GameHud::GameHud(int x, int y, int width, int height) :

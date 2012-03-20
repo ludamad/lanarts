@@ -11,17 +11,21 @@
 #include <cmath>
 #include <SDL_opengl.h>
 #include <cstring>
-#include "../data/tile_data.h"
 #include "objects/EnemyInst.h"
 #include "objects/PlayerInst.h"
+#include <ctime>
+
+#include "../procedural/levelgen.h"
+#include "../data/tile_data.h"
+#include "../data/dungeon_data.h"
 
 GameState::GameState(int width, int height, int vieww, int viewh, int hudw) :
-		world_width(width), world_height(height), pfov(7, VISION_SUBSQRS), tiles(width / TILE_SIZE,
-				height / TILE_SIZE), inst_set(width, height), hud(vieww, 0,
-				hudw, viewh), view(50, 50, vieww, viewh, width, height) {
+		level_number(1), world_width(width), world_height(height), tiles(
+				width / TILE_SIZE, height / TILE_SIZE), inst_set(width, height), hud(
+				vieww, 0, hudw, viewh), view(50, 50, vieww, viewh, width,
+				height) {
 	memset(key_states, 0, sizeof(key_states));
 	init_font(&pfont, "res/arial.ttf", 10);
-	player = 0;
 	gennextstep = false;
 }
 
@@ -72,13 +76,13 @@ int GameState::handle_event(SDL_Event *event) {
 bool GameState::step() {
 	SDL_Event event;
 	const int sub_sqrs = VISION_SUBSQRS;
-	
+
 	if (gennextstep)
-		generate_level();
-	
-	GameInst* player = this->player_obj();
-	if (player)
-		pfov.calculate(this, player->last_x*sub_sqrs/TILE_SIZE, player->last_y*sub_sqrs/TILE_SIZE);
+		reset_level();
+
+	//GameInst* player = this->player_obj();
+	//if (player)
+	//	pfov.calculate(this, player->last_x*sub_sqrs/TILE_SIZE, player->last_y*sub_sqrs/TILE_SIZE);
 
 	//std::vector<GameInst*> safe_copy = inst_set.to_vector();
 	//memset(key_states, 0, sizeof(key_states));
@@ -164,7 +168,8 @@ static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
 //game_id GameState::collides_with(){
 //}
 
-bool GameState::tile_radius_test(int x, int y, int rad, bool issolid,int ttype) {
+bool GameState::tile_radius_test(int x, int y, int rad, bool issolid,
+		int ttype) {
 	int w = world_width / TILE_SIZE, h = world_height / TILE_SIZE;
 	//(rad*2) **2 area
 	//should test x, y positions filling in circle
@@ -214,7 +219,7 @@ int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 }
 bool GameState::object_visible_test(GameInst* obj) {
 	const int sub_sqrs = VISION_SUBSQRS;
-	const int subsize = TILE_SIZE/sub_sqrs;
+	const int subsize = TILE_SIZE / sub_sqrs;
 
 	int w = world_width / subsize, h = world_height / subsize;
 	int x = obj->last_x, y = obj->last_y;
@@ -228,32 +233,47 @@ bool GameState::object_visible_test(GameInst* obj) {
 
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			if (pfov.within_fov(xx,yy))
-				return true;
+			for (int i = 0; i < pc.player_fovs().size(); i++) {
+				if (pc.player_fovs()[i]->within_fov(xx, yy))
+					return true;
+			}
 		}
 	}
 	return false;
 }
 
-void GameState::generate_level(){
-	int px,py,ex,ey;
-	
+void GameState::reset_level() {
+	GeneratedLevel level;
+	DungeonBranch& mainbranch = game_dungeon_data[DNGN_MAIN_BRANCH];
+	int leveln = (level_number-1) % mainbranch.nlevels;
+
+	generate_level(mainbranch.level_data[leveln], mtwist, level);
+
+	int start_x = (tiles.tile_width()-level.width())/2;
+	int start_y = (tiles.tile_height()-level.height())/2;
+
 	inst_set.clear();
-	tiles.generate_level();
-	
+
 	player_controller().clear();
 	monster_controller().clear();
-	
-	RoomgenSettings& rs = tile_grid().room_settings();
-	time_t t;
-	time(&t);
 
-	random_location(rs, t, px, py);
-	add_instance(new PlayerInst(px*32+16,py*32+16));
-	for (int i = 0; i < 25; i++){
-		random_location(rs, t+i, ex, ey);
-		add_instance( new EnemyInst(ex*32+16,ey*32+16));
+	tiles.generate_tiles(mtwist, level);
+
+	Pos ppos = generate_location(mtwist, level);
+	int px = (ppos.x+start_x) * 32 + 16;
+	int py = (ppos.y+start_y) * 32 + 16;
+
+	add_instance(new PlayerInst(px,py));
+
+	for (int i = 0; i < 25; i++) {
+		Pos epos = generate_location(mtwist, level);
+		int ex = (epos.x+start_x) * 32 + 16;
+		int ey = (epos.y+start_y) * 32 + 16;
+		add_instance(new EnemyInst(ex,ey));
 	}
-	window_view().sharp_center_on(px*32+16,py*32+16);
+
+	window_view().sharp_center_on(px, py);
+	//Make sure we aren't going to regenerate the level next step
 	gennextstep = false;
+	level_number++;
 }

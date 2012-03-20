@@ -80,20 +80,13 @@ public:
 		return right_click;
 	}
 
+	/* Object identifier for the player */
+	obj_id local_playerid() {
+		return pc.local_playerid();
+	}
+
 	/* Key state query information */
 	int key_press_state(int keyval);
-
-	/* Object identifier for the player */
-	obj_id& player_id() {
-		return player;
-	}
-	GameInst* player_obj() {
-		return get_instance(player);
-	}
-	/* Field-of-view for the player */
-	fov& player_fov() {
-		return pfov;
-	}
 
 	/* Getters for world size */
 	int width() {
@@ -101,6 +94,9 @@ public:
 	}
 	int height() {
 		return world_height;
+	}
+	int branch_level() {
+		return level_number;
 	}
 
 	void serialize(FILE* file);
@@ -110,15 +106,18 @@ public:
 	}
 	void set_generate_flag(){ gennextstep = true; }
 
-	void generate_level();
+	void reset_level();
 
 private:
 	void restart();
-	int world_width, world_height;
 	int handle_event(SDL_Event* event);
+
+	//Game location information
+	int level_number;
+
+	//Game bounds
+	int world_width, world_height;
 	int frame_n;
-	obj_id player;
-	fov pfov;
 	bool gennextstep;
 
 	//Game world components
@@ -137,6 +136,7 @@ private:
 	//Primary font data
 	font_data pfont;
 
+	//Key/mouse state information
 	char key_states[SDLK_LAST];
 	int mousex, mousey;
 	bool left_click, right_click;

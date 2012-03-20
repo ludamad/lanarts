@@ -10,6 +10,7 @@
 
 #include "tile_data.h"
 #include "sprite_data.h"
+#include "dungeon_data.h"
 
 
 inline void init_game_data(){

@@ -42,8 +42,6 @@ void random_location(GameState* gs, obj_id id){
 }
 
 int main(int argc, char** argv) {
-	//FT_Init_FreeType( &library );
-	obj_id player, enemy;
 	int world_width = 128*TILE_SIZE, world_height = 128*TILE_SIZE;
 	int windoww = 640, windowh = 480;
 	int vieww = 480, viewh = 480;
@@ -59,7 +57,7 @@ int main(int argc, char** argv) {
 		return 0;
 	}
 	init_system(false, windoww, windowh);
-	gs->generate_level();
+	gs->reset_level();
 
 //	gs->add_instance( new TestInst(0,0));
 

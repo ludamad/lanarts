@@ -54,7 +54,6 @@ void PlayerInst::step(GameState* gs){
 		view.center_on(nx, ny);
 	} else
 		view.center_on(last_x,last_y);
-	gs->player_id() = id;
 }
 
 void PlayerInst::draw(GameState* gs){

@@ -6,13 +6,3 @@
  */
 
 #include "Item.h"
-
-Item::Item() {
-	// TODO Auto-generated constructor stub
-
-}
-
-Item::~Item() {
-	// TODO Auto-generated destructor stub
-}
-

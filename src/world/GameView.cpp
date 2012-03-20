@@ -10,7 +10,7 @@
 #include <algorithm>
 #include "GameTiles.h"
 
-static const int VIEW_SUBW = 200, VIEW_SUBH = 200;
+static const int VIEW_SUBW = 100, VIEW_SUBH =100;
 static const int VIEW_SPEED = 8;
 
 void GameView::move_towards(int px, int py) {

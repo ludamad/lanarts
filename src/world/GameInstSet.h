@@ -16,7 +16,7 @@ class GameState;
 
 //Collection class that keeps track of game objects and assigns instance-id's.
 //Deallocates destroyed objects at end of step.
-//Use instance IDs to refer to objects in enemy memory.
+//Use instance IDs to refer to objects that may or may not still be alive.
 
 class GameInstSet {
 public:

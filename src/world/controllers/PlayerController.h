@@ -23,7 +23,7 @@ public:
 
 	const std::vector<obj_id>& player_ids() { return pids; }
 	const std::vector<fov*>& player_fovs() { return fovs; }
-
+	obj_id local_playerid() { return local_player; }
 private:
 	obj_id local_player;
 	std::vector<fov*> fovs;

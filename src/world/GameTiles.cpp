@@ -13,7 +13,7 @@
 #include "../data/tile_data.h"
 #include "../display/display.h"
 #include "../util/draw_util.h"
-#include "../procedural/roomgen.h"
+#include "../procedural/levelgen.h"
 
 void GameTiles::pre_draw(GameState* gs) {
 	GameView& view = gs->window_view();
@@ -91,49 +91,43 @@ void GameTiles::post_draw(GameState* gs) {
 	}
 }
 
-void GameTiles::generate_level() {
+void GameTiles::generate_tiles(MTwist& mt, GeneratedLevel& level) {
+	int lw = level.width(), lh = level.height();
+	int start_x = (width-lw)/2;
+	int start_y = (height-lh)/2;
+	int end_x = start_x + lw, end_y = start_y + lh;
+
 	memset(tiles, 0, width * height * sizeof(int));
 	memset(seen_tiles, 0, width * height);
-	int start_x = width/4, start_y = height/4;
-	int end_x = width - start_x, end_y = height - start_y;
-	int gen_width = width/2, gen_height = height/2;
-	generate_random_level(rs);
-	MTwist mt(~rs.seed);
-	memset(tiles, 0, sizeof(int)*width*height);
 
 	for (int y = start_y; y < end_y; y++) {
 		for (int x = start_x; x < end_x; x++) {
 			int ind = y*width+x;
-			int rs_ind = (y-start_y) * rs.w + (x-start_x);
-
-			//printf(sqr[ind].passable ? "-" : "X");
-			Sqr& s = rs.sqrs[rs_ind];
+			Sqr& s = level.at(x-start_x, y-start_y);
 			if (s.passable) {
 				tiles[ind] = TILE_FLOOR;
 				if (s.roomID){
 //					if (s.marking)
-					if ((mt.genrand_int31() % 150) == 0){
+					if (mt.rand(150) == 0){
 						tiles[ind] = TILE_STAIR_DOWN;
 					}
 // 					tiles[ind] = TILE_MESH_0+s.marking;
-				} else if (s.marking == SMALL_CORRIDOR){
+				} else if (s.feature == SMALL_CORRIDOR){
 					tiles[ind] = TILE_CORRIDOR_FLOOR;
 				}
 			} else {
 				tiles[ind] = TILE_WALL;
-				if (s.marking == SMALL_CORRIDOR){
-					if ((mt.genrand_int31() % 4) == 0){
+				if (s.feature == SMALL_CORRIDOR){
+					if (mt.rand(4) == 0){
 						tiles[ind] = TILE_STONE_WALL;
 					}
 				}
 			}
 		}
-		//printf("\n");
 	}
-	//for (int i = 0; i < 80; i++) printf("-");
 }
 GameTiles::GameTiles(int width, int height) :
-		width(width), height(height), rs(width/2, height/2,-1,5, 1) {
+		width(width), height(height) {
 	seen_tiles = new char[width * height];
 	tiles = new int[width * height];
 	memset(tiles, 0, width * height * sizeof(int));
