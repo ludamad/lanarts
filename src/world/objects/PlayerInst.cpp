@@ -1,5 +1,6 @@
 #include "PlayerInst.h"
 #include "BulletInst.h"
+#include "EnemyInst.h"
 
 #include "../../util/draw_util.h"
 #include "../GameState.h"
@@ -73,4 +74,3 @@ void PlayerInst::draw(GameState* gs){
 
 //	gs->monster_controller().paths[0].draw(gs);
 }
-

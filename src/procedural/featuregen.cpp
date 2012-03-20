@@ -9,10 +9,10 @@
 #include "../world/GameState.h"
 #include "../data/tile_data.h"
 
-void generate_features(const FeatureGenSettings& rs, MTwist& mt, GeneratedLevel& level, GameState* gs){
+void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel& level, GameState* gs){
 	GameTiles& tiles = gs->tile_grid();
 	tiles.clear();
-
+	
 	int tw = tiles.tile_width(), th = tiles.tile_height();
 	int lw = level.width(), lh = level.height();
 
@@ -29,9 +29,6 @@ void generate_features(const FeatureGenSettings& rs, MTwist& mt, GeneratedLevel&
 				tiles.get(x,y) = TILE_FLOOR;
 				if (s.roomID){
 //					if (s.marking)
-					if (mt.rand(150) == 0){
-						tiles.get(x,y) = TILE_STAIR_DOWN;
-					}
 // 					tiles[ind] = TILE_MESH_0+s.marking;
 				} else if (s.feature == SMALL_CORRIDOR){
 					tiles.get(x,y) = TILE_CORRIDOR_FLOOR;
@@ -45,6 +42,23 @@ void generate_features(const FeatureGenSettings& rs, MTwist& mt, GeneratedLevel&
 				}
 			}
 		}
+	}
+	for(int n = 0; n < fs.nstairs_down; n++){
+		Pos p = generate_location(mt, level);
+		level.at(p).has_instance = true;
+		p.x += start_x;
+		p.y += start_y;
+		
+		tiles.get(p.x, p.y) = TILE_STAIR_DOWN;
+	}
+	
+	for(int n = 0; n < fs.nstairs_up; n++){
+		Pos p = generate_location(mt, level);
+		level.at(p).has_instance = true;
+		p.x += start_x;
+		p.y += start_y;
+		
+		tiles.get(p.x, p.y) = TILE_STAIR_UP;
 	}
 
 }

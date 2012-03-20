@@ -61,7 +61,7 @@ void set_monster_headings(GameState* gs, std::vector<PathInfo>& paths, std::vect
 		double abs = sqrt(pdist);
 		if (abs < e->radius + player->radius)
 			eb.vx = 0, eb.vy = 0;
-		if (abs + e->stats().melee_reach < e->radius + player->radius ){
+		if (abs - e->stats().melee_reach < e->radius + player->radius ){
 			e->attack(player);
 		}
 	}

@@ -29,6 +29,7 @@ void EnemyInst::step(GameState* gs) {
 	x = (int) round(rx += eb.vx); //update based on rounding of true float
 	y = (int) round(ry += eb.vy);
 //	}
+	stats().step();
 }
 void EnemyInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
