@@ -11,6 +11,8 @@
 #include "mtwist.h"
 #include "GeneratedLevel.h"
 
+class GameState;
+
 struct ItemGenSettings {
 	int item_level;
 	int min_items, max_items;
@@ -21,7 +23,7 @@ struct ItemGenSettings {
 };
 
 
-void generate_items(const ItemGenSettings& rs, MTwist& mt, GeneratedLevel& room);
+void generate_items(const ItemGenSettings& is, MTwist& mt, GeneratedLevel& level, GameState* gs);
 
 
 #endif /* ITEMGEN_H_ */

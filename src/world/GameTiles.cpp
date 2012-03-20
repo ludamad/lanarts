@@ -90,7 +90,7 @@ void GameTiles::post_draw(GameState* gs) {
 		}
 	}
 }
-
+/*
 void GameTiles::generate_tiles(MTwist& mt, GeneratedLevel& level) {
 	int lw = level.width(), lh = level.height();
 	int start_x = (width-lw)/2;
@@ -125,7 +125,7 @@ void GameTiles::generate_tiles(MTwist& mt, GeneratedLevel& level) {
 			}
 		}
 	}
-}
+}*/
 GameTiles::GameTiles(int width, int height) :
 		width(width), height(height) {
 	seen_tiles = new char[width * height];

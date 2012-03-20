@@ -24,11 +24,12 @@ struct Sqr {
 	bool passable;
 	bool perimeter; //if roomID 0, perimeter of tunnel
 	bool is_corner;
+	bool has_instance;
 	feature_t feature;
 	unsigned short groupID; //For connectivity tests
 	unsigned short roomID; //0 if not in room
 	Sqr(int passable, int perimeter, int is_corner, feature_t f, int groupID, int roomID) :
-			passable(passable), perimeter(perimeter), is_corner(is_corner), feature(
+			passable(passable), perimeter(perimeter), is_corner(is_corner), has_instance(false), feature(
 					f), groupID(groupID), roomID(roomID) {
 	}
 	Sqr() {

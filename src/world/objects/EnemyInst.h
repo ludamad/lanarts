@@ -3,6 +3,7 @@
 
 #include "GameInst.h"
 #include "../../combat_logic/Stats.h"
+#include "../../data/enemy_data.h"
 
 struct EnemyBehaviour {
 	enum Action {
@@ -17,10 +18,9 @@ struct EnemyBehaviour {
 };
 
 class EnemyInst : public GameInst {
-	enum {RADIUS = 14};
 public:
-	EnemyInst(int x, int y) :
-		GameInst(x,y, RADIUS), eb(1.0f), rx(x), ry(y), stat(100,100, 5) {
+	EnemyInst(EnemyType* type, int x, int y) :
+		GameInst(x,y, type->radius), eb(1.0f), type(type), rx(x), ry(y), stat(type->basestats) {
 	}
 	virtual ~EnemyInst();
 	virtual void init(GameState* gs);
@@ -31,6 +31,7 @@ public:
 	EnemyBehaviour& behaviour() { return eb; }
 protected:
 	EnemyBehaviour eb;
+	EnemyType* type;
 	float rx, ry;
     Stats stat;
 };

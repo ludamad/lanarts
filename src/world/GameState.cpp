@@ -20,7 +20,7 @@
 #include "../data/dungeon_data.h"
 
 GameState::GameState(int width, int height, int vieww, int viewh, int hudw) :
-		level_number(1), world_width(width), world_height(height), tiles(
+		level_number(0), world_width(width), world_height(height), tiles(
 				width / TILE_SIZE, height / TILE_SIZE), inst_set(width, height), hud(
 				vieww, 0, hudw, viewh), view(50, 50, vieww, viewh, width,
 				height) {
@@ -245,34 +245,14 @@ bool GameState::object_visible_test(GameInst* obj) {
 void GameState::reset_level() {
 	GeneratedLevel level;
 	DungeonBranch& mainbranch = game_dungeon_data[DNGN_MAIN_BRANCH];
-	int leveln = (level_number-1) % mainbranch.nlevels;
-
-	generate_level(mainbranch.level_data[leveln], mtwist, level);
-
-	int start_x = (tiles.tile_width()-level.width())/2;
-	int start_y = (tiles.tile_height()-level.height())/2;
+	int leveln = level_number % mainbranch.nlevels;
 
 	inst_set.clear();
-
 	player_controller().clear();
 	monster_controller().clear();
 
-	tiles.generate_tiles(mtwist, level);
+	generate_level(mainbranch.level_data[leveln], mtwist, level, this);
 
-	Pos ppos = generate_location(mtwist, level);
-	int px = (ppos.x+start_x) * 32 + 16;
-	int py = (ppos.y+start_y) * 32 + 16;
-
-	add_instance(new PlayerInst(px,py));
-
-	for (int i = 0; i < 25; i++) {
-		Pos epos = generate_location(mtwist, level);
-		int ex = (epos.x+start_x) * 32 + 16;
-		int ey = (epos.y+start_y) * 32 + 16;
-		add_instance(new EnemyInst(ex,ey));
-	}
-
-	window_view().sharp_center_on(px, py);
 	//Make sure we aren't going to regenerate the level next step
 	gennextstep = false;
 	level_number++;

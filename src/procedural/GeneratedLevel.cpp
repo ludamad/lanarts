@@ -120,6 +120,6 @@ Pos generate_location(MTwist& mt, GeneratedLevel& level) {
 		ind = p.y * level.width() + p.x;
 		s = &level.at(p.x, p.y);
 	} while (s->roomID == 0 || !s->passable
-			|| s->is_corner);
+			|| s->is_corner || s->has_instance);
 	return p;
 }

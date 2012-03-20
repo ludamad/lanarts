@@ -32,7 +32,7 @@ void EnemyInst::step(GameState* gs) {
 }
 void EnemyInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
-	GLImage& img = spr_zombie.img;
+	GLImage& img = game_sprite_data[type->sprite_number].img;
 
 	int w = img.width, h = img.height;
 	int xx = x - w / 2, yy = y - h / 2;
@@ -44,14 +44,8 @@ void EnemyInst::draw(GameState* gs) {
 
 	if (stat.hp < stat.max_hp)
 		gl_draw_hpbar(view, stat, x - 10, y - 20, 20, 5);
-	//gl_draw_circle(view, x,y,RADIUS);
 
 	image_display(&img, xx - view.x, yy - view.y);
-	//gl_draw_rectangle(x,y,50,50, Colour(255,0,0));
-//	gl_printf(gs->primary_font(), Colour(255,255,255),
-//			x-10-view.x, y-30-view.y,
-//			"vx=%g, vy=%g",
-//			eb.vx, eb.vy);
 }
 
 

@@ -9,7 +9,6 @@
 #define GAMETILES_H_
 
 #include <cstring>
-#include "../procedural/GeneratedLevel.h"
 
 static const int TILE_SIZE = 32;
 class GameState;
@@ -17,6 +16,7 @@ class GameState;
 class GameTiles {
 public:
 	int& get(int x, int y){ return tiles[y*width+x]; }
+	int* tile_array(){return tiles; }
 	bool seen(int x, int y){ return seen_tiles[y*width+x]; }
 	//NOTE: unused for time being, remove in later version
 	void draw(GameState* gs);
@@ -31,8 +31,10 @@ public:
 	}
 	int tile_width(){ return width; }
 	int tile_height(){ return height; }
-	/* Takes a fully generated level as input*/
-	void generate_tiles(MTwist& mt, GeneratedLevel& level);
+	void clear (){
+		memset(seen_tiles, 0, width*height);
+		memset(tiles, 0, sizeof(int)*width*height);
+	}
 private:
 	char* seen_tiles;
 	int* tiles;

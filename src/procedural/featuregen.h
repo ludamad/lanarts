@@ -11,14 +11,17 @@
 #include "mtwist.h"
 #include "GeneratedLevel.h"
 
+class GameState;
 struct FeatureGenSettings {
 	int nstairs_up, nstairs_down;
-	FeatureGenSettings(int nups, int ndowns) :
-			nstairs_up(nups), nstairs_down(ndowns) {
+	int tileset;
+	FeatureGenSettings(int nups, int ndowns, int tileset) :
+			nstairs_up(nups), nstairs_down(ndowns), tileset(tileset) {
 	}
 };
 
-void generate_features(const FeatureGenSettings& rs, MTwist& mt, GeneratedLevel& level);
+//Generates tiles
+void generate_features(const FeatureGenSettings& rs, MTwist& mt, GeneratedLevel& level, GameState* gs);
 
 
 #endif /* FEATUREGEN_H_ */
