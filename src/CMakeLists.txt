@@ -27,9 +27,9 @@ set( lanarts_src
 	
 	procedural/featuregen.cpp
 	procedural/GeneratedLevel.cpp
+	procedural/itemgen.cpp
 	procedural/levelgen.cpp
 	procedural/mtwist.cpp
-	procedural/pathfind.cpp
 	procedural/tunnelgen.cpp
 	
 	util/draw_util.cpp
@@ -75,6 +75,7 @@ set( lanarts_include
 	
 	procedural/featuregen.h
 	procedural/GeneratedLevel.h
+	procedural/itemgen.h
 	procedural/levelgen.h
 	procedural/mtwist.h
 	procedural/pathfind.h
