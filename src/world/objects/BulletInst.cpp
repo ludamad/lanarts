@@ -15,11 +15,11 @@ BulletInst::~BulletInst() {
 
 }
 
-BulletInst::BulletInst(obj_id originator, int x, int y, int tx, int ty) :
+BulletInst::BulletInst(obj_id originator, int speed, int x, int y, int tx, int ty) :
 		GameInst(x, y, RADIUS, false), origin_id(originator), rx(x), ry(y) {
 	int dx = tx - x, dy = ty - y;
 	double abs = sqrt(dx * dx + dy * dy);
-	vx = dx * 7.0 / abs, vy = dy * 7.0 / abs;
+	vx = dx * speed / abs, vy = dy * speed / abs;
 }
 
 static bool enemy_hit(GameInst* self, GameInst* other){
@@ -63,5 +63,5 @@ void BulletInst::step(GameState* gs) {
 
 void BulletInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
-	gl_draw_circle(view, x, y, RADIUS, Colour(0, 255, 0));
+	gl_draw_circle(view, x, y, RADIUS, (origin_id == gs->local_playerid()) ? Colour(0, 255, 0) : Colour(255,0,0));
 }

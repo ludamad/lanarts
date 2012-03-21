@@ -12,8 +12,8 @@
 #include "sprite_data.h"
 
 EnemyType game_enemy_data[] = {
-		EnemyType("Zombie", 14, SPR_ZOMBIE, Stats(100,100, 3)),
-		EnemyType("Storm Elemental", 14, SPR_STORM_ELE, Stats(100,100, 7))
+		EnemyType("Zombie", 14, SPR_ZOMBIE, Stats(100,100, 70, 3, 4)),
+		EnemyType("Storm Elemental", 14, SPR_STORM_ELE, Stats(100,100, 70, 7, 4))
 };
 
 size_t game_enemy_n = sizeof(game_enemy_data)/sizeof(EnemyType);

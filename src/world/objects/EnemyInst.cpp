@@ -60,7 +60,7 @@ void EnemyInst::attack(GameState* gs, GameInst* inst){
 	}*/
 
 	if (dynamic_cast<PlayerInst*>(inst)) {
-		GameInst* bullet = new BulletInst(id, x,y,inst->x, inst->y);
+		GameInst* bullet = new BulletInst(id, stats().bulletspeed, x,y,inst->x, inst->y);
 		gs->add_instance(bullet);
 		stats().reset_cooldown();
 	}
