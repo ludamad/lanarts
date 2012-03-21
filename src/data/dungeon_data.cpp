@@ -9,7 +9,7 @@
 
 //Standard width and height
 const int STD_W = 128, STD_H = 128;
-ItemGenSettings itemdefault(1 /*more = stronger items*/, 5, 10 /*5 to 10 items*/);
+ItemGenSettings itemdefault(1 /*more = stronger items*/, 10, 10 /*10 to 10 items*/);
 
 RoomGenSettings roomdensevaried(1 /*padding*/, 90 /*amount of rooms*/, 4 /*min size*/, 30 /*max size*/);
 RoomGenSettings roommediumhighpad(3 /*padding*/, 30 /*amount of rooms*/, 4 /*min size*/, 20 /*max size*/);

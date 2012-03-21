@@ -43,10 +43,11 @@ void random_location(GameState* gs, obj_id id){
 
 int main(int argc, char** argv) {
 	int world_width = 128*TILE_SIZE, world_height = 128*TILE_SIZE;
-	int windoww = 640, windowh = 480;
-	int vieww = 480, viewh = 480;
-//	int windoww = 1280, windowh = 960;
-//	int vieww = 960, viewh = 960;
+//	int windoww = 640, windowh = 480;
+//  int vieww = 480, viewh = 480;
+	int hudw = 160;
+	int windoww = 960, windowh = 720;
+	int vieww = windoww -hudw, viewh = windowh;
 	char* host = argv[1], * port = argv[2];
 	bool cont = true;
 	SDL_Event event;

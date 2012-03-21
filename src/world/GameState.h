@@ -80,6 +80,9 @@ public:
 		return right_click;
 	}
 
+	int frame(){
+		return frame_n;
+	}
 	/* Object identifier for the player */
 	obj_id local_playerid() {
 		return pc.local_playerid();
@@ -95,7 +98,7 @@ public:
 	int height() {
 		return world_height;
 	}
-	int branch_level() {
+	int& branch_level() {
 		return level_number;
 	}
 

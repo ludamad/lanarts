@@ -20,7 +20,7 @@
 #include "../data/dungeon_data.h"
 
 GameState::GameState(int width, int height, int vieww, int viewh, int hudw) :
-		level_number(0), world_width(width), world_height(height), tiles(
+		level_number(0), world_width(width), world_height(height), frame_n(0), tiles(
 				width / TILE_SIZE, height / TILE_SIZE), inst_set(width, height), hud(
 				vieww, 0, hudw, viewh), view(50, 50, vieww, viewh, width,
 				height) {
@@ -91,6 +91,7 @@ bool GameState::step() {
 		if (handle_event(&event))
 			return false;
 	}
+	frame_n++;
 	pc.pre_step(this);
 	mc.pre_step(this);
 	inst_set.step(this);

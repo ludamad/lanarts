@@ -103,15 +103,18 @@ void GameHud::draw_minimap(GameState* gs, int subx, int suby) {
 void GameHud::draw(GameState* gs) {
 	gl_set_drawing_area(x, y, _width, _height);
 
-	GameInst* player_inst = gs->get_instance(gs->local_playerid());
+	PlayerInst* player_inst = (PlayerInst*) gs->get_instance(gs->local_playerid());
 	gl_draw_rectangle(0, 0, _width, _height, bg_colour);
+
 	if (player_inst)
-		draw_player_stats((PlayerInst*) player_inst, 32, 32);
+		draw_player_stats(player_inst, 32, 32);
 	else {
 		//player = state->get_instance(0);
 	}
-	draw_minimap(gs, 20, 64+20);
-	gl_printf(gs->primary_font(), Colour(255,255,255),_width/2-15,10,"Level %d", gs->branch_level());
+	draw_minimap(gs, 20, 64+45);
+	gl_printf(gs->primary_font(), Colour(255,255,255),_width/2-15,10,"Floor %d", gs->branch_level());
+	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-15,64+45+128,"Level %d", player_inst->stats().xplevel);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-15,64+45+128+15,"Gold %d", player_inst->gold());
 }
 
 GameHud::GameHud(int x, int y, int width, int height) :

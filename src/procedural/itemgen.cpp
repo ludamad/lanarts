@@ -15,7 +15,7 @@ void generate_items(const ItemGenSettings& is, MTwist& mt, GeneratedLevel& level
 	int start_x = (tiles.tile_width()-level.width())/2;
 	int start_y = (tiles.tile_height()-level.height())/2;
 
-	int amount = mt.rand(is.min_items, is.max_items);
+	int amount = mt.rand(is.min_items, is.max_items+1);
 
 	for (int i = 0; i < amount; i++) {
 

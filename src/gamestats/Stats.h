@@ -2,15 +2,21 @@
 #define STATS_H_
 
 struct Stats {
+	float movespeed;
 	int hp, max_hp;
 	int mp, max_mp;
+	bool can_melee, can_range;//TODO: Make much more fleshed out with attack profiles
 	int cooldown, start_cooldown;
-	int melee_reach, bulletspeed;
-	int xp, xpneeded;
-	Stats(int hp, int mp, int cooldown, int mreach, int bspeed = 7) :
-			hp(hp), max_hp(hp), mp(mp), max_mp(mp), cooldown(cooldown),
-			start_cooldown(cooldown), melee_reach(mreach), bulletspeed(bspeed), xp(0),
-			xpneeded(100) {
+	int melee_reach, range, bulletspeed;
+	int xp, xpneeded, xplevel;
+	Stats(float speed, int hp, int mp, bool can_melee, bool can_range, int cooldown, int mreach, int range, int bspeed = 7) :
+			movespeed(speed),
+			hp(hp), max_hp(hp), mp(mp), max_mp(mp),
+			can_melee(can_melee), can_range(can_range),
+			cooldown(cooldown), start_cooldown(cooldown),
+			melee_reach(mreach), range(range),
+			bulletspeed(bspeed),
+			xp(0), xpneeded(100), xplevel(1) {
 	}
 	void step() {
 		cooldown--;
@@ -22,6 +28,14 @@ struct Stats {
 	}
 	void reset_cooldown() {
 		cooldown = start_cooldown;
+	}
+	void gain_xp(int amnt){
+		xp += amnt;
+		if (xp < xpneeded){
+			xp -= xpneeded;
+			xpneeded = xplevel*100;
+		}
+		xplevel ++;
 	}
 };
 

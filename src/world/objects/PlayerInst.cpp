@@ -1,6 +1,7 @@
 #include "PlayerInst.h"
 #include "BulletInst.h"
 #include "EnemyInst.h"
+#include "ItemInst.h"
 
 #include "../../util/draw_util.h"
 #include "../GameState.h"
@@ -16,36 +17,57 @@ void PlayerInst::init(GameState* gs){
 	pc.register_player(this->id);
 }
 
+static bool item_hit(GameInst* self, GameInst* other){
+	return dynamic_cast<ItemInst*>(other) != NULL;
+}
+
+
 void PlayerInst::step(GameState* gs){
 	GameView& view = gs->window_view();
 
+	if (stats().hp <= 0){
+		gs->branch_level() = 0;
+		gs->reset_level();
+		return;
+	}
 	if (gs->key_press_state(SDLK_UP) || gs->key_press_state(SDLK_w)){
-		if (!gs->tile_radius_test(x, y-4, RADIUS))
-			y -= 4;
+		if (!gs->tile_radius_test(x, y-stats().movespeed, RADIUS))
+			y -= stats().movespeed;
 	}
 	if (gs->key_press_state(SDLK_RIGHT) || gs->key_press_state(SDLK_d)){
-		if (!gs->tile_radius_test(x+4, y, RADIUS))
-			x += 4;
+		if (!gs->tile_radius_test(x+stats().movespeed, y, RADIUS))
+			x += stats().movespeed;
 	}
 	if (gs->key_press_state(SDLK_DOWN) || gs->key_press_state(SDLK_s)){
-		if (!gs->tile_radius_test(x, y+4, RADIUS))
-		y += 4;
+		if (!gs->tile_radius_test(x, y+stats().movespeed, RADIUS))
+		y += stats().movespeed;
 	}
 	if (gs->key_press_state(SDLK_LEFT) || gs->key_press_state(SDLK_a)){
-		if (!gs->tile_radius_test(x-4, y, RADIUS))
-		x -= 4;
+		if (!gs->tile_radius_test(x-stats().movespeed, y, RADIUS))
+		x -= stats().movespeed;
 	}
-	if (gs->key_press_state(SDLK_c)){
+	if (money >= 100 && gs->key_press_state(SDLK_c)){
 		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN)){
 			gs->set_generate_flag();
 		}
 	}
+	ItemInst* item = NULL;
+	if (gs->object_radius_test(this, (GameInst**)&item, 1, &item_hit) ) {
+		gs->remove_instance(item);
+		money += 10;
+	}
 
-	base_stats.step();
+
+	stats().step();
+	if ( gs->frame() % 25 == 0 ) {
+	if (++stats().hp > stats().max_hp)
+		stats().hp = stats().max_hp;
+	}
+
 
 	if ((gs->key_press_state(SDLK_f) || gs->mouse_left_click()) && !base_stats.has_cooldown()){
 		int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
-		GameInst* bullet = new BulletInst(id, stats().bulletspeed, x,y,rmx, rmy);
+		GameInst* bullet = new BulletInst(id, stats().bulletspeed, stats().range, x,y,rmx, rmy);
 		gs->add_instance(bullet);
 		base_stats.reset_cooldown();
 	}
@@ -67,11 +89,11 @@ void PlayerInst::draw(GameState* gs){
 
 	image_display(&img, x-img.width/2-view.x, y-img.height/2-view.y);
 	//for (int i = 0; i < 10; i++)
-	gl_printf(gs->primary_font(), Colour(255,255,255), x-10-view.x, y-30-view.y, "id=%d", this->id);
-	gl_printf(gs->primary_font(), Colour(255,255,255), gs->mouse_x(), gs->mouse_y(),
-			"mx=%d,my=%d\nx=%d,y=%d",
-			gs->mouse_x(), gs->mouse_y(),
-			gs->mouse_x()+view.x, gs->mouse_y()+view.y);
+//	gl_printf(gs->primary_font(), Colour(255,255,255), x-10-view.x, y-30-view.y, "id=%d", this->id);
+//	gl_printf(gs->primary_font(), Colour(255,255,255), gs->mouse_x(), gs->mouse_y(),
+//			"mx=%d,my=%d\nx=%d,y=%d",
+//			gs->mouse_x(), gs->mouse_y(),
+//			gs->mouse_x()+view.x, gs->mouse_y()+view.y);
 
 
 //	gs->monster_controller().paths[0].draw(gs);

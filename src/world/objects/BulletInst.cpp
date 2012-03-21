@@ -15,8 +15,8 @@ BulletInst::~BulletInst() {
 
 }
 
-BulletInst::BulletInst(obj_id originator, int speed, int x, int y, int tx, int ty) :
-		GameInst(x, y, RADIUS, false), origin_id(originator), rx(x), ry(y) {
+BulletInst::BulletInst(obj_id originator, int speed, int range, int x, int y, int tx, int ty) :
+		GameInst(x, y, RADIUS, false), speed(speed), range_left(range), origin_id(originator), rx(x), ry(y) {
 	int dx = tx - x, dy = ty - y;
 	double abs = sqrt(dx * dx + dy * dy);
 	vx = dx * speed / abs, vy = dy * speed / abs;
@@ -32,9 +32,13 @@ static bool player_hit(GameInst* self, GameInst* other){
 void BulletInst::step(GameState* gs) {
 	x = (int) round(rx += vx); //update based on rounding of true float
 	y = (int) round(ry += vy);
-	bool b = gs->tile_radius_test(x, y, RADIUS);
-	if (b)
+
+	range_left -= speed;
+
+	if (range_left <= 0 || gs->tile_radius_test(x, y, RADIUS)){
 		gs->remove_instance(this);
+		return;
+	}
 
 	GameInst* origin = gs->get_instance(origin_id);
 	if (dynamic_cast<PlayerInst*>(origin)){
@@ -46,7 +50,7 @@ void BulletInst::step(GameState* gs) {
 			if (s.hp <= 0) {
 				s.hp = 0;
 				gs->remove_instance(enemy);
-				((PlayerInst*)origin)->stats().xp += 10;
+				((PlayerInst*)origin)->stats().gain_xp(10);
 			}
 			gs->remove_instance(this);
 		}

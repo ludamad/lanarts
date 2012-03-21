@@ -20,13 +20,13 @@ struct EnemyBehaviour {
 class EnemyInst : public GameInst {
 public:
 	EnemyInst(EnemyType* type, int x, int y) :
-		GameInst(x,y, type->radius), eb(1.0f), type(type), rx(x), ry(y), stat(type->basestats) {
+		GameInst(x,y, type->radius), eb(type->basestats.movespeed), type(type), rx(x), ry(y), stat(type->basestats) {
 	}
 	virtual ~EnemyInst();
 	virtual void init(GameState* gs);
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
-	void attack(GameState* gs, GameInst* inst);
+	void attack(GameState* gs, GameInst* inst, bool ranged);
 	Stats& stats() { return stat; }
 	EnemyBehaviour& behaviour() { return eb; }
 protected:

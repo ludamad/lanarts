@@ -59,10 +59,13 @@ void set_monster_headings(GameState* gs, std::vector<PathInfo>& paths, std::vect
 	//	paths[pind].stake_claim(e->x, e->y);
 		//Compare position to player object
 		double abs = sqrt(pdist);
-		if (abs < e->radius + player->radius)
+		Stats& s = e->stats();
+		if (abs < e->radius + player->radius || (s.can_range && abs < s.range/2))
 			eb.vx = 0, eb.vy = 0;
-		if ( abs < 300/*abs - e->stats().melee_reach < e->radius + player->radius*/ ){
-			e->attack(gs, player);
+		if ( s.can_melee && abs < s.melee_reach + 10 ){
+			e->attack(gs, player, false);
+		} else if ( s.can_range && abs < s.range+ 10 ){
+			e->attack(gs, player, true);
 		}
 	}
 }
