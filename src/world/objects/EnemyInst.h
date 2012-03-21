@@ -2,7 +2,7 @@
 #define ENEMYINST_H_
 
 #include "GameInst.h"
-#include "../../combat_logic/Stats.h"
+#include "../../gamestats/Stats.h"
 #include "../../data/enemy_data.h"
 
 struct EnemyBehaviour {
@@ -26,7 +26,7 @@ public:
 	virtual void init(GameState* gs);
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
-	void attack(GameInst* inst);
+	void attack(GameState* gs, GameInst* inst);
 	Stats& stats() { return stat; }
 	EnemyBehaviour& behaviour() { return eb; }
 protected:

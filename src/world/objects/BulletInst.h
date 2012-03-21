@@ -6,11 +6,12 @@
 class BulletInst: public GameInst {
 	enum {RADIUS = 5};
 public:
-	BulletInst(int x, int y, int tx, int ty);
+	BulletInst(obj_id originator, int x, int y, int tx, int ty);
 	~BulletInst();
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
 private:
+	int origin_id;
 	float rx, ry, vx, vy;
 };
 

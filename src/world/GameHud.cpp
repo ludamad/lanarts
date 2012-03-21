@@ -15,10 +15,13 @@
 
 static void draw_player_stats(PlayerInst* player, int x, int y) {
 	Stats& s = player->stats();
-	gl_draw_rectangle(x, y, 100, 10, Colour(255, 0, 0));
-	gl_draw_rectangle(x, y, 100 * s.hp / s.max_hp, 10, Colour(0, 255, 0));
-	gl_draw_rectangle(x, y + 15, 100, 10, Colour(200, 200, 200));
-	gl_draw_rectangle(x, y + 15, 100 * s.mp / s.max_mp, 10, Colour(0, 0, 255));
+	gl_draw_statbar(x, y, 100, 10, s.hp, s.max_hp);
+//	gl_draw_rectangle(x, y, 100, 10, Colour(255, 0, 0));
+//	gl_draw_rectangle(x, y, 100 * s.hp / s.max_hp, 10, Colour(0, 255, 0));
+	gl_draw_statbar(x, y + 15,100, 10, s.mp, s.max_mp,
+			Colour(0,0,255), Colour(200,200,200));
+	gl_draw_statbar(x, y + 30,100, 10, s.xp, s.xpneeded,
+			 Colour(255, 215, 11), Colour(169,143,100));
 }
 static void fill_buff2d(char* buff, int w, int h, int x, int y,
 		const Colour& col, int rw = 2, int rh = 2) {
@@ -107,7 +110,7 @@ void GameHud::draw(GameState* gs) {
 	else {
 		//player = state->get_instance(0);
 	}
-	draw_minimap(gs, 20, 64);
+	draw_minimap(gs, 20, 64+20);
 	gl_printf(gs->primary_font(), Colour(255,255,255),_width/2-15,10,"Level %d", gs->branch_level());
 }
 

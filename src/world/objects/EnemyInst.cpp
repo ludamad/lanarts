@@ -1,6 +1,7 @@
 #include <cmath>
 #include "EnemyInst.h"
 #include "PlayerInst.h"
+#include "BulletInst.h"
 #include "../GameState.h"
 #include "../../util/draw_util.h"
 #include "../../data/sprite_data.h"
@@ -43,18 +44,24 @@ void EnemyInst::draw(GameState* gs) {
 	if (!gs->object_visible_test(this))
 		return;
 
-	if (stat.hp < stat.max_hp)
-		gl_draw_hpbar(view, stat, x - 10, y - 20, 20, 5);
+	if (stats().hp < stats().max_hp)
+		gl_draw_statbar(view, x - 10, y - 20, 20, 5, stats().hp, stats().max_hp);
 
 	image_display(&img, xx - view.x, yy - view.y);
 }
 
 
-void EnemyInst::attack(GameInst* inst){
+void EnemyInst::attack(GameState* gs, GameInst* inst){
 	if (stats().has_cooldown()) return;
-	PlayerInst* pinst;
+	/*PlayerInst* pinst;
 	if ( (pinst = dynamic_cast<PlayerInst*>(inst)) ){
 		pinst->stats().hp -= 10;
+		stats().reset_cooldown();
+	}*/
+
+	if (dynamic_cast<PlayerInst*>(inst)) {
+		GameInst* bullet = new BulletInst(id, x,y,inst->x, inst->y);
+		gs->add_instance(bullet);
+		stats().reset_cooldown();
 	}
-	stats().reset_cooldown();
 }

@@ -9,7 +9,7 @@ set( CMAKE_BUILD_TYPE Debug)
 include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
 
 set( lanarts_src
-	combat_logic/Item.cpp
+	gamestats/Item.cpp
 	
 	data/enemy_data.cpp
 	data/tile_data.cpp
@@ -57,7 +57,8 @@ set( lanarts_src
 	)
 
 set( lanarts_include
-	combat_logic/Item.h
+	gamestats/Item.h
+	gamestats/Stats.h
 	
 	data/enemy_data.h
 	data/game_data.h
@@ -72,7 +73,6 @@ set( lanarts_include
 	fov/impl/permissive-fov.h
 	fov/impl/permissive-fov-cpp.h
 	
-	logic/Stats.h
 	
 	pathfind/pathfind.h
 	

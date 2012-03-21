@@ -8,7 +8,7 @@
 #ifndef ENEMY_DATA_H_
 #define ENEMY_DATA_H_
 #include <cstdlib>
-#include "../combat_logic/Stats.h"
+#include "../gamestats/Stats.h"
 
 struct EnemyType {
 	const char* name;

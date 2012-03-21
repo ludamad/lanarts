@@ -2,7 +2,7 @@
 #define PLAYERINST_H_
 
 #include "GameInst.h"
-#include "../../combat_logic/Stats.h"
+#include "../../gamestats/Stats.h"
 #include "../../fov/fov.h"
 #include "../../pathfind/pathfind.h"
 

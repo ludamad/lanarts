@@ -7,7 +7,7 @@
 #include <freetype/freetype.h>
 #include <string>
 #include "font_util.h"
-#include "../combat_logic/Stats.h"
+#include "../gamestats/Stats.h"
 #include "../world/GameView.h"
 
 struct Colour {
@@ -32,8 +32,16 @@ inline void gl_draw_rectangle(const GameView& view, int x, int y, int w, int h,
     const Colour& colour = Colour(0,0,0)) {
 	gl_draw_rectangle(x-view.x,y-view.y,w,h,colour);
 }
-void gl_draw_hpbar(const GameView& view, const Stats& s, int x, int y, int w, int h,
+
+void gl_draw_statbar(int x, int y, int w, int h,
+		int min_stat, int max_stat,
 		const Colour& front = Colour(0,255,0), const Colour& back = Colour(255,0,0));
+
+inline void gl_draw_statbar(const GameView& view, int x, int y, int w, int h,
+		int min_stat, int max_stat,
+		const Colour& front = Colour(0,255,0), const Colour& back = Colour(255,0,0)){
+	gl_draw_statbar(x - view.x, y - view.y, w, h, min_stat, max_stat,  front, back);
+}
 
 void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 		char* flags, const Colour& colour = Colour(0, 0, 0));
@@ -41,4 +49,5 @@ void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 //Will print out text at window coordinates x,y, using the font ft_font.
 //The current modelview matrix will also be applied to the text.
 void gl_printf(const font_data &ft_font, const Colour& colour, float x, float y, const char *fmt, ...) ;
+
 #endif

@@ -54,15 +54,15 @@ void set_monster_headings(GameState* gs, std::vector<PathInfo>& paths, std::vect
 		int pdist = eois[i].dist_to_player_sqr;
 
 		eb.current_action = EnemyBehaviour::CHASING_PLAYER;
-		paths[pind].adjust_for_claims(e->x, e->y);
+		//paths[pind].adjust_for_claims(e->x, e->y);
 		paths[pind].interpolated_direction(xx, yy, w, h, eb.speed, eb.vx, eb.vy);
-		paths[pind].stake_claim(e->x, e->y);
+	//	paths[pind].stake_claim(e->x, e->y);
 		//Compare position to player object
 		double abs = sqrt(pdist);
 		if (abs < e->radius + player->radius)
 			eb.vx = 0, eb.vy = 0;
-		if (abs - e->stats().melee_reach < e->radius + player->radius ){
-			e->attack(player);
+		if ( abs < 300/*abs - e->stats().melee_reach < e->radius + player->radius*/ ){
+			e->attack(gs, player);
 		}
 	}
 }

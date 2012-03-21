@@ -42,11 +42,13 @@ void gl_draw_rectangle(int x, int y, int w, int h, const Colour& clr) {
 	glEnd();
 }
 
-void gl_draw_hpbar(const GameView& view, const Stats& s, int x, int y, int w, int h,
+void gl_draw_statbar( int x, int y, int w, int h,
+		int minstat, int maxstat,
 		const Colour& front, const Colour& back) {
-	int hp_width = (w * s.hp) / s.max_hp;
-	gl_draw_rectangle(view, x, y, w, h, back);
-	gl_draw_rectangle(view, x, y, hp_width, h, front);
+	int hp_width = (w * minstat) / maxstat;
+	gl_draw_rectangle(x, y, w, h, back);
+	if (hp_width > 0)
+		gl_draw_rectangle(x, y, hp_width, h, front);
 }
 void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 		char* flags, const Colour& clr) {
