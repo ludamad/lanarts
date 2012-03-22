@@ -29,7 +29,6 @@ void EnemyInst::step(GameState* gs) {
 	if (collided ){
 		float dx = collided->x - x, dy = collided->y - y;
 		float mag = sqrt(dx*dx + dy*dy);
-        if (mag == 0) mag = 1;
 			eb.vx = -dy*eb.speed/mag;
 			eb.vy = -dx*eb.speed/mag;
 		if (!firstcol && gs->object_radius_test(this, NULL, 0, &enemy_hit, x + eb.vx, y +eb.vy)){
@@ -75,7 +74,7 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 		if (ranged){
 			gs->add_instance(bullet);
 		} else {
-			pinst->stats().hp -= 10;
+			pinst->stats().hp -= 20;
 		}
 		stats().reset_cooldown();
 	}

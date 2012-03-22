@@ -57,7 +57,7 @@ void PlayerInst::step(GameState* gs) {
 		dx -= 1;
 	}
 	move(gs, dx, dy);
-	if (/*money >= 100 && */ gs->key_press_state(SDLK_c)) {
+	if (money >= 80 &&  gs->key_press_state(SDLK_c)) {
 		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN)) {
 			gs->set_generate_flag();
 		}
@@ -80,7 +80,7 @@ void PlayerInst::step(GameState* gs) {
 				stats().range, x, y, rmx, rmy);
 		gs->add_instance(bullet);
 		base_stats.reset_cooldown();
-	} else */if (gs->mouse_left_click() && !base_stats.has_cooldown()) {
+	} else */if ((gs->mouse_left_click() || gs->key_press_state(SDLK_f)) && !base_stats.has_cooldown()) {
 		int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 		GameInst* bullet = new BulletInst(id, stats().bulletspeed,
 				stats().range, x, y, rmx, rmy);

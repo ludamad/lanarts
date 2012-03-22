@@ -249,13 +249,15 @@ void GameState::reset_level() {
 	DungeonBranch& mainbranch = game_dungeon_data[DNGN_MAIN_BRANCH];
 	int leveln = level_number % mainbranch.nlevels;
 
-	inst_set.clear();
 	std::vector<PlayerInst> playerinfo;
 	std::vector<obj_id> pids =player_controller().player_ids();
+
 	for (int i = 0; i < pids.size(); i++){
 		PlayerInst* p = (PlayerInst*)get_instance(pids[i]);
+		if (p->stats().hp > 0)
 		playerinfo.push_back(*p);
 	}
+	inst_set.clear();
 	player_controller().clear();
 	monster_controller().clear();
 
