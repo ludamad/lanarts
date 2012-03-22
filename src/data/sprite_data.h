@@ -15,13 +15,14 @@
 enum {
 	SPR_PLAYER = 0,
 	SPR_STORM_ELE = 1,
-	SPR_ZOMBIE = 2,
-	SPR_AMBROSIA = 3,
-	SPR_AMULET = 4,
-	SPR_BOOK = 5,
-	SPR_GLOVES = 6,
-	SPR_GOLD = 7,
-	SPR_SCROLL = 8
+	SPR_CHICKEN = 2,
+	SPR_ZOMBIE = 3,
+	SPR_AMBROSIA = 4,
+	SPR_AMULET = 5,
+	SPR_BOOK = 6,
+	SPR_GLOVES = 7,
+	SPR_GOLD = 8,
+	SPR_SCROLL = 9
 };
 struct SpriteEntry {
 	const char* name;

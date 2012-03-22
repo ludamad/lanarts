@@ -6,13 +6,16 @@ struct Stats {
 	int hp, max_hp;
 	int mp, max_mp;
 	bool can_melee, can_range;//TODO: Make much more fleshed out with attack profiles
+	int melee_dmg, range_dmg;
 	int cooldown, start_cooldown;
 	int melee_reach, range, bulletspeed;
 	int xp, xpneeded, xplevel;
-	Stats(float speed, int hp, int mp, bool can_melee, bool can_range, int cooldown, int mreach, int range, int bspeed = 7) :
+	Stats(float speed, int hp, int mp, bool can_melee, bool can_range, int can_melee, int can_range,
+			int cooldown, int mreach, int range, int bspeed = 7) :
 			movespeed(speed),
 			hp(hp), max_hp(hp), mp(mp), max_mp(mp),
 			can_melee(can_melee), can_range(can_range),
+			melee_dmg(melee_dmg), range_dmg(range_dmg),
 			cooldown(cooldown), start_cooldown(cooldown),
 			melee_reach(mreach), range(range),
 			bulletspeed(bspeed),
