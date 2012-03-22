@@ -57,7 +57,7 @@ void PlayerInst::step(GameState* gs) {
 		dx -= 1;
 	}
 	move(gs, dx, dy);
-	if (money >= 80*(gs->branch_level+1) &&  gs->key_press_state(SDLK_c)) {
+	if (money >= 80*(gs->branch_level()+1) &&  gs->key_press_state(SDLK_c)) {
 		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN)) {
 			gs->set_generate_flag();
 		}

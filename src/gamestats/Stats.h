@@ -10,7 +10,7 @@ struct Stats {
 	int cooldown, start_cooldown;
 	int melee_reach, range, bulletspeed;
 	int xp, xpneeded, xplevel;
-	Stats(float speed, int hp, int mp, bool can_melee, bool can_range, int can_melee, int can_range,
+	Stats(float speed, int hp, int mp, bool can_melee, bool can_range, int melee_dmg, int range_dmg,
 			int cooldown, int mreach, int range, int bspeed = 7) :
 			movespeed(speed),
 			hp(hp), max_hp(hp), mp(mp), max_mp(mp),
