@@ -20,6 +20,7 @@ FeatureGenSettings featuredefault(3,3 /*3 stairs up, 3 stairs down*/, 1 /*Defaul
 EnemyGenSettings enemyfew(1,2,20);
 EnemyGenSettings enemymed(1,2,30);
 EnemyGenSettings enemymany(1,2,40);
+
 #define BRANCH(arr) DungeonBranch(arr, sizeof(arr)/sizeof(LevelGenSettings))
 
 static LevelGenSettings mainbranch[] = {

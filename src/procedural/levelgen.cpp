@@ -80,18 +80,4 @@ void generate_level(const LevelGenSettings& ls, MTwist& mt,
 	generate_features(ls.features, mt, level, gs);
 	generate_enemies(ls.enemies, mt, level, gs);
 	generate_items(ls.items, mt, level, gs);
-
-	//Generate player
-	GameTiles& tiles = gs->tile_grid();
-	int start_x = (tiles.tile_width()-level.width())/2;
-	int start_y = (tiles.tile_height()-level.height())/2;
-
-	Pos ppos = generate_location(mt, level);
-	int px = (ppos.x+start_x) * 32 + 16;
-	int py = (ppos.y+start_y) * 32 + 16;
-
-	gs->window_view().sharp_center_on(px, py);
-
-	gs->add_instance(new PlayerInst(px,py));
-	level.at(ppos).has_instance = true;
 }

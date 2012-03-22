@@ -14,6 +14,7 @@
 #include "objects/EnemyInst.h"
 #include "objects/PlayerInst.h"
 #include <ctime>
+#include <vector>
 
 #include "../procedural/levelgen.h"
 #include "../data/tile_data.h"
@@ -248,13 +249,48 @@ void GameState::reset_level() {
 	DungeonBranch& mainbranch = game_dungeon_data[DNGN_MAIN_BRANCH];
 	int leveln = level_number % mainbranch.nlevels;
 
+	std::vector<PlayerInst> playerinfo;
+	std::vector<obj_id> pids =player_controller().player_ids();
+
+	for (int i = 0; i < pids.size(); i++){
+		PlayerInst* p = (PlayerInst*)get_instance(pids[i]);
+		if (p->stats().hp > 0)
+		playerinfo.push_back(*p);
+	}
 	inst_set.clear();
 	player_controller().clear();
 	monster_controller().clear();
 
 	generate_level(mainbranch.level_data[leveln], mtwist, level, this);
 
+	//Generate player
+	GameTiles& tiles = tile_grid();
+	int start_x = (tiles.tile_width()-level.width())/2;
+	int start_y = (tiles.tile_height()-level.height())/2;
+
+	if (playerinfo.size() == 0)
+		playerinfo.push_back(PlayerInst(0,0));
+	for (int i = 0; i < playerinfo.size(); i++){
+		Pos ppos = generate_location(mtwist, level);
+		int px = (ppos.x+start_x) * 32 + 16;
+		int py = (ppos.y+start_y) * 32 + 16;
+
+		window_view().sharp_center_on(px, py);
+		PlayerInst* p = new PlayerInst(playerinfo[i]);
+		p->last_x = px, p->last_y = py;
+		p->x = px, p->y = py;
+		add_instance(p);
+	}
+
+//	gs->add_instance(new PlayerInst(px,py));
+//	level.at(ppos).has_instance = true;
+
 	//Make sure we aren't going to regenerate the level next step
 	gennextstep = false;
 	level_number++;
+}
+
+
+GameInst* GameState::nearest_object(GameInst* obj, int max_radius, col_filter f){
+	return inst_set.object_nearest_test(obj, max_radius, f);
 }
