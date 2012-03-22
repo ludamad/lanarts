@@ -40,6 +40,10 @@ void set_monster_wandering(GameState* gs, EnemyInst* e) {
 	eb.vx = 0, eb.vy = 0;
 }
 
+static bool enemy_hit(GameInst* self, GameInst* other){
+	return dynamic_cast<EnemyInst*>(other) != NULL;
+}
+
 void set_monster_headings(GameState* gs, std::vector<PathInfo>& paths, std::vector<EnemyOfInterest>& eois) {
 	//Use a temporary 'GameView' object to make use of its helper methods
 	PlayerController& pc = gs->player_controller();
@@ -56,6 +60,7 @@ void set_monster_headings(GameState* gs, std::vector<PathInfo>& paths, std::vect
 		eb.current_action = EnemyBehaviour::CHASING_PLAYER;
 		//paths[pind].adjust_for_claims(e->x, e->y);
 		paths[pind].interpolated_direction(xx, yy, w, h, eb.speed, eb.vx, eb.vy);
+
 	//	paths[pind].stake_claim(e->x, e->y);
 		//Compare position to player object
 		double abs = sqrt(pdist);

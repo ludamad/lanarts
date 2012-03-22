@@ -31,11 +31,12 @@ struct Stats {
 	}
 	void gain_xp(int amnt){
 		xp += amnt;
-		if (xp < xpneeded){
+		if (xp >= xpneeded){
 			xp -= xpneeded;
 			xpneeded = xplevel*100;
+			xplevel ++;
 		}
-		xplevel ++;
+
 	}
 };
 

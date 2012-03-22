@@ -14,7 +14,7 @@ class ItemInst: public GameInst {
 public:
 	enum {RADIUS = 10};
 	ItemInst(int x, int y) :
-		GameInst(x,y, RADIUS){}
+		GameInst(x,y, RADIUS, false){}
 	virtual ~ItemInst();
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);

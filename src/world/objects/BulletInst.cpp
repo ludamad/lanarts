@@ -59,7 +59,7 @@ void BulletInst::step(GameState* gs) {
 		gs->object_radius_test(this, &player, 1, &player_hit);
 		if (player){
 			Stats& s = ((PlayerInst*)player)->stats();
-			s.hp -= 10;
+			s.hp -= 25;
 			gs->remove_instance(this);
 		}
 	}

@@ -19,16 +19,31 @@ void EnemyInst::init(GameState* gs) {
 }
 
 void EnemyInst::step(GameState* gs) {
-//	GameView& view = gs->window_view();
-//	PlayerInst* player = (PlayerInst*) gs->player_obj();
+	bool firstcol = true;
+	GameInst* collided = NULL;
+	gs->object_radius_test(this, &collided, 1, &enemy_hit);
+	if (!collided){
+		gs->object_radius_test(this, &collided, 1, &enemy_hit, x + eb.vx, y + eb.vy);
+		firstcol = false;
+	}
+	if (collided ){
+		float dx = collided->x - x, dy = collided->y - y;
+		float mag = sqrt(dx*dx + dy*dy);
+			eb.vx = -dy*eb.speed/mag;
+			eb.vy = -dx*eb.speed/mag;
+		if (!firstcol && gs->object_radius_test(this, NULL, 0, &enemy_hit, x + eb.vx, y +eb.vy)){
+			eb.vx = 0;
+			eb.vy = 0;
+		}
+		if (gs->tile_radius_test(x+eb.vx, y+eb.vy, radius)){
+			eb.vx = -eb.vx;
+			eb.vy = -eb.vy;
+		}
+	}
 
-//	int tx = round(rx + vx / eb.speed * radius);
-//	int ty = round(ry + vy / eb.speed * radius);
-
-//	if (!gs->tile_radius_test(round(rx+vx),round(ry+vy),RADIUS) &&
-//			!gs->object_radius_test(this, NULL, 0, &enemy_hit, tx, ty,1)){
 	x = (int) round(rx += eb.vx); //update based on rounding of true float
 	y = (int) round(ry += eb.vy);
+
 //	}
 	stats().step();
 }

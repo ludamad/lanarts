@@ -44,6 +44,13 @@ public:
 	int object_radius_test(GameInst* obj, GameInst** objs = NULL,
 			int obj_cap = 0, col_filter f = NULL, int x = -1,
 			int y = -1, int radius = -1);
+	bool solid_test(GameInst* obj, GameInst** objs = NULL,
+			int obj_cap = 0, col_filter f = NULL, int x = -1,
+			int y = -1, int radius = -1){
+		int lx = (x == -1 ? obj->x : x), ly = (y == -1 ? obj->y : y);
+		return tile_radius_test(lx, ly,obj->radius) ||
+				object_radius_test(obj, objs, obj_cap, f, x, y, radius);
+	}
 	bool object_visible_test(GameInst* obj);
 
 	/* GameState components */

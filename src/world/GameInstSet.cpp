@@ -296,11 +296,11 @@ int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 				GameInst* inst = ptr->inst;
 				if (obj != inst) {
 					int radsqr = (inst->radius + rad) * (inst->radius + rad);
-					int dx = inst->last_x - x, dy = inst->last_y - y;
+					int dx = inst->x - x, dy = inst->y - y;
 					int dsqr = dx * dx + dy * dy;
 					//want to test sqrt(dsqr) < orad+rad
 					//therefore we test dsqr < (orad+rad)*(orad+rad)
-					if (dsqr < radsqr && (!f || f(obj, inst))) {
+					if (dsqr < radsqr && ((!f && inst->solid) || (f && f(obj, inst)))) {
 						if (obj_cap == 0)
 							return 1;
 						objs[obj_n] = inst;

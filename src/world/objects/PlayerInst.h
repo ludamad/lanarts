@@ -18,6 +18,7 @@ public:
 	Stats& stats(){ return base_stats; }
 	int gold() { return money; }
 private:
+	void move(GameState* gs, int dx, int dy);
 	Stats base_stats;
 	int money;
 };
