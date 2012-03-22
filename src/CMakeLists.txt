@@ -57,6 +57,7 @@ set( lanarts_src
 	)
 
 set( lanarts_include
+	gamestats/Inventory.h
 	gamestats/Item.h
 	gamestats/Stats.h
 	

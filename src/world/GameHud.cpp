@@ -12,6 +12,9 @@
 #include "GameInstSet.h"
 #include "objects/PlayerInst.h"
 #include "../data/tile_data.h"
+#include "../data/sprite_data.h"
+#include "../display/display.h"
+#include "../gamestats/Inventory.h"
 
 static void draw_player_stats(PlayerInst* player, int x, int y) {
 	Stats& s = player->stats();
@@ -27,10 +30,10 @@ static void draw_player_stats(PlayerInst* player, int x, int y) {
 static void draw_player_inventory(PlayerInst* player, int x, int y, int w, int h){
     for(int iy = 0; (iy*TILE_SIZE+TILE_SIZE) < (h-y); iy++){
         for(int ix = 0; (ix*TILE_SIZE+TILE_SIZE) < (w-x+1); ix++){
-            if(5*(iy+1) > 40) return;
+            if(5*(iy+1) > INVENTORY_SIZE) return;
             gl_draw_rectangle((ix*TILE_SIZE)+x, (iy*TILE_SIZE)+y, TILE_SIZE, TILE_SIZE, Colour(43, 43, 43));
             gl_draw_rectangle((ix*TILE_SIZE)+1+x, (iy*TILE_SIZE)+1+y, TILE_SIZE-2, TILE_SIZE-2, Colour(0, 0, 0));
-            
+            image_display(&game_sprite_data[SPR_BOOK].img,(ix*TILE_SIZE)+x+1,(iy*TILE_SIZE)+y);
         }
     }
 }
