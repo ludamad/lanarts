@@ -261,11 +261,6 @@ void GameState::reset_level() {
 
 	generate_level(mainbranch.level_data[leveln], mtwist, level, this);
 
-	for (int i = 0; i < pids.size(); i++){
-		PlayerInst* p = (PlayerInst*)get_instance(pids[i]);
-		playerinfo.push_back(*p);
-	}
-
 	//Generate player
 	GameTiles& tiles = tile_grid();
 	int start_x = (tiles.tile_width()-level.width())/2;
