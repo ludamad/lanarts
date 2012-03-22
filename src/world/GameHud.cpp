@@ -23,6 +23,17 @@ static void draw_player_stats(PlayerInst* player, int x, int y) {
 	gl_draw_statbar(x, y + 30,100, 10, s.xp, s.xpneeded,
 			 Colour(255, 215, 11), Colour(169,143,100));
 }
+
+static void draw_player_inventory(PlayerInst* player, int x, int y, int w, int h){
+    for(int iy = 0; (iy*TILE_SIZE+TILE_SIZE) < (h-y); iy++){
+        for(int ix = 0; (ix*TILE_SIZE+TILE_SIZE) < (w-x); ix++){
+            if(ix * iy > 40) return;
+            gl_draw_rectangle((ix*TILE_SIZE)+x, (iy*TILE_SIZE)+y, TILE_SIZE, TILE_SIZE, Colour(43, 43, 43));
+            gl_draw_rectangle((ix*TILE_SIZE)+1+x, (iy*TILE_SIZE)+1+y, TILE_SIZE-1, TILE_SIZE-1, Colour(0, 0, 0));
+        }
+    }
+}
+
 static void fill_buff2d(char* buff, int w, int h, int x, int y,
 		const Colour& col, int rw = 2, int rh = 2) {
 	for (int yy = y; yy < y + rh; yy++)
@@ -106,8 +117,10 @@ void GameHud::draw(GameState* gs) {
 	PlayerInst* player_inst = (PlayerInst*) gs->get_instance(gs->local_playerid());
 	gl_draw_rectangle(0, 0, _width, _height, bg_colour);
 
-	if (player_inst)
+	if (player_inst){
 		draw_player_stats(player_inst, 32, 32);
+        draw_player_inventory(player_inst, 0, 296, _width, _height);
+    }
 	else {
 		//player = state->get_instance(0);
 	}
