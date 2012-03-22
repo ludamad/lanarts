@@ -63,8 +63,15 @@ int main(int argc, char** argv) {
 //	gs->add_instance( new TestInst(0,0));
 
 	for (int i = 0; cont; i++) {
+		if (gs->key_press_state(SDLK_v)) {
+			for (int repeat = 0; repeat < 4; repeat++){
+				cont = gs->step();
+			//	if (!cont) break;
+			}
+		}
 		cont = gs->step();
 		gs->draw();
+		SDL_Delay(10);
 
 	}
 	return 0;

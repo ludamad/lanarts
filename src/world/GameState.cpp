@@ -96,7 +96,6 @@ bool GameState::step() {
 	pc.pre_step(this);
 	mc.pre_step(this);
 	inst_set.step(this);
-	SDL_Delay(10);
 	return true;
 }
 
