@@ -26,10 +26,11 @@ static void draw_player_stats(PlayerInst* player, int x, int y) {
 
 static void draw_player_inventory(PlayerInst* player, int x, int y, int w, int h){
     for(int iy = 0; (iy*TILE_SIZE+TILE_SIZE) < (h-y); iy++){
-        for(int ix = 0; (ix*TILE_SIZE+TILE_SIZE) < (w-x); ix++){
-            if(ix * iy > 40) return;
+        for(int ix = 0; (ix*TILE_SIZE+TILE_SIZE) < (w-x+1); ix++){
+            if(5*(iy+1) > 40) return;
             gl_draw_rectangle((ix*TILE_SIZE)+x, (iy*TILE_SIZE)+y, TILE_SIZE, TILE_SIZE, Colour(43, 43, 43));
-            gl_draw_rectangle((ix*TILE_SIZE)+1+x, (iy*TILE_SIZE)+1+y, TILE_SIZE-1, TILE_SIZE-1, Colour(0, 0, 0));
+            gl_draw_rectangle((ix*TILE_SIZE)+1+x, (iy*TILE_SIZE)+1+y, TILE_SIZE-2, TILE_SIZE-2, Colour(0, 0, 0));
+            
         }
     }
 }
