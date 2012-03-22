@@ -328,3 +328,31 @@ void GameInstSet::clear(){
 	memset(unit_set, 0, unit_capacity * sizeof(InstState));
 	memset(unit_grid, 0, grid_w * grid_h * sizeof(int));
 }
+
+GameInst* GameInstSet::object_nearest_test(GameInst* obj, int max_radius, col_filter f){
+	/*GameInst nearest_obj = NULL;
+	int nearest_sqr = max_radius*max_radius;
+
+	int max_search = max_radius/TILE_SIZE+1;
+
+	Coord c(obj->x/REGION_SIZE, obj->y/REGION_SIZE);
+
+	for (int rad = 1; rad < max_search; rad++){
+		int start_id = unit_grid[get_xyind(c, grid_w)];
+		if (!start_id)
+			continue;
+		InstState* ptr = tset_find<GameInstSetFunctions>(start_id, unit_set,
+				unit_capacity);
+		for (;;) {
+			if (!f || f(ptr->inst)){
+				int dx = obj->x - ptr->inst->x;
+				int dy = obj->y - ptr->inst->y;
+				int dsqr = dx*dx+dy*dy;
+				return ptr->inst;
+			}
+			ptr = ptr->next_in_grid;
+			if (ptr == NULL)
+				return NULL;
+		}
+	}*/
+}

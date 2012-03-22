@@ -72,6 +72,9 @@ public:
 	const font_data& primary_font() {
 		return pfont;
 	}
+	//Finds the nearest object to 'obj' with some condition true
+	//Takes on the order of (max_radius*2/96)^2 time
+	GameInst* nearest_object(GameInst* obj, int max_radius, col_filter f = NULL);
 
 	/* Mouse state information */
 	int mouse_x() {

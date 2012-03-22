@@ -72,10 +72,15 @@ void PlayerInst::step(GameState* gs) {
 	if (gs->frame() % 25 == 0) {
 		if (++stats().hp > stats().max_hp)
 			stats().hp = stats().max_hp;
-	}
+	}/*
+	if (gs->key_press_state(SDLK_f)){
 
-	if ((gs->key_press_state(SDLK_f) || gs->mouse_left_click())
-			&& !base_stats.has_cooldown()) {
+		int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
+		GameInst* bullet = new BulletInst(id, stats().bulletspeed,
+				stats().range, x, y, rmx, rmy);
+		gs->add_instance(bullet);
+		base_stats.reset_cooldown();
+	} else */if (gs->mouse_left_click() && !base_stats.has_cooldown()) {
 		int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 		GameInst* bullet = new BulletInst(id, stats().bulletspeed,
 				stats().range, x, y, rmx, rmy);
