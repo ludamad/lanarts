@@ -7,6 +7,7 @@
 SpriteEntry game_sprite_data[] = {
 		SpriteEntry("player","res/player/fighter.png"),
 		SpriteEntry("storm_ele", "res/monsters/storm_elemental.png"),
+		SpriteEntry("chicken", "res/monsters/chicken.png"),
 		SpriteEntry("zombie", "res/monsters/zombie.png"),
 		SpriteEntry("ambrosia", "res/items/misc/ambrosia.png"),
 		SpriteEntry("amulet", "res/items/misc/amulet.png"),
