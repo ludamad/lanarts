@@ -129,7 +129,7 @@ void GameHud::draw(GameState* gs) {
 
 	if (player_inst){
 		draw_player_stats(player_inst, 32, 32);
-        draw_player_inventory(gs, player_inst, 0, 296, _width, _height);
+        draw_player_inventory(gs, player_inst, 0, INVENTORY_POSITION, _width, _height);
     }
 	else {
 		//player = state->get_instance(0);

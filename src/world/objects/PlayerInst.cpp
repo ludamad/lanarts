@@ -119,9 +119,11 @@ void PlayerInst::step(GameState* gs) {
 		gs->add_instance(bullet);
 		base_stats.reset_cooldown();
 	}else if(gs->mouse_left_click() && !mouse_within){
-		int posx = gs->mouse_x() - gs->window_view().width;
-		if(inventory.inv[0].n > 0){
-			;
+		int posx = (gs->mouse_x() - gs->window_view().width)/TILE_SIZE;
+        int posy = (gs->mouse_y() - INVENTORY_POSITION)/TILE_SIZE;
+        int slot = 5*posy+posx;
+		if(inventory.inv[slot].n > 0){
+			inventory.inv[slot].n--;
 		}
 	}
 	
