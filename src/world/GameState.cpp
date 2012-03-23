@@ -282,12 +282,7 @@ void GameState::reset_level() {
 		level_states.push_back(lvl);
 
 		generate_level(mainbranch.level_data[leveln], mtwist, level, this);
-		LANARTS_ASSERT(lvl->exits.size() == prevlvl->entrances.size());
-		for (int i = 0; i < lvl->exits.size(); i++){
-			lvl->exits[i].exitsqr = prevlvl->entrances[i].entrancesqr;
-			prevlvl->entrances[i].exitsqr = lvl->exits[i].entrancesqr;
-		}
-		if (leveln == 0){
+		if (playerinfo.size() == 0){
 			//Generate player
 			GameTiles& tiles = tile_grid();
 			int start_x = (tiles.tile_width()-level.width())/2;
@@ -296,15 +291,15 @@ void GameState::reset_level() {
 			playersqr = generate_location(mtwist, level);
 			playersqr.x += start_x;
 			playersqr.y += start_y;
+		} else {
+			LANARTS_ASSERT(lvl->exits.size() == prevlvl->entrances.size());
+			for (int i = 0; i < lvl->exits.size(); i++){
+				lvl->exits[i].exitsqr = prevlvl->entrances[i].entrancesqr;
+				prevlvl->entrances[i].exitsqr = lvl->exits[i].entrancesqr;
+			}
 		}
 	} else {
 		lvl = level_states[leveln];
-	}
-	if (playerinfo.size() > 0){
-		/*if (prevlvl->level_number > lvl->level_number)
-			playersqr = lvl->entrances[0].entrancesqr;//prevlvl->portals[0].exitsqr;
-		else
-			playersqr = lvl->exits[0].entrancesqr;//prevlvl->portals[0].exitsqr;*/
 	}
 	if (playerinfo.size() == 0)
 		playerinfo.push_back(PlayerInst(0,0));
