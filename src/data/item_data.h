@@ -10,7 +10,8 @@
 #include <cstdlib>
 
 enum {
-  ITEM_GOLD = 0
+  ITEM_GOLD = 0,
+  ITEM_POTION = 1
 };
 
 struct ItemType {
