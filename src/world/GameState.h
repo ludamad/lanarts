@@ -89,10 +89,10 @@ public:
 		return mouse_rightclick;
 	}
 	bool mouse_left_down() {
-		return mouse_leftclick;
+		return mouse_leftdown;
 	}
 	bool mouse_right_down() {
-		return mouse_rightclick;
+		return mouse_rightdown;
 	}
 
 	int frame(){

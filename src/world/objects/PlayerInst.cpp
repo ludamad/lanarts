@@ -127,7 +127,7 @@ void PlayerInst::step(GameState* gs) {
 		}
 	}
 	
-	if (gs->mouse_right_click()) {
+	if (gs->mouse_right_down()) {
 		int nx = gs->mouse_x() + view.x, ny = gs->mouse_y() + view.y;
 		view.center_on(nx, ny);
 	} else

@@ -17,6 +17,7 @@
 #include <vector>
 
 #include "../procedural/levelgen.h"
+#include "../data/item_data.h"
 #include "../data/tile_data.h"
 #include "../data/dungeon_data.h"
 
@@ -41,8 +42,6 @@ int GameState::handle_event(SDL_Event *event) {
 
 	done = 0;
 
-	mouse_leftclick = false;
-	mouse_rightclick = false;
 	switch (event->type) {
 	case SDL_ACTIVEEVENT:
 		break;
@@ -95,6 +94,8 @@ bool GameState::step() {
 	//std::vector<GameInst*> safe_copy = inst_set.to_vector();
 	//memset(key_states, 0, sizeof(key_states));
 	SDL_GetMouseState(&mousex, &mousey);
+	mouse_leftclick = false;
+	mouse_rightclick = false;
 	while (SDL_PollEvent(&event)) {
 		if (handle_event(&event))
 			return false;
@@ -319,6 +320,7 @@ void GameState::reset_level() {
 		PlayerInst* p = new PlayerInst(playerinfo[i]);
 		p->last_x = px, p->last_y = py;
 		p->x = px, p->y = py;
+		p->inventory.add(ITEM_POTION, 10);
 		add_instance(p);
 	}
 
