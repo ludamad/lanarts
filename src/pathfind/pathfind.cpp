@@ -113,8 +113,9 @@ bool PathInfo::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
 		for (int x = sx; x <= ex + TILE_SIZE; x += TILE_SIZE) {
 			xx = squish(x, sx, ex + 1);
 			yy = squish(y, sy, ey + 1);
-			if (get((xx + dx * speed) / TILE_SIZE - start_x,
-					(yy + dy * speed) / TILE_SIZE - start_y)->solid)
+			int gx = (xx + dx * speed) / TILE_SIZE - start_x;
+			int gy = (yy + dy * speed) / TILE_SIZE - start_y;
+			if (get(gx,gy)->solid)
 				return false;
 			if (is_diag) {
 				if (get(xx / TILE_SIZE - start_x,

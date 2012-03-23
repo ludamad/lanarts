@@ -67,5 +67,5 @@ void BulletInst::step(GameState* gs) {
 
 void BulletInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
-	gl_draw_circle(view, x, y, RADIUS, (origin_id == gs->local_playerid()) ? Colour(0, 255, 0) : Colour(255,0,0));
+	gl_draw_circle(view, x, y, RADIUS, (origin_id == gs->local_playerid()) ? Colour(0, 255, 0) : Colour(255, 215, 11));
 }
