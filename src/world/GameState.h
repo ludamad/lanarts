@@ -12,27 +12,12 @@
 #include "objects/GameInst.h"
 #include "controllers/MonsterController.h"
 #include "controllers/PlayerController.h"
-#include "GameInstSet.h"
-#include "GameTiles.h"
+#include "GameLevelState.h"
 #include "GameView.h"
 #include "GameHud.h"
 #include "../util/font_util.h"
 #include "../procedural/mtwist.h"
 #include "../fov/fov.h"
-
-class LevelState {
-public:
-	LevelState(int width, int height);
-	//Game location information
-	int branch_number, level_number;
-	//Game world components
-	GameTiles tiles;
-	GameInstSet inst_set;
-
-	//Game controllers
-	MonsterController mc;
-	PlayerController pc;
-};
 
 class GameState {
 public:
@@ -51,7 +36,7 @@ public:
 	void remove_instance(GameInst* inst);
 
 	/* COLLISION METHODS */
-	bool tile_radius_test(int x, int y, int rad, bool issolid = true, int ttype = -1);
+	bool tile_radius_test(int x, int y, int rad, bool issolid = true, int ttype = -1, Pos* hitloc = NULL);
 	/* Check whether intersects a solid object */
 	bool solid_radius_test(int x, int y, int rad);
 	bool tile_line_test(int x, int y, int w, int h);
@@ -72,14 +57,14 @@ public:
 		return view;
 	}
 	GameTiles& tile_grid() {
-		return tiles;
+		return lvl->tiles;
 	}
 	/* Game object central controllers */
 	MonsterController& monster_controller() {
-		return mc;
+		return lvl->mc;
 	}
 	PlayerController& player_controller() {
-		return pc;
+		return lvl->pc;
 	}
 
 	/* Default font for most text rendering */
@@ -109,7 +94,7 @@ public:
 	}
 	/* Object identifier for the player */
 	obj_id local_playerid() {
-		return pc.local_playerid();
+		return lvl->pc.local_playerid();
 	}
 
 	/* Key state query information */
@@ -125,6 +110,9 @@ public:
 	int& branch_level() {
 		return level_number;
 	}
+	GameLevelState* level() {
+		return lvl;
+	}
 
 	void serialize(FILE* file);
 
@@ -134,29 +122,26 @@ public:
 	void set_generate_flag(){ gennextstep = true; }
 
 	void reset_level();
+	void set_level(int levelnum, bool reset);
 
 private:
+	std::vector<GameLevelState*> level_states;
+
 	void restart();
 	int handle_event(SDL_Event* event);
+
+	//Game bounds
+	int world_width, world_height;
 
 	//Game location information
 	int level_number;
 
-	//Game bounds
-	int world_width, world_height;
 	int frame_n;
 	bool gennextstep;
 
-	LevelState* current_level;
-	//Game world components
-	GameTiles tiles;
-	GameInstSet inst_set;
+	GameLevelState* lvl;
 	GameHud hud;
 	GameView view;
-
-	//Game controllers
-	MonsterController mc;
-	PlayerController pc;
 
 	//Mersenne twister random number generator state
 	MTwist mtwist;

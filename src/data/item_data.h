@@ -19,7 +19,7 @@ struct ItemType {
 	int sprite_number;
 	int radius;
 	ItemType(const char* name, int rad, int spriten) :
-		name(name), radius(rad), sprite_number(spriten){
+		name(name), sprite_number(spriten), radius(rad){
 	}
 };
 

@@ -9,6 +9,8 @@
 #ifndef GAMEINST_H_
 #define GAMEINST_H_
 
+#include <cassert>
+
 typedef int obj_id;
 
 //struct for game coordinates
@@ -20,6 +22,8 @@ struct Coord {
 		return x == c.x && y == c.y;
 	}
 };
+
+#define LANARTS_ASSERT(x) assert(x)
 
 struct GameState;
 //Base class for game instances
