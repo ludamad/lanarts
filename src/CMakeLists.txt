@@ -41,6 +41,7 @@ set( lanarts_src
 
 	world/GameInstSet.cpp
 	world/GameState.cpp
+	world/GameLevelState.cpp
 	world/GameTiles.cpp
 	world/GameView.cpp
 	world/GameHud.cpp
@@ -94,6 +95,7 @@ set( lanarts_include
 
 	world/GameInstSet.h
 	world/GameState.h
+	world/GameLevelState.h
 	world/GameTiles.h
 	world/GameView.h
 	world/GameHud.h
