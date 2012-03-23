@@ -72,7 +72,7 @@ void PlayerInst::step(GameState* gs) {
 		Pos hitsqr;
 		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN, &hitsqr)) {
 			int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
-			LANARTS_ASSERT(entr_n > 0 && entr_n < gs->level()->entrances.size());
+			LANARTS_ASSERT(entr_n >= 0 && entr_n < gs->level()->entrances.size());
 			portal = &gs->level()->entrances[entr_n];
 			gs->branch_level()++;
 			gs->set_generate_flag();
@@ -82,7 +82,7 @@ void PlayerInst::step(GameState* gs) {
 		Pos hitsqr;
 		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP, &hitsqr)) {
 			int entr_n = scan_entrance(gs->level()->exits, hitsqr);
-			LANARTS_ASSERT(entr_n > 0 && entr_n < gs->level()->entrances.size());
+			LANARTS_ASSERT(entr_n >= 0 && entr_n < gs->level()->entrances.size());
 			portal = &gs->level()->exits[entr_n];
 			gs->branch_level()--;
 			gs->set_generate_flag();
@@ -119,7 +119,7 @@ void PlayerInst::step(GameState* gs) {
 		gs->add_instance(bullet);
 		base_stats.reset_cooldown();
 	}else if(gs->mouse_left_click() && !mouse_within){
-		int posx = gs->mouse_x();
+		int posx = gs->mouse_x() - gs->window_view().width;
 		if(inventory.inv[0].n > 0){
 			;
 		}
