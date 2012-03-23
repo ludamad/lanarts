@@ -36,7 +36,7 @@ public:
 	void remove_instance(GameInst* inst);
 
 	/* COLLISION METHODS */
-	bool tile_radius_test(int x, int y, int rad, bool issolid = true, int ttype = -1);
+	bool tile_radius_test(int x, int y, int rad, bool issolid = true, int ttype = -1, Pos* hitloc = NULL);
 	/* Check whether intersects a solid object */
 	bool solid_radius_test(int x, int y, int rad);
 	bool tile_line_test(int x, int y, int w, int h);
@@ -102,13 +102,16 @@ public:
 
 	/* Getters for world size */
 	int width() {
-		return lvl->world_width;
+		return world_width;
 	}
 	int height() {
-		return lvl->world_height;
+		return world_height;
 	}
 	int& branch_level() {
 		return level_number;
+	}
+	GameLevelState* level() {
+		return lvl;
 	}
 
 	void serialize(FILE* file);
@@ -119,12 +122,16 @@ public:
 	void set_generate_flag(){ gennextstep = true; }
 
 	void reset_level();
+	void set_level(int levelnum, bool reset);
 
 private:
 	std::vector<GameLevelState*> level_states;
 
 	void restart();
 	int handle_event(SDL_Event* event);
+
+	//Game bounds
+	int world_width, world_height;
 
 	//Game location information
 	int level_number;

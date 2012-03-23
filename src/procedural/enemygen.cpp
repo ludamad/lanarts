@@ -24,7 +24,7 @@ void generate_enemies(const EnemyGenSettings& es, MTwist& mt, GeneratedLevel& le
 		Pos epos = generate_location(mt, level);
 		int ex = (epos.x+start_x) * 32 + 16;
 		int ey = (epos.y+start_y) * 32 + 16;
-		gs->add_instance(new EnemyInst(&game_enemy_data[etype], ex,ey));
+//		gs->add_instance(new EnemyInst(&game_enemy_data[etype], ex,ey));
 		level.at(epos).has_instance = true;
 	}
 }

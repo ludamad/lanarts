@@ -16,6 +16,7 @@ PlayerInst::~PlayerInst() {
 void PlayerInst::init(GameState* gs) {
 	PlayerController& pc = gs->player_controller();
 	pc.register_player(this->id);
+	portal = NULL;
 }
 
 static bool item_hit(GameInst* self, GameInst* other) {
@@ -36,11 +37,20 @@ void PlayerInst::move(GameState* gs, int dx, int dy) {
 	}
 
 }
+
+static int scan_entrance(const std::vector<GameLevelPortal>& portals, const Pos& tilepos){
+	for (int i = 0; i < portals.size(); i++){
+		if (portals[i].entrancesqr == tilepos){
+			return i;
+		}
+	}
+	return -1;
+}
 void PlayerInst::step(GameState* gs) {
 	GameView& view = gs->window_view();
 
 	if (stats().hp <= 0) {
-		gs->branch_level() = 0;
+		gs->branch_level() = 1;
 		gs->set_generate_flag();
 		return;
 	}
@@ -59,13 +69,21 @@ void PlayerInst::step(GameState* gs) {
 	}
 	move(gs, dx, dy);
 	if (gs->key_press_state(SDLK_c)) {
-		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN)) {
+		Pos hitsqr;
+		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN, &hitsqr)) {
+			int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
+			LANARTS_ASSERT(entr_n > 0 && entr_n < gs->level()->entrances.size());
+			portal = &gs->level()->entrances[entr_n];
 			gs->branch_level()++;
 			gs->set_generate_flag();
 		}
 	}
 	if (gs->key_press_state(SDLK_x) && gs->branch_level() > 1) {
-		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP)) {
+		Pos hitsqr;
+		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP, &hitsqr)) {
+			int entr_n = scan_entrance(gs->level()->exits, hitsqr);
+			LANARTS_ASSERT(entr_n > 0 && entr_n < gs->level()->entrances.size());
+			portal = &gs->level()->exits[entr_n];
 			gs->branch_level()--;
 			gs->set_generate_flag();
 		}

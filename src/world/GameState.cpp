@@ -22,13 +22,13 @@
 
 
 GameState::GameState(int width, int height, int vieww, int viewh, int hudw) :
-		level_number(1),  frame_n(0), hud(
+		world_width(width), world_height(height), level_number(1),  frame_n(0), hud(
 				vieww, 0, hudw, viewh), view(50, 50, vieww, viewh, width,
 				height) {
 	memset(key_states, 0, sizeof(key_states));
 	init_font(&pfont, "res/arial.ttf", 10);
 	gennextstep = false;
-	lvl = new GameLevelState(width, height);
+	lvl = new GameLevelState(DNGN_MAIN_BRANCH, level_number, width, height);
 }
 
 GameState::~GameState() {
@@ -171,8 +171,8 @@ static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
 //}
 
 bool GameState::tile_radius_test(int x, int y, int rad, bool issolid,
-		int ttype) {
-	int w = lvl->world_width / TILE_SIZE, h = lvl->world_height / TILE_SIZE;
+		int ttype, Pos* hitloc) {
+	int w = width()/ TILE_SIZE, h = height() / TILE_SIZE;
 	//(rad*2) **2 area
 	//should test x, y positions filling in circle
 	int distsqr = (TILE_SIZE / 2 + rad), radsqr = rad * rad;
@@ -206,6 +206,7 @@ bool GameState::tile_radius_test(int x, int y, int rad, bool issolid,
 								cx + offset, cy + offset, x, y, radsqr)
 						|| circle_line_test(cx + offset, cy - offset,
 								cx + offset, cy + offset, x, y, radsqr)) {
+					if (hitloc) *hitloc = Pos(xx,yy);
 					return true;
 				}
 			}
@@ -223,7 +224,7 @@ bool GameState::object_visible_test(GameInst* obj) {
 	const int sub_sqrs = VISION_SUBSQRS;
 	const int subsize = TILE_SIZE / sub_sqrs;
 
-	int w = lvl->world_width / subsize, h = lvl->world_height / subsize;
+	int w = width() / subsize, h = height()/ subsize;
 	int x = obj->last_x, y = obj->last_y;
 	int rad = obj->radius;
 	int mingrid_x = (x - rad) / subsize, mingrid_y = (y - rad) / subsize;
@@ -244,6 +245,9 @@ bool GameState::object_visible_test(GameInst* obj) {
 	return false;
 }
 
+
+
+
 void GameState::reset_level() {
 	GeneratedLevel level;
 	DungeonBranch& mainbranch = game_dungeon_data[DNGN_MAIN_BRANCH];
@@ -256,43 +260,66 @@ void GameState::reset_level() {
 		PlayerInst* p = (PlayerInst*)get_instance(pids[i]);
 		if (p->stats().hp > 0){
 			playerinfo.push_back(*p);
-			for (int i = 0; i < level_states.size(); i++){
+			//TODO: Fix memory leak below
+			/*for (int i = 0; i < level_states.size(); i++){
 				delete level_states[i];
-			}
+			}*/
+		} else {
+			level_number = 1;
+			leveln = 0;
 			level_states.clear();
 		}
+		remove_instance(p);
 	}
 //	lvl->inst_set.clear();
-//	player_controller().clear();
+	player_controller().clear();
 //	monster_controller().clear();
 
+	Pos playersqr;
+	GameLevelState* prevlvl = lvl;
 	if (leveln >= level_states.size()){
-		lvl = new GameLevelState(lvl->world_width, lvl->world_height);
+		lvl = new GameLevelState(DNGN_MAIN_BRANCH, level_number, width(), height());
 		level_states.push_back(lvl);
 
 		generate_level(mainbranch.level_data[leveln], mtwist, level, this);
+		LANARTS_ASSERT(lvl->exits.size() == prevlvl->entrances.size());
+		for (int i = 0; i < lvl->exits.size(); i++){
+			lvl->exits[i].exitsqr = prevlvl->entrances[i].entrancesqr;
+			prevlvl->entrances[i].exitsqr = lvl->exits[i].entrancesqr;
+		}
+		if (leveln == 0){
+			//Generate player
+			GameTiles& tiles = tile_grid();
+			int start_x = (tiles.tile_width()-level.width())/2;
+			int start_y = (tiles.tile_height()-level.height())/2;
 
-		//Generate player
-		GameTiles& tiles = tile_grid();
-		int start_x = (tiles.tile_width()-level.width())/2;
-		int start_y = (tiles.tile_height()-level.height())/2;
-
-		if (playerinfo.size() == 0)
-			playerinfo.push_back(PlayerInst(0,0));
-		for (int i = 0; i < playerinfo.size(); i++){
-			Pos ppos = generate_location(mtwist, level);
-			int px = (ppos.x+start_x) * 32 + 16;
-			int py = (ppos.y+start_y) * 32 + 16;
-
-			PlayerInst* p = new PlayerInst(playerinfo[i]);
-			p->last_x = px, p->last_y = py;
-			p->x = px, p->y = py;
-			add_instance(p);
+			playersqr = generate_location(mtwist, level);
+			playersqr.x += start_x;
+			playersqr.y += start_y;
 		}
 	} else {
 		lvl = level_states[leveln];
 	}
+	if (playerinfo.size() > 0){
+		/*if (prevlvl->level_number > lvl->level_number)
+			playersqr = lvl->entrances[0].entrancesqr;//prevlvl->portals[0].exitsqr;
+		else
+			playersqr = lvl->exits[0].entrancesqr;//prevlvl->portals[0].exitsqr;*/
+	}
+	if (playerinfo.size() == 0)
+		playerinfo.push_back(PlayerInst(0,0));
+	for (int i = 0; i < playerinfo.size(); i++){
+		if (playerinfo[i].portal_used()){
+			playersqr = playerinfo[i].portal_used()->exitsqr;
+		}
+		int px = (playersqr.x) * 32 + 16;
+		int py = (playersqr.y) * 32 + 16;
 
+		PlayerInst* p = new PlayerInst(playerinfo[i]);
+		p->last_x = px, p->last_y = py;
+		p->x = px, p->y = py;
+		add_instance(p);
+	}
 
 	GameInst* p = get_instance(local_playerid());
 	window_view().sharp_center_on(p->x, p->y);
@@ -303,4 +330,10 @@ void GameState::reset_level() {
 
 GameInst* GameState::nearest_object(GameInst* obj, int max_radius, col_filter f){
 	return lvl->inst_set.object_nearest_test(obj, max_radius, f);
+}
+
+
+
+
+void GameState::set_level(int levelnum, bool reset) {
 }

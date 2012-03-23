@@ -26,6 +26,10 @@ TunnelGenSettings tunnelwide(1, 5 /*1 to 5 width tunnels*/, 1,
 
 FeatureGenSettings featuredefault(3, 3 /*3 stairs up, 3 stairs down*/,
 		1 /*Default tileset*/);
+
+FeatureGenSettings featurefirstlevel(0, 3 /*0 stairs up, 3 stairs down*/,
+		1 /*Default tileset*/);
+
 EnemyGenSettings enemyfew(1, 2, 20);
 EnemyGenSettings enemymed(1, 2, 30);
 EnemyGenSettings enemymany(1, 2, 40);
@@ -34,22 +38,28 @@ EnemyGenSettings enemymany(1, 2, 40);
 
 static LevelGenSettings mainbranch[] = { //Attempt
 		LevelGenSettings(STD_W * 0.5, STD_H * 0.5, itemdefault, roomdensevaried,
-				tunneldefault, featuredefault, enemyfew), LevelGenSettings(
+				tunneldefault, featurefirstlevel, enemyfew),
+		LevelGenSettings(
 				STD_W * 0.5, STD_H * 0.5, itemdefault, roomsparsesmall,
-				tunneldefault, featuredefault, enemymed), LevelGenSettings(
+				tunneldefault, featuredefault, enemymed),
+		LevelGenSettings(
 				STD_W * 0.6, STD_H * 0.6, itemdefault, roommediumhighpad,
-				tunneldefault, featuredefault, enemymed), LevelGenSettings(
+				tunneldefault, featuredefault, enemymed),
+		LevelGenSettings(
 				STD_W * 0.7, STD_H * 0.7, itemdefault, roommediumhighpad,
-				tunneldefault, featuredefault, enemymed), LevelGenSettings(
+				tunneldefault, featuredefault, enemymed),
+		LevelGenSettings(
 				STD_W * 0.7, STD_H * 0.7, itemdefault, roomsparsesmall,
-				tunneldefault, featuredefault, enemymany), LevelGenSettings(
+				tunneldefault, featuredefault, enemymany),
+		LevelGenSettings(
 				STD_W * 1, STD_H * 1, itemdefault, roommediumhighpad,
-				tunnelwide, featuredefault, enemymany), LevelGenSettings(
+				tunnelwide, featuredefault, enemymany),
+		LevelGenSettings(
 				STD_W * 1, STD_H * 1, itemdefault, roommediumhighpad,
 				tunnelwide, featuredefault, EnemyGenSettings(1, 2, 50)),
-				LevelGenSettings(STD_W * 1, STD_H * 1, itemdefault,
-						roommediumhighpad, tunnelwide, featuredefault,
-						EnemyGenSettings(1, 2, 50)), };
+		LevelGenSettings(STD_W * 1, STD_H * 1, itemdefault,
+				roommediumhighpad, tunnelwide, featuredefault,
+				EnemyGenSettings(1, 2, 50)), };
 
 DungeonBranch game_dungeon_data[] = { BRANCH(mainbranch) };
 

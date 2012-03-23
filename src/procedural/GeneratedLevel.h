@@ -39,6 +39,9 @@ struct Sqr {
 struct Pos {
 	int x, y;
 	Pos() {}
+	bool operator==(const Pos& o) const {
+		return o.x == x && o.y == y;
+	}
 	Pos(int x, int y) :
 			x(x), y(y) {
 	}
@@ -63,9 +66,6 @@ struct Room {
 };
 
 class GeneratedLevel {
-	Sqr* s;
-	int w, h;
-	std::vector<Room> room_list;
 public:
 	int width() { return w; }
 	int height() { return h; }
@@ -98,8 +98,12 @@ public:
 			int padding);
 
 	bool verify(const Region& r, bool check_init = true);
-
 	int region_groupID(const Region& r, Pos& p);
+
+private:
+	Sqr* s;
+	int w, h;
+	std::vector<Room> room_list;
 };
 
 Pos generate_location(MTwist& mt, GeneratedLevel& level);
