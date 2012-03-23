@@ -93,7 +93,13 @@ void PlayerInst::step(GameState* gs) {
 				stats().range, x, y, rmx, rmy);
 		gs->add_instance(bullet);
 		base_stats.reset_cooldown();
+	}else if(gs->mouse_left_click() && !mouse_within){
+		int posx = gs->mouse_x();
+		if(inventory.inv[0].n > 0){
+			;
+		}
 	}
+	
 	if (gs->mouse_right_click()) {
 		int nx = gs->mouse_x() + view.x, ny = gs->mouse_y() + view.y;
 		view.center_on(nx, ny);
