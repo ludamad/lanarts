@@ -61,8 +61,9 @@ int main(int argc, char** argv) {
 	gs->reset_level();
 
 //	gs->add_instance( new TestInst(0,0));
-
 	for (int i = 0; cont; i++) {
+		clock_t start = clock();
+
 		if (gs->key_press_state(SDLK_v)) {
 			for (int repeat = 0; repeat < 4; repeat++){
 				cont = gs->step();
@@ -71,7 +72,12 @@ int main(int argc, char** argv) {
 		}
 		cont = gs->step();
 		gs->draw();
-		SDL_Delay(10);
+
+		clock_t end = clock();
+		int delayms = 14 - (end-start)*1000/CLOCKS_PER_SEC;
+		printf("Delayms = %d\n", delayms);
+		if (delayms > 0)
+			SDL_Delay(delayms);
 
 	}
 	return 0;

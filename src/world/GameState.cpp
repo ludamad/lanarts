@@ -20,6 +20,10 @@
 #include "../data/tile_data.h"
 #include "../data/dungeon_data.h"
 
+/*
+LevelState::LevelState(int width, int height){
+
+}*/
 GameState::GameState(int width, int height, int vieww, int viewh, int hudw) :
 		level_number(0), world_width(width), world_height(height), frame_n(0), tiles(
 				width / TILE_SIZE, height / TILE_SIZE), inst_set(width, height), hud(

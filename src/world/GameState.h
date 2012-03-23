@@ -20,6 +20,20 @@
 #include "../procedural/mtwist.h"
 #include "../fov/fov.h"
 
+class LevelState {
+public:
+	LevelState(int width, int height);
+	//Game location information
+	int branch_number, level_number;
+	//Game world components
+	GameTiles tiles;
+	GameInstSet inst_set;
+
+	//Game controllers
+	MonsterController mc;
+	PlayerController pc;
+};
+
 class GameState {
 public:
 
@@ -133,6 +147,7 @@ private:
 	int frame_n;
 	bool gennextstep;
 
+	LevelState* current_level;
 	//Game world components
 	GameTiles tiles;
 	GameInstSet inst_set;
