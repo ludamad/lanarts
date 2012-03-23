@@ -24,7 +24,7 @@
 GameState::GameState(int width, int height, int vieww, int viewh, int hudw) :
 		world_width(width), world_height(height), level_number(1),  frame_n(0), hud(
 				vieww, 0, hudw, viewh), view(50, 50, vieww, viewh, width,
-				height) {
+				height), mouse_leftdown(0), mouse_rightdown(0), mouse_leftclick(0), mouse_rightclick(0) {
 	memset(key_states, 0, sizeof(key_states));
 	init_font(&pfont, "res/arial.ttf", 10);
 	gennextstep = false;
@@ -40,6 +40,9 @@ int GameState::handle_event(SDL_Event *event) {
 	int done;
 
 	done = 0;
+
+	mouse_leftclick = false;
+	mouse_rightclick = false;
 	switch (event->type) {
 	case SDL_ACTIVEEVENT:
 		break;
@@ -56,17 +59,20 @@ int GameState::handle_event(SDL_Event *event) {
 		break;
 	}
 	case SDL_MOUSEBUTTONDOWN: {
-		if (event->button.button == SDL_BUTTON_LEFT)
-			left_click = true;
-		else if (event->button.button == SDL_BUTTON_RIGHT)
-			right_click = true;
+		if (event->button.button == SDL_BUTTON_LEFT){
+			mouse_leftdown = true;
+			mouse_leftclick = true;
+		}else if (event->button.button == SDL_BUTTON_RIGHT){
+			mouse_rightdown = true;
+			mouse_rightclick = true;
+		}
 		break;
 	}
 	case SDL_MOUSEBUTTONUP: {
 		if (event->button.button == SDL_BUTTON_LEFT)
-			left_click = false;
+			mouse_leftdown = false;
 		else if (event->button.button == SDL_BUTTON_RIGHT)
-			right_click = false;
+			mouse_rightdown = false;
 		break;
 	}
 	case SDL_QUIT:

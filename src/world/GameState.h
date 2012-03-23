@@ -83,16 +83,16 @@ public:
 		return mousey;
 	}
 	bool mouse_left_click() {
-		return left_click;
+		return mouse_leftclick;
 	}
 	bool mouse_right_click() {
-		return right_click;
+		return mouse_rightclick;
 	}
 	bool mouse_left_down() {
-		return left_click;
+		return mouse_leftclick;
 	}
 	bool mouse_right_down() {
-		return right_click;
+		return mouse_rightclick;
 	}
 
 	int frame(){
@@ -158,7 +158,8 @@ private:
 	//Key/mouse state information
 	char key_states[SDLK_LAST];
 	int mousex, mousey;
-	bool left_click, right_click;
+	bool mouse_leftdown, mouse_rightdown;
+	bool mouse_leftclick, mouse_rightclick;
 };
 
 #endif /* GAMESTATE_H_ */
