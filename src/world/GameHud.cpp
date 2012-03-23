@@ -12,6 +12,7 @@
 #include "GameInstSet.h"
 #include "objects/PlayerInst.h"
 #include "../data/tile_data.h"
+#include "../data/item_data.h"
 #include "../data/sprite_data.h"
 #include "../display/display.h"
 #include "../gamestats/Inventory.h"
@@ -27,13 +28,18 @@ static void draw_player_stats(PlayerInst* player, int x, int y) {
 			 Colour(255, 215, 11), Colour(169,143,100));
 }
 
-static void draw_player_inventory(PlayerInst* player, int x, int y, int w, int h){
+static void draw_player_inventory(GameState* gs, PlayerInst* player, int x, int y, int w, int h){
     for(int iy = 0; (iy*TILE_SIZE+TILE_SIZE) < (h-y); iy++){
         for(int ix = 0; (ix*TILE_SIZE+TILE_SIZE) < (w-x+1); ix++){
-            if(5*(iy+1) > INVENTORY_SIZE) return;
+	    int slot = 5*iy+ix;
+            if(slot >= INVENTORY_SIZE) return;
             gl_draw_rectangle((ix*TILE_SIZE)+x, (iy*TILE_SIZE)+y, TILE_SIZE, TILE_SIZE, Colour(43, 43, 43));
             gl_draw_rectangle((ix*TILE_SIZE)+1+x, (iy*TILE_SIZE)+1+y, TILE_SIZE-2, TILE_SIZE-2, Colour(0, 0, 0));
-            image_display(&game_sprite_data[SPR_BOOK].img,(ix*TILE_SIZE)+x+1,(iy*TILE_SIZE)+y);
+	    if(player->inventory.inv[slot].n > 0){
+	      ItemType& itemd = game_item_data[player->inventory.inv[slot].item];
+	      image_display(&game_sprite_data[itemd.sprite_number].img,(ix*TILE_SIZE)+x+1,(iy*TILE_SIZE)+y);
+	      gl_printf(gs->primary_font(), Colour(255,255,255), x+ix*TILE_SIZE, y+iy*TILE_SIZE, "%d", player->inventory.inv[slot].n);
+	    }
         }
     }
 }
@@ -123,7 +129,7 @@ void GameHud::draw(GameState* gs) {
 
 	if (player_inst){
 		draw_player_stats(player_inst, 32, 32);
-        draw_player_inventory(player_inst, 0, 296, _width, _height);
+        draw_player_inventory(gs, player_inst, 0, 296, _width, _height);
     }
 	else {
 		//player = state->get_instance(0);

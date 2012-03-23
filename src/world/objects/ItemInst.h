@@ -13,11 +13,14 @@
 class ItemInst: public GameInst {
 public:
 	enum {RADIUS = 10};
-	ItemInst(int x, int y) :
-		GameInst(x,y, RADIUS, false){}
+	ItemInst(int type, int x, int y) :
+		GameInst(x,y, RADIUS, false), type(type){}
 	virtual ~ItemInst();
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
+	int item_type(){ return type; }
+private:
+	int type;
 };
 
 #endif /* ITEMINST_H_ */

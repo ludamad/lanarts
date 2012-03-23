@@ -12,6 +12,7 @@ set( lanarts_src
 	gamestats/Item.cpp
 	
 	data/enemy_data.cpp
+	data/item_data.cpp
 	data/tile_data.cpp
 	data/sprite_data.cpp
 	data/dungeon_data.cpp
@@ -62,6 +63,7 @@ set( lanarts_include
 	gamestats/Stats.h
 	
 	data/enemy_data.h
+	data/item_data.h
 	data/game_data.h
 	data/sprite_data.h
 	data/dungeon_data.h
