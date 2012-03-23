@@ -23,7 +23,9 @@ enum {
 	SPR_GLOVES = 7,
 	SPR_GOLD = 8,
 	SPR_SCROLL = 9,
-	SPR_POTION = 10
+	SPR_POTION = 10,
+	SPR_FIREBOLT = 11,
+	SPR_STORMBOLT = 12,
 };
 struct SpriteEntry {
 	const char* name;

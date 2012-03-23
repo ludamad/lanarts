@@ -10,13 +10,14 @@
 #include "PlayerInst.h"
 #include "../GameState.h"
 #include <cmath>
+#include "../../data/sprite_data.h"
 
 BulletInst::~BulletInst() {
 
 }
 
-BulletInst::BulletInst(obj_id originator, int speed, int range, int x, int y, int tx, int ty) :
-		GameInst(x, y, RADIUS, false), speed(speed), range_left(range), origin_id(originator), rx(x), ry(y) {
+BulletInst::BulletInst(obj_id originator, int sprnum, int speed, int range, int x, int y, int tx, int ty) :
+		GameInst(x, y, RADIUS, false), sprnum(sprnum), speed(speed), range_left(range), origin_id(originator), rx(x), ry(y) {
 	int dx = tx - x, dy = ty - y;
 	double abs = sqrt(dx * dx + dy * dy);
 	vx = dx * speed / abs, vy = dy * speed / abs;
@@ -67,5 +68,7 @@ void BulletInst::step(GameState* gs) {
 
 void BulletInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
-	gl_draw_circle(view, x, y, RADIUS, (origin_id == gs->local_playerid()) ? Colour(0, 255, 0) : Colour(255, 215, 11));
+	image_display(view, &game_sprite_data[sprnum].img,x-TILE_SIZE/2, y-TILE_SIZE/2);
+	//gl_draw_circle(view, x, y, RADIUS, (origin_id == gs->local_playerid()) ? Colour(0, 255, 0) : Colour(255, 215, 11));
+
 }

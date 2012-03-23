@@ -32,12 +32,19 @@ struct Stats {
 	void reset_cooldown() {
 		cooldown = start_cooldown;
 	}
+	void gain_level(){
+		hp += 20;
+		max_hp += 20;
+		mp += 20;
+		max_mp += 20;
+		xplevel ++;
+	}
 	void gain_xp(int amnt){
 		xp += amnt;
 		if (xp >= xpneeded){
 			xp -= xpneeded;
 			xpneeded = xplevel*100;
-			xplevel ++;
+			gain_level();
 		}
 
 	}

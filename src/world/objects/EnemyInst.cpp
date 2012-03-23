@@ -71,7 +71,7 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 	if (stats().has_cooldown()) return;
 	PlayerInst* pinst;
 	if ( (pinst = dynamic_cast<PlayerInst*>(inst))) {
-		GameInst* bullet = new BulletInst(id, stats().bulletspeed, stats().range, x,y,inst->x, inst->y);
+		GameInst* bullet = new BulletInst(id, SPR_STORMBOLT, stats().bulletspeed, stats().range, x,y,inst->x, inst->y);
 		if (ranged){
 			gs->add_instance(bullet);
 		} else {

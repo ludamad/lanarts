@@ -15,7 +15,9 @@ SpriteEntry game_sprite_data[] = {
 		SpriteEntry("gloves", "res/items/misc/gloves.png"),
 		SpriteEntry("gold", "res/items/misc/gold.png"),
 		SpriteEntry("scroll", "res/items/misc/scroll.png"),
-		SpriteEntry("potion", "res/items/misc/potion.png")
+		SpriteEntry("potion", "res/items/misc/potion.png"),
+		SpriteEntry("fire", "res/effects/bolt04.png"),
+		SpriteEntry("storm", "res/effects/bolt07.png")
 };
 
 size_t game_sprite_n = sizeof(game_sprite_data)/sizeof(SpriteEntry);

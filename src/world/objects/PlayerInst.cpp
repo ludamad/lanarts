@@ -114,7 +114,7 @@ void PlayerInst::step(GameState* gs) {
 		base_stats.reset_cooldown();
 	} else */if (( (gs->mouse_left_down() && mouse_within) || gs->key_press_state(SDLK_f)) && !base_stats.has_cooldown()) {
 		int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
-		GameInst* bullet = new BulletInst(id, stats().bulletspeed,
+		GameInst* bullet = new BulletInst(id, SPR_FIREBOLT, stats().bulletspeed,
 				stats().range, x, y, rmx, rmy);
 		gs->add_instance(bullet);
 		base_stats.reset_cooldown();
