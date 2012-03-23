@@ -8,6 +8,7 @@
 #include "../../data/sprite_data.h"
 #include "../../data/tile_data.h"
 #include "../../display/display.h"
+#include "../../data/item_data.h"
 
 PlayerInst::~PlayerInst() {
 }
@@ -65,8 +66,11 @@ void PlayerInst::step(GameState* gs) {
 	ItemInst* item = NULL;
 	if (gs->object_radius_test(this, (GameInst**) &item, 1, &item_hit)) {
 		gs->remove_instance(item);
-		money += 10;
-		inventory.add(item->item_type(), 1);
+		if(item->item_type() == ITEM_GOLD){
+			money += 10;
+		}else{
+			inventory.add(item->item_type(), 1);
+		}
 	}
 
 	stats().step();
