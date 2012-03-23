@@ -29,13 +29,13 @@ void EnemyInst::step(GameState* gs) {
 	if (collided ){
 		float dx = collided->x - x, dy = collided->y - y;
 		float mag = sqrt(dx*dx + dy*dy);
-		if (mag == 0) mag = 1;
+		/*if (mag == 0) mag = 1;
 			eb.vx = -dy*eb.speed/mag;
 			eb.vy = -dx*eb.speed/mag;
 		if (!firstcol && gs->object_radius_test(this, NULL, 0, &enemy_hit, x + eb.vx, y +eb.vy)){
 			eb.vx = 0;
 			eb.vy = 0;
-		}
+		}*/
 		if (gs->tile_radius_test(x+eb.vx, y+eb.vy, radius)){
 			eb.vx = -eb.vx;
 			eb.vy = -eb.vy;
