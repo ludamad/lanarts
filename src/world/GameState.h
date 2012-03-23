@@ -12,27 +12,12 @@
 #include "objects/GameInst.h"
 #include "controllers/MonsterController.h"
 #include "controllers/PlayerController.h"
-#include "GameInstSet.h"
-#include "GameTiles.h"
+#include "GameLevelState.h"
 #include "GameView.h"
 #include "GameHud.h"
 #include "../util/font_util.h"
 #include "../procedural/mtwist.h"
 #include "../fov/fov.h"
-
-class LevelState {
-public:
-	LevelState(int width, int height);
-	//Game location information
-	int branch_number, level_number;
-	//Game world components
-	GameTiles tiles;
-	GameInstSet inst_set;
-
-	//Game controllers
-	MonsterController mc;
-	PlayerController pc;
-};
 
 class GameState {
 public:
@@ -72,14 +57,14 @@ public:
 		return view;
 	}
 	GameTiles& tile_grid() {
-		return tiles;
+		return lvl->tiles;
 	}
 	/* Game object central controllers */
 	MonsterController& monster_controller() {
-		return mc;
+		return lvl->mc;
 	}
 	PlayerController& player_controller() {
-		return pc;
+		return lvl->pc;
 	}
 
 	/* Default font for most text rendering */
@@ -109,7 +94,7 @@ public:
 	}
 	/* Object identifier for the player */
 	obj_id local_playerid() {
-		return pc.local_playerid();
+		return lvl->pc.local_playerid();
 	}
 
 	/* Key state query information */
@@ -117,10 +102,10 @@ public:
 
 	/* Getters for world size */
 	int width() {
-		return world_width;
+		return lvl->world_width;
 	}
 	int height() {
-		return world_height;
+		return lvl->world_height;
 	}
 	int& branch_level() {
 		return level_number;
@@ -136,27 +121,20 @@ public:
 	void reset_level();
 
 private:
+	std::vector<GameLevelState*> level_states;
+
 	void restart();
 	int handle_event(SDL_Event* event);
 
 	//Game location information
 	int level_number;
 
-	//Game bounds
-	int world_width, world_height;
 	int frame_n;
 	bool gennextstep;
 
-	LevelState* current_level;
-	//Game world components
-	GameTiles tiles;
-	GameInstSet inst_set;
+	GameLevelState* lvl;
 	GameHud hud;
 	GameView view;
-
-	//Game controllers
-	MonsterController mc;
-	PlayerController pc;
 
 	//Mersenne twister random number generator state
 	MTwist mtwist;

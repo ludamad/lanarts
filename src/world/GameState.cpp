@@ -20,18 +20,15 @@
 #include "../data/tile_data.h"
 #include "../data/dungeon_data.h"
 
-/*
-LevelState::LevelState(int width, int height){
 
-}*/
 GameState::GameState(int width, int height, int vieww, int viewh, int hudw) :
-		level_number(0), world_width(width), world_height(height), frame_n(0), tiles(
-				width / TILE_SIZE, height / TILE_SIZE), inst_set(width, height), hud(
+		level_number(1),  frame_n(0), hud(
 				vieww, 0, hudw, viewh), view(50, 50, vieww, viewh, width,
 				height) {
 	memset(key_states, 0, sizeof(key_states));
 	init_font(&pfont, "res/arial.ttf", 10);
 	gennextstep = false;
+	lvl = new GameLevelState(width, height);
 }
 
 GameState::~GameState() {
@@ -97,9 +94,9 @@ bool GameState::step() {
 			return false;
 	}
 	frame_n++;
-	pc.pre_step(this);
-	mc.pre_step(this);
-	inst_set.step(this);
+	lvl->pc.pre_step(this);
+	lvl->mc.pre_step(this);
+	lvl->inst_set.step(this);
 	return true;
 }
 
@@ -112,30 +109,30 @@ void GameState::draw() {
 	gl_set_drawing_area(0, 0, view.width, view.height);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	tiles.pre_draw(this);
-	std::vector<GameInst*> safe_copy = inst_set.to_vector();
+	lvl->tiles.pre_draw(this);
+	std::vector<GameInst*> safe_copy = lvl->inst_set.to_vector();
 	for (size_t i = 0; i < safe_copy.size(); i++) {
 		safe_copy[i]->draw(this);
 	}
 
-	tiles.post_draw(this);
+	lvl->tiles.post_draw(this);
 	hud.draw(this);
 	update_display();
 	glFinish();
 }
 
 obj_id GameState::add_instance(GameInst *inst) {
-	obj_id id = inst_set.add(inst);
+	obj_id id = lvl->inst_set.add(inst);
 	inst->init(this);
 	return id;
 }
 
 void GameState::remove_instance(GameInst* inst) {
-	inst_set.remove(inst);
+	lvl->inst_set.remove(inst);
 }
 
 GameInst* GameState::get_instance(obj_id id) {
-	return inst_set.get_by_id(id);
+	return lvl->inst_set.get_by_id(id);
 }
 
 static int squish(int a, int b, int c) {
@@ -175,7 +172,7 @@ static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
 
 bool GameState::tile_radius_test(int x, int y, int rad, bool issolid,
 		int ttype) {
-	int w = world_width / TILE_SIZE, h = world_height / TILE_SIZE;
+	int w = lvl->world_width / TILE_SIZE, h = lvl->world_height / TILE_SIZE;
 	//(rad*2) **2 area
 	//should test x, y positions filling in circle
 	int distsqr = (TILE_SIZE / 2 + rad), radsqr = rad * rad;
@@ -190,7 +187,7 @@ bool GameState::tile_radius_test(int x, int y, int rad, bool issolid,
 
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			int tile = tiles.get(xx, yy);
+			int tile = lvl->tiles.get(xx, yy);
 			bool istype = (tile == ttype || ttype == -1);
 			bool solidmatch = (game_tile_data[tile].solid == issolid);
 			if (solidmatch && istype) {
@@ -220,13 +217,13 @@ bool GameState::tile_radius_test(int x, int y, int rad, bool issolid,
 
 int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 		col_filter f, int x, int y, int radius) {
-	return inst_set.object_radius_test(obj, objs, obj_cap, f, x, y, radius);
+	return lvl->inst_set.object_radius_test(obj, objs, obj_cap, f, x, y, radius);
 }
 bool GameState::object_visible_test(GameInst* obj) {
 	const int sub_sqrs = VISION_SUBSQRS;
 	const int subsize = TILE_SIZE / sub_sqrs;
 
-	int w = world_width / subsize, h = world_height / subsize;
+	int w = lvl->world_width / subsize, h = lvl->world_height / subsize;
 	int x = obj->last_x, y = obj->last_y;
 	int rad = obj->radius;
 	int mingrid_x = (x - rad) / subsize, mingrid_y = (y - rad) / subsize;
@@ -238,8 +235,8 @@ bool GameState::object_visible_test(GameInst* obj) {
 
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			for (int i = 0; i < pc.player_fovs().size(); i++) {
-				if (pc.player_fovs()[i]->within_fov(xx, yy))
+			for (int i = 0; i < lvl->pc.player_fovs().size(); i++) {
+				if (lvl->pc.player_fovs()[i]->within_fov(xx, yy))
 					return true;
 			}
 		}
@@ -250,50 +247,60 @@ bool GameState::object_visible_test(GameInst* obj) {
 void GameState::reset_level() {
 	GeneratedLevel level;
 	DungeonBranch& mainbranch = game_dungeon_data[DNGN_MAIN_BRANCH];
-	int leveln = level_number % mainbranch.nlevels;
+	int leveln = (level_number-1) % mainbranch.nlevels;
 
 	std::vector<PlayerInst> playerinfo;
 	std::vector<obj_id> pids =player_controller().player_ids();
 
 	for (int i = 0; i < pids.size(); i++){
 		PlayerInst* p = (PlayerInst*)get_instance(pids[i]);
-		if (p->stats().hp > 0)
-		playerinfo.push_back(*p);
+		if (p->stats().hp > 0){
+			playerinfo.push_back(*p);
+			for (int i = 0; i < level_states.size(); i++){
+				delete level_states[i];
+			}
+			level_states.clear();
+		}
 	}
-	inst_set.clear();
-	player_controller().clear();
-	monster_controller().clear();
+//	lvl->inst_set.clear();
+//	player_controller().clear();
+//	monster_controller().clear();
 
-	generate_level(mainbranch.level_data[leveln], mtwist, level, this);
+	if (leveln >= level_states.size()){
+		lvl = new GameLevelState(lvl->world_width, lvl->world_height);
+		level_states.push_back(lvl);
 
-	//Generate player
-	GameTiles& tiles = tile_grid();
-	int start_x = (tiles.tile_width()-level.width())/2;
-	int start_y = (tiles.tile_height()-level.height())/2;
+		generate_level(mainbranch.level_data[leveln], mtwist, level, this);
 
-	if (playerinfo.size() == 0)
-		playerinfo.push_back(PlayerInst(0,0));
-	for (int i = 0; i < playerinfo.size(); i++){
-		Pos ppos = generate_location(mtwist, level);
-		int px = (ppos.x+start_x) * 32 + 16;
-		int py = (ppos.y+start_y) * 32 + 16;
+		//Generate player
+		GameTiles& tiles = tile_grid();
+		int start_x = (tiles.tile_width()-level.width())/2;
+		int start_y = (tiles.tile_height()-level.height())/2;
 
-		window_view().sharp_center_on(px, py);
-		PlayerInst* p = new PlayerInst(playerinfo[i]);
-		p->last_x = px, p->last_y = py;
-		p->x = px, p->y = py;
-		add_instance(p);
+		if (playerinfo.size() == 0)
+			playerinfo.push_back(PlayerInst(0,0));
+		for (int i = 0; i < playerinfo.size(); i++){
+			Pos ppos = generate_location(mtwist, level);
+			int px = (ppos.x+start_x) * 32 + 16;
+			int py = (ppos.y+start_y) * 32 + 16;
+
+			PlayerInst* p = new PlayerInst(playerinfo[i]);
+			p->last_x = px, p->last_y = py;
+			p->x = px, p->y = py;
+			add_instance(p);
+		}
+	} else {
+		lvl = level_states[leveln];
 	}
 
-//	gs->add_instance(new PlayerInst(px,py));
-//	level.at(ppos).has_instance = true;
 
+	GameInst* p = get_instance(local_playerid());
+	window_view().sharp_center_on(p->x, p->y);
 	//Make sure we aren't going to regenerate the level next step
 	gennextstep = false;
-	level_number++;
 }
 
 
 GameInst* GameState::nearest_object(GameInst* obj, int max_radius, col_filter f){
-	return inst_set.object_nearest_test(obj, max_radius, f);
+	return lvl->inst_set.object_nearest_test(obj, max_radius, f);
 }

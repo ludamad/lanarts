@@ -74,7 +74,6 @@ int main(int argc, char** argv) {
 		gs->draw();
 		clock_t end = clock();
 		int delayms = 14 - (end-start)*1000/CLOCKS_PER_SEC;
-		printf("Delayms = %d\n", delayms);
 		if (delayms > 0)
 			SDL_Delay(delayms);
 	}
