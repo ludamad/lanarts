@@ -88,6 +88,12 @@ public:
 	bool mouse_right_click() {
 		return right_click;
 	}
+	bool mouse_left_down() {
+		return left_click;
+	}
+	bool mouse_right_down() {
+		return right_click;
+	}
 
 	int frame(){
 		return frame_n;
