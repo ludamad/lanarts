@@ -66,6 +66,7 @@ void PlayerInst::step(GameState* gs) {
 	if (gs->object_radius_test(this, (GameInst**) &item, 1, &item_hit)) {
 		gs->remove_instance(item);
 		money += 10;
+		inventory.add(item->item_type(), 1);
 	}
 
 	stats().step();

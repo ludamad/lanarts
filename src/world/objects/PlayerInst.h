@@ -3,6 +3,7 @@
 
 #include "GameInst.h"
 #include "../../gamestats/Stats.h"
+#include "../../gamestats/Inventory.h"
 #include "../../fov/fov.h"
 #include "../../pathfind/pathfind.h"
 
@@ -17,6 +18,7 @@ public:
 	virtual void draw(GameState* gs);
 	Stats& stats(){ return base_stats; }
 	int gold() { return money; }
+	Inventory inventory;
 private:
 	void move(GameState* gs, int dx, int dy);
 	Stats base_stats;
