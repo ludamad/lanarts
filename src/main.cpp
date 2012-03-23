@@ -72,7 +72,6 @@ int main(int argc, char** argv) {
 		cont = gs->step();
 		gs->draw();
 		SDL_Delay(10);
-
 	}
 	return 0;
 }
