@@ -8,18 +8,22 @@
 #ifndef ITEM_DATA_H_
 #define ITEM_DATA_H_
 #include <cstdlib>
+#include "../world/objects/GameInst.h"
 
 enum {
   ITEM_GOLD = 0,
   ITEM_POTION = 1
 };
 
+typedef void (*item_act_f)(GameInst* inst);
+
 struct ItemType {
 	const char* name;
 	int sprite_number;
 	int radius;
-	ItemType(const char* name, int rad, int spriten) :
-		name(name), sprite_number(spriten), radius(rad){
+	item_act_f action;
+	ItemType(const char* name, int rad, int spriten, item_act_f act) :
+		name(name), sprite_number(spriten), radius(rad), action(act){
 	}
 };
 

@@ -123,6 +123,8 @@ void PlayerInst::step(GameState* gs) {
         int posy = (gs->mouse_y() - INVENTORY_POSITION)/TILE_SIZE;
         int slot = 5*posy+posx;
 		if(inventory.inv[slot].n > 0){
+            int item = inventory.inv[slot].item;
+            game_item_data[item].action(this);
 			inventory.inv[slot].n--;
 		}
 	}
