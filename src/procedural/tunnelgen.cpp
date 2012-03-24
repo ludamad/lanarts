@@ -239,7 +239,9 @@ void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
 			//bool generate = (rand(mt, 1, 2) == 0);
 			//if (!generate)
 			//	continue;
-			while (!havepaths[i]){
+			int totaltries = 0;
+			while (!havepaths[i] && totaltries < 100){
+				totaltries++;
 				bool generated = false;
 				int path_len = 5;
 				TunnelGen tg(level, mt, i + 1,

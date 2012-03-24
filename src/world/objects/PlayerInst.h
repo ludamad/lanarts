@@ -28,6 +28,9 @@ public:
 	Stats& stats() {
 		return base_stats;
 	}
+	Stats effective_stats(){
+		return base_stats;
+	}
 	int gold() {
 		return money;
 	}

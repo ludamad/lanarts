@@ -28,40 +28,44 @@ static bool enemy_hit(GameInst* self, GameInst* other) {
 }
 
 void PlayerInst::move(GameState* gs, int dx, int dy) {
-	if (dx == 0 && dy == 0) return;
+	if (dx == 0 && dy == 0)
+		return;
 
-	float mag =	stats().movespeed;
-	float ddx = dx*mag;
-	float ddy = dy*mag;
+	float mag = effective_stats().movespeed;
+	float ddx = dx * mag;
+	float ddy = dy * mag;
 
 	EnemyInst* target = NULL;
-	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_hit, x + ddx, y + ddy);
+	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_hit, x + ddx,
+			y + ddy);
 
-	if (!gs->solid_test(this, NULL, 0, NULL, x + ddx, y + ddy)){
+	if (!gs->solid_test(this, NULL, 0, NULL, x + ddx, y + ddy)) {
 		x += ddx;
 		y += ddy;
-	} else if (!gs->solid_test(this, NULL, 0, NULL, x + ddx, y)){
+	} else if (!gs->solid_test(this, NULL, 0, NULL, x + ddx, y)) {
 		x += ddx;
-	} else if (!gs->solid_test(this, NULL, 0, NULL, x, y + ddy)){
+	} else if (!gs->solid_test(this, NULL, 0, NULL, x, y + ddy)) {
 		y += ddy;
 	}
-	if (target && !stats().has_cooldown()){
-		if (target->stats().hurt(stats().melee.damage)){
+	if (target && !stats().has_cooldown()) {
+		if (target->stats().hurt(effective_stats().melee.damage)) {
 			gs->remove_instance(target);
 		}
 		stats().reset_melee_cooldown();
 	}
 }
 
-static int scan_entrance(const std::vector<GameLevelPortal>& portals, const Pos& tilepos){
-	for (int i = 0; i < portals.size(); i++){
-		if (portals[i].entrancesqr == tilepos){
+static int scan_entrance(const std::vector<GameLevelPortal>& portals,
+		const Pos& tilepos) {
+	for (int i = 0; i < portals.size(); i++) {
+		if (portals[i].entrancesqr == tilepos) {
 			return i;
 		}
 	}
 	return -1;
 }
 void PlayerInst::step(GameState* gs) {
+
 	GameView& view = gs->window_view();
 
 	if (stats().hp <= 0) {
@@ -85,30 +89,33 @@ void PlayerInst::step(GameState* gs) {
 	move(gs, dx, dy);
 	if (gs->key_down_state(SDLK_c)) {
 		Pos hitsqr;
-		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN, &hitsqr)) {
+		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN,
+				&hitsqr)) {
 			int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
-			LANARTS_ASSERT(entr_n >= 0 && entr_n < gs->level()->entrances.size());
+			LANARTS_ASSERT(
+					entr_n >= 0 && entr_n < gs->level()->entrances.size());
 			portal = &gs->level()->entrances[entr_n];
-			gs->branch_level()++;
-			gs->set_generate_flag();
+			gs->branch_level()++;gs
+			->set_generate_flag();
 		}
 	}
 	if (gs->key_down_state(SDLK_x) && gs->branch_level() > 1) {
 		Pos hitsqr;
 		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP, &hitsqr)) {
 			int entr_n = scan_entrance(gs->level()->exits, hitsqr);
-			LANARTS_ASSERT(entr_n >= 0 && entr_n < gs->level()->entrances.size());
+			LANARTS_ASSERT(
+					entr_n >= 0 && entr_n < gs->level()->entrances.size());
 			portal = &gs->level()->exits[entr_n];
-			gs->branch_level()--;
-			gs->set_generate_flag();
+			gs->branch_level()--;gs
+			->set_generate_flag();
 		}
 	}
 	ItemInst* item = NULL;
 	if (gs->object_radius_test(this, (GameInst**) &item, 1, &item_hit)) {
 		gs->remove_instance(item);
-		if(item->item_type() == ITEM_GOLD){
+		if (item->item_type() == ITEM_GOLD) {
 			money += 10;
-		}else{
+		} else {
 			inventory.add(item->item_type(), 1);
 		}
 	}
@@ -123,55 +130,61 @@ void PlayerInst::step(GameState* gs) {
 			stats().mp = stats().max_mp;
 	}
 	bool mouse_within = gs->mouse_x() < gs->window_view().width;
-	if ( gs->key_press_state(SDLK_1) ) {
-		if(inventory.inv[0].n > 0){
-            int item = inventory.inv[0].item;
-            game_item_data[item].action(this);
+	if (gs->key_press_state(SDLK_1)) {
+		if (inventory.inv[0].n > 0) {
+			int item = inventory.inv[0].item;
+			game_item_data[item].action(this);
 			inventory.inv[0].n--;
 		}
 	}
-	/*
-	if (gs->key_press_state(SDLK_f)){
 
-		int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
-		GameInst* bullet = new BulletInst(id, stats().bulletspeed,
-				stats().range, x, y, rmx, rmy);
-		gs->add_instance(bullet);
-		base_stats.reset_cooldown();
-	} else */
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
-	if (gs->mouse_right_click() && mouse_within){
+	if (gs->mouse_right_click() && mouse_within) {
 		int px = x, py = y;
 		x = rmx, y = rmy;
-		if (stats().mp >= 50 && !gs->solid_test(this) && gs->object_visible_test(this)){
+		if (stats().mp >= 50 && !gs->solid_test(this)
+				&& gs->object_visible_test(this)) {
 			stats().mp -= 50;
 		} else {
 			x = px, y = py;
 		}
 	}
-	if (( (gs->mouse_left_down() && mouse_within) || gs->key_down_state(SDLK_f)) && !base_stats.has_cooldown()) {
+	if (gs->key_press_state(SDLK_f) && !base_stats.has_cooldown()) {
+		obj_id tid = gs->monster_controller().targetted;
+		GameInst* target = gs->get_instance(tid);
+		if (tid && target ) {
+			if (stats().mp >= 10) {
+				stats().mp -= 10;
+				GameInst* bullet = new BulletInst(id, stats().ranged, x, y,
+						target->x, target->y);
+				gs->add_instance(bullet);
+				base_stats.reset_ranged_cooldown();
+			}
+		}
+	} else if (gs->mouse_left_down() && mouse_within && !base_stats.has_cooldown()) {
 		if (stats().mp >= 10) {
 			stats().mp -= 10;
-			GameInst* bullet = new BulletInst(id, stats().ranged, x, y, rmx, rmy);
+			GameInst* bullet = new BulletInst(id, stats().ranged, x, y, rmx,
+					rmy);
 			gs->add_instance(bullet);
 			base_stats.reset_ranged_cooldown();
 		}
-	}else if(gs->mouse_left_click() && !mouse_within){
-		int posx = (gs->mouse_x() - gs->window_view().width)/TILE_SIZE;
-        int posy = (gs->mouse_y() - INVENTORY_POSITION)/TILE_SIZE;
-        int slot = 5*posy+posx;
-		if(inventory.inv[slot].n > 0){
-            int item = inventory.inv[slot].item;
-            game_item_data[item].action(this);
+	} else if (gs->mouse_left_click() && !mouse_within) {
+		int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
+		int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
+		int slot = 5 * posy + posx;
+		if (inventory.inv[slot].n > 0) {
+			int item = inventory.inv[slot].item;
+			game_item_data[item].action(this);
 			inventory.inv[slot].n--;
 		}
 	}
-	
+
 	/*if (gs->mouse_right_down()) {
-		int nx = gs->mouse_x() + view.x, ny = gs->mouse_y() + view.y;
-		view.center_on(nx, ny);
-	} else*/
-		view.center_on(last_x, last_y);
+	 int nx = gs->mouse_x() + view.x, ny = gs->mouse_y() + view.y;
+	 view.center_on(nx, ny);
+	 } else*/
+	view.center_on(last_x, last_y);
 }
 
 void PlayerInst::draw(GameState* gs) {
@@ -184,14 +197,14 @@ void PlayerInst::draw(GameState* gs) {
 		gl_draw_statbar(view, x - 10, y - 20, 20, 5, stats().hp,
 				stats().max_hp);
 
-	if (stats().hurt_cooldown > 0){
-		float s = 1 - stats().hurt_alpha()/2;
-		Colour red(255,s,s);
+	if (stats().hurt_cooldown > 0) {
+		float s = 1 - stats().hurt_alpha() / 2;
+		Colour red(255, s, s);
 		image_display(&img, x - img.width / 2 - view.x,
 				y - img.height / 2 - view.y, red);
-	}else
+	} else
 		image_display(&img, x - img.width / 2 - view.x,
-			y - img.height / 2 - view.y);
+				y - img.height / 2 - view.y);
 	//for (int i = 0; i < 10; i++)
 //	gl_printf(gs->primary_font(), Colour(255,255,255), x-10-view.x, y-30-view.y, "id=%d", this->id);
 //	gl_printf(gs->primary_font(), Colour(255,255,255), gs->mouse_x(), gs->mouse_y(),

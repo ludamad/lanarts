@@ -1,6 +1,8 @@
 #ifndef STATS_H_
 #define STATS_H_
 
+
+
 struct Attack  {//Currently for melee & ranged
 	bool canuse;
 	int damage;
@@ -23,10 +25,11 @@ struct Stats {
 	Attack melee, ranged;
 
 	int xp, xpneeded, xplevel;
+	Stats(){}
 	Stats(float speed, int hp, int mp, const Attack& melee, const Attack& ranged) :
 			movespeed(speed),
 			hp(hp), max_hp(hp), mp(mp), max_mp(mp),
-			hpregen(50), mpregen(15),
+			hpregen(40), mpregen(15),
 			cooldown(0), hurt_cooldown(0),
 			melee(melee), ranged(ranged),
 			xp(0), xpneeded(100), xplevel(1) {

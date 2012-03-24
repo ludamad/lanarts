@@ -11,6 +11,7 @@
 #include "../objects/EnemyInst.h"
 #include "../GameState.h"
 #include <algorithm>
+#include "../../util/draw_util.h"
 
 const int PATHING_RADIUS = 500;
 const int HUGE_DISTANCE = 1000000;
@@ -66,6 +67,10 @@ void MonsterController::set_monster_headings(GameState* gs, std::vector<EnemyOfI
 	}
 }
 
+void MonsterController::shift_target(){
+
+}
+
 void MonsterController::pre_step(GameState* gs) {
 	//Use a temporary 'GameView' object to make use of its helper methods
 	GameView view(0, 0, PATHING_RADIUS * 2, PATHING_RADIUS * 2, gs->width(),
@@ -84,7 +89,7 @@ void MonsterController::pre_step(GameState* gs) {
 	}
 
 	//Make sure targetted object is alive
-	if (targetted && gs->get_instance(targetted)){
+	if (targetted && !gs->get_instance(targetted)){
 		targetted = 0;
 	}
 
@@ -100,6 +105,10 @@ void MonsterController::pre_step(GameState* gs) {
 		//Add live instances back to monster id list
 		mids.push_back(mids2[i]);
 
+		bool isvisible = gs->object_visible_test(e);
+		if (isvisible && !targetted) targetted = e->id;
+		if (!isvisible && targetted == e->id) targetted = 0;
+
 		//Determine which players we are currently in view of
 		int xx = e->x - e->radius, yy = e->y - e->radius;
 		int w = e->radius * 2, h = e->radius * 2;
@@ -109,7 +118,7 @@ void MonsterController::pre_step(GameState* gs) {
 			GameInst* player = gs->get_instance(pids[i]);
 			view.sharp_center_on(player->x, player->y);
 			bool chasing = e->behaviour().current_action == EnemyBehaviour::CHASING_PLAYER;
-			if (view.within_view(xx, yy, w, h) && (chasing || gs->object_visible_test(e))) {
+			if (view.within_view(xx, yy, w, h) && (chasing || isvisible)) {
 				int dx = e->x - player->x, dy = e->y - player->y;
 				int distsqr = dx * dx + dy * dy;
 				if (distsqr > 0 /*overflow check*/) {
@@ -127,6 +136,15 @@ void MonsterController::pre_step(GameState* gs) {
 	}
 	std::sort(eois.begin(), eois.end());
 	set_monster_headings(gs, eois);
+}
+
+
+void MonsterController::post_draw(GameState* gs){
+	GameInst* target = gs->get_instance(targetted);
+	if (!target) return;
+	glLineWidth(2);
+	gl_draw_circle(gs->window_view(), target->x, target->y, target->radius+5, Colour(0,255,0,199), true);
+	glLineWidth(1);
 }
 
 
