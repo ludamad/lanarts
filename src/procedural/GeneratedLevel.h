@@ -107,5 +107,7 @@ private:
 };
 
 Pos generate_location(MTwist& mt, GeneratedLevel& level);
+Pos generate_location_byroom(MTwist& mt, GeneratedLevel& level);
+Pos generate_location_in_region(MTwist& mt, GeneratedLevel& level, const Region& r);
 
 #endif /* GENERATEDROOM_H_ */

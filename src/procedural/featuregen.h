@@ -12,6 +12,7 @@
 #include "GeneratedLevel.h"
 
 class GameState;
+
 struct FeatureGenSettings {
 	int nstairs_up, nstairs_down;
 	int tileset;

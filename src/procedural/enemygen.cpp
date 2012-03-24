@@ -21,7 +21,7 @@ void generate_enemies(const EnemyGenSettings& es, MTwist& mt, GeneratedLevel& le
 		int etype = mt.rand(es.min_xplevel, es.max_xplevel+1);//mt.rand(es.min_xplevel, es.max_xplevel);
 
 		printf("Game enemies: %d gen %d\n", game_enemy_n, etype);
-		Pos epos = generate_location(mt, level);
+		Pos epos = generate_location_byroom(mt, level);
 		int ex = (epos.x+start_x) * 32 + 16;
 		int ey = (epos.y+start_y) * 32 + 16;
 		gs->add_instance(new EnemyInst(&game_enemy_data[etype], ex,ey));

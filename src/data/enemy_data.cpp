@@ -16,18 +16,18 @@
 //			cooldown, mreach, range, bulletspeed = 7)
 //EnemyType constructor:
 //   EnemyType(name, rad, xpaward, spriten, stats)
-Attack weakmelee(true,  5, 25, 70);
-Attack medmelee(true,  7, 25, 70);
-Attack strongmelee(true,  13, 25, 70);
-Attack strongermelee(true,  20, 25, 70);
+Attack weakmelee(true,  8, 25, 70);
+Attack medmelee(true,  13, 25, 70);
+Attack strongmelee(true,  16, 25, 70);
+Attack strongermelee(true,  25, 25, 70);
 Attack strongshortrange_storm(true, 13, 100, 70, SPR_STORMBOLT, 4 );
 Attack strongshortrange_fire(true, 13, 100, 70, SPR_FIREBOLT, 4 );
 
 EnemyType game_enemy_data[] = {
-		EnemyType("Chicken", 14, 5, SPR_CHICKEN,
-				Stats(4, 20,0, Attack(true,  1, 25, 10), Attack())),
 		EnemyType("Skeleton", 11, 10, SPR_SKELETON,
 				Stats(2, 30,0, medmelee, Attack())),
+		EnemyType("Chicken", 14, 5, SPR_CHICKEN,
+				Stats(4, 20,0, Attack(true,  1, 25, 10), Attack())),
 		EnemyType("Zombie", 14, 15, SPR_ZOMBIE,
 				Stats(2, 40,0, medmelee, Attack())),
 		EnemyType("Storm Elemental", 14, 20, SPR_STORM_ELE,

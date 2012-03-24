@@ -11,9 +11,18 @@ struct EnemyBehaviour {
 		CHASING_PLAYER
 	};
 	Action current_action;
+	int action_timeout;
 	float speed, vx, vy;
 	EnemyBehaviour(float speed) :
-		current_action(WANDERING), speed(speed), vx(0), vy(0){
+		current_action(WANDERING), action_timeout(0), speed(speed), vx(0), vy(0){
+	}
+	void step(){
+		if (action_timeout){
+			action_timeout--;
+			if (action_timeout == 0){
+				current_action = WANDERING;
+			}
+		}
 	}
 };
 

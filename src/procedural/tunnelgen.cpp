@@ -233,41 +233,42 @@ void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
 
 	Pos p;
 	bool axis, more;
-
+	std::vector<bool> havepaths(level.rooms().size(), false);
 	for (int r = 0; r < tgs.max_tunnels; r++) {
 		for (int i = 0; i < level.rooms().size(); i++) {
 			//bool generate = (rand(mt, 1, 2) == 0);
 			//if (!generate)
 			//	continue;
-			bool havepath = false;
-			int path_len = 5;
-			TunnelGen tg(level, mt, i + 1,0, 20);
-			for (int attempts = 0; attempts < 15; attempts++) {
-				//bool small = (havepath && mt.rand(2) == 0);
-				generate_entrance(level.rooms()[i].room_region, mt, 2, p, axis,
-						more);
-				//if (s.at(p).passable)
-				//	continue;
-				tg.width = mt.rand(tgs.minwidth, tgs.maxwidth + 1);
-				for (; tg.width > 0; tg.width--) {
-					if (axis) {
-						if (tg.generate_y(p, more, path_len)) {
-							tg.accept_tunnel_entry = true;
-							havepath = true;
-							path_len = 5;
-							break;
+			while (!havepaths[i]){
+				bool generated = false;
+				int path_len = 5;
+				TunnelGen tg(level, mt, i + 1,
+						mt.rand(tgs.minwidth, tgs.maxwidth + 1),
+						20, havepaths[i]);
+
+				for (; tg.width >= tgs.minwidth && !generated; tg.width--) {
+					for (int attempts = 0; attempts < 16 && !generated;
+							attempts++) {
+						//bool small = (havepath && mt.rand(2) == 0);
+						generate_entrance(level.rooms()[i].room_region, mt, 2, p,
+								axis, more);
+						if (axis) {
+							if (tg.generate_y(p, more, path_len)) {
+								havepaths[i] = true;
+								path_len = 5;
+								generated = true;
+							}
+						} else {
+							if (tg.generate_x(p, more, path_len)) {
+								havepaths[i] = true;
+								path_len = 5;
+								generated = true;
+							}
 						}
-					} else {
-						if (tg.generate_x(p, more, path_len)) {
-							tg.accept_tunnel_entry = true;
-							havepath = true;
-							path_len = 5;
-							break;
+						if (attempts >= 4) {
+							path_len += 5;
 						}
 					}
-				}
-				if (attempts >= 4) {
-					path_len += 5;
 				}
 			}
 			//tg.end_room

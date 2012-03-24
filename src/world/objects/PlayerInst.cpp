@@ -184,7 +184,13 @@ void PlayerInst::draw(GameState* gs) {
 		gl_draw_statbar(view, x - 10, y - 20, 20, 5, stats().hp,
 				stats().max_hp);
 
-	image_display(&img, x - img.width / 2 - view.x,
+	if (stats().hurt_cooldown > 0){
+		float s = 1 - stats().hurt_alpha()/2;
+		Colour red(255,s,s);
+		image_display(&img, x - img.width / 2 - view.x,
+				y - img.height / 2 - view.y, red);
+	}else
+		image_display(&img, x - img.width / 2 - view.x,
 			y - img.height / 2 - view.y);
 	//for (int i = 0; i < 10; i++)
 //	gl_printf(gs->primary_font(), Colour(255,255,255), x-10-view.x, y-30-view.y, "id=%d", this->id);
