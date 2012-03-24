@@ -248,7 +248,7 @@ void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
 				continue;
 			TunnelGen tg(level, mt, i + 1,
 					mt.rand(tgs.minwidth, tgs.maxwidth + 1), 20,
-					genpaths[i] > 0);
+					genpaths[i] > 0 || nogen_tries > 100);
 			bool generated = false;
 			for (; tg.width >= tgs.minwidth && !generated; tg.width--) {
 				int path_len = 5;

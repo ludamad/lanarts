@@ -103,9 +103,6 @@ void PlayerInst::step(GameState* gs) {
 	if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
 		dx -= 1;
 	}
-	if (gs->key_press_state(SDLK_h)) {
-		effects.add(EFFECT_HASTE, 100);
-	}
 	move(gs, dx, dy);
 	
 	
@@ -122,7 +119,7 @@ void PlayerInst::step(GameState* gs) {
 			->set_generate_flag();
 		}
 	}
-	if (gs->key_down_state(SDLK_x) && gs->branch_level() > 1) {
+	if (gs->key_down_state(SDLK_COMMA) && gs->branch_level() > 1) {
 		Pos hitsqr;
 		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP, &hitsqr)) {
 			int entr_n = scan_entrance(gs->level()->exits, hitsqr);
@@ -166,7 +163,7 @@ void PlayerInst::step(GameState* gs) {
 		}
 	}
 
-	if (gs->key_press_state(SDLK_g)) {
+	if (gs->key_press_state(SDLK_k)) {
 		gs->monster_controller().shift_target(gs);
 	}
 	if (gs->key_down_state(SDLK_j) && !base_stats.has_cooldown()) {
