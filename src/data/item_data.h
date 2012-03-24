@@ -12,7 +12,8 @@
 
 enum {
   ITEM_GOLD = 0,
-  ITEM_POTION = 1
+  ITEM_POTION_HEALTH = 1,
+  ITEM_SCROLL_HASTE = 2
 };
 
 typedef void (*item_actionf)(GameInst* inst);

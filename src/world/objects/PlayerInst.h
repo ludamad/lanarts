@@ -34,6 +34,9 @@ public:
 		effects.process(base_stats, tmp);
 		return tmp;
 	}
+	Effects& status_effects(){
+		return effects;
+	}
 	int gold() {
 		return money;
 	}

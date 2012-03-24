@@ -193,7 +193,7 @@ void PlayerInst::step(GameState* gs) {
 		int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
 		int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
 		int slot = 5 * posy + posx;
-		if (inventory.inv[slot].n > 0) {
+		if (slot >= 0 && slot < INVENTORY_SIZE && slot <inventory.inv[slot].n > 0) {
 			int item = inventory.inv[slot].item;
 			game_item_data[item].action(this);
 			inventory.inv[slot].n--;

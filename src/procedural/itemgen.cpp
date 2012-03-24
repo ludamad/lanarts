@@ -23,10 +23,15 @@ void generate_items(const ItemGenSettings& is, MTwist& mt, GeneratedLevel& level
 		Pos ipos = generate_location(mt, level);
 		int ix = (ipos.x+start_x) * 32 + 16;
 		int iy = (ipos.y+start_y) * 32 + 16;
-		if (mt.rand(4)!= 0)
+		int itemrand = mt.rand(100);
+		
+		if (itemrand < 50)
 			gs->add_instance(new ItemInst(ITEM_GOLD, ix,iy));
-		else
-			gs->add_instance(new ItemInst(ITEM_POTION, ix,iy));
+		else if (itemrand < 75)
+			gs->add_instance(new ItemInst(ITEM_POTION_HEALTH, ix,iy));
+		else if (itemrand < 100)
+			gs->add_instance(new ItemInst(ITEM_SCROLL_HASTE, ix,iy));
+		
 		level.at(ipos).has_instance = true;
 	}
 }
