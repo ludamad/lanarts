@@ -250,7 +250,7 @@ void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
 					mt.rand(tgs.minwidth, tgs.maxwidth + 1), 20,
 					genpaths[i] > 0 || nogen_tries > 100);
 			bool generated = false;
-			for (; tg.width >= tgs.minwidth && !generated; tg.width--) {
+			for (; tg.width >= 1 && !generated; tg.width--) {
 				int path_len = 5;
 				for (int attempts = 0; attempts < 16 && !generated;
 						attempts++) {

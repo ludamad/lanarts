@@ -35,6 +35,10 @@ void PlayerInst::move(GameState* gs, int dx, int dy) {
 	float ddx = dx * mag;
 	float ddy = dy * mag;
 
+//	EnemyInst* alreadyhitting = NULL;
+//	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_hit, x + ddx,
+//			y + ddy);
+
 	EnemyInst* target = NULL;
 	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_hit, x + ddx,
 			y + ddy);
@@ -107,7 +111,7 @@ void PlayerInst::step(GameState* gs) {
 	
 	
 	//Up/down stairs
-	if (gs->key_down_state(SDLK_PERIOD)) {
+	if (gs->key_down_state(SDLK_PERIOD) || gs->mouse_downwheel()) {
 		Pos hitsqr;
 		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN,
 				&hitsqr)) {
@@ -119,7 +123,7 @@ void PlayerInst::step(GameState* gs) {
 			->set_generate_flag();
 		}
 	}
-	if (gs->key_down_state(SDLK_COMMA) && gs->branch_level() > 1) {
+	if ((gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel()) && gs->branch_level() > 1) {
 		Pos hitsqr;
 		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP, &hitsqr)) {
 			int entr_n = scan_entrance(gs->level()->exits, hitsqr);

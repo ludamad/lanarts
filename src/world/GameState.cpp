@@ -65,6 +65,10 @@ int GameState::handle_event(SDL_Event *event) {
 		}else if (event->button.button == SDL_BUTTON_RIGHT){
 			mouse_rightdown = true;
 			mouse_rightclick = true;
+		}else if (event->button.button == SDL_BUTTON_WHEELUP){
+			mouse_didupwheel = true;
+		}else if (event->button.button == SDL_BUTTON_WHEELDOWN){
+			mouse_diddownwheel = true;
 		}
 		break;
 	}
@@ -99,6 +103,8 @@ bool GameState::step() {
 	SDL_GetMouseState(&mousex, &mousey);
 	mouse_leftclick = false;
 	mouse_rightclick = false;
+	mouse_didupwheel = false;
+	mouse_diddownwheel = false;
 	while (SDL_PollEvent(&event)) {
 		if (handle_event(&event))
 			return false;

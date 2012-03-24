@@ -94,6 +94,12 @@ public:
 	bool mouse_right_down() {
 		return mouse_rightdown;
 	}
+	bool mouse_upwheel() {
+		return mouse_didupwheel;
+	}
+	bool mouse_downwheel() {
+		return mouse_diddownwheel;
+	}
 
 	int frame() {
 		return frame_n;
@@ -164,6 +170,7 @@ private:
 	int mousex, mousey;
 	bool mouse_leftdown, mouse_rightdown;
 	bool mouse_leftclick, mouse_rightclick;
+	bool mouse_didupwheel, mouse_diddownwheel;
 };
 
 #endif /* GAMESTATE_H_ */
