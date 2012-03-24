@@ -36,7 +36,7 @@ public:
 	void pre_step(GameState* gs);
 	void post_draw(GameState* gs);
 	void register_enemy(obj_id monster) { mids.push_back(monster); }
-	void shift_target();
+	void shift_target(GameState* gs);
 
 	void clear();
 	void set_monster_headings(GameState* gs, std::vector<EnemyOfInterest>& eois);

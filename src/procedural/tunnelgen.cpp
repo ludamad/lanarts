@@ -233,47 +233,51 @@ void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
 
 	Pos p;
 	bool axis, more;
-	std::vector<bool> havepaths(level.rooms().size(), false);
-	for (int r = 0; r < tgs.max_tunnels; r++) {
-		for (int i = 0; i < level.rooms().size(); i++) {
-			//bool generate = (rand(mt, 1, 2) == 0);
-			//if (!generate)
-			//	continue;
-			int totaltries = 0;
-			while (!havepaths[i] && totaltries < 100){
-				totaltries++;
-				bool generated = false;
-				int path_len = 5;
-				TunnelGen tg(level, mt, i + 1,
-						mt.rand(tgs.minwidth, tgs.maxwidth + 1),
-						20, havepaths[i]);
+	std::vector<int> genpaths(level.rooms().size(), 0);
+	std::vector<int> totalpaths(level.rooms().size());
+	for (int i = 0; i < level.rooms().size(); i++) {
+		totalpaths[i] = mt.rand(tgs.min_tunnels, tgs.max_tunnels);
+	}
 
-				for (; tg.width >= tgs.minwidth && !generated; tg.width--) {
-					for (int attempts = 0; attempts < 16 && !generated;
-							attempts++) {
-						//bool small = (havepath && mt.rand(2) == 0);
-						generate_entrance(level.rooms()[i].room_region, mt, 2, p,
-								axis, more);
-						if (axis) {
-							if (tg.generate_y(p, more, path_len)) {
-								havepaths[i] = true;
-								path_len = 5;
-								generated = true;
-							}
-						} else {
-							if (tg.generate_x(p, more, path_len)) {
-								havepaths[i] = true;
-								path_len = 5;
-								generated = true;
-							}
+	int nogen_tries = 0;
+	while (nogen_tries < 200) {
+		nogen_tries++;
+
+		for (int i = 0; i < level.rooms().size(); i++) {
+			if (genpaths[i] >= totalpaths[i])
+				continue;
+			TunnelGen tg(level, mt, i + 1,
+					mt.rand(tgs.minwidth, tgs.maxwidth + 1), 20,
+					genpaths[i] > 0);
+			bool generated = false;
+			for (; tg.width >= tgs.minwidth && !generated; tg.width--) {
+				int path_len = 5;
+				for (int attempts = 0; attempts < 16 && !generated;
+						attempts++) {
+					//bool small = (havepath && mt.rand(2) == 0);
+					generate_entrance(level.rooms()[i].room_region, mt, 2, p,
+							axis, more);
+					if (axis) {
+						if (tg.generate_y(p, more, path_len)) {
+							genpaths[i]++;
+							nogen_tries = 0;
+							path_len = 5;
+							generated = true;
 						}
+					} else {
+						if (tg.generate_x(p, more, path_len)) {
+								genpaths[i]++;
+								nogen_tries = 0;
+								path_len = 5;
+								generated = true;
+						}
+					}
 						if (attempts >= 4) {
 							path_len += 5;
 						}
 					}
 				}
+				//tg.end_room
 			}
-			//tg.end_room
 		}
 	}
-}
