@@ -46,9 +46,7 @@ void PlayerInst::move(GameState* gs, int dx, int dy) {
 		y += ddy;
 	}
 	if (target && !stats().has_cooldown()){
-		target->stats().hp -= stats().melee.damage;
-		if (target->stats().hp <= 0){
-			target->stats().hp = 0;
+		if (target->stats().hurt(stats().melee.damage)){
 			gs->remove_instance(target);
 		}
 		stats().reset_melee_cooldown();
@@ -72,20 +70,20 @@ void PlayerInst::step(GameState* gs) {
 		return;
 	}
 	int dx = 0, dy = 0;
-	if (gs->key_press_state(SDLK_UP) || gs->key_press_state(SDLK_w)) {
+	if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
 		dy -= 1;
 	}
-	if (gs->key_press_state(SDLK_RIGHT) || gs->key_press_state(SDLK_d)) {
+	if (gs->key_down_state(SDLK_RIGHT) || gs->key_down_state(SDLK_d)) {
 		dx += 1;
 	}
-	if (gs->key_press_state(SDLK_DOWN) || gs->key_press_state(SDLK_s)) {
+	if (gs->key_down_state(SDLK_DOWN) || gs->key_down_state(SDLK_s)) {
 		dy += 1;
 	}
-	if (gs->key_press_state(SDLK_LEFT) || gs->key_press_state(SDLK_a)) {
+	if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
 		dx -= 1;
 	}
 	move(gs, dx, dy);
-	if (gs->key_press_state(SDLK_c)) {
+	if (gs->key_down_state(SDLK_c)) {
 		Pos hitsqr;
 		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN, &hitsqr)) {
 			int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
@@ -95,7 +93,7 @@ void PlayerInst::step(GameState* gs) {
 			gs->set_generate_flag();
 		}
 	}
-	if (gs->key_press_state(SDLK_x) && gs->branch_level() > 1) {
+	if (gs->key_down_state(SDLK_x) && gs->branch_level() > 1) {
 		Pos hitsqr;
 		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP, &hitsqr)) {
 			int entr_n = scan_entrance(gs->level()->exits, hitsqr);
@@ -116,15 +114,22 @@ void PlayerInst::step(GameState* gs) {
 	}
 
 	stats().step();
-	if (gs->frame() % 25 == 0) {
+	if (gs->frame() % stats().hpregen == 0) {
 		if (++stats().hp > stats().max_hp)
 			stats().hp = stats().max_hp;
 	}
-	if (gs->frame() % 15 == 0) {
+	if (gs->frame() % stats().mpregen == 0) {
 		if (++stats().mp > stats().max_mp)
 			stats().mp = stats().max_mp;
 	}
 	bool mouse_within = gs->mouse_x() < gs->window_view().width;
+	if ( gs->key_press_state(SDLK_1) ) {
+		if(inventory.inv[0].n > 0){
+            int item = inventory.inv[0].item;
+            game_item_data[item].action(this);
+			inventory.inv[0].n--;
+		}
+	}
 	/*
 	if (gs->key_press_state(SDLK_f)){
 
@@ -133,9 +138,19 @@ void PlayerInst::step(GameState* gs) {
 				stats().range, x, y, rmx, rmy);
 		gs->add_instance(bullet);
 		base_stats.reset_cooldown();
-	} else */if (( (gs->mouse_left_down() && mouse_within) || gs->key_press_state(SDLK_f)) && !base_stats.has_cooldown()) {
-		int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
-		if (stats().mp > 10) {
+	} else */
+	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
+	if (gs->mouse_right_click() && mouse_within){
+		int px = x, py = y;
+		x = rmx, y = rmy;
+		if (stats().mp >= 50 && !gs->solid_test(this) && gs->object_visible_test(this)){
+			stats().mp -= 50;
+		} else {
+			x = px, y = py;
+		}
+	}
+	if (( (gs->mouse_left_down() && mouse_within) || gs->key_down_state(SDLK_f)) && !base_stats.has_cooldown()) {
+		if (stats().mp >= 10) {
 			stats().mp -= 10;
 			GameInst* bullet = new BulletInst(id, stats().ranged, x, y, rmx, rmy);
 			gs->add_instance(bullet);
@@ -152,10 +167,10 @@ void PlayerInst::step(GameState* gs) {
 		}
 	}
 	
-	if (gs->mouse_right_down()) {
+	/*if (gs->mouse_right_down()) {
 		int nx = gs->mouse_x() + view.x, ny = gs->mouse_y() + view.y;
 		view.center_on(nx, ny);
-	} else
+	} else*/
 		view.center_on(last_x, last_y);
 }
 

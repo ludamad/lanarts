@@ -85,7 +85,7 @@ void GameHud::draw_minimap(GameState* gs, int subx, int suby) {
 	GameTiles& tiles = gs->tile_grid();
 	GameView& view = gs->window_view();
 
-	bool pressed_z = gs->key_press_state(SDLK_z);
+	bool pressed_z = gs->key_down_state(SDLK_z);
 	int min_tilex, min_tiley;
 	int max_tilex, max_tiley;
 

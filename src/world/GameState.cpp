@@ -26,7 +26,7 @@ GameState::GameState(int width, int height, int vieww, int viewh, int hudw) :
 		world_width(width), world_height(height), level_number(1),  frame_n(0), hud(
 				vieww, 0, hudw, viewh), view(50, 50, vieww, viewh, width,
 				height), mouse_leftdown(0), mouse_rightdown(0), mouse_leftclick(0), mouse_rightclick(0) {
-	memset(key_states, 0, sizeof(key_states));
+	memset(key_down_states, 0, sizeof(key_down_states));
 	init_font(&pfont, "res/arial.ttf", 10);
 	gennextstep = false;
 	lvl = new GameLevelState(DNGN_MAIN_BRANCH, level_number, width, height);
@@ -50,11 +50,12 @@ int GameState::handle_event(SDL_Event *event) {
 		if (event->key.keysym.sym == SDLK_r) {
 
 		}
-		key_states[event->key.keysym.sym] = 1;
+		key_down_states[event->key.keysym.sym] = 1;
+		key_press_states[event->key.keysym.sym] = 1;
 		break;
 	}
 	case SDL_KEYUP: {
-		key_states[event->key.keysym.sym] = 0;
+		key_down_states[event->key.keysym.sym] = 0;
 		break;
 	}
 	case SDL_MOUSEBUTTONDOWN: {
@@ -84,6 +85,8 @@ bool GameState::step() {
 	SDL_Event event;
 	const int sub_sqrs = VISION_SUBSQRS;
 
+	memset(key_press_states, 0, sizeof(key_press_states));
+
 	if (gennextstep)
 		reset_level();
 
@@ -107,8 +110,11 @@ bool GameState::step() {
 	return true;
 }
 
+int GameState::key_down_state(int keyval) {
+	return key_down_states[keyval];
+}
 int GameState::key_press_state(int keyval) {
-	return key_states[keyval];
+	return key_press_states[keyval];
 }
 void GameState::draw() {
 	int vp[4];
@@ -232,7 +238,7 @@ bool GameState::object_visible_test(GameInst* obj) {
 	const int subsize = TILE_SIZE / sub_sqrs;
 
 	int w = width() / subsize, h = height()/ subsize;
-	int x = obj->last_x, y = obj->last_y;
+	int x = obj->x, y = obj->y;
 	int rad = obj->radius;
 	int mingrid_x = (x - rad) / subsize, mingrid_y = (y - rad) / subsize;
 	int maxgrid_x = (x + rad) / subsize, maxgrid_y = (y + rad) / subsize;

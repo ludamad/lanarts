@@ -30,8 +30,8 @@ enum {
 	SPR_JESTER = 14,
 	SPR_SUPERCHICKEN = 15,
 	SPR_SKELETON = 16,
-	SPR_CIRIBOT = 16,
-	SPR_HELLFORGED = 16,
+	SPR_CIRIBOT = 17,
+	SPR_HELLFORGED = 18,
 };
 struct SpriteEntry {
 	const char* name;

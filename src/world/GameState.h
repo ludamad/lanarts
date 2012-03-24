@@ -104,6 +104,7 @@ public:
 	}
 
 	/* Key state query information */
+	int key_down_state(int keyval);
 	int key_press_state(int keyval);
 
 	/* Getters for world size */
@@ -156,7 +157,8 @@ private:
 	font_data pfont;
 
 	//Key/mouse state information
-	char key_states[SDLK_LAST];
+	char key_down_states[SDLK_LAST];
+	char key_press_states[SDLK_LAST];
 	int mousex, mousey;
 	bool mouse_leftdown, mouse_rightdown;
 	bool mouse_leftclick, mouse_rightclick;

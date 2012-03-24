@@ -41,7 +41,8 @@ void EnemyInst::step(GameState* gs) {
 			eb.vy = -eb.vy;
 		}
 	}
-
+	if (stats().hurt_cooldown > 0)
+		eb.vx /=2, eb.vy /=2 ;
 	x = (int) round(rx += eb.vx); //update based on rounding of true float
 	y = (int) round(ry += eb.vy);
 
@@ -63,7 +64,13 @@ void EnemyInst::draw(GameState* gs) {
 	if (stats().hp < stats().max_hp)
 		gl_draw_statbar(view, x - 10, y - 20, 20, 5, stats().hp, stats().max_hp);
 
+	if (stats().hurt_cooldown > 0){
+		float s = 1 - stats().hurt_alpha();
+		Colour red(255,s,s);
+		image_display(&img, xx - view.x, yy - view.y, red);
+	}else
 	image_display(&img, xx - view.x, yy - view.y);
+
 }
 
 

@@ -16,9 +16,9 @@ public:
 		RADIUS = 10, VISION_SUBSQRS = 1
 	};
 	PlayerInst(int x, int y) :
-			GameInst(x, y, RADIUS), base_stats(4, 100, 50,
-					Attack(true, 12, 25, 20),
-					Attack(true, 15, 400, 40/*cooldown*/, SPR_FIREBOLT, 7)), money(0) {
+			GameInst(x, y, RADIUS), base_stats(4, 100, 100,
+					Attack(true, 10, 25, 40),
+					Attack(true, 8, 400, 40/*cooldown*/, SPR_FIREBOLT, 7)), money(0) {
 		portal = NULL;
 	}
 	virtual ~PlayerInst();

@@ -47,12 +47,11 @@ void BulletInst::step(GameState* gs) {
 		gs->object_radius_test(this, &enemy, 1, &enemy_hit);
 		if (enemy){
 			Stats& s = ((EnemyInst*)enemy)->stats();
-			s.hp -= attack.damage;
-			if (s.hp <= 0) {
-				s.hp = 0;
+			if (s.hurt(attack.damage)) {
 				gs->remove_instance(enemy);
 				((PlayerInst*)origin)->stats().gain_xp(10);
 			}
+
 			gs->remove_instance(this);
 		}
 	} else {
@@ -60,7 +59,7 @@ void BulletInst::step(GameState* gs) {
 		gs->object_radius_test(this, &player, 1, &player_hit);
 		if (player){
 			Stats& s = ((PlayerInst*)player)->stats();
-			s.hp -= attack.damage;
+			s.hurt(attack.damage);
 			gs->remove_instance(this);
 		}
 	}
