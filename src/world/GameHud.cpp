@@ -48,7 +48,7 @@ static void draw_player_inventory(GameState* gs, PlayerInst* player, int x, int 
 	      image_display(&game_sprite_data[itemd.sprite_number].img,(ix*TILE_SIZE)+x+1,(iy*TILE_SIZE)+y);
 	      gl_printf(gs->primary_font(), Colour(255,255,255), x+ix*TILE_SIZE, y+iy*TILE_SIZE, "%d", player->inventory.inv[slot].n);
 	    }
-        }
+		}
     }
 }
 
@@ -148,6 +148,9 @@ void GameHud::draw(GameState* gs) {
 	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-15,64+45+128+15,"Gold %d", player_inst->gold());
 	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+30,"Melee Damage %d", player_inst->effective_stats().melee.damage);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+45,"Range Damage %d", player_inst->effective_stats().ranged.damage);
+	effect* efx = player_inst->status_effects().get(EFFECT_HASTE);
+	if (efx)
+		gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+60,"HASTE %d", efx->t_remaining);
 }
 
 GameHud::GameHud(int x, int y, int width, int height) :

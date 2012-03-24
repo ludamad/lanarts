@@ -44,7 +44,7 @@ EnemyGenSettings enemyfewweak(0, 2, 20);
 static LevelGenSettings mainbranch[] = {
 		//Tiny rooms with 5 monsters
 		LevelGenSettings(STD_W * 0.3, STD_H * 0.3, itemfew, roomsparsesmall,
-				TunnelGenSettings(2, 5 /*2 to 5 width tunnels*/, 1,2 /*1 to 2 tunnels per room*/),
+				TunnelGenSettings(2, 5 /*2 to 5 width tunnels*/, 5,5 /*5 to 5 tunnels per room*/),
 				featurefirstlevel, EnemyGenSettings(0,2,5)),
 		LevelGenSettings(
 				STD_W * 0.4, STD_H * 0.4, itemmed, roomsparsesmall,
