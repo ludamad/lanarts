@@ -127,7 +127,7 @@ void GameState::draw() {
 	for (size_t i = 0; i < safe_copy.size(); i++) {
 		safe_copy[i]->draw(this);
 	}
-
+	monster_controller().post_draw(this);
 	lvl->tiles.post_draw(this);
 	hud.draw(this);
 	update_display();

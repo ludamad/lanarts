@@ -34,7 +34,9 @@ public:
 	const std::vector<obj_id>& monster_ids(){ return mids;}
 
 	void pre_step(GameState* gs);
+	void post_draw(GameState* gs);
 	void register_enemy(obj_id monster) { mids.push_back(monster); }
+	void shift_target();
 
 	void clear();
 	void set_monster_headings(GameState* gs, std::vector<EnemyOfInterest>& eois);
