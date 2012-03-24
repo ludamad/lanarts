@@ -18,10 +18,9 @@ typedef void (*effect_actionf)(Stats& basestats, Stats& affected);
 
 struct Effect {
 	const char* name;
-	int length;
 	effect_actionf action;
-	Effect(const char* name, int length, effect_actionf act) :
-		name(name), length(length), action(act){
+	Effect(const char* name, effect_actionf act) :
+		name(name), action(act){
 	}
 };
 

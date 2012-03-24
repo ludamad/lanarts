@@ -8,7 +8,7 @@ void use_health_potion(GameInst* inst){
 }
 
 void use_haste_scroll(GameInst* inst){
-	((PlayerInst*) inst)->status_effects().add(EFFECT_HASTE, 100);
+	((PlayerInst*) inst)->status_effects().add(EFFECT_HASTE, 400);
 }
 
 
