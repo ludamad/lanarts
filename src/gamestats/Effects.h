@@ -20,15 +20,21 @@ struct Effects {
 	void add(int effect, int length) {
 		for (int i = 0; i < EFFECTS_NUMBER; i++) {
 			if (effects[i].t_remaining == 0 || effects[i].effect == effect) {
-				effect[i].effect = effect;
-				effect[i].t_remaining += length;
+				effects[i].effect = effect;
+				effects[i].t_remaining += length;
 				return;
 			}
 		}
 	}
+	void step(){
+		for(int i = 0; i < EFFECTS_NUMBER; i++){
+			if (effects[i].t_remaining> 0)
+				effects[i].t_remaining--;
+		}
+	}
 	
 	void process(Stats& basestats, Stats& affected ){
-		for(int i = 0; i < game_effect_n; i++){
+		for(int i = 0; i < EFFECTS_NUMBER; i++){
 			if(effects[i].t_remaining > 0)
 				game_effect_data[effects[i].effect].action(basestats, affected);
 		}

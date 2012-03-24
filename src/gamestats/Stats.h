@@ -61,6 +61,13 @@ struct Stats {
 	void reset_ranged_cooldown() {
 		cooldown = ranged.cooldown;
 	}
+	
+	void reset_melee_cooldown(const Stats& effectivestats) {
+		cooldown = effectivestats.melee.cooldown;
+	}
+	void reset_ranged_cooldown(const Stats& effectivestats) {
+		cooldown = effectivestats.ranged.cooldown;
+	}
 	bool hurt(int dmg){
 		hp -= dmg;
 		set_hurt_cooldown();

@@ -51,7 +51,7 @@ void PlayerInst::move(GameState* gs, int dx, int dy) {
 		if (target->stats().hurt(effective_stats().melee.damage)) {
 			gs->remove_instance(target);
 		}
-		stats().reset_melee_cooldown();
+		stats().reset_melee_cooldown(effective_stats());
 	}
 }
 
@@ -68,11 +68,28 @@ void PlayerInst::step(GameState* gs) {
 
 	GameView& view = gs->window_view();
 
+	//Stats/effect step
+	stats().step();
+	effects.step();
+	
+	//HP/MP regen
+	if (gs->frame() % stats().hpregen == 0) {
+		if (++stats().hp > stats().max_hp)
+			stats().hp = stats().max_hp;
+	}
+	if (gs->frame() % stats().mpregen == 0) {
+		if (++stats().mp > stats().max_mp)
+			stats().mp = stats().max_mp;
+	}
+
 	if (stats().hp <= 0) {
 		gs->branch_level() = 1;
 		gs->set_generate_flag();
 		return;
 	}
+
+
+	//Arrow/wasd movement
 	int dx = 0, dy = 0;
 	if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
 		dy -= 1;
@@ -86,7 +103,13 @@ void PlayerInst::step(GameState* gs) {
 	if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
 		dx -= 1;
 	}
+	if (gs->key_press_state(SDLK_h)) {
+		effects.add(EFFECT_HASTE, 100);
+	}
 	move(gs, dx, dy);
+	
+	
+	//Up/down stairs
 	if (gs->key_down_state(SDLK_c)) {
 		Pos hitsqr;
 		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN,
@@ -110,6 +133,8 @@ void PlayerInst::step(GameState* gs) {
 			->set_generate_flag();
 		}
 	}
+	
+	//Item pickup
 	ItemInst* item = NULL;
 	if (gs->object_radius_test(this, (GameInst**) &item, 1, &item_hit)) {
 		gs->remove_instance(item);
@@ -120,15 +145,6 @@ void PlayerInst::step(GameState* gs) {
 		}
 	}
 
-	stats().step();
-	if (gs->frame() % stats().hpregen == 0) {
-		if (++stats().hp > stats().max_hp)
-			stats().hp = stats().max_hp;
-	}
-	if (gs->frame() % stats().mpregen == 0) {
-		if (++stats().mp > stats().max_mp)
-			stats().mp = stats().max_mp;
-	}
 	bool mouse_within = gs->mouse_x() < gs->window_view().width;
 	if (gs->key_press_state(SDLK_1)) {
 		if (inventory.inv[0].n > 0) {
@@ -158,7 +174,7 @@ void PlayerInst::step(GameState* gs) {
 				GameInst* bullet = new BulletInst(id, stats().ranged, x, y,
 						target->x, target->y);
 				gs->add_instance(bullet);
-				base_stats.reset_ranged_cooldown();
+				base_stats.reset_ranged_cooldown(effective_stats());
 			}
 		}
 	} else if (gs->mouse_left_down() && mouse_within && !base_stats.has_cooldown()) {
@@ -167,7 +183,7 @@ void PlayerInst::step(GameState* gs) {
 			GameInst* bullet = new BulletInst(id, stats().ranged, x, y, rmx,
 					rmy);
 			gs->add_instance(bullet);
-			base_stats.reset_ranged_cooldown();
+			base_stats.reset_ranged_cooldown(effective_stats());
 		}
 	} else if (gs->mouse_left_click() && !mouse_within) {
 		int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;

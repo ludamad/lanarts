@@ -146,8 +146,8 @@ void GameHud::draw(GameState* gs) {
 	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-15,10,"Level %d", player_inst->stats().xplevel);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-15,64+45+128,"Floor %d", gs->branch_level());
 	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-15,64+45+128+15,"Gold %d", player_inst->gold());
-	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+30,"Melee Damage %d", player_inst->stats().melee.damage);
-	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+45,"Range Damage %d", player_inst->stats().ranged.damage);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+30,"Melee Damage %d", player_inst->effective_stats().melee.damage);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+45,"Range Damage %d", player_inst->effective_stats().ranged.damage);
 }
 
 GameHud::GameHud(int x, int y, int width, int height) :

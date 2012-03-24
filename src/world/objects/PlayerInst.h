@@ -4,6 +4,7 @@
 #include "GameInst.h"
 #include "../../gamestats/Stats.h"
 #include "../../gamestats/Inventory.h"
+#include "../../gamestats/Effects.h"
 #include "../../fov/fov.h"
 #include "../../pathfind/pathfind.h"
 #include "../GameLevelState.h"
@@ -29,7 +30,9 @@ public:
 		return base_stats;
 	}
 	Stats effective_stats(){
-		return base_stats;
+		Stats tmp = base_stats;
+		effects.process(base_stats, tmp);
+		return tmp;
 	}
 	int gold() {
 		return money;
@@ -42,6 +45,7 @@ public:
 private:
 	void move(GameState* gs, int dx, int dy);
 	Stats base_stats;
+	Effects effects;
 	int money;
 	//Hack for now of remembering which entrance we hit last
 	GameLevelPortal* portal;

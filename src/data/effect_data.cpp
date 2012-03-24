@@ -4,7 +4,8 @@
 
 void use_haste(Stats& basestats, Stats& affected){
 	affected.movespeed += basestats.movespeed;
-	affected.melee.cooldown -= affected.melee.cooldown/2;
+	affected.melee.cooldown /= 2;
+	affected.ranged.cooldown /= 2;
 }
 
 
