@@ -110,7 +110,7 @@ void PlayerInst::step(GameState* gs) {
 	
 	
 	//Up/down stairs
-	if (gs->key_down_state(SDLK_c)) {
+	if (gs->key_down_state(SDLK_PERIOD)) {
 		Pos hitsqr;
 		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN,
 				&hitsqr)) {
@@ -169,7 +169,7 @@ void PlayerInst::step(GameState* gs) {
 	if (gs->key_press_state(SDLK_g)) {
 		gs->monster_controller().shift_target(gs);
 	}
-	if (gs->key_down_state(SDLK_f) && !base_stats.has_cooldown()) {
+	if (gs->key_down_state(SDLK_j) && !base_stats.has_cooldown()) {
 		obj_id tid = gs->monster_controller().targetted;
 		GameInst* target = gs->get_instance(tid);
 		if (tid && target ) {
