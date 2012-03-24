@@ -267,7 +267,7 @@ static int squish(int a, int b, int c) {
 }
 
 int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
-		col_filter f, int x, int y, int radius) {
+		col_filterf f, int x, int y, int radius) {
 	int rad = radius == -1 ? obj->radius : radius;
 	x = x == -1 ? obj->last_x : x;
 	y = obj->last_y;
@@ -329,7 +329,7 @@ void GameInstSet::clear(){
 	memset(unit_grid, 0, grid_w * grid_h * sizeof(int));
 }
 
-GameInst* GameInstSet::object_nearest_test(GameInst* obj, int max_radius, col_filter f){
+GameInst* GameInstSet::object_nearest_test(GameInst* obj, int max_radius, col_filterf f){
 	/*GameInst nearest_obj = NULL;
 	int nearest_sqr = max_radius*max_radius;
 

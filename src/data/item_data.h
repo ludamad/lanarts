@@ -15,14 +15,14 @@ enum {
   ITEM_POTION = 1
 };
 
-typedef void (*item_act_f)(GameInst* inst);
+typedef void (*item_actionf)(GameInst* inst);
 
 struct ItemType {
 	const char* name;
 	int sprite_number;
 	int radius;
-	item_act_f action;
-	ItemType(const char* name, int rad, int spriten, item_act_f act) :
+	item_actionf action;
+	ItemType(const char* name, int rad, int spriten, item_actionf act) :
 		name(name), sprite_number(spriten), radius(rad), action(act){
 	}
 };

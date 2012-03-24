@@ -16,11 +16,11 @@ BulletInst::~BulletInst() {
 
 }
 
-BulletInst::BulletInst(obj_id originator, int sprnum, int speed, int range, int x, int y, int tx, int ty) :
-		GameInst(x, y, RADIUS, false), sprnum(sprnum), speed(speed), range_left(range), origin_id(originator), rx(x), ry(y) {
+BulletInst::BulletInst(obj_id originator, Attack& attack, int x, int y, int tx, int ty) :
+		GameInst(x, y, RADIUS, false), attack(attack), range_left(attack.range), origin_id(originator), rx(x), ry(y) {
 	int dx = tx - x, dy = ty - y;
 	double abs = sqrt(dx * dx + dy * dy);
-	vx = dx * speed / abs, vy = dy * speed / abs;
+	vx = dx * attack.projectile_speed / abs, vy = dy * attack.projectile_speed / abs;
 }
 
 static bool enemy_hit(GameInst* self, GameInst* other){
@@ -34,7 +34,7 @@ void BulletInst::step(GameState* gs) {
 	x = (int) round(rx += vx); //update based on rounding of true float
 	y = (int) round(ry += vy);
 
-	range_left -= speed;
+	range_left -= attack.projectile_speed;
 
 	if (range_left <= 0 || gs->tile_radius_test(x, y, RADIUS)){
 		gs->remove_instance(this);
@@ -47,7 +47,7 @@ void BulletInst::step(GameState* gs) {
 		gs->object_radius_test(this, &enemy, 1, &enemy_hit);
 		if (enemy){
 			Stats& s = ((EnemyInst*)enemy)->stats();
-			s.hp -= 10;
+			s.hp -= attack.damage;
 			if (s.hp <= 0) {
 				s.hp = 0;
 				gs->remove_instance(enemy);
@@ -60,7 +60,7 @@ void BulletInst::step(GameState* gs) {
 		gs->object_radius_test(this, &player, 1, &player_hit);
 		if (player){
 			Stats& s = ((PlayerInst*)player)->stats();
-			s.hp -= 25;
+			s.hp -= attack.damage;
 			gs->remove_instance(this);
 		}
 	}
@@ -68,7 +68,7 @@ void BulletInst::step(GameState* gs) {
 
 void BulletInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
-	image_display(view, &game_sprite_data[sprnum].img,x-TILE_SIZE/2, y-TILE_SIZE/2);
+	image_display(view, &game_sprite_data[attack.projectile_sprite].img,x-TILE_SIZE/2, y-TILE_SIZE/2);
 	//gl_draw_circle(view, x, y, RADIUS, (origin_id == gs->local_playerid()) ? Colour(0, 255, 0) : Colour(255, 215, 11));
 
 }

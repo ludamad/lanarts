@@ -17,7 +17,14 @@ SpriteEntry game_sprite_data[] = {
 		SpriteEntry("scroll", "res/items/misc/scroll.png"),
 		SpriteEntry("potion", "res/items/misc/potion.png"),
 		SpriteEntry("fire", "res/effects/bolt04.png"),
-		SpriteEntry("storm", "res/effects/bolt07.png")
+		SpriteEntry("storm", "res/effects/bolt07.png"),
+
+		SpriteEntry("grue", "res/monsters/grue.png"),
+		SpriteEntry("jester", "res/monsters/jester.png"),
+		SpriteEntry("super chicken", "res/monsters/superchicken.png"),
+		SpriteEntry("skeleton", "res/monsters/skeleton.png"),
+		SpriteEntry("ciribot", "res/monsters/ciribo.png"),
+		SpriteEntry("hell forged", "res/monsters/hellforged.png"),
 };
 
 size_t game_sprite_n = sizeof(game_sprite_data)/sizeof(SpriteEntry);

@@ -41,10 +41,10 @@ public:
 	bool solid_radius_test(int x, int y, int rad);
 	bool tile_line_test(int x, int y, int w, int h);
 	int object_radius_test(GameInst* obj, GameInst** objs = NULL,
-			int obj_cap = 0, col_filter f = NULL, int x = -1,
+			int obj_cap = 0, col_filterf f = NULL, int x = -1,
 			int y = -1, int radius = -1);
 	bool solid_test(GameInst* obj, GameInst** objs = NULL,
-			int obj_cap = 0, col_filter f = NULL, int x = -1,
+			int obj_cap = 0, col_filterf f = NULL, int x = -1,
 			int y = -1, int radius = -1){
 		int lx = (x == -1 ? obj->x : x), ly = (y == -1 ? obj->y : y);
 		return tile_radius_test(lx, ly,obj->radius) ||
@@ -73,7 +73,7 @@ public:
 	}
 	//Finds the nearest object to 'obj' with some condition true
 	//Takes on the order of (max_radius*2/96)^2 time
-	GameInst* nearest_object(GameInst* obj, int max_radius, col_filter f = NULL);
+	GameInst* nearest_object(GameInst* obj, int max_radius, col_filterf f = NULL);
 
 	/* Mouse state information */
 	int mouse_x() {

@@ -1,24 +1,31 @@
 #ifndef STATS_H_
 #define STATS_H_
 
+struct Attack  {//Currently for melee & ranged
+	bool canuse;
+	int damage;
+	int range, cooldown;
+	int projectile_sprite;
+	int projectile_speed;
+
+	Attack(bool canuse = false, int damage = 0, int range = 0, int cooldown = 0, int spr = 0, int bspeed = 0 ) :
+		canuse(canuse), damage(damage), range(range), cooldown(cooldown), projectile_sprite(spr), projectile_speed(bspeed){
+	}
+};
 struct Stats {
 	float movespeed;
 	int hp, max_hp;
 	int mp, max_mp;
-	bool can_melee, can_range;//TODO: Make much more fleshed out with attack profiles
-	int melee_dmg, range_dmg;
-	int cooldown, start_cooldown;
-	int melee_reach, range, bulletspeed;
+	int cooldown;
+
+	Attack melee, ranged;
+
 	int xp, xpneeded, xplevel;
-	Stats(float speed, int hp, int mp, bool can_melee, bool can_range, int melee_dmg, int range_dmg,
-			int cooldown, int mreach, int range, int bspeed = 7) :
+	Stats(float speed, int hp, int mp, const Attack& melee, const Attack& ranged) :
 			movespeed(speed),
 			hp(hp), max_hp(hp), mp(mp), max_mp(mp),
-			can_melee(can_melee), can_range(can_range),
-			melee_dmg(melee_dmg), range_dmg(range_dmg),
-			cooldown(cooldown), start_cooldown(cooldown),
-			melee_reach(mreach), range(range),
-			bulletspeed(bspeed),
+			cooldown(0),
+			melee(melee), ranged(ranged),
 			xp(0), xpneeded(100), xplevel(1) {
 	}
 	void step() {
@@ -29,8 +36,11 @@ struct Stats {
 	bool has_cooldown() {
 		return cooldown > 0;
 	}
-	void reset_cooldown() {
-		cooldown = start_cooldown;
+	void reset_melee_cooldown() {
+		cooldown = melee.cooldown;
+	}
+	void reset_ranged_cooldown() {
+		cooldown = ranged.cooldown;
 	}
 	void gain_level(){
 		hp += 20;

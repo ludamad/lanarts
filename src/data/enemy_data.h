@@ -14,9 +14,10 @@ struct EnemyType {
 	const char* name;
 	int sprite_number;
 	int radius;
+	int xpaward;
 	Stats basestats;
-	EnemyType(const char* name, int rad, int spriten, const Stats& stats) :
-		name(name), radius(rad), sprite_number(spriten), basestats(stats){
+	EnemyType(const char* name, int rad, int xpaward, int spriten, const Stats& stats) :
+		name(name), radius(rad), xpaward(xpaward), sprite_number(spriten), basestats(stats){
 	}
 };
 

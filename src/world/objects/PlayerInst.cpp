@@ -23,10 +23,20 @@ static bool item_hit(GameInst* self, GameInst* other) {
 	return dynamic_cast<ItemInst*>(other) != NULL;
 }
 
+static bool enemy_hit(GameInst* self, GameInst* other) {
+	return dynamic_cast<EnemyInst*>(other) != NULL;
+}
+
 void PlayerInst::move(GameState* gs, int dx, int dy) {
+	if (dx == 0 && dy == 0) return;
+
 	float mag =	stats().movespeed;
 	float ddx = dx*mag;
 	float ddy = dy*mag;
+
+	EnemyInst* target = NULL;
+	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_hit, x + ddx, y + ddy);
+
 	if (!gs->solid_test(this, NULL, 0, NULL, x + ddx, y + ddy)){
 		x += ddx;
 		y += ddy;
@@ -35,7 +45,14 @@ void PlayerInst::move(GameState* gs, int dx, int dy) {
 	} else if (!gs->solid_test(this, NULL, 0, NULL, x, y + ddy)){
 		y += ddy;
 	}
-
+	if (target && !stats().has_cooldown()){
+		target->stats().hp -= stats().melee.damage;
+		if (target->stats().hp <= 0){
+			target->stats().hp = 0;
+			gs->remove_instance(target);
+		}
+		stats().reset_melee_cooldown();
+	}
 }
 
 static int scan_entrance(const std::vector<GameLevelPortal>& portals, const Pos& tilepos){
@@ -103,6 +120,10 @@ void PlayerInst::step(GameState* gs) {
 		if (++stats().hp > stats().max_hp)
 			stats().hp = stats().max_hp;
 	}
+	if (gs->frame() % 15 == 0) {
+		if (++stats().mp > stats().max_mp)
+			stats().mp = stats().max_mp;
+	}
 	bool mouse_within = gs->mouse_x() < gs->window_view().width;
 	/*
 	if (gs->key_press_state(SDLK_f)){
@@ -114,10 +135,12 @@ void PlayerInst::step(GameState* gs) {
 		base_stats.reset_cooldown();
 	} else */if (( (gs->mouse_left_down() && mouse_within) || gs->key_press_state(SDLK_f)) && !base_stats.has_cooldown()) {
 		int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
-		GameInst* bullet = new BulletInst(id, SPR_FIREBOLT, stats().bulletspeed,
-				stats().range, x, y, rmx, rmy);
-		gs->add_instance(bullet);
-		base_stats.reset_cooldown();
+		if (stats().mp > 10) {
+			stats().mp -= 10;
+			GameInst* bullet = new BulletInst(id, stats().ranged, x, y, rmx, rmy);
+			gs->add_instance(bullet);
+			base_stats.reset_ranged_cooldown();
+		}
 	}else if(gs->mouse_left_click() && !mouse_within){
 		int posx = (gs->mouse_x() - gs->window_view().width)/TILE_SIZE;
         int posy = (gs->mouse_y() - INVENTORY_POSITION)/TILE_SIZE;

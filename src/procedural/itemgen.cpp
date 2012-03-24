@@ -23,17 +23,10 @@ void generate_items(const ItemGenSettings& is, MTwist& mt, GeneratedLevel& level
 		Pos ipos = generate_location(mt, level);
 		int ix = (ipos.x+start_x) * 32 + 16;
 		int iy = (ipos.y+start_y) * 32 + 16;
-		gs->add_instance(new ItemInst(ITEM_GOLD, ix,iy));
-		level.at(ipos).has_instance = true;
-	}
-	
-	amount = mt.rand(3, 5);
-	//generate potions
-	for(int i = 0; i < amount; i++){
-		Pos ipos = generate_location(mt, level);
-		int ix = (ipos.x+start_x) * 32 + 16;
-		int iy = (ipos.y+start_y) * 32 + 16;
-		gs->add_instance(new ItemInst(ITEM_POTION, ix,iy));
+		if (mt.rand(4)!= 0)
+			gs->add_instance(new ItemInst(ITEM_GOLD, ix,iy));
+		else
+			gs->add_instance(new ItemInst(ITEM_POTION, ix,iy));
 		level.at(ipos).has_instance = true;
 	}
 }

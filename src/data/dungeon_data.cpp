@@ -9,8 +9,13 @@
 
 //Standard width and height
 const int STD_W = 128, STD_H = 128;
-ItemGenSettings itemdefault(1 /*more = stronger items*/, 10,
-		10 /*10 to 10 items*/);
+
+ItemGenSettings itemfew(1 /*more = stronger items*/, 2,
+		4 /*2 to 4 items*/);
+ItemGenSettings itemmed(1 /*more = stronger items*/, 5,
+		8 /*5 to 8 items*/);
+ItemGenSettings itemdefault(1 /*more = stronger items*/, 8,
+		16 /*8 to 10 items*/);
 
 RoomGenSettings roomdensevaried(1 /*padding*/, 90 /*amount of rooms*/,
 		4 /*min size*/, 30 /*max size*/);
@@ -30,36 +35,39 @@ FeatureGenSettings featuredefault(3, 3 /*3 stairs up, 3 stairs down*/,
 FeatureGenSettings featurefirstlevel(0, 3 /*0 stairs up, 3 stairs down*/,
 		1 /*Default tileset*/);
 
-EnemyGenSettings enemyfew(1, 2, 20);
-EnemyGenSettings enemymed(1, 2, 30);
-EnemyGenSettings enemymany(1, 2, 40);
+/*Min monster index, max monster index, # of monsters*/
+EnemyGenSettings enemyfewweak(0, 2, 20);
+
 
 #define BRANCH(arr) DungeonBranch(arr, sizeof(arr)/sizeof(LevelGenSettings))
 
-static LevelGenSettings mainbranch[] = { //Attempt
-		LevelGenSettings(STD_W * 0.5, STD_H * 0.5, itemdefault, roomdensevaried,
-				tunneldefault, featurefirstlevel, enemyfew),
+static LevelGenSettings mainbranch[] = {
+		//Tiny rooms with 5 monsters
+		LevelGenSettings(STD_W * 0.25, STD_H * 0.25, itemfew, roomdensevaried,
+				tunneldefault, featurefirstlevel, EnemyGenSettings(0,2,5)),
+		LevelGenSettings(STD_W * 0.25, STD_H * 0.25, itemfew, roomdensevaried,
+				tunneldefault, featuredefault, EnemyGenSettings(0,2,5)),
+		LevelGenSettings(STD_W * 0.25, STD_H * 0.25, itemfew, roomsparsesmall,
+				tunneldefault, featuredefault, EnemyGenSettings(0,2,5)),
+
 		LevelGenSettings(
-				STD_W * 0.5, STD_H * 0.5, itemdefault, roomsparsesmall,
-				tunneldefault, featuredefault, enemymed),
+				STD_W * 0.3, STD_H * 0.3, itemfew, roomsparsesmall,
+				tunneldefault, featuredefault, EnemyGenSettings(0,3,10)),
 		LevelGenSettings(
-				STD_W * 0.6, STD_H * 0.6, itemdefault, roommediumhighpad,
-				tunneldefault, featuredefault, enemymed),
+				STD_W * 0.5, STD_H * 0.5, itemmed, roomsparsesmall,
+				tunneldefault, featuredefault, EnemyGenSettings(0,3,20)),
 		LevelGenSettings(
-				STD_W * 0.7, STD_H * 0.7, itemdefault, roommediumhighpad,
-				tunneldefault, featuredefault, enemymed),
+				STD_W * 0.6, STD_H * 0.6, itemmed, roommediumhighpad,
+				tunneldefault, featuredefault, EnemyGenSettings(0,5,25)),
+		LevelGenSettings(
+				STD_W * 0.7, STD_H * 0.7, itemmed, roommediumhighpad,
+				tunneldefault, featuredefault, EnemyGenSettings(0,5,30)),
 		LevelGenSettings(
 				STD_W * 0.7, STD_H * 0.7, itemdefault, roomsparsesmall,
-				tunneldefault, featuredefault, enemymany),
+				tunneldefault, featuredefault, EnemyGenSettings(0,6,30)),
 		LevelGenSettings(
 				STD_W * 1, STD_H * 1, itemdefault, roommediumhighpad,
-				tunnelwide, featuredefault, enemymany),
-		LevelGenSettings(
-				STD_W * 1, STD_H * 1, itemdefault, roommediumhighpad,
-				tunnelwide, featuredefault, EnemyGenSettings(1, 2, 50)),
-		LevelGenSettings(STD_W * 1, STD_H * 1, itemdefault,
-				roommediumhighpad, tunnelwide, featuredefault,
-				EnemyGenSettings(1, 2, 50)), };
+				tunnelwide, featuredefault, EnemyGenSettings(2,7,40))};
 
 DungeonBranch game_dungeon_data[] = { BRANCH(mainbranch) };
 

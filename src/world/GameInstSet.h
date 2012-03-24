@@ -35,8 +35,8 @@ public:
 	GameInst* get_by_id(int id);
 	GameInst* get_by_coord(const Coord& c);
 
-	GameInst* object_nearest_test(GameInst* obj, int max_radius, col_filter f = NULL);
-	int object_radius_test(GameInst* obj, GameInst** objs = NULL, int obj_cap = 0, col_filter f = NULL, int x=-1, int y=-1, int radius=-1);
+	GameInst* object_nearest_test(GameInst* obj, int max_radius, col_filterf f = NULL);
+	int object_radius_test(GameInst* obj, GameInst** objs = NULL, int obj_cap = 0, col_filterf f = NULL, int x=-1, int y=-1, int radius=-1);
 
 	size_t size(){ return unit_amnt; }
 	std::vector<GameInst*> to_vector();

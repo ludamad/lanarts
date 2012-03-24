@@ -17,15 +17,23 @@
 #include "../display/display.h"
 #include "../gamestats/Inventory.h"
 
-static void draw_player_stats(PlayerInst* player, int x, int y) {
+static void draw_player_stats(GameState*gs, PlayerInst* player, int x, int y) {
 	Stats& s = player->stats();
 	gl_draw_statbar(x, y, 100, 10, s.hp, s.max_hp);
+	gl_printf(gs->primary_font(), Colour(0,0,0),
+			x+30,y, "%d/%d", s.hp, s.max_hp);
 //	gl_draw_rectangle(x, y, 100, 10, Colour(255, 0, 0));
 //	gl_draw_rectangle(x, y, 100 * s.hp / s.max_hp, 10, Colour(0, 255, 0));
 	gl_draw_statbar(x, y + 15,100, 10, s.mp, s.max_mp,
 			Colour(0,0,255), Colour(200,200,200));
+
+	gl_printf(gs->primary_font(), Colour(0,0,0),
+			x+30,y+15, "%d/%d", s.mp, s.max_mp);
 	gl_draw_statbar(x, y + 30,100, 10, s.xp, s.xpneeded,
 			 Colour(255, 215, 11), Colour(169,143,100));
+
+	gl_printf(gs->primary_font(), Colour(0,0,0),
+			x+30,y+30, "%d/%d", s.xp, s.xpneeded);
 }
 
 static void draw_player_inventory(GameState* gs, PlayerInst* player, int x, int y, int w, int h){
@@ -128,16 +136,18 @@ void GameHud::draw(GameState* gs) {
 	gl_draw_rectangle(0, 0, _width, _height, bg_colour);
 
 	if (player_inst){
-		draw_player_stats(player_inst, 32, 32);
+		draw_player_stats(gs, player_inst, 32, 32);
         draw_player_inventory(gs, player_inst, 0, INVENTORY_POSITION, _width, _height);
     }
 	else {
 		//player = state->get_instance(0);
 	}
 	draw_minimap(gs, 20, 64+45);
-	gl_printf(gs->primary_font(), Colour(255,255,255),_width/2-15,10,"Floor %d", gs->branch_level());
-	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-15,64+45+128,"Level %d", player_inst->stats().xplevel);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-15,10,"Level %d", player_inst->stats().xplevel);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-15,64+45+128,"Floor %d", gs->branch_level());
 	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-15,64+45+128+15,"Gold %d", player_inst->gold());
+	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+30,"Melee Damage %d", player_inst->stats().melee.damage);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+45,"Range Damage %d", player_inst->stats().ranged.damage);
 }
 
 GameHud::GameHud(int x, int y, int width, int height) :

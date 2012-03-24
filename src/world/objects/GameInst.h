@@ -46,7 +46,7 @@ public:
 	bool solid, destroyed;
 };
 
-typedef bool (*col_filter)(GameInst* o1, GameInst* o2);
+typedef bool (*col_filterf)(GameInst* o1, GameInst* o2);
 
 
 #endif /* GAMEINST_H_ */

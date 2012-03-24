@@ -71,12 +71,14 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 	if (stats().has_cooldown()) return;
 	PlayerInst* pinst;
 	if ( (pinst = dynamic_cast<PlayerInst*>(inst))) {
-		GameInst* bullet = new BulletInst(id, SPR_STORMBOLT, stats().bulletspeed, stats().range, x,y,inst->x, inst->y);
 		if (ranged){
+			Attack& ranged = stats().ranged;
+			GameInst* bullet = new BulletInst(id, ranged, x,y,inst->x, inst->y);
 			gs->add_instance(bullet);
+			stats().reset_ranged_cooldown();
 		} else {
-			pinst->stats().hp -= 20;
+			pinst->stats().hp -= stats().melee.damage;
+			stats().reset_melee_cooldown();
 		}
-		stats().reset_cooldown();
 	}
 }

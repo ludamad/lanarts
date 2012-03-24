@@ -18,7 +18,7 @@ void generate_enemies(const EnemyGenSettings& es, MTwist& mt, GeneratedLevel& le
 	int start_y = (tiles.tile_height()-level.height())/2;
 
 	for (int i = 0; i < es.nmonsters; i++) {
-		int etype = mt.rand(0,game_enemy_n);//mt.rand(es.min_xplevel, es.max_xplevel);
+		int etype = mt.rand(es.min_xplevel, es.max_xplevel+1);//mt.rand(es.min_xplevel, es.max_xplevel);
 
 		printf("Game enemies: %d gen %d\n", game_enemy_n, etype);
 		Pos epos = generate_location(mt, level);

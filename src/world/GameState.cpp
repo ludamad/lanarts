@@ -224,7 +224,7 @@ bool GameState::tile_radius_test(int x, int y, int rad, bool issolid,
 }
 
 int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
-		col_filter f, int x, int y, int radius) {
+		col_filterf f, int x, int y, int radius) {
 	return lvl->inst_set.object_radius_test(obj, objs, obj_cap, f, x, y, radius);
 }
 bool GameState::object_visible_test(GameInst* obj) {
@@ -320,7 +320,6 @@ void GameState::reset_level() {
 		PlayerInst* p = new PlayerInst(playerinfo[i]);
 		p->last_x = px, p->last_y = py;
 		p->x = px, p->y = py;
-		p->inventory.add(ITEM_POTION, 10);
 		add_instance(p);
 	}
 
@@ -331,7 +330,7 @@ void GameState::reset_level() {
 }
 
 
-GameInst* GameState::nearest_object(GameInst* obj, int max_radius, col_filter f){
+GameInst* GameState::nearest_object(GameInst* obj, int max_radius, col_filterf f){
 	return lvl->inst_set.object_nearest_test(obj, max_radius, f);
 }
 

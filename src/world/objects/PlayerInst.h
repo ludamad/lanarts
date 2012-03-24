@@ -8,15 +8,17 @@
 #include "../../pathfind/pathfind.h"
 #include "../GameLevelState.h"
 
+#include "../../data/sprite_data.h"
+
 class PlayerInst: public GameInst {
 public:
 	enum {
 		RADIUS = 10, VISION_SUBSQRS = 1
 	};
 	PlayerInst(int x, int y) :
-			GameInst(x, y, RADIUS), base_stats(4, 100, 100, true /*canmelee*/,
-					true /*canranged*/, 10, 10, 20/*cooldoown*/, 20 /*reach*/,
-					400 /*range*/, 5), money(0) {
+			GameInst(x, y, RADIUS), base_stats(4, 100, 50,
+					Attack(true, 12, 25, 20),
+					Attack(true, 15, 400, 40/*cooldown*/, SPR_FIREBOLT, 7)), money(0) {
 		portal = NULL;
 	}
 	virtual ~PlayerInst();
