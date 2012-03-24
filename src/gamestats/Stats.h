@@ -43,17 +43,19 @@ struct Stats {
 		cooldown = ranged.cooldown;
 	}
 	void gain_level(){
-		hp += 20;
-		max_hp += 20;
-		mp += 20;
-		max_mp += 20;
+		hp += 15;
+		max_hp += 15;
+		mp += 10;
+		max_mp += 10;
+		melee.damage += 2;
+		ranged.damage += 2;
 		xplevel ++;
 	}
 	void gain_xp(int amnt){
 		xp += amnt;
 		if (xp >= xpneeded){
 			xp -= xpneeded;
-			xpneeded = xplevel*100;
+			xpneeded = (xplevel)*50;
 			gain_level();
 		}
 
