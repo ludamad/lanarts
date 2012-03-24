@@ -11,6 +11,7 @@ include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE
 set( lanarts_src
 	gamestats/Item.cpp
 	
+	data/effect_data.cpp
 	data/enemy_data.cpp
 	data/item_data.cpp
 	data/tile_data.cpp
@@ -59,10 +60,12 @@ set( lanarts_src
 	)
 
 set( lanarts_include
+	gamestats/Effects.h
 	gamestats/Inventory.h
 	gamestats/Item.h
 	gamestats/Stats.h
 	
+	data/effect_data.h
 	data/enemy_data.h
 	data/item_data.h
 	data/game_data.h
