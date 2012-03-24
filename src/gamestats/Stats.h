@@ -29,7 +29,7 @@ struct Stats {
 	Stats(float speed, int hp, int mp, const Attack& melee, const Attack& ranged) :
 			movespeed(speed),
 			hp(hp), max_hp(hp), mp(mp), max_mp(mp),
-			hpregen(40), mpregen(15),
+			hpregen(30), mpregen(15),
 			cooldown(0), hurt_cooldown(0),
 			melee(melee), ranged(ranged),
 			xp(0), xpneeded(100), xplevel(1) {
@@ -94,7 +94,7 @@ struct Stats {
 		xp += amnt;
 		if (xp >= xpneeded){
 			xp -= xpneeded;
-			xpneeded = (xplevel)*100;
+			xpneeded = (xplevel-1)*100 + 50;
 			gain_level();
 		}
 
