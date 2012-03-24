@@ -149,7 +149,11 @@ void PlayerInst::step(GameState* gs) {
 			x = px, y = py;
 		}
 	}
-	if (gs->key_press_state(SDLK_f) && !base_stats.has_cooldown()) {
+
+	if (gs->key_press_state(SDLK_g)) {
+		gs->monster_controller().shift_target(gs);
+	}
+	if (gs->key_down_state(SDLK_f) && !base_stats.has_cooldown()) {
 		obj_id tid = gs->monster_controller().targetted;
 		GameInst* target = gs->get_instance(tid);
 		if (tid && target ) {

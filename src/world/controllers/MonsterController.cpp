@@ -67,7 +67,24 @@ void MonsterController::set_monster_headings(GameState* gs, std::vector<EnemyOfI
 	}
 }
 
-void MonsterController::shift_target(){
+void MonsterController::shift_target(GameState* gs){
+	if (!targetted) return;//Should auto-target, it no target no possible targets
+	int i, j;
+	for (i = 0; i < mids.size(); i++) {
+		if (mids[i] == targetted) break;
+	}
+
+	for (j = i+1; j % mids.size() != i; j++) {
+		EnemyInst* e = (EnemyInst*) gs->get_instance(mids[j % mids.size()]);
+		if (e == NULL)
+			continue;
+
+		bool isvisible = gs->object_visible_test(e);
+		if (isvisible){
+			targetted = e->id;
+			return;
+		}
+	}
 
 }
 
