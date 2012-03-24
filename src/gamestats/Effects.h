@@ -26,6 +26,14 @@ struct Effects {
 			}
 		}
 	}
+	effect* get(int effect) {
+		for (int i = 0; i < EFFECTS_NUMBER; i++) {
+			if (effects[i].t_remaining > 0 || effects[i].effect == effect) {
+				return &effects[i];
+			}
+		}
+		return NULL;
+	}
 	void step(){
 		for(int i = 0; i < EFFECTS_NUMBER; i++){
 			if (effects[i].t_remaining> 0)
