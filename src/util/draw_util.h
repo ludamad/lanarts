@@ -21,12 +21,12 @@ struct Colour {
 };
 
 void gl_draw_circle(float x, float y, float radius,
-    const Colour& colour = Colour(0,0,0) );
+    const Colour& colour = Colour(0,0,0), bool outline = false);
 void gl_draw_rectangle(int x, int y, int w, int h,
     const Colour& colour = Colour(0,0,0) );
 inline void gl_draw_circle(const GameView& view, float x, float y, float radius,
-    const Colour& colour = Colour(0,0,0) ){
-	gl_draw_circle(x-view.x,y-view.y,radius,colour);
+    const Colour& colour = Colour(0,0,0), bool outline = false ){
+	gl_draw_circle(x-view.x,y-view.y,radius,colour, outline);
 }
 inline void gl_draw_rectangle(const GameView& view, int x, int y, int w, int h,
     const Colour& colour = Colour(0,0,0)) {

@@ -16,22 +16,11 @@ const int PATHING_RADIUS = 500;
 const int HUGE_DISTANCE = 1000000;
 
 MonsterController::MonsterController() {
+	targetted = 0;
 }
 
 MonsterController::~MonsterController() {
 }
-
-struct EnemyOfInterest {
-	EnemyInst* e;
-	int closest_player_index;
-	int dist_to_player_sqr;
-	EnemyOfInterest(EnemyInst* e, int player_index, int distsqr) :
-			e(e), closest_player_index(player_index), dist_to_player_sqr(distsqr) {
-	}
-	bool operator<(const EnemyOfInterest& eoi) const {
-		return dist_to_player_sqr < eoi.dist_to_player_sqr;
-	}
-};
 
 void set_monster_wandering(GameState* gs, EnemyInst* e) {
 	//TODO: actually make the monster wander room to room
@@ -44,7 +33,7 @@ static bool enemy_hit(GameInst* self, GameInst* other){
 	return dynamic_cast<EnemyInst*>(other) != NULL;
 }
 
-void set_monster_headings(GameState* gs, std::vector<PathInfo>& paths, std::vector<EnemyOfInterest>& eois) {
+void MonsterController::set_monster_headings(GameState* gs, std::vector<EnemyOfInterest>& eois) {
 	//Use a temporary 'GameView' object to make use of its helper methods
 	PlayerController& pc = gs->player_controller();
 	for (int i = 0; i < eois.size(); i++) {
@@ -58,6 +47,7 @@ void set_monster_headings(GameState* gs, std::vector<PathInfo>& paths, std::vect
 		int pdist = eois[i].dist_to_player_sqr;
 
 		eb.current_action = EnemyBehaviour::CHASING_PLAYER;
+		eb.action_timeout = 200;
 		//paths[pind].adjust_for_claims(e->x, e->y);
 		paths[pind].interpolated_direction(xx, yy, w, h, eb.speed, eb.vx, eb.vy);
 
@@ -93,6 +83,11 @@ void MonsterController::pre_step(GameState* gs) {
 		paths[i].calculate_path(gs, player->x, player->y, PATHING_RADIUS);
 	}
 
+	//Make sure targetted object is alive
+	if (targetted && gs->get_instance(targetted)){
+		targetted = 0;
+	}
+
 	//Update 'mids' to only hold live objects
 	std::vector<obj_id> mids2;
 	mids2.reserve(mids.size());
@@ -101,6 +96,7 @@ void MonsterController::pre_step(GameState* gs) {
 		EnemyInst* e = (EnemyInst*) gs->get_instance(mids2[i]);
 		if (e == NULL)
 			continue;
+		e->behaviour().step();
 		//Add live instances back to monster id list
 		mids.push_back(mids2[i]);
 
@@ -112,7 +108,8 @@ void MonsterController::pre_step(GameState* gs) {
 		for (int i = 0; i < pids.size(); i++) {
 			GameInst* player = gs->get_instance(pids[i]);
 			view.sharp_center_on(player->x, player->y);
-			if (view.within_view(xx, yy, w, h)) {
+			bool chasing = e->behaviour().current_action == EnemyBehaviour::CHASING_PLAYER;
+			if (view.within_view(xx, yy, w, h) && (chasing || gs->object_visible_test(e))) {
 				int dx = e->x - player->x, dy = e->y - player->y;
 				int distsqr = dx * dx + dy * dy;
 				if (distsqr > 0 /*overflow check*/) {
@@ -129,7 +126,7 @@ void MonsterController::pre_step(GameState* gs) {
 			set_monster_wandering(gs, e);
 	}
 	std::sort(eois.begin(), eois.end());
-	set_monster_headings(gs, paths, eois);
+	set_monster_headings(gs, eois);
 }
 
 

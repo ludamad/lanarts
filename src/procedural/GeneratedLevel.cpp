@@ -109,17 +109,25 @@ void GeneratedLevel::set_region_with_perimeter(const Region & r, const Sqr & val
 }
 
 
-
 Pos generate_location(MTwist& mt, GeneratedLevel& level) {
+	return generate_location_in_region(mt, level, Region(0,0, level.width(), level.height()));
+}
+
+Pos generate_location_in_region(MTwist& mt, GeneratedLevel& level, const Region& r) {
 	int ind;
 	Pos p;
 	Sqr* s;
 	do {
-		p.x = mt.rand(1, level.width());
-		p.y = mt.rand( 1, level.height());
+		p.x = mt.rand(r.x,r.x+r.w);
+		p.y = mt.rand(r.y, r.y+r.h);
 		ind = p.y * level.width() + p.x;
 		s = &level.at(p.x, p.y);
-	} while (s->roomID == 0 || !s->passable
-			|| s->is_corner || s->has_instance);
+	} while (!s->passable || s->is_corner || s->has_instance);
 	return p;
+}
+
+Pos generate_location_byroom(MTwist& mt, GeneratedLevel& level) {
+	int roomn = mt.rand(level.rooms().size());
+	Room& room = level.rooms()[roomn];
+	return generate_location_in_region(mt, level, room.room_region);
 }

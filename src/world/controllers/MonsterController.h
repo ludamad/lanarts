@@ -10,7 +10,21 @@
 
 #include <vector>
 #include "../objects/GameInst.h"
+#include "../objects/EnemyInst.h"
 #include "../../pathfind/pathfind.h"
+
+
+struct EnemyOfInterest {
+	EnemyInst* e;
+	int closest_player_index;
+	int dist_to_player_sqr;
+	EnemyOfInterest(EnemyInst* e, int player_index, int distsqr) :
+			e(e), closest_player_index(player_index), dist_to_player_sqr(distsqr) {
+	}
+	bool operator<(const EnemyOfInterest& eoi) const {
+		return dist_to_player_sqr < eoi.dist_to_player_sqr;
+	}
+};
 
 class MonsterController {
 public:
@@ -23,7 +37,9 @@ public:
 	void register_enemy(obj_id monster) { mids.push_back(monster); }
 
 	void clear();
+	void set_monster_headings(GameState* gs, std::vector<EnemyOfInterest>& eois);
 public:
+	obj_id targetted;
 	//vector of paths to player instances
 	std::vector<PathInfo> paths;
 	//vector of monster ids

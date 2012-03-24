@@ -18,8 +18,11 @@ using namespace std;
 
 const float DEG2RAD = 3.14159 / 180;
 
-void gl_draw_circle(float x, float y, float radius, const Colour& clr) {
-	glBegin(GL_POLYGON);
+void gl_draw_circle(float x, float y, float radius, const Colour& clr, bool outline) {
+	if (outline)
+		glBegin(GL_LINE_STRIP);
+	else
+		glBegin(GL_POLYGON);
 	glColor4ub(clr.r, clr.g, clr.b, clr.a);
 	for (int i = 0; i < 360; i++) {
 		float degInRad = i * DEG2RAD;

@@ -68,9 +68,9 @@ void EnemyInst::draw(GameState* gs) {
 		float s = 1 - stats().hurt_alpha();
 		Colour red(255,s,s);
 		image_display(&img, xx - view.x, yy - view.y, red);
-	}else
-	image_display(&img, xx - view.x, yy - view.y);
-
+	}else{
+		image_display(&img, xx - view.x, yy - view.y);
+	}
 }
 
 
@@ -84,7 +84,7 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 			gs->add_instance(bullet);
 			stats().reset_ranged_cooldown();
 		} else {
-			pinst->stats().hp -= stats().melee.damage;
+			pinst->stats().hurt(stats().melee.damage);
 			stats().reset_melee_cooldown();
 		}
 	}
