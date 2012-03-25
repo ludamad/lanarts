@@ -2,6 +2,7 @@
 #include "BulletInst.h"
 #include "EnemyInst.h"
 #include "ItemInst.h"
+#include "AnimatedInst.h"
 
 #include "../../util/draw_util.h"
 #include "../GameState.h"
@@ -9,7 +10,6 @@
 #include "../../data/tile_data.h"
 #include "../../display/display.h"
 #include "../../data/item_data.h"
-
 
 static const int REST_COOLDOWN = 350;
 
@@ -38,24 +38,28 @@ void PlayerInst::move(GameState* gs, int dx, int dy) {
 	float ddx = dx * mag;
 	float ddy = dy * mag;
 
+
 	EnemyInst* target = NULL;
 	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_hit, x + ddx,
 			y + ddy);
-	gs->tile_radius_test(x + ddx, y + ddy, radius);
 
-	EnemyInst* alreadyhitting[5] = {0,0,0,0,0};
-	gs->object_radius_test(this, (GameInst**) &alreadyhitting, 5, &enemy_hit, x,
+	EnemyInst* alreadyhitting[5] = { 0, 0, 0, 0, 0 };
+	gs->object_radius_test(this, (GameInst**) alreadyhitting, 5, &enemy_hit, x,
 			y);
-	for (int i = 0; i < 5; i++){
+	bool already = false;
+	for (int i = 0; i < 5; i++) {
 		if (alreadyhitting[i]) {
-			if (ddx < 0 == ((alreadyhitting[i]->x - x + ddx*2) < 0)) {
+			if (ddx < 0 == ((alreadyhitting[i]->x - x + ddx * 2) < 0)) {
 				ddx = 0;
 			}
-			if (ddy < 0 == ((alreadyhitting[i]->y - y + ddy*2) < 0)) {
+			if (ddy < 0 == ((alreadyhitting[i]->y - y + ddy * 2) < 0)) {
 				ddy = 0;
 			}
+			already = true;
 		}
 	}
+
+	gs->tile_radius_test(x + ddx, y + ddy, radius);
 
 	if (!gs->tile_radius_test(x + ddx, y + ddy, radius)) {
 		x += ddx;
@@ -66,13 +70,14 @@ void PlayerInst::move(GameState* gs, int dx, int dy) {
 		y += ddy;
 	}
 
-	if (target && !stats().has_cooldown()) {
-		if (target->stats().hurt(effective_stats().melee.damage)) {
-			gs->remove_instance(target);
-
-			stats().gain_xp(target->etype()->xpaward);
+	if (ddx == 0 && ddy == 0){
+		if (target && !stats().has_cooldown()) {
+			if (target->hurt(gs, effective_stats().melee.damage)) {
+				stats().gain_xp(target->xpworth());
+			}
+			stats().reset_melee_cooldown(effective_stats());
+			gs->add_instance(new AnimatedInst(target->x, target->y, SPR_SHORT_SWORD, 25));
 		}
-		stats().reset_melee_cooldown(effective_stats());
 	}
 }
 
@@ -101,13 +106,14 @@ void PlayerInst::step(GameState* gs) {
 	if (stats().hurt_cooldown > 0)
 		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 	canrestcooldown--;
-	if (canrestcooldown < 0) canrestcooldown = 0;
+	if (canrestcooldown < 0)
+		canrestcooldown = 0;
 
 	bool resting = false;
 	if (gs->key_down_state(SDLK_r) && canrestcooldown == 0) {
 		resting = true;
-		stats().raise_hp(stats().hpregen*5);
-		stats().raise_mp(stats().mpregen*5);
+		stats().raise_hp(stats().hpregen * 5);
+		stats().raise_mp(stats().mpregen * 5);
 	}
 
 	//Arrow/wasd movement
@@ -199,8 +205,25 @@ void PlayerInst::step(GameState* gs) {
 			gs->monster_controller().shift_target(gs);
 		}
 
-		if ( gs->key_down_state(SDLK_j)
-				&& !base_stats.has_cooldown()) {
+		if (gs->key_down_state(SDLK_u) && !base_stats.has_cooldown()) {
+			Attack atk(effective_stats().ranged);
+			atk.projectile_sprite = SPR_MAGIC_BLAST;
+			atk.projectile_speed /= 2;
+			atk.damage *= 1.5;
+			obj_id tid = gs->monster_controller().targetted;
+			GameInst* target = gs->get_instance(tid);
+			if (tid && target) {
+				if (stats().mp >= 20) {
+					stats().mp -= 20;
+					GameInst* bullet = new BulletInst(id, atk, x, y,
+							target->x, target->y, false, 3);
+					gs->add_instance(bullet);
+					base_stats.cooldown = effective_stats().ranged.cooldown*1.2;
+				}
+			}
+
+			canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
+		} else if (gs->key_down_state(SDLK_j) && !base_stats.has_cooldown()) {
 			obj_id tid = gs->monster_controller().targetted;
 			GameInst* target = gs->get_instance(tid);
 			if (tid && target) {
@@ -214,7 +237,7 @@ void PlayerInst::step(GameState* gs) {
 			}
 
 			canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
-		} else if ( gs->mouse_left_down() && mouse_within
+		} else if (gs->mouse_left_down() && mouse_within
 				&& !base_stats.has_cooldown()) {
 			if (stats().mp >= 10) {
 				stats().mp -= 10;
@@ -228,7 +251,8 @@ void PlayerInst::step(GameState* gs) {
 			int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
 			int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
 			int slot = 5 * posy + posx;
-			if (slot >= 0 && slot < INVENTORY_SIZE && inventory.inv[slot].n > 0) {
+			if (slot >= 0 && slot < INVENTORY_SIZE
+					&& inventory.inv[slot].n > 0) {
 				int item = inventory.inv[slot].item;
 				game_item_data[item].action(this);
 				inventory.inv[slot].n--;
@@ -254,8 +278,8 @@ void PlayerInst::draw(GameState* gs) {
 				stats().max_hp);
 
 	if (stats().hurt_cooldown > 0) {
-		float s = 1 - stats().hurt_alpha() / 2;
-		Colour red(255, s, s);
+		float s = 1 - stats().hurt_alpha() ;
+		Colour red(255, 255*s, 255*s);
 		image_display(&img, x - img.width / 2 - view.x,
 				y - img.height / 2 - view.y, red);
 	} else

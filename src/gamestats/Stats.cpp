@@ -12,7 +12,7 @@ Stats::Stats(float speed, int hp, int mp, const Attack & melee,
 		movespeed(speed), hp(hp), max_hp(hp), mp(mp), max_mp(mp), hpregen(
 				1.0 / 30), mpregen(1.0 / 15), cooldown(0), hurt_cooldown(0), hp_regened(
 				0), mp_regened(0), melee(melee), ranged(ranged), xp(0), xpneeded(
-				50), xplevel(1) {
+				100), xplevel(1) {
 }
 
 void Stats::step() {
@@ -53,19 +53,19 @@ void Stats::raise_mp(float mpgain) {
 bool Stats::has_cooldown() {
 	return cooldown > 0;
 }
-
+const int HURT_COOLDOWN = 30;
 float Stats::hurt_alpha() {
-	if (hurt_cooldown < 10)
-		return hurt_cooldown / 10 * 0.7 + 0.3;
+	if (hurt_cooldown < HURT_COOLDOWN/2)
+		return hurt_cooldown / HURT_COOLDOWN/2 * 0.7 + 0.3;
 
 	else
-		return (20 - hurt_cooldown) / 10 * 0.7 + 0.3;
+		return (HURT_COOLDOWN - hurt_cooldown) / 10 * 0.7 + 0.3;
 
 }
 
 void Stats::set_hurt_cooldown() {
 	if (hurt_cooldown == 0)
-		hurt_cooldown = 20;
+		hurt_cooldown = HURT_COOLDOWN;
 
 }
 
@@ -107,9 +107,9 @@ void Stats::gain_level() {
 
 void Stats::gain_xp(int amnt) {
 	xp += amnt;
-	if (xp >= xpneeded) {
+	while (xp >= xpneeded) {
 		gain_level();
 		xp -= xpneeded;
-		xpneeded = (xplevel) * 50;
+		xpneeded = (xplevel) * 100;
 	}
 }

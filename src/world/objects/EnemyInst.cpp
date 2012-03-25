@@ -1,11 +1,11 @@
 #include <cmath>
+#include "AnimatedInst.h"
+#include "BulletInst.h"
 #include "EnemyInst.h"
 #include "PlayerInst.h"
-#include "BulletInst.h"
 #include "../GameState.h"
 #include "../../util/draw_util.h"
 #include "../../data/sprite_data.h"
-
 EnemyInst::~EnemyInst() {
 }
 
@@ -82,7 +82,7 @@ void EnemyInst::draw(GameState* gs) {
 
 	if (stats().hurt_cooldown > 0){
 		float s = 1 - stats().hurt_alpha();
-		Colour red(255,s,s);
+		Colour red(255,255*s,255*s);
 		image_display(&img, xx - view.x, yy - view.y, red);
 	}else{
 		image_display(&img, xx - view.x, yy - view.y);
@@ -104,4 +104,14 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 			stats().reset_melee_cooldown();
 		}
 	}
+}
+
+
+bool EnemyInst::hurt(GameState* gs, int hp){
+	if (!destroyed && stats().hurt(hp)){
+		gs->add_instance(new AnimatedInst(x,y,type->sprite_number, 15));
+		gs->remove_instance(this);
+		return true;
+	}
+	return false;
 }

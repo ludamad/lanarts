@@ -11,24 +11,31 @@
 #include "../GameState.h"
 #include <cmath>
 #include "../../data/sprite_data.h"
+#include "AnimatedInst.h"
 
 BulletInst::~BulletInst() {
 
 }
 
-BulletInst::BulletInst(obj_id originator, Attack& attack, int x, int y, int tx, int ty, bool bounce) :
+BulletInst::BulletInst(obj_id originator, Attack& attack, int x, int y, int tx, int ty,
+		bool bounce, int hits, GameInst* target) :
 		GameInst(x, y, RADIUS, false), attack(attack), range_left(attack.range), origin_id(originator),
-		rx(x), ry(y), bounce(bounce) {
+		rx(x), ry(y), bounce(bounce), hits(hits), target(target) {
 	int dx = tx - x, dy = ty - y;
 	double abs = sqrt(dx * dx + dy * dy);
 	vx = dx * attack.projectile_speed / abs, vy = dy * attack.projectile_speed / abs;
 }
+
 
 static bool enemy_hit(GameInst* self, GameInst* other){
 	return dynamic_cast<EnemyInst*>(other) != NULL;
 }
 static bool player_hit(GameInst* self, GameInst* other){
 	return dynamic_cast<PlayerInst*>(other) != NULL;
+}
+
+static bool target_hit(GameInst* self, GameInst* other){
+	return ((BulletInst*)self)->hit_target() == other;
 }
 
 void BulletInst::step(GameState* gs) {
@@ -61,34 +68,56 @@ void BulletInst::step(GameState* gs) {
 
 	range_left -= attack.projectile_speed;
 
-	if (range_left <= 0){
-		gs->remove_instance(this);
-		return;
-	}
 
+
+	bool hit = false;
+	GameInst* colobj = NULL;
 	GameInst* origin = gs->get_instance(origin_id);
 	if (dynamic_cast<PlayerInst*>(origin)){
-		GameInst* enemy = NULL;
-		gs->object_radius_test(this, &enemy, 1, &enemy_hit);
-		if (enemy){
-			int gain = ((EnemyInst*)enemy)->xpworth();
-			Stats& s = ((EnemyInst*)enemy)->stats();
-			if (s.hurt(attack.damage)) {
-				gs->remove_instance(enemy);
-				((PlayerInst*)origin)->stats().gain_xp(gain);
+		if (target)
+			gs->object_radius_test(this, &colobj, 1, &target_hit);
+		else
+			gs->object_radius_test(this, &colobj, 1, &enemy_hit);
+		if (colobj){
+			EnemyInst* e = (EnemyInst*)colobj;
+			if (e->hurt(gs, attack.damage)) {
+				((PlayerInst*)origin)->stats().gain_xp(e->xpworth());
 			}
-
-			gs->remove_instance(this);
 		}
 	} else {
-		GameInst* player = NULL;
-		gs->object_radius_test(this, &player, 1, &player_hit);
-		if (player){
-			Stats& s = ((PlayerInst*)player)->stats();
+		gs->object_radius_test(this, &colobj, 1, &player_hit);
+		if (colobj){
+			Stats& s = ((PlayerInst*)colobj)->stats();
 			s.hurt(attack.damage);
-			gs->remove_instance(this);
 		}
 	}
+	if (colobj || range_left <= 0){
+			hits --;
+			if (hits > 0 && colobj){
+				MonsterController& mc = gs->monster_controller();
+				int mindist = 50000;
+				target = NULL;
+				for (int i = 0; i < mc.monster_ids().size(); i++){
+					obj_id mid = mc.monster_ids()[i];
+					GameInst* enemy = gs->get_instance(mid);
+					if (enemy && enemy != colobj){
+
+						int dx = enemy->x - x, dy = enemy->y - y;
+						double abs = sqrt(dx * dx + dy * dy);
+						if (abs < mindist) {
+							target = enemy;
+							mindist = abs;
+							vx = dx * attack.projectile_speed / abs, vy = dy * attack.projectile_speed / abs;
+						}
+					}
+				}
+			}
+			if (hits == 0 || target == NULL){
+				gs->add_instance(new AnimatedInst(x,y,attack.projectile_sprite, 15));
+				gs->remove_instance(this);
+			}
+		}
+
 }
 
 void BulletInst::draw(GameState* gs) {

@@ -45,6 +45,7 @@ public:
 	int xpworth(){
 		return xpgain;
 	}
+	bool hurt(GameState* gs, int hp);
 protected:
 	EnemyBehaviour eb;
 	EnemyType* type;

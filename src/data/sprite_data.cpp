@@ -26,7 +26,9 @@ SpriteEntry game_sprite_data[] = {
 		SpriteEntry("ciribot", "res/monsters/ciribo.png"),
 		SpriteEntry("hell forged", "res/monsters/hellforged.png"),
 
-		SpriteEntry("mana potion", "res/items/misc/brilliant_blue.png")
+		SpriteEntry("mana potion", "res/items/misc/brilliant_blue.png"),
+		SpriteEntry("magic blast", "res/effects/bolt05.png"),
+		SpriteEntry("short sword", "res/effects/shortsword.png")
 };
 
 size_t game_sprite_n = sizeof(game_sprite_data)/sizeof(SpriteEntry);
