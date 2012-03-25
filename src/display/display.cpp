@@ -163,25 +163,6 @@ void init_sdl_gl(bool fullscreen, int w, int h) {
 
 }
 
-void deinit_sdl_gl(int oldw, int oldh) {
-	
-	Uint32 video_flags = SDL_OPENGL;
-	int bpp;
-	
-	/*detect the display depth */
-	if (SDL_GetVideoInfo()->vfmt->BitsPerPixel <= 8) {
-		bpp = 8;
-	} else {
-		bpp = 16; /* More doesn't seem to work */
-	}
-	
-	if (SDL_SetVideoMode(oldw, oldh, bpp, video_flags) == NULL) {
-		fprintf(stderr, "Couldn't set GL mode: %s\n", SDL_GetError());
-		SDL_Quit();
-		exit(1);
-	}
-}
-
 void gl_set_drawing_area(int x, int y, int w, int h) {
 
 	glViewport(x, y, w, h);
