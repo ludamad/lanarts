@@ -49,6 +49,7 @@ struct TileEntry {
 
 
 
+extern TileEntry* game_tile_ptr;
 extern TileEntry game_tile_data[];
 extern size_t game_tile_n;
 

@@ -23,10 +23,28 @@ Attack strongermelee(true,  45, 25, 70);
 Attack strongshortrange_storm(true, 13, 130, 45, SPR_STORMBOLT, 7 );
 Attack strongshortrange_fire(true, 13, 400, 70, SPR_FIREBOLT, 4 );
 
+EnemyType game_enemy_data2[] = {
+		EnemyType("Skeleton", 11, 10, SPR_SKELETON,
+				Stats(2, 30,0,
+						Attack(true,  1, 25, 10),
+						Attack()
+				)
+		),
+		EnemyType("Skeleton", 11, 10, SPR_SKELETON,
+				Stats(2, 30,0,
+						Attack(true,  1, 25, 10),
+						Attack()
+				)
+		)
+};
 EnemyType game_enemy_data[] = {
 		EnemyType("Skeleton", 11, 10, SPR_SKELETON,
-				Stats(2, 30,0, medmelee, Attack())),
-		EnemyType("Chicken", 14, 10, SPR_CHICKEN,
+				Stats(2, 30,0,
+						Attack(true,  1, 25, 10),
+						Attack()
+				)
+		),
+		EnemyType("Chicken", 10, 10, SPR_CHICKEN,
 				Stats(4, 20,0, Attack(true,  1, 25, 10), Attack())),
 		EnemyType("Zombie", 14, 15, SPR_ZOMBIE,
 				Stats(2, 40,0, medmelee, Attack())),
@@ -34,7 +52,7 @@ EnemyType game_enemy_data[] = {
 				Stats(1, 40,0, Attack(), strongshortrange_storm)),
 		EnemyType("Grue", 14, 25, SPR_GRUE,
 				Stats(0.5, 160,0, strongermelee, Attack())),
-		EnemyType("Super Chicken", 20, 20, SPR_SUPERCHICKEN,
+		EnemyType("Super Chicken", 10, 20, SPR_SUPERCHICKEN,
 				Stats(4, 45,0, medmelee, Attack())),
 		EnemyType("Ciribot", 14, 30, SPR_CIRIBOT,
 				Stats(2, 40,0, strongmelee, Attack())),

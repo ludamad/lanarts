@@ -160,7 +160,7 @@ void PlayerInst::use_spell(GameState* gs){
 	if (gs->key_down_state(SDLK_u) && !base_stats.has_cooldown()) {
 		Attack atk(effective_stats().ranged);
 		atk.projectile_sprite = SPR_MAGIC_BLAST;
-		atk.projectile_speed /= 1.5;
+		atk.projectile_speed /= 1.75;
 		atk.damage *= 2;
 		obj_id tid = gs->monster_controller().targetted;
 		GameInst* target = gs->get_instance(tid);
@@ -170,7 +170,7 @@ void PlayerInst::use_spell(GameState* gs){
 				GameInst* bullet = new BulletInst(id, atk, x, y,
 						target->x, target->y, false, 3);
 				gs->add_instance(bullet);
-				base_stats.cooldown = effective_stats().ranged.cooldown*1.2;
+				base_stats.cooldown = effective_stats().ranged.cooldown*1.4;
 			}
 		}
 

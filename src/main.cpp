@@ -10,7 +10,7 @@
 #include "world/objects/PlayerInst.h"
 #include "world/objects/EnemyInst.h"
 #include "world/objects/TestInst.h"
-
+#include "libyaml/yaml.h"
 using namespace std;
 
 #ifdef __WIN32
