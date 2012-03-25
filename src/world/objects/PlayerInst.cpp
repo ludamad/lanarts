@@ -156,7 +156,16 @@ void PlayerInst::use_spell(GameState* gs){
 		}
 	}
 
+	static bool spell = false;
 
+	if (gs->key_press_state(SDLK_SPACE)){
+		spell = !spell;
+	}
+	GameInst* bullet;
+	int tx, ty;
+	if (gs->key_down_state(SDLK_f)){
+
+	}
 	if (gs->key_down_state(SDLK_u) && !base_stats.has_cooldown()) {
 		Attack atk(effective_stats().ranged);
 		atk.projectile_sprite = SPR_MAGIC_BLAST;
@@ -175,7 +184,10 @@ void PlayerInst::use_spell(GameState* gs){
 		}
 
 		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
-	} else if (gs->key_down_state(SDLK_j) && !base_stats.has_cooldown()) {
+	}
+
+
+	if (gs->key_down_state(SDLK_j) && !base_stats.has_cooldown()) {
 		obj_id tid = gs->monster_controller().targetted;
 		GameInst* target = gs->get_instance(tid);
 		if (tid && target) {
@@ -199,7 +211,10 @@ void PlayerInst::use_spell(GameState* gs){
 			base_stats.reset_ranged_cooldown(effective_stats());
 			canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 		}
-	} else if (gs->mouse_left_click() && !mouse_within) {
+	}
+
+
+	if (gs->mouse_left_click() && !mouse_within) {
 		int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
 		int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
 		int slot = 5 * posy + posx;
