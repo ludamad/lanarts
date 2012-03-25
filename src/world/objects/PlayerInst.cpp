@@ -164,6 +164,20 @@ void PlayerInst::step(GameState* gs) {
 			inventory.inv[0].n--;
 		}
 	}
+    if (gs->key_press_state(SDLK_2)) {
+        if (inventory.inv[1].n > 0) {
+            int item = inventory.inv[1].item;
+            game_item_data[item].action(this);
+            inventory.inv[1].n--;
+        }
+    }
+    if (gs->key_press_state(SDLK_3)) {
+        if (inventory.inv[2].n > 0) {
+            int item = inventory.inv[2].item;
+            game_item_data[item].action(this);
+            inventory.inv[2].n--;
+        }
+    }
 
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 	if (gs->mouse_right_click() && mouse_within) {
