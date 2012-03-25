@@ -46,11 +46,11 @@ static LevelGenSettings mainbranch[] = {
 		//Tiny rooms with 5 monsters
 		LevelGenSettings(STD_W * 0.3, STD_H * 0.3, itemfew, roomsparsesmall,
 				TunnelGenSettings(2, 5 /*2 to 5 width tunnels*/, 5,5 /*5 to 5 tunnels per room*/),
-				featurefirstlevel, EnemyGenSettings(0,2,5)),
+				featurefirstlevel, EnemyGenSettings(0,1,5)),
 
 		LevelGenSettings(
 				STD_W * 0.4, STD_H * 0.4, itemmed, roomsparsesmall,
-				tunneldefault, featuredefault, EnemyGenSettings(0,3,20)),
+				tunneldefault, featuredefault, EnemyGenSettings(0,2,20)),
 
 		LevelGenSettings(
 				STD_W * 0.5, STD_H * 0.5, itemmed, roomsparsesmall,
@@ -58,7 +58,7 @@ static LevelGenSettings mainbranch[] = {
 
 		LevelGenSettings(
 				STD_W * 0.6, STD_H * 0.6, itemmed, roommediumhighpad,
-				tunneldefault, featuredefault, EnemyGenSettings(0,5,25)),
+				tunneldefault, featuredefault, EnemyGenSettings(0,4,28)),
 
 		LevelGenSettings(
 				STD_W * 0.7, STD_H * 0.7, itemmed, roommediumhighpad,
@@ -67,12 +67,12 @@ static LevelGenSettings mainbranch[] = {
 		LevelGenSettings(
 				STD_W * 0.7, STD_H * 0.7, itemdefault,
 				RoomGenSettings(1 /*padding*/, 30 /*amount of rooms*/, 4 /*min size*/, 9 /*max size*/),
-				tunneldefault, featuredefault, EnemyGenSettings(0,6,30)),
+				tunneldefault, featuredefault, EnemyGenSettings(0,6,35)),
 
 		LevelGenSettings(
 				STD_W * 0.7, STD_H * 0.7, itemdefault,
 				RoomGenSettings(1 /*padding*/, 90 /*amount of rooms*/, 4 /*min size*/, 9 /*max size*/),
-				tunneldefault, featuredefault, EnemyGenSettings(0,6,30)),
+				tunneldefault, featuredefault, EnemyGenSettings(0,7,30)),
 
 		LevelGenSettings(
 				STD_W * 1, STD_H * 1, itemdefault, roommediumhighpad,

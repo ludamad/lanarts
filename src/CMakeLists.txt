@@ -26,6 +26,15 @@ set( lanarts_src
 	
 	gamestats/Stats.cpp
 	
+	libyaml/api.c
+	libyaml/dumper.c
+	libyaml/emitter.c
+	libyaml/loader.c
+	libyaml/parser.c
+	libyaml/reader.c
+	libyaml/scanner.c
+	libyaml/writer.c
+	
 	pathfind/pathfind.cpp
 	
 	main.cpp
@@ -83,6 +92,9 @@ set( lanarts_include
 	gamestats/Inventory.h
 	gamestats/Item.h
 	gamestats/Stats.h
+	
+	libyaml/yaml_private.h
+	libyaml/yaml.h
 	
 	pathfind/pathfind.h
 	
