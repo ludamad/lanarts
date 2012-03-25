@@ -11,7 +11,7 @@
 #include "../../display/display.h"
 #include "../../data/item_data.h"
 
-static const int REST_COOLDOWN = 350;
+static const int REST_COOLDOWN = 250;
 
 PlayerInst::~PlayerInst() {
 }
@@ -231,8 +231,8 @@ void PlayerInst::step(GameState* gs) {
 	bool resting = false;
 	if (gs->key_down_state(SDLK_r) && canrestcooldown == 0) {
 		resting = true;
-		stats().raise_hp(stats().hpregen * 5);
-		stats().raise_mp(stats().mpregen * 5);
+		stats().raise_hp(stats().hpregen * 8);
+		stats().raise_mp(stats().mpregen * 8);
 	}
 
 	if (!resting)

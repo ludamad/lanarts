@@ -38,6 +38,7 @@ EnemyType game_enemy_data2[] = {
 		)
 };
 EnemyType game_enemy_data[] = {
+
 		EnemyType("Skeleton", 11, 10, SPR_SKELETON,
 				Stats(2, 30,0,
 						Attack(true,  12, 25, 70),
@@ -50,14 +51,17 @@ EnemyType game_enemy_data[] = {
 				Stats(2, 40,0, medmelee, Attack())),
 		EnemyType("Storm Elemental", 14, 20, SPR_STORM_ELE,
 				Stats(1, 40,0, Attack(), strongshortrange_storm)),
-		EnemyType("Grue", 14, 25, SPR_GRUE,
-				Stats(2, 100,0, strongermelee, Attack())),
-		EnemyType("Super Chicken", 10, 20, SPR_SUPERCHICKEN,
-				Stats(4, 80,0, medmelee, Attack())),
+
 		EnemyType("Ciribot", 14, 30, SPR_CIRIBOT,
-				Stats(3.5, 80,0, strongmelee, Attack())),
+				Stats(3, 60,0, Attack(true,  20, 65, 35), Attack())),
+
+
+		EnemyType("Super Chicken", 10, 20, SPR_SUPERCHICKEN,
+				Stats(4, 45,0, strongmelee, Attack())),
+		EnemyType("Grue", 14, 35, SPR_GRUE,
+				Stats(2, 100,0, strongermelee, Attack())),
 		EnemyType("Jester", 14, 35, SPR_JESTER,
-				Stats(3, 120,0, strongmelee, Attack())),
+				Stats(5, 80,0, strongmelee, Attack())),
 		EnemyType("Hell Forged", 14, 50, SPR_HELLFORGED,
 				Stats(3, 120,0, Attack(), strongshortrange_fire)),
 };
