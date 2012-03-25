@@ -30,7 +30,7 @@ static bool enemy_hit(GameInst* self, GameInst* other) {
 	return dynamic_cast<EnemyInst*>(other) != NULL;
 }
 
-void PlayerInst::move(GameState* gs, int dx, int dy) {
+void PlayerInst::move_and_melee(GameState* gs, int dx, int dy) {
 	if (dx == 0 && dy == 0)
 		return;
 
@@ -90,6 +90,35 @@ static int scan_entrance(const std::vector<GameLevelPortal>& portals,
 	}
 	return -1;
 }
+
+void PlayerInst::use_staircase(GameState* gs){
+	//Up/down stairs
+		if (gs->key_down_state(SDLK_PERIOD) || gs->mouse_downwheel()) {
+			Pos hitsqr;
+			if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN,
+					&hitsqr)) {
+				int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
+				LANARTS_ASSERT(
+						entr_n >= 0 && entr_n < gs->level()->entrances.size());
+				portal = &gs->level()->entrances[entr_n];
+				gs->branch_level()++;gs
+				->set_generate_flag();
+			}
+		}
+		if ((gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel())
+				&& gs->branch_level() > 1) {
+			Pos hitsqr;
+			if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP,
+					&hitsqr)) {
+				int entr_n = scan_entrance(gs->level()->exits, hitsqr);
+				LANARTS_ASSERT(
+						entr_n >= 0 && entr_n < gs->level()->entrances.size());
+				portal = &gs->level()->exits[entr_n];
+				gs->branch_level()--;gs
+				->set_generate_flag();
+			}
+		}
+}
 void PlayerInst::step(GameState* gs) {
 
 	GameView& view = gs->window_view();
@@ -136,35 +165,10 @@ void PlayerInst::step(GameState* gs) {
 	}
 
 	if (!resting)
-		move(gs, dx, dy);
+		move_and_melee(gs, dx, dy);
 
 	if (!resting) {
-		//Up/down stairs
-		if (gs->key_down_state(SDLK_PERIOD) || gs->mouse_downwheel()) {
-			Pos hitsqr;
-			if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN,
-					&hitsqr)) {
-				int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
-				LANARTS_ASSERT(
-						entr_n >= 0 && entr_n < gs->level()->entrances.size());
-				portal = &gs->level()->entrances[entr_n];
-				gs->branch_level()++;gs
-				->set_generate_flag();
-			}
-		}
-		if ((gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel())
-				&& gs->branch_level() > 1) {
-			Pos hitsqr;
-			if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP,
-					&hitsqr)) {
-				int entr_n = scan_entrance(gs->level()->exits, hitsqr);
-				LANARTS_ASSERT(
-						entr_n >= 0 && entr_n < gs->level()->entrances.size());
-				portal = &gs->level()->exits[entr_n];
-				gs->branch_level()--;gs
-				->set_generate_flag();
-			}
-		}
+
 
 		//Item pickup
 		ItemInst* item = NULL;

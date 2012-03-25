@@ -52,7 +52,10 @@ public:
 	}
 
 private:
-	void move(GameState *gs, int dx, int dy);
+	void move_and_melee(GameState *gs, int dx, int dy);
+	void use_staircase(GameState *gs);
+	void use_spell(GameState *gs);
+
 	Stats base_stats;
 	Effects effects;
 	int canrestcooldown;

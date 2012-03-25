@@ -52,6 +52,7 @@ set( lanarts_src
 	world/controllers/MonsterController.cpp
 	world/controllers/PlayerController.cpp
 	
+	world/objects/AnimatedInst.cpp
 	world/objects/PlayerInst.cpp
 	world/objects/EnemyInst.cpp
 	world/objects/ItemInst.cpp
@@ -110,6 +111,7 @@ set( lanarts_include
 	
 	world/objects/GameInst.h
 	
+	world/objects/AnimatedInst.h
 	world/objects/PlayerInst.h
 	world/objects/EnemyInst.h
 	world/objects/BulletInst.h
