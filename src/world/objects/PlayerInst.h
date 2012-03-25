@@ -22,8 +22,6 @@ public:
 					Attack(true, 8, 400, 40/*cooldown*/, SPR_FIREBOLT, 7)),
 					canrestcooldown(0), money(0) {
 		portal = NULL;
-		for (int i = 0; i < 2;i++)
-		stats().gain_level();
 	}
 	virtual ~PlayerInst();
 	virtual void init(GameState* gs);

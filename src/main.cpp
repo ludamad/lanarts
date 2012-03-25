@@ -71,11 +71,9 @@ int main(int argc, char** argv) {
 			}
 		}
 		cont = gs->step();
-		if (!cont) break;
-		cont = gs->step();
 		gs->draw();
 		clock_t end = clock();
-		int delayms = 28 - (end-start)*1000/CLOCKS_PER_SEC;
+		int delayms = 14 - (end-start)*1000/CLOCKS_PER_SEC;
 		if (delayms > 0)
 			SDL_Delay(delayms);
 	}
