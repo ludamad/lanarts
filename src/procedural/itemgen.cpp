@@ -31,7 +31,6 @@ void generate_items(const ItemGenSettings& is, MTwist& mt, GeneratedLevel& level
 			gs->add_instance(new ItemInst(ITEM_POTION_HEALTH, ix,iy));
 		else if (itemrand < 83)
 			gs->add_instance(new ItemInst(ITEM_POTION_MANA, ix,iy));
-
 		else if (itemrand < 100)
 			gs->add_instance(new ItemInst(ITEM_SCROLL_HASTE, ix,iy));
 		

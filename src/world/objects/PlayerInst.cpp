@@ -92,7 +92,7 @@ void PlayerInst::step(GameState* gs) {
 		return;
 	}
 	if (stats().hurt_cooldown > 0)
-		canrestcooldown = std::max(canrestcooldown,300);
+		canrestcooldown = std::max(canrestcooldown,500);
 	canrestcooldown--;
 	if (canrestcooldown < 0) canrestcooldown = 0;
 
@@ -187,7 +187,7 @@ void PlayerInst::step(GameState* gs) {
 			gs->monster_controller().shift_target(gs);
 		}
 
-		if (!resting && gs->key_down_state(SDLK_j)
+		if ( gs->key_down_state(SDLK_j)
 				&& !base_stats.has_cooldown()) {
 			obj_id tid = gs->monster_controller().targetted;
 			GameInst* target = gs->get_instance(tid);
@@ -201,8 +201,8 @@ void PlayerInst::step(GameState* gs) {
 				}
 			}
 
-			canrestcooldown = std::max(canrestcooldown,300);
-		} else if (!resting && gs->mouse_left_down() && mouse_within
+			canrestcooldown = std::max(canrestcooldown,500);
+		} else if ( gs->mouse_left_down() && mouse_within
 				&& !base_stats.has_cooldown()) {
 			if (stats().mp >= 10) {
 				stats().mp -= 10;
@@ -210,23 +210,20 @@ void PlayerInst::step(GameState* gs) {
 						rmy);
 				gs->add_instance(bullet);
 				base_stats.reset_ranged_cooldown(effective_stats());
+				canrestcooldown = std::max(canrestcooldown,500);
 			}
-			canrestcooldown = std::max(canrestcooldown,300);
 		} else if (gs->mouse_left_click() && !mouse_within) {
 			int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
 			int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
 			int slot = 5 * posy + posx;
-			if (slot >= 0 && slot < INVENTORY_SIZE
-					&& slot < inventory.inv[slot].n > 0) {
+			if (slot >= 0 && slot < INVENTORY_SIZE && inventory.inv[slot].n > 0) {
 				int item = inventory.inv[slot].item;
 				game_item_data[item].action(this);
 				inventory.inv[slot].n--;
+				canrestcooldown = std::max(canrestcooldown,500);
 			}
-
-			canrestcooldown = std::max(canrestcooldown,300);
 		}
 	}
-
 	/*if (gs->mouse_right_down()) {
 	 int nx = gs->mouse_x() + view.x, ny = gs->mouse_y() + view.y;
 	 view.center_on(nx, ny);

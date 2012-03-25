@@ -36,10 +36,22 @@ void BulletInst::step(GameState* gs) {
 
 	range_left -= attack.projectile_speed;
 
-	if (range_left <= 0 || gs->tile_radius_test(x, y, RADIUS)){
+	if (range_left <= 0){
 		gs->remove_instance(this);
 		return;
 	}
+	
+	Pos tile_hit;
+	if(gs->tile_radius_test(x, y, RADIUS, true, -1, &tile_hit)){
+        tile_hit.x*=TILE_SIZE;
+        tile_hit.y*=TILE_SIZE;
+        if(tile_hit.x - (x-TILE_SIZE/2) > tile_hit.y - (y-TILE_SIZE/2)){
+            vy = -vy;
+        }else {
+            vx = -vx;
+        }
+        return;
+    }
 
 	GameInst* origin = gs->get_instance(origin_id);
 	if (dynamic_cast<PlayerInst*>(origin)){
