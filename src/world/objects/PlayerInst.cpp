@@ -30,7 +30,23 @@ static bool enemy_hit(GameInst* self, GameInst* other) {
 	return dynamic_cast<EnemyInst*>(other) != NULL;
 }
 
-void PlayerInst::move_and_melee(GameState* gs, int dx, int dy) {
+void PlayerInst::use_move_and_melee(GameState* gs) {
+
+	//Arrow/wasd movement
+	int dx = 0, dy = 0;
+	if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
+		dy -= 1;
+	}
+	if (gs->key_down_state(SDLK_RIGHT) || gs->key_down_state(SDLK_d)) {
+		dx += 1;
+	}
+	if (gs->key_down_state(SDLK_DOWN) || gs->key_down_state(SDLK_s)) {
+		dy += 1;
+	}
+	if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
+		dx -= 1;
+	}
+
 	if (dx == 0 && dy == 0)
 		return;
 
@@ -134,6 +150,7 @@ void PlayerInst::use_spell(GameState* gs){
 		if (stats().mp >= 50 && !gs->solid_test(this)
 				&& gs->object_visible_test(this)) {
 			stats().mp -= 50;
+			canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 		} else {
 			x = px, y = py;
 		}
@@ -222,27 +239,8 @@ void PlayerInst::step(GameState* gs) {
 		stats().raise_mp(stats().mpregen * 5);
 	}
 
-	//Arrow/wasd movement
-	int dx = 0, dy = 0;
-	if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
-		dy -= 1;
-	}
-	if (gs->key_down_state(SDLK_RIGHT) || gs->key_down_state(SDLK_d)) {
-		dx += 1;
-	}
-	if (gs->key_down_state(SDLK_DOWN) || gs->key_down_state(SDLK_s)) {
-		dy += 1;
-	}
-	if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
-		dx -= 1;
-	}
-
-	if (gs->key_press_state(SDLK_x)) {
-		stats().gain_xp(50);
-	}
-
 	if (!resting)
-		move_and_melee(gs, dx, dy);
+		use_move_and_melee(gs);
 
 	if (!resting) {
 		use_staircase(gs);

@@ -52,7 +52,7 @@ public:
 	}
 
 private:
-	void move_and_melee(GameState *gs, int dx, int dy);
+	void use_move_and_melee(GameState *gs);
 	void use_staircase(GameState *gs);
 	void use_spell(GameState *gs);
 
