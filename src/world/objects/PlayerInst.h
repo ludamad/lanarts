@@ -22,6 +22,7 @@ public:
 					Attack(true, 8, 400, 40, SPR_FIREBOLT, 7)), canrestcooldown(
 					0), money(0) {
 		portal = NULL;
+		spellselect = 0;//Fireball
 	}
 
 	virtual ~PlayerInst();
@@ -42,6 +43,9 @@ public:
 		return effects;
 	}
 
+	int spell_selected(){
+		return spellselect;
+	}
 	int gold() {
 		return money;
 	}
@@ -60,6 +64,7 @@ private:
 	Effects effects;
 	int canrestcooldown;
 	int money;
+	int spellselect;
 	GameLevelPortal* portal;
 };
 

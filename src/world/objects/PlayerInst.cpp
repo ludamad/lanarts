@@ -156,10 +156,11 @@ void PlayerInst::use_spell(GameState* gs){
 		}
 	}
 
-	static bool spell = false;
-
 	if (gs->key_press_state(SDLK_SPACE)){
-		spell = !spell;
+		spellselect++;
+		if (spellselect >= 2){
+			spellselect = 0;
+		}
 	}
 	bool cast = false;
 	int tx, ty;
@@ -184,7 +185,7 @@ void PlayerInst::use_spell(GameState* gs){
 		bool bounce = true;
 		int hits = 0;
 		int mpcost = 10;
-		if (spell){
+		if (spellselect){
 			atk.projectile_sprite = SPR_MAGIC_BLAST;
 			atk.projectile_speed /= 1.75;
 			atk.damage *= 2;
@@ -198,7 +199,7 @@ void PlayerInst::use_spell(GameState* gs){
 			gs->add_instance(bullet);
 
 			canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
-			if (spell)
+			if (spellselect)
 				base_stats.cooldown = effective_stats().ranged.cooldown*1.4;
 			else
 				base_stats.cooldown = effective_stats().ranged.cooldown;
