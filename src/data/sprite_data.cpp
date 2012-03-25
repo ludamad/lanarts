@@ -27,7 +27,7 @@ SpriteEntry game_sprite_data[] = {
 		SpriteEntry("hell forged", "res/monsters/hellforged.png"),
 
 		SpriteEntry("mana potion", "res/items/misc/brilliant_blue.png"),
-		SpriteEntry("magic blast", "res/effects/bolt05.png"),
+		SpriteEntry("magic blast", "res/effects/orb.png"),
 		SpriteEntry("short sword", "res/effects/shortsword.png"),
 		SpriteEntry("haste", "res/effects/haste.png")
 };

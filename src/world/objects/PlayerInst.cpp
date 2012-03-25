@@ -208,7 +208,7 @@ void PlayerInst::step(GameState* gs) {
 		if (gs->key_down_state(SDLK_u) && !base_stats.has_cooldown()) {
 			Attack atk(effective_stats().ranged);
 			atk.projectile_sprite = SPR_MAGIC_BLAST;
-			atk.projectile_speed /= 2;
+			atk.projectile_speed /= 1.5;
 			atk.damage *= 2;
 			obj_id tid = gs->monster_controller().targetted;
 			GameInst* target = gs->get_instance(tid);

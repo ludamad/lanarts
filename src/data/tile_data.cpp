@@ -26,9 +26,12 @@ TileEntry game_tile_data[] = {
 		TileEntry("marb4","res/tiles/marble/marble_floor4.png"),
 		TileEntry("marb5","res/tiles/marble/marble_floor5.png"),
 		TileEntry("marb6","res/tiles/marble/marble_floor6.png"),
-		TileEntry("corridor_floor","res/tiles/corridor_floor.bmp"),
+
+		TileEntry("floor","res/tiles/crystal/crystal_floor0.png"),
+	//	TileEntry("corridor_floor","res/tiles/corridor_floor.bmp"),
 		TileEntry("stair_up", "res/tiles/features/stairs_up.png"),
 		TileEntry("stair_down", "res/tiles/features/stairs_down.png"),
+
 };
 size_t game_tile_n = sizeof(game_tile_data)/sizeof(TileEntry);
 

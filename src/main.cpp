@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0){
 		return 0;
 	}
-	init_system(false, windoww, windowh);
+	init_system(true/*Not fullscreen*/, windoww, windowh);
 	gs->reset_level();
 
 //	gs->add_instance( new TestInst(0,0));

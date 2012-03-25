@@ -47,8 +47,8 @@ int GameState::handle_event(SDL_Event *event) {
 		break;
 
 	case SDL_KEYDOWN: {
-		if (event->key.keysym.sym == SDLK_r) {
-
+		if (event->key.keysym.sym == SDLK_ESCAPE) {
+			done = 1;
 		}
 		key_down_states[event->key.keysym.sym] = 1;
 		key_press_states[event->key.keysym.sym] = 1;

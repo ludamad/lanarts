@@ -93,7 +93,7 @@ void BulletInst::step(GameState* gs) {
 	}
 	if (colobj || range_left <= 0){
 			hits --;
-			if (hits > 0 && colobj){
+			if (hits >= 0 && colobj){
 				MonsterController& mc = gs->monster_controller();
 				int mindist = 200;
 				if (target==NULL)
