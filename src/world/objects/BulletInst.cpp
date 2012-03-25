@@ -66,10 +66,11 @@ void BulletInst::step(GameState* gs) {
 		GameInst* enemy = NULL;
 		gs->object_radius_test(this, &enemy, 1, &enemy_hit);
 		if (enemy){
+			int gain = ((EnemyInst*)enemy)->xpworth();
 			Stats& s = ((EnemyInst*)enemy)->stats();
 			if (s.hurt(attack.damage)) {
 				gs->remove_instance(enemy);
-				((PlayerInst*)origin)->stats().gain_xp(10);
+				((PlayerInst*)origin)->stats().gain_xp(gain);
 			}
 
 			gs->remove_instance(this);

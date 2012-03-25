@@ -16,6 +16,9 @@ static bool enemy_hit(GameInst* self, GameInst* other) {
 void EnemyInst::init(GameState* gs) {
 	MonsterController& mc = gs->monster_controller();
 	mc.register_enemy(this->id);
+
+	xpgain *=1+gs->branch_level()/10.0;
+	xpgain = round(xpgain/5.0)*5;
 	stats().hp += stats().hp*gs->branch_level()/10.0;
 	stats().max_hp += stats().max_hp*gs->branch_level()/10.0;
 	stats().mp += stats().mp*gs->branch_level()/10.0;

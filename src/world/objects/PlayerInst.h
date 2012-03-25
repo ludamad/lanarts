@@ -19,40 +19,44 @@ public:
 	PlayerInst(int x, int y) :
 			GameInst(x, y, RADIUS), base_stats(4, 100, 100,
 					Attack(true, 10, 25, 40),
-					Attack(true, 8, 400, 40/*cooldown*/, SPR_FIREBOLT, 7)),
-					canrestcooldown(0), money(0) {
+					Attack(true, 8, 400, 40, SPR_FIREBOLT, 7)), canrestcooldown(
+					0), money(0) {
 		portal = NULL;
 	}
+
 	virtual ~PlayerInst();
-	virtual void init(GameState* gs);
-	virtual void step(GameState* gs);
-	virtual void draw(GameState* gs);
-	Stats& stats() {
+	virtual void init(GameState *gs);
+	virtual void step(GameState *gs);
+	virtual void draw(GameState *gs);
+	Stats & stats() {
 		return base_stats;
 	}
-	Stats effective_stats(){
+
+	Stats effective_stats() {
 		Stats tmp = base_stats;
 		effects.process(base_stats, tmp);
 		return tmp;
 	}
-	Effects& status_effects(){
+
+	Effects & status_effects() {
 		return effects;
 	}
+
 	int gold() {
 		return money;
 	}
+
 	Inventory inventory;
-	//Hack for now of remembering which entrance we hit last
-	GameLevelPortal* portal_used() {
+	GameLevelPortal *portal_used() {
 		return portal;
 	}
+
 private:
-	void move(GameState* gs, int dx, int dy);
+	void move(GameState *gs, int dx, int dy);
 	Stats base_stats;
 	Effects effects;
 	int canrestcooldown;
 	int money;
-	//Hack for now of remembering which entrance we hit last
 	GameLevelPortal* portal;
 };
 

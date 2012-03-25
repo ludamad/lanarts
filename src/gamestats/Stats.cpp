@@ -12,7 +12,7 @@ Stats::Stats(float speed, int hp, int mp, const Attack & melee,
 		movespeed(speed), hp(hp), max_hp(hp), mp(mp), max_mp(mp), hpregen(
 				1.0 / 30), mpregen(1.0 / 15), cooldown(0), hurt_cooldown(0), hp_regened(
 				0), mp_regened(0), melee(melee), ranged(ranged), xp(0), xpneeded(
-				100), xplevel(1) {
+				50), xplevel(1) {
 }
 
 void Stats::step() {
@@ -96,20 +96,20 @@ bool Stats::hurt(int dmg) {
 }
 
 void Stats::gain_level() {
-	hp += 10;
-	max_hp += 10;
-	mp += 10;
-	max_mp += 10;
-	melee.damage += 1;
-	ranged.damage += 1;
+	hp += 20;
+	max_hp += 20;
+	mp += 20;
+	max_mp += 20;
+	melee.damage += 2;
+	ranged.damage += 2;
 	xplevel++;
 }
 
 void Stats::gain_xp(int amnt) {
 	xp += amnt;
 	if (xp >= xpneeded) {
-		xp -= xpneeded;
-		xpneeded = (xplevel - 1) * 100 + 50;
 		gain_level();
+		xp -= xpneeded;
+		xpneeded = (xplevel) * 50;
 	}
 }

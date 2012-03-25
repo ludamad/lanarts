@@ -68,7 +68,7 @@ void MonsterController::set_monster_headings(GameState* gs, std::vector<EnemyOfI
 		double abs = sqrt(pdist);
 		Stats& s = e->stats();
 
-		if (abs < e->radius + player->radius || (s.ranged.canuse && abs < s.ranged.range/2))
+		if (abs < e->radius + player->radius || (s.ranged.canuse && abs < e->radius*2 + player->radius ))
 			eb.vx = 0, eb.vy = 0;
 		if ( s.melee.canuse && abs < s.melee.range + e->radius ){
 			e->attack(gs, player, false);

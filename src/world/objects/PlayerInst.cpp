@@ -10,6 +10,9 @@
 #include "../../display/display.h"
 #include "../../data/item_data.h"
 
+
+static const int REST_COOLDOWN = 350;
+
 PlayerInst::~PlayerInst() {
 }
 
@@ -64,6 +67,8 @@ void PlayerInst::move(GameState* gs, int dx, int dy) {
 	if (target && !stats().has_cooldown()) {
 		if (target->stats().hurt(effective_stats().melee.damage)) {
 			gs->remove_instance(target);
+
+			stats().gain_xp(target->etype()->xpaward);
 		}
 		stats().reset_melee_cooldown(effective_stats());
 	}
@@ -92,7 +97,7 @@ void PlayerInst::step(GameState* gs) {
 		return;
 	}
 	if (stats().hurt_cooldown > 0)
-		canrestcooldown = std::max(canrestcooldown,500);
+		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 	canrestcooldown--;
 	if (canrestcooldown < 0) canrestcooldown = 0;
 
@@ -117,6 +122,11 @@ void PlayerInst::step(GameState* gs) {
 	if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
 		dx -= 1;
 	}
+
+	if (gs->key_press_state(SDLK_x)) {
+		stats().gain_xp(50);
+	}
+
 	if (!resting)
 		move(gs, dx, dy);
 
@@ -201,7 +211,7 @@ void PlayerInst::step(GameState* gs) {
 				}
 			}
 
-			canrestcooldown = std::max(canrestcooldown,500);
+			canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 		} else if ( gs->mouse_left_down() && mouse_within
 				&& !base_stats.has_cooldown()) {
 			if (stats().mp >= 10) {
@@ -210,7 +220,7 @@ void PlayerInst::step(GameState* gs) {
 						rmy);
 				gs->add_instance(bullet);
 				base_stats.reset_ranged_cooldown(effective_stats());
-				canrestcooldown = std::max(canrestcooldown,500);
+				canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 			}
 		} else if (gs->mouse_left_click() && !mouse_within) {
 			int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
@@ -220,7 +230,7 @@ void PlayerInst::step(GameState* gs) {
 				int item = inventory.inv[slot].item;
 				game_item_data[item].action(this);
 				inventory.inv[slot].n--;
-				canrestcooldown = std::max(canrestcooldown,500);
+				canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 			}
 		}
 	}
