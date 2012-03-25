@@ -35,22 +35,28 @@ void PlayerInst::move(GameState* gs, int dx, int dy) {
 	float ddx = dx * mag;
 	float ddy = dy * mag;
 
-//	EnemyInst* alreadyhitting = NULL;
-//	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_hit, x + ddx,
-//			y + ddy);
+	EnemyInst* alreadyhitting = NULL;
+	gs->object_radius_test(this, (GameInst**) &alreadyhitting, 1, &enemy_hit, x, y);
+	if (alreadyhitting){
+		if (ddx < 0 == () < 0){
+
+		}
+	}
 
 	EnemyInst* target = NULL;
 	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_hit, x + ddx,
 			y + ddy);
+	gs->tile_radius_test(x+ddx, y+ddy, radius);
 
-	if (!gs->solid_test(this, NULL, 0, NULL, x + ddx, y + ddy)) {
+	if (!gs->tile_radius_test(x+ddx, y+ddy, radius)) {
 		x += ddx;
 		y += ddy;
-	} else if (!gs->solid_test(this, NULL, 0, NULL, x + ddx, y)) {
+	} else if (!gs->tile_radius_test(x+ddx, y, radius)) {
 		x += ddx;
-	} else if (!gs->solid_test(this, NULL, 0, NULL, x, y + ddy)) {
+	} else if (!gs->tile_radius_test(x, y+ddy, radius)) {
 		y += ddy;
 	}
+
 	if (target && !stats().has_cooldown()) {
 		if (target->stats().hurt(effective_stats().melee.damage)) {
 			gs->remove_instance(target);
