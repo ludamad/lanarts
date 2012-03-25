@@ -161,58 +161,50 @@ void PlayerInst::use_spell(GameState* gs){
 	if (gs->key_press_state(SDLK_SPACE)){
 		spell = !spell;
 	}
-	GameInst* bullet;
+	bool cast = false;
 	int tx, ty;
-	if (gs->key_down_state(SDLK_f)){
-
+	if (gs->key_down_state(SDLK_j)){
+		obj_id tid = gs->monster_controller().targetted;
+		if (tid){
+			GameInst* target = gs->get_instance(tid);
+			if (target){
+				cast = true;
+				tx = target->x;
+				ty = target->y;
+			}
+		}
+	} else if (gs->mouse_left_click()){
+		cast = true;
+		tx = gs->mouse_x() + view.x;
+		ty = gs->mouse_y() + view.y;
 	}
-	if (gs->key_down_state(SDLK_u) && !base_stats.has_cooldown()) {
+
+	if (cast && !stats().has_cooldown()){
 		Attack atk(effective_stats().ranged);
-		atk.projectile_sprite = SPR_MAGIC_BLAST;
-		atk.projectile_speed /= 1.75;
-		atk.damage *= 2;
-		obj_id tid = gs->monster_controller().targetted;
-		GameInst* target = gs->get_instance(tid);
-		if (tid && target) {
-			if (stats().mp >= 20) {
-				stats().mp -= 20;
-				GameInst* bullet = new BulletInst(id, atk, x, y,
-						target->x, target->y, false, 3);
-				gs->add_instance(bullet);
-				base_stats.cooldown = effective_stats().ranged.cooldown*1.4;
-			}
+		bool bounce = true;
+		int hits = 0;
+		int mpcost = 10;
+		if (spell){
+			atk.projectile_sprite = SPR_MAGIC_BLAST;
+			atk.projectile_speed /= 1.75;
+			atk.damage *= 2;
+			bounce = false;
+			hits = 3;
+			mpcost = 20;
 		}
+		if (mpcost <= stats().mp){
 
-		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
-	}
-
-
-	if (gs->key_down_state(SDLK_j) && !base_stats.has_cooldown()) {
-		obj_id tid = gs->monster_controller().targetted;
-		GameInst* target = gs->get_instance(tid);
-		if (tid && target) {
-			if (stats().mp >= 10) {
-				stats().mp -= 10;
-				GameInst* bullet = new BulletInst(id, stats().ranged, x, y,
-						target->x, target->y, true);
-				gs->add_instance(bullet);
-				base_stats.reset_ranged_cooldown(effective_stats());
-			}
-		}
-
-		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
-	} else if (gs->mouse_left_down() && mouse_within
-			&& !base_stats.has_cooldown()) {
-		if (stats().mp >= 10) {
-			stats().mp -= 10;
-			GameInst* bullet = new BulletInst(id, stats().ranged, x, y, rmx,
-					rmy, true);
+			GameInst* bullet = new BulletInst(id, atk, x, y, tx, ty, bounce, hits);
 			gs->add_instance(bullet);
-			base_stats.reset_ranged_cooldown(effective_stats());
+
 			canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
+			if (spell)
+				base_stats.cooldown = effective_stats().ranged.cooldown*1.4;
+			else
+				base_stats.cooldown = effective_stats().ranged.cooldown;
+
 		}
 	}
-
 
 	if (gs->mouse_left_click() && !mouse_within) {
 		int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
