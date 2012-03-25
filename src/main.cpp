@@ -57,6 +57,7 @@ int main(int argc, char** argv) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0){
 		return 0;
 	}
+	
 	init_system(true/*Not fullscreen*/, windoww, windowh);
 	gs->reset_level();
 
@@ -77,5 +78,7 @@ int main(int argc, char** argv) {
 		if (delayms > 0)
 			SDL_Delay(delayms);
 	}
+	
+	SDL_Quit();
 	return 0;
 }

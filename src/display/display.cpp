@@ -162,6 +162,7 @@ void init_sdl_gl(bool fullscreen, int w, int h) {
 	SDL_WM_SetCaption("RPG", "rpg");
 
 }
+
 void gl_set_drawing_area(int x, int y, int w, int h) {
 
 	glViewport(x, y, w, h);
