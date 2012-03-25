@@ -21,16 +21,17 @@ void ItemInst::step(GameState *gs){
 
 void ItemInst::draw(GameState *gs){
 	GameView& view = gs->window_view();
+
 	ItemType& itemd = game_item_data[type];
 	GLImage& img = game_sprite_data[itemd.sprite_number].img;
 
 	int w = img.width, h = img.height;
 	int xx = x - w / 2, yy = y - h / 2;
 
-	//if (!view.within_view(xx, yy, w, h))
-	//	return;
-	//if (!gs->object_visible_test(this))
-	//	return;
+	if (!view.within_view(xx, yy, w, h))
+		return;
+	if (!gs->object_visible_test(this))
+		return;
 
 	image_display(&img, xx - view.x, yy - view.y);
 }

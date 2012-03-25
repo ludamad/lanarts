@@ -30,7 +30,23 @@ static bool enemy_hit(GameInst* self, GameInst* other) {
 	return dynamic_cast<EnemyInst*>(other) != NULL;
 }
 
-void PlayerInst::move_and_melee(GameState* gs, int dx, int dy) {
+void PlayerInst::use_move_and_melee(GameState* gs) {
+
+	//Arrow/wasd movement
+	int dx = 0, dy = 0;
+	if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
+		dy -= 1;
+	}
+	if (gs->key_down_state(SDLK_RIGHT) || gs->key_down_state(SDLK_d)) {
+		dx += 1;
+	}
+	if (gs->key_down_state(SDLK_DOWN) || gs->key_down_state(SDLK_s)) {
+		dy += 1;
+	}
+	if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
+		dx -= 1;
+	}
+
 	if (dx == 0 && dy == 0)
 		return;
 
@@ -92,6 +108,7 @@ static int scan_entrance(const std::vector<GameLevelPortal>& portals,
 }
 
 void PlayerInst::use_staircase(GameState* gs){
+
 	//Up/down stairs
 		if (gs->key_down_state(SDLK_PERIOD) || gs->mouse_downwheel()) {
 			Pos hitsqr;
@@ -119,6 +136,83 @@ void PlayerInst::use_staircase(GameState* gs){
 			}
 		}
 }
+
+void PlayerInst::use_spell(GameState* gs){
+	GameView& view = gs->window_view();
+
+	bool mouse_within = gs->mouse_x() < gs->window_view().width;
+
+	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
+
+	if (gs->mouse_right_click() && mouse_within) {
+		int px = x, py = y;
+		x = rmx, y = rmy;
+		if (stats().mp >= 50 && !gs->solid_test(this)
+				&& gs->object_visible_test(this)) {
+			stats().mp -= 50;
+			canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
+		} else {
+			x = px, y = py;
+		}
+	}
+
+
+	if (gs->key_down_state(SDLK_u) && !base_stats.has_cooldown()) {
+		Attack atk(effective_stats().ranged);
+		atk.projectile_sprite = SPR_MAGIC_BLAST;
+		atk.projectile_speed /= 1.5;
+		atk.damage *= 2;
+		obj_id tid = gs->monster_controller().targetted;
+		GameInst* target = gs->get_instance(tid);
+		if (tid && target) {
+			if (stats().mp >= 20) {
+				stats().mp -= 20;
+				GameInst* bullet = new BulletInst(id, atk, x, y,
+						target->x, target->y, false, 3);
+				gs->add_instance(bullet);
+				base_stats.cooldown = effective_stats().ranged.cooldown*1.2;
+			}
+		}
+
+		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
+	} else if (gs->key_down_state(SDLK_j) && !base_stats.has_cooldown()) {
+		obj_id tid = gs->monster_controller().targetted;
+		GameInst* target = gs->get_instance(tid);
+		if (tid && target) {
+			if (stats().mp >= 10) {
+				stats().mp -= 10;
+				GameInst* bullet = new BulletInst(id, stats().ranged, x, y,
+						target->x, target->y, true);
+				gs->add_instance(bullet);
+				base_stats.reset_ranged_cooldown(effective_stats());
+			}
+		}
+
+		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
+	} else if (gs->mouse_left_down() && mouse_within
+			&& !base_stats.has_cooldown()) {
+		if (stats().mp >= 10) {
+			stats().mp -= 10;
+			GameInst* bullet = new BulletInst(id, stats().ranged, x, y, rmx,
+					rmy, true);
+			gs->add_instance(bullet);
+			base_stats.reset_ranged_cooldown(effective_stats());
+			canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
+		}
+	} else if (gs->mouse_left_click() && !mouse_within) {
+		int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
+		int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
+		int slot = 5 * posy + posx;
+		if (slot >= 0 && slot < INVENTORY_SIZE
+				&& inventory.inv[slot].n > 0) {
+			int item = inventory.inv[slot].item;
+			game_item_data[item].action(this);
+			inventory.inv[slot].n--;
+			canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
+		}
+	}
+
+}
 void PlayerInst::step(GameState* gs) {
 
 	GameView& view = gs->window_view();
@@ -145,30 +239,11 @@ void PlayerInst::step(GameState* gs) {
 		stats().raise_mp(stats().mpregen * 5);
 	}
 
-	//Arrow/wasd movement
-	int dx = 0, dy = 0;
-	if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
-		dy -= 1;
-	}
-	if (gs->key_down_state(SDLK_RIGHT) || gs->key_down_state(SDLK_d)) {
-		dx += 1;
-	}
-	if (gs->key_down_state(SDLK_DOWN) || gs->key_down_state(SDLK_s)) {
-		dy += 1;
-	}
-	if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
-		dx -= 1;
-	}
-
-	if (gs->key_press_state(SDLK_x)) {
-		stats().gain_xp(50);
-	}
-
 	if (!resting)
-		move_and_melee(gs, dx, dy);
+		use_move_and_melee(gs);
 
 	if (!resting) {
-
+		use_staircase(gs);
 
 		//Item pickup
 		ItemInst* item = NULL;
@@ -192,77 +267,10 @@ void PlayerInst::step(GameState* gs) {
 			}
 		}
 
-		int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
-
-		if (gs->mouse_right_click() && mouse_within) {
-			int px = x, py = y;
-			x = rmx, y = rmy;
-			if (stats().mp >= 50 && !gs->solid_test(this)
-					&& gs->object_visible_test(this)) {
-				stats().mp -= 50;
-			} else {
-				x = px, y = py;
-			}
-		}
-
 		if (gs->key_press_state(SDLK_k)) {
 			gs->monster_controller().shift_target(gs);
 		}
-
-		if (gs->key_down_state(SDLK_u) && !base_stats.has_cooldown()) {
-			Attack atk(effective_stats().ranged);
-			atk.projectile_sprite = SPR_MAGIC_BLAST;
-			atk.projectile_speed /= 1.5;
-			atk.damage *= 2;
-			obj_id tid = gs->monster_controller().targetted;
-			GameInst* target = gs->get_instance(tid);
-			if (tid && target) {
-				if (stats().mp >= 20) {
-					stats().mp -= 20;
-					GameInst* bullet = new BulletInst(id, atk, x, y,
-							target->x, target->y, false, 3);
-					gs->add_instance(bullet);
-					base_stats.cooldown = effective_stats().ranged.cooldown*1.2;
-				}
-			}
-
-			canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
-		} else if (gs->key_down_state(SDLK_j) && !base_stats.has_cooldown()) {
-			obj_id tid = gs->monster_controller().targetted;
-			GameInst* target = gs->get_instance(tid);
-			if (tid && target) {
-				if (stats().mp >= 10) {
-					stats().mp -= 10;
-					GameInst* bullet = new BulletInst(id, stats().ranged, x, y,
-							target->x, target->y, true);
-					gs->add_instance(bullet);
-					base_stats.reset_ranged_cooldown(effective_stats());
-				}
-			}
-
-			canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
-		} else if (gs->mouse_left_down() && mouse_within
-				&& !base_stats.has_cooldown()) {
-			if (stats().mp >= 10) {
-				stats().mp -= 10;
-				GameInst* bullet = new BulletInst(id, stats().ranged, x, y, rmx,
-						rmy, true);
-				gs->add_instance(bullet);
-				base_stats.reset_ranged_cooldown(effective_stats());
-				canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
-			}
-		} else if (gs->mouse_left_click() && !mouse_within) {
-			int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
-			int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
-			int slot = 5 * posy + posx;
-			if (slot >= 0 && slot < INVENTORY_SIZE
-					&& inventory.inv[slot].n > 0) {
-				int item = inventory.inv[slot].item;
-				game_item_data[item].action(this);
-				inventory.inv[slot].n--;
-				canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
-			}
-		}
+		use_spell(gs);
 	}
 	/*if (gs->mouse_right_down()) {
 	 int nx = gs->mouse_x() + view.x, ny = gs->mouse_y() + view.y;
