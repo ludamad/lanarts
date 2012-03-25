@@ -15,11 +15,21 @@ struct Inventory {
 		}
 	}
 	void add(int item, int number) {
-		for (int i = 0; i < INVENTORY_SIZE; i++) {
-			if (inv[i].n == 0 || inv[i].item == item) {
-				inv[i].item = item;
-				inv[i].n += number;
-				return;
+		for (int j = 0; j < 2; j++){
+			for (int i = 0; i < INVENTORY_SIZE; i++) {
+				if(j == 0){
+					if (inv[i].item == item) {
+						inv[i].item = item;
+						inv[i].n += number;
+						return;
+					}
+				}else {
+					if (inv[i].n == 0) {
+						inv[i].item = item;
+						inv[i].n += number;
+						return;
+					}
+				}
 			}
 		}
 	}
