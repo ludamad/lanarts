@@ -35,19 +35,23 @@ void PlayerInst::move(GameState* gs, int dx, int dy) {
 	float ddx = dx * mag;
 	float ddy = dy * mag;
 
-	EnemyInst* alreadyhitting = NULL;
-	gs->object_radius_test(this, (GameInst**) &alreadyhitting, 1, &enemy_hit, x, y);
-	if (alreadyhitting){
-		if (ddx < 0 == () < 0){
 
-		}
-	}
 
 	EnemyInst* target = NULL;
 	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_hit, x + ddx,
 			y + ddy);
 	gs->tile_radius_test(x+ddx, y+ddy, radius);
 
+	EnemyInst* alreadyhitting = NULL;
+	gs->object_radius_test(this, (GameInst**) &alreadyhitting, 1, &enemy_hit, x, y);
+	if (alreadyhitting){
+		if (ddx < 0 == ((alreadyhitting->x - x) < 0)){
+			ddx = 0;
+		}
+		if (ddy < 0 == ((alreadyhitting->y - y) < 0)){
+			ddy = 0;
+		}
+	}
 	if (!gs->tile_radius_test(x+ddx, y+ddy, radius)) {
 		x += ddx;
 		y += ddy;
