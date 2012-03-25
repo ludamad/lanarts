@@ -64,16 +64,18 @@ int main(int argc, char** argv) {
 	for (int i = 0; cont; i++) {
 		clock_t start = clock();
 
-		if (gs->key_down_state(SDLK_v)) {
+		if (gs->key_down_state(SDLK_e)) {
 			for (int repeat = 0; repeat < 4; repeat++){
 				cont = gs->step();
 			//	if (!cont) break;
 			}
 		}
 		cont = gs->step();
+		if (!cont) break;
+		cont = gs->step();
 		gs->draw();
 		clock_t end = clock();
-		int delayms = 14 - (end-start)*1000/CLOCKS_PER_SEC;
+		int delayms = 28 - (end-start)*1000/CLOCKS_PER_SEC;
 		if (delayms > 0)
 			SDL_Delay(delayms);
 	}

@@ -23,7 +23,7 @@
 
 
 GameState::GameState(int width, int height, int vieww, int viewh, int hudw) :
-		world_width(width), world_height(height), level_number(7),  frame_n(0), hud(
+		world_width(width), world_height(height), level_number(1),  frame_n(0), hud(
 				vieww, 0, hudw, viewh), view(50, 50, vieww, viewh, width,
 				height), mouse_leftdown(0), mouse_rightdown(0), mouse_leftclick(0), mouse_rightclick(0) {
 	memset(key_down_states, 0, sizeof(key_down_states));
