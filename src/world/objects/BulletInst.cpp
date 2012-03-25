@@ -31,6 +31,26 @@ static bool player_hit(GameInst* self, GameInst* other){
 }
 
 void BulletInst::step(GameState* gs) {
+    Pos tile_hit;
+    
+    int newx = (int) round(rx += vx); //update based on rounding of true float
+    int newy = (int) round(ry += vy);
+    bool hitsx = gs->tile_radius_test(newx, y, RADIUS, true, -1);
+    bool hitsy = gs->tile_radius_test(x, newy, RADIUS, true, -1);
+    if(hitsy || hitsx || gs->tile_radius_test(newx, newy, RADIUS, true, -1, &tile_hit)){
+        if (hitsx) {
+            vx = -vx;
+        }
+        if (hitsy) {
+            vy = -vy;
+        }
+        if (!hitsy && !hitsx) {
+            vx = -vx;
+            vy = -vy;
+        }
+    
+    //    return;
+    }
 	x = (int) round(rx += vx); //update based on rounding of true float
 	y = (int) round(ry += vy);
 
@@ -40,18 +60,6 @@ void BulletInst::step(GameState* gs) {
 		gs->remove_instance(this);
 		return;
 	}
-	
-	Pos tile_hit;
-	if(gs->tile_radius_test(x, y, RADIUS, true, -1, &tile_hit)){
-        tile_hit.x*=TILE_SIZE;
-        tile_hit.y*=TILE_SIZE;
-        if(tile_hit.x - (x-TILE_SIZE/2) > tile_hit.y - (y-TILE_SIZE/2)){
-            vy = -vy;
-        }else {
-            vx = -vx;
-        }
-        return;
-    }
 
 	GameInst* origin = gs->get_instance(origin_id);
 	if (dynamic_cast<PlayerInst*>(origin)){
