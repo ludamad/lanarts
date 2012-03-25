@@ -18,7 +18,7 @@ struct Inventory {
 		for (int j = 0; j < 2; j++){
 			for (int i = 0; i < INVENTORY_SIZE; i++) {
 				if(j == 0){
-					if (inv[i].item == item) {
+					if (inv[i].item == item && inv[i].n > 0) {
 						inv[i].item = item;
 						inv[i].n += number;
 						return;

@@ -5,6 +5,8 @@ FIND_PACKAGE(SDL_image REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
+set( CMAKE_CXX_FLAGS_RELEASE "-O3" )
+
 set( CMAKE_BUILD_TYPE Debug)
 include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
 
