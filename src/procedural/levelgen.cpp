@@ -35,8 +35,8 @@ void generate_rooms(const RoomGenSettings& rs, MTwist& mt,
 	for (int id = 1; id <= rs.amount_of_rooms; id++) {
 		for (int attempts = 0;; attempts++) {
 
-			int rw = mt.rand(minr, maxr);
-			int rh = mt.rand(minr, maxr);
+			int rw = mt.rand(minr, maxr+1);
+			int rh = mt.rand(minr, maxr+1);
 
 			int rx = mt.rand(w - 1 - rs.room_padding) | 1;
 			int ry = mt.rand(h - 1 - rs.room_padding) | 1;

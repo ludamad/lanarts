@@ -110,6 +110,6 @@ void Stats::gain_xp(int amnt) {
 	while (xp >= xpneeded) {
 		gain_level();
 		xp -= xpneeded;
-		xpneeded = (xplevel) * 100;
+		xpneeded = (xplevel) * 125;
 	}
 }

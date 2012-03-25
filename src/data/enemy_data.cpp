@@ -16,12 +16,12 @@
 //			cooldown, mreach, range, bulletspeed = 7)
 //EnemyType constructor:
 //   EnemyType(name, rad, xpaward, spriten, stats)
-Attack weakmelee(true,  8, 25, 70);
-Attack medmelee(true,  13, 25, 70);
-Attack strongmelee(true,  16, 25, 70);
+Attack weakmelee(true,  10, 25, 70);
+Attack medmelee(true,  15, 25, 70);
+Attack strongmelee(true,  20, 25, 70);
 Attack strongermelee(true,  45, 25, 70);
 Attack strongshortrange_storm(true, 13, 130, 45, SPR_STORMBOLT, 7 );
-Attack strongshortrange_fire(true, 13, 400, 70, SPR_FIREBOLT, 4 );
+Attack strongshortrange_fire(true, 30, 400, 70, SPR_FIREBOLT, 4 );
 
 EnemyType game_enemy_data2[] = {
 		EnemyType("Skeleton", 11, 10, SPR_SKELETON,
@@ -40,26 +40,26 @@ EnemyType game_enemy_data2[] = {
 EnemyType game_enemy_data[] = {
 		EnemyType("Skeleton", 11, 10, SPR_SKELETON,
 				Stats(2, 30,0,
-						Attack(true,  1, 25, 10),
+						Attack(true,  12, 25, 70),
 						Attack()
 				)
 		),
 		EnemyType("Chicken", 10, 10, SPR_CHICKEN,
-				Stats(4, 20,0, Attack(true,  1, 25, 10), Attack())),
+				Stats(4, 20,0, Attack(true,  1, 25, 5), Attack())),
 		EnemyType("Zombie", 14, 15, SPR_ZOMBIE,
 				Stats(2, 40,0, medmelee, Attack())),
 		EnemyType("Storm Elemental", 14, 20, SPR_STORM_ELE,
 				Stats(1, 40,0, Attack(), strongshortrange_storm)),
 		EnemyType("Grue", 14, 25, SPR_GRUE,
-				Stats(0.5, 160,0, strongermelee, Attack())),
+				Stats(2, 100,0, strongermelee, Attack())),
 		EnemyType("Super Chicken", 10, 20, SPR_SUPERCHICKEN,
-				Stats(4, 45,0, medmelee, Attack())),
+				Stats(4, 80,0, medmelee, Attack())),
 		EnemyType("Ciribot", 14, 30, SPR_CIRIBOT,
-				Stats(2, 40,0, strongmelee, Attack())),
+				Stats(3.5, 80,0, strongmelee, Attack())),
 		EnemyType("Jester", 14, 35, SPR_JESTER,
-				Stats(3, 100,0, weakmelee, Attack())),
+				Stats(3, 120,0, strongmelee, Attack())),
 		EnemyType("Hell Forged", 14, 50, SPR_HELLFORGED,
-				Stats(2, 100,0, Attack(), strongshortrange_fire)),
+				Stats(3, 120,0, Attack(), strongshortrange_fire)),
 };
 
 size_t game_enemy_n = sizeof(game_enemy_data)/sizeof(EnemyType);

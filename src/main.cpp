@@ -58,14 +58,14 @@ int main(int argc, char** argv) {
 		return 0;
 	}
 	
-	init_system(true/*Not fullscreen*/, windoww, windowh);
+	init_system(false/*Not fullscreen*/, windoww, windowh);
 	gs->reset_level();
 
 //	gs->add_instance( new TestInst(0,0));
 	for (int i = 0; cont; i++) {
 		clock_t start = clock();
 
-		if (gs->key_down_state(SDLK_e)) {
+		if (gs->key_down_state(SDLK_F1)) {
 			for (int repeat = 0; repeat < 4; repeat++){
 				cont = gs->step();
 			//	if (!cont) break;

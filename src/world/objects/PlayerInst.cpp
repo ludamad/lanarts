@@ -174,7 +174,7 @@ void PlayerInst::use_spell(GameState* gs){
 				ty = target->y;
 			}
 		}
-	} else if (gs->mouse_left_click()){
+	} else if (gs->mouse_left_click() && mouse_within){
 		cast = true;
 		tx = gs->mouse_x() + view.x;
 		ty = gs->mouse_y() + view.y;
@@ -194,7 +194,7 @@ void PlayerInst::use_spell(GameState* gs){
 			mpcost = 20;
 		}
 		if (mpcost <= stats().mp){
-
+			stats().mp -= mpcost;
 			GameInst* bullet = new BulletInst(id, atk, x, y, tx, ty, bounce, hits);
 			gs->add_instance(bullet);
 
@@ -206,24 +206,12 @@ void PlayerInst::use_spell(GameState* gs){
 
 		}
 	}
-
-	if (gs->mouse_left_click() && !mouse_within) {
-		int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
-		int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
-		int slot = 5 * posy + posx;
-		if (slot >= 0 && slot < INVENTORY_SIZE
-				&& inventory.inv[slot].n > 0) {
-			int item = inventory.inv[slot].item;
-			game_item_data[item].action(this);
-			inventory.inv[slot].n--;
-			canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
-		}
-	}
-
 }
 void PlayerInst::step(GameState* gs) {
 
 	GameView& view = gs->window_view();
+
+	bool mouse_within = gs->mouse_x() < gs->window_view().width;
 
 	//Stats/effect step
 	stats().step();
@@ -280,10 +268,25 @@ void PlayerInst::step(GameState* gs) {
 		}
 		use_spell(gs);
 	}
-	/*if (gs->mouse_right_down()) {
-	 int nx = gs->mouse_x() + view.x, ny = gs->mouse_y() + view.y;
-	 view.center_on(nx, ny);
-	 } else*/
+
+
+	if (gs->mouse_left_click() && !mouse_within) {
+		int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
+		int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
+		int slot = 5 * posy + posx;
+		if (slot >= 0 && slot < INVENTORY_SIZE
+				&& inventory.inv[slot].n > 0) {
+			int item = inventory.inv[slot].item;
+			game_item_data[item].action(this);
+			inventory.inv[slot].n--;
+			canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
+		}
+	}
+
+	if (gs->key_down_state(SDLK_x)) {
+		int nx = gs->mouse_x() + view.x, ny = gs->mouse_y() + view.y;
+		view.center_on(nx, ny);
+	 } else
 	view.center_on(last_x, last_y);
 }
 
