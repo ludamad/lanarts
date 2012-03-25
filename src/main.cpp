@@ -57,6 +57,11 @@ int main(int argc, char** argv) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0){
 		return 0;
 	}
+	
+	SDL_VideoInfo* vidinfo = SDL_GetVideoInfo();
+	int oldresy = vidinfo->current_h;
+	int oldresx = vidinfo->current_w;
+	
 	init_system(true/*Not fullscreen*/, windoww, windowh);
 	gs->reset_level();
 
@@ -77,5 +82,8 @@ int main(int argc, char** argv) {
 		if (delayms > 0)
 			SDL_Delay(delayms);
 	}
+	
+	deinit_sdl_gl(oldresx, oldresy);
+	
 	return 0;
 }

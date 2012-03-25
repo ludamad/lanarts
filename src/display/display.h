@@ -15,6 +15,7 @@ int power_of_two(int input);
 
 void gl_set_drawing_area(int x, int y, int w, int h);
 void init_sdl_gl(bool fullscreen, int w, int h);
+void deinit_sdl_gl(int oldw, int oldh);
 void image_display(GLImage* img, int x, int y, const Colour& c = Colour(255,255,255));
 
 inline void image_display(const GameView& view, GLImage* img, int x, int y){
