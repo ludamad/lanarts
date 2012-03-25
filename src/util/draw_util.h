@@ -12,7 +12,7 @@
 
 struct Colour {
     int r, g, b, a;
-    Colour(int r, int g, int b, int a = 255) :
+    Colour(int r = 255, int g = 255, int b = 255, int a = 255) :
         r(r), g(g), b(b), a(a) {}
     operator SDL_Color(){
     	SDL_Color ret = {r,g,b,a};

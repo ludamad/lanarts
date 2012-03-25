@@ -91,6 +91,7 @@ set( lanarts_include
 	gamestats/Effects.h
 	gamestats/Inventory.h
 	gamestats/Item.h
+	gamestats/Spells.h
 	gamestats/Stats.h
 	
 	libyaml/yaml_private.h

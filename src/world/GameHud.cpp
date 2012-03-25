@@ -61,15 +61,23 @@ static void draw_player_actionbar(GameState* gs, PlayerInst* player){
 	int y = h - TILE_SIZE;
 	
 	gl_draw_rectangle(0, y, TILE_SIZE*5, TILE_SIZE);
+	Colour outline(43,43,43);
 	for(int ix = 0; (ix*TILE_SIZE+TILE_SIZE) <= TILE_SIZE*5; ix++){
-		gl_draw_rectangle((ix*TILE_SIZE), y, TILE_SIZE, TILE_SIZE, Colour(43, 43, 43));
-		gl_draw_rectangle((ix*TILE_SIZE)+1, 1+y, TILE_SIZE-2, TILE_SIZE-2, Colour(0, 0, 0));
+		if(ix == 0){
+			outline = Colour(255,0,0);
+		}else {
+			outline = Colour(43,43,43);
+		}
+		gl_draw_rectangle((ix*TILE_SIZE), y, TILE_SIZE, TILE_SIZE, outline);
+		gl_draw_rectangle((ix*TILE_SIZE)+1, 1+y, TILE_SIZE-2, TILE_SIZE-2);
 // 		if(player->inventory.inv[slot].n > 0){
 // 			ItemType& itemd = game_item_data[player->inventory.inv[slot].item];
 // 			image_display(&game_sprite_data[itemd.sprite_number].img,(ix*TILE_SIZE)+x+1,(iy*TILE_SIZE)+y);
 // 			gl_printf(gs->primary_font(), Colour(255,255,255), x+ix*TILE_SIZE, y+iy*TILE_SIZE, "%d", player->inventory.inv[slot].n);
 // 		}
 	}
+	image_display(&game_sprite_data[SPR_FIREBOLT].img,1, y);
+	image_display(&game_sprite_data[SPR_MAGIC_BLAST].img,TILE_SIZE+1, y);
 }
 
 static void fill_buff2d(char* buff, int w, int h, int x, int y,
