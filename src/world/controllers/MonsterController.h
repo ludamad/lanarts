@@ -42,6 +42,7 @@ public:
 	void set_monster_headings(GameState* gs, std::vector<EnemyOfInterest>& eois);
 public:
 	obj_id targetted;
+	std::vector<PathInfo> room_paths;
 	//vector of paths to player instances
 	std::vector<PathInfo> paths;
 	//vector of monster ids

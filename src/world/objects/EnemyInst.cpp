@@ -16,6 +16,19 @@ static bool enemy_hit(GameInst* self, GameInst* other) {
 void EnemyInst::init(GameState* gs) {
 	MonsterController& mc = gs->monster_controller();
 	mc.register_enemy(this->id);
+	/*stats().hp += stats().hp*gs->branch_level()/10.0;
+	stats().max_hp += stats().max_hp*gs->branch_level()/10.0;
+	stats().mp += stats().mp*gs->branch_level()/10.0;
+	stats().max_mp += stats().max_mp*gs->branch_level()/10.0;
+	stats().ranged.cooldown /= 1.0 + gs->branch_level()/10.0;
+	stats().ranged.damage *= 1.0 + gs->branch_level()/10.0;
+	stats().ranged.projectile_speed *= 1.0 + gs->branch_level()/10.0;
+	stats().melee.cooldown /= 1.0 + gs->branch_level()/10.0;
+	stats().melee.damage *= 1.0 + gs->branch_level()/10.0;
+	stats().max_mp += stats().max_mp*gs->branch_level()/10.0;
+	double speedfactor = 1+stats().max_mp*gs->branch_level()/10.0;
+	if (stats().movespeed < 3)
+		eb.speed = std::min(stats().movespeed*speedfactor,3.0);*/
 }
 
 void EnemyInst::step(GameState* gs) {

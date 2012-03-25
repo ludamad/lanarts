@@ -13,6 +13,8 @@ PlayerController::PlayerController() {
 }
 
 PlayerController::~PlayerController() {
+	for (int i = 0; i < fovs.size(); i++)
+		delete fovs[i];
 }
 
 void PlayerController::pre_step(GameState* gs) {
@@ -72,6 +74,8 @@ bool PlayerController::seen_by_player(GameState* gs, int pindex,
 
 void PlayerController::clear(){
 	pids.clear();
+	for (int i = 0; i < fovs.size(); i++)
+		delete fovs[i];
 	fovs.clear();
 }
 

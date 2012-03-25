@@ -24,6 +24,8 @@ set( lanarts_src
 	fov/fov.cpp
 	fov/impl/permissive-fov.cc
 	
+	gamestats/Stats.cpp
+	
 	pathfind/pathfind.cpp
 	
 	main.cpp
@@ -60,10 +62,6 @@ set( lanarts_src
 	)
 
 set( lanarts_include
-	gamestats/Effects.h
-	gamestats/Inventory.h
-	gamestats/Item.h
-	gamestats/Stats.h
 	
 	data/effect_data.h
 	data/enemy_data.h
@@ -80,6 +78,10 @@ set( lanarts_include
 	fov/impl/permissive-fov.h
 	fov/impl/permissive-fov-cpp.h
 	
+	gamestats/Effects.h
+	gamestats/Inventory.h
+	gamestats/Item.h
+	gamestats/Stats.h
 	
 	pathfind/pathfind.h
 	
