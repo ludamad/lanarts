@@ -95,7 +95,9 @@ void BulletInst::step(GameState* gs) {
 			hits --;
 			if (hits > 0 && colobj){
 				MonsterController& mc = gs->monster_controller();
-				int mindist = 50000;
+				int mindist = 200;
+				if (target==NULL)
+					attack.damage /= 2;
 				target = NULL;
 				for (int i = 0; i < mc.monster_ids().size(); i++){
 					obj_id mid = mc.monster_ids()[i];

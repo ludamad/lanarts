@@ -209,7 +209,7 @@ void PlayerInst::step(GameState* gs) {
 			Attack atk(effective_stats().ranged);
 			atk.projectile_sprite = SPR_MAGIC_BLAST;
 			atk.projectile_speed /= 2;
-			atk.damage *= 1.5;
+			atk.damage *= 2;
 			obj_id tid = gs->monster_controller().targetted;
 			GameInst* target = gs->get_instance(tid);
 			if (tid && target) {
@@ -277,14 +277,24 @@ void PlayerInst::draw(GameState* gs) {
 		gl_draw_statbar(view, x - 10, y - 20, 20, 5, stats().hp,
 				stats().max_hp);
 
-	if (stats().hurt_cooldown > 0) {
+	if (effects.get(EFFECT_HASTE)) {
+		effect* e = effects.get(EFFECT_HASTE);
+		float s = e->t_remaining/200;
+		if (s> 1) s = 1;
+		Colour blue(255*(1-s), 255*(1-s), 255);
+		image_display(&img, x - img.width / 2 - view.x,
+				y - img.height / 2 - view.y, blue);
+	}else if (stats().hurt_cooldown > 0) {
 		float s = 1 - stats().hurt_alpha() ;
 		Colour red(255, 255*s, 255*s);
 		image_display(&img, x - img.width / 2 - view.x,
 				y - img.height / 2 - view.y, red);
-	} else
+	}else {
 		image_display(&img, x - img.width / 2 - view.x,
 				y - img.height / 2 - view.y);
+	}
+
+
 	//for (int i = 0; i < 10; i++)
 //	gl_printf(gs->primary_font(), Colour(255,255,255), x-10-view.x, y-30-view.y, "id=%d", this->id);
 //	gl_printf(gs->primary_font(), Colour(255,255,255), gs->mouse_x(), gs->mouse_y(),

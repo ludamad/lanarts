@@ -35,6 +35,7 @@ enum {
 	SPR_MANA_POTION = 19,
 	SPR_MAGIC_BLAST = 20,
 	SPR_SHORT_SWORD = 21,
+	SPR_HASTESIGN = 22,
 };
 struct SpriteEntry {
 	const char* name;
