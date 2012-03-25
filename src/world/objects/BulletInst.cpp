@@ -16,8 +16,9 @@ BulletInst::~BulletInst() {
 
 }
 
-BulletInst::BulletInst(obj_id originator, Attack& attack, int x, int y, int tx, int ty) :
-		GameInst(x, y, RADIUS, false), attack(attack), range_left(attack.range), origin_id(originator), rx(x), ry(y) {
+BulletInst::BulletInst(obj_id originator, Attack& attack, int x, int y, int tx, int ty, bool bounce) :
+		GameInst(x, y, RADIUS, false), attack(attack), range_left(attack.range), origin_id(originator),
+		rx(x), ry(y), bounce(bounce) {
 	int dx = tx - x, dy = ty - y;
 	double abs = sqrt(dx * dx + dy * dy);
 	vx = dx * attack.projectile_speed / abs, vy = dy * attack.projectile_speed / abs;
@@ -32,24 +33,28 @@ static bool player_hit(GameInst* self, GameInst* other){
 
 void BulletInst::step(GameState* gs) {
     Pos tile_hit;
-    
-    int newx = (int) round(rx + vx); //update based on rounding of true float
-    int newy = (int) round(ry + vy);
-    bool hitsx = gs->tile_radius_test(newx, y, RADIUS, true, -1);
-    bool hitsy = gs->tile_radius_test(x, newy, RADIUS, true, -1);
-    if(hitsy || hitsx || gs->tile_radius_test(newx, newy, RADIUS, true, -1, &tile_hit)){
-        if (hitsx) {
-            vx = -vx;
-        }
-        if (hitsy) {
-            vy = -vy;
-        }
-        if (!hitsy && !hitsx) {
-            vx = -vx;
-            vy = -vy;
-        }
-    
-    //    return;
+	int newx = (int) round(rx + vx); //update based on rounding of true float
+	int newy = (int) round(ry + vy);
+    bool collides = gs->tile_radius_test(newx, newy, RADIUS, true, -1, &tile_hit);
+    if (bounce){
+		bool hitsx = gs->tile_radius_test(newx, y, RADIUS, true, -1);
+		bool hitsy = gs->tile_radius_test(x, newy, RADIUS, true, -1);
+		if(hitsy || hitsx || collides){
+			if (hitsx) {
+				vx = -vx;
+			}
+			if (hitsy) {
+				vy = -vy;
+			}
+			if (!hitsy && !hitsx) {
+				vx = -vx;
+				vy = -vy;
+			}
+
+		//    return;
+		}
+    } else if (collides){
+    	gs->remove_instance(this);
     }
 	x = (int) round(rx += vx); //update based on rounding of true float
 	y = (int) round(ry += vy);

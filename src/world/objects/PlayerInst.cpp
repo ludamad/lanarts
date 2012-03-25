@@ -43,15 +43,17 @@ void PlayerInst::move(GameState* gs, int dx, int dy) {
 			y + ddy);
 	gs->tile_radius_test(x + ddx, y + ddy, radius);
 
-	EnemyInst* alreadyhitting = NULL;
-	gs->object_radius_test(this, (GameInst**) &alreadyhitting, 1, &enemy_hit, x,
+	EnemyInst* alreadyhitting[5] = {0,0,0,0,0};
+	gs->object_radius_test(this, (GameInst**) &alreadyhitting, 5, &enemy_hit, x,
 			y);
-	if (alreadyhitting) {
-		if (ddx < 0 == ((alreadyhitting->x - x) < 0)) {
-			ddx = 0;
-		}
-		if (ddy < 0 == ((alreadyhitting->y - y) < 0)) {
-			ddy = 0;
+	for (int i = 0; i < 5; i++){
+		if (alreadyhitting[i]) {
+			if (ddx < 0 == ((alreadyhitting[i]->x - x + ddx*2) < 0)) {
+				ddx = 0;
+			}
+			if (ddy < 0 == ((alreadyhitting[i]->y - y + ddy*2) < 0)) {
+				ddy = 0;
+			}
 		}
 	}
 
@@ -205,7 +207,7 @@ void PlayerInst::step(GameState* gs) {
 				if (stats().mp >= 10) {
 					stats().mp -= 10;
 					GameInst* bullet = new BulletInst(id, stats().ranged, x, y,
-							target->x, target->y);
+							target->x, target->y, true);
 					gs->add_instance(bullet);
 					base_stats.reset_ranged_cooldown(effective_stats());
 				}
@@ -217,7 +219,7 @@ void PlayerInst::step(GameState* gs) {
 			if (stats().mp >= 10) {
 				stats().mp -= 10;
 				GameInst* bullet = new BulletInst(id, stats().ranged, x, y, rmx,
-						rmy);
+						rmy, true);
 				gs->add_instance(bullet);
 				base_stats.reset_ranged_cooldown(effective_stats());
 				canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
