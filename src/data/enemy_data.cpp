@@ -20,7 +20,7 @@ Attack weakmelee(true,  8, 25, 70);
 Attack medmelee(true,  13, 25, 70);
 Attack strongmelee(true,  16, 25, 70);
 Attack strongermelee(true,  25, 25, 70);
-Attack strongshortrange_storm(true, 13, 100, 70, SPR_STORMBOLT, 4 );
+Attack strongshortrange_storm(true, 13, 130, 45, SPR_STORMBOLT, 7 );
 Attack strongshortrange_fire(true, 13, 100, 70, SPR_FIREBOLT, 4 );
 
 EnemyType game_enemy_data[] = {
