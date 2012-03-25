@@ -63,7 +63,7 @@ static void draw_player_actionbar(GameState* gs, PlayerInst* player){
 	gl_draw_rectangle(0, y, TILE_SIZE*5, TILE_SIZE);
 	Colour outline(43,43,43);
 	for(int ix = 0; (ix*TILE_SIZE+TILE_SIZE) <= TILE_SIZE*5; ix++){
-		if(ix == 0){
+		if(ix == player->spell_selected()){
 			outline = Colour(255,0,0);
 		}else {
 			outline = Colour(43,43,43);
