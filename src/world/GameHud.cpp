@@ -52,6 +52,26 @@ static void draw_player_inventory(GameState* gs, PlayerInst* player, int x, int 
     }
 }
 
+static void draw_player_actionbar(GameState* gs, PlayerInst* player){
+	int w = gs->window_view().width;
+	int h = gs->window_view().height;
+	
+	gl_set_drawing_area(0,0,w,h);
+	
+	int y = h - TILE_SIZE;
+	
+	gl_draw_rectangle(0, y, TILE_SIZE*5, TILE_SIZE);
+	for(int ix = 0; (ix*TILE_SIZE+TILE_SIZE) <= TILE_SIZE*5; ix++){
+		gl_draw_rectangle((ix*TILE_SIZE), y, TILE_SIZE, TILE_SIZE, Colour(43, 43, 43));
+		gl_draw_rectangle((ix*TILE_SIZE)+1, 1+y, TILE_SIZE-2, TILE_SIZE-2, Colour(0, 0, 0));
+// 		if(player->inventory.inv[slot].n > 0){
+// 			ItemType& itemd = game_item_data[player->inventory.inv[slot].item];
+// 			image_display(&game_sprite_data[itemd.sprite_number].img,(ix*TILE_SIZE)+x+1,(iy*TILE_SIZE)+y);
+// 			gl_printf(gs->primary_font(), Colour(255,255,255), x+ix*TILE_SIZE, y+iy*TILE_SIZE, "%d", player->inventory.inv[slot].n);
+// 		}
+	}
+}
+
 static void fill_buff2d(char* buff, int w, int h, int x, int y,
 		const Colour& col, int rw = 2, int rh = 2) {
 	for (int yy = y; yy < y + rh; yy++)
@@ -154,6 +174,7 @@ void GameHud::draw(GameState* gs) {
         draw_player_inventory(gs, player_inst, 0, INVENTORY_POSITION, _width, _height);
     }
 	else {
+		return;
 		//player = state->get_instance(0);
 	}
 	draw_minimap(gs, 20, 64+45);
@@ -165,6 +186,8 @@ void GameHud::draw(GameState* gs) {
 	effect* efx = player_inst->status_effects().get(EFFECT_HASTE);
 	if (efx)
 		gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+60,"HASTE %d", efx->t_remaining);
+	
+	draw_player_actionbar(gs, player_inst);
 }
 
 GameHud::GameHud(int x, int y, int width, int height) :
