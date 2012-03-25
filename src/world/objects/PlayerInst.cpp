@@ -35,29 +35,29 @@ void PlayerInst::move(GameState* gs, int dx, int dy) {
 	float ddx = dx * mag;
 	float ddy = dy * mag;
 
-
-
 	EnemyInst* target = NULL;
 	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_hit, x + ddx,
 			y + ddy);
-	gs->tile_radius_test(x+ddx, y+ddy, radius);
+	gs->tile_radius_test(x + ddx, y + ddy, radius);
 
 	EnemyInst* alreadyhitting = NULL;
-	gs->object_radius_test(this, (GameInst**) &alreadyhitting, 1, &enemy_hit, x, y);
-	if (alreadyhitting){
-		if (ddx < 0 == ((alreadyhitting->x - x) < 0)){
+	gs->object_radius_test(this, (GameInst**) &alreadyhitting, 1, &enemy_hit, x,
+			y);
+	if (alreadyhitting) {
+		if (ddx < 0 == ((alreadyhitting->x - x) < 0)) {
 			ddx = 0;
 		}
-		if (ddy < 0 == ((alreadyhitting->y - y) < 0)){
+		if (ddy < 0 == ((alreadyhitting->y - y) < 0)) {
 			ddy = 0;
 		}
 	}
-	if (!gs->tile_radius_test(x+ddx, y+ddy, radius)) {
+
+	if (!gs->tile_radius_test(x + ddx, y + ddy, radius)) {
 		x += ddx;
 		y += ddy;
-	} else if (!gs->tile_radius_test(x+ddx, y, radius)) {
+	} else if (!gs->tile_radius_test(x + ddx, y, radius)) {
 		x += ddx;
-	} else if (!gs->tile_radius_test(x, y+ddy, radius)) {
+	} else if (!gs->tile_radius_test(x, y + ddy, radius)) {
 		y += ddy;
 	}
 
@@ -85,23 +85,23 @@ void PlayerInst::step(GameState* gs) {
 	//Stats/effect step
 	stats().step();
 	effects.step();
-	
-	//HP/MP regen
-	if (gs->frame() % stats().hpregen == 0) {
-		if (++stats().hp > stats().max_hp)
-			stats().hp = stats().max_hp;
-	}
-	if (gs->frame() % stats().mpregen == 0) {
-		if (++stats().mp > stats().max_mp)
-			stats().mp = stats().max_mp;
-	}
 
 	if (stats().hp <= 0) {
 		gs->branch_level() = 1;
 		gs->set_generate_flag();
 		return;
 	}
+	if (stats().hurt_cooldown > 0)
+		canrestcooldown = std::max(canrestcooldown,500);
+	canrestcooldown--;
+	if (canrestcooldown < 0) canrestcooldown = 0;
 
+	bool resting = false;
+	if (gs->key_down_state(SDLK_r) && canrestcooldown == 0) {
+		resting = true;
+		stats().raise_hp(stats().hpregen*5);
+		stats().raise_mp(stats().mpregen*5);
+	}
 
 	//Arrow/wasd movement
 	int dx = 0, dy = 0;
@@ -117,114 +117,113 @@ void PlayerInst::step(GameState* gs) {
 	if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
 		dx -= 1;
 	}
-	move(gs, dx, dy);
-	
-	
-	//Up/down stairs
-	if (gs->key_down_state(SDLK_PERIOD) || gs->mouse_downwheel()) {
-		Pos hitsqr;
-		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN,
-				&hitsqr)) {
-			int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
-			LANARTS_ASSERT(
-					entr_n >= 0 && entr_n < gs->level()->entrances.size());
-			portal = &gs->level()->entrances[entr_n];
-			gs->branch_level()++;gs
-			->set_generate_flag();
-		}
-	}
-	if ((gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel()) && gs->branch_level() > 1) {
-		Pos hitsqr;
-		if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP, &hitsqr)) {
-			int entr_n = scan_entrance(gs->level()->exits, hitsqr);
-			LANARTS_ASSERT(
-					entr_n >= 0 && entr_n < gs->level()->entrances.size());
-			portal = &gs->level()->exits[entr_n];
-			gs->branch_level()--;gs
-			->set_generate_flag();
-		}
-	}
-	
-	//Item pickup
-	ItemInst* item = NULL;
-	if (gs->object_radius_test(this, (GameInst**) &item, 1, &item_hit)) {
-		gs->remove_instance(item);
-		if (item->item_type() == ITEM_GOLD) {
-			money += 10;
-		} else {
-			inventory.add(item->item_type(), 1);
-		}
-	}
+	if (!resting)
+		move(gs, dx, dy);
 
-	bool mouse_within = gs->mouse_x() < gs->window_view().width;
-	if (gs->key_press_state(SDLK_1)) {
-		if (inventory.inv[0].n > 0) {
-			int item = inventory.inv[0].item;
-			game_item_data[item].action(this);
-			inventory.inv[0].n--;
-		}
-	}
-    if (gs->key_press_state(SDLK_2)) {
-        if (inventory.inv[1].n > 0) {
-            int item = inventory.inv[1].item;
-            game_item_data[item].action(this);
-            inventory.inv[1].n--;
-        }
-    }
-    if (gs->key_press_state(SDLK_3)) {
-        if (inventory.inv[2].n > 0) {
-            int item = inventory.inv[2].item;
-            game_item_data[item].action(this);
-            inventory.inv[2].n--;
-        }
-    }
-
-	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
-	if (gs->mouse_right_click() && mouse_within) {
-		int px = x, py = y;
-		x = rmx, y = rmy;
-		if (stats().mp >= 50 && !gs->solid_test(this)
-				&& gs->object_visible_test(this)) {
-			stats().mp -= 50;
-		} else {
-			x = px, y = py;
-		}
-	}
-
-	if (gs->key_press_state(SDLK_k)) {
-		gs->monster_controller().shift_target(gs);
-	}
-	if (gs->key_down_state(SDLK_j) && !base_stats.has_cooldown()) {
-		obj_id tid = gs->monster_controller().targetted;
-		GameInst* target = gs->get_instance(tid);
-		if (tid && target ) {
-			if (stats().mp >= 10) {
-				stats().mp -= 10;
-				GameInst* bullet = new BulletInst(id, stats().ranged, x, y,
-						target->x, target->y);
-				gs->add_instance(bullet);
-				base_stats.reset_ranged_cooldown(effective_stats());
+	if (!resting) {
+		//Up/down stairs
+		if (gs->key_down_state(SDLK_PERIOD) || gs->mouse_downwheel()) {
+			Pos hitsqr;
+			if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN,
+					&hitsqr)) {
+				int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
+				LANARTS_ASSERT(
+						entr_n >= 0 && entr_n < gs->level()->entrances.size());
+				portal = &gs->level()->entrances[entr_n];
+				gs->branch_level()++;gs
+				->set_generate_flag();
 			}
 		}
-	} else if (gs->mouse_left_down() && mouse_within && !base_stats.has_cooldown()) {
-		if (stats().mp >= 10) {
-			stats().mp -= 10;
-			GameInst* bullet = new BulletInst(id, stats().ranged, x, y, rmx,
-					rmy);
-			gs->add_instance(bullet);
-			base_stats.reset_ranged_cooldown(effective_stats());
+		if ((gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel())
+				&& gs->branch_level() > 1) {
+			Pos hitsqr;
+			if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP,
+					&hitsqr)) {
+				int entr_n = scan_entrance(gs->level()->exits, hitsqr);
+				LANARTS_ASSERT(
+						entr_n >= 0 && entr_n < gs->level()->entrances.size());
+				portal = &gs->level()->exits[entr_n];
+				gs->branch_level()--;gs
+				->set_generate_flag();
+			}
 		}
-	} else if (gs->mouse_left_click() && !mouse_within) {
-		int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
-		int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
-		int slot = 5 * posy + posx;
-		if (slot >= 0 && slot < INVENTORY_SIZE && inventory.inv[slot].n > 0) {
-			int item = inventory.inv[slot].item;
-			game_item_data[item].action(this);
-			inventory.inv[slot].n--;
+
+		//Item pickup
+		ItemInst* item = NULL;
+		if (gs->object_radius_test(this, (GameInst**) &item, 1, &item_hit)) {
+			gs->remove_instance(item);
+			if (item->item_type() == ITEM_GOLD) {
+				money += 10;
+			} else {
+				inventory.add(item->item_type(), 1);
+			}
+		}
+
+		bool mouse_within = gs->mouse_x() < gs->window_view().width;
+		for (int i = 0; i < 9; i++) {
+			if (gs->key_press_state(SDLK_1 + i)) {
+				if (inventory.inv[i].n > 0) {
+					int item = inventory.inv[i].item;
+					game_item_data[item].action(this);
+					inventory.inv[i].n--;
+				}
+			}
+		}
+
+		int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
+
+		if (gs->mouse_right_click() && mouse_within) {
+			int px = x, py = y;
+			x = rmx, y = rmy;
+			if (stats().mp >= 50 && !gs->solid_test(this)
+					&& gs->object_visible_test(this)) {
+				stats().mp -= 50;
+			} else {
+				x = px, y = py;
+			}
+		}
+
+		if (gs->key_press_state(SDLK_k)) {
+			gs->monster_controller().shift_target(gs);
+		}
+
+		if ( gs->key_down_state(SDLK_j)
+				&& !base_stats.has_cooldown()) {
+			obj_id tid = gs->monster_controller().targetted;
+			GameInst* target = gs->get_instance(tid);
+			if (tid && target) {
+				if (stats().mp >= 10) {
+					stats().mp -= 10;
+					GameInst* bullet = new BulletInst(id, stats().ranged, x, y,
+							target->x, target->y);
+					gs->add_instance(bullet);
+					base_stats.reset_ranged_cooldown(effective_stats());
+				}
+			}
+
+			canrestcooldown = std::max(canrestcooldown,500);
+		} else if ( gs->mouse_left_down() && mouse_within
+				&& !base_stats.has_cooldown()) {
+			if (stats().mp >= 10) {
+				stats().mp -= 10;
+				GameInst* bullet = new BulletInst(id, stats().ranged, x, y, rmx,
+						rmy);
+				gs->add_instance(bullet);
+				base_stats.reset_ranged_cooldown(effective_stats());
+				canrestcooldown = std::max(canrestcooldown,500);
+			}
+		} else if (gs->mouse_left_click() && !mouse_within) {
+			int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
+			int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
+			int slot = 5 * posy + posx;
+			if (slot >= 0 && slot < INVENTORY_SIZE && inventory.inv[slot].n > 0) {
+				int item = inventory.inv[slot].item;
+				game_item_data[item].action(this);
+				inventory.inv[slot].n--;
+				canrestcooldown = std::max(canrestcooldown,500);
+			}
 		}
 	}
-
 	/*if (gs->mouse_right_down()) {
 	 int nx = gs->mouse_x() + view.x, ny = gs->mouse_y() + view.y;
 	 view.center_on(nx, ny);

@@ -23,11 +23,22 @@ MonsterController::MonsterController() {
 MonsterController::~MonsterController() {
 }
 
-void set_monster_wandering(GameState* gs, EnemyInst* e) {
+void towards_highest(PathInfo& path, Pos& p){
+	int higest;
+	for (int y = -1; y <= + 1; y++){
+		for (int x = -1; x <= + 1; x++){
+			path.get(p.x +x, p.y + y);
+		}
+	}
+
+}
+void monster_wandering(GameState* gs, EnemyInst* e) {
 	//TODO: actually make the monster wander room to room
 	EnemyBehaviour& eb = e->behaviour();
 	eb.current_action = EnemyBehaviour::WANDERING;
 	eb.vx = 0, eb.vy = 0;
+	int rn = gs->level()->room_within(Pos(e->x, e->y));
+
 }
 
 static bool enemy_hit(GameInst* self, GameInst* other){
@@ -97,7 +108,14 @@ void MonsterController::pre_step(GameState* gs) {
 	const std::vector<obj_id> pids = pc.player_ids();
 
 	std::vector<EnemyOfInterest> eois;
-
+	if (room_paths.empty()){
+		std::vector<Room> rooms = gs->level()->rooms;
+		room_paths = std::vector<PathInfo>( rooms.size());
+		for (int i = 0; i < room_paths.size(); i++){
+			Region& r = rooms[i].room_region;
+			room_paths[i].calculate_path(gs, (r.x+r.w/2)*TILE_SIZE, (r.y+r.h/2)*TILE_SIZE, PATHING_RADIUS);
+		}
+	}
 	//Create as many paths as there are players
 	paths.resize(pids.size());
 	for (int i = 0; i < pids.size(); i++) {
@@ -149,7 +167,7 @@ void MonsterController::pre_step(GameState* gs) {
 		if (closest_player_index != -1) {
 			eois.push_back(EnemyOfInterest(e, closest_player_index, mindistsqr));
 		} else
-			set_monster_wandering(gs, e);
+			monster_wandering(gs, e);
 	}
 	std::sort(eois.begin(), eois.end());
 	set_monster_headings(gs, eois);

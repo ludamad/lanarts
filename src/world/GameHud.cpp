@@ -119,6 +119,20 @@ void GameHud::draw_minimap(GameState* gs, int subx, int suby) {
 			iter += 4;
 		}
 	}
+	const std::vector<int>& enemy_ids = gs->monster_controller().monster_ids();
+	for (int i = 0; i < enemy_ids.size(); i++){
+		GameInst* enemy = gs->get_instance(enemy_ids[i]);
+		if (enemy){
+			int ex = enemy->x/TILE_SIZE;
+			int ey = enemy->y/TILE_SIZE;
+			int loc = ey* ptw + ex;
+			if (!tiles.seen(ex,ey)) continue;
+			minimap_arr[loc * 4] = 0;
+			minimap_arr[loc * 4 + 1] = 0;
+			minimap_arr[loc * 4 + 2] = 255;
+			minimap_arr[loc * 4 + 3] = 255;
+		}
+	}
 	GameInst* inst = gs->get_instance(gs->local_playerid());
 	int arr_x = (inst->x / TILE_SIZE), arr_y = (inst->y / TILE_SIZE);
 	fill_buff2d(minimap_arr, tilew, tileh, arr_x - arr_x % 2, arr_y - arr_y % 2,

@@ -87,7 +87,16 @@ void BulletInst::step(GameState* gs) {
 
 void BulletInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
-	image_display(view, &game_sprite_data[attack.projectile_sprite].img,x-TILE_SIZE/2, y-TILE_SIZE/2);
+	GLImage& img = game_sprite_data[attack.projectile_sprite].img;
+	int w = img.width, h = img.height;
+	int xx = x - w / 2, yy = y - h / 2;
+
+	if (!view.within_view(xx, yy, w, h))
+		return;
+	if (!gs->object_visible_test(this))
+		return;
+
+	image_display(view, &img ,x-TILE_SIZE/2, y-TILE_SIZE/2);
 	//gl_draw_circle(view, x, y, RADIUS, (origin_id == gs->local_playerid()) ? Colour(0, 255, 0) : Colour(255, 215, 11));
 
 }

@@ -19,8 +19,11 @@ public:
 	PlayerInst(int x, int y) :
 			GameInst(x, y, RADIUS), base_stats(4, 100, 100,
 					Attack(true, 10, 25, 40),
-					Attack(true, 8, 400, 40/*cooldown*/, SPR_FIREBOLT, 7)), money(0) {
+					Attack(true, 8, 400, 40/*cooldown*/, SPR_FIREBOLT, 7)),
+					canrestcooldown(0), money(0) {
 		portal = NULL;
+		for (int i = 0; i < 2;i++)
+		stats().gain_level();
 	}
 	virtual ~PlayerInst();
 	virtual void init(GameState* gs);
@@ -49,6 +52,7 @@ private:
 	void move(GameState* gs, int dx, int dy);
 	Stats base_stats;
 	Effects effects;
+	int canrestcooldown;
 	int money;
 	//Hack for now of remembering which entrance we hit last
 	GameLevelPortal* portal;

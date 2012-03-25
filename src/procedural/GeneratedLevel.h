@@ -63,6 +63,9 @@ struct Room {
 	Room(const Region& r, int groupID) :
 		room_region(r), groupID(groupID){
 	}
+	void operator=(const Room& r){
+		memcpy(this, &r, sizeof(Room));
+	}
 };
 
 class GeneratedLevel {
