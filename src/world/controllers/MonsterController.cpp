@@ -9,6 +9,7 @@
 #include "MonsterController.h"
 #include "PlayerController.h"
 #include "../objects/EnemyInst.h"
+#include "../objects/PlayerInst.h"
 #include "../GameState.h"
 #include <algorithm>
 #include "../../util/draw_util.h"
@@ -151,6 +152,7 @@ void MonsterController::pre_step(GameState* gs) {
 		int closest_player_index = -1;
 		for (int i = 0; i < pids.size(); i++) {
 			GameInst* player = gs->get_instance(pids[i]);
+			if (isvisible) ((PlayerInst*)player)->rest_cooldown() = 150;
 			view.sharp_center_on(player->x, player->y);
 			bool chasing = e->behaviour().current_action == EnemyBehaviour::CHASING_PLAYER;
 			if (view.within_view(xx, yy, w, h) && (chasing || isvisible)) {

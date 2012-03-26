@@ -4,10 +4,10 @@
 #include "../world/objects/PlayerInst.h"
 
 void use_health_potion(GameInst* inst){
-	((PlayerInst*) inst)->stats().hp += 25;
+	((PlayerInst*) inst)->stats().hp += 50;
 }
 void use_mana_potion(GameInst* inst){
-	((PlayerInst*) inst)->stats().mp += 25;
+	((PlayerInst*) inst)->stats().mp += 50;
 }
 
 void use_haste_scroll(GameInst* inst){

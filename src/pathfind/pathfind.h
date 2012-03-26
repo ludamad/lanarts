@@ -7,6 +7,7 @@
 
 #ifndef PATHFIND_H_
 #define PATHFIND_H_
+#include "../procedural/mtwist.h"
 
 class GameState;
 
@@ -41,9 +42,13 @@ public:
 	PathInfo();
 	~PathInfo();
 	void calculate_path(GameState* gs, int ox, int oy, int radius);
+
 	int width() { return w; }
 	int height() { return h; }
+	//Towards object
 	void interpolated_direction(int x, int y, int w, int h, float speed, float& vx, float& vy);
+	//Away from object
+	void random_further_direction(MTwist& mt, int x, int y, int w, int h, float speed, float& vx, float& vy);
 	PathingNode* get(int x, int y) { return &path[w*y+x]; }
 	void stake_claim(int x, int y);
 	//Call before 'interpolated_direction'
@@ -51,6 +56,7 @@ public:
 	void draw(GameState* gs);
 private:
 	void point_to_local_min(int sx, int sy);
+	void point_to_random_further(MTwist& mt, int sx, int sy);
 	void fix_distances(int sx, int sy);
 	bool can_head(int sx, int sy, int ex, int ey, int speed, int dx, int dy);
 	PathingNode* path;

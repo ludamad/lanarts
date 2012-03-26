@@ -1,0 +1,50 @@
+---
+- tile:
+
+- tile:wall  
+  spritefile: res/tiles/darkrock_wall.bmp", true),
+- tile:stone_wall
+  spritefile: res/tiles/stone_wall.bmp", true),
+- tile:floor
+  spritefile: res/tiles/room_floor.bmp"),
+- tile:sandfloor0
+  spritefile: res/tiles/sandstone/sandstone_floor0.png"),
+- tile:sandfloor1
+  spritefile: res/tiles/sandstone/sandstone_floor1.png"),
+- tile:sandfloor2
+  spritefile: res/tiles/sandstone/sandstone_floor2.png"),
+- tile:sandfloor3
+  spritefile: res/tiles/sandstone/sandstone_floor3.png"),
+- tile:sandfloor4
+  spritefile: res/tiles/sandstone/sandstone_floor4.png"),
+- tile:mesh0
+  spritefile: res/tiles/mesh/mesh0.png"),
+- tile:mesh1
+  spritefile: res/tiles/mesh/mesh1.png"),
+- tile:mesh2
+  spritefile: res/tiles/mesh/mesh2.png"),
+- tile:mesh3
+  spritefile: res/tiles/mesh/mesh3.png"),
+- tile:marb1 
+  spritefile: res/tiles/marble/marble_floor1.png"),
+- tile:marb2
+  spritefile: res/tiles/marble/marble_floor2.png"),
+- tile:marb3  
+  spritefile: res/tiles/marble/marble_floor3.png"),
+- tile:marb4  
+  spritefile: res/tiles/marble/marble_floor4.png"),
+- tile:marb5  
+  spritefile: res/tiles/marble/marble_floor5.png"),
+- tile:marb6
+  spritefile: res/tiles/marble/marble_floor6.png"),
+
+- tile:floor
+  spritefile: res/tiles/crystal/crystal_floor0.png"),
+- tile:corridor_floor
+  spritefile: res/tiles/corridor_floor.bmp"),
+- tile:stair_up
+  spritefile: res/tiles/features/stairs_up.png"),
+- tile:stair_down
+  spritefile: res/tiles/features/stairs_down.png"),
+
+	
