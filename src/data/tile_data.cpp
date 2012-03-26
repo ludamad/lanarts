@@ -11,15 +11,18 @@ TileEntry game_tile_data[] = {
 		TileEntry("wall", "res/tiles/darkrock_wall.bmp", true),
 		TileEntry("stone_wall", "res/tiles/stone_wall.bmp", true),
 		TileEntry("floor","res/tiles/room_floor.bmp"),
+
 		TileEntry("sandfloor0","res/tiles/sandstone/sandstone_floor0.png"),
 		TileEntry("sandfloor1","res/tiles/sandstone/sandstone_floor1.png"),
 		TileEntry("sandfloor2","res/tiles/sandstone/sandstone_floor2.png"),
 		TileEntry("sandfloor3","res/tiles/sandstone/sandstone_floor3.png"),
 		TileEntry("sandfloor4","res/tiles/sandstone/sandstone_floor4.png"),
+
 		TileEntry("mesh0","res/tiles/mesh/mesh0.png"),
 		TileEntry("mesh1","res/tiles/mesh/mesh1.png"),
 		TileEntry("mesh2","res/tiles/mesh/mesh2.png"),
 		TileEntry("mesh3","res/tiles/mesh/mesh3.png"),
+
 		TileEntry("marb1","res/tiles/marble/marble_floor1.png"),
 		TileEntry("marb2","res/tiles/marble/marble_floor2.png"),
 		TileEntry("marb3","res/tiles/marble/marble_floor3.png"),

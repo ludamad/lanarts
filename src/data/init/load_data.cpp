@@ -12,7 +12,6 @@
 void load_tile_data(const char* filename){
 
     std::fstream file(filename, std::fstream::in | std::fstream::binary);
-
 	try {
 		YAML::Parser parser(file);
 		YAML::Node doc;

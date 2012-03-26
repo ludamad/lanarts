@@ -10,6 +10,7 @@
 
 #include "mtwist.h"
 #include "GeneratedLevel.h"
+#include <vector>
 
 class GameState;
 
@@ -22,8 +23,27 @@ struct EnemyGenSettings {
 	}
 };
 
+struct EnemyGenChance {
+	int genchance;//Out of 100%
+	int enemytype;
+	int groupchance;//Out of 100%
+	int groupmin, groupmax;
+
+};
+struct MonsterGenSettings {
+	std::vector<EnemyGenChance> enemy_chances;
+	int min_monsters, max_monsters;
+	MonsterGenSettings(const std::vector<EnemyGenChance>& enemies, int min_monsters, int max_monster) :
+		enemy_chances(enemies), min_monsters(min_monsters), max_monsters(max_monsters){
+	}
+};
+
 //Generates enemy monsters
 void generate_enemies(const EnemyGenSettings& rs, MTwist& mt, GeneratedLevel& level, GameState* gs);
+
+
+//Generates enemy monsters
+void generate_enemies(const MonsterGenSettings& rs, MTwist& mt, GeneratedLevel& level, GameState* gs);
 
 
 
