@@ -13,6 +13,7 @@
 #include "controllers/MonsterController.h"
 #include "controllers/PlayerController.h"
 #include "GameLevelState.h"
+#include "GameSettings.h"
 #include "GameView.h"
 #include "GameHud.h"
 #include "../util/font_util.h"
@@ -22,7 +23,7 @@
 class GameState {
 public:
 
-	GameState(int width, int height, int vieww = 640, int viewh = 480,
+	GameState(const GameSettings& settings, int width, int height, int vieww = 640, int viewh = 480,
 			int hudw = 160);
 	~GameState();
 
@@ -140,7 +141,12 @@ public:
 	void reset_level();
 	void set_level(int levelnum, bool reset);
 
+	GameSettings& game_settings(){
+		return settings;
+	}
+
 private:
+	GameSettings settings;
 	std::vector<GameLevelState*> level_states;
 
 	void restart();
