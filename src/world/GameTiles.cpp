@@ -31,7 +31,7 @@ void GameTiles::pre_draw(GameState* gs) {
 	for (int y = min_tiley; y <= max_tiley; y++) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
 			int tile = tiles[y * width + x];
-			GLImage* img = &game_tile_yaml[tile].img;
+			GLImage* img = &game_tile_data[tile].img;
 			image_display(img, x * TILE_SIZE - view.x, y * TILE_SIZE - view.y);
 		}
 	}
@@ -60,7 +60,7 @@ void GameTiles::post_draw(GameState* gs) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
 			bool has_match = false, has_free = false;
 			int tile = tiles[y * width + x];
-			GLImage* img = &game_tile_yaml[tile].img;
+			GLImage* img = &game_tile_data[tile].img;
 
 			f.matches(x, y, matches);
 			for (int i = 0; i < sub_sqrs * sub_sqrs; i++) {

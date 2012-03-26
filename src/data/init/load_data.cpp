@@ -43,11 +43,11 @@ void load_tile_data(const char* filename){
 			entry["solid"] >> issolid;
 		}
 		
-		printf("writing to index: %d\n", game_tile_yaml.size());
-		game_tile_yaml.push_back(TileEntry(tocstring(name) , tocstring(filen), issolid > 0));
+		printf("writing to index: %d\n", game_tile_data.size());
+		game_tile_data.push_back(TileEntry(tocstring(name) , tocstring(filen), issolid > 0));
 	}
-	for (int i = 0; i < game_tile_yaml.size();i++){
-		game_tile_yaml[i].init();
+	for (int i = 0; i < game_tile_data.size();i++){
+		game_tile_data[i].init();
 	}
 }
 

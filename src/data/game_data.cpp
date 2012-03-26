@@ -7,4 +7,4 @@
 
 #include "game_data.h"
 
-std::vector<TileEntry> game_tile_yaml;
+std::vector<TileEntry> game_tile_data;

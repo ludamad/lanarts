@@ -50,9 +50,7 @@ struct TileEntry {
 
 
 
-extern std::vector<TileEntry> game_tile_yaml;
-extern TileEntry game_tile_data[];
-extern size_t game_tile_n;
+extern std::vector<TileEntry> game_tile_data;
 
 void init_tile_data();
 

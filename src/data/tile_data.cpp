@@ -6,7 +6,7 @@
  */
 
 #include "tile_data.h"
-
+/*
 TileEntry game_tile_data[] = {
 		TileEntry("wall", "res/tiles/darkrock_wall.bmp", true),
 		TileEntry("stone_wall", "res/tiles/stone_wall.bmp", true),
@@ -35,10 +35,11 @@ TileEntry game_tile_data[] = {
 		TileEntry("stair_up", "res/tiles/features/stairs_up.png"),
 		TileEntry("stair_down", "res/tiles/features/stairs_down.png"),
 
-};
+}
 size_t game_tile_n = sizeof(game_tile_data)/sizeof(TileEntry);
 
 void init_tile_data(){
 // 	for (int i = 0; i < game_tile_n; i++)
 // 		game_tile_data[i].init();
 }
+*/
