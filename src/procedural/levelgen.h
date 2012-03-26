@@ -39,6 +39,23 @@ struct LevelGenSettings {
 	}
 };
 
+
+struct LevelGenSettings2 {
+	ItemGenSettings items;
+	RoomGenSettings rooms;
+	TunnelGenSettings tunnels;
+	FeatureGenSettings features;
+	MonsterGenSettings enemies;
+	int level_w, level_h;
+
+	LevelGenSettings2(int w, int h, const ItemGenSettings& i,
+			const RoomGenSettings& r, const TunnelGenSettings& t,
+			const FeatureGenSettings& f, const MonsterGenSettings& e) :
+			items(i), rooms(r), tunnels(t), features(f), enemies(e),
+			level_w(w), level_h(h) {
+	}
+};
+
 void generate_rooms(const RoomGenSettings& rs, MTwist& mt, GeneratedLevel& level);
 void generate_level(const LevelGenSettings& ls, MTwist& mt, GeneratedLevel& level, GameState* gs);
 

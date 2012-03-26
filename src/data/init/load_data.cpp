@@ -30,6 +30,7 @@ void load_tile_data(const char* filename){
 	int issolid = 0;
 	
 	parser.GetNextDocument(root);
+	game_tile_data.clear();
 	
 	const YAML::Node& node = root["Tiles"];
 
@@ -63,6 +64,7 @@ void load_sprite_data(const char* filename){
 	int issolid = 0;
 	
 	parser.GetNextDocument(root);
+	game_sprite_data.clear();
 	
 	const YAML::Node& node = root["Sprites"];
 

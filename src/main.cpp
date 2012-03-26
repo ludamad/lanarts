@@ -64,6 +64,9 @@ int main(int argc, char** argv) {
 	for (int i = 0; cont; i++) {
 		clock_t start = clock();
 
+		if (gs->key_down_state(SDLK_F2)) {
+			init_game_data();
+		}
 		if (gs->key_down_state(SDLK_F1)) {
 			for (int repeat = 0; repeat < 4; repeat++){
 				cont = gs->step();

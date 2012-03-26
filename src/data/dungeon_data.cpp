@@ -158,5 +158,6 @@ static LevelGenSettings mainbranch[] = {
 //};
 
 DungeonBranch game_dungeon_data[] = { BRANCH(mainbranch) };
+std::vector<LevelGenSettings2> game_dungeon_yaml;
 
 size_t game_dungeon_n = sizeof(game_dungeon_data) / sizeof(DungeonBranch);
