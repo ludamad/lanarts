@@ -3,7 +3,7 @@ Sprites:
   - sprite:  player
     spritefile: res/player/fighter.png
     
-  - sprite:  storm_ele
+  - sprite:  storm ele
     spritefile: res/monsters/storm_elemental.png
   - sprite: chicken
     spritefile: res/monsters/chicken.png
