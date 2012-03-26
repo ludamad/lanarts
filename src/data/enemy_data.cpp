@@ -23,20 +23,6 @@ Attack strongermelee(true,  45, 25, 70);
 Attack strongshortrange_storm(true, 13, 130, 45, SPR_STORMBOLT, 7 );
 Attack strongshortrange_fire(true, 30, 400, 70, SPR_FIREBOLT, 4 );
 
-EnemyType game_enemy_data2[] = {
-		EnemyType("Skeleton", 11, 10, SPR_SKELETON,
-				Stats(2, 30,0,
-						Attack(true,  1, 25, 10),
-						Attack()
-				)
-		),
-		EnemyType("Skeleton", 11, 10, SPR_SKELETON,
-				Stats(2, 30,0,
-						Attack(true,  1, 25, 10),
-						Attack()
-				)
-		)
-};
 EnemyType game_enemy_data[] = {
 
 		EnemyType("Skeleton", 11, 10, SPR_SKELETON,

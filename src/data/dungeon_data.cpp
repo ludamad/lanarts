@@ -10,33 +10,33 @@
 //Standard width and height
 const int STD_W = 128, STD_H = 128;
 
-ItemGenSettings itemfew(1 /*more = stronger items*/, 2,
+static ItemGenSettings itemfew(1 /*more = stronger items*/, 2,
 		4 /*2 to 4 items*/);
-ItemGenSettings itemmed(1 /*more = stronger items*/, 5,
+static ItemGenSettings itemmed(1 /*more = stronger items*/, 5,
 		8 /*5 to 8 items*/);
-ItemGenSettings itemdefault(1 /*more = stronger items*/, 8,
+static ItemGenSettings itemdefault(1 /*more = stronger items*/, 8,
 		16 /*8 to 10 items*/);
 
-RoomGenSettings roomdensevaried(1 /*padding*/, 90 /*amount of rooms*/,
+static RoomGenSettings roomdensevaried(1 /*padding*/, 90 /*amount of rooms*/,
 		4 /*min size*/, 30 /*max size*/);
-RoomGenSettings roommediumhighpad(3 /*padding*/, 30 /*amount of rooms*/,
+static RoomGenSettings roommediumhighpad(3 /*padding*/, 30 /*amount of rooms*/,
 		4 /*min size*/, 20 /*max size*/);
-RoomGenSettings roomuniformsparse(1 /*padding*/, 15 /*amount of rooms*/,
+static RoomGenSettings roomuniformsparse(1 /*padding*/, 15 /*amount of rooms*/,
 		10 /*min size*/, 12 /*max size*/);
 
-TunnelGenSettings tunneldefault(1, 3 /*1 to 3 width tunnels*/, 1,
+static TunnelGenSettings tunneldefault(1, 3 /*1 to 3 width tunnels*/, 1,
 		20 /*1 to 20 tunnels per room*/);
-TunnelGenSettings tunnelwide(1, 5 /*1 to 5 width tunnels*/, 1,
+static TunnelGenSettings tunnelwide(1, 5 /*1 to 5 width tunnels*/, 1,
 		20 /*1 to 20 tunnels per room*/);
 
-FeatureGenSettings featuredefault(3, 3 /*3 stairs up, 3 stairs down*/,
+static FeatureGenSettings featuredefault(3, 3 /*3 stairs up, 3 stairs down*/,
 		1 /*Default tileset*/);
 
-FeatureGenSettings featurefirstlevel(0, 3 /*0 stairs up, 3 stairs down*/,
+static FeatureGenSettings featurefirstlevel(0, 3 /*0 stairs up, 3 stairs down*/,
 		1 /*Default tileset*/);
 
 /*Min monster index, max monster index, # of monsters*/
-EnemyGenSettings enemyfewweak(0, 2, 20);
+static EnemyGenSettings enemyfewweak(0, 2, 20);
 
 
 #define BRANCH(arr) DungeonBranch(arr, sizeof(arr)/sizeof(LevelGenSettings))
@@ -158,6 +158,6 @@ static LevelGenSettings mainbranch[] = {
 //};
 
 DungeonBranch game_dungeon_data[] = { BRANCH(mainbranch) };
-std::vector<LevelGenSettings2> game_dungeon_yaml;
+std::vector<LevelGenSettings> game_dungeon_yaml;
 
 size_t game_dungeon_n = sizeof(game_dungeon_data) / sizeof(DungeonBranch);

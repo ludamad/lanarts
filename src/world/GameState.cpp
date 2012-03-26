@@ -265,6 +265,15 @@ bool GameState::object_visible_test(GameInst* obj) {
 }
 
 
+void GameState::regen_level(){
+	level_states.resize(level_number-1);
+	if (level_states.size()){
+		lvl = level_states.back();
+	} else {
+		lvl = new GameLevelState(DNGN_MAIN_BRANCH, level_number, width(), height());
+	}
+	reset_level();
+}
 
 
 void GameState::reset_level() {

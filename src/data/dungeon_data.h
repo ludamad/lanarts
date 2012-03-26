@@ -23,7 +23,7 @@ struct DungeonBranch {
 };
 
 extern DungeonBranch game_dungeon_data[];
-extern std::vector<LevelGenSettings2> game_dungeon_yaml;
+extern std::vector<LevelGenSettings> game_dungeon_yaml;
 extern size_t game_dungeon_n;
 
 #endif /* DUNGEON_DATA_H_ */

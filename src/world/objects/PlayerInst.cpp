@@ -94,6 +94,8 @@ void PlayerInst::use_move_and_melee(GameState* gs) {
 			stats().reset_melee_cooldown(effective_stats());
 			gs->add_instance(new AnimatedInst(target->x, target->y, SPR_SHORT_SWORD, 25));
 		}
+	} else {
+		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN/4);
 	}
 }
 
