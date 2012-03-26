@@ -43,7 +43,6 @@ void load_tile_data(const char* filename){
 			entry["solid"] >> issolid;
 		}
 		
-		printf("writing to index: %d\n", game_tile_data.size());
 		game_tile_data.push_back(TileEntry(tocstring(name) , tocstring(filen), issolid > 0));
 	}
 	for (int i = 0; i < game_tile_data.size();i++){
@@ -51,3 +50,31 @@ void load_tile_data(const char* filename){
 	}
 }
 
+void load_sprite_data(const char* filename){
+	
+    fstream file(filename, fstream::in | fstream::binary);
+
+
+	YAML::Parser parser(file);
+	YAML::Node root;
+	
+	
+	string name, filen;
+	int issolid = 0;
+	
+	parser.GetNextDocument(root);
+	
+	const YAML::Node& node = root["Sprites"];
+
+	for(int i = 0; i < node.size(); i++){
+		issolid = 0;
+		const YAML::Node& entry = node[i];
+		entry["sprite"] >> name;
+		entry["spritefile"] >> filen;
+		
+		game_sprite_data.push_back(SpriteEntry(tocstring(name) , tocstring(filen)));
+	}
+	for (int i = 0; i < game_sprite_data.size();i++){
+		game_sprite_data[i].init();
+	}
+}
