@@ -15,6 +15,7 @@ set( lanarts_src
 	gamestats/Item.cpp
 	
 	data/init/load_data.cpp
+	data/init/load_dungeon_data.cpp
 	
 	data/effect_data.cpp
 	data/enemy_data.cpp
