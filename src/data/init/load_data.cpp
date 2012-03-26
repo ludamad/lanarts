@@ -11,7 +11,7 @@
 
 using namespace std;
 
-char* tocstring(const string& s){
+static char* tocstring(const string& s){
 	char* ret = new char[s.size()+1];
 	memcpy(ret, s.c_str(), s.size()+1);
 	return ret;

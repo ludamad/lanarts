@@ -38,13 +38,29 @@ void generate_enemies(const MonsterGenSettings& rs, MTwist& mt,
 	int nmons = mt.rand(rs.min_monsters, rs.max_monsters+1);
 
 	for (int i = 0; i < nmons; i++) {
-		/*int etype = mt.rand(es.min_xplevel, es.max_xplevel + 1); //mt.rand(es.min_xplevel, es.max_xplevel);
+		int monster_roll = mt.rand(100);
+		int monstn;
+		for (monstn = 0; monstn < rs.enemy_chances.size(); monstn++){
+			monster_roll -= rs.enemy_chances[monstn].genchance;
+			if (monster_roll < 0)
+				break;
+		}
 
-		printf("Game enemies: %d gen %d\n", game_enemy_n, etype);
-		Pos epos = generate_location_byroom(mt, level);
-		int ex = (epos.x + start_x) * 32 + 16;
-		int ey = (epos.y + start_y) * 32 + 16;
-		gs->add_instance(new EnemyInst(&game_enemy_data[etype], ex, ey));
-		level.at(epos).has_instance = true;*/
+		const EnemyGenChance& ec = rs.enemy_chances[monstn];
+		int etype = ec.enemytype;
+		int number = 1;
+		if (mt.rand(100) < ec.genchance){
+			number = mt.rand(ec.groupmin, ec.groupmax+1);
+			i += number-1;
+		}
+
+		int room = mt.rand(level.rooms().size());
+		Region r = level.rooms()[i].room_region;
+		for (int i = 0; i < number; i++){
+			Pos epos = generate_location_in_region(mt, level, r);
+			int ex = (epos.x + start_x) * 32 + 16;
+			int ey = (epos.y + start_y) * 32 + 16;
+			gs->add_instance(new EnemyInst(&game_enemy_data[etype], ex, ey));
+		}
 	}
 }
