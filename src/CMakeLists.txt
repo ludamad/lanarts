@@ -114,6 +114,7 @@ set( lanarts_include
 	world/GameInstSet.h
 	world/GameState.h
 	world/GameLevelState.h
+	world/GameSettings.h
 	world/GameTiles.h
 	world/GameView.h
 	world/GameHud.h
