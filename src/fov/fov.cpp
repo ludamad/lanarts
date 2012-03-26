@@ -58,7 +58,7 @@ int fov::isBlocked(short destX, short destY) {
 	if (outof)
 		return false;
 
-	return (tiles.get(px, py) <= TILE_STONE_WALL);
+	return (game_tile_data[tiles.get(px, py)].solid);
 }
 
 void fov::visit(short destX, short destY) {
