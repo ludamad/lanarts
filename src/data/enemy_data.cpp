@@ -46,14 +46,14 @@ EnemyType game_enemy_data[] = {
 				)
 		),
 		EnemyType("Chicken", 10, 10, SPR_CHICKEN,
-				Stats(4, 20,0, Attack(true,  1, 25, 5), Attack())),
+				Stats(4, 10,0, Attack(true,  2, 25, 5), Attack())),
 		EnemyType("Zombie", 14, 15, SPR_ZOMBIE,
 				Stats(2, 40,0, medmelee, Attack())),
 		EnemyType("Storm Elemental", 14, 20, SPR_STORM_ELE,
 				Stats(1, 40,0, Attack(), strongshortrange_storm)),
 
 		EnemyType("Ciribot", 14, 30, SPR_CIRIBOT,
-				Stats(3, 60,0, Attack(true,  20, 65, 35), Attack())),
+				Stats(3, 60,0, Attack(true,  10, 45, 35), Attack())),
 
 
 		EnemyType("Super Chicken", 10, 20, SPR_SUPERCHICKEN,
