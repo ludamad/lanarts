@@ -1,0 +1,122 @@
+--- 
+
+#Dungeon Markup
+    
+branches:
+  - branch: main_branch
+    levels:
+      #Level 1
+      - size: [40, 40]
+        items:
+          amount: 2
+        rooms:
+          padding: 0
+          amount: 20
+          size: [4,4]
+        tunnels:
+          width: 1
+          per_room: [2, 5]          
+        features:
+          stairs_up: 0
+          stairs_down: 3
+        enemies:
+          index: [0, 1]
+          amount: 5
+      #Level 2
+      - size: [64, 64]
+        items:
+          amount: [2,9]
+        rooms:
+          padding: 1
+          amount: 23
+          size: [4,6]
+        tunnels:
+          width: [1, 2]
+          per_room: [2, 5]   
+        enemies:
+          index: [0, 2]
+          amount: 15
+      #Level 3
+      - size: [76, 76]
+        items:
+          amount: [2,9]
+        rooms:
+          padding: 1
+          amount: 20
+          size: [8,10]
+        tunnels:
+          width: [1, 2]
+          per_room: [2, 5]   
+        enemies:
+          index: [1, 4]
+          amount: 20
+      #Level 4
+      - size: [89, 89]
+        items:
+          amount: [5,10]
+        rooms:
+          padding: 4
+          amount: 20
+          size: [10,30]
+        tunnels:
+          width: [2, 6]
+          per_room: [2, 5]   
+        enemies:
+          index: [1, 4]
+          amount: 25
+      #Level 5
+      - size: [89, 89]
+        items:
+          amount: [5,10]
+        rooms:
+          padding: 4
+          amount: 20
+          size: [10,30]
+        tunnels:
+          width: [2, 6]
+          per_room: [2, 5]   
+        enemies:
+          index: [2, 4]
+          amount: 25
+      #Level 6
+      - size: [89, 89]
+        items:
+          amount: [2,9]
+        rooms:
+          padding: 4
+          amount: 20
+          size: [10,15]
+        tunnels:
+          width: [1, 5]
+          per_room: [2, 20]   
+        enemies:
+          index: [2, 5]
+          amount: 30
+      #Level 7
+      - size: [102, 102]
+        items:
+          amount: [2,9]
+        rooms:
+          padding: 3
+          amount: 90
+          size: [4,12]
+        tunnels:
+          width: [1, 3]
+          per_room: 9   
+        enemies:
+          index: [2, 8]
+          amount: 45
+      #Level 8
+      - size: [102, 102]
+        items:
+          amount: [2,9]
+        rooms:
+          padding: 3
+          amount: 90
+          size: [4,12]
+        tunnels:
+          width: [1, 3]
+          per_room: 9   
+        enemies:
+          index: [2, 8]
+          amount: 50
