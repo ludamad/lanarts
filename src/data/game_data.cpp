@@ -8,3 +8,5 @@
 #include "game_data.h"
 
 std::vector<TileEntry> game_tile_data;
+
+std::vector<SpriteEntry> game_sprite_data;

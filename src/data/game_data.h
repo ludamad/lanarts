@@ -16,8 +16,9 @@
 
 inline void init_game_data(){
 	//init_tile_data();
-	init_sprite_data();
+// 	init_sprite_data();
 	load_tile_data("res/tiles.yaml");
+	load_sprite_data("res/sprites.yaml");
 }
 
 

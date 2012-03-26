@@ -10,5 +10,6 @@
 
 
 void load_tile_data(const char* filename);
+void load_sprite_data(const char* filename);
 
 #endif /* LOAD_DATA_H_ */

@@ -10,6 +10,8 @@
 #ifndef SPRITE_DATA_H_
 #define SPRITE_DATA_H_
 
+#include <vector>
+
 
 #include "../display/GLImage.h"
 enum {
@@ -50,7 +52,7 @@ struct SpriteEntry {
 
 
 
-extern SpriteEntry game_sprite_data[];
+extern std::vector<SpriteEntry> game_sprite_data;
 extern size_t game_sprite_n;
 
 #define spr_player (game_sprite_data[SPR_PLAYER])
