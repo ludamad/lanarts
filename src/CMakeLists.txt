@@ -18,6 +18,7 @@ set( lanarts_src
 	
 	data/effect_data.cpp
 	data/enemy_data.cpp
+	data/game_data.cpp
 	data/item_data.cpp
 	data/tile_data.cpp
 	data/sprite_data.cpp

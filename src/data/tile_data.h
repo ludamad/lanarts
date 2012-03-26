@@ -8,6 +8,7 @@
 #ifndef TILE_DATA_H_
 #define TILE_DATA_H_
 
+#include <vector>
 #include "../display/GLImage.h"
 
 enum {
@@ -49,7 +50,7 @@ struct TileEntry {
 
 
 
-extern TileEntry* game_tile_ptr;
+extern std::vector<TileEntry> game_tile_yaml;
 extern TileEntry game_tile_data[];
 extern size_t game_tile_n;
 
