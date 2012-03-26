@@ -36,6 +36,7 @@ GameSettings load_settings_data(const char* filename){
 
 		optional_set(root, "fullscreen", ret.fullscreen);
 		optional_set(root, "regen_level_on_death", ret.regen_on_death);
+		optional_set(root, "regen_level_on_death", ret.regen_on_death);
 	}
 
 	return ret;
