@@ -16,6 +16,7 @@ set( lanarts_src
 	
 	data/init/load_data.cpp
 	data/init/load_dungeon_data.cpp
+	data/init/load_settings_data.cpp
 	
 	data/effect_data.cpp
 	data/enemy_data.cpp
@@ -72,6 +73,7 @@ set( lanarts_src
 set( lanarts_include
 	
 	data/init/load_data.h
+	data/init/yaml_util.h
 	
 	data/effect_data.h
 	data/enemy_data.h
