@@ -11,9 +11,9 @@
 
 using namespace std;
 
-char* tocstring(string s){
+char* tocstring(const string& s){
 	char* ret = new char[s.size()+1];
-	strcpy(ret, s.c_str());
+	memcpy(ret, s.c_str(), s.size()+1);
 	return ret;
 }
 
@@ -32,7 +32,7 @@ void load_tile_data(const char* filename){
 	parser.GetNextDocument(root);
 	
 	const YAML::Node& node = root["Tiles"];
-	
+
 	for(int i = 0; i < node.size(); i++){
 		issolid = 0;
 		const YAML::Node& entry = node[i];
@@ -44,8 +44,10 @@ void load_tile_data(const char* filename){
 		}
 		
 		printf("writing to index: %d\n", game_tile_yaml.size());
-		game_tile_yaml.push_back(TileEntry(tocstring(name) , tocstring(filen), issolid));
-		game_tile_yaml.back().init();
+		game_tile_yaml.push_back(TileEntry(tocstring(name) , tocstring(filen), issolid > 0));
+	}
+	for (int i = 0; i < game_tile_yaml.size();i++){
+		game_tile_yaml[i].init();
 	}
 }
 
