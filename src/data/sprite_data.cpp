@@ -29,7 +29,8 @@ SpriteEntry game_sprite_data[] = {
 		SpriteEntry("mana potion", "res/items/misc/brilliant_blue.png"),
 		SpriteEntry("magic blast", "res/effects/orb.png"),
 		SpriteEntry("short sword", "res/effects/shortsword.png"),
-		SpriteEntry("haste", "res/effects/haste.png")
+		SpriteEntry("haste", "res/effects/haste.png"),
+		SpriteEntry("poison", "res/effects/cloud_poison2.png")
 };
 
 size_t game_sprite_n = sizeof(game_sprite_data)/sizeof(SpriteEntry);

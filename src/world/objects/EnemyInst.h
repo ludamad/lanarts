@@ -31,6 +31,7 @@ public:
 	EnemyInst(EnemyType* type, int x, int y) :
 		GameInst(x,y, type->radius), eb(type->basestats.movespeed), type(type), rx(x), ry(y),
 		xpgain(type->xpaward),stat(type->basestats) {
+		last_seen_counter = 0;
 	}
 	virtual ~EnemyInst();
 	virtual void init(GameState* gs);
@@ -47,6 +48,7 @@ public:
 	}
 	bool hurt(GameState* gs, int hp);
 protected:
+	int last_seen_counter;
 	EnemyBehaviour eb;
 	EnemyType* type;
 	float rx, ry;

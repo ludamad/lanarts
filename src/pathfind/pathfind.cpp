@@ -130,6 +130,37 @@ bool PathInfo::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
 	return true;
 }
 
+
+//Away from object
+void PathInfo::random_further_direction(MTwist& mt, int x, int y, int w, int h, float speed, float& vx, float& vy){
+	if (!path) {
+		vx = 0, vy = 0;
+		return;
+	}
+	int mx = x + w, my = y + h;
+	//Set up coordinate min and max
+	int mingrid_x = x / TILE_SIZE, mingrid_y = y / TILE_SIZE;
+	int maxgrid_x = mx / TILE_SIZE, maxgrid_y = my / TILE_SIZE;
+	//Make sure coordinates do not go out of bounds
+	int minx = squish(mingrid_x, start_x, start_x + width());
+	int miny = squish(mingrid_y, start_y, start_y + height());
+	int maxx = squish(maxgrid_x, start_x, start_x + width());
+	int maxy = squish(maxgrid_y, start_y, start_y + height());
+	//Set up accumulators for x and y (later normalized)
+	int acc_x = 0, acc_y = 0;
+
+	for (int yy = miny; yy <= maxy; yy++) {
+		for (int xx = minx; xx <= maxx; xx++) {
+			int px = xx - start_x, py = yy - start_y;
+			PathingNode* p = get(px, py);
+			if (!p->solid) {
+				point_to_random_further(mt, px,py);
+			}
+		}
+	}
+	interpolated_direction(x,y,w,h,speed,vx,vy);
+}
+
 void PathInfo::interpolated_direction(int x, int y, int w, int h, float speed,
 		float& vx, float& vy) {
 	if (!path) {
@@ -200,6 +231,41 @@ void PathInfo::point_to_local_min(int sx, int sy) {
 				if (dist < min_distance) {
 					dx = xx - sx, dy = yy - sy;
 					min_distance = dist;
+				}
+			}
+		}
+	}
+	fixed_node->dx = dx;
+	fixed_node->dy = dy;
+//	if (dx == 0 && dy == 0) {
+//		fixed_node->distance = HUGE_DISTANCE;
+//	} else {
+//		fixed_node->distance = min_distance + (abs(dx) == abs(dy) ? 140 : 100);
+//	}
+}
+
+void PathInfo::point_to_random_further(MTwist& mt, int sx, int sy) {
+	PathingNode* fixed_node = get(sx, sy);
+
+	int minx = squish(sx - 1, 0, width()), miny = squish(sy - 1, 0, height());
+	int maxx = squish(sx + 1, 0, width()), maxy = squish(sy + 1, 0, height());
+
+	int dx = 0, dy = 0;
+	int compare_distance = fixed_node->distance;
+	bool set = false;
+
+	if (!fixed_node->marked) {
+		for (int yy = miny; yy <= maxy; yy++) {
+			for (int xx = minx; xx <= maxx; xx++) {
+				if (sx == xx && sy == yy)
+					continue;
+				PathingNode* p = get(xx, yy);
+				if (p->solid)
+					continue;
+				int dist = p->distance;
+				if (dist >= compare_distance && (!set || mt.rand(2))) {
+					dx = xx - sx, dy = yy - sy;
+					set = true;
 				}
 			}
 		}

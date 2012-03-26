@@ -46,6 +46,9 @@ public:
 	int spell_selected(){
 		return spellselect;
 	}
+	int& rest_cooldown(){
+		return canrestcooldown;
+	}
 	int gold() {
 		return money;
 	}

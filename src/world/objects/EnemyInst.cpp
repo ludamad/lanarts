@@ -61,6 +61,18 @@ void EnemyInst::step(GameState* gs) {
 		eb.vx /=2, eb.vy /=2 ;
 	x = (int) round(rx += eb.vx); //update based on rounding of true float
 	y = (int) round(ry += eb.vy);
+	if (gs->object_visible_test(this))
+		last_seen_counter = gs->rng().rand(300);
+	else
+		last_seen_counter++;
+	if (last_seen_counter > 2500 && gs->rng().rand(500) == 0){
+		do {
+			x = gs->rng().rand(32, gs->width()-32);
+			y = gs->rng().rand(32, gs->height()-32);
+		} while (gs->solid_test(this) || gs->object_visible_test(this));
+		rx = x, ry = y;
+		last_seen_counter = 0;
+	}
 
 //	}
 	stats().step();
