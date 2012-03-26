@@ -46,7 +46,6 @@ void generate_rooms(const RoomGenSettings& rs, MTwist& mt,
 					Region(rx + pad, ry + pad, rw - pad * 2, rh - pad * 2), 0);
 
 			if (generate_room(rs, mt, level, r, id)) {
-				printf("Generated room x=%d,y=%d,w=%d,h=%d\n", rx, ry, rw, rh);
 				room_list.push_back(room);
 				break;
 			}

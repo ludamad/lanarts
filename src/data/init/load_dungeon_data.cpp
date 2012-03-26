@@ -78,8 +78,7 @@ void load_dungeon_data(const char* filename){
 
 		game_dungeon_data[0] = DungeonBranch(&game_dungeon_yaml[0], game_dungeon_yaml.size());
 	} catch (const YAML::Exception& parse){
+		printf("Dungeon Parsed Incorrectly: \n");
 		printf("%s\n", parse.what());
-		printf("Parsed Incorrectly \n");
 	}
-	printf("Parsed Correctly \n");
 }

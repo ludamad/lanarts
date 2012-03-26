@@ -11,6 +11,9 @@ struct GameSettings {
 		//sets defaults
 		fullscreen = false;
 		regen_on_death = false;
+
+		view_width = 960;
+		view_height = 720;
 	}
 };
 

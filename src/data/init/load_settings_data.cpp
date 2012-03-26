@@ -23,19 +23,33 @@ static void optional_set(const YAML::Node& node, const char* key, T& value){
 		node[key] >> value;
 	}
 }
+static void optional_set(const YAML::Node& node, const char* key, bool& value){
+	if (hasnode(node, key)){
+		int val;
+		node[key] >> val;
+		value = val;
+	}
+}
 GameSettings load_settings_data(const char* filename){
 
 	fstream file(filename, fstream::in | fstream::binary);
 
 	GameSettings ret;
 	if (file){
-		YAML::Parser parser(file);
-		YAML::Node root;
+		try{
+			YAML::Parser parser(file);
+			YAML::Node root;
 
-		parser.GetNextDocument(root);
+			parser.GetNextDocument(root);
 
-		optional_set(root, "fullscreen", ret.fullscreen);
-		optional_set(root, "regen_level_on_death", ret.regen_on_death);
+			optional_set(root, "fullscreen", ret.fullscreen);
+			optional_set(root, "regen_level_on_death", ret.regen_on_death);
+			optional_set(root, "view_width", ret.view_width);
+			optional_set(root, "view_height", ret.view_height);
+		} catch (const YAML::Exception& parse){
+			printf("Settings Parsed Incorrectly: \n");
+			printf("%s\n", parse.what());
+		}
 	}
 
 	return ret;

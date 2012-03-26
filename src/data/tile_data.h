@@ -43,7 +43,6 @@ struct TileEntry {
 		: name(name), img(fname), solid(solid){}
 
 	void init(){
-		printf("Loading tile '%s'\n", img.filename);
 		init_GL_Image(&img, img.filename);
 	}
 };

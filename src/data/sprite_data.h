@@ -45,7 +45,6 @@ struct SpriteEntry {
 	GLImage img;
 	SpriteEntry(const char* name, const char* fname) : name(name), img(fname){}
 	void init(){
-		printf("Loading sprite '%s'\n", img.filename);
 		init_GL_Image(&img, img.filename);
 	}
 };

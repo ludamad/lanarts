@@ -18,8 +18,6 @@ void generate_enemies(const EnemyGenSettings& es, MTwist& mt,
 
 	for (int i = 0; i < es.nmonsters; i++) {
 		int etype = mt.rand(es.min_xplevel, es.max_xplevel + 1); //mt.rand(es.min_xplevel, es.max_xplevel);
-
-		printf("Game enemies: %d gen %d\n", game_enemy_n, etype);
 		Pos epos = generate_location_byroom(mt, level);
 		int ex = (epos.x + start_x) * 32 + 16;
 		int ey = (epos.y + start_y) * 32 + 16;
@@ -55,7 +53,7 @@ void generate_enemies(const MonsterGenSettings& rs, MTwist& mt,
 		}
 
 		int room = mt.rand(level.rooms().size());
-		Region r = level.rooms()[i].room_region;
+		Region r = level.rooms()[room].room_region;
 		for (int i = 0; i < number; i++){
 			Pos epos = generate_location_in_region(mt, level, r);
 			int ex = (epos.x + start_x) * 32 + 16;
