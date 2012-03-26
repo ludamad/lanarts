@@ -11,7 +11,7 @@
 #include "../../display/display.h"
 #include "../../data/item_data.h"
 
-static const int REST_COOLDOWN = 250;
+static const int REST_COOLDOWN = 150;
 
 PlayerInst::~PlayerInst() {
 }
@@ -202,7 +202,7 @@ void PlayerInst::use_spell(GameState* gs){
 			if (spellselect)
 				base_stats.cooldown = effective_stats().ranged.cooldown*1.4;
 			else
-				base_stats.cooldown = effective_stats().ranged.cooldown;
+				base_stats.cooldown = effective_stats().ranged.cooldown/(1 + base_stats.xplevel/10);
 
 		}
 	}
