@@ -11,11 +11,13 @@
 #include "tile_data.h"
 #include "sprite_data.h"
 #include "dungeon_data.h"
+#include "init/load_data.h"
 
 
 inline void init_game_data(){
 	init_tile_data();
 	init_sprite_data();
+	load_tile_data();
 }
 
 

@@ -6,18 +6,23 @@
  */
 
 #include "../game_data.h"
-#include "../../libyaml/yaml.h"
+#include <yaml-cpp/yaml.h>
 
 void load_tile_data(const char* filename){
 
     FILE *file;
-    yaml_parser_t parser;
-    yaml_token_t token;
-    int done = 0;
-    int count = 0;
-    int error = 0;
+	file = fopen("res/tiles.yaml", "rb");
 
-    file = fopen("res/tiles.yaml", "rb");
 
-    yaml_parser_set_input_file(&parser, file);
+	try {
+		YAML::Parser parser(file);
+		YAML::Node doc;
+		while(parser.GetNextDocument(doc)) {
+			YAML::Emitter emitter;
+			emitter << doc;
+			std::cout << emitter.c_str() << "\n";
+		}
+	} catch(const YAML::Exception& e) {
+		std::cerr << e.what() << "\n";
+	}
 }

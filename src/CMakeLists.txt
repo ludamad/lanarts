@@ -1,17 +1,20 @@
 cmake_minimum_required( VERSION 2.8 )
-PROJECT(LanARTS)
+PROJECT(base_LanARTS)
+
 FIND_PACKAGE(SDL REQUIRED)
 FIND_PACKAGE(SDL_image REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
 set( CMAKE_CXX_FLAGS_RELEASE "-O3" )
-
 set( CMAKE_BUILD_TYPE Debug)
-include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
+
+include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} yaml-cpp/include)
 
 set( lanarts_src
 	gamestats/Item.cpp
+	
+	data/init/load_data.cpp
 	
 	data/effect_data.cpp
 	data/enemy_data.cpp
@@ -27,15 +30,6 @@ set( lanarts_src
 	fov/impl/permissive-fov.cc
 	
 	gamestats/Stats.cpp
-	
-	libyaml/api.c
-	libyaml/dumper.c
-	libyaml/emitter.c
-	libyaml/loader.c
-	libyaml/parser.c
-	libyaml/reader.c
-	libyaml/scanner.c
-	libyaml/writer.c
 	
 	pathfind/pathfind.cpp
 	
@@ -75,6 +69,8 @@ set( lanarts_src
 
 set( lanarts_include
 	
+	data/init/load_data.h
+	
 	data/effect_data.h
 	data/enemy_data.h
 	data/item_data.h
@@ -95,9 +91,6 @@ set( lanarts_include
 	gamestats/Item.h
 	gamestats/Spells.h
 	gamestats/Stats.h
-	
-	libyaml/yaml_private.h
-	libyaml/yaml.h
 	
 	pathfind/pathfind.h
 	
@@ -133,12 +126,15 @@ set( lanarts_include
 	world/objects/TestInst.h
 )
 
+add_subdirectory( yaml-cpp )
+
 add_executable( lanarts
              ${lanarts_src}
              ${lanarts_include} )
 
 
 target_link_libraries( lanarts
+			yaml-cpp
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}
 			${SDLIMAGE_LIBRARY}
