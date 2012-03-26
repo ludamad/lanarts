@@ -9,19 +9,43 @@
 #include "../game_data.h"
 #include <yaml-cpp/yaml.h>
 
+using namespace std;
+
+char* tocstring(string s){
+	char* ret = new char[s.size()+1];
+	strcpy(ret, s.c_str());
+	return ret;
+}
+
 void load_tile_data(const char* filename){
 
-    std::fstream file(filename, std::fstream::in | std::fstream::binary);
+    fstream file(filename, fstream::in | fstream::binary);
 
-	try {
-		YAML::Parser parser(file);
-		YAML::Node doc;
-		while(parser.GetNextDocument(doc)) {
-			YAML::Emitter emitter;
-			emitter << doc;
-			std::cout << emitter.c_str() << "\n";
+
+	YAML::Parser parser(file);
+	YAML::Node root;
+	
+	
+	string name, filen;
+	int issolid = 0;
+	
+	parser.GetNextDocument(root);
+	
+	const YAML::Node& node = root["Tiles"];
+	
+	for(int i = 0; i < node.size(); i++){
+		issolid = 0;
+		const YAML::Node& entry = node[i];
+		entry["tile"] >> name;
+		entry["spritefile"] >> filen;
+		
+		if(const YAML::Node* sptr = entry.FindValue("solid")){
+			entry["solid"] >> issolid;
 		}
-	} catch(const YAML::Exception& e) {
-		std::cerr << e.what() << "\n";
+		
+		printf("writing to index: %d\n", game_tile_yaml.size());
+		game_tile_yaml.push_back(TileEntry(tocstring(name) , tocstring(filen), issolid));
+		game_tile_yaml.back().init();
 	}
 }
+

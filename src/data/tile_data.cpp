@@ -36,6 +36,6 @@ TileEntry game_tile_data[] = {
 size_t game_tile_n = sizeof(game_tile_data)/sizeof(TileEntry);
 
 void init_tile_data(){
-	for (int i = 0; i < game_tile_n; i++)
-		game_tile_data[i].init();
+// 	for (int i = 0; i < game_tile_n; i++)
+// 		game_tile_data[i].init();
 }
