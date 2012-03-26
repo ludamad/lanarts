@@ -138,10 +138,28 @@ void MonsterController::pre_step(GameState* gs) {
 		if (e == NULL)
 			continue;
 		e->behaviour().step();
+
+
+		bool isvisible = gs->object_visible_test(e);
+		bool go_after_player = false;
+		//Monster repositioning
+		if (isvisible)
+			e->last_seen() = gs->rng().rand(300);
+		else
+			e->last_seen()++;
+		if (e->last_seen() > 2500 && gs->rng().rand(500) == 0) {
+			do {
+				e->x = gs->rng().rand(32, gs->width()-32);
+				e->y = gs->rng().rand(32, gs->height()-32);
+			}while (gs->solid_test(e) || gs->object_visible_test(e));
+			e->rx = e->x, e->ry = e->y;
+			e->last_seen() = gs->rng().rand(300);
+			go_after_player = gs->rng().rand(4) == 0;
+		}
+
 		//Add live instances back to monster id list
 		mids.push_back(mids2[i]);
 
-		bool isvisible = gs->object_visible_test(e);
 		if (isvisible && !targetted) targetted = e->id;
 		if (!isvisible && targetted == e->id) targetted = 0;
 
@@ -155,7 +173,10 @@ void MonsterController::pre_step(GameState* gs) {
 			if (isvisible) ((PlayerInst*)player)->rest_cooldown() = 150;
 			view.sharp_center_on(player->x, player->y);
 			bool chasing = e->behaviour().current_action == EnemyBehaviour::CHASING_PLAYER;
-			if (view.within_view(xx, yy, w, h) && (chasing || isvisible)) {
+			if (view.within_view(xx, yy, w, h) && (go_after_player || chasing || isvisible)) {
+				if (go_after_player){
+					e->behaviour().current_action = EnemyBehaviour::CHASING_PLAYER;
+				}
 				int dx = e->x - player->x, dy = e->y - player->y;
 				int distsqr = dx * dx + dy * dy;
 				if (distsqr > 0 /*overflow check*/) {
