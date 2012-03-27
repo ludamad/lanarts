@@ -22,7 +22,7 @@ Attack strongmelee(true,  20, 25, 70);
 Attack strongermelee(true,  45, 25, 70);
 Attack strongshortrange_storm(true, 13, 130, 45, SPR_STORMBOLT, 7 );
 Attack strongshortrange_fire(true, 30, 400, 70, SPR_FIREBOLT, 4 );
-
+/*
 EnemyType game_enemy_data[] = {
 
 		EnemyType("Skeleton", 11, 10, SPR_SKELETON,
@@ -50,7 +50,9 @@ EnemyType game_enemy_data[] = {
 				Stats(5, 80,0, strongmelee, Attack())),
 		EnemyType("Hell Forged", 14, 50, SPR_HELLFORGED,
 				Stats(3, 120,0, Attack(), strongshortrange_fire)),
-};
+};*/
+
+EnemyType game_enemy_data[100];
 
 size_t game_enemy_n = sizeof(game_enemy_data)/sizeof(EnemyType);
 
