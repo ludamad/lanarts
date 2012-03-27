@@ -23,7 +23,6 @@ static char* tocstring(const std::string& s){
 	return ret;
 }
 
-
 inline int get_sprite_number(const std::string& s){
 	for (int i = 0; i < game_sprite_data.size(); i++){
 		if (s == game_sprite_data[i].name){
@@ -32,13 +31,15 @@ inline int get_sprite_number(const std::string& s){
 	}
 	return -1;
 }
+inline bool hasnode(const YAML::Node& n, const char* key){
+	return n.FindValue(key);
+}
 inline int parse_sprite_number(const YAML::Node& n, const char* key){
 	if (!hasnode(n,key)) return 0;
 	std::string s;
 	n[key] >> s;
 	return get_sprite_number(s);
 }
-
 template <class T>
 inline T parse_defaulted(const YAML::Node& n, const char* key, const T& dflt){
 	T ret;
@@ -48,9 +49,6 @@ inline T parse_defaulted(const YAML::Node& n, const char* key, const T& dflt){
 	return ret;
 }
 
-inline bool hasnode(const YAML::Node& n, const char* key){
-	return n.FindValue(key);
-}
 
 
 inline GenRange parse_range(const YAML::Node& n){
