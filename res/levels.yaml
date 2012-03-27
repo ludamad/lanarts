@@ -25,7 +25,7 @@ branches:
             - enemy: Skeleton
               chance: 100
             - enemy: Chicken
-              chance: 100
+              chance: 1000
             - enemy: Storm Elemental
               chance: 33
               group_chance: 33
