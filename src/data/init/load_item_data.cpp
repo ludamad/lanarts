@@ -32,11 +32,12 @@ static void optional_set(const YAML::Node& node, const char* key, bool& value){
 	}
 }
 ItemType parse_item_type(const YAML::Node& n){
+	std::string action = parse_defaulted(n, "action", std::string());
 	return ItemType(
 			parse_cstr(n["name"]),
 			parse_defaulted(n,"radius", 11),
 			parse_sprite_number(n, "sprite"),
-			NULL
+			get_action_by_name(action.c_str())
 		);
 }
 void load_item_data(const char* filename){

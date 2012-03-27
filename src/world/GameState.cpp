@@ -292,9 +292,19 @@ void GameState::reset_level() {
 				delete level_states[i];
 			}*/
 		} else {
-			level_number = 1;
-			leveln = 0;
-			level_states.clear();
+			if (settings.regen_on_death){
+
+				level_number = 1;
+				leveln = 0;
+				level_states.clear();
+			} else {
+				level_states.resize(level_number-1);
+				if (level_states.size()){
+					lvl = level_states.back();
+				} else {
+					lvl = new GameLevelState(DNGN_MAIN_BRANCH, level_number, width(), height());
+				}
+			}
 		}
 		remove_instance(p);
 	}

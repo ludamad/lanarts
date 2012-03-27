@@ -29,6 +29,7 @@ struct ItemType {
 	}
 };
 
+item_actionf get_action_by_name(const char* name);
 extern ItemType game_item_data[];
 extern size_t game_item_n;
 

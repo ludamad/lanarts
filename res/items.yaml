@@ -1,0 +1,14 @@
+---
+#Gold is currently hardcoded in the first slot
+items:
+  - name: Gold
+    sprite: gold
+  - name: Health Potion
+    sprite: health_potion
+    action: increase_health
+  - name: Mana_Potion
+    sprite: mana potion
+    action: increase_mana
+  - name: Haste Scroll
+    sprite: scroll
+    action: hasten
