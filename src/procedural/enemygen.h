@@ -13,7 +13,7 @@
 #include <vector>
 
 class GameState;
-
+/*
 struct EnemyGenSettings {
 	int min_xplevel, max_xplevel;
 	int nmonsters;
@@ -21,7 +21,7 @@ struct EnemyGenSettings {
 		min_xplevel(min_xplevel), max_xplevel(max_xplevel), nmonsters(nmonsters){
 
 	}
-};
+};*/
 
 struct EnemyGenChance {
 	int genchance;//Out of 100%
@@ -30,10 +30,10 @@ struct EnemyGenChance {
 	int groupmin, groupmax;
 
 };
-struct MonsterGenSettings {
+struct EnemyGenSettings {
 	std::vector<EnemyGenChance> enemy_chances;
 	int min_monsters, max_monsters;
-	MonsterGenSettings(const std::vector<EnemyGenChance>& enemies, int min_monsters, int max_monster) :
+	EnemyGenSettings(const std::vector<EnemyGenChance>& enemies, int min_monsters, int max_monsters) :
 		enemy_chances(enemies), min_monsters(min_monsters), max_monsters(max_monsters){
 	}
 };
@@ -43,7 +43,7 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt, GeneratedLevel& le
 
 
 //Generates enemy monsters
-void generate_enemies(const MonsterGenSettings& rs, MTwist& mt, GeneratedLevel& level, GameState* gs);
+//void generate_enemies(const MonsterGenSettings& rs, MTwist& mt, GeneratedLevel& level, GameState* gs);
 
 
 

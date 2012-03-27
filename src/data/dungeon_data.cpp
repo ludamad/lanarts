@@ -36,13 +36,13 @@ static FeatureGenSettings featurefirstlevel(0, 3 /*0 stairs up, 3 stairs down*/,
 		1 /*Default tileset*/);
 
 /*Min monster index, max monster index, # of monsters*/
-static EnemyGenSettings enemyfewweak(0, 2, 20);
+//static EnemyGenSettings enemyfewweak(0, 2, 20);
 
 
 #define BRANCH(arr) DungeonBranch(arr, sizeof(arr)/sizeof(LevelGenSettings))
 
 
-
+/*
 
 
 static LevelGenSettings mainbranch[] = {
@@ -116,7 +116,7 @@ static LevelGenSettings mainbranch[] = {
 				TunnelGenSettings(1, 3, 9,9),
 				featuredefault,
 				EnemyGenSettings(2,8,50)),
-};
+};*/
 
 //
 //static LevelGenSettings mainbranch[] = {
@@ -157,7 +157,7 @@ static LevelGenSettings mainbranch[] = {
 //				tunnelwide, featuredefault, EnemyGenSettings(2,7,40))
 //};
 
-DungeonBranch game_dungeon_data[] = { BRANCH(mainbranch) };
+DungeonBranch game_dungeon_data[1] = {  };
 std::vector<LevelGenSettings> game_dungeon_yaml;
 
 size_t game_dungeon_n = sizeof(game_dungeon_data) / sizeof(DungeonBranch);

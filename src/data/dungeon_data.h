@@ -17,6 +17,9 @@ enum {
 struct DungeonBranch {
 	LevelGenSettings* level_data;
 	int nlevels;
+	DungeonBranch(){
+		level_data = NULL;
+	}
 	DungeonBranch(LevelGenSettings* level_data, int nlevels):
 		level_data(level_data), nlevels(nlevels){
 	}

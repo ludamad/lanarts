@@ -109,7 +109,7 @@ enemies:
     attacks:
       - projectile: 1
         damage: 12
-        range: 25
+        range: 400
         cooldown: 70
         sprite: fire
         projectile_speed: 4

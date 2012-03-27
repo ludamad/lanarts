@@ -39,10 +39,20 @@ FeatureGenSettings parse_feature_gen(const YAML::Node& n){
 	return FeatureGenSettings(nstairsup, nstairsdown, 1);
 }
 EnemyGenSettings parse_enemy_gen(const YAML::Node& n){
-	GenRange index = parse_range(n["index"]);
 	GenRange nmonsters = parse_range(n["amount"]);
+	GenRange index = parse_range(n["index"]);
+	int size = index.max - index.min + 1;
+	vector<EnemyGenChance> chances;
+	for (int i = 0; i < size; i++){
+		EnemyGenChance egc;
+		egc.enemytype = i + index.min;
+		egc.genchance = 100/size;
+		egc.groupchance = 0;
+		egc.groupmax = egc.groupmin = 1;
+		chances.push_back(egc);
+	}
 
-	return EnemyGenSettings(index.min, index.max, nmonsters.min);
+	return EnemyGenSettings(chances, nmonsters.min, nmonsters.max);
 }
 LevelGenSettings parse_level_gen(const YAML::Node& n){
 	GenRange dim = parse_range(n["size"]);
