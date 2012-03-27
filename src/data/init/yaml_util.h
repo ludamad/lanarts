@@ -23,7 +23,6 @@ static char* tocstring(const std::string& s){
 	return ret;
 }
 
-
 inline int get_sprite_number(const std::string& s){
 	for (int i = 0; i < game_sprite_data.size(); i++){
 		if (s == game_sprite_data[i].name){
@@ -43,7 +42,6 @@ inline int parse_sprite_number(const YAML::Node& n, const char* key){
 	n[key] >> s;
 	return get_sprite_number(s);
 }
-
 template <class T>
 inline T parse_defaulted(const YAML::Node& n, const char* key, const T& dflt){
 	T ret;
