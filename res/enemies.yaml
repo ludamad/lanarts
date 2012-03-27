@@ -34,7 +34,7 @@ enemies:
         hp: 40
         hpregen: 0.05
     attacks:
-      - damage: 40
+      - damage: 15
       
   - name: Storm Elemental
     sprite: storm_ele

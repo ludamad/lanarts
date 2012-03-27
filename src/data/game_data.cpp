@@ -8,9 +8,7 @@
 #include "game_data.h"
 
 std::vector<TileEntry> game_tile_data;
-
 std::vector<SpriteEntry> game_sprite_data;
-
 std::vector<WeaponType> game_weapon_data;
 
 void init_game_data(){
@@ -19,5 +17,6 @@ void init_game_data(){
 	load_tile_data("res/tiles.yaml");
 	load_sprite_data("res/sprites.yaml");
 	load_enemy_data("res/enemies.yaml");
+	load_item_data("res/items.yaml");
 	load_dungeon_data("res/levels.yaml");
 }
