@@ -52,6 +52,7 @@ EnemyType game_enemy_data[] = {
 				Stats(3, 120,0, Attack(), strongshortrange_fire)),
 };
 
+
 size_t game_enemy_n = sizeof(game_enemy_data)/sizeof(EnemyType);
 
 
