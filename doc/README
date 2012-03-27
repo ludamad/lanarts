@@ -1,0 +1,12 @@
+Authors: Adam Domurad, Pat Goebel
+
+Lanarts trunk
+
+Dependencies:
+    SDL
+    SDL_opengl
+    SDL_Image
+    libPNG
+    
+Installation:
+    run cmake on the src directory then use the generated makefile/project files.

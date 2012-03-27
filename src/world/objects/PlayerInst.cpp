@@ -204,7 +204,7 @@ void PlayerInst::use_spell(GameState* gs){
 			if (spellselect)
 				base_stats.cooldown = effective_stats().ranged.cooldown*1.4;
 			else
-				base_stats.cooldown = effective_stats().ranged.cooldown/(1 + base_stats.xplevel/10);
+				base_stats.cooldown = effective_stats().ranged.cooldown/(1 + base_stats.xplevel/8);
 
 		}
 	}

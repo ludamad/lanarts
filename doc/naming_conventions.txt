@@ -1,0 +1,5 @@
+
+File Naming:
+- Header files X.h should generally have X.cpp as implementation
+- If a source & header file pair mainly implement a class, use capitals
+- If a source & header file mainly implement a series of functions/declarations, use all lowercase
