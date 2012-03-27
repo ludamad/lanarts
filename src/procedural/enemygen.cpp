@@ -9,7 +9,7 @@
 #include "../world/GameState.h"
 #include "../world/objects/EnemyInst.h"
 #include "../data/enemy_data.h"
-
+/*
 void generate_enemies(const EnemyGenSettings& es, MTwist& mt,
 		GeneratedLevel& level, GameState* gs) {
 	GameTiles& tiles = gs->tile_grid();
@@ -24,10 +24,10 @@ void generate_enemies(const EnemyGenSettings& es, MTwist& mt,
 		gs->add_instance(new EnemyInst(&game_enemy_data[etype], ex, ey));
 		level.at(epos).has_instance = true;
 	}
-}
+}*/
 
 //Generates enemy monsters
-void generate_enemies(const MonsterGenSettings& rs, MTwist& mt,
+void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 		GeneratedLevel& level, GameState* gs) {
 	GameTiles& tiles = gs->tile_grid();
 	int start_x = (tiles.tile_width() - level.width()) / 2;

@@ -39,8 +39,10 @@ FeatureGenSettings parse_feature_gen(const YAML::Node& n){
 	return FeatureGenSettings(nstairsup, nstairsdown, 1);
 }
 EnemyGenSettings parse_enemy_gen(const YAML::Node& n){
-	GenRange index = parse_range(n["index"]);
 	GenRange nmonsters = parse_range(n["amount"]);
+	GenRange index = parse_range(n["index"]);
+	EnemyGenChance egc;
+	for (int i = 0; i <  )
 
 	return EnemyGenSettings(index.min, index.max, nmonsters.min);
 }
