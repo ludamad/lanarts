@@ -25,11 +25,11 @@ branches:
             - enemy: Skeleton
               chance: 100
             - enemy: Chicken
-              chance: 1000
+              chance: 100
             - enemy: Storm Elemental
               chance: 33
               group_chance: 33
-              group_size: 3
+              group_size: 2
 
       #Level 2
       - size: [64, 64]
@@ -53,7 +53,7 @@ branches:
             - enemy: Storm Elemental
               chance: 66
               group_chance: 33
-              group_size: 3
+              group_size: 2
           amount: 15
       #Level 3
       - size: [76, 76]
@@ -75,7 +75,7 @@ branches:
             - enemy: Storm Elemental
               chance: 150
               group_chance: 33
-              group_size: 3
+              group_size: 2
           amount: 20
       #Level 4
       - size: [89, 89]
