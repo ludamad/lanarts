@@ -90,6 +90,7 @@ LevelGenSettings parse_level_gen(const YAML::Node& n){
 void parse_dungeon_branch(const YAML::Node& n, std::vector<LevelGenSettings>& levels){
 	const YAML::Node& lnodes = n["levels"];
 	for (int i = 0; i < lnodes.size(); i++){
+		printf("Loading level\n");
 		levels.push_back(parse_level_gen(lnodes[i]));
 	}
 }
@@ -105,6 +106,7 @@ void load_dungeon_data(const char* filename){
 		parser.GetNextDocument(root);
 
 		const YAML::Node& node = root["branches"];
+		printf("Node size = %d\n", node.size());
 		//First branch should be main branch, using node[0]:
 		parse_dungeon_branch(node[0], game_dungeon_yaml);
 
