@@ -115,7 +115,7 @@ void BulletInst::step(GameState* gs) {
 				}
 			}
 			if (hits == 0 || target == NULL){
-				gs->add_instance(new AnimatedInst(x,y,attack.projectile_sprite, 15));
+				gs->add_instance(new AnimatedInst(x,y,attack.attack_sprite, 15));
 				gs->remove_instance(this);
 			}
 		}
@@ -124,7 +124,7 @@ void BulletInst::step(GameState* gs) {
 
 void BulletInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
-	GLImage& img = game_sprite_data[attack.projectile_sprite].img;
+	GLImage& img = game_sprite_data[attack.attack_sprite].img;
 	int w = img.width, h = img.height;
 	int xx = x - w / 2, yy = y - h / 2;
 

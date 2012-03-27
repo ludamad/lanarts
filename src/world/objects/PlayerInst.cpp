@@ -188,7 +188,7 @@ void PlayerInst::use_spell(GameState* gs){
 		int hits = 0;
 		int mpcost = 10;
 		if (spellselect){
-			atk.projectile_sprite = SPR_MAGIC_BLAST;
+			atk.attack_sprite = SPR_MAGIC_BLAST;
 			atk.projectile_speed /= 1.75;
 			atk.damage *= 2;
 			bounce = false;

@@ -64,6 +64,7 @@ int main(int argc, char** argv) {
 	init_system(settings.fullscreen, windoww, windowh);
 	gs->reset_level();
 
+	bool paused = false;
 //	gs->add_instance( new TestInst(0,0));
 	for (int i = 0; cont; i++) {
 		clock_t start = clock();
@@ -74,13 +75,19 @@ int main(int argc, char** argv) {
 		if (gs->key_press_state(SDLK_F3)) {
 			gs->regen_level();
 		}
-		if (gs->key_down_state(SDLK_F1)) {
-			for (int repeat = 0; repeat < 4; repeat++){
-				cont = gs->step();
-			//	if (!cont) break;
-			}
+		if (gs->key_press_state(SDLK_F4)) {
+			paused = !paused;
 		}
-		cont = gs->step();
+		if (!paused){
+			if (gs->key_down_state(SDLK_F1)) {
+				for (int repeat = 0; repeat < 4; repeat++){
+					cont = gs->step();
+				//	if (!cont) break;
+				}
+			}
+			cont = gs->step();
+		} else
+			gs->update_iostate();
 		gs->draw();
 		clock_t end = clock();
 		int delayms = 14 - (end-start)*1000/CLOCKS_PER_SEC;

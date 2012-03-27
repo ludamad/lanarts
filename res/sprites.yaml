@@ -32,13 +32,13 @@ Sprites:
     spritefile: res/monsters/grue.png
   - sprite: jester
     spritefile: res/monsters/jester.png
-  - sprite: super chicken
+  - sprite: super_chicken
     spritefile: res/monsters/superchicken.png
   - sprite: skeleton
     spritefile: res/monsters/skeleton.png
   - sprite: ciribot
     spritefile: res/monsters/ciribo.png
-  - sprite: hell forged
+  - sprite: hell_forged
     spritefile: res/monsters/hellforged.png
 
   - sprite: mana potion
