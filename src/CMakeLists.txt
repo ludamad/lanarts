@@ -6,8 +6,8 @@ FIND_PACKAGE(SDL_image REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
-set( CMAKE_CXX_FLAGS_RELEASE "-O3" )
-set( CMAKE_BUILD_TYPE Debug)
+set( CMAKE_CXX_FLAGS_RELEASE "-O3 -static-libgcc -static-libstdc++" )
+set( CMAKE_BUILD_TYPE Release)
 
 include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} yaml-cpp/include)
 

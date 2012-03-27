@@ -63,7 +63,7 @@ static void draw_player_actionbar(GameState* gs, PlayerInst* player){
 	gl_draw_rectangle(0, y, TILE_SIZE*5, TILE_SIZE);
 	Colour outline(43,43,43);
 	for(int ix = 0; (ix*TILE_SIZE+TILE_SIZE) <= TILE_SIZE*5; ix++){
-		if(ix == player->spell_selected()){
+		if(ix == player->spell_selected()+1){
 			outline = Colour(255,0,0);
 		}else {
 			outline = Colour(43,43,43);
@@ -76,8 +76,9 @@ static void draw_player_actionbar(GameState* gs, PlayerInst* player){
 // 			gl_printf(gs->primary_font(), Colour(255,255,255), x+ix*TILE_SIZE, y+iy*TILE_SIZE, "%d", player->inventory.inv[slot].n);
 // 		}
 	}
-	image_display(&game_sprite_data[SPR_FIREBOLT].img,1, y);
-	image_display(&game_sprite_data[SPR_MAGIC_BLAST].img,TILE_SIZE+1, y);
+	image_display(&game_sprite_data[SPR_GLOVES].img, 1, y);
+	image_display(&game_sprite_data[SPR_FIREBOLT].img,TILE_SIZE + 1, y);
+	image_display(&game_sprite_data[SPR_MAGIC_BLAST].img,TILE_SIZE*2 + 1, y);
 }
 
 static void fill_buff2d(char* buff, int w, int h, int x, int y,
