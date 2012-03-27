@@ -13,6 +13,7 @@
 
 void load_tile_data(const char* filename);
 void load_sprite_data(const char* filename);
+void load_weapon_data(const char* filename);
 
 void load_enemy_data(const char* filename);
 void load_dungeon_data(const char* filename);

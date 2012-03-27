@@ -1,6 +1,6 @@
 - Refactor room generation with tiered room, tunnel, feature, item generation. [DONE]
 - (Long term) versatile save format that allows for resuming a networked game even through major game updates
-- (Long term) versatile markup format that allows for human edit-able game objects (YAML?). 
+- [DONE] versatile markup format that allows for human edit-able game objects (YAML?)
 - (Continual) Networked play over LAN with action-based synchronization
 
 - Move out of combat [DONE]

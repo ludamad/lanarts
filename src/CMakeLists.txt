@@ -25,6 +25,7 @@ set( lanarts_src
 	data/tile_data.cpp
 	data/sprite_data.cpp
 	data/dungeon_data.cpp
+	data/weapon_data.h
 	
 	display/display.cpp
 	display/GLImage.cpp
