@@ -27,6 +27,7 @@ struct Stats {
 	int hurt_cooldown;
 	float hp_regened, mp_regened;
 
+	int weapontype;
 	Attack melee, ranged;
 
 	int xp, xpneeded, xplevel;

@@ -44,3 +44,5 @@ Tiles:
     spritefile: res/tiles/features/stairs_up.png
   - tile: stair_down
     spritefile: res/tiles/features/stairs_down.png
+  - tile: floor2
+    spritefile: res/tiles/room_floor3.bmp

@@ -98,7 +98,7 @@ enemies:
     attacks:
       - damage: 20
         
-  - name: HellForged
+  - name: Hell Forged
     sprite: hell_forged
     radius: 14
     xpaward: 50

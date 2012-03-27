@@ -12,3 +12,5 @@
 
 -Fix monsters getting stuck due to random movement
 -Fix items on border of view not being visible -> subtract away from player and check visibility
+
+-More visual output on the minimap

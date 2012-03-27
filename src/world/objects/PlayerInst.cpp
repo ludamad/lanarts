@@ -203,8 +203,11 @@ void PlayerInst::use_spell(GameState* gs){
 			canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 			if (spellselect)
 				base_stats.cooldown = effective_stats().ranged.cooldown*1.4;
-			else
-				base_stats.cooldown = effective_stats().ranged.cooldown/(1 + base_stats.xplevel/8);
+			else {
+				double mult = 1 + base_stats.xplevel/8.0;
+				mult = std::min(2.0, mult);
+				base_stats.cooldown = effective_stats().ranged.cooldown/mult;
+			}
 
 		}
 	}
