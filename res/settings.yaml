@@ -1,4 +1,4 @@
-fullscreen: 1
+fullscreen: 0
 regen_level_on_death: 1
-view_width: 640
-view_height: 480
+view_width: 1280
+view_height: 1024

@@ -37,7 +37,7 @@ enemies:
       - damage: 15
       
   - name: Storm Elemental
-    sprite: storm_ele
+    sprite: storm ele
     radius: 14
     xpaward: 20
     stats:
