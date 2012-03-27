@@ -8,3 +8,7 @@
 - Lightning Spells takes up multiple squares
 - Melee attack animation [DONE]
 - Classes for players
+
+
+-Fix monsters getting stuck due to random movement
+-Fix items on border of view not being visible -> subtract away from player and check visibility
