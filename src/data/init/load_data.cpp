@@ -115,8 +115,5 @@ void load_weapon_data(const char* filename){
 		
 		game_weapon_data.push_back(entry);
 	}
-// 	for (int i = 0; i < game_sprite_data.size();i++){
-// 		game_sprite_data[i].init();
-// 	}
 }
 

@@ -11,6 +11,8 @@ std::vector<TileEntry> game_tile_data;
 
 std::vector<SpriteEntry> game_sprite_data;
 
+std::vector<WeaponType> game_weapon_data;
+
 void init_game_data(){
 	//init_tile_data();
 // 	init_sprite_data();

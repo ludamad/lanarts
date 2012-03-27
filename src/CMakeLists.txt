@@ -26,7 +26,6 @@ set( lanarts_src
 	data/tile_data.cpp
 	data/sprite_data.cpp
 	data/dungeon_data.cpp
-	data/weapon_data.h
 	
 	display/display.cpp
 	display/GLImage.cpp
@@ -84,6 +83,7 @@ set( lanarts_include
 	data/sprite_data.h
 	data/dungeon_data.h
 	data/tile_data.h
+	data/weapon_data.h
 	
 	display/display.h
 	display/GLImage.h
