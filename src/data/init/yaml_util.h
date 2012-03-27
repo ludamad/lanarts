@@ -11,6 +11,7 @@
 #include <cstring>
 #include <yaml-cpp/yaml.h>
 #include "../../world/objects/GameInst.h"
+#include "../game_data.h"
 
 struct GenRange {
 	int min, max;
@@ -20,6 +21,22 @@ static char* tocstring(const std::string& s){
 	char* ret = new char[s.size()+1];
 	memcpy(ret, s.c_str(), s.size()+1);
 	return ret;
+}
+
+
+inline int get_sprite_number(const std::string& s){
+	for (int i = 0; i < game_sprite_data.size(); i++){
+		if (s == game_sprite_data[i].name){
+			return i;
+		}
+	}
+	return -1;
+}
+inline int parse_sprite_number(const YAML::Node& n, const char* key){
+	if (!hasnode(n,key)) return 0;
+	std::string s;
+	n[key] >> s;
+	return get_sprite_number(s);
 }
 
 template <class T>
