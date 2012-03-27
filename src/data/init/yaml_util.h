@@ -51,7 +51,9 @@ inline T parse_defaulted(const YAML::Node& n, const char* key, const T& dflt){
 	return ret;
 }
 
+inline std::string stripped_parse(const YAML::Node& n){
 
+}
 
 inline GenRange parse_range(const YAML::Node& n){
 	GenRange gr;

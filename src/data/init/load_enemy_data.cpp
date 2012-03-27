@@ -24,7 +24,7 @@ Attack parse_attack(const YAML::Node& n){
 	ret.projectile_speed = parse_defaulted(n, "projectile_speed",0);
 	n["damage"] >> ret.damage;
 	ret.isprojectile= parse_defaulted(n, "projectile", 0);
-	ret.projectile_speed = parse_sprite_number(n, "sprite");
+	ret.attack_sprite = parse_sprite_number(n, "sprite");
 	return ret;
 }
 Stats parse_stats(const YAML::Node& n, const vector<Attack>& attacks){
