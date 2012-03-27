@@ -77,9 +77,10 @@ void load_enemy_data(const char* filename){
 			YAML::Node root;
 
 			parser.GetNextDocument(root);
+			game_enemy_data.clear();
 			const YAML::Node& enemies = root["enemies"];
 			for (int i = 0; i < enemies.size(); i++){
-				game_enemy_data[i] = parse_enemy_type(enemies[i]);
+				game_enemy_data.push_back( parse_enemy_type(enemies[i]) );
 			}
 		} catch (const YAML::Exception& parse){
 			printf("Enemies Parsed Incorrectly: \n");

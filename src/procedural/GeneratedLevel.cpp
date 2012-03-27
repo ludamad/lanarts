@@ -117,12 +117,18 @@ Pos generate_location_in_region(MTwist& mt, GeneratedLevel& level, const Region&
 	int ind;
 	Pos p;
 	Sqr* s;
+	int tries = 0;
 	do {
 		p.x = mt.rand(r.x,r.x+r.w);
 		p.y = mt.rand(r.y, r.y+r.h);
 		ind = p.y * level.width() + p.x;
 		s = &level.at(p.x, p.y);
-	} while (!s->passable || s->is_corner || s->has_instance);
+		tries++;
+	} while ( tries < 100 && (!s->passable || s->is_corner || s->has_instance));
+
+	if (tries >= 100)
+		return generate_location(mt, level);
+
 	return p;
 }
 

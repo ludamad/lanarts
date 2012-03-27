@@ -42,6 +42,17 @@ inline int parse_sprite_number(const YAML::Node& n, const char* key){
 	n[key] >> s;
 	return get_sprite_number(s);
 }
+inline int parse_enemy_number(const YAML::Node& n, const char* key){
+	if (!hasnode(n,key)) return -1;
+	std::string s;
+	n[key] >> s;
+	for (int i = 0; i < game_enemy_data.size(); i++){
+		if (s == game_enemy_data[i].name){
+			return i;
+		}
+	}
+	return -1;
+}
 template <class T>
 inline T parse_defaulted(const YAML::Node& n, const char* key, const T& dflt){
 	T ret;

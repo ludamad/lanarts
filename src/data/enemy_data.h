@@ -9,6 +9,7 @@
 #define ENEMY_DATA_H_
 #include <cstdlib>
 #include "../gamestats/Stats.h"
+#include <vector>
 
 struct EnemyType {
 	const char* name;
@@ -23,7 +24,6 @@ struct EnemyType {
 	}
 };
 
-extern EnemyType game_enemy_data[];
-extern size_t game_enemy_n;
+extern std::vector<EnemyType> game_enemy_data;
 
 #endif /* ENEMY_DATA_H_ */

@@ -6,7 +6,23 @@
 #include "../GameState.h"
 #include "../../util/draw_util.h"
 #include "../../data/sprite_data.h"
+#include "../../data/enemy_data.h"
+
+
+EnemyInst::EnemyInst(int enemytype, int x, int y) :
+	GameInst(x,y, game_enemy_data[enemytype].radius),
+	eb(game_enemy_data[enemytype].basestats.movespeed),
+	enemytype(enemytype), rx(x), ry(y),
+	xpgain(game_enemy_data[enemytype].xpaward),
+	stat(game_enemy_data[enemytype].basestats) {
+	last_seen_counter = 0;
+}
+
 EnemyInst::~EnemyInst() {
+}
+
+EnemyType* EnemyInst::etype(){
+	return &game_enemy_data[enemytype];
 }
 
 static bool enemy_hit(GameInst* self, GameInst* other) {
@@ -67,7 +83,7 @@ void EnemyInst::step(GameState* gs) {
 }
 void EnemyInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
-	GLImage& img = game_sprite_data[type->sprite_number].img;
+	GLImage& img = game_sprite_data[etype()->sprite_number].img;
 
 	int w = img.width, h = img.height;
 	int xx = x - w / 2, yy = y - h / 2;
@@ -113,7 +129,7 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 
 bool EnemyInst::hurt(GameState* gs, int hp){
 	if (!destroyed && stats().hurt(hp)){
-		gs->add_instance(new AnimatedInst(x,y,type->sprite_number, 15));
+		gs->add_instance(new AnimatedInst(x,y,etype()->sprite_number, 15));
 		gs->remove_instance(this);
 		return true;
 	}

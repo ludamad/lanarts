@@ -11,6 +11,7 @@
 #include "tile_data.h"
 #include "sprite_data.h"
 #include "dungeon_data.h"
+#include "enemy_data.h"
 #include "weapon_data.h"
 #include "init/load_data.h"
 

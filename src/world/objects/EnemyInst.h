@@ -28,11 +28,7 @@ struct EnemyBehaviour {
 
 class EnemyInst : public GameInst {
 public:
-	EnemyInst(EnemyType* type, int x, int y) :
-		GameInst(x,y, type->radius), eb(type->basestats.movespeed), type(type), rx(x), ry(y),
-		xpgain(type->xpaward),stat(type->basestats) {
-		last_seen_counter = 0;
-	}
+	EnemyInst(int enemytype, int x, int y);
 	virtual ~EnemyInst();
 	virtual void init(GameState* gs);
 	virtual void step(GameState* gs);
@@ -40,9 +36,7 @@ public:
 	void attack(GameState* gs, GameInst* inst, bool ranged);
 	Stats& stats() { return stat; }
 	EnemyBehaviour& behaviour() { return eb; }
-	EnemyType* etype(){
-		return type;
-	}
+	EnemyType* etype();
 	int xpworth(){
 		return xpgain;
 	}
@@ -55,7 +49,7 @@ public:
 protected:
 	int last_seen_counter;
 	EnemyBehaviour eb;
-	EnemyType* type;
+	int enemytype;
 	int xpgain;
     Stats stat;
 };

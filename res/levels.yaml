@@ -20,8 +20,15 @@ branches:
           stairs_up: 0
           stairs_down: 3
         enemies:
-          index: [0, 1]
           amount: 5
+          generated:
+            - enemy: Skeleton
+              chance: 100
+            - enemy: Chicken
+              chance: 100
+            - enemy: Storm Elemental
+              chance: 33
+
       #Level 2
       - size: [64, 64]
         items:

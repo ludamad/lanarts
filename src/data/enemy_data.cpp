@@ -16,12 +16,12 @@
 //			cooldown, mreach, range, bulletspeed = 7)
 //EnemyType constructor:
 //   EnemyType(name, rad, xpaward, spriten, stats)
-Attack weakmelee(true,  10, 25, 70);
-Attack medmelee(true,  15, 25, 70);
-Attack strongmelee(true,  20, 25, 70);
-Attack strongermelee(true,  45, 25, 70);
-Attack strongshortrange_storm(true, 13, 130, 45, SPR_STORMBOLT, 7 );
-Attack strongshortrange_fire(true, 30, 400, 70, SPR_FIREBOLT, 4 );
+//Attack weakmelee(true,  10, 25, 70);
+//Attack medmelee(true,  15, 25, 70);
+//Attack strongmelee(true,  20, 25, 70);
+//Attack strongermelee(true,  45, 25, 70);
+//Attack strongshortrange_storm(true, 13, 130, 45, SPR_STORMBOLT, 7 );
+//Attack strongshortrange_fire(true, 30, 400, 70, SPR_FIREBOLT, 4 );
 //
 //EnemyType game_enemy_data[] = {
 //
@@ -51,11 +51,6 @@ Attack strongshortrange_fire(true, 30, 400, 70, SPR_FIREBOLT, 4 );
 //		EnemyType("Hell Forged", 14, 50, SPR_HELLFORGED,
 //				Stats(3, 120,0, Attack(), strongshortrange_fire)),
 //};
-const int MAX_ENEMIES = 255;
-EnemyType game_enemy_data[255];
-
-size_t game_enemy_n = sizeof(game_enemy_data)/sizeof(EnemyType);
-
 
 
 #endif /* ENEMY_DATA_CPP_ */
