@@ -37,7 +37,7 @@ inline bool hasnode(const YAML::Node& n, const char* key){
 }
 
 inline int parse_sprite_number(const YAML::Node& n, const char* key){
-	if (!hasnode(n,key)) return 0;
+	if (!hasnode(n,key)) return -1;
 	std::string s;
 	n[key] >> s;
 	return get_sprite_number(s);

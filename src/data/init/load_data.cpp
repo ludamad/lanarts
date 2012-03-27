@@ -71,7 +71,7 @@ void load_sprite_data(const char* filename){
 		game_sprite_data[i].init();
 	}
 }
-
+/*
 void load_weapon_data(const char* filename){
 	
     fstream file(filename, fstream::in | fstream::binary);
@@ -119,4 +119,4 @@ void load_weapon_data(const char* filename){
 // 		game_sprite_data[i].init();
 // 	}
 }
-
+*/
