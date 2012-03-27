@@ -65,7 +65,7 @@ enemies:
         range: 45
         cooldown: 35
       
-  - name: Super_Chicken
+  - name: Super Chicken
     sprite: super_chicken
     radius: 14
     xpaward: 20
