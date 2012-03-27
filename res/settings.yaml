@@ -1,2 +1,4 @@
 fullscreen: 0
 reset_level_on_death: 1
+view_width: 960
+view_height: 720

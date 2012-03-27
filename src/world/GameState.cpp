@@ -85,21 +85,9 @@ int GameState::handle_event(SDL_Event *event) {
 	}
 	return (done);
 }
-bool GameState::step() {
+bool GameState::update_iostate(){
 	SDL_Event event;
-	const int sub_sqrs = VISION_SUBSQRS;
-
 	memset(key_press_states, 0, sizeof(key_press_states));
-
-	if (gennextstep)
-		reset_level();
-
-	//GameInst* player = this->player_obj();
-	//if (player)
-	//	pfov.calculate(this, player->last_x*sub_sqrs/TILE_SIZE, player->last_y*sub_sqrs/TILE_SIZE);
-
-	//std::vector<GameInst*> safe_copy = inst_set.to_vector();
-	//memset(key_states, 0, sizeof(key_states));
 	SDL_GetMouseState(&mousex, &mousey);
 	mouse_leftclick = false;
 	mouse_rightclick = false;
@@ -109,6 +97,17 @@ bool GameState::step() {
 		if (handle_event(&event))
 			return false;
 	}
+	return true;
+}
+bool GameState::step() {
+	const int sub_sqrs = VISION_SUBSQRS;
+
+	if (gennextstep)
+		reset_level();
+
+	if (!update_iostate())
+		return false;
+
 	frame_n++;
 	lvl->pc.pre_step(this);
 	lvl->mc.pre_step(this);

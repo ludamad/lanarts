@@ -1,0 +1,115 @@
+---
+
+#Enemy Markup
+enemies:
+  - name: Skeleton
+    sprite: skeleton
+    radius: 11
+    xpaward: 10
+    stats:
+        movespeed: 2
+        hp: 30
+        hpregen: 0.03
+    attacks:
+      - damage: 12
+      
+  - name: Chicken
+    sprite: chicken
+    radius: 10
+    xpaward: 10
+    stats:
+        movespeed: 4
+        hp: 10
+        hpregen: 0.08
+    attacks:
+      - damage: 2
+        cooldown: 5
+        
+  - name: Zombie
+    sprite: zombie
+    radius: 14
+    xpaward: 10
+    stats:
+        movespeed: 2
+        hp: 40
+        hpregen: 0.05
+    attacks:
+      - damage: 40
+      
+  - name: Storm Elemental
+    sprite: storm_ele
+    radius: 14
+    xpaward: 20
+    stats:
+        movespeed: 1
+        hp: 20
+        hpregen: 0.05
+    attacks:
+      - projectile: 1
+        damage: 13
+        range: 130
+        cooldown: 45
+        sprite: storm
+        projectile_speed: 7    
+      
+  - name: Ciribot
+    sprite: ciribot
+    radius: 14
+    xpaward: 30
+    stats:
+        movespeed: 3
+        hp: 60
+        hpregen: 0.05
+    attacks:
+      - damage: 10
+        range: 45
+        cooldown: 35
+      
+  - name: Super_Chicken
+    sprite: super_chicken
+    radius: 14
+    xpaward: 20
+    stats:
+        movespeed: 4
+        hp: 45
+        hpregen: 0.08
+    attacks:
+      - damage: 20
+      
+  - name: Grue
+    sprite: grue
+    radius: 14
+    xpaward: 35
+    stats:
+        movespeed: 2
+        hp: 100
+        hpregen: 0.02
+    attacks:
+      - damage: 45
+        
+  - name: Jester
+    sprite: jester
+    radius: 14
+    xpaward: 35
+    stats:
+        movespeed: 5
+        hp: 80
+        hpregen: 0.06
+    attacks:
+      - damage: 20
+        
+  - name: HellForged
+    sprite: hell_forged
+    radius: 14
+    xpaward: 50
+    stats:
+        movespeed: 3
+        hp: 120
+        hpregen: 0.0
+    attacks:
+      - projectile: 1
+        damage: 12
+        range: 25
+        cooldown: 70
+        sprite: fire
+        projectile_speed: 4

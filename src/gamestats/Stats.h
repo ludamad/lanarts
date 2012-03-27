@@ -2,18 +2,20 @@
 #define STATS_H_
 
 #include <cmath>
+#include <cstring>
 
 struct Attack { //Currently for melee & ranged
 	bool canuse;
 	int damage;
 	int range, cooldown;
-	int projectile_sprite;
+	int attack_sprite;
 	int projectile_speed;
+	bool isprojectile;
 
 	Attack(bool canuse = false, int damage = 0, int range = 0, int cooldown = 0,
 			int spr = 0, int bspeed = 0) :
-			canuse(canuse), damage(damage), range(range), cooldown(cooldown), projectile_sprite(
-					spr), projectile_speed(bspeed) {
+			canuse(canuse), damage(damage), range(range), cooldown(cooldown), attack_sprite(
+					spr), projectile_speed(bspeed), isprojectile(false) {
 	}
 };
 struct Stats {
@@ -29,6 +31,7 @@ struct Stats {
 
 	int xp, xpneeded, xplevel;
 	Stats() {
+		memset(this, 0, sizeof(Stats));
 	}
 	Stats(float speed, int hp, int mp, const Attack& melee,
 			const Attack& ranged);
