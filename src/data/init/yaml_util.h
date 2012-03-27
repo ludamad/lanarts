@@ -32,6 +32,11 @@ inline int get_sprite_number(const std::string& s){
 	}
 	return -1;
 }
+
+inline bool hasnode(const YAML::Node& n, const char* key){
+	return n.FindValue(key);
+}
+
 inline int parse_sprite_number(const YAML::Node& n, const char* key){
 	if (!hasnode(n,key)) return 0;
 	std::string s;
@@ -48,9 +53,6 @@ inline T parse_defaulted(const YAML::Node& n, const char* key, const T& dflt){
 	return ret;
 }
 
-inline bool hasnode(const YAML::Node& n, const char* key){
-	return n.FindValue(key);
-}
 
 
 inline GenRange parse_range(const YAML::Node& n){

@@ -108,8 +108,8 @@ void load_weapon_data(const char* filename){
 				mult_dmg,
 				range,
 				cooldown,
-				parse_cstr(n["spr_weap"]),
-				parse_cstr(n["spr_attack"]),
+				parse_sprite_number(n, "spr_weap"),
+				parse_sprite_number(n,"spr_attack"),
 				parse_defaulted(n , "proj_speed", 0)
 		);
 		
