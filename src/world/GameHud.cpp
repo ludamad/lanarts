@@ -155,6 +155,7 @@ void GameHud::draw_minimap(GameState* gs, int subx, int suby) {
 			int ey = enemy->y/TILE_SIZE;
 			int loc = ey* ptw + ex;
 			if (!pressed_z && !tiles.seen(ex,ey)) continue;
+			if (!pressed_z && !gs->object_visible_test(enemy)) continue;
 			minimap_arr[loc * 4] = 0;
 			minimap_arr[loc * 4 + 1] = 0;
 			minimap_arr[loc * 4 + 2] = 255;
