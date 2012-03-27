@@ -33,7 +33,7 @@ struct EnemyGenChance {
 struct EnemyGenSettings {
 	std::vector<EnemyGenChance> enemy_chances;
 	int min_monsters, max_monsters;
-	EnemyGenSettings(const std::vector<EnemyGenChance>& enemies, int min_monsters, int max_monster) :
+	EnemyGenSettings(const std::vector<EnemyGenChance>& enemies, int min_monsters, int max_monsters) :
 		enemy_chances(enemies), min_monsters(min_monsters), max_monsters(max_monsters){
 	}
 };

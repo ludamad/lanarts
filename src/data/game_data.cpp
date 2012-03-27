@@ -19,5 +19,5 @@ void init_game_data(){
 	load_enemy_data("res/enemies.yaml");
 	load_item_data("res/items.yaml");
 	load_dungeon_data("res/levels.yaml");
-	load_weapon_data("res/weapons.yaml");
+	//load_weapon_data("res/weapons.yaml");
 }
