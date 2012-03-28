@@ -15,6 +15,7 @@
 
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <algorithm>
 
 /* Quick utility function for texture creation */
 int power_of_two(int input) {
@@ -199,13 +200,15 @@ void gl_set_drawing_area(int x, int y, int w, int h) {
 	//update_display();
 }
 
-void gl_image_from_bytes(GLImage* img, int w, int h, char* data) {
+void gl_image_from_bytes(GLImage* img, int w, int h, char* data, int type) {
 	bool was_init = img->texture;
 	// allocate a texture name
 	if (!was_init)
 		glGenTextures(1, &img->texture);
 
 	int ptw = power_of_two(w), pth = power_of_two(h);
+	ptw = std::min(64, ptw);
+	pth = std::min(64, pth);
 
 	img->width = w, img->height = h;
 	img->texw = w / ((float) ptw);
@@ -216,12 +219,10 @@ void gl_image_from_bytes(GLImage* img, int w, int h, char* data) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	if (!was_init)
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, ptw, pth, 0, GL_BGRA,
+//	if (!was_init)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, ptw, pth, 0, type,
 				GL_UNSIGNED_BYTE, data);
-	else
-		;
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ptw, pth, GL_BGRA, GL_UNSIGNED_BYTE,
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, type, GL_UNSIGNED_BYTE,
 			data);
 }
 

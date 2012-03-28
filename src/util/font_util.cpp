@@ -38,14 +38,16 @@ char_data::char_data(char ch, FT_Face face){
 	left=bitmap_glyph->left;
 	w=bitmap.width;
 	h=bitmap.rows;
-	move_up=bitmap_glyph->top-bitmap.rows;
+	move_up=bitmap_glyph->top;//-bitmap.rows;
 
 
-	data = new unsigned char[2*w*h];
+	data = new unsigned char[4*w*h];
 	for(int y=0;y<h;y++) for(int x=0;x<w;x++) {
-		const int my=h-1-y;
-		data[2*(x+w*my)]=255;
-		data[2*(x+w*my)+1]=bitmap.buffer[x+w*y];
+		const int my=y;//h-1-y;
+		data[4*(x+w*my)]=255;
+		data[4*(x+w*my)+1]=255;
+		data[4*(x+w*my)+2]=255;
+		data[4*(x+w*my)+3]=bitmap.buffer[x+w*y];
 	}
 }
 
@@ -72,7 +74,9 @@ void init_font(font_data* fd, const char * fname, unsigned int h) {
 	//(h << 6 is just a prettier way of writting h*64)
 	FT_Set_Char_Size( face, h << 6, h << 6, 96, 96);
 
-	for(int i=0;i<128;i++) fd->data[i]=new char_data(i,face);
+	for(int i=0;i<128;i++) {
+		fd->data[i]=new char_data(i,face);
+	}
 
 	//We don't need the face information now that the display
 	//lists have been created, so we free the assosiated resources.

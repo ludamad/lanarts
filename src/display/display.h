@@ -7,6 +7,10 @@
 
 #ifndef DISPLAY_H_
 #define DISPLAY_H_
+
+#include <SDL.h>
+#include <GL/glu.h>
+#include <SDL_opengl.h>
 #include "../world/GameView.h"
 #include "../util/draw_util.h"
 
@@ -24,6 +28,6 @@ void image_display_parts(GLImage* img, int x, int y, int sub_parts, char* flags)
 void update_display();
 void SDL_GL_diagnostics();
 
-void gl_image_from_bytes(GLImage* img, int w, int h, char* data);
+void gl_image_from_bytes(GLImage* img, int w, int h, char* data, int type = GL_BGRA);
 
 #endif /* DISPLAY_H_ */

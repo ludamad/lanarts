@@ -14,6 +14,9 @@
 #include <string>
 #include <cstring>
 
+#include "../display/display.h"
+#include "../display/GLImage.h"
+
 using namespace std;
 
 const float DEG2RAD = 3.14159 / 180;
@@ -83,7 +86,7 @@ inline void move_raster(int x, int y) {
 
 ///Much like Nehe's glPrint function, but modified to work
 ///with freetype fonts.
-void gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
+void gl_printf2(const font_data &ft_font, const Colour& colour, float x, float y,
 		const char *fmt, ...) {
 	//	float h=ft_font.h/.63f;						//We make the height about 1.5* that of
 
@@ -145,5 +148,58 @@ void gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, old_unpack);
 		glPopAttrib();
+	}
+}
+
+
+///Much like Nehe's glPrint function, but modified to work
+///with freetype fonts.
+void gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
+		const char *fmt, ...) {
+	//	float h=ft_font.h/.63f;						//We make the height about 1.5* that of
+	GLImage img;
+	char text[256]; // Holds Our String
+	va_list ap; // Pointer To List Of Arguments
+
+	if (fmt == NULL) // If There's No Text
+		*text = 0; // Do Nothing
+
+	else {
+		va_start(ap, fmt);
+		// Parses The String For Variables
+		vsprintf(text, fmt, ap); // And Converts Symbols To Actual Numbers
+		va_end(ap);
+		// Results Are Stored In Text
+	}
+	int textlen = strlen(text);
+	for (int i = 0; i < textlen; i++)
+		if (text[i] == '\n')
+			text[i] = '\0';
+	int len = 0;
+	y += ft_font.h;
+	for (char* iter = text; iter < text + textlen;
+			iter += strlen(iter) + 1, y += ft_font.h + 1) {
+//
+		//glPushAttrib(GL_CURRENT_BIT | GL_PIXEL_MODE_BIT | GL_ENABLE_BIT);
+//
+//		//we'll be nice people and save the old pixel unpack alignment-
+//		//while setting the unpack allignment to one couldn't possibly
+//		//hurt anyone else's pixel drawing, it might slow it down.
+		int old_unpack;
+		//glGetIntegerv(GL_UNPACK_ALIGNMENT, &old_unpack);
+		//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+		for (int i = 0; iter[i]; i++) {
+			const char_data &cdata = *ft_font.data[iter[i]];
+			len += cdata.advance;
+			gl_image_from_bytes(&img, cdata.w, cdata.h, (char*)cdata.data, GL_BGRA);
+			int up = cdata.h - cdata.move_up;
+			image_display(&img, x-len-cdata.left, y -cdata.move_up, colour);
+
+		}
+//
+		//glPixelStorei(GL_UNPACK_ALIGNMENT, old_unpack);
+//
+		//glPopAttrib();
 	}
 }
