@@ -169,7 +169,13 @@ void GameHud::draw_minimap(GameState* gs, int subx, int suby) {
 			Colour(255, 180, 99), 2, 2);
 	draw_rect2d(minimap_arr, tilew, tileh, min_tilex, min_tiley, max_tilex,
 			max_tiley, Colour(255, 180, 99));//
+
+	int old_unpack;
+	glGetIntegerv(GL_UNPACK_ALIGNMENT, &old_unpack);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	gl_image_from_bytes(&minimap_buff, ptw, pth, minimap_arr);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, old_unpack);
+
 	image_display(&minimap_buff, subx, suby);
 	//gl_printf(gs->primary_font(),Colour(255,255,255),0,100,"Whatup");
 }

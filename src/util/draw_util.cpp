@@ -193,12 +193,11 @@ void gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
 			const char_data &cdata = *ft_font.data[iter[i]];
 			len += cdata.advance;
 			gl_image_from_bytes(&font_img, cdata.w, cdata.h, (char*)cdata.data, GL_BGRA);
-			int up = cdata.h - cdata.move_up;
-			image_display(&font_img, x+len-(cdata.w-cdata.left), y -cdata.move_up, colour);
+			image_display(&font_img, x+len-(cdata.advance-cdata.left), y -cdata.move_up, colour);
 
 		}
 //
-		//glPixelStorei(GL_UNPACK_ALIGNMENT, old_unpack);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, old_unpack);
 //
 		//glPopAttrib();
 	}

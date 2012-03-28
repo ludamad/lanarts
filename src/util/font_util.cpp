@@ -35,7 +35,7 @@ char_data::char_data(char ch, FT_Face face){
 	FT_Bitmap& bitmap=bitmap_glyph->bitmap;
 
 	advance=face->glyph->advance.x >> 6;
-	left=bitmap_glyph->left;
+	left= bitmap_glyph->left;
 	w=bitmap.width;
 	h=bitmap.rows;
 	move_up=bitmap_glyph->top;//-bitmap.rows;
