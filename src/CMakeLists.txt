@@ -37,6 +37,7 @@ set( lanarts_src
 	
 	gamestats/Stats.cpp
 	
+	pathfind/astar_pathfind.cpp
 	pathfind/pathfind.cpp
 	
 	main.cpp
@@ -100,6 +101,7 @@ set( lanarts_include
 	gamestats/Spells.h
 	gamestats/Stats.h
 	
+	pathfind/astar_pathfind.h
 	pathfind/pathfind.h
 	
 	procedural/enemygen.h

@@ -12,6 +12,7 @@
 #include "../objects/GameInst.h"
 #include "../objects/EnemyInst.h"
 #include "../../pathfind/pathfind.h"
+#include "../../pathfind/astar_pathfind.h"
 
 
 struct EnemyOfInterest {
@@ -41,6 +42,8 @@ public:
 	void clear();
 	void set_monster_headings(GameState* gs, std::vector<EnemyOfInterest>& eois);
 public:
+	void monster_wandering(GameState* gs, EnemyInst* e);
+	AStarPathFind astarcontext;
 	obj_id targetted;
 	std::vector<PathInfo> room_paths;
 	//vector of paths to player instances

@@ -103,10 +103,7 @@ void EnemyInst::draw(GameState* gs) {
 	}else{
 		image_display(&img, xx - view.x, yy - view.y);
 	}
-	/*if (gs->solid_test(this)){
-
-		image_display(&img, xx - view.x, yy - view.y, Colour(255,0,0));
-	}*/
+	//draw_path(gs, eb.path);
 }
 
 

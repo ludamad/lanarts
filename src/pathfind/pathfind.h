@@ -8,6 +8,7 @@
 #ifndef PATHFIND_H_
 #define PATHFIND_H_
 #include "../procedural/mtwist.h"
+#include <vector>
 
 class GameState;
 
@@ -37,14 +38,17 @@ struct PathingNode {
 	}
 };
 
+//Used for floodfill or AStar
 class PathInfo {
 public:
 	PathInfo();
 	~PathInfo();
-	void calculate_path(GameState* gs, int ox, int oy, int radius);
 
 	int width() { return w; }
 	int height() { return h; }
+
+//Floodfill based API
+	void calculate_path(GameState* gs, int ox, int oy, int radius);
 	//Towards object
 	void interpolated_direction(int x, int y, int w, int h, float speed, float& vx, float& vy);
 	//Away from object
@@ -53,6 +57,8 @@ public:
 	void stake_claim(int x, int y);
 	//Call before 'interpolated_direction'
 	void adjust_for_claims(int x, int y);
+
+
 	void draw(GameState* gs);
 private:
 	void point_to_local_min(int sx, int sy);

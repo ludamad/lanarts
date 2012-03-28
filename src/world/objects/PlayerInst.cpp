@@ -10,6 +10,7 @@
 #include "../../data/tile_data.h"
 #include "../../display/display.h"
 #include "../../data/item_data.h"
+#include "TestInst.h"
 
 static const int REST_COOLDOWN = 150;
 

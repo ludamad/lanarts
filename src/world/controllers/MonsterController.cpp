@@ -13,6 +13,7 @@
 #include "../GameState.h"
 #include <algorithm>
 #include "../../util/draw_util.h"
+#include "../../data/tile_data.h"
 
 const int PATHING_RADIUS = 500;
 const int HUGE_DISTANCE = 1000000;
@@ -33,13 +34,51 @@ void towards_highest(PathInfo& path, Pos& p){
 	}
 
 }
-void monster_wandering(GameState* gs, EnemyInst* e) {
+//returns true if will be exactly on target
+bool move_towards(EnemyInst* e, const Pos& p){
+	EnemyBehaviour& eb = e->behaviour();
+	float dx = p.x - e->x, dy = p.y - e->y;
+	float mag = sqrt(dx*dx+dy*dy);
+	if (mag <= eb.speed){
+		eb.vx = dx;
+		eb.vy = dy;
+		return true;
+	}
+	eb.vx = dx/mag*eb.speed;
+	eb.vy = dy/mag*eb.speed;
+	return false;
+}
+void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	//TODO: actually make the monster wander room to room
+	GameTiles& tile = gs->tile_grid();
+	MTwist& mt = gs->rng();
 	EnemyBehaviour& eb = e->behaviour();
 	eb.current_action = EnemyBehaviour::WANDERING;
 	eb.vx = 0, eb.vy = 0;
-	int rn = gs->level()->room_within(Pos(e->x, e->y));
+	if (eb.path.empty()){
+		if (mt.rand(100) != 0) return;
+		do {
+			int targx, targy;
+			do {
+				targx = mt.rand(tile.tile_width());
+				targy = mt.rand(tile.tile_height());
+			} while (game_tile_data[tile.get(targx,targy)].solid);
+			eb.current_node = 0;
+			eb.path = astarcontext.calculate_AStar_path(gs, e->x/TILE_SIZE, e->y/TILE_SIZE, targx,targy);
+		} while (eb.path.size() <= 1);
+	}
+	if (eb.current_node < eb.path.size()){
+		if (move_towards(e, eb.path[eb.current_node]))
+			eb.current_node++;
 
+	} else {
+		if (mt.rand(6) == 0){
+			std::reverse(eb.path.begin(), eb.path.end());
+			eb.current_node = 0;
+		}
+		else
+			eb.path.clear();
+	}
 }
 
 static bool enemy_hit(GameInst* self, GameInst* other){
@@ -60,6 +99,7 @@ void MonsterController::set_monster_headings(GameState* gs, std::vector<EnemyOfI
 		int pdist = eois[i].dist_to_player_sqr;
 
 		eb.current_action = EnemyBehaviour::CHASING_PLAYER;
+		eb.path.clear();
 		eb.action_timeout = 200;
 		//paths[pind].adjust_for_claims(e->x, e->y);
 		paths[pind].interpolated_direction(xx, yy, w, h, eb.speed, eb.vx, eb.vy);
@@ -109,14 +149,14 @@ void MonsterController::pre_step(GameState* gs) {
 	const std::vector<obj_id> pids = pc.player_ids();
 
 	std::vector<EnemyOfInterest> eois;
-	if (room_paths.empty()){
-		std::vector<Room> rooms = gs->level()->rooms;
-		room_paths = std::vector<PathInfo>( rooms.size());
-		for (int i = 0; i < room_paths.size(); i++){
-			Region& r = rooms[i].room_region;
-			room_paths[i].calculate_path(gs, (r.x+r.w/2)*TILE_SIZE, (r.y+r.h/2)*TILE_SIZE, PATHING_RADIUS);
-		}
-	}
+//	if (room_paths.empty()){
+//		std::vector<Room> rooms = gs->level()->rooms;
+//		room_paths = std::vector<PathInfo>( rooms.size());
+//		for (int i = 0; i < room_paths.size(); i++){
+//			Region& r = rooms[i].room_region;
+//			room_paths[i].calculate_path(gs, (r.x+r.w/2)*TILE_SIZE, (r.y+r.h/2)*TILE_SIZE, PATHING_RADIUS);
+//		}
+//	}
 	//Create as many paths as there are players
 	paths.resize(pids.size());
 	for (int i = 0; i < pids.size(); i++) {
@@ -142,20 +182,20 @@ void MonsterController::pre_step(GameState* gs) {
 
 		bool isvisible = gs->object_visible_test(e);
 		bool go_after_player = false;
-		//Monster repositioning
-		if (isvisible)
-			e->last_seen() = gs->rng().rand(300);
-		else
-			e->last_seen()++;
-		if (e->last_seen() > 2500 && gs->rng().rand(500) == 0) {
-			do {
-				e->x = gs->rng().rand(32, gs->width()-32);
-				e->y = gs->rng().rand(32, gs->height()-32);
-			}while (gs->solid_test(e) || gs->object_visible_test(e));
-			e->rx = e->x, e->ry = e->y;
-			e->last_seen() = gs->rng().rand(300);
-			go_after_player = gs->rng().rand(4) == 0;
-		}
+//		//Monster repositioning
+//		if (isvisible)
+//			e->last_seen() = gs->rng().rand(300);
+//		else
+//			e->last_seen()++;
+//		if (e->last_seen() > 2500 && gs->rng().rand(500) == 0) {
+//			do {
+//				e->x = gs->rng().rand(32, gs->width()-32);
+//				e->y = gs->rng().rand(32, gs->height()-32);
+//			}while (gs->solid_test(e) || gs->object_visible_test(e));
+//			e->rx = e->x, e->ry = e->y;
+//			e->last_seen() = gs->rng().rand(300);
+//			go_after_player = gs->rng().rand(4) == 0;
+//		}
 
 		//Add live instances back to monster id list
 		mids.push_back(mids2[i]);

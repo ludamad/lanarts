@@ -104,7 +104,7 @@ static int squish(int a, int b, int c) {
 	return std::min(std::max(a, b), c - 1);
 }
 
-/*Used to make sure all interpolated directions are possible*/
+
 bool PathInfo::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
 		int dy) {
 	bool is_diag = (abs(dx) == abs(dy));

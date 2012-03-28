@@ -4,17 +4,23 @@
 #include "GameInst.h"
 #include "../../gamestats/Stats.h"
 #include "../../data/enemy_data.h"
+#include <vector>
+#include "../../procedural/GeneratedLevel.h"
 
 struct EnemyBehaviour {
 	enum Action {
 		WANDERING,
 		CHASING_PLAYER
 	};
+
+	std::vector<Pos> path;
+	int current_node;
+
 	Action current_action;
 	int action_timeout;
 	float speed, vx, vy;
 	EnemyBehaviour(float speed) :
-		current_action(WANDERING), action_timeout(0), speed(speed), vx(0), vy(0){
+		current_node(0), current_action(WANDERING), action_timeout(0), speed(speed), vx(0), vy(0){
 	}
 	void step(){
 		if (action_timeout){
