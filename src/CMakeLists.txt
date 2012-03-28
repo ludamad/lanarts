@@ -54,6 +54,7 @@ set( lanarts_src
 	util/font_util.cpp
 	
 
+	world/GameAction.cpp
 	world/GameInstSet.cpp
 	world/GameState.cpp
 	world/GameLevelState.cpp
@@ -66,6 +67,7 @@ set( lanarts_src
 	
 	world/objects/AnimatedInst.cpp
 	world/objects/PlayerInst.cpp
+	world/objects/PlayerInstActions.cpp
 	world/objects/EnemyInst.cpp
 	world/objects/ItemInst.cpp
 	world/objects/BulletInst.cpp
@@ -116,7 +118,7 @@ set( lanarts_include
 	util/draw_util.h
 	util/font_util.h
 	
-
+	world/GameAction.h
 	world/GameInstSet.h
 	world/GameState.h
 	world/GameLevelState.h
