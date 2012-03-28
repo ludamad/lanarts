@@ -179,6 +179,8 @@ void gl_set_drawing_area(int x, int y, int w, int h) {
 	glEnable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_DEPTH_TEST);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glDisable(GL_CULL_FACE);
 	//glPushAttrib(GL_ENABLE_BIT);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

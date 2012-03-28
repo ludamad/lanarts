@@ -19,6 +19,10 @@
 #include "../../data/item_data.h"
 #include "TestInst.h"
 
+/*
+static FILE* saved = fopen("res/saved_replay.rep", "wb+");
+static FILE* open = fopen("res/replay.rep", "rb");
+static std::vector<GameAction> replay_actions;*/
 
 static int scan_entrance(const std::vector<GameLevelPortal>& portals,
 		const Pos& tilepos) {
@@ -38,6 +42,18 @@ static bool enemy_hit(GameInst* self, GameInst* other) {
 	return dynamic_cast<EnemyInst*>(other) != NULL;
 }
 
+/*
+static void get_current_actions(int frame, std::vector<GameAction>& actions){
+	if (open){
+		while (!feof(open)){
+			replay_actions.push_back(from_action_file(open));
+		}
+		fclose(open);
+		open = NULL;
+	}
+	for (int i = 0; i < )
+
+}*/
 
 void PlayerInst::perform_io_action(GameState* gs){
 	GameView& view = gs->window_view();
@@ -183,6 +199,7 @@ void PlayerInst::perform_io_action(GameState* gs){
 
 
 	for (int i = 0; i < actions.size(); i++){
+		//to_action_file(saved, actions[i]);
 		perform_action(gs, actions[i]);
 	}
 }

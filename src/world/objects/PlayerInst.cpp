@@ -12,9 +12,6 @@
 #include "../../data/item_data.h"
 #include "TestInst.h"
 
-FILE* saved = fopen("res/saved_replay.rep", "wb+");
-FILE* open = fopen("res/replay.rep", "wb+");
-
 PlayerInst::~PlayerInst() {
 }
 

@@ -114,10 +114,6 @@ void gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
 		GLint viewport[4];
 		glGetIntegerv(GL_VIEWPORT, viewport);
 		glDisable(GL_TEXTURE_2D);
-		glDisable(GL_DEPTH_TEST);
-		glEnable(GL_BLEND);
-		glDisable(GL_LIGHTING);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		//we'll be nice people and save the old pixel unpack alignment-
 		//while setting the unpack allignment to one couldn't possibly
