@@ -7,7 +7,7 @@
 #include "../../util/draw_util.h"
 #include "../../data/sprite_data.h"
 #include "../../data/enemy_data.h"
-
+#include "../../util/geometry.h"
 
 EnemyInst::EnemyInst(int enemytype, int x, int y) :
 	GameInst(x,y, game_enemy_data[enemytype].radius),
@@ -118,6 +118,14 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 			stats().reset_ranged_cooldown();
 		} else {
 			pinst->stats().hurt(stats().melee.damage);
+
+			char dmgstr[32];
+			itoa(stats().melee.damage, dmgstr, 10);
+			float rx, ry;
+			direction_towards(Pos(x,y), Pos(pinst->x, pinst->y), rx, ry, 0.5);
+			gs->add_instance(new AnimatedInst(pinst->x-5 + rx*5,pinst->y+ry*5, -1, 25,
+					rx, ry, dmgstr));
+
 			stats().reset_melee_cooldown();
 		}
 	}

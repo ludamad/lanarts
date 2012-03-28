@@ -109,11 +109,20 @@ bool GameState::step() {
 		return false;
 
 	frame_n++;
+	const int SIMULATE_TIMEOUT = 1000;
+	GameLevelState* current_level = lvl;
+	current_level->simulate_count = 1000;
 	for (int i = 0; i < level_states.size(); i++){
-		lvl->pc.pre_step(this);
-		lvl->mc.pre_step(this);
-		lvl->inst_set.step(this);
+		if (level_states[i]->simulate_count > 0){
+			//Set so that all the GameState getters are properly updated
+			lvl = level_states[i];
+			lvl->pc.pre_step(this);
+			lvl->mc.pre_step(this);
+			lvl->inst_set.step(this);
+			lvl->simulate_count--;
+		}
 	}
+	lvl = current_level;
 	return true;
 }
 

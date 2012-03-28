@@ -1,16 +1,32 @@
-- Refactor room generation with tiered room, tunnel, feature, item generation. [DONE]
-- (Long term) versatile save format that allows for resuming a networked game even through major game updates
+Done:
+- [DONE] Refactor room generation with tiered room, tunnel, feature, item generation.
+- [DONE] Move out of combat
+- [DONE] Melee attack animation 
 - [DONE] versatile markup format that allows for human edit-able game objects (YAML?)
+
+Done with Issues:
+-[DONE - MAY RESURFACE DURING MONSTER SPAWNING] Fix monsters getting stuck due to random movement 
+-[DONE - CURRENTLY HARDCODED] Action bar, below screen 
+
+Complex:
 - (Continual) Networked play over LAN with action-based synchronization
-
-- Move out of combat [DONE]
-- Action bar, below screen [IN PROGRESS]
-- Lightning Spells takes up multiple squares
-- Melee attack animation [DONE]
 - Classes for players
+- (Long term) versatile save format that allows for resuming a networked game even through major game updates
+
+Some complexity:
+- Weapons spawn on ground
+- Weapons are usable, with graphical validation (unhardcode them)
+- Lightning Spell that takes up multiple squares
+
+- Support for multiple PlayerInst (Maybe re-use PlayerInst for summoned monsters ?)
+- Unification of code-path's for PlayerInst/EnemyInst ?
+- Actions for players & action replay
+
+- Refactor away all enum's for resources so order no longer matters
+- ^ This implies: Put tile-set information in the YAML files for level generation
 
 
--Fix monsters getting stuck due to random movement
--Fix items on border of view not being visible -> subtract away from player and check visibility
-
--More visual output on the minimap
+Trivial:
+- Add cooldowns to item use
+- More visual output on the minimap [Stairs etc]
+- Fix items on border of view not being visible -> subtract away from player and check visibility??

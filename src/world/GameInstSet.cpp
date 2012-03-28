@@ -92,7 +92,7 @@ void GameInstSet::reallocate_hashset_() {
 	delete[] old_set;
 
 }
-static inline int get_xyind(const Coord& c, int grid_w) {
+static inline int get_xyind(const Pos& c, int grid_w) {
 	return (c.y / GameInstSet::REGION_SIZE) * grid_w
 			+ c.x / GameInstSet::REGION_SIZE;
 }
@@ -104,7 +104,7 @@ void GameInstSet::remove(GameInst* inst) {
 			unit_capacity);
 
 //	InstState* is = tset_find<GameInstSetFunctions> (id, unit_set, unit_capacity);
-	obj_id* start_id = &unit_grid[get_xyind(Coord(inst->last_x, inst->last_y),
+	obj_id* start_id = &unit_grid[get_xyind(Pos(inst->last_x, inst->last_y),
 			grid_w)];
 	InstState* next = state->next_in_grid;
 	InstState* prev = state->prev_in_grid;
@@ -128,7 +128,7 @@ obj_id GameInstSet::add(GameInst* inst) {
 		this->reallocate_hashset_();
 
 	InstState* unit_state;
-	Coord c(inst->last_x, inst->last_y);
+	Pos c(inst->last_x, inst->last_y);
 	InstState* data = unit_set;
 
 	//TODO: cause a more descriptive error
@@ -161,8 +161,8 @@ obj_id GameInstSet::add(GameInst* inst) {
 void GameInstSet::update_instance(InstState* state, GameInst* inst) {
 	if (inst->destroyed)
 		return;
-	int old_bucket = get_xyind(Coord(inst->last_x, inst->last_y), grid_w);
-	int new_bucket = get_xyind(Coord(inst->x, inst->y), grid_w);
+	int old_bucket = get_xyind(Pos(inst->last_x, inst->last_y), grid_w);
+	int new_bucket = get_xyind(Pos(inst->x, inst->y), grid_w);
 	InstState* st = tset_find<GameInstSetFunctions>(inst->id, unit_set,
 			unit_capacity);
 	bool has_id = false;
@@ -247,7 +247,7 @@ std::vector<GameInst*> GameInstSet::to_vector() {
 	}
 	return ret;
 }
-GameInst* GameInstSet::get_by_coord(const Coord& c) {
+GameInst* GameInstSet::get_by_Pos(const Pos& c) {
 	int start_id = unit_grid[get_xyind(c, grid_w)];
 	if (!start_id)
 		return NULL;
@@ -335,7 +335,7 @@ GameInst* GameInstSet::object_nearest_test(GameInst* obj, int max_radius, col_fi
 
 	int max_search = max_radius/TILE_SIZE+1;
 
-	Coord c(obj->x/REGION_SIZE, obj->y/REGION_SIZE);
+	Pos c(obj->x/REGION_SIZE, obj->y/REGION_SIZE);
 
 	for (int rad = 1; rad < max_search; rad++){
 		int start_id = unit_grid[get_xyind(c, grid_w)];

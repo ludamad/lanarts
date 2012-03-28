@@ -20,6 +20,8 @@ void AnimatedInst::step(GameState* gs){
 
 }
 void AnimatedInst::draw(GameState* gs){
+	x = round(rx += vx);
+	y = round(ry += vy);
 	GameView& view = gs->window_view();
 	if (sprite > -1){
 		GLImage& img = game_sprite_data[sprite].img;
@@ -36,6 +38,8 @@ void AnimatedInst::draw(GameState* gs){
 		image_display(&img, xx - view.x, yy - view.y, alphacol);
 	}
 	if (text.size() > 0){
-		gl_printf(gs->primary_font(), Colour(255,0,0), x, y, "%s", text.c_str());
+		int fade =100*timeleft*2/animatetime;
+		Colour alphacol(255,255-fade,255-fade);
+		gl_printf(gs->primary_font(), alphacol, x - view.x, y - view.y, "%s", text.c_str());
 	}
 }

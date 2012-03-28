@@ -8,6 +8,7 @@
 #include <cstring>
 #include <vector>
 #include "mtwist.h"
+#include "../util/geometry.h"
 
 enum feature_t {
 	UNSET = 0,
@@ -38,26 +39,6 @@ struct Sqr {
 	}
 };
 
-struct Pos {
-	int x, y;
-	Pos() {}
-	bool operator==(const Pos& o) const {
-		return o.x == x && o.y == y;
-	}
-	Pos(int x, int y) :
-			x(x), y(y) {
-	}
-};
-
-struct Region {
-	int x, y, w, h;
-	Region(int x, int y, int w, int h) :
-			x(x), y(y), w(w), h(h) {
-	}
-	inline Pos pos() {
-		return Pos(x, y);
-	}
-};
 
 struct Room {
 	Region room_region;

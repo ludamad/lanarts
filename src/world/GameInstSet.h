@@ -9,6 +9,7 @@
 #define UNITSET_H_
 
 #include "../util/settools.h"
+#include "../util/geometry.h"
 #include "objects/GameInst.h"
 #include <vector>
 
@@ -33,7 +34,7 @@ public:
 
 	//Returns NULL if no unit found
 	GameInst* get_by_id(int id);
-	GameInst* get_by_coord(const Coord& c);
+	GameInst* get_by_Pos(const Pos& c);
 
 	GameInst* object_nearest_test(GameInst* obj, int max_radius, col_filterf f = NULL);
 	int object_radius_test(GameInst* obj, GameInst** objs = NULL, int obj_cap = 0, col_filterf f = NULL, int x=-1, int y=-1, int radius=-1);

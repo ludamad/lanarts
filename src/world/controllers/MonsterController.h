@@ -44,6 +44,7 @@ public:
 public:
 	void monster_wandering(GameState* gs, EnemyInst* e);
 	void monster_follow_path(GameState* gs, EnemyInst* e);
+	void monster_get_to_stairs(GameState* gs, EnemyInst* e);
 
 	AStarPathFind astarcontext;
 	obj_id targetted;

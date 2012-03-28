@@ -16,14 +16,18 @@ const int DONT_DRAW_SPRITE = -1;
 class AnimatedInst: public GameInst {
 public:
 	enum {RADIUS = 10, VISION_SUBSQRS = 1};
-	AnimatedInst(int x, int y, int sprite, int animatetime, std::string text = std::string()) :
-		GameInst(x,y, RADIUS, false), sprite(sprite), timeleft(animatetime), animatetime(animatetime), text(text){}
+	AnimatedInst(int x, int y, int sprite, int animatetime, float vx =0, float vy=0, std::string text = std::string()) :
+		GameInst(x,y, RADIUS, false),
+		rx(x), ry(y), vx(vx), vy(vy),
+		sprite(sprite), timeleft(animatetime), animatetime(animatetime),
+		text(text){}
 	virtual ~AnimatedInst();
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
 private:
-	std::string text;
+	float rx, ry, vx, vy;
 	int sprite, timeleft, animatetime;
+	std::string text;
 };
 
 

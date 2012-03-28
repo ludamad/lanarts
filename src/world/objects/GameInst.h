@@ -12,16 +12,16 @@
 #include <cassert>
 
 typedef int obj_id;
-
-//struct for game coordinates
-struct Coord {
-	int x, y;
-	inline Coord(){}
-	inline Coord(int x, int y) : x(x), y(y) { }
-	bool operator=(const Coord& c){
-		return x == c.x && y == c.y;
-	}
-};
+//
+////struct for game coordinates
+//struct Coord {
+//	int x, y;
+//	inline Coord(){}
+//	inline Coord(int x, int y) : x(x), y(y) { }
+//	bool operator=(const Coord& c){
+//		return x == c.x && y == c.y;
+//	}
+//};
 
 #define LANARTS_ASSERT(x) assert(x)
 

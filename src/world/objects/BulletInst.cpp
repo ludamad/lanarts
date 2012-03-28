@@ -83,12 +83,24 @@ void BulletInst::step(GameState* gs) {
 			if (e->hurt(gs, attack.damage)) {
 				((PlayerInst*)origin)->stats().gain_xp(e->xpworth());
 			}
-		}
+			char dmgstr[32];
+			itoa(attack.damage, dmgstr, 10);
+			float rx = vx/attack.projectile_speed*.5;
+			float ry = vy/attack.projectile_speed*.5;
+			gs->add_instance(new AnimatedInst(e->x-5 + rx*5,e->y+ry*5, -1, 25,
+					rx, ry, dmgstr));
+}
 	} else {
 		gs->object_radius_test(this, &colobj, 1, &player_hit);
 		if (colobj){
 			Stats& s = ((PlayerInst*)colobj)->stats();
 			s.hurt(attack.damage);
+			char dmgstr[32];
+			itoa(attack.damage, dmgstr, 10);
+			float rx = vx/attack.projectile_speed*.5;
+			float ry = vy/attack.projectile_speed*.5;
+			gs->add_instance(new AnimatedInst(colobj->x-5 + rx*5,colobj->y+ry*5, -1, 25,
+					rx, ry, dmgstr));
 		}
 	}
 	if (colobj || range_left <= 0){

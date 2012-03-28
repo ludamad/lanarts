@@ -11,6 +11,10 @@
 
 #include "../../data/sprite_data.h"
 
+#include "../GameAction.h"
+
+const int REST_COOLDOWN = 150;
+
 class PlayerInst: public GameInst {
 public:
 	enum {
@@ -29,6 +33,10 @@ public:
 	virtual void init(GameState *gs);
 	virtual void step(GameState *gs);
 	virtual void draw(GameState *gs);
+
+	void perform_io_action(GameState* gs);
+	void perform_action(GameState* gs, const GameAction& action);
+
 	Stats & stats() {
 		return base_stats;
 	}
@@ -59,9 +67,13 @@ public:
 	}
 
 private:
-	void use_move_and_melee(GameState *gs);
-	void use_staircase(GameState *gs);
-	void use_spell(GameState *gs);
+	void use_move_and_melee(GameState *gs, const GameAction& action);
+	void use_dngn_exit(GameState* gs, const GameAction& action);
+	void use_dngn_entrance(GameState *gs, const GameAction& action);
+	void use_spell(GameState *gs, const GameAction& action);
+	void use_rest(GameState *gs, const GameAction& action);
+	void use_item(GameState *gs, const GameAction& action);
+	void pickup_item(GameState* gs, const GameAction& action);
 
 	Stats base_stats;
 	Effects effects;

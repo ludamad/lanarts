@@ -138,6 +138,7 @@ public:
 		gennextstep = true;
 	}
 
+	void level_transfer(GameInst* inst, int x, int y);
 	void regen_level();
 	void reset_level();
 	void set_level(int levelnum, bool reset);
