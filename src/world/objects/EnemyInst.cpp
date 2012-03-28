@@ -120,7 +120,7 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 			pinst->stats().hurt(stats().melee.damage);
 
 			char dmgstr[32];
-			itoa(stats().melee.damage, dmgstr, 10);
+			snprintf(dmgstr, 32, "%d", stats().melee.damage);
 			float rx, ry;
 			direction_towards(Pos(x,y), Pos(pinst->x, pinst->y), rx, ry, 0.5);
 			gs->add_instance(new AnimatedInst(pinst->x-5 + rx*5,pinst->y+ry*5, -1, 25,

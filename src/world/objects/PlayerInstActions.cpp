@@ -279,7 +279,7 @@ void PlayerInst::use_move_and_melee(GameState* gs, const GameAction& action) {
 			stats().reset_melee_cooldown(effective_stats());
 			gs->add_instance(new AnimatedInst(target->x, target->y, SPR_SHORT_SWORD, 25));
 			char dmgstr[32];
-			itoa(damage, dmgstr, 10);
+			snprintf(dmgstr, 32, "%d", damage);
 			float rx, ry;
 			direction_towards(Pos(x,y), Pos(target->x, target->y), rx, ry, 0.5);
 			gs->add_instance(new AnimatedInst(target->x-5+rx*5, target->y-3+rx*5, -1, 25, rx, ry, dmgstr));

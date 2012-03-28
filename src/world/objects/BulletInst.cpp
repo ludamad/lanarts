@@ -84,7 +84,7 @@ void BulletInst::step(GameState* gs) {
 				((PlayerInst*)origin)->stats().gain_xp(e->xpworth());
 			}
 			char dmgstr[32];
-			itoa(attack.damage, dmgstr, 10);
+			snprintf(dmgstr, 32, "%d", attack.damage);
 			float rx = vx/attack.projectile_speed*.5;
 			float ry = vy/attack.projectile_speed*.5;
 			gs->add_instance(new AnimatedInst(e->x-5 + rx*5,e->y+ry*5, -1, 25,
@@ -96,7 +96,7 @@ void BulletInst::step(GameState* gs) {
 			Stats& s = ((PlayerInst*)colobj)->stats();
 			s.hurt(attack.damage);
 			char dmgstr[32];
-			itoa(attack.damage, dmgstr, 10);
+			snprintf(dmgstr, 32, "%d", attack.damage);
 			float rx = vx/attack.projectile_speed*.5;
 			float ry = vy/attack.projectile_speed*.5;
 			gs->add_instance(new AnimatedInst(colobj->x-5 + rx*5,colobj->y+ry*5, -1, 25,
