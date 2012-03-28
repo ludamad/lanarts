@@ -30,4 +30,7 @@ void SDL_GL_diagnostics();
 
 void gl_image_from_bytes(GLImage* img, int w, int h, char* data, int type = GL_BGRA);
 
+void copy_to_buffer(int w, int h, char* data);
+extern char buffer[64*64*4];
+
 #endif /* DISPLAY_H_ */

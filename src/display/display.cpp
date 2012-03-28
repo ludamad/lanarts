@@ -207,8 +207,8 @@ void gl_image_from_bytes(GLImage* img, int w, int h, char* data, int type) {
 		glGenTextures(1, &img->texture);
 
 	int ptw = power_of_two(w), pth = power_of_two(h);
-	ptw = std::min(64, ptw);
-	pth = std::min(64, pth);
+	ptw = std::max(16, ptw);
+	pth = std::max(16, pth);
 
 	img->width = w, img->height = h;
 	img->texw = w / ((float) ptw);
@@ -219,7 +219,7 @@ void gl_image_from_bytes(GLImage* img, int w, int h, char* data, int type) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//	if (!was_init)
+	if (!was_init)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, ptw, pth, 0, type,
 				GL_UNSIGNED_BYTE, data);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, type, GL_UNSIGNED_BYTE,

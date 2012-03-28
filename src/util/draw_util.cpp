@@ -151,13 +151,13 @@ void gl_printf2(const font_data &ft_font, const Colour& colour, float x, float y
 	}
 }
 
-
+GLImage font_img;
 ///Much like Nehe's glPrint function, but modified to work
 ///with freetype fonts.
 void gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
 		const char *fmt, ...) {
 	//	float h=ft_font.h/.63f;						//We make the height about 1.5* that of
-	GLImage img;
+
 	char text[256]; // Holds Our String
 	va_list ap; // Pointer To List Of Arguments
 
@@ -180,21 +180,21 @@ void gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
 	for (char* iter = text; iter < text + textlen;
 			iter += strlen(iter) + 1, y += ft_font.h + 1) {
 //
-		//glPushAttrib(GL_CURRENT_BIT | GL_PIXEL_MODE_BIT | GL_ENABLE_BIT);
+	//	glPushAttrib(GL_CURRENT_BIT | GL_PIXEL_MODE_BIT | GL_ENABLE_BIT);
 //
 //		//we'll be nice people and save the old pixel unpack alignment-
 //		//while setting the unpack allignment to one couldn't possibly
 //		//hurt anyone else's pixel drawing, it might slow it down.
 		int old_unpack;
-		//glGetIntegerv(GL_UNPACK_ALIGNMENT, &old_unpack);
-		//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glGetIntegerv(GL_UNPACK_ALIGNMENT, &old_unpack);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		for (int i = 0; iter[i]; i++) {
 			const char_data &cdata = *ft_font.data[iter[i]];
 			len += cdata.advance;
-			gl_image_from_bytes(&img, cdata.w, cdata.h, (char*)cdata.data, GL_BGRA);
+			gl_image_from_bytes(&font_img, cdata.w, cdata.h, (char*)cdata.data, GL_BGRA);
 			int up = cdata.h - cdata.move_up;
-			image_display(&img, x-len-cdata.left, y -cdata.move_up, colour);
+			image_display(&font_img, x+len-(cdata.w-cdata.left), y -cdata.move_up, colour);
 
 		}
 //
