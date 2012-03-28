@@ -41,6 +41,8 @@ struct GameLevelState{
 		}
 		return -1;
 	}
+	//How many steps a level should be simulated after you leave it
+	int simulate_count;
 	//Game location information
 	int branch_number, level_number;
 

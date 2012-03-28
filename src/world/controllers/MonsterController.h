@@ -43,6 +43,8 @@ public:
 	void set_monster_headings(GameState* gs, std::vector<EnemyOfInterest>& eois);
 public:
 	void monster_wandering(GameState* gs, EnemyInst* e);
+	void monster_follow_path(GameState* gs, EnemyInst* e);
+
 	AStarPathFind astarcontext;
 	obj_id targetted;
 	std::vector<PathInfo> room_paths;

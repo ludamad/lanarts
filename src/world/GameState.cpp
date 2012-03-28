@@ -109,9 +109,11 @@ bool GameState::step() {
 		return false;
 
 	frame_n++;
-	lvl->pc.pre_step(this);
-	lvl->mc.pre_step(this);
-	lvl->inst_set.step(this);
+	for (int i = 0; i < level_states.size(); i++){
+		lvl->pc.pre_step(this);
+		lvl->mc.pre_step(this);
+		lvl->inst_set.step(this);
+	}
 	return true;
 }
 

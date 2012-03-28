@@ -39,34 +39,19 @@ bool move_towards(EnemyInst* e, const Pos& p){
 	EnemyBehaviour& eb = e->behaviour();
 	float dx = p.x - e->x, dy = p.y - e->y;
 	float mag = sqrt(dx*dx+dy*dy);
-	if (mag <= eb.speed){
+	if (mag <= eb.speed/2){
 		eb.vx = dx;
 		eb.vy = dy;
 		return true;
 	}
-	eb.vx = dx/mag*eb.speed;
-	eb.vy = dy/mag*eb.speed;
+	eb.vx = dx/mag*eb.speed/2;
+	eb.vy = dy/mag*eb.speed/2;
 	return false;
 }
-void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
-	//TODO: actually make the monster wander room to room
-	GameTiles& tile = gs->tile_grid();
+
+void MonsterController::monster_follow_path(GameState* gs, EnemyInst* e){
 	MTwist& mt = gs->rng();
 	EnemyBehaviour& eb = e->behaviour();
-	eb.current_action = EnemyBehaviour::WANDERING;
-	eb.vx = 0, eb.vy = 0;
-	if (eb.path.empty()){
-		if (mt.rand(100) != 0) return;
-		do {
-			int targx, targy;
-			do {
-				targx = mt.rand(tile.tile_width());
-				targy = mt.rand(tile.tile_height());
-			} while (game_tile_data[tile.get(targx,targy)].solid);
-			eb.current_node = 0;
-			eb.path = astarcontext.calculate_AStar_path(gs, e->x/TILE_SIZE, e->y/TILE_SIZE, targx,targy);
-		} while (eb.path.size() <= 1);
-	}
 	if (eb.current_node < eb.path.size()){
 		if (move_towards(e, eb.path[eb.current_node]))
 			eb.current_node++;
@@ -78,6 +63,40 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 		}
 		else
 			eb.path.clear();
+			eb.current_action = EnemyBehaviour::INACTIVE;
+	}
+}
+void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
+	GameTiles& tile = gs->tile_grid();
+	MTwist& mt = gs->rng();
+	EnemyBehaviour& eb = e->behaviour();
+	eb.vx = 0, eb.vy = 0;
+	bool is_fullpath = true;
+	if (eb.path_cooldown > 0){
+		eb.path_cooldown--;
+		is_fullpath = false;
+	}
+	int ex = e->x/TILE_SIZE, ey = e->y/TILE_SIZE;
+
+	if (eb.path.empty()){
+		do {
+			int targx, targy;
+			do {
+				if (!is_fullpath){
+					targx = ex+mt.rand(-3, 4);
+					targy = ey+mt.rand(-3, 4);
+				}else {
+					targx = mt.rand(tile.tile_width());
+					targy = mt.rand(tile.tile_height());
+
+				}
+			} while (game_tile_data[tile.get(targx,targy)].solid);
+			eb.current_node = 0;
+			eb.path = astarcontext.calculate_AStar_path(gs, ex, ey, targx,targy);
+			if (is_fullpath)
+				eb.path_cooldown = mt.rand(EnemyBehaviour::RANDOM_WALK_COOLDOWN*2);
+			eb.current_action = EnemyBehaviour::FOLLOWING_PATH;
+		} while (eb.path.size() <= 1);
 	}
 }
 
@@ -182,20 +201,6 @@ void MonsterController::pre_step(GameState* gs) {
 
 		bool isvisible = gs->object_visible_test(e);
 		bool go_after_player = false;
-//		//Monster repositioning
-//		if (isvisible)
-//			e->last_seen() = gs->rng().rand(300);
-//		else
-//			e->last_seen()++;
-//		if (e->last_seen() > 2500 && gs->rng().rand(500) == 0) {
-//			do {
-//				e->x = gs->rng().rand(32, gs->width()-32);
-//				e->y = gs->rng().rand(32, gs->height()-32);
-//			}while (gs->solid_test(e) || gs->object_visible_test(e));
-//			e->rx = e->x, e->ry = e->y;
-//			e->last_seen() = gs->rng().rand(300);
-//			go_after_player = gs->rng().rand(4) == 0;
-//		}
 
 		//Add live instances back to monster id list
 		mids.push_back(mids2[i]);
@@ -213,10 +218,8 @@ void MonsterController::pre_step(GameState* gs) {
 			if (isvisible) ((PlayerInst*)player)->rest_cooldown() = 150;
 			view.sharp_center_on(player->x, player->y);
 			bool chasing = e->behaviour().current_action == EnemyBehaviour::CHASING_PLAYER;
-			if (view.within_view(xx, yy, w, h) && (go_after_player || chasing || isvisible)) {
-				if (go_after_player){
-					e->behaviour().current_action = EnemyBehaviour::CHASING_PLAYER;
-				}
+			if (view.within_view(xx, yy, w, h) && (chasing || isvisible)) {
+				e->behaviour().current_action = EnemyBehaviour::CHASING_PLAYER;
 				int dx = e->x - player->x, dy = e->y - player->y;
 				int distsqr = dx * dx + dy * dy;
 				if (distsqr > 0 /*overflow check*/) {
@@ -227,10 +230,17 @@ void MonsterController::pre_step(GameState* gs) {
 				}
 			}
 		}
-		if (closest_player_index != -1) {
+		if (closest_player_index == -1 &&
+				e->behaviour().current_action == EnemyBehaviour::CHASING_PLAYER)
+			e->behaviour().current_action = EnemyBehaviour::INACTIVE;
+
+
+		if (e->behaviour().current_action == EnemyBehaviour::CHASING_PLAYER)
 			eois.push_back(EnemyOfInterest(e, closest_player_index, mindistsqr));
-		} else
+		else if (e->behaviour().current_action == EnemyBehaviour::INACTIVE)
 			monster_wandering(gs, e);
+		else if (e->behaviour().current_action == EnemyBehaviour::FOLLOWING_PATH)
+			monster_follow_path(gs, e);
 	}
 	std::sort(eois.begin(), eois.end());
 	set_monster_headings(gs, eois);
@@ -250,3 +260,19 @@ void MonsterController::clear(){
 	paths.clear();
 	mids.clear();
 }
+
+
+//		//Monster repositioning
+//		if (isvisible)
+//			e->last_seen() = gs->rng().rand(300);
+//		else
+//			e->last_seen()++;
+//		if (e->last_seen() > 2500 && gs->rng().rand(500) == 0) {
+//			do {
+//				e->x = gs->rng().rand(32, gs->width()-32);
+//				e->y = gs->rng().rand(32, gs->height()-32);
+//			}while (gs->solid_test(e) || gs->object_visible_test(e));
+//			e->rx = e->x, e->ry = e->y;
+//			e->last_seen() = gs->rng().rand(300);
+//			go_after_player = gs->rng().rand(4) == 0;
+//		}

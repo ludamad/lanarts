@@ -60,9 +60,13 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 		Region r = level.rooms()[room].room_region;
 		for (int i = 0; i < number; i++){
 			Pos epos;
+			int tries = 0;
 			do {
-				epos = generate_location_in_region(mt, level, r);
-			} while (level.at(epos).near_entrance);
+				if (tries++ < 20){
+					epos = generate_location_in_region(mt, level, r);
+				} else
+					epos = generate_location(mt, level);
+			} while ( level.at(epos).near_entrance);
 			level.at(epos).has_instance = true;
 			int ex = (epos.x + start_x) * 32 + 16;
 			int ey = (epos.y + start_y) * 32 + 16;

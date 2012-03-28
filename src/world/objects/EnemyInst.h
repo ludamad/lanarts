@@ -8,25 +8,31 @@
 #include "../../procedural/GeneratedLevel.h"
 
 struct EnemyBehaviour {
+	enum {
+		RANDOM_WALK_COOLDOWN = 3000
+	};
 	enum Action {
-		WANDERING,
+		INACTIVE,
+		FOLLOWING_PATH,
 		CHASING_PLAYER
 	};
 
 	std::vector<Pos> path;
 	int current_node;
+	int path_cooldown;
 
 	Action current_action;
 	int action_timeout;
 	float speed, vx, vy;
 	EnemyBehaviour(float speed) :
-		current_node(0), current_action(WANDERING), action_timeout(0), speed(speed), vx(0), vy(0){
+		current_node(0), path_cooldown(0),
+		current_action(INACTIVE), action_timeout(0), speed(speed), vx(0), vy(0){
 	}
 	void step(){
 		if (action_timeout){
 			action_timeout--;
 			if (action_timeout == 0){
-				current_action = WANDERING;
+				current_action = INACTIVE;
 			}
 		}
 	}
