@@ -78,26 +78,24 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	}
 	int ex = e->x/TILE_SIZE, ey = e->y/TILE_SIZE;
 
-	if (eb.path.empty()){
+	do {
+		int targx, targy;
 		do {
-			int targx, targy;
-			do {
-				if (!is_fullpath){
-					targx = ex+mt.rand(-3, 4);
-					targy = ey+mt.rand(-3, 4);
-				}else {
-					targx = mt.rand(tile.tile_width());
-					targy = mt.rand(tile.tile_height());
+			if (!is_fullpath){
+				targx = ex+mt.rand(-3, 4);
+				targy = ey+mt.rand(-3, 4);
+			}else {
+				targx = mt.rand(tile.tile_width());
+				targy = mt.rand(tile.tile_height());
 
-				}
-			} while (game_tile_data[tile.get(targx,targy)].solid);
-			eb.current_node = 0;
-			eb.path = astarcontext.calculate_AStar_path(gs, ex, ey, targx,targy);
-			if (is_fullpath)
-				eb.path_cooldown = mt.rand(EnemyBehaviour::RANDOM_WALK_COOLDOWN*2);
-			eb.current_action = EnemyBehaviour::FOLLOWING_PATH;
-		} while (eb.path.size() <= 1);
-	}
+			}
+		} while (game_tile_data[tile.get(targx,targy)].solid);
+		eb.current_node = 0;
+		eb.path = astarcontext.calculate_AStar_path(gs, ex, ey, targx,targy);
+		if (is_fullpath)
+			eb.path_cooldown = mt.rand(EnemyBehaviour::RANDOM_WALK_COOLDOWN*2);
+		eb.current_action = EnemyBehaviour::FOLLOWING_PATH;
+	} while (eb.path.size() <= 1);
 }
 
 static bool enemy_hit(GameInst* self, GameInst* other){
