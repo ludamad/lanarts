@@ -14,7 +14,7 @@ include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE
 set( lanarts_src
 	gamestats/Item.cpp
 	
-	data/init/load_data.cpp
+	data/init/load_sprite_data.cpp
 	data/init/load_dungeon_data.cpp
 	data/init/load_enemy_data.cpp
 	data/init/load_item_data.cpp
@@ -25,9 +25,6 @@ set( lanarts_src
 	data/enemy_data.cpp
 	data/game_data.cpp
 	data/item_data.cpp
-	data/tile_data.cpp
-	data/sprite_data.cpp
-	data/dungeon_data.cpp
 	
 	display/display.cpp
 	display/GLImage.cpp
