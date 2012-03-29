@@ -134,7 +134,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 
 				int px = x, py = y;
 				x = rmx, y = rmy;
-				if (!stats().has_cooldown() && stats().mp >= 50
+				if ( stats().mp >= 50
 						&& !gs->solid_test(this)
 						&& gs->object_visible_test(this)) {
 					actions.push_back(
@@ -302,8 +302,13 @@ void PlayerInst::use_move_and_melee(GameState* gs, const GameAction& action) {
 
 	if (ddx == 0 && ddy == 0) {
 		if (target && !stats().has_cooldown()) {
-			int damage = effective_stats().melee.damage + gs->rng().rand(-4, 5);
-
+			//int damage = effective_stats().melee.damage + gs->rng().rand(-4, 5);
+			WeaponType& wtype = game_weapon_data[weapon_type()];
+			Stats ef = effective_stats();
+			int base_damage = gs->rng().rand(wtype.base_mindmg, wtype.base_maxdmg+1);
+			StatModifier& sm = wtype.damage_multiplier;
+			float statdmg = ef.strength*sm.strength_mult + ef.dexterity*sm.dexterity_mult + ef.magic*sm.magic_mult;
+			int damage = round(statdmg) + base_damage;
 			char buffstr[32];
 			snprintf(buffstr, 32, "%d", damage);
 			float rx, ry;
