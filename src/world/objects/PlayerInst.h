@@ -20,11 +20,10 @@ public:
 	enum {
 		RADIUS = 10, VISION_SUBSQRS = 1
 	};
-	PlayerInst(int x, int y) :
-			GameInst(x, y, RADIUS), base_stats(4, 100, 100,
-					Attack(true, 10, 25, 40),
-					Attack(true, 8, 400, 40, SPR_FIREBOLT, 7)), canrestcooldown(
+	PlayerInst(const Stats& start_stats, int x, int y) :
+			GameInst(x, y, RADIUS), base_stats(start_stats), canrestcooldown(
 					0), money(0) {
+		weapon = 0;
 		portal = NULL;
 		spellselect = 0;//Fireball
 	}
@@ -60,6 +59,9 @@ public:
 	int gold() {
 		return money;
 	}
+	int& weapon_type(){
+		return weapon;
+	}
 
 	Inventory inventory;
 	GameLevelPortal *portal_used() {
@@ -75,6 +77,7 @@ private:
 	void use_item(GameState *gs, const GameAction& action);
 	void pickup_item(GameState* gs, const GameAction& action);
 
+	int weapon;
 	Stats base_stats;
 	Effects effects;
 	int canrestcooldown;

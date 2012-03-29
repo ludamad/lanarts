@@ -22,8 +22,8 @@ enemies:
         hp: 10
         hpregen: 0.08
     attacks:
-      - damage: 2
-        cooldown: 5
+      - damage: 8
+        cooldown: 20
         
   - name: Zombie
     sprite: zombie

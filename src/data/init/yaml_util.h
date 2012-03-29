@@ -12,6 +12,8 @@
 #include <yaml-cpp/yaml.h>
 #include "../../world/objects/GameInst.h"
 #include "../game_data.h"
+#include "../../gamestats/Stats.h"
+#include "../weapon_data.h"
 
 struct GenRange {
 	int min, max;
@@ -62,6 +64,44 @@ inline T parse_defaulted(const YAML::Node& n, const char* key, const T& dflt){
 	return ret;
 }
 
+template <class T>
+inline void optional_set(const YAML::Node& node, const char* key, T& value){
+	if (hasnode(node, key)){
+		node[key] >> value;
+	}
+}
+inline void optional_set(const YAML::Node& node, const char* key, bool& value){
+	if (hasnode(node, key)){
+		int val;
+		node[key] >> val;
+		value = val;
+	}
+}
+
+inline Stats parse_stats(const YAML::Node& n, const std::vector<Attack>& attacks){
+	Stats ret_stats;
+
+	n["movespeed"] >> ret_stats.movespeed;
+
+	n["hp"] >> ret_stats.max_hp;
+	ret_stats.max_mp = parse_defaulted(n, "mp", 0);
+	ret_stats.hpregen = parse_defaulted(n,"hpregen",0.0);
+	ret_stats.mpregen = parse_defaulted(n,"mpregen",0.0);
+	ret_stats.hp = ret_stats.max_hp;
+	ret_stats.mp = ret_stats.max_hp;
+	ret_stats.strength = parse_defaulted(n, "strength", 0);
+	ret_stats.dexterity = parse_defaulted(n, "dexterity", 0);
+	ret_stats.magic = parse_defaulted(n, "magic", 0);
+	ret_stats.xpneeded = parse_defaulted(n, "xpneeded", 125);
+	ret_stats.xplevel = parse_defaulted(n, "xplevel", 1);
+	for (int i = 0; i < attacks.size(); i++){
+		if (!attacks[i].isprojectile)
+			ret_stats.melee = attacks[i];
+		if (attacks[i].isprojectile)
+			ret_stats.ranged = attacks[i];
+	}
+	return ret_stats;
+}
 
 inline GenRange parse_range(const YAML::Node& n){
 	GenRange gr;
@@ -75,6 +115,14 @@ inline GenRange parse_range(const YAML::Node& n){
 		gr.max = gr.min;
 	}
 	return gr;
+}
+
+inline StatModifier parse_modifiers(const YAML::Node& n){
+	StatModifier stat;
+	optional_set(n, "strength", stat.strength_mult);
+	optional_set(n, "dexterity", stat.dexterity_mult);
+	optional_set(n, "magic", stat.magic_mult);
+	return stat;
 }
 
 inline const char* parse_cstr(const YAML::Node& n){

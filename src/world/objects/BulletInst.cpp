@@ -80,15 +80,19 @@ void BulletInst::step(GameState* gs) {
 			gs->object_radius_test(this, &colobj, 1, &enemy_hit);
 		if (colobj){
 			EnemyInst* e = (EnemyInst*)colobj;
-			if (e->hurt(gs, attack.damage)) {
-				((PlayerInst*)origin)->stats().gain_xp(e->xpworth());
-			}
-			char dmgstr[32];
-			snprintf(dmgstr, 32, "%d", attack.damage);
+			char buffstr[32];
+			snprintf(buffstr, 32, "%d", attack.damage);
 			float rx = vx/attack.projectile_speed*.5;
 			float ry = vy/attack.projectile_speed*.5;
 			gs->add_instance(new AnimatedInst(e->x-5 + rx*5,e->y+ry*5, -1, 25,
-					rx, ry, dmgstr));
+					rx, ry, buffstr));
+			if (e->hurt(gs, attack.damage)) {
+				((PlayerInst*)origin)->stats().gain_xp(e->xpworth());
+
+				snprintf(buffstr, 32, "%d XP", e->xpworth());
+				gs->add_instance(new AnimatedInst(e->x, e->y, -1, 25,
+						0,0, buffstr, Colour(255,215,11)));
+			}
 }
 	} else {
 		gs->object_radius_test(this, &colobj, 1, &player_hit);

@@ -14,7 +14,7 @@
 #include "objects/GameInst.h"
 #include "GameInstSet.h"
 
-#define INVENTORY_POSITION 312
+#define INVENTORY_POSITION 327
 
 
 /* Component of GameState that draws statistic overview */

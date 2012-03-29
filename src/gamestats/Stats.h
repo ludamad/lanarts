@@ -27,14 +27,16 @@ struct Stats {
 	int hurt_cooldown;
 	float hp_regened, mp_regened;
 
-	int weapontype;
 	Attack melee, ranged;
 
 	int xp, xpneeded, xplevel;
+
+	int strength, dexterity, magic;
 	Stats() {
 		memset(this, 0, sizeof(Stats));
 	}
-	Stats(float speed, int hp, int mp, const Attack& melee,
+	Stats(float speed, int hp, int mp, int strength,
+			int dexterity, int magic, const Attack& melee,
 			const Attack& ranged);
 	void step();
 

@@ -152,6 +152,7 @@ void gl_printf2(const font_data &ft_font, const Colour& colour, float x, float y
 }
 
 GLImage font_img;
+
 ///Much like Nehe's glPrint function, but modified to work
 ///with freetype fonts.
 void gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,

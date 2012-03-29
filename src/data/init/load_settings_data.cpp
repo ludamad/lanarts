@@ -5,31 +5,14 @@
  *      Author: 100397561
  */
 
-
-
-
-
 #include <fstream>
 
-#include "load_data.h"
+#include "../game_data.h"
 #include <yaml-cpp/yaml.h>
 #include "yaml_util.h"
 
 using namespace std;
 
-template <class T>
-static void optional_set(const YAML::Node& node, const char* key, T& value){
-	if (hasnode(node, key)){
-		node[key] >> value;
-	}
-}
-static void optional_set(const YAML::Node& node, const char* key, bool& value){
-	if (hasnode(node, key)){
-		int val;
-		node[key] >> val;
-		value = val;
-	}
-}
 GameSettings load_settings_data(const char* filename){
 
 	fstream file(filename, fstream::in | fstream::binary);
@@ -46,6 +29,12 @@ GameSettings load_settings_data(const char* filename){
 			optional_set(root, "regen_level_on_death", ret.regen_on_death);
 			optional_set(root, "view_width", ret.view_width);
 			optional_set(root, "view_height", ret.view_height);
+			if (hasnode(root, "class")){
+				std::string classname;
+				root["class"] >> classname;
+				printf("Class is %s\n", classname.c_str());
+				ret.classn = get_class_by_name(classname.c_str());
+			}
 		} catch (const YAML::Exception& parse){
 			printf("Settings Parsed Incorrectly: \n");
 			printf("%s\n", parse.what());

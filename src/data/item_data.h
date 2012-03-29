@@ -9,6 +9,7 @@
 #define ITEM_DATA_H_
 #include <cstdlib>
 #include "../world/objects/GameInst.h"
+#include <vector>
 
 enum {
   ITEM_GOLD = 0,
@@ -17,21 +18,24 @@ enum {
   ITEM_SCROLL_HASTE = 3
 };
 
-typedef void (*item_actionf)(GameInst* inst);
+struct ItemType;
+
+typedef void (*item_actionf)(ItemType* item, GameInst* inst);
 
 struct ItemType {
 	const char* name;
 	int sprite_number;
 	int radius;
 	item_actionf action;
-	ItemType(const char* name, int rad, int spriten, item_actionf act) :
-		name(name), sprite_number(spriten), radius(rad), action(act){
+	int weapon;
+	ItemType(const char* name, int rad, int spriten, item_actionf act, int weapon = -1) :
+		name(name), sprite_number(spriten), radius(rad), action(act), weapon(weapon){
 	}
 };
 
 item_actionf get_action_by_name(const char* name);
-extern ItemType game_item_data[];
-extern size_t game_item_n;
+int get_item_by_name(const char* name);
+extern std::vector<ItemType> game_item_data;
 
 
 

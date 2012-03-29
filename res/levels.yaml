@@ -9,13 +9,24 @@ branches:
       - size: [40, 40]
         items:
           amount: 2
+          generated:
+            - item: Gold
+              chance: 75
+            - item: Haste Scroll
+              chance: 25
+            - item: Health Potion
+              chance: 25
+            - item: Mana Potion
+              chance: 25
+            - item: Short Sword
+              chance: 25000
         rooms:
           padding: 0
           amount: 20
           size: [4,4]
         tunnels:
           width: 1
-          per_room: [2, 5]          
+          per_room: [5, 5]          
         features:
           stairs_up: 0
           stairs_down: 3

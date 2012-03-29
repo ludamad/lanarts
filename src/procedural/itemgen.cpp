@@ -18,22 +18,29 @@ void generate_items(const ItemGenSettings& is, MTwist& mt, GeneratedLevel& level
 
 	int amount = mt.rand(is.min_items, is.max_items+1);
 
+	int total_chance = 0;
+
+	for (int i = 0; i < is.item_chances.size(); i++){
+		total_chance += is.item_chances[i].genchance;
+	}
+	if (is.item_chances.empty()) return;
+
 	//generate gold
 	for (int i = 0; i < amount; i++) {
 		Pos ipos = generate_location(mt, level);
 		int ix = (ipos.x+start_x) * 32 + 16;
 		int iy = (ipos.y+start_y) * 32 + 16;
-		int itemrand = mt.rand(100);
 		
-		if (itemrand < 50)
-			gs->add_instance(new ItemInst(ITEM_GOLD, ix,iy));
-		else if (itemrand < 75)
-			gs->add_instance(new ItemInst(ITEM_POTION_HEALTH, ix,iy));
-		else if (itemrand < 83)
-			gs->add_instance(new ItemInst(ITEM_POTION_MANA, ix,iy));
-		else if (itemrand < 100)
-			gs->add_instance(new ItemInst(ITEM_SCROLL_HASTE, ix,iy));
-		
+		int item_roll = mt.rand(total_chance);
+		int item_type;
+		int itemn;
+		for (itemn = 0; itemn < is.item_chances.size(); itemn++){
+			item_roll -= is.item_chances[itemn].genchance;
+			item_type = is.item_chances[itemn].itemtype;
+			if (item_roll < 0)
+				break;
+		}
+		gs->add_instance(new ItemInst(item_type, ix,iy));
 		level.at(ipos).has_instance = true;
 	}
 }

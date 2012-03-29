@@ -1,4 +1,5 @@
 fullscreen: 0
 regen_level_on_death: 1
-view_width: 640
-view_height: 480
+view_width: 960
+view_height: 720
+class: Mage

@@ -6,16 +6,22 @@
  */
 
 #include "GameHud.h"
+
 #include "../util/draw_util.h"
+#include "../display/display.h"
+
 #include "GameState.h"
-#include "objects/GameInst.h"
 #include "GameInstSet.h"
+
+#include "objects/GameInst.h"
 #include "objects/PlayerInst.h"
+#include "../gamestats/Inventory.h"
+
 #include "../data/tile_data.h"
 #include "../data/item_data.h"
 #include "../data/sprite_data.h"
-#include "../display/display.h"
-#include "../gamestats/Inventory.h"
+#include "../data/weapon_data.h"
+
 
 static void draw_player_stats(GameState*gs, PlayerInst* player, int x, int y) {
 	Stats& s = player->stats();
@@ -76,7 +82,8 @@ static void draw_player_actionbar(GameState* gs, PlayerInst* player){
 // 			gl_printf(gs->primary_font(), Colour(255,255,255), x+ix*TILE_SIZE, y+iy*TILE_SIZE, "%d", player->inventory.inv[slot].n);
 // 		}
 	}
-	image_display(&game_sprite_data[SPR_GLOVES].img, 1, y);
+	WeaponType* wtype = &game_weapon_data[player->weapon_type()];
+	image_display(&game_sprite_data[wtype->weapon_sprite].img, 1, y);
 	image_display(&game_sprite_data[SPR_FIREBOLT].img,TILE_SIZE + 1, y);
 	image_display(&game_sprite_data[SPR_MAGIC_BLAST].img,TILE_SIZE*2 + 1, y);
 }
@@ -195,10 +202,11 @@ void GameHud::draw(GameState* gs) {
 	}
 	draw_minimap(gs, 20, 64+45);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-15,10,"Level %d", player_inst->stats().xplevel);
-	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-15,64+45+128,"Floor %d", gs->branch_level());
-	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-15,64+45+128+15,"Gold %d", player_inst->gold());
-	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+30,"Melee Damage %d", player_inst->effective_stats().melee.damage);
-	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+45,"Range Damage %d", player_inst->effective_stats().ranged.damage);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-40,64+45+128,"Floor %d", gs->branch_level());
+	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-40,64+45+128+15,"Gold %d", player_inst->gold());
+	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+30,"Strength   %d", player_inst->effective_stats().strength);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+45,"Magic      %d", player_inst->effective_stats().magic);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+60,"Dexterity  %d", player_inst->effective_stats().dexterity);
 	effect* efx = player_inst->status_effects().get(EFFECT_HASTE);
 	if (efx)
 		gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+60,"HASTE %d", efx->t_remaining);

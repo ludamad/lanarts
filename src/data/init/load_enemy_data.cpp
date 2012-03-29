@@ -27,26 +27,6 @@ Attack parse_attack(const YAML::Node& n){
 	ret.attack_sprite = parse_sprite_number(n, "sprite");
 	return ret;
 }
-Stats parse_stats(const YAML::Node& n, const vector<Attack>& attacks){
-	Stats ret_stats;
-
-	n["movespeed"] >> ret_stats.movespeed;
-
-	n["hp"] >> ret_stats.max_hp;
-	ret_stats.max_mp = parse_defaulted(n, "mp", 0);
-	ret_stats.hpregen = parse_defaulted(n,"hpregen",0.0);
-	ret_stats.mpregen = parse_defaulted(n,"mpregen",0.0);
-	ret_stats.hp = ret_stats.max_hp;
-	ret_stats.mp = ret_stats.max_hp;
-	for (int i = 0; i < attacks.size(); i++){
-		if (!attacks[i].isprojectile)
-			ret_stats.melee = attacks[i];
-		if (attacks[i].isprojectile)
-			ret_stats.ranged = attacks[i];
-	}
-	return ret_stats;
-}
-
 EnemyType parse_enemy_type(const YAML::Node& n){
 	int sprite_number;
 	int radius;

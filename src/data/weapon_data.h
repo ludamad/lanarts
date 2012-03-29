@@ -18,19 +18,29 @@ enum {
 };
 
 
+struct StatModifier {
+	float strength_mult, magic_mult, dexterity_mult;
+	StatModifier(){
+		memset(this, 0, sizeof(StatModifier));
+	}
+};
+
 struct WeaponType { //Currently for melee & ranged
 	const char* name;
 	bool projectile;
-	int base_damage;
-	float damage_multiplier;
+	int base_mindmg, base_maxdmg;
+	StatModifier damage_multiplier;
 	int range, cooldown;
 	int weapon_sprite;
 	int attack_sprite;
 	int projectile_speed;
 
-	WeaponType(const char* name, bool projectile , int base_damage, float damage_multiplier, int range, int cooldown,
+
+
+	WeaponType(const char* name, bool projectile, int base_mindamage, int base_maxdamage, const StatModifier& dmgm, int range, int cooldown,
 			int weapon_spr, int attack_spr, int bspeed = 0) :
-			name(name), projectile(projectile),base_damage(base_damage), damage_multiplier(damage_multiplier), range(range), cooldown(cooldown),
+			name(name), projectile(projectile),base_mindmg(base_mindamage),
+			base_maxdmg(base_maxdamage), damage_multiplier(dmgm), range(range), cooldown(cooldown),
 			weapon_sprite(weapon_spr), attack_sprite(attack_spr), projectile_speed(bspeed) {}
 };
 

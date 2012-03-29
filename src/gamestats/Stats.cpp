@@ -7,12 +7,13 @@
 
 #include "Stats.h"
 
-Stats::Stats(float speed, int hp, int mp, const Attack & melee,
+Stats::Stats(float speed, int hp, int mp, int strength,
+		int dexterity, int magic, const Attack & melee,
 		const Attack & ranged) :
 		movespeed(speed), hp(hp), max_hp(hp), mp(mp), max_mp(mp), hpregen(
 				1.0 / 30), mpregen(1.0 / 15), cooldown(0), hurt_cooldown(0), hp_regened(
 				0), mp_regened(0), melee(melee), ranged(ranged), xp(0), xpneeded(
-				100), xplevel(1) {
+				100), xplevel(1), strength(strength), dexterity(dexterity), magic(magic) {
 }
 
 void Stats::step() {

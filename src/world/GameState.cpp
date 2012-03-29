@@ -20,6 +20,7 @@
 #include "../data/item_data.h"
 #include "../data/tile_data.h"
 #include "../data/dungeon_data.h"
+#include "../data/class_data.h"
 
 
 GameState::GameState(const GameSettings& settings, int width, int height, int vieww, int viewh, int hudw) :
@@ -28,6 +29,7 @@ GameState::GameState(const GameSettings& settings, int width, int height, int vi
 				height), mouse_leftdown(0), mouse_rightdown(0), mouse_leftclick(0), mouse_rightclick(0) {
 	memset(key_down_states, 0, sizeof(key_down_states));
 	init_font(&pfont, "res/arial.ttf", 10);
+	mtwist.init_genrand(12300);
 	gennextstep = false;
 	lvl = new GameLevelState(DNGN_MAIN_BRANCH, level_number, width, height);
 }
@@ -350,8 +352,10 @@ void GameState::reset_level() {
 	} else {
 		lvl = level_states[leveln];
 	}
-	if (playerinfo.size() == 0)
-		playerinfo.push_back(PlayerInst(0,0));
+	if (playerinfo.size() == 0){
+		ClassType* c = &game_class_data[settings.classn];
+		playerinfo.push_back(PlayerInst(c->starting_stats, 0,0));
+	}
 	for (int i = 0; i < playerinfo.size(); i++){
 		if (playerinfo[i].portal_used()){
 			playersqr = playerinfo[i].portal_used()->exitsqr;

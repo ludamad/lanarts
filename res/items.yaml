@@ -6,7 +6,7 @@ items:
   - name: Health Potion
     sprite: health_potion
     action: increase_health
-  - name: Mana_Potion
+  - name: Mana Potion
     sprite: mana potion
     action: increase_mana
   - name: Haste Scroll
