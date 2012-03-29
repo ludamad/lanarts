@@ -21,7 +21,7 @@
 #include "../data/tile_data.h"
 #include "../data/dungeon_data.h"
 #include "../data/class_data.h"
-
+#include <ctime>
 
 GameState::GameState(const GameSettings& settings, int width, int height, int vieww, int viewh, int hudw) :
 		settings(settings), world_width(width), world_height(height), level_number(1),  frame_n(0), hud(
@@ -29,7 +29,9 @@ GameState::GameState(const GameSettings& settings, int width, int height, int vi
 				height), mouse_leftdown(0), mouse_rightdown(0), mouse_leftclick(0), mouse_rightclick(0) {
 	memset(key_down_states, 0, sizeof(key_down_states));
 	init_font(&pfont, "res/arial.ttf", 10);
-	mtwist.init_genrand(12300);
+	time_t t;
+	time(&t);
+	mtwist.init_genrand(t);
 	gennextstep = false;
 	lvl = new GameLevelState(DNGN_MAIN_BRANCH, level_number, width, height);
 }
