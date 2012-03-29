@@ -6,9 +6,16 @@ items:
   - name: Health Potion
     sprite: health_potion
     action: increase_health
+    action_amount: 50
   - name: Mana Potion
     sprite: mana potion
     action: increase_mana
+    action_amount: 50
   - name: Haste Scroll
     sprite: scroll
     action: hasten
+    action_duration: 400
+  - name: Strength Scroll
+    sprite: scroll_strength
+    action: increase_strength
+    action_amount: 1

@@ -2,6 +2,7 @@
 
 classes:
   - name: Mage
+    sprite: mage
     start_stats:
         movespeed: 4
         hp: 100
@@ -13,6 +14,7 @@ classes:
         magic: 4
 
   - name: Fighter
+    sprite: fighter
     start_stats:
         movespeed: 4
         hp: 150

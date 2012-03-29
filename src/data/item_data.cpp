@@ -5,18 +5,32 @@
 #include <cstring>
 
 void use_health_potion(ItemType* item, GameInst* inst){
-	((PlayerInst*) inst)->stats().hp += 50;
+	((PlayerInst*) inst)->stats().hp += item->action_amount;
 }
 void use_mana_potion(ItemType* item, GameInst* inst){
-	((PlayerInst*) inst)->stats().mp += 50;
+	((PlayerInst*) inst)->stats().mp += item->action_amount;
 }
 
 void use_haste_scroll(ItemType* item, GameInst* inst){
-	((PlayerInst*) inst)->status_effects().add(EFFECT_HASTE, 400);
+	((PlayerInst*) inst)->status_effects().add(EFFECT_HASTE, item->action_duration);
 }
 void equip_weapon(ItemType* item, GameInst* inst){
 	PlayerInst* play = (PlayerInst*) inst;
 	play->weapon_type() = item->weapon;
+}
+
+
+void increase_strength(ItemType* item, GameInst* inst){
+	PlayerInst* play = (PlayerInst*) inst;
+	play->stats().strength += item->action_amount;
+}
+void increase_magic(ItemType* item, GameInst* inst){
+	PlayerInst* play = (PlayerInst*) inst;
+	play->stats().magic += item->action_amount;
+}
+void increase_dexterity(ItemType* item, GameInst* inst){
+	PlayerInst* play = (PlayerInst*) inst;
+	play->stats().dexterity += item->action_amount;
 }
 
 
@@ -31,15 +45,10 @@ static ItemAction game_item_actions[] = {
 		ItemAction("increase_mana", &use_mana_potion),
 		ItemAction("hasten", &use_haste_scroll),
 		ItemAction("equip", &equip_weapon),
+		ItemAction("increase_strength", &increase_strength),
+		ItemAction("increase_magic", &increase_magic),
+		ItemAction("increase_dexterity", &increase_magic),
 };
-
-
-/*[] = {
-		ItemType("gold", 14, SPR_GOLD, NULL),
-		ItemType("health potion", 14, SPR_POTION, &use_health_potion),
-		ItemType("mana potion", 14, SPR_MANA_POTION, &use_mana_potion),
-		ItemType("haste scroll", 14, SPR_SCROLL, &use_haste_scroll)
-};*/
 
 item_actionf get_action_by_name(const char* name){
 	for (int i = 0; i < sizeof(game_item_actions)/sizeof(ItemAction); i++){

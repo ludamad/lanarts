@@ -84,8 +84,8 @@ static void draw_player_actionbar(GameState* gs, PlayerInst* player){
 	}
 	WeaponType* wtype = &game_weapon_data[player->weapon_type()];
 	image_display(&game_sprite_data[wtype->weapon_sprite].img, 1, y);
-	image_display(&game_sprite_data[SPR_FIREBOLT].img,TILE_SIZE + 1, y);
-	image_display(&game_sprite_data[SPR_MAGIC_BLAST].img,TILE_SIZE*2 + 1, y);
+	image_display(&game_sprite_data[get_sprite_by_name("fire bolt")].img,TILE_SIZE + 1, y);
+	image_display(&game_sprite_data[get_sprite_by_name("magic blast")].img,TILE_SIZE*2 + 1, y);
 }
 
 static void fill_buff2d(char* buff, int w, int h, int x, int y,

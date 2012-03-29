@@ -29,42 +29,33 @@ void world_display(TileSet& ts, const ViewPoint& vp){
 }*/
 
 
-void init_system(bool fullscreen, int w, int h){
-	init_sdl_gl(fullscreen,w,h);
-//	init_units_list();
-//	init_tiles_list();
+void init_system(GameSettings& settings){
+	settings = load_settings_data("res/settings.yaml");
+	if (SDL_Init(SDL_INIT_EVERYTHING) < 0){
+		exit(0);
+	}
+	init_sdl_gl(settings.fullscreen, settings.view_width, settings.view_height);
 	init_game_data();
-}
-void random_location(GameState* gs, obj_id id){
-	GameInst* inst = gs->get_instance(id);
-
+	settings = load_settings_data("res/settings.yaml");
 }
 
 const int HUD_WIDTH = 160;
 
 int main(int argc, char** argv) {
-
-	GameSettings settings = load_settings_data("res/settings.yaml");
+	GameSettings settings;
+	init_system(settings);
 
 	int world_width = 128*TILE_SIZE, world_height = 128*TILE_SIZE;
 
 	int windoww = settings.view_width, windowh = settings.view_height;
 	int vieww = windoww -HUD_WIDTH, viewh = windowh;
-	char* host = argv[1], * port = argv[2];
-	bool cont = true;
 
-	SDL_Event event;
-	//Initialize the game tiles and empty game state
+	//Initialize the game state and start the level
 	GameState* gs = new GameState(settings, world_width,world_height, vieww, viewh);
-
-	if (SDL_Init(SDL_INIT_EVERYTHING) < 0){
-		return 0;
-	}
-	
-	init_system(settings.fullscreen, windoww, windowh);
 	gs->reset_level();
 
-	bool paused = false;
+	SDL_Event event;
+	bool paused = false, cont = true;
 //	gs->add_instance( new TestInst(0,0));
 	for (int i = 0; cont; i++) {
 		clock_t start = clock();

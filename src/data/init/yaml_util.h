@@ -25,15 +25,6 @@ static char* tocstring(const std::string& s){
 	return ret;
 }
 
-inline int get_sprite_number(const std::string& s){
-	for (int i = 0; i < game_sprite_data.size(); i++){
-		if (s == game_sprite_data[i].name){
-			return i;
-		}
-	}
-	return -1;
-}
-
 inline bool hasnode(const YAML::Node& n, const char* key){
 	return n.FindValue(key);
 }
@@ -42,7 +33,7 @@ inline int parse_sprite_number(const YAML::Node& n, const char* key){
 	if (!hasnode(n,key)) return -1;
 	std::string s;
 	n[key] >> s;
-	return get_sprite_number(s);
+	return get_sprite_by_name(s);
 }
 inline int parse_enemy_number(const YAML::Node& n, const char* key){
 	if (!hasnode(n,key)) return -1;

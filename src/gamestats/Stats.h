@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstring>
 
+class MTwist;
 struct Attack { //Currently for melee & ranged
 	bool canuse;
 	int damage;
@@ -54,6 +55,8 @@ struct Stats {
 
 	bool hurt(int dmg);
 
+	int calculate_melee_damage(MTwist& mt, int weapon_type);
+	int calculate_spell_damage(MTwist& mt, int spell_type);
 	void gain_level();
 	void gain_xp(int amnt);
 

@@ -26,10 +26,14 @@ struct ItemType {
 	const char* name;
 	int sprite_number;
 	int radius;
+	int action_amount;
+	int action_duration;
 	item_actionf action;
 	int weapon;
-	ItemType(const char* name, int rad, int spriten, item_actionf act, int weapon = -1) :
-		name(name), sprite_number(spriten), radius(rad), action(act), weapon(weapon){
+	ItemType(const char* name, int rad, int spriten, item_actionf act, int weapon = -1,
+			int action_amount = 0, int action_duration = 0) :
+		name(name), sprite_number(spriten), radius(rad),
+		action_amount(action_amount), action_duration(action_duration), action(act), weapon(weapon){
 	}
 };
 

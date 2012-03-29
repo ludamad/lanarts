@@ -19,7 +19,7 @@ using namespace std;
 
 ClassType parse_class(const YAML::Node& n){
 	Attack melee(true, 10, 25, 40);
-	Attack ranged(true, 8, 400, 40, SPR_FIREBOLT, 7);
+	Attack ranged(true, 8, 400, 40, get_sprite_by_name("fire bolt"), 7);
 	ranged.isprojectile = true;
 	vector<Attack> attacks;
 	attacks.push_back(melee);

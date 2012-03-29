@@ -49,7 +49,7 @@ enemies:
         damage: 13
         range: 130
         cooldown: 45
-        sprite: storm
+        sprite: storm bolt
         projectile_speed: 7    
       
   - name: Ciribot
@@ -111,5 +111,5 @@ enemies:
         damage: 12
         range: 400
         cooldown: 70
-        sprite: fire
+        sprite: fire bolt
         projectile_speed: 4

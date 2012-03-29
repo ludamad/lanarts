@@ -54,7 +54,7 @@ void PlayerInst::step(GameState* gs) {
 
 void PlayerInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
-	GLImage& img = spr_player.img;
+	GLImage& img = game_sprite_data[get_sprite_by_name("fighter")].img;
 	bool b = gs->tile_radius_test(x, y, RADIUS);
 	//gl_draw_rectangle(view, x-10,y-20,20,5, b ? Colour(255,0,0) : Colour(0,255,0));
 	//gl_draw_circle(view, x,y,RADIUS);
@@ -64,7 +64,7 @@ void PlayerInst::draw(GameState* gs) {
 
 	if (effects.get(EFFECT_HASTE)) {
 		effect* e = effects.get(EFFECT_HASTE);
-		float s = e->t_remaining/200;
+		float s = e->t_remaining/200.0;
 		if (s> 1) s = 1;
 		Colour blue(255*(1-s), 255*(1-s), 255);
 		image_display(&img, x - img.width / 2 - view.x,

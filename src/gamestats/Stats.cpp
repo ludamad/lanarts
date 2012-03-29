@@ -6,6 +6,8 @@
  */
 
 #include "Stats.h"
+#include "../procedural/mtwist.h"
+#include "../data/weapon_data.h"
 
 Stats::Stats(float speed, int hp, int mp, int strength,
 		int dexterity, int magic, const Attack & melee,
@@ -101,8 +103,11 @@ void Stats::gain_level() {
 	max_hp += 20;
 	mp += 20;
 	max_mp += 20;
-	melee.damage += 2;
-	ranged.damage += 2;
+	dexterity += 2;
+	strength += 3;
+	magic += 2;
+	//melee.damage += 2;
+	//ranged.damage += 2;
 	xplevel++;
 }
 
@@ -113,4 +118,20 @@ void Stats::gain_xp(int amnt) {
 		xp -= xpneeded;
 		xpneeded = (xplevel) * 125;
 	}
+}
+
+int Stats::calculate_melee_damage(MTwist& mt, int weapon_type){
+	WeaponType& wtype = game_weapon_data[weapon_type];
+	int base_damage = mt.rand(wtype.base_mindmg, wtype.base_maxdmg+1);
+	StatModifier& sm = wtype.damage_multiplier;
+	float statdmg = strength*sm.strength_mult + dexterity*sm.dexterity_mult + magic*sm.magic_mult;
+	int damage = round(statdmg) + base_damage;
+	return damage;
+}
+int Stats::calculate_spell_damage(MTwist& mt, int spell_type){
+	int base_damage = mt.rand(4,8);
+	//StatModifier& sm = wtype.damage_multiplier;
+	//float statdmg = strength*sm.strength_mult + dexterity*sm.dexterity_mult + magic*sm.magic_mult;
+	int damage = magic + base_damage;
+	return damage * (spell_type+1);
 }

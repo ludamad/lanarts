@@ -304,11 +304,7 @@ void PlayerInst::use_move_and_melee(GameState* gs, const GameAction& action) {
 		if (target && !stats().has_cooldown()) {
 			//int damage = effective_stats().melee.damage + gs->rng().rand(-4, 5);
 			WeaponType& wtype = game_weapon_data[weapon_type()];
-			Stats ef = effective_stats();
-			int base_damage = gs->rng().rand(wtype.base_mindmg, wtype.base_maxdmg+1);
-			StatModifier& sm = wtype.damage_multiplier;
-			float statdmg = ef.strength*sm.strength_mult + ef.dexterity*sm.dexterity_mult + ef.magic*sm.magic_mult;
-			int damage = round(statdmg) + base_damage;
+			int damage = effective_stats().calculate_melee_damage(gs->rng(), weapon_type());
 			char buffstr[32];
 			snprintf(buffstr, 32, "%d", damage);
 			float rx, ry;
@@ -324,7 +320,8 @@ void PlayerInst::use_move_and_melee(GameState* gs, const GameAction& action) {
 				gs->add_instance(new AnimatedInst(target->x-5, target->y-5, -1, 25,
 						0,0, buffstr, Colour(255,215,11)));
 			}
-			stats().reset_melee_cooldown(effective_stats());
+			stats().cooldown = wtype.cooldown;
+			//stats().reset_melee_cooldown(effective_stats());
 			int atksprite = game_weapon_data[weapon_type()].attack_sprite;
 			gs->add_instance(
 					new AnimatedInst(target->x, target->y, atksprite,
@@ -417,12 +414,13 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	int hits = 0;
 
 	if (action.use_id == 1) {
-		atk.attack_sprite = SPR_MAGIC_BLAST;
+		atk.attack_sprite = get_sprite_by_name("magic blast");//SPR_MAGIC_BLAST;
 		atk.projectile_speed /= 1.75;
-		atk.damage *= 2;
+	//	atk.damage *= 2;
 		bounce = false;
 		hits = 3;
 	}
+	atk.damage = effective_stats().calculate_spell_damage(gs->rng(), action.use_id);
 
 	if (action.use_id < 2) {
 		GameInst* bullet = new BulletInst(id, atk, x, y, action.action_x,

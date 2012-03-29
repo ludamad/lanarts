@@ -8,6 +8,7 @@
 #ifndef WEAPON_DATA_H_
 #define WEAPON_DATA_H_
 #include <cstdlib>
+#include <vector>
 #include "../world/objects/GameInst.h"
 
 enum {
