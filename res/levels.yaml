@@ -8,7 +8,7 @@ branches:
       #Level 1
       - size: [40, 40]
         items:
-          amount: 20
+          amount: [5, 8]
           generated:
             - item: Gold
               chance: 75
@@ -18,6 +18,10 @@ branches:
               chance: 25
             - item: Mana Potion
               chance: 25
+            - item: Dagger
+              chance: 25
+            - item: Strength Scroll
+              chance: 15
         rooms:
           padding: 0
           amount: 20
@@ -43,7 +47,22 @@ branches:
       #Level 2
       - size: [64, 64]
         items:
-          amount: [2,9]
+          amount: [7, 10]
+          generated:
+            - item: Gold
+              chance: 75
+            - item: Haste Scroll
+              chance: 25
+            - item: Health Potion
+              chance: 25
+            - item: Mana Potion
+              chance: 25
+            - item: Dagger
+              chance: 25
+            - item: Short Sword
+              chance: 15
+            - item: Strength Scroll
+              chance: 15
         rooms:
           padding: 1
           amount: 23
@@ -67,7 +86,24 @@ branches:
       #Level 3
       - size: [76, 76]
         items:
-          amount: [2,9]
+          amount: [7, 10]
+          generated:
+            - item: Gold
+              chance: 75
+            - item: Haste Scroll
+              chance: 25
+            - item: Health Potion
+              chance: 25
+            - item: Mana Potion
+              chance: 25
+            - item: Dagger
+              chance: 25
+            - item: Short Sword
+              chance: 25
+            - item: Mace
+              chance: 15
+            - item: Strength Scroll
+              chance: 15
         rooms:
           padding: 1
           amount: 20
@@ -89,7 +125,24 @@ branches:
       #Level 4
       - size: [89, 89]
         items:
-          amount: [5,10]
+          amount: [9, 12]
+          generated:
+            - item: Gold
+              chance: 75
+            - item: Haste Scroll
+              chance: 25
+            - item: Health Potion
+              chance: 25
+            - item: Mana Potion
+              chance: 25
+            - item: Dagger
+              chance: 25
+            - item: Short Sword
+              chance: 25
+            - item: Mace
+              chance: 15
+            - item: Strength Scroll
+              chance: 20
         rooms:
           padding: 4
           amount: 20
@@ -115,7 +168,24 @@ branches:
       #Level 5
       - size: [89, 89]
         items:
-          amount: [5,10]
+          amount: [9, 12]
+          generated:
+            - item: Gold
+              chance: 75
+            - item: Haste Scroll
+              chance: 25
+            - item: Health Potion
+              chance: 25
+            - item: Mana Potion
+              chance: 25
+            - item: Dagger
+              chance: 25
+            - item: Short Sword
+              chance: 25
+            - item: Mace
+              chance: 15
+            - item: Strength Scroll
+              chance: 20
         rooms:
           padding: 4
           amount: 20
@@ -143,7 +213,24 @@ branches:
       #Level 6
       - size: [89, 89]
         items:
-          amount: [2,9]
+          amount: [9, 12]
+          generated:
+            - item: Gold
+              chance: 75
+            - item: Haste Scroll
+              chance: 25
+            - item: Health Potion
+              chance: 25
+            - item: Mana Potion
+              chance: 25
+            - item: Dagger
+              chance: 25
+            - item: Short Sword
+              chance: 25
+            - item: Mace
+              chance: 15
+            - item: Strength Scroll
+              chance: 20
         rooms:
           padding: 4
           amount: 20
@@ -173,7 +260,24 @@ branches:
       #Level 7
       - size: [102, 102]
         items:
-          amount: [2,9]
+          amount: [9, 12]
+          generated:
+            - item: Gold
+              chance: 75
+            - item: Haste Scroll
+              chance: 25
+            - item: Health Potion
+              chance: 25
+            - item: Mana Potion
+              chance: 25
+            - item: Dagger
+              chance: 25
+            - item: Short Sword
+              chance: 25
+            - item: Mace
+              chance: 15
+            - item: Strength Scroll
+              chance: 20
         rooms:
           padding: 3
           amount: 90
@@ -205,7 +309,24 @@ branches:
       #Level 8
       - size: [102, 102]
         items:
-          amount: [2,9]
+          amount: [9, 12]
+          generated:
+            - item: Gold
+              chance: 75
+            - item: Haste Scroll
+              chance: 25
+            - item: Health Potion
+              chance: 25
+            - item: Mana Potion
+              chance: 25
+            - item: Dagger
+              chance: 25
+            - item: Short Sword
+              chance: 25
+            - item: Mace
+              chance: 15
+            - item: Strength Scroll
+              chance: 20
         rooms:
           padding: 3
           amount: 90

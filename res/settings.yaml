@@ -1,5 +1,5 @@
 fullscreen: 0
 regen_level_on_death: 1
-view_width: 900
-view_height: 700
+view_width: 1024
+view_height: 768
 class: Fighter

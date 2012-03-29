@@ -3,7 +3,7 @@ Weapons:
   - weapon: Unarmed
     damage: [4, 8]
     modifiers: 
-        strength: 0.5
+        strength: 1.0
     cooldown: 30
     spr_weap: gloves
     spr_attack: gloves
@@ -11,26 +11,26 @@ Weapons:
   - weapon: Dagger
     damage: [8, 12]
     modifiers: 
-        strength: 0.6
+        strength: 1.1
     range: 27
-    cooldown: 35
+    cooldown: 32
     spr_weap: dagger
     spr_attack: dagger
 
   - weapon: Short Sword
     damage: [16, 20]
     modifiers: 
-        strength: 0.8
+        strength: 1.3
     range: 30
-    cooldown: 45
+    cooldown: 42
     spr_weap: short sword
     spr_attack: short sword
 
   - weapon: Mace
     damage: [18, 22]
     modifiers: 
-        strength: 0.6
+        strength: 1.5
     range: 30
-    cooldown: 50
+    cooldown: 55
     spr_weap: mace
     spr_attack: mace
