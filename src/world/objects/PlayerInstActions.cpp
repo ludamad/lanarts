@@ -20,8 +20,8 @@
 #include "../../data/weapon_data.h"
 #include "TestInst.h"
 
-static FILE* saved = fopen("res/saved_replay.rep", "wb");
-static FILE* open = fopen("res/replay.rep", "rb");
+// static FILE* saved = fopen("res/saved_replay.rep", "wb");
+// static FILE* open = fopen("res/replay.rep", "rb");
 static std::vector<GameAction> replay_actions;
 
 static int scan_entrance(const std::vector<GameLevelPortal>& portals,
@@ -43,23 +43,23 @@ static bool enemy_hit(GameInst* self, GameInst* other) {
 }
 
 static void get_current_actions(int frame, std::vector<GameAction>& actions) {
-	if (!open)
-		return;
-	if (!feof(open)) {
-		while (!feof(open)) {
-			replay_actions.push_back(from_action_file(open));
-			if (replay_actions.back().frame > frame)
-				break;
-		}
-	}
-	int i;
-	for (i = 0; i < replay_actions.size(); i++) {
-		if (replay_actions[i].frame == frame) {
-			actions.push_back(replay_actions[i]);
-		} else if (replay_actions[i].frame > frame)
-			break;
-	}
-	replay_actions = std::vector<GameAction>(&replay_actions[i], &replay_actions[replay_actions.size()]);
+// 	if (!open)
+// 		return;
+// 	if (!feof(open)) {
+// 		while (!feof(open)) {
+// 			replay_actions.push_back(from_action_file(open));
+// 			if (replay_actions.back().frame > frame)
+// 				break;
+// 		}
+// 	}
+// 	int i;
+// 	for (i = 0; i < replay_actions.size(); i++) {
+// 		if (replay_actions[i].frame == frame) {
+// 			actions.push_back(replay_actions[i]);
+// 		} else if (replay_actions[i].frame > frame)
+// 			break;
+// 	}
+// 	replay_actions = std::vector<GameAction>(&replay_actions[i], &replay_actions[replay_actions.size()]);
 }
 
 void PlayerInst::perform_io_action(GameState* gs) {
@@ -213,7 +213,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 	}
 
 	for (int i = 0; i < actions.size(); i++) {
-		to_action_file(saved, actions[i]);
+// 		to_action_file(saved, actions[i]);
 		perform_action(gs, actions[i]);
 	}
 }

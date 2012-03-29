@@ -20,9 +20,10 @@ set( lanarts_src
 	data/init/load_item_data.cpp
 	data/init/load_settings_data.cpp
 	data/init/load_weapon_data.cpp
+	data/init/load_class_data.cpp 
+	data/init/load_sprite_data.cpp
 	
 	data/effect_data.cpp
-	data/enemy_data.cpp
 	data/game_data.cpp
 	data/item_data.cpp
 	
@@ -32,6 +33,7 @@ set( lanarts_src
 	fov/fov.cpp
 	fov/impl/permissive-fov.cc
 	
+	gamestats/Ability.cpp
 	gamestats/Stats.cpp
 	
 	pathfind/astar_pathfind.cpp
@@ -75,9 +77,9 @@ set( lanarts_src
 
 set( lanarts_include
 	
-	data/init/load_data.h
 	data/init/yaml_util.h
 	
+	data/class_data.h
 	data/effect_data.h
 	data/enemy_data.h
 	data/item_data.h
@@ -94,10 +96,10 @@ set( lanarts_include
 	fov/impl/permissive-fov.h
 	fov/impl/permissive-fov-cpp.h
 	
+	gamestats/Ability.h
 	gamestats/Effects.h
 	gamestats/Inventory.h
 	gamestats/Item.h
-	gamestats/Spells.h
 	gamestats/Stats.h
 	
 	pathfind/astar_pathfind.h
