@@ -1,0 +1,25 @@
+---
+
+classes:
+  - name: Mage
+    start_stats:
+        movespeed: 4
+        hp: 100
+        mp: 100
+        hpregen: 0.033
+        mpregen: 0.066
+        strength: 2
+        dexterity: 3
+        magic: 4
+
+  - name: Fighter
+    start_stats:
+        movespeed: 4
+        hp: 150
+        mp: 50
+        hpregen: 0.066
+        mpregen: 0.033
+        strength: 4
+        dexterity: 3
+        magic: 2
+   
