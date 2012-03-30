@@ -81,7 +81,7 @@ inline Stats parse_stats(const YAML::Node& n, const std::vector<Attack>& attacks
 	ret_stats.hp = ret_stats.max_hp;
 	ret_stats.mp = ret_stats.max_hp;
 	ret_stats.strength = parse_defaulted(n, "strength", 0);
-	ret_stats.dexterity = parse_defaulted(n, "dexterity", 0);
+	ret_stats.defence = parse_defaulted(n, "defence", 0);
 	ret_stats.magic = parse_defaulted(n, "magic", 0);
 	ret_stats.xpneeded = parse_defaulted(n, "xpneeded", 125);
 	ret_stats.xplevel = parse_defaulted(n, "xplevel", 1);
@@ -111,7 +111,7 @@ inline GenRange parse_range(const YAML::Node& n){
 inline StatModifier parse_modifiers(const YAML::Node& n){
 	StatModifier stat;
 	optional_set(n, "strength", stat.strength_mult);
-	optional_set(n, "dexterity", stat.dexterity_mult);
+	optional_set(n, "defence", stat.defence_mult);
 	optional_set(n, "magic", stat.magic_mult);
 	return stat;
 }

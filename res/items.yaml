@@ -19,3 +19,11 @@ items:
     sprite: scroll_strength
     action: increase_strength
     action_amount: 1
+  - name: Defence Scroll
+    sprite: scroll_defence
+    action: increase_defence
+    action_amount: 1
+  - name: Magic Scroll
+    sprite: scroll_magic
+    action: increase_magic
+    action_amount: 1

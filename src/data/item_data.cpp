@@ -28,9 +28,9 @@ void increase_magic(ItemType* item, GameInst* inst){
 	PlayerInst* play = (PlayerInst*) inst;
 	play->stats().magic += item->action_amount;
 }
-void increase_dexterity(ItemType* item, GameInst* inst){
+void increase_defence(ItemType* item, GameInst* inst){
 	PlayerInst* play = (PlayerInst*) inst;
-	play->stats().dexterity += item->action_amount;
+	play->stats().defence += item->action_amount;
 }
 
 
@@ -47,7 +47,7 @@ static ItemAction game_item_actions[] = {
 		ItemAction("equip", &equip_weapon),
 		ItemAction("increase_strength", &increase_strength),
 		ItemAction("increase_magic", &increase_magic),
-		ItemAction("increase_dexterity", &increase_magic),
+		ItemAction("increase_defence", &increase_defence),
 };
 
 item_actionf get_action_by_name(const char* name){

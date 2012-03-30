@@ -20,7 +20,7 @@ enum {
 
 
 struct StatModifier {
-	float strength_mult, magic_mult, dexterity_mult;
+	float strength_mult, magic_mult, defence_mult;
 	StatModifier(){
 		memset(this, 0, sizeof(StatModifier));
 	}

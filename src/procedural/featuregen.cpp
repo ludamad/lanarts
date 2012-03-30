@@ -83,8 +83,8 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 		Pos p = generate_location(mt, level);
 		level.at(p).has_instance = true;
 		
-		int x = p.x - 2, y = p.y - 2;
-		int ex = p.x + 3, ey = p.y + 3;
+		int x = p.x - 4, y = p.y - 4;
+		int ex = p.x + 5, ey = p.y + 5;
 		x = std::max(0, x), y = std::max(0,y);
 		ex = std::min(ex, level.width()), ey = std::min(ey,level.height());
 		for (int yy = y; yy < ey; yy++) {

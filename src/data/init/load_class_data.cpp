@@ -24,10 +24,20 @@ ClassType parse_class(const YAML::Node& n){
 	vector<Attack> attacks;
 	attacks.push_back(melee);
 	attacks.push_back(ranged);
+	const YAML::Node& gainperlevel = n["gain_per_level"];
+	int hp, mp, mag, str, def;
+	gainperlevel["hp"] >> hp;
+	gainperlevel["mp"] >> mp;
+	gainperlevel["strength"] >> str;
+	gainperlevel["magic"] >> mag;
+	gainperlevel["defence"] >> def;
 
 	return ClassType(
 			parse_cstr(n["name"]),
-			parse_stats(n["start_stats"], attacks));
+			parse_stats(n["start_stats"], attacks),
+			hp, mp,
+			str, def, mag
+			);
 }
 
 void load_class_data(const char* filename){
@@ -44,11 +54,11 @@ void load_class_data(const char* filename){
 			const YAML::Node& cnode = root["classes"];
 			for (int i = 0; i < cnode.size(); i++){
 				game_class_data.push_back( parse_class(cnode[i]) );
+				game_class_data.back().starting_stats.classtype = i;
 			}
 		} catch (const YAML::Exception& parse){
 			printf("Class Parsed Incorrectly: \n");
 			printf("%s\n", parse.what());
 		}
 	}
-
 }

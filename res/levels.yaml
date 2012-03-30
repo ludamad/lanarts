@@ -21,12 +21,17 @@ branches:
             - item: Dagger
               chance: 25
             - item: Strength Scroll
-              chance: 15
+              chance: 5
+            - item: Magic Scroll
+              chance: 5
+            - item: Defence Scroll
+              chance: 5
         rooms:
           padding: 0
           amount: 20
           size: [4,4]
         tunnels:
+          padding: 0
           width: 1
           per_room: [5, 5]          
         features:
@@ -62,7 +67,11 @@ branches:
             - item: Short Sword
               chance: 15
             - item: Strength Scroll
-              chance: 15
+              chance: 5
+            - item: Magic Scroll
+              chance: 5
+            - item: Defence Scroll
+              chance: 5
         rooms:
           padding: 1
           amount: 23
@@ -136,13 +145,17 @@ branches:
             - item: Mana Potion
               chance: 25
             - item: Dagger
-              chance: 25
+              chance: 10
             - item: Short Sword
-              chance: 25
+              chance: 10
             - item: Mace
-              chance: 15
+              chance: 10
             - item: Strength Scroll
-              chance: 20
+              chance: 7
+            - item: Magic Scroll
+              chance: 7
+            - item: Defence Scroll
+              chance: 7
         rooms:
           padding: 4
           amount: 20
@@ -179,13 +192,17 @@ branches:
             - item: Mana Potion
               chance: 25
             - item: Dagger
-              chance: 25
+              chance: 5
             - item: Short Sword
-              chance: 25
+              chance: 10
             - item: Mace
               chance: 15
             - item: Strength Scroll
-              chance: 20
+              chance: 7
+            - item: Magic Scroll
+              chance: 7
+            - item: Defence Scroll
+              chance: 7
         rooms:
           padding: 4
           amount: 20
@@ -224,13 +241,17 @@ branches:
             - item: Mana Potion
               chance: 25
             - item: Dagger
-              chance: 25
+              chance: 5
             - item: Short Sword
-              chance: 25
+              chance: 10
             - item: Mace
               chance: 15
             - item: Strength Scroll
-              chance: 20
+              chance: 7
+            - item: Magic Scroll
+              chance: 7
+            - item: Defence Scroll
+              chance: 7
         rooms:
           padding: 4
           amount: 20
@@ -271,13 +292,17 @@ branches:
             - item: Mana Potion
               chance: 25
             - item: Dagger
-              chance: 25
+              chance: 5
             - item: Short Sword
-              chance: 25
+              chance: 5
             - item: Mace
               chance: 15
             - item: Strength Scroll
-              chance: 20
+              chance: 7
+            - item: Magic Scroll
+              chance: 7
+            - item: Defence Scroll
+              chance: 7
         rooms:
           padding: 3
           amount: 90
@@ -309,7 +334,7 @@ branches:
       #Level 8
       - size: [102, 102]
         items:
-          amount: [9, 12]
+          amount: [8, 12]
           generated:
             - item: Gold
               chance: 75
@@ -320,13 +345,17 @@ branches:
             - item: Mana Potion
               chance: 25
             - item: Dagger
-              chance: 25
+              chance: 5
             - item: Short Sword
-              chance: 25
+              chance: 5
             - item: Mace
-              chance: 15
+              chance: 5
             - item: Strength Scroll
-              chance: 20
+              chance: 7
+            - item: Magic Scroll
+              chance: 7
+            - item: Defence Scroll
+              chance: 7
         rooms:
           padding: 3
           amount: 90

@@ -206,7 +206,7 @@ void GameHud::draw(GameState* gs) {
 	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-40,64+45+128+15,"Gold %d", player_inst->gold());
 	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+30,"Strength   %d", player_inst->effective_stats().strength);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+45,"Magic      %d", player_inst->effective_stats().magic);
-	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+60,"Dexterity  %d", player_inst->effective_stats().dexterity);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+60,"Defence  %d", player_inst->effective_stats().defence);
 	effect* efx = player_inst->status_effects().get(EFFECT_HASTE);
 	if (efx)
 		gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+60,"HASTE %d", efx->t_remaining);

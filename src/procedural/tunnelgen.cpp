@@ -14,6 +14,7 @@ struct TunnelGen {
 	MTwist& mt;
 	int start_room;
 	int end_room;
+	int padding;
 	bool accept_tunnel_entry;
 	int avoid_groupid;
 	int width;
@@ -21,9 +22,9 @@ struct TunnelGen {
 	enum {
 		NO_TURN = 0, TURN_PERIMETER = 1, TURN_START = 2,
 	};
-	inline TunnelGen(GeneratedLevel& s, MTwist& mt, int start_room, int width,
+	inline TunnelGen(GeneratedLevel& s, MTwist& mt, int start_room, int padding, int width,
 			int change_odds, bool ate = false) :
-			s(s), mt(mt), start_room(start_room), end_room(0), accept_tunnel_entry(
+			s(s), mt(mt), start_room(start_room), end_room(0), padding(padding), accept_tunnel_entry(
 					ate), avoid_groupid(0), width(width), change_odds(
 					change_odds) {
 	}
@@ -34,7 +35,7 @@ struct TunnelGen {
 
 bool TunnelGen::generate_x(Pos p, bool right, int depth, int turn_state) {
 	bool generated;
-	Sqr prev_content[width + 2]; //For backtracking
+	Sqr prev_content[width + padding*2]; //For backtracking
 	Pos ip(p.x, p.y - 1), newpos;
 
 	if (p.x <= 2 || p.x >= s.width() - width)
@@ -61,7 +62,7 @@ bool TunnelGen::generate_x(Pos p, bool right, int depth, int turn_state) {
 		//s.at(p)
 		return true;
 	}
-	for (int i = 0; i < width + 2; i++) {
+	for (int i = 0; i < width + padding*2; i++) {
 		Sqr& sqr = s.at(ip.x, ip.y + i);
 		if (sqr.passable
 				|| (!accept_tunnel_entry && turn_state == NO_TURN
@@ -123,7 +124,7 @@ bool TunnelGen::generate_x(Pos p, bool right, int depth, int turn_state) {
 }
 bool TunnelGen::generate_y(Pos p, bool down, int depth, int turn_state) {
 	bool generated;
-	Sqr prev_content[width + 2]; //For backtracking
+	Sqr prev_content[width + padding*2]; //For backtracking
 	Pos ip(p.x - 1, p.y), newpos;
 
 	if (p.y <= 2 || p.y >= s.height() - width)
@@ -150,7 +151,7 @@ bool TunnelGen::generate_y(Pos p, bool down, int depth, int turn_state) {
 		end_room = s.at(p).roomID;
 		return true;
 	}
-	for (int i = 0; i < width + 2; i++) {
+	for (int i = 0; i < width + padding*2; i++) {
 		Sqr& sqr = s.at(ip.x + i, ip.y);
 		if (sqr.passable
 				|| (!accept_tunnel_entry && turn_state == NO_TURN
@@ -246,7 +247,7 @@ void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
 		for (int i = 0; i < level.rooms().size(); i++) {
 			if (genpaths[i] >= totalpaths[i])
 				continue;
-			TunnelGen tg(level, mt, i + 1,
+			TunnelGen tg(level, mt, i + 1, tgs.padding,
 					mt.rand(tgs.minwidth, tgs.maxwidth + 1), 20,
 					genpaths[i] > 0 || nogen_tries > 100);
 			bool generated = false;

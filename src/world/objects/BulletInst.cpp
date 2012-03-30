@@ -122,6 +122,7 @@ void BulletInst::step(GameState* gs) {
 
 						int dx = enemy->x - x, dy = enemy->y - y;
 						double abs = sqrt(dx * dx + dy * dy);
+						if (abs < 1) abs = 1;
 						if (abs < mindist) {
 							target = enemy;
 							mindist = abs;

@@ -7,7 +7,7 @@ void use_haste(Stats& basestats, Stats& affected){
 	affected.melee.cooldown /= 1.50;
 	affected.strength += 10;
 	affected.magic += 10;
-	affected.dexterity += 10;
+	affected.defence += 10;
 	affected.ranged.cooldown /= 1.50;
 }
 

@@ -20,6 +20,7 @@ struct Attack { //Currently for melee & ranged
 	}
 };
 struct Stats {
+	int classtype;
 	float movespeed;
 	int hp, max_hp;
 	int mp, max_mp;
@@ -32,12 +33,12 @@ struct Stats {
 
 	int xp, xpneeded, xplevel;
 
-	int strength, dexterity, magic;
+	int strength, defence, magic;
 	Stats() {
 		memset(this, 0, sizeof(Stats));
 	}
 	Stats(float speed, int hp, int mp, int strength,
-			int dexterity, int magic, const Attack& melee,
+			int defence, int magic, const Attack& melee,
 			const Attack& ranged);
 	void step();
 

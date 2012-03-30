@@ -9,9 +9,15 @@ classes:
         mp: 100
         hpregen: 0.033
         mpregen: 0.066
-        strength: 2
-        dexterity: 3
-        magic: 4
+        strength: 4
+        defence: 4
+        magic: 7
+    gain_per_level:
+        hp: 15
+        mp: 20
+        magic: 3
+        strength: 1
+        defence: 1
 
   - name: Fighter
     sprite: fighter
@@ -21,7 +27,13 @@ classes:
         mp: 50
         hpregen: 0.066
         mpregen: 0.033
-        strength: 4
-        dexterity: 3
-        magic: 2
+        strength: 7
+        defence: 5
+        magic: 3
+    gain_per_level:
+        hp: 30
+        mp: 10
+        strength: 3
+        magic: 1
+        defence: 2
    

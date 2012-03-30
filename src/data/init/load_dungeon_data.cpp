@@ -54,7 +54,10 @@ RoomGenSettings parse_room_gen(const YAML::Node& n) {
 TunnelGenSettings parse_tunnel_gen(const YAML::Node& n) {
 	GenRange width = parse_range(n["width"]);
 	GenRange per_room = parse_range(n["per_room"]);
-	return TunnelGenSettings(width.min, width.max, per_room.min, per_room.max);
+
+	return TunnelGenSettings(parse_defaulted(n, "padding", 1),
+			width.min, width.max,
+			per_room.min, per_room.max);
 }
 FeatureGenSettings parse_feature_gen(const YAML::Node& n) {
 	int nstairsup = parse_defaulted(n, "stairs_up", 3);

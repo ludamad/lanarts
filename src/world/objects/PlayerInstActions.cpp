@@ -78,6 +78,10 @@ void PlayerInst::perform_io_action(GameState* gs) {
 		gs->monster_controller().shift_target(gs);
 	}
 
+//	if (gs->key_press_state(SDLK_q)) {
+//		stats().gain_xp(50);
+//	}
+
 	if (gs->key_press_state(SDLK_SPACE)) {
 		spellselect++;
 		if (spellselect >= 2) {

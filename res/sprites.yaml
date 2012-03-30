@@ -46,10 +46,16 @@ Sprites:
     spritefile: res/items/misc/book.png
   - sprite: gold
     spritefile: res/items/misc/gold.png
+
   - sprite: scroll
     spritefile: res/items/misc/scroll.png
   - sprite: scroll_strength
-    spritefile: res/items/misc/scroll_str.png
+    spritefile: res/items/scrolls/scroll_str.png
+  - sprite: scroll_defence
+    spritefile: res/items/scrolls/scroll_def.png
+  - sprite: scroll_magic
+    spritefile: res/items/scrolls/scroll_mag.png
+
   - sprite: health_potion
     spritefile: res/items/misc/redpotion.png
 
