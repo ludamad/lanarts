@@ -85,7 +85,7 @@ enemies:
         hp: 160
         hpregen: 0.02
     attacks:
-      - damage: 55
+      - damage: 40
         
   - name: Jester
     sprite: jester
