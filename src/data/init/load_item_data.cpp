@@ -48,6 +48,7 @@ void load_item_data(const char* filename){
 
 			parser.GetNextDocument(root);
 
+			file.close();
 		} catch (const YAML::Exception& parse){
 			printf("Items Parsed Incorrectly: \n");
 			printf("%s\n", parse.what());

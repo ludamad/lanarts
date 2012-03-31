@@ -56,6 +56,7 @@ void load_class_data(const char* filename){
 				game_class_data.push_back( parse_class(cnode[i]) );
 				game_class_data.back().starting_stats.classtype = i;
 			}
+			file.close();
 		} catch (const YAML::Exception& parse){
 			printf("Class Parsed Incorrectly: \n");
 			printf("%s\n", parse.what());

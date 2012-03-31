@@ -37,6 +37,7 @@ void load_tile_data(const char* filename){
 	for (int i = 0; i < game_tile_data.size();i++){
 		game_tile_data[i].init();
 	}
+	file.close();
 }
 
 void load_sprite_data(const char* filename){
@@ -70,4 +71,5 @@ void load_sprite_data(const char* filename){
 	for (int i = 0; i < game_sprite_data.size();i++){
 		game_sprite_data[i].init();
 	}
+	file.close();
 }

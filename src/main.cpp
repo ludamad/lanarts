@@ -43,7 +43,6 @@ const int HUD_WIDTH = 160;
 
 static void game_loop(GameState* gs){
 
-	SDL_Event event;
 	bool paused = false, cont = true;
 
 	unsigned long draw_time = 5*CLOCKS_PER_SEC/1000;
@@ -82,12 +81,12 @@ static void game_loop(GameState* gs){
 				int len = end-start;
 				step_time += len;
 
-				time_allowance += per_frame - len;
+				time_allowance = per_frame - len;
 
 			}
 		} else
 			gs->update_iostate();
-		if (time_allowance > draw_events/draw_time){
+	//	if (time_allowance > draw_events/draw_time){
 			//Draw event
 			clock_t start = clock();
 			gs->draw();
@@ -95,13 +94,13 @@ static void game_loop(GameState* gs){
 			draw_events++;
 			draw_time += end-start;
 			time_allowance -= end-start;
-		}
-		if (time_allowance > draw_events/draw_time){
+		//}
+	//	if (time_allowance > draw_events/draw_time){
 			int delayms = time_allowance*1000/CLOCKS_PER_SEC;
 			if (delayms > 0)
 				SDL_Delay(delayms);
-			time_allowance = 0;
-		}
+		//	time_allowance = 0;
+	///	}
 	}
 	printf("Step time: %f\n", float(step_time)/step_events);
 	printf("Draw time: %f\n", float(draw_time)/draw_events);

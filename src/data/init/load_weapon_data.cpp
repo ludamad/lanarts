@@ -38,6 +38,7 @@ void load_weapon_data(const char* filename) {
 
 			game_weapon_data.push_back(entry);
 		}
+		file.close();
 
 	} catch (const YAML::Exception& parse) {
 		printf("Weapons Parsed Incorrectly: \n");

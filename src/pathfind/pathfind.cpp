@@ -81,8 +81,8 @@ void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
 	int ww = max_tilex - min_tilex, hh = max_tiley - min_tiley;
 	w = ww, h = hh;
 	if (!path || w < alloc_w || h < alloc_h) {
-		alloc_w = power_of_two(w);
-		alloc_h = power_of_two(h);
+		alloc_w = max(alloc_w, power_of_two(w));
+		alloc_h = max(alloc_h, power_of_two(h));
 		if (path) delete[] path;
 		path = new PathingNode[alloc_w * alloc_h];
 	}

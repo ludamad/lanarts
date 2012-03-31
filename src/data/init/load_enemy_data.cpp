@@ -66,6 +66,7 @@ void load_enemy_data(const char* filename){
 			printf("Enemies Parsed Incorrectly: \n");
 			printf("%s\n", parse.what());
 		}
+		file.close();
 	}
 
 }

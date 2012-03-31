@@ -22,7 +22,7 @@ enemies:
         hp: 18
         hpregen: 0.08
     attacks:
-      - damage: 12
+      - damage: 10
         cooldown: 20
         
   - name: Zombie
