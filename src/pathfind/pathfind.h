@@ -53,7 +53,7 @@ public:
 	void interpolated_direction(int x, int y, int w, int h, float speed, float& vx, float& vy);
 	//Away from object
 	void random_further_direction(MTwist& mt, int x, int y, int w, int h, float speed, float& vx, float& vy);
-	PathingNode* get(int x, int y) { return &path[w*y+x]; }
+	PathingNode* get(int x, int y) { return &path[alloc_w*y+x]; }
 	void stake_claim(int x, int y);
 	//Call before 'interpolated_direction'
 	void adjust_for_claims(int x, int y);
@@ -69,6 +69,7 @@ private:
 	int start_x, start_y;
 	int path_x, path_y;
 	int w,h;
+	int alloc_w, alloc_h;
 };
 
 

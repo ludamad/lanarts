@@ -78,7 +78,7 @@ bool TunnelGen::generate_x(Pos p, bool right, int depth, int turn_state) {
 		else
 			newpos.y = p.y - 1;
 		newpos.x = right ? p.x - width : p.x + 1;
-		for (int i = 0; i < width + 2; i++) {
+		for (int i = 0; i < width + padding*2; i++) {
 			Sqr& sqr = s.at(ip.x, ip.y + i);
 			sqr.perimeter = true;
 			sqr.passable = false;
@@ -103,7 +103,7 @@ bool TunnelGen::generate_x(Pos p, bool right, int depth, int turn_state) {
 		else
 			newpos.x = p.x - 1;
 
-		if (turn_state == NO_TURN && mt.rand(change_odds) == 0) { //95% chance of 90 degree turn
+		if (turn_state == NO_TURN && mt.rand(change_odds) == 0) { //5% chance of 90 degree turn
 			generated = generate_x(newpos, right, depth - 1, TURN_START);
 			if (!generated)
 				generated = generate_x(newpos, right, depth - 1);
@@ -116,7 +116,7 @@ bool TunnelGen::generate_x(Pos p, bool right, int depth, int turn_state) {
 		}
 	}
 	if (!generated) {
-		for (int i = 0; i < width + 2; i++) {
+		for (int i = 0; i < width + padding*2; i++) {
 			s.at(ip.x, ip.y + i) = prev_content[i];
 		}
 	}
@@ -167,7 +167,7 @@ bool TunnelGen::generate_y(Pos p, bool down, int depth, int turn_state) {
 		else
 			newpos.x = p.x - 1;
 		newpos.y = down ? p.y - width : p.y + 1;
-		for (int i = 0; i < width + 2; i++) {
+		for (int i = 0; i < width + padding*2; i++) {
 			Sqr& sqr = s.at(ip.x + i, ip.y);
 			sqr.perimeter = true;
 			sqr.passable = false;
@@ -204,7 +204,7 @@ bool TunnelGen::generate_y(Pos p, bool down, int depth, int turn_state) {
 		}
 	}
 	if (!generated) {
-		for (int i = 0; i < width + 2; i++) {
+		for (int i = 0; i < width + padding*2; i++) {
 			s.at(ip.x + i, ip.y) = prev_content[i];
 		}
 	}
@@ -249,14 +249,14 @@ void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
 				continue;
 			TunnelGen tg(level, mt, i + 1, tgs.padding,
 					mt.rand(tgs.minwidth, tgs.maxwidth + 1), 20,
-					genpaths[i] > 0 || nogen_tries > 100);
+					tgs.padding > 0 && (genpaths[i] > 0 || nogen_tries > 100));
 			bool generated = false;
 			for (; tg.width >= 1 && !generated; tg.width--) {
 				int path_len = 5;
 				for (int attempts = 0; attempts < 16 && !generated;
 						attempts++) {
 					//bool small = (havepath && mt.rand(2) == 0);
-					generate_entrance(level.rooms()[i].room_region, mt, 2, p,
+					generate_entrance(level.rooms()[i].room_region, mt, std::min(tg.width, 2), p,
 							axis, more);
 					if (axis) {
 						if (tg.generate_y(p, more, path_len)) {

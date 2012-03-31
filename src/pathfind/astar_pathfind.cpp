@@ -98,13 +98,13 @@ std::vector<Pos> AStarPathFind::calculate_AStar_path(GameState *gs, int sx, int 
 				int dx = x-xx, dy = y-yy;
 				int g_score = node->g_score + (abs(dx) == abs(dy) ? 114 : 100);
 				if (!neighbour->solid && !neighbour->openset){
-					heap.push_back(neighbour);
-					std::push_heap(heap.begin(), heap.end(), orderfunc);
 					neighbour->openset = true;
 					neighbour->previous = node;
 					neighbour->h_score = heurestic_distance(Pos(xx,yy), Pos(ex,ey));
 					neighbour->g_score = g_score;
 					neighbour->f_score = neighbour->g_score + neighbour->h_score;
+					heap.push_back(neighbour);
+					std::push_heap(heap.begin(), heap.end(), orderfunc);
 				} else if (!neighbour->solid && neighbour->g_score > g_score){
 					neighbour->previous = node;
 					neighbour->g_score = g_score;

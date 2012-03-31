@@ -11,15 +11,16 @@
 #include "../data/tile_data.h"
 #include "../world/GameState.h"
 #include "../util/draw_util.h"
+#include "../display/display.h"//for power_of_two
 
 using namespace std;
 
-void floodfill(PathingNode* path, int w, int h, int sx, int sy) {
+void floodfill(PathingNode* path, int w, int h, int sx, int sy, int alloc_w) {
 	PathCoord* heap = new PathCoord[w * h];
 	PathCoord* heap_end = heap + 1;
 
 	heap[0] = PathCoord(sx, sy, 0); //Start coordinate
-	path[sy * w + sx] = PathingNode(false, false, 0, 0, 0);
+	path[sy * alloc_w + sx] = PathingNode(false, false, 0, 0, 0);
 	while (heap != heap_end) {
 		PathCoord curr = *heap;
 		PathCoord next;
@@ -29,14 +30,14 @@ void floodfill(PathingNode* path, int w, int h, int sx, int sy) {
 				int nx = curr.x + dx, ny = curr.y + dy;
 				if (nx < 0 || nx >= w || ny < 0 || ny >= h)
 					continue;
-				int coord = ny * w + nx;
+				int coord = ny * alloc_w + nx;
 				bool is_diag = (abs(dx) == abs(dy));
 				int dist = curr.distance + (is_diag ? 140 : 100);
 				PathingNode* p = &path[coord];
 				if (p->open && !p->solid) {
 					bool cant_cross = is_diag
-							&& (path[curr.y * w + nx].solid
-									|| path[ny * w + curr.x].solid);
+							&& (path[curr.y * alloc_w + nx].solid
+									|| path[ny * alloc_w + curr.x].solid);
 					if (!cant_cross) {
 						p->open = false;
 						p->dx = -dx, p->dy = -dy;
@@ -49,7 +50,6 @@ void floodfill(PathingNode* path, int w, int h, int sx, int sy) {
 
 		}
 	}
-//	make_heap(heap, );
 
 	delete[] heap;
 }
@@ -57,12 +57,12 @@ void floodfill(PathingNode* path, int w, int h, int sx, int sy) {
 PathInfo::PathInfo() {
 	path = NULL;
 	w = 0, h = 0;
+	alloc_w = 0, alloc_h = 0;
 	start_x = 0, start_y = 0;
 }
 PathInfo::~PathInfo() {
 	delete[] path;
 }
-
 void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
 	int min_tilex, min_tiley;
 	int max_tilex, max_tiley;
@@ -79,13 +79,16 @@ void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
 	start_x = min_tilex, start_y = min_tiley;
 
 	int ww = max_tilex - min_tilex, hh = max_tiley - min_tiley;
-	if (!path || w != ww || h != hh) {
-		w = ww, h = hh;
-		path = new PathingNode[w * h];
+	w = ww, h = hh;
+	if (!path || w < alloc_w || h < alloc_h) {
+		alloc_w = power_of_two(w);
+		alloc_h = power_of_two(h);
+		if (path) delete[] path;
+		path = new PathingNode[alloc_w * alloc_h];
 	}
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			PathingNode* node = &path[y * w + x];
+			PathingNode* node = &path[y * alloc_w + x];
 			node->solid = tile.get(x + min_tilex, y + min_tiley)
 					<= TILE_STONE_WALL;
 			node->open = true;
@@ -96,7 +99,7 @@ void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
 		}
 	}
 	int tx = ox / TILE_SIZE - min_tilex, ty = oy / TILE_SIZE - min_tiley;
-	floodfill(path, w, h, tx, ty);
+	floodfill(path, w, h, tx, ty, alloc_w);
 	path_x = tx, path_y = ty;
 }
 
@@ -361,7 +364,7 @@ void PathInfo::draw(GameState* gs) {
 
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			PathingNode* node = &path[y * w + x];
+			PathingNode* node = get(x,y);
 			if (false && !node->solid)
 				gl_printf(gs->primary_font(), Colour(255, 255, 255),
 						(x + start_x) * TILE_SIZE - view.x,

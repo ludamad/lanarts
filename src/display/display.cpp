@@ -27,6 +27,7 @@ int power_of_two(int input) {
 	return value;
 }
 void image_display(GLImage* img, int x, int y, const Colour& c) {
+	if (img->width == 0 || img->height == 0) return;
 	int x2 = x + img->width, y2 = y + img->height;
 	glBindTexture(GL_TEXTURE_2D, img->texture);
 	glBegin(GL_QUADS);
@@ -207,14 +208,16 @@ void gl_image_from_bytes(GLImage* img, int w, int h, char* data, int type) {
 		glGenTextures(1, &img->texture);
 
 	int ptw = power_of_two(w), pth = power_of_two(h);
-	ptw = std::max(16, ptw);
-	pth = std::max(16, pth);
+//	ptw = std::max(16, ptw);
+//	pth = std::max(16, pth);
 
 	img->width = w, img->height = h;
 	img->texw = w / ((float) ptw);
 	img->texh = h / ((float) pth);
+	if (w == 0 && h == 0) return;
 
 	glBindTexture(GL_TEXTURE_2D, img->texture);
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

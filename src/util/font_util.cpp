@@ -16,8 +16,9 @@
 #include <freetype/ftoutln.h>
 #include <freetype/fttrigon.h>
 #include <stdexcept>
+#include "../display/display.h"
 
-char_data::char_data(char ch, FT_Face face){
+char_data::char_data(char ch, FT_Face face) : img(){
 	// Load The Glyph For Our Character.
 	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, ch ), FT_LOAD_DEFAULT ))
 		throw std::runtime_error("FT_Load_Glyph failed");
@@ -49,7 +50,17 @@ char_data::char_data(char ch, FT_Face face){
 		data[4*(x+w*my)+2]=255;
 		data[4*(x+w*my)+3]=bitmap.buffer[x+w*y];
 	}
+	int old_unpack;
+	glGetIntegerv(GL_UNPACK_ALIGNMENT, &old_unpack);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	gl_image_from_bytes(&img, w, h, (char*)data, GL_BGRA);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, old_unpack);
 }
+
+char_data::~char_data(){
+    delete [] data;
+}
+
 
 
 void init_font(font_data* fd, const char * fname, unsigned int h) {
