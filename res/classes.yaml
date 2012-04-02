@@ -15,6 +15,8 @@ classes:
     gain_per_level:
         hp: 15
         mp: 20
+        hpregen: 0.01
+        mpregen: 0.015
         magic: 3
         strength: 1
         defence: 1
@@ -33,6 +35,8 @@ classes:
     gain_per_level:
         hp: 30
         mp: 10
+        hpregen: 0.015
+        mpregen: 0.01
         strength: 3
         magic: 1
         defence: 2

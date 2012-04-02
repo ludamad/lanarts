@@ -50,7 +50,7 @@ void load_weapon_item_entries(){
 	//Create items from weapons
 	for (int i = 0; i < game_weapon_data.size(); i++){
 		WeaponType* wtype = &game_weapon_data[i];
-		printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
+		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
 		game_item_data.push_back(ItemType(wtype->name, 11, wtype->weapon_sprite, get_action_by_name("equip"), i));
 	}
 }

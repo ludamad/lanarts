@@ -89,7 +89,7 @@ enemies:
         
   - name: Jester
     sprite: jester
-    radius: 14
+    radius: 12
     xpaward: 35
     stats:
         movespeed: 5
@@ -100,12 +100,12 @@ enemies:
         
   - name: Hell Forged
     sprite: hell_forged
-    radius: 14
+    radius: 12
     xpaward: 50
     stats:
         movespeed: 3
         hp: 190
-        hpregen: 0.0
+        hpregen: 0.01
     attacks:
       - projectile: 1
         damage: 20

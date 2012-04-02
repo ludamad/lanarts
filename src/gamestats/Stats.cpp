@@ -112,6 +112,9 @@ void Stats::gain_level() {
 	strength += ct.str_perlevel;
 	magic += ct.mag_perlevel;
 
+	hpregen += ct.hpregen_perlevel;
+	mpregen += ct.mpregen_perlevel;
+
 	xplevel++;
 }
 

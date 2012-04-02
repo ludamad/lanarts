@@ -26,17 +26,21 @@ ClassType parse_class(const YAML::Node& n){
 	attacks.push_back(ranged);
 	const YAML::Node& gainperlevel = n["gain_per_level"];
 	int hp, mp, mag, str, def;
+	float hpregen, mpregen;
 	gainperlevel["hp"] >> hp;
 	gainperlevel["mp"] >> mp;
 	gainperlevel["strength"] >> str;
 	gainperlevel["magic"] >> mag;
 	gainperlevel["defence"] >> def;
+	gainperlevel["mpregen"] >> mpregen;
+	gainperlevel["hpregen"] >> hpregen;
 
 	return ClassType(
 			parse_cstr(n["name"]),
 			parse_stats(n["start_stats"], attacks),
 			hp, mp,
-			str, def, mag
+			str, def, mag,
+			hpregen, mpregen
 			);
 }
 

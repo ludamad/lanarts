@@ -59,10 +59,8 @@ item_actionf get_action_by_name(const char* name){
 	return NULL;
 }
 int get_item_by_name(const char* name){
-	printf("Getting item '%s' by name\n", name);
 	for (int i = 0; i < game_item_data.size(); i++){
 		if (strcmp(name, game_item_data[i].name) == 0){
-			printf("Comparing '%s' to '%s' returning '%d'\n", name,game_item_data[i].name,i);
 			return i;
 		}
 	}

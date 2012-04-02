@@ -32,7 +32,6 @@ char_data::char_data(char ch, FT_Face face) : img(){
 	FT_Glyph_To_Bitmap( &glyph, ft_render_mode_normal, 0, 1 );
 	FT_BitmapGlyph bitmap_glyph = (FT_BitmapGlyph)glyph;
 
-	// This Reference Will Make Accessing The Bitmap Easier.
 	FT_Bitmap& bitmap=bitmap_glyph->bitmap;
 
 	advance=face->glyph->advance.x >> 6;
@@ -51,10 +50,10 @@ char_data::char_data(char ch, FT_Face face) : img(){
 		data[4*(x+w*my)+3]=bitmap.buffer[x+w*y];
 	}
 	int old_unpack;
-	glGetIntegerv(GL_UNPACK_ALIGNMENT, &old_unpack);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	//glGetIntegerv(GL_UNPACK_ALIGNMENT, &old_unpack);
+	//lPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	gl_image_from_bytes(&img, w, h, (char*)data, GL_BGRA);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, old_unpack);
+	//glPixelStorei(GL_UNPACK_ALIGNMENT, old_unpack);
 }
 
 char_data::~char_data(){

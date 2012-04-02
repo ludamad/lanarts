@@ -242,6 +242,9 @@ void MonsterController::pre_step(GameState* gs) {
 	}
 	std::sort(eois.begin(), eois.end());
 	set_monster_headings(gs, eois);
+
+//
+//	update_monster_positions(gs);
 }
 
 

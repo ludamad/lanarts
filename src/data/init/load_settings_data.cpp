@@ -32,7 +32,6 @@ GameSettings load_settings_data(const char* filename){
 			if (hasnode(root, "class")){
 				std::string classname;
 				root["class"] >> classname;
-				printf("Class is %s\n", classname.c_str());
 				ret.classn = get_class_by_name(classname.c_str());
 			}
 		} catch (const YAML::Exception& parse){

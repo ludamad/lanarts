@@ -277,7 +277,7 @@ branches:
               group_size: 2
             - enemy: Grue
               chance: 30
-          amount: 30
+          amount: 25
       #Level 7
       - size: [102, 102]
         items:
@@ -330,7 +330,7 @@ branches:
               chance: 80
             - enemy: Hell Forged
               chance: 25
-          amount: 45
+          amount: 25
       #Level 8
       - size: [102, 102]
         items:
@@ -383,4 +383,4 @@ branches:
               chance: 100
             - enemy: Hell Forged
               chance: 50
-          amount: 50
+          amount: 30
