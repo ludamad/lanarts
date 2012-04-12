@@ -139,6 +139,7 @@ set( lanarts_include
 )
 
 add_subdirectory( yaml-cpp )
+add_subdirectory( net )
 
 add_executable( lanarts
              ${lanarts_src}
@@ -146,6 +147,7 @@ add_executable( lanarts
 
 
 target_link_libraries( lanarts
+			lanarts_tcp
 			yaml-cpp
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}

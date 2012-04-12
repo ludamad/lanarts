@@ -10,6 +10,7 @@
 #include "world/objects/PlayerInst.h"
 #include "world/objects/EnemyInst.h"
 #include "world/objects/TestInst.h"
+
 using namespace std;
 
 #ifdef __WIN32

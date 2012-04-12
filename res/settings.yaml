@@ -1,5 +1,10 @@
 fullscreen: 0
 regen_level_on_death: 1
-view_width: 1600
-view_height: 900
+view_width: 640
+view_height: 480
 class: Mage
+
+#Either 'host', 'client', or 'none'
+connection_type: host
+ip: localhost
+port: 5000

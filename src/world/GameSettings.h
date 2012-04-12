@@ -1,12 +1,28 @@
 
 #ifndef GAMESETTINGS_H_
 #define GAMESETTINGS_H_
+#include <string>
 
 struct GameSettings {
+	enum connection_type {
+		NONE,
+		CLIENT,
+		HOST
+	};
+
+	/*Multiplayer settings*/
+	std::string ip;
+	int port;
+	connection_type conntype;
+
+	/*Window settings*/
 	bool fullscreen;
+	int view_width, view_height;
+
+	/*Gameplay settings*/
 	bool regen_on_death;
 	int classn;
-	int view_width, view_height;
+
 	GameSettings(){
 		//sets defaults
 		fullscreen = false;
@@ -15,6 +31,10 @@ struct GameSettings {
 		classn = 1;
 		view_width = 960;
 		view_height = 720;
+
+		port = 0;
+		conntype = NONE;
+
 	}
 };
 

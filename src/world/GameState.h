@@ -19,6 +19,7 @@
 #include "../util/font_util.h"
 #include "../procedural/mtwist.h"
 #include "../fov/fov.h"
+#include "net/GameNetConnection.h"
 
 class GameState {
 public:
@@ -147,6 +148,10 @@ public:
 		return settings;
 	}
 
+	GameNetConnection& net_connection() {
+		return connection;
+	}
+
 private:
 	GameSettings settings;
 	std::vector<GameLevelState*> level_states;
@@ -163,6 +168,7 @@ private:
 	int frame_n;
 	bool gennextstep;
 
+	GameNetConnection connection;
 	GameLevelState* lvl;
 	GameHud hud;
 	GameView view;

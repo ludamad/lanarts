@@ -23,6 +23,8 @@
 #include "../data/class_data.h"
 #include <ctime>
 
+#include "net/GameNetConnection.h"
+
 GameState::GameState(const GameSettings& settings, int width, int height, int vieww, int viewh, int hudw) :
 		settings(settings), world_width(width), world_height(height), level_number(1),  frame_n(0), hud(
 				vieww, 0, hudw, viewh), view(50, 50, vieww, viewh, width,
@@ -34,6 +36,15 @@ GameState::GameState(const GameSettings& settings, int width, int height, int vi
 	mtwist.init_genrand(t);
 	gennextstep = false;
 	lvl = new GameLevelState(DNGN_MAIN_BRANCH, level_number, width, height);
+
+	if (settings.conntype == GameSettings::CLIENT){
+		char port_buffer[50];
+		snprintf(port_buffer, 50, "%d", settings.port);
+		connection.get_connection() = create_client_connection(settings.ip.c_str(), port_buffer);
+	} else if (settings.conntype == GameSettings::HOST){
+		connection.get_connection() = create_server_connection(settings.port);
+	}
+
 }
 
 GameState::~GameState() {

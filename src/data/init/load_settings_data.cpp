@@ -29,6 +29,21 @@ GameSettings load_settings_data(const char* filename){
 			optional_set(root, "regen_level_on_death", ret.regen_on_death);
 			optional_set(root, "view_width", ret.view_width);
 			optional_set(root, "view_height", ret.view_height);
+			optional_set(root, "ip", ret.ip);
+			optional_set(root, "port", ret.port);
+
+			if (hasnode(root, "connection_type")){
+				std::string connname;
+				root["connection_type"] >> connname;
+				if (connname == "none"){
+					ret.conntype = GameSettings::NONE;
+				} else if (connname == "client"){
+					ret.conntype = GameSettings::CLIENT;
+				} else if (connname == "host"){
+					ret.conntype = GameSettings::HOST;
+				}
+			}
+
 			if (hasnode(root, "class")){
 				std::string classname;
 				root["class"] >> classname;

@@ -90,7 +90,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 	}
 
 	get_current_actions(gs->frame(), actions);
-	if (actions.size() == 0 && replay_actions.size() == 0) {
+	if (actions.size() == 0 && gs->game_settings().conntype != GameSettings::CLIENT) {
 
 		//Resting
 		bool resting = false;
@@ -215,6 +215,9 @@ void PlayerInst::perform_io_action(GameState* gs) {
 			}
 		}
 	}
+
+//	NetConnection* connection = gs->net_connection();
+//	NetPacket packet;
 
 	for (int i = 0; i < actions.size(); i++) {
 // 		to_action_file(saved, actions[i]);
