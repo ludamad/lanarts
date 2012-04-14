@@ -9,6 +9,7 @@
 #define FONT_UTIL_H_
 
 #include <GL/glu.h>
+#undef GL_GLEXT_VERSION
 #include <ft2build.h>
 #include <freetype/freetype.h>
 #include "../display/GLImage.h"

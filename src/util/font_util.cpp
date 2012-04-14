@@ -9,6 +9,7 @@
 
 #include <SDL.h>
 #include <GL/glu.h>
+#undef GL_GLEXT_VERSION
 
 #include <ft2build.h>
 #include <freetype/freetype.h>

@@ -1,5 +1,6 @@
 #include "draw_util.h"
 #include <cmath>
+#undef GL_GLEXT_VERSION
 #include <SDL_opengl.h>
 #include <cstdio>
 

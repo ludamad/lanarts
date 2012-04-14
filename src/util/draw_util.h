@@ -2,6 +2,7 @@
 #define DRAW_UTIL_H_
 
 #include <SDL.h>
+#undef GL_GLEXT_VERSION
 #include <GL/glu.h>
 #include <ft2build.h>
 #include <freetype/freetype.h>
