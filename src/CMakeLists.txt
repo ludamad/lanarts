@@ -9,7 +9,7 @@ include(FindFreetype)
 set( CMAKE_CXX_FLAGS_RELEASE "-O3 -static-libgcc -static-libstdc++" )
 set( CMAKE_BUILD_TYPE Release)
 
-include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} yaml-cpp/include)
+include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} ../src_yaml/yaml-cpp/include ../src_net/)
 
 set( lanarts_src
 	gamestats/Item.cpp
@@ -39,6 +39,7 @@ set( lanarts_src
 	pathfind/astar_pathfind.cpp
 	pathfind/pathfind.cpp
 	
+	net/GameNetConnection.cpp
 	main.cpp
 	
 	procedural/enemygen.cpp
@@ -117,6 +118,8 @@ set( lanarts_include
 	util/draw_util.h
 	util/font_util.h
 	
+	net/GameNetConnection.h
+
 	world/GameAction.h
 	world/GameInstSet.h
 	world/GameState.h
@@ -137,9 +140,6 @@ set( lanarts_include
 	world/objects/BulletInst.h
 	world/objects/TestInst.h
 )
-
-add_subdirectory( yaml-cpp )
-add_subdirectory( net )
 
 add_executable( lanarts
              ${lanarts_src}
