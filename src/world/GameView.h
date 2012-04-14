@@ -1,8 +1,6 @@
 /*
  * GameView.h
- *
- *  Created on: 2011-11-03
- *      Author: 100397561
+ *	Represents a section of the game world, bounded by the dimensions of the world, and roughly centred on an object
  */
 
 #ifndef GAMEVIEW_H_

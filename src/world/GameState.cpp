@@ -300,6 +300,8 @@ void GameState::regen_level(){
 	reset_level();
 }
 
+void
+
 
 void GameState::reset_level() {
 	GeneratedLevel level;
