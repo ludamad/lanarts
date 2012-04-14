@@ -39,7 +39,7 @@ set( lanarts_src
 	pathfind/astar_pathfind.cpp
 	pathfind/pathfind.cpp
 	
-	net/GameNetConnection.cpp
+	world/net/GameNetConnection.cpp
 	main.cpp
 	
 	procedural/enemygen.cpp
@@ -118,7 +118,7 @@ set( lanarts_include
 	util/draw_util.h
 	util/font_util.h
 	
-	net/GameNetConnection.h
+	world/net/GameNetConnection.h
 
 	world/GameAction.h
 	world/GameInstSet.h

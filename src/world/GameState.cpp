@@ -300,9 +300,6 @@ void GameState::regen_level(){
 	reset_level();
 }
 
-void
-
-
 void GameState::reset_level() {
 	GeneratedLevel level;
 	DungeonBranch& mainbranch = game_dungeon_data[DNGN_MAIN_BRANCH];
