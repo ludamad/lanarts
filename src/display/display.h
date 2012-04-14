@@ -10,6 +10,7 @@
 
 #include <SDL.h>
 #include <GL/glu.h>
+#undef GL_GLEXT_VERSION
 #include <SDL_opengl.h>
 #include "../world/GameView.h"
 #include "../util/draw_util.h"

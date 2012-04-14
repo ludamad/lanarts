@@ -10,6 +10,7 @@
 
 #include <SDL.h>
 #include <SDL_opengl.h>
+#undef GL_GLEXT_VERSION
 
 struct GLImage{
 	const char* filename;

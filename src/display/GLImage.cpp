@@ -8,8 +8,10 @@
 #include "GLImage.h"
 #include <SDL.h>
 #include <SDL_opengl.h>
+#undef GL_GLEXT_VERSION
 #include <SDL_image.h>
 #include <GL/glu.h>
+#undef GL_GLEXT_VERSION
 
 
 void init_GL_Image(GLImage* img, const char* fname){

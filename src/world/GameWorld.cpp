@@ -6,13 +6,19 @@
  */
 
 #include "GameWorld.h"
+#include "GameState.h"
+#include "GameLevelState.h"
 
 GameWorld::GameWorld() {
-	// TODO Auto-generated constructor stub
 
 }
 
 GameWorld::~GameWorld() {
-	// TODO Auto-generated destructor stub
+}
+
+GameLevelState *GameWorld::get_level(int roomid) {
+}
+
+void GameWorld::step(GameState *gs) {
 }
 

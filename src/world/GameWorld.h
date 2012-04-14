@@ -5,13 +5,17 @@
 
 #ifndef GAMEWORLD_H_
 #define GAMEWORLD_H_
+#include <vector>
 
+struct GameState;
 struct GameLevelState;
 
 class GameWorld {
 public:
 	GameWorld();
 	~GameWorld();
+	GameLevelState* get_level(int roomid);
+	void step(GameState* gs);
 private:
 	std::vector<GameLevelState*> level_states;
 };
