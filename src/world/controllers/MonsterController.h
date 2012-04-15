@@ -27,6 +27,10 @@ struct EnemyOfInterest {
 	}
 };
 
+namespace RVO {
+	struct RVOSimulator;
+}
+
 class MonsterController {
 public:
 	MonsterController();
@@ -36,24 +40,27 @@ public:
 
 	void pre_step(GameState* gs);
 	void post_draw(GameState* gs);
-	void register_enemy(obj_id monster) { mids.push_back(monster); }
-	void shift_target(GameState* gs);
-
-	void clear();
-	void set_monster_headings(GameState* gs, std::vector<EnemyOfInterest>& eois);
-	void update_monster_positions(GameState* gs);
+	void register_enemy(GameInst* enemy);
+    void shift_target(GameState *gs);
+    void clear();
+    void set_monster_headings(GameState *gs, std::vector<EnemyOfInterest> & eois);
+    void update_monster_positions(GameState *gs);
+    void update_position(EnemyInst* e);
 public:
-	void monster_wandering(GameState* gs, EnemyInst* e);
-	void monster_follow_path(GameState* gs, EnemyInst* e);
-	void monster_get_to_stairs(GameState* gs, EnemyInst* e);
-
-	AStarPathFind astarcontext;
-	obj_id targetted;
-	std::vector<PathInfo> room_paths;
-	//vector of paths to player instances
-	std::vector<PathInfo> paths;
-	//vector of monster ids
+    void monster_wandering(GameState *gs, EnemyInst *e);
+    void monster_follow_path(GameState *gs, EnemyInst *e);
+    void monster_get_to_stairs(GameState *gs, EnemyInst *e);
+    bool must_initialize;
+    AStarPathFind astarcontext;
+    obj_id targetted;
+    std::vector<PathInfo> room_paths;
+    std::vector<PathInfo> paths;
 	std::vector<obj_id> mids;
+
+	RVO::RVOSimulator* simulator;
 };
+
+
+
 
 #endif /* MONSTERCONTROLLER_H_ */

@@ -1,0 +1,16 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+
+PROJECT(RVO)
+
+ADD_EXECUTABLE(ExampleBlocks ExampleBlocks.cpp)
+TARGET_LINK_LIBRARIES(ExampleBlocks RVO)
+
+ADD_EXECUTABLE(ExampleCircle ExampleCircle.cpp)
+TARGET_LINK_LIBRARIES(ExampleCircle RVO)
+
+ADD_EXECUTABLE(ExampleRoadmap ExampleRoadmap.cpp)
+TARGET_LINK_LIBRARIES(ExampleRoadmap RVO)
+
+INSTALL(TARGETS ExampleBlocks DESTINATION ../bin)
+INSTALL(TARGETS ExampleCircle DESTINATION ../bin)
+INSTALL(TARGETS ExampleRoadmap DESTINATION ../bin)

@@ -17,6 +17,7 @@ void ServerNetConnection::accept_handler(SocketStream* ss, const asio::error_cod
 							asio::placeholders::error));
 		}
 		ss = new SocketStream(io_service);
+//		peer_id = ss->get_peer_id();
 		acceptor.async_accept(
 			ss->get_socket(),
 			boost::bind(&ServerNetConnection::accept_handler, this, ss, asio::placeholders::error));
@@ -38,12 +39,36 @@ ServerNetConnection::ServerNetConnection(int port) :
 ServerNetConnection::~ServerNetConnection() {
 }
 
+void ServerNetConnection::assign_peerid(SocketStream* stream, int peerid){
+	NetPacket packet(get_peer_id());
+	packet.packet_type = PACKET_NEW;
+	packet.add_int(peerid);
+	stream->send_packet(packet);
+}
 bool ServerNetConnection::get_next_packet(NetPacket & packet) {
 	bool found = false;
 
 	streamlock.lock();
 	std::vector< stream_ptr > s = streams;
 	streamlock.unlock();
+
+	for (int i = 0; i < s.size() && !found; i++){
+		SocketStream* ss = s[i].get();
+		boost::mutex& m = ss->get_mutex();
+		//We try to determine the status without a lock, should never be 0 when non-empty
+		if (ss->rmessages().size() != 0){
+			m.lock();
+			do {
+				packet = ss->rmessages().front();
+				ss->rmessages().pop_front();
+				if (packet.packet_type == PACKET_NEW){
+					assign_peerid(ss, i+1);
+				}
+			} while (packet.packet_type == PACKET_NEW);
+			m.unlock();
+			found = true;
+		}
+	}
 
 	for (int i = 0; i < s.size() && !found; i++){
 		SocketStream* ss = s[i].get();

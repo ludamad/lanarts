@@ -21,9 +21,12 @@ public:
 
 	virtual bool get_next_packet(NetPacket& packet);
 	virtual void broadcast_packet(const NetPacket& packet);
+	virtual int get_peer_id(){ return 0;}
+	virtual int get_number_peers(){ return streams.size();}
 	virtual void join();
 
 private:
+	void assign_peerid(SocketStream* stream, int peerid);
 	boost::mutex streamlock;
 	boost::shared_ptr<asio::thread> execution_thread;
 	void accept_handler(SocketStream* ss, const asio::error_code& error);

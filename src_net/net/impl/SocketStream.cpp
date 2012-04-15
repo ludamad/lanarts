@@ -1,5 +1,6 @@
 #include "ClientNetConnection.h"
 #include <boost/bind.hpp>
+#include <string>
 
 using namespace asio::ip;
 
@@ -28,6 +29,7 @@ void socketstream_read_header_handler(SocketStream* ss,
 void socketstream_read_body_handler(SocketStream* ss,
 		const asio::error_code& error) {
 	if (!error) {
+		ss->last_message().decode_header();
 		ss->get_mutex().lock();
 		ss->rmessages().push_back(ss->last_message());
 		ss->get_mutex().unlock();
@@ -102,3 +104,18 @@ void SocketStream::send_packet(const NetPacket & packet) {
 						asio::placeholders::error));
     }
 }
+
+//static unsigned int to_ip_number(const char* ipString){
+//	unsigned char bytes[4] = {0,0,0,0};
+//	for (int i = 0; i < 4; i++){
+//		bytes[i] = atoi(ipString);
+//		while (*ipString != 0 && *ipString != '.')
+//			++ipString;
+//	}
+//	return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+//}
+//int SocketStream::get_peer_id(){
+//	asio::ip::address remote_ad = socket.remote_endpoint().address();
+//	std::string s = remote_ad.to_string();
+//	return to_ip_number(s.c_str());
+//}

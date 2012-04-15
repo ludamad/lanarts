@@ -31,7 +31,7 @@ static bool enemy_hit(GameInst* self, GameInst* other) {
 
 void EnemyInst::init(GameState* gs) {
 	MonsterController& mc = gs->monster_controller();
-	mc.register_enemy(this->id);
+	mc.register_enemy(this);
 
 	//xpgain *=1+gs->branch_level()/10.0;
 	//xpgain = round(xpgain/5.0)*5;
@@ -75,9 +75,9 @@ void EnemyInst::step(GameState* gs) {
 	}
 	if (stats().hurt_cooldown > 0)
 		eb.vx /=2, eb.vy /=2 ;
-	x = (int) round(rx += eb.vx); //update based on rounding of true float
-	y = (int) round(ry += eb.vy);
-
+//	x = (int) round(rx += eb.vx); //update based on rounding of true float
+//	y = (int) round(ry += eb.vy);
+		gs->monster_controller().update_position(this);
 //	}
 	stats().step();
 }

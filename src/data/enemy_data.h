@@ -1,8 +1,6 @@
 /*
  * enemy_data.h
- *
- *  Created on: Mar 20, 2012
- *      Author: 100397561
+ *	Definitions for the enemy type, these are filled through the parsed yaml file.
  */
 
 #ifndef ENEMY_DATA_H_

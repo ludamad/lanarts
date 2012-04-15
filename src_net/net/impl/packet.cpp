@@ -10,8 +10,8 @@
 
 typedef unsigned long long ullong;
 
-NetPacket::NetPacket() :
-		body_length(0) {
+NetPacket::NetPacket(int packet_origin) :
+		body_length(0), packet_type(PACKET_MSG), packet_origin(packet_origin){
 }
 
 size_t NetPacket::length() const {
@@ -23,16 +23,23 @@ char *NetPacket::body() {
 }
 
 bool NetPacket::decode_header() {
-	body_length = *((short *) ((((data)))));
+	int* idata = (int*)data;
+	body_length = idata[0];
 	if (body_length > MAX_PACKET_SIZE) {
 		body_length = 0;
 		return false;
 	}
+	packet_type = idata[1];
+	packet_origin = idata[2];
+
 	return true;
 }
 
 void NetPacket::encode_header() {
-	*(short *) data = body_length;
+	int* idata = (int*)data;
+	idata[0] = body_length;
+	idata[1] = packet_type;
+	idata[2] = packet_origin;
 }
 
 void NetPacket::add_int(long val) {

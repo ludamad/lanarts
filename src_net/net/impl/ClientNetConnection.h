@@ -21,11 +21,15 @@ public:
 
 	virtual bool get_next_packet(NetPacket& packet);
 	virtual void broadcast_packet(const NetPacket& packet);
+	virtual int get_peer_id(){ return peer_id;}
+	virtual int get_number_peers(){ return number_of_peers;}
 
 	SocketStream& socket_stream() { return stream; }
 	virtual void join();
 
 private:
+	int peer_id;
+	int number_of_peers;
 	boost::shared_ptr<asio::thread> execution_thread;
 	asio::io_service io_service;
 	SocketStream stream;

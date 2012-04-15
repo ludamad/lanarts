@@ -39,6 +39,7 @@ public:
 	boost::mutex& get_mutex(){ return mutex;}
 	NetPacket& last_message() { return read_message; }
 	bool& is_closed(){ return closed; }
+//	int get_peer_id();
 
 private:
 	bool closed;

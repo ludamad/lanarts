@@ -15,14 +15,31 @@
 #include "../../util/draw_util.h"
 #include "../../data/tile_data.h"
 
+#include <rvo2/RVO.h>
+
 const int PATHING_RADIUS = 500;
 const int HUGE_DISTANCE = 1000000;
 
 MonsterController::MonsterController() {
 	targetted = 0;
+	must_initialize = true;
+	simulator = new RVO::RVOSimulator();
 }
 
 MonsterController::~MonsterController() {
+	delete simulator;
+}
+
+void MonsterController::register_enemy(GameInst* enemy){
+    mids.push_back(enemy->id);
+    RVO::Vector2 enemy_position(enemy->x, enemy->y);
+    EnemyBehaviour& eb = ((EnemyInst*)enemy)->behaviour();
+//    const Vector2& position, float neighborDist,
+//                        size_t maxNeighbors, float timeHorizon,
+//                        float timeHorizonObst, float radius, float maxSpeed,
+//                        const Vector2& velocity = Vector2());
+    int simid = simulator->addAgent(enemy_position, 100, 10, 5.0f, 5.0f, enemy->radius, eb.speed);
+    eb.simulation_id = simid;
 }
 
 void towards_highest(PathInfo& path, Pos& p){
@@ -47,6 +64,31 @@ bool move_towards(EnemyInst* e, const Pos& p){
 	eb.vx = dx/mag*eb.speed/2;
 	eb.vy = dy/mag*eb.speed/2;
 	return false;
+}
+
+
+void set_preferred_velocity(GameState* gs, RVO::RVOSimulator* sim, EnemyInst* e){
+	MTwist& mt = gs->rng();
+	EnemyBehaviour& eb = e->behaviour();
+  /*
+   * Set the preferred velocity to be a vector of unit magnitude (speed) in the
+   * direction of the goal.
+   */
+	RVO::Vector2 goalVector(eb.vx, eb.vy);
+
+	if (RVO::absSq(goalVector) > eb.speed) {
+	  goalVector = RVO::normalize(goalVector)*eb.speed;
+	}
+
+	/*
+	 * Perturb a little to avoid deadlocks due to perfect symmetry.
+	 */
+	float angle = gs->rng().rand(3600) / 3600.0 * 2.0f * M_PI;
+	float dist =  gs->rng().rand(10000) / 10000.0 * 0.0001f;
+
+	goalVector += dist * RVO::Vector2(std::cos(angle), std::sin(angle));
+
+	sim->setAgentPrefVelocity(eb.simulation_id, goalVector);
 }
 
 void MonsterController::monster_follow_path(GameState* gs, EnemyInst* e){
@@ -157,11 +199,29 @@ void MonsterController::shift_target(GameState* gs){
 
 }
 
+
 void MonsterController::pre_step(GameState* gs) {
 	//Use a temporary 'GameView' object to make use of its helper methods
 	GameView view(0, 0, PATHING_RADIUS * 2, PATHING_RADIUS * 2, gs->width(),
 			gs->height());
-
+	if (must_initialize){
+		must_initialize = !must_initialize;
+		std::vector<RVO::Vector2> vertices;
+		vertices.resize(4);
+		GameTiles& tiles = gs->tile_grid();
+		for (int y = 0; y < tiles.tile_height(); y++){
+			for (int x = 0; x < tiles.tile_width(); x++){
+				if (game_tile_data[tiles.get(x,y)].solid ){
+					int xx = x*TILE_SIZE, yy = y*TILE_SIZE;
+					vertices[0] = RVO::Vector2(xx+TILE_SIZE,yy+TILE_SIZE);
+					vertices[1] = RVO::Vector2(xx,yy+TILE_SIZE);
+					vertices[2] = RVO::Vector2(xx,yy);
+					vertices[3] = RVO::Vector2(xx+TILE_SIZE,yy);
+					simulator->addObstacle(vertices);
+				}
+			}
+		}
+	}
 	PlayerController& pc = gs->player_controller();
 	const std::vector<obj_id> pids = pc.player_ids();
 
@@ -239,14 +299,21 @@ void MonsterController::pre_step(GameState* gs) {
 			monster_wandering(gs, e);
 		else if (e->behaviour().current_action == EnemyBehaviour::FOLLOWING_PATH)
 			monster_follow_path(gs, e);
+		set_preferred_velocity(gs, simulator, e);
+	//	else
+	//		monster_wandering(gs, e);
 	}
 	std::sort(eois.begin(), eois.end());
 	set_monster_headings(gs, eois);
+	simulator->doStep();
 
-//
-//	update_monster_positions(gs);
 }
 
+void MonsterController::update_position(EnemyInst* e){
+	RVO::Vector2 updated = simulator->getAgentPosition(e->behaviour().simulation_id);
+	e->x = updated.x();
+	e->y = updated.y();
+}
 
 void MonsterController::post_draw(GameState* gs){
 	GameInst* target = gs->get_instance(targetted);

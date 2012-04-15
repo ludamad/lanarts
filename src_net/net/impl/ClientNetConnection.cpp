@@ -8,6 +8,9 @@ void client_connect_handler(ClientNetConnection* cnc,
 		tcp::resolver::iterator endpoint_iterator) {
 	SocketStream* s = &cnc->socket_stream();
 	if (!error) {
+		NetPacket packet(cnc->get_peer_id());
+		s->send_packet(packet);
+
 		asio::async_read(
 				s->get_socket(),
 				asio::buffer(s->last_message().data, NetPacket::HEADER_LEN),
