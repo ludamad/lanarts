@@ -9,7 +9,7 @@ include(FindFreetype)
 set( CMAKE_CXX_FLAGS_RELEASE "-O3 -static-libgcc -static-libstdc++" )
 set( CMAKE_BUILD_TYPE Release)
 
-include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} ../src_yaml/yaml-cpp/include ../src_net/ ../src_rvo2/RVO2/rvo2)
+include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} ../src_yaml/yaml-cpp/include ../src_net/ ../src_rvo2/RVO2)
 
 set( lanarts_src
 	gamestats/Item.cpp
