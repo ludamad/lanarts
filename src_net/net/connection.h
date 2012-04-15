@@ -10,7 +10,7 @@ public:
 	virtual void broadcast_packet(const NetPacket& packet) = 0;
 	virtual void join() = 0;
 	virtual int get_peer_id() = 0;
-	virtual int get_number_peers();
+	virtual int get_number_peers() = 0;
 
 	virtual ~NetConnection(){}
 };
