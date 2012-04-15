@@ -14,12 +14,14 @@ set( lanarts_tcp_src
 	impl/packet.cpp
 	impl/ServerNetConnection.cpp
 	impl/ClientNetConnection.cpp
+	impl/DummyNetConnection.cpp
 	impl/SocketStream.cpp
 	)
 
 set( lanarts_tcp_include
 	impl/ServerNetConnection.h
 	impl/ClientNetConnection.h
+	impl/DummyNetConnection.h
 	impl/SocketStream.h
 	connection.h
 	packet.h
