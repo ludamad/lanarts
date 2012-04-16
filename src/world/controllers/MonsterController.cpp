@@ -24,6 +24,7 @@ MonsterController::MonsterController() {
 	targetted = 0;
 	must_initialize = true;
 	simulator = new RVO::RVOSimulator();
+	simulator->setTimeStep(1.0f);
 }
 
 MonsterController::~MonsterController() {
@@ -38,7 +39,7 @@ void MonsterController::register_enemy(GameInst* enemy){
 //                        size_t maxNeighbors, float timeHorizon,
 //                        float timeHorizonObst, float radius, float maxSpeed,
 //                        const Vector2& velocity = Vector2());
-    int simid = simulator->addAgent(enemy_position, 100, 10, 5.0f, 5.0f, enemy->radius, eb.speed);
+    int simid = simulator->addAgent(enemy_position, 1000, 10, 4.0f, 1.0f, 16, eb.speed);
     eb.simulation_id = simid;
 }
 
@@ -83,11 +84,11 @@ void set_preferred_velocity(GameState* gs, RVO::RVOSimulator* sim, EnemyInst* e)
 	/*
 	 * Perturb a little to avoid deadlocks due to perfect symmetry.
 	 */
-	float angle = gs->rng().rand(3600) / 3600.0 * 2.0f * M_PI;
-	float dist =  gs->rng().rand(10000) / 10000.0 * 0.0001f;
-
-	goalVector += dist * RVO::Vector2(std::cos(angle), std::sin(angle));
-
+//	float angle = gs->rng().rand(3600) / 3600.0 * 2.0f * M_PI;
+//	float dist =  gs->rng().rand(10000) / 10000.0 * 0.0001f;
+//
+//	goalVector += dist * RVO::Vector2(std::cos(angle), std::sin(angle));
+//
 	sim->setAgentPrefVelocity(eb.simulation_id, goalVector);
 }
 
@@ -204,24 +205,39 @@ void MonsterController::pre_step(GameState* gs) {
 	//Use a temporary 'GameView' object to make use of its helper methods
 	GameView view(0, 0, PATHING_RADIUS * 2, PATHING_RADIUS * 2, gs->width(),
 			gs->height());
-	if (must_initialize){
-		must_initialize = !must_initialize;
-		std::vector<RVO::Vector2> vertices;
-		vertices.resize(4);
-		GameTiles& tiles = gs->tile_grid();
-		for (int y = 0; y < tiles.tile_height(); y++){
-			for (int x = 0; x < tiles.tile_width(); x++){
-				if (game_tile_data[tiles.get(x,y)].solid ){
-					int xx = x*TILE_SIZE, yy = y*TILE_SIZE;
-					vertices[0] = RVO::Vector2(xx+TILE_SIZE,yy+TILE_SIZE);
-					vertices[1] = RVO::Vector2(xx,yy+TILE_SIZE);
-					vertices[2] = RVO::Vector2(xx,yy);
-					vertices[3] = RVO::Vector2(xx+TILE_SIZE,yy);
-					simulator->addObstacle(vertices);
-				}
-			}
-		}
-	}
+//	if (must_initialize){
+//		must_initialize = !must_initialize;
+//		std::vector<RVO::Vector2> vertices;
+//		vertices.resize(4);
+//		int walls = 0;
+//		GameTiles& tiles = gs->tile_grid();
+//		for (int y = 0; y < tiles.tile_height(); y++){
+//			for (int x = 0; x < tiles.tile_width(); x++){
+//				bool is_near_nonsolid = false;
+//				for (int dy = -1; dy <= +1; dy++){
+//					for (int dx = -1; dx <= +1; dx++){
+//						int tx = x + dx;
+//						int ty = y + dy;
+//						if (tx < 0 || tx >= tiles.tile_width()) continue;
+//						if (ty < 0 || ty >= tiles.tile_height()) continue;
+//						if (!game_tile_data[tiles.get(tx,ty)].solid){
+//							is_near_nonsolid = true;
+//						}
+//					}
+//				}
+//				if (is_near_nonsolid && game_tile_data[tiles.get(x,y)].solid ){
+//					walls++;
+//					int xx = x*TILE_SIZE, yy = y*TILE_SIZE;
+//					vertices[0] = RVO::Vector2(xx,yy+TILE_SIZE);
+//					vertices[1] = RVO::Vector2(xx,yy);
+//					vertices[2] = RVO::Vector2(xx+TILE_SIZE,yy);
+//					vertices[3] = RVO::Vector2(xx+TILE_SIZE,yy+TILE_SIZE);
+//					simulator->addObstacle(vertices);
+//				}
+//			}
+//		}
+//		simulator->processObstacles();
+//	}
 	PlayerController& pc = gs->player_controller();
 	const std::vector<obj_id> pids = pc.player_ids();
 
@@ -299,20 +315,30 @@ void MonsterController::pre_step(GameState* gs) {
 			monster_wandering(gs, e);
 		else if (e->behaviour().current_action == EnemyBehaviour::FOLLOWING_PATH)
 			monster_follow_path(gs, e);
-		set_preferred_velocity(gs, simulator, e);
 	//	else
 	//		monster_wandering(gs, e);
 	}
-	std::sort(eois.begin(), eois.end());
+	//std::sort(eois.begin(), eois.end());
 	set_monster_headings(gs, eois);
-	simulator->doStep();
+	//for (int i = 0; i < 4; i++)
+
+//	for (int i = 0; i < mids2.size(); i++) {
+//		EnemyInst* e = (EnemyInst*) gs->get_instance(mids2[i]);
+//		if (e == NULL)
+//			continue;
+//		set_preferred_velocity(gs, simulator, e);
+//	}
+//
+//	for (int i = 0; i < 10; i++){
+	//	simulator->doStep();
+//	}
 
 }
 
 void MonsterController::update_position(EnemyInst* e){
 	RVO::Vector2 updated = simulator->getAgentPosition(e->behaviour().simulation_id);
-	e->x = updated.x();
-	e->y = updated.y();
+	e->x = round(updated.x());
+	e->y = round(updated.y());
 }
 
 void MonsterController::post_draw(GameState* gs){

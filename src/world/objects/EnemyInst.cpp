@@ -51,6 +51,7 @@ void EnemyInst::init(GameState* gs) {
 }
 
 void EnemyInst::step(GameState* gs) {
+	gs->monster_controller().update_position(this);
 	bool firstcol = true;
 	GameInst* collided = NULL;
 	gs->object_radius_test(this, &collided, 1, &enemy_hit);
@@ -60,7 +61,7 @@ void EnemyInst::step(GameState* gs) {
 	}
 	if (collided ){
 		float dx = collided->x - x, dy = collided->y - y;
-		float mag = sqrt(dx*dx + dy*dy);
+		//float mag = sqrt(dx*dx + dy*dy);
 		/*if (mag == 0) mag = 1;
 			eb.vx = -dy*eb.speed/mag;
 			eb.vy = -dx*eb.speed/mag;
@@ -75,9 +76,8 @@ void EnemyInst::step(GameState* gs) {
 	}
 	if (stats().hurt_cooldown > 0)
 		eb.vx /=2, eb.vy /=2 ;
-//	x = (int) round(rx += eb.vx); //update based on rounding of true float
-//	y = (int) round(ry += eb.vy);
-		gs->monster_controller().update_position(this);
+	x = (int) round(rx += eb.vx); //update based on rounding of true float
+	y = (int) round(ry += eb.vy);
 //	}
 	stats().step();
 }
@@ -100,8 +100,13 @@ void EnemyInst::draw(GameState* gs) {
 		float s = 1 - stats().hurt_alpha();
 		Colour red(255,255*s,255*s);
 		image_display(&img, xx - view.x, yy - view.y, red);
-	}else{
+	}
+	else{
 		image_display(&img, xx - view.x, yy - view.y);
+//		if (gs->solid_test(this)){
+//		Colour red(255,0,0);
+//		image_display(&img, xx - view.x, yy - view.y,red);
+//		}
 	}
 	//draw_path(gs, eb.path);
 }
