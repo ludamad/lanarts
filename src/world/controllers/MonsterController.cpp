@@ -39,7 +39,7 @@ void MonsterController::register_enemy(GameInst* enemy){
 //                        size_t maxNeighbors, float timeHorizon,
 //                        float timeHorizonObst, float radius, float maxSpeed,
 //                        const Vector2& velocity = Vector2());
-    int simid = simulator->addAgent(enemy_position, 1000, 10, 4.0f, 1.0f, 16, eb.speed);
+    int simid = simulator->addAgent(enemy_position, 32, 10, 4.0f, 1.0f, 16, eb.speed);
     eb.simulation_id = simid;
 }
 
@@ -322,23 +322,78 @@ void MonsterController::pre_step(GameState* gs) {
 	set_monster_headings(gs, eois);
 	//for (int i = 0; i < 4; i++)
 
-//	for (int i = 0; i < mids2.size(); i++) {
-//		EnemyInst* e = (EnemyInst*) gs->get_instance(mids2[i]);
-//		if (e == NULL)
-//			continue;
-//		set_preferred_velocity(gs, simulator, e);
-//	}
-//
-//	for (int i = 0; i < 10; i++){
-	//	simulator->doStep();
-//	}
+	for (int i = 0; i < mids2.size(); i++) {
+		EnemyInst* e = (EnemyInst*) gs->get_instance(mids2[i]);
+		if (e == NULL)
+			continue;
+		update_velocity(gs, e);
+		set_preferred_velocity(gs, simulator, e);
+	}
 
+	simulator->doStep();
+
+	for (int i = 0; i < mids2.size(); i++) {
+		EnemyInst* e = (EnemyInst*) gs->get_instance(mids2[i]);
+		if (e == NULL)
+			continue;
+		update_position(gs, e);
+	}
 }
 
-void MonsterController::update_position(EnemyInst* e){
+void MonsterController::update_velocity(GameState* gs, EnemyInst* e){
+//	GameInst* collided = NULL;
+//	gs->object_radius_test(e, &collided, 1, &enemy_hit);
+	EnemyBehaviour& eb = e->behaviour();
+//	if (gs->tile_radius_test(e->x+eb.vx, e->y+eb.vy, e->radius)){
+//		eb.vx = -eb.vx;
+//		eb.vy = -eb.vy;
+//	}
+
+
+	if (e->stats().hurt_cooldown > 0)
+		eb.vx /=2, eb.vy /=2 ;
+}
+void MonsterController::update_position(GameState* gs, EnemyInst* e){
+	EnemyBehaviour& eb = e->behaviour();
 	RVO::Vector2 updated = simulator->getAgentPosition(e->behaviour().simulation_id);
-	e->x = round(updated.x());
-	e->y = round(updated.y());
+
+	float ux = updated.x(), uy = updated.y();
+	float dx = ux - e->rx, dy = uy - e->ry;
+	float dist = sqrt(dx*dx+dy*dy);
+//	float mag = sqrt(eb.vx*eb.vx + eb.vy*eb.vy);
+//	bool less_significantly = dist <= mag*.99f;
+	bool collided = gs->tile_radius_test(round(ux), round(uy), /*e->radius+4*/20);
+
+	if (dist > 0.5f && !collided){
+		e->rx = ux;
+		e->ry = uy;
+	} else {
+
+		float nx = round(e->rx+eb.vx), ny = round(e->ry+eb.vy);
+		bool collided = gs->tile_radius_test(nx, ny, e->radius);
+		if (collided){
+			bool hitsx = gs->tile_radius_test(nx, e->y, e->radius, true, -1);
+			bool hitsy = gs->tile_radius_test(e->x, ny, e->radius, true, -1);
+			if(hitsy || hitsx || collided){
+				if (hitsx) {
+					eb.vx = -eb.vx;
+				}
+				if (hitsy) {
+					eb.vy = -eb.vy;
+				}
+				if (!hitsy && !hitsx) {
+					eb.vx = -eb.vx;
+					eb.vy = -eb.vy;
+				}
+			}
+		}
+		e->rx += eb.vx;
+		e->ry += eb.vy;
+		simulator->setAgentPosition(e->behaviour().simulation_id, RVO::Vector2(e->rx, e->ry));
+	}
+
+	e->x = (int) round(e->rx); //update based on rounding of true float
+	e->y = (int) round(e->ry);
 }
 
 void MonsterController::post_draw(GameState* gs){

@@ -44,8 +44,8 @@ public:
     void shift_target(GameState *gs);
     void clear();
     void set_monster_headings(GameState *gs, std::vector<EnemyOfInterest> & eois);
-    void update_monster_positions(GameState *gs);
-    void update_position(EnemyInst* e);
+    void update_position(GameState* gs, EnemyInst* e);
+    void update_velocity(GameState* gs, EnemyInst* e);
 public:
     void monster_wandering(GameState *gs, EnemyInst *e);
     void monster_follow_path(GameState *gs, EnemyInst *e);
