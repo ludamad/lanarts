@@ -29,7 +29,10 @@ int power_of_two(int input) {
 void image_display(GLImage* img, int x, int y, const Colour& c) {
 	if (img->width == 0 || img->height == 0) return;
 	int x2 = x + img->width, y2 = y + img->height;
+
+	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, img->texture);
+
 	glBegin(GL_QUADS);
 	glColor4ub(c.r, c.g, c.b, c.a);
 
@@ -47,8 +50,8 @@ void image_display(GLImage* img, int x, int y, const Colour& c) {
 	glVertex2i(x, y2);
 
 	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, NULL);
+	glDisable(GL_TEXTURE_2D);
+	//Don't use glBindTexture(GL_TEXTURE_2D, NULL);
 }
 
 void image_display_parts(GLImage* img, int x, int y, int sub_parts,
@@ -63,6 +66,7 @@ void image_display_parts(GLImage* img, int x, int y, int sub_parts,
 		image_display(img,x,y);
 		return;
 	}
+	glEnable(GL_TEXTURE_2D);
 	glColor4ub(255, 255, 255, 255);
 	int xincr = img->width / sub_parts, yincr = img->height / sub_parts;
 	float tex_xincr = img->texw / sub_parts, tex_yincr = img->texh / sub_parts;
@@ -92,11 +96,10 @@ void image_display_parts(GLImage* img, int x, int y, int sub_parts,
 //			glTexCoord2f(0, img->texh);
 			glTexCoord2f(tsx, tey);
 			glVertex2i(sx, ey);
-
-			glBindTexture(GL_TEXTURE_2D, NULL);
 	glEnd();
 		}
 	}
+	glDisable(GL_TEXTURE_2D);
 }
 
 void update_display() {
@@ -163,6 +166,7 @@ void init_sdl_gl(bool fullscreen, int w, int h) {
 	/* Set the window manager title bar */
 	SDL_WM_SetCaption("RPG", "rpg");
 
+	glDisable(GL_TEXTURE_2D);
 }
 
 void gl_set_drawing_area(int x, int y, int w, int h) {
@@ -216,6 +220,7 @@ void gl_image_from_bytes(GLImage* img, int w, int h, char* data, int type) {
 	img->texh = h / ((float) pth);
 	if (w == 0 || h == 0) return;
 
+	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, img->texture);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -227,5 +232,6 @@ void gl_image_from_bytes(GLImage* img, int w, int h, char* data, int type) {
 				GL_UNSIGNED_BYTE, NULL);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, type, GL_UNSIGNED_BYTE,
 			data);
+	glDisable(GL_TEXTURE_2D);
 }
 

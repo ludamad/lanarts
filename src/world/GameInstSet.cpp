@@ -96,7 +96,7 @@ static inline int get_xyind(const Pos& c, int grid_w) {
 	return (c.y / GameInstSet::REGION_SIZE) * grid_w
 			+ c.x / GameInstSet::REGION_SIZE;
 }
-void GameInstSet::remove(GameInst* inst) {
+void GameInstSet::remove(GameInst* inst, bool deallocate) {
 	if (inst->destroyed)
 		return;
 	inst->destroyed = true;
@@ -120,7 +120,9 @@ void GameInstSet::remove(GameInst* inst) {
 		next->prev_in_grid = prev;
 	this->unit_amnt--;
 	state->inst = GAMEINST_TOMBSTONE;
-	deallocation_list.push_back(inst);
+	if (deallocate){
+		deallocation_list.push_back(inst);
+	}
 }
 
 obj_id GameInstSet::add(GameInst* inst) {

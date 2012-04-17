@@ -179,6 +179,9 @@ void MonsterController::set_monster_headings(GameState* gs, std::vector<EnemyOfI
 	}
 }
 
+void MonsterController::deregister_enemy(EnemyInst* enemy){
+	simulator->setAgentPosition(enemy->behaviour().simulation_id, RVO::Vector2(-TILE_SIZE, -TILE_SIZE));
+}
 void MonsterController::shift_target(GameState* gs){
 	if (!targetted) return;//Should auto-target, it no target no possible targets
 	int i, j;

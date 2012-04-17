@@ -122,6 +122,7 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 bool EnemyInst::hurt(GameState* gs, int hp){
 	if (!destroyed && stats().hurt(hp)){
 		gs->add_instance(new AnimatedInst(x,y,etype()->sprite_number, 15));
+		gs->monster_controller().deregister_enemy(this);
 		gs->remove_instance(this);
 		return true;
 	}

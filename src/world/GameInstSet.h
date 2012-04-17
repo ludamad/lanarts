@@ -29,7 +29,7 @@ public:
 	~GameInstSet();
 
 	obj_id add(GameInst* inst);
-	void remove(GameInst* inst);
+	void remove(GameInst* inst, bool deallocate = true);
 	void step(GameState* state);
 
 	//Returns NULL if no unit found

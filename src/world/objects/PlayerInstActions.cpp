@@ -24,16 +24,6 @@
 // static FILE* open = fopen("res/replay.rep", "rb");
 static std::vector<GameAction> replay_actions;
 
-static int scan_entrance(const std::vector<GameLevelPortal>& portals,
-		const Pos& tilepos) {
-	for (int i = 0; i < portals.size(); i++) {
-		if (portals[i].entrancesqr == tilepos) {
-			return i;
-		}
-	}
-	return -1;
-}
-
 static bool item_hit(GameInst* self, GameInst* other) {
 	return dynamic_cast<ItemInst*>(other) != NULL;
 }
@@ -199,19 +189,17 @@ void PlayerInst::perform_io_action(GameState* gs) {
 		if (gs->key_down_state(SDLK_PERIOD) || gs->mouse_downwheel()) {
 			if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN,
 					&hitsqr)) {
-				int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
+//				int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
 				actions.push_back(
-						GameAction(id, GameAction::USE_ENTRANCE, frame, level,
-								entr_n));
+						GameAction(id, GameAction::USE_ENTRANCE, frame, level));
 			}
 		}
 		if (gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel()) {
 			if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP,
 					&hitsqr)) {
-				int entr_n = scan_entrance(gs->level()->exits, hitsqr);
+//				int entr_n = scan_entrance(gs->level()->exits, hitsqr);
 				actions.push_back(
-						GameAction(id, GameAction::USE_EXIT, frame, level,
-								entr_n));
+						GameAction(id, GameAction::USE_EXIT, frame, level));
 			}
 		}
 	}
@@ -333,8 +321,6 @@ void PlayerInst::use_move_and_melee(GameState* gs, const GameAction& action) {
 			gs->add_instance(
 					new AnimatedInst(target->x, target->y, atksprite,
 							25));
-
-
 		}
 	} else {
 		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN / 4);
@@ -354,8 +340,8 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 	int entr_n = action.use_id;
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->level()->entrances.size());
 	portal = &gs->level()->entrances[entr_n];
-	gs->branch_level()++;gs
-	->set_generate_flag();
+	gs->branch_level()++;
+	gs->set_generate_flag();
 
 	canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 }
