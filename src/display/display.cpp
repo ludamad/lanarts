@@ -33,9 +33,9 @@ void image_display(GLImage* img, int x, int y, const Colour& c) {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, img->texture);
 
-	glBegin(GL_QUADS);
 	glColor4ub(c.r, c.g, c.b, c.a);
 
+	glBegin(GL_QUADS);
 	//Draw our four points, clockwise.
 	glTexCoord2f(0, 0);
 	glVertex2i(x, y);
@@ -183,7 +183,7 @@ void gl_set_drawing_area(int x, int y, int w, int h) {
 
 	/* This allows alpha blending of 2D textures with the scene */
 	glEnable(GL_BLEND);
-	glEnable(GL_TEXTURE_2D);
+	//glEnable(GL_TEXTURE_2D);
 	glDisable(GL_DEPTH_TEST);
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
