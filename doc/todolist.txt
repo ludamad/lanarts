@@ -1,32 +1,37 @@
-Done:
-- [DONE] Refactor room generation with tiered room, tunnel, feature, item generation.
-- [DONE] Move out of combat
-- [DONE] Melee attack animation 
-- [DONE] versatile markup format that allows for human edit-able game objects (YAML?)
-
-Done with Issues:
--[DONE - MAY RESURFACE DURING MONSTER SPAWNING] Fix monsters getting stuck due to random movement 
--[DONE - CURRENTLY HARDCODED] Action bar, below screen 
-
 Complex:
-- (Continual) Networked play over LAN with action-based synchronization
-- Classes for players
-- (Long term) versatile save format that allows for resuming a networked game even through major game updates
+- [STARTED] Networked play over LAN with action-based synchronization
+- [STARTED] Classes for players
+- Versatile save format that allows for resuming a networked game even through major game updates
+- Add LUA integration for specification of actions, make sure all data remains in YAML files
 
 Some complexity:
-- Weapons spawn on ground
-- Weapons are usable, with graphical validation (unhardcode them)
 - Lightning Spell that takes up multiple squares
 
-- Support for multiple PlayerInst (Maybe re-use PlayerInst for summoned monsters ?)
-- Unification of code-path's for PlayerInst/EnemyInst ?
-- Actions for players & action replay
-
-- Refactor away all enum's for resources so order no longer matters
-- ^ This implies: Put tile-set information in the YAML files for level generation
-
+- [ALMOST DONE] Support for multiple PlayerInst (Maybe re-use PlayerInst for summoned monsters ?)
+- [IFFY] Unification of code-path's for PlayerInst/EnemyInst ?
+- Put tile-set information in the YAML files for level generation
+- Add keyboard based blink that moves to furthest point
+- Add dropping of objects & dont always autopickup
+- Make spells not hardcoded (Eventually use LUA integration)
+- More complete & functional sidebar interface, with tabs
 
 Trivial:
 - Add cooldowns to item use
 - More visual output on the minimap [Stairs etc]
 - Fix items on border of view not being visible -> subtract away from player and check visibility??
+
+
+Done before 18/04/2012:
+- [DONE] Refactor room generation with tiered room, tunnel, feature, item generation.
+- [DONE] Move out of combat
+- [DONE] Melee attack animation 
+- [DONE] versatile markup format that allows for human edit-able game objects (YAML?)
+- [DONE - MAY RESURFACE DURING MONSTER SPAWNING] Fix monsters getting stuck due to random movement 
+- [DONE - CURRENTLY HARDCODED] Action bar, below screen 
+
+Done As of 18/04/2012:
+- [DONE] Refactor away all enum's for resources so order no longer matters
+- [DONE] Actions for players & action replay
+- [DONE] Weapons spawn on ground
+- [DONE] Weapons are usable, with graphical validation (unhardcode them)
+- [MOSTLY DONE] Enemies fan out & walk away from player
