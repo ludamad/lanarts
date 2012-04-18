@@ -36,8 +36,10 @@ inline void direction_towards(const Pos& a, const Pos& b, float& rx, float& ry, 
 	rx = b.x - a.x;
 	ry = b.y - a.y;
 	float mag = sqrt(rx*rx + ry*ry);
-	rx /= mag/speed;
-	ry /= mag/speed;
+	if (mag > 0){
+		rx /= mag/speed;
+		ry /= mag/speed;
+	}
 }
 
 #endif /* GEOMETRY_H_ */

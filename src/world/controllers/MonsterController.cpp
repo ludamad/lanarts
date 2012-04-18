@@ -208,7 +208,14 @@ void MonsterController::pre_step(GameState* gs) {
 	//Use a temporary 'GameView' object to make use of its helper methods
 	GameView view(0, 0, PATHING_RADIUS * 2, PATHING_RADIUS * 2, gs->width(),
 			gs->height());
-//	if (must_initialize){
+	const std::vector<obj_id>& pids = gs->player_controller().player_ids();
+	if (pids.size() > player_simids.size()){
+		player_simids.resize(pids.size());
+		for (int i = 0; i < gs->player_controller().player_ids().size(); i++){
+			PlayerInst* p = (PlayerInst*)gs->get_instance(pids[i]);
+			player_simids[i] = simulator->addAgent(RVO::Vector2(p->x, p->y), 0, 10, 0.0f, 0.0f, p->radius, 0);
+		}
+	}
 //		must_initialize = !must_initialize;
 //		std::vector<RVO::Vector2> vertices;
 //		vertices.resize(4);
@@ -241,8 +248,6 @@ void MonsterController::pre_step(GameState* gs) {
 //		}
 //		simulator->processObstacles();
 //	}
-	PlayerController& pc = gs->player_controller();
-	const std::vector<obj_id> pids = pc.player_ids();
 
 	std::vector<EnemyOfInterest> eois;
 //	if (room_paths.empty()){
@@ -324,6 +329,11 @@ void MonsterController::pre_step(GameState* gs) {
 	//std::sort(eois.begin(), eois.end());
 	set_monster_headings(gs, eois);
 	//for (int i = 0; i < 4; i++)
+
+	for (int i = 0; i < pids.size(); i++){
+		PlayerInst* p = (PlayerInst*)gs->get_instance(gs->player_controller().player_ids()[i]);
+		simulator->setAgentPosition(player_simids[i], RVO::Vector2(p->x, p->y));
+	}
 
 	for (int i = 0; i < mids2.size(); i++) {
 		EnemyInst* e = (EnemyInst*) gs->get_instance(mids2[i]);

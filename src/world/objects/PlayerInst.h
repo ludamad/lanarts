@@ -67,7 +67,6 @@ public:
 	GameLevelPortal *portal_used() {
 		return portal;
 	}
-
 private:
 	void use_move_and_melee(GameState *gs, const GameAction& action);
 	void use_dngn_exit(GameState* gs, const GameAction& action);

@@ -327,8 +327,22 @@ void PlayerInst::use_move_and_melee(GameState* gs, const GameAction& action) {
 	}
 }
 
+
+static int scan_entrance(const std::vector<GameLevelPortal>& portals,
+		const Pos& tilepos) {
+	for (int i = 0; i < portals.size(); i++) {
+		if (portals[i].entrancesqr == tilepos) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
-	int entr_n = action.use_id;
+	Pos hitpos;
+	LANARTS_ASSERT( gs->tile_radius_test(x,y,radius,false, TILE_STAIR_UP,&hitpos) );
+	int entr_n = scan_entrance(gs->level()->exits, hitpos);
+//	int entr_n = action.use_id;
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->level()->exits.size());
 	portal = &gs->level()->exits[entr_n];
 	gs->branch_level()--;gs
@@ -337,7 +351,10 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 	canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 }
 void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
-	int entr_n = action.use_id;
+	Pos hitpos;
+	LANARTS_ASSERT( gs->tile_radius_test(x,y,radius,false, TILE_STAIR_DOWN,&hitpos) );
+	int entr_n = scan_entrance(gs->level()->entrances, hitpos);
+//	int entr_n = action.use_id;
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->level()->entrances.size());
 	portal = &gs->level()->entrances[entr_n];
 	gs->branch_level()++;

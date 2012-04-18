@@ -57,6 +57,7 @@ public:
     std::vector<PathInfo> room_paths;
     std::vector<PathInfo> paths;
 	std::vector<obj_id> mids;
+	std::vector<int> player_simids;
 
 	RVO::RVOSimulator* simulator;
 };
