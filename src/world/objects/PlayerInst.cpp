@@ -85,9 +85,15 @@ void PlayerInst::draw(GameState* gs) {
 		image_display(&img, x - img.width / 2 - view.x,
 				y - img.height / 2 - view.y, red);
 	}else {
+		if (is_local_focus())
 		image_display(&img, x - img.width / 2 - view.x,
 				y - img.height / 2 - view.y);
+		else
+			image_display(&img, x - img.width / 2 - view.x,
+					y - img.height / 2 - view.y, Colour(255,0,0));
+
 	}
+
 
 
 	//for (int i = 0; i < 10; i++)
