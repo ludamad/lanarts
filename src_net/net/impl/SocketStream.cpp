@@ -102,16 +102,18 @@ void SocketStream::send_packet(const NetPacket & packet) {
 
 	wmutex.lock();
 	bool write_in_progress = !writing_msgs.empty();
-
-    if (!write_in_progress){
-		asio::async_write(
-				socket,
-				asio::buffer(writing_msgs.front().data,
-						writing_msgs.front().length()),
-				boost::bind(socketstream_write_handler, this,
-						asio::placeholders::error));
-    } else
-    	writing_msgs.push_front(packet);
+	asio::write(socket,
+					asio::buffer(writing_msgs.front().data,
+							writing_msgs.front().length()));
+//    if (!write_in_progress){
+//		asio::async_write(
+//				socket,
+//				asio::buffer(writing_msgs.front().data,
+//						writing_msgs.front().length()),
+//				boost::bind(socketstream_write_handler, this,
+//						asio::placeholders::error));
+//    } else
+//    	writing_msgs.push_front(packet);
 	wmutex.unlock();
 //    }
 }
