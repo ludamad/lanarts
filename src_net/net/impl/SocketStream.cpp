@@ -50,7 +50,7 @@ void socketstream_write_handler(SocketStream* ss,
 	if (!error) {
 		static int msg = 0;
 
-		printf("Writing message %d\n", msg);
+		printf("Writing message %d\n", ++msg);
 		ss->get_mutex().lock();
 		ss->wmessages().pop_front();
 		ss->get_mutex().unlock();

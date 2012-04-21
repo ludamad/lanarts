@@ -12,7 +12,6 @@
 
 using namespace std;
 
-
 void load_tile_data(const char* filename){
 
     fstream file(filename, fstream::in | fstream::binary);

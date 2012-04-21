@@ -96,11 +96,11 @@ bool ServerNetConnection::get_next_packet(NetPacket & packet) {
 }
 
 void ServerNetConnection::broadcast_packet(const NetPacket & packet) {
-	streamlock.lock();
-	for (int i = 0; i < streams.size(); i++){
-		streams[i]->send_packet(packet);
-	}
-	streamlock.unlock();
+//	streamlock.lock();
+//	for (int i = 0; i < streams.size(); i++){
+//		streams[i]->send_packet(packet);
+//	}
+//	streamlock.unlock();
 }
 
 void ServerNetConnection::join(){

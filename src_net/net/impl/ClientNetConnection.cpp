@@ -57,6 +57,8 @@ ClientNetConnection::ClientNetConnection(const char* host, const char* port) :
     tcp::resolver::iterator iterator = resolver.resolve(query);
 	asio::ip::tcp::endpoint endpoint = *iterator;
 
+	printf("%s and %s are being connected to\n", host, port);
+
 //	io_service.post(
 //			boost::bind(&ClientNetConnection::async_connect, this, host, port)
 //    );
