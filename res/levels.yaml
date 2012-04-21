@@ -18,6 +18,7 @@ branches:
           width: 0
           per_room: 0        
         features:
+          tileset: pebble_tiles
           stairs_up: 0
           stairs_down: 5
         enemies:
@@ -55,6 +56,7 @@ branches:
           width: 1
           per_room: [5, 5]          
         features:
+          tileset: blue_tiles
           stairs_up: 5
           stairs_down: 3
         enemies:
@@ -112,6 +114,8 @@ branches:
               group_chance: 33
               group_size: 2
           amount: 15
+        features:
+          tileset: pebble_tiles
       #Level 3
       - size: [76, 76]
         items:
@@ -151,6 +155,8 @@ branches:
               group_chance: 33
               group_size: 2
           amount: 20
+        features:
+          tileset: pebble_tiles
       #Level 4
       - size: [89, 89]
         items:
@@ -198,6 +204,8 @@ branches:
               group_chance: 33
               group_size: 2
           amount: 25
+        features:
+          tileset: pebble_tiles
       #Level 5
       - size: [89, 89]
         items:
@@ -247,6 +255,8 @@ branches:
               group_chance: 33
               group_size: 3
           amount: 25
+        features:
+          tileset: pebble_tiles
       #Level 6
       - size: [89, 89]
         items:
@@ -272,6 +282,8 @@ branches:
               chance: 7
             - item: Defence Scroll
               chance: 7
+        features:
+          tileset: pebble_tiles
         rooms:
           padding: 4
           amount: 20
@@ -323,6 +335,8 @@ branches:
               chance: 7
             - item: Defence Scroll
               chance: 7
+        features:
+          tileset: pebble_tiles
         rooms:
           padding: 3
           amount: 90
@@ -376,6 +390,8 @@ branches:
               chance: 7
             - item: Defence Scroll
               chance: 7
+        features:
+          tileset: pebble_tiles
         rooms:
           padding: 3
           amount: 90

@@ -1,5 +1,5 @@
 ---
-Weapons:
+weapons:
   - weapon: Unarmed
     damage: [4, 8]
     modifiers: 

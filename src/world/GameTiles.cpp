@@ -53,6 +53,7 @@ void GameTiles::post_draw(GameState* gs) {
 	const int sub_sqrs = VISION_SUBSQRS;
 	if (gs->local_playerid() == 0) return;
 
+
 	fov& f = *gs->player_controller().local_playerfov();
 
 	char matches[sub_sqrs * sub_sqrs];
@@ -71,6 +72,8 @@ void GameTiles::post_draw(GameState* gs) {
 					has_free = true;
 				}
 			}
+
+
 			//Do not draw black if we have a match, and we see a wall
 			if (!has_match) {
 				if (!seen_tiles[y * width + x]) {

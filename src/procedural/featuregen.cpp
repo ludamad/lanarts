@@ -8,9 +8,16 @@
 #include "featuregen.h"
 #include "../world/GameState.h"
 #include "../data/tile_data.h"
+#include "../data/tileset_data.h"
+
+//Random time in a specified range
+static int rtile(MTwist& mt, Range& r){
+	return mt.rand(r.min, r.max+1);
+}
 
 void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel& level, GameState* gs){
 	GameTiles& tiles = gs->tile_grid();
+	TilesetEntry& tileset = game_tileset_data[fs.tileset];
 	tiles.clear();
 	
 	int tw = tiles.tile_width(), th = tiles.tile_height();
@@ -26,18 +33,18 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 		for (int x = start_x; x < end_x; x++) {
 			Sqr& s = level.at(x-start_x, y-start_y);
 			if (s.passable) {
-				tiles.get(x,y) = TILE_GRASS + 7 + mt.rand(9);
+				tiles.get(x,y) = rtile(mt, tileset.floor);
 				if (s.roomID){
 //					if (s.marking)
 // 					tiles[ind] = TILE_MESH_0+s.marking;
 				} else if (s.feature == SMALL_CORRIDOR){
-					tiles.get(x,y) = TILE_GRASS + 7 +9 + mt.rand(4);//TILE_CORRIDOR_FLOOR;
+					tiles.get(x,y) = rtile(mt, tileset.corridor);
 				}
 			} else {
-				tiles.get(x,y)= TILE_GRASS + mt.rand(7);//TILE_WALL;
+				tiles.get(x,y)= rtile(mt, tileset.wall);
 				if (s.feature == SMALL_CORRIDOR){
 					if (mt.rand(4) == 0){
-						tiles.get(x,y) = TILE_STONE_WALL;
+						tiles.get(x,y) = rtile(mt, tileset.altwall);
 					}
 				}
 			}
@@ -62,8 +69,9 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 
 		for (int y = ry; y < ry+rh; y++) {
 			for (int x = rx; x < rx+rw; x++) {
-				if (tiles.get(x+start_x, y+start_y) == TILE_FLOOR)
-				tiles.get(x+start_x,y+start_y) = TILE_FLOOR2;
+				Sqr& s = level.at(x-start_x, y-start_y);
+				if (s.passable && s.roomID && s.feature != SMALL_CORRIDOR)
+				tiles.get(x+start_x,y+start_y) = rtile(mt, tileset.altfloor);
 			}
 		}
 	}

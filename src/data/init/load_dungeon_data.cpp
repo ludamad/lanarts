@@ -62,7 +62,13 @@ TunnelGenSettings parse_tunnel_gen(const YAML::Node& n) {
 FeatureGenSettings parse_feature_gen(const YAML::Node& n) {
 	int nstairsup = parse_defaulted(n, "stairs_up", 3);
 	int nstairsdown = parse_defaulted(n, "stairs_down", 3);
-	return FeatureGenSettings(nstairsup, nstairsdown, 1);
+	int tileset = 0;
+	if (hasnode(n, "tileset")){
+		std::string tilesetname;
+		n["tileset"] >> tilesetname;
+		tileset = get_tileset_by_name(tilesetname.c_str());
+	}
+	return FeatureGenSettings(nstairsup, nstairsdown, tileset);
 }
 
 EnemyGenSettings parse_enemy_gen(const YAML::Node& supernode, const char* subnode) {

@@ -63,7 +63,13 @@ ClientNetConnection::ClientNetConnection(const char* host, const char* port) :
 //
 	stream.get_socket().connect(endpoint);
 	client_connect_handler(this, asio::error_code(), ++iterator);
-
+	NetPacket packet;
+	const char* c = "hello world";
+	while (*c){
+		packet.add(*(c++));
+	}
+	packet.encode_header();
+	stream.send_packet(packet);
 
     execution_thread = boost::shared_ptr<asio::thread>(
     		new asio::thread(boost::bind(&wrapped_run, &io_service))

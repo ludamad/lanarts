@@ -1,12 +1,12 @@
 ---
-Tiles:
-  - tile: wall
+tiles:
+  - tile: blue_wall
     spritefile: res/tiles/darkrock_wall.bmp
     solid: 1
   - tile: stone_wall
     spritefile: res/tiles/stone_wall.bmp
     solid: 1
-  - tile: floor
+  - tile: blue_floor
     spritefile: res/tiles/room_floor.bmp
   - tile: sandfloor0
     spritefile: res/tiles/sandstone/sandstone_floor0.png
@@ -38,7 +38,7 @@ Tiles:
     spritefile: res/tiles/marble/marble_floor5.png
   - tile: marb6
     spritefile: res/tiles/marble/marble_floor6.png
-  - tile: floor
+  - tile: crystal_floor
     spritefile: res/tiles/crystal/crystal_floor0.png
   - tile: stair_up
     spritefile: res/tiles/features/stairs_up.png

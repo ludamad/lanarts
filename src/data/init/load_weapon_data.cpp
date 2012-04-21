@@ -18,7 +18,7 @@ void load_weapon_data(const char* filename) {
 		parser.GetNextDocument(root);
 		game_weapon_data.clear();
 
-		const YAML::Node& node = root["Weapons"];
+		const YAML::Node& node = root["weapons"];
 
 		for (int i = 0; i < node.size(); i++) {
 			issolid = 0;

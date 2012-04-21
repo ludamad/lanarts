@@ -11,6 +11,7 @@
 #include "class_data.h"
 #include "item_data.h"
 #include "tile_data.h"
+#include "tileset_data.h"
 #include "sprite_data.h"
 #include "dungeon_data.h"
 #include "enemy_data.h"
@@ -19,6 +20,7 @@
 
 
 void load_tile_data(const char* filename);
+void load_tileset_data(const char* filename);
 void load_sprite_data(const char* filename);
 void load_weapon_data(const char* filename);
 void load_weapon_item_entries();

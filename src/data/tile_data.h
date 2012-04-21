@@ -53,6 +53,6 @@ struct TileEntry {
 
 extern std::vector<TileEntry> game_tile_data;
 
-void init_tile_data();
+int get_tile_by_name(const char* name);
 
 #endif /* TILE_DATA_H_ */

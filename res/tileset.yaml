@@ -1,0 +1,17 @@
+---
+tilesets:
+  - tileset: blue_tiles
+    floor_tile: blue_floor
+    wall_tile: blue_wall
+    corridor_tile: floor2
+    alt_wall_tile: stone_wall
+    alt_floor_tile: floor2
+    alt_corridor_tile: floor2
+  - tileset: pebble_tiles
+    floor_tile: [pebblebrown0, pebblebrown8]
+    wall_tile: [brickdark0, brickdark6]
+    corridor_tile: [hive0, hive3]
+    alt_wall_tile: [brickdark0, brickdark6]
+    alt_floor_tile: [hive0, hive3]
+    alt_corridor_tile: [hive0, hive3]
+    

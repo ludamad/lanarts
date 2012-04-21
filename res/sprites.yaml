@@ -1,5 +1,5 @@
 ---
-Sprites:
+sprites:
   - sprite: fighter
     spritefile: res/player/fighter.png
   - sprite: mage
