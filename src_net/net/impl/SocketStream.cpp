@@ -55,17 +55,15 @@ void socketstream_write_handler(SocketStream* ss,
 		static int msg = 0;
 
 //		printf("Writing message %d\n", ++msg);
-		if (ss->wmessages().size() == 0)
-			return;
 		ss->get_wmutex().lock();
 		NetPacket next = ss->wmessages().front();
 		ss->wmessages().pop_front();
 		ss->get_wmutex().unlock();
-		asio::async_write(
-				ss->get_socket(),
-				asio::buffer(next.data, next.length()),
-				boost::bind(socketstream_write_handler, ss,
-						asio::placeholders::error));
+			asio::async_write(
+					ss->get_socket(),
+					asio::buffer(next.data, next.length()),
+					boost::bind(socketstream_write_handler, ss,
+							asio::placeholders::error));
 	} else {
 //		socketstream_do_close(ss);
 	}
@@ -102,17 +100,15 @@ void SocketStream::send_packet(const NetPacket & packet) {
 
 	wmutex.lock();
 	bool write_in_progress = !writing_msgs.empty();
-	asio::write(socket,
-					asio::buffer(packet.data, packet.length()));
-//    if (!write_in_progress){
-//		asio::async_write(
-//				socket,
-//				asio::buffer(writing_msgs.front().data,
-//						writing_msgs.front().length()),
-//				boost::bind(socketstream_write_handler, this,
-//						asio::placeholders::error));
-//    } else
-//    	writing_msgs.push_front(packet);
+	writing_msgs.push_front(packet);
+    if (!write_in_progress){
+		asio::async_write(
+				socket,
+				asio::buffer(writing_msgs.front().data,
+						writing_msgs.front().length()),
+				boost::bind(socketstream_write_handler, this,
+						asio::placeholders::error));
+    }
 	wmutex.unlock();
 //    }
 }
