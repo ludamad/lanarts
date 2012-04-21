@@ -16,20 +16,20 @@ void socketstream_read_header_handler(SocketStream* ss,
 		const asio::error_code& error) {
 	if (!error && ss->last_message().decode_header()) {
 //		printf("reading header of message\n");
-		if (ss->last_message().body_length > 0){
+//		if (ss->last_message().body_length > 0){
 			asio::async_read(
 					ss->get_socket(),
 					asio::buffer(ss->last_message().body(),
 							ss->last_message().body_length),
 					boost::bind(socketstream_read_body_handler, ss,
 							asio::placeholders::error));
-		} else {
-			asio::async_read(
-					ss->get_socket(),
-					asio::buffer(ss->last_message().data, NetPacket::HEADER_LEN),
-					boost::bind(&socketstream_read_header_handler, ss,
-							asio::placeholders::error));
-		}
+//		} else {
+//			asio::async_read(
+//					ss->get_socket(),
+//					asio::buffer(ss->last_message().data, NetPacket::HEADER_LEN),
+//					boost::bind(&socketstream_read_header_handler, ss,
+//							asio::placeholders::error));
+//		}
 	} else {
 //		socketstream_do_close(ss);
 	}
