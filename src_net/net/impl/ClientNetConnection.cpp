@@ -51,7 +51,7 @@ ClientNetConnection::~ClientNetConnection() {
 }
 
 bool ClientNetConnection::get_next_packet(NetPacket & packet) {
-	stream.get_next_packet(packet);
+	return stream.get_next_packet(packet);
 	/*while (true){
 		if (packet.packet_type == NetPacket::PACKET_ASSIGN_PEERID){
 			peer_id = packet.get_int();

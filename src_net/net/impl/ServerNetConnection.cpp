@@ -17,6 +17,7 @@ void ServerNetConnection::accept_handler(SocketStream* ss, const asio::error_cod
 			streams.push_back(stream_ptr(ss));
 			streamlock.unlock();
 			printf("Connected!\n");
+			fflush(stdout);
 
 			asio::async_read(
 					ss->get_socket(),
