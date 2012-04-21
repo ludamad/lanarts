@@ -1,5 +1,6 @@
 #include "ClientNetConnection.h"
 #include <boost/bind.hpp>
+#include <exception>
 
 using namespace asio::ip;
 
@@ -27,22 +28,45 @@ void client_connect_handler(ClientNetConnection* cnc,
 	}
 }
 
-ClientNetConnection::ClientNetConnection(const char* host, const char* port) :
-		io_service(), stream(io_service) {
+void ClientNetConnection::async_connect(const char* host, const char* port){
 
     tcp::resolver resolver(io_service);
     tcp::resolver::query query(host, port);
     tcp::resolver::iterator iterator = resolver.resolve(query);
 
 	asio::ip::tcp::endpoint endpoint = *iterator;
-	connected = false;
-
 	stream.get_socket().async_connect(
 			endpoint,
 			boost::bind(client_connect_handler, this, asio::placeholders::error, ++iterator));
+}
+
+void wrapped_run(asio::io_service* ios){
+	try {
+		ios->run();
+	} catch (const std::exception& e){
+		printf("type=%d\n", typeid(e).name());
+		printf("%s\n", e.what());
+	}
+}
+
+ClientNetConnection::ClientNetConnection(const char* host, const char* port) :
+		io_service(), stream(io_service) {
+	connected = false;
+    tcp::resolver resolver(io_service);
+    tcp::resolver::query query(host, port);
+    tcp::resolver::iterator iterator = resolver.resolve(query);
+	asio::ip::tcp::endpoint endpoint = *iterator;
+
+//	io_service.post(
+//			boost::bind(&ClientNetConnection::async_connect, this, host, port)
+//    );
+//
+	stream.get_socket().connect(endpoint);
+	client_connect_handler(this, asio::error_code(), ++iterator);
+
 
     execution_thread = boost::shared_ptr<asio::thread>(
-    		new asio::thread(boost::bind(&asio::io_service::run, &io_service))
+    		new asio::thread(boost::bind(&wrapped_run, &io_service))
     );
 
 }

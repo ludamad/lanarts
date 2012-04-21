@@ -57,6 +57,7 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, PlayerInst* inst){
 	game_state->add_instance(inst);
 	game_state->add_instance(new PlayerInst(c->starting_stats, px+TILE_SIZE,py, false));
 }
+
 GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player_instances, size_t nplayers) {
 	if (roomid >= level_states.size()) {
 		level_states.resize(roomid + 1, NULL);
@@ -83,6 +84,7 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player
 	}
 	return level_states[roomid];
 }
+
 void GameWorld::step() {
 	redofirststep://I used a goto dont kill me
 

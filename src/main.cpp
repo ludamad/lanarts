@@ -88,7 +88,6 @@ static void game_loop(GameState* gs){
 				step_time += len;
 
 				time_allowance = per_frame - len;
-
 			}
 		} else
 			gs->update_iostate();

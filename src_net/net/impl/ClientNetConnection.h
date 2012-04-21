@@ -27,6 +27,7 @@ public:
 	void set_connected() { connected = true; }
 	SocketStream& socket_stream() { return stream; }
 	virtual void join();
+	void async_connect(const char* host, const char* port);
 
 private:
 	volatile bool connected;

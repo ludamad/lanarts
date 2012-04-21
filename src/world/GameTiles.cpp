@@ -37,6 +37,7 @@ void GameTiles::pre_draw(GameState* gs) {
 	}
 
 }
+
 void GameTiles::post_draw(GameState* gs) {
 	GameView& view = gs->window_view();
 	int min_tilex, min_tiley;

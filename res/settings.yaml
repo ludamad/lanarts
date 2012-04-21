@@ -5,6 +5,6 @@ view_height: 480
 class: Mage
 
 #Either 'host', 'client', or 'none'
-connection_type: host
-ip: localhost
+connection_type: client
+ip: 192.168.0.130
 port: 5000

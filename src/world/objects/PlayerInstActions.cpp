@@ -82,148 +82,140 @@ void PlayerInst::perform_io_action(GameState* gs) {
 		}
 
 //		get_current_actions(gs->frame(), actions);
-		if (actions.size() == 0
-				&& gs->game_settings().conntype != GameSettings::CLIENT) {
 
-			//Resting
-			bool resting = false;
-			if (gs->key_down_state(SDLK_r) && canrestcooldown == 0) {
+//Resting
+		bool resting = false;
+		if (gs->key_down_state(SDLK_r) && canrestcooldown == 0) {
+			actions.push_back(GameAction(id, GameAction::REST, frame, level));
+			resting = true;
+		}
+
+		if (!resting) {
+			//Arrow/wasd movement
+			if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
+				dy -= 1;
+			}
+			if (gs->key_down_state(SDLK_RIGHT) || gs->key_down_state(SDLK_d)) {
+				dx += 1;
+			}
+			if (gs->key_down_state(SDLK_DOWN) || gs->key_down_state(SDLK_s)) {
+				dy += 1;
+			}
+			if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
+				dx -= 1;
+			}
+			if (dx != 0 || dy != 0) {
 				actions.push_back(
-						GameAction(id, GameAction::REST, frame, level));
-				resting = true;
+						GameAction(id, GameAction::MOVE_IN_DIRECTION, frame,
+								level, 0, dx, dy));
 			}
 
-			if (!resting) {
-				//Arrow/wasd movement
-				if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
-					dy -= 1;
-				}
-				if (gs->key_down_state(SDLK_RIGHT)
-						|| gs->key_down_state(SDLK_d)) {
-					dx += 1;
-				}
-				if (gs->key_down_state(SDLK_DOWN)
-						|| gs->key_down_state(SDLK_s)) {
-					dy += 1;
-				}
-				if (gs->key_down_state(SDLK_LEFT)
-						|| gs->key_down_state(SDLK_a)) {
-					dx -= 1;
-				}
-				if (dx != 0 || dy != 0) {
+			//Spell use
+			if (gs->key_down_state(SDLK_j)) {
+				MonsterController& mc = gs->monster_controller();
+				GameInst* target = gs->get_instance(mc.targetted);
+				int mpcost = 10;
+				if (spellselect)
+					mpcost = 20;
+				if (target && !stats().has_cooldown() && stats().mp >= mpcost
+						&& !gs->solid_test(this)
+						&& gs->object_visible_test(this)) {
 					actions.push_back(
-							GameAction(id, GameAction::MOVE_IN_DIRECTION, frame,
-									level, 0, dx, dy));
+							GameAction(id, GameAction::SPELL, frame, level,
+									spellselect, target->x, target->y));
 				}
+			}
+			if (gs->mouse_right_click() && mouse_within) {
 
-				//Spell use
-				if (gs->key_down_state(SDLK_j)) {
-					MonsterController& mc = gs->monster_controller();
-					GameInst* target = gs->get_instance(mc.targetted);
-					int mpcost = 10;
-					if (spellselect)
-						mpcost = 20;
-					if (target && !stats().has_cooldown()
-							&& stats().mp >= mpcost && !gs->solid_test(this)
-							&& gs->object_visible_test(this)) {
-						actions.push_back(
-								GameAction(id, GameAction::SPELL, frame, level,
-										spellselect, target->x, target->y));
-					}
+				int px = x, py = y;
+				x = rmx, y = rmy;
+				if (stats().mp >= 50 && !gs->solid_test(this)
+						&& gs->object_visible_test(this)) {
+					actions.push_back(
+							GameAction(id, GameAction::SPELL, frame, level, 2,
+									x, y));
 				}
-				if (gs->mouse_right_click() && mouse_within) {
+				x = px, y = py;
+			}
 
-					int px = x, py = y;
-					x = rmx, y = rmy;
-					if (stats().mp >= 50 && !gs->solid_test(this)
-							&& gs->object_visible_test(this)) {
-						actions.push_back(
-								GameAction(id, GameAction::SPELL, frame, level,
-										2, x, y));
-					}
-					x = px, y = py;
+			if (gs->mouse_left_down() && mouse_within) {
+				int mpcost = 10;
+				if (spellselect)
+					mpcost = 20;
+				if (!stats().has_cooldown() && stats().mp >= mpcost
+						&& !gs->solid_test(this)
+						&& gs->object_visible_test(this)) {
+					actions.push_back(
+							GameAction(id, GameAction::SPELL, frame, level,
+									spellselect, rmx, rmy));
 				}
+			}
 
-				if (gs->mouse_left_down() && mouse_within) {
-					int mpcost = 10;
-					if (spellselect)
-						mpcost = 20;
-					if (!stats().has_cooldown() && stats().mp >= mpcost
-							&& !gs->solid_test(this)
-							&& gs->object_visible_test(this)) {
-						actions.push_back(
-								GameAction(id, GameAction::SPELL, frame, level,
-										spellselect, rmx, rmy));
-					}
-				}
-
-				//Item use
-				for (int i = 0; i < 9; i++) {
-					if (gs->key_press_state(SDLK_1 + i)) {
-						if (inventory.inv[i].n > 0) {
-							item_used = true;
-							actions.push_back(
-									GameAction(id, GameAction::USE_ITEM, frame,
-											level, i));
-							break; //Can only use one item/step (until we have item cooldowns)
-						}
-					}
-				}
-				if (!item_used && gs->mouse_left_click() && !mouse_within) {
-					int posx = (gs->mouse_x() - gs->window_view().width)
-							/ TILE_SIZE;
-					int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
-					int slot = 5 * posy + posx;
-					if (slot >= 0 && slot < INVENTORY_SIZE
-							&& inventory.inv[slot].n > 0) {
+			//Item use
+			for (int i = 0; i < 9; i++) {
+				if (gs->key_press_state(SDLK_1 + i)) {
+					if (inventory.inv[i].n > 0) {
+						item_used = true;
 						actions.push_back(
 								GameAction(id, GameAction::USE_ITEM, frame,
-										level, slot));
+										level, i));
+						break; //Can only use one item/step (until we have item cooldowns)
 					}
 				}
 			}
-
-			//Item pickup
-			GameInst* item = NULL;
-			if (gs->object_radius_test(this, &item, 1, &item_hit)) {
-				actions.push_back(
-						GameAction(id, GameAction::PICKUP_ITEM, frame, level,
-								item->id));
+			if (!item_used && gs->mouse_left_click() && !mouse_within) {
+				int posx = (gs->mouse_x() - gs->window_view().width)
+						/ TILE_SIZE;
+				int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
+				int slot = 5 * posy + posx;
+				if (slot >= 0 && slot < INVENTORY_SIZE
+						&& inventory.inv[slot].n > 0) {
+					actions.push_back(
+							GameAction(id, GameAction::USE_ITEM, frame, level,
+									slot));
+				}
 			}
+		}
 
-			Pos hitsqr;
-			if (gs->key_down_state(SDLK_PERIOD) || gs->mouse_downwheel()) {
-				if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN,
-						&hitsqr)) {
+		//Item pickup
+		GameInst* item = NULL;
+		if (gs->object_radius_test(this, &item, 1, &item_hit)) {
+			actions.push_back(
+					GameAction(id, GameAction::PICKUP_ITEM, frame, level,
+							item->id));
+		}
+
+		Pos hitsqr;
+		if (gs->key_down_state(SDLK_PERIOD) || gs->mouse_downwheel()) {
+			if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN,
+					&hitsqr)) {
 //				int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
-					actions.push_back(
-							GameAction(id, GameAction::USE_ENTRANCE, frame,
-									level));
-				}
+				actions.push_back(
+						GameAction(id, GameAction::USE_ENTRANCE, frame, level));
 			}
-			if (gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel()) {
-				if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP,
-						&hitsqr)) {
+		}
+		if (gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel()) {
+			if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP,
+					&hitsqr)) {
 //				int entr_n = scan_entrance(gs->level()->exits, hitsqr);
-					actions.push_back(
-							GameAction(id, GameAction::USE_EXIT, frame, level));
-				}
+				actions.push_back(
+						GameAction(id, GameAction::USE_EXIT, frame, level));
 			}
 		}
 	}
 	GameNetConnection& connection = gs->net_connection();
-	bool hasconnection = connection.get_connection();
+	bool hasconnection = connection.get_connection() != NULL;
 	if (!is_local_focus() && hasconnection){
 			NetPacket packet;
 			if ( connection.get_connection()->get_next_packet(packet) ){
-				while (packet.body_length >= sizeof(GameAction)){
+				while (packet.body_length > 0){
 					GameAction action;
 					packet.get(action);
 					actions.push_front(action);
 				}
 			}
 	}
-//	NetPacket packet;
+	NetPacket packet;
 
 	if (is_local_focus() && hasconnection){
 		NetPacket packet;
