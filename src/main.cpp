@@ -80,6 +80,7 @@ static void game_loop(GameState* gs){
 			}
 			{
 				//Draw event
+
 				clock_t start = clock();
 				cont = gs->step();
 				clock_t end = clock();
