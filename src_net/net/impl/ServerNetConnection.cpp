@@ -16,8 +16,6 @@ void ServerNetConnection::accept_handler(SocketStream* ss, const asio::error_cod
 			streamlock.lock();
 			streams.push_back(stream_ptr(ss));
 			streamlock.unlock();
-			printf("Connected!\n");
-			fflush(stdout);
 
 			asio::async_read(
 					ss->get_socket(),
@@ -55,6 +53,7 @@ void ServerNetConnection::assign_peerid(SocketStream* stream, int peerid){
 	stream->send_packet(packet);
 }
 bool ServerNetConnection::get_next_packet(NetPacket & packet) {
+	return false;
 	bool found = false;
 
 	streamlock.lock();
