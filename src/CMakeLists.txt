@@ -18,6 +18,7 @@ set( lanarts_src
 	data/init/load_dungeon_data.cpp
 	data/init/load_enemy_data.cpp
 	data/init/load_item_data.cpp
+	data/init/load_tileset_data.cpp
 	data/init/load_settings_data.cpp
 	data/init/load_weapon_data.cpp
 	data/init/load_class_data.cpp 
@@ -89,6 +90,7 @@ set( lanarts_include
 	data/sprite_data.h
 	data/dungeon_data.h
 	data/tile_data.h
+	data/tileset_data.h
 	data/weapon_data.h
 	
 	display/display.h
