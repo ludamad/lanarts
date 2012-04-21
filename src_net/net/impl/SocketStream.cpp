@@ -95,17 +95,17 @@ void SocketStream::send_packet(const NetPacket & packet) {
 	if (closed) return;
 
 	mutex.lock();
-//	bool write_in_progress = !writing_msgs.empty();
+	bool write_in_progress = !writing_msgs.empty();
 	writing_msgs.push_front(packet);
 	mutex.unlock();
-//    if (!write_in_progress){
+    if (!write_in_progress){
 		asio::async_write(
 				socket,
 				asio::buffer(writing_msgs.front().data,
 						writing_msgs.front().length()),
 				boost::bind(socketstream_write_handler, this,
 						asio::placeholders::error));
-//    }
+    }
 }
 
 //static unsigned int to_ip_number(const char* ipString){

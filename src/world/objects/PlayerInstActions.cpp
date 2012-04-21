@@ -222,6 +222,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 		for (int i = 0; i < actions.size(); i++) {
 			packet.add(actions[i]);
 		}
+		packet.encode_header();
 		connection.get_connection()->broadcast_packet(packet);
 	}
 
