@@ -45,7 +45,7 @@ static void wrapped_run(asio::io_service* ios){
 		printf("type=%d\n", typeid(e).name());
 		printf("%s\n", e.what());
 	}
-	printf("Run completed!\n");
+	printf("io_service::run completed!\n");
 }
 
 ClientNetConnection::ClientNetConnection(const char* host, const char* port) :

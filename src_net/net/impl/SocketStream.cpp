@@ -15,7 +15,7 @@ void socketstream_do_close(SocketStream* ss) {
 void socketstream_read_header_handler(SocketStream* ss,
 		const asio::error_code& error) {
 	if (!error && ss->last_message().decode_header()) {
-		printf("reading header of message\n");
+//		printf("reading header of message\n");
 		asio::async_read(
 				ss->get_socket(),
 				asio::buffer(ss->last_message().body(),
@@ -36,7 +36,7 @@ void socketstream_read_body_handler(SocketStream* ss,
 		ss->get_rmutex().unlock();
 
 		static int msg = 0;
-		printf("Reading message %d\n", ++msg);
+//		printf("Reading message %d\n", ++msg);
 
 		asio::async_read(
 				ss->get_socket(),
@@ -54,7 +54,7 @@ void socketstream_write_handler(SocketStream* ss,
 	if (!error) {
 		static int msg = 0;
 
-		printf("Writing message %d\n", ++msg);
+//		printf("Writing message %d\n", ++msg);
 		ss->get_wmutex().lock();
 		NetPacket next = ss->wmessages().front();
 		ss->wmessages().pop_front();
