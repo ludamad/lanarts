@@ -18,9 +18,9 @@ enemies:
     radius: 10
     xpaward: 10
     stats:
-        movespeed: 4
+        movespeed: 3
         hp: 18
-        hpregen: 0.08
+        hpregen: 0.04
     attacks:
       - damage: 10
         cooldown: 20
@@ -97,6 +97,22 @@ enemies:
         hpregen: 0.06
     attacks:
       - damage: 30
+
+  - name: Executioner
+    sprite: exec
+    radius: 12
+    xpaward: 35
+    stats:
+        movespeed: 3.5
+        hp: 50
+        hpregen: 0.5
+    attacks:
+      - projectile: 1
+        damage: 12
+        range: 500
+        cooldown: 20
+        sprite: poison
+        projectile_speed: 12
         
   - name: Hell Forged
     sprite: hell_forged

@@ -55,12 +55,13 @@ set( lanarts_src
 	
 
 	world/GameAction.cpp
+	world/GameHud.cpp
 	world/GameInstSet.cpp
 	world/GameState.cpp
 	world/GameLevelState.cpp
 	world/GameTiles.cpp
 	world/GameView.cpp
-	world/GameHud.cpp
+	world/GameWorld.cpp
 	
 	world/controllers/MonsterController.cpp
 	world/controllers/PlayerController.cpp
@@ -121,13 +122,14 @@ set( lanarts_include
 	world/net/GameNetConnection.h
 
 	world/GameAction.h
+	world/GameHud.h
 	world/GameInstSet.h
 	world/GameState.h
 	world/GameLevelState.h
 	world/GameSettings.h
 	world/GameTiles.h
 	world/GameView.h
-	world/GameHud.h
+	world/GameWorld.h
 	
 	world/controllers/MonsterController.h
 	world/controllers/PlayerController.h

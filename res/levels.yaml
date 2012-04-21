@@ -5,6 +5,26 @@
 branches:
   - branch: main_branch
     levels:
+      #Level 0
+      - size: [40,40]
+        items:
+          amount: 0
+        rooms:
+          padding: 0
+          amount: 1
+          size: [30,39]
+        tunnels:
+          padding: 0
+          width: 0
+          per_room: 0        
+        features:
+          stairs_up: 0
+          stairs_down: 5
+        enemies:
+          amount: 1
+          generated:
+            - enemy: Executioner
+              chance: 100
       #Level 1
       - size: [40, 40]
         items:
@@ -35,7 +55,7 @@ branches:
           width: 1
           per_room: [5, 5]          
         features:
-          stairs_up: 0
+          stairs_up: 5
           stairs_down: 3
         enemies:
           amount: 5

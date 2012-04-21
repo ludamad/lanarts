@@ -7,6 +7,13 @@
 
 #include "tunnelgen.h"
 #include "mtwist.h"
+#include <cassert>
+
+static const int MAXPADDING = 3;
+static const int MAXWIDTH = 10;
+static const int MAXSIZE = MAXWIDTH + MAXPADDING*2;
+
+#define LANARTS_ASSERT(x) assert(x)
 
 //Attempt connection from start room to another room
 struct TunnelGen {
@@ -20,13 +27,15 @@ struct TunnelGen {
 	int width;
 	int change_odds;
 	enum {
-		NO_TURN = 0, TURN_PERIMETER = 1, TURN_START = 2,
+		NO_TURN = 0, TURN_PERIMETER = 1, TURN_START = 2
 	};
 	inline TunnelGen(GeneratedLevel& s, MTwist& mt, int start_room, int padding, int width,
 			int change_odds, bool ate = false) :
 			s(s), mt(mt), start_room(start_room), end_room(0), padding(padding), accept_tunnel_entry(
 					ate), avoid_groupid(0), width(width), change_odds(
 					change_odds) {
+		LANARTS_ASSERT(padding <= MAXPADDING);
+		LANARTS_ASSERT(width <= MAXWIDTH);
 	}
 
 	bool generate_x(Pos p, bool right, int depth, int turn_state = NO_TURN);
@@ -35,7 +44,8 @@ struct TunnelGen {
 
 bool TunnelGen::generate_x(Pos p, bool right, int depth, int turn_state) {
 	bool generated;
-	Sqr prev_content[width + padding*2]; //For backtracking
+//	Sqr prev_content[width + padding*2]; //For backtracking
+	Sqr prev_content[MAXSIZE]; //For backtracking
 	Pos ip(p.x, p.y - 1), newpos;
 
 	if (p.x <= 2 || p.x >= s.width() - width)
@@ -124,7 +134,8 @@ bool TunnelGen::generate_x(Pos p, bool right, int depth, int turn_state) {
 }
 bool TunnelGen::generate_y(Pos p, bool down, int depth, int turn_state) {
 	bool generated;
-	Sqr prev_content[width + padding*2]; //For backtracking
+	//	Sqr prev_content[width + padding*2]; //For backtracking
+	Sqr prev_content[MAXSIZE]; //For backtracking
 	Pos ip(p.x - 1, p.y), newpos;
 
 	if (p.y <= 2 || p.y >= s.height() - width)

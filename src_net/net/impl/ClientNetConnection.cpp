@@ -10,6 +10,7 @@ void client_connect_handler(ClientNetConnection* cnc,
 	if (!error) {
 		NetPacket packet(cnc->get_peer_id());
 		s->send_packet(packet);
+		cnc->set_connected();
 
 		asio::async_read(
 				s->get_socket(),
@@ -34,6 +35,7 @@ ClientNetConnection::ClientNetConnection(const char* host, const char* port) :
     tcp::resolver::iterator iterator = resolver.resolve(query);
 
 	asio::ip::tcp::endpoint endpoint = *iterator;
+	connected = false;
 
 	stream.get_socket().async_connect(
 			endpoint,
@@ -49,7 +51,15 @@ ClientNetConnection::~ClientNetConnection() {
 }
 
 bool ClientNetConnection::get_next_packet(NetPacket & packet) {
-	return stream.get_next_packet(packet);
+	stream.get_next_packet(packet);
+	while (true){
+		if (packet.packet_type == NetPacket::PACKET_ASSIGN_PEERID){
+			peer_id = packet.get_int();
+		} else if (packet.packet_type == NetPacket::PACKET_BROADCAST_PEERLISTSIZE){
+			number_of_peers = packet.get_int();
+		} else break;
+		stream.get_next_packet(packet);
+	}
 }
 
 void ClientNetConnection::broadcast_packet(const NetPacket & packet) {

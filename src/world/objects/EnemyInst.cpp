@@ -35,17 +35,18 @@ void EnemyInst::init(GameState* gs) {
 
 	//xpgain *=1+gs->branch_level()/10.0;
 	//xpgain = round(xpgain/5.0)*5;
-	stats().hp += stats().hp*gs->branch_level()/10.0;
-	stats().max_hp += stats().max_hp*gs->branch_level()/10.0;
-	stats().mp += stats().mp*gs->branch_level()/10.0;
-	stats().max_mp += stats().max_mp*gs->branch_level()/10.0;
-	stats().ranged.cooldown /= 1.0 + gs->branch_level()/10.0;
-	stats().ranged.damage *= 1.0 + gs->branch_level()/10.0;
-	stats().ranged.projectile_speed *= 1.0 + gs->branch_level()/10.0;
-	stats().melee.cooldown /= 1.0 + gs->branch_level()/10.0;
-	stats().melee.damage *= 1.0 + gs->branch_level()/10.0;
-	stats().max_mp += stats().max_mp*gs->branch_level()/10.0;
-	double speedfactor = 1+stats().max_mp*gs->branch_level()/10.0;
+	int ln = gs->level()->level_number+1;
+	stats().hp += stats().hp*ln/10.0;
+	stats().max_hp += stats().max_hp*ln/10.0;
+	stats().mp += stats().mp*ln/10.0;
+	stats().max_mp += stats().max_mp*ln/10.0;
+	stats().ranged.cooldown /= 1.0 + ln/10.0;
+	stats().ranged.damage *= 1.0 + ln/10.0;
+	stats().ranged.projectile_speed *= 1.0 + ln/10.0;
+	stats().melee.cooldown /= 1.0 + ln/10.0;
+	stats().melee.damage *= 1.0 + ln/10.0;
+	stats().max_mp += stats().max_mp*ln/10.0;
+	double speedfactor = 1+stats().max_mp*ln/10.0;
 	if (stats().movespeed < 3)
 		eb.speed = std::min(stats().movespeed*speedfactor,3.0);
 }
@@ -100,9 +101,14 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 	if ( (pinst = dynamic_cast<PlayerInst*>(inst))) {
 		if (ranged){
 			Attack& ranged = stats().ranged;
-			GameInst* bullet = new BulletInst(id, ranged, x,y,inst->x, inst->y);
+
+			Pos p(pinst->x, pinst->y);
+			p.x += gs->rng().rand(-12,+13);
+			p.y += gs->rng().rand(-12,+13);
+			GameInst* bullet = new BulletInst(id, ranged, x,y,p.x, p.y);
 			gs->add_instance(bullet);
 			stats().reset_ranged_cooldown();
+			stats().cooldown += gs->rng().rand(-4,5);
 		} else {
 			pinst->stats().hurt(stats().melee.damage);
 
@@ -114,6 +120,7 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 					rx, ry, dmgstr));
 
 			stats().reset_melee_cooldown();
+			stats().cooldown += gs->rng().rand(-4,5);
 		}
 	}
 }

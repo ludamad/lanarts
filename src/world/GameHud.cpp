@@ -43,16 +43,20 @@ static void draw_player_stats(GameState*gs, PlayerInst* player, int x, int y) {
 }
 
 static void draw_player_inventory(GameState* gs, PlayerInst* player, int x, int y, int w, int h){
+	Inventory& inv = player->get_inventory();
+
     for(int iy = 0; (iy*TILE_SIZE+TILE_SIZE) < (h-y); iy++){
         for(int ix = 0; (ix*TILE_SIZE+TILE_SIZE) < (w-x+1); ix++){
 	    int slot = 5*iy+ix;
             if(slot >= INVENTORY_SIZE) return;
             gl_draw_rectangle((ix*TILE_SIZE)+x, (iy*TILE_SIZE)+y, TILE_SIZE, TILE_SIZE, Colour(43, 43, 43));
             gl_draw_rectangle((ix*TILE_SIZE)+1+x, (iy*TILE_SIZE)+1+y, TILE_SIZE-2, TILE_SIZE-2, Colour(0, 0, 0));
-	    if(player->inventory.inv[slot].n > 0){
-	      ItemType& itemd = game_item_data[player->inventory.inv[slot].item];
-	      image_display(&game_sprite_data[itemd.sprite_number].img,(ix*TILE_SIZE)+x+1,(iy*TILE_SIZE)+y);
-	      gl_printf(gs->primary_font(), Colour(255,255,255), x+ix*TILE_SIZE, y+iy*TILE_SIZE, "%d", player->inventory.inv[slot].n);
+	    if(inv.inv[slot].n > 0){
+	      ItemType& itemd = game_item_data[inv.inv[slot].item];
+	      GLImage* itemimg = &game_sprite_data[itemd.sprite_number].img;
+	      Pos p(x+ix*TILE_SIZE, y+iy*TILE_SIZE);
+	      image_display(itemimg,p.x+1,p.y);
+	      gl_printf(gs->primary_font(), Colour(255,255,255), p.x, p.y, "%d", inv.inv[slot].n);
 	    }
 		}
     }
@@ -146,7 +150,9 @@ void GameHud::draw_minimap(GameState* gs, int subx, int suby) {
 			int tile = tiles.get(x, y);
 			int seen = tiles.seen(x, y) || pressed_z;
 			if (seen) {
-				if (tile > TILE_STONE_WALL) {/*floor*/
+				if (tile == TILE_STAIR_DOWN || tile == TILE_STAIR_UP){
+					iter[0] = 255, iter[1] = 0, iter[2] = 0, iter[3] = 255;
+				} else if (!game_tile_data[tile].solid) {/*floor*/
 					iter[0] = 255, iter[1] = 255, iter[2] = 255, iter[3] = 255;
 				} else { //if (tile == 1){/*wall*/
 					iter[0] = 100, iter[1] = 100, iter[2] = 100, iter[3] = 255;
@@ -171,11 +177,13 @@ void GameHud::draw_minimap(GameState* gs, int subx, int suby) {
 		}
 	}
 	GameInst* inst = gs->get_instance(gs->local_playerid());
-	int arr_x = (inst->x / TILE_SIZE), arr_y = (inst->y / TILE_SIZE);
-	fill_buff2d(minimap_arr, tilew, tileh, arr_x - arr_x % 2, arr_y - arr_y % 2,
-			Colour(255, 180, 99), 2, 2);
-	draw_rect2d(minimap_arr, tilew, tileh, min_tilex, min_tiley, max_tilex,
-			max_tiley, Colour(255, 180, 99));//
+	if (inst){
+		int arr_x = (inst->x / TILE_SIZE), arr_y = (inst->y / TILE_SIZE);
+		fill_buff2d(minimap_arr, tilew, tileh, arr_x - arr_x % 2, arr_y - arr_y % 2,
+				Colour(255, 180, 99), 2, 2);
+		draw_rect2d(minimap_arr, tilew, tileh, min_tilex, min_tiley, max_tilex,
+				max_tiley, Colour(255, 180, 99));//
+	}
 
 	int old_unpack;
 	//glGetIntegerv(GL_UNPACK_ALIGNMENT, &old_unpack);
@@ -191,6 +199,7 @@ void GameHud::draw(GameState* gs) {
 	PlayerInst* player_inst = (PlayerInst*) gs->get_instance(gs->local_playerid());
 	gl_draw_rectangle(0, 0, _width, _height, bg_colour);
 
+	draw_minimap(gs, 20, 64+45);
 	if (player_inst){
 		draw_player_stats(gs, player_inst, 32, 32);
         draw_player_inventory(gs, player_inst, 0, INVENTORY_POSITION, _width, _height);
@@ -199,9 +208,8 @@ void GameHud::draw(GameState* gs) {
 		return;
 		//player = state->get_instance(0);
 	}
-	draw_minimap(gs, 20, 64+45);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-15,10,"Level %d", player_inst->stats().xplevel);
-	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-40,64+45+128,"Floor %d", gs->branch_level());
+	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-40,64+45+128,"Floor %d", gs->level()->level_number);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-40,64+45+128+15,"Gold %d", player_inst->gold());
 	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+30,"Strength   %d", player_inst->effective_stats().strength);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11),_width/2-50,64+45+128+45,"Magic      %d", player_inst->effective_stats().magic);

@@ -3,12 +3,20 @@
 
 typedef boost::shared_ptr<SocketStream> stream_ptr;
 
+void ServerNetConnection::get_peer_packets(std::vector<NetPacket> & packets){
+	packets.resize(get_number_peers());
+	for (int i = 0; i < packets.size(); i++){
+
+	}
+}
+
 void ServerNetConnection::accept_handler(SocketStream* ss, const asio::error_code& error) {
 	if (!error) {
 		if (ss){
 			streamlock.lock();
 			streams.push_back(stream_ptr(ss));
 			streamlock.unlock();
+			printf("Connected!\n");
 
 			asio::async_read(
 					ss->get_socket(),
@@ -41,7 +49,7 @@ ServerNetConnection::~ServerNetConnection() {
 
 void ServerNetConnection::assign_peerid(SocketStream* stream, int peerid){
 	NetPacket packet(get_peer_id());
-	packet.packet_type = PACKET_NEW;
+	packet.packet_type = NetPacket::PACKET_ASSIGN_PEERID;
 	packet.add_int(peerid);
 	stream->send_packet(packet);
 }
@@ -61,10 +69,10 @@ bool ServerNetConnection::get_next_packet(NetPacket & packet) {
 			do {
 				packet = ss->rmessages().front();
 				ss->rmessages().pop_front();
-				if (packet.packet_type == PACKET_NEW){
+				if (packet.packet_type == NetPacket::PACKET_HELLO){
 					assign_peerid(ss, i+1);
 				}
-			} while (packet.packet_type == PACKET_NEW);
+			} while (packet.packet_type == NetPacket::PACKET_HELLO);
 			m.unlock();
 			found = true;
 		}

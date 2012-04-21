@@ -24,6 +24,8 @@ public:
 	virtual int get_peer_id(){ return 0;}
 	virtual int get_number_peers(){ return streams.size();}
 	virtual void join();
+	virtual bool is_initialized() { return !streams.empty(); }
+	virtual void get_peer_packets(std::vector<NetPacket>& packets);
 
 private:
 	void assign_peerid(SocketStream* stream, int peerid);

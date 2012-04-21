@@ -26,15 +26,15 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 		for (int x = start_x; x < end_x; x++) {
 			Sqr& s = level.at(x-start_x, y-start_y);
 			if (s.passable) {
-				tiles.get(x,y) = TILE_FLOOR;
+				tiles.get(x,y) = TILE_GRASS + 7 + mt.rand(9);
 				if (s.roomID){
 //					if (s.marking)
 // 					tiles[ind] = TILE_MESH_0+s.marking;
 				} else if (s.feature == SMALL_CORRIDOR){
-					tiles.get(x,y) = TILE_CORRIDOR_FLOOR;
+					tiles.get(x,y) = TILE_GRASS + 7 +9 + mt.rand(4);//TILE_CORRIDOR_FLOOR;
 				}
 			} else {
-				tiles.get(x,y)= TILE_WALL;
+				tiles.get(x,y)= TILE_GRASS + mt.rand(7);//TILE_WALL;
 				if (s.feature == SMALL_CORRIDOR){
 					if (mt.rand(4) == 0){
 						tiles.get(x,y) = TILE_STONE_WALL;
@@ -67,6 +67,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 			}
 		}
 	}
+	gs->level()->entrances.clear();
 	for(int n = 0; n < fs.nstairs_down; n++){
 		Pos p = generate_location(mt, level);
 		level.at(p).has_instance = true;
@@ -79,6 +80,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 		gs->level()->entrances.push_back(GameLevelPortal(p, Pos(0,0)));
 	}
 
+	gs->level()->exits.clear();
 	for(int n = 0; n < fs.nstairs_up; n++){
 		Pos p = generate_location(mt, level);
 		level.at(p).has_instance = true;

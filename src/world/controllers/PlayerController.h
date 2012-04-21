@@ -17,13 +17,14 @@ public:
 	void pre_step(GameState* gs);
 	void clear();
 
-	void register_player(obj_id player);
-	void remove_player(obj_id player);
+	void register_player(obj_id player, bool islocal);
+	void deregister_player(obj_id player);
 	bool seen_by_player(GameState* gs, int pindex, GameInst* obj);
 
 	const std::vector<obj_id>& player_ids() { return pids; }
 	const std::vector<fov*>& player_fovs() { return fovs; }
 	obj_id local_playerid() { return local_player; }
+	fov* local_playerfov();
 private:
 	obj_id local_player;
 	std::vector<fov*> fovs;

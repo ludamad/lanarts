@@ -11,6 +11,7 @@
 #include "../connection.h"
 #include <asio.hpp>
 #include <deque>
+#include <vector>
 #include <boost/thread/mutex.hpp>
 
 class SocketStream;
@@ -40,6 +41,8 @@ public:
 	NetPacket& last_message() { return read_message; }
 	bool& is_closed(){ return closed; }
 //	int get_peer_id();
+	//Returns a max(peer)-size list
+	void get_connections(std::vector<NetPacket>& packets);
 
 private:
 	bool closed;
@@ -47,6 +50,7 @@ private:
 	NetPacket read_message;
 	asio::io_service& io_service;
 	asio::ip::tcp::socket socket;
+	std::vector<NetPacket> peerpackets;
 	std::deque<NetPacket> reading_msgs, writing_msgs;
 };
 

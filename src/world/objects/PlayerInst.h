@@ -20,16 +20,15 @@ public:
 	enum {
 		RADIUS = 10, VISION_SUBSQRS = 1
 	};
-	PlayerInst(const Stats& start_stats, int x, int y) :
-			GameInst(x, y, RADIUS), base_stats(start_stats), canrestcooldown(
-					0), money(0) {
-		weapon = 0;
-		portal = NULL;
-		spellselect = 0;//Fireball
+	PlayerInst(const Stats& start_stats, int x, int y, bool local = true) :
+			GameInst(x, y, RADIUS), local(local), weapon(0),
+			base_stats(start_stats), canrestcooldown(0),
+			money(0), spellselect(0) {
 	}
 
 	virtual ~PlayerInst();
 	virtual void init(GameState *gs);
+	virtual void deinit(GameState *gs);
 	virtual void step(GameState *gs);
 	virtual void draw(GameState *gs);
 
@@ -62,11 +61,14 @@ public:
 	int& weapon_type(){
 		return weapon;
 	}
-
-	Inventory inventory;
-	GameLevelPortal *portal_used() {
-		return portal;
+	//Is it player of focus ?
+	bool is_local_focus(){
+		return local;
 	}
+	Inventory& get_inventory(){
+		return inventory;
+	}
+
 private:
 	void use_move_and_melee(GameState *gs, const GameAction& action);
 	void use_dngn_exit(GameState* gs, const GameAction& action);
@@ -76,13 +78,14 @@ private:
 	void use_item(GameState *gs, const GameAction& action);
 	void pickup_item(GameState* gs, const GameAction& action);
 
+	Inventory inventory;
+	bool local;
 	int weapon;
 	Stats base_stats;
 	Effects effects;
 	int canrestcooldown;
 	int money;
 	int spellselect;
-	GameLevelPortal* portal;
 };
 
 #endif /* PLAYERINST_H_ */

@@ -12,16 +12,6 @@
 #include <cassert>
 
 typedef int obj_id;
-//
-////struct for game coordinates
-//struct Coord {
-//	int x, y;
-//	inline Coord(){}
-//	inline Coord(int x, int y) : x(x), y(y) { }
-//	bool operator=(const Coord& c){
-//		return x == c.x && y == c.y;
-//	}
-//};
 
 #define LANARTS_ASSERT(x) assert(x)
 
@@ -36,6 +26,8 @@ public:
 	virtual ~GameInst();
 	/* Initialize the object further, 'id' will be set*/
 	virtual void init(GameState* gs);
+	/* Deinitialize the object, removing eg child instances*/
+	virtual void deinit(GameState* gs);
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
 public:

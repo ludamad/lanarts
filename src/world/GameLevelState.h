@@ -23,7 +23,7 @@ struct GameLevelPortal {
 };
 
 struct GameLevelState{
-	GameLevelState(int branch, int level, int w, int h);
+	GameLevelState(int roomid, int branch, int level, int w, int h);
 	~GameLevelState();
 
 	std::vector<GameLevelPortal> exits, entrances;
@@ -41,8 +41,10 @@ struct GameLevelState{
 		}
 		return -1;
 	}
+
+	int roomid;//Global room id
 	//How many steps a level should be simulated after you leave it
-	int simulate_count;
+	int steps_left;
 	//Game location information
 	int branch_number, level_number;
 

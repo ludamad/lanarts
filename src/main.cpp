@@ -61,11 +61,16 @@ static void game_loop(GameState* gs){
 			init_game_data();
 		}
 		if (gs->key_press_state(SDLK_F3)) {
-			gs->regen_level();
+			gs->game_world().regen_level(gs->level()->roomid);
 		}
 		if (gs->key_press_state(SDLK_F4)) {
 			paused = !paused;
 		}
+		if (gs->key_down_state(SDLK_x)) {
+			GameView& view = gs->window_view();
+			int nx = gs->mouse_x() + view.x, ny = gs->mouse_y() + view.y;
+			view.center_on(nx, ny);
+		 }
 		if (!paused){
 			if (gs->key_down_state(SDLK_F1)) {
 				for (int repeat = 0; repeat < 4; repeat++){
@@ -118,7 +123,6 @@ int main(int argc, char** argv) {
 
 	//Initialize the game state and start the level
 	GameState* gs = new GameState(settings, world_width,world_height, vieww, viewh);
-	gs->reset_level();
 	gs->update_iostate();//for first iteration
 
 	game_loop(gs);

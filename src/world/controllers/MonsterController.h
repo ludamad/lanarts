@@ -40,21 +40,24 @@ public:
 
 	void pre_step(GameState* gs);
 	void post_draw(GameState* gs);
+
 	void register_enemy(GameInst* enemy);
 	void deregister_enemy(EnemyInst* enemy);
+
     void shift_target(GameState *gs);
+
     void clear();
+public:
     void set_monster_headings(GameState *gs, std::vector<EnemyOfInterest> & eois);
     void update_position(GameState* gs, EnemyInst* e);
     void update_velocity(GameState* gs, EnemyInst* e);
-public:
     void monster_wandering(GameState *gs, EnemyInst *e);
     void monster_follow_path(GameState *gs, EnemyInst *e);
     void monster_get_to_stairs(GameState *gs, EnemyInst *e);
+
     bool must_initialize;
     AStarPathFind astarcontext;
     obj_id targetted;
-    std::vector<PathInfo> room_paths;
     std::vector<PathInfo> paths;
 	std::vector<obj_id> mids;
 	std::vector<int> player_simids;

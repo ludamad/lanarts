@@ -368,7 +368,7 @@ void MonsterController::update_velocity(GameState* gs, EnemyInst* e){
 }
 void MonsterController::update_position(GameState* gs, EnemyInst* e){
 	EnemyBehaviour& eb = e->behaviour();
-	RVO::Vector2 updated = simulator->getAgentPosition(e->behaviour().simulation_id);
+	RVO::Vector2 updated = simulator->getAgentPosition(eb.simulation_id);
 
 	float ux = updated.x(), uy = updated.y();
 	float dx = ux - e->rx, dy = uy - e->ry;
@@ -376,8 +376,9 @@ void MonsterController::update_position(GameState* gs, EnemyInst* e){
 //	float mag = sqrt(eb.vx*eb.vx + eb.vy*eb.vy);
 //	bool less_significantly = dist <= mag*.99f;
 	bool collided = gs->tile_radius_test(round(ux), round(uy), /*e->radius+4*/20);
+	int neighbours = simulator->getAgentNumAgentNeighbors(eb.simulation_id);
 
-	if (dist > 0.5f && !collided){
+	if (neighbours > 0 && dist > 0.5f && !collided){
 		e->rx = ux;
 		e->ry = uy;
 	} else {
@@ -385,20 +386,20 @@ void MonsterController::update_position(GameState* gs, EnemyInst* e){
 		float nx = round(e->rx+eb.vx), ny = round(e->ry+eb.vy);
 		bool collided = gs->tile_radius_test(nx, ny, e->radius);
 		if (collided){
-			bool hitsx = gs->tile_radius_test(nx, e->y, e->radius, true, -1);
-			bool hitsy = gs->tile_radius_test(e->x, ny, e->radius, true, -1);
-			if(hitsy || hitsx || collided){
-				if (hitsx) {
+//			bool hitsx = gs->tile_radius_test(nx, e->y, e->radius, true, -1);
+//			bool hitsy = gs->tile_radius_test(e->x, ny, e->radius, true, -1);
+//			if(hitsy || hitsx || collided){
+//				if (hitsx) {
+//					eb.vx = -eb.vx;
+//				}
+//				if (hitsy) {
+//					eb.vy = -eb.vy;
+//				}
+//				if (!hitsy && !hitsx) {
 					eb.vx = -eb.vx;
-				}
-				if (hitsy) {
 					eb.vy = -eb.vy;
-				}
-				if (!hitsy && !hitsx) {
-					eb.vx = -eb.vx;
-					eb.vy = -eb.vy;
-				}
-			}
+//				}
+//			}
 		}
 		e->rx += eb.vx;
 		e->ry += eb.vy;

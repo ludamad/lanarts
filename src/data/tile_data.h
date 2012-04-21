@@ -33,7 +33,8 @@ enum {
 	TILE_CORRIDOR_FLOOR = 18,
 	TILE_STAIR_UP = 19,
 	TILE_STAIR_DOWN = 20,
-	TILE_FLOOR2 = 21
+	TILE_FLOOR2 = 21,
+	TILE_GRASS = 22
 };
 
 struct TileEntry {

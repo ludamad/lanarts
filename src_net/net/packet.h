@@ -5,10 +5,16 @@
 #include <cstdlib>
 #include <cstring>
 
-const int PACKET_MSG = 0;
-const int PACKET_NEW = 1;
 
 struct NetPacket {
+	enum {
+		PACKET_MSG = 0,
+		PACKET_BROADCAST_PEERID = 1,
+		PACKET_ASSIGN_PEERID = 2,
+		PACKET_BROADCAST_PEERLISTSIZE = 3,
+		PACKET_HELLO = 4,
+		PACKET_ACTIONS_DONE = 5
+	};
 	enum {
 		HEADER_LEN = sizeof(int)*3, MAX_PACKET_SIZE = 512
 	};

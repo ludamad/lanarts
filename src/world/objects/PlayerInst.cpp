@@ -18,8 +18,18 @@ PlayerInst::~PlayerInst() {
 
 void PlayerInst::init(GameState* gs) {
 	PlayerController& pc = gs->player_controller();
-	pc.register_player(this->id);
-	portal = NULL;
+	pc.register_player(this->id, is_local_focus());
+	if (gs->level()->roomid > 0){
+//	x = gs->level()->exits[0].entrancesqr.x*TILE_SIZE + TILE_SIZE/2;
+//	y = gs->level()->exits[0].entrancesqr.y*TILE_SIZE + TILE_SIZE/2;
+	}
+}
+
+
+void PlayerInst::deinit(GameState* gs) {
+	PlayerController& pc = gs->player_controller();
+	pc.deregister_player(this->id);
+	GameInst::deinit(gs);
 }
 
 void PlayerInst::step(GameState* gs) {
@@ -33,8 +43,10 @@ void PlayerInst::step(GameState* gs) {
 	effects.step();
 
 	if (stats().hp <= 0) {
-		gs->branch_level() = 1;
-		gs->set_generate_flag();
+		if (is_local_focus())
+		gs->game_world().reset(0);
+		else
+			gs->remove_instance(this);
 		return;
 	}
 
@@ -45,10 +57,7 @@ void PlayerInst::step(GameState* gs) {
 
 	perform_io_action(gs);
 
-	if (gs->key_down_state(SDLK_x)) {
-		int nx = gs->mouse_x() + view.x, ny = gs->mouse_y() + view.y;
-		view.center_on(nx, ny);
-	 } else
+	if (!gs->key_down_state(SDLK_x) && is_local_focus())
 		 view.center_on(last_x, last_y);
 }
 

@@ -26,13 +26,23 @@ void PlayerController::pre_step(GameState* gs) {
 	}
 }
 
-void PlayerController::register_player(obj_id player) {
-	local_player = player;
+fov* PlayerController::local_playerfov() {
+	int i;
+	for (i = 0; i < pids.size(); i++) {
+		if (pids[i] == local_playerid())
+			break;
+	}
+	return fovs[i];
+}
+
+void PlayerController::register_player(obj_id player, bool islocal) {
+	if (islocal)
+		local_player = player;
 	pids.push_back(player);
 	fovs.push_back(new fov(7, VISION_SUBSQRS));
 }
 
-void PlayerController::remove_player(obj_id player) {
+void PlayerController::deregister_player(obj_id player) {
 	int i;
 	for (i = 0; i < pids.size() && pids[i] != player; i++) {
 		//find 'i' such that pids[i] == player

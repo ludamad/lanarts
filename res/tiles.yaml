@@ -46,3 +46,17 @@ Tiles:
     spritefile: res/tiles/features/stairs_down.png
   - tile: floor2
     spritefile: res/tiles/room_floor3.bmp
+  - tile: brickdark
+    spritefile: res/tiles/brickdark/brick_dark
+    solid: 1
+    variations: 7
+    extension: .png
+  - tile: pebblebrown
+    spritefile: res/tiles/pebblebrown/pebble_brown
+    variations: 9
+    extension: .png
+  - tile: hive
+    spritefile: res/tiles/hive/hive
+    variations: 4
+    extension: .png
+  

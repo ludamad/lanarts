@@ -10,33 +10,37 @@
 
 struct GameState;
 struct GameLevelState;
+struct GeneratedLevel;
+struct PlayerInst;
 
 class GameWorld {
 public:
-	GameWorld(int width, int height);
+	GameWorld(GameState* gs, int width, int height);
 	~GameWorld();
-	GameLevelState* get_level(int roomid);
-	void step(GameState* gs);
-	void level_move(int id, int roomid1, int roomid2);
+	void generate_room(GameLevelState* level);
+	GameLevelState* get_level(int roomid, bool spawnplayer = false, void** player_instances = NULL, size_t nplayers = 0);
+	void step();
+	void level_move(int id, int x, int y, int roomid1, int roomid2);
 	void set_current_level(int roomid);
 	void set_current_level_lazy(int roomid);
-	GameLevelState *get_current_level() {
+	void reset(int keep = 0);
+	void regen_level(int roomid);
+	void spawn_player(GeneratedLevel& genlevel, PlayerInst* inst = NULL);
+	GameLevelState*& get_current_level() {
 		return lvl;
 	}
 
-	int get_current_level_id() {
-		return current_room_id;
-	}
-
-	bool tile_radius_test(int x, int y, int rad, bool issolid = true,
-			int ttype = -1, Pos* hitloc = NULL, int roomid = -1);
-
-private:
+	int get_current_level_id();
 	void connect_entrance_to_exit(int roomid1, int roomid2);
+private:
+	bool midstep;
 	int w, h;
-	int current_room_id, next_room_id;
+	int next_room_id;
 	GameLevelState* lvl;
+	GameState* game_state;
 	std::vector<GameLevelState*> level_states;
 };
+
+
 
 #endif /* GAMEWORLD_H_ */

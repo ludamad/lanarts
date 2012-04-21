@@ -26,25 +26,36 @@
 #include "net/GameNetConnection.h"
 
 GameState::GameState(const GameSettings& settings, int width, int height, int vieww, int viewh, int hudw) :
-		settings(settings), world_width(width), world_height(height), level_number(1),  frame_n(0), hud(
-				vieww, 0, hudw, viewh), view(50, 50, vieww, viewh, width,
-				height), mouse_leftdown(0), mouse_rightdown(0), mouse_leftclick(0), mouse_rightclick(0) {
+		settings(settings), world_width(width), world_height(height),  frame_n(0),
+				hud(vieww, 0, hudw, viewh),
+				view(50, 50, vieww, viewh, width, height),
+				world(this, width, height),
+				mouse_leftdown(0), mouse_rightdown(0),
+				mouse_leftclick(0), mouse_rightclick(0) {
 	memset(key_down_states, 0, sizeof(key_down_states));
 	init_font(&pfont, "res/arial.ttf", 10);
 	time_t t;
 	time(&t);
 	mtwist.init_genrand(t);
 	gennextstep = false;
-	lvl = new GameLevelState(DNGN_MAIN_BRANCH, level_number, width, height);
 
 	if (settings.conntype == GameSettings::CLIENT){
 		char port_buffer[50];
 		snprintf(port_buffer, 50, "%d", settings.port);
 		connection.get_connection() = create_client_connection(settings.ip.c_str(), port_buffer);
+		while (!connection.get_connection()->is_initialized()){
+
+		}
 	} else if (settings.conntype == GameSettings::HOST){
 		connection.get_connection() = create_server_connection(settings.port);
+		while (!connection.get_connection()->is_initialized()){
+
+		}
 	}
 
+	level() = world.get_level(0, true);
+	GameInst* p = get_instance(level()->pc.local_playerid());
+	window_view().sharp_center_on(p->x, p->y);
 }
 
 GameState::~GameState() {
@@ -117,27 +128,11 @@ bool GameState::update_iostate(){
 bool GameState::step() {
 	const int sub_sqrs = VISION_SUBSQRS;
 
-	if (gennextstep)
-		reset_level();
-
 	if (!update_iostate())
 		return false;
 
 	frame_n++;
-	const int SIMULATE_TIMEOUT = 1000;
-	GameLevelState* current_level = lvl;
-	current_level->simulate_count = 1000;
-	for (int i = 0; i < level_states.size(); i++){
-		if (level_states[i]->simulate_count > 0){
-			//Set so that all the GameState getters are properly updated
-			lvl = level_states[i];
-			lvl->pc.pre_step(this);
-			lvl->mc.pre_step(this);
-			lvl->inst_set.step(this);
-			lvl->simulate_count--;
-		}
-	}
-	lvl = current_level;
+	world.step();
 	return true;
 }
 
@@ -153,30 +148,31 @@ void GameState::draw() {
 	gl_set_drawing_area(0, 0, view.width, view.height);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	lvl->tiles.pre_draw(this);
-	std::vector<GameInst*> safe_copy = lvl->inst_set.to_vector();
+	level()->tiles.pre_draw(this);
+	std::vector<GameInst*> safe_copy = level()->inst_set.to_vector();
 	for (size_t i = 0; i < safe_copy.size(); i++) {
 		safe_copy[i]->draw(this);
 	}
 	monster_controller().post_draw(this);
-	lvl->tiles.post_draw(this);
+	level()->tiles.post_draw(this);
 	hud.draw(this);
 	update_display();
 	glFinish();
 }
 
 obj_id GameState::add_instance(GameInst *inst) {
-	obj_id id = lvl->inst_set.add(inst);
+	obj_id id = level()->inst_set.add(inst);
 	inst->init(this);
 	return id;
 }
 
-void GameState::remove_instance(GameInst* inst) {
-	lvl->inst_set.remove(inst);
+void GameState::remove_instance(GameInst* inst, bool deallocate) {
+	level()->inst_set.remove(inst, deallocate);
+	inst->deinit(this);
 }
 
 GameInst* GameState::get_instance(obj_id id) {
-	return lvl->inst_set.get_by_id(id);
+	return level()->inst_set.get_by_id(id);
 }
 
 static int squish(int a, int b, int c) {
@@ -231,7 +227,7 @@ bool GameState::tile_radius_test(int x, int y, int rad, bool issolid,
 
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			int tile = lvl->tiles.get(xx, yy);
+			int tile = level()->tiles.get(xx, yy);
 			bool istype = (tile == ttype || ttype == -1);
 			bool solidmatch = (game_tile_data[tile].solid == issolid);
 			if (solidmatch && istype) {
@@ -262,7 +258,7 @@ bool GameState::tile_radius_test(int x, int y, int rad, bool issolid,
 
 int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 		col_filterf f, int x, int y, int radius) {
-	return lvl->inst_set.object_radius_test(obj, objs, obj_cap, f, x, y, radius);
+	return level()->inst_set.object_radius_test(obj, objs, obj_cap, f, x, y, radius);
 }
 bool GameState::object_visible_test(GameInst* obj) {
 	const int sub_sqrs = VISION_SUBSQRS;
@@ -275,13 +271,16 @@ bool GameState::object_visible_test(GameInst* obj) {
 	int maxgrid_x = (x + rad) / subsize, maxgrid_y = (y + rad) / subsize;
 	int minx = squish(mingrid_x, 0, w), miny = squish(mingrid_y, 0, h);
 	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
+	const std::vector<fov*>& fovs = level()->pc.player_fovs();
+
+	if (fovs.empty()) return true;
 
 //printf("minx=%d,miny=%d,maxx=%d,maxy=%d\n",minx,miny,maxx,maxy);
 
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			for (int i = 0; i < lvl->pc.player_fovs().size(); i++) {
-				if (lvl->pc.player_fovs()[i]->within_fov(xx, yy))
+			for (int i = 0; i < fovs.size(); i++) {
+				if (fovs[i]->within_fov(xx, yy))
 					return true;
 			}
 		}
@@ -289,111 +288,14 @@ bool GameState::object_visible_test(GameInst* obj) {
 	return false;
 }
 
-
-void GameState::regen_level(){
-	level_states.resize(level_number-1);
-	if (level_states.size()){
-		lvl = level_states.back();
-	} else {
-		lvl = new GameLevelState(DNGN_MAIN_BRANCH, level_number, width(), height());
-	}
-	reset_level();
+void GameState::ensure_connectivity(int roomid1, int roomid2){
+	world.connect_entrance_to_exit(roomid1, roomid2);
 }
-
-void GameState::reset_level() {
-	GeneratedLevel level;
-	DungeonBranch& mainbranch = game_dungeon_data[DNGN_MAIN_BRANCH];
-	int leveln = (level_number-1) % mainbranch.nlevels;
-
-	std::vector<PlayerInst> playerinfo;
-	std::vector<obj_id> pids =player_controller().player_ids();
-
-	for (int i = 0; i < pids.size(); i++){
-		PlayerInst* p = (PlayerInst*)get_instance(pids[i]);
-		if (p->stats().hp > 0){
-			playerinfo.push_back(*p);
-			//TODO: Fix memory leak below
-			/*for (int i = 0; i < level_states.size(); i++){
-				delete level_states[i];
-			}*/
-		} else {
-			if (settings.regen_on_death){
-
-				level_number = 1;
-				leveln = 0;
-				level_states.clear();
-			} else {
-				level_states.resize(level_number-1);
-				if (level_states.size()){
-					lvl = level_states.back();
-				} else {
-					lvl = new GameLevelState(DNGN_MAIN_BRANCH, level_number, width(), height());
-				}
-			}
-		}
-		remove_instance(p);
-	}
-//	lvl->inst_set.clear();
-	player_controller().clear();
-//	monster_controller().clear();
-
-	Pos playersqr;
-	GameLevelState* prevlvl = lvl;
-	if (leveln >= level_states.size()){
-		lvl = new GameLevelState(DNGN_MAIN_BRANCH, level_number, width(), height());
-		level_states.push_back(lvl);
-
-		generate_level(mainbranch.level_data[leveln], mtwist, level, this);
-		lvl->rooms = level.rooms();
-		if (playerinfo.size() == 0){
-			//Generate player
-			GameTiles& tiles = tile_grid();
-			int start_x = (tiles.tile_width()-level.width())/2;
-			int start_y = (tiles.tile_height()-level.height())/2;
-
-			playersqr = generate_location(mtwist, level);
-			playersqr.x += start_x;
-			playersqr.y += start_y;
-		} else {
-			LANARTS_ASSERT(lvl->exits.size() == prevlvl->entrances.size());
-			for (int i = 0; i < lvl->exits.size(); i++){
-				lvl->exits[i].exitsqr = prevlvl->entrances[i].entrancesqr;
-				prevlvl->entrances[i].exitsqr = lvl->exits[i].entrancesqr;
-			}
-		}
-	} else {
-		lvl = level_states[leveln];
-	}
-	if (playerinfo.size() == 0){
-		ClassType* c = &game_class_data[settings.classn];
-		playerinfo.push_back(PlayerInst(c->starting_stats, 0,0));
-	}
-	for (int i = 0; i < playerinfo.size(); i++){
-		if (playerinfo[i].portal_used()){
-			playersqr = playerinfo[i].portal_used()->exitsqr;
-		}
-		int px = (playersqr.x) * 32 + 16;
-		int py = (playersqr.y) * 32 + 16;
-
-		PlayerInst* p = new PlayerInst(playerinfo[i]);
-		p->last_x = px, p->last_y = py;
-		p->x = px, p->y = py;
-		add_instance(p);
-	}
-
-	GameInst* p = get_instance(local_playerid());
-	window_view().sharp_center_on(p->x, p->y);
-	//Make sure we aren't going to regenerate the level next step
-	gennextstep = false;
+void GameState::level_move(int id, int x, int y, int roomid1, int roomid2){
+	world.level_move(id, x, y, roomid1, roomid2);
 }
-
 
 GameInst* GameState::nearest_object(GameInst* obj, int max_radius, col_filterf f){
-	return lvl->inst_set.object_nearest_test(obj, max_radius, f);
+	return level()->inst_set.object_nearest_test(obj, max_radius, f);
 }
 
-
-
-
-void GameState::set_level(int levelnum, bool reset) {
-}

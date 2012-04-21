@@ -10,45 +10,130 @@
 #include "GameLevelState.h"
 #include "../data/dungeon_data.h"
 #include "../data/tile_data.h"
+#include "../data/class_data.h"
+#include "objects/PlayerInst.h"
 
-GameWorld::GameWorld(int width, int height) :
-		w(width), h(height), next_room_id(-1) {
+GameWorld::GameWorld(GameState* gs, int width, int height) :
+		game_state(gs), w(width), h(height), next_room_id(-1) {
+	midstep = false;
 }
 
 GameWorld::~GameWorld() {
+	reset();
 }
 
-GameLevelState* GameWorld::get_level(int roomid) {
-	if (roomid < level_states.size()) {
+void GameWorld::generate_room(GameLevelState* level){
+
+}
+
+int GameWorld::get_current_level_id()
+{
+    return game_state->level()->roomid;
+}
+
+void GameWorld::spawn_player(GeneratedLevel& genlevel, PlayerInst* inst){
+	GameTiles& tiles = game_state->tile_grid();
+	ClassType* c = &game_class_data[game_state->game_settings().classn];
+	Pos epos;
+	do {
+		epos = generate_location(game_state->rng(), genlevel);
+	} while (! genlevel.at(epos).passable || genlevel.at(epos).has_instance);
+
+	int start_x = (tiles.tile_width() - genlevel.width()) / 2;
+	int start_y = (tiles.tile_height() - genlevel.height()) / 2;
+
+	genlevel.at(epos).has_instance = true;
+	int px = (epos.x + start_x) * 32 + 16;
+	int py = (epos.y + start_y) * 32 + 16;
+
+	if (!inst){
+		inst = new PlayerInst(c->starting_stats, px,py);
+	} else {
+		inst->last_x = px;
+		inst->last_y = py;
+		inst->x = px;
+		inst->y = py;
+	}
+	game_state->add_instance(inst);
+	game_state->add_instance(new PlayerInst(c->starting_stats, px+TILE_SIZE,py, false));
+}
+GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player_instances, size_t nplayers) {
+	if (roomid >= level_states.size()) {
 		level_states.resize(roomid + 1, NULL);
 	}
-	if (!level_states[roomid])
-		level_states[roomid] = new GameLevelState(DNGN_MAIN_BRANCH, roomid, w,
-				h);
+	if (!level_states[roomid]){
+		GameLevelState* currlvl = game_state->level();
+		game_state->level() = new GameLevelState(roomid, DNGN_MAIN_BRANCH, roomid, w,h);
+		level_states[roomid] = game_state->level();
+
+		DungeonBranch& mainbranch = game_dungeon_data[DNGN_MAIN_BRANCH];
+		GeneratedLevel genlevel;
+		generate_level(mainbranch.level_data[roomid], game_state->rng(), genlevel, game_state);
+		game_state->level()->rooms = genlevel.rooms();
+		if (spawnplayer){
+			if (!player_instances)
+				spawn_player(genlevel);
+			else {
+				for (int i =0; i < nplayers; i++){
+					spawn_player(genlevel, (PlayerInst*)player_instances[i]);
+				}
+			}
+		}
+		game_state->level() = currlvl;//restore level context
+	}
 	return level_states[roomid];
 }
+void GameWorld::step() {
+	redofirststep://I used a goto dont kill me
 
-void GameWorld::step(GameState *gs) {
-	if (next_room_id != -1){
-		set_current_level(next_room_id);
-		next_room_id = -1;
-	}
+	const int STEPS_TO_SIMULATE = 1000;
+	GameLevelState* current_level = game_state->level();
+	current_level->steps_left = STEPS_TO_SIMULATE;
 
-	GameLevelState* current_level = lvl;
-	current_level->simulate_count = 1000;
+	midstep = true;
 	for (int i = 0; i < level_states.size(); i++){
-		if (level_states[i]->simulate_count > 0){
+		if (level_states[i]->steps_left > 0){
 			//Set so that all the GameState getters are properly updated
-			lvl = level_states[i];
-			lvl->pc.pre_step(gs);
-			lvl->mc.pre_step(gs);
-			lvl->inst_set.step(gs);
-			lvl->simulate_count--;
+			game_state->level() = level_states[i];
+			game_state->level()->pc.pre_step(game_state);
+			game_state->level()->mc.pre_step(game_state);
+			game_state->level()->inst_set.step(game_state);
+			game_state->level()->steps_left--;
 		}
 	}
-	lvl = current_level;
+	game_state->level() = current_level;
+
+	midstep = false;
+	if (next_room_id == -2){
+		reset(0);
+		next_room_id = 0;
+	}
+	if (next_room_id != -1){
+		set_current_level(next_room_id);
+		GameInst* g = game_state->get_instance(game_state->player_controller().local_playerid());
+		game_state->window_view().sharp_center_on(g->x,g->y);
+		next_room_id = -1;
+		goto redofirststep;// goto top
+	}
 }
 
+void GameWorld::regen_level(int roomid){
+	GameLevelState* level = get_level(roomid);
+	std::vector<PlayerInst*> player_cache;
+	for (int i = 0; i < level->pc.player_ids().size(); i++){
+		PlayerInst* p = (PlayerInst*)game_state->get_instance(level->pc.player_ids()[i]);
+		game_state->remove_instance(p, false); // Remove but do not deallocate
+		player_cache.push_back(p);
+	}
+	delete level;
+	level_states[roomid] = NULL;
+	GameLevelState* newlevel = get_level(roomid, true, (void**)&player_cache[0], player_cache.size());
+	if (game_state->level() == level){
+		game_state->level() = newlevel;
+		GameInst* p = game_state->get_instance(game_state->local_playerid());
+		game_state->window_view().sharp_center_on(p->x, p->y);
+	}
+}
 static int scan_entrance(const std::vector<GameLevelPortal>& portals,
 		const Pos& tilepos) {
 	for (int i = 0; i < portals.size(); i++) {
@@ -59,26 +144,49 @@ static int scan_entrance(const std::vector<GameLevelPortal>& portals,
 	return -1;
 }
 
-void GameWorld::level_move(int id, int roomid1, int roomid2) {
+void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
+	//save the level context
+	GameLevelState* last = game_state->level();
 	GameLevelState* state = get_level(roomid1);
-	GameInst* inst = state->inst_set.get_by_id(id);
+	//set the level context
+	game_state->level() = state;
+
+	GameInst* inst = game_state->get_instance(id);
+
 	Pos hitsqr;
-	LANARTS_ASSERT(tile_radius_test(inst->x, inst->y, inst->radius, true, -1, &hitsqr, roomid1));
+	if (!inst) return;
+	game_state->remove_instance(inst, false); // Remove but do not deallocate
+	inst->last_x = x, inst->last_y = y;
+	inst->x = x, inst->y = y;
 
-	int entr_n = scan_entrance(state->entrances, hitsqr);
-	connect_entrance_to_exit(roomid1, roomid2);
+	game_state->level() = get_level(roomid2);
+	game_state->add_instance(inst);
 
-	state->inst_set.remove(inst, false); // Remove but do not deallocate
-	inst->id = 0; //Make ID null
-	get_level(roomid2)->inst_set.add(inst);
-
+	game_state->level() = last;
+	PlayerInst* p;
+	if ((p = dynamic_cast<PlayerInst*>(inst)) && p->is_local_focus())
+		set_current_level_lazy(roomid2);
 }
 
 void GameWorld::set_current_level(int roomid){
-	lvl = get_level(roomid);
+	if (midstep) set_current_level_lazy(roomid);
+	else
+	game_state->level() = get_level(roomid);
 }
 void GameWorld::set_current_level_lazy(int roomid){
 	next_room_id = roomid;
+}
+
+void GameWorld::reset(int keep){
+	if (midstep) {
+		next_room_id = -2;
+	} else {
+		for (int i = keep; i < level_states.size(); i++){
+			delete level_states[i];
+		}
+		level_states.resize(keep);
+		game_state->level() = get_level(keep, true /*spawn player*/);
+	}
 }
 
 void GameWorld::connect_entrance_to_exit(int roomid1, int roomid2) {
@@ -115,41 +223,3 @@ static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
 static int squish(int a, int b, int c) {
 	return std::min(std::max(a, b), c - 1);
 }
-
-bool GameWorld::tile_radius_test(int x, int y, int rad, bool issolid, int ttype, Pos *hitloc, int roomid){
-	GameLevelState* lvl = get_level(roomid >= 0 ? roomid : current_room_id);
-    int w = this->w / TILE_SIZE, h = this->h / TILE_SIZE;
-    int distsqr = (TILE_SIZE / 2 + rad), radsqr = rad * rad;
-    distsqr *= distsqr;
-    int mingrid_x = (x - rad) / TILE_SIZE, mingrid_y = (y - rad) / TILE_SIZE;
-    int maxgrid_x = (x + rad) / TILE_SIZE, maxgrid_y = (y + rad) / TILE_SIZE;
-    int minx = squish(mingrid_x, 0, w), miny = squish(mingrid_y, 0, h);
-    int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
-    for(int yy = miny;yy <= maxy;yy++){
-        for(int xx = minx;xx <= maxx;xx++){
-            int tile = lvl->tiles.get(xx, yy);
-            bool istype = (tile == ttype || ttype == -1);
-            bool solidmatch = (game_tile_data[tile].solid == issolid);
-            if(solidmatch && istype){
-                int offset = TILE_SIZE / 2;
-                int cx = int(xx * TILE_SIZE) + offset;
-                int cy = int(yy * TILE_SIZE) + offset;
-                int ydist = cy - y;
-                int xdist = cx - x;
-                double ddist = ydist * ydist + xdist * xdist;
-                if(ddist < distsqr || circle_line_test(cx - offset, cy - offset, cx + offset, cy - offset, x, y, radsqr) || circle_line_test(cx - offset, cy - offset, cx - offset, cy + offset, x, y, radsqr) || circle_line_test(cx - offset, cy + offset, cx + offset, cy + offset, x, y, radsqr) || circle_line_test(cx + offset, cy - offset, cx + offset, cy + offset, x, y, radsqr)){
-                    if(hitloc)
-                        *hitloc = Pos(xx, yy);
-
-                    return true;
-                }
-            }
-
-        }
-
-    }
-
-    return false;
-}
-
-

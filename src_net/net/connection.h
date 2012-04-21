@@ -8,10 +8,12 @@ class NetConnection {
 public:
 	virtual bool get_next_packet(NetPacket& packet) = 0;
 	virtual void broadcast_packet(const NetPacket& packet) = 0;
+//	virtual void get_peer_packets(std::vector<NetPacket>& packets) = 0;
 	virtual void join() = 0;
 	virtual int get_peer_id() = 0;
 	virtual int get_number_peers() = 0;
 
+	virtual bool is_initialized() { return true; }
 	virtual ~NetConnection(){}
 };
 

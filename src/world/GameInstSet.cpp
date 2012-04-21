@@ -227,6 +227,7 @@ void GameInstSet::step(GameState* gs) {
 	for (int i = 0; i < unit_capacity; i++) {
 		GameInst* inst = unit_set[i].inst;
 		if (valid_inst(inst)) {
+			inst->destroyed = false;
 			inst->step(gs);
 			update_instance(&unit_set[i], inst);
 		}

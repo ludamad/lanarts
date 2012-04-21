@@ -5,6 +5,7 @@ Complex:
 - Add LUA integration for specification of actions, make sure all data remains in YAML files
 
 Some complexity:
+- Special case pushing for tight corridors ?
 - Lightning Spell that takes up multiple squares
 
 - [ALMOST DONE] Support for multiple PlayerInst (Maybe re-use PlayerInst for summoned monsters ?)
@@ -14,8 +15,10 @@ Some complexity:
 - Add dropping of objects & dont always autopickup
 - Make spells not hardcoded (Eventually use LUA integration)
 - More complete & functional sidebar interface, with tabs
+- Add stat defence multipliers to enemy attacks, maybe create attack types
 
 Trivial:
+- Make levels not start from 1 internally (or have a flexible portal system that indicates which level to connect it to)
 - Add cooldowns to item use
 - More visual output on the minimap [Stairs etc]
 - Fix items on border of view not being visible -> subtract away from player and check visibility??

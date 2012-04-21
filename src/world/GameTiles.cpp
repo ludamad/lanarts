@@ -50,10 +50,9 @@ void GameTiles::post_draw(GameState* gs) {
 	if (max_tiley >= height)
 		max_tiley = height - 1;
 	const int sub_sqrs = VISION_SUBSQRS;
-	const std::vector<fov*>& vf = gs->player_controller().player_fovs();
-	if (vf.size() < 1) return;
+	if (gs->local_playerid() == 0) return;
 
-	fov& f = *vf[0];
+	fov& f = *gs->player_controller().local_playerfov();
 
 	char matches[sub_sqrs * sub_sqrs];
 	for (int y = min_tiley; y <= max_tiley; y++) {
@@ -79,7 +78,7 @@ void GameTiles::post_draw(GameState* gs) {
 				} else {
 					gl_draw_rectangle(x * TILE_SIZE - view.x,
 							y * TILE_SIZE - view.y, img->width, img->height,
-							Colour(0, 0, 0, 180));
+							Colour(0, 0, 0, 120));
 				}
 			}
 //			else if (has_match && has_free && tile != 1) {

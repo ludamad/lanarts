@@ -16,6 +16,7 @@
 #include "GameSettings.h"
 #include "GameView.h"
 #include "GameHud.h"
+#include "GameWorld.h"
 #include "../util/font_util.h"
 #include "../procedural/mtwist.h"
 #include "../fov/fov.h"
@@ -36,7 +37,7 @@ public:
 	/* INSTANCE HANDLING METHODS */
 	GameInst* get_instance(obj_id id);
 	obj_id add_instance(GameInst* inst);
-	void remove_instance(GameInst* inst);
+	void remove_instance(GameInst* inst, bool deallocate = true);
 
 	/* COLLISION METHODS */
 	bool tile_radius_test(int x, int y, int rad, bool issolid = true,
@@ -54,20 +55,24 @@ public:
 				|| object_radius_test(obj, objs, obj_cap, f, x, y, radius);
 	}
 	bool object_visible_test(GameInst* obj);
+	void ensure_connectivity(int roomid1, int roomid2);
 
 	/* GameState components */
 	GameView& window_view() {
 		return view;
 	}
 	GameTiles& tile_grid() {
-		return lvl->tiles;
+		return level()->tiles;
+	}
+	GameWorld& game_world() {
+		return world;
 	}
 	/* Game object central controllers */
 	MonsterController& monster_controller() {
-		return lvl->mc;
+		return level()->mc;
 	}
 	PlayerController& player_controller() {
-		return lvl->pc;
+		return level()->pc;
 	}
 	/* Default font for most text rendering */
 	const font_data& primary_font() {
@@ -109,7 +114,7 @@ public:
 	}
 	/* Object identifier for the player */
 	obj_id local_playerid() {
-		return lvl->pc.local_playerid();
+		return level()->pc.local_playerid();
 	}
 
 	/* Key state query information */
@@ -123,11 +128,8 @@ public:
 	int height() {
 		return world_height;
 	}
-	int& branch_level() {
-		return level_number;
-	}
-	GameLevelState* level() {
-		return lvl;
+	GameLevelState*& level() {
+		return world.get_current_level();
 	}
 
 	void serialize(FILE* file);
@@ -139,10 +141,7 @@ public:
 		gennextstep = true;
 	}
 
-	void level_transfer(GameInst* inst, int x, int y);
-	void regen_level();
-	void reset_level();
-	void set_level(int levelnum, bool reset);
+	void level_move(int id, int x, int y, int roomid1, int roomid2);
 
 	GameSettings& game_settings(){
 		return settings;
@@ -162,9 +161,6 @@ private:
 	//Game bounds
 	int world_width, world_height;
 
-	//Game location information
-	int level_number;
-
 	int frame_n;
 	bool gennextstep;
 
@@ -172,6 +168,7 @@ private:
 	GameLevelState* lvl;
 	GameHud hud;
 	GameView view;
+	GameWorld world;
 
 	//Mersenne twister random number generator state
 	MTwist mtwist;

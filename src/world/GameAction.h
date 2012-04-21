@@ -19,6 +19,7 @@ struct GameAction {
 		USE_ITEM,
 		PICKUP_ITEM
 	};
+	GameAction(){}
 	GameAction(obj_id origin, action_t act, int frame, int level, int use_id = 0, int action_x = 0,
 			int action_y = 0);
 	obj_id origin;

@@ -23,8 +23,8 @@ namespace YAML
 	template <> struct is_numeric <__int64> { enum { value = true }; };
 	template <> struct is_numeric <unsigned __int64> { enum { value = true }; };
 #else
-	template <> struct is_numeric <long long> { enum { value = true }; };
-	template <> struct is_numeric <unsigned long long> { enum { value = true }; };
+//	template <> struct is_numeric <long long> { enum { value = true }; };
+//	template <> struct is_numeric <unsigned long long> { enum { value = true }; };
 #endif
 	template <> struct is_numeric <float> { enum { value = true }; };
 	template <> struct is_numeric <double> { enum { value = true }; };
