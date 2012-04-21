@@ -20,3 +20,4 @@ GameAction from_action_file(FILE* f){
 	fread(data, sizeof(GameAction), 1, f);
 	return *(GameAction*)data;
 }
+
