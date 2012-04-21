@@ -106,13 +106,13 @@ bool ServerNetConnection::get_next_packet(NetPacket & packet) {
 		SocketStream* ss = s[i].get();
 		boost::mutex& m = ss->get_rmutex();
 		//We try to determine the status without a lock, should never be 0 when non-empty
+		m.lock();
 		if (ss->rmessages().size() != 0){
-			m.lock();
 			packet = ss->rmessages().front();
 			ss->rmessages().pop_front();
-			m.unlock();
 			found = true;
 		}
+		m.unlock();
 	}
 	return found;
 }

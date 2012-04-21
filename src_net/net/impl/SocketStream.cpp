@@ -90,13 +90,14 @@ SocketStream::~SocketStream() {
 bool SocketStream::get_next_packet(NetPacket & packet) {
 	if (closed) return false;
 
+	rmutex.lock();
 	if (reading_msgs.size() != 0){
-		rmutex.lock();
 		packet = reading_msgs.front();
 		reading_msgs.pop_front();
 		rmutex.unlock();
 		return true;
 	}
+	rmutex.unlock();
 
 	return false;
 }
