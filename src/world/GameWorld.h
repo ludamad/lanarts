@@ -7,6 +7,7 @@
 #define GAMEWORLD_H_
 #include <vector>
 #include "../util/geometry.h"
+#include <cstdlib>
 
 struct GameState;
 struct GameLevelState;
