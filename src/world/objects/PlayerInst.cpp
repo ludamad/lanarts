@@ -34,6 +34,7 @@ void PlayerInst::deinit(GameState* gs) {
 
 void PlayerInst::step(GameState* gs) {
 
+	gs->level()->steps_left = 1000;
 	GameView& view = gs->window_view();
 
 	bool mouse_within = gs->mouse_x() < gs->window_view().width;
