@@ -44,6 +44,7 @@ void socketstream_read_body_handler(SocketStream* ss,
 		ss->get_rmutex().unlock();
 
 		static int msg = 0;
+		printf("Read queue size '%d' msg#'%d' \n", ss->rmessages().size(), ++msg);
 //		printf("Reading message %d\n", ++msg);
 
 		asio::async_read(
@@ -61,7 +62,7 @@ void socketstream_write_handler(SocketStream* ss,
 		const asio::error_code& error) {
 	if (!error) {
 		static int msg = 0;
-//		printf("Writing message %d\n", ++msg);
+		printf("Write queue size '%d' msg#'%d' \n", ss->wmessages().size(), ++msg);
 		ss->get_wmutex().lock();
 		ss->wmessages().pop_front();
 		if (!ss->wmessages().empty()){

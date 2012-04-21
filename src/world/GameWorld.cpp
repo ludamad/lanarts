@@ -94,6 +94,7 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player
 	return level_states[roomid];
 }
 
+
 void GameWorld::step() {
 	redofirststep://I used a goto dont kill me
 
