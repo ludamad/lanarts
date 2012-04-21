@@ -54,42 +54,45 @@ void GameTiles::post_draw(GameState* gs) {
 	if (gs->local_playerid() == 0) return;
 
 
-	fov& f = *gs->player_controller().local_playerfov();
+	fov& mainfov = *gs->player_controller().local_playerfov();
+	for (int i = 0; i <  gs->player_controller().player_fovs().size(); i++){
+		fov& f = *gs->player_controller().player_fovs()[i];
+		char matches[sub_sqrs * sub_sqrs];
+		for (int y = min_tiley; y <= max_tiley; y++) {
+			for (int x = min_tilex; x <= max_tilex; x++) {
+				bool has_match = false, has_free = false;
+				int tile = tiles[y * width + x];
+				GLImage* img = &game_tile_data[tile].img;
 
-	char matches[sub_sqrs * sub_sqrs];
-	for (int y = min_tiley; y <= max_tiley; y++) {
-		for (int x = min_tilex; x <= max_tilex; x++) {
-			bool has_match = false, has_free = false;
-			int tile = tiles[y * width + x];
-			GLImage* img = &game_tile_data[tile].img;
-
-			f.matches(x, y, matches);
-			for (int i = 0; i < sub_sqrs * sub_sqrs; i++) {
-				if (matches[i]) {
-					seen_tiles[y * width + x] = 1;
-					has_match = true;
-				} else {
-					has_free = true;
+				f.matches(x, y, matches);
+				for (int i = 0; i < sub_sqrs * sub_sqrs; i++) {
+					if (matches[i]) {
+						seen_tiles[y * width + x] = 1;
+						has_match = true;
+					} else {
+						has_free = true;
+					}
 				}
-			}
 
+				if (&f != &mainfov) continue;
 
-			//Do not draw black if we have a match, and we see a wall
-			if (!has_match) {
-				if (!seen_tiles[y * width + x]) {
-					gl_draw_rectangle(x * TILE_SIZE - view.x,
-							y * TILE_SIZE - view.y, img->width, img->height);
-				} else {
-					gl_draw_rectangle(x * TILE_SIZE - view.x,
-							y * TILE_SIZE - view.y, img->width, img->height,
-							Colour(0, 0, 0, 120));
+				//Do not draw black if we have a match, and we see a wall
+				if (!has_match) {
+					if (!seen_tiles[y * width + x]) {
+						gl_draw_rectangle(x * TILE_SIZE - view.x,
+								y * TILE_SIZE - view.y, img->width, img->height);
+					} else {
+						gl_draw_rectangle(x * TILE_SIZE - view.x,
+								y * TILE_SIZE - view.y, img->width, img->height,
+								Colour(0, 0, 0, 120));
+					}
 				}
+	//			else if (has_match && has_free && tile != 1) {
+	//				gl_draw_rectangle_parts(x * TILE_SIZE - view.x,
+	//						y * TILE_SIZE - view.y, img->width, img->height, 2,
+	//						matches);
+	//			}
 			}
-//			else if (has_match && has_free && tile != 1) {
-//				gl_draw_rectangle_parts(x * TILE_SIZE - view.x,
-//						y * TILE_SIZE - view.y, img->width, img->height, 2,
-//						matches);
-//			}
 		}
 	}
 }

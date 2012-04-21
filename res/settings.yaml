@@ -1,7 +1,7 @@
-fullscreen: 0
+fullscreen: 1
 regen_level_on_death: 1
-view_width: 640
-view_height: 480
+view_width: 1600
+view_height: 900
 class: Mage
 
 #Either 'host', 'client', or 'none'
