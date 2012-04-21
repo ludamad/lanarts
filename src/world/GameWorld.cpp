@@ -170,7 +170,6 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	inst->last_x = x, inst->last_y = y;
 	inst->x = x, inst->y = y;
 
-
 	game_state->level() = get_level(roomid2);
 	game_state->add_instance(inst);
 	game_state->level()->steps_left = 1000;
