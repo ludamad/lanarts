@@ -69,7 +69,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 
 		for (int y = ry; y < ry+rh; y++) {
 			for (int x = rx; x < rx+rw; x++) {
-				Sqr& s = level.at(x-start_x, y-start_y);
+				Sqr& s = level.at(x, y);
 				if (s.passable && s.roomID && s.feature != SMALL_CORRIDOR)
 				tiles.get(x+start_x,y+start_y) = rtile(mt, tileset.altfloor);
 			}
