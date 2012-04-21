@@ -16,12 +16,12 @@ void ServerNetConnection::accept_handler(SocketStream* ss, const asio::error_cod
 			streamlock.lock();
 			streams.push_back(stream_ptr(ss));
 			streamlock.unlock();
-
-			asio::async_read(
-					ss->get_socket(),
-					asio::buffer(ss->last_message().data, NetPacket::HEADER_LEN),
-					boost::bind(socketstream_read_header_handler, streams.back().get(),
-							asio::placeholders::error));
+//
+//			asio::async_read(
+//					ss->get_socket(),
+//					asio::buffer(ss->last_message().data, NetPacket::HEADER_LEN),
+//					boost::bind(socketstream_read_header_handler, streams.back().get(),
+//							asio::placeholders::error));
 		}
 		ss = new SocketStream(io_service);
 //		peer_id = ss->get_peer_id();
