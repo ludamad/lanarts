@@ -40,10 +40,10 @@ void PlayerInst::step(GameState* gs) {
 	effects.step();
 
 	if (stats().hp <= 0) {
-		if (is_local_focus())
+//		if (is_local_focus())
 		gs->game_world().reset(0);
-		else
-			gs->remove_instance(this);
+//		else
+//			gs->remove_instance(this);
 		return;
 	}
 
