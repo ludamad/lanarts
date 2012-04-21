@@ -28,6 +28,7 @@ public:
 	virtual void get_peer_packets(std::vector<NetPacket>& packets);
 
 private:
+	void async_read(SocketStream* ss);
 	void assign_peerid(SocketStream* stream, int peerid);
 	boost::mutex streamlock;
 	boost::shared_ptr<asio::thread> execution_thread;

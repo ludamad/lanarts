@@ -10,18 +10,24 @@ void ServerNetConnection::get_peer_packets(std::vector<NetPacket> & packets){
 	}
 }
 
+void ServerNetConnection::async_read(SocketStream* ss){
+	asio::async_read(
+			ss->get_socket(),
+			asio::buffer(ss->last_message().data, NetPacket::HEADER_LEN),
+			boost::bind(socketstream_read_header_handler, ss,
+					asio::placeholders::error));
+}
 void ServerNetConnection::accept_handler(SocketStream* ss, const asio::error_code& error) {
 	if (!error) {
 		if (ss){
 			streamlock.lock();
 			streams.push_back(stream_ptr(ss));
 			streamlock.unlock();
-//
-//			asio::async_read(
-//					ss->get_socket(),
-//					asio::buffer(ss->last_message().data, NetPacket::HEADER_LEN),
-//					boost::bind(socketstream_read_header_handler, streams.back().get(),
-//							asio::placeholders::error));
+
+			printf("connection accepted\n");
+			io_service.post(
+		    		boost::bind(&ServerNetConnection::async_read, this, ss)
+		    );
 		}
 		ss = new SocketStream(io_service);
 //		peer_id = ss->get_peer_id();
@@ -30,15 +36,26 @@ void ServerNetConnection::accept_handler(SocketStream* ss, const asio::error_cod
 			boost::bind(&ServerNetConnection::accept_handler, this, ss, asio::placeholders::error));
 	}
 }
+
+static void wrapped_run(asio::io_service* ios){
+	try {
+		ios->run();
+	} catch (const std::exception& e){
+		printf("type=%d\n", typeid(e).name());
+		printf("%s\n", e.what());
+	}
+	printf("Run completed!\n");
+}
+
 ServerNetConnection::ServerNetConnection(int port) :
 		io_service(), endpoint(asio::ip::tcp::v4(), port), acceptor(io_service,endpoint) {
 
 	io_service.post(
     		boost::bind(&ServerNetConnection::accept_handler, this, (SocketStream*)NULL, asio::error_code())
     );
-
+//	accept_handler(NULL, asio::error_code());
 	execution_thread = boost::shared_ptr<asio::thread>(
-    	new asio::thread(boost::bind(&asio::io_service::run, &io_service))
+    	new asio::thread(boost::bind(&wrapped_run, &io_service))
     );
 }
 
@@ -53,7 +70,6 @@ void ServerNetConnection::assign_peerid(SocketStream* stream, int peerid){
 	stream->send_packet(packet);
 }
 bool ServerNetConnection::get_next_packet(NetPacket & packet) {
-	return false;
 	bool found = false;
 
 	streamlock.lock();

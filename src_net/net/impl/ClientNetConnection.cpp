@@ -9,8 +9,6 @@ void client_connect_handler(ClientNetConnection* cnc,
 		tcp::resolver::iterator endpoint_iterator) {
 	SocketStream* s = &cnc->socket_stream();
 	if (!error) {
-		NetPacket packet(cnc->get_peer_id());
-		s->send_packet(packet);
 		cnc->set_connected();
 
 		asio::async_read(
@@ -40,36 +38,34 @@ void ClientNetConnection::async_connect(const char* host, const char* port){
 			boost::bind(client_connect_handler, this, asio::placeholders::error, ++iterator));
 }
 
-void wrapped_run(asio::io_service* ios){
+static void wrapped_run(asio::io_service* ios){
 	try {
 		ios->run();
 	} catch (const std::exception& e){
 		printf("type=%d\n", typeid(e).name());
 		printf("%s\n", e.what());
 	}
+	printf("Run completed!\n");
 }
 
 ClientNetConnection::ClientNetConnection(const char* host, const char* port) :
 		io_service(), stream(io_service) {
 	connected = false;
-    tcp::resolver resolver(io_service);
-    tcp::resolver::query query(host, port);
-    tcp::resolver::iterator iterator = resolver.resolve(query);
-	asio::ip::tcp::endpoint endpoint = *iterator;
+//    tcp::resolver resolver(io_service);
+//    tcp::resolver::query query(host, port);
+//    tcp::resolver::iterator iterator = resolver.resolve(query);
+//	asio::ip::tcp::endpoint endpoint = *iterator;
 
-//	io_service.post(
-//			boost::bind(&ClientNetConnection::async_connect, this, host, port)
-//    );
-//
-	stream.get_socket().connect(endpoint);
-	client_connect_handler(this, asio::error_code(), ++iterator);
-	NetPacket packet;
-	const char* c = "hello world";
-	while (*c){
-		packet.add(*(c++));
-	}
-	packet.encode_header();
-	stream.send_packet(packet);
+	io_service.post(
+			boost::bind(&ClientNetConnection::async_connect, this, host, port)
+    );
+////
+//	stream.get_socket().connect(endpoint);
+//	client_connect_handler(this, asio::error_code(), ++iterator);
+
+//	stream.get_socket().async_connect(
+//			endpoint,
+//			boost::bind(client_connect_handler, this, asio::placeholders::error, ++iterator));
 
     execution_thread = boost::shared_ptr<asio::thread>(
     		new asio::thread(boost::bind(&wrapped_run, &io_service))

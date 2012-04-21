@@ -15,17 +15,18 @@ NetPacket::NetPacket(int packet_origin) :
 }
 
 size_t NetPacket::length() const {
-	return sizeof(short) + body_length;
+	return HEADER_LEN + body_length;
 }
 
 char *NetPacket::body() {
-	return data + sizeof(short);
+	return data + HEADER_LEN;
 }
 
 bool NetPacket::decode_header() {
 	int* idata = (int*)data;
 	body_length = idata[0];
 	if (body_length > MAX_PACKET_SIZE) {
+		printf("TOO LARGE size = %d\n", body_length);
 		body_length = 0;
 		return false;
 	}

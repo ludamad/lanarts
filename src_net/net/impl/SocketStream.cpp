@@ -7,14 +7,15 @@ using namespace asio::ip;
 
 void socketstream_do_close(SocketStream* ss) {
 	if (!ss->is_closed()){
-		ss->get_socket().close();
-		ss->is_closed() = true;
+//		ss->get_socket().close();
+//		ss->is_closed() = true;
 	}
 }
 
 void socketstream_read_header_handler(SocketStream* ss,
 		const asio::error_code& error) {
 	if (!error && ss->last_message().decode_header()) {
+		printf("reading header of message\n");
 		asio::async_read(
 				ss->get_socket(),
 				asio::buffer(ss->last_message().body(),
@@ -22,7 +23,7 @@ void socketstream_read_header_handler(SocketStream* ss,
 				boost::bind(socketstream_read_body_handler, ss,
 						asio::placeholders::error));
 	} else {
-		socketstream_do_close(ss);
+//		socketstream_do_close(ss);
 	}
 }
 
@@ -34,6 +35,9 @@ void socketstream_read_body_handler(SocketStream* ss,
 		ss->rmessages().push_back(ss->last_message());
 		ss->get_mutex().unlock();
 
+		static int msg = 0;
+		printf("Reading message %d\n", ++msg);
+
 		asio::async_read(
 				ss->get_socket(),
 				asio::buffer(ss->last_message().data, NetPacket::HEADER_LEN),
@@ -41,7 +45,7 @@ void socketstream_read_body_handler(SocketStream* ss,
 						asio::placeholders::error));
 
 	} else {
-		socketstream_do_close(ss);
+//		socketstream_do_close(ss);
 	}
 }
 
@@ -64,7 +68,7 @@ void socketstream_write_handler(SocketStream* ss,
 							asio::placeholders::error));
 		}
 	} else {
-		socketstream_do_close(ss);
+//		socketstream_do_close(ss);
 	}
 }
 
@@ -92,20 +96,23 @@ bool SocketStream::get_next_packet(NetPacket & packet) {
 }
 
 void SocketStream::send_packet(const NetPacket & packet) {
-	if (closed) return;
+	if (closed) {
+		printf("Pools closed due to AIDS\n!");
+		return;
+	}
 
 	mutex.lock();
 	bool write_in_progress = !writing_msgs.empty();
 	writing_msgs.push_front(packet);
 	mutex.unlock();
-    if (!write_in_progress){
+//    if (!write_in_progress){
 		asio::async_write(
 				socket,
 				asio::buffer(writing_msgs.front().data,
 						writing_msgs.front().length()),
 				boost::bind(socketstream_write_handler, this,
 						asio::placeholders::error));
-    }
+//    }
 }
 
 //static unsigned int to_ip_number(const char* ipString){
