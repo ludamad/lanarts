@@ -56,14 +56,15 @@ void socketstream_write_handler(SocketStream* ss,
 
 //		printf("Writing message %d\n", ++msg);
 		ss->get_wmutex().lock();
-		NetPacket next = ss->wmessages().front();
-		ss->wmessages().pop_front();
-		ss->get_wmutex().unlock();
+		if (!ss->wmessages().empty()){
 			asio::async_write(
 					ss->get_socket(),
-					asio::buffer(next.data, next.length()),
+					asio::buffer(ss->wmessages().front().data, ss->wmessages().front().length()),
 					boost::bind(socketstream_write_handler, ss,
 							asio::placeholders::error));
+			ss->wmessages().pop_front();
+		}
+		ss->get_wmutex().unlock();
 	} else {
 //		socketstream_do_close(ss);
 	}
