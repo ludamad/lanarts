@@ -60,6 +60,7 @@ bool ServerNetConnection::get_next_packet(NetPacket & packet) {
 	std::vector< stream_ptr > s = streams;
 	streamlock.unlock();
 
+	/*
 	for (int i = 0; i < s.size() && !found; i++){
 		SocketStream* ss = s[i].get();
 		boost::mutex& m = ss->get_mutex();
@@ -76,7 +77,7 @@ bool ServerNetConnection::get_next_packet(NetPacket & packet) {
 			m.unlock();
 			found = true;
 		}
-	}
+	}*/
 
 	for (int i = 0; i < s.size() && !found; i++){
 		SocketStream* ss = s[i].get();

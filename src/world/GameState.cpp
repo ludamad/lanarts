@@ -43,14 +43,8 @@ GameState::GameState(const GameSettings& settings, int width, int height, int vi
 		char port_buffer[50];
 		snprintf(port_buffer, 50, "%d", settings.port);
 		connection.get_connection() = create_client_connection(settings.ip.c_str(), port_buffer);
-		while (!connection.get_connection()->is_initialized()){
-
-		}
 	} else if (settings.conntype == GameSettings::HOST){
 		connection.get_connection() = create_server_connection(settings.port);
-		while (!connection.get_connection()->is_initialized()){
-
-		}
 	}
 
 	level() = world.get_level(0, true);

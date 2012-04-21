@@ -52,14 +52,14 @@ ClientNetConnection::~ClientNetConnection() {
 
 bool ClientNetConnection::get_next_packet(NetPacket & packet) {
 	stream.get_next_packet(packet);
-	while (true){
+	/*while (true){
 		if (packet.packet_type == NetPacket::PACKET_ASSIGN_PEERID){
 			peer_id = packet.get_int();
 		} else if (packet.packet_type == NetPacket::PACKET_BROADCAST_PEERLISTSIZE){
 			number_of_peers = packet.get_int();
 		} else break;
 		stream.get_next_packet(packet);
-	}
+	}*/
 }
 
 void ClientNetConnection::broadcast_packet(const NetPacket & packet) {
