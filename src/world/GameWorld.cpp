@@ -55,7 +55,7 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, PlayerInst* inst){
 		inst->x = px;
 		inst->y = py;
 	}
-	if (game_state->game_settings().conntype = GameSettings::CLIENT){
+	if (game_state->game_settings().conntype == GameSettings::CLIENT){
 	game_state->add_instance(inst);
 	game_state->add_instance(new PlayerInst(c->starting_stats, px+TILE_SIZE,py, false));
 	} else {
