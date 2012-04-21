@@ -19,10 +19,6 @@ PlayerInst::~PlayerInst() {
 void PlayerInst::init(GameState* gs) {
 	PlayerController& pc = gs->player_controller();
 	pc.register_player(this->id, is_local_focus());
-	if (gs->level()->roomid > 0){
-//	x = gs->level()->exits[0].entrancesqr.x*TILE_SIZE + TILE_SIZE/2;
-//	y = gs->level()->exits[0].entrancesqr.y*TILE_SIZE + TILE_SIZE/2;
-	}
 }
 
 
@@ -90,7 +86,7 @@ void PlayerInst::draw(GameState* gs) {
 				y - img.height / 2 - view.y);
 		else
 			image_display(&img, x - img.width / 2 - view.x,
-					y - img.height / 2 - view.y, Colour(255,0,0));
+					y - img.height / 2 - view.y, Colour(255,0,0 ));
 
 	}
 

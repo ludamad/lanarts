@@ -46,6 +46,14 @@ public:
 
     void shift_target(GameState *gs);
 
+    void resize_paths(int size){
+    	if (paths.size() > size){
+    		for (int i = size; i < paths.size(); i++)
+    			delete paths[i];
+    	}
+    	paths.resize(size, NULL);
+
+    }
     void clear();
 public:
     void set_monster_headings(GameState *gs, std::vector<EnemyOfInterest> & eois);
@@ -58,7 +66,7 @@ public:
     bool must_initialize;
     AStarPathFind astarcontext;
     obj_id targetted;
-    std::vector<PathInfo> paths;
+    std::vector<PathInfo*> paths;
 	std::vector<obj_id> mids;
 	std::vector<int> player_simids;
 

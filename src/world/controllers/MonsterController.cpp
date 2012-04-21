@@ -29,6 +29,7 @@ MonsterController::MonsterController() {
 
 MonsterController::~MonsterController() {
 	delete simulator;
+	resize_paths(0);
 }
 
 void MonsterController::register_enemy(GameInst* enemy){
@@ -162,7 +163,7 @@ void MonsterController::set_monster_headings(GameState* gs, std::vector<EnemyOfI
 		eb.path.clear();
 		eb.action_timeout = 200;
 		//paths[pind].adjust_for_claims(e->x, e->y);
-		paths[pind].interpolated_direction(xx, yy, w, h, eb.speed, eb.vx, eb.vy);
+		paths[pind]->interpolated_direction(xx, yy, w, h, eb.speed, eb.vx, eb.vy);
 
 	//	paths[pind].stake_claim(e->x, e->y);
 		//Compare position to player object
@@ -262,7 +263,9 @@ void MonsterController::pre_step(GameState* gs) {
 	paths.resize(pids.size());
 	for (int i = 0; i < pids.size(); i++) {
 		GameInst* player = gs->get_instance(pids[i]);
-		paths[i].calculate_path(gs, player->x, player->y, PATHING_RADIUS);
+		if (paths[i] == NULL)
+			paths[i] = new PathInfo;
+		paths[i]->calculate_path(gs, player->x, player->y, PATHING_RADIUS);
 	}
 
 	//Make sure targetted object is alive
