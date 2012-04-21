@@ -59,6 +59,7 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, PlayerInst* inst){
 	game_state->add_instance(inst);
 	game_state->add_instance(new PlayerInst(c->starting_stats, px+TILE_SIZE,py, false));
 	} else {
+		inst->last_x += TILE_SIZE;
 		inst->x += TILE_SIZE;
 		game_state->add_instance(inst);
 		game_state->add_instance(new PlayerInst(c->starting_stats, px,py, false));

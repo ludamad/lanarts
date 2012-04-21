@@ -224,7 +224,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 					has_connect = true;
 					break;
 				}
-				if (gs->game_settings().conntype == GameSettings::HOST)
+//				if (gs->game_settings().conntype == GameSettings::HOST)
 					break;
 			}
 			if (has_connect){
