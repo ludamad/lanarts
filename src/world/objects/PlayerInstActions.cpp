@@ -205,16 +205,6 @@ void PlayerInst::perform_io_action(GameState* gs) {
 	}
 	GameNetConnection& connection = gs->net_connection();
 	bool hasconnection = connection.get_connection() != NULL;
-	if (!is_local_focus() && hasconnection){
-			NetPacket packet;
-			if ( connection.get_connection()->get_next_packet(packet) ){
-				while (packet.body_length > 0){
-					GameAction action;
-					packet.get(action);
-					actions.push_front(action);
-				}
-			}
-	}
 	NetPacket packet;
 
 	if (is_local_focus() && hasconnection){
@@ -225,6 +215,27 @@ void PlayerInst::perform_io_action(GameState* gs) {
 		packet.encode_header();
 		connection.get_connection()->broadcast_packet(packet);
 	}
+
+	if (!is_local_focus() && hasconnection){
+			NetPacket packet;
+			bool has_connect = false;
+			while (true ){
+				if (connection.get_connection()->get_next_packet(packet)){
+					has_connect = true;
+					break;
+				}
+				if (gs->game_settings().conntype == GameSettings::HOST)
+					break;
+			}
+			if (has_connect){
+				while (packet.body_length > 0){
+					GameAction action;
+					packet.get(action);
+					actions.push_front(action);
+				}
+			}
+	}
+
 
 	for (int i = 0; i < actions.size(); i++) {
 // 		to_action_file(saved, actions[i]);

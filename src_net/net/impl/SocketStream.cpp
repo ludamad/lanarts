@@ -31,9 +31,9 @@ void socketstream_read_body_handler(SocketStream* ss,
 		const asio::error_code& error) {
 	if (!error) {
 		ss->last_message().decode_header();
-		ss->get_mutex().lock();
+		ss->get_rmutex().lock();
 		ss->rmessages().push_back(ss->last_message());
-		ss->get_mutex().unlock();
+		ss->get_rmutex().unlock();
 
 		static int msg = 0;
 		printf("Reading message %d\n", ++msg);
@@ -55,12 +55,12 @@ void socketstream_write_handler(SocketStream* ss,
 		static int msg = 0;
 
 		printf("Writing message %d\n", ++msg);
-		ss->get_mutex().lock();
+		ss->get_wmutex().lock();
+		NetPacket next = ss->wmessages().front();
 		ss->wmessages().pop_front();
-		ss->get_mutex().unlock();
+		ss->get_wmutex().unlock();
 
 		if (!ss->wmessages().empty()) {
-			NetPacket& next = ss->wmessages().front();
 			asio::async_write(
 					ss->get_socket(),
 					asio::buffer(next.data, next.length()),
@@ -85,10 +85,10 @@ bool SocketStream::get_next_packet(NetPacket & packet) {
 	if (closed) return false;
 
 	if (reading_msgs.size() != 0){
-		mutex.lock();
+		rmutex.lock();
 		packet = reading_msgs.front();
 		reading_msgs.pop_front();
-		mutex.unlock();
+		rmutex.unlock();
 		return true;
 	}
 
@@ -101,17 +101,18 @@ void SocketStream::send_packet(const NetPacket & packet) {
 		return;
 	}
 
-	mutex.lock();
+	wmutex.lock();
 	bool write_in_progress = !writing_msgs.empty();
 	writing_msgs.push_front(packet);
-	mutex.unlock();
-//    if (!write_in_progress){
+    if (!write_in_progress){
 		asio::async_write(
 				socket,
 				asio::buffer(writing_msgs.front().data,
 						writing_msgs.front().length()),
 				boost::bind(socketstream_write_handler, this,
 						asio::placeholders::error));
+    }
+	wmutex.unlock();
 //    }
 }
 

@@ -37,7 +37,8 @@ public:
 	std::deque<NetPacket>& rmessages()  { return reading_msgs;}
 	std::deque<NetPacket>& wmessages()  { return writing_msgs;}
 	asio::ip::tcp::socket& get_socket(){ return socket; }
-	boost::mutex& get_mutex(){ return mutex;}
+	boost::mutex& get_rmutex(){ return rmutex;}
+	boost::mutex& get_wmutex(){ return wmutex;}
 	NetPacket& last_message() { return read_message; }
 	bool& is_closed(){ return closed; }
 //	int get_peer_id();
@@ -46,7 +47,7 @@ public:
 
 private:
 	bool closed;
-	boost::mutex mutex;
+	boost::mutex rmutex, wmutex;
 	NetPacket read_message;
 	asio::io_service& io_service;
 	asio::ip::tcp::socket socket;

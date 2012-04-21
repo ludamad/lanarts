@@ -18,6 +18,7 @@ GameWorld::GameWorld(GameState* gs, int width, int height) :
 	midstep = false;
 }
 
+
 GameWorld::~GameWorld() {
 	reset();
 }
@@ -54,8 +55,15 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, PlayerInst* inst){
 		inst->x = px;
 		inst->y = py;
 	}
+	if (game_state->game_settings().conntype = GameSettings::CLIENT){
 	game_state->add_instance(inst);
 	game_state->add_instance(new PlayerInst(c->starting_stats, px+TILE_SIZE,py, false));
+	} else {
+		inst->x += TILE_SIZE;
+		game_state->add_instance(inst);
+		game_state->add_instance(new PlayerInst(c->starting_stats, px,py, false));
+
+	}
 }
 
 GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player_instances, size_t nplayers) {

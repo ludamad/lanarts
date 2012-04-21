@@ -36,7 +36,7 @@ GameState::GameState(const GameSettings& settings, int width, int height, int vi
 	init_font(&pfont, "res/arial.ttf", 10);
 	time_t t;
 	time(&t);
-	mtwist.init_genrand(t);
+	mtwist.init_genrand(1);
 	gennextstep = false;
 
 	if (settings.conntype == GameSettings::CLIENT){

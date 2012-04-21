@@ -97,7 +97,7 @@ bool ServerNetConnection::get_next_packet(NetPacket & packet) {
 
 	for (int i = 0; i < s.size() && !found; i++){
 		SocketStream* ss = s[i].get();
-		boost::mutex& m = ss->get_mutex();
+		boost::mutex& m = ss->get_rmutex();
 		//We try to determine the status without a lock, should never be 0 when non-empty
 		if (ss->rmessages().size() != 0){
 			m.lock();
