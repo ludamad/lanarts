@@ -157,6 +157,7 @@ static int scan_entrance(const std::vector<GameLevelPortal>& portals,
 	return -1;
 }
 
+
 void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	//save the level context
 	GameLevelState* last = game_state->level();

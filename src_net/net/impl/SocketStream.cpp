@@ -59,18 +59,19 @@ void socketstream_read_body_handler(SocketStream* ss,
 }
 
 void socketstream_write_handler(SocketStream* ss,
-		const asio::error_code& error) {
+		const asio::error_code& error, bool pop) {
 	if (!error) {
 		static int msg = 0;
 //		printf("Write queue size '%d' msg#'%d' \n", ss->wmessages().size(), ++msg);
 		ss->get_wmutex().lock();
-		ss->wmessages().pop_front();
+		if (pop)
+			ss->wmessages().pop_front();
 		if (!ss->wmessages().empty()){
 			asio::async_write(
 					ss->get_socket(),
 					asio::buffer(ss->wmessages().front().data, ss->wmessages().front().length()),
 					boost::bind(socketstream_write_handler, ss,
-							asio::placeholders::error));
+							asio::placeholders::error, true));
 		}
 		ss->get_wmutex().unlock();
 	} else {
@@ -102,6 +103,7 @@ bool SocketStream::get_next_packet(NetPacket & packet) {
 	return false;
 }
 
+
 void SocketStream::send_packet(const NetPacket & packet) {
 	if (closed) {
 		printf("Pools closed due to AIDS\n!");
@@ -110,14 +112,10 @@ void SocketStream::send_packet(const NetPacket & packet) {
 
 	wmutex.lock();
 		bool write_in_progress = !writing_msgs.empty();
-		writing_msgs.push_front(packet);
+		writing_msgs.push_back(packet);
 		if (!write_in_progress){
-			asio::async_write(
-					socket,
-					asio::buffer(writing_msgs.front().data,
-							writing_msgs.front().length()),
-					boost::bind(socketstream_write_handler, this,
-							asio::placeholders::error));
+			io_service.post(boost::bind(socketstream_write_handler, this,
+					asio::error_code(), false));
 		}
 	wmutex.unlock();
 //    }
