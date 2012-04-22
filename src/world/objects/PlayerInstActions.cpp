@@ -130,7 +130,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				int px = x, py = y;
 				x = rmx, y = rmy;
 				if (stats().mp >= 50 && !gs->solid_test(this)
-						&& gs->object_visible_test(this)) {
+						&& gs->object_visible_test(this, this)) {
 					actions.push_back(
 							GameAction(id, GameAction::SPELL, frame, level, 2,
 									x, y));

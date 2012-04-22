@@ -254,7 +254,7 @@ int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 		col_filterf f, int x, int y, int radius) {
 	return level()->inst_set.object_radius_test(obj, objs, obj_cap, f, x, y, radius);
 }
-bool GameState::object_visible_test(GameInst* obj) {
+bool GameState::object_visible_test(GameInst* obj, GameInst* player) {
 	const int sub_sqrs = VISION_SUBSQRS;
 	const int subsize = TILE_SIZE / sub_sqrs;
 
@@ -270,13 +270,14 @@ bool GameState::object_visible_test(GameInst* obj) {
 	if (fovs.empty()) return true;
 
 //printf("minx=%d,miny=%d,maxx=%d,maxy=%d\n",minx,miny,maxx,maxy);
-
+	PlayerController& pc = player_controller();
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			for (int i = 0; i < fovs.size(); i++) {
-				if (fovs[i]->within_fov(xx, yy))
-					return true;
-			}
+				for (int i = 0; i < fovs.size(); i++) {
+					bool isplayer = player == NULL || (player->id = pc.player_ids()[i]);
+					if (isplayer && fovs[i]->within_fov(xx, yy))
+						return true;
+				}
 		}
 	}
 	return false;

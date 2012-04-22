@@ -54,7 +54,7 @@ public:
 		return tile_radius_test(lx, ly, radius)
 				|| object_radius_test(obj, objs, obj_cap, f, x, y, radius);
 	}
-	bool object_visible_test(GameInst* obj);
+	bool object_visible_test(GameInst* obj, GameInst* player = NULL);
 	void ensure_connectivity(int roomid1, int roomid2);
 
 	/* GameState components */
