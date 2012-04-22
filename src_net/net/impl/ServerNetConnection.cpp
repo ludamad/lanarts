@@ -25,9 +25,11 @@ void ServerNetConnection::accept_handler(SocketStream* ss, const asio::error_cod
 			streamlock.unlock();
 
 			printf("connection accepted\n");
-			io_service.post(
-		    		boost::bind(&ServerNetConnection::async_read, this, ss)
-		    );
+			asio::async_read(
+					ss->get_socket(),
+					asio::buffer(ss->last_message().data, NetPacket::HEADER_LEN),
+					boost::bind(socketstream_read_header_handler, ss,
+							asio::placeholders::error));
 		}
 		ss = new SocketStream(io_service);
 //		peer_id = ss->get_peer_id();
