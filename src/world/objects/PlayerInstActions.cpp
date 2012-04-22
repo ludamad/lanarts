@@ -208,7 +208,6 @@ void PlayerInst::perform_io_action(GameState* gs) {
 	NetPacket packet;
 
 	if (is_local_focus() && hasconnection){
-		NetPacket packet;
 		for (int i = 0; i < actions.size(); i++) {
 			packet.add(actions[i]);
 		}
@@ -217,7 +216,6 @@ void PlayerInst::perform_io_action(GameState* gs) {
 	}
 
 	if (!is_local_focus() && hasconnection){
-			NetPacket packet;
 			bool has_connect = false;
 			while (true ){
 				if (connection.get_connection()->get_next_packet(packet)){
@@ -230,6 +228,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 			if (has_connect){
 				while (packet.body_length > 0){
 					GameAction action;
+					LANARTS_ASSERT(action.frame == gs->frame());
 					packet.get(action);
 					actions.push_front(action);
 				}
