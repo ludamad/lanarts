@@ -346,13 +346,13 @@ void MonsterController::pre_step(GameState* gs) {
 		set_preferred_velocity(gs, simulator, e);
 	}
 
-//	simulator->doStep();
+	simulator->doStep();
 
 	for (int i = 0; i < mids2.size(); i++) {
 		EnemyInst* e = (EnemyInst*) gs->get_instance(mids2[i]);
 		if (e == NULL)
 			continue;
-//		update_position(gs, e);
+		update_position(gs, e);
 	}
 }
 
