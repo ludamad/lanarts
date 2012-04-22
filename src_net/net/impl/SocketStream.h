@@ -34,8 +34,8 @@ public:
 	void send_packet(const NetPacket& packet);
 
 	//Use these getters/setters only if you know what you're doing:
-	std::deque<NetPacket>& rmessages()  { return reading_msgs;}
-	std::deque<NetPacket>& wmessages()  { return writing_msgs;}
+	std::list<NetPacket>& rmessages()  { return reading_msgs;}
+	std::list<NetPacket>& wmessages()  { return writing_msgs;}
 	asio::ip::tcp::socket& get_socket(){ return socket; }
 	boost::mutex& get_rmutex(){ return rmutex;}
 	boost::mutex& get_wmutex(){ return wmutex;}
@@ -52,7 +52,7 @@ private:
 	asio::io_service& io_service;
 	asio::ip::tcp::socket socket;
 	std::vector<NetPacket> peerpackets;
-	std::deque<NetPacket> reading_msgs, writing_msgs;
+	std::list<NetPacket> reading_msgs, writing_msgs;
 };
 
 #endif /* SOCKETSTREAM_H_ */
