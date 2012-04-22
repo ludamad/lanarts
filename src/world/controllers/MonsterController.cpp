@@ -189,13 +189,14 @@ void MonsterController::shift_target(GameState* gs){
 	for (i = 0; i < mids.size(); i++) {
 		if (mids[i] == targetted) break;
 	}
+	GameInst* player = gs->get_instance(gs->local_playerid());
 
 	for (j = i+1; j % mids.size() != i; j++) {
 		EnemyInst* e = (EnemyInst*) gs->get_instance(mids[j % mids.size()]);
 		if (e == NULL)
 			continue;
 
-		bool isvisible = gs->object_visible_test(e);
+		bool isvisible = gs->object_visible_test(e, player);
 		if (isvisible){
 			targetted = e->id;
 			return;

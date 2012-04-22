@@ -96,7 +96,7 @@ void GameTiles::post_draw(GameState* gs) {
 				} else {
 					gl_draw_rectangle(x * TILE_SIZE - view.x,
 							y * TILE_SIZE - view.y, img->width, img->height,
-							Colour(0, 0, 0, 100));
+							Colour(0, 0, 0, 60));
 				}
 			}
 			//			else if (has_match && has_free && tile != 1) {

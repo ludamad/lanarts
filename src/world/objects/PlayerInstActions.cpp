@@ -119,7 +119,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 					mpcost = 20;
 				if (target && !stats().has_cooldown() && stats().mp >= mpcost
 						&& !gs->solid_test(this)
-						&& gs->object_visible_test(this)) {
+						&& gs->object_visible_test(this,this)) {
 					actions.push_back(
 							GameAction(id, GameAction::SPELL, frame, level,
 									spellselect, target->x, target->y));
