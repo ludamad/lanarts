@@ -2,8 +2,8 @@
 sprites:
   - sprite: fighter
     spritefile: res/player/fighter.png
-  - sprite: mage
-    spritefile: res/player/fighter.png
+  - sprite: wizard
+    spritefile: res/player/wizard.png
     
   - sprite:  storm ele
     spritefile: res/monsters/storm_elemental.png

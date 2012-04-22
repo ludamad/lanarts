@@ -60,7 +60,9 @@ void PlayerInst::step(GameState* gs) {
 
 void PlayerInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
-	GLImage& img = game_sprite_data[get_sprite_by_name("fighter")].img;
+	bool isclient = gs->game_settings().conntype == GameSettings::CLIENT;
+	bool isfighterimg = (isclient == is_local_focus());
+	GLImage& img = game_sprite_data[get_sprite_by_name(isfighterimg ?"fighter" : "wizard")].img;
 	bool b = gs->tile_radius_test(x, y, RADIUS);
 	//gl_draw_rectangle(view, x-10,y-20,20,5, b ? Colour(255,0,0) : Colour(0,255,0));
 	//gl_draw_circle(view, x,y,RADIUS);
@@ -81,12 +83,8 @@ void PlayerInst::draw(GameState* gs) {
 		image_display(&img, x - img.width / 2 - view.x,
 				y - img.height / 2 - view.y, red);
 	}else {
-		if (is_local_focus())
 		image_display(&img, x - img.width / 2 - view.x,
 				y - img.height / 2 - view.y);
-		else
-			image_display(&img, x - img.width / 2 - view.x,
-					y - img.height / 2 - view.y, Colour(255,0,0 ));
 
 	}
 
