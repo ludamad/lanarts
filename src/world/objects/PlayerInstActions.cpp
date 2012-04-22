@@ -231,7 +231,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 					GameAction action;
 //					LANARTS_ASSERT(action.frame == gs->frame());
 					packet.get(action);
-					actions.push_front(action);
+					actions.push_back(action);
 				}
 			}
 	}
