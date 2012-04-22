@@ -110,7 +110,7 @@ bool ServerNetConnection::get_next_packet(NetPacket & packet) {
 		//We try to determine the status without a lock, should never be 0 when non-empty
 		m.lock();
 		if (ss->rmessages().size() != 0){
-			packet = ss->rmessages().front();
+			packet = *ss->rmessages().front().get();
 			ss->rmessages().pop_front();
 			found = true;
 		}

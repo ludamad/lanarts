@@ -25,6 +25,7 @@ void socketstream_read_body_handler(SocketStream* cnc,
 void socketstream_write_handler(SocketStream* cnc,
 		const asio::error_code& error);
 
+typedef std::deque< boost::shared_ptr<NetPacket> > PacketQueue;
 class SocketStream {
 public:
 	SocketStream(asio::io_service& io_service);
@@ -35,8 +36,8 @@ public:
 	void send_packet(const NetPacket& packet);
 
 	//Use these getters/setters only if you know what you're doing:
-	std::list<NetPacket>& rmessages()  { return reading_msgs;}
-	std::list<NetPacket>& wmessages()  { return writing_msgs;}
+	PacketQueue& rmessages()  { return reading_msgs;}
+	PacketQueue& wmessages()  { return writing_msgs;}
 	asio::ip::tcp::socket& get_socket(){ return socket; }
 	boost::mutex& get_rmutex(){ return rmutex;}
 	boost::mutex& get_wmutex(){ return wmutex;}
@@ -53,7 +54,7 @@ private:
 	asio::io_service& io_service;
 	asio::ip::tcp::socket socket;
 	std::vector<NetPacket> peerpackets;
-	std::list<NetPacket> reading_msgs, writing_msgs;
+	PacketQueue reading_msgs, writing_msgs;
 };
 
 #endif /* SOCKETSTREAM_H_ */
