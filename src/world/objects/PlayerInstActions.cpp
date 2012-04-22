@@ -229,7 +229,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 			if (has_connect){
 				while (packet.body_length > 0){
 					GameAction action;
-				LANARTS_ASSERT(action.frame == gs->frame());
+//				LANARTS_ASSERT(action.frame == gs->frame());
 					packet.get(action);
 					actions.push_front(action);
 				}
