@@ -39,10 +39,10 @@ void PlayerController::register_player(obj_id player, bool islocal) {
 	if (islocal)
 		local_player = player;
 	pids.push_back(player);
-	if (islocal)
+//	if (islocal)
 		fovs.push_back(new fov(7, VISION_SUBSQRS));
-	else
-		fovs.push_back(new fov(4, VISION_SUBSQRS));
+//	else
+//		fovs.push_back(new fov(4, VISION_SUBSQRS));
 
 }
 
