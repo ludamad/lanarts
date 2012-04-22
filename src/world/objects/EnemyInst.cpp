@@ -91,6 +91,7 @@ void EnemyInst::draw(GameState* gs) {
 //		image_display(&img, xx - view.x, yy - view.y,red);
 //		}
 	}
+	gl_printf(gs->primary_font(), Colour(255,255,255), x, y-25, "id=%d", id);
 	//draw_path(gs, eb.path);
 }
 

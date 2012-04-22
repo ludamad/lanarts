@@ -100,5 +100,6 @@ void PlayerInst::draw(GameState* gs) {
 //			gs->mouse_x(), gs->mouse_y(),
 //			gs->mouse_x()+view.x, gs->mouse_y()+view.y);
 
+	gl_printf(gs->primary_font(), Colour(255,255,255), x, y-25, "id=%d", id);
 //	gs->monster_controller().paths[0].draw(gs);
 }

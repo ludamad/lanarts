@@ -151,6 +151,8 @@ void BulletInst::draw(GameState* gs) {
 		return;
 
 	image_display(view, &img ,x-TILE_SIZE/2, y-TILE_SIZE/2);
+
+	gl_printf(gs->primary_font(), Colour(255,255,255), x, y-25, "id=%d", id);
 	//gl_draw_circle(view, x, y, RADIUS, (origin_id == gs->local_playerid()) ? Colour(0, 255, 0) : Colour(255, 215, 11));
 
 }
