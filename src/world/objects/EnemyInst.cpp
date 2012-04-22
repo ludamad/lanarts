@@ -59,8 +59,8 @@ void EnemyInst::step(GameState* gs) {
 		gs->object_radius_test(this, &collided, 1, &enemy_hit, x + eb.vx, y + eb.vy);
 		firstcol = false;
 	}*/
-//	x = (int) round(rx += eb.vx); //update based on rounding of true float
-//	y = (int) round(ry += eb.vy);
+	x = (int) round(rx += eb.vx); //update based on rounding of true float
+	y = (int) round(ry += eb.vy);
 //	}
 	stats().step();
 }
