@@ -352,7 +352,7 @@ void MonsterController::pre_step(GameState* gs) {
 		EnemyInst* e = (EnemyInst*) gs->get_instance(mids2[i]);
 		if (e == NULL)
 			continue;
-		update_position(gs, e);
+//		update_position(gs, e);
 	}
 }
 
