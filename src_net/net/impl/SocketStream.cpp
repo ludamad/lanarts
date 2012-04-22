@@ -110,7 +110,7 @@ void SocketStream::send_packet(const NetPacket & packet) {
 
 	wmutex.lock();
 		bool write_in_progress = !writing_msgs.empty();
-		writing_msgs.push_back(packet);
+		writing_msgs.push_front(packet);
 		if (!write_in_progress){
 			asio::async_write(
 					socket,

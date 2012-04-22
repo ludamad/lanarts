@@ -109,7 +109,6 @@ static void game_loop(GameState* gs){
 	///	}
 	}
 
-
 	printf("Step time: %f\n", float(step_time)/step_events);
 	printf("Draw time: %f\n", float(draw_time)/draw_events);
 }
