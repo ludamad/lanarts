@@ -48,6 +48,7 @@ GameState::GameState(const GameSettings& settings, int width, int height, int vi
 	}
 
 	level() = world.get_level(0, true);
+	level()->steps_left = 1000;
 	GameInst* p = get_instance(level()->pc.local_playerid());
 	window_view().sharp_center_on(p->x, p->y);
 }
@@ -255,6 +256,7 @@ int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 	return level()->inst_set.object_radius_test(obj, objs, obj_cap, f, x, y, radius);
 }
 bool GameState::object_visible_test(GameInst* obj, GameInst* player) {
+	player = NULL;
 	const int sub_sqrs = VISION_SUBSQRS;
 	const int subsize = TILE_SIZE / sub_sqrs;
 

@@ -101,7 +101,7 @@ void GameWorld::step() {
 
 	const int STEPS_TO_SIMULATE = 1000;
 	GameLevelState* current_level = game_state->level();
-	current_level->steps_left = STEPS_TO_SIMULATE;
+//	current_level->steps_left = STEPS_TO_SIMULATE;
 
 	midstep = true;
 	for (int i = 0; i < level_states.size(); i++){
