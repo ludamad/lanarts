@@ -59,6 +59,7 @@ void GameTiles::post_draw(GameState* gs) {
 	for (int y = min_tiley; y <= max_tiley; y++) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
 			bool has_match = false, has_free = false;
+			bool is_other_match = false;
 			int tile = tiles[y * width + x];
 			GLImage* img = &game_tile_data[tile].img;
 
@@ -69,7 +70,10 @@ void GameTiles::post_draw(GameState* gs) {
 				for (int i = 0; i < sub_sqrs * sub_sqrs; i++) {
 					if (matches[i]) {
 						seen_tiles[y * width + x] = 1;
-						has_match = true;
+						if (&f == &mainfov)
+							has_match = true;
+						else
+							is_other_match = true;
 					} else {
 						has_free = true;
 					}
@@ -80,13 +84,19 @@ void GameTiles::post_draw(GameState* gs) {
 
 			//Do not draw black if we have a match, and we see a wall
 			if (!has_match) {
-				if (!seen_tiles[y * width + x]) {
-					gl_draw_rectangle(x * TILE_SIZE - view.x,
-							y * TILE_SIZE - view.y, img->width, img->height);
+				if (!is_other_match){
+					if (!seen_tiles[y * width + x]) {
+						gl_draw_rectangle(x * TILE_SIZE - view.x,
+								y * TILE_SIZE - view.y, img->width, img->height);
+					} else {
+						gl_draw_rectangle(x * TILE_SIZE - view.x,
+								y * TILE_SIZE - view.y, img->width, img->height,
+								Colour(0, 0, 0, 180));
+					}
 				} else {
 					gl_draw_rectangle(x * TILE_SIZE - view.x,
 							y * TILE_SIZE - view.y, img->width, img->height,
-							Colour(0, 0, 0, 120));
+							Colour(0, 0, 0, 100));
 				}
 			}
 			//			else if (has_match && has_free && tile != 1) {
