@@ -83,7 +83,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 		p.x += start_x;
 		p.y += start_y;
 
-		tiles.get(p.x, p.y) = TILE_STAIR_DOWN;
+		tiles.get(p.x, p.y) = get_tile_by_name("stairs_down");
 
 		gs->level()->entrances.push_back(GameLevelPortal(p, Pos(0,0)));
 	}
@@ -108,7 +108,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 		p.x += start_x;
 		p.y += start_y;
 		
-		tiles.get(p.x, p.y) = TILE_STAIR_UP;
+		tiles.get(p.x, p.y) = get_tile_by_name("stairs_up");
 		gs->level()->exits.push_back(GameLevelPortal(p, Pos(0,0)));
 	}
 

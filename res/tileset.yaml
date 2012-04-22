@@ -2,16 +2,25 @@
 tilesets:
   - tileset: blue_tiles
     floor_tile: blue_floor
-    wall_tile: blue_wall
-    corridor_tile: floor2
+    wall_tile: [brick_gray0,brick_gray3]
+    corridor_tile: [crystal_floor0, crystal_floor5]
     alt_wall_tile: stone_wall
     alt_floor_tile: floor2
     alt_corridor_tile: floor2
+
   - tileset: pebble_tiles
-    floor_tile: [pebblebrown0, pebblebrown8]
+    floor_tile: [pebble_brown0, pebble_brown8]
     wall_tile: [brickdark0, brickdark6]
     corridor_tile: [hive0, hive3]
     alt_wall_tile: [brickdark0, brickdark6]
     alt_floor_tile: [hive0, hive3]
     alt_corridor_tile: [hive0, hive3]
+
+  - tileset: crystal_tiles
+    floor_tile: [crystal_floor0, crystal_floor5]
+    wall_tile: [crystal_wall0,crystal_wall13]
+    corridor_tile: [mesh0,mesh3]
+    alt_floor_tile: [crystal_floor0, crystal_floor5]
+    alt_wall_tile: [crystal_wall0,crystal_wall13]
+    alt_corridor_tile: [crystal_floor0, crystal_floor5]
     

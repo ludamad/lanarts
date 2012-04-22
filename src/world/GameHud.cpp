@@ -144,13 +144,15 @@ void GameHud::draw_minimap(GameState* gs, int subx, int suby) {
 		minimap_arr[i * 4 + 3] = 255;
 	}
 
+	int stdown = get_tile_by_name("stairs_down");
+	int stup = get_tile_by_name("stairs_up");
 	for (int y = 0; y < tileh; y++) {
 		char* iter = minimap_arr + y * ptw * 4;
 		for (int x = 0; x < tilew; x++) {
 			int tile = tiles.get(x, y);
 			int seen = tiles.seen(x, y) || pressed_z;
 			if (seen) {
-				if (tile == TILE_STAIR_DOWN || tile == TILE_STAIR_UP){
+				if (tile == stdown || tile == stup){
 					iter[0] = 255, iter[1] = 0, iter[2] = 0, iter[3] = 255;
 				} else if (!game_tile_data[tile].solid) {/*floor*/
 					iter[0] = 255, iter[1] = 255, iter[2] = 255, iter[3] = 255;

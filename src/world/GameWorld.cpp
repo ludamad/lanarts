@@ -126,6 +126,7 @@ void GameWorld::step() {
 		GameInst* g = game_state->get_instance(game_state->player_controller().local_playerid());
 		game_state->window_view().sharp_center_on(g->x,g->y);
 		next_room_id = -1;
+		game_state->level()->steps_left = 1000;
 		goto redofirststep;// goto top
 	}
 }
@@ -143,6 +144,7 @@ void GameWorld::regen_level(int roomid){
 	GameLevelState* newlevel = get_level(roomid, true, (void**)&player_cache[0], player_cache.size());
 	if (game_state->level() == level){
 		game_state->level() = newlevel;
+		game_state->level()->steps_left = 1000;
 		GameInst* p = game_state->get_instance(game_state->local_playerid());
 		game_state->window_view().sharp_center_on(p->x, p->y);
 	}

@@ -11,14 +11,14 @@ branches:
           amount: 0
         rooms:
           padding: 0
-          amount: 1
-          size: [30,39]
+          amount: 3
+          size: [10,10]
         tunnels:
-          padding: 0
-          width: 0
-          per_room: 0        
+          padding: 2
+          width: [1,2]
+          per_room: 5       
         features:
-          tileset: pebble_tiles
+          tileset: crystal_tiles
           stairs_up: 0
           stairs_down: 5
         enemies:

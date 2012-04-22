@@ -202,7 +202,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 
 		Pos hitsqr;
 		if (gs->key_down_state(SDLK_PERIOD) || gs->mouse_downwheel()) {
-			if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN,
+			if (gs->tile_radius_test(x, y, RADIUS, false, get_tile_by_name("stairs_down"),
 					&hitsqr)) {
 //				int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
 				actions.push_back(
@@ -210,7 +210,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 			}
 		}
 		if (gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel()) {
-			if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP,
+			if (gs->tile_radius_test(x, y, RADIUS, false, get_tile_by_name("stairs_up"),
 					&hitsqr)) {
 //				int entr_n = scan_entrance(gs->level()->exits, hitsqr);
 				actions.push_back(
@@ -397,7 +397,7 @@ static int scan_entrance(const std::vector<GameLevelPortal>& portals,
 void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 	Pos hitpos;
 	LANARTS_ASSERT(
-			gs->tile_radius_test(x,y,radius,false, TILE_STAIR_UP,&hitpos));
+			gs->tile_radius_test(x,y,radius,false, get_tile_by_name("stairs_up"),&hitpos));
 	int entr_n = scan_entrance(gs->level()->exits, hitpos);
 //	int entr_n = action.use_id;
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->level()->exits.size());
@@ -413,7 +413,7 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 	Pos hitpos;
 	LANARTS_ASSERT(
-			gs->tile_radius_test(x,y,radius,false, TILE_STAIR_DOWN,&hitpos));
+			gs->tile_radius_test(x,y,radius,false, get_tile_by_name("stairs_down"),&hitpos));
 	int entr_n = scan_entrance(gs->level()->entrances, hitpos);
 //	int entr_n = action.use_id;
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->level()->entrances.size());
