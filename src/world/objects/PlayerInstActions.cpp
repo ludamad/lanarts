@@ -209,6 +209,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 
 	if (is_local_focus() && hasconnection){
 		for (int i = 0; i < actions.size(); i++) {
+			actions[i].frame = gs->frame();
 			packet.add(actions[i]);
 		}
 		packet.encode_header();

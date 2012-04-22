@@ -115,6 +115,8 @@ static void game_loop(GameState* gs){
 }
 
 int main(int argc, char** argv) {
+	printf("Size of action = %d\n", sizeof(GameAction));
+	fflush(stdout);
 	GameSettings settings;
 	init_system(settings);
 
