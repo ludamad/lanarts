@@ -180,8 +180,9 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 
 	game_state->level() = last;
 	PlayerInst* p;
-	if ((p = dynamic_cast<PlayerInst*>(inst)) && p->is_local_focus())
+	if ((p = dynamic_cast<PlayerInst*>(inst)) && p->is_local_focus()){
 		set_current_level_lazy(roomid2);
+	}
 
 }
 
