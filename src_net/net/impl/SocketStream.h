@@ -11,6 +11,7 @@
 #include "../connection.h"
 #include <asio.hpp>
 #include <deque>
+#include <list>
 #include <vector>
 #include <boost/thread/mutex.hpp>
 
