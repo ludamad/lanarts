@@ -175,11 +175,26 @@ void PlayerInst::perform_io_action(GameState* gs) {
 									slot));
 				}
 			}
+			// Drop item
+			if (!item_used && gs->mouse_right_click() && !mouse_within) {
+				int posx = (gs->mouse_x() - gs->window_view().width)
+						/ TILE_SIZE;
+				int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
+				int slot = 5 * posy + posx;
+				if (slot >= 0 && slot < INVENTORY_SIZE
+						&& inventory.inv[slot].n > 0) {
+					actions.push_back(
+							GameAction(id, GameAction::DROP_ITEM, frame, level,
+									slot));
+				}
+			}
 		}
 
 		//Item pickup
 		GameInst* item = NULL;
 		if (gs->object_radius_test(this, &item, 1, &item_hit)) {
+			int type = ((ItemInst*) item)->item_type();
+			if(gs->key_down_state(SDLK_LSHIFT) || game_item_data[type].weapon < 0)
 			actions.push_back(
 					GameAction(id, GameAction::PICKUP_ITEM, frame, level,
 							item->id));
@@ -253,6 +268,13 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	}
 }
 
+void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
+// 	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
+	itemslot& item = inventory.inv[action.use_id];
+	gs->add_instance(new ItemInst(item.item, x, y));
+	inventory.inv[action.use_id].n--;
+}
+
 void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 	switch (action.act) {
 	case GameAction::MOVE_IN_DIRECTION:
@@ -269,6 +291,8 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 		return use_item(gs, action);
 	case GameAction::PICKUP_ITEM:
 		return pickup_item(gs, action);
+	case GameAction::DROP_ITEM:
+		return drop_item(gs, action);
 	}
 }
 

@@ -77,6 +77,7 @@ private:
 	void use_rest(GameState *gs, const GameAction& action);
 	void use_item(GameState *gs, const GameAction& action);
 	void pickup_item(GameState* gs, const GameAction& action);
+	void drop_item(GameState* gs, const GameAction& action);
 
 	Inventory inventory;
 	bool local;
