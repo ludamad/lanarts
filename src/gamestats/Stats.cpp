@@ -90,6 +90,7 @@ void Stats::reset_ranged_cooldown(const Stats & effectivestats) {
 }
 
 bool Stats::hurt(int dmg) {
+	return false;
 	hp -= std::max(0, dmg-defence);
 	set_hurt_cooldown();
 	if (hp < 0) {

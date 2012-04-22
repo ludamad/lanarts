@@ -28,7 +28,6 @@ void generate_enemies(const EnemyGenSettings& es, MTwist& mt,
 //Generates enemy monsters
 void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 		GeneratedLevel& level, GameState* gs) {
-	return;
 	GameTiles& tiles = gs->tile_grid();
 	int start_x = (tiles.tile_width() - level.width()) / 2;
 	int start_y = (tiles.tile_height() - level.height()) / 2;
