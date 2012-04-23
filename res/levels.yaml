@@ -22,7 +22,7 @@ branches:
           stairs_up: 0
           stairs_down: 5
         enemies:
-          amount: 0
+          amount: 1
           generated:
             - enemy: Executioner
               chance: 100
