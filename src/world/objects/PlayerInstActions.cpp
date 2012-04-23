@@ -91,24 +91,6 @@ void PlayerInst::perform_io_action(GameState* gs) {
 		}
 
 		if (!resting) {
-			//Arrow/wasd movement
-			if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
-				dy -= 1;
-			}
-			if (gs->key_down_state(SDLK_RIGHT) || gs->key_down_state(SDLK_d)) {
-				dx += 1;
-			}
-			if (gs->key_down_state(SDLK_DOWN) || gs->key_down_state(SDLK_s)) {
-				dy += 1;
-			}
-			if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
-				dx -= 1;
-			}
-			if (dx != 0 || dy != 0) {
-				actions.push_back(
-						GameAction(id, GameAction::MOVE_IN_DIRECTION, frame,
-								level, 0, dx, dy));
-			}
 
 			//Spell use
 			if (gs->key_down_state(SDLK_j)) {
@@ -217,10 +199,30 @@ void PlayerInst::perform_io_action(GameState* gs) {
 						GameAction(id, GameAction::USE_EXIT, frame, level));
 			}
 		}
+		//Arrow/wasd movement
+		if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
+			dy -= 1;
+		}
+		if (gs->key_down_state(SDLK_RIGHT) || gs->key_down_state(SDLK_d)) {
+			dx += 1;
+		}
+		if (gs->key_down_state(SDLK_DOWN) || gs->key_down_state(SDLK_s)) {
+			dy += 1;
+		}
+		if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
+			dx -= 1;
+		}
+		if (dx != 0 || dy != 0) {
+			actions.push_back(
+					GameAction(id, GameAction::MOVE_IN_DIRECTION, frame,
+							level, 0, dx, dy));
+		}
 	}
 	GameNetConnection& connection = gs->net_connection();
 	bool hasconnection = connection.get_connection() != NULL;
 	NetPacket packet;
+	printf("step for player\n");
+	fflush(stdout);
 
 	if (is_local_focus() && hasconnection){
 		for (int i = 0; i < actions.size(); i++) {
