@@ -247,11 +247,11 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				while (packet.body_length > 0){
 					GameAction action;
 //				LANARTS_ASSERT(action.frame == gs->frame());
-                    if (output1){
+					packet.get(action);                    
+                    if (output1 && action.frame != frame){
                         printf("action frame %d vs %d\n", action.frame, frame);
                         output1 = false;
                     }
-					packet.get(action);
 					actions.push_front(action);
 				}
 			}
