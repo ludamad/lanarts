@@ -109,7 +109,7 @@ public:
 		return mouse_diddownwheel;
 	}
 
-	int frame() {
+	int& frame() {
 		return frame_n;
 	}
 	/* Object identifier for the player */
