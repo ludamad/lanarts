@@ -259,6 +259,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 	}
 
 
+	isresting = false;
 	for (int i = 0; i < actions.size(); i++) {
 // 		to_action_file(saved, actions[i]);
 		perform_action(gs, actions[i]);
@@ -311,11 +312,12 @@ void PlayerInst::use_item(GameState *gs, const GameAction& action) {
 	canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 }
 void PlayerInst::use_rest(GameState *gs, const GameAction& action) {
-	if (canrestcooldown == 0) {
+	bool atfull = stats().hp >= stats().max_hp && stats().mp >= stats().max_mp;
+	if (canrestcooldown == 0 && !atfull) {
 		stats().raise_hp(stats().hpregen * 8);
 		stats().raise_mp(stats().mpregen * 8);
+		isresting = true;
 	}
-
 }
 void PlayerInst::use_move_and_melee(GameState* gs, const GameAction& action) {
 	int dx = action.action_x;

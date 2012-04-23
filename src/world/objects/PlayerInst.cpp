@@ -91,6 +91,11 @@ void PlayerInst::draw(GameState* gs) {
 
 	}
 
+	if (isresting){
+		GLImage& restimg = game_sprite_data[get_sprite_by_name("resting")].img;
+		image_display(&restimg, x - img.width / 2 - view.x,
+				y - img.height / 2 - view.y);
+	}
 
 
 	//for (int i = 0; i < 10; i++)

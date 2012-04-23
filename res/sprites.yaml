@@ -2,45 +2,64 @@
 sprites:
   - sprite: fighter
     spritefile: res/player/fighter.png
+
   - sprite: wizard
     spritefile: res/player/wizard.png
     
-  - sprite:  storm ele
+  - sprite: resting
+    spritefile: res/effects/resting.png
+
+  - sprite: storm ele
     spritefile: res/monsters/storm_elemental.png
+
   - sprite: chicken
     spritefile: res/monsters/chicken.png
+
   - sprite: exec
     spritefile: res/monsters/exec.png
+
   - sprite: zombie
     spritefile: res/monsters/zombie.png
+
   - sprite: ambrosia
     spritefile: res/items/misc/ambrosia.png
+
   - sprite: amulet
     spritefile: res/items/misc/amulet.png
+
   - sprite: fire bolt
     spritefile: res/effects/bolt04.png
+
   - sprite: storm bolt
     spritefile: res/effects/bolt07.png
 
   - sprite: grue
     spritefile: res/monsters/grue.png
+
   - sprite: jester
     spritefile: res/monsters/jester.png
+
   - sprite: super_chicken
     spritefile: res/monsters/superchicken.png
+
   - sprite: skeleton
     spritefile: res/monsters/skeleton.png
+
   - sprite: ciribot
     spritefile: res/monsters/ciribo.png
+
   - sprite: hell_forged
     spritefile: res/monsters/hellforged.png
 
   - sprite: mana potion
     spritefile: res/items/misc/brilliant_blue.png
+
   - sprite: magic blast
     spritefile: res/effects/orb.png
+
   - sprite: haste
     spritefile: res/effects/haste.png
+
   - sprite: poison
     spritefile: res/effects/cloud_poison2.png
 

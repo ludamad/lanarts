@@ -21,7 +21,7 @@ public:
 		RADIUS = 10, VISION_SUBSQRS = 1
 	};
 	PlayerInst(const Stats& start_stats, int x, int y, bool local = true) :
-			GameInst(x, y, RADIUS), local(local), weapon(0),
+			GameInst(x, y, RADIUS), local(local), isresting(0), weapon(0),
 			base_stats(start_stats), canrestcooldown(0),
 			money(0), spellselect(0) {
 	}
@@ -80,7 +80,7 @@ private:
 	void drop_item(GameState* gs, const GameAction& action);
 
 	Inventory inventory;
-	bool local;
+	bool local, isresting;
 	int weapon;
 	Stats base_stats;
 	Effects effects;

@@ -1,23 +1,32 @@
 Large:
 - Versatile save format that allows for resuming a networked game even through major game updates
 - Add LUA integration for specification of actions, make sure all data remains in YAML files
+- Make spells not hardcoded (Uses LUA integration ideally)
+- Add allied monsters that stay close to their 'owner' and shoot at nearby enemies
+	Details:
+	-May need two pathfinds per monster
+	-More if we support double-sized enemies
+	-Performance hit reasonable
 
 Medium:
+- Add higher level sprite class that handles animation & orientation & multiple tile variations
+- Add in-game chat support for multiplayer
 - Support for double-sized enemies (2x2 tile size max)
-- Broadcast RNG seed & class information
 - Add start up screen with networking options
 - Special case pushing for tight corridors ?
+- Straight line AOE spell
 - Lightning Spell that takes up multiple squares
 - Add levels of minimap viewing
 - Add float coordinate buffering (or make ->x and ->y floats) for all GameInst objects
 
 - Add keyboard based blink that moves to furthest point
-- Make spells not hardcoded (Eventually use LUA integration)
 - More complete & functional sidebar interface, with tabs
 - Add stat defence multipliers to enemy attacks, maybe create attack types
 
 
 Small:
+- Broadcast RNG seed & class information
+- Add a resting animation
 - Have a flexible portal system that indicates which level to connect to
 - Add cooldowns to item use
 
