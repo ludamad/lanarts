@@ -1,40 +1,54 @@
-Complex:
-- [STARTED] Networked play over LAN with action-based synchronization
-- [STARTED] Classes for players
+Large:
 - Versatile save format that allows for resuming a networked game even through major game updates
 - Add LUA integration for specification of actions, make sure all data remains in YAML files
 
-Some complexity:
+Medium:
+- Support for double-sized enemies (2x2 tile size max)
+- Broadcast RNG seed & class information
+- Add start up screen with networking options
 - Special case pushing for tight corridors ?
 - Lightning Spell that takes up multiple squares
+- Add levels of minimap viewing
+- Add float coordinate buffering (or make ->x and ->y floats) for all GameInst objects
 
-- [ALMOST DONE] Support for multiple PlayerInst (Maybe re-use PlayerInst for summoned monsters ?)
-- [IFFY] Unification of code-path's for PlayerInst/EnemyInst ?
-- Put tile-set information in the YAML files for level generation
 - Add keyboard based blink that moves to furthest point
-- Add dropping of objects & dont always autopickup
 - Make spells not hardcoded (Eventually use LUA integration)
 - More complete & functional sidebar interface, with tabs
 - Add stat defence multipliers to enemy attacks, maybe create attack types
 
-Trivial:
-- Make levels not start from 1 internally (or have a flexible portal system that indicates which level to connect it to)
+
+Small:
+- Have a flexible portal system that indicates which level to connect to
 - Add cooldowns to item use
-- More visual output on the minimap [Stairs etc]
-- Fix items on border of view not being visible -> subtract away from player and check visibility??
 
+Partial Completion:
+- [DONE WITH BUGS/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
+- [STARTED] Classes for players
 
-Done before 18/04/2012:
+- [ALMOST DONE] Support for multiple PlayerInst (Maybe re-use PlayerInst for summoned monsters ?)
+- [IFFY] Unification of code-path's for PlayerInst/EnemyInst ?
+- [DONE - IMPROVE VISIBILITY] More visual output on the minimap [Stairs etc]
+- [DONE - VERY RARE INSTANCES LEFT] Fix monsters getting stuck due to random movement 
+- [DONE - CURRENTLY HARDCODED] Action bar, below screen 
+
+Completed:
+BEFORE 18/04/2012:
 - [DONE] Refactor room generation with tiered room, tunnel, feature, item generation.
 - [DONE] Move out of combat
 - [DONE] Melee attack animation 
 - [DONE] versatile markup format that allows for human edit-able game objects (YAML?)
-- [DONE - MAY RESURFACE DURING MONSTER SPAWNING] Fix monsters getting stuck due to random movement 
-- [DONE - CURRENTLY HARDCODED] Action bar, below screen 
 
-Done As of 18/04/2012:
+
+AFTER 18/04/2012:
 - [DONE] Refactor away all enum's for resources so order no longer matters
 - [DONE] Actions for players & action replay
 - [DONE] Weapons spawn on ground
 - [DONE] Weapons are usable, with graphical validation (unhardcode them)
 - [MOSTLY DONE] Enemies fan out & walk away from player
+
+23/04/2012:
+- [DONE WITH BUGS/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
+- [DONE]Fix random appearance of offscreen tiles -> GameTiles may be the culprit
+- [DONE] Fix items on border of view not being visible -> subtract away from player and check visibility??
+- [DONE] Put tile-set information in the YAML files for level generation
+- [DONE] Add dropping of objects & dont always autopickup

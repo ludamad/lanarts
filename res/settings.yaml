@@ -3,8 +3,9 @@ regen_level_on_death: 1
 view_width: 900
 view_height: 720
 class: Mage
+font: res/MateSC-Regular.ttf
 
 #Either 'host', 'client', or 'none'
-connection_type: host
-ip: localhost
+connection_type: none
+ip: 192.168.0.130
 port: 6112

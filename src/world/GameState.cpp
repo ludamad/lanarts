@@ -33,7 +33,7 @@ GameState::GameState(const GameSettings& settings, int width, int height, int vi
 				mouse_leftdown(0), mouse_rightdown(0),
 				mouse_leftclick(0), mouse_rightclick(0) {
 	memset(key_down_states, 0, sizeof(key_down_states));
-	init_font(&pfont, "res/arial.ttf", 10);
+	init_font(&pfont, settings.font.c_str(), 10);
 	time_t t;
 	time(&t);
 	mtwist.init_genrand(1);

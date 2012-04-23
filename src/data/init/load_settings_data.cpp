@@ -25,6 +25,7 @@ GameSettings load_settings_data(const char* filename){
 
 			parser.GetNextDocument(root);
 
+			optional_set(root, "font", ret.font);
 			optional_set(root, "fullscreen", ret.fullscreen);
 			optional_set(root, "regen_level_on_death", ret.regen_on_death);
 			optional_set(root, "view_width", ret.view_width);

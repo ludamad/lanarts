@@ -16,6 +16,7 @@ struct GameSettings {
 	connection_type conntype;
 
 	/*Window settings*/
+	std::string font;
 	bool fullscreen;
 	int view_width, view_height;
 
@@ -31,6 +32,8 @@ struct GameSettings {
 		classn = 1;
 		view_width = 960;
 		view_height = 720;
+
+		font = "res/arial.ttf";
 
 		port = 0;
 		conntype = NONE;
