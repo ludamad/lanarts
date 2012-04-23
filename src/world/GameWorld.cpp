@@ -115,6 +115,7 @@ void GameWorld::step() {
 			game_state->level()->mc.pre_step(game_state);
 			game_state->level()->inst_set.step(game_state);
 			game_state->level()->steps_left--;
+            game_state->level()->tiles.step(game_state);
 		}
 	}
 	game_state->level() = current_level;

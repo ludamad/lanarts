@@ -1,10 +1,10 @@
-fullscreen: 0
+fullscreen: 1
 regen_level_on_death: 1
-view_width: 900
-view_height: 720
+view_width: 1680
+view_height: 1050
 class: Mage
 
 #Either 'host', 'client', or 'none'
-connection_type: client
-ip: 192.168.0.130
+connection_type: host
+ip: 192.168.0.126
 port: 6112
