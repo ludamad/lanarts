@@ -99,10 +99,13 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player
 void GameWorld::step() {
 	redofirststep://I used a goto dont kill me
 
+	
 	const int STEPS_TO_SIMULATE = 1000;
 	GameLevelState* current_level = game_state->level();
 //	current_level->steps_left = STEPS_TO_SIMULATE;
 
+    game_state->frame()++;
+    
 	midstep = true;
 	for (int i = 0; i < level_states.size(); i++){
 		if (level_states[i]->steps_left > 0){
@@ -112,6 +115,7 @@ void GameWorld::step() {
 			game_state->level()->mc.pre_step(game_state);
 			game_state->level()->inst_set.step(game_state);
 			game_state->level()->steps_left--;
+            game_state->level()->tiles.step(game_state);
 		}
 	}
 	game_state->level() = current_level;
@@ -127,7 +131,7 @@ void GameWorld::step() {
 		game_state->window_view().sharp_center_on(g->x,g->y);
 		next_room_id = -1;
 		game_state->level()->steps_left = 1000;
-		goto redofirststep;// goto top
+		//goto redofirststep;// goto top
 	}
 }
 

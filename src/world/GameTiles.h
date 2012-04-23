@@ -29,6 +29,7 @@ public:
 		delete[] tiles;
 		delete[] seen_tiles;
 	}
+    void step(GameState* gs);
 	int tile_width(){ return width; }
 	int tile_height(){ return height; }
 	void clear (){
