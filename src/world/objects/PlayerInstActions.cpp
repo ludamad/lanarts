@@ -221,7 +221,6 @@ void PlayerInst::perform_io_action(GameState* gs) {
 	GameNetConnection& connection = gs->net_connection();
 	bool hasconnection = connection.get_connection() != NULL;
 	NetPacket packet;
-	printf("step for player\n");
 	fflush(stdout);
 
 	if (is_local_focus() && hasconnection){
@@ -244,9 +243,14 @@ void PlayerInst::perform_io_action(GameState* gs) {
 //					break;
 			}
 			if (has_connect){
+                bool output1 = true;
 				while (packet.body_length > 0){
 					GameAction action;
 //				LANARTS_ASSERT(action.frame == gs->frame());
+                    if (output1){
+                        printf("action frame %d vs %d\n", action.frame, frame);
+                        output1 = false;
+                    }
 					packet.get(action);
 					actions.push_front(action);
 				}
