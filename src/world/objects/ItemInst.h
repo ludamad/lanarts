@@ -13,14 +13,16 @@
 class ItemInst: public GameInst {
 public:
 	enum {RADIUS = 10};
-	ItemInst(int type, int x, int y) :
-		GameInst(x,y, RADIUS, false), type(type){}
+	ItemInst(int type, int x, int y, obj_id dropped_by = 0) :
+		GameInst(x,y, RADIUS, false), type(type), dropped_by(dropped_by){}
 	virtual ~ItemInst();
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
 	int item_type(){ return type; }
+	obj_id last_held_by() { return dropped_by; }
 private:
 	int type;
+	obj_id dropped_by;
 };
 
 #endif /* ITEMINST_H_ */

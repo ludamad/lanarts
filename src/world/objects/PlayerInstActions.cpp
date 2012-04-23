@@ -175,11 +175,12 @@ void PlayerInst::perform_io_action(GameState* gs) {
 		//Item pickup
 		GameInst* item = NULL;
 		if (gs->object_radius_test(this, &item, 1, &item_hit)) {
-			int type = ((ItemInst*) item)->item_type();
-			if(gs->key_down_state(SDLK_LSHIFT) || game_item_data[type].weapon < 0)
-			actions.push_back(
-					GameAction(id, GameAction::PICKUP_ITEM, frame, level,
-							item->id));
+			ItemInst* iteminst = (ItemInst*) item;
+			int type = iteminst->item_type();
+			bool autopickup = game_item_data[type].weapon < 0 && iteminst->last_held_by() != id;
+			bool pickup_io = gs->key_down_state(SDLK_LSHIFT) || gs->key_down_state(SDLK_RSHIFT);
+			if (pickup_io || autopickup)
+				actions.push_back(GameAction(id, GameAction::PICKUP_ITEM, frame, level,item->id));
 		}
 
 		Pos hitsqr;
@@ -273,7 +274,7 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 // 	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
 	itemslot& item = inventory.inv[action.use_id];
-	gs->add_instance(new ItemInst(item.item, x, y));
+	gs->add_instance(new ItemInst(item.item, x, y, id));
 	inventory.inv[action.use_id].n--;
 }
 
