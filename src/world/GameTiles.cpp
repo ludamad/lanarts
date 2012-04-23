@@ -40,21 +40,11 @@ void GameTiles::pre_draw(GameState* gs) {
 
 void GameTiles::step(GameState* gs){
     GameView& view = gs->window_view();
-    int min_tilex, min_tiley;
-    int max_tilex, max_tiley;
-
-    view.min_tile_within(min_tilex, min_tiley);
-    view.max_tile_within(max_tilex, max_tiley);
-
-    if (max_tilex >= width)
-        max_tilex = width - 1;
-    if (max_tiley >= height)
-        max_tiley = height - 1;
     const int sub_sqrs = VISION_SUBSQRS;
 
     char matches[sub_sqrs * sub_sqrs];
-    for (int y = min_tiley; y <= max_tiley; y++) {
-        for (int x = min_tilex; x <= max_tilex; x++) {
+    for (int y = 0; y <= height; y++) {
+        for (int x = 0; x <= width; x++) {
             bool has_match = false, has_free = false;
             bool is_other_match = false;
             int tile = tiles[y * width + x];
