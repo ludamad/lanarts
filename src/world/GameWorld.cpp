@@ -99,10 +99,13 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player
 void GameWorld::step() {
 	redofirststep://I used a goto dont kill me
 
+	
 	const int STEPS_TO_SIMULATE = 1000;
 	GameLevelState* current_level = game_state->level();
 //	current_level->steps_left = STEPS_TO_SIMULATE;
 
+    game_state->frame()++;
+    
 	midstep = true;
 	for (int i = 0; i < level_states.size(); i++){
 		if (level_states[i]->steps_left > 0){

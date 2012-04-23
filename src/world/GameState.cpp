@@ -125,8 +125,7 @@ bool GameState::step() {
 
 	if (!update_iostate())
 		return false;
-
-	frame_n++;
+    
 	world.step();
 	return true;
 }
