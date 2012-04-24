@@ -257,11 +257,12 @@ void PlayerInst::perform_io_action(GameState* gs) {
                 
 				has_connect = true;
 				break;
-			} else if ((++tries)%3000 == 0){
+			} 
+			/*else if ((++tries)%3000 == 0){
                 if ( !gs->update_iostate() ) {
                     exit(0);
                 }
-            }
+        }*/
 //				if (gs->game_settings().conntype == GameSettings::HOST)
 //					break;
 		}
