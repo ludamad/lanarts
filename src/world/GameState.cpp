@@ -62,7 +62,7 @@ GameState::GameState(const GameSettings& settings, int width, int height, int vi
         NetPacket packet;
         packet.add_int((int)seed);
         packet.encode_header();
-        connection.get_connection()->broadcast_packet(packet);
+        connection.get_connection()->broadcast_packet(packet, true);
     }
     
     mtwist.init_genrand((int)seed);
