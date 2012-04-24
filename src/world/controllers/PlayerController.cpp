@@ -51,11 +51,16 @@ void PlayerController::deregister_player(obj_id player) {
 	for (i = 0; i < pids.size() && pids[i] != player; i++) {
 		//find 'i' such that pids[i] == player
 	}
-	if (i == pids.size())
+	if (i == pids.size()){
+        printf("Didn't find player in list\n");
 		return;
+    }
 	pids.erase(pids.begin() + i);
 	delete fovs[i];
 	fovs.erase(fovs.begin() + i);
+    printf("Deregistering '%d'\n", player);
+    
+    fflush(stdout);
 }
 
 static int squish(int a, int b, int c) {
