@@ -107,8 +107,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 									spellselect, target->x, target->y));
 				} else {
 					if (target && !stats().has_cooldown() && stats().mp >= mpcost
-							&& !gs->solid_test(this)
-							&& gs->object_visible_test(this, this)) {
+							&& gs->object_visible_test(target, this)) {
 						actions.push_back(
 								GameAction(id, GameAction::USE_SPELL, frame, level,
 										spellselect, target->x, target->y));
@@ -120,7 +119,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				int px = x, py = y;
 				x = rmx, y = rmy;
 				if (stats().mp >= 50 && !gs->solid_test(this)
-						&& gs->object_visible_test(this, this)) {
+						&& gs->object_visible_test(this)) {
 					actions.push_back(
 							GameAction(id, GameAction::USE_SPELL, frame, level, 2,
 									x, y));
@@ -136,9 +135,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 					actions.push_back(
 							GameAction(id, GameAction::USE_WEAPON, frame, level,
 									spellselect, rmx, rmy));
-				} else if (!stats().has_cooldown() && stats().mp >= mpcost
-						&& !gs->solid_test(this)
-						&& gs->object_visible_test(this)) {
+				} else if (!stats().has_cooldown() && stats().mp >= mpcost) {
 					actions.push_back(
 							GameAction(id, GameAction::USE_SPELL, frame, level,
 									spellselect, rmx, rmy));
@@ -238,7 +235,6 @@ void PlayerInst::perform_io_action(GameState* gs) {
 	GameNetConnection& connection = gs->net_connection();
 	bool hasconnection = connection.get_connection() != NULL;
 	NetPacket packet;
-	fflush(stdout);
 
 	if (is_local_focus() && hasconnection) {
 		for (int i = 0; i < actions.size(); i++) {
@@ -257,12 +253,11 @@ void PlayerInst::perform_io_action(GameState* gs) {
                 
 				has_connect = true;
 				break;
-			} 
-			/*else if ((++tries)%3000 == 0){
+			} else if ((++tries)%30000 == 0){
                 if ( !gs->update_iostate() ) {
                     exit(0);
                 }
-        }*/
+        }
 //				if (gs->game_settings().conntype == GameSettings::HOST)
 //					break;
 		}
@@ -512,7 +507,7 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 //}
 
 void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
-	if (action.use_id < 2 && stats().has_cooldown()) return;
+    if (action.use_id < 2 && stats().has_cooldown()) return;
 
 	if (action.use_id == 0) {
 		stats().mp -= 10;

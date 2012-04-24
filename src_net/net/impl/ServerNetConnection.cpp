@@ -60,11 +60,11 @@ ServerNetConnection::ServerNetConnection(int port) :
     	new asio::thread(boost::bind(&wrapped_run, &io_service))
     );
 
-// 	bool done = false;
-// 	while (!done){
-// 	streamlock.lock();
-// 	done = !streams.empty();
-// 	streamlock.unlock();
+ 	bool done = false;
+//  	while (!done){
+//         streamlock.lock();
+//         done = !streams.empty();
+//         streamlock.unlock();
 // 	}
 }
 

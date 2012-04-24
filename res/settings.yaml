@@ -6,6 +6,6 @@ class: Mage
 font: res/MateSC-Regular.ttf
 
 #Either 'host', 'client', or 'none'
-connection_type: client
+connection_type: none
 ip: 10.42.0.1
 port: 6112

@@ -34,10 +34,8 @@ GameState::GameState(const GameSettings& settings, int width, int height, int vi
 				mouse_leftclick(0), mouse_rightclick(0) {
 	memset(key_down_states, 0, sizeof(key_down_states));
 	init_font(&pfont, settings.font.c_str(), 10);
-	time_t t;
-	time(&t);
-	mtwist.init_genrand(1);
-	gennextstep = false;
+	time_t seed;
+	time(&seed);
 
 	if (settings.conntype == GameSettings::CLIENT){
 		char port_buffer[50];
@@ -47,6 +45,27 @@ GameState::GameState(const GameSettings& settings, int width, int height, int vi
 		connection.get_connection() = create_server_connection(settings.port);
 	}
 
+	if (settings.conntype == GameSettings::CLIENT) {
+        NetPacket packet;
+        int tries = 0;
+        while (true) {
+            if (connection.get_connection()->get_next_packet(packet)) {
+                seed = packet.get_int();
+                break;
+            } else if ((++tries)%30000 == 0){
+                if ( !update_iostate() ) {
+                    exit(0);
+                }
+            }
+        }
+    } else if (settings.conntype == GameSettings::HOST){
+        NetPacket packet;
+        packet.add_int((int)seed);
+        packet.encode_header();
+        connection.get_connection()->broadcast_packet(packet);
+    }
+    
+    mtwist.init_genrand((int)seed);
 	level() = world.get_level(0, true);
 	level()->steps_left = 1000;
 	GameInst* p = get_instance(level()->pc.local_playerid());
