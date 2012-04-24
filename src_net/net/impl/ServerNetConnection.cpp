@@ -61,11 +61,11 @@ ServerNetConnection::ServerNetConnection(int port) :
     );
 
  	bool done = false;
- 	while (!done){
-        streamlock.lock();
-        done = !streams.empty();
-        streamlock.unlock();
-	}
+//  	while (!done){
+//         streamlock.lock();
+//         done = !streams.empty();
+//         streamlock.unlock();
+// 	}
 }
 
 
