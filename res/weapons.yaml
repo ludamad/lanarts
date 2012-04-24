@@ -4,6 +4,7 @@ weapons:
     damage: [4, 8]
     modifiers: 
         strength: 1.0
+    range: 18
     cooldown: 30
     spr_weap: gloves
     spr_attack: gloves
@@ -12,6 +13,7 @@ weapons:
     damage: [8, 12]
     modifiers: 
         strength: 1.1
+    range: 18
     cooldown: 32
     spr_weap: dagger
     spr_attack: dagger
@@ -20,6 +22,7 @@ weapons:
     damage: [16, 20]
     modifiers: 
         strength: 1.3
+    range: 19
     cooldown: 42
     spr_weap: short sword
     spr_attack: short sword
@@ -28,6 +31,7 @@ weapons:
     damage: [18, 22]
     modifiers: 
         strength: 1.5
+    range: 20
     cooldown: 55
     spr_weap: mace
     spr_attack: mace
