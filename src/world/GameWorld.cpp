@@ -131,7 +131,7 @@ void GameWorld::step() {
 		game_state->window_view().sharp_center_on(g->x,g->y);
 		next_room_id = -1;
 		game_state->level()->steps_left = 1000;
-		goto redofirststep;// goto top
+// 		goto redofirststep;// goto top
 	}
 }
 
