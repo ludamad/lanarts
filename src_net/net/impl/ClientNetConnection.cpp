@@ -88,7 +88,7 @@ bool ClientNetConnection::get_next_packet(NetPacket & packet) {
 	}*/
 }
 
-void ClientNetConnection::broadcast_packet(const NetPacket & packet) {
+void ClientNetConnection::broadcast_packet(const NetPacket & packet, bool send_to_new) {
 	stream.send_packet(packet);
 }
 

@@ -20,7 +20,6 @@ set( lanarts_tcp_src
 set( lanarts_tcp_include
 	impl/ServerNetConnection.h
 	impl/ClientNetConnection.h
-	impl/DummyNetConnection.h
 	impl/SocketStream.h
 	connection.h
 	packet.h

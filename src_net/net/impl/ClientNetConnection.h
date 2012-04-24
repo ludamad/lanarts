@@ -20,7 +20,7 @@ public:
 	virtual ~ClientNetConnection();
 
 	virtual bool get_next_packet(NetPacket& packet);
-	virtual void broadcast_packet(const NetPacket& packet);
+	virtual void broadcast_packet(const NetPacket& packet, bool send_to_new = false);
 	virtual int get_peer_id(){ return peer_id;}
 	virtual int get_number_peers(){ return number_of_peers;}
 	virtual bool is_initialized() { return connected; }

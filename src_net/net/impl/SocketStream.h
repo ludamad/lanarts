@@ -53,7 +53,7 @@ private:
 	NetPacket read_message;
 	asio::io_service& io_service;
 	asio::ip::tcp::socket socket;
-	std::vector<NetPacket> peerpackets;
+	std::vector<boost::shared_ptr<NetPacket> > peerpackets;
 	PacketQueue reading_msgs, writing_msgs;
 };
 
