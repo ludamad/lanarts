@@ -12,11 +12,13 @@
 
 struct GameAction {
 	enum action_t {
-		MOVE_IN_DIRECTION, SPELL,
-		REST,
+		MOVE,
+		USE_SPELL,
+		USE_REST,
 		USE_ENTRANCE,
 		USE_EXIT,
 		USE_ITEM,
+		USE_WEAPON,
 		PICKUP_ITEM,
 		DROP_ITEM
 	};

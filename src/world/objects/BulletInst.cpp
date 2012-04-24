@@ -86,12 +86,15 @@ void BulletInst::step(GameState* gs) {
 			float ry = vy/attack.projectile_speed*.5;
 			gs->add_instance(new AnimatedInst(e->x-5 + rx*5,e->y+ry*5, -1, 25,
 					rx, ry, buffstr));
-			if (e->hurt(gs, attack.damage)) {
-				((PlayerInst*)origin)->stats().gain_xp(e->xpworth());
+			if (e->hurt(gs, attack.damage)){
+				PlayerInst* p = (PlayerInst*)origin;
+				p->stats().gain_xp(e->xpworth());
 
-				snprintf(buffstr, 32, "%d XP", e->xpworth());
-				gs->add_instance(new AnimatedInst(e->x, e->y, -1, 25,
+				if (p->is_local_focus()){
+					snprintf(buffstr, 32, "%d XP", e->xpworth());
+					gs->add_instance(new AnimatedInst(e->x, e->y, -1, 25,
 						0,0, buffstr, Colour(255,215,11)));
+				}
 			}
 }
 	} else {

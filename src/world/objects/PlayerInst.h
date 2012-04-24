@@ -70,7 +70,8 @@ public:
 	}
 
 private:
-	void use_move_and_melee(GameState *gs, const GameAction& action);
+	void use_move(GameState *gs, const GameAction& action);
+	void use_weapon(GameState *gs, const GameAction& action);
 	void use_dngn_exit(GameState* gs, const GameAction& action);
 	void use_dngn_entrance(GameState *gs, const GameAction& action);
 	void use_spell(GameState *gs, const GameAction& action);

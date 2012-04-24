@@ -76,17 +76,19 @@ void PlayerInst::perform_io_action(GameState* gs) {
 
 		if (gs->key_press_state(SDLK_SPACE)) {
 			spellselect++;
-			if (spellselect >= 2) {
+			if (spellselect > 1) {
 				spellselect = 0;
 			}
 		}
+		if (gs->key_press_state(SDLK_m))
+			spellselect = -1;
 
 //		get_current_actions(gs->frame(), actions);
 
 //Resting
 		bool resting = false;
 		if (gs->key_down_state(SDLK_r) && canrestcooldown == 0) {
-			actions.push_back(GameAction(id, GameAction::REST, frame, level));
+			actions.push_back(GameAction(id, GameAction::USE_REST, frame, level));
 			resting = true;
 		}
 
@@ -99,12 +101,18 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				int mpcost = 10;
 				if (spellselect)
 					mpcost = 20;
-				if (target && !stats().has_cooldown() && stats().mp >= mpcost
-						&& !gs->solid_test(this)
-						&& gs->object_visible_test(this,this)) {
+				if (target && (spellselect == -1 || stats().mp < mpcost)){
 					actions.push_back(
-							GameAction(id, GameAction::SPELL, frame, level,
+							GameAction(id, GameAction::USE_WEAPON, frame, level,
 									spellselect, target->x, target->y));
+				} else {
+					if (target && !stats().has_cooldown() && stats().mp >= mpcost
+							&& !gs->solid_test(this)
+							&& gs->object_visible_test(this, this)) {
+						actions.push_back(
+								GameAction(id, GameAction::USE_SPELL, frame, level,
+										spellselect, target->x, target->y));
+					}
 				}
 			}
 			if (gs->mouse_right_click() && mouse_within) {
@@ -114,7 +122,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				if (stats().mp >= 50 && !gs->solid_test(this)
 						&& gs->object_visible_test(this, this)) {
 					actions.push_back(
-							GameAction(id, GameAction::SPELL, frame, level, 2,
+							GameAction(id, GameAction::USE_SPELL, frame, level, 2,
 									x, y));
 				}
 				x = px, y = py;
@@ -124,11 +132,15 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				int mpcost = 10;
 				if (spellselect)
 					mpcost = 20;
-				if (!stats().has_cooldown() && stats().mp >= mpcost
+				if (spellselect == -1 || stats().mp < mpcost){
+					actions.push_back(
+							GameAction(id, GameAction::USE_WEAPON, frame, level,
+									spellselect, rmx, rmy));
+				} else if (!stats().has_cooldown() && stats().mp >= mpcost
 						&& !gs->solid_test(this)
 						&& gs->object_visible_test(this)) {
 					actions.push_back(
-							GameAction(id, GameAction::SPELL, frame, level,
+							GameAction(id, GameAction::USE_SPELL, frame, level,
 									spellselect, rmx, rmy));
 				}
 			}
@@ -177,24 +189,28 @@ void PlayerInst::perform_io_action(GameState* gs) {
 		if (gs->object_radius_test(this, &item, 1, &item_hit)) {
 			ItemInst* iteminst = (ItemInst*) item;
 			int type = iteminst->item_type();
-			bool autopickup = game_item_data[type].weapon < 0 && iteminst->last_held_by() != id;
-			bool pickup_io = gs->key_down_state(SDLK_LSHIFT) || gs->key_down_state(SDLK_RSHIFT);
+			bool autopickup = game_item_data[type].weapon < 0
+					&& iteminst->last_held_by() != id;
+			bool pickup_io = gs->key_down_state(SDLK_LSHIFT)
+					|| gs->key_down_state(SDLK_RSHIFT);
 			if (pickup_io || autopickup)
-				actions.push_back(GameAction(id, GameAction::PICKUP_ITEM, frame, level,item->id));
+				actions.push_back(
+						GameAction(id, GameAction::PICKUP_ITEM, frame, level,
+								item->id));
 		}
 
 		Pos hitsqr;
 		if (gs->key_down_state(SDLK_PERIOD) || gs->mouse_downwheel()) {
-			if (gs->tile_radius_test(x, y, RADIUS, false, get_tile_by_name("stairs_down"),
-					&hitsqr)) {
+			if (gs->tile_radius_test(x, y, RADIUS, false,
+					get_tile_by_name("stairs_down"), &hitsqr)) {
 //				int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
 				actions.push_back(
 						GameAction(id, GameAction::USE_ENTRANCE, frame, level));
 			}
 		}
 		if (gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel()) {
-			if (gs->tile_radius_test(x, y, RADIUS, false, get_tile_by_name("stairs_up"),
-					&hitsqr)) {
+			if (gs->tile_radius_test(x, y, RADIUS, false,
+					get_tile_by_name("stairs_up"), &hitsqr)) {
 //				int entr_n = scan_entrance(gs->level()->exits, hitsqr);
 				actions.push_back(
 						GameAction(id, GameAction::USE_EXIT, frame, level));
@@ -215,8 +231,8 @@ void PlayerInst::perform_io_action(GameState* gs) {
 		}
 		if (dx != 0 || dy != 0) {
 			actions.push_back(
-					GameAction(id, GameAction::MOVE_IN_DIRECTION, frame,
-							level, 0, dx, dy));
+					GameAction(id, GameAction::MOVE, frame, level,
+							0, dx, dy));
 		}
 	}
 	GameNetConnection& connection = gs->net_connection();
@@ -224,7 +240,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 	NetPacket packet;
 	fflush(stdout);
 
-	if (is_local_focus() && hasconnection){
+	if (is_local_focus() && hasconnection) {
 		for (int i = 0; i < actions.size(); i++) {
 			actions[i].frame = gs->frame();
 			packet.add(actions[i]);
@@ -233,31 +249,30 @@ void PlayerInst::perform_io_action(GameState* gs) {
 		connection.get_connection()->broadcast_packet(packet);
 	}
 
-	if (!is_local_focus() && hasconnection){
-			bool has_connect = false;
-			while (true ){
-				if (connection.get_connection()->get_next_packet(packet)){
-					has_connect = true;
-					break;
-				}
+	if (!is_local_focus() && hasconnection) {
+		bool has_connect = false;
+		while (true) {
+			if (connection.get_connection()->get_next_packet(packet)) {
+				has_connect = true;
+				break;
+			}
 //				if (gs->game_settings().conntype == GameSettings::HOST)
 //					break;
-			}
-			if (has_connect){
-                bool output1 = true;
-				while (packet.body_length > 0){
-					GameAction action;
+		}
+		if (has_connect) {
+			bool output1 = true;
+			while (packet.body_length > 0) {
+				GameAction action;
 //				LANARTS_ASSERT(action.frame == gs->frame());
-					packet.get(action);                    
-                    if (output1 && action.frame != frame){
-                        printf("action frame %d vs %d\n", action.frame, frame);
-                        output1 = false;
-                    }
-					actions.push_front(action);
+				packet.get(action);
+				if (output1 && action.frame != frame) {
+					printf("action frame %d vs %d\n", action.frame, frame);
+					output1 = false;
 				}
+				actions.push_front(action);
 			}
+		}
 	}
-
 
 	isresting = false;
 	for (int i = 0; i < actions.size(); i++) {
@@ -285,11 +300,13 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 
 void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 	switch (action.act) {
-	case GameAction::MOVE_IN_DIRECTION:
-		return use_move_and_melee(gs, action);
-	case GameAction::SPELL:
+	case GameAction::MOVE:
+		return use_move(gs, action);
+	case GameAction::USE_WEAPON:
+		return use_weapon(gs, action);
+	case GameAction::USE_SPELL:
 		return use_spell(gs, action);
-	case GameAction::REST:
+	case GameAction::USE_REST:
 		return use_rest(gs, action);
 	case GameAction::USE_ENTRANCE:
 		return use_dngn_entrance(gs, action);
@@ -319,7 +336,7 @@ void PlayerInst::use_rest(GameState *gs, const GameAction& action) {
 		isresting = true;
 	}
 }
-void PlayerInst::use_move_and_melee(GameState* gs, const GameAction& action) {
+void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 	int dx = action.action_x;
 	int dy = action.action_y;
 
@@ -360,37 +377,38 @@ void PlayerInst::use_move_and_melee(GameState* gs, const GameAction& action) {
 		y += ddy;
 	}
 
-	if (ddx == 0 && ddy == 0) {
-		if (target && !stats().has_cooldown()) {
-			//int damage = effective_stats().melee.damage + gs->rng().rand(-4, 5);
-			WeaponType& wtype = game_weapon_data[weapon_type()];
-			int damage = effective_stats().calculate_melee_damage(gs->rng(),
-					weapon_type());
-			char buffstr[32];
-			snprintf(buffstr, 32, "%d", damage);
-			float rx, ry;
-			direction_towards(Pos(x, y), Pos(target->x, target->y), rx, ry,
-					0.5);
-			gs->add_instance(
-					new AnimatedInst(target->x - 5 + rx * 5,
-							target->y - 3 + rx * 5, -1, 25, rx, ry, buffstr));
-
-			if (target->hurt(gs, damage)) {
-				stats().gain_xp(target->xpworth());
-				snprintf(buffstr, 32, "%d XP", target->xpworth());
-				gs->add_instance(
-						new AnimatedInst(target->x - 5, target->y - 5, -1, 25,
-								0, 0, buffstr, Colour(255, 215, 11)));
-			}
-			stats().cooldown = wtype.cooldown;
-			//stats().reset_melee_cooldown(effective_stats());
-			int atksprite = game_weapon_data[weapon_type()].attack_sprite;
-			gs->add_instance(
-					new AnimatedInst(target->x, target->y, atksprite, 25));
-		}
-	} else {
-		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN / 4);
-	}
+	//Melee:
+//	if (ddx == 0 && ddy == 0) {
+//		if (target && !stats().has_cooldown()) {
+//			//int damage = effective_stats().melee.damage + gs->rng().rand(-4, 5);
+//			WeaponType& wtype = game_weapon_data[weapon_type()];
+//			int damage = effective_stats().calculate_melee_damage(gs->rng(),
+//					weapon_type());
+//			char buffstr[32];
+//			snprintf(buffstr, 32, "%d", damage);
+//			float rx, ry;
+//			direction_towards(Pos(x, y), Pos(target->x, target->y), rx, ry,
+//					0.5);
+//			gs->add_instance(
+//					new AnimatedInst(target->x - 5 + rx * 5,
+//							target->y - 3 + rx * 5, -1, 25, rx, ry, buffstr));
+//
+//			if (target->hurt(gs, damage)) {
+//				stats().gain_xp(target->xpworth());
+//				snprintf(buffstr, 32, "%d XP", target->xpworth());
+//				gs->add_instance(
+//						new AnimatedInst(target->x - 5, target->y - 5, -1, 25,
+//								0, 0, buffstr, Colour(255, 215, 11)));
+//			}
+//			stats().cooldown = wtype.cooldown;
+//			//stats().reset_melee_cooldown(effective_stats());
+//			int atksprite = game_weapon_data[weapon_type()].attack_sprite;
+//			gs->add_instance(
+//					new AnimatedInst(target->x, target->y, atksprite, 25));
+//		}
+//	} else {
+//		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN / 4);
+//	}
 }
 
 static int scan_entrance(const std::vector<GameLevelPortal>& portals,
@@ -487,6 +505,7 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 //}
 
 void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
+	if (action.use_id < 2 && stats().has_cooldown()) return;
 
 	if (action.use_id == 0) {
 		stats().mp -= 10;
@@ -530,4 +549,55 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	}
 
 	canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
+}
+
+void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
+	const int MAX_MELEE_HITS = 10;
+
+	if (stats().has_cooldown())
+		return;
+
+	WeaponType& weap = game_weapon_data[weapon];
+
+	int dx = action.action_x - x, dy = action.action_y - y;
+	float mag = sqrt(dx * dx + dy * dy);
+	if (mag == 0) mag = 1;
+	int ax = x + weap.range*dx/mag, ay = y + weap.range*dy/mag;
+
+	GameInst* enemies[MAX_MELEE_HITS];
+
+	int max_targets = std::min(MAX_MELEE_HITS, weap.max_targets);
+
+	int numhit = gs->object_radius_test(this, enemies, MAX_MELEE_HITS, enemy_hit, ax,
+			ay, weap.dmgradius);
+
+	for (int i = 0; i < numhit; i++) {
+		EnemyInst* e = (EnemyInst*) enemies[i];
+		//int damage = effective_stats().melee.damage + gs->rng().rand(-4, 5);
+		WeaponType& wtype = game_weapon_data[weapon_type()];
+		int damage = effective_stats().calculate_melee_damage(gs->rng(),
+				weapon_type());
+		char buffstr[32];
+		snprintf(buffstr, 32, "%d", damage);
+		float rx, ry;
+		direction_towards(Pos(x, y), Pos(e->x, e->y), rx, ry, 0.5);
+		gs->add_instance(
+				new AnimatedInst(e->x - 5 + rx * 5, e->y - 3 + rx * 5, -1, 25,
+						rx, ry, buffstr));
+
+		if (e->hurt(gs, damage)) {
+			stats().gain_xp(e->xpworth());
+			if ( is_local_focus() ){
+				snprintf(buffstr, 32, "%d XP", e->xpworth());
+				gs->add_instance(
+						new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0, buffstr,
+								Colour(255, 215, 11)));
+			}
+		}
+		stats().cooldown = wtype.cooldown;
+		//stats().reset_melee_cooldown(effective_stats());
+		int atksprite = game_weapon_data[weapon_type()].attack_sprite;
+		gs->add_instance(new AnimatedInst(e->x, e->y, atksprite, 25));
+
+	}
 }

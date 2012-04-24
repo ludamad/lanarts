@@ -58,6 +58,8 @@ void PlayerInst::step(GameState* gs) {
 		 view.center_on(last_x, last_y);
 }
 
+
+
 void PlayerInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
 	bool isclient = gs->game_settings().conntype == GameSettings::CLIENT;

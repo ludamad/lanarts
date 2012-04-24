@@ -9,6 +9,8 @@ Large:
 	-Performance hit reasonable
 
 Medium:
+- Fix melee attacks -> add to action bar and make them not based on running into enemies, instead holding j/mouse
+	- add attack rate to base stats -> agility
 - Add higher level sprite class that handles animation & orientation & multiple tile variations
 - Add in-game chat support for multiplayer
 - Support for double-sized enemies (2x2 tile size max)

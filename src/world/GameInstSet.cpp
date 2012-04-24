@@ -273,7 +273,7 @@ int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 		col_filterf f, int x, int y, int radius) {
 	int rad = radius == -1 ? obj->radius : radius;
 	x = x == -1 ? obj->x : x;
-	y = obj->y;
+	y = y == -1 ? obj->y : y;
 
 	int mingrid_x = (x - rad) / REGION_SIZE, mingrid_y = (y - rad)
 			/ REGION_SIZE;

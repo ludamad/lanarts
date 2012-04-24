@@ -27,11 +27,13 @@ void load_weapon_data(const char* filename) {
 			GenRange damage = parse_range(n["damage"]);
 			WeaponType entry(parse_cstr(n["weapon"]),
 					parse_defaulted(n, "projectile", 0),
+					parse_defaulted(n, "max_targets", 1),
 					damage.min,
 					damage.max,
 					parse_modifiers(n["modifiers"]),
-					parse_defaulted(n, "range", 25),
+					parse_defaulted(n, "range", 18),
 					parse_defaulted(n, "cooldown", 30),
+					parse_defaulted(n, "damage_area_radius", 3),
 					parse_sprite_number(n, "spr_weap"),
 					parse_sprite_number(n, "spr_attack"),
 					parse_defaulted(n, "proj_speed", 0));

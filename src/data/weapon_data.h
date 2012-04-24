@@ -29,20 +29,25 @@ struct StatModifier {
 struct WeaponType { //Currently for melee & ranged
 	const char* name;
 	bool projectile;
+	int max_targets;
 	int base_mindmg, base_maxdmg;
 	StatModifier damage_multiplier;
-	int range, cooldown;
+	int range, cooldown, dmgradius;
 	int weapon_sprite;
 	int attack_sprite;
 	int projectile_speed;
 
 
 
-	WeaponType(const char* name, bool projectile, int base_mindamage, int base_maxdamage, const StatModifier& dmgm, int range, int cooldown,
+	WeaponType(const char* name, bool projectile,
+			int max_targets,
+			int base_mindamage, int base_maxdamage, const StatModifier& dmgm, int range, int cooldown,
+			int dmgradius,
 			int weapon_spr, int attack_spr, int bspeed = 0) :
-			name(name), projectile(projectile),base_mindmg(base_mindamage),
-			base_maxdmg(base_maxdamage), damage_multiplier(dmgm), range(range), cooldown(cooldown),
-			weapon_sprite(weapon_spr), attack_sprite(attack_spr), projectile_speed(bspeed) {}
+			name(name), projectile(projectile),
+			max_targets(max_targets), base_mindmg(base_mindamage),
+			base_maxdmg(base_maxdamage), damage_multiplier(dmgm), range(range), dmgradius(dmgradius),
+			cooldown(cooldown), weapon_sprite(weapon_spr), attack_sprite(attack_spr), projectile_speed(bspeed) {}
 };
 
 extern std::vector<WeaponType> game_weapon_data;
