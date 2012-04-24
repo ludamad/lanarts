@@ -16,6 +16,7 @@
 GameWorld::GameWorld(GameState* gs, int width, int height) :
 		game_state(gs), w(width), h(height), next_room_id(-1) {
 	midstep = false;
+	lvl = NULL;
 }
 
 
@@ -55,16 +56,19 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, PlayerInst* inst){
 		inst->x = px;
 		inst->y = py;
 	}
-	if (game_state->game_settings().conntype == GameSettings::CLIENT){
-	game_state->add_instance(inst);
-	game_state->add_instance(new PlayerInst(c->starting_stats, px+TILE_SIZE,py, false));
-	} else {
-		inst->last_x += TILE_SIZE;
-		inst->x += TILE_SIZE;
-		game_state->add_instance(new PlayerInst(c->starting_stats, px,py, false));
-		game_state->add_instance(inst);
 
-	}
+	game_state->add_instance(inst);
+
+//	if (game_state->game_settings().conntype == GameSettings::CLIENT){
+//	game_state->add_instance(inst);
+//	game_state->add_instance(new PlayerInst(c->starting_stats, px+TILE_SIZE,py, false));
+//	} else {
+//		inst->last_x += TILE_SIZE;
+//		inst->x += TILE_SIZE;
+//		game_state->add_instance(new PlayerInst(c->starting_stats, px,py, false));
+//		game_state->add_instance(inst);
+//
+//	}
 }
 
 GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player_instances, size_t nplayers) {
@@ -73,7 +77,8 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player
 	}
 	if (!level_states[roomid]){
 		GameLevelState* currlvl = game_state->level();
-		game_state->level() = new GameLevelState(roomid, DNGN_MAIN_BRANCH, roomid, w,h);
+		GameLevelState* newlvl = new GameLevelState(roomid, DNGN_MAIN_BRANCH, roomid, w,h);
+		game_state->level() = newlvl;
 		level_states[roomid] = game_state->level();
 
 		DungeonBranch& mainbranch = game_dungeon_data[DNGN_MAIN_BRANCH];

@@ -1,12 +1,16 @@
 ---
 tilesets:
   - tileset: blue_tiles
-    floor_tile: blue_floor
+    floor_tile: [crystal_floor0, crystal_floor5]
     wall_tile: [brick_gray0,brick_gray3]
-    corridor_tile: [crystal_floor0, crystal_floor5]
+    corridor_tile: blue_floor
     alt_wall_tile: stone_wall
     alt_floor_tile: floor2
-    alt_corridor_tile: floor2
+    alt_corridor_tile: floor2  
+
+  - tileset: sand_tiles
+    floor_tile: [sand_rock0, sand_rock3]
+    wall_tile: [yellow_wall0, yellow_wall3]
 
   - tileset: pebble_tiles
     floor_tile: [pebble_brown0, pebble_brown8]

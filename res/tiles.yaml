@@ -58,4 +58,13 @@ tiles:
     variations: 14
     solid: 1
     extension: .png
+  - tile: sand_rock
+    spritefile: res/tiles/sandrockfloor/floor_sand_rock
+    variations: 4
+    extension: .png
+  
+  - tile: cobble_blood
+    spritefile: res/tiles/cobbleblood/cobble_blood
+    variations: 12
+    extension: .png
   

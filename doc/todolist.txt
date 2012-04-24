@@ -9,6 +9,7 @@ Large:
 	-Performance hit reasonable
 
 Medium:
+- Make game based on Strength/Defence/Agility and Magic/Resistance
 - Fix melee attacks -> add to action bar and make them not based on running into enemies, instead holding j/mouse
 	- add attack rate to base stats -> agility
 - Add higher level sprite class that handles animation & orientation & multiple tile variations
@@ -27,6 +28,7 @@ Medium:
 
 
 Small:
+- Add item use preconditions so items are not wasted when they cannot be used
 - Broadcast RNG seed & class information
 - Add a resting animation
 - Have a flexible portal system that indicates which level to connect to

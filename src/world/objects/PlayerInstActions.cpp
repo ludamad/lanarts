@@ -343,6 +343,7 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 	int dy = action.action_y;
 
 	float mag = effective_stats().movespeed;
+
 	float ddx = dx * mag;
 	float ddy = dy * mag;
 

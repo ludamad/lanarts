@@ -35,7 +35,7 @@ branches:
           width: [1,2]
           per_room: 5       
         features:
-          tileset: crystal_tiles
+          tileset: sand_tiles
           stairs_up: 0
           stairs_down: 5
         enemies:
@@ -73,7 +73,7 @@ branches:
           width: 1
           per_room: [5, 5]          
         features:
-          tileset: blue_tiles
+          tileset: crystal_tiles
           stairs_up: 5
           stairs_down: 3
         enemies:
@@ -171,6 +171,8 @@ branches:
               chance: 150
               group_chance: 33
               group_size: 2
+            - enemy: Hell Forged
+              chance: 5
           amount: 20
         features:
           tileset: pebble_tiles
@@ -220,9 +222,11 @@ branches:
               chance: 100
               group_chance: 33
               group_size: 2
+            - enemy: Hell Forged
+              chance: 5
           amount: 25
         features:
-          tileset: pebble_tiles
+          tileset: crystal_tiles
       #Level 5
       - size: [89, 89]
         items:
@@ -271,6 +275,8 @@ branches:
               chance: 50
               group_chance: 33
               group_size: 3
+            - enemy: Hell Forged
+              chance: 5
           amount: 25
         features:
           tileset: pebble_tiles
@@ -326,6 +332,8 @@ branches:
               group_size: 2
             - enemy: Grue
               chance: 30
+            - enemy: Hell Forged
+              chance: 10
           amount: 25
       #Level 7
       - size: [102, 102]
@@ -408,7 +416,7 @@ branches:
             - item: Defence Scroll
               chance: 7
         features:
-          tileset: pebble_tiles
+          tileset: crystal_tiles
         rooms:
           padding: 3
           amount: 90

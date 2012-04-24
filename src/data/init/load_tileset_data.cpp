@@ -33,10 +33,23 @@ static TilesetEntry parse_tilesetentry(const YAML::Node& node){
 	node["tileset"] >> name;
 	GenRange floor = parse_tile_range(node["floor_tile"]);
 	GenRange wall = parse_tile_range(node["wall_tile"]);
-	GenRange corridor = parse_tile_range(node["corridor_tile"]);
-	GenRange altfloor = parse_tile_range(node["alt_floor_tile"]);
-	GenRange altwall = parse_tile_range(node["alt_wall_tile"]);
-	GenRange altcorridor = parse_tile_range(node["alt_corridor_tile"]);
+
+	GenRange corridor = floor;
+	if (hasnode(node, "corridor_tile"))
+		corridor = parse_tile_range(node["corridor_tile"]);
+
+	GenRange altfloor = floor;
+	if (hasnode(node, "alt_floor_tile"))
+		altfloor = parse_tile_range(node["alt_floor_tile"]);
+
+	GenRange altwall = wall;
+	if (hasnode(node, "alt_wall_tile"))
+		altwall = parse_tile_range(node["alt_wall_tile"]);
+
+	GenRange altcorridor = corridor;
+	if (hasnode(node, "alt_corridor_tile"))
+		altcorridor = parse_tile_range(node["alt_corridor_tile"]);
+
 	return TilesetEntry(
 			name,
 			floor.min,floor.max,
