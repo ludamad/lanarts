@@ -285,7 +285,8 @@ void MonsterController::pre_step(GameState* gs) {
 		e->behaviour().step();
 
 
-		bool isvisible = gs->object_visible_test(e);
+        bool isvisible = gs->object_visible_test(e);
+        bool isvisibleToLocal = gs->object_visible_test(e);
 		bool go_after_player = false;
 
 		//Add live instances back to monster id list
@@ -306,6 +307,7 @@ void MonsterController::pre_step(GameState* gs) {
 			bool chasing = e->behaviour().current_action == EnemyBehaviour::CHASING_PLAYER;
 			if (view.within_view(xx, yy, w, h) && (chasing || isvisible)) {
 				e->behaviour().current_action = EnemyBehaviour::CHASING_PLAYER;
+                
 				int dx = e->x - player->x, dy = e->y - player->y;
 				int distsqr = dx * dx + dy * dy;
 				if (distsqr > 0 /*overflow check*/) {

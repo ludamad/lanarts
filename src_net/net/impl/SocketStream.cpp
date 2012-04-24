@@ -7,8 +7,8 @@ using namespace asio::ip;
 
 void socketstream_do_close(SocketStream* ss) {
 	if (!ss->is_closed()){
-//		ss->get_socket().close();
-//		ss->is_closed() = true;
+		ss->get_socket().close();
+		ss->is_closed() = true;
 	}
 }
 
@@ -31,7 +31,7 @@ void socketstream_read_header_handler(SocketStream* ss,
 //							asio::placeholders::error));
 //		}
 	} else {
-//		socketstream_do_close(ss);
+//         socketstream_do_close(ss);
 	}
 }
 
@@ -54,7 +54,7 @@ void socketstream_read_body_handler(SocketStream* ss,
 						asio::placeholders::error));
 
 	} else {
-//		socketstream_do_close(ss);
+//         socketstream_do_close(ss);
 	}
 }
 
@@ -75,7 +75,7 @@ void socketstream_write_handler(SocketStream* ss,
 		}
 		ss->get_wmutex().unlock();
 	} else {
-//		socketstream_do_close(ss);
+//         socketstream_do_close(ss);
 	}
 }
 

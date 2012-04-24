@@ -251,11 +251,17 @@ void PlayerInst::perform_io_action(GameState* gs) {
 
 	if (!is_local_focus() && hasconnection) {
 		bool has_connect = false;
+        int tries = 0;
 		while (true) {
 			if (connection.get_connection()->get_next_packet(packet)) {
+                
 				has_connect = true;
 				break;
-			}
+			} else if ((++tries)%3000 == 0){
+                if ( !gs->update_iostate() ) {
+                    exit(0);
+                }
+            }
 //				if (gs->game_settings().conntype == GameSettings::HOST)
 //					break;
 		}
