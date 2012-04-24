@@ -120,7 +120,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				int px = x, py = y;
 				x = rmx, y = rmy;
 				if (stats().mp >= 50 && !gs->solid_test(this)
-						&& gs->object_visible_test(this, this)) {
+						&& gs->object_visible_test(this)) {
 					actions.push_back(
 							GameAction(id, GameAction::USE_SPELL, frame, level, 2,
 									x, y));
@@ -238,7 +238,6 @@ void PlayerInst::perform_io_action(GameState* gs) {
 	GameNetConnection& connection = gs->net_connection();
 	bool hasconnection = connection.get_connection() != NULL;
 	NetPacket packet;
-	fflush(stdout);
 
 	if (is_local_focus() && hasconnection) {
 		for (int i = 0; i < actions.size(); i++) {
@@ -512,7 +511,7 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 //}
 
 void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
-	if (action.use_id < 2 && stats().has_cooldown()) return;
+    if (action.use_id < 2 && stats().has_cooldown()) return;
 
 	if (action.use_id == 0) {
 		stats().mp -= 10;
