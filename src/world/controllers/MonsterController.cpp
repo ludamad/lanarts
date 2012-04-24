@@ -218,48 +218,10 @@ void MonsterController::pre_step(GameState* gs) {
 			player_simids[i] = simulator->addAgent(RVO::Vector2(p->x, p->y), 0, 10, 0.0f, 0.0f, p->radius, 0);
 		}
 	}
-//		must_initialize = !must_initialize;
-//		std::vector<RVO::Vector2> vertices;
-//		vertices.resize(4);
-//		int walls = 0;
-//		GameTiles& tiles = gs->tile_grid();
-//		for (int y = 0; y < tiles.tile_height(); y++){
-//			for (int x = 0; x < tiles.tile_width(); x++){
-//				bool is_near_nonsolid = false;
-//				for (int dy = -1; dy <= +1; dy++){
-//					for (int dx = -1; dx <= +1; dx++){
-//						int tx = x + dx;
-//						int ty = y + dy;
-//						if (tx < 0 || tx >= tiles.tile_width()) continue;
-//						if (ty < 0 || ty >= tiles.tile_height()) continue;
-//						if (!game_tile_data[tiles.get(tx,ty)].solid){
-//							is_near_nonsolid = true;
-//						}
-//					}
-//				}
-//				if (is_near_nonsolid && game_tile_data[tiles.get(x,y)].solid ){
-//					walls++;
-//					int xx = x*TILE_SIZE, yy = y*TILE_SIZE;
-//					vertices[0] = RVO::Vector2(xx,yy+TILE_SIZE);
-//					vertices[1] = RVO::Vector2(xx,yy);
-//					vertices[2] = RVO::Vector2(xx+TILE_SIZE,yy);
-//					vertices[3] = RVO::Vector2(xx+TILE_SIZE,yy+TILE_SIZE);
-//					simulator->addObstacle(vertices);
-//				}
-//			}
-//		}
-//		simulator->processObstacles();
-//	}
 
+	GameInst* local_player = gs->get_instance(gs->local_playerid());
 	std::vector<EnemyOfInterest> eois;
-//	if (room_paths.empty()){
-//		std::vector<Room> rooms = gs->level()->rooms;
-//		room_paths = std::vector<PathInfo>( rooms.size());
-//		for (int i = 0; i < room_paths.size(); i++){
-//			Region& r = rooms[i].room_region;
-//			room_paths[i].calculate_path(gs, (r.x+r.w/2)*TILE_SIZE, (r.y+r.h/2)*TILE_SIZE, PATHING_RADIUS);
-//		}
-//	}
+
 	//Create as many paths as there are players
 	paths.resize(pids.size());
 	for (int i = 0; i < pids.size(); i++) {
@@ -286,14 +248,14 @@ void MonsterController::pre_step(GameState* gs) {
 
 
         bool isvisible = gs->object_visible_test(e);
-        bool isvisibleToLocal = gs->object_visible_test(e);
+        bool isvisibleToLocal = gs->object_visible_test(e, local_player);
 		bool go_after_player = false;
 
 		//Add live instances back to monster id list
 		mids.push_back(mids2[i]);
 
-		if (isvisible && !targetted) targetted = e->id;
-		if (!isvisible && targetted == e->id) targetted = 0;
+		if (isvisibleToLocal && !targetted) targetted = e->id;
+		if (!isvisibleToLocal && targetted == e->id) targetted = 0;
 
 		//Determine which players we are currently in view of
 		int xx = e->x - e->radius, yy = e->y - e->radius;

@@ -137,10 +137,6 @@ public:
 	MTwist& rng() {
 		return mtwist;
 	}
-	void set_generate_flag() {
-		gennextstep = true;
-	}
-
 	void level_move(int id, int x, int y, int roomid1, int roomid2);
 
 	GameSettings& game_settings(){
@@ -162,7 +158,6 @@ private:
 	int world_width, world_height;
 
 	int frame_n;
-	bool gennextstep;
 
 	GameNetConnection connection;
 	GameLevelState* lvl;

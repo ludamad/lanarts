@@ -107,8 +107,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 									spellselect, target->x, target->y));
 				} else {
 					if (target && !stats().has_cooldown() && stats().mp >= mpcost
-							&& !gs->solid_test(this)
-							&& gs->object_visible_test(this, this)) {
+							&& gs->object_visible_test(target, this)) {
 						actions.push_back(
 								GameAction(id, GameAction::USE_SPELL, frame, level,
 										spellselect, target->x, target->y));
@@ -136,9 +135,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 					actions.push_back(
 							GameAction(id, GameAction::USE_WEAPON, frame, level,
 									spellselect, rmx, rmy));
-				} else if (!stats().has_cooldown() && stats().mp >= mpcost
-						&& !gs->solid_test(this)
-						&& gs->object_visible_test(this)) {
+				} else if (!stats().has_cooldown() && stats().mp >= mpcost) {
 					actions.push_back(
 							GameAction(id, GameAction::USE_SPELL, frame, level,
 									spellselect, rmx, rmy));
