@@ -100,9 +100,7 @@ void GameTiles::post_draw(GameState* gs) {
 					}
 				}
 			}
-
-			//				if (&f != &mainfov) continue;
-
+			
 			//Do not draw black if we have a match, and we see a wall
 			if (!has_match) {
 				if (!is_other_match){
@@ -120,51 +118,11 @@ void GameTiles::post_draw(GameState* gs) {
 							Colour(0, 0, 0, 60));
 				}
 			}
-			//			else if (has_match && has_free && tile != 1) {
-			//				gl_draw_rectangle_parts(x * TILE_SIZE - view.x,
-			//						y * TILE_SIZE - view.y, img->width, img->height, 2,
-			//						matches);
-			//			}
 		}
 	}
 
 }
-/*
- void GameTiles::generate_tiles(MTwist& mt, GeneratedLevel& level) {
- int lw = level.width(), lh = level.height();
- int start_x = (width-lw)/2;
- int start_y = (height-lh)/2;
- int end_x = start_x + lw, end_y = start_y + lh;
 
- memset(tiles, 0, width * height * sizeof(int));
- memset(seen_tiles, 0, width * height);
-
- for (int y = start_y; y < end_y; y++) {
- for (int x = start_x; x < end_x; x++) {
- int ind = y*width+x;
- Sqr& s = level.at(x-start_x, y-start_y);
- if (s.passable) {
- tiles[ind] = TILE_FLOOR;
- if (s.roomID){
- //					if (s.marking)
- if (mt.rand(150) == 0){
- tiles[ind] = TILE_STAIR_DOWN;
- }
- // 					tiles[ind] = TILE_MESH_0+s.marking;
- } else if (s.feature == SMALL_CORRIDOR){
- tiles[ind] = TILE_CORRIDOR_FLOOR;
- }
- } else {
- tiles[ind] = TILE_WALL;
- if (s.feature == SMALL_CORRIDOR){
- if (mt.rand(4) == 0){
- tiles[ind] = TILE_STONE_WALL;
- }
- }
- }
- }
- }
- }*/
 GameTiles::GameTiles(int width, int height) :
 		width(width), height(height) {
 	seen_tiles = new char[width * height];

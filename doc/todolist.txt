@@ -7,8 +7,16 @@ Large:
 	-May need two pathfinds per monster
 	-More if we support double-sized enemies
 	-Performance hit reasonable
+- Improve room generation with more patterns & room connectivity tests
+- Add doors and other dungeon features such as keys etc
 
 Medium:
+- Specify a draw order (or draw & execution order) for objects based on a depth parameter & object id
+	- Binary tree ? Binary tree with ~ 100 elements not tooo bad.
+	- Difficulty to imagine better ordering structure 
+	- Can keep binary tree of inst state pointers for efficiency 
+		-> optimize for depth bins & not many objects with different depths, adds nearly no overhead
+		-> Keep another doubly linked list in the internal structure that points to next highest ID object of same depth
 - Make game based on Strength/Defence/Agility and Magic/Resistance
 - Fix melee attacks -> add to action bar and make them not based on running into enemies, instead holding j/mouse
 	- add attack rate to base stats -> agility
