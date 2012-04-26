@@ -1,8 +1,7 @@
 /*
  * GameTiles.h
- *
- *  Created on: 2011-10-27
- *      Author: 100397561
+ * Part of GameLevelState.
+ * Handles drawing of the tiles of the game, drawing of the fog-of-war, storage of tile information for a level
  */
 
 #ifndef GAMETILES_H_
