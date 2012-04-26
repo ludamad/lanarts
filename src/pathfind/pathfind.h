@@ -8,6 +8,7 @@
 #ifndef PATHFIND_H_
 #define PATHFIND_H_
 #include "../procedural/mtwist.h"
+#include "../util/game_basic_structs.h"
 #include <vector>
 
 class GameState;
@@ -51,6 +52,9 @@ public:
 	void calculate_path(GameState* gs, int ox, int oy, int radius);
 	//Towards object
 	void interpolated_direction(int x, int y, int w, int h, float speed, float& vx, float& vy);
+	void interpolated_direction(const BBox& bbox, float speed, float& vx, float& vy){
+		interpolated_direction(bbox.x1, bbox.y1, bbox.width(), bbox.height(), speed, vx, vy);
+	}
 	//Away from object
 	void random_further_direction(MTwist& mt, int x, int y, int w, int h, float speed, float& vx, float& vy);
 	PathingNode* get(int x, int y) { return &path[alloc_w*y+x]; }

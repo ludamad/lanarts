@@ -56,6 +56,8 @@ struct Stats {
 
 	bool hurt(int dmg);
 
+	void heal_fully();
+
 	int calculate_melee_damage(MTwist& mt, int weapon_type);
 	int calculate_spell_damage(MTwist& mt, int spell_type);
 	void gain_level();
@@ -64,5 +66,8 @@ struct Stats {
 	void raise_hp(float hpgain);
 	void raise_mp(float mpgain);
 };
+
+
+
 
 #endif /* STATS_H_ */

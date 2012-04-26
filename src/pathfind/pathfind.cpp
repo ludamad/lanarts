@@ -11,7 +11,7 @@
 #include "../data/tile_data.h"
 #include "../world/GameState.h"
 #include "../util/draw_util.h"
-#include "../display/display.h"//for power_of_two
+#include "../util/math_util.h"
 
 using namespace std;
 
@@ -101,11 +101,6 @@ void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
 	floodfill(path, w, h, tx, ty, alloc_w);
 	path_x = tx, path_y = ty;
 }
-
-static int squish(int a, int b, int c) {
-	return std::min(std::max(a, b), c - 1);
-}
-
 
 bool PathInfo::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
 		int dy) {

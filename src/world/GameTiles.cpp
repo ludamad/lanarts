@@ -32,7 +32,7 @@ void GameTiles::pre_draw(GameState* gs) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
 			int tile = tiles[y * width + x];
 			GLImage* img = &game_tile_data[tile].img;
-			image_display(img, x * TILE_SIZE - view.x, y * TILE_SIZE - view.y);
+			gl_draw_image(img, x * TILE_SIZE - view.x, y * TILE_SIZE - view.y);
 		}
 	}
 

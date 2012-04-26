@@ -5,17 +5,23 @@
  *      Author: 100397561
  */
 
-#include <cmath>
-#include "MonsterController.h"
-#include "PlayerController.h"
-#include "../objects/EnemyInst.h"
-#include "../objects/PlayerInst.h"
-#include "../GameState.h"
 #include <algorithm>
-#include "../../util/draw_util.h"
-#include "../../data/tile_data.h"
+#include <cmath>
 
 #include <rvo2/RVO.h>
+
+#include "../GameState.h"
+#include "MonsterController.h"
+#include "PlayerController.h"
+
+#include "../objects/EnemyInst.h"
+#include "../objects/PlayerInst.h"
+
+#include "../../util/draw_util.h"
+#include "../../util/collision_util.h"
+
+#include "../../data/tile_data.h"
+
 
 const int PATHING_RADIUS = 500;
 const int HUGE_DISTANCE = 1000000;
@@ -85,11 +91,11 @@ void set_preferred_velocity(GameState* gs, RVO::RVOSimulator* sim, EnemyInst* e)
 	/*
 	 * Perturb a little to avoid deadlocks due to perfect symmetry.
 	 */
-//	float angle = gs->rng().rand(3600) / 3600.0 * 2.0f * M_PI;
-//	float dist =  gs->rng().rand(10000) / 10000.0 * 0.0001f;
-//
-//	goalVector += dist * RVO::Vector2(std::cos(angle), std::sin(angle));
-//
+	float angle = gs->rng().rand(3600) / 3600.0 * 2.0f * M_PI;
+	float dist =  gs->rng().rand(10000) / 10000.0 * 0.0001f;
+
+	goalVector += dist * RVO::Vector2(std::cos(angle), std::sin(angle));
+
 	sim->setAgentPrefVelocity(eb.simulation_id, goalVector);
 }
 
@@ -142,40 +148,30 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	} while (eb.path.size() <= 1);
 }
 
-static bool enemy_hit(GameInst* self, GameInst* other){
-	return dynamic_cast<EnemyInst*>(other) != NULL;
-}
-
 void MonsterController::set_monster_headings(GameState* gs, std::vector<EnemyOfInterest>& eois) {
 	//Use a temporary 'GameView' object to make use of its helper methods
 	PlayerController& pc = gs->player_controller();
 	for (int i = 0; i < eois.size(); i++) {
 		EnemyInst* e = eois[i].e;
 		int pind = eois[i].closest_player_index;
-		GameInst* player = gs->get_instance(pc.player_ids()[pind]);
+		GameInst* p = gs->get_instance(pc.player_ids()[pind]);
 		EnemyBehaviour& eb = e->behaviour();
-
-		int xx = e->x - e->radius, yy = e->y - e->radius;
-		int w = e->radius * 2, h = e->radius * 2;
-		int pdist = eois[i].dist_to_player_sqr;
 
 		eb.current_action = EnemyBehaviour::CHASING_PLAYER;
 		eb.path.clear();
 		eb.action_timeout = 200;
-		//paths[pind].adjust_for_claims(e->x, e->y);
-		paths[pind]->interpolated_direction(xx, yy, w, h, eb.speed, eb.vx, eb.vy);
+		paths[pind]->interpolated_direction(e->bbox(), eb.speed, eb.vx, eb.vy);
 
-	//	paths[pind].stake_claim(e->x, e->y);
 		//Compare position to player object
-		double abs = sqrt(pdist);
+		double abs = sqrt((e->x-p->x)*(e->x-p->x)+(e->y-p->y)*(e->y-p->y));
 		Stats& s = e->stats();
 
-		if (abs < e->radius + player->radius || (s.ranged.canuse && abs < e->radius*2 + player->radius ))
+		if (abs < e->radius + p->radius || (s.ranged.canuse && abs < e->radius*2 + p->radius ))
 			eb.vx = 0, eb.vy = 0;
 		if ( s.melee.canuse && abs < s.melee.range + e->radius ){
-			e->attack(gs, player, false);
+			e->attack(gs, p, false);
 		} else if ( s.ranged.canuse && abs < s.ranged.range+ 10 ){
-			e->attack(gs, player, true);
+			e->attack(gs, p, true);
 		}
 	}
 }
@@ -205,11 +201,38 @@ void MonsterController::shift_target(GameState* gs){
 
 }
 
-
-void MonsterController::pre_step(GameState* gs) {
-	//Use a temporary 'GameView' object to make use of its helper methods
+int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e){
+	//Use a 'GameView' object to make use of its helper methods
 	GameView view(0, 0, PATHING_RADIUS * 2, PATHING_RADIUS * 2, gs->width(),
 			gs->height());
+
+	const std::vector<obj_id>& pids = gs->player_controller().player_ids();
+	//Determine which players we are currently in view of
+	BBox ebox = e->bbox();
+	int mindistsqr = HUGE_DISTANCE;
+	int closest_player_index = -1;
+	for (int i = 0; i < pids.size(); i++) {
+		GameInst* player = gs->get_instance(pids[i]);
+		bool isvisible = gs->object_visible_test(e, player);
+		if (isvisible) ((PlayerInst*)player)->rest_cooldown() = 150;
+		view.sharp_center_on(player->x, player->y);
+		bool chasing = e->behaviour().current_action == EnemyBehaviour::CHASING_PLAYER;
+		if (view.within_view(ebox) && (chasing || isvisible)) {
+			e->behaviour().current_action = EnemyBehaviour::CHASING_PLAYER;
+
+			int dx = e->x - player->x, dy = e->y - player->y;
+			int distsqr = dx * dx + dy * dy;
+			if (distsqr > 0 /*overflow check*/) {
+				if (distsqr < mindistsqr) {
+					mindistsqr = distsqr;
+					closest_player_index = i;
+				}
+			}
+		}
+	}
+	return closest_player_index;
+}
+void MonsterController::process_players(GameState* gs){
 	const std::vector<obj_id>& pids = gs->player_controller().player_ids();
 	if (pids.size() > player_simids.size()){
 		player_simids.resize(pids.size());
@@ -219,9 +242,6 @@ void MonsterController::pre_step(GameState* gs) {
 		}
 	}
 
-	GameInst* local_player = gs->get_instance(gs->local_playerid());
-	std::vector<EnemyOfInterest> eois;
-
 	//Create as many paths as there are players
 	paths.resize(pids.size());
 	for (int i = 0; i < pids.size(); i++) {
@@ -230,6 +250,15 @@ void MonsterController::pre_step(GameState* gs) {
 			paths[i] = new PathInfo;
 		paths[i]->calculate_path(gs, player->x, player->y, PATHING_RADIUS);
 	}
+}
+
+
+void MonsterController::pre_step(GameState* gs) {
+
+	GameInst* local_player = gs->get_instance(gs->local_playerid());
+	std::vector<EnemyOfInterest> eois;
+
+	process_players(gs);
 
 	//Make sure targetted object is alive
 	if (targetted && !gs->get_instance(targetted)){
@@ -246,77 +275,46 @@ void MonsterController::pre_step(GameState* gs) {
 			continue;
 		e->behaviour().step();
 
-
-        bool isvisible = gs->object_visible_test(e);
         bool isvisibleToLocal = gs->object_visible_test(e, local_player);
-		bool go_after_player = false;
+        if (isvisibleToLocal && !targetted) targetted = e->id;
+		if (!isvisibleToLocal && targetted == e->id) targetted = 0;
 
 		//Add live instances back to monster id list
 		mids.push_back(mids2[i]);
 
-		if (isvisibleToLocal && !targetted) targetted = e->id;
-		if (!isvisibleToLocal && targetted == e->id) targetted = 0;
+		int closest_player_index = find_player_to_target(gs, e);
 
-		//Determine which players we are currently in view of
-		int xx = e->x - e->radius, yy = e->y - e->radius;
-		int w = e->radius * 2, h = e->radius * 2;
-		int mindistsqr = HUGE_DISTANCE;
-		int closest_player_index = -1;
-		for (int i = 0; i < pids.size(); i++) {
-			GameInst* player = gs->get_instance(pids[i]);
-			if (isvisible) ((PlayerInst*)player)->rest_cooldown() = 150;
-			view.sharp_center_on(player->x, player->y);
-			bool chasing = e->behaviour().current_action == EnemyBehaviour::CHASING_PLAYER;
-			if (view.within_view(xx, yy, w, h) && (chasing || isvisible)) {
-				e->behaviour().current_action = EnemyBehaviour::CHASING_PLAYER;
-                
-				int dx = e->x - player->x, dy = e->y - player->y;
-				int distsqr = dx * dx + dy * dy;
-				if (distsqr > 0 /*overflow check*/) {
-					if (distsqr < mindistsqr) {
-						mindistsqr = distsqr;
-						closest_player_index = i;
-					}
-				}
-			}
-		}
 		if (closest_player_index == -1 &&
 				e->behaviour().current_action == EnemyBehaviour::CHASING_PLAYER)
 			e->behaviour().current_action = EnemyBehaviour::INACTIVE;
 
 
 		if (e->behaviour().current_action == EnemyBehaviour::CHASING_PLAYER)
-			eois.push_back(EnemyOfInterest(e, closest_player_index, mindistsqr));
+			eois.push_back(EnemyOfInterest(e, closest_player_index));
 		else if (e->behaviour().current_action == EnemyBehaviour::INACTIVE)
 			monster_wandering(gs, e);
-		else if (e->behaviour().current_action == EnemyBehaviour::FOLLOWING_PATH)
+		else //if (e->behaviour().current_action == EnemyBehaviour::FOLLOWING_PATH)
 			monster_follow_path(gs, e);
-	//	else
-	//		monster_wandering(gs, e);
 	}
-	//std::sort(eois.begin(), eois.end());
 	set_monster_headings(gs, eois);
-	//for (int i = 0; i < 4; i++)
 
+	//Handle necessary upkeep of player related information, such as paths to player
+	const std::vector<obj_id>& pids = gs->player_controller().player_ids();
 	for (int i = 0; i < pids.size(); i++){
 		PlayerInst* p = (PlayerInst*)gs->get_instance(gs->player_controller().player_ids()[i]);
 		simulator->setAgentPosition(player_simids[i], RVO::Vector2(p->x, p->y));
 	}
 
-	for (int i = 0; i < mids2.size(); i++) {
-		EnemyInst* e = (EnemyInst*) gs->get_instance(mids2[i]);
-		if (e == NULL)
-			continue;
+	for (int i = 0; i < mids.size(); i++) {
+		EnemyInst* e = (EnemyInst*) gs->get_instance(mids[i]);
 		update_velocity(gs, e);
 		set_preferred_velocity(gs, simulator, e);
 	}
 
 	simulator->doStep();
 
-	for (int i = 0; i < mids2.size(); i++) {
-		EnemyInst* e = (EnemyInst*) gs->get_instance(mids2[i]);
-		if (e == NULL)
-			continue;
+	for (int i = 0; i < mids.size(); i++) {
+		EnemyInst* e = (EnemyInst*) gs->get_instance(mids[i]);
 		update_position(gs, e);
 	}
 }
@@ -341,8 +339,7 @@ void MonsterController::update_position(GameState* gs, EnemyInst* e){
 	float ux = updated.x(), uy = updated.y();
 	float dx = ux - e->rx, dy = uy - e->ry;
 	float dist = sqrt(dx*dx+dy*dy);
-//	float mag = sqrt(eb.vx*eb.vx + eb.vy*eb.vy);
-//	bool less_significantly = dist <= mag*.99f;
+
 	bool collided = gs->tile_radius_test(round(ux), round(uy), /*e->radius+4*/20);
 	int neighbours = simulator->getAgentNumAgentNeighbors(eb.simulation_id);
 
@@ -350,24 +347,23 @@ void MonsterController::update_position(GameState* gs, EnemyInst* e){
 		e->rx = ux;
 		e->ry = uy;
 	} else {
-
 		float nx = round(e->rx+eb.vx), ny = round(e->ry+eb.vy);
 		bool collided = gs->tile_radius_test(nx, ny, e->radius);
 		if (collided){
-//			bool hitsx = gs->tile_radius_test(nx, e->y, e->radius, true, -1);
-//			bool hitsy = gs->tile_radius_test(e->x, ny, e->radius, true, -1);
-//			if(hitsy || hitsx || collided){
-//				if (hitsx) {
-//					eb.vx = -eb.vx;
-//				}
-//				if (hitsy) {
-//					eb.vy = -eb.vy;
-//				}
-//				if (!hitsy && !hitsx) {
+			bool hitsx = gs->tile_radius_test(nx, e->y, e->radius, true, -1);
+			bool hitsy = gs->tile_radius_test(e->x, ny, e->radius, true, -1);
+			if(hitsy || hitsx || collided){
+				if (hitsx) {
+					eb.vx = 0;
+				}
+				if (hitsy) {
+					eb.vy = 0;
+				}
+				if (!hitsy && !hitsx) {
 					eb.vx = -eb.vx;
 					eb.vy = -eb.vy;
-//				}
-//			}
+				}
+			}
 		}
 		e->rx += eb.vx;
 		e->ry += eb.vy;
@@ -391,19 +387,3 @@ void MonsterController::clear(){
 	paths.clear();
 	mids.clear();
 }
-
-
-//		//Monster repositioning
-//		if (isvisible)
-//			e->last_seen() = gs->rng().rand(300);
-//		else
-//			e->last_seen()++;
-//		if (e->last_seen() > 2500 && gs->rng().rand(500) == 0) {
-//			do {
-//				e->x = gs->rng().rand(32, gs->width()-32);
-//				e->y = gs->rng().rand(32, gs->height()-32);
-//			}while (gs->solid_test(e) || gs->object_visible_test(e));
-//			e->rx = e->x, e->ry = e->y;
-//			e->last_seen() = gs->rng().rand(300);
-//			go_after_player = gs->rng().rand(4) == 0;
-//		}

@@ -1,10 +1,7 @@
 /*
  * levelgen.h
- *
- *  Created on: Mar 19, 2012
- *      Author: 100397561
+ *  Defines parameters for level & room generation as well as the generate_level & generate_rooms functions
  */
-
 #ifndef LEVELGEN_H_
 #define LEVELGEN_H_
 

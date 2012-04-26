@@ -1,15 +1,7 @@
-/*
- * UnitSet.h
- *
- *  Created on: Jun 28, 2011
- *      Author: 100397561
- */
+#ifndef GAMEINSTSET_H_
+#define GAMEINSTSET_H_
 
-#ifndef UNITSET_H_
-#define UNITSET_H_
-
-#include "../util/settools.h"
-#include "../util/geometry.h"
+#include "../util/game_basic_structs.h"
 #include "objects/GameInst.h"
 #include <vector>
 
@@ -71,4 +63,4 @@ private:
 	int* unit_grid;
 };
 
-#endif /* UNITSET_H_ */
+#endif /* GAMEINSTSET_H_ */

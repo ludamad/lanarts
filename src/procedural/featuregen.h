@@ -1,8 +1,7 @@
 /*
  * featuregen.h
- *
- *  Created on: Mar 19, 2012
- *      Author: 100397561
+ *  Defines parameters for feature generation (eg tile generation, staircase placement),
+ *  as well as the generate_features function
  */
 
 #ifndef FEATUREGEN_H_

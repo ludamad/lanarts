@@ -1,8 +1,6 @@
 /*
  * MonsterController.h
- *
- *  Created on: Feb 20, 2012
- *      Author: 100397561
+ *  Centralized location of all pathing decisions of monsters, with collision avoidance
  */
 
 #ifndef MONSTERCONTROLLER_H_
@@ -18,12 +16,8 @@
 struct EnemyOfInterest {
 	EnemyInst* e;
 	int closest_player_index;
-	int dist_to_player_sqr;
-	EnemyOfInterest(EnemyInst* e, int player_index, int distsqr) :
-			e(e), closest_player_index(player_index), dist_to_player_sqr(distsqr) {
-	}
-	bool operator<(const EnemyOfInterest& eoi) const {
-		return dist_to_player_sqr < eoi.dist_to_player_sqr;
+	EnemyOfInterest(EnemyInst* e, int player_index) :
+			e(e), closest_player_index(player_index){
 	}
 };
 
@@ -54,11 +48,16 @@ public:
     	paths.resize(size, NULL);
 
     }
+    obj_id current_target(){ return targetted; }
     void clear();
-public:
+private:
+
     void set_monster_headings(GameState *gs, std::vector<EnemyOfInterest> & eois);
     void update_position(GameState* gs, EnemyInst* e);
     void update_velocity(GameState* gs, EnemyInst* e);
+    /*returns an index into the player_simids vector*/
+    int find_player_to_target(GameState* gs, EnemyInst* e);
+    void process_players(GameState* gs);
     void monster_wandering(GameState *gs, EnemyInst *e);
     void monster_follow_path(GameState *gs, EnemyInst *e);
     void monster_get_to_stairs(GameState *gs, EnemyInst *e);

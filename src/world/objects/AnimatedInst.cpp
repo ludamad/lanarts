@@ -35,7 +35,7 @@ void AnimatedInst::draw(GameState* gs){
 			return;
 
 		Colour alphacol(255,255,255, 255*timeleft/animatetime);
-		image_display(&img, xx - view.x, yy - view.y, alphacol);
+		gl_draw_image(&img, xx - view.x, yy - view.y, alphacol);
 	}
 	Colour wd(255 - textcol.r, 255 -textcol.g, 255 - textcol.b);
 	if (text.size() > 0){

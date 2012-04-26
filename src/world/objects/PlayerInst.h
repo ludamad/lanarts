@@ -1,3 +1,8 @@
+/* PlayerInst.h:
+ *  Represents a player of the game, in a networked game there can be many, only one of
+ *  which is the 'local' player
+ */
+
 #ifndef PLAYERINST_H_
 #define PLAYERINST_H_
 
@@ -61,7 +66,8 @@ public:
 	int& weapon_type(){
 		return weapon;
 	}
-	//Is it player of focus ?
+
+	//Is this the local player?
 	bool is_local_focus(){
 		return local;
 	}

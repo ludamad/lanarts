@@ -1,7 +1,6 @@
 /*
  * PlayerController.h
  *	Handles network communication of player coordinates, creates input actions for player objects.
- *  TODO: Implement action system, currently players directly respond to keyboard commands.
  */
 
 #ifndef PLAYERCONTROLLER_H_

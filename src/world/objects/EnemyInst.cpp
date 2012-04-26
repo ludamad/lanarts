@@ -1,13 +1,14 @@
 #include <cmath>
 #include "AnimatedInst.h"
-#include "BulletInst.h"
+#include "ProjectileInst.h"
 #include "EnemyInst.h"
 #include "PlayerInst.h"
 #include "../GameState.h"
 #include "../../util/draw_util.h"
+#include "../../util/math_util.h"
+#include "../../util/collision_util.h"
 #include "../../data/sprite_data.h"
 #include "../../data/enemy_data.h"
-#include "../../util/geometry.h"
 
 EnemyInst::EnemyInst(int enemytype, int x, int y) :
 	GameInst(x,y, game_enemy_data[enemytype].radius),
@@ -25,9 +26,6 @@ EnemyType* EnemyInst::etype(){
 	return &game_enemy_data[enemytype];
 }
 
-static bool enemy_hit(GameInst* self, GameInst* other) {
-	return dynamic_cast<EnemyInst*>(other) != NULL;
-}
 
 void EnemyInst::init(GameState* gs) {
 	MonsterController& mc = gs->monster_controller();
@@ -54,7 +52,7 @@ void EnemyInst::init(GameState* gs) {
 void EnemyInst::step(GameState* gs) {
 	bool firstcol = true;
 	GameInst* collided = NULL;
-	gs->object_radius_test(this, &collided, 1, &enemy_hit);
+	gs->object_radius_test(this, &collided, 1, &enemy_colfilter);
 	/*if (!collided){
 		gs->object_radius_test(this, &collided, 1, &enemy_hit, x + eb.vx, y + eb.vy);
 		firstcol = false;
@@ -82,10 +80,10 @@ void EnemyInst::draw(GameState* gs) {
 	if (stats().hurt_cooldown > 0){
 		float s = 1 - stats().hurt_alpha();
 		Colour red(255,255*s,255*s);
-		image_display(&img, xx - view.x, yy - view.y, red);
+		gl_draw_image(&img, xx - view.x, yy - view.y, red);
 	}
 	else{
-		image_display(&img, xx - view.x, yy - view.y);
+		gl_draw_image(&img, xx - view.x, yy - view.y);
 //		if (gs->solid_test(this)){
 //		Colour red(255,0,0);
 //		image_display(&img, xx - view.x, yy - view.y,red);
@@ -106,7 +104,7 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 			Pos p(pinst->x, pinst->y);
 			p.x += gs->rng().rand(-12,+13);
 			p.y += gs->rng().rand(-12,+13);
-			GameInst* bullet = new BulletInst(id, ranged, x,y,p.x, p.y);
+			GameInst* bullet = new ProjectileInst(id, ranged, x,y,p.x, p.y);
 			gs->add_instance(bullet);
 			stats().reset_ranged_cooldown();
 			stats().cooldown += gs->rng().rand(-4,5);

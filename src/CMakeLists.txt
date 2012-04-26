@@ -48,6 +48,7 @@ set( lanarts_src
 	procedural/mtwist.cpp
 	procedural/tunnelgen.cpp
 	
+	util/collision_util.cpp
 	util/draw_util.cpp
 	util/font_util.cpp
 	
@@ -112,11 +113,13 @@ set( lanarts_include
 	procedural/itemgen.h
 	procedural/levelgen.h
 	procedural/mtwist.h
-	procedural/pathfind.h
 	procedural/tunnelgen.h
 	
+	util/collision_util.h
 	util/draw_util.h
 	util/font_util.h
+	util/game_basic_structs.h
+	util/settools.h
 	
 	world/net/GameNetConnection.h
 

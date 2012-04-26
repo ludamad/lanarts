@@ -1,6 +1,6 @@
 /*
  * GeneratedLevel.h
- * 	Utility class for room generation functions
+ * 	Utility class for room generation functions, stores generated room state & where the rooms are located
  */
 
 #ifndef GENERATEDLEVEL_H_
@@ -8,7 +8,7 @@
 #include <cstring>
 #include <vector>
 #include "mtwist.h"
-#include "../util/geometry.h"
+#include "../util/game_basic_structs.h"
 
 enum feature_t {
 	UNSET = 0,

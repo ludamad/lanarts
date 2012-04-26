@@ -1,8 +1,6 @@
 /*
  * itemgen.h
- *
- *  Created on: Mar 19, 2012
- *      Author: 100397561
+ *  Defines parameters for item generation as well as the generate_items function
  */
 
 #ifndef ITEMGEN_H_

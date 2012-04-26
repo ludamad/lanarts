@@ -1,17 +1,20 @@
 /*
  * PlayerInstActions.cpp
- *
- *  Created on: Mar 28, 2012
- *      Author: 100397561
+ *  Implements the various actions that the player can perform, handles keyboard & mouse IO
+ *  as well as networking communication of actions
  */
 
 #include "PlayerInst.h"
-#include "BulletInst.h"
+#include "ProjectileInst.h"
 #include "EnemyInst.h"
 #include "ItemInst.h"
 #include "AnimatedInst.h"
 
 #include "../../util/draw_util.h"
+#include "../../util/math_util.h"
+#include "../../util/collision_util.h"
+#include "../../util/game_basic_structs.h"
+
 #include "../GameState.h"
 #include "../../data/sprite_data.h"
 #include "../../data/tile_data.h"
@@ -24,14 +27,6 @@
 // static FILE* saved = fopen("res/saved_replay.rep", "wb");
 // static FILE* open = fopen("res/replay.rep", "rb");
 static std::vector<GameAction> replay_actions;
-
-static bool item_hit(GameInst* self, GameInst* other) {
-	return dynamic_cast<ItemInst*>(other) != NULL;
-}
-
-static bool enemy_hit(GameInst* self, GameInst* other) {
-	return dynamic_cast<EnemyInst*>(other) != NULL;
-}
 
 static void get_current_actions(int frame, std::vector<GameAction>& actions) {
 // 	if (!open)
@@ -97,7 +92,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 			//Spell use
 			if (gs->key_down_state(SDLK_j)) {
 				MonsterController& mc = gs->monster_controller();
-				GameInst* target = gs->get_instance(mc.targetted);
+				GameInst* target = gs->get_instance(mc.current_target());
 				int mpcost = 10;
 				if (spellselect)
 					mpcost = 20;
@@ -183,7 +178,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 
 		//Item pickup
 		GameInst* item = NULL;
-		if (gs->object_radius_test(this, &item, 1, &item_hit)) {
+		if (gs->object_radius_test(this, &item, 1, &item_colfilter)) {
 			ItemInst* iteminst = (ItemInst*) item;
 			int type = iteminst->item_type();
 			bool autopickup = game_item_data[type].weapon < 0
@@ -286,7 +281,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
 	gs->remove_instance(item);
-	if (item->item_type() == ITEM_GOLD) {
+	if (item->item_type() == get_item_by_name("Gold")) {
 		money += 10;
 	} else {
 		inventory.add(item->item_type(), 1);
@@ -349,12 +344,12 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 
 	EnemyInst* target = NULL;
 	//Enemy hitting test for melee
-	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_hit,
+	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_colfilter,
 			x + ddx * 2, y + ddy * 2);
 
 	//Smaller radius enemy pushing test, can intercept enemy radius but not too far
 	EnemyInst* alreadyhitting[5] = { 0, 0, 0, 0, 0 };
-	gs->object_radius_test(this, (GameInst**) alreadyhitting, 5, &enemy_hit, x,
+	gs->object_radius_test(this, (GameInst**) alreadyhitting, 5, &enemy_colfilter, x,
 			y, radius);
 	bool already = false;
 	for (int i = 0; i < 5; i++) {
@@ -533,7 +528,7 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 			action.use_id);
 
 	if (action.use_id < 2) {
-		GameInst* bullet = new BulletInst(id, atk, x, y, action.action_x,
+		GameInst* bullet = new ProjectileInst(id, atk, x, y, action.action_x,
 				action.action_y, bounce, hits);
 		gs->add_instance(bullet);
 	} else {
@@ -571,7 +566,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 
 	int max_targets = std::min(MAX_MELEE_HITS, weap.max_targets);
 
-	int numhit = gs->object_radius_test(this, enemies, MAX_MELEE_HITS, enemy_hit, ax,
+	int numhit = gs->object_radius_test(this, enemies, MAX_MELEE_HITS, enemy_colfilter, ax,
 			ay, weap.dmgradius);
 
 	for (int i = 0; i < numhit; i++) {

@@ -6,7 +6,8 @@
  */
 
 #include "GameInstSet.h"
-#include "../util/settools.h"
+#include "../util/hashset_util.h"
+#include "../util/math_util.h"
 #include <cstring>
 #include <cstdio>
 
@@ -263,10 +264,6 @@ GameInst* GameInstSet::get_by_Pos(const Pos& c) {
 		if (ptr == NULL)
 			return NULL;
 	}
-}
-
-static int squish(int a, int b, int c) {
-	return std::min(std::max(a, b), c - 1);
 }
 
 int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,

@@ -8,6 +8,7 @@
 #include "GameHud.h"
 
 #include "../util/draw_util.h"
+#include "../util/math_util.h"
 #include "../display/display.h"
 
 #include "GameState.h"
@@ -55,7 +56,7 @@ static void draw_player_inventory(GameState* gs, PlayerInst* player, int x, int 
 	      ItemType& itemd = game_item_data[inv.inv[slot].item];
 	      GLImage* itemimg = &game_sprite_data[itemd.sprite_number].img;
 	      Pos p(x+ix*TILE_SIZE, y+iy*TILE_SIZE);
-	      image_display(itemimg,p.x+1,p.y);
+	      gl_draw_image(itemimg,p.x+1,p.y);
 	      gl_printf(gs->primary_font(), Colour(255,255,255), p.x, p.y, "%d", inv.inv[slot].n);
 	    }
 		}
@@ -87,9 +88,9 @@ static void draw_player_actionbar(GameState* gs, PlayerInst* player){
 // 		}
 	}
 	WeaponType* wtype = &game_weapon_data[player->weapon_type()];
-	image_display(&game_sprite_data[wtype->weapon_sprite].img, 1, y);
-	image_display(&game_sprite_data[get_sprite_by_name("fire bolt")].img,TILE_SIZE + 1, y);
-	image_display(&game_sprite_data[get_sprite_by_name("magic blast")].img,TILE_SIZE*2 + 1, y);
+	gl_draw_image(&game_sprite_data[wtype->weapon_sprite].img, 1, y);
+	gl_draw_image(&game_sprite_data[get_sprite_by_name("fire bolt")].img,TILE_SIZE + 1, y);
+	gl_draw_image(&game_sprite_data[get_sprite_by_name("magic blast")].img,TILE_SIZE*2 + 1, y);
 }
 
 static void fill_buff2d(char* buff, int w, int h, int x, int y,
@@ -193,7 +194,7 @@ void GameHud::draw_minimap(GameState* gs, int subx, int suby) {
 	gl_image_from_bytes(&minimap_buff, ptw, pth, minimap_arr);
 	//glPixelStorei(GL_UNPACK_ALIGNMENT, old_unpack);
 
-	image_display(&minimap_buff, subx, suby);
+	gl_draw_image(&minimap_buff, subx, suby);
 }
 void GameHud::draw(GameState* gs) {
 	gl_set_drawing_area(x, y, _width, _height);

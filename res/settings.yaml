@@ -2,7 +2,7 @@ fullscreen: 0
 regen_level_on_death: 1
 view_width: 1200
 view_height: 850
-class: Mage
+class: Fighter
 font: res/MateSC-Regular.ttf
 
 #Either 'host', 'client', or 'none'

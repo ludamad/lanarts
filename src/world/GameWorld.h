@@ -6,8 +6,8 @@
 #ifndef GAMEWORLD_H_
 #define GAMEWORLD_H_
 #include <vector>
-#include "../util/geometry.h"
 #include <cstdlib>
+#include "../util/game_basic_structs.h"
 
 struct GameState;
 struct GameLevelState;
@@ -26,7 +26,7 @@ public:
 	void set_current_level_lazy(int roomid);
 	void reset(int keep = 0);
 	void regen_level(int roomid);
-	void spawn_player(GeneratedLevel& genlevel, PlayerInst* inst = NULL);
+	void spawn_player(GeneratedLevel& genlevel, bool local = true, PlayerInst* inst = NULL);
 	GameLevelState*& get_current_level() {
 		return lvl;
 	}

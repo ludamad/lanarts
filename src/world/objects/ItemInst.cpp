@@ -33,7 +33,7 @@ void ItemInst::draw(GameState *gs){
 	if (!gs->object_visible_test(this))
 		return;
 
-	image_display(&img, xx - view.x, yy - view.y);
+	gl_draw_image(&img, xx - view.x, yy - view.y);
 }
 
 

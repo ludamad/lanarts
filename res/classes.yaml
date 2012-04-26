@@ -27,7 +27,7 @@ classes:
         movespeed: 4
         hp: 150
         mp: 50
-        hpregen: 0.066
+        hpregen: 0.055
         mpregen: 0.033
         strength: 7
         defence: 5

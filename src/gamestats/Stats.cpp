@@ -99,6 +99,11 @@ bool Stats::hurt(int dmg) {
 	return false;
 }
 
+void Stats::heal_fully(){
+    hp = max_hp;
+    mp = max_mp;
+}
+
 void Stats::gain_level() {
 	ClassType& ct = game_class_data[classtype];
 

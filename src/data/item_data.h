@@ -11,13 +11,6 @@
 #include "../world/objects/GameInst.h"
 #include <vector>
 
-enum {
-  ITEM_GOLD = 0,
-  ITEM_POTION_HEALTH = 1,
-  ITEM_POTION_MANA =  2,
-  ITEM_SCROLL_HASTE = 3
-};
-
 struct ItemType;
 
 typedef void (*item_actionf)(ItemType* item, GameInst* inst);

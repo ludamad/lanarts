@@ -5,25 +5,27 @@
  *      Author: 100397561
  */
 
-#include "GameState.h"
-#include "../display/display.h"
 #include <SDL.h>
 #include <cmath>
 #include <SDL_opengl.h>
 #include <cstring>
-#include "objects/EnemyInst.h"
-#include "objects/PlayerInst.h"
 #include <ctime>
 #include <vector>
 
-#include "../procedural/levelgen.h"
+#include "GameState.h"
+#include "../display/display.h"
+#include "net/GameNetConnection.h"
+
+#include "objects/EnemyInst.h"
+#include "objects/PlayerInst.h"
+
+#include "../util/math_util.h"
+
 #include "../data/item_data.h"
 #include "../data/tile_data.h"
 #include "../data/dungeon_data.h"
 #include "../data/class_data.h"
-#include <ctime>
 
-#include "net/GameNetConnection.h"
 
 GameState::GameState(const GameSettings& settings, int width, int height, int vieww, int viewh, int hudw) :
 		settings(settings), world_width(width), world_height(height),  frame_n(0),
@@ -188,18 +190,14 @@ void GameState::remove_instance(GameInst* inst, bool deallocate) {
 GameInst* GameState::get_instance(obj_id id) {
 	return level()->inst_set.get_by_id(id);
 }
-
-static int squish(int a, int b, int c) {
-	return std::min(std::max(a, b), c - 1);
-}
-
-static bool sqr_line_test(int x, int y, int w, int h, int sx, int sy,
-		int size) {
-
-}
-bool GameState::tile_line_test(int x, int y, int w, int h) {
-	int sx = x / TILE_SIZE, sy = y / TILE_SIZE;
-}
+//
+//static bool sqr_line_test(int x, int y, int w, int h, int sx, int sy,
+//		int size) {
+//
+//}
+//bool GameState::tile_line_test(int x, int y, int w, int h) {
+//	int sx = x / TILE_SIZE, sy = y / TILE_SIZE;
+//}
 
 static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
 		float radsqr) {
@@ -285,7 +283,7 @@ bool GameState::object_visible_test(GameInst* obj, GameInst* player) {
 	int maxgrid_x = (x + rad) / subsize, maxgrid_y = (y + rad) / subsize;
 	int minx = squish(mingrid_x, 0, w), miny = squish(mingrid_y, 0, h);
 	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
-	const std::vector<fov*>& fovs = level()->pc.player_fovs();
+	const std::vector<fov*>& fovs = player_controller().player_fovs();
 
 	if (fovs.empty()) return true;
 
@@ -294,7 +292,7 @@ bool GameState::object_visible_test(GameInst* obj, GameInst* player) {
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
 				for (int i = 0; i < fovs.size(); i++) {
-					bool isplayer = player == NULL || (player->id = pc.player_ids()[i]);
+					bool isplayer = player == NULL || (player->id == pc.player_ids()[i]);
 					if (isplayer && fovs[i]->within_fov(xx, yy))
 						return true;
 				}

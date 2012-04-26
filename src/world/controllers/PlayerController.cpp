@@ -8,6 +8,7 @@
 #include "PlayerController.h"
 #include "../GameTiles.h"
 #include "../GameState.h"
+#include "../../util/math_util.h"
 
 PlayerController::PlayerController() {
 }
@@ -61,10 +62,6 @@ void PlayerController::deregister_player(obj_id player) {
     printf("Deregistering '%d'\n", player);
     
     fflush(stdout);
-}
-
-static int squish(int a, int b, int c) {
-	return std::min(std::max(a, b), c - 1);
 }
 
 bool PlayerController::seen_by_player(GameState* gs, int pindex,

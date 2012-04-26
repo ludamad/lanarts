@@ -1,5 +1,5 @@
 #include "PlayerInst.h"
-#include "BulletInst.h"
+#include "ProjectileInst.h"
 #include "EnemyInst.h"
 #include "ItemInst.h"
 #include "AnimatedInst.h"
@@ -80,22 +80,22 @@ void PlayerInst::draw(GameState* gs) {
 		float s = e->t_remaining/200.0;
 		if (s> 1) s = 1;
 		Colour blue(255*(1-s), 255*(1-s), 255);
-		image_display(&img, x - img.width / 2 - view.x,
+		gl_draw_image(&img, x - img.width / 2 - view.x,
 				y - img.height / 2 - view.y, blue);
 	}else if (stats().hurt_cooldown > 0) {
 		float s = 1 - stats().hurt_alpha() ;
 		Colour red(255, 255*s, 255*s);
-		image_display(&img, x - img.width / 2 - view.x,
+		gl_draw_image(&img, x - img.width / 2 - view.x,
 				y - img.height / 2 - view.y, red);
 	}else {
-		image_display(&img, x - img.width / 2 - view.x,
+		gl_draw_image(&img, x - img.width / 2 - view.x,
 				y - img.height / 2 - view.y);
 
 	}
 
 	if (isresting){
 		GLImage& restimg = game_sprite_data[get_sprite_by_name("resting")].img;
-		image_display(&restimg, x - img.width / 2 - view.x,
+		gl_draw_image(&restimg, x - img.width / 2 - view.x,
 				y - img.height / 2 - view.y);
 	}
 

@@ -13,20 +13,13 @@
 #include "display.h"
 #include "GLImage.h"
 
+#include "../util/math_util.h"
+
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <algorithm>
 
-/* Quick utility function for texture creation */
-int power_of_two(int input) {
-	int value = 1;
-
-	while (value < input) {
-		value <<= 1;
-	}
-	return value;
-}
-void image_display(GLImage* img, int x, int y, const Colour& c) {
+void gl_draw_image(GLImage* img, int x, int y, const Colour& c) {
 	if (img->width == 0 || img->height == 0) return;
 	int x2 = x + img->width, y2 = y + img->height;
 
@@ -52,54 +45,6 @@ void image_display(GLImage* img, int x, int y, const Colour& c) {
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 	//Don't use glBindTexture(GL_TEXTURE_2D, NULL);
-}
-
-void image_display_parts(GLImage* img, int x, int y, int sub_parts,
-		char* flags) {
-	bool all_true = 1, all_false = 1;
-	for (int i = 0; i < sub_parts*sub_parts; i++) {
-		if (flags[i]) all_false = 0;
-		else all_true = 0;
-	}
-	if (all_false) return;
-	if (all_true){
-		image_display(img,x,y);
-		return;
-	}
-	glEnable(GL_TEXTURE_2D);
-	glColor4ub(255, 255, 255, 255);
-	int xincr = img->width / sub_parts, yincr = img->height / sub_parts;
-	float tex_xincr = img->texw / sub_parts, tex_yincr = img->texh / sub_parts;
-	for (int ysub = 0; ysub < sub_parts; ysub++) {
-		for (int xsub = 0; xsub < sub_parts; xsub++, flags++) {
-			if (!*flags)
-				continue;
-			glBindTexture(GL_TEXTURE_2D, img->texture);
-			glBegin(GL_QUADS);
-			float tsx = tex_xincr * xsub, tex = tsx + tex_xincr;
-			float tsy = tex_yincr * ysub, tey = tsy + tex_yincr;
-			int sx = x+xincr * xsub, ex = sx + xincr;
-			int sy = y+yincr * ysub, ey = sy + yincr;
-			//Draw our four points, clockwise.
-//			glTexCoord2f(0, 0);
-			glTexCoord2f(tsx, tsy);
-			glVertex2i(sx, sy);
-
-//			glTexCoord2f(img->texw, 0);
-			glTexCoord2f(tex, tsy);
-			glVertex2i(ex, sy);
-
-//			glTexCoord2f(img->texw, img->texh);
-			glTexCoord2f(tex, tey);
-			glVertex2i(ex, ey);
-
-//			glTexCoord2f(0, img->texh);
-			glTexCoord2f(tsx, tey);
-			glVertex2i(sx, ey);
-	glEnd();
-		}
-	}
-	glDisable(GL_TEXTURE_2D);
 }
 
 void update_display() {

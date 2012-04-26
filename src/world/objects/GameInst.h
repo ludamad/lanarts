@@ -10,14 +10,10 @@
 #define GAMEINST_H_
 
 #include <cassert>
-
-typedef int obj_id;
-
-#define LANARTS_ASSERT(x) assert(x)
+#include "../../util/game_basic_structs.h"
 
 struct GameState;
 //Base class for game instances
-
 
 class GameInst {
 public:
@@ -30,6 +26,14 @@ public:
 	virtual void deinit(GameState* gs);
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
+
+	BBox bbox(){
+		return BBox(x-radius,y-radius,x+radius,y+radius);
+	}
+	Pos pos(){
+		return Pos(x,y);
+	}
+
 public:
 	/*Should probably keep these public, many functions operate on these*/
 	obj_id id;

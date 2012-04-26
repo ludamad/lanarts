@@ -33,7 +33,7 @@ int GameWorld::get_current_level_id()
     return game_state->level()->roomid;
 }
 
-void GameWorld::spawn_player(GeneratedLevel& genlevel, PlayerInst* inst){
+void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, PlayerInst* inst){
 	GameTiles& tiles = game_state->tile_grid();
 	ClassType* c = &game_class_data[game_state->game_settings().classn];
 	Pos epos;
@@ -49,26 +49,27 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, PlayerInst* inst){
 	int py = (epos.y + start_y) * 32 + 16;
 
 	if (!inst){
-		inst = new PlayerInst(c->starting_stats, px,py);
-	} else {
-		inst->last_x = px;
-		inst->last_y = py;
-		inst->x = px;
-		inst->y = py;
+		inst = new PlayerInst(c->starting_stats, px,py, local);
 	}
+	inst->last_x = px;
+	inst->last_y = py;
+	inst->x = px;
+	inst->y = py;
 
 //	game_state->add_instance(inst);
 
-	if (game_state->game_settings().conntype == GameSettings::CLIENT){
 	game_state->add_instance(inst);
-	game_state->add_instance(new PlayerInst(c->starting_stats, px+TILE_SIZE,py, false));
-	} else {
-		inst->last_x += TILE_SIZE;
-		inst->x += TILE_SIZE;
-		game_state->add_instance(new PlayerInst(c->starting_stats, px,py, false));
-		game_state->add_instance(inst);
-
-	}
+//
+//	if (game_state->game_settings().conntype == GameSettings::CLIENT){
+//	game_state->add_instance(inst);
+//	game_state->add_instance(new PlayerInst(c->starting_stats, px+TILE_SIZE,py, false));
+//	} else {
+//		inst->last_x += TILE_SIZE;
+//		inst->x += TILE_SIZE;
+//		game_state->add_instance(new PlayerInst(c->starting_stats, px,py, false));
+//		game_state->add_instance(inst);
+//
+//	}
 }
 
 GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player_instances, size_t nplayers) {
@@ -86,11 +87,13 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player
 		generate_level(mainbranch.level_data[roomid], game_state->rng(), genlevel, game_state);
 		game_state->level()->rooms = genlevel.rooms();
 		if (spawnplayer){
-			if (!player_instances)
-				spawn_player(genlevel);
-			else {
+			if (!player_instances){
+				bool flocal = (game_state->game_settings().conntype == GameSettings::CLIENT);
+				spawn_player(genlevel, flocal);
+				spawn_player(genlevel, !flocal);
+			}	else {
 				for (int i =0; i < nplayers; i++){
-					spawn_player(genlevel, (PlayerInst*)player_instances[i]);
+					spawn_player(genlevel, false, (PlayerInst*)player_instances[i]);
 				}
 			}
 		}
@@ -143,10 +146,12 @@ void GameWorld::step() {
 void GameWorld::regen_level(int roomid){
 	GameLevelState* level = get_level(roomid);
 	std::vector<PlayerInst*> player_cache;
-	for (int i = 0; i < level->pc.player_ids().size(); i++){
-		PlayerInst* p = (PlayerInst*)game_state->get_instance(level->pc.player_ids()[i]);
+	std::vector<obj_id> player_ids = level->pc.player_ids();
+	for (int i = 0; i < player_ids.size(); i++){
+		PlayerInst* p = (PlayerInst*)game_state->get_instance(player_ids[i]);
 		game_state->remove_instance(p, false); // Remove but do not deallocate
 		player_cache.push_back(p);
+		p->stats().heal_fully();
 	}
 	delete level;
 	level_states[roomid] = NULL;
@@ -226,29 +231,4 @@ void GameWorld::connect_entrance_to_exit(int roomid1, int roomid2) {
 		l2->exits[i].exitsqr = l1->entrances[i].entrancesqr;
 		l1->entrances[i].exitsqr = l2->exits[i].entrancesqr;
 	}
-}
-
-
-static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
-		float radsqr) {
-	int dx, dy, t, rt, ddist;
-	dx = qx - px;
-	dy = qy - py;
-	ddist = dx * dx + dy * dy;
-	t = -((px - cx) * dx + (py - cy) * dy);
-	//;/ ddist;
-
-	/* Restrict t to within the limits of the line segment */
-	if (t < 0)
-		t = 0;
-	else if (t > ddist)
-		t = ddist;
-
-	dx = (px + t * (qx - px) / ddist) - cx;
-	dy = (py + t * (qy - py) / ddist) - cy;
-	rt = (dx * dx) + (dy * dy);
-	return rt < (radsqr);
-}
-static int squish(int a, int b, int c) {
-	return std::min(std::max(a, b), c - 1);
 }

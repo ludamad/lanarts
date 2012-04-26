@@ -1,8 +1,6 @@
 /*
  * AnimatedInst.h
- *
- *  Created on: Mar 25, 2012
- *      Author: 100397561
+ *  Represents an object that displays on the screen for a fixed amount of time before removing itself
  */
 
 #ifndef ANIMATEDINST_H_
