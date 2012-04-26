@@ -33,9 +33,9 @@ int GameWorld::get_current_level_id()
     return game_state->level()->roomid;
 }
 
-void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, PlayerInst* inst){
+void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, int classn, PlayerInst* inst){
 	GameTiles& tiles = game_state->tile_grid();
-	ClassType* c = &game_class_data[game_state->game_settings().classn];
+	ClassType* c = &game_class_data[classn];
 	Pos epos;
 	do {
 		epos = generate_location(game_state->rng(), genlevel);
@@ -56,20 +56,7 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, PlayerInst* i
 	inst->x = px;
 	inst->y = py;
 
-//	game_state->add_instance(inst);
-
 	game_state->add_instance(inst);
-//
-//	if (game_state->game_settings().conntype == GameSettings::CLIENT){
-//	game_state->add_instance(inst);
-//	game_state->add_instance(new PlayerInst(c->starting_stats, px+TILE_SIZE,py, false));
-//	} else {
-//		inst->last_x += TILE_SIZE;
-//		inst->x += TILE_SIZE;
-//		game_state->add_instance(new PlayerInst(c->starting_stats, px,py, false));
-//		game_state->add_instance(inst);
-//
-//	}
 }
 
 GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player_instances, size_t nplayers) {
@@ -89,11 +76,25 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player
 		if (spawnplayer){
 			if (!player_instances){
 				bool flocal = (game_state->game_settings().conntype == GameSettings::CLIENT);
-				spawn_player(genlevel, flocal);
-				spawn_player(genlevel, !flocal);
+				GameSettings& settings = game_state->game_settings();
+				GameNetConnection& netconn = game_state->net_connection();
+				int myclassn = game_state->game_settings().classn;
+
+				std::vector<NetPacket> others_classes;
+				NetPacket classpacket;
+				classpacket.add_int(myclassn);
+				netconn.send_and_sync(classpacket, others_classes);
+
+				if (others_classes.empty()){
+					spawn_player(genlevel, true, myclassn);
+				} else {
+					int theirclass = others_classes[0].get_int();
+					spawn_player(genlevel, flocal, flocal ? myclassn : theirclass );
+					spawn_player(genlevel, !flocal, !flocal ? myclassn : theirclass );
+				}
 			}	else {
 				for (int i =0; i < nplayers; i++){
-					spawn_player(genlevel, false, (PlayerInst*)player_instances[i]);
+					spawn_player(genlevel, false, 0, (PlayerInst*)player_instances[i]);
 				}
 			}
 		}

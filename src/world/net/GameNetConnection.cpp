@@ -25,9 +25,8 @@ void GameNetConnection::send_and_sync(const NetPacket & packet,
 		return;
 	NetPacket local;
 	connect->broadcast_packet(packet);
-	for (;;) {
-		wait_for_packet(local);
-	//	local.get_int()
-	}
+	wait_for_packet(local);
+	received.push_back(local);
 }
+
 
