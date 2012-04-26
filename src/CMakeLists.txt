@@ -50,6 +50,7 @@ set( lanarts_src
 	
 	util/collision_util.cpp
 	util/draw_util.cpp
+	util/math_util.cpp
 	util/font_util.cpp
 	
 
@@ -70,7 +71,7 @@ set( lanarts_src
 	world/objects/PlayerInstActions.cpp
 	world/objects/EnemyInst.cpp
 	world/objects/ItemInst.cpp
-	world/objects/BulletInst.cpp
+	world/objects/ProjectileInst.cpp
 	world/objects/TestInst.cpp
 
 	world/objects/GameInst.cpp
@@ -117,9 +118,10 @@ set( lanarts_include
 	
 	util/collision_util.h
 	util/draw_util.h
+	util/math_util.h
 	util/font_util.h
 	util/game_basic_structs.h
-	util/settools.h
+	util/hashset_util.h
 	
 	world/net/GameNetConnection.h
 
@@ -141,7 +143,7 @@ set( lanarts_include
 	world/objects/AnimatedInst.h
 	world/objects/PlayerInst.h
 	world/objects/EnemyInst.h
-	world/objects/BulletInst.h
+	world/objects/ProjectileInst.h
 	world/objects/TestInst.h
 )
 
