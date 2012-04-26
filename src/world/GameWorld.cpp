@@ -83,6 +83,7 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player
 				std::vector<NetPacket> others_classes;
 				NetPacket classpacket;
 				classpacket.add_int(myclassn);
+				classpacket.encode_header();
 				netconn.send_and_sync(classpacket, others_classes);
 
 				if (others_classes.empty()){
