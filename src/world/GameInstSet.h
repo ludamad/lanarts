@@ -7,9 +7,10 @@
 #ifndef GAMEINSTSET_H_
 #define GAMEINSTSET_H_
 
+#include <cstdlib>
+#include <vector>
 #include "../util/game_basic_structs.h"
 #include "objects/GameInst.h"
-#include <vector>
 
 class GameState;
 
@@ -39,7 +40,7 @@ public:
 private:
 	void reallocate_hashset_();
 
-	struct InstState{
+	struct InstState {
 		GameInst* inst;
 		//These pointers are invalidated upon hashmap reallocation
 		InstState* next_in_grid, *prev_in_grid;

@@ -2,10 +2,10 @@ fullscreen: 0
 regen_level_on_death: 1
 view_width: 1200
 view_height: 850
-class: Mage
+class: Fighter
 font: res/MateSC-Regular.ttf
 
 #Either 'host', 'client', or 'none'
-connection_type: client
-ip: 192.168.0.130
+connection_type: none
+ip: 10.42.0.99
 port: 6112

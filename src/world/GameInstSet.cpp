@@ -4,12 +4,12 @@
  *  Created on: Jun 28, 2011
  *      Author: 100397561
  */
+#include <cstring>
+#include <cstdio>
 
 #include "GameInstSet.h"
 #include "../util/hashset_util.h"
 #include "../util/math_util.h"
-#include <cstring>
-#include <cstdio>
 
 GameInst* const GAMEINST_TOMBSTONE = (GameInst*) 1;
 
