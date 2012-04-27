@@ -13,7 +13,7 @@
 
 struct ItemType;
 
-typedef void (*item_actionf)(ItemType* item, GameInst* inst);
+typedef void (*item_actionf)(GameState* gs, ItemType* item, GameInst* inst);
 
 struct ItemType {
 	const char* name;

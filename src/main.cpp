@@ -1,12 +1,12 @@
 
-#include <iostream>
+#include <iostream>"
+#include <vector>
 #include <ctime>
 #include <SDL.h>
 #include <SDL_opengl.h>
-#include "display/display.h"
-#include "world/GameState.h"
-#include <vector>
+#include "display/display.h
 #include "data/game_data.h"
+#include "world/GameState.h"
 #include "world/objects/PlayerInst.h"
 #include "world/objects/EnemyInst.h"
 #include "world/objects/TestInst.h"

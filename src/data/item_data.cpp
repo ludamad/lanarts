@@ -4,31 +4,31 @@
 #include "../world/objects/PlayerInst.h"
 #include <cstring>
 
-void use_health_potion(ItemType* item, GameInst* inst){
+void use_health_potion(GameState* gs, ItemType* item, GameInst* inst){
 	((PlayerInst*) inst)->stats().hp += item->action_amount;
 }
-void use_mana_potion(ItemType* item, GameInst* inst){
+void use_mana_potion(GameState* gs, ItemType* item, GameInst* inst){
 	((PlayerInst*) inst)->stats().mp += item->action_amount;
 }
 
-void use_haste_scroll(ItemType* item, GameInst* inst){
+void use_haste_scroll(GameState* gs, ItemType* item, GameInst* inst){
 	((PlayerInst*) inst)->status_effects().add(EFFECT_HASTE, item->action_duration);
 }
-void equip_weapon(ItemType* item, GameInst* inst){
+void equip_weapon(GameState* gs, ItemType* item, GameInst* inst){
 	PlayerInst* play = (PlayerInst*) inst;
 	play->weapon_type() = item->weapon;
 }
 
 
-void increase_strength(ItemType* item, GameInst* inst){
+void increase_strength(GameState* gs, ItemType* item, GameInst* inst){
 	PlayerInst* play = (PlayerInst*) inst;
 	play->stats().strength += item->action_amount;
 }
-void increase_magic(ItemType* item, GameInst* inst){
+void increase_magic(GameState* gs, ItemType* item, GameInst* inst){
 	PlayerInst* play = (PlayerInst*) inst;
 	play->stats().magic += item->action_amount;
 }
-void increase_defence(ItemType* item, GameInst* inst){
+void increase_defence(GameState* gs, ItemType* item, GameInst* inst){
 	PlayerInst* play = (PlayerInst*) inst;
 	play->stats().defence += item->action_amount;
 }

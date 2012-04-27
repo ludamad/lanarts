@@ -80,16 +80,19 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player
 				GameNetConnection& netconn = game_state->net_connection();
 				int myclassn = game_state->game_settings().classn;
 
-				std::vector<NetPacket> others_classes;
-				NetPacket classpacket;
-				classpacket.add_int(myclassn);
-				classpacket.encode_header();
-				netconn.send_and_sync(classpacket, others_classes);
+				static int theirclass = -1;
+				if (theirclass == -1 && netconn.get_connection()){
+					std::vector<NetPacket> others_classes;
+					NetPacket classpacket;
+					classpacket.add_int(myclassn);
+					classpacket.encode_header();
+					netconn.send_and_sync(classpacket, others_classes);
+					theirclass = others_classes[0].get_int();
+				}
 
-				if (others_classes.empty()){
+				if (theirclass == -1){
 					spawn_player(genlevel, true, myclassn);
 				} else {
-					int theirclass = others_classes[0].get_int();
 					spawn_player(genlevel, flocal, flocal ? myclassn : theirclass );
 					spawn_player(genlevel, !flocal, !flocal ? myclassn : theirclass );
 				}

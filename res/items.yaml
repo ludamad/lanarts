@@ -1,7 +1,6 @@
 ---
-#Gold is currently hardcoded in the first slot
 items:
-  - name: Gold
+  - name: Gold #Gold must be named 'Gold' for the time being
     sprite: gold
   - name: Health Potion
     sprite: health_potion

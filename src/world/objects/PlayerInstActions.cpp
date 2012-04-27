@@ -65,10 +65,6 @@ void PlayerInst::perform_io_action(GameState* gs) {
 			gs->monster_controller().shift_target(gs);
 		}
 
-//	if (gs->key_press_state(SDLK_q)) {
-//		stats().gain_xp(50);
-//	}
-
 		if (gs->key_press_state(SDLK_SPACE)) {
 			spellselect++;
 			if (spellselect > 1) {
@@ -280,6 +276,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
+	if (!item) return;
 	gs->remove_instance(item);
 	if (item->item_type() == get_item_by_name("Gold")) {
 		money += 10;
@@ -320,7 +317,7 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 
 void PlayerInst::use_item(GameState *gs, const GameAction& action) {
 	int item = inventory.inv[action.use_id].item;
-	game_item_data[item].action(&game_item_data[item], this);
+	game_item_data[item].action(gs, &game_item_data[item], this);
 	inventory.inv[action.use_id].n--;
 
 	canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
@@ -374,39 +371,6 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 	} else if (!gs->tile_radius_test(x, y + ddy, radius)) {
 		y += ddy;
 	}
-
-	//Melee:
-//	if (ddx == 0 && ddy == 0) {
-//		if (target && !stats().has_cooldown()) {
-//			//int damage = effective_stats().melee.damage + gs->rng().rand(-4, 5);
-//			WeaponType& wtype = game_weapon_data[weapon_type()];
-//			int damage = effective_stats().calculate_melee_damage(gs->rng(),
-//					weapon_type());
-//			char buffstr[32];
-//			snprintf(buffstr, 32, "%d", damage);
-//			float rx, ry;
-//			direction_towards(Pos(x, y), Pos(target->x, target->y), rx, ry,
-//					0.5);
-//			gs->add_instance(
-//					new AnimatedInst(target->x - 5 + rx * 5,
-//							target->y - 3 + rx * 5, -1, 25, rx, ry, buffstr));
-//
-//			if (target->hurt(gs, damage)) {
-//				stats().gain_xp(target->xpworth());
-//				snprintf(buffstr, 32, "%d XP", target->xpworth());
-//				gs->add_instance(
-//						new AnimatedInst(target->x - 5, target->y - 5, -1, 25,
-//								0, 0, buffstr, Colour(255, 215, 11)));
-//			}
-//			stats().cooldown = wtype.cooldown;
-//			//stats().reset_melee_cooldown(effective_stats());
-//			int atksprite = game_weapon_data[weapon_type()].attack_sprite;
-//			gs->add_instance(
-//					new AnimatedInst(target->x, target->y, atksprite, 25));
-//		}
-//	} else {
-//		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN / 4);
-//	}
 }
 
 static int scan_entrance(const std::vector<GameLevelPortal>& portals,
@@ -455,52 +419,6 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 
 	canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 }
-//void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action){
-//
-//	//Up/down stairs
-////	if (gs->key_down_state(SDLK_PERIOD) || gs->mouse_downwheel()) {
-////				Pos hitsqr;
-////				if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_DOWN,
-////						&hitsqr)) {
-////					int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
-////					LANARTS_ASSERT(
-////							entr_n >= 0 && entr_n < gs->level()->entrances.size());
-////					portal = &gs->level()->entrances[entr_n];
-////					gs->branch_level()++;
-////					gs->set_generate_flag();
-////				}
-////			}
-////			if ((gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel())
-////					&& gs->branch_level() > 1) {
-////				Pos hitsqr;
-////				if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP,
-////						&hitsqr)) {
-////					int entr_n = scan_entrance(gs->level()->exits, hitsqr);
-////					LANARTS_ASSERT(
-////							entr_n >= 0 && entr_n < gs->level()->entrances.size());
-////					portal = &gs->level()->exits[entr_n];
-////					gs->branch_level()--;
-////					gs->set_generate_flag();
-////				}
-////			}
-//
-//			if ((gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel())
-//					&& gs->branch_level() > 1) {
-//				Pos hitsqr;
-//				if (gs->tile_radius_test(x, y, RADIUS, false, TILE_STAIR_UP,
-//						&hitsqr)) {
-//					int entr_n = scan_entrance(gs->level()->exits, hitsqr);
-//					LANARTS_ASSERT(
-//							entr_n >= 0 && entr_n < gs->level()->entrances.size());
-//					portal = &gs->level()->exits[entr_n];
-//					gs->branch_level()--;
-//					gs->set_generate_flag();
-//				}
-//			}
-//
-//
-//	canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
-//}
 
 void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
     if (action.use_id < 2 && stats().has_cooldown()) return;
