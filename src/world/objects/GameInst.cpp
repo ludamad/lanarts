@@ -21,3 +21,4 @@ void GameInst::init(GameState* gs){
 void GameInst::deinit(GameState* gs){
 	id = 0;
 }
+

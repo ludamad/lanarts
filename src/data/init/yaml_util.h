@@ -87,9 +87,9 @@ inline Stats parse_stats(const YAML::Node& n, const std::vector<Attack>& attacks
 	ret_stats.xplevel = parse_defaulted(n, "xplevel", 1);
 	for (int i = 0; i < attacks.size(); i++){
 		if (!attacks[i].isprojectile)
-			ret_stats.melee = attacks[i];
+			ret_stats.meleeatk = attacks[i];
 		if (attacks[i].isprojectile)
-			ret_stats.ranged = attacks[i];
+			ret_stats.magicatk = attacks[i];
 	}
 	return ret_stats;
 }

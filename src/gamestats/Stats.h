@@ -29,7 +29,7 @@ struct Stats {
 	int hurt_cooldown;
 	float hp_regened, mp_regened;
 
-	Attack melee, ranged;
+	Attack meleeatk, magicatk;
 
 	int xp, xpneeded, xplevel;
 

@@ -15,7 +15,7 @@ Stats::Stats(float speed, int hp, int mp, int strength,
 		const Attack & ranged) :
 		classtype(0), movespeed(speed), hp(hp), max_hp(hp), mp(mp), max_mp(mp), hpregen(
 				1.0 / 30), mpregen(1.0 / 15), cooldown(0), hurt_cooldown(0), hp_regened(
-				0), mp_regened(0), melee(melee), ranged(ranged), xp(0), xpneeded(
+				0), mp_regened(0), meleeatk(melee), magicatk(ranged), xp(0), xpneeded(
 				100), xplevel(1), strength(strength), defence(defence), magic(magic) {
 }
 
@@ -74,19 +74,19 @@ void Stats::set_hurt_cooldown() {
 }
 
 void Stats::reset_melee_cooldown() {
-	cooldown = melee.cooldown;
+	cooldown = meleeatk.cooldown;
 }
 
 void Stats::reset_ranged_cooldown() {
-	cooldown = ranged.cooldown;
+	cooldown = magicatk.cooldown;
 }
 
 void Stats::reset_melee_cooldown(const Stats & effectivestats) {
-	cooldown = effectivestats.melee.cooldown;
+	cooldown = effectivestats.meleeatk.cooldown;
 }
 
 void Stats::reset_ranged_cooldown(const Stats & effectivestats) {
-	cooldown = effectivestats.ranged.cooldown;
+	cooldown = effectivestats.magicatk.cooldown;
 }
 
 bool Stats::hurt(int dmg) {

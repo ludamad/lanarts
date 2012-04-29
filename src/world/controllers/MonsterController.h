@@ -48,6 +48,7 @@ public:
     	paths.resize(size, NULL);
 
     }
+    size_t number_monsters() { return mids.size(); }
     obj_id current_target(){ return targetted; }
     void clear();
 private:

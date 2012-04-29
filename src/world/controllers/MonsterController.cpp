@@ -166,11 +166,11 @@ void MonsterController::set_monster_headings(GameState* gs, std::vector<EnemyOfI
 		double abs = sqrt((e->x-p->x)*(e->x-p->x)+(e->y-p->y)*(e->y-p->y));
 		Stats& s = e->stats();
 
-		if (abs < e->radius + p->radius || (s.ranged.canuse && abs < e->radius*2 + p->radius ))
+		if (abs < e->radius + p->radius || (s.magicatk.canuse && abs < e->radius*2 + p->radius ))
 			eb.vx = 0, eb.vy = 0;
-		if ( s.melee.canuse && abs < s.melee.range + e->radius ){
+		if ( s.meleeatk.canuse && abs < s.meleeatk.range + e->radius ){
 			e->attack(gs, p, false);
-		} else if ( s.ranged.canuse && abs < s.ranged.range+ 10 ){
+		} else if ( s.magicatk.canuse && abs < s.magicatk.range+ 10 ){
 			e->attack(gs, p, true);
 		}
 	}

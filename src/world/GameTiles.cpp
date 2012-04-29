@@ -32,35 +32,37 @@ void GameTiles::pre_draw(GameState* gs) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
 			int tile = tiles[y * width + x];
 			GLImage* img = &game_tile_data[tile].img;
+			if (seen_tiles[y * width + x])
 			gl_draw_image(img, x * TILE_SIZE - view.x, y * TILE_SIZE - view.y);
 		}
 	}
 
 }
 
-void GameTiles::step(GameState* gs){
-    GameView& view = gs->window_view();
-    const int sub_sqrs = VISION_SUBSQRS;
+void GameTiles::step(GameState* gs) {
+	GameView& view = gs->window_view();
+	const int sub_sqrs = VISION_SUBSQRS;
 
-    char matches[sub_sqrs * sub_sqrs];
-    for (int y = 0; y <= height; y++) {
-        for (int x = 0; x <= width; x++) {
-            bool has_match = false, has_free = false;
-            bool is_other_match = false;
-            int tile = tiles[y * width + x];
-            GLImage* img = &game_tile_data[tile].img;
+	char matches[sub_sqrs * sub_sqrs];
 
-            for (int i = 0; i < gs->player_controller().player_fovs().size();
-                    i++) {
-                fov& f = *gs->player_controller().player_fovs()[i];
-                f.matches(x, y, matches);
-                for (int i = 0; i < sub_sqrs * sub_sqrs; i++) {
-                    if (matches[i])
-                        seen_tiles[y * width + x] = 1;
-                }
-            }
-        }
-    }
+	for (int i = 0; i < gs->player_controller().player_fovs().size(); i++) {
+		fov& f = *gs->player_controller().player_fovs()[i];
+		BBox fovbox = f.tiles_covered();
+		for (int y = std::max(fovbox.y1, 0); y <= std::max(fovbox.y2, height); y++) {
+			for (int x = std::max(fovbox.x1, 0); x <= std::min(fovbox.x2, width); x++) {
+				bool has_match = false, has_free = false;
+				bool is_other_match = false;
+				int tile = tiles[y * width + x];
+				GLImage* img = &game_tile_data[tile].img;
+
+				f.matches(x, y, matches);
+				for (int i = 0; i < sub_sqrs * sub_sqrs; i++) {
+					if (matches[i])
+						seen_tiles[y * width + x] = 1;
+				}
+			}
+		}
+	}
 }
 void GameTiles::post_draw(GameState* gs) {
 	GameView& view = gs->window_view();
@@ -100,13 +102,14 @@ void GameTiles::post_draw(GameState* gs) {
 					}
 				}
 			}
-			
+
 			//Do not draw black if we have a match, and we see a wall
 			if (!has_match) {
-				if (!is_other_match){
+				if (!is_other_match) {
 					if (!seen_tiles[y * width + x]) {
 						gl_draw_rectangle(x * TILE_SIZE - view.x,
-								y * TILE_SIZE - view.y, img->width, img->height);
+								y * TILE_SIZE - view.y, img->width,
+								img->height);
 					} else {
 						gl_draw_rectangle(x * TILE_SIZE - view.x,
 								y * TILE_SIZE - view.y, img->width, img->height,

@@ -18,13 +18,16 @@ PlayerController::~PlayerController() {
 		delete fovs[i];
 }
 
-void PlayerController::pre_step(GameState* gs) {
+void PlayerController::update_fieldsofview(GameState* gs){
 	for (int i = 0; i < pids.size(); i++) {
 		GameInst* player = gs->get_instance(pids[i]);
 		int sx = player->last_x * VISION_SUBSQRS / TILE_SIZE;
 		int sy = player->last_y * VISION_SUBSQRS / TILE_SIZE;
 		fovs[i]->calculate(gs, sx, sy);
 	}
+}
+void PlayerController::pre_step(GameState* gs) {
+	update_fieldsofview(gs);
 }
 
 fov* PlayerController::local_playerfov() {

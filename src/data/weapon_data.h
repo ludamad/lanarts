@@ -32,7 +32,7 @@ struct WeaponType { //Currently for melee & ranged
 	int max_targets;
 	int base_mindmg, base_maxdmg;
 	StatModifier damage_multiplier;
-	int range, cooldown, dmgradius;
+	int range, dmgradius, cooldown;
 	int weapon_sprite;
 	int attack_sprite;
 	int projectile_speed;

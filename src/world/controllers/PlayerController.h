@@ -13,6 +13,7 @@ class PlayerController {
 public:
 	PlayerController();
 	~PlayerController();
+	void update_fieldsofview(GameState* gs);
 	void pre_step(GameState* gs);
 	void clear();
 

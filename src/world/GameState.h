@@ -22,6 +22,8 @@
 #include "../fov/fov.h"
 #include "net/GameNetConnection.h"
 
+struct lua_State;
+
 class GameState {
 public:
 
@@ -147,6 +149,9 @@ public:
 		return connection;
 	}
 
+	lua_State* get_luastate(){
+		return lua_state;
+	}
 private:
 	GameSettings settings;
 	std::vector<GameLevelState*> level_states;
@@ -170,6 +175,9 @@ private:
 
 	//Primary font data
 	font_data pfont;
+
+	//Lua state
+	lua_State *lua_state;
 
 	//Key/mouse state information
 	char key_down_states[SDLK_LAST];

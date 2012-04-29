@@ -25,7 +25,12 @@
 #include "../data/tile_data.h"
 #include "../data/dungeon_data.h"
 #include "../data/class_data.h"
+#include "lua/lua_api.h"
 
+extern "C" {
+#include <lua/lua.h>
+#include <lua/lauxlib.h>
+}
 
 GameState::GameState(const GameSettings& settings, int width, int height, int vieww, int viewh, int hudw) :
 		settings(settings), world_width(width), world_height(height),  frame_n(0),
@@ -73,10 +78,17 @@ GameState::GameState(const GameSettings& settings, int width, int height, int vi
 	level()->steps_left = 1000;
 	GameInst* p = get_instance(level()->pc.local_playerid());
 	window_view().sharp_center_on(p->x, p->y);
+
+	lua_state = lua_open();
+
+	lua_lanarts_api(this,lua_state);
+	luaL_dofile(lua_state, "res/lua/effects.lua");
 }
 
 GameState::~GameState() {
 	release_font(&pfont);
+	lua_gc(lua_state, LUA_GCCOLLECT, 0);  // collected garbage
+	lua_close(lua_state);
 }
 
 /*Handle new characters and exit signals*/
@@ -143,12 +155,12 @@ bool GameState::update_iostate(){
 	return true;
 }
 bool GameState::step() {
-	const int sub_sqrs = VISION_SUBSQRS;
 
 	if (!update_iostate())
 		return false;
     
 	world.step();
+
 	return true;
 }
 

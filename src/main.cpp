@@ -1,10 +1,10 @@
 
-#include <iostream>"
+#include <iostream>
 #include <vector>
 #include <ctime>
 #include <SDL.h>
 #include <SDL_opengl.h>
-#include "display/display.h
+#include "display/display.h"
 #include "data/game_data.h"
 #include "world/GameState.h"
 #include "world/objects/PlayerInst.h"
@@ -113,9 +113,17 @@ static void game_loop(GameState* gs){
 	printf("Draw time: %f\n", float(draw_time)/draw_events);
 }
 
+
+extern "C" {
+#include <lua/lua.h>
+#include <lua/lauxlib.h>
+}
+
+#include "world/lua/lua_api.h"
+
+
+
 int main(int argc, char** argv) {
-	printf("Size of action = %d\n", sizeof(GameAction));
-	fflush(stdout);
 	GameSettings settings;
 	init_system(settings);
 
@@ -127,9 +135,24 @@ int main(int argc, char** argv) {
 	//Initialize the game state and start the level
 	GameState* gs = new GameState(settings, world_width,world_height, vieww, viewh);
 	gs->update_iostate();//for first iteration
-
-	game_loop(gs);
+//
+	//
+		game_loop(gs);
+//
+//		lua_State* state = lua_open();
+//
+//		lua_lanarts_api(gs, state);
+//
+//		luaL_dofile(state, "res/lua/effects.lua");
+//
+//		printf("-------------------");
+//		fflush(stdout);
+////		printf(" Num = %d\n", num);
+//
+//		lua_gc(state, LUA_GCCOLLECT, 0);  // collected garbage
+//		lua_close(state);
 
 	SDL_Quit();
+
 	return 0;
 }

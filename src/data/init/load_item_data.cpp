@@ -5,10 +5,6 @@
  *      Author: 100397561
  */
 
-
-
-
-
 #include <fstream>
 
 #include "../game_data.h"
@@ -24,7 +20,7 @@ ItemType parse_item_type(const YAML::Node& n){
 			parse_cstr(n["name"]),
 			parse_defaulted(n,"radius", 11),
 			parse_sprite_number(n, "sprite"),
-			get_action_by_name(action.c_str()),
+			action,
 			-1,
 			parse_defaulted(n,"action_amount", 50),
 			parse_defaulted(n,"action_duration", 400)

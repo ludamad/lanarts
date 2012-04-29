@@ -12,6 +12,7 @@
 #include <cassert>
 #include "../../util/game_basic_structs.h"
 
+struct lua_State;
 struct GameState;
 //Base class for game instances
 
@@ -44,5 +45,7 @@ public:
 
 typedef bool (*col_filterf)(GameInst* o1, GameInst* o2);
 
+
+void load_lua_gameinst_binding(lua_State* lua_state);
 
 #endif /* GAMEINST_H_ */

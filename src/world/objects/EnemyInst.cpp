@@ -38,11 +38,11 @@ void EnemyInst::init(GameState* gs) {
 	stats().max_hp += stats().max_hp*ln/10.0;
 	stats().mp += stats().mp*ln/10.0;
 	stats().max_mp += stats().max_mp*ln/10.0;
-	stats().ranged.cooldown /= 1.0 + ln/10.0;
-	stats().ranged.damage *= 1.0 + ln/10.0;
-	stats().ranged.projectile_speed *= 1.0 + ln/10.0;
-	stats().melee.cooldown /= 1.0 + ln/10.0;
-	stats().melee.damage *= 1.0 + ln/10.0;
+	stats().magicatk.cooldown /= 1.0 + ln/10.0;
+	stats().magicatk.damage *= 1.0 + ln/10.0;
+	stats().magicatk.projectile_speed *= 1.0 + ln/10.0;
+	stats().meleeatk.cooldown /= 1.0 + ln/10.0;
+	stats().meleeatk.damage *= 1.0 + ln/10.0;
 	stats().max_mp += stats().max_mp*ln/10.0;
 	double speedfactor = 1+stats().max_mp*ln/10.0;
 	if (stats().movespeed < 3)
@@ -99,7 +99,7 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 	PlayerInst* pinst;
 	if ( (pinst = dynamic_cast<PlayerInst*>(inst))) {
 		if (ranged){
-			Attack& ranged = stats().ranged;
+			Attack& ranged = stats().magicatk;
 
 			Pos p(pinst->x, pinst->y);
 			p.x += gs->rng().rand(-12,+13);
@@ -109,10 +109,10 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 			stats().reset_ranged_cooldown();
 			stats().cooldown += gs->rng().rand(-4,5);
 		} else {
-			pinst->stats().hurt(stats().melee.damage);
+			pinst->stats().hurt(stats().meleeatk.damage);
 
 			char dmgstr[32];
-			snprintf(dmgstr, 32, "%d", stats().melee.damage);
+			snprintf(dmgstr, 32, "%d", stats().meleeatk.damage);
 			float rx, ry;
 			direction_towards(Pos(x,y), Pos(pinst->x, pinst->y), rx, ry, 0.5);
 			gs->add_instance(new AnimatedInst(pinst->x-5 + rx*5,pinst->y+ry*5, -1, 25,

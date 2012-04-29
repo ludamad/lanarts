@@ -23,6 +23,13 @@
 #include "../../data/weapon_data.h"
 #include "TestInst.h"
 #include <deque>
+#include "../lua/lua_api.h"
+
+extern "C" {
+    #include <lua/lua.h>
+    #include <lua/lauxlib.h>
+    #include <lua/lualib.h>
+}
 
 // static FILE* saved = fopen("res/saved_replay.rep", "wb");
 // static FILE* open = fopen("res/replay.rep", "rb");
@@ -317,7 +324,12 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 
 void PlayerInst::use_item(GameState *gs, const GameAction& action) {
 	int item = inventory.inv[action.use_id].item;
-	game_item_data[item].action(gs, &game_item_data[item], this);
+	ItemType& type = game_item_data[item];
+
+	luadata_push(gs->get_luastate(), type.luadata);
+	lua_pushitem(gs->get_luastate(), type);
+	lua_pushgameinst(gs->get_luastate(), this->id);
+	lua_call(gs->get_luastate(), 2,0);
 	inventory.inv[action.use_id].n--;
 
 	canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
@@ -431,7 +443,7 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 		stats().mp -= 50;
 	}
 
-	Attack atk(effective_stats().ranged);
+	Attack atk(effective_stats().magicatk);
 	bool bounce = true;
 	int hits = 0;
 
@@ -455,13 +467,13 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	}
 
 	if (action.use_id == 1)
-		base_stats.cooldown = effective_stats().ranged.cooldown * 1.4;
+		base_stats.cooldown = effective_stats().magicatk.cooldown * 1.4;
 	else if (action.use_id == 0) {
 		double mult = 1 + base_stats.xplevel / 8.0;
 		mult = std::min(2.0, mult);
-		base_stats.cooldown = effective_stats().ranged.cooldown / mult;
+		base_stats.cooldown = effective_stats().magicatk.cooldown / mult;
 	} else if (action.use_id == 2) {
-		base_stats.cooldown = effective_stats().ranged.cooldown * 2;
+		base_stats.cooldown = effective_stats().magicatk.cooldown * 2;
 	}
 
 	canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
