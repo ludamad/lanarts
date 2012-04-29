@@ -6,7 +6,7 @@ FIND_PACKAGE(SDL_image REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
-include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} ../src_yaml/yaml-cpp/include ../src_net/ ../src_rvo2/RVO2)
+include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} ../src_yaml/yaml-cpp/include ../src_net/ ../src_rvo2/RVO2 ../src_lua)
 
 set( lanarts_src
 	gamestats/Item.cpp
@@ -24,6 +24,7 @@ set( lanarts_src
 	data/effect_data.cpp
 	data/game_data.cpp
 	data/item_data.cpp
+	data/lua_data.cpp
 	
 	display/display.cpp
 	display/GLImage.cpp
@@ -63,6 +64,12 @@ set( lanarts_src
 	world/GameView.cpp
 	world/GameWorld.cpp
 	
+	world/lua/lua_api.cpp
+	world/lua/lua_gameinst.cpp
+	world/lua/lua_gamestate.cp
+	world/lua/lua_item.cpp
+	world/lua/lua_util.cpp
+	
 	world/controllers/MonsterController.cpp
 	world/controllers/PlayerController.cpp
 	
@@ -91,6 +98,7 @@ set( lanarts_include
 	data/tile_data.h
 	data/tileset_data.h
 	data/weapon_data.h
+	data/lua_util.h
 	
 	display/display.h
 	display/GLImage.h
@@ -145,6 +153,9 @@ set( lanarts_include
 	world/objects/EnemyInst.h
 	world/objects/ProjectileInst.h
 	world/objects/TestInst.h
+	
+	world/lua/lua_api.h
+	world/lua/lua_util.h
 )
 
 add_executable( lanarts
@@ -156,6 +167,7 @@ target_link_libraries( lanarts
 			lanarts_tcp
 			yaml-cpp
 			RVO
+			lua
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}
 			${SDLIMAGE_LIBRARY}
