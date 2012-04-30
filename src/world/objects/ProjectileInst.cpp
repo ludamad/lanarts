@@ -88,6 +88,8 @@ void ProjectileInst::step(GameState* gs) {
 					gs->add_instance(new AnimatedInst(e->x, e->y, -1, 25,
 						0,0, buffstr, Colour(255,215,11)));
 				}
+				else
+					gs->skip_next_id();
 			}
 }
 	} else {

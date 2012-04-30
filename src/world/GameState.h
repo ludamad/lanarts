@@ -152,6 +152,10 @@ public:
 	lua_State* get_luastate(){
 		return lua_state;
 	}
+	//For staying in-synch on current-player dependent actions
+	void skip_next_id(){
+		level()->inst_set.skip_next_id();
+	}
 private:
 	GameSettings settings;
 	std::vector<GameLevelState*> level_states;

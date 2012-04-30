@@ -36,6 +36,7 @@ public:
 
 	unsigned int hash();
 
+	void skip_next_id(){ next_id++; }
 	size_t size(){ return unit_amnt; }
 	std::vector<GameInst*> to_vector();
 	void clear();
