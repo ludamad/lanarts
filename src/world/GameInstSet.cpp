@@ -11,6 +11,8 @@
 #include "../util/hashset_util.h"
 #include "../util/math_util.h"
 
+#include "objects/AnimatedInst.h"
+
 GameInst* const GAMEINST_TOMBSTONE = (GameInst*) 1;
 
 static bool valid_inst(GameInst* inst) {
@@ -270,7 +272,7 @@ unsigned int GameInstSet::hash(){
 	unsigned int hash = 0xbabdabe;
 	for (int i = 0, j = 0; i < unit_capacity; i++) {
 		GameInst* inst = unit_set[i].inst;
-		if (valid_inst(inst)){
+		if (valid_inst(inst) && !dynamic_cast<AnimatedInst*>(inst)){
 			hash ^= (inst->x) << 16 + inst->y;
 			hash *= 31337;
 		}
