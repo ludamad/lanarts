@@ -267,7 +267,7 @@ GameInst* GameInstSet::get_by_Pos(const Pos& c) {
 }
 
 unsigned int GameInstSet::hash(){
-	size_t hash = 0xbabdabe;
+	unsigned int hash = 0xbabdabe;
 	for (int i = 0, j = 0; i < unit_capacity; i++) {
 		GameInst* inst = unit_set[i].inst;
 		if (valid_inst(inst)){
