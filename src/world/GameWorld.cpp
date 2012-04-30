@@ -133,6 +133,7 @@ void GameWorld::step() {
 			unsigned int hash = game_state->level()->inst_set.hash();
 			NetPacket packet;
 			packet.add_int(hash);
+			packet.encode_header();
 			std::vector<NetPacket> packets;
 			game_state->net_connection().send_and_sync(packet, packets);
 			for (int i = 0; i < packets.size(); i++){
