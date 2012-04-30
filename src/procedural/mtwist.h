@@ -48,14 +48,14 @@ class MTwist {
 	enum {
 		N = 624
 	};
-	unsigned long mt[N];
+	unsigned int mt[N];
 	int mti;
 
 	/* generates a random number on [0,0xffffffff]-interval */
-	unsigned long genrand_int32(void);
+	unsigned int genrand_int32(void);
 
 	/* generates a random number on [0,0x7fffffff]-interval */
-	long genrand_int31(void);
+	int genrand_int31(void);
 
 	/* generates a random number on [0,1]-real-interval */
 	double genrand_real1(void);
@@ -71,15 +71,15 @@ class MTwist {
 
 
 public:
-	void init_genrand(unsigned long s);
-	void init_by_array(unsigned long init_key[], int key_length);
+	void init_genrand(unsigned int s);
+	void init_by_array(unsigned int init_key[], int key_length);
 
 	MTwist() : mti(N+1){
 	}
-	MTwist (unsigned long s) : mti(N+1){
+	MTwist (unsigned int s) : mti(N+1){
 		init_genrand(s);
 	}
-	MTwist(unsigned long init_key[], int key_length) : mti(N+1){
+	MTwist(unsigned int init_key[], int key_length) : mti(N+1){
 		init_by_array(init_key, key_length);
 	}
 

@@ -1,7 +1,7 @@
 fullscreen: 0
 regen_level_on_death: 1
-view_width: 1200
-view_height: 850
+view_width: 1600
+view_height: 800
 class: Mage
 font: res/MateSC-Regular.ttf
 
