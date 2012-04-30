@@ -66,7 +66,7 @@ set( lanarts_src
 	
 	world/lua/lua_api.cpp
 	world/lua/lua_gameinst.cpp
-	world/lua/lua_gamestate.cp
+	world/lua/lua_gamestate.cpp
 	world/lua/lua_item.cpp
 	world/lua/lua_util.cpp
 	
@@ -98,7 +98,7 @@ set( lanarts_include
 	data/tile_data.h
 	data/tileset_data.h
 	data/weapon_data.h
-	data/lua_util.h
+	data/lua_data.h
 	
 	display/display.h
 	display/GLImage.h
