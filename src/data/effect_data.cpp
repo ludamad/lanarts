@@ -12,8 +12,8 @@ void use_haste(Stats& basestats, Stats& affected){
 }
 
 
-Effect game_effect_data[] = {
-		Effect("haste",&use_haste)
+EffectType game_effect_data[] = {
+		EffectType("haste",&use_haste)
 };
-size_t game_effect_n = sizeof(game_effect_data)/sizeof(Effect);
+size_t game_effect_n = sizeof(game_effect_data)/sizeof(EffectType);
 

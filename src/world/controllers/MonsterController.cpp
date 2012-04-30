@@ -243,7 +243,7 @@ void MonsterController::process_players(GameState* gs){
 	}
 
 	//Create as many paths as there are players
-	paths.resize(pids.size());
+	resize_paths(pids.size());
 	for (int i = 0; i < pids.size(); i++) {
 		GameInst* player = gs->get_instance(pids[i]);
 		if (paths[i] == NULL)
@@ -384,6 +384,6 @@ void MonsterController::post_draw(GameState* gs){
 
 
 void MonsterController::clear(){
-	paths.clear();
+	resize_paths(0);
 	mids.clear();
 }

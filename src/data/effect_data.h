@@ -16,15 +16,15 @@ enum {
 
 typedef void (*effect_actionf)(Stats& basestats, Stats& affected);
 
-struct Effect {
+struct EffectType {
 	const char* name;
 	effect_actionf action;
-	Effect(const char* name, effect_actionf act) :
+	EffectType(const char* name, effect_actionf act) :
 		name(name), action(act){
 	}
 };
 
-extern Effect game_effect_data[];
+extern EffectType game_effect_data[];
 extern size_t game_effect_n;
 
 #endif /* EFFECT_DATA_H_ */
