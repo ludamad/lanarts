@@ -129,6 +129,18 @@ void GameWorld::step() {
 			game_state->level()->inst_set.step(game_state);
 			game_state->level()->steps_left--;
             game_state->level()->tiles.step(game_state);
+
+			unsigned int hash = game_state->level()->inst_set.hash();
+			NetPacket packet;
+			packet.add_int(hash);
+			std::vector<NetPacket> packets;
+			game_state->net_connection().send_and_sync(packet, packets);
+			for (int i = 0; i < packets.size(); i++){
+				unsigned int theirhash = packets[i].get_int();
+				if (theirhash != hash){
+					printf("Hashes dont match frame %d, theirs %d vs ours %d", game_state->frame(), theirhash, hash);
+				}
+			}
 		}
 	}
 	game_state->level() = current_level;
@@ -146,7 +158,7 @@ void GameWorld::step() {
 		game_state->level()->steps_left = 1000;
 
 		game_state->level()->pc.update_fieldsofview(game_state);
-// 		goto redofirststep;// goto top
+ 		goto redofirststep;// goto top
 	}
 }
 

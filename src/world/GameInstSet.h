@@ -34,6 +34,8 @@ public:
 	GameInst* object_nearest_test(GameInst* obj, int max_radius, col_filterf f = NULL);
 	int object_radius_test(GameInst* obj, GameInst** objs = NULL, int obj_cap = 0, col_filterf f = NULL, int x=-1, int y=-1, int radius=-1);
 
+	unsigned int hash();
+
 	size_t size(){ return unit_amnt; }
 	std::vector<GameInst*> to_vector();
 	void clear();

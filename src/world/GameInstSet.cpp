@@ -266,6 +266,17 @@ GameInst* GameInstSet::get_by_Pos(const Pos& c) {
 	}
 }
 
+unsigned int GameInstSet::hash(){
+	size_t hash = 0xbabdabe;
+	for (int i = 0, j = 0; i < unit_capacity; i++) {
+		GameInst* inst = unit_set[i].inst;
+		if (valid_inst(inst)){
+			hash ^= (inst->x) << 16 + inst->y;
+			hash *= 31337;
+		}
+	}
+	return hash;
+}
 int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 		col_filterf f, int x, int y, int radius) {
 	int rad = radius == -1 ? obj->radius : radius;
