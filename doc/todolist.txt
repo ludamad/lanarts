@@ -1,7 +1,6 @@
 Large:
 - Versatile save format that allows for resuming a networked game even through major game updates
-- Add LUA integration for specification of actions, make sure all data remains in YAML files
-- Make spells not hardcoded (Uses LUA integration ideally)
+- Make spells not hardcoded
 - Add allied monsters that stay close to their 'owner' and shoot at nearby enemies
 	Details:
 	-May need two pathfinds per monster
@@ -18,7 +17,6 @@ Medium:
 		-> optimize for depth bins & not many objects with different depths, adds nearly no overhead
 		-> Keep another doubly linked list in the internal structure that points to next highest ID object of same depth
 - Make game based on Strength/Defence/Agility and Magic/Resistance
-- Fix melee attacks -> add to action bar and make them not based on running into enemies, instead holding j/mouse
 	- add attack rate to base stats -> agility
 - Add higher level sprite class that handles animation & orientation & multiple tile variations
 - Add in-game chat support for multiplayer
@@ -37,8 +35,6 @@ Medium:
 
 Small:
 - Add item use preconditions so items are not wasted when they cannot be used
-- Broadcast RNG seed & class information
-- Add a resting animation
 - Have a flexible portal system that indicates which level to connect to
 - Add cooldowns to item use
 
@@ -73,3 +69,12 @@ AFTER 18/04/2012:
 - [DONE] Fix items on border of view not being visible -> subtract away from player and check visibility??
 - [DONE] Put tile-set information in the YAML files for level generation
 - [DONE] Add dropping of objects & dont always autopickup
+
+30/04/2012:
+- [DONE] Add LUA integration for specification of actions, make sure all data remains in YAML files
+
+
+03/05/2012:
+- [DONE] Broadcast RNG seed & class information
+- [DONE] Add a resting animation
+- [DONE] Fix melee attacks -> add to action bar and make them not based on running into enemies, instead holding j/mouse

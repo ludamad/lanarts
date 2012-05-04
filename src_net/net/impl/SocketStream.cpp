@@ -19,7 +19,7 @@ void socketstream_read_header_handler(SocketStream* ss,
 //		if (ss->last_message().body_length > 0){
 			asio::async_read(
 					ss->get_socket(),
-					asio::buffer(ss->last_message().body(),
+					asio::buffer(ss->last_message().body_start(),
 							ss->last_message().body_length),
 					boost::bind(socketstream_read_body_handler, ss,
 							asio::placeholders::error));

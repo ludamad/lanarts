@@ -33,8 +33,9 @@ public:
 
 	/* Each frame is divided into a step event, and a draw event */
 	void draw();
-	bool step();
-	bool update_iostate();
+	void step();
+	bool pre_step();
+	bool update_iostate(bool resetprev = true);
 
 	/* INSTANCE HANDLING METHODS */
 	GameInst* get_instance(obj_id id);

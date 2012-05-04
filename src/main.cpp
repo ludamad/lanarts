@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <vector>
 #include <ctime>
@@ -17,22 +16,21 @@ using namespace std;
 #define main SDL_main
 #endif
 /*
-void init_system(bool fullscreen, int w, int h){
-	init_sdl_gl(fullscreen,w,h);
-	init_window(w,h);
-}
-void world_display(TileSet& ts, const ViewPoint& vp){
-	glClearColor( 0.0, 0.0, 0.0, 1.0 );
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	ts.draw(vp);
-	update_display();
-	glFinish();
-}*/
+ void init_system(bool fullscreen, int w, int h){
+ init_sdl_gl(fullscreen,w,h);
+ init_window(w,h);
+ }
+ void world_display(TileSet& ts, const ViewPoint& vp){
+ glClearColor( 0.0, 0.0, 0.0, 1.0 );
+ glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+ ts.draw(vp);
+ update_display();
+ glFinish();
+ }*/
 
-
-void init_system(GameSettings& settings){
+void init_system(GameSettings& settings) {
 	settings = load_settings_data("res/settings.yaml");
-	if (SDL_Init(SDL_INIT_EVERYTHING) < 0){
+	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		exit(0);
 	}
 	init_sdl_gl(settings.fullscreen, settings.view_width, settings.view_height);
@@ -42,19 +40,20 @@ void init_system(GameSettings& settings){
 
 const int HUD_WIDTH = 160;
 
-static void game_loop(GameState* gs){
+static void game_loop(GameState* gs) {
 
 	bool paused = false, cont = true;
 
-	unsigned long draw_time = 5*CLOCKS_PER_SEC/1000;
+	unsigned long draw_time = 5 * CLOCKS_PER_SEC / 1000;
 	unsigned long draw_events = 1;
 
 	unsigned long step_time = 0;
 	unsigned long step_events = 1;
 
-	const clock_t per_frame = 14*CLOCKS_PER_SEC/1000;
+	const clock_t per_frame = 12 * CLOCKS_PER_SEC / 1000;
 	clock_t time_allowance = 0;
 
+	gs->pre_step();
 	for (int i = 0; cont; i++) {
 
 		if (gs->key_press_state(SDLK_F2)) {
@@ -70,49 +69,55 @@ static void game_loop(GameState* gs){
 			GameView& view = gs->window_view();
 			int nx = gs->mouse_x() + view.x, ny = gs->mouse_y() + view.y;
 			view.center_on(nx, ny);
-		 }
-		if (!paused){
-			if (gs->key_down_state(SDLK_F1)) {
-				for (int repeat = 0; repeat < 4; repeat++){
-					cont = gs->step();
-					if (!cont) break;
-				}
-			}
-			{
-				//Draw event
+		}
 
-				clock_t start = clock();
-				cont = gs->step();
-				clock_t end = clock();
+		//Draw event
+
+		clock_t stepndraw_start = clock(), stepndraw_end;
+		gs->draw();
+		clock_t draw_end = clock();
+		draw_events++;
+		draw_time += draw_end - stepndraw_start;
+		time_allowance -= draw_end - stepndraw_start;
+
+		if (!paused) {
+			int repeat_amount = 1;
+			if (gs->key_down_state(SDLK_F1))
+				repeat_amount = 4;
+
+			for (int repeat = 0; repeat < repeat_amount; repeat++) {
+				//Step event
+
+				clock_t step_start = clock();
+				gs->step();
+				stepndraw_end = clock();
 				step_events++;
-				int len = end-start;
+				int len = stepndraw_end - step_start;
 				step_time += len;
 
 				time_allowance = per_frame - len;
+				bool is_done = (!paused && !gs->pre_step())
+						|| (paused && !gs->update_iostate());
+				if (is_done) {
+					cont = false;
+					break;
+				}
 			}
-		} else
-			gs->update_iostate();
-	//	if (time_allowance > draw_events/draw_time){
-			//Draw event
-			clock_t start = clock();
-			gs->draw();
-			clock_t end = clock();
-			draw_events++;
-			draw_time += end-start;
-			time_allowance -= end-start;
-		//}
-	//	if (time_allowance > draw_events/draw_time){
-			int delayms = time_allowance*1000/CLOCKS_PER_SEC;
+		}
+
+		clock_t time_to_wait = per_frame - (clock() - stepndraw_start);
+
+		if (time_to_wait > 0) {
+			int delayms = time_to_wait * 1000 / CLOCKS_PER_SEC;
 			if (delayms > 0)
 				SDL_Delay(delayms);
-		//	time_allowance = 0;
-	///	}
+			time_allowance = 0;
+		}
 	}
 
-	printf("Step time: %f\n", float(step_time)/step_events);
-	printf("Draw time: %f\n", float(draw_time)/draw_events);
+	printf("Step time: %f\n", float(step_time) / step_events);
+	printf("Draw time: %f\n", float(draw_time) / draw_events);
 }
-
 
 extern "C" {
 #include <lua/lua.h>
@@ -121,23 +126,22 @@ extern "C" {
 
 #include "world/lua/lua_api.h"
 
-
-
 int main(int argc, char** argv) {
 	GameSettings settings;
 	init_system(settings);
 
-	int world_width = 128*TILE_SIZE, world_height = 128*TILE_SIZE;
+	int world_width = 128 * TILE_SIZE, world_height = 128 * TILE_SIZE;
 
 	int windoww = settings.view_width, windowh = settings.view_height;
-	int vieww = windoww -HUD_WIDTH, viewh = windowh;
+	int vieww = windoww - HUD_WIDTH, viewh = windowh;
 
 	//Initialize the game state and start the level
-	GameState* gs = new GameState(settings, world_width,world_height, vieww, viewh);
-	gs->update_iostate();//for first iteration
+	GameState* gs = new GameState(settings, world_width, world_height, vieww,
+			viewh);
+	gs->update_iostate(); //for first iteration
 //
 	//
-		game_loop(gs);
+	game_loop(gs);
 //
 //		lua_State* state = lua_open();
 //

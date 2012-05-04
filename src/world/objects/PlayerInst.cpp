@@ -30,6 +30,8 @@ void PlayerInst::deinit(GameState* gs) {
 
 void PlayerInst::step(GameState* gs) {
 
+	if (performed_actions_for_step()) return;
+
 	gs->level()->steps_left = 1000;
 	GameView& view = gs->window_view();
 
@@ -38,6 +40,8 @@ void PlayerInst::step(GameState* gs) {
 	//Stats/effect step
 	stats().step();
 	effects.step();
+
+	queue_network_actions(gs);
 
 	if (stats().hp <= 0) {
 //		if (is_local_focus())
@@ -52,10 +56,12 @@ void PlayerInst::step(GameState* gs) {
 	if (--canrestcooldown < 0)
 		canrestcooldown = 0;
 
-	perform_io_action(gs);
+	perform_queued_actions(gs);
 
 	if (!gs->key_down_state(SDLK_x) && is_local_focus())
 		 view.center_on(last_x, last_y);
+
+	performed_actions_for_step() = true;
 }
 
 

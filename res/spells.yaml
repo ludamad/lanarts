@@ -1,6 +1,18 @@
 ---
 spells:
 
-  - name: 
-    sprite: fire bolt
-    effect:
+  - name: Fire Bolt
+    attack_sprite: fire bolt
+    effect: firebolt
+    modifiers:
+        magic: 1
+    range: 
+    cooldown: 
+
+  - name: Magic Bolt
+    attack_sprite: magic bolt
+    effect: magicbolt
+    modifiers:
+        magic: 1
+    range: 
+    cooldown: 

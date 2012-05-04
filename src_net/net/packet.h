@@ -21,7 +21,8 @@ struct NetPacket {
 
 	NetPacket(int packet_origin = 0);
 	size_t length() const;
-    char *body();
+    char* body_start();
+    char* body_end();
     bool decode_header();
     void encode_header();
 
@@ -32,13 +33,13 @@ struct NetPacket {
 
 	template<typename T>
 	void add(const T& t) {
-		memcpy(body() + body_length, &t, sizeof(T));
+		memcpy(body_end(), &t, sizeof(T));
 		body_length += sizeof(T);
 	}
 	template<typename T>
 	void get(T& t) {
 		body_length -= sizeof(T);
-		memcpy(&t, body() + body_length, sizeof(T));
+		memcpy(&t, body_end(), sizeof(T));
 	}
 
 	char data[HEADER_LEN + MAX_PACKET_SIZE];

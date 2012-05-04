@@ -1,8 +1,7 @@
-#include <asio.hpp>
-#include <boost/bind.hpp>
 #include "../connection.h"
 #include "ClientNetConnection.h"
 #include "ServerNetConnection.h"
+
 
 NetConnection* create_server_connection(int port){
 	return new ServerNetConnection(port);

@@ -20,11 +20,11 @@ void GameNetConnection::wait_for_packet(NetPacket & packet) {
 }
 
 void GameNetConnection::send_and_sync(const NetPacket & packet,
-		std::vector<NetPacket>& received) {
+		std::vector<NetPacket>& received, bool send_to_new) {
 	if (!connect)
 		return;
 	NetPacket local;
-	connect->broadcast_packet(packet, true);
+	connect->broadcast_packet(packet, send_to_new);
 	wait_for_packet(local);
 	received.push_back(local);
 }

@@ -20,6 +20,8 @@ bool generate_room(const RoomGenSettings& rs, MTwist& mt, GeneratedLevel& level,
 	int mark = marked ? mt.rand(1,4) : 0;
 	Sqr val = Sqr( true, false, false, (feature_t)mark, 0, room_id );
 	level.set_region_with_perimeter(r, val, rs.room_padding);
+//	Region reg(r.x,r.y, 10, 10);
+//	level.set_circle_with_perimeter(reg, val, rs.room_padding);
 	return true;
 }
 
@@ -74,9 +76,15 @@ void generate_rooms(const RoomGenSettings& rs, MTwist& mt,
 void generate_level(const LevelGenSettings& ls, MTwist& mt,
 		GeneratedLevel& level, GameState* gs) {
 	level.initialize(ls.level_w, ls.level_h);
+	printf("level.init RNG state at %d numbers\n", mt.amount_of_randoms);
 	generate_rooms(ls.rooms, mt, level);
+	printf("ROOMS state at %d numbers\n", mt.amount_of_randoms);
 	generate_tunnels(ls.tunnels, mt, level);
+	printf("TUNNELS state at %d numbers\n", mt.amount_of_randoms);
 	generate_features(ls.features, mt, level, gs);
+	printf("FEATURES state at %d numbers\n", mt.amount_of_randoms);
 	generate_enemies(ls.enemies, mt, level, gs);
+	printf("ENEMIES state at %d numbers\n", mt.amount_of_randoms);
 	generate_items(ls.items, mt, level, gs);
+	printf("ITEMS state at %d numbers\n", mt.amount_of_randoms);
 }

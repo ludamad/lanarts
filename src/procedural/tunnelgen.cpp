@@ -8,12 +8,32 @@
 #include "tunnelgen.h"
 #include "mtwist.h"
 #include <cassert>
+#include <vector>
 
 static const int MAXPADDING = 3;
 static const int MAXWIDTH = 10;
-static const int MAXSIZE = MAXWIDTH + MAXPADDING*2;
+static const int MAXSIZE = MAXWIDTH + MAXPADDING * 2;
 
 #define LANARTS_ASSERT(x) assert(x)
+
+static Sqr* backtrack_entry(Sqr* backtracking, int entry_size, int entryn) {
+	return &backtracking[entry_size * entryn];
+}
+
+struct TunnelSliceContext {
+	//provided
+	Pos p;
+	int dx, dy;
+	char turn_state;
+	int attempt_number;
+
+	//calculated
+	bool tunneled;
+	Pos ip, newpos;
+
+	TunnelSliceContext() {
+	}
+};
 
 //Attempt connection from start room to another room
 struct TunnelGen {
@@ -25,130 +45,78 @@ struct TunnelGen {
 	bool accept_tunnel_entry;
 	int avoid_groupid;
 	int width;
+	int maxdepth;
 	int change_odds;
 	enum {
 		NO_TURN = 0, TURN_PERIMETER = 1, TURN_START = 2
 	};
-	inline TunnelGen(GeneratedLevel& s, MTwist& mt, int start_room, int padding, int width,
-			int change_odds, bool ate = false) :
+	inline TunnelGen(GeneratedLevel& s, MTwist& mt, int start_room, int padding,
+			int width, int depth, int change_odds, bool ate = false) :
 			s(s), mt(mt), start_room(start_room), end_room(0), padding(padding), accept_tunnel_entry(
-					ate), avoid_groupid(0), width(width), change_odds(
+					ate), avoid_groupid(0), width(width), maxdepth(depth), change_odds(
 					change_odds) {
 		LANARTS_ASSERT(padding <= MAXPADDING);
 		LANARTS_ASSERT(width <= MAXWIDTH);
 	}
 
-	bool generate_x(Pos p, bool right, int depth, int turn_state = NO_TURN);
-	bool generate_y(Pos p, bool down, int depth, int turn_state = NO_TURN);
+	Pos next_turn_position(TunnelSliceContext* cntxt, int& ndx, int& ndy);
+	Pos next_tunnel_position(TunnelSliceContext* cntxt);
+
+	void initialize_slice(TunnelSliceContext* cntxt, int turn_state, int dx,
+			int dy, const Pos& pos);
+	void backtrack_slice(Sqr* prev_content, TunnelSliceContext* cntxt, int dep);
+	void tunnel_turning_slice(TunnelSliceContext* curr,
+			TunnelSliceContext* next);
+	void tunnel_straight_slice(TunnelSliceContext* cntxt,
+			TunnelSliceContext* next);
+
+	//all return true if valid
+	bool validate_slice(Sqr* prev_content, TunnelSliceContext* cntxt, int dep);
+
+	bool generate(Pos p, int dx, int dy, std::vector<Sqr>& btbuff, std::vector<TunnelSliceContext>& tsbuff);
+
 };
 
-bool TunnelGen::generate_x(Pos p, bool right, int depth, int turn_state) {
-	bool generated;
-//	Sqr prev_content[width + padding*2]; //For backtracking
-	Sqr prev_content[MAXSIZE]; //For backtracking
-	Pos ip(p.x, p.y - 1), newpos;
-
-	if (p.x <= 2 || p.x >= s.width() - width)
-		return false;
-	if (depth <= 0)
-		return false;
-	bool tunneled = true;
-	for (int i = 0; i < width; i++) {
-		Sqr& sqr = s.at(p.x, p.y + i);
-		if (!sqr.passable || (!accept_tunnel_entry && sqr.roomID == 0)
-				|| sqr.is_corner) {
-			tunneled = false;
-			break;
-		}
-		if (avoid_groupid && sqr.groupID == avoid_groupid)
-			return false;
-		if (sqr.roomID == start_room)
-			return false;
-	}
-	if (tunneled) {
-		if (turn_state != NO_TURN)
-			return false;
-		end_room = s.at(p).roomID;
-		//s.at(p)
-		return true;
-	}
-	for (int i = 0; i < width + padding*2; i++) {
-		Sqr& sqr = s.at(ip.x, ip.y + i);
-		if (sqr.passable
-				|| (!accept_tunnel_entry && turn_state == NO_TURN
-						&& sqr.perimeter && sqr.roomID == 0))
-			return false;
-		memcpy(prev_content + i, &sqr, sizeof(Sqr));
-	}
-
-	if (turn_state == TURN_START) {
-		bool down = mt.rand(2);
-		if (down)
-			newpos.y = p.y + width;
-		else
-			newpos.y = p.y - 1;
-		newpos.x = right ? p.x - width : p.x + 1;
-		for (int i = 0; i < width + padding*2; i++) {
-			Sqr& sqr = s.at(ip.x, ip.y + i);
-			sqr.perimeter = true;
-			sqr.passable = false;
-			sqr.feature = width == 1 ? SMALL_CORRIDOR : LARGE_CORRIDOR;
-			sqr.roomID = 0;
-		}
-		generated = generate_y(newpos, down, depth - 1, TURN_PERIMETER);
-	} else {
-		s.at(ip).perimeter = true;
-		for (int i = 0; i < width; i++) {
-			Sqr& sqr = s.at(p.x, p.y + i);
-			sqr.perimeter = false;
-			sqr.passable = true;
-			sqr.feature = width == 1 ? SMALL_CORRIDOR : LARGE_CORRIDOR;
-			sqr.roomID = 0;
-		}
-		s.at(ip.x, ip.y + width + 1).perimeter = true;
-
-		newpos.y = p.y;
-		if (right)
-			newpos.x = p.x + 1;
-		else
-			newpos.x = p.x - 1;
-
-		if (turn_state == NO_TURN && mt.rand(change_odds) == 0) { //5% chance of 90 degree turn
-			generated = generate_x(newpos, right, depth - 1, TURN_START);
-			if (!generated)
-				generated = generate_x(newpos, right, depth - 1);
-		} else {
-			generated = generate_x(newpos, right, depth - 1);
-			if (turn_state == NO_TURN && !generated
-					&& mt.rand(change_odds) == 0) {
-				generated = generate_x(newpos, right, depth - 1, TURN_START);
-			}
-		}
-	}
-	if (!generated) {
-		for (int i = 0; i < width + padding*2; i++) {
-			s.at(ip.x, ip.y + i) = prev_content[i];
-		}
-	}
-	return generated;
+void TunnelGen::initialize_slice(TunnelSliceContext* cntxt, int turn_state,
+		int dx, int dy, const Pos& pos) {
+	cntxt->turn_state = turn_state;
+	cntxt->dx = dx, cntxt->dy = dy;
+	cntxt->p = pos;
+	cntxt->ip = Pos(pos.x - (dy != 0 ? 1 : 0), pos.y - (dx != 0 ? 1 : 0));
+	cntxt->attempt_number = 0;
 }
-bool TunnelGen::generate_y(Pos p, bool down, int depth, int turn_state) {
-	bool generated;
-	//	Sqr prev_content[width + padding*2]; //For backtracking
-	Sqr prev_content[MAXSIZE]; //For backtracking
-	Pos ip(p.x - 1, p.y), newpos;
 
-	if (p.y <= 2 || p.y >= s.height() - width)
+void TunnelGen::backtrack_slice(Sqr* prev_content, TunnelSliceContext* cntxt,
+		int dep) {
+	int dx = cntxt->dx, dy = cntxt->dy;
+
+	for (int i = 0; i < width + padding * 2; i++) {
+		int xcomp = (dy == 0 ? 0 : i);
+		int ycomp = (dx == 0 ? 0 : i);
+		s.at(cntxt->ip.x + xcomp, cntxt->ip.y + ycomp) = prev_content[i];
+	}
+
+}
+bool TunnelGen::validate_slice(Sqr* prev_content, TunnelSliceContext* cntxt,
+		int dep) {
+	int dx = cntxt->dx, dy = cntxt->dy;
+	if (cntxt->p.x <= 2 || cntxt->p.x >= s.width() - width)
 		return false;
-	if (depth <= 0)
+	if (cntxt->p.y <= 2 || cntxt->p.y >= s.height() - width)
+		return false;
+	//We must leave room to initialize the next tunnel depth
+	if (dep >= maxdepth - 1)
 		return false;
 
-	bool tunneled = true;
+	cntxt->tunneled = true;
+
 	for (int i = 0; i < width; i++) {
-		Sqr& sqr = s.at(p.x + i, p.y);
+		int xcomp = (dy == 0 ? 0 : i);
+		int ycomp = (dx == 0 ? 0 : i);
+		Sqr& sqr = s.at(cntxt->p.x + xcomp, cntxt->p.y + ycomp);
 		if (!sqr.passable || (!accept_tunnel_entry && sqr.roomID == 0)
 				|| sqr.is_corner) {
-			tunneled = false;
+			cntxt->tunneled = false;
 			break;
 		}
 		if (avoid_groupid && sqr.groupID == avoid_groupid)
@@ -156,85 +124,197 @@ bool TunnelGen::generate_y(Pos p, bool down, int depth, int turn_state) {
 		if (sqr.roomID == start_room)
 			return false;
 	}
-	if (tunneled) {
-		if (turn_state != NO_TURN)
+
+	if (cntxt->tunneled) {
+		if (cntxt->turn_state != NO_TURN)
 			return false;
-		end_room = s.at(p).roomID;
 		return true;
 	}
-	for (int i = 0; i < width + padding*2; i++) {
-		Sqr& sqr = s.at(ip.x + i, ip.y);
+
+	for (int i = 0; i < width + padding * 2; i++) {
+		int xcomp = (dy == 0 ? 0 : i);
+		int ycomp = (dx == 0 ? 0 : i);
+		Sqr& sqr = s.at(cntxt->ip.x + xcomp, cntxt->ip.y + ycomp);
 		if (sqr.passable
-				|| (!accept_tunnel_entry && turn_state == NO_TURN
+				|| (!accept_tunnel_entry && cntxt->turn_state == NO_TURN
 						&& sqr.perimeter && sqr.roomID == 0))
 			return false;
 		memcpy(prev_content + i, &sqr, sizeof(Sqr));
 	}
+	return true;
+}
 
-	if (turn_state == TURN_START) {
-		bool right = mt.rand(2);
-		if (right)
-			newpos.x = p.x + width;
+Pos TunnelGen::next_turn_position(TunnelSliceContext* cntxt, int& ndx,
+		int& ndy) {
+	Pos newpos;
+	int dx = cntxt->dx, dy = cntxt->dy;
+	bool positive = mt.rand(2);
+
+	if (dx == 0) {
+		if (positive)
+			newpos.x = cntxt->p.x + width;
 		else
-			newpos.x = p.x - 1;
-		newpos.y = down ? p.y - width : p.y + 1;
-		for (int i = 0; i < width + padding*2; i++) {
-			Sqr& sqr = s.at(ip.x + i, ip.y);
-			sqr.perimeter = true;
-			sqr.passable = false;
-			sqr.feature = width == 1 ? SMALL_CORRIDOR : LARGE_CORRIDOR;
-			sqr.roomID = 0;
-		}
-		generated = generate_x(newpos, right, depth - 1, TURN_PERIMETER);
+			newpos.x = cntxt->p.x - 1;
+		ndx = positive ? +1 : -1;
 	} else {
-		s.at(ip).perimeter = true;
-		for (int i = 0; i < width; i++) {
-			Sqr& sqr = s.at(p.x + i, p.y);
-			sqr.perimeter = false;
-			sqr.passable = true;
-			sqr.feature = width == 1 ? SMALL_CORRIDOR : LARGE_CORRIDOR;
-			sqr.roomID = 0;
-		}
-		s.at(ip.x + width + 1, ip.y).perimeter = true;
-		newpos.x = p.x;
-		if (down)
-			newpos.y = p.y + 1;
-		else
-			newpos.y = p.y - 1;
+		ndx = 0;
+		newpos.x = dx > 0 ? cntxt->p.x - width : cntxt->p.x + 1;
+	}
 
-		if (turn_state == NO_TURN && mt.rand(change_odds) == 0) { //95% chance of 90 degree turn
-			generated = generate_y(newpos, down, depth - 1, TURN_START);
-			if (!generated)
-				generated = generate_y(newpos, down, depth - 1);
-		} else {
-			generated = generate_y(newpos, down, depth - 1);
-			if (turn_state == NO_TURN && !generated
-					&& mt.rand(change_odds) == 0) {
-				generated = generate_y(newpos, down, depth - 1, TURN_START);
+	if (dy == 0) {
+		if (positive)
+			newpos.y = cntxt->p.y + width;
+		else
+			newpos.y = cntxt->p.y - 1;
+		ndy = positive ? +1 : -1;
+	} else {
+		ndy = 0;
+		newpos.y = dy > 0 ? cntxt->p.y - width : cntxt->p.y + 1;
+	}
+	return newpos;
+}
+
+Pos TunnelGen::next_tunnel_position(TunnelSliceContext* cntxt) {
+	Pos newpos;
+	int dx = cntxt->dx, dy = cntxt->dy;
+
+	if (dy == 0)
+		newpos.y = cntxt->p.y;
+	else if (dy > 0)
+		newpos.y = cntxt->p.y + 1;
+	else
+		newpos.y = cntxt->p.y - 1;
+
+	if (dx == 0)
+		newpos.x = cntxt->p.x;
+	else if (dx > 0)
+		newpos.x = cntxt->p.x + 1;
+	else
+		newpos.x = cntxt->p.x - 1;
+
+	return newpos;
+}
+
+void TunnelGen::tunnel_straight_slice(TunnelSliceContext* cntxt,
+		TunnelSliceContext* next) {
+	int dx = cntxt->dx, dy = cntxt->dy;
+
+	s.at(cntxt->ip).perimeter = true;
+	for (int i = 0; i < width; i++) {
+		int xcomp = (dy == 0 ? 0 : i);
+		int ycomp = (dx == 0 ? 0 : i);
+
+		Sqr& sqr = s.at(cntxt->p.x + xcomp, cntxt->p.y + ycomp);
+		sqr.perimeter = false;
+		sqr.passable = true;
+		sqr.feature = width == 1 ? SMALL_CORRIDOR : LARGE_CORRIDOR;
+		sqr.roomID = 0;
+	}
+
+	s.at(cntxt->ip.x + (dy == 0 ? 0 : width + 1), cntxt->ip.y + (dx == 0 ? 0 : width + 1)).perimeter = true;
+
+	Pos newpos = next_tunnel_position(cntxt);
+
+	bool start_turn = cntxt->turn_state == NO_TURN && mt.rand(change_odds) == 0;
+	initialize_slice(next, start_turn ? TURN_START : NO_TURN, dx, dy, newpos);
+}
+void TunnelGen::tunnel_turning_slice(TunnelSliceContext* cntxt,
+		TunnelSliceContext* next) {
+	int dx = cntxt->dx, dy = cntxt->dy;
+	int ndx, ndy;
+	Pos newpos = next_turn_position(cntxt, ndx, ndy);
+
+	for (int i = 0; i < width + padding * 2; i++) {
+		int xcomp = (dy == 0 ? 0 : i);
+		int ycomp = (dx == 0 ? 0 : i);
+		Sqr& sqr = s.at(cntxt->ip.x + xcomp, cntxt->ip.y + ycomp);
+		sqr.perimeter = true;
+		sqr.passable = false;
+		sqr.feature = width == 1 ? SMALL_CORRIDOR : LARGE_CORRIDOR;
+		sqr.roomID = 0;
+	}
+	initialize_slice(next, TURN_PERIMETER, ndx, ndy, newpos);
+}
+
+
+template <class T>
+void __resizebuff(T& t, size_t size){
+	if (t.size() <= size/2)
+		t.resize(size);
+	else if (t.size() < size)
+		t.resize(t.size()*2);
+}
+bool TunnelGen::generate(Pos p, int dx, int dy, std::vector<Sqr>& btbuff, std::vector<TunnelSliceContext>& tsbuff) {
+
+	int entry_size = MAXWIDTH + MAXPADDING * 2;
+
+	__resizebuff(btbuff, entry_size*maxdepth);
+	__resizebuff(tsbuff, maxdepth);
+
+	Sqr* backtracking = &btbuff[0];
+	TunnelSliceContext* tsc = &tsbuff[0];
+
+	Sqr* prev_content;
+	TunnelSliceContext* cntxt;
+
+	bool complete_tunnel = false;
+	int tunnel_depth = 0;
+
+	//By setting TURN_PERIMETER we avoid trying a turn on the first tunnel slice
+	initialize_slice(&tsc[tunnel_depth], TURN_PERIMETER, dx, dy, p);
+	while (true) {
+		prev_content = backtrack_entry(backtracking, entry_size, tunnel_depth);
+		cntxt = &tsc[tunnel_depth];
+
+		bool valid = tsc[tunnel_depth].attempt_number > 0
+				|| validate_slice(prev_content, cntxt, tunnel_depth);
+
+		if (valid && cntxt->attempt_number <= 0) {
+
+			if (cntxt->tunneled) {
+				end_room = s.at(p).roomID;
+				complete_tunnel = true;
+				break;
 			}
+
+			if (cntxt->turn_state == TURN_START) {
+				this->tunnel_turning_slice(cntxt, &tsc[tunnel_depth + 1]);
+			} else {
+				this->tunnel_straight_slice(cntxt, &tsc[tunnel_depth + 1]);
+			}
+
+			cntxt->attempt_number++;
+			tunnel_depth++;
+		} else {
+			tunnel_depth--;
+			if (tunnel_depth < 0)
+				break;
+
+			//set values to those of previous depth
+			prev_content = backtrack_entry(backtracking, entry_size,
+					tunnel_depth);
+			cntxt = &tsc[tunnel_depth];
+
+			backtrack_slice(prev_content, cntxt, tunnel_depth);
 		}
 	}
-	if (!generated) {
-		for (int i = 0; i < width + padding*2; i++) {
-			s.at(ip.x + i, ip.y) = prev_content[i];
-		}
-	}
-	return generated;
+
+	return complete_tunnel;
 }
 
 void generate_entrance(const Region& r, MTwist& mt, int len, Pos& p, bool& axis,
-		bool& more) {
+		bool& positive) {
 	int ind;
-	axis = mt.rand(2), more = mt.rand(2);
+	axis = mt.rand(2), positive = mt.rand(2);
 	if (axis) {
 		int rmx = r.x + r.w - len;
 		ind = mt.rand(r.x + 1, rmx);
-		p.y = more ? r.y + r.h : r.y - 1;
+		p.y = positive ? r.y + r.h : r.y - 1;
 		p.x = ind;
 	} else {
 		int rmy = r.y + r.h - len;
 		ind = mt.rand(r.y + 1, rmy);
-		p.x = more ? r.x + r.w : r.x - 1;
+		p.x = positive ? r.x + r.w : r.x - 1;
 		p.y = ind;
 	}
 }
@@ -244,13 +324,16 @@ void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
 		GeneratedLevel& level) {
 
 	Pos p;
-	bool axis, more;
+	bool axis, positive;
+
+	std::vector<Sqr> btbuff;
+	std::vector<TunnelSliceContext> tsbuff;
+
 	std::vector<int> genpaths(level.rooms().size(), 0);
 	std::vector<int> totalpaths(level.rooms().size());
 	for (int i = 0; i < level.rooms().size(); i++) {
-		totalpaths[i] = mt.rand(tgs.min_tunnels, tgs.max_tunnels+1);
+		totalpaths[i] = mt.rand(tgs.min_tunnels, tgs.max_tunnels + 1);
 	}
-
 	int nogen_tries = 0;
 	while (nogen_tries < 200) {
 		nogen_tries++;
@@ -258,38 +341,40 @@ void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
 		for (int i = 0; i < level.rooms().size(); i++) {
 			if (genpaths[i] >= totalpaths[i])
 				continue;
-			TunnelGen tg(level, mt, i + 1, tgs.padding,
-					mt.rand(tgs.minwidth, tgs.maxwidth + 1), 20,
-					tgs.padding > 0 && (genpaths[i] > 0 || nogen_tries > 100));
 			bool generated = false;
-			for (; tg.width >= 1 && !generated; tg.width--) {
+			int genwidth = mt.rand(tgs.minwidth, tgs.maxwidth + 1);
+			for (; genwidth >= 1 && !generated; genwidth--) {
 				int path_len = 5;
 				for (int attempts = 0; attempts < 16 && !generated;
 						attempts++) {
-					//bool small = (havepath && mt.rand(2) == 0);
-					generate_entrance(level.rooms()[i].room_region, mt, std::min(tg.width, 2), p,
-							axis, more);
-					if (axis) {
-						if (tg.generate_y(p, more, path_len)) {
-							genpaths[i]++;
-							nogen_tries = 0;
-							path_len = 5;
-							generated = true;
-						}
-					} else {
-						if (tg.generate_x(p, more, path_len)) {
-								genpaths[i]++;
-								nogen_tries = 0;
-								path_len = 5;
-								generated = true;
-						}
+					TunnelGen tg(
+							level,
+							mt,
+							i + 1,
+							tgs.padding,
+							genwidth,
+							path_len,
+							20,
+							tgs.padding > 0
+									&& (genpaths[i] > 0 || nogen_tries > 100));
+
+					generate_entrance(level.rooms()[i].room_region, mt,
+							std::min(tg.width, 2), p, axis, positive);
+
+					int val = positive ? +1 : -1;
+					int dx = axis ? 0 : val, dy = axis ? val : 0;
+
+					if (tg.generate(p, dx, dy, btbuff, tsbuff)) {
+						genpaths[i]++;
+						nogen_tries = 0;
+						path_len = 5;
+						generated = true;
 					}
-						if (attempts >= 4) {
-							path_len += 5;
-						}
+					if (attempts >= 4) {
+						path_len += 5;
 					}
 				}
-				//tg.end_room
 			}
 		}
 	}
+}

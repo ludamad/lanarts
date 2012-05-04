@@ -67,7 +67,24 @@ int GeneratedLevel::region_groupID(const Region & r, Pos & p) {
 
 		sqrs += w;
 	}
+	return 0;
+}
 
+void GeneratedLevel::set_circle_with_perimeter(const Region & r, const Sqr & val,
+		int padding) {
+	Sqr *sqrs = s + r.y * w;
+	Sqr val2 = Sqr(0, 1, 0, UNSET, 0, val.roomID);
+	float cx = r.x + float(r.w)/2, cy = r.y + float(r.h)/2;
+	for (int y = r.y; y < r.y + r.h; y++) {
+		for (int x = r.x; x < r.x + r.w; x++) {
+			float dx = (x +.5 - cx)/(r.w/2.0f - 1), dy = (y + .5 - cy)/(r.h/2.0f - 1);
+			if ((dx*dx)+(dy*dy) < 1.0)
+				memcpy(sqrs + x, &val, sizeof(Sqr));
+//			else
+//				memcpy(sqrs + x, &val2, sizeof(Sqr));
+		}
+		sqrs += w;
+	}
 }
 
 void GeneratedLevel::set_region_with_perimeter(const Region & r, const Sqr & val,

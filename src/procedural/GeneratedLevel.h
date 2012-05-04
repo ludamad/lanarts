@@ -82,6 +82,8 @@ public:
 	void set_region_corners(const Region & r);
 	void set_region_with_perimeter(const Region & r, const Sqr & val,
 			int padding);
+	void set_circle_with_perimeter(const Region & r, const Sqr & val,
+			int padding);
 
 	bool verify(const Region& r, bool check_init = true);
 	int region_groupID(const Region& r, Pos& p);

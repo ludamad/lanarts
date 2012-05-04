@@ -21,7 +21,7 @@ public:
 
 	NetConnection*& get_connection() { return connect; }
 	void wait_for_packet(NetPacket& packet);
-	void send_and_sync(const NetPacket& packet, std::vector<NetPacket>& receieved);
+	void send_and_sync(const NetPacket& packet, std::vector<NetPacket>& receieved, bool send_to_new = false);
 private:
 	std::vector<int> peer_ids;
 	int our_peer_id;

@@ -41,8 +41,9 @@ GameState::GameState(const GameSettings& settings, int width, int height, int vi
 				mouse_leftclick(0), mouse_rightclick(0) {
 	memset(key_down_states, 0, sizeof(key_down_states));
 	init_font(&pfont, settings.font.c_str(), 10);
-	time_t seed;
-	time(&seed);
+	time_t systime;
+	time(&systime);
+	int seed = systime;
 
 
 	if (settings.conntype == GameSettings::CLIENT){
@@ -68,12 +69,12 @@ GameState::GameState(const GameSettings& settings, int width, int height, int vi
         }
     } else if (settings.conntype == GameSettings::HOST){
         NetPacket packet;
-        packet.add_int((int)seed);
+        packet.add_int(seed);
         packet.encode_header();
         connection.get_connection()->broadcast_packet(packet, true);
     }
-    
-    mtwist.init_genrand((int)seed);
+	printf("Seed used for RNG = 0x%X\n", seed);
+    mtwist.init_genrand(seed);
 	level() = world.get_level(0, true);
 	level()->steps_left = 1000;
 	GameInst* p = get_instance(level()->pc.local_playerid());
@@ -140,28 +141,27 @@ int GameState::handle_event(SDL_Event *event) {
 	}
 	return (done);
 }
-bool GameState::update_iostate(){
+bool GameState::update_iostate(bool resetprev){
 	SDL_Event event;
-	memset(key_press_states, 0, sizeof(key_press_states));
+	if (resetprev){
+		memset(key_press_states, 0, sizeof(key_press_states));
+		mouse_leftclick = false;
+		mouse_rightclick = false;
+		mouse_didupwheel = false;
+		mouse_diddownwheel = false;
+	}
 	SDL_GetMouseState(&mousex, &mousey);
-	mouse_leftclick = false;
-	mouse_rightclick = false;
-	mouse_didupwheel = false;
-	mouse_diddownwheel = false;
 	while (SDL_PollEvent(&event)) {
 		if (handle_event(&event))
 			return false;
 	}
 	return true;
 }
-bool GameState::step() {
-
-	if (!update_iostate())
-		return false;
-    
+bool GameState::pre_step() {
+	return world.pre_step();
+}
+void GameState::step() {
 	world.step();
-
-	return true;
 }
 
 int GameState::key_down_state(int keyval) {

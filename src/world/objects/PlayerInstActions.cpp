@@ -55,9 +55,8 @@ static void get_current_actions(int frame, std::vector<GameAction>& actions) {
 // 	replay_actions = std::vector<GameAction>(&replay_actions[i], &replay_actions[replay_actions.size()]);
 }
 
-void PlayerInst::perform_io_action(GameState* gs) {
+void PlayerInst::queue_io_actions(GameState* gs) {
 	GameView& view = gs->window_view();
-	std::deque<GameAction> actions;
 	int level = gs->level()->roomid;
 	int frame = gs->frame();
 	int dx = 0, dy = 0;
@@ -86,7 +85,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 //Resting
 		bool resting = false;
 		if (gs->key_down_state(SDLK_r) && canrestcooldown == 0) {
-			actions.push_back(
+			queued_actions.push_back(
 					GameAction(id, GameAction::USE_REST, frame, level));
 			resting = true;
 		}
@@ -101,14 +100,14 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				if (spellselect)
 					mpcost = 20;
 				if (target && (spellselect == -1 || stats().mp < mpcost)) {
-					actions.push_back(
+					queued_actions.push_back(
 							GameAction(id, GameAction::USE_WEAPON, frame, level,
 									spellselect, target->x, target->y));
 				} else {
 					if (target && !stats().has_cooldown()
 							&& stats().mp >= mpcost
 							&& gs->object_visible_test(target, this)) {
-						actions.push_back(
+						queued_actions.push_back(
 								GameAction(id, GameAction::USE_SPELL, frame,
 										level, spellselect, target->x,
 										target->y));
@@ -121,7 +120,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				x = rmx, y = rmy;
 				if (stats().mp >= 50 && !gs->solid_test(this)
 						&& gs->object_visible_test(this)) {
-					actions.push_back(
+					queued_actions.push_back(
 							GameAction(id, GameAction::USE_SPELL, frame, level,
 									2, x, y));
 				}
@@ -133,11 +132,11 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				if (spellselect)
 					mpcost = 20;
 				if (spellselect == -1 || stats().mp < mpcost) {
-					actions.push_back(
+					queued_actions.push_back(
 							GameAction(id, GameAction::USE_WEAPON, frame, level,
 									spellselect, rmx, rmy));
 				} else if (!stats().has_cooldown() && stats().mp >= mpcost) {
-					actions.push_back(
+					queued_actions.push_back(
 							GameAction(id, GameAction::USE_SPELL, frame, level,
 									spellselect, rmx, rmy));
 				}
@@ -148,7 +147,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				if (gs->key_press_state(SDLK_1 + i)) {
 					if (inventory.inv[i].n > 0) {
 						item_used = true;
-						actions.push_back(
+						queued_actions.push_back(
 								GameAction(id, GameAction::USE_ITEM, frame,
 										level, i));
 						break; //Can only use one item/step (until we have item cooldowns)
@@ -162,7 +161,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				int slot = 5 * posy + posx;
 				if (slot >= 0 && slot < INVENTORY_SIZE
 						&& inventory.inv[slot].n > 0) {
-					actions.push_back(
+					queued_actions.push_back(
 							GameAction(id, GameAction::USE_ITEM, frame, level,
 									slot));
 				}
@@ -175,7 +174,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				int slot = 5 * posy + posx;
 				if (slot >= 0 && slot < INVENTORY_SIZE
 						&& inventory.inv[slot].n > 0) {
-					actions.push_back(
+					queued_actions.push_back(
 							GameAction(id, GameAction::DROP_ITEM, frame, level,
 									slot));
 				}
@@ -190,7 +189,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				bool pickup_io = gs->key_down_state(SDLK_LSHIFT)
 						|| gs->key_down_state(SDLK_RSHIFT);
 				if (pickup_io || autopickup)
-					actions.push_back(
+					queued_actions.push_back(
 							GameAction(id, GameAction::PICKUP_ITEM, frame,
 									level, item->id));
 			}
@@ -199,7 +198,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				if (gs->tile_radius_test(x, y, RADIUS, false,
 						get_tile_by_name("stairs_down"), &hitsqr)) {
 //				int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
-					actions.push_back(
+					queued_actions.push_back(
 							GameAction(id, GameAction::USE_ENTRANCE, frame,
 									level));
 				}
@@ -208,7 +207,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				if (gs->tile_radius_test(x, y, RADIUS, false,
 						get_tile_by_name("stairs_up"), &hitsqr)) {
 //				int entr_n = scan_entrance(gs->level()->exits, hitsqr);
-					actions.push_back(
+					queued_actions.push_back(
 							GameAction(id, GameAction::USE_EXIT, frame, level));
 				}
 			}
@@ -226,7 +225,7 @@ void PlayerInst::perform_io_action(GameState* gs) {
 				dx -= 1;
 			}
 			if (dx != 0 || dy != 0) {
-				actions.push_back(
+				queued_actions.push_back(
 						GameAction(id, GameAction::MOVE, frame, level, 0, dx,
 								dy));
 			}
@@ -238,50 +237,15 @@ void PlayerInst::perform_io_action(GameState* gs) {
 	NetPacket packet;
 
 	if (is_local_focus() && hasconnection) {
-		for (int i = 0; i < actions.size(); i++) {
-			actions[i].frame = gs->frame();
-			packet.add(actions[i]);
+		for (int i = 0; i < queued_actions.size(); i++) {
+			queued_actions[i].frame = gs->frame();
+			packet.add(queued_actions[i]);
 		}
 		packet.encode_header();
 		connection.get_connection()->broadcast_packet(packet);
 	}
 
-	if (!is_local_focus() && hasconnection) {
-		bool has_connect = false;
-		int tries = 0;
-		while (true) {
-			if (connection.get_connection()->get_next_packet(packet)) {
-
-				has_connect = true;
-				break;
-			} else if ((++tries) % 30000 == 0) {
-				if (!gs->update_iostate()) {
-					exit(0);
-				}
-			}
-//				if (gs->game_settings().conntype == GameSettings::HOST)
-//					break;
-		}
-		if (has_connect) {
-			bool output1 = true;
-			while (packet.body_length > 0) {
-				GameAction action;
-//				LANARTS_ASSERT(action.frame == gs->frame());
-				packet.get(action);
-				if (output1 && action.frame != frame) {
-					printf("action frame %d vs %d\n", action.frame, frame);
-					output1 = false;
-				}
-				actions.push_front(action);
-			}
-		}
-	}
-
 	isresting = false;
-	for (int i = 0; i < actions.size(); i++) {
-// 		to_action_file(saved, actions[i]);
-		perform_action(gs, actions[i]);
-	}
 }
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
@@ -294,6 +258,41 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	} else {
 		inventory.add(item->item_type(), 1);
 	}
+}
+
+void PlayerInst::queue_network_actions(GameState *gs){
+	GameNetConnection& connection = gs->net_connection();
+	bool hasconnection = connection.get_connection() != NULL;
+	NetPacket packet;
+	if (!is_local_focus() && hasconnection) {
+		int tries = 0;
+		while (!connection.get_connection()->get_next_packet(packet)) {
+			 if ((++tries) % 30000 == 0) {
+				if (!gs->update_iostate(false)) {
+					exit(0);
+				}
+			}
+		}
+		bool output1 = true;
+		while (packet.body_length > 0) {
+			GameAction action;
+			packet.get(action);
+			if (output1 && action.frame != gs->frame()) {
+				printf("action frame %d vs %d\n", action.frame, gs->frame());
+				output1 = false;
+			}
+			queued_actions.push_front(action);
+		}
+	}
+}
+
+
+void PlayerInst::perform_queued_actions(GameState *gs){
+	for (int i = 0; i < queued_actions.size(); i++) {
+// 		to_action_file(saved, actions[i]);
+		perform_action(gs, queued_actions[i]);
+	}
+	queued_actions.clear();
 }
 
 void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
@@ -323,6 +322,9 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 		return pickup_item(gs, action);
 	case GameAction::DROP_ITEM:
 		return drop_item(gs, action);
+	default:
+		printf("PlayerInst::perform_action() error: Invalid action id %d!!\n", action.act);
+		break;
 	}
 }
 
@@ -396,6 +398,7 @@ static int scan_entrance(const std::vector<GameLevelPortal>& portals,
 			return i;
 		}
 	}
+
 	return -1;
 }
 

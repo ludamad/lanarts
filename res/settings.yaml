@@ -7,5 +7,5 @@ font: res/MateSC-Regular.ttf
 
 #Either 'host', 'client', or 'none'
 connection_type: client
-ip: 10.42.0.1
+ip: 67.204.2.45
 port: 6112

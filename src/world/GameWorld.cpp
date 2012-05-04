@@ -86,7 +86,7 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player
 					NetPacket classpacket;
 					classpacket.add_int(myclassn);
 					classpacket.encode_header();
-					netconn.send_and_sync(classpacket, others_classes);
+					netconn.send_and_sync(classpacket, others_classes, true);
 					theirclass = others_classes[0].get_int();
 				}
 
@@ -109,6 +109,26 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer, void** player
 
 
 
+bool GameWorld::pre_step(){
+	if (!game_state->update_iostate()) return false;
+
+	GameLevelState* current_level = game_state->level();
+
+	midstep = true;
+    game_state->frame()++;
+	for (int i = 0; i < level_states.size(); i++){
+			game_state->level() = level_states[i];
+			const std::vector<obj_id>& player_ids = game_state->level()->pc.player_ids();
+			for (int i = 0; i < player_ids.size(); i++){
+				PlayerInst* p = (PlayerInst*)game_state->get_instance(player_ids[i]);
+				p->queue_io_actions(game_state);
+				p->performed_actions_for_step() = false;
+			}
+		}
+	game_state->level() = current_level;
+	midstep = false;
+	return true;
+}
 void GameWorld::step() {
 	redofirststep://I used a goto dont kill me
 
@@ -117,9 +137,9 @@ void GameWorld::step() {
 	GameLevelState* current_level = game_state->level();
 //	current_level->steps_left = STEPS_TO_SIMULATE;
 
-    game_state->frame()++;
     
 	midstep = true;
+
 	for (int i = 0; i < level_states.size(); i++){
 		if (level_states[i]->steps_left > 0){
 			//Set so that all the GameState getters are properly updated
@@ -130,18 +150,29 @@ void GameWorld::step() {
 			game_state->level()->steps_left--;
             game_state->level()->tiles.step(game_state);
 
-			unsigned int hash = game_state->level()->inst_set.hash();
-			NetPacket packet;
-			packet.add_int(hash);
-			packet.encode_header();
-			std::vector<NetPacket> packets;
-			game_state->net_connection().send_and_sync(packet, packets);
-			for (int i = 0; i < packets.size(); i++){
-				unsigned int theirhash = packets[i].get_int();
-				if (theirhash != hash){
-					printf("Hashes dont match frame %d, theirs %d vs ours %d", game_state->frame(), theirhash, hash);
-				}
-			}
+//            if (true) {
+//				int hash = game_state->level()->inst_set.hash();
+//				int randoms = game_state->rng().amount_of_randoms;
+//				NetPacket packet;
+//				packet.add_int(hash);
+//				packet.add_int(randoms);
+//				packet.encode_header();
+//				std::vector<NetPacket> packets;
+//				game_state->net_connection().send_and_sync(packet, packets, false);
+//				for (int i = 0; i < packets.size(); i++){
+//					NetPacket& p = packets[i];
+//					int theirrandoms = p.get_int();
+//					int theirhash = p.get_int();
+//
+//
+//					if (theirrandoms != randoms){
+//						printf("RNG states do not match: frame %d, theirs %d vs ours %d\n", game_state->frame(), theirrandoms, randoms);
+//					}
+//					if (theirhash != hash){
+//						printf("Hashes dont match frame %d, theirs %d vs ours %d\n", game_state->frame(), theirhash, hash);
+//					}
+//				}
+//            }
 		}
 	}
 	game_state->level() = current_level;
@@ -156,10 +187,9 @@ void GameWorld::step() {
 		GameInst* g = game_state->get_instance(game_state->player_controller().local_playerid());
 		game_state->window_view().sharp_center_on(g->x,g->y);
 		next_room_id = -1;
-		game_state->level()->steps_left = 1000;
 
 		game_state->level()->pc.update_fieldsofview(game_state);
- 		goto redofirststep;// goto top
+// 		goto redofirststep;// goto top
 	}
 }
 
@@ -240,6 +270,7 @@ void GameWorld::reset(int keep){
 		}
 		level_states.resize(keep);
 		game_state->level() = get_level(keep, true /*spawn player*/);
+		game_state->level()->steps_left = 1000;
 	}
 }
 

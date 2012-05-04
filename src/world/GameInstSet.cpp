@@ -273,7 +273,7 @@ unsigned int GameInstSet::hash(){
 	for (int i = 0, j = 0; i < unit_capacity; i++) {
 		GameInst* inst = unit_set[i].inst;
 		if (valid_inst(inst) && !dynamic_cast<AnimatedInst*>(inst)){
-			hash ^= (inst->x) << 16 + inst->y;
+			hash ^= ((inst->x) << 16) + inst->y;
 			hash *= 31337;
 		}
 	}

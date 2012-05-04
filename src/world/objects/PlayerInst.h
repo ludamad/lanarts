@@ -17,6 +17,7 @@
 #include "../../data/sprite_data.h"
 
 #include "../GameAction.h"
+#include <deque>
 
 const int REST_COOLDOWN = 150;
 
@@ -37,7 +38,9 @@ public:
 	virtual void step(GameState *gs);
 	virtual void draw(GameState *gs);
 
-	void perform_io_action(GameState* gs);
+	void queue_io_actions(GameState* gs);
+	void queue_network_actions(GameState* gs);
+	void perform_queued_actions(GameState* gs);
 	void perform_action(GameState* gs, const GameAction& action);
 
 	Stats & stats() {
@@ -75,6 +78,10 @@ public:
 		return inventory;
 	}
 
+	bool& performed_actions_for_step(){
+		return didstep;
+	}
+
 private:
 	void use_move(GameState *gs, const GameAction& action);
 	void use_weapon(GameState *gs, const GameAction& action);
@@ -86,6 +93,8 @@ private:
 	void pickup_item(GameState* gs, const GameAction& action);
 	void drop_item(GameState* gs, const GameAction& action);
 
+	std::deque<GameAction> queued_actions;
+	bool didstep;
 	Inventory inventory;
 	bool local, isresting;
 	int weapon;

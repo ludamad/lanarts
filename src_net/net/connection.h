@@ -17,7 +17,6 @@ public:
 	virtual ~NetConnection(){}
 };
 
-
 NetConnection* create_server_connection(int port);
 NetConnection* create_client_connection(const char* host, const char* port);
 

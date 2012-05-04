@@ -20,6 +20,7 @@ set( lanarts_src
 	data/init/load_weapon_data.cpp
 	data/init/load_class_data.cpp 
 	data/init/load_sprite_data.cpp
+	data/init/yaml_util.cpp
 	
 	data/effect_data.cpp
 	data/game_data.cpp

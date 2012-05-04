@@ -31,7 +31,7 @@ branches:
           amount: 3
           size: [10,10]
         tunnels:
-          padding: 1
+          padding: 2
           width: [1,2]
           per_room: 5       
         features:
