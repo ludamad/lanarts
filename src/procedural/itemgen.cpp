@@ -28,8 +28,8 @@ void generate_items(const ItemGenSettings& is, MTwist& mt, GeneratedLevel& level
 	//generate gold
 	for (int i = 0; i < amount; i++) {
 		Pos ipos = generate_location(mt, level);
-		int ix = (ipos.x+start_x) * 32 + 16;
-		int iy = (ipos.y+start_y) * 32 + 16;
+		int ix = (ipos.x+start_x) * TILE_SIZE + TILE_SIZE/2;
+		int iy = (ipos.y+start_y) * TILE_SIZE + TILE_SIZE/2;
 		
 		int item_roll = mt.rand(total_chance);
 		int item_type;

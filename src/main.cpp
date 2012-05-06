@@ -142,19 +142,6 @@ int main(int argc, char** argv) {
 //
 	//
 	game_loop(gs);
-//
-//		lua_State* state = lua_open();
-//
-//		lua_lanarts_api(gs, state);
-//
-//		luaL_dofile(state, "res/lua/effects.lua");
-//
-//		printf("-------------------");
-//		fflush(stdout);
-////		printf(" Num = %d\n", num);
-//
-//		lua_gc(state, LUA_GCCOLLECT, 0);  // collected garbage
-//		lua_close(state);
 
 	SDL_Quit();
 

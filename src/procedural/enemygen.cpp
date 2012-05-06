@@ -8,22 +8,6 @@
 #include "enemygen.h"
 #include "../world/GameState.h"
 #include "../world/objects/EnemyInst.h"
-/*
-void generate_enemies(const EnemyGenSettings& es, MTwist& mt,
-		GeneratedLevel& level, GameState* gs) {
-	GameTiles& tiles = gs->tile_grid();
-	int start_x = (tiles.tile_width() - level.width()) / 2;
-	int start_y = (tiles.tile_height() - level.height()) / 2;
-
-	for (int i = 0; i < es.nmonsters; i++) {
-		int etype = mt.rand(es.min_xplevel, es.max_xplevel + 1); //mt.rand(es.min_xplevel, es.max_xplevel);
-		Pos epos = generate_location_byroom(mt, level);
-		int ex = (epos.x + start_x) * 32 + 16;
-		int ey = (epos.y + start_y) * 32 + 16;
-		gs->add_instance(new EnemyInst(&game_enemy_data[etype], ex, ey));
-		level.at(epos).has_instance = true;
-	}
-}*/
 
 //Generates enemy monsters
 void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,

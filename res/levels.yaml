@@ -31,11 +31,11 @@ branches:
           amount: 3
           size: [10,10]
         tunnels:
-          padding: 1
+          padding: 2
           width: [1,2]
           per_room: 5       
         features:
-          tileset: sand_tiles
+          tileset: pebble_tiles
           stairs_up: 0
           stairs_down: 5
         enemies:
@@ -132,7 +132,7 @@ branches:
               group_size: 2
           amount: 15
         features:
-          tileset: pebble_tiles
+          tileset: crystal_tiles
       #Level 3
       - size: [76, 76]
         items:

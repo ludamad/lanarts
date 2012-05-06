@@ -55,6 +55,55 @@ static void get_current_actions(int frame, std::vector<GameAction>& actions) {
 // 	replay_actions = std::vector<GameAction>(&replay_actions[i], &replay_actions[replay_actions.size()]);
 }
 
+static bool find_blink_target(PlayerInst* p, GameState* gs, Pos& position) {
+	PlayerController& pc = gs->player_controller();
+	int maxdist = 0;
+	const std::vector<obj_id>& mids = gs->monster_controller().monster_ids();
+	std::vector<GameInst*> visible_monsters;
+
+	for (int i = 0; i < mids.size(); i++) {
+		GameInst* inst = gs->get_instance(mids[i]);
+		if (gs->object_visible_test(inst)) {
+			visible_monsters.push_back(inst);
+		}
+	}
+
+	for (int i = 0; i < pc.player_ids().size(); i++){
+
+		fov* fov = pc.player_fovs()[i];
+		BBox fbox = fov->tiles_covered();
+		FOR_EACH_BBOX(fbox, x, y) {
+			if (fov->within_fov(x, y)) {
+				int mindist = -1;
+				int cx = x * TILE_SIZE + TILE_SIZE / 2, cy = y * TILE_SIZE
+						+ TILE_SIZE / 2;
+
+				if (gs->solid_test(p, cx, cy))
+					continue;
+
+				for (int i = 0; i < visible_monsters.size(); i++) {
+					GameInst* inst = visible_monsters[i];
+					float dx = inst->x - cx, dy = inst->y - cy;
+					float dist = sqrt(dx * dx + dy * dy);
+					if (mindist == -1 || dist < mindist) {
+						mindist = dist;
+					}
+				}
+
+				if (mindist > TILE_SIZE / 2 && mindist > maxdist) {
+					maxdist = mindist;
+					position = Pos(cx, cy);
+				}
+			}
+		}
+	}
+	if (maxdist != 0) {
+		float dx = p->x - position.x, dy = p->y - position.y;
+		float dist = sqrt(dx * dx + dy * dy);
+		return (dist > TILE_SIZE / 2);
+	} else
+		return false;
+}
 void PlayerInst::queue_io_actions(GameState* gs) {
 	GameView& view = gs->window_view();
 	int level = gs->level()->roomid;
@@ -92,8 +141,19 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 
 		if (!resting) {
 
+			//Keyboard-oriented blink
+			if (!spell_used && gs->key_press_state(SDLK_h)) {
+				Pos blinkposition;
+				if (stats().mp >= 50
+						&& find_blink_target(this, gs, blinkposition)) {
+					queued_actions.push_back(
+							GameAction(id, GameAction::USE_SPELL, frame, level,
+									2, blinkposition.x, blinkposition.y));
+					spell_used = true;
+				}
+			}
 			//Spell use
-			if (gs->key_down_state(SDLK_j)) {
+			if (!spell_used && gs->key_down_state(SDLK_j)) {
 				MonsterController& mc = gs->monster_controller();
 				GameInst* target = gs->get_instance(mc.current_target());
 				int mpcost = 10;
@@ -103,6 +163,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 					queued_actions.push_back(
 							GameAction(id, GameAction::USE_WEAPON, frame, level,
 									spellselect, target->x, target->y));
+					spell_used = true;
 				} else {
 					if (target && !stats().has_cooldown()
 							&& stats().mp >= mpcost
@@ -111,10 +172,11 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 								GameAction(id, GameAction::USE_SPELL, frame,
 										level, spellselect, target->x,
 										target->y));
+						spell_used = true;
 					}
 				}
 			}
-			if (gs->mouse_right_click() && mouse_within) {
+			if (!spell_used && gs->mouse_right_click() && mouse_within) {
 
 				int px = x, py = y;
 				x = rmx, y = rmy;
@@ -127,7 +189,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 				x = px, y = py;
 			}
 
-			if (gs->mouse_left_down() && mouse_within) {
+			if (!spell_used && gs->mouse_left_down() && mouse_within) {
 				int mpcost = 10;
 				if (spellselect)
 					mpcost = 20;
@@ -135,10 +197,12 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 					queued_actions.push_back(
 							GameAction(id, GameAction::USE_WEAPON, frame, level,
 									spellselect, rmx, rmy));
+					spell_used = true;
 				} else if (!stats().has_cooldown() && stats().mp >= mpcost) {
 					queued_actions.push_back(
 							GameAction(id, GameAction::USE_SPELL, frame, level,
 									spellselect, rmx, rmy));
+					spell_used = true;
 				}
 			}
 
@@ -244,8 +308,6 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 		packet.encode_header();
 		connection.get_connection()->broadcast_packet(packet);
 	}
-
-	isresting = false;
 }
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
@@ -260,14 +322,14 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	}
 }
 
-void PlayerInst::queue_network_actions(GameState *gs){
+void PlayerInst::queue_network_actions(GameState *gs) {
 	GameNetConnection& connection = gs->net_connection();
 	bool hasconnection = connection.get_connection() != NULL;
 	NetPacket packet;
 	if (!is_local_focus() && hasconnection) {
 		int tries = 0;
 		while (!connection.get_connection()->get_next_packet(packet)) {
-			 if ((++tries) % 30000 == 0) {
+			if ((++tries) % 30000 == 0) {
 				if (!gs->update_iostate(false)) {
 					exit(0);
 				}
@@ -286,8 +348,7 @@ void PlayerInst::queue_network_actions(GameState *gs){
 	}
 }
 
-
-void PlayerInst::perform_queued_actions(GameState *gs){
+void PlayerInst::perform_queued_actions(GameState *gs) {
 	for (int i = 0; i < queued_actions.size(); i++) {
 // 		to_action_file(saved, actions[i]);
 		perform_action(gs, queued_actions[i]);
@@ -323,7 +384,8 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 	case GameAction::DROP_ITEM:
 		return drop_item(gs, action);
 	default:
-		printf("PlayerInst::perform_action() error: Invalid action id %d!!\n", action.act);
+		printf("PlayerInst::perform_action() error: Invalid action id %d!!\n",
+				action.act);
 		break;
 	}
 }

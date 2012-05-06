@@ -30,13 +30,16 @@ void PlayerController::pre_step(GameState* gs) {
 	update_fieldsofview(gs);
 }
 
-fov* PlayerController::local_playerfov() {
+fov* PlayerController::playerfov(obj_id pid){
 	int i;
 	for (i = 0; i < pids.size(); i++) {
-		if (pids[i] == local_playerid())
+		if (pids[i] == pid)
 			break;
 	}
 	return fovs[i];
+}
+fov* PlayerController::local_playerfov() {
+	return playerfov(local_playerid());
 }
 
 void PlayerController::register_player(obj_id player, bool islocal) {

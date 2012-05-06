@@ -1,5 +1,9 @@
 ---
 tilesets:
+  - tileset: nerve_tiles
+    floor_tile: [nerve_floor0, nerve_floor6]
+    wall_tile: [cobble_blood0,cobble_blood11]
+  
   - tileset: blue_tiles
     floor_tile: [crystal_floor0, crystal_floor5]
     wall_tile: [brick_gray0,brick_gray3]

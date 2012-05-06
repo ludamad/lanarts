@@ -46,6 +46,10 @@ struct Region {
 typedef int obj_id;
 
 #define LANARTS_ASSERT(x) assert(x)
+#define FOR_EACH_BBOX(bbox, x, y) \
+	for (int y = (bbox).y1; y < (bbox).y2; y++)\
+		for (int x = (bbox).x1; x < (bbox).x2; x++)
+
 
 
 #endif

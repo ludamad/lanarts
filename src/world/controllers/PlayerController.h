@@ -25,6 +25,7 @@ public:
 	const std::vector<fov*>& player_fovs() { return fovs; }
 	obj_id local_playerid() { return local_player; }
 	fov* local_playerfov();
+	fov* playerfov(obj_id pid);
 private:
 	obj_id local_player;
 	std::vector<fov*> fovs;
