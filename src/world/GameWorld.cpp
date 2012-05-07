@@ -44,8 +44,8 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, int classn, P
 	int start_y = (tiles.tile_height() - genlevel.height()) / 2;
 
 	genlevel.at(epos).has_instance = true;
-	int px = (epos.x + start_x) * 32 + 16;
-	int py = (epos.y + start_y) * 32 + 16;
+	int px = (epos.x + start_x) * TILE_SIZE + TILE_SIZE/2;
+	int py = (epos.y + start_y) * TILE_SIZE + TILE_SIZE/2;
 
 	if (!inst){
 		inst = new PlayerInst(c->starting_stats, px,py, local);

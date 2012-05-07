@@ -39,11 +39,14 @@ void AnimatedInst::draw(GameState* gs){
 	}
 	Colour wd(255 - textcol.r, 255 -textcol.g, 255 - textcol.b);
 	if (text.size() > 0){
-		int fade =100*timeleft/animatetime;
-		Colour alphacol(textcol.r+fade*wd.r/100,
-				textcol.g+fade*wd.g/100,
-				textcol.b+fade*wd.b/100,
-				255 - fade);
+		Colour alphacol = textcol;
+		if (timeleft > -1){
+			int fade =100*timeleft/animatetime;
+			alphacol = Colour(textcol.r+fade*wd.r/100,
+					textcol.g+fade*wd.g/100,
+					textcol.b+fade*wd.b/100,
+					255 - fade);
+		}
 		gl_printf(gs->primary_font(), alphacol, x - view.x, y - view.y, "%s", text.c_str());
 	}
 }

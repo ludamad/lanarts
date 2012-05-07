@@ -177,7 +177,7 @@ void gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
 	int len = 0;
 	y += ft_font.h;
 	for (char* iter = text; iter < text + textlen;
-			iter += strlen(iter) + 1, y += ft_font.h + 1) {
+			iter += strlen(iter) + 1, len = 0, y += ft_font.h + 1) {
 //
 	//	glPushAttrib(GL_CURRENT_BIT | GL_PIXEL_MODE_BIT | GL_ENABLE_BIT);
 //

@@ -34,6 +34,16 @@ static void leave_menu(void* flag) {
 	*(bool*) flag = true;
 }
 
+static const char HELP_TEXT[] =
+		"Movement: WASD or Arrow Keys\n"
+		"Use Attack or Attack Spell: j or left-click\n"
+		"Switch Auto-Target (for use with 'j'): k\n"
+		"Switch Attack Spell: space\n"
+		"Switch to Melee: m or e\n"
+		"Use Blink: h or right-click\n"
+		"Use Item: click item or keys 1 through 9\n"
+		"Use Stairs: < and > or mouse wheel\n";
+
 static void menu_loop(GameState* gs, int width, int height) {
 	bool exit = false;
 	int halfw = width / 2;
@@ -46,6 +56,7 @@ static void menu_loop(GameState* gs, int width, int height) {
 	gs->window_view().y = 0;
 
 	gs->add_instance(new AnimatedInst(halfw, 100, get_sprite_by_name("logo")));
+	gs->add_instance(new AnimatedInst(halfw - 100, 500, -1, -1,  0.0f,0.0f, HELP_TEXT, Colour(255,255,255)));
 	gs->add_instance(
 			new ButtonInst("START", BBox(halfw - 60, 400, halfw + 60, 430),
 					leave_menu, &exit));
