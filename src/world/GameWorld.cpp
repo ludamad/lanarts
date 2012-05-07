@@ -28,8 +28,7 @@ void GameWorld::generate_room(GameLevelState* level){
 
 }
 
-int GameWorld::get_current_level_id()
-{
+int GameWorld::get_current_level_id(){
     return game_state->level()->roomid;
 }
 

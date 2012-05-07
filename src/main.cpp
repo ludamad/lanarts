@@ -6,8 +6,10 @@
 #include "display/display.h"
 #include "data/game_data.h"
 #include "world/GameState.h"
+#include "world/objects/ButtonInst.h"
 #include "world/objects/PlayerInst.h"
 #include "world/objects/EnemyInst.h"
+#include "world/objects/AnimatedInst.h"
 #include "world/objects/TestInst.h"
 
 using namespace std;
@@ -15,18 +17,6 @@ using namespace std;
 #ifdef __WIN32
 #define main SDL_main
 #endif
-/*
- void init_system(bool fullscreen, int w, int h){
- init_sdl_gl(fullscreen,w,h);
- init_window(w,h);
- }
- void world_display(TileSet& ts, const ViewPoint& vp){
- glClearColor( 0.0, 0.0, 0.0, 1.0 );
- glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
- ts.draw(vp);
- update_display();
- glFinish();
- }*/
 
 void init_system(GameSettings& settings) {
 	settings = load_settings_data("res/settings.yaml");
@@ -40,6 +30,36 @@ void init_system(GameSettings& settings) {
 
 const int HUD_WIDTH = 160;
 
+static void leave_menu(void* flag) {
+	*(bool*) flag = true;
+}
+
+static void menu_loop(GameState* gs, int width, int height) {
+	bool exit = false;
+	int halfw = width / 2;
+
+	GameView prevview = gs->window_view();
+	GameLevelState* oldlevel = gs->level();
+
+	gs->level() = new GameLevelState(0, 0, 0, width, height);
+	gs->window_view().x = 0;
+	gs->window_view().y = 0;
+
+	gs->add_instance(new AnimatedInst(halfw, 100, get_sprite_by_name("logo")));
+	gs->add_instance(
+			new ButtonInst("START", BBox(halfw - 60, 400, halfw + 60, 430),
+					leave_menu, &exit));
+
+	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {
+		gs->level()->inst_set.step(gs);
+		gs->draw(false);
+	}
+
+	delete gs->level();
+
+	gs->level() = oldlevel;
+	gs->window_view() = prevview;
+}
 static void game_loop(GameState* gs) {
 
 	bool paused = false, cont = true;
@@ -119,13 +139,6 @@ static void game_loop(GameState* gs) {
 	printf("Draw time: %f\n", float(draw_time) / draw_events);
 }
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-}
-
-#include "world/lua/lua_api.h"
-
 int main(int argc, char** argv) {
 	GameSettings settings;
 	init_system(settings);
@@ -139,8 +152,11 @@ int main(int argc, char** argv) {
 	GameState* gs = new GameState(settings, world_width, world_height, vieww,
 			viewh);
 	gs->update_iostate(); //for first iteration
-//
-	//
+
+	menu_loop(gs, windoww, windowh);
+
+	gs->init_game();
+
 	game_loop(gs);
 
 	SDL_Quit();

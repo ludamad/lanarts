@@ -70,10 +70,13 @@ sprites:
 
   - sprite: scroll
     spritefile: res/items/misc/scroll.png
+
   - sprite: scroll_strength
     spritefile: res/items/scrolls/scroll_str.png
+
   - sprite: scroll_defence
     spritefile: res/items/scrolls/scroll_def.png
+
   - sprite: scroll_magic
     spritefile: res/items/scrolls/scroll_mag.png
 
@@ -88,3 +91,6 @@ sprites:
     spritefile: res/items/weapons/mace.png
   - sprite: gloves
     spritefile: res/items/weapons/gloves.png
+
+  - sprite: logo
+    spritefile: res/interface/lanarts_logo.png

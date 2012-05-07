@@ -16,6 +16,12 @@ struct BBox {
 	int height() const{
 		return y2 - y1;
 	}
+	int center_x() const {
+		return (x1 + x2)/2;
+	}
+	int center_y() const {
+		return (y1 + y2)/2;
+	}
 };
 
 /*Represents an integer x,y pair position*/

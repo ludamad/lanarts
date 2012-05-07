@@ -13,7 +13,7 @@
 AnimatedInst::~AnimatedInst() {}
 
 void AnimatedInst::step(GameState* gs){
-	if (--timeleft < 0){
+	if (timeleft != -1 && --timeleft < 0){
 		timeleft = 0;
 		gs->remove_instance(this);
 	}

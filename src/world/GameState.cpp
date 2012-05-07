@@ -35,12 +35,21 @@ extern "C" {
 GameState::GameState(const GameSettings& settings, int width, int height, int vieww, int viewh, int hudw) :
 		settings(settings), world_width(width), world_height(height),  frame_n(0),
 				hud(vieww, 0, hudw, viewh),
-				view(50, 50, vieww, viewh, width, height),
+				view(0, 0, vieww, viewh, width, height),
 				world(this, width, height),
 				mouse_leftdown(0), mouse_rightdown(0),
 				mouse_leftclick(0), mouse_rightclick(0) {
 	memset(key_down_states, 0, sizeof(key_down_states));
 	init_font(&pfont, settings.font.c_str(), 10);
+	init_font(&menufont, settings.font.c_str(), 20);
+
+	lua_state = lua_open();
+
+	lua_lanarts_api(this,lua_state);
+	luaL_dofile(lua_state, "res/lua/effects.lua");
+}
+
+void GameState::init_game(){
 	time_t systime;
 	time(&systime);
 	int seed = systime;
@@ -77,13 +86,9 @@ GameState::GameState(const GameSettings& settings, int width, int height, int vi
     mtwist.init_genrand(seed);
 	level() = world.get_level(0, true);
 	level()->steps_left = 1000;
+
 	GameInst* p = get_instance(level()->pc.local_playerid());
 	window_view().sharp_center_on(p->x, p->y);
-
-	lua_state = lua_open();
-
-	lua_lanarts_api(this,lua_state);
-	luaL_dofile(lua_state, "res/lua/effects.lua");
 }
 
 GameState::~GameState() {
@@ -170,10 +175,13 @@ int GameState::key_down_state(int keyval) {
 int GameState::key_press_state(int keyval) {
 	return key_press_states[keyval];
 }
-void GameState::draw() {
+void GameState::draw(bool drawhud) {
 	int vp[4];
 
-	gl_set_drawing_area(0, 0, view.width, view.height);
+	if (drawhud)
+		gl_set_drawing_area(0, 0, view.width, view.height);
+	else
+		gl_set_drawing_area(0, 0, view.width + hud.width(), view.height);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	level()->tiles.pre_draw(this);
@@ -183,7 +191,7 @@ void GameState::draw() {
 	}
 	monster_controller().post_draw(this);
 	level()->tiles.post_draw(this);
-	hud.draw(this);
+	if (drawhud) hud.draw(this);
 	update_display();
 	glFinish();
 }

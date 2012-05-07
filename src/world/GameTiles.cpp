@@ -78,6 +78,8 @@ void GameTiles::post_draw(GameState* gs) {
 		max_tiley = height - 1;
 	const int sub_sqrs = VISION_SUBSQRS;
 
+	if (gs->player_controller().player_ids().empty()) return;
+
 	fov& mainfov = *gs->player_controller().local_playerfov();
 	char matches[sub_sqrs * sub_sqrs];
 	for (int y = min_tiley; y <= max_tiley; y++) {

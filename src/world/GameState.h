@@ -31,9 +31,12 @@ public:
 			int hudw = 160);
 	~GameState();
 
+	void init_game();
+
 	/* Each frame is divided into a step event, and a draw event */
-	void draw();
+	void draw(bool drawhud = true);
 	void step();
+
 	bool pre_step();
 	bool update_iostate(bool resetprev = true);
 
@@ -82,6 +85,10 @@ public:
 	/* Default font for most text rendering */
 	const font_data& primary_font() {
 		return pfont;
+	}
+	/* Menu font for buttons etc */
+	const font_data& menu_font() {
+		return menufont;
 	}
 	//Finds the nearest object to 'obj' with some condition true
 	//Takes on the order of (max_radius*2/96)^2 time
@@ -181,7 +188,7 @@ private:
 	MTwist mtwist;
 
 	//Primary font data
-	font_data pfont;
+	font_data pfont, menufont;
 
 	//Lua state
 	lua_State *lua_state;
