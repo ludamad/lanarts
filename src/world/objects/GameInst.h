@@ -12,6 +12,7 @@
 #include <cassert>
 #include "../../util/game_basic_structs.h"
 
+struct LuaData;
 struct lua_State;
 struct GameState;
 //Base class for game instances
@@ -19,7 +20,7 @@ struct GameState;
 class GameInst {
 public:
 	GameInst(int x, int y, int radius, bool solid=true) :
-		id(0), last_x(x), last_y(y), x(x), y(y), radius(radius), solid(solid), destroyed(false) {}
+		id(0), last_x(x), last_y(y), x(x), y(y), radius(radius), solid(solid), destroyed(false), lua_hooks(0){}
 	virtual ~GameInst();
 	/* Initialize the object further, 'id' will be set*/
 	virtual void init(GameState* gs);
@@ -41,6 +42,7 @@ public:
 	int last_x, last_y;
 	int x, y, radius;
 	bool solid, destroyed;
+	LuaData* lua_hooks;
 };
 
 typedef bool (*col_filterf)(GameInst* o1, GameInst* o2);

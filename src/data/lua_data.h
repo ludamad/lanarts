@@ -8,6 +8,7 @@
 #ifndef LUA_DATA_H_
 #define LUA_DATA_H_
 #include <string>
+#include "../util/game_basic_structs.h"
 
 struct LuaData {
 	int table_id;
@@ -20,5 +21,8 @@ struct LuaData {
 void luadata_call(lua_State* lua_state, const LuaData& ld);
 void luadata_push(lua_State* lua_state, const LuaData& ld);
 void luadata_pop(lua_State* lua_state, const LuaData& ld);
+
+void luadata_step_event(lua_State* lua_state, const LuaData& ld, obj_id id);
+void luadata_draw_event(lua_State* lua_state, const LuaData& ld, obj_id id);
 
 #endif /* LUA_DATA_H_ */

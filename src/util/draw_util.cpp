@@ -157,7 +157,7 @@ inline void move_raster(int x, int y) {
 void gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
 		const char *fmt, ...) {
 	//	float h=ft_font.h/.63f;						//We make the height about 1.5* that of
-	char text[256]; // Holds Our String
+	char text[512]; // Holds Our String
 	va_list ap; // Pointer To List Of Arguments
 
 	if (fmt == NULL) // If There's No Text
@@ -189,7 +189,8 @@ void gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
 //		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		for (int i = 0; iter[i]; i++) {
-			char_data &cdata = *ft_font.data[iter[i]];
+			unsigned char chr = iter[i];
+			char_data &cdata = *ft_font.data[chr];
 			len += cdata.advance;
 			//gl_image_from_bytes(&font_img, cdata.w, cdata.h, (char*)cdata.data, GL_BGRA);
 			gl_draw_image(&cdata.img, x+len-(cdata.advance-cdata.left), y -cdata.move_up, colour);

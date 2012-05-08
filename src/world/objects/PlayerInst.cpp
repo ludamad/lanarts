@@ -56,6 +56,7 @@ void PlayerInst::step(GameState* gs) {
 	if (--canrestcooldown < 0)
 		canrestcooldown = 0;
 
+	isresting = false;
 	perform_queued_actions(gs);
 
 	if (!gs->key_down_state(SDLK_x) && is_local_focus())
