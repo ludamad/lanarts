@@ -1,14 +1,21 @@
 #include <cmath>
+
+#include "EnemyInst.h"
 #include "AnimatedInst.h"
 #include "ProjectileInst.h"
-#include "EnemyInst.h"
 #include "PlayerInst.h"
+
 #include "../GameState.h"
-#include "../../util/draw_util.h"
-#include "../../util/math_util.h"
-#include "../../util/collision_util.h"
+
+#include "../../display/display.h"
+
 #include "../../data/sprite_data.h"
 #include "../../data/enemy_data.h"
+
+
+#include "../../util/math_util.h"
+#include "../../util/collision_util.h"
+
 
 EnemyInst::EnemyInst(int enemytype, int x, int y) :
 	GameInst(x,y, game_enemy_data[enemytype].radius),

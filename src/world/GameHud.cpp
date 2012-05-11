@@ -6,17 +6,17 @@
  */
 
 #include "GameHud.h"
-
-#include "../util/draw_util.h"
-#include "../util/math_util.h"
-#include "../display/display.h"
-
 #include "GameState.h"
 #include "GameInstSet.h"
 
 #include "objects/GameInst.h"
 #include "objects/PlayerInst.h"
+
 #include "../gamestats/Inventory.h"
+
+#include "../util/math_util.h"
+
+#include "../display/display.h"
 
 #include "../data/tile_data.h"
 #include "../data/item_data.h"

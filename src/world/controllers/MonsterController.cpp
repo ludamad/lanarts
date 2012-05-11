@@ -17,7 +17,6 @@
 #include "../objects/EnemyInst.h"
 #include "../objects/PlayerInst.h"
 
-#include "../../util/draw_util.h"
 #include "../../util/collision_util.h"
 
 #include "../../data/tile_data.h"

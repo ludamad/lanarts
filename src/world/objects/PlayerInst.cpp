@@ -1,17 +1,18 @@
 #include "PlayerInst.h"
-#include "ProjectileInst.h"
+
+#include "AnimatedInst.h"
 #include "EnemyInst.h"
 #include "ItemInst.h"
-#include "AnimatedInst.h"
+#include "ProjectileInst.h"
 
-#include "../../util/draw_util.h"
 #include "../GameState.h"
+
+#include "../../display/display.h"
+
 #include "../../data/sprite_data.h"
 #include "../../data/tile_data.h"
-#include "../../display/display.h"
 #include "../../data/item_data.h"
 #include "../../data/weapon_data.h"
-#include "TestInst.h"
 
 PlayerInst::~PlayerInst() {
 }

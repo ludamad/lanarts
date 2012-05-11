@@ -7,7 +7,7 @@
 
 #include "GameInst.h"
 #include "../GameState.h"
-#include "../../util/draw_util.h"
+#include "../../display/display.h"
 #include "../../data/lua_data.h"
 
 GameInst::~GameInst() {

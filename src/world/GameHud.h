@@ -10,7 +10,6 @@
 
 #include "../display/display.h"
 #include "../display/GLImage.h"
-#include "../util/draw_util.h"
 #include "objects/GameInst.h"
 #include "GameInstSet.h"
 

@@ -10,7 +10,6 @@
 #include "pathfind.h"
 #include "../data/tile_data.h"
 #include "../world/GameState.h"
-#include "../util/draw_util.h"
 #include "../util/math_util.h"
 
 using namespace std;

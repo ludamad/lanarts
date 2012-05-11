@@ -8,7 +8,7 @@
 #include "AnimatedInst.h"
 #include "../GameState.h"
 #include "../../data/sprite_data.h"
-#include "../../util/draw_util.h"
+#include "../../display/display.h"
 
 AnimatedInst::~AnimatedInst() {}
 

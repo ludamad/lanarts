@@ -7,12 +7,13 @@
 #include <cstring>
 #include <SDL_opengl.h>
 
-#include "GameState.h"
 #include "GameTiles.h"
+#include "GameState.h"
 
 #include "../data/tile_data.h"
+
 #include "../display/display.h"
-#include "../util/draw_util.h"
+
 #include "../procedural/levelgen.h"
 
 void GameTiles::pre_draw(GameState* gs) {

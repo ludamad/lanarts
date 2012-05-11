@@ -5,31 +5,29 @@
  */
 
 #include "PlayerInst.h"
-#include "ProjectileInst.h"
+#include "AnimatedInst.h"
 #include "EnemyInst.h"
 #include "ItemInst.h"
-#include "AnimatedInst.h"
 
-#include "../../util/draw_util.h"
+#include "ProjectileInst.h"
+#include "../GameState.h"
+
+#include "../lua/lua_api.h"
+extern "C" {
+    #include <lua/lua.h>
+}
+
 #include "../../util/math_util.h"
 #include "../../util/collision_util.h"
 #include "../../util/game_basic_structs.h"
 
-#include "../GameState.h"
+#include "../../display/display.h"
+
+#include "../../data/item_data.h"
 #include "../../data/sprite_data.h"
 #include "../../data/tile_data.h"
-#include "../../display/display.h"
-#include "../../data/item_data.h"
 #include "../../data/weapon_data.h"
-#include "TestInst.h"
-#include <deque>
-#include "../lua/lua_api.h"
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-#include <lua/lualib.h>
-}
 
 // static FILE* saved = fopen("res/saved_replay.rep", "wb");
 // static FILE* open = fopen("res/replay.rep", "rb");

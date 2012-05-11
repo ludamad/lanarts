@@ -5,6 +5,13 @@
 #ifndef GAME_BASIC_STRUCTS_H_
 #define GAME_BASIC_STRUCTS_H_
 
+/*Represents a Canadian colour*/
+struct Colour {
+    int r, g, b, a;
+    Colour(int r = 255, int g = 255, int b = 255, int a = 255) :
+        r(r), g(g), b(b), a(a) {}
+};
+
 /*Represents a rectangular region in terms of its start and end x & y values*/
 struct BBox {
 	int x1, y1, x2, y2;

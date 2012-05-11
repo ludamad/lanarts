@@ -1,7 +1,6 @@
 #include "ButtonInst.h"
 #include "../GameState.h"
 #include "../../display/display.h"
-#include "../../util/draw_util.h"
 
 void ButtonInst::init(GameState* gs) {
 }

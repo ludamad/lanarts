@@ -18,6 +18,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <algorithm>
+#include "../world/GameView.h"
 
 void gl_draw_image(GLImage* img, int x, int y, const Colour& c) {
 	if (img->width == 0 || img->height == 0) return;
@@ -46,6 +47,10 @@ void gl_draw_image(GLImage* img, int x, int y, const Colour& c) {
 	glDisable(GL_TEXTURE_2D);
 	//Don't use glBindTexture(GL_TEXTURE_2D, NULL);
 }
+void gl_draw_image(const GameView& view, GLImage* img, int x, int y){
+	gl_draw_image(img, x - view.x, y - view.y);
+}
+
 
 void update_display() {
 	SDL_GL_SwapBuffers();
@@ -179,4 +184,3 @@ void gl_image_from_bytes(GLImage* img, int w, int h, char* data, int type) {
 			data);
 	glDisable(GL_TEXTURE_2D);
 }
-
