@@ -1,5 +1,5 @@
 cmake_minimum_required( VERSION 2.8 )
-PROJECT(lanartsTCP)
+PROJECT(project_lanarts_tcp)
 
 FIND_PACKAGE(Boost REQUIRED)
 #FIND_PACKAGE(asio REQUIRED)
