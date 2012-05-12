@@ -27,7 +27,9 @@ set( lanarts_src
 	data/item_data.cpp
 	data/lua_data.cpp
 	
+	display/display_util.cpp
 	display/display.cpp
+	display/font.cpp
 	display/GLImage.cpp
 	
 	fov/fov.cpp
