@@ -130,7 +130,6 @@ bool GameWorld::pre_step(){
 }
 void GameWorld::step() {
 	redofirststep://I used a goto dont kill me
-	int prehashvalue =  game_state->level()->inst_set.hash();
 	
 	const int STEPS_TO_SIMULATE = 1000;
 	GameLevelState* current_level = game_state->level();
@@ -141,6 +140,7 @@ void GameWorld::step() {
 
 	for (int i = 0; i < level_states.size(); i++){
 		if (level_states[i]->steps_left > 0){
+			int prehashvalue =  game_state->level()->inst_set.hash();
 			if (!game_state->net_connection().check_integrity(game_state, prehashvalue)) {
 				printf("Hashes don't match before step, frame %d, level %d\n", game_state->frame(), i);
 			}
@@ -153,7 +153,8 @@ void GameWorld::step() {
             game_state->level()->tiles.step(game_state);
 
 
-			if (!game_state->net_connection().check_integrity(game_state, prehashvalue)) {
+			int posthashvalue =  game_state->level()->inst_set.hash();
+			if (!game_state->net_connection().check_integrity(game_state, posthashvalue)) {
 				printf("Hashes don't match after step, frame %d, level %d\n", game_state->frame(), i);
 			}
 		}
