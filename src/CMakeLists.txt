@@ -54,7 +54,6 @@ set( lanarts_src
 	
 	util/collision_util.cpp
 	util/math_util.cpp
-	util/font_util.cpp
 	
 
 	world/GameAction.cpp
@@ -129,7 +128,6 @@ set( lanarts_include
 	
 	util/collision_util.h
 	util/math_util.h
-	util/font_util.h
 	util/game_basic_structs.h
 	util/hashset_util.h
 	
