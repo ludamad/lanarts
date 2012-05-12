@@ -11,6 +11,8 @@
 #include <net/packet.h>
 #include <vector>
 
+struct GameState;
+
 class GameNetConnection {
 public:
 	GameNetConnection(int our_peer_id){connect=NULL;}

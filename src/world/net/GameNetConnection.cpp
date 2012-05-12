@@ -1,4 +1,5 @@
 #include "GameNetConnection.h"
+#include "../GameState.h"
 
 GameNetConnection::GameNetConnection(NetConnection *connect) :
 		connect(connect) {
