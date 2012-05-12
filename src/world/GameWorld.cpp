@@ -135,7 +135,7 @@ void GameWorld::step() {
 	GameLevelState* current_level = game_state->level();
 //	current_level->steps_left = STEPS_TO_SIMULATE;
 
-    bool inmenu = game_state->level()->level_number!= -1;
+    bool inmenu = (game_state->level()->level_number == -1);
 	midstep = true;
 
 	for (int i = 0; i < level_states.size(); i++){
