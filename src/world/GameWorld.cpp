@@ -135,13 +135,14 @@ void GameWorld::step() {
 	GameLevelState* current_level = game_state->level();
 //	current_level->steps_left = STEPS_TO_SIMULATE;
 
-    
+    bool inmenu = game_state->level()->level_number!= -1;
 	midstep = true;
 
 	for (int i = 0; i < level_states.size(); i++){
 		if (level_states[i]->steps_left > 0){
 			int prehashvalue =  game_state->level()->inst_set.hash();
-			if (!game_state->net_connection().check_integrity(game_state, prehashvalue)) {
+
+			if (!inmenu && !game_state->net_connection().check_integrity(game_state, prehashvalue)) {
 				printf("Hashes don't match before step, frame %d, level %d\n", game_state->frame(), i);
 			}
 			//Set so that all the GameState getters are properly updated
@@ -154,7 +155,7 @@ void GameWorld::step() {
 
 
 			int posthashvalue =  game_state->level()->inst_set.hash();
-			if (!game_state->net_connection().check_integrity(game_state, posthashvalue)) {
+			if (!inmenu &&!game_state->net_connection().check_integrity(game_state, posthashvalue)) {
 				printf("Hashes don't match after step, frame %d, level %d\n", game_state->frame(), i);
 			}
 		}

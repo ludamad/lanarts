@@ -52,6 +52,7 @@ static void menu_loop(GameState* gs, int width, int height) {
 	GameLevelState* oldlevel = gs->level();
 
 	gs->level() = new GameLevelState(0, 0, 0, width, height);
+	gs->level()->level_number = -1;
 	gs->window_view().x = 0;
 	gs->window_view().y = 0;
 
