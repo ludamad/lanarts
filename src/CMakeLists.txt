@@ -53,7 +53,6 @@ set( lanarts_src
 	procedural/tunnelgen.cpp
 	
 	util/collision_util.cpp
-	util/draw_util.cpp
 	util/math_util.cpp
 	util/font_util.cpp
 	
@@ -129,7 +128,6 @@ set( lanarts_include
 	procedural/tunnelgen.h
 	
 	util/collision_util.h
-	util/draw_util.h
 	util/math_util.h
 	util/font_util.h
 	util/game_basic_structs.h
