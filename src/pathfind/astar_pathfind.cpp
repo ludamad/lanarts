@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include "../data/tile_data.h"
+#include "../world/GameTiles.h"
 #include "../world/GameState.h"
 
 using namespace std;

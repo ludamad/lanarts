@@ -19,8 +19,8 @@ struct GameState;
 
 class GameInst {
 public:
-	GameInst(int x, int y, int radius, bool solid=true) :
-		id(0), last_x(x), last_y(y), x(x), y(y), radius(radius), solid(solid), destroyed(false), lua_hooks(0){}
+	GameInst(int x, int y, int radius, bool solid=true, int depth = 0) :
+		id(0), last_x(x), last_y(y), x(x), y(y),  radius(radius), depth(depth), solid(solid), destroyed(false), lua_hooks(0){}
 	virtual ~GameInst();
 	/* Initialize the object further, 'id' will be set*/
 	virtual void init(GameState* gs);
@@ -41,6 +41,7 @@ public:
 	obj_id id;
 	int last_x, last_y;
 	int x, y, radius;
+	int depth;
 	bool solid, destroyed;
 	LuaData* lua_hooks;
 };

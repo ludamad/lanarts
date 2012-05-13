@@ -2,6 +2,7 @@
 
 #include <lua/lunar.h>
 #include "../GameState.h"
+#include "../GameLevelState.h"
 
 
 class GameStateLuaBinding {

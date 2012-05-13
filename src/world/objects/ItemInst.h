@@ -12,9 +12,9 @@
 
 class ItemInst: public GameInst {
 public:
-	enum {RADIUS = 10};
+	enum {RADIUS = 10, DEPTH = 100};
 	ItemInst(int type, int x, int y, int quantity = 1, obj_id dropped_by = 0) :
-		GameInst(x,y, RADIUS, false), type(type), dropped_by(dropped_by){}
+		GameInst(x,y, RADIUS, false, DEPTH), type(type), dropped_by(dropped_by){}
 	virtual ~ItemInst();
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);

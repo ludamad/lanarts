@@ -259,7 +259,6 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 			if (gs->key_down_state(SDLK_PERIOD) || gs->mouse_downwheel()) {
 				if (gs->tile_radius_test(x, y, RADIUS, false,
 						get_tile_by_name("stairs_down"), &hitsqr)) {
-//				int entr_n = scan_entrance(gs->level()->entrances, hitsqr);
 					queued_actions.push_back(
 							GameAction(id, GameAction::USE_ENTRANCE, frame,
 									level));
@@ -268,7 +267,6 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 			if (gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel()) {
 				if (gs->tile_radius_test(x, y, RADIUS, false,
 						get_tile_by_name("stairs_up"), &hitsqr)) {
-//				int entr_n = scan_entrance(gs->level()->exits, hitsqr);
 					queued_actions.push_back(
 							GameAction(id, GameAction::USE_EXIT, frame, level));
 				}

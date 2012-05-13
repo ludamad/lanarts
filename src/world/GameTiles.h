@@ -8,8 +8,8 @@
 #define GAMETILES_H_
 
 #include <cstring>
+#include "../util/game_basic_structs.h"
 
-static const int TILE_SIZE = 32;
 class GameState;
 
 class GameTiles {

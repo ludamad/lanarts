@@ -7,6 +7,8 @@
 
 #include "featuregen.h"
 #include "../world/GameState.h"
+#include "../world/GameTiles.h"
+#include "../world/GameLevelState.h"
 #include "../data/tile_data.h"
 #include "../data/tileset_data.h"
 

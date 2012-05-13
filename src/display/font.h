@@ -15,7 +15,7 @@ struct char_data {
 	int left;
 	int move_up;
 	unsigned char * data;
-	GLImage img;
+	GLimage img;
 
 	char_data(char ch, FT_Face face);
 	~char_data();

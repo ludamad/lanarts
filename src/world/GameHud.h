@@ -35,7 +35,7 @@ private:
 	int x, y, _width, _height;
 	Colour bg_colour;
 	char* minimap_arr;
-	GLImage minimap_buff;
+	GLimage minimap_buff;
 };
 
 

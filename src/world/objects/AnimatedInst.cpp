@@ -24,7 +24,7 @@ void AnimatedInst::draw(GameState* gs){
 	y = round(ry += vy);
 	GameView& view = gs->window_view();
 	if (sprite > -1){
-		GLImage& img = game_sprite_data[sprite].img;
+		GLimage& img = game_sprite_data[sprite].img;
 
 		int w = img.width, h = img.height;
 		int xx = x - w / 2, yy = y - h / 2;

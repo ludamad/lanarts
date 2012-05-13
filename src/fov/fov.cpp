@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cstdlib>
 #include "../world/GameState.h"
+#include "../world/GameTiles.h"
 #include "../data/tile_data.h"
 
 

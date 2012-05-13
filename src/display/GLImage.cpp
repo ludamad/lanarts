@@ -14,7 +14,7 @@
 #undef GL_GLEXT_VERSION
 
 
-void init_GL_Image(GLImage* img, const char* fname){
+void init_GL_Image(GLimage* img, const char* fname){
 	SDL_Surface *image;
 	GLfloat texcoord[4];
 
@@ -43,7 +43,7 @@ void init_GL_Image(GLImage* img, const char* fname){
 }
 
 
-GLImage::~GLImage(){
+GLimage::~GLimage(){
 	if (texture){
 		glDeleteTextures( 1, (GLuint*)&texture );
 #ifdef DEBUG

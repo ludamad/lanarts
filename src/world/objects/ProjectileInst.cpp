@@ -139,7 +139,7 @@ void ProjectileInst::step(GameState* gs) {
 
 void ProjectileInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
-	GLImage& img = game_sprite_data[attack.attack_sprite].img;
+	GLimage& img = game_sprite_data[attack.attack_sprite].img;
 	int w = img.width, h = img.height;
 	int xx = x - w / 2, yy = y - h / 2;
 

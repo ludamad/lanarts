@@ -7,6 +7,7 @@
 
 #include "itemgen.h"
 #include "../world/GameState.h"
+#include "../world/GameTiles.h"
 #include "../world/objects/ItemInst.h"
 #include "../data/item_data.h"
 

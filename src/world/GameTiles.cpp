@@ -32,7 +32,7 @@ void GameTiles::pre_draw(GameState* gs) {
 	for (int y = min_tiley; y <= max_tiley; y++) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
 			int tile = tiles[y * width + x];
-			GLImage* img = &game_tile_data[tile].img;
+			GLimage* img = &game_tile_data[tile].img;
 			if (seen_tiles[y * width + x])
 			gl_draw_image(img, x * TILE_SIZE - view.x, y * TILE_SIZE - view.y);
 		}
@@ -54,7 +54,7 @@ void GameTiles::step(GameState* gs) {
 				bool has_match = false, has_free = false;
 				bool is_other_match = false;
 				int tile = tiles[y * width + x];
-				GLImage* img = &game_tile_data[tile].img;
+				GLimage* img = &game_tile_data[tile].img;
 
 				f.matches(x, y, matches);
 				for (int i = 0; i < sub_sqrs * sub_sqrs; i++) {
@@ -88,7 +88,7 @@ void GameTiles::post_draw(GameState* gs) {
 			bool has_match = false, has_free = false;
 			bool is_other_match = false;
 			int tile = tiles[y * width + x];
-			GLImage* img = &game_tile_data[tile].img;
+			GLimage* img = &game_tile_data[tile].img;
 
 			for (int i = 0; i < gs->player_controller().player_fovs().size();
 					i++) {

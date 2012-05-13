@@ -12,19 +12,19 @@
 #include <SDL_opengl.h>
 #undef GL_GLEXT_VERSION
 
-struct GLImage{
+struct GLimage{
 	const char* filename;
 	int width, height;
 	float texw, texh;
 	GLuint texture;
-	GLImage(const char* fname = NULL){
+	GLimage(const char* fname = NULL){
 		filename = fname;
 		texture = 0;
 	}
-	~GLImage();
+	~GLimage();
 };
 
 GLuint SDL_GL_LoadTexture(SDL_Surface *surface, GLfloat *texcoord);
-void init_GL_Image(GLImage* img, const char* fname);
+void init_GL_Image(GLimage* img, const char* fname);
 
 #endif /* GLIMAGE_H_ */

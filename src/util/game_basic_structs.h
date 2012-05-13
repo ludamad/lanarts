@@ -55,6 +55,8 @@ struct Region {
 };
 
 
+static const int TILE_SIZE = 32;
+
 /*Used to identify objects. Safe to store and use later, can query if object still in play.*/
 typedef int obj_id;
 

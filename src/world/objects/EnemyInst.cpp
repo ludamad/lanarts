@@ -16,9 +16,10 @@
 #include "../../util/math_util.h"
 #include "../../util/collision_util.h"
 
+static const int DEPTH = 50;
 
 EnemyInst::EnemyInst(int enemytype, int x, int y) :
-	GameInst(x,y, game_enemy_data[enemytype].radius),
+	GameInst(x,y, game_enemy_data[enemytype].radius, true, DEPTH),
 	eb(game_enemy_data[enemytype].basestats.movespeed),
 	enemytype(enemytype), rx(x), ry(y),
 	xpgain(game_enemy_data[enemytype].xpaward),
@@ -57,21 +58,12 @@ void EnemyInst::init(GameState* gs) {
 }
 
 void EnemyInst::step(GameState* gs) {
-	bool firstcol = true;
-	GameInst* collided = NULL;
-	gs->object_radius_test(this, &collided, 1, &enemy_colfilter);
-	/*if (!collided){
-		gs->object_radius_test(this, &collided, 1, &enemy_hit, x + eb.vx, y + eb.vy);
-		firstcol = false;
-	}*/
-//	x = (int) round(rx += eb.vx); //update based on rounding of true float
-//	y = (int) round(ry += eb.vy);
-//	}
+	//Much of the monster implementation resides in MonsterController
 	stats().step();
 }
 void EnemyInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
-	GLImage& img = game_sprite_data[etype()->sprite_number].img;
+	GLimage& img = game_sprite_data[etype()->sprite_number].img;
 
 	int w = img.width, h = img.height;
 	int xx = x - w / 2, yy = y - h / 2;
@@ -111,6 +103,10 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 			Pos p(pinst->x, pinst->y);
 			p.x += gs->rng().rand(-12,+13);
 			p.y += gs->rng().rand(-12,+13);
+			if (gs->tile_radius_test(p.x, p.y, 10)) {
+				p.x = pinst->x;
+				p.y = pinst->y;
+			}
 			GameInst* bullet = new ProjectileInst(id, ranged, x,y,p.x, p.y);
 			gs->add_instance(bullet);
 			stats().reset_ranged_cooldown();

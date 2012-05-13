@@ -14,7 +14,7 @@
 #include <GL/glu.h>
 #include "../util/game_basic_structs.h"
 
-struct GLImage;
+struct GLimage;
 struct font_data;
 struct GameView;
 
@@ -24,10 +24,10 @@ void init_sdl_gl(bool fullscreen, int w, int h);
 void update_display();
 void SDL_GL_diagnostics();
 
-void gl_image_from_bytes(GLImage* img, int w, int h, char* data, int type = GL_BGRA);
+void gl_image_from_bytes(GLimage* img, int w, int h, char* data, int type = GL_BGRA);
 
-void gl_draw_image(GLImage* img, int x, int y, const Colour& c = Colour(255,255,255));
-void gl_draw_image(const GameView& view, GLImage* img, int x, int y);
+void gl_draw_image(GLimage* img, int x, int y, const Colour& c = Colour(255,255,255));
+void gl_draw_image(const GameView& view, GLimage* img, int x, int y);
 
 
 

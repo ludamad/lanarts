@@ -17,7 +17,7 @@
 
 struct SpriteEntry {
 	const char* name;
-	GLImage img;
+	GLimage img;
 	SpriteEntry(const char* name, const char* fname) : name(name), img(fname){}
 	void init(){
 		init_GL_Image(&img, img.filename);

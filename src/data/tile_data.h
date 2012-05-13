@@ -39,7 +39,7 @@
 
 struct TileEntry {
 	const char* name;
-	GLImage img; 
+	GLimage img; 
 	bool solid;
 	TileEntry(const char* name, const char* fname, bool solid = false) 
 		: name(name), img(fname), solid(solid){}

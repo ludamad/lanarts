@@ -54,7 +54,7 @@ static void draw_player_inventory(GameState* gs, PlayerInst* player, int x, int 
             gl_draw_rectangle((ix*TILE_SIZE)+1+x, (iy*TILE_SIZE)+1+y, TILE_SIZE-2, TILE_SIZE-2, Colour(0, 0, 0));
 	    if(inv.inv[slot].n > 0){
 	      ItemType& itemd = game_item_data[inv.inv[slot].item];
-	      GLImage* itemimg = &game_sprite_data[itemd.sprite_number].img;
+	      GLimage* itemimg = &game_sprite_data[itemd.sprite_number].img;
 	      Pos p(x+ix*TILE_SIZE, y+iy*TILE_SIZE);
 	      gl_draw_image(itemimg,p.x+1,p.y);
 	      gl_printf(gs->primary_font(), Colour(255,255,255), p.x, p.y, "%d", inv.inv[slot].n);

@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "GameState.h"
+#include "GameLevelState.h"
 #include "../display/display.h"
 #include "net/GameNetConnection.h"
 
@@ -32,58 +33,57 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-GameState::GameState(const GameSettings& settings, int width, int height, int vieww, int viewh, int hudw) :
-		settings(settings), world_width(width), world_height(height),  frame_n(0),
-				hud(vieww, 0, hudw, viewh),
-				view(0, 0, vieww, viewh, width, height),
-				world(this, width, height),
-				mouse_leftdown(0), mouse_rightdown(0),
-				mouse_leftclick(0), mouse_rightclick(0) {
+GameState::GameState(const GameSettings& settings, int width, int height,
+		int vieww, int viewh, int hudw) :
+		settings(settings), world_width(width), world_height(height), frame_n(
+				0), hud(vieww, 0, hudw, viewh), view(0, 0, vieww, viewh, width,
+				height), world(this, width, height), mouse_leftdown(0), mouse_rightdown(
+				0), mouse_leftclick(0), mouse_rightclick(0) {
 	memset(key_down_states, 0, sizeof(key_down_states));
 	init_font(&pfont, settings.font.c_str(), 10);
 	init_font(&menufont, settings.font.c_str(), 20);
 
 	lua_state = lua_open();
 
-	lua_lanarts_api(this,lua_state);
+	lua_lanarts_api(this, lua_state);
 	luaL_dofile(lua_state, "res/lua/effects.lua");
 }
 
-void GameState::init_game(){
+void GameState::init_game() {
 	time_t systime;
 	time(&systime);
 	int seed = systime;
 
-
-	if (settings.conntype == GameSettings::CLIENT){
+	if (settings.conntype == GameSettings::CLIENT) {
 		char port_buffer[50];
 		snprintf(port_buffer, 50, "%d", settings.port);
-		connection.get_connection() = create_client_connection(settings.ip.c_str(), port_buffer);
-	} else if (settings.conntype == GameSettings::HOST){
+		connection.get_connection() = create_client_connection(
+				settings.ip.c_str(), port_buffer);
+	} else if (settings.conntype == GameSettings::HOST) {
 		connection.get_connection() = create_server_connection(settings.port);
 	}
 
 	if (settings.conntype == GameSettings::CLIENT) {
-        NetPacket packet;
-        int tries = 0;
-        while (true) {
-            if (connection.get_connection()->get_next_packet(packet)) {
-                seed = packet.get_int();
-                break;
-            } else if ((++tries)%30000 == 0){
-                if ( !update_iostate() ) {
-                    exit(0);
-                }
-            }
-        }
-    } else if (settings.conntype == GameSettings::HOST){
-        NetPacket packet;
-        packet.add_int(seed);
-        packet.encode_header();
-        connection.get_connection()->broadcast_packet(packet, true);
-    }
+		NetPacket packet;
+		int tries = 0;
+		while (true) {
+			if (connection.get_connection()->get_next_packet(packet)) {
+				seed = packet.get_int();
+				break;
+			} else if ((++tries) % 30000 == 0) {
+				if (!update_iostate()) {
+					exit(0);
+				}
+			}
+		}
+	} else if (settings.conntype == GameSettings::HOST) {
+		NetPacket packet;
+		packet.add_int(seed);
+		packet.encode_header();
+		connection.get_connection()->broadcast_packet(packet, true);
+	}
 	printf("Seed used for RNG = 0x%X\n", seed);
-    mtwist.init_genrand(seed);
+	mtwist.init_genrand(seed);
 	level() = world.get_level(0, true);
 	level()->steps_left = 1000;
 
@@ -93,7 +93,7 @@ void GameState::init_game(){
 
 GameState::~GameState() {
 	release_font(&pfont);
-	lua_gc(lua_state, LUA_GCCOLLECT, 0);  // collected garbage
+	lua_gc(lua_state, LUA_GCCOLLECT, 0); // collected garbage
 	lua_close(lua_state);
 }
 
@@ -120,15 +120,15 @@ int GameState::handle_event(SDL_Event *event) {
 		break;
 	}
 	case SDL_MOUSEBUTTONDOWN: {
-		if (event->button.button == SDL_BUTTON_LEFT){
+		if (event->button.button == SDL_BUTTON_LEFT) {
 			mouse_leftdown = true;
 			mouse_leftclick = true;
-		}else if (event->button.button == SDL_BUTTON_RIGHT){
+		} else if (event->button.button == SDL_BUTTON_RIGHT) {
 			mouse_rightdown = true;
 			mouse_rightclick = true;
-		}else if (event->button.button == SDL_BUTTON_WHEELUP){
+		} else if (event->button.button == SDL_BUTTON_WHEELUP) {
 			mouse_didupwheel = true;
-		}else if (event->button.button == SDL_BUTTON_WHEELDOWN){
+		} else if (event->button.button == SDL_BUTTON_WHEELDOWN) {
 			mouse_diddownwheel = true;
 		}
 		break;
@@ -146,9 +146,9 @@ int GameState::handle_event(SDL_Event *event) {
 	}
 	return (done);
 }
-bool GameState::update_iostate(bool resetprev){
+bool GameState::update_iostate(bool resetprev) {
 	SDL_Event event;
-	if (resetprev){
+	if (resetprev) {
 		memset(key_press_states, 0, sizeof(key_press_states));
 		mouse_leftclick = false;
 		mouse_rightclick = false;
@@ -191,7 +191,8 @@ void GameState::draw(bool drawhud) {
 	}
 	monster_controller().post_draw(this);
 	level()->tiles.post_draw(this);
-	if (drawhud) hud.draw(this);
+	if (drawhud)
+		hud.draw(this);
 	update_display();
 	glFinish();
 }
@@ -239,14 +240,10 @@ static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
 	rt = (dx * dx) + (dy * dy);
 	return rt < (radsqr);
 }
-//game_id GameState::collides_with(){
-//}
 
-bool GameState::tile_radius_test(int x, int y, int rad, bool issolid,
-		int ttype, Pos* hitloc) {
-	int w = width()/ TILE_SIZE, h = height() / TILE_SIZE;
-	//(rad*2) **2 area
-	//should test x, y positions filling in circle
+bool GameState::tile_radius_test(int x, int y, int rad, bool issolid, int ttype,
+		Pos* hitloc) {
+	int w = width() / TILE_SIZE, h = height() / TILE_SIZE;
 	int distsqr = (TILE_SIZE / 2 + rad), radsqr = rad * rad;
 	distsqr *= distsqr; //sqr it
 
@@ -254,8 +251,6 @@ bool GameState::tile_radius_test(int x, int y, int rad, bool issolid,
 	int maxgrid_x = (x + rad) / TILE_SIZE, maxgrid_y = (y + rad) / TILE_SIZE;
 	int minx = squish(mingrid_x, 0, w), miny = squish(mingrid_y, 0, h);
 	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
-
-	//printf("minx=%d,miny=%d,maxx=%d,maxy=%d\n",minx,miny,maxx,maxy);
 
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
@@ -278,7 +273,8 @@ bool GameState::tile_radius_test(int x, int y, int rad, bool issolid,
 								cx + offset, cy + offset, x, y, radsqr)
 						|| circle_line_test(cx + offset, cy - offset,
 								cx + offset, cy + offset, x, y, radsqr)) {
-					if (hitloc) *hitloc = Pos(xx,yy);
+					if (hitloc)
+						*hitloc = Pos(xx, yy);
 					return true;
 				}
 			}
@@ -290,13 +286,14 @@ bool GameState::tile_radius_test(int x, int y, int rad, bool issolid,
 
 int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 		col_filterf f, int x, int y, int radius) {
-	return level()->inst_set.object_radius_test(obj, objs, obj_cap, f, x, y, radius);
+	return level()->inst_set.object_radius_test(obj, objs, obj_cap, f, x, y,
+			radius);
 }
 bool GameState::object_visible_test(GameInst* obj, GameInst* player) {
 	const int sub_sqrs = VISION_SUBSQRS;
 	const int subsize = TILE_SIZE / sub_sqrs;
 
-	int w = width() / subsize, h = height()/ subsize;
+	int w = width() / subsize, h = height() / subsize;
 	int x = obj->x, y = obj->y;
 	int rad = obj->radius;
 	int mingrid_x = (x - rad) / subsize, mingrid_y = (y - rad) / subsize;
@@ -305,30 +302,46 @@ bool GameState::object_visible_test(GameInst* obj, GameInst* player) {
 	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
 	const std::vector<fov*>& fovs = player_controller().player_fovs();
 
-	if (fovs.empty()) return true;
+	if (fovs.empty())
+		return true;
 
 //printf("minx=%d,miny=%d,maxx=%d,maxy=%d\n",minx,miny,maxx,maxy);
 	PlayerController& pc = player_controller();
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-				for (int i = 0; i < fovs.size(); i++) {
-					bool isplayer = player == NULL || (player->id == pc.player_ids()[i]);
-					if (isplayer && fovs[i]->within_fov(xx, yy))
-						return true;
-				}
+			for (int i = 0; i < fovs.size(); i++) {
+				bool isplayer = player == NULL
+						|| (player->id == pc.player_ids()[i]);
+				if (isplayer && fovs[i]->within_fov(xx, yy))
+					return true;
+			}
 		}
 	}
 	return false;
 }
 
-void GameState::ensure_connectivity(int roomid1, int roomid2){
+void GameState::ensure_connectivity(int roomid1, int roomid2) {
 	world.connect_entrance_to_exit(roomid1, roomid2);
 }
-void GameState::level_move(int id, int x, int y, int roomid1, int roomid2){
+void GameState::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	world.level_move(id, x, y, roomid1, roomid2);
 }
 
-GameInst* GameState::nearest_object(GameInst* obj, int max_radius, col_filterf f){
-	return level()->inst_set.object_nearest_test(obj, max_radius, f);
+obj_id GameState::local_playerid() {
+	return level()->pc.local_playerid();
 }
 
+GameTiles& GameState::tile_grid() {
+	return level()->tiles;
+}
+
+MonsterController& GameState::monster_controller() {
+	return level()->mc;
+}
+
+PlayerController& GameState::player_controller() {
+	return level()->pc;
+}
+void GameState::skip_next_id() {
+	level()->inst_set.skip_next_id();
+}

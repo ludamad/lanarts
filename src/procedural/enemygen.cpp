@@ -7,6 +7,7 @@
 
 #include "enemygen.h"
 #include "../world/GameState.h"
+#include "../world/GameTiles.h"
 #include "../world/objects/EnemyInst.h"
 
 //Generates enemy monsters

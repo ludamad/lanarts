@@ -10,7 +10,7 @@
 #include "../../gamestats/Stats.h"
 
 class ProjectileInst: public GameInst {
-	enum {RADIUS = 5};
+	enum {RADIUS = 5, DEPTH = -100};
 public:
 	ProjectileInst(obj_id originator, Attack& attack, int x, int y, int tx, int ty,
 			bool bounce = false, int hits = 1, GameInst* target = NULL);
