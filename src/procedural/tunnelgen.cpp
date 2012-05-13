@@ -268,10 +268,11 @@ bool TunnelGen::generate(Pos p, int dx, int dy, std::vector<Sqr>& btbuff, std::v
 
 		bool valid = tsc[tunnel_depth].attempt_number > 0
 				|| validate_slice(prev_content, cntxt, tunnel_depth);
+		bool finish = !valid;
 		valid = true;
 		if (valid && cntxt->attempt_number <= 0) {
 
-			if (cntxt->tunneled) {
+			if (cntxt->tunneled || finish) {
 				end_room = s.at(p).roomID;
 				complete_tunnel = true;
 				break;

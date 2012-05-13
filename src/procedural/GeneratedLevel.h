@@ -69,6 +69,7 @@ public:
 		memset(s, 0, sizeof(Sqr) * w * h);
 	}
 	GeneratedLevel(int w, int h) {
+		s = NULL;
 		initialize(w,h);
 	}
 	~GeneratedLevel() {
