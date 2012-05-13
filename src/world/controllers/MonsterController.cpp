@@ -364,8 +364,8 @@ void MonsterController::update_position(GameState* gs, EnemyInst* e){
 				}
 			}
 		}
-		eb.vx = round(e->rx*1024)/1024;
-		eb.vy = round(e->rx*1024)/1024;
+		eb.vx = round(eb.vx*1024)/1024;
+		eb.vy = round(eb.vy*1024)/1024;
 		e->rx += eb.vx;
 		e->ry += eb.vy;
 		e->rx = round(e->rx*1024)/1024;
