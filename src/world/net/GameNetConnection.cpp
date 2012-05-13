@@ -14,7 +14,6 @@ void GameNetConnection::add_peer_id(int peer_id) {
 }
 
 bool GameNetConnection::check_integrity(GameState* gs, int value) {
-	int randoms = gs->rng().amount_of_randoms;
 	NetPacket packet;
 	packet.add_int(value);
 	packet.encode_header();

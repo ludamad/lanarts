@@ -268,7 +268,7 @@ bool TunnelGen::generate(Pos p, int dx, int dy, std::vector<Sqr>& btbuff, std::v
 
 		bool valid = tsc[tunnel_depth].attempt_number > 0
 				|| validate_slice(prev_content, cntxt, tunnel_depth);
-
+		valid = true;
 		if (valid && cntxt->attempt_number <= 0) {
 
 			if (cntxt->tunneled) {
@@ -330,7 +330,7 @@ void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
 	std::vector<TunnelSliceContext> tsbuff;
 
 	std::vector<int> genpaths(level.rooms().size(), 0);
-	std::vector<int> totalpaths(level.rooms().size());
+	std::vector<int> totalpaths(level.rooms().size(), 0);
 	for (int i = 0; i < level.rooms().size(); i++) {
 		totalpaths[i] = mt.rand(tgs.min_tunnels, tgs.max_tunnels + 1);
 	}
