@@ -369,7 +369,7 @@ void MonsterController::update_position(GameState* gs, EnemyInst* e){
 		e->rx += eb.vx;
 		e->ry += eb.vy;
 		e->rx = round(e->rx*4084.0f)/4084.0f;
-		e->ry = round(e->rx*4084.0f)/4084.0f;
+		e->ry = round(e->ry*4084.0f)/4084.0f;
 		simulator->setAgentPosition(e->behaviour().simulation_id, RVO::Vector2(e->rx, e->ry));
 	}
 
