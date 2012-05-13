@@ -95,7 +95,7 @@ void set_preferred_velocity(GameState* gs, RVO::RVOSimulator* sim, EnemyInst* e)
 //
 //	goalVector += dist * RVO::Vector2(std::cos(angle), std::sin(angle));
 //
-//	sim->setAgentPrefVelocity(eb.simulation_id, goalVector);
+	sim->setAgentPrefVelocity(eb.simulation_id, goalVector);
 }
 
 void MonsterController::monster_follow_path(GameState* gs, EnemyInst* e){
@@ -364,12 +364,12 @@ void MonsterController::update_position(GameState* gs, EnemyInst* e){
 				}
 			}
 		}
-		eb.vx = round(eb.vx*1024)/1024;
-		eb.vy = round(eb.vy*1024)/1024;
+		eb.vx = round(eb.vx*4084.0f)/4084.0f;
+		eb.vy = round(eb.vy*4084.0f)/4084.0f;
 		e->rx += eb.vx;
 		e->ry += eb.vy;
-		e->rx = round(e->rx*1024)/1024;
-		e->ry = round(e->rx*1024)/1024;
+		e->rx = round(e->rx*4084.0f)/4084.0f;
+		e->ry = round(e->rx*4084.0f)/4084.0f;
 		simulator->setAgentPosition(e->behaviour().simulation_id, RVO::Vector2(e->rx, e->ry));
 	}
 
