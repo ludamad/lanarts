@@ -16,6 +16,122 @@ static const int MAXSIZE = MAXWIDTH + MAXPADDING * 2;
 
 #define LANARTS_ASSERT(x) assert(x)
 
+struct TunnelSliceContext;
+//defined below
+void generate_entrance(const Region& r, MTwist& mt, int len, Pos& p, bool& axis,
+		bool& positive); //defined below
+
+/*Internal implementation class to connect a specified room to either another tunnel
+ * (accept_tunnel_entry = true) or to another room (always). */
+class TunnelGenImpl {
+public:
+	enum {
+		NO_TURN = 0, TURN_PERIMETER = 1, TURN_START = 2
+	};
+	TunnelGenImpl(GeneratedLevel& s, MTwist& mt, int start_room, int padding,
+			int width, int depth, int change_odds, bool ate = false) :
+			s(s), mt(mt), start_room(start_room), end_room(0), padding(padding), accept_tunnel_entry(
+					ate), avoid_groupid(0), width(width), maxdepth(depth), change_odds(
+					change_odds) {
+		LANARTS_ASSERT(padding <= MAXPADDING);
+		LANARTS_ASSERT(width <= MAXWIDTH);
+	}
+
+public:
+	//Tunnel generation function, generates as described above
+	bool generate(Pos p, int dx, int dy, std::vector<Sqr>& btbuff,
+			std::vector<TunnelSliceContext>& tsbuff);
+
+
+
+private:
+	Pos next_turn_position(TunnelSliceContext* cntxt, int& ndx, int& ndy);
+	Pos next_tunnel_position(TunnelSliceContext* cntxt);
+
+	void initialize_slice(TunnelSliceContext* cntxt, int turn_state, int dx,
+			int dy, const Pos& pos);
+	void backtrack_slice(Sqr* prev_content, TunnelSliceContext* cntxt, int dep);
+	void tunnel_turning_slice(TunnelSliceContext* curr,
+			TunnelSliceContext* next);
+	void tunnel_straight_slice(TunnelSliceContext* cntxt,
+			TunnelSliceContext* next);
+
+	//all return true if valid
+	bool validate_slice(Sqr* prev_content, TunnelSliceContext* cntxt, int dep);
+
+private:
+	GeneratedLevel& s;
+	MTwist& mt;
+	int start_room;
+	int end_room;
+	int padding;
+	bool accept_tunnel_entry;
+	int avoid_groupid;
+	int width;
+	int maxdepth;
+	int change_odds;
+};
+
+/*Sole visible function*/
+void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
+		GeneratedLevel& level) {
+
+	Pos p;
+	bool axis, positive;
+
+	std::vector<Sqr> btbuff;
+	std::vector<TunnelSliceContext> tsbuff;
+
+	std::vector<int> genpaths(level.rooms().size(), 0);
+	std::vector<int> totalpaths(level.rooms().size(), 0);
+	for (int i = 0; i < level.rooms().size(); i++) {
+		totalpaths[i] = mt.rand(tgs.min_tunnels, tgs.max_tunnels + 1);
+	}
+	int nogen_tries = 0;
+	while (nogen_tries < 200) {
+		nogen_tries++;
+
+		for (int i = 0; i < level.rooms().size(); i++) {
+			if (genpaths[i] >= totalpaths[i])
+				continue;
+			bool generated = false;
+			int genwidth = mt.rand(tgs.minwidth, tgs.maxwidth + 1);
+			for (; genwidth >= 1 && !generated; genwidth--) {
+				int path_len = 5;
+				for (int attempts = 0; attempts < 16 && !generated;
+						attempts++) {
+					TunnelGenImpl tg(
+							level,
+							mt,
+							i + 1,
+							tgs.padding,
+							genwidth,
+							path_len,
+							20,
+							tgs.padding > 0
+									&& (genpaths[i] > 0 || nogen_tries > 100));
+
+					generate_entrance(level.rooms()[i].room_region, mt,
+							std::min(genwidth, 2), p, axis, positive);
+
+					int val = positive ? +1 : -1;
+					int dx = axis ? 0 : val, dy = axis ? val : 0;
+
+					if (tg.generate(p, dx, dy, btbuff, tsbuff)) {
+						genpaths[i]++;
+						nogen_tries = 0;
+						path_len = 5;
+						generated = true;
+					}
+					if (attempts >= 4) {
+						path_len += 5;
+					}
+				}
+			}
+		}
+	}
+}
+
 static Sqr* backtrack_entry(Sqr* backtracking, int entry_size, int entryn) {
 	return &backtracking[entry_size * entryn];
 }
@@ -35,49 +151,7 @@ struct TunnelSliceContext {
 	}
 };
 
-//Attempt connection from start room to another room
-struct TunnelGen {
-	GeneratedLevel& s;
-	MTwist& mt;
-	int start_room;
-	int end_room;
-	int padding;
-	bool accept_tunnel_entry;
-	int avoid_groupid;
-	int width;
-	int maxdepth;
-	int change_odds;
-	enum {
-		NO_TURN = 0, TURN_PERIMETER = 1, TURN_START = 2
-	};
-	inline TunnelGen(GeneratedLevel& s, MTwist& mt, int start_room, int padding,
-			int width, int depth, int change_odds, bool ate = false) :
-			s(s), mt(mt), start_room(start_room), end_room(0), padding(padding), accept_tunnel_entry(
-					ate), avoid_groupid(0), width(width), maxdepth(depth), change_odds(
-					change_odds) {
-		LANARTS_ASSERT(padding <= MAXPADDING);
-		LANARTS_ASSERT(width <= MAXWIDTH);
-	}
-
-	Pos next_turn_position(TunnelSliceContext* cntxt, int& ndx, int& ndy);
-	Pos next_tunnel_position(TunnelSliceContext* cntxt);
-
-	void initialize_slice(TunnelSliceContext* cntxt, int turn_state, int dx,
-			int dy, const Pos& pos);
-	void backtrack_slice(Sqr* prev_content, TunnelSliceContext* cntxt, int dep);
-	void tunnel_turning_slice(TunnelSliceContext* curr,
-			TunnelSliceContext* next);
-	void tunnel_straight_slice(TunnelSliceContext* cntxt,
-			TunnelSliceContext* next);
-
-	//all return true if valid
-	bool validate_slice(Sqr* prev_content, TunnelSliceContext* cntxt, int dep);
-
-	bool generate(Pos p, int dx, int dy, std::vector<Sqr>& btbuff, std::vector<TunnelSliceContext>& tsbuff);
-
-};
-
-void TunnelGen::initialize_slice(TunnelSliceContext* cntxt, int turn_state,
+void TunnelGenImpl::initialize_slice(TunnelSliceContext* cntxt, int turn_state,
 		int dx, int dy, const Pos& pos) {
 	cntxt->turn_state = turn_state;
 	cntxt->dx = dx, cntxt->dy = dy;
@@ -86,8 +160,8 @@ void TunnelGen::initialize_slice(TunnelSliceContext* cntxt, int turn_state,
 	cntxt->attempt_number = 0;
 }
 
-void TunnelGen::backtrack_slice(Sqr* prev_content, TunnelSliceContext* cntxt,
-		int dep) {
+void TunnelGenImpl::backtrack_slice(Sqr* prev_content,
+		TunnelSliceContext* cntxt, int dep) {
 	int dx = cntxt->dx, dy = cntxt->dy;
 
 	for (int i = 0; i < width + padding * 2; i++) {
@@ -97,7 +171,7 @@ void TunnelGen::backtrack_slice(Sqr* prev_content, TunnelSliceContext* cntxt,
 	}
 
 }
-bool TunnelGen::validate_slice(Sqr* prev_content, TunnelSliceContext* cntxt,
+bool TunnelGenImpl::validate_slice(Sqr* prev_content, TunnelSliceContext* cntxt,
 		int dep) {
 	int dx = cntxt->dx, dy = cntxt->dy;
 	if (cntxt->p.x <= 2 || cntxt->p.x >= s.width() - width)
@@ -144,7 +218,7 @@ bool TunnelGen::validate_slice(Sqr* prev_content, TunnelSliceContext* cntxt,
 	return true;
 }
 
-Pos TunnelGen::next_turn_position(TunnelSliceContext* cntxt, int& ndx,
+Pos TunnelGenImpl::next_turn_position(TunnelSliceContext* cntxt, int& ndx,
 		int& ndy) {
 	Pos newpos;
 	int dx = cntxt->dx, dy = cntxt->dy;
@@ -174,7 +248,7 @@ Pos TunnelGen::next_turn_position(TunnelSliceContext* cntxt, int& ndx,
 	return newpos;
 }
 
-Pos TunnelGen::next_tunnel_position(TunnelSliceContext* cntxt) {
+Pos TunnelGenImpl::next_tunnel_position(TunnelSliceContext* cntxt) {
 	Pos newpos;
 	int dx = cntxt->dx, dy = cntxt->dy;
 
@@ -195,7 +269,7 @@ Pos TunnelGen::next_tunnel_position(TunnelSliceContext* cntxt) {
 	return newpos;
 }
 
-void TunnelGen::tunnel_straight_slice(TunnelSliceContext* cntxt,
+void TunnelGenImpl::tunnel_straight_slice(TunnelSliceContext* cntxt,
 		TunnelSliceContext* next) {
 	int dx = cntxt->dx, dy = cntxt->dy;
 
@@ -211,14 +285,15 @@ void TunnelGen::tunnel_straight_slice(TunnelSliceContext* cntxt,
 		sqr.roomID = 0;
 	}
 
-	s.at(cntxt->ip.x + (dy == 0 ? 0 : width + 1), cntxt->ip.y + (dx == 0 ? 0 : width + 1)).perimeter = true;
+	s.at(cntxt->ip.x + (dy == 0 ? 0 : width + 1),
+			cntxt->ip.y + (dx == 0 ? 0 : width + 1)).perimeter = true;
 
 	Pos newpos = next_tunnel_position(cntxt);
 
 	bool start_turn = cntxt->turn_state == NO_TURN && mt.rand(change_odds) == 0;
 	initialize_slice(next, start_turn ? TURN_START : NO_TURN, dx, dy, newpos);
 }
-void TunnelGen::tunnel_turning_slice(TunnelSliceContext* cntxt,
+void TunnelGenImpl::tunnel_turning_slice(TunnelSliceContext* cntxt,
 		TunnelSliceContext* next) {
 	int dx = cntxt->dx, dy = cntxt->dy;
 	int ndx, ndy;
@@ -236,19 +311,19 @@ void TunnelGen::tunnel_turning_slice(TunnelSliceContext* cntxt,
 	initialize_slice(next, TURN_PERIMETER, ndx, ndy, newpos);
 }
 
-
-template <class T>
-void __resizebuff(T& t, size_t size){
-	if (t.size() <= size/2)
+template<class T>
+void __resizebuff(T& t, size_t size) {
+	if (t.size() <= size / 2)
 		t.resize(size);
 	else if (t.size() < size)
-		t.resize(t.size()*2);
+		t.resize(t.size() * 2);
 }
-bool TunnelGen::generate(Pos p, int dx, int dy, std::vector<Sqr>& btbuff, std::vector<TunnelSliceContext>& tsbuff) {
+bool TunnelGenImpl::generate(Pos p, int dx, int dy, std::vector<Sqr>& btbuff,
+		std::vector<TunnelSliceContext>& tsbuff) {
 
 	int entry_size = MAXWIDTH + MAXPADDING * 2;
 
-	__resizebuff(btbuff, entry_size*maxdepth);
+	__resizebuff(btbuff, entry_size * maxdepth);
 	__resizebuff(tsbuff, maxdepth);
 
 	Sqr* backtracking = &btbuff[0];
@@ -315,65 +390,5 @@ void generate_entrance(const Region& r, MTwist& mt, int len, Pos& p, bool& axis,
 		ind = mt.rand(r.y + 1, rmy);
 		p.x = positive ? r.x + r.w : r.x - 1;
 		p.y = ind;
-	}
-}
-
-//TODO: Refactor generate_x and generate_y as one templated function!
-void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
-		GeneratedLevel& level) {
-
-	Pos p;
-	bool axis, positive;
-
-	std::vector<Sqr> btbuff;
-	std::vector<TunnelSliceContext> tsbuff;
-
-	std::vector<int> genpaths(level.rooms().size(), 0);
-	std::vector<int> totalpaths(level.rooms().size(), 0);
-	for (int i = 0; i < level.rooms().size(); i++) {
-		totalpaths[i] = mt.rand(tgs.min_tunnels, tgs.max_tunnels + 1);
-	}
-	int nogen_tries = 0;
-	while (nogen_tries < 200) {
-		nogen_tries++;
-
-		for (int i = 0; i < level.rooms().size(); i++) {
-			if (genpaths[i] >= totalpaths[i])
-				continue;
-			bool generated = false;
-			int genwidth = mt.rand(tgs.minwidth, tgs.maxwidth + 1);
-			for (; genwidth >= 1 && !generated; genwidth--) {
-				int path_len = 5;
-				for (int attempts = 0; attempts < 16 && !generated;
-						attempts++) {
-					TunnelGen tg(
-							level,
-							mt,
-							i + 1,
-							tgs.padding,
-							genwidth,
-							path_len,
-							20,
-							tgs.padding > 0
-									&& (genpaths[i] > 0 || nogen_tries > 100));
-
-					generate_entrance(level.rooms()[i].room_region, mt,
-							std::min(tg.width, 2), p, axis, positive);
-
-					int val = positive ? +1 : -1;
-					int dx = axis ? 0 : val, dy = axis ? val : 0;
-
-					if (tg.generate(p, dx, dy, btbuff, tsbuff)) {
-						genpaths[i]++;
-						nogen_tries = 0;
-						path_len = 5;
-						generated = true;
-					}
-					if (attempts >= 4) {
-						path_len += 5;
-					}
-				}
-			}
-		}
 	}
 }

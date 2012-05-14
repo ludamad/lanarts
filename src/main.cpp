@@ -72,11 +72,15 @@ static void menu_loop(GameState* gs, int width, int height) {
 	gs->level() = oldlevel;
 	gs->window_view() = prevview;
 }
+
+#define GAME_DRAW_EVERY_N_FRAMES 3
+
 static void game_loop(GameState* gs) {
 
 	bool paused = false, cont = true;
 
 	unsigned long draw_time = 5 * CLOCKS_PER_SEC / 1000;
+
 	unsigned long draw_events = 1;
 
 	unsigned long step_time = 0;
@@ -86,7 +90,7 @@ static void game_loop(GameState* gs) {
 	clock_t time_allowance = 0;
 
 	gs->pre_step();
-	for (int i = 0; cont; i++) {
+	for (int i = 1; cont; i++) {
 
 		if (gs->key_press_state(SDLK_F2)) {
 			init_game_data();
@@ -106,7 +110,11 @@ static void game_loop(GameState* gs) {
 		//Draw event
 
 		clock_t stepndraw_start = clock(), stepndraw_end;
+#ifdef GAME_DRAW_EVERY_N_FRAMES
+		if (i%GAME_DRAW_EVERY_N_FRAMES == 0) gs->draw();
+#else
 		gs->draw();
+#endif
 		clock_t draw_end = clock();
 		draw_events++;
 		draw_time += draw_end - stepndraw_start;
@@ -137,8 +145,11 @@ static void game_loop(GameState* gs) {
 			}
 		}
 
+#ifdef GAME_DRAW_EVERY_N_FRAMES
+		clock_t time_to_wait = per_frame - (draw_time/i/GAME_DRAW_EVERY_N_FRAMES + step_time/i);
+#else
 		clock_t time_to_wait = per_frame - (clock() - stepndraw_start);
-
+#endif
 		if (time_to_wait > 0) {
 			int delayms = time_to_wait * 1000 / CLOCKS_PER_SEC;
 			if (delayms > 0)

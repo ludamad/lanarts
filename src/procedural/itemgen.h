@@ -11,15 +11,6 @@
 #include <vector>
 
 class GameState;
-//
-//struct ItemGenSettings {
-//	int item_level;
-//	int min_items, max_items;
-//	//TODO: Add item probabilities
-//	ItemGenSettings(int item_level, int min_items, int max_items) :
-//		item_level(item_level), min_items(min_items), max_items(max_items){
-//	}
-//};
 
 struct ItemGenChance {
 	int genchance;//Out of 100%

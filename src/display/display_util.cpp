@@ -82,7 +82,7 @@ void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 ///So while glRasterPos won't let us set the raster position using
 ///window coordinates, these hacky functions will let us move the current raster
 ///position a given delta x or y.
-inline void move_raster(int x, int y) {
+static void move_raster(int x, int y) {
 	glBitmap(0, 0, 0, 0, x, y, NULL);
 }
 

@@ -106,7 +106,7 @@ void GameInstSet::reallocate_hashset_() {
 	delete[] old_set;
 
 }
-static inline int get_xyind(const Pos& c, int grid_w) {
+static int get_xyind(const Pos& c, int grid_w) {
 	return (c.y / GameInstSet::REGION_SIZE) * grid_w
 			+ c.x / GameInstSet::REGION_SIZE;
 }

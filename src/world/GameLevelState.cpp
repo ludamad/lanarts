@@ -13,6 +13,5 @@ GameLevelState::GameLevelState(int roomid, int branch, int level, int w, int h) 
 }
 
 GameLevelState::~GameLevelState() {
-	// TODO Auto-generated destructor stub
 }
 

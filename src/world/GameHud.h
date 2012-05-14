@@ -1,10 +1,3 @@
-/*
- * GameHud.h
- *
- *  Created on: 2011-11-06
- *      Author: 100400530
- */
-
 #ifndef GAMEHUD_H_
 #define GAMEHUD_H_
 
