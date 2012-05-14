@@ -18,31 +18,38 @@ class GameState;
 class GameInstSet {
 public:
 	enum {
-		DEFAULT_CAPACITY = 256,
-		REGION_SIZE = 96//cell is REGION_SIZE by REGION_SIZE
+		DEFAULT_CAPACITY = 256, REGION_SIZE = 96
+	//cell is REGION_SIZE by REGION_SIZE
 	};
 	GameInstSet(int w, int h, int capacity = DEFAULT_CAPACITY);
 	~GameInstSet();
 
-	obj_id add(GameInst* inst);
-	void remove(GameInst* inst, bool deallocate = true);
+	//The main part of the API:
+	obj_id add_instance(GameInst* inst);
+	void remove_instance(GameInst* inst, bool deallocate = true);
 	void step(GameState* state);
 
 	//Returns NULL if no unit found
-	GameInst* get_by_id(int id);
+	GameInst* get_instance(int id);
 
-	int object_radius_test(GameInst* obj, GameInst** objs = NULL, int obj_cap = 0, col_filterf f = NULL, int x=-1, int y=-1, int radius=-1);
+	int object_radius_test(GameInst* obj, GameInst** objs = NULL, int obj_cap =
+			0, col_filterf f = NULL, int x = -1, int y = -1, int radius = -1);
 
 	//Used to synchronize game-id's across network play where objects are created on some systems but not all
-	void skip_next_id(){ next_id++; }
+	void skip_next_id() {
+		next_id++;
+	}
 	//Allocate all instances to one vector, traversed according to depth order
 	std::vector<GameInst*> to_vector();
-	size_t size(){ return unit_amnt; }
+	size_t size() {
+		return unit_amnt;
+	}
 	//Return a semi-unique hash of the instances contained in the structure
 	unsigned int hash();
 
 	void clear();
 private:
+
 	//Internal Structures:
 	//Encapsulates instances and the data needed to perform collision lookups by area
 	struct InstanceState {
@@ -51,7 +58,7 @@ private:
 		InstanceState* next_in_grid, *prev_in_grid;
 		InstanceState* next_same_depth, *prev_same_depth;
 		//Used in settools.h
-		void operator=(GameInst* inst){
+		void operator=(GameInst* inst) {
 			this->inst = inst;
 			next_in_grid = NULL;
 			prev_in_grid = NULL;
@@ -63,9 +70,9 @@ private:
 	//List of instances with the same rendering depth
 	struct InstanceLinkedList {
 		InstanceState* start_of_list, *end_of_list;
-		InstanceLinkedList() : start_of_list(NULL), end_of_list(NULL){
+		InstanceLinkedList() :
+				start_of_list(NULL), end_of_list(NULL) {
 		}
-		bool empty() { return start_of_list; }
 	};
 
 	typedef std::map<int, InstanceLinkedList> DepthMap;
@@ -85,16 +92,18 @@ private:
 	InstanceLinkedList* unit_grid;
 
 	//Internal structure upkeep functions
-	void reallocate_hashset_();
+	void reallocate_internal_data();
 	void update_statepointer_for_reallocate_(InstanceState** stateptr);
 	void update_depthlist_for_reallocate_(InstanceLinkedList& list);
-	void update_instance(InstanceState* state, GameInst* inst);
+
+	void update_instance_for_step(InstanceState* state, GameInst* inst);
 
 	void add_to_depthlist(InstanceState* state, InstanceLinkedList& list);
 	void remove_from_depthlist(InstanceState* inst, InstanceLinkedList& list);
 
 	void add_to_collisionlist(InstanceState* inst, InstanceLinkedList& list);
-	void remove_from_collisionlist(InstanceState* inst, InstanceLinkedList& list);
+	void remove_from_collisionlist(InstanceState* inst,
+			InstanceLinkedList& list);
 
 	//Used to allow access to internal data/functions for our hash set implementation utility class
 	friend class GameInstSetFunctions;

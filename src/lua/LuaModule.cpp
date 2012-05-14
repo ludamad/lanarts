@@ -111,5 +111,5 @@ static void push_yaml_node(lua_State* L, const YAML::Node* node){
 	}
 }
 void LuaModule::set_yaml(const char* key, const YAML::Node* root){
-	
+	push_yaml_node(L, root);
 }

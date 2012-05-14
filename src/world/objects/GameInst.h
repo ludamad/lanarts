@@ -49,6 +49,6 @@ public:
 typedef bool (*col_filterf)(GameInst* o1, GameInst* o2);
 
 
-void load_lua_gameinst_binding(lua_State* lua_state);
+void load_lua_gameinst_binding(lua_State* L);
 
 #endif /* GAMEINST_H_ */

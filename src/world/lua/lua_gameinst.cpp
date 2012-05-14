@@ -16,8 +16,8 @@ public:
   static const char className[];
   static Lunar<GameInstLuaBinding>::RegType methods[];
 
-  GameInstLuaBinding(lua_State* lua_state, obj_id id) :
-	  gs(lua_get_gamestate(lua_state)), id(id) {
+  GameInstLuaBinding(lua_State* L, obj_id id) :
+	  gs(lua_get_gamestate(L)), id(id) {
   }
 
   GameInst* get_instance() {
@@ -35,34 +35,34 @@ public:
 		  return NULL;
 	  }
   }
-  int heal_fully(lua_State* lua_state){
+  int heal_fully(lua_State* L){
 	  get_stats()->heal_fully();
 	  return 0;
   }
-  int hurt(lua_State* lua_state){
-	  get_stats()->hurt(lua_tonumber(lua_state,1));
+  int hurt(lua_State* L){
+	  get_stats()->hurt(lua_tonumber(L,1));
 	  return 0;
   }
-  int equip(lua_State* lua_state){
+  int equip(lua_State* L){
 	  PlayerInst* p;
 	  if ( (p = dynamic_cast<PlayerInst*>(get_instance()))){
-		  p->weapon_type() = lua_item_arg(lua_state,1).weapon;
+		  p->weapon_type() = lua_item_arg(L,1).weapon;
 	  }
 	  return 0;
   }
-  int hasten(lua_State* lua_state){
+  int hasten(lua_State* L){
 	  PlayerInst* p;
 	  if ( (p = dynamic_cast<PlayerInst*>(get_instance()))){
-		p->status_effects().add(EFFECT_HASTE, lua_tonumber(lua_state, 1));
+		p->status_effects().add(EFFECT_HASTE, lua_tonumber(L, 1));
 	  }
 	  return 0;
   }
-  int heal_hp(lua_State* lua_state){
-	  get_stats()->raise_hp(lua_tonumber(lua_state,1));
+  int heal_hp(lua_State* L){
+	  get_stats()->raise_hp(lua_tonumber(L,1));
 	  return 0;
   }
-  int heal_mp(lua_State* lua_state){
-	  get_stats()->raise_mp(lua_tonumber(lua_state,1));
+  int heal_mp(lua_State* L){
+	  get_stats()->raise_mp(lua_tonumber(L,1));
 	  return 0;
   }
   obj_id get_id(){ return id; }
@@ -77,20 +77,20 @@ typedef Lunar<GameInstLuaBinding> lunar_t;
 typedef lunar_t::RegType meth_t;
 #define LUA_DEF(m) meth_t(#m, &bind_t:: m)
 
-obj_id lua_gameinst_arg(lua_State* lua_state, int narg){
-	bind_t* bind = lunar_t::check(lua_state, narg);
+obj_id lua_gameinst_arg(lua_State* L, int narg){
+	bind_t* bind = lunar_t::check(L, narg);
 	return bind->get_id();
 }
-static int lua_member_lookup(lua_State* lua_state){
+static int lua_member_lookup(lua_State* L){
 	#define IFLUA_NUM_MEMB_LOOKUP(n, m) \
 		if (strncmp(cstr, n, sizeof(n))==0){\
-		lua_pushnumber(lua_state, m );\
+		lua_pushnumber(L, m );\
 	}
 
-	bind_t* state = lunar_t::check(lua_state,1);
+	bind_t* state = lunar_t::check(L,1);
 	GameInst* inst = state->get_instance();
 	Stats* stats = state->get_stats();
-	const char* cstr = lua_tostring(lua_state, 2);
+	const char* cstr = lua_tostring(L, 2);
 
 	IFLUA_NUM_MEMB_LOOKUP("hp", stats->hp)
 	else IFLUA_NUM_MEMB_LOOKUP("mp", stats->mp)
@@ -106,23 +106,23 @@ static int lua_member_lookup(lua_State* lua_state){
 	else IFLUA_NUM_MEMB_LOOKUP("level", stats->xplevel)
 	else IFLUA_NUM_MEMB_LOOKUP("id", inst->id)
 	else{
-		lua_getglobal(lua_state, bind_t::className);
-		int tableind = lua_gettop(lua_state);
-		lua_pushvalue(lua_state, 2);
-		lua_gettable(lua_state, tableind);
+		lua_getglobal(L, bind_t::className);
+		int tableind = lua_gettop(L);
+		lua_pushvalue(L, 2);
+		lua_gettable(L, tableind);
 	}
 	return 1;
 }
-static int lua_member_update(lua_State* lua_state){
+static int lua_member_update(lua_State* L){
 	#define IFLUA_NUM_MEMB_UPDATE(n, m) \
 		if (strncmp(cstr, n, sizeof(n))==0){\
-			m = lua_tonumber(lua_state, 3 );\
+			m = lua_tonumber(L, 3 );\
 	}
 
-	bind_t* state = lunar_t::check(lua_state,1);
+	bind_t* state = lunar_t::check(L,1);
 	GameInst* inst = state->get_instance();
 	Stats* stats = state->get_stats();
-	const char* cstr = lua_tostring(lua_state, 2);
+	const char* cstr = lua_tostring(L, 2);
 
 	IFLUA_NUM_MEMB_UPDATE("hp", stats->hp)
 	else IFLUA_NUM_MEMB_UPDATE("mp", stats->mp)
@@ -148,24 +148,24 @@ meth_t bind_t::methods[] = {
 };
 
 
-void lua_gameinst_bindings(GameState* gs, lua_State* lua_state){
-	lunar_t::Register(lua_state);
+void lua_gameinst_bindings(GameState* gs, lua_State* L){
+	lunar_t::Register(L);
 
-     luaL_getmetatable(lua_state, bind_t::className);
+     luaL_getmetatable(L, bind_t::className);
 //
-    int tableind = lua_gettop(lua_state);
+    int tableind = lua_gettop(L);
 
-    lua_pushstring(lua_state, "__index");
-    lua_pushcfunction(lua_state, lua_member_lookup);
-    lua_settable(lua_state, tableind);
+    lua_pushstring(L, "__index");
+    lua_pushcfunction(L, lua_member_lookup);
+    lua_settable(L, tableind);
 
-    lua_pushstring(lua_state, "__newindex");
-    lua_pushcfunction(lua_state, lua_member_update);
-    lua_settable(lua_state, tableind);
+    lua_pushstring(L, "__newindex");
+    lua_pushcfunction(L, lua_member_update);
+    lua_settable(L, tableind);
 }
 
 
-void lua_pushgameinst(lua_State* lua_state, obj_id id){
-	lunar_t::push(lua_state, new GameInstLuaBinding(lua_state, id), true);
+void lua_pushgameinst(lua_State* L, obj_id id){
+	lunar_t::push(L, new GameInstLuaBinding(L, id), true);
 }
 const char GameInstLuaBinding::className[] = "GameInst";

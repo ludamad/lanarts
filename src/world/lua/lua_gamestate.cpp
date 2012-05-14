@@ -13,22 +13,22 @@ public:
   GameStateLuaBinding(GameState* gs) : gs(gs) {
   }
 
-  int destroy_object(lua_State* lua_state){
-	  obj_id id = lua_gameinst_arg(lua_state, 1);
+  int destroy_object(lua_State* L){
+	  obj_id id = lua_gameinst_arg(L, 1);
 	  if (id > 0){
 		  gs->remove_instance(gs->get_instance(id));
 	  }
 	  return 0;
   }
 
-  int players_in_room(lua_State* lua_state){
+  int players_in_room(lua_State* L){
 	  PlayerController& pc = gs->player_controller();
-	  lua_createtable(lua_state, 0, 0);
-	  int table = lua_gettop(lua_state);
+	  lua_createtable(L, 0, 0);
+	  int table = lua_gettop(L);
 	  for (int i=0; i<pc.player_ids().size(); i++) {
-		  lua_pushgameinst(lua_state, pc.player_ids()[i]);
-		//  lua_pushnumber(lua_state, 2);
-		  lua_rawseti (lua_state, table, i+1);
+		  lua_pushgameinst(L, pc.player_ids()[i]);
+		//  lua_pushnumber(L, 2);
+		  lua_rawseti (L, table, i+1);
 	  }
 	  return 1;
   }
@@ -44,15 +44,15 @@ typedef Lunar<GameStateLuaBinding> lunar_t;
 typedef lunar_t::RegType meth_t;
 #define LUA_DEF(m) meth_t(#m, &bind_t:: m)
 
-static int lua_member_lookup(lua_State* lua_state){
+static int lua_member_lookup(lua_State* L){
 	#define IFLUA_NUM_MEMB_UPDATE(n, m) \
 		if (strncmp(cstr, n, sizeof(n))==0){\
-		lua_pushnumber(lua_state, m );\
+		lua_pushnumber(L, m );\
 	}
 
-	bind_t* state = lunar_t::check(lua_state,1);
+	bind_t* state = lunar_t::check(L,1);
 	GameState* gs = state->game_state();
-	const char* cstr = lua_tostring(lua_state, 2);
+	const char* cstr = lua_tostring(L, 2);
 
 	IFLUA_NUM_MEMB_UPDATE("width", gs->width())
 	else IFLUA_NUM_MEMB_UPDATE("height", gs->height())
@@ -62,10 +62,10 @@ static int lua_member_lookup(lua_State* lua_state){
 	else IFLUA_NUM_MEMB_UPDATE("level_number", gs->level()->level_number)
 	else IFLUA_NUM_MEMB_UPDATE("monster_num", gs->monster_controller().number_monsters())
 	else {
-		lua_getglobal(lua_state, bind_t::className);
-		int tableind = lua_gettop(lua_state);
-		lua_pushvalue(lua_state, 2);
-		lua_gettable(lua_state, tableind);
+		lua_getglobal(L, bind_t::className);
+		int tableind = lua_gettop(L);
+		lua_pushvalue(L, 2);
+		lua_gettable(L, tableind);
 	}
 	return 1;
 }
@@ -78,28 +78,28 @@ meth_t bind_t::methods[] = {
 };
 
 
-GameState* lua_get_gamestate(lua_State* lua_state){
-	lua_getglobal(lua_state, "world");
-	int idx = lua_gettop(lua_state);
-	bind_t* obj = lunar_t::check(lua_state, idx);
-	lua_pop(lua_state, 1);
+GameState* lua_get_gamestate(lua_State* L){
+	lua_getglobal(L, "world");
+	int idx = lua_gettop(L);
+	bind_t* obj = lunar_t::check(L, idx);
+	lua_pop(L, 1);
 	if (!obj) return NULL;
 	return obj->game_state();
 }
 
-void lua_gamestate_bindings(GameState* gs, lua_State* lua_state){
-	lunar_t::Register(lua_state);
+void lua_gamestate_bindings(GameState* gs, lua_State* L){
+	lunar_t::Register(L);
 
-     luaL_getmetatable(lua_state, bind_t::className);
+     luaL_getmetatable(L, bind_t::className);
 //
-    int tableind = lua_gettop(lua_state);
+    int tableind = lua_gettop(L);
 
-    lua_pushstring(lua_state, "__index");
-    lua_pushcfunction(lua_state, lua_member_lookup);
-    lua_settable(lua_state, tableind);
+    lua_pushstring(L, "__index");
+    lua_pushcfunction(L, lua_member_lookup);
+    lua_settable(L, tableind);
 
-	lunar_t::push(lua_state, new bind_t(gs), true);
+	lunar_t::push(L, new bind_t(gs), true);
 
-	lua_setglobal(lua_state, "world");
+	lua_setglobal(L, "world");
 }
 const char GameStateLuaBinding::className[] = "GameWorld";
