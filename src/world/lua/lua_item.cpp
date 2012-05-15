@@ -37,34 +37,34 @@ meth_t bind_t::methods[] = {
   meth_t(0,0)
 };
 
-void lua_pushitem(lua_State* lua_state, ItemType& item){
-	lunar_t::push(lua_state, new ItemLuaBinding(item), true);
+void lua_pushitem(lua_State* L, ItemType& item){
+	lunar_t::push(L, new ItemLuaBinding(item), true);
 }
 
-ItemType& lua_item_arg(lua_State* lua_state, int narg){
-	bind_t* bind = lunar_t::check(lua_state, narg);
+ItemType& lua_item_arg(lua_State* L, int narg){
+	bind_t* bind = lunar_t::check(L, narg);
 	return bind->get_item();
 }
-static int lua_member_lookup(lua_State* lua_state){
+static int lua_member_lookup(lua_State* L){
 	#define IFLUA_STR_MEMB_LOOKUP(n, m) \
 		if (strncmp(cstr, n, sizeof(n))==0){\
-		lua_pushstring(lua_state, m );\
+		lua_pushstring(L, m );\
 	}
 	#define IFLUA_NUM_MEMB_LOOKUP(n, m) \
 		if (strncmp(cstr, n, sizeof(n))==0){\
-		lua_pushnumber(lua_state, m );\
+		lua_pushnumber(L, m );\
 	}
 	#define IFLUA_BOOL_MEMB_LOOKUP(n, m) \
 		if (strncmp(cstr, n, sizeof(n))==0){\
-		lua_pushboolean(lua_state, m );\
+		lua_pushboolean(L, m );\
 	}
 
-	bind_t* state = lunar_t::check(lua_state,1);
+	bind_t* state = lunar_t::check(L,1);
 	ItemType& item = state->get_item();
 	bool is_weapon = item.weapon != 0;
 	WeaponType* weap = NULL;
 	if (is_weapon) weap = &game_weapon_data[item.weapon];
-	const char* cstr = lua_tostring(lua_state, 2);
+	const char* cstr = lua_tostring(L, 2);
 
 	if (is_weapon){
 		IFLUA_STR_MEMB_LOOKUP("weapon_name", weap->name)
@@ -75,25 +75,25 @@ static int lua_member_lookup(lua_State* lua_state){
 			else IFLUA_NUM_MEMB_LOOKUP("action_amount", item.action_amount)
 			else IFLUA_NUM_MEMB_LOOKUP("action_duration", item.action_duration)
 	else{
-		lua_getglobal(lua_state, bind_t::className);
-		int tableind = lua_gettop(lua_state);
-		lua_pushvalue(lua_state, 2);
-		lua_gettable(lua_state, tableind);
+		lua_getglobal(L, bind_t::className);
+		int tableind = lua_gettop(L);
+		lua_pushvalue(L, 2);
+		lua_gettable(L, tableind);
 	}
 	return 1;
 }
 
 
-void lua_item_bindings(GameState* gs, lua_State* lua_state){
-	lunar_t::Register(lua_state);
+void lua_item_bindings(GameState* gs, lua_State* L){
+	lunar_t::Register(L);
 
-     luaL_getmetatable(lua_state, bind_t::className);
+     luaL_getmetatable(L, bind_t::className);
 //
-    int tableind = lua_gettop(lua_state);
+    int tableind = lua_gettop(L);
 
-    lua_pushstring(lua_state, "__index");
-    lua_pushcfunction(lua_state, lua_member_lookup);
-    lua_settable(lua_state, tableind);
+    lua_pushstring(L, "__index");
+    lua_pushcfunction(L, lua_member_lookup);
+    lua_settable(L, tableind);
 }
 
 const char ItemLuaBinding::className[] = "Item";

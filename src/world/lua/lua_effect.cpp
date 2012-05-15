@@ -38,26 +38,26 @@ meth_t bind_t::methods[] = {
   meth_t(0,0)
 };
 
-void lua_pusheffects(lua_State* lua_state, int effectnum){
-	lunar_t::push(lua_state, new EffectsLuaBinding(effectnum), true);
+void lua_pusheffects(lua_State* L, int effectnum){
+	lunar_t::push(L, new EffectsLuaBinding(effectnum), true);
 }
 
-EffectType& lua_effects_arg(lua_State* lua_state, int narg){
-	bind_t* bind = lunar_t::check(lua_state, narg);
+EffectType& lua_effects_arg(lua_State* L, int narg){
+	bind_t* bind = lunar_t::check(L, narg);
 	return bind->get_effects();
 }
 
-void lua_effects_bindings(GameState* gs, lua_State* lua_state){
-	lunar_t::Register(lua_state);
-     luaL_getmetatable(lua_state, bind_t::className);
-     lua_newtable(lua_state);
-     int top = lua_gettop(lua_state);
+void lua_effects_bindings(GameState* gs, lua_State* L){
+	lunar_t::Register(L);
+     luaL_getmetatable(L, bind_t::className);
+     lua_newtable(L);
+     int top = lua_gettop(L);
      for (int i = 0; i < game_effect_n; i++) {
-    	    lua_pushstring(lua_state, game_effect_data[i].name);
-    	    lua_pusheffects(lua_state, i);
-    	    lua_settable(lua_state, top);
+    	    lua_pushstring(L, game_effect_data[i].name);
+    	    lua_pusheffects(L, i);
+    	    lua_settable(L, top);
      }
-     lua_setglobal(lua_state, "effects");
+     lua_setglobal(L, "effects");
 //
 
 }

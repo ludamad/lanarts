@@ -117,6 +117,7 @@ static void push_yaml_node(lua_State* L, const YAML::Node* node){
 	}
 }
 void LuaModule::set_yaml(const char* key, const YAML::Node* root){
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 	
 =======
@@ -126,4 +127,7 @@ void LuaModule::set_yaml(const char* key, const YAML::Node* root){
 	push_yaml_node(L, root);
 	lua_pop(L, 1); /*Pop table*/
 >>>>>>> Stashed changes
+=======
+	push_yaml_node(L, root);
+>>>>>>> b474e806017570a86ebd691884fcdecc6ca4fc80
 }

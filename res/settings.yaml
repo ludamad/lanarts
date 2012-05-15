@@ -1,11 +1,11 @@
-fullscreen: 1
+fullscreen: 0
 regen_level_on_death: 1
-view_width: 1650
-view_height: 1050
+view_width: 920
+view_height: 720
 class: Mage
 font: res/MateSC-Regular.ttf
 
 #Either 'host', 'client', or 'none'
 connection_type: none
 ip: 192.168.0.24
-port: 80
+port: 6112

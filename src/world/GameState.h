@@ -150,7 +150,7 @@ public:
 	}
 
 	lua_State *get_luastate() {
-		return lua_state;
+		return L;
 	}
 
 	void skip_next_id();
@@ -169,7 +169,7 @@ private:
 	GameWorld world;
 	MTwist mtwist;
 	font_data pfont, menufont;
-	lua_State *lua_state;
+	lua_State *L;
 	char key_down_states[SDLK_LAST];
 	char key_press_states[SDLK_LAST];
 	int mousex, mousey;

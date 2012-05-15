@@ -88,8 +88,8 @@ void GameState::init_game() {
 
 GameState::~GameState() {
 	release_font(&pfont);
-	lua_gc(lua_state, LUA_GCCOLLECT, 0); // collected garbage
-	lua_close(lua_state);
+	lua_gc(L, LUA_GCCOLLECT, 0); // collected garbage
+	lua_close(L);
 }
 
 /*Handle new characters and exit signals*/
@@ -193,18 +193,18 @@ void GameState::draw(bool drawhud) {
 }
 
 obj_id GameState::add_instance(GameInst *inst) {
-	obj_id id = level()->inst_set.add(inst);
+	obj_id id = level()->inst_set.add_instance(inst);
 	inst->init(this);
 	return id;
 }
 
 void GameState::remove_instance(GameInst* inst, bool deallocate) {
-	level()->inst_set.remove(inst, deallocate);
+	level()->inst_set.remove_instance(inst, deallocate);
 	inst->deinit(this);
 }
 
 GameInst* GameState::get_instance(obj_id id) {
-	return level()->inst_set.get_by_id(id);
+	return level()->inst_set.get_instance(id);
 }
 //
 //static bool sqr_line_test(int x, int y, int w, int h, int sx, int sy,

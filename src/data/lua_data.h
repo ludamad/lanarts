@@ -18,11 +18,11 @@ struct LuaData {
 	LuaData(const std::string& str);
 };
 
-void luadata_call(lua_State* lua_state, const LuaData& ld);
-void luadata_push(lua_State* lua_state, const LuaData& ld);
-void luadata_pop(lua_State* lua_state, const LuaData& ld);
+void luadata_call(lua_State* L, const LuaData& ld);
+void luadata_push(lua_State* L, const LuaData& ld);
+void luadata_pop(lua_State* L, const LuaData& ld);
 
-void luadata_step_event(lua_State* lua_state, const LuaData& ld, obj_id id);
-void luadata_draw_event(lua_State* lua_state, const LuaData& ld, obj_id id);
+void luadata_step_event(lua_State* L, const LuaData& ld, obj_id id);
+void luadata_draw_event(lua_State* L, const LuaData& ld, obj_id id);
 
 #endif /* LUA_DATA_H_ */

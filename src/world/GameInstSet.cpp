@@ -74,7 +74,7 @@ void GameInstSet::update_depthlist_for_reallocate_(InstanceLinkedList& list){
 	update_statepointer_for_reallocate_(&list.start_of_list);
 	update_statepointer_for_reallocate_(&list.end_of_list);
 }
-void GameInstSet::reallocate_hashset_() {
+void GameInstSet::reallocate_internal_data() {
 	unit_capacity *= 2;
 	InstanceState* old_set = unit_set, *new_set = new InstanceState[unit_capacity];
 	for (int i = 0; i < unit_capacity; i++) {
@@ -110,7 +110,7 @@ static int get_xyind(const Pos& c, int grid_w) {
 	return (c.y / GameInstSet::REGION_SIZE) * grid_w
 			+ c.x / GameInstSet::REGION_SIZE;
 }
-void GameInstSet::remove(GameInst* inst, bool deallocate) {
+void GameInstSet::remove_instance(GameInst* inst, bool deallocate) {
 	if (inst->destroyed)
 		return;
 	inst->destroyed = true;
@@ -130,9 +130,9 @@ void GameInstSet::remove(GameInst* inst, bool deallocate) {
 	}
 }
 
-obj_id GameInstSet::add(GameInst* inst) {
+obj_id GameInstSet::add_instance(GameInst* inst) {
 	if (tset_should_resize(unit_amnt, unit_capacity))
-		this->reallocate_hashset_();
+		this->reallocate_internal_data();
 
 	Pos c(inst->last_x, inst->last_y);
 	//Will be set to the current state object in 'add'
@@ -165,11 +165,11 @@ void GameInstSet::step(GameState* gs) {
 		if (valid_inst(inst)) {
 			inst->destroyed = false;
 			inst->step(gs);
-			update_instance(&unit_set[i], inst);
+			update_instance_for_step(&unit_set[i], inst);
 		}
 	}
 }
-GameInst* GameInstSet::get_by_id(int id) {
+GameInst* GameInstSet::get_instance(int id) {
 	InstanceState* is = tset_find<GameInstSetFunctions>(id, unit_set,
 			unit_capacity);
 	if (is)
@@ -268,7 +268,7 @@ void GameInstSet::clear(){
 }
 
 
-void GameInstSet::update_instance(InstanceState* state, GameInst* inst) {
+void GameInstSet::update_instance_for_step(InstanceState* state, GameInst* inst) {
 	if (inst->destroyed)
 		return;
 	int old_bucket = get_xyind(Pos(inst->last_x, inst->last_y), grid_w);
