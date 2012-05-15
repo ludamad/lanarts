@@ -33,7 +33,7 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-GameState::GameState(const GameSettings& settings, int width, int height,
+GameState::GameState(const GameSettings& settings, lua_State* L, int width, int height,
 		int vieww, int viewh, int hudw) :
 		settings(settings), world_width(width), world_height(height), frame_n(
 				0), hud(vieww, 0, hudw, viewh), view(0, 0, vieww, viewh, width,
@@ -42,11 +42,6 @@ GameState::GameState(const GameSettings& settings, int width, int height,
 	memset(key_down_states, 0, sizeof(key_down_states));
 	init_font(&pfont, settings.font.c_str(), 10);
 	init_font(&menufont, settings.font.c_str(), 20);
-
-	lua_state = lua_open();
-
-	lua_lanarts_api(this, lua_state);
-	luaL_dofile(lua_state, "res/lua/effects.lua");
 }
 
 void GameState::init_game() {

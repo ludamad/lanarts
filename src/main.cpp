@@ -11,6 +11,12 @@
 #include "world/objects/EnemyInst.h"
 #include "world/objects/AnimatedInst.h"
 #include "world/objects/TestInst.h"
+#include "world/lua/lua_api.h"
+
+extern "C" {
+#include <lua/lua.h>
+#include <lua/lauxlib.h>
+}
 
 using namespace std;
 
@@ -18,13 +24,13 @@ using namespace std;
 #define main SDL_main
 #endif
 
-void init_system(GameSettings& settings) {
+void init_system(GameSettings& settings, lua_State* L) {
 	settings = load_settings_data("res/settings.yaml");
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		exit(0);
 	}
 	init_sdl_gl(settings.fullscreen, settings.view_width, settings.view_height);
-	init_game_data();
+	init_game_data(L);
 	settings = load_settings_data("res/settings.yaml");
 }
 
@@ -93,7 +99,7 @@ static void game_loop(GameState* gs) {
 	for (int i = 1; cont; i++) {
 
 		if (gs->key_press_state(SDLK_F2)) {
-			init_game_data();
+			init_game_data(gs->get_luastate());
 		}
 		if (gs->key_press_state(SDLK_F3)) {
 			gs->game_world().regen_level(gs->level()->roomid);
@@ -163,8 +169,11 @@ static void game_loop(GameState* gs) {
 }
 
 int main(int argc, char** argv) {
+	lua_State* L = lua_open();
+	luaL_dofile(L, "res/lua/effects.lua");
+
 	GameSettings settings;
-	init_system(settings);
+	init_system(settings, L);
 
 	int world_width = 128 * TILE_SIZE, world_height = 128 * TILE_SIZE;
 
@@ -172,8 +181,10 @@ int main(int argc, char** argv) {
 	int vieww = windoww - HUD_WIDTH, viewh = windowh;
 
 	//Initialize the game state and start the level
-	GameState* gs = new GameState(settings, world_width, world_height, vieww,
+	//GameState claims ownership of the passed lua_State*
+	GameState* gs = new GameState(settings, L, world_width, world_height, vieww,
 			viewh);
+	lua_lanarts_api(gs, L);
 	gs->update_iostate(); //for first iteration
 
 	menu_loop(gs, windoww, windowh);

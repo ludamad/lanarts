@@ -1,6 +1,5 @@
-namespace YAML {
-	class Node;
-}
+
+#include "LuaModule.h"
 #include <cstring>
 
 extern "C" {
@@ -10,43 +9,33 @@ extern "C" {
 
 #include <yaml-cpp/yaml.h>
 
-void lua_registry_newtable(lua_State* L, void* addr){
+static void lua_registry_newtable(lua_State* L, void* addr){
     lua_pushlightuserdata(L, addr);  /* push address as key */
     lua_newtable(L);
     lua_settable(L, LUA_REGISTRYINDEX);  
 }
 
-void lua_registry_push(lua_State* L, void* object){
+static void lua_registry_push(lua_State* L, void* object){
     lua_pushlightuserdata(L, object);  /* push address as key */
     lua_gettable(L, LUA_REGISTRYINDEX);  
 }
 
-void lua_registry_erase(lua_State* L, void* object){
+static void lua_registry_erase(lua_State* L, void* object){
     lua_pushlightuserdata(L, object);  /* push address as key */
     lua_pushnil(L);  		       /* push nil as value */
     lua_settable(L, LUA_REGISTRYINDEX);  
 }
 
-class LuaModule {
-public:
-	LuaModule(lua_State* L) : L(L){
-		lua_registry_push(L, this);
-	}
-	~LuaModule(){
-		lua_registry_erase(L, this);
-	}
-	void set_function(const char* key, lua_CFunction value);
-	void set_number(const char* key, double value);
-	void set_newtable(const char* key);
-	void set_yaml(const char* key, const YAML::Node* root);
-	void pop(const char* key);
-	void push(const char* key);
-private:
-	lua_State* L;
-};
+void LuaModule::initialize(const char *name){
+    lua_registry_newtable(L, this);
+    lua_pushstring(L, name);
+    lua_registry_push(L, this);
+    lua_settable(L, LUA_GLOBALSINDEX);
+}
 
-
-
+void LuaModule::deinitialize(){
+    lua_registry_erase(L, this);
+}
 	
 void LuaModule::pop(const char* key){
 	int value = lua_gettop(L);
@@ -84,6 +73,10 @@ void LuaModule::set_newtable(const char* key){
 	lua_pop(L, 1); /*Pop table*/	
 }
 
+
+//YAML related
+
+
 static bool nodeis(const YAML::Node* node, const char* str){
 	return (strcmp(node->Tag().c_str(), str) == 0);
 }
@@ -104,12 +97,33 @@ static void push_yaml_node(lua_State* L, const YAML::Node* node){
 		}
 		break;
 	case YAML::NodeType::Sequence:
-//		lua_pushtable
+		lua_newtable(L);
+		int table = lua_gettop(L);
+		for (int i = 0; i < node->size(); i++){
+			push_yaml_node(L, &(*node)[i]);
+			lua_rawseti (L, table, i+1);
+		}
 		break;
 	case YAML::NodeType::Map:
+		lua_newtable(L);
+		int table = lua_gettop(L);
+		YAML::Iterator it = node->begin();
+		for (; it != node->end(); ++it){
+			push_yaml_node(L, &it.first());
+			push_yaml_node(L, &it.second());
+			lua_settable(L, table);
+		}
 		break;
 	}
 }
 void LuaModule::set_yaml(const char* key, const YAML::Node* root){
+<<<<<<< Updated upstream
 	
+=======
+	lua_registry_push(L, this); /*Get the associated lua table*/
+	int tableind = lua_gettop(L);
+	lua_pushstring(L, key);
+	push_yaml_node(L, root);
+	lua_pop(L, 1); /*Pop table*/
+>>>>>>> Stashed changes
 }

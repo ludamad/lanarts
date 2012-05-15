@@ -28,8 +28,8 @@ struct GameTiles;
 class GameState {
 public:
 
-	GameState(const GameSettings& settings, int width, int height, int vieww =
-			640, int viewh = 480, int hudw = 160);
+	GameState(const GameSettings& settings, lua_State* L,
+			int width, int height, int vieww = 640, int viewh = 480, int hudw = 160);
 	~GameState();
 
 	void init_game();

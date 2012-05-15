@@ -18,6 +18,7 @@
 #include "weapon_data.h"
 #include "../world/GameSettings.h"
 
+struct lua_State;
 
 void load_tile_data(const char* filename);
 void load_tileset_data(const char* filename);
@@ -32,7 +33,7 @@ void load_class_data(const char* filename);
 
 GameSettings load_settings_data(const char* filename);
 
-void init_game_data();
+void init_game_data(lua_State* L);
 
 
 #endif /* GAME_DATA_H_ */

@@ -45,7 +45,7 @@ int get_tileset_by_name(const char* name){
 
 }
 
-void init_game_data(){
+void init_game_data(lua_State* L){
 
 //NB: Do not re-order the way resources are loaded unless you know what you're doing
 	load_tile_data("res/tiles.yaml");
