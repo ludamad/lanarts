@@ -35,7 +35,7 @@ extern "C" {
 
 GameState::GameState(const GameSettings& settings, lua_State* L, int width, int height,
 		int vieww, int viewh, int hudw) :
-		settings(settings), world_width(width), world_height(height), frame_n(
+		settings(settings), L(L), world_width(width), world_height(height), frame_n(
 				0), hud(vieww, 0, hudw, viewh), view(0, 0, vieww, viewh, width,
 				height), world(this, width, height), mouse_leftdown(0), mouse_rightdown(
 				0), mouse_leftclick(0), mouse_rightclick(0) {
@@ -84,6 +84,10 @@ void GameState::init_game() {
 
 	GameInst* p = get_instance(level()->pc.local_playerid());
 	window_view().sharp_center_on(p->x, p->y);
+
+	//Lua configuration
+	lua_lanarts_api(this, L);
+	luaL_dofile(L, "res/lua/effects.lua");
 }
 
 GameState::~GameState() {

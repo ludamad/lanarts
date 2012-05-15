@@ -170,8 +170,6 @@ static void game_loop(GameState* gs) {
 
 int main(int argc, char** argv) {
 	lua_State* L = lua_open();
-	luaL_dofile(L, "res/lua/effects.lua");
-
 	GameSettings settings;
 	init_system(settings, L);
 
@@ -184,7 +182,7 @@ int main(int argc, char** argv) {
 	//GameState claims ownership of the passed lua_State*
 	GameState* gs = new GameState(settings, L, world_width, world_height, vieww,
 			viewh);
-	lua_lanarts_api(gs, L);
+
 	gs->update_iostate(); //for first iteration
 
 	menu_loop(gs, windoww, windowh);

@@ -28,8 +28,8 @@ struct GameTiles;
 class GameState {
 public:
 
-	GameState(const GameSettings& settings, lua_State* L,
-			int width, int height, int vieww = 640, int viewh = 480, int hudw = 160);
+	GameState(const GameSettings& settings, lua_State* L, int width, int height,
+			int vieww = 640, int viewh = 480, int hudw = 160);
 	~GameState();
 
 	void init_game();
@@ -157,21 +157,34 @@ public:
 
 private:
 	GameSettings settings;
-	std::vector<GameLevelState*> level_states;
-	void restart();
+	lua_State *L;
+
+	//Event handling code (eg escape presses)
 	int handle_event(SDL_Event *event);
+
+	//Width & height of the world (TODO: push into GameLevelState)
 	int world_width, world_height;
 	int frame_n;
+
+	//Game network connection
 	GameNetConnection connection;
-	GameLevelState *lvl;
+
+	//Game world components
 	GameHud hud;
 	GameView view;
 	GameWorld world;
+
+	//RNG state
 	MTwist mtwist;
+
+	//Font data
 	font_data pfont, menufont;
-	lua_State *L;
+
+	//Key states
 	char key_down_states[SDLK_LAST];
 	char key_press_states[SDLK_LAST];
+
+	//Mouse states
 	int mousex, mousey;
 	bool mouse_leftdown, mouse_rightdown;
 	bool mouse_leftclick, mouse_rightclick;
