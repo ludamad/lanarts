@@ -89,7 +89,7 @@ static void game_loop(GameState* gs) {
 
 	unsigned long draw_events = 1;
 
-	unsigned long step_time = http://icedtea.classpath.org/bugzilla/describecomponents.cgi?product=IcedTea-Web0;
+	unsigned long step_time = 0;
 	unsigned long step_events = 1;
 
 	const clock_t per_frame = 12 * CLOCKS_PER_SEC / 1000;
