@@ -69,7 +69,7 @@ bool move_towards(EnemyInst* e, const Pos& p){
 	float mag = distance_between(p, Pos(e->x, e->y));
 	float progress = distance_between(eb.path_start, Pos(e->x, e->y));
 
-	const int PATH_CHECK_INTERVAL = 300;
+	const int PATH_CHECK_INTERVAL = 600;//~10seconds
 	float path_progress_threshold = eb.speed/25.0f;
 
 	eb.vx = dx/mag*eb.speed/2;
@@ -158,7 +158,7 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 		eb.current_action = EnemyBehaviour::FOLLOWING_PATH;
 	} while (eb.path.size() <= 1);
 
-	eb.path_steps = 1;
+	eb.path_steps = 0;
 	eb.path_start = Pos(e->x, e->y);
 }
 
@@ -177,14 +177,14 @@ void MonsterController::set_monster_headings(GameState* gs, std::vector<EnemyOfI
 		paths[pind]->interpolated_direction(e->bbox(), eb.speed, eb.vx, eb.vy);
 
 		//Compare position to player object
-		double abs = sqrt((e->x-p->x)*(e->x-p->x)+(e->y-p->y)*(e->y-p->y));
+		float pdist = distance_between(Pos(e->x, e->y), Pos(p->x, p->y));
 		Stats& s = e->stats();
 
-		if (abs < e->radius + p->radius || (s.magicatk.canuse && abs < e->radius*2 + p->radius ))
+		if (pdist < e->radius + p->radius || (s.magicatk.canuse && pdist < e->radius*2 + p->radius ))
 			eb.vx = 0, eb.vy = 0;
-		if ( s.meleeatk.canuse && abs < s.meleeatk.range + e->radius ){
+		if ( s.meleeatk.canuse && pdist < s.meleeatk.range + e->radius ){
 			e->attack(gs, p, false);
-		} else if ( s.magicatk.canuse && abs < s.magicatk.range+ 10 ){
+		} else if ( s.magicatk.canuse && pdist < s.magicatk.range+ 10 ){
 			e->attack(gs, p, true);
 		}
 	}
@@ -379,12 +379,13 @@ void MonsterController::update_position(GameState* gs, EnemyInst* e){
 				}
 			}
 		}
-		eb.vx = round(eb.vx*4084.0f)/4084.0f;
-		eb.vy = round(eb.vy*4084.0f)/4084.0f;
+		const float ROUNDING_MULTIPLE = 4084.0f;
+		eb.vx = round(eb.vx*ROUNDING_MULTIPLE)/ROUNDING_MULTIPLE;
+		eb.vy = round(eb.vy*ROUNDING_MULTIPLE)/ROUNDING_MULTIPLE;
 		e->rx += eb.vx;
 		e->ry += eb.vy;
-		e->rx = round(e->rx*4084.0f)/4084.0f;
-		e->ry = round(e->ry*4084.0f)/4084.0f;
+		e->rx = round(e->rx*ROUNDING_MULTIPLE)/ROUNDING_MULTIPLE;
+		e->ry = round(e->ry*ROUNDING_MULTIPLE)/ROUNDING_MULTIPLE;
 		simulator->setAgentPosition(e->behaviour().simulation_id, RVO::Vector2(e->rx, e->ry));
 	}
 

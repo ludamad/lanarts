@@ -34,7 +34,7 @@ struct EnemyBehaviour {
 		force_x(0), force_y(0),
 		current_action(INACTIVE), action_timeout(0), simulation_id(0),
 		speed(speed), vx(0), vy(0),
-		path_start(0,0), path_steps(1){
+		path_start(0,0), path_steps(0){
 	}
 	void step(){
 		if (action_timeout){
