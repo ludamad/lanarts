@@ -18,6 +18,7 @@
 #include "../objects/PlayerInst.h"
 
 #include "../../util/collision_util.h"
+#include "../../util/math_util.h"
 
 #include "../../data/tile_data.h"
 
@@ -41,10 +42,11 @@ void MonsterController::register_enemy(GameInst* enemy){
     mids.push_back(enemy->id);
     RVO::Vector2 enemy_position(enemy->x, enemy->y);
     EnemyBehaviour& eb = ((EnemyInst*)enemy)->behaviour();
-//    const Vector2& position, float neighborDist,
-//                        size_t maxNeighbors, float timeHorizon,
-//                        float timeHorizonObst, float radius, float maxSpeed,
-//                        const Vector2& velocity = Vector2());
+
+//  addAgent parameters (for convenience):
+//	position, neighborDist, maxNeighbors, timeHorizon,
+//  timeHorizonObst, radius, maxSpeed,
+//  velocity
     int simid = simulator->addAgent(enemy_position, 32, 10, 4.0f, 1.0f, 16, eb.speed);
     eb.simulation_id = simid;
 }
@@ -58,18 +60,31 @@ void towards_highest(PathInfo& path, Pos& p){
 	}
 
 }
+
 //returns true if will be exactly on target
 bool move_towards(EnemyInst* e, const Pos& p){
 	EnemyBehaviour& eb = e->behaviour();
+
 	float dx = p.x - e->x, dy = p.y - e->y;
-	float mag = sqrt(dx*dx+dy*dy);
+	float mag = distance_between(p, Pos(e->x, e->y));
+	float progress = distance_between(eb.path_start, Pos(e->x, e->y));
+
+	const float PATH_PROGRESS_THRESHOLD = 0.01;
+
+	eb.vx = dx/mag*eb.speed/2;
+	eb.vy = dy/mag*eb.speed/2;
+
+	if (progress / eb.path_steps < PATH_PROGRESS_THRESHOLD)
+		return true;
+
 	if (mag <= eb.speed/2){
 		eb.vx = dx;
 		eb.vy = dy;
 		return true;
 	}
-	eb.vx = dx/mag*eb.speed/2;
-	eb.vy = dy/mag*eb.speed/2;
+
+	eb.path_steps++;
+
 	return false;
 }
 
@@ -87,14 +102,6 @@ void set_preferred_velocity(GameState* gs, RVO::RVOSimulator* sim, EnemyInst* e)
 	  goalVector = RVO::normalize(goalVector)*eb.speed;
 	}
 
-	/*
-	 * Perturb a little to avoid deadlocks due to perfect symmetry.
-	 */
-//	float angle = gs->rng().rand(3600) / 3600.0 * 2.0f * M_PI;
-//	float dist =  gs->rng().rand(10000) / 10000.0 * 0.0001f;
-//
-//	goalVector += dist * RVO::Vector2(std::cos(angle), std::sin(angle));
-//
 	sim->setAgentPrefVelocity(eb.simulation_id, goalVector);
 }
 
@@ -145,6 +152,9 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 			eb.path_cooldown = mt.rand(EnemyBehaviour::RANDOM_WALK_COOLDOWN*2);
 		eb.current_action = EnemyBehaviour::FOLLOWING_PATH;
 	} while (eb.path.size() <= 1);
+
+	eb.path_steps = 1;
+	eb.path_start = Pos(e->x, e->y);
 }
 
 void MonsterController::set_monster_headings(GameState* gs, std::vector<EnemyOfInterest>& eois) {

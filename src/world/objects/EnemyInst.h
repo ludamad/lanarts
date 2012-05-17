@@ -26,11 +26,15 @@ struct EnemyBehaviour {
 	int action_timeout;
 	int simulation_id;
 	float speed, vx, vy;
+
+	Pos path_start;
+	int path_steps;
 	EnemyBehaviour(float speed) :
 		current_node(0), path_cooldown(0),
 		force_x(0), force_y(0),
 		current_action(INACTIVE), action_timeout(0), simulation_id(0),
-		speed(speed), vx(0), vy(0){
+		speed(speed), vx(0), vy(0),
+		path_start(0,0), path_steps(1){
 	}
 	void step(){
 		if (action_timeout){

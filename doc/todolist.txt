@@ -10,12 +10,6 @@ Large:
 - Add doors and other dungeon features such as keys etc
 
 Medium:
-- Specify a draw order (or draw & execution order) for objects based on a depth parameter & object id
-	- Binary tree ? Binary tree with ~ 100 elements not tooo bad.
-	- Difficulty to imagine better ordering structure 
-	- Can keep binary tree of inst state pointers for efficiency 
-		-> optimize for depth bins & not many objects with different depths, adds nearly no overhead
-		-> Keep another doubly linked list in the internal structure that points to next highest ID object of same depth
 - Make game based on Strength/Defence/Agility and Magic/Resistance
 	- add attack rate to base stats -> agility
 - Add higher level sprite class that handles animation & orientation & multiple tile variations
@@ -42,7 +36,6 @@ Partial Completion:
 - [DONE WITH BUGS/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
 - [STARTED] Classes for players
 
-- [ALMOST DONE] Support for multiple PlayerInst (Maybe re-use PlayerInst for summoned monsters ?)
 - [IFFY] Unification of code-path's for PlayerInst/EnemyInst ?
 - [DONE - IMPROVE VISIBILITY] More visual output on the minimap [Stairs etc]
 - [DONE - VERY RARE INSTANCES LEFT] Fix monsters getting stuck due to random movement 
@@ -78,3 +71,8 @@ AFTER 18/04/2012:
 - [DONE] Broadcast RNG seed & class information
 - [DONE] Add a resting animation
 - [DONE] Fix melee attacks -> add to action bar and make them not based on running into enemies, instead holding j/mouse
+
+
+May 17 2012:
+- [DONE] Specify a draw order (or draw & execution order) for objects based on a depth parameter & object id
+- [DONE] Support for multiple PlayerInst (Maybe re-use PlayerInst for summoned monsters ?)
