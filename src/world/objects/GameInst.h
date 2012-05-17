@@ -6,13 +6,14 @@
  * 		->GameInst::init(GameState) called from add_instance, does further initialization
  * ->
  */
+
 #ifndef GAMEINST_H_
 #define GAMEINST_H_
 
 #include <cassert>
 #include "../../util/game_basic_structs.h"
+#include "../../lua/LuaValue.h"
 
-struct LuaData;
 struct lua_State;
 struct GameState;
 //Base class for game instances
@@ -20,7 +21,7 @@ struct GameState;
 class GameInst {
 public:
 	GameInst(int x, int y, int radius, bool solid=true, int depth = 0) :
-		id(0), last_x(x), last_y(y), x(x), y(y),  radius(radius), depth(depth), solid(solid), destroyed(false), lua_hooks(0){}
+		id(0), last_x(x), last_y(y), x(x), y(y),  radius(radius), depth(depth), solid(solid), destroyed(false){}
 	virtual ~GameInst();
 	/* Initialize the object further, 'id' will be set*/
 	virtual void init(GameState* gs);
@@ -43,7 +44,7 @@ public:
 	int x, y, radius;
 	int depth;
 	bool solid, destroyed;
-	LuaData* lua_hooks;
+	LuaValue lua_variables;
 };
 
 typedef bool (*col_filterf)(GameInst* o1, GameInst* o2);

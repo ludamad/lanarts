@@ -44,7 +44,9 @@ EnemyType parse_enemy_type(const YAML::Node& n){
 			radius,
 			xpaward,
 			parse_sprite_number(n,"sprite"),
-			parse_stats(n["stats"], attacks));
+			parse_stats(n["stats"], attacks),
+			parse_defaulted(n, "step", std::string())
+	);
 }
 
 void load_enemy_data(const char* filename){

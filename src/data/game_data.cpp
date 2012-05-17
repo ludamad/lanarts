@@ -57,4 +57,8 @@ void init_game_data(lua_State* L){
 	load_weapon_item_entries();
 	load_dungeon_data("res/levels.yaml");
 	load_class_data("res/classes.yaml");
+
+	for (int i = 0; i < game_enemy_data.size(); i++){
+		game_enemy_data[i].step_event.initialize();
+	}
 }

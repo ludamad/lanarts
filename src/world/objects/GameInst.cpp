@@ -11,16 +11,11 @@
 #include "../../data/lua_data.h"
 
 GameInst::~GameInst() {
-	delete lua_hooks;
 }
 void GameInst::step(GameState* gs){
-	if (lua_hooks)
-		luadata_step_event(gs->get_luastate(), *lua_hooks, id);
 }
 
 void GameInst::draw(GameState* gs){
-	if (lua_hooks)
-		luadata_draw_event(gs->get_luastate(), *lua_hooks, id);
 }
 
 void GameInst::init(GameState* gs){

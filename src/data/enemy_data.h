@@ -14,9 +14,9 @@
 
 struct EnemyType {
 	const char* name;
-	int sprite_number;
 	int radius;
 	int xpaward;
+	int sprite_number;
 	Stats basestats;
 
 	LuaValue init_event;
@@ -25,7 +25,7 @@ struct EnemyType {
 	EnemyType(){
 	}
 	EnemyType(const char* name, int rad, int xpaward, int spriten, const Stats& stats, const std::string& step) :
-		name(name), radius(rad), xpaward(xpaward), sprite_number(spriten), basestats(stats){
+		name(name), radius(rad), xpaward(xpaward), sprite_number(spriten), basestats(stats), step_event(step){
 	}
 };
 

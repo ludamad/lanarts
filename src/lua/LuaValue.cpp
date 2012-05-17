@@ -73,7 +73,7 @@ static void push_yaml_node(lua_State* L, const YAML::Node* node) {
 class LuaValueImpl {
 public:
 
-	LuaValueImpl(const std::string& expr = std::string()) :
+	LuaValueImpl(lua_State* L, const std::string& expr = std::string()) :
 			lua_expression(expr) {
 	}
 
@@ -84,10 +84,11 @@ public:
 	}
 
 	void initialize() {
-		if (!lua_expression.empty())
-			break;
+		if (lua_expression.empty())
+			return;
 		lua_pushlightuserdata(L, this); /* push address as key */
 		luaL_dostring(L, lua_expression.c_str());
+		double number = lua_tonumber(L, -1);
 		lua_settable(L, LUA_REGISTRYINDEX);
 	}
 
@@ -156,11 +157,11 @@ private:
 	lua_State* L;
 };
 
-LuaValue::LuaValue(const std::string & expr) {
-	impl = new LuaValueImpl(expr);
+LuaValue::LuaValue(lua_State* L, const std::string & expr) {
+	impl = new LuaValueImpl(L, expr);
 }
 
-LuaValue::LuaValue() {
+LuaValue::LuaValue(lua_State* L) {
 	impl = NULL;
 }
 
@@ -170,12 +171,8 @@ LuaValue::~LuaValue() {
 
 void LuaValue::initialize() {
 	if (!impl)
-		impl = new LuaValue();
+		impl = new LuaValueImpl(L);
 	impl->initialize();
-}
-
-LuaValue::LuaValue() {
-	impl = NULL;
 }
 
 void LuaValue::push() {
@@ -188,25 +185,25 @@ void LuaValue::pop() {
 
 void LuaValue::set_function(const char *key, lua_CFunction value) {
 	if (!impl)
-		impl = new LuaValue();
+		impl = new LuaValueImpl(L);
 	impl->set_function(key, value);
 }
 
 void LuaValue::set_number(const char *key, double value) {
 	if (!impl)
-		impl = new LuaValue();
+		impl = new LuaValueImpl(L);
 	impl->set_number(key, value);
 }
 
 void LuaValue::set_newtable(const char *key) {
 	if (!impl)
-		impl = new LuaValue();
+		impl = new LuaValueImpl(L);
 	impl->set_newtable(key);
 }
 
 void LuaValue::set_yaml(const char *key, const YAML::Node *root) {
 	if (!impl)
-		impl = new LuaValue();
+		impl = new LuaValueImpl(L);
 	impl->set_yaml(key, root);
 }
 
