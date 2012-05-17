@@ -6,8 +6,11 @@
 #ifndef ENEMY_DATA_H_
 #define ENEMY_DATA_H_
 #include <cstdlib>
-#include "../gamestats/Stats.h"
 #include <vector>
+#include <string>
+
+#include "../lua/LuaValue.h"
+#include "../gamestats/Stats.h"
 
 struct EnemyType {
 	const char* name;
@@ -15,9 +18,13 @@ struct EnemyType {
 	int radius;
 	int xpaward;
 	Stats basestats;
+
+	LuaValue init_event;
+	LuaValue step_event;
+
 	EnemyType(){
 	}
-	EnemyType(const char* name, int rad, int xpaward, int spriten, const Stats& stats) :
+	EnemyType(const char* name, int rad, int xpaward, int spriten, const Stats& stats, const std::string& step) :
 		name(name), radius(rad), xpaward(xpaward), sprite_number(spriten), basestats(stats){
 	}
 };

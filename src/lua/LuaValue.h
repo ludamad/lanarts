@@ -1,25 +1,29 @@
-/*
- * LuaValue.h
- *
- *  Created on: May 16, 2012
- *      Author: adomurad
- */
-
 #ifndef LUAVALUE_H_
 #define LUAVALUE_H_
 
 #include <string>
 
+namespace YAML {
+	class Node;
+}
+
+class LuaValueImpl;
+
 class LuaValue {
-public:
-	void initialize();
-	void deinitialize();
-	void push();
 	LuaValue(const std::string& expr);
+	LuaValue();
 	~LuaValue();
+
+	void initialize();
+	void push();
+	void pop();
+
+	void set_function(const char* key, lua_CFunction value);
+	void set_number(const char* key, double value);
+	void set_newtable(const char* key);
+	void set_yaml(const char* key, const YAML::Node* root);
 private:
-	std::string lua_expression;
-	lua_State* L;
+	LuaValueImpl* impl;
 };
 
 #endif /* LUAVALUE_H_ */
