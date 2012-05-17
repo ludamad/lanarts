@@ -69,13 +69,18 @@ bool move_towards(EnemyInst* e, const Pos& p){
 	float mag = distance_between(p, Pos(e->x, e->y));
 	float progress = distance_between(eb.path_start, Pos(e->x, e->y));
 
-	const float PATH_PROGRESS_THRESHOLD = 0.01;
+	const int PATH_CHECK_INTERVAL = 300;
+	float path_progress_threshold = eb.speed/25.0f;
 
 	eb.vx = dx/mag*eb.speed/2;
 	eb.vy = dy/mag*eb.speed/2;
 
-	if (progress / eb.path_steps < PATH_PROGRESS_THRESHOLD)
-		return true;
+	if (eb.path_steps > PATH_CHECK_INTERVAL){
+		if (progress / eb.path_steps < path_progress_threshold)
+			return true;
+		eb.path_steps = 0;
+		eb.path_start = Pos(e->x, e->y);
+	}
 
 	if (mag <= eb.speed/2){
 		eb.vx = dx;
