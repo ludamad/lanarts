@@ -15,8 +15,12 @@ typedef int (*lua_CFunction) (lua_State *L);
 class LuaValue {
 public:
 	LuaValue(const std::string& expr);
+	LuaValue(const LuaValue& value);
 	LuaValue();
 	~LuaValue();
+
+
+	void operator=(const LuaValue& value);
 
 	void initialize(lua_State* L);
 	void deinitialize(lua_State* L);

@@ -76,7 +76,7 @@ class LuaValueImpl {
 public:
 
 	LuaValueImpl(const std::string& expr = std::string()) :
-			lua_expression(expr) {
+			lua_expression(expr), refcount(1), empty(true) {
 	}
 
 	void deinitialize(lua_State* L) {
@@ -88,6 +88,7 @@ public:
 	void initialize(lua_State* L) {
 		if (lua_expression.empty())
 			return;
+		empty = false;
 		lua_pushlightuserdata(L, this); /* push address as key */
 		luaL_dostring(L, lua_expression.c_str());
 		double number = lua_tonumber(L, -1);
@@ -154,19 +155,35 @@ public:
 		lua_gettable(L, LUA_REGISTRYINDEX);
 	}
 
+	size_t& ref_count() {
+		return refcount;
+	}
+
+	bool is_empty() {
+		return lua_expression.empty() || empty;
+	}
+
 private:
 	std::string lua_expression;
+	size_t refcount;
+	bool empty;
 };
 
+static void deref(LuaValueImpl* impl){
+	//if (impl && --impl->ref_count() == 0) delete impl;
+}
+
 LuaValue::LuaValue(const std::string & expr) {
-	impl = new LuaValueImpl(expr);
+	if (expr.empty()) impl = NULL;
+	else impl = new LuaValueImpl(expr);
 }
 
 LuaValue::LuaValue() {
 	impl = NULL;
 }
+
 LuaValue::~LuaValue() {
-	delete impl;
+	deref(impl);
 }
 
 void LuaValue::initialize(lua_State* L) {
@@ -175,7 +192,8 @@ void LuaValue::initialize(lua_State* L) {
 	impl->initialize(L);
 }
 void LuaValue::deinitialize(lua_State* L) {
-	if (impl) impl->deinitialize(L);
+	if (impl)
+		impl->deinitialize(L);
 }
 
 void LuaValue::push(lua_State* L) {
@@ -186,7 +204,8 @@ void LuaValue::pop(lua_State* L) {
 	impl->pop(L);
 }
 
-void LuaValue::set_function(lua_State* L, const char *key, lua_CFunction value) {
+void LuaValue::set_function(lua_State* L, const char *key,
+		lua_CFunction value) {
 	if (!impl)
 		impl = new LuaValueImpl();
 	impl->set_function(L, key, value);
@@ -204,6 +223,19 @@ void LuaValue::set_newtable(lua_State* L, const char *key) {
 	impl->set_newtable(L, key);
 }
 
+LuaValue::LuaValue(const LuaValue & value) {
+	impl = value.impl;
+	if (impl)
+		impl->ref_count()++;
+}
+
+void LuaValue::operator =(const LuaValue & value) {
+	deref(impl);
+	impl = value.impl;
+	if (impl)
+		impl->ref_count()++;
+}
+
 void LuaValue::set_yaml(lua_State* L, const char *key, const YAML::Node *root) {
 	if (!impl)
 		impl = new LuaValueImpl();
@@ -211,11 +243,12 @@ void LuaValue::set_yaml(lua_State* L, const char *key, const YAML::Node *root) {
 }
 
 bool LuaValue::empty() {
-	return impl == NULL;
+	return impl == NULL || impl->is_empty();
 }
 
-void lua_gameinstcallback(lua_State* L, LuaValue& value, int id){
-	if (value.empty()) return;
+void lua_gameinstcallback(lua_State* L, LuaValue& value, int id) {
+	if (value.empty())
+		return;
 	value.push(L);
 	lua_pushgameinst(L, id);
 	lua_call(L, 1, 0);

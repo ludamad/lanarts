@@ -6,7 +6,7 @@ enemies:
     sprite: skeleton
     radius: 11
     xpaward: 10
-    step: 1
+    step: enemy_step
     stats:
         movespeed: 2
         hp: 60

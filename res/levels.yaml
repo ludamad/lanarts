@@ -39,9 +39,9 @@ branches:
           stairs_up: 0
           stairs_down: 5
         enemies:
-          amount: 1
+          amount: 2
           generated:
-            - enemy: Storm Elemental
+            - enemy: Skeleton
               chance: 100
       #Level 1
       - size: [40, 40]
