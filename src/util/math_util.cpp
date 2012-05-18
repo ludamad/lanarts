@@ -31,3 +31,11 @@ void direction_towards(const Pos& a, const Pos& b, float& rx, float& ry, float s
 int squish(int a, int b, int c) {
 	return std::min(std::max(a, b), c - 1);
 }
+
+float distance_between(const Pos & a, const Pos & b){
+	float dx = a.x - b.x;
+	float dy = a.y - b.y;
+	return sqrt(dx*dx + dy*dy);
+}
+
+
