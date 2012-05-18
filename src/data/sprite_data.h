@@ -25,7 +25,6 @@ struct SpriteEntry {
 };
 
 extern std::vector<SpriteEntry> game_sprite_data;
-extern size_t game_sprite_n;
 
 inline int get_sprite_by_name(const std::string& s){
 	for (int i = 0; i < game_sprite_data.size(); i++){

@@ -18,6 +18,7 @@ std::vector<ClassType> game_class_data;
 std::vector<ItemType> game_item_data;
 std::vector<TileEntry> game_tile_data;
 std::vector<TilesetEntry> game_tileset_data;
+std::vector<SpellEntry> game_spell_data;
 std::vector<SpriteEntry> game_sprite_data;
 std::vector<EnemyType> game_enemy_data;
 std::vector<LevelGenSettings> game_dungeon_yaml;

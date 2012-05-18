@@ -8,15 +8,23 @@
 
 #include <string>
 
-struct SpellData;
+#include "../lua/LuaValue.h"
 
-typedef bool (*spell_effectf)(GameState* state, const SpellData& spell, GameInst* caster);
+//This never got to be used:
+//typedef bool (*spell_effectf)(GameState* state, const SpellData& spell, GameInst* caster);
 
-
-struct SpellData {
+struct SpellEntry {
 	std::string name;
 	int sprite;
-	spell_effectf effect;
+	LuaValue effect;//Immediate effect
+	LuaValue projectile_init;
+	LuaValue projectile_step;
+	SpellEntry(const std::string& name, int sprite, const std::string& effect);
+	void init(lua_State* L){
+		effect.initialize(L);
+	}
 };
+
+extern std::vector<SpellEntry> game_spell_data;
 
 #endif /* SPELL_DATA_H_ */

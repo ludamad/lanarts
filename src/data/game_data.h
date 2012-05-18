@@ -12,6 +12,7 @@
 #include "item_data.h"
 #include "tile_data.h"
 #include "tileset_data.h"
+#include "spell_data.h"
 #include "sprite_data.h"
 #include "dungeon_data.h"
 #include "enemy_data.h"
