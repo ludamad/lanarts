@@ -7,6 +7,8 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
+#include "../world/lua/lua_api.h"
+
 #include <yaml-cpp/yaml.h>
 
 static void lua_registry_newtable(lua_State* L, void* addr) {
@@ -73,17 +75,17 @@ static void push_yaml_node(lua_State* L, const YAML::Node* node) {
 class LuaValueImpl {
 public:
 
-	LuaValueImpl(lua_State* L, const std::string& expr = std::string()) :
+	LuaValueImpl(const std::string& expr = std::string()) :
 			lua_expression(expr) {
 	}
 
-	~LuaValueImpl() {
+	void deinitialize(lua_State* L) {
 		lua_pushlightuserdata(L, this); /* push address as key */
 		lua_pushnil(L);
 		lua_settable(L, LUA_REGISTRYINDEX);
 	}
 
-	void initialize() {
+	void initialize(lua_State* L) {
 		if (lua_expression.empty())
 			return;
 		lua_pushlightuserdata(L, this); /* push address as key */
@@ -92,7 +94,7 @@ public:
 		lua_settable(L, LUA_REGISTRYINDEX);
 	}
 
-	void pop(const char* key) {
+	void pop(lua_State* L, const char* key) {
 		int value = lua_gettop(L);
 		lua_registry_push(L, this); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
@@ -104,7 +106,7 @@ public:
 		lua_pop(L, 2);
 	}
 
-	void set_function(const char* key, lua_CFunction value) {
+	void set_function(lua_State* L, const char* key, lua_CFunction value) {
 		lua_registry_push(L, this); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
 		lua_pushstring(L, key);
@@ -114,7 +116,7 @@ public:
 		lua_pop(L, 1);
 		/*Pop table*/
 	}
-	void set_number(const char* key, double value) {
+	void set_number(lua_State* L, const char* key, double value) {
 		lua_registry_push(L, this); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
 		lua_pushstring(L, key);
@@ -123,7 +125,7 @@ public:
 		/*Pop table*/
 		lua_pop(L, 1);
 	}
-	void set_newtable(const char* key) {
+	void set_newtable(lua_State* L, const char* key) {
 		lua_registry_push(L, this); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
 		lua_pushstring(L, key);
@@ -134,7 +136,7 @@ public:
 		lua_pop(L, 1);
 	}
 
-	void set_yaml(const char* key, const YAML::Node* root) {
+	void set_yaml(lua_State* L, const char* key, const YAML::Node* root) {
 		lua_registry_push(L, this); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
 		lua_pushstring(L, key);
@@ -142,68 +144,80 @@ public:
 		/*Pop table*/
 		lua_pop(L, 1);
 	}
-	void push() {
+	void push(lua_State* L) {
 		lua_pushlightuserdata(L, this); /* push address as key */
 		lua_gettable(L, LUA_REGISTRYINDEX);
 	}
 
-	void pop() {
+	void pop(lua_State* L) {
 		lua_pushlightuserdata(L, this); /* push address as key */
 		lua_gettable(L, LUA_REGISTRYINDEX);
 	}
 
 private:
 	std::string lua_expression;
-	lua_State* L;
 };
 
-LuaValue::LuaValue(lua_State* L, const std::string & expr) {
-	impl = new LuaValueImpl(L, expr);
+LuaValue::LuaValue(const std::string & expr) {
+	impl = new LuaValueImpl(expr);
 }
 
-LuaValue::LuaValue(lua_State* L) {
+LuaValue::LuaValue() {
 	impl = NULL;
 }
-
 LuaValue::~LuaValue() {
 	delete impl;
 }
 
-void LuaValue::initialize() {
+void LuaValue::initialize(lua_State* L) {
 	if (!impl)
-		impl = new LuaValueImpl(L);
-	impl->initialize();
+		impl = new LuaValueImpl();
+	impl->initialize(L);
+}
+void LuaValue::deinitialize(lua_State* L) {
+	if (impl) impl->deinitialize(L);
 }
 
-void LuaValue::push() {
-	impl->push();
+void LuaValue::push(lua_State* L) {
+	impl->push(L);
 }
 
-void LuaValue::pop() {
-	impl->pop();
+void LuaValue::pop(lua_State* L) {
+	impl->pop(L);
 }
 
-void LuaValue::set_function(const char *key, lua_CFunction value) {
+void LuaValue::set_function(lua_State* L, const char *key, lua_CFunction value) {
 	if (!impl)
-		impl = new LuaValueImpl(L);
-	impl->set_function(key, value);
+		impl = new LuaValueImpl();
+	impl->set_function(L, key, value);
 }
 
-void LuaValue::set_number(const char *key, double value) {
+void LuaValue::set_number(lua_State* L, const char *key, double value) {
 	if (!impl)
-		impl = new LuaValueImpl(L);
-	impl->set_number(key, value);
+		impl = new LuaValueImpl();
+	impl->set_number(L, key, value);
 }
 
-void LuaValue::set_newtable(const char *key) {
+void LuaValue::set_newtable(lua_State* L, const char *key) {
 	if (!impl)
-		impl = new LuaValueImpl(L);
-	impl->set_newtable(key);
+		impl = new LuaValueImpl();
+	impl->set_newtable(L, key);
 }
 
-void LuaValue::set_yaml(const char *key, const YAML::Node *root) {
+void LuaValue::set_yaml(lua_State* L, const char *key, const YAML::Node *root) {
 	if (!impl)
-		impl = new LuaValueImpl(L);
-	impl->set_yaml(key, root);
+		impl = new LuaValueImpl();
+	impl->set_yaml(L, key, root);
+}
+
+bool LuaValue::empty() {
+	return impl == NULL;
+}
+
+void lua_gameinstcallback(lua_State* L, LuaValue& value, int id){
+	if (value.empty()) return;
+	value.push(L);
+	lua_pushgameinst(L, id);
+	lua_call(L, 1, 0);
 }
 

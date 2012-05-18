@@ -14,22 +14,24 @@ typedef int (*lua_CFunction) (lua_State *L);
 
 class LuaValue {
 public:
-	LuaValue(lua_State* L, const std::string& expr);
-	LuaValue(lua_State* L);
+	LuaValue(const std::string& expr);
+	LuaValue();
 	~LuaValue();
 
-	void initialize();
-	void push();
-	void pop();
-	bool empty() { return impl == NULL; }
+	void initialize(lua_State* L);
+	void deinitialize(lua_State* L);
+	void push(lua_State* L);
+	void pop(lua_State* L);
+	bool empty();
 
-	void set_function(const char* key, lua_CFunction value);
-	void set_number(const char* key, double value);
-	void set_newtable(const char* key);
-	void set_yaml(const char* key, const YAML::Node* root);
+	void set_function(lua_State* L, const char* key, lua_CFunction value);
+	void set_number(lua_State* L, const char* key, double value);
+	void set_newtable(lua_State* L, const char* key);
+	void set_yaml(lua_State* L, const char* key, const YAML::Node* root);
 private:
-	lua_State* L;
 	LuaValueImpl* impl;
 };
+
+void lua_gameinstcallback(lua_State* L, LuaValue& value, int id);
 
 #endif /* LUAVALUE_H_ */

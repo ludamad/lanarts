@@ -87,7 +87,7 @@ void GameState::init_game() {
 
 	//Lua configuration
 	lua_lanarts_api(this, L);
-	luaL_dofile(L, "res/lua/effects.lua");
+	luaL_dofile(L, "res/lua/defines.lua");
 }
 
 GameState::~GameState() {

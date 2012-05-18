@@ -45,6 +45,7 @@ EnemyType parse_enemy_type(const YAML::Node& n){
 			xpaward,
 			parse_sprite_number(n,"sprite"),
 			parse_stats(n["stats"], attacks),
+			parse_defaulted(n, "init", std::string()),
 			parse_defaulted(n, "step", std::string())
 	);
 }

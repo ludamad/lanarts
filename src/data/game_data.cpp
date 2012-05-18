@@ -42,7 +42,6 @@ int get_tileset_by_name(const char* name){
 		}
 	}
 	return NULL;
-
 }
 
 void init_game_data(lua_State* L){
@@ -59,6 +58,6 @@ void init_game_data(lua_State* L){
 	load_class_data("res/classes.yaml");
 
 	for (int i = 0; i < game_enemy_data.size(); i++){
-		game_enemy_data[i].step_event.initialize();
+		game_enemy_data[i].init(L);
 	}
 }

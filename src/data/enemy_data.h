@@ -24,8 +24,13 @@ struct EnemyType {
 
 	EnemyType(){
 	}
-	EnemyType(const char* name, int rad, int xpaward, int spriten, const Stats& stats, const std::string& step) :
-		name(name), radius(rad), xpaward(xpaward), sprite_number(spriten), basestats(stats), step_event(step){
+	EnemyType(const char* name, int rad, int xpaward, int spriten, const Stats& stats, const std::string& init, const std::string& step) :
+		name(name), radius(rad), xpaward(xpaward), sprite_number(spriten), basestats(stats), init_event(step), step_event(step){
+	}
+
+	void init(lua_State* L){
+		init_event.initialize(L);
+		step_event.initialize(L);
 	}
 };
 
