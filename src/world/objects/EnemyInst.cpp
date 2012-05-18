@@ -16,6 +16,8 @@
 #include "../../util/math_util.h"
 #include "../../util/collision_util.h"
 
+#include "../../lua/LuaValue.h"
+
 static const int DEPTH = 50;
 
 EnemyInst::EnemyInst(int enemytype, int x, int y) :
@@ -55,6 +57,8 @@ void EnemyInst::init(GameState* gs) {
 	double speedfactor = 1+stats().max_mp*ln/10.0;
 	if (stats().movespeed < 3)
 		eb.speed = std::min(stats().movespeed*speedfactor,3.0);
+
+	lua_gameinstcallback(gs->get_luastate(), etype()->init_event, id);
 }
 
 void EnemyInst::step(GameState* gs) {
