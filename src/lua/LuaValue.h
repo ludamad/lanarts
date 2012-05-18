@@ -28,6 +28,7 @@ public:
 	void pop(lua_State* L);
 	bool empty();
 
+	void table_initialize(lua_State* L);
 	void set_function(lua_State* L, const char* key, lua_CFunction value);
 	void set_number(lua_State* L, const char* key, double value);
 	void set_newtable(lua_State* L, const char* key);

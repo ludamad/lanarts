@@ -101,6 +101,12 @@ public:
 		luaL_dostring(L, lua_expression.c_str());
 		lua_settable(L, LUA_REGISTRYINDEX);
 	}
+	void table_initialize(lua_State* L) {
+		empty = false;
+		lua_pushlightuserdata(L, this); /* push address as key */
+		lua_newtable(L);
+		lua_settable(L, LUA_REGISTRYINDEX);
+	}
 
 	void pop(lua_State* L, const char* key) {
 		int value = lua_gettop(L);
@@ -197,6 +203,13 @@ void LuaValue::initialize(lua_State* L) {
 		impl = new LuaValueImpl();
 	impl->initialize(L);
 }
+
+void LuaValue::table_initialize(lua_State* L) {
+	if (!impl)
+		impl = new LuaValueImpl();
+	impl->table_initialize(L);
+}
+
 void LuaValue::deinitialize(lua_State* L) {
 	if (impl)
 		impl->deinitialize(L);

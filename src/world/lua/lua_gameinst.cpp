@@ -132,7 +132,11 @@ static int lua_member_update(lua_State* L){
 	else IFLUA_NUM_MEMB_UPDATE("xp", stats->xp)
 	else IFLUA_NUM_MEMB_UPDATE("x", inst->x)
 	else IFLUA_NUM_MEMB_UPDATE("y", inst->y)
-	else return 0;
+	else {
+		if (inst->lua_variables.empty())
+			inst->lua_variables.table_initialize(L);
+//		inst->lua_variables.set_value(L, cstr);
+	}
 	return 1;
 }
 
