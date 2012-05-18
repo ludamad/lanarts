@@ -136,6 +136,7 @@ static int lua_member_update(lua_State* L){
 		if (inst->lua_variables.empty())
 			inst->lua_variables.table_initialize(L);
 //		inst->lua_variables.set_value(L, cstr);
+
 	}
 	return 1;
 }
