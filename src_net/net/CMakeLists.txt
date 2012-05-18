@@ -2,7 +2,7 @@ cmake_minimum_required( VERSION 2.8 )
 PROJECT(project_lanarts_tcp)
 
 FIND_PACKAGE(Boost REQUIRED)
-FIND_PACKAGE(asio REQUIRED)
+#FIND_PACKAGE(ASIO REQUIRED)
 
 set( CMAKE_CXX_FLAGS_RELEASE "-O3" )
 set( CMAKE_BUILD_TYPE Release)

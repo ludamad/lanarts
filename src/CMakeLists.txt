@@ -38,6 +38,8 @@ set( lanarts_src
 	gamestats/Ability.cpp
 	gamestats/Stats.cpp
 	
+	lua/LuaValue.cpp
+	
 	pathfind/astar_pathfind.cpp
 	pathfind/pathfind.cpp
 	
@@ -108,6 +110,8 @@ set( lanarts_include
 	fov/fov.h
 	fov/impl/permissive-fov.h
 	fov/impl/permissive-fov-cpp.h
+	
+	lua/LuaValue.h
 	
 	gamestats/Ability.h
 	gamestats/Effects.h

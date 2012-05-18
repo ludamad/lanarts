@@ -33,7 +33,7 @@ void load_class_data(const char* filename);
 
 GameSettings load_settings_data(const char* filename);
 
-void init_game_data(lua_State* L);
-
+void init_game_data();
+void init_lua_data(GameState* gs, lua_State* L);
 
 #endif /* GAME_DATA_H_ */

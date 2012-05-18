@@ -22,6 +22,7 @@
 
 #include "../util/math_util.h"
 
+#include "../data/game_data.h"
 #include "../data/item_data.h"
 #include "../data/tile_data.h"
 #include "../data/dungeon_data.h"
@@ -85,9 +86,7 @@ void GameState::init_game() {
 	GameInst* p = get_instance(level()->pc.local_playerid());
 	window_view().sharp_center_on(p->x, p->y);
 
-	//Lua configuration
-	lua_lanarts_api(this, L);
-	luaL_dofile(L, "res/lua/defines.lua");
+	init_lua_data(this, L);
 }
 
 GameState::~GameState() {

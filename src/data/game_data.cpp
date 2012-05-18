@@ -5,7 +5,14 @@
  *      Author: 100397561
  */
 
+
 #include "game_data.h"
+
+extern "C" {
+#include <lua/lua.h>
+#include <lua/lauxlib.h>
+}
+#include "../world/lua/lua_api.h"
 
 std::vector<ClassType> game_class_data;
 std::vector<ItemType> game_item_data;
@@ -44,7 +51,7 @@ int get_tileset_by_name(const char* name){
 	return NULL;
 }
 
-void init_game_data(lua_State* L){
+void init_game_data(){
 
 //NB: Do not re-order the way resources are loaded unless you know what you're doing
 	load_tile_data("res/tiles.yaml");
@@ -56,6 +63,12 @@ void init_game_data(lua_State* L){
 	load_weapon_item_entries();
 	load_dungeon_data("res/levels.yaml");
 	load_class_data("res/classes.yaml");
+}
+
+void init_lua_data(GameState* gs, lua_State* L){
+	//Lua configuration
+	lua_lanarts_api(gs, L);
+	luaL_dofile(L, "res/lua/defines.lua");
 
 	for (int i = 0; i < game_enemy_data.size(); i++){
 		game_enemy_data[i].init(L);

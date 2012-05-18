@@ -54,7 +54,7 @@ void load_class_data(const char* filename){
 			YAML::Node root;
 
 			parser.GetNextDocument(root);
-			game_enemy_data.clear();
+			game_class_data.clear();
 			const YAML::Node& cnode = root["classes"];
 			for (int i = 0; i < cnode.size(); i++){
 				game_class_data.push_back( parse_class(cnode[i]) );

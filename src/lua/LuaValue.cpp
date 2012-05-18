@@ -72,11 +72,19 @@ static void push_yaml_node(lua_State* L, const YAML::Node* node) {
 	}
 }
 
+static std::string format_expression_string(const std::string& str){
+	const char prefix[] = "return ";
+	if (str.empty()) return str;
+	if (strncmp(str.c_str(), prefix, sizeof(prefix)) == 0)
+		return str;
+	return "return " + str;
+}
+
 class LuaValueImpl {
 public:
 
 	LuaValueImpl(const std::string& expr = std::string()) :
-			lua_expression(expr), refcount(1), empty(true) {
+			lua_expression(format_expression_string(expr)), refcount(1), empty(true) {
 	}
 
 	void deinitialize(lua_State* L) {
@@ -91,7 +99,6 @@ public:
 		empty = false;
 		lua_pushlightuserdata(L, this); /* push address as key */
 		luaL_dostring(L, lua_expression.c_str());
-		double number = lua_tonumber(L, -1);
 		lua_settable(L, LUA_REGISTRYINDEX);
 	}
 
@@ -99,7 +106,6 @@ public:
 		int value = lua_gettop(L);
 		lua_registry_push(L, this); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
-
 		lua_pushstring(L, key); /*Push the key*/
 		lua_pushvalue(L, value); /*Clone value*/
 		lua_settable(L, value);
