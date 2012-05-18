@@ -1,8 +1,0 @@
-dofile "res/lua/items.lua"
-
-function enemy_step(enemy) 
-	print("Calling lua function enemy_step")
-	enemy.hp = 1
-end
-
-print("Printing from Lua")
