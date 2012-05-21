@@ -130,7 +130,7 @@ void GameInstSet::remove_instance(GameInst* inst, bool deallocate) {
 	}
 }
 
-obj_id GameInstSet::add_instance(GameInst* inst) {
+obj_id GameInstSet::add_instance(GameInst* inst, int id) {
 	if (tset_should_resize(unit_amnt, unit_capacity))
 		this->reallocate_internal_data();
 
@@ -139,10 +139,10 @@ obj_id GameInstSet::add_instance(GameInst* inst) {
 	InstanceState* state = unit_set;
 
 	//TODO: cause a more descriptive error
-	if (inst->id != 0)
+	if (id == 0 && inst->id != 0)
 		printf("Adding instance with id not 0!\n");
 
-	inst->id = next_id++;
+	inst->id = id ? id : (next_id++);
 	//Add an object with the assumption that this object does not currently exist (_noequal)
 	if (tset_add_noequal<GameInstSetFunctions>(inst, state, unit_capacity))
 		unit_amnt++;
@@ -196,7 +196,7 @@ std::vector<GameInst*> GameInstSet::to_vector() {
 	return ret;
 }
 
-unsigned int GameInstSet::hash(){
+unsigned int GameInstSet::hash() const{
 	unsigned int hash = 0xbabdabe;
 	for (int i = 0, j = 0; i < unit_capacity; i++) {
 		GameInst* inst = unit_set[i].inst;
@@ -207,6 +207,21 @@ unsigned int GameInstSet::hash(){
 	}
 	return hash;
 }
+
+void GameInstSet::copy_to(GameInstSet& inst_set) const{
+	for (int i = 0, j = 0; i < unit_capacity; i++) {
+		GameInst* inst = unit_set[i].inst;
+		if (valid_inst(inst)){
+			obj_id id = inst->id;
+			GameInst* oinst = inst_set.get_instance(id);
+			if (oinst) inst->copy_to(oinst);
+			else inst_set.add_instance(inst->clone(), id);
+		}
+	}
+	inst_set.next_id = this->next_id;
+	LANARTS_ASSERT(hash() == inst_set.hash());
+}
+
 int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 		col_filterf f, int x, int y, int radius) {
 	int rad = radius == -1 ? obj->radius : radius;

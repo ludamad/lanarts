@@ -17,14 +17,14 @@ public:
   static const char className[];
   static Lunar<ItemLuaBinding>::RegType methods[];
 
-  ItemLuaBinding(ItemType& item) : item(item) {
+  ItemLuaBinding(ItemEntry& item) : item(item) {
   }
 
-  ItemType& get_item(){
+  ItemEntry& get_item(){
 	  return item;
   }
 private:
-  ItemType& item;
+  ItemEntry& item;
 };
 
 typedef ItemLuaBinding bind_t;
@@ -37,11 +37,11 @@ meth_t bind_t::methods[] = {
   meth_t(0,0)
 };
 
-void lua_pushitem(lua_State* L, ItemType& item){
+void lua_pushitem(lua_State* L, ItemEntry& item){
 	lunar_t::push(L, new ItemLuaBinding(item), true);
 }
 
-ItemType& lua_item_arg(lua_State* L, int narg){
+ItemEntry& lua_item_arg(lua_State* L, int narg){
 	bind_t* bind = lunar_t::check(L, narg);
 	return bind->get_item();
 }
@@ -60,9 +60,9 @@ static int lua_member_lookup(lua_State* L){
 	}
 
 	bind_t* state = lunar_t::check(L,1);
-	ItemType& item = state->get_item();
+	ItemEntry& item = state->get_item();
 	bool is_weapon = item.weapon != 0;
-	WeaponType* weap = NULL;
+	WeaponEntry* weap = NULL;
 	if (is_weapon) weap = &game_weapon_data[item.weapon];
 	const char* cstr = lua_tostring(L, 2);
 

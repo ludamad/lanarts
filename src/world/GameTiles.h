@@ -35,6 +35,11 @@ public:
 		memset(seen_tiles, 0, width*height);
 		memset(tiles, 0, sizeof(int)*width*height);
 	}
+	void copy_to(GameTiles& t) const {
+		t.width = width, t.height = height;
+		memcpy(t.seen_tiles, seen_tiles, width*height);
+		memcpy(t.tiles, tiles, sizeof(int)*width*height);
+	}
 private:
 	char* seen_tiles;
 	int* tiles;

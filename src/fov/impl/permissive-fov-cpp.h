@@ -94,6 +94,10 @@ namespace permissive
     {
       return &mask;
     }
+    const permissiveMaskT * getMask(void) const
+    {
+      return &mask;
+    }
   private:
     permissiveMaskT mask;
   };

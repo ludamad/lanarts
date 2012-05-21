@@ -17,6 +17,7 @@
 #include "../../util/collision_util.h"
 
 #include "../../lua/LuaValue.h"
+#include <typeinfo>
 
 static const int DEPTH = 50;
 
@@ -132,6 +133,10 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 }
 
 
+EnemyInst *EnemyInst::clone() const{
+	return new EnemyInst(*this);
+}
+
 bool EnemyInst::hurt(GameState* gs, int hp){
 	if (!destroyed && stats().hurt(hp)){
 		gs->add_instance(new AnimatedInst(x,y,etype()->sprite_number, 15));
@@ -140,4 +145,9 @@ bool EnemyInst::hurt(GameState* gs, int hp){
 		return true;
 	}
 	return false;
+}
+
+void EnemyInst::copy_to(GameInst *inst) const{
+	LANARTS_ASSERT(typeid(this) == typeid(inst));
+	*inst = *this;
 }

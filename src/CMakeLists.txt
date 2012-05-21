@@ -25,7 +25,6 @@ set( lanarts_src
 	data/effect_data.cpp
 	data/game_data.cpp
 	data/item_data.cpp
-	data/lua_data.cpp
 	
 	display/display_util.cpp
 	display/display.cpp
@@ -102,7 +101,6 @@ set( lanarts_include
 	data/tile_data.h
 	data/tileset_data.h
 	data/weapon_data.h
-	data/lua_data.h
 	
 	display/display.h
 	display/GLImage.h

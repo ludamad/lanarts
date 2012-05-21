@@ -388,12 +388,13 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 
 void PlayerInst::use_item(GameState *gs, const GameAction& action) {
 	int item = inventory.inv[action.use_id].item;
-	ItemType& type = game_item_data[item];
+	ItemEntry& type = game_item_data[item];
 
-	luadata_push(gs->get_luastate(), type.luadata);
-	lua_pushitem(gs->get_luastate(), type);
-	lua_pushgameinst(gs->get_luastate(), this->id);
-	lua_call(gs->get_luastate(), 2, 0);
+	lua_State* L = gs->get_luastate();
+	type.effect.push(L);
+	lua_pushitem(L, type);
+	lua_pushgameinst(L, this->id);
+	lua_call(L, 2, 0);
 	inventory.inv[action.use_id].n--;
 
 	canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
@@ -462,9 +463,9 @@ static int scan_entrance(const std::vector<GameLevelPortal>& portals,
 
 void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 	Pos hitpos;
-	LANARTS_ASSERT(
-			gs->tile_radius_test(x,y,radius,false, get_tile_by_name("stairs_up"),&hitpos));
+	bool didhit = gs->tile_radius_test(x,y,radius,false, get_tile_by_name("stairs_up"),&hitpos);
 	int entr_n = scan_entrance(gs->level()->exits, hitpos);
+	if (!didhit || entr_n == -1) return;
 //	int entr_n = action.use_id;
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->level()->exits.size());
 	gs->ensure_connectivity(gs->level()->roomid - 1, gs->level()->roomid);
@@ -478,9 +479,9 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 }
 void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 	Pos hitpos;
-	LANARTS_ASSERT(
-			gs->tile_radius_test(x,y,radius,false, get_tile_by_name("stairs_down"),&hitpos));
+	bool didhit = gs->tile_radius_test(x,y,radius,false, get_tile_by_name("stairs_down"),&hitpos);
 	int entr_n = scan_entrance(gs->level()->entrances, hitpos);
+	if (!didhit || entr_n == -1) return;
 //	int entr_n = action.use_id;
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->level()->entrances.size());
 	gs->ensure_connectivity(gs->level()->roomid, gs->level()->roomid + 1);
@@ -551,7 +552,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 	if (stats().has_cooldown())
 		return;
 
-	WeaponType& weap = game_weapon_data[weapon];
+	WeaponEntry& weap = game_weapon_data[weapon];
 
 	int dx = action.action_x - x, dy = action.action_y - y;
 	float mag = sqrt(dx * dx + dy * dy);
@@ -569,7 +570,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 	for (int i = 0; i < numhit; i++) {
 		EnemyInst* e = (EnemyInst*) enemies[i];
 		//int damage = effective_stats().melee.damage + gs->rng().rand(-4, 5);
-		WeaponType& wtype = game_weapon_data[weapon_type()];
+		WeaponEntry& wtype = game_weapon_data[weapon_type()];
 		int damage = effective_stats().calculate_melee_damage(gs->rng(),
 				weapon_type());
 		char buffstr[32];

@@ -29,10 +29,14 @@ public:
 	bool empty();
 
 	void table_initialize(lua_State* L);
-	void set_function(lua_State* L, const char* key, lua_CFunction value);
-	void set_number(lua_State* L, const char* key, double value);
-	void set_newtable(lua_State* L, const char* key);
-	void set_yaml(lua_State* L, const char* key, const YAML::Node* root);
+	void table_pop_value(lua_State* L, const char *key);
+	void table_push_value(lua_State* L, const char *key);
+	void table_copy(lua_State* L, LuaValue& othertable);
+	void table_set_function(lua_State* L, const char* key, lua_CFunction value);
+
+	void table_set_number(lua_State* L, const char* key, double value);
+	void table_set_newtable(lua_State* L, const char* key);
+	void table_set_yaml(lua_State* L, const char* key, const YAML::Node* root);
 private:
 	LuaValueImpl* impl;
 };

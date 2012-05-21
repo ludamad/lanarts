@@ -9,6 +9,7 @@
 #include "../GameTiles.h"
 #include "../GameState.h"
 #include "../../util/math_util.h"
+#include "../../fov/fov.h"
 
 PlayerController::PlayerController() {
 }
@@ -40,6 +41,20 @@ fov* PlayerController::playerfov(obj_id pid){
 }
 fov* PlayerController::local_playerfov() {
 	return playerfov(local_playerid());
+}
+
+void PlayerController::copy_to(PlayerController& pc) const {
+	pc.local_player = this->local_player;
+	pc.pids.clear();
+
+	for (int i = 0; i < pc.fovs.size(); i++)
+		delete pc.fovs[i];
+	pc.fovs.clear();
+
+	for (int i = 0; i < pc.pids.size(); i++){
+		pc.pids.push_back(this->pids[i]);
+		pc.fovs.push_back(this->fovs[i]->clone());
+	}
 }
 
 void PlayerController::register_player(obj_id player, bool islocal) {

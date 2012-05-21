@@ -37,6 +37,8 @@ public:
 	virtual void deinit(GameState *gs);
 	virtual void step(GameState *gs);
 	virtual void draw(GameState *gs);
+	virtual void copy_to(GameInst* inst) const;
+	virtual PlayerInst* clone() const;
 
 	void queue_io_actions(GameState* gs);
 	void queue_network_actions(GameState* gs);

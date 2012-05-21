@@ -137,7 +137,8 @@ void parse_dungeon_branch(const YAML::Node& n,
 	}
 }
 
-void load_dungeon_data(const char* filename) {
+LuaValue load_dungeon_data(lua_State* L, const char* filename) {
+	LuaValue ret;
 	try {
 
 		fstream file(filename, fstream::in | fstream::binary);
@@ -158,4 +159,5 @@ void load_dungeon_data(const char* filename) {
 		printf("Dungeon Parsed Incorrectly: \n");
 		printf("%s\n", parse.what());
 	}
+	return ret;
 }

@@ -13,11 +13,15 @@ class ProjectileInst: public GameInst {
 	enum {RADIUS = 5, DEPTH = -100};
 public:
 	ProjectileInst(obj_id originator, Attack& attack, int x, int y, int tx, int ty,
-			bool bounce = false, int hits = 1, GameInst* target = NULL);
+			bool bounce = false, int hits = 1, obj_id target = 0);
 	~ProjectileInst();
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
-	GameInst* hit_target(){return target;}
+	virtual void copy_to(GameInst* inst) const;
+	virtual ProjectileInst* clone() const;
+
+	GameInst* hit_target(GameState* gs);
+	obj_id hit_target_id() { return target;}
 private:
 	Attack attack;
 	int range_left;
@@ -25,7 +29,7 @@ private:
 	float rx, ry, vx, vy;
 	bool bounce;
 	int hits;
-	GameInst* target;
+	obj_id target;
 };
 
 #endif /* PROJECTILEINST_H_ */

@@ -24,6 +24,9 @@ public:
 	virtual ~AnimatedInst();
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
+	virtual void copy_to(GameInst* inst) const;
+	virtual AnimatedInst* clone() const;
+
 private:
 	Colour textcol;
 	float rx, ry, vx, vy;

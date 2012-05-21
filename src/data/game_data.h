@@ -18,23 +18,24 @@
 #include "enemy_data.h"
 #include "weapon_data.h"
 #include "../world/GameSettings.h"
+#include "../lua/LuaValue.h"
 
 struct lua_State;
 
 void load_tile_data(const char* filename);
 void load_tileset_data(const char* filename);
 void load_sprite_data(const char* filename);
-void load_weapon_data(const char* filename);
-void load_weapon_item_entries();
+LuaValue load_weapon_data(lua_State* L, const char* filename);
+void load_weapon_item_entries(lua_State* L, LuaValue* itemstable = NULL);
 
-void load_item_data(const char* filename);
-void load_enemy_data(const char* filename);
-void load_dungeon_data(const char* filename);
-void load_class_data(const char* filename);
+LuaValue load_item_data(lua_State* L, const char* filename);
+LuaValue load_enemy_data(lua_State* L, const char* filename);
+LuaValue load_dungeon_data(lua_State* L, const char* filename);
+LuaValue load_class_data(lua_State* L, const char* filename);
 
 GameSettings load_settings_data(const char* filename);
 
-void init_game_data();
+void init_game_data(lua_State* L);
 void init_lua_data(GameState* gs, lua_State* L);
 
 #endif /* GAME_DATA_H_ */

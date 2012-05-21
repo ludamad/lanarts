@@ -25,6 +25,8 @@ namespace RVO {
 	struct RVOSimulator;
 }
 
+struct GameLevelState;
+
 class MonsterController {
 public:
 	MonsterController();
@@ -51,6 +53,11 @@ public:
     size_t number_monsters() { return mids.size(); }
     obj_id current_target(){ return targetted; }
     void clear();
+    //Copy everything but RVO::Simulator
+    void partial_copy_to(MonsterController& mc) const;
+    //Fill out RVO::Simulator
+    void finish_copy(GameLevelState* level);
+
 private:
 
     void set_monster_headings(GameState *gs, std::vector<EnemyOfInterest> & eois);

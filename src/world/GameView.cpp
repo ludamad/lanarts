@@ -13,6 +13,11 @@
 static const int VIEW_SUBW = 100, VIEW_SUBH =100;
 static const int VIEW_SPEED = 8;
 
+
+bool GameView::out_of_view_center(int px, int py){
+	int dx = px - x, dy = py - y;
+	return (abs(dx) > width / 2 || abs(dy) > height / 2);
+}
 void GameView::move_towards(int px, int py) {
 	int dx = px - x, dy = py - y;
 	if (abs(dx) > VIEW_SUBW / 2) {

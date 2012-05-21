@@ -33,6 +33,7 @@ public:
 	~GameState();
 
 	void init_game();
+	void handle_dragging();
 	void draw(bool drawhud = true);
 	void step();
 	bool pre_step();
@@ -183,6 +184,7 @@ private:
 	//Key states
 	char key_down_states[SDLK_LAST];
 	char key_press_states[SDLK_LAST];
+	bool dragging_view;
 
 	//Mouse states
 	int mousex, mousey;

@@ -29,10 +29,13 @@ public:
 	virtual void deinit(GameState* gs);
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
+	virtual void copy_to(GameInst* inst) const = 0;
+	virtual GameInst* clone() const = 0;
 
 	BBox bbox(){
 		return BBox(x-radius,y-radius,x+radius,y+radius);
 	}
+
 	Pos pos(){
 		return Pos(x,y);
 	}
@@ -49,7 +52,5 @@ public:
 
 typedef bool (*col_filterf)(GameInst* o1, GameInst* o2);
 
-
-void load_lua_gameinst_binding(lua_State* L);
 
 #endif /* GAMEINST_H_ */

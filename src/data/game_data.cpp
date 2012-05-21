@@ -15,14 +15,14 @@ extern "C" {
 #include "../world/lua/lua_api.h"
 
 std::vector<ClassType> game_class_data;
-std::vector<ItemType> game_item_data;
+std::vector<ItemEntry> game_item_data;
 std::vector<TileEntry> game_tile_data;
 std::vector<TilesetEntry> game_tileset_data;
 std::vector<SpellEntry> game_spell_data;
 std::vector<SpriteEntry> game_sprite_data;
 std::vector<EnemyType> game_enemy_data;
 std::vector<LevelGenSettings> game_dungeon_yaml;
-std::vector<WeaponType> game_weapon_data;
+std::vector<WeaponEntry> game_weapon_data;
 
 DungeonBranch game_dungeon_data[1] = {  };
 
@@ -52,18 +52,19 @@ int get_tileset_by_name(const char* name){
 	return NULL;
 }
 
-void init_game_data(){
+LuaValue enemies, weapons, items, dungeon, classes;
+void init_game_data(lua_State* L){
 
 //NB: Do not re-order the way resources are loaded unless you know what you're doing
 	load_tile_data("res/tiles.yaml");
 	load_sprite_data("res/sprites.yaml");
 	load_tileset_data("res/tileset.yaml");
-	load_enemy_data("res/enemies.yaml");
-	load_weapon_data("res/weapons.yaml");
-	load_item_data("res/items.yaml");
-	load_weapon_item_entries();
-	load_dungeon_data("res/levels.yaml");
-	load_class_data("res/classes.yaml");
+	enemies = load_enemy_data(L, "res/enemies.yaml");
+	weapons = load_weapon_data(L, "res/weapons.yaml");
+	items = load_item_data(L, "res/items.yaml");
+	load_weapon_item_entries(L, &items);
+	dungeon = load_dungeon_data(L, "res/levels.yaml");
+	classes = load_class_data(L, "res/classes.yaml");
 }
 
 void init_lua_data(GameState* gs, lua_State* L){
@@ -73,5 +74,8 @@ void init_lua_data(GameState* gs, lua_State* L){
 
 	for (int i = 0; i < game_enemy_data.size(); i++){
 		game_enemy_data[i].init(L);
+	}
+	for (int i = 0; i < game_item_data.size(); i++){
+		game_item_data[i].init(L);
 	}
 }

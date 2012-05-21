@@ -9,13 +9,13 @@
 
 struct lua_State;
 struct GameState;
-struct ItemType;
+struct ItemEntry;
 struct EffectType;
 
 obj_id lua_gameinst_arg(lua_State* L, int narg);
-ItemType& lua_item_arg(lua_State* L, int narg);
+ItemEntry& lua_item_arg(lua_State* L, int narg);
 EffectType& lua_effects_arg(lua_State* L, int narg);
-void lua_pushitem(lua_State* L, ItemType& item);
+void lua_pushitem(lua_State* L, ItemEntry& item);
 void lua_pushgameinst(lua_State* L, obj_id id);
 void lua_pusheffects(lua_State* L, int effectnum);
 GameState* lua_get_gamestate(lua_State* L);

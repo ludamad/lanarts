@@ -7,7 +7,8 @@
 #define PLAYERCONTROLLER_H_
 #include <vector>
 #include "../objects/GameInst.h"
-#include "../../fov/fov.h"
+
+class fov;
 
 class PlayerController {
 public:
@@ -26,6 +27,8 @@ public:
 	obj_id local_playerid() { return local_player; }
 	fov* local_playerfov();
 	fov* playerfov(obj_id pid);
+
+	void copy_to(PlayerController& pc) const;
 private:
 	obj_id local_player;
 	std::vector<fov*> fovs;

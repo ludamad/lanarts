@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <vector>
 #include <string>
+#include <cstdio>
 
 #include "../lua/LuaValue.h"
 #include "../gamestats/Stats.h"
@@ -19,13 +20,14 @@ struct EnemyType {
 	int sprite_number;
 	Stats basestats;
 
-	LuaValue init_event;
-	LuaValue step_event;
+	LuaValue init_event, step_event;
 
 	EnemyType(){
 	}
-	EnemyType(const char* name, int rad, int xpaward, int spriten, const Stats& stats, const std::string& init, const std::string& step) :
-		name(name), radius(rad), xpaward(xpaward), sprite_number(spriten), basestats(stats), init_event(step), step_event(step){
+	EnemyType(const char* name, int rad, int xpaward, int spriten, const Stats& stats, const std::string& initev, const std::string& stepev) :
+		name(name), radius(rad), xpaward(xpaward), sprite_number(spriten), basestats(stats), init_event(initev), step_event(stepev){
+		printf("Initializing enemy %s with init function %s, step function %s\n", name, initev.c_str(), stepev.c_str());
+
 	}
 
 	void init(lua_State* L){

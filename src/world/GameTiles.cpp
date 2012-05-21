@@ -28,12 +28,12 @@ void GameTiles::pre_draw(GameState* gs) {
 		max_tilex = width - 1;
 	if (max_tiley >= height)
 		max_tiley = height - 1;
-
+	bool reveal_enabled = gs->key_down_state(SDLK_BACKQUOTE);
 	for (int y = min_tiley; y <= max_tiley; y++) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
 			int tile = tiles[y * width + x];
 			GLimage* img = &game_tile_data[tile].img;
-			if (seen_tiles[y * width + x])
+			if (reveal_enabled || seen_tiles[y * width + x])
 			gl_draw_image(img, x * TILE_SIZE - view.x, y * TILE_SIZE - view.y);
 		}
 	}
@@ -79,7 +79,7 @@ void GameTiles::post_draw(GameState* gs) {
 		max_tiley = height - 1;
 	const int sub_sqrs = VISION_SUBSQRS;
 
-	if (gs->player_controller().player_ids().empty()) return;
+	if (gs->key_down_state(SDLK_BACKQUOTE) || gs->player_controller().player_ids().empty()) return;
 
 	fov& mainfov = *gs->player_controller().local_playerfov();
 	char matches[sub_sqrs * sub_sqrs];

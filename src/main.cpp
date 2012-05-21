@@ -24,13 +24,13 @@ using namespace std;
 #define main SDL_main
 #endif
 
-void init_system(GameSettings& settings) {
+void init_system(GameSettings& settings, lua_State* L) {
 	settings = load_settings_data("res/settings.yaml");
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		exit(0);
 	}
 	init_sdl_gl(settings.fullscreen, settings.view_width, settings.view_height);
-	init_game_data();
+	init_game_data(L);
 	settings = load_settings_data("res/settings.yaml");
 }
 
@@ -79,7 +79,7 @@ static void menu_loop(GameState* gs, int width, int height) {
 	gs->window_view() = prevview;
 }
 
-#define GAME_DRAW_EVERY_N_FRAMES 2
+//#define GAME_DRAW_EVERY_N_FRAMES 3
 
 static void game_loop(GameState* gs) {
 
@@ -99,7 +99,7 @@ static void game_loop(GameState* gs) {
 	for (int i = 1; cont; i++) {
 
 		if (gs->key_press_state(SDLK_F2)) {
-			init_game_data();
+			init_game_data(gs->get_luastate());
 			init_lua_data(gs, gs->get_luastate());
 		}
 		if (gs->key_press_state(SDLK_F3)) {
@@ -107,11 +107,6 @@ static void game_loop(GameState* gs) {
 		}
 		if (gs->key_press_state(SDLK_F4)) {
 			paused = !paused;
-		}
-		if (gs->key_down_state(SDLK_x)) {
-			GameView& view = gs->window_view();
-			int nx = gs->mouse_x() + view.x, ny = gs->mouse_y() + view.y;
-			view.center_on(nx, ny);
 		}
 
 		//Draw event
@@ -170,8 +165,10 @@ static void game_loop(GameState* gs) {
 }
 
 int main(int argc, char** argv) {
+	lua_State* L = lua_open();
+
 	GameSettings settings;
-	init_system(settings);
+	init_system(settings, L);
 
 	int world_width = 128 * TILE_SIZE, world_height = 128 * TILE_SIZE;
 
@@ -180,7 +177,7 @@ int main(int argc, char** argv) {
 
 	//Initialize the game state and start the level
 	//GameState claims ownership of the passed lua_State*
-	lua_State* L = lua_open();
+
 	GameState* gs = new GameState(settings, L, world_width, world_height, vieww,
 			viewh);
 

@@ -9,37 +9,39 @@
 #include <cmath>
 #include "../../data/sprite_data.h"
 #include "../../util/collision_util.h"
+#include "../../util/math_util.h"
 #include "AnimatedInst.h"
+#include <typeinfo>
 
-
-static bool bullet_target_hit(GameInst* self, GameInst* other){
-	return ((ProjectileInst*)self)->hit_target() == other;
+static bool bullet_target_hit(GameInst* self, GameInst* other) {
+	return ((ProjectileInst*) self)->hit_target_id() == other->id;
 }
 
 ProjectileInst::~ProjectileInst() {
 
 }
 
-ProjectileInst::ProjectileInst(obj_id originator, Attack& attack, int x, int y, int tx, int ty,
-		bool bounce, int hits, GameInst* target) :
-		GameInst(x, y, RADIUS, false), attack(attack), range_left(attack.range), origin_id(originator),
-		rx(x), ry(y), bounce(bounce), hits(hits), target(target) {
+ProjectileInst::ProjectileInst(obj_id originator, Attack& attack, int x, int y,
+		int tx, int ty, bool bounce, int hits, obj_id target) :
+		GameInst(x, y, RADIUS, false), attack(attack), range_left(attack.range), origin_id(
+				originator), rx(x), ry(y), bounce(bounce), hits(hits), target(
+				target) {
 	int dx = tx - x, dy = ty - y;
-	double abs = sqrt(dx * dx + dy * dy);
-	vx = dx * attack.projectile_speed / abs, vy = dy * attack.projectile_speed / abs;
+	double abs = distance_between(Pos(x, y), Pos(tx, ty));
+	vx = dx * attack.projectile_speed / abs, vy = dy * attack.projectile_speed
+			/ abs;
 }
 
-
-
 void ProjectileInst::step(GameState* gs) {
-    Pos tile_hit;
+	Pos tile_hit;
 	int newx = (int) round(rx + vx); //update based on rounding of true float
 	int newy = (int) round(ry + vy);
-    bool collides = gs->tile_radius_test(newx, newy, radius, true, -1, &tile_hit);
-    if (bounce){
+	bool collides = gs->tile_radius_test(newx, newy, radius, true, -1,
+			&tile_hit);
+	if (bounce) {
 		bool hitsx = gs->tile_radius_test(newx, y, radius, true, -1);
 		bool hitsy = gs->tile_radius_test(x, newy, radius, true, -1);
-		if(hitsy || hitsx || collides){
+		if (hitsy || hitsx || collides) {
 			if (hitsx) {
 				vx = -vx;
 			}
@@ -51,89 +53,91 @@ void ProjectileInst::step(GameState* gs) {
 				vy = -vy;
 			}
 
-		//    return;
+			//    return;
 		}
-    } else if (collides){
-    	gs->remove_instance(this);
-    }
+	} else if (collides) {
+		gs->remove_instance(this);
+	}
 	x = (int) round(rx += vx); //update based on rounding of true float
 	y = (int) round(ry += vy);
 
 	range_left -= attack.projectile_speed;
 
-
-
 	bool hit = false;
 	GameInst* colobj = NULL;
 	GameInst* origin = gs->get_instance(origin_id);
-	if (dynamic_cast<PlayerInst*>(origin)){
+	if (dynamic_cast<PlayerInst*>(origin)) {
 		if (target)
 			gs->object_radius_test(this, &colobj, 1, &bullet_target_hit);
 		else
 			gs->object_radius_test(this, &colobj, 1, &enemy_colfilter);
-		if (colobj){
-			EnemyInst* e = (EnemyInst*)colobj;
+		if (colobj) {
+			EnemyInst* e = (EnemyInst*) colobj;
 			char buffstr[32];
 			snprintf(buffstr, 32, "%d", attack.damage);
-			float rx = vx/attack.projectile_speed*.5;
-			float ry = vy/attack.projectile_speed*.5;
-			gs->add_instance(new AnimatedInst(e->x-5 + rx*5,e->y+ry*5, -1, 25,
-					rx, ry, buffstr));
-			if (e->hurt(gs, attack.damage)){
-				PlayerInst* p = (PlayerInst*)origin;
+			float rx = vx / attack.projectile_speed * .5;
+			float ry = vy / attack.projectile_speed * .5;
+			gs->add_instance(
+					new AnimatedInst(e->x - 5 + rx * 5, e->y + ry * 5, -1, 25,
+							rx, ry, buffstr));
+			if (e->hurt(gs, attack.damage)) {
+				PlayerInst* p = (PlayerInst*) origin;
 				p->stats().gain_xp(e->xpworth());
 
-				if (p->is_local_focus()){
+				if (p->is_local_focus()) {
 					snprintf(buffstr, 32, "%d XP", e->xpworth());
-					gs->add_instance(new AnimatedInst(e->x, e->y, -1, 25,
-						0,0, buffstr, Colour(255,215,11)));
-				}
-				else
+					gs->add_instance(
+							new AnimatedInst(e->x, e->y, -1, 25, 0, 0, buffstr,
+									Colour(255, 215, 11)));
+				} else
 					gs->skip_next_id();
 			}
-}
+		}
 	} else {
 		gs->object_radius_test(this, &colobj, 1, &player_colfilter);
-		if (colobj){
-			Stats& s = ((PlayerInst*)colobj)->stats();
+		if (colobj) {
+			Stats& s = ((PlayerInst*) colobj)->stats();
 			s.hurt(attack.damage);
 			char dmgstr[32];
 			snprintf(dmgstr, 32, "%d", attack.damage);
-			float rx = vx/attack.projectile_speed*.5;
-			float ry = vy/attack.projectile_speed*.5;
-			gs->add_instance(new AnimatedInst(colobj->x-5 + rx*5,colobj->y+ry*5, -1, 25,
-					rx, ry, dmgstr));
+			float rx = vx / attack.projectile_speed * .5;
+			float ry = vy / attack.projectile_speed * .5;
+			gs->add_instance(
+					new AnimatedInst(colobj->x - 5 + rx * 5, colobj->y + ry * 5,
+							-1, 25, rx, ry, dmgstr));
 		}
 	}
-	if (colobj || range_left <= 0){
-			hits --;
-			if (hits >= 0 && colobj){
-				MonsterController& mc = gs->monster_controller();
-				int mindist = 200;
-				if (target==NULL)
-					attack.damage /= 2;
-				target = NULL;
-				for (int i = 0; i < mc.monster_ids().size(); i++){
-					obj_id mid = mc.monster_ids()[i];
-					GameInst* enemy = gs->get_instance(mid);
-					if (enemy && enemy != colobj){
+	if (colobj || range_left <= 0) {
+		hits--;
+		if (hits >= 0 && colobj) {
+			MonsterController& mc = gs->monster_controller();
+			int mindist = 200;
+			if (target == 0)
+				attack.damage /= 2;
+			target = NULL;
+			for (int i = 0; i < mc.monster_ids().size(); i++) {
+				obj_id mid = mc.monster_ids()[i];
+				GameInst* enemy = gs->get_instance(mid);
+				if (enemy && enemy != colobj) {
 
-						int dx = enemy->x - x, dy = enemy->y - y;
-						double abs = sqrt(dx * dx + dy * dy);
-						if (abs < 1) abs = 1;
-						if (abs < mindist) {
-							target = enemy;
-							mindist = abs;
-							vx = dx * attack.projectile_speed / abs, vy = dy * attack.projectile_speed / abs;
-						}
+					int dx = enemy->x - x, dy = enemy->y - y;
+					double abs = sqrt(dx * dx + dy * dy);
+					if (abs < 1)
+						abs = 1;
+					if (abs < mindist) {
+						target = mid;
+						mindist = abs;
+						vx = dx * attack.projectile_speed / abs, vy = dy
+								* attack.projectile_speed / abs;
 					}
 				}
 			}
-			if (hits == 0 || target == NULL){
-				gs->add_instance(new AnimatedInst(x,y,attack.attack_sprite, 15));
-				gs->remove_instance(this);
-			}
 		}
+		if (hits == 0 || target == 0) {
+			gs->add_instance(new AnimatedInst(x, y, attack.attack_sprite, 15));
+			gs->remove_instance(this);
+		}
+	}
 
 }
 
@@ -148,9 +152,22 @@ void ProjectileInst::draw(GameState* gs) {
 	if (!gs->object_visible_test(this))
 		return;
 
-	gl_draw_image(view, &img ,x-TILE_SIZE/2, y-TILE_SIZE/2);
+	gl_draw_image(view, &img, x - TILE_SIZE / 2, y - TILE_SIZE / 2);
 
 //	gl_printf(gs->primary_font(), Colour(255,255,255), x - view.x, y-25 -view.y, "id=%d", id);
 	//gl_draw_circle(view, x, y, RADIUS, (origin_id == gs->local_playerid()) ? Colour(0, 255, 0) : Colour(255, 215, 11));
 
+}
+
+ProjectileInst *ProjectileInst::clone() const {
+	return new ProjectileInst(*this);
+}
+
+GameInst* ProjectileInst::hit_target(GameState *gs) {
+	return gs->get_instance(target);
+}
+
+void ProjectileInst::copy_to(GameInst *inst) const {
+	LANARTS_ASSERT(typeid(this) == typeid(inst));
+	*inst = *this;
 }

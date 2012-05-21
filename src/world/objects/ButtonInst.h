@@ -15,6 +15,9 @@ public:
 	virtual void init(GameState* gs);
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
+	virtual void copy_to(GameInst* inst) const;
+	virtual ButtonInst* clone() const;
+
 private:
 	std::string str;
 	BBox bounding;

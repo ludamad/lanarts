@@ -50,8 +50,8 @@ EnemyType parse_enemy_type(const YAML::Node& n){
 	);
 }
 
-void load_enemy_data(const char* filename){
-
+LuaValue load_enemy_data(lua_State* L, const char* filename){
+	LuaValue ret;
 	fstream file(filename, fstream::in | fstream::binary);
 
 	if (file){
@@ -71,5 +71,5 @@ void load_enemy_data(const char* filename){
 		}
 		file.close();
 	}
-
+	return ret;
 }

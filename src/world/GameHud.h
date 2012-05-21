@@ -6,6 +6,8 @@
 #include "objects/GameInst.h"
 #include "GameInstSet.h"
 
+#include "../util/game_basic_structs.h"
+
 #define INVENTORY_POSITION 327
 
 
@@ -14,6 +16,10 @@ class GameHud {
 public:
 	/* Draw the game statistics overlay */
 	void draw(GameState* gs);
+
+	/*Location of the minimap on the screen*/
+	BBox minimap_bbox();
+
 	GameHud(int x, int y, int width, int height);
 	~GameHud();
 
@@ -23,7 +29,7 @@ public:
 	int height() { return _height; }
 private:
 	/* Helper method for drawing mini-map based on game information */
-	void draw_minimap(GameState* gs, int subx, int suby);
+	void draw_minimap(GameState* gs, const BBox& bbox);
 
 	int x, y, _width, _height;
 	Colour bg_colour;

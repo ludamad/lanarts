@@ -44,7 +44,8 @@ ClassType parse_class(const YAML::Node& n){
 			);
 }
 
-void load_class_data(const char* filename){
+LuaValue load_class_data(lua_State* L, const char* filename){
+	LuaValue ret;
 
 	fstream file(filename, fstream::in | fstream::binary);
 
@@ -66,4 +67,5 @@ void load_class_data(const char* filename){
 			printf("%s\n", parse.what());
 		}
 	}
+	return ret;
 }

@@ -23,6 +23,7 @@ public:
     BBox tiles_covered() {
     	return BBox( ptx - radius, pty - radius, ptx + radius, pty + radius);
     }
+    fov* clone() const;
 private:
     char* sight_mask;
     GameState* gs;

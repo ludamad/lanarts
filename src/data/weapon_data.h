@@ -26,7 +26,7 @@ struct StatModifier {
 	}
 };
 
-struct WeaponType { //Currently for melee & ranged
+struct WeaponEntry { //Currently for melee & ranged
 	const char* name;
 	bool projectile;
 	int max_targets;
@@ -39,7 +39,7 @@ struct WeaponType { //Currently for melee & ranged
 
 
 
-	WeaponType(const char* name, bool projectile,
+	WeaponEntry(const char* name, bool projectile,
 			int max_targets,
 			int base_mindamage, int base_maxdamage, const StatModifier& dmgm, int range, int cooldown,
 			int dmgradius,
@@ -50,6 +50,6 @@ struct WeaponType { //Currently for melee & ranged
 			cooldown(cooldown), weapon_sprite(weapon_spr), attack_sprite(attack_spr), projectile_speed(bspeed) {}
 };
 
-extern std::vector<WeaponType> game_weapon_data;
+extern std::vector<WeaponEntry> game_weapon_data;
 
 #endif /* WEAPON_DATA_H_ */

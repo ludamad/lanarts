@@ -96,3 +96,30 @@ void fov::matches(int sqr_x, int sqr_y, char *sub_sqrs) {
 
 }
 
+static int alloc_mask_size(int w, int h){
+	static const int BITS_PER_INT = sizeof(int)*8;
+
+	int cellCount = w * h;
+	int intCount = cellCount / BITS_PER_INT;
+	if (cellCount % BITS_PER_INT != 0){
+	  ++intCount;
+	}
+	return intCount;
+}
+
+
+fov* fov::clone() const {
+	fov* ret = new fov(radius, sub_squares);
+
+	int dim = radsub * 2 + 1;
+    memcpy(ret->sight_mask, this->sight_mask, dim*dim);
+
+    ret->gs = this->gs;
+    ret->ptx = this->ptx, ret->pty = this->pty;
+
+    permissiveMaskT* mask = ret->m.getMask();
+    int size = alloc_mask_size(mask->width, mask->height);
+    memcpy( ret->m.getMask()->mask, this->m.getMask(), size * sizeof(int));
+
+	return ret;
+}

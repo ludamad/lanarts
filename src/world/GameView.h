@@ -28,6 +28,9 @@ struct GameView {
 	void min_tile_within(int& px, int& py) const;
 	void max_tile_within(int& px, int& py) const;
 
+	/*Are we outside of the centre of the view enough to warrant snapping the view ?*/
+	bool out_of_view_center(int px, int py);
+
 	void move_towards(const Pos& p){
 		move_towards(p.x,p.y);
 	}

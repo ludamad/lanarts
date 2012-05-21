@@ -9,20 +9,18 @@
 #include "../GameState.h"
 #include "../../data/item_data.h"
 #include "../../data/sprite_data.h"
-
+#include <typeinfo>
 
 ItemInst::~ItemInst() {
 }
 
-void ItemInst::step(GameState *gs){
+void ItemInst::step(GameState *gs) {
 }
 
-
-
-void ItemInst::draw(GameState *gs){
+void ItemInst::draw(GameState *gs) {
 	GameView& view = gs->window_view();
 
-	ItemType& itemd = game_item_data[type];
+	ItemEntry& itemd = game_item_data[type];
 	GLimage& img = game_sprite_data[itemd.sprite_number].img;
 
 	int w = img.width, h = img.height;
@@ -36,5 +34,12 @@ void ItemInst::draw(GameState *gs){
 	gl_draw_image(&img, xx - view.x, yy - view.y);
 }
 
+void ItemInst::copy_to(GameInst *inst) const {
+	LANARTS_ASSERT(typeid(this) == typeid(inst));
+	*inst = *this;
+}
 
+ItemInst *ItemInst::clone() const {
+	return new ItemInst(*this);
+}
 

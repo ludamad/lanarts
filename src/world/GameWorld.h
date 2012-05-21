@@ -41,6 +41,7 @@ private:
 	GameLevelState* lvl;
 	GameState* game_state;
 	std::vector<GameLevelState*> level_states;
+
 };
 
 

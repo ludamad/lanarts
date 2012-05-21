@@ -53,6 +53,10 @@ public:
 	virtual void init(GameState* gs);
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
+	virtual void copy_to(GameInst* inst) const;
+	virtual EnemyInst* clone() const;
+
+
 	void attack(GameState* gs, GameInst* inst, bool ranged);
 	Stats& stats() { return stat; }
 	EnemyBehaviour& behaviour() { return eb; }

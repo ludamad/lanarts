@@ -108,18 +108,26 @@ public:
 		lua_settable(L, LUA_REGISTRYINDEX);
 	}
 
-	void pop(lua_State* L, const char* key) {
+	void table_pop_value(lua_State* L, const char* key) {
 		int value = lua_gettop(L);
 		lua_registry_push(L, this); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
 		lua_pushstring(L, key); /*Push the key*/
 		lua_pushvalue(L, value); /*Clone value*/
-		lua_settable(L, value);
+		lua_settable(L, tableind);
 		/*Pop table and value*/
 		lua_pop(L, 2);
 	}
 
-	void set_function(lua_State* L, const char* key, lua_CFunction value) {
+	void table_push_value(lua_State* L, const char* key) {
+		lua_registry_push(L, this); /*Get the associated lua table*/
+		int tableind = lua_gettop(L);
+		lua_pushstring(L, key); /*Push the key*/
+		lua_gettable(L, tableind);
+//		lua_replace(L, tableind);
+	}
+
+	void table_set_function(lua_State* L, const char* key, lua_CFunction value) {
 		lua_registry_push(L, this); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
 		lua_pushstring(L, key);
@@ -129,7 +137,7 @@ public:
 		lua_pop(L, 1);
 		/*Pop table*/
 	}
-	void set_number(lua_State* L, const char* key, double value) {
+	void table_set_number(lua_State* L, const char* key, double value) {
 		lua_registry_push(L, this); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
 		lua_pushstring(L, key);
@@ -138,7 +146,7 @@ public:
 		/*Pop table*/
 		lua_pop(L, 1);
 	}
-	void set_newtable(lua_State* L, const char* key) {
+	void table_set_newtable(lua_State* L, const char* key) {
 		lua_registry_push(L, this); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
 		lua_pushstring(L, key);
@@ -149,7 +157,7 @@ public:
 		lua_pop(L, 1);
 	}
 
-	void set_yaml(lua_State* L, const char* key, const YAML::Node* root) {
+	void table_set_yaml(lua_State* L, const char* key, const YAML::Node* root) {
 		lua_registry_push(L, this); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
 		lua_pushstring(L, key);
@@ -163,8 +171,12 @@ public:
 	}
 
 	void pop(lua_State* L) {
+		int value = lua_gettop(L);
 		lua_pushlightuserdata(L, this); /* push address as key */
-		lua_gettable(L, LUA_REGISTRYINDEX);
+		lua_pushvalue(L, value); /*Clone value*/
+		lua_settable(L, LUA_REGISTRYINDEX);
+
+		lua_pop(L, 1); /*Pop value*/
 	}
 
 	size_t& ref_count() {
@@ -223,23 +235,23 @@ void LuaValue::pop(lua_State* L) {
 	impl->pop(L);
 }
 
-void LuaValue::set_function(lua_State* L, const char *key,
+void LuaValue::table_set_function(lua_State* L, const char *key,
 		lua_CFunction value) {
-	if (!impl)
-		impl = new LuaValueImpl();
-	impl->set_function(L, key, value);
+	if (empty())
+		table_initialize(L);
+	impl->table_set_function(L, key, value);
 }
 
-void LuaValue::set_number(lua_State* L, const char *key, double value) {
-	if (!impl)
-		impl = new LuaValueImpl();
-	impl->set_number(L, key, value);
+void LuaValue::table_set_number(lua_State* L, const char *key, double value) {
+	if (empty())
+		table_initialize(L);
+	impl->table_set_number(L, key, value);
 }
 
-void LuaValue::set_newtable(lua_State* L, const char *key) {
-	if (!impl)
-		impl = new LuaValueImpl();
-	impl->set_newtable(L, key);
+void LuaValue::table_set_newtable(lua_State* L, const char *key) {
+	if (empty())
+		table_initialize(L);
+	impl->table_set_newtable(L, key);
 }
 
 LuaValue::LuaValue(const LuaValue & value) {
@@ -255,10 +267,21 @@ void LuaValue::operator =(const LuaValue & value) {
 		impl->ref_count()++;
 }
 
-void LuaValue::set_yaml(lua_State* L, const char *key, const YAML::Node *root) {
-	if (!impl)
-		impl = new LuaValueImpl();
-	impl->set_yaml(L, key, root);
+void LuaValue::table_set_yaml(lua_State* L, const char *key, const YAML::Node *root) {
+	if (empty())
+		table_initialize(L);
+	impl->table_set_yaml(L, key, root);
+}
+
+void LuaValue::table_pop_value(lua_State* L, const char *key) {
+	if (empty())
+		table_initialize(L);
+	impl->table_pop_value(L, key);
+}
+void LuaValue::table_push_value(lua_State* L, const char *key) {
+	if (empty())
+		table_initialize(L);
+	impl->table_push_value(L, key);
 }
 
 bool LuaValue::empty() {

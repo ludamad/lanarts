@@ -25,7 +25,8 @@ public:
 	~GameInstSet();
 
 	//The main part of the API:
-	obj_id add_instance(GameInst* inst);
+	/*Add an instance, optionally specifying its id*/
+	obj_id add_instance(GameInst* inst, int id = 0);
 	void remove_instance(GameInst* inst, bool deallocate = true);
 	void step(GameState* state);
 
@@ -45,7 +46,9 @@ public:
 		return unit_amnt;
 	}
 	//Return a semi-unique hash of the instances contained in the structure
-	unsigned int hash();
+	unsigned int hash() const;
+
+	void copy_to(GameInstSet& inst_set) const;
 
 	void clear();
 private:

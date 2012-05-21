@@ -18,6 +18,9 @@ public:
 	virtual ~ItemInst();
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
+	virtual void copy_to(GameInst* inst) const;
+	virtual ItemInst* clone() const;
+
 	int item_type(){ return type; }
 	int item_quantity() { return quantity; }
 	obj_id last_held_by() { return dropped_by; }

@@ -43,12 +43,15 @@ GameState::GameState(const GameSettings& settings, lua_State* L, int width, int 
 	memset(key_down_states, 0, sizeof(key_down_states));
 	init_font(&pfont, settings.font.c_str(), 10);
 	init_font(&menufont, settings.font.c_str(), 20);
+	dragging_view = false;
 }
 
 void GameState::init_game() {
 	time_t systime;
 	time(&systime);
 	int seed = systime;
+
+	init_lua_data(this, L);
 
 	if (settings.conntype == GameSettings::CLIENT) {
 		char port_buffer[50];
@@ -86,7 +89,6 @@ void GameState::init_game() {
 	GameInst* p = get_instance(level()->pc.local_playerid());
 	window_view().sharp_center_on(p->x, p->y);
 
-	init_lua_data(this, L);
 }
 
 GameState::~GameState() {
@@ -173,13 +175,51 @@ int GameState::key_down_state(int keyval) {
 int GameState::key_press_state(int keyval) {
 	return key_press_states[keyval];
 }
+
+void GameState::handle_dragging(){
+	/*Adjust the view if the player is far from view center,
+	 *if we are following the cursor, or if the minimap is clicked */
+	bool is_dragged = false;
+	if (key_down_state(SDLK_x)) {
+		GameView& view = window_view();
+		int nx = mouse_x() + view.x, ny = mouse_y() + view.y;
+		for (int i = 0; i < 2; i++)
+			view.center_on(nx, ny);
+		is_dragged = true;
+	} else {
+		if (mouse_right_down()){
+			BBox minimap_bbox = hud.minimap_bbox();
+			int mx = mouse_x() - minimap_bbox.x1, my = mouse_y() - minimap_bbox.y1;
+			int mw = minimap_bbox.width(), mh = minimap_bbox.height();
+
+			bool outofx = ( mx < 0 || mx >= mw);
+			bool outofy = ( my < 0 || my >= mh);
+
+			if ( dragging_view || (!outofx && !outofy)){
+				view.sharp_center_on(mx*width()/mw, my*height()/mh);
+				is_dragged = true;
+			}
+		}
+	}
+
+	/*If we were previously dragging, now snap back to the player position*/
+	if (!is_dragged && dragging_view){
+		GameInst* p = get_instance(local_playerid());
+		view.sharp_center_on(p->x, p->y);
+	}
+	dragging_view = is_dragged;
+}
 void GameState::draw(bool drawhud) {
-	int vp[4];
+	GameLevelState* prev = level();
+//	level() = level()->clone();
+
+	handle_dragging();
 
 	if (drawhud)
 		gl_set_drawing_area(0, 0, view.width, view.height);
 	else
 		gl_set_drawing_area(0, 0, view.width + hud.width(), view.height);
+
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	level()->tiles.pre_draw(this);
@@ -193,6 +233,9 @@ void GameState::draw(bool drawhud) {
 		hud.draw(this);
 	update_display();
 	glFinish();
+
+//	delete level();
+	level() = prev;
 }
 
 obj_id GameState::add_instance(GameInst *inst) {
@@ -300,7 +343,7 @@ bool GameState::object_visible_test(GameInst* obj, GameInst* player) {
 	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
 	const std::vector<fov*>& fovs = player_controller().player_fovs();
 
-	if (fovs.empty())
+	if (key_down_state(SDLK_BACKQUOTE) || fovs.empty())
 		return true;
 
 //printf("minx=%d,miny=%d,maxx=%d,maxy=%d\n",minx,miny,maxx,maxy);

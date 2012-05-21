@@ -8,10 +8,10 @@
 #include "GameInst.h"
 #include "../GameState.h"
 #include "../../display/display.h"
-#include "../../data/lua_data.h"
 
 GameInst::~GameInst() {
 }
+
 void GameInst::step(GameState* gs){
 }
 
@@ -19,9 +19,14 @@ void GameInst::draw(GameState* gs){
 }
 
 void GameInst::init(GameState* gs){
-
 }
+
 void GameInst::deinit(GameState* gs){
 	id = 0;
 }
 
+//Probably safer to force all implementations to define their own copy_to function
+//void GameInst::copy_to(GameInst *inst){
+//	LANARTS_ASSERT(typeid(this) == typeid(inst));
+//	*inst = *this;
+//}

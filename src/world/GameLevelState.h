@@ -23,7 +23,7 @@ struct GameLevelPortal {
 };
 
 struct GameLevelState{
-	GameLevelState(int roomid, int branch, int level, int w, int h);
+	GameLevelState(int roomid, int branch, int level, int w, int h, bool is_simulation = false);
 	~GameLevelState();
 
 	std::vector<GameLevelPortal> exits, entrances;
@@ -42,11 +42,17 @@ struct GameLevelState{
 		return -1;
 	}
 
+	void copy_to(GameLevelState& level) const;
+	GameLevelState* clone() const;
+
 	int roomid;//Global room id
 	//How many steps a level should be simulated after you leave it
 	int steps_left;
 	//Game location information
 	int branch_number, level_number;
+
+	//Dimensions in pixels
+	int width, height;
 
 	//Game world components
 	GameTiles tiles;
@@ -55,6 +61,8 @@ struct GameLevelState{
 	//Game controllers
 	MonsterController mc;
 	PlayerController pc;
+
+	bool is_simulation;
 };
 
 #endif /* GAMELEVELSTATE_H_ */

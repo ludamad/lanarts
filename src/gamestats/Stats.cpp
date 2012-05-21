@@ -133,7 +133,7 @@ void Stats::gain_xp(int amnt) {
 }
 
 int Stats::calculate_melee_damage(MTwist& mt, int weapon_type){
-	WeaponType& wtype = game_weapon_data[weapon_type];
+	WeaponEntry& wtype = game_weapon_data[weapon_type];
 	int base_damage = mt.rand(wtype.base_mindmg, wtype.base_maxdmg+1);
 	StatModifier& sm = wtype.damage_multiplier;
 	float statdmg = strength*sm.strength_mult + defence*sm.defence_mult + magic*sm.magic_mult;

@@ -11,31 +11,31 @@
 #include "../world/objects/GameInst.h"
 #include <vector>
 #include <string>
-#include "lua_data.h"
 
-struct ItemType;
+#include "../lua/LuaValue.h"
 
-typedef void (*item_actionf)(GameState* gs, ItemType* item, GameInst* inst);
-
-struct ItemType {
+struct ItemEntry {
 	const char* name;
 	int sprite_number;
 	int radius;
 	int action_amount;
 	int action_duration;
-	LuaData luadata;
+	LuaValue effect;
 	int weapon;
-	ItemType(const char* name, int rad, int spriten, const std::string& itemaction, int weapon = -1,
+	ItemEntry(const char* name, int rad, int spriten, const std::string& itemaction, int weapon = -1,
 			int action_amount = 0, int action_duration = 0) :
 		name(name), sprite_number(spriten), radius(rad),
 		action_amount(action_amount), action_duration(action_duration),
-		luadata(itemaction), weapon(weapon){
+		effect(itemaction), weapon(weapon){
+	}
+
+	void init(lua_State* L){
+		effect.initialize(L);
 	}
 };
 
-item_actionf get_action_by_name(const char* name);
 int get_item_by_name(const char* name);
-extern std::vector<ItemType> game_item_data;
+extern std::vector<ItemEntry> game_item_data;
 
 
 

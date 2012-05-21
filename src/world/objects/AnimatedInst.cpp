@@ -9,6 +9,7 @@
 #include "../GameState.h"
 #include "../../data/sprite_data.h"
 #include "../../display/display.h"
+#include <typeinfo>
 
 AnimatedInst::~AnimatedInst() {}
 
@@ -50,3 +51,15 @@ void AnimatedInst::draw(GameState* gs){
 		gl_printf(gs->primary_font(), alphacol, x - view.x, y - view.y, "%s", text.c_str());
 	}
 }
+
+
+void AnimatedInst::copy_to(GameInst *inst) const {
+	LANARTS_ASSERT(typeid(this) == typeid(inst));
+	*inst = *this;
+}
+
+AnimatedInst *AnimatedInst::clone() const {
+	return new AnimatedInst(*this);
+}
+
+

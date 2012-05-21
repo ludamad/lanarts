@@ -110,6 +110,16 @@ static int lua_member_lookup(lua_State* L){
 		int tableind = lua_gettop(L);
 		lua_pushvalue(L, 2);
 		lua_gettable(L, tableind);
+		lua_replace(L, tableind);
+		if (lua_isnil(L, -1)){
+			lua_pop(L, 1);
+
+			inst->lua_variables.push(L);
+			tableind = lua_gettop(L);
+			lua_pushvalue(L, 2);
+			lua_gettable(L, tableind);
+			lua_replace(L, tableind);
+		}
 	}
 	return 1;
 }
@@ -121,9 +131,12 @@ static int lua_member_update(lua_State* L){
 
 	bind_t* state = lunar_t::check(L,1);
 	GameInst* inst = state->get_instance();
+	EnemyInst* einst = dynamic_cast<EnemyInst*>(inst);
+
 	Stats* stats = state->get_stats();
 	const char* cstr = lua_tostring(L, 2);
 
+	bool had_member = true;
 	IFLUA_NUM_MEMB_UPDATE("hp", stats->hp)
 	else IFLUA_NUM_MEMB_UPDATE("mp", stats->mp)
 	else IFLUA_NUM_MEMB_UPDATE("magic", stats->magic)
@@ -132,11 +145,21 @@ static int lua_member_update(lua_State* L){
 	else IFLUA_NUM_MEMB_UPDATE("xp", stats->xp)
 	else IFLUA_NUM_MEMB_UPDATE("x", inst->x)
 	else IFLUA_NUM_MEMB_UPDATE("y", inst->y)
-	else {
+	else if (einst){
+		IFLUA_NUM_MEMB_UPDATE("vx", einst->behaviour().vx)
+		else IFLUA_NUM_MEMB_UPDATE("vy", einst->behaviour().vy)
+		else IFLUA_NUM_MEMB_UPDATE("speed", einst->behaviour().speed)
+		else had_member = false;
+	}
+	if (!had_member){
 		if (inst->lua_variables.empty())
 			inst->lua_variables.table_initialize(L);
-//		inst->lua_variables.set_value(L, cstr);
-
+		inst->lua_variables.push(L);
+		int tableind = lua_gettop(L);
+		lua_pushvalue(L, 2);
+		lua_pushvalue(L, 3);
+		lua_settable(L, tableind);
+		lua_replace(L, tableind);
 	}
 	return 1;
 }
