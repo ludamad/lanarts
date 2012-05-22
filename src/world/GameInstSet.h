@@ -41,12 +41,13 @@ public:
 		next_id++;
 	}
 	//Allocate all instances to one vector, traversed according to depth order
-	std::vector<GameInst*> to_vector();
-	size_t size() {
+	std::vector<GameInst*> to_vector() const;
+	size_t size() const {
 		return unit_amnt;
 	}
 	//Return a semi-unique hash of the instances contained in the structure
 	unsigned int hash() const;
+	bool check_copy_integrity(const GameInstSet& inst_set) const;
 
 	void copy_to(GameInstSet& inst_set) const;
 

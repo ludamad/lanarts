@@ -60,7 +60,7 @@ public:
 	void attack(GameState* gs, GameInst* inst, bool ranged);
 	Stats& stats() { return stat; }
 	EnemyBehaviour& behaviour() { return eb; }
-	EnemyType* etype();
+	EnemyEntry* etype();
 	int xpworth(){
 		return xpgain;
 	}

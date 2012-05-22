@@ -54,7 +54,7 @@ void AnimatedInst::draw(GameState* gs){
 
 
 void AnimatedInst::copy_to(GameInst *inst) const {
-	LANARTS_ASSERT(typeid(this) == typeid(inst));
+	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
 	*inst = *this;
 }
 

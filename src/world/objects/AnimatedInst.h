@@ -13,10 +13,10 @@ const int DONT_DRAW_SPRITE = -1;
 
 class AnimatedInst: public GameInst {
 public:
-	enum {RADIUS = 10, VISION_SUBSQRS = 1};
+	enum {RADIUS = 10, VISION_SUBSQRS = 1, DEPTH = -100};
 	AnimatedInst(int x, int y, int sprite, int animatetime = -1, float vx =0, float vy=0,
 			const std::string& text = std::string(), Colour textcol = Colour(255,0,0)) :
-		GameInst(x,y, RADIUS, false),
+		GameInst(x,y, RADIUS, false, DEPTH),
 		textcol(textcol),
 		rx(x), ry(y), vx(vx), vy(vy),
 		sprite(sprite), timeleft(animatetime), animatetime(animatetime),

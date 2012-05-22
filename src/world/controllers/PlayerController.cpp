@@ -51,7 +51,7 @@ void PlayerController::copy_to(PlayerController& pc) const {
 		delete pc.fovs[i];
 	pc.fovs.clear();
 
-	for (int i = 0; i < pc.pids.size(); i++){
+	for (int i = 0; i < this->pids.size(); i++){
 		pc.pids.push_back(this->pids[i]);
 		pc.fovs.push_back(this->fovs[i]->clone());
 	}

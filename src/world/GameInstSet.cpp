@@ -29,6 +29,13 @@ GameInstSet::GameInstSet(int w, int h, int capacity) {
 	unit_grid = new InstanceLinkedList[grid_w * grid_h];
 }
 GameInstSet::~GameInstSet() {
+
+	for (int i = 0, j = 0; i < unit_capacity; i++) {
+		GameInst* inst = unit_set[i].inst;
+		if (valid_inst(inst))
+			delete inst;
+	}
+
 	delete[] unit_grid;
 	delete[] unit_set;
 	for (int i = 0; i < deallocation_list.size(); i++) {
@@ -66,17 +73,20 @@ struct GameInstSetFunctions { //Helper class
 	}
 };
 
-void GameInstSet::update_statepointer_for_reallocate_(InstanceState** stateptr){
+void GameInstSet::update_statepointer_for_reallocate_(
+		InstanceState** stateptr) {
 	if (*stateptr)
-		*stateptr = tset_find<GameInstSetFunctions>((*stateptr)->inst->id, unit_set, unit_capacity);
+		*stateptr = tset_find<GameInstSetFunctions>((*stateptr)->inst->id,
+				unit_set, unit_capacity);
 }
-void GameInstSet::update_depthlist_for_reallocate_(InstanceLinkedList& list){
+void GameInstSet::update_depthlist_for_reallocate_(InstanceLinkedList& list) {
 	update_statepointer_for_reallocate_(&list.start_of_list);
 	update_statepointer_for_reallocate_(&list.end_of_list);
 }
 void GameInstSet::reallocate_internal_data() {
 	unit_capacity *= 2;
-	InstanceState* old_set = unit_set, *new_set = new InstanceState[unit_capacity];
+	InstanceState* old_set = unit_set, *new_set =
+			new InstanceState[unit_capacity];
 	for (int i = 0; i < unit_capacity; i++) {
 		new_set[i].inst = NULL;
 	}
@@ -95,11 +105,11 @@ void GameInstSet::reallocate_internal_data() {
 		}
 	}
 	DepthMap::iterator it = depthlist_map.begin();
-	for (; it != depthlist_map.end(); it++){
+	for (; it != depthlist_map.end(); it++) {
 		update_depthlist_for_reallocate_(it->second);
 	}
 
-	for (int i = 0; i < grid_w*grid_h; i++){
+	for (int i = 0; i < grid_w * grid_h; i++) {
 		update_depthlist_for_reallocate_(unit_grid[i]);
 	}
 
@@ -117,15 +127,15 @@ void GameInstSet::remove_instance(GameInst* inst, bool deallocate) {
 	InstanceState* state = tset_find<GameInstSetFunctions>(inst->id, unit_set,
 			unit_capacity);
 
-	InstanceLinkedList& list = unit_grid[get_xyind(Pos(inst->last_x, inst->last_y),
-			grid_w)];
+	InstanceLinkedList& list = unit_grid[get_xyind(
+			Pos(inst->last_x, inst->last_y), grid_w)];
 
 	remove_from_collisionlist(state, list);
 	remove_from_depthlist(state, depthlist_map[inst->depth]);
 
 	this->unit_amnt--;
 	state->inst = GAMEINST_TOMBSTONE;
-	if (deallocate){
+	if (deallocate) {
 		deallocation_list.push_back(inst);
 	}
 }
@@ -154,7 +164,6 @@ obj_id GameInstSet::add_instance(GameInst* inst, int id) {
 	return inst->id;
 }
 
-
 void GameInstSet::step(GameState* gs) {
 	for (int i = 0; i < deallocation_list.size(); i++) {
 		delete deallocation_list[i];
@@ -177,30 +186,33 @@ GameInst* GameInstSet::get_instance(int id) {
 	return NULL;
 }
 
-std::vector<GameInst*> GameInstSet::to_vector() {
+std::vector<GameInst*> GameInstSet::to_vector() const {
 	std::vector<GameInst*> ret(size(), NULL);
-	for (int i = 0, j = 0; i < unit_capacity; i++) {
-		GameInst* inst = unit_set[i].inst;
-		if (valid_inst(inst))
-			ret[j++] = inst;
-	}
-	DepthMap::iterator it = depthlist_map.end();
-	for (; it-- != depthlist_map.begin();){
+//
+//	for (int i = 0, j = 0; i < unit_capacity; i++) {
+//		GameInst* inst = unit_set[i].inst;
+//		if (valid_inst(inst))
+//			ret[j++] = inst;
+//	}
+
+	DepthMap::const_iterator it = depthlist_map.end();
+	for (int ind = 0; it != depthlist_map.begin();) {
+		--it;
 		InstanceState* state = it->second.start_of_list;
-		while (state){
-			ret.push_back(state->inst);
+		while (state) {
+			ret[ind++] = state->inst;
 			state = state->next_same_depth;
 		}
-
 	}
 	return ret;
 }
 
-unsigned int GameInstSet::hash() const{
+unsigned int GameInstSet::hash() const {
 	unsigned int hash = 0xbabdabe;
-	for (int i = 0, j = 0; i < unit_capacity; i++) {
-		GameInst* inst = unit_set[i].inst;
-		if (valid_inst(inst) && !dynamic_cast<AnimatedInst*>(inst)){
+	std::vector<GameInst*> as_vector = to_vector();
+	for (int i = 0; i < as_vector.size(); i++) {
+		GameInst* inst = as_vector[i];
+		if (!dynamic_cast<AnimatedInst*>(inst)) {
 			hash ^= ((inst->x) << 16) + inst->y;
 			hash *= 31337;
 		}
@@ -208,18 +220,25 @@ unsigned int GameInstSet::hash() const{
 	return hash;
 }
 
-void GameInstSet::copy_to(GameInstSet& inst_set) const{
-	for (int i = 0, j = 0; i < unit_capacity; i++) {
-		GameInst* inst = unit_set[i].inst;
-		if (valid_inst(inst)){
+void GameInstSet::copy_to(GameInstSet& inst_set) const {
+
+	DepthMap::const_iterator it = depthlist_map.end();
+	for (int ind = 0; it != depthlist_map.begin();) {
+		--it;
+		InstanceState* state = it->second.start_of_list;
+		while (state) {
+			GameInst* inst = state->inst;
 			obj_id id = inst->id;
 			GameInst* oinst = inst_set.get_instance(id);
-			if (oinst) inst->copy_to(oinst);
-			else inst_set.add_instance(inst->clone(), id);
+			if (oinst)
+				inst->copy_to(oinst);
+			else
+				inst_set.add_instance(inst->clone(), id);
+			state = state->next_same_depth;
 		}
 	}
 	inst_set.next_id = this->next_id;
-	LANARTS_ASSERT(hash() == inst_set.hash());
+	LANARTS_ASSERT(check_copy_integrity(inst_set));
 }
 
 int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
@@ -244,7 +263,8 @@ int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 		for (int xx = minx; xx <= maxx; xx++) {
 			InstanceLinkedList& unit_list = unit_grid[index++];
 			InstanceState* ptr = unit_list.start_of_list;
-			if (!ptr) continue;
+			if (!ptr)
+				continue;
 
 			while (ptr) {
 				GameInst* inst = ptr->inst;
@@ -254,7 +274,8 @@ int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 					int dsqr = dx * dx + dy * dy;
 					//want to test sqrt(dsqr) < orad+rad
 					//therefore we test dsqr < (orad+rad)*(orad+rad)
-					if (dsqr < radsqr && ((!f && inst->solid) || (f && f(obj, inst)))) {
+					if (dsqr < radsqr
+							&& ((!f && inst->solid) || (f && f(obj, inst)))) {
 						if (obj_cap == 0)
 							return 1;
 						objs[obj_n] = inst;
@@ -270,7 +291,7 @@ int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 	return obj_n;
 }
 
-void GameInstSet::clear(){
+void GameInstSet::clear() {
 	for (int i = 0; i < unit_capacity; i++) {
 		GameInst* inst = unit_set[i].inst;
 		if (valid_inst(inst)) {
@@ -282,8 +303,8 @@ void GameInstSet::clear(){
 	memset(unit_set, 0, unit_capacity * sizeof(InstanceState));
 }
 
-
-void GameInstSet::update_instance_for_step(InstanceState* state, GameInst* inst) {
+void GameInstSet::update_instance_for_step(InstanceState* state,
+		GameInst* inst) {
 	if (inst->destroyed)
 		return;
 	int old_bucket = get_xyind(Pos(inst->last_x, inst->last_y), grid_w);
@@ -303,9 +324,10 @@ void GameInstSet::update_instance_for_step(InstanceState* state, GameInst* inst)
 	inst->last_x = inst->x, inst->last_y = inst->y;
 }
 
-void GameInstSet::add_to_depthlist(InstanceState* inst, InstanceLinkedList& list){
+void GameInstSet::add_to_depthlist(InstanceState* inst,
+		InstanceLinkedList& list) {
 	inst->next_same_depth = NULL;
-	if (list.start_of_list == NULL){
+	if (list.start_of_list == NULL) {
 		inst->prev_same_depth = NULL;
 		list.start_of_list = inst;
 		list.end_of_list = inst;
@@ -316,8 +338,8 @@ void GameInstSet::add_to_depthlist(InstanceState* inst, InstanceLinkedList& list
 	}
 }
 
-
-void GameInstSet::remove_from_depthlist(InstanceState* inst, InstanceLinkedList& list){
+void GameInstSet::remove_from_depthlist(InstanceState* inst,
+		InstanceLinkedList& list) {
 	InstanceState* next = inst->next_same_depth;
 	InstanceState* prev = inst->prev_same_depth;
 	if (prev == NULL)
@@ -330,11 +352,10 @@ void GameInstSet::remove_from_depthlist(InstanceState* inst, InstanceLinkedList&
 		next->prev_same_depth = prev;
 }
 
-
-
-void GameInstSet::add_to_collisionlist(InstanceState* inst, InstanceLinkedList& list){
+void GameInstSet::add_to_collisionlist(InstanceState* inst,
+		InstanceLinkedList& list) {
 	inst->next_in_grid = NULL;
-	if (list.start_of_list == NULL){
+	if (list.start_of_list == NULL) {
 		inst->prev_in_grid = NULL;
 		list.start_of_list = inst;
 		list.end_of_list = inst;
@@ -346,8 +367,35 @@ void GameInstSet::add_to_collisionlist(InstanceState* inst, InstanceLinkedList& 
 	}
 }
 
+bool GameInstSet::check_copy_integrity(const GameInstSet & inst_set) const {
+	std::vector<GameInst*> v1 = this->to_vector(), v2 = inst_set.to_vector();
+	int size = v1.size();
+	if (next_id != inst_set.next_id)
+		return false;
+	if (size != v2.size())
+		return false;
 
-void GameInstSet::remove_from_collisionlist(InstanceState* inst, InstanceLinkedList& list){
+	for (int i = 0; i < size; i++){
+		GameInst* i1 =v1[i], *i2 = v2[i];
+		if (i1->id != i2->id)
+			return false;
+		if (i1->last_x != i2->last_x)
+			return false;
+
+		if (i1->last_y != i2->last_y)
+			return false;
+
+		if (i1->x != i2->x)
+			return false;
+
+		if (i1->y != i2->y)
+			return false;
+	}
+	return true;
+}
+
+void GameInstSet::remove_from_collisionlist(InstanceState* inst,
+		InstanceLinkedList& list) {
 	InstanceState* next = inst->next_in_grid;
 	InstanceState* prev = inst->prev_in_grid;
 	if (prev == NULL)

@@ -27,7 +27,7 @@ Attack parse_attack(const YAML::Node& n){
 	ret.attack_sprite = parse_sprite_number(n, "sprite");
 	return ret;
 }
-EnemyType parse_enemy_type(const YAML::Node& n){
+EnemyEntry parse_enemy_type(const YAML::Node& n){
 	int sprite_number;
 	int radius;
 	int xpaward;
@@ -39,7 +39,7 @@ EnemyType parse_enemy_type(const YAML::Node& n){
 		attacks.push_back(parse_attack(anodes[i]));
 	}
 
-	return EnemyType(
+	return EnemyEntry(
 			parse_cstr(n["name"]),
 			radius,
 			xpaward,

@@ -210,8 +210,6 @@ void GameState::handle_dragging(){
 	dragging_view = is_dragged;
 }
 void GameState::draw(bool drawhud) {
-	GameLevelState* prev = level();
-//	level() = level()->clone();
 
 	handle_dragging();
 
@@ -223,6 +221,8 @@ void GameState::draw(bool drawhud) {
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	level()->tiles.pre_draw(this);
+
+	level()->pc.update_fieldsofview(this);
 	std::vector<GameInst*> safe_copy = level()->inst_set.to_vector();
 	for (size_t i = 0; i < safe_copy.size(); i++) {
 		safe_copy[i]->draw(this);
@@ -233,9 +233,6 @@ void GameState::draw(bool drawhud) {
 		hud.draw(this);
 	update_display();
 	glFinish();
-
-//	delete level();
-	level() = prev;
 }
 
 obj_id GameState::add_instance(GameInst *inst) {

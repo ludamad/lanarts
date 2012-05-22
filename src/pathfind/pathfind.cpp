@@ -105,6 +105,7 @@ void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
 bool PathInfo::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
 		int dy) {
 	bool is_diag = (abs(dx) == abs(dy));
+
 	int xx, yy;
 	for (int y = sy; y <= ey + TILE_SIZE; y += TILE_SIZE) {
 		for (int x = sx; x <= ex + TILE_SIZE; x += TILE_SIZE) {
@@ -112,6 +113,8 @@ bool PathInfo::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
 			yy = squish(y, sy, ey + 1);
 			int gx = (xx + dx * speed) / TILE_SIZE - start_x;
 			int gy = (yy + dy * speed) / TILE_SIZE - start_y;
+			if (gx < 0 || gx >= alloc_w || gy < 0 || gy >= alloc_h)
+				return false;
 			if (get(gx,gy)->solid)
 				return false;
 			if (is_diag) {

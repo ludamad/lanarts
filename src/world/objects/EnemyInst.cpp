@@ -19,6 +19,7 @@
 #include "../../lua/LuaValue.h"
 #include <typeinfo>
 
+//draw depth, also determines what order objects evaluate in
 static const int DEPTH = 50;
 
 EnemyInst::EnemyInst(int enemytype, int x, int y) :
@@ -33,7 +34,7 @@ EnemyInst::EnemyInst(int enemytype, int x, int y) :
 EnemyInst::~EnemyInst() {
 }
 
-EnemyType* EnemyInst::etype(){
+EnemyEntry* EnemyInst::etype(){
 	return &game_enemy_data[enemytype];
 }
 
@@ -148,6 +149,6 @@ bool EnemyInst::hurt(GameState* gs, int hp){
 }
 
 void EnemyInst::copy_to(GameInst *inst) const{
-	LANARTS_ASSERT(typeid(this) == typeid(inst));
+	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
 	*inst = *this;
 }

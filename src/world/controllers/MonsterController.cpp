@@ -101,14 +101,17 @@ void set_preferred_velocity(GameState* gs, RVO::RVOSimulator* sim,
 void MonsterController::partial_copy_to(MonsterController & mc) const{
 	mc.mids = this->mids;
 	mc.must_initialize = this->must_initialize;
-	mc.resize_paths(this->paths.size());
-	mc.player_simids = this->player_simids;
-	mc.simulator = new RVO::RVOSimulator();
+	mc.resize_paths(0);//Automatically built in pre_step
+	mc.player_simids.clear();//Automatically built in pre_step
+	mc.simulator = new RVO::RVOSimulator();//Rebuilt in finish_copy
+	mc.targetted = this->targetted;
+	mc.
 }
 
 void MonsterController::finish_copy(GameLevelState* level){
 	for (int i = 0; i < mids.size(); i++){
 		GameInst* enemy = level->inst_set.get_instance(mids[i]);
+		if (!enemy) continue;
 		RVO::Vector2 enemy_position(enemy->x, enemy->y);
 		EnemyBehaviour& eb = ((EnemyInst*) enemy)->behaviour();
 
@@ -282,8 +285,9 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 void MonsterController::process_players(GameState* gs) {
 	const std::vector<obj_id>& pids = gs->player_controller().player_ids();
 	if (pids.size() > player_simids.size()) {
+		int old_pids = player_simids.size();
 		player_simids.resize(pids.size());
-		for (int i = 0; i < gs->player_controller().player_ids().size(); i++) {
+		for (int i = old_pids; i < gs->player_controller().player_ids().size(); i++) {
 			PlayerInst* p = (PlayerInst*) gs->get_instance(pids[i]);
 			player_simids[i] = simulator->addAgent(RVO::Vector2(p->x, p->y), 0,
 					10, 0.0f, 0.0f, p->radius, 0);

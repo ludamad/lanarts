@@ -4,7 +4,7 @@
     
 branches:
   - branch: main_branch
-    levels:
+    levels:      
       #Level 0
       - size: [40,40]
         items:
@@ -444,4 +444,58 @@ branches:
               chance: 100
             - enemy: Hell Forged
               chance: 50
-          amount: 30
+          amount: 30      
+      #Bonus Round ??
+      - size: [100,100]
+        items:
+          amount: 100
+          generated:
+            - item: Gold
+              chance: 75
+            - item: Haste Scroll
+              chance: 25
+            - item: Health Potion
+              chance: 25
+            - item: Mana Potion
+              chance: 25
+            - item: Dagger
+              chance: 25
+            - item: Strength Scroll
+              chance: 5
+            - item: Magic Scroll
+              chance: 5
+            - item: Defence Scroll
+              chance: 5
+        rooms:
+          padding: 0
+          amount: 1
+          size: [70,70]
+        tunnels:
+          padding: 2
+          width: [1,2]
+          per_room: 0      
+        features:
+          tileset: pebble_tiles
+          stairs_up: 0
+          stairs_down: 5
+        enemies:
+          amount: 50
+          generated:
+            - enemy: Super Chicken
+              chance: 50
+              group_chance: 33
+              group_size: 3
+            - enemy: Ciribot
+              chance: 100
+            - enemy: Storm Elemental
+              chance: 100
+              group_chance: 100
+              group_size: 3
+            - enemy: Grue
+              chance: 100
+              group_chance: 33
+              group_size: 2
+            - enemy: Jester
+              chance: 100
+            - enemy: Hell Forged
+              chance: 50

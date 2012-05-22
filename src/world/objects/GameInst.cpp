@@ -27,6 +27,6 @@ void GameInst::deinit(GameState* gs){
 
 //Probably safer to force all implementations to define their own copy_to function
 //void GameInst::copy_to(GameInst *inst){
-//	LANARTS_ASSERT(typeid(this) == typeid(inst));
+//	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
 //	*inst = *this;
 //}

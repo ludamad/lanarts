@@ -24,8 +24,7 @@ const int REST_COOLDOWN = 150;
 class PlayerInst: public GameInst {
 public:
 	enum {
-		RADIUS = 10, VISION_SUBSQRS = 1, DEPTH = 100
-	};
+		RADIUS = 10, VISION_SUBSQRS = 1, DEPTH = 75	};
 	PlayerInst(const Stats& start_stats, int x, int y, bool local = true) :
 			GameInst(x, y, RADIUS, true, DEPTH), local(local), isresting(0), weapon(0),
 			base_stats(start_stats), canrestcooldown(0),
