@@ -48,6 +48,7 @@ GameSettings load_settings_data(const char* filename){
 			if (hasnode(root, "class")){
 				std::string classname;
 				root["class"] >> classname;
+				if (!game_class_data.empty())
 				ret.classn = get_class_by_name(classname.c_str());
 			}
 		} catch (const YAML::Exception& parse){
