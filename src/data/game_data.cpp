@@ -51,7 +51,8 @@ int get_tileset_by_name(const char* name){
 			return i;
 		}
 	}
-	return NULL;
+	LANARTS_ASSERT(false);
+	return 0;
 }
 
 LuaValue enemies, weapons, items, dungeon, classes;
