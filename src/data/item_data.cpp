@@ -10,5 +10,7 @@ int get_item_by_name(const char* name){
 			return i;
 		}
 	}
-	return NULL;
+
+	LANARTS_ASSERT(false);
+	return 0;
 }

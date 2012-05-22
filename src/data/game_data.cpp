@@ -32,7 +32,8 @@ int get_class_by_name(const char* name){
 			return i;
 		}
 	}
-	return NULL;
+	LANARTS_ASSERT(false);
+	return 0;
 }
 int get_tile_by_name(const char *name){
 	for (int i = 0; i < game_tile_data.size(); i++){
@@ -40,7 +41,8 @@ int get_tile_by_name(const char *name){
 			return i;
 		}
 	}
-	return NULL;
+	LANARTS_ASSERT(false);
+	return 0;
 }
 
 int get_tileset_by_name(const char* name){

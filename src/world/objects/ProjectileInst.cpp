@@ -7,6 +7,7 @@
 #include "PlayerInst.h"
 #include "../GameState.h"
 #include <cmath>
+#include <cstdio>
 #include "../../data/sprite_data.h"
 #include "../../util/collision_util.h"
 #include "../../util/math_util.h"
@@ -114,7 +115,7 @@ void ProjectileInst::step(GameState* gs) {
 			int mindist = 200;
 			if (target == 0)
 				attack.damage /= 2;
-			target = NULL;
+			target = 0;//Clear target
 			for (int i = 0; i < mc.monster_ids().size(); i++) {
 				obj_id mid = mc.monster_ids()[i];
 				GameInst* enemy = gs->get_instance(mid);
