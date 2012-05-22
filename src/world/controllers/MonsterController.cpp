@@ -105,7 +105,6 @@ void MonsterController::partial_copy_to(MonsterController & mc) const{
 	mc.player_simids.clear();//Automatically built in pre_step
 	mc.simulator = new RVO::RVOSimulator();//Rebuilt in finish_copy
 	mc.targetted = this->targetted;
-	mc.
 }
 
 void MonsterController::finish_copy(GameLevelState* level){
