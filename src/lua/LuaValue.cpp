@@ -1,6 +1,7 @@
 #include "LuaValue.h"
 #include <string>
 #include <cstring>
+#include <cstdlib>
 
 extern "C" {
 #include <lua/lua.h>
@@ -36,18 +37,22 @@ static bool nodeis(const YAML::Node* node, const char* str) {
 static void push_yaml_node(lua_State* L, const YAML::Node* node) {
 	int table;
 	YAML::Iterator it;
+	std::string str;
 	switch (node->Type()) {
 	case YAML::NodeType::Null:
 		lua_pushnil(L);
 		break;
 	case YAML::NodeType::Scalar:
-		if (nodeis(node, "float") || nodeis(node, "int")) {
-			double value;
-			*node >> value;
-			lua_pushnumber(L, value);
-		} else /*if (nodeis(node, "str"))*/ {
-			std::string str;
-			*node >> str;
+		node->GetScalar(str);
+		if (nodeis(node, "?")) {
+			char* end;
+			double value = strtod(str.c_str(), &end);
+			size_t convchrs = (end - str.c_str());
+			if (convchrs == str.size() )
+				lua_pushnumber(L, value);
+			else
+				lua_pushstring(L, str.c_str());
+		} else {
 			lua_pushstring(L, str.c_str());
 		}
 		break;

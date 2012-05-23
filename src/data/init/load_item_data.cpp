@@ -45,8 +45,6 @@ LuaValue load_item_data(lua_State* L, const char* filename){
 				ret.table_set_yaml(L, game_item_data.back().name, &items[i]);
 			}
 
-
-
 			file.close();
 		} catch (const YAML::Exception& parse){
 			printf("Items Parsed Incorrectly: \n");
