@@ -52,7 +52,7 @@ enemies:
         range: 130
         cooldown: 45
         sprite: storm bolt
-        projectile_speed: 7    
+        projectile_speed: 7
       
   - name: Ciribot
     sprite: ciribot
@@ -63,9 +63,12 @@ enemies:
         hp: 100
         hpregen: 0.05
     attacks:
-      - damage: 18
-        range: 45
+      - projectile: 1
+        damage: 18
+        range: 65
         cooldown: 35
+        sprite: magic bolt
+        projectile_speed: 7
       
   - name: Super Chicken
     sprite: super_chicken

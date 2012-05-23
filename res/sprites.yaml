@@ -30,6 +30,9 @@ sprites:
   - sprite: fire bolt
     spritefile: res/effects/bolt04.png
 
+  - sprite: magic bolt
+    spritefile: res/effects/bolt05.png
+
   - sprite: storm bolt
     spritefile: res/effects/bolt07.png
 
