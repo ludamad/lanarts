@@ -392,7 +392,7 @@ void PlayerInst::use_item(GameState *gs, const GameAction& action) {
 
 	lua_State* L = gs->get_luastate();
 	type.effect.push(L);
-	lua_pushitem(L, type);
+	luayaml_push_item(L, type.name);
 	lua_pushgameinst(L, this->id);
 	lua_call(L, 2, 0);
 	inventory.inv[action.use_id].n--;

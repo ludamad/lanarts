@@ -1,5 +1,5 @@
 function increase_health(item, obj)
-	obj:heal_hp(item.action_amount)
+	obj:heal_hp(item.amount)
 end 
 
 function increase_mana(item, obj)

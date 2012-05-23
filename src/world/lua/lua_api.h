@@ -26,4 +26,7 @@ void lua_effects_bindings(GameState* gs, lua_State* L);
 void lua_gamestate_bindings(GameState* gs, lua_State* L);
 void lua_lanarts_api(GameState* gs, lua_State* L);
 
+//Implemented in data/game_data.cpp
+void luayaml_push_item(lua_State* L, const char* item);
+
 #endif /* LUA_API_H_ */

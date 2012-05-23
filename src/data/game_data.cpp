@@ -96,3 +96,11 @@ void init_lua_data(GameState* gs, lua_State* L){
 	}
 
 }
+
+void luayaml_push_item(lua_State *L, const char *item){
+	items.push(L);
+	int tableind = lua_gettop(L);
+	lua_pushstring(L, item);
+	lua_gettable(L, tableind);
+	lua_replace(L, tableind);
+}
