@@ -41,14 +41,14 @@ static void push_yaml_node(lua_State* L, const YAML::Node* node) {
 		lua_pushnil(L);
 		break;
 	case YAML::NodeType::Scalar:
-		if (nodeis(node, "str")) {
-			std::string str;
-			*node >> str;
-			lua_pushstring(L, str.c_str());
-		} else if (nodeis(node, "float") || nodeis(node, "int")) {
+		if (nodeis(node, "float") || nodeis(node, "int")) {
 			double value;
 			*node >> value;
 			lua_pushnumber(L, value);
+		} else /*if (nodeis(node, "str"))*/ {
+			std::string str;
+			*node >> str;
+			lua_pushstring(L, str.c_str());
 		}
 		break;
 	case YAML::NodeType::Sequence:
@@ -138,11 +138,11 @@ public:
 		/*Pop table*/
 	}
 	void table_set_number(lua_State* L, const char* key, double value) {
-		lua_registry_push(L, this); /*Get the associated lua table*/
+		push(L); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
 		lua_pushstring(L, key);
 		lua_pushnumber(L, value); /*Push the number*/
-		lua_settable(L, tableind);
+		lua_settable(L, -3);
 		/*Pop table*/
 		lua_pop(L, 1);
 	}
@@ -158,10 +158,11 @@ public:
 	}
 
 	void table_set_yaml(lua_State* L, const char* key, const YAML::Node* root) {
-		lua_registry_push(L, this); /*Get the associated lua table*/
+		push(L); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
 		lua_pushstring(L, key);
 		push_yaml_node(L, root);
+		lua_settable(L, tableind);
 		/*Pop table*/
 		lua_pop(L, 1);
 	}
@@ -184,7 +185,7 @@ public:
 	}
 
 	bool is_empty() {
-		return lua_expression.empty() || empty;
+		return empty;
 	}
 
 private:

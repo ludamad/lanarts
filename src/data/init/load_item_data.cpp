@@ -39,11 +39,13 @@ LuaValue load_item_data(lua_State* L, const char* filename){
 
 			parser.GetNextDocument(root);
 			const YAML::Node& items = root["items"];
+			ret.table_initialize(L);
 			for (int i = 0; i < items.size(); i++){
 				game_item_data.push_back(parse_item_type(items[i]));
+				ret.table_set_yaml(L, game_item_data.back().name, &items[i]);
 			}
 
-			parser.GetNextDocument(root);
+
 
 			file.close();
 		} catch (const YAML::Exception& parse){

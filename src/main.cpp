@@ -79,7 +79,7 @@ static void menu_loop(GameState* gs, int width, int height) {
 	gs->window_view() = prevview;
 }
 
-//#define GAME_DRAW_EVERY_N_FRAMES 3
+#define GAME_DRAW_EVERY_N_FRAMES 3
 
 static void game_loop(GameState* gs) {
 

@@ -70,9 +70,22 @@ void init_game_data(lua_State* L){
 	classes = load_class_data(L, "res/classes.yaml");
 }
 
+static void register_as_global(lua_State* L, LuaValue& value, const char* name){
+	lua_pushstring(L, name);
+	value.push(L);
+	lua_settable(L, LUA_GLOBALSINDEX);
+}
+
 void init_lua_data(GameState* gs, lua_State* L){
 	//Lua configuration
 	lua_lanarts_api(gs, L);
+
+	register_as_global(L, enemies, "enemies");
+	register_as_global(L, weapons, "weapons");
+	register_as_global(L, items, "items");
+	register_as_global(L, dungeon, "dungeon");
+	register_as_global(L, classes, "classes");
+
 	luaL_dofile(L, "res/lua/defines.lua");
 
 	for (int i = 0; i < game_enemy_data.size(); i++){
@@ -81,4 +94,5 @@ void init_lua_data(GameState* gs, lua_State* L){
 	for (int i = 0; i < game_item_data.size(); i++){
 		game_item_data[i].init(L);
 	}
+
 }
