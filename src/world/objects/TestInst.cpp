@@ -28,7 +28,7 @@ void TestInst::draw(GameState* gs) {
 
 void TestInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*inst = *this;
+	*(TestInst*)inst = *this;
 }
 
 TestInst *TestInst::clone() const {

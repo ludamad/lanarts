@@ -6,6 +6,7 @@
  */
 #include <cstring>
 #include <cstdio>
+#include <typeinfo>
 
 #include "GameInstSet.h"
 #include "../util/hashset_util.h"
@@ -120,13 +121,9 @@ static int get_xyind(const Pos& c, int grid_w) {
 	return (c.y / GameInstSet::REGION_SIZE) * grid_w
 			+ c.x / GameInstSet::REGION_SIZE;
 }
-void GameInstSet::remove_instance(GameInst* inst, bool deallocate) {
-	if (inst->destroyed)
-		return;
-	inst->destroyed = true;
-	InstanceState* state = tset_find<GameInstSetFunctions>(inst->id, unit_set,
-			unit_capacity);
 
+void GameInstSet::__remove_instance(InstanceState* state) {
+	GameInst* inst = state->inst;
 	InstanceLinkedList& list = unit_grid[get_xyind(
 			Pos(inst->last_x, inst->last_y), grid_w)];
 
@@ -135,6 +132,14 @@ void GameInstSet::remove_instance(GameInst* inst, bool deallocate) {
 
 	this->unit_amnt--;
 	state->inst = GAMEINST_TOMBSTONE;
+}
+void GameInstSet::remove_instance(GameInst* inst, bool deallocate) {
+	if (inst->destroyed)
+		return;
+	inst->destroyed = true;
+	InstanceState* state = tset_find<GameInstSetFunctions>(inst->id, unit_set,
+			unit_capacity);
+	__remove_instance(state);
 	if (deallocate) {
 		deallocation_list.push_back(inst);
 	}
@@ -178,7 +183,7 @@ void GameInstSet::step(GameState* gs) {
 		}
 	}
 }
-GameInst* GameInstSet::get_instance(int id) {
+GameInst* GameInstSet::get_instance(int id) const {
 	InstanceState* is = tset_find<GameInstSetFunctions>(id, unit_set,
 			unit_capacity);
 	if (is)
@@ -223,6 +228,7 @@ unsigned int GameInstSet::hash() const {
 void GameInstSet::copy_to(GameInstSet& inst_set) const {
 
 	DepthMap::const_iterator it = depthlist_map.end();
+	//Synch live objects
 	for (int ind = 0; it != depthlist_map.begin();) {
 		--it;
 		InstanceState* state = it->second.start_of_list;
@@ -230,11 +236,30 @@ void GameInstSet::copy_to(GameInstSet& inst_set) const {
 			GameInst* inst = state->inst;
 			obj_id id = inst->id;
 			GameInst* oinst = inst_set.get_instance(id);
-			if (oinst)
-				inst->copy_to(oinst);
-			else
+			if (oinst == NULL || typeid(inst) != typeid(oinst)) {
 				inst_set.add_instance(inst->clone(), id);
+				if (oinst)
+					oinst->destroyed = true;
+			}
 			state = state->next_same_depth;
+		}
+	}
+	//Remove dead objects
+	for (int i = 0; i < inst_set.unit_capacity; i++) {
+		InstanceState* state = &inst_set.unit_set[i];
+		GameInst* oinst = state->inst;
+		if (valid_inst(oinst)) {
+			if (!oinst->destroyed) {
+				GameInst* inst = get_instance(oinst->id);
+				if (inst != NULL) {
+					inst_set.__update_collision_position(state,
+							Pos(oinst->x, oinst->y), Pos(inst->x, inst->y));
+					inst->copy_to(oinst);
+				} else
+					inst_set.__remove_instance(state);
+				delete inst;
+			}
+
 		}
 	}
 	inst_set.next_id = this->next_id;
@@ -303,24 +328,26 @@ void GameInstSet::clear() {
 	memset(unit_set, 0, unit_capacity * sizeof(InstanceState));
 }
 
-void GameInstSet::update_instance_for_step(InstanceState* state,
-		GameInst* inst) {
-	if (inst->destroyed)
-		return;
-	int old_bucket = get_xyind(Pos(inst->last_x, inst->last_y), grid_w);
-	int new_bucket = get_xyind(Pos(inst->x, inst->y), grid_w);
-	InstanceState* st = tset_find<GameInstSetFunctions>(inst->id, unit_set,
-			unit_capacity);
+//TODO: Make collisionlist entry positions deterministic -or- make collision functions always return the same object
+void GameInstSet::__update_collision_position(InstanceState* state,
+		const Pos& p1, const Pos& p2) {
+	GameInst* inst = state->inst;
 
-	if (!st || inst != st->inst) {
-		printf("Non-equal for id=%d!\n", inst->id);
-	}
+	int old_bucket = get_xyind(p1, grid_w), new_bucket = get_xyind(p2, grid_w);
 	if (old_bucket != new_bucket) {
 		//remove from previous unit grid lookup
 		remove_from_collisionlist(state, unit_grid[old_bucket]);
 		//add to next unit lookup
 		add_to_collisionlist(state, unit_grid[new_bucket]);
 	}
+}
+
+void GameInstSet::update_instance_for_step(InstanceState* state,
+		GameInst* inst) {
+	if (inst->destroyed)
+		return;
+	__update_collision_position(state, Pos(inst->last_x, inst->last_y),
+			Pos(inst->x, inst->y));
 	inst->last_x = inst->x, inst->last_y = inst->y;
 }
 
@@ -375,8 +402,8 @@ bool GameInstSet::check_copy_integrity(const GameInstSet & inst_set) const {
 	if (size != v2.size())
 		return false;
 
-	for (int i = 0; i < size; i++){
-		GameInst* i1 =v1[i], *i2 = v2[i];
+	for (int i = 0; i < size; i++) {
+		GameInst* i1 = v1[i], *i2 = v2[i];
 		if (i1->id != i2->id)
 			return false;
 		if (i1->last_x != i2->last_x)

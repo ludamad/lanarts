@@ -25,10 +25,11 @@ void GameLevelState::copy_to(GameLevelState & level) const {
 	level.is_simulation = this->is_simulation;
 	level.level_number = this->level_number;
 	tiles.copy_to(level.tiles);
+	this->pc.copy_to(level.pc);
 	this->mc.partial_copy_to(level.mc);
 	level.mc.finish_copy(&level);
-	this->pc.copy_to(level.pc);
 	level.is_simulation = this->is_simulation;
+	level.steps_left = this->steps_left;
 }
 
 GameLevelState* GameLevelState::clone() const{
