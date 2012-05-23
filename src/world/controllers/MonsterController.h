@@ -70,7 +70,6 @@ private:
     void monster_follow_path(GameState *gs, EnemyInst *e);
     void monster_get_to_stairs(GameState *gs, EnemyInst *e);
 
-    bool must_initialize;
     AStarPathFind astarcontext;
     obj_id targetted;
     std::vector<PathInfo*> paths;

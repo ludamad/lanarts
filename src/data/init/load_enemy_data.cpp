@@ -20,7 +20,7 @@ Attack parse_attack(const YAML::Node& n){
 	Attack ret;
 	ret.canuse = true;
 	ret.cooldown = parse_defaulted(n, "cooldown", 70);
-	ret.range = parse_defaulted(n, "range", 25);
+	ret.range = parse_defaulted(n, "range", 20);
 	ret.projectile_speed = parse_defaulted(n, "projectile_speed",0);
 	n["damage"] >> ret.damage;
 	ret.isprojectile= parse_defaulted(n, "projectile", 0);

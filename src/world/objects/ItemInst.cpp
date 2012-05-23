@@ -36,7 +36,7 @@ void ItemInst::draw(GameState *gs) {
 
 void ItemInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*inst = *this;
+	*(ItemInst*)inst = *this;
 }
 
 ItemInst *ItemInst::clone() const {

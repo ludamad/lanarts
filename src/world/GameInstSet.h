@@ -31,7 +31,7 @@ public:
 	void step(GameState* state);
 
 	//Returns NULL if no unit found
-	GameInst* get_instance(int id);
+	GameInst* get_instance(int id) const;
 
 	int object_radius_test(GameInst* obj, GameInst** objs = NULL, int obj_cap =
 			0, col_filterf f = NULL, int x = -1, int y = -1, int radius = -1);
@@ -96,6 +96,8 @@ private:
 	InstanceLinkedList* unit_grid;
 
 	//Internal structure upkeep functions
+	void __remove_instance(InstanceState* state);
+	void __update_collision_position(InstanceState* state, const Pos& p1, const Pos& p2);
 	void reallocate_internal_data();
 	void update_statepointer_for_reallocate_(InstanceState** stateptr);
 	void update_depthlist_for_reallocate_(InstanceLinkedList& list);

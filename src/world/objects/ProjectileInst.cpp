@@ -170,5 +170,5 @@ GameInst* ProjectileInst::hit_target(GameState *gs) {
 
 void ProjectileInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*inst = *this;
+	*(ProjectileInst*)inst = *this;
 }

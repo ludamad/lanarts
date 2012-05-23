@@ -151,7 +151,7 @@ void GameWorld::step() {
 //Clone part1:
 //			GameLevelState* clone = game_state->level()->clone();
 //			GameLevelState* real = game_state->level();
-//			level_states[i] = clone;
+////			level_states[i] = clone;
 //            game_state->level() = clone;
 
 			game_state->level()->pc.pre_step(game_state);
@@ -160,8 +160,10 @@ void GameWorld::step() {
 			game_state->level()->steps_left--;
             game_state->level()->tiles.step(game_state);
 //Clone part2:
-//            delete real;
-//            if (real == current_level) current_level = clone;
+////            if (real == current_level) current_level = clone;
+//            game_state->level() = real;
+//            clone->copy_to(*real);
+//            delete clone;
 
 //
 //			int posthashvalue =  game_state->level()->inst_set.hash();
@@ -209,16 +211,6 @@ void GameWorld::regen_level(int roomid){
 		game_state->window_view().sharp_center_on(p->x, p->y);
 	}
 }
-static int scan_entrance(const std::vector<GameLevelPortal>& portals,
-		const Pos& tilepos) {
-	for (int i = 0; i < portals.size(); i++) {
-		if (portals[i].entrancesqr == tilepos) {
-			return i;
-		}
-	}
-	return -1;
-}
-
 
 void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	//save the level context

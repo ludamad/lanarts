@@ -150,5 +150,5 @@ bool EnemyInst::hurt(GameState* gs, int hp){
 
 void EnemyInst::copy_to(GameInst *inst) const{
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*inst = *this;
+	*(EnemyInst*)inst = *this;
 }

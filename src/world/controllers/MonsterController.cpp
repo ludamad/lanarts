@@ -27,7 +27,6 @@ const int HUGE_DISTANCE = 1000000;
 
 MonsterController::MonsterController() {
 	targetted = 0;
-	must_initialize = true;
 	simulator = new RVO::RVOSimulator();
 	simulator->setTimeStep(1.0f);
 }
@@ -100,10 +99,11 @@ void set_preferred_velocity(GameState* gs, RVO::RVOSimulator* sim,
 
 void MonsterController::partial_copy_to(MonsterController & mc) const{
 	mc.mids = this->mids;
-	mc.must_initialize = this->must_initialize;
 	mc.resize_paths(0);//Automatically built in pre_step
 	mc.player_simids.clear();//Automatically built in pre_step
+	delete mc.simulator;
 	mc.simulator = new RVO::RVOSimulator();//Rebuilt in finish_copy
+	simulator->setTimeStep(1.0f);
 	mc.targetted = this->targetted;
 }
 
