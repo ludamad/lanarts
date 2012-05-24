@@ -22,15 +22,15 @@ ProjectileInst::~ProjectileInst() {
 
 }
 
-ProjectileInst::ProjectileInst(obj_id originator, Attack& attack, int x, int y,
-		int tx, int ty, bool bounce, int hits, obj_id target) :
-		GameInst(x, y, RADIUS, false), attack(attack), range_left(attack.range), origin_id(
-				originator), rx(x), ry(y), bounce(bounce), hits(hits), target(
-				target) {
+ProjectileInst::ProjectileInst(sprite_id sprite, obj_id originator, float speed,
+		int range, int damage, int x, int y, int tx, int ty, bool bounce,
+		int hits, obj_id target) :
+		GameInst(x, y, RADIUS, false), rx(x), ry(y), speed(speed), damage(
+				damage), sprite(sprite), origin_id(originator), target_id(
+				target), range_left(range), bounce(bounce), hits(hits) {
 	int dx = tx - x, dy = ty - y;
 	double abs = distance_between(Pos(x, y), Pos(tx, ty));
-	vx = dx * attack.projectile_speed / abs, vy = dy * attack.projectile_speed
-			/ abs;
+	vx = dx * speed / abs, vy = dy * speed / abs;
 }
 
 void ProjectileInst::step(GameState* gs) {
@@ -62,27 +62,27 @@ void ProjectileInst::step(GameState* gs) {
 	x = (int) round(rx += vx); //update based on rounding of true float
 	y = (int) round(ry += vy);
 
-	range_left -= attack.projectile_speed;
+	range_left -= speed;
 
 	bool hit = false;
 	GameInst* colobj = NULL;
 	GameInst* origin = gs->get_instance(origin_id);
 	if (dynamic_cast<PlayerInst*>(origin)) {
-		if (target)
+		if (target_id)
 			gs->object_radius_test(this, &colobj, 1, &bullet_target_hit);
 		else
 			gs->object_radius_test(this, &colobj, 1, &enemy_colfilter);
 		if (colobj) {
 			EnemyInst* e = (EnemyInst*) colobj;
 			char buffstr[32];
-			snprintf(buffstr, 32, "%d", attack.damage);
-			float rx = vx / attack.projectile_speed * .5;
-			float ry = vy / attack.projectile_speed * .5;
+			snprintf(buffstr, 32, "%d", damage);
+			float rx = vx / speed * .5;
+			float ry = vy / speed * .5;
 			gs->add_instance(
 					new AnimatedInst(e->x - 5 + rx * 5, e->y + ry * 5, -1, 25,
 							rx, ry, buffstr));
 
-			if (e->hurt(gs, attack.damage)) {
+			if (e->hurt(gs, damage)) {
 				PlayerInst* p = (PlayerInst*) origin;
 				p->stats().gain_xp(e->xpworth());
 
@@ -100,11 +100,11 @@ void ProjectileInst::step(GameState* gs) {
 		if (colobj) {
 			Stats& s = ((PlayerInst*) colobj)->stats();
 			if (!gs->game_settings().invincible)
-				s.hurt(attack.damage);
+				s.hurt(damage);
 			char dmgstr[32];
-			snprintf(dmgstr, 32, "%d", attack.damage);
-			float rx = vx / attack.projectile_speed * .5;
-			float ry = vy / attack.projectile_speed * .5;
+			snprintf(dmgstr, 32, "%d", damage);
+			float rx = vx / speed * .5;
+			float ry = vy / speed * .5;
 			gs->add_instance(
 					new AnimatedInst(colobj->x - 5 + rx * 5, colobj->y + ry * 5,
 							-1, 25, rx, ry, dmgstr));
@@ -115,9 +115,9 @@ void ProjectileInst::step(GameState* gs) {
 		if (hits >= 0 && colobj) {
 			MonsterController& mc = gs->monster_controller();
 			int mindist = 200;
-			if (target == 0)
-				attack.damage /= 2;
-			target = 0;//Clear target
+			if (target_id == 0)
+				damage /= 2;
+			target_id = NONE; //Clear target
 			for (int i = 0; i < mc.monster_ids().size(); i++) {
 				obj_id mid = mc.monster_ids()[i];
 				GameInst* enemy = gs->get_instance(mid);
@@ -128,16 +128,15 @@ void ProjectileInst::step(GameState* gs) {
 					if (abs < 1)
 						abs = 1;
 					if (abs < mindist) {
-						target = mid;
+						target_id = mid;
 						mindist = abs;
-						vx = dx * attack.projectile_speed / abs, vy = dy
-								* attack.projectile_speed / abs;
+						vx = dx * speed / abs, vy = dy * speed / abs;
 					}
 				}
 			}
 		}
-		if (hits == 0 || target == 0) {
-			gs->add_instance(new AnimatedInst(x, y, attack.attack_sprite, 15));
+		if (hits == 0 || target_id == 0) {
+			gs->add_instance(new AnimatedInst(x, y, sprite, 15));
 			gs->remove_instance(this);
 		}
 	}
@@ -146,7 +145,7 @@ void ProjectileInst::step(GameState* gs) {
 
 void ProjectileInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
-	GLimage& img = game_sprite_data[attack.attack_sprite].img;
+	GLimage& img = game_sprite_data[sprite].img;
 	int w = img.width, h = img.height;
 	int xx = x - w / 2, yy = y - h / 2;
 
@@ -167,10 +166,10 @@ ProjectileInst *ProjectileInst::clone() const {
 }
 
 GameInst* ProjectileInst::hit_target(GameState *gs) {
-	return gs->get_instance(target);
+	return gs->get_instance(target_id);
 }
 
 void ProjectileInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(ProjectileInst*)inst = *this;
+	*(ProjectileInst*) inst = *this;
 }

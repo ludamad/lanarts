@@ -113,7 +113,12 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 				p.x = pinst->x;
 				p.y = pinst->y;
 			}
-			GameInst* bullet = new ProjectileInst(id, ranged, x,y,p.x, p.y);
+			//	ProjectileInst(sprite_id sprite, obj_id originator, float speed, int range,
+			//			int damage, int x, int y, int tx, int ty, bool bounce = false,
+			//			int hits = 1, obj_id target = NONE);
+			GameInst* bullet = new ProjectileInst(ranged.attack_sprite, id, ranged.projectile_speed,
+					ranged.range, ranged.damage,
+					x,y,p.x, p.y);
 			gs->add_instance(bullet);
 			stats().reset_ranged_cooldown();
 			stats().cooldown += gs->rng().rand(-4,5);
