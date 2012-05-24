@@ -118,7 +118,8 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 			stats().reset_ranged_cooldown();
 			stats().cooldown += gs->rng().rand(-4,5);
 		} else {
-			pinst->stats().hurt(stats().meleeatk.damage);
+			if (!gs->game_settings().invincible)
+				pinst->stats().hurt(stats().meleeatk.damage);
 
 			char dmgstr[32];
 			snprintf(dmgstr, 32, "%d", stats().meleeatk.damage);

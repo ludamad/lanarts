@@ -1,6 +1,6 @@
 ---
 weapons:
-  - weapon: Unarmed
+  - name: Unarmed
     damage: [2, 4]
     modifiers: 
         strength: .5
@@ -9,7 +9,7 @@ weapons:
     spr_weap: gloves
     spr_attack: gloves
 
-  - weapon: Dagger
+  - name: Dagger
     damage: [8, 12]
     modifiers: 
         strength: .75
@@ -18,7 +18,7 @@ weapons:
     spr_weap: dagger
     spr_attack: dagger
 
-  - weapon: Short Sword
+  - name: Short Sword
     damage: [16, 20]
     max_targets: 2
     modifiers: 
@@ -28,7 +28,7 @@ weapons:
     spr_weap: short sword
     spr_attack: short sword
 
-  - weapon: Mace
+  - name: Mace
     damage: [20, 22]
     max_targets: 2
     modifiers: 

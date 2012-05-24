@@ -63,9 +63,11 @@ void init_game_data(lua_State* L){
 	load_sprite_data("res/sprites.yaml");
 	load_tileset_data("res/tileset.yaml");
 	enemies = load_enemy_data(L, "res/enemies.yaml");
-	weapons = load_weapon_data(L, "res/weapons.yaml");
+	//TODO: make separate weapons table
 	items = load_item_data(L, "res/items.yaml");
-	load_weapon_item_entries(L, &items);
+	load_weapon_data(L, "res/weapons.yaml",  &items);
+	//TODO: remove lua_state arg
+	load_weapon_item_entries(L);
 	dungeon = load_dungeon_data(L, "res/levels.yaml");
 	classes = load_class_data(L, "res/classes.yaml");
 }
@@ -81,7 +83,7 @@ void init_lua_data(GameState* gs, lua_State* L){
 	lua_lanarts_api(gs, L);
 
 	register_as_global(L, enemies, "enemies");
-	register_as_global(L, weapons, "weapons");
+//	register_as_global(L, weapons, "weaponss");
 	register_as_global(L, items, "items");
 	register_as_global(L, dungeon, "dungeon");
 	register_as_global(L, classes, "classes");

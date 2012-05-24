@@ -32,6 +32,10 @@ GameSettings load_settings_data(const char* filename){
 			optional_set(root, "view_height", ret.view_height);
 			optional_set(root, "ip", ret.ip);
 			optional_set(root, "port", ret.port);
+			optional_set(root, "steps_per_draw", ret.steps_per_draw);
+			if (ret.steps_per_draw < 1) ret.steps_per_draw = 1;
+			optional_set(root, "invincible", ret.invincible);
+			optional_set(root, "time_per_step", ret.time_per_step);
 
 			if (hasnode(root, "connection_type")){
 				std::string connname;

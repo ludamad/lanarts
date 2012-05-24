@@ -5,8 +5,7 @@
 
 using namespace std;
 
-LuaValue load_weapon_data(lua_State* L, const char* filename) {
-	LuaValue ret;
+void load_weapon_data(lua_State* L, const char* filename, LuaValue* itemtable) {
 	fstream file(filename, fstream::in | fstream::binary);
 
 	YAML::Parser parser(file);
@@ -25,7 +24,7 @@ LuaValue load_weapon_data(lua_State* L, const char* filename) {
 			const YAML::Node& n = node[i];
 
 			GenRange damage = parse_range(n["damage"]);
-			WeaponEntry entry(parse_cstr(n["weapon"]),
+			WeaponEntry entry(parse_cstr(n["name"]),
 					parse_defaulted(n, "projectile", 0),
 					parse_defaulted(n, "max_targets", 1),
 					damage.min,
@@ -39,6 +38,8 @@ LuaValue load_weapon_data(lua_State* L, const char* filename) {
 					parse_defaulted(n, "proj_speed", 0));
 
 			game_weapon_data.push_back(entry);
+			if (itemtable)
+				itemtable->table_set_yaml(L, game_weapon_data.back().name, &n);
 		}
 		file.close();
 
@@ -46,10 +47,9 @@ LuaValue load_weapon_data(lua_State* L, const char* filename) {
 		printf("Weapons Parsed Incorrectly: \n");
 		printf("%s\n", parse.what());
 	}
-	return ret;
 }
 
-void load_weapon_item_entries(lua_State* L, LuaValue* itemtable){
+void load_weapon_item_entries(lua_State* L){
 	//Create items from weapons
 	for (int i = 0; i < game_weapon_data.size(); i++){
 		WeaponEntry* wtype = &game_weapon_data[i];

@@ -72,8 +72,6 @@ static int lua_member_lookup(lua_State* L){
 	}
     IFLUA_BOOL_MEMB_LOOKUP("is_weapon", item.weapon == 0)
 			else IFLUA_STR_MEMB_LOOKUP("item_name", item.name)
-			else IFLUA_NUM_MEMB_LOOKUP("action_amount", item.action_amount)
-			else IFLUA_NUM_MEMB_LOOKUP("action_duration", item.action_duration)
 	else{
 		lua_getglobal(L, bind_t::className);
 		int tableind = lua_gettop(L);

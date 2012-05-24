@@ -81,6 +81,7 @@ void ProjectileInst::step(GameState* gs) {
 			gs->add_instance(
 					new AnimatedInst(e->x - 5 + rx * 5, e->y + ry * 5, -1, 25,
 							rx, ry, buffstr));
+
 			if (e->hurt(gs, attack.damage)) {
 				PlayerInst* p = (PlayerInst*) origin;
 				p->stats().gain_xp(e->xpworth());
@@ -98,7 +99,8 @@ void ProjectileInst::step(GameState* gs) {
 		gs->object_radius_test(this, &colobj, 1, &player_colfilter);
 		if (colobj) {
 			Stats& s = ((PlayerInst*) colobj)->stats();
-			s.hurt(attack.damage);
+			if (!gs->game_settings().invincible)
+				s.hurt(attack.damage);
 			char dmgstr[32];
 			snprintf(dmgstr, 32, "%d", attack.damage);
 			float rx = vx / attack.projectile_speed * .5;

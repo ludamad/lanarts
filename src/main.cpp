@@ -48,7 +48,8 @@ static const char HELP_TEXT[] =
 		"Switch to Melee: m or e\n"
 		"Use Blink: h or right-click\n"
 		"Use Item: click item or keys 1 through 9\n"
-		"Use Stairs: < and > or mouse wheel\n";
+		"Use Stairs: < and > or mouse wheel\n"
+		"Regenerate: Hold 'r'\n";
 
 static void menu_loop(GameState* gs, int width, int height) {
 	bool exit = false;
@@ -79,8 +80,6 @@ static void menu_loop(GameState* gs, int width, int height) {
 	gs->window_view() = prevview;
 }
 
-#define GAME_DRAW_EVERY_N_FRAMES 3
-
 static void game_loop(GameState* gs) {
 
 	bool paused = false, cont = true;
@@ -92,8 +91,10 @@ static void game_loop(GameState* gs) {
 	unsigned long step_time = 0;
 	unsigned long step_events = 1;
 
-	const clock_t per_frame = 12 * CLOCKS_PER_SEC / 1000;
-	clock_t time_allowance = 0;
+	GameSettings& settings = gs->game_settings();
+
+	const clock_t per_frame = settings.time_per_step * CLOCKS_PER_SEC / 1000;
+
 
 	gs->pre_step();
 	for (int i = 1; cont; i++) {
@@ -112,15 +113,13 @@ static void game_loop(GameState* gs) {
 		//Draw event
 
 		clock_t stepndraw_start = clock(), stepndraw_end;
-#ifdef GAME_DRAW_EVERY_N_FRAMES
-		if (i%GAME_DRAW_EVERY_N_FRAMES == 0) gs->draw();
-#else
-		gs->draw();
-#endif
+		bool draw_this_step = (settings.steps_per_draw == 1 || i%settings.steps_per_draw == 0);
+		if (draw_this_step)
+			gs->draw();
+
 		clock_t draw_end = clock();
 		draw_events++;
 		draw_time += draw_end - stepndraw_start;
-		time_allowance -= draw_end - stepndraw_start;
 
 		if (!paused) {
 			int repeat_amount = 1;
@@ -137,7 +136,6 @@ static void game_loop(GameState* gs) {
 				int len = stepndraw_end - step_start;
 				step_time += len;
 
-				time_allowance = per_frame - len;
 				bool is_done = (!paused && !gs->pre_step())
 						|| (paused && !gs->update_iostate());
 				if (is_done) {
@@ -147,21 +145,17 @@ static void game_loop(GameState* gs) {
 			}
 		}
 
-#ifdef GAME_DRAW_EVERY_N_FRAMES
-		clock_t time_to_wait = per_frame - (draw_time/i/GAME_DRAW_EVERY_N_FRAMES + step_time/i);
-#else
-		clock_t time_to_wait = per_frame - (clock() - stepndraw_start);
-#endif
-		if (time_to_wait > 0) {
+		clock_t thisdraw = draw_end - stepndraw_start, thisstep = stepndraw_end - draw_end;
+		clock_t time_to_wait = per_frame*settings.steps_per_draw - (thisdraw /settings.steps_per_draw  + thisstep*settings.steps_per_draw);
+		if (draw_this_step && time_to_wait > 0) {
 			int delayms = time_to_wait * 1000 / CLOCKS_PER_SEC;
 			if (delayms > 0)
 				SDL_Delay(delayms);
-			time_allowance = 0;
 		}
 	}
 
-	printf("Step time: %f\n", float(step_time) / step_events);
-	printf("Draw time: %f\n", float(draw_time) / draw_events);
+	printf("Step time: %f\n", float(step_time) * 1000 / CLOCKS_PER_SEC / step_events);
+	printf("Draw time: %f\n", float(draw_time) * 1000 / CLOCKS_PER_SEC / draw_events);
 }
 
 int main(int argc, char** argv) {

@@ -73,7 +73,7 @@ void optional_set(const YAML::Node & node, const char *key, bool & value) {
 	if (hasnode(node, key)) {
 		int val;
 		node[key] >> val;
-		value = val;
+		value = (val != 0);
 	}
 }
 

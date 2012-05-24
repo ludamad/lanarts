@@ -6,8 +6,8 @@ enemies:
     sprite: skeleton
     radius: 11
     xpaward: 10
-    init: enemy_init
-    step: enemy_step
+    init_func: enemy_init
+    step_func: enemy_step
     stats:
         movespeed: 2
         hp: 60

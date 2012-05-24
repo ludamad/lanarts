@@ -15,14 +15,18 @@ struct GameSettings {
 	int port;
 	connection_type conntype;
 
-	/*Window settings*/
+	/*Draw settings*/
 	std::string font;
 	bool fullscreen;
 	int view_width, view_height;
+	int steps_per_draw;
+	float time_per_step;
 
 	/*Gameplay settings*/
 	bool regen_on_death;
+	bool invincible;
 	int classn;
+
 
 	GameSettings(){
 		//sets defaults
@@ -32,8 +36,11 @@ struct GameSettings {
 		classn = 1;
 		view_width = 960;
 		view_height = 720;
+		steps_per_draw = 1;
+		time_per_step = 12;
 
-		font = "res/arial.ttf";
+		font = "res/MateSC-Regular.ttf";
+		invincible = false;
 
 		port = 0;
 		conntype = NONE;

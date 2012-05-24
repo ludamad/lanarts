@@ -21,9 +21,7 @@ ItemEntry parse_item_type(const YAML::Node& n){
 			parse_defaulted(n,"radius", 11),
 			parse_sprite_number(n, "sprite"),
 			action,
-			-1,
-			parse_defaulted(n,"action_amount", 50),
-			parse_defaulted(n,"action_duration", 400)
+			-1
 		);
 }
 LuaValue load_item_data(lua_State* L, const char* filename){
