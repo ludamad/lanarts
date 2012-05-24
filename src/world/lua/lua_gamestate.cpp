@@ -13,11 +13,22 @@ public:
   GameStateLuaBinding(GameState* gs) : gs(gs) {
   }
 
-  int destroy_object(lua_State* L){
+  /*Takes GameInst object*/
+  int remove_object(lua_State* L){
 	  obj_id id = lua_gameinst_arg(L, 1);
 	  if (id > 0){
-		  gs->remove_instance(gs->get_instance(id));
+		  GameInst* inst = gs->get_instance(id);
+		  if (inst)
+			  gs->remove_instance(inst);
 	  }
+	  return 0;
+  }
+  /*Takes <object type> <sprite> <x> <y>, [<target x>, <target y>] */
+  int create_object(lua_State* L){
+	  obj_id id = 0;
+//	  GameInst* inst = new ProjectileInst();
+//	  id = gs->add_instance();
+//	  lua_pushgameinst(L, id);
 	  return 0;
   }
 
@@ -72,7 +83,8 @@ static int lua_member_lookup(lua_State* L){
 
 
 meth_t bind_t::methods[] = {
-  LUA_DEF(destroy_object),
+  LUA_DEF(remove_object),
+  LUA_DEF(create_object),
   LUA_DEF(players_in_room),
   meth_t(0,0)
 };
