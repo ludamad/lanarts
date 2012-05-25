@@ -14,7 +14,7 @@
 
 #include "../lua/lua_api.h"
 extern "C" {
-    #include <lua/lua.h>
+#include <lua/lua.h>
 }
 
 #include "../../util/math_util.h"
@@ -27,7 +27,6 @@ extern "C" {
 #include "../../data/sprite_data.h"
 #include "../../data/tile_data.h"
 #include "../../data/weapon_data.h"
-
 
 // static FILE* saved = fopen("res/saved_replay.rep", "wb");
 // static FILE* open = fopen("res/replay.rep", "rb");
@@ -66,7 +65,7 @@ static bool find_blink_target(PlayerInst* p, GameState* gs, Pos& position) {
 		}
 	}
 
-	for (int i = 0; i < pc.player_ids().size(); i++){
+	for (int i = 0; i < pc.player_ids().size(); i++) {
 
 		fov* fov = pc.player_fovs()[i];
 		BBox fbox = fov->tiles_covered();
@@ -463,9 +462,11 @@ static int scan_entrance(const std::vector<GameLevelPortal>& portals,
 
 void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 	Pos hitpos;
-	bool didhit = gs->tile_radius_test(x,y,radius,false, get_tile_by_name("stairs_up"),&hitpos);
+	bool didhit = gs->tile_radius_test(x, y, radius, false,
+			get_tile_by_name("stairs_up"), &hitpos);
 	int entr_n = scan_entrance(gs->level()->exits, hitpos);
-	if (!didhit || entr_n == -1) return;
+	if (!didhit || entr_n == -1)
+		return;
 //	int entr_n = action.use_id;
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->level()->exits.size());
 	gs->ensure_connectivity(gs->level()->roomid - 1, gs->level()->roomid);
@@ -479,9 +480,11 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 }
 void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 	Pos hitpos;
-	bool didhit = gs->tile_radius_test(x,y,radius,false, get_tile_by_name("stairs_down"),&hitpos);
+	bool didhit = gs->tile_radius_test(x, y, radius, false,
+			get_tile_by_name("stairs_down"), &hitpos);
 	int entr_n = scan_entrance(gs->level()->entrances, hitpos);
-	if (!didhit || entr_n == -1) return;
+	if (!didhit || entr_n == -1)
+		return;
 //	int entr_n = action.use_id;
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->level()->entrances.size());
 	gs->ensure_connectivity(gs->level()->roomid, gs->level()->roomid + 1);
@@ -525,8 +528,9 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 			action.use_id);
 
 	if (action.use_id < 2) {
-		GameInst* bullet = new ProjectileInst(id, atk, x, y, action.action_x,
-				action.action_y, bounce, hits);
+		GameInst* bullet = new ProjectileInst(atk.attack_sprite, id,
+				atk.projectile_speed, atk.range, atk.damage, x, y,
+				action.action_x, action.action_y, bounce, hits);
 		gs->add_instance(bullet);
 	} else {
 		x = action.action_x;

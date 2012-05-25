@@ -4,7 +4,7 @@
     
 branches:
   - branch: main_branch
-    levels:      
+    levels:         
       #Level 0
       - size: [40,40]
         items:
@@ -499,3 +499,41 @@ branches:
               chance: 100
             - enemy: Hell Forged
               chance: 50
+      #Level 0
+      - size: [100,100]
+        items:
+          amount: 2
+          generated:
+            - item: Gold
+              chance: 75
+            - item: Haste Scroll
+              chance: 25
+            - item: Health Potion
+              chance: 25
+            - item: Mana Potion
+              chance: 25
+            - item: Dagger
+              chance: 25
+            - item: Strength Scroll
+              chance: 5
+            - item: Magic Scroll
+              chance: 5
+            - item: Defence Scroll
+              chance: 5
+        rooms:
+          padding: 0
+          amount: 10
+          size: [4,20]
+        tunnels:
+          padding: 2
+          width: [1,2]
+          per_room: 1      
+        features:
+          tileset: pebble_tiles
+          stairs_up: 0
+          stairs_down: 5
+        enemies:
+          amount: 2
+          generated:
+            - enemy: Skeleton
+              chance: 100   

@@ -64,6 +64,13 @@ static const int TILE_SIZE = 32;
 
 /*Used to identify objects. Safe to store and use later, can query if object still in play.*/
 typedef int obj_id;
+/*Indices to the various game data arrays*/
+typedef int item_id;
+typedef int sprite_id;
+typedef int spell_id;
+typedef int tile_id;
+
+const int NONE = 0;
 
 #define LANARTS_ASSERT(x) assert(x)
 #define FOR_EACH_BBOX(bbox, x, y) \

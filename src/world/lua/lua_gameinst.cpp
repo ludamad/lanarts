@@ -46,7 +46,7 @@ public:
   int equip(lua_State* L){
 	  PlayerInst* p;
 	  if ( (p = dynamic_cast<PlayerInst*>(get_instance()))){
-		  //hack for now:
+		  //TODO: hack for now
 		  lua_pushstring(L, "name");
 		  lua_gettable(L, 1);
 		  const char* itemname = lua_tostring(L, lua_gettop(L));
