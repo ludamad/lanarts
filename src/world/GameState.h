@@ -62,7 +62,9 @@ public:
 		return solid_test(obj, NULL, 0, NULL, x, y, radius);
 	}
 
-	bool object_visible_test(GameInst *obj, GameInst *player = NULL);
+	//Checks if an object is visible by all players (default) or a single player.
+	//Also specify if the test is affected by revealing with backquote
+	bool object_visible_test(GameInst *obj, GameInst *player = NULL, bool canreveal = true);
 	void ensure_connectivity(int roomid1, int roomid2);
 	GameView & window_view() {
 		return view;

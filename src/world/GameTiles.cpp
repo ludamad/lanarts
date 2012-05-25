@@ -49,8 +49,8 @@ void GameTiles::step(GameState* gs) {
 	for (int i = 0; i < gs->player_controller().player_fovs().size(); i++) {
 		fov& f = *gs->player_controller().player_fovs()[i];
 		BBox fovbox = f.tiles_covered();
-		for (int y = std::max(fovbox.y1, 0); y <= std::max(fovbox.y2, height); y++) {
-			for (int x = std::max(fovbox.x1, 0); x <= std::min(fovbox.x2, width); x++) {
+		for (int y = std::max(fovbox.y1, 0); y <= std::min(fovbox.y2, height-1); y++) {
+			for (int x = std::max(fovbox.x1, 0); x <= std::min(fovbox.x2, width-1); x++) {
 				bool has_match = false, has_free = false;
 				bool is_other_match = false;
 				int tile = tiles[y * width + x];

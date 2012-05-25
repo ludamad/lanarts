@@ -68,8 +68,15 @@ void EnemyInst::step(GameState* gs) {
 	stats().step();
 }
 void EnemyInst::draw(GameState* gs) {
+
 	GameView& view = gs->window_view();
 	GLimage& img = game_sprite_data[etype()->sprite_number].img;
+
+	if (gs->game_settings().draw_diagnostics){
+		char statbuff[255];
+		snprintf(statbuff, 255, "vx=%f vy=%f\n act=%d, steps = %d\ncooldown = %d", eb.vx, eb.vy, eb.current_action, eb.path_steps, eb.path_cooldown);
+		gl_printf(gs->primary_font(), Colour(255,255,255), x- radius - view.x, y - 50 - view.y, statbuff );
+	}
 
 	int w = img.width, h = img.height;
 	int xx = x - w / 2, yy = y - h / 2;
@@ -132,6 +139,7 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 			stats().cooldown += gs->rng().rand(-4,5);
 		}
 	}
+
 }
 
 

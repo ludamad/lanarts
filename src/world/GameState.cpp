@@ -327,7 +327,7 @@ int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 	return level()->inst_set.object_radius_test(obj, objs, obj_cap, f, x, y,
 			radius);
 }
-bool GameState::object_visible_test(GameInst* obj, GameInst* player) {
+bool GameState::object_visible_test(GameInst* obj, GameInst* player, bool canreveal ) {
 	const int sub_sqrs = VISION_SUBSQRS;
 	const int subsize = TILE_SIZE / sub_sqrs;
 
@@ -340,7 +340,7 @@ bool GameState::object_visible_test(GameInst* obj, GameInst* player) {
 	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
 	const std::vector<fov*>& fovs = player_controller().player_fovs();
 
-	if (key_down_state(SDLK_BACKQUOTE) || fovs.empty())
+	if ((canreveal && key_down_state(SDLK_BACKQUOTE)) || fovs.empty())
 		return true;
 
 //printf("minx=%d,miny=%d,maxx=%d,maxy=%d\n",minx,miny,maxx,maxy);

@@ -36,6 +36,7 @@ GameSettings load_settings_data(const char* filename){
 			if (ret.steps_per_draw < 1) ret.steps_per_draw = 1;
 			optional_set(root, "invincible", ret.invincible);
 			optional_set(root, "time_per_step", ret.time_per_step);
+			optional_set(root, "draw_diagnostics", ret.draw_diagnostics);
 
 			if (hasnode(root, "connection_type")){
 				std::string connname;

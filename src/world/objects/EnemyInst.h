@@ -12,9 +12,9 @@ struct EnemyBehaviour {
 		RANDOM_WALK_COOLDOWN = 3000
 	};
 	enum Action {
-		INACTIVE,
-		FOLLOWING_PATH,
-		CHASING_PLAYER
+		INACTIVE = 0,
+		FOLLOWING_PATH = 1,
+		CHASING_PLAYER = 2
 	};
 
 	std::vector<Pos> path;
