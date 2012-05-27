@@ -13,6 +13,18 @@ struct Colour {
 	}
 };
 
+/*Represents a range*/
+struct Range {
+	int min, max;
+	Range(){}
+	Range(int min, int max) :
+		min(min), max(max){
+	}
+	Range(const Range& r){
+		min = r.min, max = r.max;
+	}
+};
+
 /*Represents a rectangular region in terms of its start and end x & y values*/
 struct BBox {
 	int x1, y1, x2, y2;

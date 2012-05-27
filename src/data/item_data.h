@@ -18,15 +18,20 @@ struct ItemEntry {
 	const char* name;
 	int sprite_number;
 	int radius;
-	LuaValue effect;
+	LuaValue action_func, prereq_func;
+	bool stackable;
 	int weapon;
-	ItemEntry(const char* name, int rad, int spriten, const std::string& itemaction, int weapon = -1) :
+	ItemEntry(const char* name, int rad, int spriten,
+			const std::string& action_luaf, const std::string& prereq_luaf,
+			bool stackable, int weapon = -1) :
 		name(name), sprite_number(spriten), radius(rad),
-		effect(itemaction), weapon(weapon){
+		action_func(action_luaf), prereq_func(prereq_luaf),
+		stackable(stackable), weapon(weapon){
 	}
 
 	void init(lua_State* L){
-		effect.initialize(L);
+		action_func.initialize(L);
+		prereq_func.initialize(L);
 	}
 };
 

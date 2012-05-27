@@ -4,27 +4,41 @@ items:
     sprite: gold
   - name: Health Potion
     sprite: health_potion
-    action: increase_health
+    action_func: increase_health
+    prereq_func: function (item, obj) return obj.hp < obj.max_hp end 
     amount: 50
 
   - name: Mana Potion
     sprite: mana potion
-    action: increase_mana
+    action_func: increase_mana
+    prereq_func: function (item, obj) return obj.mp < obj.max_mp end 
     amount: 50
+
   - name: Haste Scroll
     sprite: scroll
-    action: hasten
+    action_func: hasten
     duration: 400
 
   - name: Strength Scroll
     sprite: scroll_strength
-    action: increase_strength
+    action_func: increase_strength
     amount: 1
+
   - name: Defence Scroll
     sprite: scroll_defence
-    action: increase_defence
+    action_func: increase_defence
     amount: 1
+
   - name: Magic Scroll
     sprite: scroll_magic
-    action: increase_magic
+    action_func: increase_magic
     amount: 1
+
+  - name: Stone
+    sprite: stone
+    action_func: stone
+    prereq_func: function(item, obj) return obj.cooldown <= 0 end
+    speed: 8
+    cooldown: 20
+    range: 400
+    damage: 20

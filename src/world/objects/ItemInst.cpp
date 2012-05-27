@@ -30,8 +30,11 @@ void ItemInst::draw(GameState *gs) {
 		return;
 	if (!gs->object_visible_test(this))
 		return;
-
-	gl_draw_image(&img, xx - view.x, yy - view.y);
+	int x_inview = xx - view.x, y_inview = yy - view.y;
+	gl_draw_image(&img, x_inview, y_inview);
+	if (itemd.stackable && quantity > 1) {
+		gl_printf(gs->primary_font(), Colour(255,255,255), x_inview+1, y_inview+1, "%d", quantity);
+	}
 }
 
 void ItemInst::copy_to(GameInst *inst) const {

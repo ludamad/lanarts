@@ -44,6 +44,8 @@
 #ifndef MTWIST_H_
 #define MTWIST_H_
 
+#include "../util/game_basic_structs.h"
+
 class MTwist {
 	enum {
 		N = 624
@@ -94,6 +96,10 @@ public:
 	int rand(int min, int max) {
 		amount_of_randoms++;
 		return genrand_int32() % (max - min) + min;
+	}
+
+	int rand(const Range& r) {
+		return rand(r.min, r.max+1);
 	}
 };
 

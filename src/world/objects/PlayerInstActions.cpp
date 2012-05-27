@@ -203,6 +203,12 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 				}
 			}
 
+			Pos p(gs->mouse_x() + view.x, gs->mouse_y() + view.y);
+			obj_id target = gs->monster_controller().current_target();
+			GameInst* targetted = gs->get_instance(target);
+			if (targetted)
+				p = Pos(targetted->x, targetted->y);
+
 			//Item use
 			for (int i = 0; i < 9; i++) {
 				if (gs->key_press_state(SDLK_1 + i)) {
@@ -210,7 +216,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 						item_used = true;
 						queued_actions.push_back(
 								GameAction(id, GameAction::USE_ITEM, frame,
-										level, i));
+										level, i, p.x, p.y ));
 						break; //Can only use one item/step (until we have item cooldowns)
 					}
 				}
@@ -220,11 +226,12 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 						/ TILE_SIZE;
 				int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
 				int slot = 5 * posy + posx;
+				item_used = true;
 				if (slot >= 0 && slot < INVENTORY_SIZE
 						&& inventory.inv[slot].n > 0) {
 					queued_actions.push_back(
 							GameAction(id, GameAction::USE_ITEM, frame, level,
-									slot));
+									slot, p.x, p.y));
 				}
 			}
 			// Drop item
@@ -313,7 +320,7 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	if (item->item_type() == get_item_by_name("Gold")) {
 		money += 10;
 	} else {
-		inventory.add(item->item_type(), 1);
+		inventory.add(item->item_type(), item->item_quantity());
 	}
 }
 
@@ -385,18 +392,40 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 	}
 }
 
+static bool item_check_lua_prereq(lua_State* L, ItemEntry& type, obj_id user){
+	if (type.prereq_func.empty())
+		return true;
+
+	type.prereq_func.push(L);
+	luayaml_push_item(L, type.name);
+	lua_pushgameinst(L, user);
+	lua_call(L, 2, 1);
+
+	bool ret = lua_toboolean(L, lua_gettop(L));
+	lua_pop(L, 1);
+
+	return ret;
+}
+static void item_do_lua_action(lua_State* L, ItemEntry& type, obj_id user, const Pos& p){
+	type.action_func.push(L);
+	luayaml_push_item(L, type.name);
+	lua_pushgameinst(L, user);
+	lua_pushnumber(L, p.x);
+	lua_pushnumber(L, p.y);
+	lua_call(L, 4, 0);
+}
 void PlayerInst::use_item(GameState *gs, const GameAction& action) {
-	int item = inventory.inv[action.use_id].item;
-	ItemEntry& type = game_item_data[item];
+	itemslot& slot = inventory.inv[action.use_id];
+	ItemEntry& type = game_item_data[slot.item];
 
 	lua_State* L = gs->get_luastate();
-	type.effect.push(L);
-	luayaml_push_item(L, type.name);
-	lua_pushgameinst(L, this->id);
-	lua_call(L, 2, 0);
-	inventory.inv[action.use_id].n--;
 
-	canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
+	if (slot.n > 0 && item_check_lua_prereq(L, type, this->id)){
+		item_do_lua_action(L, type, this->id, Pos(action.action_x, action.action_y));
+		inventory.inv[action.use_id].n--;
+		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
+	}
+
 }
 void PlayerInst::use_rest(GameState *gs, const GameAction& action) {
 	bool atfull = stats().hp >= stats().max_hp && stats().mp >= stats().max_mp;

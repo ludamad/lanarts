@@ -5,8 +5,8 @@ class: Mage
 #Window settingss
 fullscreen: 0
 regen_level_on_death: 1
-view_width: 920
-view_height: 720
+view_width: 900
+view_height: 700
 
 #Font settings
 font: res/MateSC-Regular.ttf

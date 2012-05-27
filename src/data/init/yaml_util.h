@@ -10,14 +10,12 @@
 #include <string>
 #include <cstring>
 #include <yaml-cpp/yaml.h>
+
+#include "../../util/game_basic_structs.h"
 #include "../../world/objects/GameInst.h"
 #include "../game_data.h"
 #include "../../gamestats/Stats.h"
 #include "../weapon_data.h"
-
-struct GenRange {
-	int min, max;
-};
 
 //Allows for sequence merges to be defined using hash merge syntax in yaml, eg - <<: *handle, in a sequence
 std::vector<const YAML::Node* > flatten_seq_mappings(const YAML::Node & n);
@@ -31,9 +29,11 @@ bool hasnode(const YAML::Node & n, const char *key);
 void optional_set(const YAML::Node & node, const char *key, bool & value);
 
 Stats parse_stats(const YAML::Node & n, const std::vector<Attack> & attacks);
-GenRange parse_range(const YAML::Node & n);
+Range parse_range(const YAML::Node & n);
 StatModifier parse_modifiers(const YAML::Node & n);
 const char *parse_cstr(const YAML::Node & n);
+
+const YAML::Node& operator >> (const YAML::Node& n, Range& r);
 
 template <class T>
 inline T parse_defaulted(const YAML::Node& n, const char* key, const T& dflt){

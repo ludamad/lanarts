@@ -1,91 +1,91 @@
 ---
 tiles:
-  - tile: blue_wall
-    spritefile: res/tiles/darkrock_wall.bmp
+  - name: blue_wall
+    file: res/tiles/darkrock_wall.bmp
     solid: 1
  
-  - tile: stone_wall
-    spritefile: res/tiles/stone_wall.bmp
+  - name: stone_wall
+    file: res/tiles/stone_wall.bmp
     solid: 1
  
-  - tile: blue_floor
-    spritefile: res/tiles/room_floor.bmp
+  - name: blue_floor
+    file: res/tiles/room_floor.bmp
  
-  - tile: sandstone
-    spritefile: res/tiles/sandstone/sandstone_floor
+  - name: sandstone
+    file: res/tiles/sandstone/sandstone_floor
     variations: 5
     extension: .png
  
-  - tile: mesh
-    spritefile: res/tiles/mesh/mesh
+  - name: mesh
+    file: res/tiles/mesh/mesh
     variations: 4
     extension: .png
  
-  - tile: marb
-    spritefile: res/tiles/marble/marble_floor
+  - name: marb
+    file: res/tiles/marble/marble_floor
     variations: 6
     extension: .png
  
-  - tile: crystal_floor
-    spritefile: res/tiles/crystal/crystal_floor
+  - name: crystal_floor
+    file: res/tiles/crystal/crystal_floor
     variations: 6
     extension: .png
  
-  - tile: stairs_up
-    spritefile: res/tiles/features/stairs_up.png
+  - name: stairs_up
+    file: res/tiles/features/stairs_up.png
  
-  - tile: stairs_down
-    spritefile: res/tiles/features/stairs_down.png
+  - name: stairs_down
+    file: res/tiles/features/stairs_down.png
  
-  - tile: floor2
-    spritefile: res/tiles/room_floor3.bmp
+  - name: floor2
+    file: res/tiles/room_floor3.bmp
  
-  - tile: brickdark
-    spritefile: res/tiles/brickdark/brick_dark
+  - name: brickdark
+    file: res/tiles/brickdark/brick_dark
     solid: 1
     variations: 7
     extension: .png
 
-  - tile: brick_gray
-    spritefile: res/tiles/brickgray/brick_gray
+  - name: brick_gray
+    file: res/tiles/brickgray/brick_gray
     solid: 1
     variations: 4
     extension: .png
 
-  - tile: pebble_brown
-    spritefile: res/tiles/pebblebrown/pebble_brown
+  - name: pebble_brown
+    file: res/tiles/pebblebrown/pebble_brown
     variations: 9
     extension: .png
 
-  - tile: hive
-    spritefile: res/tiles/hive/hive
+  - name: hive
+    file: res/tiles/hive/hive
     variations: 4
     extension: .png
 
-  - tile: yellow_wall
-    spritefile: res/tiles/wallyellow/wall_yellow_rock
+  - name: yellow_wall
+    file: res/tiles/wallyellow/wall_yellow_rock
     variations: 4
     solid: 1
     extension: .png
 
-  - tile: crystal_wall
-    spritefile: res/tiles/crystal/crystal_wall
+  - name: crystal_wall
+    file: res/tiles/crystal/crystal_wall
     variations: 14
     solid: 1
     extension: .png
 
-  - tile: sand_rock
-    spritefile: res/tiles/sandrockfloor/floor_sand_rock
+  - name: sand_rock
+    file: res/tiles/sandrockfloor/floor_sand_rock
     variations: 4
     extension: .png
   
-  - tile: cobble_blood
-    spritefile: res/tiles/cobbleblood/cobble_blood
+  - name: cobble_blood
+    file: res/tiles/cobbleblood/cobble_blood
     variations: 12
     extension: .png
   
-  - tile: nerve_floor
-    spritefile: res/tiles/nerves/floor_nerves
+  - name: nerve_floor
+    file: res/tiles/nerves/floor_nerves
     variations: 7
     extension: .png
   

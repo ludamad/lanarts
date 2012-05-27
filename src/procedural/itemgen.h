@@ -15,14 +15,12 @@ class GameState;
 struct ItemGenChance {
 	int genchance;//Out of 100%
 	int itemtype;
-	int groupchance;//Out of 100%
-	int groupmin, groupmax;
-
+	Range quantity;
 };
 struct ItemGenSettings {
 	std::vector<ItemGenChance> item_chances;
 	int min_items, max_items;
-	ItemGenSettings(std::vector<ItemGenChance>& genchances, int min_items, int max_items) :
+	ItemGenSettings(const std::vector<ItemGenChance>& genchances, int min_items, int max_items) :
 		item_chances(genchances), min_items(min_items), max_items(max_items){
 	}
 };

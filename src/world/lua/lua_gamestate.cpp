@@ -39,22 +39,31 @@ public:
 		}
 		return 0;
 	}
-	/*Takes <object type> <sprite> <x> <y>, [<target x>, <target y>] */
 	int create_projectile(lua_State* L) {
 		int nargs = lua_gettop(L);
 		obj_id origin_id = lua_gameinst_arg(L, 1);
-		int tx = lua_tonumber(L, 2), ty = lua_tonumber(L, 3);//TODO
-		bool bounce = nargs < 4 ? false : lua_toboolean(L, 4);//TODO
-		int hits = nargs < 5 ? 1 : lua_tonumber(L, 5);//TODO
-		obj_id target = nargs < 6 ? 0 : lua_gameinst_arg(L, 6);
+
+		lua_pushstring(L, "name");
+		lua_gettable(L, 4);
+		sprite_id sprite = get_sprite_by_name(lua_tostring(L, lua_gettop(L)));
+		lua_pop(L, 1);
+
+
+		bool bounce = nargs < 8 ? false : lua_toboolean(L, 8);
+		int hits = nargs < 9 ? 1 : lua_tonumber(L, 9);
+		obj_id target = nargs < 10 ? 0 : lua_gameinst_arg(L, 10);
 
 		obj_id projectile_id = 0;
 		GameInst* origin_obj = gs->get_instance(origin_id);
 		Stats* s = get_stats(origin_obj);
+
 		if (s != NULL) {
-			Attack& atk = s->magicatk;
-			GameInst* inst = new ProjectileInst(atk.attack_sprite, origin_id, atk.projectile_speed,
-					atk.range, atk.damage, origin_obj->x, origin_obj->y, tx, ty, bounce,
+//			ProjectileInst(sprite_id sprite, obj_id originator, float speed, int range,
+//					int damage, int x, int y, int tx, int ty, bool bounce = false,
+//					int hits = 1, obj_id target = NONE);
+			GameInst* inst = new ProjectileInst(sprite, origin_id, lua_tonumber(L, 5),
+					lua_tonumber(L, 6), lua_tonumber(L, 7), origin_obj->x, origin_obj->y,
+					lua_tonumber(L, 2), lua_tonumber(L, 3), bounce,
 					hits, target);
 			projectile_id = gs->add_instance(inst);
 		}
@@ -72,6 +81,26 @@ public:
 			//  lua_pushnumber(L, 2);
 			lua_rawseti(L, table, i + 1);
 		}
+		return 1;
+	}
+
+	int rand_range(lua_State* L) {
+		int nargs = lua_gettop(L);
+
+		lua_pushnumber(L, 1.0);
+		lua_rawget(L, 1);
+		int min = lua_tonumber(L,lua_gettop(L));
+		int max = min;
+		lua_pop(L, 1);
+
+		if (nargs > 1){
+			lua_pushnumber(L, 2.0);
+			lua_rawget(L, 1);
+			max = lua_tonumber(L,lua_gettop(L));
+			lua_pop(L, 1);
+		}
+
+		lua_pushnumber(L, gs->rng().rand(min, max+1));
 		return 1;
 	}
 	GameState* game_state() {
@@ -95,11 +124,12 @@ static int lua_member_lookup(lua_State* L) {
 	bind_t* state = lunar_t::check(L, 1);
 	GameState* gs = state->game_state();
 	const char* cstr = lua_tostring(L, 2);
+	GameView& view = gs->window_view();
 
 	IFLUA_NUM_MEMB_UPDATE("width", gs->width())
 	else IFLUA_NUM_MEMB_UPDATE("height", gs->height())
-	else IFLUA_NUM_MEMB_UPDATE("mouse_x", gs->mouse_x())
-	else IFLUA_NUM_MEMB_UPDATE("mouse_y", gs->mouse_y())
+	else IFLUA_NUM_MEMB_UPDATE("mouse_x", gs->mouse_x() + view.x)
+	else IFLUA_NUM_MEMB_UPDATE("mouse_y", gs->mouse_y() + view.y)
 	else IFLUA_NUM_MEMB_UPDATE("frame_number", gs->frame())
 	else IFLUA_NUM_MEMB_UPDATE("level_number", gs->level()->level_number)
 	else IFLUA_NUM_MEMB_UPDATE("monster_num", gs->monster_controller().number_monsters())
@@ -112,8 +142,12 @@ static int lua_member_lookup(lua_State* L) {
 	return 1;
 }
 
-meth_t bind_t::methods[] = { LUA_DEF(remove_object), LUA_DEF(create_projectile),
-		LUA_DEF(players_in_room), meth_t(0, 0) };
+meth_t bind_t::methods[] = {
+		LUA_DEF(remove_object),
+		LUA_DEF(create_projectile),
+		LUA_DEF(players_in_room),
+		LUA_DEF(rand_range),
+		meth_t(0, 0) };
 
 GameState* lua_get_gamestate(lua_State* L) {
 	lua_getglobal(L, "world");

@@ -8,15 +8,9 @@
 
 #include <vector>
 #include <string>
+#include "../util/game_basic_structs.h"
 #include "../display/GLImage.h"
 
-
-struct Range {
-	int min, max;
-	Range(int min, int max) :
-		min(min), max(max){
-	}
-};
 struct TilesetEntry {
 	std::string name;
 	Range floor, wall, corridor, altfloor, altwall, altcorridor;

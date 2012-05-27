@@ -15,12 +15,13 @@
 using namespace std;
 
 ItemEntry parse_item_type(const YAML::Node& n){
-	std::string action = parse_defaulted(n, "action", std::string());
 	return ItemEntry(
 			parse_cstr(n["name"]),
 			parse_defaulted(n,"radius", 11),
 			parse_sprite_number(n, "sprite"),
-			action,
+			parse_defaulted(n, "action_func", std::string()),
+			parse_defaulted(n, "prereq_func", std::string()),
+			parse_defaulted(n, "stackable", 1),
 			-1
 		);
 }
@@ -34,6 +35,7 @@ LuaValue load_item_data(lua_State* L, const char* filename){
 			YAML::Parser parser(file);
 			YAML::Node root;
 
+			game_item_data.clear();
 
 			parser.GetNextDocument(root);
 			const YAML::Node& items = root["items"];

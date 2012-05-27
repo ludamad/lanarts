@@ -55,8 +55,8 @@ StatModifier parse_modifiers(const YAML::Node & n) {
 	return stat;
 }
 
-GenRange parse_range(const YAML::Node & n) {
-	GenRange gr;
+Range parse_range(const YAML::Node & n) {
+	Range gr;
 	if (n.Type() == YAML::NodeType::Sequence) {
 		std::vector<int> components;
 		n >> components;
@@ -110,5 +110,10 @@ Stats parse_stats(const YAML::Node & n, const std::vector<Attack> & attacks) {
 
 	}
 	return ret_stats;
+}
+
+const YAML::Node & operator >>(const YAML::Node & n, Range & r) {
+	r = parse_range(n);
+	return n;
 }
 

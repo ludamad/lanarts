@@ -1,99 +1,103 @@
 ---
 sprites:
-  - sprite: fighter
-    spritefile: res/player/fighter.png
+  - name: fighter
+    file: res/player/fighter.png
 
-  - sprite: wizard
-    spritefile: res/player/wizard.png
+  - name: wizard
+    file: res/player/wizard.png
     
-  - sprite: resting
-    spritefile: res/effects/resting.png
+  - name: resting
+    file: res/effects/resting.png
 
-  - sprite: storm ele
-    spritefile: res/monsters/storm_elemental.png
+  - name: storm ele
+    file: res/monsters/storm_elemental.png
 
-  - sprite: chicken
-    spritefile: res/monsters/chicken.png
+  - name: chicken
+    file: res/monsters/chicken.png
 
-  - sprite: exec
-    spritefile: res/monsters/exec.png
+  - name: exec
+    file: res/monsters/exec.png
 
-  - sprite: zombie
-    spritefile: res/monsters/zombie.png
+  - name: zombie
+    file: res/monsters/zombie.png
 
-  - sprite: ambrosia
-    spritefile: res/items/misc/ambrosia.png
+  - name: ambrosia
+    file: res/items/misc/ambrosia.png
 
-  - sprite: amulet
-    spritefile: res/items/misc/amulet.png
+  - name: amulet
+    file: res/items/misc/amulet.png
 
-  - sprite: fire bolt
-    spritefile: res/effects/bolt04.png
+  - name: fire bolt
+    file: res/effects/bolt04.png
 
-  - sprite: magic bolt
-    spritefile: res/effects/bolt05.png
+  - name: magic bolt
+    file: res/effects/bolt05.png
 
-  - sprite: storm bolt
-    spritefile: res/effects/bolt07.png
+  - name: storm bolt
+    file: res/effects/bolt07.png
 
-  - sprite: grue
-    spritefile: res/monsters/grue.png
+  - name: grue
+    file: res/monsters/grue.png
 
-  - sprite: jester
-    spritefile: res/monsters/jester.png
+  - name: jester
+    file: res/monsters/jester.png
 
-  - sprite: super_chicken
-    spritefile: res/monsters/superchicken.png
+  - name: super_chicken
+    file: res/monsters/superchicken.png
 
-  - sprite: skeleton
-    spritefile: res/monsters/skeleton.png
+  - name: skeleton
+    file: res/monsters/skeleton.png
 
-  - sprite: ciribot
-    spritefile: res/monsters/ciribo.png
+  - name: ciribot
+    file: res/monsters/ciribo.png
 
-  - sprite: hell_forged
-    spritefile: res/monsters/hellforged.png
+  - name: hell_forged
+    file: res/monsters/hellforged.png
 
-  - sprite: mana potion
-    spritefile: res/items/misc/brilliant_blue.png
+  - name: mana potion
+    file: res/items/misc/brilliant_blue.png
 
-  - sprite: magic blast
-    spritefile: res/effects/orb.png
+  - name: magic blast
+    file: res/effects/orb.png
 
-  - sprite: haste
-    spritefile: res/effects/haste.png
+  - name: haste
+    file: res/effects/haste.png
 
-  - sprite: poison
-    spritefile: res/effects/cloud_poison2.png
+  - name: poison
+    file: res/effects/cloud_poison2.png
 
-  - sprite: book
-    spritefile: res/items/misc/book.png
-  - sprite: gold
-    spritefile: res/items/misc/gold.png
+  - name: stone
+    file: res/effects/stone.png
 
-  - sprite: scroll
-    spritefile: res/items/misc/scroll.png
+  - name: book
+    file: res/items/misc/book.png
 
-  - sprite: scroll_strength
-    spritefile: res/items/scrolls/scroll_str.png
+  - name: gold
+    file: res/items/misc/gold.png
 
-  - sprite: scroll_defence
-    spritefile: res/items/scrolls/scroll_def.png
+  - name: scroll
+    file: res/items/misc/scroll.png
 
-  - sprite: scroll_magic
-    spritefile: res/items/scrolls/scroll_mag.png
+  - name: scroll_strength
+    file: res/items/scrolls/scroll_str.png
 
-  - sprite: health_potion
-    spritefile: res/items/misc/redpotion.png
+  - name: scroll_defence
+    file: res/items/scrolls/scroll_def.png
 
-  - sprite: dagger
-    spritefile: res/items/weapons/dagger.png
-  - sprite: short sword
-    spritefile: res/items/weapons/shortsword.png
-  - sprite: mace
-    spritefile: res/items/weapons/mace.png
-  - sprite: gloves
-    spritefile: res/items/weapons/gloves.png
+  - name: scroll_magic
+    file: res/items/scrolls/scroll_mag.png
 
-  - sprite: logo
-    spritefile: res/interface/lanarts_logo.png
+  - name: health_potion
+    file: res/items/misc/redpotion.png
+
+  - name: dagger
+    file: res/items/weapons/dagger.png
+  - name: short sword
+    file: res/items/weapons/shortsword.png
+  - name: mace
+    file: res/items/weapons/mace.png
+  - name: gloves
+    file: res/items/weapons/gloves.png
+
+  - name: logo
+    file: res/interface/lanarts_logo.png

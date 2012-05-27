@@ -17,7 +17,6 @@
 #include "../procedural/levelgen.h"
 
 void GameTiles::pre_draw(GameState* gs) {
-	return;
 	GameView& view = gs->window_view();
 	int min_tilex, min_tiley;
 	int max_tilex, max_tiley;

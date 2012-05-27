@@ -37,7 +37,7 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 		int etype = ec.enemytype;
 		int number = 1;
 		if (mt.rand(100) < ec.groupchance){
-			number = mt.rand(ec.groupmin, ec.groupmax+1);
+			number = mt.rand(ec.groupsize);
 			i += number-1;
 		}
 
