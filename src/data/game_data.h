@@ -18,7 +18,7 @@
 #include "enemy_data.h"
 #include "weapon_data.h"
 #include "../world/GameSettings.h"
-#include "../lua/LuaValue.h"
+#include "../util/LuaValue.h"
 
 struct lua_State;
 

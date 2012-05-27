@@ -7,7 +7,7 @@
 #ifndef FEATUREGEN_H_
 #define FEATUREGEN_H_
 
-#include "mtwist.h"
+#include "../util/mtwist.h"
 #include "GeneratedLevel.h"
 
 class GameState;

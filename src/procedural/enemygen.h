@@ -8,7 +8,7 @@
 #ifndef ENEMYGEN_H_
 #define ENEMYGEN_H_
 
-#include "mtwist.h"
+#include "../util/mtwist.h"
 #include "GeneratedLevel.h"
 #include <vector>
 #include "../util/game_basic_structs.h"

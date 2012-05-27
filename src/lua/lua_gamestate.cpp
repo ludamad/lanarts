@@ -1,12 +1,13 @@
+#include <lua/lunar.h>
+
 #include "lua_api.h"
 
-#include <lua/lunar.h>
-#include "../GameState.h"
-#include "../GameLevelState.h"
+#include "../world/GameState.h"
+#include "../world/GameLevelState.h"
 
-#include "../objects/EnemyInst.h"
-#include "../objects/PlayerInst.h"
-#include "../objects/ProjectileInst.h"
+#include "../world/objects/EnemyInst.h"
+#include "../world/objects/PlayerInst.h"
+#include "../world/objects/ProjectileInst.h"
 
 static Stats* get_stats(GameInst* inst) {
 	PlayerInst* p;

@@ -64,16 +64,12 @@ public:
 	int xpworth(){
 		return xpgain;
 	}
-	int& last_seen(){
-		return last_seen_counter;
-	}
 	bool hurt(GameState* gs, int hp);
 public:
 	float rx, ry;
 protected:
-	int last_seen_counter;
-	EnemyBehaviour eb;
 	int enemytype;
+	EnemyBehaviour eb;
 	int xpgain;
     Stats stat;
 };

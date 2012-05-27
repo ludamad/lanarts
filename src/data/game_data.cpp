@@ -12,7 +12,7 @@ extern "C" {
 #include <lua/lua.h>
 #include <lua/lauxlib.h>
 }
-#include "../world/lua/lua_api.h"
+#include "../lua/lua_api.h"
 
 std::vector<ClassType> game_class_data;
 std::vector<ItemEntry> game_item_data;
@@ -59,17 +59,17 @@ LuaValue sprites, enemies, weapons, items, dungeon, classes;
 void init_game_data(lua_State* L){
 
 //NB: Do not re-order the way resources are loaded unless you know what you're doing
-	load_tile_data("res/tiles.yaml");
-	sprites = load_sprite_data(L, "res/sprites.yaml");
-	load_tileset_data("res/tileset.yaml");
-	enemies = load_enemy_data(L, "res/enemies.yaml");
+	load_tile_data("res/data/tiles.yaml");
+	sprites = load_sprite_data(L, "res/data/sprites.yaml");
+	load_tileset_data("res/data/tileset.yaml");
+	enemies = load_enemy_data(L, "res/data/enemies.yaml");
 	//TODO: make separate weapons table
-	items = load_item_data(L, "res/items.yaml");
-	load_weapon_data(L, "res/weapons.yaml",  &items);
+	items = load_item_data(L, "res/data/items.yaml");
+	load_weapon_data(L, "res/data/weapons.yaml",  &items);
 	//TODO: remove lua_state arg
 	load_weapon_item_entries(L);
-	dungeon = load_dungeon_data(L, "res/levels.yaml");
-	classes = load_class_data(L, "res/classes.yaml");
+	dungeon = load_dungeon_data(L, "res/data/levels.yaml");
+	classes = load_class_data(L, "res/data/classes.yaml");
 }
 
 static void register_as_global(lua_State* L, LuaValue& value, const char* name){

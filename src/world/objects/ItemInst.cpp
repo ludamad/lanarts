@@ -7,6 +7,7 @@
 
 #include "ItemInst.h"
 #include "../GameState.h"
+#include "../../util/collision_util.h"
 #include "../../data/item_data.h"
 #include "../../data/sprite_data.h"
 #include <typeinfo>
@@ -15,6 +16,15 @@ ItemInst::~ItemInst() {
 }
 
 void ItemInst::step(GameState *gs) {
+	GameInst* other_item = NULL;
+	ItemEntry& item = game_item_data[type];
+	if (item.stackable && gs->solid_test(this, &other_item, 1, item_colfilter)){
+		ItemInst* item = (ItemInst*)other_item;
+		if (item->type == type && id < item->id){
+			gs->remove_instance(item);
+			quantity += item->quantity;
+		}
+	}
 }
 
 void ItemInst::draw(GameState *gs) {

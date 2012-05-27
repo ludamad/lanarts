@@ -361,7 +361,9 @@ void PlayerInst::perform_queued_actions(GameState *gs) {
 void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 // 	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
 	itemslot& item = inventory.inv[action.use_id];
-	gs->add_instance(new ItemInst(item.item, x, y, id));
+	int gx = x/TILE_SIZE, gy = y/TILE_SIZE;
+	int dropx = gx*TILE_SIZE + TILE_SIZE/2, dropy = gy*TILE_SIZE + TILE_SIZE/2;
+	gs->add_instance(new ItemInst(item.item, dropx, dropy, 1, id));
 	inventory.inv[action.use_id].n--;
 }
 

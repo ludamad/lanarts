@@ -8,7 +8,7 @@
 
 const int MAX_TUNNEL_WIDTH = 4;
 
-#include "mtwist.h"
+#include "../util/mtwist.h"
 #include "GeneratedLevel.h"
 
 struct TunnelGenSettings {

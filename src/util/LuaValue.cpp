@@ -8,7 +8,7 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-#include "../world/lua/lua_api.h"
+#include "../lua/lua_api.h"
 
 #include <yaml-cpp/yaml.h>
 

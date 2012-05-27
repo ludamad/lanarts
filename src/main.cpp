@@ -3,15 +3,19 @@
 #include <ctime>
 #include <SDL.h>
 #include <SDL_opengl.h>
-#include "display/display.h"
+
 #include "data/game_data.h"
+
+#include "display/display.h"
+
+#include "lua/lua_api.h"
+
 #include "world/GameState.h"
 #include "world/objects/ButtonInst.h"
 #include "world/objects/PlayerInst.h"
 #include "world/objects/EnemyInst.h"
 #include "world/objects/AnimatedInst.h"
 #include "world/objects/TestInst.h"
-#include "world/lua/lua_api.h"
 
 extern "C" {
 #include <lua/lua.h>

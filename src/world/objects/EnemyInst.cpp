@@ -1,4 +1,5 @@
 #include <cmath>
+#include <typeinfo>
 
 #include "EnemyInst.h"
 #include "AnimatedInst.h"
@@ -7,28 +8,25 @@
 
 #include "../GameState.h"
 
-#include "../../display/display.h"
-
 #include "../../data/sprite_data.h"
 #include "../../data/enemy_data.h"
 
+#include "../../display/display.h"
 
-#include "../../util/math_util.h"
 #include "../../util/collision_util.h"
+#include "../../util/math_util.h"
+#include "../../util/LuaValue.h"
 
-#include "../../lua/LuaValue.h"
-#include <typeinfo>
 
 //draw depth, also determines what order objects evaluate in
 static const int DEPTH = 50;
 
 EnemyInst::EnemyInst(int enemytype, int x, int y) :
 	GameInst(x,y, game_enemy_data[enemytype].radius, true, DEPTH),
+	rx(x), ry(y), enemytype(enemytype),
 	eb(game_enemy_data[enemytype].basestats.movespeed),
-	enemytype(enemytype), rx(x), ry(y),
 	xpgain(game_enemy_data[enemytype].xpaward),
 	stat(game_enemy_data[enemytype].basestats) {
-	last_seen_counter = 0;
 }
 
 EnemyInst::~EnemyInst() {

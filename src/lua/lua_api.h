@@ -5,7 +5,7 @@
 
 #ifndef LUA_API_H_
 #define LUA_API_H_
-#include "../../util/game_basic_structs.h"
+#include "../util/game_basic_structs.h"
 
 struct lua_State;
 struct GameState;

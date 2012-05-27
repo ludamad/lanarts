@@ -6,7 +6,7 @@
  */
 
 #include "tunnelgen.h"
-#include "mtwist.h"
+#include "../util/mtwist.h"
 #include <cassert>
 #include <vector>
 

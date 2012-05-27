@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include "../lua/LuaValue.h"
+#include "../util/LuaValue.h"
 
 //This never got to be used:
 //typedef bool (*spell_effectf)(GameState* state, const SpellData& spell, GameInst* caster);

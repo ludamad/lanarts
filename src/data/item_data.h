@@ -12,7 +12,7 @@
 #include <vector>
 #include <string>
 
-#include "../lua/LuaValue.h"
+#include "../util/LuaValue.h"
 
 struct ItemEntry {
 	const char* name;

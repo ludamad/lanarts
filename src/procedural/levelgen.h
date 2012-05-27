@@ -5,7 +5,7 @@
 #ifndef LEVELGEN_H_
 #define LEVELGEN_H_
 
-#include "mtwist.h"
+#include "../util/mtwist.h"
 #include "GeneratedLevel.h"
 #include "itemgen.h"
 #include "featuregen.h"

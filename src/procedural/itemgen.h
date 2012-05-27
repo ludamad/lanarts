@@ -6,7 +6,7 @@
 #ifndef ITEMGEN_H_
 #define ITEMGEN_H_
 
-#include "mtwist.h"
+#include "../util/mtwist.h"
 #include "GeneratedLevel.h"
 #include <vector>
 

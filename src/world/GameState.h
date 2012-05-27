@@ -17,7 +17,7 @@
 #include "GameHud.h"
 #include "GameWorld.h"
 #include "../display/font.h"
-#include "../procedural/mtwist.h"
+#include "../util/mtwist.h"
 #include "../fov/fov.h"
 #include "net/GameNetConnection.h"
 
