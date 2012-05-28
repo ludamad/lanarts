@@ -121,7 +121,6 @@ Pos gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
 			offset.x = std::max(len, offset.x);
 			gl_draw_image(&cdata.img, x + len - (cdata.advance - cdata.left),
 					y + offset.y - cdata.move_up, colour);
-
 		}
 		offset.y += 1;
 	}

@@ -76,29 +76,28 @@ static void draw_player_actionbar(GameState* gs, PlayerInst* player) {
 
 	int y = h - TILE_SIZE;
 
-	gl_draw_rectangle(0, y, TILE_SIZE * 21, TILE_SIZE);
-	Colour outline(43, 43, 43);
-	for (int ix = 0; ix <= 21; ix++) {
+//	gl_draw_rectangle(0, y, w, TILE_SIZE);
+	for (int x = 0; x < w; x += TILE_SIZE) {
+		Colour outline;
+		int ix = x / TILE_SIZE;
 		if (ix == player->spell_selected() + 1) {
 			outline = Colour(255, 0, 0);
 		} else {
 			outline = Colour(43, 43, 43);
 		}
-		gl_draw_rectangle((ix * TILE_SIZE), y, TILE_SIZE, TILE_SIZE, outline);
-		gl_draw_rectangle((ix * TILE_SIZE) + 1, 1 + y, TILE_SIZE - 2,
-				TILE_SIZE - 2);
-// 		if(player->inventory.inv[slot].n > 0){
-// 			ItemType& itemd = game_item_data[player->inventory.inv[slot].item];
-// 			image_display(&game_sprite_data[itemd.sprite_number].img,(ix*TILE_SIZE)+x+1,(iy*TILE_SIZE)+y);
-// 			gl_printf(gs->primary_font(), Colour(255,255,255), x+ix*TILE_SIZE, y+iy*TILE_SIZE, "%d", player->inventory.inv[slot].n);
-// 		}
+//		gl_draw_rectangle(x, y, TILE_SIZE, TILE_SIZE, outline);
+//		gl_draw_rectangle(x + 1, y + 1, TILE_SIZE - 2, TILE_SIZE - 2);
 	}
 	WeaponEntry* wtype = &game_weapon_data[player->weapon_type()];
-	gl_draw_image(&game_sprite_data[wtype->weapon_sprite].img, 1, y);
-	gl_draw_image(&game_sprite_data[get_sprite_by_name("fire bolt")].img,
-			TILE_SIZE + 1, y);
-	gl_draw_image(&game_sprite_data[get_sprite_by_name("magic blast")].img,
-			TILE_SIZE * 2 + 1, y);
+//	gl_draw_image(&game_sprite_data[wtype->weapon_sprite].img, 1, y);
+//	gl_draw_image(&game_sprite_data[get_sprite_by_name("fire bolt")].img,
+//			TILE_SIZE + 1, y);
+//	gl_draw_image(&game_sprite_data[get_sprite_by_name("magic blast")].img,
+//			TILE_SIZE * 2 + 1, y);
+//
+//	for (int i = 2; i < 22; i++)
+//	gl_draw_image(&game_sprite_data[get_sprite_by_name("magic blast")].img,
+//			TILE_SIZE * i + 1, y);
 }
 
 static void fill_buff2d(char* buff, int w, int h, int x, int y,

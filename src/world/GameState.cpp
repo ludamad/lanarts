@@ -147,6 +147,7 @@ int GameState::handle_event(SDL_Event *event) {
 	return (done);
 }
 bool GameState::update_iostate(bool resetprev) {
+	/*Reset everything to not-pressed and find out what is currently pressed*/
 	SDL_Event event;
 	if (resetprev) {
 		memset(key_press_states, 0, sizeof(key_press_states));
@@ -166,7 +167,8 @@ bool GameState::pre_step() {
 	return world.pre_step();
 }
 void GameState::step() {
-	world.step();
+	chat.step(this);
+	world.step();//Has pointer to this object
 }
 
 int GameState::key_down_state(int keyval) {
