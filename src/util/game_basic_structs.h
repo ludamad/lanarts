@@ -81,6 +81,7 @@ typedef int item_id;
 typedef int sprite_id;
 typedef int spell_id;
 typedef int tile_id;
+typedef int money_t;
 
 const int NONE = 0;
 

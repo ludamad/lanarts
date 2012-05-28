@@ -13,6 +13,7 @@
 #include "controllers/MonsterController.h"
 #include "controllers/PlayerController.h"
 #include "GameSettings.h"
+#include "GameChat.h"
 #include "GameView.h"
 #include "GameHud.h"
 #include "GameWorld.h"
@@ -173,6 +174,7 @@ private:
 	GameNetConnection connection;
 
 	//Game world components
+	GameChat chat;
 	GameHud hud;
 	GameView view;
 	GameWorld world;

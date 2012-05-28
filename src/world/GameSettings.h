@@ -11,7 +11,7 @@ struct GameSettings {
 	};
 
 	/*Multiplayer settings*/
-	std::string ip;
+	std::string ip, username;
 	int port;
 	connection_type conntype;
 

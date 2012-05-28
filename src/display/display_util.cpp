@@ -23,7 +23,8 @@ using namespace std;
 
 const float DEG2RAD = 3.14159 / 180;
 
-void gl_draw_circle(float x, float y, float radius, const Colour& clr, bool outline) {
+void gl_draw_circle(float x, float y, float radius, const Colour& clr,
+		bool outline) {
 	if (outline)
 		glBegin(GL_LINE_STRIP);
 	else
@@ -50,8 +51,7 @@ void gl_draw_rectangle(int x, int y, int w, int h, const Colour& clr) {
 	glEnd();
 }
 
-void gl_draw_statbar( int x, int y, int w, int h,
-		int minstat, int maxstat,
+void gl_draw_statbar(int x, int y, int w, int h, int minstat, int maxstat,
 		const Colour& front, const Colour& back) {
 	int hp_width = (w * minstat) / maxstat;
 	gl_draw_rectangle(x, y, w, h, back);
@@ -86,10 +86,10 @@ static void move_raster(int x, int y) {
 	glBitmap(0, 0, 0, 0, x, y, NULL);
 }
 
-
 ///Much like Nehe's glPrint function, but modified to work
 ///with freetype fonts.
-void gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
+/*returns width of formatted string*/
+Pos gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
 		const char *fmt, ...) {
 	//	float h=ft_font.h/.63f;						//We make the height about 1.5* that of
 	char text[512]; // Holds Our String
@@ -109,34 +109,37 @@ void gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
 	for (int i = 0; i < textlen; i++)
 		if (text[i] == '\n')
 			text[i] = '\0';
+	Pos offset(0, 0);
 	int len = 0;
-	y += ft_font.h;
 	for (char* iter = text; iter < text + textlen;
-			iter += strlen(iter) + 1, len = 0, y += ft_font.h + 1) {
+			iter += strlen(iter) + 1, len = 0) {
+		offset.y += ft_font.h;
 		for (int i = 0; iter[i]; i++) {
 			unsigned char chr = iter[i];
 			char_data &cdata = *ft_font.data[chr];
 			len += cdata.advance;
-			gl_draw_image(&cdata.img, x+len-(cdata.advance-cdata.left), y -cdata.move_up, colour);
+			offset.x = std::max(len, offset.x);
+			gl_draw_image(&cdata.img, x + len - (cdata.advance - cdata.left),
+					y + offset.y - cdata.move_up, colour);
 
 		}
+		offset.y += 1;
 	}
+	return offset;
 }
-
 
 void gl_draw_circle(const GameView& view, float x, float y, float radius,
-    const Colour& colour, bool outline){
-	gl_draw_circle(x-view.x,y-view.y,radius,colour, outline);
+		const Colour& colour, bool outline) {
+	gl_draw_circle(x - view.x, y - view.y, radius, colour, outline);
 }
 void gl_draw_rectangle(const GameView& view, int x, int y, int w, int h,
-    const Colour& colour) {
-	gl_draw_rectangle(x-view.x,y-view.y,w,h,colour);
+		const Colour& colour) {
+	gl_draw_rectangle(x - view.x, y - view.y, w, h, colour);
 }
 
 void gl_draw_statbar(const GameView& view, int x, int y, int w, int h,
-		int min_stat, int max_stat,
-		const Colour& front, const Colour& back){
-	gl_draw_statbar(x - view.x, y - view.y, w, h, min_stat, max_stat,  front, back);
+		int min_stat, int max_stat, const Colour& front, const Colour& back) {
+	gl_draw_statbar(x - view.x, y - view.y, w, h, min_stat, max_stat, front,
+			back);
 }
-
 

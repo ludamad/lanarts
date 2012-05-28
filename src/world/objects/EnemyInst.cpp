@@ -2,9 +2,9 @@
 #include <typeinfo>
 
 #include "EnemyInst.h"
-#include "AnimatedInst.h"
 #include "ProjectileInst.h"
 #include "PlayerInst.h"
+#include "../utility_objects/AnimatedInst.h"
 
 #include "../GameState.h"
 

@@ -1,9 +1,9 @@
 #include "PlayerInst.h"
 
-#include "AnimatedInst.h"
 #include "EnemyInst.h"
 #include "ItemInst.h"
 #include "ProjectileInst.h"
+#include "../utility_objects/AnimatedInst.h"
 
 #include "../GameState.h"
 

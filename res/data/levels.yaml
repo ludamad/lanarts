@@ -4,7 +4,24 @@
     
 branches:
   - branch: main_branch
-    levels:         
+    levels:
+      - size: [128,128]
+        items:
+          amount: 0
+        rooms:
+          padding: 0
+          amount: 1
+          size: [120,120]
+        tunnels:
+          padding: 2
+          width: [1,2]
+          per_room: 0      
+        features:
+          tileset: grass_tiles
+          stairs_up: 0
+          stairs_down: 5
+        enemies:
+          amount: 0
       #Level 0
       - size: [40,40]
         items:
@@ -39,7 +56,7 @@ branches:
           per_room: 5       
         features:
           tileset: pebble_tiles
-          stairs_up: 0
+          stairs_up: 5
           stairs_down: 5
         enemies:
           amount: 2
@@ -452,6 +469,7 @@ branches:
           width: [1, 3]
           per_room: 9   
         enemies:
+          amount: 30
           generated:
             - enemy: Super Chicken
               chance: 50
@@ -471,7 +489,6 @@ branches:
               chance: 100
             - enemy: Hell Forged
               chance: 50
-          amount: 30      
       #Bonus Round ??
       - size: [100,100]
         items:

@@ -27,7 +27,7 @@
 #include "../data/tile_data.h"
 #include "../data/dungeon_data.h"
 #include "../data/class_data.h"
-#include "lua/lua_api.h"
+#include "../lua/lua_api.h"
 
 extern "C" {
 #include <lua/lua.h>
@@ -229,8 +229,11 @@ void GameState::draw(bool drawhud) {
 	}
 	monster_controller().post_draw(this);
 	level()->tiles.post_draw(this);
-	if (drawhud)
+	if (drawhud){
 		hud.draw(this);
+		chat.draw(this);
+	}
+
 	update_display();
 	glFinish();
 }

@@ -2,6 +2,9 @@
 #Gameplay choices
 class: Mage
 
+#Online settings
+username: ludamad
+
 #Window settingss
 fullscreen: 0
 regen_level_on_death: 1

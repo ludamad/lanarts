@@ -88,4 +88,9 @@ tiles:
     file: res/tiles/nerves/floor_nerves
     variations: 7
     extension: .png
+
+  - name: grass
+    file: res/tiles/grass/grass
+    variations: 12
+    extension: .png
   

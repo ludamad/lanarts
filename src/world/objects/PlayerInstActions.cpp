@@ -5,14 +5,14 @@
  */
 
 #include "PlayerInst.h"
-#include "AnimatedInst.h"
 #include "EnemyInst.h"
 #include "ItemInst.h"
+#include "../utility_objects/AnimatedInst.h"
 
 #include "ProjectileInst.h"
 #include "../GameState.h"
 
-#include "../lua/lua_api.h"
+#include "../../lua/lua_api.h"
 extern "C" {
 #include <lua/lua.h>
 }

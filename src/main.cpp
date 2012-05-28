@@ -11,11 +11,13 @@
 #include "lua/lua_api.h"
 
 #include "world/GameState.h"
-#include "world/objects/ButtonInst.h"
+
 #include "world/objects/PlayerInst.h"
 #include "world/objects/EnemyInst.h"
-#include "world/objects/AnimatedInst.h"
 #include "world/objects/TestInst.h"
+
+#include "world/utility_objects/AnimatedInst.h"
+#include "world/utility_objects/ButtonInst.h"
 
 extern "C" {
 #include <lua/lua.h>
