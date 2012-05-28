@@ -3,15 +3,20 @@
 #include <ctime>
 #include <SDL.h>
 #include <SDL_opengl.h>
-#include "display/display.h"
+
 #include "data/game_data.h"
+
+#include "display/display.h"
+
+#include "lua/lua_api.h"
+
 #include "world/GameState.h"
-#include "world/objects/ButtonInst.h"
+
 #include "world/objects/PlayerInst.h"
 #include "world/objects/EnemyInst.h"
-#include "world/objects/AnimatedInst.h"
-#include "world/objects/TestInst.h"
-#include "world/lua/lua_api.h"
+
+#include "world/utility_objects/AnimatedInst.h"
+#include "world/utility_objects/ButtonInst.h"
 
 extern "C" {
 #include <lua/lua.h>
@@ -40,8 +45,7 @@ static void leave_menu(void* flag) {
 	*(bool*) flag = true;
 }
 
-static const char HELP_TEXT[] =
-		"Movement: WASD or Arrow Keys\n"
+static const char HELP_TEXT[] = "Movement: WASD or Arrow Keys\n"
 		"Use Attack or Attack Spell: j or left-click\n"
 		"Switch Auto-Target (for use with 'j'): k\n"
 		"Switch Attack Spell: space\n"
@@ -64,7 +68,9 @@ static void menu_loop(GameState* gs, int width, int height) {
 	gs->window_view().y = 0;
 
 	gs->add_instance(new AnimatedInst(halfw, 100, get_sprite_by_name("logo")));
-	gs->add_instance(new AnimatedInst(halfw - 100, 500, -1, -1,  0.0f,0.0f, HELP_TEXT, Colour(255,255,255)));
+	gs->add_instance(
+			new AnimatedInst(halfw - 100, 500, -1, -1, 0.0f, 0.0f, HELP_TEXT,
+					Colour(255, 255, 255)));
 	gs->add_instance(
 			new ButtonInst("START", BBox(halfw - 60, 400, halfw + 60, 430),
 					leave_menu, &exit));
@@ -95,7 +101,6 @@ static void game_loop(GameState* gs) {
 
 	const clock_t per_frame = settings.time_per_step * CLOCKS_PER_SEC / 1000;
 
-
 	gs->pre_step();
 	for (int i = 1; cont; i++) {
 
@@ -113,7 +118,7 @@ static void game_loop(GameState* gs) {
 		//Draw event
 
 		clock_t stepndraw_start = clock(), stepndraw_end;
-		bool draw_this_step = (settings.steps_per_draw == 1 || i%settings.steps_per_draw == 0);
+		bool draw_this_step = (i > 1 && i % settings.steps_per_draw == 0);
 		if (draw_this_step)
 			gs->draw();
 
@@ -121,32 +126,35 @@ static void game_loop(GameState* gs) {
 		draw_events++;
 		draw_time += draw_end - stepndraw_start;
 
-		if (!paused) {
-			int repeat_amount = 1;
-			if (gs->key_down_state(SDLK_F1))
-				repeat_amount = 4;
+		int repeat_amount = 1;
+		if (gs->key_down_state(SDLK_F1))
+			repeat_amount = 4;
 
-			for (int repeat = 0; repeat < repeat_amount; repeat++) {
-				//Step event
+		for (int repeat = 0; repeat < repeat_amount; repeat++) {
+			//Step event
 
-				clock_t step_start = clock();
+			clock_t step_start = clock();
+			if (!paused) {
 				gs->step();
-				stepndraw_end = clock();
-				step_events++;
-				int len = stepndraw_end - step_start;
-				step_time += len;
+			}
+			stepndraw_end = clock();
+			step_events++;
+			int len = stepndraw_end - step_start;
+			step_time += len;
 
-				bool is_done = (!paused && !gs->pre_step())
-						|| (paused && !gs->update_iostate());
-				if (is_done) {
-					cont = false;
-					break;
-				}
+			bool is_done = (!paused && !gs->pre_step())
+					|| (paused && !gs->update_iostate());
+			if (is_done) {
+				cont = false;
+				break;
 			}
 		}
 
-		clock_t thisdraw = draw_end - stepndraw_start, thisstep = stepndraw_end - draw_end;
-		clock_t time_to_wait = per_frame*settings.steps_per_draw - (thisdraw /settings.steps_per_draw  + thisstep*settings.steps_per_draw);
+		clock_t thisdraw = draw_end - stepndraw_start, thisstep = stepndraw_end
+				- draw_end;
+		clock_t time_to_wait = per_frame * settings.steps_per_draw
+				- (thisdraw / settings.steps_per_draw
+						+ thisstep * settings.steps_per_draw);
 		if (draw_this_step && time_to_wait > 0) {
 			int delayms = time_to_wait * 1000 / CLOCKS_PER_SEC;
 			if (delayms > 0)
@@ -154,8 +162,10 @@ static void game_loop(GameState* gs) {
 		}
 	}
 
-	printf("Step time: %f\n", float(step_time) * 1000 / CLOCKS_PER_SEC / step_events);
-	printf("Draw time: %f\n", float(draw_time) * 1000 / CLOCKS_PER_SEC / draw_events);
+	printf("Step time: %f\n",
+			float(step_time) * 1000 / CLOCKS_PER_SEC / step_events);
+	printf("Draw time: %f\n",
+			float(draw_time) * 1000 / CLOCKS_PER_SEC / draw_events);
 }
 
 int main(int argc, char** argv) {

@@ -37,7 +37,7 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 		int etype = ec.enemytype;
 		int number = 1;
 		if (mt.rand(100) < ec.groupchance){
-			number = mt.rand(ec.groupmin, ec.groupmax+1);
+			number = mt.rand(ec.groupsize);
 			i += number-1;
 		}
 
@@ -53,8 +53,8 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 					epos = generate_location(mt, level);
 			} while ( level.at(epos).near_entrance);
 			level.at(epos).has_instance = true;
-			int ex = (epos.x + start_x) * 32 + 16;
-			int ey = (epos.y + start_y) * 32 + 16;
+			int ex = (epos.x + start_x) * TILE_SIZE + TILE_SIZE/2;
+			int ey = (epos.y + start_y) * TILE_SIZE + TILE_SIZE/2;
 			gs->add_instance(new EnemyInst(etype, ex, ey));
 		}
 	}

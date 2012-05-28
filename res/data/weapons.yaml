@@ -37,3 +37,13 @@ weapons:
     cooldown: 55
     spr_weap: mace
     spr_attack: mace
+
+  - name: Short Bow
+    damage: [20, 22]
+    max_targets: 2
+    modifiers: 
+        strength: 1.7
+    range: 20
+    cooldown: 55
+    spr_weap: mace
+    spr_attack: mace

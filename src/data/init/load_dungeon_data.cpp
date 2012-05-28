@@ -17,11 +17,12 @@ FeatureGenSettings featuredefault(3, 3 /*3 stairs up, 3 stairs down*/,
 		1 /*Default tileset*/);
 
 ItemGenSettings parse_item_gen(const YAML::Node& n) {
-	GenRange amnt = parse_range(n["amount"]);
+	Range amnt = parse_range(n["amount"]);
 
 	vector<ItemGenChance> chances;
 	if (hasnode(n, "generated")) {
 		const YAML::Node& cnodes = n["generated"];
+		chances.reserve(cnodes.size());
 		for (int i = 0; i < cnodes.size(); i++) {
 			const YAML::Node& cn = cnodes[i];
 
@@ -30,15 +31,7 @@ ItemGenSettings parse_item_gen(const YAML::Node& n) {
 			cn["item"] >> itemname;
 			igc.itemtype = get_item_by_name(itemname.c_str());
 			cn["chance"] >> igc.genchance;
-			igc.groupchance = parse_defaulted(cn, "group_chance", 0);
-			if (igc.groupchance > 0) {
-				GenRange groupsize = parse_range(cn["group_size"]);
-				igc.groupmin = groupsize.min;
-				igc.groupmax = groupsize.max;
-			} else {
-				igc.groupmax = igc.groupmin = 0;
-			}
-
+			igc.quantity = parse_defaulted(cn, "quantity", Range(1,1));
 			chances.push_back(igc);
 		}
 	}
@@ -47,13 +40,13 @@ ItemGenSettings parse_item_gen(const YAML::Node& n) {
 RoomGenSettings parse_room_gen(const YAML::Node& n) {
 	int pad;
 	n["padding"] >> pad;
-	GenRange amount = parse_range(n["amount"]);
-	GenRange size = parse_range(n["size"]);
+	Range amount = parse_range(n["amount"]);
+	Range size = parse_range(n["size"]);
 	return RoomGenSettings(pad, amount.min, size.min, size.max);
 }
 TunnelGenSettings parse_tunnel_gen(const YAML::Node& n) {
-	GenRange width = parse_range(n["width"]);
-	GenRange per_room = parse_range(n["per_room"]);
+	Range width = parse_range(n["width"]);
+	Range per_room = parse_range(n["per_room"]);
 
 	return TunnelGenSettings(parse_defaulted(n, "padding", 1),
 			width.min, width.max,
@@ -73,7 +66,7 @@ FeatureGenSettings parse_feature_gen(const YAML::Node& n) {
 
 EnemyGenSettings parse_enemy_gen(const YAML::Node& supernode, const char* subnode) {
 	vector<EnemyGenChance> chances;
-	GenRange nmonsters;
+	Range nmonsters;
 	nmonsters.max = 0;
 	nmonsters.min = 0;
 
@@ -81,14 +74,14 @@ EnemyGenSettings parse_enemy_gen(const YAML::Node& supernode, const char* subnod
 		const YAML::Node& n = supernode[subnode];
 		nmonsters = parse_range(n["amount"]);
 		if (hasnode(n, "index")) {
-			GenRange index = parse_range(n["index"]);
+			Range index = parse_range(n["index"]);
 			int size = index.max - index.min + 1;
 			for (int i = 0; i < size; i++) {
 				EnemyGenChance egc;
 				egc.enemytype = i + index.min;
 				egc.genchance = 100 / size;
 				egc.groupchance = 0;
-				egc.groupmax = egc.groupmin = 1;
+				egc.groupsize = Range(0,0);
 				chances.push_back(egc);
 			}
 		} else if (hasnode(n, "generated")) {
@@ -100,23 +93,16 @@ EnemyGenSettings parse_enemy_gen(const YAML::Node& supernode, const char* subnod
 				egc.enemytype = parse_enemy_number(cn, "enemy");
 				cn["chance"] >> egc.genchance;
 				egc.groupchance = parse_defaulted(cn, "group_chance", 0);
-				if (egc.groupchance > 0) {
-					GenRange groupsize = parse_range(cn["group_size"]);
-					egc.groupmin = groupsize.min;
-					egc.groupmax = groupsize.max;
-				} else {
-					egc.groupmax = egc.groupmin = 0;
-				}
+				egc.groupsize = parse_defaulted(cn, "group_size", Range(0,0));
 
 				chances.push_back(egc);
 			}
 		}
 	}
-
 	return EnemyGenSettings(chances, nmonsters.min, nmonsters.max);
 }
 LevelGenSettings parse_level_gen(const YAML::Node& n) {
-	GenRange dim = parse_range(n["size"]);
+	Range dim = parse_range(n["size"]);
 	ItemGenSettings items = parse_item_gen(n["items"]);
 	RoomGenSettings rooms = parse_room_gen(n["rooms"]);
 	TunnelGenSettings tunnels = parse_tunnel_gen(n["tunnels"]);

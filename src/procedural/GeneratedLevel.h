@@ -7,7 +7,7 @@
 #define GENERATEDLEVEL_H_
 #include <cstring>
 #include <vector>
-#include "mtwist.h"
+#include "../util/mtwist.h"
 #include "../util/game_basic_structs.h"
 
 enum feature_t {

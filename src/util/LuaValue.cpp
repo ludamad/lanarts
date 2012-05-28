@@ -8,7 +8,7 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-#include "../world/lua/lua_api.h"
+#include "../lua/lua_api.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -217,9 +217,8 @@ LuaValue::~LuaValue() {
 }
 
 void LuaValue::initialize(lua_State* L) {
-	if (!impl)
-		impl = new LuaValueImpl();
-	impl->initialize(L);
+	if (impl)
+		impl->initialize(L);
 }
 
 void LuaValue::table_initialize(lua_State* L) {
@@ -234,10 +233,13 @@ void LuaValue::deinitialize(lua_State* L) {
 }
 
 void LuaValue::push(lua_State* L) {
-	impl->push(L);
+	if (!impl) lua_pushnil(L);
+	else impl->push(L);
 }
 
 void LuaValue::pop(lua_State* L) {
+	if (!impl)
+		impl = new LuaValueImpl();
 	impl->pop(L);
 }
 

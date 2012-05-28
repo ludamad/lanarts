@@ -12,6 +12,10 @@ tilesets:
     alt_floor_tile: floor2
     alt_corridor_tile: floor2  
 
+  - tileset: grass_tiles
+    floor_tile: [grass0, grass11]
+    wall_tile: [yellow_wall0, yellow_wall3]
+
   - tileset: sand_tiles
     floor_tile: [sand_rock0, sand_rock3]
     wall_tile: [yellow_wall0, yellow_wall3]

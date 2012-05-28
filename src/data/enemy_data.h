@@ -10,7 +10,7 @@
 #include <string>
 #include <cstdio>
 
-#include "../lua/LuaValue.h"
+#include "../util/LuaValue.h"
 #include "../gamestats/Stats.h"
 
 struct EnemyEntry {

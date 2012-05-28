@@ -41,7 +41,10 @@ void generate_items(const ItemGenSettings& is, MTwist& mt, GeneratedLevel& level
 			if (item_roll < 0)
 				break;
 		}
-		gs->add_instance(new ItemInst(item_type, ix,iy));
+		const ItemGenChance& igc = is.item_chances[itemn];
+		gs->add_instance(
+				new ItemInst(item_type, ix,iy,
+						mt.rand(igc.quantity.min, igc.quantity.max+1)));
 		level.at(ipos).has_instance = true;
 	}
 }

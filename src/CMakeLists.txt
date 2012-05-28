@@ -37,7 +37,11 @@ set( lanarts_src
 	gamestats/Ability.cpp
 	gamestats/Stats.cpp
 	
-	lua/LuaValue.cpp
+		
+	lua/lua_api.cpp
+	lua/lua_gameinst.cpp
+	lua/lua_gamestate.cpp
+	lua/lua_item.cpp
 	
 	pathfind/astar_pathfind.cpp
 	pathfind/pathfind.cpp
@@ -50,14 +54,15 @@ set( lanarts_src
 	procedural/GeneratedLevel.cpp
 	procedural/itemgen.cpp
 	procedural/levelgen.cpp
-	procedural/mtwist.cpp
 	procedural/tunnelgen.cpp
 	
 	util/collision_util.cpp
 	util/math_util.cpp
-	
+	util/mtwist.cpp
+	util/LuaValue.cpp
 
 	world/GameAction.cpp
+	world/GameChat.cpp
 	world/GameHud.cpp
 	world/GameInstSet.cpp
 	world/GameState.cpp
@@ -66,23 +71,18 @@ set( lanarts_src
 	world/GameView.cpp
 	world/GameWorld.cpp
 	
-	world/lua/lua_api.cpp
-	world/lua/lua_gameinst.cpp
-	world/lua/lua_gamestate.cpp
-	world/lua/lua_item.cpp
-	world/lua/lua_util.cpp
-	
 	world/controllers/MonsterController.cpp
 	world/controllers/PlayerController.cpp
 	
-	world/objects/AnimatedInst.cpp
-	world/objects/ButtonInst.cpp
+	world/utility_objects/AnimatedInst.cpp
+	world/utility_objects/ButtonInst.cpp
+	world/utility_objects/TestInst.cpp
+	
 	world/objects/PlayerInst.cpp
 	world/objects/PlayerInstActions.cpp
 	world/objects/EnemyInst.cpp
 	world/objects/ItemInst.cpp
 	world/objects/ProjectileInst.cpp
-	world/objects/TestInst.cpp
 
 	world/objects/GameInst.cpp
 	)
@@ -109,7 +109,7 @@ set( lanarts_include
 	fov/impl/permissive-fov.h
 	fov/impl/permissive-fov-cpp.h
 	
-	lua/LuaValue.h
+	lua/lua_api.h
 	
 	gamestats/Ability.h
 	gamestats/Effects.h
@@ -125,17 +125,18 @@ set( lanarts_include
 	procedural/GeneratedLevel.h
 	procedural/itemgen.h
 	procedural/levelgen.h
-	procedural/mtwist.h
 	procedural/tunnelgen.h
 	
 	util/collision_util.h
-	util/math_util.h
 	util/game_basic_structs.h
 	util/hashset_util.h
+	util/math_util.h
+	util/mtwist.h
 	
 	world/net/GameNetConnection.h
 
 	world/GameAction.h
+	world/GameChat.h
 	world/GameHud.h
 	world/GameInstSet.h
 	world/GameState.h
@@ -149,16 +150,15 @@ set( lanarts_include
 	world/controllers/PlayerController.h
 	
 	world/objects/GameInst.h
+
+
+	world/utility_objects/AnimatedInst.h
+	world/utility_objects/ButtonInst.h
+	world/utility_objects/TestInst.h
 	
-	world/objects/AnimatedInst.h
-	world/objects/ButtonInst.h
 	world/objects/PlayerInst.h
 	world/objects/EnemyInst.h
 	world/objects/ProjectileInst.h
-	world/objects/TestInst.h
-	
-	world/lua/lua_api.h
-	world/lua/lua_util.h
 )
 
 add_executable( lanarts

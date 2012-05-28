@@ -11,7 +11,7 @@
 #include "../../data/sprite_data.h"
 #include "../../util/collision_util.h"
 #include "../../util/math_util.h"
-#include "AnimatedInst.h"
+#include "../utility_objects/AnimatedInst.h"
 #include <typeinfo>
 
 static bool bullet_target_hit(GameInst* self, GameInst* other) {

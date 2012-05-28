@@ -12,8 +12,8 @@
 
 using namespace std;
 
-static GenRange parse_tile_range(const YAML::Node& n){
-	GenRange gr;
+static Range parse_tile_range(const YAML::Node& n){
+	Range gr;
 	if (n.Type() == YAML::NodeType::Sequence){
 		std::vector<std::string> components;
 		n >> components;
@@ -31,22 +31,22 @@ static GenRange parse_tile_range(const YAML::Node& n){
 static TilesetEntry parse_tilesetentry(const YAML::Node& node){
 	std::string name;
 	node["tileset"] >> name;
-	GenRange floor = parse_tile_range(node["floor_tile"]);
-	GenRange wall = parse_tile_range(node["wall_tile"]);
+	Range floor = parse_tile_range(node["floor_tile"]);
+	Range wall = parse_tile_range(node["wall_tile"]);
 
-	GenRange corridor = floor;
+	Range corridor = floor;
 	if (hasnode(node, "corridor_tile"))
 		corridor = parse_tile_range(node["corridor_tile"]);
 
-	GenRange altfloor = floor;
+	Range altfloor = floor;
 	if (hasnode(node, "alt_floor_tile"))
 		altfloor = parse_tile_range(node["alt_floor_tile"]);
 
-	GenRange altwall = wall;
+	Range altwall = wall;
 	if (hasnode(node, "alt_wall_tile"))
 		altwall = parse_tile_range(node["alt_wall_tile"]);
 
-	GenRange altcorridor = corridor;
+	Range altcorridor = corridor;
 	if (hasnode(node, "alt_corridor_tile"))
 		altcorridor = parse_tile_range(node["alt_corridor_tile"]);
 

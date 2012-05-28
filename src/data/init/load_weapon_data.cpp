@@ -23,7 +23,7 @@ void load_weapon_data(lua_State* L, const char* filename, LuaValue* itemtable) {
 			issolid = 0;
 			const YAML::Node& n = node[i];
 
-			GenRange damage = parse_range(n["damage"]);
+			Range damage = parse_range(n["damage"]);
 			WeaponEntry entry(parse_cstr(n["name"]),
 					parse_defaulted(n, "projectile", 0),
 					parse_defaulted(n, "max_targets", 1),
@@ -54,6 +54,6 @@ void load_weapon_item_entries(lua_State* L){
 	for (int i = 0; i < game_weapon_data.size(); i++){
 		WeaponEntry* wtype = &game_weapon_data[i];
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
-		game_item_data.push_back(ItemEntry(wtype->name, 11, wtype->weapon_sprite, "equip", i));
+		game_item_data.push_back(ItemEntry(wtype->name, 11, wtype->weapon_sprite, "equip", "", false, i));
 	}
 }

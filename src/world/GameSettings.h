@@ -11,13 +11,13 @@ struct GameSettings {
 	};
 
 	/*Multiplayer settings*/
-	std::string ip;
+	std::string ip, username;
 	int port;
 	connection_type conntype;
 
 	/*Draw settings*/
 	std::string font;
-	bool fullscreen;
+	bool fullscreen, draw_diagnostics;
 	int view_width, view_height;
 	int steps_per_draw;
 	float time_per_step;
@@ -41,6 +41,7 @@ struct GameSettings {
 
 		font = "res/MateSC-Regular.ttf";
 		invincible = false;
+		draw_diagnostics = false;
 
 		port = 0;
 		conntype = NONE;

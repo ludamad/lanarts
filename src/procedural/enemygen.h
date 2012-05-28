@@ -8,9 +8,10 @@
 #ifndef ENEMYGEN_H_
 #define ENEMYGEN_H_
 
-#include "mtwist.h"
+#include "../util/mtwist.h"
 #include "GeneratedLevel.h"
 #include <vector>
+#include "../util/game_basic_structs.h"
 
 class GameState;
 /*
@@ -27,7 +28,7 @@ struct EnemyGenChance {
 	int genchance;//Out of 100%
 	int enemytype;
 	int groupchance;//Out of 100%
-	int groupmin, groupmax;
+	Range groupsize;
 
 };
 struct EnemyGenSettings {

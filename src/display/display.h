@@ -52,7 +52,7 @@ void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 
 //Will print out text at window coordinates x,y, using the font ft_font.
 //The current modelview matrix will also be applied to the text.
-void gl_printf(const font_data &ft_font, const Colour& colour, float x, float y, const char *fmt, ...) ;
+Pos gl_printf(const font_data &ft_font, const Colour& colour, float x, float y, const char *fmt, ...) ;
 
 
 #endif /* DISPLAY_H_ */

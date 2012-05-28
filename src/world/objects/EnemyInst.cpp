@@ -1,34 +1,32 @@
 #include <cmath>
+#include <typeinfo>
 
 #include "EnemyInst.h"
-#include "AnimatedInst.h"
 #include "ProjectileInst.h"
 #include "PlayerInst.h"
+#include "../utility_objects/AnimatedInst.h"
 
 #include "../GameState.h"
-
-#include "../../display/display.h"
 
 #include "../../data/sprite_data.h"
 #include "../../data/enemy_data.h"
 
+#include "../../display/display.h"
 
-#include "../../util/math_util.h"
 #include "../../util/collision_util.h"
+#include "../../util/math_util.h"
+#include "../../util/LuaValue.h"
 
-#include "../../lua/LuaValue.h"
-#include <typeinfo>
 
 //draw depth, also determines what order objects evaluate in
 static const int DEPTH = 50;
 
 EnemyInst::EnemyInst(int enemytype, int x, int y) :
 	GameInst(x,y, game_enemy_data[enemytype].radius, true, DEPTH),
+	rx(x), ry(y), enemytype(enemytype),
 	eb(game_enemy_data[enemytype].basestats.movespeed),
-	enemytype(enemytype), rx(x), ry(y),
 	xpgain(game_enemy_data[enemytype].xpaward),
 	stat(game_enemy_data[enemytype].basestats) {
-	last_seen_counter = 0;
 }
 
 EnemyInst::~EnemyInst() {
@@ -68,8 +66,15 @@ void EnemyInst::step(GameState* gs) {
 	stats().step();
 }
 void EnemyInst::draw(GameState* gs) {
+
 	GameView& view = gs->window_view();
 	GLimage& img = game_sprite_data[etype()->sprite_number].img;
+
+	if (gs->game_settings().draw_diagnostics){
+		char statbuff[255];
+		snprintf(statbuff, 255, "vx=%f vy=%f\n act=%d, steps = %d\ncooldown = %d", eb.vx, eb.vy, eb.current_action, eb.path_steps, eb.path_cooldown);
+		gl_printf(gs->primary_font(), Colour(255,255,255), x- radius - view.x, y - 50 - view.y, statbuff );
+	}
 
 	int w = img.width, h = img.height;
 	int xx = x - w / 2, yy = y - h / 2;
@@ -137,6 +142,7 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged){
 			stats().cooldown += gs->rng().rand(-4,5);
 		}
 	}
+
 }
 
 

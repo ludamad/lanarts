@@ -24,3 +24,9 @@ end
 function hasten(item, obj)
 	obj:hasten(item.duration)
 end
+
+function stone(item, obj, tx, ty)
+	world:create_projectile(obj, tx, ty, sprites["stone"], 
+		item.speed, item.range, item.damage)
+	obj.cooldown = item.cooldown
+end

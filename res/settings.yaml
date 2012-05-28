@@ -1,14 +1,28 @@
+
+#Gameplay choices
+class: Mage
+
+#Online settings
+username: ludamad
+
+#Window settingss
 fullscreen: 0
 regen_level_on_death: 1
-view_width: 920
-view_height: 720
-class: Mage
+view_width: 900
+view_height: 700
+
+#Font settings
 font: res/MateSC-Regular.ttf
 
-#Either 'host', 'client', or 'none'
-connection_type: none
+#Network settings
+connection_type: none #Either 'host', 'client', or 'none'
 ip: 192.168.0.24
 port: 6112
+
+#Speed settings
 steps_per_draw: 1 #More is almost guaranteed to make the game faster, 1 is ideal
 time_per_step: 12
+
+#Debug settings
 invincible: 0 #Feel like exploring ? -> 1
+draw_diagnostics: 0

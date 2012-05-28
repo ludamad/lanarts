@@ -1,7 +1,7 @@
 #ifndef BUTTONINST_H_
 #define BUTTONINST_H_
 
-#include "GameInst.h"
+#include "../objects/GameInst.h"
 #include <string>
 
 typedef void (*callbackf)(void* data);

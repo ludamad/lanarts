@@ -12,7 +12,7 @@
 
 #include <cassert>
 #include "../../util/game_basic_structs.h"
-#include "../../lua/LuaValue.h"
+#include "../../util/LuaValue.h"
 
 struct lua_State;
 struct GameState;

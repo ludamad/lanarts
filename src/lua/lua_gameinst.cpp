@@ -1,13 +1,14 @@
-#include "lua_api.h"
 #include <cstring>
-
 #include <lua/lunar.h>
-#include "../GameState.h"
-#include "../objects/EnemyInst.h"
-#include "../objects/GameInst.h"
-#include "../objects/PlayerInst.h"
-#include "../../gamestats/Stats.h"
-#include "../../data/item_data.h"
+
+#include "lua_api.h"
+
+#include "../world/GameState.h"
+#include "../world/objects/EnemyInst.h"
+#include "../world/objects/GameInst.h"
+#include "../world/objects/PlayerInst.h"
+#include "../gamestats/Stats.h"
+#include "../data/item_data.h"
 
 
 
@@ -107,6 +108,7 @@ static int lua_member_lookup(lua_State* L){
 	else IFLUA_NUM_MEMB_LOOKUP("magic", stats->magic)
 	else IFLUA_NUM_MEMB_LOOKUP("strength", stats->strength)
 	else IFLUA_NUM_MEMB_LOOKUP("defence", stats->defence)
+	else IFLUA_NUM_MEMB_LOOKUP("cooldown", stats->cooldown)
 	else IFLUA_NUM_MEMB_LOOKUP("xp", stats->xp)
 	else IFLUA_NUM_MEMB_LOOKUP("xpneeded", stats->xpneeded)
 	else IFLUA_NUM_MEMB_LOOKUP("level", stats->xplevel)
@@ -147,6 +149,7 @@ static int lua_member_update(lua_State* L){
 	else IFLUA_NUM_MEMB_UPDATE("mp", stats->mp)
 	else IFLUA_NUM_MEMB_UPDATE("magic", stats->magic)
 	else IFLUA_NUM_MEMB_UPDATE("strength", stats->strength)
+	else IFLUA_NUM_MEMB_UPDATE("cooldown", stats->cooldown)
 	else IFLUA_NUM_MEMB_UPDATE("defence", stats->defence)
 	else IFLUA_NUM_MEMB_UPDATE("xp", stats->xp)
 	else IFLUA_NUM_MEMB_UPDATE("x", inst->x)

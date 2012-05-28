@@ -12,7 +12,7 @@
 #include "../util/hashset_util.h"
 #include "../util/math_util.h"
 
-#include "objects/AnimatedInst.h"
+#include "utility_objects/AnimatedInst.h"
 
 GameInst* const GAMEINST_TOMBSTONE = (GameInst*) 1;
 

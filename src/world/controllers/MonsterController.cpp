@@ -133,12 +133,12 @@ void MonsterController::monster_follow_path(GameState* gs, EnemyInst* e) {
 	float path_progress_threshold = eb.speed / 50.0f;
 	float progress = distance_between(eb.path_start, Pos(e->x, e->y));
 
-	if (eb.path_steps > PATH_CHECK_INTERVAL
-			&& progress / eb.path_steps < path_progress_threshold) {
-		eb.path.clear();
-		eb.current_action = EnemyBehaviour::INACTIVE;
-		return;
-	}
+//	if (eb.path_steps > PATH_CHECK_INTERVAL
+//			&& progress / eb.path_steps < path_progress_threshold) {
+//		eb.path.clear();
+//		eb.current_action = EnemyBehaviour::INACTIVE;
+//		return;
+//	}
 
 	if (eb.current_node < eb.path.size()) {
 		if (move_towards(e, eb.path[eb.current_node]))
@@ -161,7 +161,7 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	bool is_fullpath = true;
 	if (eb.path_cooldown > 0) {
 		eb.path_cooldown--;
-		is_fullpath = false;
+		is_fullpath = true;//false;
 	}
 	int ex = e->x / TILE_SIZE, ey = e->y / TILE_SIZE;
 
@@ -239,7 +239,7 @@ void MonsterController::shift_target(GameState* gs) {
 		if (e == NULL)
 			continue;
 
-		bool isvisible = gs->object_visible_test(e, player);
+		bool isvisible = gs->object_visible_test(e, player, false);
 		if (isvisible) {
 			targetted = e->id;
 			return;
@@ -260,7 +260,7 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 	int closest_player_index = -1;
 	for (int i = 0; i < pids.size(); i++) {
 		GameInst* player = gs->get_instance(pids[i]);
-		bool isvisible = gs->object_visible_test(e, player);
+		bool isvisible = gs->object_visible_test(e, player, false);
 		if (isvisible)
 			((PlayerInst*) player)->rest_cooldown() = 150;
 		view.sharp_center_on(player->x, player->y);
@@ -326,7 +326,7 @@ void MonsterController::pre_step(GameState* gs) {
 		EnemyBehaviour& eb = e->behaviour();
 		eb.step();
 
-		bool isvisibleToLocal = gs->object_visible_test(e, local_player);
+		bool isvisibleToLocal = gs->object_visible_test(e, local_player, false);
 		if (isvisibleToLocal && !targetted)
 			targetted = e->id;
 		if (!isvisibleToLocal && targetted == e->id)

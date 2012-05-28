@@ -7,7 +7,7 @@
 
 #ifndef PATHFIND_H_
 #define PATHFIND_H_
-#include "../procedural/mtwist.h"
+#include "../util/mtwist.h"
 #include "../util/game_basic_structs.h"
 #include <vector>
 

@@ -67,5 +67,6 @@ LuaValue load_class_data(lua_State* L, const char* filename){
 			printf("%s\n", parse.what());
 		}
 	}
+
 	return ret;
 }

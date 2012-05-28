@@ -5,7 +5,7 @@
 
 #ifndef ANIMATEDINST_H_
 #define ANIMATEDINST_H_
-#include "GameInst.h"
+#include "../objects/GameInst.h"
 #include <string>
 #include "../../display/display.h"
 
