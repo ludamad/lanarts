@@ -6,7 +6,7 @@
  */
 
 #include "Stats.h"
-#include "../procedural/mtwist.h"
+#include "../util/mtwist.h"
 #include "../data/class_data.h"
 #include "../data/weapon_data.h"
 

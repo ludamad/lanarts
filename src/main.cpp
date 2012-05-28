@@ -14,7 +14,6 @@
 
 #include "world/objects/PlayerInst.h"
 #include "world/objects/EnemyInst.h"
-#include "world/objects/TestInst.h"
 
 #include "world/utility_objects/AnimatedInst.h"
 #include "world/utility_objects/ButtonInst.h"

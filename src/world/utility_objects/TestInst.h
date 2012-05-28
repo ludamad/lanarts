@@ -8,7 +8,7 @@
 #ifndef TESTINST_H_
 #define TESTINST_H_
 
-#include "GameInst.h"
+#include "../objects/GameInst.h"
 #include "../../pathfind/astar_pathfind.h"
 
 class TestInst: public GameInst {
