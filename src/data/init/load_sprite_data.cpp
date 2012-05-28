@@ -30,31 +30,29 @@ void load_tile_data(const char* filename){
 		bool is_seq = seq > 0;
 		if (is_seq){
 			for (int i = 0; i < seq; i++){
-				char number[12];
+				char numbuff[12];
 				std::string tilefile;
 				n["spritefile"] >> tilefile;
-				snprintf(number, 12, "%d", i);
-				tilefile += number;
+				snprintf(numbuff, sizeof(numbuff), "%d", i);
+				tilefile += numbuff;
 				tilefile += parse_defaulted(n, "extension", std::string());
 
 //				printf("Parsing tile name '%s'\n", tilefile.c_str());
 
 				std::string tilename;
 				n["tile"] >> tilename;
-				tilename += number;
+				tilename += numbuff;
 
 				TileEntry entry(
 						tocstring(tilename),
-						tocstring(tilefile),
-						parse_defaulted(n, "solid", 0)
+						tocstring(tilefile)
 				);
 				game_tile_data.push_back(entry);
 			}
 		} else {
 			TileEntry entry(
 					parse_cstr(n["tile"]) ,
-					parse_cstr(n["spritefile"]),
-					parse_defaulted(n, "solid", 0)
+					parse_cstr(n["spritefile"])
 			);
 			game_tile_data.push_back(entry);
 		}

@@ -38,9 +38,7 @@ void AStarPathFind::initialize(GameState* gs){
 		nodes = new AStarNode[w*h];
 		for (int y = 0; y < h; y++){
 			for (int x = 0; x < w; x++){
-				int tilen = gs->tile_grid().get(x,y);
-				TileEntry& entry = game_tile_data[tilen];
-				nodes[y*w+x].solid = entry.solid;
+				nodes[y*w+x].solid = gs->tile_grid().is_solid(x,y);
 			}
 		}
 	}

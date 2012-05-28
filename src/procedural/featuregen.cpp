@@ -34,6 +34,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 	for (int y = start_y; y < end_y; y++) {
 		for (int x = start_x; x < end_x; x++) {
 			Sqr& s = level.at(x-start_x, y-start_y);
+			tiles.set_solid(x,y, !s.passable);
 			if (s.passable) {
 				tiles.get(x,y) = rtile(mt, tileset.floor);
 				if (s.roomID){

@@ -54,8 +54,6 @@ char_data::~char_data(){
     delete [] data;
 }
 
-
-
 void init_font(font_data* fd, const char * fname, unsigned int h) {
 	fd->h=h;
 

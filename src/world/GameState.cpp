@@ -294,7 +294,7 @@ bool GameState::tile_radius_test(int x, int y, int rad, bool issolid, int ttype,
 		for (int xx = minx; xx <= maxx; xx++) {
 			int tile = level()->tiles.get(xx, yy);
 			bool istype = (tile == ttype || ttype == -1);
-			bool solidmatch = (game_tile_data[tile].solid == issolid);
+			bool solidmatch = (level()->tiles.is_solid(xx, yy) == issolid);
 			if (solidmatch && istype) {
 				int offset = TILE_SIZE / 2; //To and from center
 				int cx = int(xx * TILE_SIZE) + offset;

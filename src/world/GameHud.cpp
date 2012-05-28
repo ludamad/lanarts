@@ -157,11 +157,11 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 		char* iter = minimap_arr + y * ptw * 4;
 		for (int x = 0; x < minimap_w; x++) {
 			int tile = tiles.get(x, y);
-			int seen = tiles.seen(x, y) || minimap_reveal;
+			int seen = tiles.is_seen(x, y) || minimap_reveal;
 			if (seen) {
 				if (tile == stdown || tile == stup){
 					iter[0] = 255, iter[1] = 0, iter[2] = 0, iter[3] = 255;
-				} else if (!game_tile_data[tile].solid) {/*floor*/
+				} else if (!tiles.is_solid(x, y)) {/*floor*/
 					iter[0] = 255, iter[1] = 255, iter[2] = 255, iter[3] = 255;
 				} else { //if (tile == 1){/*wall*/
 					iter[0] = 100, iter[1] = 100, iter[2] = 100, iter[3] = 255;
@@ -177,7 +177,7 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 			int ex = enemy->x/TILE_SIZE;
 			int ey = enemy->y/TILE_SIZE;
 			int loc = ey* ptw + ex;
-			if (!minimap_reveal && !tiles.seen(ex,ey)) continue;
+			if (!minimap_reveal && !tiles.is_seen(ex,ey)) continue;
 			if (!minimap_reveal && !gs->object_visible_test(enemy)) continue;
 			minimap_arr[loc * 4] = 0;
 			minimap_arr[loc * 4 + 1] = 0;

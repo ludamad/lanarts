@@ -130,10 +130,56 @@ void GameTiles::post_draw(GameState* gs) {
 }
 
 GameTiles::GameTiles(int width, int height) :
-		width(width), height(height) {
+		width(width), height(height), solid_tiles(width*height, false) {
 	seen_tiles = new char[width * height];
 	tiles = new int[width * height];
 	memset(tiles, 0, width * height * sizeof(int));
 	memset(seen_tiles, 0, width * height);
 }
+
+GameTiles::~GameTiles(){
+    delete [] tiles;
+    delete [] seen_tiles;
+}
+
+int GameTiles::tile_width() {
+	return width;
+}
+
+int GameTiles::tile_height() {
+	return height;
+}
+
+int& GameTiles::get(int x, int y) {
+	return tiles[y * width + x];
+}
+
+int* GameTiles::tile_array() {
+	return tiles;
+}
+
+bool GameTiles::is_seen(int x, int y) {
+	return seen_tiles[y * width + x];
+}
+
+void GameTiles::set_solid(int x, int y, bool solid){
+	solid_tiles[y * width + x] = solid;
+}
+
+bool GameTiles::is_solid(int x, int y){
+	return solid_tiles[y * width + x];
+}
+
+void GameTiles::clear(){
+    memset(seen_tiles, 0, width * height);
+    memset(tiles, 0, sizeof (int) * width * height);
+}
+
+void GameTiles::copy_to(GameTiles & t) const{
+    t.width = width, t.height = height;
+    memcpy(t.seen_tiles, seen_tiles, width * height);
+    memcpy(t.tiles, tiles, sizeof (int) * width * height);
+    t.solid_tiles = solid_tiles;
+}
+
 

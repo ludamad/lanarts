@@ -176,7 +176,7 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 				targy = mt.rand(tile.tile_height());
 
 			}
-		} while (game_tile_data[tile.get(targx, targy)].solid);
+		} while (tile.is_solid(targx, targy));
 		eb.current_node = 0;
 		eb.path = astarcontext.calculate_AStar_path(gs, ex, ey, targx, targy);
 		if (is_fullpath)

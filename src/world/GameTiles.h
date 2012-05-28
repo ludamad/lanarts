@@ -8,43 +8,44 @@
 #define GAMETILES_H_
 
 #include <cstring>
+#include <vector>
 #include "../util/game_basic_structs.h"
 
 class GameState;
 
 class GameTiles {
 public:
-	int& get(int x, int y){ return tiles[y*width+x]; }
-	int* tile_array(){return tiles; }
-	bool seen(int x, int y){ return seen_tiles[y*width+x]; }
-	//NOTE: unused for time being, remove in later version
-	void draw(GameState* gs);
-	//Called before object drawing
-	void pre_draw(GameState* gs);
-	//Called after object drawing
-	void post_draw(GameState* gs);
 	GameTiles(int width, int height);
-	~GameTiles(){
-		delete[] tiles;
-		delete[] seen_tiles;
-	}
-    void step(GameState* gs);
-	int tile_width(){ return width; }
-	int tile_height(){ return height; }
-	void clear (){
-		memset(seen_tiles, 0, width*height);
-		memset(tiles, 0, sizeof(int)*width*height);
-	}
-	void copy_to(GameTiles& t) const {
-		t.width = width, t.height = height;
-		memcpy(t.seen_tiles, seen_tiles, width*height);
-		memcpy(t.tiles, tiles, sizeof(int)*width*height);
-	}
+	~GameTiles();
+
+	void step(GameState *gs);
+
+	void pre_draw(GameState *gs);
+	void post_draw(GameState *gs);
+
+	int tile_width();
+	int tile_height();
+
+	int* tile_array();
+
+	int& get(int x, int y);
+
+	void set_solid(int x, int y, bool solid);
+
+	bool is_seen(int x, int y);
+	bool is_solid(int x, int y);
+
+
+	void clear();
+	void copy_to(GameTiles& t) const;
 private:
 	char* seen_tiles;
 	int* tiles;
+	std::vector<bool> solid_tiles;
 	int width, height;
 };
+
+
 
 
 
