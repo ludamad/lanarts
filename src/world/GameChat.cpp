@@ -11,7 +11,18 @@
 #include "../display/display.h"
 
 void GameChat::add_message(const ChatMessage& cm) {
-	messages.push_back(cm);
+	bool dupe = false;
+
+	if (!messages.empty()) {
+		if (messages.back() == cm) {
+			messages.back().exact_copies++;
+			dupe = true;
+		}
+	}
+
+	if (!dupe)
+		messages.push_back(cm);
+
 	fade_out = 1.0f;
 	fade_out_rate = 0.0025f;
 }
@@ -20,11 +31,20 @@ void GameChat::add_message(const std::string& msg, const Colour& colour) {
 	add_message(ChatMessage("", msg, Colour(), colour));
 }
 
+static void print_dupe_string(const ChatMessage& cm, const font_data& font,
+		const Pos& location) {
+	if (cm.exact_copies > 1)
+		gl_printf(font, Colour(0, 191, 255), location.x, location.y, " x%d",
+				cm.exact_copies);
+}
+
 void GameChat::draw_player_chat(GameState* gs) {
+	char dupebuff[32];
+
 	int w = gs->window_view().width, h = gs->window_view().height;
 	int chat_w = w, chat_h = 100;
 	int chat_x = 0, chat_y = 0; //h - chat_h - TILE_SIZE;
-	int textx = chat_x + 10, text_y = chat_y + 10;
+	int textx = chat_x + 5, text_y = chat_y + 5;
 
 	int alpha_channel = 255 * fade_out;
 
@@ -34,23 +54,28 @@ void GameChat::draw_player_chat(GameState* gs) {
 			Colour(180, 180, 255, 50 * fade_out));
 	const font_data& font = gs->primary_font();
 	int start_msg = 0;
-	int msgs_in_screen = chat_h / (font.h + 1);
+	int msgs_in_screen = (chat_h - 20) / (font.h + 1);
 	if (messages.size() > msgs_in_screen - 2) {
 		start_msg = messages.size() - msgs_in_screen - 2;
 //		text_y += int(start_msg * (font.h + 1)) % chat_h;
 	}
 
 	for (int i = start_msg; i < messages.size(); i++) {
+		int tx = textx;
 		ChatMessage& cm = messages[i];
 		Colour sender_colour = cm.sender_colour, message_colour =
 				cm.message_colour;
 		sender_colour.a = alpha_channel, message_colour.a = alpha_channel;
 		Pos offset(0, 0);
-		if (!cm.sender.empty())
-			offset = gl_printf(font, sender_colour, textx, text_y, "%s: ",
+		if (!cm.sender.empty()) {
+			offset = gl_printf(font, sender_colour, tx, text_y, "%s: %s",
 					cm.sender.c_str());
-		offset = gl_printf(font, message_colour, textx + offset.x, text_y,
+			tx += offset.x;
+		}
+		offset = gl_printf(font, message_colour, tx, text_y,
 				cm.message.c_str());
+		tx += offset.x;
+		print_dupe_string(cm, font, Pos(tx, text_y));
 		text_y += offset.y;
 
 	}

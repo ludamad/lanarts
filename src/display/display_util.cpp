@@ -145,7 +145,7 @@ void gl_draw_rectangle_outline(int x, int y, int w, int h, const Colour& clr,
 	glVertex2i(x2, y);
 	glVertex2i(x2, y2);
 	glVertex2i(x, y2);
-	glVertex2i(x, y);
+	glVertex2i(x, y-1);
 
 	glEnd();
 

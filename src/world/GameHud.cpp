@@ -48,26 +48,30 @@ static void draw_player_inventory(GameState* gs, PlayerInst* player, int inv_x,
 
 	int chat_w = (w - inv_x + 1) - TILE_SIZE, chat_h = (h - inv_y) - TILE_SIZE;
 
-
-	for (int iy = 0; iy < chat_h; iy += TILE_SIZE) {
-		for (int ix = 0; ix < chat_w; ix += TILE_SIZE) {
-			int slot = 5 * iy + ix;
+	int slot = 0;
+	for (int y = 0; y < chat_h; y += TILE_SIZE) {
+		for (int x = 0; x < chat_w; x += TILE_SIZE) {
 			if (slot >= INVENTORY_SIZE)
 				return;
 
-			gl_draw_rectangle((ix * TILE_SIZE) + inv_x, (iy * TILE_SIZE) + inv_y,
-					TILE_SIZE, TILE_SIZE, Colour(43, 43, 43));
-			gl_draw_rectangle((ix * TILE_SIZE) + 1 + inv_x,
-					(iy * TILE_SIZE) + 1 + inv_y, TILE_SIZE - 2, TILE_SIZE - 2,
-					Colour(0, 0, 0));
+			Colour outline(43, 43, 43);
+			Pos p(inv_x + x, inv_y + y);
+
+			if (inv.inv[slot].n > 0)
+				outline = Colour(250, 250, 210);
+
+			gl_draw_rectangle_outline(x + inv_x, y + inv_y, TILE_SIZE,
+					TILE_SIZE, outline);
+
 			if (inv.inv[slot].n > 0) {
 				ItemEntry& itemd = game_item_data[inv.inv[slot].item];
 				GLimage* itemimg = &game_sprite_data[itemd.sprite_number].img;
-				Pos p(inv_x + ix * TILE_SIZE, inv_y + iy * TILE_SIZE);
-				gl_draw_image(itemimg, p.x + 1, p.y);
+				gl_draw_image(itemimg, p.x, p.y);
 				gl_printf(gs->primary_font(), Colour(255, 255, 255), p.x, p.y,
 						"%d", inv.inv[slot].n);
 			}
+
+			slot++;
 		}
 	}
 }
@@ -92,11 +96,11 @@ static void draw_player_actionbar(GameState* gs, PlayerInst* player) {
 		gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE, outline, 1);
 	}
 	WeaponEntry* wtype = &game_weapon_data[player->weapon_type()];
-	gl_draw_image(&game_sprite_data[wtype->weapon_sprite].img, 1, y);
+	gl_draw_image(&game_sprite_data[wtype->weapon_sprite].img, 0, y);
 	gl_draw_image(&game_sprite_data[get_sprite_by_name("fire bolt")].img,
-			TILE_SIZE + 1, y);
+			TILE_SIZE, y);
 	gl_draw_image(&game_sprite_data[get_sprite_by_name("magic blast")].img,
-			TILE_SIZE * 2 + 1, y);
+			TILE_SIZE * 2, y);
 }
 
 static void fill_buff2d(char* buff, int w, int h, int x, int y,
@@ -179,12 +183,14 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 	const std::vector<int>& enemy_ids = gs->monster_controller().monster_ids();
 	for (int i = 0; i < enemy_ids.size(); i++) {
 		GameInst* enemy = gs->get_instance(enemy_ids[i]);
-		if (enemy){
-			int ex = enemy->x/TILE_SIZE;
-			int ey = enemy->y/TILE_SIZE;
-			int loc = ey* ptw + ex;
-			if (!minimap_reveal && !tiles.is_seen(ex,ey)) continue;
-			if (!minimap_reveal && !gs->object_visible_test(enemy)) continue;
+		if (enemy) {
+			int ex = enemy->x / TILE_SIZE;
+			int ey = enemy->y / TILE_SIZE;
+			int loc = ey * ptw + ex;
+			if (!minimap_reveal && !tiles.is_seen(ex, ey))
+				continue;
+			if (!minimap_reveal && !gs->object_visible_test(enemy))
+				continue;
 
 			minimap_arr[loc * 4] = 0;
 			minimap_arr[loc * 4 + 1] = 0;

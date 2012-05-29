@@ -72,7 +72,7 @@ static void show_appear_message(GameChat& chat, EnemyEntry* e){
 	const char* a_or_an = starts_with_vowel(e->name) ? "An" : "a";
 
 	snprintf(buff, 100, "%s %s appears!", a_or_an, e->name);
-	chat.add_message(buff, Colour(255, 69, 0));
+	chat.add_message(buff, Colour(255, 248, 220));
 
 }
 void EnemyInst::draw(GameState* gs) {

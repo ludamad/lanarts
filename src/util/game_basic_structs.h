@@ -11,16 +11,20 @@ struct Colour {
 	Colour(int r = 255, int g = 255, int b = 255, int a = 255) :
 			r(r), g(g), b(b), a(a) {
 	}
+	bool operator==(const Colour& col) const {
+		return r == col.r && g == col.g && b == col.b && a == col.a;
+	}
 };
 
 /*Represents a range*/
 struct Range {
 	int min, max;
-	Range(){}
-	Range(int min, int max) :
-		min(min), max(max){
+	Range() {
 	}
-	Range(const Range& r){
+	Range(int min, int max) :
+			min(min), max(max) {
+	}
+	Range(const Range& r) {
 		min = r.min, max = r.max;
 	}
 };

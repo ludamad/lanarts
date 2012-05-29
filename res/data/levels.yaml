@@ -7,7 +7,27 @@ branches:
     levels:
       - size: [128,128]
         items:
-          amount: 0
+          amount: 200
+          generated:
+            - item: Stone
+              chance: 25
+              quantity: [1,3]
+            - item: Gold
+              chance: 75
+            - item: Haste Scroll
+              chance: 25
+            - item: Health Potion
+              chance: 25
+            - item: Mana Potion
+              chance: 25
+            - item: Dagger
+              chance: 25
+            - item: Strength Scroll
+              chance: 5
+            - item: Magic Scroll
+              chance: 5
+            - item: Defence Scroll
+              chance: 5
         rooms:
           padding: 0
           amount: 1
