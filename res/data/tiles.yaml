@@ -2,11 +2,9 @@
 tiles:
   - name: blue_wall
     file: res/tiles/darkrock_wall.bmp
-    solid: 1
  
   - name: stone_wall
     file: res/tiles/stone_wall.bmp
-    solid: 1
  
   - name: blue_floor
     file: res/tiles/room_floor.bmp
@@ -42,13 +40,11 @@ tiles:
  
   - name: brickdark
     file: res/tiles/brickdark/brick_dark
-    solid: 1
     variations: 7
     extension: .png
 
   - name: brick_gray
     file: res/tiles/brickgray/brick_gray
-    solid: 1
     variations: 4
     extension: .png
 
@@ -65,13 +61,11 @@ tiles:
   - name: yellow_wall
     file: res/tiles/wallyellow/wall_yellow_rock
     variations: 4
-    solid: 1
     extension: .png
 
   - name: crystal_wall
     file: res/tiles/crystal/crystal_wall
     variations: 14
-    solid: 1
     extension: .png
 
   - name: sand_rock

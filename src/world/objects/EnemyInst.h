@@ -68,6 +68,7 @@ public:
 public:
 	float rx, ry;
 protected:
+	bool seen;
 	int enemytype;
 	EnemyBehaviour eb;
 	int xpgain;

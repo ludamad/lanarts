@@ -71,9 +71,12 @@ public:
 		return view;
 	}
 
-	GameTiles & tile_grid();
-	GameWorld & game_world() {
+	GameTiles& tile_grid();
+	GameWorld& game_world() {
 		return world;
+	}
+	GameChat& game_chat() {
+		return chat;
 	}
 
 	MonsterController & monster_controller();

@@ -85,19 +85,14 @@ static void draw_player_actionbar(GameState* gs, PlayerInst* player) {
 		} else {
 			outline = Colour(43, 43, 43);
 		}
-//		gl_draw_rectangle(x, y, TILE_SIZE, TILE_SIZE, outline);
-//		gl_draw_rectangle(x + 1, y + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+		gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE, outline, 1);
 	}
 	WeaponEntry* wtype = &game_weapon_data[player->weapon_type()];
-//	gl_draw_image(&game_sprite_data[wtype->weapon_sprite].img, 1, y);
-//	gl_draw_image(&game_sprite_data[get_sprite_by_name("fire bolt")].img,
-//			TILE_SIZE + 1, y);
-//	gl_draw_image(&game_sprite_data[get_sprite_by_name("magic blast")].img,
-//			TILE_SIZE * 2 + 1, y);
-//
-//	for (int i = 2; i < 22; i++)
-//	gl_draw_image(&game_sprite_data[get_sprite_by_name("magic blast")].img,
-//			TILE_SIZE * i + 1, y);
+	gl_draw_image(&game_sprite_data[wtype->weapon_sprite].img, 1, y);
+	gl_draw_image(&game_sprite_data[get_sprite_by_name("fire bolt")].img,
+			TILE_SIZE + 1, y);
+	gl_draw_image(&game_sprite_data[get_sprite_by_name("magic blast")].img,
+			TILE_SIZE * 2 + 1, y);
 }
 
 static void fill_buff2d(char* buff, int w, int h, int x, int y,

@@ -40,9 +40,9 @@ void gl_draw_circle(float x, float y, float radius, const Colour& clr,
 void gl_draw_rectangle(int x, int y, int w, int h, const Colour& clr) {
 	int x2 = x + w, y2 = y + h;
 
-	glBegin(GL_QUADS);
 	glColor4ub(clr.r, clr.g, clr.b, clr.a);
 	//Draw our four points, clockwise.
+	glBegin(GL_QUADS);
 	glVertex2i(x, y);
 	glVertex2i(x2, y);
 	glVertex2i(x2, y2);
@@ -77,13 +77,6 @@ void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 		}
 	}
 	glEnd();
-}
-
-///So while glRasterPos won't let us set the raster position using
-///window coordinates, these hacky functions will let us move the current raster
-///position a given delta x or y.
-static void move_raster(int x, int y) {
-	glBitmap(0, 0, 0, 0, x, y, NULL);
 }
 
 ///Much like Nehe's glPrint function, but modified to work
@@ -134,6 +127,30 @@ void gl_draw_circle(const GameView& view, float x, float y, float radius,
 void gl_draw_rectangle(const GameView& view, int x, int y, int w, int h,
 		const Colour& colour) {
 	gl_draw_rectangle(x - view.x, y - view.y, w, h, colour);
+}
+
+void gl_draw_rectangle_outline(int x, int y, int w, int h, const Colour& clr,
+		int linewidth) {
+	int x2 = x + w - linewidth, y2 = y + h - linewidth;
+
+	if (linewidth != 1)
+		glLineWidth(linewidth);
+
+	glColor4ub(clr.r, clr.g, clr.b, clr.a);
+	//Draw our four points, clockwise.
+
+	glBegin(GL_LINE_STRIP);
+
+	glVertex2i(x, y);
+	glVertex2i(x2, y);
+	glVertex2i(x2, y2);
+	glVertex2i(x, y2);
+	glVertex2i(x, y);
+
+	glEnd();
+
+	if (linewidth != 1)
+		glLineWidth(1);
 }
 
 void gl_draw_statbar(const GameView& view, int x, int y, int w, int h,

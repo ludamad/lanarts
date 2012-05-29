@@ -25,7 +25,7 @@ branches:
       #Level 0
       - size: [40,40]
         items:
-          amount: 50
+          amount: 2
           generated:
             - item: Stone
               chance: 25
