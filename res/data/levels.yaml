@@ -7,7 +7,7 @@ branches:
     levels:
       - size: [128,128]
         items:
-          amount: 200
+          amount: 5
           generated:
             - item: Stone
               chance: 25
@@ -31,7 +31,7 @@ branches:
         rooms:
           padding: 0
           amount: 1
-          size: [120,120]
+          size: [40,40]
         tunnels:
           padding: 2
           width: [1,2]
@@ -39,7 +39,7 @@ branches:
         features:
           tileset: grass_tiles
           stairs_up: 0
-          stairs_down: 5
+          stairs_down: 8
         enemies:
           amount: 0
       #Level 0
@@ -76,7 +76,7 @@ branches:
           per_room: 5       
         features:
           tileset: pebble_tiles
-          stairs_up: 5
+          stairs_up: 8
           stairs_down: 5
         enemies:
           amount: 2

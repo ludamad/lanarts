@@ -36,12 +36,12 @@ void GameView::move_towards(int px, int py) {
 	}
 }
 
-void GameView::min_tile_within(int & px, int & py) const {
+void GameView::min_tile_within(int& px, int& py) const {
 	px = x / TILE_SIZE;
 	py = y / TILE_SIZE;
 }
 
-void GameView::max_tile_within(int & px, int & py) const {
+void GameView::max_tile_within(int& px, int& py) const {
 	px = (x + width) / TILE_SIZE;
 	py = (y + height) / TILE_SIZE;
 }

@@ -32,9 +32,9 @@ void GameChat::add_message(const std::string& msg, const Colour& colour) {
 }
 
 static void print_dupe_string(const ChatMessage& cm, const font_data& font,
-		const Pos& location) {
+		const Pos& location, float alpha) {
 	if (cm.exact_copies > 1)
-		gl_printf(font, Colour(0, 191, 255), location.x, location.y, " x%d",
+		gl_printf(font, Colour(0, 191, 255, alpha*255), location.x, location.y, " x%d",
 				cm.exact_copies);
 }
 
@@ -54,9 +54,9 @@ void GameChat::draw_player_chat(GameState* gs) {
 			Colour(180, 180, 255, 50 * fade_out));
 	const font_data& font = gs->primary_font();
 	int start_msg = 0;
-	int msgs_in_screen = (chat_h - 20) / (font.h + 1);
-	if (messages.size() > msgs_in_screen - 2) {
-		start_msg = messages.size() - msgs_in_screen - 2;
+	int msgs_in_screen = (chat_h - 10) / (font.h + 1);
+	if (messages.size() > msgs_in_screen) {
+		start_msg = messages.size() - msgs_in_screen;
 //		text_y += int(start_msg * (font.h + 1)) % chat_h;
 	}
 
@@ -75,7 +75,7 @@ void GameChat::draw_player_chat(GameState* gs) {
 		offset = gl_printf(font, message_colour, tx, text_y,
 				cm.message.c_str());
 		tx += offset.x;
-		print_dupe_string(cm, font, Pos(tx, text_y));
+		print_dupe_string(cm, font, Pos(tx, text_y), fade_out);
 		text_y += offset.y;
 
 	}
@@ -105,5 +105,11 @@ GameChat::GameChat() {
 //			ChatMessage("ludamad", "What's up!?\nGo eff off",
 //					Colour(37, 207, 240)));
 //	messages.push_back(ChatMessage("ciribot", "nm u", Colour(255, 69, 0)));
+
+//	char buff[40];
+//	for (int i = 0; i < 14; i++){
+//		snprintf(buff, 40, "Message %d\n", i);
+//		this->add_message(buff);
+//	}
 }
 
