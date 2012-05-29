@@ -42,24 +42,28 @@ static void draw_player_stats(GameState*gs, PlayerInst* player, int x, int y) {
 			s.xp, s.xpneeded);
 }
 
-static void draw_player_inventory(GameState* gs, PlayerInst* player, int x,
-		int y, int w, int h) {
+static void draw_player_inventory(GameState* gs, PlayerInst* player, int inv_x,
+		int inv_y, int w, int h) {
 	Inventory& inv = player->get_inventory();
 
-	for (int iy = 0; (iy * TILE_SIZE + TILE_SIZE) < (h - y); iy++) {
-		for (int ix = 0; (ix * TILE_SIZE + TILE_SIZE) < (w - x + 1); ix++) {
+	int chat_w = (w - inv_x + 1) - TILE_SIZE, chat_h = (h - inv_y) - TILE_SIZE;
+
+
+	for (int iy = 0; iy < chat_h; iy += TILE_SIZE) {
+		for (int ix = 0; ix < chat_w; ix += TILE_SIZE) {
 			int slot = 5 * iy + ix;
 			if (slot >= INVENTORY_SIZE)
 				return;
-			gl_draw_rectangle((ix * TILE_SIZE) + x, (iy * TILE_SIZE) + y,
+
+			gl_draw_rectangle((ix * TILE_SIZE) + inv_x, (iy * TILE_SIZE) + inv_y,
 					TILE_SIZE, TILE_SIZE, Colour(43, 43, 43));
-			gl_draw_rectangle((ix * TILE_SIZE) + 1 + x,
-					(iy * TILE_SIZE) + 1 + y, TILE_SIZE - 2, TILE_SIZE - 2,
+			gl_draw_rectangle((ix * TILE_SIZE) + 1 + inv_x,
+					(iy * TILE_SIZE) + 1 + inv_y, TILE_SIZE - 2, TILE_SIZE - 2,
 					Colour(0, 0, 0));
 			if (inv.inv[slot].n > 0) {
 				ItemEntry& itemd = game_item_data[inv.inv[slot].item];
 				GLimage* itemimg = &game_sprite_data[itemd.sprite_number].img;
-				Pos p(x + ix * TILE_SIZE, y + iy * TILE_SIZE);
+				Pos p(inv_x + ix * TILE_SIZE, inv_y + iy * TILE_SIZE);
 				gl_draw_image(itemimg, p.x + 1, p.y);
 				gl_printf(gs->primary_font(), Colour(255, 255, 255), p.x, p.y,
 						"%d", inv.inv[slot].n);
