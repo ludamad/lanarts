@@ -131,7 +131,7 @@ void gl_draw_rectangle(const GameView& view, int x, int y, int w, int h,
 
 void gl_draw_rectangle_outline(int x, int y, int w, int h, const Colour& clr,
 		int linewidth) {
-	int x2 = x + w - linewidth, y2 = y + h - linewidth;
+	int x2 = x + w, y2 = y + h;
 
 	if (linewidth != 1)
 		glLineWidth(linewidth);
@@ -141,11 +141,11 @@ void gl_draw_rectangle_outline(int x, int y, int w, int h, const Colour& clr,
 
 	glBegin(GL_LINE_STRIP);
 
-	glVertex2i(x, y);
-	glVertex2i(x2, y);
+	glVertex2i(x+linewidth, y+linewidth);
+	glVertex2i(x2, y+linewidth);
 	glVertex2i(x2, y2);
-	glVertex2i(x, y2);
-	glVertex2i(x, y-1);
+	glVertex2i(x+linewidth, y2);
+	glVertex2i(x+linewidth, y);
 
 	glEnd();
 

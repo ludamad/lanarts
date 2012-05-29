@@ -225,7 +225,7 @@ void GameHud::draw(GameState* gs) {
 	draw_minimap(gs, minimap_bbox().translated(-x, -y));
 	if (player_inst) {
 		draw_player_stats(gs, player_inst, 32, 32);
-		draw_player_inventory(gs, player_inst, 1, INVENTORY_POSITION, _width,
+		draw_player_inventory(gs, player_inst, 0, INVENTORY_POSITION, _width,
 				_height);
 	} else {
 		return;
