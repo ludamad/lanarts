@@ -56,7 +56,7 @@ void GameChat::add_message(const std::string& msg, const Colour& colour) {
 }
 
 bool GameChat::is_typing_message() {
-	return typing_message;
+	return is_typing;
 }
 
 void GameChat::draw_player_chat(GameState* gs) const {
@@ -74,7 +74,7 @@ void GameChat::draw_player_chat(GameState* gs) const {
 	gl_draw_rectangle(chat_x, chat_y, chat_w, chat_h,
 			Colour(180, 180, 255, 50 * fade_out));
 
-	bool draw_typed_message = typing_message || !current_message.empty();
+	bool draw_typed_message = is_typing || !typed_message.empty();
 
 	int start_msg = 0;
 	int message_space = chat_h - padding * 2
@@ -91,7 +91,9 @@ void GameChat::draw_player_chat(GameState* gs) const {
 
 	if (draw_typed_message) {
 		int type_y = chat_y + chat_h - padding - line_sep;
-		current_message.draw(font, fade_out, text_x, type_y);
+		gl_draw_line(chat_x, type_y, chat_x + chat_w, type_y,
+				Colour(200, 200, 200, fade_out * 180));
+		typed_message.draw(font, fade_out, text_x, type_y + padding - 1);
 	}
 }
 
@@ -111,11 +113,11 @@ void GameChat::draw(GameState *gs) const {
 }
 
 GameChat::GameChat() :
-		current_message("", "This is My Message") {
+		typed_message("", "This is My Message") {
 	show_chat = false;
 	fade_out = 0.0f;
 	fade_out_rate = 0.05f;
-	typing_message = false;
+	is_typing = true;
 //	messages.push_back(
 //			ChatMessage("ludamad", "What's up!?\nGo eff off",
 //					Colour(37, 207, 240)));

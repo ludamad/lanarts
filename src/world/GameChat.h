@@ -49,12 +49,12 @@ public:
 
 	GameChat();
 private:
-	ChatMessage current_message;
+	ChatMessage typed_message;
 
 	void draw_player_chat(GameState* gs) const;
 
 	std::vector<ChatMessage> messages;
-	bool show_chat, typing_message;
+	bool show_chat, is_typing;
 	float fade_out, fade_out_rate;
 };
 
