@@ -5,6 +5,7 @@
  *      Author: 100397561
  */
 
+#include <SDL.h>
 #include "GameChat.h"
 #include "GameState.h"
 
@@ -112,12 +113,37 @@ void GameChat::draw(GameState *gs) const {
 		draw_player_chat(gs);
 }
 
+static bool is_typeable_keycode(int keycode){
+	return (keycode >= SDLK_SPACE && keycode <= SDLK_z);
+}
+/*Returns whether has handled event or not*/
+bool GameChat::handle_event(SDL_Event *event) {
+	switch (event->type) {
+	case SDL_KEYDOWN: {
+		if (is_typing) {
+			int keycode = event->key.keysym.sym;
+			std::string& msg = typed_message.message;
+			if (is_typeable_keycode(keycode)){
+				msg += (char)keycode;
+				return true;
+			}
+			if (keycode == SDLK_BACKSPACE) {
+				if (!msg.empty())
+					msg.resize(msg.size() - 1);
+				return true;
+			}
+		}
+		break;
+	}
+	}
+	return false;
+}
 GameChat::GameChat() :
 		typed_message("", "This is My Message") {
-	show_chat = false;
-	fade_out = 0.0f;
+	show_chat = true;
+	fade_out = 1.0f;
 	fade_out_rate = 0.05f;
-	is_typing = true;
+	is_typing = false;
 //	messages.push_back(
 //			ChatMessage("ludamad", "What's up!?\nGo eff off",
 //					Colour(37, 207, 240)));

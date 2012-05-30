@@ -159,11 +159,10 @@ void gl_draw_line(int x1, int y1, int x2, int y2, const Colour& clr,
 	if (linewidth != 1)
 		glLineWidth(linewidth);
 
+	glBegin(GL_LINES);
 	glColor4ub(clr.r, clr.g, clr.b, clr.a);
 
-	glBegin(GL_LINE);
-
-	glVertex2i(x1 + linewidth, y1 + linewidth);
+	glVertex2i(x1, y1);
 	glVertex2i(x2, y2);
 
 	glEnd();

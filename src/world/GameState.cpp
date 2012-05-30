@@ -99,9 +99,10 @@ GameState::~GameState() {
 
 /*Handle new characters and exit signals*/
 int GameState::handle_event(SDL_Event *event) {
-	int done;
+	int done = 0;
 
-	done = 0;
+	if (chat.handle_event(event))
+		return done;
 
 	switch (event->type) {
 	case SDL_ACTIVEEVENT:

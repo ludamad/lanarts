@@ -8,6 +8,7 @@
 #ifndef GAMECHAT_H_
 #define GAMECHAT_H_
 
+#include <SDL.h>
 #include <string>
 #include <vector>
 #include "../util/game_basic_structs.h"
@@ -46,10 +47,13 @@ public:
 			const Colour& colour = Colour(255, 255, 255));
 
 	bool is_typing_message();
+	/*Returns whether has handled event or not*/
+	bool handle_event(SDL_Event *event);
 
 	GameChat();
 private:
 	ChatMessage typed_message;
+
 
 	void draw_player_chat(GameState* gs) const;
 
