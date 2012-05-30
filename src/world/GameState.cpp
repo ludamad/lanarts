@@ -34,12 +34,12 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-GameState::GameState(const GameSettings& settings, lua_State* L, int width, int height,
-		int vieww, int viewh, int hudw) :
+GameState::GameState(const GameSettings& settings, lua_State* L, int width,
+		int height, int vieww, int viewh, int hudw) :
 		settings(settings), L(L), world_width(width), world_height(height), frame_n(
-				0), hud(vieww, 0, hudw, viewh), view(0, 0, vieww, viewh, width,
-				height), world(this, width, height), mouse_leftdown(0), mouse_rightdown(
-				0), mouse_leftclick(0), mouse_rightclick(0) {
+				0), chat(settings.username), hud(vieww, 0, hudw, viewh), view(0,
+				0, vieww, viewh, width, height), world(this, width, height), mouse_leftdown(
+				0), mouse_rightdown(0), mouse_leftclick(0), mouse_rightclick(0) {
 	memset(key_down_states, 0, sizeof(key_down_states));
 	init_font(&pfont, settings.font.c_str(), 10);
 	init_font(&menufont, settings.font.c_str(), 20);
@@ -169,7 +169,7 @@ bool GameState::pre_step() {
 }
 void GameState::step() {
 	chat.step(this);
-	world.step();//Has pointer to this object
+	world.step(); //Has pointer to this object
 }
 
 int GameState::key_down_state(int keyval) {
@@ -179,7 +179,7 @@ int GameState::key_press_state(int keyval) {
 	return key_press_states[keyval];
 }
 
-void GameState::handle_dragging(){
+void GameState::handle_dragging() {
 	/*Adjust the view if the player is far from view center,
 	 *if we are following the cursor, or if the minimap is clicked */
 	bool is_dragged = false;
@@ -190,23 +190,24 @@ void GameState::handle_dragging(){
 			view.center_on(nx, ny);
 		is_dragged = true;
 	} else {
-		if (mouse_right_down()){
+		if (mouse_right_down()) {
 			BBox minimap_bbox = hud.minimap_bbox();
-			int mx = mouse_x() - minimap_bbox.x1, my = mouse_y() - minimap_bbox.y1;
+			int mx = mouse_x() - minimap_bbox.x1, my = mouse_y()
+					- minimap_bbox.y1;
 			int mw = minimap_bbox.width(), mh = minimap_bbox.height();
 
-			bool outofx = ( mx < 0 || mx >= mw);
-			bool outofy = ( my < 0 || my >= mh);
+			bool outofx = (mx < 0 || mx >= mw);
+			bool outofy = (my < 0 || my >= mh);
 
-			if ( dragging_view || (!outofx && !outofy)){
-				view.sharp_center_on(mx*width()/mw, my*height()/mh);
+			if (dragging_view || (!outofx && !outofy)) {
+				view.sharp_center_on(mx * width() / mw, my * height() / mh);
 				is_dragged = true;
 			}
 		}
 	}
 
 	/*If we were previously dragging, now snap back to the player position*/
-	if (!is_dragged && dragging_view){
+	if (!is_dragged && dragging_view) {
 		GameInst* p = get_instance(local_playerid());
 		view.sharp_center_on(p->x, p->y);
 	}
@@ -232,7 +233,7 @@ void GameState::draw(bool drawhud) {
 	}
 	monster_controller().post_draw(this);
 	level()->tiles.post_draw(this);
-	if (drawhud){
+	if (drawhud) {
 		hud.draw(this);
 		chat.draw(this);
 	}
@@ -333,7 +334,8 @@ int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 	return level()->inst_set.object_radius_test(obj, objs, obj_cap, f, x, y,
 			radius);
 }
-bool GameState::object_visible_test(GameInst* obj, GameInst* player, bool canreveal ) {
+bool GameState::object_visible_test(GameInst* obj, GameInst* player,
+		bool canreveal) {
 	const int sub_sqrs = VISION_SUBSQRS;
 	const int subsize = TILE_SIZE / sub_sqrs;
 

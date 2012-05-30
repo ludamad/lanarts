@@ -50,11 +50,12 @@ public:
 	/*Returns whether has handled event or not*/
 	bool handle_event(SDL_Event *event);
 
-	GameChat();
+	GameChat(const std::string& local_sender);
 private:
+	std::string local_sender;
 	ChatMessage typed_message;
 
-
+	void reset_typed_message();
 	void draw_player_chat(GameState* gs) const;
 
 	std::vector<ChatMessage> messages;

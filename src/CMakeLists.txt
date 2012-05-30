@@ -157,6 +157,7 @@ set( lanarts_include
 	world/utility_objects/TestInst.h
 	
 	world/objects/PlayerInst.h
+	world/objects/EnemyBehaviour.h
 	world/objects/EnemyInst.h
 	world/objects/ProjectileInst.h
 )

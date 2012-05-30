@@ -23,7 +23,7 @@ void ChatMessage::draw(const font_data& font, float alpha, int x, int y) const {
 	sendcol.a *= alpha, msgcol.a *= alpha;
 	Pos offset(0, 0);
 	if (!sender.empty()) {
-		offset = gl_printf(font, sendcol, x, y, "%s: %s", sender.c_str());
+		offset = gl_printf(font, sendcol, x, y, "%s: ", sender.c_str());
 		x += offset.x;
 	}
 	offset = gl_printf(font, msgcol, x, y, message.c_str());
@@ -63,7 +63,7 @@ bool GameChat::is_typing_message() {
 void GameChat::draw_player_chat(GameState* gs) const {
 	const font_data& font = gs->primary_font();
 	const int padding = 5;
-	int line_sep = font.h + 1;
+	int line_sep = font.h + 2;
 
 	int view_w = gs->window_view().width, view_h = gs->window_view().height;
 	int chat_w = view_w, chat_h = 100;
@@ -113,23 +113,44 @@ void GameChat::draw(GameState *gs) const {
 		draw_player_chat(gs);
 }
 
-static bool is_typeable_keycode(int keycode){
+static bool should_capitalize(SDLMod keymod) {
+	bool hitcaps = (keymod & KMOD_CAPS);
+	bool hitshift = (keymod & (KMOD_LSHIFT | KMOD_RSHIFT));
+	return hitcaps != hitshift;
+}
+static bool is_typeable_keycode(SDLKey keycode) {
 	return (keycode >= SDLK_SPACE && keycode <= SDLK_z);
 }
 /*Returns whether has handled event or not*/
 bool GameChat::handle_event(SDL_Event *event) {
+	SDLKey keycode = event->key.keysym.sym;
+	SDLMod keymod = event->key.keysym.mod;
 	switch (event->type) {
 	case SDL_KEYDOWN: {
 		if (is_typing) {
-			int keycode = event->key.keysym.sym;
 			std::string& msg = typed_message.message;
-			if (is_typeable_keycode(keycode)){
-				msg += (char)keycode;
+			if (is_typeable_keycode(keycode)) {
+				char chr = keycode;
+				if (isalpha(chr) && should_capitalize(keymod)) {
+					chr = toupper(chr);
+				}
+				msg += chr;
 				return true;
 			}
 			if (keycode == SDLK_BACKSPACE) {
 				if (!msg.empty())
 					msg.resize(msg.size() - 1);
+				return true;
+			}
+			if (keycode == SDLK_RETURN) {
+				add_message(typed_message);
+				reset_typed_message();
+				is_typing = false;
+				return true;
+			}
+		} else {
+			if (keycode == SDLK_RETURN) {
+				is_typing = true;
 				return true;
 			}
 		}
@@ -138,8 +159,13 @@ bool GameChat::handle_event(SDL_Event *event) {
 	}
 	return false;
 }
-GameChat::GameChat() :
-		typed_message("", "This is My Message") {
+void GameChat::reset_typed_message(){
+	typed_message.sender = local_sender;
+	typed_message.message.clear();
+}
+GameChat::GameChat(const std::string& local_sender) :
+		local_sender(local_sender), typed_message(std::string(), std::string()) {
+	reset_typed_message();
 	show_chat = true;
 	fade_out = 1.0f;
 	fade_out_rate = 0.05f;
