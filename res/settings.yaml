@@ -12,7 +12,7 @@ view_width: 928
 view_height: 700
 
 #Font settings
-font: res/MateSC-Regular.ttf
+font: res/fonts/Gudea-Regular.ttf
 
 #Network settings
 connection_type: none #Either 'host', 'client', or 'none'

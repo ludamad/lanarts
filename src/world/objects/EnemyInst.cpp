@@ -69,7 +69,7 @@ static bool starts_with_vowel(const char* name){
 }
 static void show_appear_message(GameChat& chat, EnemyEntry* e){
 	char buff[100];
-	const char* a_or_an = starts_with_vowel(e->name) ? "An" : "a";
+	const char* a_or_an = starts_with_vowel(e->name) ? "An" : "A";
 
 	snprintf(buff, 100, "%s %s appears!", a_or_an, e->name);
 	chat.add_message(buff, Colour(255, 248, 220));

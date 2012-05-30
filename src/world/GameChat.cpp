@@ -143,7 +143,11 @@ bool GameChat::handle_event(SDL_Event *event) {
 				return true;
 			}
 			if (keycode == SDLK_RETURN) {
-				add_message(typed_message);
+				if (!typed_message.message.empty()) {
+					typed_message.sender = local_sender;
+					typed_message.sender_colour = Colour(37, 207, 240);
+					add_message(typed_message);
+				}
 				reset_typed_message();
 				is_typing = false;
 				return true;
@@ -159,8 +163,8 @@ bool GameChat::handle_event(SDL_Event *event) {
 	}
 	return false;
 }
-void GameChat::reset_typed_message(){
-	typed_message.sender = local_sender;
+void GameChat::reset_typed_message() {
+	typed_message.sender.clear();
 	typed_message.message.clear();
 }
 GameChat::GameChat(const std::string& local_sender) :
