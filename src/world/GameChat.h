@@ -13,6 +13,7 @@
 #include "../util/game_basic_structs.h"
 
 struct GameState;
+struct font_data;
 
 /*Represents a coloured message in chat*/
 struct ChatMessage {
@@ -31,23 +32,29 @@ struct ChatMessage {
 				&& sender_colour == cm.sender_colour
 				&& message_colour == cm.message_colour;
 	}
+	void draw(const font_data& font, float alpha, int x, int y) const;
+	bool empty() const;
 };
 
 class GameChat {
 public:
 	void step(GameState* gs);
-	void draw(GameState* gs);
+	void draw(GameState* gs) const;
 
 	void add_message(const ChatMessage& cm);
 	void add_message(const std::string& msg,
 			const Colour& colour = Colour(255, 255, 255));
+
+	bool is_typing_message();
+
 	GameChat();
 private:
+	ChatMessage current_message;
 
-	void draw_player_chat(GameState* gs);
+	void draw_player_chat(GameState* gs) const;
 
 	std::vector<ChatMessage> messages;
-	bool show_chat;
+	bool show_chat, typing_message;
 	float fade_out, fade_out_rate;
 };
 
