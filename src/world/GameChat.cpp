@@ -138,8 +138,12 @@ bool GameChat::handle_event(SDL_Event *event) {
 				return true;
 			}
 			if (keycode == SDLK_BACKSPACE) {
-				if (!msg.empty())
+				if (msg.empty()) {
+					reset_typed_message();
+					is_typing = false;
+				} else {
 					msg.resize(msg.size() - 1);
+				}
 				return true;
 			}
 			if (keycode == SDLK_RETURN) {
@@ -148,6 +152,15 @@ bool GameChat::handle_event(SDL_Event *event) {
 					typed_message.sender_colour = Colour(37, 207, 240);
 					add_message(typed_message);
 				}
+				reset_typed_message();
+				is_typing = false;
+				return true;
+			}
+			if (keycode == SDLK_LCTRL || keycode == SDLK_RCTRL) {
+				is_typing = false;
+				return true;
+			}
+			if (keycode == SDLK_DELETE) {
 				reset_typed_message();
 				is_typing = false;
 				return true;
