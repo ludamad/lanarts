@@ -141,11 +141,30 @@ void gl_draw_rectangle_outline(int x, int y, int w, int h, const Colour& clr,
 
 	glBegin(GL_LINE_STRIP);
 
-	glVertex2i(x+linewidth, y+linewidth);
-	glVertex2i(x2, y+linewidth);
+	glVertex2i(x + linewidth, y + linewidth);
+	glVertex2i(x2, y + linewidth);
 	glVertex2i(x2, y2);
-	glVertex2i(x+linewidth, y2);
-	glVertex2i(x+linewidth, y);
+	glVertex2i(x + linewidth, y2);
+	glVertex2i(x + linewidth, y);
+
+	glEnd();
+
+	if (linewidth != 1)
+		glLineWidth(1);
+}
+
+void gl_draw_line(int x1, int y1, int x2, int y2, const Colour& clr,
+		int linewidth) {
+
+	if (linewidth != 1)
+		glLineWidth(linewidth);
+
+	glColor4ub(clr.r, clr.g, clr.b, clr.a);
+
+	glBegin(GL_LINE);
+
+	glVertex2i(x1 + linewidth, y1 + linewidth);
+	glVertex2i(x2, y2);
 
 	glEnd();
 

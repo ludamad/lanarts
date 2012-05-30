@@ -10,6 +10,30 @@
 
 #include "../display/display.h"
 
+static void print_dupe_string(const ChatMessage& cm, const font_data& font,
+		const Pos& location, float alpha) {
+	if (cm.exact_copies > 1)
+		gl_printf(font, Colour(0, 191, 255, alpha * 255), location.x,
+				location.y, " x%d", cm.exact_copies);
+}
+
+void ChatMessage::draw(const font_data& font, float alpha, int x, int y) const {
+	Colour sendcol = sender_colour, msgcol = message_colour;
+	sendcol.a *= alpha, msgcol.a *= alpha;
+	Pos offset(0, 0);
+	if (!sender.empty()) {
+		offset = gl_printf(font, sendcol, x, y, "%s: %s", sender.c_str());
+		x += offset.x;
+	}
+	offset = gl_printf(font, msgcol, x, y, message.c_str());
+	x += offset.x;
+	print_dupe_string(*this, font, Pos(x, y), alpha);
+}
+
+bool ChatMessage::empty() const {
+	return sender.empty() && message.empty();
+}
+
 void GameChat::add_message(const ChatMessage& cm) {
 	bool dupe = false;
 
@@ -31,55 +55,44 @@ void GameChat::add_message(const std::string& msg, const Colour& colour) {
 	add_message(ChatMessage("", msg, Colour(), colour));
 }
 
-static void print_dupe_string(const ChatMessage& cm, const font_data& font,
-		const Pos& location, float alpha) {
-	if (cm.exact_copies > 1)
-		gl_printf(font, Colour(0, 191, 255, alpha*255), location.x, location.y, " x%d",
-				cm.exact_copies);
+bool GameChat::is_typing_message() {
+	return typing_message;
 }
 
-void GameChat::draw_player_chat(GameState* gs) {
-	char dupebuff[32];
+void GameChat::draw_player_chat(GameState* gs) const {
+	const font_data& font = gs->primary_font();
+	const int padding = 5;
+	int line_sep = font.h + 1;
 
-	int w = gs->window_view().width, h = gs->window_view().height;
-	int chat_w = w, chat_h = 100;
+	int view_w = gs->window_view().width, view_h = gs->window_view().height;
+	int chat_w = view_w, chat_h = 100;
 	int chat_x = 0, chat_y = 0; //h - chat_h - TILE_SIZE;
-	int textx = chat_x + 5, text_y = chat_y + 5;
+	int text_x = chat_x + padding, text_y = chat_y + padding;
 
-	int alpha_channel = 255 * fade_out;
-
-	gl_set_drawing_area(0, 0, w, h);
+	gl_set_drawing_area(0, 0, view_w, view_h);
 
 	gl_draw_rectangle(chat_x, chat_y, chat_w, chat_h,
 			Colour(180, 180, 255, 50 * fade_out));
-	const font_data& font = gs->primary_font();
+
+	bool draw_typed_message = typing_message || !current_message.empty();
+
 	int start_msg = 0;
-	int msgs_in_screen = (chat_h - 10) / (font.h + 1);
+	int message_space = chat_h - padding * 2
+			- (draw_typed_message ? line_sep : 0);
+	int msgs_in_screen = message_space / line_sep;
 	if (messages.size() > msgs_in_screen) {
 		start_msg = messages.size() - msgs_in_screen;
-//		text_y += int(start_msg * (font.h + 1)) % chat_h;
 	}
 
 	for (int i = start_msg; i < messages.size(); i++) {
-		int tx = textx;
-		ChatMessage& cm = messages[i];
-		Colour sender_colour = cm.sender_colour, message_colour =
-				cm.message_colour;
-		sender_colour.a = alpha_channel, message_colour.a = alpha_channel;
-		Pos offset(0, 0);
-		if (!cm.sender.empty()) {
-			offset = gl_printf(font, sender_colour, tx, text_y, "%s: %s",
-					cm.sender.c_str());
-			tx += offset.x;
-		}
-		offset = gl_printf(font, message_colour, tx, text_y,
-				cm.message.c_str());
-		tx += offset.x;
-		print_dupe_string(cm, font, Pos(tx, text_y), fade_out);
-		text_y += offset.y;
-
+		messages[i].draw(font, fade_out, text_x, text_y);
+		text_y += line_sep;
 	}
 
+	if (draw_typed_message) {
+		int type_y = chat_y + chat_h - padding - line_sep;
+		current_message.draw(font, fade_out, text_x, type_y);
+	}
 }
 
 void GameChat::step(GameState *gs) {
@@ -92,15 +105,17 @@ void GameChat::step(GameState *gs) {
 	else if (fade_out > 0.0f)
 		fade_out -= fade_out_rate;
 }
-void GameChat::draw(GameState *gs) {
+void GameChat::draw(GameState *gs) const {
 	if (fade_out > 0.0f)
 		draw_player_chat(gs);
 }
 
-GameChat::GameChat() {
+GameChat::GameChat() :
+		current_message("", "This is My Message") {
 	show_chat = false;
 	fade_out = 0.0f;
 	fade_out_rate = 0.05f;
+	typing_message = false;
 //	messages.push_back(
 //			ChatMessage("ludamad", "What's up!?\nGo eff off",
 //					Colour(37, 207, 240)));
@@ -112,4 +127,3 @@ GameChat::GameChat() {
 //		this->add_message(buff);
 //	}
 }
-

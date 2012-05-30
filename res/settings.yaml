@@ -20,7 +20,7 @@ ip: 192.168.0.24
 port: 6112
 
 #Speed settings
-steps_per_draw: 2 #More is almost guaranteed to make the game faster, 1 is ideal
+steps_per_draw: 1 #More is almost guaranteed to make the game faster, 1 is ideal
 time_per_step: 12
 
 #Debug settings
