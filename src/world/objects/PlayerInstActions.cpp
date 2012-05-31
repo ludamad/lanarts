@@ -212,7 +212,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 			//Item use
 			for (int i = 0; i < 9; i++) {
 				if (gs->key_press_state(SDLK_1 + i)) {
-					if (inventory.inv[i].n > 0) {
+					if (inventory.get(i).amount > 0) {
 						item_used = true;
 						queued_actions.push_back(
 								GameAction(id, GameAction::USE_ITEM, frame,
@@ -228,7 +228,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 				int slot = 5 * posy + posx;
 				item_used = true;
 				if (slot >= 0 && slot < INVENTORY_SIZE
-						&& inventory.inv[slot].n > 0) {
+						&& inventory.get(slot).amount > 0) {
 					queued_actions.push_back(
 							GameAction(id, GameAction::USE_ITEM, frame, level,
 									slot, p.x, p.y));
@@ -241,7 +241,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 				int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
 				int slot = 5 * posy + posx;
 				if (slot >= 0 && slot < INVENTORY_SIZE
-						&& inventory.inv[slot].n > 0) {
+						&& inventory.get(slot).amount > 0) {
 					queued_actions.push_back(
 							GameAction(id, GameAction::DROP_ITEM, frame, level,
 									slot));
@@ -360,11 +360,11 @@ void PlayerInst::perform_queued_actions(GameState *gs) {
 
 void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 // 	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
-	itemslot& item = inventory.inv[action.use_id];
+	ItemSlot& itemslot = inventory.get(action.use_id);
 	int gx = x/TILE_SIZE, gy = y/TILE_SIZE;
 	int dropx = gx*TILE_SIZE + TILE_SIZE/2, dropy = gy*TILE_SIZE + TILE_SIZE/2;
-	gs->add_instance(new ItemInst(item.item, dropx, dropy, 1, id));
-	inventory.inv[action.use_id].n--;
+	gs->add_instance(new ItemInst(itemslot.item, dropx, dropy, 1, id));
+	itemslot.amount--;
 }
 
 void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
@@ -417,14 +417,14 @@ static void item_do_lua_action(lua_State* L, ItemEntry& type, obj_id user, const
 	lua_call(L, 4, 0);
 }
 void PlayerInst::use_item(GameState *gs, const GameAction& action) {
-	itemslot& slot = inventory.inv[action.use_id];
-	ItemEntry& type = game_item_data[slot.item];
+	ItemSlot& itemslot = inventory.get(action.use_id);
+	ItemEntry& type = game_item_data[itemslot.item];
 
 	lua_State* L = gs->get_luastate();
 
-	if (slot.n > 0 && item_check_lua_prereq(L, type, this->id)){
+	if (itemslot.amount > 0 && item_check_lua_prereq(L, type, this->id)){
 		item_do_lua_action(L, type, this->id, Pos(action.action_x, action.action_y));
-		inventory.inv[action.use_id].n--;
+		itemslot.amount--;
 		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 	}
 

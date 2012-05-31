@@ -1,39 +1,45 @@
 #ifndef INVENTORY_H
 #define INVENTORY_H
 
-#define INVENTORY_SIZE 40
+#include "../util/game_basic_structs.h"
 
-struct itemslot {
-	int item;
-	int n;
+const int INVENTORY_SIZE = 40;
+
+struct ItemSlot {
+	item_id item;
+	int amount;
 };
 
-struct Inventory {
+class Inventory {
+public:
 	Inventory() {
 		for (int i = 0; i < INVENTORY_SIZE; i++) {
-			inv[i].n = 0;
+			inv[i].amount = 0;
 		}
 	}
-	void add(int item, int number) {
-		for (int j = 0; j < 2; j++){
-			for (int i = 0; i < INVENTORY_SIZE; i++) {
-				if(j == 0){
-					if (inv[i].item == item && inv[i].n > 0) {
-						inv[i].item = item;
-						inv[i].n += number;
-						return;
-					}
-				}else {
-					if (inv[i].n == 0) {
-						inv[i].item = item;
-						inv[i].n += number;
-						return;
-					}
-				}
+	bool add(int item, int number) {
+
+		for (int i = 0; i < INVENTORY_SIZE; i++) {
+			if (inv[i].item == item && inv[i].amount > 0) {
+				inv[i].item = item;
+				inv[i].amount += number;
+				return true;
 			}
 		}
+		for (int i = 0; i < INVENTORY_SIZE; i++) {
+			if (inv[i].amount == 0) {
+				inv[i].item = item;
+				inv[i].amount += number;
+				return true;
+			}
+		}
+		return false;
 	}
-	itemslot inv[INVENTORY_SIZE];
+	ItemSlot& get(int i){
+		return inv[i];
+	}
+private:
+	ItemSlot inv[INVENTORY_SIZE];
 };
 
 #endif // INVENTORY_H

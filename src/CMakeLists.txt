@@ -62,14 +62,16 @@ set( lanarts_src
 	util/LuaValue.cpp
 
 	world/GameAction.cpp
-	world/GameChat.cpp
-	world/GameHud.cpp
 	world/GameInstSet.cpp
 	world/GameState.cpp
 	world/GameLevelState.cpp
 	world/GameTiles.cpp
 	world/GameView.cpp
 	world/GameWorld.cpp
+	
+	world/ui/GameChat.cpp
+	world/ui/GameDialogs.cpp
+	world/ui/GameHud.cpp
 	
 	world/controllers/MonsterController.cpp
 	world/controllers/PlayerController.cpp
@@ -136,8 +138,6 @@ set( lanarts_include
 	world/net/GameNetConnection.h
 
 	world/GameAction.h
-	world/GameChat.h
-	world/GameHud.h
 	world/GameInstSet.h
 	world/GameState.h
 	world/GameLevelState.h
@@ -151,6 +151,9 @@ set( lanarts_include
 	
 	world/objects/GameInst.h
 
+	world/ui/GameChat.h
+	world/ui/GameDialogs.h
+	world/ui/GameHud.h
 
 	world/utility_objects/AnimatedInst.h
 	world/utility_objects/ButtonInst.h

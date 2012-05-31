@@ -12,22 +12,26 @@
 #include <ctime>
 #include <vector>
 
-#include "GameState.h"
-#include "GameLevelState.h"
-#include "../display/display.h"
-#include "net/GameNetConnection.h"
-
-#include "objects/EnemyInst.h"
-#include "objects/PlayerInst.h"
-
-#include "../util/math_util.h"
 
 #include "../data/game_data.h"
 #include "../data/item_data.h"
 #include "../data/tile_data.h"
 #include "../data/dungeon_data.h"
 #include "../data/class_data.h"
+
+#include "../display/display.h"
+
+#include "../util/math_util.h"
+
 #include "../lua/lua_api.h"
+
+#include "GameState.h"
+#include "GameLevelState.h"
+
+#include "net/GameNetConnection.h"
+
+#include "objects/EnemyInst.h"
+#include "objects/PlayerInst.h"
 
 extern "C" {
 #include <lua/lua.h>
@@ -100,6 +104,9 @@ GameState::~GameState() {
 /*Handle new characters and exit signals*/
 int GameState::handle_event(SDL_Event *event) {
 	int done = 0;
+
+	if (dialogs.handle_event(this, event))
+		return done;
 
 	if (chat.handle_event(connection, event))
 		return done;

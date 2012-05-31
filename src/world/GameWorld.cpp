@@ -259,6 +259,7 @@ void GameWorld::reset(int keep){
 		level_states.resize(keep);
 		game_state->level() = get_level(keep, true /*spawn player*/);
 		game_state->level()->steps_left = 1000;
+		game_state->game_chat().clear();
 	}
 }
 

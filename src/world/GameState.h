@@ -9,18 +9,26 @@
 #define GAMESTATE_H_
 #include <vector>
 #include <SDL.h>
-#include "objects/GameInst.h"
-#include "controllers/MonsterController.h"
-#include "controllers/PlayerController.h"
-#include "GameSettings.h"
-#include "GameChat.h"
-#include "GameView.h"
-#include "GameHud.h"
-#include "GameWorld.h"
+
 #include "../display/font.h"
 #include "../util/mtwist.h"
 #include "../fov/fov.h"
+
+#include "controllers/MonsterController.h"
+#include "controllers/PlayerController.h"
+
+#include "ui/GameChat.h"
+#include "ui/GameHud.h"
+#include "ui/GameDialogs.h"
+
 #include "net/GameNetConnection.h"
+
+#include "objects/GameInst.h"
+
+#include "GameSettings.h"
+#include "GameView.h"
+#include "GameWorld.h"
+
 
 struct lua_State;
 struct GameLevelState;
@@ -178,6 +186,7 @@ private:
 
 	//Game world components
 	GameChat chat;
+	GameDialogs dialogs;
 	GameHud hud;
 	GameView view;
 	GameWorld world;
