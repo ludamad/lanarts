@@ -10,8 +10,8 @@
 
 typedef long long llong;
 
-NetPacket::NetPacket(int packet_origin) :
-		body_length(0), packet_type(PACKET_MSG), packet_origin(packet_origin) {
+NetPacket::NetPacket(int packet_origin, int packet_type) :
+		body_length(0), packet_type(packet_type), packet_origin(packet_origin) {
 }
 
 size_t NetPacket::length() const {

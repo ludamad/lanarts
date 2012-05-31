@@ -15,6 +15,11 @@ struct GameState;
 
 class GameNetConnection {
 public:
+	/*Packet types*/
+	enum {
+		PACKET_ACTION = 0,
+		PACKET_CHAT_MESSAGE = 1
+	};
 	GameNetConnection(int our_peer_id){connect=NULL;}
 	GameNetConnection(NetConnection* connect = NULL);
 	~GameNetConnection();
@@ -25,6 +30,7 @@ public:
 	void wait_for_packet(NetPacket& packet);
 	void send_and_sync(const NetPacket& packet, std::vector<NetPacket>& receieved, bool send_to_new = false);
 	void broadcast_packet(const NetPacket& packet, bool send_to_new = false);
+	void finalize_connections();
 	bool check_integrity(GameState* gs, int value);
 private:
 	std::vector<int> peer_ids;

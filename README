@@ -5,6 +5,9 @@ asio-devel
 boost-devel
 cmake
 
+
+Just run make_and_run.sh to build and run, or do the following:
+
 To build, make a directory called lanarts_build, and do:
 cmake <path to lanarts folder>
 
@@ -13,3 +16,5 @@ cd ..
 mkdir lanarts_build
 cd lanarts_build
 cmake ../lanarts
+
+Copy the exe from 'lanarts_build/src' into the 'lanarts' folder and run it from there.

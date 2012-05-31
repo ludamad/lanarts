@@ -27,9 +27,12 @@ public:
 	virtual bool is_initialized() { return !streams.empty(); }
 	virtual void get_peer_packets(std::vector<NetPacket>& packets);
 
+	virtual void finalize_connections();
 private:
 	void async_read(SocketStream* ss);
 	void assign_peerid(SocketStream* stream, int peerid);
+
+	bool accepting_connections;
 	boost::mutex streamlock;
     boost::mutex sendlock;
 	boost::shared_ptr<asio::thread> execution_thread;

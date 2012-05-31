@@ -14,6 +14,7 @@ public:
 	virtual int get_number_peers() = 0;
 
 	virtual bool is_initialized() { return true; }
+	virtual void finalize_connections() = 0;
 	virtual ~NetConnection(){}
 };
 

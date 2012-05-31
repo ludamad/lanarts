@@ -8,18 +8,21 @@
 
 struct NetPacket {
 	enum {
-		PACKET_MSG = 0,
-		PACKET_BROADCAST_PEERID = 1,
-		PACKET_ASSIGN_PEERID = 2,
-		PACKET_BROADCAST_PEERLISTSIZE = 3,
-		PACKET_HELLO = 4,
-		PACKET_ACTIONS_DONE = 5
-	};
-	enum {
 		HEADER_LEN = sizeof(int)*3, MAX_PACKET_SIZE = 512
 	};
 
-	NetPacket(int packet_origin = 0);
+	/* Messages internal to the networking library use negative indices
+	 * This allows a regular enum to be used for the library's user
+	 * In general, the library user should not worry about server/client differences */
+	enum {
+		/*SRV_ASSERT messages give a client information*/
+		PACKET_SRV_ASSERT_NUM_PEERIDS = -1,
+		PACKET_SRV_ASSERT_PEERID = -2,
+		PACKET_SRV_ASSERT_STARTED = -3,
+		PACKET_CLIENT_REQUEST_NUM_PEERIDS = -4,
+	};
+
+	NetPacket(int packet_origin = 0, int packet_type = 0);
 	size_t length() const;
     char* body_start();
     char* body_end();

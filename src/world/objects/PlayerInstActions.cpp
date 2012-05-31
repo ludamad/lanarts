@@ -4,29 +4,32 @@
  *  as well as networking communication of actions
  */
 
-#include "PlayerInst.h"
-#include "EnemyInst.h"
-#include "ItemInst.h"
-#include "../utility_objects/AnimatedInst.h"
-
-#include "ProjectileInst.h"
-#include "../GameState.h"
-
-#include "../../lua/lua_api.h"
 extern "C" {
 #include <lua/lua.h>
 }
-
-#include "../../util/math_util.h"
-#include "../../util/collision_util.h"
-#include "../../util/game_basic_structs.h"
-
-#include "../../display/display.h"
 
 #include "../../data/item_data.h"
 #include "../../data/sprite_data.h"
 #include "../../data/tile_data.h"
 #include "../../data/weapon_data.h"
+
+#include "../../display/display.h"
+
+#include "../../lua/lua_api.h"
+
+#include "../../util/math_util.h"
+#include "../../util/collision_util.h"
+#include "../../util/game_basic_structs.h"
+
+#include "../GameState.h"
+
+#include "../utility_objects/AnimatedInst.h"
+
+#include "PlayerInst.h"
+#include "EnemyInst.h"
+#include "ItemInst.h"
+
+#include "ProjectileInst.h"
 
 // static FILE* saved = fopen("res/saved_replay.rep", "wb");
 // static FILE* open = fopen("res/replay.rep", "rb");
