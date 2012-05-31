@@ -1,0 +1,15 @@
+YUM packages required:
+SDL-static
+freetype-devel
+asio-devel
+boost-devel
+cmake
+
+To build, make a directory called lanarts_build, and do:
+cmake <path to lanarts folder>
+
+eg, from lanarts:
+cd ..
+mkdir lanarts_build
+cd lanarts_build
+cmake ../lanarts
