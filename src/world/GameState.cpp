@@ -101,7 +101,7 @@ GameState::~GameState() {
 int GameState::handle_event(SDL_Event *event) {
 	int done = 0;
 
-	if (chat.handle_event(event))
+	if (chat.handle_event(connection, event))
 		return done;
 
 	switch (event->type) {

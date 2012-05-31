@@ -66,3 +66,16 @@ double NetPacket::get_double() {
 	body_length -= sizeof(double);
 	return *(double*) body_end();
 }
+
+void NetPacket::add_str(const char* str, int len) {
+	add_int(len);
+	memcpy(body_end(), str, len);
+	body_length += len;
+}
+
+void NetPacket::get_str(char* str, int len) {
+	body_length -= len;
+	memcpy(str, body_end(), len);
+}
+
+

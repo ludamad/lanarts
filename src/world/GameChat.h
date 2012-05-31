@@ -15,6 +15,13 @@
 
 struct GameState;
 struct font_data;
+struct NetPacket;
+class GameNetConnection;
+
+/*Handle key repeating, in steps*/
+const int INITIAL_REPEAT_STEP_AMNT = 40;
+const int NEXT_REPEAT_STEP_AMNT = 5;
+const int NEXT_BACKSPACE_STEP_AMNT = 3;
 
 /*Represents a coloured message in chat*/
 struct ChatMessage {
@@ -35,6 +42,8 @@ struct ChatMessage {
 	}
 	void draw(const font_data& font, float alpha, int x, int y) const;
 	bool empty() const;
+	void packet_add(NetPacket& packet);
+	void packet_get(NetPacket& packet);
 };
 
 class GameChat {
@@ -47,20 +56,25 @@ public:
 			const Colour& colour = Colour(255, 255, 255));
 
 	bool is_typing_message();
-	/*Returns whether has handled event or not*/
-	bool handle_event(SDL_Event *event);
+	/*Returns whether has handled event completely or not*/
+	bool handle_event(GameNetConnection& connection, SDL_Event *event);
 
 	GameChat(const std::string& local_sender);
 private:
+	void reset_typed_message();
+	void draw_player_chat(GameState* gs) const;
+
 	std::string local_sender;
 	ChatMessage typed_message;
 
-	void reset_typed_message();
-	void draw_player_chat(GameState* gs) const;
+	SDLKey current_key;
+	SDLMod current_mod;
+	int repeat_steps_left;
 
 	std::vector<ChatMessage> messages;
 	bool show_chat, is_typing;
 	float fade_out, fade_out_rate;
+
 };
 
 #endif /* GAMECHAT_H_ */

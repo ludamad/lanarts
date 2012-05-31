@@ -8,6 +8,7 @@
 #include <SDL.h>
 #include "GameChat.h"
 #include "GameState.h"
+#include <net/packet.h>
 
 #include "../display/display.h"
 
@@ -98,43 +99,87 @@ void GameChat::draw_player_chat(GameState* gs) const {
 	}
 }
 
+static char keycode_to_char(SDLKey keycode, SDLMod keymod) {
+	const char DIGIT_SYMBOLS[] = { ')', '!', '@', '#', '$', '%', '^', '&', '*',
+			'(' };
+	const char MISC_SYMBOLS[][2] = { { '`', '~' }, { ',', '<' }, { '.', '>' }, {
+			'/', '?' }, { ';', ':' }, { '\'', '"' }, { '[', '{' }, { ']', '}' },
+			{ '\\', '|' }, { '-', '_' }, { '=', '+' } };
+	bool hitcaps = (keymod & KMOD_CAPS);
+	bool hitshift = (keymod & (KMOD_LSHIFT | KMOD_RSHIFT));
+	if ((hitcaps != hitshift) && isalpha(keycode)) {
+		return toupper(keycode);
+	} else if (hitshift) {
+		if (isdigit(keycode))
+			return DIGIT_SYMBOLS[keycode - '0'];
+		for (int i = 0; i < sizeof(MISC_SYMBOLS) / sizeof(char) / 2; i++) {
+			if (keycode == MISC_SYMBOLS[i][0])
+				return MISC_SYMBOLS[i][1];
+		}
+	}
+	return keycode;
+}
+static bool is_typeable_keycode(SDLKey keycode) {
+	return (keycode >= SDLK_SPACE && keycode <= SDLK_z);
+}
+
 void GameChat::step(GameState *gs) {
+	std::string& msg = typed_message.message;
+
 	if (gs->key_press_state(SDLK_c)) {
 		show_chat = !show_chat;
 		fade_out_rate = 0.05f;
 	}
+
 	if (show_chat)
 		fade_out = 1.0f;
 	else if (fade_out > 0.0f)
 		fade_out -= fade_out_rate;
+
+	if (repeat_steps_left > 0)
+		repeat_steps_left--;
+	else if (current_key != SDLK_FIRST) {
+		/*Handle keys being held down*/
+		if (is_typeable_keycode(current_key)) {
+			msg += keycode_to_char(current_key, current_mod);
+			repeat_steps_left = NEXT_REPEAT_STEP_AMNT;
+		} else if (current_key == SDLK_BACKSPACE) {
+			if (msg.empty()) {
+				reset_typed_message();
+				is_typing = false;
+			} else {
+				msg.resize(msg.size() - 1);
+			}
+			repeat_steps_left = NEXT_BACKSPACE_STEP_AMNT;
+		}
+	}
 }
 void GameChat::draw(GameState *gs) const {
 	if (fade_out > 0.0f)
 		draw_player_chat(gs);
 }
 
-static bool should_capitalize(SDLMod keymod) {
-	bool hitcaps = (keymod & KMOD_CAPS);
-	bool hitshift = (keymod & (KMOD_LSHIFT | KMOD_RSHIFT));
-	return hitcaps != hitshift;
-}
-static bool is_typeable_keycode(SDLKey keycode) {
-	return (keycode >= SDLK_SPACE && keycode <= SDLK_z);
-}
-/*Returns whether has handled event or not*/
-bool GameChat::handle_event(SDL_Event *event) {
+/*Returns whether has handled event completely or not*/
+bool GameChat::handle_event(GameNetConnection& connection, SDL_Event *event) {
 	SDLKey keycode = event->key.keysym.sym;
 	SDLMod keymod = event->key.keysym.mod;
+	current_mod = keymod;
 	switch (event->type) {
+	case SDL_KEYUP: {
+		if (current_key == keycode)
+			current_key = SDLK_FIRST;
+		/*Let GameState handle this as well*/
+		break;
+	}
 	case SDL_KEYDOWN: {
 		if (is_typing) {
 			std::string& msg = typed_message.message;
 			if (is_typeable_keycode(keycode)) {
-				char chr = keycode;
-				if (isalpha(chr) && should_capitalize(keymod)) {
-					chr = toupper(chr);
+				msg += keycode_to_char(keycode, keymod);
+				if (current_key != keycode) {
+					current_key = keycode;
+					repeat_steps_left = INITIAL_REPEAT_STEP_AMNT;
 				}
-				msg += chr;
 				return true;
 			}
 			if (keycode == SDLK_BACKSPACE) {
@@ -143,6 +188,10 @@ bool GameChat::handle_event(SDL_Event *event) {
 					is_typing = false;
 				} else {
 					msg.resize(msg.size() - 1);
+				}
+				if (current_key != keycode) {
+					current_key = keycode;
+					repeat_steps_left = INITIAL_REPEAT_STEP_AMNT;
 				}
 				return true;
 			}
@@ -182,6 +231,8 @@ void GameChat::reset_typed_message() {
 }
 GameChat::GameChat(const std::string& local_sender) :
 		local_sender(local_sender), typed_message(std::string(), std::string()) {
+	current_key = SDLK_UNKNOWN;
+	current_mod = KMOD_NONE;
 	reset_typed_message();
 	show_chat = true;
 	fade_out = 1.0f;
@@ -198,3 +249,22 @@ GameChat::GameChat(const std::string& local_sender) :
 //		this->add_message(buff);
 //	}
 }
+
+void packet_get_str(NetPacket& packet, std::string& str) {
+	int size = packet.get_int();
+	str.resize(size);
+	packet.get_str(&str[0], size);
+}
+void ChatMessage::packet_add(NetPacket& packet) {
+	packet.add_str(sender.c_str(), sender.size());
+	packet.add_str(message.c_str(), message.size());
+	packet.add(sender_colour);
+	packet.add(message_colour);
+}
+void ChatMessage::packet_get(NetPacket& packet) {
+	packet_get_str(packet, sender);
+	packet_get_str(packet, message);
+	packet.get(sender_colour);
+	packet.get(message_colour);
+}
+

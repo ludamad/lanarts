@@ -27,6 +27,8 @@ struct NetPacket {
     void encode_header();
 
 	void add_int(long val);
+	void add_str(const char* str, int len);
+	void get_str(char* str, int len);
 	void add_double(double val);
 	long get_int();
 	double get_double();

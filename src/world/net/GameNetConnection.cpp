@@ -13,6 +13,10 @@ void GameNetConnection::add_peer_id(int peer_id) {
 	peer_ids.push_back( peer_id );
 }
 
+void GameNetConnection::broadcast_packet(const NetPacket & packet, bool send_to_new){
+	connect->broadcast_packet(packet, send_to_new);
+}
+
 bool GameNetConnection::check_integrity(GameState* gs, int value) {
 	NetPacket packet;
 	packet.add_int(value);
