@@ -111,7 +111,7 @@ static int lua_member_update(lua_State* L) {
 
 meth_t bind_t::methods[] = { meth_t(0, 0) };
 
-void lua_stats_bindings(Stats* gs, lua_State* L) {
+void lua_stats_bindings(GameState* gs, lua_State* L) {
 	lunar_t::Register(L);
 
    luaL_getmetatable(L, bind_t::className);
@@ -124,7 +124,7 @@ void lua_stats_bindings(Stats* gs, lua_State* L) {
    lua_pushcfunction(L, lua_member_update);
    lua_settable(L, tableind);
 }
-void lua_pushgamestats(lua_State* L, obj_id id){
+void lua_pushstats(lua_State* L, obj_id id){
 	lunar_t::push(L, new StatsLuaBinding(id), true);
 }
 const char StatsLuaBinding::className[] = "Stats";
