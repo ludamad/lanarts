@@ -6,13 +6,13 @@ items:
   - name: Health Potion
     sprite: health_potion
     action_func: increase_health
-    prereq_func: function (item, obj) return obj.hp < obj.max_hp end 
+    prereq_func: function (item, obj) return obj.stats.hp < obj.stats.max_hp end 
     amount: 50
 
   - name: Mana Potion
     sprite: mana potion
     action_func: increase_mana
-    prereq_func: function (item, obj) return obj.mp < obj.max_mp end 
+    prereq_func: function (item, obj) return obj.stats.mp < obj.stats.max_mp end 
     amount: 50
 
   - name: Haste Scroll
@@ -38,7 +38,7 @@ items:
   - name: Stone
     sprite: stone
     action_func: stone
-    prereq_func: function(item, obj) return obj.cooldown <= 0 end
+    prereq_func: function(item, obj) return obj.stats.cooldown <= 0 end
     speed: 8
     cooldown: 20
     range: 400

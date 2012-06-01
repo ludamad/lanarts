@@ -41,7 +41,7 @@ set( lanarts_src
 	lua/lua_api.cpp
 	lua/lua_gameinst.cpp
 	lua/lua_gamestate.cpp
-	lua/lua_item.cpp
+	lua/lua_stats.cpp
 	
 	pathfind/astar_pathfind.cpp
 	pathfind/pathfind.cpp

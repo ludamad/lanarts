@@ -7,15 +7,15 @@ function increase_mana(item, obj)
 end 
 
 function increase_strength(item, obj)
-	obj.strength = obj.strength + item.amount
+	obj.stats.strength = obj.stats.strength + item.amount
 end 
 
 function increase_defence(item, obj)
-	obj.defence = obj.defence + item.amount
+	obj.stats.defence = obj.stats.defence + item.amount
 end 
 
 function increase_magic(item, obj)
-	obj.magic = obj.magic + item.amount
+	obj.stats.magic = obj.stats.magic + item.amount
 end 
 
 function equip(item, obj)

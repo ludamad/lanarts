@@ -120,7 +120,8 @@ void lua_stats_bindings(GameState* gs, lua_State* L) {
 
    lua_pushstring(L, "__index");
    lua_pushcfunction(L, lua_member_lookup);
-   lua_pushstring(L, "__newIndex");
+   lua_settable(L, tableind);
+   lua_pushstring(L, "__newindex");
    lua_pushcfunction(L, lua_member_update);
    lua_settable(L, tableind);
 }
