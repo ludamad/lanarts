@@ -13,6 +13,7 @@ set( lanarts_src
 	
 	data/init/load_sprite_data.cpp
 	data/init/load_dungeon_data.cpp
+	data/init/load_effect_data.cpp
 	data/init/load_enemy_data.cpp
 	data/init/load_item_data.cpp
 	data/init/load_tileset_data.cpp
@@ -35,6 +36,7 @@ set( lanarts_src
 	fov/impl/permissive-fov.cc
 	
 	gamestats/Ability.cpp
+	gamestats/Effects.cpp
 	gamestats/Stats.cpp
 	
 		

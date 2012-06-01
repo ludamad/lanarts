@@ -8,17 +8,20 @@
 #ifndef GAME_DATA_H_
 #define GAME_DATA_H_
 
+#include "../util/LuaValue.h"
+
+#include "../world/GameSettings.h"
+
 #include "class_data.h"
+#include "dungeon_data.h"
+#include "effect_data.h"
+#include "enemy_data.h"
 #include "item_data.h"
-#include "tile_data.h"
-#include "tileset_data.h"
 #include "spell_data.h"
 #include "sprite_data.h"
-#include "dungeon_data.h"
-#include "enemy_data.h"
+#include "tile_data.h"
+#include "tileset_data.h"
 #include "weapon_data.h"
-#include "../world/GameSettings.h"
-#include "../util/LuaValue.h"
 
 struct lua_State;
 
@@ -30,6 +33,7 @@ void load_weapon_item_entries(lua_State* L);
 
 LuaValue load_item_data(lua_State* L, const char* filename);
 LuaValue load_enemy_data(lua_State* L, const char* filename);
+LuaValue load_effect_data(lua_State* L, const char* filename);
 LuaValue load_dungeon_data(lua_State* L, const char* filename);
 LuaValue load_class_data(lua_State* L, const char* filename);
 

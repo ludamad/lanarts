@@ -1,28 +1,27 @@
 /*
  * effect_data.h
  *
- *  Created on: March 24, 2012
+ *  Created on: March 24, 2012dw
  *      Author: 100397561
  */
 #ifndef EFFECT_DATA_H_
 #define EFFECT_DATA_H_
 
 #include <cstdlib>
+#include <string>
 #include <vector>
 
+#include "../util/LuaValue.h"
 #include "../gamestats/Stats.h"
-
-enum {
-	EFFECT_HASTE = 0
-};
-
-typedef void (*effect_actionf)(Stats& basestats, Stats& affected);
 
 struct EffectType {
 	const char* name;
-	effect_actionf action;
-	EffectType(const char* name, effect_actionf act) :
-		name(name), action(act){
+	LuaValue statmod;
+	EffectType(const char* name, const std::string& statmod_luaf) :
+		name(name), statmod(statmod_luaf){
+	}
+	void init(lua_State* L){
+		statmod.initialize(L);
 	}
 };
 

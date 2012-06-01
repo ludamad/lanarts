@@ -15,12 +15,13 @@ extern "C" {
 #include "../lua/lua_api.h"
 
 std::vector<ClassType> game_class_data;
+std::vector<EffectType> game_effect_data;
+std::vector<EnemyEntry> game_enemy_data;
 std::vector<ItemEntry> game_item_data;
 std::vector<TileEntry> game_tile_data;
 std::vector<TilesetEntry> game_tileset_data;
 std::vector<SpellEntry> game_spell_data;
 std::vector<SpriteEntry> game_sprite_data;
-std::vector<EnemyEntry> game_enemy_data;
 std::vector<LevelGenSettings> game_dungeon_yaml;
 std::vector<WeaponEntry> game_weapon_data;
 
@@ -55,7 +56,7 @@ int get_tileset_by_name(const char* name){
 	return 0;
 }
 
-LuaValue sprites, enemies, weapons, items, dungeon, classes;
+LuaValue sprites, enemies, effects, weapons, items, dungeon, classes;
 void init_game_data(lua_State* L){
 
 //NB: Do not re-order the way resources are loaded unless you know what you're doing
@@ -63,6 +64,7 @@ void init_game_data(lua_State* L){
 	sprites = load_sprite_data(L, "res/data/sprites.yaml");
 	load_tileset_data("res/data/tileset.yaml");
 	enemies = load_enemy_data(L, "res/data/enemies.yaml");
+	effects = load_effect_data(L, "res/data/effects.yaml");
 	//TODO: make separate weapons table
 	items = load_item_data(L, "res/data/items.yaml");
 	load_weapon_data(L, "res/data/weapons.yaml",  &items);
@@ -78,11 +80,19 @@ static void register_as_global(lua_State* L, LuaValue& value, const char* name){
 	lua_settable(L, LUA_GLOBALSINDEX);
 }
 
+
+template <class T>
+static void __lua_init(lua_State* L, T& t){
+	for (int i = 0; i < t.size(); i++)
+		t[i].init(L);
+}
+
 void init_lua_data(GameState* gs, lua_State* L){
 	//Lua configuration
 	lua_lanarts_api(gs, L);
 
 	register_as_global(L, enemies, "enemies");
+	register_as_global(L, effects, "effects");
 //	register_as_global(L, weapons, "weaponss");
 	register_as_global(L, items, "items");
 	register_as_global(L, sprites, "sprites");
@@ -91,13 +101,9 @@ void init_lua_data(GameState* gs, lua_State* L){
 
 	luaL_dofile(L, "res/lua/defines.lua");
 
-	for (int i = 0; i < game_enemy_data.size(); i++){
-		game_enemy_data[i].init(L);
-	}
-	for (int i = 0; i < game_item_data.size(); i++){
-		game_item_data[i].init(L);
-	}
-
+	__lua_init(L, game_enemy_data);
+	__lua_init(L, game_effect_data);
+	__lua_init(L, game_item_data);
 }
 
 static void luayaml_push(LuaValue& value, lua_State *L, const char *name){

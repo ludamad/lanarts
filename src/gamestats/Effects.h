@@ -17,36 +17,11 @@ struct Effects {
 			effects[i].t_remaining = 0;
 		}
 	}
-	void add(int effect, int length) {
-		for (int i = 0; i < EFFECTS_MAX; i++) {
-			if (effects[i].t_remaining == 0 || effects[i].effect == effect) {
-				effects[i].effect = effect;
-				effects[i].t_remaining += length;
-				return;
-			}
-		}
-	}
-	Effect* get(int effect) {
-		for (int i = 0; i < EFFECTS_MAX; i++) {
-			if (effects[i].t_remaining > 0 && effects[i].effect == effect) {
-				return &effects[i];
-			}
-		}
-		return NULL;
-	}
-	void step() {
-		for (int i = 0; i < EFFECTS_MAX; i++) {
-			if (effects[i].t_remaining > 0)
-				effects[i].t_remaining--;
-		}
-	}
+	void add(int effect, int length);
+	Effect* get(int effect);
+	void step();
 
-	void process(Stats& basestats, Stats& affected) {
-		for (int i = 0; i < EFFECTS_MAX; i++) {
-			if (effects[i].t_remaining > 0)
-				game_effect_data[effects[i].effect].action(basestats, affected);
-		}
-	}
+	void process(lua_State* L, Stats& basestats, Stats& affected);
 
 	Effect effects[EFFECTS_MAX];
 };

@@ -444,7 +444,7 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 	int dx = action.action_x;
 	int dy = action.action_y;
 
-	float mag = effective_stats().movespeed;
+	float mag = effective_stats(gs->get_luastate()).movespeed;
 
 	float ddx = dx * mag;
 	float ddy = dy * mag;
@@ -536,6 +536,7 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
+	Stats estats = effective_stats(gs->get_luastate());
 	if (action.use_id < 2 && stats().has_cooldown())
 		return;
 
@@ -547,7 +548,7 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 		stats().mp -= 50;
 	}
 
-	Attack atk(effective_stats().magicatk);
+	Attack atk(estats.magicatk);
 	bool bounce = true;
 	int hits = 0;
 
@@ -558,7 +559,7 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 		bounce = false;
 		hits = 3;
 	}
-	atk.damage = effective_stats().calculate_spell_damage(gs->rng(),
+	atk.damage = estats.calculate_spell_damage(gs->rng(),
 			action.use_id);
 
 	if (action.use_id < 2) {
@@ -572,13 +573,13 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	}
 
 	if (action.use_id == 1)
-		base_stats.cooldown = effective_stats().magicatk.cooldown * 1.4;
+		base_stats.cooldown = estats.magicatk.cooldown * 1.4;
 	else if (action.use_id == 0) {
 		double mult = 1 + base_stats.xplevel / 8.0;
 		mult = std::min(2.0, mult);
-		base_stats.cooldown = effective_stats().magicatk.cooldown / mult;
+		base_stats.cooldown = estats.magicatk.cooldown / mult;
 	} else if (action.use_id == 2) {
-		base_stats.cooldown = effective_stats().magicatk.cooldown * 2;
+		base_stats.cooldown = estats.magicatk.cooldown * 2;
 	}
 
 	canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
@@ -586,8 +587,8 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 
 void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 	const int MAX_MELEE_HITS = 10;
-
-	if (stats().has_cooldown())
+	Stats estats = effective_stats(gs->get_luastate());
+	if (estats.has_cooldown())
 		return;
 
 	WeaponEntry& weap = game_weapon_data[weapon];
@@ -609,7 +610,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 		EnemyInst* e = (EnemyInst*) enemies[i];
 		//int damage = effective_stats().melee.damage + gs->rng().rand(-4, 5);
 		WeaponEntry& wtype = game_weapon_data[weapon_type()];
-		int damage = effective_stats().calculate_melee_damage(gs->rng(),
+		int damage = estats.calculate_melee_damage(gs->rng(),
 				weapon_type());
 		char buffstr[32];
 		snprintf(buffstr, 32, "%d", damage);

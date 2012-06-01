@@ -60,7 +60,7 @@ public:
   int hasten(lua_State* L){
 	  PlayerInst* p;
 	  if ( (p = dynamic_cast<PlayerInst*>(get_instance()))){
-		p->status_effects().add(EFFECT_HASTE, lua_tonumber(L, 1));
+		p->status_effects().add(0, lua_tonumber(L, 1));
 	  }
 	  return 0;
   }

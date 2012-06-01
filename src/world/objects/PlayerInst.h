@@ -48,9 +48,9 @@ public:
 		return base_stats;
 	}
 
-	Stats effective_stats() {
+	Stats effective_stats(lua_State* L) {
 		Stats tmp = base_stats;
-		effects.process(base_stats, tmp);
+		effects.process(L, base_stats, tmp);
 		return tmp;
 	}
 

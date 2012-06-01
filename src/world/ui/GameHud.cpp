@@ -229,6 +229,8 @@ void GameHud::draw(GameState* gs) {
 
 	PlayerInst* player_inst = (PlayerInst*) gs->get_instance(
 			gs->local_playerid());
+	Stats effective_stats = player_inst->effective_stats(gs->get_luastate());
+
 	gl_draw_rectangle(0, 0, _width, _height, bg_colour);
 
 	draw_minimap(gs, minimap_bbox().translated(-x, -y));
@@ -241,21 +243,21 @@ void GameHud::draw(GameState* gs) {
 		//player = state->get_instance(0);
 	}
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 15, 10,
-			"Level %d", player_inst->stats().xplevel);
+			"Level %d", effective_stats.xplevel);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 40,
 			64 + 45 + 128, "Floor %d", gs->level()->level_number);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 40,
 			64 + 45 + 128 + 15, "Gold %d", player_inst->gold());
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
 			64 + 45 + 128 + 30, "Strength   %d",
-			player_inst->effective_stats().strength);
+			effective_stats.strength);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
 			64 + 45 + 128 + 45, "Magic      %d",
-			player_inst->effective_stats().magic);
+			effective_stats.magic);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
 			64 + 45 + 128 + 60, "Defence  %d",
-			player_inst->effective_stats().defence);
-	Effect* efx = player_inst->status_effects().get(EFFECT_HASTE);
+			effective_stats.defence);
+	Effect* efx = player_inst->status_effects().get(0);
 	if (efx)
 		gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
 				64 + 45 + 128 + 60, "HASTE %d", efx->t_remaining);

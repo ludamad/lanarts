@@ -68,6 +68,8 @@ static int lua_member_lookup(lua_State* L){
 	else IFLUA_NUM_MEMB_LOOKUP("strength", stats->strength)
 	else IFLUA_NUM_MEMB_LOOKUP("defence", stats->defence)
 	else IFLUA_NUM_MEMB_LOOKUP("cooldown", stats->cooldown)
+	else IFLUA_NUM_MEMB_LOOKUP("melee_rate", stats->meleeatk.cooldown)
+	else IFLUA_NUM_MEMB_LOOKUP("magic_rate", stats->magicatk.cooldown)
 	else IFLUA_NUM_MEMB_LOOKUP("xp", stats->xp)
 	else IFLUA_NUM_MEMB_LOOKUP("xpneeded", stats->xpneeded)
 	else IFLUA_NUM_MEMB_LOOKUP("level", stats->xplevel)
@@ -98,6 +100,8 @@ static int lua_member_update(lua_State* L) {
 	else IFLUA_NUM_MEMB_UPDATE("strength", stats->strength)
 	else IFLUA_NUM_MEMB_UPDATE("defence", stats->defence)
 	else IFLUA_NUM_MEMB_UPDATE("cooldown", stats->cooldown)
+	else IFLUA_NUM_MEMB_UPDATE("melee_rate", stats->meleeatk.cooldown)
+	else IFLUA_NUM_MEMB_UPDATE("magic_rate", stats->magicatk.cooldown)
 	else IFLUA_NUM_MEMB_UPDATE("xp", stats->xp)
 	else IFLUA_NUM_MEMB_UPDATE("xpneeded", stats->xpneeded)
 	else {
@@ -127,5 +131,11 @@ void lua_stats_bindings(GameState* gs, lua_State* L) {
 }
 void lua_pushstats(lua_State* L, obj_id id){
 	lunar_t::push(L, new StatsLuaBinding(id), true);
+}
+void lua_pushstats(lua_State* L, const Stats& stats){
+	lunar_t::push(L, new StatsLuaBinding(stats), true);
+}
+Stats* lua_getstats(lua_State* L, int idx){
+	return lunar_t::check(L, idx)->get_stats(L);
 }
 const char StatsLuaBinding::className[] = "Stats";

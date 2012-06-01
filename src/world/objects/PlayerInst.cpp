@@ -83,8 +83,8 @@ void PlayerInst::draw(GameState* gs) {
 //					gl_draw_statbar(view, x - 10, y - 25, 20, 5, stats().mp,
 //							stats().max_mp, Colour(0,0,255));
 
-	if (effects.get(EFFECT_HASTE)) {
-		Effect* e = effects.get(EFFECT_HASTE);
+	if (effects.get(0)) {
+		Effect* e = effects.get(0);
 		float s = e->t_remaining / 200.0;
 		if (s > 1)
 			s = 1;
