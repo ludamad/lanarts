@@ -117,7 +117,7 @@ typedef lunar_t::RegType meth_t;
 #define LUA_DEF(m) meth_t(#m, &bind_t:: m)
 
 static int lua_member_lookup(lua_State* L) {
-#define IFLUA_NUM_MEMB_UPDATE(n, m) \
+#define IFLUA_NUM_MEMB_LOOKUP(n, m) \
 		if (strncmp(cstr, n, sizeof(n))==0){\
 		lua_pushnumber(L, m );\
 	}
@@ -127,13 +127,13 @@ static int lua_member_lookup(lua_State* L) {
 	const char* cstr = lua_tostring(L, 2);
 	GameView& view = gs->window_view();
 
-	IFLUA_NUM_MEMB_UPDATE("width", gs->width())
-	else IFLUA_NUM_MEMB_UPDATE("height", gs->height())
-	else IFLUA_NUM_MEMB_UPDATE("mouse_x", gs->mouse_x() + view.x)
-	else IFLUA_NUM_MEMB_UPDATE("mouse_y", gs->mouse_y() + view.y)
-	else IFLUA_NUM_MEMB_UPDATE("frame_number", gs->frame())
-	else IFLUA_NUM_MEMB_UPDATE("level_number", gs->level()->level_number)
-	else IFLUA_NUM_MEMB_UPDATE("monster_num", gs->monster_controller().number_monsters())
+	IFLUA_NUM_MEMB_LOOKUP("width", gs->width())
+	else IFLUA_NUM_MEMB_LOOKUP("height", gs->height())
+	else IFLUA_NUM_MEMB_LOOKUP("mouse_x", gs->mouse_x() + view.x)
+	else IFLUA_NUM_MEMB_LOOKUP("mouse_y", gs->mouse_y() + view.y)
+	else IFLUA_NUM_MEMB_LOOKUP("frame_number", gs->frame())
+	else IFLUA_NUM_MEMB_LOOKUP("level_number", gs->level()->level_number)
+	else IFLUA_NUM_MEMB_LOOKUP("monster_num", gs->monster_controller().number_monsters())
 	else {
 		lua_getglobal(L, bind_t::className);
 		int tableind = lua_gettop(L);

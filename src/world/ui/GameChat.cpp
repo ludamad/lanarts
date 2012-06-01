@@ -53,7 +53,7 @@ void GameChat::add_message(const ChatMessage& cm) {
 		messages.push_back(cm);
 
 	fade_out = 1.0f;
-	fade_out_rate = 0.0025f;
+	fade_out_rate = 0.005f;
 }
 
 void GameChat::add_message(const std::string& msg, const Colour& colour) {
@@ -133,11 +133,6 @@ static bool is_typeable_keycode(SDLKey keycode) {
 void GameChat::step(GameState *gs) {
 	std::string& msg = typed_message.message;
 
-	if (gs->key_press_state(SDLK_c)) {
-		show_chat = !show_chat;
-		fade_out_rate = 0.05f;
-	}
-
 	if (show_chat)
 		fade_out = 1.0f;
 	else if (fade_out > 0.0f)
@@ -207,6 +202,9 @@ bool GameChat::handle_event(GameNetConnection& connection, SDL_Event *event) {
 					typed_message.sender = local_sender;
 					typed_message.sender_colour = Colour(37, 207, 240);
 					add_message(typed_message);
+				} else {
+					show_chat = false;
+					fade_out_rate = 0.1f;
 				}
 				reset_typed_message();
 				is_typing = false;
@@ -223,7 +221,10 @@ bool GameChat::handle_event(GameNetConnection& connection, SDL_Event *event) {
 			}
 		} else {
 			if (keycode == SDLK_RETURN) {
-				is_typing = true;
+				if (!show_chat)
+					show_chat = true;
+				else if (show_chat)
+					is_typing = true;
 				return true;
 			}
 		}

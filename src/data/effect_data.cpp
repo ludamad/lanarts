@@ -12,8 +12,11 @@ void use_haste(Stats& basestats, Stats& affected){
 }
 
 
-EffectType game_effect_data[] = {
-		EffectType("haste",&use_haste)
-};
-size_t game_effect_n = sizeof(game_effect_data)/sizeof(EffectType);
+std::vector<EffectType> init_effects(){
+	std::vector<EffectType> ret;
+	ret.push_back(EffectType("haste",&use_haste));
+	return ret;
+}
+
+std::vector<EffectType> game_effect_data = init_effects();
 

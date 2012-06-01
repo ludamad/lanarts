@@ -1,6 +1,11 @@
 #ifndef GAMEDIALOGS_H_
 #define GAMEDIALOGS_H_
 
+/*Windows defines this - how very evil*/
+#ifdef DialogBox
+#undef DialogBox
+#endif
+
 #include <vector>
 
 class GameNetConnection;

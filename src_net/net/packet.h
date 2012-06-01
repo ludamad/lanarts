@@ -19,7 +19,7 @@ struct NetPacket {
 		PACKET_SRV_ASSERT_NUM_PEERIDS = -1,
 		PACKET_SRV_ASSERT_PEERID = -2,
 		PACKET_SRV_ASSERT_STARTED = -3,
-		PACKET_CLIENT_REQUEST_NUM_PEERIDS = -4,
+		PACKET_CLIENT_REQUEST_NUM_PEERIDS = -4
 	};
 
 	NetPacket(int packet_origin = 0, int packet_type = 0);

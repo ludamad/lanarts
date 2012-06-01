@@ -84,7 +84,7 @@ void PlayerInst::draw(GameState* gs) {
 //							stats().max_mp, Colour(0,0,255));
 
 	if (effects.get(EFFECT_HASTE)) {
-		effect* e = effects.get(EFFECT_HASTE);
+		Effect* e = effects.get(EFFECT_HASTE);
 		float s = e->t_remaining / 200.0;
 		if (s > 1)
 			s = 1;

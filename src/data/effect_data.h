@@ -8,6 +8,8 @@
 #define EFFECT_DATA_H_
 
 #include <cstdlib>
+#include <vector>
+
 #include "../gamestats/Stats.h"
 
 enum {
@@ -24,7 +26,6 @@ struct EffectType {
 	}
 };
 
-extern EffectType game_effect_data[];
-extern size_t game_effect_n;
+extern std::vector<EffectType> game_effect_data;
 
 #endif /* EFFECT_DATA_H_ */

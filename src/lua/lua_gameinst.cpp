@@ -88,31 +88,26 @@ obj_id lua_gameinst_arg(lua_State* L, int narg){
 	bind_t* bind = lunar_t::check(L, narg);
 	return bind->get_id();
 }
-static int lua_member_lookup(lua_State* L){
-	#define IFLUA_NUM_MEMB_LOOKUP(n, m) \
-		if (strncmp(cstr, n, sizeof(n))==0){\
-		lua_pushnumber(L, m );\
-	}
 
+#define IFLUA_NUM_MEMB_LOOKUP(n, m) \
+	if (strncmp(cstr, n, sizeof(n))==0){\
+	lua_pushnumber(L, m );\
+}
+#define IFLUA_STATS_MEMB_LOOKUP(n, m) \
+	if (strncmp(cstr, n, sizeof(n))==0){\
+	lua_pushstats(L, m );\
+}
+
+static int lua_member_lookup(lua_State* L){
 	bind_t* state = lunar_t::check(L,1);
-	GameInst* inst = state->get_instance();
-	Stats* stats = state->get_stats();
 	const char* cstr = lua_tostring(L, 2);
 
-	IFLUA_NUM_MEMB_LOOKUP("hp", stats->hp)
-	else IFLUA_NUM_MEMB_LOOKUP("mp", stats->mp)
-	else IFLUA_NUM_MEMB_LOOKUP("max_hp", stats->max_hp)
-	else IFLUA_NUM_MEMB_LOOKUP("max_mp", stats->max_mp)
-	else IFLUA_NUM_MEMB_LOOKUP("x", inst->x)
+	GameInst* inst = state->get_instance();
+
+	IFLUA_NUM_MEMB_LOOKUP("x", inst->x)
 	else IFLUA_NUM_MEMB_LOOKUP("y", inst->y)
-	else IFLUA_NUM_MEMB_LOOKUP("magic", stats->magic)
-	else IFLUA_NUM_MEMB_LOOKUP("strength", stats->strength)
-	else IFLUA_NUM_MEMB_LOOKUP("defence", stats->defence)
-	else IFLUA_NUM_MEMB_LOOKUP("cooldown", stats->cooldown)
-	else IFLUA_NUM_MEMB_LOOKUP("xp", stats->xp)
-	else IFLUA_NUM_MEMB_LOOKUP("xpneeded", stats->xpneeded)
-	else IFLUA_NUM_MEMB_LOOKUP("level", stats->xplevel)
 	else IFLUA_NUM_MEMB_LOOKUP("id", inst->id)
+	else IFLUA_STATS_MEMB_LOOKUP("stats", inst->id)
 	else{
 		lua_getglobal(L, bind_t::className);
 		int tableind = lua_gettop(L);
@@ -145,14 +140,7 @@ static int lua_member_update(lua_State* L){
 	const char* cstr = lua_tostring(L, 2);
 
 	bool had_member = true;
-	IFLUA_NUM_MEMB_UPDATE("hp", stats->hp)
-	else IFLUA_NUM_MEMB_UPDATE("mp", stats->mp)
-	else IFLUA_NUM_MEMB_UPDATE("magic", stats->magic)
-	else IFLUA_NUM_MEMB_UPDATE("strength", stats->strength)
-	else IFLUA_NUM_MEMB_UPDATE("cooldown", stats->cooldown)
-	else IFLUA_NUM_MEMB_UPDATE("defence", stats->defence)
-	else IFLUA_NUM_MEMB_UPDATE("xp", stats->xp)
-	else IFLUA_NUM_MEMB_UPDATE("x", inst->x)
+	IFLUA_NUM_MEMB_UPDATE("x", inst->x)
 	else IFLUA_NUM_MEMB_UPDATE("y", inst->y)
 	else if (einst){
 		IFLUA_NUM_MEMB_UPDATE("vx", einst->behaviour().vx)

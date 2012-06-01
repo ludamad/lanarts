@@ -79,25 +79,78 @@ void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 	glEnd();
 }
 
-///Much like Nehe's glPrint function, but modified to work
-///with freetype fonts.
-/*returns width of formatted string*/
-Pos gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
-		const char *fmt, ...) {
-	//	float h=ft_font.h/.63f;						//We make the height about 1.5* that of
-	char text[512]; // Holds Our String
-	va_list ap; // Pointer To List Of Arguments
+const int UNBOUNDED = 10000;
 
-	if (fmt == NULL) // If There's No Text
-		*text = 0; // Do Nothing
+/*Splits up strings, respecting space boundaries*/
+static std::vector<int> split_up_string(const font_data& font, int max_width, const char* text){
+	std::vector<int> line_splits;
+	int last_space = 0, ind = 0;
+	int width = 0, width_since_space = 0;
+	unsigned char c;
 
-	else {
-		va_start(ap, fmt);
-		// Parses The String For Variables
-		vsprintf(text, fmt, ap); // And Converts Symbols To Actual Numbers
-		va_end(ap);
-		// Results Are Stored In Text
+	while ( (c = text[ind]) != '\0' ){
+		char_data &cdata = *font.data[c];
+		width += cdata.advance;
+		width_since_space += cdata.advance;
+
+		if (isspace(c)) {
+			last_space = ind;
+			width_since_space = 0;
+		}
+
+		if (width > max_width){
+			line_splits.push_back(last_space);
+			width = width_since_space;
+		}
+		ind++;
 	}
+
+	return line_splits;
+}
+
+//Pos gl_printf_bounded(const font_data& font, const Colour& colour,
+//		const BBox& bounds, const char* text) {
+//	int textlen = strlen(text);
+//	for (int i = 0; i < textlen; i++)
+//		if (text[i] == '\n')
+//			text[i] = '\0';
+//
+//	Pos offset(0, 0);
+//	int len = 0;
+//	const char* iter = text;
+//	while (iter < text + textlen) {
+//		int len = 0;
+//		offset.y += font.h;
+//		for (int i = 0; iter[i]; i++) {
+//			unsigned char chr = iter[i];
+//			char_data &cdata = *font.data[chr];
+//			len += cdata.advance;
+//			gl_draw_image(&cdata.img, bounds.x1 + len - (cdata.advance - cdata.left),
+//					bounds.y1 + offset.y - cdata.move_up, colour);
+//		}
+//		offset.x = std::max(len, offset.x);
+//		offset.y += 1;
+//
+//		iter += strlen(iter) + 1;
+//	}
+//	return offset;
+//}
+
+/* printf-like function that draws to the screen, returns width of formatted string*/
+Pos gl_printf(const font_data& font, const Colour& colour, float x, float y,
+		const char *fmt, ...) {
+	char text[512];
+	va_list ap;
+
+	va_start(ap, fmt);
+#ifdef __GNUC__
+	vsnprintf(text, 512, fmt, ap);
+#else
+	//TODO, add visual studio #if block
+	vsprintf(text, fmt, ap);
+#endif
+	va_end(ap);
+
 	int textlen = strlen(text);
 	for (int i = 0; i < textlen; i++)
 		if (text[i] == '\n')
@@ -106,10 +159,10 @@ Pos gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
 	int len = 0;
 	for (char* iter = text; iter < text + textlen;
 			iter += strlen(iter) + 1, len = 0) {
-		offset.y += ft_font.h;
+		offset.y += font.h;
 		for (int i = 0; iter[i]; i++) {
 			unsigned char chr = iter[i];
-			char_data &cdata = *ft_font.data[chr];
+			char_data &cdata = *font.data[chr];
 			len += cdata.advance;
 			offset.x = std::max(len, offset.x);
 			gl_draw_image(&cdata.img, x + len - (cdata.advance - cdata.left),

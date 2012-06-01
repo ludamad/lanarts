@@ -14,23 +14,24 @@
 #include "../data/weapon_data.h"
 
 
-class EffectsLuaBinding {
+class EffectLuaBinding {
 public:
   static const char className[];
-  static Lunar<EffectsLuaBinding>::RegType methods[];
+  static Lunar<EffectLuaBinding>::RegType methods[];
 
-  EffectsLuaBinding(int effectnum) : effectnum(effectnum) {
+  EffectLuaBinding(int effectnum) : effectnum(effectnum) {
   }
 
   EffectType& get_effects(){
 	  return game_effect_data[effectnum];
   }
 private:
+  obj_id id;
   int effectnum;
 };
 
-typedef EffectsLuaBinding bind_t;
-typedef Lunar<EffectsLuaBinding> lunar_t;
+typedef EffectLuaBinding bind_t;
+typedef Lunar<EffectLuaBinding> lunar_t;
 typedef lunar_t::RegType meth_t;
 #define LUA_DEF(m) meth_t(#m, &bind_t:: m)
 
@@ -40,7 +41,7 @@ meth_t bind_t::methods[] = {
 };
 
 void lua_pusheffects(lua_State* L, int effectnum){
-	lunar_t::push(L, new EffectsLuaBinding(effectnum), true);
+	lunar_t::push(L, new EffectLuaBinding(effectnum), true);
 }
 
 EffectType& lua_effects_arg(lua_State* L, int narg){
@@ -53,7 +54,7 @@ void lua_effects_bindings(GameState* gs, lua_State* L){
      luaL_getmetatable(L, bind_t::className);
      lua_newtable(L);
      int top = lua_gettop(L);
-     for (int i = 0; i < game_effect_n; i++) {
+     for (int i = 0; i < game_effect_data.size(); i++) {
     	    lua_pushstring(L, game_effect_data[i].name);
     	    lua_pusheffects(L, i);
     	    lua_settable(L, top);
@@ -63,4 +64,4 @@ void lua_effects_bindings(GameState* gs, lua_State* L){
 
 }
 
-const char EffectsLuaBinding::className[] = "Effects";
+const char EffectLuaBinding::className[] = "Effects";
