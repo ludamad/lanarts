@@ -219,7 +219,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 						item_used = true;
 						queued_actions.push_back(
 								GameAction(id, GameAction::USE_ITEM, frame,
-										level, i, p.x, p.y ));
+										level, i, p.x, p.y));
 						break; //Can only use one item/step (until we have item cooldowns)
 					}
 				}
@@ -364,8 +364,9 @@ void PlayerInst::perform_queued_actions(GameState *gs) {
 void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 // 	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
 	ItemSlot& itemslot = inventory.get(action.use_id);
-	int gx = x/TILE_SIZE, gy = y/TILE_SIZE;
-	int dropx = gx*TILE_SIZE + TILE_SIZE/2, dropy = gy*TILE_SIZE + TILE_SIZE/2;
+	int gx = x / TILE_SIZE, gy = y / TILE_SIZE;
+	int dropx = gx * TILE_SIZE + TILE_SIZE / 2, dropy = gy * TILE_SIZE
+			+ TILE_SIZE / 2;
 	gs->add_instance(new ItemInst(itemslot.item, dropx, dropy, 1, id));
 	itemslot.amount--;
 }
@@ -397,7 +398,7 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 	}
 }
 
-static bool item_check_lua_prereq(lua_State* L, ItemEntry& type, obj_id user){
+static bool item_check_lua_prereq(lua_State* L, ItemEntry& type, obj_id user) {
 	if (type.prereq_func.empty())
 		return true;
 
@@ -411,7 +412,8 @@ static bool item_check_lua_prereq(lua_State* L, ItemEntry& type, obj_id user){
 
 	return ret;
 }
-static void item_do_lua_action(lua_State* L, ItemEntry& type, obj_id user, const Pos& p){
+static void item_do_lua_action(lua_State* L, ItemEntry& type, obj_id user,
+		const Pos& p) {
 	type.action_func.push(L);
 	luayaml_push_item(L, type.name);
 	lua_pushgameinst(L, user);
@@ -425,8 +427,9 @@ void PlayerInst::use_item(GameState *gs, const GameAction& action) {
 
 	lua_State* L = gs->get_luastate();
 
-	if (itemslot.amount > 0 && item_check_lua_prereq(L, type, this->id)){
-		item_do_lua_action(L, type, this->id, Pos(action.action_x, action.action_y));
+	if (itemslot.amount > 0 && item_check_lua_prereq(L, type, this->id)) {
+		item_do_lua_action(L, type, this->id,
+				Pos(action.action_x, action.action_y));
 		itemslot.amount--;
 		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 	}
@@ -559,8 +562,7 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 		bounce = false;
 		hits = 3;
 	}
-	atk.damage = estats.calculate_spell_damage(gs->rng(),
-			action.use_id);
+	atk.damage = estats.calculate_spell_damage(gs->rng(), action.use_id);
 
 	if (action.use_id < 2) {
 		GameInst* bullet = new ProjectileInst(atk.attack_sprite, id,
@@ -583,6 +585,17 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	}
 
 	canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
+}
+
+void PlayerInst::gain_xp(GameState* gs, int xp) {
+	int levels_gained = stats().gain_xp(xp);
+	if (levels_gained > 0) {
+//		bool plural = levels_gained > 1;
+
+		char level_gain_str[128];
+		snprintf(level_gain_str, 128, "You have reached level %d!", stats().xplevel);
+		gs->game_chat().add_message(level_gain_str, Colour(50, 205, 50));
+	}
 }
 
 void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
@@ -610,8 +623,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 		EnemyInst* e = (EnemyInst*) enemies[i];
 		//int damage = effective_stats().melee.damage + gs->rng().rand(-4, 5);
 		WeaponEntry& wtype = game_weapon_data[weapon_type()];
-		int damage = estats.calculate_melee_damage(gs->rng(),
-				weapon_type());
+		int damage = estats.calculate_melee_damage(gs->rng(), weapon_type());
 		char buffstr[32];
 		snprintf(buffstr, 32, "%d", damage);
 		float rx, ry;
@@ -621,7 +633,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 						rx, ry, buffstr));
 
 		if (e->hurt(gs, damage)) {
-			stats().gain_xp(e->xpworth());
+			gain_xp(gs, e->xpworth());
 			if (is_local_focus()) {
 				snprintf(buffstr, 32, "%d XP", e->xpworth());
 				gs->add_instance(

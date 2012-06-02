@@ -73,7 +73,7 @@ void PlayerInst::draw(GameState* gs) {
 	bool isfighterimg = (isclient == is_local_focus());
 	GLimage& img = game_sprite_data[get_sprite_by_name(
 			isfighterimg ? "fighter" : "wizard")].img;
-	bool b = gs->tile_radius_test(x, y, RADIUS);
+//	bool b = gs->tile_radius_test(x, y, RADIUS);
 	//gl_draw_rectangle(view, x-10,y-20,20,5, b ? Colour(255,0,0) : Colour(0,255,0));
 	//gl_draw_circle(view, x,y,RADIUS);
 	if (stats().hp < stats().max_hp)
@@ -83,8 +83,9 @@ void PlayerInst::draw(GameState* gs) {
 //					gl_draw_statbar(view, x - 10, y - 25, 20, 5, stats().mp,
 //							stats().max_mp, Colour(0,0,255));
 
-	if (effects.get(0)) {
-		Effect* e = effects.get(0);
+	int haste_effect = get_effect_by_name("Haste");
+	if (effects.get(haste_effect)) {
+		Effect* e = effects.get(haste_effect);
 		float s = e->t_remaining / 200.0;
 		if (s > 1)
 			s = 1;

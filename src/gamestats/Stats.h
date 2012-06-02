@@ -61,7 +61,7 @@ struct Stats {
 	int calculate_melee_damage(MTwist& mt, int weapon_type);
 	int calculate_spell_damage(MTwist& mt, int spell_type);
 	void gain_level();
-	void gain_xp(int amnt);
+	int gain_xp(int amnt);
 
 	void raise_hp(float hpgain);
 	void raise_mp(float mpgain);

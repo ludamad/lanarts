@@ -22,7 +22,7 @@ public:
   EffectLuaBinding(int effectnum) : effectnum(effectnum) {
   }
 
-  EffectType& get_effects(){
+  EffectEntry& get_effects(){
 	  return game_effect_data[effectnum];
   }
 private:
@@ -44,7 +44,7 @@ void lua_pusheffects(lua_State* L, int effectnum){
 	lunar_t::push(L, new EffectLuaBinding(effectnum), true);
 }
 
-EffectType& lua_effects_arg(lua_State* L, int narg){
+EffectEntry& lua_effects_arg(lua_State* L, int narg){
 	bind_t* bind = lunar_t::check(L, narg);
 	return bind->get_effects();
 }

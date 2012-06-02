@@ -84,7 +84,7 @@ void ProjectileInst::step(GameState* gs) {
 
 			if (e->hurt(gs, damage)) {
 				PlayerInst* p = (PlayerInst*) origin;
-				p->stats().gain_xp(e->xpworth());
+				p->gain_xp(gs, e->xpworth());
 
 				if (p->is_local_focus()) {
 					snprintf(buffstr, 32, "%d XP", e->xpworth());

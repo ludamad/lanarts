@@ -6,8 +6,7 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-
-void Effects::process(lua_State* L, Stats & basestats, Stats & affected) {
+void Effects::process(lua_State* L, Stats& basestats, Stats& affected) {
 	lua_pushstats(L, basestats);
 	lua_pushstats(L, affected);
 
@@ -17,12 +16,12 @@ void Effects::process(lua_State* L, Stats & basestats, Stats & affected) {
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining > 0) {
 			game_effect_data[effects[i].effect].statmod.push(L);
-			lua_pushvalue(L, affind);
 			lua_pushvalue(L, baseind);
+			lua_pushvalue(L, affind);
 			lua_call(L, 2, 0);
 		}
 	}
-	basestats = *lua_getstats(L, baseind);
+//	basestats = *lua_getstats(L, baseind);
 	affected = *lua_getstats(L, affind);
 	lua_pop(L, 2);//pop base&affected
 }

@@ -123,13 +123,16 @@ void Stats::gain_level() {
 	xplevel++;
 }
 
-void Stats::gain_xp(int amnt) {
+int Stats::gain_xp(int amnt) {
+	int levels_gained = 0;
 	xp += amnt;
 	while (xp >= xpneeded) {
 		gain_level();
+		levels_gained++;
 		xp -= xpneeded;
 		xpneeded = (xplevel) * 125;
 	}
+	return levels_gained;
 }
 
 int Stats::calculate_melee_damage(MTwist& mt, int weapon_type){

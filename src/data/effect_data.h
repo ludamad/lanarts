@@ -14,10 +14,10 @@
 #include "../util/LuaValue.h"
 #include "../gamestats/Stats.h"
 
-struct EffectType {
+struct EffectEntry {
 	const char* name;
 	LuaValue statmod;
-	EffectType(const char* name, const std::string& statmod_luaf) :
+	EffectEntry(const char* name, const std::string& statmod_luaf) :
 		name(name), statmod(statmod_luaf){
 	}
 	void init(lua_State* L){
@@ -25,6 +25,7 @@ struct EffectType {
 	}
 };
 
-extern std::vector<EffectType> game_effect_data;
+int get_effect_by_name(const char* name);
+extern std::vector<EffectEntry> game_effect_data;
 
 #endif /* EFFECT_DATA_H_ */

@@ -19,7 +19,7 @@
 #include "../GameAction.h"
 #include <deque>
 
-const int REST_COOLDOWN = 150;
+const int REST_COOLDOWN = 300;
 
 class PlayerInst: public GameInst {
 public:
@@ -38,6 +38,8 @@ public:
 	virtual void draw(GameState *gs);
 	virtual void copy_to(GameInst* inst) const;
 	virtual PlayerInst* clone() const;
+
+	void gain_xp(GameState* gs, int xp);
 
 	void queue_io_actions(GameState* gs);
 	void queue_network_actions(GameState* gs);

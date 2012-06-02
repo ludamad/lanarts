@@ -12,8 +12,8 @@
 
 using namespace std;
 
-EffectType parse_effect(const YAML::Node& n) {
-	return EffectType(parse_cstr(n["name"]),
+EffectEntry parse_effect(const YAML::Node& n) {
+	return EffectEntry(parse_cstr(n["name"]),
 			parse_defaulted(n, "stat_func", std::string()));
 }
 

@@ -18,7 +18,7 @@ class GameState;
 class GameInstSet {
 public:
 	enum {
-		DEFAULT_CAPACITY = 256, REGION_SIZE = 96
+		DEFAULT_CAPACITY = 64, REGION_SIZE = 96
 	//cell is REGION_SIZE by REGION_SIZE
 	};
 	GameInstSet(int w, int h, int capacity = DEFAULT_CAPACITY);

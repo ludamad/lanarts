@@ -15,7 +15,7 @@ extern "C" {
 #include "../lua/lua_api.h"
 
 std::vector<ClassType> game_class_data;
-std::vector<EffectType> game_effect_data;
+std::vector<EffectEntry> game_effect_data;
 std::vector<EnemyEntry> game_enemy_data;
 std::vector<ItemEntry> game_item_data;
 std::vector<TileEntry> game_tile_data;
@@ -27,23 +27,26 @@ std::vector<WeaponEntry> game_weapon_data;
 
 DungeonBranch game_dungeon_data[1] = {  };
 
-int get_class_by_name(const char* name){
-	for (int i = 0; i < game_class_data.size(); i++){
-		if (strcmp(name, game_class_data[i].name) == 0){
+template <typename T>
+int get_X_by_name(const T& t, const char* name){
+	for (int i = 0; i < t.size(); i++){
+		if (strcmp(name, t[i].name) == 0){
 			return i;
 		}
 	}
-	LANARTS_ASSERT(false);
-	return 0;
+	return -1;
 }
-int get_tile_by_name(const char *name){
-	for (int i = 0; i < game_tile_data.size(); i++){
-		if (strcmp(name, game_tile_data[i].name) == 0){
-			return i;
-		}
-	}
-	LANARTS_ASSERT(false);
-	return 0;
+int get_item_by_name(const char* name){
+	return get_X_by_name(game_item_data, name);
+}
+int get_class_by_name(const char* name){
+	return get_X_by_name(game_class_data, name);
+}
+int get_tile_by_name(const char* name){
+	return get_X_by_name(game_tile_data, name);
+}
+int get_effect_by_name(const char* name){
+	return get_X_by_name(game_effect_data, name);
 }
 
 int get_tileset_by_name(const char* name){
@@ -93,7 +96,7 @@ void init_lua_data(GameState* gs, lua_State* L){
 
 	register_as_global(L, enemies, "enemies");
 	register_as_global(L, effects, "effects");
-//	register_as_global(L, weapons, "weaponss");
+//	register_as_global(L, weapons, "weapons");
 	register_as_global(L, items, "items");
 	register_as_global(L, sprites, "sprites");
 	register_as_global(L, dungeon, "dungeon");

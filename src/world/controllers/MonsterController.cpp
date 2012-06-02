@@ -262,7 +262,7 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 		GameInst* player = gs->get_instance(pids[i]);
 		bool isvisible = gs->object_visible_test(e, player, false);
 		if (isvisible)
-			((PlayerInst*) player)->rest_cooldown() = 150;
+			((PlayerInst*) player)->rest_cooldown() = REST_COOLDOWN;
 		view.sharp_center_on(player->x, player->y);
 		bool chasing = e->behaviour().current_action
 				== EnemyBehaviour::CHASING_PLAYER;

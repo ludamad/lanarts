@@ -24,7 +24,6 @@
 
 #include "GameHud.h"
 
-
 static void draw_player_stats(GameState*gs, PlayerInst* player, int x, int y) {
 	Stats& s = player->stats();
 	gl_draw_statbar(x, y, 100, 10, s.hp, s.max_hp);
@@ -42,6 +41,14 @@ static void draw_player_stats(GameState*gs, PlayerInst* player, int x, int y) {
 
 	gl_printf(gs->primary_font(), Colour(0, 0, 0), x + 30, y + 30, "%d/%d",
 			s.xp, s.xpneeded);
+
+	float ratio = player->rest_cooldown() / float(REST_COOLDOWN);
+	Colour col(200 * ratio, 200 * (1.0f - ratio), 0);
+	gl_draw_rectangle(x, y + 45, 100, 10, col);
+
+	if (player->rest_cooldown() == 0)
+		gl_printf(gs->primary_font(), Colour(0, 0, 0), x + 25, y + 44, "can rest",
+				player->rest_cooldown() * 100 / REST_COOLDOWN);
 }
 
 static void draw_player_inventory(GameState* gs, PlayerInst* player, int inv_x,
@@ -70,8 +77,8 @@ static void draw_player_inventory(GameState* gs, PlayerInst* player, int inv_x,
 				ItemEntry& itemd = game_item_data[itemslot.item];
 				GLimage* itemimg = &game_sprite_data[itemd.sprite_number].img;
 				gl_draw_image(itemimg, p.x, p.y);
-				gl_printf(gs->primary_font(), Colour(255, 255, 255), p.x+1, p.y+1,
-						"%d", itemslot.amount);
+				gl_printf(gs->primary_font(), Colour(255, 255, 255), p.x + 1,
+						p.y + 1, "%d", itemslot.amount);
 			}
 
 			slot++;
@@ -140,8 +147,7 @@ BBox GameHud::minimap_bbox() {
 	return BBox(x + 20, y + 64 + 45, x + 20 + 128, y + 64 + 45 + 128);
 }
 
-void GameHud::step(GameState *gs)
-{
+void GameHud::step(GameState *gs) {
 }
 
 void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
@@ -249,18 +255,11 @@ void GameHud::draw(GameState* gs) {
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 40,
 			64 + 45 + 128 + 15, "Gold %d", player_inst->gold());
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
-			64 + 45 + 128 + 30, "Strength   %d",
-			effective_stats.strength);
+			64 + 45 + 128 + 30, "Strength   %d", effective_stats.strength);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
-			64 + 45 + 128 + 45, "Magic      %d",
-			effective_stats.magic);
+			64 + 45 + 128 + 45, "Magic      %d", effective_stats.magic);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
-			64 + 45 + 128 + 60, "Defence  %d",
-			effective_stats.defence);
-	Effect* efx = player_inst->status_effects().get(0);
-	if (efx)
-		gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
-				64 + 45 + 128 + 60, "HASTE %d", efx->t_remaining);
+			64 + 45 + 128 + 60, "Defence  %d", effective_stats.defence);
 	draw_player_actionbar(gs, player_inst);
 }
 
