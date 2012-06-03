@@ -1,0 +1,24 @@
+--- 
+
+#Locations of markup files
+#relative to res/data
+
+class_files: classes.yaml
+
+effect_files: effects.yaml
+
+enemy_files: enemies.yaml
+
+item_files: items.yaml
+
+level_files: levels.yaml
+
+spell_files: spells.yaml
+
+sprite_files: sprites/sprites.yaml
+
+tile_files: tiles.yaml
+
+tileset_files: tilesets.yaml
+
+weapon_files: weapons.yaml

@@ -1,0 +1,38 @@
+---
+tilesets:
+  - tileset: nerve_tiles
+    floor_tile: nerve_floor
+    wall_tile: cobble_blood
+  
+  - tileset: blue_tiles
+    floor_tile: crystal_floor
+    wall_tile: brick_gray
+    corridor_tile: blue_floor
+    alt_wall_tile: stone_wall
+    alt_floor_tile: floor2
+    alt_corridor_tile: floor2  
+
+  - tileset: grass_tiles
+    floor_tile: grass
+    wall_tile: grass_tree
+
+  - tileset: sand_tiles
+    floor_tile: sand_rock
+    wall_tile: yellow_wall
+
+  - tileset: pebble_tiles
+    floor_tile: pebble_brown
+    wall_tile: brickdark
+    corridor_tile: hive
+    alt_wall_tile: brickdark
+    alt_floor_tile: hive
+    alt_corridor_tile: hive
+
+  - tileset: crystal_tiles
+    floor_tile: crystal_floor
+    wall_tile: crystal_wall
+    corridor_tile: mesh
+    alt_floor_tile: crystal_floor
+    alt_wall_tile: crystal_wall
+    alt_corridor_tile: crystal_floor
+    
