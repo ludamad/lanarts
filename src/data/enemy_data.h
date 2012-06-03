@@ -14,7 +14,7 @@
 #include "../gamestats/Stats.h"
 
 struct EnemyEntry {
-	const char* name;
+	std::string name;
 	int radius;
 	int xpaward;
 	int sprite_number;
@@ -22,13 +22,16 @@ struct EnemyEntry {
 
 	LuaValue init_event, step_event;
 
-	EnemyEntry(){
+	EnemyEntry() {
 	}
-	EnemyEntry(const char* name, int rad, int xpaward, int spriten, const Stats& stats, const std::string& initev, const std::string& stepev) :
-		name(name), radius(rad), xpaward(xpaward), sprite_number(spriten), basestats(stats), init_event(initev), step_event(stepev){
+	EnemyEntry(const std::string& name, int rad, int xpaward, int spriten,
+			const Stats& stats, const std::string& initev,
+			const std::string& stepev) :
+			name(name), radius(rad), xpaward(xpaward), sprite_number(spriten), basestats(
+					stats), init_event(initev), step_event(stepev) {
 	}
 
-	void init(lua_State* L){
+	void init(lua_State* L) {
 		init_event.initialize(L);
 		step_event.initialize(L);
 	}

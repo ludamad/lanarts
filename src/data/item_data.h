@@ -15,13 +15,13 @@
 #include "../util/LuaValue.h"
 
 struct ItemEntry {
-	const char* name;
+	std::string name;
 	int sprite_number;
 	int radius;
 	LuaValue action_func, prereq_func;
 	bool stackable;
 	int weapon;
-	ItemEntry(const char* name, int rad, int spriten,
+	ItemEntry(const std::string& name, int rad, int spriten,
 			const std::string& action_luaf, const std::string& prereq_luaf,
 			bool stackable, int weapon = -1) :
 		name(name), sprite_number(spriten), radius(rad),
@@ -36,6 +36,7 @@ struct ItemEntry {
 };
 
 int get_item_by_name(const char* name);
+
 extern std::vector<ItemEntry> game_item_data;
 
 

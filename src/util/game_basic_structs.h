@@ -5,6 +5,8 @@
 #ifndef GAME_BASIC_STRUCTS_H_
 #define GAME_BASIC_STRUCTS_H_
 
+#include <cassert>
+
 /*Represents a Canadian colour*/
 struct Colour {
 	int r, g, b, a;
@@ -49,6 +51,14 @@ struct BBox {
 	}
 	BBox translated(int x, int y) {
 		return BBox(x1 + x, y1 + y, x2 + x, y2 + y);
+	}
+};
+
+/*Represents a single square tile*/
+struct Tile {
+	unsigned short tile, subtile;
+	Tile(int tile = 0, int subtile = 0) :
+			tile(tile), subtile(subtile) {
 	}
 };
 

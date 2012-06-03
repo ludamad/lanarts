@@ -1,5 +1,4 @@
 ---
-
 #Enemy Markup
 enemies:
   - name: Skeleton
@@ -133,4 +132,17 @@ enemies:
         range: 400
         cooldown: 70
         sprite: fire bolt
+        projectile_speed: 4
+
+  - name: Imp
+    sprite: imp
+    radius: 12
+    xpaward: 50
+    stats:
+        movespeed: 3.3
+        hp: 50
+        hpregen: 0.25
+    attacks:
+      - damage: 20
+        cooldown: 70
         projectile_speed: 4

@@ -75,7 +75,7 @@ static void draw_player_inventory(GameState* gs, PlayerInst* player, int inv_x,
 
 			if (itemslot.amount > 0) {
 				ItemEntry& itemd = game_item_data[itemslot.item];
-				GLimage* itemimg = &game_sprite_data[itemd.sprite_number].img;
+				GLimage& itemimg = game_sprite_data[itemd.sprite_number].img();
 				gl_draw_image(itemimg, p.x, p.y);
 				gl_printf(gs->primary_font(), Colour(255, 255, 255), p.x + 1,
 						p.y + 1, "%d", itemslot.amount);
@@ -108,10 +108,10 @@ static void draw_player_actionbar(GameState* gs, PlayerInst* player) {
 		gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE, outline, 1);
 	}
 	WeaponEntry* wtype = &game_weapon_data[player->weapon_type()];
-	gl_draw_image(&game_sprite_data[wtype->weapon_sprite].img, 0, y);
-	gl_draw_image(&game_sprite_data[get_sprite_by_name("fire bolt")].img,
+	gl_draw_image(game_sprite_data[wtype->weapon_sprite].img(), 0, y);
+	gl_draw_image(game_sprite_data[get_sprite_by_name("fire bolt")].img(),
 			TILE_SIZE, y);
-	gl_draw_image(&game_sprite_data[get_sprite_by_name("magic blast")].img,
+	gl_draw_image(game_sprite_data[get_sprite_by_name("magic blast")].img(),
 			TILE_SIZE * 2, y);
 }
 
@@ -176,15 +176,15 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 		minimap_arr[i * 4 + 3] = 255;
 	}
 
-	int stdown = get_tile_by_name("stairs_down");
-	int stup = get_tile_by_name("stairs_up");
+	int stairs_down = get_tile_by_name("stairs_down");
+	int stairs_up = get_tile_by_name("stairs_up");
 	for (int y = 0; y < minimap_h; y++) {
 		char* iter = minimap_arr + y * ptw * 4;
 		for (int x = 0; x < minimap_w; x++) {
-			int tile = tiles.get(x, y);
+			int tile = tiles.get(x, y).tile;
 			int seen = tiles.is_seen(x, y) || minimap_reveal;
 			if (seen) {
-				if (tile == stdown || tile == stup) {
+				if (tile == stairs_down || tile == stairs_up) {
 					iter[0] = 255, iter[1] = 0, iter[2] = 0, iter[3] = 255;
 				} else if (!tiles.is_solid(x, y)) {/*floor*/
 					iter[0] = 255, iter[1] = 255, iter[2] = 255, iter[3] = 255;
@@ -222,13 +222,10 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 				max_tilex, max_tiley, Colour(255, 180, 99)); //
 	}
 
-	int old_unpack;
-	//glGetIntegerv(GL_UNPACK_ALIGNMENT, &old_unpack);
-	//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	gl_image_from_bytes(&minimap_buff, ptw, pth, minimap_arr);
-	//glPixelStorei(GL_UNPACK_ALIGNMENT, old_unpack);
 
-	gl_draw_image(&minimap_buff, minimap_x, minimap_y);
+	gl_image_from_bytes(minimap_buff, ptw, pth, minimap_arr);
+
+	gl_draw_image(minimap_buff, minimap_x, minimap_y);
 }
 void GameHud::draw(GameState* gs) {
 	gl_set_drawing_area(x, y, _width, _height);

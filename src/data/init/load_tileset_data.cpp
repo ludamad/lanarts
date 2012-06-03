@@ -12,9 +12,9 @@
 
 using namespace std;
 
-static Range parse_tile_range(const YAML::Node& n){
+static Range parse_tile_range(const YAML::Node& n) {
 	Range gr;
-	if (n.Type() == YAML::NodeType::Sequence){
+	if (n.Type() == YAML::NodeType::Sequence) {
 		std::vector<std::string> components;
 		n >> components;
 		gr.min = get_tile_by_name(components[0].c_str());
@@ -28,58 +28,40 @@ static Range parse_tile_range(const YAML::Node& n){
 	return gr;
 }
 
-static TilesetEntry parse_tilesetentry(const YAML::Node& node){
+static TilesetEntry parse_tilesetentry(const YAML::Node& node) {
 	std::string name;
 	node["tileset"] >> name;
+
 	Range floor = parse_tile_range(node["floor_tile"]);
 	Range wall = parse_tile_range(node["wall_tile"]);
-
 	Range corridor = floor;
+	Range altfloor = floor;
+	Range altwall = wall;
+	Range altcorridor = corridor;
+
 	if (hasnode(node, "corridor_tile"))
 		corridor = parse_tile_range(node["corridor_tile"]);
 
-	Range altfloor = floor;
 	if (hasnode(node, "alt_floor_tile"))
 		altfloor = parse_tile_range(node["alt_floor_tile"]);
 
-	Range altwall = wall;
 	if (hasnode(node, "alt_wall_tile"))
 		altwall = parse_tile_range(node["alt_wall_tile"]);
 
-	Range altcorridor = corridor;
 	if (hasnode(node, "alt_corridor_tile"))
 		altcorridor = parse_tile_range(node["alt_corridor_tile"]);
 
-	return TilesetEntry(
-			name,
-			floor.min,floor.max,
-			wall.min,wall.max,
-			corridor.min,corridor.max,
-			altfloor.min,altfloor.max,
-			altwall.min,altwall.max,
-			altcorridor.min,altcorridor.max);
+	return TilesetEntry(name, floor.min, floor.max, wall.min, wall.max,
+			corridor.min, corridor.max, altfloor.min, altfloor.max, altwall.min,
+			altwall.max, altcorridor.min, altcorridor.max);
 }
 
-void load_tileset_data(const char* filename){
+void load_tileset_callbackf(const YAML::Node& node, lua_State* L,
+		LuaValue* value) {
+	game_tileset_data.push_back(parse_tilesetentry(node));
+}
 
-    fstream file(filename, fstream::in | fstream::binary);
+void load_tileset_data(const FilenameList& filenames) {
 	game_tileset_data.clear();
-
-	try{
-		YAML::Parser parser(file);
-		YAML::Node root;
-
-		parser.GetNextDocument(root);
-
-		const YAML::Node& node = root["tilesets"];
-	
-		for(int i = 0; i < node.size(); i++){
-			game_tileset_data.push_back(parse_tilesetentry(node[i]));
-		}
-	} catch (const YAML::Exception& parse){
-		printf("Enemies Parsed Incorrectly: \n");
-		printf("%s\n", parse.what());
-	}
-	file.close();
-
+	load_data_impl_template(filenames, "tilesets", load_tileset_callbackf);
 }

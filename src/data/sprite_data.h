@@ -1,12 +1,3 @@
-/*
- * sprite_data.h
- *
- *  Created on: Feb 4, 2012
- *      Author: 100397561
- */
-
-
-
 #ifndef SPRITE_DATA_H_
 #define SPRITE_DATA_H_
 
@@ -15,28 +6,29 @@
 
 #include "../display/GLImage.h"
 
+#include "../util/types_util.h"//For FilenameList
+
 struct SpriteEntry {
-	const char* name;
-	GLimage img;
-	SpriteEntry(const char* name, const char* fname) : name(name), img(fname){}
-	void init(){
-		init_GL_Image(&img, img.filename);
+	std::string name;
+	std::vector<GLimage> images;
+	SpriteEntry(const std::string& name, const FilenameList& filenames) :
+			name(name) {
+		for (int i = 0; i < filenames.size(); i++) {
+			images.push_back(GLimage(filenames[i]));
+		}
+	}
+	void init() {
+		for (int i = 0; i < images.size(); i++) {
+			images[i].init();
+		}
+	}
+	GLimage& img() {
+		return images.at(0);
 	}
 };
 
 extern std::vector<SpriteEntry> game_sprite_data;
 
-inline int get_sprite_by_name(const std::string& s){
-	for (int i = 0; i < game_sprite_data.size(); i++){
-		if (s == game_sprite_data[i].name){
-			return i;
-		}
-	}
-	return -1;
-}
-
-void init_sprite_data();
-
-
+int get_sprite_by_name(const char* name);
 
 #endif /* SPRITE_DATA_H_ */

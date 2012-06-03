@@ -27,7 +27,7 @@ struct StatModifier {
 };
 
 struct WeaponEntry { //Currently for melee & ranged
-	const char* name;
+	std::string name;
 	bool projectile;
 	int max_targets;
 	int base_mindmg, base_maxdmg;
@@ -39,7 +39,7 @@ struct WeaponEntry { //Currently for melee & ranged
 
 
 
-	WeaponEntry(const char* name, bool projectile,
+	WeaponEntry(const std::string& name, bool projectile,
 			int max_targets,
 			int base_mindamage, int base_maxdamage, const StatModifier& dmgm, int range, int cooldown,
 			int dmgradius,

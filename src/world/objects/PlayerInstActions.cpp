@@ -403,7 +403,7 @@ static bool item_check_lua_prereq(lua_State* L, ItemEntry& type, obj_id user) {
 		return true;
 
 	type.prereq_func.push(L);
-	luayaml_push_item(L, type.name);
+	luayaml_push_item(L, type.name.c_str());
 	lua_pushgameinst(L, user);
 	lua_call(L, 2, 1);
 
@@ -415,7 +415,7 @@ static bool item_check_lua_prereq(lua_State* L, ItemEntry& type, obj_id user) {
 static void item_do_lua_action(lua_State* L, ItemEntry& type, obj_id user,
 		const Pos& p) {
 	type.action_func.push(L);
-	luayaml_push_item(L, type.name);
+	luayaml_push_item(L, type.name.c_str());
 	lua_pushgameinst(L, user);
 	lua_pushnumber(L, p.x);
 	lua_pushnumber(L, p.y);
@@ -616,7 +616,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 
 	int max_targets = std::min(MAX_MELEE_HITS, weap.max_targets);
 
-	int numhit = gs->object_radius_test(this, enemies, MAX_MELEE_HITS,
+	int numhit = gs->object_radius_test(this, enemies, max_targets,
 			enemy_colfilter, ax, ay, weap.dmgradius);
 
 	for (int i = 0; i < numhit; i++) {
@@ -630,7 +630,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 		direction_towards(Pos(x, y), Pos(e->x, e->y), rx, ry, 0.5);
 		gs->add_instance(
 				new AnimatedInst(e->x - 5 + rx * 5, e->y - 3 + rx * 5, -1, 25,
-						rx, ry, buffstr));
+						rx, ry, buffstr, Colour(255, 148, 120)));
 
 		if (e->hurt(gs, damage)) {
 			gain_xp(gs, e->xpworth());

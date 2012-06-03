@@ -31,7 +31,7 @@ void ItemInst::draw(GameState *gs) {
 	GameView& view = gs->window_view();
 
 	ItemEntry& itemd = game_item_data[type];
-	GLimage& img = game_sprite_data[itemd.sprite_number].img;
+	GLimage& img = game_sprite_data[itemd.sprite_number].images[0];
 
 	int w = img.width, h = img.height;
 	int xx = x - w / 2, yy = y - h / 2;
@@ -41,7 +41,7 @@ void ItemInst::draw(GameState *gs) {
 	if (!gs->object_visible_test(this))
 		return;
 	int x_inview = xx - view.x, y_inview = yy - view.y;
-	gl_draw_image(&img, x_inview, y_inview);
+	gl_draw_image(img, x_inview, y_inview);
 	if (itemd.stackable && quantity > 1) {
 		gl_printf(gs->primary_font(), Colour(255,255,255), x_inview+1, y_inview+1, "%d", quantity);
 	}

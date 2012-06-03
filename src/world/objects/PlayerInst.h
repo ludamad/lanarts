@@ -86,13 +86,13 @@ public:
 	}
 
 private:
-	void use_move(GameState *gs, const GameAction& action);
-	void use_weapon(GameState *gs, const GameAction& action);
+	void use_move(GameState* gs, const GameAction& action);
+	void use_weapon(GameState* gs, const GameAction& action);
 	void use_dngn_exit(GameState* gs, const GameAction& action);
-	void use_dngn_entrance(GameState *gs, const GameAction& action);
-	void use_spell(GameState *gs, const GameAction& action);
-	void use_rest(GameState *gs, const GameAction& action);
-	void use_item(GameState *gs, const GameAction& action);
+	void use_dngn_entrance(GameState* gs, const GameAction& action);
+	void use_spell(GameState* gs, const GameAction& action);
+	void use_rest(GameState* gs, const GameAction& action);
+	void use_item(GameState* gs, const GameAction& action);
 	void pickup_item(GameState* gs, const GameAction& action);
 	void drop_item(GameState* gs, const GameAction& action);
 

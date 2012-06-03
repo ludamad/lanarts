@@ -41,6 +41,11 @@ struct Sqr {
 
 
 struct Room {
+	enum shape_t {
+		RECT = 0,
+		OVAL = 1
+	};
+
 	Region room_region;
 	int groupID;
 	Room(const Region& r, int groupID) :

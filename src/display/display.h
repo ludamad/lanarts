@@ -24,12 +24,12 @@ void init_sdl_gl(bool fullscreen, int w, int h);
 void update_display();
 void SDL_GL_diagnostics();
 
-void gl_image_from_bytes(GLimage* img, int w, int h, char* data, int type =
+void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type =
 		GL_BGRA);
 
-void gl_draw_image(GLimage* img, int x, int y,
+void gl_draw_image(GLimage& img, int x, int y,
 		const Colour& c = Colour(255, 255, 255));
-void gl_draw_image(const GameView& view, GLimage* img, int x, int y);
+void gl_draw_image(const GameView& view, GLimage& img, int x, int y);
 
 void gl_draw_circle(float x, float y, float radius, const Colour& colour =
 		Colour(0, 0, 0), bool outline = false);

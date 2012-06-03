@@ -1,3 +1,10 @@
+/*
+ * yaml_util.cpp
+ *  Utilities for loading and parsing yaml data
+ */
+
+#include <fstream>
+
 #include "yaml_util.h"
 
 std::vector<const YAML::Node*> flatten_seq_mappings(const YAML::Node & n) {
@@ -23,7 +30,7 @@ int parse_sprite_number(const YAML::Node & n, const char *key) {
 
 	std::string s;
 	n[key] >> s;
-	return get_sprite_by_name(s);
+	return get_sprite_by_name(s.c_str());
 }
 
 int parse_enemy_number(const YAML::Node & n, const char *key) {
@@ -41,10 +48,15 @@ int parse_enemy_number(const YAML::Node & n, const char *key) {
 	return -1;
 }
 
-const char *parse_cstr(const YAML::Node & n) {
+const char* parse_cstr(const YAML::Node & n) {
 	std::string s;
 	n >> s;
 	return tocstring(s);
+}
+std::string parse_str(const YAML::Node & n) {
+	std::string s;
+	n >> s;
+	return s;
 }
 
 StatModifier parse_modifiers(const YAML::Node & n) {
@@ -99,7 +111,7 @@ Stats parse_stats(const YAML::Node & n, const std::vector<Attack> & attacks) {
 	ret_stats.strength = parse_defaulted(n, "strength", 0);
 	ret_stats.defence = parse_defaulted(n, "defence", 0);
 	ret_stats.magic = parse_defaulted(n, "magic", 0);
-	ret_stats.xpneeded = parse_defaulted(n, "xpneeded", 125);
+	ret_stats.xpneeded = parse_defaulted(n, "xpneeded", 150);
 	ret_stats.xplevel = parse_defaulted(n, "xplevel", 1);
 	for (int i = 0; i < attacks.size(); i++) {
 		if (!attacks[i].isprojectile)
@@ -112,8 +124,40 @@ Stats parse_stats(const YAML::Node & n, const std::vector<Attack> & attacks) {
 	return ret_stats;
 }
 
-const YAML::Node & operator >>(const YAML::Node & n, Range & r) {
+const YAML::Node & operator >>(const YAML::Node& n, Range& r) {
 	r = parse_range(n);
 	return n;
+}
+
+void load_data_impl_template(const FilenameList& filenames,
+		const char* resource, load_data_impl_callbackf node_callback,
+		lua_State* L, LuaValue* value) {
+	using namespace std;
+
+	FilenameList::const_iterator it = filenames.begin();
+	for (; it != filenames.end();
+			++it) {
+		std::string fname = "res/data/"+*it;
+		fstream file(fname.c_str(), fstream::in | fstream::binary);
+
+		if (file) {
+			try {
+				YAML::Parser parser(file);
+				YAML::Node root;
+
+				parser.GetNextDocument(root);
+				const YAML::Node& cnode = root[resource];
+				for (int i = 0; i < cnode.size(); i++) {
+					node_callback(cnode[i], L, value);
+				}
+				file.close();
+			} catch (const YAML::Exception& parse) {
+				printf("%s parsed incorrectly! \n", resource);
+				printf("Error:\n%s\n", parse.what());
+			}
+		} else {
+			printf("file '%s' could not be loaded!\n", it->c_str());
+		}
+	}
 }
 

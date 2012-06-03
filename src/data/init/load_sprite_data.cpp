@@ -12,94 +12,58 @@
 
 using namespace std;
 
-void load_tile_data(const char* filename) {
+void load_tile_callbackf(const YAML::Node& node, lua_State* L,
+		LuaValue* value) {
+	int seq = parse_defaulted(node, "variations", 0);
+	bool is_seq = seq > 0;
 
-	fstream file(filename, fstream::in | fstream::binary);
-	game_tile_data.clear();
+	FilenameList filenames;
+	std::string tilefile = parse_str(node["file"]);
 
-
-	try {
-		YAML::Parser parser(file);
-		YAML::Node root;
-		parser.GetNextDocument(root);
-
-		const YAML::Node& node = root["tiles"];
-
-		for (int i = 0; i < node.size(); i++) {
-			const YAML::Node& n = node[i];
-			int seq = parse_defaulted(n, "variations", 0);
-			bool is_seq = seq > 0;
-			if (is_seq) {
-				for (int i = 0; i < seq; i++) {
-					char number[12];
-					std::string tilefile;
-					n["file"] >> tilefile;
-					snprintf(number, 12, "%d", i);
-					tilefile += number;
-					tilefile += parse_defaulted(n, "extension", std::string());
-
-//				printf("Parsing tile name '%s'\n", tilefile.c_str());
-
-					std::string tilename;
-					n["name"] >> tilename;
-					tilename += number;
-
-					TileEntry entry(tocstring(tilename),
-							tocstring(tilefile)
-					);
-					game_tile_data.push_back(entry);
-				}
-			} else {
-				TileEntry entry(parse_cstr(n["name"]),
-						parse_cstr(n["file"])
-				);
-				game_tile_data.push_back(entry);
-			}
+	if (is_seq) {
+		for (int i = 0; i < seq; i++) {
+			char number[32];
+			snprintf(number, 32, "%d", i);
+			filenames.push_back(
+					tilefile + number + parse_str(node["extension"]));
 		}
-		for (int i = 0; i < game_tile_data.size(); i++) {
-			game_tile_data[i].init();
-		}
-	} catch (const YAML::Exception& parse) {
-		printf("Sprites Parsed Incorrectly: \n");
-		printf("%s\n", parse.what());
+	} else {
+		filenames.push_back(tilefile);
 	}
-	file.close();
+
+	game_tile_data.push_back(TileEntry(parse_str(node["name"]), filenames));
 }
 
-LuaValue load_sprite_data(lua_State* L, const char* filename) {
+void load_tile_data(const FilenameList& filenames) {
+	game_tile_data.clear();
+
+	load_data_impl_template(filenames, "tiles", load_tile_callbackf);
+
+	for (int i = 0; i < game_tile_data.size(); i++) {
+		game_tile_data[i].init();
+	}
+}
+
+void load_sprite_callbackf(const YAML::Node& node, lua_State* L,
+		LuaValue* value) {
+	FilenameList files(1);
+	node["file"] >> files[0];
+
+	SpriteEntry entry(parse_str(node["name"]), files);
+	game_sprite_data.push_back(entry);
+	value->table_set_yaml(L, game_sprite_data.back().name.c_str(), &node);
+}
+LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
 
-	fstream file(filename, fstream::in | fstream::binary);
+	game_sprite_data.clear();
 
-	try {
-		YAML::Parser parser(file);
-		YAML::Node root;
+	load_data_impl_template(filenames, "sprites", load_sprite_callbackf, L,
+			&ret);
 
-		string name, filen;
-		int issolid = 0;
-
-		parser.GetNextDocument(root);
-		game_sprite_data.clear();
-
-		const YAML::Node& node = root["sprites"];
-
-		for (int i = 0; i < node.size(); i++) {
-			issolid = 0;
-			const YAML::Node& n = node[i];
-
-			SpriteEntry entry(parse_cstr(n["name"]), parse_cstr(n["file"]));
-
-			game_sprite_data.push_back(entry);
-			ret.table_set_yaml(L, game_sprite_data.back().name, &n);
-		}
-		for (int i = 0; i < game_sprite_data.size(); i++) {
-			game_sprite_data[i].init();
-		}
-	} catch (const YAML::Exception& parse) {
-		printf("Sprites Parsed Incorrectly: \n");
-		printf("%s\n", parse.what());
+	for (int i = 0; i < game_sprite_data.size(); i++) {
+		game_sprite_data[i].init();
 	}
-	file.close();
 
 	return ret;
 }

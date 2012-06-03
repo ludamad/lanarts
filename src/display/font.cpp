@@ -44,10 +44,7 @@ char_data::char_data(char ch, FT_Face face) : img(){
 		data[4*(x+w*my)+3]=bitmap.buffer[x+w*y];
 	}
 	int old_unpack;
-	//glGetIntegerv(GL_UNPACK_ALIGNMENT, &old_unpack);
-	//lPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	gl_image_from_bytes(&img, w, h, (char*)data, GL_BGRA);
-	//glPixelStorei(GL_UNPACK_ALIGNMENT, old_unpack);
+	gl_image_from_bytes(img, w, h, (char*)data, GL_BGRA);
 }
 
 char_data::~char_data(){

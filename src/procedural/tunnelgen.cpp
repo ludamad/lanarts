@@ -42,8 +42,6 @@ public:
 	bool generate(Pos p, int dx, int dy, std::vector<Sqr>& btbuff,
 			std::vector<TunnelSliceContext>& tsbuff);
 
-
-
 private:
 	Pos next_turn_position(TunnelSliceContext* cntxt, int& ndx, int& ndy);
 	Pos next_tunnel_position(TunnelSliceContext* cntxt);
@@ -382,12 +380,18 @@ void generate_entrance(const Region& r, MTwist& mt, int len, Pos& p, bool& axis,
 	axis = mt.rand(2), positive = mt.rand(2);
 	if (axis) {
 		int rmx = r.x + r.w - len;
-		ind = mt.rand(r.x + 1, rmx);
+		if (rmx == r.x + 1)
+			ind = rmx;
+		else
+			ind = mt.rand(r.x + 1, rmx);
 		p.y = positive ? r.y + r.h : r.y - 1;
 		p.x = ind;
 	} else {
 		int rmy = r.y + r.h - len;
-		ind = mt.rand(r.y + 1, rmy);
+		if (rmy == r.y + 1)
+			ind = rmy;
+		else
+			ind = mt.rand(r.y + 1, rmy);
 		p.x = positive ? r.x + r.w : r.x - 1;
 		p.y = ind;
 	}

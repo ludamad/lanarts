@@ -125,7 +125,7 @@ static std::vector<int> split_up_string(const font_data& font, int max_width, co
 //			unsigned char chr = iter[i];
 //			char_data &cdata = *font.data[chr];
 //			len += cdata.advance;
-//			gl_draw_image(&cdata.img, bounds.x1 + len - (cdata.advance - cdata.left),
+//			gl_draw_image(cdata.img, bounds.x1 + len - (cdata.advance - cdata.left),
 //					bounds.y1 + offset.y - cdata.move_up, colour);
 //		}
 //		offset.x = std::max(len, offset.x);
@@ -165,7 +165,7 @@ Pos gl_printf(const font_data& font, const Colour& colour, float x, float y,
 			char_data &cdata = *font.data[chr];
 			len += cdata.advance;
 			offset.x = std::max(len, offset.x);
-			gl_draw_image(&cdata.img, x + len - (cdata.advance - cdata.left),
+			gl_draw_image(cdata.img, x + len - (cdata.advance - cdata.left),
 					y + offset.y - cdata.move_up, colour);
 		}
 		offset.y += 1;
@@ -198,7 +198,7 @@ void gl_draw_rectangle_outline(int x, int y, int w, int h, const Colour& clr,
 	glVertex2i(x2, y + linewidth);
 	glVertex2i(x2, y2);
 	glVertex2i(x + linewidth, y2);
-	glVertex2i(x + linewidth, y);
+	glVertex2i(x + linewidth, y + linewidth);
 
 	glEnd();
 

@@ -1,30 +1,33 @@
 /*
- * GLImage.h
- *
- *  Created on: Jun 9, 2011
- *      Author: 100397561
+ * GLImage.h:
+ *  A convenient OpenGL image wrapper
  */
 
 #ifndef GLIMAGE_H_
 #define GLIMAGE_H_
 
+#include <string>
+
 #include <SDL.h>
 #include <SDL_opengl.h>
 #undef GL_GLEXT_VERSION
 
-struct GLimage{
-	const char* filename;
+/* can be copy constructed so long as it has not been init'd yet */
+struct GLimage {
+	GLimage(const std::string filename = std::string()) :
+			filename(filename) {
+		texture = 0;
+	}
+	/* asserts img.texture == 0 */
+	GLimage(const GLimage& img);
+	~GLimage();
+
+	void init();
+
+	std::string filename;
 	int width, height;
 	float texw, texh;
 	GLuint texture;
-	GLimage(const char* fname = NULL){
-		filename = fname;
-		texture = 0;
-	}
-	~GLimage();
 };
-
-GLuint SDL_GL_LoadTexture(SDL_Surface *surface, GLfloat *texcoord);
-void init_GL_Image(GLimage* img, const char* fname);
 
 #endif /* GLIMAGE_H_ */

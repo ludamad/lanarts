@@ -5,7 +5,7 @@ class: Mage
 #Online settings
 username: ludamad
 
-#Window settingss
+#Window settings
 fullscreen: 0
 regen_level_on_death: 1
 view_width: 928
@@ -20,7 +20,7 @@ ip: localhost
 port: 6112
 
 #Speed settings
-steps_per_draw: 2 #More is almost guaranteed to make the game faster, 1 is ideal
+steps_per_draw: 1 #More is almost guaranteed to make the game faster, 1 is ideal
 time_per_step: 12
 
 #Debug settings

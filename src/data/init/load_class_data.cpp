@@ -36,7 +36,7 @@ ClassType parse_class(const YAML::Node& n){
 	gainperlevel["hpregen"] >> hpregen;
 
 	return ClassType(
-			parse_cstr(n["name"]),
+			parse_str(n["name"]),
 			parse_stats(n["start_stats"], attacks),
 			hp, mp,
 			str, def, mag,
@@ -44,28 +44,19 @@ ClassType parse_class(const YAML::Node& n){
 			);
 }
 
-LuaValue load_class_data(lua_State* L, const char* filename){
+void load_class_callbackf(const YAML::Node& node, lua_State* L, LuaValue* value){
+	game_class_data.push_back( parse_class(node) );
+}
+
+LuaValue load_class_data(lua_State* L, const FilenameList& filenames){
 	LuaValue ret;
 
-	fstream file(filename, fstream::in | fstream::binary);
+	game_class_data.clear();
+	load_data_impl_template(filenames, "classes", load_class_callbackf, L,
+			&ret);
 
-	if (file){
-		try{
-			YAML::Parser parser(file);
-			YAML::Node root;
-
-			parser.GetNextDocument(root);
-			game_class_data.clear();
-			const YAML::Node& cnode = root["classes"];
-			for (int i = 0; i < cnode.size(); i++){
-				game_class_data.push_back( parse_class(cnode[i]) );
-				game_class_data.back().starting_stats.classtype = i;
-			}
-			file.close();
-		} catch (const YAML::Exception& parse){
-			printf("Class Parsed Incorrectly: \n");
-			printf("%s\n", parse.what());
-		}
+	for (int i = 0; i < game_class_data.size(); i++){
+		game_class_data[i].starting_stats.classtype = i;
 	}
 
 	return ret;

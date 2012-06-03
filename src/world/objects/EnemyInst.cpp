@@ -63,22 +63,22 @@ void EnemyInst::step(GameState* gs) {
 	//Much of the monster implementation resides in MonsterController
 	stats().step();
 }
-static bool starts_with_vowel(const char* name){
-	char c = tolower(*name);
+static bool starts_with_vowel(const std::string& name){
+	char c = tolower(name[0]);
 	return (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u');
 }
 static void show_appear_message(GameChat& chat, EnemyEntry* e){
 	char buff[100];
 	const char* a_or_an = starts_with_vowel(e->name) ? "An" : "A";
 
-	snprintf(buff, 100, "%s %s appears!", a_or_an, e->name);
+	snprintf(buff, 100, "%s %s appears!", a_or_an, e->name.c_str());
 	chat.add_message(buff, Colour(255, 148, 120));
 
 }
 void EnemyInst::draw(GameState* gs) {
 
 	GameView& view = gs->window_view();
-	GLimage& img = game_sprite_data[etype()->sprite_number].img;
+	GLimage& img = game_sprite_data[etype()->sprite_number].images[0];
 
 	if (gs->game_settings().draw_diagnostics) {
 		char statbuff[255];
@@ -108,12 +108,12 @@ void EnemyInst::draw(GameState* gs) {
 	if (stats().hurt_cooldown > 0) {
 		float s = 1 - stats().hurt_alpha();
 		Colour red(255, 255 * s, 255 * s);
-		gl_draw_image(&img, xx - view.x, yy - view.y, red);
+		gl_draw_image(img, xx - view.x, yy - view.y, red);
 	} else {
-		gl_draw_image(&img, xx - view.x, yy - view.y);
+		gl_draw_image(img, xx - view.x, yy - view.y);
 //		if (gs->solid_test(this)){
 //		Colour red(255,0,0);
-//		image_display(&img, xx - view.x, yy - view.y,red);
+//		image_display(img, xx - view.x, yy - view.y,red);
 //		}
 	}
 //	gl_printf(gs->primary_font(), Colour(255,255,255), x - view.x, y-25 -view.y, "id=%d", id);
@@ -154,7 +154,7 @@ void EnemyInst::attack(GameState* gs, GameInst* inst, bool ranged) {
 			direction_towards(Pos(x, y), Pos(pinst->x, pinst->y), rx, ry, 0.5);
 			gs->add_instance(
 					new AnimatedInst(pinst->x - 5 + rx * 5, pinst->y + ry * 5,
-							-1, 25, rx, ry, dmgstr));
+							-1, 25, rx, ry, dmgstr, Colour(255, 148, 120)));
 
 			stats().reset_melee_cooldown();
 			stats().cooldown += gs->rng().rand(-4, 5);

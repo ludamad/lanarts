@@ -16,7 +16,7 @@ using namespace std;
 
 ItemEntry parse_item_type(const YAML::Node& n){
 	return ItemEntry(
-			parse_cstr(n["name"]),
+			parse_str(n["name"]),
 			parse_defaulted(n,"radius", 11),
 			parse_sprite_number(n, "sprite"),
 			parse_defaulted(n, "action_func", std::string()),
@@ -25,31 +25,18 @@ ItemEntry parse_item_type(const YAML::Node& n){
 			-1
 		);
 }
-LuaValue load_item_data(lua_State* L, const char* filename){
+
+void load_item_callbackf(const YAML::Node& node, lua_State* L, LuaValue* value){
+	game_item_data.push_back(parse_item_type(node));
+	value->table_set_yaml(L, game_item_data.back().name, &node);
+}
+LuaValue load_item_data(lua_State* L, const FilenameList& filenames){
 	LuaValue ret;
 
-	fstream file(filename, fstream::in | fstream::binary);
+	game_item_data.clear();
 
-	if (file){
-		try{
-			YAML::Parser parser(file);
-			YAML::Node root;
+	load_data_impl_template(filenames, "items", load_item_callbackf, L,
+			&ret);
 
-			game_item_data.clear();
-
-			parser.GetNextDocument(root);
-			const YAML::Node& items = root["items"];
-			ret.table_initialize(L);
-			for (int i = 0; i < items.size(); i++){
-				game_item_data.push_back(parse_item_type(items[i]));
-				ret.table_set_yaml(L, game_item_data.back().name, &items[i]);
-			}
-
-			file.close();
-		} catch (const YAML::Exception& parse){
-			printf("Items Parsed Incorrectly: \n");
-			printf("%s\n", parse.what());
-		}
-	}
 	return ret;
 }

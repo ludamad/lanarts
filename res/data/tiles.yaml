@@ -87,4 +87,7 @@ tiles:
     file: res/tiles/grass/grass
     variations: 12
     extension: .png
+
+  - name: grass_tree
+    file: res/tiles/grass/tree.png
   

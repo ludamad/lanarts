@@ -1,18 +1,12 @@
-/*
- * load_dungeon_data.cpp
- *
- *  Created on: Mar 26, 2012
- *      Author: 100397561
- */
-
-
 #include <fstream>
-
-#include "../game_data.h"
 #include <yaml-cpp/yaml.h>
-#include "yaml_util.h"
+
 #include "../../gamestats/Stats.h"
+
 #include "../enemy_data.h"
+#include "../game_data.h"
+
+#include "yaml_util.h"
 
 using namespace std;
 
@@ -40,7 +34,7 @@ EnemyEntry parse_enemy_type(const YAML::Node& n){
 	}
 
 	return EnemyEntry(
-			parse_cstr(n["name"]),
+			parse_str(n["name"]),
 			radius,
 			xpaward,
 			parse_sprite_number(n,"sprite"),
@@ -50,26 +44,16 @@ EnemyEntry parse_enemy_type(const YAML::Node& n){
 	);
 }
 
-LuaValue load_enemy_data(lua_State* L, const char* filename){
+void load_enemy_callbackf(const YAML::Node& node, lua_State* L, LuaValue* value){
+	game_enemy_data.push_back( parse_enemy_type(node) );
+	value->table_set_yaml(L, game_enemy_data.back().name, &node);
+}
+
+LuaValue load_enemy_data(lua_State* L, const FilenameList& filenames){
 	LuaValue ret;
-	fstream file(filename, fstream::in | fstream::binary);
 
-	if (file){
-		try{
-			YAML::Parser parser(file);
-			YAML::Node root;
+	game_enemy_data.clear();
+	load_data_impl_template(filenames, "enemies", load_enemy_callbackf, L, &ret);
 
-			parser.GetNextDocument(root);
-			game_enemy_data.clear();
-			const YAML::Node& enemies = root["enemies"];
-			for (int i = 0; i < enemies.size(); i++){
-				game_enemy_data.push_back( parse_enemy_type(enemies[i]) );
-			}
-		} catch (const YAML::Exception& parse){
-			printf("Enemies Parsed Incorrectly: \n");
-			printf("%s\n", parse.what());
-		}
-		file.close();
-	}
 	return ret;
 }

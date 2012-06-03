@@ -28,9 +28,9 @@ std::vector<WeaponEntry> game_weapon_data;
 DungeonBranch game_dungeon_data[1] = {  };
 
 template <typename T>
-int get_X_by_name(const T& t, const char* name){
+int get_X_by_name(const T& t, const std::string& name){
 	for (int i = 0; i < t.size(); i++){
-		if (strcmp(name, t[i].name) == 0){
+		if (name == t[i].name){
 			return i;
 		}
 	}
@@ -41,6 +41,9 @@ int get_item_by_name(const char* name){
 }
 int get_class_by_name(const char* name){
 	return get_X_by_name(game_class_data, name);
+}
+int get_sprite_by_name(const char* name){
+	return get_X_by_name(game_sprite_data, name);
 }
 int get_tile_by_name(const char* name){
 	return get_X_by_name(game_tile_data, name);
@@ -61,20 +64,21 @@ int get_tileset_by_name(const char* name){
 
 LuaValue sprites, enemies, effects, weapons, items, dungeon, classes;
 void init_game_data(lua_State* L){
+	DataFiles dfiles = load_datafiles_data("res/datafiles.yaml");
 
 //NB: Do not re-order the way resources are loaded unless you know what you're doing
-	load_tile_data("res/data/tiles.yaml");
-	sprites = load_sprite_data(L, "res/data/sprites.yaml");
-	load_tileset_data("res/data/tileset.yaml");
-	enemies = load_enemy_data(L, "res/data/enemies.yaml");
-	effects = load_effect_data(L, "res/data/effects.yaml");
+	load_tile_data(dfiles.tile_files);
+	sprites = load_sprite_data(L, dfiles.sprite_files);
+	load_tileset_data(dfiles.tileset_files);
+	enemies = load_enemy_data(L, dfiles.enemy_files);
+	effects = load_effect_data(L, dfiles.effect_files);
 	//TODO: make separate weapons table
-	items = load_item_data(L, "res/data/items.yaml");
-	load_weapon_data(L, "res/data/weapons.yaml",  &items);
+	items = load_item_data(L, dfiles.item_files);
+	load_weapon_data(L, dfiles.weapon_files,  &items);
 	//TODO: remove lua_state arg
 	load_weapon_item_entries(L);
-	dungeon = load_dungeon_data(L, "res/data/levels.yaml");
-	classes = load_class_data(L, "res/data/classes.yaml");
+	dungeon = load_dungeon_data(L, dfiles.level_files);
+	classes = load_class_data(L, dfiles.class_files);
 }
 
 static void register_as_global(lua_State* L, LuaValue& value, const char* name){
@@ -102,7 +106,7 @@ void init_lua_data(GameState* gs, lua_State* L){
 	register_as_global(L, dungeon, "dungeon");
 	register_as_global(L, classes, "classes");
 
-	luaL_dofile(L, "res/lua/defines.lua");
+	luaL_dofile(L, "res/main.lua");
 
 	__lua_init(L, game_enemy_data);
 	__lua_init(L, game_effect_data);
@@ -116,15 +120,15 @@ static void luayaml_push(LuaValue& value, lua_State *L, const char *name){
 	lua_gettable(L, tableind);
 	lua_replace(L, tableind);
 }
-void luayaml_push_item(lua_State *L, const char *name){
+void luayaml_push_item(lua_State *L, const char* name){
 	luayaml_push(items, L, name);
 }
-void luayaml_push_sprites(lua_State *L, const char *name){
+void luayaml_push_sprites(lua_State *L, const char* name){
 	luayaml_push(sprites, L, name);
 }
-void luayaml_push_enemies(lua_State *L, const char *name){
+void luayaml_push_enemies(lua_State *L, const char* name){
 	luayaml_push(enemies, L, name);
 }
-void luayaml_push_levelinfo(lua_State *L, const char *name){
+void luayaml_push_levelinfo(lua_State *L, const char* name){
 	luayaml_push(dungeon, L, name);
 }

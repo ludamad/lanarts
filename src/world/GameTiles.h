@@ -26,9 +26,9 @@ public:
 	int tile_width();
 	int tile_height();
 
-	int* tile_array();
+	Tile* tile_array();
 
-	int& get(int x, int y);
+	Tile& get(int x, int y);
 
 	void set_solid(int x, int y, bool solid);
 
@@ -40,13 +40,9 @@ public:
 	void copy_to(GameTiles& t) const;
 private:
 	char* seen_tiles;
-	int* tiles;
-	std::vector<bool> solid_tiles;
+	Tile* tiles;
 	int width, height;
+	std::vector<bool> solid_tiles;
 };
-
-
-
-
 
 #endif /* GAMETILES_H_ */

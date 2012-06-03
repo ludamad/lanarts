@@ -12,9 +12,15 @@
 #include "../data/tile_data.h"
 #include "../data/tileset_data.h"
 
-//Random time in a specified range
-static int rtile(MTwist& mt, Range& r){
-	return mt.rand(r.min, r.max+1);
+/* Generate a random subtile for a tile */
+static Tile rltile(MTwist& mt, int tile){
+	int subtiles = game_tile_data[tile].images.size();
+	return Tile(tile, mt.rand(subtiles));
+}
+
+/* Generate a random tile from a tile range */
+static Tile rltile(MTwist& mt, const Range& r){
+	return rltile(mt, mt.rand(r));
 }
 
 void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel& level, GameState* gs){
@@ -36,18 +42,18 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 			Sqr& s = level.at(x-start_x, y-start_y);
 			tiles.set_solid(x,y, !s.passable);
 			if (s.passable) {
-				tiles.get(x,y) = rtile(mt, tileset.floor);
+				tiles.get(x,y) = rltile(mt, tileset.floor);
 				if (s.roomID){
 //					if (s.marking)
 // 					tiles[ind] = TILE_MESH_0+s.marking;
 				} else if (s.feature == SMALL_CORRIDOR){
-					tiles.get(x,y) = rtile(mt, tileset.corridor);
+					tiles.get(x,y) = rltile(mt, tileset.corridor);
 				}
 			} else {
-				tiles.get(x,y)= rtile(mt, tileset.wall);
+				tiles.get(x,y)= rltile(mt, tileset.wall);
 				if (s.feature == SMALL_CORRIDOR){
 					if (mt.rand(4) == 0){
-						tiles.get(x,y) = rtile(mt, tileset.altwall);
+						tiles.get(x,y) = rltile(mt, tileset.altwall);
 					}
 				}
 			}
@@ -74,7 +80,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 			for (int x = rx; x < rx+rw; x++) {
 				Sqr& s = level.at(x, y);
 				if (s.passable && s.roomID && s.feature != SMALL_CORRIDOR)
-				tiles.get(x+start_x,y+start_y) = rtile(mt, tileset.altfloor);
+				tiles.get(x+start_x,y+start_y) = rltile(mt, tileset.altfloor);
 			}
 		}
 	}
@@ -86,7 +92,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 		p.x += start_x;
 		p.y += start_y;
 
-		tiles.get(p.x, p.y) = get_tile_by_name("stairs_down");
+		tiles.get(p.x, p.y) = rltile(mt, get_tile_by_name("stairs_down"));
 
 		gs->level()->entrances.push_back(GameLevelPortal(p, Pos(0,0)));
 	}
@@ -103,15 +109,13 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 		for (int yy = y; yy < ey; yy++) {
 			for (int xx = x; xx < ex; xx++) {
 				level.at(xx,yy).near_entrance = true;
-//				if (xx != x || yy != y)//For visual confirmation
-//					tiles.get(xx+start_x,yy+start_y) = TILE_MESH_0;
 			}
 		}
 
 		p.x += start_x;
 		p.y += start_y;
 		
-		tiles.get(p.x, p.y) = get_tile_by_name("stairs_up");
+		tiles.get(p.x, p.y) = rltile(mt, get_tile_by_name("stairs_up"));
 		gs->level()->exits.push_back(GameLevelPortal(p, Pos(0,0)));
 	}
 

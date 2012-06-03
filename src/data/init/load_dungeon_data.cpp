@@ -123,11 +123,18 @@ void parse_dungeon_branch(const YAML::Node& n,
 	}
 }
 
-LuaValue load_dungeon_data(lua_State* L, const char* filename) {
+
+void load_dungeon_callbackf(const YAML::Node& node, lua_State* L, LuaValue* value){
+//	game_class_data.push_back( parse_class(node) );
+}
+
+
+LuaValue load_dungeon_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
 	try {
 
-		fstream file(filename, fstream::in | fstream::binary);
+		std::string fname = "res/data/"+filenames[0];
+		fstream file(fname.c_str(), fstream::in | fstream::binary);
 
 		YAML::Parser parser(file);
 		YAML::Node root;

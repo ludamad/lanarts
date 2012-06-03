@@ -55,7 +55,7 @@ void lua_effects_bindings(GameState* gs, lua_State* L){
      lua_newtable(L);
      int top = lua_gettop(L);
      for (int i = 0; i < game_effect_data.size(); i++) {
-    	    lua_pushstring(L, game_effect_data[i].name);
+    	    lua_pushstring(L, game_effect_data[i].name.c_str());
     	    lua_pusheffects(L, i);
     	    lua_settable(L, top);
      }

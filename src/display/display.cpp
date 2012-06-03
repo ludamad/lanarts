@@ -20,12 +20,12 @@
 #include <algorithm>
 #include "../world/GameView.h"
 
-void gl_draw_image(GLimage* img, int x, int y, const Colour& c) {
-	if (img->width == 0 || img->height == 0) return;
-	int x2 = x + img->width, y2 = y + img->height;
+void gl_draw_image(GLimage& img, int x, int y, const Colour& c) {
+	if (img.width == 0 || img.height == 0) return;
+	int x2 = x + img.width, y2 = y + img.height;
 
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, img->texture);
+	glBindTexture(GL_TEXTURE_2D, img.texture);
 
 	glColor4ub(c.r, c.g, c.b, c.a);
 
@@ -34,20 +34,20 @@ void gl_draw_image(GLimage* img, int x, int y, const Colour& c) {
 	glTexCoord2f(0, 0);
 	glVertex2i(x, y);
 
-	glTexCoord2f(img->texw, 0);
+	glTexCoord2f(img.texw, 0);
 	glVertex2i(x2, y);
 
-	glTexCoord2f(img->texw, img->texh);
+	glTexCoord2f(img.texw, img.texh);
 	glVertex2i(x2, y2);
 
-	glTexCoord2f(0, img->texh);
+	glTexCoord2f(0, img.texh);
 	glVertex2i(x, y2);
 
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 	//Don't use glBindTexture(GL_TEXTURE_2D, NULL);
 }
-void gl_draw_image(const GameView& view, GLimage* img, int x, int y){
+void gl_draw_image(const GameView& view, GLimage& img, int x, int y){
 	gl_draw_image(img, x - view.x, y - view.y);
 }
 
@@ -103,7 +103,7 @@ void init_sdl_gl(bool fullscreen, int w, int h) {
 	}
 
 	/* Set the flags we want to use for setting the video mode */
-	video_flags = SDL_OPENGL;
+	video_flags = SDL_OPENGL | SDL_DOUBLEBUF;
 	if (fullscreen)
 		video_flags |= SDL_FULLSCREEN;
 
@@ -155,23 +155,23 @@ void gl_set_drawing_area(int x, int y, int w, int h) {
 	//update_display();
 }
 
-void gl_image_from_bytes(GLimage* img, int w, int h, char* data, int type) {
-	bool was_init = img->texture;
+void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type) {
+	bool was_init = img.texture;
 	// allocate a texture name
 	if (!was_init)
-		glGenTextures(1, &img->texture);
+		glGenTextures(1, &img.texture);
 
 	int ptw = power_of_two(w), pth = power_of_two(h);
 	ptw = std::max(4, ptw);
 	pth = std::max(4, pth);
 
-	img->width = w, img->height = h;
-	img->texw = w / ((float) ptw);
-	img->texh = h / ((float) pth);
+	img.width = w, img.height = h;
+	img.texw = w / ((float) ptw);
+	img.texh = h / ((float) pth);
 	if (w == 0 || h == 0) return;
 
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, img->texture);
+	glBindTexture(GL_TEXTURE_2D, img.texture);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

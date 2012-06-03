@@ -1,9 +1,3 @@
-/*
- * effect_data.h
- *
- *  Created on: March 24, 2012dw
- *      Author: 100397561
- */
 #ifndef EFFECT_DATA_H_
 #define EFFECT_DATA_H_
 
@@ -15,12 +9,12 @@
 #include "../gamestats/Stats.h"
 
 struct EffectEntry {
-	const char* name;
+	std::string name;
 	LuaValue statmod;
-	EffectEntry(const char* name, const std::string& statmod_luaf) :
-		name(name), statmod(statmod_luaf){
+	EffectEntry(const std::string& name, const std::string& statmod_luaf) :
+			name(name), statmod(statmod_luaf) {
 	}
-	void init(lua_State* L){
+	void init(lua_State* L) {
 		statmod.initialize(L);
 	}
 };

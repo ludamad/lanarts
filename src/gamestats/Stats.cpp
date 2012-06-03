@@ -10,13 +10,18 @@
 #include "../data/class_data.h"
 #include "../data/weapon_data.h"
 
-Stats::Stats(float speed, int hp, int mp, int strength,
-		int defence, int magic, const Attack & melee,
-		const Attack & ranged) :
+static int experience_needed_formula(int xplevel) {
+	float proportion = pow(xplevel, 1.75);
+	return round(proportion) * 50 + 100;
+}
+
+Stats::Stats(float speed, int hp, int mp, int strength, int defence, int magic,
+		const Attack & melee, const Attack & ranged) :
 		classtype(0), movespeed(speed), hp(hp), max_hp(hp), mp(mp), max_mp(mp), hpregen(
 				1.0 / 30), mpregen(1.0 / 15), cooldown(0), hurt_cooldown(0), hp_regened(
 				0), mp_regened(0), meleeatk(melee), magicatk(ranged), xp(0), xpneeded(
-				100), xplevel(1), strength(strength), defence(defence), magic(magic) {
+				experience_needed_formula(1)), xplevel(1), strength(strength), defence(
+				defence), magic(magic) {
 }
 
 void Stats::step() {
@@ -59,8 +64,8 @@ bool Stats::has_cooldown() {
 }
 const int HURT_COOLDOWN = 30;
 float Stats::hurt_alpha() {
-	if (hurt_cooldown < HURT_COOLDOWN/2)
-		return hurt_cooldown / HURT_COOLDOWN/2 * 0.7 + 0.3;
+	if (hurt_cooldown < HURT_COOLDOWN / 2)
+		return hurt_cooldown / HURT_COOLDOWN / 2 * 0.7 + 0.3;
 
 	else
 		return (HURT_COOLDOWN - hurt_cooldown) / 10 * 0.7 + 0.3;
@@ -90,7 +95,7 @@ void Stats::reset_ranged_cooldown(const Stats & effectivestats) {
 }
 
 bool Stats::hurt(int dmg) {
-	hp -= std::max(0, dmg-defence);
+	hp -= std::max(0, dmg - defence);
 	set_hurt_cooldown();
 	if (hp < 0) {
 		hp = 0;
@@ -99,9 +104,9 @@ bool Stats::hurt(int dmg) {
 	return false;
 }
 
-void Stats::heal_fully(){
-    hp = max_hp;
-    mp = max_mp;
+void Stats::heal_fully() {
+	hp = max_hp;
+	mp = max_mp;
 }
 
 void Stats::gain_level() {
@@ -130,23 +135,24 @@ int Stats::gain_xp(int amnt) {
 		gain_level();
 		levels_gained++;
 		xp -= xpneeded;
-		xpneeded = (xplevel) * 125;
+		xpneeded = experience_needed_formula(xplevel);
 	}
 	return levels_gained;
 }
 
-int Stats::calculate_melee_damage(MTwist& mt, int weapon_type){
+int Stats::calculate_melee_damage(MTwist& mt, int weapon_type) {
 	WeaponEntry& wtype = game_weapon_data[weapon_type];
-	int base_damage = mt.rand(wtype.base_mindmg, wtype.base_maxdmg+1);
+	int base_damage = mt.rand(wtype.base_mindmg, wtype.base_maxdmg + 1);
 	StatModifier& sm = wtype.damage_multiplier;
-	float statdmg = strength*sm.strength_mult + defence*sm.defence_mult + magic*sm.magic_mult;
+	float statdmg = strength * sm.strength_mult + defence * sm.defence_mult
+			+ magic * sm.magic_mult;
 	int damage = round(statdmg) + base_damage;
 	return damage;
 }
-int Stats::calculate_spell_damage(MTwist& mt, int spell_type){
-	int base_damage = mt.rand(4,8);
+int Stats::calculate_spell_damage(MTwist& mt, int spell_type) {
+	int base_damage = mt.rand(4, 8);
 	//StatModifier& sm = wtype.damage_multiplier;
 	//float statdmg = strength*sm.strength_mult + defence*sm.defence_mult + magic*sm.magic_mult;
 	int damage = magic + base_damage;
-	return damage * (spell_type+1);
+	return damage * (spell_type + 1);
 }

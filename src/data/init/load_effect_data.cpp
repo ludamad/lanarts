@@ -13,30 +13,21 @@
 using namespace std;
 
 EffectEntry parse_effect(const YAML::Node& n) {
-	return EffectEntry(parse_cstr(n["name"]),
+	return EffectEntry(parse_str(n["name"]),
 			parse_defaulted(n, "stat_func", std::string()));
 }
 
-LuaValue load_effect_data(lua_State* L, const char* filename) {
+void load_effect_callbackf(const YAML::Node& node, lua_State* L,
+		LuaValue* value) {
+	game_effect_data.push_back(parse_effect(node));
+}
+
+LuaValue load_effect_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
-	fstream file(filename, fstream::in | fstream::binary);
+	game_effect_data.clear();
 
-	if (file) {
-		try {
-			YAML::Parser parser(file);
-			YAML::Node root;
+	load_data_impl_template(filenames, "effects", load_effect_callbackf, L,
+			&ret);
 
-			parser.GetNextDocument(root);
-			game_effect_data.clear();
-			const YAML::Node& effects = root["effects"];
-			for (int i = 0; i < effects.size(); i++) {
-				game_effect_data.push_back(parse_effect(effects[i]));
-			}
-		} catch (const YAML::Exception& parse) {
-			printf("Effects Parsed Incorrectly: \n");
-			printf("%s\n", parse.what());
-		}
-		file.close();
-	}
 	return ret;
 }

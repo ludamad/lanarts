@@ -5,7 +5,7 @@
 branches:
   - branch: main_branch
     levels:
-      - size: [128,128]
+      - size: [32,32]
         items:
           amount: 5
           generated:
@@ -30,19 +30,22 @@ branches:
               chance: 5
         rooms:
           padding: 0
-          amount: 1
-          size: [40,40]
+          amount: 10
+          size: [2,9]
         tunnels:
-          padding: 2
+          padding: 0
           width: [1,2]
-          per_room: 0      
+          per_room: 4      
         features:
           tileset: grass_tiles
           stairs_up: 0
           stairs_down: 8
         enemies:
-          amount: 0
-      #Level 0
+          amount: 1
+          generated:
+            - enemy: Imp
+              chance: 100
+      #Level 1
       - size: [40,40]
         items:
           amount: 2
@@ -83,7 +86,7 @@ branches:
           generated:
             - enemy: Skeleton
               chance: 100
-      #Level 1
+      #Level 2
       - size: [40, 40]
         items:
           amount: [5, 8]
@@ -131,7 +134,7 @@ branches:
               group_chance: 33
               group_size: 2
 
-      #Level 2
+      #Level 3
       - size: [64, 64]
         items:
           amount: [7, 10]
@@ -179,7 +182,7 @@ branches:
           amount: 15
         features:
           tileset: crystal_tiles
-      #Level 3
+      #Level 4
       - size: [76, 76]
         items:
           amount: [7, 10]
@@ -225,7 +228,7 @@ branches:
           amount: 20
         features:
           tileset: pebble_tiles
-      #Level 4
+      #Level 5
       - size: [89, 89]
         items:
           amount: [9, 12]
@@ -279,7 +282,7 @@ branches:
           amount: 25
         features:
           tileset: crystal_tiles
-      #Level 5
+      #Level 6
       - size: [89, 89]
         items:
           amount: [9, 12]
@@ -335,7 +338,7 @@ branches:
           amount: 25
         features:
           tileset: pebble_tiles
-      #Level 6
+      #Level 7
       - size: [89, 89]
         items:
           amount: [9, 12]
@@ -393,7 +396,7 @@ branches:
             - enemy: Hell Forged
               chance: 10
           amount: 25
-      #Level 7
+      #Level 8
       - size: [102, 102]
         items:
           amount: [9, 12]
@@ -451,7 +454,7 @@ branches:
             - enemy: Hell Forged
               chance: 25
           amount: 25
-      #Level 8
+      #Level 9
       - size: [102, 102]
         items:
           amount: [8, 12]
@@ -509,7 +512,7 @@ branches:
               chance: 100
             - enemy: Hell Forged
               chance: 50
-      #Bonus Round ??
+      #Level 10
       - size: [100,100]
         items:
           amount: 100
@@ -563,7 +566,7 @@ branches:
               chance: 100
             - enemy: Hell Forged
               chance: 50
-      #Level 0
+      #Level 10
       - size: [100,100]
         items:
           amount: 2

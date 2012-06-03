@@ -1,9 +1,3 @@
-/*
- * GameTiles.cpp
- *
- *  Created on: 2011-10-27
- *      Author: 100397561
- */
 #include <cstring>
 #include <SDL_opengl.h>
 
@@ -15,6 +9,58 @@
 #include "../display/display.h"
 
 #include "../procedural/levelgen.h"
+
+GameTiles::GameTiles(int width, int height) :
+		width(width), height(height), solid_tiles(width * height, true) {
+	seen_tiles = new char[width * height];
+	tiles = new Tile[width * height];
+	memset(seen_tiles, 0, width * height);
+}
+
+GameTiles::~GameTiles() {
+	delete[] tiles;
+	delete[] seen_tiles;
+}
+
+int GameTiles::tile_width() {
+	return width;
+}
+
+int GameTiles::tile_height() {
+	return height;
+}
+
+Tile& GameTiles::get(int x, int y) {
+	return tiles[y * width + x];
+}
+
+Tile* GameTiles::tile_array() {
+	return tiles;
+}
+
+bool GameTiles::is_seen(int x, int y) {
+	return seen_tiles[y * width + x];
+}
+
+void GameTiles::set_solid(int x, int y, bool solid) {
+	solid_tiles[y * width + x] = solid;
+}
+
+bool GameTiles::is_solid(int x, int y) {
+	return solid_tiles[y * width + x];
+}
+
+void GameTiles::clear() {
+	memset(seen_tiles, 0, width * height);
+	memset(tiles, 0, sizeof(int) * width * height);
+}
+
+void GameTiles::copy_to(GameTiles & t) const {
+	t.width = width, t.height = height;
+	memcpy(t.seen_tiles, seen_tiles, width * height);
+	memcpy(t.tiles, tiles, sizeof(int) * width * height);
+	t.solid_tiles = solid_tiles;
+}
 
 void GameTiles::pre_draw(GameState* gs) {
 	GameView& view = gs->window_view();
@@ -31,17 +77,17 @@ void GameTiles::pre_draw(GameState* gs) {
 	bool reveal_enabled = gs->key_down_state(SDLK_BACKQUOTE);
 	for (int y = min_tiley; y <= max_tiley; y++) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
-			int tile = tiles[y * width + x];
-			GLimage* img = &game_tile_data[tile].img;
+			Tile& tile = get(x,y);
+			GLimage& img = game_tile_data[tile.tile].img(tile.subtile);
 			if (reveal_enabled || seen_tiles[y * width + x])
-			gl_draw_image(img, x * TILE_SIZE - view.x, y * TILE_SIZE - view.y);
+				gl_draw_image(img, x * TILE_SIZE - view.x,
+						y * TILE_SIZE - view.y);
 		}
 	}
 
 }
 
 void GameTiles::step(GameState* gs) {
-	GameView& view = gs->window_view();
 	const int sub_sqrs = VISION_SUBSQRS;
 
 	char matches[sub_sqrs * sub_sqrs];
@@ -49,13 +95,10 @@ void GameTiles::step(GameState* gs) {
 	for (int i = 0; i < gs->player_controller().player_fovs().size(); i++) {
 		fov& f = *gs->player_controller().player_fovs()[i];
 		BBox fovbox = f.tiles_covered();
-		for (int y = std::max(fovbox.y1, 0); y <= std::min(fovbox.y2, height-1); y++) {
-			for (int x = std::max(fovbox.x1, 0); x <= std::min(fovbox.x2, width-1); x++) {
-				bool has_match = false, has_free = false;
-				bool is_other_match = false;
-				int tile = tiles[y * width + x];
-				GLimage* img = &game_tile_data[tile].img;
-
+		for (int y = std::max(fovbox.y1, 0);
+				y <= std::min(fovbox.y2, height - 1); y++) {
+			for (int x = std::max(fovbox.x1, 0);
+					x <= std::min(fovbox.x2, width - 1); x++) {
 				f.matches(x, y, matches);
 				for (int i = 0; i < sub_sqrs * sub_sqrs; i++) {
 					if (matches[i])
@@ -79,7 +122,9 @@ void GameTiles::post_draw(GameState* gs) {
 		max_tiley = height - 1;
 	const int sub_sqrs = VISION_SUBSQRS;
 
-	if (gs->key_down_state(SDLK_BACKQUOTE) || gs->player_controller().player_ids().empty()) return;
+	if (gs->key_down_state(SDLK_BACKQUOTE)
+			|| gs->player_controller().player_ids().empty())
+		return;
 
 	fov& mainfov = *gs->player_controller().local_playerfov();
 	char matches[sub_sqrs * sub_sqrs];
@@ -87,8 +132,8 @@ void GameTiles::post_draw(GameState* gs) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
 			bool has_match = false, has_free = false;
 			bool is_other_match = false;
-			int tile = tiles[y * width + x];
-			GLimage* img = &game_tile_data[tile].img;
+			Tile& tile = get(x, y);
+			GLimage& img = game_tile_data[tile.tile].img(tile.subtile);
 
 			for (int i = 0; i < gs->player_controller().player_fovs().size();
 					i++) {
@@ -111,16 +156,15 @@ void GameTiles::post_draw(GameState* gs) {
 				if (!is_other_match) {
 					if (!seen_tiles[y * width + x]) {
 						gl_draw_rectangle(x * TILE_SIZE - view.x,
-								y * TILE_SIZE - view.y, img->width,
-								img->height);
+								y * TILE_SIZE - view.y, img.width, img.height);
 					} else {
 						gl_draw_rectangle(x * TILE_SIZE - view.x,
-								y * TILE_SIZE - view.y, img->width, img->height,
+								y * TILE_SIZE - view.y, img.width, img.height,
 								Colour(0, 0, 0, 180));
 					}
 				} else {
 					gl_draw_rectangle(x * TILE_SIZE - view.x,
-							y * TILE_SIZE - view.y, img->width, img->height,
+							y * TILE_SIZE - view.y, img.width, img.height,
 							Colour(0, 0, 0, 60));
 				}
 			}
@@ -128,58 +172,3 @@ void GameTiles::post_draw(GameState* gs) {
 	}
 
 }
-
-GameTiles::GameTiles(int width, int height) :
-		width(width), height(height), solid_tiles(width*height, false) {
-	seen_tiles = new char[width * height];
-	tiles = new int[width * height];
-	memset(tiles, 0, width * height * sizeof(int));
-	memset(seen_tiles, 0, width * height);
-}
-
-GameTiles::~GameTiles(){
-    delete [] tiles;
-    delete [] seen_tiles;
-}
-
-int GameTiles::tile_width() {
-	return width;
-}
-
-int GameTiles::tile_height() {
-	return height;
-}
-
-int& GameTiles::get(int x, int y) {
-	return tiles[y * width + x];
-}
-
-int* GameTiles::tile_array() {
-	return tiles;
-}
-
-bool GameTiles::is_seen(int x, int y) {
-	return seen_tiles[y * width + x];
-}
-
-void GameTiles::set_solid(int x, int y, bool solid){
-	solid_tiles[y * width + x] = solid;
-}
-
-bool GameTiles::is_solid(int x, int y){
-	return solid_tiles[y * width + x];
-}
-
-void GameTiles::clear(){
-    memset(seen_tiles, 0, width * height);
-    memset(tiles, 0, sizeof (int) * width * height);
-}
-
-void GameTiles::copy_to(GameTiles & t) const{
-    t.width = width, t.height = height;
-    memcpy(t.seen_tiles, seen_tiles, width * height);
-    memcpy(t.tiles, tiles, sizeof (int) * width * height);
-    t.solid_tiles = solid_tiles;
-}
-
-
