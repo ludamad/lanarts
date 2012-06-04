@@ -1,3 +1,4 @@
+export vblank_mode=0
 mkdir ../lanarts_build
 cd ../lanarts_build
 cmake ../lanarts

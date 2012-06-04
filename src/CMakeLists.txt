@@ -23,8 +23,7 @@ set( lanarts_src
 	data/init/load_sprite_data.cpp
 	data/init/yaml_util.cpp
 	
-	data/game_data.cpp
-	data/item_data.cpp
+	data/game_data.cpp	
 	
 	display/display_util.cpp
 	display/display.cpp
