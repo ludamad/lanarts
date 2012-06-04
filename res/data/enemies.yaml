@@ -146,3 +146,16 @@ enemies:
       - damage: 20
         cooldown: 70
         projectile_speed: 4
+
+  - name: Zin
+    sprite: zin
+    radius: 15
+    xpaward: 50
+    stats:
+        movespeed: 3.3
+        hp: 50
+        hpregen: 0.25
+    attacks:
+      - damage: 20
+        cooldown: 70
+        projectile_speed: 4

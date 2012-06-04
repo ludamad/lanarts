@@ -32,18 +32,3 @@ sprites:
 
   - name: health_potion
     file: res/sprites/items/misc/redpotion.png
-
-  - name: dagger
-    file: res/sprites/items/weapons/dagger.png
-
-  - name: short sword
-    file: res/sprites/items/weapons/shortsword.png
-
-  - name: mace
-    file: res/sprites/items/weapons/mace.png
-
-  - name: gloves
-    file: res/sprites/items/weapons/gloves.png
-
-  - name: hand
-    file: res/sprites/items/weapons/hand.png

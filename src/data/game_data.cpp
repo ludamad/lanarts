@@ -1,16 +1,17 @@
 /*
- * game_data.cpp
- *
- *  Created on: Mar 25, 2012
- *      Author: 100397561
+ * game_data.cpp:
+ *  Handles loading of all the various game data that is described in yaml files
  */
 
-#include "game_data.h"
+#include <typeinfo>
 
 extern "C" {
 #include <lua/lua.h>
 #include <lua/lauxlib.h>
 }
+
+#include "game_data.h"
+
 #include "../lua/lua_api.h"
 
 /* Components of init_game_data */
@@ -46,12 +47,17 @@ std::vector<WeaponEntry> game_weapon_data;
 DungeonBranch game_dungeon_data[1] = { };
 
 template<typename T>
-int get_X_by_name(const T& t, const std::string& name) {
+int get_X_by_name(const T& t, const char* name) {
 	for (int i = 0; i < t.size(); i++) {
 		if (name == t[i].name) {
 			return i;
 		}
-	}LANARTS_ASSERT(false /*resource not found*/);
+	}
+	/*Error if resource not found*/
+	fprintf(stderr, "Failed to load resource!\nname: %s, of type %s\n", name,
+			typeid(t[0]).name());
+	fflush(stderr);
+	LANARTS_ASSERT(false /*resource not found*/);
 	return -1;
 }
 int get_item_by_name(const char* name) {

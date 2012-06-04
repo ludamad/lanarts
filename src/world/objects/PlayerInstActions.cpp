@@ -396,7 +396,7 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 	case GameAction::DROP_ITEM:
 		return drop_item(gs, action);
 	default:
-		printf("PlayerInst::perform_action() error: Invalid action id %d!!\n",
+		printf("PlayerInst::perform_action() error: Invalid action id %d!\n",
 				action.act);
 		break;
 	}
@@ -435,7 +435,10 @@ void PlayerInst::use_item(GameState *gs, const GameAction& action) {
 	if (itemslot.amount > 0 && item_check_lua_prereq(L, type, this->id)) {
 		item_do_lua_action(L, type, this->id,
 				Pos(action.action_x, action.action_y), itemslot.amount);
-		itemslot.amount--;
+		if (type.equipment_type == ItemEntry::PROJECTILE)
+			itemslot.amount = 0;
+		else
+			itemslot.amount--;
 		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 	}
 
@@ -509,7 +512,7 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 	int entr_n = scan_entrance(gs->level()->exits, hitpos);
 	if (!didhit || entr_n == -1)
 		return;
-//	int entr_n = action.use_id;
+
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->level()->exits.size());
 	gs->ensure_connectivity(gs->level()->roomid - 1, gs->level()->roomid);
 	GameLevelPortal* portal = &gs->level()->exits[entr_n];
@@ -527,18 +530,14 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 	int entr_n = scan_entrance(gs->level()->entrances, hitpos);
 	if (!didhit || entr_n == -1)
 		return;
-//	int entr_n = action.use_id;
+
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->level()->entrances.size());
 	gs->ensure_connectivity(gs->level()->roomid, gs->level()->roomid + 1);
 	GameLevelPortal* portal = &gs->level()->entrances[entr_n];
-//
+
 	int px = (portal->exitsqr.x) * TILE_SIZE + TILE_SIZE / 2;
 	int py = (portal->exitsqr.y) * TILE_SIZE + TILE_SIZE / 2;
 	gs->level_move(id, px, py, gs->level()->roomid, gs->level()->roomid + 1);
-	if (is_local_player()) {
-
-	}
-//	gs->remove_instance(this, true);
 
 	canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 }

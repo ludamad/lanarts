@@ -21,7 +21,8 @@ sprite_files:
   [sprites/item_sprites.yaml,
   sprites/monster_sprites.yaml,
   sprites/other_sprites.yaml,
-  sprites/spell_sprites.yaml]
+  sprites/spell_sprites.yaml,
+  sprites/weapon_sprites.yaml]
 
 tile_files: tiles.yaml
 

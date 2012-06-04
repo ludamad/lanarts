@@ -1,3 +1,8 @@
 ---
 projectiles:
-
+  - name: Arrow
+    weapon_class: bows
+    damage: [2, 5]
+    spr_item: arrow_item
+    spr_attack: arrow_projectile
+    break_chance: 5 # % chance

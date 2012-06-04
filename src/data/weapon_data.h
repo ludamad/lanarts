@@ -1,13 +1,12 @@
 /*
  * weapon_data.h
- *
- *  Created on: March 26, 2012
- *      Author: pat goebel
+ *  Represents projectile & weapon type data loaded from the yaml
  */
 
 #ifndef WEAPON_DATA_H_
 #define WEAPON_DATA_H_
 #include <cstdlib>
+#include <cstring>
 #include <vector>
 #include "../world/objects/GameInst.h"
 

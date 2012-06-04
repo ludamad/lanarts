@@ -34,6 +34,7 @@ DataFiles load_datafiles_data(const char* filename) {
 			optional_set(root, "weapon_files", dfiles.weapon_files);
 			optional_set(root, "level_files", dfiles.level_files);
 			optional_set(root, "class_files", dfiles.class_files);
+			optional_set(root, "projectile_files", dfiles.projectile_files);
 
 		} catch (const YAML::Exception& parse) {
 			printf("data file lists parsed incorrectly: \n");

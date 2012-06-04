@@ -95,14 +95,20 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 	Colour outline = outline_col(player->spell_selected() == -1);
 	Equipment& equipment = player->get_equipment();
 
-	gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE, outline);
-	if (equipment.projectile != -1){
-		gl_draw_rectangle_outline(x + TILE_SIZE, y, TILE_SIZE, TILE_SIZE,
-				outline);
+	if (equipment.projectile == -1) {
+		gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE, outline);
+	} else {
+		gl_draw_rectangle_outline(x, y, TILE_SIZE * 2, TILE_SIZE, outline);
+		ProjectileEntry& ptype =
+				game_projectile_data[player->get_equipment().projectile];
+		gl_draw_image(game_sprite_data[ptype.item_sprite].img(), x + TILE_SIZE,
+				y);
+		gl_printf(gs->primary_font(), Colour(255, 255, 255), x + TILE_SIZE + 1,
+				y + 1, "%d", player->get_equipment().projectile_amnt);
 	}
 
-	WeaponEntry* wtype = &game_weapon_data[player->weapon_type()];
-	gl_draw_image(game_sprite_data[wtype->item_sprite].img(), x, y);
+	WeaponEntry& wtype = game_weapon_data[player->weapon_type()];
+	gl_draw_image(game_sprite_data[wtype.item_sprite].img(), x, y);
 }
 static void draw_player_actionbar(GameState* gs, PlayerInst* player) {
 	int w = gs->window_view().width;

@@ -9,9 +9,6 @@ sprites:
   - name: exec
     file: res/sprites/monsters/exec.png
 
-  - name: zombie
-    file: res/sprites/monsters/zombie.png
-
   - name: imp
     file: res/sprites/monsters/cute_imp.png
 
@@ -32,3 +29,9 @@ sprites:
 
   - name: hell_forged
     file: res/sprites/monsters/hellforged.png
+    
+  - name: zin
+    file: res/sprites/monsters/bosses/zin.png
+    
+  - name: zombie
+    file: res/sprites/monsters/zombie.png

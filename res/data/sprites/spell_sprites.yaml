@@ -17,9 +17,3 @@ sprites:
 
   - name: magic blast
     file: res/sprites/effects/orb.png
-
-  - name: arrow
-    type: directional
-    file: res/sprites/items/weapons/projectiles/arrow
-    variations: 8
-    extension: .png

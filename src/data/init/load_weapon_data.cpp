@@ -60,6 +60,7 @@ void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
 	const int default_damage_radius = 3;
 
 	ProjectileEntry entry;
+	entry.name = parse_str(node["name"]);
 	entry.damage_bonus = parse_range(node["damage"]);
 
 	entry.item_sprite = parse_sprite_number(node, "spr_item");
@@ -89,6 +90,6 @@ void load_projectile_item_entries() {
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
 		game_item_data.push_back(
 				ItemEntry(ptype.name, default_radius, ptype.item_sprite,
-						"equip", "", false, ItemEntry::PROJECTILE, i));
+						"equip", "", true, ItemEntry::PROJECTILE, i));
 	}
 }

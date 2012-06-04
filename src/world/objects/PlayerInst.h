@@ -11,9 +11,10 @@
 
 #include "../../data/sprite_data.h"
 
-#include "../../gamestats/Stats.h"
 #include "../../gamestats/Inventory.h"
 #include "../../gamestats/Effects.h"
+#include "../../gamestats/Equipment.h"
+#include "../../gamestats/Stats.h"
 
 #include "../../pathfind/pathfind.h"
 
@@ -23,20 +24,6 @@
 #include "GameInst.h"
 
 const int REST_COOLDOWN = 300;
-
-struct Equipment {
-	Inventory inventory;
-	weapon_id weapon;
-	projectile_id projectile;
-	int projectile_amnt;
-	money_t money;
-	Equipment() :
-			weapon(0), projectile(-1), projectile_amnt(0), money(0) {
-	}
-
-	void equip(item_id item, int amnt = 1);
-	void deequip_projectiles();
-};
 
 class PlayerInst: public GameInst {
 public:
