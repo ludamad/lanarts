@@ -35,9 +35,9 @@ set( lanarts_src
 	
 	gamestats/Ability.cpp
 	gamestats/Effects.cpp
+	gamestats/Equipment.cpp
 	gamestats/Stats.cpp
-	
-		
+			
 	lua/lua_api.cpp
 	lua/lua_gameinst.cpp
 	lua/lua_gamestate.cpp
@@ -114,9 +114,10 @@ set( lanarts_include
 	lua/lua_api.h
 	
 	gamestats/Ability.h
-	gamestats/Effects.h
 	gamestats/Inventory.h
 	gamestats/Item.h
+	gamestats/Effects.h
+	gamestats/Equipment.h
 	gamestats/Stats.h
 	
 	pathfind/astar_pathfind.h

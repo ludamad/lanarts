@@ -23,7 +23,7 @@ public:
 	virtual ItemInst* clone() const;
 
 	int item_type(){ return type; }
-	int item_quantity() { return quantity; }
+	int& item_quantity() { return quantity; }
 	obj_id last_held_by() { return dropped_by; }
 private:
 	int type, quantity;

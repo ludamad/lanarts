@@ -1,6 +1,8 @@
 #ifndef GAMEHUD_H_
 #define GAMEHUD_H_
 
+#include <deque>
+
 #include "../../display/display.h"
 #include "../../display/GLImage.h"
 
@@ -8,9 +10,10 @@
 
 #include "../objects/GameInst.h"
 
+#include "../GameAction.h"
 #include "../GameInstSet.h"
 
-#define INVENTORY_POSITION 327
+struct PlayerInst;
 
 
 /* Component of GameState that draws statistic overview */
@@ -19,8 +22,10 @@ public:
 	/* Draw the game statistics overlay */
 	void draw(GameState* gs);
 
-	/* Handles clicks, etc */
 	void step(GameState* gs);
+
+	/* Handles clicks, etc */
+	void queue_io_actions(GameState* gs, PlayerInst* player, std::deque<GameAction>& queued_actions);
 
 	/*Location of the minimap on the screen*/
 	BBox minimap_bbox();

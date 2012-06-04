@@ -47,7 +47,10 @@ public:
 	void equip(item_id item, int amnt = 1);
 
 	void queue_io_actions(GameState* gs);
+	void queue_io_spell_actions(GameState* gs);
+	void queue_io_equipment_actions(GameState* gs);
 	void queue_network_actions(GameState* gs);
+
 	void perform_queued_actions(GameState* gs);
 	void perform_action(GameState* gs, const GameAction& action);
 

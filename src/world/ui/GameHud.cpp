@@ -24,6 +24,8 @@
 
 #include "GameHud.h"
 
+const int INVENTORY_POSITION = 327;
+
 static void draw_player_stats(GameState*gs, PlayerInst* player, int x, int y) {
 	Stats& s = player->stats();
 	gl_draw_statbar(x, y, 100, 10, s.hp, s.max_hp);
@@ -171,6 +173,44 @@ BBox GameHud::minimap_bbox() {
 void GameHud::step(GameState *gs) {
 }
 
+void GameHud::queue_io_actions(GameState* gs, PlayerInst* player,
+		std::deque<GameAction>& queued_actions) {
+	bool mouse_within_view = gs->mouse_x() < gs->window_view().width;
+	int level = gs->level()->roomid, frame = gs->frame();
+
+	Inventory inv = player->get_inventory();
+
+	if (gs->mouse_left_click() && mouse_within_view) {
+	}
+
+	if (gs->mouse_left_click() && !mouse_within_view) {
+		int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
+		int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
+		int slot = 5 * posy + posx;
+		if (slot >= 0 && slot < INVENTORY_SIZE && inv.get(slot).amount > 0) {
+			queued_actions.push_back(
+					GameAction(player->id, GameAction::USE_ITEM, frame, level,
+							slot, player->x, player->y));
+		}
+	}
+
+	// Drop item
+	const int ITEM_DROP_RATE = 2; //steps
+	bool within_rate = gs->mouse_right_click()
+			|| (gs->mouse_right_down() && frame % ITEM_DROP_RATE == 0);
+
+	if (within_rate && frame && !mouse_within_view) {
+		int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
+		int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
+		int slot = 5 * posy + posx;
+		if (slot >= 0 && slot < INVENTORY_SIZE && inv.get(slot).amount > 0) {
+			queued_actions.push_back(
+					GameAction(player->id, GameAction::DROP_ITEM, frame, level,
+							slot));
+		}
+	}
+}
+
 void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 	//Draw a mini version of the contents of gs->tile_grid()
 	GameTiles& tiles = gs->tile_grid();
@@ -250,7 +290,7 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 void GameHud::draw(GameState* gs) {
 	gl_set_drawing_area(x, y, _width, _height);
 
-	PlayerInst* player_inst = (PlayerInst*)gs->get_instance(
+	PlayerInst* player_inst = (PlayerInst*) gs->get_instance(
 			gs->local_playerid());
 	Stats effective_stats = player_inst->effective_stats(gs->get_luastate());
 

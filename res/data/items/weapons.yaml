@@ -43,6 +43,6 @@ weapons:
     damage: [10, 15]
     modifiers: 
         strength: 1
-    range: 400
+    range: 20
     cooldown: 35
     spr_item: bow1

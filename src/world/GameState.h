@@ -80,6 +80,9 @@ public:
 	}
 
 	GameTiles& tile_grid();
+	GameHud& game_hud() {
+		return hud;
+	}
 	GameWorld& game_world() {
 		return world;
 	}

@@ -19,6 +19,7 @@ branches:
               quantity: [1,3]
             - item: Gold
               chance: 75
+              quantity: [5,20]
             - item: Haste Scroll
               chance: 25
             - item: Health Potion
@@ -60,6 +61,7 @@ branches:
               quantity: [1,3]
             - item: Gold
               chance: 75
+              quantity: [5,20]
             - item: Haste Scroll
               chance: 25
             - item: Health Potion
@@ -101,6 +103,7 @@ branches:
               quantity: [1,3]
             - item: Gold
               chance: 75
+              quantity: [5,20]
             - item: Haste Scroll
               chance: 25
             - item: Health Potion
@@ -149,6 +152,7 @@ branches:
               quantity: [1,3]
             - item: Gold
               chance: 75
+              quantity: [5,20]
             - item: Haste Scroll
               chance: 25
             - item: Health Potion
@@ -197,6 +201,7 @@ branches:
               quantity: [1,3]
             - item: Gold
               chance: 75
+              quantity: [5,20]
             - item: Haste Scroll
               chance: 25
             - item: Health Potion
@@ -243,6 +248,7 @@ branches:
               quantity: [1,3]
             - item: Gold
               chance: 75
+              quantity: [5,20]
             - item: Haste Scroll
               chance: 25
             - item: Health Potion
@@ -297,6 +303,7 @@ branches:
               quantity: [1,3]
             - item: Gold
               chance: 75
+              quantity: [5,20]
             - item: Haste Scroll
               chance: 25
             - item: Health Potion
@@ -353,6 +360,7 @@ branches:
               quantity: [1,3]
             - item: Gold
               chance: 75
+              quantity: [5,20]
             - item: Haste Scroll
               chance: 25
             - item: Health Potion
@@ -411,6 +419,7 @@ branches:
               quantity: [1,3]
             - item: Gold
               chance: 75
+              quantity: [5,20]
             - item: Haste Scroll
               chance: 25
             - item: Health Potion
@@ -469,6 +478,7 @@ branches:
               quantity: [1,3]
             - item: Gold
               chance: 75
+              quantity: [5,20]
             - item: Haste Scroll
               chance: 25
             - item: Health Potion
@@ -524,6 +534,7 @@ branches:
           generated:
             - item: Gold
               chance: 75
+              quantity: [5,20]
             - item: Haste Scroll
               chance: 25
             - item: Health Potion
@@ -581,6 +592,7 @@ branches:
               quantity: [1,3]
             - item: Gold
               chance: 75
+              quantity: [5,20]
             - item: Haste Scroll
               chance: 25
             - item: Health Potion
