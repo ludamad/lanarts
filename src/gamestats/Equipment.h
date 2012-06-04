@@ -1,0 +1,28 @@
+/*
+ * Equipment.h:
+ *  Represents all the possessions and equipped items of a player
+ */
+
+#ifndef EQUIPMENT_H_
+#define EQUIPMENT_H_
+
+#include "../util/game_basic_structs.h"
+#include "Inventory.h"
+
+class Equipment {
+public:
+	Equipment() :
+			weapon(0), projectile(-1), projectile_amnt(0), money(0) {
+	}
+
+	void equip(item_id item, int amnt = 1);
+	void deequip_projectiles();
+
+	Inventory inventory;
+	weapon_id weapon;
+	projectile_id projectile;
+	int projectile_amnt;
+	money_t money;
+};
+
+#endif /* EQUIPMENT_H_ */
