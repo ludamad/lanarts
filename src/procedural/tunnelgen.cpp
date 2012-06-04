@@ -176,9 +176,6 @@ bool TunnelGenImpl::validate_slice(Sqr* prev_content, TunnelSliceContext* cntxt,
 		return false;
 	if (cntxt->p.y <= 2 || cntxt->p.y >= s.height() - width)
 		return false;
-	//We must leave room to initialize the next tunnel depth
-	if (dep >= maxdepth - 1)
-		return false;
 
 	cntxt->tunneled = true;
 
@@ -339,8 +336,10 @@ bool TunnelGenImpl::generate(Pos p, int dx, int dy, std::vector<Sqr>& btbuff,
 		prev_content = backtrack_entry(backtracking, entry_size, tunnel_depth);
 		cntxt = &tsc[tunnel_depth];
 
-		bool valid = tsc[tunnel_depth].attempt_number > 0
-				|| validate_slice(prev_content, cntxt, tunnel_depth);
+		//We must leave room to initialize the next tunnel depth
+		bool valid = tunnel_depth < maxdepth - 1
+				&& (tsc[tunnel_depth].attempt_number > 0
+						|| validate_slice(prev_content, cntxt, tunnel_depth));
 		if (valid && cntxt->attempt_number <= 0) {
 
 			if (cntxt->tunneled) {

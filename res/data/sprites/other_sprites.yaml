@@ -1,0 +1,16 @@
+---
+sprites:
+  - name: fighter
+    file: res/sprites/player/fighter.png
+
+  - name: wizard
+    file: res/sprites/player/wizard.png
+    
+  - name: resting
+    file: res/sprites/effects/resting.png
+
+  - name: haste
+    file: res/sprites/effects/haste.png
+
+  - name: logo
+    file: res/sprites/interface/lanarts_logo.png

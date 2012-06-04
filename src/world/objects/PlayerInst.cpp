@@ -20,7 +20,7 @@ PlayerInst::~PlayerInst() {
 
 void PlayerInst::init(GameState* gs) {
 	PlayerController& pc = gs->player_controller();
-	pc.register_player(this->id, is_local_focus());
+	pc.register_player(this->id, is_local_player());
 }
 
 void PlayerInst::deinit(GameState* gs) {
@@ -61,7 +61,7 @@ void PlayerInst::step(GameState* gs) {
 	isresting = false;
 	perform_queued_actions(gs);
 
-	if (!gs->key_down_state(SDLK_x) && is_local_focus())
+	if (!gs->key_down_state(SDLK_x) && is_local_player())
 		view.center_on(last_x, last_y);
 
 	performed_actions_for_step() = true;
@@ -70,7 +70,7 @@ void PlayerInst::step(GameState* gs) {
 void PlayerInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
 	bool isclient = gs->game_settings().conntype == GameSettings::CLIENT;
-	bool isfighterimg = (isclient == is_local_focus());
+	bool isfighterimg = (isclient == is_local_player());
 	GLimage& img = game_sprite_data[get_sprite_by_name(
 			isfighterimg ? "fighter" : "wizard")].img();
 //	bool b = gs->tile_radius_test(x, y, RADIUS);
@@ -128,3 +128,34 @@ void PlayerInst::copy_to(GameInst *inst) const {
 PlayerInst *PlayerInst::clone() const {
 	return new PlayerInst(*this);
 }
+
+void Equipment::deequip_projectiles(){
+	if (projectile != -1){
+		ProjectileEntry& entry = game_projectile_data[weapon];
+		item_id item = get_item_by_name(entry.name.c_str());
+		inventory.add(item, projectile_amnt);
+		projectile = -1;
+		projectile_amnt = 0;
+	}
+}
+void Equipment::equip(item_id item, int amnt){
+	ItemEntry& entry = game_item_data[item];
+	switch (entry.equipment_type) {
+	case ItemEntry::WEAPON:
+		deequip_projectiles();
+		if (weapon != 0){
+			WeaponEntry& entry = game_weapon_data[weapon];
+			item_id item = get_item_by_name(entry.name.c_str());
+			inventory.add(item, 1);
+		}
+		weapon = game_item_data[item].equipment_id;
+		break;
+	case ItemEntry::PROJECTILE:
+		deequip_projectiles();
+		projectile = game_item_data[item].equipment_id;
+		projectile_amnt = amnt;
+		break;
+	}
+}
+
+

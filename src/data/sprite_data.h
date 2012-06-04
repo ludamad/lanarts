@@ -7,12 +7,17 @@
 #include "../display/GLImage.h"
 
 #include "../util/types_util.h"//For FilenameList
-
 struct SpriteEntry {
+	enum sprite_type {
+		ANIMATED, DIRECTIONAL
+	};
+	sprite_type type;
 	std::string name;
 	std::vector<GLimage> images;
-	SpriteEntry(const std::string& name, const FilenameList& filenames) :
-			name(name) {
+
+	SpriteEntry(const std::string& name, const FilenameList& filenames,
+			sprite_type type = ANIMATED) :
+			type(type), name(name){
 		for (int i = 0; i < filenames.size(); i++) {
 			images.push_back(GLimage(filenames[i]));
 		}
@@ -22,8 +27,8 @@ struct SpriteEntry {
 			images[i].init();
 		}
 	}
-	GLimage& img() {
-		return images.at(0);
+	GLimage& img(int ind = 0) {
+		return images.at(ind);
 	}
 };
 

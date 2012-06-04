@@ -47,12 +47,14 @@ public:
   int equip(lua_State* L){
 	  PlayerInst* p;
 	  if ( (p = dynamic_cast<PlayerInst*>(get_instance()))){
-		  //TODO: hack for now
+		  int args = lua_gettop(L);
+
 		  lua_pushstring(L, "name");
 		  lua_gettable(L, 1);
 		  const char* itemname = lua_tostring(L, lua_gettop(L));
-		  int item = get_item_by_name(itemname);
-		  p->weapon_type() = game_item_data[item].weapon;
+		  item_id item = get_item_by_name(itemname);
+		  int amnt = args >= 2 ? lua_tonumber(L,2) : 1;
+		  p->equip(item, amnt);
 		  lua_pop(L, 1);
 	  }
 	  return 0;

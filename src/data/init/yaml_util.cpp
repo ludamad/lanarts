@@ -129,15 +129,27 @@ const YAML::Node & operator >>(const YAML::Node& n, Range& r) {
 	return n;
 }
 
+const YAML::Node & operator >>(const YAML::Node& n, FilenameList & filenames) {
+	if (n.Type() == YAML::NodeType::Scalar) {
+		filenames.resize(1);
+		n >> filenames[0];
+	} else {
+		filenames.resize(n.size());
+		for (int i = 0; i < n.size(); i++) {
+			n[i] >> filenames[i];
+		}
+	}
+	return n;
+}
+
 void load_data_impl_template(const FilenameList& filenames,
 		const char* resource, load_data_impl_callbackf node_callback,
 		lua_State* L, LuaValue* value) {
 	using namespace std;
 
 	FilenameList::const_iterator it = filenames.begin();
-	for (; it != filenames.end();
-			++it) {
-		std::string fname = "res/data/"+*it;
+	for (; it != filenames.end(); ++it) {
+		std::string fname = "res/data/" + *it;
 		fstream file(fname.c_str(), fstream::in | fstream::binary);
 
 		if (file) {
@@ -153,10 +165,13 @@ void load_data_impl_template(const FilenameList& filenames,
 				file.close();
 			} catch (const YAML::Exception& parse) {
 				printf("%s parsed incorrectly! \n", resource);
-				printf("Error:\n%s\n", parse.what());
+				printf("Error while loading from file %s:\n%s\n", fname.c_str(),
+						parse.what());
+				fflush(stdout);
 			}
 		} else {
 			printf("file '%s' could not be loaded!\n", it->c_str());
+			fflush(stdout);
 		}
 	}
 }

@@ -12,15 +12,16 @@
 
 using namespace std;
 
-void load_tile_callbackf(const YAML::Node& node, lua_State* L,
-		LuaValue* value) {
+/* Either given as a list of filenames or a base name, extension,
+ * and number of sequentially numbered files */
+static FilenameList parse_imgfilelist(const YAML::Node& node) {
 	int seq = parse_defaulted(node, "variations", 0);
 	bool is_seq = seq > 0;
 
 	FilenameList filenames;
-	std::string tilefile = parse_str(node["file"]);
 
 	if (is_seq) {
+		std::string tilefile = parse_str(node["file"]);
 		for (int i = 0; i < seq; i++) {
 			char number[32];
 			snprintf(number, 32, "%d", i);
@@ -28,10 +29,15 @@ void load_tile_callbackf(const YAML::Node& node, lua_State* L,
 					tilefile + number + parse_str(node["extension"]));
 		}
 	} else {
-		filenames.push_back(tilefile);
+		node["file"] >> filenames;
 	}
+	return filenames;
+}
 
-	game_tile_data.push_back(TileEntry(parse_str(node["name"]), filenames));
+void load_tile_callbackf(const YAML::Node& node, lua_State* L,
+		LuaValue* value) {
+	game_tile_data.push_back(
+			TileEntry(parse_str(node["name"]), parse_imgfilelist(node)));
 }
 
 void load_tile_data(const FilenameList& filenames) {
@@ -44,13 +50,18 @@ void load_tile_data(const FilenameList& filenames) {
 	}
 }
 
+static SpriteEntry::sprite_type type_from_str(const std::string& type) {
+	if (type == "directional")
+		return SpriteEntry::DIRECTIONAL;
+	return SpriteEntry::ANIMATED;
+}
+
 void load_sprite_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
-	FilenameList files(1);
-	node["file"] >> files[0];
-
-	SpriteEntry entry(parse_str(node["name"]), files);
-	game_sprite_data.push_back(entry);
+	std::string type = parse_defaulted(node, "type", std::string());
+	game_sprite_data.push_back(
+			SpriteEntry(parse_str(node["name"]), parse_imgfilelist(node),
+					type_from_str(type)));
 	value->table_set_yaml(L, game_sprite_data.back().name.c_str(), &node);
 }
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames) {

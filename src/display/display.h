@@ -17,6 +17,7 @@
 struct GLimage;
 struct font_data;
 struct GameView;
+struct SpriteEntry;
 
 void gl_set_drawing_area(int x, int y, int w, int h);
 void init_sdl_gl(bool fullscreen, int w, int h);
@@ -29,7 +30,12 @@ void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type =
 
 void gl_draw_image(GLimage& img, int x, int y,
 		const Colour& c = Colour(255, 255, 255));
-void gl_draw_image(const GameView& view, GLimage& img, int x, int y);
+void gl_draw_image(const GameView& view, GLimage& img, int x, int y,
+		const Colour& c = Colour(255, 255, 255));
+
+void gl_draw_sprite_entry(const GameView& view, SpriteEntry& entry, int x,
+		int y, float dx, float dy, int steps,
+		const Colour& c = Colour(255, 255, 255));
 
 void gl_draw_circle(float x, float y, float radius, const Colour& colour =
 		Colour(0, 0, 0), bool outline = false);
@@ -43,8 +49,8 @@ void gl_draw_rectangle(const GameView& view, int x, int y, int w, int h,
 void gl_draw_rectangle_outline(int x, int y, int w, int h, const Colour& clr =
 		Colour(255, 255, 255), int linewidth = 1);
 
-void gl_draw_line(int x1, int y1, int x2, int y2, const Colour& clr = Colour(255, 255, 255),
-		int linewidth = 1);
+void gl_draw_line(int x1, int y1, int x2, int y2,
+		const Colour& clr = Colour(255, 255, 255), int linewidth = 1);
 
 void gl_draw_statbar(int x, int y, int w, int h, int min_stat, int max_stat,
 		const Colour& front = Colour(0, 255, 0),

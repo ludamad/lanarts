@@ -78,7 +78,7 @@ static void show_appear_message(GameChat& chat, EnemyEntry* e){
 void EnemyInst::draw(GameState* gs) {
 
 	GameView& view = gs->window_view();
-	GLimage& img = game_sprite_data[etype()->sprite_number].images[0];
+	GLimage& img = game_sprite_data[etype()->sprite_number].img();
 
 	if (gs->game_settings().draw_diagnostics) {
 		char statbuff[255];

@@ -1,5 +1,5 @@
 ---
-sprites:
+sprites: 
   - name: ambrosia
     file: res/sprites/items/misc/ambrosia.png
 
@@ -44,3 +44,6 @@ sprites:
 
   - name: gloves
     file: res/sprites/items/weapons/gloves.png
+
+  - name: hand
+    file: res/sprites/items/weapons/hand.png

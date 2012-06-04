@@ -86,7 +86,7 @@ void ProjectileInst::step(GameState* gs) {
 				PlayerInst* p = (PlayerInst*) origin;
 				p->gain_xp(gs, e->xpworth());
 
-				if (p->is_local_focus()) {
+				if (p->is_local_player()) {
 					snprintf(buffstr, 32, "%d XP", e->xpworth());
 					gs->add_instance(
 							new AnimatedInst(e->x, e->y, -1, 25, 0, 0, buffstr,
@@ -145,6 +145,7 @@ void ProjectileInst::step(GameState* gs) {
 
 void ProjectileInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
+	SpriteEntry& spr = game_sprite_data[sprite];
 	GLimage& img = game_sprite_data[sprite].img();
 	int w = img.width, h = img.height;
 	int xx = x - w / 2, yy = y - h / 2;
@@ -154,7 +155,8 @@ void ProjectileInst::draw(GameState* gs) {
 	if (!gs->object_visible_test(this))
 		return;
 
-	gl_draw_image(view, img, x - TILE_SIZE / 2, y - TILE_SIZE / 2);
+	gl_draw_sprite_entry(view, spr, x - TILE_SIZE / 2, y - TILE_SIZE / 2, vx, vy, 0);
+//	gl_draw_image(view, img, x - TILE_SIZE / 2, y - TILE_SIZE / 2);
 
 //	gl_printf(gs->primary_font(), Colour(255,255,255), x - view.x, y-25 -view.y, "id=%d", id);
 	//gl_draw_circle(view, x, y, RADIUS, (origin_id == gs->local_playerid()) ? Colour(0, 255, 0) : Colour(255, 215, 11));

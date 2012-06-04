@@ -47,8 +47,8 @@ static void draw_player_stats(GameState*gs, PlayerInst* player, int x, int y) {
 	gl_draw_rectangle(x, y + 45, 100, 10, col);
 
 	if (player->rest_cooldown() == 0)
-		gl_printf(gs->primary_font(), Colour(0, 0, 0), x + 25, y + 44, "can rest",
-				player->rest_cooldown() * 100 / REST_COOLDOWN);
+		gl_printf(gs->primary_font(), Colour(0, 0, 0), x + 25, y + 44,
+				"can rest", player->rest_cooldown() * 100 / REST_COOLDOWN);
 }
 
 static void draw_player_inventory(GameState* gs, PlayerInst* player, int inv_x,
@@ -86,33 +86,48 @@ static void draw_player_inventory(GameState* gs, PlayerInst* player, int inv_x,
 	}
 }
 
+static Colour outline_col(bool cond) {
+	return cond ? Colour(50, 205, 50) : Colour(43, 43, 43);
+}
+
+static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
+		int x, int y) {
+	Colour outline = outline_col(player->spell_selected() == -1);
+	Equipment& equipment = player->get_equipment();
+
+	gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE, outline);
+	if (equipment.projectile != -1){
+		gl_draw_rectangle_outline(x + TILE_SIZE, y, TILE_SIZE, TILE_SIZE,
+				outline);
+	}
+
+	WeaponEntry* wtype = &game_weapon_data[player->weapon_type()];
+	gl_draw_image(game_sprite_data[wtype->item_sprite].img(), x, y);
+}
 static void draw_player_actionbar(GameState* gs, PlayerInst* player) {
 	int w = gs->window_view().width;
 	int h = gs->window_view().height;
 
 	gl_set_drawing_area(0, 0, w, h);
 
-	int y = h - TILE_SIZE;
+	int sx = TILE_SIZE * 2;
+	int sy = h - TILE_SIZE;
 
-//	gl_draw_rectangle(0, y, w, TILE_SIZE);
-	for (int x = 0; x < w; x += TILE_SIZE) {
-		Colour outline;
-		int ix = x / TILE_SIZE;
-		if (ix == player->spell_selected() + 1) {
-			outline = Colour(255, 0, 0);
-		} else {
-			outline = Colour(43, 43, 43);
-			if (ix < 3)
-				outline = Colour(120, 115, 110);
-		}
-		gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE, outline, 1);
+	draw_player_weapon_actionbar(gs, player, 0, sy);
+
+	int spellidx = 0;
+	for (int x = sx; x < w; x += TILE_SIZE) {
+		bool is_selected = spellidx++ == player->spell_selected();
+		Colour outline = outline_col(is_selected);
+		if (!is_selected && spellidx < 3)
+			outline = Colour(120, 115, 110);
+		gl_draw_rectangle_outline(x, sy, TILE_SIZE, TILE_SIZE, outline);
 	}
-	WeaponEntry* wtype = &game_weapon_data[player->weapon_type()];
-	gl_draw_image(game_sprite_data[wtype->weapon_sprite].img(), 0, y);
-	gl_draw_image(game_sprite_data[get_sprite_by_name("fire bolt")].img(),
-			TILE_SIZE, y);
+	//TODO: Unhardcode this already !!
+	gl_draw_image(game_sprite_data[get_sprite_by_name("fire bolt")].img(), sx,
+			sy);
 	gl_draw_image(game_sprite_data[get_sprite_by_name("magic blast")].img(),
-			TILE_SIZE * 2, y);
+			sx + TILE_SIZE, sy);
 }
 
 static void fill_buff2d(char* buff, int w, int h, int x, int y,
@@ -222,7 +237,6 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 				max_tilex, max_tiley, Colour(255, 180, 99)); //
 	}
 
-
 	gl_image_from_bytes(minimap_buff, ptw, pth, minimap_arr);
 
 	gl_draw_image(minimap_buff, minimap_x, minimap_y);
@@ -230,7 +244,7 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 void GameHud::draw(GameState* gs) {
 	gl_set_drawing_area(x, y, _width, _height);
 
-	PlayerInst* player_inst = (PlayerInst*) gs->get_instance(
+	PlayerInst* player_inst = (PlayerInst*)gs->get_instance(
 			gs->local_playerid());
 	Stats effective_stats = player_inst->effective_stats(gs->get_luastate());
 

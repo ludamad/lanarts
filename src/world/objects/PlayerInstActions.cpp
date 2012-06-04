@@ -114,7 +114,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 
 	bool item_used = false, spell_used = false;
 
-	if (is_local_focus()) {
+	if (is_local_player()) {
 		//Shifting target
 		if (gs->key_press_state(SDLK_k)) {
 			gs->monster_controller().shift_target(gs);
@@ -215,7 +215,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 			//Item use
 			for (int i = 0; i < 9; i++) {
 				if (gs->key_press_state(SDLK_1 + i)) {
-					if (inventory.get(i).amount > 0) {
+					if (get_inventory().get(i).amount > 0) {
 						item_used = true;
 						queued_actions.push_back(
 								GameAction(id, GameAction::USE_ITEM, frame,
@@ -231,7 +231,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 				int slot = 5 * posy + posx;
 				item_used = true;
 				if (slot >= 0 && slot < INVENTORY_SIZE
-						&& inventory.get(slot).amount > 0) {
+						&& get_inventory().get(slot).amount > 0) {
 					queued_actions.push_back(
 							GameAction(id, GameAction::USE_ITEM, frame, level,
 									slot, p.x, p.y));
@@ -244,7 +244,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 				int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
 				int slot = 5 * posy + posx;
 				if (slot >= 0 && slot < INVENTORY_SIZE
-						&& inventory.get(slot).amount > 0) {
+						&& get_inventory().get(slot).amount > 0) {
 					queued_actions.push_back(
 							GameAction(id, GameAction::DROP_ITEM, frame, level,
 									slot));
@@ -253,10 +253,10 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 			//Item pickup
 			GameInst* item = NULL;
 			if (gs->object_radius_test(this, &item, 1, &item_colfilter)) {
-				ItemInst* iteminst = (ItemInst*) item;
+				ItemInst* iteminst = (ItemInst*)item;
 				int type = iteminst->item_type();
-				bool autopickup = game_item_data[type].weapon < 0
-						&& iteminst->last_held_by() != id;
+				bool autopickup = game_item_data[type].equipment_type
+						== ItemEntry::NONE && iteminst->last_held_by() != id;
 				bool pickup_io = gs->key_down_state(SDLK_LSHIFT)
 						|| gs->key_down_state(SDLK_RSHIFT);
 				if (pickup_io || autopickup)
@@ -305,7 +305,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 	bool hasconnection = connection.get_connection() != NULL;
 	NetPacket packet;
 
-	if (is_local_focus() && hasconnection) {
+	if (is_local_player() && hasconnection) {
 		for (int i = 0; i < queued_actions.size(); i++) {
 			queued_actions[i].frame = gs->frame();
 			packet.add(queued_actions[i]);
@@ -316,14 +316,14 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 }
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
-	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
+	ItemInst* item = (ItemInst*)gs->get_instance(action.use_id);
 	if (!item)
 		return;
 	gs->remove_instance(item);
 	if (item->item_type() == get_item_by_name("Gold")) {
 		money += 10;
 	} else {
-		inventory.add(item->item_type(), item->item_quantity());
+		get_inventory().add(item->item_type(), item->item_quantity());
 	}
 }
 
@@ -331,7 +331,7 @@ void PlayerInst::queue_network_actions(GameState *gs) {
 	GameNetConnection& connection = gs->net_connection();
 	bool hasconnection = connection.get_connection() != NULL;
 	NetPacket packet;
-	if (!is_local_focus() && hasconnection) {
+	if (!is_local_player() && hasconnection) {
 		int tries = 0;
 		while (!connection.get_connection()->get_next_packet(packet)) {
 			if ((++tries) % 30000 == 0) {
@@ -361,9 +361,13 @@ void PlayerInst::perform_queued_actions(GameState *gs) {
 	queued_actions.clear();
 }
 
+void PlayerInst::equip(item_id item, int amnt) {
+	equipment.equip(item, amnt);
+}
+
 void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 // 	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
-	ItemSlot& itemslot = inventory.get(action.use_id);
+	ItemSlot& itemslot = get_inventory().get(action.use_id);
 	int gx = x / TILE_SIZE, gy = y / TILE_SIZE;
 	int dropx = gx * TILE_SIZE + TILE_SIZE / 2, dropy = gy * TILE_SIZE
 			+ TILE_SIZE / 2;
@@ -413,23 +417,24 @@ static bool item_check_lua_prereq(lua_State* L, ItemEntry& type, obj_id user) {
 	return ret;
 }
 static void item_do_lua_action(lua_State* L, ItemEntry& type, obj_id user,
-		const Pos& p) {
+		const Pos& p, int amnt) {
 	type.action_func.push(L);
 	luayaml_push_item(L, type.name.c_str());
 	lua_pushgameinst(L, user);
 	lua_pushnumber(L, p.x);
 	lua_pushnumber(L, p.y);
-	lua_call(L, 4, 0);
+	lua_pushnumber(L, amnt);
+	lua_call(L, 5, 0);
 }
 void PlayerInst::use_item(GameState *gs, const GameAction& action) {
-	ItemSlot& itemslot = inventory.get(action.use_id);
+	ItemSlot& itemslot = get_inventory().get(action.use_id);
 	ItemEntry& type = game_item_data[itemslot.item];
 
 	lua_State* L = gs->get_luastate();
 
 	if (itemslot.amount > 0 && item_check_lua_prereq(L, type, this->id)) {
 		item_do_lua_action(L, type, this->id,
-				Pos(action.action_x, action.action_y));
+				Pos(action.action_x, action.action_y), itemslot.amount);
 		itemslot.amount--;
 		canrestcooldown = std::max(canrestcooldown, REST_COOLDOWN);
 	}
@@ -454,12 +459,12 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 
 	EnemyInst* target = NULL;
 	//Enemy hitting test for melee
-	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_colfilter,
+	gs->object_radius_test(this, (GameInst**)&target, 1, &enemy_colfilter,
 			x + ddx * 2, y + ddy * 2);
 
 	//Smaller radius enemy pushing test, can intercept enemy radius but not too far
 	EnemyInst* alreadyhitting[5] = { 0, 0, 0, 0, 0 };
-	gs->object_radius_test(this, (GameInst**) alreadyhitting, 5,
+	gs->object_radius_test(this, (GameInst**)alreadyhitting, 5,
 			&enemy_colfilter, x, y, radius);
 	bool already = false;
 	for (int i = 0; i < 5; i++) {
@@ -530,7 +535,7 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 	int px = (portal->exitsqr.x) * TILE_SIZE + TILE_SIZE / 2;
 	int py = (portal->exitsqr.y) * TILE_SIZE + TILE_SIZE / 2;
 	gs->level_move(id, px, py, gs->level()->roomid, gs->level()->roomid + 1);
-	if (is_local_focus()) {
+	if (is_local_player()) {
 
 	}
 //	gs->remove_instance(this, true);
@@ -556,7 +561,7 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	int hits = 0;
 
 	if (action.use_id == 1) {
-		atk.attack_sprite = get_sprite_by_name("magic blast"); //SPR_MAGIC_BLAST;
+		atk.attack_sprite = get_sprite_by_name("magic blast");
 		atk.projectile_speed /= 1.75;
 		//	atk.damage *= 2;
 		bounce = false;
@@ -593,7 +598,8 @@ void PlayerInst::gain_xp(GameState* gs, int xp) {
 //		bool plural = levels_gained > 1;
 
 		char level_gain_str[128];
-		snprintf(level_gain_str, 128, "You have reached level %d!", stats().xplevel);
+		snprintf(level_gain_str, 128, "You have reached level %d!",
+				stats().xplevel);
 		gs->game_chat().add_message(level_gain_str, Colour(50, 205, 50));
 	}
 }
@@ -604,7 +610,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 	if (estats.has_cooldown())
 		return;
 
-	WeaponEntry& weap = game_weapon_data[weapon];
+	WeaponEntry& weap = game_weapon_data[weapon_type()];
 
 	int dx = action.action_x - x, dy = action.action_y - y;
 	float mag = sqrt(dx * dx + dy * dy);
@@ -620,7 +626,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 			enemy_colfilter, ax, ay, weap.dmgradius);
 
 	for (int i = 0; i < numhit; i++) {
-		EnemyInst* e = (EnemyInst*) enemies[i];
+		EnemyInst* e = (EnemyInst*)enemies[i];
 		//int damage = effective_stats().melee.damage + gs->rng().rand(-4, 5);
 		WeaponEntry& wtype = game_weapon_data[weapon_type()];
 		int damage = estats.calculate_melee_damage(gs->rng(), weapon_type());
@@ -634,7 +640,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 
 		if (e->hurt(gs, damage)) {
 			gain_xp(gs, e->xpworth());
-			if (is_local_focus()) {
+			if (is_local_player()) {
 				snprintf(buffstr, 32, "%d XP", e->xpworth());
 				gs->add_instance(
 						new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0,

@@ -1,0 +1,25 @@
+---
+sprites: 
+  - name: fire bolt
+    file: res/sprites/effects/bolt04.png
+
+  - name: magic bolt
+    file: res/sprites/effects/bolt05.png
+
+  - name: storm bolt
+    file: res/sprites/effects/bolt07.png
+
+  - name: magic blast
+    file: res/sprites/effects/orb.png
+
+  - name: poison
+    file: res/sprites/effects/cloud_poison2.png
+
+  - name: magic blast
+    file: res/sprites/effects/orb.png
+
+  - name: arrow
+    type: directional
+    file: res/sprites/items/weapons/projectiles/arrow
+    variations: 8
+    extension: .png

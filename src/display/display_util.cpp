@@ -1,8 +1,12 @@
-#include "display.h"
 #include <cmath>
+#include <cstring>
+#include <cstdio>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
 #undef GL_GLEXT_VERSION
 #include <SDL_opengl.h>
-#include <cstdio>
 
 #include <ft2build.h>
 #include <freetype/freetype.h>
@@ -10,14 +14,13 @@
 #include <freetype/ftoutln.h>
 #include <freetype/fttrigon.h>
 
-#include <stdexcept>
-#include <vector>
-#include <string>
-#include <cstring>
+#include "../data/sprite_data.h"
 
-#include "GLImage.h"
-#include "font.h"
 #include "../world/GameView.h"
+
+#include "display.h"
+#include "font.h"
+#include "GLImage.h"
 
 using namespace std;
 
@@ -82,13 +85,14 @@ void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 const int UNBOUNDED = 10000;
 
 /*Splits up strings, respecting space boundaries*/
-static std::vector<int> split_up_string(const font_data& font, int max_width, const char* text){
+static std::vector<int> split_up_string(const font_data& font, int max_width,
+		const char* text) {
 	std::vector<int> line_splits;
 	int last_space = 0, ind = 0;
 	int width = 0, width_since_space = 0;
 	unsigned char c;
 
-	while ( (c = text[ind]) != '\0' ){
+	while ((c = text[ind]) != '\0') {
 		char_data &cdata = *font.data[c];
 		width += cdata.advance;
 		width_since_space += cdata.advance;
@@ -98,7 +102,7 @@ static std::vector<int> split_up_string(const font_data& font, int max_width, co
 			width_since_space = 0;
 		}
 
-		if (width > max_width){
+		if (width > max_width) {
 			line_splits.push_back(last_space);
 			width = width_since_space;
 		}
@@ -137,6 +141,23 @@ static std::vector<int> split_up_string(const font_data& font, int max_width, co
 //}
 
 /* printf-like function that draws to the screen, returns width of formatted string*/
+void gl_draw_sprite_entry(const GameView& view, SpriteEntry& entry, int x,
+		int y, float dx, float dy, int steps, const Colour& c) {
+	float PI = 3.1415921;
+	GLimage* img;
+	if (entry.type == SpriteEntry::DIRECTIONAL) {
+		float direction = PI*2.5 + atan2(dy, dx);
+		int nimgs = entry.images.size();
+		float bucket_size = PI*2 / nimgs;
+		int bucket = round(direction / bucket_size);
+		bucket = bucket % nimgs;
+		img = &entry.img(bucket);
+	} else if (entry.type == SpriteEntry::ANIMATED) {
+		img = &entry.img();
+	}
+	gl_draw_image(view, *img, x, y, c);
+}
+
 Pos gl_printf(const font_data& font, const Colour& colour, float x, float y,
 		const char *fmt, ...) {
 	char text[512];
@@ -194,10 +215,10 @@ void gl_draw_rectangle_outline(int x, int y, int w, int h, const Colour& clr,
 
 	glBegin(GL_LINE_STRIP);
 
-	glVertex2i(x + linewidth, y + linewidth);
-	glVertex2i(x2, y + linewidth);
-	glVertex2i(x2, y2);
-	glVertex2i(x + linewidth, y2);
+	glVertex2i(x, y );
+	glVertex2i(x2, y);
+	glVertex2i(x2, y2 - linewidth);
+	glVertex2i(x, y2 - linewidth);
 	glVertex2i(x + linewidth, y + linewidth);
 
 	glEnd();

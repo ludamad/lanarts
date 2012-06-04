@@ -47,8 +47,8 @@ void gl_draw_image(GLimage& img, int x, int y, const Colour& c) {
 	glDisable(GL_TEXTURE_2D);
 	//Don't use glBindTexture(GL_TEXTURE_2D, NULL);
 }
-void gl_draw_image(const GameView& view, GLimage& img, int x, int y){
-	gl_draw_image(img, x - view.x, y - view.y);
+void gl_draw_image(const GameView& view, GLimage& img, int x, int y, const Colour& c){
+	gl_draw_image(img, x - view.x, y - view.y, c);
 }
 
 

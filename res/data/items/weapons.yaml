@@ -1,49 +1,49 @@
 ---
 weapons:
   - name: Unarmed
+    weapon_class: unarmed
     damage: [2, 4]
     modifiers: 
         strength: .5
     range: 18
     cooldown: 20
-    spr_weap: gloves
-    spr_attack: gloves
+    spr_item: hand
 
   - name: Dagger
+    weapon_class: short blades
     damage: [8, 12]
     modifiers: 
         strength: .75
     range: 18
     cooldown: 25
-    spr_weap: dagger
-    spr_attack: dagger
+    spr_item: dagger
 
   - name: Short Sword
+    weapon_class: short blades
     damage: [16, 20]
     max_targets: 2
     modifiers: 
         strength: 1.3
     range: 19
     cooldown: 42
-    spr_weap: short sword
-    spr_attack: short sword
+    spr_item: short sword
 
   - name: Mace
+    weapon_class: maces and flails
     damage: [20, 22]
     max_targets: 2
     modifiers: 
         strength: 1.7
     range: 20
     cooldown: 55
-    spr_weap: mace
-    spr_attack: mace
+    spr_item: mace
 
   - name: Short Bow
+    weapon_class: bows
     damage: [20, 22]
     max_targets: 2
     modifiers: 
         strength: 1.7
     range: 20
     cooldown: 55
-    spr_weap: mace
-    spr_attack: mace
+    spr_item: mace

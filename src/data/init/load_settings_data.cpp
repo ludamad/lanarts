@@ -13,19 +13,6 @@
 
 using namespace std;
 
-static void dataopt_set(const YAML::Node& node, const char* key,
-		FilenameList& files) {
-	if (hasnode(node, key)) {
-		const YAML::Node& data = node[key];
-		if (data.Type() == YAML::NodeType::Scalar) {
-			files.resize(1);
-			data >> files[0];
-		} else {
-			data >> files;
-		}
-	}
-}
-
 DataFiles load_datafiles_data(const char* filename) {
 	DataFiles dfiles;
 
@@ -38,15 +25,15 @@ DataFiles load_datafiles_data(const char* filename) {
 
 			parser.GetNextDocument(root);
 
-			dataopt_set(root, "tile_files", dfiles.tile_files);
-			dataopt_set(root, "sprite_files", dfiles.sprite_files);
-			dataopt_set(root, "tileset_files", dfiles.tileset_files);
-			dataopt_set(root, "enemy_files", dfiles.enemy_files);
-			dataopt_set(root, "effect_files", dfiles.effect_files);
-			dataopt_set(root, "item_files", dfiles.item_files);
-			dataopt_set(root, "weapon_files", dfiles.weapon_files);
-			dataopt_set(root, "level_files", dfiles.level_files);
-			dataopt_set(root, "class_files", dfiles.class_files);
+			optional_set(root, "tile_files", dfiles.tile_files);
+			optional_set(root, "sprite_files", dfiles.sprite_files);
+			optional_set(root, "tileset_files", dfiles.tileset_files);
+			optional_set(root, "enemy_files", dfiles.enemy_files);
+			optional_set(root, "effect_files", dfiles.effect_files);
+			optional_set(root, "item_files", dfiles.item_files);
+			optional_set(root, "weapon_files", dfiles.weapon_files);
+			optional_set(root, "level_files", dfiles.level_files);
+			optional_set(root, "class_files", dfiles.class_files);
 
 		} catch (const YAML::Exception& parse) {
 			printf("data file lists parsed incorrectly: \n");

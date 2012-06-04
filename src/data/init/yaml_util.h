@@ -13,6 +13,7 @@
 #include "../../gamestats/Stats.h"
 
 #include "../../util/game_basic_structs.h"
+#include "../../util/types_util.h"
 
 #include "../../world/objects/GameInst.h"
 
@@ -32,11 +33,13 @@ void optional_set(const YAML::Node & node, const char *key, bool & value);
 
 Stats parse_stats(const YAML::Node & n, const std::vector<Attack> & attacks);
 Range parse_range(const YAML::Node & n);
+
 StatModifier parse_modifiers(const YAML::Node & n);
 //const char* parse_cstr(const YAML::Node & n);
 std::string parse_str(const YAML::Node & n);
 
 const YAML::Node& operator >>(const YAML::Node& n, Range& r);
+const YAML::Node& operator >>(const YAML::Node& n, FilenameList& filenames);
 
 template<class T>
 inline T parse_defaulted(const YAML::Node& n, const char* key, const T& dflt) {
@@ -55,8 +58,8 @@ inline void optional_set(const YAML::Node& node, const char* key, T& value) {
 	}
 }
 
-typedef void (*load_data_impl_callbackf)(const YAML::Node& node,
-		lua_State* L, LuaValue* value);
+typedef void (*load_data_impl_callbackf)(const YAML::Node& node, lua_State* L,
+		LuaValue* value);
 
 void load_data_impl_template(const FilenameList& filenames,
 		const char* resource, load_data_impl_callbackf node_callback,

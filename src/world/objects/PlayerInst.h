@@ -5,30 +5,47 @@
 
 #ifndef PLAYERINST_H_
 #define PLAYERINST_H_
+#include <deque>
 
-#include "GameInst.h"
-#include "../../gamestats/Stats.h"
-#include "../../gamestats/Inventory.h"
-#include "../../gamestats/Effects.h"
 #include "../../fov/fov.h"
-#include "../../pathfind/pathfind.h"
-#include "../GameLevelState.h"
 
 #include "../../data/sprite_data.h"
 
+#include "../../gamestats/Stats.h"
+#include "../../gamestats/Inventory.h"
+#include "../../gamestats/Effects.h"
+
+#include "../../pathfind/pathfind.h"
+
 #include "../GameAction.h"
-#include <deque>
+#include "../GameLevelState.h"
+
+#include "GameInst.h"
 
 const int REST_COOLDOWN = 300;
+
+struct Equipment {
+	Inventory inventory;
+	weapon_id weapon;
+	projectile_id projectile;
+	int projectile_amnt;
+	money_t money;
+	Equipment() :
+			weapon(0), projectile(-1), projectile_amnt(0), money(0) {
+	}
+
+	void equip(item_id item, int amnt = 1);
+	void deequip_projectiles();
+};
 
 class PlayerInst: public GameInst {
 public:
 	enum {
-		RADIUS = 10, VISION_SUBSQRS = 1, DEPTH = 75	};
+		RADIUS = 10, VISION_SUBSQRS = 1, DEPTH = 75
+	};
 	PlayerInst(const Stats& start_stats, int x, int y, bool local = true) :
-			GameInst(x, y, RADIUS, true, DEPTH), local(local), isresting(0), weapon(0),
-			base_stats(start_stats), canrestcooldown(0),
-			money(0), spellselect(0) {
+			GameInst(x, y, RADIUS, true, DEPTH), local(local), isresting(0), base_stats(
+					start_stats), canrestcooldown(0), money(0), spellselect(0) {
 	}
 
 	virtual ~PlayerInst();
@@ -40,6 +57,7 @@ public:
 	virtual PlayerInst* clone() const;
 
 	void gain_xp(GameState* gs, int xp);
+	void equip(item_id item, int amnt = 1);
 
 	void queue_io_actions(GameState* gs);
 	void queue_network_actions(GameState* gs);
@@ -60,28 +78,30 @@ public:
 		return effects;
 	}
 
-	int spell_selected(){
+	int spell_selected() {
 		return spellselect;
 	}
-	int& rest_cooldown(){
+	int& rest_cooldown() {
 		return canrestcooldown;
 	}
 	int gold() {
 		return money;
 	}
-	int& weapon_type(){
-		return weapon;
+	int& weapon_type() {
+		return equipment.weapon;
 	}
 
-	//Is this the local player?
-	bool is_local_focus(){
+	bool is_local_player() {
 		return local;
 	}
-	Inventory& get_inventory(){
-		return inventory;
+	Inventory& get_inventory() {
+		return equipment.inventory;
+	}
+	Equipment& get_equipment() {
+		return equipment;
 	}
 
-	bool& performed_actions_for_step(){
+	bool& performed_actions_for_step() {
 		return didstep;
 	}
 
@@ -98,9 +118,8 @@ private:
 
 	std::deque<GameAction> queued_actions;
 	bool didstep;
-	Inventory inventory;
 	bool local, isresting;
-	int weapon;
+	Equipment equipment;
 	Stats base_stats;
 	Effects effects;
 	int canrestcooldown;

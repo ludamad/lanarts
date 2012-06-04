@@ -18,8 +18,8 @@ function increase_magic(item, obj)
 	obj.stats.magic = obj.stats.magic + item.amount
 end 
 
-function equip(item, obj)
-	obj:equip(item)
+function equip(item, obj, _, _, amnt)
+	obj:equip(item, amnt)
 end
 function hasten(item, obj)
 	obj:hasten(item.duration)

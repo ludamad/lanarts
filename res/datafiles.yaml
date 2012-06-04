@@ -9,16 +9,22 @@ effect_files: effects.yaml
 
 enemy_files: enemies.yaml
 
-item_files: items.yaml
+item_files: items/items.yaml
 
 level_files: levels.yaml
 
+projectile_files: items/projectiles.yaml
+
 spell_files: spells.yaml
 
-sprite_files: sprites/sprites.yaml
+sprite_files: 
+  [sprites/item_sprites.yaml,
+  sprites/monster_sprites.yaml,
+  sprites/other_sprites.yaml,
+  sprites/spell_sprites.yaml]
 
 tile_files: tiles.yaml
 
 tileset_files: tilesets.yaml
 
-weapon_files: weapons.yaml
+weapon_files: items/weapons.yaml
