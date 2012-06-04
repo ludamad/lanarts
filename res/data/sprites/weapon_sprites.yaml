@@ -1,0 +1,28 @@
+---
+sprites: 
+  - name: dagger
+    file: res/sprites/items/weapons/dagger.png
+
+  - name: short sword
+    file: res/sprites/items/weapons/shortsword.png
+
+  - name: mace
+    file: res/sprites/items/weapons/mace.png
+
+  - name: bow1
+    file: res/sprites/items/weapons/bow1.png
+
+  - name: gloves
+    file: res/sprites/items/weapons/gloves.png
+
+  - name: hand
+    file: res/sprites/items/weapons/hand.png
+
+  - name: arrow_projectile
+    type: directional
+    file: res/sprites/items/weapons/projectiles/arrow
+    variations: 8
+    extension: .png
+
+  - name: arrow_item
+    file: res/sprites/items/weapons/arrow.png
