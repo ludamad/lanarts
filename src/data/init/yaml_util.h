@@ -66,4 +66,31 @@ void load_data_impl_template(const FilenameList& filenames,
 		const char* resource, load_data_impl_callbackf node_callback,
 		lua_State* L = NULL, LuaValue* value = NULL);
 
+template<class T>
+void parse_map_with_defaults(const YAML::Node& node,
+		std::map<std::string, T>& value_map, const char* name_key, T(*func)(const YAML::Node&)) {
+	for (int i = 0; i < node.size(); i++) {
+		const YAML::Node& n = node[i];
+		if (hasnode(n, "default")) {
+			parse_map_with_defaults(n["default"], value_map, name_key, func);
+		} else {
+			std::string name = parse_str(n[name_key]);
+			value_map[name] = func(n);
+		}
+	}
+}
+template<class T>
+std::vector<T> parse_named_with_defaults(const YAML::Node& node, const char* name_key,
+		T(*func)(const YAML::Node&)) {
+	std::map<std::string, T> value_map;
+	typename std::map<std::string, T>::iterator it;
+
+	parse_map_with_defaults(node, value_map, name_key, func);
+	std::vector<T> value_list;
+	for (it = value_map.begin(); it != value_map.end(); it++) {
+		value_list.push_back(it->second);
+	}
+	return value_list;
+}
+
 #endif /* YAML_UTIL_H_ */

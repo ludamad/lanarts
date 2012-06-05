@@ -1,39 +1,52 @@
 --- 
 
 #Dungeon Markup
-    
+
+default_enemies: &default_enemies
+  - enemy: Skeleton
+    chance: 100
+  - enemy: Chicken
+    chance: 100
+  - enemy: Storm Elemental
+    chance: 33
+    group_chance: 33
+    group_size: 2
+
+default_items: &default_items
+  - item: Arrow
+    chance: 20
+    quantity: [2,20]
+  - item: Short Bow
+    chance: 10
+  - item: Stone
+    chance: 25
+    quantity: [1,3]
+  - item: Gold
+    chance: 75
+    quantity: [5,20]
+  - item: Haste Scroll
+    chance: 25
+  - item: Health Potion
+    chance: 25
+  - item: Mana Potion
+    chance: 25
+  - item: Dagger
+    chance: 25
+  - item: Strength Scroll
+    chance: 5
+  - item: Magic Scroll
+    chance: 5
+  - item: Defence Scroll
+    chance: 5
+
 branches:
   - branch: main_branch
     levels:
       - size: [32,32]
         items:
           amount: 50
-          generated:
-            - item: Arrow
-              chance: 2000
-              quantity: [1,20]
-            - item: Short Bow
-              chance: 2000
-            - item: Stone
-              chance: 25
-              quantity: [1,3]
-            - item: Gold
-              chance: 75
-              quantity: [5,20]
-            - item: Haste Scroll
-              chance: 25
-            - item: Health Potion
-              chance: 25
-            - item: Mana Potion
-              chance: 25
-            - item: Dagger
-              chance: 25
-            - item: Strength Scroll
-              chance: 5
-            - item: Magic Scroll
-              chance: 5
-            - item: Defence Scroll
-              chance: 5
+          generated: 
+            - default: *default_items
         rooms:
           padding: 0
           amount: 10
@@ -48,34 +61,19 @@ branches:
           stairs_down: 8
         enemies:
           amount: 1
-#          generated:
-#            - enemy: Imp
-#              chance: 100
+          generated:
+            - enemy: Skeleton
+              chance: 50
+              group_chance: 100
+              group_size: 3
+            - enemy: Imp
+              chance: 100
       #Level 1
       - size: [40,40]
         items:
           amount: 2
           generated:
-            - item: Stone
-              chance: 25
-              quantity: [1,3]
-            - item: Gold
-              chance: 75
-              quantity: [5,20]
-            - item: Haste Scroll
-              chance: 25
-            - item: Health Potion
-              chance: 25
-            - item: Mana Potion
-              chance: 25
-            - item: Dagger
-              chance: 25
-            - item: Strength Scroll
-              chance: 5
-            - item: Magic Scroll
-              chance: 5
-            - item: Defence Scroll
-              chance: 5
+            - default: *default_items
         rooms:
           padding: 0
           amount: 3
@@ -98,26 +96,7 @@ branches:
         items:
           amount: [5, 8]
           generated:
-            - item: Stone
-              chance: 25
-              quantity: [1,3]
-            - item: Gold
-              chance: 75
-              quantity: [5,20]
-            - item: Haste Scroll
-              chance: 25
-            - item: Health Potion
-              chance: 25
-            - item: Mana Potion
-              chance: 25
-            - item: Dagger
-              chance: 25
-            - item: Strength Scroll
-              chance: 5
-            - item: Magic Scroll
-              chance: 5
-            - item: Defence Scroll
-              chance: 5
+            - default: *default_items
         rooms:
           padding: 0
           amount: 40
@@ -147,28 +126,7 @@ branches:
         items:
           amount: [7, 10]
           generated:
-            - item: Stone
-              chance: 25
-              quantity: [1,3]
-            - item: Gold
-              chance: 75
-              quantity: [5,20]
-            - item: Haste Scroll
-              chance: 25
-            - item: Health Potion
-              chance: 25
-            - item: Mana Potion
-              chance: 25
-            - item: Dagger
-              chance: 25
-            - item: Short Sword
-              chance: 15
-            - item: Strength Scroll
-              chance: 5
-            - item: Magic Scroll
-              chance: 5
-            - item: Defence Scroll
-              chance: 5
+            - default: *default_items
         rooms:
           padding: 1
           amount: 23
@@ -196,18 +154,7 @@ branches:
         items:
           amount: [7, 10]
           generated:
-            - item: Stone
-              chance: 25
-              quantity: [1,3]
-            - item: Gold
-              chance: 75
-              quantity: [5,20]
-            - item: Haste Scroll
-              chance: 25
-            - item: Health Potion
-              chance: 25
-            - item: Mana Potion
-              chance: 25
+            - default: *default_items
             - item: Dagger
               chance: 25
             - item: Short Sword
@@ -243,18 +190,7 @@ branches:
         items:
           amount: [9, 12]
           generated:
-            - item: Stone
-              chance: 25
-              quantity: [1,3]
-            - item: Gold
-              chance: 75
-              quantity: [5,20]
-            - item: Haste Scroll
-              chance: 25
-            - item: Health Potion
-              chance: 25
-            - item: Mana Potion
-              chance: 25
+            - default: *default_items
             - item: Dagger
               chance: 10
             - item: Short Sword
@@ -298,18 +234,7 @@ branches:
         items:
           amount: [9, 12]
           generated:
-            - item: Stone
-              chance: 25
-              quantity: [1,3]
-            - item: Gold
-              chance: 75
-              quantity: [5,20]
-            - item: Haste Scroll
-              chance: 25
-            - item: Health Potion
-              chance: 25
-            - item: Mana Potion
-              chance: 25
+            - default: *default_items
             - item: Dagger
               chance: 5
             - item: Short Sword
@@ -355,18 +280,7 @@ branches:
         items:
           amount: [9, 12]
           generated:
-            - item: Stone
-              chance: 25
-              quantity: [1,3]
-            - item: Gold
-              chance: 75
-              quantity: [5,20]
-            - item: Haste Scroll
-              chance: 25
-            - item: Health Potion
-              chance: 25
-            - item: Mana Potion
-              chance: 25
+            - default: *default_items
             - item: Dagger
               chance: 5
             - item: Short Sword
@@ -414,22 +328,7 @@ branches:
         items:
           amount: [9, 12]
           generated:
-            - item: Stone
-              chance: 25
-              quantity: [1,3]
-            - item: Gold
-              chance: 75
-              quantity: [5,20]
-            - item: Haste Scroll
-              chance: 25
-            - item: Health Potion
-              chance: 25
-            - item: Mana Potion
-              chance: 25
-            - item: Dagger
-              chance: 5
-            - item: Short Sword
-              chance: 5
+            - default: *default_items
             - item: Mace
               chance: 15
             - item: Strength Scroll
@@ -473,18 +372,7 @@ branches:
         items:
           amount: [8, 12]
           generated:
-            - item: Stone
-              chance: 25
-              quantity: [1,3]
-            - item: Gold
-              chance: 75
-              quantity: [5,20]
-            - item: Haste Scroll
-              chance: 25
-            - item: Health Potion
-              chance: 25
-            - item: Mana Potion
-              chance: 25
+            - default: *default_items
             - item: Dagger
               chance: 5
             - item: Short Sword
@@ -532,23 +420,7 @@ branches:
         items:
           amount: 100
           generated:
-            - item: Gold
-              chance: 75
-              quantity: [5,20]
-            - item: Haste Scroll
-              chance: 25
-            - item: Health Potion
-              chance: 25
-            - item: Mana Potion
-              chance: 25
-            - item: Dagger
-              chance: 25
-            - item: Strength Scroll
-              chance: 5
-            - item: Magic Scroll
-              chance: 5
-            - item: Defence Scroll
-              chance: 5
+            - default: *default_items
         rooms:
           padding: 0
           amount: 1
@@ -587,26 +459,7 @@ branches:
         items:
           amount: 2
           generated:
-            - item: Stone
-              chance: 25
-              quantity: [1,3]
-            - item: Gold
-              chance: 75
-              quantity: [5,20]
-            - item: Haste Scroll
-              chance: 25
-            - item: Health Potion
-              chance: 25
-            - item: Mana Potion
-              chance: 25
-            - item: Dagger
-              chance: 25
-            - item: Strength Scroll
-              chance: 5
-            - item: Magic Scroll
-              chance: 5
-            - item: Defence Scroll
-              chance: 5
+            - default: *default_items
         rooms:
           padding: 0
           amount: 10

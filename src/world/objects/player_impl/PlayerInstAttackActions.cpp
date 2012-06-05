@@ -164,10 +164,10 @@ static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
 static void projectile_item_drop(GameState* gs, GameInst* obj, void* data) {
 	item_id item_type = (item_id)data;
 	ItemEntry& ientry = game_item_data[item_type];
-	if (ientry.equipment_type == ItemEntry::PROJECTILE){
+	if (ientry.equipment_type == ItemEntry::PROJECTILE) {
 		ProjectileEntry& pentry = game_projectile_data[ientry.equipment_id];
 		int break_roll = gs->rng().rand(100);
-		if (break_roll < pentry.break_chance){
+		if (break_roll < pentry.break_chance) {
 			return; // Item 'breaks', ie don't spawn new item
 		}
 	}
@@ -326,8 +326,10 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 	//Spell use
 	if (!spell_used && gs->key_down_state(SDLK_j)) {
 		MonsterController& mc = gs->monster_controller();
-		GameInst* target = get_weapon_autotarget(gs, this,
-				gs->get_instance(mc.current_target()), dx, dy);
+		GameInst* target = gs->get_instance(mc.current_target());
+		if (spellselect == -1) {
+			target = get_weapon_autotarget(gs, this, target, dx, dy);
+		}
 		int mpcost = 10;
 		if (spellselect)
 			mpcost = 20;

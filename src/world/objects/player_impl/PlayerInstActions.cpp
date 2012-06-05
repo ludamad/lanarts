@@ -198,7 +198,7 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	if (!item)
 		return;
 	if (item->item_type() == get_item_by_name("Gold")) {
-		money += 10;
+		money += item->item_quantity();
 	} else {
 		get_inventory().add(item->item_type(), item->item_quantity());
 	}

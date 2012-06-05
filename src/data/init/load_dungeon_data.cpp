@@ -16,24 +16,21 @@ using namespace std;
 FeatureGenSettings featuredefault(3, 3 /*3 stairs up, 3 stairs down*/,
 		1 /*Default tileset*/);
 
+ItemGenChance parse_item_chance(const YAML::Node& n) {
+	ItemGenChance igc;
+	string itemname;
+	n["item"] >> itemname;
+	igc.itemtype = get_item_by_name(itemname.c_str());
+	n["chance"] >> igc.genchance;
+	igc.quantity = parse_defaulted(n, "quantity", Range(1, 1));
+	return igc;
+}
 ItemGenSettings parse_item_gen(const YAML::Node& n) {
 	Range amnt = parse_range(n["amount"]);
 
 	vector<ItemGenChance> chances;
 	if (hasnode(n, "generated")) {
-		const YAML::Node& cnodes = n["generated"];
-		chances.reserve(cnodes.size());
-		for (int i = 0; i < cnodes.size(); i++) {
-			const YAML::Node& cn = cnodes[i];
-
-			ItemGenChance igc;
-			string itemname;
-			cn["item"] >> itemname;
-			igc.itemtype = get_item_by_name(itemname.c_str());
-			cn["chance"] >> igc.genchance;
-			igc.quantity = parse_defaulted(cn, "quantity", Range(1,1));
-			chances.push_back(igc);
-		}
+		chances = parse_named_with_defaults(n["generated"], "item", &parse_item_chance);
 	}
 	return ItemGenSettings(chances, amnt.min, amnt.max);
 }
@@ -48,15 +45,14 @@ TunnelGenSettings parse_tunnel_gen(const YAML::Node& n) {
 	Range width = parse_range(n["width"]);
 	Range per_room = parse_range(n["per_room"]);
 
-	return TunnelGenSettings(parse_defaulted(n, "padding", 1),
-			width.min, width.max,
-			per_room.min, per_room.max);
+	return TunnelGenSettings(parse_defaulted(n, "padding", 1), width.min,
+			width.max, per_room.min, per_room.max);
 }
 FeatureGenSettings parse_feature_gen(const YAML::Node& n) {
 	int nstairsup = parse_defaulted(n, "stairs_up", 3);
 	int nstairsdown = parse_defaulted(n, "stairs_down", 3);
 	int tileset = 0;
-	if (hasnode(n, "tileset")){
+	if (hasnode(n, "tileset")) {
 		std::string tilesetname;
 		n["tileset"] >> tilesetname;
 		tileset = get_tileset_by_name(tilesetname.c_str());
@@ -64,40 +60,26 @@ FeatureGenSettings parse_feature_gen(const YAML::Node& n) {
 	return FeatureGenSettings(nstairsup, nstairsdown, tileset);
 }
 
-EnemyGenSettings parse_enemy_gen(const YAML::Node& supernode, const char* subnode) {
+EnemyGenChance parse_enemy_chance(const YAML::Node& n) {
+	EnemyGenChance egc;
+	egc.enemytype = parse_enemy_number(n, "enemy");
+	n["chance"] >> egc.genchance;
+	egc.groupchance = parse_defaulted(n, "group_chance", 0);
+	egc.groupsize = parse_defaulted(n, "group_size", Range(0, 0));
+	return egc;
+}
+EnemyGenSettings parse_enemy_gen(const YAML::Node& supernode,
+		const char* subnode) {
 	vector<EnemyGenChance> chances;
 	Range nmonsters;
 	nmonsters.max = 0;
 	nmonsters.min = 0;
 
-	if (hasnode(supernode, subnode)){
+	if (hasnode(supernode, subnode)) {
 		const YAML::Node& n = supernode[subnode];
+
 		nmonsters = parse_range(n["amount"]);
-		if (hasnode(n, "index")) {
-			Range index = parse_range(n["index"]);
-			int size = index.max - index.min + 1;
-			for (int i = 0; i < size; i++) {
-				EnemyGenChance egc;
-				egc.enemytype = i + index.min;
-				egc.genchance = 100 / size;
-				egc.groupchance = 0;
-				egc.groupsize = Range(0,0);
-				chances.push_back(egc);
-			}
-		} else if (hasnode(n, "generated")) {
-			const YAML::Node& cnodes = n["generated"];
-			for (int i = 0; i < cnodes.size(); i++) {
-				const YAML::Node& cn = cnodes[i];
-
-				EnemyGenChance egc;
-				egc.enemytype = parse_enemy_number(cn, "enemy");
-				cn["chance"] >> egc.genchance;
-				egc.groupchance = parse_defaulted(cn, "group_chance", 0);
-				egc.groupsize = parse_defaulted(cn, "group_size", Range(0,0));
-
-				chances.push_back(egc);
-			}
-		}
+		chances = parse_named_with_defaults(n["generated"], "enemy", &parse_enemy_chance);
 	}
 	return EnemyGenSettings(chances, nmonsters.min, nmonsters.max);
 }
@@ -123,17 +105,16 @@ void parse_dungeon_branch(const YAML::Node& n,
 	}
 }
 
-
-void load_dungeon_callbackf(const YAML::Node& node, lua_State* L, LuaValue* value){
+void load_dungeon_callbackf(const YAML::Node& node, lua_State* L,
+		LuaValue* value) {
 //	game_class_data.push_back( parse_class(node) );
 }
-
 
 LuaValue load_dungeon_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
 	try {
 
-		std::string fname = "res/data/"+filenames[0];
+		std::string fname = "res/data/" + filenames[0];
 		fstream file(fname.c_str(), fstream::in | fstream::binary);
 
 		YAML::Parser parser(file);
@@ -151,6 +132,7 @@ LuaValue load_dungeon_data(lua_State* L, const FilenameList& filenames) {
 	} catch (const YAML::Exception& parse) {
 		printf("Dungeon Parsed Incorrectly: \n");
 		printf("%s\n", parse.what());
+		fflush(stdout);
 	}
 	return ret;
 }

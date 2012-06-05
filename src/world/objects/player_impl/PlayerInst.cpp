@@ -43,9 +43,10 @@ void PlayerInst::step(GameState* gs) {
 	gs->level()->steps_left = 1000;
 	GameView& view = gs->window_view();
 
-	bool mouse_within = gs->mouse_x() < gs->window_view().width;
-
 	//Stats/effect step
+	if (stats().hurt_cooldown > 0)
+		reset_rest_cooldown();
+	cooldowns.step();
 	stats().step();
 	effects.step();
 
@@ -53,15 +54,12 @@ void PlayerInst::step(GameState* gs) {
 
 	if (stats().hp <= 0) {
 //		if (is_local_focus())
+		queued_actions.clear();
 		gs->game_world().reset(0);
 //		else
 //			gs->remove_instance(this);
 		return;
 	}
-
-	if (stats().hurt_cooldown > 0)
-		reset_rest_cooldown();
-	cooldowns.step();
 
 	isresting = false;
 	perform_queued_actions(gs);
