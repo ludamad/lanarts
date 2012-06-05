@@ -69,7 +69,7 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 	Pos ppos(p->x, p->y);
 	GameInst* inst = NULL;
 	bool ismelee = !wentry.projectile;
-	int target_range = wentry.range;
+	int target_range = wentry.range + p->radius;
 
 	if (targ && distance_between(Pos(targ->x, targ->y), ppos) <= target_range) {
 		return targ;
@@ -98,7 +98,7 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 		float dist;
 		GameInst* inst = find_closest_from_list(gs, visible_monsters, ppos,
 				&dist);
-		if (inst && (!ismelee || dist <= wentry.range)) {
+		if (inst && (!ismelee || dist <= target_range)) {
 			return inst;
 		}
 	}
@@ -162,7 +162,7 @@ static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
 }
 
 static void projectile_item_drop(GameState* gs, GameInst* obj, void* data) {
-	item_id item_type = (item_id)(long)data;
+	item_id item_type = (item_id) (long) data;
 	ItemEntry& ientry = game_item_data[item_type];
 	if (ientry.equipment_type == ItemEntry::PROJECTILE) {
 		ProjectileEntry& pentry = game_projectile_data[ientry.equipment_id];
@@ -179,15 +179,101 @@ static void projectile_item_drop(GameState* gs, GameInst* obj, void* data) {
 	gs->add_instance(item);
 }
 
+void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
+		float dy) {
+	GameView& view = gs->window_view();
+	bool mouse_within = gs->mouse_x() < gs->window_view().width;
+	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
+
+	int level = gs->level()->roomid, frame = gs->frame();
+	bool spell_used = false;
+
+	//Keyboard-oriented blink
+	if (!spell_used && gs->key_press_state(SDLK_h)) {
+		Pos blinkposition;
+		if (stats().mp >= 50 && find_blink_target(this, gs, blinkposition)) {
+			queued_actions.push_back(
+					GameAction(id, GameAction::USE_SPELL, frame, level, 2,
+							blinkposition.x, blinkposition.y));
+			spell_used = true;
+		}
+	}
+
+	//Spell use
+	if (!spell_used && gs->key_down_state(SDLK_j)) {
+		MonsterController& mc = gs->monster_controller();
+		GameInst* target = gs->get_instance(mc.current_target());
+		if (spellselect == -1) {
+			target = get_weapon_autotarget(gs, this, target, dx, dy);
+		}
+		int mpcost = 10;
+		if (spellselect)
+			mpcost = 20;
+		if (target && (spellselect == -1 || stats().mp < mpcost)) {
+			queued_actions.push_back(
+					GameAction(id, GameAction::USE_WEAPON, frame, level,
+							spellselect, target->x, target->y));
+			spell_used = true;
+		} else {
+			if (target && !stats().has_cooldown() && stats().mp >= mpcost
+					&& gs->object_visible_test(target, this)) {
+				queued_actions.push_back(
+						GameAction(id, GameAction::USE_SPELL, frame, level,
+								spellselect, target->x, target->y));
+				spell_used = true;
+			}
+		}
+	}
+	if (!spell_used && gs->mouse_right_click() && mouse_within) {
+		int px = x, py = y;
+		/* set-up x and y for gs->object_visible_test() */
+		x = rmx, y = rmy;
+		if (stats().mp >= 50 && !gs->solid_test(this)
+				&& gs->object_visible_test(this)) {
+			queued_actions.push_back(
+					GameAction(id, GameAction::USE_SPELL, frame, level, 2, x,
+							y));
+		}
+		/* restore x and y */
+		x = px, y = py;
+	}
+
+	if (!spell_used && gs->mouse_left_down() && mouse_within) {
+		int mpcost = 10;
+		if (spellselect)
+			mpcost = 20;
+		if (spellselect == -1 || stats().mp < mpcost) {
+			GameInst* target = get_weapon_autotarget(gs, this, NULL, rmx - x, rmy - y);
+			if (target){
+				queued_actions.push_back(
+						GameAction(id, GameAction::USE_WEAPON, frame, level,
+								spellselect, target->x, target->y));
+			}
+			spell_used = true;
+		} else if (!stats().has_cooldown() && stats().mp >= mpcost) {
+			queued_actions.push_back(
+					GameAction(id, GameAction::USE_SPELL, frame, level,
+							spellselect, rmx, rmy));
+			spell_used = true;
+		}
+	}
+}
+
 void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
+	WeaponEntry& wtype = game_weapon_data[weapon_type()];
 	MTwist& mt = gs->rng();
 	const int MAX_MELEE_HITS = 10;
 	Stats estats = effective_stats(gs->get_luastate());
 	if (estats.has_cooldown())
 		return;
 
-	GameInst* player = gs->get_instance(action.origin);
-	WeaponEntry& wtype = game_weapon_data[weapon_type()];
+	Pos actpos(action.action_x, action.action_y);
+	int weaprange = wtype.range + this->radius;
+	float mag = distance_between(actpos, Pos(x,y));
+	if (mag > weaprange){
+		float dx = actpos.x - x, dy = actpos.y - dy;
+		actpos = Pos(x + dx/mag*weaprange, y + dy/mag*weaprange);
+	}
 
 	if (wtype.projectile && equipment.projectile == -1)
 		return;
@@ -200,31 +286,32 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 		equipment.use_ammo();
 		int dmg_bonus = mt.rand(pentry.damage_bonus);
 
-		ObjCallback drop_callback(projectile_item_drop, (void*)item);
+		ObjCallback drop_callback(projectile_item_drop, (void*) item);
 
 		GameInst* bullet = new ProjectileInst(pentry.attack_sprite, id, 6,
-				wtype.range, damage + dmg_bonus, x, y, action.action_x,
-				action.action_y, false, 0, NONE, drop_callback);
+				wtype.range, damage + dmg_bonus, x, y, actpos.x, actpos.y,
+				false, 0, NONE, drop_callback);
 		gs->add_instance(bullet);
 	} else {
 		GameInst* enemies[MAX_MELEE_HITS];
 
 		int max_targets = std::min(MAX_MELEE_HITS, wtype.max_targets);
 
-		int numhit = get_targets(gs, this, x, y, wtype.dmgradius, enemies,
-				max_targets);
+		int numhit = get_targets(gs, this, actpos.x, actpos.y, wtype.dmgradius,
+				enemies, max_targets);
 
 		if (numhit == 0)
 			return;
 
 		for (int i = 0; i < numhit; i++) {
-			EnemyInst* e = (EnemyInst*)enemies[i];
+			EnemyInst* e = (EnemyInst*) enemies[i];
 
 			int damage = estats.calculate_melee_damage(mt, weapon_type());
 			char buffstr[32];
 			snprintf(buffstr, 32, "%d", damage);
 			float rx, ry;
-			direction_towards(Pos(player->x, player->y), Pos(e->x, e->y), rx, ry, 0.5);
+			direction_towards(Pos(x,y), Pos(e->x, e->y), rx,
+					ry, 0.5);
 			gs->add_instance(
 					new AnimatedInst(e->x - 5 + rx * 5, e->y - 3 + rx * 5, -1,
 							25, rx, ry, buffstr, Colour(255, 148, 120)));
@@ -295,82 +382,4 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	}
 
 	reset_rest_cooldown();
-}
-
-void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
-		float dy) {
-	GameView& view = gs->window_view();
-	bool mouse_within = gs->mouse_x() < gs->window_view().width;
-	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
-
-	int level = gs->level()->roomid, frame = gs->frame();
-	bool spell_used = false;
-
-	//Keyboard-oriented blink
-	if (!spell_used && gs->key_press_state(SDLK_h)) {
-		Pos blinkposition;
-		if (stats().mp >= 50 && find_blink_target(this, gs, blinkposition)) {
-			queued_actions.push_back(
-					GameAction(id, GameAction::USE_SPELL, frame, level, 2,
-							blinkposition.x, blinkposition.y));
-			spell_used = true;
-		}
-	}
-
-	//Spell use
-	if (!spell_used && gs->key_down_state(SDLK_j)) {
-		MonsterController& mc = gs->monster_controller();
-		GameInst* target = gs->get_instance(mc.current_target());
-		if (spellselect == -1) {
-			target = get_weapon_autotarget(gs, this, target, dx, dy);
-		}
-		int mpcost = 10;
-		if (spellselect)
-			mpcost = 20;
-		if (target && (spellselect == -1 || stats().mp < mpcost)) {
-			queued_actions.push_back(
-					GameAction(id, GameAction::USE_WEAPON, frame, level,
-							spellselect, target->x, target->y));
-			spell_used = true;
-		} else {
-			if (target && !stats().has_cooldown() && stats().mp >= mpcost
-					&& gs->object_visible_test(target, this)) {
-				queued_actions.push_back(
-						GameAction(id, GameAction::USE_SPELL, frame, level,
-								spellselect, target->x, target->y));
-				spell_used = true;
-			}
-		}
-	}
-	if (!spell_used && gs->mouse_right_click() && mouse_within) {
-
-		int px = x, py = y;
-		/* set-up x and y for gs->object_visible_test() */
-		x = rmx, y = rmy;
-		if (stats().mp >= 50 && !gs->solid_test(this)
-				&& gs->object_visible_test(this)) {
-			queued_actions.push_back(
-					GameAction(id, GameAction::USE_SPELL, frame, level, 2, x,
-							y));
-		}
-		/* restore x and y */
-		x = px, y = py;
-	}
-
-	if (!spell_used && gs->mouse_left_down() && mouse_within) {
-		int mpcost = 10;
-		if (spellselect)
-			mpcost = 20;
-		if (spellselect == -1 || stats().mp < mpcost) {
-			queued_actions.push_back(
-					GameAction(id, GameAction::USE_WEAPON, frame, level,
-							spellselect, rmx, rmy));
-			spell_used = true;
-		} else if (!stats().has_cooldown() && stats().mp >= mpcost) {
-			queued_actions.push_back(
-					GameAction(id, GameAction::USE_SPELL, frame, level,
-							spellselect, rmx, rmy));
-			spell_used = true;
-		}
-	}
 }

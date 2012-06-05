@@ -214,7 +214,7 @@ void MonsterController::set_monster_headings(GameState* gs,
 		if (s.meleeatk.canuse && pdist < s.meleeatk.range + e->radius) {
 			e->attack(gs, p, false);
 			eb.vx = 0, eb.vy = 0;
-		} else if (s.magicatk.canuse && pdist < s.magicatk.range + 10) {
+		} else if (s.magicatk.canuse && pdist < s.magicatk.range*1.1) {
 			e->attack(gs, p, true);
 		}
 	}
