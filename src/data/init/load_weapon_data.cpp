@@ -83,7 +83,7 @@ void load_projectile_data(lua_State* L, const FilenameList& filenames,
 }
 
 void load_projectile_item_entries() {
-	const int default_radius = 11;
+	const int default_radius = 16;
 
 	//Create items from projectiles
 	for (int i = 0; i < game_projectile_data.size(); i++) {

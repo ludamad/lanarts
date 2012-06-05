@@ -41,9 +41,9 @@ weapons:
   - name: Short Bow
     weapon_class: bows
     projectile: 1
-    damage: [10, 15]
+    damage: [5, 12]
     modifiers: 
-        strength: 1
+        strength: .75
     range: 400
     cooldown: 35
     spr_item: bow1

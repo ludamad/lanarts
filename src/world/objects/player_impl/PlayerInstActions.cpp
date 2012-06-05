@@ -35,6 +35,16 @@ extern "C" {
 // static FILE* open = fopen("res/replay.rep", "rb");
 static std::vector<GameAction> replay_actions;
 
+static bool is_similar_projectile(projectile_id projectile, item_id item) {
+	if (projectile > -1) {
+		ItemEntry& ientry = game_item_data[item];
+		if (ientry.equipment_type == ItemEntry::PROJECTILE) {
+			return (ientry.equipment_id == projectile);
+		}
+	}
+	return false;
+}
+
 static void get_current_actions(int frame, std::vector<GameAction>& actions) {
 // 	if (!open)
 // 		return;
@@ -88,9 +98,10 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs) {
 	if (cooldowns.can_pickup()
 			&& gs->object_radius_test(this, &item, 1, &item_colfilter)) {
 		ItemInst* iteminst = (ItemInst*)item;
-		int type = iteminst->item_type();
+		item_id type = iteminst->item_type();
 		bool autopickup = game_item_data[type].equipment_type == ItemEntry::NONE
 				&& iteminst->last_held_by() != id;
+		autopickup |= is_similar_projectile(equipment.projectile, type);
 		bool pickup_io = gs->key_down_state(SDLK_LSHIFT)
 				|| gs->key_down_state(SDLK_RSHIFT);
 		if (pickup_io || autopickup)
@@ -195,13 +206,20 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	const int PICKUP_RATE = 10;
 	ItemInst* item = (ItemInst*)gs->get_instance(action.use_id);
+	item_id type = item->item_type();
+	int amnt = item->item_quantity();
+
 	if (!item)
 		return;
-	if (item->item_type() == get_item_by_name("Gold")) {
-		money += item->item_quantity();
+	if (type == get_item_by_name("Gold")) {
+		money += amnt;
 	} else {
-		get_inventory().add(item->item_type(), item->item_quantity());
+		if (is_similar_projectile(equipment.projectile, type))
+			equipment.projectile_amnt += amnt;
+		else
+			get_inventory().add(type, amnt);
 	}
+
 	cooldowns.canpickupcooldown = PICKUP_RATE;
 	gs->remove_instance(item);
 }
