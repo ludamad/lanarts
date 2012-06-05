@@ -48,9 +48,9 @@ branches:
           stairs_down: 8
         enemies:
           amount: 1
-          generated:
-            - enemy: Imp
-              chance: 100
+#          generated:
+#            - enemy: Imp
+#              chance: 100
       #Level 1
       - size: [40,40]
         items:

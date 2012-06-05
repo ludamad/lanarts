@@ -6,6 +6,7 @@
 #define GAME_BASIC_STRUCTS_H_
 
 #include <cassert>
+#include <cstdlib>
 
 /*Represents a Canadian colour*/
 struct Colour {

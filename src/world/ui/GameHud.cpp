@@ -180,7 +180,21 @@ void GameHud::queue_io_actions(GameState* gs, PlayerInst* player,
 
 	Inventory inv = player->get_inventory();
 
-	if (gs->mouse_left_click() && mouse_within_view) {
+	if (gs->mouse_right_click() && mouse_within_view) {
+		int action_bar_x = 0, action_bar_y = gs->window_view().height
+				- TILE_SIZE;
+		int posx = (gs->mouse_x() - action_bar_x) / TILE_SIZE;
+		int posy = (gs->mouse_y() - action_bar_y) / TILE_SIZE;
+
+		Equipment& equipment = player->get_equipment();
+		if (posy == 0 && posx == 0)
+			queued_actions.push_back(
+					GameAction(player->id, GameAction::DEEQUIP_ITEM, frame, level,
+							ItemEntry::WEAPON));
+		else if (posy == 0 && posx == 1)
+			queued_actions.push_back(
+					GameAction(player->id, GameAction::DEEQUIP_ITEM, frame, level,
+							ItemEntry::PROJECTILE));
 	}
 
 	if (gs->mouse_left_click() && !mouse_within_view) {
@@ -256,7 +270,8 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 			iter += 4;
 		}
 	}
-	const std::vector<int>& enemy_ids = gs->monster_controller().monster_ids();
+	const std::vector<obj_id>& enemy_ids =
+			gs->monster_controller().monster_ids();
 	for (int i = 0; i < enemy_ids.size(); i++) {
 		GameInst* enemy = gs->get_instance(enemy_ids[i]);
 		if (enemy) {
@@ -290,7 +305,7 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 void GameHud::draw(GameState* gs) {
 	gl_set_drawing_area(x, y, _width, _height);
 
-	PlayerInst* player_inst = (PlayerInst*) gs->get_instance(
+	PlayerInst* player_inst = (PlayerInst*)gs->get_instance(
 			gs->local_playerid());
 	Stats effective_stats = player_inst->effective_stats(gs->get_luastate());
 

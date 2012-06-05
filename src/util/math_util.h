@@ -9,7 +9,12 @@
 #include "game_basic_structs.h"
 
 int power_of_two(int input);
-void direction_towards(const Pos& a, const Pos& b, float& rx, float& ry, float speed = 1);
+void direction_towards(const Pos& a, const Pos& b, float& rx, float& ry,
+		float speed = 1);
 int squish(int a, int b, int c);
 float distance_between(const Pos& a, const Pos& b);
+
+int round_to_multiple(int num, int mult, bool centered = false);
+int centered_multiple(int num, int mult);
+
 #endif /* MATH_UTIL_H_ */

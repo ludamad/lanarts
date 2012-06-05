@@ -18,13 +18,14 @@ int power_of_two(int input) {
 	return value;
 }
 
-void direction_towards(const Pos& a, const Pos& b, float& rx, float& ry, float speed){
+void direction_towards(const Pos& a, const Pos& b, float& rx, float& ry,
+		float speed) {
 	rx = b.x - a.x;
 	ry = b.y - a.y;
-	float mag = sqrt(rx*rx + ry*ry);
-	if (mag > 0){
-		rx /= mag/speed;
-		ry /= mag/speed;
+	float mag = sqrt(rx * rx + ry * ry);
+	if (mag > 0) {
+		rx /= mag / speed;
+		ry /= mag / speed;
 	}
 }
 
@@ -32,10 +33,17 @@ int squish(int a, int b, int c) {
 	return std::min(std::max(a, b), c - 1);
 }
 
-float distance_between(const Pos & a, const Pos & b){
+float distance_between(const Pos & a, const Pos & b) {
 	float dx = a.x - b.x;
 	float dy = a.y - b.y;
-	return sqrt(dx*dx + dy*dy);
+	return sqrt(dx * dx + dy * dy);
 }
 
+int round_to_multiple(int num, int mult, bool centered) {
+	return num / mult * mult + (centered ? mult / 2 : 0);
+}
+
+int centered_multiple(int num, int mult) {
+	return num * mult + mult / 2;
+}
 

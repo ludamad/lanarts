@@ -68,6 +68,7 @@ void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
 	if (hasnode(node, "spr_attack")) {
 		entry.attack_sprite = parse_sprite_number(node, "spr_attack");
 	}
+	entry.break_chance = parse_defaulted(node, "break_chance", 0);
 	entry.weapon_class = parse_str(node["weapon_class"]);
 
 	game_projectile_data.push_back(entry);

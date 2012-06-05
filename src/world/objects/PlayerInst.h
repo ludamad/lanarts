@@ -1,6 +1,7 @@
 /* PlayerInst.h:
  *  Represents a player of the game, in a networked game there can be many, only one of
- *  which is the 'local' player
+ *  which is the 'local' player.
+ *  See player_impl/ for member implementations.
  */
 
 #ifndef PLAYERINST_H_
@@ -25,6 +26,25 @@
 
 const int REST_COOLDOWN = 300;
 
+struct PlayerCooldowns {
+	int canrestcooldown;
+	int canpickupcooldown;
+	PlayerCooldowns() : canrestcooldown(0), canpickupcooldown(0) {
+	}
+	void step(){
+		if (--canrestcooldown < 0)
+			canrestcooldown = 0;
+		if (--canpickupcooldown < 0)
+			canpickupcooldown = 0;
+	}
+	bool can_pickup(){
+		return canpickupcooldown <= 0;
+	}
+	bool can_rest(){
+		return canrestcooldown <= 0;
+	}
+};
+
 class PlayerInst: public GameInst {
 public:
 	enum {
@@ -32,7 +52,7 @@ public:
 	};
 	PlayerInst(const Stats& start_stats, int x, int y, bool local = true) :
 			GameInst(x, y, RADIUS, true, DEPTH), local(local), isresting(0), base_stats(
-					start_stats), canrestcooldown(0), money(0), spellselect(0) {
+					start_stats), money(0), spellselect(0) {
 	}
 
 	virtual ~PlayerInst();
@@ -47,7 +67,7 @@ public:
 	void equip(item_id item, int amnt = 1);
 
 	void queue_io_actions(GameState* gs);
-	void queue_io_spell_actions(GameState* gs);
+	void queue_io_spell_and_attack_actions(GameState* gs, float dx, float dy);
 	void queue_io_equipment_actions(GameState* gs);
 	void queue_network_actions(GameState* gs);
 
@@ -72,7 +92,10 @@ public:
 		return spellselect;
 	}
 	int& rest_cooldown() {
-		return canrestcooldown;
+		return cooldowns.canrestcooldown;
+	}
+	void reset_rest_cooldown(int cooldown = REST_COOLDOWN) {
+		rest_cooldown() = std::max(cooldown, rest_cooldown());
 	}
 	int gold() {
 		return money;
@@ -109,10 +132,11 @@ private:
 	std::deque<GameAction> queued_actions;
 	bool didstep;
 	bool local, isresting;
+	PlayerCooldowns cooldowns;
 	Equipment equipment;
 	Stats base_stats;
 	Effects effects;
-	int canrestcooldown;
+
 	int money;
 	int spellselect;
 };

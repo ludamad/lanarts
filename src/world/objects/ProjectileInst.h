@@ -6,8 +6,12 @@
 #define PROJECTILEINST_H_
 
 #include <cstdlib>
-#include "GameInst.h"
+
 #include "../../gamestats/Stats.h"
+
+#include "../../util/callback_util.h"
+
+#include "GameInst.h"
 
 class ProjectileInst: public GameInst {
 	enum {
@@ -16,10 +20,12 @@ class ProjectileInst: public GameInst {
 public:
 	ProjectileInst(sprite_id sprite, obj_id originator, float speed, int range,
 			int damage, int x, int y, int tx, int ty, bool bounce = false,
-			int hits = 1, obj_id target = NONE);
+			int hits = 1, obj_id target = NONE,
+			const ObjCallback& onhit_callback = ObjCallback());
 	~ProjectileInst();
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
+	virtual void deinit(GameState* gs);
 	virtual void copy_to(GameInst* inst) const;
 	virtual ProjectileInst* clone() const;
 
@@ -40,6 +46,9 @@ private:
 	/*Multi-hit behaviour*/
 	bool bounce;
 	int hits;
+
+	/*Callback behaviour*/
+	ObjCallback onhit_callback;
 };
 
 #endif /* PROJECTILEINST_H_ */

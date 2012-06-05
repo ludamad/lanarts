@@ -33,7 +33,7 @@ int parse_sprite_number(const YAML::Node & n, const char *key) {
 	return get_sprite_by_name(s.c_str());
 }
 
-int parse_enemy_number(const YAML::Node & n, const char *key) {
+int parse_enemy_number(const YAML::Node& n, const char *key) {
 	if (!hasnode(n, key))
 		return -1;
 
@@ -48,18 +48,23 @@ int parse_enemy_number(const YAML::Node & n, const char *key) {
 	return -1;
 }
 
-const char* parse_cstr(const YAML::Node & n) {
+const char* parse_cstr(const YAML::Node& n) {
 	std::string s;
 	n >> s;
 	return tocstring(s);
 }
-std::string parse_str(const YAML::Node & n) {
+int parse_int(const YAML::Node& n) {
+	int val;
+	n >> val;
+	return val;
+}
+std::string parse_str(const YAML::Node& n) {
 	std::string s;
 	n >> s;
 	return s;
 }
 
-StatModifier parse_modifiers(const YAML::Node & n) {
+StatModifier parse_modifiers(const YAML::Node& n) {
 	StatModifier stat;
 	optional_set(n, "strength", stat.strength_mult);
 	optional_set(n, "defence", stat.defence_mult);
@@ -67,7 +72,7 @@ StatModifier parse_modifiers(const YAML::Node & n) {
 	return stat;
 }
 
-Range parse_range(const YAML::Node & n) {
+Range parse_range(const YAML::Node& n) {
 	Range gr;
 	if (n.Type() == YAML::NodeType::Sequence) {
 		std::vector<int> components;
@@ -81,7 +86,7 @@ Range parse_range(const YAML::Node & n) {
 	return gr;
 }
 
-void optional_set(const YAML::Node & node, const char *key, bool & value) {
+void optional_set(const YAML::Node& node, const char *key, bool & value) {
 	if (hasnode(node, key)) {
 		int val;
 		node[key] >> val;
@@ -89,7 +94,7 @@ void optional_set(const YAML::Node & node, const char *key, bool & value) {
 	}
 }
 
-char* tocstring(const std::string & s) {
+char* tocstring(const std::string& s) {
 	char *ret = new char[s.size() + 1];
 	memcpy(ret, s.c_str(), s.size() + 1);
 	return ret;

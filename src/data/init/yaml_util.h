@@ -37,6 +37,7 @@ Range parse_range(const YAML::Node & n);
 StatModifier parse_modifiers(const YAML::Node & n);
 //const char* parse_cstr(const YAML::Node & n);
 std::string parse_str(const YAML::Node & n);
+int parse_int(const YAML::Node & n);
 
 const YAML::Node& operator >>(const YAML::Node& n, Range& r);
 const YAML::Node& operator >>(const YAML::Node& n, FilenameList& filenames);

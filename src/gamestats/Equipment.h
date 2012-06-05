@@ -15,8 +15,13 @@ public:
 			weapon(0), projectile(-1), projectile_amnt(0), money(0) {
 	}
 
+	bool valid_to_use(item_id item);
 	void equip(item_id item, int amnt = 1);
 	void deequip_projectiles();
+	void deequip_weapon();
+	void deequip(int equipment_type);
+
+	void use_ammo(int amnt = 1);
 
 	Inventory inventory;
 	weapon_id weapon;

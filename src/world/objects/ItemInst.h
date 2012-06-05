@@ -13,7 +13,7 @@
 class ItemInst: public GameInst {
 public:
 	enum {RADIUS = 10, DEPTH = 100};
-	ItemInst(int type, int x, int y, int quantity = 1, obj_id dropped_by = 0) :
+	ItemInst(item_id type, int x, int y, int quantity = 1, obj_id dropped_by = 0) :
 		GameInst(x,y, RADIUS, false, DEPTH), type(type),
 		quantity(quantity), dropped_by(dropped_by){}
 	virtual ~ItemInst();
@@ -22,11 +22,12 @@ public:
 	virtual void copy_to(GameInst* inst) const;
 	virtual ItemInst* clone() const;
 
-	int item_type(){ return type; }
+	item_id item_type(){ return type; }
 	int& item_quantity() { return quantity; }
 	obj_id last_held_by() { return dropped_by; }
 private:
-	int type, quantity;
+	item_id type;
+	int quantity;
 	obj_id dropped_by;
 };
 

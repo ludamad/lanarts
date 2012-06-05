@@ -23,6 +23,7 @@ struct ProjectileEntry {
 
 	sprite_id item_sprite, attack_sprite;
 	Range damage_bonus;
+	int break_chance;//out of 100
 };
 
 struct WeaponEntry {

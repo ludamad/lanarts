@@ -80,8 +80,9 @@ set( lanarts_src
 	world/utility_objects/ButtonInst.cpp
 	world/utility_objects/TestInst.cpp
 	
-	world/objects/PlayerInst.cpp
-	world/objects/PlayerInstActions.cpp
+	world/objects/player_impl/PlayerInst.cpp
+	world/objects/player_impl/PlayerInstActions.cpp
+	world/objects/player_impl/PlayerInstAttackActions.cpp
 	world/objects/EnemyInst.cpp
 	world/objects/ItemInst.cpp
 	world/objects/ProjectileInst.cpp
@@ -131,6 +132,7 @@ set( lanarts_include
 	procedural/tunnelgen.h
 	
 	util/collision_util.h
+	util/callback_util.h
 	util/game_basic_structs.h
 	util/hashset_util.h
 	util/math_util.h
