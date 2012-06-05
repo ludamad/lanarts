@@ -162,7 +162,7 @@ static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
 }
 
 static void projectile_item_drop(GameState* gs, GameInst* obj, void* data) {
-	item_id item_type = (item_id) (long) data;
+	item_id item_type = (item_id)(long)data;
 	ItemEntry& ientry = game_item_data[item_type];
 	if (ientry.equipment_type == ItemEntry::PROJECTILE) {
 		ProjectileEntry& pentry = game_projectile_data[ientry.equipment_id];
@@ -203,19 +203,20 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 	if (!spell_used && gs->key_down_state(SDLK_j)) {
 		MonsterController& mc = gs->monster_controller();
 		GameInst* target = gs->get_instance(mc.current_target());
-		if (spellselect == -1) {
-			target = get_weapon_autotarget(gs, this, target, dx, dy);
-		}
 		int mpcost = 10;
 		if (spellselect)
 			mpcost = 20;
-		if (target && (spellselect == -1 || stats().mp < mpcost)) {
+		bool use_weapon = spellselect == -1 || stats().mp < mpcost;
+		if (spellselect == -1 || use_weapon) {
+			target = get_weapon_autotarget(gs, this, target, dx, dy);
+		}
+		if (target && use_weapon) {
 			queued_actions.push_back(
 					GameAction(id, GameAction::USE_WEAPON, frame, level,
 							spellselect, target->x, target->y));
 			spell_used = true;
-		} else {
-			if (target && !stats().has_cooldown() && stats().mp >= mpcost
+		} else if (target) {
+			if (!stats().has_cooldown() && stats().mp >= mpcost
 					&& gs->object_visible_test(target, this)) {
 				queued_actions.push_back(
 						GameAction(id, GameAction::USE_SPELL, frame, level,
@@ -243,8 +244,9 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		if (spellselect)
 			mpcost = 20;
 		if (spellselect == -1 || stats().mp < mpcost) {
-			GameInst* target = get_weapon_autotarget(gs, this, NULL, rmx - x, rmy - y);
-			if (target){
+			GameInst* target = get_weapon_autotarget(gs, this, NULL, rmx - x,
+					rmy - y);
+			if (target) {
 				queued_actions.push_back(
 						GameAction(id, GameAction::USE_WEAPON, frame, level,
 								spellselect, target->x, target->y));
@@ -269,10 +271,10 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 
 	Pos actpos(action.action_x, action.action_y);
 	int weaprange = wtype.range + this->radius;
-	float mag = distance_between(actpos, Pos(x,y));
-	if (mag > weaprange){
+	float mag = distance_between(actpos, Pos(x, y));
+	if (mag > weaprange) {
 		float dx = actpos.x - x, dy = actpos.y - dy;
-		actpos = Pos(x + dx/mag*weaprange, y + dy/mag*weaprange);
+		actpos = Pos(x + dx / mag * weaprange, y + dy / mag * weaprange);
 	}
 
 	if (wtype.projectile && equipment.projectile == -1)
@@ -286,7 +288,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 		equipment.use_ammo();
 		int dmg_bonus = mt.rand(pentry.damage_bonus);
 
-		ObjCallback drop_callback(projectile_item_drop, (void*) item);
+		ObjCallback drop_callback(projectile_item_drop, (void*)item);
 
 		GameInst* bullet = new ProjectileInst(pentry.attack_sprite, id, 6,
 				wtype.range, damage + dmg_bonus, x, y, actpos.x, actpos.y,
@@ -304,14 +306,13 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 			return;
 
 		for (int i = 0; i < numhit; i++) {
-			EnemyInst* e = (EnemyInst*) enemies[i];
+			EnemyInst* e = (EnemyInst*)enemies[i];
 
 			int damage = estats.calculate_melee_damage(mt, weapon_type());
 			char buffstr[32];
 			snprintf(buffstr, 32, "%d", damage);
 			float rx, ry;
-			direction_towards(Pos(x,y), Pos(e->x, e->y), rx,
-					ry, 0.5);
+			direction_towards(Pos(x, y), Pos(e->x, e->y), rx, ry, 0.5);
 			gs->add_instance(
 					new AnimatedInst(e->x - 5 + rx * 5, e->y - 3 + rx * 5, -1,
 							25, rx, ry, buffstr, Colour(255, 148, 120)));
