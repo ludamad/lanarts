@@ -186,12 +186,11 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 	if (estats.has_cooldown())
 		return;
 
+	GameInst* player = gs->get_instance(action.origin);
 	WeaponEntry& wtype = game_weapon_data[weapon_type()];
 
 	if (wtype.projectile && equipment.projectile == -1)
 		return;
-
-	int dx = action.action_x - x, dy = action.action_y - y;
 
 	if (wtype.projectile) {
 		int damage = estats.calculate_melee_damage(mt, weapon_type());
@@ -208,16 +207,11 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 				action.action_y, false, 0, NONE, drop_callback);
 		gs->add_instance(bullet);
 	} else {
-		float mag = sqrt(dx * dx + dy * dy);
-		if (mag == 0)
-			mag = 1;
-		int ax = x + wtype.range * dx / mag, ay = y + wtype.range * dy / mag;
-
 		GameInst* enemies[MAX_MELEE_HITS];
 
 		int max_targets = std::min(MAX_MELEE_HITS, wtype.max_targets);
 
-		int numhit = get_targets(gs, this, ax, ay, wtype.dmgradius, enemies,
+		int numhit = get_targets(gs, this, x, y, wtype.dmgradius, enemies,
 				max_targets);
 
 		if (numhit == 0)
@@ -230,7 +224,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 			char buffstr[32];
 			snprintf(buffstr, 32, "%d", damage);
 			float rx, ry;
-			direction_towards(Pos(x, y), Pos(e->x, e->y), rx, ry, 0.5);
+			direction_towards(Pos(player->x, player->y), Pos(e->x, e->y), rx, ry, 0.5);
 			gs->add_instance(
 					new AnimatedInst(e->x - 5 + rx * 5, e->y - 3 + rx * 5, -1,
 							25, rx, ry, buffstr, Colour(255, 148, 120)));
