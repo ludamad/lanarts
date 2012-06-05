@@ -43,6 +43,8 @@ void PlayerInst::step(GameState* gs) {
 	gs->level()->steps_left = 1000;
 	GameView& view = gs->window_view();
 
+	queue_network_actions(gs);
+
 	//Stats/effect step
 	if (stats().hurt_cooldown > 0)
 		reset_rest_cooldown();
@@ -50,7 +52,6 @@ void PlayerInst::step(GameState* gs) {
 	stats().step();
 	effects.step();
 
-	queue_network_actions(gs);
 
 	if (stats().hp <= 0) {
 //		if (is_local_focus())

@@ -35,7 +35,7 @@ static void get_visible_monsters(GameState* gs,
 	const std::vector<obj_id>& mids = gs->monster_controller().monster_ids();
 	for (int i = 0; i < mids.size(); i++) {
 		GameInst* inst = gs->get_instance(mids[i]);
-		if (gs->object_visible_test(inst, p)) {
+		if (inst && gs->object_visible_test(inst, p)) {
 			visible_monsters.push_back(inst);
 		}
 	}
@@ -162,7 +162,7 @@ static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
 }
 
 static void projectile_item_drop(GameState* gs, GameInst* obj, void* data) {
-	item_id item_type = (item_id)data;
+	item_id item_type = (item_id)(long)data;
 	ItemEntry& ientry = game_item_data[item_type];
 	if (ientry.equipment_type == ItemEntry::PROJECTILE) {
 		ProjectileEntry& pentry = game_projectile_data[ientry.equipment_id];
