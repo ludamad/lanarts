@@ -18,30 +18,36 @@
 using namespace std;
 
 ClassType parse_class(const YAML::Node& n){
+
+//	std::string name;
+//	Stats starting_stats;
+//	int hp_perlevel, mp_perlevel;
+//	int str_perlevel, def_perlevel, mag_perlevel;
+//	float mpregen_perlevel, hpregen_perlevel;
+	ClassType classtype;
+
 	Attack melee(true, 10, 25, 40);
 	Attack ranged(true, 8, 400, 40, get_sprite_by_name("fire bolt"), 7);
 	ranged.isprojectile = true;
 	vector<Attack> attacks;
 	attacks.push_back(melee);
 	attacks.push_back(ranged);
-	const YAML::Node& gainperlevel = n["gain_per_level"];
-	int hp, mp, mag, str, def;
-	float hpregen, mpregen;
-	gainperlevel["hp"] >> hp;
-	gainperlevel["mp"] >> mp;
-	gainperlevel["strength"] >> str;
-	gainperlevel["magic"] >> mag;
-	gainperlevel["defence"] >> def;
-	gainperlevel["mpregen"] >> mpregen;
-	gainperlevel["hpregen"] >> hpregen;
 
-	return ClassType(
-			parse_str(n["name"]),
-			parse_stats(n["start_stats"], attacks),
-			hp, mp,
-			str, def, mag,
-			hpregen, mpregen
-			);
+	const YAML::Node& level = n["gain_per_level"];
+
+	n["name"] >> classtype.name;
+	classtype.starting_stats = parse_stats(n["start_stats"], attacks);
+	level["mp"] >> classtype.mp_perlevel;
+	level["hp"] >> classtype.hp_perlevel;
+
+	level["strength"] >> classtype.str_perlevel;
+	level["defence"] >> classtype.def_perlevel;
+	level["magic"] >> classtype.mag_perlevel;
+
+	level["mpregen"] >> classtype.mpregen_perlevel;
+	level["hpregen"] >> classtype.hpregen_perlevel;
+
+	return classtype;
 }
 
 void load_class_callbackf(const YAML::Node& node, lua_State* L, LuaValue* value){

@@ -268,7 +268,7 @@ void GameInstSet::copy_to(GameInstSet& inst_set) const {
 
 int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 		col_filterf f, int x, int y, int radius) {
-	int rad = radius == -1 ? obj->radius : radius;
+	int rad = radius == -1 ? obj->target_radius : radius;
 	x = x == -1 ? obj->x : x;
 	y = y == -1 ? obj->y : y;
 

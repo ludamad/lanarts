@@ -22,7 +22,7 @@ void ButtonInst::draw(GameState* gs) {
 	Colour col =
 			(!outofx && !outofy) ? Colour(255, 0, 0) : Colour(255, 255, 255);
 //	gl_draw_rectangle(bounding.x1, bounding.y1, bounding.width(), bounding.height(),  Colour(0,255,0));
-	gl_printf(gs->menu_font(), col, bounding.x1, bounding.y1, str.c_str());
+	gl_printf(gs->menu_font(), col, bounding.x1, bounding.y1, "%s", str.c_str());
 }
 
 void ButtonInst::copy_to(GameInst *inst) const {

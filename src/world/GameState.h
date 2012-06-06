@@ -29,7 +29,6 @@
 #include "GameView.h"
 #include "GameWorld.h"
 
-
 struct lua_State;
 struct GameLevelState;
 struct GameTiles;
@@ -61,10 +60,8 @@ public:
 	bool solid_test(GameInst *obj, GameInst **objs = NULL, int obj_cap = 0,
 			col_filterf f = NULL, int x = -1, int y = -1, int radius = -1) {
 		int lx = (x == -1 ? obj->x : x), ly = (y == -1 ? obj->y : y);
-		if (radius == -1)
-			radius = obj->radius;
 
-		return tile_radius_test(lx, ly, radius)
+		return tile_radius_test(lx, ly, radius == -1 ? obj->radius : radius)
 				|| object_radius_test(obj, objs, obj_cap, f, x, y, radius);
 	}
 	bool solid_test(GameInst *obj, int x, int y, int radius = -1) {
@@ -73,7 +70,8 @@ public:
 
 	//Checks if an object is visible by all players (default) or a single player.
 	//Also specify if the test is affected by revealing with backquote
-	bool object_visible_test(GameInst *obj, GameInst *player = NULL, bool canreveal = true);
+	bool object_visible_test(GameInst *obj, GameInst *player = NULL,
+			bool canreveal = true);
 	void ensure_connectivity(int roomid1, int roomid2);
 	GameView & window_view() {
 		return view;

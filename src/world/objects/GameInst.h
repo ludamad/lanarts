@@ -20,8 +20,12 @@ struct GameState;
 
 class GameInst {
 public:
-	GameInst(int x, int y, int radius, bool solid=true, int depth = 0) :
-		id(0), last_x(x), last_y(y), x(x), y(y),  radius(radius), depth(depth), solid(solid), destroyed(false){}
+	GameInst(int x, int y, int radius, bool solid = true, int depth = 0) :
+			id(0), last_x(x), last_y(y), x(x), y(y), radius(radius), target_radius(
+					radius), depth(depth), solid(solid), destroyed(false) {
+		if (this->radius > 14)
+			this->radius = 14;
+	}
 	virtual ~GameInst();
 	/* Initialize the object further, 'id' will be set*/
 	virtual void init(GameState* gs);
@@ -32,25 +36,24 @@ public:
 	virtual void copy_to(GameInst* inst) const = 0;
 	virtual GameInst* clone() const = 0;
 
-	BBox bbox(){
-		return BBox(x-radius,y-radius,x+radius,y+radius);
+	BBox bbox() {
+		return BBox(x - radius, y - radius, x + radius, y + radius);
 	}
 
-	Pos pos(){
-		return Pos(x,y);
+	Pos pos() {
+		return Pos(x, y);
 	}
 
 public:
 	/*Should probably keep these public, many functions operate on these*/
 	obj_id id;
 	int last_x, last_y;
-	int x, y, radius;
+	int x, y, radius, target_radius;
 	int depth;
 	bool solid, destroyed;
 	LuaValue lua_variables;
 };
 
 typedef bool (*col_filterf)(GameInst* o1, GameInst* o2);
-
 
 #endif /* GAMEINST_H_ */

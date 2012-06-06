@@ -25,10 +25,7 @@ EnemyInst::EnemyInst(int enemytype, int x, int y) :
 				false), rx(x), ry(y), enemytype(enemytype), eb(
 				game_enemy_data[enemytype].basestats.movespeed), xpgain(
 				game_enemy_data[enemytype].xpaward), stat(
-				game_enemy_data[enemytype].basestats), real_radius(
-				game_enemy_data[enemytype].radius) {
-	if (radius > 14)
-		radius = 14;
+				game_enemy_data[enemytype].basestats) {
 }
 
 EnemyInst::~EnemyInst() {
@@ -97,12 +94,23 @@ void EnemyInst::draw(GameState* gs) {
 
 	if (gs->game_settings().draw_diagnostics) {
 		char statbuff[255];
-		snprintf(statbuff, 255,
-				"vx=%f vy=%f\n act=%d, steps = %d\ncooldown = %d", eb.vx, eb.vy,
-				eb.current_action, eb.path_steps, eb.path_cooldown);
+		snprintf(
+				statbuff,
+				255,
+				"vx=%f vy=%f\n act=%d, path_steps = %d\npath_cooldown = %d\nradius=%d\ntarget_radius=%d",
+				eb.vx, eb.vy, eb.current_action, eb.path_steps,
+				eb.path_cooldown, radius, target_radius);
 		gl_printf(gs->primary_font(), Colour(255, 255, 255),
-				x - radius - view.x, y - 50 - view.y, statbuff);
+				x - radius - view.x, y - 70 - view.y, statbuff);
 	}
+
+	int healthbar_offsety = 20;
+	if (target_radius > 16)
+		healthbar_offsety = target_radius + 4;
+
+	if (stats().hp < stats().max_hp)
+		gl_draw_statbar(view, x - 10, y - healthbar_offsety, 20, 5, stats().hp,
+				stats().max_hp);
 
 	int w = img.width, h = img.height;
 	int xx = x - w / 2, yy = y - h / 2;
@@ -115,10 +123,6 @@ void EnemyInst::draw(GameState* gs) {
 		seen = true;
 		show_appear_message(gs->game_chat(), etype());
 	}
-
-	if (stats().hp < stats().max_hp)
-		gl_draw_statbar(view, x - 10, y - 20, 20, 5, stats().hp,
-				stats().max_hp);
 
 	if (stats().hurt_cooldown > 0) {
 		float s = 1 - stats().hurt_alpha();
