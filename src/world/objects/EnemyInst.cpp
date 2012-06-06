@@ -25,7 +25,10 @@ EnemyInst::EnemyInst(int enemytype, int x, int y) :
 				false), rx(x), ry(y), enemytype(enemytype), eb(
 				game_enemy_data[enemytype].basestats.movespeed), xpgain(
 				game_enemy_data[enemytype].xpaward), stat(
-				game_enemy_data[enemytype].basestats) {
+				game_enemy_data[enemytype].basestats), real_radius(
+				game_enemy_data[enemytype].radius) {
+	if (radius > 14)
+		radius = 14;
 }
 
 EnemyInst::~EnemyInst() {
@@ -63,16 +66,28 @@ void EnemyInst::step(GameState* gs) {
 	//Much of the monster implementation resides in MonsterController
 	stats().step();
 }
-static bool starts_with_vowel(const std::string& name){
+static bool starts_with_vowel(const std::string& name) {
 	char c = tolower(name[0]);
 	return (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u');
 }
-static void show_appear_message(GameChat& chat, EnemyEntry* e){
+static void show_appear_message(GameChat& chat, EnemyEntry* e) {
 	char buff[100];
-	const char* a_or_an = starts_with_vowel(e->name) ? "An" : "A";
+	const char* a_or_an = starts_with_vowel(e->name) ? "An " : "A ";
 
-	snprintf(buff, 100, "%s %s appears!", a_or_an, e->name.c_str());
+	if (e->unique)
+		a_or_an = "";
+
+	snprintf(buff, 100, "%s%s appears!", a_or_an, e->name.c_str());
 	chat.add_message(buff, Colour(255, 148, 120));
+
+}
+static void show_defeat_message(GameChat& chat, EnemyEntry* e) {
+	char buff[100];
+	/* Only show messages for uniques ... for now*/
+	if (e->unique) {
+		snprintf(buff, 100, "You have defeated %s!", e->name.c_str());
+		chat.add_message(buff, Colour(50, 205, 50));
+	}
 
 }
 void EnemyInst::draw(GameState* gs) {
@@ -96,7 +111,7 @@ void EnemyInst::draw(GameState* gs) {
 		return;
 	if (!gs->object_visible_test(this))
 		return;
-	if (!seen){
+	if (!seen) {
 		seen = true;
 		show_appear_message(gs->game_chat(), etype());
 	}
@@ -172,6 +187,7 @@ bool EnemyInst::hurt(GameState* gs, int hp) {
 		gs->add_instance(new AnimatedInst(x, y, etype()->sprite_number, 15));
 		gs->monster_controller().deregister_enemy(this);
 		gs->remove_instance(this);
+		show_defeat_message(gs->game_chat(), etype());
 		return true;
 	}
 	return false;
@@ -179,5 +195,5 @@ bool EnemyInst::hurt(GameState* gs, int hp) {
 
 void EnemyInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(EnemyInst*) inst = *this;
+	*(EnemyInst*)inst = *this;
 }

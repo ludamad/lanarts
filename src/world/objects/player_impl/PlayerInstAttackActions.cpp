@@ -207,7 +207,7 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		if (spellselect)
 			mpcost = 20;
 		bool use_weapon = spellselect == -1 || stats().mp < mpcost;
-		if (spellselect == -1 || use_weapon) {
+		if (use_weapon) {
 			target = get_weapon_autotarget(gs, this, target, dx, dy);
 		}
 		if (target && use_weapon) {
@@ -244,12 +244,20 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		if (spellselect)
 			mpcost = 20;
 		if (spellselect == -1 || stats().mp < mpcost) {
-			GameInst* target = get_weapon_autotarget(gs, this, NULL, rmx - x,
-					rmy - y);
-			if (target) {
+			bool is_projectile = !game_weapon_data[weapon_type()].projectile;
+			GameInst* target = NULL;
+			if (!is_projectile) {
+				target = get_weapon_autotarget(gs, this, NULL, rmx - x,
+						rmy - y);
+				if (target) {
+					rmx = target->x, rmy = target->y;
+				}
+			}
+
+			if (is_projectile || target) {
 				queued_actions.push_back(
 						GameAction(id, GameAction::USE_WEAPON, frame, level,
-								spellselect, target->x, target->y));
+								spellselect, rmx, rmy));
 			}
 			spell_used = true;
 		} else if (!stats().has_cooldown() && stats().mp >= mpcost) {

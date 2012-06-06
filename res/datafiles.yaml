@@ -7,7 +7,10 @@ class_files: classes.yaml
 
 effect_files: effects.yaml
 
-enemy_files: enemies.yaml
+enemy_files: 
+  [enemies/basic_enemies.yaml,
+  enemies/boss_enemies.yaml]
+
 
 item_files: items/items.yaml
 

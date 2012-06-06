@@ -9,11 +9,14 @@ sprites:
   - name: storm bolt
     file: res/sprites/effects/bolt07.png
 
-  - name: magic blast
-    file: res/sprites/effects/orb.png
+  - name: blue blast
+    file: res/sprites/effects/blueblast.png
 
   - name: poison
     file: res/sprites/effects/cloud_poison2.png
+
+  - name: fire storm
+    file: res/sprites/effects/firestorm.png
 
   - name: magic blast
     file: res/sprites/effects/orb.png

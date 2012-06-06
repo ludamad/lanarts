@@ -19,6 +19,7 @@ struct EnemyEntry {
 	int xpaward;
 	int sprite_number;
 	Stats basestats;
+	bool unique;
 
 	LuaValue init_event, step_event;
 
@@ -26,9 +27,9 @@ struct EnemyEntry {
 	}
 	EnemyEntry(const std::string& name, int rad, int xpaward, int spriten,
 			const Stats& stats, const std::string& initev,
-			const std::string& stepev) :
+			const std::string& stepev, bool unique = false) :
 			name(name), radius(rad), xpaward(xpaward), sprite_number(spriten), basestats(
-					stats), init_event(initev), step_event(stepev) {
+					stats), init_event(initev), step_event(stepev), unique(unique) {
 	}
 
 	void init(lua_State* L) {

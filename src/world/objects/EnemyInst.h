@@ -23,6 +23,9 @@ public:
 	Stats& stats() { return stat; }
 	EnemyBehaviour& behaviour() { return eb; }
 	EnemyEntry* etype();
+	int draw_radius() {
+		return real_radius;
+	}
 	int xpworth(){
 		return xpgain;
 	}
@@ -30,6 +33,7 @@ public:
 public:
 	float rx, ry;
 protected:
+	float real_radius;
 	bool seen;
 	int enemytype;
 	EnemyBehaviour eb;
