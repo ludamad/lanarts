@@ -34,7 +34,10 @@ sprites:
     file: res/sprites/monsters/hellforged.png
     
   - name: zin
-    file: res/sprites/monsters/bosses/zin.png
+    file: res/sprites/monsters/bosses/zin.png 
+   
+  - name: red dragon
+    file: res/sprites/monsters/bosses/reddragon.png
     
   - name: zombie
     file: res/sprites/monsters/zombie.png

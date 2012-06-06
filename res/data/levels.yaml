@@ -65,16 +65,16 @@ testlevel: &testlevel
           stairs_up: 0
           stairs_down: 1
         enemies:
-          amount: 1
-          generated:
-             - enemy: Zin
-               chance: 100
+          amount: 0
+#          generated:
+#             - enemy: Red Dragon
+#               guaranteed_spawns: 1
 
 
 branches:
   - branch: main_branch
     levels:
-#      - *testlevel
+      - *testlevel
       #Level 1
       - size: [40,40]
         items:
@@ -91,7 +91,7 @@ branches:
           per_room: 5       
         features:
           tileset: pebble_tiles
-          stairs_up: 0
+          stairs_up: 1
           stairs_down: 5
         enemies:
           amount: 2
@@ -179,6 +179,8 @@ branches:
           per_room: [2, 5]   
         enemies:
           generated:
+            - enemy: Red Dragon
+              guaranteed_spawns: 1
             - enemy: Chicken
               chance: 100
             - enemy: Zombie
@@ -404,84 +406,8 @@ branches:
         enemies:
           amount: 30
           generated:
-            - enemy: Super Chicken
-              chance: 50
-              group_chance: 33
-              group_size: 3
-            - enemy: Ciribot
-              chance: 100
-            - enemy: Storm Elemental
-              chance: 100
-              group_chance: 100
-              group_size: 3
-            - enemy: Grue
-              chance: 100
-              group_chance: 33
-              group_size: 2
-            - enemy: Jester
-              chance: 100
-            - enemy: Hell Forged
-              chance: 50
-      #Level 10
-      - size: [100,100]
-        items:
-          amount: 100
-          generated:
-            - default: *default_items
-        rooms:
-          padding: 0
-          amount: 1
-          size: [70,70]
-        tunnels:
-          padding: 2
-          width: [1,2]
-          per_room: 0      
-        features:
-          tileset: pebble_tiles
-          stairs_up: 3
-          stairs_down: 3
-        enemies:
-          amount: 50
-          generated:
-            - enemy: Super Chicken
-              chance: 50
-              group_chance: 33
-              group_size: 3
-            - enemy: Ciribot
-              chance: 100
-            - enemy: Storm Elemental
-              chance: 100
-              group_chance: 100
-              group_size: 3
-            - enemy: Grue
-              chance: 100
-              group_chance: 33
-              group_size: 2
-            - enemy: Jester
-              chance: 100
-            - enemy: Hell Forged
-              chance: 50
-      #Level 10
-      - size: [100,100]
-        items:
-          amount: 2
-          generated:
-            - default: *default_items
-        rooms:
-          padding: 0
-          amount: 10
-          size: [4,20]
-        tunnels:
-          padding: 2
-          width: [1,2]
-          per_room: 1      
-        features:
-          tileset: pebble_tiles
-          stairs_up: 3
-          stairs_down: 0
-        enemies:
-          amount: 20
-          generated:
+            - enemy: Zin
+              guaranteed_spawns: 1
             - enemy: Super Chicken
               chance: 50
               group_chance: 33

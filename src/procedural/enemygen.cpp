@@ -10,23 +10,61 @@
 #include "../world/GameTiles.h"
 #include "../world/objects/EnemyInst.h"
 
-//Generates enemy monsters
-void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
-		GeneratedLevel& level, GameState* gs) {
+int generate_enemy(const EnemyGenChance& ec, MTwist& mt, GeneratedLevel& level,
+		GameState* gs, int amount) {
+
+	enemy_id etype = ec.enemytype;
+
 	GameTiles& tiles = gs->tile_grid();
 	int start_x = (tiles.tile_width() - level.width()) / 2;
 	int start_y = (tiles.tile_height() - level.height()) / 2;
 
-	int nmons = mt.rand(rs.min_monsters, rs.max_monsters + 1);
+	int room = mt.rand(level.rooms().size());
+	Region r = level.rooms()[room].room_region;
 
+	for (int i = 0; i < amount; i++) {
+		Pos epos;
+		int tries = 0;
+		do {
+			if (tries++ < 20) {
+				epos = generate_location_in_region(mt, level, r);
+			} else
+				epos = generate_location(mt, level);
+		} while (level.at(epos).near_entrance);
+		level.at(epos).has_instance = true;
+		int ex = (epos.x + start_x) * TILE_SIZE + TILE_SIZE / 2;
+		int ey = (epos.y + start_y) * TILE_SIZE + TILE_SIZE / 2;
+		gs->add_instance(new EnemyInst(etype, ex, ey));
+	}
+	return amount;
+}
+
+static int get_total_chance(const EnemyGenSettings& rs){
 	int total_chance = 0;
-
 	for (int i = 0; i < rs.enemy_chances.size(); i++) {
 		total_chance += rs.enemy_chances[i].genchance;
 	}
-	if (nmons == 0 || total_chance == 0)
+	return total_chance;
+}
+
+//Generates enemy monsters
+void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
+		GeneratedLevel& level, GameState* gs) {
+
+	int nmons = mt.rand(rs.num_monsters);
+	int total_chance = get_total_chance(rs);
+
+
+	for (int i = 0; i < rs.enemy_chances.size(); i++) {
+		const EnemyGenChance& ec = rs.enemy_chances[i];
+		if (ec.guaranteed > 0){
+			generate_enemy(ec, mt, level, gs, ec.guaranteed);
+		}
+	}
+
+	if (total_chance == 0)
 		return;
-	for (int i = 0; i < nmons; i++) {
+	for (int i = 0; i < nmons;) {
 		int monster_roll = mt.rand(total_chance);
 		int monstn;
 		for (monstn = 0; monstn < rs.enemy_chances.size(); monstn++) {
@@ -36,28 +74,12 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 		}
 
 		const EnemyGenChance& ec = rs.enemy_chances[monstn];
-		int etype = ec.enemytype;
-		int number = 1;
+
+		int amnt = 1;
 		if (mt.rand(100) < ec.groupchance) {
-			number = mt.rand(ec.groupsize);
-			i += number - 1;
+			amnt = mt.rand(ec.groupsize);
 		}
 
-		int room = mt.rand(level.rooms().size());
-		Region r = level.rooms()[room].room_region;
-		for (int i = 0; i < number; i++) {
-			Pos epos;
-			int tries = 0;
-			do {
-				if (tries++ < 20) {
-					epos = generate_location_in_region(mt, level, r);
-				} else
-					epos = generate_location(mt, level);
-			} while (level.at(epos).near_entrance);
-			level.at(epos).has_instance = true;
-			int ex = (epos.x + start_x) * TILE_SIZE + TILE_SIZE / 2;
-			int ey = (epos.y + start_y) * TILE_SIZE + TILE_SIZE / 2;
-			gs->add_instance(new EnemyInst(etype, ex, ey));
-		}
+		i += generate_enemy(ec, mt, level, gs, amnt);
 	}
 }

@@ -25,6 +25,7 @@ struct EnemyGenSettings {
 };*/
 
 struct EnemyGenChance {
+	int guaranteed;
 	int genchance;//Out of 100%
 	int enemytype;
 	int groupchance;//Out of 100%
@@ -33,9 +34,9 @@ struct EnemyGenChance {
 };
 struct EnemyGenSettings {
 	std::vector<EnemyGenChance> enemy_chances;
-	int min_monsters, max_monsters;
+	Range num_monsters;
 	EnemyGenSettings(const std::vector<EnemyGenChance>& enemies, int min_monsters, int max_monsters) :
-		enemy_chances(enemies), min_monsters(min_monsters), max_monsters(max_monsters){
+		enemy_chances(enemies), num_monsters(min_monsters, max_monsters){
 	}
 };
 

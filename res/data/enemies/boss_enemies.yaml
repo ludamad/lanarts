@@ -6,7 +6,7 @@ enemies:
     appear_message: 
         Zin laughs at your feeble presence!
     defeat_message: 
-        Zin has been defeated!
+        Zin has been defeated! Consider the game won. For now.
     sprite: zin
     radius: 20
     xpaward: 100
@@ -23,4 +23,27 @@ enemies:
         range: 400
         cooldown: 70
         sprite: blue blast
+        projectile_speed: 8
+
+  - name: Red Dragon
+    appear_message: 
+        A frighteningly large red dragon comes into view!
+    defeat_message: 
+        You have slain the red dragon!
+    sprite: red dragon
+    radius: 27
+    xpaward: 60
+    unique: 1
+    stats:
+        movespeed: 2.5
+        hp: 150
+        hpregen: 0.1
+    attacks:
+      - damage: 15
+        cooldown: 40
+      - projectile: 1
+        damage: 25
+        range: 400
+        cooldown: 70
+        sprite: fire bolt
         projectile_speed: 8

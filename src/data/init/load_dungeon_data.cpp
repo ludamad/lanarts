@@ -30,7 +30,8 @@ ItemGenSettings parse_item_gen(const YAML::Node& n) {
 
 	vector<ItemGenChance> chances;
 	if (hasnode(n, "generated")) {
-		chances = parse_named_with_defaults(n["generated"], "item", &parse_item_chance);
+		chances = parse_named_with_defaults(n["generated"], "item",
+				&parse_item_chance);
 	}
 	return ItemGenSettings(chances, amnt.min, amnt.max);
 }
@@ -63,23 +64,27 @@ FeatureGenSettings parse_feature_gen(const YAML::Node& n) {
 EnemyGenChance parse_enemy_chance(const YAML::Node& n) {
 	EnemyGenChance egc;
 	egc.enemytype = parse_enemy_number(n, "enemy");
-	n["chance"] >> egc.genchance;
+	egc.genchance = parse_defaulted(n, "chance", 0);
+	egc.guaranteed = parse_defaulted(n, "guaranteed_spawns", 0);
 	egc.groupchance = parse_defaulted(n, "group_chance", 0);
 	egc.groupsize = parse_defaulted(n, "group_size", Range(0, 0));
 	return egc;
 }
-EnemyGenSettings parse_enemy_gen(const YAML::Node& supernode,
-		const char* subnode) {
+EnemyGenSettings parse_enemy_gen(const YAML::Node& node,
+		const char* key) {
 	vector<EnemyGenChance> chances;
 	Range nmonsters;
 	nmonsters.max = 0;
 	nmonsters.min = 0;
 
-	if (hasnode(supernode, subnode)) {
-		const YAML::Node& n = supernode[subnode];
+	if (hasnode(node, key)) {
+		const YAML::Node& n = node[key];
 
 		nmonsters = parse_range(n["amount"]);
-		chances = parse_named_with_defaults(n["generated"], "enemy", &parse_enemy_chance);
+		if (hasnode(n, "generated")) {
+			chances = parse_named_with_defaults(n["generated"], "enemy",
+					&parse_enemy_chance);
+		}
 	}
 	return EnemyGenSettings(chances, nmonsters.min, nmonsters.max);
 }
