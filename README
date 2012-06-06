@@ -5,6 +5,11 @@ asio-devel
 boost-devel
 cmake
 
+Packages for ubuntu:
+libsdl1.2-dev libsdl-image1.2-dev libfreetype6-dev libasio-dev libboost-dev cmake
+
+The project uses cmake to create plaform independent build files. If you a
+
 
 Just run make_and_run.sh to build and run, or do the following:
 

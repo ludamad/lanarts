@@ -39,13 +39,8 @@ int parse_enemy_number(const YAML::Node& n, const char *key) {
 
 	std::string s;
 	n[key] >> s;
-	for (int i = 0; i < game_enemy_data.size(); i++) {
-		if (s == game_enemy_data[i].name) {
-			return i;
-		}
-	}
 
-	return -1;
+	return get_enemy_by_name(s.c_str());
 }
 
 const char* parse_cstr(const YAML::Node& n) {

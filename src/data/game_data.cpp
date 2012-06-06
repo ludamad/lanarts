@@ -75,6 +75,9 @@ int get_tile_by_name(const char* name) {
 int get_effect_by_name(const char* name) {
 	return get_X_by_name(game_effect_data, name);
 }
+int get_enemy_by_name(const char* name) {
+	return get_X_by_name(game_enemy_data, name);
+}
 
 int get_tileset_by_name(const char* name) {
 	for (int i = 0; i < game_tileset_data.size(); i++) {
