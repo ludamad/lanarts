@@ -1,0 +1,22 @@
+---
+#Enemy Markup
+enemies:
+
+  - name: Zin
+    sprite: zin
+    radius: 20
+    xpaward: 100
+    unique: 1
+    stats:
+        movespeed: 2.5
+        hp: 250
+        hpregen: 0.1
+    attacks:
+      - damage: 25
+        cooldown: 40
+      - projectile: 1
+        damage: 35
+        range: 400
+        cooldown: 70
+        sprite: blue blast
+        projectile_speed: 8
