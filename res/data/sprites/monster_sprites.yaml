@@ -15,6 +15,9 @@ sprites:
   - name: grue
     file: res/sprites/monsters/grue.png
 
+  - name: giant rat
+    file: res/sprites/monsters/giant_rat.png
+
   - name: jester
     file: res/sprites/monsters/jester.png
 

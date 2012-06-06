@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstring>
 
+struct StatModifier;
 class MTwist;
 struct Attack { //Currently for melee & ranged
 	bool canuse;
@@ -58,8 +59,11 @@ struct Stats {
 
 	void heal_fully();
 
+	int calculate_statmod_damage(MTwist& mt, StatModifier& sm);
 	int calculate_melee_damage(MTwist& mt, int weapon_type);
+	int calculate_ranged_damage(MTwist& mt, int weapon_type, int projectile_type);
 	int calculate_spell_damage(MTwist& mt, int spell_type);
+
 	void gain_level();
 	int gain_xp(int amnt);
 

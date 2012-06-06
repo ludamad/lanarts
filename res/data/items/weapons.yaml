@@ -45,5 +45,5 @@ weapons:
     modifiers: 
         strength: .75
     range: 400
-    cooldown: 35
+    cooldown: 55
     spr_item: bow1

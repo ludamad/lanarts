@@ -104,6 +104,14 @@ void EnemyInst::draw(GameState* gs) {
 				x - radius - view.x, y - 70 - view.y, statbuff);
 	}
 
+	int w = img.width, h = img.height;
+	int xx = x - w / 2, yy = y - h / 2;
+
+	if (!view.within_view(xx, yy, w, h))
+		return;
+	if (!gs->object_visible_test(this))
+		return;
+
 	int healthbar_offsety = 20;
 	if (target_radius > 16)
 		healthbar_offsety = target_radius + 4;
@@ -112,13 +120,6 @@ void EnemyInst::draw(GameState* gs) {
 		gl_draw_statbar(view, x - 10, y - healthbar_offsety, 20, 5, stats().hp,
 				stats().max_hp);
 
-	int w = img.width, h = img.height;
-	int xx = x - w / 2, yy = y - h / 2;
-
-	if (!view.within_view(xx, yy, w, h))
-		return;
-	if (!gs->object_visible_test(this))
-		return;
 	if (!seen) {
 		seen = true;
 		show_appear_message(gs->game_chat(), etype());

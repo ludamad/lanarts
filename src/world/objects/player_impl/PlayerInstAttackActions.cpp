@@ -68,7 +68,7 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 	WeaponEntry& wentry = game_weapon_data[p->weapon_type()];
 	Pos ppos(p->x, p->y);
 	GameInst* inst = NULL;
-	bool ismelee = !wentry.projectile;
+	bool ismelee = !(wentry.projectile || p->get_equipment().projectile > -1);
 	int target_range = wentry.range + p->radius;
 
 	if (targ && distance_between(Pos(targ->x, targ->y), ppos) <= target_range) {
@@ -244,7 +244,8 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		if (spellselect)
 			mpcost = 20;
 		if (spellselect == -1 || stats().mp < mpcost) {
-			bool is_projectile = !game_weapon_data[weapon_type()].projectile;
+			bool is_projectile = game_weapon_data[weapon_type()].projectile
+					|| equipment.projectile > -1;
 			GameInst* target = NULL;
 			if (!is_projectile) {
 				target = get_weapon_autotarget(gs, this, NULL, rmx - x,
@@ -270,7 +271,7 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 }
 
 void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
-	WeaponEntry& wtype = game_weapon_data[weapon_type()];
+	WeaponEntry& wentry = game_weapon_data[weapon_type()];
 	MTwist& mt = gs->rng();
 	const int MAX_MELEE_HITS = 10;
 	Stats estats = effective_stats(gs->get_luastate());
@@ -278,36 +279,36 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 		return;
 
 	Pos actpos(action.action_x, action.action_y);
-	int weaprange = wtype.range + this->radius;
+	int weaprange = wentry.range + this->radius;
 	float mag = distance_between(actpos, Pos(x, y));
 	if (mag > weaprange) {
 		float dx = actpos.x - x, dy = actpos.y - dy;
 		actpos = Pos(x + dx / mag * weaprange, y + dy / mag * weaprange);
 	}
 
-	if (wtype.projectile && equipment.projectile == -1)
+	if (wentry.projectile && equipment.projectile == -1)
 		return;
 
-	if (wtype.projectile) {
-		int damage = estats.calculate_melee_damage(mt, weapon_type());
+	if (equipment.projectile > -1) {
+		int damage = estats.calculate_ranged_damage(mt, weapon_type(), equipment.projectile);
 		ProjectileEntry& pentry = game_projectile_data[equipment.projectile];
 		item_id item = get_item_by_name(pentry.name.c_str());
 
 		equipment.use_ammo();
-		int dmg_bonus = mt.rand(pentry.damage_bonus);
 
 		ObjCallback drop_callback(projectile_item_drop, (void*)item);
 
-		GameInst* bullet = new ProjectileInst(pentry.attack_sprite, id, 6,
-				wtype.range, damage + dmg_bonus, x, y, actpos.x, actpos.y,
+		GameInst* bullet = new ProjectileInst(pentry.attack_sprite, id, pentry.speed,
+				wentry.range, damage, x, y, actpos.x, actpos.y,
 				false, 0, NONE, drop_callback);
 		gs->add_instance(bullet);
+		stats().cooldown = std::max(wentry.cooldown, pentry.cooldown);
 	} else {
 		GameInst* enemies[MAX_MELEE_HITS];
 
-		int max_targets = std::min(MAX_MELEE_HITS, wtype.max_targets);
+		int max_targets = std::min(MAX_MELEE_HITS, wentry.max_targets);
 
-		int numhit = get_targets(gs, this, actpos.x, actpos.y, wtype.dmgradius,
+		int numhit = get_targets(gs, this, actpos.x, actpos.y, wentry.dmgradius,
 				enemies, max_targets);
 
 		if (numhit == 0)
@@ -335,12 +336,12 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 				}
 			}
 			gs->add_instance(
-					new AnimatedInst(e->x, e->y, wtype.attack_sprite, 25));
+					new AnimatedInst(e->x, e->y, wentry.attack_sprite, 25));
 
 		}
+		stats().cooldown = wentry.cooldown;
 	}
 
-	stats().cooldown = wtype.cooldown;
 	reset_rest_cooldown();
 }
 

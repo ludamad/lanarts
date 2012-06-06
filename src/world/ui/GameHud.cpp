@@ -89,7 +89,7 @@ static void draw_player_inventory(GameState* gs, PlayerInst* player, int inv_x,
 }
 
 static Colour outline_col(bool cond) {
-	return cond ? Colour(50, 205, 50) : Colour(43, 43, 43);
+	return cond ? Colour(50, 255, 50) : Colour(43, 43, 43);
 }
 
 static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,

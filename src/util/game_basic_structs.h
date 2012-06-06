@@ -22,7 +22,7 @@ struct Colour {
 /*Represents a range*/
 struct Range {
 	int min, max;
-	Range() {
+	Range() : min(0), max(0) {
 	}
 	Range(int min, int max) :
 			min(min), max(max) {

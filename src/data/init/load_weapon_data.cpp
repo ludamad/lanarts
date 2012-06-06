@@ -56,12 +56,13 @@ void load_weapon_item_entries() {
 void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	const int default_cooldown = 30;
-	const int default_range = 18;
 	const int default_damage_radius = 3;
 
 	ProjectileEntry entry;
 	entry.name = parse_str(node["name"]);
-	entry.damage_bonus = parse_range(node["damage"]);
+	entry.damage = parse_defaulted(node, "damage", Range(0,0));
+	entry.damage_multiplier = parse_defaulted(node, "modifiers", StatModifier());
+	entry.damage_added = parse_defaulted(node, "damage_added", Range(0,0));
 
 	entry.item_sprite = parse_sprite_number(node, "spr_item");
 	entry.attack_sprite = entry.item_sprite;
@@ -70,6 +71,9 @@ void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
 	}
 	entry.break_chance = parse_defaulted(node, "break_chance", 0);
 	entry.weapon_class = parse_str(node["weapon_class"]);
+
+	entry.speed = parse_defaulted(node, "speed", 4);
+	entry.cooldown = parse_defaulted(node, "cooldown", 0);
 
 	game_projectile_data.push_back(entry);
 	if (value)
@@ -83,7 +87,7 @@ void load_projectile_data(lua_State* L, const FilenameList& filenames,
 }
 
 void load_projectile_item_entries() {
-	const int default_radius = 16;
+	const int default_radius = 15;
 
 	//Create items from projectiles
 	for (int i = 0; i < game_projectile_data.size(); i++) {

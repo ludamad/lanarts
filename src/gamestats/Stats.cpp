@@ -140,13 +140,29 @@ int Stats::gain_xp(int amnt) {
 	return levels_gained;
 }
 
-int Stats::calculate_melee_damage(MTwist& mt, weapon_id weapon_type) {
-	WeaponEntry& wtype = game_weapon_data[weapon_type];
-	int base_damage = mt.rand(wtype.base_damage);
-	StatModifier& sm = wtype.damage_multiplier;
+int Stats::calculate_statmod_damage(MTwist& mt, StatModifier& sm) {
 	float statdmg = strength * sm.strength_mult + defence * sm.defence_mult
 			+ magic * sm.magic_mult;
-	int damage = round(statdmg) + base_damage;
+	return round(statdmg);
+}
+
+int Stats::calculate_ranged_damage(MTwist& mt, weapon_id weapon_type,
+		projectile_id projectile_type) {
+	int damage = 0;
+	ProjectileEntry& pentry = game_projectile_data[projectile_type];
+	if (!pentry.is_unarmed()) {
+		damage += calculate_melee_damage(mt, weapon_type);
+	}
+	StatModifier& sm = pentry.damage_multiplier;
+	damage += calculate_statmod_damage(mt, sm) + mt.rand(pentry.damage)
+			+ mt.rand(pentry.damage_added);
+	return damage;
+}
+int Stats::calculate_melee_damage(MTwist& mt, weapon_id weapon_type) {
+	WeaponEntry& wentry = game_weapon_data[weapon_type];
+	int base_damage = mt.rand(wentry.base_damage);
+	StatModifier& sm = wentry.damage_multiplier;
+	int damage = calculate_statmod_damage(mt, sm) + base_damage;
 	return damage;
 }
 int Stats::calculate_spell_damage(MTwist& mt, int spell_type) {

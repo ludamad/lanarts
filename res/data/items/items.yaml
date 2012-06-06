@@ -34,12 +34,3 @@ items:
     sprite: scroll_magic
     action_func: increase_magic
     amount: 1
-
-  - name: Stone
-    sprite: stone
-    action_func: stone
-    prereq_func: function(item, obj) return obj.stats.cooldown <= 0 end
-    speed: 8
-    cooldown: 20
-    range: 400
-    damage: 20

@@ -147,6 +147,10 @@ const YAML::Node & operator >>(const YAML::Node& n, FilenameList & filenames) {
 	return n;
 }
 
+const YAML::Node& operator >>(const YAML::Node& n, StatModifier& sm) {
+	sm = parse_modifiers(n);
+}
+
 void load_data_impl_template(const FilenameList& filenames,
 		const char* resource, load_data_impl_callbackf node_callback,
 		lua_State* L, LuaValue* value) {

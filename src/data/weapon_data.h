@@ -22,8 +22,16 @@ struct ProjectileEntry {
 	std::string weapon_class; //Compatible with this weapon class
 
 	sprite_id item_sprite, attack_sprite;
-	Range damage_bonus;
+	StatModifier damage_multiplier;
+	Range damage, damage_added;
 	int break_chance;//out of 100
+	//If unarmed projectile, range/cooldown used
+	//or if larger than base weapon's
+	int speed, cooldown, range;
+
+	bool is_unarmed(){
+		return weapon_class == "unarmed";
+	}
 };
 
 struct WeaponEntry {

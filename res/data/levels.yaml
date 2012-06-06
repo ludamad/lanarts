@@ -38,19 +38,19 @@ default_items: &default_items
     chance: 5
   - item: Defence Scroll
     chance: 5
-
-branches:
-  - branch: main_branch
-    levels:
+testlevel:
       - size: [32,32]
         items:
-          amount: 50
+          amount: 30
           generated: 
               - item: Arrow
-                chance: 100
+                chance: 50
+                quantity: [2,20]
+              - item: Stone
+                chance: 50
                 quantity: [2,20]
               - item: Short Bow
-                chance: 10
+                chance: 100
         rooms:
 #          padding: 0
 #          amount: 10
@@ -69,7 +69,7 @@ branches:
         enemies:
           amount: 1
           generated:
-             - enemy: Zin
+             - enemy: Giant Rat
                chance: 100
 #            - enemy: Skeleton
 #              chance: 50
@@ -77,6 +77,9 @@ branches:
 #              group_size: 3
 #            - enemy: Imp
 #              chance: 100
+branches:
+  - branch: main_branch
+    levels:
       #Level 1
       - size: [40,40]
         items:
