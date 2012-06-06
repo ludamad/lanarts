@@ -22,22 +22,38 @@ Attack parse_attack(const YAML::Node& n) {
 	return ret;
 }
 EnemyEntry parse_enemy_type(const YAML::Node& n) {
-	int sprite_number;
-	int radius;
-	int xpaward;
-	n["xpaward"] >> xpaward;
-	n["radius"] >> radius;
+	EnemyEntry entry;
+
 	const YAML::Node& anodes = n["attacks"];
 	vector<Attack> attacks;
 	for (int i = 0; i < anodes.size(); i++) {
 		attacks.push_back(parse_attack(anodes[i]));
 	}
+//	std::string name, appear_msg, defeat_msg;
+//	int radius;
+//	int xpaward;
+//	int sprite_number;
+//	Stats basestats;
+//	bool unique;
+//
+//	LuaValue init_event, step_event;
 
-	return EnemyEntry(parse_str(n["name"]), radius, xpaward,
-			parse_sprite_number(n, "sprite"), parse_stats(n["stats"], attacks),
-			parse_defaulted(n, "init_func", std::string()),
-			parse_defaulted(n, "step_func", std::string()),
-			parse_defaulted(n, "unique", 0));
+	entry.name = parse_str(n["name"]);
+
+	entry.appear_msg = parse_defaulted(n, "appear_message", std::string());
+	entry.defeat_msg = parse_defaulted(n, "defeat_message", std::string());
+
+	entry.radius = parse_int(n["radius"]);
+	entry.xpaward = parse_int(n["xpaward"]);
+
+	entry.sprite_number = parse_sprite_number(n, "sprite");
+	entry.basestats = parse_stats(n["stats"], attacks);
+	entry.unique = parse_defaulted(n, "unique", 0);
+
+	entry.init_event = LuaValue(parse_defaulted(n, "init_func", std::string()));
+	entry.step_event = LuaValue(parse_defaulted(n, "step_func", std::string()));
+
+	return entry;
 }
 
 void load_enemy_callbackf(const YAML::Node& node, lua_State* L,

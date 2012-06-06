@@ -3,6 +3,10 @@
 enemies:
 
   - name: Zin
+    appear_message: 
+        Zin laughs at your feeble presence!
+    defeat_message: 
+        Zin has been defeated!
     sprite: zin
     radius: 20
     xpaward: 100

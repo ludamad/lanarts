@@ -38,8 +38,9 @@ default_items: &default_items
     chance: 5
   - item: Defence Scroll
     chance: 5
-testlevel:
-      - size: [32,32]
+
+testlevel: &testlevel
+        size: [32,32]
         items:
           amount: 30
           generated: 
@@ -52,9 +53,6 @@ testlevel:
               - item: Short Bow
                 chance: 100
         rooms:
-#          padding: 0
-#          amount: 10
-#          size: [2,9]
            padding: 0
            amount: 1
            size: [20,24]
@@ -65,21 +63,18 @@ testlevel:
         features:
           tileset: grass_tiles
           stairs_up: 0
-          stairs_down: 8
+          stairs_down: 1
         enemies:
           amount: 1
           generated:
-             - enemy: Giant Rat
+             - enemy: Zin
                chance: 100
-#            - enemy: Skeleton
-#              chance: 50
-#              group_chance: 100
-#              group_size: 3
-#            - enemy: Imp
-#              chance: 100
+
+
 branches:
   - branch: main_branch
     levels:
+#      - *testlevel
       #Level 1
       - size: [40,40]
         items:
@@ -96,7 +91,7 @@ branches:
           per_room: 5       
         features:
           tileset: pebble_tiles
-          stairs_up: 8
+          stairs_up: 0
           stairs_down: 5
         enemies:
           amount: 2

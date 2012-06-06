@@ -144,6 +144,7 @@ const YAML::Node & operator >>(const YAML::Node& n, FilenameList & filenames) {
 
 const YAML::Node& operator >>(const YAML::Node& n, StatModifier& sm) {
 	sm = parse_modifiers(n);
+	return n;
 }
 
 void load_data_impl_template(const FilenameList& filenames,

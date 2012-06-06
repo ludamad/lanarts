@@ -68,15 +68,14 @@ static bool starts_with_vowel(const std::string& name) {
 	return (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u');
 }
 static void show_appear_message(GameChat& chat, EnemyEntry* e) {
-	char buff[100];
-	const char* a_or_an = starts_with_vowel(e->name) ? "An " : "A ";
-
-	if (e->unique)
-		a_or_an = "";
-
-	snprintf(buff, 100, "%s%s appears!", a_or_an, e->name.c_str());
-	chat.add_message(buff, Colour(255, 148, 120));
-
+	if (e->appear_msg.empty()) {
+		char buff[100];
+		const char* a_or_an = starts_with_vowel(e->name) ? "An " : "A ";
+		snprintf(buff, 100, "%s%s appears!", a_or_an, e->name.c_str());
+		chat.add_message(buff, Colour(255, 148, 120));
+	} else {
+		chat.add_message(e->appear_msg.c_str(), Colour(255, 148, 120));
+	}
 }
 static void show_defeat_message(GameChat& chat, EnemyEntry* e) {
 	char buff[100];
@@ -200,5 +199,5 @@ bool EnemyInst::hurt(GameState* gs, int hp) {
 
 void EnemyInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(EnemyInst*)inst = *this;
+	*(EnemyInst*) inst = *this;
 }
