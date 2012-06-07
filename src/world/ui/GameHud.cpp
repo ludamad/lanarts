@@ -89,7 +89,7 @@ static void draw_player_inventory(GameState* gs, PlayerInst* player, int inv_x,
 }
 
 static Colour outline_col(bool cond) {
-	return cond ? Colour(50, 255, 50) : Colour(43, 43, 43);
+	return cond ? Colour(50, 205, 50) : Colour(43, 43, 43);
 }
 
 static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
@@ -189,12 +189,12 @@ void GameHud::queue_io_actions(GameState* gs, PlayerInst* player,
 		Equipment& equipment = player->get_equipment();
 		if (posy == 0 && posx == 0)
 			queued_actions.push_back(
-					GameAction(player->id, GameAction::DEEQUIP_ITEM, frame, level,
-							ItemEntry::WEAPON));
+					GameAction(player->id, GameAction::DEEQUIP_ITEM, frame,
+							level, ItemEntry::WEAPON));
 		else if (posy == 0 && posx == 1)
 			queued_actions.push_back(
-					GameAction(player->id, GameAction::DEEQUIP_ITEM, frame, level,
-							ItemEntry::PROJECTILE));
+					GameAction(player->id, GameAction::DEEQUIP_ITEM, frame,
+							level, ItemEntry::PROJECTILE));
 	}
 
 	if (gs->mouse_left_click() && !mouse_within_view) {
@@ -223,6 +223,42 @@ void GameHud::queue_io_actions(GameState* gs, PlayerInst* player,
 							slot));
 		}
 	}
+}
+
+const int SPELL_MAX = 2;
+bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
+	bool mouse_within_view = gs->mouse_x() < gs->window_view().width;
+	PlayerInst* player = (PlayerInst*)gs->get_instance(gs->local_playerid());
+	if (!player) return false;
+
+	Inventory inv = player->get_inventory();
+
+	switch (event->type) {
+	case SDL_MOUSEBUTTONDOWN: {
+		if (event->button.button == SDL_BUTTON_LEFT && mouse_within_view) {
+			int action_bar_x = 0, action_bar_y = gs->window_view().height
+					- TILE_SIZE;
+			int posx = (gs->mouse_x() - action_bar_x) / TILE_SIZE;
+			int posy = (gs->mouse_y() - action_bar_y) / TILE_SIZE;
+
+			Equipment& equipment = player->get_equipment();
+			if (posy == 0) {
+				if (posx == 0) {
+					player->spell_selected() = -1;
+					return true;
+				} else if (posx == 1 && equipment.has_projectile()) {
+					player->spell_selected() = -1;
+					return true;
+				} else if (posx > 1 && posx - 2 < SPELL_MAX) {
+					player->spell_selected() = posx - 2;
+					return true;
+				}
+			}
+		}
+	}
+		break;
+	}
+	return false;
 }
 
 void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {

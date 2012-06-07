@@ -12,7 +12,6 @@
 #include <ctime>
 #include <vector>
 
-
 #include "../data/game_data.h"
 #include "../data/item_data.h"
 #include "../data/tile_data.h"
@@ -105,11 +104,16 @@ GameState::~GameState() {
 int GameState::handle_event(SDL_Event *event) {
 	int done = 0;
 
-	if (dialogs.handle_event(this, event))
-		return done;
+	if (level()) {
+		if (dialogs.handle_event(this, event))
+			return done;
 
-	if (chat.handle_event(connection, event))
-		return done;
+		if (hud.handle_event(this, event))
+			return done;
+
+		if (chat.handle_event(this, event))
+			return done;
+	}
 
 	switch (event->type) {
 	case SDL_ACTIVEEVENT:

@@ -64,7 +64,7 @@ bool GameChat::is_typing_message() {
 	return is_typing;
 }
 
-void GameChat::clear(){
+void GameChat::clear() {
 	messages.clear();
 }
 
@@ -161,12 +161,43 @@ void GameChat::draw(GameState *gs) const {
 		draw_player_chat(gs);
 }
 
+void GameChat::toggle_chat() {
+	if (is_typing) {
+		if (!typed_message.message.empty()) {
+			typed_message.sender = local_sender;
+			typed_message.sender_colour = Colour(37, 207, 240);
+			add_message(typed_message);
+		} else {
+			show_chat = false;
+			fade_out_rate = 0.1f;
+		}
+		reset_typed_message();
+		is_typing = false;
+	} else {
+		if (!show_chat)
+			show_chat = true;
+		else if (show_chat)
+			is_typing = true;
+	}
+}
 /*Returns whether has handled event completely or not*/
-bool GameChat::handle_event(GameNetConnection& connection, SDL_Event *event) {
+bool GameChat::handle_event(GameState* gs, SDL_Event *event) {
+	int view_w = gs->window_view().width, view_h = gs->window_view().height;
+	int chat_w = view_w, chat_h = 100;
+	int chat_x = 0, chat_y = 0; //h - chat_h - TILE_SIZE;
+
 	SDLKey keycode = event->key.keysym.sym;
 	SDLMod keymod = event->key.keysym.mod;
 	current_mod = keymod;
 	switch (event->type) {
+	case SDL_MOUSEBUTTONDOWN: {
+		if (show_chat && event->button.button == SDL_BUTTON_LEFT
+				&& gs->mouse_x() < chat_w && gs->mouse_y() < chat_h) {
+			toggle_chat();
+			return true;
+		}
+		break;
+	}
 	case SDL_KEYUP: {
 		if (current_key == keycode)
 			current_key = SDLK_FIRST;
@@ -174,6 +205,10 @@ bool GameChat::handle_event(GameNetConnection& connection, SDL_Event *event) {
 		break;
 	}
 	case SDL_KEYDOWN: {
+		if (keycode == SDLK_RETURN) {
+			toggle_chat();
+			return true;
+		}
 		if (is_typing) {
 			std::string& msg = typed_message.message;
 			if (is_typeable_keycode(keycode)) {
@@ -197,19 +232,6 @@ bool GameChat::handle_event(GameNetConnection& connection, SDL_Event *event) {
 				}
 				return true;
 			}
-			if (keycode == SDLK_RETURN) {
-				if (!typed_message.message.empty()) {
-					typed_message.sender = local_sender;
-					typed_message.sender_colour = Colour(37, 207, 240);
-					add_message(typed_message);
-				} else {
-					show_chat = false;
-					fade_out_rate = 0.1f;
-				}
-				reset_typed_message();
-				is_typing = false;
-				return true;
-			}
 			if (keycode == SDLK_LCTRL || keycode == SDLK_RCTRL) {
 				is_typing = false;
 				return true;
@@ -217,14 +239,6 @@ bool GameChat::handle_event(GameNetConnection& connection, SDL_Event *event) {
 			if (keycode == SDLK_DELETE) {
 				reset_typed_message();
 				is_typing = false;
-				return true;
-			}
-		} else {
-			if (keycode == SDLK_RETURN) {
-				if (!show_chat)
-					show_chat = true;
-				else if (show_chat)
-					is_typing = true;
 				return true;
 			}
 		}

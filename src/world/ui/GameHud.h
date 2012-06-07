@@ -24,6 +24,8 @@ public:
 
 	void step(GameState* gs);
 
+	/*Returns whether has handled event completely or not*/
+	bool handle_event(GameState* gs, SDL_Event *event);
 	/* Handles clicks, etc */
 	void queue_io_actions(GameState* gs, PlayerInst* player, std::deque<GameAction>& queued_actions);
 

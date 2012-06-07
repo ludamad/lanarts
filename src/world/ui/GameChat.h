@@ -16,7 +16,6 @@
 struct GameState;
 struct font_data;
 struct NetPacket;
-class GameNetConnection;
 
 /*Handle key repeating, in steps*/
 const int INITIAL_REPEAT_STEP_AMNT = 40;
@@ -58,7 +57,8 @@ public:
 
 	bool is_typing_message();
 	/*Returns whether has handled event completely or not*/
-	bool handle_event(GameNetConnection& connection, SDL_Event *event);
+	bool handle_event(GameState* gs, SDL_Event *event);
+	void toggle_chat();
 
 	GameChat(const std::string& local_sender);
 private:

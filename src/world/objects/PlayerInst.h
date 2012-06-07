@@ -88,7 +88,7 @@ public:
 		return effects;
 	}
 
-	int spell_selected() {
+	int& spell_selected() {
 		return spellselect;
 	}
 	int& rest_cooldown() {
