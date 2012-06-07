@@ -78,10 +78,8 @@ static void show_appear_message(GameChat& chat, EnemyEntry* e) {
 	}
 }
 static void show_defeat_message(GameChat& chat, EnemyEntry* e) {
-	char buff[100];
 	if (!e->defeat_msg.empty()) {
-		snprintf(buff, 100, "You have defeated %s!", e->defeat_msg.c_str());
-		chat.add_message(buff, Colour(50, 205, 50));
+		chat.add_message(e->defeat_msg, Colour(50, 205, 50));
 	}
 
 }
