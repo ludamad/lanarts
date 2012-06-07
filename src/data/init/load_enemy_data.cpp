@@ -17,7 +17,7 @@ Attack parse_attack(const YAML::Node& n) {
 	ret.range = parse_defaulted(n, "range", 20);
 	ret.projectile_speed = parse_defaulted(n, "projectile_speed", 0);
 	n["damage"] >> ret.damage;
-	ret.isprojectile = parse_defaulted(n, "projectile", 0);
+	ret.isprojectile = parse_defaulted(n, "uses_projectile", false);
 	ret.attack_sprite = parse_sprite_number(n, "sprite");
 	return ret;
 }
@@ -48,7 +48,7 @@ EnemyEntry parse_enemy_type(const YAML::Node& n) {
 
 	entry.sprite_number = parse_sprite_number(n, "sprite");
 	entry.basestats = parse_stats(n["stats"], attacks);
-	entry.unique = parse_defaulted(n, "unique", 0);
+	entry.unique = parse_defaulted(n, "unique", false);
 
 	entry.init_event = LuaValue(parse_defaulted(n, "init_func", std::string()));
 	entry.step_event = LuaValue(parse_defaulted(n, "step_func", std::string()));

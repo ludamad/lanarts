@@ -20,7 +20,7 @@ void load_weapon_callbackf(const YAML::Node& node, lua_State* L,
 	}
 
 	WeaponEntry entry(parse_str(node["name"]), parse_str(node["weapon_class"]),
-			parse_defaulted(node, "projectile", 0),
+			parse_defaulted(node, "uses_projectile", false),
 			parse_defaulted(node, "max_targets", 1),
 			parse_range(node["damage"]), parse_modifiers(node["modifiers"]),
 			parse_defaulted(node, "range", default_range),

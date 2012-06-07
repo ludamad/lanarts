@@ -14,8 +14,11 @@ default_enemies: &default_enemies
 
 default_items: &default_items
   - item: Arrow
-    chance: 20
-    quantity: [2,20]
+    chance: 10
+    quantity: [2,20]  
+  - item: Stone Arrow
+    chance: 10
+    quantity: [1,5]
   - item: Short Bow
     chance: 5
   - item: Stone
@@ -42,16 +45,8 @@ default_items: &default_items
 testlevel: &testlevel
         size: [32,32]
         items:
-          amount: 30
-          generated: 
-              - item: Arrow
-                chance: 50
-                quantity: [2,20]
-              - item: Stone
-                chance: 50
-                quantity: [2,20]
-              - item: Short Bow
-                chance: 100
+          amount: 90
+          generated: *default_items
         rooms:
            padding: 0
            amount: 1
@@ -68,7 +63,7 @@ testlevel: &testlevel
           amount: 0
 #          generated:
 #             - enemy: Red Dragon
-#               guaranteed_spawns: 1
+#               guaranteed_spawns: yes
 
 
 branches:
@@ -180,7 +175,7 @@ branches:
         enemies:
           generated:
             - enemy: Red Dragon
-              guaranteed_spawns: 1
+              guaranteed_spawns: yes
             - enemy: Chicken
               chance: 100
             - enemy: Zombie
@@ -407,7 +402,7 @@ branches:
           amount: 30
           generated:
             - enemy: Zin
-              guaranteed_spawns: 1
+              guaranteed_spawns: yes
             - enemy: Super Chicken
               chance: 50
               group_chance: 33

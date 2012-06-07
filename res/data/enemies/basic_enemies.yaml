@@ -55,7 +55,7 @@ enemies:
         hp: 50
         hpregen: 0.05
     attacks:
-      - projectile: 1
+      - uses_projectile: yes
         damage: 20
         range: 130
         cooldown: 45
@@ -71,7 +71,7 @@ enemies:
         hp: 100
         hpregen: 0.05
     attacks:
-      - projectile: 1
+      - uses_projectile: yes
         damage: 18
         range: 65
         cooldown: 35
@@ -120,7 +120,7 @@ enemies:
         hp: 50
         hpregen: 0.5
     attacks:
-      - projectile: 1
+      - uses_projectile: yes
         damage: 12
         range: 500
         cooldown: 20
@@ -136,7 +136,7 @@ enemies:
         hp: 190
         hpregen: 0.01
     attacks:
-      - projectile: 1
+      - uses_projectile: yes
         damage: 20
         range: 400
         cooldown: 70

@@ -23,6 +23,9 @@ public:
 
 	void use_ammo(int amnt = 1);
 
+	bool has_weapon(){ return weapon > 0; }
+	bool has_projectile(){ return projectile > -1; }
+
 	Inventory inventory;
 	weapon_id weapon;
 	projectile_id projectile;

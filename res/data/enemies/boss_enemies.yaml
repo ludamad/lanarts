@@ -10,7 +10,7 @@ enemies:
     sprite: zin
     radius: 20
     xpaward: 100
-    unique: 1
+    unique: yes
     stats:
         movespeed: 2.5
         hp: 250
@@ -18,7 +18,7 @@ enemies:
     attacks:
       - damage: 25
         cooldown: 40
-      - projectile: 1
+      - uses_projectile: yes
         damage: 35
         range: 400
         cooldown: 70
@@ -33,7 +33,7 @@ enemies:
     sprite: red dragon
     radius: 27
     xpaward: 60
-    unique: 1
+    unique: yes
     stats:
         movespeed: 2.5
         hp: 150
@@ -41,7 +41,7 @@ enemies:
     attacks:
       - damage: 15
         cooldown: 40
-      - projectile: 1
+      - uses_projectile: yes
         damage: 25
         range: 400
         cooldown: 70

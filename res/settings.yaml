@@ -1,13 +1,13 @@
 
 #Gameplay choices
-class: Mage
+class: Fighter
 
 #Online settings
 username: ludamad
 
 #Window settings
-fullscreen: 0
-regen_level_on_death: 1
+fullscreen: no
+regen_level_on_death: yes
 view_width: 928
 view_height: 700
 
@@ -24,5 +24,5 @@ steps_per_draw: 1 #More is almost guaranteed to make the game faster, 1 is ideal
 time_per_step: 12
 
 #Debug settings
-invincible: 0 #Feel like exploring ? -> 1
-draw_diagnostics: 0
+invincible: no #Feel like exploring ? -> yes
+draw_diagnostics: no

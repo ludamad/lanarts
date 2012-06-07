@@ -8,6 +8,14 @@ projectiles:
     break_chance: 25 # % chance
     speed: 6
 
+  - name: Stone Arrow
+    weapon_class: bows
+    damage_added: [5, 15]
+    spr_item: stone_arrow_item
+    spr_attack: stone_arrow_projectile
+    break_chance: 10 # % chance
+    speed: 5
+
   - name: Stone
     weapon_class: unarmed
     damage: [5, 12]

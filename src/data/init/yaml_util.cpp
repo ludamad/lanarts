@@ -81,14 +81,6 @@ Range parse_range(const YAML::Node& n) {
 	return gr;
 }
 
-void optional_set(const YAML::Node& node, const char *key, bool & value) {
-	if (hasnode(node, key)) {
-		int val;
-		node[key] >> val;
-		value = (val != 0);
-	}
-}
-
 char* tocstring(const std::string& s) {
 	char *ret = new char[s.size() + 1];
 	memcpy(ret, s.c_str(), s.size() + 1);
@@ -144,6 +136,17 @@ const YAML::Node & operator >>(const YAML::Node& n, FilenameList & filenames) {
 
 const YAML::Node& operator >>(const YAML::Node& n, StatModifier& sm) {
 	sm = parse_modifiers(n);
+	return n;
+}
+
+const YAML::Node & operator >>(const YAML::Node& n, bool& r) {
+	std::string val = parse_str(n);
+	if (val == "yes")
+		r = true;
+	else if (val == "no")
+		r = false;
+	else
+		throw YAML::InvalidScalar(n.GetMark());
 	return n;
 }
 

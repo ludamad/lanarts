@@ -279,12 +279,6 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 		return;
 
 	Pos actpos(action.action_x, action.action_y);
-	int weaprange = wentry.range + this->radius;
-	float mag = distance_between(actpos, Pos(x, y));
-	if (mag > weaprange) {
-		float dx = actpos.x - x, dy = actpos.y - dy;
-		actpos = Pos(x + dx / mag * weaprange, y + dy / mag * weaprange);
-	}
 
 	if (wentry.projectile && equipment.projectile == -1)
 		return;
@@ -293,17 +287,25 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 		int damage = estats.calculate_ranged_damage(mt, weapon_type(), equipment.projectile);
 		ProjectileEntry& pentry = game_projectile_data[equipment.projectile];
 		item_id item = get_item_by_name(pentry.name.c_str());
+		int weaprange = std::max(wentry.range, pentry.range);
 
 		equipment.use_ammo();
 
 		ObjCallback drop_callback(projectile_item_drop, (void*)item);
 
 		GameInst* bullet = new ProjectileInst(pentry.attack_sprite, id, pentry.speed,
-				wentry.range, damage, x, y, actpos.x, actpos.y,
+				weaprange, damage, x, y, actpos.x, actpos.y,
 				false, 0, NONE, drop_callback);
 		gs->add_instance(bullet);
 		stats().cooldown = std::max(wentry.cooldown, pentry.cooldown);
 	} else {
+		int weaprange = wentry.range + this->radius;
+		float mag = distance_between(actpos, Pos(x, y));
+		if (mag > weaprange) {
+			float dx = actpos.x - x, dy = actpos.y - dy;
+			actpos = Pos(x + dx / mag * weaprange, y + dy / mag * weaprange);
+		}
+
 		GameInst* enemies[MAX_MELEE_HITS];
 
 		int max_targets = std::min(MAX_MELEE_HITS, wentry.max_targets);
