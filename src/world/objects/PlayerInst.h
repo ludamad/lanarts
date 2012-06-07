@@ -128,6 +128,7 @@ private:
 	void use_item(GameState* gs, const GameAction& action);
 	void pickup_item(GameState* gs, const GameAction& action);
 	void drop_item(GameState* gs, const GameAction& action);
+	void reposition_item(GameState* gs, const GameAction& action);
 
 	std::deque<GameAction> queued_actions;
 	bool didstep;

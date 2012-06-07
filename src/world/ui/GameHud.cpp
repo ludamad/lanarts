@@ -26,7 +26,8 @@
 
 const int INVENTORY_POSITION = 327;
 
-static void draw_player_stats(GameState*gs, PlayerInst* player, int x, int y) {
+static void draw_player_statbars(GameState*gs, PlayerInst* player, int x,
+		int y) {
 	Stats& s = player->stats();
 	gl_draw_statbar(x, y, 100, 10, s.hp, s.max_hp);
 	gl_printf(gs->primary_font(), Colour(0, 0, 0), x + 30, y, "%d/%d", s.hp,
@@ -53,38 +54,45 @@ static void draw_player_stats(GameState*gs, PlayerInst* player, int x, int y) {
 				"can rest", player->rest_cooldown() * 100 / REST_COOLDOWN);
 }
 
+static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot, int x,
+		int y) {
+	if (itemslot.amount > 0) {
+		ItemEntry& itemd = game_item_data[itemslot.item];
+		GLimage& itemimg = game_sprite_data[itemd.sprite_number].img();
+		gl_draw_image(itemimg, x, y);
+		gl_printf(gs->primary_font(), Colour(255, 255, 255), x + 1, y + 1, "%d",
+				itemslot.amount);
+	}
+}
 static void draw_player_inventory(GameState* gs, PlayerInst* player, int inv_x,
-		int inv_y, int w, int h) {
+		int inv_y, int w, int h, int slot_selected) {
 	Inventory& inv = player->get_inventory();
 
-	int chat_w = (w - inv_x + 1) - TILE_SIZE, chat_h = (h - inv_y) - TILE_SIZE;
-
 	int slot = 0;
-	for (int y = 0; y < chat_h; y += TILE_SIZE) {
-		for (int x = 0; x < chat_w; x += TILE_SIZE) {
+	for (int y = 0; y < h; y += TILE_SIZE) {
+		for (int x = 0; x < w; x += TILE_SIZE) {
 			if (slot >= INVENTORY_SIZE)
-				return;
+				break;
 
 			ItemSlot& itemslot = inv.get(slot);
-			Colour outline(43, 43, 43);
-			Pos p(inv_x + x, inv_y + y);
 
-			if (itemslot.amount > 0)
+			Colour outline(43, 43, 43);
+			if (itemslot.amount > 0 && slot != slot_selected)
 				outline = Colour(120, 115, 110);
 
-			gl_draw_rectangle_outline(x + inv_x, y + inv_y, TILE_SIZE,
-					TILE_SIZE, outline);
-
-			if (itemslot.amount > 0) {
-				ItemEntry& itemd = game_item_data[itemslot.item];
-				GLimage& itemimg = game_sprite_data[itemd.sprite_number].img();
-				gl_draw_image(itemimg, p.x, p.y);
-				gl_printf(gs->primary_font(), Colour(255, 255, 255), p.x + 1,
-						p.y + 1, "%d", itemslot.amount);
-			}
+			int slot_x = inv_x + x, slot_y = inv_y + y;
+			gl_draw_rectangle_outline(slot_x, slot_y, TILE_SIZE, TILE_SIZE,
+					outline);
+			if (slot != slot_selected)
+				draw_player_inventory_slot(gs, itemslot, slot_x, slot_y);
 
 			slot++;
 		}
+	}
+
+	if (slot_selected != -1) {
+		draw_player_inventory_slot(gs, inv.get(slot_selected),
+				gs->mouse_x() - TILE_SIZE / 2, gs->mouse_y() - TILE_SIZE / 2);
 	}
 }
 
@@ -131,7 +139,7 @@ static void draw_player_actionbar(GameState* gs, PlayerInst* player) {
 			outline = Colour(120, 115, 110);
 		gl_draw_rectangle_outline(x, sy, TILE_SIZE, TILE_SIZE, outline);
 	}
-	//TODO: Unhardcode this already !!
+//TODO: Unhardcode this already !!
 	gl_draw_image(game_sprite_data[get_sprite_by_name("fire bolt")].img(), sx,
 			sy);
 	gl_draw_image(game_sprite_data[get_sprite_by_name("magic blast")].img(),
@@ -173,12 +181,26 @@ BBox GameHud::minimap_bbox() {
 void GameHud::step(GameState *gs) {
 }
 
+static int get_itemslotn(GameState* gs, int x, int y) {
+	int posx = (x - gs->window_view().width) / TILE_SIZE;
+	int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
+	int slot = 5 * posy + posx;
+	if (slot < 0 || slot >= INVENTORY_SIZE)
+		return -1;
+	return slot;
+}
+
 void GameHud::queue_io_actions(GameState* gs, PlayerInst* player,
 		std::deque<GameAction>& queued_actions) {
 	bool mouse_within_view = gs->mouse_x() < gs->window_view().width;
 	int level = gs->level()->roomid, frame = gs->frame();
 
 	Inventory inv = player->get_inventory();
+
+	for (int i = 0; i < this->queued_actions.size(); i++) {
+		queued_actions.push_back(this->queued_actions[i]);
+	}
+	this->queued_actions.clear();
 
 	if (gs->mouse_right_click() && mouse_within_view) {
 		int action_bar_x = 0, action_bar_y = gs->window_view().height
@@ -198,9 +220,7 @@ void GameHud::queue_io_actions(GameState* gs, PlayerInst* player,
 	}
 
 	if (gs->mouse_left_click() && !mouse_within_view) {
-		int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
-		int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
-		int slot = 5 * posy + posx;
+		int slot = get_itemslotn(gs, gs->mouse_x(), gs->mouse_y());
 		if (slot >= 0 && slot < INVENTORY_SIZE && inv.get(slot).amount > 0) {
 			queued_actions.push_back(
 					GameAction(player->id, GameAction::USE_ITEM, frame, level,
@@ -208,34 +228,39 @@ void GameHud::queue_io_actions(GameState* gs, PlayerInst* player,
 		}
 	}
 
-	// Drop item
-	const int ITEM_DROP_RATE = 2; //steps
-	bool within_rate = gs->mouse_right_click()
-			|| (gs->mouse_right_down() && frame % ITEM_DROP_RATE == 0);
-
-	if (within_rate && frame && !mouse_within_view) {
-		int posx = (gs->mouse_x() - gs->window_view().width) / TILE_SIZE;
-		int posy = (gs->mouse_y() - INVENTORY_POSITION) / TILE_SIZE;
-		int slot = 5 * posy + posx;
-		if (slot >= 0 && slot < INVENTORY_SIZE && inv.get(slot).amount > 0) {
-			queued_actions.push_back(
-					GameAction(player->id, GameAction::DROP_ITEM, frame, level,
-							slot));
-		}
-	}
+//	// Drop item
+//	const int ITEM_DROP_RATE = 2; //steps
+//	bool within_rate = gs->mouse_right_click()
+//			|| (gs->mouse_right_down() && frame % ITEM_DROP_RATE == 0);
+//
+//	if (within_rate && !mouse_within_view) {
+//		int slot = get_itemslotn(gs, gs->mouse_x(), gs->mouse_y());
+//
+//		if (slot != -1 && inv.get(slot).amount > 0) {
+//			queued_actions.push_back(
+//					GameAction(player->id, GameAction::DROP_ITEM, frame, level,
+//							slot));
+//		}
+//	}
 }
 
 const int SPELL_MAX = 2;
 bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
+	int level = gs->level()->roomid, frame = gs->frame();
+
 	bool mouse_within_view = gs->mouse_x() < gs->window_view().width;
-	PlayerInst* player = (PlayerInst*)gs->get_instance(gs->local_playerid());
-	if (!player) return false;
+	PlayerInst* player = (PlayerInst*) gs->get_instance(gs->local_playerid());
+	if (!player)
+		return false;
 
 	Inventory inv = player->get_inventory();
 
+	bool mleft = event->button.button == SDL_BUTTON_LEFT;
+	bool mright = event->button.button == SDL_BUTTON_RIGHT;
+
 	switch (event->type) {
-	case SDL_MOUSEBUTTONDOWN: {
-		if (event->button.button == SDL_BUTTON_LEFT && mouse_within_view) {
+	case SDL_MOUSEBUTTONDOWN:
+		if (mleft && mouse_within_view) {
 			int action_bar_x = 0, action_bar_y = gs->window_view().height
 					- TILE_SIZE;
 			int posx = (gs->mouse_x() - action_bar_x) / TILE_SIZE;
@@ -255,14 +280,36 @@ bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 				}
 			}
 		}
-	}
+		if (mright && !mouse_within_view) {
+			int slot = get_itemslotn(gs, gs->mouse_x(), gs->mouse_y());
+			if (slot != -1 && inv.get(slot).amount > 0) {
+				item_slot_selected = slot;
+				return true;
+			}
+		}
+		break;
+	case SDL_MOUSEBUTTONUP:
+		if (item_slot_selected != -1) {
+			int slot = get_itemslotn(gs, gs->mouse_x(), gs->mouse_y());
+			//TODO: fix selection outside of the inventory
+			if (slot == -1 || slot == item_slot_selected) {
+				queued_actions.push_back(
+						GameAction(player->id, GameAction::DROP_ITEM, frame,
+								level, item_slot_selected));
+			} else {
+				this->queued_actions.push_back(
+						GameAction(player->id, GameAction::REPOSITION_ITEM,
+								frame, level, item_slot_selected, 0, 0, slot));
+			}
+			return true;
+		}
 		break;
 	}
 	return false;
 }
 
 void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
-	//Draw a mini version of the contents of gs->tile_grid()
+//Draw a mini version of the contents of gs->tile_grid()
 	GameTiles& tiles = gs->tile_grid();
 	GameView& view = gs->window_view();
 
@@ -340,22 +387,18 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 }
 void GameHud::draw(GameState* gs) {
 	gl_set_drawing_area(x, y, _width, _height);
-
-	PlayerInst* player_inst = (PlayerInst*)gs->get_instance(
-			gs->local_playerid());
-	Stats effective_stats = player_inst->effective_stats(gs->get_luastate());
-
 	gl_draw_rectangle(0, 0, _width, _height, bg_colour);
 
-	draw_minimap(gs, minimap_bbox().translated(-x, -y));
-	if (player_inst) {
-		draw_player_stats(gs, player_inst, 32, 32);
-		draw_player_inventory(gs, player_inst, 0, INVENTORY_POSITION, _width,
-				_height);
-	} else {
+	PlayerInst* player_inst = (PlayerInst*) gs->get_instance(
+			gs->local_playerid());
+	if (!player_inst)
 		return;
-		//player = state->get_instance(0);
-	}
+	Stats effective_stats = player_inst->effective_stats(gs->get_luastate());
+
+	draw_player_statbars(gs, player_inst, 32, 32);
+
+	draw_minimap(gs, minimap_bbox().translated(-x, -y));
+
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 15, 10,
 			"Level %d", effective_stats.xplevel);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 40,
@@ -369,11 +412,20 @@ void GameHud::draw(GameState* gs) {
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
 			64 + 45 + 128 + 60, "Defence  %d", effective_stats.defence);
 	draw_player_actionbar(gs, player_inst);
+
+	GameView& view = gs->window_view();
+	gl_set_drawing_area(0, 0, x + _width, y + _height);
+
+	int inv_w = _width, inv_h = _height - y - TILE_SIZE;
+	draw_player_inventory(gs, player_inst, x, y + INVENTORY_POSITION, inv_w,
+			inv_h, item_slot_selected);
+
 }
 
 GameHud::GameHud(int x, int y, int width, int height) :
 		x(x), y(y), _width(width), _height(height), bg_colour(0, 0, 0), minimap_arr(
 				NULL) {
+	item_slot_selected = -1;
 }
 GameHud::~GameHud() {
 	delete[] minimap_arr;

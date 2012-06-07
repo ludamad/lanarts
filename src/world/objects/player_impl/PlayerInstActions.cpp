@@ -286,13 +286,20 @@ void PlayerInst::equip(item_id item, int amnt) {
 }
 
 void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
-// 	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
 	ItemSlot& itemslot = get_inventory().get(action.use_id);
 	int dropx = round_to_multiple(x, TILE_SIZE, true), dropy =
 			round_to_multiple(y, TILE_SIZE, true);
 	int amnt = itemslot.amount;
 	gs->add_instance(new ItemInst(itemslot.item, dropx, dropy, amnt, id));
 	itemslot.amount -= amnt;
+	gs->game_hud().reset_slot_selected();
+}
+void PlayerInst::reposition_item(GameState* gs, const GameAction& action) {
+	ItemSlot& itemslot1 = get_inventory().get(action.use_id);
+	ItemSlot& itemslot2 = get_inventory().get(action.use_id2);
+
+	std::swap(itemslot1, itemslot2);
+	gs->game_hud().reset_slot_selected();
 }
 
 void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
@@ -317,6 +324,8 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 		return drop_item(gs, action);
 	case GameAction::DEEQUIP_ITEM:
 		return equipment.deequip(action.use_id);
+	case GameAction::REPOSITION_ITEM:
+		return reposition_item(gs, action);
 	default:
 		printf("PlayerInst::perform_action() error: Invalid action id %d!\n",
 				action.act);

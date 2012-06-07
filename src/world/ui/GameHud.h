@@ -39,6 +39,12 @@ public:
 	int width() { return _width; }
 	/* Height of overlay */
 	int height() { return _height; }
+
+	/* Reset the selected item after action is finished, otherwise drawing will lag a step
+	 * Used in PlayerInstActions.cpp*/
+	void reset_slot_selected(){
+		item_slot_selected = -1;
+	}
 private:
 	enum HudView {
 		INVENTORY, STATS, SHOP
@@ -50,6 +56,9 @@ private:
 	Colour bg_colour;
 	char* minimap_arr;
 	GLimage minimap_buff;
+	int item_slot_selected;
+
+	std::deque<GameAction> queued_actions;
 };
 
 
