@@ -11,7 +11,7 @@
 #include <cstdio>
 
 #include "../util/LuaValue.h"
-#include "../gamestats/Stats.h"
+#include "../gamestats/stats.h"
 
 struct EnemyEntry {
 	std::string name, appear_msg, defeat_msg;

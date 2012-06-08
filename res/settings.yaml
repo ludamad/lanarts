@@ -15,13 +15,13 @@ view_height: 700
 font: res/fonts/Gudea-Regular.ttf
 
 #Network settings
-connection_type: client #Either 'host', 'client', or 'none'
+connection_type: none #Either 'host', 'client', or 'none'
 ip: 10.15.16.160
 port: 6112
 
 #Speed settings
 steps_per_draw: 1 #More is almost guaranteed to make the game faster, 1 is ideal
-time_per_step: 10
+time_per_step: 12
 
 #Debug settings
 invincible: no #Feel like exploring ? -> yes

@@ -8,7 +8,7 @@
 
 #include <string>
 #include <vector>
-#include "../gamestats/Stats.h"
+#include "../gamestats/stats.h"
 
 struct ClassType {
 	std::string name;

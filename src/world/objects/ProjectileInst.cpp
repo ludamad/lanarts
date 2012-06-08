@@ -9,7 +9,7 @@
 #include <cmath>
 #include <cstdio>
 #include "../../data/sprite_data.h"
-#include "../../util/collision_util.h"
+#include "../../util/world/collision_util.h"
 #include "../../util/math_util.h"
 #include "../utility_objects/AnimatedInst.h"
 #include <typeinfo>
@@ -27,7 +27,7 @@ ProjectileInst::ProjectileInst(sprite_id sprite, obj_id originator, float speed,
 		int hits, obj_id target, const ObjCallback& onhit_callback) :
 		GameInst(x, y, RADIUS, false), rx(x), ry(y), speed(speed), damage(
 				damage), sprite(sprite), origin_id(originator), target_id(
-				target), range_left(range), bounce(bounce), hits(hits), onhit_callback(
+				target), range_left(range), bounce(bounce), hits(hits), hit_callback(
 				onhit_callback) {
 	int dx = tx - x, dy = ty - y;
 	double abs = distance_between(Pos(x, y), Pos(tx, ty));
@@ -170,7 +170,7 @@ ProjectileInst *ProjectileInst::clone() const {
 }
 
 void ProjectileInst::deinit(GameState* gs){
-	onhit_callback.call(gs, this);
+	hit_callback.call(gs, this);
 }
 
 GameInst* ProjectileInst::hit_target(GameState *gs) {

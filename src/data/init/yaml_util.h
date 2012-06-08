@@ -10,7 +10,7 @@
 #include <cstring>
 #include <yaml-cpp/yaml.h>
 
-#include "../../gamestats/Stats.h"
+#include "../../gamestats/stats.h"
 
 #include "../../util/game_basic_structs.h"
 #include "../../util/types_util.h"

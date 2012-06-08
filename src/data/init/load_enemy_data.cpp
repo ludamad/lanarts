@@ -1,7 +1,7 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
-#include "../../gamestats/Stats.h"
+#include "../../gamestats/stats.h"
 
 #include "../enemy_data.h"
 #include "../game_data.h"

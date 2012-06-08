@@ -1,0 +1,11 @@
+---
+#Weapons that enemies have 'naturally'
+weapons:
+  - name: Unarmed
+    weapon_class: unarmed
+    damage: [2, 4]
+    modifiers: 
+        strength: .5
+    range: 16
+    cooldown: 20
+    spr_item: hand

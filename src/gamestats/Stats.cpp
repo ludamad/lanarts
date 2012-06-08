@@ -1,11 +1,11 @@
 /*
- * Stats.cpp
+ * stats.cpp
  *
  *  Created on: Mar 24, 2012
  *      Author: 100397561
  */
 
-#include "Stats.h"
+#include "stats.h"
 #include "../util/mtwist.h"
 #include "../data/class_data.h"
 #include "../data/weapon_data.h"
@@ -172,3 +172,44 @@ int Stats::calculate_spell_damage(MTwist& mt, int spell_type) {
 	int damage = magic + base_damage;
 	return damage * (spell_type + 1);
 }
+
+bool CoreStats::hurt(int dmg) {
+	hp -= dmg;
+
+	if (hp < 0) {
+		hp = 0;
+		return true;
+	}
+	return false;
+}
+
+void CoreStats::heal_fully() {
+	hp = max_hp;
+	mp = max_mp;
+}
+
+void CoreStats::heal_hp(float hpgain) {
+	hp_regened += hpgain;
+	if (hp_regened > 0) {
+		hp += floor(hp_regened);
+		hp_regened -= floor(hp_regened);
+	}
+	if (hp > max_hp)
+		hp = max_hp;
+}
+
+void CoreStats::heal_mp(float mpgain) {
+	mp_regened += mpgain;
+	if (mp_regened > 0) {
+		mp += floor(mp_regened);
+		mp_regened -= floor(mp_regened);
+	}
+	if (mp > max_mp)
+		mp = max_mp;
+}
+
+float StatMultiplier::calculate(const CoreStats& stats) {
+	return stats.strength * strength + stats.defence * defence
+			+ stats.magic * magic + stats.willpower * willpower;
+}
+

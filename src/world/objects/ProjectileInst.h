@@ -7,7 +7,7 @@
 
 #include <cstdlib>
 
-#include "../../gamestats/Stats.h"
+#include "../../gamestats/stats.h"
 
 #include "../../util/callback_util.h"
 
@@ -47,8 +47,8 @@ private:
 	bool bounce;
 	int hits;
 
-	/*Callback behaviour*/
-	ObjCallback onhit_callback;
+	/*Callback determined behaviour*/
+	ObjCallback hit_callback;
 };
 
 #endif /* PROJECTILEINST_H_ */

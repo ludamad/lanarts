@@ -4,7 +4,7 @@
 #include "GameInst.h"
 #include "EnemyBehaviour.h"
 
-#include "../../gamestats/Stats.h"
+#include "../../gamestats/stats.h"
 
 #include "../../data/enemy_data.h"
 
