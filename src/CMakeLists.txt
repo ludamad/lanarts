@@ -34,9 +34,10 @@ set( lanarts_src
 	fov/impl/permissive-fov.cc
 	
 	gamestats/Ability.cpp
-	gamestats/Effects.cpp
+	gamestats/effects.cpp
 	gamestats/Equipment.cpp
-	gamestats/Stats.cpp
+	gamestats/skills.h
+	gamestats/stats.cpp
 			
 	lua/lua_api.cpp
 	lua/lua_gameinst.cpp
@@ -117,9 +118,10 @@ set( lanarts_include
 	gamestats/Ability.h
 	gamestats/Inventory.h
 	gamestats/Item.h
-	gamestats/Effects.h
+	gamestats/effects.h
 	gamestats/Equipment.h
-	gamestats/Stats.h
+	gamestats/skills.h
+	gamestats/stats.h
 	
 	pathfind/astar_pathfind.h
 	pathfind/pathfind.h

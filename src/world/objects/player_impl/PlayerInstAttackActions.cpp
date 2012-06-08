@@ -17,7 +17,7 @@ extern "C" {
 #include "../../../lua/lua_api.h"
 
 #include "../../../util/math_util.h"
-#include "../../../util/collision_util.h"
+#include "../../../util/world/collision_util.h"
 #include "../../../util/game_basic_structs.h"
 
 #include "../../GameState.h"

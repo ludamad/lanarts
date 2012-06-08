@@ -13,7 +13,7 @@
 
 #include "../../display/display.h"
 
-#include "../../util/collision_util.h"
+#include "../../util/world/collision_util.h"
 #include "../../util/math_util.h"
 #include "../../util/LuaValue.h"
 

@@ -7,7 +7,7 @@
 #include "../world/objects/EnemyInst.h"
 #include "../world/objects/GameInst.h"
 #include "../world/objects/PlayerInst.h"
-#include "../gamestats/Stats.h"
+#include "../gamestats/stats.h"
 #include "../data/item_data.h"
 
 

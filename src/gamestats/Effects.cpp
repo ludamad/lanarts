@@ -1,4 +1,4 @@
-#include "Effects.h"
+#include "effects.h"
 #include "../lua/lua_api.h"
 
 extern "C" {
@@ -6,7 +6,7 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-void Effects::process(lua_State* L, Stats& basestats, Stats& affected) {
+void EffectStats::process(lua_State* L, Stats& basestats, Stats& affected) {
 	lua_pushstats(L, basestats);
 	lua_pushstats(L, affected);
 
@@ -26,7 +26,7 @@ void Effects::process(lua_State* L, Stats& basestats, Stats& affected) {
 	lua_pop(L, 2);//pop base&affected
 }
 
-void Effects::step() {
+void EffectStats::step() {
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining > 0)
 			effects[i].t_remaining--;
@@ -34,7 +34,7 @@ void Effects::step() {
 	}
 }
 
-Effect *Effects::get(int effect) {
+Effect *EffectStats::get(int effect) {
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining > 0 && effects[i].effect == effect) {
 			return &effects[i];
@@ -44,7 +44,7 @@ Effect *Effects::get(int effect) {
 	return NULL;
 }
 
-void Effects::add(int effect, int length) {
+void EffectStats::add(int effect, int length) {
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining == 0 || effects[i].effect == effect) {
 			effects[i].effect = effect;

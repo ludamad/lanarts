@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <cstring>
+#include "../util/game_basic_structs.h"
 
 struct StatModifier;
 class MTwist;
@@ -38,9 +39,8 @@ struct Stats {
 	Stats() {
 		memset(this, 0, sizeof(Stats));
 	}
-	Stats(float speed, int hp, int mp, int strength,
-			int defence, int magic, const Attack& melee,
-			const Attack& ranged);
+	Stats(float speed, int hp, int mp, int strength, int defence, int magic,
+			const Attack& melee, const Attack& ranged);
 	void step();
 
 	bool has_cooldown();
@@ -58,20 +58,85 @@ struct Stats {
 	bool hurt(int dmg);
 
 	void heal_fully();
+	void raise_hp(float hpgain);
+	void raise_mp(float mpgain);
 
 	int calculate_statmod_damage(MTwist& mt, StatModifier& sm);
 	int calculate_melee_damage(MTwist& mt, int weapon_type);
-	int calculate_ranged_damage(MTwist& mt, int weapon_type, int projectile_type);
+	int calculate_ranged_damage(MTwist& mt, int weapon_type,
+			int projectile_type);
 	int calculate_spell_damage(MTwist& mt, int spell_type);
 
 	void gain_level();
 	int gain_xp(int amnt);
 
-	void raise_hp(float hpgain);
-	void raise_mp(float mpgain);
 };
 
 
+/* Core combat stats*/
+struct CoreStats {
+	int hp, max_hp;
+	int mp, max_mp;
+	int strength, defence, magic, willpower;
+	float
 
+	bool hurt(int dmg);
+	void heal_fully();
+	void heal_hp(float hpgain);
+	void heal_mp(float mpgain);
+private:
+	float hp_regened, mp_regened;
+};
+
+/* Stat multiplier, weighted sum*/
+struct StatMultiplier {
+	float strength, defence, magic, willpower;
+	StatMultiplier(float strength, float defence, float magic, float willpower) :
+			strength(strength), defence(defence), magic(magic), willpower(
+					willpower) {
+	}
+	float calculate(const CoreStats& stats);
+};
+
+/* Derived combat stats */
+struct DerivedStats {
+	int power, resistance;
+	int damage, reduction;
+};
+
+/* Core & derived stats after stat bonuses */
+struct EffectiveStats {
+	CoreStats stats;
+	DerivedStats physical, magic;
+	float movespeed;
+};
+
+/* Cooldown, eg count before a certain action can be done again*/
+struct CooldownStats {
+	int action_cooldown;
+	int pickup_cooldown;
+	int rest_cooldown;
+	CooldownStats() :
+			action_cooldown(0), pickup_cooldown(0), rest_cooldown(0) {
+	}
+};
+
+/* Represents class related stats */
+struct ClassStats {
+	class_id classtype;
+	int xp, xpneeded, xplevel;
+	ClassStats(class_id classtype, int xp, int xpneeded, int xplevel) :
+			classtype(classtype), xp(xp), xpneeded(xpneeded), xplevel(xplevel) {
+	}
+};
+
+/* Represents all the stats used by a combat entity */
+struct CombatStats {
+	CoreStats core;
+	CooldownStats cooldowns;
+	ClassStats class_stats;
+	Equipment equipment;
+	float movespeed;
+};
 
 #endif /* STATS_H_ */

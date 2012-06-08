@@ -11,7 +11,7 @@
 #include "../game_data.h"
 #include <yaml-cpp/yaml.h>
 #include "yaml_util.h"
-#include "../../gamestats/Stats.h"
+#include "../../gamestats/stats.h"
 #include "../enemy_data.h"
 #include "../class_data.h"
 

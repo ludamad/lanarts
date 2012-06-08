@@ -13,9 +13,9 @@
 #include "../../data/sprite_data.h"
 
 #include "../../gamestats/Inventory.h"
-#include "../../gamestats/Effects.h"
+#include "../../gamestats/effects.h"
 #include "../../gamestats/Equipment.h"
-#include "../../gamestats/Stats.h"
+#include "../../gamestats/stats.h"
 
 #include "../../pathfind/pathfind.h"
 
@@ -84,7 +84,7 @@ public:
 		return tmp;
 	}
 
-	Effects & status_effects() {
+	EffectStats & status_effects() {
 		return effects;
 	}
 
@@ -136,7 +136,7 @@ private:
 	PlayerCooldowns cooldowns;
 	Equipment equipment;
 	Stats base_stats;
-	Effects effects;
+	EffectStats effects;
 
 	int money;
 	int spellselect;

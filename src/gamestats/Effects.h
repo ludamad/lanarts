@@ -1,7 +1,7 @@
 #ifndef EFFECTS_H
 #define EFFECTS_H
 
-#include "Stats.h"
+#include "stats.h"
 #include "../data/effect_data.h"
 
 const int EFFECTS_MAX = 40;
@@ -11,8 +11,8 @@ struct Effect {
 	int t_remaining;
 };
 
-struct Effects {
-	Effects() {
+struct EffectStats {
+	EffectStats() {
 		for (int i = 0; i < EFFECTS_MAX; i++) {
 			effects[i].t_remaining = 0;
 		}

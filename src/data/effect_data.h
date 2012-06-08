@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "../util/LuaValue.h"
-#include "../gamestats/Stats.h"
+#include "../gamestats/stats.h"
 
 struct EffectEntry {
 	std::string name;
