@@ -3,6 +3,8 @@
  *  Represents an instance that is affected by combat, ie enemies and players
  */
 
+#include "../GameState.h"
+
 #include "CombatGameInst.h"
 
 bool CombatGameInst::damage(GameState* gs, int dmg) {
