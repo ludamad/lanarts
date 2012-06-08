@@ -6,6 +6,8 @@
 #ifndef COMBATGAMEINST_H_
 #define COMBATGAMEINST_H_
 
+#include "GameInst.h"
+
 #include "../../gamestats/stats.h"
 
 class CombatGameInst: public GameInst {
@@ -19,7 +21,7 @@ public:
 	void damage(int dmg);
 
 protected:
-	CombatStats stats;
+//	CombatStats stats;
 private:
 	EffectiveStats estats;
 };
