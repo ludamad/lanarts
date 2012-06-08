@@ -1,8 +1,6 @@
 /*
- * pathfind.cpp
- *
- *  Created on: Feb 6, 2012
- *      Author: 100397561
+ * pathfind.cpp:
+ *  Utilities for flood-fill based pathfinding
  */
 
 #include <algorithm>

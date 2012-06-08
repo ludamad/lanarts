@@ -12,28 +12,38 @@
 
 #include "GameInst.h"
 
+
+struct EntityBehaviour {
+	int simulation_id; // For collision-avoidance
+
+};
+
 class CombatGameInst: public GameInst {
 public:
 	CombatGameInst(int x, int y, int radius, bool solid = true, int depth = 0) :
 			GameInst(x, y, radius, solid, depth) {
 	}
+	/*  GameInst members */
+	virtual void step(GameState* gs);
 
-	CombatStats& base_stats() {
-		return stats;
-	}
-	EffectiveStats& effective_stats() {
-		return estats;
-	}
+	/* Querying */
+	virtual void update_field_of_view();
+	virtual bool within_field_of_view(const Pos& pos) = 0;
 
 	bool damage(GameState* gs, int dmg);
 
-	void step(GameState* gs);
-
+	/* Getters */
+	CombatStats& base_stats();
+	EffectiveStats& effective_stats();
 protected:
 	PathInfo path;
 	CombatStats stats;
 private:
 	EffectiveStats estats;
 };
+
+
+
+
 
 #endif /* COMBATGAMEINST_H_ */
