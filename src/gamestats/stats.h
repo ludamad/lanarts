@@ -3,7 +3,10 @@
 
 #include <cmath>
 #include <cstring>
+
 #include "../util/game_basic_structs.h"
+
+#include "Equipment.h"
 
 struct StatModifier;
 class MTwist;
@@ -72,13 +75,11 @@ struct Stats {
 
 };
 
-
 /* Core combat stats*/
 struct CoreStats {
 	int hp, max_hp;
 	int mp, max_mp;
 	int strength, defence, magic, willpower;
-	float
 
 	bool hurt(int dmg);
 	void heal_fully();
@@ -102,6 +103,12 @@ struct StatMultiplier {
 struct DerivedStats {
 	int power, resistance;
 	int damage, reduction;
+	DerivedStats(int power = 0, int resistance = 0, int damage = 0,
+			int reduction = 0) :
+			power(power), resistance(resistance), damage(damage), reduction(
+					reduction) {
+
+	}
 };
 
 /* Core & derived stats after stat bonuses */
@@ -119,6 +126,22 @@ struct CooldownStats {
 	CooldownStats() :
 			action_cooldown(0), pickup_cooldown(0), rest_cooldown(0) {
 	}
+
+	void step();
+
+	bool can_rest() {
+		return rest_cooldown <= 0;
+	}
+	bool can_pickup() {
+		return pickup_cooldown <= 0;
+	}
+	bool can_doaction() {
+		return action_cooldown <= 0;
+	}
+
+	void reset_action_cooldown(int cooldown);
+	void reset_pickup_cooldown(int cooldown);
+	void reset_rest_cooldown(int cooldown);
 };
 
 /* Represents class related stats */
@@ -128,6 +151,11 @@ struct ClassStats {
 	ClassStats(class_id classtype, int xp, int xpneeded, int xplevel) :
 			classtype(classtype), xp(xp), xpneeded(xpneeded), xplevel(xplevel) {
 	}
+};
+
+/* Represents stats related to a single attack option */
+struct AttackStats {
+	weapon_id weapon;
 };
 
 /* Represents all the stats used by a combat entity */

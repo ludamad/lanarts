@@ -213,3 +213,24 @@ float StatMultiplier::calculate(const CoreStats& stats) {
 			+ stats.magic * magic + stats.willpower * willpower;
 }
 
+void CooldownStats::step() {
+	if (--action_cooldown < 0)
+		action_cooldown = 0;
+	if (--rest_cooldown < 0)
+		rest_cooldown = 0;
+	if (--pickup_cooldown < 0)
+		pickup_cooldown = 0;
+}
+
+void CooldownStats::reset_action_cooldown(int cooldown) {
+	action_cooldown = std::max(cooldown, action_cooldown);
+}
+
+void CooldownStats::reset_pickup_cooldown(int cooldown) {
+	pickup_cooldown = std::max(cooldown, pickup_cooldown);
+}
+
+void CooldownStats::reset_rest_cooldown(int cooldown) {
+	rest_cooldown = std::max(cooldown, rest_cooldown);
+}
+

@@ -94,6 +94,7 @@ typedef int obj_id;
 /*Indices to the various game data arrays*/
 typedef int class_id;
 typedef int item_id;
+typedef int armour_id;
 typedef int projectile_id;
 typedef int sprite_id;
 typedef int spell_id;

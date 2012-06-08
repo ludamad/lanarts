@@ -9,8 +9,6 @@ include(FindFreetype)
 include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} ../src_yaml/yaml-cpp/include ../src_net/ ../src_rvo2/RVO2 ../src_lua)
 
 set( lanarts_src
-	gamestats/Item.cpp
-	
 	data/init/load_sprite_data.cpp
 	data/init/load_dungeon_data.cpp
 	data/init/load_effect_data.cpp
@@ -36,7 +34,8 @@ set( lanarts_src
 	gamestats/Ability.cpp
 	gamestats/effects.cpp
 	gamestats/Equipment.cpp
-	gamestats/skills.h
+	gamestats/items.cpp
+	gamestats/skills.cpp
 	gamestats/stats.cpp
 			
 	lua/lua_api.cpp
@@ -57,10 +56,10 @@ set( lanarts_src
 	procedural/levelgen.cpp
 	procedural/tunnelgen.cpp
 	
-	util/collision_util.cpp
 	util/math_util.cpp
 	util/mtwist.cpp
 	util/LuaValue.cpp
+	util/world/collision_util.cpp
 
 	world/GameAction.cpp
 	world/GameInstSet.cpp
@@ -117,7 +116,7 @@ set( lanarts_include
 	
 	gamestats/Ability.h
 	gamestats/Inventory.h
-	gamestats/Item.h
+	gamestats/items.h
 	gamestats/effects.h
 	gamestats/Equipment.h
 	gamestats/skills.h
@@ -133,12 +132,12 @@ set( lanarts_include
 	procedural/levelgen.h
 	procedural/tunnelgen.h
 	
-	util/collision_util.h
 	util/callback_util.h
 	util/game_basic_structs.h
 	util/hashset_util.h
 	util/math_util.h
 	util/mtwist.h
+	util/world/collision_util.h
 	
 	world/net/GameNetConnection.h
 
