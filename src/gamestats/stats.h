@@ -148,7 +148,8 @@ struct CooldownStats {
 struct ClassStats {
 	class_id classtype;
 	int xp, xpneeded, xplevel;
-	ClassStats(class_id classtype, int xp, int xpneeded, int xplevel) :
+	ClassStats(class_id classtype = -1, int xplevel = 0, int xp = 0,
+			int xpneeded = 0) :
 			classtype(classtype), xp(xp), xpneeded(xpneeded), xplevel(xplevel) {
 	}
 };
@@ -165,6 +166,14 @@ struct CombatStats {
 	ClassStats class_stats;
 	Equipment equipment;
 	float movespeed;
+
+	CombatStats(const ClassStats& class_stats = ClassStats(),
+			const CoreStats& core = CoreStats(),
+			const CooldownStats& cooldowns = CooldownStats(),
+			const Equipment& equipment = Equipment(), float movespeed = 0.0f) :
+			core(core), cooldowns(cooldowns), class_stats(class_stats), equipment(
+					equipment), movespeed(movespeed) {
+	}
 };
 
 #endif /* STATS_H_ */

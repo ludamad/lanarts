@@ -7,10 +7,11 @@
 #define ITEMS_H_
 
 #include "../util/game_basic_structs.h"
+
 #include "stats.h"
 
 struct ItemEntry;
-struct ProjectilEntry;
+struct ProjectileEntry;
 struct WeaponEntry;
 
 struct Bonuses {

@@ -1,8 +1,6 @@
 /*
- * pathfind.h
- *
- *  Created on: Feb 6, 2012
- *      Author: 100397561
+ * pathfind.h:
+ *  Utilities for flood-fill based pathfinding
  */
 
 #ifndef PATHFIND_H_

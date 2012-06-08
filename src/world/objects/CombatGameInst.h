@@ -6,22 +6,32 @@
 #ifndef COMBATGAMEINST_H_
 #define COMBATGAMEINST_H_
 
-#include "GameInst.h"
-
 #include "../../gamestats/stats.h"
+
+#include "../../pathfind/pathfind.h"
+
+#include "GameInst.h"
 
 class CombatGameInst: public GameInst {
 public:
 	CombatGameInst(int x, int y, int radius, bool solid = true, int depth = 0) :
 			GameInst(x, y, radius, solid, depth) {
 	}
+
+	CombatStats& base_stats() {
+		return stats;
+	}
 	EffectiveStats& effective_stats() {
 		return estats;
 	}
-	void damage(int dmg);
+
+	bool damage(GameState* gs, int dmg);
+
+	void step(GameState* gs);
 
 protected:
-//	CombatStats stats;
+	PathInfo path;
+	CombatStats stats;
 private:
 	EffectiveStats estats;
 };

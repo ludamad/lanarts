@@ -83,11 +83,11 @@ set( lanarts_src
 	world/objects/player_impl/PlayerInst.cpp
 	world/objects/player_impl/PlayerInstActions.cpp
 	world/objects/player_impl/PlayerInstAttackActions.cpp
+	world/objects/CombatGameInst.cpp
 	world/objects/EnemyInst.cpp
+	world/objects/GameInst.cpp
 	world/objects/ItemInst.cpp
 	world/objects/ProjectileInst.cpp
-
-	world/objects/GameInst.cpp
 	)
 
 set( lanarts_include
@@ -153,7 +153,7 @@ set( lanarts_include
 	world/controllers/MonsterController.h
 	world/controllers/PlayerController.h
 	
-	world/objects/GameInst.h
+
 
 	world/ui/GameChat.h
 	world/ui/GameDialogs.h
@@ -162,7 +162,9 @@ set( lanarts_include
 	world/utility_objects/AnimatedInst.h
 	world/utility_objects/ButtonInst.h
 	world/utility_objects/TestInst.h
-	
+			
+	world/objects/CombatGameInst.h	
+	world/objects/GameInst.h
 	world/objects/PlayerInst.h
 	world/objects/EnemyBehaviour.h
 	world/objects/EnemyInst.h

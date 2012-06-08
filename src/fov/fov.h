@@ -1,15 +1,14 @@
 /*
- * fov.h
- *
- *  Created on: 2011-11-05
- *      Author: 100397561
+ * fov.h:
+ *  Represents a field of view
  */
 
 #ifndef FOV_H_
 #define FOV_H_
 
-#include "impl/permissive-fov-cpp.h"
 #include "../util/game_basic_structs.h"
+
+#include "impl/permissive-fov-cpp.h"
 
 class GameState;
 
