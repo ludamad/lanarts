@@ -17,10 +17,13 @@
 #include "../objects/EnemyInst.h"
 #include "../objects/PlayerInst.h"
 
+#include "../../combat_logic/attack_logic.h"
+
 #include "../../util/world/collision_util.h"
 #include "../../util/math_util.h"
 
 #include "../../data/tile_data.h"
+#include "../../data/weapon_data.h"
 
 const int PATHING_RADIUS = 500;
 const int HUGE_DISTANCE = 1000000;
@@ -39,7 +42,7 @@ MonsterController::~MonsterController() {
 void MonsterController::register_enemy(GameInst* enemy) {
 	mids.push_back(enemy->id);
 	RVO::Vector2 enemy_position(enemy->x, enemy->y);
-	EnemyBehaviour& eb = ((EnemyInst*) enemy)->behaviour();
+	EnemyBehaviour& eb = ((EnemyInst*)enemy)->behaviour();
 
 //  addAgent parameters (for convenience):
 //	position, neighborDist, maxNeighbors, timeHorizon,
@@ -97,28 +100,29 @@ void set_preferred_velocity(GameState* gs, RVO::RVOSimulator* sim,
 	sim->setAgentPrefVelocity(eb.simulation_id, goalVector);
 }
 
-void MonsterController::partial_copy_to(MonsterController & mc) const{
+void MonsterController::partial_copy_to(MonsterController & mc) const {
 	mc.mids = this->mids;
-	mc.resize_paths(0);//Automatically built in pre_step
-	mc.player_simids.clear();//Automatically built in pre_step
+	mc.resize_paths(0); //Automatically built in pre_step
+	mc.player_simids.clear(); //Automatically built in pre_step
 	delete mc.simulator;
-	mc.simulator = new RVO::RVOSimulator();//Rebuilt in finish_copy
+	mc.simulator = new RVO::RVOSimulator(); //Rebuilt in finish_copy
 	simulator->setTimeStep(1.0f);
 	mc.targetted = this->targetted;
 }
 
-void MonsterController::finish_copy(GameLevelState* level){
-	for (int i = 0; i < mids.size(); i++){
+void MonsterController::finish_copy(GameLevelState* level) {
+	for (int i = 0; i < mids.size(); i++) {
 		GameInst* enemy = level->inst_set.get_instance(mids[i]);
-		if (!enemy) continue;
+		if (!enemy)
+			continue;
 		RVO::Vector2 enemy_position(enemy->x, enemy->y);
-		EnemyBehaviour& eb = ((EnemyInst*) enemy)->behaviour();
+		EnemyBehaviour& eb = ((EnemyInst*)enemy)->behaviour();
 
-	//TODO: Remove code cloning
-	//  addAgent parameters (for convenience):
-	//	position, neighborDist, maxNeighbors, timeHorizon,
-	//  timeHorizonObst, radius, maxSpeed,
-	//  velocity
+		//TODO: Remove code cloning
+		//  addAgent parameters (for convenience):
+		//	position, neighborDist, maxNeighbors, timeHorizon,
+		//  timeHorizonObst, radius, maxSpeed,
+		//  velocity
 		int simid = simulator->addAgent(enemy_position, 32, 10, 4.0f, 1.0f, 16,
 				eb.speed);
 		eb.simulation_id = simid;
@@ -161,7 +165,7 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	bool is_fullpath = true;
 	if (eb.path_cooldown > 0) {
 		eb.path_cooldown--;
-		is_fullpath = true;//false;
+		is_fullpath = true; //false;
 	}
 	int ex = e->x / TILE_SIZE, ey = e->y / TILE_SIZE;
 
@@ -196,7 +200,7 @@ void MonsterController::set_monster_headings(GameState* gs,
 	for (int i = 0; i < eois.size(); i++) {
 		EnemyInst* e = eois[i].e;
 		int pind = eois[i].closest_player_index;
-		GameInst* p = gs->get_instance(pc.player_ids()[pind]);
+		CombatGameInst* p = (CombatGameInst*)gs->get_instance(pc.player_ids()[pind]);
 		EnemyBehaviour& eb = e->behaviour();
 
 		eb.current_action = EnemyBehaviour::CHASING_PLAYER;
@@ -206,16 +210,22 @@ void MonsterController::set_monster_headings(GameState* gs,
 
 		//Compare position to player object
 		float pdist = distance_between(Pos(e->x, e->y), Pos(p->x, p->y));
-		Stats& s = e->stats();
 
-		if (pdist < e->radius + p->radius
-				|| (s.magicatk.canuse && pdist < e->radius * 2 + p->radius))
+		AttackStats attack;
+		bool viable_attack = attack_ai_choice(gs, e, p, attack);
+		WeaponEntry& wentry = attack.weapon.weapon_entry();
+
+		if (pdist < e->radius + p->radius) {
 			eb.vx = 0, eb.vy = 0;
-		if (s.meleeatk.canuse && pdist < s.meleeatk.range + e->radius) {
-			e->attack(gs, p, false);
-			eb.vx = 0, eb.vy = 0;
-		} else if (s.magicatk.canuse && pdist < s.magicatk.range*1.1) {
-			e->attack(gs, p, true);
+		}
+		if (viable_attack) {
+			if (!attack.is_ranged()) {
+				eb.vx = 0, eb.vy = 0;
+			} else if (pdist < std::min(wentry.range, 40)) {
+				eb.vx = 0, eb.vy = 0;
+			}
+			e->attack(gs, p, attack);
+
 		}
 	}
 }
@@ -235,7 +245,7 @@ void MonsterController::shift_target(GameState* gs) {
 	GameInst* player = gs->get_instance(gs->local_playerid());
 
 	for (j = i + 1; j % mids.size() != i; j++) {
-		EnemyInst* e = (EnemyInst*) gs->get_instance(mids[j % mids.size()]);
+		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[j % mids.size()]);
 		if (e == NULL)
 			continue;
 
@@ -262,7 +272,7 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 		GameInst* player = gs->get_instance(pids[i]);
 		bool isvisible = gs->object_visible_test(e, player, false);
 		if (isvisible)
-			((PlayerInst*) player)->rest_cooldown() = REST_COOLDOWN;
+			((PlayerInst*)player)->rest_cooldown() = REST_COOLDOWN;
 		view.sharp_center_on(player->x, player->y);
 		bool chasing = e->behaviour().current_action
 				== EnemyBehaviour::CHASING_PLAYER;
@@ -286,8 +296,9 @@ void MonsterController::process_players(GameState* gs) {
 	if (pids.size() > player_simids.size()) {
 		int old_pids = player_simids.size();
 		player_simids.resize(pids.size());
-		for (int i = old_pids; i < gs->player_controller().player_ids().size(); i++) {
-			PlayerInst* p = (PlayerInst*) gs->get_instance(pids[i]);
+		for (int i = old_pids; i < gs->player_controller().player_ids().size();
+				i++) {
+			PlayerInst* p = (PlayerInst*)gs->get_instance(pids[i]);
 			player_simids[i] = simulator->addAgent(RVO::Vector2(p->x, p->y), 0,
 					10, 0.0f, 0.0f, p->radius, 0);
 		}
@@ -320,7 +331,7 @@ void MonsterController::pre_step(GameState* gs) {
 	mids2.reserve(mids.size());
 	mids.swap(mids2);
 	for (int i = 0; i < mids2.size(); i++) {
-		EnemyInst* e = (EnemyInst*) gs->get_instance(mids2[i]);
+		EnemyInst* e = (EnemyInst*)gs->get_instance(mids2[i]);
 		if (e == NULL)
 			continue;
 		EnemyBehaviour& eb = e->behaviour();
@@ -338,8 +349,7 @@ void MonsterController::pre_step(GameState* gs) {
 		int closest_player_index = find_player_to_target(gs, e);
 
 		if (closest_player_index == -1
-				&& eb.current_action
-						== EnemyBehaviour::CHASING_PLAYER)
+				&& eb.current_action == EnemyBehaviour::CHASING_PLAYER)
 			eb.current_action = EnemyBehaviour::INACTIVE;
 
 		if (eb.current_action == EnemyBehaviour::CHASING_PLAYER)
@@ -355,22 +365,22 @@ void MonsterController::pre_step(GameState* gs) {
 	//Handle necessary upkeep of player related information, such as paths to player
 	const std::vector<obj_id>& pids = gs->player_controller().player_ids();
 	for (int i = 0; i < pids.size(); i++) {
-		PlayerInst* p = (PlayerInst*) gs->get_instance(
+		PlayerInst* p = (PlayerInst*)gs->get_instance(
 				gs->player_controller().player_ids()[i]);
 		simulator->setAgentPosition(player_simids[i], RVO::Vector2(p->x, p->y));
 	}
 
 	for (int i = 0; i < mids.size(); i++) {
-		EnemyInst* e = (EnemyInst*) gs->get_instance(mids[i]);
+		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[i]);
 		update_velocity(gs, e);
-		lua_gameinstcallback(gs->get_luastate(), e->etype()->step_event, e->id);
+		lua_gameinstcallback(gs->get_luastate(), e->etype().step_event, e->id);
 		set_preferred_velocity(gs, simulator, e);
 	}
 
 	simulator->doStep();
 
 	for (int i = 0; i < mids.size(); i++) {
-		EnemyInst* e = (EnemyInst*) gs->get_instance(mids[i]);
+		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[i]);
 		update_position(gs, e);
 	}
 }
@@ -384,7 +394,7 @@ void MonsterController::update_velocity(GameState* gs, EnemyInst* e) {
 //		eb.vy = -eb.vy;
 //	}
 
-	if (e->stats().hurt_cooldown > 0)
+	if (e->cooldowns().is_hurting())
 		eb.vx /= 2, eb.vy /= 2;
 }
 void MonsterController::update_position(GameState* gs, EnemyInst* e) {
@@ -396,7 +406,7 @@ void MonsterController::update_position(GameState* gs, EnemyInst* e) {
 	float dist = sqrt(dx * dx + dy * dy);
 
 	bool collided = gs->tile_radius_test(round(ux), round(uy), /*e->radius+4*/
-			20);
+	20);
 	int neighbours = simulator->getAgentNumAgentNeighbors(eb.simulation_id);
 
 	if (neighbours > 0 && dist > 0.5f && !collided) {
@@ -434,8 +444,8 @@ void MonsterController::update_position(GameState* gs, EnemyInst* e) {
 		simulator->setAgentMaxSpeed(eb.simulation_id, eb.speed);
 	}
 
-	e->x = (int) round(e->rx); //update based on rounding of true float
-	e->y = (int) round(e->ry);
+	e->x = (int)round(e->rx); //update based on rounding of true float
+	e->y = (int)round(e->ry);
 }
 
 void MonsterController::post_draw(GameState* gs) {
@@ -443,8 +453,8 @@ void MonsterController::post_draw(GameState* gs) {
 	if (!target)
 		return;
 	glLineWidth(2);
-	gl_draw_circle(gs->window_view(), target->x, target->y, target->target_radius + 5,
-			Colour(0, 255, 0, 199), true);
+	gl_draw_circle(gs->window_view(), target->x, target->y,
+			target->target_radius + 5, Colour(0, 255, 0, 199), true);
 	glLineWidth(1);
 }
 

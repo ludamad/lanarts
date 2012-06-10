@@ -1,8 +1,6 @@
 /*
- * GameLevelState.h
- *
- *  Created on: Mar 23, 2012
- *      Author: 100397561
+ * GameLevelState.h:
+ *  Contains game level state information
  */
 
 #ifndef GAMELEVELSTATE_H_

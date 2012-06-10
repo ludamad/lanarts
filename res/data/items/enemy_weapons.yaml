@@ -1,11 +1,20 @@
 ---
 #Weapons that enemies have 'naturally'
 weapons:
-  - name: Unarmed
+  - name: Basic Melee
     weapon_class: unarmed
-    damage: [2, 4]
-    modifiers: 
-        strength: .5
+    damage: 
+        base: [2,5]
+        strength: 1.0 # 100 %
+    range: 16
+    cooldown: 40
+    spr_item: none
+    
+  - name: Fast Melee
+    weapon_class: unarmed
+    damage: 
+        base: [2,5]
+        strength: 0.5 # 50 %
     range: 16
     cooldown: 20
-    spr_item: hand
+    spr_item: none

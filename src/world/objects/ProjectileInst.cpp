@@ -2,16 +2,21 @@
  *  Represents a projectile attack's trajectory
  */
 
+#include "../../data/sprite_data.h"
+#include "../../data/weapon_data.h"
+
+#include "../../util/world/collision_util.h"
+#include "../../util/math_util.h"
+
+#include "../utility_objects/AnimatedInst.h"
+
 #include "ProjectileInst.h"
 #include "EnemyInst.h"
+#include "ItemInst.h"
 #include "PlayerInst.h"
 #include "../GameState.h"
 #include <cmath>
 #include <cstdio>
-#include "../../data/sprite_data.h"
-#include "../../util/world/collision_util.h"
-#include "../../util/math_util.h"
-#include "../utility_objects/AnimatedInst.h"
 #include <typeinfo>
 
 static bool bullet_target_hit(GameInst* self, GameInst* other) {
@@ -83,7 +88,7 @@ void ProjectileInst::step(GameState* gs) {
 					new AnimatedInst(e->x - 5 + rx * 5, e->y + ry * 5, -1, 25,
 							rx, ry, buffstr));
 
-			if (e->hurt(gs, damage)) {
+			if (e->damage(gs, damage)) {
 				PlayerInst* p = (PlayerInst*)origin;
 				p->gain_xp(gs, e->xpworth());
 
@@ -99,9 +104,9 @@ void ProjectileInst::step(GameState* gs) {
 	} else {
 		gs->object_radius_test(this, &colobj, 1, &player_colfilter);
 		if (colobj) {
-			Stats& s = ((PlayerInst*)colobj)->stats();
+			CombatGameInst* combat_inst = (CombatGameInst*)colobj;
 			if (!gs->game_settings().invincible)
-				s.hurt(damage);
+				combat_inst->damage(gs, damage);
 			char dmgstr[32];
 			snprintf(dmgstr, 32, "%d", damage);
 			float rx = vx / speed * .5;
@@ -165,11 +170,11 @@ void ProjectileInst::draw(GameState* gs) {
 
 }
 
-ProjectileInst *ProjectileInst::clone() const {
+ProjectileInst* ProjectileInst::clone() const {
 	return new ProjectileInst(*this);
 }
 
-void ProjectileInst::deinit(GameState* gs){
+void ProjectileInst::deinit(GameState* gs) {
 	hit_callback.call(gs, this);
 }
 
@@ -181,3 +186,41 @@ void ProjectileInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
 	*(ProjectileInst*)inst = *this;
 }
+
+_ProjectileInst::~_ProjectileInst() {
+}
+
+void _ProjectileInst::step(GameState* gs) {
+}
+
+void _ProjectileInst::draw(GameState* gs) {
+}
+
+void _ProjectileInst::deinit(GameState* gs) {
+	ProjectileEntry& pentry = projectile.projectile_entry();
+	int break_roll = gs->rng().rand(100);
+	if (pentry.drop_chance > break_roll) {
+		gs->add_instance(new ItemInst(projectile.as_item().id, x, y));
+	}
+}
+
+void _ProjectileInst::copy_to(GameInst* inst) const {
+	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
+	*(_ProjectileInst*)inst = *this;
+}
+
+_ProjectileInst::_ProjectileInst(const Projectile& projectile,
+		const EffectiveStats& stats, obj_id origin, const Pos& start,
+		const Pos& target, float speed, int range, obj_id sole_target) :
+		GameInst(start.x, start.y, projectile.projectile_entry().radius, false), rx(
+				start.x), ry(start.y), speed(speed), team(
+				0 /*TODO: properly init*/), origin(origin), sole_target(
+				sole_target), projectile(projectile), stats(stats), range_left(
+				range) {
+	direction_towards(start, target, vx, vy, speed);
+}
+
+_ProjectileInst* _ProjectileInst::clone() const {
+	return new _ProjectileInst(*this);
+}
+

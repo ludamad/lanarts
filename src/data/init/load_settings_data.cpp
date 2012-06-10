@@ -72,7 +72,7 @@ GameSettings load_settings_data(const char* filename) {
 			optional_set(root, "draw_diagnostics", ret.draw_diagnostics);
 			optional_set(root, "username", ret.username);
 
-			if (hasnode(root, "connection_type")) {
+			if (yaml_has_node(root, "connection_type")) {
 				std::string connname;
 				root["connection_type"] >> connname;
 				if (connname == "none") {
@@ -84,7 +84,7 @@ GameSettings load_settings_data(const char* filename) {
 				}
 			}
 
-			if (hasnode(root, "class")) {
+			if (yaml_has_node(root, "class")) {
 				std::string classname;
 				root["class"] >> classname;
 				if (!game_class_data.empty())

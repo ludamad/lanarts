@@ -1,8 +1,6 @@
 /*
- * GameLevelState.cpp
- *
- *  Created on: Mar 23, 2012
- *      Author: 100397561
+ * GameLevelState.cpp:
+ *  Contains game level state information
  */
 
 #include "GameLevelState.h"

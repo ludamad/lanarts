@@ -15,9 +15,17 @@ struct SpriteEntry {
 	std::string name;
 	std::vector<GLimage> images;
 
+	int width() {
+		return img().width;
+	}
+
+	int height() {
+		return img().height;
+	}
+
 	SpriteEntry(const std::string& name, const FilenameList& filenames,
 			sprite_type type = ANIMATED) :
-			type(type), name(name){
+			type(type), name(name) {
 		for (int i = 0; i < filenames.size(); i++) {
 			images.push_back(GLimage(filenames[i]));
 		}

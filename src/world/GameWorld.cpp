@@ -34,7 +34,7 @@ int GameWorld::get_current_level_id(){
 
 void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, int classn, PlayerInst* inst){
 	GameTiles& tiles = game_state->tile_grid();
-	ClassType* c = &game_class_data[classn];
+	ClassType& c = game_class_data.at(classn);
 	Pos epos;
 	do {
 		epos = generate_location(game_state->rng(), genlevel);
@@ -48,7 +48,7 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, int classn, P
 	int py = (epos.y + start_y) * TILE_SIZE + TILE_SIZE/2;
 
 	if (!inst){
-		inst = new PlayerInst(c->starting_stats, px,py, local);
+		inst = new PlayerInst(c.starting_stats, get_sprite_by_name("fighter"), px,py, local);
 	}
 	inst->last_x = px;
 	inst->last_y = py;
@@ -201,7 +201,7 @@ void GameWorld::regen_level(int roomid){
 		PlayerInst* p = (PlayerInst*)game_state->get_instance(player_ids[i]);
 		game_state->remove_instance(p, false); // Remove but do not deallocate
 		player_cache.push_back(p);
-		p->stats().heal_fully();
+		p->core_stats().heal_fully();
 	}
 	delete level;
 	level_states[roomid] = NULL;

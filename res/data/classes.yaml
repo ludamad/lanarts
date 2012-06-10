@@ -20,6 +20,7 @@ classes:
         magic: 3
         strength: 1
         defence: 1
+        willpower: 2
 
   - name: Fighter
     sprite: fighter
@@ -40,4 +41,5 @@ classes:
         strength: 3
         magic: 1
         defence: 2
+        willpower: 1
    

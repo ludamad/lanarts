@@ -6,24 +6,24 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-void EffectStats::process(lua_State* L, Stats& basestats, Stats& affected) {
-	lua_pushstats(L, basestats);
-	lua_pushstats(L, affected);
-
-	int affind = lua_gettop(L);
-	int baseind = affind-1;
-
-	for (int i = 0; i < EFFECTS_MAX; i++) {
-		if (effects[i].t_remaining > 0) {
-			game_effect_data[effects[i].effect].statmod.push(L);
-			lua_pushvalue(L, baseind);
-			lua_pushvalue(L, affind);
-			lua_call(L, 2, 0);
-		}
-	}
-//	basestats = *lua_getstats(L, baseind);
-	affected = *lua_getstats(L, affind);
-	lua_pop(L, 2);//pop base&affected
+void EffectStats::process(lua_State* L, const CombatStats& basestats, EffectiveStats& effective) const {
+//	lua_pushstats(L, basestats);
+//	lua_pushstats(L, effective);
+//
+//	int affind = lua_gettop(L);
+//	int baseind = affind-1;
+//
+//	for (int i = 0; i < EFFECTS_MAX; i++) {
+//		if (effects[i].t_remaining > 0) {
+//			game_effect_data[effects[i].effect].statmod.push(L);
+//			lua_pushvalue(L, baseind);
+//			lua_pushvalue(L, affind);
+//			lua_call(L, 2, 0);
+//		}
+//	}
+////	basestats = *lua_getstats(L, baseind);
+//	effective = *lua_getstats(L, affind);
+//	lua_pop(L, 2);//pop base&affected
 }
 
 void EffectStats::step() {
@@ -34,7 +34,7 @@ void EffectStats::step() {
 	}
 }
 
-Effect *EffectStats::get(int effect) {
+Effect* EffectStats::get(int effect) {
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining > 0 && effects[i].effect == effect) {
 			return &effects[i];

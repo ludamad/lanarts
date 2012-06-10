@@ -1,10 +1,13 @@
 #ifndef EFFECTS_H
 #define EFFECTS_H
 
-#include "stats.h"
-#include "../data/effect_data.h"
+#include "../util/game_basic_structs.h"
 
 const int EFFECTS_MAX = 40;
+
+struct CombatStats;
+struct EffectiveStats;
+struct lua_State;
 
 struct Effect {
 	int effect;
@@ -21,7 +24,7 @@ struct EffectStats {
 	Effect* get(int effect);
 	void step();
 
-	void process(lua_State* L, Stats& basestats, Stats& affected);
+	void process(lua_State* L, const CombatStats& basestats, EffectiveStats& effective) const;
 
 	Effect effects[EFFECTS_MAX];
 };

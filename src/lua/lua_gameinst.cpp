@@ -28,13 +28,13 @@ public:
 	  GameInst* g = get_instance();
 	  PlayerInst* p;
 	  EnemyInst* e;
-	  if ( (p = dynamic_cast<PlayerInst*>(g))){
-		  return &p->stats();
-	  } else if ( (e = dynamic_cast<EnemyInst*>(g))){
-		  return &e->stats();
-	  } else {
+//	  if ( (p = dynamic_cast<PlayerInst*>(g))){
+//		  return &p->stats();
+//	  if ( (e = dynamic_cast<EnemyInst*>(g))){
+//		  return &e->oldstats();
+//	  } else {
 		  return NULL;
-	  }
+//	  }
   }
   int heal_fully(lua_State* L){
 	  get_stats()->heal_fully();
@@ -62,7 +62,7 @@ public:
   int hasten(lua_State* L){
 	  PlayerInst* p;
 	  if ( (p = dynamic_cast<PlayerInst*>(get_instance()))){
-		p->status_effects().add(0, lua_tonumber(L, 1));
+//		p->status_effects().add(0, lua_tonumber(L, 1));
 	  }
 	  return 0;
   }
@@ -109,7 +109,7 @@ static int lua_member_lookup(lua_State* L){
 	IFLUA_NUM_MEMB_LOOKUP("x", inst->x)
 	else IFLUA_NUM_MEMB_LOOKUP("y", inst->y)
 	else IFLUA_NUM_MEMB_LOOKUP("id", inst->id)
-	else IFLUA_STATS_MEMB_LOOKUP("stats", inst->id)
+//	else IFLUA_STATS_MEMB_LOOKUP("stats", inst->id)
 	else{
 		lua_getglobal(L, bind_t::className);
 		int tableind = lua_gettop(L);

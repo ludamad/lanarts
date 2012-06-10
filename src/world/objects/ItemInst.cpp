@@ -1,8 +1,6 @@
 /*
- * ItemInst.cpp
- *
- *  Created on: Mar 20, 2012
- *      Author: 100397561
+ * ItemInst.cpp:
+ *  Represents an item on the floor
  */
 
 #include "ItemInst.h"
@@ -23,35 +21,35 @@ static bool same_item_colfilter(GameInst* self, GameInst* other) {
 }
 void ItemInst::step(GameState *gs) {
 	GameInst* other_item = NULL;
-	ItemEntry& item = game_item_data[type];
-	if (item.stackable
+	ItemEntry& ientry = item.item_entry();
+	if (ientry.stackable
 			&& gs->solid_test(this, &other_item, 1, same_item_colfilter)) {
-		ItemInst* item = (ItemInst*)other_item;
-		if (item->type == type && id < item->id) {
-			gs->remove_instance(item);
-			quantity += item->quantity;
+		ItemInst* oinst = (ItemInst*)other_item;
+		if (oinst->item == item && id < oinst->id) {
+			gs->remove_instance(oinst);
+			quantity += oinst->item_quantity();
 		}
 	}
 }
 
-void ItemInst::draw(GameState *gs) {
+void ItemInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
 
-	ItemEntry& itemd = game_item_data[type];
-	GLimage& img = game_sprite_data[itemd.sprite_number].images[0];
+	ItemEntry& ientry = item.item_entry();
+	SpriteEntry& spr = game_sprite_data[ientry.sprite_number];
 
-	int w = img.width, h = img.height;
+	int w = spr.width(), h = spr.height();
 	int xx = x - w / 2, yy = y - h / 2;
 
 	if (!view.within_view(xx, yy, w, h))
 		return;
 	if (!gs->object_visible_test(this))
 		return;
-	int x_inview = xx - view.x, y_inview = yy - view.y;
-	gl_draw_image(img, x_inview, y_inview);
-	if (itemd.stackable && quantity > 1) {
-		gl_printf(gs->primary_font(), Colour(255, 255, 255), x_inview + 1,
-				y_inview + 1, "%d", quantity);
+
+	gl_draw_sprite_entry(view, spr, xx, yy, 0, 0, gs->frame());
+	if (ientry.stackable && quantity > 1) {
+		gl_printf(gs->primary_font(), Colour(255, 255, 255), xx - view.x + 1,
+				yy - view.y + 1, "%d", quantity);
 	}
 }
 

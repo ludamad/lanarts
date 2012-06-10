@@ -48,7 +48,7 @@ static void push_yaml_node(lua_State* L, const YAML::Node* node) {
 			char* end;
 			double value = strtod(str.c_str(), &end);
 			size_t convchrs = (end - str.c_str());
-			if (convchrs == str.size() )
+			if (convchrs == str.size())
 				lua_pushnumber(L, value);
 			else
 				lua_pushstring(L, str.c_str());
@@ -77,9 +77,10 @@ static void push_yaml_node(lua_State* L, const YAML::Node* node) {
 	}
 }
 
-static std::string format_expression_string(const std::string& str){
+static std::string format_expression_string(const std::string& str) {
 	const char prefix[] = "return ";
-	if (str.empty()) return str;
+	if (str.empty())
+		return str;
 	if (strncmp(str.c_str(), prefix, sizeof(prefix)) == 0)
 		return str;
 	return "return " + str;
@@ -89,7 +90,8 @@ class LuaValueImpl {
 public:
 
 	LuaValueImpl(const std::string& expr = std::string()) :
-			lua_expression(format_expression_string(expr)), refcount(1), empty(true) {
+			lua_expression(format_expression_string(expr)), refcount(1), empty(
+					true) {
 	}
 
 	void deinitialize(lua_State* L) {
@@ -132,7 +134,8 @@ public:
 //		lua_replace(L, tableind);
 	}
 
-	void table_set_function(lua_State* L, const char* key, lua_CFunction value) {
+	void table_set_function(lua_State* L, const char* key,
+			lua_CFunction value) {
 		lua_registry_push(L, this); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
 		lua_pushstring(L, key);
@@ -182,7 +185,8 @@ public:
 		lua_pushvalue(L, value); /*Clone value*/
 		lua_settable(L, LUA_REGISTRYINDEX);
 
-		lua_pop(L, 1); /*Pop value*/
+		lua_pop(L, 1);
+		/*Pop value*/
 	}
 
 	size_t& ref_count() {
@@ -199,13 +203,16 @@ private:
 	bool empty;
 };
 
-static void deref(LuaValueImpl* impl){
-	//if (impl && --impl->ref_count() == 0) delete impl;
+static void deref(LuaValueImpl* impl) {
+	if (impl && --impl->ref_count() == 0)
+		delete impl;
 }
 
 LuaValue::LuaValue(const std::string & expr) {
-	if (expr.empty()) impl = NULL;
-	else impl = new LuaValueImpl(expr);
+	if (expr.empty())
+		impl = NULL;
+	else
+		impl = new LuaValueImpl(expr);
 }
 
 LuaValue::LuaValue() {
@@ -233,8 +240,10 @@ void LuaValue::deinitialize(lua_State* L) {
 }
 
 void LuaValue::push(lua_State* L) {
-	if (!impl) lua_pushnil(L);
-	else impl->push(L);
+	if (!impl)
+		lua_pushnil(L);
+	else
+		impl->push(L);
 }
 
 void LuaValue::pop(lua_State* L) {
@@ -265,17 +274,16 @@ void LuaValue::table_set_newtable(lua_State* L, const char *key) {
 LuaValue::LuaValue(const LuaValue & value) {
 	impl = value.impl;
 	if (impl)
-		impl->ref_count()++;
-}
+		impl->ref_count()++;}
 
 void LuaValue::operator =(const LuaValue & value) {
 	deref(impl);
 	impl = value.impl;
 	if (impl)
-		impl->ref_count()++;
-}
+		impl->ref_count()++;}
 
-void LuaValue::table_set_yaml(lua_State* L, const char *key, const YAML::Node *root) {
+void LuaValue::table_set_yaml(lua_State* L, const char *key,
+		const YAML::Node *root) {
 	if (empty())
 		table_initialize(L);
 	impl->table_set_yaml(L, key, root);

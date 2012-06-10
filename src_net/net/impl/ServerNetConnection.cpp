@@ -24,11 +24,11 @@ void ServerNetConnection::finalize_connections() {
 void ServerNetConnection::accept_handler(SocketStream* ss,
 		const asio::error_code& error) {
 	if (!error) {
-		if (!accepting_connections) {
-			if (ss)
-				delete ss;
-			return;
-		}
+//		if (!accepting_connections) {
+//			if (ss)
+//				delete ss;
+//			return;
+//		}
 		if (ss) {
 			streamlock.lock();
 			streams.push_back(stream_ptr(ss));
@@ -62,7 +62,7 @@ static void wrapped_run(asio::io_service* ios) {
 	try {
 		ios->run();
 	} catch (const std::exception& e) {
-		printf("type=%d\n", typeid(e).name());
+		printf("type=%s\n", typeid(e).name());
 		printf("%s\n", e.what());
 	}
 	printf("io_service::run completed!\n");

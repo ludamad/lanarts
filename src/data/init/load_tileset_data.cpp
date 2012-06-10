@@ -39,16 +39,16 @@ static TilesetEntry parse_tilesetentry(const YAML::Node& node) {
 	Range altwall = wall;
 	Range altcorridor = corridor;
 
-	if (hasnode(node, "corridor_tile"))
+	if (yaml_has_node(node, "corridor_tile"))
 		corridor = parse_tile_range(node["corridor_tile"]);
 
-	if (hasnode(node, "alt_floor_tile"))
+	if (yaml_has_node(node, "alt_floor_tile"))
 		altfloor = parse_tile_range(node["alt_floor_tile"]);
 
-	if (hasnode(node, "alt_wall_tile"))
+	if (yaml_has_node(node, "alt_wall_tile"))
 		altwall = parse_tile_range(node["alt_wall_tile"]);
 
-	if (hasnode(node, "alt_corridor_tile"))
+	if (yaml_has_node(node, "alt_corridor_tile"))
 		altcorridor = parse_tile_range(node["alt_corridor_tile"]);
 
 	return TilesetEntry(name, floor.min, floor.max, wall.min, wall.max,

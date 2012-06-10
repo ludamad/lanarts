@@ -28,22 +28,23 @@ const int INVENTORY_POSITION = 327;
 
 static void draw_player_statbars(GameState*gs, PlayerInst* player, int x,
 		int y) {
-	Stats& s = player->stats();
-	gl_draw_statbar(x, y, 100, 10, s.hp, s.max_hp);
-	gl_printf(gs->primary_font(), Colour(0, 0, 0), x + 30, y, "%d/%d", s.hp,
-			s.max_hp);
-//	gl_draw_rectangle(x, y, 100, 10, Colour(255, 0, 0));
-//	gl_draw_rectangle(x, y, 100 * s.hp / s.max_hp, 10, Colour(0, 255, 0));
-	gl_draw_statbar(x, y + 15, 100, 10, s.mp, s.max_mp, Colour(0, 0, 255),
+	ClassStats& class_stats = player->class_stats();
+	CoreStats& core = player->effective_stats().core;
+
+	gl_draw_statbar(x, y, 100, 10, core.hp, core.max_hp);
+	gl_printf(gs->primary_font(), Colour(0, 0, 0), x + 30, y, "%d/%d", core.hp,
+			core.max_hp);
+
+	gl_draw_statbar(x, y + 15, 100, 10, core.mp, core.max_mp, Colour(0, 0, 255),
 			Colour(200, 200, 200));
 
 	gl_printf(gs->primary_font(), Colour(0, 0, 0), x + 30, y + 15, "%d/%d",
-			s.mp, s.max_mp);
-	gl_draw_statbar(x, y + 30, 100, 10, s.xp, s.xpneeded, Colour(255, 215, 11),
+			core.mp, core.max_mp);
+	gl_draw_statbar(x, y + 30, 100, 10, class_stats.xp, class_stats.xpneeded, Colour(255, 215, 11),
 			Colour(169, 143, 100));
 
 	gl_printf(gs->primary_font(), Colour(0, 0, 0), x + 30, y + 30, "%d/%d",
-			s.xp, s.xpneeded);
+			class_stats.xp, class_stats.xpneeded);
 
 	float ratio = player->rest_cooldown() / float(REST_COOLDOWN);
 	Colour col(200 * ratio, 200 * (1.0f - ratio), 0);
@@ -54,10 +55,10 @@ static void draw_player_statbars(GameState*gs, PlayerInst* player, int x,
 				"can rest", player->rest_cooldown() * 100 / REST_COOLDOWN);
 }
 
-static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot, int x,
+static void draw_player_inventory_slot(GameState* gs, _ItemSlot& itemslot, int x,
 		int y) {
 	if (itemslot.amount > 0) {
-		ItemEntry& itemd = game_item_data[itemslot.item];
+		ItemEntry& itemd = itemslot.item.item_entry();
 		GLimage& itemimg = game_sprite_data[itemd.sprite_number].img();
 		gl_draw_image(itemimg, x, y);
 		gl_printf(gs->primary_font(), Colour(255, 255, 255), x + 1, y + 1, "%d",
@@ -66,7 +67,7 @@ static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot, int x,
 }
 static void draw_player_inventory(GameState* gs, PlayerInst* player, int inv_x,
 		int inv_y, int w, int h, int slot_selected) {
-	Inventory& inv = player->get_inventory();
+	_Inventory& inv = player->inventory();
 
 	int slot = 0;
 	for (int y = 0; y < h; y += TILE_SIZE) {
@@ -74,7 +75,7 @@ static void draw_player_inventory(GameState* gs, PlayerInst* player, int inv_x,
 			if (slot >= INVENTORY_SIZE)
 				break;
 
-			ItemSlot& itemslot = inv.get(slot);
+			_ItemSlot& itemslot = inv.get(slot);
 
 			Colour outline(43, 43, 43);
 			if (itemslot.amount > 0 && slot != slot_selected)
@@ -103,18 +104,17 @@ static Colour outline_col(bool cond) {
 static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 		int x, int y) {
 	Colour outline = outline_col(player->spell_selected() == -1);
-	Equipment& equipment = player->get_equipment();
+	_Equipment& equipment = player->equipment();
 
 	if (equipment.projectile == -1) {
 		gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE, outline);
 	} else {
 		gl_draw_rectangle_outline(x, y, TILE_SIZE * 2, TILE_SIZE, outline);
-		ProjectileEntry& ptype =
-				game_projectile_data[player->get_equipment().projectile];
+		ProjectileEntry& ptype = equipment.projectile.projectile_entry();
 		gl_draw_image(game_sprite_data[ptype.item_sprite].img(), x + TILE_SIZE,
 				y);
 		gl_printf(gs->primary_font(), Colour(255, 255, 255), x + TILE_SIZE + 1,
-				y + 1, "%d", player->get_equipment().projectile_amnt);
+				y + 1, "%d", player->equipment().projectile_amnt);
 	}
 
 	WeaponEntry& wtype = game_weapon_data[player->weapon_type()];
@@ -195,7 +195,7 @@ void GameHud::queue_io_actions(GameState* gs, PlayerInst* player,
 	bool mouse_within_view = gs->mouse_x() < gs->window_view().width;
 	int level = gs->level()->roomid, frame = gs->frame();
 
-	Inventory inv = player->get_inventory();
+	_Inventory inv = player->inventory();
 
 	for (int i = 0; i < this->queued_actions.size(); i++) {
 		queued_actions.push_back(this->queued_actions[i]);
@@ -208,7 +208,7 @@ void GameHud::queue_io_actions(GameState* gs, PlayerInst* player,
 		int posx = (gs->mouse_x() - action_bar_x) / TILE_SIZE;
 		int posy = (gs->mouse_y() - action_bar_y) / TILE_SIZE;
 
-		Equipment& equipment = player->get_equipment();
+		_Equipment& equipment = player->equipment();
 		if (posy == 0 && posx == 0)
 			queued_actions.push_back(
 					GameAction(player->id, GameAction::DEEQUIP_ITEM, frame,
@@ -253,7 +253,7 @@ bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 	if (!player)
 		return false;
 
-	Inventory inv = player->get_inventory();
+	_Inventory inv = player->inventory();
 
 	bool mleft = event->button.button == SDL_BUTTON_LEFT;
 	bool mright = event->button.button == SDL_BUTTON_RIGHT;
@@ -266,7 +266,7 @@ bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 			int posx = (gs->mouse_x() - action_bar_x) / TILE_SIZE;
 			int posy = (gs->mouse_y() - action_bar_y) / TILE_SIZE;
 
-			Equipment& equipment = player->get_equipment();
+			_Equipment& equipment = player->equipment();
 			if (posy == 0) {
 				if (posx == 0) {
 					player->spell_selected() = -1;
@@ -393,24 +393,26 @@ void GameHud::draw(GameState* gs) {
 			gs->local_playerid());
 	if (!player_inst)
 		return;
-	Stats effective_stats = player_inst->effective_stats(gs->get_luastate());
+
+	ClassStats& class_stats = player_inst->class_stats();
+	CoreStats& core = player_inst->effective_stats().core;
 
 	draw_player_statbars(gs, player_inst, 32, 32);
 
 	draw_minimap(gs, minimap_bbox().translated(-x, -y));
 
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 15, 10,
-			"Level %d", effective_stats.xplevel);
+			"Level %d", class_stats.xplevel);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 40,
 			64 + 45 + 128, "Floor %d", gs->level()->level_number);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 40,
 			64 + 45 + 128 + 15, "Gold %d", player_inst->gold());
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
-			64 + 45 + 128 + 30, "Strength   %d", effective_stats.strength);
+			64 + 45 + 128 + 30, "Strength   %d", core.strength);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
-			64 + 45 + 128 + 45, "Magic      %d", effective_stats.magic);
+			64 + 45 + 128 + 45, "Magic      %d", core.magic);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
-			64 + 45 + 128 + 60, "Defence  %d", effective_stats.defence);
+			64 + 45 + 128 + 60, "Defence  %d", core.defence);
 	draw_player_actionbar(gs, player_inst);
 
 	GameView& view = gs->window_view();

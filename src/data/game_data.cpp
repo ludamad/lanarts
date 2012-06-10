@@ -20,8 +20,8 @@ void load_tileset_data(const FilenameList& filenames);
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames);
 void load_weapon_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemstable = NULL);
-void load_projectile_data(lua_State* L, const FilenameList& filenames,
-		LuaValue* itemstable = NULL);
+LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
+		LuaValue& itemstable);
 void load_weapon_item_entries();
 void load_projectile_item_entries();
 
@@ -78,17 +78,24 @@ int get_effect_by_name(const char* name) {
 int get_enemy_by_name(const char* name) {
 	return get_X_by_name(game_enemy_data, name);
 }
+int get_projectile_by_name(const char* name) {
+	return get_X_by_name(game_projectile_data, name);
+}
+int get_weapon_by_name(const char* name) {
+	return get_X_by_name(game_weapon_data, name);
+}
 
 int get_tileset_by_name(const char* name) {
 	for (int i = 0; i < game_tileset_data.size(); i++) {
 		if (name == game_tileset_data[i].name) {
 			return i;
 		}
-	}LANARTS_ASSERT(false);
+	}
+	LANARTS_ASSERT(false);
 	return 0;
 }
 
-LuaValue sprites, enemies, effects, weapons, items, dungeon, classes;
+LuaValue sprites, enemies, effects, weapons, projectiles, items, dungeon, classes;
 void init_game_data(lua_State* L) {
 	DataFiles dfiles = load_datafiles_data("res/datafiles.yaml");
 
@@ -96,18 +103,17 @@ void init_game_data(lua_State* L) {
 	load_tile_data(dfiles.tile_files);
 	sprites = load_sprite_data(L, dfiles.sprite_files);
 	load_tileset_data(dfiles.tileset_files);
-	enemies = load_enemy_data(L, dfiles.enemy_files);
-	effects = load_effect_data(L, dfiles.effect_files);
 	//TODO: make separate weapons table
 	items = load_item_data(L, dfiles.item_files);
+
+	projectiles = load_projectile_data(L, dfiles.projectile_files, items);
+	load_projectile_item_entries();
 
 	load_weapon_data(L, dfiles.weapon_files, &items);
 	load_weapon_item_entries();
 
-	//TODO: make separate projectile table
-	load_projectile_data(L, dfiles.projectile_files, &items);
-	load_projectile_item_entries();
-
+	effects = load_effect_data(L, dfiles.effect_files);
+	enemies = load_enemy_data(L, dfiles.enemy_files);
 	dungeon = load_dungeon_data(L, dfiles.level_files);
 	classes = load_class_data(L, dfiles.class_files);
 }
@@ -133,6 +139,7 @@ void init_lua_data(GameState* gs, lua_State* L) {
 	register_as_global(L, effects, "effects");
 //	register_as_global(L, weapons, "weapons");
 	register_as_global(L, items, "items");
+	register_as_global(L, projectiles, "projectiles");
 	register_as_global(L, sprites, "sprites");
 	register_as_global(L, dungeon, "dungeon");
 	register_as_global(L, classes, "classes");

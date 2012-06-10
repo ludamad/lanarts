@@ -148,22 +148,24 @@ int Stats::calculate_statmod_damage(MTwist& mt, StatModifier& sm) {
 
 int Stats::calculate_ranged_damage(MTwist& mt, weapon_id weapon_type,
 		projectile_id projectile_type) {
-	int damage = 0;
-	ProjectileEntry& pentry = game_projectile_data[projectile_type];
-	if (!pentry.is_unarmed()) {
-		damage += calculate_melee_damage(mt, weapon_type);
-	}
-	StatModifier& sm = pentry.damage_multiplier;
-	damage += calculate_statmod_damage(mt, sm) + mt.rand(pentry.damage)
-			+ mt.rand(pentry.damage_added);
-	return damage;
+//	int damage = 0;
+//	ProjectileEntry& pentry = game_projectile_data[projectile_type];
+//	if (!pentry.is_unarmed()) {
+//		damage += calculate_melee_damage(mt, weapon_type);
+//	}
+//	StatModifier& sm = pentry.damage_multiplier;
+//	damage += calculate_statmod_damage(mt, sm) + mt.rand(pentry.damage)
+//			+ mt.rand(pentry.damage_added);
+//	return damage;
+	return 0;
 }
 int Stats::calculate_melee_damage(MTwist& mt, weapon_id weapon_type) {
-	WeaponEntry& wentry = game_weapon_data[weapon_type];
-	int base_damage = mt.rand(wentry.base_damage);
-	StatModifier& sm = wentry.damage_multiplier;
-	int damage = calculate_statmod_damage(mt, sm) + base_damage;
-	return damage;
+//	WeaponEntry& wentry = game_weapon_data[weapon_type];
+//	int base_damage = mt.rand(wentry.base_damage);
+//	StatModifier& sm = wentry.damage_multiplier;
+//	int damage = calculate_statmod_damage(mt, sm) + base_damage;
+//	return damage;
+	return 0;
 }
 int Stats::calculate_spell_damage(MTwist& mt, int spell_type) {
 	int base_damage = mt.rand(4, 8);
@@ -198,6 +200,11 @@ void CoreStats::heal_hp(float hpgain) {
 		hp = max_hp;
 }
 
+void CoreStats::step() {
+	heal_hp(hpregen);
+	heal_mp(mpregen);
+}
+
 void CoreStats::heal_mp(float mpgain) {
 	mp_regened += mpgain;
 	if (mp_regened > 0) {
@@ -208,9 +215,12 @@ void CoreStats::heal_mp(float mpgain) {
 		mp = max_mp;
 }
 
-float StatMultiplier::calculate(const CoreStats& stats) {
-	return stats.strength * strength + stats.defence * defence
+float CoreStatMultiplier::calculate(MTwist& mt, const CoreStats& stats) {
+	int basevalue = mt.rand(base);
+	int stats_sum = stats.strength * strength + stats.defence * defence
 			+ stats.magic * magic + stats.willpower * willpower;
+	float random_multiplier = (100 + mt.rand(Range(-5, 5))) / 100.0f;
+	return basevalue + stats_sum * random_multiplier;
 }
 
 void CooldownStats::step() {
@@ -234,3 +244,12 @@ void CooldownStats::reset_rest_cooldown(int cooldown) {
 	rest_cooldown = std::max(cooldown, rest_cooldown);
 }
 
+bool DerivedStats::operator ==(const DerivedStats & derived) const {
+	return damage == derived.damage && power == derived.power
+			&& reduction == derived.reduction
+			&& resistance == derived.resistance;
+}
+
+void CooldownStats::reset_hurt_cooldown(int cooldown) {
+	hurt_cooldown = std::max(cooldown, hurt_cooldown);
+}

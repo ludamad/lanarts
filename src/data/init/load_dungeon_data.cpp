@@ -29,7 +29,7 @@ ItemGenSettings parse_item_gen(const YAML::Node& n) {
 	Range amnt = parse_range(n["amount"]);
 
 	vector<ItemGenChance> chances;
-	if (hasnode(n, "generated")) {
+	if (yaml_has_node(n, "generated")) {
 		chances = parse_named_with_defaults(n["generated"], "item",
 				&parse_item_chance);
 	}
@@ -53,7 +53,7 @@ FeatureGenSettings parse_feature_gen(const YAML::Node& n) {
 	int nstairsup = parse_defaulted(n, "stairs_up", 3);
 	int nstairsdown = parse_defaulted(n, "stairs_down", 3);
 	int tileset = 0;
-	if (hasnode(n, "tileset")) {
+	if (yaml_has_node(n, "tileset")) {
 		std::string tilesetname;
 		n["tileset"] >> tilesetname;
 		tileset = get_tileset_by_name(tilesetname.c_str());
@@ -77,11 +77,11 @@ EnemyGenSettings parse_enemy_gen(const YAML::Node& node,
 	nmonsters.max = 0;
 	nmonsters.min = 0;
 
-	if (hasnode(node, key)) {
+	if (yaml_has_node(node, key)) {
 		const YAML::Node& n = node[key];
 
 		nmonsters = parse_range(n["amount"]);
-		if (hasnode(n, "generated")) {
+		if (yaml_has_node(n, "generated")) {
 			chances = parse_named_with_defaults(n["generated"], "enemy",
 					&parse_enemy_chance);
 		}
@@ -94,7 +94,7 @@ LevelGenSettings parse_level_gen(const YAML::Node& n) {
 	RoomGenSettings rooms = parse_room_gen(n["rooms"]);
 	TunnelGenSettings tunnels = parse_tunnel_gen(n["tunnels"]);
 	FeatureGenSettings features =
-			hasnode(n, "features") ?
+			yaml_has_node(n, "features") ?
 					parse_feature_gen(n["features"]) : featuredefault;
 	EnemyGenSettings enemies = parse_enemy_gen(n, "enemies");
 

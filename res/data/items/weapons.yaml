@@ -2,48 +2,9 @@
 weapons:
   - name: Unarmed
     weapon_class: unarmed
-    damage: [2, 4]
-    modifiers: 
-        strength: .5
-    range: 16
-    cooldown: 20
     spr_item: hand
-
-  - name: Dagger
-    weapon_class: short blades
-    damage: [8, 12]
-    modifiers: 
-        strength: .75
-    range: 17
-    cooldown: 25
-    spr_item: dagger
-
-  - name: Short Sword
-    weapon_class: short blades
-    damage: [16, 20]
-    max_targets: 2
-    modifiers: 
-        strength: 1.3
-    range: 18
-    cooldown: 42
-    spr_item: short sword
-
-  - name: Mace
-    weapon_class: maces and flails
-    damage: [20, 22]
-    max_targets: 2
-    modifiers: 
-        strength: 1.7
-    range: 18
-    cooldown: 55
-    spr_item: mace
-
-  - name: Short Bow
-    weapon_class: bows
-    uses_projectile: yes
-    damage: [8, 16]
-    modifiers: 
-        strength: 1.0
-    range: 400
-    cooldown: 42
-    spr_item: bow1
+    #Stats
+    damage: {base: [2,5], strength: 1.0}
+    power: {base: 0, strength: 1.0}
+    range: 20
+    cooldown: 30

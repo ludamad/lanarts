@@ -1,6 +1,7 @@
 #ifndef ENEMYINST_H_
 #define ENEMYINST_H_
 
+#include "CombatGameInst.h"
 #include "GameInst.h"
 #include "EnemyBehaviour.h"
 
@@ -8,24 +9,25 @@
 
 #include "../../data/enemy_data.h"
 
-class EnemyInst : public GameInst {
+class EnemyInst : public CombatGameInst {
 public:
 	EnemyInst(int enemytype, int x, int y);
 	virtual ~EnemyInst();
+
 	virtual void init(GameState* gs);
 	virtual void step(GameState* gs);
+	virtual void die(GameState* gs);
 	virtual void draw(GameState* gs);
 	virtual void copy_to(GameInst* inst) const;
 	virtual EnemyInst* clone() const;
 
-	void attack(GameState* gs, GameInst* inst, bool ranged);
-	Stats& stats() { return stat; }
+	virtual bool within_field_of_view(const Pos& pos);
+
 	EnemyBehaviour& behaviour() { return eb; }
-	EnemyEntry* etype();
+	EnemyEntry& etype();
 	int xpworth(){
 		return xpgain;
 	}
-	bool hurt(GameState* gs, int hp);
 public:
 	float rx, ry;
 protected:
@@ -33,7 +35,6 @@ protected:
 	int enemytype;
 	EnemyBehaviour eb;
 	int xpgain;
-    Stats stat;
 };
 
 

@@ -8,13 +8,14 @@
 
 #include <string>
 #include <vector>
-#include "../gamestats/stats.h"
+
+#include "../gamestats/combat_stats.h"
 
 struct ClassType {
 	std::string name;
-	Stats starting_stats;
+	CombatStats starting_stats;
 	int hp_perlevel, mp_perlevel;
-	int str_perlevel, def_perlevel, mag_perlevel;
+	int str_perlevel, def_perlevel, mag_perlevel, will_perlevel;
 	float mpregen_perlevel, hpregen_perlevel;
 	ClassType(){
 	}

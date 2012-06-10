@@ -7,3 +7,8 @@
 --			x, y, target_x, target_y)
 --	
 --end
+
+
+function spell_create_projectile(spell, obj, target_x, target_y)
+    
+end

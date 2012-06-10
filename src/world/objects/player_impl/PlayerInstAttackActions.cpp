@@ -68,7 +68,7 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 	WeaponEntry& wentry = game_weapon_data[p->weapon_type()];
 	Pos ppos(p->x, p->y);
 	GameInst* inst = NULL;
-	bool ismelee = !(wentry.projectile || p->get_equipment().projectile > -1);
+	bool ismelee = !(wentry.uses_projectile || p->equipment().has_projectile());
 	int target_range = wentry.range + p->radius;
 
 	if (targ && distance_between(Pos(targ->x, targ->y), ppos) <= target_range) {
@@ -167,7 +167,7 @@ static void projectile_item_drop(GameState* gs, GameInst* obj, void* data) {
 	if (ientry.equipment_type == ItemEntry::PROJECTILE) {
 		ProjectileEntry& pentry = game_projectile_data[ientry.equipment_id];
 		int break_roll = gs->rng().rand(100);
-		if (break_roll < pentry.break_chance) {
+		if (break_roll < pentry.drop_chance) {
 			return; // Item 'breaks', ie don't spawn new item
 		}
 	}
@@ -191,7 +191,7 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 	//Keyboard-oriented blink
 	if (!spell_used && gs->key_press_state(SDLK_h)) {
 		Pos blinkposition;
-		if (stats().mp >= 50 && find_blink_target(this, gs, blinkposition)) {
+		if (core_stats().mp >= 50 && find_blink_target(this, gs, blinkposition)) {
 			queued_actions.push_back(
 					GameAction(id, GameAction::USE_SPELL, frame, level, 2,
 							blinkposition.x, blinkposition.y));
@@ -206,7 +206,7 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		int mpcost = 10;
 		if (spellselect)
 			mpcost = 20;
-		bool use_weapon = spellselect == -1 || stats().mp < mpcost;
+		bool use_weapon = spellselect == -1 || core_stats().mp < mpcost;
 		if (use_weapon) {
 			target = get_weapon_autotarget(gs, this, target, dx, dy);
 		}
@@ -216,7 +216,7 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 							spellselect, target->x, target->y));
 			spell_used = true;
 		} else if (target) {
-			if (!stats().has_cooldown() && stats().mp >= mpcost
+			if (cooldowns().can_doaction() && core_stats().mp >= mpcost
 					&& gs->object_visible_test(target, this)) {
 				queued_actions.push_back(
 						GameAction(id, GameAction::USE_SPELL, frame, level,
@@ -229,7 +229,7 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		int px = x, py = y;
 		/* set-up x and y for gs->object_visible_test() */
 		x = rmx, y = rmy;
-		if (stats().mp >= 50 && !gs->solid_test(this)
+		if (core_stats().mp >= 50 && !gs->solid_test(this)
 				&& gs->object_visible_test(this)) {
 			queued_actions.push_back(
 					GameAction(id, GameAction::USE_SPELL, frame, level, 2, x,
@@ -243,9 +243,9 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		int mpcost = 10;
 		if (spellselect)
 			mpcost = 20;
-		if (spellselect == -1 || stats().mp < mpcost) {
-			bool is_projectile = game_weapon_data[weapon_type()].projectile
-					|| equipment.projectile > -1;
+		if (spellselect == -1 || core_stats().mp < mpcost) {
+			bool is_projectile = game_weapon_data[weapon_type()].uses_projectile
+					|| equipment().has_projectile();
 			GameInst* target = NULL;
 			if (!is_projectile) {
 				target = get_weapon_autotarget(gs, this, NULL, rmx - x,
@@ -261,7 +261,7 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 								spellselect, rmx, rmy));
 			}
 			spell_used = true;
-		} else if (!stats().has_cooldown() && stats().mp >= mpcost) {
+		} else if (cooldowns().can_doaction() && core_stats().mp >= mpcost) {
 			queued_actions.push_back(
 					GameAction(id, GameAction::USE_SPELL, frame, level,
 							spellselect, rmx, rmy));
@@ -274,30 +274,30 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 	WeaponEntry& wentry = game_weapon_data[weapon_type()];
 	MTwist& mt = gs->rng();
 	const int MAX_MELEE_HITS = 10;
-	Stats estats = effective_stats(gs->get_luastate());
-	if (estats.has_cooldown())
+	EffectiveStats& estats = effective_stats();
+	if (!cooldowns().can_doaction())
 		return;
 
 	Pos actpos(action.action_x, action.action_y);
 
-	if (wentry.projectile && equipment.projectile == -1)
+	if (wentry.uses_projectile && !equipment().has_projectile())
 		return;
 
-	if (equipment.projectile > -1) {
-		int damage = estats.calculate_ranged_damage(mt, weapon_type(), equipment.projectile);
-		ProjectileEntry& pentry = game_projectile_data[equipment.projectile];
+	if (equipment().has_projectile()) {
+		ProjectileEntry& pentry = equipment().projectile.projectile_entry();
 		item_id item = get_item_by_name(pentry.name.c_str());
 		int weaprange = std::max(wentry.range, pentry.range);
 
-		equipment.use_ammo();
+		equipment().use_ammo();
 
 		ObjCallback drop_callback(projectile_item_drop, (void*)item);
 
-		GameInst* bullet = new ProjectileInst(pentry.attack_sprite, id, pentry.speed,
-				weaprange, damage, x, y, actpos.x, actpos.y,
+		GameInst* bullet = new ProjectileInst(pentry.attack_sprite, id,
+				pentry.speed, weaprange, estats.magic.damage, x, y, actpos.x, actpos.y,
 				false, 0, NONE, drop_callback);
 		gs->add_instance(bullet);
-		stats().cooldown = std::max(wentry.cooldown, pentry.cooldown);
+		cooldowns().reset_action_cooldown(
+				std::max(wentry.cooldown, pentry.cooldown));
 	} else {
 		int weaprange = wentry.range + this->radius;
 		float mag = distance_between(actpos, Pos(x, y));
@@ -318,17 +318,8 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 
 		for (int i = 0; i < numhit; i++) {
 			EnemyInst* e = (EnemyInst*)enemies[i];
-
-			int damage = estats.calculate_melee_damage(mt, weapon_type());
-			char buffstr[32];
-			snprintf(buffstr, 32, "%d", damage);
-			float rx, ry;
-			direction_towards(Pos(x, y), Pos(e->x, e->y), rx, ry, 0.5);
-			gs->add_instance(
-					new AnimatedInst(e->x - 5 + rx * 5, e->y - 3 + rx * 5, -1,
-							25, rx, ry, buffstr, Colour(255, 148, 120)));
-
-			if (e->hurt(gs, damage)) {
+			if (attack(gs, e, AttackStats())) {
+				char buffstr[32];
 				gain_xp(gs, e->xpworth());
 				if (is_local_player()) {
 					snprintf(buffstr, 32, "%d XP", e->xpworth());
@@ -337,45 +328,42 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 									buffstr, Colour(255, 215, 11)));
 				}
 			}
-			gs->add_instance(
-					new AnimatedInst(e->x, e->y, wentry.attack_sprite, 25));
 
 		}
-		stats().cooldown = wentry.cooldown;
+		cooldowns().reset_action_cooldown(wentry.cooldown);
 	}
 
 	reset_rest_cooldown();
 }
 
 void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
-	Stats estats = effective_stats(gs->get_luastate());
-	if (action.use_id < 2 && stats().has_cooldown())
+	EffectiveStats& estats = effective_stats();
+	if (action.use_id < 2 && !cooldowns().can_doaction())
 		return;
 
 	if (action.use_id == 0) {
-		stats().mp -= 10;
+		core_stats().mp -= 10;
 	} else if (action.use_id == 1) {
-		stats().mp -= 20;
+		core_stats().mp -= 20;
 	} else if (action.use_id == 2) {
-		stats().mp -= 50;
+		core_stats().mp -= 50;
 	}
 
-	Attack atk(estats.magicatk);
 	bool bounce = true;
 	int hits = 0;
 
 	if (action.use_id == 1) {
-		atk.attack_sprite = get_sprite_by_name("magic blast");
-		atk.projectile_speed /= 1.75;
+//		atk.attack_sprite = get_sprite_by_name("magic blast");
+//		atk.projectile_speed /= 1.75;
 		//	atk.damage *= 2;
 		bounce = false;
 		hits = 3;
 	}
-	atk.damage = estats.calculate_spell_damage(gs->rng(), action.use_id);
+//	atk.damage = estats.calculate_spell_damage(gs->rng(), action.use_id);
 
 	if (action.use_id < 2) {
-		GameInst* bullet = new ProjectileInst(atk.attack_sprite, id,
-				atk.projectile_speed, atk.range, atk.damage, x, y,
+		GameInst* bullet = new ProjectileInst(get_sprite_by_name("fire bolt"), id,
+				4, 400, 10, x, y,
 				action.action_x, action.action_y, bounce, hits);
 		gs->add_instance(bullet);
 	} else {
@@ -383,15 +371,16 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 		y = action.action_y;
 	}
 
-	if (action.use_id == 1)
-		base_stats.cooldown = estats.magicatk.cooldown * 1.4;
+	if (action.use_id == 1);
+//		stats.cooldown = estats.magicatk.cooldown * 1.4;
 	else if (action.use_id == 0) {
-		double mult = 1 + base_stats.xplevel / 8.0;
+		double mult = 1 + class_stats().xplevel / 8.0;
 		mult = std::min(2.0, mult);
-		base_stats.cooldown = estats.magicatk.cooldown / mult;
+//		stats.cooldown = estats.magicatk.cooldown / mult;
 	} else if (action.use_id == 2) {
-		base_stats.cooldown = estats.magicatk.cooldown * 2;
+//		stats.cooldown = estats.magicatk.cooldown * 2;
 	}
+	cooldowns().reset_action_cooldown(100);
 
-	reset_rest_cooldown();
+	cooldowns().reset_rest_cooldown(REST_COOLDOWN);
 }

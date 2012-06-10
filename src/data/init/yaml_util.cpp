@@ -25,7 +25,7 @@ std::vector<const YAML::Node*> flatten_seq_mappings(const YAML::Node & n) {
 }
 
 int parse_sprite_number(const YAML::Node & n, const char *key) {
-	if (!hasnode(n, key))
+	if (!yaml_has_node(n, key))
 		return -1;
 
 	std::string s;
@@ -34,7 +34,7 @@ int parse_sprite_number(const YAML::Node & n, const char *key) {
 }
 
 int parse_enemy_number(const YAML::Node& n, const char *key) {
-	if (!hasnode(n, key))
+	if (!yaml_has_node(n, key))
 		return -1;
 
 	std::string s;
@@ -87,7 +87,7 @@ char* tocstring(const std::string& s) {
 	return ret;
 }
 
-bool hasnode(const YAML::Node & n, const char *key) {
+bool yaml_has_node(const YAML::Node & n, const char *key) {
 	return n.FindValue(key);
 }
 
@@ -149,6 +149,62 @@ const YAML::Node & operator >>(const YAML::Node& n, bool& r) {
 		throw YAML::InvalidScalar(n.GetMark());
 	return n;
 }
+
+CombatStats parse_combat_stats(const YAML::Node& n) {
+	CombatStats ret;
+	ClassStats& class_stats = ret.class_stats;
+	CoreStats& core = ret.core;
+
+	n["movespeed"] >> ret.movespeed;
+	n["hp"] >> core.max_hp;
+	core.max_mp = parse_defaulted(n, "mp", 0);
+	core.hpregen = parse_defaulted(n, "hpregen", 0.0);
+	core.mpregen = parse_defaulted(n, "mpregen", 0.0);
+	core.hp = core.max_hp;
+	core.mp = core.max_hp;
+	core.strength = parse_defaulted(n, "strength", 0);
+	core.defence = parse_defaulted(n, "defence", 0);
+	core.magic = parse_defaulted(n, "magic", 0);
+	core.willpower = parse_defaulted(n, "willpower", 0);
+	class_stats.xpneeded = parse_defaulted(n, "xpneeded", 150);
+	class_stats.xplevel = parse_defaulted(n, "xplevel", 1);
+	ret.attacks = parse_defaulted(n, "attacks", std::vector<AttackStats>());
+
+	return ret;
+}
+
+const YAML::Node& operator >>(const YAML::Node& n, CoreStatMultiplier& sm) {
+	sm.base = parse_defaulted(n, "base", Range(0,0));
+	sm.strength = parse_defaulted(n, "strength", 0.0f);
+	sm.magic = parse_defaulted(n, "magic", 0.0f);
+	sm.defence = parse_defaulted(n, "defence", 0.0f);
+	sm.willpower = parse_defaulted(n, "willpower", 0.0f);
+	return n;
+}
+
+const YAML::Node& operator >>(const YAML::Node& n, std::vector<AttackStats>& attacks){
+	for (int i = 0; i < n.size(); i++){
+		attacks.push_back(parse_attack(n[i]));
+	}
+	return n;
+}
+
+AttackStats parse_attack(const YAML::Node & n) {
+	std::string name;
+	AttackStats ret;
+
+	if (yaml_has_node(n, "weapon")) {
+		name = parse_str(n["weapon"]);
+		ret.weapon = Weapon(get_weapon_by_name(name.c_str()));
+	}
+	if (yaml_has_node(n, "projectile")){
+		name = parse_str(n["weapon"]);
+		ret.projectile = Projectile(get_projectile_by_name(name.c_str()));
+	}
+	return ret;
+}
+
+
 
 void load_data_impl_template(const FilenameList& filenames,
 		const char* resource, load_data_impl_callbackf node_callback,

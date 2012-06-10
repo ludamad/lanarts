@@ -10,12 +10,15 @@
 
 #include "stats.h"
 
+struct Item;
 struct ItemEntry;
 struct ProjectileEntry;
 struct WeaponEntry;
 
 struct Bonuses {
 	DerivedStats magic, physical;
+
+	bool operator==(const Bonuses& bonuses) const;
 };
 
 struct Armour {
@@ -30,22 +33,30 @@ struct Projectile {
 	projectile_id id;
 	Bonuses bonuses;
 
-	ItemEntry& item_entry();
-	ProjectileEntry& projectile_entry();
-	Projectile(projectile_id id, Bonuses bonuses = Bonuses()) :
+	Item as_item() const;
+	ItemEntry& item_entry() const;
+	ProjectileEntry& projectile_entry() const;
+	Projectile(projectile_id id = -1, Bonuses bonuses = Bonuses()) :
 			id(id), bonuses(bonuses) {
 	}
+	bool valid_projectile() const {
+		return id >= 0;
+	}
+
+	bool operator==(const Projectile& projectile) const;
 };
 
 struct Weapon {
 	weapon_id id;
 	Bonuses bonuses;
 
-	ItemEntry& item_entry();
-	WeaponEntry& weapon_entry();
-	Weapon(weapon_id id, Bonuses bonuses = Bonuses()) :
+	Item as_item() const;
+	ItemEntry& item_entry() const;
+	WeaponEntry& weapon_entry() const;
+	Weapon(weapon_id id = 0, Bonuses bonuses = Bonuses()) :
 			id(id), bonuses(bonuses) {
 	}
+	bool operator==(const Weapon& weapon) const;
 };
 
 struct Item {
@@ -53,21 +64,24 @@ struct Item {
 	bool is_artifact;
 	Bonuses bonuses;
 
-	ItemEntry& item_entry();
-	Armour as_armour();
-	Projectile as_projectile();
-	Weapon as_weapon();
+	ItemEntry& item_entry() const;
+	Armour as_armour() const;
+	Projectile as_projectile() const;
+	Weapon as_weapon() const;
 
 //	ArmourEntry& armour_entry();
-	ProjectileEntry& projectile_entry();
-	WeaponEntry& weapon_entry();
+	ProjectileEntry& projectile_entry() const;
+	WeaponEntry& weapon_entry() const;
 
-	bool is_armour();
-	bool is_projectile();
-	bool is_weapon();
+	bool is_normal_item() const;
+	bool is_armour() const;
+	bool is_projectile() const;
+	bool is_weapon() const;
 
-	Item(item_id id, Bonuses bonuses = Bonuses()) :
+	Item(item_id id = -1, Bonuses bonuses = Bonuses()) :
 			id(id), bonuses(bonuses) {
 	}
+
+	bool operator==(const Item& item) const;
 };
 #endif /* ITEMS_H_ */

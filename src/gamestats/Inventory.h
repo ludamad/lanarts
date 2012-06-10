@@ -1,7 +1,16 @@
+/*
+ * Inventory.cpp:
+ *  Item's held by a player/enemy
+ */
+
 #ifndef INVENTORY_H
 #define INVENTORY_H
 
+#include <vector>
+
 #include "../util/game_basic_structs.h"
+
+#include "items.h"
 
 const int INVENTORY_SIZE = 40;
 
@@ -35,11 +44,31 @@ public:
 		}
 		return false;
 	}
-	ItemSlot& get(int i){
+	ItemSlot& get(int i) {
 		return inv[i];
 	}
 private:
 	ItemSlot inv[INVENTORY_SIZE];
+};
+
+struct _ItemSlot {
+	Item item;
+	int amount;
+	_ItemSlot() : amount(0) {
+	}
+};
+
+class _Inventory {
+public:
+	_Inventory(int size = INVENTORY_SIZE) {
+		items.resize(size);
+	}
+	bool add(const Item& item, int amount);
+	_ItemSlot& get(int i) {
+		return items.at(i);
+	}
+private:
+	std::vector<_ItemSlot> items;
 };
 
 #endif // INVENTORY_H

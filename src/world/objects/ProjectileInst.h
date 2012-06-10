@@ -7,6 +7,7 @@
 
 #include <cstdlib>
 
+#include "../../gamestats/items.h"
 #include "../../gamestats/stats.h"
 
 #include "../../util/callback_util.h"
@@ -49,6 +50,38 @@ private:
 
 	/*Callback determined behaviour*/
 	ObjCallback hit_callback;
+};
+
+class _ProjectileInst: public GameInst {
+	enum {
+		DEPTH = 0
+	};
+public:
+	_ProjectileInst(const Projectile& projectile,
+			const EffectiveStats& stats, obj_id origin, const Pos& start,
+			const Pos& target, float speed, int range, obj_id sole_target = 0);
+	~_ProjectileInst();
+	virtual void step(GameState* gs);
+	virtual void draw(GameState* gs);
+	virtual void deinit(GameState* gs);
+	virtual void copy_to(GameInst* inst) const;
+	virtual _ProjectileInst* clone() const;
+
+private:
+	float rx, ry, vx, vy, speed;
+	/* Team alignment, to determine if friendly-firing */
+	team_id team;
+	/* Origin object, and optional exclusive target*/
+	obj_id origin, sole_target;
+
+	/* Projectile used */
+	Projectile projectile;
+
+	/* Stats at time of projectile creation */
+	EffectiveStats stats;
+
+	/* Range left before projectile is destroyed */
+	int range_left;
 };
 
 #endif /* PROJECTILEINST_H_ */

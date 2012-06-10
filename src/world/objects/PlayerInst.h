@@ -22,41 +22,23 @@
 #include "../GameAction.h"
 #include "../GameLevelState.h"
 
+#include "CombatGameInst.h"
 #include "GameInst.h"
 
 const int REST_COOLDOWN = 300;
 
-struct PlayerCooldowns {
-	int canrestcooldown;
-	int canpickupcooldown;
-	PlayerCooldowns() : canrestcooldown(0), canpickupcooldown(0) {
-	}
-	void step(){
-		if (--canrestcooldown < 0)
-			canrestcooldown = 0;
-		if (--canpickupcooldown < 0)
-			canpickupcooldown = 0;
-	}
-	bool can_pickup(){
-		return canpickupcooldown <= 0;
-	}
-	bool can_rest(){
-		return canrestcooldown <= 0;
-	}
-};
-
-class PlayerInst: public GameInst {
+class PlayerInst: public CombatGameInst {
 public:
 	enum {
-		RADIUS = 10, VISION_SUBSQRS = 1, DEPTH = 75
+		RADIUS = 10, DEPTH = 75, LINEOFSIGHT = 7
 	};
-	PlayerInst(const Stats& start_stats, int x, int y, bool local = true) :
-			GameInst(x, y, RADIUS, true, DEPTH), local(local), isresting(0), base_stats(
-					start_stats), money(0), spellselect(0) {
+	PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y, bool local = true) :
+			CombatGameInst(stats, sprite, 0, x, y, RADIUS, true, DEPTH), fieldofview(LINEOFSIGHT),  local(local), money(0), spellselect(0) {
 	}
 
 	virtual ~PlayerInst();
 	virtual void init(GameState *gs);
+	virtual void die(GameState* gs);
 	virtual void deinit(GameState *gs);
 	virtual void step(GameState *gs);
 	virtual void draw(GameState *gs);
@@ -74,44 +56,27 @@ public:
 	void perform_queued_actions(GameState* gs);
 	void perform_action(GameState* gs, const GameAction& action);
 
-	Stats & stats() {
-		return base_stats;
-	}
 
-	Stats effective_stats(lua_State* L) {
-		Stats tmp = base_stats;
-		effects.process(L, base_stats, tmp);
-		return tmp;
-	}
-
-	EffectStats & status_effects() {
-		return effects;
-	}
+    virtual bool within_field_of_view(const Pos& pos);
 
 	int& spell_selected() {
 		return spellselect;
 	}
 	int& rest_cooldown() {
-		return cooldowns.canrestcooldown;
+		return stats().cooldowns.rest_cooldown;
 	}
 	void reset_rest_cooldown(int cooldown = REST_COOLDOWN) {
-		rest_cooldown() = std::max(cooldown, rest_cooldown());
+		stats().cooldowns.reset_rest_cooldown(cooldown);
 	}
 	int gold() {
 		return money;
 	}
 	int& weapon_type() {
-		return equipment.weapon;
+		return equipment().weapon.id;
 	}
 
 	bool is_local_player() {
 		return local;
-	}
-	Inventory& get_inventory() {
-		return equipment.inventory;
-	}
-	Equipment& get_equipment() {
-		return equipment;
 	}
 
 	bool& performed_actions_for_step() {
@@ -131,12 +96,9 @@ private:
 	void reposition_item(GameState* gs, const GameAction& action);
 
 	std::deque<GameAction> queued_actions;
+	fov fieldofview;
 	bool didstep;
 	bool local, isresting;
-	PlayerCooldowns cooldowns;
-	Equipment equipment;
-	Stats base_stats;
-	EffectStats effects;
 
 	int money;
 	int spellselect;

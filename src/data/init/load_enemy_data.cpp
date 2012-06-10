@@ -10,25 +10,9 @@
 
 using namespace std;
 
-Attack parse_attack(const YAML::Node& n) {
-	Attack ret;
-	ret.canuse = true;
-	ret.cooldown = parse_defaulted(n, "cooldown", 70);
-	ret.range = parse_defaulted(n, "range", 20);
-	ret.projectile_speed = parse_defaulted(n, "projectile_speed", 0);
-	n["damage"] >> ret.damage;
-	ret.isprojectile = parse_defaulted(n, "uses_projectile", false);
-	ret.attack_sprite = parse_sprite_number(n, "sprite");
-	return ret;
-}
 EnemyEntry parse_enemy_type(const YAML::Node& n) {
 	EnemyEntry entry;
 
-	const YAML::Node& anodes = n["attacks"];
-	vector<Attack> attacks;
-	for (int i = 0; i < anodes.size(); i++) {
-		attacks.push_back(parse_attack(anodes[i]));
-	}
 //	std::string name, appear_msg, defeat_msg;
 //	int radius;
 //	int xpaward;
@@ -47,7 +31,7 @@ EnemyEntry parse_enemy_type(const YAML::Node& n) {
 	entry.xpaward = parse_int(n["xpaward"]);
 
 	entry.sprite_number = parse_sprite_number(n, "sprite");
-	entry.basestats = parse_stats(n["stats"], attacks);
+	entry.basestats = parse_combat_stats(n["stats"]);
 	entry.unique = parse_defaulted(n, "unique", false);
 
 	entry.init_event = LuaValue(parse_defaulted(n, "init_func", std::string()));

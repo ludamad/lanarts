@@ -12,13 +12,14 @@
 static Stats* get_stats(GameInst* inst) {
 	PlayerInst* p;
 	EnemyInst* e;
-	if ((p = dynamic_cast<PlayerInst*>(inst))) {
-		return &p->stats();
-	} else if ((e = dynamic_cast<EnemyInst*>(inst))) {
-		return &e->stats();
-	} else {
-		return NULL;
-	}
+//	if ((p = dynamic_cast<CombatGameInst*>(inst))) {
+//		return &p->stats();
+//	if ((e = dynamic_cast<EnemyInst*>(inst))) {
+//		return &e->oldstats();
+//	} else {
+//		return NULL;
+//	}
+	return NULL;
 }
 
 class GameStateLuaBinding {

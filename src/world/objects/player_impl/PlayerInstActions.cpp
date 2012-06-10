@@ -31,56 +31,29 @@ extern "C" {
 
 #include "../ProjectileInst.h"
 
-// static FILE* saved = fopen("res/saved_replay.rep", "wb");
-// static FILE* open = fopen("res/replay.rep", "rb");
-static std::vector<GameAction> replay_actions;
-
-static bool is_same_projectile(projectile_id projectile, item_id item) {
-	if (projectile > -1) {
-		ItemEntry& ientry = game_item_data[item];
-		if (ientry.equipment_type == ItemEntry::PROJECTILE) {
-			return (ientry.equipment_id == projectile);
+static bool is_same_projectile(const Projectile& projectile, const Item& item) {
+	if (projectile.valid_projectile()) {
+		if (item.is_projectile()) {
+			return (item.as_projectile() == projectile);
 		}
 	}
 	return false;
 }
 
-static bool is_wieldable_projectile(Equipment& equipment, item_id item) {
-	ItemEntry& ientry = game_item_data[item];
-
+static bool is_wieldable_projectile(_Equipment& equipment, const Item& item) {
 	if (is_same_projectile(equipment.projectile, item))
 		return true;
 
-	if (ientry.equipment_type == ItemEntry::PROJECTILE) {
-		ProjectileEntry& pentry = game_projectile_data[ientry.equipment_id];
+	if (item.is_projectile()) {
+		ProjectileEntry& pentry = item.projectile_entry();
 		if (pentry.weapon_class == "unarmed")
 			return false;
 	}
 
-	if (ientry.equipment_type != ItemEntry::PROJECTILE)
+	if (!item.is_projectile())
 		return false;
 
 	return equipment.valid_to_use(item);
-}
-
-static void get_current_actions(int frame, std::vector<GameAction>& actions) {
-// 	if (!open)
-// 		return;
-// 	if (!feof(open)) {
-// 		while (!feof(open)) {
-// 			replay_actions.push_back(from_action_file(open));
-// 			if (replay_actions.back().frame > frame)
-// 				break;
-// 		}
-// 	}
-// 	int i;
-// 	for (i = 0; i < replay_actions.size(); i++) {
-// 		if (replay_actions[i].frame == frame) {
-// 			actions.push_back(replay_actions[i]);
-// 		} else if (replay_actions[i].frame > frame)
-// 			break;
-// 	}
-// 	replay_actions = std::vector<GameAction>(&replay_actions[i], &replay_actions[replay_actions.size()]);
 }
 
 void PlayerInst::queue_io_equipment_actions(GameState* gs) {
@@ -101,7 +74,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs) {
 	//Item use
 	for (int i = 0; i < 9; i++) {
 		if (gs->key_press_state(SDLK_1 + i)) {
-			if (get_inventory().get(i).amount > 0) {
+			if (inventory().get(i).amount > 0) {
 				item_used = true;
 				queued_actions.push_back(
 						GameAction(id, GameAction::USE_ITEM, frame, level, i,
@@ -112,20 +85,27 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs) {
 	}
 
 	//Item pickup
-	GameInst* item = NULL;
-	if (cooldowns.can_pickup()
-			&& gs->object_radius_test(this, &item, 1, &item_colfilter)) {
-		ItemInst* iteminst = (ItemInst*)item;
-		item_id type = iteminst->item_type();
-		bool autopickup = game_item_data[type].equipment_type == ItemEntry::NONE
-				&& iteminst->last_held_by() != id;
-		autopickup |= is_wieldable_projectile(equipment, type);
+	GameInst* inst = NULL;
+	if (cooldowns().can_pickup()
+			&& gs->object_radius_test(this, &inst, 1, &item_colfilter)) {
+		ItemInst* iteminst = (ItemInst*)inst;
+		Item& item = iteminst->item_type();
+
+		bool was_dropper = iteminst->last_held_by() == id;
+		bool dropper_autopickup = iteminst->autopickup_held();
+
+		bool autopickup = (item.is_normal_item() && !was_dropper
+				&& !dropper_autopickup) || (was_dropper && dropper_autopickup);
+
+		bool wieldable_projectile = is_wieldable_projectile(equipment(), item);
+
 		bool pickup_io = gs->key_down_state(SDLK_LSHIFT)
 				|| gs->key_down_state(SDLK_RSHIFT);
-		if (pickup_io || autopickup)
+
+		if (wieldable_projectile || pickup_io || autopickup)
 			queued_actions.push_back(
 					GameAction(id, GameAction::PICKUP_ITEM, frame, level,
-							item->id));
+							iteminst->id));
 	}
 
 	if (!item_used) {
@@ -159,7 +139,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 
 //Resting
 		bool resting = false;
-		if (gs->key_down_state(SDLK_r) && cooldowns.can_rest()) {
+		if (gs->key_down_state(SDLK_r) && cooldowns().can_rest()) {
 			queued_actions.push_back(
 					GameAction(id, GameAction::USE_REST, frame, level));
 			resting = true;
@@ -224,7 +204,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	const int PICKUP_RATE = 10;
 	ItemInst* item = (ItemInst*)gs->get_instance(action.use_id);
-	item_id type = item->item_type();
+	const Item& type = item->item_type();
 	int amnt = item->item_quantity();
 
 	if (!item)
@@ -232,18 +212,18 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	if (type == get_item_by_name("Gold")) {
 		money += amnt;
 	} else {
-		if (is_same_projectile(equipment.projectile, type)) {
-			equipment.projectile_amnt += amnt;
-		} else if (!equipment.has_projectile()
-				&& is_wieldable_projectile(equipment, type)) {
-			equipment.deequip_projectiles();
-			equipment.equip(type, amnt);
+		if (is_same_projectile(equipment().projectile, type)) {
+			equipment().projectile_amnt += amnt;
+		} else if (!equipment().has_projectile()
+				&& is_wieldable_projectile(equipment(), type)) {
+			equipment().deequip_projectiles();
+			equipment().equip(type, amnt);
 		} else {
-			get_inventory().add(type, amnt);
+			inventory().add(type, amnt);
 		}
 	}
 
-	cooldowns.canpickupcooldown = PICKUP_RATE;
+	cooldowns().reset_pickup_cooldown(PICKUP_RATE);
 	gs->remove_instance(item);
 }
 
@@ -282,11 +262,11 @@ void PlayerInst::perform_queued_actions(GameState *gs) {
 }
 
 void PlayerInst::equip(item_id item, int amnt) {
-	equipment.equip(item, amnt);
+	equipment().equip(item, amnt);
 }
 
 void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
-	ItemSlot& itemslot = get_inventory().get(action.use_id);
+	_ItemSlot& itemslot = inventory().get(action.use_id);
 	int dropx = round_to_multiple(x, TILE_SIZE, true), dropy =
 			round_to_multiple(y, TILE_SIZE, true);
 	int amnt = itemslot.amount;
@@ -294,9 +274,10 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 	itemslot.amount -= amnt;
 	gs->game_hud().reset_slot_selected();
 }
+
 void PlayerInst::reposition_item(GameState* gs, const GameAction& action) {
-	ItemSlot& itemslot1 = get_inventory().get(action.use_id);
-	ItemSlot& itemslot2 = get_inventory().get(action.use_id2);
+	_ItemSlot& itemslot1 = inventory().get(action.use_id);
+	_ItemSlot& itemslot2 = inventory().get(action.use_id2);
 
 	std::swap(itemslot1, itemslot2);
 	gs->game_hud().reset_slot_selected();
@@ -323,7 +304,7 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 	case GameAction::DROP_ITEM:
 		return drop_item(gs, action);
 	case GameAction::DEEQUIP_ITEM:
-		return equipment.deequip(action.use_id);
+		return equipment().deequip(action.use_id);
 	case GameAction::REPOSITION_ITEM:
 		return reposition_item(gs, action);
 	default:
@@ -358,12 +339,12 @@ static void item_do_lua_action(lua_State* L, ItemEntry& type, obj_id user,
 	lua_call(L, 5, 0);
 }
 void PlayerInst::use_item(GameState *gs, const GameAction& action) {
-	ItemSlot& itemslot = get_inventory().get(action.use_id);
-	ItemEntry& type = game_item_data[itemslot.item];
+	_ItemSlot& itemslot = inventory().get(action.use_id);
+	ItemEntry& type = itemslot.item.item_entry();
 
 	lua_State* L = gs->get_luastate();
 
-	if (itemslot.amount > 0 && equipment.valid_to_use(itemslot.item)
+	if (itemslot.amount > 0 && equipment().valid_to_use(itemslot.item)
 			&& item_check_lua_prereq(L, type, this->id)) {
 		item_do_lua_action(L, type, this->id,
 				Pos(action.action_x, action.action_y), itemslot.amount);
@@ -376,10 +357,11 @@ void PlayerInst::use_item(GameState *gs, const GameAction& action) {
 
 }
 void PlayerInst::use_rest(GameState *gs, const GameAction& action) {
-	bool atfull = stats().hp >= stats().max_hp && stats().mp >= stats().max_mp;
-	if (cooldowns.can_rest() && !atfull) {
-		stats().raise_hp(stats().hpregen * 8);
-		stats().raise_mp(stats().mpregen * 8);
+	bool atfull = core_stats().hp >= core_stats().max_hp
+			&& core_stats().mp >= core_stats().max_mp;
+	if (cooldowns().can_rest() && !atfull) {
+		core_stats().heal_hp(core_stats().hpregen * 8);
+		core_stats().heal_mp(core_stats().mpregen * 8);
 		isresting = true;
 	}
 }
@@ -387,7 +369,7 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 	int dx = action.action_x;
 	int dy = action.action_y;
 
-	float mag = effective_stats(gs->get_luastate()).movespeed;
+	float mag = effective_stats().movespeed;
 
 	float ddx = dx * mag;
 	float ddy = dy * mag;
@@ -481,7 +463,7 @@ void PlayerInst::gain_xp(GameState* gs, int xp) {
 
 		char level_gain_str[128];
 		snprintf(level_gain_str, 128, "You have reached level %d!",
-				stats().xplevel);
+				class_stats().xplevel);
 		gs->game_chat().add_message(level_gain_str, Colour(50, 205, 50));
 	}
 }

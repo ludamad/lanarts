@@ -1,5 +1,8 @@
 ---
 sprites:
+  - name: none
+    file: res/sprites/none.png
+    
   - name: fighter
     file: res/sprites/player/fighter.png
 
