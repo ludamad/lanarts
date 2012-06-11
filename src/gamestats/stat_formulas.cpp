@@ -54,8 +54,9 @@ static void derive_from_equipment(MTwist& mt, EffectiveStats& effective,
 	WeaponEntry& wentry = equipment.weapon.weapon_entry();
 	effective.physical.damage = wentry.damage.calculate(mt, core);
 	effective.physical.power = wentry.power.calculate(mt, core);
-	effective.physical.reduction = core.defence;
-	effective.magic.reduction = core.willpower;
+	effective.physical.resistance = core.defence;
+	effective.magic.damage = core.magic;
+	effective.magic.resistance = core.willpower;
 }
 
 EffectiveStats effective_stats(GameState* gs, const CombatStats& stats) {

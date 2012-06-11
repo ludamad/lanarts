@@ -15,3 +15,63 @@ enemies:
         strength: 10
         defence: 5
         willpower: 5
+        
+  - name: Giant Rat
+    sprite: giant rat
+    radius: 10
+    xpaward: 5
+    stats:
+        hp: 40
+        hpregen: 0.01
+        movespeed: 2.5
+
+        strength: 6
+        defence: 4
+        willpower: 4
+    attacks:
+      - weapon: Basic Melee
+      
+  - name: Chicken
+    sprite: chicken
+    radius: 10
+    xpaward: 10
+    stats:
+        hp: 18
+        hpregen: 0.04
+        movespeed: 3
+
+        strength: 10
+        defence: 8
+        willpower: 8
+    attacks:
+      - weapon: Fast Melee
+        
+  - name: Zombie
+    sprite: zombie
+    radius: 14
+    xpaward: 10
+    stats:
+        hp: 70
+        hpregen: 0.05
+        movespeed: 2
+
+        strength: 17
+        defence: 10  
+        willpower: 12
+    attacks:
+      - weapon: Basic Melee
+      
+  - name: Storm Elemental
+    sprite: storm ele
+    radius: 14
+    xpaward: 20
+    stats:
+        movespeed: 1
+        hp: 50
+        hpregen: 0.05
+        
+        strength: 20
+        defence: 10  
+        willpower: 12
+    attacks:
+      - projectile: Storm Bolt

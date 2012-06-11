@@ -5,7 +5,7 @@
  *      Author: 100397561
  */
 
-#include "C:/lanarts-git/lanarts/src/world/controllers/CombatInstController.h"
+#include "CombatInstController.h"
 
 CombatInstController::CombatInstController() {
 	// TODO Auto-generated constructor stub

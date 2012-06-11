@@ -337,17 +337,23 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 }
 
 void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
+	MTwist& mt = gs->rng();
 	EffectiveStats& estats = effective_stats();
 	if (action.use_id < 2 && !cooldowns().can_doaction())
 		return;
 
+	Projectile projectile;
+
 	if (action.use_id == 0) {
+		projectile = Projectile(get_projectile_by_name("Fire Bolt"));
 		core_stats().mp -= 10;
 	} else if (action.use_id == 1) {
+		projectile = Projectile(get_projectile_by_name("Magic Blast"));
 		core_stats().mp -= 20;
 	} else if (action.use_id == 2) {
 		core_stats().mp -= 50;
 	}
+
 
 	bool bounce = true;
 	int hits = 0;
@@ -362,25 +368,27 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 //	atk.damage = estats.calculate_spell_damage(gs->rng(), action.use_id);
 
 	if (action.use_id < 2) {
-		GameInst* bullet = new ProjectileInst(get_sprite_by_name("fire bolt"), id,
-				4, 400, 10, x, y,
-				action.action_x, action.action_y, bounce, hits);
+		Pos self(x,y), target(action.action_x, action.action_y);
+		ProjectileEntry& pentry = projectile.projectile_entry();
+		estats.magic.damage = pentry.damage.calculate(mt, estats.core);
+		estats.magic.power = pentry.power.calculate(mt, estats.core);
+		GameInst* bullet = new _ProjectileInst(projectile, estats, id, self, target,
+				pentry.speed, pentry.range, NONE, bounce, hits);
 		gs->add_instance(bullet);
+
+		cooldowns().reset_action_cooldown(pentry.cooldown * 1.4);
 	} else {
 		x = action.action_x;
 		y = action.action_y;
 	}
 
-	if (action.use_id == 1);
-//		stats.cooldown = estats.magicatk.cooldown * 1.4;
-	else if (action.use_id == 0) {
+
+	if (action.use_id == 0) {
 		double mult = 1 + class_stats().xplevel / 8.0;
 		mult = std::min(2.0, mult);
-//		stats.cooldown = estats.magicatk.cooldown / mult;
+		cooldowns().action_cooldown /= mult;
 	} else if (action.use_id == 2) {
-//		stats.cooldown = estats.magicatk.cooldown * 2;
+		cooldowns().reset_action_cooldown(130);
 	}
-	cooldowns().reset_action_cooldown(100);
-
 	cooldowns().reset_rest_cooldown(REST_COOLDOWN);
 }

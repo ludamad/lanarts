@@ -11,6 +11,7 @@
 #include "../../gamestats/stats.h"
 
 #include "../../util/callback_util.h"
+#include "../../util/game_basic_structs.h"
 
 #include "GameInst.h"
 
@@ -58,8 +59,8 @@ class _ProjectileInst: public GameInst {
 	};
 public:
 	_ProjectileInst(const Projectile& projectile,
-			const EffectiveStats& stats, obj_id origin, const Pos& start,
-			const Pos& target, float speed, int range, obj_id sole_target = 0);
+			const EffectiveStats& stats, obj_id origin_id, const Pos& start,
+			const Pos& target, float speed, int range, obj_id sole_target = 0, bool bounce = true, int hits = 1);
 	~_ProjectileInst();
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
@@ -67,12 +68,15 @@ public:
 	virtual void copy_to(GameInst* inst) const;
 	virtual _ProjectileInst* clone() const;
 
+	sprite_id sprite() const;
 private:
+	static bool bullet_target_hit2(GameInst* self, GameInst* other);
+
 	float rx, ry, vx, vy, speed;
 	/* Team alignment, to determine if friendly-firing */
 	team_id team;
 	/* Origin object, and optional exclusive target*/
-	obj_id origin, sole_target;
+	obj_id origin_id, sole_target;
 
 	/* Projectile used */
 	Projectile projectile;
@@ -82,6 +86,11 @@ private:
 
 	/* Range left before projectile is destroyed */
 	int range_left;
+
+	/*TODO: move to lua*/
+	bool bounce;
+	int hits;
+	float damage_mult;
 };
 
 #endif /* PROJECTILEINST_H_ */

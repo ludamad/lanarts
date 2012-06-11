@@ -17,11 +17,13 @@
 #include "CombatGameInst.h"
 #include "ProjectileInst.h"
 
+const int HURT_COOLDOWN = 30;
 bool CombatGameInst::damage(GameState* gs, int dmg) {
 	if (core_stats().hurt(dmg)) {
 		die(gs);
 		return true;
 	}
+	cooldowns().reset_hurt_cooldown(HURT_COOLDOWN);
 	return false;
 }
 
@@ -41,8 +43,6 @@ CombatStats& CombatGameInst::stats() {
 EffectiveStats& CombatGameInst::effective_stats() {
 	return estats;
 }
-
-const int HURT_COOLDOWN = 30;
 
 static float hurt_alpha_value(int hurt_cooldown) {
 	if (hurt_cooldown < HURT_COOLDOWN / 2)
