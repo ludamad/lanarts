@@ -172,9 +172,11 @@ void TunnelGenImpl::backtrack_slice(Sqr* prev_content,
 bool TunnelGenImpl::validate_slice(Sqr* prev_content, TunnelSliceContext* cntxt,
 		int dep) {
 	int dx = cntxt->dx, dy = cntxt->dy;
-	if (cntxt->p.x <= 2 || cntxt->p.x >= s.width() - width)
+	if (cntxt->p.x <= 2
+			|| cntxt->p.x >= s.width() - width - (dx == 0 ? 0 : padding * 2))
 		return false;
-	if (cntxt->p.y <= 2 || cntxt->p.y >= s.height() - width)
+	if (cntxt->p.y <= 2
+			|| cntxt->p.y >= s.height() - width - (dy == 0 ? 0 : padding * 2))
 		return false;
 
 	cntxt->tunneled = true;

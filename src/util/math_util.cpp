@@ -47,3 +47,7 @@ int centered_multiple(int num, int mult) {
 	return num * mult + mult / 2;
 }
 
+Pos centered_multiple(const Pos& pos, int mult) {
+	return Pos(centered_multiple(pos.x, mult), centered_multiple(pos.y, mult));
+}
+

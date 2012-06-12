@@ -11,13 +11,14 @@ classes:
         mpregen: 0.066
         strength: 4
         defence: 4
+        willpower: 4
         magic: 7
     gain_per_level:
         hp: 15
         mp: 20
         hpregen: 0.01
         mpregen: 0.015
-        magic: 3
+        magic: 2
         strength: 1
         defence: 1
         willpower: 2
@@ -32,13 +33,14 @@ classes:
         mpregen: 0.033
         strength: 7
         defence: 5
+        willpower: 3
         magic: 3
     gain_per_level:
         hp: 30
         mp: 10
         hpregen: 0.015
         mpregen: 0.01
-        strength: 3
+        strength: 2
         magic: 1
         defence: 2
         willpower: 1

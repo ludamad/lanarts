@@ -198,7 +198,7 @@ AttackStats parse_attack(const YAML::Node & n) {
 		ret.weapon = Weapon(get_weapon_by_name(name.c_str()));
 	}
 	if (yaml_has_node(n, "projectile")){
-		name = parse_str(n["weapon"]);
+		name = parse_str(n["projectile"]);
 		ret.projectile = Projectile(get_projectile_by_name(name.c_str()));
 	}
 	return ret;

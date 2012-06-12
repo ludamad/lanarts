@@ -47,17 +47,20 @@ std::vector<WeaponEntry> game_weapon_data;
 DungeonBranch game_dungeon_data[1] = { };
 
 template<typename T>
-int get_X_by_name(const T& t, const char* name) {
+static int get_X_by_name(const T& t, const char* name, bool error_if_not_found =
+		true) {
 	for (int i = 0; i < t.size(); i++) {
 		if (name == t[i].name) {
 			return i;
 		}
 	}
-	/*Error if resource not found*/
-	fprintf(stderr, "Failed to load resource!\nname: %s, of type %s\n", name,
-			typeid(t[0]).name());
-	fflush(stderr);
-	LANARTS_ASSERT(false /*resource not found*/);
+	if (error_if_not_found) {
+		/*Error if resource not found*/
+		fprintf(stderr, "Failed to load resource!\nname: %s, of type %s\n",
+				name, typeid(t[0]).name());
+		fflush(stderr);
+		LANARTS_ASSERT(false /*resource not found*/);
+	}
 	return -1;
 }
 int get_item_by_name(const char* name) {
@@ -75,8 +78,8 @@ int get_tile_by_name(const char* name) {
 int get_effect_by_name(const char* name) {
 	return get_X_by_name(game_effect_data, name);
 }
-int get_enemy_by_name(const char* name) {
-	return get_X_by_name(game_enemy_data, name);
+int get_enemy_by_name(const char* name, bool error_if_not_found) {
+	return get_X_by_name(game_enemy_data, name, error_if_not_found);
 }
 int get_projectile_by_name(const char* name) {
 	return get_X_by_name(game_projectile_data, name);
@@ -90,12 +93,12 @@ int get_tileset_by_name(const char* name) {
 		if (name == game_tileset_data[i].name) {
 			return i;
 		}
-	}
-	LANARTS_ASSERT(false);
+	}LANARTS_ASSERT(false);
 	return 0;
 }
 
-LuaValue sprites, enemies, effects, weapons, projectiles, items, dungeon, classes;
+LuaValue sprites, enemies, effects, weapons, projectiles, items, dungeon,
+		classes;
 void init_game_data(lua_State* L) {
 	DataFiles dfiles = load_datafiles_data("res/datafiles.yaml");
 

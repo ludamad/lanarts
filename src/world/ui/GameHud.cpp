@@ -24,7 +24,7 @@
 
 #include "GameHud.h"
 
-const int INVENTORY_POSITION = 327;
+const int INVENTORY_POSITION = 342;
 
 static void draw_player_statbars(GameState*gs, PlayerInst* player, int x,
 		int y) {
@@ -413,6 +413,8 @@ void GameHud::draw(GameState* gs) {
 			64 + 45 + 128 + 45, "Magic      %d", core.magic);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
 			64 + 45 + 128 + 60, "Defence  %d", core.defence);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
+			64 + 45 + 128 + 75, "Willpower  %d", core.willpower);
 	draw_player_actionbar(gs, player_inst);
 
 	GameView& view = gs->window_view();

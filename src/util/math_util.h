@@ -16,5 +16,6 @@ float distance_between(const Pos& a, const Pos& b);
 
 int round_to_multiple(int num, int mult, bool centered = false);
 int centered_multiple(int num, int mult);
+Pos centered_multiple(const Pos& pos, int mult);
 
 #endif /* MATH_UTIL_H_ */

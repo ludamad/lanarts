@@ -47,13 +47,11 @@ void EnemyInst::init(GameState* gs) {
 	MonsterController& mc = gs->monster_controller();
 	mc.register_enemy(this);
 
-	//xpgain *=1+gs->branch_level()/10.0;
-	//xpgain = round(xpgain/5.0)*5;
-	int ln = gs->level()->level_number + 1;
-	core_stats().hp += core_stats().hp * ln / 10.0;
-	core_stats().max_hp += core_stats().max_hp * ln / 10.0;
-	core_stats().mp += core_stats().mp * ln / 10.0;
-	core_stats().max_mp += core_stats().max_mp * ln / 10.0;
+//	int ln = gs->level()->level_number + 1;
+//	core_stats().hp += core_stats().hp * ln / 10.0;
+//	core_stats().max_hp += core_stats().max_hp * ln / 10.0;
+//	core_stats().mp += core_stats().mp * ln / 10.0;
+//	core_stats().max_mp += core_stats().max_mp * ln / 10.0;
 
 	lua_gameinstcallback(gs->get_luastate(), etype().init_event, id);
 }

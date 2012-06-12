@@ -81,56 +81,82 @@ void CombatGameInst::draw(GameState *gs) {
 	}
 }
 
-bool CombatGameInst::attack(GameState* gs, CombatGameInst* inst,
-		const AttackStats& attack) {
+bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst, const Weapon& weapon) {
 	bool isdead = false;
 	if (!cooldowns().can_doaction())
 		return false;
-	if (attack.is_ranged()) {
-		ProjectileEntry& pentry = attack.projectile_entry();
+	MTwist& mt = gs->rng();
 
-		Pos p(inst->x, inst->y);
-		p.x += gs->rng().rand(-12, +13);
-		p.y += gs->rng().rand(-12, +13);
-		if (gs->tile_radius_test(p.x, p.y, 10)) {
-			p.x = inst->x;
-			p.y = inst->y;
-		}
-		//	ProjectileInst(sprite_id sprite, obj_id originator, float speed, int range,
-		//			int damage, int x, int y, int tx, int ty, bool bounce = false,
-		//			int hits = 1, obj_id target = NONE);
-		GameInst* bullet = new ProjectileInst(pentry.attack_sprite, id,
-				pentry.speed, pentry.range, 1, x, y, p.x, p.y);
-		gs->add_instance(bullet);
-		cooldowns().reset_action_cooldown(pentry.cooldown);
-		cooldowns().action_cooldown += gs->rng().rand(-4, 5);
-	} else {
-		WeaponEntry& wentry = attack.weapon_entry();
+	WeaponEntry& wentry = weapon.weapon_entry();
 
-		int damage = physical_damage_formula(effective_stats(),
-				inst->effective_stats());
-		if (!gs->game_settings().invincible) {
-			isdead = inst->damage(gs, damage);
-		}
+	if (wentry.percentage_magic > 0.5f){
+		EffectiveStats& estats = effective_stats();
+		estats.magic.damage = wentry.damage.calculate(mt, estats.core);
+		estats.magic.power = wentry.power.calculate(mt, estats.core);
+	}
 
-		char dmgstr[32];
-		snprintf(dmgstr, 32, "%d", damage);
-		float rx, ry;
-		direction_towards(Pos(x, y), Pos(inst->x, inst->y), rx, ry, 0.5);
+	int damage = physical_damage_formula(effective_stats(),
+			inst->effective_stats());
+	if (!gs->game_settings().invincible) {
+		isdead = inst->damage(gs, damage);
+	}
+
+	char dmgstr[32];
+	snprintf(dmgstr, 32, "%d", damage);
+	float rx, ry;
+	direction_towards(Pos(x, y), Pos(inst->x, inst->y), rx, ry, 0.5);
+	gs->add_instance(
+			new AnimatedInst(inst->x - 5 + rx * 5, inst->y + ry * 5, -1, 25,
+					rx, ry, dmgstr, Colour(255, 148, 120)));
+
+	cooldowns().reset_action_cooldown(wentry.cooldown);
+	cooldowns().action_cooldown += gs->rng().rand(-4, 5);
+
+	if (wentry.name != "none") {
 		gs->add_instance(
-				new AnimatedInst(inst->x - 5 + rx * 5, inst->y + ry * 5, -1, 25,
-						rx, ry, dmgstr, Colour(255, 148, 120)));
-
-		cooldowns().reset_action_cooldown(wentry.cooldown);
-		cooldowns().action_cooldown += gs->rng().rand(-4, 5);
-
-		if (wentry.name != "none") {
-			gs->add_instance(
-					new AnimatedInst(inst->x, inst->y, wentry.attack_sprite,
-							25));
-		}
+				new AnimatedInst(inst->x, inst->y, wentry.attack_sprite,
+						25));
 	}
 	return isdead;
+}
+
+bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst, const Weapon& weapon, const Projectile& projectile) {
+	if (!cooldowns().can_doaction())
+		return false;
+	MTwist& mt = gs->rng();
+
+	WeaponEntry& wentry = weapon.weapon_entry();
+	ProjectileEntry& pentry = projectile.projectile_entry();
+
+	if (pentry.percentage_magic > 0.5f){
+		EffectiveStats& estats = effective_stats();
+		estats.magic.damage = pentry.damage.calculate(mt, estats.core);
+		estats.magic.power = pentry.power.calculate(mt, estats.core);
+	}
+	Pos p(inst->x, inst->y);
+	p.x += gs->rng().rand(-12, +13);
+	p.y += gs->rng().rand(-12, +13);
+	if (gs->tile_radius_test(p.x, p.y, 10)) {
+		p.x = inst->x;
+		p.y = inst->y;
+	}
+	GameInst* bullet = new _ProjectileInst(projectile, effective_stats(), id, Pos(x,y), p,
+			pentry.speed, pentry.range, false, 1);
+	gs->add_instance(bullet);
+	cooldowns().reset_action_cooldown(pentry.cooldown);
+	cooldowns().action_cooldown += gs->rng().rand(-4, 5);
+	return false;
+}
+
+
+bool CombatGameInst::attack(GameState* gs, CombatGameInst* inst,
+		const AttackStats& attack) {
+
+	if (attack.is_ranged()) {
+		return projectile_attack(gs, inst, attack.weapon, attack.projectile);
+	} else {
+		return melee_attack(gs, inst, attack.weapon);
+	}
 }
 
 void CombatGameInst::init(GameState* gs) {

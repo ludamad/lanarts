@@ -31,7 +31,8 @@ struct ProjectileEntry {
 	int drop_chance;//out of 100
 	//If unarmed projectile, range/cooldown used
 	//or if larger than base weapon's
-	int speed, cooldown, range, radius;
+	float speed;
+	int cooldown, range, radius;
 
 	bool is_unarmed(){
 		return weapon_class == "unarmed";

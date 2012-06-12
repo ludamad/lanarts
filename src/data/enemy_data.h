@@ -36,6 +36,6 @@ struct EnemyEntry {
 
 extern std::vector<EnemyEntry> game_enemy_data;
 
-int get_enemy_by_name(const char* name);
+int get_enemy_by_name(const char* name, bool error_if_not_found = true);
 
 #endif /* ENEMY_DATA_H_ */

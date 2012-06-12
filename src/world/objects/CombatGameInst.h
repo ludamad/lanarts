@@ -37,6 +37,9 @@ public:
 	virtual void update_field_of_view();
 	virtual bool within_field_of_view(const Pos& pos) =0;
 	bool damage(GameState* gs, int dmg);
+	bool melee_attack(GameState* gs, CombatGameInst* inst, const Weapon& projectile);
+	bool projectile_attack(GameState* gs, CombatGameInst* inst, const Weapon& weapon, const Projectile& projectile);
+	//bool spell_attack ...
 	bool attack(GameState* gs, CombatGameInst* inst, const AttackStats& attack);
 
 	CombatStats& stats();

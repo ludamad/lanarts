@@ -11,6 +11,8 @@
 
 #include "../../display/display.h"
 
+#include "../../procedural/enemygen.h"
+
 #include "../GameState.h"
 
 #include "GameChat.h"
@@ -161,12 +163,38 @@ void GameChat::draw(GameState *gs) const {
 		draw_player_chat(gs);
 }
 
-void GameChat::toggle_chat() {
+static bool starts_with(const std::string& str, const char* prefix,
+		const char** rest) {
+	int length = strlen(prefix);
+	bool hasprefix = strncmp(str.c_str(), prefix, length) == 0;
+	if (hasprefix) {
+		*rest = str.c_str() + length;
+		return true;
+	}
+	return false;
+}
+void GameChat::toggle_chat(GameState* gs) {
 	if (is_typing) {
 		if (!typed_message.message.empty()) {
 			typed_message.sender = local_sender;
 			typed_message.sender_colour = Colour(37, 207, 240);
-			add_message(typed_message);
+			const char* rest = NULL;
+			if (starts_with(typed_message.message, "!spawn ", &rest)) {
+				ChatMessage msg = typed_message;
+				msg.sender = "";
+				int enemy = get_enemy_by_name(rest, false);
+				if (enemy == -1) {
+					msg.message = "No such monster, '" + std::string(rest)
+							+ "'!";
+					msg.message_colour = Colour(255, 0, 0);
+				} else {
+					msg.message = std::string(rest) + " has spawned !";
+					post_generate_enemy(gs, enemy);
+					msg.message_colour = Colour(0, 255, 0);
+				}
+				add_message(msg);
+			} else
+				add_message(typed_message);
 		} else {
 			show_chat = false;
 			fade_out_rate = 0.1f;
@@ -193,7 +221,7 @@ bool GameChat::handle_event(GameState* gs, SDL_Event *event) {
 	case SDL_MOUSEBUTTONDOWN: {
 		if (show_chat && event->button.button == SDL_BUTTON_LEFT
 				&& gs->mouse_x() < chat_w && gs->mouse_y() < chat_h) {
-			toggle_chat();
+			toggle_chat(gs);
 			return true;
 		}
 		break;
@@ -206,7 +234,7 @@ bool GameChat::handle_event(GameState* gs, SDL_Event *event) {
 	}
 	case SDL_KEYDOWN: {
 		if (keycode == SDLK_RETURN) {
-			toggle_chat();
+			toggle_chat(gs);
 			return true;
 		}
 		if (is_typing) {

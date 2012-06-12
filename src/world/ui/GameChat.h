@@ -58,7 +58,7 @@ public:
 	bool is_typing_message();
 	/*Returns whether has handled event completely or not*/
 	bool handle_event(GameState* gs, SDL_Event *event);
-	void toggle_chat();
+	void toggle_chat(GameState* gs);
 
 	GameChat(const std::string& local_sender);
 private:

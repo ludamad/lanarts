@@ -230,6 +230,8 @@ void CooldownStats::step() {
 		rest_cooldown = 0;
 	if (--pickup_cooldown < 0)
 		pickup_cooldown = 0;
+	if (--hurt_cooldown < 0)
+		hurt_cooldown = 0;
 }
 
 void CooldownStats::reset_action_cooldown(int cooldown) {

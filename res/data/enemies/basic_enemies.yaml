@@ -6,72 +6,145 @@ enemies:
     radius: 11
     xpaward: 10
     stats:
-        attacks:
-            - weapon: Basic Melee
-        hp: 60
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 30
         hpregen: 0.03
         movespeed: 2
-        
+        #base stats:
         strength: 10
-        defence: 5
-        willpower: 5
+        defence: 2
+        willpower: 2
         
   - name: Giant Rat
     sprite: giant rat
     radius: 10
     xpaward: 5
     stats:
+        attacks: [ {weapon: Basic Melee} ]
         hp: 40
         hpregen: 0.01
         movespeed: 2.5
-
         strength: 6
         defence: 4
         willpower: 4
-    attacks:
-      - weapon: Basic Melee
       
   - name: Chicken
     sprite: chicken
     radius: 10
     xpaward: 10
     stats:
+        attacks: [ {weapon: Fast Melee} ]
         hp: 18
         hpregen: 0.04
         movespeed: 3
-
         strength: 10
-        defence: 8
-        willpower: 8
-    attacks:
-      - weapon: Fast Melee
+        defence: 5
+        willpower: 5
         
   - name: Zombie
     sprite: zombie
     radius: 14
     xpaward: 10
     stats:
-        hp: 70
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 40
         hpregen: 0.05
         movespeed: 2
-
         strength: 17
-        defence: 10  
-        willpower: 12
-    attacks:
-      - weapon: Basic Melee
+        defence: 5  
+        willpower: 5
       
   - name: Storm Elemental
     sprite: storm ele
     radius: 14
     xpaward: 20
     stats:
+        attacks: [ {projectile: Storm Bolt} ]
         movespeed: 1
         hp: 50
         hpregen: 0.05
-        
-        strength: 20
+        strength: 5
+        magic: 20
+        defence: 5  
+        willpower: 5
+      
+  - name: Ciribot
+    sprite: ciribot
+    radius: 14
+    xpaward: 30
+    stats:
+        attacks: [ {projectile: Magic Bolt} ]
+        movespeed: 3
+        hp: 100
+        hpregen: 0.05
+        strength: 18
+        magic: 18
         defence: 10  
         willpower: 12
-    attacks:
-      - projectile: Storm Bolt
+      
+  - name: Super Chicken
+    sprite: super_chicken
+    radius: 14
+    xpaward: 20
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 75
+        hpregen: 0.08
+        movespeed: 4
+        strength: 25
+        defence: 15  
+        willpower: 15
+      
+  - name: Grue
+    sprite: grue
+    radius: 14
+    xpaward: 35
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 100
+        hpregen: 0.02
+        movespeed: 2
+        strength: 18
+        defence: 20  
+        willpower: 20
+        
+  - name: Jester
+    sprite: jester
+    radius: 12
+    xpaward: 35
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 130
+        hpregen: 0.06
+        movespeed: 5
+        strength: 30
+        defence: 10  
+        willpower: 10
+        
+  - name: Hell Forged
+    sprite: hell_forged
+    radius: 12
+    xpaward: 50
+    stats:
+        attacks: [ {projectile: Slow Fire Bolt} ]
+        movespeed: 3
+        hp: 190
+        hpregen: 0.01
+        strength: 20
+        magic: 20
+        defence: 10  
+        willpower: 10
+
+  - name: Imp
+    sprite: imp
+    radius: 12
+    xpaward: 50
+    stats:
+        attacks: [ {weapon: Slow Melee} ]
+        movespeed: 3.3
+        hp: 50
+        hpregen: 0.25
+        strength: 20
+        magic: 20
+        defence: 10  
+        willpower: 10

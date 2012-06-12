@@ -60,7 +60,7 @@ class _ProjectileInst: public GameInst {
 public:
 	_ProjectileInst(const Projectile& projectile,
 			const EffectiveStats& stats, obj_id origin_id, const Pos& start,
-			const Pos& target, float speed, int range, obj_id sole_target = 0, bool bounce = true, int hits = 1);
+			const Pos& target, float speed, int range, obj_id sole_target = 0, bool bounce = false, int hits = 1);
 	~_ProjectileInst();
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);

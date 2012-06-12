@@ -354,7 +354,6 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 		core_stats().mp -= 50;
 	}
 
-
 	bool bounce = true;
 	int hits = 0;
 
@@ -381,7 +380,6 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 		x = action.action_x;
 		y = action.action_y;
 	}
-
 
 	if (action.use_id == 0) {
 		double mult = 1 + class_stats().xplevel / 8.0;

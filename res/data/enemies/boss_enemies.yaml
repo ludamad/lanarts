@@ -1,5 +1,5 @@
 ---
-#Enemy Markup
+#Enemy Marku
 enemies:
 
   - name: Zin
@@ -12,18 +12,14 @@ enemies:
     xpaward: 100
     unique: yes
     stats:
+        attacks: [ { weapon: Basic Melee}, { projectile: Blue Blast} ]
         movespeed: 2.5
         hp: 250
         hpregen: 0.1
-    attacks:
-      - damage: 25
-        cooldown: 40
-      - uses_projectile: yes
-        damage: 35
-        range: 400
-        cooldown: 70
-        sprite: blue blast
-        projectile_speed: 8
+        strength: 25
+        magic: 20
+        defence: 30
+        willpower: 30
 
   - name: Red Dragon
     appear_message: 
@@ -35,15 +31,11 @@ enemies:
     xpaward: 60
     unique: yes
     stats:
-        movespeed: 2.5
+        attacks: [ {weapon: Basic Melee}, { projectile: Fire Bolt} ]
         hp: 150
         hpregen: 0.1
-    attacks:
-      - damage: 15
-        cooldown: 40
-      - uses_projectile: yes
-        damage: 25
-        range: 400
-        cooldown: 70
-        sprite: fire bolt
-        projectile_speed: 8
+        movespeed: 2.5
+        strength: 25
+        magic: 25
+        defence: 15
+        willpower: 15

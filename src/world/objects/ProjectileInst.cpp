@@ -269,13 +269,12 @@ void _ProjectileInst::step(GameState* gs) {
 
 	range_left -= speed;
 
-	bool hit = false;
 	GameInst* colobj = NULL;
 	CombatGameInst* origin = (CombatGameInst*)gs->get_instance(origin_id);
 
 	if (dynamic_cast<PlayerInst*>(origin)) {
 		if (sole_target)
-			gs->object_radius_test(this, &colobj, 1, &bullet_target_hit);
+			gs->object_radius_test(this, &colobj, 1, &bullet_target_hit2);
 		else
 			gs->object_radius_test(this, &colobj, 1, &enemy_colfilter);
 
@@ -335,7 +334,7 @@ void _ProjectileInst::step(GameState* gs) {
 			MonsterController& mc = gs->monster_controller();
 			int mindist = 200;
 			if (sole_target == 0)
-				damage_mult /= 2;
+				damage_mult = 0.5;
 			sole_target = NONE; //Clear target
 			for (int i = 0; i < mc.monster_ids().size(); i++) {
 				obj_id mid = mc.monster_ids()[i];

@@ -19,6 +19,11 @@ void lua_pushgameinst(lua_State* L, obj_id id);
 void lua_pusheffects(lua_State* L, int effectnum);
 void lua_pushstats(lua_State* L, obj_id id);
 void lua_pushstats(lua_State* L, const Stats& stats);
+
+void lua_push_combatstats(lua_State* L, obj_id id);
+void lua_push_combatstats(lua_State* L, const Stats& stats);
+void lua_push_effective_stats(lua_State* L, const Stats& stats);
+
 Stats* lua_getstats(lua_State* L, int idx);
 GameState* lua_get_gamestate(lua_State* L);
 

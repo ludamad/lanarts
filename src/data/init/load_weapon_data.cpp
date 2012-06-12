@@ -105,7 +105,7 @@ void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
 	entry.drop_chance = parse_defaulted(node, "drop_chance", 0);
 	entry.weapon_class = parse_str(node["weapon_class"]);
 
-	entry.speed = parse_defaulted(node, "speed", 4);
+	entry.speed = parse_defaulted(node, "speed", 4.0f);
 	entry.cooldown = parse_defaulted(node, "cooldown", 0);
 	entry.radius = parse_defaulted(node, "radius", 5);
 	entry.range = parse_defaulted(node, "range", 0);
