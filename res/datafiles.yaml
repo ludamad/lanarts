@@ -17,9 +17,9 @@ item_files: items/items.yaml
 level_files: levels.yaml
 
 projectile_files: 
-    [items/projectiles.yaml,
-    items/enemy_projectiles.yaml,
-    items/spell_projectiles.yaml]
+    [projectiles/projectiles.yaml,
+    projectiles/enemy_projectiles.yaml,
+    projectiles/spell_projectiles.yaml]
 
 spell_files: spells.yaml
 

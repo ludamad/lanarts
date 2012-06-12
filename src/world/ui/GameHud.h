@@ -1,3 +1,9 @@
+/**
+ * GameHud:
+ *  Various components of the overlay display & side bar
+ *  Includes inventory manipulation
+ */
+
 #ifndef GAMEHUD_H_
 #define GAMEHUD_H_
 
@@ -46,6 +52,7 @@ public:
 		item_slot_selected = -1;
 	}
 private:
+	//TODO use HudView
 	enum HudView {
 		INVENTORY, STATS, SHOP
 	};

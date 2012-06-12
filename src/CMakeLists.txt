@@ -9,6 +9,14 @@ include(FindFreetype)
 include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} ../src_yaml/yaml-cpp/include ../src_net/ ../src_rvo2/RVO2 ../src_lua)
 
 set( lanarts_src
+	combat_logic/ai_logic.cpp
+	combat_logic/attack_logic.cpp
+	combat_logic/combat_logic.cpp
+	combat_logic/movement_logic.cpp
+
+	lua/lua_combatstats.cpp
+	lua/lua_effectivestats.cpp
+
 	data/init/load_sprite_data.cpp
 	data/init/load_dungeon_data.cpp
 	data/init/load_effect_data.cpp
@@ -32,16 +40,18 @@ set( lanarts_src
 	fov/impl/permissive-fov.cc
 	
 	gamestats/Ability.cpp
+	gamestats/combat_stats.cpp
 	gamestats/effects.cpp
 	gamestats/Equipment.cpp
+	gamestats/Inventory.cpp
 	gamestats/items.cpp
 	gamestats/skills.cpp
-	gamestats/stats.cpp
+	gamestats/stat_formulas.cpp
+	gamestats/stats.cpp	
 			
 	lua/lua_api.cpp
 	lua/lua_gameinst.cpp
 	lua/lua_gamestate.cpp
-	lua/lua_stats.cpp
 	
 	pathfind/astar_pathfind.cpp
 	pathfind/pathfind.cpp
@@ -73,6 +83,7 @@ set( lanarts_src
 	world/ui/GameDialogs.cpp
 	world/ui/GameHud.cpp
 	
+	world/controllers/CombatInstController.cpp
 	world/controllers/MonsterController.cpp
 	world/controllers/PlayerController.cpp
 	
@@ -92,6 +103,11 @@ set( lanarts_src
 
 set( lanarts_include
 	
+	combat_logic/ai_logic.h
+	combat_logic/attack_logic.h
+	combat_logic/combat_logic.h
+	combat_logic/movement_logic.h
+
 	data/init/yaml_util.h
 	
 	data/class_data.h
@@ -111,15 +127,17 @@ set( lanarts_include
 	fov/fov.h
 	fov/impl/permissive-fov.h
 	fov/impl/permissive-fov-cpp.h
-	
+
 	lua/lua_api.h
 	
-	gamestats/Ability.h
+	gamestats/Ability.h	
+	gamestats/combat_stats.h
 	gamestats/Inventory.h
 	gamestats/items.h
 	gamestats/effects.h
 	gamestats/Equipment.h
 	gamestats/skills.h
+	gamestats/stat_formulas.h
 	gamestats/stats.h
 	
 	pathfind/astar_pathfind.h
@@ -152,8 +170,7 @@ set( lanarts_include
 	
 	world/controllers/MonsterController.h
 	world/controllers/PlayerController.h
-	
-
+	world/controllers/CombatInstController.h
 
 	world/ui/GameChat.h
 	world/ui/GameDialogs.h

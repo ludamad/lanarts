@@ -63,8 +63,8 @@ static int get_X_by_name(const T& t, const char* name, bool error_if_not_found =
 	}
 	return -1;
 }
-int get_item_by_name(const char* name) {
-	return get_X_by_name(game_item_data, name);
+int get_item_by_name(const char* name, bool error_if_not_found) {
+	return get_X_by_name(game_item_data, name, error_if_not_found);
 }
 int get_class_by_name(const char* name) {
 	return get_X_by_name(game_class_data, name);

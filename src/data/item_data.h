@@ -43,7 +43,7 @@ struct ItemEntry {
 	}
 };
 
-int get_item_by_name(const char* name);
+int get_item_by_name(const char* name, bool error_if_not_found = true);
 
 extern std::vector<ItemEntry> game_item_data;
 

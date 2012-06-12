@@ -1,13 +1,8 @@
 /*
  * GameHud.cpp
- *
- *  Created on: 2011-11-06
- *      Author: 100400530
+ *  Various components of the overlay display & side bar
+ *  Includes inventory manipulation
  */
-
-#include "../../gamestats/Inventory.h"
-
-#include "../../util/math_util.h"
 
 #include "../../display/display.h"
 
@@ -15,6 +10,10 @@
 #include "../../data/item_data.h"
 #include "../../data/sprite_data.h"
 #include "../../data/weapon_data.h"
+
+#include "../../gamestats/Inventory.h"
+
+#include "../../util/math_util.h"
 
 #include "../GameState.h"
 #include "../GameInstSet.h"

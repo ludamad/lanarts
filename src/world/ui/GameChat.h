@@ -27,7 +27,7 @@ struct ChatMessage {
 	std::string sender, message;
 	Colour sender_colour, message_colour;
 	int exact_copies;
-	ChatMessage(const std::string& sender, const std::string& message,
+	ChatMessage(const std::string& sender = std::string(), const std::string& message = std::string(),
 			const Colour& sender_colour = Colour(255, 255, 255),
 			const Colour& message_colour = Colour(255, 255, 255)) :
 			sender(sender), message(message), sender_colour(sender_colour), message_colour(
@@ -62,6 +62,8 @@ public:
 
 	GameChat(const std::string& local_sender);
 private:
+	bool handle_special_commands(GameState* gs, const std::string& command);
+
 	void reset_typed_message();
 	void draw_player_chat(GameState* gs) const;
 
