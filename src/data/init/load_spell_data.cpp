@@ -14,7 +14,7 @@
 using namespace std;
 
 LuaValue load_spell_data(lua_State* L, const FilenameList& filenames){
-//	LuaValue ret;
+	LuaValue ret;
 //
 //    fstream file(filename, fstream::in | fstream::binary);
 //	game_spell_data.clear();
@@ -37,5 +37,5 @@ LuaValue load_spell_data(lua_State* L, const FilenameList& filenames){
 ////		game_spell_data.push_back(entry);
 //	}
 //	file.close();
-//	return ret;
+	return ret;
 }

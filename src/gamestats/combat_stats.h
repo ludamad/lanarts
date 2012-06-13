@@ -26,6 +26,12 @@ struct AttackStats {
 	bool is_ranged() const;
 	WeaponEntry& weapon_entry() const;
 	ProjectileEntry& projectile_entry() const;
+
+	int atk_cooldown() const;
+
+	int atk_damage(MTwist& mt, const EffectiveStats& stats) const;
+	int atk_power(MTwist& mt, const EffectiveStats& stats) const;
+	int atk_percentage_magic() const;
 };
 
 /* Represents all the stats used by a combat entity */
@@ -54,7 +60,7 @@ struct CombatStats {
 
 	bool has_died();
 
-	EffectiveStats effective_stats(GameState* gs) const;
+	EffectiveStats effective_stats_without_atk(GameState* gs) const;
 
 	void gain_level();
 	int gain_xp(int amnt);

@@ -45,7 +45,12 @@ public:
 	CombatStats& stats();
 	CoreStats& core_stats();
 	ClassStats& class_stats();
+
+	/* With attack data */
+	EffectiveAttackStats effective_atk_stats(MTwist& mt, const AttackStats& attack);
+	/* Damage, power, cooldown not complete without attack specified: */
 	EffectiveStats& effective_stats();
+
 	CooldownStats& cooldowns();
 	EffectStats& effects();
 	_Inventory& inventory();

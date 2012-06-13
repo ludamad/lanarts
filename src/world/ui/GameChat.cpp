@@ -307,7 +307,6 @@ bool GameChat::handle_special_commands(GameState* gs,
 			lua_pop(L, 1);
 		}
 
-
 		return true;
 	}
 

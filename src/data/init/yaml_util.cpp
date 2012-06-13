@@ -59,14 +59,6 @@ std::string parse_str(const YAML::Node& n) {
 	return s;
 }
 
-StatModifier parse_modifiers(const YAML::Node& n) {
-	StatModifier stat;
-	optional_set(n, "strength", stat.strength_mult);
-	optional_set(n, "defence", stat.defence_mult);
-	optional_set(n, "magic", stat.magic_mult);
-	return stat;
-}
-
 Range parse_range(const YAML::Node& n) {
 	Range gr;
 	if (n.Type() == YAML::NodeType::Sequence) {
@@ -91,30 +83,6 @@ bool yaml_has_node(const YAML::Node & n, const char *key) {
 	return n.FindValue(key);
 }
 
-Stats parse_stats(const YAML::Node & n, const std::vector<Attack> & attacks) {
-	Stats ret_stats;
-	n["movespeed"] >> ret_stats.movespeed;
-	n["hp"] >> ret_stats.max_hp;
-	ret_stats.max_mp = parse_defaulted(n, "mp", 0);
-	ret_stats.hpregen = parse_defaulted(n, "hpregen", 0.0);
-	ret_stats.mpregen = parse_defaulted(n, "mpregen", 0.0);
-	ret_stats.hp = ret_stats.max_hp;
-	ret_stats.mp = ret_stats.max_hp;
-	ret_stats.strength = parse_defaulted(n, "strength", 0);
-	ret_stats.defence = parse_defaulted(n, "defence", 0);
-	ret_stats.magic = parse_defaulted(n, "magic", 0);
-	ret_stats.xpneeded = parse_defaulted(n, "xpneeded", 150);
-	ret_stats.xplevel = parse_defaulted(n, "xplevel", 1);
-	for (int i = 0; i < attacks.size(); i++) {
-		if (!attacks[i].isprojectile)
-			ret_stats.meleeatk = attacks[i];
-
-		if (attacks[i].isprojectile)
-			ret_stats.magicatk = attacks[i];
-
-	}
-	return ret_stats;
-}
 
 const YAML::Node & operator >>(const YAML::Node& n, Range& r) {
 	r = parse_range(n);
@@ -131,11 +99,6 @@ const YAML::Node & operator >>(const YAML::Node& n, FilenameList & filenames) {
 			n[i] >> filenames[i];
 		}
 	}
-	return n;
-}
-
-const YAML::Node& operator >>(const YAML::Node& n, StatModifier& sm) {
-	sm = parse_modifiers(n);
 	return n;
 }
 
@@ -156,16 +119,23 @@ CombatStats parse_combat_stats(const YAML::Node& n) {
 	CoreStats& core = ret.core;
 
 	n["movespeed"] >> ret.movespeed;
-	n["hp"] >> core.max_hp;
+
 	core.max_mp = parse_defaulted(n, "mp", 0);
+	core.max_hp = parse_int(n["hp"]);
 	core.hpregen = parse_defaulted(n, "hpregen", 0.0);
 	core.mpregen = parse_defaulted(n, "mpregen", 0.0);
 	core.hp = core.max_hp;
 	core.mp = core.max_hp;
+
 	core.strength = parse_defaulted(n, "strength", 0);
 	core.defence = parse_defaulted(n, "defence", 0);
+
 	core.magic = parse_defaulted(n, "magic", 0);
 	core.willpower = parse_defaulted(n, "willpower", 0);
+
+	core.base_physical_reduction = parse_defaulted(n, "reduction", 0);
+	core.base_magic_reduction = parse_defaulted(n, "magic_reduction", 0);
+
 	class_stats.xpneeded = parse_defaulted(n, "xpneeded", 150);
 	class_stats.xplevel = parse_defaulted(n, "xplevel", 1);
 	ret.attacks = parse_defaulted(n, "attacks", std::vector<AttackStats>());

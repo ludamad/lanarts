@@ -13,13 +13,6 @@
 
 #include "../world/objects/GameInst.h"
 
-struct StatModifier {
-	float strength_mult, magic_mult, defence_mult;
-	StatModifier() {
-		memset(this, 0, sizeof(StatModifier));
-	}
-};
-
 struct ProjectileEntry {
 	std::string name;
 	std::string weapon_class; //Compatible with this weapon class

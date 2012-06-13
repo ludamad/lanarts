@@ -31,13 +31,18 @@ void CombatGameInst::update_field_of_view() {
 }
 
 void CombatGameInst::step(GameState* gs) {
-	estats = stats().effective_stats(gs);
+	estats = stats().effective_stats_without_atk(gs);
 	stats().step();
 }
 
 /* Getters */
 CombatStats& CombatGameInst::stats() {
 	return base_stats;
+}
+
+EffectiveAttackStats CombatGameInst::effective_atk_stats(MTwist& mt,
+		const AttackStats& attack) {
+	return effective_stats().with_attack(mt, attack);
 }
 
 EffectiveStats& CombatGameInst::effective_stats() {
@@ -81,7 +86,8 @@ void CombatGameInst::draw(GameState *gs) {
 	}
 }
 
-bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst, const Weapon& weapon) {
+bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
+		const Weapon& weapon) {
 	bool isdead = false;
 	if (!cooldowns().can_doaction())
 		return false;
@@ -89,7 +95,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst, const Wea
 
 	WeaponEntry& wentry = weapon.weapon_entry();
 
-	if (wentry.percentage_magic > 0.5f){
+	if (wentry.percentage_magic > 0.5f) {
 		EffectiveStats& estats = effective_stats();
 		estats.magic.damage = wentry.damage.calculate(mt, estats.core);
 		estats.magic.power = wentry.power.calculate(mt, estats.core);
@@ -106,21 +112,21 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst, const Wea
 	float rx, ry;
 	direction_towards(Pos(x, y), Pos(inst->x, inst->y), rx, ry, 0.5);
 	gs->add_instance(
-			new AnimatedInst(inst->x - 5 + rx * 5, inst->y + ry * 5, -1, 25,
-					rx, ry, dmgstr, Colour(255, 148, 120)));
+			new AnimatedInst(inst->x - 5 + rx * 5, inst->y + ry * 5, -1, 25, rx,
+					ry, dmgstr, Colour(255, 148, 120)));
 
 	cooldowns().reset_action_cooldown(wentry.cooldown);
 	cooldowns().action_cooldown += gs->rng().rand(-4, 5);
 
 	if (wentry.name != "none") {
 		gs->add_instance(
-				new AnimatedInst(inst->x, inst->y, wentry.attack_sprite,
-						25));
+				new AnimatedInst(inst->x, inst->y, wentry.attack_sprite, 25));
 	}
 	return isdead;
 }
 
-bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst, const Weapon& weapon, const Projectile& projectile) {
+bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
+		const Weapon& weapon, const Projectile& projectile) {
 	if (!cooldowns().can_doaction())
 		return false;
 	MTwist& mt = gs->rng();
@@ -128,7 +134,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst, cons
 	WeaponEntry& wentry = weapon.weapon_entry();
 	ProjectileEntry& pentry = projectile.projectile_entry();
 
-	if (pentry.percentage_magic > 0.5f){
+	if (pentry.percentage_magic > 0.5f) {
 		EffectiveStats& estats = effective_stats();
 		estats.magic.damage = pentry.damage.calculate(mt, estats.core);
 		estats.magic.power = pentry.power.calculate(mt, estats.core);
@@ -140,14 +146,13 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst, cons
 		p.x = inst->x;
 		p.y = inst->y;
 	}
-	GameInst* bullet = new _ProjectileInst(projectile, effective_stats(), id, Pos(x,y), p,
-			pentry.speed, pentry.range, false, 1);
+	GameInst* bullet = new _ProjectileInst(projectile, effective_stats(), id,
+			Pos(x, y), p, pentry.speed, pentry.range, false, 1);
 	gs->add_instance(bullet);
 	cooldowns().reset_action_cooldown(pentry.cooldown);
 	cooldowns().action_cooldown += gs->rng().rand(-4, 5);
 	return false;
 }
-
 
 bool CombatGameInst::attack(GameState* gs, CombatGameInst* inst,
 		const AttackStats& attack) {
@@ -160,7 +165,7 @@ bool CombatGameInst::attack(GameState* gs, CombatGameInst* inst,
 }
 
 void CombatGameInst::init(GameState* gs) {
-	estats = stats().effective_stats(gs);
+	estats = stats().effective_stats_without_atk(gs);
 }
 
 team_id& CombatGameInst::team() {

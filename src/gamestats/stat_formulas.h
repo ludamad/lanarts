@@ -9,12 +9,13 @@
 struct lua_State;
 struct Attack;
 struct CombatStats;
+struct EffectiveAttackStats;
 struct EffectiveStats;
 struct GameState;
 
-int physical_damage_formula(const EffectiveStats& attacker,
+int physical_damage_formula(const EffectiveAttackStats& attacker,
 		const EffectiveStats& defender);
-int magic_damage_formula(const EffectiveStats& attacker,
+int magic_damage_formula(const EffectiveAttackStats& attacker,
 		const EffectiveStats& defender);
 
 EffectiveStats effective_stats(GameState* gs, const CombatStats& stats);
