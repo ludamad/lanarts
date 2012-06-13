@@ -59,7 +59,7 @@ class _ProjectileInst: public GameInst {
 	};
 public:
 	_ProjectileInst(const Projectile& projectile,
-			const EffectiveStats& stats, obj_id origin_id, const Pos& start,
+			const EffectiveAttackStats& atkstats, obj_id origin_id, const Pos& start,
 			const Pos& target, float speed, int range, obj_id sole_target = 0, bool bounce = false, int hits = 1);
 	~_ProjectileInst();
 	virtual void step(GameState* gs);
@@ -82,7 +82,7 @@ private:
 	Projectile projectile;
 
 	/* Stats at time of projectile creation */
-	EffectiveStats stats;
+	EffectiveAttackStats atkstats;
 
 	/* Range left before projectile is destroyed */
 	int range_left;

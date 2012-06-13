@@ -65,7 +65,7 @@ static GameInst* find_closest_from_list(GameState* gs,
 
 static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 		GameInst* targ, float dx, float dy) {
-	WeaponEntry& wentry = game_weapon_data[p->weapon_type()];
+	WeaponEntry& wentry = p->weapon_type().weapon_entry();
 	Pos ppos(p->x, p->y);
 	GameInst* inst = NULL;
 	bool ismelee = !(wentry.uses_projectile || p->equipment().has_projectile());
@@ -162,7 +162,7 @@ static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
 }
 
 static void projectile_item_drop(GameState* gs, GameInst* obj, void* data) {
-	item_id item_type = (item_id)(long)data;
+	item_id item_type = (item_id) (long) data;
 	ItemEntry& ientry = game_item_data[item_type];
 	if (ientry.equipment_type == ItemEntry::PROJECTILE) {
 		ProjectileEntry& pentry = game_projectile_data[ientry.equipment_id];
@@ -182,6 +182,8 @@ static void projectile_item_drop(GameState* gs, GameInst* obj, void* data) {
 void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		float dy) {
 	GameView& view = gs->window_view();
+	WeaponEntry& wentry = weapon_type().weapon_entry();
+
 	bool mouse_within = gs->mouse_x() < gs->window_view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
@@ -191,7 +193,8 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 	//Keyboard-oriented blink
 	if (!spell_used && gs->key_press_state(SDLK_h)) {
 		Pos blinkposition;
-		if (core_stats().mp >= 50 && find_blink_target(this, gs, blinkposition)) {
+		if (core_stats().mp >= 50
+				&& find_blink_target(this, gs, blinkposition)) {
 			queued_actions.push_back(
 					GameAction(id, GameAction::USE_SPELL, frame, level, 2,
 							blinkposition.x, blinkposition.y));
@@ -244,7 +247,7 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		if (spellselect)
 			mpcost = 20;
 		if (spellselect == -1 || core_stats().mp < mpcost) {
-			bool is_projectile = game_weapon_data[weapon_type()].uses_projectile
+			bool is_projectile = wentry.uses_projectile
 					|| equipment().has_projectile();
 			GameInst* target = NULL;
 			if (!is_projectile) {
@@ -271,14 +274,14 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 }
 
 void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
-	WeaponEntry& wentry = game_weapon_data[weapon_type()];
+	WeaponEntry& wentry = weapon_type().weapon_entry();
 	MTwist& mt = gs->rng();
 	const int MAX_MELEE_HITS = 10;
 	EffectiveStats& estats = effective_stats();
 	if (!cooldowns().can_doaction())
 		return;
 
-	Pos start(x,y);
+	Pos start(x, y);
 	Pos actpos(action.action_x, action.action_y);
 
 	if (wentry.uses_projectile && !equipment().has_projectile())
@@ -291,12 +294,9 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 
 		equipment().use_ammo();
 
-//		ObjCallback drop_callback(projectile_item_drop, (void*)item);
-//		const Projectile& projectile,
-//				const EffectiveStats& stats, obj_id origin_id, const Pos& start,
-//				const Pos& target, float speed, int range, obj_id sole_target,
-//				bool bounce, int hits) :
-		GameInst* bullet = new _ProjectileInst(equipment().projectile, estats, id, start, actpos,
+		AttackStats weaponattack(weapon_type());
+		GameInst* bullet = new _ProjectileInst(equipment().projectile,
+				effective_atk_stats(mt, weaponattack), id, start, actpos,
 				pentry.speed, weaprange);
 		gs->add_instance(bullet);
 		cooldowns().reset_action_cooldown(
@@ -320,8 +320,8 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 			return;
 
 		for (int i = 0; i < numhit; i++) {
-			EnemyInst* e = (EnemyInst*)enemies[i];
-			if (attack(gs, e, AttackStats())) {
+			EnemyInst* e = (EnemyInst*) enemies[i];
+			if (attack(gs, e, AttackStats(weapon_type()))) {
 				char buffstr[32];
 				gain_xp(gs, e->xpworth());
 				if (is_local_player()) {
@@ -370,11 +370,11 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 //	atk.damage = estats.calculate_spell_damage(gs->rng(), action.use_id);
 
 	if (action.use_id < 2) {
-		Pos self(x,y), target(action.action_x, action.action_y);
+		Pos self(x, y), target(action.action_x, action.action_y);
 		ProjectileEntry& pentry = projectile.projectile_entry();
-		estats.magic.damage = pentry.damage.calculate(mt, estats.core);
-		estats.magic.power = pentry.power.calculate(mt, estats.core);
-		GameInst* bullet = new _ProjectileInst(projectile, estats, id, self, target,
+		AttackStats spellattack(Weapon(), projectile);
+		GameInst* bullet = new _ProjectileInst(projectile,
+				effective_atk_stats(mt, spellattack), id, self, target,
 				pentry.speed, pentry.range, NONE, bounce, hits);
 		gs->add_instance(bullet);
 

@@ -24,7 +24,7 @@
 #include "PlayerInst.h"
 
 static bool bullet_target_hit(GameInst* self, GameInst* other) {
-	return ((ProjectileInst*)self)->hit_target_id() == other->id;
+	return ((ProjectileInst*) self)->hit_target_id() == other->id;
 }
 
 ProjectileInst::~ProjectileInst() {
@@ -45,8 +45,8 @@ ProjectileInst::ProjectileInst(sprite_id sprite, obj_id originator, float speed,
 
 void ProjectileInst::step(GameState* gs) {
 	Pos tile_hit;
-	int newx = (int)round(rx + vx); //update based on rounding of true float
-	int newy = (int)round(ry + vy);
+	int newx = (int) round(rx + vx); //update based on rounding of true float
+	int newy = (int) round(ry + vy);
 	bool collides = gs->tile_radius_test(newx, newy, radius, true, -1,
 			&tile_hit);
 	if (bounce) {
@@ -69,8 +69,8 @@ void ProjectileInst::step(GameState* gs) {
 	} else if (collides) {
 		gs->remove_instance(this);
 	}
-	x = (int)round(rx += vx); //update based on rounding of true float
-	y = (int)round(ry += vy);
+	x = (int) round(rx += vx); //update based on rounding of true float
+	y = (int) round(ry += vy);
 
 	range_left -= speed;
 
@@ -83,7 +83,7 @@ void ProjectileInst::step(GameState* gs) {
 		else
 			gs->object_radius_test(this, &colobj, 1, &enemy_colfilter);
 		if (colobj) {
-			EnemyInst* e = (EnemyInst*)colobj;
+			EnemyInst* e = (EnemyInst*) colobj;
 			char buffstr[32];
 			snprintf(buffstr, 32, "%d", damage);
 			float rx = vx / speed * .5;
@@ -93,7 +93,7 @@ void ProjectileInst::step(GameState* gs) {
 							rx, ry, buffstr));
 
 			if (e->damage(gs, damage)) {
-				PlayerInst* p = (PlayerInst*)origin;
+				PlayerInst* p = (PlayerInst*) origin;
 				p->gain_xp(gs, e->xpworth());
 
 				if (p->is_local_player()) {
@@ -108,7 +108,7 @@ void ProjectileInst::step(GameState* gs) {
 	} else {
 		gs->object_radius_test(this, &colobj, 1, &player_colfilter);
 		if (colobj) {
-			CombatGameInst* combat_inst = (CombatGameInst*)colobj;
+			CombatGameInst* combat_inst = (CombatGameInst*) colobj;
 			if (!gs->game_settings().invincible)
 				combat_inst->damage(gs, damage);
 			char dmgstr[32];
@@ -188,7 +188,7 @@ GameInst* ProjectileInst::hit_target(GameState *gs) {
 
 void ProjectileInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(ProjectileInst*)inst = *this;
+	*(ProjectileInst*) inst = *this;
 }
 
 _ProjectileInst::~_ProjectileInst() {
@@ -219,17 +219,17 @@ void _ProjectileInst::deinit(GameState* gs) {
 
 void _ProjectileInst::copy_to(GameInst* inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(_ProjectileInst*)inst = *this;
+	*(_ProjectileInst*) inst = *this;
 }
 
 _ProjectileInst::_ProjectileInst(const Projectile& projectile,
-		const EffectiveStats& stats, obj_id origin_id, const Pos& start,
-		const Pos& target, float speed, int range, obj_id sole_target,
-		bool bounce, int hits) :
+		const EffectiveAttackStats& atkstats, obj_id origin_id,
+		const Pos& start, const Pos& target, float speed, int range,
+		obj_id sole_target, bool bounce, int hits) :
 		GameInst(start.x, start.y, projectile.projectile_entry().radius, false), rx(
 				start.x), ry(start.y), speed(speed), team(
 				0 /*TODO: properly init*/), origin_id(origin_id), sole_target(
-				sole_target), projectile(projectile), stats(stats), range_left(
+				sole_target), projectile(projectile), atkstats(atkstats), range_left(
 				range), bounce(bounce), hits(hits), damage_mult(1.0f) {
 	direction_towards(start, target, vx, vy, speed);
 }
@@ -240,8 +240,8 @@ _ProjectileInst* _ProjectileInst::clone() const {
 
 void _ProjectileInst::step(GameState* gs) {
 	Pos tile_hit;
-	int newx = (int)round(rx + vx); //update based on rounding of true float
-	int newy = (int)round(ry + vy);
+	int newx = (int) round(rx + vx); //update based on rounding of true float
+	int newy = (int) round(ry + vy);
 	bool collides = gs->tile_radius_test(newx, newy, radius, true, -1,
 			&tile_hit);
 	if (bounce) {
@@ -264,13 +264,13 @@ void _ProjectileInst::step(GameState* gs) {
 	} else if (collides) {
 		gs->remove_instance(this);
 	}
-	x = (int)round(rx += vx); //update based on rounding of true float
-	y = (int)round(ry += vy);
+	x = (int) round(rx += vx); //update based on rounding of true float
+	y = (int) round(ry += vy);
 
 	range_left -= speed;
 
 	GameInst* colobj = NULL;
-	CombatGameInst* origin = (CombatGameInst*)gs->get_instance(origin_id);
+	CombatGameInst* origin = (CombatGameInst*) gs->get_instance(origin_id);
 
 	if (dynamic_cast<PlayerInst*>(origin)) {
 		if (sole_target)
@@ -279,11 +279,8 @@ void _ProjectileInst::step(GameState* gs) {
 			gs->object_radius_test(this, &colobj, 1, &enemy_colfilter);
 
 		if (colobj) {
-			EnemyInst* victim = (EnemyInst*)colobj;
-			int damage = physical_damage_formula(stats,
-					victim->effective_stats());
-			if (projectile.projectile_entry().percentage_magic > 0.0f)
-				damage = magic_damage_formula(stats, victim->effective_stats());
+			EnemyInst* victim = (EnemyInst*) colobj;
+			int damage = damage_formula(atkstats, victim->effective_stats());
 			damage *= damage_mult;
 
 			char buffstr[32];
@@ -295,7 +292,7 @@ void _ProjectileInst::step(GameState* gs) {
 							-1, 25, rx, ry, buffstr));
 
 			if (victim->damage(gs, damage)) {
-				PlayerInst* p = (PlayerInst*)origin;
+				PlayerInst* p = (PlayerInst*) origin;
 				p->gain_xp(gs, victim->xpworth());
 
 				if (p->is_local_player()) {
@@ -310,11 +307,8 @@ void _ProjectileInst::step(GameState* gs) {
 	} else {
 		gs->object_radius_test(this, &colobj, 1, &player_colfilter);
 		if (colobj) {
-			CombatGameInst* victim = (CombatGameInst*)colobj;
-			int damage = physical_damage_formula(stats,
-					victim->effective_stats());
-			if (projectile.projectile_entry().percentage_magic > 0.0f)
-				damage = magic_damage_formula(stats, victim->effective_stats());
+			CombatGameInst* victim = (CombatGameInst*) colobj;
+			int damage = damage_formula(atkstats, victim->effective_stats());
 			damage *= damage_mult;
 
 			if (!gs->game_settings().invincible)
@@ -368,6 +362,6 @@ sprite_id _ProjectileInst::sprite() const {
 }
 
 bool _ProjectileInst::bullet_target_hit2(GameInst* self, GameInst* other) {
-	return ((_ProjectileInst*)self)->sole_target == other->id;
+	return ((_ProjectileInst*) self)->sole_target == other->id;
 }
 

@@ -86,13 +86,14 @@ int AttackStats::atk_cooldown() const {
 int AttackStats::atk_damage(MTwist& mt, const EffectiveStats& stats) const {
 	const CoreStats& core = stats.core;
 	int dmg = 0;
-	if (weapon.id > 0) {
+	bool hasprojectile = projectile.valid_projectile();
+	if (!hasprojectile || weapon.id > 0) {
 		WeaponEntry& wentry = weapon.weapon_entry();
 		dmg += wentry.damage.calculate(mt, core);
 		dmg += round(wentry.percentage_magic * stats.magic.damage);
 		dmg += round((1.0f - wentry.percentage_magic) * stats.physical.damage);
 	}
-	if (projectile.valid_projectile()) {
+	if (hasprojectile) {
 		ProjectileEntry& pentry = projectile.projectile_entry();
 		dmg += projectile.projectile_entry().damage.calculate(mt, core);
 		if (weapon.id == 0) {
@@ -107,13 +108,14 @@ int AttackStats::atk_damage(MTwist& mt, const EffectiveStats& stats) const {
 int AttackStats::atk_power(MTwist& mt, const EffectiveStats& stats) const {
 	const CoreStats& core = stats.core;
 	int dmg = 0;
-	if (weapon.id > 0) {
+	bool hasprojectile = projectile.valid_projectile();
+	if (!hasprojectile || weapon.id > 0) {
 		WeaponEntry& wentry = weapon.weapon_entry();
 		dmg += wentry.power.calculate(mt, core);
 		dmg += round(wentry.percentage_magic * stats.magic.power);
 		dmg += round((1.0f - wentry.percentage_magic) * stats.physical.power);
 	}
-	if (projectile.valid_projectile()) {
+	if (hasprojectile) {
 		ProjectileEntry& pentry = projectile.projectile_entry();
 		dmg += projectile.projectile_entry().power.calculate(mt, core);
 		if (weapon.id == 0) {

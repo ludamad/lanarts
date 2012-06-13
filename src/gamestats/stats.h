@@ -74,7 +74,7 @@ struct EffectiveAttackStats {
 	EffectiveAttackStats() :
 			damage(0), power(0), cooldown(0) {
 	}
-	float physical_percentage(){
+	float physical_percentage() const {
 		return 1.0f - magic_percentage;
 	}
 };

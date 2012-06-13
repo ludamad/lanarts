@@ -71,8 +71,8 @@ public:
 	int gold() {
 		return money;
 	}
-	int& weapon_type() {
-		return equipment().weapon.id;
+	Weapon& weapon_type() {
+		return equipment().weapon;
 	}
 
 	bool is_local_player() {

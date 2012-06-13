@@ -116,8 +116,8 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 				y + 1, "%d", player->equipment().projectile_amnt);
 	}
 
-	WeaponEntry& wtype = game_weapon_data[player->weapon_type()];
-	gl_draw_image(game_sprite_data[wtype.item_sprite].img(), x, y);
+	WeaponEntry& wentry = player->weapon_type().weapon_entry();
+	gl_draw_image(game_sprite_data[wentry.item_sprite].img(), x, y);
 }
 static void draw_player_actionbar(GameState* gs, PlayerInst* player) {
 	int w = gs->window_view().width;

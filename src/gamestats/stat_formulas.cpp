@@ -16,9 +16,8 @@
 /* What power, resistance difference causes damage to be raised by 100% */
 const int POWER_MULTIPLE_INTERVAL = 30;
 
-static float damage_multiplier(const DerivedStats& attacker,
-		const DerivedStats& defender) {
-	float powdiff = attacker.power - defender.resistance;
+static float damage_multiplier(int power, int resistance) {
+	float powdiff = power - resistance;
 	float intervals = powdiff / POWER_MULTIPLE_INTERVAL;
 	if (intervals < 0) {
 		//100% / (1+intervals)
@@ -29,23 +28,32 @@ static float damage_multiplier(const DerivedStats& attacker,
 	}
 }
 
-static int damage_formula(const DerivedStats& attacker,
+static int basic_damage_formula(const EffectiveAttackStats& attacker,
 		const DerivedStats& defender) {
-	float mult = damage_multiplier(attacker, defender);
+	float mult = damage_multiplier(attacker.power, defender.resistance);
 	int base = attacker.damage - defender.reduction;
 	if (base < 0)
 		return 0;
 	return round(mult * base);
 }
 
-int physical_damage_formula(const EffectiveStats& attacker,
+static int physical_damage_formula(const EffectiveAttackStats& attacker,
 		const EffectiveStats& defender) {
-	return damage_formula(attacker.physical, defender.physical);
+	return basic_damage_formula(attacker, defender.physical);
 }
 
-int magic_damage_formula(const EffectiveStats& attacker,
+static int magic_damage_formula(const EffectiveAttackStats& attacker,
 		const EffectiveStats& defender) {
-	return damage_formula(attacker.magic, defender.magic);
+	return basic_damage_formula(attacker, defender.magic);
+}
+
+int damage_formula(const EffectiveAttackStats& attacker,
+		const EffectiveStats& defender) {
+	float mdmg = magic_damage_formula(attacker, defender);
+	float pdmg = magic_damage_formula(attacker, defender);
+
+	return mdmg * attacker.magic_percentage
+			+ pdmg * attacker.physical_percentage();
 }
 
 static void derive_from_equipment(MTwist& mt, EffectiveStats& effective,

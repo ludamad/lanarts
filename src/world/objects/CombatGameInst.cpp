@@ -14,8 +14,10 @@
 #include "../GameState.h"
 
 #include "../utility_objects/AnimatedInst.h"
+
 #include "CombatGameInst.h"
 #include "ProjectileInst.h"
+#include "PlayerInst.h"
 
 const int HURT_COOLDOWN = 30;
 bool CombatGameInst::damage(GameState* gs, int dmg) {
@@ -91,19 +93,16 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 	bool isdead = false;
 	if (!cooldowns().can_doaction())
 		return false;
+
 	MTwist& mt = gs->rng();
 
-	WeaponEntry& wentry = weapon.weapon_entry();
+	AttackStats attack(weapon);
+	EffectiveAttackStats atkstats = effective_atk_stats(mt,
+			AttackStats(weapon));
 
-	if (wentry.percentage_magic > 0.5f) {
-		EffectiveStats& estats = effective_stats();
-		estats.magic.damage = wentry.damage.calculate(mt, estats.core);
-		estats.magic.power = wentry.power.calculate(mt, estats.core);
-	}
+	int damage = damage_formula(atkstats, inst->effective_stats());
 
-	int damage = physical_damage_formula(effective_stats(),
-			inst->effective_stats());
-	if (!gs->game_settings().invincible) {
+	if (dynamic_cast<PlayerInst*>(this) || !gs->game_settings().invincible) {
 		isdead = inst->damage(gs, damage);
 	}
 
@@ -115,13 +114,15 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 			new AnimatedInst(inst->x - 5 + rx * 5, inst->y + ry * 5, -1, 25, rx,
 					ry, dmgstr, Colour(255, 148, 120)));
 
-	cooldowns().reset_action_cooldown(wentry.cooldown);
+	cooldowns().reset_action_cooldown(atkstats.cooldown);
 	cooldowns().action_cooldown += gs->rng().rand(-4, 5);
 
+	WeaponEntry wentry = weapon.weapon_entry();
 	if (wentry.name != "none") {
 		gs->add_instance(
 				new AnimatedInst(inst->x, inst->y, wentry.attack_sprite, 25));
 	}
+
 	return isdead;
 }
 
@@ -133,12 +134,8 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 
 	WeaponEntry& wentry = weapon.weapon_entry();
 	ProjectileEntry& pentry = projectile.projectile_entry();
+	EffectiveAttackStats atkstats = effective_atk_stats(mt, AttackStats(weapon, projectile));
 
-	if (pentry.percentage_magic > 0.5f) {
-		EffectiveStats& estats = effective_stats();
-		estats.magic.damage = pentry.damage.calculate(mt, estats.core);
-		estats.magic.power = pentry.power.calculate(mt, estats.core);
-	}
 	Pos p(inst->x, inst->y);
 	p.x += gs->rng().rand(-12, +13);
 	p.y += gs->rng().rand(-12, +13);
@@ -146,7 +143,8 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 		p.x = inst->x;
 		p.y = inst->y;
 	}
-	GameInst* bullet = new _ProjectileInst(projectile, effective_stats(), id,
+
+	GameInst* bullet = new _ProjectileInst(projectile, atkstats, id,
 			Pos(x, y), p, pentry.speed, pentry.range, false, 1);
 	gs->add_instance(bullet);
 	cooldowns().reset_action_cooldown(pentry.cooldown);
