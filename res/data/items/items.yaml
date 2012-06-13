@@ -17,8 +17,9 @@ items:
 
   - name: Haste Scroll
     sprite: scroll
-    action_func: hasten
-    duration: 400
+    action_func: increase_willpower
+#    duration: 400
+    amount: 1
 
   - name: Strength Scroll
     sprite: scroll_strength

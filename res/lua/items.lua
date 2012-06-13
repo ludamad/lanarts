@@ -18,6 +18,10 @@ function increase_magic(item, obj)
 	obj.stats.magic = obj.stats.magic + item.amount
 end 
 
+function increase_willpower(item, obj)
+	obj.stats.willpower = obj.stats.willpower + item.amount
+end 
+
 function equip(item, obj, _, _, amnt)
 	obj:equip(item, amnt)
 end
