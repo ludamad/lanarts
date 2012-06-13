@@ -308,7 +308,7 @@ void lua_gameinstcallback(lua_State* L, LuaValue& value, int id) {
 	if (value.empty())
 		return;
 	value.push(L);
-	lua_pushgameinst(L, id);
+	lua_push_gameinst(L, id);
 	lua_call(L, 1, 0);
 }
 

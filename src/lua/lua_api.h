@@ -15,7 +15,7 @@ struct Stats;
 
 obj_id lua_gameinst_arg(lua_State* L, int narg);
 EffectEntry& lua_effects_arg(lua_State* L, int narg);
-void lua_pushgameinst(lua_State* L, obj_id id);
+void lua_push_gameinst(lua_State* L, obj_id id);
 void lua_pusheffects(lua_State* L, int effectnum);
 void lua_pushstats(lua_State* L, obj_id id);
 void lua_pushstats(lua_State* L, const Stats& stats);

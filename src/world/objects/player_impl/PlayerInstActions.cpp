@@ -320,7 +320,7 @@ static bool item_check_lua_prereq(lua_State* L, ItemEntry& type, obj_id user) {
 
 	type.prereq_func.push(L);
 	luayaml_push_item(L, type.name.c_str());
-	lua_pushgameinst(L, user);
+	lua_push_gameinst(L, user);
 	lua_call(L, 2, 1);
 
 	bool ret = lua_toboolean(L, lua_gettop(L));
@@ -332,7 +332,7 @@ static void item_do_lua_action(lua_State* L, ItemEntry& type, obj_id user,
 		const Pos& p, int amnt) {
 	type.action_func.push(L);
 	luayaml_push_item(L, type.name.c_str());
-	lua_pushgameinst(L, user);
+	lua_push_gameinst(L, user);
 	lua_pushnumber(L, p.x);
 	lua_pushnumber(L, p.y);
 	lua_pushnumber(L, amnt);

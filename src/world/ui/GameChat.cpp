@@ -7,11 +7,18 @@
 
 #include <SDL.h>
 
+extern "C" {
+#include <lua/lua.h>
+#include <lua/lauxlib.h>
+}
+
 #include <net/packet.h>
 
 #include "../../data/game_data.h"
 
 #include "../../display/display.h"
+
+#include "../../lua/lua_api.h"
 
 #include "../../procedural/enemygen.h"
 
@@ -167,12 +174,18 @@ void GameChat::draw(GameState *gs) const {
 		draw_player_chat(gs);
 }
 
+static const char* skip_whitespace(const char* cstr) {
+	while (*cstr != '\0' && isspace(*cstr)) {
+		cstr++;
+	}
+	return cstr;
+}
 static bool starts_with(const std::string& str, const char* prefix,
 		const char** content) {
 	int length = strlen(prefix);
 	bool hasprefix = strncmp(str.c_str(), prefix, length) == 0;
 	if (hasprefix) {
-		*content = str.c_str() + length;
+		*content = skip_whitespace(str.c_str() + length);
 		return true;
 	}
 	return false;
@@ -186,13 +199,19 @@ bool GameChat::handle_special_commands(GameState* gs,
 
 	//Spawn monster
 	if (starts_with(command, "!spawn ", &content)) {
-		int enemy = get_enemy_by_name(content, false);
+		const char* rest = content;
+		int amnt = strtol(content, (char**)&rest, 10);
+		if (content == rest)
+			amnt = 1;
+		rest = skip_whitespace(rest);
+
+		int enemy = get_enemy_by_name(rest, false);
 		if (enemy == -1) {
-			printed.message = "No such monster, '" + std::string(content) + "'!";
+			printed.message = "No such monster, '" + std::string(rest) + "'!";
 			printed.message_colour = Colour(255, 50, 50);
 		} else {
-			printed.message = std::string(content) + " has spawned !";
-			post_generate_enemy(gs, enemy);
+			printed.message = std::string(rest) + " has spawned !";
+			post_generate_enemy(gs, enemy, amnt);
 			printed.message_colour = Colour(50, 255, 50);
 		}
 		add_message(printed);
@@ -202,34 +221,93 @@ bool GameChat::handle_special_commands(GameState* gs,
 	//Gain XP
 	if (starts_with(command, "!gainxp ", &content)) {
 		int xp = atoi(content);
-		if (xp > 0 && xp < 50000){
-			printed.message = std::string("You have gained ") + content + " experience.";
-			printed.message_colour = Colour(255, 50, 50);
+		if (xp > 0 && xp < 50000) {
+			printed.message = std::string("You have gained ") + content
+					+ " experience.";
+			printed.message_colour = Colour(50, 255, 50);
+			add_message(printed);
 			p->gain_xp(gs, xp);
 		} else {
 			printed.message = "Invalid experience amount!";
 			printed.message_colour = Colour(255, 50, 50);
+			add_message(printed);
+		}
+		return true;
+	}
+
+	//Create item
+	if (starts_with(command, "!item ", &content)) {
+		const char* rest = content;
+		int amnt = strtol(content, (char**)&rest, 10);
+		if (content == rest)
+			amnt = 1;
+		rest = skip_whitespace(rest);
+
+		int item = get_item_by_name(rest, false);
+		if (item == -1) {
+			printed.message = "No such item, '" + std::string(rest) + "'!";
+			printed.message_colour = Colour(255, 50, 50);
+		} else {
+			printed.message = std::string(rest) + " put in your inventory !";
+			p->stats().equipment.inventory.add(Item(item), amnt);
+			printed.message_colour = Colour(50, 255, 50);
 		}
 		add_message(printed);
 		return true;
 	}
 
-	//Gain XP
-	if (starts_with(command, "!item ", &content)) {
-		char* rest = (char*)content;
-		int amnt = strtol(content, &rest, 10);
-		if (content == rest) amnt = 1;
-		int item = get_item_by_name(content, false);
-		if (item == -1) {
-			printed.message = "No such item, '" + std::string(content) + "'!";
-			printed.message_colour = Colour(255, 50, 50);
-		} else {
-			printed.message = std::string(content) + " put in your inventory !";
-			p->stats().equipment.inventory.add(Item(item), amnt);
-			post_generate_enemy(gs, item);
-			printed.message_colour = Colour(50, 255, 50);
+	//Kill all monsters
+	if (starts_with(command, "!killall", &content)) {
+		MonsterController& mc = gs->monster_controller();
+		for (int i = 0; i < mc.monster_ids().size(); i++) {
+			EnemyInst* inst = (EnemyInst*)gs->get_instance(mc.monster_ids()[i]);
+			if (inst) {
+				inst->damage(gs, 99999);
+			}
 		}
+		printed.message = "Killed all monsters.";
+		printed.message_colour = Colour(50, 255, 50);
 		add_message(printed);
+		return true;
+	}
+	//Run lua command
+	if (starts_with(command, "!lua ", &content)) {
+		static LuaValue script_globals;
+		lua_State* L = gs->get_luastate();
+
+		lua_push_gameinst(L, p->id);
+		script_globals.table_pop_value(L, "player");
+		lua_push_combatstats(L, p->id);
+		script_globals.table_pop_value(L, "stats");
+
+//		std::string luafunc = std::string(content);
+
+		int prior_top = lua_gettop(L);
+
+		luaL_loadstring(L, content);
+		if (lua_isstring(L, -1)){
+			const char* val = lua_tostring(L, -1);
+			add_message(val, /*iserr ? Colour(255,50,50) :*/ Colour(120,120,255));
+			return true;
+		}
+
+		int lfunc = lua_gettop(L);
+		script_globals.push(L);
+		lua_setfenv(L, lfunc);
+
+		bool iserr = (lua_pcall(L, 0, LUA_MULTRET, 0) != 0);
+
+		int current_top = lua_gettop(L);
+
+		for (; prior_top < current_top; prior_top++) {
+			if (lua_isstring(L, -1)) {
+				const char* val = lua_tostring(L, -1);
+				add_message(val, iserr ? Colour(255,50,50) : Colour(120,120,255));
+			}
+			lua_pop(L, 1);
+		}
+
+
 		return true;
 	}
 
@@ -240,7 +318,6 @@ void GameChat::toggle_chat(GameState* gs) {
 		if (!typed_message.message.empty()) {
 			typed_message.sender = local_sender;
 			typed_message.sender_colour = Colour(37, 207, 240);
-			const char* content = NULL;
 			if (!handle_special_commands(gs, typed_message.message)) {
 				add_message(typed_message);
 			}

@@ -38,6 +38,7 @@ void CombatStats::gain_level() {
 	core.defence += ct.def_perlevel;
 	core.strength += ct.str_perlevel;
 	core.magic += ct.mag_perlevel;
+	core.willpower += ct.will_perlevel;
 
 	core.hpregen += ct.hpregen_perlevel;
 	core.mpregen += ct.mpregen_perlevel;

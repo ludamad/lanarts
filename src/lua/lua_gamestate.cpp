@@ -70,7 +70,7 @@ public:
 			projectile_id = gs->add_instance(inst);
 		}
 
-		lua_pushgameinst(L, projectile_id);
+		lua_push_gameinst(L, projectile_id);
 		return 0;
 	}
 
@@ -79,7 +79,7 @@ public:
 		lua_createtable(L, 0, 0);
 		int table = lua_gettop(L);
 		for (int i = 0; i < pc.player_ids().size(); i++) {
-			lua_pushgameinst(L, pc.player_ids()[i]);
+			lua_push_gameinst(L, pc.player_ids()[i]);
 			//  lua_pushnumber(L, 2);
 			lua_rawseti(L, table, i + 1);
 		}

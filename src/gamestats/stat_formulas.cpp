@@ -54,6 +54,11 @@ static void derive_from_equipment(MTwist& mt, EffectiveStats& effective,
 	WeaponEntry& wentry = equipment.weapon.weapon_entry();
 	effective.physical.damage = wentry.damage.calculate(mt, core);
 	effective.physical.power = wentry.power.calculate(mt, core);
+	if (equipment.projectile.valid_projectile()){
+		ProjectileEntry& pentry = equipment.projectile.projectile_entry();
+		effective.physical.damage += pentry.damage.calculate(mt, core);
+		effective.physical.power += pentry.power.calculate(mt, core);
+	}
 	effective.physical.resistance = core.defence;
 	effective.magic.damage = core.magic;
 	effective.magic.resistance = core.willpower;

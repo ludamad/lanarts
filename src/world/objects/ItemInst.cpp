@@ -23,7 +23,7 @@ void ItemInst::step(GameState *gs) {
 	GameInst* other_item = NULL;
 	ItemEntry& ientry = item.item_entry();
 	if (ientry.stackable
-			&& gs->solid_test(this, &other_item, 1, same_item_colfilter)) {
+			&& gs->object_radius_test(this, &other_item, 1, same_item_colfilter)) {
 		ItemInst* oinst = (ItemInst*)other_item;
 		if (oinst->item == item && id < oinst->id) {
 			gs->remove_instance(oinst);

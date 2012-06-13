@@ -278,6 +278,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 	if (!cooldowns().can_doaction())
 		return;
 
+	Pos start(x,y);
 	Pos actpos(action.action_x, action.action_y);
 
 	if (wentry.uses_projectile && !equipment().has_projectile())
@@ -290,11 +291,13 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 
 		equipment().use_ammo();
 
-		ObjCallback drop_callback(projectile_item_drop, (void*)item);
-
-		GameInst* bullet = new ProjectileInst(pentry.attack_sprite, id,
-				pentry.speed, weaprange, estats.magic.damage, x, y, actpos.x, actpos.y,
-				false, 0, NONE, drop_callback);
+//		ObjCallback drop_callback(projectile_item_drop, (void*)item);
+//		const Projectile& projectile,
+//				const EffectiveStats& stats, obj_id origin_id, const Pos& start,
+//				const Pos& target, float speed, int range, obj_id sole_target,
+//				bool bounce, int hits) :
+		GameInst* bullet = new _ProjectileInst(equipment().projectile, estats, id, start, actpos,
+				pentry.speed, weaprange);
 		gs->add_instance(bullet);
 		cooldowns().reset_action_cooldown(
 				std::max(wentry.cooldown, pentry.cooldown));

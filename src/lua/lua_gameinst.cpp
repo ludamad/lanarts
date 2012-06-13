@@ -182,7 +182,7 @@ void lua_gameinst_bindings(GameState* gs, lua_State* L) {
 	lua_settable(L, tableind);
 }
 
-void lua_pushgameinst(lua_State* L, obj_id id) {
+void lua_push_gameinst(lua_State* L, obj_id id) {
 	lunar_t::push(L, new GameInstLuaBinding(L, id), true);
 }
 const char GameInstLuaBinding::className[] = "GameInst";
