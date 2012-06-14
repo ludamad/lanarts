@@ -9,7 +9,7 @@ local function avg(val)
     end
 end
 
-local INTERVAL = 30
+local INTERVAL = 50
 local function dmgformula(power, damage, resist, reduction)
     local base_damage = damage - reduction
     if base_damage < 0 then return 0 end
@@ -35,8 +35,8 @@ local function hits_for_mons(power, damage, magicness)
         local hp = avg(stats.hp)
         local def = avg(stats.defence)
         local will = avg(stats.willpower)
-        local physdam = dmgformula(power, damage, def, avg(stats.physical_reduction))
-        local magicdam = dmgformula(power, damage, will, avg(stats.magic_reduction))
+        local physdam = dmgformula(power, damage, def/2.5, avg(stats.physical_reduction))
+        local magicdam = dmgformula(power, damage, will/2.5, avg(stats.magic_reduction))
         local dam = physdam * physicalness + magicdam * magicness
         local avgdam = 99999
         if dam > 0 then avgdam = hp / dam end
@@ -53,31 +53,6 @@ end
 
 local function hitstats(atk, willpower, defence)
 
-end
-
-local function hits_for_player(willpower, defence)
-    print("\t\thits_for_player("..power..","..damage..","..magicness..")")
-    local physicalness = 1 - magicness
-    local name_and_hits = {}
-
-    for name, mons in pairs(enemies) do
-        local stats = mons.stats
-        local hp = avg(stats.hp)
-        local def = avg(stats.defence)
-        local will = avg(stats.willpower)
-        local physdam = dmgformula(power, damage, def, 0)
-        local magicdam = dmgformula(power, damage, will, 0)
-        local dam = physdam * physicalness + magicdam * magicness
-        local avgdam = 99999
-        if dam > 0 then avgdam = hp / dam end
-		table.insert(name_and_hits, {name, avgdam})
-    end 
-    table.sort(name_and_hits, enemy_order)
-    
-    for _, namedam in ipairs(name_and_hits) do
-    	local name, avgdam = unpack(namedam)
-        print("\t\t\t"..name .. ": AVG: " .. avgdam .. " hits")
-    end
 end
 
 local function atlevel(stats, gain, leveln)
@@ -99,9 +74,9 @@ function class_test(class, magicness)
 		local copy = atlevel(stats, gain, leveln)
 		print("\tFor level " .. leveln)
 		if magicness == 1.0 then
-			hits_for_mons(copy.magic + 1.5, copy.magic + 1, magicness)
+			hits_for_mons(copy.magic + 6.5, 1 + copy.magic/5, magicness)
 		else
-			hits_for_mons(copy.strength * 1.6 + 12.5, copy.strength *1.1 + 3.5, magicness)
+			hits_for_mons(copy.strength * 1.6 + 12.5, 5 + copy.strength/5, magicness)
 		end
 	end
 end

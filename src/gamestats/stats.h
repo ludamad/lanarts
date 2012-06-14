@@ -56,7 +56,7 @@ struct CoreStatMultiplier {
 /* Derived combat stats, power & damage represent bonuses
  * They are not fully determined until EffectiveAttackStats is created */
 struct DerivedStats {
-	int power, resistance;
+	float power, resistance;
 	int damage, reduction;
 	DerivedStats(int power = 0, int resistance = 0, int damage = 0,
 			int reduction = 0, int cooldown = 0) :

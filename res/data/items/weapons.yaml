@@ -5,14 +5,14 @@ weapons:
     spr_item: hand
     #Damage: { base: <range>, strength: <multiplier>, magic: <multiplier> }
     damage: {base: [2,5], strength: 1.0}
-    power: {base: 0, strength: 1.0}
+    power: {base: 0, strength: 0.2}
     range: 20
     cooldown: 30
 
   - name: Dagger
     weapon_class: short blades
     damage: {base: [4,9], strength: 1.3}
-    power: {base: 0, strength: 1.0}
+    power: {base: 0, strength: 0.2}
     range: 17
     cooldown: 25
     spr_item: dagger
@@ -21,7 +21,7 @@ weapons:
     weapon_class: short blades
     max_targets: 2
     damage: {base: [6,12], strength: 1.6}
-    power: {base: 0, strength: 1.0}
+    power: {base: 0, strength: 0.2}
     range: 18
     cooldown: 42
     spr_item: short sword
@@ -40,7 +40,7 @@ weapons:
     uses_projectile: yes
     #Stats
     damage: {base: [8,16], strength: 1.0}
-    power: {base: 0, strength: 1.0}
+    power: {base: 0, strength: 0.2}
     range: 400
     cooldown: 42
     spr_item: bow1

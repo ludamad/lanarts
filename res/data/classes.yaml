@@ -9,10 +9,10 @@ classes:
         mp: 100
         hpregen: 0.033
         mpregen: 0.066
-        strength: 7
-        defence: 5
+        strength: 3
+        defence: 3
         willpower: 5
-        magic: 10
+        magic: 5
     gain_per_level:
         hp: 15
         mp: 20
@@ -31,10 +31,10 @@ classes:
         mp: 50
         hpregen: 0.055
         mpregen: 0.044
-        strength: 12
+        strength: 6
         defence: 5
-        willpower: 5
-        magic: 5
+        willpower: 3
+        magic: 2
     gain_per_level:
         hp: 30
         mp: 10
