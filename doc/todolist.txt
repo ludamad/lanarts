@@ -10,12 +10,9 @@ Large:
 - Add doors and other dungeon features such as keys etc
 
 Medium:
-- Make game based on Strength/Defence/Agility and Magic/Resistance
-	- add attack rate to base stats -> agility
 - Add higher level sprite class that handles animation & orientation & multiple tile variations
 - Add in-game chat support for multiplayer
 - Support for double-sized enemies (2x2 tile size max)
-- Add start up screen with networking options
 - Special case pushing for tight corridors ?
 - Straight line AOE spell
 - Lightning Spell that takes up multiple squares
@@ -28,33 +25,30 @@ Medium:
 
 
 Small:
-- Add item use preconditions so items are not wasted when they cannot be used
 - Have a flexible portal system that indicates which level to connect to
 - Add cooldowns to item use
 
 Partial Completion:
 - [DONE WITH BUGS/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
 - [STARTED] Classes for players
-
-- [IFFY] Unification of code-path's for PlayerInst/EnemyInst ?
 - [DONE - IMPROVE VISIBILITY] More visual output on the minimap [Stairs etc]
-- [DONE - VERY RARE INSTANCES LEFT] Fix monsters getting stuck due to random movement 
-- [DONE - CURRENTLY HARDCODED] Action bar, below screen 
+- [IMPROVED - STILL HARDCODED] Action bar, below screen 
+- [DONE - NEEDS OPTIONS] Add start up screen with networking options
 
 Completed:
-BEFORE 18/04/2012:
+<18/04/2012:
 - [DONE] Refactor room generation with tiered room, tunnel, feature, item generation.
 - [DONE] Move out of combat
 - [DONE] Melee attack animation 
 - [DONE] versatile markup format that allows for human edit-able game objects (YAML?)
 
 
-AFTER 18/04/2012:
+>18/04/2012:
 - [DONE] Refactor away all enum's for resources so order no longer matters
 - [DONE] Actions for players & action replay
 - [DONE] Weapons spawn on ground
 - [DONE] Weapons are usable, with graphical validation (unhardcode them)
-- [MOSTLY DONE] Enemies fan out & walk away from player
+- [MOSTLY DONE] Enemies fan out & walk away from player, some edge cases have it turn off
 
 23/04/2012:
 - [DONE WITH BUGS/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
@@ -73,6 +67,17 @@ AFTER 18/04/2012:
 - [DONE] Fix melee attacks -> add to action bar and make them not based on running into enemies, instead holding j/mouse
 
 
-May 17 2012:
+17/05/2012:
 - [DONE] Specify a draw order (or draw & execution order) for objects based on a depth parameter & object id
 - [DONE] Support for multiple PlayerInst (Maybe re-use PlayerInst for summoned monsters ?)
+
+
+<14/06/2012:
+- [DONE] Unification of code-path's for PlayerInst/EnemyInst ?
+- [DONE - SHOULD BE FIXED] Fix monsters getting stuck due to random movement 
+- [IMPROVED - STILL HARDCODED] Action bar, below screen 
+- [DONE] Add item use preconditions so items are not wasted when they cannot be used
+- [DONE] Make game based on Strength/Defence/Agility and Magic/Resistance
+	- [WONTDO] add attack rate to base stats -> agility
+
+

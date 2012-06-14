@@ -9,19 +9,6 @@
 #include "../world/objects/PlayerInst.h"
 #include "../world/objects/ProjectileInst.h"
 
-static Stats* get_stats(GameInst* inst) {
-	PlayerInst* p;
-	EnemyInst* e;
-//	if ((p = dynamic_cast<CombatGameInst*>(inst))) {
-//		return &p->stats();
-//	if ((e = dynamic_cast<EnemyInst*>(inst))) {
-//		return &e->oldstats();
-//	} else {
-//		return NULL;
-//	}
-	return NULL;
-}
-
 class GameStateLuaBinding {
 public:
 	static const char className[];
@@ -57,18 +44,17 @@ public:
 
 		obj_id projectile_id = 0;
 		GameInst* origin_obj = gs->get_instance(origin_id);
-		Stats* s = get_stats(origin_obj);
 
-		if (s != NULL) {
-//			ProjectileInst(sprite_id sprite, obj_id originator, float speed, int range,
-//					int damage, int x, int y, int tx, int ty, bool bounce = false,
-//					int hits = 1, obj_id target = NONE);
-			GameInst* inst = new ProjectileInst(sprite, origin_id, lua_tonumber(L, 5),
-					lua_tonumber(L, 6), lua_tonumber(L, 7), origin_obj->x, origin_obj->y,
-					lua_tonumber(L, 2), lua_tonumber(L, 3), bounce,
-					hits, target);
-			projectile_id = gs->add_instance(inst);
-		}
+//		if (s != NULL) {
+////			ProjectileInst(sprite_id sprite, obj_id originator, float speed, int range,
+////					int damage, int x, int y, int tx, int ty, bool bounce = false,
+////					int hits = 1, obj_id target = NONE);
+//			GameInst* inst = new ProjectileInst(sprite, origin_id, lua_tonumber(L, 5),
+//					lua_tonumber(L, 6), lua_tonumber(L, 7), origin_obj->x, origin_obj->y,
+//					lua_tonumber(L, 2), lua_tonumber(L, 3), bounce,
+//					hits, target);
+//			projectile_id = gs->add_instance(inst);
+//		}
 
 		lua_push_gameinst(L, projectile_id);
 		return 0;

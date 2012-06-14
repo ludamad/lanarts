@@ -11,20 +11,18 @@ struct lua_State;
 struct GameState;
 struct ItemEntry;
 struct EffectEntry;
-struct Stats;
+struct CombatStats;
+struct EffectiveStats;
 
 obj_id lua_gameinst_arg(lua_State* L, int narg);
 EffectEntry& lua_effects_arg(lua_State* L, int narg);
 void lua_push_gameinst(lua_State* L, obj_id id);
 void lua_pusheffects(lua_State* L, int effectnum);
-void lua_pushstats(lua_State* L, obj_id id);
-void lua_pushstats(lua_State* L, const Stats& stats);
 
 void lua_push_combatstats(lua_State* L, obj_id id);
-void lua_push_combatstats(lua_State* L, const Stats& stats);
-void lua_push_effective_stats(lua_State* L, const Stats& stats);
+void lua_push_combatstats(lua_State* L, const CombatStats& stats);
+void lua_push_effective_stats(lua_State* L, const EffectiveStats& stats);
 
-Stats* lua_getstats(lua_State* L, int idx);
 GameState* lua_get_gamestate(lua_State* L);
 
 void lua_gameinst_bindings(GameState* gs, lua_State* L);

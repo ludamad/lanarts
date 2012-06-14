@@ -9,3 +9,5 @@ dofile "res/lua/items.lua"
 dofile "res/lua/effects.lua"
 dofile "res/lua/spells.lua"
 
+-- Balance measurement related files
+dofile "res/lua/tests/progressions.lua"

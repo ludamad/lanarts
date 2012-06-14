@@ -270,24 +270,34 @@ bool GameChat::handle_special_commands(GameState* gs,
 		add_message(printed);
 		return true;
 	}
+
+	lua_State* L = gs->get_luastate();
+	static LuaValue script_globals;
+	if (script_globals.empty()) {
+		script_globals.table_initialize(L);
+//		script_globals.push(L);
+//		int script = lua_gettop(L);
+//		lua_pushvalue(L, LUA_GLOBALSINDEX);
+//		lua_setmetatable(L, script);
+//		lua_pop(L, 1);
+	}
+
+	lua_push_gameinst(L, p->id);
+	script_globals.table_pop_value(L, "player");
+	lua_push_combatstats(L, p->id);
+	script_globals.table_pop_value(L, "stats");
+
 	//Run lua command
 	if (starts_with(command, "!lua ", &content)) {
-		static LuaValue script_globals;
-		lua_State* L = gs->get_luastate();
-
-		lua_push_gameinst(L, p->id);
-		script_globals.table_pop_value(L, "player");
-		lua_push_combatstats(L, p->id);
-		script_globals.table_pop_value(L, "stats");
-
 //		std::string luafunc = std::string(content);
 
 		int prior_top = lua_gettop(L);
 
 		luaL_loadstring(L, content);
-		if (lua_isstring(L, -1)){
+		if (lua_isstring(L, -1)) {
 			const char* val = lua_tostring(L, -1);
-			add_message(val, /*iserr ? Colour(255,50,50) :*/ Colour(120,120,255));
+			add_message(val, /*iserr ? Colour(255,50,50) :*/
+			Colour(120, 120, 255));
 			return true;
 		}
 
@@ -302,11 +312,36 @@ bool GameChat::handle_special_commands(GameState* gs,
 		for (; prior_top < current_top; prior_top++) {
 			if (lua_isstring(L, -1)) {
 				const char* val = lua_tostring(L, -1);
-				add_message(val, iserr ? Colour(255,50,50) : Colour(120,120,255));
+				add_message(val,
+						iserr ? Colour(255, 50, 50) : Colour(120, 120, 255));
 			}
 			lua_pop(L, 1);
 		}
 
+		return true;
+	}
+	//Run lua file
+	if (starts_with(command, "!luafile ", &content)) {
+		int prior_top = lua_gettop(L);
+
+		int err_func = luaL_loadfile(L, content);
+		if (err_func) {
+			const char* val = lua_tostring(L, -1);
+			add_message(val, Colour(120, 120, 255));
+			lua_pop(L, 1);
+			return true;
+		}
+
+		int lfunc = lua_gettop(L);
+		script_globals.push(L);
+		lua_setfenv(L, lfunc);
+
+		bool err_call = (lua_pcall(L, 0, 0, 0) != 0);
+		if (err_call) {
+			const char* val = lua_tostring(L, -1);
+			add_message(val, Colour(120, 120, 255));
+			lua_pop(L, 1);
+		}
 		return true;
 	}
 

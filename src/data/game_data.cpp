@@ -89,12 +89,7 @@ int get_weapon_by_name(const char* name) {
 }
 
 int get_tileset_by_name(const char* name) {
-	for (int i = 0; i < game_tileset_data.size(); i++) {
-		if (name == game_tileset_data[i].name) {
-			return i;
-		}
-	}LANARTS_ASSERT(false);
-	return 0;
+	return get_X_by_name(game_tileset_data, name);
 }
 
 LuaValue sprites, enemies, effects, weapons, projectiles, items, dungeon,
@@ -123,9 +118,8 @@ void init_game_data(lua_State* L) {
 
 static void register_as_global(lua_State* L, LuaValue& value,
 		const char* name) {
-	lua_pushstring(L, name);
 	value.push(L);
-	lua_settable(L, LUA_GLOBALSINDEX);
+	lua_setglobal(L, name);
 }
 
 template<class T>
@@ -152,13 +146,15 @@ void init_lua_data(GameState* gs, lua_State* L) {
 	__lua_init(L, game_enemy_data);
 	__lua_init(L, game_effect_data);
 	__lua_init(L, game_item_data);
+
+	lua_getglobal(L, "level_tests");
+	lua_call(L, 0, 0);
 }
 
-static void luayaml_push(LuaValue& value, lua_State *L, const char *name) {
+static void luayaml_push(LuaValue& value, lua_State *L, const char* name) {
 	value.push(L);
 	int tableind = lua_gettop(L);
-	lua_pushstring(L, name);
-	lua_gettable(L, tableind);
+	lua_getfield(L, tableind, name);
 	lua_replace(L, tableind);
 }
 void luayaml_push_item(lua_State *L, const char* name) {

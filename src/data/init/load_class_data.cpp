@@ -46,6 +46,7 @@ ClassType parse_class(const YAML::Node& n) {
 void load_class_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	game_class_data.push_back(parse_class(node));
+	value->table_set_yaml(L, game_class_data.back().name, &node);
 }
 
 LuaValue load_class_data(lua_State* L, const FilenameList& filenames) {

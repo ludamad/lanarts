@@ -22,12 +22,12 @@ struct CoreStats {
 	int hp, max_hp;
 	int mp, max_mp;
 	int strength, defence, magic, willpower;
-	int base_magic_reduction, base_physical_reduction;
+	int magic_reduction, physical_reduction;
 	float hpregen, mpregen;
 
 	CoreStats() :
 			hp(0), max_hp(0), mp(0), max_mp(0), strength(0), defence(0), magic(
-					0), willpower(0), base_magic_reduction(0), base_physical_reduction(
+					0), willpower(0), magic_reduction(0), physical_reduction(
 					0), hpregen(0), mpregen(0), hp_regened(0), mp_regened(0) {
 	}
 

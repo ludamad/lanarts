@@ -1,8 +1,6 @@
 /*
- * load_dungeon_data.cpp
- *
- *  Created on: Mar 26, 2012
- *      Author: 100397561
+ * load_dungeon_data.cpp:
+ *  Load dungeon branch & level data
  */
 
 #include <fstream>

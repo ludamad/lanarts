@@ -12,23 +12,6 @@ extern "C" {
 
 #include <yaml-cpp/yaml.h>
 
-static void lua_registry_newtable(lua_State* L, void* addr) {
-	lua_pushlightuserdata(L, addr); /* push address as key */
-	lua_newtable(L);
-	lua_settable(L, LUA_REGISTRYINDEX);
-}
-
-static void lua_registry_push(lua_State* L, void* object) {
-	lua_pushlightuserdata(L, object); /* push address as key */
-	lua_gettable(L, LUA_REGISTRYINDEX);
-}
-
-static void lua_registry_erase(lua_State* L, void* object) {
-	lua_pushlightuserdata(L, object); /* push address as key */
-	lua_pushnil(L); /* push nil as value */
-	lua_settable(L, LUA_REGISTRYINDEX);
-}
-
 //YAML related helper functions
 
 static bool nodeis(const YAML::Node* node, const char* str) {
@@ -96,7 +79,7 @@ public:
 
 	void deinitialize(lua_State* L) {
 		lua_pushlightuserdata(L, this); /* push address as key */
-		lua_pushnil(L);
+		lua_pushnil(L); /* push nil as value */
 		lua_settable(L, LUA_REGISTRYINDEX);
 	}
 
@@ -117,50 +100,46 @@ public:
 
 	void table_pop_value(lua_State* L, const char* key) {
 		int value = lua_gettop(L);
-		lua_registry_push(L, this); /*Get the associated lua table*/
+		push(L); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
-		lua_pushstring(L, key); /*Push the key*/
 		lua_pushvalue(L, value); /*Clone value*/
-		lua_settable(L, tableind);
+		lua_setfield(L, tableind, key);
 		/*Pop table and value*/
 		lua_pop(L, 2);
 	}
 
 	void table_push_value(lua_State* L, const char* key) {
-		lua_registry_push(L, this); /*Get the associated lua table*/
+		push(L); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
 		lua_pushstring(L, key); /*Push the key*/
 		lua_gettable(L, tableind);
-//		lua_replace(L, tableind);
+		lua_replace(L, tableind);
 	}
 
 	void table_set_function(lua_State* L, const char* key,
 			lua_CFunction value) {
-		lua_registry_push(L, this); /*Get the associated lua table*/
+		push(L); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
-		lua_pushstring(L, key);
-		lua_pushcfunction(L, value);
 		/*Push the C function*/
-		lua_settable(L, tableind);
-		lua_pop(L, 1);
+		lua_pushcfunction(L, value);
+		lua_setfield(L, tableind, key);
 		/*Pop table*/
+		lua_pop(L, 1);
 	}
 	void table_set_number(lua_State* L, const char* key, double value) {
 		push(L); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
-		lua_pushstring(L, key);
 		lua_pushnumber(L, value); /*Push the number*/
-		lua_settable(L, -3);
+		lua_setfield(L, tableind, key);
 		/*Pop table*/
 		lua_pop(L, 1);
 	}
 	void table_set_newtable(lua_State* L, const char* key) {
-		lua_registry_push(L, this); /*Get the associated lua table*/
+		push(L); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
-		lua_pushstring(L, key);
 		lua_newtable(L);
 		/*Push a new table*/
-		lua_settable(L, tableind);
+		lua_setfield(L, tableind, key);
 		/*Pop table*/
 		lua_pop(L, 1);
 	}
@@ -168,9 +147,9 @@ public:
 	void table_set_yaml(lua_State* L, const char* key, const YAML::Node* root) {
 		push(L); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
-		lua_pushstring(L, key);
+		/*Push a YAML node as a lua value*/
 		push_yaml_node(L, root);
-		lua_settable(L, tableind);
+		lua_setfield(L, tableind, key);
 		/*Pop table*/
 		lua_pop(L, 1);
 	}
@@ -273,14 +252,17 @@ void LuaValue::table_set_newtable(lua_State* L, const char *key) {
 
 LuaValue::LuaValue(const LuaValue & value) {
 	impl = value.impl;
-	if (impl)
-		impl->ref_count()++;}
+	if (impl) {
+		impl->ref_count()++;
+	}
+}
 
 void LuaValue::operator =(const LuaValue & value) {
 	deref(impl);
 	impl = value.impl;
 	if (impl)
-		impl->ref_count()++;}
+		impl->ref_count()++;
+}
 
 void LuaValue::table_set_yaml(lua_State* L, const char *key,
 		const YAML::Node *root) {

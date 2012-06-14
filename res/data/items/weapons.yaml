@@ -11,8 +11,7 @@ weapons:
 
   - name: Dagger
     weapon_class: short blades
-    damage: [8, 12]
-    damage: {base: [2,5], strength: 1.3}
+    damage: {base: [4,9], strength: 1.3}
     power: {base: 0, strength: 1.0}
     range: 17
     cooldown: 25
@@ -20,9 +19,8 @@ weapons:
 
   - name: Short Sword
     weapon_class: short blades
-    damage: [16, 20]
     max_targets: 2
-    damage: {base: [2,5], strength: 1.6}
+    damage: {base: [6,12], strength: 1.6}
     power: {base: 0, strength: 1.0}
     range: 18
     cooldown: 42
@@ -30,9 +28,8 @@ weapons:
 
   - name: Mace
     weapon_class: maces and flails
-    damage: [20, 22]
     max_targets: 2
-    damage: {base: [2,5], strength: 2.0}
+    damage: {base: [8,14], strength: 2.0}
     power: {base: [2,5], strength: 1.1}
     range: 18
     cooldown: 55
