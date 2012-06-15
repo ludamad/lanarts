@@ -3,20 +3,27 @@
  *  Contains procedures related to generating a full dungeon level
  */
 
-#include "levelgen.h"
 #include <cstdio>
-#include "../world/GameState.h"
+
+#include "../data/dungeon_data.h"
+
 #include "../world/objects/PlayerInst.h"
+
+#include "../world/GameState.h"
+
+#include "GeneratedLevel.h"
+#include "levelgen.h"
 
 const int TOO_MANY_ATTEMPTS = 1000;
 
 //return false on failure
-bool generate_room(const RoomGenSettings& rs, MTwist& mt, GeneratedLevel& level, const Region& r, int room_id) {
+bool generate_room(const RoomGenSettings& rs, MTwist& mt, GeneratedLevel& level,
+		const Region& r, int room_id) {
 	if (!level.verify(r))
 		return false;
 	bool marked = (mt.rand(4) == 0);
-	int mark = marked ? mt.rand(1,4) : 0;
-	Sqr val = Sqr( true, false, false, (feature_t)mark, 0, room_id );
+	int mark = marked ? mt.rand(1, 4) : 0;
+	Sqr val = Sqr(true, false, false, (feature_t) mark, 0, room_id);
 	level.set_region_with_perimeter(r, val, rs.room_padding);
 //	Region reg(r.x,r.y, 10, 10);
 //	level.set_circle_with_perimeter(reg, val, rs.room_padding);
@@ -35,25 +42,26 @@ void generate_rooms(const RoomGenSettings& rs, MTwist& mt,
 	for (int id = 1; id <= rs.amount_of_rooms; id++) {
 		for (int attempts = 0;; attempts++) {
 
-			int rw = mt.rand(minr, maxr+1);
-			int rh = mt.rand(minr, maxr+1);
+			int rw = mt.rand(minr, maxr + 1);
+			int rh = mt.rand(minr, maxr + 1);
 
 			int rx = mt.rand(w - 1 - rs.room_padding) | 1;
 			int ry = mt.rand(h - 1 - rs.room_padding) | 1;
 
 			Region r(rx, ry, rw, rh);
-			Room room(
-					Region(rx + pad, ry + pad, rw - pad * 2, rh - pad * 2), 0);
+			Room room(Region(rx + pad, ry + pad, rw - pad * 2, rh - pad * 2),
+					0);
 
 			if (generate_room(rs, mt, level, r, id)) {
 				room_list.push_back(room);
 				break;
 			}
 			if (attempts > TOO_MANY_ATTEMPTS)
-				goto NoMoreRooms;// Goto below
+				goto NoMoreRooms;
+			// Goto below
 		}
 	}
-	NoMoreRooms:				 // Come from above
+	NoMoreRooms: // Come from above
 
 	/*Room erosion/dilation*/
 	int remove_corners_chance = 20;
@@ -62,18 +70,25 @@ void generate_rooms(const RoomGenSettings& rs, MTwist& mt,
 		bool remove_corners = mt.rand(100) <= remove_corners_chance;
 		for (int y = r.y - 1; y < r.y + r.h + 1; y++)
 			for (int x = r.x - 1; x < r.x + r.w + 1; x++) {
-				Sqr& s = level.at(x,y);
+				Sqr& s = level.at(x, y);
 				if (s.is_corner && remove_corners)
 					s.passable = false;
 			}
 	}
 }
 
-
-
-void generate_level(const LevelGenSettings& ls, MTwist& mt,
-		GeneratedLevel& level, GameState* gs) {
+GameLevelState* generate_level(int roomid, MTwist& mt, GeneratedLevel& level,
+		GameState* gs) {
+	DungeonBranch& branch = game_dungeon_data[DNGN_MAIN_BRANCH];
+	const LevelGenSettings& ls = branch.level_data[roomid];
 	level.initialize(ls.level_w, ls.level_h);
+
+	GameLevelState* newlvl = new GameLevelState(roomid, DNGN_MAIN_BRANCH,
+			roomid, level.width() * TILE_SIZE, level.height() * TILE_SIZE);
+
+	GameLevelState* prevlvl = gs->level(); //Save level context
+	gs->level() = newlvl; //Set level context to new level
+
 	printf("level.init RNG state at %d numbers\n", mt.amount_of_randoms);
 	generate_rooms(ls.rooms, mt, level);
 	printf("ROOMS state at %d numbers\n", mt.amount_of_randoms);
@@ -85,4 +100,10 @@ void generate_level(const LevelGenSettings& ls, MTwist& mt,
 	printf("ENEMIES state at %d numbers\n", mt.amount_of_randoms);
 	generate_items(ls.items, mt, level, gs);
 	printf("ITEMS state at %d numbers\n", mt.amount_of_randoms);
+	newlvl->rooms = level.rooms();
+
+	gs->level() = prevlvl; //Restore level context
+
+
+	return newlvl;
 }

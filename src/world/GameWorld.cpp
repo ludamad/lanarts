@@ -1,17 +1,19 @@
 /*
- * GameWorld.cpp
- *
- *  Created on: Apr 14, 2012
- *      Author: 100397561
+ * GameWorld.cpp:
+ * 	Contains all the information and functionality of previously generated levels,
+ * 	and which levels are currently being generated
  */
 
-#include "GameWorld.h"
-#include "GameState.h"
-#include "GameLevelState.h"
-#include "../data/dungeon_data.h"
 #include "../data/tile_data.h"
 #include "../data/class_data.h"
+
+#include "../procedural/levelgen.h"
+
 #include "objects/PlayerInst.h"
+
+#include "GameState.h"
+#include "GameLevelState.h"
+#include "GameWorld.h"
 
 GameWorld::GameWorld(GameState* gs) :
 		game_state(gs), next_room_id(-1) {
@@ -101,18 +103,12 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer,
 		level_states.resize(roomid + 1, NULL);
 	}
 	if (!level_states[roomid]) {
-
-		DungeonBranch& mainbranch = game_dungeon_data[DNGN_MAIN_BRANCH];
 		GeneratedLevel genlevel;
-		generate_level(mainbranch.level_data[roomid], game_state->rng(),
+		GameLevelState* newlvl = generate_level(roomid, game_state->rng(),
 				genlevel, game_state);
 
-		GameLevelState* newlvl = new GameLevelState(roomid, DNGN_MAIN_BRANCH,
-				roomid, genlevel.width(), genlevel.height());
-		game_state->level() = newlvl;
-		level_states[roomid] = game_state->level();
+		game_state->level() = level_states[roomid] = newlvl;
 
-		game_state->level()->rooms = genlevel.rooms();
 		if (spawnplayer) {
 			spawn_players(genlevel, player_instances, nplayers);
 		}

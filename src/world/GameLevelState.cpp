@@ -30,6 +30,21 @@ void GameLevelState::copy_to(GameLevelState & level) const {
 	level.steps_left = this->steps_left;
 }
 
+int GameLevelState::room_within(const Pos& p) {
+	    for(int i = 0;i < rooms.size();i++){
+	        int px = p.x / TILE_SIZE, py = p.y / TILE_SIZE;
+	        const Region & r = rooms[i].room_region;
+	        if(r.x <= px && r.x + r.w >= px){
+	            if(r.y <= py && r.y + r.h >= py){
+	                return i;
+	            }
+	        }
+
+	    }
+
+	    return -1;
+}
+
 GameLevelState* GameLevelState::clone() const{
 	GameLevelState* state = new GameLevelState(roomid, branch_number, level_number, width, height, is_simulation);
 	copy_to(*state);

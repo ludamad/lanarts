@@ -59,6 +59,7 @@ private:
 	/* Helper method for drawing mini-map based on game information */
 	void draw_minimap(GameState* gs, const BBox& bbox);
 
+	BBox minimapbox;
 	int x, y, _width, _height;
 	Colour bg_colour;
 	char* minimap_arr;

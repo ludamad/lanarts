@@ -39,8 +39,8 @@ static void draw_player_statbars(GameState*gs, PlayerInst* player, int x,
 
 	gl_printf(gs->primary_font(), Colour(0, 0, 0), x + 30, y + 15, "%d/%d",
 			core.mp, core.max_mp);
-	gl_draw_statbar(x, y + 30, 100, 10, class_stats.xp, class_stats.xpneeded, Colour(255, 215, 11),
-			Colour(169, 143, 100));
+	gl_draw_statbar(x, y + 30, 100, 10, class_stats.xp, class_stats.xpneeded,
+			Colour(255, 215, 11), Colour(169, 143, 100));
 
 	gl_printf(gs->primary_font(), Colour(0, 0, 0), x + 30, y + 30, "%d/%d",
 			class_stats.xp, class_stats.xpneeded);
@@ -54,8 +54,8 @@ static void draw_player_statbars(GameState*gs, PlayerInst* player, int x,
 				"can rest", player->rest_cooldown() * 100 / REST_COOLDOWN);
 }
 
-static void draw_player_inventory_slot(GameState* gs, _ItemSlot& itemslot, int x,
-		int y) {
+static void draw_player_inventory_slot(GameState* gs, _ItemSlot& itemslot,
+		int x, int y) {
 	if (itemslot.amount > 0) {
 		ItemEntry& itemd = itemslot.item.item_entry();
 		GLimage& itemimg = game_sprite_data[itemd.sprite_number].img();
@@ -174,7 +174,7 @@ static void draw_rect2d(char* buff, int w, int h, int x, int y, int mx, int my,
 }
 
 BBox GameHud::minimap_bbox() {
-	return BBox(x + 20, y + 64 + 45, x + 20 + 128, y + 64 + 45 + 128);
+	return minimapbox;
 }
 
 void GameHud::step(GameState *gs) {
@@ -321,7 +321,7 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 	view.max_tile_within(max_tilex, max_tiley);
 
 	int minimap_x = bbox.x1, minimap_y = bbox.y1;
-	int minimap_w = 128 /*bbox.width()*/, minimap_h = 128 /*bbox.height()*/;
+	int minimap_w = bbox.width(), minimap_h = bbox.height();
 	int ptw = power_of_two(minimap_w), pth = power_of_two(minimap_h);
 	if (!minimap_arr) {
 		minimap_arr = new char[ptw * pth * 4];
@@ -385,6 +385,11 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 	gl_draw_image(minimap_buff, minimap_x, minimap_y);
 }
 void GameHud::draw(GameState* gs) {
+	int minimap_relposx = 20, minimap_relposy = 64 + 45;
+	minimapbox = BBox(x + minimap_relposx, y + minimap_relposy,
+			x + minimap_relposx + gs->level()->tile_width(),
+			y + minimap_relposy + gs->level()->tile_height());
+
 	gl_set_drawing_area(x, y, _width, _height);
 	gl_draw_rectangle(0, 0, _width, _height, bg_colour);
 
