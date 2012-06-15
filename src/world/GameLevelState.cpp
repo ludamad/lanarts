@@ -41,7 +41,6 @@ int GameLevelState::room_within(const Pos& p) {
 	        }
 
 	    }
-
 	    return -1;
 }
 

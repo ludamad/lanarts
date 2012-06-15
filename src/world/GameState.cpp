@@ -37,8 +37,8 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-GameState::GameState(const GameSettings& settings, lua_State* L, int width,
-		int height, int vieww, int viewh, int hudw) :
+GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
+		int viewh, int hudw) :
 		settings(settings), L(L), frame_n(0), chat(settings.username), hud(
 				vieww, 0, hudw, viewh), view(0, 0, vieww, viewh, width, height), world(
 				this), mouse_leftdown(0), mouse_rightdown(0), mouse_leftclick(

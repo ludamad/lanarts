@@ -36,8 +36,8 @@ struct GameTiles;
 class GameState {
 public:
 
-	GameState(const GameSettings& settings, lua_State* L, int width, int height,
-			int vieww = 640, int viewh = 480, int hudw = 160);
+	GameState(const GameSettings& settings, lua_State* L, int vieww = 640,
+			int viewh = 480, int hudw = 160);
 	~GameState();
 
 	void init_game();
@@ -145,6 +145,11 @@ public:
 
 	GameLevelState*& level() {
 		return world.get_current_level();
+	}
+	void set_level(GameLevelState* lvl) {
+		world.get_current_level() = lvl;
+		view.world_width = lvl->width;
+		view.world_height = lvl->height;
 	}
 
 	void serialize(FILE *file);

@@ -120,7 +120,6 @@ void init_sdl_gl(bool fullscreen, int w, int h) {
 }
 
 void gl_set_drawing_area(int x, int y, int w, int h) {
-
 	glViewport(x, y, w, h);
 
 	//Set projection

@@ -41,7 +41,7 @@ void init_system(GameSettings& settings, lua_State* L) {
 
 const int HUD_WIDTH = 160;
 
-static void leave_menu(void* flag) {
+static void set_flag_callback(void* flag) {
 	*(bool*)flag = true;
 }
 
@@ -73,7 +73,7 @@ static void menu_loop(GameState* gs, int width, int height) {
 					Colour(255, 255, 255)));
 	gs->add_instance(
 			new ButtonInst("START", BBox(halfw - 60, 400, halfw + 60, 430),
-					leave_menu, &exit));
+					set_flag_callback, &exit));
 
 	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {
 		gs->level()->inst_set.step(gs);
