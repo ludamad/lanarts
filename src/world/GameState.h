@@ -139,13 +139,9 @@ public:
 
 	int key_down_state(int keyval);
 	int key_press_state(int keyval);
-	int width() {
-		return world_width;
-	}
-
-	int height() {
-		return world_height;
-	}
+	/* Get dimensions of game level, in pixels */
+	int width();
+	int height();
 
 	GameLevelState*& level() {
 		return world.get_current_level();
@@ -178,8 +174,6 @@ private:
 	//Event handling code (eg escape presses)
 	int handle_event(SDL_Event *event);
 
-	//Width & height of the world (TODO: push into GameLevelState)
-	int world_width, world_height;
 	int frame_n;
 
 	//Game network connection

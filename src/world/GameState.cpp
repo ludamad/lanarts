@@ -39,10 +39,10 @@ extern "C" {
 
 GameState::GameState(const GameSettings& settings, lua_State* L, int width,
 		int height, int vieww, int viewh, int hudw) :
-		settings(settings), L(L), world_width(width), world_height(height), frame_n(
-				0), chat(settings.username), hud(vieww, 0, hudw, viewh), view(0,
-				0, vieww, viewh, width, height), world(this, width, height), mouse_leftdown(
-				0), mouse_rightdown(0), mouse_leftclick(0), mouse_rightclick(0) {
+		settings(settings), L(L), frame_n(0), chat(settings.username), hud(
+				vieww, 0, hudw, viewh), view(0, 0, vieww, viewh, width, height), world(
+				this), mouse_leftdown(0), mouse_rightdown(0), mouse_leftclick(
+				0), mouse_rightclick(0) {
 	memset(key_down_states, 0, sizeof(key_down_states));
 	init_font(&pfont, settings.font.c_str(), 10);
 	init_font(&menufont, settings.font.c_str(), 20);
@@ -262,6 +262,14 @@ obj_id GameState::add_instance(GameInst *inst) {
 void GameState::remove_instance(GameInst* inst, bool deallocate) {
 	level()->inst_set.remove_instance(inst, deallocate);
 	inst->deinit(this);
+}
+
+int GameState::width() {
+	return level()->width;
+}
+
+int GameState::height() {
+	return level()->height;
 }
 
 GameInst* GameState::get_instance(obj_id id) {

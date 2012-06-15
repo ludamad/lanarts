@@ -8,32 +8,31 @@ class_files: classes.yaml
 effect_files: effects.yaml
 
 enemy_files: 
-  [enemies/basic_enemies.yaml,
-  enemies/boss_enemies.yaml]
-
+  - enemies/basic_enemies.yaml
+  - enemies/boss_enemies.yaml
 
 item_files: items/items.yaml
 
 level_files: levels.yaml
 
 projectile_files: 
-    [projectiles/projectiles.yaml,
-    projectiles/enemy_projectiles.yaml,
-    projectiles/spell_projectiles.yaml]
+  - projectiles/projectiles.yaml
+  - projectiles/enemy_projectiles.yaml
+  - projectiles/spell_projectiles.yaml
 
 spell_files: spells.yaml
 
 sprite_files: 
-  [sprites/item_sprites.yaml,
-  sprites/monster_sprites.yaml,
-  sprites/other_sprites.yaml,
-  sprites/spell_sprites.yaml,
-  sprites/weapon_sprites.yaml]
+ - sprites/item_sprites.yaml
+ - sprites/monster_sprites.yaml
+ - sprites/other_sprites.yaml
+ - sprites/spell_sprites.yaml
+ - sprites/weapon_sprites.yaml
 
 tile_files: tiles.yaml
 
 tileset_files: tilesets.yaml
 
 weapon_files: 
-    [items/weapons.yaml,
-    items/enemy_weapons.yaml]
+  - items/weapons.yaml
+  - items/enemy_weapons.yaml

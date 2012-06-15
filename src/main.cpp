@@ -42,7 +42,7 @@ void init_system(GameSettings& settings, lua_State* L) {
 const int HUD_WIDTH = 160;
 
 static void leave_menu(void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 }
 
 static const char HELP_TEXT[] = "Movement: WASD or Arrow Keys\n"
@@ -174,16 +174,13 @@ int main(int argc, char** argv) {
 	GameSettings settings;
 	init_system(settings, L);
 
-	int world_width = 128 * TILE_SIZE, world_height = 128 * TILE_SIZE;
-
 	int windoww = settings.view_width, windowh = settings.view_height;
 	int vieww = windoww - HUD_WIDTH, viewh = windowh;
 
 	//Initialize the game state and start the level
 	//GameState claims ownership of the passed lua_State*
 
-	GameState* gs = new GameState(settings, L, world_width, world_height, vieww,
-			viewh);
+	GameState* gs = new GameState(settings, L, vieww, viewh);
 
 	gs->update_iostate(); //for first iteration
 

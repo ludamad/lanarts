@@ -16,7 +16,7 @@ struct PlayerInst;
 
 class GameWorld {
 public:
-	GameWorld(GameState* gs, int width, int height);
+	GameWorld(GameState* gs);
 	~GameWorld();
 	void generate_room(GameLevelState* level);
 	GameLevelState* get_level(int roomid, bool spawnplayer = false, void** player_instances = NULL, size_t nplayers = 0);
@@ -35,8 +35,8 @@ public:
 	int get_current_level_id();
 	void connect_entrance_to_exit(int roomid1, int roomid2);
 private:
+	void spawn_players(GeneratedLevel& genlevel, void** player_instances, size_t nplayers);
 	bool midstep;
-	int w, h;
 	int next_room_id;
 	GameLevelState* lvl;
 	GameState* game_state;

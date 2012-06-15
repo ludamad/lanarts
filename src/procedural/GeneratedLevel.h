@@ -95,6 +95,7 @@ public:
 	int region_groupID(const Region& r, Pos& p);
 
 private:
+	GeneratedLevel(const GeneratedLevel&);//DO-NOT-USE
 	Sqr* s;
 	int w, h;
 	std::vector<Room> room_list;

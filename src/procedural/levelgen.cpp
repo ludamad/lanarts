@@ -1,8 +1,6 @@
 /*
- * levelgen.cpp
- *
- *  Created on: Mar 19, 2012
- *      Author: 100397561
+ * levelgen.cpp:
+ *  Contains procedures related to generating a full dungeon level
  */
 
 #include "levelgen.h"

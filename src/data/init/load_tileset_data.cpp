@@ -34,8 +34,8 @@ static TilesetEntry parse_tilesetentry(const YAML::Node& node) {
 
 	Range floor = parse_tile_range(node["floor_tile"]);
 	Range wall = parse_tile_range(node["wall_tile"]);
-	Range corridor = floor;
 	Range altfloor = floor;
+	Range corridor = altfloor;
 	Range altwall = wall;
 	Range altcorridor = corridor;
 
