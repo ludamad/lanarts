@@ -16,7 +16,7 @@ EnemyEntry parse_enemy_type(const YAML::Node& n) {
 //	std::string name, appear_msg, defeat_msg;
 //	int radius;
 //	int xpaward;
-//	int sprite_number;
+//	sprite_id sprite_number, death_sprite;
 //	Stats basestats;
 //	bool unique;
 //
@@ -30,7 +30,8 @@ EnemyEntry parse_enemy_type(const YAML::Node& n) {
 	entry.radius = parse_int(n["radius"]);
 	entry.xpaward = parse_int(n["xpaward"]);
 
-	entry.sprite_number = parse_sprite_number(n, "sprite");
+	entry.enemy_sprite = parse_sprite_number(n, "sprite");
+	entry.death_sprite = parse_sprite_number(n, "death_sprite");
 	entry.basestats = parse_combat_stats(n["stats"]);
 	entry.unique = parse_defaulted(n, "unique", false);
 

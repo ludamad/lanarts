@@ -21,7 +21,7 @@ struct GameLevelPortal {
 };
 
 struct GameLevelState {
-	GameLevelState(int roomid, int branch, int level, int w, int h,
+	GameLevelState(int roomid, int branch, int level, int w, int h, bool wandering_flag = true,
 			bool is_simulation = false);
 	~GameLevelState();
 

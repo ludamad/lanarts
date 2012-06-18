@@ -16,15 +16,382 @@ default_items: &default_items #Reference with *default_items
   - { item: Magic Scroll,       chance: 5                      }
   - { item: Defence Scroll,     chance: 5                      }
 
-branches:
+easy_animals: &easy_animals
+  - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 2 }
+  - { enemy: Hound,             chance: 100                                   }
+  - { enemy: Sheep,             chance: 100                                   }
+
+easy_enemies: &easy_enemies
+  - { enemy: Skeleton,          chance: 100                                   }
+  - { enemy: Chicken,           chance: 33                                    }
+  - { enemy: Zombie,            chance: 33,  group_chance: 33, group_size: 2  }
+
+medium_enemies: &medium_enemies
+  - { enemy: Skeleton,          chance: 100                                   }
+  - { enemy: Chicken,           chance: 50                                    }
+  - { enemy: Zombie,            chance: 100                                   }
+  - { enemy: Storm Elemental,   chance: 66,  group_chance: 33, group_size: 2  }
+
+hard_enemies: &hard_enemies
+  - { enemy: Super Chicken,     chance: 50,  group_chance: 33, group_size: 3  }
+  - { enemy: Ciribot,           chance: 100                                   }
+  - { enemy: Storm Elemental,   chance: 50,  group_chance: 33, group_size: 3  }
+  - { enemy: Grue,              chance: 50,  group_chance: 33, group_size: 2  }
+  - { enemy: Jester,            chance: 5,                                    }
+  - { enemy: Hell Forged,       chance: 25                                    }
+
+areas:
   - branch: main_branch
     levels:
+#      - size: [40,40]
+#        items:
+#          amount: 2
+#          generated:
+#            - default: *default_items
+#        rooms:
+#          padding: 0
+#          amount: 3
+#          size: [10,10]
+#        tunnels:
+#          padding: 2
+#          width: [1,2]
+#          per_room: 5       
+#        features:
+#          tileset: pebble_tiles
+#          stairs_up: 0
+#          stairs_down: 5
+#        enemies:
+#          amount: 2
+#          generated:
+#            - enemy: Skeleton
+#              chance: 100
+#      #Level 2
+#      - size: [40, 40]
+#        items:
+#          amount: [5, 8]
+#          generated:
+#            - default: *default_items
+#        rooms:
+#          padding: 0
+#          amount: 40
+#          size: [4,4]
+#        tunnels:
+#          padding: 0
+#          width: 1
+#          per_room: [5, 5]          
+#        features:
+#          tileset: crystal_tiles
+#          stairs_up: 5
+#          stairs_down: 3
+#        enemies:
+#          amount: 5
+#          generated: *easy_enemies
+#
+#      #Level 3
+#      - size: [64, 64]
+#        items:
+#          amount: [7, 10]
+#          generated:
+#            - default: *default_items
+#        rooms:
+#          padding: 1
+#          amount: 23
+#          size: [4,6]
+#        tunnels:
+#          width: [1, 2]
+#          per_room: [2, 5]   
+#        enemies:
+#          generated: *medium_enemies
+#          amount: 15
+#        features:
+#          tileset: crystal_tiles
+#      #Level 4
+#      - size: [76, 76]
+#        items:
+#          amount: [7, 10]
+#          generated:
+#            - default: *default_items
+#            - item: Dagger
+#              chance: 25
+#            - item: Short Sword
+#              chance: 25
+#            - item: Mace
+#              chance: 15
+#            - item: Strength Scroll
+#              chance: 15
+#        rooms:
+#          padding: 1
+#          amount: 20
+#          size: [8,10]
+#        tunnels:
+#          width: [1, 2]
+#          per_room: [2, 5]   
+#        enemies:
+#          generated:
+#            - enemy: Red Dragon
+#              guaranteed_spawns: yes
+#            - enemy: Chicken
+#              chance: 100
+#            - enemy: Zombie
+#              chance: 100
+#            - enemy: Storm Elemental
+#              chance: 150
+#              group_chance: 33
+#              group_size: 2
+#            - enemy: Hell Forged
+#              chance: 5
+#          amount: 20
+#        features:
+#          tileset: pebble_tiles
+#      #Level 5
+#      - size: [89, 89]
+#        items:
+#          amount: [9, 12]
+#          generated:
+#            - default: *default_items
+#            - item: Dagger
+#              chance: 10
+#            - item: Short Sword
+#              chance: 10
+#            - item: Mace
+#              chance: 10
+#            - item: Strength Scroll
+#              chance: 7
+#            - item: Magic Scroll
+#              chance: 7
+#            - item: Defence Scroll
+#              chance: 7
+#        rooms:
+#          padding: 4
+#          amount: 20
+#          size: [10,30]
+#        tunnels:
+#          width: [2, 6]
+#          per_room: [2, 5]   
+#        enemies:
+#          generated:
+#            - enemy: Chicken
+#              chance: 50
+#            - enemy: Super Chicken
+#              chance: 50
+#            - enemy: Zombie
+#              chance: 50
+#            - enemy: Ciribot
+#              chance: 75
+#            - enemy: Storm Elemental
+#              chance: 100
+#              group_chance: 33
+#              group_size: 2
+#            - enemy: Hell Forged
+#              chance: 5
+#          amount: 25
+#        features:
+#          tileset: crystal_tiles
+#      #Level 6
+#      - size: [89, 89]
+#        items:
+#          amount: [9, 12]
+#          generated:
+#            - default: *default_items
+#            - item: Dagger
+#              chance: 5
+#            - item: Short Sword
+#              chance: 10
+#            - item: Mace
+#              chance: 15
+#            - item: Strength Scroll
+#              chance: 7
+#            - item: Magic Scroll
+#              chance: 7
+#            - item: Defence Scroll
+#              chance: 7
+#        rooms:
+#          padding: 4
+#          amount: 20
+#          size: [10,30]
+#        tunnels:
+#          width: [2, 6]
+#          per_room: [2, 5]   
+#        enemies:
+#          generated:
+#            - enemy: Chicken
+#              chance: 25
+#              group_chance: 50
+#              group_size: 3
+#            - enemy: Super Chicken
+#              chance: 100
+#            - enemy: Zombie
+#              chance: 75
+#            - enemy: Ciribot
+#              chance: 100
+#            - enemy: Storm Elemental
+#              chance: 50
+#              group_chance: 33
+#              group_size: 3
+#            - enemy: Hell Forged
+#              chance: 5
+#          amount: 25
+#        features:
+#          tileset: pebble_tiles
+#      #Level 7
+#      - size: [89, 89]
+#        items:
+#          amount: [9, 12]
+#          generated:
+#            - default: *default_items
+#            - item: Dagger
+#              chance: 5
+#            - item: Short Sword
+#              chance: 10
+#            - item: Mace
+#              chance: 15
+#            - item: Strength Scroll
+#              chance: 7
+#            - item: Magic Scroll
+#              chance: 7
+#            - item: Defence Scroll
+#              chance: 7
+#        features:
+#          tileset: pebble_tiles
+#        rooms:
+#          padding: 4
+#          amount: 20
+#          size: [10,15]
+#        tunnels:
+#          width: [1, 5]
+#          per_room: [2, 20]   
+#        enemies:
+#          generated:
+#            - enemy: Super Chicken
+#              chance: 50
+#              group_chance: 33
+#              group_size: 3
+#            - enemy: Zombie
+#              chance: 50
+#              group_chance: 100
+#              group_size: 2
+#            - enemy: Ciribot
+#              chance: 100
+#            - enemy: Storm Elemental
+#              chance: 50
+#              group_chance: 100
+#              group_size: 2
+#            - enemy: Grue
+#              chance: 30
+#            - enemy: Hell Forged
+#              chance: 10
+#          amount: 25
+#      #Level 8
+#      - size: [102, 102]
+#        items:
+#          amount: [9, 12]
+#          generated:
+#            - default: *default_items
+#            - item: Mace
+#              chance: 15
+#            - item: Strength Scroll
+#              chance: 7
+#            - item: Magic Scroll
+#              chance: 7
+#            - item: Defence Scroll
+#              chance: 7
+#        features:
+#          tileset: pebble_tiles
+#        rooms:
+#          padding: 3
+#          amount: 90
+#          size: [4,12]
+#        tunnels:
+#          width: [1, 3]
+#          per_room: 9   
+#        enemies:
+#          generated:
+#            - enemy: Super Chicken
+#              chance: 50
+#              group_chance: 33
+#              group_size: 3
+#            - enemy: Ciribot
+#              chance: 100
+#            - enemy: Storm Elemental
+#              chance: 50
+#              group_chance: 50
+#              group_size: 3
+#            - enemy: Grue
+#              chance: 50
+#              group_chance: 33
+#              group_size: 2
+#            - enemy: Jester
+#              chance: 80
+#            - enemy: Hell Forged
+#              chance: 25
+#          amount: 25
+#      #Level 9
+#      - size: [102, 102]
+#        items:
+#          amount: [8, 12]
+#          generated:
+#            - default: *default_items
+#            - item: Dagger
+#              chance: 5
+#            - item: Short Sword
+#              chance: 5
+#            - item: Mace
+#              chance: 5
+#            - item: Strength Scroll
+#              chance: 7
+#            - item: Magic Scroll
+#              chance: 7
+#            - item: Defence Scroll
+#              chance: 7
+#        features:
+#          tileset: crystal_tiles
+#        rooms:
+#          padding: 3
+#          amount: 90
+#          size: [4,12]
+#        tunnels:
+#          width: [1, 3]
+#          per_room: 9   
+#        enemies:
+#          amount: 30
+#          generated:
+#            - enemy: Zin
+#              guaranteed_spawns: yes
+#            - enemy: Super Chicken
+#              chance: 50
+#              group_chance: 33
+#              group_size: 3
+#            - enemy: Ciribot
+#              chance: 100
+#            - enemy: Storm Elemental
+#              chance: 100
+#              group_chance: 100
+#              group_size: 3
+#            - enemy: Grue
+#              chance: 100
+#              group_chance: 33
+#              group_size: 2
+#            - enemy: Jester
+#              chance: 100
+#            - enemy: Hell Forged
+#              chance: 50
+#newlevels:
+      #Outer world
+      - size: [50, 50]
+        wandering: no
+        items:    { amount: 2,  generated: *default_items   }
+        rooms:    { padding: 1, amount: 20, size: [4,4] }
+        tunnels:  { padding: 1, width: 1,  per_room: 2  }
+        features: { tileset: grass_tiles,     stairs_up: 0  }
+        enemies:
+          amount: 10
+          generated: *easy_animals
       #Level 1
       - size: [40,40]
         items:    { amount: 2,  generated: *default_items   }
         rooms:    { padding: 1, amount: [2,4], size: [8,10] }
         tunnels:  { padding: 2, width: [1,2],  per_room: [2,5] }
-        features: { tileset: cobble,     stairs_up: 0  }
+        features: { tileset: cobble,     stairs_up: 3  }
         enemies:
           amount: 2
           generated:
@@ -34,10 +401,36 @@ branches:
         items:    { amount: 2,  generated: *default_items   }
         rooms:    { padding: 1, amount: [2,4], size: [5,15] }
         tunnels:  { padding: 2, width: [1,2],  per_room: 2   }
-        features: { tileset: cobble }
+        features: { tileset: cobble}
         enemies:
           amount: 4
           generated:
             - { enemy: Skeleton,        chance: 100 }
             - { enemy: Chicken,         chance: 33 }
             - { enemy: Storm Elemental, chance: 33,  group_chance: 33, group_size: 2}
+      #Level 3
+      - size: [40,40]
+        items:    { amount: 2,  generated: *default_items   }
+        rooms:    { padding: 0, amount: 1, size: [38,38] }
+        tunnels:  { padding: 1, width: [4,5],  per_room: 2     }
+        features: { tileset: cobalt_tiles}
+        enemies:
+          amount: 3
+          generated: *medium_enemies
+      - size: [90,90]
+        items:    { amount: 2,  generated: *default_items   }
+        rooms:    { padding: 1, amount: [8,10], size: [4,10] }
+        tunnels:  { padding: 1, width: [4,5],  per_room: 2     }
+        features: { tileset: cobalt_tiles}
+        enemies:
+          amount: 25
+          generated: *medium_enemies
+      #Level 9
+      - size: [128, 90]
+        items:    { amount: 2,  generated: *default_items   }
+        rooms:    { padding: 1, amount: 40, size: [4,10] }
+        tunnels:  { padding: 1, width: [1,5],  per_room: 2     }
+        features: { tileset: cobalt_tiles}
+        enemies:
+          amount: 50
+          generated: *hard_enemies

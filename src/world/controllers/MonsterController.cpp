@@ -28,7 +28,8 @@
 const int PATHING_RADIUS = 500;
 const int HUGE_DISTANCE = 1000000;
 
-MonsterController::MonsterController() {
+MonsterController::MonsterController(bool wander) :
+		monsters_wandering_flag(wander) {
 	targetted = 0;
 	simulator = new RVO::RVOSimulator();
 	simulator->setTimeStep(1.0f);
@@ -162,6 +163,8 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	MTwist& mt = gs->rng();
 	EnemyBehaviour& eb = e->behaviour();
 	eb.vx = 0, eb.vy = 0;
+	if (!monsters_wandering_flag)
+		return;
 	bool is_fullpath = true;
 	if (eb.path_cooldown > 0) {
 		eb.path_cooldown--;
@@ -200,7 +203,8 @@ void MonsterController::set_monster_headings(GameState* gs,
 	for (int i = 0; i < eois.size(); i++) {
 		EnemyInst* e = eois[i].e;
 		int pind = eois[i].closest_player_index;
-		CombatGameInst* p = (CombatGameInst*)gs->get_instance(pc.player_ids()[pind]);
+		CombatGameInst* p = (CombatGameInst*)gs->get_instance(
+				pc.player_ids()[pind]);
 		EnemyBehaviour& eb = e->behaviour();
 
 		eb.current_action = EnemyBehaviour::CHASING_PLAYER;

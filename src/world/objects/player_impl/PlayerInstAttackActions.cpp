@@ -162,7 +162,7 @@ static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
 }
 
 static void projectile_item_drop(GameState* gs, GameInst* obj, void* data) {
-	item_id item_type = (item_id) (long) data;
+	item_id item_type = (item_id)(long)data;
 	ItemEntry& ientry = game_item_data[item_type];
 	if (ientry.equipment_type == ItemEntry::PROJECTILE) {
 		ProjectileEntry& pentry = game_projectile_data[ientry.equipment_id];
@@ -187,7 +187,7 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 	bool mouse_within = gs->mouse_x() < gs->window_view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
-	int level = gs->level()->roomid, frame = gs->frame();
+	int level = gs->get_level()->roomid, frame = gs->frame();
 	bool spell_used = false;
 
 	//Keyboard-oriented blink
@@ -288,19 +288,20 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 		return;
 
 	if (equipment().has_projectile()) {
-		ProjectileEntry& pentry = equipment().projectile.projectile_entry();
+		const Projectile& projectile = equipment().projectile;
+		ProjectileEntry& pentry = projectile.projectile_entry();
 		item_id item = get_item_by_name(pentry.name.c_str());
 		int weaprange = std::max(wentry.range, pentry.range);
 
-		equipment().use_ammo();
-
 		AttackStats weaponattack(weapon_type());
-		GameInst* bullet = new _ProjectileInst(equipment().projectile,
+		GameInst* bullet = new _ProjectileInst(projectile,
 				effective_atk_stats(mt, weaponattack), id, start, actpos,
 				pentry.speed, weaprange);
 		gs->add_instance(bullet);
 		cooldowns().reset_action_cooldown(
 				std::max(wentry.cooldown, pentry.cooldown));
+
+		equipment().use_ammo();
 	} else {
 		int weaprange = wentry.range + this->radius;
 		float mag = distance_between(actpos, Pos(x, y));
@@ -320,14 +321,14 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 			return;
 
 		for (int i = 0; i < numhit; i++) {
-			EnemyInst* e = (EnemyInst*) enemies[i];
+			EnemyInst* e = (EnemyInst*)enemies[i];
 			if (attack(gs, e, AttackStats(weapon_type()))) {
 				char buffstr[32];
 				gain_xp(gs, e->xpworth());
 				if (is_local_player()) {
 					snprintf(buffstr, 32, "%d XP", e->xpworth());
 					gs->add_instance(
-							new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0,
+							new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0, AnimatedInst::DEPTH,
 									buffstr, Colour(255, 215, 11)));
 				}
 			}

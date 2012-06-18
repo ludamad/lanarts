@@ -60,29 +60,29 @@ static void menu_loop(GameState* gs, int width, int height) {
 	int halfw = width / 2;
 
 	GameView prevview = gs->window_view();
-	GameLevelState* oldlevel = gs->level();
+	GameLevelState* oldlevel = gs->get_level();
 
-	gs->level() = new GameLevelState(0, 0, 0, width, height);
-	gs->level()->level_number = -1;
+	gs->set_level(new GameLevelState(0, 0, 0, width, height));
+	gs->get_level()->level_number = -1;
 	gs->window_view().x = 0;
 	gs->window_view().y = 0;
 
 	gs->add_instance(new AnimatedInst(halfw, 100, get_sprite_by_name("logo")));
 	gs->add_instance(
-			new AnimatedInst(halfw - 100, 500, -1, -1, 0.0f, 0.0f, HELP_TEXT,
+			new AnimatedInst(halfw - 100, 500, -1, -1, 0.0f, 0.0f, AnimatedInst::DEPTH, HELP_TEXT,
 					Colour(255, 255, 255)));
 	gs->add_instance(
 			new ButtonInst("START", BBox(halfw - 60, 400, halfw + 60, 430),
 					set_flag_callback, &exit));
 
 	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {
-		gs->level()->inst_set.step(gs);
+		gs->get_level()->inst_set.step(gs);
 		gs->draw(false);
 	}
 
-	delete gs->level();
+	delete gs->get_level();
 
-	gs->level() = oldlevel;
+	gs->set_level(oldlevel);
 	gs->window_view() = prevview;
 }
 
@@ -109,7 +109,7 @@ static void game_loop(GameState* gs) {
 			init_lua_data(gs, gs->get_luastate());
 		}
 		if (gs->key_press_state(SDLK_F3)) {
-			gs->game_world().regen_level(gs->level()->roomid);
+			gs->game_world().regen_level(gs->get_level()->roomid);
 		}
 		if (gs->key_press_state(SDLK_F4)) {
 			paused = !paused;

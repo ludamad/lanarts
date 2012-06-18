@@ -12,6 +12,7 @@
 #include "../world/GameState.h"
 
 #include "GeneratedLevel.h"
+#include "shapefill.h"
 #include "levelgen.h"
 
 const int TOO_MANY_ATTEMPTS = 1000;
@@ -23,7 +24,7 @@ bool generate_room(const RoomGenSettings& rs, MTwist& mt, GeneratedLevel& level,
 		return false;
 	bool marked = (mt.rand(4) == 0);
 	int mark = marked ? mt.rand(1, 4) : 0;
-	Sqr val = Sqr(true, false, false, (feature_t) mark, 0, room_id);
+	Sqr val = Sqr(true, false, false, (feature_t)mark, 0, room_id);
 	level.set_region_with_perimeter(r, val, rs.room_padding);
 //	Region reg(r.x,r.y, 10, 10);
 //	level.set_circle_with_perimeter(reg, val, rs.room_padding);
@@ -81,16 +82,23 @@ GameLevelState* generate_level(int roomid, MTwist& mt, GeneratedLevel& level,
 		GameState* gs) {
 	DungeonBranch& branch = game_dungeon_data[DNGN_MAIN_BRANCH];
 	const LevelGenSettings& ls = branch.level_data[roomid];
-	level.initialize(ls.level_w, ls.level_h);
+	const RoomGenSettings& rs = ls.rooms;
 
+	level.initialize(ls.level_w, ls.level_h, rs.solid_fill);
+
+	int LEVEL_BORDER_PAD = 10;
+	int lw = std::min(128, ls.level_w + LEVEL_BORDER_PAD), lh = std::min(128,
+			ls.level_h + LEVEL_BORDER_PAD);
+//	lw = 128, lh = 128;
 	GameLevelState* newlvl = new GameLevelState(roomid, DNGN_MAIN_BRANCH,
-			roomid, level.width() * TILE_SIZE, level.height() * TILE_SIZE);
 
-	GameLevelState* prevlvl = gs->level(); //Save level context
-	gs->level() = newlvl; //Set level context to new level
+			roomid, lw * TILE_SIZE, lh * TILE_SIZE, ls.wander);
+
+	GameLevelState* prevlvl = gs->get_level(); //Save level context
+	gs->set_level(newlvl); //Set level context to new level
 
 	printf("level.init RNG state at %d numbers\n", mt.amount_of_randoms);
-	generate_rooms(ls.rooms, mt, level);
+	generate_rooms(rs, mt, level);
 	printf("ROOMS state at %d numbers\n", mt.amount_of_randoms);
 	generate_tunnels(ls.tunnels, mt, level);
 	printf("TUNNELS state at %d numbers\n", mt.amount_of_randoms);
@@ -102,8 +110,7 @@ GameLevelState* generate_level(int roomid, MTwist& mt, GeneratedLevel& level,
 	printf("ITEMS state at %d numbers\n", mt.amount_of_randoms);
 	newlvl->rooms = level.rooms();
 
-	gs->level() = prevlvl; //Restore level context
-
+	gs->set_level(prevlvl); //Restore level context
 
 	return newlvl;
 }

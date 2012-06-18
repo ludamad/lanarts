@@ -28,8 +28,11 @@ public:
 	void reset(int keep = 0);
 	void regen_level(int roomid);
 	void spawn_player(GeneratedLevel& genlevel, bool local = true, int classn = 0, PlayerInst* inst = NULL);
-	GameLevelState*& get_current_level() {
+	GameLevelState* get_current_level() {
 		return lvl;
+	}
+	void set_current_level(GameLevelState* level){
+		lvl = level;
 	}
 
 	int get_current_level_id();

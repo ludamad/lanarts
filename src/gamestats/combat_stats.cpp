@@ -83,12 +83,19 @@ int AttackStats::atk_cooldown() const {
 	return weapon.weapon_entry().cooldown;
 }
 
+static bool is_compatible_projectile(WeaponEntry& wentry,
+		ProjectileEntry& pentry) {
+	return wentry.weapon_class != "unarmed"
+			&& wentry.weapon_class == pentry.weapon_class;
+}
 int AttackStats::atk_damage(MTwist& mt, const EffectiveStats& stats) const {
 	const CoreStats& core = stats.core;
-	int dmg = 0;
 	bool hasprojectile = projectile.valid_projectile();
-	if (!hasprojectile || weapon.id > 0) {
-		WeaponEntry& wentry = weapon.weapon_entry();
+	WeaponEntry& wentry = weapon.weapon_entry();
+	int dmg = 0;
+
+	if (!hasprojectile
+			|| is_compatible_projectile(wentry, projectile.projectile_entry())) {
 		dmg += wentry.damage.calculate(mt, core);
 		dmg += round(wentry.percentage_magic * stats.magic.damage);
 		dmg += round((1.0f - wentry.percentage_magic) * stats.physical.damage);
@@ -96,7 +103,7 @@ int AttackStats::atk_damage(MTwist& mt, const EffectiveStats& stats) const {
 	if (hasprojectile) {
 		ProjectileEntry& pentry = projectile.projectile_entry();
 		dmg += projectile.projectile_entry().damage.calculate(mt, core);
-		if (weapon.id == 0) {
+		if (!is_compatible_projectile(wentry, pentry)) {
 			dmg += round(pentry.percentage_magic * stats.magic.damage);
 			dmg += round(
 					(1.0f - pentry.percentage_magic) * stats.physical.damage);
@@ -107,24 +114,27 @@ int AttackStats::atk_damage(MTwist& mt, const EffectiveStats& stats) const {
 
 int AttackStats::atk_power(MTwist& mt, const EffectiveStats& stats) const {
 	const CoreStats& core = stats.core;
-	int dmg = 0;
 	bool hasprojectile = projectile.valid_projectile();
-	if (!hasprojectile || weapon.id > 0) {
+	WeaponEntry& wentry = weapon.weapon_entry();
+	int pow = 0;
+
+	if (!hasprojectile
+			|| is_compatible_projectile(wentry, projectile.projectile_entry())) {
 		WeaponEntry& wentry = weapon.weapon_entry();
-		dmg += wentry.power.calculate(mt, core);
-		dmg += round(wentry.percentage_magic * stats.magic.power);
-		dmg += round((1.0f - wentry.percentage_magic) * stats.physical.power);
+		pow += wentry.power.calculate(mt, core);
+		pow += round(wentry.percentage_magic * stats.magic.power);
+		pow += round((1.0f - wentry.percentage_magic) * stats.physical.power);
 	}
 	if (hasprojectile) {
 		ProjectileEntry& pentry = projectile.projectile_entry();
-		dmg += projectile.projectile_entry().power.calculate(mt, core);
-		if (weapon.id == 0) {
-			dmg += round(pentry.percentage_magic * stats.magic.power);
-			dmg += round(
+		pow += projectile.projectile_entry().power.calculate(mt, core);
+		if (!is_compatible_projectile(wentry, pentry)) {
+			pow += round(pentry.percentage_magic * stats.magic.power);
+			pow += round(
 					(1.0f - pentry.percentage_magic) * stats.physical.power);
 		}
 	}
-	return dmg;
+	return pow;
 }
 
 int AttackStats::atk_percentage_magic() const {

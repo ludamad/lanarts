@@ -1,0 +1,52 @@
+---
+sprites:
+#Animals
+  - name: giant rat
+    file: res/sprites/monsters/giant_rat.png
+
+  - name: hound
+    file: res/sprites/monsters/hound.png
+
+  - name: sheep
+    file: res/sprites/monsters/sheep.png
+
+  - name: chicken
+    file: res/sprites/monsters/chicken.png
+
+#Undead
+  - name: skeleton
+    file: res/sprites/monsters/skeleton.png
+    
+  - name: zombie
+    file: res/sprites/monsters/zombie.png
+
+#Misc
+  - name: storm ele
+    file: res/sprites/monsters/storm_elemental.png
+
+  - name: exec
+    file: res/sprites/monsters/exec.png
+
+  - name: imp
+    file: res/sprites/monsters/cute_imp.png
+
+  - name: grue
+    file: res/sprites/monsters/grue.png
+
+  - name: jester
+    file: res/sprites/monsters/jester.png
+
+  - name: super_chicken
+    file: res/sprites/monsters/superchicken.png
+
+  - name: ciribot
+    file: res/sprites/monsters/ciribo.png
+
+  - name: hell_forged
+    file: res/sprites/monsters/hellforged.png
+    
+  - name: zin
+    file: res/sprites/monsters/bosses/zin.png 
+   
+  - name: red dragon
+    file: res/sprites/monsters/bosses/reddragon.png

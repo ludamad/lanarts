@@ -192,7 +192,7 @@ static int get_itemslotn(GameState* gs, int x, int y) {
 void GameHud::queue_io_actions(GameState* gs, PlayerInst* player,
 		std::deque<GameAction>& queued_actions) {
 	bool mouse_within_view = gs->mouse_x() < gs->window_view().width;
-	int level = gs->level()->roomid, frame = gs->frame();
+	int level = gs->get_level()->roomid, frame = gs->frame();
 
 	_Inventory inv = player->inventory();
 
@@ -245,10 +245,10 @@ void GameHud::queue_io_actions(GameState* gs, PlayerInst* player,
 
 const int SPELL_MAX = 2;
 bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
-	int level = gs->level()->roomid, frame = gs->frame();
+	int level = gs->get_level()->roomid, frame = gs->frame();
 
 	bool mouse_within_view = gs->mouse_x() < gs->window_view().width;
-	PlayerInst* player = (PlayerInst*) gs->get_instance(gs->local_playerid());
+	PlayerInst* player = (PlayerInst*)gs->get_instance(gs->local_playerid());
 	if (!player)
 		return false;
 
@@ -307,37 +307,20 @@ bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 	return false;
 }
 
-void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
-//Draw a mini version of the contents of gs->tile_grid()
+static void world2minimapbuffer(GameState* gs, char* buff, const BBox& world_portion, int w, int h,
+		int ptw, int pth) {
 	GameTiles& tiles = gs->tile_grid();
 	GameView& view = gs->window_view();
 
 	bool minimap_reveal = gs->key_down_state(SDLK_z)
 			|| gs->key_down_state(SDLK_BACKQUOTE);
-	int min_tilex, min_tiley;
-	int max_tilex, max_tiley;
 
-	view.min_tile_within(min_tilex, min_tiley);
-	view.max_tile_within(max_tilex, max_tiley);
-
-	int minimap_x = bbox.x1, minimap_y = bbox.y1;
-	int minimap_w = bbox.width(), minimap_h = bbox.height();
-	int ptw = power_of_two(minimap_w), pth = power_of_two(minimap_h);
-	if (!minimap_arr) {
-		minimap_arr = new char[ptw * pth * 4];
-	}
-	for (int i = 0; i < ptw * pth; i++) {
-		minimap_arr[i * 4] = 0;
-		minimap_arr[i * 4 + 1] = 0;
-		minimap_arr[i * 4 + 2] = 0;
-		minimap_arr[i * 4 + 3] = 255;
-	}
 
 	int stairs_down = get_tile_by_name("stairs_down");
 	int stairs_up = get_tile_by_name("stairs_up");
-	for (int y = 0; y < minimap_h; y++) {
-		char* iter = minimap_arr + y * ptw * 4;
-		for (int x = 0; x < minimap_w; x++) {
+	for (int y = 0; y < h; y++) {
+		char* iter = buff + y * ptw * 4;
+		for (int x = 0; x < w; x++) {
 			int tile = tiles.get(x, y).tile;
 			int seen = tiles.is_seen(x, y) || minimap_reveal;
 			if (seen) {
@@ -365,19 +348,55 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 			if (!minimap_reveal && !gs->object_visible_test(enemy))
 				continue;
 
-			minimap_arr[loc * 4] = 0;
-			minimap_arr[loc * 4 + 1] = 0;
-			minimap_arr[loc * 4 + 2] = 255;
-			minimap_arr[loc * 4 + 3] = 255;
+			buff[loc * 4] = 0;
+			buff[loc * 4 + 1] = 0;
+			buff[loc * 4 + 2] = 255;
+			buff[loc * 4 + 3] = 255;
 		}
 	}
+//
+//	int min_tilex, min_tiley;
+//	int max_tilex, max_tiley;
+//
+//	view.min_tile_within(min_tilex, min_tiley);
+//	view.max_tile_within(max_tilex, max_tiley);
+}
+
+const int MINIMAP_SIZEMAX = 128;
+
+void GameHud::draw_minimap(GameState* gs, const BBox& bbox, float scale) {
+//Draw a mini version of the contents of gs->tile_grid()
+	GameTiles& tiles = gs->tile_grid();
+	GameView& view = gs->window_view();
+
+	int min_tilex, min_tiley;
+	int max_tilex, max_tiley;
+
+	view.min_tile_within(min_tilex, min_tiley);
+	view.max_tile_within(max_tilex, max_tiley);
+
+	int minimap_w = bbox.width(), minimap_h = bbox.height();
+	int minimap_x = bbox.x1 + (128 - minimap_w)/2, minimap_y = bbox.y1 + (128 - minimap_w)/2;
+	int ptw = power_of_two(MINIMAP_SIZEMAX), pth = power_of_two(MINIMAP_SIZEMAX);
+	if (!minimap_arr) {
+		minimap_arr = new char[ptw * pth * 4];
+	}
+	for (int i = 0; i < ptw * pth; i++) {
+		minimap_arr[i * 4] = 0;
+		minimap_arr[i * 4 + 1] = 0;
+		minimap_arr[i * 4 + 2] = 0;
+		minimap_arr[i * 4 + 3] = 255;
+	}
+
+	world2minimapbuffer(gs, minimap_arr, BBox(), minimap_w, minimap_h, ptw, pth);
+
 	GameInst* inst = gs->get_instance(gs->local_playerid());
 	if (inst) {
 		int arr_x = (inst->x / TILE_SIZE), arr_y = (inst->y / TILE_SIZE);
-		fill_buff2d(minimap_arr, minimap_w, minimap_h, arr_x - arr_x % 2,
-				arr_y - arr_y % 2, Colour(255, 180, 99), 2, 2);
-		draw_rect2d(minimap_arr, minimap_w, minimap_h, min_tilex, min_tiley,
-				max_tilex, max_tiley, Colour(255, 180, 99)); //
+		fill_buff2d(minimap_arr, ptw, pth, arr_x - arr_x % 2, arr_y - arr_y % 2,
+				Colour(255, 180, 99), 2, 2);
+		draw_rect2d(minimap_arr, ptw, pth, min_tilex, min_tiley, max_tilex,
+				max_tiley, Colour(255, 180, 99)); //
 	}
 
 	gl_image_from_bytes(minimap_buff, ptw, pth, minimap_arr);
@@ -387,13 +406,13 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox) {
 void GameHud::draw(GameState* gs) {
 	int minimap_relposx = 20, minimap_relposy = 64 + 45;
 	minimapbox = BBox(x + minimap_relposx, y + minimap_relposy,
-			x + minimap_relposx + gs->level()->tile_width(),
-			y + minimap_relposy + gs->level()->tile_height());
+			x + minimap_relposx + gs->get_level()->tile_width(),
+			y + minimap_relposy + gs->get_level()->tile_height());
 
 	gl_set_drawing_area(x, y, _width, _height);
 	gl_draw_rectangle(0, 0, _width, _height, bg_colour);
 
-	PlayerInst* player_inst = (PlayerInst*) gs->get_instance(
+	PlayerInst* player_inst = (PlayerInst*)gs->get_instance(
 			gs->local_playerid());
 	if (!player_inst)
 		return;
@@ -403,12 +422,12 @@ void GameHud::draw(GameState* gs) {
 
 	draw_player_statbars(gs, player_inst, 32, 32);
 
-	draw_minimap(gs, minimap_bbox().translated(-x, -y));
+	draw_minimap(gs, minimap_bbox().translated(-x, -y), 2.0);
 
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 15, 10,
 			"Level %d", class_stats.xplevel);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 40,
-			64 + 45 + 128, "Floor %d", gs->level()->level_number);
+			64 + 45 + 128, "Floor %d", gs->get_level()->level_number);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 40,
 			64 + 45 + 128 + 15, "Gold %d", player_inst->gold());
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,

@@ -61,7 +61,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs) {
 	bool mouse_within = gs->mouse_x() < gs->window_view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
-	int level = gs->level()->roomid;
+	int level = gs->get_level()->roomid;
 	int frame = gs->frame();
 	bool item_used = false;
 
@@ -114,7 +114,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs) {
 }
 void PlayerInst::queue_io_actions(GameState* gs) {
 	GameView& view = gs->window_view();
-	int level = gs->level()->roomid;
+	int level = gs->get_level()->roomid;
 	int frame = gs->frame();
 	int dx = 0, dy = 0;
 	bool mouse_within = gs->mouse_x() < gs->window_view().width;
@@ -423,17 +423,17 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 	Pos hitpos;
 	bool didhit = gs->tile_radius_test(x, y, radius, false,
 			get_tile_by_name("stairs_up"), &hitpos);
-	int entr_n = scan_entrance(gs->level()->exits, hitpos);
+	int entr_n = scan_entrance(gs->get_level()->exits, hitpos);
 	if (!didhit || entr_n == -1)
 		return;
 
-	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->level()->exits.size());
-	gs->ensure_connectivity(gs->level()->roomid - 1, gs->level()->roomid);
-	GameLevelPortal* portal = &gs->level()->exits[entr_n];
+	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->get_level()->exits.size());
+	gs->ensure_connectivity(gs->get_level()->roomid - 1, gs->get_level()->roomid);
+	GameLevelPortal* portal = &gs->get_level()->exits[entr_n];
 
 	int px = centered_multiple(portal->exitsqr.x, TILE_SIZE);
 	int py = centered_multiple(portal->exitsqr.y, TILE_SIZE);
-	gs->level_move(id, px, py, gs->level()->roomid, gs->level()->roomid - 1);
+	gs->level_move(id, px, py, gs->get_level()->roomid, gs->get_level()->roomid - 1);
 
 	reset_rest_cooldown();
 }
@@ -441,17 +441,17 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 	Pos hitpos;
 	bool didhit = gs->tile_radius_test(x, y, radius, false,
 			get_tile_by_name("stairs_down"), &hitpos);
-	int entr_n = scan_entrance(gs->level()->entrances, hitpos);
+	int entr_n = scan_entrance(gs->get_level()->entrances, hitpos);
 	if (!didhit || entr_n == -1)
 		return;
 
-	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->level()->entrances.size());
-	gs->ensure_connectivity(gs->level()->roomid, gs->level()->roomid + 1);
-	GameLevelPortal* portal = &gs->level()->entrances[entr_n];
+	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->get_level()->entrances.size());
+	gs->ensure_connectivity(gs->get_level()->roomid, gs->get_level()->roomid + 1);
+	GameLevelPortal* portal = &gs->get_level()->entrances[entr_n];
 
 	int px = centered_multiple(portal->exitsqr.x, TILE_SIZE);
 	int py = centered_multiple(portal->exitsqr.y, TILE_SIZE);
-	gs->level_move(id, px, py, gs->level()->roomid, gs->level()->roomid + 1);
+	gs->level_move(id, px, py, gs->get_level()->roomid, gs->get_level()->roomid + 1);
 
 	reset_rest_cooldown();
 }

@@ -17,3 +17,6 @@ sprites:
 
   - name: logo
     file: res/sprites/interface/lanarts_logo.png
+    
+  - name: blood
+    file: res/sprites/effects/blood.png

@@ -90,7 +90,7 @@ void ProjectileInst::step(GameState* gs) {
 			float ry = vy / speed * .5;
 			gs->add_instance(
 					new AnimatedInst(e->x - 5 + rx * 5, e->y + ry * 5, -1, 25,
-							rx, ry, buffstr));
+							rx, ry, AnimatedInst::DEPTH, buffstr));
 
 			if (e->damage(gs, damage)) {
 				PlayerInst* p = (PlayerInst*)origin;
@@ -99,7 +99,8 @@ void ProjectileInst::step(GameState* gs) {
 				if (p->is_local_player()) {
 					snprintf(buffstr, 32, "%d XP", e->xpworth());
 					gs->add_instance(
-							new AnimatedInst(e->x, e->y, -1, 25, 0, 0, buffstr,
+							new AnimatedInst(e->x, e->y, -1, 25, 0, 0,
+									AnimatedInst::DEPTH, buffstr,
 									Colour(255, 215, 11)));
 				} else
 					gs->skip_next_id();
@@ -117,7 +118,7 @@ void ProjectileInst::step(GameState* gs) {
 			float ry = vy / speed * .5;
 			gs->add_instance(
 					new AnimatedInst(colobj->x - 5 + rx * 5, colobj->y + ry * 5,
-							-1, 25, rx, ry, dmgstr));
+							-1, 25, rx, ry, AnimatedInst::DEPTH, dmgstr));
 		}
 	}
 	if (colobj || range_left <= 0) {
@@ -290,7 +291,7 @@ void _ProjectileInst::step(GameState* gs) {
 			float ry = vy / speed * .5;
 			gs->add_instance(
 					new AnimatedInst(victim->x - 5 + rx * 5, victim->y + ry * 5,
-							-1, 25, rx, ry, buffstr));
+							-1, 25, rx, ry, AnimatedInst::DEPTH, buffstr));
 
 			if (victim->damage(gs, damage)) {
 				PlayerInst* p = (PlayerInst*)origin;
@@ -300,7 +301,8 @@ void _ProjectileInst::step(GameState* gs) {
 					snprintf(buffstr, 32, "%d XP", victim->xpworth());
 					gs->add_instance(
 							new AnimatedInst(victim->x, victim->y, -1, 25, 0, 0,
-									buffstr, Colour(255, 215, 11)));
+									AnimatedInst::DEPTH, buffstr,
+									Colour(255, 215, 11)));
 				} else
 					gs->skip_next_id();
 			}
@@ -320,7 +322,7 @@ void _ProjectileInst::step(GameState* gs) {
 			float ry = vy / speed * .5;
 			gs->add_instance(
 					new AnimatedInst(colobj->x - 5 + rx * 5, colobj->y + ry * 5,
-							-1, 25, rx, ry, dmgstr));
+							-1, 25, rx, ry, AnimatedInst::DEPTH, dmgstr));
 		}
 	}
 	if (colobj || range_left <= 0) {

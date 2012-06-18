@@ -111,6 +111,8 @@ private:
 	void remove_from_collisionlist(InstanceState* inst,
 			InstanceLinkedList& list);
 
+	bool within_bounds_check(const Pos& c);
+
 	//Used to allow access to internal data/functions for our hash set implementation utility class
 	friend class GameInstSetFunctions;
 };

@@ -3,7 +3,7 @@ projectiles:
   - name: Storm Bolt
     weapon_class: magic
     damage: { magic: 1.0 }    # 100% magic
-    power:  { magic: 1.0 }    # 100% magic
+    power:  { magic: 0.2 }   
     range: 130
     cooldown: 45
     speed: 7
@@ -13,7 +13,7 @@ projectiles:
   - name: Magic Bolt
     weapon_class: magic
     damage: { magic: 1.0 }    # 100% magic
-    power:  { magic: 1.0 }    # 100% magic
+    power:  { magic: 0.2 }    
     range: 65
     cooldown: 35
     speed: 7
@@ -23,7 +23,7 @@ projectiles:
   - name: Blue Blast
     weapon_class: magic
     damage: { magic: 1.5 }    # 100% magic
-    power:  { magic: 1.5 }    # 100% magic
+    power:  { magic: 0.3 }    
     range: 65
     cooldown: 70
     speed: 8
@@ -36,9 +36,9 @@ projectiles:
     damage: 
         magic: 1.0 # 100 %
     power: 
-        magic: 1.0 # 100 %
+        magic: 0.2 # 100 %
     range: 300
     cooldown: 70
-    speed: 4
+    speed: 6
     spr_item: none
     spr_attack: fire bolt

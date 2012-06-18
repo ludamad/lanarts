@@ -2,6 +2,7 @@
 #include <typeinfo>
 
 #include "EnemyInst.h"
+#include "ItemInst.h"
 #include "ProjectileInst.h"
 #include "PlayerInst.h"
 #include "../utility_objects/AnimatedInst.h"
@@ -28,7 +29,7 @@ static EnemyEntry& __E(enemy_id enemytype) {
 }
 
 EnemyInst::EnemyInst(int enemytype, int x, int y) :
-		CombatGameInst(__E(enemytype).basestats, __E(enemytype).sprite_number,
+		CombatGameInst(__E(enemytype).basestats, __E(enemytype).enemy_sprite,
 				0, x, y, __E(enemytype).radius, true, DEPTH), seen(false), rx(
 				x), ry(y), enemytype(enemytype), eb(
 				__E(enemytype).basestats.movespeed), xpgain(
@@ -83,7 +84,7 @@ static void show_defeat_message(GameChat& chat, EnemyEntry& e) {
 void EnemyInst::draw(GameState* gs) {
 
 	GameView& view = gs->window_view();
-	GLimage& img = game_sprite_data[etype().sprite_number].img();
+	GLimage& img = game_sprite_data[etype().enemy_sprite].img();
 
 	if (gs->game_settings().draw_diagnostics) {
 		char statbuff[255];
@@ -179,10 +180,13 @@ bool EnemyInst::within_field_of_view(const Pos & pos) {
 
 void EnemyInst::die(GameState *gs) {
 	if (!destroyed) {
-		gs->add_instance(new AnimatedInst(x, y, etype().sprite_number, 15));
+		gs->add_instance(new AnimatedInst(x, y, etype().enemy_sprite, 15));
 		gs->monster_controller().deregister_enemy(this);
 		gs->remove_instance(this);
 		show_defeat_message(gs->game_chat(), etype());
+		if (etype().death_sprite > -1) {
+//			gs->add_instance(new AnimatedInst(x, y, etype().death_sprite, 400, ItemInst::DEPTH));
+		}
 	}
 }
 

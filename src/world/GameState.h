@@ -131,7 +131,7 @@ public:
 		return mouse_diddownwheel;
 	}
 
-	int & frame() {
+	int& frame() {
 		return frame_n;
 	}
 
@@ -143,14 +143,10 @@ public:
 	int width();
 	int height();
 
-	GameLevelState*& level() {
+	GameLevelState* get_level() {
 		return world.get_current_level();
 	}
-	void set_level(GameLevelState* lvl) {
-		world.get_current_level() = lvl;
-		view.world_width = lvl->width;
-		view.world_height = lvl->height;
-	}
+	void set_level(GameLevelState* lvl);
 
 	void serialize(FILE *file);
 	MTwist & rng() {

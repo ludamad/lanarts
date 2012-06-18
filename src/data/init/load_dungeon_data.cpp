@@ -1,6 +1,6 @@
 /*
  * load_dungeon_data.cpp:
- *  Load dungeon branch & level data
+ *  Load dungeon area & level data
  */
 
 #include <fstream>
@@ -38,7 +38,8 @@ RoomGenSettings parse_room_gen(const YAML::Node& n) {
 	n["padding"] >> pad;
 	Range amount = parse_range(n["amount"]);
 	Range size = parse_range(n["size"]);
-	return RoomGenSettings(pad, amount.min, size.min, size.max);
+	return RoomGenSettings(pad, amount.min, size.min, size.max,
+			parse_defaulted(n, "fill_solid", true));
 }
 TunnelGenSettings parse_tunnel_gen(const YAML::Node& n) {
 	Range width = parse_range(n["width"]);
@@ -68,8 +69,7 @@ EnemyGenChance parse_enemy_chance(const YAML::Node& n) {
 	egc.groupsize = parse_defaulted(n, "group_size", Range(0, 0));
 	return egc;
 }
-EnemyGenSettings parse_enemy_gen(const YAML::Node& node,
-		const char* key) {
+EnemyGenSettings parse_enemy_gen(const YAML::Node& node, const char* key) {
 	vector<EnemyGenChance> chances;
 	Range nmonsters;
 	nmonsters.max = 0;
@@ -88,6 +88,7 @@ EnemyGenSettings parse_enemy_gen(const YAML::Node& node,
 }
 LevelGenSettings parse_level_gen(const YAML::Node& n) {
 	Range dim = parse_range(n["size"]);
+	bool wander = parse_defaulted(n, "wandering", true);
 	ItemGenSettings items = parse_item_gen(n["items"]);
 	RoomGenSettings rooms = parse_room_gen(n["rooms"]);
 	TunnelGenSettings tunnels = parse_tunnel_gen(n["tunnels"]);
@@ -96,7 +97,7 @@ LevelGenSettings parse_level_gen(const YAML::Node& n) {
 					parse_feature_gen(n["features"]) : featuredefault;
 	EnemyGenSettings enemies = parse_enemy_gen(n, "enemies");
 
-	return LevelGenSettings(dim.min, dim.max, items, rooms, tunnels, features,
+	return LevelGenSettings(dim.min, dim.max, wander, items, rooms, tunnels, features,
 			enemies);
 }
 void parse_dungeon_branch(const YAML::Node& n,
@@ -125,7 +126,7 @@ LuaValue load_dungeon_data(lua_State* L, const FilenameList& filenames) {
 
 		parser.GetNextDocument(root);
 
-		const YAML::Node& node = root["branches"];
+		const YAML::Node& node = root["areas"];
 		//First branch should be main branch, using node[0]:
 		parse_dungeon_branch(node[0], game_dungeon_yaml);
 

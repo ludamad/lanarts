@@ -29,7 +29,7 @@ struct GameLevelState;
 
 class MonsterController {
 public:
-	MonsterController();
+	MonsterController(bool wander = true);
 	~MonsterController();
 
 	const std::vector<obj_id>& monster_ids(){ return mids;}
@@ -77,6 +77,7 @@ private:
 	std::vector<int> player_simids;
 
 	RVO::RVOSimulator* simulator;
+	bool monsters_wandering_flag;
 };
 
 

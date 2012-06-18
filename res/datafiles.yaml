@@ -8,6 +8,7 @@ class_files: classes.yaml
 effect_files: effects.yaml
 
 enemy_files: 
+  - enemies/animal_enemies.yaml
   - enemies/basic_enemies.yaml
   - enemies/boss_enemies.yaml
 
@@ -24,7 +25,7 @@ spell_files: spells.yaml
 
 sprite_files: 
  - sprites/item_sprites.yaml
- - sprites/monster_sprites.yaml
+ - sprites/enemy_sprites.yaml
  - sprites/other_sprites.yaml
  - sprites/spell_sprites.yaml
  - sprites/weapon_sprites.yaml

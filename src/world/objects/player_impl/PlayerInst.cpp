@@ -50,7 +50,7 @@ void PlayerInst::step(GameState* gs) {
 
 	CombatGameInst::step(gs);
 
-	gs->level()->steps_left = 1000;
+	gs->get_level()->steps_left = 1000;
 	GameView& view = gs->window_view();
 
 	queue_network_actions(gs);

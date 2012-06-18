@@ -1,8 +1,7 @@
 /*
  * GeneratedLevel.cpp
- *
- *  Created on: Mar 19, 2012
- *      Author: 100397561
+ * GeneratedLevel.cpp:
+ * 	Utility class for room generation functions, stores generated room state & where the rooms are located
  */
 
 #include "GeneratedLevel.h"

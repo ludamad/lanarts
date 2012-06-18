@@ -14,7 +14,7 @@
 
 #include "utility_objects/AnimatedInst.h"
 
-GameInst* const GAMEINST_TOMBSTONE = (GameInst*) 1;
+GameInst* const GAMEINST_TOMBSTONE = (GameInst*)1;
 
 static bool valid_inst(GameInst* inst) {
 	return inst > GAMEINST_TOMBSTONE;
@@ -64,13 +64,13 @@ struct GameInstSetFunctions { //Helper class
 		return v1.inst == v2.inst;
 	}
 	static size_t hash(const V& v) {
-		return (size_t) v.inst->id;
+		return (size_t)v.inst->id;
 	}
 	static size_t hash(GameInst* inst) {
-		return (size_t) inst->id;
+		return (size_t)inst->id;
 	}
 	static size_t hash(obj_id id) {
-		return (size_t) id;
+		return (size_t)id;
 	}
 };
 
@@ -145,6 +145,11 @@ void GameInstSet::remove_instance(GameInst* inst, bool deallocate) {
 	}
 }
 
+bool GameInstSet::within_bounds_check(const Pos& c) {
+	return !(c.x < 0 || c.y < 0 || c.x >= grid_w * REGION_SIZE
+			|| c.y >= grid_h * REGION_SIZE);
+}
+
 obj_id GameInstSet::add_instance(GameInst* inst, int id) {
 	if (tset_should_resize(unit_amnt, unit_capacity))
 		this->reallocate_internal_data();
@@ -162,8 +167,11 @@ obj_id GameInstSet::add_instance(GameInst* inst, int id) {
 	if (tset_add_noequal<GameInstSetFunctions>(inst, state, unit_capacity))
 		unit_amnt++;
 
-	InstanceLinkedList& unit_list = unit_grid[get_xyind(c, grid_w)];
-	add_to_collisionlist(state, unit_list);
+	if (true || inst->solid) {
+		LANARTS_ASSERT(within_bounds_check(c));
+		InstanceLinkedList& unit_list = unit_grid[get_xyind(c, grid_w)];
+		add_to_collisionlist(state, unit_list);
+	}
 	add_to_depthlist(state, depthlist_map[inst->depth]);
 
 	return inst->id;
@@ -294,7 +302,8 @@ int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 			while (ptr) {
 				GameInst* inst = ptr->inst;
 				if (obj != inst) {
-					int radsqr = (inst->target_radius + rad) * (inst->target_radius + rad);
+					int radsqr = (inst->target_radius + rad)
+							* (inst->target_radius + rad);
 					int dx = inst->x - x, dy = inst->y - y;
 					int dsqr = dx * dx + dy * dy;
 					//want to test sqrt(dsqr) < orad+rad
@@ -346,8 +355,12 @@ void GameInstSet::update_instance_for_step(InstanceState* state,
 		GameInst* inst) {
 	if (inst->destroyed)
 		return;
-	__update_collision_position(state, Pos(inst->last_x, inst->last_y),
-			Pos(inst->x, inst->y));
+	if (true || inst->solid) {
+		Pos last_pos(inst->last_x, inst->last_y), new_pos(inst->x, inst->y);
+		LANARTS_ASSERT(within_bounds_check(last_pos));
+		LANARTS_ASSERT(within_bounds_check(new_pos));
+		__update_collision_position(state, last_pos, new_pos);
+	}
 	inst->last_x = inst->x, inst->last_y = inst->y;
 }
 
@@ -381,6 +394,7 @@ void GameInstSet::remove_from_depthlist(InstanceState* inst,
 
 void GameInstSet::add_to_collisionlist(InstanceState* inst,
 		InstanceLinkedList& list) {
+//	LANARTS_ASSERT(inst->inst->solid);
 	inst->next_in_grid = NULL;
 	if (list.start_of_list == NULL) {
 		inst->prev_in_grid = NULL;
@@ -434,4 +448,3 @@ void GameInstSet::remove_from_collisionlist(InstanceState* inst,
 	else
 		next->prev_in_grid = prev;
 }
-

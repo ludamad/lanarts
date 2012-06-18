@@ -84,7 +84,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 			}
 		}
 	}
-	gs->level()->entrances.clear();
+	gs->get_level()->entrances.clear();
 	for(int n = 0; n < fs.nstairs_down; n++){
 		Pos p = generate_location(mt, level);
 		level.at(p).has_instance = true;
@@ -94,10 +94,10 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 
 		tiles.get(p.x, p.y) = rltile(mt, get_tile_by_name("stairs_down"));
 
-		gs->level()->entrances.push_back(GameLevelPortal(p, Pos(0,0)));
+		gs->get_level()->entrances.push_back(GameLevelPortal(p, Pos(0,0)));
 	}
 
-	gs->level()->exits.clear();
+	gs->get_level()->exits.clear();
 	for(int n = 0; n < fs.nstairs_up; n++){
 		Pos p = generate_location(mt, level);
 		level.at(p).has_instance = true;
@@ -116,7 +116,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel&
 		p.y += start_y;
 		
 		tiles.get(p.x, p.y) = rltile(mt, get_tile_by_name("stairs_up"));
-		gs->level()->exits.push_back(GameLevelPortal(p, Pos(0,0)));
+		gs->get_level()->exits.push_back(GameLevelPortal(p, Pos(0,0)));
 	}
 
 }

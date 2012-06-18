@@ -112,7 +112,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 	direction_towards(Pos(x, y), Pos(inst->x, inst->y), rx, ry, 0.5);
 	gs->add_instance(
 			new AnimatedInst(inst->x - 5 + rx * 5, inst->y + ry * 5, -1, 25, rx,
-					ry, dmgstr, Colour(255, 148, 120)));
+					ry, AnimatedInst::DEPTH, dmgstr, Colour(255, 148, 120)));
 
 	cooldowns().reset_action_cooldown(atkstats.cooldown);
 	cooldowns().action_cooldown += gs->rng().rand(-4, 5);
@@ -134,7 +134,8 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 
 	WeaponEntry& wentry = weapon.weapon_entry();
 	ProjectileEntry& pentry = projectile.projectile_entry();
-	EffectiveAttackStats atkstats = effective_atk_stats(mt, AttackStats(weapon, projectile));
+	EffectiveAttackStats atkstats = effective_atk_stats(mt,
+			AttackStats(weapon, projectile));
 
 	Pos p(inst->x, inst->y);
 	p.x += gs->rng().rand(-12, +13);
@@ -144,8 +145,8 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 		p.y = inst->y;
 	}
 
-	GameInst* bullet = new _ProjectileInst(projectile, atkstats, id,
-			Pos(x, y), p, pentry.speed, pentry.range, false, 1);
+	GameInst* bullet = new _ProjectileInst(projectile, atkstats, id, Pos(x, y),
+			p, pentry.speed, pentry.range);
 	gs->add_instance(bullet);
 	cooldowns().reset_action_cooldown(pentry.cooldown);
 	cooldowns().action_cooldown += gs->rng().rand(-4, 5);

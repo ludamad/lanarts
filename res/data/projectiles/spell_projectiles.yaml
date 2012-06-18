@@ -3,7 +3,7 @@ projectiles:
   - name: Fire Bolt
     weapon_class: magic
     damage_type: {magic: 1.0}
-    damage: { base: 6, magic: 1.0 }
+    damage: { base: [6,8], magic: 1.0 }
     power: { base: 1, magic: 0.2 }
     range: 300
     cooldown: 45
@@ -14,8 +14,8 @@ projectiles:
   - name: Magic Blast
     weapon_class: magic
     damage_type: { magic: 1.0}
-    damage: { base: [10,16], magic: 2.0 }
-    power: { base: [1,2], magic: 0.2 }
+    damage: { base: [10,17], magic: 2.0 }
+    power: { base: 1, magic: 0.2 }
     range: 300
     cooldown: 65
     speed: 4.5

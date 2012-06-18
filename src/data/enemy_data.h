@@ -10,6 +10,7 @@
 #include <string>
 #include <cstdio>
 
+#include "../util/game_basic_structs.h"
 #include "../util/LuaValue.h"
 
 #include "../gamestats/combat_stats.h"
@@ -18,14 +19,14 @@ struct EnemyEntry {
 	std::string name, appear_msg, defeat_msg;
 	int radius;
 	int xpaward;
-	int sprite_number;
+	sprite_id enemy_sprite, death_sprite;
 	CombatStats basestats;
 	bool unique;
 
 	LuaValue init_event, step_event;
 
 	EnemyEntry() :
-			radius(15), xpaward(0), sprite_number(-1), unique(false) {
+			radius(15), xpaward(0), enemy_sprite(-1), death_sprite(-1), unique(false) {
 	}
 
 	void init(lua_State* L) {

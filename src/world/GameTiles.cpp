@@ -1,14 +1,14 @@
 #include <cstring>
 #include <SDL_opengl.h>
 
-#include "GameTiles.h"
-#include "GameState.h"
-
 #include "../data/tile_data.h"
 
 #include "../display/display.h"
 
 #include "../procedural/levelgen.h"
+
+#include "GameTiles.h"
+#include "GameState.h"
 
 GameTiles::GameTiles(int width, int height) :
 		width(width), height(height), solid_tiles(width * height, true) {

@@ -30,7 +30,7 @@ void GameWorld::generate_room(GameLevelState* level) {
 }
 
 int GameWorld::get_current_level_id() {
-	return game_state->level()->roomid;
+	return game_state->get_level()->roomid;
 }
 
 void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, int classn,
@@ -97,7 +97,7 @@ void GameWorld::spawn_players(GeneratedLevel& genlevel, void** player_instances,
 }
 GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer,
 		void** player_instances, size_t nplayers) {
-	GameLevelState* currlvl = game_state->level(); // Save level context
+	GameLevelState* currlvl = game_state->get_level(); // Save level context
 
 	if (roomid >= level_states.size()) {
 		level_states.resize(roomid + 1, NULL);
@@ -106,15 +106,15 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer,
 		GeneratedLevel genlevel;
 		GameLevelState* newlvl = generate_level(roomid, game_state->rng(),
 				genlevel, game_state);
-
-		game_state->level() = level_states[roomid] = newlvl;
+		level_states[roomid] = newlvl;
+		game_state->set_level(newlvl);
 
 		if (spawnplayer) {
 			spawn_players(genlevel, player_instances, nplayers);
 		}
 	}
 
-	game_state->level() = currlvl; // Restore level context
+	game_state->set_level(currlvl); // Restore level context
 	return level_states[roomid];
 }
 
@@ -122,20 +122,20 @@ bool GameWorld::pre_step() {
 	if (!game_state->update_iostate())
 		return false;
 
-	GameLevelState* current_level = game_state->level();
+	GameLevelState* current_level = game_state->get_level();
 
 	midstep = true;
 	game_state->frame()++;for
 (	int i = 0; i < level_states.size(); i++) {
-		game_state->level() = level_states[i];
-		const std::vector<obj_id>& player_ids = game_state->level()->pc.player_ids();
+		game_state->set_level(level_states[i]);
+		const std::vector<obj_id>& player_ids = game_state->get_level()->pc.player_ids();
 		for (int i = 0; i < player_ids.size(); i++) {
 			PlayerInst* p = (PlayerInst*)game_state->get_instance(player_ids[i]);
 			p->queue_io_actions(game_state);
 			p->performed_actions_for_step() = false;
 		}
 	}
-	game_state->level() = current_level;
+	game_state->set_level(current_level);
 	midstep = false;
 	return true;
 }
@@ -143,21 +143,21 @@ void GameWorld::step() {
 	redofirststep: //I used a goto dont kill me
 
 	const int STEPS_TO_SIMULATE = 1000;
-	GameLevelState* current_level = game_state->level();
+	GameLevelState* current_level = game_state->get_level();
 //	current_level->steps_left = STEPS_TO_SIMULATE;
 
-	bool inmenu = (game_state->level()->level_number == -1);
+	bool inmenu = (game_state->get_level()->level_number == -1);
 	midstep = true;
 
 	for (int i = 0; i < level_states.size(); i++) {
 		if (level_states[i]->steps_left > 0) {
-			int prehashvalue = game_state->level()->inst_set.hash();
+			int prehashvalue = game_state->get_level()->inst_set.hash();
 
 //			if (!inmenu && !game_state->net_connection().check_integrity(game_state, prehashvalue)) {
 //				printf("Hashes don't match before step, frame %d, level %d\n", game_state->frame(), i);
 //			}
 			//Set so that all the GameState getters are properly updated
-			game_state->level() = level_states[i];
+			game_state->set_level(level_states[i]);
 
 //Clone part1:
 //			GameLevelState* clone = game_state->level()->clone();
@@ -165,11 +165,11 @@ void GameWorld::step() {
 ////			level_states[i] = clone;
 //            game_state->level() = clone;
 
-			game_state->level()->pc.pre_step(game_state);
-			game_state->level()->mc.pre_step(game_state);
-			game_state->level()->inst_set.step(game_state);
-			game_state->level()->steps_left--;
-			game_state->level()->tiles.step(game_state);
+			game_state->get_level()->pc.pre_step(game_state);
+			game_state->get_level()->mc.pre_step(game_state);
+			game_state->get_level()->inst_set.step(game_state);
+			game_state->get_level()->steps_left--;
+			game_state->get_level()->tiles.step(game_state);
 //Clone part2:
 ////            if (real == current_level) current_level = clone;
 //            game_state->level() = real;
@@ -184,7 +184,7 @@ void GameWorld::step() {
 		}
 	}
 
-	game_state->level() = current_level;
+	game_state->set_level(current_level);
 
 	midstep = false;
 	if (next_room_id == -2) {
@@ -198,7 +198,7 @@ void GameWorld::step() {
 		game_state->window_view().sharp_center_on(g->x, g->y);
 		next_room_id = -1;
 
-		game_state->level()->pc.update_fieldsofview(game_state);
+		game_state->get_level()->pc.update_fieldsofview(game_state);
 // 		goto redofirststep;// goto top
 	}
 }
@@ -213,24 +213,24 @@ void GameWorld::regen_level(int roomid) {
 		player_cache.push_back(p);
 		p->core_stats().heal_fully();
 	}
-	delete level;
 	level_states[roomid] = NULL;
 	GameLevelState* newlevel = get_level(roomid, true, (void**)&player_cache[0],
 			player_cache.size());
-	if (game_state->level() == level) {
-		game_state->level() = newlevel;
-		game_state->level()->steps_left = 1000;
+	if (game_state->get_level() == level) {
+		game_state->set_level(newlevel);
+		game_state->get_level()->steps_left = 1000;
 		GameInst* p = game_state->get_instance(game_state->local_playerid());
 		game_state->window_view().sharp_center_on(p->x, p->y);
 	}
+	delete level;
 }
 
 void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	//save the level context
-	GameLevelState* last = game_state->level();
+	GameLevelState* last = game_state->get_level();
 	GameLevelState* state = get_level(roomid1);
 	//set the level context
-	game_state->level() = state;
+	game_state->set_level(state);
 
 	GameInst* inst = game_state->get_instance(id);
 
@@ -241,11 +241,11 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	inst->last_x = x, inst->last_y = y;
 	inst->x = x, inst->y = y;
 
-	game_state->level() = get_level(roomid2);
+	game_state->set_level(get_level(roomid2));
 	game_state->add_instance(inst);
-	game_state->level()->steps_left = 1000;
+	game_state->get_level()->steps_left = 1000;
 
-	game_state->level() = last;
+	game_state->set_level(last);
 	PlayerInst* p;
 	if ((p = dynamic_cast<PlayerInst*>(inst)) && p->is_local_player()) {
 		set_current_level_lazy(roomid2);
@@ -257,23 +257,27 @@ void GameWorld::set_current_level(int roomid) {
 	if (midstep)
 		set_current_level_lazy(roomid);
 	else
-		game_state->level() = get_level(roomid);
+		game_state->set_level(get_level(roomid));
 }
 void GameWorld::set_current_level_lazy(int roomid) {
 	next_room_id = roomid;
 }
 
 void GameWorld::reset(int keep) {
+	std::vector<GameLevelState*> delete_list;
 	if (midstep) {
 		next_room_id = -2;
 	} else {
 		for (int i = keep; i < level_states.size(); i++) {
-			delete level_states[i];
+			delete_list.push_back(level_states[i]);
 		}
 		level_states.resize(keep);
-		game_state->level() = get_level(keep, true /*spawn player*/);
-		game_state->level()->steps_left = 1000;
+		game_state->set_level(get_level(keep, true /*spawn player*/));
+		game_state->get_level()->steps_left = 1000;
 		game_state->game_chat().clear();
+	}
+	for (int i = 0; i < delete_list.size(); i++) {
+		delete delete_list[i];
 	}
 }
 

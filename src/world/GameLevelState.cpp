@@ -5,10 +5,10 @@
 
 #include "GameLevelState.h"
 
-GameLevelState::GameLevelState(int roomid, int branch, int level, int w, int h,
+GameLevelState::GameLevelState(int roomid, int branch, int level, int w, int h, bool wandering_flag,
 		bool is_simulation) :
 		roomid(roomid), steps_left(0), branch_number(branch), level_number(
-				level), width(w), height(h), tiles(w / TILE_SIZE, h / TILE_SIZE), inst_set(w, h), is_simulation(
+				level), width(w), height(h), tiles(w / TILE_SIZE, h / TILE_SIZE), inst_set(w, h), mc(wandering_flag), is_simulation(
 				is_simulation) {
 }
 

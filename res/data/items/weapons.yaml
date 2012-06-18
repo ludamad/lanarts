@@ -30,7 +30,7 @@ weapons:
     weapon_class: maces and flails
     max_targets: 2
     damage: {base: [8,14], strength: 2.0}
-    power: {base: [2,5], strength: 1.1}
+    power: {base: [2,5], strength: 0.25}
     range: 18
     cooldown: 55
     spr_item: mace

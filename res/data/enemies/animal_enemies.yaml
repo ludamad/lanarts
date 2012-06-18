@@ -1,0 +1,80 @@
+---
+#Enemy Markup
+enemies:
+  - name: Giant Rat
+    sprite: giant rat
+    death_sprite: blood
+    radius: 10
+    xpaward: 5
+    appear_message: A hostile large rat approaches!
+    defeat_message: A loud squeek is heard as the rat is blown to bits.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 25
+        hpregen: 0.03
+        movespeed: 2
+        #base stats:
+        strength: 10
+        defence: 2
+        willpower: 2
+       
+  - name: Hound
+    sprite: hound
+    death_sprite: blood
+    radius: 14
+    xpaward: 10
+    appear_message: A hungry, feral hound notices you.
+    defeat_message: The hound yelps as it is pulverized.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 35
+        hpregen: 0.03
+        movespeed: 2.5
+        strength: 12
+        defence: 2
+        willpower: 2
+
+  - name: Sheep
+    sprite: sheep
+    radius: 14
+    xpaward: 8
+    appear_message: A hostile sheep approaches!
+    defeat_message: The sheep recieves a fatal blow.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 35
+        hpregen: 0.03
+        movespeed: 2
+        strength: 10
+        defence: 2
+        willpower: 2
+          
+  - name: Chicken
+    sprite: chicken
+    radius: 10
+    xpaward: 10
+    appear_message: A hostile chicken appears!
+    defeat_message: The chicken is blown to bits.
+    stats:
+        attacks: [ {weapon: Fast Melee} ]
+        hp: 18
+        hpregen: 0.04
+        movespeed: 3
+        strength: 15
+        defence: 5
+        willpower: 5
+        
+  - name: Super Chicken
+    sprite: super_chicken
+    radius: 14
+    xpaward: 20
+    appear_message: An unnaturally glowing chicken appears!
+    defeat_message: The glowing chicken recieves a fatal blow.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 75
+        hpregen: 0.08
+        movespeed: 4
+        strength: 25
+        defence: 15  
+        willpower: 15

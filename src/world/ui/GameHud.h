@@ -57,7 +57,7 @@ private:
 		INVENTORY, STATS, SHOP
 	};
 	/* Helper method for drawing mini-map based on game information */
-	void draw_minimap(GameState* gs, const BBox& bbox);
+	void draw_minimap(GameState* gs, const BBox& bbox, float scale);
 
 	BBox minimapbox;
 	int x, y, _width, _height;

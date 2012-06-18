@@ -50,7 +50,7 @@ template<typename T>
 static int get_X_by_name(const T& t, const char* name, bool error_if_not_found =
 		true) {
 	for (int i = 0; i < t.size(); i++) {
-		if (name == t[i].name) {
+		if (name == t.at(i).name) {
 			return i;
 		}
 	}

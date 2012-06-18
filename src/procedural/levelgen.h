@@ -21,9 +21,10 @@ struct RoomGenSettings {
 	int room_padding;
 	int amount_of_rooms;
 	int min_size, max_size;
-	RoomGenSettings(int pad, int amnt, int mins, int maxs) :
+	bool solid_fill;
+	RoomGenSettings(int pad, int amnt, int mins, int maxs, bool solid_fill) :
 			room_padding(pad), amount_of_rooms(amnt), min_size(mins), max_size(
-					maxs) {
+					maxs), solid_fill(solid_fill) {
 	}
 };
 struct LevelGenSettings {
@@ -33,12 +34,13 @@ struct LevelGenSettings {
 	FeatureGenSettings features;
 	EnemyGenSettings enemies;
 	int level_w, level_h;
+	bool wander;
 
-	LevelGenSettings(int w, int h, const ItemGenSettings& i,
+	LevelGenSettings(int w, int h, bool wander, const ItemGenSettings& i,
 			const RoomGenSettings& r, const TunnelGenSettings& t,
 			const FeatureGenSettings& f, const EnemyGenSettings& e) :
 			items(i), rooms(r), tunnels(t), features(f), enemies(e), level_w(w), level_h(
-					h) {
+					h), wander(wander) {
 	}
 };
 

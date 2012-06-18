@@ -9,6 +9,18 @@ tilesets:
     floor_tile: sand_rock
     wall_tile: hive_wall
 
+  - tileset: lair_tiles
+    floor_tile: lair_floor
+    alt_floor_tile: mesh
+    corridor_tile: mesh
+    wall_tile: marble_wall
+
+  - tileset: cobalt_tiles
+    floor_tile: cobalt_floor
+    alt_floor_tile: mesh
+    corridor_tile: mesh
+    wall_tile: marble_wall
+
   - tileset: pebble_tiles
     floor_tile: pebble_brown
     wall_tile: brick
