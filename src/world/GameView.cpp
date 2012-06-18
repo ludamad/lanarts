@@ -37,13 +37,13 @@ void GameView::move_towards(int px, int py) {
 }
 
 void GameView::min_tile_within(int& px, int& py) const {
-	px = x / TILE_SIZE;
-	py = y / TILE_SIZE;
+	px = std::max(0,x / TILE_SIZE);
+	py = std::max(0,y / TILE_SIZE);
 }
 
 void GameView::max_tile_within(int& px, int& py) const {
-	px = (x + width) / TILE_SIZE;
-	py = (y + height) / TILE_SIZE;
+	px = (std::min(world_width, x + width)) / TILE_SIZE;
+	py = (std::min(world_height, y + height)) / TILE_SIZE;
 }
 
 void GameView::sharp_center_on(int px, int py) {

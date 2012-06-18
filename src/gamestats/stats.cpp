@@ -57,8 +57,8 @@ float CoreStatMultiplier::calculate(MTwist& mt, const CoreStats& stats) {
 	int basevalue = mt.rand(base);
 	int stats_sum = stats.strength * strength + stats.defence * defence
 			+ stats.magic * magic + stats.willpower * willpower;
-	float random_multiplier = (100 + mt.rand(Range(-5, 5))) / 100.0f;
-	return basevalue + stats_sum * random_multiplier;
+//	float random_multiplier = (100 + mt.rand(Range(-5, 5))) / 100.0f;
+	return basevalue + stats_sum;// * random_multiplier;
 }
 
 EffectiveAttackStats EffectiveStats::with_attack(MTwist& mt,

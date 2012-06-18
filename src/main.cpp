@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <ctime>
+
 #include <SDL.h>
 #include <SDL_opengl.h>
 
