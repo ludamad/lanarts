@@ -21,14 +21,18 @@ void lua_pusheffects(lua_State* L, int effectnum);
 
 void lua_push_combatstats(lua_State* L, obj_id id);
 void lua_push_combatstats(lua_State* L, const CombatStats& stats);
-void lua_push_effective_stats(lua_State* L, const EffectiveStats& stats);
+void lua_push_effectivestats(lua_State* L, const EffectiveStats& stats);
+
+CombatStats& lua_get_combatstats(lua_State* L, int narg);
+EffectiveStats& lua_get_effectivestats(lua_State* L, int narg);
 
 GameState* lua_get_gamestate(lua_State* L);
 
 void lua_gameinst_bindings(GameState* gs, lua_State* L);
 void lua_effects_bindings(GameState* gs, lua_State* L);
 void lua_gamestate_bindings(GameState* gs, lua_State* L);
-void lua_stats_bindings(GameState* gs, lua_State* L);
+void lua_combatstats_bindings(GameState* gs, lua_State* L);
+void lua_effectivestats_bindings(GameState* gs, lua_State* L);
 void lua_lanarts_api(GameState* gs, lua_State* L);
 
 //Implemented in data/game_data.cpp

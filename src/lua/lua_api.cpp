@@ -10,6 +10,7 @@ void lua_lanarts_api(GameState* state, lua_State* L){
 	luaL_openlibs(L);
 	lua_gamestate_bindings(state, L);
 	lua_gameinst_bindings(state, L);
-	lua_stats_bindings(state, L);
+	lua_combatstats_bindings(state, L);
+	lua_effectivestats_bindings(state, L);
 }
 
