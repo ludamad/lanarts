@@ -294,7 +294,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 		int weaprange = std::max(wentry.range, pentry.range);
 
 		AttackStats weaponattack(weapon_type());
-		GameInst* bullet = new _ProjectileInst(projectile,
+		GameInst* bullet = new ProjectileInst(projectile,
 				effective_atk_stats(mt, weaponattack), id, start, actpos,
 				pentry.speed, weaprange);
 		gs->add_instance(bullet);
@@ -374,7 +374,7 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 		Pos self(x, y), target(action.action_x, action.action_y);
 		ProjectileEntry& pentry = projectile.projectile_entry();
 		AttackStats spellattack(Weapon(), projectile);
-		GameInst* bullet = new _ProjectileInst(projectile,
+		GameInst* bullet = new ProjectileInst(projectile,
 				effective_atk_stats(mt, spellattack), id, self, target,
 				pentry.speed, pentry.range, NONE, bounce, hits);
 		gs->add_instance(bullet);

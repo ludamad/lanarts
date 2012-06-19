@@ -15,60 +15,23 @@
 const int INVENTORY_SIZE = 40;
 
 struct ItemSlot {
-	item_id item;
+	Item item;
 	int amount;
+	ItemSlot() : amount(0) {
+	}
 };
 
 class Inventory {
 public:
-	Inventory() {
-		for (int i = 0; i < INVENTORY_SIZE; i++) {
-			inv[i].amount = 0;
-		}
-	}
-	bool add(int item, int number) {
-
-		for (int i = 0; i < INVENTORY_SIZE; i++) {
-			if (inv[i].item == item && inv[i].amount > 0) {
-				inv[i].item = item;
-				inv[i].amount += number;
-				return true;
-			}
-		}
-		for (int i = 0; i < INVENTORY_SIZE; i++) {
-			if (inv[i].amount == 0) {
-				inv[i].item = item;
-				inv[i].amount += number;
-				return true;
-			}
-		}
-		return false;
-	}
-	ItemSlot& get(int i) {
-		return inv[i];
-	}
-private:
-	ItemSlot inv[INVENTORY_SIZE];
-};
-
-struct _ItemSlot {
-	Item item;
-	int amount;
-	_ItemSlot() : amount(0) {
-	}
-};
-
-class _Inventory {
-public:
-	_Inventory(int size = INVENTORY_SIZE) {
+	Inventory(int size = INVENTORY_SIZE) {
 		items.resize(size);
 	}
 	bool add(const Item& item, int amount);
-	_ItemSlot& get(int i) {
+	ItemSlot& get(int i) {
 		return items.at(i);
 	}
 private:
-	std::vector<_ItemSlot> items;
+	std::vector<ItemSlot> items;
 };
 
 #endif // INVENTORY_H

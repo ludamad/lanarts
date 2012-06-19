@@ -3,18 +3,22 @@
 #Dungeon Markup
 
 default_items: &default_items #Reference with *default_items
-  - { item: Arrow,              chance: 10,  quantity: [2,20]  }
-  - { item: Stone Arrow,        chance: 10,  quantity: [1,5]   }
-  - { item: Short Bow,          chance: 5                      }
-  - { item: Stone,              chance: 25,  quantity: [1,3]   }
+  - { item: Arrow,              chance: 20,  quantity: [2,20]  }
+  - { item: Stone Arrow,        chance: 20,  quantity: [1,5]   }
+  - { item: Short Bow,          chance: 10                     }
+  - { item: Stone,              chance: 25,  quantity: [2,8]   }
   - { item: Gold,               chance: 75,  quantity: [5,20]  }
-  - { item: Haste Scroll,       chance: 25                     }
-  - { item: Health Potion,      chance: 25                     }
-  - { item: Mana Potion,        chance: 25                     }
-  - { item: Dagger,             chance: 25                     }
-  - { item: Strength Scroll,    chance: 5                      }
-  - { item: Magic Scroll,       chance: 5                      }
-  - { item: Defence Scroll,     chance: 5                      }
+  - { item: Haste Scroll,       chance: 15                     }
+  - { item: Health Potion,      chance: 5                      }
+  - { item: Mana Potion,        chance: 5                      }
+  - { item: Dagger,             chance: 15                     }
+  - { item: Short Sword,        chance: 10                     }
+  - { item: Mace,               chance: 5                      }
+  - { item: Dagger,             chance: 15                     }
+  - { item: Strength Scroll,    chance: 2                      }
+  - { item: Magic Scroll,       chance: 2                      }
+  - { item: Defence Scroll,     chance: 2                      }
+  - { item: Will Scroll,   	chance: 2                      }
 
 easy_animals: &easy_animals
   - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 2 }
@@ -29,8 +33,10 @@ easy_animals: &medium_animals
 
 easy_enemies: &easy_enemies
   - { enemy: Skeleton,          chance: 100                                   }
-  - { enemy: Chicken,           chance: 33                                    }
-  - { enemy: Zombie,            chance: 33,  group_chance: 33, group_size: 2  }
+  - { enemy: Chicken,           chance: 100                                   }
+  - { enemy: Zombie,            chance: 33 				      }
+  - { enemy: Cloud Elemental,   chance: 33,  group_chance: 33, group_size: 2  }
+  - { enemy: Storm Elemental,   chance: 33 				      }
 
 medium_enemies: &medium_enemies
   - { enemy: Skeleton,          chance: 100                                   }
@@ -128,6 +134,7 @@ layouts:
 areas:
   - branch: main_branch
     levels:
+#tiny levels with animals
       #Level 1
       - layout: [*tiny_layout1]
         content:
@@ -138,33 +145,40 @@ areas:
       #Level 2
       - layout: [*tiny_layout1, *tiny_layout2, *tiny_layout3]
         content:
-          features: { tileset: lair_tiles2}
-          items:    { amount: 8,  generated: *default_items   }
-          enemies: { wandering: no, amount: 8, generated: *easy_animals }
-          
+          features: { tileset: lair_tiles1}
+          items:    { amount: 3,  generated: *default_items   }
+          enemies: { wandering: no, amount: 4, generated: *easy_animals }
+        
       #Level 3
-      - layout: [*small_layout1, *small_layout2, *small_layout3, *small_layout4]
+      - layout: [*tiny_layout1, *tiny_layout2, *tiny_layout3]
         content:
-          features: { tileset: lair_tiles2}
-          items:    { amount: 5,  generated: *default_items   }
+          features: { tileset: lair_tiles1}
+          items:    { amount: 3,  generated: *default_items   }          
           enemies: { 
-            wandering: no, amount: 8, 
-            generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 100}] 
+            wandering: no, amount: 5, 
+            generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}] 
           }
           
+#small levels with easy enemies
+      #Level 4
+      - layout: [*small_layout1]
+        content:
+          features: { tileset: crystal_tiles}
+          items:    { amount: 8,  generated: *default_items   }
+          enemies:  { amount: 5,  generated: *easy_enemies    }
       #Level 4
       - layout: [*small_layout1, *small_layout2, *small_layout3, *small_layout4]
         content:
-          features: { tileset: lair_tiles2}
+          features: { tileset: pebble_tiles}
           items:    { amount: 5,  generated: *default_items   }
-          enemies: { wandering: no, amount: 8, generated: *easy_animals }      
+          enemies: { wandering: no, amount: 8, generated: *easy_enemies }      
           
       #Level 5
       - layout: [*small_layout1, *small_layout2, *small_layout3, *small_layout4]
         content:
-          features: { tileset: lair_tiles2}
+          features: { tileset: pebble_tiles}
           items:    { amount: 5,  generated: *default_items   }
-          enemies: { wandering: no, amount: 8, generated: *easy_animals }
+          enemies: { wandering: no, amount: 8, generated: *easy_enemies }
           
       #Level 6
       - layout: [*small_layout1, *small_layout2, *small_layout3, *small_layout4]

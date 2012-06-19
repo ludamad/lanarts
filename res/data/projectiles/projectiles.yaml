@@ -16,17 +16,17 @@ projectiles:
     spr_attack: stone_arrow_projectile
     #Stats
     damage: {base: [4,6]}
-    power: {base: 1}
+    power: {base: 2}
     drop_chance: 90 # % chance
     speed: 5
 
   - name: Stone
     weapon_class: unarmed
     spr_item: stone
-    drop_chance: 50 # % chance
+    drop_chance: 90 # % chance
     #Stats
     range: 400
     speed: 8
     cooldown: 20
     damage: {base: [5,8], strength: 1.0}
-    power: {base: 2, strength: 1.0}
+    power: {base: 2, strength: 0.2}

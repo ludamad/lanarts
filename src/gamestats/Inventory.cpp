@@ -7,7 +7,7 @@
 
 #include "Inventory.h"
 
-bool _Inventory::add(const Item& item, int amount) {
+bool Inventory::add(const Item& item, int amount) {
 	/* Try to merge with existing entry */
 	for (int i = 0; i < items.size(); i++) {
 		if (items[i].item == item && items[i].amount > 0) {

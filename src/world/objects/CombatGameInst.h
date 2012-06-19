@@ -53,8 +53,8 @@ public:
 
 	CooldownStats& cooldowns();
 	EffectStats& effects();
-	_Inventory& inventory();
-	_Equipment& equipment();
+	Inventory& inventory();
+	Equipment& equipment();
 
 	team_id& team();
 

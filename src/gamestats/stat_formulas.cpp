@@ -57,7 +57,7 @@ int damage_formula(const EffectiveAttackStats& attacker,
 }
 
 static void derive_from_equipment(MTwist& mt, EffectiveStats& effective,
-		const _Equipment& equipment) {
+		const Equipment& equipment) {
 	CoreStats& core = effective.core;
 	WeaponEntry& wentry = equipment.weapon.weapon_entry();
 	effective.physical.resistance = core.defence / 2.5f;

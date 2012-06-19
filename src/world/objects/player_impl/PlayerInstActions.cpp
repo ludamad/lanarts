@@ -40,7 +40,7 @@ static bool is_same_projectile(const Projectile& projectile, const Item& item) {
 	return false;
 }
 
-static bool is_wieldable_projectile(_Equipment& equipment, const Item& item) {
+static bool is_wieldable_projectile(Equipment& equipment, const Item& item) {
 	if (is_same_projectile(equipment.projectile, item))
 		return true;
 
@@ -268,7 +268,7 @@ void PlayerInst::equip(item_id item, int amnt) {
 }
 
 void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
-	_ItemSlot& itemslot = inventory().get(action.use_id);
+	ItemSlot& itemslot = inventory().get(action.use_id);
 	int dropx = round_to_multiple(x, TILE_SIZE, true), dropy =
 			round_to_multiple(y, TILE_SIZE, true);
 	int amnt = itemslot.amount;
@@ -278,8 +278,8 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::reposition_item(GameState* gs, const GameAction& action) {
-	_ItemSlot& itemslot1 = inventory().get(action.use_id);
-	_ItemSlot& itemslot2 = inventory().get(action.use_id2);
+	ItemSlot& itemslot1 = inventory().get(action.use_id);
+	ItemSlot& itemslot2 = inventory().get(action.use_id2);
 
 	std::swap(itemslot1, itemslot2);
 	gs->game_hud().reset_slot_selected();
@@ -341,7 +341,7 @@ static void item_do_lua_action(lua_State* L, ItemEntry& type, obj_id user,
 	lua_call(L, 5, 0);
 }
 void PlayerInst::use_item(GameState* gs, const GameAction& action) {
-	_ItemSlot& itemslot = inventory().get(action.use_id);
+	ItemSlot& itemslot = inventory().get(action.use_id);
 	ItemEntry& type = itemslot.item.item_entry();
 
 	lua_State* L = gs->get_luastate();

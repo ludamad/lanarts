@@ -145,7 +145,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 		p.y = inst->y;
 	}
 
-	GameInst* bullet = new _ProjectileInst(projectile, atkstats, id, Pos(x, y),
+	GameInst* bullet = new ProjectileInst(projectile, atkstats, id, Pos(x, y),
 			p, pentry.speed, pentry.range);
 	gs->add_instance(bullet);
 	cooldowns().reset_action_cooldown(pentry.cooldown);
@@ -187,10 +187,10 @@ CoreStats& CombatGameInst::core_stats() {
 	return stats().core;
 }
 
-_Inventory& CombatGameInst::inventory() {
+Inventory& CombatGameInst::inventory() {
 	return stats().equipment.inventory;
 }
 
-_Equipment& CombatGameInst::equipment() {
+Equipment& CombatGameInst::equipment() {
 	return stats().equipment;
 }

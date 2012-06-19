@@ -39,7 +39,7 @@ struct CombatStats {
 	CoreStats core;
 	CooldownStats cooldowns;
 	ClassStats class_stats;
-	_Equipment equipment;
+	Equipment equipment;
 	EffectStats effects;
 
 	std::vector<AttackStats> attacks;
@@ -49,7 +49,7 @@ struct CombatStats {
 	CombatStats(const ClassStats& class_stats = ClassStats(),
 			const CoreStats& core = CoreStats(),
 			const CooldownStats& cooldowns = CooldownStats(),
-			const _Equipment& equipment = _Equipment(),
+			const Equipment& equipment = Equipment(),
 			const std::vector<AttackStats>& attacks =
 					std::vector<AttackStats>(), float movespeed = 0.0f) :
 			core(core), cooldowns(cooldowns), class_stats(class_stats), equipment(

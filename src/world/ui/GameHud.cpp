@@ -54,7 +54,7 @@ static void draw_player_statbars(GameState*gs, PlayerInst* player, int x,
 				"can rest", player->rest_cooldown() * 100 / REST_COOLDOWN);
 }
 
-static void draw_player_inventory_slot(GameState* gs, _ItemSlot& itemslot,
+static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot,
 		int x, int y) {
 	if (itemslot.amount > 0) {
 		ItemEntry& itemd = itemslot.item.item_entry();
@@ -66,7 +66,7 @@ static void draw_player_inventory_slot(GameState* gs, _ItemSlot& itemslot,
 }
 static void draw_player_inventory(GameState* gs, PlayerInst* player, int inv_x,
 		int inv_y, int w, int h, int slot_selected) {
-	_Inventory& inv = player->inventory();
+	Inventory& inv = player->inventory();
 
 	int slot = 0;
 	for (int y = 0; y < h; y += TILE_SIZE) {
@@ -74,7 +74,7 @@ static void draw_player_inventory(GameState* gs, PlayerInst* player, int inv_x,
 			if (slot >= INVENTORY_SIZE)
 				break;
 
-			_ItemSlot& itemslot = inv.get(slot);
+			ItemSlot& itemslot = inv.get(slot);
 
 			Colour outline(43, 43, 43);
 			if (itemslot.amount > 0 && slot != slot_selected)
@@ -103,7 +103,7 @@ static Colour outline_col(bool cond) {
 static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 		int x, int y) {
 	Colour outline = outline_col(player->spell_selected() == -1);
-	_Equipment& equipment = player->equipment();
+	Equipment& equipment = player->equipment();
 
 	if (equipment.projectile == -1) {
 		gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE, outline);
@@ -198,7 +198,7 @@ void GameHud::queue_io_actions(GameState* gs, PlayerInst* player,
 	bool mouse_within_view = gs->mouse_x() < gs->window_view().width;
 	int level = gs->get_level()->roomid, frame = gs->frame();
 
-	_Inventory inv = player->inventory();
+	Inventory inv = player->inventory();
 
 	for (int i = 0; i < this->queued_actions.size(); i++) {
 		queued_actions.push_back(this->queued_actions[i]);
@@ -211,7 +211,7 @@ void GameHud::queue_io_actions(GameState* gs, PlayerInst* player,
 		int posx = (gs->mouse_x() - action_bar_x) / TILE_SIZE;
 		int posy = (gs->mouse_y() - action_bar_y) / TILE_SIZE;
 
-		_Equipment& equipment = player->equipment();
+		Equipment& equipment = player->equipment();
 		if (posy == 0 && posx == 0)
 			queued_actions.push_back(
 					GameAction(player->id, GameAction::DEEQUIP_ITEM, frame,
@@ -255,7 +255,7 @@ bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 	if (!player)
 		return false;
 
-	_Inventory inv = player->inventory();
+	Inventory inv = player->inventory();
 	const int SPELL_MAX = player->class_stats().xplevel >= 3 ? 2 : 1;
 
 	bool mleft = event->button.button == SDL_BUTTON_LEFT;
@@ -269,7 +269,7 @@ bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 			int posx = (gs->mouse_x() - action_bar_x) / TILE_SIZE;
 			int posy = (gs->mouse_y() - action_bar_y) / TILE_SIZE;
 
-			_Equipment& equipment = player->equipment();
+			Equipment& equipment = player->equipment();
 
 			if (posy == 0) {
 				if (posx == 0) {
