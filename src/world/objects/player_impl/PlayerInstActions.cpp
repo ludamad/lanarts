@@ -340,7 +340,7 @@ static void item_do_lua_action(lua_State* L, ItemEntry& type, obj_id user,
 	lua_pushnumber(L, amnt);
 	lua_call(L, 5, 0);
 }
-void PlayerInst::use_item(GameState *gs, const GameAction& action) {
+void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 	_ItemSlot& itemslot = inventory().get(action.use_id);
 	ItemEntry& type = itemslot.item.item_entry();
 
@@ -350,6 +350,9 @@ void PlayerInst::use_item(GameState *gs, const GameAction& action) {
 			&& item_check_lua_prereq(L, type, this->id)) {
 		item_do_lua_action(L, type, this->id,
 				Pos(action.action_x, action.action_y), itemslot.amount);
+		if (!type.use_message.empty()) {
+			gs->game_chat().add_message(type.use_message, Colour(100,100,255));
+		}
 		if (type.equipment_type == ItemEntry::PROJECTILE)
 			itemslot.amount = 0;
 		else

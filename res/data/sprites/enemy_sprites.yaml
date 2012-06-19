@@ -21,8 +21,11 @@ sprites:
     file: res/sprites/monsters/zombie.png
 
 #Misc
-  - name: storm ele
+  - name: storm elemental
     file: res/sprites/monsters/storm_elemental.png
+
+  - name: cloud elemental
+    file: res/sprites/monsters/cloud_elemental.png
 
   - name: exec
     file: res/sprites/monsters/exec.png

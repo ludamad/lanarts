@@ -20,8 +20,9 @@ struct Room {
 
 	Region room_region;
 	int groupID;
+	int enemies_in_room;
 	Room(const Region& r, int groupID) :
-			room_region(r), groupID(groupID) {
+			room_region(r), groupID(groupID), enemies_in_room(0) {
 	}
 	void operator=(const Room& r) {
 		memcpy(this, &r, sizeof(Room));

@@ -18,8 +18,8 @@ sprites:
   - name: gold
     file: res/sprites/items/misc/gold.png
 
-  - name: scroll
-    file: res/sprites/items/misc/scroll.png
+  - name: scroll_haste
+    file: res/sprites/items/scrolls/scroll_haste.png
 
   - name: scroll_strength
     file: res/sprites/items/scrolls/scroll_str.png
@@ -29,6 +29,9 @@ sprites:
 
   - name: scroll_magic
     file: res/sprites/items/scrolls/scroll_mag.png
+
+  - name: scroll_will
+    file: res/sprites/items/scrolls/scroll_will.png
 
   - name: health_potion
     file: res/sprites/items/misc/redpotion.png

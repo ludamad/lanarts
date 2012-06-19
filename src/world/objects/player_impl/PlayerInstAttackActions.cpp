@@ -386,7 +386,7 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	}
 
 	if (action.use_id == 0) {
-		double mult = 1 + class_stats().xplevel / 8.0;
+		double mult = 1 + (class_stats().xplevel-1) / 10.0;
 		mult = std::min(2.0, mult);
 		cooldowns().action_cooldown /= mult;
 	} else if (action.use_id == 2) {

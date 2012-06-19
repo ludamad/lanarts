@@ -30,6 +30,29 @@ void post_generate_enemy(GameState* gs, enemy_id etype, int amount) {
 	}
 }
 
+static Room& enemy_region_candidate(MTwist& mt, GeneratedLevel& level) {
+	std::vector<Room>& rooms = level.rooms();
+	int ind1 = mt.rand(rooms.size()), ind2 = mt.rand(rooms.size());
+	Room& r1 = rooms[ind1], &r2 = rooms[ind2];
+	if (r1.enemies_in_room < r2.enemies_in_room) {
+		return r1;
+	} else {
+		return r2;
+	}
+}
+static Pos enemy_position_candidate(MTwist& mt, GeneratedLevel& level,
+		const Region& region_suggestion) {
+	Pos epos;
+	int tries = 0;
+	do {
+		if (tries++ < 20) {
+			epos = generate_location_in_region(mt, level, region_suggestion);
+		} else
+			epos = generate_location(mt, level);
+	} while (level.at(epos).near_entrance);
+	return epos;
+}
+
 int generate_enemy(const EnemyGenChance& ec, MTwist& mt, GeneratedLevel& level,
 		GameState* gs, int amount) {
 
@@ -39,19 +62,12 @@ int generate_enemy(const EnemyGenChance& ec, MTwist& mt, GeneratedLevel& level,
 	int start_x = (tiles.tile_width() - level.width()) / 2;
 	int start_y = (tiles.tile_height() - level.height()) / 2;
 
-	int room = mt.rand(level.rooms().size());
-	Region r = level.rooms()[room].room_region;
+	Room& r = enemy_region_candidate(mt, level);
 
 	for (int i = 0; i < amount; i++) {
-		Pos epos;
-		int tries = 0;
-		do {
-			if (tries++ < 20) {
-				epos = generate_location_in_region(mt, level, r);
-			} else
-				epos = generate_location(mt, level);
-		} while (level.at(epos).near_entrance);
+		Pos epos = enemy_position_candidate(mt, level, r.room_region);
 		level.at(epos).has_instance = true;
+		r.enemies_in_room++;
 
 		epos.x += start_x, epos.y += start_y;
 

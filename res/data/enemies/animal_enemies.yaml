@@ -15,8 +15,8 @@ enemies:
         movespeed: 2
         #base stats:
         strength: 10
-        defence: 2
-        willpower: 2
+        defence: 5
+        willpower: 5
        
   - name: Hound
     sprite: hound
@@ -31,8 +31,8 @@ enemies:
         hpregen: 0.03
         movespeed: 2.5
         strength: 12
-        defence: 2
-        willpower: 2
+        defence: 5
+        willpower: 5
 
   - name: Sheep
     sprite: sheep
@@ -46,8 +46,8 @@ enemies:
         hpregen: 0.03
         movespeed: 2
         strength: 10
-        defence: 2
-        willpower: 2
+        defence: 5
+        willpower: 5
           
   - name: Chicken
     sprite: chicken
@@ -61,8 +61,8 @@ enemies:
         hpregen: 0.04
         movespeed: 3
         strength: 15
-        defence: 5
-        willpower: 5
+        defence: 7
+        willpower: 7
         
   - name: Super Chicken
     sprite: super_chicken

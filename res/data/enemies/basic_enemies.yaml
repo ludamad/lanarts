@@ -1,6 +1,20 @@
 ---
 #Enemy Markup
 enemies:
+  - name: Cloud Elemental
+    sprite: cloud elemental
+    radius: 12
+    xpaward: 10
+    stats:
+        attacks: [ {projectile: Storm Bolt} ]
+        movespeed: 1.5
+        hp: 30
+        hpregen: 0.02
+        strength: 5
+        magic: 10
+        defence: 5  
+        willpower: 5
+
   - name: Skeleton
     sprite: skeleton
     radius: 11
@@ -29,7 +43,7 @@ enemies:
         willpower: 5
       
   - name: Storm Elemental
-    sprite: storm ele
+    sprite: storm elemental
     radius: 14
     xpaward: 20
     stats:

@@ -16,22 +16,32 @@ items:
     amount: 50
 
   - name: Haste Scroll
-    sprite: scroll
-    action_func: increase_willpower
-#    duration: 400
+    use_message: You feel yourself moving faster and faster!
+    sprite: scroll_haste
+    action_func: hasten
+    duration: 400
     amount: 1
 
   - name: Strength Scroll
+    use_message: Strength is bestowed upon you!
     sprite: scroll_strength
     action_func: increase_strength
     amount: 1
 
   - name: Defence Scroll
+    use_message: Defence is bestowed upon you!
     sprite: scroll_defence
     action_func: increase_defence
     amount: 1
 
   - name: Magic Scroll
+    use_message: Magic is bestowed upon you!
     sprite: scroll_magic
     action_func: increase_magic
+    amount: 1
+
+  - name: Will Scroll
+    use_message: Will is bestowed upon you!
+    sprite: scroll_will
+    action_func: increase_willpower
     amount: 1

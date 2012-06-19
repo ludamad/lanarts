@@ -82,7 +82,7 @@ void load_weapon_item_entries() {
 		WeaponEntry& wtype = game_weapon_data[i];
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
 		game_item_data.push_back(
-				ItemEntry(wtype.name, default_radius, wtype.item_sprite,
+				ItemEntry(wtype.name, "", default_radius, wtype.item_sprite,
 						"equip", "", false, ItemEntry::WEAPON, i));
 	}
 }
@@ -138,7 +138,7 @@ void load_projectile_item_entries() {
 		ProjectileEntry& ptype = game_projectile_data[i];
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
 		game_item_data.push_back(
-				ItemEntry(ptype.name, default_radius, ptype.item_sprite,
+				ItemEntry(ptype.name, "", default_radius, ptype.item_sprite,
 						"equip", "", true, ItemEntry::PROJECTILE, i));
 	}
 }

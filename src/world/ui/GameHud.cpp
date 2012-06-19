@@ -438,13 +438,13 @@ void GameHud::draw(GameState* gs) {
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 40,
 			64 + 45 + 128 + 15, "Gold %d", player_inst->gold());
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
-			64 + 45 + 128 + 30, "Strength   %d", core.strength);
+			64 + 45 + 128 + 30, "Strength %d", core.strength);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
-			64 + 45 + 128 + 45, "Magic      %d", core.magic);
+			64 + 45 + 128 + 45, "Magic    %d", core.magic);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
 			64 + 45 + 128 + 60, "Defence  %d", core.defence);
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
-			64 + 45 + 128 + 75, "Willpower  %d", core.willpower);
+			64 + 45 + 128 + 75, "Will     %d", core.willpower);
 	draw_player_actionbar(gs, player_inst);
 
 	GameView& view = gs->window_view();
