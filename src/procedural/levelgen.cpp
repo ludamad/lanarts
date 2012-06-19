@@ -37,17 +37,17 @@ void generate_rooms(const RoomGenSettings& rs, MTwist& mt,
 	int w = level.width(), h = level.height();
 
 	int pad = rs.room_padding;
-	int minr = rs.min_size + pad * 2;
-	int maxr = rs.max_size + pad * 2;
+	int nrooms = mt.rand(rs.amount_of_rooms);
+	Range sizerange(rs.size.min + pad * 2, rs.size.max + pad * 2);
 
-	for (int id = 1; id <= rs.amount_of_rooms; id++) {
+	for (int id = 1; id <= nrooms; id++) {
 		for (int attempts = 0;; attempts++) {
 
-			int rw = mt.rand(minr, maxr + 1);
-			int rh = mt.rand(minr, maxr + 1);
+			int rw = mt.rand(sizerange);
+			int rh = mt.rand(sizerange);
 
-			int rx = mt.rand(w - 1 - rs.room_padding) | 1;
-			int ry = mt.rand(h - 1 - rs.room_padding) | 1;
+			int rx = mt.rand(1, w - rw - rs.room_padding) | 1;
+			int ry = mt.rand(1, h - rh - rs.room_padding) | 1;
 
 			Region r(rx, ry, rw, rh);
 			Room room(Region(rx + pad, ry + pad, rw - pad * 2, rh - pad * 2),
@@ -78,35 +78,50 @@ void generate_rooms(const RoomGenSettings& rs, MTwist& mt,
 	}
 }
 
+static const LayoutGenSettings& choose_random_layout(MTwist& mt,
+		const LevelGenSettings& ls) {
+	int layout_index = mt.rand(ls.layouts.size());
+	return ls.layouts[layout_index];
+}
+
 GameLevelState* generate_level(int roomid, MTwist& mt, GeneratedLevel& level,
 		GameState* gs) {
 	DungeonBranch& branch = game_dungeon_data[DNGN_MAIN_BRANCH];
-	const LevelGenSettings& ls = branch.level_data[roomid];
-	const RoomGenSettings& rs = ls.rooms;
 
-	level.initialize(ls.level_w, ls.level_h, rs.solid_fill);
+	const LevelGenSettings& ls = branch.level_data[roomid];
+	const ContentGenSettings& content = ls.content;
+	const LayoutGenSettings& layout = choose_random_layout(mt, ls);
+
+	const std::vector<RoomGenSettings>& roomsettings = layout.rooms;
+
+	int w = mt.rand(layout.width), h = mt.rand(layout.height);
+	bool wandering = content.enemies.wandering;
+
+	level.initialize(w, h, layout.solid_fill);
 
 	int LEVEL_BORDER_PAD = 10;
-	int lw = std::min(128, ls.level_w + LEVEL_BORDER_PAD), lh = std::min(128,
-			ls.level_h + LEVEL_BORDER_PAD);
-//	lw = 128, lh = 128;
-	GameLevelState* newlvl = new GameLevelState(roomid, DNGN_MAIN_BRANCH,
+	int lw = std::min(128, w + LEVEL_BORDER_PAD), lh = std::min(128,
+			h + LEVEL_BORDER_PAD);
+	int pxw = lw * TILE_SIZE, pxh = lh * TILE_SIZE;
 
-			roomid, lw * TILE_SIZE, lh * TILE_SIZE, ls.wander);
+	GameLevelState* newlvl = new GameLevelState(roomid, DNGN_MAIN_BRANCH,
+			roomid, pxw, pxh, wandering);
 
 	GameLevelState* prevlvl = gs->get_level(); //Save level context
 	gs->set_level(newlvl); //Set level context to new level
 
 	printf("level.init RNG state at %d numbers\n", mt.amount_of_randoms);
-	generate_rooms(rs, mt, level);
+	for (int i = 0; i < roomsettings.size(); i++) {
+		generate_rooms(roomsettings[i], mt, level);
+	}
 	printf("ROOMS state at %d numbers\n", mt.amount_of_randoms);
-	generate_tunnels(ls.tunnels, mt, level);
+	generate_tunnels(layout.tunnels, mt, level);
 	printf("TUNNELS state at %d numbers\n", mt.amount_of_randoms);
-	generate_features(ls.features, mt, level, gs);
+	generate_features(content.features, mt, level, gs);
 	printf("FEATURES state at %d numbers\n", mt.amount_of_randoms);
-	generate_enemies(ls.enemies, mt, level, gs);
+	generate_enemies(content.enemies, mt, level, gs);
 	printf("ENEMIES state at %d numbers\n", mt.amount_of_randoms);
-	generate_items(ls.items, mt, level, gs);
+	generate_items(content.items, mt, level, gs);
 	printf("ITEMS state at %d numbers\n", mt.amount_of_randoms);
 	newlvl->rooms = level.rooms();
 

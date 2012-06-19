@@ -13,12 +13,7 @@ const int MAX_TUNNEL_WIDTH = 4;
 
 struct TunnelGenSettings {
 	int padding;
-	int minwidth, maxwidth;
-	int min_tunnels, max_tunnels;
-	TunnelGenSettings(int padding, int minw,int maxw, int minn, int maxn) :
-			padding(padding), minwidth(minw), maxwidth(maxw),
-			min_tunnels(minn), max_tunnels(maxn) {
-	}
+	Range size, num_tunnels;
 };
 void generate_entrance(const Region& r, MTwist& mt, int len, Pos& p, bool& axis,
 		bool& more);

@@ -15,13 +15,13 @@ class GameState;
 struct FeatureGenSettings {
 	int nstairs_up, nstairs_down;
 	int tileset;
-	FeatureGenSettings(int nups, int ndowns, int tileset) :
-			nstairs_up(nups), nstairs_down(ndowns), tileset(tileset) {
+	FeatureGenSettings() :
+			nstairs_up(3), nstairs_down(3), tileset(0) {
 	}
 };
 
 //Generates tiles
-void generate_features(const FeatureGenSettings& rs, MTwist& mt, GeneratedLevel& level, GameState* gs);
-
+void generate_features(const FeatureGenSettings& rs, MTwist& mt,
+		GeneratedLevel& level, GameState* gs);
 
 #endif /* FEATUREGEN_H_ */

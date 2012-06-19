@@ -9,7 +9,7 @@ tilesets:
     floor_tile: sand_rock
     wall_tile: hive_wall
 
-  - tileset: lair_tiles
+  - tileset: lair_tiles1
     floor_tile: lair_floor
     alt_floor_tile: mesh
     wall_tile: marble_wall

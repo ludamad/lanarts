@@ -10,7 +10,7 @@ enemies:
     defeat_message: A loud squeek is heard as the rat is blown to bits.
     stats:
         attacks: [ {weapon: Basic Melee} ]
-        hp: 25
+        hp: 14
         hpregen: 0.03
         movespeed: 2
         #base stats:
@@ -27,7 +27,7 @@ enemies:
     defeat_message: The hound yelps as it is pulverized.
     stats:
         attacks: [ {weapon: Basic Melee} ]
-        hp: 35
+        hp: 25
         hpregen: 0.03
         movespeed: 2.5
         strength: 12
@@ -42,7 +42,7 @@ enemies:
     defeat_message: The sheep recieves a fatal blow.
     stats:
         attacks: [ {weapon: Basic Melee} ]
-        hp: 35
+        hp: 20
         hpregen: 0.03
         movespeed: 2
         strength: 10

@@ -131,6 +131,8 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 			if (spellselect > 1) {
 				spellselect = 0;
 			}
+			if (spellselect == 1 && class_stats().xplevel < 3)
+				spellselect = 0;
 		}
 		if (gs->key_press_state(SDLK_m))
 			spellselect = -1;

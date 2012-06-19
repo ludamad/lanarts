@@ -19,29 +19,33 @@ struct GeneratedLevel;
 
 struct RoomGenSettings {
 	int room_padding;
-	int amount_of_rooms;
-	int min_size, max_size;
-	bool solid_fill;
-	RoomGenSettings(int pad, int amnt, int mins, int maxs, bool solid_fill) :
-			room_padding(pad), amount_of_rooms(amnt), min_size(mins), max_size(
-					maxs), solid_fill(solid_fill) {
+	Range amount_of_rooms;
+	Range size;
+	RoomGenSettings() :
+			room_padding(1), amount_of_rooms(0,0), size(0, 0) {
+
 	}
 };
-struct LevelGenSettings {
-	ItemGenSettings items;
-	RoomGenSettings rooms;
+
+struct LayoutGenSettings {
+	Range width, height;
 	TunnelGenSettings tunnels;
+	std::vector<RoomGenSettings> rooms;
+	bool solid_fill;
+	LayoutGenSettings() :
+			solid_fill(true) {
+	}
+};
+
+struct ContentGenSettings {
+	ItemGenSettings items;
 	FeatureGenSettings features;
 	EnemyGenSettings enemies;
-	int level_w, level_h;
-	bool wander;
+};
 
-	LevelGenSettings(int w, int h, bool wander, const ItemGenSettings& i,
-			const RoomGenSettings& r, const TunnelGenSettings& t,
-			const FeatureGenSettings& f, const EnemyGenSettings& e) :
-			items(i), rooms(r), tunnels(t), features(f), enemies(e), level_w(w), level_h(
-					h), wander(wander) {
-	}
+struct LevelGenSettings {
+	std::vector<LayoutGenSettings> layouts;
+	ContentGenSettings content;
 };
 
 void generate_rooms(const RoomGenSettings& rs, MTwist& mt,

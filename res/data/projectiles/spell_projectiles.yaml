@@ -7,7 +7,7 @@ projectiles:
     power: { base: 1, magic: 0.2 }
     range: 300
     cooldown: 45
-    speed: 8
+    speed: 7
     spr_item: none
     spr_attack: fire bolt
     

@@ -19,10 +19,7 @@ struct ItemGenChance {
 };
 struct ItemGenSettings {
 	std::vector<ItemGenChance> item_chances;
-	int min_items, max_items;
-	ItemGenSettings(const std::vector<ItemGenChance>& genchances, int min_items, int max_items) :
-		item_chances(genchances), min_items(min_items), max_items(max_items){
-	}
+	Range num_items;
 };
 
 

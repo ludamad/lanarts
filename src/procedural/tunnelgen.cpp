@@ -83,7 +83,7 @@ void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
 	std::vector<int> genpaths(level.rooms().size(), 0);
 	std::vector<int> totalpaths(level.rooms().size(), 0);
 	for (int i = 0; i < level.rooms().size(); i++) {
-		totalpaths[i] = mt.rand(tgs.min_tunnels, tgs.max_tunnels + 1);
+		totalpaths[i] = mt.rand(tgs.num_tunnels);
 	}
 	int nogen_tries = 0;
 	while (nogen_tries < 200) {
@@ -93,7 +93,7 @@ void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
 			if (genpaths[i] >= totalpaths[i])
 				continue;
 			bool generated = false;
-			int genwidth = mt.rand(tgs.minwidth, tgs.maxwidth + 1);
+			int genwidth = mt.rand(tgs.size);
 			for (; genwidth >= 1 && !generated; genwidth--) {
 				int path_len = 5;
 				for (int attempts = 0; attempts < 16 && !generated;

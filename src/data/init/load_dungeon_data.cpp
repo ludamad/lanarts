@@ -11,9 +11,6 @@
 
 using namespace std;
 
-FeatureGenSettings featuredefault(3, 3 /*3 stairs up, 3 stairs down*/,
-		1 /*Default tileset*/);
-
 ItemGenChance parse_item_chance(const YAML::Node& n) {
 	ItemGenChance igc;
 	string itemname;
@@ -24,40 +21,40 @@ ItemGenChance parse_item_chance(const YAML::Node& n) {
 	return igc;
 }
 ItemGenSettings parse_item_gen(const YAML::Node& n) {
-	Range amnt = parse_range(n["amount"]);
+	ItemGenSettings igs;
+	igs.num_items = parse_range(n["amount"]);
 
-	vector<ItemGenChance> chances;
 	if (yaml_has_node(n, "generated")) {
-		chances = parse_named_with_defaults(n["generated"], "item",
+		igs.item_chances = parse_named_with_defaults(n["generated"], "item",
 				&parse_item_chance);
 	}
-	return ItemGenSettings(chances, amnt.min, amnt.max);
+	return igs;
 }
 RoomGenSettings parse_room_gen(const YAML::Node& n) {
-	int pad;
-	n["padding"] >> pad;
-	Range amount = parse_range(n["amount"]);
-	Range size = parse_range(n["size"]);
-	return RoomGenSettings(pad, amount.min, size.min, size.max,
-			parse_defaulted(n, "fill_solid", true));
+	RoomGenSettings rgs;
+	rgs.amount_of_rooms = parse_range(n["amount"]);
+	rgs.room_padding = parse_defaulted(n, "padding", 1);
+	rgs.size = parse_range(n["size"]);
+	return rgs;
 }
 TunnelGenSettings parse_tunnel_gen(const YAML::Node& n) {
-	Range width = parse_range(n["width"]);
-	Range per_room = parse_range(n["per_room"]);
+	TunnelGenSettings tgs;
+	tgs.size = parse_range(n["width"]);
+	tgs.num_tunnels = parse_range(n["per_room"]);
+	tgs.padding = parse_defaulted(n, "padding", 1);
 
-	return TunnelGenSettings(parse_defaulted(n, "padding", 1), width.min,
-			width.max, per_room.min, per_room.max);
+	return tgs;
 }
 FeatureGenSettings parse_feature_gen(const YAML::Node& n) {
-	int nstairsup = parse_defaulted(n, "stairs_up", 3);
-	int nstairsdown = parse_defaulted(n, "stairs_down", 3);
-	int tileset = 0;
+	FeatureGenSettings fgs;
+	fgs.nstairs_up = parse_defaulted(n, "stairs_up", 3);
+	fgs.nstairs_down = parse_defaulted(n, "stairs_down", 3);
 	if (yaml_has_node(n, "tileset")) {
 		std::string tilesetname;
 		n["tileset"] >> tilesetname;
-		tileset = get_tileset_by_name(tilesetname.c_str());
+		fgs.tileset = get_tileset_by_name(tilesetname.c_str());
 	}
-	return FeatureGenSettings(nstairsup, nstairsdown, tileset);
+	return fgs;
 }
 
 EnemyGenChance parse_enemy_chance(const YAML::Node& n) {
@@ -70,35 +67,63 @@ EnemyGenChance parse_enemy_chance(const YAML::Node& n) {
 	return egc;
 }
 EnemyGenSettings parse_enemy_gen(const YAML::Node& node, const char* key) {
-	vector<EnemyGenChance> chances;
-	Range nmonsters;
-	nmonsters.max = 0;
-	nmonsters.min = 0;
-
+	EnemyGenSettings egs;
 	if (yaml_has_node(node, key)) {
 		const YAML::Node& n = node[key];
+		egs.wandering = parse_defaulted(n, "wandering", true);
 
-		nmonsters = parse_range(n["amount"]);
+		egs.num_monsters = parse_range(n["amount"]);
 		if (yaml_has_node(n, "generated")) {
-			chances = parse_named_with_defaults(n["generated"], "enemy",
-					&parse_enemy_chance);
+			egs.enemy_chances = parse_named_with_defaults(n["generated"],
+					"enemy", &parse_enemy_chance);
 		}
 	}
-	return EnemyGenSettings(chances, nmonsters.min, nmonsters.max);
+	return egs;
 }
-LevelGenSettings parse_level_gen(const YAML::Node& n) {
-	Range dim = parse_range(n["size"]);
-	bool wander = parse_defaulted(n, "wandering", true);
-	ItemGenSettings items = parse_item_gen(n["items"]);
-	RoomGenSettings rooms = parse_room_gen(n["rooms"]);
-	TunnelGenSettings tunnels = parse_tunnel_gen(n["tunnels"]);
-	FeatureGenSettings features =
-			yaml_has_node(n, "features") ?
-					parse_feature_gen(n["features"]) : featuredefault;
-	EnemyGenSettings enemies = parse_enemy_gen(n, "enemies");
 
-	return LevelGenSettings(dim.min, dim.max, wander, items, rooms, tunnels, features,
-			enemies);
+ContentGenSettings parse_content_gen(const YAML::Node& n) {
+	ContentGenSettings cgs;
+	cgs.items = parse_item_gen(n["items"]);
+	cgs.features = parse_feature_gen(n["features"]);
+	cgs.enemies = parse_enemy_gen(n, "enemies");
+	return cgs;
+}
+
+LayoutGenSettings parse_layout_gen(const YAML::Node& n) {
+	LayoutGenSettings lgs;
+
+	lgs.solid_fill = parse_defaulted(n, "solid_fill", true);
+	lgs.tunnels = parse_tunnel_gen(n["tunnels"]);
+	const YAML::Node& size = n["size"];
+	lgs.width = parse_range(size[0]);
+	lgs.height = parse_range(size[1]);
+
+	const YAML::Node& rooms = n["rooms"];
+	if (rooms.Type() == YAML::NodeType::Sequence) {
+		for (int i = 0; i < rooms.size(); i++) {
+			lgs.rooms.push_back(parse_room_gen(rooms[i]));
+		}
+	} else {
+		lgs.rooms.push_back(parse_room_gen(rooms));
+	}
+
+	return lgs;
+}
+
+LevelGenSettings parse_level_gen(const YAML::Node& n) {
+	LevelGenSettings level;
+	level.content = parse_content_gen(n["content"]);
+
+	const YAML::Node& layouts = n["layout"];
+	if (layouts.Type() == YAML::NodeType::Sequence) {
+		for (int i = 0; i < layouts.size(); i++) {
+			level.layouts.push_back(parse_layout_gen(layouts[i]));
+		}
+	} else {
+		level.layouts.push_back(parse_layout_gen(layouts));
+	}
+	return level;
+
 }
 void parse_dungeon_branch(const YAML::Node& n,
 		std::vector<LevelGenSettings>& levels) {

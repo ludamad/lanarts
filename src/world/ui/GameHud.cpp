@@ -130,19 +130,23 @@ static void draw_player_actionbar(GameState* gs, PlayerInst* player) {
 
 	draw_player_weapon_actionbar(gs, player, 0, sy);
 
+	const int SPELL_MAX = player->class_stats().xplevel >= 3 ? 2 : 1;
+
 	int spellidx = 0;
 	for (int x = sx; x < w; x += TILE_SIZE) {
 		bool is_selected = spellidx++ == player->spell_selected();
 		Colour outline = outline_col(is_selected);
-		if (!is_selected && spellidx < 3)
+		if (!is_selected && spellidx <= SPELL_MAX)
 			outline = Colour(120, 115, 110);
 		gl_draw_rectangle_outline(x, sy, TILE_SIZE, TILE_SIZE, outline);
 	}
 //TODO: Unhardcode this already !!
 	gl_draw_image(game_sprite_data[get_sprite_by_name("fire bolt")].img(), sx,
 			sy);
-	gl_draw_image(game_sprite_data[get_sprite_by_name("magic blast")].img(),
-			sx + TILE_SIZE, sy);
+	if (SPELL_MAX >= 2) {
+		gl_draw_image(game_sprite_data[get_sprite_by_name("magic blast")].img(),
+				sx + TILE_SIZE, sy);
+	}
 }
 
 static void fill_buff2d(char* buff, int w, int h, int x, int y,
@@ -243,7 +247,6 @@ void GameHud::queue_io_actions(GameState* gs, PlayerInst* player,
 //	}
 }
 
-const int SPELL_MAX = 2;
 bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 	int level = gs->get_level()->roomid, frame = gs->frame();
 
@@ -253,6 +256,7 @@ bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 		return false;
 
 	_Inventory inv = player->inventory();
+	const int SPELL_MAX = player->class_stats().xplevel >= 3 ? 2 : 1;
 
 	bool mleft = event->button.button == SDL_BUTTON_LEFT;
 	bool mright = event->button.button == SDL_BUTTON_RIGHT;
@@ -266,6 +270,7 @@ bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 			int posy = (gs->mouse_y() - action_bar_y) / TILE_SIZE;
 
 			_Equipment& equipment = player->equipment();
+
 			if (posy == 0) {
 				if (posx == 0) {
 					player->spell_selected() = -1;
@@ -307,14 +312,13 @@ bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 	return false;
 }
 
-static void world2minimapbuffer(GameState* gs, char* buff, const BBox& world_portion, int w, int h,
-		int ptw, int pth) {
+static void world2minimapbuffer(GameState* gs, char* buff,
+		const BBox& world_portion, int w, int h, int ptw, int pth) {
 	GameTiles& tiles = gs->tile_grid();
 	GameView& view = gs->window_view();
 
 	bool minimap_reveal = gs->key_down_state(SDLK_z)
 			|| gs->key_down_state(SDLK_BACKQUOTE);
-
 
 	int stairs_down = get_tile_by_name("stairs_down");
 	int stairs_up = get_tile_by_name("stairs_up");
@@ -376,8 +380,10 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox, float scale) {
 	view.max_tile_within(max_tilex, max_tiley);
 
 	int minimap_w = bbox.width(), minimap_h = bbox.height();
-	int minimap_x = bbox.x1 + (128 - minimap_w)/2, minimap_y = bbox.y1 + (128 - minimap_w)/2;
-	int ptw = power_of_two(MINIMAP_SIZEMAX), pth = power_of_two(MINIMAP_SIZEMAX);
+	int minimap_x = bbox.x1 + (128 - minimap_w) / 2, minimap_y = bbox.y1
+			+ (128 - minimap_w) / 2;
+	int ptw = power_of_two(MINIMAP_SIZEMAX), pth = power_of_two(
+			MINIMAP_SIZEMAX);
 	if (!minimap_arr) {
 		minimap_arr = new char[ptw * pth * 4];
 	}
@@ -388,7 +394,8 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox, float scale) {
 		minimap_arr[i * 4 + 3] = 255;
 	}
 
-	world2minimapbuffer(gs, minimap_arr, BBox(), minimap_w, minimap_h, ptw, pth);
+	world2minimapbuffer(gs, minimap_arr, BBox(), minimap_w, minimap_h, ptw,
+			pth);
 
 	GameInst* inst = gs->get_instance(gs->local_playerid());
 	if (inst) {
