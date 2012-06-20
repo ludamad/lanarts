@@ -55,8 +55,7 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, int classn,
 	}
 	inst->last_x = px;
 	inst->last_y = py;
-	inst->x = px;
-	inst->y = py;
+	inst->update_position(px, py);
 
 	game_state->add_instance(inst);
 }
@@ -232,14 +231,14 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	//set the level context
 	game_state->set_level(state);
 
-	GameInst* inst = game_state->get_instance(id);
+	CombatGameInst* inst = (CombatGameInst*)game_state->get_instance(id);
 
 	Pos hitsqr;
 	if (!inst)
 		return;
 	game_state->remove_instance(inst, false); // Remove but do not deallocate
 	inst->last_x = x, inst->last_y = y;
-	inst->x = x, inst->y = y;
+	inst->update_position(x, y);
 
 	game_state->set_level(get_level(roomid2));
 	game_state->add_instance(inst);

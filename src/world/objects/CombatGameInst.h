@@ -37,7 +37,10 @@ public:
 	virtual void update_field_of_view();
 	virtual bool within_field_of_view(const Pos& pos) =0;
 
-	void update_position(GameState* gs, float& newx, float& newy);
+	void attempt_move_to_position(GameState* gs, float& newx, float& newy);
+	//update based on rounding of true float
+	void update_position();
+	void update_position(float newx, float newy);
 
 	bool damage(GameState* gs, int dmg);
 	bool melee_attack(GameState* gs, CombatGameInst* inst, const Weapon& projectile);

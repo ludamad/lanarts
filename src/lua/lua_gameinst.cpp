@@ -148,8 +148,7 @@ static int lua_member_update(lua_State* L) {
 	else IFLUA_NUM_MEMB_UPDATE("y", inst->y)
 	else if (combatinst) {
 		IFLUA_NUM_MEMB_UPDATE("vx", combatinst->vx)
-		else IFLUA_NUM_MEMB_UPDATE("vy", einst->behaviour().vy)
-		else IFLUA_NUM_MEMB_UPDATE("speed", einst->behaviour().speed)
+		else IFLUA_NUM_MEMB_UPDATE("vy", combatinst->vy)
 		else
 			had_member = false;
 	}

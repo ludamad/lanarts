@@ -88,7 +88,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs) {
 	GameInst* inst = NULL;
 	if (cooldowns().can_pickup()
 			&& gs->object_radius_test(this, &inst, 1, &item_colfilter)) {
-		ItemInst* iteminst = (ItemInst*)inst;
+		ItemInst* iteminst = (ItemInst*) inst;
 		Item& item = iteminst->item_type();
 
 		bool was_dropper = iteminst->last_held_by() == id;
@@ -205,7 +205,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	const int PICKUP_RATE = 10;
-	ItemInst* item = (ItemInst*)gs->get_instance(action.use_id);
+	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
 	const Item& type = item->item_type();
 	int amnt = item->item_quantity();
 
@@ -347,7 +347,8 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 		item_do_lua_action(L, type, this->id,
 				Pos(action.action_x, action.action_y), itemslot.amount);
 		if (!type.use_message.empty()) {
-			gs->game_chat().add_message(type.use_message, Colour(100,100,255));
+			gs->game_chat().add_message(type.use_message,
+					Colour(100, 100, 255));
 		}
 		if (type.equipment_type == ItemEntry::PROJECTILE)
 			itemslot.amount = 0;
@@ -377,12 +378,12 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 
 	EnemyInst* target = NULL;
 	//Enemy hitting test for melee
-	gs->object_radius_test(this, (GameInst**)&target, 1, &enemy_colfilter,
+	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_colfilter,
 			x + ddx * 2, y + ddy * 2);
 
 	//Smaller radius enemy pushing test, can intercept enemy radius but not too far
 	EnemyInst* alreadyhitting[5] = { 0, 0, 0, 0, 0 };
-	gs->object_radius_test(this, (GameInst**)alreadyhitting, 5,
+	gs->object_radius_test(this, (GameInst**) alreadyhitting, 5,
 			&enemy_colfilter, x, y, radius);
 	bool already = false;
 	for (int i = 0; i < 5; i++) {
@@ -397,15 +398,18 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 		}
 	}
 
-	gs->tile_radius_test(x + ddx, y + ddy, radius);
+	Pos newpos(round(rx + ddx), round(ry + ddy));
 
-	if (!gs->tile_radius_test(x + ddx, y + ddy, radius)) {
-		x += ddx;
-		y += ddy;
-	} else if (!gs->tile_radius_test(x + ddx, y, radius)) {
-		x += ddx;
-	} else if (!gs->tile_radius_test(x, y + ddy, radius)) {
-		y += ddy;
+	if (!gs->tile_radius_test(newpos.x, newpos.y, radius)) {
+		float realmag = sqrt(ddx * ddx + ddy * ddy);
+		if (realmag > 0) {
+			rx += ddx / realmag * mag;
+			ry += ddy / realmag * mag;
+		}
+	} else if (!gs->tile_radius_test(newpos.x, y, radius)) {
+		rx += ddx;
+	} else if (!gs->tile_radius_test(x, newpos.y, radius)) {
+		ry += ddy;
 	}
 }
 
@@ -429,12 +433,14 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 		return;
 
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->get_level()->exits.size());
-	gs->ensure_connectivity(gs->get_level()->roomid - 1, gs->get_level()->roomid);
+	gs->ensure_connectivity(gs->get_level()->roomid - 1,
+			gs->get_level()->roomid);
 	GameLevelPortal* portal = &gs->get_level()->exits[entr_n];
 
 	int px = centered_multiple(portal->exitsqr.x, TILE_SIZE);
 	int py = centered_multiple(portal->exitsqr.y, TILE_SIZE);
-	gs->level_move(id, px, py, gs->get_level()->roomid, gs->get_level()->roomid - 1);
+	gs->level_move(id, px, py, gs->get_level()->roomid,
+			gs->get_level()->roomid - 1);
 
 	reset_rest_cooldown();
 }
@@ -447,12 +453,14 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 		return;
 
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->get_level()->entrances.size());
-	gs->ensure_connectivity(gs->get_level()->roomid, gs->get_level()->roomid + 1);
+	gs->ensure_connectivity(gs->get_level()->roomid,
+			gs->get_level()->roomid + 1);
 	GameLevelPortal* portal = &gs->get_level()->entrances[entr_n];
 
 	int px = centered_multiple(portal->exitsqr.x, TILE_SIZE);
 	int py = centered_multiple(portal->exitsqr.y, TILE_SIZE);
-	gs->level_move(id, px, py, gs->get_level()->roomid, gs->get_level()->roomid + 1);
+	gs->level_move(id, px, py, gs->get_level()->roomid,
+			gs->get_level()->roomid + 1);
 
 	reset_rest_cooldown();
 }

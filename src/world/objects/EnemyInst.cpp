@@ -35,10 +35,9 @@ static EnemyEntry& __E(enemy_id enemytype) {
 }
 
 EnemyInst::EnemyInst(int enemytype, int x, int y) :
-		CombatGameInst(__E(enemytype).basestats, __E(enemytype).enemy_sprite,
-				0, x, y, __E(enemytype).radius, true, DEPTH), seen(false), enemytype(enemytype), eb(
-				__E(enemytype).basestats.movespeed), xpgain(
-				__E(enemytype).xpaward) {
+		CombatGameInst(__E(enemytype).basestats, __E(enemytype).enemy_sprite, 0,
+				x, y, __E(enemytype).radius, true, DEPTH), seen(false), enemytype(
+				enemytype), xpgain(__E(enemytype).xpaward) {
 }
 
 EnemyInst::~EnemyInst() {
@@ -65,6 +64,7 @@ void EnemyInst::init(GameState* gs) {
 void EnemyInst::step(GameState* gs) {
 	//Much of the monster implementation resides in MonsterController
 	CombatGameInst::step(gs);
+	update_position();
 }
 static bool starts_with_vowel(const std::string& name) {
 	char c = tolower(name[0]);
@@ -97,8 +97,8 @@ void EnemyInst::draw(GameState* gs) {
 				statbuff,
 				255,
 				"vx=%f vy=%f\n act=%d, path_steps = %d\npath_cooldown = %d\nradius=%d\ntarget_radius=%d",
-				eb.vx, eb.vy, eb.current_action, eb.path_steps,
-				eb.path_cooldown, radius, target_radius);
+				vx, vy, eb.current_action, eb.path_steps, eb.path_cooldown,
+				radius, target_radius);
 		gl_printf(gs->primary_font(), Colour(255, 255, 255),
 				x - radius - view.x, y - 70 - view.y, statbuff);
 	}
@@ -189,5 +189,5 @@ void EnemyInst::die(GameState *gs) {
 
 void EnemyInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(EnemyInst*)inst = *this;
+	*(EnemyInst*) inst = *this;
 }

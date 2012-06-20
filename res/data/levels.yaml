@@ -190,7 +190,7 @@ areas:
         content:
           features: { tileset: lair_tiles2}
           items:    { amount: 5,  generated: *default_items   }
-          enemies: { wandering: no, amount: 8, generated: *easy_animals }
+          enemies: { wandering: no, amount: 12, generated: *easy_enemies}
 
 #      - size: [50, 50]
 #        wandering: no

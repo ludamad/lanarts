@@ -7,6 +7,8 @@
 
 #include "yaml_util.h"
 
+#include "../../gamestats/stat_formulas.h"
+
 std::vector<const YAML::Node*> flatten_seq_mappings(const YAML::Node & n) {
 	std::vector<const YAML::Node*> ret;
 	for (int i = 0; i < n.size(); i++) {
@@ -136,7 +138,7 @@ CombatStats parse_combat_stats(const YAML::Node& n) {
 	core.physical_reduction = parse_defaulted(n, "reduction", 0);
 	core.magic_reduction = parse_defaulted(n, "magic_reduction", 0);
 
-	class_stats.xpneeded = parse_defaulted(n, "xpneeded", 150);
+	class_stats.xpneeded = parse_defaulted(n, "xpneeded", experience_needed_formula(1));
 	class_stats.xplevel = parse_defaulted(n, "xplevel", 1);
 	ret.attacks = parse_defaulted(n, "attacks", std::vector<AttackStats>());
 

@@ -10,9 +10,7 @@ struct EnemyBehaviour {
 		RANDOM_WALK_COOLDOWN = 3000
 	};
 	enum Action {
-		INACTIVE = 0,
-		FOLLOWING_PATH = 1,
-		CHASING_PLAYER = 2
+		INACTIVE = 0, FOLLOWING_PATH = 1, CHASING_PLAYER = 2
 	};
 
 	std::vector<Pos> path;
@@ -26,16 +24,15 @@ struct EnemyBehaviour {
 
 	Pos path_start;
 	int path_steps;
-	EnemyBehaviour(float speed) :
-		current_node(0), path_cooldown(0),
-		force_x(0), force_y(0),
-		current_action(INACTIVE), action_timeout(0), simulation_id(0),
-		path_start(0,0), path_steps(0){
+	EnemyBehaviour() :
+			current_node(0), path_cooldown(0), force_x(0), force_y(0), current_action(
+					INACTIVE), action_timeout(0), simulation_id(0), path_start(
+					0, 0), path_steps(0) {
 	}
-	void step(){
-		if (action_timeout){
+	void step() {
+		if (action_timeout) {
 			action_timeout--;
-			if (action_timeout == 0){
+			if (action_timeout == 0) {
 				current_action = INACTIVE;
 			}
 		}

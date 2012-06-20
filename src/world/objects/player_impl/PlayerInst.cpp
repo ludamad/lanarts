@@ -75,6 +75,8 @@ void PlayerInst::step(GameState* gs) {
 		view.center_on(last_x, last_y);
 
 	performed_actions_for_step() = true;
+
+	update_position();
 }
 
 void PlayerInst::draw(GameState* gs) {
