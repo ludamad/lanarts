@@ -1,13 +1,10 @@
+/*
+ * EnemyInst.cpp:
+ *  Represents an AI controlled combat entity
+ */
+
 #include <cmath>
 #include <typeinfo>
-
-#include "EnemyInst.h"
-#include "ItemInst.h"
-#include "ProjectileInst.h"
-#include "PlayerInst.h"
-#include "../utility_objects/AnimatedInst.h"
-
-#include "../GameState.h"
 
 #include "../../data/sprite_data.h"
 #include "../../data/enemy_data.h"
@@ -21,6 +18,15 @@
 #include "../../util/math_util.h"
 #include "../../util/LuaValue.h"
 
+#include "../utility_objects/AnimatedInst.h"
+
+#include "../GameState.h"
+
+#include "EnemyInst.h"
+#include "ItemInst.h"
+#include "ProjectileInst.h"
+#include "PlayerInst.h"
+
 //draw depth, also determines what order objects evaluate in
 static const int DEPTH = 50;
 
@@ -30,8 +36,7 @@ static EnemyEntry& __E(enemy_id enemytype) {
 
 EnemyInst::EnemyInst(int enemytype, int x, int y) :
 		CombatGameInst(__E(enemytype).basestats, __E(enemytype).enemy_sprite,
-				0, x, y, __E(enemytype).radius, true, DEPTH), seen(false), rx(
-				x), ry(y), enemytype(enemytype), eb(
+				0, x, y, __E(enemytype).radius, true, DEPTH), seen(false), enemytype(enemytype), eb(
 				__E(enemytype).basestats.movespeed), xpgain(
 				__E(enemytype).xpaward) {
 }
@@ -105,14 +110,6 @@ void EnemyInst::draw(GameState* gs) {
 		return;
 	if (!gs->object_visible_test(this))
 		return;
-
-	int healthbar_offsety = 20;
-	if (target_radius > 16)
-		healthbar_offsety = target_radius + 4;
-
-	if (core_stats().hp < core_stats().max_hp)
-		gl_draw_statbar(view, x - 10, y - healthbar_offsety, 20, 5,
-				core_stats().hp, core_stats().max_hp);
 
 	if (!seen) {
 		seen = true;

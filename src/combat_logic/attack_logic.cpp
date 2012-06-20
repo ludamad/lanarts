@@ -14,15 +14,17 @@
 
 #include "attack_logic.h"
 
+const int TOO_LARGE_RANGE = 99999;
 bool attack_ai_choice(GameState* gs, CombatGameInst* inst,
 		CombatGameInst* target, AttackStats& attack) {
 	CombatStats& stats = inst->stats();
 	std::vector<AttackStats>& attacks = stats.attacks;
 
 	int attack_id = -1;
-	int largest_range = 0;
+	int smallest_range = TOO_LARGE_RANGE;
 	float dist = distance_between(Pos(inst->x, inst->y),
 			Pos(target->x, target->y));
+	int radii = inst->target_radius + target->target_radius;
 
 	for (int i = 0; i < attacks.size(); i++) {
 		WeaponEntry& wentry = attacks[i].weapon.weapon_entry();
@@ -31,9 +33,9 @@ bool attack_ai_choice(GameState* gs, CombatGameInst* inst,
 			ProjectileEntry& pentry = attacks[i].projectile.projectile_entry();
 			range = std::max(range, pentry.range);
 		}
-		if (inst->radius + range > dist && range > largest_range) {
+		if (radii + range > dist && range < smallest_range) {
 			attack_id = i;
-			largest_range = range;
+			smallest_range = range;
 		}
 	}
 

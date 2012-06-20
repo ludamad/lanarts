@@ -1,5 +1,5 @@
 /*
- * MonsterController.h
+ * MonsterController.h:
  *  Centralized location of all pathing decisions of monsters, with collision avoidance
  */
 

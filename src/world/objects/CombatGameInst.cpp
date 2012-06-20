@@ -63,10 +63,6 @@ void CombatGameInst::draw(GameState *gs) {
 	SpriteEntry& spr = game_sprite_data[spriteid];
 	Colour draw_colour(255, 255, 255);
 
-	if (core_stats().hp < core_stats().max_hp)
-		gl_draw_statbar(view, x - 10, y - 20, 20, 5, core_stats().hp,
-				core_stats().max_hp);
-
 	int haste_effect = get_effect_by_name("Haste");
 	if (effects().get(haste_effect)) {
 		Effect* e = effects().get(haste_effect);
@@ -85,6 +81,16 @@ void CombatGameInst::draw(GameState *gs) {
 		GLimage& restimg =
 				game_sprite_data[get_sprite_by_name("resting")].img();
 		gl_draw_image(view, restimg, x - spr.width() / 2, y - spr.height() / 2);
+	}
+	CoreStats& ecore = effective_stats().core;
+
+	//Draw health bar
+	int healthbar_offsety = 20;
+	if (target_radius > 16)
+		healthbar_offsety = target_radius + 8;
+	if (ecore.hp < ecore.max_hp) {
+		gl_draw_statbar(view, x - 10, y - healthbar_offsety, 20, 5, ecore.hp,
+				ecore.max_hp);
 	}
 }
 
@@ -163,8 +169,56 @@ bool CombatGameInst::attack(GameState* gs, CombatGameInst* inst,
 	}
 }
 
+void CombatGameInst::equip(item_id item, int amnt) {
+	equipment().equip(item, amnt);
+}
+
 void CombatGameInst::init(GameState* gs) {
 	estats = stats().effective_stats_without_atk(gs);
+}
+
+void CombatGameInst::update_position(GameState *gs, float& newx, float& newy) {
+	const float ROUNDING_MULTIPLE = 65536.0f;
+
+	float dx = newx - rx, dy = newy - ry;
+	float dist = sqrt(dx * dx + dy * dy);
+
+	bool collided = gs->tile_radius_test(round(newx), round(newy), /*radius+4*/
+	20);
+
+	if (!collided) {
+		rx = newx, ry = newy;
+	} else {
+		float nx = round(rx + vx), ny = round(ry + vy);
+		bool collided = gs->tile_radius_test(nx, ny, radius);
+		if (collided) {
+			bool hitsx = gs->tile_radius_test(nx, y, radius, true, -1);
+			bool hitsy = gs->tile_radius_test(x, ny, radius, true, -1);
+			if (hitsy || hitsx || collided) {
+				if (hitsx) {
+					vx = 0;
+				}
+				if (hitsy) {
+					vy = 0;
+				}
+				if (!hitsy && !hitsx) {
+					vx = -vx;
+					vy = -vy;
+				}
+			}
+		}
+		vx = round(vx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
+		vy = round(vy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
+		rx += vx;
+		ry += vy;
+	}
+
+	rx = round(rx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
+	ry = round(ry * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
+
+	x = (int)round(rx); //update based on rounding of true float
+	y = (int)round(ry);
+	newx = rx, newy = ry;
 }
 
 team_id& CombatGameInst::team() {

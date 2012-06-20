@@ -27,8 +27,8 @@ struct CoreStats {
 
 	CoreStats() :
 			hp(0), max_hp(0), mp(0), max_mp(0), strength(0), defence(0), magic(
-					0), willpower(0), magic_reduction(0), physical_reduction(
-					0), hpregen(0), mpregen(0), hp_regened(0), mp_regened(0) {
+					0), willpower(0), magic_reduction(0), physical_reduction(0), hpregen(
+					0), mpregen(0), hp_regened(0), mp_regened(0) {
 	}
 
 	void step();
@@ -76,6 +76,14 @@ struct EffectiveAttackStats {
 	}
 	float physical_percentage() const {
 		return 1.0f - magic_percentage;
+	}
+};
+
+/* Which actions are allowed ? */
+struct ActionsAllowed {
+	bool can_use_spell, can_use_item, can_use_weapon;
+	ActionsAllowed() :
+			can_use_spell(true), can_use_item(true), can_use_weapon(true) {
 	}
 };
 

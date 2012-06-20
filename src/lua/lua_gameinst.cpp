@@ -1,14 +1,18 @@
 #include <cstring>
 #include <lua/lunar.h>
 
-#include "lua_api.h"
+
+#include "../data/effect_data.h"
+#include "../data/item_data.h"
+
+#include "../gamestats/stats.h"
 
 #include "../world/GameState.h"
 #include "../world/objects/EnemyInst.h"
 #include "../world/objects/GameInst.h"
 #include "../world/objects/PlayerInst.h"
-#include "../gamestats/stats.h"
-#include "../data/item_data.h"
+
+#include "lua_api.h"
 
 class GameInstLuaBinding {
 public:
@@ -44,8 +48,8 @@ public:
 		return 0;
 	}
 	int equip(lua_State* L) {
-		PlayerInst* p;
-		if ((p = dynamic_cast<PlayerInst*>(get_inst()))) {
+		CombatGameInst* combatinst;
+		if ((combatinst = dynamic_cast<CombatGameInst*>(get_inst()))) {
 			int args = lua_gettop(L);
 
 			lua_pushstring(L, "name");
@@ -53,15 +57,15 @@ public:
 			const char* itemname = lua_tostring(L, lua_gettop(L));
 			item_id item = get_item_by_name(itemname);
 			int amnt = args >= 2 ? lua_tonumber(L, 2) : 1;
-			p->equip(item, amnt);
+			combatinst->equip(item, amnt);
 			lua_pop(L, 1);
 		}
 		return 0;
 	}
 	int hasten(lua_State* L) {
-		PlayerInst* p;
-		if ((p = dynamic_cast<PlayerInst*>(get_inst()))) {
-//		p->status_effects().add(0, lua_tonumber(L, 1));
+		CombatGameInst* combatinst;
+		if ((combatinst = dynamic_cast<CombatGameInst*>(get_inst()))) {
+			combatinst->effects().add(get_effect_by_name("Haste"), lua_tonumber(L, 1));
 		}
 		return 0;
 	}
@@ -136,14 +140,14 @@ static int lua_member_update(lua_State* L) {
 
 	bind_t* state = lunar_t::check(L, 1);
 	GameInst* inst = state->get_inst();
-	EnemyInst* einst = dynamic_cast<EnemyInst*>(inst);
+	CombatGameInst* combatinst = state->get_combat_inst();
 	const char* cstr = lua_tostring(L, 2);
 
 	bool had_member = true;
 	IFLUA_NUM_MEMB_UPDATE("x", inst->x)
 	else IFLUA_NUM_MEMB_UPDATE("y", inst->y)
-	else if (einst) {
-		IFLUA_NUM_MEMB_UPDATE("vx", einst->behaviour().vx)
+	else if (combatinst) {
+		IFLUA_NUM_MEMB_UPDATE("vx", combatinst->vx)
 		else IFLUA_NUM_MEMB_UPDATE("vy", einst->behaviour().vy)
 		else IFLUA_NUM_MEMB_UPDATE("speed", einst->behaviour().speed)
 		else

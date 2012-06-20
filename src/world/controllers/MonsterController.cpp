@@ -1,8 +1,6 @@
 /*
- * MonsterController.cpp
- *
- *  Created on: Feb 20, 2012
- *      Author: 100397561
+ * MonsterController.cpp:
+ *  Centralized location of all pathing decisions of monsters, with collision avoidance
  */
 
 #include <algorithm>
@@ -219,13 +217,13 @@ void MonsterController::set_monster_headings(GameState* gs,
 		bool viable_attack = attack_ai_choice(gs, e, p, attack);
 		WeaponEntry& wentry = attack.weapon.weapon_entry();
 
-		if (pdist < e->radius + p->radius) {
+		if (pdist < e->target_radius + p->target_radius) {
 			eb.vx = 0, eb.vy = 0;
 		}
 		if (viable_attack) {
 			if (!attack.is_ranged()) {
 				eb.vx = 0, eb.vy = 0;
-			} else if (pdist < std::min(wentry.range, 40)) {
+			} else if (pdist < std::min(wentry.range + e->target_radius, 40)) {
 				eb.vx = 0, eb.vy = 0;
 			}
 			e->attack(gs, p, attack);
@@ -406,50 +404,9 @@ void MonsterController::update_position(GameState* gs, EnemyInst* e) {
 	RVO::Vector2 updated = simulator->getAgentPosition(eb.simulation_id);
 
 	float ux = updated.x(), uy = updated.y();
-	float dx = ux - e->rx, dy = uy - e->ry;
-	float dist = sqrt(dx * dx + dy * dy);
-
-	bool collided = gs->tile_radius_test(round(ux), round(uy), /*e->radius+4*/
-	20);
-	int neighbours = simulator->getAgentNumAgentNeighbors(eb.simulation_id);
-
-	if (neighbours > 0 && dist > 0.5f && !collided) {
-		e->rx = ux;
-		e->ry = uy;
-	} else {
-		float nx = round(e->rx + eb.vx), ny = round(e->ry + eb.vy);
-		bool collided = gs->tile_radius_test(nx, ny, e->radius);
-		if (collided) {
-			bool hitsx = gs->tile_radius_test(nx, e->y, e->radius, true, -1);
-			bool hitsy = gs->tile_radius_test(e->x, ny, e->radius, true, -1);
-			if (hitsy || hitsx || collided) {
-				if (hitsx) {
-					eb.vx = 0;
-				}
-				if (hitsy) {
-					eb.vy = 0;
-				}
-				if (!hitsy && !hitsx) {
-					eb.vx = -eb.vx;
-					eb.vy = -eb.vy;
-				}
-			}
-		}
-		const float ROUNDING_MULTIPLE = 65536.0f;
-		eb.vx = round(eb.vx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-		eb.vy = round(eb.vy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-		e->rx += eb.vx;
-		e->ry += eb.vy;
-		e->rx = round(e->rx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-		e->ry = round(e->ry * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-
-		simulator->setAgentPosition(eb.simulation_id,
-				RVO::Vector2(e->rx, e->ry));
-		simulator->setAgentMaxSpeed(eb.simulation_id, eb.speed);
-	}
-
-	e->x = (int)round(e->rx); //update based on rounding of true float
-	e->y = (int)round(e->ry);
+	e->update_position(gs, ux, uy);
+	simulator->setAgentPosition(eb.simulation_id, RVO::Vector2(ux, uy));
+	simulator->setAgentMaxSpeed(eb.simulation_id, e->effective_stats().movespeed);
 }
 
 void MonsterController::post_draw(GameState* gs) {
@@ -458,7 +415,7 @@ void MonsterController::post_draw(GameState* gs) {
 		return;
 	glLineWidth(2);
 	gl_draw_circle(gs->window_view(), target->x, target->y,
-			target->target_radius + 5, Colour(0, 255, 0, 199), true);
+			target->target_radius + 5, Colour(0, 255, 0, 140), true);
 	glLineWidth(1);
 }
 

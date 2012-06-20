@@ -46,7 +46,6 @@ public:
 	virtual PlayerInst* clone() const;
 
 	void gain_xp(GameState* gs, int xp);
-	void equip(item_id item, int amnt = 1);
 
 	void queue_io_actions(GameState* gs);
 	void queue_io_spell_and_attack_actions(GameState* gs, float dx, float dy);

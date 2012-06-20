@@ -263,10 +263,6 @@ void PlayerInst::perform_queued_actions(GameState *gs) {
 	queued_actions.clear();
 }
 
-void PlayerInst::equip(item_id item, int amnt) {
-	equipment().equip(item, amnt);
-}
-
 void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 	ItemSlot& itemslot = inventory().get(action.use_id);
 	int dropx = round_to_multiple(x, TILE_SIZE, true), dropy =

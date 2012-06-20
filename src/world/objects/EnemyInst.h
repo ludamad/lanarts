@@ -1,3 +1,8 @@
+/*
+ * EnemyInst.h:
+ *  Represents an AI controlled combat entity
+ */
+
 #ifndef ENEMYINST_H_
 #define ENEMYINST_H_
 
@@ -28,8 +33,6 @@ public:
 	int xpworth(){
 		return xpgain;
 	}
-public:
-	float rx, ry;
 protected:
 	bool seen;
 	int enemytype;

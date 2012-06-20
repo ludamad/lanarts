@@ -38,8 +38,14 @@ tilesets:
     wall_tile: crystal_wall
     corridor_tile: mesh
     alt_floor_tile: crystal_floor
-    alt_wall_tile: crystal_wall
+    alt_wall_tile: marble
     alt_corridor_tile: crystal_floor
+
+  - tileset: crystal_tiles_with_marble
+    floor_tile: crystal_floor
+    wall_tile: marble
+    corridor_tile: mesh
+    alt_wall_tile: crystal_wall
     
   - tileset: cobble
     floor_tile: cobble_blood

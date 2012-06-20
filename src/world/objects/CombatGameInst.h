@@ -23,7 +23,7 @@ class CombatGameInst: public GameInst {
 public:
 	CombatGameInst(const CombatStats& base_stats, sprite_id sprite, int teamid,
 			int x, int y, int radius, bool solid = true, int depth = 0) :
-			GameInst(x, y, radius, solid, depth), vx(0), vy(0), is_resting(
+			GameInst(x, y, radius, solid, depth), rx(x), ry(y), vx(0), vy(0), is_resting(
 					false), teamid(teamid), spriteid(sprite), base_stats(
 					base_stats) {
 	}
@@ -36,11 +36,16 @@ public:
 	virtual void draw(GameState* gs);
 	virtual void update_field_of_view();
 	virtual bool within_field_of_view(const Pos& pos) =0;
+
+	void update_position(GameState* gs, float& newx, float& newy);
+
 	bool damage(GameState* gs, int dmg);
 	bool melee_attack(GameState* gs, CombatGameInst* inst, const Weapon& projectile);
 	bool projectile_attack(GameState* gs, CombatGameInst* inst, const Weapon& weapon, const Projectile& projectile);
 	//bool spell_attack ...
 	bool attack(GameState* gs, CombatGameInst* inst, const AttackStats& attack);
+
+	void equip(item_id item, int amnt = 1);
 
 	CombatStats& stats();
 	CoreStats& core_stats();
@@ -58,8 +63,10 @@ public:
 
 	team_id& team();
 
-protected:
+
 	float vx, vy;
+protected:
+	float rx, ry;
 	bool is_resting;
 	team_id teamid;
 	sprite_id spriteid;

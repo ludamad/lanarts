@@ -50,8 +50,8 @@ static GameInst* find_closest_from_list(GameState* gs,
 	for (int i = 0; i < candidates.size(); i++) {
 		GameInst* inst = candidates[i];
 		float dx = inst->x - pos.x, dy = inst->y - pos.y;
-		float dist = sqrt(dx * dx + dy * dy);
-		if (mindist == -1 || dist < mindist) {
+		float dist = sqrt(dx * dx + dy * dy) - inst->target_radius;
+		if (closest == NULL || dist < mindist) {
 			mindist = dist;
 			closest = inst;
 		}
@@ -69,7 +69,7 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 	Pos ppos(p->x, p->y);
 	GameInst* inst = NULL;
 	bool ismelee = !(wentry.uses_projectile || p->equipment().has_projectile());
-	int target_range = wentry.range + p->radius;
+	int target_range = wentry.range + p->target_radius;
 
 	if (targ && distance_between(Pos(targ->x, targ->y), ppos) <= target_range) {
 		return targ;
@@ -159,24 +159,6 @@ static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
 		}
 	}
 	return numhit;
-}
-
-static void projectile_item_drop(GameState* gs, GameInst* obj, void* data) {
-	item_id item_type = (item_id)(long)data;
-	ItemEntry& ientry = game_item_data[item_type];
-	if (ientry.equipment_type == ItemEntry::PROJECTILE) {
-		ProjectileEntry& pentry = game_projectile_data[ientry.equipment_id];
-		int break_roll = gs->rng().rand(100);
-		if (break_roll < pentry.drop_chance) {
-			return; // Item 'breaks', ie don't spawn new item
-		}
-	}
-
-	int dropx = round_to_multiple(obj->x, TILE_SIZE, true), dropy =
-			round_to_multiple(obj->y, TILE_SIZE, true);
-
-	ItemInst* item = new ItemInst(item_type, dropx, dropy);
-	gs->add_instance(item);
 }
 
 void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
@@ -303,7 +285,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 
 		equipment().use_ammo();
 	} else {
-		int weaprange = wentry.range + this->radius;
+		int weaprange = wentry.range + this->radius + TILE_SIZE/2;
 		float mag = distance_between(actpos, Pos(x, y));
 		if (mag > weaprange) {
 			float dx = actpos.x - x, dy = actpos.y - dy;
@@ -322,7 +304,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 
 		for (int i = 0; i < numhit; i++) {
 			EnemyInst* e = (EnemyInst*)enemies[i];
-			if (attack(gs, e, AttackStats(weapon_type()))) {
+			if (attack(gs, e, AttackStats(equipment().weapon))) {
 				char buffstr[32];
 				gain_xp(gs, e->xpworth());
 				if (is_local_player()) {
@@ -337,6 +319,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 		cooldowns().reset_action_cooldown(wentry.cooldown);
 	}
 
+	cooldowns().action_cooldown *= estats.cooldown_mult;
 	reset_rest_cooldown();
 }
 
@@ -392,5 +375,6 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	} else if (action.use_id == 2) {
 		cooldowns().reset_action_cooldown(130);
 	}
+	cooldowns().action_cooldown *= estats.cooldown_mult;
 	cooldowns().reset_rest_cooldown(REST_COOLDOWN);
 }

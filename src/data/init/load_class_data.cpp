@@ -1,8 +1,6 @@
 /*
- * load_dungeon_data.cpp
- *
- *  Created on: Mar 26, 2012
- *      Author: 100397561
+ * load_class_data.cpp:
+ *  Load class stats and experience data
  */
 
 #include <fstream>
