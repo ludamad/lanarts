@@ -71,7 +71,7 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 	bool ismelee = !(wentry.uses_projectile || p->equipment().has_projectile());
 	int target_range = wentry.range + p->target_radius;
 
-	if (targ && distance_between(Pos(targ->x, targ->y), ppos) <= target_range) {
+	if (targ && distance_between(Pos(targ->x, targ->y), ppos) - targ->target_radius <= target_range) {
 		return targ;
 	}
 
