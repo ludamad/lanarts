@@ -33,7 +33,7 @@ bool attack_ai_choice(GameState* gs, CombatGameInst* inst,
 			ProjectileEntry& pentry = attacks[i].projectile.projectile_entry();
 			range = std::max(range, pentry.range);
 		}
-		if (radii + range > dist && range < smallest_range) {
+		if (radii + range >= dist && range < smallest_range) {
 			attack_id = i;
 			smallest_range = range;
 		}

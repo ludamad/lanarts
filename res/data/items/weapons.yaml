@@ -6,32 +6,32 @@ weapons:
     #Damage: { base: <range>, strength: <multiplier>, magic: <multiplier> }
     damage: {base: [2,5], strength: 1.0}
     power: {base: 0, strength: 0.2}
-    range: 4
+    range: 7
     cooldown: 30
 
   - name: Dagger
     weapon_class: short blades
-    damage: {base: [4,9], strength: 1.3}
+    damage: {base: [4,9], strength: 1.1}
     power: {base: 0, strength: 0.2}
-    range: 4
+    range: 7
     cooldown: 25
     spr_item: dagger
 
   - name: Short Sword
     weapon_class: short blades
     max_targets: 2
-    damage: {base: [6,12], strength: 1.6}
+    damage: {base: [6,12], strength: 1.2}
     power: {base: 0, strength: 0.2}
-    range: 4
+    range: 7
     cooldown: 42
     spr_item: short sword
 
   - name: Mace
     weapon_class: maces and flails
     max_targets: 2
-    damage: {base: [8,14], strength: 2.0}
+    damage: {base: [8,14], strength: 1.4}
     power: {base: [2,5], strength: 0.25}
-    range: 4
+    range: 7
     cooldown: 55
     spr_item: mace
 
