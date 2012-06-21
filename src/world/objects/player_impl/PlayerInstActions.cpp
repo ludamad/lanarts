@@ -412,6 +412,19 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 		rx += ddx;
 	} else if (!gs->tile_radius_test(x, newpos.y, radius)) {
 		ry += ddy;
+	} else if (ddx != 0 && ddy != 0) {
+		//Alternatives in opposite directions for x & y
+		Pos newpos_alt1(round(rx + ddx), round(ry - ddy));
+		Pos newpos_alt2(round(rx - ddx), round(ry + ddy));
+		if (!gs->tile_radius_test(newpos_alt1.x, newpos_alt1.y, radius)) {
+			rx += ddx;
+			ry -= ddy;
+		} else if (!gs->tile_radius_test(newpos_alt2.x, newpos_alt2.y,
+				radius)) {
+			rx -= ddx;
+			ry += ddy;
+		}
+
 	}
 }
 

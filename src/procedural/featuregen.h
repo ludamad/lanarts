@@ -7,16 +7,18 @@
 #ifndef FEATUREGEN_H_
 #define FEATUREGEN_H_
 
+#include "../util/game_basic_structs.h"
 #include "../util/mtwist.h"
+
 #include "GeneratedLevel.h"
 
 class GameState;
 
 struct FeatureGenSettings {
 	int nstairs_up, nstairs_down;
-	int tileset;
+	std::vector<tileset_id> tilesets;
 	FeatureGenSettings() :
-			nstairs_up(3), nstairs_down(3), tileset(0) {
+			nstairs_up(3), nstairs_down(3) {
 	}
 };
 

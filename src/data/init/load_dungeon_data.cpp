@@ -45,14 +45,26 @@ TunnelGenSettings parse_tunnel_gen(const YAML::Node& n) {
 
 	return tgs;
 }
+
+static void push_tileset_node(std::vector<tileset_id>& tilesets,
+		const YAML::Node& n) {
+	std::string tilesetname = parse_str(n);
+	tilesets.push_back(get_tileset_by_name(tilesetname.c_str()));
+}
+
 FeatureGenSettings parse_feature_gen(const YAML::Node& n) {
 	FeatureGenSettings fgs;
 	fgs.nstairs_up = parse_defaulted(n, "stairs_up", 3);
 	fgs.nstairs_down = parse_defaulted(n, "stairs_down", 3);
 	if (yaml_has_node(n, "tileset")) {
-		std::string tilesetname;
-		n["tileset"] >> tilesetname;
-		fgs.tileset = get_tileset_by_name(tilesetname.c_str());
+		const YAML::Node& tilenode = n["tileset"];
+		if (tilenode.Type() == YAML::NodeType::Scalar) {
+			push_tileset_node(fgs.tilesets, tilenode);
+		} else {
+			for (int i = 0; i < tilenode.size(); i++) {
+				push_tileset_node(fgs.tilesets, tilenode[i]);
+			}
+		}
 	}
 	return fgs;
 }

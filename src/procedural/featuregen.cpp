@@ -23,6 +23,8 @@ static Tile rltile(MTwist& mt, const Range& r){
 	return rltile(mt, mt.rand(r));
 }
 
+static tileset_id randtileset()
+
 void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel& level, GameState* gs){
 	GameTiles& tiles = gs->tile_grid();
 	TilesetEntry& tileset = game_tileset_data[fs.tileset];

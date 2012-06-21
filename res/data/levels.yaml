@@ -146,7 +146,7 @@ areas:
         content:
           features: { tileset: lair_tiles1}
           items:    { amount: 3,  generated: *default_items   }
-          enemies: { wandering: no, amount: 4, generated: *easy_animals }
+          enemies: { wandering: no, amount: 5, generated: *easy_animals }
         
       #Level 3
       - layout: [*tiny_layout1, *tiny_layout2, *tiny_layout3]
@@ -154,7 +154,7 @@ areas:
           features: { tileset: lair_tiles1}
           items:    { amount: 3,  generated: *default_items   }          
           enemies: { 
-            wandering: no, amount: 5, 
+            wandering: no, amount: 8, 
             generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}] 
           }
       #Level 4
@@ -162,7 +162,7 @@ areas:
         content:
           features: { tileset: crystal_tiles_with_marble}
           items:    { amount: 5,  generated: *default_items   }
-          enemies:  { wandering: no, amount: [4,5], generated: *easy_enemies }      
+          enemies:  { wandering: no, amount: [7,9], generated: *easy_enemies }      
           
 #small levels with easy enemies
       #Level 4

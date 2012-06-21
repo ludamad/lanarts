@@ -99,6 +99,7 @@ typedef int projectile_id;
 typedef int sprite_id;
 typedef int spell_id;
 typedef int tile_id;
+typedef int tileset_id;
 typedef int enemy_id;
 typedef int weapon_id;
 /*Determines what team something belongs to*/
