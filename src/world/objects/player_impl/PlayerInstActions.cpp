@@ -401,11 +401,13 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 	Pos newpos(round(rx + ddx), round(ry + ddy));
 
 	if (!gs->tile_radius_test(newpos.x, newpos.y, radius)) {
-		float realmag = sqrt(ddx * ddx + ddy * ddy);
-		if (realmag > 0) {
-			rx += ddx / realmag * mag;
-			ry += ddy / realmag * mag;
-		}
+//		float realmag = sqrt(ddx * ddx + ddy * ddy);
+//		if (realmag > 0) {
+//			rx += ddx / realmag * mag;
+//			ry += ddy / realmag * mag;
+//		}
+		rx += ddx;
+		ry += ddy;
 	} else if (!gs->tile_radius_test(newpos.x, y, radius)) {
 		rx += ddx;
 	} else if (!gs->tile_radius_test(x, newpos.y, radius)) {

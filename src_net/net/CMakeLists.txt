@@ -15,6 +15,7 @@ set( lanarts_tcp_src
 	impl/ServerNetConnection.cpp
 	impl/ClientNetConnection.cpp
 	impl/SocketStream.cpp
+	impl/timing.cpp
 	)
 
 set( lanarts_tcp_include
@@ -23,6 +24,7 @@ set( lanarts_tcp_include
 	impl/SocketStream.h
 	connection.h
 	packet.h
+	timing.h
 )
 
 add_library( lanarts_tcp

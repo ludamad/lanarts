@@ -227,10 +227,11 @@ void MonsterController::set_monster_headings(GameState* gs,
 		if (pdist < e->target_radius + p->target_radius) {
 			e->vx = 0, e->vy = 0;
 		}
+		int mindist = wentry.range + e->target_radius - TILE_SIZE/8;
 		if (viable_attack) {
 			if (!attack.is_ranged()) {
 				e->vx = 0, e->vy = 0;
-			} else if (pdist < std::min(wentry.range + e->target_radius, 40)) {
+			} else if (pdist < std::min(mindist, 40)) {
 				e->vx = 0, e->vy = 0;
 			}
 			e->attack(gs, p, attack);

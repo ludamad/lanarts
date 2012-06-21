@@ -5,6 +5,8 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
+#include <net/timing.h>
+
 #include "data/game_data.h"
 
 #include "display/display.h"
@@ -100,7 +102,7 @@ static void game_loop(GameState* gs) {
 
 	GameSettings& settings = gs->game_settings();
 
-	const clock_t per_frame = settings.time_per_step * CLOCKS_PER_SEC / 1000;
+	Timer total_timer, step_timer, draw_timer;
 
 	gs->pre_step();
 	for (int i = 1; cont; i++) {
@@ -118,14 +120,15 @@ static void game_loop(GameState* gs) {
 
 		//Draw event
 
-		clock_t stepndraw_start = clock(), stepndraw_end;
+		total_timer.start();
+		draw_timer.start();
 		bool draw_this_step = (i > 1 && i % settings.steps_per_draw == 0);
 		if (draw_this_step)
 			gs->draw();
 
-		clock_t draw_end = clock();
+
 		draw_events++;
-		draw_time += draw_end - stepndraw_start;
+		draw_time += draw_timer.get_microseconds();
 
 		int repeat_amount = 1;
 		if (gs->key_down_state(SDLK_F1))
@@ -134,14 +137,12 @@ static void game_loop(GameState* gs) {
 		for (int repeat = 0; repeat < repeat_amount; repeat++) {
 			//Step event
 
-			clock_t step_start = clock();
+			step_timer.start();
 			if (!paused) {
 				gs->step();
 			}
-			stepndraw_end = clock();
 			step_events++;
-			int len = stepndraw_end - step_start;
-			step_time += len;
+			step_time += step_timer.get_microseconds();
 
 			bool is_done = (!paused && !gs->pre_step())
 					|| (paused && !gs->update_iostate());
@@ -151,13 +152,9 @@ static void game_loop(GameState* gs) {
 			}
 		}
 
-		clock_t thisdraw = draw_end - stepndraw_start, thisstep = stepndraw_end
-				- draw_end;
-		clock_t time_to_wait = per_frame * settings.steps_per_draw
-				- (thisdraw / settings.steps_per_draw
-						+ thisstep * settings.steps_per_draw);
-		if (draw_this_step && time_to_wait > 0) {
-			int delayms = time_to_wait * 1000 / CLOCKS_PER_SEC;
+		long microwait = settings.time_per_step * 1000 - total_timer.get_microseconds();
+		if (draw_this_step && microwait > 0) {
+			long delayms = microwait / 1000;
 			if (delayms > 0)
 				SDL_Delay(delayms);
 		}
