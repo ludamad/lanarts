@@ -134,29 +134,29 @@ areas:
   - branch: main_branch
     levels:
 #tiny levels with animals
-#      #Level 1
-#      - layout: [*tiny_layout1]
-#        content:
-#          features: { tileset: lair_tiles2,     stairs_up: 0  }
-#          items:    { amount: 3,  generated: *default_items   }
-#          enemies: { wandering: no, amount: 3, generated: *easy_animals }
-#          
-#      #Level 2
-#      - layout: [*tiny_layout1, *tiny_layout2, *tiny_layout3]
-#        content:
-#          features: { tileset: lair_tiles1}
-#          items:    { amount: 3,  generated: *default_items   }
-#          enemies: { wandering: no, amount: 4, generated: *easy_animals }
-#        
-#      #Level 3
-#      - layout: [*tiny_layout1, *tiny_layout2, *tiny_layout3]
-#        content:
-#          features: { tileset: lair_tiles1}
-#          items:    { amount: 3,  generated: *default_items   }          
-#          enemies: { 
-#            wandering: no, amount: 5, 
-#            generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}] 
-#          }
+      #Level 1
+      - layout: [*tiny_layout1]
+        content:
+          features: { tileset: lair_tiles2,     stairs_up: 0  }
+          items:    { amount: 3,  generated: *default_items   }
+          enemies: { wandering: no, amount: 3, generated: *easy_animals }
+          
+      #Level 2
+      - layout: [*tiny_layout1, *tiny_layout2, *tiny_layout3]
+        content:
+          features: { tileset: lair_tiles1}
+          items:    { amount: 3,  generated: *default_items   }
+          enemies: { wandering: no, amount: 4, generated: *easy_animals }
+        
+      #Level 3
+      - layout: [*tiny_layout1, *tiny_layout2, *tiny_layout3]
+        content:
+          features: { tileset: lair_tiles1}
+          items:    { amount: 3,  generated: *default_items   }          
+          enemies: { 
+            wandering: no, amount: 5, 
+            generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}] 
+          }
       #Level 4
       - layout: [*small_layout1, *small_layout2, *small_layout3, *small_layout4]
         content:

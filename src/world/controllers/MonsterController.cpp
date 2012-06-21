@@ -228,9 +228,11 @@ void MonsterController::set_monster_headings(GameState* gs,
 			e->vx = 0, e->vy = 0;
 		}
 		if (viable_attack) {
+			int mindist = wentry.range + p->target_radius + e->target_radius
+					- TILE_SIZE / 8;
 			if (!attack.is_ranged()) {
 				e->vx = 0, e->vy = 0;
-			} else if (pdist < std::min(wentry.range + e->target_radius, 40)) {
+			} else if (pdist < std::min(mindist, 40)) {
 				e->vx = 0, e->vy = 0;
 			}
 			e->attack(gs, p, attack);
@@ -413,7 +415,8 @@ void MonsterController::update_position(GameState* gs, EnemyInst* e) {
 	float ux = updated.x(), uy = updated.y();
 	e->attempt_move_to_position(gs, ux, uy);
 	simulator->setAgentPosition(eb.simulation_id, RVO::Vector2(ux, uy));
-	simulator->setAgentMaxSpeed(eb.simulation_id, e->effective_stats().movespeed);
+	simulator->setAgentMaxSpeed(eb.simulation_id,
+			e->effective_stats().movespeed);
 }
 
 void MonsterController::post_draw(GameState* gs) {
