@@ -1,5 +1,5 @@
 /*
- * featuregen.h
+ * featuregen.h:
  *  Defines parameters for feature generation (eg tile generation, staircase placement),
  *  as well as the generate_features function
  */
