@@ -36,7 +36,7 @@ public:
 	void queue_io_actions(GameState* gs, PlayerInst* player, std::deque<GameAction>& queued_actions);
 
 	/*Location of the minimap on the screen*/
-	BBox minimap_bbox();
+	BBox minimap_bbox(GameState* gs);
 
 	GameHud(int x, int y, int width, int height);
 	~GameHud();

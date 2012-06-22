@@ -161,9 +161,9 @@ static void game_loop(GameState* gs) {
 	}
 
 	printf("Step time: %f\n",
-			float(step_time) * 1000 / CLOCKS_PER_SEC / step_events);
+			float(step_time) / step_events / 1000);
 	printf("Draw time: %f\n",
-			float(draw_time) * 1000 / CLOCKS_PER_SEC / draw_events);
+			float(draw_time) / draw_events / 1000);
 }
 
 int main(int argc, char** argv) {

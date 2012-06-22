@@ -150,7 +150,7 @@ void GameWorld::step() {
 
 	for (int i = 0; i < level_states.size(); i++) {
 		if (level_states[i]->steps_left > 0) {
-			int prehashvalue = game_state->get_level()->inst_set.hash();
+//			int prehashvalue = game_state->get_level()->inst_set.hash();
 
 //			if (!inmenu && !game_state->net_connection().check_integrity(game_state, prehashvalue)) {
 //				printf("Hashes don't match before step, frame %d, level %d\n", game_state->frame(), i);
@@ -167,8 +167,8 @@ void GameWorld::step() {
 			game_state->get_level()->pc.pre_step(game_state);
 			game_state->get_level()->mc.pre_step(game_state);
 			game_state->get_level()->inst_set.step(game_state);
-			game_state->get_level()->steps_left--;
 			game_state->get_level()->tiles.step(game_state);
+			game_state->get_level()->steps_left--;
 //Clone part2:
 ////            if (real == current_level) current_level = clone;
 //            game_state->level() = real;
@@ -182,7 +182,6 @@ void GameWorld::step() {
 //			}
 		}
 	}
-
 	game_state->set_level(current_level);
 
 	midstep = false;

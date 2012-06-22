@@ -23,11 +23,13 @@ static Tile rltile(MTwist& mt, const Range& r){
 	return rltile(mt, mt.rand(r));
 }
 
-static tileset_id randtileset()
+static tileset_id randtileset(MTwist& mt, const std::vector<tileset_id>& tilesets){
+	return tilesets[mt.rand(tilesets.size())];
+}
 
 void generate_features(const FeatureGenSettings& fs, MTwist& mt, GeneratedLevel& level, GameState* gs){
 	GameTiles& tiles = gs->tile_grid();
-	TilesetEntry& tileset = game_tileset_data[fs.tileset];
+	TilesetEntry& tileset = game_tileset_data[randtileset(mt, fs.tilesets)];
 	tiles.clear();
 	
 	int tw = tiles.tile_width(), th = tiles.tile_height();

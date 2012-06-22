@@ -20,6 +20,7 @@ struct EffectStats {
 			effects[i].t_remaining = 0;
 		}
 	}
+	bool has_active_effect() const;
 	void add(int effect, int length);
 	Effect* get(int effect);
 	void step();

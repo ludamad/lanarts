@@ -209,7 +209,7 @@ void GameState::handle_dragging() {
 		is_dragged = true;
 	} else {
 		if (mouse_right_down()) {
-			BBox minimap_bbox = hud.minimap_bbox();
+			BBox minimap_bbox = hud.minimap_bbox(this);
 			int mx = mouse_x() - minimap_bbox.x1, my = mouse_y()
 					- minimap_bbox.y1;
 			int mw = minimap_bbox.width(), mh = minimap_bbox.height();

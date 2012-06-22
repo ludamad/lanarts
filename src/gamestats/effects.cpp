@@ -9,7 +9,18 @@ extern "C" {
 
 #include "effects.h"
 
+bool EffectStats::has_active_effect() const {
+	for (int i = 0; i < EFFECTS_MAX; i++) {
+		if (effects[i].t_remaining > 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void EffectStats::process(lua_State* L, const CombatStats& basestats, EffectiveStats& effective) const {
+	if (!has_active_effect())
+		return;
 	lua_push_combatstats(L, basestats);
 	lua_push_effectivestats(L, effective);
 

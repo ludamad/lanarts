@@ -72,9 +72,9 @@ enemies:
     defeat_message: The glowing chicken recieves a fatal blow.
     stats:
         attacks: [ {weapon: Basic Melee} ]
-        hp: 75
+        hp: 50
         hpregen: 0.08
         movespeed: 4
         strength: 25
-        defence: 15  
-        willpower: 15
+        defence: 10
+        willpower: 10

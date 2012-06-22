@@ -54,8 +54,8 @@ static void draw_player_statbars(GameState*gs, PlayerInst* player, int x,
 				"can rest", player->rest_cooldown() * 100 / REST_COOLDOWN);
 }
 
-static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot,
-		int x, int y) {
+static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot, int x,
+		int y) {
 	if (itemslot.amount > 0) {
 		ItemEntry& itemd = itemslot.item.item_entry();
 		GLimage& itemimg = game_sprite_data[itemd.sprite_number].img();
@@ -177,8 +177,16 @@ static void draw_rect2d(char* buff, int w, int h, int x, int y, int mx, int my,
 		}
 }
 
-BBox GameHud::minimap_bbox() {
-	return minimapbox;
+BBox GameHud::minimap_bbox(GameState* gs) {
+	int minimap_relposx = 20, minimap_relposy = 64 + 45;
+	BBox bbox(x + minimap_relposx, y + minimap_relposy,
+			x + minimap_relposx + gs->get_level()->tile_width(),
+			y + minimap_relposy + gs->get_level()->tile_height());
+	int minimap_w = bbox.width(), minimap_h = bbox.height();
+	int minimap_x = bbox.x1 + (128 - minimap_w) / 2, minimap_y = bbox.y1
+			+ (128 - minimap_w) / 2;
+	return BBox(minimap_x, minimap_y, minimap_x + minimap_w,
+			minimap_y + minimap_h);
 }
 
 void GameHud::step(GameState *gs) {
@@ -379,9 +387,6 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox, float scale) {
 	view.min_tile_within(min_tilex, min_tiley);
 	view.max_tile_within(max_tilex, max_tiley);
 
-	int minimap_w = bbox.width(), minimap_h = bbox.height();
-	int minimap_x = bbox.x1 + (128 - minimap_w) / 2, minimap_y = bbox.y1
-			+ (128 - minimap_w) / 2;
 	int ptw = power_of_two(MINIMAP_SIZEMAX), pth = power_of_two(
 			MINIMAP_SIZEMAX);
 	if (!minimap_arr) {
@@ -394,8 +399,8 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox, float scale) {
 		minimap_arr[i * 4 + 3] = 255;
 	}
 
-	world2minimapbuffer(gs, minimap_arr, BBox(), minimap_w, minimap_h, ptw,
-			pth);
+	world2minimapbuffer(gs, minimap_arr, BBox(), bbox.width(), bbox.height(),
+			ptw, pth);
 
 	GameInst* inst = gs->get_instance(gs->local_playerid());
 	if (inst) {
@@ -408,14 +413,9 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox, float scale) {
 
 	gl_image_from_bytes(minimap_buff, ptw, pth, minimap_arr);
 
-	gl_draw_image(minimap_buff, minimap_x, minimap_y);
+	gl_draw_image(minimap_buff, bbox.x1, bbox.y1);
 }
 void GameHud::draw(GameState* gs) {
-	int minimap_relposx = 20, minimap_relposy = 64 + 45;
-	minimapbox = BBox(x + minimap_relposx, y + minimap_relposy,
-			x + minimap_relposx + gs->get_level()->tile_width(),
-			y + minimap_relposy + gs->get_level()->tile_height());
-
 	gl_set_drawing_area(x, y, _width, _height);
 	gl_draw_rectangle(0, 0, _width, _height, bg_colour);
 
@@ -429,7 +429,7 @@ void GameHud::draw(GameState* gs) {
 
 	draw_player_statbars(gs, player_inst, 32, 32);
 
-	draw_minimap(gs, minimap_bbox().translated(-x, -y), 2.0);
+	draw_minimap(gs, minimap_bbox(gs).translated(-x, -y), 2.0);
 
 	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 15, 10,
 			"Level %d", class_stats.xplevel);

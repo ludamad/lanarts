@@ -67,6 +67,7 @@ EffectiveAttackStats EffectiveStats::with_attack(MTwist& mt,
 	ret.cooldown = attack.atk_cooldown() * cooldown_mult;
 	ret.damage = attack.atk_damage(mt, *this);
 	ret.power = attack.atk_power(mt, *this);
+	ret.magic_percentage = attack.atk_percentage_magic();
 	return ret;
 }
 

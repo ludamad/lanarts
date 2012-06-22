@@ -32,8 +32,11 @@ public:
 	enum {
 		RADIUS = 10, DEPTH = 75, LINEOFSIGHT = 7
 	};
-	PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y, bool local = true) :
-			CombatGameInst(stats, sprite, 0, x, y, RADIUS, true, DEPTH), fieldofview(LINEOFSIGHT),  local(local), money(0), spellselect(0) {
+	PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y,
+			bool local = true) :
+			CombatGameInst(stats, sprite, 0, x, y, RADIUS, true, DEPTH), fieldofview(
+					LINEOFSIGHT), local(local), money(0), lives(0), spellselect(
+					0) {
 	}
 
 	virtual ~PlayerInst();
@@ -55,8 +58,7 @@ public:
 	void perform_queued_actions(GameState* gs);
 	void perform_action(GameState* gs, const GameAction& action);
 
-
-    virtual bool within_field_of_view(const Pos& pos);
+	virtual bool within_field_of_view(const Pos& pos);
 
 	int& spell_selected() {
 		return spellselect;
@@ -99,7 +101,7 @@ private:
 	bool didstep;
 	bool local, isresting;
 
-	int money;
+	int money, lives;
 	int spellselect;
 };
 

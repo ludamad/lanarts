@@ -42,14 +42,26 @@ medium_enemies: &medium_enemies
   - { enemy: Chicken,           chance: 50                                    }
   - { enemy: Zombie,            chance: 100                                   }
   - { enemy: Storm Elemental,   chance: 66,  group_chance: 33, group_size: 2  }
+ 
+medium_enemies2: &hard_enemies
+ - { enemy: Skeleton,          chance: 50                                    }
+ - { enemy: Storm Elemental,   chance: 66,  group_chance: 33, group_size: 2  }
+ - { enemy: Grue                                                             }
+ - { enemy: Chicken,           chance: 25,  group_chance: 50, group_size: 3  }
+ - { enemy: Super Chicken,     chance: 100                                   }
+ - { enemy: Zombie,            chance: 75                                    }
+ - { enemy: Ciribot,           chance: 75                                    }
+ - { enemy: Storm Elemental,   chance: 50,  group_chance: 33, group_size: 3  }
+ - { enemy: Hell Forged,       chance: 10                                    }
 
-hard_enemies: &hard_enemies
+harder_enemies: &harder_enemies
   - { enemy: Super Chicken,     chance: 50,  group_chance: 33, group_size: 3  }
   - { enemy: Ciribot,           chance: 100                                   }
   - { enemy: Storm Elemental,   chance: 50,  group_chance: 33, group_size: 3  }
   - { enemy: Grue,              chance: 50,  group_chance: 33, group_size: 2  }
   - { enemy: Jester,            chance: 5,                                    }
   - { enemy: Hell Forged,       chance: 25                                    }
+
 layouts:
       - &tiny_layout1
         size: [[35,45],[35,46]] #[width] by [height]
@@ -90,18 +102,8 @@ layouts:
         size: [89, 89]
         rooms:    { padding: 4, amount: 20, size: [10,30]}
         tunnels:  { width: [2,6], per_room: [2, 5]      }
-        
-      - &medium_layout2
-        size: [89, 89]
-        rooms:
-          padding: 4
-          amount: 20
-          size: [10,30]
-        tunnels:
-          width: [2, 6]
-          per_room: [2, 5]
           
-      - &medium_layout3
+      - &medium_layout2
         size: [89, 89]
         rooms:
           padding: 4
@@ -128,7 +130,17 @@ layouts:
         tunnels:
           width: [1, 3]
           per_room: 9   
-        
+tiny_layouts: &tiny_layouts
+  [*tiny_layout1, *tiny_layout2, *tiny_layout3]    
+small_layouts: &small_layouts
+  [*small_layout1, *small_layout2, *small_layout3, *small_layout4]
+medium_layouts: &medium_layouts
+  [*medium_layout1, *medium_layout2]        
+large_layouts: &large_layouts
+  [*large_layout1, *large_layout2]
+all_tilesets: &all_tilesets
+  [lair_tiles1, lair_tiles2, cobalt_tiles, pebble_tiles, crystal_tiles, 
+  crystal_tiles_with_marble, cobble]
 
 areas:
   - branch: main_branch
@@ -137,115 +149,94 @@ areas:
       #Level 1
       - layout: [*tiny_layout1]
         content:
-          features: { tileset: lair_tiles2,     stairs_up: 0  }
+          features: { tileset: [lair_tiles1, lair_tiles2],     stairs_up: 0  }
           items:    { amount: 3,  generated: *default_items   }
           enemies: { wandering: no, amount: 3, generated: *easy_animals }
           
       #Level 2
-      - layout: [*tiny_layout1, *tiny_layout2, *tiny_layout3]
+      - layout: *tiny_layouts
         content:
-          features: { tileset: lair_tiles1}
+          features: { tileset: [lair_tiles1, lair_tiles2]}
           items:    { amount: 3,  generated: *default_items   }
           enemies: { wandering: no, amount: 5, generated: *easy_animals }
         
       #Level 3
-      - layout: [*tiny_layout1, *tiny_layout2, *tiny_layout3]
+      - layout: *tiny_layouts
         content:
-          features: { tileset: lair_tiles1}
+          features: { tileset: [lair_tiles1, lair_tiles2]}
           items:    { amount: 3,  generated: *default_items   }          
           enemies: { 
             wandering: no, amount: 8, 
             generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}] 
           }
       #Level 4
-      - layout: [*small_layout1, *small_layout2, *small_layout3, *small_layout4]
+      - layout: *small_layouts
         content:
-          features: { tileset: crystal_tiles_with_marble}
+          features: { tileset: [lair_tiles1, lair_tiles2, crystal_tiles, crystal_tiles_with_marble]}
           items:    { amount: 5,  generated: *default_items   }
-          enemies:  { wandering: no, amount: [7,9], generated: *easy_enemies }      
+          enemies:  { amount: [7,9], generated: *easy_enemies }      
           
 #small levels with easy enemies
-      #Level 4
+      #Level 5
       - layout: [*small_layout1]
         content:
-          features: { tileset: crystal_tiles}
+          features: { tileset: [crystal_tiles, crystal_tiles_with_marble]}
           items:    { amount: 8,  generated: *default_items   }
-          enemies:  { amount: 5,  generated: *easy_enemies    }
-      #Level 4
-      - layout: [*small_layout1, *small_layout2, *small_layout3, *small_layout4]
-        content:
-          features: { tileset: pebble_tiles}
-          items:    { amount: 5,  generated: *default_items   }
-          enemies: { wandering: no, amount: 8, generated: *easy_enemies }      
-          
-      #Level 5
-      - layout: [*small_layout1, *small_layout2, *small_layout3, *small_layout4]
-        content:
-          features: { tileset: pebble_tiles}
-          items:    { amount: 5,  generated: *default_items   }
-          enemies: { wandering: no, amount: 8, generated: *easy_enemies }
-          
+          enemies:  { amount: 10,  generated: *easy_enemies    }
       #Level 6
-      - layout: [*small_layout1, *small_layout2, *small_layout3, *small_layout4]
+      - layout: *small_layouts
         content:
-          features: { tileset: lair_tiles2}
+          features: { tileset: pebble_tiles}
           items:    { amount: 5,  generated: *default_items   }
-          enemies: { wandering: no, amount: 12, generated: *easy_enemies}
-
-#      - size: [50, 50]
-#        wandering: no
-#        items:    { amount: 2,  generated: *default_items   }
-#        rooms:    { padding: 1, amount: 5, size: [10,10] }
-#        tunnels:  { padding: 1, width: [1,5],  per_room: 5  }
-#        features: { tileset: lair_tiles2}
-#        enemies:
-#          amount: 10
-#          generated: *easy_animals
-#      #Level 1
-#      - size: [20,60]
-#        items:    { amount: 2,  generated: *default_items   }
-#        rooms:    { padding: 1, amount: [5,10], size: [4,8] }
-#        tunnels:  { padding: 1, width: [1,3],  per_room: [2,3] }
-#        features: { tileset: lair_tiles2,     stairs_up: 3  }
-#        enemies:
-#          amount: 2
-#          generated:
-#            - {default: *medium_animals}
-#      #Level 2
-#      - size: [40,40]
-#        items:    { amount: 2,  generated: *default_items   }
-#        rooms:    { padding: 1, amount: [2,4], size: [5,15] }
-#        tunnels:  { padding: 2, width: [1,2],  per_room: 2   }
-#        features: { tileset: cobble}
-#        enemies:
-#          amount: 4
-#          generated:
-#            - { enemy: Skeleton,        chance: 100 }
-#            - { enemy: Chicken,         chance: 33 }
-#            - { enemy: Storm Elemental, chance: 33,  group_chance: 33, group_size: 2}
-#      #Level 3
-#      - size: [40,40]
-#        items:    { amount: 2,  generated: *default_items   }
-#        rooms:    { padding: 0, amount: 1, size: [38,38] }
-#        tunnels:  { padding: 1, width: [4,5],  per_room: 2     }
-#        features: { tileset: cobalt_tiles}
-#        enemies:
-#          amount: 3
-#          generated: *medium_enemies
-#      - size: [90,90]
-#        items:    { amount: 2,  generated: *default_items   }
-#        rooms:    { padding: 1, amount: [8,10], size: [4,10] }
-#        tunnels:  { padding: 1, width: [4,5],  per_room: 2     }
-#        features: { tileset: cobalt_tiles}
-#        enemies:
-#          amount: 25
-#          generated: *medium_enemies
-#      #Level 9
-#      - size: [128, 90]
-#        items:    { amount: 2,  generated: *default_items   }
-#        rooms:    { padding: 1, amount: 40, size: [4,10] }
-#        tunnels:  { padding: 1, width: [1,5],  per_room: 2     }
-#        features: { tileset: cobalt_tiles}
-#        enemies:
-#          amount: 50
-#          generated: *hard_enemies
+          enemies: {  amount: 10, generated: *medium_enemies }      
+          
+      #Level 7
+      - layout: *small_layouts 
+        content:
+          features: { tileset: *all_tilesets}
+          items:    { amount: 5,  generated: *default_items   }
+          enemies:  { amount: 10, generated: *medium_enemies }
+          
+      #Level 8
+      - layout: *medium_layouts
+        content:
+          features: { tileset: *all_tilesets}
+          items:    { amount: 5,  generated: *default_items   }
+          enemies:          
+            generated: *hard_enemies
+            amount: 12
+      
+      #Level 9
+      - layout: *medium_layouts
+        content:
+          features: { tileset: *all_tilesets}
+          items:    { amount: 5,  generated: *default_items   }
+          enemies:          
+            generated: *hard_enemies
+            amount: 15
+      
+      #Level 10
+      - layout: *large_layouts
+        content:
+          features: { tileset: *all_tilesets}
+          items:    { amount: 5,  generated: *default_items   }
+          enemies:          
+            generated: *hard_enemies
+            amount: 20
+      
+      #Level 12
+      - layout: *large_layouts
+        content:
+          features: { tileset: *all_tilesets}
+          items:    { amount: 5,  generated: *default_items   }
+          enemies:          
+            generated: *harder_enemies
+            amount: 25
+      #Level 13
+      - layout: *large_layouts
+        content:
+          features: { tileset: *all_tilesets}
+          items:    { amount: 5,  generated: *default_items   }
+          enemies:          
+            generated: *harder_enemies
+            amount: 30

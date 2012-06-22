@@ -147,8 +147,8 @@ void init_lua_data(GameState* gs, lua_State* L) {
 	__lua_init(L, game_effect_data);
 	__lua_init(L, game_item_data);
 
-	lua_getglobal(L, "level_tests");
-	lua_call(L, 0, 0);
+//	lua_getglobal(L, "level_tests");
+//	lua_call(L, 0, 0);
 }
 
 static void luayaml_push(LuaValue& value, lua_State *L, const char* name) {

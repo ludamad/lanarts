@@ -47,8 +47,8 @@ struct CoreStatMultiplier {
 	float strength, defence, magic, willpower;
 	CoreStatMultiplier(int base = 0, float strength = 0, float defence = 0,
 			float magic = 0, float willpower = 0) :
-			strength(strength), defence(defence), magic(magic), willpower(
-					willpower) {
+			base(base, base), strength(strength), defence(defence), magic(
+					magic), willpower(willpower) {
 	}
 	float calculate(MTwist& mt, const CoreStats& stats);
 };
@@ -59,7 +59,7 @@ struct DerivedStats {
 	float power, resistance;
 	int damage, reduction;
 	DerivedStats(int power = 0, int resistance = 0, int damage = 0,
-			int reduction = 0, int cooldown = 0) :
+			int reduction = 0) :
 			power(power), resistance(resistance), damage(damage), reduction(
 					reduction) {
 	}
@@ -72,7 +72,7 @@ struct EffectiveAttackStats {
 	int damage, power, cooldown;
 	float magic_percentage;
 	EffectiveAttackStats() :
-			damage(0), power(0), cooldown(0) {
+			damage(0), power(0), cooldown(0), magic_percentage(0.0f) {
 	}
 	float physical_percentage() const {
 		return 1.0f - magic_percentage;

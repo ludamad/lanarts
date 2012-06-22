@@ -142,12 +142,12 @@ void MonsterController::monster_follow_path(GameState* gs, EnemyInst* e) {
 	float path_progress_threshold = movespeed / 50.0f;
 	float progress = distance_between(eb.path_start, Pos(e->x, e->y));
 
-//	if (eb.path_steps > PATH_CHECK_INTERVAL
-//			&& progress / eb.path_steps < path_progress_threshold) {
-//		eb.path.clear();
-//		eb.current_action = EnemyBehaviour::INACTIVE;
-//		return;
-//	}
+	if (eb.path_steps > PATH_CHECK_INTERVAL
+			&& progress / eb.path_steps < path_progress_threshold) {
+		eb.path.clear();
+		eb.current_action = EnemyBehaviour::INACTIVE;
+		return;
+	}
 
 	if (eb.current_node < eb.path.size()) {
 		if (move_towards(e, eb.path[eb.current_node]))
@@ -172,7 +172,7 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	bool is_fullpath = true;
 	if (eb.path_cooldown > 0) {
 		eb.path_cooldown--;
-		is_fullpath = true; //false;
+		is_fullpath = false;
 	}
 	int ex = e->x / TILE_SIZE, ey = e->y / TILE_SIZE;
 
