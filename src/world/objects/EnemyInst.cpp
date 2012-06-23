@@ -182,12 +182,15 @@ void EnemyInst::die(GameState *gs) {
 		gs->remove_instance(this);
 		show_defeat_message(gs->game_chat(), etype());
 		if (etype().death_sprite > -1) {
-//			gs->add_instance(new AnimatedInst(x, y, etype().death_sprite, 400, ItemInst::DEPTH));
+			const int DEATH_SPRITE_TIMEOUT = 1600;
+			gs->add_instance(
+					new AnimatedInst(x, y, etype().death_sprite, DEATH_SPRITE_TIMEOUT, 0, 0,
+							ItemInst::DEPTH));
 		}
 	}
 }
 
 void EnemyInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(EnemyInst*) inst = *this;
+	*(EnemyInst*)inst = *this;
 }

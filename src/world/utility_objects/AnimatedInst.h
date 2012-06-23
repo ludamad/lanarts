@@ -22,7 +22,7 @@ public:
 			float vx = 0, float vy = 0, int depth = DEPTH,
 			const std::string& text = std::string(),
 			Colour textcol = Colour(255, 0, 0)) :
-			GameInst(x, y, RADIUS, false, DEPTH), textcol(textcol), rx(x), ry(
+			GameInst(x, y, RADIUS, false, depth), textcol(textcol), rx(x), ry(
 					y), vx(vx), vy(vy), sprite(sprite), timeleft(animatetime), animatetime(
 					animatetime), text(text) {
 	}

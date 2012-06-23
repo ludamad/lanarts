@@ -73,7 +73,7 @@ EnemyGenChance parse_enemy_chance(const YAML::Node& n) {
 	EnemyGenChance egc;
 	egc.enemytype = parse_enemy_number(n, "enemy");
 	egc.genchance = parse_defaulted(n, "chance", 0);
-	egc.guaranteed = parse_defaulted(n, "guaranteed_spawns", false);
+	egc.guaranteed = parse_defaulted(n, "guaranteed_spawns", 0);
 	egc.groupchance = parse_defaulted(n, "group_chance", 0);
 	egc.groupsize = parse_defaulted(n, "group_size", Range(0, 0));
 	return egc;

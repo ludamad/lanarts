@@ -101,7 +101,7 @@ void PlayerInst::step(GameState* gs) {
 		return;
 	}
 
-	isresting = false;
+	is_resting = false;
 	perform_queued_actions(gs);
 
 	if (!gs->key_down_state(SDLK_x) && is_local_player())

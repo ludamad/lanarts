@@ -139,7 +139,7 @@ int AttackStats::atk_power(MTwist& mt, const EffectiveStats& stats) const {
 
 int AttackStats::atk_percentage_magic() const {
 
-	if (weapon.id > 0) {
+	if (weapon.id > 0 || !projectile.valid_projectile()) {
 		return weapon.weapon_entry().percentage_magic;
 	}
 	return projectile.projectile_entry().percentage_magic;

@@ -7,7 +7,7 @@ enemies:
     radius: 10
     xpaward: 5
     appear_message: A hostile large rat approaches!
-    defeat_message: A loud squeek is heard as the rat is blown to bits.
+    defeat_message: Blood splatters as the large rat is destroyed.
     stats:
         attacks: [ {weapon: Basic Melee} ]
         hp: 14
@@ -36,6 +36,7 @@ enemies:
 
   - name: Sheep
     sprite: sheep
+    death_sprite: blood
     radius: 14
     xpaward: 8
     appear_message: A hostile sheep approaches!
@@ -51,13 +52,14 @@ enemies:
           
   - name: Chicken
     sprite: chicken
+    death_sprite: blood
     radius: 10
     xpaward: 10
     appear_message: A hostile chicken appears!
-    defeat_message: The chicken is blown to bits.
+    defeat_message: The chicken may as well be fried.
     stats:
         attacks: [ {weapon: Fast Melee} ]
-        hp: 18
+        hp: 25
         hpregen: 0.04
         movespeed: 3
         strength: 15
@@ -66,10 +68,11 @@ enemies:
         
   - name: Super Chicken
     sprite: super_chicken
+    death_sprite: blood
     radius: 14
     xpaward: 20
     appear_message: An unnaturally glowing chicken appears!
-    defeat_message: The glowing chicken recieves a fatal blow.
+    defeat_message: The glowing chicken recieves a final blow.
     stats:
         attacks: [ {weapon: Basic Melee} ]
         hp: 50

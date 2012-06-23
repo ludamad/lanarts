@@ -99,7 +99,7 @@ private:
 	std::deque<GameAction> queued_actions;
 	fov fieldofview;
 	bool didstep;
-	bool local, isresting;
+	bool local;
 
 	int money, lives;
 	int spellselect;
