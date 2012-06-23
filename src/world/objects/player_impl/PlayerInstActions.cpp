@@ -364,7 +364,7 @@ void PlayerInst::use_rest(GameState *gs, const GameAction& action) {
 	if (cooldowns().can_rest() && !atfull) {
 		core_stats().heal_hp(core_stats().hpregen * 8);
 		core_stats().heal_mp(core_stats().mpregen * 8);
-		isresting = true;
+		is_resting = true;
 	}
 }
 void PlayerInst::use_move(GameState* gs, const GameAction& action) {

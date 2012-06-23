@@ -49,9 +49,11 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, int classn,
 	int px = (epos.x + start_x) * TILE_SIZE + TILE_SIZE / 2;
 	int py = (epos.y + start_y) * TILE_SIZE + TILE_SIZE / 2;
 
+	sprite_id sprite =
+			local ? get_sprite_by_name("wizard") : get_sprite_by_name("fighter");
+
 	if (!inst) {
-		inst = new PlayerInst(c.starting_stats, get_sprite_by_name("fighter"),
-				px, py, local);
+		inst = new PlayerInst(c.starting_stats, sprite, px, py, local);
 	}
 	inst->last_x = px;
 	inst->last_y = py;
