@@ -17,6 +17,7 @@ set( lanarts_src
 	lua/lua_combatstats.cpp
 	lua/lua_effectivestats.cpp
 
+	data/init/load_armour_data.cpp
 	data/init/load_sprite_data.cpp
 	data/init/load_dungeon_data.cpp
 	data/init/load_effect_data.cpp
@@ -110,6 +111,7 @@ set( lanarts_include
 
 	data/init/yaml_util.h
 	
+	data/armour_data.h
 	data/class_data.h
 	data/effect_data.h
 	data/enemy_data.h
