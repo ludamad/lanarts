@@ -152,11 +152,11 @@ void GameWorld::step() {
 
 	for (int i = 0; i < level_states.size(); i++) {
 		if (level_states[i]->steps_left > 0) {
-//			int prehashvalue = game_state->get_level()->inst_set.hash();
+			int prehashvalue = game_state->get_level()->inst_set.hash();
 
-//			if (!inmenu && !game_state->net_connection().check_integrity(game_state, prehashvalue)) {
-//				printf("Hashes don't match before step, frame %d, level %d\n", game_state->frame(), i);
-//			}
+			if (!inmenu && !game_state->net_connection().check_integrity(game_state, prehashvalue)) {
+				printf("Hashes don't match before step, frame %d, level %d\n", game_state->frame(), i);
+			}
 			//Set so that all the GameState getters are properly updated
 			game_state->set_level(level_states[i]);
 
@@ -178,10 +178,10 @@ void GameWorld::step() {
 //            delete clone;
 
 //
-//			int posthashvalue =  game_state->level()->inst_set.hash();
-//			if (!inmenu &&!game_state->net_connection().check_integrity(game_state, posthashvalue)) {
-//				printf("Hashes don't match after step, frame %d, level %d\n", game_state->frame(), i);
-//			}
+			int posthashvalue =  game_state->get_level()->inst_set.hash();
+			if (!inmenu &&!game_state->net_connection().check_integrity(game_state, posthashvalue)) {
+				printf("Hashes don't match after step, frame %d, level %d\n", game_state->frame(), i);
+			}
 		}
 	}
 	game_state->set_level(current_level);

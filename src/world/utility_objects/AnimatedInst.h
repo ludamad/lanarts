@@ -1,5 +1,5 @@
 /*
- * AnimatedInst.h
+ * AnimatedInst.h:
  *  Represents an object that displays on the screen for a fixed amount of time before removing itself
  */
 

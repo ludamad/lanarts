@@ -1,8 +1,6 @@
 /*
- * AnimatedInst.cpp
- *
- *  Created on: Mar 25, 2012
- *      Author: 100397561
+ * AnimatedInst.cpp:
+ *  Represents an object that displays on the screen for a fixed amount of time before removing itself
  */
 
 #include "AnimatedInst.h"
