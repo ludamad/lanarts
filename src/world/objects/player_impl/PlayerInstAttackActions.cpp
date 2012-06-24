@@ -288,7 +288,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 		int weaprange = wentry.range + this->radius + TILE_SIZE/2;
 		float mag = distance_between(actpos, Pos(x, y));
 		if (mag > weaprange) {
-			float dx = actpos.x - x, dy = actpos.y - dy;
+			float dx = actpos.x - x, dy = actpos.y - y;
 			actpos = Pos(x + dx / mag * weaprange, y + dy / mag * weaprange);
 		}
 
@@ -364,8 +364,7 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 
 		cooldowns().reset_action_cooldown(pentry.cooldown * 1.4);
 	} else {
-		x = action.action_x;
-		y = action.action_y;
+		update_position(action.action_x, action.action_y);
 	}
 
 	if (action.use_id == 0) {

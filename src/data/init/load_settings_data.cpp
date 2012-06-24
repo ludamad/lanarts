@@ -25,6 +25,7 @@ DataFiles load_datafiles_data(const char* filename) {
 
 			parser.GetNextDocument(root);
 
+			optional_set(root, "armour_files", dfiles.armour_files);
 			optional_set(root, "tile_files", dfiles.tile_files);
 			optional_set(root, "sprite_files", dfiles.sprite_files);
 			optional_set(root, "tileset_files", dfiles.tileset_files);

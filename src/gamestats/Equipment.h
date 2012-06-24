@@ -15,7 +15,7 @@
 class Equipment {
 public:
 	Equipment() :
-			weapon(0), projectile(-1), projectile_amnt(0), money(0) {
+			weapon(0), projectile(-1), projectile_amnt(0), body_armour(0), money(0) {
 	}
 	bool valid_to_use_projectile(const Projectile& proj);
 	bool valid_to_use(const Item& item);
@@ -27,12 +27,14 @@ public:
 	void use_ammo(int amnt = 1);
 
 	bool has_weapon(){ return weapon.id > 0; }
+	bool has_body_armour(){ return body_armour.id > 0; }
 	bool has_projectile(){ return projectile.id > -1; }
 
 	Inventory inventory;
 	Weapon weapon;
 	Projectile projectile;
 	int projectile_amnt;
+	Armour body_armour;
 	money_t money;
 };
 

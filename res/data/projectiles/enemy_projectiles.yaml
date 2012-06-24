@@ -29,7 +29,17 @@ projectiles:
     speed: 8
     spr_item: none
     spr_attack: blue blast
-
+    
+  - name: Longer Range Blue Blast
+    weapon_class: magic
+    damage: { magic: 1.5 }    # 150% magic
+    power:  { magic: 0.3 }    
+    range: 300
+    cooldown: 70
+    speed: 8
+    spr_item: none
+    spr_attack: blue blast
+    
   - name: Slow Fire Bolt
     weapon_class: magic
     damage_type: {magic: 1.0}

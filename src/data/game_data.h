@@ -12,6 +12,7 @@
 
 #include "../world/GameSettings.h"
 
+#include "armour_data.h"
 #include "class_data.h"
 #include "datafiles_data.h"
 #include "dungeon_data.h"

@@ -5,6 +5,7 @@
 
 #include <cmath>
 
+#include "../data/armour_data.h"
 #include "../data/weapon_data.h"
 
 #include "../world/GameState.h"
@@ -56,10 +57,21 @@ int damage_formula(const EffectiveAttackStats& attacker,
 			+ pdmg * attacker.physical_percentage();
 }
 
-static void derive_from_equipment(MTwist& mt, EffectiveStats& effective,
-		const Equipment& equipment) {
+static void factor_in_armour_slot(MTwist& mt, EffectiveStats& effective, const Armour& slot) {
 	CoreStats& core = effective.core;
-	WeaponEntry& wentry = equipment.weapon.weapon_entry();
+	ArmourEntry& aentry = slot.armour_entry();
+
+	effective.physical.resistance += aentry.resistance.calculate(mt, core);
+	effective.magic.resistance += aentry.magic_resistance.calculate(mt, core);
+	effective.physical.reduction += aentry.damage_reduction.calculate(mt, core);
+	effective.magic.reduction += aentry.magic_reduction.calculate(mt, core);
+}
+static void factor_in_equipment(MTwist& mt, EffectiveStats& effective,
+		const Equipment& equipment) {
+	factor_in_armour_slot(mt, effective, equipment.body_armour);
+}
+static void derive_from_equipment(MTwist& mt, EffectiveStats& effective) {
+	CoreStats& core = effective.core;
 	effective.physical.resistance = core.defence / 2.5f;
 	effective.magic.resistance = core.willpower / 2.5f;
 	effective.physical.reduction = core.physical_reduction + core.defence / 2.0;
@@ -71,7 +83,8 @@ EffectiveStats effective_stats(GameState* gs, const CombatStats& stats) {
 	EffectiveStats ret;
 	ret.core = stats.core;
 	ret.movespeed = stats.movespeed;
-	derive_from_equipment(gs->rng(), ret, stats.equipment);
+	derive_from_equipment(gs->rng(), ret);
+	factor_in_equipment(gs->rng(), ret, stats.equipment);
 	stats.effects.process(L, stats, ret);
 	return ret;
 }

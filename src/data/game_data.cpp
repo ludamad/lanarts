@@ -18,10 +18,13 @@ extern "C" {
 void load_tile_data(const FilenameList& filenames);
 void load_tileset_data(const FilenameList& filenames);
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames);
+void load_armour_data(lua_State* L, const FilenameList& filenames,
+		LuaValue* itemtable);
 void load_weapon_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemstable = NULL);
 LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 		LuaValue& itemstable);
+void load_armour_item_entries();
 void load_weapon_item_entries();
 void load_projectile_item_entries();
 
@@ -32,6 +35,8 @@ LuaValue load_dungeon_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_class_data(lua_State* L, const FilenameList& filenames);
 
 /* Definition of game data */
+
+std::vector<ArmourEntry> game_armour_data;
 std::vector<ClassType> game_class_data;
 std::vector<EffectEntry> game_effect_data;
 std::vector<EnemyEntry> game_enemy_data;
@@ -63,6 +68,10 @@ static int get_X_by_name(const T& t, const char* name, bool error_if_not_found =
 	}
 	return -1;
 }
+
+int get_armour_by_name(const char *name, bool error_if_not_found) {
+	return get_X_by_name(game_armour_data, name, error_if_not_found);
+}
 int get_item_by_name(const char* name, bool error_if_not_found) {
 	return get_X_by_name(game_item_data, name, error_if_not_found);
 }
@@ -92,7 +101,7 @@ int get_tileset_by_name(const char* name) {
 	return get_X_by_name(game_tileset_data, name);
 }
 
-LuaValue sprites, enemies, effects, weapons, projectiles, items, dungeon,
+LuaValue sprites, armours, enemies, effects, weapons, projectiles, items, dungeon,
 		classes;
 void init_game_data(lua_State* L) {
 	DataFiles dfiles = load_datafiles_data("res/datafiles.yaml");
@@ -109,6 +118,9 @@ void init_game_data(lua_State* L) {
 
 	load_weapon_data(L, dfiles.weapon_files, &items);
 	load_weapon_item_entries();
+
+	load_armour_data(L, dfiles.armour_files, &items);
+	load_armour_item_entries();
 
 	effects = load_effect_data(L, dfiles.effect_files);
 	enemies = load_enemy_data(L, dfiles.enemy_files);

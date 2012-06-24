@@ -3,6 +3,7 @@
 #Dungeon Markup
 
 default_items: &default_items #Reference with *default_items
+  - { item: Leather Armour,              chance: 1000,  quantity: 1  }
   - { item: Arrow,              chance: 10,  quantity: [2,8]  }
   - { item: Stone Arrow,        chance: 10,  quantity: [1,4]   }
   - { item: Short Bow,          chance: 10                     }

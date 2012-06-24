@@ -3,6 +3,9 @@
 #Locations of markup files
 #relative to res/data
 
+armour_files:
+  - armour/armour.yaml
+
 class_files: 
   - classes.yaml
 
@@ -28,6 +31,7 @@ projectile_files:
 spell_files: spells.yaml
 
 sprite_files: 
+ - sprites/armour_sprites.yaml
  - sprites/item_sprites.yaml
  - sprites/enemy_sprites.yaml
  - sprites/other_sprites.yaml

@@ -11,6 +11,7 @@
 #include "stats.h"
 
 struct Item;
+struct ArmourEntry;
 struct ItemEntry;
 struct ProjectileEntry;
 struct WeaponEntry;
@@ -27,6 +28,7 @@ struct Armour {
 	Armour(armour_id id, Bonuses bonuses = Bonuses()) :
 			id(id), bonuses(bonuses) {
 	}
+	ArmourEntry& armour_entry() const;
 };
 
 struct Projectile {

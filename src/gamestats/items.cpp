@@ -44,6 +44,10 @@ Armour Item::as_armour() const {
 	return Armour(item_entry().equipment_id, bonuses);
 }
 
+ArmourEntry& Armour::armour_entry() const {
+	return game_armour_data.at(id);
+}
+
 Projectile Item::as_projectile() const {
 	return Projectile(item_entry().equipment_id, bonuses);
 }

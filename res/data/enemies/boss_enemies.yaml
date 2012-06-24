@@ -12,9 +12,9 @@ enemies:
     xpaward: 100
     unique: yes
     stats:
-        attacks: [ { weapon: Basic Melee}, { projectile: Blue Blast} ]
+        attacks: [ { weapon: Basic Melee}, { projectile: Longer Range Blue Blast} ]
         movespeed: 2.5
-        hp: 250
+        hp: 150
         hpregen: 0.1
         strength: 25
         magic: 20
