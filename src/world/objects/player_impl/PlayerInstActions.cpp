@@ -206,11 +206,11 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	const int PICKUP_RATE = 10;
 	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
+	if (!item)
+		return;
 	const Item& type = item->item_type();
 	int amnt = item->item_quantity();
 
-	if (!item)
-		return;
 	if (type == get_item_by_name("Gold")) {
 		money += amnt;
 	} else {
