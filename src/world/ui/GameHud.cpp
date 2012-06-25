@@ -139,6 +139,10 @@ static void draw_player_actionbar(GameState* gs, PlayerInst* player) {
 		if (!is_selected && spellidx <= SPELL_MAX)
 			outline = Colour(120, 115, 110);
 		gl_draw_rectangle_outline(x, sy, TILE_SIZE, TILE_SIZE, outline);
+
+		if (spellidx <= 9) {
+			gl_printf(gs->primary_font(), Colour(100, 255, 255), x + TILE_SIZE - 12, sy + TILE_SIZE - 12, "%d", spellidx);
+		}
 	}
 //TODO: Unhardcode this already !!
 	gl_draw_image(game_sprite_data[get_sprite_by_name("fire bolt")].img(), sx,
