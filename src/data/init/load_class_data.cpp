@@ -48,6 +48,7 @@ ClassType parse_class(const YAML::Node& n) {
 	n["name"] >> classtype.name;
 	classtype.spell_progression = parse_class_spell_progression(n["spells"]);
 	classtype.starting_stats = parse_combat_stats(n["start_stats"]);
+
 	level["mp"] >> classtype.mp_perlevel;
 	level["hp"] >> classtype.hp_perlevel;
 
@@ -76,7 +77,9 @@ LuaValue load_class_data(lua_State* L, const FilenameList& filenames) {
 			&ret);
 
 	for (int i = 0; i < game_class_data.size(); i++) {
-		game_class_data[i].starting_stats.class_stats.classid = i;
+		CombatStats& cstats = game_class_data[i].starting_stats;
+		cstats.class_stats.classid = i;
+		cstats.init();
 	}
 
 	return ret;

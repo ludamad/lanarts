@@ -7,6 +7,7 @@
 #define SPELL_DATA_H_
 
 #include <string>
+#include <vector>
 
 #include "../gamestats/items.h"
 

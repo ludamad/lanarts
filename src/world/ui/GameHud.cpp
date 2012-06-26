@@ -24,6 +24,8 @@
 
 #include "GameHud.h"
 
+#include "detail/SpellsContent.h"
+
 const int INVENTORY_POSITION = 342;
 
 static void draw_player_statbars(GameState*gs, PlayerInst* player, int x,
@@ -67,34 +69,38 @@ static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot, int x,
 }
 static void draw_player_inventory(GameState* gs, PlayerInst* player, int inv_x,
 		int inv_y, int w, int h, int slot_selected) {
-	Inventory& inv = player->inventory();
+	SpellsContent spells(BBox(inv_x, inv_y, inv_x + w, inv_y + h));
 
-	int slot = 0;
-	for (int y = 0; y < h; y += TILE_SIZE) {
-		for (int x = 0; x < w; x += TILE_SIZE) {
-			if (slot >= INVENTORY_SIZE)
-				break;
+	spells.draw(gs);
 
-			ItemSlot& itemslot = inv.get(slot);
-
-			Colour outline(43, 43, 43);
-			if (itemslot.amount > 0 && slot != slot_selected)
-				outline = Colour(120, 115, 110);
-
-			int slot_x = inv_x + x, slot_y = inv_y + y;
-			gl_draw_rectangle_outline(slot_x, slot_y, TILE_SIZE, TILE_SIZE,
-					outline);
-			if (slot != slot_selected)
-				draw_player_inventory_slot(gs, itemslot, slot_x, slot_y);
-
-			slot++;
-		}
-	}
-
-	if (slot_selected != -1) {
-		draw_player_inventory_slot(gs, inv.get(slot_selected),
-				gs->mouse_x() - TILE_SIZE / 2, gs->mouse_y() - TILE_SIZE / 2);
-	}
+//	Inventory& inv = player->inventory();
+//
+//	int slot = 0;
+//	for (int y = 0; y < h; y += TILE_SIZE) {
+//		for (int x = 0; x < w; x += TILE_SIZE) {
+//			if (slot >= INVENTORY_SIZE)
+//				break;
+//
+//			ItemSlot& itemslot = inv.get(slot);
+//
+//			Colour outline(43, 43, 43);
+//			if (itemslot.amount > 0 && slot != slot_selected)
+//				outline = Colour(120, 115, 110);
+//
+//			int slot_x = inv_x + x, slot_y = inv_y + y;
+//			gl_draw_rectangle_outline(slot_x, slot_y, TILE_SIZE, TILE_SIZE,
+//					outline);
+//			if (slot != slot_selected)
+//				draw_player_inventory_slot(gs, itemslot, slot_x, slot_y);
+//
+//			slot++;
+//		}
+//	}
+//
+//	if (slot_selected != -1) {
+//		draw_player_inventory_slot(gs, inv.get(slot_selected),
+//				gs->mouse_x() - TILE_SIZE / 2, gs->mouse_y() - TILE_SIZE / 2);
+//	}
 }
 
 static Colour outline_col(bool cond) {
@@ -197,6 +203,7 @@ BBox GameHud::minimap_bbox(GameState* gs) {
 }
 
 void GameHud::step(GameState *gs) {
+	action_bar.step(gs);
 }
 
 static int get_itemslotn(GameState* gs, int x, int y) {
@@ -266,7 +273,7 @@ bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 	int level = gs->get_level()->roomid, frame = gs->frame();
 
 	bool mouse_within_view = gs->mouse_x() < gs->window_view().width;
-	PlayerInst* player = (PlayerInst*)gs->get_instance(gs->local_playerid());
+	PlayerInst* player = (PlayerInst*) gs->get_instance(gs->local_playerid());
 	if (!player)
 		return false;
 
@@ -426,7 +433,7 @@ void GameHud::draw(GameState* gs) {
 	gl_set_drawing_area(x, y, _width, _height);
 	gl_draw_rectangle(0, 0, _width, _height, bg_colour);
 
-	PlayerInst* player_inst = (PlayerInst*)gs->get_instance(
+	PlayerInst* player_inst = (PlayerInst*) gs->get_instance(
 			gs->local_playerid());
 	if (!player_inst)
 		return;
@@ -463,8 +470,10 @@ void GameHud::draw(GameState* gs) {
 
 }
 
-GameHud::GameHud(int x, int y, int width, int height) :
-		x(x), y(y), _width(width), _height(height), bg_colour(0, 0, 0), minimap_arr(
+GameHud::GameHud(int x, int y, int width, int height, int view_width,
+		int view_height) :
+		action_bar(0, view_height - TILE_SIZE, view_width, TILE_SIZE), x(x), y(
+				y), _width(width), _height(height), bg_colour(0, 0, 0), minimap_arr(
 				NULL) {
 	item_slot_selected = -1;
 }

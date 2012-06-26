@@ -19,6 +19,8 @@
 #include "../GameAction.h"
 #include "../GameInstSet.h"
 
+#include "detail/ActionBar.h"
+
 struct PlayerInst;
 
 
@@ -38,7 +40,7 @@ public:
 	/*Location of the minimap on the screen*/
 	BBox minimap_bbox(GameState* gs);
 
-	GameHud(int x, int y, int width, int height);
+	GameHud(int x, int y, int width, int height, int view_width, int view_height);
 	~GameHud();
 
 	/* Width of overlay */
@@ -58,6 +60,9 @@ private:
 	};
 	/* Helper method for drawing mini-map based on game information */
 	void draw_minimap(GameState* gs, const BBox& bbox, float scale);
+
+	ActionBar action_bar;
+	ActionSlot dragging_action;
 
 	BBox minimapbox;
 	int x, y, _width, _height;

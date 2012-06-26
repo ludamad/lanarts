@@ -18,6 +18,7 @@ set( lanarts_src
 	lua/lua_effectivestats.cpp
 
 	data/init/load_armour_data.cpp
+	data/init/load_spell_data.cpp
 	data/init/load_sprite_data.cpp
 	data/init/load_dungeon_data.cpp
 	data/init/load_effect_data.cpp
@@ -49,6 +50,7 @@ set( lanarts_src
 	gamestats/skills.cpp
 	gamestats/stat_formulas.cpp
 	gamestats/stats.cpp	
+	gamestats/SpellsKnown.cpp	
 			
 	lua/lua_api.cpp
 	lua/lua_gameinst.cpp
@@ -83,6 +85,9 @@ set( lanarts_src
 	world/ui/GameChat.cpp
 	world/ui/GameDialogs.cpp
 	world/ui/GameHud.cpp
+	world/ui/detail/ActionBar.cpp
+	world/ui/detail/SpellsContent.cpp
+	world/ui/detail/InventoryContent.cpp
 	
 	world/controllers/CombatInstController.cpp
 	world/controllers/MonsterController.cpp
@@ -141,6 +146,7 @@ set( lanarts_include
 	gamestats/skills.h
 	gamestats/stat_formulas.h
 	gamestats/stats.h
+	gamestats/SpellsKnown.h
 	
 	pathfind/astar_pathfind.h
 	pathfind/pathfind.h
@@ -177,7 +183,11 @@ set( lanarts_include
 	world/ui/GameChat.h
 	world/ui/GameDialogs.h
 	world/ui/GameHud.h
-
+	world/ui/detail/ActionBar.h
+	world/ui/detail/InventoryContent.h
+	world/ui/detail/SidebarContent.h
+	world/ui/detail/SpellsContent.h
+	
 	world/utility_objects/AnimatedInst.h
 	world/utility_objects/ButtonInst.h
 	world/utility_objects/TestInst.h
