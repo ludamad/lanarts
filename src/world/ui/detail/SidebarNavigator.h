@@ -12,6 +12,7 @@
 struct NavigationSprites {
 	sprite_id left_arrow, right_arrow;
 	sprite_id inventory_icon, stats_icon, spells_icon;
+	NavigationSprites();
 };
 
 class SidebarNavigator {
@@ -24,6 +25,7 @@ public:
 
 	SidebarContent* current_content();
 private:
+	NavigationSprites sprites;
 	BBox side_bar, main_content;
 
 	enum view_t {

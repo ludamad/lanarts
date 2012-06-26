@@ -15,9 +15,6 @@ sprites:
   - name: haste
     file: res/sprites/effects/haste.png
 
-  - name: logo
-    file: res/sprites/interface/lanarts_logo.png
-    
   - name: blood
     file: res/sprites/effects/blood.png
     

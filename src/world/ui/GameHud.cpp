@@ -468,9 +468,9 @@ void GameHud::draw(GameState* gs) {
 
 GameHud::GameHud(int x, int y, int width, int height, int view_width,
 		int view_height) :
-		action_bar(0, view_height - TILE_SIZE, view_width, TILE_SIZE), x(x), y(
-				y), _width(width), _height(height), bg_colour(0, 0, 0), minimap_arr(
-				NULL) {
+		navigation(BBox(), BBox()/*TODO*/), action_bar(0,
+				view_height - TILE_SIZE, view_width, TILE_SIZE), x(x), y(y), _width(
+				width), _height(height), bg_colour(0, 0, 0), minimap_arr(NULL) {
 	item_slot_selected = -1;
 }
 GameHud::~GameHud() {

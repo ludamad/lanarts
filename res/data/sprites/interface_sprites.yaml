@@ -1,0 +1,14 @@
+---
+sprites:
+  - name: logo
+    file: res/sprites/interface/lanarts_logo.png
+    
+  - name: inventory_icon
+    file: res/sprites/interface/items.png
+    
+  - name: spells_icon
+    file: res/sprites/interface/magic.png
+    
+  - name: stats_icon
+    file: res/sprites/interface/stats.png
+    

@@ -3,9 +3,19 @@
  *  Handles navigation of content in the side bar
  */
 
+#include "../../../data/sprite_data.h"
+
 #include "InventoryContent.h"
 #include "SpellsContent.h"
 #include "SidebarNavigator.h"
+
+NavigationSprites::NavigationSprites() :
+		left_arrow(get_sprite_by_name("left_arrow")), right_arrow(
+				get_sprite_by_name("right_arrow")), inventory_icon(
+				get_sprite_by_name("inventory_icon")), stats_icon(
+				get_sprite_by_name("stats_icon")), spells_icon(
+				get_sprite_by_name("spells_icon")) {
+}
 
 SidebarNavigator::SidebarNavigator(const BBox& side_bar,
 		const BBox& main_content) :
@@ -22,7 +32,7 @@ SidebarNavigator::~SidebarNavigator() {
 }
 
 void SidebarNavigator::draw(GameState* gs) {
-	current_content()->draw(gs);
+//	current_content()->draw(gs);
 }
 
 void SidebarNavigator::step(GameState* gs) {
@@ -45,4 +55,3 @@ SidebarContent* SidebarNavigator::current_content() {
 	LANARTS_ASSERT(false);
 	return NULL;
 }
-
