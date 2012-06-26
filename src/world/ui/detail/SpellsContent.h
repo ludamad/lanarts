@@ -14,6 +14,8 @@ public:
 			SidebarContent(bbox) {
 	}
 	virtual void draw(GameState* gs) const;
+
+	virtual int amount_of_pages(GameState* gs);
 };
 
 #endif /* SPELLSCONTENT_H_ */

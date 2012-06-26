@@ -23,7 +23,6 @@
 
 struct PlayerInst;
 
-
 /* Component of GameState that draws statistic overview */
 class GameHud {
 public:
@@ -35,29 +34,32 @@ public:
 	/*Returns whether has handled event completely or not*/
 	bool handle_event(GameState* gs, SDL_Event *event);
 	/* Handles clicks, etc */
-	void queue_io_actions(GameState* gs, PlayerInst* player, std::deque<GameAction>& queued_actions);
+	void queue_io_actions(GameState* gs, PlayerInst* player,
+			std::deque<GameAction>& queued_actions);
 
 	/*Location of the minimap on the screen*/
 	BBox minimap_bbox(GameState* gs);
 
-	GameHud(int x, int y, int width, int height, int view_width, int view_height);
+	//TODO: args: BBox for sidebar, bbox for action bar
+	GameHud(int x, int y, int width, int height, int view_width,
+			int view_height);
 	~GameHud();
 
 	/* Width of overlay */
-	int width() { return _width; }
+	int width() {
+		return _width;
+	}
 	/* Height of overlay */
-	int height() { return _height; }
+	int height() {
+		return _height;
+	}
 
 	/* Reset the selected item after action is finished, otherwise drawing will lag a step
 	 * Used in PlayerInstActions.cpp*/
-	void reset_slot_selected(){
+	void reset_slot_selected() {
 		item_slot_selected = -1;
 	}
 private:
-	//TODO use HudView
-	enum HudView {
-		INVENTORY, STATS, SHOP
-	};
 	/* Helper method for drawing mini-map based on game information */
 	void draw_minimap(GameState* gs, const BBox& bbox, float scale);
 
@@ -73,7 +75,5 @@ private:
 
 	std::deque<GameAction> queued_actions;
 };
-
-
 
 #endif /* GAMEHUD_H_ */

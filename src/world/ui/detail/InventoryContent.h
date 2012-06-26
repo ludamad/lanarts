@@ -10,7 +10,10 @@
 
 class InventoryContent: public SidebarContent {
 public:
-	virtual void draw(GameState* gs){}
+	InventoryContent(const BBox& bbox) :
+			SidebarContent(bbox) {
+	}
+	virtual void draw(GameState* gs) const{}
 private:
 
 };

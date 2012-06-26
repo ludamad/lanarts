@@ -24,12 +24,16 @@ static void draw_spell_icon(spell_id spell, int x, int y) {
 	gl_draw_image(spr_entry.img(), x, y);
 }
 
-static void draw_spells_known(const BBox& bbox, SpellsKnown& spells) {
+static void draw_spells_known(const BBox& bbox, SpellsKnown& spells,
+		int ind_low, int ind_high) {
 	const int spell_n = spells.amount();
-	int spellidx = 0;
+	int spellidx = ind_low;
 
 	for (int y = bbox.y1; y < bbox.y2; y += TILE_SIZE) {
 		for (int x = bbox.x1; x < bbox.x2; x += TILE_SIZE) {
+			if (spellidx >= ind_high)
+				break;
+
 			bool filledslot = spellidx < spell_n;
 			Colour outline = filledslot ? FILLED_OUTLINE : UNFILLED_OUTLINE;
 
@@ -44,6 +48,8 @@ static void draw_spells_known(const BBox& bbox, SpellsKnown& spells) {
 	}
 }
 
+const int SPELLS_PER_PAGE = 40;
+
 void SpellsContent::draw(GameState* gs) const {
 	PlayerInst* p = (PlayerInst*) gs->get_instance(gs->local_playerid());
 
@@ -51,6 +57,23 @@ void SpellsContent::draw(GameState* gs) const {
 		return;
 	}
 
-	draw_spells_known(bbox, p->spells_known());
+	int min_spell = SPELLS_PER_PAGE * page_number, max_spell = min_spell
+			+ SPELLS_PER_PAGE;
+	draw_spells_known(bbox, p->spells_known(), min_spell, max_spell);
+}
+
+int SpellsContent::amount_of_pages(GameState* gs) {
+	PlayerInst* p = (PlayerInst*) gs->get_instance(gs->local_playerid());
+
+	if (!p) {
+		return 0;
+	}
+
+	SpellsKnown& spells = p->spells_known();
+	int spells_n = spells.amount();
+	/* Add SPELLS_PER_PAGE - 1 so that 0 spells need 0 pages, 1 spell needs 1 page, etc*/
+	int spell_pages = (spells_n + SPELLS_PER_PAGE - 1) / SPELLS_PER_PAGE;
+
+	return spell_pages;
 }
 
