@@ -64,7 +64,7 @@ void load_weapon_callbackf(const YAML::Node& node, lua_State* L,
 
 	game_weapon_data.push_back(entry);
 	if (value)
-		value->table_set_yaml(L, game_weapon_data.back().name, &node);
+		value->table_set_yaml(L, game_weapon_data.back().name, node);
 }
 
 void load_weapon_data(lua_State* L, const FilenameList& filenames,
@@ -112,7 +112,7 @@ void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
 
 	game_projectile_data.push_back(entry);
 	if (value)
-		value->table_set_yaml(L, game_projectile_data.back().name, &node);
+		value->table_set_yaml(L, game_projectile_data.back().name, node);
 }
 LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 		LuaValue& itemtable) {

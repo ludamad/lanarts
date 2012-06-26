@@ -15,6 +15,7 @@
 #include "../util/game_basic_structs.h"
 
 struct AttackStats;
+struct ClassType;
 class MTwist;
 
 /* Core combat stats*/
@@ -135,12 +136,14 @@ struct CooldownStats {
 
 /* Represents class related stats */
 struct ClassStats {
-	class_id classtype;
+	class_id classid;
 	int xp, xpneeded, xplevel;
 	ClassStats(class_id classtype = -1, int xplevel = 0, int xp = 0,
 			int xpneeded = 0) :
-			classtype(classtype), xp(xp), xpneeded(xpneeded), xplevel(xplevel) {
+			classid(classtype), xp(xp), xpneeded(xpneeded), xplevel(xplevel) {
 	}
+	bool has_class() { return classid >= 0; }
+	ClassType& class_type() const;
 };
 
 #endif /* STATS_H_ */

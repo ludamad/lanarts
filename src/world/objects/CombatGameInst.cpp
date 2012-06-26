@@ -177,7 +177,8 @@ void CombatGameInst::init(GameState* gs) {
 	estats = stats().effective_stats_without_atk(gs);
 }
 
-void CombatGameInst::attempt_move_to_position(GameState *gs, float& newx, float& newy) {
+void CombatGameInst::attempt_move_to_position(GameState *gs, float& newx,
+		float& newy) {
 	const float ROUNDING_MULTIPLE = 65536.0f;
 
 	float dx = newx - rx, dy = newy - ry;
@@ -222,13 +223,17 @@ void CombatGameInst::attempt_move_to_position(GameState *gs, float& newx, float&
 }
 
 void CombatGameInst::update_position() {
-	x = (int) round(rx); //update based on rounding of true float
-	y = (int) round(ry);
+	x = (int)round(rx); //update based on rounding of true float
+	y = (int)round(ry);
 }
 
 void CombatGameInst::update_position(float newx, float newy) {
 	rx = newx, ry = newy;
 	update_position();
+}
+
+SpellsKnown& CombatGameInst::spells_known() {
+	return stats().spells;
 }
 
 team_id& CombatGameInst::team() {

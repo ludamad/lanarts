@@ -8,6 +8,7 @@
 
 #include "../../data/tile_data.h"
 #include "../../data/item_data.h"
+#include "../../data/spell_data.h"
 #include "../../data/sprite_data.h"
 #include "../../data/weapon_data.h"
 
@@ -120,6 +121,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 	gl_draw_image(game_sprite_data[wentry.item_sprite].img(), x, y);
 }
 static void draw_player_actionbar(GameState* gs, PlayerInst* player) {
+
 	int w = gs->window_view().width;
 	int h = gs->window_view().height;
 
@@ -130,26 +132,27 @@ static void draw_player_actionbar(GameState* gs, PlayerInst* player) {
 
 	draw_player_weapon_actionbar(gs, player, 0, sy);
 
-	const int SPELL_MAX = player->class_stats().xplevel >= 3 ? 2 : 1;
-
+	SpellsKnown& spells = player->spells_known();
+	const int spell_n = spells.amount();
 	int spellidx = 0;
+
 	for (int x = sx; x < w; x += TILE_SIZE) {
 		bool is_selected = spellidx++ == player->spell_selected();
 		Colour outline = outline_col(is_selected);
-		if (!is_selected && spellidx <= SPELL_MAX)
+		if (!is_selected && spellidx <= spell_n)
 			outline = Colour(120, 115, 110);
 		gl_draw_rectangle_outline(x, sy, TILE_SIZE, TILE_SIZE, outline);
 
 		if (spellidx <= 9) {
-			gl_printf(gs->primary_font(), Colour(100, 255, 255), x + TILE_SIZE - 12, sy + TILE_SIZE - 12, "%d", spellidx);
+			gl_printf(gs->primary_font(), Colour(100, 255, 255),
+					x + TILE_SIZE - 12, sy + TILE_SIZE - 12, "%d", spellidx);
 		}
 	}
-//TODO: Unhardcode this already !!
-	gl_draw_image(game_sprite_data[get_sprite_by_name("fire bolt")].img(), sx,
-			sy);
-	if (SPELL_MAX >= 2) {
-		gl_draw_image(game_sprite_data[get_sprite_by_name("magic blast")].img(),
-				sx + TILE_SIZE, sy);
+	for (int i = 0; i < spell_n; i++) {
+		spell_id spell = spells.get(i);
+		SpellEntry& spl_entry = game_spell_data.at(spell);
+		SpriteEntry& spr_entry = game_sprite_data.at(spl_entry.sprite);
+		gl_draw_image(spr_entry.img(), sx + i * TILE_SIZE, sy);
 	}
 }
 

@@ -8,6 +8,7 @@
 
 #include "../display/GLImage.h"
 
+#include "../util/game_basic_structs.h"
 #include "../util/types_util.h"
 
 struct TileEntry {
@@ -32,6 +33,6 @@ struct TileEntry {
 
 extern std::vector<TileEntry> game_tile_data;
 
-int get_tile_by_name(const char* name);
+tile_id get_tile_by_name(const char* name);
 
 #endif /* TILE_DATA_H_ */

@@ -58,7 +58,7 @@ float CoreStatMultiplier::calculate(MTwist& mt, const CoreStats& stats) {
 	int stats_sum = stats.strength * strength + stats.defence * defence
 			+ stats.magic * magic + stats.willpower * willpower;
 //	float random_multiplier = (100 + mt.rand(Range(-5, 5))) / 100.0f;
-	return basevalue + stats_sum;// * random_multiplier;
+	return basevalue + stats_sum; // * random_multiplier;
 }
 
 EffectiveAttackStats EffectiveStats::with_attack(MTwist& mt,
@@ -102,5 +102,9 @@ bool DerivedStats::operator ==(const DerivedStats & derived) const {
 
 void CooldownStats::reset_hurt_cooldown(int cooldown) {
 	hurt_cooldown = std::max(cooldown, hurt_cooldown);
+}
+
+ClassType& ClassStats::class_type() const {
+	return game_class_data.at(classid);
 }
 

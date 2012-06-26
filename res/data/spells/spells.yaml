@@ -2,19 +2,19 @@
 spells:
 
   - name: Fire Bolt
-    attack_sprite: fire bolt
-    effect: spell_create_projectile
+    mp_cost: 10
+    spr_spell: fire bolt
     projectile: Fire Bolt
-    modifiers:
-        magic: 1
-    range: 
-    cooldown: 
 
-  - name: Magic Bolt
-    attack_sprite: magic bolt
-    effect: spell_create_projectile
-    projectile: Fire Bolt
-    modifiers:
-        magic: 1
-    range: 
-    cooldown: 
+  - name: Magic Blast
+    mp_cost: 20
+    spr_spell: magic blast
+    projectile: Magic Blast
+    
+  - name: Blink
+    mp_cost: 50
+    spr_spell: blink
+    action_func: spell_blink_action
+    #prereq_func: eventually add this
+    #NB: if the autotarget_func returns nil, the spell is not performed
+    autotarget_func: furthest_sqr_from_enemy

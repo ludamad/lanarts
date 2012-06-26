@@ -28,7 +28,7 @@ projectile_files:
   - projectiles/enemy_projectiles.yaml
   - projectiles/spell_projectiles.yaml
 
-spell_files: spells.yaml
+spell_files: spells/spells.yaml
 
 sprite_files: 
  - sprites/armour_sprites.yaml

@@ -20,3 +20,8 @@ sprites:
 
   - name: magic blast
     file: res/sprites/effects/orb.png
+    
+  - name: blink
+    file: res/sprites/spells/blink.png
+    
+    

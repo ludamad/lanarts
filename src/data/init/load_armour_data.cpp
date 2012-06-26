@@ -17,7 +17,7 @@ void load_armour_callbackf(const YAML::Node& node, lua_State* L,
 
 	game_armour_data.push_back(entry);
 	if (value)
-		value->table_set_yaml(L, game_armour_data.back().name, &node);
+		value->table_set_yaml(L, game_armour_data.back().name, node);
 }
 
 void load_armour_data(lua_State* L, const FilenameList& filenames,

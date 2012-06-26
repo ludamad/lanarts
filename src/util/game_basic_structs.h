@@ -95,6 +95,7 @@ typedef int obj_id;
 typedef int class_id;
 typedef int item_id;
 typedef int armour_id;
+typedef int effect_id;
 typedef int projectile_id;
 typedef int sprite_id;
 typedef int spell_id;

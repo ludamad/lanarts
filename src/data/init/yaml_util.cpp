@@ -142,6 +142,8 @@ CombatStats parse_combat_stats(const YAML::Node& n) {
 	class_stats.xplevel = parse_defaulted(n, "xplevel", 1);
 	ret.attacks = parse_defaulted(n, "attacks", std::vector<AttackStats>());
 
+	ret.init();
+
 	return ret;
 }
 

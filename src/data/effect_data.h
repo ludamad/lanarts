@@ -7,6 +7,8 @@
 #include <vector>
 
 #include "../util/LuaValue.h"
+#include "../util/game_basic_structs.h"
+
 #include "../gamestats/stats.h"
 
 struct EffectEntry {
@@ -21,7 +23,7 @@ struct EffectEntry {
 	}
 };
 
-int get_effect_by_name(const char* name);
+effect_id get_effect_by_name(const char* name);
 extern std::vector<EffectEntry> game_effect_data;
 
 #endif /* EFFECT_DATA_H_ */

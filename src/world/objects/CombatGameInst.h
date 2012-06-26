@@ -60,6 +60,7 @@ public:
 	EffectiveStats& effective_stats();
 
 	CooldownStats& cooldowns();
+	SpellsKnown& spells_known();
 	EffectStats& effects();
 	Inventory& inventory();
 	Equipment& equipment();

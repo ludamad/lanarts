@@ -6,7 +6,9 @@
 
 #include "../display/GLImage.h"
 
+#include "../util/game_basic_structs.h"
 #include "../util/types_util.h"//For FilenameList
+
 struct SpriteEntry {
 	enum sprite_type {
 		ANIMATED, DIRECTIONAL
@@ -42,6 +44,6 @@ struct SpriteEntry {
 
 extern std::vector<SpriteEntry> game_sprite_data;
 
-int get_sprite_by_name(const char* name);
+sprite_id get_sprite_by_name(const char* name);
 
 #endif /* SPRITE_DATA_H_ */

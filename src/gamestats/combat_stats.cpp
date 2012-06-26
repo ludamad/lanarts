@@ -11,6 +11,14 @@
 #include "items.h"
 #include "stat_formulas.h"
 
+CombatStats::CombatStats(const ClassStats& class_stats, const CoreStats& core,
+		const CooldownStats& cooldowns, const Equipment& equipment,
+		const std::vector<AttackStats>& attacks, float movespeed) :
+		core(core), cooldowns(cooldowns), class_stats(class_stats), equipment(
+				equipment), attacks(attacks), movespeed(movespeed) {
+
+}
+
 void CombatStats::step() {
 	core.step();
 	cooldowns.step();
@@ -25,8 +33,20 @@ EffectiveStats CombatStats::effective_stats_without_atk(GameState* gs) const {
 	return ::effective_stats(gs, *this);
 }
 
+static void learn_class_spells(SpellsKnown& spells,
+		const ClassSpellProgression& spell_progression, int level) {
+	std::vector<spell_id> spells_available =
+			spell_progression.spells_available_at_level(level);
+
+	for (int i = 0; i < spells_available.size(); i++) {
+		if (!spells.has_spell(spells_available[i])) {
+			spells.add_spell(spells_available[i]);
+		}
+	}
+}
+
 void CombatStats::gain_level() {
-	ClassType& ct = game_class_data[class_stats.classtype];
+	ClassType& ct = class_stats.class_type();
 
 	core.hp += ct.hp_perlevel;
 	core.max_hp += ct.hp_perlevel;
@@ -43,6 +63,15 @@ void CombatStats::gain_level() {
 	core.mpregen += ct.mpregen_perlevel;
 
 	class_stats.xplevel++;
+
+	learn_class_spells(spells, ct.spell_progression, class_stats.xplevel);
+}
+
+void CombatStats::init() {
+	if (class_stats.has_class()) {
+		const ClassType& ct = class_stats.class_type();
+		learn_class_spells(spells, ct.spell_progression, class_stats.xplevel);
+	}
 }
 
 int CombatStats::gain_xp(int amnt) {

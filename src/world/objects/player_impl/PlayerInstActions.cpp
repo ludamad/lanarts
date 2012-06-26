@@ -88,7 +88,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs) {
 	GameInst* inst = NULL;
 	if (cooldowns().can_pickup()
 			&& gs->object_radius_test(this, &inst, 1, &item_colfilter)) {
-		ItemInst* iteminst = (ItemInst*) inst;
+		ItemInst* iteminst = (ItemInst*)inst;
 		Item& item = iteminst->item_type();
 
 		bool was_dropper = iteminst->last_held_by() == id;
@@ -205,7 +205,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	const int PICKUP_RATE = 10;
-	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
+	ItemInst* item = (ItemInst*)gs->get_instance(action.use_id);
 	if (!item)
 		return;
 	const Item& type = item->item_type();
@@ -378,12 +378,12 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 
 	EnemyInst* target = NULL;
 	//Enemy hitting test for melee
-	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_colfilter,
+	gs->object_radius_test(this, (GameInst**)&target, 1, &enemy_colfilter,
 			x + ddx * 2, y + ddy * 2);
 
 	//Smaller radius enemy pushing test, can intercept enemy radius but not too far
 	EnemyInst* alreadyhitting[5] = { 0, 0, 0, 0, 0 };
-	gs->object_radius_test(this, (GameInst**) alreadyhitting, 5,
+	gs->object_radius_test(this, (GameInst**)alreadyhitting, 5,
 			&enemy_colfilter, x, y, radius);
 	bool already = false;
 	for (int i = 0; i < 5; i++) {
@@ -482,7 +482,7 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 
 void PlayerInst::gain_xp(GameState* gs, int xp) {
 	int levels_gained = stats().gain_xp(xp);
-	if (levels_gained > 0) {
+	if (levels_gained > 0 && is_local_player()) {
 //		bool plural = levels_gained > 1;
 
 		char level_gain_str[128];

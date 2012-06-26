@@ -9,7 +9,7 @@ struct GameEvent {
 		USE_ITEM_N,
 		AUTOTARGET_CURRENT_ACTION,
 		SWITCH_TO_SPELL_N,
-		SWITCH_TO_WEAPON,
+		SWITCH_TO_WEAPON
 
 	};
 	int event_type;

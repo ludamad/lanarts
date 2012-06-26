@@ -11,6 +11,7 @@
 
 #include "effects.h"
 #include "Equipment.h"
+#include "SpellsKnown.h"
 #include "stats.h"
 
 struct lua_State;
@@ -18,11 +19,10 @@ struct GameState;
 
 /* Represents stats related to a single attack option */
 struct AttackStats {
-	Weapon weapon;
-	Projectile projectile;
 	AttackStats(Weapon weapon = Weapon(), Projectile projectile = Projectile()) :
 			weapon(weapon), projectile(projectile) {
 	}
+
 	bool is_ranged() const;
 	WeaponEntry& weapon_entry() const;
 	ProjectileEntry& projectile_entry() const;
@@ -32,30 +32,22 @@ struct AttackStats {
 	int atk_damage(MTwist& mt, const EffectiveStats& stats) const;
 	int atk_power(MTwist& mt, const EffectiveStats& stats) const;
 	int atk_percentage_magic() const;
+
+	/* members */
+	Weapon weapon;
+	Projectile projectile;
 };
 
 /* Represents all the stats used by a combat entity */
 struct CombatStats {
-	CoreStats core;
-	CooldownStats cooldowns;
-	ClassStats class_stats;
-	Equipment equipment;
-	EffectStats effects;
-
-	std::vector<AttackStats> attacks;
-
-	float movespeed;
-
 	CombatStats(const ClassStats& class_stats = ClassStats(),
 			const CoreStats& core = CoreStats(),
 			const CooldownStats& cooldowns = CooldownStats(),
 			const Equipment& equipment = Equipment(),
 			const std::vector<AttackStats>& attacks =
-					std::vector<AttackStats>(), float movespeed = 0.0f) :
-			core(core), cooldowns(cooldowns), class_stats(class_stats), equipment(
-					equipment), attacks(attacks), movespeed(movespeed) {
-	}
+					std::vector<AttackStats>(), float movespeed = 0.0f);
 
+	void init();
 	void step();
 
 	bool has_died();
@@ -64,6 +56,18 @@ struct CombatStats {
 
 	void gain_level();
 	int gain_xp(int amnt);
+
+	/* members */
+	CoreStats core;
+	CooldownStats cooldowns;
+	ClassStats class_stats;
+	Equipment equipment;
+	EffectStats effects;
+	SpellsKnown spells;
+
+	std::vector<AttackStats> attacks;
+
+	float movespeed;
 };
 
 #endif /* COMBAT_STATS_H_ */

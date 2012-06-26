@@ -44,7 +44,7 @@ EnemyEntry parse_enemy_type(const YAML::Node& n) {
 void load_enemy_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	game_enemy_data.push_back(parse_enemy_type(node));
-	value->table_set_yaml(L, game_enemy_data.back().name, &node);
+	value->table_set_yaml(L, game_enemy_data.back().name, node);
 }
 
 LuaValue load_enemy_data(lua_State* L, const FilenameList& filenames) {
