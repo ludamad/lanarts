@@ -114,7 +114,7 @@ void init_game_data(lua_State* L) {
 	load_tile_data(dfiles.tile_files);
 	sprites = load_sprite_data(L, dfiles.sprite_files);
 	load_tileset_data(dfiles.tileset_files);
-	//TODO: make separate weapons table
+	//TODO: make separate weapons table ?
 	items = load_item_data(L, dfiles.item_files);
 
 	projectiles = load_projectile_data(L, dfiles.projectile_files, items);

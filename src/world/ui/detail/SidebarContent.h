@@ -13,7 +13,7 @@ class GameState;
 class SidebarContent {
 public:
 	SidebarContent(const BBox& bbox) :
-			bbox(bbox) {
+			page_number(0), bbox(bbox) {
 	}
 	virtual ~SidebarContent() {
 	}

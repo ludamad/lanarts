@@ -7,7 +7,8 @@
 #define SIDEBARNAVIGATOR_H_
 
 #include <vector>
-#include "SidebarContent.h"
+
+class SidebarContent;
 
 struct NavigationSprites {
 	sprite_id left_arrow, right_arrow;

@@ -187,6 +187,7 @@ bool GameState::pre_step() {
 void GameState::step() {
 	chat.step(this);
 	world.step(); //Has pointer to this object
+	lua_gc(L, LUA_GCCOLLECT, 0); // collected garbage
 }
 
 int GameState::key_down_state(int keyval) {

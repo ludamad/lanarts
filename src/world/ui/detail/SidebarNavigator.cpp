@@ -5,6 +5,7 @@
 
 #include "../../../data/sprite_data.h"
 
+#include "SidebarContent.h"
 #include "InventoryContent.h"
 #include "SpellsContent.h"
 #include "SidebarNavigator.h"
@@ -20,7 +21,7 @@ NavigationSprites::NavigationSprites() :
 SidebarNavigator::SidebarNavigator(const BBox& side_bar,
 		const BBox& main_content) :
 		side_bar(side_bar), main_content(main_content) {
-	viewtype = SPELLS;
+	viewtype = INVENTORY;
 	inventory = new InventoryContent(main_content);
 	spells = new SpellsContent(main_content);
 	shop = NULL;
