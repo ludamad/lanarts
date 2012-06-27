@@ -1,8 +1,6 @@
 /*
- * GameState.cpp
- *
- *  Created on: 2011-09-29
- *      Author: 100397561
+ * GameState.cpp:
+ *  Handle to all the global game data.
  */
 
 #include <SDL.h>
@@ -40,8 +38,9 @@ extern "C" {
 GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 		int viewh, int hudw) :
 		settings(settings), L(L), frame_n(0), chat(settings.username), hud(
-				vieww, 0, hudw, viewh, vieww, viewh), view(0, 0, vieww, viewh), world(this), mouse_leftdown(
-				0), mouse_rightdown(0), mouse_leftclick(0), mouse_rightclick(0) {
+				BBox(vieww, 0, vieww + hudw, viewh), BBox(0, 0, vieww, viewh)), view(
+				0, 0, vieww, viewh), world(this), mouse_leftdown(0), mouse_rightdown(
+				0), mouse_leftclick(0), mouse_rightclick(0) {
 	memset(key_down_states, 0, sizeof(key_down_states));
 	init_font(&pfont, settings.font.c_str(), 10);
 	init_font(&menufont, settings.font.c_str(), 20);

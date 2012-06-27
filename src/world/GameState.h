@@ -1,8 +1,6 @@
 /*
- * GameState.h
- *
- *  Created on: 2011-09-29
- *      Author: 100397561
+ * GameState.h:
+ *  Handle to all the global game data.
  */
 
 #ifndef GAMESTATE_H_

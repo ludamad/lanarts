@@ -20,6 +20,7 @@ NavigationSprites::NavigationSprites() :
 SidebarNavigator::SidebarNavigator(const BBox& side_bar,
 		const BBox& main_content) :
 		side_bar(side_bar), main_content(main_content) {
+	viewtype = SPELLS;
 	inventory = new InventoryContent(main_content);
 	spells = new SpellsContent(main_content);
 	shop = NULL;
@@ -32,7 +33,7 @@ SidebarNavigator::~SidebarNavigator() {
 }
 
 void SidebarNavigator::draw(GameState* gs) {
-//	current_content()->draw(gs);
+	current_content()->draw(gs);
 }
 
 void SidebarNavigator::step(GameState* gs) {
@@ -44,7 +45,7 @@ SidebarContent* SidebarNavigator::current_content() {
 	case INVENTORY:
 		return inventory;
 		break;
-	case STATS:
+	case SPELLS:
 		return spells;
 		break;
 	case SHOP:

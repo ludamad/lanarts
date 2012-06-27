@@ -42,17 +42,16 @@ public:
 	BBox minimap_bbox(GameState* gs);
 
 	//TODO: args: BBox for sidebar, bbox for action bar
-	GameHud(int x, int y, int width, int height, int view_width,
-			int view_height);
+	GameHud(const BBox& sidebar_box, const BBox& view_box);
 	~GameHud();
 
 	/* Width of overlay */
 	int width() {
-		return _width;
+		return sidebar_box.width();
 	}
 	/* Height of overlay */
 	int height() {
-		return _height;
+		return sidebar_box.height();
 	}
 
 	/* Reset the selected item after action is finished, otherwise drawing will lag a step
@@ -61,6 +60,8 @@ public:
 		item_slot_selected = -1;
 	}
 private:
+	/* Helper method for drawing basic stat information*/
+	void draw_base_stats(GameState* gs, PlayerInst* player_inst);
 	/* Helper method for drawing mini-map based on game information */
 	void draw_minimap(GameState* gs, const BBox& bbox, float scale);
 
@@ -68,8 +69,7 @@ private:
 	ActionBar action_bar;
 	ActionSlot dragging_action;
 
-	BBox minimapbox;
-	int x, y, _width, _height;
+	BBox sidebar_box, view_box;
 	Colour bg_colour;
 	char* minimap_arr;
 	GLimage minimap_buff;

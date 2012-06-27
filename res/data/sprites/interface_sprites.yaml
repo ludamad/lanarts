@@ -12,3 +12,9 @@ sprites:
   - name: stats_icon
     file: res/sprites/interface/stats.png
     
+  - name: left_arrow
+    file: res/sprites/interface/left_arrow.png
+    
+  - name: right_arrow
+    file: res/sprites/interface/right_arrow.png
+    

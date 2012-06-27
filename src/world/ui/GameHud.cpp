@@ -188,9 +188,10 @@ static void draw_rect2d(char* buff, int w, int h, int x, int y, int mx, int my,
 
 BBox GameHud::minimap_bbox(GameState* gs) {
 	int minimap_relposx = 20, minimap_relposy = 64 + 45;
-	BBox bbox(x + minimap_relposx, y + minimap_relposy,
-			x + minimap_relposx + gs->get_level()->tile_width(),
-			y + minimap_relposy + gs->get_level()->tile_height());
+	int sx = sidebar_box.x1 + minimap_relposx, sy = sidebar_box.y1
+			+ minimap_relposy;
+	BBox bbox(sx, sy, sx + gs->get_level()->tile_width(),
+			sy + gs->get_level()->tile_height());
 	int minimap_w = bbox.width(), minimap_h = bbox.height();
 	int minimap_x = bbox.x1 + (128 - minimap_w) / 2, minimap_y = bbox.y1
 			+ (128 - minimap_w) / 2;
@@ -200,6 +201,7 @@ BBox GameHud::minimap_bbox(GameState* gs) {
 
 void GameHud::step(GameState *gs) {
 	action_bar.step(gs);
+	navigation.step(gs);
 }
 
 static int get_itemslotn(GameState* gs, int x, int y) {
@@ -269,7 +271,7 @@ bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 	int level = gs->get_level()->roomid, frame = gs->frame();
 
 	bool mouse_within_view = gs->mouse_x() < gs->window_view().width;
-	PlayerInst* player = (PlayerInst*) gs->get_instance(gs->local_playerid());
+	PlayerInst* player = (PlayerInst*)gs->get_instance(gs->local_playerid());
 	if (!player)
 		return false;
 
@@ -425,52 +427,66 @@ void GameHud::draw_minimap(GameState* gs, const BBox& bbox, float scale) {
 
 	gl_draw_image(minimap_buff, bbox.x1, bbox.y1);
 }
-void GameHud::draw(GameState* gs) {
-	gl_set_drawing_area(x, y, _width, _height);
-	gl_draw_rectangle(0, 0, _width, _height, bg_colour);
 
-	PlayerInst* player_inst = (PlayerInst*) gs->get_instance(
+void GameHud::draw_base_stats(GameState* gs, PlayerInst* player_inst) {
+	ClassStats& class_stats = player_inst->class_stats();
+	CoreStats& core = player_inst->effective_stats().core;
+
+	gl_printf(gs->primary_font(), Colour(255, 215, 11), width() / 2 - 15, 10,
+			"Level %d", class_stats.xplevel);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11), width() / 2 - 40,
+			64 + 45 + 128, "Floor %d", gs->get_level()->level_number);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11), width() / 2 - 40,
+			64 + 45 + 128 + 15, "Gold %d", player_inst->gold());
+	gl_printf(gs->primary_font(), Colour(255, 215, 11), width() / 2 - 50,
+			64 + 45 + 128 + 30, "Strength %d", core.strength);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11), width() / 2 - 50,
+			64 + 45 + 128 + 45, "Magic    %d", core.magic);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11), width() / 2 - 50,
+			64 + 45 + 128 + 60, "Defence  %d", core.defence);
+	gl_printf(gs->primary_font(), Colour(255, 215, 11), width() / 2 - 50,
+			64 + 45 + 128 + 75, "Will     %d", core.willpower);
+	draw_player_actionbar(gs, player_inst);
+}
+void GameHud::draw(GameState* gs) {
+	gl_set_drawing_area(sidebar_box.x1, sidebar_box.y1, width(), height());
+	gl_draw_rectangle(0, 0, width(), height(), bg_colour);
+
+	PlayerInst* player_inst = (PlayerInst*)gs->get_instance(
 			gs->local_playerid());
 	if (!player_inst)
 		return;
 
-	ClassStats& class_stats = player_inst->class_stats();
-	CoreStats& core = player_inst->effective_stats().core;
 
 	draw_player_statbars(gs, player_inst, 32, 32);
 
-	draw_minimap(gs, minimap_bbox(gs).translated(-x, -y), 2.0);
+	draw_minimap(gs,
+			minimap_bbox(gs).translated(-sidebar_box.x1, -sidebar_box.y1), 2.0);
 
-	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 15, 10,
-			"Level %d", class_stats.xplevel);
-	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 40,
-			64 + 45 + 128, "Floor %d", gs->get_level()->level_number);
-	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 40,
-			64 + 45 + 128 + 15, "Gold %d", player_inst->gold());
-	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
-			64 + 45 + 128 + 30, "Strength %d", core.strength);
-	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
-			64 + 45 + 128 + 45, "Magic    %d", core.magic);
-	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
-			64 + 45 + 128 + 60, "Defence  %d", core.defence);
-	gl_printf(gs->primary_font(), Colour(255, 215, 11), _width / 2 - 50,
-			64 + 45 + 128 + 75, "Will     %d", core.willpower);
-	draw_player_actionbar(gs, player_inst);
+	draw_base_stats(gs, player_inst);
 
 	GameView& view = gs->window_view();
-	gl_set_drawing_area(0, 0, x + _width, y + _height);
+	gl_set_drawing_area(0, 0, sidebar_box.x2, sidebar_box.y2);
 
-	int inv_w = _width, inv_h = _height - y - TILE_SIZE;
-	draw_player_inventory(gs, player_inst, x, y + INVENTORY_POSITION, inv_w,
-			inv_h, item_slot_selected);
-
+	int inv_w = width(), inv_h = height() - sidebar_box.y1 - TILE_SIZE;
+	draw_player_inventory(gs, player_inst, sidebar_box.x1,
+			sidebar_box.y1 + INVENTORY_POSITION, inv_w, inv_h,
+			item_slot_selected);
+	navigation.draw(gs);
 }
 
-GameHud::GameHud(int x, int y, int width, int height, int view_width,
-		int view_height) :
-		navigation(BBox(), BBox()/*TODO*/), action_bar(0,
-				view_height - TILE_SIZE, view_width, TILE_SIZE), x(x), y(y), _width(
-				width), _height(height), bg_colour(0, 0, 0), minimap_arr(NULL) {
+static BBox content_area_box(const BBox& sidebar_box) {
+	const int CONTENT_AREA_Y = 342;
+	const int CONTENT_ROWS = 8;
+	int sx = sidebar_box.x1, sy = sidebar_box.y1 + CONTENT_AREA_Y;
+	int ex = sidebar_box.x2, ey = sy + CONTENT_ROWS * TILE_SIZE;
+	return BBox(sx, sy, ex, ey);
+}
+GameHud::GameHud(const BBox& sidebar_box, const BBox& view_box) :
+		navigation(sidebar_box, content_area_box(sidebar_box)), action_bar(0,
+				view_box.y2 - TILE_SIZE, view_box.width(), TILE_SIZE), sidebar_box(
+				sidebar_box), view_box(view_box), bg_colour(0, 0, 0), minimap_arr(
+				NULL) {
 	item_slot_selected = -1;
 }
 GameHud::~GameHud() {
