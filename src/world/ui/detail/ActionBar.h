@@ -34,21 +34,24 @@ const int MAX_ACTIONS = 32;
 
 class ActionBar {
 public:
-	ActionBar(int x, int y, int w, int h, int max_actions = MAX_ACTIONS);
+	ActionBar(const BBox& bbox, int max_actions = MAX_ACTIONS);
 
 	ActionSlot& get(int ind) {
 		return actions.at(ind);
 	}
 
+	/* Returns whether a click was processed */
+	bool handle_click(GameState* gs);
+
+	void draw(GameState* gs) const;
+	void step(GameState* gs);
+private:
 	bool is_within_equipped(int mx, int my);
 	bool is_within_actionbar(int mx, int my);
 	/* Return which slot the mouse is hovering over */
 	int get_selected_slot(int mx, int my);
 
-	void draw(GameState* gs) const;
-	void step(GameState* gs);
-private:
-	int x, y, w, h;
+	BBox bbox;
 	std::vector<ActionSlot> actions;
 };
 

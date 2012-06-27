@@ -11,8 +11,8 @@
 
 #include "ActionBar.h"
 
-ActionBar::ActionBar(int x, int y, int w, int h, int max_actions) :
-		x(x), y(y), w(w), h(h), actions(max_actions) {
+ActionBar::ActionBar(const BBox& bbox, int max_actions) :
+		bbox(bbox), actions(max_actions) {
 }
 
 const int EQUIP_SLOT_WIDTH = TILE_SIZE * 2;
@@ -20,19 +20,24 @@ const int ACTION_SLOT_WIDTH = TILE_SIZE;
 const int SLOT_HEIGHT = TILE_SIZE;
 
 bool ActionBar::is_within_equipped(int mx, int my) {
-	BBox bbox(x, y, x + EQUIP_SLOT_WIDTH, y + SLOT_HEIGHT);
-	return bbox.contains(mx, my);
+	BBox equip_box(bbox.x1, bbox.y1, bbox.x1 + EQUIP_SLOT_WIDTH,
+			bbox.y1 + SLOT_HEIGHT);
+	return equip_box.contains(mx, my);
 }
 
 bool ActionBar::is_within_actionbar(int mx, int my) {
-	int action_start_x = x + EQUIP_SLOT_WIDTH;
-	BBox bbox(action_start_x, y, x + w, y + h);
-	return bbox.contains(mx, my);
+	BBox actionbar_box(bbox);
+	actionbar_box.x1 += EQUIP_SLOT_WIDTH;
+	return actionbar_box.contains(mx, my);
 }
 
 /* Return which slot the mouse is hovering over */
+bool ActionBar::handle_click(GameState *gs) {
+	return false;
+}
+
 int ActionBar::get_selected_slot(int mx, int my) {
-	int action_start_x = x + EQUIP_SLOT_WIDTH;
+	int action_start_x = bbox.x1 + EQUIP_SLOT_WIDTH;
 
 	if (!is_within_actionbar(mx, my)) {
 		return -1;

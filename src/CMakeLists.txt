@@ -86,6 +86,7 @@ set( lanarts_src
 	world/ui/GameDialogs.cpp
 	world/ui/GameHud.cpp
 	world/ui/detail/ActionBar.cpp
+	world/ui/detail/Sidebar.cpp
 	world/ui/detail/SidebarNavigator.cpp
 	world/ui/detail/SpellsContent.cpp
 	world/ui/detail/InventoryContent.cpp
@@ -186,8 +187,9 @@ set( lanarts_include
 	world/ui/GameHud.h
 	world/ui/detail/ActionBar.h
 	world/ui/detail/InventoryContent.h
-	world/ui/detail/SidebarNavigator.h
+	world/ui/detail/Sidebar.h
 	world/ui/detail/SidebarContent.h
+	world/ui/detail/SidebarNavigator.h
 	world/ui/detail/SpellsContent.h
 	
 	world/utility_objects/AnimatedInst.h

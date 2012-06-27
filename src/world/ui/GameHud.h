@@ -17,9 +17,9 @@
 #include "../objects/GameInst.h"
 
 #include "../GameAction.h"
-#include "../GameInstSet.h"
 
 #include "detail/ActionBar.h"
+#include "detail/Sidebar.h"
 #include "detail/SidebarNavigator.h"
 
 struct PlayerInst;
@@ -65,6 +65,7 @@ private:
 	/* Helper method for drawing mini-map based on game information */
 	void draw_minimap(GameState* gs, const BBox& bbox, float scale);
 
+	Sidebar sidebar;
 	SidebarNavigator navigation;
 	ActionBar action_bar;
 	ActionSlot dragging_action;
