@@ -448,6 +448,7 @@ GameChat::GameChat(const std::string& local_sender) :
 	fade_out = 1.0f;
 	fade_out_rate = 0.05f;
 	is_typing = false;
+	repeat_steps_left = 0;
 //	messages.push_back(
 //			ChatMessage("ludamad", "What's up!?\nGo eff off",
 //					Colour(37, 207, 240)));

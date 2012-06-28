@@ -473,6 +473,7 @@ void GameHud::draw(GameState* gs) {
 			item_slot_selected);
 	navigation.draw(gs);
 	sidebar.draw(gs);
+	action_bar.draw(gs);
 }
 
 static BBox content_area_box(const BBox& sidebar_box) {

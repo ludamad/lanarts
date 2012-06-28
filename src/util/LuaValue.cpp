@@ -28,7 +28,7 @@ static void push_yaml_node(lua_State* L, const YAML::Node& node) {
 	case YAML::NodeType::Scalar:
 		node.GetScalar(str);
 		if (nodeis(node, "?")) {
-			char* end;
+			char* end = NULL;
 			double value = strtod(str.c_str(), &end);
 			size_t convchrs = (end - str.c_str());
 			if (convchrs == str.size())

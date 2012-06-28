@@ -90,6 +90,7 @@ set( lanarts_src
 	world/ui/detail/SidebarNavigator.cpp
 	world/ui/detail/SpellsContent.cpp
 	world/ui/detail/InventoryContent.cpp
+	world/ui/detail/Minimap.cpp
 	
 	world/controllers/CombatInstController.cpp
 	world/controllers/MonsterController.cpp
@@ -191,6 +192,7 @@ set( lanarts_include
 	world/ui/detail/SidebarContent.h
 	world/ui/detail/SidebarNavigator.h
 	world/ui/detail/SpellsContent.h
+	world/ui/detail/Minimap.h
 	
 	world/utility_objects/AnimatedInst.h
 	world/utility_objects/ButtonInst.h

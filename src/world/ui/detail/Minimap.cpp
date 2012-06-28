@@ -113,6 +113,16 @@ BBox Minimap::minimap_bounds(GameState* gs) {
 	return BBox(draw_x, draw_y, draw_x + level_w, draw_y + level_h);
 }
 
+static void init_minimap_buff(char* minimap_arr, int ptw, int pth) {
+	int buffsize = ptw * pth;
+	for (int i = 0; i < buffsize; i++) {
+		minimap_arr[i * 4] = 0;
+		minimap_arr[i * 4 + 1] = 0;
+		minimap_arr[i * 4 + 2] = 0;
+		minimap_arr[i * 4 + 3] = 255;
+	}
+}
+
 void Minimap::draw(GameState* gs, float scale) {
 	//Draw a mini version of the contents of gs->tile_grid()
 	GameTiles& tiles = gs->tile_grid();
@@ -130,12 +140,8 @@ void Minimap::draw(GameState* gs, float scale) {
 	if (!minimap_arr) {
 		minimap_arr = new char[ptw * pth * 4];
 	}
-	for (int i = 0; i < ptw * pth; i++) {
-		minimap_arr[i * 4] = 0;
-		minimap_arr[i * 4 + 1] = 0;
-		minimap_arr[i * 4 + 2] = 0;
-		minimap_arr[i * 4 + 3] = 255;
-	}
+
+	init_minimap_buff(minimap_arr, ptw, pth);
 
 	world2minimapbuffer(gs, minimap_arr, BBox(), bbox.width(), bbox.height(),
 			ptw, pth);

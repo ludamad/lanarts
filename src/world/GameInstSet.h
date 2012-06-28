@@ -61,6 +61,9 @@ private:
 		//These pointers are invalidated upon hashmap reallocation
 		InstanceState* next_in_grid, *prev_in_grid;
 		InstanceState* next_same_depth, *prev_same_depth;
+		InstanceState() {
+			memset(this, 0, sizeof(InstanceState));
+		}
 		//Used in settools.h
 		void operator=(GameInst* inst) {
 			this->inst = inst;
