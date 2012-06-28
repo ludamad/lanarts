@@ -7,8 +7,9 @@
 #define MINIMAP_H_
 
 #include "../../../util/game_basic_structs.h"
+#include "../../../display/GLImage.h"
 
-struct GameState;
+class GameState;
 
 class Minimap {
 public:

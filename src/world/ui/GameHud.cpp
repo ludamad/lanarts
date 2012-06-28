@@ -271,7 +271,7 @@ bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 	int level = gs->get_level()->roomid, frame = gs->frame();
 
 	bool mouse_within_view = gs->mouse_x() < gs->window_view().width;
-	PlayerInst* player = (PlayerInst*) gs->get_instance(gs->local_playerid());
+	PlayerInst* player = (PlayerInst*)gs->get_instance(gs->local_playerid());
 	if (!player)
 		return false;
 
@@ -452,17 +452,17 @@ void GameHud::draw(GameState* gs) {
 	gl_set_drawing_area(sidebar_box.x1, sidebar_box.y1, width(), height());
 	gl_draw_rectangle(0, 0, width(), height(), bg_colour);
 
-	PlayerInst* player_inst = (PlayerInst*) gs->get_instance(
+	PlayerInst* player_inst = (PlayerInst*)gs->get_instance(
 			gs->local_playerid());
 	if (!player_inst)
 		return;
 
-	draw_player_statbars(gs, player_inst, 32, 32);
+//	draw_player_statbars(gs, player_inst, 32, 32);
 
-	draw_minimap(gs,
-			minimap_bbox(gs).translated(-sidebar_box.x1, -sidebar_box.y1), 2.0);
+//	draw_minimap(gs,
+//			minimap_bbox(gs).translated(-sidebar_box.x1, -sidebar_box.y1), 2.0);
 
-	draw_base_stats(gs, player_inst);
+//	draw_base_stats(gs, player_inst);
 
 	GameView& view = gs->window_view();
 	gl_set_drawing_area(0, 0, sidebar_box.x2, sidebar_box.y2);
@@ -472,6 +472,7 @@ void GameHud::draw(GameState* gs) {
 			sidebar_box.y1 + INVENTORY_POSITION, inv_w, inv_h,
 			item_slot_selected);
 	navigation.draw(gs);
+	sidebar.draw(gs);
 }
 
 static BBox content_area_box(const BBox& sidebar_box) {
@@ -487,7 +488,8 @@ static BBox action_bar_area(const BBox& view_box) {
 }
 
 GameHud::GameHud(const BBox& sidebar_box, const BBox& view_box) :
-		navigation(sidebar_box, content_area_box(sidebar_box)), action_bar(
+		sidebar(sidebar_box), navigation(sidebar_box,
+				content_area_box(sidebar_box)), action_bar(
 				action_bar_area(view_box)), sidebar_box(sidebar_box), view_box(
 				view_box), bg_colour(0, 0, 0), minimap_arr(NULL) {
 	item_slot_selected = -1;

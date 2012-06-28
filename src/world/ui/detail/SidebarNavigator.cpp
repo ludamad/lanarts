@@ -18,12 +18,12 @@ NavigationSprites::NavigationSprites() :
 				get_sprite_by_name("spells_icon")) {
 }
 
-SidebarNavigator::SidebarNavigator(const BBox& side_bar,
-		const BBox& main_content) :
-		side_bar(side_bar), main_content(main_content) {
+SidebarNavigator::SidebarNavigator(const BBox& sidebar_bounds,
+		const BBox& main_content_bounds) :
+		side_bar(sidebar_bounds), main_content(main_content_bounds) {
 	viewtype = INVENTORY;
-	inventory = new InventoryContent(main_content);
-	spells = new SpellsContent(main_content);
+	inventory = new InventoryContent(main_content_bounds);
+	spells = new SpellsContent(main_content_bounds);
 	shop = NULL;
 }
 

@@ -3,6 +3,14 @@
  *  Handles drawing & state of a minimap
  */
 
+#include "../../../data/tile_data.h"
+
+#include "../../../util/math_util.h"
+
+#include "../../GameState.h"
+
+#include "../../objects/PlayerInst.h"
+
 #include "Minimap.h"
 
 static void fill_buff2d(char* buff, int w, int h, int x, int y,
@@ -89,19 +97,20 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 
 const int MINIMAP_SIZEMAX = 128;
 
-Minimap::Minimap(const BBox& minimap_max_bounds) {
+Minimap::Minimap(const BBox& minimap_max_bounds) :
+		minimap_max_bounds(minimap_max_bounds), minimap_arr(NULL) {
 }
 
 BBox Minimap::minimap_bounds(GameState* gs) {
-	int level_w = gs->get_level()->tile_width(), level_h =
-			gs->get_level()->tile_height();
+	int level_w = gs->get_level()->tile_width();
+	int level_h = gs->get_level()->tile_height();
 
-	int minimap_w = minimap_max_bounds.width(), minimap_h =
-			minimap_max_bounds.height();
-	int minimap_x = minimap_max_bounds.x1 + (minimap_w - level_w) / 2,
-			minimap_y = minimap_max_bounds.y1 + (minimap_h - level_h) / 2;
-	return BBox(minimap_x, minimap_y, minimap_x + level_w,
-			minimap_y + level_h);
+	int max_w = minimap_max_bounds.width(), max_h = minimap_max_bounds.height();
+
+	int draw_x = minimap_max_bounds.x1 + (max_w - level_w) / 2;
+	int draw_y = minimap_max_bounds.y1 + (max_h - level_h) / 2;
+
+	return BBox(draw_x, draw_y, draw_x + level_w, draw_y + level_h);
 }
 
 void Minimap::draw(GameState* gs, float scale) {

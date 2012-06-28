@@ -11,12 +11,17 @@
 #include "Minimap.h"
 #include "SidebarNavigator.h"
 
+class GameState;
+
 class Sidebar {
 public:
 	Sidebar(const BBox& sidebar_box);
 
+	void draw(GameState* gs);
+	void step(GameState* gs);
+
 private:
-	BBox sidebar_box;
+	BBox sidebar_bounds;
 	Minimap minimap;
 	SidebarNavigator navigator;
 };

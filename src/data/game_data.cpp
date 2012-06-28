@@ -113,6 +113,7 @@ void init_game_data(lua_State* L) {
 //NB: Do not re-order the way resources are loaded unless you know what you're doing
 	load_tile_data(dfiles.tile_files);
 	sprites = load_sprite_data(L, dfiles.sprite_files);
+	sprites.deinitialize(L);
 	load_tileset_data(dfiles.tileset_files);
 	//TODO: make separate weapons table ?
 	items = load_item_data(L, dfiles.item_files);
@@ -131,6 +132,7 @@ void init_game_data(lua_State* L) {
 	effects = load_effect_data(L, dfiles.effect_files);
 	enemies = load_enemy_data(L, dfiles.enemy_files);
 	dungeon = load_dungeon_data(L, dfiles.level_files);
+	dungeon.deinitialize(L);
 	classes = load_class_data(L, dfiles.class_files);
 }
 
@@ -156,8 +158,8 @@ void init_lua_data(GameState* gs, lua_State* L) {
 	register_as_global(L, items, "items");
 	register_as_global(L, projectiles, "projectiles");
 	register_as_global(L, spells, "spells");
-	register_as_global(L, sprites, "sprites");
-	register_as_global(L, dungeon, "dungeon");
+//	register_as_global(L, sprites, "sprites");
+//	register_as_global(L, dungeon, "dungeon");
 	register_as_global(L, classes, "classes");
 
 	luaL_dofile(L, "res/main.lua");
