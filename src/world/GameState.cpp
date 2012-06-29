@@ -28,6 +28,7 @@
 #include "net/GameNetConnection.h"
 
 #include "objects/EnemyInst.h"
+#include "objects/GameInst.h"
 #include "objects/PlayerInst.h"
 
 extern "C" {
@@ -39,12 +40,30 @@ GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 		int viewh, int hudw) :
 		settings(settings), L(L), frame_n(0), chat(settings.username), hud(
 				BBox(vieww, 0, vieww + hudw, viewh), BBox(0, 0, vieww, viewh)), view(
-				0, 0, vieww, viewh), world(this), mouse_leftdown(0), mouse_rightdown(
-				0), mouse_leftclick(0), mouse_rightclick(0) {
+				0, 0, vieww, viewh), world(this) {
 	memset(key_down_states, 0, sizeof(key_down_states));
-	init_font(&pfont, settings.font.c_str(), 10);
-	init_font(&menufont, settings.font.c_str(), 20);
+
 	dragging_view = false;
+
+	mouse_leftdown = false;
+	mouse_rightdown = false;
+
+	mouse_leftclick = false;
+	mouse_rightclick = false;
+
+	mouse_leftrelease = false;
+	mouse_rightrelease = false;
+
+	init_font(&small_font, settings.font.c_str(), 10);
+	init_font(&large_font, settings.font.c_str(), 20);
+}
+
+GameState::~GameState() {
+	release_font(&small_font);
+	release_font(&large_font);
+
+	lua_gc(L, LUA_GCCOLLECT, 0);
+	lua_close(L);
 }
 
 void GameState::init_game() {
@@ -53,6 +72,8 @@ void GameState::init_game() {
 	int seed = systime;
 
 	init_lua_data(this, L);
+
+	lua_gc(L, LUA_GCSTOP, 0); // collected garbage
 
 	if (settings.conntype == GameSettings::CLIENT) {
 		char port_buffer[50];
@@ -92,12 +113,6 @@ void GameState::init_game() {
 
 }
 
-GameState::~GameState() {
-	release_font(&pfont);
-	lua_gc(L, LUA_GCCOLLECT, 0); // collected garbage
-	lua_close(L);
-}
-
 void GameState::set_level(GameLevelState* lvl) {
 	world.set_current_level(lvl);
 	if (lvl != NULL) {
@@ -107,6 +122,12 @@ void GameState::set_level(GameLevelState* lvl) {
 }
 
 /*Handle new characters and exit signals*/
+PlayerInst* GameState::local_player() {
+	GameInst* player = get_instance(local_playerid());
+	LANARTS_ASSERT(!player || dynamic_cast<PlayerInst*>(player));
+	return (PlayerInst*)player;
+}
+
 int GameState::handle_event(SDL_Event *event) {
 	int done = 0;
 
@@ -187,7 +208,7 @@ bool GameState::pre_step() {
 void GameState::step() {
 	chat.step(this);
 	world.step(); //Has pointer to this object
-	lua_gc(L, LUA_GCSTEP, 0); // collected garbage
+//	lua_gc(L, LUA_GCSTEP, 0); // collected garbage
 }
 
 int GameState::key_down_state(int keyval) {
@@ -197,7 +218,7 @@ int GameState::key_press_state(int keyval) {
 	return key_press_states[keyval];
 }
 
-void GameState::handle_dragging() {
+void GameState::adjust_view_to_dragging() {
 	/*Adjust the view if the player is far from view center,
 	 *if we are following the cursor, or if the minimap is clicked */
 	bool is_dragged = false;
@@ -233,7 +254,7 @@ void GameState::handle_dragging() {
 }
 void GameState::draw(bool drawhud) {
 
-	handle_dragging();
+	adjust_view_to_dragging();
 
 	if (drawhud)
 		gl_set_drawing_area(0, 0, view.width, view.height);
@@ -282,14 +303,6 @@ int GameState::height() {
 GameInst* GameState::get_instance(obj_id id) {
 	return get_level()->inst_set.get_instance(id);
 }
-//
-//static bool sqr_line_test(int x, int y, int w, int h, int sx, int sy,
-//		int size) {
-//
-//}
-//bool GameState::tile_line_test(int x, int y, int w, int h) {
-//	int sx = x / TILE_SIZE, sy = y / TILE_SIZE;
-//}
 
 static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
 		float radsqr) {
@@ -360,7 +373,7 @@ int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 	return get_level()->inst_set.object_radius_test(obj, objs, obj_cap, f, x, y,
 			radius);
 }
-bool GameState::object_visible_test(GameInst* obj, GameInst* player,
+bool GameState::object_visible_test(GameInst* obj, PlayerInst* player,
 		bool canreveal) {
 	const int sub_sqrs = VISION_SUBSQRS;
 	const int subsize = TILE_SIZE / sub_sqrs;
@@ -377,7 +390,6 @@ bool GameState::object_visible_test(GameInst* obj, GameInst* player,
 	if ((canreveal && key_down_state(SDLK_BACKQUOTE)) || fovs.empty())
 		return true;
 
-//printf("minx=%d,miny=%d,maxx=%d,maxy=%d\n",minx,miny,maxx,maxy);
 	PlayerController& pc = player_controller();
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
@@ -392,12 +404,46 @@ bool GameState::object_visible_test(GameInst* obj, GameInst* player,
 	return false;
 }
 
-void GameState::ensure_connectivity(int roomid1, int roomid2) {
+void GameState::ensure_level_connectivity(int roomid1, int roomid2) {
 	world.connect_entrance_to_exit(roomid1, roomid2);
 }
 void GameState::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	world.level_move(id, x, y, roomid1, roomid2);
 }
+
+bool GameState::mouse_left_click() {
+	return mouse_leftclick;
+}
+
+/* Mouse click states */
+bool GameState::mouse_right_click() {
+	return mouse_rightclick;
+}
+
+bool GameState::mouse_left_down() {
+	return mouse_leftdown;
+}
+
+bool GameState::mouse_right_down() {
+	return mouse_rightdown;
+}
+
+bool GameState::mouse_left_release() {
+	return mouse_leftdown;
+}
+
+bool GameState::mouse_right_release() {
+	return mouse_rightdown;
+}
+
+bool GameState::mouse_upwheel() {
+	return mouse_didupwheel;
+}
+bool GameState::mouse_downwheel() {
+	return mouse_diddownwheel;
+}
+
+/* End mouse click states */
 
 obj_id GameState::local_playerid() {
 	return get_level()->pc.local_playerid();
@@ -414,6 +460,6 @@ MonsterController& GameState::monster_controller() {
 PlayerController& GameState::player_controller() {
 	return get_level()->pc;
 }
-void GameState::skip_next_id() {
+void GameState::skip_next_instance_id() {
 	get_level()->inst_set.skip_next_id();
 }

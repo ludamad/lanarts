@@ -227,7 +227,7 @@ void MonsterController::set_monster_headings(GameState* gs,
 		if (pdist < e->target_radius + p->target_radius) {
 			e->vx = 0, e->vy = 0;
 		}
-		int mindist = wentry.range + e->target_radius - TILE_SIZE/8;
+		int mindist = wentry.range + e->target_radius - TILE_SIZE / 8;
 		if (viable_attack) {
 			int mindist = wentry.range + p->target_radius + e->target_radius
 					- TILE_SIZE / 8;
@@ -254,7 +254,7 @@ void MonsterController::shift_target(GameState* gs) {
 		if (mids[i] == targetted)
 			break;
 	}
-	GameInst* player = gs->get_instance(gs->local_playerid());
+	PlayerInst* player = gs->local_player();
 
 	for (j = i + 1; j % mids.size() != i; j++) {
 		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[j % mids.size()]);
@@ -281,7 +281,7 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 	int mindistsqr = HUGE_DISTANCE;
 	int closest_player_index = -1;
 	for (int i = 0; i < pids.size(); i++) {
-		GameInst* player = gs->get_instance(pids[i]);
+		PlayerInst* player = (PlayerInst*)gs->get_instance(pids[i]);
 		bool isvisible = gs->object_visible_test(e, player, false);
 		if (isvisible)
 			((PlayerInst*)player)->rest_cooldown() = REST_COOLDOWN;
@@ -328,7 +328,7 @@ void MonsterController::process_players(GameState* gs) {
 
 void MonsterController::pre_step(GameState* gs) {
 
-	GameInst* local_player = gs->get_instance(gs->local_playerid());
+	PlayerInst* local_player = gs->local_player();
 	std::vector<EnemyOfInterest> eois;
 
 	process_players(gs);

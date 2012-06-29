@@ -1,8 +1,6 @@
 /*
- * Inventory.cpp
- *
- *  Created on: Jun 8, 2012
- *      Author: 100397561
+ * Inventory.cpp:
+ *  Item's held by a player/enemy
  */
 
 #include "Inventory.h"
@@ -25,4 +23,15 @@ bool Inventory::add(const Item& item, int amount) {
 		}
 	}
 	return false;
+}
+
+size_t Inventory::size() const {
+	int i = max_size() - 1;
+	for (; i >= 0; i--) {
+		if (items[i].amount > 0) {
+			return i + 1;
+		}
+	}
+
+	return 0;
 }

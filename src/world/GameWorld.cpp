@@ -50,7 +50,8 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, int classn,
 	int py = (epos.y + start_y) * TILE_SIZE + TILE_SIZE / 2;
 
 	sprite_id sprite =
-			local ? get_sprite_by_name("wizard") : get_sprite_by_name("fighter");
+			local ? get_sprite_by_name("wizard") : get_sprite_by_name(
+							"fighter");
 
 	if (!inst) {
 		inst = new PlayerInst(c.starting_stats, sprite, px, py, local);
@@ -126,8 +127,9 @@ bool GameWorld::pre_step() {
 	GameLevelState* current_level = game_state->get_level();
 
 	midstep = true;
-	game_state->frame()++;for
-(	int i = 0; i < level_states.size(); i++) {
+	game_state->frame()++;
+	/* Queue actions for each player */
+	for (int i = 0; i < level_states.size(); i++) {
 		game_state->set_level(level_states[i]);
 		const std::vector<obj_id>& player_ids = game_state->get_level()->pc.player_ids();
 		for (int i = 0; i < player_ids.size(); i++) {
@@ -154,8 +156,11 @@ void GameWorld::step() {
 		if (level_states[i]->steps_left > 0) {
 			int prehashvalue = game_state->get_level()->inst_set.hash();
 
-			if (!inmenu && !game_state->net_connection().check_integrity(game_state, prehashvalue)) {
-				printf("Hashes don't match before step, frame %d, level %d\n", game_state->frame(), i);
+			if (!inmenu
+					&& !game_state->net_connection().check_integrity(game_state,
+							prehashvalue)) {
+				printf("Hashes don't match before step, frame %d, level %d\n",
+						game_state->frame(), i);
 			}
 			//Set so that all the GameState getters are properly updated
 			game_state->set_level(level_states[i]);
@@ -178,9 +183,12 @@ void GameWorld::step() {
 //            delete clone;
 
 //
-			int posthashvalue =  game_state->get_level()->inst_set.hash();
-			if (!inmenu &&!game_state->net_connection().check_integrity(game_state, posthashvalue)) {
-				printf("Hashes don't match after step, frame %d, level %d\n", game_state->frame(), i);
+			int posthashvalue = game_state->get_level()->inst_set.hash();
+			if (!inmenu
+					&& !game_state->net_connection().check_integrity(game_state,
+							posthashvalue)) {
+				printf("Hashes don't match after step, frame %d, level %d\n",
+						game_state->frame(), i);
 			}
 		}
 	}

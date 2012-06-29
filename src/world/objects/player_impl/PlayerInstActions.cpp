@@ -109,7 +109,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs) {
 	}
 
 	if (!item_used) {
-		gs->game_hud().queue_io_actions(gs, this, queued_actions);
+		gs->game_hud().handle_io(gs, queued_actions);
 	}
 }
 void PlayerInst::queue_io_actions(GameState* gs) {
@@ -448,7 +448,7 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 		return;
 
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->get_level()->exits.size());
-	gs->ensure_connectivity(gs->get_level()->roomid - 1,
+	gs->ensure_level_connectivity(gs->get_level()->roomid - 1,
 			gs->get_level()->roomid);
 	GameLevelPortal* portal = &gs->get_level()->exits[entr_n];
 
@@ -468,7 +468,7 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 		return;
 
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->get_level()->entrances.size());
-	gs->ensure_connectivity(gs->get_level()->roomid,
+	gs->ensure_level_connectivity(gs->get_level()->roomid,
 			gs->get_level()->roomid + 1);
 	GameLevelPortal* portal = &gs->get_level()->entrances[entr_n];
 

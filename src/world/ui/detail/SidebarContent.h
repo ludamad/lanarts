@@ -6,7 +6,11 @@
 #ifndef SIDEBARCONTENT_H_
 #define SIDEBARCONTENT_H_
 
+#include "../../GameAction.h"
+
 #include "../../../util/game_basic_structs.h"
+
+#include "../../../util/ActionQueue.h"
 
 class GameState;
 
@@ -20,6 +24,7 @@ public:
 	virtual void draw(GameState* gs) const = 0;
 	virtual void step(GameState* gs) {
 	}
+	virtual bool handle_io(GameState* gs, ActionQueue& queued_actions) = 0;
 
 	void goto_previous_page() {
 		page_number--;

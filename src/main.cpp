@@ -155,8 +155,8 @@ static void game_loop(GameState* gs) {
 		long microwait = settings.time_per_step * 1000 - total_timer.get_microseconds();
 		if (draw_this_step && microwait > 0) {
 			long delayms = microwait / 1000;
-			if (delayms > 0);
-//				SDL_Delay(delayms);
+			if (delayms > 0)
+				SDL_Delay(delayms);
 		}
 	}
 

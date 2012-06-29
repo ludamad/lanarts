@@ -1,8 +1,7 @@
 /*
- * GameAction.h
- *
- *  Created on: Mar 28, 2012
- *      Author: 100397561
+ * GameAction.h:
+ *  Represents an action taken by a player instance.
+ *  Formatted for sending over network.
  */
 
 #ifndef GAMEACTION_H_

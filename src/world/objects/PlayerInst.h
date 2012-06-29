@@ -6,18 +6,16 @@
 
 #ifndef PLAYERINST_H_
 #define PLAYERINST_H_
+
 #include <deque>
 
 #include "../../fov/fov.h"
 
 #include "../../data/sprite_data.h"
 
-#include "../../gamestats/Inventory.h"
-#include "../../gamestats/effects.h"
-#include "../../gamestats/Equipment.h"
-#include "../../gamestats/stats.h"
-
 #include "../../pathfind/pathfind.h"
+
+#include "../../util/ActionQueue.h"
 
 #include "../GameAction.h"
 #include "../GameLevelState.h"
@@ -85,6 +83,7 @@ public:
 	}
 
 private:
+	/* Actions */
 	void use_move(GameState* gs, const GameAction& action);
 	void use_weapon(GameState* gs, const GameAction& action);
 	void use_dngn_exit(GameState* gs, const GameAction& action);
@@ -96,7 +95,8 @@ private:
 	void drop_item(GameState* gs, const GameAction& action);
 	void reposition_item(GameState* gs, const GameAction& action);
 
-	std::deque<GameAction> queued_actions;
+	/* Members */
+	ActionQueue queued_actions;
 	fov fieldofview;
 	bool didstep;
 	bool local;

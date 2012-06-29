@@ -8,6 +8,8 @@
 
 #include "../../../display/display.h"
 
+#include "../../../data/sprite_data.h"
+
 #include "../../GameState.h"
 
 #include "../../objects/PlayerInst.h"
@@ -24,7 +26,8 @@ static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot, int x,
 				itemslot.amount);
 	}
 }
-static void draw_player_inventory(GameState* gs, Inventory& inv, const BBox& bbox, int min_slot, int max_slot, int slot_selected = -1) {
+static void draw_player_inventory(GameState* gs, Inventory& inv,
+		const BBox& bbox, int min_slot, int max_slot, int slot_selected = -1) {
 	int slot = min_slot;
 	for (int y = bbox.y1; y < bbox.y2; y += TILE_SIZE) {
 		for (int x = bbox.x1; x < bbox.x2; x += TILE_SIZE) {
@@ -37,8 +40,7 @@ static void draw_player_inventory(GameState* gs, Inventory& inv, const BBox& bbo
 			if (itemslot.amount > 0 && slot != slot_selected)
 				outline = Colour(120, 115, 110);
 
-			gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE,
-					outline);
+			gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE, outline);
 			if (slot != slot_selected)
 				draw_player_inventory_slot(gs, itemslot, x, y);
 
@@ -55,29 +57,49 @@ static void draw_player_inventory(GameState* gs, Inventory& inv, const BBox& bbo
 const int ITEMS_PER_PAGE = 40;
 
 void InventoryContent::draw(GameState* gs) const {
-	PlayerInst* p = (PlayerInst*) gs->get_instance(gs->local_playerid());
-
-	if (!p) {
-		return;
-	}
+	PlayerInst* p = gs->local_player();
 
 	Inventory& inv = p->inventory();
 	int min_item = ITEMS_PER_PAGE * page_number, max_item = min_item
 			+ ITEMS_PER_PAGE;
-	draw_player_inventory(gs, inv, bbox, min_item, max_item);
+	draw_player_inventory(gs, inv, bbox, min_item, max_item, slot_selected);
 }
 
 int InventoryContent::amount_of_pages(GameState* gs) {
-	PlayerInst* p = (PlayerInst*) gs->get_instance(gs->local_playerid());
+	PlayerInst* p = gs->local_player();
 
-	if (!p) {
-		return 0;
-	}
-
-	SpellsKnown& spells = p->spells_known();
-	int items_n = spells.amount();
-	/* Add SPELLS_PER_PAGE - 1 so that 0 spells need 0 pages, 1 spell needs 1 page, etc*/
+	int items_n = p->inventory().size();
+	/* Add ITEMS_PER_PAGE - 1 so that 0 spells need 0 pages, 1 spell needs 1 page, etc*/
 	int item_pages = (items_n + ITEMS_PER_PAGE - 1) / ITEMS_PER_PAGE;
 
 	return item_pages;
 }
+
+int InventoryContent::get_itemslotn(GameState* gs, int mx, int my) {
+	int posx = (mx - bbox.x1) / TILE_SIZE;
+	int posy = (my - bbox.y1) / TILE_SIZE;
+	int slot = 5 * posy + posx;
+	if (slot < 0 || slot >= INVENTORY_SIZE)
+		return -1;
+	return slot;
+}
+
+bool InventoryContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
+	PlayerInst* p = gs->local_player();
+	int level = gs->get_level()->roomid, frame = gs->frame();
+
+	if (gs->mouse_left_click() && bbox.contains(gs->mouse_x(), gs->mouse_y())) {
+		Inventory inv = p->inventory();
+
+		int slot = get_itemslotn(gs, gs->mouse_x(), gs->mouse_y());
+		if (slot >= 0 && slot < INVENTORY_SIZE && inv.get(slot).amount > 0) {
+			queued_actions.push_back(
+					GameAction(p->id, GameAction::USE_ITEM, frame, level, slot,
+							p->x, p->y));
+			return true;
+		}
+	}
+
+	return false;
+}
+

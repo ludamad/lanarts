@@ -8,6 +8,10 @@
 
 #include <vector>
 
+#include "../../../util/ActionQueue.h"
+
+#include "../../GameAction.h"
+
 class SidebarContent;
 
 struct NavigationSprites {
@@ -23,6 +27,8 @@ public:
 
 	void draw(GameState* gs);
 	void step(GameState* gs);
+
+	bool handle_io(GameState* gs, ActionQueue& queued_actions);
 
 	SidebarContent* current_content();
 private:

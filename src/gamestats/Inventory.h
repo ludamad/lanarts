@@ -17,7 +17,8 @@ const int INVENTORY_SIZE = 40;
 struct ItemSlot {
 	Item item;
 	int amount;
-	ItemSlot() : amount(0) {
+	ItemSlot() :
+			amount(0) {
 	}
 };
 
@@ -30,6 +31,10 @@ public:
 	ItemSlot& get(int i) {
 		return items.at(i);
 	}
+	size_t max_size() const {
+		return items.size();
+	}
+	size_t size() const;
 private:
 	std::vector<ItemSlot> items;
 };

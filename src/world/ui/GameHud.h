@@ -13,6 +13,7 @@
 #include "../../display/GLImage.h"
 
 #include "../../util/game_basic_structs.h"
+#include "../../util/ActionQueue.h"
 
 #include "../objects/GameInst.h"
 
@@ -35,13 +36,11 @@ public:
 	/*Returns whether has handled event completely or not*/
 	bool handle_event(GameState* gs, SDL_Event *event);
 	/* Handles clicks, etc */
-	void queue_io_actions(GameState* gs, PlayerInst* player,
-			std::deque<GameAction>& queued_actions);
+	void handle_io(GameState* gs, ActionQueue& queued_actions);
 
 	/*Location of the minimap on the screen*/
 	BBox minimap_bbox(GameState* gs);
 
-	//TODO: args: BBox for sidebar, bbox for action bar
 	GameHud(const BBox& sidebar_box, const BBox& view_box);
 	~GameHud();
 
@@ -60,8 +59,6 @@ public:
 		item_slot_selected = -1;
 	}
 private:
-	/* Helper method for drawing basic stat information*/
-	void draw_base_stats(GameState* gs, PlayerInst* player_inst);
 	/* Helper method for drawing mini-map based on game information */
 	void draw_minimap(GameState* gs, const BBox& bbox, float scale);
 
@@ -76,7 +73,7 @@ private:
 	GLimage minimap_buff;
 	int item_slot_selected;
 
-	std::deque<GameAction> queued_actions;
+	ActionQueue queued_actions;
 };
 
 #endif /* GAMEHUD_H_ */

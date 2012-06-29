@@ -51,11 +51,7 @@ static void draw_spells_known(const BBox& bbox, SpellsKnown& spells,
 const int SPELLS_PER_PAGE = 40;
 
 void SpellsContent::draw(GameState* gs) const {
-	PlayerInst* p = (PlayerInst*) gs->get_instance(gs->local_playerid());
-
-	if (!p) {
-		return;
-	}
+	PlayerInst* p = gs->local_player();
 
 	int min_spell = SPELLS_PER_PAGE * page_number, max_spell = min_spell
 			+ SPELLS_PER_PAGE;
@@ -63,11 +59,7 @@ void SpellsContent::draw(GameState* gs) const {
 }
 
 int SpellsContent::amount_of_pages(GameState* gs) {
-	PlayerInst* p = (PlayerInst*) gs->get_instance(gs->local_playerid());
-
-	if (!p) {
-		return 0;
-	}
+	PlayerInst* p = gs->local_player();
 
 	SpellsKnown& spells = p->spells_known();
 	int spells_n = spells.amount();

@@ -1,8 +1,7 @@
 /*
- * GameChat.h
- *
- *  Created on: May 27, 2012
- *      Author: 100397561
+ * GameChat.h:
+ *  Game HUD component for drawing messages.
+ *  These messages include things like "A monster has appeared!" and chat messages.
  */
 
 #ifndef GAMECHAT_H_

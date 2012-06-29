@@ -10,6 +10,10 @@
 
 #include "../../../gamestats/items.h"
 
+#include "../../../util/ActionQueue.h"
+
+#include "../../GameAction.h"
+
 class GameState;
 
 struct ActionSlot {
@@ -40,8 +44,8 @@ public:
 		return actions.at(ind);
 	}
 
-	/* Returns whether a click was processed */
-	bool handle_click(GameState* gs);
+	/* Returns whether an action was processed */
+	bool handle_io(GameState* gs, ActionQueue& queued_action);
 
 	void draw(GameState* gs) const;
 	void step(GameState* gs);

@@ -9,6 +9,7 @@
 
 #include "Sidebar.h"
 
+/* Helper method for drawing stat bars */
 static void draw_player_statbars(GameState* gs, PlayerInst* player, int x,
 		int y) {
 	ClassStats& class_stats = player->class_stats();
@@ -38,6 +39,7 @@ static void draw_player_statbars(GameState* gs, PlayerInst* player, int x,
 				"can rest", player->rest_cooldown() * 100 / REST_COOLDOWN);
 }
 
+/* Helper method for drawing basic stat information*/
 static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 		int x, int y, int width) {
 	ClassStats& class_stats = player_inst->class_stats();
@@ -85,7 +87,7 @@ Sidebar::Sidebar(const BBox& sidebar_bounds) :
 void Sidebar::draw(GameState *gs) {
 	const int STATBAR_OFFSET_X = 32, STATBAR_OFFSET_Y = 32;
 
-	PlayerInst* p = (PlayerInst*)gs->get_instance(gs->local_playerid());
+	PlayerInst* p = gs->local_player();
 
 	if (!p) {
 		return;

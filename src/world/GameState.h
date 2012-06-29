@@ -5,6 +5,7 @@
 
 #ifndef GAMESTATE_H_
 #define GAMESTATE_H_
+
 #include <vector>
 #include <SDL.h>
 
@@ -21,8 +22,6 @@
 
 #include "net/GameNetConnection.h"
 
-#include "objects/GameInst.h"
-
 #include "GameSettings.h"
 #include "GameView.h"
 #include "GameWorld.h"
@@ -31,47 +30,64 @@ struct lua_State;
 struct GameLevelState;
 struct GameTiles;
 
+class GameInst;
+class PlayerInst;
+
 class GameState {
 public:
 
 	GameState(const GameSettings& settings, lua_State* L, int vieww = 640,
 			int viewh = 480, int hudw = 160);
 	~GameState();
-
+	/* Call after construction, before game starts: */
 	void init_game();
-	void handle_dragging();
+
+	/* Primary events */
 	void draw(bool drawhud = true);
-	void step();
 	bool pre_step();
+	void step();
 	bool update_iostate(bool resetprev = true);
 
-	GameInst *get_instance(obj_id id);
-	obj_id add_instance(GameInst *inst);
-	void remove_instance(GameInst *inst, bool deallocate = true);
+	void adjust_view_to_dragging();
 
-	//All solid test functions return true if a solid object is hit
+	/* Instance retrieval and removal functions */
+	GameInst* get_instance(obj_id id);
+	obj_id add_instance(GameInst* inst);
+	void remove_instance(GameInst* inst, bool deallocate = true);
+	//Skip an instance id as if we were making an instance
+	//used for synchronization purposes in network play
+	void skip_next_instance_id();
+
+	obj_id local_playerid();
+	PlayerInst* local_player();
+
+	/* Dimensions (in pixels) of game world */
+	int width();
+	int height();
+
+	/* Collision test functions */
 	bool tile_radius_test(int x, int y, int rad, bool issolid = true,
-			int ttype = -1, Pos *hitloc = NULL);
+			int ttype = -1, Pos* hitloc = NULL);
 	bool tile_line_test(int x, int y, int w, int h);
-	int object_radius_test(GameInst *obj, GameInst **objs = NULL, int obj_cap =
+	int object_radius_test(GameInst* obj, GameInst** objs = NULL, int obj_cap =
 			0, col_filterf f = NULL, int x = -1, int y = -1, int radius = -1);
-	bool solid_test(GameInst *obj, GameInst **objs = NULL, int obj_cap = 0,
+	bool solid_test(GameInst* obj, GameInst** objs = NULL, int obj_cap = 0,
 			col_filterf f = NULL, int x = -1, int y = -1, int radius = -1) {
 		int lx = (x == -1 ? obj->x : x), ly = (y == -1 ? obj->y : y);
-
 		return tile_radius_test(lx, ly, radius == -1 ? obj->radius : radius)
 				|| object_radius_test(obj, objs, obj_cap, f, x, y, radius);
 	}
-	bool solid_test(GameInst *obj, int x, int y, int radius = -1) {
+
+	bool solid_test(GameInst* obj, int x, int y, int radius = -1) {
 		return solid_test(obj, NULL, 0, NULL, x, y, radius);
 	}
 
-	//Checks if an object is visible by all players (default) or a single player.
-	//Also specify if the test is affected by revealing with backquote
-	bool object_visible_test(GameInst *obj, GameInst *player = NULL,
+	/* player's field-of-view visibility tests */
+	bool object_visible_test(GameInst* obj, PlayerInst* player = NULL,
 			bool canreveal = true);
-	void ensure_connectivity(int roomid1, int roomid2);
-	GameView & window_view() {
+
+	/* GameState components */
+	GameView& window_view() {
 		return view;
 	}
 
@@ -79,24 +95,45 @@ public:
 	GameHud& game_hud() {
 		return hud;
 	}
+
 	GameWorld& game_world() {
 		return world;
 	}
+
 	GameChat& game_chat() {
 		return chat;
 	}
 
-	MonsterController & monster_controller();
-	PlayerController & player_controller();
-
-	const font_data & primary_font() {
-		return pfont;
+	GameSettings& game_settings() {
+		return settings;
 	}
 
-	const font_data & menu_font() {
-		return menufont;
+	GameNetConnection& net_connection() {
+		return connection;
 	}
 
+	lua_State* get_luastate() {
+		return L;
+	}
+	/* A single mersenne twister state is used for all random number generation */
+	MTwist& rng() {
+		return mtwist;
+	}
+
+	/* Instance global controllers */
+	MonsterController& monster_controller();
+	PlayerController& player_controller();
+
+	/* Font getters */
+	const font_data& primary_font() {
+		return small_font;
+	}
+
+	const font_data& menu_font() {
+		return large_font;
+	}
+
+	/* Mouse position */
 	int mouse_x() {
 		return mousex;
 	}
@@ -105,101 +142,69 @@ public:
 		return mousey;
 	}
 
-	bool mouse_left_click() {
-		return mouse_leftclick;
-	}
+	/* Mouse click states */
+	bool mouse_left_click();
+	bool mouse_right_click();
 
-	bool mouse_right_click() {
-		return mouse_rightclick;
-	}
+	bool mouse_left_down();
+	bool mouse_right_down();
 
-	bool mouse_left_down() {
-		return mouse_leftdown;
-	}
+	bool mouse_left_release();
+	bool mouse_right_release();
 
-	bool mouse_right_down() {
-		return mouse_rightdown;
-	}
+	bool mouse_upwheel();
+	bool mouse_downwheel();
 
-	bool mouse_upwheel() {
-		return mouse_didupwheel;
-	}
-
-	bool mouse_downwheel() {
-		return mouse_diddownwheel;
-	}
-
+	/* Current frame number */
 	int& frame() {
 		return frame_n;
 	}
 
-	obj_id local_playerid();
-
+	/* Keyboard press states */
 	int key_down_state(int keyval);
 	int key_press_state(int keyval);
-	/* Get dimensions of game level, in pixels */
-	int width();
-	int height();
 
+	/* Level utility functions */
 	GameLevelState* get_level() {
 		return world.get_current_level();
 	}
+
 	void set_level(GameLevelState* lvl);
-
-	void serialize(FILE *file);
-	MTwist & rng() {
-		return mtwist;
-	}
-
 	void level_move(int id, int x, int y, int roomid1, int roomid2);
-	GameSettings & game_settings() {
-		return settings;
-	}
+	/* Make sure rooms exist & portals point to valid locations in next room */
+	void ensure_level_connectivity(int roomid1, int roomid2);
 
-	GameNetConnection & net_connection() {
-		return connection;
-	}
 
-	lua_State *get_luastate() {
-		return L;
-	}
-
-	void skip_next_id();
+	void serialize(FILE* file);
 
 private:
+	int handle_event(SDL_Event* event);
+
+	/* Members */
 	GameSettings settings;
-	lua_State *L;
-
-	//Event handling code (eg escape presses)
-	int handle_event(SDL_Event *event);
-
+	lua_State* L;
 	int frame_n;
-
-	//Game network connection
 	GameNetConnection connection;
-
-	//Game world components
 	GameChat chat;
 	GameDialogs dialogs;
 	GameHud hud;
 	GameView view;
 	GameWorld world;
-
-	//RNG state
 	MTwist mtwist;
-
-	//Font data
-	font_data pfont, menufont;
-
-	//Key states
-	char key_down_states[SDLK_LAST];
-	char key_press_states[SDLK_LAST];
+	font_data small_font, large_font;
 	bool dragging_view;
 
-	//Mouse states
+	/* Keyboard states */
+	char key_down_states[SDLK_LAST];
+	char key_press_states[SDLK_LAST];
+
+	/* Mouse position */
 	int mousex, mousey;
+
+	/* Mouse click states */
 	bool mouse_leftdown, mouse_rightdown;
 	bool mouse_leftclick, mouse_rightclick;
+	bool mouse_leftrelease, mouse_rightrelease;
 	bool mouse_didupwheel, mouse_diddownwheel;
 };
 

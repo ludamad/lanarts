@@ -1,8 +1,7 @@
 /*
- * GameChat.cpp
- *
- *  Created on: May 27, 2012
- *      Author: 100397561
+ * GameChat.cpp:
+ *  Game HUD component for drawing messages.
+ *  These messages include things like "A monster has appeared!" and chat messages.
  */
 
 #include <SDL.h>
@@ -195,7 +194,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 		const std::string& command) {
 	ChatMessage printed;
 	const char* content;
-	PlayerInst* p = (PlayerInst*)gs->get_instance(gs->local_playerid());
+	PlayerInst* p = gs->local_player();
 
 	//Spawn monster
 	if (starts_with(command, "!spawn ", &content)) {
