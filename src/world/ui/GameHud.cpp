@@ -125,8 +125,7 @@ static int get_itemslotn(GameState* gs, int x, int y) {
 	return slot;
 }
 
-void GameHud::handle_io(GameState* gs,
-		ActionQueue& queued_actions) {
+void GameHud::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	PlayerInst* player = gs->local_player();
 	bool mouse_within_view = gs->mouse_x() < gs->window_view().width;
 	int level = gs->get_level()->roomid, frame = gs->frame();
@@ -138,23 +137,7 @@ void GameHud::handle_io(GameState* gs,
 	}
 	this->queued_actions.clear();
 
-	if (gs->mouse_right_click() && mouse_within_view) {
-		int action_bar_x = 0, action_bar_y = gs->window_view().height
-				- TILE_SIZE;
-		int posx = (gs->mouse_x() - action_bar_x) / TILE_SIZE;
-		int posy = (gs->mouse_y() - action_bar_y) / TILE_SIZE;
-
-		Equipment& equipment = player->equipment();
-		if (posy == 0 && posx == 0)
-			queued_actions.push_back(
-					GameAction(player->id, GameAction::DEEQUIP_ITEM, frame,
-							level, ItemEntry::WEAPON));
-		else if (posy == 0 && posx == 1)
-			queued_actions.push_back(
-					GameAction(player->id, GameAction::DEEQUIP_ITEM, frame,
-							level, ItemEntry::PROJECTILE));
-	}
-
+	action_bar.handle_io(gs, queued_actions);
 
 //	// Drop item
 //	const int ITEM_DROP_RATE = 2; //steps
@@ -337,7 +320,7 @@ void GameHud::draw(GameState* gs) {
 	gl_set_drawing_area(sidebar_box.x1, sidebar_box.y1, width(), height());
 	gl_draw_rectangle(0, 0, width(), height(), bg_colour);
 
-	PlayerInst* player_inst = (PlayerInst*)gs->get_instance(
+	PlayerInst* player_inst = (PlayerInst*) gs->get_instance(
 			gs->local_playerid());
 	if (!player_inst)
 		return;

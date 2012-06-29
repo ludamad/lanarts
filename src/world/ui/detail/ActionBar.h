@@ -45,15 +45,11 @@ public:
 	}
 
 	/* Returns whether an action was processed */
-	bool handle_io(GameState* gs, ActionQueue& queued_action);
+	bool handle_io(GameState* gs, ActionQueue& queued_actions);
 
 	void draw(GameState* gs) const;
 	void step(GameState* gs);
 private:
-	bool is_within_equipped(int mx, int my);
-	bool is_within_actionbar(int mx, int my);
-	/* Return which slot the mouse is hovering over */
-	int get_selected_slot(int mx, int my);
 
 	BBox bbox;
 	std::vector<ActionSlot> actions;

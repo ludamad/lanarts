@@ -20,53 +20,90 @@ ActionBar::ActionBar(const BBox& bbox, int max_actions) :
 }
 
 const int EQUIP_SLOT_WIDTH = TILE_SIZE * 2;
-const int ACTION_SLOT_WIDTH = TILE_SIZE;
+
+const int SLOT_WIDTH = TILE_SIZE;
 const int SLOT_HEIGHT = TILE_SIZE;
 
-bool ActionBar::is_within_equipped(int mx, int my) {
+static bool is_within_equipped(const BBox& bbox, int mx, int my) {
 	BBox equip_box(bbox.x1, bbox.y1, bbox.x1 + EQUIP_SLOT_WIDTH,
 			bbox.y1 + SLOT_HEIGHT);
 	return equip_box.contains(mx, my);
 }
+static bool is_within_equipped_weapon(const BBox& bbox, int mx, int my) {
+	BBox equip_box(bbox.x1, bbox.y1, bbox.x1 + SLOT_WIDTH,
+			bbox.y1 + SLOT_HEIGHT);
+	return equip_box.contains(mx, my);
+}
+static bool is_within_equipped_projectile(const BBox& bbox, int mx, int my) {
+	BBox equip_box(bbox.x1 + SLOT_WIDTH, bbox.y1, bbox.x1 + EQUIP_SLOT_WIDTH,
+			bbox.y1 + SLOT_HEIGHT);
+	return equip_box.contains(mx, my);
+}
 
-bool ActionBar::is_within_actionbar(int mx, int my) {
+static bool is_within_actionbar(const BBox& bbox, int mx, int my) {
 	BBox actionbar_box(bbox);
 	actionbar_box.x1 += EQUIP_SLOT_WIDTH;
 	return actionbar_box.contains(mx, my);
 }
 
 /* Return which slot the mouse is hovering over */
-bool ActionBar::handle_io(GameState* gs, ActionQueue& queued_actions) {
-	return true;
-}
-
-int ActionBar::get_selected_slot(int mx, int my) {
+static int get_selected_slot(const BBox& bbox, int mx, int my) {
 	int action_start_x = bbox.x1 + EQUIP_SLOT_WIDTH;
 
-	if (!is_within_actionbar(mx, my)) {
+	if (!is_within_actionbar(bbox, mx, my)) {
 		return -1;
 	}
 
-	return (mx - action_start_x) / ACTION_SLOT_WIDTH;
+	return (mx - action_start_x) / SLOT_WIDTH;
+}
+
+/* Return which slot the mouse is hovering over */
+bool ActionBar::handle_io(GameState* gs, ActionQueue& queued_actions) {
+	PlayerInst* p = gs->local_player();
+
+	int mx = gs->mouse_x(), my = gs->mouse_y();
+	bool rightclick = gs->mouse_right_click();
+
+	/* Check whether to de-equip weapon */
+	if (rightclick && is_within_equipped_weapon(bbox, mx, my)) {
+		queued_actions.push_back(
+				game_action(gs, p, GameAction::DEEQUIP_ITEM,
+						ItemEntry::WEAPON));
+		return true;
+	}
+
+	/* Check whether to de-equip projectile */
+	if (rightclick && is_within_equipped_projectile(bbox, mx, my)) {
+		if (p->projectile().valid_projectile()) {
+			queued_actions.push_back(
+					game_action(gs, p, GameAction::DEEQUIP_ITEM,
+							ItemEntry::PROJECTILE));
+			return true;
+		}
+	}
+	return false;
 }
 
 static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 		int x, int y) {
 	bool weapon_selected = player->spell_selected() == -1;
 	Colour outline = weapon_selected ? SELECTED_OUTLINE : FILLED_OUTLINE;
-	Equipment& equipment = player->equipment();
 
-	if (equipment.projectile == -1) {
+	if (!player->projectile().valid_projectile()) {
+		/* Draw only enough space for weapon if no projectile used */
 		gl_draw_rectangle_outline(x + 1, y, TILE_SIZE, TILE_SIZE, outline);
 	} else {
+		/* Draw enough space for weapon & projectile otherwise*/
 		gl_draw_rectangle_outline(x + 1, y, TILE_SIZE * 2, TILE_SIZE, outline);
-		ProjectileEntry& ptype = equipment.projectile.projectile_entry();
+		ProjectileEntry& ptype = player->projectile().projectile_entry();
 		gl_draw_image(game_sprite_data[ptype.item_sprite].img(), x + TILE_SIZE,
 				y);
-		gl_printf(gs->primary_font(), Colour(255, 255, 255), x + TILE_SIZE + 1,
-				y + 1, "%d", player->equipment().projectile_amnt);
+		/* Draw action hotkey */
+//		gl_printf(gs->primary_font(), Colour(255, 255, 255), x + TILE_SIZE + 1,
+//				y + 1, "%d", player->equipment().projectile_amnt);
 	}
 
+	/* Draw weapon*/
 	WeaponEntry& wentry = player->weapon_type().weapon_entry();
 	gl_draw_image(game_sprite_data[wentry.item_sprite].img(), x, y);
 }

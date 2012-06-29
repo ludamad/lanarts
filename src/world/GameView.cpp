@@ -1,8 +1,6 @@
 /*
- * GameView.cpp
- *
- *  Created on: 2011-11-05
- *      Author: 100397561
+ * GameView.cpp:
+ *	Represents a section of the game world, bounded by the dimensions of the world, and roughly centred on an object
  */
 
 #include "GameView.h"
@@ -10,11 +8,10 @@
 #include <algorithm>
 #include "GameTiles.h"
 
-static const int VIEW_SUBW = 100, VIEW_SUBH =100;
+static const int VIEW_SUBW = 100, VIEW_SUBH = 100;
 static const int VIEW_SPEED = 8;
 
-
-bool GameView::out_of_view_center(int px, int py){
+bool GameView::out_of_view_center(int px, int py) {
 	int dx = px - x, dy = py - y;
 	return (abs(dx) > width / 2 || abs(dy) > height / 2);
 }
@@ -37,8 +34,8 @@ void GameView::move_towards(int px, int py) {
 }
 
 void GameView::min_tile_within(int& px, int& py) const {
-	px = std::max(0,x / TILE_SIZE);
-	py = std::max(0,y / TILE_SIZE);
+	px = std::max(0, x / TILE_SIZE);
+	py = std::max(0, y / TILE_SIZE);
 }
 
 void GameView::max_tile_within(int& px, int& py) const {

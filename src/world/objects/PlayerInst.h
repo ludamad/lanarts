@@ -73,6 +73,9 @@ public:
 	Weapon& weapon_type() {
 		return equipment().weapon;
 	}
+	Projectile& projectile() {
+		return equipment().projectile;
+	}
 
 	bool is_local_player() {
 		return local;

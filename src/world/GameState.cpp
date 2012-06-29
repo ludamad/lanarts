@@ -73,8 +73,6 @@ void GameState::init_game() {
 
 	init_lua_data(this, L);
 
-	lua_gc(L, LUA_GCSTOP, 0); // collected garbage
-
 	if (settings.conntype == GameSettings::CLIENT) {
 		char port_buffer[50];
 		snprintf(port_buffer, 50, "%d", settings.port);
@@ -125,7 +123,7 @@ void GameState::set_level(GameLevelState* lvl) {
 PlayerInst* GameState::local_player() {
 	GameInst* player = get_instance(local_playerid());
 	LANARTS_ASSERT(!player || dynamic_cast<PlayerInst*>(player));
-	return (PlayerInst*)player;
+	return (PlayerInst*) player;
 }
 
 int GameState::handle_event(SDL_Event *event) {
@@ -173,10 +171,13 @@ int GameState::handle_event(SDL_Event *event) {
 		break;
 	}
 	case SDL_MOUSEBUTTONUP: {
-		if (event->button.button == SDL_BUTTON_LEFT)
+		if (event->button.button == SDL_BUTTON_LEFT) {
 			mouse_leftdown = false;
-		else if (event->button.button == SDL_BUTTON_RIGHT)
+			mouse_leftrelease = true;
+		} else if (event->button.button == SDL_BUTTON_RIGHT) {
 			mouse_rightdown = false;
+			mouse_rightrelease = true;
+		}
 		break;
 	}
 	case SDL_QUIT:
@@ -192,8 +193,12 @@ bool GameState::update_iostate(bool resetprev) {
 		memset(key_press_states, 0, sizeof(key_press_states));
 		mouse_leftclick = false;
 		mouse_rightclick = false;
+
 		mouse_didupwheel = false;
 		mouse_diddownwheel = false;
+
+		mouse_leftrelease = false;
+		mouse_rightrelease = false;
 	}
 	SDL_GetMouseState(&mousex, &mousey);
 	while (SDL_PollEvent(&event)) {
@@ -208,7 +213,7 @@ bool GameState::pre_step() {
 void GameState::step() {
 	chat.step(this);
 	world.step(); //Has pointer to this object
-//	lua_gc(L, LUA_GCSTEP, 0); // collected garbage
+	lua_gc(L, LUA_GCSTEP, 0); // collect garbage incrementally
 }
 
 int GameState::key_down_state(int keyval) {
@@ -429,11 +434,11 @@ bool GameState::mouse_right_down() {
 }
 
 bool GameState::mouse_left_release() {
-	return mouse_leftdown;
+	return mouse_leftrelease;
 }
 
 bool GameState::mouse_right_release() {
-	return mouse_rightdown;
+	return mouse_rightrelease;
 }
 
 bool GameState::mouse_upwheel() {
