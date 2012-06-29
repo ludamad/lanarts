@@ -54,6 +54,21 @@ static void draw_player_inventory(GameState* gs, Inventory& inv,
 	}
 }
 
+static int get_itemslotn(Inventory& inv, const BBox& bbox, int mx, int my) {
+	if (!bbox.contains(mx, my)) {
+		return -1;
+	}
+
+	int posx = (mx - bbox.x1) / TILE_SIZE;
+	int posy = (my - bbox.y1) / TILE_SIZE;
+	int slot = 5 * posy + posx;
+
+	if (slot < 0 || slot >= inv.max_size())
+		return -1;
+
+	return slot;
+}
+
 const int ITEMS_PER_PAGE = 40;
 
 void InventoryContent::draw(GameState* gs) const {
@@ -75,29 +90,45 @@ int InventoryContent::amount_of_pages(GameState* gs) {
 	return item_pages;
 }
 
-int InventoryContent::get_itemslotn(GameState* gs, int mx, int my) {
-	int posx = (mx - bbox.x1) / TILE_SIZE;
-	int posy = (my - bbox.y1) / TILE_SIZE;
-	int slot = 5 * posy + posx;
-	if (slot < 0 || slot >= INVENTORY_SIZE)
-		return -1;
-	return slot;
-}
-
 bool InventoryContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	PlayerInst* p = gs->local_player();
-	int level = gs->get_level()->roomid, frame = gs->frame();
+	Inventory inv = p->inventory();
+	int mx = gs->mouse_x(), my = gs->mouse_y();
+	bool within_inventory = bbox.contains(mx, my);
 
-	if (gs->mouse_left_click() && bbox.contains(gs->mouse_x(), gs->mouse_y())) {
-		Inventory inv = p->inventory();
+	/* Use an item */
+	if (gs->mouse_left_click() && within_inventory) {
 
-		int slot = get_itemslotn(gs, gs->mouse_x(), gs->mouse_y());
+		int slot = get_itemslotn(inv, bbox, mx, my);
 		if (slot >= 0 && slot < INVENTORY_SIZE && inv.get(slot).amount > 0) {
 			queued_actions.push_back(
-					GameAction(p->id, GameAction::USE_ITEM, frame, level, slot,
-							p->x, p->y));
+					game_action(gs, p, GameAction::USE_ITEM, slot, p->x, p->y));
 			return true;
 		}
+	}
+
+	/* Start dragging an item */
+	if (gs->mouse_right_click() && within_inventory) {
+		int slot = get_itemslotn(inv, bbox, mx, my);
+		if (slot != -1 && inv.slot_filled(slot)) {
+			slot_selected = slot;
+			return true;
+		}
+	}
+
+	/* Drop a dragged item */
+	if (slot_selected > -1 && gs->mouse_right_release()) {
+		int slot = get_itemslotn(inv, bbox, mx, my);
+
+		if (slot == -1 || slot == slot_selected) {
+			queued_actions.push_back(
+					game_action(gs, p, GameAction::DROP_ITEM, slot_selected));
+		} else {
+			queued_actions.push_back(
+					game_action(gs, p, GameAction::REPOSITION_ITEM,
+							slot_selected, 0, 0, slot));
+		}
+		return true;
 	}
 
 	return false;

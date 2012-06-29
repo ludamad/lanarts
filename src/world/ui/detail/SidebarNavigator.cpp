@@ -41,8 +41,7 @@ void SidebarNavigator::step(GameState* gs) {
 	current_content()->step(gs);
 }
 
-bool SidebarNavigator::handle_io(GameState* gs, ActionQueue& queued_actions)
-{
+bool SidebarNavigator::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	return current_content()->handle_io(gs, queued_actions);
 }
 

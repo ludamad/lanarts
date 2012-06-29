@@ -6,7 +6,10 @@
 #ifndef SIDEBAR_H_
 #define SIDEBAR_H_
 
+#include "../../../util/ActionQueue.h"
 #include "../../../util/game_basic_structs.h"
+
+#include "../../GameAction.h"
 
 #include "Minimap.h"
 #include "SidebarNavigator.h"
@@ -19,6 +22,7 @@ public:
 
 	void draw(GameState* gs);
 	void step(GameState* gs);
+	bool handle_io(GameState* gs, ActionQueue& queued_actions);
 
 private:
 	BBox sidebar_bounds;

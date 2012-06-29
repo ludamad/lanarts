@@ -8,7 +8,7 @@
 #define GAMEACTION_H_
 #include <cstdio>
 
-#include "../../util/game_basic_structs.h"
+#include "../util/game_basic_structs.h"
 
 class GameInst;
 class GameState;

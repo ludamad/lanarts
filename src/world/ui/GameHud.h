@@ -36,7 +36,7 @@ public:
 	/*Returns whether has handled event completely or not*/
 	bool handle_event(GameState* gs, SDL_Event *event);
 	/* Handles clicks, etc */
-	void handle_io(GameState* gs, ActionQueue& queued_actions);
+	bool handle_io(GameState* gs, ActionQueue& queued_actions);
 
 	/*Location of the minimap on the screen*/
 	BBox minimap_bbox(GameState* gs);
@@ -59,9 +59,6 @@ public:
 		item_slot_selected = -1;
 	}
 private:
-	/* Helper method for drawing mini-map based on game information */
-	void draw_minimap(GameState* gs, const BBox& bbox, float scale);
-
 	Sidebar sidebar;
 	SidebarNavigator navigation;
 	ActionBar action_bar;

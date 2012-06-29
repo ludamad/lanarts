@@ -20,7 +20,6 @@ public:
 	virtual bool handle_io(GameState* gs, ActionQueue& queued_actions);
 
 private:
-	int get_itemslotn(GameState* gs, int mx, int my);
 	int slot_selected;
 };
 

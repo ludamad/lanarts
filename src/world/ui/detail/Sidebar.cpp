@@ -84,7 +84,7 @@ Sidebar::Sidebar(const BBox& sidebar_bounds) :
 				sidebar_bounds, content_area_box(sidebar_bounds)) {
 }
 
-void Sidebar::draw(GameState *gs) {
+void Sidebar::draw(GameState* gs) {
 	const int STATBAR_OFFSET_X = 32, STATBAR_OFFSET_Y = 32;
 
 	PlayerInst* p = gs->local_player();
@@ -101,6 +101,13 @@ void Sidebar::draw(GameState *gs) {
 			sidebar_bounds.y1 + STATBAR_OFFSET_Y);
 }
 
-void Sidebar::step(GameState *gs) {
+void Sidebar::step(GameState* gs) {
+}
+
+bool Sidebar::handle_io(GameState* gs, ActionQueue& queued_actions) {
+	if (navigator.handle_io(gs, queued_actions)) {
+		return true;
+	}
+	return false;
 }
 

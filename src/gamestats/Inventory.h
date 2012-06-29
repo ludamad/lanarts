@@ -31,6 +31,9 @@ public:
 	ItemSlot& get(int i) {
 		return items.at(i);
 	}
+	bool slot_filled(int i) const {
+		return items.at(i).amount > 0;
+	}
 	size_t max_size() const {
 		return items.size();
 	}

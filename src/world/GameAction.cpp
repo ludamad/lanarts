@@ -6,6 +6,7 @@
 
 #include "GameAction.h"
 #include "GameState.h"
+#include "GameLevelState.h"
 
 #include "objects/GameInst.h"
 
@@ -21,7 +22,7 @@ void to_action_file(FILE* f, const GameAction& action) {
 GameAction game_action(GameState* gs, GameInst *origin,
 		GameAction::action_t action, int use_id, int action_x, int action_y,
 		int use_id2) {
-	return GameAction(origin->id, action, gs, gs->frame(),
+	return GameAction(origin->id, action, gs->frame(),
 			gs->get_level()->level_number, use_id, action_x, action_y, use_id2);
 }
 

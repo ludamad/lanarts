@@ -3,6 +3,7 @@
  *  Holds the contents of the action bar.
  */
 
+#include "../../../data/item_data.h"
 #include "../../../data/spell_data.h"
 #include "../../../data/weapon_data.h"
 
@@ -62,7 +63,8 @@ bool ActionBar::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	PlayerInst* p = gs->local_player();
 
 	int mx = gs->mouse_x(), my = gs->mouse_y();
-	bool rightclick = gs->mouse_right_click();
+	bool leftclick = gs->mouse_left_click(), rightclick =
+			gs->mouse_right_click();
 
 	/* Check whether to de-equip weapon */
 	if (rightclick && is_within_equipped_weapon(bbox, mx, my)) {
@@ -81,6 +83,26 @@ bool ActionBar::handle_io(GameState* gs, ActionQueue& queued_actions) {
 			return true;
 		}
 	}
+
+	/* Check if a spell is selected */
+	int spell_slot = get_selected_slot(bbox, mx, my);
+
+	if (leftclick && spell_slot > -1) {
+		if (spell_slot < p->spells_known().amount()) {
+			p->spell_selected() = spell_slot;
+			return true;
+		}
+	}
+
+	/* Check if the weapon is selected */
+	bool selects_projectile = p->projectile().valid_projectile()
+			&& is_within_equipped_projectile(bbox, mx, my);
+	if (leftclick
+			&& (is_within_equipped_weapon(bbox, mx, my) || selects_projectile)) {
+		p->spell_selected() = -1;
+		return true;
+	}
+
 	return false;
 }
 

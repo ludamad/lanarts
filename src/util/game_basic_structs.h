@@ -42,7 +42,7 @@ struct BBox {
 			x1(x1), y1(y1), x2(x2), y2(y2) {
 		LANARTS_ASSERT(x1 <= x2 && y1 <= y2);
 	}
-	bool contains(int x, int y) {
+	bool contains(int x, int y) const {
 		return x >= x1 && x1 < x2 && y >= y1 && y < y2;
 	}
 	int width() const {

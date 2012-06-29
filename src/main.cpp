@@ -93,7 +93,7 @@ static void game_loop(GameState* gs) {
 
 	bool paused = false, cont = true;
 
-	unsigned long draw_time = 5 * CLOCKS_PER_SEC / 1000;
+	unsigned long draw_time = 0;
 
 	unsigned long draw_events = 1;
 
