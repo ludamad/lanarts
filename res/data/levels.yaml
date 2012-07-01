@@ -21,11 +21,13 @@ default_items: &default_items #Reference with *default_items
 
 easy_animals: &easy_animals
   - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 2 }
+  - { enemy: Giant Bat,         chance: 100                                   }
   - { enemy: Hound,             chance: 60                                    }
   - { enemy: Sheep,             chance: 60                                    }
 
 easy_animals: &medium_animals
   - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 3 }
+  - { enemy: Giant Bat,         chance: 100,  group_chance: 33, group_size: 3 }
   - { enemy: Hound,             chance: 100                                   }
   - { enemy: Sheep,             chance: 100                                   }
   - { enemy: Giant Frog,        chance: 100                                   }
@@ -167,7 +169,7 @@ areas:
         content:
           features: { tileset: [lair_tiles1, lair_tiles2],     stairs_up: 0  }
           items:    { amount: 3,  generated: *default_items   }
-          enemies: { wandering: no, amount: 0, generated: *easy_animals }
+          enemies: { wandering: no, amount: 3, generated: *easy_animals }
           
       #Level 2
       - layout: *tiny_layouts

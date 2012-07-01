@@ -17,6 +17,22 @@ enemies:
         strength: 10
         defence: 5
         willpower: 5
+              
+  - name: Giant Bat
+    sprite: giant bat
+    death_sprite: blood
+    radius: 12
+    xpaward: 8
+    appear_message: A hungry giant bat surveys the scene.
+    defeat_message: The giant bat has died.
+    stats:
+        attacks: [ {weapon: Fast Melee} ]
+        hp: 12
+        hpregen: 0.03
+        movespeed: 2.5
+        strength: 10
+        defence: 5
+        willpower: 5
        
   - name: Hound
     sprite: hound

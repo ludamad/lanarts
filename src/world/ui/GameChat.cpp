@@ -18,6 +18,7 @@ extern "C" {
 #include "../../display/display.h"
 
 #include "../../lua/lua_api.h"
+#include "../../util/math_util.h"
 
 #include "../../procedural/enemygen.h"
 
@@ -215,6 +216,15 @@ bool GameChat::handle_special_commands(GameState* gs,
 		}
 		add_message(printed);
 		return true;
+	}
+
+	//Set game speed
+	if (starts_with(command, "!gamespeed ", &content)) {
+		int gamespeed = squish(atoi(content), 1, 200);
+		gs->game_settings().steps_per_draw = gamespeed;
+		printed.message = std::string("Game speed set.");
+		printed.message_colour = Colour(50, 255, 50);
+		add_message(printed);
 	}
 
 	//Gain XP

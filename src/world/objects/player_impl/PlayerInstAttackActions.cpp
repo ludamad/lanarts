@@ -16,9 +16,10 @@ extern "C" {
 
 #include "../../../lua/lua_api.h"
 
+#include "../../../util/colour_constants.h"
 #include "../../../util/math_util.h"
-#include "../../../util/world/collision_util.h"
 #include "../../../util/game_basic_structs.h"
+#include "../../../util/world/collision_util.h"
 
 #include "../../GameState.h"
 
@@ -71,7 +72,9 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 	bool ismelee = !(wentry.uses_projectile || p->equipment().has_projectile());
 	int target_range = wentry.range + p->target_radius;
 
-	if (targ && distance_between(Pos(targ->x, targ->y), ppos) - targ->target_radius <= target_range) {
+	if (targ
+			&& distance_between(Pos(targ->x, targ->y), ppos)
+					- targ->target_radius <= target_range) {
 		return targ;
 	}
 
@@ -174,9 +177,19 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 
 	//Keyboard-oriented blink
 	if (!spell_used && gs->key_press_state(SDLK_h)) {
+		bool canuse = true;
 		Pos blinkposition;
-		if (core_stats().mp >= 50
-				&& find_blink_target(this, gs, blinkposition)) {
+		if (core_stats().mp < 50) {
+			canuse = false;
+			gs->game_chat().add_message(
+					"You do not have enough mana to blink, 50 MP required!",
+					RED);
+		} else if (!find_blink_target(this, gs, blinkposition)) {
+			canuse = false;
+			gs->game_chat().add_message(
+					"Cannot auto-blink, no hostile targets. Right click to blink manually.");
+		}
+		if (canuse) {
 			queued_actions.push_back(
 					GameAction(id, GameAction::USE_SPELL, frame, level, 2,
 							blinkposition.x, blinkposition.y));
@@ -214,11 +227,16 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		int px = x, py = y;
 		/* set-up x and y for gs->object_visible_test() */
 		x = rmx, y = rmy;
-		if (core_stats().mp >= 50 && !gs->solid_test(this)
-				&& gs->object_visible_test(this)) {
-			queued_actions.push_back(
-					GameAction(id, GameAction::USE_SPELL, frame, level, 2, x,
-							y));
+		if (core_stats().mp >= 50) {
+			if (!gs->solid_test(this) && gs->object_visible_test(this)) {
+				queued_actions.push_back(
+						GameAction(id, GameAction::USE_SPELL, frame, level, 2,
+								x, y));
+			}
+		} else {
+			gs->game_chat().add_message(
+					"You do not have enough mana to blink, 50 MP required!",
+					RED);
 		}
 		/* restore x and y */
 		x = px, y = py;
@@ -285,7 +303,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 
 		equipment().use_ammo();
 	} else {
-		int weaprange = wentry.range + this->radius + TILE_SIZE/2;
+		int weaprange = wentry.range + this->radius + TILE_SIZE / 2;
 		float mag = distance_between(actpos, Pos(x, y));
 		if (mag > weaprange) {
 			float dx = actpos.x - x, dy = actpos.y - y;
@@ -310,8 +328,9 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 				if (is_local_player()) {
 					snprintf(buffstr, 32, "%d XP", e->xpworth());
 					gs->add_instance(
-							new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0, AnimatedInst::DEPTH,
-									buffstr, Colour(255, 215, 11)));
+							new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0,
+									AnimatedInst::DEPTH, buffstr,
+									Colour(255, 215, 11)));
 				}
 			}
 
@@ -368,7 +387,7 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	}
 
 	if (action.use_id == 0) {
-		double mult = 1 + (class_stats().xplevel-1) / 10.0;
+		double mult = 1 + (class_stats().xplevel - 1) / 10.0;
 		mult = std::min(2.0, mult);
 		cooldowns().action_cooldown /= mult;
 	} else if (action.use_id == 2) {

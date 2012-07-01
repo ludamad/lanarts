@@ -22,6 +22,9 @@ sprites:
   - name: super_chicken
     file: res/sprites/monsters/animals/superchicken.png
 
+  - name: giant bat
+    file: res/sprites/monsters/animals/bat.png
+
 #Undead
   - name: skeleton
     file: res/sprites/monsters/skeleton.png
