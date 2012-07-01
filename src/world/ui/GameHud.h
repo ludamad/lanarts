@@ -55,12 +55,9 @@ public:
 
 	/* Reset the selected item after action is finished, otherwise drawing will lag a step
 	 * Used in PlayerInstActions.cpp*/
-	void reset_slot_selected() {
-		item_slot_selected = -1;
-	}
+	void reset_slot_selected();
 private:
 	Sidebar sidebar;
-	SidebarNavigator navigation;
 	ActionBar action_bar;
 	ActionSlot dragging_action;
 
@@ -68,7 +65,6 @@ private:
 	Colour bg_colour;
 	char* minimap_arr;
 	GLimage minimap_buff;
-	int item_slot_selected;
 
 	ActionQueue queued_actions;
 };

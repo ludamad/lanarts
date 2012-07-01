@@ -47,6 +47,18 @@ int centered_multiple(int num, int mult) {
 	return num * mult + mult / 2;
 }
 
+float magnitude(float x, float y) {
+	return sqrt(x * x + y * y);
+}
+
+void normalize(float& x, float& y, float mag) {
+	float curr_mag = magnitude(x, y);
+	if (curr_mag == 0.0f)
+		return;
+	x *= mag / curr_mag;
+	y *= mag / curr_mag;
+}
+
 Pos centered_multiple(const Pos& pos, int mult) {
 	return Pos(centered_multiple(pos.x, mult), centered_multiple(pos.y, mult));
 }

@@ -1,8 +1,6 @@
 /*
- * load_settings_data.cpp
- *
- *  Created on: Mar 26, 2012
- *      Author: 100397561
+ * load_settings_data.cpp:
+ *  Load configuration data.
  */
 
 #include <fstream>
@@ -73,6 +71,7 @@ GameSettings load_settings_data(const char* filename) {
 			optional_set(root, "time_per_step", ret.time_per_step);
 			optional_set(root, "draw_diagnostics", ret.draw_diagnostics);
 			optional_set(root, "username", ret.username);
+			optional_set(root, "use_stop_actions", ret.stop_controls);
 
 			if (yaml_has_node(root, "connection_type")) {
 				std::string connname;

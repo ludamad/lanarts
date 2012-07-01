@@ -27,6 +27,8 @@ struct GameSettings {
 	bool invincible;
 	int classn;
 
+	/*Control settings*/
+	bool stop_controls;
 
 	GameSettings(){
 		//sets defaults
@@ -42,6 +44,8 @@ struct GameSettings {
 		font = "res/MateSC-Regular.ttf";
 		invincible = false;
 		draw_diagnostics = false;
+
+		stop_controls = true;
 
 		port = 0;
 		conntype = NONE;

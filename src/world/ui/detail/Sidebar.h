@@ -23,6 +23,9 @@ public:
 	void draw(GameState* gs);
 	void step(GameState* gs);
 	bool handle_io(GameState* gs, ActionQueue& queued_actions);
+	void reset_slot_selected() {
+		navigator.reset_slot_selected();
+	}
 
 private:
 	BBox sidebar_bounds;

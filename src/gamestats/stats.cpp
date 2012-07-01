@@ -80,6 +80,8 @@ void CooldownStats::step() {
 		pickup_cooldown = 0;
 	if (--hurt_cooldown < 0)
 		hurt_cooldown = 0;
+	if (--stopaction_timeout < 0)
+		stopaction_timeout = 0;
 }
 
 void CooldownStats::reset_action_cooldown(int cooldown) {
@@ -92,6 +94,9 @@ void CooldownStats::reset_pickup_cooldown(int cooldown) {
 
 void CooldownStats::reset_rest_cooldown(int cooldown) {
 	rest_cooldown = std::max(cooldown, rest_cooldown);
+}
+void CooldownStats::reset_stopaction_timeout(int cooldown) {
+	stopaction_timeout = std::max(cooldown, stopaction_timeout);
 }
 
 bool DerivedStats::operator ==(const DerivedStats & derived) const {

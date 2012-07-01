@@ -19,6 +19,9 @@ public:
 
 	virtual bool handle_io(GameState* gs, ActionQueue& queued_actions);
 
+	void reset_slot_selected() {
+		slot_selected = -1;
+	}
 private:
 	int slot_selected;
 };

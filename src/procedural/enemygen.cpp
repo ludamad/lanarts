@@ -1,8 +1,6 @@
 /*
- * enemygen.cpp
- *
- *  Created on: Mar 20, 2012
- *      Author: 100397561
+ * enemygen.cpp:
+ *  Enemy spawning routines
  */
 
 #include "../util/math_util.h"
@@ -14,7 +12,8 @@
 
 #include "enemygen.h"
 
-void post_generate_enemy(GameState* gs, enemy_id etype, int amount) {
+//Used for !spawn command
+void generate_enemy_after_level_creation(GameState* gs, enemy_id etype, int amount) {
 	MTwist& mt = gs->rng();
 	GameTiles& tiles = gs->tile_grid();
 

@@ -16,7 +16,6 @@ class SidebarContent;
 
 struct NavigationSprites {
 	sprite_id left_arrow, right_arrow;
-	sprite_id inventory_icon, stats_icon, spells_icon;
 	NavigationSprites();
 };
 
@@ -31,15 +30,31 @@ public:
 	bool handle_io(GameState* gs, ActionQueue& queued_actions);
 
 	SidebarContent* current_content();
+	void reset_slot_selected();
+
 private:
+	enum view_t {
+		INVENTORY, SPELLS, EQUIPMENT, STATS
+	};
+	struct NavigationOption {
+		NavigationOption(sprite_id icon, SidebarContent* content,
+				const BBox& icon_bbox);
+		~NavigationOption();
+
+		void draw_icon(GameState* gs, bool selected = false);
+
+		sprite_id icon;
+		SidebarContent* content;
+		BBox icon_bbox;
+	};
+	NavigationOption& current_option();
+
+	bool handle_icon_io(GameState* gs, NavigationOption& option, view_t value);
+
 	NavigationSprites sprites;
 	BBox side_bar, main_content;
-
-	enum view_t {
-		INVENTORY, SPELLS, STATS, SHOP
-	};
-	view_t viewtype;
-	SidebarContent* inventory, *spells, *shop;
+	view_t view;
+	NavigationOption inventory, equipment, spells;
 };
 
 #endif /* SIDEBARNAVIGATOR_H_ */

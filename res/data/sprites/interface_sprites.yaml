@@ -6,6 +6,9 @@ sprites:
   - name: inventory_icon
     file: res/sprites/interface/items.png
     
+  - name: equipment_icon
+    file: res/sprites/interface/equipment.png
+    
   - name: spells_icon
     file: res/sprites/interface/magic.png
     

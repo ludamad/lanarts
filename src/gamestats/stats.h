@@ -107,10 +107,11 @@ struct CooldownStats {
 	int pickup_cooldown;
 	int rest_cooldown;
 	int hurt_cooldown;
+	int stopaction_timeout;
 
 	CooldownStats() :
 			action_cooldown(0), pickup_cooldown(0), rest_cooldown(0), hurt_cooldown(
-					0) {
+					0), stopaction_timeout(0) {
 	}
 
 	void step();
@@ -127,11 +128,15 @@ struct CooldownStats {
 	bool is_hurting() {
 		return hurt_cooldown > 0;
 	}
+	bool can_do_stopaction() {
+		return stopaction_timeout <= 0;
+	}
 
 	void reset_action_cooldown(int cooldown);
 	void reset_pickup_cooldown(int cooldown);
 	void reset_rest_cooldown(int cooldown);
 	void reset_hurt_cooldown(int cooldown);
+	void reset_stopaction_timeout(int cooldown);
 };
 
 /* Represents class related stats */
@@ -142,7 +147,9 @@ struct ClassStats {
 			int xpneeded = 0) :
 			classid(classtype), xp(xp), xpneeded(xpneeded), xplevel(xplevel) {
 	}
-	bool has_class() { return classid >= 0; }
+	bool has_class() {
+		return classid >= 0;
+	}
 	ClassType& class_type() const;
 };
 

@@ -1,8 +1,6 @@
 /*
- * PlayerController.cpp
- *
- *  Created on: Feb 20, 2012
- *      Author: 100397561
+ * PlayerController.cpp:
+ *	Handles network communication of player coordinates, creates input actions for player objects.
  */
 
 #include "PlayerController.h"

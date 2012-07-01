@@ -1,3 +1,8 @@
+/*
+ * display_util.cpp:
+ *  Image drawing and other drawing related utility functions
+ */
+
 #include <cmath>
 #include <cstring>
 #include <cstdio>
@@ -84,16 +89,16 @@ void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 
 const int UNBOUNDED = 10000;
 
-/*Splits up strings, respecting space boundaries*/
-static std::vector<int> split_up_string(const font_data& font, int max_width,
-		const char* text) {
-	std::vector<int> line_splits;
+/*Splits up strings, respecting space boundaries & returns maximum width */
+static int process_string(const font_data& font, const char* text,
+		int max_width, std::vector<int>& line_splits) {
 	int last_space = 0, ind = 0;
+	int largest_width = 0;
 	int width = 0, width_since_space = 0;
 	unsigned char c;
 
 	while ((c = text[ind]) != '\0') {
-		char_data &cdata = *font.data[c];
+		char_data& cdata = *font.data[c];
 		width += cdata.advance;
 		width_since_space += cdata.advance;
 
@@ -102,53 +107,91 @@ static std::vector<int> split_up_string(const font_data& font, int max_width,
 			width_since_space = 0;
 		}
 
-		if (width > max_width) {
+		if (max_width != -1 && width > max_width) {
 			line_splits.push_back(last_space);
+			largest_width = std::max(width, largest_width);
 			width = width_since_space;
 		}
 		ind++;
 	}
 
-	return line_splits;
+	largest_width = std::max(width, largest_width);
+
+	return largest_width;
 }
 
-//Pos gl_printf_bounded(const font_data& font, const Colour& colour,
-//		const BBox& bounds, const char* text) {
-//	int textlen = strlen(text);
-//	for (int i = 0; i < textlen; i++)
-//		if (text[i] == '\n')
-//			text[i] = '\0';
-//
-//	Pos offset(0, 0);
-//	int len = 0;
-//	const char* iter = text;
-//	while (iter < text + textlen) {
-//		int len = 0;
-//		offset.y += font.h;
-//		for (int i = 0; iter[i]; i++) {
-//			unsigned char chr = iter[i];
-//			char_data &cdata = *font.data[chr];
-//			len += cdata.advance;
-//			gl_draw_image(cdata.img, bounds.x1 + len - (cdata.advance - cdata.left),
-//					bounds.y1 + offset.y - cdata.move_up, colour);
-//		}
-//		offset.x = std::max(len, offset.x);
-//		offset.y += 1;
-//
-//		iter += strlen(iter) + 1;
-//	}
-//	return offset;
-//}
+/* General center printed function for others to delegate to */
+static Pos gl_print_centered(const font_data& font, const Colour& colour,
+		const Pos& p, const char* text, int max_width, bool center_text_x) {
+	int textlen = strlen(text);
+	for (int i = 0; i < textlen; i++)
+		if (text[i] == '\n')
+			text[i] = '\0';
 
-/* printf-like function that draws to the screen, returns width of formatted string*/
+	std::vector<int> line_splits;
+
+	Pos offset(0, 0);
+	const char* iter = text;
+
+	int measured_width = process_string(font, text, max_width, line_splits);
+	Pos draw_pos(p.x - center_text_x ? measured_width / 2 : 0, p.y);
+
+	while (iter < text + textlen) {
+		int len = 0;
+		offset.y += font.h;
+		for (int i = 0; iter[i]; i++) {
+			unsigned char chr = iter[i];
+			char_data &cdata = *font.data[chr];
+			len += cdata.advance;
+			gl_draw_image(cdata.img, p.x + len - (cdata.advance - cdata.left),
+					p.y + offset.y - cdata.move_up, colour);
+		}
+		offset.x = std::max(len, offset.x);
+		offset.y += 1;
+
+		iter += strlen(iter) + 1;
+	}
+	return offset;
+}
+
+/* Most general gl_print function that the rest build on */
+static Pos gl_print_bounded(const font_data& font, const Colour& colour,
+		const BBox& bounds, const char* text) {
+	int textlen = strlen(text);
+	for (int i = 0; i < textlen; i++)
+		if (text[i] == '\n')
+			text[i] = '\0';
+
+	Pos offset(0, 0);
+	int len = 0;
+	const char* iter = text;
+	while (iter < text + textlen) {
+		int len = 0;
+		offset.y += font.h;
+		for (int i = 0; iter[i]; i++) {
+			unsigned char chr = iter[i];
+			char_data &cdata = *font.data[chr];
+			len += cdata.advance;
+			gl_draw_image(cdata.img,
+					bounds.x1 + len - (cdata.advance - cdata.left),
+					bounds.y1 + offset.y - cdata.move_up, colour);
+		}
+		offset.x = std::max(len, offset.x);
+		offset.y += 1;
+
+		iter += strlen(iter) + 1;
+	}
+	return offset;
+}
+
 void gl_draw_sprite_entry(const GameView& view, SpriteEntry& entry, int x,
 		int y, float dx, float dy, int steps, const Colour& c) {
 	float PI = 3.1415921;
 	GLimage* img;
 	if (entry.type == SpriteEntry::DIRECTIONAL) {
-		float direction = PI*2.5 + atan2(dy, dx);
+		float direction = PI * 2.5 + atan2(dy, dx);
 		int nimgs = entry.images.size();
-		float bucket_size = PI*2 / nimgs;
+		float bucket_size = PI * 2 / nimgs;
 		int bucket = round(direction / bucket_size);
 		bucket = bucket % nimgs;
 		img = &entry.img(bucket);
@@ -158,6 +201,16 @@ void gl_draw_sprite_entry(const GameView& view, SpriteEntry& entry, int x,
 	gl_draw_image(view, *img, x, y, c);
 }
 
+void gl_draw_sprite(sprite_id sprite, int x, int y, const Colour& c) {
+	GLimage& img = game_sprite_data.at(sprite).img();
+	gl_draw_image(img, x, y, c);
+}
+void gl_draw_sprite(sprite_id sprite, const GameView& view, int x, int y,
+		const Colour& c) {
+	gl_draw_sprite(sprite, x - view.x, y - view.y, c);
+}
+
+/* printf-like function that draws to the screen, returns width of formatted string*/
 Pos gl_printf(const font_data& font, const Colour& colour, float x, float y,
 		const char *fmt, ...) {
 	char text[512];

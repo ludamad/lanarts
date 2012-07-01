@@ -160,7 +160,7 @@ obj_id GameInstSet::add_instance(GameInst* inst, int id) {
 
 	//TODO: cause a more descriptive error
 	if (id == 0 && inst->id != 0)
-		printf("Adding instance with id not 0!\n");
+		printf("Adding instance with id of %d; not 0!\n", inst->id);
 
 	inst->id = id ? id : (next_id++);
 	//Add an object with the assumption that this object does not currently exist (_noequal)

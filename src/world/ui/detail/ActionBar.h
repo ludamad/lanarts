@@ -1,6 +1,6 @@
 /*
  * ActionBar.h:
- *  Holds the contents of the action bar.
+ *  Handles drawing and state of the action bar.
  */
 
 #ifndef ACTIONBAR_H_

@@ -70,7 +70,6 @@ void GameState::init_game() {
 	time_t systime;
 	time(&systime);
 	int seed = systime;
-
 	init_lua_data(this, L);
 
 	if (settings.conntype == GameSettings::CLIENT) {

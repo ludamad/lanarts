@@ -31,7 +31,7 @@ struct EnemyGenSettings {
 };
 
 //Generate enemy monster after level generation
-void post_generate_enemy(GameState* gs, enemy_id etype, int amount = 1);
+void generate_enemy_after_level_creation(GameState* gs, enemy_id etype, int amount = 1);
 //Generates enemy monsters
 void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 		GeneratedLevel& level, GameState* gs);

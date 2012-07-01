@@ -210,7 +210,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 			printed.message_colour = Colour(255, 50, 50);
 		} else {
 			printed.message = std::string(rest) + " has spawned !";
-			post_generate_enemy(gs, enemy, amnt);
+			generate_enemy_after_level_creation(gs, enemy, amnt);
 			printed.message_colour = Colour(50, 255, 50);
 		}
 		add_message(printed);

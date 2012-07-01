@@ -56,7 +56,7 @@ static bool is_wieldable_projectile(Equipment& equipment, const Item& item) {
 	return equipment.valid_to_use(item);
 }
 
-void PlayerInst::queue_io_equipment_actions(GameState* gs) {
+void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 	GameView& view = gs->window_view();
 	bool mouse_within = gs->mouse_x() < gs->window_view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
@@ -102,14 +102,32 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs) {
 		bool pickup_io = gs->key_down_state(SDLK_LSHIFT)
 				|| gs->key_down_state(SDLK_RSHIFT);
 
-		if (wieldable_projectile || pickup_io || autopickup)
+		if (do_stopaction || wieldable_projectile || pickup_io || autopickup)
 			queued_actions.push_back(
 					GameAction(id, GameAction::PICKUP_ITEM, frame, level,
 							iteminst->id));
 	}
-
-	if (!item_used) {
-		gs->game_hud().handle_io(gs, queued_actions);
+}
+void PlayerInst::queue_io_movement_actions(GameState* gs, int& dx, int& dy) {
+	//Arrow/wasd movement
+	if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
+		dy -= 1;
+	}
+	if (gs->key_down_state(SDLK_RIGHT) || gs->key_down_state(SDLK_d)) {
+		dx += 1;
+	}
+	if (gs->key_down_state(SDLK_DOWN) || gs->key_down_state(SDLK_s)) {
+		dy += 1;
+	}
+	if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
+		dx -= 1;
+	}
+	if (dx != 0 || dy != 0) {
+		queued_actions.push_back(
+				game_action(gs, this, GameAction::MOVE, 0, dx, dy));
+		moving = true;
+	} else {
+		moving = false;
 	}
 }
 void PlayerInst::queue_io_actions(GameState* gs) {
@@ -120,7 +138,26 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 	bool mouse_within = gs->mouse_x() < gs->window_view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
+	/* If in stop-controls mode, perform some actions when movement has stopped */
+	bool stop_controls = gs->game_settings().stop_controls;
+	bool was_moving = moving, do_stopaction = false;
+
 	if (is_local_player()) {
+//Resting
+		bool resting = false;
+		if (gs->key_down_state(SDLK_r) && cooldowns().can_rest()) {
+			queued_actions.push_back(
+					GameAction(id, GameAction::USE_REST, frame, level));
+			resting = true;
+		}
+
+		if (!resting) {
+			queue_io_movement_actions(gs, dx, dy);
+			if (stop_controls && was_moving && !moving
+					&& cooldowns().can_do_stopaction()) {
+				do_stopaction = true;
+			}
+		}
 		//Shifting target
 		if (gs->key_press_state(SDLK_k)) {
 			gs->monster_controller().shift_target(gs);
@@ -139,52 +176,37 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 
 //		get_current_actions(gs->frame(), actions);
 
-//Resting
-		bool resting = false;
-		if (gs->key_down_state(SDLK_r) && cooldowns().can_rest()) {
-			queued_actions.push_back(
-					GameAction(id, GameAction::USE_REST, frame, level));
-			resting = true;
+		if (!resting) {
+			if (!gs->game_hud().handle_io(gs, queued_actions)) {
+				queue_io_spell_and_attack_actions(gs, dx, dy);
+				queue_io_equipment_actions(gs, do_stopaction);
+			}
 		}
 
 		if (!resting) {
-			queue_io_spell_and_attack_actions(gs, dx, dy);
-			queue_io_equipment_actions(gs);
-
-			if (gs->key_down_state(SDLK_PERIOD) || gs->mouse_downwheel()) {
+			if (do_stopaction || gs->key_down_state(SDLK_PERIOD)
+					|| gs->mouse_downwheel()) {
 				Pos hitsqr;
 				if (gs->tile_radius_test(x, y, RADIUS, false,
 						get_tile_by_name("stairs_down"), &hitsqr)) {
 					queued_actions.push_back(
 							GameAction(id, GameAction::USE_ENTRANCE, frame,
 									level));
+					cooldowns().reset_stopaction_timeout(50);
 				}
 			}
-			if (gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel()) {
+		}
+
+		if (!resting) {
+			if (do_stopaction || gs->key_down_state(SDLK_COMMA)
+					|| gs->mouse_upwheel()) {
 				Pos hitsqr;
 				if (gs->tile_radius_test(x, y, RADIUS, false,
 						get_tile_by_name("stairs_up"), &hitsqr)) {
 					queued_actions.push_back(
 							GameAction(id, GameAction::USE_EXIT, frame, level));
+					cooldowns().reset_stopaction_timeout(50);
 				}
-			}
-			//Arrow/wasd movement
-			if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
-				dy -= 1;
-			}
-			if (gs->key_down_state(SDLK_RIGHT) || gs->key_down_state(SDLK_d)) {
-				dx += 1;
-			}
-			if (gs->key_down_state(SDLK_DOWN) || gs->key_down_state(SDLK_s)) {
-				dy += 1;
-			}
-			if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
-				dx -= 1;
-			}
-			if (dx != 0 || dy != 0) {
-				queued_actions.push_back(
-						GameAction(id, GameAction::MOVE, frame, level, 0, dx,
-								dy));
 			}
 		}
 

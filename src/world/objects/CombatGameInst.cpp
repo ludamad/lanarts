@@ -176,16 +176,14 @@ void CombatGameInst::equip(item_id item, int amnt) {
 void CombatGameInst::init(GameState* gs) {
 	estats = stats().effective_stats_without_atk(gs);
 }
-
-void CombatGameInst::attempt_move_to_position(GameState *gs, float& newx,
+void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 		float& newy) {
 	const float ROUNDING_MULTIPLE = 65536.0f;
 
 	float dx = newx - rx, dy = newy - ry;
 	float dist = sqrt(dx * dx + dy * dy);
 
-	bool collided = gs->tile_radius_test(round(newx), round(newy), /*radius+4*/
-	20);
+	bool collided = gs->tile_radius_test(round(newx), round(newy), 20);
 
 	if (!collided) {
 		rx = newx, ry = newy;
@@ -193,8 +191,8 @@ void CombatGameInst::attempt_move_to_position(GameState *gs, float& newx,
 		float nx = round(rx + vx), ny = round(ry + vy);
 		bool collided = gs->tile_radius_test(nx, ny, radius);
 		if (collided) {
-			bool hitsx = gs->tile_radius_test(nx, y, radius, true, -1);
-			bool hitsy = gs->tile_radius_test(x, ny, radius, true, -1);
+			bool hitsx = gs->tile_radius_test(nx, y, radius);
+			bool hitsy = gs->tile_radius_test(x, ny, radius);
 			if (hitsy || hitsx || collided) {
 				if (hitsx) {
 					vx = 0;

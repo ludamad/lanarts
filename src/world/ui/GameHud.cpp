@@ -43,7 +43,7 @@ BBox GameHud::minimap_bbox(GameState* gs) {
 
 void GameHud::step(GameState *gs) {
 	action_bar.step(gs);
-	navigation.step(gs);
+	sidebar.step(gs);
 }
 
 bool GameHud::handle_io(GameState* gs, ActionQueue& queued_actions) {
@@ -89,25 +89,15 @@ void GameHud::draw(GameState* gs) {
 	gl_set_drawing_area(sidebar_box.x1, sidebar_box.y1, width(), height());
 	gl_draw_rectangle(0, 0, width(), height(), bg_colour);
 
-	PlayerInst* player_inst = (PlayerInst*) gs->get_instance(
+	PlayerInst* player_inst = (PlayerInst*)gs->get_instance(
 			gs->local_playerid());
 	if (!player_inst)
 		return;
 
 	gl_set_drawing_area(0, 0, sidebar_box.x2, sidebar_box.y2);
 
-	int inv_w = width(), inv_h = height() - sidebar_box.y1 - TILE_SIZE;
-	navigation.draw(gs);
 	sidebar.draw(gs);
 	action_bar.draw(gs);
-}
-
-static BBox content_area_box(const BBox& sidebar_box) {
-	const int CONTENT_AREA_Y = 342;
-	const int CONTENT_ROWS = 8;
-	int sx = sidebar_box.x1, sy = sidebar_box.y1 + CONTENT_AREA_Y;
-	int ex = sidebar_box.x2, ey = sy + CONTENT_ROWS * TILE_SIZE;
-	return BBox(sx, sy, ex, ey);
 }
 
 static BBox action_bar_area(const BBox& view_box) {
@@ -115,12 +105,15 @@ static BBox action_bar_area(const BBox& view_box) {
 }
 
 GameHud::GameHud(const BBox& sidebar_box, const BBox& view_box) :
-		sidebar(sidebar_box), navigation(sidebar_box,
-				content_area_box(sidebar_box)), action_bar(
-				action_bar_area(view_box)), sidebar_box(sidebar_box), view_box(
-				view_box), bg_colour(0, 0, 0), minimap_arr(NULL) {
-	item_slot_selected = -1;
+		sidebar(sidebar_box), action_bar(action_bar_area(view_box)), sidebar_box(
+				sidebar_box), view_box(view_box), bg_colour(0, 0, 0), minimap_arr(
+				NULL) {
 }
 GameHud::~GameHud() {
 	delete[] minimap_arr;
 }
+
+void GameHud::reset_slot_selected() {
+	sidebar.reset_slot_selected();
+}
+

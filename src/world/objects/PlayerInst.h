@@ -23,7 +23,7 @@
 #include "CombatGameInst.h"
 #include "GameInst.h"
 
-const int REST_COOLDOWN = 300;
+const int REST_COOLDOWN = 200;
 
 class PlayerInst: public CombatGameInst {
 public:
@@ -33,7 +33,7 @@ public:
 	PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y,
 			bool local = true) :
 			CombatGameInst(stats, sprite, 0, x, y, RADIUS, true, DEPTH), fieldofview(
-					LINEOFSIGHT), local(local), money(0), lives(0), spellselect(
+					LINEOFSIGHT), local(local), moving(0), money(0), lives(0), spellselect(
 					0) {
 	}
 
@@ -49,8 +49,9 @@ public:
 	void gain_xp(GameState* gs, int xp);
 
 	void queue_io_actions(GameState* gs);
+	void queue_io_movement_actions(GameState* gs, int& dx, int& dy);
 	void queue_io_spell_and_attack_actions(GameState* gs, float dx, float dy);
-	void queue_io_equipment_actions(GameState* gs);
+	void queue_io_equipment_actions(GameState* gs, bool do_stop_action);
 	void queue_network_actions(GameState* gs);
 
 	void perform_queued_actions(GameState* gs);
@@ -101,8 +102,7 @@ private:
 	/* Members */
 	ActionQueue queued_actions;
 	fov fieldofview;
-	bool didstep;
-	bool local;
+	bool didstep, local, moving;
 
 	int money, lives;
 	int spellselect;

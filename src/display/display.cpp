@@ -1,8 +1,6 @@
 /*
- * Display.cpp
- *
- *  Created on: Jun 8, 2011
- *      Author: 100397561
+ * display.cpp:
+ *  Core image drawing and display functions
  */
 
 #include <cstdlib>

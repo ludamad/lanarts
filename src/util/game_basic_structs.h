@@ -43,7 +43,7 @@ struct BBox {
 		LANARTS_ASSERT(x1 <= x2 && y1 <= y2);
 	}
 	bool contains(int x, int y) const {
-		return x >= x1 && x1 < x2 && y >= y1 && y < y2;
+		return x >= x1 && x < x2 && y >= y1 && y < y2;
 	}
 	int width() const {
 		return x2 - x1;

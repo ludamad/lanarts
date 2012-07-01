@@ -89,10 +89,6 @@ void Sidebar::draw(GameState* gs) {
 
 	PlayerInst* p = gs->local_player();
 
-	if (!p) {
-		return;
-	}
-
 	minimap.draw(gs, 1.0f);
 	navigator.draw(gs);
 	draw_player_base_stats(gs, p, sidebar_bounds.x1, sidebar_bounds.y1,

@@ -76,6 +76,8 @@ protected:
 	sprite_id spriteid;
 //	PathInfo path;
 private:
+	void ensure_valid_direction(GameState* gs, float speed);
+
 	CombatStats base_stats;
 	EffectiveStats estats;
 };
