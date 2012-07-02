@@ -170,8 +170,7 @@ void ProjectileInst::step(GameState* gs) {
 				GameInst* enemy = gs->get_instance(mid);
 				if (enemy && enemy != colobj) {
 
-					int dx = enemy->x - x, dy = enemy->y - y;
-					double abs = sqrt(dx * dx + dy * dy);
+					float abs = distance_between(Pos(x,y), Pos(enemy->x, enemy->y));
 					if (abs < 1)
 						abs = 1;
 					if (abs < mindist) {

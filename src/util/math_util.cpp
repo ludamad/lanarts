@@ -1,8 +1,6 @@
 /*
- * math_util.cpp
- *
- *  Created on: Apr 25, 2012
- *      Author: 100397561
+ * math_util.cpp:
+ *  Defines utility functions for things such as vector normalization, rounding to powers of two, etc
  */
 
 #include "math_util.h"

@@ -196,7 +196,7 @@ void PathInfo::interpolated_direction(int x, int y, int w, int h, float speed,
 			}
 		}
 	}
-	float mag = sqrt(acc_x * acc_x + acc_y * acc_y);
+	float mag = sqrt(float(acc_x * acc_x + acc_y * acc_y));
 	if (mag == 0) {
 		vx = 0, vy = 0;
 	} else {

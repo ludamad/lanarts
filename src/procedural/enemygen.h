@@ -1,8 +1,6 @@
 /*
- * enemygen.h
- *
- *  Created on: Mar 20, 2012
- *      Author: 100397561
+ * enemygen.h:
+ *  Enemy spawning routines
  */
 
 #ifndef ENEMYGEN_H_

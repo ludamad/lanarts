@@ -15,7 +15,7 @@
 #include "stats.h"
 
 struct lua_State;
-struct GameState;
+class GameState;
 
 /* Represents stats related to a single attack option */
 struct AttackStats {

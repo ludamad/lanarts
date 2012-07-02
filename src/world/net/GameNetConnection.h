@@ -11,7 +11,7 @@
 #include <net/packet.h>
 #include <vector>
 
-struct GameState;
+class GameState;
 
 class GameNetConnection {
 public:

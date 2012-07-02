@@ -221,7 +221,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 	//Set game speed
 	if (starts_with(command, "!gamespeed ", &content)) {
 		int gamespeed = squish(atoi(content), 1, 200);
-		gs->game_settings().steps_per_draw = gamespeed;
+		gs->game_settings().time_per_step = gamespeed;
 		printed.message = std::string("Game speed set.");
 		printed.message_colour = Colour(50, 255, 50);
 		add_message(printed);

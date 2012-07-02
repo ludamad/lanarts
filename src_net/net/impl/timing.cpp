@@ -1,6 +1,8 @@
 #include "../timing.h"
 
+#define BOOST_ALL_NO_LIB 1
 #include <boost/date_time/posix_time/posix_time.hpp>
+
 using namespace boost::posix_time;
 
 struct TimerImpl {

@@ -1,5 +1,5 @@
 /*
- * math_util.h
+ * math_util.h:
  *  Defines utility functions for things such as vector normalization, rounding to powers of two, etc
  */
 

@@ -1,6 +1,6 @@
 /*
- * tunnelgen.h
- * Tunnel generation algorithms
+ * tunnelgen.h:
+ *  Tunnel generation algorithms
  */
 
 #ifndef TUNNELGEN_H_

@@ -10,7 +10,7 @@
 
 class GameNetConnection;
 union SDL_Event;
-struct GameState;
+class GameState;
 class DialogBox;
 
 class GameDialogs {

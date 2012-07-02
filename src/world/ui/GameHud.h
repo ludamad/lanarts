@@ -23,7 +23,7 @@
 #include "detail/Sidebar.h"
 #include "detail/SidebarNavigator.h"
 
-struct PlayerInst;
+class PlayerInst;
 
 /* Component of GameState that draws statistic overview */
 class GameHud {

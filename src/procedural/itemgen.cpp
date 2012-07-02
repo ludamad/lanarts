@@ -1,8 +1,6 @@
 /*
- * itemgen.cpp
- *
- *  Created on: Mar 19, 2012
- *      Author: 100397561
+ * itemgen.cpp:
+ *  Defines parameters for item generation as well as the generate_items function
  */
 
 #include "itemgen.h"

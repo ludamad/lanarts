@@ -8,6 +8,12 @@
 #include <cassert>
 #include <cstdlib>
 
+//These file should be included if there are issues with Microsoft's compiler
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#define round(x) floor((x)+0.5f)
+#endif
+
 #define LANARTS_ASSERT(x) assert(x)
 
 /*Represents a Canadian colour*/

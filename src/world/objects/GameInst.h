@@ -15,7 +15,7 @@
 #include "../../util/LuaValue.h"
 
 struct lua_State;
-struct GameState;
+class GameState;
 //Base class for game instances
 
 class GameInst {

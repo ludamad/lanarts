@@ -9,10 +9,10 @@
 #include <cstdlib>
 #include "../util/game_basic_structs.h"
 
-struct GameState;
-struct GameLevelState;
-struct GeneratedLevel;
-struct PlayerInst;
+class GameState;
+class GameLevelState;
+class GeneratedLevel;
+class PlayerInst;
 
 class GameWorld {
 public:

@@ -119,70 +119,70 @@ static int process_string(const font_data& font, const char* text,
 
 	return largest_width;
 }
-
-/* General center printed function for others to delegate to */
-static Pos gl_print_centered(const font_data& font, const Colour& colour,
-		const Pos& p, const char* text, int max_width, bool center_text_x) {
-	int textlen = strlen(text);
-	for (int i = 0; i < textlen; i++)
-		if (text[i] == '\n')
-			text[i] = '\0';
-
-	std::vector<int> line_splits;
-
-	Pos offset(0, 0);
-	const char* iter = text;
-
-	int measured_width = process_string(font, text, max_width, line_splits);
-	Pos draw_pos(p.x - center_text_x ? measured_width / 2 : 0, p.y);
-
-	while (iter < text + textlen) {
-		int len = 0;
-		offset.y += font.h;
-		for (int i = 0; iter[i]; i++) {
-			unsigned char chr = iter[i];
-			char_data &cdata = *font.data[chr];
-			len += cdata.advance;
-			gl_draw_image(cdata.img, p.x + len - (cdata.advance - cdata.left),
-					p.y + offset.y - cdata.move_up, colour);
-		}
-		offset.x = std::max(len, offset.x);
-		offset.y += 1;
-
-		iter += strlen(iter) + 1;
-	}
-	return offset;
-}
-
-/* Most general gl_print function that the rest build on */
-static Pos gl_print_bounded(const font_data& font, const Colour& colour,
-		const BBox& bounds, const char* text) {
-	int textlen = strlen(text);
-	for (int i = 0; i < textlen; i++)
-		if (text[i] == '\n')
-			text[i] = '\0';
-
-	Pos offset(0, 0);
-	int len = 0;
-	const char* iter = text;
-	while (iter < text + textlen) {
-		int len = 0;
-		offset.y += font.h;
-		for (int i = 0; iter[i]; i++) {
-			unsigned char chr = iter[i];
-			char_data &cdata = *font.data[chr];
-			len += cdata.advance;
-			gl_draw_image(cdata.img,
-					bounds.x1 + len - (cdata.advance - cdata.left),
-					bounds.y1 + offset.y - cdata.move_up, colour);
-		}
-		offset.x = std::max(len, offset.x);
-		offset.y += 1;
-
-		iter += strlen(iter) + 1;
-	}
-	return offset;
-}
+//
+///* General center printed function for others to delegate to */
+//static Pos gl_print_centered(const font_data& font, const Colour& colour,
+//		const Pos& p, const char* text, int max_width, bool center_text_x) {
+//	int textlen = strlen(text);
+//	for (int i = 0; i < textlen; i++)
+//		if (text[i] == '\n')
+//			text[i] = '\0';
+//
+//	std::vector<int> line_splits;
+//
+//	Pos offset(0, 0);
+//	const char* iter = text;
+//
+//	int measured_width = process_string(font, text, max_width, line_splits);
+//	Pos draw_pos(p.x - center_text_x ? measured_width / 2 : 0, p.y);
+//
+//	while (iter < text + textlen) {
+//		int len = 0;
+//		offset.y += font.h;
+//		for (int i = 0; iter[i]; i++) {
+//			unsigned char chr = iter[i];
+//			char_data &cdata = *font.data[chr];
+//			len += cdata.advance;
+//			gl_draw_image(cdata.img, p.x + len - (cdata.advance - cdata.left),
+//					p.y + offset.y - cdata.move_up, colour);
+//		}
+//		offset.x = std::max(len, offset.x);
+//		offset.y += 1;
+//
+//		iter += strlen(iter) + 1;
+//	}
+//	return offset;
+//}
+//
+///* Most general gl_print function that the rest build on */
+//static Pos gl_print_bounded(const font_data& font, const Colour& colour,
+//		const BBox& bounds, const char* text) {
+//	int textlen = strlen(text);
+//	for (int i = 0; i < textlen; i++)
+//		if (text[i] == '\n')
+//			text[i] = '\0';
+//
+//	Pos offset(0, 0);
+//	int len = 0;
+//	const char* iter = text;
+//	while (iter < text + textlen) {
+//		int len = 0;
+//		offset.y += font.h;
+//		for (int i = 0; iter[i]; i++) {
+//			unsigned char chr = iter[i];
+//			char_data &cdata = *font.data[chr];
+//			len += cdata.advance;
+//			gl_draw_image(cdata.img,
+//					bounds.x1 + len - (cdata.advance - cdata.left),
+//					bounds.y1 + offset.y - cdata.move_up, colour);
+//		}
+//		offset.x = std::max(len, offset.x);
+//		offset.y += 1;
+//
+//		iter += strlen(iter) + 1;
+//	}
+//	return offset;
+//}
 
 void gl_draw_sprite_entry(const GameView& view, SpriteEntry& entry, int x,
 		int y, float dx, float dy, int steps, const Colour& c) {

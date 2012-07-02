@@ -1,8 +1,6 @@
 /*
- * tunnelgen.cpp
- *
- *  Created on: Mar 19, 2012
- *      Author: 100397561
+ * tunnelgen.cpp:
+ *  Tunnel generation algorithms
  */
 
 #include "tunnelgen.h"

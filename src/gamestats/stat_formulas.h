@@ -11,7 +11,7 @@ struct Attack;
 struct CombatStats;
 struct EffectiveAttackStats;
 struct EffectiveStats;
-struct GameState;
+class GameState;
 
 int damage_formula(const EffectiveAttackStats& attacker,
 		const EffectiveStats& defender);

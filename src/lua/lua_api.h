@@ -8,7 +8,7 @@
 #include "../util/game_basic_structs.h"
 
 struct lua_State;
-struct GameState;
+class GameState;
 struct ItemEntry;
 struct EffectEntry;
 struct CombatStats;

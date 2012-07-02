@@ -164,6 +164,7 @@ set( lanarts_include
 	
 	util/callback_util.h
 	util/game_basic_structs.h
+	util/gheap.h
 	util/hashset_util.h
 	util/math_util.h
 	util/mtwist.h

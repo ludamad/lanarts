@@ -30,7 +30,7 @@ public:
 		page_number--;
 	}
 	void goto_next_page() {
-		page_number--;
+		page_number++;
 	}
 
 	bool has_previous_page(GameState* gs) {

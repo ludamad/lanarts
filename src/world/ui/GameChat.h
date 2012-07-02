@@ -12,7 +12,7 @@
 #include <vector>
 #include "../../util/game_basic_structs.h"
 
-struct GameState;
+class GameState;
 struct font_data;
 struct NetPacket;
 

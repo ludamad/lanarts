@@ -1,5 +1,5 @@
 /*
- * itemgen.h
+ * itemgen.h:
  *  Defines parameters for item generation as well as the generate_items function
  */
 
