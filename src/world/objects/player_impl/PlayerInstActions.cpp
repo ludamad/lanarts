@@ -269,7 +269,8 @@ void PlayerInst::queue_network_actions(GameState *gs) {
 			GameAction action;
 			packet.get(action);
 			if (output1 && action.frame != gs->frame()) {
-				printf("action frame %d vs %d\n", action.frame, gs->frame());
+				fprintf(stderr, "action frame %d vs %d\n", action.frame, gs->frame());
+				fflush(stderr);
 				output1 = false;
 			}
 			queued_actions.push_front(action);

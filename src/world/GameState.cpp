@@ -94,16 +94,17 @@ void GameState::init_game() {
 				}
 			}
 		}
+		printf("NETWORK: Recieving seed=0x%X\n", seed);
 	} else if (settings.conntype == GameSettings::HOST) {
 		NetPacket packet;
 		packet.add_int(seed);
 		packet.encode_header();
 		connection.get_connection()->broadcast_packet(packet, true);
+		printf("NETWORK: Broadcasting seed=0x%X\n", seed);
 	}
 	printf("Seed used for RNG = 0x%X\n", seed);
 	mtwist.init_genrand(seed);
 	set_level(world.get_level(0, true));
-	get_level()->steps_left = 1000;
 
 	GameInst* p = get_instance(get_level()->pc.local_playerid());
 	window_view().sharp_center_on(p->x, p->y);
@@ -211,7 +212,7 @@ bool GameState::pre_step() {
 }
 void GameState::step() {
 	chat.step(this);
-	world.step(); //Has pointer to this object
+	world.step(); //Has pointer to this (GameState) object
 	lua_gc(L, LUA_GCSTEP, 0); // collect garbage incrementally
 }
 

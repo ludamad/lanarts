@@ -225,6 +225,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 		printed.message = std::string("Game speed set.");
 		printed.message_colour = Colour(50, 255, 50);
 		add_message(printed);
+		return true;
 	}
 
 	//Gain XP

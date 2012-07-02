@@ -34,8 +34,9 @@ bool GameNetConnection::check_integrity(GameState* gs, int value) {
 		NetPacket& p = packets[i];
 		int theirvalue = p.get_int();
 		if (theirvalue != value) {
-			printf("Conflicting value theirs %d vs ours %d for sender %d\n",
+			fprintf(stderr, "Conflicting value theirs 0x%X vs ours 0x%X for sender %d\n",
 					theirvalue, value, i);
+			fflush(stderr);
 			return false;
 		}
 	}
