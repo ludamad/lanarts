@@ -5,8 +5,6 @@
 
 #include <algorithm>
 
-#include <vld.h>
-
 #include "../data/tile_data.h"
 
 #include "../util/gheap.h"
