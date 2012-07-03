@@ -35,6 +35,8 @@ public:
 	virtual void draw(GameState* gs);
 	virtual void copy_to(GameInst* inst) const = 0;
 	virtual GameInst* clone() const = 0;
+	//Used for integrity checking
+	virtual unsigned int integrity_hash();
 
 	BBox bbox() {
 		return BBox(x - radius, y - radius, x + radius, y + radius);

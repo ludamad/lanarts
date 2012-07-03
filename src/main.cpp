@@ -57,7 +57,6 @@ static const char HELP_TEXT[] = "Movement: WASD or Arrow Keys\n"
 		"Use Item: click item or keys 1 through 9\n"
 		"Use Stairs: < and > or mouse wheel\n"
 		"Regenerate: Hold 'r'\n";
-
 static void menu_loop(GameState* gs, int width, int height) {
 	bool exit = false;
 	int halfw = width / 2;
@@ -88,6 +87,7 @@ static void menu_loop(GameState* gs, int width, int height) {
 	gs->set_level(oldlevel);
 	gs->window_view() = prevview;
 }
+
 
 static void game_loop(GameState* gs) {
 

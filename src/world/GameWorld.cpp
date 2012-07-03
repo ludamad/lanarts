@@ -120,6 +120,31 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer,
 	return level_states[roomid];
 }
 
+static bool check_level_is_in_sync(GameState* gs, GameLevelState* level) {
+	if (level->level_number == -1 || !level->pc.has_player()
+			|| !gs->net_connection().get_connection()) {
+		return true;
+	}
+
+	int hash_value = level->inst_set.hash();
+
+//	printf("NETWORK: Checking integrity hash=0x%X\n", prehashvalue);
+//	fflush(stdout);
+	if (!gs->net_connection().check_integrity(gs, hash_value)) {
+		std::vector<GameInst*> instances = level->inst_set.to_vector();
+		for (int i = 0; i < instances.size(); i++) {
+			if (gs->net_connection().check_integrity(gs,
+					instances[i]->integrity_hash())) {
+				GameInst* inst = instances[i];
+				printf("Hashes don't match for instance %d!", inst->id);
+			}
+		}
+		printf("Hashes don't match before step, frame %d, level %d\n",
+				gs->frame(), level->level_number);
+		return false;
+	}
+	return true;
+}
 bool GameWorld::pre_step() {
 	if (!game_state->update_iostate())
 		return false;
@@ -127,14 +152,20 @@ bool GameWorld::pre_step() {
 	GameLevelState* current_level = game_state->get_level();
 
 	midstep = true;
-	game_state->frame()++;
+
+	/* Check level sync states */
+	for (int i = 0; i < level_states.size(); i++) {
+		check_level_is_in_sync(game_state, level_states[i]);
+	}
+
 	/* Queue actions for each player */
-	for
-(	int i = 0; i < level_states.size(); i++) {
+	for (int i = 0; i < level_states.size(); i++) {
 		game_state->set_level(level_states[i]);
-		const std::vector<obj_id>& player_ids = game_state->get_level()->pc.player_ids();
+		const std::vector<obj_id>& player_ids =
+				game_state->get_level()->pc.player_ids();
 		for (int i = 0; i < player_ids.size(); i++) {
-			PlayerInst* p = (PlayerInst*)game_state->get_instance(player_ids[i]);
+			PlayerInst* p = (PlayerInst*)game_state->get_instance(
+					player_ids[i]);
 			p->queue_io_actions(game_state);
 			p->performed_actions_for_step() = false;
 		}
@@ -149,7 +180,6 @@ void GameWorld::step() {
 	const int STEPS_TO_SIMULATE = 1000;
 	GameLevelState* current_level = game_state->get_level();
 
-	bool inmenu = (game_state->get_level()->level_number == -1);
 	midstep = true;
 
 	for (int i = 0; i < level_states.size(); i++) {
@@ -161,18 +191,6 @@ void GameWorld::step() {
 		}
 
 		if (level->steps_left > 0) {
-			int prehashvalue = game_state->get_level()->inst_set.hash();
-
-			if (!inmenu) {
-				printf("NETWORK: Checking integrity hash=%d\n", prehashvalue);
-				fflush(stdout);
-				if (!game_state->net_connection().check_integrity(game_state,
-						prehashvalue)) {
-					printf(
-							"Hashes don't match before step, frame %d, level %d\n",
-							game_state->frame(), i);
-				}
-			}
 			//Set so that all the GameState getters are properly updated
 			game_state->set_level(level);
 
@@ -194,15 +212,6 @@ void GameWorld::step() {
 //            delete clone;
 
 //
-			int posthashvalue = level->inst_set.hash();
-			if (!inmenu
-					&& !game_state->net_connection().check_integrity(game_state,
-							posthashvalue)) {
-				fprintf(stderr,
-						"Hashes don't match after step, frame %d, level %d\n",
-						game_state->frame(), i);
-				fflush(stderr);
-			}
 		}
 	}
 	game_state->set_level(current_level);
@@ -254,17 +263,18 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 
 	CombatGameInst* inst = (CombatGameInst*)game_state->get_instance(id);
 
-	Pos hitsqr;
 	if (!inst)
 		return;
+
 	game_state->remove_instance(inst, false); // Remove but do not deallocate
 	inst->last_x = x, inst->last_y = y;
 	inst->update_position(x, y);
 
 	game_state->set_level(get_level(roomid2));
 	game_state->add_instance(inst);
-
+	//restore the level context
 	game_state->set_level(last);
+
 	PlayerInst* p;
 	if ((p = dynamic_cast<PlayerInst*>(inst)) && p->is_local_player()) {
 		set_current_level_lazy(roomid2);

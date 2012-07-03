@@ -226,8 +226,8 @@ unsigned int GameInstSet::hash() const {
 	for (int i = 0; i < as_vector.size(); i++) {
 		GameInst* inst = as_vector[i];
 		if (!dynamic_cast<AnimatedInst*>(inst)) {
-			hash ^= ((inst->x) << 16) + inst->y;
-			hash *= 31337;
+			hash ^= inst->integrity_hash();
+			hash ^= hash * 31337;//Ad hoc hashing yay
 		}
 	}
 	return hash;

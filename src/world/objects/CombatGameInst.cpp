@@ -233,6 +233,33 @@ void CombatGameInst::update_position(float newx, float newy) {
 SpellsKnown& CombatGameInst::spells_known() {
 	return stats().spells;
 }
+static void combine_hash(unsigned int& hash, unsigned int val1, unsigned val2) {
+	hash ^= (hash >> 11) * val1;
+	hash ^= val1;
+	hash ^= (hash >> 11) * val2;
+	hash ^= val2;
+	hash ^= hash << 11;
+}
+static void combine_stat_hash(unsigned int& hash, CombatStats& stats) {
+	ClassStats& cstats = stats.class_stats;
+	CoreStats& core = stats.core;
+	Inventory& inventory = stats.equipment.inventory;
+
+	combine_hash(hash, core.hp, core.max_hp);
+	combine_hash(hash, core.mp, core.max_mp);
+	combine_hash(hash, cstats.xp, cstats.classid);
+	for (int i = 0; i < inventory.size(); i++) {
+		if (inventory.slot_filled(i)) {
+			ItemSlot& slot = inventory.get(i);
+			combine_hash(hash, slot.amount, slot.item.id);
+		}
+	}
+}
+unsigned int CombatGameInst::integrity_hash() {
+	unsigned int hash = GameInst::integrity_hash();
+	combine_stat_hash(hash, stats());
+	return hash;
+}
 
 team_id& CombatGameInst::team() {
 	return teamid;

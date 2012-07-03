@@ -25,6 +25,15 @@ void GameInst::deinit(GameState* gs){
 	id = 0;
 }
 
+unsigned int GameInst::integrity_hash(){
+	unsigned int hash = 0x9a3e;
+	hash ^= (x << 16) + y;
+	hash ^= this->radius * hash;
+	return hash;
+}
+
+
+
 //Probably safer to force all implementations to define their own copy_to function
 //void GameInst::copy_to(GameInst *inst){
 //	LANARTS_ASSERT(typeid(*this) == typeid(*inst));

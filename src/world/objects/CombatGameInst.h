@@ -37,6 +37,8 @@ public:
 	virtual void update_field_of_view();
 	virtual bool within_field_of_view(const Pos& pos) =0;
 
+	virtual unsigned int integrity_hash();
+
 	void attempt_move_to_position(GameState* gs, float& newx, float& newy);
 	//update based on rounding of true float
 	void update_position();
