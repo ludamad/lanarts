@@ -59,12 +59,13 @@ void gl_draw_rectangle(int x, int y, int w, int h, const Colour& clr) {
 	glEnd();
 }
 
-void gl_draw_statbar(int x, int y, int w, int h, int minstat, int maxstat,
+void gl_draw_statbar(const BBox& bbox, int minstat, int maxstat,
 		const Colour& front, const Colour& back) {
-	int hp_width = (w * minstat) / maxstat;
-	gl_draw_rectangle(x, y, w, h, back);
-	if (hp_width > 0)
-		gl_draw_rectangle(x, y, hp_width, h, front);
+	int bar_width = (bbox.width() * minstat) / maxstat;
+	gl_draw_rectangle(bbox.x1, bbox.y1, bbox.width(), bbox.height(), back);
+	if (bar_width > 0) {
+		gl_draw_rectangle(bbox.x1, bbox.y1, bar_width, bbox.height(), front);
+	}
 }
 void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 		char* flags, const Colour& clr) {
@@ -107,52 +108,56 @@ static int process_string(const font_data& font, const char* text,
 			width_since_space = 0;
 		}
 
-		if (max_width != -1 && width > max_width) {
+		bool overmax = max_width != -1 && width > max_width;
+		if (c == '\n' || overmax) {
 			line_splits.push_back(last_space);
 			largest_width = std::max(width, largest_width);
 			width = width_since_space;
 		}
 		ind++;
 	}
+	line_splits.push_back(ind);
 
 	largest_width = std::max(width, largest_width);
 
 	return largest_width;
 }
 //
-///* General center printed function for others to delegate to */
-//static Pos gl_print_centered(const font_data& font, const Colour& colour,
-//		const Pos& p, const char* text, int max_width, bool center_text_x) {
-//	int textlen = strlen(text);
-//	for (int i = 0; i < textlen; i++)
-//		if (text[i] == '\n')
-//			text[i] = '\0';
-//
-//	std::vector<int> line_splits;
-//
-//	Pos offset(0, 0);
-//	const char* iter = text;
-//
-//	int measured_width = process_string(font, text, max_width, line_splits);
-//	Pos draw_pos(p.x - center_text_x ? measured_width / 2 : 0, p.y);
-//
-//	while (iter < text + textlen) {
-//		int len = 0;
-//		offset.y += font.h;
-//		for (int i = 0; iter[i]; i++) {
-//			unsigned char chr = iter[i];
-//			char_data &cdata = *font.data[chr];
-//			len += cdata.advance;
-//			gl_draw_image(cdata.img, p.x + len - (cdata.advance - cdata.left),
-//					p.y + offset.y - cdata.move_up, colour);
-//		}
-//		offset.x = std::max(len, offset.x);
-//		offset.y += 1;
-//
-//		iter += strlen(iter) + 1;
-//	}
-//	return offset;
-//}
+/* General gl_print function for others to delegate to */
+static Pos gl_print_impl(const font_data& font, const Colour& colour, Pos p,
+		const char* text, int max_width, bool center_text) {
+
+	Pos offset(0, 0);
+
+	std::vector<int> line_splits;
+	int measured_width = process_string(font, text, max_width, line_splits);
+
+	if (center_text) {
+		p.x -= measured_width / 2;
+		p.y -= font.h / 2;
+	}
+
+	for (int linenum = 0, i = 0; linenum < line_splits.size(); linenum++) {
+		int len = 0;
+		int eol = line_splits[linenum];
+
+		offset.y += font.h;
+
+		for (; i < eol; i++) {
+			unsigned char chr = text[i];
+			if (chr == '\n') {
+				continue; //skip newline char
+			}
+			char_data &cdata = *font.data[chr];
+			len += cdata.advance;
+			gl_draw_image(cdata.img, p.x + len - (cdata.advance - cdata.left),
+					p.y + offset.y - cdata.move_up, colour);
+		}
+		offset.x = std::max(len, offset.x);
+		offset.y += 1;
+	}
+	return offset;
+}
 //
 ///* Most general gl_print function that the rest build on */
 //static Pos gl_print_bounded(const font_data& font, const Colour& colour,
@@ -210,41 +215,43 @@ void gl_draw_sprite(sprite_id sprite, const GameView& view, int x, int y,
 	gl_draw_sprite(sprite, x - view.x, y - view.y, c);
 }
 
-/* printf-like function that draws to the screen, returns width of formatted string*/
+#ifndef __GNUC__
+#define vsnprintf(text, len, fmt, ap) vsprintf(text, fmt, ap)
+#endif
+
+/* printf-like function that draws to the screen, returns dimensions of formatted string*/
 Pos gl_printf(const font_data& font, const Colour& colour, float x, float y,
 		const char *fmt, ...) {
 	char text[512];
 	va_list ap;
-
 	va_start(ap, fmt);
-#ifdef __GNUC__
 	vsnprintf(text, 512, fmt, ap);
-#else
-	//TODO, add visual studio #if block
-	vsprintf(text, fmt, ap);
-#endif
 	va_end(ap);
 
-	int textlen = strlen(text);
-	for (int i = 0; i < textlen; i++)
-		if (text[i] == '\n')
-			text[i] = '\0';
-	Pos offset(0, 0);
-	int len = 0;
-	for (char* iter = text; iter < text + textlen;
-			iter += strlen(iter) + 1, len = 0) {
-		offset.y += font.h;
-		for (int i = 0; iter[i]; i++) {
-			unsigned char chr = iter[i];
-			char_data &cdata = *font.data[chr];
-			len += cdata.advance;
-			offset.x = std::max(len, offset.x);
-			gl_draw_image(cdata.img, x + len - (cdata.advance - cdata.left),
-					y + offset.y - cdata.move_up, colour);
-		}
-		offset.y += 1;
-	}
-	return offset;
+	return gl_print_impl(font, colour, Pos(x, y), text, -1, false);
+}
+
+/* printf-like function that draws to the screen, returns width of formatted string*/
+Pos gl_printf_bounded(const font_data& font, const Colour& colour, float x,
+		float y, int max_width, const char *fmt, ...) {
+	char text[512];
+	va_list ap;
+	va_start(ap, fmt);
+	vsnprintf(text, 512, fmt, ap);
+	va_end(ap);
+
+	return gl_print_impl(font, colour, Pos(x, y), text, max_width, false);
+}
+/* printf-like function that draws to the screen, returns width of formatted string*/
+Pos gl_printf_centered(const font_data& font, const Colour& colour, float x,
+		float y, const char *fmt, ...) {
+	char text[512];
+	va_list ap;
+	va_start(ap, fmt);
+	vsnprintf(text, 512, fmt, ap);
+	va_end(ap);
+
+	return gl_print_impl(font, colour, Pos(x, y), text, -1, true);
 }
 
 void gl_draw_circle(const GameView& view, float x, float y, float radius,
@@ -298,9 +305,9 @@ void gl_draw_line(int x1, int y1, int x2, int y2, const Colour& clr,
 		glLineWidth(1);
 }
 
-void gl_draw_statbar(const GameView& view, int x, int y, int w, int h,
+void gl_draw_statbar(const GameView& view, const BBox& bbox,
 		int min_stat, int max_stat, const Colour& front, const Colour& back) {
-	gl_draw_statbar(x - view.x, y - view.y, w, h, min_stat, max_stat, front,
+	gl_draw_statbar(bbox.translated(-view.x, -view.y), min_stat, max_stat, front,
 			back);
 }
 

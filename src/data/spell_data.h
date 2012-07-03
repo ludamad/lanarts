@@ -15,7 +15,7 @@
 #include "../util/LuaValue.h"
 
 struct SpellEntry {
-	std::string name;
+	std::string name, description;
 	sprite_id sprite;
 	LuaValue action; //Immediate action
 	Projectile projectile; //Projectile used, if any

@@ -41,6 +41,7 @@ EnemyInst::EnemyInst(int enemytype, int x, int y) :
 }
 
 EnemyInst::~EnemyInst() {
+
 }
 
 static void combine_hash(unsigned int& hash, unsigned int val1, unsigned val2) {

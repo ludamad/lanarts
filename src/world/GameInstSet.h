@@ -1,9 +1,12 @@
 /**
  * GameInstSet.h:
  *  Collection class that keeps track of game objects and assigns instance-id's.
- * Deallocates destroyed objects at end of step.
- * Use instance IDs to refer to objects that may or may not still be alive.
+ *  Releases reference to destroyed objects at end of step.
+ *  Use instance IDs to refer to objects that may or may not still be alive.
+ *  Use GameInstRef to objects that -must- be kept undeleted.
+ *  The object may still be removed from the game world.
  */
+
 #ifndef GAMEINSTSET_H_
 #define GAMEINSTSET_H_
 
@@ -27,7 +30,7 @@ public:
 	//The main part of the API:
 	/*Add an instance, optionally specifying its id*/
 	obj_id add_instance(GameInst* inst, int id = 0);
-	void remove_instance(GameInst* inst, bool deallocate = true);
+	void remove_instance(GameInst* inst);
 	void step(GameState* state);
 
 	//Returns NULL if no unit found
@@ -84,21 +87,26 @@ private:
 
 	typedef std::map<int, InstanceLinkedList> DepthMap;
 
-	//Internal Data:
-	//Map to the first object of a certain depth
+	/* Internal Data */
+
+	// Map to the first object of a certain depth
 	DepthMap depthlist_map;
-	//Destroyed objects marked for deletion
+
+	// Destroyed objects marked for reference release
+	// This will typically result in object deletion
+	// unless additional references are retained to it
 	std::vector<GameInst*> deallocation_list;
-	//Hashset portion
+
+	// Hashset portion
 	int next_id, unit_amnt, unit_capacity;
 	InstanceState* unit_set;
 
-	//Grid portion
+	// Grid portion
 	int grid_w, grid_h;
 	//Holds units IDs, 0 if empty
 	InstanceLinkedList* unit_grid;
 
-	//Internal structure upkeep functions
+	// Internal structure upkeep functions
 	void __remove_instance(InstanceState* state);
 	void __update_collision_position(InstanceState* state, const Pos& p1, const Pos& p2);
 	void reallocate_internal_data();
@@ -114,6 +122,7 @@ private:
 	void remove_from_collisionlist(InstanceState* inst,
 			InstanceLinkedList& list);
 
+	/* Integrity check */
 	bool within_bounds_check(const Pos& c);
 
 	//Used to allow access to internal data/functions for our hash set implementation utility class

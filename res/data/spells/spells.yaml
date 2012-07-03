@@ -2,11 +2,13 @@
 spells:
 
   - name: Fire Bolt
+    description: Basic fire attack spell
     mp_cost: 10
     spr_spell: fire bolt
     projectile: Fire Bolt
 
   - name: Magic Blast
+    description: Bounces off multiple targets
     mp_cost: 20
     spr_spell: magic blast
     projectile: Magic Blast

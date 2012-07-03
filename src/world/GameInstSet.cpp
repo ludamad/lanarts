@@ -1,9 +1,12 @@
-/*
- * GameInstSet.cpp
- *
- *  Created on: Jun 28, 2011
- *      Author: 100397561
+/**
+ * GameInstSet.cpp:
+ *  Collection class that keeps track of game objects and assigns instance-id's.
+ *  Releases reference to destroyed objects at end of step.
+ *  Use instance IDs to refer to objects that may or may not still be alive.
+ *  Use GameInstRef to objects that -must- be kept undeleted.
+ *  The object may still be removed from the game world.
  */
+
 #include <cstring>
 #include <cstdio>
 #include <typeinfo>
@@ -14,7 +17,7 @@
 
 #include "utility_objects/AnimatedInst.h"
 
-GameInst* const GAMEINST_TOMBSTONE = (GameInst*)1;
+GameInst* const GAMEINST_TOMBSTONE = (GameInst*) 1;
 
 static bool valid_inst(GameInst* inst) {
 	return inst > GAMEINST_TOMBSTONE;
@@ -64,13 +67,13 @@ struct GameInstSetFunctions { //Helper class
 		return v1.inst == v2.inst;
 	}
 	static size_t hash(const V& v) {
-		return (size_t)v.inst->id;
+		return (size_t) v.inst->id;
 	}
 	static size_t hash(GameInst* inst) {
-		return (size_t)inst->id;
+		return (size_t) inst->id;
 	}
 	static size_t hash(obj_id id) {
-		return (size_t)id;
+		return (size_t) id;
 	}
 };
 
@@ -133,16 +136,14 @@ void GameInstSet::__remove_instance(InstanceState* state) {
 	this->unit_amnt--;
 	state->inst = GAMEINST_TOMBSTONE;
 }
-void GameInstSet::remove_instance(GameInst* inst, bool deallocate) {
+void GameInstSet::remove_instance(GameInst* inst) {
 	if (inst->destroyed)
 		return;
 	inst->destroyed = true;
 	InstanceState* state = tset_find<GameInstSetFunctions>(inst->id, unit_set,
 			unit_capacity);
 	__remove_instance(state);
-	if (deallocate) {
-		deallocation_list.push_back(inst);
-	}
+	deallocation_list.push_back(inst);
 }
 
 bool GameInstSet::within_bounds_check(const Pos& c) {
@@ -158,9 +159,10 @@ obj_id GameInstSet::add_instance(GameInst* inst, int id) {
 	//Will be set to the current state object in 'add'
 	InstanceState* state = unit_set;
 
-	//TODO: cause a more descriptive error
-	if (id == 0 && inst->id != 0)
-		printf("Adding instance with id of %d; not 0!\n", inst->id);
+	if (id == 0 && inst->id != 0) {
+		fprintf(stderr, "Adding instance with id of %d; not 0!\n", inst->id);
+		LANARTS_ASSERT(false);
+	}
 
 	inst->id = id ? id : (next_id++);
 	//Add an object with the assumption that this object does not currently exist (_noequal)
@@ -174,12 +176,14 @@ obj_id GameInstSet::add_instance(GameInst* inst, int id) {
 	}
 	add_to_depthlist(state, depthlist_map[inst->depth]);
 
+	inst->retain_reference();
+
 	return inst->id;
 }
 
 void GameInstSet::step(GameState* gs) {
 	for (int i = 0; i < deallocation_list.size(); i++) {
-		delete deallocation_list[i];
+		deallocation_list[i]->free_reference();
 	}
 	deallocation_list.clear();
 	for (int i = 0; i < unit_capacity; i++) {
@@ -227,7 +231,7 @@ unsigned int GameInstSet::hash() const {
 		GameInst* inst = as_vector[i];
 		if (!dynamic_cast<AnimatedInst*>(inst)) {
 			hash ^= inst->integrity_hash();
-			hash ^= hash * 31337;//Ad hoc hashing yay
+			hash ^= hash * 31337; //Ad hoc hashing yay
 		}
 	}
 	return hash;

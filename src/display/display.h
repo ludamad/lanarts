@@ -53,10 +53,10 @@ void gl_draw_rectangle_outline(int x, int y, int w, int h, const Colour& clr =
 void gl_draw_line(int x1, int y1, int x2, int y2,
 		const Colour& clr = Colour(255, 255, 255), int linewidth = 1);
 
-void gl_draw_statbar(int x, int y, int w, int h, int min_stat, int max_stat,
+void gl_draw_statbar(const BBox& bbox, int min_stat, int max_stat,
 		const Colour& front = Colour(0, 255, 0),
 		const Colour& back = Colour(255, 0, 0));
-void gl_draw_statbar(const GameView& view, int x, int y, int w, int h,
+void gl_draw_statbar(const GameView& view, const BBox& bbox,
 		int min_stat, int max_stat, const Colour& front = Colour(0, 255, 0),
 		const Colour& back = Colour(255, 0, 0));
 
@@ -66,6 +66,11 @@ void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 //Will print out text at window coordinates x,y, using the font ft_font.
 //The current modelview matrix will also be applied to the text.
 Pos gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
+		const char *fmt, ...);
+Pos gl_printf_bounded(const font_data& font, const Colour& colour, float x, float y, int max_width,
+		const char *fmt, ...);
+/* printf-like function that draws to the screen, returns width of formatted string*/
+Pos gl_printf_centered(const font_data& font, const Colour& colour, float x, float y,
 		const char *fmt, ...);
 
 #endif /* DISPLAY_H_ */

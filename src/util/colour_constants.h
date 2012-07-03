@@ -10,7 +10,10 @@
 
 /* Colours */
 const Colour YELLOW(255, 255, 0);
-const Colour RED(255, 50, 50);
+const Colour LIGHT_RED(255, 50, 50);
+const Colour RED(255, 0, 0);
+const Colour GREEN(0, 255, 0);
+const Colour BLUE(0, 0, 255);
 const Colour GOLD(255, 215, 0);
 const Colour PALE_YELLOW(255, 250, 150);
 const Colour MEDIUM_PURPLE(123,104,238);

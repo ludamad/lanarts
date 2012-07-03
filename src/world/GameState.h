@@ -53,7 +53,7 @@ public:
 	/* Instance retrieval and removal functions */
 	GameInst* get_instance(obj_id id);
 	obj_id add_instance(GameInst* inst);
-	void remove_instance(GameInst* inst, bool deallocate = true);
+	void remove_instance(GameInst* inst);
 	//Skip an instance id as if we were making an instance
 	//used for synchronization purposes in network play
 	void skip_next_instance_id();

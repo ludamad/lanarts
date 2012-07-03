@@ -8,11 +8,18 @@ using namespace std;
 void load_armour_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	ArmourEntry entry;
-	entry.damage_reduction = parse_defaulted(node, "reduction", CoreStatMultiplier());
-	entry.resistance = parse_defaulted(node, "resistance", CoreStatMultiplier());
-	entry.magic_reduction = parse_defaulted(node, "magic_reduction", CoreStatMultiplier());
-	entry.magic_resistance = parse_defaulted(node, "magic_resistance", CoreStatMultiplier());
-	entry.spell_cooldown_multiplier = parse_defaulted(node, "spell_cooldown_multiplier", 1.0f);
+	entry.name = parse_str(node["name"]);
+	entry.description = parse_defaulted(node, "description", std::string());
+	entry.damage_reduction = parse_defaulted(node, "reduction",
+			CoreStatMultiplier());
+	entry.resistance = parse_defaulted(node, "resistance",
+			CoreStatMultiplier());
+	entry.magic_reduction = parse_defaulted(node, "magic_reduction",
+			CoreStatMultiplier());
+	entry.magic_resistance = parse_defaulted(node, "magic_resistance",
+			CoreStatMultiplier());
+	entry.spell_cooldown_multiplier = parse_defaulted(node,
+			"spell_cooldown_multiplier", 1.0f);
 	entry.item_sprite = parse_sprite_number(node, "spr_item");
 
 	game_armour_data.push_back(entry);
@@ -35,7 +42,7 @@ void load_armour_item_entries() {
 		ArmourEntry& entry = game_armour_data[i];
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
 		game_item_data.push_back(
-				ItemEntry(entry.name, "", default_radius, entry.item_sprite,
+				ItemEntry(entry.name, entry.description, "", default_radius, entry.item_sprite,
 						"equip", "", false, entry.equiptype, i));
 	}
 }

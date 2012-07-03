@@ -292,8 +292,8 @@ obj_id GameState::add_instance(GameInst *inst) {
 	return id;
 }
 
-void GameState::remove_instance(GameInst* inst, bool deallocate) {
-	get_level()->inst_set.remove_instance(inst, deallocate);
+void GameState::remove_instance(GameInst* inst) {
+	get_level()->inst_set.remove_instance(inst);
 	inst->deinit(this);
 }
 

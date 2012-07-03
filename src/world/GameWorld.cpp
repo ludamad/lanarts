@@ -11,6 +11,7 @@
 
 #include "../procedural/levelgen.h"
 
+#include "objects/GameInstRef.h"
 #include "objects/PlayerInst.h"
 #include "objects/EnemyInst.h"
 
@@ -96,7 +97,7 @@ void GameWorld::spawn_players(GeneratedLevel& genlevel, void** player_instances,
 		}
 	} else {
 		for (int i = 0; i < nplayers; i++) {
-			spawn_player(genlevel, false, 0, (PlayerInst*)player_instances[i]);
+			spawn_player(genlevel, false, 0, (PlayerInst*) player_instances[i]);
 		}
 	}
 }
@@ -183,7 +184,7 @@ bool GameWorld::pre_step() {
 		const std::vector<obj_id>& player_ids =
 				game_state->get_level()->pc.player_ids();
 		for (int i = 0; i < player_ids.size(); i++) {
-			PlayerInst* p = (PlayerInst*)game_state->get_instance(
+			PlayerInst* p = (PlayerInst*) game_state->get_instance(
 					player_ids[i]);
 			p->queue_io_actions(game_state);
 			p->performed_actions_for_step() = false;
@@ -254,22 +255,32 @@ void GameWorld::step() {
 
 void GameWorld::regen_level(int roomid) {
 	GameLevelState* level = get_level(roomid);
-	std::vector<PlayerInst*> player_cache;
+	std::vector<GameInstRef> player_cache;
 	std::vector<obj_id> player_ids = level->pc.player_ids();
+
+	/* Take all players out of level*/
 	for (int i = 0; i < player_ids.size(); i++) {
-		PlayerInst* p = (PlayerInst*)game_state->get_instance(player_ids[i]);
-		game_state->remove_instance(p, false); // Remove but do not deallocate
+		// Get and retain player
+		GameInst* p = game_state->get_instance(player_ids[i]);
 		player_cache.push_back(p);
-		p->core_stats().heal_fully();
+		((PlayerInst*) p)->core_stats().heal_fully();
+
+		// Remove from current level
+		game_state->remove_instance(p);
 	}
+
 	level_states[roomid] = NULL;
-	GameLevelState* newlevel = get_level(roomid, true, (void**)&player_cache[0],
-			player_cache.size());
+
+	GameLevelState* newlevel = get_level(roomid, true,
+			(void**) &player_cache[0], player_cache.size());
+
 	if (game_state->get_level() == level) {
 		game_state->set_level(newlevel);
 		GameInst* p = game_state->get_instance(game_state->local_playerid());
 		game_state->window_view().sharp_center_on(p->x, p->y);
 	}
+
+	//Delete existing level
 	delete level;
 }
 
@@ -280,14 +291,17 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	//set the level context
 	game_state->set_level(state);
 
-	CombatGameInst* inst = (CombatGameInst*)game_state->get_instance(id);
+	//Keep object alive during move
+	GameInstRef gref(game_state->get_instance(id));
+	GameInst* inst = gref.get_instance();
 
-	if (!inst)
+	if (!gref.get_instance()) {
 		return;
+	}
 
-	game_state->remove_instance(inst, false); // Remove but do not deallocate
-	inst->last_x = x, inst->last_y = y;
-	inst->update_position(x, y);
+	game_state->remove_instance(inst);
+	gref->last_x = x, gref->last_y = y;
+	gref->update_position(x, y);
 
 	game_state->set_level(get_level(roomid2));
 	game_state->add_instance(inst);

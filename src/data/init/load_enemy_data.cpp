@@ -23,6 +23,7 @@ EnemyEntry parse_enemy_type(const YAML::Node& n) {
 //	LuaValue init_event, step_event;
 
 	entry.name = parse_str(n["name"]);
+	entry.description = parse_defaulted(n, "description", std::string());
 
 	entry.appear_msg = parse_defaulted(n, "appear_message", std::string());
 	entry.defeat_msg = parse_defaulted(n, "defeat_message", std::string());

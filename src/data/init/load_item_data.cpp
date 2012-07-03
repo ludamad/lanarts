@@ -17,6 +17,7 @@ using namespace std;
 ItemEntry parse_item_type(const YAML::Node& n){
 	return ItemEntry(
 			parse_str(n["name"]),
+			parse_defaulted(n, "description", std::string()),
 			parse_defaulted(n, "use_message", std::string()),
 			parse_defaulted(n,"radius", 11),
 			parse_sprite_number(n, "sprite"),

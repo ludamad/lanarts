@@ -20,6 +20,7 @@ Projectile parse_projectile_name(const YAML::Node& n) {
 SpellEntry parse_spell_type(const YAML::Node& n) {
 	SpellEntry entry;
 	entry.name = parse_str(n["name"]);
+	entry.description = parse_defaulted(n, "description", std::string());
 	if (yaml_has_node(n, "projectile")) {
 		entry.projectile = parse_projectile_name(n["projectile"]);
 	}

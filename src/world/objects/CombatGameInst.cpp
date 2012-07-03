@@ -89,8 +89,9 @@ void CombatGameInst::draw(GameState *gs) {
 	if (target_radius > 16)
 		healthbar_offsety = target_radius + 8;
 	if (ecore.hp < ecore.max_hp) {
-		gl_draw_statbar(view, x - 10, y - healthbar_offsety, 20, 5, ecore.hp,
-				ecore.max_hp);
+		const BBox statbox(x - 10, y - healthbar_offsety, x + 10,
+				y - healthbar_offsety + 5);
+		gl_draw_statbar(view, statbox, ecore.hp, ecore.max_hp);
 	}
 }
 
@@ -221,8 +222,8 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 }
 
 void CombatGameInst::update_position() {
-	x = (int)round(rx); //update based on rounding of true float
-	y = (int)round(ry);
+	x = (int) round(rx); //update based on rounding of true float
+	y = (int) round(ry);
 }
 
 void CombatGameInst::update_position(float newx, float newy) {
@@ -257,7 +258,7 @@ static void combine_stat_hash(unsigned int& hash, CombatStats& stats) {
 }
 unsigned int CombatGameInst::integrity_hash() {
 	unsigned int hash = GameInst::integrity_hash();
-	combine_hash(hash, (unsigned int&)vx, (unsigned int&)vy);
+	combine_hash(hash, (unsigned int&) vx, (unsigned int&) vy);
 	combine_stat_hash(hash, stats());
 	return hash;
 }

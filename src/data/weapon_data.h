@@ -17,7 +17,7 @@
 #include "../world/objects/GameInst.h"
 
 struct ProjectileEntry {
-	std::string name;
+	std::string name, description;
 	std::string weapon_class; //Compatible with this weapon class
 
 	sprite_id item_sprite, attack_sprite;
@@ -36,7 +36,7 @@ struct ProjectileEntry {
 };
 
 struct WeaponEntry {
-	std::string name;
+	std::string name, description;
 	std::string weapon_class;
 	bool uses_projectile;
 	int max_targets;

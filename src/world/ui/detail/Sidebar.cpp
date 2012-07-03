@@ -7,7 +7,18 @@
 
 #include "../../objects/PlayerInst.h"
 
+#include "../../../util/colour_constants.h"
+
 #include "Sidebar.h"
+
+static void draw_statbar_with_text(GameState* gs, const BBox& bbox, int statmin,
+		int statmax, Colour statcol, Colour backcol,
+		Colour textcol = Colour(0, 0, 0)) {
+	gl_draw_statbar(bbox, statmin, statmax, statcol, backcol);
+	gl_printf_centered(gs->primary_font(), textcol, bbox.center_x(),
+			bbox.center_y(), "%d/%d", statmin, statmax);
+
+}
 
 /* Helper method for drawing stat bars */
 static void draw_player_statbars(GameState* gs, PlayerInst* player, int x,
@@ -15,20 +26,16 @@ static void draw_player_statbars(GameState* gs, PlayerInst* player, int x,
 	ClassStats& class_stats = player->class_stats();
 	CoreStats& core = player->effective_stats().core;
 
-	gl_draw_statbar(x, y, 100, 10, core.hp, core.max_hp);
-	gl_printf(gs->primary_font(), Colour(0, 0, 0), x + 30, y, "%d/%d", core.hp,
-			core.max_hp);
+	BBox bbox(x, y, x + 100, y + 10);
+	draw_statbar_with_text(gs, bbox, core.hp, core.max_hp, GREEN, RED);
 
-	gl_draw_statbar(x, y + 15, 100, 10, core.mp, core.max_mp, Colour(0, 0, 255),
+	bbox = bbox.translated(0, 15);
+	draw_statbar_with_text(gs, bbox, core.mp, core.max_mp, BLUE,
 			Colour(200, 200, 200));
 
-	gl_printf(gs->primary_font(), Colour(0, 0, 0), x + 30, y + 15, "%d/%d",
-			core.mp, core.max_mp);
-	gl_draw_statbar(x, y + 30, 100, 10, class_stats.xp, class_stats.xpneeded,
-			Colour(255, 215, 11), Colour(169, 143, 100));
-
-	gl_printf(gs->primary_font(), Colour(0, 0, 0), x + 30, y + 30, "%d/%d",
-			class_stats.xp, class_stats.xpneeded);
+	bbox = bbox.translated(0, 15);
+	draw_statbar_with_text(gs, bbox, class_stats.xp, class_stats.xpneeded, Colour(255, 215, 11),
+			Colour(169, 143, 100));
 
 	float ratio = player->rest_cooldown() / float(REST_COOLDOWN);
 	Colour col(200 * ratio, 200 * (1.0f - ratio), 0);

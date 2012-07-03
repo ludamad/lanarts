@@ -63,7 +63,7 @@ struct BBox {
 	int center_y() const {
 		return (y1 + y2) / 2;
 	}
-	BBox translated(int x, int y) {
+	BBox translated(int x, int y) const {
 		return BBox(x1 + x, y1 + y, x2 + x, y2 + y);
 	}
 };
