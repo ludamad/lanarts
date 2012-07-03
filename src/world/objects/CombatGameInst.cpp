@@ -257,6 +257,7 @@ static void combine_stat_hash(unsigned int& hash, CombatStats& stats) {
 }
 unsigned int CombatGameInst::integrity_hash() {
 	unsigned int hash = GameInst::integrity_hash();
+	combine_hash(hash, (unsigned int&)vx, (unsigned int&)vy);
 	combine_stat_hash(hash, stats());
 	return hash;
 }

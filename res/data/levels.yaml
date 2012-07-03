@@ -25,7 +25,7 @@ easy_animals: &easy_animals
   - { enemy: Hound,             chance: 60                                    }
   - { enemy: Sheep,             chance: 60                                    }
 
-easy_animals: &medium_animals
+medium_animals: &medium_animals
   - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 3 }
   - { enemy: Giant Bat,         chance: 100,  group_chance: 33, group_size: 3 }
   - { enemy: Hound,             chance: 100                                   }
@@ -65,6 +65,10 @@ harder_enemies: &harder_enemies
   - { enemy: Hell Forged,       chance: 25                                    }
 
 layouts:
+      - &test_layout
+        size: [70,70]
+        rooms:    { padding: 1, amount: 1,  size: [60,60]}
+        tunnels:  { padding: 2, width: [1,2], per_room: 0}
       - &tiny_layout1
         size: [[35,45],[35,46]] #[width] by [height]
         rooms:    { padding: 1, amount: 3,  size: [10,10]}
@@ -164,6 +168,12 @@ areas:
   - branch: main_branch
     levels:
 #tiny levels with animals
+#      #Level 1
+#      - layout: [*test_layout]
+#        content:
+#          features: { tileset: [lair_tiles1, lair_tiles2],     stairs_up: 0  }
+#          items:    { amount: 3,  generated: *default_items   }
+#          enemies: { wandering: yes, amount: 69, generated: *easy_animals }
       #Level 1
       - layout: [*tiny_layout1]
         content:

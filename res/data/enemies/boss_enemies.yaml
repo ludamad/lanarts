@@ -9,7 +9,7 @@ enemies:
         Zin has been defeated! Consider the game won. For now.
     sprite: zin
     radius: 20
-    xpaward: 100
+    xpaward: 300
     unique: yes
     stats:
         attacks: [ { weapon: Basic Melee}, { projectile: Longer Range Blue Blast} ]
@@ -28,7 +28,7 @@ enemies:
         You have slain the red dragon!
     sprite: red dragon
     radius: 27
-    xpaward: 60
+    xpaward: 150
     unique: yes
     stats:
         attacks: [ {weapon: Basic Melee}, { projectile: Fire Bolt} ]

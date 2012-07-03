@@ -55,7 +55,7 @@ void MonsterController::register_enemy(GameInst* enemy) {
 }
 
 void towards_highest(PathInfo& path, Pos& p) {
-	int higest;
+	int highest;
 	for (int y = -1; y <= +1; y++) {
 		for (int x = -1; x <= +1; x++) {
 			path.get(p.x + x, p.y + y);

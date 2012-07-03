@@ -43,6 +43,21 @@ EnemyInst::EnemyInst(int enemytype, int x, int y) :
 EnemyInst::~EnemyInst() {
 }
 
+static void combine_hash(unsigned int& hash, unsigned int val1, unsigned val2) {
+	hash ^= (hash >> 11) * val1;
+	hash ^= val1;
+	hash ^= (hash >> 11) * val2;
+	hash ^= val2;
+	hash ^= hash << 11;
+}
+unsigned int EnemyInst::integrity_hash() {
+	unsigned int hash = CombatGameInst::integrity_hash();
+	combine_hash(hash, eb.current_node, eb.path_steps);
+	combine_hash(hash, eb.path_start.x, eb.path_start.y);
+	combine_hash(hash, eb.simulation_id, eb.current_action);
+	return hash;
+}
+
 EnemyEntry& EnemyInst::etype() {
 	return game_enemy_data.at(enemytype);
 }
@@ -184,8 +199,8 @@ void EnemyInst::die(GameState *gs) {
 		if (etype().death_sprite > -1) {
 			const int DEATH_SPRITE_TIMEOUT = 1600;
 			gs->add_instance(
-					new AnimatedInst(x, y, etype().death_sprite, DEATH_SPRITE_TIMEOUT, 0, 0,
-							ItemInst::DEPTH));
+					new AnimatedInst(x, y, etype().death_sprite,
+							DEATH_SPRITE_TIMEOUT, 0, 0, ItemInst::DEPTH));
 		}
 	}
 }

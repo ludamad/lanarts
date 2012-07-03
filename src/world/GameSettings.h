@@ -14,6 +14,7 @@ struct GameSettings {
 	std::string ip, username;
 	int port;
 	connection_type conntype;
+	bool network_debug_mode;
 
 	/*Draw settings*/
 	std::string font;
@@ -49,6 +50,7 @@ struct GameSettings {
 
 		port = 0;
 		conntype = NONE;
+		network_debug_mode = false;
 
 	}
 };

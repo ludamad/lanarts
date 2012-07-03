@@ -26,6 +26,8 @@ public:
 	virtual void copy_to(GameInst* inst) const;
 	virtual EnemyInst* clone() const;
 
+	virtual unsigned int integrity_hash();
+
 	virtual bool within_field_of_view(const Pos& pos);
 
 	EnemyBehaviour& behaviour() { return eb; }

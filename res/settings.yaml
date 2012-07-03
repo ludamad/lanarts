@@ -15,7 +15,8 @@ view_height: 720
 font: res/fonts/Gudea-Regular.ttf
 
 #Network settings
-connection_type: client #Either 'host', 'client', or 'none'
+network_debug_mode: yes
+connection_type: none #Either 'host', 'client', or 'none'
 ip: localhost
 port: 6112
 

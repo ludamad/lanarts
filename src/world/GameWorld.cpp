@@ -4,12 +4,15 @@
  * 	and which levels are currently being generated
  */
 
+#include <typeinfo>
+
 #include "../data/tile_data.h"
 #include "../data/class_data.h"
 
 #include "../procedural/levelgen.h"
 
 #include "objects/PlayerInst.h"
+#include "objects/EnemyInst.h"
 
 #include "GameState.h"
 #include "GameLevelState.h"
@@ -133,10 +136,24 @@ static bool check_level_is_in_sync(GameState* gs, GameLevelState* level) {
 	if (!gs->net_connection().check_integrity(gs, hash_value)) {
 		std::vector<GameInst*> instances = level->inst_set.to_vector();
 		for (int i = 0; i < instances.size(); i++) {
-			if (gs->net_connection().check_integrity(gs,
+			if (!gs->net_connection().check_integrity(gs,
 					instances[i]->integrity_hash())) {
 				GameInst* inst = instances[i];
-				printf("Hashes don't match for instance %d!", inst->id);
+				const char* type = typeid(*inst).name();
+				printf("Hashes don't match for instance id=%d, type=%s!\n",
+						inst->id, type);
+				std::vector<Pos> theirs;
+				gs->net_connection().send_and_sync(Pos(inst->x, inst->y),
+						theirs);
+				Pos* theirinst = &theirs[0];
+				EnemyInst* e;
+				if ((e = dynamic_cast<EnemyInst*>(inst))) {
+					Pos vpos(e->vx * 1000, e->vy * 1000);
+					std::vector<Pos> theirs;
+					gs->net_connection().send_and_sync(vpos, theirs);
+					Pos vpos2 = theirs[0];
+				}
+
 			}
 		}
 		printf("Hashes don't match before step, frame %d, level %d\n",
@@ -154,8 +171,10 @@ bool GameWorld::pre_step() {
 	midstep = true;
 
 	/* Check level sync states */
-	for (int i = 0; i < level_states.size(); i++) {
-		check_level_is_in_sync(game_state, level_states[i]);
+	if (game_state->game_settings().network_debug_mode) {
+		for (int i = 0; i < level_states.size(); i++) {
+			check_level_is_in_sync(game_state, level_states[i]);
+		}
 	}
 
 	/* Queue actions for each player */
