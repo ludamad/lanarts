@@ -112,7 +112,7 @@ void init_sdl_gl(bool fullscreen, int w, int h) {
 	}
 
 	/* Set the window manager title bar */
-	SDL_WM_SetCaption("RPG", "rpg");
+	SDL_WM_SetCaption("Lanarts", "Lanarts");
 
 	glDisable(GL_TEXTURE_2D);
 }

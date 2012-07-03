@@ -16,6 +16,8 @@ set( lanarts_src
 
 	lua/lua_combatstats.cpp
 	lua/lua_effectivestats.cpp
+	
+	config/GameControlSettings.cpp
 
 	data/init/load_armour_data.cpp
 	data/init/load_spell_data.cpp
@@ -83,6 +85,7 @@ set( lanarts_src
 	world/GameWorld.cpp
 	
 	world/ui/GameChat.cpp
+	world/ui/GameTextConsole.cpp
 	world/ui/GameDialogs.cpp
 	world/ui/GameHud.cpp
 	world/ui/detail/ActionBar.cpp
@@ -119,6 +122,8 @@ set( lanarts_include
 	combat_logic/combat_logic.h
 	combat_logic/movement_logic.h
 
+	config/GameControlSettings.h
+	
 	data/init/yaml_util.h
 	
 	data/armour_data.h
@@ -189,6 +194,7 @@ set( lanarts_include
 	world/ui/GameChat.h
 	world/ui/GameDialogs.h
 	world/ui/GameHud.h
+	world/ui/GameTextConsole.h
 	world/ui/detail/ActionBar.h
 	world/ui/detail/EquipmentContent.h
 	world/ui/detail/InventoryContent.h
