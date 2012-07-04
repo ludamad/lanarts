@@ -73,6 +73,20 @@ static int get_X_by_name(const T& t, const char* name, bool error_if_not_found =
 int get_armour_by_name(const char *name, bool error_if_not_found) {
 	return get_X_by_name(game_armour_data, name, error_if_not_found);
 }
+const char* equip_type_description(ItemEntry::equip_type equipment_type) {
+	switch (equipment_type) {
+	case ItemEntry::ARMOUR:
+		return "Armour";
+	case ItemEntry::WEAPON:
+		return "Weapon";
+	case ItemEntry::PROJECTILE:
+		return "Projectile";
+	case ItemEntry::NONE:
+		return "One-time Use";
+	}
+	return "";
+}
+
 item_id get_item_by_name(const char* name, bool error_if_not_found) {
 	return get_X_by_name(game_item_data, name, error_if_not_found);
 }
@@ -105,8 +119,8 @@ tileset_id get_tileset_by_name(const char* name) {
 	return get_X_by_name(game_tileset_data, name);
 }
 
-LuaValue sprites, armours, enemies, effects, weapons, projectiles, items, dungeon,
-		classes, spells;
+LuaValue sprites, armours, enemies, effects, weapons, projectiles, items,
+		dungeon, classes, spells;
 void init_game_data(lua_State* L) {
 	DataFiles dfiles = load_datafiles_data("res/datafiles.yaml");
 

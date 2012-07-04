@@ -5,17 +5,22 @@ items:
 
   - name: Health Potion
     sprite: health_potion
+    description: A blessed potion of healing infusions, it restores 50 HP to the user.
     action_func: increase_health
     prereq_func: function (item, obj) return obj.stats.hp < obj.stats.max_hp end 
     amount: 50
 
   - name: Mana Potion
     sprite: mana potion
+    description: A magical potion of energizing infusions, it restores 50 MP to the user.
     action_func: increase_mana
     prereq_func: function (item, obj) return obj.stats.mp < obj.stats.max_mp end 
     amount: 50
 
   - name: Haste Scroll
+    description: 
+      A scroll of that captures the power of the winds, 
+      it bestows the user with power and speed for a limited duration.
     use_message: You feel yourself moving faster and faster!
     sprite: scroll_haste
     action_func: hasten
@@ -23,24 +28,36 @@ items:
     amount: 1
 
   - name: Strength Scroll
+    description:
+      A mantra of unnatural modification, 
+      it bestows the user with a permanent, albeit small, increase to strength.
     use_message: Strength is bestowed upon you!
     sprite: scroll_strength
     action_func: increase_strength
     amount: 1
 
   - name: Defence Scroll
+    description:
+      A mantra of unnatural modification, 
+      it bestows the user with a permanent, albeit small, increase to defence.
     use_message: Defence is bestowed upon you!
     sprite: scroll_defence
     action_func: increase_defence
     amount: 1
 
   - name: Magic Scroll
+    description:
+      A mantra of unnatural modification, 
+      it bestows the user with a permanent, albeit small, increase to magic.
     use_message: Magic is bestowed upon you!
     sprite: scroll_magic
     action_func: increase_magic
     amount: 1
 
   - name: Will Scroll
+    description:
+      A mantra of unnatural modification, 
+      it bestows the user with a permanent, albeit small, increase to will.
     use_message: Will is bestowed upon you!
     sprite: scroll_will
     action_func: increase_willpower

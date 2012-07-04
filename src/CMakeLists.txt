@@ -71,6 +71,7 @@ set( lanarts_src
 	procedural/levelgen.cpp
 	procedural/tunnelgen.cpp
 	
+	util/content_draw_util.cpp
 	util/math_util.cpp
 	util/mtwist.cpp
 	util/LuaValue.cpp
@@ -169,6 +170,7 @@ set( lanarts_include
 	procedural/tunnelgen.h
 	
 	util/callback_util.h
+	util/content_draw_util.h
 	util/game_basic_structs.h
 	util/gheap.h
 	util/hashset_util.h

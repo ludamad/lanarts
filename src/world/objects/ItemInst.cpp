@@ -36,7 +36,7 @@ void ItemInst::draw(GameState* gs) {
 	GameView& view = gs->window_view();
 
 	ItemEntry& ientry = item.item_entry();
-	SpriteEntry& spr = game_sprite_data[ientry.sprite_number];
+	SpriteEntry& spr = game_sprite_data[ientry.sprite];
 
 	int w = spr.width(), h = spr.height();
 	int xx = x - w / 2, yy = y - h / 2;
