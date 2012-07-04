@@ -93,12 +93,12 @@ static void show_appear_message(GameChat& chat, EnemyEntry& e) {
 		snprintf(buff, 100, "%s%s appears!", a_or_an, e.name.c_str());
 		chat.add_message(buff, Colour(255, 148, 120));
 	} else {
-		chat.add_message(e.appear_msg.c_str(), Colour(255, 148, 120));
+		chat.add_message(e.appear_msg.c_str(), PALE_RED);
 	}
 }
 static void show_defeat_message(GameChat& chat, EnemyEntry& e) {
 	if (!e.defeat_msg.empty()) {
-		chat.add_message(e.defeat_msg, Colour(50, 205, 50));
+		chat.add_message(e.defeat_msg, PALE_GREEN);
 	}
 
 }

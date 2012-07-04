@@ -122,72 +122,6 @@ static int process_string(const font_data& font, const char* text,
 
 	return largest_width;
 }
-//
-/* General gl_print function for others to delegate to */
-static Pos gl_print_impl(const font_data& font, const Colour& colour, Pos p,
-		const char* text, int max_width, bool center_text) {
-
-	Pos offset(0, 0);
-
-	std::vector<int> line_splits;
-	int measured_width = process_string(font, text, max_width, line_splits);
-
-	if (center_text) {
-		p.x -= measured_width / 2;
-		p.y -= font.h / 2;
-	}
-
-	for (int linenum = 0, i = 0; linenum < line_splits.size(); linenum++) {
-		int len = 0;
-		int eol = line_splits[linenum];
-
-		offset.y += font.h;
-
-		for (; i < eol; i++) {
-			unsigned char chr = text[i];
-			if (chr == '\n') {
-				continue; //skip newline char
-			}
-			char_data &cdata = *font.data[chr];
-			len += cdata.advance;
-			gl_draw_image(cdata.img, p.x + len - (cdata.advance - cdata.left),
-					p.y + offset.y - cdata.move_up, colour);
-		}
-		offset.x = std::max(len, offset.x);
-		offset.y += 1;
-	}
-	return offset;
-}
-//
-///* Most general gl_print function that the rest build on */
-//static Pos gl_print_bounded(const font_data& font, const Colour& colour,
-//		const BBox& bounds, const char* text) {
-//	int textlen = strlen(text);
-//	for (int i = 0; i < textlen; i++)
-//		if (text[i] == '\n')
-//			text[i] = '\0';
-//
-//	Pos offset(0, 0);
-//	int len = 0;
-//	const char* iter = text;
-//	while (iter < text + textlen) {
-//		int len = 0;
-//		offset.y += font.h;
-//		for (int i = 0; iter[i]; i++) {
-//			unsigned char chr = iter[i];
-//			char_data &cdata = *font.data[chr];
-//			len += cdata.advance;
-//			gl_draw_image(cdata.img,
-//					bounds.x1 + len - (cdata.advance - cdata.left),
-//					bounds.y1 + offset.y - cdata.move_up, colour);
-//		}
-//		offset.x = std::max(len, offset.x);
-//		offset.y += 1;
-//
-//		iter += strlen(iter) + 1;
-//	}
-//	return offset;
-//}
 
 void gl_draw_sprite_entry(const GameView& view, SpriteEntry& entry, int x,
 		int y, float dx, float dy, int steps, const Colour& c) {
@@ -219,40 +153,81 @@ void gl_draw_sprite(sprite_id sprite, const GameView& view, int x, int y,
 #define vsnprintf(text, len, fmt, ap) vsprintf(text, fmt, ap)
 #endif
 
-/* printf-like function that draws to the screen, returns dimensions of formatted string*/
-Pos gl_printf(const font_data& font, const Colour& colour, float x, float y,
-		const char *fmt, ...) {
+//
+/* General gl_print function for others to delegate to */
+static Pos gl_print_impl(const font_data& font, const Colour& colour, Pos p,
+		int max_width, bool center_x, bool center_y, const char* fmt, va_list ap) {
 	char text[512];
-	va_list ap;
-	va_start(ap, fmt);
 	vsnprintf(text, 512, fmt, ap);
 	va_end(ap);
 
-	return gl_print_impl(font, colour, Pos(x, y), text, -1, false);
+	Pos offset(0, 0);
+
+	std::vector<int> line_splits;
+	int measured_width = process_string(font, text, max_width, line_splits);
+
+	if (center_x) {
+		p.x -= measured_width / 2;
+	}
+	if (center_y) {
+		p.y -= font.h / 2;
+	}
+
+	for (int linenum = 0, i = 0; linenum < line_splits.size(); linenum++) {
+		int len = 0;
+		int eol = line_splits[linenum];
+
+		offset.y += font.h;
+
+		for (; i < eol; i++) {
+			unsigned char chr = text[i];
+			if (chr == '\n') {
+				continue; //skip newline char
+			}
+			char_data &cdata = *font.data[chr];
+			len += cdata.advance;
+			gl_draw_image(cdata.img, p.x + len - (cdata.advance - cdata.left),
+					p.y + offset.y - cdata.move_up, colour);
+		}
+		offset.x = std::max(len, offset.x);
+		offset.y += 1;
+	}
+	return offset;
+}
+/* printf-like function that draws to the screen, returns dimensions of formatted string*/
+Pos gl_printf(const font_data& font, const Colour& colour, float x, float y,
+		const char* fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+
+	return gl_print_impl(font, colour, Pos(x, y), -1, false, false, fmt, ap);
 }
 
 /* printf-like function that draws to the screen, returns width of formatted string*/
 Pos gl_printf_bounded(const font_data& font, const Colour& colour, float x,
 		float y, int max_width, const char *fmt, ...) {
-	char text[512];
 	va_list ap;
 	va_start(ap, fmt);
-	vsnprintf(text, 512, fmt, ap);
-	va_end(ap);
 
-	return gl_print_impl(font, colour, Pos(x, y), text, max_width, false);
+	return gl_print_impl(font, colour, Pos(x, y), max_width, false, false, fmt, ap);
 }
 
 /* printf-like function that draws to the screen, returns width of formatted string*/
 Pos gl_printf_centered(const font_data& font, const Colour& colour, float x,
 		float y, const char *fmt, ...) {
-	char text[512];
 	va_list ap;
 	va_start(ap, fmt);
-	vsnprintf(text, 512, fmt, ap);
-	va_end(ap);
 
-	return gl_print_impl(font, colour, Pos(x, y), text, -1, true);
+	return gl_print_impl(font, colour, Pos(x, y), -1, true, true, fmt, ap);
+}
+
+/* printf-like function that draws to the screen, returns width of formatted string*/
+Pos gl_printf_y_centered(const font_data& font, const Colour& colour, float x,
+		float y, const char *fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+
+	return gl_print_impl(font, colour, Pos(x, y), -1, false, true, fmt, ap);
 }
 
 void gl_draw_circle(const GameView& view, float x, float y, float radius,
@@ -306,9 +281,9 @@ void gl_draw_line(int x1, int y1, int x2, int y2, const Colour& clr,
 		glLineWidth(1);
 }
 
-void gl_draw_statbar(const GameView& view, const BBox& bbox,
-		int min_stat, int max_stat, const Colour& front, const Colour& back) {
-	gl_draw_statbar(bbox.translated(-view.x, -view.y), min_stat, max_stat, front,
-			back);
+void gl_draw_statbar(const GameView& view, const BBox& bbox, int min_stat,
+		int max_stat, const Colour& front, const Colour& back) {
+	gl_draw_statbar(bbox.translated(-view.x, -view.y), min_stat, max_stat,
+			front, back);
 }
 

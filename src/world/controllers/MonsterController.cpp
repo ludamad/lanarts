@@ -426,7 +426,7 @@ void MonsterController::post_draw(GameState* gs) {
 		return;
 	glLineWidth(2);
 	gl_draw_circle(gs->window_view(), target->x, target->y,
-			target->target_radius + 5, Colour(0, 255, 0, 140), true);
+			target->target_radius + 5, RED.with_alpha(140), true);
 	glLineWidth(1);
 }
 

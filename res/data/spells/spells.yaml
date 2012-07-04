@@ -2,13 +2,17 @@
 spells:
 
   - name: Fire Bolt
-    description: Basic fire attack spell
+    description:
+     A fast bolt of fire, hits a single target.
+     The bolt can bounce off walls safely.
     mp_cost: 10
     spr_spell: fire bolt
     projectile: Fire Bolt
 
   - name: Magic Blast
-    description: Bounces off multiple targets
+    description:
+     A slow, powerful magic blast of energy.
+     The blast can bounce off an enemy twice before dissipating.
     mp_cost: 20
     spr_spell: magic blast
     projectile: Magic Blast

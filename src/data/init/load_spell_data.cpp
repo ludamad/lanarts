@@ -21,10 +21,11 @@ SpellEntry parse_spell_type(const YAML::Node& n) {
 	SpellEntry entry;
 	entry.name = parse_str(n["name"]);
 	entry.description = parse_defaulted(n, "description", std::string());
+	entry.sprite = parse_sprite_number(n, "spr_spell");
+	entry.mp_cost = parse_int(n["mp_cost"]);
 	if (yaml_has_node(n, "projectile")) {
 		entry.projectile = parse_projectile_name(n["projectile"]);
 	}
-	entry.sprite = parse_sprite_number(n, "spr_spell");
 	entry.action = LuaValue(parse_defaulted(n, "action_func", std::string()));
 	return entry;
 }

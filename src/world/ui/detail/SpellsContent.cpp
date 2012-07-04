@@ -23,6 +23,21 @@ static void draw_spell_icon(spell_id spell, int x, int y) {
 	gl_draw_sprite(spl_entry.sprite, x, y);
 }
 
+static void draw_icon_and_name(GameState* gs, SpellEntry& spl_entry, Colour col,
+		int x, int y) {
+	gl_draw_sprite(spl_entry.sprite, x, y);
+	/* Draw spell name */
+	gl_printf(gs->primary_font(), col, x + TILE_SIZE + 5, y + TILE_SIZE / 2 - 4,
+			"%s", spl_entry.name.c_str());
+}
+
+static void draw_stat_text(GameState* gs, int x, int y, const char* prefix,
+		Colour prefix_col, int stat, Colour stat_col) {
+
+	Pos p = gl_printf_y_centered(gs->primary_font(), prefix_col, x, y, "%s", prefix);
+	gl_printf_y_centered(gs->primary_font(), stat_col, p.x + x, y, "%d", stat);
+}
+
 static void draw_console_spell_description(GameState* gs,
 		SpellEntry& spl_entry) {
 	GameTextConsole& console = gs->game_console();
@@ -32,10 +47,16 @@ static void draw_console_spell_description(GameState* gs,
 	}
 
 	console.draw_box(gs);
-	BBox box(console.bounding_box());
-	gl_draw_sprite(spl_entry.sprite, box.x1, box.y1);
-	gl_printf_centered(gs->primary_font(), Colour(), box.x1 + TILE_SIZE + 5,
-			box.y1 + TILE_SIZE / 2, "%s", spl_entry.name.c_str());
+	BBox bbox(console.bounding_box());
+	draw_icon_and_name(gs, spl_entry, Colour(PALE_YELLOW), bbox.x1, bbox.y1);
+	draw_stat_text(gs, bbox.center_x(), bbox.y1 + TILE_SIZE/2, "MP cost: ", Colour(),
+			spl_entry.mp_cost, Colour());
+
+	const int MAX_WIDTH = bbox.width() - TILE_SIZE;
+
+	gl_printf_bounded(gs->primary_font(), LIGHT_GRAY, bbox.x1 + TILE_SIZE + 5,
+			bbox.y1 + TILE_SIZE + 5, MAX_WIDTH, "%s",
+			spl_entry.description.c_str());
 }
 
 static void draw_spells_known(GameState* gs, const BBox& bbox,
@@ -53,11 +74,9 @@ static void draw_spells_known(GameState* gs, const BBox& bbox,
 
 		spell_id spell = spells.get(spellidx);
 		SpellEntry& spl_entry = game_spell_data.at(spell);
+		draw_icon_and_name(gs, spl_entry, Colour(), x, y);
+
 		BBox entry_box(x, y, ex - 2, y + TILE_SIZE);
-		gl_draw_sprite(spl_entry.sprite, x, y);
-		/* Draw spell name */
-		gl_printf(gs->primary_font(), Colour(), x + TILE_SIZE + 5,
-				y + TILE_SIZE / 2 - 4, "%s", spl_entry.name.c_str());
 		if (entry_box.contains(mx, my)) {
 			gl_draw_rectangle_outline(entry_box, COL_FILLED_OUTLINE);
 			draw_console_spell_description(gs, spl_entry);

@@ -17,10 +17,11 @@
 struct SpellEntry {
 	std::string name, description;
 	sprite_id sprite;
+	int mp_cost;
 	LuaValue action; //Immediate action
 	Projectile projectile; //Projectile used, if any
 	SpellEntry() :
-			sprite(-1) {
+			sprite(-1), mp_cost(0) {
 	}
 
 	void init(lua_State* L) {

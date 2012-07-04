@@ -25,6 +25,16 @@ struct Colour {
 	bool operator==(const Colour& col) const {
 		return r == col.r && g == col.g && b == col.b && a == col.a;
 	}
+	Colour with_alpha(int alpha) const {
+		Colour ret = *this;
+		ret.a = alpha;
+		return ret;
+	}
+	Colour mult_alpha(float alpha) const {
+		Colour ret = *this;
+		ret.a *= alpha;
+		return ret;
+	}
 };
 
 /*Represents a range*/

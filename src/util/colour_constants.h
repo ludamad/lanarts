@@ -12,11 +12,15 @@
 const Colour YELLOW(255, 255, 0);
 const Colour LIGHT_RED(255, 50, 50);
 const Colour RED(255, 0, 0);
+const Colour PALE_RED(255, 148, 120);
+const Colour PALE_GREEN(50, 205, 50);
 const Colour GREEN(0, 255, 0);
 const Colour BLUE(0, 0, 255);
 const Colour GOLD(255, 215, 0);
 const Colour PALE_YELLOW(255, 250, 150);
-const Colour MEDIUM_PURPLE(123,104,238);
+const Colour MEDIUM_PURPLE(123, 104, 238);
+
+const Colour LIGHT_GRAY(180, 180, 180);
 
 /* For drawing of the action bar and inventory */
 const Colour COL_SELECTED_OUTLINE(50, 205, 50);
