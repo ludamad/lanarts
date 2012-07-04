@@ -91,8 +91,6 @@ void GameChat::draw_player_chat(GameState* gs) const {
 	int chat_x = 0, chat_y = 0; //h - chat_h - TILE_SIZE;
 	int text_x = chat_x + padding, text_y = chat_y + padding;
 
-	gl_set_drawing_area(0, 0, view_w, view_h);
-
 	gl_draw_rectangle(chat_x, chat_y, chat_w, chat_h,
 			Colour(180, 180, 255, 50 * fade_out));
 
@@ -360,7 +358,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 void GameChat::toggle_chat(GameState* gs) {
 	if (is_typing) {
 		if (!typed_message.message.empty()) {
-			typed_message.sender = local_sender;
+			typed_message.sender = gs->game_settings().username;
 			typed_message.sender_colour = Colour(37, 207, 240);
 			if (!handle_special_commands(gs, typed_message.message)) {
 				add_message(typed_message);
@@ -449,8 +447,7 @@ void GameChat::reset_typed_message() {
 	typed_message.sender.clear();
 	typed_message.message.clear();
 }
-GameChat::GameChat(const std::string& local_sender) :
-		local_sender(local_sender), typed_message(std::string(), std::string()) {
+GameChat::GameChat() :  typed_message(std::string(), std::string()) {
 	current_key = SDLK_UNKNOWN;
 	current_mod = KMOD_NONE;
 	reset_typed_message();

@@ -100,8 +100,12 @@ public:
 		return world;
 	}
 
+	GameTextConsole& game_console() {
+		return game_hud().game_console();
+	}
+
 	GameChat& game_chat() {
-		return chat;
+		return game_hud().game_chat();
 	}
 
 	GameSettings& game_settings() {
@@ -174,7 +178,6 @@ public:
 	/* Make sure rooms exist & portals point to valid locations in next room */
 	void ensure_level_connectivity(int roomid1, int roomid2);
 
-
 	void serialize(FILE* file);
 
 private:
@@ -185,7 +188,6 @@ private:
 	lua_State* L;
 	int frame_n;
 	GameNetConnection connection;
-	GameChat chat;
 	GameDialogs dialogs;
 	GameHud hud;
 	GameView view;

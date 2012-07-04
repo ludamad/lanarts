@@ -249,7 +249,6 @@ void GameWorld::step() {
 		next_room_id = -1;
 
 		game_state->get_level()->pc.update_fieldsofview(game_state);
-// 		goto redofirststep;// goto top
 	}
 }
 

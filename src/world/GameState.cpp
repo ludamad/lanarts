@@ -38,7 +38,7 @@ extern "C" {
 
 GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 		int viewh, int hudw) :
-		settings(settings), L(L), frame_n(0), chat(settings.username), hud(
+		settings(settings), L(L), frame_n(0), hud(
 				BBox(vieww, 0, vieww + hudw, viewh), BBox(0, 0, vieww, viewh)), view(
 				0, 0, vieww, viewh), world(this) {
 	memset(key_down_states, 0, sizeof(key_down_states));
@@ -123,7 +123,7 @@ void GameState::set_level(GameLevelState* lvl) {
 PlayerInst* GameState::local_player() {
 	GameInst* player = get_instance(local_playerid());
 	LANARTS_ASSERT(!player || dynamic_cast<PlayerInst*>(player));
-	return (PlayerInst*) player;
+	return (PlayerInst*)player;
 }
 
 int GameState::handle_event(SDL_Event *event) {
@@ -134,9 +134,6 @@ int GameState::handle_event(SDL_Event *event) {
 			return done;
 
 		if (hud.handle_event(this, event))
-			return done;
-
-		if (chat.handle_event(this, event))
 			return done;
 	}
 
@@ -211,7 +208,7 @@ bool GameState::pre_step() {
 	return world.pre_step();
 }
 void GameState::step() {
-	chat.step(this);
+	hud.step(this);
 	world.step(); //Has pointer to this (GameState) object
 	lua_gc(L, LUA_GCSTEP, 0); // collect garbage incrementally
 }
@@ -279,7 +276,6 @@ void GameState::draw(bool drawhud) {
 	get_level()->tiles.post_draw(this);
 	if (drawhud) {
 		hud.draw(this);
-		chat.draw(this);
 	}
 
 	update_display();

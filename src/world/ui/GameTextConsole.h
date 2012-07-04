@@ -9,6 +9,7 @@
 #include "GameChat.h"
 
 class GameTextConsole {
+public:
 	GameTextConsole(const BBox& bbox);
 	GameChat& game_chat() {
 		return chat;
@@ -23,8 +24,9 @@ class GameTextConsole {
 		content_already_drawn = true;
 	}
 	void step(GameState* gs);
+	void draw_box(GameState* gs);
 	void draw(GameState* gs);
-public:
+private:
 	bool content_already_drawn;
 	BBox bbox;
 	GameChat chat;

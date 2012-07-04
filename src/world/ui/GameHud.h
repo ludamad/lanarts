@@ -19,6 +19,8 @@
 
 #include "../GameAction.h"
 
+#include "GameTextConsole.h"
+
 #include "detail/ActionBar.h"
 #include "detail/Sidebar.h"
 #include "detail/SidebarNavigator.h"
@@ -52,11 +54,18 @@ public:
 	int height() {
 		return sidebar_box.height();
 	}
+	GameChat& game_chat() {
+		return console.game_chat();
+	}
+	GameTextConsole& game_console() {
+		return console;
+	}
 
 	/* Reset the selected item after action is finished, otherwise drawing will lag a step
 	 * Used in PlayerInstActions.cpp*/
 	void reset_slot_selected();
 private:
+	GameTextConsole console;
 	Sidebar sidebar;
 	ActionBar action_bar;
 	ActionSlot dragging_action;

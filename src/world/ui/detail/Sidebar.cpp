@@ -7,6 +7,8 @@
 
 #include "../../objects/PlayerInst.h"
 
+#include "../../../display/display.h"
+
 #include "../../../util/colour_constants.h"
 
 #include "Sidebar.h"

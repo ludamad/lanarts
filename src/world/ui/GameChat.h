@@ -46,6 +46,8 @@ struct ChatMessage {
 
 class GameChat {
 public:
+	GameChat();
+
 	void step(GameState* gs);
 	void draw(GameState* gs) const;
 	void clear();
@@ -59,14 +61,12 @@ public:
 	bool handle_event(GameState* gs, SDL_Event *event);
 	void toggle_chat(GameState* gs);
 
-	GameChat(const std::string& local_sender);
 private:
 	bool handle_special_commands(GameState* gs, const std::string& command);
 
 	void reset_typed_message();
 	void draw_player_chat(GameState* gs) const;
 
-	std::string local_sender;
 	ChatMessage typed_message;
 
 	SDLKey current_key;

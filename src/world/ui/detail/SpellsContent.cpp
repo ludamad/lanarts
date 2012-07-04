@@ -23,26 +23,45 @@ static void draw_spell_icon(spell_id spell, int x, int y) {
 	gl_draw_sprite(spl_entry.sprite, x, y);
 }
 
+static void draw_console_spell_description(GameState* gs,
+		SpellEntry& spl_entry) {
+	GameTextConsole& console = gs->game_console();
+
+	if (console.has_content_already()) {
+		return;
+	}
+
+	console.draw_box(gs);
+	BBox box(console.bounding_box());
+	gl_draw_sprite(spl_entry.sprite, box.x1, box.y1);
+	gl_printf_centered(gs->primary_font(), Colour(), box.x1 + TILE_SIZE + 5,
+			box.y1 + TILE_SIZE / 2, "%s", spl_entry.name.c_str());
+}
+
 static void draw_spells_known(GameState* gs, const BBox& bbox,
 		SpellsKnown& spells, int ind_low, int ind_high) {
 	const int spell_n = spells.amount();
+	int mx = gs->mouse_x(), my = gs->mouse_y();
 	int spellidx = ind_low;
 
-	gl_draw_rectangle_outline(bbox.x1, bbox.y1, bbox.width(), bbox.height(),
-			COL_UNFILLED_OUTLINE);
+	gl_draw_rectangle_outline(bbox, COL_UNFILLED_OUTLINE);
 
-	int x = bbox.x1 + 5;
-	for (int y = bbox.y1 + 5; y < bbox.y2; y += TILE_SIZE) {
+	int x = bbox.x1, ex = bbox.x2;
+	for (int y = bbox.y1; y < bbox.y2; y += TILE_SIZE) {
 		if (spellidx >= spell_n)
 			break;
 
 		spell_id spell = spells.get(spellidx);
 		SpellEntry& spl_entry = game_spell_data.at(spell);
+		BBox entry_box(x, y, ex - 2, y + TILE_SIZE);
 		gl_draw_sprite(spl_entry.sprite, x, y);
 		/* Draw spell name */
-		gl_printf(gs->primary_font(), Colour(), x + TILE_SIZE + 5, y + 10, "%s",
-				spl_entry.name.c_str());
-
+		gl_printf(gs->primary_font(), Colour(), x + TILE_SIZE + 5,
+				y + TILE_SIZE / 2 - 4, "%s", spl_entry.name.c_str());
+		if (entry_box.contains(mx, my)) {
+			gl_draw_rectangle_outline(entry_box, COL_FILLED_OUTLINE);
+			draw_console_spell_description(gs, spl_entry);
+		}
 		spellidx++;
 	}
 

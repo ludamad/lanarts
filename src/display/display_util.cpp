@@ -242,6 +242,7 @@ Pos gl_printf_bounded(const font_data& font, const Colour& colour, float x,
 
 	return gl_print_impl(font, colour, Pos(x, y), text, max_width, false);
 }
+
 /* printf-like function that draws to the screen, returns width of formatted string*/
 Pos gl_printf_centered(const font_data& font, const Colour& colour, float x,
 		float y, const char *fmt, ...) {
