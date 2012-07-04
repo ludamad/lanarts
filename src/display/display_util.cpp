@@ -205,7 +205,7 @@ Pos gl_printf(const font_data& font, const Colour& colour, float x, float y,
 
 /* printf-like function that draws to the screen, returns width of formatted string*/
 Pos gl_printf_bounded(const font_data& font, const Colour& colour, float x,
-		float y, int max_width, const char *fmt, ...) {
+		float y, int max_width, bool center_y, const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
 

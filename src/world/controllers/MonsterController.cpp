@@ -17,8 +17,9 @@
 
 #include "../../combat_logic/attack_logic.h"
 
-#include "../../util/world/collision_util.h"
+#include "../../util/colour_constants.h"
 #include "../../util/math_util.h"
+#include "../../util/world/collision_util.h"
 
 #include "../../data/tile_data.h"
 #include "../../data/weapon_data.h"
@@ -426,7 +427,7 @@ void MonsterController::post_draw(GameState* gs) {
 		return;
 	glLineWidth(2);
 	gl_draw_circle(gs->window_view(), target->x, target->y,
-			target->target_radius + 5, RED.with_alpha(140), true);
+			target->target_radius + 5, COL_GREEN.with_alpha(140), true);
 	glLineWidth(1);
 }
 

@@ -14,9 +14,10 @@
 
 #include "../../gamestats/stat_formulas.h"
 
-#include "../../util/world/collision_util.h"
+#include "../../util/colour_constants.h"
 #include "../../util/math_util.h"
 #include "../../util/LuaValue.h"
+#include "../../util/world/collision_util.h"
 
 #include "../utility_objects/AnimatedInst.h"
 
@@ -93,12 +94,12 @@ static void show_appear_message(GameChat& chat, EnemyEntry& e) {
 		snprintf(buff, 100, "%s%s appears!", a_or_an, e.name.c_str());
 		chat.add_message(buff, Colour(255, 148, 120));
 	} else {
-		chat.add_message(e.appear_msg.c_str(), PALE_RED);
+		chat.add_message(e.appear_msg.c_str(), COL_PALE_RED);
 	}
 }
 static void show_defeat_message(GameChat& chat, EnemyEntry& e) {
 	if (!e.defeat_msg.empty()) {
-		chat.add_message(e.defeat_msg, PALE_GREEN);
+		chat.add_message(e.defeat_msg, COL_PALE_GREEN);
 	}
 
 }

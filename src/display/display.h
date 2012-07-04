@@ -74,7 +74,7 @@ void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 Pos gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
 		const char *fmt, ...);
 Pos gl_printf_bounded(const font_data& font, const Colour& colour, float x,
-		float y, int max_width, const char *fmt, ...);
+		float y, int max_width, bool center_y, const char *fmt, ...);
 /* printf-like function that draws to the screen, returns width of formatted string*/
 Pos gl_printf_centered(const font_data& font, const Colour& colour, float x,
 		float y, const char *fmt, ...);

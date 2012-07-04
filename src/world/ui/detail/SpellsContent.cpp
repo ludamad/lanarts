@@ -27,14 +27,15 @@ static void draw_icon_and_name(GameState* gs, SpellEntry& spl_entry, Colour col,
 		int x, int y) {
 	gl_draw_sprite(spl_entry.sprite, x, y);
 	/* Draw spell name */
-	gl_printf(gs->primary_font(), col, x + TILE_SIZE + 5, y + TILE_SIZE / 2 - 4,
+	gl_printf_y_centered(gs->primary_font(), col, x + TILE_SIZE * 1.25, y + TILE_SIZE / 2,
 			"%s", spl_entry.name.c_str());
 }
 
 static void draw_stat_text(GameState* gs, int x, int y, const char* prefix,
 		Colour prefix_col, int stat, Colour stat_col) {
 
-	Pos p = gl_printf_y_centered(gs->primary_font(), prefix_col, x, y, "%s", prefix);
+	Pos p = gl_printf_y_centered(gs->primary_font(), prefix_col, x, y, "%s",
+			prefix);
 	gl_printf_y_centered(gs->primary_font(), stat_col, p.x + x, y, "%d", stat);
 }
 
@@ -48,14 +49,15 @@ static void draw_console_spell_description(GameState* gs,
 
 	console.draw_box(gs);
 	BBox bbox(console.bounding_box());
-	draw_icon_and_name(gs, spl_entry, Colour(PALE_YELLOW), bbox.x1, bbox.y1);
-	draw_stat_text(gs, bbox.center_x(), bbox.y1 + TILE_SIZE/2, "MP cost: ", Colour(),
-			spl_entry.mp_cost, Colour());
+	draw_icon_and_name(gs, spl_entry, Colour(), bbox.x1 + 4,
+			bbox.y1);
+	draw_stat_text(gs, bbox.center_x()/2, bbox.y1 + TILE_SIZE / 2, "MP cost: ",
+			COL_PALE_YELLOW, spl_entry.mp_cost, COL_PALE_RED);
 
 	const int MAX_WIDTH = bbox.width() - TILE_SIZE;
 
-	gl_printf_bounded(gs->primary_font(), LIGHT_GRAY, bbox.x1 + TILE_SIZE + 5,
-			bbox.y1 + TILE_SIZE + 5, MAX_WIDTH, "%s",
+	gl_printf_bounded(gs->primary_font(), COL_LIGHT_GRAY,
+			bbox.x1 + TILE_SIZE/2, bbox.y1 + TILE_SIZE + 5, MAX_WIDTH, "%s",
 			spl_entry.description.c_str());
 }
 

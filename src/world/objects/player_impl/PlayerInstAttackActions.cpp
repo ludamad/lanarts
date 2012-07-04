@@ -183,7 +183,7 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 			canuse = false;
 			gs->game_chat().add_message(
 					"You do not have enough mana to blink, 50 MP required!",
-					RED);
+					COL_RED);
 		} else if (!find_blink_target(this, gs, blinkposition)) {
 			canuse = false;
 			gs->game_chat().add_message(
@@ -236,7 +236,7 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		} else {
 			gs->game_chat().add_message(
 					"You do not have enough mana to blink, 50 MP required!",
-					RED);
+					COL_RED);
 		}
 		/* restore x and y */
 		x = px, y = py;

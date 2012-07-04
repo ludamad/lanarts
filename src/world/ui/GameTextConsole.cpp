@@ -5,6 +5,8 @@
 
 #include "../../display/display.h"
 
+#include "../../util/colour_constants.h"
+
 #include "GameTextConsole.h"
 
 GameTextConsole::GameTextConsole(const BBox & bbox) :
@@ -19,7 +21,7 @@ void GameTextConsole::step(GameState *gs) {
 void GameTextConsole::draw_box(GameState *gs) {
 	content_already_drawn = true;
 	gl_draw_rectangle(bbox.x1, bbox.y1, bbox.width(), bbox.height(),
-			Colour(180, 180, 255, 50));
+			COL_CONSOLE_BOX.with_alpha(50));
 }
 
 void GameTextConsole::draw(GameState* gs) {

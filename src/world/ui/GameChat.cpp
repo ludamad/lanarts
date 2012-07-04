@@ -17,10 +17,12 @@ extern "C" {
 
 #include "../../display/display.h"
 
-#include "../../lua/lua_api.h"
+#include "../../util/colour_constants.h"
 #include "../../util/math_util.h"
 
 #include "../../procedural/enemygen.h"
+
+#include "../../lua/lua_api.h"
 
 #include "../objects/PlayerInst.h"
 
@@ -92,7 +94,7 @@ void GameChat::draw_player_chat(GameState* gs) const {
 	int text_x = chat_x + padding, text_y = chat_y + padding;
 
 	gl_draw_rectangle(chat_x, chat_y, chat_w, chat_h,
-			Colour(180, 180, 255, 50 * fade_out));
+			COL_CONSOLE_BOX.with_alpha(50 * fade_out));
 
 	bool draw_typed_message = is_typing || !typed_message.empty();
 
@@ -359,7 +361,7 @@ void GameChat::toggle_chat(GameState* gs) {
 	if (is_typing) {
 		if (!typed_message.message.empty()) {
 			typed_message.sender = gs->game_settings().username;
-			typed_message.sender_colour = Colour(37, 207, 240);
+			typed_message.sender_colour = COL_BABY_BLUE;
 			if (!handle_special_commands(gs, typed_message.message)) {
 				add_message(typed_message);
 			}
@@ -443,10 +445,12 @@ bool GameChat::handle_event(GameState* gs, SDL_Event *event) {
 	}
 	return false;
 }
+
 void GameChat::reset_typed_message() {
 	typed_message.sender.clear();
 	typed_message.message.clear();
 }
+
 GameChat::GameChat() :  typed_message(std::string(), std::string()) {
 	current_key = SDLK_UNKNOWN;
 	current_mod = KMOD_NONE;
@@ -456,16 +460,6 @@ GameChat::GameChat() :  typed_message(std::string(), std::string()) {
 	fade_out_rate = 0.05f;
 	is_typing = false;
 	repeat_steps_left = 0;
-//	messages.push_back(
-//			ChatMessage("ludamad", "What's up!?\nGo eff off",
-//					Colour(37, 207, 240)));
-//	messages.push_back(ChatMessage("ciribot", "nm u", Colour(255, 69, 0)));
-
-//	char buff[40];
-//	for (int i = 0; i < 14; i++){
-//		snprintf(buff, 40, "Message %d\n", i);
-//		this->add_message(buff);
-//	}
 }
 
 void packet_get_str(NetPacket& packet, std::string& str) {

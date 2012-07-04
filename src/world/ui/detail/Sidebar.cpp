@@ -29,10 +29,10 @@ static void draw_player_statbars(GameState* gs, PlayerInst* player, int x,
 	CoreStats& core = player->effective_stats().core;
 
 	BBox bbox(x, y, x + 100, y + 10);
-	draw_statbar_with_text(gs, bbox, core.hp, core.max_hp, GREEN, RED);
+	draw_statbar_with_text(gs, bbox, core.hp, core.max_hp, COL_GREEN, COL_RED);
 
 	bbox = bbox.translated(0, 15);
-	draw_statbar_with_text(gs, bbox, core.mp, core.max_mp, BLUE,
+	draw_statbar_with_text(gs, bbox, core.mp, core.max_mp, COL_BLUE,
 			Colour(200, 200, 200));
 
 	bbox = bbox.translated(0, 15);
