@@ -54,7 +54,7 @@ private:
 	NavigationSprites sprites;
 	BBox side_bar, main_content;
 	view_t view;
-	NavigationOption inventory, equipment, spells;
+	NavigationOption inventory, equipment, spells, config;
 };
 
 #endif /* SIDEBARNAVIGATOR_H_ */

@@ -42,22 +42,22 @@ void SidebarNavigator::NavigationOption::draw_icon(GameState* gs,
 }
 
 static BBox icon_bounds(const BBox& main_content_bounds, int icon_n,
-		int total_n) {
+		int total_n, int row = 0) {
 	int icon_sep = TILE_SIZE + 2;
 	int icon_sx = main_content_bounds.center_x() - icon_sep * total_n / 2;
-	int icon_sy = main_content_bounds.y2 + TILE_SIZE;
+	int icon_sy = main_content_bounds.y2 + (row + 1) * TILE_SIZE;
 
 	int icon_x = icon_sx + icon_n * icon_sep;
 
 	return BBox(icon_x, icon_sy, icon_x + TILE_SIZE, icon_sy + TILE_SIZE);
 }
 
-const int NUM_ICONS = 3;
+const int NUM_ICONS = 4;
 
 SidebarNavigator::SidebarNavigator(const BBox& sidebar_bounds,
 		const BBox& main_content_bounds) :
 		side_bar(sidebar_bounds), main_content(main_content_bounds), view(
-				INVENTORY), inventory(get_sprite_by_name("stats_icon"),
+				INVENTORY), inventory(get_sprite_by_name("inventory_icon"),
 				new InventoryContent(main_content_bounds),
 				icon_bounds(main_content_bounds, 0, NUM_ICONS)), equipment(
 				get_sprite_by_name("equipment_icon"),
@@ -65,7 +65,10 @@ SidebarNavigator::SidebarNavigator(const BBox& sidebar_bounds,
 				icon_bounds(main_content_bounds, 1, NUM_ICONS)), spells(
 				get_sprite_by_name("spells_icon"),
 				new SpellsContent(main_content_bounds),
-				icon_bounds(main_content_bounds, 2, NUM_ICONS)) {
+				icon_bounds(main_content_bounds, 2, NUM_ICONS)), config(
+				get_sprite_by_name("config_icon"),
+				new SpellsContent(main_content_bounds),
+				icon_bounds(main_content_bounds, 3, NUM_ICONS)) {
 }
 
 SidebarNavigator::~SidebarNavigator() {
@@ -76,6 +79,7 @@ void SidebarNavigator::draw(GameState* gs) {
 	inventory.draw_icon(gs);
 	spells.draw_icon(gs);
 	equipment.draw_icon(gs);
+	config.draw_icon(gs);
 	current_option().draw_icon(gs, true);
 }
 
@@ -84,7 +88,7 @@ void SidebarNavigator::step(GameState* gs) {
 }
 
 void SidebarNavigator::reset_slot_selected() {
-	((InventoryContent*)inventory.content)->reset_slot_selected();
+	((InventoryContent*) inventory.content)->reset_slot_selected();
 }
 
 bool SidebarNavigator::handle_icon_io(GameState* gs, NavigationOption& option,

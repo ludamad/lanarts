@@ -12,6 +12,9 @@ sprites:
   - name: spells_icon
     file: res/sprites/interface/magic.png
     
+  - name: config_icon
+    file: res/sprites/interface/config.png
+    
   - name: stats_icon
     file: res/sprites/interface/stats.png
     
