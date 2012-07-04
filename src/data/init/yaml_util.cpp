@@ -85,7 +85,6 @@ bool yaml_has_node(const YAML::Node & n, const char *key) {
 	return n.FindValue(key);
 }
 
-
 const YAML::Node & operator >>(const YAML::Node& n, Range& r) {
 	r = parse_range(n);
 	return n;
@@ -115,6 +114,25 @@ const YAML::Node & operator >>(const YAML::Node& n, bool& r) {
 	return n;
 }
 
+static Item parse_as_item(const YAML::Node& n) {
+	std::string s = parse_str(n);
+	return Item(get_item_by_name(s.c_str()));
+}
+
+Inventory parse_inventory(const YAML::Node& n) {
+	Inventory ret;
+	for (int i = 0; i < n.size(); i++) {
+		const YAML::Node& slot = n[i];
+		ret.add(parse_as_item(slot["item"]), parse_defaulted(slot, "amount", 1));
+	}
+	return ret;
+}
+Equipment parse_equipment(const YAML::Node& n) {
+	Equipment ret;
+	ret.inventory = parse_inventory(n["inventory"]);
+	return ret;
+}
+
 CombatStats parse_combat_stats(const YAML::Node& n) {
 	CombatStats ret;
 	ClassStats& class_stats = ret.class_stats;
@@ -122,6 +140,9 @@ CombatStats parse_combat_stats(const YAML::Node& n) {
 
 	n["movespeed"] >> ret.movespeed;
 
+	if (yaml_has_node(n, "equipment")) {
+		ret.equipment = parse_equipment(n["equipment"]);
+	}
 	core.max_mp = parse_defaulted(n, "mp", 0);
 	core.max_hp = parse_int(n["hp"]);
 	core.hpregen = parse_defaulted(n, "hpregen", 0.0);
@@ -138,7 +159,8 @@ CombatStats parse_combat_stats(const YAML::Node& n) {
 	core.physical_reduction = parse_defaulted(n, "reduction", 0);
 	core.magic_reduction = parse_defaulted(n, "magic_reduction", 0);
 
-	class_stats.xpneeded = parse_defaulted(n, "xpneeded", experience_needed_formula(1));
+	class_stats.xpneeded = parse_defaulted(n, "xpneeded",
+			experience_needed_formula(1));
 	class_stats.xplevel = parse_defaulted(n, "xplevel", 1);
 	ret.attacks = parse_defaulted(n, "attacks", std::vector<AttackStats>());
 
@@ -146,7 +168,7 @@ CombatStats parse_combat_stats(const YAML::Node& n) {
 }
 
 const YAML::Node& operator >>(const YAML::Node& n, CoreStatMultiplier& sm) {
-	sm.base = parse_defaulted(n, "base", Range(0,0));
+	sm.base = parse_defaulted(n, "base", Range(0, 0));
 	sm.strength = parse_defaulted(n, "strength", 0.0f);
 	sm.magic = parse_defaulted(n, "magic", 0.0f);
 	sm.defence = parse_defaulted(n, "defence", 0.0f);
@@ -154,8 +176,9 @@ const YAML::Node& operator >>(const YAML::Node& n, CoreStatMultiplier& sm) {
 	return n;
 }
 
-const YAML::Node& operator >>(const YAML::Node& n, std::vector<AttackStats>& attacks){
-	for (int i = 0; i < n.size(); i++){
+const YAML::Node& operator >>(const YAML::Node& n,
+		std::vector<AttackStats>& attacks) {
+	for (int i = 0; i < n.size(); i++) {
 		attacks.push_back(parse_attack(n[i]));
 	}
 	return n;
@@ -169,14 +192,12 @@ AttackStats parse_attack(const YAML::Node & n) {
 		name = parse_str(n["weapon"]);
 		ret.weapon = Weapon(get_weapon_by_name(name.c_str()));
 	}
-	if (yaml_has_node(n, "projectile")){
+	if (yaml_has_node(n, "projectile")) {
 		name = parse_str(n["projectile"]);
 		ret.projectile = Projectile(get_projectile_by_name(name.c_str()));
 	}
 	return ret;
 }
-
-
 
 void load_data_impl_template(const FilenameList& filenames,
 		const char* resource, load_data_impl_callbackf node_callback,

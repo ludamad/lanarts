@@ -109,23 +109,23 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 	Colour outline =
 			weapon_selected ? COL_SELECTED_OUTLINE : COL_FILLED_OUTLINE;
 
+	/* Draw weapon*/
+	WeaponEntry& wentry = player->weapon_type().weapon_entry();
+	gl_draw_image(game_sprite_data[wentry.item_sprite].img(), x, y);
 	if (!player->projectile().valid_projectile()) {
 		/* Draw only enough space for weapon if no projectile used */
 		gl_draw_rectangle_outline(x + 1, y, TILE_SIZE, TILE_SIZE, outline);
 	} else {
-		/* Draw enough space for weapon & projectile otherwise*/
-		gl_draw_rectangle_outline(x + 1, y, TILE_SIZE * 2, TILE_SIZE, outline);
 		ProjectileEntry& ptype = player->projectile().projectile_entry();
 		gl_draw_image(game_sprite_data[ptype.item_sprite].img(), x + TILE_SIZE,
 				y);
 		/* Draw projectile amount */
 		gl_printf(gs->primary_font(), Colour(255, 255, 255), x + TILE_SIZE + 1,
 				y + 1, "%d", player->equipment().projectile_amnt);
+		/* Draw enough space for weapon & projectile */
+		gl_draw_rectangle_outline(x + 1, y, TILE_SIZE * 2, TILE_SIZE, outline);
 	}
 
-	/* Draw weapon*/
-	WeaponEntry& wentry = player->weapon_type().weapon_entry();
-	gl_draw_image(game_sprite_data[wentry.item_sprite].img(), x, y);
 }
 
 static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,

@@ -5,8 +5,6 @@ projectiles:
     spr_item: arrow_item
     spr_attack: arrow_projectile
     #Stats
-    damage: {base: [2,5]}
-    power: {base: 0}
     drop_chance: 75 # % chance
     speed: 6
 
@@ -27,6 +25,6 @@ projectiles:
     #Stats
     range: 400
     speed: 8
-    cooldown: 20
+    cooldown: 45
     damage: {base: [5,8], strength: 1.0}
     power: {base: 2, strength: 0.2}
