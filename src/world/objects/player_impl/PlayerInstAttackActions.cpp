@@ -66,7 +66,7 @@ static GameInst* find_closest_from_list(GameState* gs,
 
 static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 		GameInst* targ, float dx, float dy) {
-	WeaponEntry& wentry = p->weapon_type().weapon_entry();
+	WeaponEntry& wentry = p->weapon().weapon_entry();
 	Pos ppos(p->x, p->y);
 	GameInst* inst = NULL;
 	bool ismelee = !(wentry.uses_projectile || p->equipment().has_projectile());
@@ -167,7 +167,7 @@ static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
 void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		float dy) {
 	GameView& view = gs->window_view();
-	WeaponEntry& wentry = weapon_type().weapon_entry();
+	WeaponEntry& wentry = weapon().weapon_entry();
 
 	bool mouse_within = gs->mouse_x() < gs->window_view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
@@ -274,7 +274,7 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 }
 
 void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
-	WeaponEntry& wentry = weapon_type().weapon_entry();
+	WeaponEntry& wentry = weapon().weapon_entry();
 	MTwist& mt = gs->rng();
 	const int MAX_MELEE_HITS = 10;
 	EffectiveStats& estats = effective_stats();
@@ -293,7 +293,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 		item_id item = get_item_by_name(pentry.name.c_str());
 		int weaprange = std::max(wentry.range, pentry.range);
 
-		AttackStats weaponattack(weapon_type());
+		AttackStats weaponattack(weapon());
 		GameInst* bullet = new ProjectileInst(projectile,
 				effective_atk_stats(mt, weaponattack), id, start, actpos,
 				pentry.speed, weaprange);

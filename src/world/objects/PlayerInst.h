@@ -71,7 +71,7 @@ public:
 	int gold() {
 		return money;
 	}
-	Weapon& weapon_type() {
+	Weapon& weapon() {
 		return equipment().weapon;
 	}
 	Projectile& projectile() {

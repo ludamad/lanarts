@@ -45,6 +45,7 @@ struct Range {
 	}
 	Range(int min, int max) :
 			min(min), max(max) {
+		LANARTS_ASSERT(min <= max);
 	}
 	Range(const Range& r) {
 		min = r.min, max = r.max;

@@ -73,14 +73,20 @@ static int get_X_by_name(const T& t, const char* name, bool error_if_not_found =
 int get_armour_by_name(const char *name, bool error_if_not_found) {
 	return get_X_by_name(game_armour_data, name, error_if_not_found);
 }
-const char* equip_type_description(ItemEntry::equip_type equipment_type) {
-	switch (equipment_type) {
+const char* equip_type_description(const ItemEntry& ientry) {
+	switch (ientry.equipment_type) {
 	case ItemEntry::ARMOUR:
 		return "Armour";
 	case ItemEntry::WEAPON:
 		return "Weapon";
-	case ItemEntry::PROJECTILE:
-		return "Projectile";
+	case ItemEntry::PROJECTILE: {
+		ProjectileEntry& pentry = game_projectile_data.at(ientry.equipment_id);
+		if (pentry.is_unarmed()) {
+			return "Unarmed Projectile";
+		} else {
+			return "Projectile";
+		}
+	}
 	case ItemEntry::NONE:
 		return "One-time Use";
 	}

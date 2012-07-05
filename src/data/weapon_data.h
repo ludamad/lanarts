@@ -22,16 +22,16 @@ struct ProjectileEntry {
 
 	sprite_id item_sprite, attack_sprite;
 	CoreStatMultiplier power, damage;
-	float percentage_magic;//Conversely the rest is percentage physical
+	float percentage_magic; //Conversely the rest is percentage physical
 
-	int drop_chance;//out of 100
+	int drop_chance; //out of 100
 	//If unarmed projectile, range/cooldown used
 	//or if larger than base weapon's
 	float speed;
 	int cooldown, range, radius;
 
-	bool is_unarmed(){
-		return weapon_class == "unarmed";
+	bool is_unarmed() {
+		return weapon_class == "unarmed" || weapon_class == "magic";
 	}
 };
 
@@ -41,7 +41,7 @@ struct WeaponEntry {
 	bool uses_projectile;
 	int max_targets;
 	CoreStatMultiplier power, damage;
-	float percentage_magic;//Conversely the rest is percentage physical
+	float percentage_magic; //Conversely the rest is percentage physical
 
 	int range, dmgradius, cooldown;
 	sprite_id item_sprite, attack_sprite;

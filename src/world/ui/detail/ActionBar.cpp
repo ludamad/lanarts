@@ -8,6 +8,7 @@
 #include "../../../data/weapon_data.h"
 
 #include "../../../util/colour_constants.h"
+#include "../../../util/content_draw_util.h"
 #include "../../../util/game_basic_structs.h"
 
 #include "../../GameState.h"
@@ -53,13 +54,8 @@ static int get_selected_slot(const BBox& bbox, int mx, int my) {
 	return (mx - action_start_x) / SLOT_WIDTH;
 }
 
-/* Return which slot the mouse is hovering over
- * NOTE: This function should return true when the left mouse button is down
- * and within the action bar, so that other click events (eg using an attack)
- * do not process */
-bool ActionBar::handle_io(GameState* gs, ActionQueue& queued_actions) {
-	PlayerInst* p = gs->local_player();
-
+static bool handle_equip_slot_io(GameState* gs, PlayerInst* p, const BBox& bbox,
+		ActionQueue& queued_actions) {
 	int mx = gs->mouse_x(), my = gs->mouse_y();
 	bool leftdown = gs->mouse_left_down(), rightdown = gs->mouse_right_down();
 
@@ -81,6 +77,22 @@ bool ActionBar::handle_io(GameState* gs, ActionQueue& queued_actions) {
 		}
 	}
 
+	/* Check whether to select weapon as active action */
+	bool selects_projectile = p->projectile().valid_projectile()
+			&& is_within_equipped_projectile(bbox, mx, my);
+	if (leftdown
+			&& (is_within_equipped_weapon(bbox, mx, my) || selects_projectile)) {
+		p->spell_selected() = -1;
+		return true;
+	}
+	return false;
+}
+
+static bool handle_spell_slot_io(GameState* gs, PlayerInst* p, const BBox& bbox,
+		ActionQueue& queued_actions) {
+	int mx = gs->mouse_x(), my = gs->mouse_y();
+	bool leftdown = gs->mouse_left_down(), rightdown = gs->mouse_right_down();
+
 	/* Check if a spell is selected */
 	int spell_slot = get_selected_slot(bbox, mx, my);
 
@@ -91,12 +103,27 @@ bool ActionBar::handle_io(GameState* gs, ActionQueue& queued_actions) {
 		return true; // Ensures mouse actions are filtered when clicking on action bar
 	}
 
-	/* Check if the weapon is selected */
-	bool selects_projectile = p->projectile().valid_projectile()
-			&& is_within_equipped_projectile(bbox, mx, my);
-	if (leftdown
-			&& (is_within_equipped_weapon(bbox, mx, my) || selects_projectile)) {
-		p->spell_selected() = -1;
+	if (rightdown && spell_slot > -1) {
+		if (spell_slot < p->spells_known().amount()) {
+			p->spell_selected() = -1;
+		}
+		return true; // Ensures mouse actions are filtered when clicking on action bar
+	}
+	return false;
+}
+
+/* Return which slot the mouse is hovering over
+ * NOTE: This function should return true when the left mouse button is down
+ * and within the action bar, so that other click events (eg using an attack)
+ * do not process */
+bool ActionBar::handle_io(GameState* gs, ActionQueue& queued_actions) {
+	PlayerInst* p = gs->local_player();
+
+	if (handle_equip_slot_io(gs, p, bbox, queued_actions)) {
+		return true;
+	}
+
+	if (handle_spell_slot_io(gs, p, bbox, queued_actions)) {
 		return true;
 	}
 
@@ -105,32 +132,46 @@ bool ActionBar::handle_io(GameState* gs, ActionQueue& queued_actions) {
 
 static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 		int x, int y) {
+	Weapon& weapon = player->weapon();
 	bool weapon_selected = player->spell_selected() == -1;
 	Colour outline =
 			weapon_selected ? COL_SELECTED_OUTLINE : COL_FILLED_OUTLINE;
 
+	/* Draw only enough space for weapon if no projectile used */
+	bool draw_with_projectile = player->projectile().valid_projectile();
+
+	BBox weaponbox(x + 1, y, x + 1 + TILE_SIZE, y + TILE_SIZE);
+	if (draw_with_projectile) {
+		weaponbox.x2 += TILE_SIZE;
+	}
+
+	if (weaponbox.contains(gs->mouse_x(), gs->mouse_y())) {
+		draw_console_item_description(gs, weapon.as_item());
+		if (!weapon_selected) {
+			outline = COL_PALE_YELLOW;
+		}
+	}
+
 	/* Draw weapon*/
-	WeaponEntry& wentry = player->weapon_type().weapon_entry();
+	WeaponEntry& wentry = weapon.weapon_entry();
 	gl_draw_image(game_sprite_data[wentry.item_sprite].img(), x, y);
-	if (!player->projectile().valid_projectile()) {
-		/* Draw only enough space for weapon if no projectile used */
-		gl_draw_rectangle_outline(x + 1, y, TILE_SIZE, TILE_SIZE, outline);
-	} else {
+
+	if (draw_with_projectile) {
 		ProjectileEntry& ptype = player->projectile().projectile_entry();
 		gl_draw_image(game_sprite_data[ptype.item_sprite].img(), x + TILE_SIZE,
 				y);
 		/* Draw projectile amount */
 		gl_printf(gs->primary_font(), Colour(255, 255, 255), x + TILE_SIZE + 1,
 				y + 1, "%d", player->equipment().projectile_amnt);
-		/* Draw enough space for weapon & projectile */
-		gl_draw_rectangle_outline(x + 1, y, TILE_SIZE * 2, TILE_SIZE, outline);
 	}
 
+	gl_draw_rectangle_outline(weaponbox, outline);
 }
 
 static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 		const BBox& bounds) {
 
+	int mx = gs->mouse_x(), my = gs->mouse_y();
 	SpellsKnown& spells = player->spells_known();
 
 	const int spell_n = spells.amount();
@@ -143,13 +184,26 @@ static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 		gl_draw_image(spr_entry.img(), sx + i * TILE_SIZE, sy);
 	}
 
-	for (int x = sx, spellidx = 0; x < bounds.x2; x += TILE_SIZE) {
-		bool is_selected = spellidx++ == player->spell_selected();
-		Colour outline =
-				is_selected ? COL_SELECTED_OUTLINE : COL_UNFILLED_OUTLINE;
-		if (!is_selected && spellidx <= spell_n)
-			outline = COL_FILLED_OUTLINE;
-		gl_draw_rectangle_outline(x, sy, TILE_SIZE, TILE_SIZE, outline);
+	for (int x = sx, spellidx = 0; x < bounds.x2; x += TILE_SIZE, spellidx++) {
+		BBox spellbox(x, sy, x + TILE_SIZE, sy + TILE_SIZE);
+		bool is_selected = spellidx == player->spell_selected();
+		Colour outline = COL_UNFILLED_OUTLINE;
+
+		if (spellidx < spell_n) {
+			spell_id spell = spells.get(spellidx);
+			SpellEntry& spl_entry = game_spell_data.at(spell);
+
+			outline = is_selected ? COL_SELECTED_OUTLINE : COL_FILLED_OUTLINE;
+
+			if (spellbox.contains(mx, my)) {
+				draw_console_spell_description(gs, spl_entry);
+				if (!is_selected) {
+					outline = COL_PALE_YELLOW;
+				}
+			}
+		}
+
+		gl_draw_rectangle_outline(spellbox, outline);
 
 //		if (spellidx <= 9) {
 //			gl_printf(gs->primary_font(), Colour(100, 255, 255),
