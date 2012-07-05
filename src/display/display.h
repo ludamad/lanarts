@@ -78,6 +78,10 @@ Pos gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
 Pos gl_printf_bounded(const font_data& font, const Colour& colour, float x,
 		float y, int max_width, bool center_y, const char *fmt, ...);
 /* printf-like function that draws to the screen, returns width of formatted string
+ * bounded within 'max_width' & centered on y */
+Pos gl_printf_y_centered_bounded(const font_data& font, const Colour& colour, float x,
+		float y, int max_width, bool center_y, const char *fmt, ...);
+/* printf-like function that draws to the screen, returns width of formatted string
  * centered on x and y */
 Pos gl_printf_centered(const font_data& font, const Colour& colour, float x,
 		float y, const char *fmt, ...);

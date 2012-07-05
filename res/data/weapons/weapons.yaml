@@ -1,6 +1,7 @@
 ---
 weapons:
   - name: Unarmed
+    description: You are currently fighting with your fists.
     weapon_class: unarmed
     spr_item: hand
     #Damage: { base: <range>, strength: <multiplier>, magic: <multiplier> }

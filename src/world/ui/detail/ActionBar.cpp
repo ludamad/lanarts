@@ -132,6 +132,7 @@ bool ActionBar::handle_io(GameState* gs, ActionQueue& queued_actions) {
 
 static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 		int x, int y) {
+	int mx = gs->mouse_x(), my = gs->mouse_y();
 	Weapon& weapon = player->weapon();
 	bool weapon_selected = player->spell_selected() == -1;
 	Colour outline =
@@ -141,15 +142,17 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 	bool draw_with_projectile = player->projectile().valid_projectile();
 
 	BBox weaponbox(x + 1, y, x + 1 + TILE_SIZE, y + TILE_SIZE);
+	BBox equipbox(weaponbox);
 	if (draw_with_projectile) {
-		weaponbox.x2 += TILE_SIZE;
+		equipbox.x2 += TILE_SIZE;
 	}
 
-	if (weaponbox.contains(gs->mouse_x(), gs->mouse_y())) {
+	if (equipbox.contains(mx, my) && !weapon_selected) {
+		outline = COL_PALE_YELLOW;
+	}
+
+	if (weaponbox.contains(mx, my)) {
 		draw_console_item_description(gs, weapon.as_item());
-		if (!weapon_selected) {
-			outline = COL_PALE_YELLOW;
-		}
 	}
 
 	/* Draw weapon*/
@@ -157,7 +160,15 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 	gl_draw_image(game_sprite_data[wentry.item_sprite].img(), x, y);
 
 	if (draw_with_projectile) {
-		ProjectileEntry& ptype = player->projectile().projectile_entry();
+		BBox projectilebox(equipbox.translated(TILE_SIZE, 0));
+
+		Projectile& projectile = player->projectile();
+
+		if (projectilebox.contains(mx, my)) {
+			draw_console_item_description(gs, projectile.as_item());
+		}
+
+		ProjectileEntry& ptype = projectile.projectile_entry();
 		gl_draw_image(game_sprite_data[ptype.item_sprite].img(), x + TILE_SIZE,
 				y);
 		/* Draw projectile amount */
@@ -165,7 +176,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 				y + 1, "%d", player->equipment().projectile_amnt);
 	}
 
-	gl_draw_rectangle_outline(weaponbox, outline);
+	gl_draw_rectangle_outline(equipbox, outline);
 }
 
 static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,

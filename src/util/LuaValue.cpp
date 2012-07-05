@@ -1,16 +1,16 @@
-#include "LuaValue.h"
-#include <string>
-#include <cstring>
-#include <cstdlib>
+#include <yaml-cpp/yaml.h>
 
 extern "C" {
 #include <lua/lua.h>
 #include <lua/lauxlib.h>
 }
 
-#include "../lua/lua_api.h"
+#include "LuaValue.h"
+#include <string>
+#include <cstring>
+#include <cstdlib>
 
-#include <yaml-cpp/yaml.h>
+#include "../lua/lua_api.h"
 
 //YAML related helper functions
 
@@ -253,16 +253,14 @@ void LuaValue::table_set_newtable(lua_State* L, const char *key) {
 LuaValue::LuaValue(const LuaValue & value) {
 	impl = value.impl;
 	if (impl) {
-		impl->ref_count()++;
+		impl->ref_count()++;}
 	}
-}
 
 void LuaValue::operator =(const LuaValue & value) {
 	deref(impl);
 	impl = value.impl;
 	if (impl)
-		impl->ref_count()++;
-}
+		impl->ref_count()++;}
 
 void LuaValue::table_set_yaml(lua_State* L, const char *key,
 		const YAML::Node& root) {

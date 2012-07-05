@@ -99,7 +99,7 @@ static void show_appear_message(GameChat& chat, EnemyEntry& e) {
 }
 static void show_defeat_message(GameChat& chat, EnemyEntry& e) {
 	if (!e.defeat_msg.empty()) {
-		chat.add_message(e.defeat_msg, COL_PALE_GREEN);
+		chat.add_message(e.defeat_msg, COL_MUTED_GREEN);
 	}
 
 }

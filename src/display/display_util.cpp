@@ -107,10 +107,9 @@ static int process_string(const font_data& font, const char* text,
 			last_space = ind;
 			width_since_space = 0;
 		}
-
 		bool overmax = max_width != -1 && width > max_width;
-		if (c == '\n' || overmax) {
-			line_splits.push_back(last_space);
+		if (c == '\n' || (overmax && !isspace(c))) {
+			line_splits.push_back(last_space+1);
 			largest_width = std::max(width, largest_width);
 			width = width_since_space;
 		}
@@ -156,7 +155,8 @@ void gl_draw_sprite(sprite_id sprite, const GameView& view, int x, int y,
 //
 /* General gl_print function for others to delegate to */
 static Pos gl_print_impl(const font_data& font, const Colour& colour, Pos p,
-		int max_width, bool center_x, bool center_y, const char* fmt, va_list ap) {
+		int max_width, bool center_x, bool center_y, const char* fmt,
+		va_list ap) {
 	char text[512];
 	vsnprintf(text, 512, fmt, ap);
 	va_end(ap);
@@ -209,7 +209,17 @@ Pos gl_printf_bounded(const font_data& font, const Colour& colour, float x,
 	va_list ap;
 	va_start(ap, fmt);
 
-	return gl_print_impl(font, colour, Pos(x, y), max_width, false, false, fmt, ap);
+	return gl_print_impl(font, colour, Pos(x, y), max_width, false, false, fmt,
+			ap);
+}
+/* printf-like function that draws to the screen, returns width of formatted string*/
+Pos gl_printf_y_centered_bounded(const font_data& font, const Colour& colour, float x,
+		float y, int max_width, bool center_y, const char *fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+
+	return gl_print_impl(font, colour, Pos(x, y), max_width, false, true, fmt,
+			ap);
 }
 
 /* printf-like function that draws to the screen, returns width of formatted string*/
