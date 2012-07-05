@@ -9,6 +9,7 @@
 #include "../../../display/display.h"
 
 #include "../../../util/colour_constants.h"
+#include "../../../util/content_draw_util.h"
 
 #include "../../GameState.h"
 
@@ -16,49 +17,19 @@
 
 #include "InventoryContent.h"
 
-static void draw_item_and_name(GameState* gs, ItemEntry& ientry, Colour col,
-		int x, int y) {
-	gl_draw_sprite(ientry.sprite, x, y);
-	gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE,
-			COL_PALE_YELLOW.with_alpha(50));
-	/* Draw item name */
-	gl_printf_y_centered(gs->primary_font(), col, x + TILE_SIZE * 1.25,
-			y + TILE_SIZE / 2, "%s", ientry.name.c_str());
-}
-
-static void draw_console_item_description(GameState* gs, ItemSlot& itemslot) {
-	GameTextConsole& console = gs->game_console();
-
-	ItemEntry& ientry = itemslot.item.item_entry();
-
-	if (console.has_content_already()) {
-		return;
-	}
-
-	console.draw_box(gs);
-	BBox bbox(console.bounding_box());
-	draw_item_and_name(gs, ientry, Colour(), bbox.x1 + 4, bbox.y1 + 4);
-	gl_printf_y_centered(gs->primary_font(), COL_PALE_YELLOW,
-			bbox.center_x() / 2, bbox.y1 + TILE_SIZE / 2 + 4, "%s",
-			equip_type_description(ientry.equipment_type));
-
-	const int MAX_WIDTH = bbox.width() - TILE_SIZE;
-
-	gl_printf_bounded(gs->primary_font(), COL_LIGHT_GRAY,
-			bbox.x1 + TILE_SIZE / 2, bbox.y1 + TILE_SIZE + 9, MAX_WIDTH, "%s",
-			ientry.description.c_str());
-}
-
 static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot, int x,
 		int y) {
 	if (itemslot.amount > 0) {
-		ItemEntry& itemd = itemslot.item.item_entry();
-		GLimage& itemimg = game_sprite_data[itemd.sprite].img();
+		ItemEntry& ientry = itemslot.item.item_entry();
+		GLimage& itemimg = game_sprite_data[ientry.sprite].img();
 		gl_draw_image(itemimg, x, y);
-		gl_printf(gs->primary_font(), Colour(255, 255, 255), x + 1, y + 1, "%d",
-				itemslot.amount);
+		if (ientry.stackable) {
+			gl_printf(gs->primary_font(), Colour(255, 255, 255), x + 1, y + 1,
+					"%d", itemslot.amount);
+		}
 	}
 }
+
 static void draw_player_inventory(GameState* gs, Inventory& inv,
 		const BBox& bbox, int min_slot, int max_slot, int slot_selected = -1) {
 	int mx = gs->mouse_x(), my = gs->mouse_y();
@@ -76,7 +47,7 @@ static void draw_player_inventory(GameState* gs, Inventory& inv,
 				outline = COL_FILLED_OUTLINE;
 				if (slotbox.contains(mx, my)) {
 					outline = COL_PALE_YELLOW;
-					draw_console_item_description(gs, itemslot);
+					draw_console_item_description(gs, itemslot.item);
 				}
 			}
 
@@ -118,7 +89,7 @@ void InventoryContent::draw(GameState* gs) const {
 	Inventory& inv = p->inventory();
 	int min_item = ITEMS_PER_PAGE * page_number, max_item = min_item
 			+ ITEMS_PER_PAGE;
-	gl_printf(gs->primary_font(), COL_FILLED_OUTLINE, bbox.center_x() - 10,
+	gl_printf_x_centered(gs->primary_font(), COL_FILLED_OUTLINE, bbox.center_x(),
 			bbox.y2 + 3, "Items");
 	draw_player_inventory(gs, inv, bbox, min_item, max_item, slot_selected);
 }

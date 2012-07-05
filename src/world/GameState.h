@@ -71,6 +71,8 @@ public:
 	bool tile_line_test(int x, int y, int w, int h);
 	int object_radius_test(GameInst* obj, GameInst** objs = NULL, int obj_cap =
 			0, col_filterf f = NULL, int x = -1, int y = -1, int radius = -1);
+	int object_radius_test(int x, int y, int radius, col_filterf f = NULL,
+			GameInst** objs = NULL, int obj_cap = 0);
 	bool solid_test(GameInst* obj, GameInst** objs = NULL, int obj_cap = 0,
 			col_filterf f = NULL, int x = -1, int y = -1, int radius = -1) {
 		int lx = (x == -1 ? obj->x : x), ly = (y == -1 ? obj->y : y);

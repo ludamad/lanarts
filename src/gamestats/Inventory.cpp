@@ -3,15 +3,20 @@
  *  Item's held by a player/enemy
  */
 
+#include "../data/item_data.h"
+
 #include "Inventory.h"
 
 bool Inventory::add(const Item& item, int amount) {
-	/* Try to merge with existing entry */
-	for (int i = 0; i < items.size(); i++) {
-		if (items[i].item == item && items[i].amount > 0) {
-			items[i].item = item;
-			items[i].amount += amount;
-			return true;
+	ItemEntry& ientry = item.item_entry();
+	if (ientry.stackable) {
+		/* Try to merge with existing entry */
+		for (int i = 0; i < items.size(); i++) {
+			if (items[i].item == item && items[i].amount > 0) {
+				items[i].item = item;
+				items[i].amount += amount;
+				return true;
+			}
 		}
 	}
 	/* Try to add to new slot */

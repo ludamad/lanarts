@@ -106,7 +106,7 @@ enemies:
     appear_message: An unnaturally glowing chicken appears!
     defeat_message: The glowing chicken recieves a final blow.
     stats:
-        attacks: [ {weapon: Basic Melee} ]
+        attacks: [ {weapon: Fast Melee} ]
         hp: 50
         hpregen: 0.08
         movespeed: 4

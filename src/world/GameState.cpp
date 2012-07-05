@@ -126,6 +126,11 @@ PlayerInst* GameState::local_player() {
 	return (PlayerInst*)player;
 }
 
+int GameState::object_radius_test(int x, int y, int radius, col_filterf f,
+		GameInst** objs, int obj_cap) {
+	return object_radius_test(NULL, objs, obj_cap, f, x, y, radius);
+}
+
 int GameState::handle_event(SDL_Event *event) {
 	int done = 0;
 

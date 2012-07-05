@@ -13,7 +13,7 @@
 class ItemInst: public GameInst {
 public:
 	enum {
-		RADIUS = 10, DEPTH = 100
+		RADIUS = 15, DEPTH = 100
 	};
 	ItemInst(const Item& item, int x, int y, int quantity = 1,
 			obj_id dropped_by = 0, bool pickup_by_dropper = false) :

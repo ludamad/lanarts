@@ -4,7 +4,7 @@
 
 default_items: &default_items #Reference with *default_items
   - { item: Arrow,              chance: 10,  quantity: [2,8]  }
-  - { item: Stone Arrow,        chance: 10,  quantity: [1,4]   }
+  - { item: Silver Arrow,        chance: 10,  quantity: [1,4]   }
   - { item: Short Bow,          chance: 10                     }
   - { item: Stone,              chance: 10,  quantity: [2,8]   }
   - { item: Gold,               chance: 75,  quantity: [5,20]  }

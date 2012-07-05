@@ -85,8 +85,8 @@ void GameHud::draw(GameState* gs) {
 	if (!player_inst)
 		return;
 
-	sidebar.draw(gs);
 	action_bar.draw(gs);
+	sidebar.draw(gs);
 	// Must draw console after other components have chance to draw content there
 	console.draw(gs);
 }

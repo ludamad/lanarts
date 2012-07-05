@@ -230,6 +230,15 @@ Pos gl_printf_y_centered(const font_data& font, const Colour& colour, float x,
 	return gl_print_impl(font, colour, Pos(x, y), -1, false, true, fmt, ap);
 }
 
+/* printf-like function that draws to the screen, returns width of formatted string*/
+Pos gl_printf_x_centered(const font_data& font, const Colour& colour, float x,
+		float y, const char *fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+
+	return gl_print_impl(font, colour, Pos(x, y), -1, true, false, fmt, ap);
+}
+
 void gl_draw_circle(const GameView& view, float x, float y, float radius,
 		const Colour& colour, bool outline) {
 	gl_draw_circle(x - view.x, y - view.y, radius, colour, outline);

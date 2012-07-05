@@ -53,12 +53,14 @@ void CoreStats::heal_mp(float mpgain) {
 		mp = max_mp;
 }
 
-float CoreStatMultiplier::calculate(MTwist& mt, const CoreStats& stats) {
-	int basevalue = mt.rand(base);
+Range CoreStatMultiplier::calculate_range(const CoreStats& stats) {
 	int stats_sum = stats.strength * strength + stats.defence * defence
 			+ stats.magic * magic + stats.willpower * willpower;
-//	float random_multiplier = (100 + mt.rand(Range(-5, 5))) / 100.0f;
-	return basevalue + stats_sum; // * random_multiplier;
+	return Range(base.min + stats_sum, base.max + stats_sum);
+}
+
+int CoreStatMultiplier::calculate(MTwist& mt, const CoreStats& stats) {
+	return mt.rand(calculate_range(stats));
 }
 
 EffectiveAttackStats EffectiveStats::with_attack(MTwist& mt,
@@ -112,4 +114,3 @@ void CooldownStats::reset_hurt_cooldown(int cooldown) {
 ClassType& ClassStats::class_type() const {
 	return game_class_data.at(classid);
 }
-

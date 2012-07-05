@@ -51,7 +51,8 @@ struct CoreStatMultiplier {
 			base(base, base), strength(strength), defence(defence), magic(
 					magic), willpower(willpower) {
 	}
-	float calculate(MTwist& mt, const CoreStats& stats);
+	Range calculate_range(const CoreStats& stats);
+	int calculate(MTwist& mt, const CoreStats& stats);
 };
 
 /* Derived combat stats, power & damage represent bonuses

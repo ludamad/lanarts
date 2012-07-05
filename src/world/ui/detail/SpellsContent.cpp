@@ -19,36 +19,6 @@
 
 #include "../../objects/PlayerInst.h"
 
-static void draw_icon_and_name(GameState* gs, SpellEntry& spl_entry, Colour col,
-		int x, int y) {
-	gl_draw_sprite(spl_entry.sprite, x, y);
-	gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE,
-			COL_PALE_YELLOW.with_alpha(50));
-	/* Draw spell name */
-	gl_printf_y_centered(gs->primary_font(), col, x + TILE_SIZE * 1.25,
-			y + TILE_SIZE / 2, "%s", spl_entry.name.c_str());
-}
-
-static void draw_console_spell_description(GameState* gs,
-		SpellEntry& spl_entry) {
-	GameTextConsole& console = gs->game_console();
-
-	if (console.has_content_already()) {
-		return;
-	}
-
-	console.draw_box(gs);
-	BBox bbox(console.bounding_box());
-	draw_icon_and_name(gs, spl_entry, Colour(), bbox.x1 + 4, bbox.y1 + 4);
-	draw_stat_text(gs, bbox.center_x() / 2, bbox.y1 + TILE_SIZE / 2 + 4,
-			"MP cost: ", COL_PALE_YELLOW, spl_entry.mp_cost, COL_PALE_RED);
-
-	const int MAX_WIDTH = bbox.width() - TILE_SIZE;
-
-	gl_printf_bounded(gs->primary_font(), COL_LIGHT_GRAY,
-			bbox.x1 + TILE_SIZE / 2, bbox.y1 + TILE_SIZE + 9, MAX_WIDTH, "%s",
-			spl_entry.description.c_str());
-}
 
 static void draw_spells_known(GameState* gs, const BBox& bbox,
 		SpellsKnown& spells, int ind_low, int ind_high) {
@@ -65,7 +35,7 @@ static void draw_spells_known(GameState* gs, const BBox& bbox,
 
 		spell_id spell = spells.get(spellidx);
 		SpellEntry& spl_entry = game_spell_data.at(spell);
-		draw_icon_and_name(gs, spl_entry, Colour(), x, y);
+		draw_spell_icon_and_name(gs, spl_entry, Colour(), x, y);
 
 		BBox entry_box(x, y, ex - 2, y + TILE_SIZE);
 		if (entry_box.contains(mx, my)) {
@@ -74,24 +44,6 @@ static void draw_spells_known(GameState* gs, const BBox& bbox,
 		}
 		spellidx++;
 	}
-
-//	for (int y = bbox.y1; y < bbox.y2; y += TILE_SIZE) {
-//		for (int x = bbox.x1; x < bbox.x2; x += TILE_SIZE) {
-//			if (spellidx >= ind_high)
-//				break;
-//
-//			bool filledslot = spellidx < spell_n;
-//			Colour outline = filledslot ? COL_FILLED_OUTLINE : COL_UNFILLED_OUTLINE;
-//
-//			gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE, outline);
-//
-//			if (filledslot) {
-//				draw_spell_icon(spells.get(spellidx), x, y);
-//			}
-//
-//			spellidx++;
-//		}
-//	}
 }
 
 const int SPELLS_PER_PAGE = 40;
@@ -101,7 +53,7 @@ void SpellsContent::draw(GameState* gs) const {
 
 	int min_spell = SPELLS_PER_PAGE * page_number, max_spell = min_spell
 			+ SPELLS_PER_PAGE;
-	gl_printf(gs->primary_font(), COL_FILLED_OUTLINE, bbox.center_x() - 15,
+	gl_printf_x_centered(gs->primary_font(), COL_FILLED_OUTLINE, bbox.center_x(),
 			bbox.y2 + 3, "Spells");
 	draw_spells_known(gs, bbox, p->spells_known(), min_spell, max_spell);
 }

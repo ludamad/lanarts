@@ -269,7 +269,8 @@ void PlayerInst::queue_network_actions(GameState *gs) {
 			GameAction action;
 			packet.get(action);
 			if (output1 && action.frame != gs->frame()) {
-				fprintf(stderr, "action frame %d vs %d\n", action.frame, gs->frame());
+				fprintf(stderr, "action frame %d vs %d\n", action.frame,
+						gs->frame());
 				fflush(stderr);
 				output1 = false;
 			}
@@ -291,9 +292,15 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 	int dropx = round_to_multiple(x, TILE_SIZE, true), dropy =
 			round_to_multiple(y, TILE_SIZE, true);
 	int amnt = itemslot.amount;
-	gs->add_instance(new ItemInst(itemslot.item, dropx, dropy, amnt, id));
-	itemslot.amount -= amnt;
-	gs->game_hud().reset_slot_selected();
+	bool already_item_here = gs->object_radius_test(dropx, dropy,
+			ItemInst::RADIUS);
+	if (!already_item_here) {
+		gs->add_instance(new ItemInst(itemslot.item, dropx, dropy, amnt, id));
+		itemslot.amount -= amnt;
+	}
+	if (this->local) {
+		gs->game_hud().reset_slot_selected();
+	}
 }
 
 void PlayerInst::reposition_item(GameState* gs, const GameAction& action) {
