@@ -9,6 +9,9 @@ include(FindFreetype)
 include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} ../src_yaml/yaml-cpp/include ../src_net/ ../src_rvo2/RVO2 ../src_lua)
 
 set( lanarts_src
+
+	collision_avoidance/CollisionAvoidance.cpp
+
 	combat_logic/ai_logic.cpp
 	combat_logic/attack_logic.cpp
 	combat_logic/combat_logic.cpp
@@ -118,6 +121,8 @@ set( lanarts_src
 	)
 
 set( lanarts_include
+
+	collision_avoidance/CollisionAvoidance.h
 	
 	combat_logic/ai_logic.h
 	combat_logic/attack_logic.h

@@ -39,6 +39,7 @@ private:
 	std::vector<obj_id> pids;
 };
 
+//One instance for all levels
 class _PlayerController {
 public:
 	_PlayerController();
