@@ -26,6 +26,8 @@ void floodfill(PathingNode* path, int w, int h, int sx, int sy, int alloc_w) {
 		for (int dy = -1; dy <= +1; dy++) {
 			for (int dx = -1; dx <= +1; dx++) {
 				int nx = curr.x + dx, ny = curr.y + dy;
+				LANARTS_ASSERT(
+						curr.x >= 0 && curr.x < w && curr.y >= 0 && curr.y < h);
 				if (nx < 0 || nx >= w || ny < 0 || ny >= h)
 					continue;
 				int coord = ny * alloc_w + nx;
@@ -81,12 +83,13 @@ void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
 	if (!path || w < alloc_w || h < alloc_h) {
 		alloc_w = max(alloc_w, power_of_two(w));
 		alloc_h = max(alloc_h, power_of_two(h));
-		if (path) delete[] path;
+		if (path)
+			delete[] path;
 		path = new PathingNode[alloc_w * alloc_h];
 	}
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			PathingNode* node = &path[y * alloc_w + x];
+			PathingNode* node = get(x, y);
 			node->solid = tile.is_solid(x + min_tilex, y + min_tiley);
 			node->open = true;
 			node->dx = 0;
@@ -100,6 +103,12 @@ void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
 	path_x = tx, path_y = ty;
 }
 
+static bool is_solid_or_out_of_bounds(PathInfo& path, int x, int y) {
+	if (x < 0 || x >= path.width() || y < 0 || y >= path.height())
+		return true;
+	return path.get(x, y)->solid;
+}
+
 bool PathInfo::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
 		int dy) {
 	bool is_diag = (abs(dx) == abs(dy));
@@ -111,26 +120,28 @@ bool PathInfo::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
 			yy = squish(y, sy, ey + 1);
 			int gx = (xx + dx * speed) / TILE_SIZE - start_x;
 			int gy = (yy + dy * speed) / TILE_SIZE - start_y;
-			if (gx < 0 || gx >= alloc_w || gy < 0 || gy >= alloc_h)
+			if (is_solid_or_out_of_bounds(*this, gx, gy)) {
 				return false;
-			if (get(gx,gy)->solid)
-				return false;
+			}
 			if (is_diag) {
-				if (get(xx / TILE_SIZE - start_x,
-						(yy + dy * speed) / TILE_SIZE - start_y)->solid)
+				if (is_solid_or_out_of_bounds(*this, xx / TILE_SIZE - start_x,
+						(yy + dy * speed) / TILE_SIZE - start_y)) {
 					return false;
-				if (get((xx + dx * speed) / TILE_SIZE - start_x,
-						yy / TILE_SIZE - start_y)->solid)
+				}
+				if (is_solid_or_out_of_bounds(*this,
+						(xx + dx * speed) / TILE_SIZE - start_x,
+						yy / TILE_SIZE - start_y)) {
 					return false;
+				}
 			}
 		}
 	}
 	return true;
 }
 
-
 //Away from object
-void PathInfo::random_further_direction(MTwist& mt, int x, int y, int w, int h, float speed, float& vx, float& vy){
+void PathInfo::random_further_direction(MTwist& mt, int x, int y, int w, int h,
+		float speed, float& vx, float& vy) {
 	if (!path) {
 		vx = 0, vy = 0;
 		return;
@@ -152,11 +163,11 @@ void PathInfo::random_further_direction(MTwist& mt, int x, int y, int w, int h, 
 			int px = xx - start_x, py = yy - start_y;
 			PathingNode* p = get(px, py);
 			if (!p->solid) {
-				point_to_random_further(mt, px,py);
+				point_to_random_further(mt, px, py);
 			}
 		}
 	}
-	interpolated_direction(x,y,w,h,speed,vx,vy);
+	interpolated_direction(x, y, w, h, speed, vx, vy);
 }
 
 void PathInfo::interpolated_direction(int x, int y, int w, int h, float speed,
@@ -359,7 +370,7 @@ void PathInfo::draw(GameState* gs) {
 
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			PathingNode* node = get(x,y);
+			PathingNode* node = get(x, y);
 			if (false && !node->solid)
 				gl_printf(gs->primary_font(), Colour(255, 255, 255),
 						(x + start_x) * TILE_SIZE - view.x,

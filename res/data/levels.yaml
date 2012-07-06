@@ -168,7 +168,7 @@ areas:
   - branch: main_branch
     levels:
 #tiny levels with animals
-#      #Level 1
+      #Level 1
 #      - layout: [*test_layout]
 #        content:
 #          features: { tileset: [lair_tiles1, lair_tiles2],     stairs_up: 0  }

@@ -70,6 +70,8 @@ public:
 	void random_further_direction(MTwist& mt, int x, int y, int w, int h,
 			float speed, float& vx, float& vy);
 	PathingNode* get(int x, int y) {
+		LANARTS_ASSERT( x >= 0 && x < w );
+		LANARTS_ASSERT( y >= 0 && y < h );
 		return &path[alloc_w * y + x];
 	}
 	void stake_claim(int x, int y);
