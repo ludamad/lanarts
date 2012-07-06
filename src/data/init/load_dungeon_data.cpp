@@ -166,6 +166,8 @@ LuaValue load_dungeon_data(lua_State* L, const FilenameList& filenames) {
 		const YAML::Node& node = root["areas"];
 		//First branch should be main branch, using node[0]:
 		parse_dungeon_branch(node[0], game_dungeon_yaml);
+		//TODO: remove this hack when there are proper subbranches
+		game_dungeon_yaml[0].content.features.nstairs_up = 0;
 
 		game_dungeon_data[0] = DungeonBranch(&game_dungeon_yaml[0],
 				game_dungeon_yaml.size());

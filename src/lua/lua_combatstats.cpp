@@ -8,6 +8,7 @@
 #include "../world/GameState.h"
 #include "../world/GameLevelState.h"
 
+#include "../world/objects/GameInstRef.h"
 #include "../world/objects/EnemyInst.h"
 #include "../world/objects/PlayerInst.h"
 
@@ -16,26 +17,26 @@ public:
 	static const char className[];
 	static Lunar<CombatStatsLuaBinding>::RegType methods[];
 
-	CombatStatsLuaBinding(obj_id id) :
-			id(id) {
+	CombatStatsLuaBinding(GameInst* inst) :
+			inst(inst) {
 	}
 	CombatStatsLuaBinding(const CombatStats& value) :
-			id(0), value(value) {
+			value(value) {
 	}
 
 	CombatStats* get_stats(lua_State* L) {
-		if (!id)
+		if (!inst.get_instance())
 			return &value;
 		GameState* gs = lua_get_gamestate(L);
-		CombatGameInst* inst = dynamic_cast<CombatGameInst*>(gs->get_instance(
-				id));
-		if (!inst)
+		CombatGameInst* combat_inst =
+				dynamic_cast<CombatGameInst*>(inst.get_instance());
+		if (!combat_inst)
 			return NULL;
-		return &inst->stats();
+		return &combat_inst->stats();
 	}
 
 private:
-	obj_id id; //If id !=0, use object stats
+	GameInstRef inst;
 	CombatStats value; //If id == 0, use this
 };
 
@@ -127,8 +128,8 @@ void lua_combatstats_bindings(GameState* gs, lua_State* L) {
 	lua_pushcfunction(L, lua_member_update);
 	lua_settable(L, tableind);
 }
-void lua_push_combatstats(lua_State* L, obj_id id) {
-	lunar_t::push(L, new CombatStatsLuaBinding(id), true);
+void lua_push_combatstats(lua_State* L, GameInst* inst) {
+	lunar_t::push(L, new CombatStatsLuaBinding(inst), true);
 }
 void lua_push_combatstats(lua_State* L, const CombatStats& stats) {
 	lunar_t::push(L, new CombatStatsLuaBinding(stats), true);

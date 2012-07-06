@@ -15,6 +15,7 @@ class Node;
 }
 
 class LuaValueImpl;
+class GameInst;
 struct lua_State;
 
 typedef int (*lua_CFunction)(lua_State *L);
@@ -44,13 +45,14 @@ public:
 	void table_set_newtable(lua_State* L, const char* key);
 	void table_set_yaml(lua_State* L, const char* key, const YAML::Node& root);
 	/* For convenience, since these keys will often be dynamically allocated 'string's */
-	void table_set_yaml(lua_State* L, const std::string& key, const YAML::Node& root){
+	void table_set_yaml(lua_State* L, const std::string& key,
+			const YAML::Node& root) {
 		table_set_yaml(L, key.c_str(), root);
 	}
 private:
 	LuaValueImpl* impl;
 };
 
-void lua_gameinstcallback(lua_State* L, LuaValue& value, int id);
+void lua_gameinstcallback(lua_State* L, LuaValue& value, GameInst* inst);
 
 #endif /* LUAVALUE_H_ */

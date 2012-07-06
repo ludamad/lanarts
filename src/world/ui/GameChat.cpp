@@ -200,7 +200,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 	//Spawn monster
 	if (starts_with(command, "!spawn ", &content)) {
 		const char* rest = content;
-		int amnt = strtol(content, (char**)&rest, 10);
+		int amnt = strtol(content, (char**) &rest, 10);
 		if (content == rest)
 			amnt = 1;
 		rest = skip_whitespace(rest);
@@ -248,7 +248,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 	//Create item
 	if (starts_with(command, "!item ", &content)) {
 		const char* rest = content;
-		int amnt = strtol(content, (char**)&rest, 10);
+		int amnt = strtol(content, (char**) &rest, 10);
 		if (content == rest)
 			amnt = 1;
 		rest = skip_whitespace(rest);
@@ -270,7 +270,8 @@ bool GameChat::handle_special_commands(GameState* gs,
 	if (starts_with(command, "!killall", &content)) {
 		MonsterController& mc = gs->monster_controller();
 		for (int i = 0; i < mc.monster_ids().size(); i++) {
-			EnemyInst* inst = (EnemyInst*)gs->get_instance(mc.monster_ids()[i]);
+			EnemyInst* inst = (EnemyInst*) gs->get_instance(
+					mc.monster_ids()[i]);
 			if (inst) {
 				inst->damage(gs, 99999);
 			}
@@ -292,9 +293,9 @@ bool GameChat::handle_special_commands(GameState* gs,
 //		lua_pop(L, 1);
 	}
 
-	lua_push_gameinst(L, p->id);
+	lua_push_gameinst(L, p);
 	script_globals.table_pop_value(L, "player");
-	lua_push_combatstats(L, p->id);
+	lua_push_combatstats(L, p);
 	script_globals.table_pop_value(L, "stats");
 
 	//Run lua command
@@ -451,7 +452,8 @@ void GameChat::reset_typed_message() {
 	typed_message.message.clear();
 }
 
-GameChat::GameChat() :  typed_message(std::string(), std::string()) {
+GameChat::GameChat() :
+		typed_message(std::string(), std::string()) {
 	current_key = SDLK_UNKNOWN;
 	current_mod = KMOD_NONE;
 	reset_typed_message();
