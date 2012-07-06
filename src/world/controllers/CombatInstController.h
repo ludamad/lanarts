@@ -6,6 +6,8 @@
 #ifndef COMBATINSTCONTROLLER_H_
 #define COMBATINSTCONTROLLER_H_
 
+#include <vector>
+
 #include "../../util/game_basic_structs.h"
 
 class CombatGameInst;

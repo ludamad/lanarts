@@ -155,6 +155,7 @@ set( lanarts_include
 	gamestats/items.h
 	gamestats/effects.h
 	gamestats/Equipment.h
+	gamestats/EnemiesSeen.h
 	gamestats/skills.h
 	gamestats/stat_formulas.h
 	gamestats/stats.h
@@ -172,7 +173,6 @@ set( lanarts_include
 	
 	util/callback_util.h
 	util/content_draw_util.h
-	util/EnemiesSeen.h
 	util/game_basic_structs.h
 	util/gheap.h
 	util/hashset_util.h

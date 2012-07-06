@@ -49,13 +49,13 @@ public:
 
 	void register_player(obj_id player, bool islocal);
 	void deregister_player(obj_id player);
-
-	const std::vector<obj_id>& player_ids() {
-		return pids;
-	}
-	obj_id local_playerid() {
-		return local_player;
-	}
+//
+//	const std::vector<obj_id>& player_ids() {
+//		return pids;
+//	}
+//	obj_id local_playerid() {
+//		return local_player;
+//	}
 	bool has_player() {
 		return !pids.empty();
 	}
