@@ -89,8 +89,6 @@ void InventoryContent::draw(GameState* gs) const {
 	Inventory& inv = p->inventory();
 	int min_item = ITEMS_PER_PAGE * page_number, max_item = min_item
 			+ ITEMS_PER_PAGE;
-	gl_printf_x_centered(gs->primary_font(), COL_FILLED_OUTLINE, bbox.center_x(),
-			bbox.y2 + 3, "Items");
 	draw_player_inventory(gs, inv, bbox, min_item, max_item, slot_selected);
 }
 

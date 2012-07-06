@@ -52,7 +52,7 @@ struct CoreStatMultiplier {
 					magic), willpower(willpower) {
 	}
 	Range calculate_range(const CoreStats& stats) const;
-	int calculate(MTwist& mt, const CoreStats& stats) const;
+	float calculate(MTwist& mt, const CoreStats& stats) const;
 };
 
 /* Derived combat stats, power & damage represent bonuses

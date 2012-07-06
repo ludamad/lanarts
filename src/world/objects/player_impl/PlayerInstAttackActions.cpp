@@ -115,11 +115,10 @@ static bool find_blink_target(PlayerInst* p, GameState* gs, Pos& position) {
 
 	int maxdist = 0;
 	for (int i = 0; i < pc.player_ids().size(); i++) {
-
-		fov* fov = pc.player_fovs()[i];
-		BBox fbox = fov->tiles_covered();
+		PlayerInst* player = (PlayerInst*)gs->get_instance(pc.player_ids()[i]);
+		BBox fbox = player->field_of_view().tiles_covered();
 		FOR_EACH_BBOX(fbox, x, y) {
-			if (fov->within_fov(x, y)) {
+			if (player->field_of_view().within_fov(x, y)) {
 				Pos pos(x * TILE_SIZE + TILE_SIZE / 2,
 						y * TILE_SIZE + TILE_SIZE / 2);
 

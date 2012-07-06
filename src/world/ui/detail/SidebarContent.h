@@ -19,6 +19,8 @@ public:
 	SidebarContent(const BBox& bbox) :
 			page_number(0), bbox(bbox) {
 	}
+	virtual const char* name() = 0;
+
 	virtual ~SidebarContent() {
 	}
 	virtual void draw(GameState* gs) const = 0;

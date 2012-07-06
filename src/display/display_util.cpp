@@ -143,6 +143,7 @@ void gl_draw_sprite(sprite_id sprite, int x, int y, const Colour& c) {
 	GLimage& img = game_sprite_data.at(sprite).img();
 	gl_draw_image(img, x, y, c);
 }
+
 void gl_draw_sprite(sprite_id sprite, const GameView& view, int x, int y,
 		const Colour& c) {
 	gl_draw_sprite(sprite, x - view.x, y - view.y, c);

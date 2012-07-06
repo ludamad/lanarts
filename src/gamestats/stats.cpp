@@ -54,13 +54,15 @@ void CoreStats::heal_mp(float mpgain) {
 }
 
 Range CoreStatMultiplier::calculate_range(const CoreStats& stats) const {
-	int stats_sum = stats.strength * strength + stats.defence * defence
+	float stats_sum = stats.strength * strength + stats.defence * defence
 			+ stats.magic * magic + stats.willpower * willpower;
-	return Range(base.min + stats_sum, base.max + stats_sum);
+	return Range(base.min + round(stats_sum), base.max + round(stats_sum));
 }
 
-int CoreStatMultiplier::calculate(MTwist& mt, const CoreStats& stats) const {
-	return mt.rand(calculate_range(stats));
+float CoreStatMultiplier::calculate(MTwist& mt, const CoreStats& stats) const {
+	float stats_sum = stats.strength * strength + stats.defence * defence
+			+ stats.magic * magic + stats.willpower * willpower;
+	return stats_sum + mt.rand(base);
 }
 
 EffectiveAttackStats EffectiveStats::with_attack(MTwist& mt,

@@ -249,7 +249,7 @@ void MonsterController::deregister_enemy(EnemyInst* enemy) {
 }
 void MonsterController::shift_target(GameState* gs) {
 	if (!targetted)
-		return; //Should auto-target, it no target no possible targets
+		return; //Shouldn't auto-target if no targets are possible
 	int i, j;
 	for (i = 0; i < mids.size(); i++) {
 		if (mids[i] == targetted)

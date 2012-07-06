@@ -12,6 +12,7 @@
 #include "../../GameState.h"
 
 #include "EquipmentContent.h"
+#include "EnemiesSeenContent.h"
 #include "InventoryContent.h"
 #include "SidebarContent.h"
 #include "SpellsContent.h"
@@ -45,42 +46,51 @@ static BBox icon_bounds(const BBox& main_content_bounds, int icon_n,
 		int total_n, int row = 0) {
 	int icon_sep = TILE_SIZE + 2;
 	int icon_sx = main_content_bounds.center_x() - icon_sep * total_n / 2;
-	int icon_sy = main_content_bounds.y2 + (row + 1) * TILE_SIZE;
+	int icon_sy = main_content_bounds.y2 + (row + 1) * (TILE_SIZE + 2);
 
 	int icon_x = icon_sx + icon_n * icon_sep;
 
 	return BBox(icon_x, icon_sy, icon_x + TILE_SIZE, icon_sy + TILE_SIZE);
 }
 
-const int NUM_ICONS = 4;
+const int NUM_ICONS_ROW_1 = 3;
+const int NUM_ICONS_ROW_2 = 2;
 
 SidebarNavigator::SidebarNavigator(const BBox& sidebar_bounds,
 		const BBox& main_content_bounds) :
 		side_bar(sidebar_bounds), main_content(main_content_bounds), view(
 				INVENTORY), inventory(get_sprite_by_name("inventory_icon"),
 				new InventoryContent(main_content_bounds),
-				icon_bounds(main_content_bounds, 0, NUM_ICONS)), equipment(
+				icon_bounds(main_content_bounds, 0, NUM_ICONS_ROW_1)), equipment(
 				get_sprite_by_name("equipment_icon"),
 				new EquipmentContent(main_content_bounds),
-				icon_bounds(main_content_bounds, 1, NUM_ICONS)), spells(
+				icon_bounds(main_content_bounds, 1, NUM_ICONS_ROW_1)), spells(
 				get_sprite_by_name("spells_icon"),
 				new SpellsContent(main_content_bounds),
-				icon_bounds(main_content_bounds, 2, NUM_ICONS)), config(
+				icon_bounds(main_content_bounds, 2, NUM_ICONS_ROW_1)), enemies(
+				get_sprite_by_name("enemies_icon"),
+				new EnemiesSeenContent(main_content_bounds),
+				icon_bounds(main_content_bounds, 0, NUM_ICONS_ROW_2, 1)), config(
 				get_sprite_by_name("config_icon"),
-				new SpellsContent(main_content_bounds),
-				icon_bounds(main_content_bounds, 3, NUM_ICONS)) {
+				new EquipmentContent(main_content_bounds),
+				icon_bounds(main_content_bounds, 1, NUM_ICONS_ROW_2, 1)) {
 }
 
 SidebarNavigator::~SidebarNavigator() {
 }
 
 void SidebarNavigator::draw(GameState* gs) {
-	current_content()->draw(gs);
 	inventory.draw_icon(gs);
 	spells.draw_icon(gs);
+	enemies.draw_icon(gs);
 	equipment.draw_icon(gs);
 	config.draw_icon(gs);
 	current_option().draw_icon(gs, true);
+
+	current_content()->draw(gs);
+	gl_printf_x_centered(gs->primary_font(), COL_FILLED_OUTLINE,
+			main_content.center_x(), main_content.y2 + 3,
+			current_content()->name());
 }
 
 void SidebarNavigator::step(GameState* gs) {
@@ -88,7 +98,7 @@ void SidebarNavigator::step(GameState* gs) {
 }
 
 void SidebarNavigator::reset_slot_selected() {
-	((InventoryContent*) inventory.content)->reset_slot_selected();
+	((InventoryContent*)inventory.content)->reset_slot_selected();
 }
 
 bool SidebarNavigator::handle_icon_io(GameState* gs, NavigationOption& option,
@@ -103,6 +113,8 @@ bool SidebarNavigator::handle_icon_io(GameState* gs, NavigationOption& option,
 bool SidebarNavigator::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	if (handle_icon_io(gs, inventory, INVENTORY)
 			|| handle_icon_io(gs, spells, SPELLS)
+//			|| handle_icon_io(gs, config, CONFIG)
+			|| handle_icon_io(gs, enemies, ENEMIES)
 			|| handle_icon_io(gs, equipment, EQUIPMENT)) {
 		return true;
 	}
@@ -119,8 +131,12 @@ SidebarNavigator::NavigationOption& SidebarNavigator::current_option() {
 		return inventory;
 	case SPELLS:
 		return spells;
+	case ENEMIES:
+		return enemies;
 	case EQUIPMENT:
 		return equipment;
+	case CONFIG:
+		return config;
 	}
 	/* shouldn't happen */
 	LANARTS_ASSERT(false);

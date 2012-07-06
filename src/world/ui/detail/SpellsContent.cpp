@@ -53,8 +53,6 @@ void SpellsContent::draw(GameState* gs) const {
 
 	int min_spell = SPELLS_PER_PAGE * page_number, max_spell = min_spell
 			+ SPELLS_PER_PAGE;
-	gl_printf_x_centered(gs->primary_font(), COL_FILLED_OUTLINE, bbox.center_x(),
-			bbox.y2 + 3, "Spells");
 	draw_spells_known(gs, bbox, p->spells_known(), min_spell, max_spell);
 }
 

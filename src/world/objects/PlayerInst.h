@@ -86,6 +86,10 @@ public:
 		return didstep;
 	}
 
+	fov& field_of_view() {
+		return fieldofview;
+	}
+
 private:
 	/* Actions */
 	void use_move(GameState* gs, const GameAction& action);

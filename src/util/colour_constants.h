@@ -23,6 +23,7 @@ const Colour COL_GOLD(255, 215, 0);
 const Colour COL_PALE_YELLOW(255, 250, 150);
 const Colour COL_MEDIUM_PURPLE(123, 104, 238);
 
+const Colour COL_WHITE(255, 255, 255);
 const Colour COL_LIGHT_GRAY(180, 180, 180);
 
 /* Text console constants */

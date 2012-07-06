@@ -93,6 +93,7 @@ set( lanarts_src
 	world/ui/detail/Sidebar.cpp
 	world/ui/detail/SidebarNavigator.cpp
 	world/ui/detail/SpellsContent.cpp
+	world/ui/detail/EnemiesSeenContent.cpp
 	world/ui/detail/EquipmentContent.cpp
 	world/ui/detail/InventoryContent.cpp
 	world/ui/detail/Minimap.cpp
@@ -171,6 +172,7 @@ set( lanarts_include
 	
 	util/callback_util.h
 	util/content_draw_util.h
+	util/EnemiesSeen.h
 	util/game_basic_structs.h
 	util/gheap.h
 	util/hashset_util.h
@@ -198,6 +200,7 @@ set( lanarts_include
 	world/ui/GameHud.h
 	world/ui/GameTextConsole.h
 	world/ui/detail/ActionBar.h
+	world/ui/detail/EnemiesSeenContent.h
 	world/ui/detail/EquipmentContent.h
 	world/ui/detail/InventoryContent.h
 	world/ui/detail/Sidebar.h

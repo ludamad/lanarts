@@ -15,6 +15,9 @@ sprites:
   - name: config_icon
     file: res/sprites/interface/config.png
     
+  - name: enemies_icon
+    file: res/sprites/interface/enemies.png
+    
   - name: stats_icon
     file: res/sprites/interface/stats.png
     

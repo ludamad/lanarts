@@ -24,8 +24,6 @@ void EquipmentContent::draw(GameState* gs) const {
 
 	Equipment& inv = p->equipment();
 
-	gl_printf_x_centered(gs->primary_font(), COL_FILLED_OUTLINE,
-			bbox.center_x(), bbox.y2 + 3, "Equipment");
 //	draw_player_inventory(gs, inv, bbox, min_item, max_item, slot_selected);
 }
 

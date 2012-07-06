@@ -34,7 +34,7 @@ public:
 
 private:
 	enum view_t {
-		INVENTORY, SPELLS, EQUIPMENT, STATS
+		INVENTORY, SPELLS, EQUIPMENT, STATS, ENEMIES, CONFIG
 	};
 	struct NavigationOption {
 		NavigationOption(sprite_id icon, SidebarContent* content,
@@ -54,7 +54,7 @@ private:
 	NavigationSprites sprites;
 	BBox side_bar, main_content;
 	view_t view;
-	NavigationOption inventory, equipment, spells, config;
+	NavigationOption inventory, equipment, spells, enemies, config;
 };
 
 #endif /* SIDEBARNAVIGATOR_H_ */

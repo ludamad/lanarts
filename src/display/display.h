@@ -28,6 +28,8 @@ void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type =
 
 void gl_draw_image(GLimage& img, int x, int y,
 		const Colour& c = Colour(255, 255, 255));
+void gl_draw_image_section(GLimage& img, const BBox& section, int x, int y,
+		const Colour& c = Colour(255, 255, 255));
 void gl_draw_image(const GameView& view, GLimage& img, int x, int y,
 		const Colour& c = Colour(255, 255, 255));
 void gl_draw_sprite(sprite_id sprite, int x, int y,
@@ -50,8 +52,8 @@ void gl_draw_rectangle(const GameView& view, int x, int y, int w, int h,
 void gl_draw_rectangle_outline(int x, int y, int w, int h, const Colour& clr =
 		Colour(255, 255, 255), int linewidth = 1);
 
-inline void gl_draw_rectangle_outline(const BBox& bbox,
-		const Colour& clr = Colour(255, 255, 255), int linewidth = 1) {
+inline void gl_draw_rectangle_outline(const BBox& bbox, const Colour& clr =
+		Colour(255, 255, 255), int linewidth = 1) {
 	gl_draw_rectangle_outline(bbox.x1, bbox.y1, bbox.width(), bbox.height(),
 			clr, linewidth);
 }
@@ -79,8 +81,8 @@ Pos gl_printf_bounded(const font_data& font, const Colour& colour, float x,
 		float y, int max_width, bool center_y, const char *fmt, ...);
 /* printf-like function that draws to the screen, returns width of formatted string
  * bounded within 'max_width' & centered on y */
-Pos gl_printf_y_centered_bounded(const font_data& font, const Colour& colour, float x,
-		float y, int max_width, bool center_y, const char *fmt, ...);
+Pos gl_printf_y_centered_bounded(const font_data& font, const Colour& colour,
+		float x, float y, int max_width, bool center_y, const char *fmt, ...);
 /* printf-like function that draws to the screen, returns width of formatted string
  * centered on x and y */
 Pos gl_printf_centered(const font_data& font, const Colour& colour, float x,

@@ -391,19 +391,24 @@ bool GameState::object_visible_test(GameInst* obj, PlayerInst* player,
 	int maxgrid_x = (x + rad) / subsize, maxgrid_y = (y + rad) / subsize;
 	int minx = squish(mingrid_x, 0, w), miny = squish(mingrid_y, 0, h);
 	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
-	const std::vector<fov*>& fovs = player_controller().player_fovs();
 
-	if ((canreveal && key_down_state(SDLK_BACKQUOTE)) || fovs.empty())
+	std::vector<obj_id> players = player_controller().player_ids();
+
+	if ((canreveal && key_down_state(SDLK_BACKQUOTE)) || players.empty())
 		return true;
 
 	PlayerController& pc = player_controller();
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			for (int i = 0; i < fovs.size(); i++) {
-				bool isplayer = player == NULL
-						|| (player->id == pc.player_ids()[i]);
-				if (isplayer && fovs[i]->within_fov(xx, yy))
-					return true;
+			if (player && player->field_of_view().within_fov(xx, yy)) {
+				return true;
+			} else if (!player) {
+				for (int i = 0; i < players.size(); i++) {
+					PlayerInst* p = (PlayerInst*)get_instance(players[i]);
+					if (p->field_of_view().within_fov(xx, yy)) {
+						return true;
+					}
+				}
 			}
 		}
 	}

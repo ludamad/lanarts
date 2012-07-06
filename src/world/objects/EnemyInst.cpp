@@ -130,6 +130,7 @@ void EnemyInst::draw(GameState* gs) {
 
 	if (!seen) {
 		seen = true;
+		gs->enemies_seen().mark_as_seen(enemytype);
 		show_appear_message(gs->game_chat(), etype());
 	}
 

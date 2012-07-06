@@ -129,6 +129,9 @@ public:
 	/* Instance global controllers */
 	MonsterController& monster_controller();
 	PlayerController& player_controller();
+	EnemiesSeen& enemies_seen() {
+		return world.enemies_seen();
+	}
 
 	/* Font getters */
 	const font_data& primary_font() {

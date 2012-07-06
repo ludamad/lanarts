@@ -26,7 +26,7 @@ const char* projectile_speed_description(int speed) {
 	} else if (speed < 3) {
 		return "Slow";
 	} else if (speed < 5) {
-		return "Mediums";
+		return "Medium";
 	} else if (speed < 8) {
 		return "Fast";
 	}
@@ -100,20 +100,22 @@ static void draw_projectile_description_overlay(GameState* gs,
 
 	bool is_unarmed = pentry.is_unarmed();
 
-	int stat_x = bbox.x1 + TILE_SIZE / 2;
-	int stat_sy = bbox.y1 + TILE_SIZE * 1.5 + 4;
-	int interval_x = bbox.width() / 4;
-	int interval_y = bbox.height() / 6;
+	int stat_x = bbox.x1 + TILE_SIZE / 2, stat_sy = bbox.y1 + TILE_SIZE * 1.5
+			+ 4;
+	int interval_x = bbox.width() / 4, interval_y = bbox.height() / 6;
 
 	//First row
-	draw_statmult_with_prefix(gs, is_unarmed ? "Damage: " : "Damage Bonus: ",
-			pentry.damage, estats.core, stat_x, stat_sy + interval_y, true);
-	draw_statmult_with_prefix(gs, is_unarmed ? "Power: " : "Power Bonus: ",
-			pentry.power, estats.core, stat_x + interval_x, stat_sy + interval_y, true);
-
 	draw_descript_with_prefix(gs, "Speed: ",
 			projectile_speed_description(pentry.speed), stat_x + interval_x,
 			stat_sy, COL_PALE_YELLOW, COL_PALE_GREEN);
+
+	//Second row
+	draw_statmult_with_prefix(gs, is_unarmed ? "Damage: " : "Damage Bonus: ",
+			pentry.damage, estats.core, stat_x, stat_sy + interval_y);
+	draw_statmult_with_prefix(gs, is_unarmed ? "Power: " : "Power Bonus: ",
+			pentry.power, estats.core, stat_x + interval_x,
+			stat_sy + interval_y);
+
 	//Third row
 	if (is_unarmed) {
 		draw_stat_with_prefix(gs, "Cooldown: ", pentry.cooldown, stat_x,
@@ -135,11 +137,27 @@ static void draw_weapon_description_overlay(GameState* gs,
 
 	BBox bbox(console.bounding_box());
 
-	int stat_x = bbox.x1 + TILE_SIZE / 2;
-	int stat_sy = bbox.y1 + TILE_SIZE * 1.5 + bbox.height() / 6 + 4;
+	int stat_x = bbox.x1 + TILE_SIZE / 2, stat_sy = bbox.y1 + TILE_SIZE * 1.5
+			+ 4;
+	int interval_x = bbox.width() / 4, interval_y = bbox.height() / 6;
 
+	//First row
+//	draw_descript_with_prefix(gs, "Speed: ",
+//			projectile_speed_description(pentry.speed), stat_x + interval_x,
+//			stat_sy, COL_PALE_YELLOW, COL_PALE_GREEN);
+
+//Second row
 	draw_statmult_with_prefix(gs, "Damage: ", wentry.damage, estats.core,
-			stat_x, stat_sy);
+			stat_x, stat_sy + interval_y);
+	draw_statmult_with_prefix(gs, "Power: ", wentry.power, estats.core,
+			stat_x + interval_x, stat_sy + interval_y);
+
+	//Third row
+	draw_stat_with_prefix(gs, "Cooldown: ", wentry.cooldown, stat_x,
+			stat_sy + interval_y * 2);
+	draw_descript_with_prefix(gs, "Range: ", range_description(wentry.range),
+			stat_x + interval_x, stat_sy + interval_y * 2, COL_PALE_YELLOW,
+			COL_PALE_GREEN);
 }
 
 void draw_item_icon_and_name(GameState* gs, ItemEntry& ientry, Colour col,
@@ -162,6 +180,16 @@ void draw_spell_icon_and_name(GameState* gs, SpellEntry& spl_entry, Colour col,
 			y + TILE_SIZE / 2, "%s", spl_entry.name.c_str());
 }
 
+static void draw_labelled_sprite(GameState* gs, sprite_id sprite,
+		const char* text, Colour col, int x, int y) {
+	gl_draw_sprite(sprite, x, y);
+	gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE,
+			COL_PALE_YELLOW.with_alpha(50));
+	/* Draw spell name */
+	gl_printf_y_centered(gs->primary_font(), col, x + TILE_SIZE * 1.25,
+			y + TILE_SIZE / 2, "%s", text);
+}
+
 void draw_console_item_description(GameState* gs, const Item& item) {
 	GameTextConsole& console = gs->game_console();
 
@@ -172,16 +200,16 @@ void draw_console_item_description(GameState* gs, const Item& item) {
 	console.draw_box(gs);
 	BBox bbox(console.bounding_box());
 	draw_item_icon_and_name(gs, ientry, Colour(), bbox.x1 + 4, bbox.y1 + 4);
-	gl_printf_y_centered(gs->primary_font(), COL_PALE_GREEN,
-			bbox.x1 + TILE_SIZE / 2, bbox.y1 + TILE_SIZE * 1.5 + 4, "%s",
+	gl_printf_y_centered(gs->primary_font(), COL_WHITE, bbox.x1 + TILE_SIZE / 2,
+			bbox.y1 + TILE_SIZE * 1.5 + 4, "%s",
 			equip_type_description(ientry));
 
-	const int x_offset = TILE_SIZE / 2;
-	const int max_width = bbox.width() / 2 - x_offset;
+	const int x_offset = bbox.width() / 6, y_offset = 4 + TILE_SIZE / 2;
+	const int max_width = bbox.width() - x_offset * 2;
 
 	gl_printf_y_centered_bounded(gs->primary_font(), COL_LIGHT_GRAY,
-			bbox.x1 + bbox.width() / 6, bbox.y1 + 4 + TILE_SIZE / 2, max_width,
-			"%s", ientry.description.c_str());
+			bbox.x1 + x_offset, bbox.y1 + y_offset, max_width, "%s",
+			ientry.description.c_str());
 
 	if (item.is_projectile()) {
 		draw_projectile_description_overlay(gs, item.as_projectile());
@@ -203,14 +231,42 @@ void draw_console_spell_description(GameState* gs, SpellEntry& spl_entry) {
 	draw_stat_with_prefix(gs, "MP cost: ", spl_entry.mp_cost,
 			bbox.x1 + TILE_SIZE / 2, bbox.y1 + TILE_SIZE * 1.5 + 4);
 
-	const int x_offset = bbox.width() / 6;
+	const int x_offset = bbox.width() / 6, y_offset = 4 + TILE_SIZE / 2;
 	const int max_width = bbox.width() - x_offset * 2;
 
 	gl_printf_y_centered_bounded(gs->primary_font(), COL_LIGHT_GRAY,
-			bbox.x1 + x_offset, bbox.y1 + 4 + TILE_SIZE / 2, max_width, "%s",
+			bbox.x1 + x_offset, bbox.y1 + y_offset, max_width, "%s",
 			spl_entry.description.c_str());
 
 	if (spl_entry.projectile.valid_projectile()) {
 		draw_projectile_description_overlay(gs, spl_entry.projectile);
 	}
 }
+
+void draw_console_enemy_description(GameState* gs, EnemyEntry& eentry) {
+	GameTextConsole& console = gs->game_console();
+
+	if (console.has_content_already()) {
+		return;
+	}
+
+	console.draw_box(gs);
+	BBox bbox(console.bounding_box());
+	draw_labelled_sprite(gs, eentry.enemy_sprite, eentry.name.c_str(), Colour(),
+			bbox.x1 + 4, bbox.y1 + 4);
+
+//	draw_stat_with_prefix(gs, "MP cost: ", spl_entry.mp_cost,
+//			bbox.x1 + TILE_SIZE / 2, bbox.y1 + TILE_SIZE * 1.5 + 4);
+
+	const int x_offset = bbox.width() / 6, y_offset = 4 + TILE_SIZE / 2;
+	const int max_width = bbox.width() - x_offset * 2;
+
+	gl_printf_y_centered_bounded(gs->primary_font(), COL_LIGHT_GRAY,
+			bbox.x1 + x_offset, bbox.y1 + y_offset, max_width, "%s",
+			eentry.description.c_str());
+
+//	if (spl_entry.projectile.valid_projectile()) {
+//		draw_projectile_description_overlay(gs, spl_entry.projectile);
+//	}
+}
+

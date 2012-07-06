@@ -13,6 +13,9 @@ public:
 	InventoryContent(const BBox& bbox) :
 			SidebarContent(bbox), slot_selected(-1) {
 	}
+	virtual const char* name() {
+		return "Inventory";
+	}
 	virtual void draw(GameState* gs) const;
 
 	virtual int amount_of_pages(GameState* gs);
