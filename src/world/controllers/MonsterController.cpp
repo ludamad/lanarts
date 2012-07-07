@@ -294,11 +294,9 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 
 			int dx = e->x - player->x, dy = e->y - player->y;
 			int distsqr = dx * dx + dy * dy;
-			if (distsqr > 0 /*overflow check*/) {
-				if (distsqr < mindistsqr) {
-					mindistsqr = distsqr;
-					closest_player_index = i;
-				}
+			if (distsqr > 0 /*overflow check*/ && distsqr < mindistsqr) {
+				mindistsqr = distsqr;
+				closest_player_index = i;
 			}
 		}
 	}
@@ -407,8 +405,11 @@ void MonsterController::update_velocity(GameState* gs, EnemyInst* e) {
 //		e->vy = -e->vy;
 //	}
 
-	if (e->cooldowns().is_hurting())
+	if (e->cooldowns().is_hurting()){
+		if(eb.current_action == EnemyBehaviour::INACTIVE)
+			eb.current_action = EnemyBehaviour::CHASING_PLAYER;
 		e->vx /= 2, e->vy /= 2;
+	}
 }
 void MonsterController::update_position(GameState* gs, EnemyInst* e) {
 	EnemyBehaviour& eb = e->behaviour();

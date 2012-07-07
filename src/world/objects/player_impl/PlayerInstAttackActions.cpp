@@ -332,7 +332,6 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 									Colour(255, 215, 11)));
 				}
 			}
-
 		}
 		cooldowns().reset_action_cooldown(wentry.cooldown);
 	}

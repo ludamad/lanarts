@@ -145,7 +145,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 	if (is_local_player()) {
 //Resting
 		bool resting = false;
-		if (gs->key_down_state(SDLK_r) && cooldowns().can_rest()) {
+		if ((stop_controls && !moving || gs->key_down_state(SDLK_r)) && cooldowns().can_rest()) {
 			queued_actions.push_back(
 					GameAction(id, GameAction::USE_REST, frame, level));
 			resting = true;
