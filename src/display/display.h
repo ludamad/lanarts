@@ -71,6 +71,8 @@ void gl_draw_statbar(const GameView& view, const BBox& bbox, int min_stat,
 void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 		char* flags, const Colour& colour = Colour(0, 0, 0));
 
+
+Pos gl_text_dimensions(const font_data& font, const char *fmt, ...);
 //Will print out text at window coordinates x,y, using the font ft_font.
 //The current modelview matrix will also be applied to the text.
 Pos gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,

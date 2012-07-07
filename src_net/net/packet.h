@@ -4,11 +4,13 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <string>
 
+typedef int packet_t;
 
 struct NetPacket {
 	enum {
-		HEADER_LEN = sizeof(int)*3, MAX_PACKET_SIZE = 512
+		HEADER_LEN = sizeof(int) * 3, MAX_PACKET_SIZE = 512
 	};
 
 	/* Messages internal to the networking library use negative indices
@@ -24,14 +26,23 @@ struct NetPacket {
 
 	NetPacket(int packet_origin = 0, int packet_type = 0);
 	size_t length() const;
-    char* body_start();
-    char* body_end();
-    bool decode_header();
-    void encode_header();
+	char* body_start();
+	char* body_end();
+	bool decode_header();
+	void encode_header();
 
 	void add_int(long val);
 	void add_str(const char* str, int len);
+	void add_str(const std::string& str) {
+		add_str(str.c_str(), str.size());
+		add_int(str.size());
+	}
 	void get_str(char* str, int len);
+	void get_str(std::string& str) {
+		int size = get_int();
+		str.resize(size);
+		get_str(&str[0], size);
+	}
 	void add_double(double val);
 	long get_int();
 	double get_double();
@@ -49,7 +60,7 @@ struct NetPacket {
 
 	char data[HEADER_LEN + MAX_PACKET_SIZE];
 	size_t body_length;
-	int packet_type;
+	packet_t packet_type;
 	int packet_origin;
 };
 

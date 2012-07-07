@@ -143,7 +143,23 @@ static bool is_typeable_keycode(SDLKey keycode) {
 	return (keycode >= SDLK_SPACE && keycode <= SDLK_z);
 }
 
-void GameChat::step(GameState *gs) {
+static ChatMessage from_net_packet(NetPacket& p) {
+	ChatMessage msg;
+	p.get_str(msg.sender);
+	p.get_str(msg.message);
+	p.get(msg.sender_colour);
+	p.get(msg.message_colour);
+	return msg;
+}
+
+static void chat_to_net_packet(const ChatMessage& msg, NetPacket& p) {
+	p.add(msg.message_colour);
+	p.add(msg.sender_colour);
+	p.add_str(msg.message);
+	p.add_str(msg.sender);
+}
+
+void GameChat::step(GameState* gs) {
 	std::string& msg = typed_message.message;
 
 	if (show_chat)
@@ -168,10 +184,16 @@ void GameChat::step(GameState *gs) {
 			repeat_steps_left = NEXT_BACKSPACE_STEP_AMNT;
 		}
 	}
+	NetPacket p;
+	while (gs->net_connection().get_next_packet(p,
+			GameNetConnection::PACKET_CHAT_MESSAGE)) {
+		add_message(from_net_packet(p));
+	}
 }
 void GameChat::draw(GameState *gs) const {
-	if (fade_out > 0.0f)
+	if (fade_out > 0.0f) {
 		draw_player_chat(gs);
+	}
 }
 
 static const char* skip_whitespace(const char* cstr) {
@@ -200,7 +222,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 	//Spawn monster
 	if (starts_with(command, "!spawn ", &content)) {
 		const char* rest = content;
-		int amnt = strtol(content, (char**) &rest, 10);
+		int amnt = strtol(content, (char**)&rest, 10);
 		if (content == rest)
 			amnt = 1;
 		rest = skip_whitespace(rest);
@@ -248,7 +270,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 	//Create item
 	if (starts_with(command, "!item ", &content)) {
 		const char* rest = content;
-		int amnt = strtol(content, (char**) &rest, 10);
+		int amnt = strtol(content, (char**)&rest, 10);
 		if (content == rest)
 			amnt = 1;
 		rest = skip_whitespace(rest);
@@ -270,8 +292,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 	if (starts_with(command, "!killall", &content)) {
 		MonsterController& mc = gs->monster_controller();
 		for (int i = 0; i < mc.monster_ids().size(); i++) {
-			EnemyInst* inst = (EnemyInst*) gs->get_instance(
-					mc.monster_ids()[i]);
+			EnemyInst* inst = (EnemyInst*)gs->get_instance(mc.monster_ids()[i]);
 			if (inst) {
 				inst->damage(gs, 99999);
 			}
@@ -358,6 +379,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 
 	return false;
 }
+
 void GameChat::toggle_chat(GameState* gs) {
 	if (is_typing) {
 		if (!typed_message.message.empty()) {
@@ -365,6 +387,12 @@ void GameChat::toggle_chat(GameState* gs) {
 			typed_message.sender_colour = COL_BABY_BLUE;
 			if (!handle_special_commands(gs, typed_message.message)) {
 				add_message(typed_message);
+				NetPacket p(0, GameNetConnection::PACKET_CHAT_MESSAGE);
+				typed_message.sender_colour = COL_MUTED_GREEN;
+				typed_message.message_colour = COL_PALE_GREEN;
+				chat_to_net_packet(typed_message, p);
+				p.encode_header();
+				gs->net_connection().broadcast_packet(p);
 			}
 		} else {
 			show_chat = false;
@@ -464,20 +492,15 @@ GameChat::GameChat() :
 	repeat_steps_left = 0;
 }
 
-void packet_get_str(NetPacket& packet, std::string& str) {
-	int size = packet.get_int();
-	str.resize(size);
-	packet.get_str(&str[0], size);
-}
 void ChatMessage::packet_add(NetPacket& packet) {
-	packet.add_str(sender.c_str(), sender.size());
-	packet.add_str(message.c_str(), message.size());
+	packet.add_str(sender);
+	packet.add_str(message);
 	packet.add(sender_colour);
 	packet.add(message_colour);
 }
 void ChatMessage::packet_get(NetPacket& packet) {
-	packet_get_str(packet, sender);
-	packet_get_str(packet, message);
+	packet.get_str(sender);
+	packet.get_str(message);
 	packet.get(sender_colour);
 	packet.get(message_colour);
 }

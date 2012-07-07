@@ -17,6 +17,7 @@ class GameNetConnection {
 public:
 	/*Packet types*/
 	enum {
+		//Negative packet types are reserved as implementation details
 		PACKET_ACTION = 0, PACKET_CHAT_MESSAGE = 1
 	};
 	GameNetConnection(int our_peer_id) {
@@ -30,7 +31,8 @@ public:
 	NetConnection*& get_connection() {
 		return connect;
 	}
-	void wait_for_packet(NetPacket& packet);
+	void wait_for_packet(NetPacket& packet, packet_t type = PACKET_ACTION);
+	bool get_next_packet(NetPacket& packet, packet_t type = PACKET_ACTION);
 	void send_and_sync(const NetPacket& packet,
 			std::vector<NetPacket>& received, bool send_to_new = false);
 

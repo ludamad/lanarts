@@ -74,7 +74,7 @@ ServerNetConnection::ServerNetConnection(int port) :
 
 	io_service.post(
 			boost::bind(&ServerNetConnection::accept_handler, this,
-					(SocketStream*) NULL, asio::error_code()));
+					(SocketStream*)NULL, asio::error_code()));
 //	accept_handler(NULL, asio::error_code());
 	execution_thread = boost::shared_ptr<asio::thread>(
 			new asio::thread(boost::bind(&wrapped_run, &io_service)));
@@ -91,7 +91,7 @@ void ServerNetConnection::assign_peerid(SocketStream* stream, int peerid) {
 //	packet.add_int(peerid);
 //	stream->send_packet(packet);
 }
-bool ServerNetConnection::get_next_packet(NetPacket & packet) {
+bool ServerNetConnection::get_next_packet(NetPacket& packet, packet_t type) {
 	bool found = false;
 
 	streamlock.lock();
@@ -103,10 +103,15 @@ bool ServerNetConnection::get_next_packet(NetPacket & packet) {
 		boost::mutex& m = ss->get_rmutex();
 		//We try to determine the status without a lock, should never be 0 when non-empty
 		m.lock();
-		if (ss->rmessages().size() != 0) {
-			packet = *ss->rmessages().front().get();
-			ss->rmessages().pop_front();
-			found = true;
+		PacketQueue::iterator it = ss->rmessages().begin();
+		for (; it != ss->rmessages().end(); it++) {
+			NetPacket* p = it->get();
+			if (p->packet_type == type) {
+				packet = *p;
+				ss->rmessages().erase(it);
+				found = true;
+				break;
+			}
 		}
 		m.unlock();
 	}

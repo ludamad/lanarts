@@ -19,7 +19,7 @@ public:
 	ServerNetConnection(int port);
 	virtual ~ServerNetConnection();
 
-	virtual bool get_next_packet(NetPacket& packet);
+	virtual bool get_next_packet(NetPacket& packet, packet_t type = 0);
 	virtual void broadcast_packet(const NetPacket& packet, bool send_to_new = false);
 	virtual int get_peer_id(){ return 0;}
 	virtual int get_number_peers(){ return streams.size();}

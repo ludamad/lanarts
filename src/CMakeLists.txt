@@ -39,6 +39,7 @@ set( lanarts_src
 	data/game_data.cpp	
 	
 	display/display_util.cpp
+	display/display_text.cpp
 	display/display.cpp
 	display/font.cpp
 	display/GLImage.cpp

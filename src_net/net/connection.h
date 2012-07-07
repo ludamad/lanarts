@@ -6,7 +6,7 @@
 
 class NetConnection {
 public:
-	virtual bool get_next_packet(NetPacket& packet) = 0;
+	virtual bool get_next_packet(NetPacket& packet, packet_t type = 0) = 0;
 	virtual void broadcast_packet(const NetPacket& packet, bool send_to_new = false) = 0;
 //	virtual void get_peer_packets(std::vector<NetPacket>& packets) = 0;
 	virtual void join() = 0;

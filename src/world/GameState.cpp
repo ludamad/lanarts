@@ -77,7 +77,7 @@ void GameState::init_game() {
 		snprintf(port_buffer, 50, "%d", settings.port);
 		connection.get_connection() = create_client_connection(
 				settings.ip.c_str(), port_buffer);
-	} else if (settings.conntype == GameSettings::HOST) {
+	} else if (settings.conntype == GameSettings::SERVER) {
 		connection.get_connection() = create_server_connection(settings.port);
 	}
 
@@ -95,7 +95,7 @@ void GameState::init_game() {
 			}
 		}
 		printf("NETWORK: Recieving seed=0x%X\n", seed);
-	} else if (settings.conntype == GameSettings::HOST) {
+	} else if (settings.conntype == GameSettings::SERVER) {
 		NetPacket packet;
 		packet.add_int(seed);
 		packet.encode_header();
@@ -284,7 +284,8 @@ void GameState::draw(bool drawhud) {
 	}
 
 	update_display();
-	glFinish();
+// XXX: Apparently glFinish is not recommended
+//	glFinish();
 }
 
 obj_id GameState::add_instance(GameInst *inst) {

@@ -49,4 +49,15 @@ projectiles:
     cooldown: 70
     speed: 6
     spr_item: none
-    spr_attack: fire bolt
+    spr_attack: fire bolt    
+
+  - name: Big Stone
+    weapon_class: physical
+    damage_type: {physical: 1.0}
+    damage: { strength: 1.0 }    # 100% magic
+    power:  { strength: 0.2 }    
+    range: 300
+    cooldown: 100
+    speed: 9
+    spr_item: none
+    spr_attack: big stone

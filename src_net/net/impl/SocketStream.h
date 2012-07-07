@@ -25,24 +25,38 @@ void socketstream_read_body_handler(SocketStream* cnc,
 void socketstream_write_handler(SocketStream* cnc,
 		const asio::error_code& error);
 
-typedef std::deque< boost::shared_ptr<NetPacket> > PacketQueue;
+typedef std::deque<boost::shared_ptr<NetPacket> > PacketQueue;
 class SocketStream {
 public:
 	SocketStream(asio::io_service& io_service);
 
 	~SocketStream();
 
-	bool get_next_packet(NetPacket& packet);
+	bool get_next_packet(NetPacket& packet, packet_t type);
 	void send_packet(const NetPacket& packet);
 
 	//Use these getters/setters only if you know what you're doing:
-	PacketQueue& rmessages()  { return reading_msgs;}
-	PacketQueue& wmessages()  { return writing_msgs;}
-	asio::ip::tcp::socket& get_socket(){ return socket; }
-	boost::mutex& get_rmutex(){ return rmutex;}
-	boost::mutex& get_wmutex(){ return wmutex;}
-	NetPacket& last_message() { return read_message; }
-	bool& is_closed(){ return closed; }
+	PacketQueue& rmessages() {
+		return reading_msgs;
+	}
+	PacketQueue& wmessages() {
+		return writing_msgs;
+	}
+	asio::ip::tcp::socket& get_socket() {
+		return socket;
+	}
+	boost::mutex& get_rmutex() {
+		return rmutex;
+	}
+	boost::mutex& get_wmutex() {
+		return wmutex;
+	}
+	NetPacket& last_message() {
+		return read_message;
+	}
+	bool& is_closed() {
+		return closed;
+	}
 //	int get_peer_id();
 	//Returns a max(peer)-size list
 	void get_connections(std::vector<NetPacket>& packets);

@@ -16,6 +16,7 @@ enemy_files:
   - enemies/animal_enemies.yaml
   - enemies/basic_enemies.yaml
   - enemies/boss_enemies.yaml
+  - enemies/undead_enemies.yaml
 
 item_files: 
   - items/items.yaml

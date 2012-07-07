@@ -68,7 +68,6 @@ double NetPacket::get_double() {
 }
 
 void NetPacket::add_str(const char* str, int len) {
-	add_int(len);
 	memcpy(body_end(), str, len);
 	body_length += len;
 }

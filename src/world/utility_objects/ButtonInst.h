@@ -1,17 +1,24 @@
 #ifndef BUTTONINST_H_
 #define BUTTONINST_H_
 
-#include "../objects/GameInst.h"
 #include <string>
 
-typedef void (*callbackf)(void* data);
+#include "../../util/callback_util.h"
+
+#include "../objects/GameInst.h"
 
 class ButtonInst: public GameInst {
 public:
-	enum {RADIUS = 10};
-	ButtonInst(const std::string& str, const BBox& bounding, callbackf callback = NULL, void* data = NULL) :
-		GameInst(bounding.x1, bounding.y1, RADIUS), str(str), bounding(bounding), callback(callback), data(data){}
-	virtual ~ButtonInst(){}
+	enum {
+		RADIUS = 10
+	};
+	ButtonInst(const std::string& str, int x, int y,
+			const ObjCallback& click_callback) :
+			GameInst(x, y, RADIUS), str(str), click_callback(click_callback) {
+	}
+	virtual ~ButtonInst() {
+	}
+	BBox bounds(GameState* gs);
 	virtual void init(GameState* gs);
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
@@ -20,9 +27,7 @@ public:
 
 private:
 	std::string str;
-	BBox bounding;
-	callbackf callback;
-	void* data;
+	ObjCallback click_callback;
 };
 
 #endif /* BUTTONINST_H_ */

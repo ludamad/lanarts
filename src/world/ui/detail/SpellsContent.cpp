@@ -19,12 +19,12 @@
 
 #include "../../objects/PlayerInst.h"
 
-
 static void draw_spells_known(GameState* gs, const BBox& bbox,
 		SpellsKnown& spells, int ind_low, int ind_high) {
 	const int spell_n = spells.amount();
 	int mx = gs->mouse_x(), my = gs->mouse_y();
 	int spellidx = ind_low;
+	int selected_spell = gs->local_player()->spell_selected();
 
 	gl_draw_rectangle_outline(bbox, COL_UNFILLED_OUTLINE);
 
@@ -39,8 +39,13 @@ static void draw_spells_known(GameState* gs, const BBox& bbox,
 
 		BBox entry_box(x, y, ex - 2, y + TILE_SIZE);
 		if (entry_box.contains(mx, my)) {
-			gl_draw_rectangle_outline(entry_box, COL_FILLED_OUTLINE);
+			if (spellidx != selected_spell) {
+				gl_draw_rectangle_outline(entry_box, COL_FILLED_OUTLINE);
+			}
 			draw_console_spell_description(gs, spl_entry);
+		}
+		if (spellidx == selected_spell) {
+			gl_draw_rectangle_outline(entry_box, COL_WHITE);
 		}
 		spellidx++;
 	}
@@ -65,5 +70,35 @@ int SpellsContent::amount_of_pages(GameState* gs) {
 	int spell_pages = (spells_n + SPELLS_PER_PAGE - 1) / SPELLS_PER_PAGE;
 
 	return spell_pages;
+}
+
+static bool handle_io_spells_known(GameState* gs, const BBox& bbox,
+		SpellsKnown& spells, int ind_low, int ind_high) {
+	const int spell_n = spells.amount();
+	int mx = gs->mouse_x(), my = gs->mouse_y();
+	int spellidx = ind_low;
+
+	int x = bbox.x1, ex = bbox.x2;
+	for (int y = bbox.y1; y < bbox.y2; y += TILE_SIZE) {
+		if (spellidx >= spell_n)
+			break;
+
+		BBox entry_box(x, y, ex - 2, y + TILE_SIZE);
+		if (entry_box.contains(mx, my) && gs->mouse_left_click()) {
+			gs->local_player()->spell_selected() = spellidx;
+			return true;
+		}
+		spellidx++;
+	}
+	return false;
+}
+
+bool SpellsContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
+	PlayerInst* p = gs->local_player();
+
+	int min_spell = SPELLS_PER_PAGE * page_number, max_spell = min_spell
+			+ SPELLS_PER_PAGE;
+	return handle_io_spells_known(gs, bbox, p->spells_known(), min_spell,
+			max_spell);
 }
 

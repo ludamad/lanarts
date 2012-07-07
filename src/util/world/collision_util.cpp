@@ -1,8 +1,6 @@
 /*
- * collision_util.cpp
- *
- *  Created on: Apr 25, 2012
- *      Author: 100397561
+ * collision_util.cpp:
+ *  Defines functions that are often used in conjunction with collision detection
  */
 
 #include "collision_util.h"

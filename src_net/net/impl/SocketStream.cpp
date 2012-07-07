@@ -4,9 +4,8 @@
 
 using namespace asio::ip;
 
-
 void socketstream_do_close(SocketStream* ss) {
-	if (!ss->is_closed()){
+	if (!ss->is_closed()) {
 		ss->get_socket().close();
 		ss->is_closed() = true;
 	}
@@ -17,12 +16,12 @@ void socketstream_read_header_handler(SocketStream* ss,
 	if (!error && ss->last_message().decode_header()) {
 //		printf("reading header of message\n");
 //		if (ss->last_message().body_length > 0){
-			asio::async_read(
-					ss->get_socket(),
-					asio::buffer(ss->last_message().body_start(),
-							ss->last_message().body_length),
-					boost::bind(socketstream_read_body_handler, ss,
-							asio::placeholders::error));
+		asio::async_read(
+				ss->get_socket(),
+				asio::buffer(ss->last_message().body_start(),
+						ss->last_message().body_length),
+				boost::bind(socketstream_read_body_handler, ss,
+						asio::placeholders::error));
 //		} else {
 //			asio::async_read(
 //					ss->get_socket(),
@@ -40,7 +39,9 @@ void socketstream_read_body_handler(SocketStream* ss,
 	if (!error) {
 		ss->last_message().decode_header();
 		ss->get_rmutex().lock();
-		ss->rmessages().push_back(boost::shared_ptr<NetPacket>(new NetPacket(ss->last_message())));
+		ss->rmessages().push_back(
+				boost::shared_ptr<NetPacket>(
+						new NetPacket(ss->last_message())));
 		ss->get_rmutex().unlock();
 
 		static int msg = 0;
@@ -58,18 +59,19 @@ void socketstream_read_body_handler(SocketStream* ss,
 	}
 }
 
-void socketstream_write_handler(SocketStream* ss,
-		const asio::error_code& error, bool pop) {
+void socketstream_write_handler(SocketStream* ss, const asio::error_code& error,
+		bool pop) {
 	if (!error) {
 		static int msg = 0;
 //		printf("Write queue size '%d' msg#'%d' \n", ss->wmessages().size(), ++msg);
 		ss->get_wmutex().lock();
 		if (pop)
 			ss->wmessages().pop_front();
-		if (!ss->wmessages().empty()){
+		if (!ss->wmessages().empty()) {
 			asio::async_write(
 					ss->get_socket(),
-					asio::buffer(ss->wmessages().front()->data, ss->wmessages().front()->length()),
+					asio::buffer(ss->wmessages().front()->data,
+							ss->wmessages().front()->length()),
 					boost::bind(socketstream_write_handler, ss,
 							asio::placeholders::error, true));
 		}
@@ -88,21 +90,25 @@ SocketStream::~SocketStream() {
 	socketstream_do_close(this);
 }
 
-bool SocketStream::get_next_packet(NetPacket & packet) {
-	if (closed) return false;
+bool SocketStream::get_next_packet(NetPacket& packet, packet_t type) {
+	if (closed)
+		return false;
 
 	rmutex.lock();
-	if (reading_msgs.size() != 0){
-		packet = *reading_msgs.front().get();
-		reading_msgs.pop_front();
-		rmutex.unlock();
-		return true;
+	PacketQueue::iterator it = reading_msgs.begin();
+	for (; it != reading_msgs.end(); it++) {
+		NetPacket* p = it->get();
+		if (p->packet_type == type) {
+			packet = *p;
+			reading_msgs.erase(it);
+			rmutex.unlock();
+			return true;
+		}
 	}
 	rmutex.unlock();
 
 	return false;
 }
-
 
 void SocketStream::send_packet(const NetPacket & packet) {
 	if (closed) {
@@ -111,12 +117,13 @@ void SocketStream::send_packet(const NetPacket & packet) {
 	}
 
 	wmutex.lock();
-		bool write_in_progress = !writing_msgs.empty();
-		writing_msgs.push_back(boost::shared_ptr<NetPacket>(new NetPacket(packet)));
-		if (!write_in_progress){
-			io_service.post(boost::bind(socketstream_write_handler, this,
-					asio::error_code(), false));
-		}
+	bool write_in_progress = !writing_msgs.empty();
+	writing_msgs.push_back(boost::shared_ptr<NetPacket>(new NetPacket(packet)));
+	if (!write_in_progress) {
+		io_service.post(
+				boost::bind(socketstream_write_handler, this,
+						asio::error_code(), false));
+	}
 	wmutex.unlock();
 //    }
 }

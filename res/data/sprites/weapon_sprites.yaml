@@ -15,6 +15,9 @@ sprites:
   - name: bow1
     file: res/sprites/items/weapons/bow1.png
 
+  - name: big stone
+    file: res/sprites/effects/big_stone.png
+
   - name: gloves
     file: res/sprites/items/weapons/gloves.png
 

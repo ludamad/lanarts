@@ -21,7 +21,6 @@ public:
 	virtual void draw(GameState* gs);
 	virtual void copy_to(GameInst* inst) const;
 	virtual TestInst* clone() const;
-
 private:
 	AStarPathFind path;
 	std::vector<Pos> p;

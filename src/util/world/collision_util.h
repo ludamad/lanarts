@@ -1,5 +1,5 @@
 /*
- * collision_util.h
+ * collision_util.h:
  *  Defines functions that are often used in conjunction with collision detection
  */
 

@@ -7,7 +7,7 @@ struct GameSettings {
 	enum connection_type {
 		NONE,
 		CLIENT,
-		HOST
+		SERVER
 	};
 
 	/*Multiplayer settings*/

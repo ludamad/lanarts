@@ -49,7 +49,7 @@ GameSettings load_settings_data(const char* filename) {
 				} else if (connname == "client") {
 					ret.conntype = GameSettings::CLIENT;
 				} else if (connname == "host") {
-					ret.conntype = GameSettings::HOST;
+					ret.conntype = GameSettings::SERVER;
 				}
 			}
 

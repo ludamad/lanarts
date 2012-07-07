@@ -26,22 +26,23 @@ void client_connect_handler(ClientNetConnection* cnc,
 	}
 }
 
-void ClientNetConnection::async_connect(const char* host, const char* port){
+void ClientNetConnection::async_connect(const char* host, const char* port) {
 
-    tcp::resolver resolver(io_service);
-    tcp::resolver::query query(host, port);
-    tcp::resolver::iterator iterator = resolver.resolve(query);
+	tcp::resolver resolver(io_service);
+	tcp::resolver::query query(host, port);
+	tcp::resolver::iterator iterator = resolver.resolve(query);
 
 	asio::ip::tcp::endpoint endpoint = *iterator;
 	stream.get_socket().async_connect(
 			endpoint,
-			boost::bind(client_connect_handler, this, asio::placeholders::error, ++iterator));
+			boost::bind(client_connect_handler, this, asio::placeholders::error,
+					++iterator));
 }
 
-static void wrapped_run(asio::io_service* ios){
+static void wrapped_run(asio::io_service* ios) {
 	try {
 		ios->run();
-	} catch (const std::exception& e){
+	} catch (const std::exception& e) {
 		printf("type=%d\n", typeid(e).name());
 		printf("%s\n", e.what());
 	}
@@ -57,8 +58,7 @@ ClientNetConnection::ClientNetConnection(const char* host, const char* port) :
 //	asio::ip::tcp::endpoint endpoint = *iterator;
 
 	io_service.post(
-			boost::bind(&ClientNetConnection::async_connect, this, host, port)
-    );
+			boost::bind(&ClientNetConnection::async_connect, this, host, port));
 ////
 //	stream.get_socket().connect(endpoint);
 //	client_connect_handler(this, asio::error_code(), ++iterator);
@@ -67,28 +67,28 @@ ClientNetConnection::ClientNetConnection(const char* host, const char* port) :
 //			endpoint,
 //			boost::bind(client_connect_handler, this, asio::placeholders::error, ++iterator));
 
-    execution_thread = boost::shared_ptr<asio::thread>(
-    		new asio::thread(boost::bind(&wrapped_run, &io_service))
-    );
+	execution_thread = boost::shared_ptr<asio::thread>(
+			new asio::thread(boost::bind(&wrapped_run, &io_service)));
 
 }
 
 ClientNetConnection::~ClientNetConnection() {
 }
 
-bool ClientNetConnection::get_next_packet(NetPacket & packet) {
-	return stream.get_next_packet(packet);
+bool ClientNetConnection::get_next_packet(NetPacket& packet, packet_t type) {
+	return stream.get_next_packet(packet, type);
 	/*while (true){
-		if (packet.packet_type == NetPacket::PACKET_ASSIGN_PEERID){
-			peer_id = packet.get_int();
-		} else if (packet.packet_type == NetPacket::PACKET_BROADCAST_PEERLISTSIZE){
-			number_of_peers = packet.get_int();
-		} else break;
-		stream.get_next_packet(packet);
-	}*/
+	 if (packet.packet_type == NetPacket::PACKET_ASSIGN_PEERID){
+	 peer_id = packet.get_int();
+	 } else if (packet.packet_type == NetPacket::PACKET_BROADCAST_PEERLISTSIZE){
+	 number_of_peers = packet.get_int();
+	 } else break;
+	 stream.get_next_packet(packet);
+	 }*/
 }
 
-void ClientNetConnection::broadcast_packet(const NetPacket & packet, bool send_to_new) {
+void ClientNetConnection::broadcast_packet(const NetPacket & packet,
+		bool send_to_new) {
 	stream.send_packet(packet);
 }
 
