@@ -8,7 +8,7 @@ username: ludamad
 #Window settings
 fullscreen: no
 regen_level_on_death: yes
-view_width: 960
+view_width: 1280
 view_height: 720
 
 #Font settings
