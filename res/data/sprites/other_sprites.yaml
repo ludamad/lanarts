@@ -22,4 +22,4 @@ sprites:
     file: res/sprites/effects/blood_green.png
 
   - name: purple blood
-    file: res/sprites/effects/blood_green.png
+    file: res/sprites/effects/blood_purple.png
