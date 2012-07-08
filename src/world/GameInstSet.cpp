@@ -17,7 +17,7 @@
 
 #include "utility_objects/AnimatedInst.h"
 
-GameInst* const GAMEINST_TOMBSTONE = (GameInst*) 1;
+GameInst* const GAMEINST_TOMBSTONE = (GameInst*)1;
 
 static bool valid_inst(GameInst* inst) {
 	return inst > GAMEINST_TOMBSTONE;
@@ -43,7 +43,7 @@ GameInstSet::~GameInstSet() {
 	delete[] unit_grid;
 	delete[] unit_set;
 	for (int i = 0; i < deallocation_list.size(); i++) {
-		delete deallocation_list[i];
+		deallocation_list[i]->free_reference();
 	}
 }
 struct GameInstSetFunctions { //Helper class
@@ -67,13 +67,13 @@ struct GameInstSetFunctions { //Helper class
 		return v1.inst == v2.inst;
 	}
 	static size_t hash(const V& v) {
-		return (size_t) v.inst->id;
+		return (size_t)v.inst->id;
 	}
 	static size_t hash(GameInst* inst) {
-		return (size_t) inst->id;
+		return (size_t)inst->id;
 	}
 	static size_t hash(obj_id id) {
-		return (size_t) id;
+		return (size_t)id;
 	}
 };
 

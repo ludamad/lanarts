@@ -79,7 +79,7 @@ int generate_enemy(const EnemyGenChance& ec, MTwist& mt, GeneratedLevel& level,
 static int get_total_chance(const EnemyGenSettings& rs) {
 	int total_chance = 0;
 	for (int i = 0; i < rs.enemy_chances.size(); i++) {
-		total_chance += rs.enemy_chances[i].genchance;
+		total_chance += rs.enemy_chances[i].generate_chance;
 	}
 	return total_chance;
 }
@@ -93,8 +93,8 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 
 	for (int i = 0; i < rs.enemy_chances.size(); i++) {
 		const EnemyGenChance& ec = rs.enemy_chances[i];
-		if (ec.guaranteed > 0) {
-			generate_enemy(ec, mt, level, gs, ec.guaranteed);
+		if (ec.guaranteed_spawns > 0) {
+			generate_enemy(ec, mt, level, gs, ec.guaranteed_spawns);
 		}
 	}
 
@@ -104,7 +104,7 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 		int monster_roll = mt.rand(total_chance);
 		int monstn;
 		for (monstn = 0; monstn < rs.enemy_chances.size(); monstn++) {
-			monster_roll -= rs.enemy_chances[monstn].genchance;
+			monster_roll -= rs.enemy_chances[monstn].generate_chance;
 			if (monster_roll < 0)
 				break;
 		}
@@ -112,7 +112,7 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 		const EnemyGenChance& ec = rs.enemy_chances[monstn];
 
 		int amnt = 1;
-		if (mt.rand(100) < ec.groupchance) {
+		if (mt.rand(100) < ec.generate_group_chance) {
 			amnt = mt.rand(ec.groupsize);
 		}
 
