@@ -1,0 +1,43 @@
+---
+#Enemy Markup
+enemies:
+  - name: Franken
+    sprite: franken
+    death_sprite: green blood
+    radius: 14
+    xpaward: 30
+    step_func: heal_step
+    stats:
+        attacks: [ {weapon: Slow Melee} ]
+        hp: 50
+        hpregen: 0.01
+        movespeed: 1
+        strength: 30
+        defence: 10
+        willpower: 10
+
+  - name: Unseen Horror
+    sprite: unseen horror
+    radius: 14
+    xpaward: 25
+    stats:
+        attacks: [ {weapon: Fast Melee} ]
+        hp: 130
+        hpregen: 0
+        movespeed: 3
+        strength: 25
+        defence: 0
+        willpower: 40
+
+  - name: Golem
+    sprite: golem
+    radius: 14
+    xpaward: 45
+    stats:
+        attacks: [ {projectile: Big Stone} ]
+        hp: 200
+        hpregen: 0
+        movespeed: 1
+        strength: 35
+        defence: 20
+        willpower: 20
