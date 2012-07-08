@@ -166,7 +166,7 @@ namespace RVO
   size_t RVOSimulator::addAgent(const Vector2& position, float neighborDist, size_t maxNeighbors, float timeHorizon, float timeHorizonObst, float radius, float maxSpeed, const Vector2& velocity)
   {
     Agent* agent = new Agent(this);
-    
+
     agent->position_ = position;
     agent->maxNeighbors_ = maxNeighbors;
     agent->maxSpeed_ = maxSpeed;
@@ -176,11 +176,27 @@ namespace RVO
     agent->timeHorizonObst_ = timeHorizonObst;
     agent->velocity_ = velocity;
 
+    for (int i = 0; i < agents_.size(); i++)
+    {
+      if (agents_[i] == NULL)
+      {
+        agent->id_ = i;
+        agents_[i] = agent;
+        return i;
+      }
+    }
+
     agent->id_ = agents_.size();
     
     agents_.push_back(agent);
 
     return agents_.size() - 1;
+  }
+
+  void RVOSimulator::removeAgent(size_t agentNo)
+  {
+    delete agents_[agentNo];
+    agents_[agentNo] = NULL;
   }
 
   size_t RVOSimulator::addObstacle(const std::vector<Vector2>& vertices)
@@ -224,15 +240,15 @@ namespace RVO
 
 #pragma omp parallel for
 
-    for (int i = 0; i < static_cast<int>(agents_.size()); ++i) {
-      agents_[i]->computeNeighbors();
-      agents_[i]->computeNewVelocity();
+    for (int i = 0; i < static_cast<int>(kdTree_->agents_.size()); ++i) {
+      kdTree_->agents_[i]->computeNeighbors();
+      kdTree_->agents_[i]->computeNewVelocity();
     }
 
 #pragma omp parallel for
 
-    for (int i = 0; i < static_cast<int>(agents_.size()); ++i) {
-      agents_[i]->update();
+    for (int i = 0; i < static_cast<int>(kdTree_->agents_.size()); ++i) {
+      kdTree_->agents_[i]->update();
     }
 
     globalTime_ += timeStep_;

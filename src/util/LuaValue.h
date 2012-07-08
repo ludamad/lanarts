@@ -54,5 +54,4 @@ private:
 };
 
 void lua_gameinstcallback(lua_State* L, LuaValue& value, GameInst* inst);
-
 #endif /* LUAVALUE_H_ */

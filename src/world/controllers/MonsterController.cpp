@@ -244,8 +244,7 @@ void MonsterController::set_monster_headings(GameState* gs,
 }
 
 void MonsterController::deregister_enemy(EnemyInst* enemy) {
-	simulator->setAgentPosition(enemy->behaviour().simulation_id,
-			RVO::Vector2(-TILE_SIZE, -TILE_SIZE));
+	simulator->removeAgent(enemy->behaviour().simulation_id);
 }
 void MonsterController::shift_target(GameState* gs) {
 	if (!targetted)
@@ -294,7 +293,7 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 
 			int dx = e->x - player->x, dy = e->y - player->y;
 			int distsqr = dx * dx + dy * dy;
-			if (distsqr > 0 /*overflow check*/ && distsqr < mindistsqr) {
+			if (distsqr > 0 /*overflow check*/&& distsqr < mindistsqr) {
 				mindistsqr = distsqr;
 				closest_player_index = i;
 			}
@@ -304,7 +303,14 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 }
 void MonsterController::process_players(GameState* gs) {
 	const std::vector<obj_id>& pids = gs->player_controller().player_ids();
-	if (pids.size() > player_simids.size()) {
+
+	if (player_simids.size() > pids.size()) {
+		int diff = player_simids.size() - pids.size();
+		for (int i = 0; i < diff; i++) {
+			simulator->removeAgent(player_simids.back());
+			player_simids.pop_back();
+		}
+	} else if (pids.size() > player_simids.size()) {
 		int old_pids = player_simids.size();
 		player_simids.resize(pids.size());
 		for (int i = old_pids; i < gs->player_controller().player_ids().size();
@@ -359,9 +365,14 @@ void MonsterController::pre_step(GameState* gs) {
 
 		int closest_player_index = find_player_to_target(gs, e);
 
+		if (eb.current_action == EnemyBehaviour::INACTIVE
+				&& e->cooldowns().is_hurting()) {
+			eb.current_action = EnemyBehaviour::CHASING_PLAYER;
+		}
 		if (closest_player_index == -1
-				&& eb.current_action == EnemyBehaviour::CHASING_PLAYER)
+				&& eb.current_action == EnemyBehaviour::CHASING_PLAYER) {
 			eb.current_action = EnemyBehaviour::INACTIVE;
+		}
 
 		if (eb.current_action == EnemyBehaviour::CHASING_PLAYER)
 			eois.push_back(EnemyOfInterest(e, closest_player_index));
@@ -373,7 +384,7 @@ void MonsterController::pre_step(GameState* gs) {
 	}
 	set_monster_headings(gs, eois);
 
-	//Handle necessary upkeep of player related information, such as paths to player
+	//Update player positions for collision avoidance simulator
 	const std::vector<obj_id>& pids = gs->player_controller().player_ids();
 	for (int i = 0; i < pids.size(); i++) {
 		PlayerInst* p = (PlayerInst*)gs->get_instance(
@@ -405,9 +416,7 @@ void MonsterController::update_velocity(GameState* gs, EnemyInst* e) {
 //		e->vy = -e->vy;
 //	}
 
-	if (e->cooldowns().is_hurting()){
-		if(eb.current_action == EnemyBehaviour::INACTIVE)
-			eb.current_action = EnemyBehaviour::CHASING_PLAYER;
+	if (e->cooldowns().is_hurting()) {
 		e->vx /= 2, e->vy /= 2;
 	}
 }

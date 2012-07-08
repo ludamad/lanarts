@@ -73,19 +73,26 @@ class LuaValueImpl {
 public:
 
 	LuaValueImpl(const std::string& expr = std::string()) :
-			lua_expression(format_expression_string(expr)), refcount(1), empty(
-					true) {
+			L(NULL), lua_expression(format_expression_string(expr)), refcount(
+					1), empty(true) {
+	}
+	~LuaValueImpl() {
+		if (L) {
+			deinitialize(L);
+		}
 	}
 
 	void deinitialize(lua_State* L) {
 		lua_pushlightuserdata(L, this); /* push address as key */
 		lua_pushnil(L); /* push nil as value */
 		lua_settable(L, LUA_REGISTRYINDEX);
+		this->L = NULL;
 	}
 
 	void initialize(lua_State* L) {
 		if (lua_expression.empty())
 			return;
+		this->L = L;
 		empty = false;
 		lua_pushlightuserdata(L, this); /* push address as key */
 		luaL_dostring(L, lua_expression.c_str());
@@ -93,6 +100,7 @@ public:
 	}
 	void table_initialize(lua_State* L) {
 		empty = false;
+		this->L = L;
 		lua_pushlightuserdata(L, this); /* push address as key */
 		lua_newtable(L);
 		lua_settable(L, LUA_REGISTRYINDEX);
@@ -177,6 +185,7 @@ public:
 	}
 
 private:
+	lua_State* L;
 	std::string lua_expression;
 	size_t refcount;
 	bool empty;
@@ -214,8 +223,9 @@ void LuaValue::table_initialize(lua_State* L) {
 }
 
 void LuaValue::deinitialize(lua_State* L) {
-	if (impl)
+	if (impl) {
 		impl->deinitialize(L);
+	}
 }
 
 void LuaValue::push(lua_State* L) {
@@ -289,6 +299,34 @@ void lua_gameinstcallback(lua_State* L, LuaValue& value, GameInst* inst) {
 		return;
 	value.push(L);
 	lua_push_gameinst(L, inst);
+	lua_call(L, 1, 0);
+}
+
+//Not used for now:
+static void cached_gameinst_push(lua_State* L, LuaValue& cache,
+		GameInst* inst) {
+	if (cache.empty()) {
+		cache.table_initialize(L);
+		cache.push(L);
+		int cacheind = lua_gettop(L);
+		lua_pushlightuserdata(L, inst); /* push address as key */
+		lua_gettable(L, cacheind);
+		if (lua_isnil(L, -1)) {
+			lua_push_gameinst(L, inst);
+			lua_replace(L, cacheind);
+		}
+		lua_replace(L, cacheind);
+	}
+}
+
+//Not used for now:
+void lua_gameinst_cached_callback(lua_State* L, LuaValue& cache,
+		LuaValue& value, GameInst* inst) {
+	if (value.empty())
+		return;
+	value.push(L);
+	cached_gameinst_push(L, cache, inst);
+	lua_pop(L, 1);
 	lua_call(L, 1, 0);
 }
 

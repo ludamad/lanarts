@@ -76,13 +76,17 @@ namespace RVO
 
   void KdTree::buildAgentTree()
   {
-    if (agents_.size() < sim_->agents_.size()) {
-      for (size_t i = agents_.size(); i < sim_->agents_.size(); ++i) {
-        agents_.push_back(sim_->agents_[i]);
-      }
+	agents_.resize(0);
+    for (size_t i = 0; i < sim_->agents_.size(); ++i) {
+    	if (sim_->agents_[i] != NULL){
+           agents_.push_back(sim_->agents_[i]);
+
+    	}
+     }
+    if (agents_.size() * 2 - 1 > agentTree_.size()) {
       agentTree_.resize(2 * agents_.size() - 1);
     }
-    
+
     if (!agents_.empty()) {
       buildAgentTreeRecursive(0, agents_.size(), 0);
     }
@@ -94,7 +98,7 @@ namespace RVO
     agentTree_[node].end = end;
     agentTree_[node].minX = agentTree_[node].maxX = agents_[begin]->position_.x();
     agentTree_[node].minY = agentTree_[node].maxY = agents_[begin]->position_.y();
-    
+
     for (size_t i = begin + 1; i < end; ++i) {
       agentTree_[node].maxX = std::max(agentTree_[node].maxX, agents_[i]->position_.x());
       agentTree_[node].minX = std::min(agentTree_[node].minX, agents_[i]->position_.x());

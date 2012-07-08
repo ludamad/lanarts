@@ -113,9 +113,9 @@ void EnemyInst::draw(GameState* gs) {
 		snprintf(
 				statbuff,
 				255,
-				"vx=%f vy=%f\n act=%d, path_steps = %d\npath_cooldown = %d\nradius=%d\ntarget_radius=%d",
-				vx, vy, eb.current_action, eb.path_steps, eb.path_cooldown,
-				radius, target_radius);
+				"simid=%d nvx=%f vy=%f\n act=%d, path_steps = %d\npath_cooldown = %d\n",
+				eb.simulation_id, vx, vy, eb.current_action, eb.path_steps,
+				eb.path_cooldown);
 		gl_printf(gs->primary_font(), Colour(255, 255, 255),
 				x - radius - view.x, y - 70 - view.y, statbuff);
 	}

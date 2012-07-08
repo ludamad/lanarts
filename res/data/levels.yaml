@@ -171,26 +171,27 @@ all_tilesets: &all_tilesets
 areas:
   - branch: main_branch
     levels:
-#tiny levels with animals
-#      #Level 1
+#     #Test Level
 #      - layout: [*test_layout]
 #        content:
 #          features: { tileset: [lair_tiles1, lair_tiles2],     stairs_up: 0  }
 #          items:    { amount: 3,  generated: *default_items   }
-#          enemies: { wandering: yes, amount: 69, generated: *easy_animals }
+#          enemies: { wandering: no, amount: 69, generated: *easy_animals }
+
+#tiny levels with animals
       #Level 1
       - layout: [*tiny_layout1]
         content:
           features: { tileset: [lair_tiles1, lair_tiles2],     stairs_up: 3  }
           items:    { amount: 3,  generated: *default_items   }
-          enemies: { wandering: yes, amount: 3, generated: *easy_animals }
+          enemies: { wandering: no, amount: 3, generated: *easy_animals }
           
       #Level 2
       - layout: *tiny_layouts
         content:
           features: { tileset: [lair_tiles1, lair_tiles2]}
           items:    { amount: 3,  generated: *default_items   }
-          enemies: { wandering: yes, amount: 5, generated: *easy_animals }
+          enemies: { wandering: no, amount: 5, generated: *easy_animals }
         
       #Level 3
       - layout: *tiny_layouts
@@ -198,7 +199,7 @@ areas:
           features: { tileset: [lair_tiles1, lair_tiles2]}
           items:    { amount: 3,  generated: *default_items   }          
           enemies: { 
-            wandering: yes, amount: 8, 
+            wandering: no, amount: 8, 
             generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}] 
           }
       #Level 4

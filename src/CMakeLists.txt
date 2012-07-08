@@ -67,6 +67,7 @@ set( lanarts_src
 	
 	world/net/GameNetConnection.cpp
 	main.cpp
+	main_menu.cpp
 	
 	procedural/enemygen.cpp
 	procedural/featuregen.cpp

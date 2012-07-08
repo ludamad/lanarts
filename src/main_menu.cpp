@@ -31,11 +31,11 @@ extern "C" {
 #include "world/utility_objects/AnimatedInst.h"
 #include "world/utility_objects/ButtonInst.h"
 
-
 static void continue_as_loner(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 }
+
 
 static void continue_as_client(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;
