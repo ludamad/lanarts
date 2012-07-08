@@ -18,9 +18,6 @@ sprites:
   - name: big stone
     file: res/sprites/effects/big_stone.png
 
-  - name: gloves
-    file: res/sprites/items/weapons/gloves.png
-
   - name: hand
     file: res/sprites/items/weapons/hand.png
 

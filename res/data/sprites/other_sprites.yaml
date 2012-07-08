@@ -20,3 +20,6 @@ sprites:
     
   - name: green blood
     file: res/sprites/effects/blood_green.png
+
+  - name: purple blood
+    file: res/sprites/effects/blood_green.png

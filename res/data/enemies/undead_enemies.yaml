@@ -1,43 +1,57 @@
 ---
 #Enemy Markup
 enemies:
-  - name: Franken
+  - name: Skeleton
+    sprite: skeleton
+    radius: 11
+    xpaward: 10
+    appear_message: A re-animated skeleton appears!
+    defeat_message: The skeleton is broken unto a pile of bones.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 50
+        hpregen: 0.03
+        movespeed: 2
+        #base stats:
+        strength: 10
+        defence: 2
+        willpower: 2
+        
+  - name: Zombie
+    sprite: zombie
+    death_sprite: green blood
+    appear_message: A re-animated zombie appears!
+    defeat_message: The zombie is beaten into a mess of flesh.
+    radius: 14
+    xpaward: 10
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 60
+        hpregen: 0.05
+        movespeed: 2
+        strength: 20
+        defence: 5  
+        willpower: 5
+      
+  - name: Krell
     sprite: franken
     death_sprite: green blood
+    description: A creature of unholy will to live.
+    appear_message: A horrible krell enters the scene.
+    defeat_message: The krell dies at last.
     radius: 14
     xpaward: 30
-    step_func: heal_step
+    step_func: #Inline lua, heal very fast when under 23 hp
+      function(enemy)
+        if enemy.stats.hp < 15 then 
+          enemy.stats.hp = enemy.stats.hp + 1
+        end
+      end
     stats:
         attacks: [ {weapon: Slow Melee} ]
         hp: 50
-        hpregen: 0.01
-        movespeed: 1
+        hpregen: 0.05
+        movespeed: 2
         strength: 30
         defence: 10
         willpower: 10
-
-  - name: Unseen Horror
-    sprite: unseen horror
-    radius: 14
-    xpaward: 25
-    stats:
-        attacks: [ {weapon: Fast Melee} ]
-        hp: 130
-        hpregen: 0
-        movespeed: 3
-        strength: 25
-        defence: 0
-        willpower: 40
-
-  - name: Golem
-    sprite: golem
-    radius: 14
-    xpaward: 45
-    stats:
-        attacks: [ {projectile: Big Stone} ]
-        hp: 200
-        hpregen: 0
-        movespeed: 1
-        strength: 35
-        defence: 20
-        willpower: 20

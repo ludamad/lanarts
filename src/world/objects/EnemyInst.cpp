@@ -15,6 +15,7 @@
 #include "../../gamestats/stat_formulas.h"
 
 #include "../../util/colour_constants.h"
+#include "../../util/content_draw_util.h"
 #include "../../util/math_util.h"
 #include "../../util/LuaValue.h"
 #include "../../util/world/collision_util.h"
@@ -134,56 +135,13 @@ void EnemyInst::draw(GameState* gs) {
 		show_appear_message(gs->game_chat(), etype());
 	}
 
+	BBox ebox(xx - view.x, yy - view.x, xx + w - view.x, yy + h - view.x);
+	if (ebox.contains(gs->mouse_x(), gs->mouse_y())) {
+		draw_console_enemy_description(gs, etype());
+	}
+
 	CombatGameInst::draw(gs);
 }
-
-//void EnemyInst::attack(GameState* gs, GameInst* inst, AttackStats& attack) {
-//	if (!cooldowns().can_doaction())
-//		return;
-//	CombatGameInst* combat_inst;
-//	if ((combat_inst = dynamic_cast<CombatGameInst*>(inst))) {
-//		if (attack.is_ranged()) {
-//			ProjectileEntry& pentry = attack.projectile_entry();
-//
-//			Pos p(combat_inst->x, combat_inst->y);
-//			p.x += gs->rng().rand(-12, +13);
-//			p.y += gs->rng().rand(-12, +13);
-//			if (gs->tile_radius_test(p.x, p.y, 10)) {
-//				p.x = combat_inst->x;
-//				p.y = combat_inst->y;
-//			}
-//			//	ProjectileInst(sprite_id sprite, obj_id originator, float speed, int range,
-//			//			int damage, int x, int y, int tx, int ty, bool bounce = false,
-//			//			int hits = 1, obj_id target = NONE);
-//			GameInst* bullet = new ProjectileInst(pentry.attack_sprite, id,
-//					pentry.speed, pentry.range, 1, x, y, p.x, p.y);
-//			gs->add_instance(bullet);
-//			cooldowns().reset_action_cooldown(pentry.cooldown);
-//			cooldowns().action_cooldown += gs->rng().rand(-4, 5);
-//		} else {
-//			WeaponEntry& wentry = attack.weapon_entry();
-//
-//			int damage = physical_damage_formula(effective_stats(),
-//					combat_inst->effective_stats());
-//			if (!gs->game_settings().invincible)
-//				combat_inst->damage(gs, damage);
-//
-//			char dmgstr[32];
-//			snprintf(dmgstr, 32, "%d", damage);
-//			float rx, ry;
-//			direction_towards(Pos(x, y), Pos(combat_inst->x, combat_inst->y),
-//					rx, ry, 0.5);
-//			gs->add_instance(
-//					new AnimatedInst(combat_inst->x - 5 + rx * 5,
-//							combat_inst->y + ry * 5, -1, 25, rx, ry, dmgstr,
-//							Colour(255, 148, 120)));
-//
-//			cooldowns().reset_action_cooldown(wentry.cooldown);
-//			cooldowns().action_cooldown += gs->rng().rand(-4, 5);
-//		}
-//	}
-//
-//}
 
 EnemyInst* EnemyInst::clone() const {
 	return new EnemyInst(*this);

@@ -154,12 +154,8 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 
 		if (!resting) {
 			queue_io_movement_actions(gs, dx, dy);
-			// If we aren't moving, maybe we can rest
-			if (stop_controls && !moving && cooldowns().can_rest()) {
-				queued_actions.push_back(
-						GameAction(id, GameAction::USE_REST, frame, level));
-				resting = true;
-			} else if (stop_controls && was_moving && !moving
+
+			if (stop_controls && was_moving && !moving
 					&& cooldowns().can_do_stopaction()) {
 				do_stopaction = true;
 			}
@@ -216,6 +212,12 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 			}
 		}
 
+		// If we haven't done anything, and we have stop controls, rest
+		if (stop_controls && queued_actions.empty()) {
+			queued_actions.push_back(
+					GameAction(id, GameAction::USE_REST, frame, level));
+			resting = true;
+		}
 	}
 	GameNetConnection& connection = gs->net_connection();
 	bool hasconnection = connection.get_connection() != NULL;
