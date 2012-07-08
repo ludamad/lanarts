@@ -145,6 +145,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 	if (is_local_player()) {
 //Resting
 		bool resting = false;
+		// Check for explicit rest
 		if (gs->key_down_state(SDLK_r) && cooldowns().can_rest()) {
 			queued_actions.push_back(
 					GameAction(id, GameAction::USE_REST, frame, level));
@@ -153,16 +154,15 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 
 		if (!resting) {
 			queue_io_movement_actions(gs, dx, dy);
-			if (stop_controls && was_moving && !moving
+			// If we aren't moving, maybe we can rest
+			if (stop_controls && !moving && cooldowns().can_rest()) {
+				queued_actions.push_back(
+						GameAction(id, GameAction::USE_REST, frame, level));
+				resting = true;
+			} else if (stop_controls && was_moving && !moving
 					&& cooldowns().can_do_stopaction()) {
 				do_stopaction = true;
 			}
-		}
-		if (stop_controls && !moving && cooldowns().can_rest()) {
-			queued_actions.push_back(
-					GameAction(id, GameAction::USE_REST, frame, level));
-			resting = true;
-
 		}
 		//Shifting target
 		if (gs->key_press_state(SDLK_k)) {
