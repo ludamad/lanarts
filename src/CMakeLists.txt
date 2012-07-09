@@ -106,6 +106,7 @@ set( lanarts_src
 	
 	world/controllers/CombatInstController.cpp
 	world/controllers/MonsterController.cpp
+	world/controllers/MonsterControllerActions.cpp
 	world/controllers/PlayerController.cpp
 	
 	world/utility_objects/AnimatedInst.cpp
