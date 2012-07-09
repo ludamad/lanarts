@@ -162,8 +162,13 @@ static int lua_member_update(lua_State* L) {
 	return 1;
 }
 
-meth_t bind_t::methods[] = { LUA_DEF(heal_fully), LUA_DEF(heal_hp),
-		LUA_DEF(heal_mp), LUA_DEF(hurt), LUA_DEF(equip), LUA_DEF(hasten),
+meth_t bind_t::methods[] = {
+		LUA_DEF(heal_fully),
+		LUA_DEF(heal_hp),
+		LUA_DEF(heal_mp),
+		LUA_DEF(hurt),
+		LUA_DEF(equip),
+		LUA_DEF(hasten),
 		meth_t(0, 0) };
 
 void lua_gameinst_bindings(GameState* gs, lua_State* L) {

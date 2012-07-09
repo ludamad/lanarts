@@ -2,6 +2,8 @@
 
 #include "lua_api.h"
 
+#include "../data/lua_game_data.h"
+
 #include "../world/GameState.h"
 #include "../world/GameLevelState.h"
 
@@ -25,11 +27,10 @@ public:
 		return 0;
 	}
 	int create_projectile(lua_State* L) {
+		//<origin>, <sprite>, <tx>, <ty> [, <target>]
 		int nargs = lua_gettop(L);
 		GameInst* origin_obj = lua_gameinst_arg(L, 1);
 
-		lua_pushstring(L, "name");
-		lua_gettable(L, 4);
 		sprite_id sprite = get_sprite_by_name(lua_tostring(L, lua_gettop(L)));
 		lua_pop(L, 1);
 
@@ -38,6 +39,8 @@ public:
 		GameInst* target = nargs < 10 ? NULL : lua_gameinst_arg(L, 10);
 
 		obj_id projectile_id = 0;
+
+
 
 //		if (s != NULL) {
 ////			ProjectileInst(sprite_id sprite, obj_id originator, float speed, int range,

@@ -1,8 +1,6 @@
 /*
- * game_data.h
- *
- *  Created on: 2011-10-27
- *      Author: 100397561
+ * game_data.h:
+ *  Handles loading of all the various game data that is described in yaml files
  */
 
 #ifndef GAME_DATA_H_
@@ -19,6 +17,7 @@
 #include "effect_data.h"
 #include "enemy_data.h"
 #include "item_data.h"
+#include "scriptobject_data.h"
 #include "spell_data.h"
 #include "sprite_data.h"
 #include "tile_data.h"

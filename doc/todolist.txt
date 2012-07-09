@@ -1,39 +1,33 @@
 Large:
 - Versatile save format that allows for resuming a networked game even through major game updates
-- Make spells not hardcoded
 - Add allied monsters that stay close to their 'owner' and shoot at nearby enemies
 	Details:
 	-May need two pathfinds per monster
 	-More if we support double-sized enemies
 	-Performance hit reasonable
 - Improve room generation with more patterns & room connectivity tests
-- Add doors and other dungeon features such as keys etc
+- Add tiered level generation with dungeons inline with overworld
 
 Medium:
-- Add higher level sprite class that handles animation & orientation & multiple tile variations
 - Add in-game chat support for multiplayer
 - Support for double-sized enemies (2x2 tile size max)
 - Special case pushing for tight corridors ?
 - Straight line AOE spell
 - Lightning Spell that takes up multiple squares
 - Add levels of minimap viewing
-- Add float coordinate buffering (or make ->x and ->y floats) for all GameInst objects
-
-- Add keyboard based blink that moves to furthest point
-- More complete & functional sidebar interface, with tabs
-- Add stat defence multipliers to enemy attacks, maybe create attack types
-
+- Add doors and other dungeon features such as keys, destroyable blocks etc
 
 Small:
 - Have a flexible portal system that indicates which level to connect to
 - Add cooldowns to item use
 
 Partial Completion:
-- [DONE WITH BUGS/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
+- [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
 - [STARTED] Classes for players
+- [NEEDS MORE LUA] Make spells not hardcoded
 - [DONE - IMPROVE VISIBILITY] More visual output on the minimap [Stairs etc]
 - [IMPROVED - STILL HARDCODED] Action bar, below screen 
-- [DONE - NEEDS OPTIONS] Add start up screen with networking options
+- [DONE - NEEDS MORE OPTIONS] Add start up screen with networking options
 
 Completed:
 <18/04/2012:
@@ -79,5 +73,12 @@ Completed:
 - [DONE] Add item use preconditions so items are not wasted when they cannot be used
 - [DONE] Make game based on Strength/Defence/Agility and Magic/Resistance
 	- [WONTDO] add attack rate to base stats -> agility
-
-
+- [DONE] Add keyboard based blink that moves to furthest point
+ 
+<08/08/20120:
+- [DONE] Add in-game chat support for multiplayer
+- [DONE] Add higher level sprite class that handles animation & orientation & multiple tile variations
+- [DONE ENOUGH] Add float coordinate buffering (or make ->x and ->y floats) for all GameInst objects
+- [DONE] Add stat defence multipliers to enemy attacks, maybe create attack types
+- [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization (fixed synch bugs)
+- [DONE] More complete & functional sidebar interface, with tabs

@@ -3,6 +3,10 @@
  *  Handle to all the global game data.
  */
 
+extern "C" {
+#include <lua/lua.h>
+#include <lua/lauxlib.h>
+}
 #include <SDL.h>
 #include <cmath>
 #include <SDL_opengl.h>
@@ -31,10 +35,6 @@
 #include "objects/GameInst.h"
 #include "objects/PlayerInst.h"
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-}
 
 GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 		int viewh, int hudw) :

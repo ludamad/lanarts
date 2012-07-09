@@ -1,0 +1,7 @@
+---
+objects:
+  - name: Sonic Wave
+    sprite: 
+    step_func: func
+    init_func: func
+#    draw_func: #TODO: drawing primitives for lua

@@ -45,12 +45,13 @@ std::vector<ItemEntry> game_item_data;
 std::vector<TileEntry> game_tile_data;
 std::vector<TilesetEntry> game_tileset_data;
 std::vector<ProjectileEntry> game_projectile_data;
+std::vector<ScriptObjectEntry> game_scriptobject_data;
 std::vector<SpellEntry> game_spell_data;
 std::vector<SpriteEntry> game_sprite_data;
 std::vector<LevelGenSettings> game_dungeon_yaml;
 std::vector<WeaponEntry> game_weapon_data;
 
-DungeonBranch game_dungeon_data[1] = { };
+extern DungeonBranch game_dungeon_data[1] = { };
 
 template<typename T>
 static int get_X_by_name(const T& t, const char* name, bool error_if_not_found =
@@ -68,6 +69,20 @@ static int get_X_by_name(const T& t, const char* name, bool error_if_not_found =
 		LANARTS_ASSERT(false /*resource not found*/);
 	}
 	return -1;
+}
+template<typename E>
+static E& get_X_ref_by_name(std::vector<E>& t, const char* name) {
+	for (int i = 0; i < t.size(); i++) {
+		if (name == t.at(i).name) {
+			return t.at(i);
+		}
+	}
+	/*Error if resource not found*/
+	fprintf(stderr, "Failed to load resource!\nname: %s, of type %s\n", name,
+			typeid(t[0]).name());
+	fflush(stderr);
+	LANARTS_ASSERT(false /*resource not found*/);
+	return t.at(-1); /* throws */
 }
 
 int get_armour_by_name(const char *name, bool error_if_not_found) {
@@ -99,6 +114,10 @@ item_id get_item_by_name(const char* name, bool error_if_not_found) {
 class_id get_class_by_name(const char* name) {
 	return get_X_by_name(game_class_data, name);
 }
+scriptobject_id get_scriptobject_by_name(const char* name,
+		bool error_if_not_found) {
+	return get_X_by_name(game_scriptobject_data, name, error_if_not_found);
+}
 sprite_id get_sprite_by_name(const char* name) {
 	return get_X_by_name(game_sprite_data, name);
 }
@@ -123,6 +142,42 @@ weapon_id get_weapon_by_name(const char* name) {
 
 tileset_id get_tileset_by_name(const char* name) {
 	return get_X_by_name(game_tileset_data, name);
+}
+
+
+//Lua argument getters
+item_id item_from_lua(lua_State* L, int idx) {
+	return get_X_by_name(game_item_data, lua_tostring(L, idx));
+}
+class_id class_from_lua(lua_State* L, int idx) {
+	return get_X_by_name(game_class_data, lua_tostring(L, idx));
+}
+scriptobject_id scriptobject_from_lua(lua_State* L, int idx) {
+	return get_X_by_name(game_scriptobject_data, lua_tostring(L, idx));
+}
+sprite_id sprite_from_lua(lua_State* L, int idx) {
+	return get_X_by_name(game_sprite_data, lua_tostring(L, idx));
+}
+spell_id spell_from_lua(lua_State* L, int idx) {
+	return get_X_by_name(game_spell_data, lua_tostring(L, idx));
+}
+tile_id tile_from_lua(lua_State* L, int idx) {
+	return get_X_by_name(game_tile_data, lua_tostring(L, idx));
+}
+effect_id effect_from_lua(lua_State* L, int idx) {
+	return get_X_by_name(game_effect_data, lua_tostring(L, idx));
+}
+enemy_id enemy_from_lua(lua_State* L, int idx) {
+	return get_X_by_name(game_enemy_data, lua_tostring(L, idx));
+}
+projectile_id projectile_from_lua(lua_State* L, int idx) {
+	return get_X_by_name(game_projectile_data, lua_tostring(L, idx));
+}
+weapon_id weapon_from_lua(lua_State* L, int idx) {
+	return get_X_by_name(game_weapon_data, lua_tostring(L, idx));
+}
+tileset_id tileset_from_lua(lua_State* L, int idx) {
+	return get_X_by_name(game_tileset_data, lua_tostring(L, idx));
 }
 
 LuaValue sprites, armours, enemies, effects, weapons, projectiles, items,

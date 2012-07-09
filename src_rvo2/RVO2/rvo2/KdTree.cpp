@@ -85,7 +85,7 @@ namespace RVO
      }
 
     if (!agents_.empty()) {
-      if (agents_.size() * 2 - 1 > agentTree_.size()) {
+      if (agents_.size() * 2 > agentTree_.size() + 1) {
         agentTree_.resize(2 * agents_.size() - 1);
       }
       buildAgentTreeRecursive(0, agents_.size(), 0);

@@ -1,4 +1,4 @@
-/* game_basic_structs.h
+ /* game_basic_structs.h
  *  Defines simple structures that are used throughout the code
  */
 
@@ -129,6 +129,7 @@ typedef int effect_id;
 typedef int projectile_id;
 typedef int sprite_id;
 typedef int spell_id;
+typedef int scriptobject_id;
 typedef int tile_id;
 typedef int tileset_id;
 typedef int enemy_id;
