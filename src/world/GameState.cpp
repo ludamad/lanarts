@@ -35,7 +35,6 @@ extern "C" {
 #include "objects/GameInst.h"
 #include "objects/PlayerInst.h"
 
-
 GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 		int viewh, int hudw) :
 		settings(settings), L(L), frame_n(0), hud(
@@ -395,8 +394,9 @@ bool GameState::object_visible_test(GameInst* obj, PlayerInst* player,
 
 	std::vector<obj_id> players = player_controller().player_ids();
 
-	if ((canreveal && key_down_state(SDLK_BACKQUOTE)) || players.empty())
+	if ((canreveal && key_down_state(SDLK_BACKQUOTE)) || players.empty()) {
 		return true;
+	}
 
 	PlayerController& pc = player_controller();
 	for (int yy = miny; yy <= maxy; yy++) {

@@ -18,16 +18,23 @@ CollisionAvoidance::~CollisionAvoidance() {
 	delete simulator;
 }
 
-simul_id CollisionAvoidance::add_to_simulation(CombatGameInst* inst) {
+simul_id CollisionAvoidance::add_object(CombatGameInst* inst) {
 	RVO::Vector2 enemy_position(inst->x, inst->y);
 	EffectiveStats& estats = inst->effective_stats();
 
-	return simulator->addAgent(enemy_position, 32, 10, 4.0f, 1.0f, 16,
+	return simulator->addAgent(enemy_position, inst->target_radius*2, 10, 8.0f, 1.0f, inst->target_radius,
 			estats.movespeed);
 }
+simul_id CollisionAvoidance::add_player_object(CombatGameInst* inst) {
+	RVO::Vector2 enemy_position(inst->x, inst->y);
+	EffectiveStats& estats = inst->effective_stats();
 
-void CollisionAvoidance::remove_from_simulation(simul_id id) {
-	//NO-OP for rvo ??
+	return simulator->addAgent(enemy_position, 0, 10, 0.0f, 0.0f, inst->radius,
+			0);
+}
+
+void CollisionAvoidance::remove_object(simul_id id) {
+	simulator->removeAgent(id);
 }
 
 void CollisionAvoidance::set_preferred_velocity(simul_id id, float vx,
@@ -35,13 +42,25 @@ void CollisionAvoidance::set_preferred_velocity(simul_id id, float vx,
 	simulator->setAgentPrefVelocity(id, RVO::Vector2(vx, vy));
 }
 
-void CollisionAvoidance::set_position_and_maxspeed(simul_id id, float x,
-		float y, float maxspeed) {
+void CollisionAvoidance::set_position(simul_id id, float x, float y) {
 	simulator->setAgentPosition(id, RVO::Vector2(x, y));
+}
+
+void CollisionAvoidance::set_maxspeed(simul_id id, float maxspeed) {
 	simulator->setAgentMaxSpeed(id, maxspeed);
 }
 
 void CollisionAvoidance::step() {
 	simulator->doStep();
+}
+
+Posf CollisionAvoidance::get_position(simul_id id) {
+	RVO::Vector2 pos = simulator->getAgentPosition(id);
+	return Posf(pos.x(), pos.y());
+}
+
+void CollisionAvoidance::clear() {
+	simulator = new RVO::RVOSimulator();
+	simulator->setTimeStep(1.0f);
 }
 

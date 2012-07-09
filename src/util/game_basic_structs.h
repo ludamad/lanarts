@@ -1,4 +1,4 @@
- /* game_basic_structs.h
+/* game_basic_structs.h
  *  Defines simple structures that are used throughout the code
  */
 
@@ -104,6 +104,16 @@ struct Pos {
 	}
 };
 
+/*Represents a float x,y pair position*/
+struct Posf {
+	float x, y;
+	Posf() {
+	}
+	Posf(float x, float y) :
+			x(x), y(y) {
+	}
+};
+
 /*Represents a rectangular region in terms of its start x,y values as well as its dimensions*/
 struct Region {
 	int x, y, w, h;
@@ -139,5 +149,10 @@ typedef int team_id;
 
 /*Type used to store monetary values*/
 typedef int money_t;
+
+/* Cooldown related utility function */
+inline void cooldown_step(int& cooldown) {
+	cooldown = cooldown > 0 ? cooldown - 1 : 0;
+}
 
 #endif

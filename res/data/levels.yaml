@@ -173,8 +173,8 @@ all_tilesets: &all_tilesets
   crystal_tiles_with_marble, cobble]
 
 areas:
-  - branch: main_branch
-    levels:
+#  - branch: main_branch
+#    levels:
 #     #Test Level
 #      - layout: [*test_layout]
 #        content:

@@ -7,10 +7,14 @@
 #define MONSTERCONTROLLER_H_
 
 #include <vector>
-#include "../objects/GameInst.h"
-#include "../objects/EnemyInst.h"
+
+#include "../../collision_avoidance/CollisionAvoidance.h"
+
 #include "../../pathfind/pathfind.h"
 #include "../../pathfind/astar_pathfind.h"
+
+#include "../objects/GameInst.h"
+#include "../objects/EnemyInst.h"
 
 
 struct EnemyOfInterest {
@@ -76,7 +80,7 @@ private:
 	std::vector<obj_id> mids;
 	std::vector<int> player_simids;
 
-	RVO::RVOSimulator* simulator;
+	CollisionAvoidance coll_avoid;
 	bool monsters_wandering_flag;
 };
 

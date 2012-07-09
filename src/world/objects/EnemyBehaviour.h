@@ -3,7 +3,25 @@
 
 #include <vector>
 
+#include "../../util/game_basic_structs.h"
+
 #include "GameInst.h"
+
+struct EnemyCooldowns {
+	EnemyCooldowns() :
+			successful_hit_timeout(0), damage_taken_timer(0) {
+
+	}
+	//XXX: This attempts to randomize enemy movement
+	//If they have been hit but have not hit anything in some time
+	int successful_hit_timeout;
+	int damage_taken_timer;
+
+	void step() {
+		cooldown_step(successful_hit_timeout);
+		cooldown_step(damage_taken_timer);
+	}
+};
 
 struct EnemyBehaviour {
 	enum {
@@ -21,6 +39,8 @@ struct EnemyBehaviour {
 	Action current_action;
 	int action_timeout;
 	int simulation_id;
+
+	EnemyCooldowns cooldowns;
 
 	Pos path_start;
 	int path_steps;

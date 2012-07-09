@@ -6,6 +6,8 @@
 #ifndef COLLISIONAVOIDANCE_H_
 #define COLLISIONAVOIDANCE_H_
 
+#include "../util/game_basic_structs.h"
+
 class CombatGameInst;
 
 namespace RVO {
@@ -19,12 +21,18 @@ public:
 	CollisionAvoidance();
 	~CollisionAvoidance();
 
-	simul_id add_to_simulation(CombatGameInst* inst);
-	void remove_from_simulation(simul_id id);
+	simul_id add_object(CombatGameInst* inst);
+	simul_id add_player_object(CombatGameInst* inst);
+
+	void remove_object(simul_id id);
 	void set_preferred_velocity(simul_id id, float vx, float vy);
-	void set_position_and_maxspeed(simul_id, float x, float y, float maxspeed);
+
+	void set_position(simul_id, float x, float y);
+	void set_maxspeed(simul_id, float maxspeed);
+	Posf get_position(simul_id);
 
 	void step();
+	void clear();
 
 private:
 	RVO::RVOSimulator* simulator;
