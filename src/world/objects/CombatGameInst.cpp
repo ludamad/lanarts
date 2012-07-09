@@ -177,6 +177,14 @@ void CombatGameInst::equip(item_id item, int amnt) {
 void CombatGameInst::init(GameState* gs) {
 	estats = stats().effective_stats_without_atk(gs);
 }
+
+static float magnitude_in_same_dir(float vx1, float vy1, float vx2, float vy2) {
+	float dir = atan2(vy1, vx1);
+
+
+
+	return 0;
+}
 void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 		float& newy) {
 	const float ROUNDING_MULTIPLE = 65536.0f;
@@ -189,6 +197,15 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 	if (!collided) {
 		rx = newx, ry = newy;
 	} else {
+		bool collided_x = gs->tile_radius_test(round(newx), y, 15);
+		bool collided_y = gs->tile_radius_test(x, round(newy), 15);
+
+		if (!collided_x) {
+			vx = round(newx) - x;
+		}
+		if (!collided_y) {
+			vy = round(newy) - y;
+		}
 		float nx = round(rx + vx), ny = round(ry + vy);
 		bool collided = gs->tile_radius_test(nx, ny, radius);
 		if (collided) {
@@ -207,6 +224,9 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 				}
 			}
 		}
+
+		normalize(nx, ny, effective_stats().movespeed);
+
 		vx = round(vx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
 		vy = round(vy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
 		rx += vx;

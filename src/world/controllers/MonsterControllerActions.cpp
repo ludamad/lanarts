@@ -27,8 +27,6 @@
 const int PATHING_RADIUS = 500;
 const int HUGE_DISTANCE = 1000000;
 
-
-
 void MonsterController::set_monster_headings(GameState* gs,
 		std::vector<EnemyOfInterest>& eois) {
 	//Use a temporary 'GameView' object to make use of its helper methods
@@ -37,7 +35,7 @@ void MonsterController::set_monster_headings(GameState* gs,
 		EnemyInst* e = eois[i].e;
 		float movespeed = e->effective_stats().movespeed;
 		int pind = eois[i].closest_player_index;
-		CombatGameInst* p = (CombatGameInst*)gs->get_instance(
+		CombatGameInst* p = (CombatGameInst*) gs->get_instance(
 				pc.player_ids()[pind]);
 		EnemyBehaviour& eb = e->behaviour();
 
@@ -70,7 +68,6 @@ void MonsterController::set_monster_headings(GameState* gs,
 		}
 	}
 }
-
 
 //returns true if will be exactly on target
 static bool move_towards(EnemyInst* e, const Pos& p) {
@@ -145,14 +142,15 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 			} else {
 				targx = mt.rand(tile.tile_width());
 				targy = mt.rand(tile.tile_height());
-
 			}
 		} while (tile.is_solid(targx, targy));
+
 		eb.current_node = 0;
 		eb.path = astarcontext.calculate_AStar_path(gs, ex, ey, targx, targy);
-		if (is_fullpath)
+		if (is_fullpath) {
 			eb.path_cooldown = mt.rand(
 					EnemyBehaviour::RANDOM_WALK_COOLDOWN * 2);
+		}
 		eb.current_action = EnemyBehaviour::FOLLOWING_PATH;
 	} while (eb.path.size() <= 1);
 
