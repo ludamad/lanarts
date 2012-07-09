@@ -59,6 +59,7 @@ set( lanarts_src
 	gamestats/SpellsKnown.cpp	
 			
 	lua/lua_api.cpp
+	lua/lua_collision_checks.cpp
 	lua/lua_gameinst.cpp
 	lua/lua_gamestate.cpp
 	
@@ -115,6 +116,7 @@ set( lanarts_src
 	world/objects/player_impl/PlayerInstActions.cpp
 	world/objects/player_impl/PlayerInstAttackActions.cpp
 	world/objects/CombatGameInst.cpp
+	world/objects/ScriptedInst.cpp
 	world/objects/EnemyInst.cpp
 	world/objects/GameInst.cpp
 	world/objects/GameInstRef.cpp
@@ -140,7 +142,9 @@ set( lanarts_include
 	data/effect_data.h
 	data/enemy_data.h
 	data/item_data.h
+	data/lua_game_data.h
 	data/game_data.h
+	data/scriptobject_data.h
 	data/sprite_data.h
 	data/dungeon_data.h
 	data/tile_data.h
@@ -155,6 +159,7 @@ set( lanarts_include
 	fov/impl/permissive-fov-cpp.h
 
 	lua/lua_api.h
+	lua/lua_impl_util.h
 	
 	gamestats/Ability.h	
 	gamestats/combat_stats.h
@@ -226,6 +231,7 @@ set( lanarts_include
 	world/objects/PlayerInst.h
 	world/objects/EnemyBehaviour.h
 	world/objects/EnemyInst.h
+	world/objects/ScriptedInst.h
 	world/objects/ProjectileInst.h
 )
 
