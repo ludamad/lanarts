@@ -253,7 +253,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 	//Gain XP
 	if (starts_with(command, "!gainxp ", &content)) {
 		int xp = atoi(content);
-		if (xp > 0 && xp < 50000) {
+		if (xp > 0 && xp < 999999) {
 			printed.message = std::string("You have gained ") + content
 					+ " experience.";
 			printed.message_colour = Colour(50, 255, 50);

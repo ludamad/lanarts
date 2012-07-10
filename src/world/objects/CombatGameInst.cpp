@@ -178,12 +178,27 @@ void CombatGameInst::init(GameState* gs) {
 	estats = stats().effective_stats_without_atk(gs);
 }
 
-static float magnitude_in_same_dir(float vx1, float vy1, float vx2, float vy2) {
-	float dir = atan2(vy1, vx1);
+static float proportion_in_same_dir(float vx1, float vy1, float vx2,
+		float vy2) {
+	float dir1 = atan2(vy1, vx1);
+	float dir2 = atan2(vy2, vx2);
 
+	return cos(dir2 - dir1);
+}
 
+bool in_corridor_heurestic(GameState* gs, const Pos& p, float vx, float vy) {
+	bool in_xy = abs(vx) > abs(vy);
 
-	return 0;
+	GameTiles& tiles = gs->tile_grid();
+	int solid = 0;
+	for (int dy = -1; dy <= 1; dy++) {
+		for (int dx = -1; dx <= 1; dx++) {
+			if (tiles.is_solid(p.x + dx, p.y + dy)) {
+				solid++;
+			}
+		}
+	}
+	return solid >= 4;
 }
 void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 		float& newy) {
@@ -197,15 +212,6 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 	if (!collided) {
 		rx = newx, ry = newy;
 	} else {
-		bool collided_x = gs->tile_radius_test(round(newx), y, 15);
-		bool collided_y = gs->tile_radius_test(x, round(newy), 15);
-
-		if (!collided_x) {
-			vx = round(newx) - x;
-		}
-		if (!collided_y) {
-			vy = round(newy) - y;
-		}
 		float nx = round(rx + vx), ny = round(ry + vy);
 		bool collided = gs->tile_radius_test(nx, ny, radius);
 		if (collided) {
@@ -224,17 +230,29 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 				}
 			}
 		}
+//		else {
+//			if (in_corridor_heurestic(gs,
+//					Pos(rx / TILE_SIZE, ry / TILE_SIZE))) {
+//				float proportion = proportion_in_same_dir(dx, dy, vx, vy);
+//				if (!gs->tile_radius_test(round(rx + vx * proportion),
+//						round(ry + vy * proportion), radius)) {
+//					vx *= proportion, vy *= proportion;
+//				} else {
+//					vx = 0.0f, vy = 0.0f;
+//				}
+//			}
+//		}
 
-		normalize(nx, ny, effective_stats().movespeed);
+//		normalize(nx, ny, effective_stats().movespeed);
 
-		vx = round(vx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-		vy = round(vy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
+//		vx = round(vx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
+//		vy = round(vy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
 		rx += vx;
 		ry += vy;
 	}
 
-	rx = round(rx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-	ry = round(ry * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
+//	rx = round(rx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
+//	ry = round(ry * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
 
 	newx = rx, newy = ry;
 
@@ -242,8 +260,8 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 }
 
 void CombatGameInst::update_position() {
-	x = (int) round(rx); //update based on rounding of true float
-	y = (int) round(ry);
+	x = (int)round(rx); //update based on rounding of true float
+	y = (int)round(ry);
 }
 
 void CombatGameInst::update_position(float newx, float newy) {
@@ -278,7 +296,7 @@ static void combine_stat_hash(unsigned int& hash, CombatStats& stats) {
 }
 unsigned int CombatGameInst::integrity_hash() {
 	unsigned int hash = GameInst::integrity_hash();
-	combine_hash(hash, (unsigned int&) vx, (unsigned int&) vy);
+	combine_hash(hash, (unsigned int&)vx, (unsigned int&)vy);
 	combine_stat_hash(hash, stats());
 	return hash;
 }

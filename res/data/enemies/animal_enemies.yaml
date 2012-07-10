@@ -50,6 +50,22 @@ enemies:
         strength: 12
         defence: 5
         willpower: 5
+       
+  - name: Mock
+    sprite: hound
+    death_sprite: blood
+    radius: 15
+    xpaward: 10
+    appear_message: A hungry, feral hound notices you.
+    defeat_message: The hound yelps as it is pulverized.
+    stats:
+        attacks: []
+        hp: 20
+        hpregen: 0.03
+        movespeed: 2.5
+        strength: 12
+        defence: 5
+        willpower: 5
 
   - name: Sheep
     sprite: sheep
