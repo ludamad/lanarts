@@ -1,0 +1,32 @@
+## THIS IS A DRAFT, DOES NOT CURRENTLY AFFECT GAME ##
+
+
+# Configures controls for lanarts
+# Handles event dispatch
+#
+# special keys:
+#  - stop_moving: dispatched when you stop moving
+#  - not_moving: dispatched whenever you're not moving
+#  - mouse_wheel_up, mouse_wheel_down: dispatched when you scroll with mouse wheel
+#  - mouse_left_click, mouse_right_click, mouse_left_hold, mouse_right_hold: click vs holding mouse button
+#
+# In most cases, order does not matter, and everything presents an alternative, unless noted
+# Also note that although anything can be assigned, it may cause some weird control setups.
+# Eg, not_moving makes sense for rest, but not item use
+
+pickup_item: [enter, stop_moving]
+
+# Handles spell selection
+spell_toggle_up: [E, mouse_wheel_up] 
+spell_toggle_down: [Q, mouse_wheel_up] 
+
+# Quick-use, order matters:
+item_hotkeys = [Y, U, I, O, P]
+spell_hotkeys = [shift + Y, shift + U, shift + I, shift + O, shift + P]
+
+# Handles chatbar toggle
+
+
+use_stop_actions: yes
+
+## THIS IS A DRAFT, DOES NOT CURRENTLY AFFECT GAME ##
