@@ -294,7 +294,7 @@ bool LuaValue::empty() {
 	return impl == NULL || impl->is_empty();
 }
 
-void lua_gameinstcallback(lua_State* L, LuaValue& value, GameInst* inst) {
+void lua_gameinst_callback(lua_State* L, LuaValue& value, GameInst* inst) {
 	if (value.empty())
 		return;
 	value.push(L);

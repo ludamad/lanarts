@@ -28,7 +28,7 @@ struct ScriptObjectEntry {
 	}
 };
 
-scriptobject_id get_scriptobject_by_name(const char* name,
+scriptobj_id get_scriptobject_by_name(const char* name,
 		bool error_if_not_found = true);
 
 extern std::vector<ScriptObjectEntry> game_scriptobject_data;

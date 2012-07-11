@@ -13,7 +13,7 @@ struct lua_State;
 //Lua argument getters
 item_id item_from_lua(lua_State* L, int idx);
 class_id class_from_lua(lua_State* L, int idx);
-scriptobject_id scriptobject_from_lua(lua_State* L, int idx);
+scriptobj_id scriptobject_from_lua(lua_State* L, int idx);
 sprite_id sprite_from_lua(lua_State* L, int idx);
 spell_id spell_from_lua(lua_State* L, int idx);
 tile_id tile_from_lua(lua_State* L, int idx);

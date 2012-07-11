@@ -5,11 +5,11 @@
 
 #include "GeneratedLevel.h"
 
-Sqr & GeneratedLevel::at(const Pos & p) {
+Sqr& GeneratedLevel::at(const Pos & p) {
 	return s[p.y * w + p.x];
 }
 
-Sqr & GeneratedLevel::at(int x, int y) {
+Sqr& GeneratedLevel::at(int x, int y) {
 	return s[y * w + x];
 }
 

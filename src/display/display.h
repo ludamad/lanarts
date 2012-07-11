@@ -34,9 +34,9 @@ void gl_draw_image(const GameView& view, GLimage& img, int x, int y,
 		const Colour& c = Colour(255, 255, 255));
 void gl_draw_sprite(sprite_id sprite, int x, int y,
 		const Colour& c = Colour(255, 255, 255));
-void gl_draw_sprite(sprite_id sprite, const GameView& view, int x, int y,
+void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 		const Colour& c = Colour(255, 255, 255));
-void gl_draw_sprite_entry(const GameView& view, SpriteEntry& entry, int x,
+void gl_draw_sprite(const GameView& view, sprite_id sprite, int x,
 		int y, float dx, float dy, int steps,
 		const Colour& c = Colour(255, 255, 255));
 

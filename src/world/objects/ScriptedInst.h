@@ -14,17 +14,23 @@
 
 #include "GameInst.h"
 
+struct ScriptObjectEntry;
+
 class ScriptedInst: public GameInst {
 public:
-	ScriptedInst(scriptobject_id script_obj, int radius, int x, int y);
+	ScriptedInst(scriptobj_id script_obj, int x, int y);
 	virtual ~ScriptedInst();
 
 	virtual void init(GameState* gs);
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
 
+	virtual void copy_to(GameInst* inst) const;
+	virtual ScriptedInst* clone() const;
+
+	ScriptObjectEntry& script_object();
 protected:
-	scriptobject_id script_obj;
+	scriptobj_id script_obj_id;
 };
 
 #endif /* SCRIPTEDINST_H_ */

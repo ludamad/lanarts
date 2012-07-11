@@ -76,7 +76,7 @@ void EnemyInst::init(GameState* gs) {
 //	core_stats().mp += core_stats().mp * ln / 10.0;
 //	core_stats().max_mp += core_stats().max_mp * ln / 10.0;
 
-	lua_gameinstcallback(gs->get_luastate(), etype().init_event, this);
+	lua_gameinst_callback(gs->get_luastate(), etype().init_event, this);
 }
 
 void EnemyInst::step(GameState* gs) {

@@ -1,12 +1,12 @@
 YUM packages required:
 SDL-static
+SDL-image
 freetype-devel
-asio-devel
 boost-devel
 cmake
 
 Packages for ubuntu:
-libsdl1.2-dev libsdl-image1.2-dev libfreetype6-dev libasio-dev libboost-dev cmake
+libsdl1.2-dev libsdl-image1.2-dev libfreetype6-dev libboost-dev cmake
 
 The project uses cmake to create plaform independent build files. 
 
@@ -23,3 +23,9 @@ cd lanarts_build
 cmake ../lanarts
 
 Copy the exe from 'lanarts_build/src' into the 'lanarts' folder and run it from there.
+
+
+CREATING ECLIPSE PROJECT FILES:
+Go to folder where you want eclipse project files:
+cmake -G"Eclipse CDT4 - Unix Makefiles" <path to lanarts source>
+

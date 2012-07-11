@@ -110,7 +110,8 @@ GameLevelState* generate_level(int roomid, MTwist& mt, GeneratedLevel& level,
 	GameLevelState* prevlvl = gs->get_level(); //Save level context
 	gs->set_level(newlvl); //Set level context to new level
 
-	printf("level.init RNG state at %d numbers\n", mt.DEBUG_INFO_amnt_generated);
+	printf("level.init RNG state at %d numbers\n",
+			mt.DEBUG_INFO_amnt_generated);
 	for (int i = 0; i < roomsettings.size(); i++) {
 		generate_rooms(roomsettings[i], mt, level);
 	}

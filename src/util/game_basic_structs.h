@@ -139,7 +139,7 @@ typedef int effect_id;
 typedef int projectile_id;
 typedef int sprite_id;
 typedef int spell_id;
-typedef int scriptobject_id;
+typedef int scriptobj_id;
 typedef int tile_id;
 typedef int tileset_id;
 typedef int enemy_id;

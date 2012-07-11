@@ -78,9 +78,10 @@ void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 
 const int UNBOUNDED = 10000;
 
-void gl_draw_sprite_entry(const GameView& view, SpriteEntry& entry, int x,
-		int y, float dx, float dy, int steps, const Colour& c) {
+void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
+		float dx, float dy, int steps, const Colour& c) {
 	float PI = 3.1415921;
+	SpriteEntry& entry = game_sprite_data.at(sprite);
 	GLimage* img;
 	if (entry.type == SpriteEntry::DIRECTIONAL) {
 		float direction = PI * 2.5 + atan2(dy, dx);
@@ -100,7 +101,7 @@ void gl_draw_sprite(sprite_id sprite, int x, int y, const Colour& c) {
 	gl_draw_image(img, x, y, c);
 }
 
-void gl_draw_sprite(sprite_id sprite, const GameView& view, int x, int y,
+void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 		const Colour& c) {
 	gl_draw_sprite(sprite, x - view.x, y - view.y, c);
 }

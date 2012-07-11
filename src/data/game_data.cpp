@@ -114,7 +114,7 @@ item_id get_item_by_name(const char* name, bool error_if_not_found) {
 class_id get_class_by_name(const char* name) {
 	return get_X_by_name(game_class_data, name);
 }
-scriptobject_id get_scriptobject_by_name(const char* name,
+scriptobj_id get_scriptobject_by_name(const char* name,
 		bool error_if_not_found) {
 	return get_X_by_name(game_scriptobject_data, name, error_if_not_found);
 }
@@ -152,7 +152,7 @@ item_id item_from_lua(lua_State* L, int idx) {
 class_id class_from_lua(lua_State* L, int idx) {
 	return get_X_by_name(game_class_data, lua_tostring(L, idx));
 }
-scriptobject_id scriptobject_from_lua(lua_State* L, int idx) {
+scriptobj_id scriptobject_from_lua(lua_State* L, int idx) {
 	return get_X_by_name(game_scriptobject_data, lua_tostring(L, idx));
 }
 sprite_id sprite_from_lua(lua_State* L, int idx) {

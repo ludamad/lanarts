@@ -19,3 +19,5 @@ end
 function spell_blink_action(spell, caster, target_x, target_y)
 	
 end
+
+--function 

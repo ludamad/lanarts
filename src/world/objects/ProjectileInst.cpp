@@ -37,8 +37,7 @@ void ProjectileInst::draw(GameState* gs) {
 	if (!gs->object_visible_test(this))
 		return;
 
-	gl_draw_sprite_entry(view, spr, x - TILE_SIZE / 2, y - TILE_SIZE / 2, vx,
-			vy, 0);
+	gl_draw_sprite(view, sprite(), xx, yy, vx, vy, 0);
 }
 
 void ProjectileInst::deinit(GameState* gs) {
@@ -170,7 +169,8 @@ void ProjectileInst::step(GameState* gs) {
 				GameInst* enemy = gs->get_instance(mid);
 				if (enemy && enemy != colobj) {
 
-					float abs = distance_between(Pos(x,y), Pos(enemy->x, enemy->y));
+					float abs = distance_between(Pos(x, y),
+							Pos(enemy->x, enemy->y));
 					if (abs < 1)
 						abs = 1;
 					if (abs < mindist) {
