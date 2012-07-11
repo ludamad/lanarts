@@ -8,7 +8,7 @@ T="$(date +%s%N)"
 ## START TIMER CODE
 
 ##MAKE
-VERBOSE=1 make -j4
+make -j4
 
 ## END TIMER CODE
 T="$(($(date +%s%N)-T))"
