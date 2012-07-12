@@ -53,6 +53,15 @@ static void combine_hash(unsigned int& hash, unsigned int val1, unsigned val2) {
 	hash ^= val2;
 	hash ^= hash << 11;
 }
+
+void EnemyInst::signal_attacked_successfully() {
+	eb.randomization.successful_hit_timer = 0;
+}
+
+void EnemyInst::signal_was_damaged() {
+	eb.randomization.damage_taken_timer = 0;
+}
+
 unsigned int EnemyInst::integrity_hash() {
 	unsigned int hash = CombatGameInst::integrity_hash();
 	combine_hash(hash, eb.current_node, eb.path_steps);
@@ -114,9 +123,10 @@ void EnemyInst::draw(GameState* gs) {
 		snprintf(
 				statbuff,
 				255,
-				"simid=%d nvx=%f vy=%f\n act=%d, path_steps = %d\npath_cooldown = %d\n",
-				eb.simulation_id, vx, vy, eb.current_action, eb.path_steps,
-				eb.path_cooldown);
+				"simid=%d nvx=%f vy=%f\n washit=%d didhit=%d \n act=%d, path_steps = %d\npath_cooldown = %d\n",
+				eb.simulation_id, vx, vy, eb.randomization.damage_taken_timer,
+				eb.randomization.successful_hit_timer, eb.current_action,
+				eb.path_steps, eb.path_cooldown);
 		gl_printf(gs->primary_font(), Colour(255, 255, 255),
 				x - radius - view.x, y - 70 - view.y, statbuff);
 	}

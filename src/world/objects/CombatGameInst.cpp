@@ -25,6 +25,7 @@ bool CombatGameInst::damage(GameState* gs, int dmg) {
 		die(gs);
 		return true;
 	}
+	signal_was_damaged();
 	cooldowns().reset_hurt_cooldown(HURT_COOLDOWN);
 	return false;
 }
@@ -129,6 +130,8 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 		gs->add_instance(
 				new AnimatedInst(inst->x, inst->y, wentry.attack_sprite, 25));
 	}
+
+	signal_attacked_successfully();
 
 	return isdead;
 }

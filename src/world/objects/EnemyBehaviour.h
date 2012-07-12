@@ -7,19 +7,44 @@
 
 #include "GameInst.h"
 
-struct EnemyCooldowns {
-	EnemyCooldowns() :
-			successful_hit_timeout(0), damage_taken_timer(0) {
+struct EnemyRandomization {
+	enum {
+		SUCCESSFUL_HIT_MAXTIME = 200, DAMAGE_TAKEN_TIMETHRESHOLD = 200
+	};
+	EnemyRandomization() :
+			successful_hit_timer(0), damage_taken_timer(0), random_walk_timer(
+					0), vx(0), vy(0) {
 
 	}
 	//XXX: This attempts to randomize enemy movement
 	//If they have been hit but have not hit anything in some time
-	int successful_hit_timeout;
+	int successful_hit_timer;
 	int damage_taken_timer;
+	int random_walk_timer;
+	float vx, vy;
 
 	void step() {
-		cooldown_step(successful_hit_timeout);
-		cooldown_step(damage_taken_timer);
+		if (successful_hit_timer < SUCCESSFUL_HIT_MAXTIME) {
+			successful_hit_timer++;
+		}
+		if (damage_taken_timer < DAMAGE_TAKEN_TIMETHRESHOLD) {
+			damage_taken_timer++;
+		}
+		if (random_walk_timer > 0){
+			random_walk_timer--;
+			if (random_walk_timer == 0){
+				successful_hit_timer = 0;
+				damage_taken_timer = 0;
+			}
+		}
+	}
+	bool has_random_goal() {
+		return random_walk_timer > 0;
+	}
+	bool should_randomize_movement() {
+		return random_walk_timer > 0
+				|| (successful_hit_timer >= SUCCESSFUL_HIT_MAXTIME
+						&& damage_taken_timer < DAMAGE_TAKEN_TIMETHRESHOLD);
 	}
 };
 
@@ -40,7 +65,7 @@ struct EnemyBehaviour {
 	int action_timeout;
 	int simulation_id;
 
-	EnemyCooldowns cooldowns;
+	EnemyRandomization randomization;
 
 	Pos path_start;
 	int path_steps;
@@ -55,6 +80,7 @@ struct EnemyBehaviour {
 			if (action_timeout == 0) {
 				current_action = INACTIVE;
 			}
+			randomization.step();
 		}
 	}
 };

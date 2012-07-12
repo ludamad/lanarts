@@ -113,6 +113,7 @@ void ProjectileInst::step(GameState* gs) {
 
 		if (colobj) {
 			EnemyInst* victim = (EnemyInst*) colobj;
+			origin->signal_attacked_successfully();
 			int damage = damage_formula(atkstats, victim->effective_stats());
 			damage *= damage_mult;
 
@@ -142,6 +143,8 @@ void ProjectileInst::step(GameState* gs) {
 		gs->object_radius_test(this, &colobj, 1, &player_colfilter);
 		if (colobj) {
 			CombatGameInst* victim = (CombatGameInst*) colobj;
+			origin->signal_attacked_successfully();
+
 			int damage = damage_formula(atkstats, victim->effective_stats());
 			damage *= damage_mult;
 

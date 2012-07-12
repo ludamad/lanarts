@@ -50,6 +50,11 @@ public:
 	//bool spell_attack ...
 	bool attack(GameState* gs, CombatGameInst* inst, const AttackStats& attack);
 
+	virtual void signal_attacked_successfully() {
+	}
+	virtual void signal_was_damaged() {
+	}
+
 	void equip(item_id item, int amnt = 1);
 
 	CombatStats& stats();
@@ -71,8 +76,8 @@ public:
 
 
 	float vx, vy;
-protected:
 	float rx, ry;
+protected:
 	bool is_resting;
 	team_id teamid;
 	sprite_id spriteid;

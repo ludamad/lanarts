@@ -26,6 +26,9 @@ public:
 	virtual void copy_to(GameInst* inst) const;
 	virtual EnemyInst* clone() const;
 
+	virtual void signal_attacked_successfully();
+	virtual void signal_was_damaged();
+
 	virtual unsigned int integrity_hash();
 
 	virtual bool within_field_of_view(const Pos& pos);

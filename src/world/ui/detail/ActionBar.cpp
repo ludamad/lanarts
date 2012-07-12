@@ -160,7 +160,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 	gl_draw_image(game_sprite_data[wentry.item_sprite].img(), x, y);
 
 	if (draw_with_projectile) {
-		BBox projectilebox(equipbox.translated(TILE_SIZE, 0));
+		BBox projectilebox(weaponbox.translated(TILE_SIZE, 0));
 
 		Projectile& projectile = player->projectile();
 

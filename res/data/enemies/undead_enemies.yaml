@@ -54,4 +54,4 @@ enemies:
         movespeed: 2
         strength: 30
         defence: 10
-        willpower: 10
+        willpower: 15

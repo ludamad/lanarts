@@ -27,6 +27,70 @@
 const int PATHING_RADIUS = 500;
 const int HUGE_DISTANCE = 1000000;
 
+static bool choose_random_direction(GameState* gs, EnemyInst* e, float& vx,
+		float& vy) {
+	const float deg2rad = 3.14159265f / 180.0f;
+	int MAX_ATTEMPTS = 10;
+	float movespeed = e->effective_stats().movespeed;
+	MTwist& mt = gs->rng();
+
+	for (int attempts = 0; attempts < MAX_ATTEMPTS; attempts++) {
+		float direction = mt.rand(360) * deg2rad;
+		vx = cos(direction), vy = sin(direction);
+		int nx = round(e->rx + vx * TILE_SIZE), ny = round(
+				e->ry + vy * TILE_SIZE);
+
+		bool solid = gs->tile_radius_test(nx, ny, e->radius);
+		if (!solid) {
+			vx *= movespeed, vy *= movespeed;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool has_ranged_attack(EnemyInst* e) {
+	CombatStats& stats = e->stats();
+	for (int i = 0; i < stats.attacks.size(); i++) {
+		if (stats.attacks[i].is_ranged()) {
+			return true;
+		}
+	}
+	return false;
+}
+bool potentially_randomize_movement(GameState* gs, EnemyInst* e) {
+	EnemyRandomization& er = e->behaviour().randomization;
+
+	if (!has_ranged_attack(e)) {
+		//Only enable this behaviour for ranged enemies for now
+		return false;
+	}
+
+	bool randomized = false;
+	if (er.should_randomize_movement()) {
+		if (er.has_random_goal()) {
+			randomized = true;
+		}
+		if (!randomized && gs->rng().rand(32) == 0
+				&& choose_random_direction(gs, e, er.vx, er.vy)) {
+			er.random_walk_timer = gs->rng().rand(TILE_SIZE, TILE_SIZE * 2);
+			randomized = true;
+		}
+		if (randomized) {
+			int nx = round(e->rx + er.vx), ny = round(e->ry + er.vy);
+			bool solid = gs->tile_radius_test(nx, ny, e->radius);
+			if (!solid) {
+				e->vx = er.vx, e->vy = er.vy;
+			} else {
+				er.random_walk_timer = 0;
+				er.successful_hit_timer = 0;
+				er.damage_taken_timer = 0;
+				randomized = false;
+			}
+		}
+	}
+	return randomized;
+}
 void MonsterController::set_monster_headings(GameState* gs,
 		std::vector<EnemyOfInterest>& eois) {
 	//Use a temporary 'GameView' object to make use of its helper methods
@@ -35,14 +99,18 @@ void MonsterController::set_monster_headings(GameState* gs,
 		EnemyInst* e = eois[i].e;
 		float movespeed = e->effective_stats().movespeed;
 		int pind = eois[i].closest_player_index;
-		CombatGameInst* p = (CombatGameInst*) gs->get_instance(
+		CombatGameInst* p = (CombatGameInst*)gs->get_instance(
 				pc.player_ids()[pind]);
 		EnemyBehaviour& eb = e->behaviour();
 
 		eb.current_action = EnemyBehaviour::CHASING_PLAYER;
 		eb.path.clear();
-		eb.action_timeout = 200;
-		paths[pind]->interpolated_direction(e->bbox(), movespeed, e->vx, e->vy);
+		eb.action_timeout = 300;
+
+		if (!potentially_randomize_movement(gs, e)) {
+			paths[pind]->interpolated_direction(e->bbox(), movespeed, e->vx,
+					e->vy);
+		}
 
 		//Compare position to player object
 		float pdist = distance_between(Pos(e->x, e->y), Pos(p->x, p->y));
