@@ -4,14 +4,14 @@ enemies:
   - name: Giant Rat
     sprite: giant rat
     death_sprite: blood
-    radius: 10
+    radius: 14
     xpaward: 5
     description: A giant, aggressive vermin.
     appear_message: A hostile large rat approaches!
     defeat_message: Blood splatters as the large rat is destroyed.
     stats:
         attacks: [ {weapon: Basic Melee} ]
-        hp: 10
+        hp: 15
         hpregen: 0.03
         movespeed: 2
         #base stats:
@@ -28,9 +28,9 @@ enemies:
     defeat_message: The giant bat has died.
     stats:
         attacks: [ {weapon: Fast Melee} ]
-        hp: 12
+        hp: 18
         hpregen: 0.03
-        movespeed: 2.5
+        movespeed: 3
         strength: 10
         defence: 5
         willpower: 5
@@ -44,23 +44,7 @@ enemies:
     defeat_message: The hound yelps as it is pulverized.
     stats:
         attacks: [ {weapon: Basic Melee} ]
-        hp: 20
-        hpregen: 0.03
-        movespeed: 2.5
-        strength: 12
-        defence: 5
-        willpower: 5
-       
-  - name: Mock
-    sprite: hound
-    death_sprite: blood
-    radius: 15
-    xpaward: 10
-    appear_message: A hungry, feral hound notices you.
-    defeat_message: The hound yelps as it is pulverized.
-    stats:
-        attacks: []
-        hp: 20
+        hp: 25
         hpregen: 0.03
         movespeed: 2.5
         strength: 12
@@ -76,7 +60,7 @@ enemies:
     defeat_message: The sheep recieves a fatal blow.
     stats:
         attacks: [ {weapon: Basic Melee} ]
-        hp: 15
+        hp: 20
         hpregen: 0.03
         movespeed: 2
         strength: 10

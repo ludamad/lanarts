@@ -16,7 +16,7 @@ enemies:
         movespeed: 3
         strength: 25
         defence: 0
-        willpower: 40
+        willpower: 55
 
   - name: Imp
     sprite: imp

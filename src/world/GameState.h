@@ -13,6 +13,7 @@
 #include "../util/mtwist.h"
 #include "../fov/fov.h"
 
+#include "controllers/IOController.h"
 #include "controllers/MonsterController.h"
 #include "controllers/PlayerController.h"
 
@@ -144,11 +145,11 @@ public:
 
 	/* Mouse position */
 	int mouse_x() {
-		return mousex;
+		return iocontroller.mouse_x();
 	}
 
 	int mouse_y() {
-		return mousey;
+		return iocontroller.mouse_y();
 	}
 
 	/* Mouse click states */
@@ -200,19 +201,7 @@ private:
 	MTwist mtwist;
 	font_data small_font, large_font;
 	bool dragging_view;
-
-	/* Keyboard states */
-	char key_down_states[SDLK_LAST];
-	char key_press_states[SDLK_LAST];
-
-	/* Mouse position */
-	int mousex, mousey;
-
-	/* Mouse click states */
-	bool mouse_leftdown, mouse_rightdown;
-	bool mouse_leftclick, mouse_rightclick;
-	bool mouse_leftrelease, mouse_rightrelease;
-	bool mouse_didupwheel, mouse_diddownwheel;
+	IOController iocontroller;
 };
 
 #endif /* GAMESTATE_H_ */

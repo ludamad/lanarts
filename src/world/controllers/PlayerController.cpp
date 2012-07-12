@@ -21,7 +21,7 @@ PlayerController::~PlayerController() {
 
 void PlayerController::update_fieldsofview(GameState* gs) {
 	for (int i = 0; i < pids.size(); i++) {
-		PlayerInst* player = (PlayerInst*)gs->get_instance(pids[i]);
+		PlayerInst* player = (PlayerInst*) gs->get_instance(pids[i]);
 		int sx = player->last_x * VISION_SUBSQRS / TILE_SIZE;
 		int sy = player->last_y * VISION_SUBSQRS / TILE_SIZE;
 		player->field_of_view().calculate(gs, sx, sy);
@@ -47,6 +47,9 @@ void PlayerController::register_player(obj_id player, bool islocal) {
 }
 
 void PlayerController::deregister_player(obj_id player) {
+	if (player == local_player) {
+		local_player = 0;
+	}
 	int i;
 	for (i = 0; i < pids.size() && pids[i] != player; i++) {
 		//find 'i' such that pids[i] == player

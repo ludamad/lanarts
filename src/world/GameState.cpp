@@ -40,18 +40,8 @@ GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 		settings(settings), L(L), frame_n(0), hud(
 				BBox(vieww, 0, vieww + hudw, viewh), BBox(0, 0, vieww, viewh)), view(
 				0, 0, vieww, viewh), world(this) {
-	memset(key_down_states, 0, sizeof(key_down_states));
 
 	dragging_view = false;
-
-	mouse_leftdown = false;
-	mouse_rightdown = false;
-
-	mouse_leftclick = false;
-	mouse_rightclick = false;
-
-	mouse_leftrelease = false;
-	mouse_rightrelease = false;
 
 	init_font(&small_font, settings.font.c_str(), 10);
 	init_font(&large_font, settings.font.c_str(), 20);
@@ -130,78 +120,22 @@ int GameState::object_radius_test(int x, int y, int radius, col_filterf f,
 	return object_radius_test(NULL, objs, obj_cap, f, x, y, radius);
 }
 
-int GameState::handle_event(SDL_Event *event) {
-	int done = 0;
-
+int GameState::handle_event(SDL_Event* event) {
 	if (get_level()) {
 		if (dialogs.handle_event(this, event))
-			return done;
+			return 0;
 
 		if (hud.handle_event(this, event))
-			return done;
+			return 0;
 	}
-
-	switch (event->type) {
-	case SDL_ACTIVEEVENT:
-		break;
-
-	case SDL_KEYDOWN: {
-		if (event->key.keysym.sym == SDLK_ESCAPE) {
-			done = 1;
-		}
-		key_down_states[event->key.keysym.sym] = 1;
-		key_press_states[event->key.keysym.sym] = 1;
-		break;
-	}
-	case SDL_KEYUP: {
-		key_down_states[event->key.keysym.sym] = 0;
-		break;
-	}
-	case SDL_MOUSEBUTTONDOWN: {
-		if (event->button.button == SDL_BUTTON_LEFT) {
-			mouse_leftdown = true;
-			mouse_leftclick = true;
-		} else if (event->button.button == SDL_BUTTON_RIGHT) {
-			mouse_rightdown = true;
-			mouse_rightclick = true;
-		} else if (event->button.button == SDL_BUTTON_WHEELUP) {
-			mouse_didupwheel = true;
-		} else if (event->button.button == SDL_BUTTON_WHEELDOWN) {
-			mouse_diddownwheel = true;
-		}
-		break;
-	}
-	case SDL_MOUSEBUTTONUP: {
-		if (event->button.button == SDL_BUTTON_LEFT) {
-			mouse_leftdown = false;
-			mouse_leftrelease = true;
-		} else if (event->button.button == SDL_BUTTON_RIGHT) {
-			mouse_rightdown = false;
-			mouse_rightrelease = true;
-		}
-		break;
-	}
-	case SDL_QUIT:
-		done = 1;
-		break;
-	}
-	return (done);
+	return iocontroller.handle_event(event);
 }
 bool GameState::update_iostate(bool resetprev) {
-	/*Reset everything to not-pressed and find out what is currently pressed*/
+	/* If 'resetprev', clear the io state
+	 * and then poll is currently pressed */
+	iocontroller.update_iostate(resetprev);
+
 	SDL_Event event;
-	if (resetprev) {
-		memset(key_press_states, 0, sizeof(key_press_states));
-		mouse_leftclick = false;
-		mouse_rightclick = false;
-
-		mouse_didupwheel = false;
-		mouse_diddownwheel = false;
-
-		mouse_leftrelease = false;
-		mouse_rightrelease = false;
-	}
-	SDL_GetMouseState(&mousex, &mousey);
 	while (SDL_PollEvent(&event)) {
 		if (handle_event(&event))
 			return false;
@@ -218,10 +152,10 @@ void GameState::step() {
 }
 
 int GameState::key_down_state(int keyval) {
-	return key_down_states[keyval];
+	return iocontroller.key_down_state(keyval);
 }
 int GameState::key_press_state(int keyval) {
-	return key_press_states[keyval];
+	return iocontroller.key_press_state(keyval);
 }
 
 void GameState::adjust_view_to_dragging() {
@@ -424,35 +358,35 @@ void GameState::level_move(int id, int x, int y, int roomid1, int roomid2) {
 }
 
 bool GameState::mouse_left_click() {
-	return mouse_leftclick;
+	return iocontroller.mouse_left_click();
 }
 
 /* Mouse click states */
 bool GameState::mouse_right_click() {
-	return mouse_rightclick;
+	return iocontroller.mouse_right_click();
 }
 
 bool GameState::mouse_left_down() {
-	return mouse_leftdown;
+	return iocontroller.mouse_left_down();
 }
 
 bool GameState::mouse_right_down() {
-	return mouse_rightdown;
+	return iocontroller.mouse_right_down();
 }
 
 bool GameState::mouse_left_release() {
-	return mouse_leftrelease;
+	return iocontroller.mouse_left_release();
 }
 
 bool GameState::mouse_right_release() {
-	return mouse_rightrelease;
+	return iocontroller.mouse_right_release();
 }
 
 bool GameState::mouse_upwheel() {
-	return mouse_didupwheel;
+	return iocontroller.mouse_upwheel();
 }
 bool GameState::mouse_downwheel() {
-	return mouse_diddownwheel;
+	return iocontroller.mouse_downwheel();
 }
 
 /* End mouse click states */

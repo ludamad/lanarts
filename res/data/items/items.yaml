@@ -19,7 +19,7 @@ items:
 
   - name: Haste Scroll
     description: 
-      A scroll of that captures the power of the winds, 
+      A scroll that captures the power of the winds, 
       it bestows the user with power and speed for a limited duration.
     use_message: You feel yourself moving faster and faster!
     sprite: scroll_haste

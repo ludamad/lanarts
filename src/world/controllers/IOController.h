@@ -9,6 +9,8 @@
 #include <vector>
 #include <SDL/SDL.h>
 
+#include "../../util/game_basic_structs.h"
+
 // Multiple keys can refer to same action, in which case multiple
 // GameEventTrigger instances can exist
 struct GameEvent {
@@ -29,6 +31,12 @@ struct GameEvent {
 	event_t event_type;
 	int event_num; // Not-always-necessary event data
 
+	explicit GameEvent(event_t event_type, int event_num = 0) :
+			event_type(event_type), event_num(event_num) {
+	}
+	bool operator==(const GameEvent& o) const {
+		return event_type == o.event_type && event_num == o.event_num;
+	}
 };
 
 // Encapsulates trigger + necessary action to emit
@@ -66,6 +74,10 @@ struct IOState {
 
 	/* Action states */
 	std::vector<GameEvent> active_events;
+
+	IOState();
+	void clear();
+	void clear_for_step();
 };
 
 class IOController {
@@ -77,27 +89,24 @@ public:
 
 	void bind_item(spell_id spell);
 	void unbind_item(spell_id spell);
-
-	/* Mouse click states */
 	bool mouse_left_click();
 	bool mouse_right_click();
-
 	bool mouse_left_down();
 	bool mouse_right_down();
-
 	bool mouse_left_release();
 	bool mouse_right_release();
-
 	bool mouse_upwheel();
 	bool mouse_downwheel();
 
-	/* Keyboard press states */
+	int mouse_x();
+	int mouse_y();
+
 	int key_down_state(int keyval);
 	int key_press_state(int keyval);
 
-	/* Returns true if game should exit */
-	int handle_event(SDL_Event *event);
+	void update_iostate(bool resetprev);
 
+	int handle_event(SDL_Event* event);
 	bool query_event(const GameEvent& event);
 
 private:

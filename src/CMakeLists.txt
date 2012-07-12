@@ -106,6 +106,7 @@ set( lanarts_src
 	world/ui/detail/Minimap.cpp
 	
 	world/controllers/CombatInstController.cpp
+	world/controllers/IOController.cpp
 	world/controllers/MonsterController.cpp
 	world/controllers/MonsterControllerActions.cpp
 	world/controllers/PlayerController.cpp
@@ -205,6 +206,7 @@ set( lanarts_include
 	world/GameView.h
 	world/GameWorld.h
 	
+	world/controllers/IOController.h
 	world/controllers/MonsterController.h
 	world/controllers/PlayerController.h
 	world/controllers/CombatInstController.h
