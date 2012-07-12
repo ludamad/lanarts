@@ -40,7 +40,8 @@ static bool choose_random_direction(GameState* gs, EnemyInst* e, float& vx,
 		int nx = round(e->rx + vx * TILE_SIZE), ny = round(
 				e->ry + vy * TILE_SIZE);
 
-		bool solid = gs->tile_radius_test(nx, ny, e->radius);
+		//Use TILE_SIZE for checking solidity so that we don't jiggle in corridors
+		bool solid = gs->tile_radius_test(nx, ny, TILE_SIZE);
 		if (!solid) {
 			vx *= movespeed, vy *= movespeed;
 			return true;
@@ -78,7 +79,8 @@ bool potentially_randomize_movement(GameState* gs, EnemyInst* e) {
 		}
 		if (randomized) {
 			int nx = round(e->rx + er.vx), ny = round(e->ry + er.vy);
-			bool solid = gs->tile_radius_test(nx, ny, e->radius);
+			//Use TILE_SIZE for checking solidity so that we don't jiggle in corridors
+			bool solid = gs->tile_radius_test(nx, ny, TILE_SIZE);
 			if (!solid) {
 				e->vx = er.vx, e->vy = er.vy;
 			} else {
