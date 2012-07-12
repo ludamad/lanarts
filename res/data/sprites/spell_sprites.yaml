@@ -23,5 +23,8 @@ sprites:
     
   - name: blink
     file: res/sprites/spells/blink.png
-    
+        
+  - name: large fire
+    file: res/sprites/effects/cloud_fire2.png
+
     

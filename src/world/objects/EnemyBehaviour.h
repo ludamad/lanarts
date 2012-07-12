@@ -30,9 +30,9 @@ struct EnemyRandomization {
 		if (damage_taken_timer < DAMAGE_TAKEN_TIMETHRESHOLD) {
 			damage_taken_timer++;
 		}
-		if (random_walk_timer > 0){
+		if (random_walk_timer > 0) {
 			random_walk_timer--;
-			if (random_walk_timer == 0){
+			if (random_walk_timer == 0) {
 				successful_hit_timer = 0;
 				damage_taken_timer = 0;
 			}
@@ -62,7 +62,7 @@ struct EnemyBehaviour {
 
 	float force_x, force_y;
 	Action current_action;
-	int action_timeout;
+	int chase_timeout;
 	int simulation_id;
 
 	EnemyRandomization randomization;
@@ -71,17 +71,12 @@ struct EnemyBehaviour {
 	int path_steps;
 	EnemyBehaviour() :
 			current_node(0), path_cooldown(0), force_x(0), force_y(0), current_action(
-					INACTIVE), action_timeout(0), simulation_id(0), path_start(
+					INACTIVE), chase_timeout(0), simulation_id(0), path_start(
 					0, 0), path_steps(0) {
 	}
 	void step() {
-		if (action_timeout) {
-			action_timeout--;
-			if (action_timeout == 0) {
-				current_action = INACTIVE;
-			}
-			randomization.step();
-		}
+		cooldown_step(chase_timeout);
+		randomization.step();
 	}
 };
 

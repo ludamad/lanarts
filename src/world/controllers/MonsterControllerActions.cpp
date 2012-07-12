@@ -91,6 +91,7 @@ bool potentially_randomize_movement(GameState* gs, EnemyInst* e) {
 	}
 	return randomized;
 }
+
 void MonsterController::set_monster_headings(GameState* gs,
 		std::vector<EnemyOfInterest>& eois) {
 	//Use a temporary 'GameView' object to make use of its helper methods
@@ -99,13 +100,14 @@ void MonsterController::set_monster_headings(GameState* gs,
 		EnemyInst* e = eois[i].e;
 		float movespeed = e->effective_stats().movespeed;
 		int pind = eois[i].closest_player_index;
-		CombatGameInst* p = (CombatGameInst*)gs->get_instance(
-				pc.player_ids()[pind]);
+		PlayerInst* p = (PlayerInst*) gs->get_instance(pc.player_ids()[pind]);
 		EnemyBehaviour& eb = e->behaviour();
 
 		eb.current_action = EnemyBehaviour::CHASING_PLAYER;
 		eb.path.clear();
-		eb.action_timeout = 300;
+		if (gs->object_visible_test(e, p, false)) {
+			eb.chase_timeout = 300;
+		}
 
 		if (!potentially_randomize_movement(gs, e)) {
 			paths[pind]->interpolated_direction(e->bbox(), movespeed, e->vx,

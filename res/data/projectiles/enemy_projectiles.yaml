@@ -61,3 +61,15 @@ projectiles:
     speed: 9
     spr_item: none
     spr_attack: big stone
+    
+  - name: Large Fire Ball
+    weapon_class: magic
+    damage_type: {magic: 1.0}
+    damage: { base: [2,6], magic: 1.0 }
+    power: { base: 4, magic: 0.2 }
+    range: 300
+    radius: 11
+    cooldown: 40
+    speed: 7
+    spr_item: none
+    spr_attack: large fire

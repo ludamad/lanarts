@@ -31,7 +31,7 @@ enemies:
     xpaward: 150
     unique: yes
     stats:
-        attacks: [ {weapon: Basic Melee}, { projectile: Fire Bolt} ]
+        attacks: [ {weapon: Basic Melee}, { projectile: Large Fire Ball} ]
         hp: 150
         hpregen: 0.1
         movespeed: 2.5
