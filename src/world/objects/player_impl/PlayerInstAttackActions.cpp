@@ -343,7 +343,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 	reset_rest_cooldown();
 }
 
-/*static void __use_projectile_spell(GameState* gs, PlayerInst* p,
+static void __use_projectile_spell(GameState* gs, PlayerInst* p,
 		SpellEntry& spl_entry, const Projectile& projectile,
 		const Pos& target) {
 	MTwist& mt = gs->rng();
@@ -373,7 +373,7 @@ static void __use_spell(GameState* gs, PlayerInst* p, SpellEntry& spl_entry,
 	} else {
 		__use_luacallback_spell(gs, p, spl_entry, spl_entry.action, target);
 	}
-}*/
+}
 
 void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	MTwist& mt = gs->rng();
@@ -382,14 +382,18 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 		return;
 
 	Projectile projectile;
+	spell_id spell = NONE;
 
 	if (action.use_id == 0) {
+		spell = get_spell_by_name("Fire Bolt");
 		projectile = Projectile(get_projectile_by_name("Fire Bolt"));
 		core_stats().mp -= 10;
 	} else if (action.use_id == 1) {
+		spell = get_spell_by_name("Magic Blast");
 		projectile = Projectile(get_projectile_by_name("Magic Blast"));
 		core_stats().mp -= 20;
 	} else if (action.use_id == 2) {
+		spell = get_spell_by_name("Blink");
 		core_stats().mp -= 50;
 	}
 
@@ -411,7 +415,7 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 		AttackStats spellattack(Weapon(), projectile);
 		GameInst* bullet = new ProjectileInst(projectile,
 				effective_atk_stats(mt, spellattack), id, self, target,
-				pentry.speed, pentry.range, NONE, bounce, hits);
+				pentry.speed, pentry.range, NONE, true, hits);
 		gs->add_instance(bullet);
 
 		cooldowns().reset_action_cooldown(pentry.cooldown * 1.4);
@@ -419,7 +423,7 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 		update_position(action.action_x, action.action_y);
 	}
 
-	Pos target = Pos(action.action_x, action.action_y);
+//	Pos target = Pos(action.action_x, action.action_y);
 //	__use_spell(gs, this, game_spell_data.at(spell), target);
 
 	if (action.use_id == 0) {

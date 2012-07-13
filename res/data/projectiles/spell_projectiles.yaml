@@ -10,6 +10,7 @@ projectiles:
     speed: 7
     spr_item: none
     spr_attack: fire bolt
+    can_wall_bounce: yes
     
   - name: Magic Blast
     weapon_class: magic
