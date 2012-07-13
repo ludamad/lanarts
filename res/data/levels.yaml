@@ -176,11 +176,11 @@ areas:
   - branch: main_branch
     levels:
      #Test Level
-#      - layout: [*test_layout]
-#        content:
-#          features: { tileset: [lair_tiles1, lair_tiles2],     stairs_up: 0  }
-#          items:    { amount: 3,  generated: *default_items   }
-#          enemies: { wandering: no, amount: 69, generated: *easy_animals }
+      - layout: [*test_layout]
+        content:
+          features: { tileset: [lair_tiles1, lair_tiles2],     stairs_up: 0  }
+          items:    { amount: 3,  generated: *default_items   }
+          enemies: { wandering: no, amount: 69, generated: *easy_animals }
 
 #tiny levels with animals
       #Level 0

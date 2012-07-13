@@ -27,7 +27,7 @@ time_per_step: 14
 
 #Debug settings
 invincible: no #Feel like exploring ? -> yes
-draw_diagnostics: no
+draw_diagnostics: yes
 
 #Control options
 use_stop_actions: yes
