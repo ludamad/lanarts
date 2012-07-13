@@ -15,7 +15,7 @@ view_height: 720
 font: res/fonts/Gudea-Regular.ttf
 
 #Network settings
-network_debug_mode: no
+network_debug_mode: yes
 #Either 'host', 'client', or 'none'
 #Shouldn't be required anymore: connection_type: client
 ip: localhost
@@ -27,7 +27,7 @@ time_per_step: 14
 
 #Debug settings
 invincible: no #Feel like exploring ? -> yes
-draw_diagnostics: yes
+draw_diagnostics: no
 
 #Control options
 use_stop_actions: yes
