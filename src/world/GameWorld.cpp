@@ -14,6 +14,7 @@
 #include "objects/GameInstRef.h"
 #include "objects/PlayerInst.h"
 #include "objects/EnemyInst.h"
+#include "utility_objects/AnimatedInst.h"
 
 #include "GameState.h"
 #include "GameLevelState.h"

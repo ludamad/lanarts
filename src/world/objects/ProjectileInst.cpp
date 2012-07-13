@@ -136,8 +136,9 @@ void ProjectileInst::step(GameState* gs) {
 							new AnimatedInst(victim->x, victim->y, -1, 25, 0, 0,
 									AnimatedInst::DEPTH, buffstr,
 									Colour(255, 215, 11)));
-				} else
+				} else {
 					gs->skip_next_instance_id();
+				}
 			}
 		}
 	} else {
