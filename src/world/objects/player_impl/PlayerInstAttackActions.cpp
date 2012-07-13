@@ -342,66 +342,39 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 	cooldowns().action_cooldown *= estats.cooldown_mult;
 	reset_rest_cooldown();
 }
-//
-//static void __use_projectile_spell(GameState* gs, PlayerInst* p,
-//		SpellEntry& spl_entry, const Projectile& projectile,
-//		const Pos& target) {
-//	MTwist& mt = gs->rng();
-//	AttackStats projectile_attack(Weapon(), projectile);
-//	ProjectileEntry& pentry = projectile.projectile_entry();
-//	bool wallbounce = pentry.can_wall_bounce;
-//	int nbounces = pentry.number_of_target_bounces;
-//
-//	GameInst* pinst = new ProjectileInst(projectile,
-//			p->effective_atk_stats(mt, projectile_attack), p->id,
-//			Pos(p->x, p->y), target, pentry.speed, pentry.range, NONE,
-//			wallbounce, nbounces);
-//	gs->add_instance(pinst);
-//}
-//
-//static void __use_luacallback_spell(GameState* gs, PlayerInst* p,
-//		SpellEntry& spl_entry, LuaValue& action, const Pos& target) {
-//
-//}
-//
-//static void __use_spell(GameState* gs, PlayerInst* p, SpellEntry& spl_entry,
-//		const Pos& target) {
-//	p->core_stats().mp -= spl_entry.mp_cost;
-//	p->cooldowns().reset_action_cooldown(spl_entry.cooldown);
-//	if (spl_entry.uses_projectile()) {
-//		__use_projectile_spell(gs, p, spl_entry, spl_entry.projectile, target);
-//	} else {
-//		__use_luacallback_spell(gs, p, spl_entry, spl_entry.action, target);
-//	}
-//}
-//
-//void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
-//	MTwist& mt = gs->rng();
-//	EffectiveStats& estats = effective_stats();
-//	if (action.use_id < 2 && !cooldowns().can_doaction())
-//		return;
-//
-//	spell_id spell;
-//
-//	if (action.use_id == 0) {
-//		spell = get_spell_by_name("Fire Bolt");
-//	} else if (action.use_id == 1) {
-//		spell = get_spell_by_name("Magic Blast");
-//	} else if (action.use_id == 2) {
-//		spell = get_spell_by_name("Blink");
-//	}
-//
-//	Pos target = Pos(action.action_x, action.action_y);
-//	__use_spell(gs, this, game_spell_data.at(spell), target);
-//
-//	if (action.use_id == 0) {
-//		double mult = 1 + (class_stats().xplevel - 1) / 10.0;
-//		mult = std::min(2.0, mult);
-//		cooldowns().action_cooldown /= mult;
-//	}
-//	cooldowns().action_cooldown *= estats.cooldown_mult;
-//	cooldowns().reset_rest_cooldown(REST_COOLDOWN);
-//}
+
+/*static void __use_projectile_spell(GameState* gs, PlayerInst* p,
+		SpellEntry& spl_entry, const Projectile& projectile,
+		const Pos& target) {
+	MTwist& mt = gs->rng();
+	AttackStats projectile_attack(Weapon(), projectile);
+	ProjectileEntry& pentry = projectile.projectile_entry();
+	bool wallbounce = pentry.can_wall_bounce;
+	int nbounces = pentry.number_of_target_bounces;
+
+	GameInst* pinst = new ProjectileInst(projectile,
+			p->effective_atk_stats(mt, projectile_attack), p->id,
+			Pos(p->x, p->y), target, pentry.speed, pentry.range, NONE,
+			wallbounce, nbounces);
+	gs->add_instance(pinst);
+}
+
+static void __use_luacallback_spell(GameState* gs, PlayerInst* p,
+		SpellEntry& spl_entry, LuaValue& action, const Pos& target) {
+
+}
+
+static void __use_spell(GameState* gs, PlayerInst* p, SpellEntry& spl_entry,
+		const Pos& target) {
+	p->core_stats().mp -= spl_entry.mp_cost;
+	p->cooldowns().reset_action_cooldown(spl_entry.cooldown);
+	if (spl_entry.uses_projectile()) {
+		__use_projectile_spell(gs, p, spl_entry, spl_entry.projectile, target);
+	} else {
+		__use_luacallback_spell(gs, p, spl_entry, spl_entry.action, target);
+	}
+}*/
+
 void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	MTwist& mt = gs->rng();
 	EffectiveStats& estats = effective_stats();
@@ -446,12 +419,13 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 		update_position(action.action_x, action.action_y);
 	}
 
+	Pos target = Pos(action.action_x, action.action_y);
+//	__use_spell(gs, this, game_spell_data.at(spell), target);
+
 	if (action.use_id == 0) {
 		double mult = 1 + (class_stats().xplevel - 1) / 10.0;
 		mult = std::min(2.0, mult);
 		cooldowns().action_cooldown /= mult;
-	} else if (action.use_id == 2) {
-		cooldowns().reset_action_cooldown(130);
 	}
 	cooldowns().action_cooldown *= estats.cooldown_mult;
 	cooldowns().reset_rest_cooldown(REST_COOLDOWN);
