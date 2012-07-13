@@ -67,9 +67,9 @@ projectiles:
     damage_type: {magic: 1.0}
     damage: { base: [2,6], magic: 1.0 }
     power: { base: 4, magic: 0.2 }
-    range: 300
+    range: 250
     radius: 11
     cooldown: 40
-    speed: 7
+    speed: 8
     spr_item: none
     spr_attack: large fire

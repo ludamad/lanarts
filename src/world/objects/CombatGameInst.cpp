@@ -5,6 +5,7 @@
 
 #include "../../data/sprite_data.h"
 #include "../../data/effect_data.h"
+#include "../../data/projectile_data.h"
 #include "../../data/weapon_data.h"
 
 #include "../../gamestats/stat_formulas.h"

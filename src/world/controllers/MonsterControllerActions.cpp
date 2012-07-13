@@ -24,8 +24,8 @@
 #include "../../data/tile_data.h"
 #include "../../data/weapon_data.h"
 
-const int PATHING_RADIUS = 500;
 const int HUGE_DISTANCE = 1000000;
+const int OFFSCREEN_CHASE_TIME = 300;
 
 static bool choose_random_direction(GameState* gs, EnemyInst* e, float& vx,
 		float& vy) {
@@ -102,13 +102,15 @@ void MonsterController::set_monster_headings(GameState* gs,
 		EnemyInst* e = eois[i].e;
 		float movespeed = e->effective_stats().movespeed;
 		int pind = eois[i].closest_player_index;
-		PlayerInst* p = (PlayerInst*) gs->get_instance(pc.player_ids()[pind]);
+		obj_id pid = pc.player_ids()[pind];
+		PlayerInst* p = (PlayerInst*)gs->get_instance(pid);
 		EnemyBehaviour& eb = e->behaviour();
 
 		eb.current_action = EnemyBehaviour::CHASING_PLAYER;
 		eb.path.clear();
 		if (gs->object_visible_test(e, p, false)) {
-			eb.chase_timeout = 300;
+			eb.chase_timeout = OFFSCREEN_CHASE_TIME;
+			eb.chasing_player = pid;
 		}
 
 		if (!potentially_randomize_movement(gs, e)) {

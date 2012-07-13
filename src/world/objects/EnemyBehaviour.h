@@ -63,6 +63,7 @@ struct EnemyBehaviour {
 	float force_x, force_y;
 	Action current_action;
 	int chase_timeout;
+	obj_id chasing_player;
 	int simulation_id;
 
 	EnemyRandomization randomization;
@@ -71,8 +72,8 @@ struct EnemyBehaviour {
 	int path_steps;
 	EnemyBehaviour() :
 			current_node(0), path_cooldown(0), force_x(0), force_y(0), current_action(
-					INACTIVE), chase_timeout(0), simulation_id(0), path_start(
-					0, 0), path_steps(0) {
+					INACTIVE), chase_timeout(0), chasing_player(0), simulation_id(
+					0), path_start(0, 0), path_steps(0) {
 	}
 	void step() {
 		cooldown_step(chase_timeout);

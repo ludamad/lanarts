@@ -17,6 +17,7 @@
 #include "effect_data.h"
 #include "enemy_data.h"
 #include "item_data.h"
+#include "projectile_data.h"
 #include "scriptobject_data.h"
 #include "spell_data.h"
 #include "sprite_data.h"

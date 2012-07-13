@@ -70,6 +70,10 @@ public:
 		}
 		return 0;
 	}
+	int move_to(lua_State* L) {
+		inst->update_position(lua_tonumber(L, 1), lua_tonumber(L, 2));
+		return 0;
+	}
 	int heal_hp(lua_State* L) {
 		get_stats()->core.heal_hp(lua_tonumber(L, 1));
 		return 0;
@@ -162,14 +166,9 @@ static int lua_member_update(lua_State* L) {
 	return 1;
 }
 
-meth_t bind_t::methods[] = {
-		LUA_DEF(heal_fully),
-		LUA_DEF(heal_hp),
-		LUA_DEF(heal_mp),
-		LUA_DEF(hurt),
-		LUA_DEF(equip),
-		LUA_DEF(hasten),
-		meth_t(0, 0) };
+meth_t bind_t::methods[] = { LUA_DEF(heal_fully), LUA_DEF(move_to),
+		LUA_DEF(heal_hp), LUA_DEF(heal_mp), LUA_DEF(hurt), LUA_DEF(equip),
+		LUA_DEF(hasten), LUA_DEF(hasten), meth_t(0, 0) };
 
 void lua_gameinst_bindings(GameState* gs, lua_State* L) {
 	lunar_t::Register(L);

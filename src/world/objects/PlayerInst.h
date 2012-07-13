@@ -112,4 +112,7 @@ private:
 	int spellselect;
 };
 
+
+bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position);
+
 #endif /* PLAYERINST_H_ */

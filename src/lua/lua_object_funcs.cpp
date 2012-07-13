@@ -17,10 +17,11 @@ extern "C" {
 #include "../world/GameState.h"
 
 #include "../world/objects/GameInst.h"
+#include "../world/objects/ScriptedInst.h"
 
 // Creates object, adding to game world, returns said object
+// Take arguments: objtype, x, y; returns obj
 static int obj_create(lua_State* L) {
-	// Take arguments: obj_create(objtype, x, y)
 	scriptobj_id scr_obj = scriptobject_from_lua(L, 1);
 	int x = lua_tonumber(L, 2), y = lua_tonumber(L, 3);
 

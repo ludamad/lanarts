@@ -23,19 +23,19 @@ weapons:
     weapon_class: short blades
     description: An easy-to-wield short sword.
     max_targets: 2
-    damage: {base: [4,8], strength: 1.2}
+    damage: {base: [4,8], strength: 1.0}
     power: {base: 1, strength: 0.2}
     range: 7
-    cooldown: 30
+    cooldown: 35
     spr_item: short sword
 
   - name: Mace
     weapon_class: maces and flails
     description: An large, strong mace.
     max_targets: 2
-    damage: {base: [5,10], strength: 1.5}
-    power: {base: [2,5], strength: 0.3}
-    range: 8
+    damage: {base: [5,10], strength: 1.25}
+    power: {base: [2,5], strength: 0.25}
+    range: 7
     cooldown: 55
     spr_item: mace
 
@@ -44,7 +44,7 @@ weapons:
     weapon_class: bows
     uses_projectile: yes
     #Stats
-    damage: {base: [4,6], strength: 1.0}
+    damage: {base: [4,6], strength: 0.9}
     power: {base: 0, strength: 0.2}
     range: 400
     cooldown: 45

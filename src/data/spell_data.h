@@ -20,12 +20,16 @@ struct SpellEntry {
 	int mp_cost;
 	LuaValue action; //Immediate action
 	Projectile projectile; //Projectile used, if any
+	bool can_cast_without_cooldown;
 	SpellEntry() :
-			sprite(-1), mp_cost(0) {
+			sprite(-1), mp_cost(0), can_cast_without_cooldown(false) {
 	}
 
 	void init(lua_State* L) {
 		action.initialize(L);
+	}
+	bool uses_projectile() {
+		return projectile.valid_projectile();
 	}
 };
 

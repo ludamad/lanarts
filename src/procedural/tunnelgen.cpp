@@ -8,10 +8,6 @@
 #include <cassert>
 #include <vector>
 
-static const int MAXPADDING = 3;
-static const int MAXWIDTH = 10;
-static const int MAXSIZE = MAXWIDTH + MAXPADDING * 2;
-
 #define LANARTS_ASSERT(x) assert(x)
 
 struct TunnelSliceContext;
@@ -31,8 +27,8 @@ public:
 			s(s), mt(mt), start_room(start_room), end_room(0), padding(padding), accept_tunnel_entry(
 					ate), avoid_groupid(0), width(width), maxdepth(depth), change_odds(
 					change_odds) {
-		LANARTS_ASSERT(padding <= MAXPADDING);
-		LANARTS_ASSERT(width <= MAXWIDTH);
+//		LANARTS_ASSERT(padding <= MAXPADDING);
+//		LANARTS_ASSERT(width <= MAXWIDTH);
 	}
 
 public:
@@ -316,7 +312,7 @@ void __resizebuff(T& t, size_t size) {
 bool TunnelGenImpl::generate(Pos p, int dx, int dy, std::vector<Sqr>& btbuff,
 		std::vector<TunnelSliceContext>& tsbuff) {
 
-	int entry_size = MAXWIDTH + MAXPADDING * 2;
+	int entry_size = width + padding*2;
 
 	__resizebuff(btbuff, entry_size * maxdepth);
 	__resizebuff(tsbuff, maxdepth);

@@ -28,6 +28,6 @@ projectiles:
     #Stats
     range: 400
     speed: 8
-    cooldown: 45
-    damage: {base: [5,8], strength: 1.0}
+    cooldown: 50
+    damage: {base: [1,4], strength: 0.9}
     power: {base: 2, strength: 0.2}

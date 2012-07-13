@@ -30,6 +30,7 @@ set( lanarts_src
 	data/init/load_effect_data.cpp
 	data/init/load_enemy_data.cpp
 	data/init/load_item_data.cpp
+	data/init/load_projectile_data.cpp
 	data/init/load_tileset_data.cpp
 	data/init/load_settings_data.cpp
 	data/init/load_weapon_data.cpp
@@ -61,6 +62,8 @@ set( lanarts_src
 			
 	lua/lua_api.cpp
 	lua/lua_collision_checks.cpp
+	lua/lua_object_funcs.cpp
+	lua/lua_spelltarget_funcs.cpp
 	lua/lua_gameinst.cpp
 	lua/lua_gamestate.cpp
 	

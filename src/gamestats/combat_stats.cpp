@@ -5,6 +5,7 @@
  */
 
 #include "../data/class_data.h"
+#include "../data/projectile_data.h"
 #include "../data/weapon_data.h"
 
 #include "combat_stats.h"

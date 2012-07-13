@@ -6,7 +6,6 @@ projectiles:
     damage: { base: [2,6], magic: 1.0 }
     power: { base: 1, magic: 0.2 }
     range: 300
-    cooldown: 40
     speed: 7
     spr_item: none
     spr_attack: fire bolt
@@ -17,8 +16,8 @@ projectiles:
     damage: { base: [4,12], magic: 1.75 }
     power: { base: 1, magic: 0.2 }
     range: 300
-    cooldown: 65
     speed: 4
+    number_of_target_bounces: 3
     spr_item: none
     spr_attack: magic blast
  

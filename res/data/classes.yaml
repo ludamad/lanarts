@@ -35,7 +35,7 @@ classes:
         spell: Fire Bolt
     start_stats:
         movespeed: 4
-        hp: 120
+        hp: 100
         mp: 40
         hpregen: 0.055
         mpregen: 0.044
@@ -45,12 +45,12 @@ classes:
         magic: 2
         equipment:
           inventory:
-            - item: Short Sword
+            - item: Dagger
             - item: Short Bow
             - item: Arrow
-              amount: 20
+              amount: 10
     gain_per_level:
-        hp: 30
+        hp: 25
         mp: 10
         hpregen: 0.010
         mpregen: 0.007

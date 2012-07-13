@@ -11,6 +11,7 @@ extern "C" {
 #include "../../../data/item_data.h"
 #include "../../../data/sprite_data.h"
 #include "../../../data/tile_data.h"
+#include "../../../data/projectile_data.h"
 #include "../../../data/weapon_data.h"
 
 #include "../../../display/display.h"

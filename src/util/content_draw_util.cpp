@@ -5,6 +5,7 @@
 
 #include "../data/armour_data.h"
 #include "../data/item_data.h"
+#include "../data/projectile_data.h"
 #include "../data/spell_data.h"
 #include "../data/sprite_data.h"
 #include "../data/weapon_data.h"

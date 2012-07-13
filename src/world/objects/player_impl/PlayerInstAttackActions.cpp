@@ -8,8 +8,10 @@ extern "C" {
 }
 
 #include "../../../data/item_data.h"
+#include "../../../data/spell_data.h"
 #include "../../../data/sprite_data.h"
 #include "../../../data/tile_data.h"
+#include "../../../data/projectile_data.h"
 #include "../../../data/weapon_data.h"
 
 #include "../../../display/display.h"
@@ -107,7 +109,7 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 	}
 	return NULL;
 }
-static bool find_blink_target(PlayerInst* p, GameState* gs, Pos& position) {
+bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
 	PlayerController& pc = gs->player_controller();
 
 	std::vector<GameInst*> visible_monsters;
@@ -183,7 +185,7 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 			gs->game_chat().add_message(
 					"You do not have enough mana to blink, 50 MP required!",
 					COL_RED);
-		} else if (!find_blink_target(this, gs, blinkposition)) {
+		} else if (!find_safest_square(this, gs, blinkposition)) {
 			canuse = false;
 			gs->game_chat().add_message(
 					"Cannot auto-blink, no hostile targets. Right click to blink manually.");
@@ -340,48 +342,40 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 	reset_rest_cooldown();
 }
 
+static void use_projectile_spell(PlayerInst* p, GameState* gs,
+		SpellEntry& spl_entry, ProjectileEntry& pentry, const Pos& target) {
+
+}
+static void use_luacallback_spell(PlayerInst* p, GameState* gs,
+		SpellEntry& spl_entry, LuaValue& action, const Pos& target) {
+
+}
+
+static void use_spell(PlayerInst* p, GameState* gs, SpellEntry& spl_entry,
+		const Pos& target) {
+	p->core_stats().mp -= spl_entry.mp_cost;
+	if (spl_entry.uses_projectile()) {
+		use_projectile_spell(p, gs, spl_entry,
+				spl_entry.projectile.projectile_entry(), target);
+	} else {
+		use_luacallback_spell(p, gs, spl_entry, spl_entry.action, target);
+	}
+}
+
 void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	MTwist& mt = gs->rng();
 	EffectiveStats& estats = effective_stats();
 	if (action.use_id < 2 && !cooldowns().can_doaction())
 		return;
 
-	Projectile projectile;
+	spell_id spell;
 
 	if (action.use_id == 0) {
-		projectile = Projectile(get_projectile_by_name("Fire Bolt"));
-		core_stats().mp -= 10;
+		spell = get_spell_by_name("Fire Bolt");
 	} else if (action.use_id == 1) {
-		projectile = Projectile(get_projectile_by_name("Magic Blast"));
-		core_stats().mp -= 20;
+		spell = get_spell_by_name("Magic Blast");
 	} else if (action.use_id == 2) {
-		core_stats().mp -= 50;
-	}
-
-	bool bounce = true;
-	int hits = 0;
-
-	if (action.use_id == 1) {
-//		atk.attack_sprite = get_sprite_by_name("magic blast");
-//		atk.projectile_speed /= 1.75;
-		//	atk.damage *= 2;
-		bounce = false;
-		hits = 3;
-	}
-//	atk.damage = estats.calculate_spell_damage(gs->rng(), action.use_id);
-
-	if (action.use_id < 2) {
-		Pos self(x, y), target(action.action_x, action.action_y);
-		ProjectileEntry& pentry = projectile.projectile_entry();
-		AttackStats spellattack(Weapon(), projectile);
-		GameInst* bullet = new ProjectileInst(projectile,
-				effective_atk_stats(mt, spellattack), id, self, target,
-				pentry.speed, pentry.range, NONE, bounce, hits);
-		gs->add_instance(bullet);
-
-		cooldowns().reset_action_cooldown(pentry.cooldown * 1.4);
-	} else {
-		update_position(action.action_x, action.action_y);
+		spell = get_spell_by_name("Blink");
 	}
 
 	if (action.use_id == 0) {

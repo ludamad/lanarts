@@ -83,8 +83,9 @@ void load_weapon_item_entries() {
 		WeaponEntry& wtype = game_weapon_data[i];
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
 		game_item_data.push_back(
-				ItemEntry(wtype.name, wtype.description, "", default_radius, wtype.item_sprite,
-						"equip", "", false, ItemEntry::WEAPON, i));
+				ItemEntry(wtype.name, wtype.description, "", default_radius,
+						wtype.item_sprite, "equip", "", false,
+						ItemEntry::WEAPON, i));
 	}
 }
 
@@ -108,6 +109,8 @@ void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
 	entry.weapon_class = parse_str(node["weapon_class"]);
 
 	entry.speed = parse_defaulted(node, "speed", 4.0f);
+	entry.number_of_target_bounces = parse_defaulted(node,
+			"number_of_target_bounces", 0);
 	entry.cooldown = parse_defaulted(node, "cooldown", 0);
 	entry.radius = parse_defaulted(node, "radius", 5);
 	entry.range = parse_defaulted(node, "range", 0);
@@ -140,7 +143,8 @@ void load_projectile_item_entries() {
 		ProjectileEntry& ptype = game_projectile_data[i];
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
 		game_item_data.push_back(
-				ItemEntry(ptype.name, ptype.description, "", default_radius, ptype.item_sprite,
-						"equip", "", true, ItemEntry::PROJECTILE, i));
+				ItemEntry(ptype.name, ptype.description, "", default_radius,
+						ptype.item_sprite, "equip", "", true,
+						ItemEntry::PROJECTILE, i));
 	}
 }

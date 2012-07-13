@@ -7,6 +7,7 @@
 
 #include "../gamestats/combat_stats.h"
 
+#include "../data/projectile_data.h"
 #include "../data/weapon_data.h"
 
 #include "../util/math_util.h"

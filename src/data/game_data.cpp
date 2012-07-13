@@ -51,7 +51,7 @@ std::vector<SpriteEntry> game_sprite_data;
 std::vector<LevelGenSettings> game_dungeon_yaml;
 std::vector<WeaponEntry> game_weapon_data;
 
-extern DungeonBranch game_dungeon_data[1] = { };
+DungeonBranch game_dungeon_data[1] = { };
 
 template<typename T>
 static int get_X_by_name(const T& t, const char* name, bool error_if_not_found =
@@ -242,6 +242,7 @@ void init_lua_data(GameState* gs, lua_State* L) {
 	__lua_init(L, game_enemy_data);
 	__lua_init(L, game_effect_data);
 	__lua_init(L, game_item_data);
+	__lua_init(L, game_spell_data);
 
 //	lua_getglobal(L, "level_tests");
 //	lua_call(L, 0, 0);

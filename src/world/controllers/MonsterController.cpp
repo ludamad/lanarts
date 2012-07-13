@@ -24,7 +24,7 @@
 #include "../../data/tile_data.h"
 #include "../../data/weapon_data.h"
 
-const int PATHING_RADIUS = 650;
+const int PATHING_RADIUS = 500;
 const int HUGE_DISTANCE = 1000000;
 
 MonsterController::MonsterController(bool wander) :
@@ -118,7 +118,8 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 		if (isvisible)
 			((PlayerInst*)player)->rest_cooldown() = REST_COOLDOWN;
 		view.sharp_center_on(player->x, player->y);
-		bool chasing = e->behaviour().chase_timeout > 0;
+		bool chasing = e->behaviour().chase_timeout > 0
+				&& pids[i] == e->behaviour().chasing_player;
 		if (view.within_view(ebox) && (chasing || isvisible)) {
 			e->behaviour().current_action = EnemyBehaviour::CHASING_PLAYER;
 

@@ -6,6 +6,7 @@
 #include "Equipment.h"
 
 #include "../data/item_data.h"
+#include "../data/projectile_data.h"
 #include "../data/weapon_data.h"
 
 bool Equipment::valid_to_use_projectile(const Projectile& proj) {
