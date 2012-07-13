@@ -76,8 +76,8 @@ ProjectileInst* ProjectileInst::clone() const {
 
 void ProjectileInst::step(GameState* gs) {
 	Pos tile_hit;
-	int newx = (int) round(rx += vx); //update based on rounding of true float
-	int newy = (int) round(ry += vy);
+	int newx = (int) round(rx + vx); //update based on rounding of true float
+	int newy = (int) round(ry + vy);
 	bool collides = gs->tile_radius_test(newx, newy, radius, true, -1,
 			&tile_hit);
 	if (bounce) {
@@ -98,8 +98,9 @@ void ProjectileInst::step(GameState* gs) {
 	} else if (collides) {
 		gs->remove_instance(this);
 	}
-	x = newx; //update based on rounding of true float
-	y = newy;
+
+	x = (int) round(rx += vx); //update based on rounding of true float
+	y = (int) round(ry += vy);
 
 	range_left -= speed;
 
