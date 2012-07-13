@@ -20,7 +20,7 @@ set( lanarts_src
 
 	lua/lua_combatstats.cpp
 	lua/lua_effectivestats.cpp
-	
+
 	config/GameControlSettings.cpp
 
 	data/init/load_armour_data.cpp
@@ -30,25 +30,24 @@ set( lanarts_src
 	data/init/load_effect_data.cpp
 	data/init/load_enemy_data.cpp
 	data/init/load_item_data.cpp
-	data/init/load_projectile_data.cpp
 	data/init/load_tileset_data.cpp
 	data/init/load_settings_data.cpp
 	data/init/load_weapon_data.cpp
-	data/init/load_class_data.cpp 
+	data/init/load_class_data.cpp
 	data/init/load_sprite_data.cpp
 	data/init/yaml_util.cpp
-	
-	data/game_data.cpp	
-	
+
+	data/game_data.cpp
+
 	display/display_util.cpp
 	display/display_text.cpp
 	display/display.cpp
 	display/font.cpp
 	display/GLImage.cpp
-	
+
 	fov/fov.cpp
 	fov/impl/permissive-fov.cc
-	
+
 	gamestats/Ability.cpp
 	gamestats/combat_stats.cpp
 	gamestats/effects.cpp
@@ -57,30 +56,30 @@ set( lanarts_src
 	gamestats/items.cpp
 	gamestats/skills.cpp
 	gamestats/stat_formulas.cpp
-	gamestats/stats.cpp	
-	gamestats/SpellsKnown.cpp	
-			
+	gamestats/stats.cpp
+	gamestats/SpellsKnown.cpp
+
 	lua/lua_api.cpp
 	lua/lua_collision_checks.cpp
 	lua/lua_object_funcs.cpp
 	lua/lua_spelltarget_funcs.cpp
 	lua/lua_gameinst.cpp
 	lua/lua_gamestate.cpp
-	
+
 	pathfind/astar_pathfind.cpp
 	pathfind/pathfind.cpp
-	
+
 	world/net/GameNetConnection.cpp
 	main.cpp
 	main_menu.cpp
-	
+
 	procedural/enemygen.cpp
 	procedural/featuregen.cpp
 	procedural/GeneratedLevel.cpp
 	procedural/itemgen.cpp
 	procedural/levelgen.cpp
 	procedural/tunnelgen.cpp
-	
+
 	util/content_draw_util.cpp
 	util/math_util.cpp
 	util/mtwist.cpp
@@ -94,7 +93,7 @@ set( lanarts_src
 	world/GameTiles.cpp
 	world/GameView.cpp
 	world/GameWorld.cpp
-	
+
 	world/ui/GameChat.cpp
 	world/ui/GameTextConsole.cpp
 	world/ui/GameDialogs.cpp
@@ -107,17 +106,17 @@ set( lanarts_src
 	world/ui/detail/EquipmentContent.cpp
 	world/ui/detail/InventoryContent.cpp
 	world/ui/detail/Minimap.cpp
-	
+
 	world/controllers/CombatInstController.cpp
 	world/controllers/IOController.cpp
 	world/controllers/MonsterController.cpp
 	world/controllers/MonsterControllerActions.cpp
 	world/controllers/PlayerController.cpp
-	
+
 	world/utility_objects/AnimatedInst.cpp
 	world/utility_objects/ButtonInst.cpp
 	world/utility_objects/TestInst.cpp
-	
+
 	world/objects/player_impl/PlayerInst.cpp
 	world/objects/player_impl/PlayerInstActions.cpp
 	world/objects/player_impl/PlayerInstAttackActions.cpp
@@ -133,16 +132,16 @@ set( lanarts_src
 set( lanarts_include
 
 	collision_avoidance/CollisionAvoidance.h
-	
+
 	combat_logic/ai_logic.h
 	combat_logic/attack_logic.h
 	combat_logic/combat_logic.h
 	combat_logic/movement_logic.h
 
 	config/GameControlSettings.h
-	
+
 	data/init/yaml_util.h
-	
+
 	data/armour_data.h
 	data/class_data.h
 	data/effect_data.h
@@ -156,18 +155,18 @@ set( lanarts_include
 	data/tile_data.h
 	data/tileset_data.h
 	data/weapon_data.h
-	
+
 	display/display.h
 	display/GLImage.h
-	
+
 	fov/fov.h
 	fov/impl/permissive-fov.h
 	fov/impl/permissive-fov-cpp.h
 
 	lua/lua_api.h
 	lua/lua_impl_util.h
-	
-	gamestats/Ability.h	
+
+	gamestats/Ability.h
 	gamestats/combat_stats.h
 	gamestats/Inventory.h
 	gamestats/items.h
@@ -178,17 +177,17 @@ set( lanarts_include
 	gamestats/stat_formulas.h
 	gamestats/stats.h
 	gamestats/SpellsKnown.h
-	
+
 	pathfind/astar_pathfind.h
 	pathfind/pathfind.h
-	
+
 	procedural/enemygen.h
 	procedural/featuregen.h
 	procedural/GeneratedLevel.h
 	procedural/itemgen.h
 	procedural/levelgen.h
 	procedural/tunnelgen.h
-	
+
 	util/callback_util.h
 	util/content_draw_util.h
 	util/game_basic_structs.h
@@ -197,7 +196,7 @@ set( lanarts_include
 	util/math_util.h
 	util/mtwist.h
 	util/world/collision_util.h
-	
+
 	world/net/GameNetConnection.h
 
 	world/GameAction.h
@@ -208,7 +207,7 @@ set( lanarts_include
 	world/GameTiles.h
 	world/GameView.h
 	world/GameWorld.h
-	
+
 	world/controllers/IOController.h
 	world/controllers/MonsterController.h
 	world/controllers/PlayerController.h
@@ -227,12 +226,12 @@ set( lanarts_include
 	world/ui/detail/SidebarNavigator.h
 	world/ui/detail/SpellsContent.h
 	world/ui/detail/Minimap.h
-	
+
 	world/utility_objects/AnimatedInst.h
 	world/utility_objects/ButtonInst.h
 	world/utility_objects/TestInst.h
-			
-	world/objects/CombatGameInst.h	
+
+	world/objects/CombatGameInst.h
 	world/objects/GameInst.h
 	world/objects/GameInstRef.h
 	world/objects/PlayerInst.h

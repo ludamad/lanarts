@@ -1,10 +1,9 @@
-if ! ./make.sh ; then
+if ./make.sh; then
 	echo "Build failed, aborting lanarts run."
-	return -1
+	exit $?
 fi
 
 # Run lanarts
 
 cd ../lanarts
-export vblank_mode=0
-../lanarts_build/src/lanarts
+vblank_mode=0 ../lanarts_build/src/lanarts
