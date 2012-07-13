@@ -331,6 +331,8 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 							new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0,
 									AnimatedInst::DEPTH, buffstr,
 									Colour(255, 215, 11)));
+				} else {
+					gs->skip_next_instance_id();
 				}
 			}
 		}
@@ -422,8 +424,8 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	int hits = 0;
 
 	if (action.use_id == 1) {
-	//		atk.attack_sprite = get_sprite_by_name("magic blast");
-	//		atk.projectile_speed /= 1.75;
+		//		atk.attack_sprite = get_sprite_by_name("magic blast");
+		//		atk.projectile_speed /= 1.75;
 		//	atk.damage *= 2;
 		bounce = false;
 		hits = 3;

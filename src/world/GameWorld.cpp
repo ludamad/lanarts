@@ -140,19 +140,21 @@ static bool check_level_is_in_sync(GameState* gs, GameLevelState* level) {
 			if (!gs->net_connection().check_integrity(gs,
 					instances[i]->integrity_hash())) {
 				GameInst* inst = instances[i];
-				const char* type = typeid(*inst).name();
-				printf("Hashes don't match for instance id=%d, type=%s!\n",
-						inst->id, type);
-				std::vector<Pos> theirs;
-				gs->net_connection().send_and_sync(Pos(inst->x, inst->y),
-						theirs);
-				Pos* theirinst = &theirs[0];
-				EnemyInst* e;
-				if ((e = dynamic_cast<EnemyInst*>(inst))) {
-					Pos vpos(e->vx * 1000, e->vy * 1000);
+				if (!dynamic_cast<AnimatedInst*>(inst)){
+					const char* type = typeid(*inst).name();
+					printf("Hashes don't match for instance id=%d, type=%s!\n",
+							inst->id, type);
 					std::vector<Pos> theirs;
-					gs->net_connection().send_and_sync(vpos, theirs);
-					Pos vpos2 = theirs[0];
+					gs->net_connection().send_and_sync(Pos(inst->x, inst->y),
+							theirs);
+					Pos* theirinst = &theirs[0];
+					EnemyInst* e;
+					if ((e = dynamic_cast<EnemyInst*>(inst))) {
+						Pos vpos(e->vx * 1000, e->vy * 1000);
+						std::vector<Pos> theirs;
+						gs->net_connection().send_and_sync(vpos, theirs);
+						Pos vpos2 = theirs[0];
+					}
 				}
 
 			}
