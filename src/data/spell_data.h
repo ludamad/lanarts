@@ -17,12 +17,12 @@
 struct SpellEntry {
 	std::string name, description;
 	sprite_id sprite;
-	int mp_cost;
+	int mp_cost, cooldown;
 	LuaValue action; //Immediate action
 	Projectile projectile; //Projectile used, if any
-	bool can_cast_without_cooldown;
+	bool can_cast_with_cooldown;
 	SpellEntry() :
-			sprite(-1), mp_cost(0), can_cast_without_cooldown(false) {
+			sprite(-1), mp_cost(0), cooldown(0), can_cast_with_cooldown(false) {
 	}
 
 	void init(lua_State* L) {

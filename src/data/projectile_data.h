@@ -25,12 +25,14 @@ struct ProjectileEntry {
 	//If unarmed projectile, range/cooldown used
 	//or if larger than base weapon's
 	float speed;
+	bool can_wall_bounce;
 	int number_of_target_bounces;
 	int cooldown, range, radius;
 
 	ProjectileEntry() :
-			percentage_magic(0.0f), drop_chance(0), speed(0.0f), number_of_target_bounces(
-					0), cooldown(0), range(0), radius(0) {
+			percentage_magic(0.0f), drop_chance(0), speed(0.0f), can_wall_bounce(
+					false), number_of_target_bounces(0), cooldown(0), range(0), radius(
+					0) {
 
 	}
 

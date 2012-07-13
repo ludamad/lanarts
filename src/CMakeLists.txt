@@ -30,8 +30,8 @@ set( lanarts_src
 	data/init/load_effect_data.cpp
 	data/init/load_enemy_data.cpp
 	data/init/load_item_data.cpp
-	data/init/load_projectile_data.cpp
 	data/init/load_tileset_data.cpp
+	data/init/load_projectile_data.cpp
 	data/init/load_settings_data.cpp
 	data/init/load_weapon_data.cpp
 	data/init/load_class_data.cpp 

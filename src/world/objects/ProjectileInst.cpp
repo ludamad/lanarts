@@ -7,6 +7,7 @@
 #include <typeinfo>
 
 #include "../../data/sprite_data.h"
+#include "../../data/projectile_data.h"
 #include "../../data/weapon_data.h"
 
 #include "../../gamestats/stat_formulas.h"
@@ -143,9 +144,7 @@ void ProjectileInst::step(GameState* gs) {
 		gs->object_radius_test(this, &colobj, 1, &player_colfilter);
 		if (colobj) {
 			CombatGameInst* victim = (CombatGameInst*) colobj;
-			if (origin) {
-				origin->signal_attacked_successfully();
-			}
+			origin->signal_attacked_successfully();
 
 			int damage = damage_formula(atkstats, victim->effective_stats());
 			damage *= damage_mult;

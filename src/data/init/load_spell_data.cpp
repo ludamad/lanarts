@@ -23,11 +23,12 @@ SpellEntry parse_spell_type(const YAML::Node& n) {
 	entry.description = parse_defaulted(n, "description", std::string());
 	entry.sprite = parse_sprite_number(n, "spr_spell");
 	entry.mp_cost = parse_int(n["mp_cost"]);
+	entry.cooldown = parse_int(n["cooldown"]);
 	if (yaml_has_node(n, "projectile")) {
 		entry.projectile = parse_projectile_name(n["projectile"]);
 	}
-	entry.can_cast_without_cooldown = parse_defaulted(n,
-			"can_cast_without_cooldown", false);
+	entry.can_cast_with_cooldown = parse_defaulted(n,
+			"can_cast_with_cooldown", false);
 	entry.action = LuaValue(
 			parse_defaulted(n, "action_func", default_action_func));
 	return entry;
