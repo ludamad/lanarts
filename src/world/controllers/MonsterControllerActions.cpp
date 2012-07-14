@@ -39,7 +39,6 @@ static bool choose_random_direction(GameState* gs, EnemyInst* e, float& vx,
 		vx = cos(direction), vy = sin(direction);
 		int nx = round(e->rx + vx * TILE_SIZE), ny = round(
 				e->ry + vy * TILE_SIZE);
-
 		bool solid = gs->tile_radius_test(nx, ny, TILE_SIZE);
 		if (!solid) {
 			vx *= movespeed, vy *= movespeed;
