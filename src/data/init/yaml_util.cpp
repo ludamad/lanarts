@@ -123,7 +123,8 @@ Inventory parse_inventory(const YAML::Node& n) {
 	Inventory ret;
 	for (int i = 0; i < n.size(); i++) {
 		const YAML::Node& slot = n[i];
-		ret.add(parse_as_item(slot["item"]), parse_defaulted(slot, "amount", 1));
+		ret.add(parse_as_item(slot["item"]),
+				parse_defaulted(slot, "amount", 1));
 	}
 	return ret;
 }
