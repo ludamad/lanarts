@@ -116,7 +116,7 @@ bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
 
 	int maxdist = 0;
 	for (int i = 0; i < pc.player_ids().size(); i++) {
-		PlayerInst* player = (PlayerInst*) gs->get_instance(pc.player_ids()[i]);
+		PlayerInst* player = (PlayerInst*)gs->get_instance(pc.player_ids()[i]);
 		BBox fbox = player->field_of_view().tiles_covered();
 		FOR_EACH_BBOX(fbox, x, y) {
 			if (player->field_of_view().within_fov(x, y)) {
@@ -321,7 +321,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 			return;
 
 		for (int i = 0; i < numhit; i++) {
-			EnemyInst* e = (EnemyInst*) enemies[i];
+			EnemyInst* e = (EnemyInst*)enemies[i];
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
 				char buffstr[32];
 				gain_xp(gs, e->xpworth());
@@ -361,7 +361,12 @@ static void __use_projectile_spell(GameState* gs, PlayerInst* p,
 
 static void __use_luacallback_spell(GameState* gs, PlayerInst* p,
 		SpellEntry& spl_entry, LuaValue& action, const Pos& target) {
-
+	lua_State* L = gs->get_luastate();
+	action.push(L);
+	lua_push_gameinst(L, p);
+	lua_pushnumber(L, target.x);
+	lua_pushnumber(L, target.y);
+	lua_call(L, 3, 0);
 }
 
 static void __use_spell(GameState* gs, PlayerInst* p, SpellEntry& spl_entry,
@@ -378,53 +383,23 @@ static void __use_spell(GameState* gs, PlayerInst* p, SpellEntry& spl_entry,
 void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	MTwist& mt = gs->rng();
 	EffectiveStats& estats = effective_stats();
-	if (action.use_id < 2 && !cooldowns().can_doaction())
-		return;
+	if (action.use_id >= spells_known().amount()
+			|| !cooldowns().can_doaction()) {
+//		return;
+	}
 
-	Projectile projectile;
 	spell_id spell = NONE;
 
 	if (action.use_id == 0) {
 		spell = get_spell_by_name("Fire Bolt");
-		projectile = Projectile(get_projectile_by_name("Fire Bolt"));
-		core_stats().mp -= 10;
 	} else if (action.use_id == 1) {
 		spell = get_spell_by_name("Magic Blast");
-		projectile = Projectile(get_projectile_by_name("Magic Blast"));
-		core_stats().mp -= 20;
 	} else if (action.use_id == 2) {
 		spell = get_spell_by_name("Blink");
-		core_stats().mp -= 50;
 	}
 
-	bool bounce = true;
-	int hits = 0;
-
-	if (action.use_id == 1) {
-		//		atk.attack_sprite = get_sprite_by_name("magic blast");
-		//		atk.projectile_speed /= 1.75;
-		//	atk.damage *= 2;
-		bounce = false;
-		hits = 3;
-	}
-	//	atk.damage = estats.calculate_spell_damage(gs->rng(), action.use_id);
-
-	if (action.use_id < 2) {
-		Pos self(x, y), target(action.action_x, action.action_y);
-		ProjectileEntry& pentry = projectile.projectile_entry();
-		AttackStats spellattack(Weapon(), projectile);
-		GameInst* bullet = new ProjectileInst(projectile,
-				effective_atk_stats(mt, spellattack), id, self, target,
-				pentry.speed, pentry.range, NONE, true, hits);
-		gs->add_instance(bullet);
-
-		cooldowns().reset_action_cooldown(pentry.cooldown * 1.4);
-	} else {
-		update_position(action.action_x, action.action_y);
-	}
-
-//	Pos target = Pos(action.action_x, action.action_y);
-//	__use_spell(gs, this, game_spell_data.at(spell), target);
+	Pos target = Pos(action.action_x, action.action_y);
+	__use_spell(gs, this, game_spell_data.at(spell), target);
 
 	if (action.use_id == 0) {
 		double mult = 1 + (class_stats().xplevel - 1) / 10.0;

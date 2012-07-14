@@ -26,7 +26,7 @@ spells:
     mp_cost: 50
     cooldown: 130
     can_cast_with_cooldown: yes
-    action_func: spell_blink_action
+    action_func: function(obj, x, y) obj:move_to(x,y) end
     #prereq_func: eventually add this
     #NB: if the autotarget_func returns nil, the spell is not performed
     autotarget_func: spell_choose_safest_square

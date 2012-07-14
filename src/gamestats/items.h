@@ -86,4 +86,5 @@ struct Item {
 
 	bool operator==(const Item& item) const;
 };
+
 #endif /* ITEMS_H_ */
