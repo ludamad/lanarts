@@ -1,4 +1,4 @@
-if ./make.sh; then
+if ! ./make.sh; then
 	echo "Build failed, aborting lanarts run."
 	exit $?
 fi
