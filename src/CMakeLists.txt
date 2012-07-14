@@ -21,8 +21,6 @@ set( lanarts_src
 	lua/lua_combatstats.cpp
 	lua/lua_effectivestats.cpp
 
-	config/GameControlSettings.cpp
-
 	data/init/load_armour_data.cpp
 	data/init/load_spell_data.cpp
 	data/init/load_sprite_data.cpp
@@ -49,7 +47,6 @@ set( lanarts_src
 	fov/fov.cpp
 	fov/impl/permissive-fov.cc
 
-	gamestats/Ability.cpp
 	gamestats/combat_stats.cpp
 	gamestats/effects.cpp
 	gamestats/Equipment.cpp
@@ -139,8 +136,6 @@ set( lanarts_include
 	combat_logic/combat_logic.h
 	combat_logic/movement_logic.h
 
-	config/GameControlSettings.h
-
 	data/init/yaml_util.h
 
 	data/armour_data.h
@@ -167,7 +162,7 @@ set( lanarts_include
 	lua/lua_api.h
 	lua/lua_impl_util.h
 
-	gamestats/Ability.h
+
 	gamestats/combat_stats.h
 	gamestats/Inventory.h
 	gamestats/items.h

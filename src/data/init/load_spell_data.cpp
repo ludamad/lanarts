@@ -27,8 +27,8 @@ SpellEntry parse_spell_type(const YAML::Node& n) {
 	if (yaml_has_node(n, "projectile")) {
 		entry.projectile = parse_projectile_name(n["projectile"]);
 	}
-	entry.can_cast_with_cooldown = parse_defaulted(n,
-			"can_cast_with_cooldown", false);
+	entry.can_cast_with_cooldown = parse_defaulted(n, "can_cast_with_cooldown",
+			false);
 	entry.action = LuaValue(
 			parse_defaulted(n, "action_func", default_action_func));
 	return entry;
