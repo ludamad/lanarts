@@ -59,8 +59,9 @@ static GameInst* find_closest_from_list(GameState* gs,
 		}
 	}
 
-	if (dist)
+	if (dist) {
 		*dist = mindist;
+	}
 
 	return closest;
 }
@@ -140,8 +141,9 @@ bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
 		float dx = p->x - position.x, dy = p->y - position.y;
 		float dist = sqrt(dx * dx + dy * dy);
 		return (dist > TILE_SIZE / 2);
-	} else
+	} else {
 		return false;
+	}
 }
 
 static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
