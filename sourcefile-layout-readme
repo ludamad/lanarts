@@ -121,7 +121,7 @@ Source:
 			GameInstRef is a reference counted pointer to a GameInst. Use sparingly.
 			
 			All GameInst objects are assigned a level-specific object ID. 
-			This can be queried in a levle and returns NULL if the object has died.
+			This can be queried in a level and returns NULL if the object has died.
 			
 		ui:
 			Defines user interface components, such as the action bar, the HUD, and side bar contents
