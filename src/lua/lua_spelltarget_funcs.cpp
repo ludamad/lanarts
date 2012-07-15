@@ -28,7 +28,7 @@ static int spell_choose_safest_square(lua_State* L) {
 	Pos p;
 	if (find_safest_square(inst, gs, p)) {
 		lua_pushnumber(L, round_to_multiple(p.x, TILE_SIZE, true));
-		lua_pushnumber(L, p.y);
+		lua_pushnumber(L, round_to_multiple(p.y, TILE_SIZE, true));
 		return 2;
 	} else {
 		lua_pushnil(L);

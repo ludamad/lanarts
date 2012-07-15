@@ -388,9 +388,10 @@ void GameChat::toggle_chat(GameState* gs) {
 			if (!handle_special_commands(gs, typed_message.message)) {
 				add_message(typed_message);
 				NetPacket p(0, GameNetConnection::PACKET_CHAT_MESSAGE);
-				typed_message.sender_colour = COL_MUTED_GREEN;
-				typed_message.message_colour = COL_PALE_GREEN;
-				chat_to_net_packet(typed_message, p);
+				ChatMessage msg = typed_message;
+				msg.sender_colour = COL_MUTED_GREEN;
+				msg.message_colour = COL_PALE_GREEN;
+				chat_to_net_packet(msg, p);
 				p.encode_header();
 				gs->net_connection().broadcast_packet(p);
 			}
@@ -418,11 +419,11 @@ bool GameChat::handle_event(GameState* gs, SDL_Event *event) {
 	current_mod = keymod;
 	switch (event->type) {
 	case SDL_MOUSEBUTTONDOWN: {
-		if (show_chat && event->button.button == SDL_BUTTON_LEFT
-				&& gs->mouse_x() < chat_w && gs->mouse_y() < chat_h) {
-			toggle_chat(gs);
-			return true;
-		}
+//		if (show_chat && event->button.button == SDL_BUTTON_LEFT
+//				&& gs->mouse_x() < chat_w && gs->mouse_y() < chat_h) {
+//			toggle_chat(gs);
+//			return true;
+//		}
 		break;
 	}
 	case SDL_KEYUP: {

@@ -2,6 +2,7 @@
  * 	Utility class for managing communication with other players
  * 	If no network communication is used, the methods of this class
  * 	return trivial results.
+ * 	Provides useful behaviour on top of the src_net library.
  */
 
 #ifndef GAMENETCONNECTION_H_

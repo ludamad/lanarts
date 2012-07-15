@@ -10,17 +10,22 @@
 
 /* Colours */
 const Colour COL_YELLOW(255, 255, 0);
+const Colour COL_PALE_YELLOW(255, 250, 150);
+
 const Colour COL_LIGHT_RED(255, 50, 50);
 const Colour COL_RED(255, 0, 0);
 const Colour COL_PALE_RED(255, 148, 120);
+
 const Colour COL_MUTED_GREEN(50, 205, 50);
 const Colour COL_PALE_GREEN(180, 255, 180);
-const Colour COL_PALE_BLUE(180, 180, 255);
 const Colour COL_GREEN(0, 255, 0);
+
 const Colour COL_BLUE(0, 0, 255);
+const Colour COL_PALE_BLUE(180, 180, 255);
 const Colour COL_BABY_BLUE(37, 207, 240);
+
 const Colour COL_GOLD(255, 215, 0);
-const Colour COL_PALE_YELLOW(255, 250, 150);
+
 const Colour COL_MEDIUM_PURPLE(123, 104, 238);
 
 const Colour COL_WHITE(255, 255, 255);

@@ -54,6 +54,8 @@ public:
 	}
 	virtual void signal_was_damaged() {
 	}
+	virtual void signal_killed_enemy() {
+	}
 
 	void equip(item_id item, int amnt = 1);
 

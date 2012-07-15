@@ -33,6 +33,7 @@ public:
 	bool has_player() {
 		return !pids.empty();
 	}
+	void players_gain_xp(GameState* gs, int xp);
 	void copy_to(PlayerController& pc) const;
 private:
 	obj_id local_player;

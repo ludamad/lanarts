@@ -1,5 +1,13 @@
+/* GameNetConnection.cpp:
+ * 	Utility class for managing communication with other players
+ * 	If no network communication is used, the methods of this class
+ * 	return trivial results.
+ * 	Provides useful behaviour on top of the src_net library.
+ */
+
+#include "../world/GameState.h"
+
 #include "GameNetConnection.h"
-#include "../GameState.h"
 
 GameNetConnection::GameNetConnection(NetConnection *connect) :
 		connect(connect) {

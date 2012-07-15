@@ -36,8 +36,8 @@ static void draw_player_statbars(GameState* gs, PlayerInst* player, int x,
 			Colour(200, 200, 200));
 
 	bbox = bbox.translated(0, 15);
-	draw_statbar_with_text(gs, bbox, class_stats.xp, class_stats.xpneeded, Colour(255, 215, 11),
-			Colour(169, 143, 100));
+	draw_statbar_with_text(gs, bbox, class_stats.xp, class_stats.xpneeded,
+			Colour(255, 215, 11), Colour(169, 143, 100));
 
 	float ratio = player->rest_cooldown() / float(REST_COOLDOWN);
 	Colour col(200 * ratio, 200 * (1.0f - ratio), 0);
@@ -54,22 +54,34 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 	ClassStats& class_stats = player_inst->class_stats();
 	CoreStats& core = player_inst->effective_stats().core;
 
-	int midx = x + width / 2;
+	int x_interval = width / 2;
+	int y_interval = 15;
 
-	gl_printf(gs->primary_font(), Colour(255, 215, 11), midx - 15, 10,
-			"Level %d", class_stats.xplevel);
-	gl_printf(gs->primary_font(), Colour(255, 215, 11), midx - 40,
-			64 + 45 + 128, "Floor %d", gs->get_level()->level_number);
-	gl_printf(gs->primary_font(), Colour(255, 215, 11), midx - 40,
-			64 + 45 + 128 + 15, "Gold %d", player_inst->gold());
-	gl_printf(gs->primary_font(), Colour(255, 215, 11), midx - 50,
-			64 + 45 + 128 + 30, "Strength %d", core.strength);
-	gl_printf(gs->primary_font(), Colour(255, 215, 11), midx - 50,
-			64 + 45 + 128 + 45, "Magic    %d", core.magic);
-	gl_printf(gs->primary_font(), Colour(255, 215, 11), midx - 50,
-			64 + 45 + 128 + 60, "Defence  %d", core.defence);
-	gl_printf(gs->primary_font(), Colour(255, 215, 11), midx - 50,
-			64 + 45 + 128 + 75, "Will     %d", core.willpower);
+	gl_printf(gs->primary_font(), COL_GOLD, x + 35, y, "Level %d",
+			class_stats.xplevel);
+	y += y_interval;
+
+	gl_printf(gs->primary_font(), COL_GOLD, x, y, "Kills %d",
+			player_inst->number_of_kills());
+	gl_printf(gs->primary_font(), COL_GOLD, x + x_interval, y, "Deaths %d",
+			player_inst->number_of_deaths());
+	y += y_interval;
+
+	gl_printf(gs->primary_font(), COL_GOLD, x, y, "Floor %d",
+			gs->get_level()->level_number);
+	gl_printf(gs->primary_font(), COL_GOLD, x + x_interval, y, "Gold %d",
+			player_inst->gold());
+	y += y_interval;
+
+	gl_printf(gs->primary_font(), COL_GOLD, x, y, "Strength %d", core.strength);
+	gl_printf(gs->primary_font(), COL_GOLD, x + x_interval, y, "Magic %d",
+			core.magic);
+	y += y_interval;
+
+	gl_printf(gs->primary_font(), COL_GOLD, x, y, "Defence %d", core.defence);
+	gl_printf(gs->primary_font(), COL_GOLD, x + x_interval, y, "Will %d",
+			core.willpower);
+	y += y_interval;
 }
 
 static BBox content_area_box(const BBox& sidebar_box) {
@@ -99,8 +111,8 @@ void Sidebar::draw(GameState* gs) {
 	PlayerInst* p = gs->local_player();
 
 	minimap.draw(gs, 1.0f);
-	draw_player_base_stats(gs, p, sidebar_bounds.x1, sidebar_bounds.y1,
-			sidebar_bounds.width());
+	draw_player_base_stats(gs, p, sidebar_bounds.x1 + 10,
+			sidebar_bounds.y1 + 237, sidebar_bounds.width());
 	draw_player_statbars(gs, p, sidebar_bounds.x1 + STATBAR_OFFSET_X,
 			sidebar_bounds.y1 + STATBAR_OFFSET_Y);
 	navigator.draw(gs);

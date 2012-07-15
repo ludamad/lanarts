@@ -19,7 +19,6 @@ public:
 	static Lunar<GameInstLuaBinding>::RegType methods[];
 
 	GameInstLuaBinding(GameInst* inst) :
-//			gs(lua_get_gamestate(L)), id(id) {
 			inst(inst) {
 	}
 
@@ -114,6 +113,8 @@ static int lua_member_lookup(lua_State* L) {
 	IFLUA_NUM_MEMB_LOOKUP("x", inst->x)
 	else IFLUA_NUM_MEMB_LOOKUP("y", inst->y)
 	else IFLUA_NUM_MEMB_LOOKUP("id", inst->id)
+	else IFLUA_NUM_MEMB_LOOKUP("radius", inst->radius)
+	else IFLUA_NUM_MEMB_LOOKUP("target_radius", inst->target_radius)
 	else IFLUA_STATS_MEMB_LOOKUP("stats", inst)
 	else {
 		lua_getglobal(L, bind_t::className);

@@ -166,7 +166,185 @@ static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
 	return numhit;
 }
 
-void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
+static bool lua_spell_get_target(GameState* gs, PlayerInst* p, LuaValue& action,
+		Pos& pos) {
+	bool nilresult = false;
+	lua_State* L = gs->get_luastate();
+	obj_id target_id = gs->monster_controller().current_target();
+	GameInst* target = gs->get_instance(target_id);
+	if (!target) {
+		return false;
+	}
+	int beforecall_idx = lua_gettop(L);
+	action.push(L);
+	lua_push_gameinst(L, p);
+	lua_push_gameinst(L, target);
+
+	// Allow for multiple return values
+	// read the stack size difference to find out how many were returned
+	lua_call(L, 2, LUA_MULTRET);
+	int nret = lua_gettop(L) - beforecall_idx;
+
+	if (nret != 2 || lua_isnil(L, -1)) {
+		nilresult = true;
+	} else if (nret == 2) {
+		pos.x = lua_tonumber(L, -2);
+		pos.y = lua_tonumber(L, -1);
+	}
+
+	lua_pop(L, nret);
+
+	return !nilresult;
+}
+
+static void player_use_luacallback_spell(GameState* gs, PlayerInst* p,
+		SpellEntry& spl_entry, LuaValue& action, const Pos& target) {
+	lua_State* L = gs->get_luastate();
+	action.push(L);
+	lua_push_gameinst(L, p);
+	lua_pushnumber(L, target.x);
+	lua_pushnumber(L, target.y);
+	lua_call(L, 3, 0);
+}
+
+static bool lua_spell_check_prereq(GameState* gs, PlayerInst* p,
+		SpellEntry& spl_entry, LuaValue& action, const Pos& target) {
+	lua_State* L = gs->get_luastate();
+	bool passes = true;
+
+	action.push(L);
+	if (!lua_isnil(L, -1)) {
+		lua_push_gameinst(L, p);
+		lua_pushnumber(L, target.x);
+		lua_pushnumber(L, target.y);
+		lua_call(L, 3, 1);
+		passes = lua_toboolean(L, -1);
+	}
+
+	/*Pop either the nill or the boolean*/
+	lua_pop(L, 1);
+	return passes;
+}
+
+static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
+		SpellEntry& spl_entry, const Projectile& projectile,
+		const Pos& target) {
+	MTwist& mt = gs->rng();
+	AttackStats projectile_attack(Weapon(), projectile);
+	ProjectileEntry& pentry = projectile.projectile_entry();
+	bool wallbounce = pentry.can_wall_bounce;
+	int nbounces = pentry.number_of_target_bounces;
+
+	GameInst* pinst = new ProjectileInst(projectile,
+			p->effective_atk_stats(mt, projectile_attack), p->id,
+			Pos(p->x, p->y), target, pentry.speed, pentry.range, NONE,
+			wallbounce, nbounces);
+	gs->add_instance(pinst);
+}
+
+static void player_use_spell(GameState* gs, PlayerInst* p,
+		SpellEntry& spl_entry, const Pos& target) {
+	p->core_stats().mp -= spl_entry.mp_cost;
+	p->cooldowns().reset_action_cooldown(spl_entry.cooldown);
+	if (spl_entry.uses_projectile()) {
+		player_use_projectile_spell(gs, p, spl_entry, spl_entry.projectile,
+				target);
+	} else {
+		player_use_luacallback_spell(gs, p, spl_entry, spl_entry.action_func,
+				target);
+	}
+}
+
+bool PlayerInst::queue_io_spell_actions(GameState* gs) {
+	GameView& view = gs->window_view();
+	IOController& io = gs->io_controller();
+	SpellsKnown& spells = spells_known();
+
+	bool perform_spell = false;
+	bool chose_spell = false;
+	bool triggered_already = false;
+
+	//Spell choice
+	for (int i = 0; i < spells.amount(); i++) {
+		IOEvent event(IOEvent::ACTIVATE_SPELL_N, i);
+		if (io.query_event(event, &triggered_already)) {
+			chose_spell = true;
+			// Use the remembered choice to determine if its appropriate to cast this spell
+			// This makes sure the key must be hit once to switch spell, and again to use it
+			if (spell_selected() == i
+					&& previous_spellselect == spell_selected()) {
+				//Double hit a spell switch to quick-perform it
+				perform_spell = true;
+			} else if (!triggered_already) {
+				spell_selected() = i;
+			}
+			break;
+		}
+	}
+	if (!chose_spell) {
+		// If we did not switch a spell with one of the quick-select keys, remember our choice
+		previous_spellselect = spell_selected();
+
+		if (io.query_event(IOEvent::TOGGLE_ACTION_UP)) {
+			spell_selected() = (spell_selected() + 1) % spells.amount();
+		} else if (io.query_event(IOEvent::TOGGLE_ACTION_DOWN)) {
+			if (spell_selected() <= 0) {
+				spell_selected() = spells.amount() - 1;
+			} else {
+				spell_selected()--;}
+			}
+		}
+bool 	auto_target = true;
+	// We don't auto-target unless a mouse is not used
+	if (!perform_spell
+			&& io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION,
+					&triggered_already)) {
+		perform_spell = true;
+		auto_target = false;
+
+	} else if (!perform_spell) {
+		perform_spell = io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION,
+				&triggered_already);
+	}
+	if (spell_selected() > -1 && perform_spell) {
+		SpellEntry& spl_entry = spells.get_entry(spell_selected());
+		if (spl_entry.mp_cost > core_stats().mp) {
+			return false;
+		}
+		Pos target;
+		bool can_trigger = !triggered_already
+				|| spl_entry.can_cast_with_held_key;
+		bool can_target;
+		if (auto_target) {
+			can_target = lua_spell_get_target(gs, this,
+					spl_entry.autotarget_func, target);
+		} else {
+			int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
+			target = Pos(rmx, rmy);
+			can_target = true;
+		}
+
+		if (can_trigger && can_target) {
+			bool can_use = lua_spell_check_prereq(gs, this, spl_entry,
+					spl_entry.prereq_func, target);
+			if (can_use) {
+				queued_actions.push_back(
+						game_action(gs, this, GameAction::USE_SPELL,
+								spell_selected(), target.x, target.y));
+				return true;
+			} else if (!auto_target) {
+				gs->game_chat().add_message("Target location is not valid.");
+			}
+		} else if (!triggered_already && !can_target) {
+			gs->game_chat().add_message(
+					"Cannot currently auto-target spell. Use manual controls (with mouse).");
+		}
+	}
+	return false;
+}
+
+// dx & dy indicates moving direction, useful for choosing melee attack targets
+bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		float dy) {
 	GameView& view = gs->window_view();
 	WeaponEntry& wentry = weapon().weapon_entry();
@@ -175,104 +353,59 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
 	int level = gs->get_level()->roomid, frame = gs->frame();
-	bool spell_used = false;
 
-	//Keyboard-oriented blink
-	if (!spell_used && gs->key_press_state(SDLK_h)) {
-		bool canuse = true;
-		Pos blinkposition;
-		if (core_stats().mp < 50) {
-			canuse = false;
-			gs->game_chat().add_message(
-					"You do not have enough mana to blink, 50 MP required!",
-					COL_RED);
-		} else if (!find_safest_square(this, gs, blinkposition)) {
-			canuse = false;
-			gs->game_chat().add_message(
-					"Cannot auto-blink, no hostile targets. Right click to blink manually.");
-		}
-		if (canuse) {
-			queued_actions.push_back(
-					GameAction(id, GameAction::USE_SPELL, frame, level, 2,
-							blinkposition.x, blinkposition.y));
-			spell_used = true;
-		}
+	IOController& io = gs->io_controller();
+	bool attack_used = queue_io_spell_actions(gs);
+
+	bool autotarget = io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION)
+			|| io.query_event(IOEvent::ACTIVATE_SPELL_N);
+	bool mousetarget = io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION);
+
+	bool weaponuse = spell_selected() == -1;
+
+	if (io.query_event(IOEvent::USE_WEAPON)) {
+		spell_selected() = -1;
+		autotarget = true;
+		weaponuse = true;
+	}
+	if (spell_selected() >= 0
+			&& spells_known().get_entry(spell_selected()).mp_cost
+					> core_stats().mp) {
+		weaponuse = true;
 	}
 
-	//Spell use
-	if (!spell_used && gs->key_down_state(SDLK_j)) {
-		MonsterController& mc = gs->monster_controller();
-		GameInst* target = gs->get_instance(mc.current_target());
-		int mpcost = 10;
-		if (spellselect)
-			mpcost = 20;
-		bool use_weapon = spellselect == -1 || core_stats().mp < mpcost;
-		if (use_weapon) {
+//Weapon use
+	if (!attack_used && weaponuse && (autotarget || mousetarget)) {
+
+		bool is_projectile = wentry.uses_projectile
+				|| equipment().has_projectile();
+
+		GameInst* target = NULL;
+		Pos targ_pos;
+
+		if (is_projectile) {
+			targ_pos = Pos(rmx, rmy);
+		} else {
+			if (mousetarget) {
+				dx = rmx - x, dy = rmy - y;
+			} else if (autotarget) {
+				MonsterController& mc = gs->monster_controller();
+				target = gs->get_instance(mc.current_target());
+			}
 			target = get_weapon_autotarget(gs, this, target, dx, dy);
+			if (target) {
+				targ_pos = Pos(target->x, target->y);
+			}
 		}
-		if (target && use_weapon) {
+
+		if (target || is_projectile) {
 			queued_actions.push_back(
 					GameAction(id, GameAction::USE_WEAPON, frame, level,
-							spellselect, target->x, target->y));
-			spell_used = true;
-		} else if (target) {
-			if (cooldowns().can_doaction() && core_stats().mp >= mpcost
-					&& gs->object_visible_test(target, this)) {
-				queued_actions.push_back(
-						GameAction(id, GameAction::USE_SPELL, frame, level,
-								spellselect, target->x, target->y));
-				spell_used = true;
-			}
+							spellselect, targ_pos.x, targ_pos.y));
+			attack_used = true;
 		}
 	}
-	if (!spell_used && gs->mouse_right_click() && mouse_within) {
-		int px = x, py = y;
-		/* set-up x and y for gs->object_visible_test() */
-		x = rmx, y = rmy;
-		if (core_stats().mp >= 50) {
-			if (!gs->solid_test(this) && gs->object_visible_test(this)) {
-				queued_actions.push_back(
-						GameAction(id, GameAction::USE_SPELL, frame, level, 2,
-								x, y));
-			}
-		} else {
-			gs->game_chat().add_message(
-					"You do not have enough mana to blink, 50 MP required!",
-					COL_RED);
-		}
-		/* restore x and y */
-		x = px, y = py;
-	}
-
-	if (!spell_used && gs->mouse_left_down() && mouse_within) {
-		int mpcost = 10;
-		if (spellselect)
-			mpcost = 20;
-		if (spellselect == -1 || core_stats().mp < mpcost) {
-			bool is_projectile = wentry.uses_projectile
-					|| equipment().has_projectile();
-			GameInst* target = NULL;
-			if (!is_projectile) {
-				target = get_weapon_autotarget(gs, this, NULL, rmx - x,
-						rmy - y);
-				if (target) {
-					rmx = target->x, rmy = target->y;
-				}
-			}
-
-			if (is_projectile || target) {
-				queued_actions.push_back(
-						GameAction(id, GameAction::USE_WEAPON, frame, level,
-								spellselect, rmx, rmy));
-			}
-			spell_used = true;
-		} else if (cooldowns().can_doaction() && core_stats().mp >= mpcost) {
-			queued_actions.push_back(
-					GameAction(id, GameAction::USE_SPELL, frame, level,
-							spellselect, rmx, rmy));
-			spell_used = true;
-		}
-	}
+	return attack_used;
 }
 
 void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
@@ -280,14 +413,16 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 	MTwist& mt = gs->rng();
 	const int MAX_MELEE_HITS = 10;
 	EffectiveStats& estats = effective_stats();
-	if (!cooldowns().can_doaction())
+	if (!cooldowns().can_doaction()) {
 		return;
+	}
 
 	Pos start(x, y);
 	Pos actpos(action.action_x, action.action_y);
 
-	if (wentry.uses_projectile && !equipment().has_projectile())
+	if (wentry.uses_projectile && !equipment().has_projectile()) {
 		return;
+	}
 
 	if (equipment().has_projectile()) {
 		const Projectile& projectile = equipment().projectile;
@@ -319,23 +454,24 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 		int numhit = get_targets(gs, this, actpos.x, actpos.y, wentry.dmgradius,
 				enemies, max_targets);
 
-		if (numhit == 0)
+		if (numhit == 0) {
 			return;
+		}
 
 		for (int i = 0; i < numhit; i++) {
 			EnemyInst* e = (EnemyInst*)enemies[i];
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
+				PlayerController& pc = gs->player_controller();
+				signal_killed_enemy();
+
 				char buffstr[32];
-				gain_xp(gs, e->xpworth());
-				if (is_local_player()) {
-					snprintf(buffstr, 32, "%d XP", e->xpworth());
-					gs->add_instance(
-							new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0,
-									AnimatedInst::DEPTH, buffstr,
-									Colour(255, 215, 11)));
-				} else {
-					gs->skip_next_instance_id();
-				}
+				int amnt = round(double(e->xpworth()) / pc.player_ids().size());
+				gs->player_controller().players_gain_xp(gs, amnt);
+				snprintf(buffstr, 32, "%d XP", amnt);
+				gs->add_instance(
+						new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0,
+								AnimatedInst::DEPTH, buffstr,
+								Colour(255, 215, 11)));
 			}
 		}
 		cooldowns().reset_action_cooldown(wentry.cooldown);
@@ -345,63 +481,20 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 	reset_rest_cooldown();
 }
 
-static void __use_projectile_spell(GameState* gs, PlayerInst* p,
-		SpellEntry& spl_entry, const Projectile& projectile,
-		const Pos& target) {
-	MTwist& mt = gs->rng();
-	AttackStats projectile_attack(Weapon(), projectile);
-	ProjectileEntry& pentry = projectile.projectile_entry();
-	bool wallbounce = pentry.can_wall_bounce;
-	int nbounces = pentry.number_of_target_bounces;
-
-	GameInst* pinst = new ProjectileInst(projectile,
-			p->effective_atk_stats(mt, projectile_attack), p->id,
-			Pos(p->x, p->y), target, pentry.speed, pentry.range, NONE,
-			wallbounce, nbounces);
-	gs->add_instance(pinst);
-}
-
-static void __use_luacallback_spell(GameState* gs, PlayerInst* p,
-		SpellEntry& spl_entry, LuaValue& action, const Pos& target) {
-	lua_State* L = gs->get_luastate();
-	action.push(L);
-	lua_push_gameinst(L, p);
-	lua_pushnumber(L, target.x);
-	lua_pushnumber(L, target.y);
-	lua_call(L, 3, 0);
-}
-
-static void __use_spell(GameState* gs, PlayerInst* p, SpellEntry& spl_entry,
-		const Pos& target) {
-	p->core_stats().mp -= spl_entry.mp_cost;
-	p->cooldowns().reset_action_cooldown(spl_entry.cooldown);
-	if (spl_entry.uses_projectile()) {
-		__use_projectile_spell(gs, p, spl_entry, spl_entry.projectile, target);
-	} else {
-		__use_luacallback_spell(gs, p, spl_entry, spl_entry.action, target);
-	}
-}
-
 void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	MTwist& mt = gs->rng();
 	EffectiveStats& estats = effective_stats();
-	if (action.use_id >= spells_known().amount()
-			|| !cooldowns().can_doaction()) {
-//		return;
-	}
 
-	spell_id spell = NONE;
+	spell_id spell = spells_known().get(action.use_id);
+	SpellEntry& spl_entry = game_spell_data.at(spell);
 
-	if (action.use_id == 0) {
-		spell = get_spell_by_name("Fire Bolt");
-	} else if (action.use_id == 1) {
-		spell = get_spell_by_name("Magic Blast");
-	} else if (action.use_id == 2) {
-		spell = get_spell_by_name("Blink");
+	if (spl_entry.mp_cost > core_stats().mp
+			|| (!spl_entry.can_cast_with_cooldown && !cooldowns().can_doaction())) {
+		return;
 	}
 
 	Pos target = Pos(action.action_x, action.action_y);
-	__use_spell(gs, this, game_spell_data.at(spell), target);
+	player_use_spell(gs, this, spl_entry, target);
 
 	if (action.use_id == 0) {
 		double mult = 1 + (class_stats().xplevel - 1) / 10.0;

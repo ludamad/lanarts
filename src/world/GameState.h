@@ -10,8 +10,12 @@
 #include <SDL.h>
 
 #include "../display/font.h"
-#include "../util/mtwist.h"
+
 #include "../fov/fov.h"
+
+#include "../util/mtwist.h"
+
+#include "../net/GameNetConnection.h"
 
 #include "controllers/IOController.h"
 #include "controllers/MonsterController.h"
@@ -20,8 +24,6 @@
 #include "ui/GameChat.h"
 #include "ui/GameHud.h"
 #include "ui/GameDialogs.h"
-
-#include "net/GameNetConnection.h"
 
 #include "GameSettings.h"
 #include "GameView.h"
@@ -88,6 +90,9 @@ public:
 	/* player's field-of-view visibility tests */
 	bool object_visible_test(GameInst* obj, PlayerInst* player = NULL,
 			bool canreveal = true);
+	/* player's field-of-view visibility tests */
+	bool radius_visible_test(int x, int y, int radius, PlayerInst* player = NULL,
+			bool canreveal = true);
 
 	/* GameState components */
 	GameView& window_view() {
@@ -141,6 +146,11 @@ public:
 
 	const font_data& menu_font() {
 		return large_font;
+	}
+
+	/* IO & action controller */
+	IOController& io_controller() {
+		return iocontroller;
 	}
 
 	/* Mouse position */

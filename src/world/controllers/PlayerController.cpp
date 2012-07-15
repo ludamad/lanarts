@@ -21,7 +21,7 @@ PlayerController::~PlayerController() {
 
 void PlayerController::update_fieldsofview(GameState* gs) {
 	for (int i = 0; i < pids.size(); i++) {
-		PlayerInst* player = (PlayerInst*) gs->get_instance(pids[i]);
+		PlayerInst* player = (PlayerInst*)gs->get_instance(pids[i]);
 		int sx = player->last_x * VISION_SUBSQRS / TILE_SIZE;
 		int sy = player->last_y * VISION_SUBSQRS / TILE_SIZE;
 		player->field_of_view().calculate(gs, sx, sy);
@@ -29,6 +29,13 @@ void PlayerController::update_fieldsofview(GameState* gs) {
 }
 void PlayerController::pre_step(GameState* gs) {
 	update_fieldsofview(gs);
+}
+
+void PlayerController::players_gain_xp(GameState* gs, int xp) {
+	for (int i = 0; i < pids.size(); i++) {
+		PlayerInst* p = (PlayerInst*)gs->get_instance(pids[i]);
+		p->gain_xp(gs, xp);
+	}
 }
 
 void PlayerController::copy_to(PlayerController& pc) const {

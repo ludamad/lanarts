@@ -22,14 +22,14 @@ extern "C" {
 
 #include "../display/display.h"
 
-#include "../util/math_util.h"
+#include "../net/GameNetConnection.h"
 
 #include "../lua/lua_api.h"
 
+#include "../util/math_util.h"
+
 #include "GameState.h"
 #include "GameLevelState.h"
-
-#include "net/GameNetConnection.h"
 
 #include "objects/EnemyInst.h"
 #include "objects/GameInst.h"
@@ -140,6 +140,9 @@ bool GameState::update_iostate(bool resetprev) {
 		if (handle_event(&event))
 			return false;
 	}
+	/* Fire IOEvents for the current step*/
+	iocontroller.trigger_events(BBox(0, 0, view.width, view.height));
+
 	return true;
 }
 bool GameState::pre_step() {
@@ -313,16 +316,15 @@ int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 	return get_level()->inst_set.object_radius_test(obj, objs, obj_cap, f, x, y,
 			radius);
 }
-bool GameState::object_visible_test(GameInst* obj, PlayerInst* player,
-		bool canreveal) {
+
+bool GameState::radius_visible_test(int x, int y, int radius,
+		PlayerInst* player, bool canreveal) {
 	const int sub_sqrs = VISION_SUBSQRS;
 	const int subsize = TILE_SIZE / sub_sqrs;
 
 	int w = width() / subsize, h = height() / subsize;
-	int x = obj->x, y = obj->y;
-	int rad = obj->radius;
-	int mingrid_x = (x - rad) / subsize, mingrid_y = (y - rad) / subsize;
-	int maxgrid_x = (x + rad) / subsize, maxgrid_y = (y + rad) / subsize;
+	int mingrid_x = (x - radius) / subsize, mingrid_y = (y - radius) / subsize;
+	int maxgrid_x = (x + radius) / subsize, maxgrid_y = (y + radius) / subsize;
 	int minx = squish(mingrid_x, 0, w), miny = squish(mingrid_y, 0, h);
 	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
 
@@ -348,6 +350,10 @@ bool GameState::object_visible_test(GameInst* obj, PlayerInst* player,
 		}
 	}
 	return false;
+}
+bool GameState::object_visible_test(GameInst* obj, PlayerInst* player,
+		bool canreveal) {
+	return radius_visible_test(obj->x, obj->y, obj->radius, player);
 }
 
 void GameState::ensure_level_connectivity(int roomid1, int roomid2) {

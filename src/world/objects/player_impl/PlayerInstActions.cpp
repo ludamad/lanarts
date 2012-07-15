@@ -65,6 +65,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 	int level = gs->get_level()->roomid;
 	int frame = gs->frame();
 	bool item_used = false;
+	IOController& io = gs->io_controller();
 
 	Pos p(gs->mouse_x() + view.x, gs->mouse_y() + view.y);
 	obj_id target = gs->monster_controller().current_target();
@@ -74,7 +75,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 
 	//Item use
 	for (int i = 0; i < 9; i++) {
-		if (gs->key_press_state(SDLK_1 + i)) {
+		if (io.query_event(IOEvent(IOEvent::USE_ITEM_N, i))) {
 			if (inventory().get(i).amount > 0) {
 				item_used = true;
 				queued_actions.push_back(
@@ -142,6 +143,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 	/* If in stop-controls mode, perform some actions when movement has stopped */
 	bool stop_controls = gs->game_settings().stop_controls;
 	bool was_moving = moving, do_stopaction = false;
+	IOController& io = gs->io_controller();
 
 	if (is_local_player()) {
 //Resting
@@ -166,28 +168,34 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 			gs->monster_controller().shift_target(gs);
 		}
 
-		if (gs->key_press_state(SDLK_SPACE)) {
-			spellselect++;
-			if (spellselect > 1) {
-				spellselect = 0;
-			}
-			if (spellselect == 1 && class_stats().xplevel < 3)
-				spellselect = 0;
-		}
+//		if (gs->key_press_state(SDLK_SPACE)) {
+//			spellselect++;
+//			if (spellselect > 1) {
+//				spellselect = 0;
+//			}
+//			if (spellselect == 1 && class_stats().xplevel < 3)
+//				spellselect = 0;
+//		}
 		if (gs->key_press_state(SDLK_m))
 			spellselect = -1;
 
 //		get_current_actions(gs->frame(), actions);
 
+		bool attack_used = false;
 		if (!resting) {
 			if (!gs->game_hud().handle_io(gs, queued_actions)) {
-				queue_io_spell_and_attack_actions(gs, dx, dy);
+				attack_used = queue_io_spell_and_attack_actions(gs, dx, dy);
 				queue_io_equipment_actions(gs, do_stopaction);
 			}
 		}
 
+		bool action_usage = io.query_event(IOEvent::ACTIVATE_SPELL_N)
+				|| io.query_event(IOEvent::USE_WEAPON)
+				|| io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION)
+				|| io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION);
 		if (!resting) {
-			if (do_stopaction || gs->key_down_state(SDLK_PERIOD)
+			if ((do_stopaction && !action_usage)
+					|| gs->key_down_state(SDLK_PERIOD)
 					|| gs->mouse_downwheel()) {
 				Pos hitsqr;
 				if (gs->tile_radius_test(x, y, RADIUS, false,
@@ -201,8 +209,8 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 		}
 
 		if (!resting) {
-			if (do_stopaction || gs->key_down_state(SDLK_COMMA)
-					|| gs->mouse_upwheel()) {
+			if ((do_stopaction && !action_usage)
+					|| gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel()) {
 				Pos hitsqr;
 				if (gs->tile_radius_test(x, y, RADIUS, false,
 						get_tile_by_name("stairs_up"), &hitsqr)) {

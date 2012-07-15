@@ -10,10 +10,18 @@
 
 #include "../util/game_basic_structs.h"
 
+struct SpellEntry;
+
 class SpellsKnown {
 public:
-	spell_id get(int ind) { return spells.at(ind); }
-	size_t amount() { return spells.size(); }
+	spell_id get(int ind) {
+		return spells.at(ind);
+	}
+	SpellEntry& get_entry(int ind);
+
+	size_t amount() {
+		return spells.size();
+	}
 
 	void add_spell(spell_id slot);
 	void remove_spell(spell_id slot);

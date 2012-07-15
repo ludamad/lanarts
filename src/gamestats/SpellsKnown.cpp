@@ -5,6 +5,8 @@
 
 #include <algorithm>
 
+#include "../data/spell_data.h"
+
 #include "SpellsKnown.h"
 
 void SpellsKnown::add_spell(spell_id slot) {
@@ -17,6 +19,10 @@ void SpellsKnown::remove_spell(spell_id slot) {
 	if (it != spells.end()) {
 		spells.erase(it);
 	}
+}
+
+SpellEntry& SpellsKnown::get_entry(int ind) {
+	return game_spell_data.at(get(ind));
 }
 
 bool SpellsKnown::has_spell(spell_id slot) {

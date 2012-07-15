@@ -33,8 +33,8 @@ public:
 	PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y,
 			bool local = true) :
 			CombatGameInst(stats, sprite, 0, x, y, RADIUS, true, DEPTH), fieldofview(
-					LINEOFSIGHT), local(local), moving(0), money(0), lives(0), spellselect(
-					0) {
+					LINEOFSIGHT), local(local), moving(0), money(0), lives(0), kills(
+					0), deaths(0), previous_spellselect(0), spellselect(0) {
 	}
 
 	virtual ~PlayerInst();
@@ -49,10 +49,6 @@ public:
 	void gain_xp(GameState* gs, int xp);
 
 	void queue_io_actions(GameState* gs);
-	void queue_io_movement_actions(GameState* gs, int& dx, int& dy);
-	void queue_io_spell_and_attack_actions(GameState* gs, float dx, float dy);
-	void queue_io_equipment_actions(GameState* gs, bool do_stop_action);
-	void queue_network_actions(GameState* gs);
 
 	void perform_queued_actions(GameState* gs);
 	void perform_action(GameState* gs, const GameAction& action);
@@ -71,6 +67,12 @@ public:
 	int gold() {
 		return money;
 	}
+	int number_of_deaths() {
+		return deaths;
+	}
+	int number_of_kills() {
+		return kills;
+	}
 	Weapon& weapon() {
 		return equipment().weapon;
 	}
@@ -82,6 +84,10 @@ public:
 		return local;
 	}
 
+	virtual void signal_killed_enemy() {
+		kills++;
+	}
+
 	bool& performed_actions_for_step() {
 		return didstep;
 	}
@@ -91,7 +97,15 @@ public:
 	}
 
 private:
-	/* Actions */
+
+	/* Deciding which actions to take in a step */
+	void queue_io_movement_actions(GameState* gs, int& dx, int& dy);
+	bool queue_io_spell_actions(GameState* gs);
+	bool queue_io_spell_and_attack_actions(GameState* gs, float dx, float dy);
+	void queue_io_equipment_actions(GameState* gs, bool do_stop_action);
+	void queue_network_actions(GameState* gs);
+
+	/* Performing Actions */
 	void use_move(GameState* gs, const GameAction& action);
 	void use_weapon(GameState* gs, const GameAction& action);
 	void use_dngn_exit(GameState* gs, const GameAction& action);
@@ -108,10 +122,9 @@ private:
 	fov fieldofview;
 	bool didstep, local, moving;
 
-	int money, lives;
-	int spellselect;
+	int money, lives, deaths, kills;
+	int previous_spellselect, spellselect;
 };
-
 
 bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position);
 

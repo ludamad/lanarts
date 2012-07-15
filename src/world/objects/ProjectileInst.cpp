@@ -12,8 +12,10 @@
 
 #include "../../gamestats/stat_formulas.h"
 
-#include "../../util/world/collision_util.h"
 #include "../../util/math_util.h"
+#include "../../util/colour_constants.h"
+
+#include "../../util/world/collision_util.h"
 
 #include "../utility_objects/AnimatedInst.h"
 
@@ -55,7 +57,7 @@ void ProjectileInst::deinit(GameState* gs) {
 
 void ProjectileInst::copy_to(GameInst* inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(ProjectileInst*) inst = *this;
+	*(ProjectileInst*)inst = *this;
 }
 
 ProjectileInst::ProjectileInst(const Projectile& projectile,
@@ -76,8 +78,8 @@ ProjectileInst* ProjectileInst::clone() const {
 
 void ProjectileInst::step(GameState* gs) {
 	Pos tile_hit;
-	int newx = (int) round(rx + vx); //update based on rounding of true float
-	int newy = (int) round(ry + vy);
+	int newx = (int)round(rx + vx); //update based on rounding of true float
+	int newy = (int)round(ry + vy);
 	bool collides = gs->tile_radius_test(newx, newy, radius, true, -1,
 			&tile_hit);
 	if (bounce) {
@@ -99,13 +101,13 @@ void ProjectileInst::step(GameState* gs) {
 		gs->remove_instance(this);
 	}
 
-	x = (int) round(rx += vx); //update based on rounding of true float
-	y = (int) round(ry += vy);
+	x = (int)round(rx += vx); //update based on rounding of true float
+	y = (int)round(ry += vy);
 
 	range_left -= speed;
 
 	GameInst* colobj = NULL;
-	CombatGameInst* origin = (CombatGameInst*) gs->get_instance(origin_id);
+	CombatGameInst* origin = (CombatGameInst*)gs->get_instance(origin_id);
 
 	if (dynamic_cast<PlayerInst*>(origin)) {
 		if (sole_target)
@@ -114,7 +116,7 @@ void ProjectileInst::step(GameState* gs) {
 			gs->object_radius_test(this, &colobj, 1, &enemy_colfilter);
 
 		if (colobj) {
-			EnemyInst* victim = (EnemyInst*) colobj;
+			EnemyInst* victim = (EnemyInst*)colobj;
 			origin->signal_attacked_successfully();
 			int damage = damage_formula(atkstats, victim->effective_stats());
 			damage *= damage_mult;
@@ -128,24 +130,24 @@ void ProjectileInst::step(GameState* gs) {
 							-1, 25, rx, ry, AnimatedInst::DEPTH, buffstr));
 
 			if (victim->damage(gs, damage)) {
-				PlayerInst* p = (PlayerInst*) origin;
-				p->gain_xp(gs, victim->xpworth());
+				PlayerInst* p = (PlayerInst*)origin;
+				PlayerController& pc = gs->player_controller();
+				p->signal_killed_enemy();
 
-				if (p->is_local_player()) {
-					snprintf(buffstr, 32, "%d XP", victim->xpworth());
-					gs->add_instance(
-							new AnimatedInst(victim->x, victim->y, -1, 25, 0, 0,
-									AnimatedInst::DEPTH, buffstr,
-									Colour(255, 215, 11)));
-				} else {
-					gs->skip_next_instance_id();
-				}
+				int amnt = round(
+						double(victim->xpworth()) / pc.player_ids().size());
+				gs->player_controller().players_gain_xp(gs, amnt);
+
+				snprintf(buffstr, 32, "%d XP", amnt);
+				gs->add_instance(
+						new AnimatedInst(victim->x, victim->y, -1, 25, 0, 0,
+								AnimatedInst::DEPTH, buffstr, COL_GOLD));
 			}
 		}
 	} else {
 		gs->object_radius_test(this, &colobj, 1, &player_colfilter);
 		if (colobj) {
-			CombatGameInst* victim = (CombatGameInst*) colobj;
+			CombatGameInst* victim = (CombatGameInst*)colobj;
 			if (origin) {
 				origin->signal_attacked_successfully();
 			}
@@ -204,6 +206,6 @@ sprite_id ProjectileInst::sprite() const {
 }
 
 bool ProjectileInst::bullet_target_hit2(GameInst* self, GameInst* other) {
-	return ((ProjectileInst*) self)->sole_target == other->id;
+	return ((ProjectileInst*)self)->sole_target == other->id;
 }
 

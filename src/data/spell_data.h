@@ -18,15 +18,20 @@ struct SpellEntry {
 	std::string name, description;
 	sprite_id sprite;
 	int mp_cost, cooldown;
-	LuaValue action; //Immediate action
+	LuaValue action_func; //Immediate action
+	LuaValue autotarget_func; //Auto-target func
+	LuaValue prereq_func; //Pre-req to casting
 	Projectile projectile; //Projectile used, if any
-	bool can_cast_with_cooldown;
+	bool can_cast_with_cooldown, can_cast_with_held_key;
 	SpellEntry() :
-			sprite(-1), mp_cost(0), cooldown(0), can_cast_with_cooldown(false) {
+			sprite(-1), mp_cost(0), cooldown(0), can_cast_with_cooldown(false), can_cast_with_held_key(
+					false) {
 	}
 
 	void init(lua_State* L) {
-		action.initialize(L);
+		action_func.initialize(L);
+		autotarget_func.initialize(L);
+		prereq_func.initialize(L);
 	}
 	bool uses_projectile() {
 		return projectile.valid_projectile();

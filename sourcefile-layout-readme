@@ -75,6 +75,8 @@ Source:
 			This is used for most cases where stats are queried. It is calculated once per step.
 	lua:
 		Defines lua bindings
+	net:
+		Defines an interface for using src_net library. This keeps some lanarts details away from src_net.
 	pathfind:
 		Pathfinding algorithms, A* and floodfill based
 	procedural:
@@ -107,8 +109,6 @@ Source:
 			
 		level:
 			To-be-used. Will define level layouts.
-		net:
-			Should be moved out of world/. Defines an abstraction over src_net library.
 		objects:
 			Defines for game instances in lanarts. 
 			All objects derive from GameInst and have draw/step phases.

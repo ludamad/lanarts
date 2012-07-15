@@ -6,6 +6,8 @@ classes:
     spells:
       - level_needed: 1
         spell: Fire Bolt
+      - level_needed: 1
+        spell: Blink
       - level_needed: 3
         spell: Magic Blast
     start_stats:

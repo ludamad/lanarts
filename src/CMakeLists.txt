@@ -67,7 +67,7 @@ set( lanarts_src
 	pathfind/astar_pathfind.cpp
 	pathfind/pathfind.cpp
 
-	world/net/GameNetConnection.cpp
+	net/GameNetConnection.cpp
 	main.cpp
 	main_menu.cpp
 
@@ -193,7 +193,7 @@ set( lanarts_include
 	util/mtwist.h
 	util/world/collision_util.h
 
-	world/net/GameNetConnection.h
+	net/GameNetConnection.h
 
 	world/GameAction.h
 	world/GameInstSet.h

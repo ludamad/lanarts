@@ -120,7 +120,9 @@ void EnemyInst::draw(GameState* gs) {
 
 	if (gs->game_settings().draw_diagnostics) {
 		char statbuff[255];
-		snprintf(statbuff, 255,
+		snprintf(
+				statbuff,
+				255,
 				"simid=%d nvx=%f vy=%f\n chasetime=%d \n washit=%d didhit=%d \n act=%d, path_steps = %d\npath_cooldown = %d\n",
 				eb.simulation_id, vx, vy, eb.chase_timeout,
 				eb.randomization.damage_taken_timer,
@@ -144,8 +146,8 @@ void EnemyInst::draw(GameState* gs) {
 		show_appear_message(gs->game_chat(), etype());
 	}
 
-	BBox ebox(xx - view.x, yy - view.x, xx + w - view.x, yy + h - view.x);
-	if (ebox.contains(gs->mouse_x(), gs->mouse_y())) {
+	BBox ebox(xx, yy, xx + w, yy + h);
+	if (ebox.contains(gs->mouse_x() + view.x, gs->mouse_y() + view.y)) {
 		draw_console_enemy_description(gs, etype());
 	}
 
@@ -177,5 +179,5 @@ void EnemyInst::die(GameState *gs) {
 
 void EnemyInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(EnemyInst*) inst = *this;
+	*(EnemyInst*)inst = *this;
 }

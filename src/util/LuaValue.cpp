@@ -97,6 +97,7 @@ public:
 		lua_pushlightuserdata(L, this); /* push address as key */
 		luaL_dostring(L, lua_expression.c_str());
 		lua_settable(L, LUA_REGISTRYINDEX);
+		lua_expression.clear();
 	}
 	void table_initialize(lua_State* L) {
 		empty = false;

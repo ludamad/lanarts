@@ -19,7 +19,7 @@ GameAction::GameAction(obj_id origin, action_t act, int frame, int level,
 void to_action_file(FILE* f, const GameAction& action) {
 	fwrite(&action, sizeof(GameAction), 1, f);
 }
-GameAction game_action(GameState* gs, GameInst *origin,
+GameAction game_action(GameState* gs, GameInst* origin,
 		GameAction::action_t action, int use_id, int action_x, int action_y,
 		int use_id2) {
 	return GameAction(origin->id, action, gs->frame(),

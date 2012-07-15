@@ -14,12 +14,35 @@ extern "C" {
 #include "../world/GameState.h"
 
 #include "../world/objects/GameInst.h"
+#include "../world/objects/PlayerInst.h"
 
 // Takes obj returns bool
 static int obj_solid_check(lua_State* L) {
 	GameState* gs = lua_get_gamestate(L);
+	int nargs = lua_gettop(L);
+
 	GameInst* obj = lua_gameinst_arg(L, 1);
-	lua_pushboolean(L, gs->solid_test(obj));
+	int x = nargs >= 2 ? lua_tonumber(L, 2) : obj->x;
+	int y = nargs >= 3 ? lua_tonumber(L, 3) : obj->y;
+	int radius = nargs >= 4 ? lua_tonumber(L, 4) : obj->radius;
+
+	lua_pushboolean(L, gs->solid_test(obj, x, y, radius));
+	return 1;
+}
+
+// Takes x, y, rad, [player observer] returns bool
+static int radius_visible_check(lua_State* L) {
+	GameState* gs = lua_get_gamestate(L);
+	int nargs = lua_gettop(L);
+
+	int x = lua_tonumber(L, 1);
+	int y = lua_tonumber(L, 2);
+	int radius = lua_tonumber(L, 3);
+	PlayerInst* observer =
+			nargs >= 4 ?
+					dynamic_cast<PlayerInst*>(lua_gameinst_arg(L, 4)) : NULL;
+
+	lua_pushboolean(L, gs->radius_visible_test(x, y, radius, observer, false));
 	return 1;
 }
 
@@ -35,7 +58,12 @@ static int obj_tile_check(lua_State* L) {
 static int radius_tile_check(lua_State* L) {
 	GameState* gs = lua_get_gamestate(L);
 	GameInst* obj = lua_gameinst_arg(L, 1);
-	lua_pushboolean(L, gs->tile_radius_test(obj->radius, obj->x, obj->y));
+
+	int x = lua_tonumber(L, 1);
+	int y = lua_tonumber(L, 2);
+	int radius = lua_tonumber(L, 3);
+
+	lua_pushboolean(L, gs->tile_radius_test(radius, x, y));
 	return 1;
 }
 
@@ -61,5 +89,6 @@ void lua_collision_check_bindings(lua_State* L) {
 	LUA_FUNC_REGISTER(obj_solid_check);
 	LUA_FUNC_REGISTER(obj_tile_check);
 	LUA_FUNC_REGISTER(radius_tile_check);
+	LUA_FUNC_REGISTER(radius_visible_check);
 	LUA_FUNC_REGISTER(obj_enemy_check);
 }

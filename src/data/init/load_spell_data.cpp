@@ -16,7 +16,9 @@ Projectile parse_projectile_name(const YAML::Node& n) {
 	int projectile_id = get_projectile_by_name(projectile_name.c_str());
 	return Projectile(projectile_id);
 }
-const std::string default_action_func = "spell_choose_target";
+
+const std::string default_autotarget_func = "spell_choose_target";
+
 SpellEntry parse_spell_type(const YAML::Node& n) {
 	SpellEntry entry;
 	entry.name = parse_str(n["name"]);
@@ -27,10 +29,16 @@ SpellEntry parse_spell_type(const YAML::Node& n) {
 	if (yaml_has_node(n, "projectile")) {
 		entry.projectile = parse_projectile_name(n["projectile"]);
 	}
+	entry.action_func = LuaValue(
+			parse_defaulted(n, "action_func", std::string()));
+	entry.autotarget_func = LuaValue(
+			parse_defaulted(n, "autotarget_func", default_autotarget_func));
+	entry.prereq_func = LuaValue(
+			parse_defaulted(n, "prereq_func", std::string()));
 	entry.can_cast_with_cooldown = parse_defaulted(n, "can_cast_with_cooldown",
 			false);
-	entry.action = LuaValue(
-			parse_defaulted(n, "action_func", default_action_func));
+	entry.can_cast_with_held_key = parse_defaulted(n, "can_cast_with_held_key",
+			true);
 	return entry;
 }
 

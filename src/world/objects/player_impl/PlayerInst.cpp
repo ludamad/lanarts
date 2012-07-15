@@ -30,6 +30,7 @@ bool PlayerInst::within_field_of_view(const Pos& pos) {
 }
 
 void PlayerInst::die(GameState* gs) {
+	deaths++;
 	//Let step event handle death
 }
 
@@ -112,6 +113,15 @@ void PlayerInst::step(GameState* gs) {
 
 void PlayerInst::draw(GameState* gs) {
 	CombatGameInst::draw(gs);
+//	Test io event firing
+//	for (int i = 0; i < 5; i++) {
+//
+//		IOEvent event(IOEvent::SWITCH_TO_SPELL_N, i);
+//		if (gs->io_controller().query_event(event)) {
+//			gl_printf(gs->primary_font(), Colour(), x - gs->window_view().x,
+//					y - gs->window_view().y, "%d", i);
+//		}
+//	}
 }
 
 void PlayerInst::copy_to(GameInst *inst) const {
