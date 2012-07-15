@@ -13,9 +13,13 @@
 using namespace std;
 
 EffectEntry parse_effect(const YAML::Node& n) {
-	return EffectEntry(parse_str(n["name"]),
-			parse_defaulted(n, "stat_func", std::string()),
-			parse_defaulted(n, "additive_duration", true));
+	EffectEntry entry;
+	entry.name = parse_str(n["name"]);
+	entry.init_func = LuaValue(parse_defaulted(n, "init_func", std::string()));
+	entry.stat_func = LuaValue(parse_defaulted(n, "stat_func", std::string()));
+	entry.step_func = LuaValue(parse_defaulted(n, "step_func", std::string()));
+	entry.additive_duration = parse_defaulted(n, "additive_duration", false);
+	return entry;
 }
 
 void load_effect_callbackf(const YAML::Node& node, lua_State* L,

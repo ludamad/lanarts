@@ -34,7 +34,7 @@ public:
 			bool local = true) :
 			CombatGameInst(stats, sprite, 0, x, y, RADIUS, true, DEPTH), fieldofview(
 					LINEOFSIGHT), local(local), moving(0), money(0), lives(0), kills(
-					0), deaths(0), previous_spellselect(0), spellselect(0) {
+					0), deaths(0), previous_spellselect(0), spellselect(-1) {
 	}
 
 	virtual ~PlayerInst();

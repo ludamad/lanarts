@@ -162,8 +162,8 @@ public:
 		/*Pop table*/
 		lua_pop(L, 1);
 	}
-	void push(lua_State* L) {
-		lua_pushlightuserdata(L, this); /* push address as key */
+	void push(lua_State* L) const {
+		lua_pushlightuserdata(L, (void*)this); /* push address as key */
 		lua_gettable(L, LUA_REGISTRYINDEX);
 	}
 
@@ -229,7 +229,7 @@ void LuaValue::deinitialize(lua_State* L) {
 	}
 }
 
-void LuaValue::push(lua_State* L) {
+void LuaValue::push(lua_State* L) const {
 	if (!impl)
 		lua_pushnil(L);
 	else

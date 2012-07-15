@@ -31,7 +31,7 @@ public:
 
 	void initialize(lua_State* L);
 	void deinitialize(lua_State* L);
-	void push(lua_State* L);
+	void push(lua_State* L) const;
 	void pop(lua_State* L);
 	bool empty();
 

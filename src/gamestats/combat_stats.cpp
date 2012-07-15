@@ -20,18 +20,18 @@ CombatStats::CombatStats(const ClassStats& class_stats, const CoreStats& core,
 
 }
 
-void CombatStats::step() {
+void CombatStats::step(GameState* gs, CombatGameInst* inst) {
 	core.step();
 	cooldowns.step();
-	effects.step();
+	effects.step(gs, inst);
 }
 
 bool CombatStats::has_died() {
 	return core.hp <= 0;
 }
 
-EffectiveStats CombatStats::effective_stats_without_atk(GameState* gs) const {
-	return ::effective_stats(gs, *this);
+EffectiveStats CombatStats::effective_stats(GameState* gs, CombatGameInst* inst) const {
+	return ::effective_stats(gs, inst, *this);
 }
 
 static void learn_class_spells(SpellsKnown& spells,

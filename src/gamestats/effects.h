@@ -2,15 +2,18 @@
 #define EFFECTS_H
 
 #include "../util/game_basic_structs.h"
+#include "../util/LuaValue.h"
 
 const int EFFECTS_MAX = 40;
 
 struct CombatStats;
 struct EffectiveStats;
-struct lua_State;
+struct GameState;
+struct CombatGameInst;
 
 struct Effect {
-	int effect;
+	effect_id effect;
+	LuaValue state;
 	int t_remaining;
 };
 
@@ -21,11 +24,12 @@ struct EffectStats {
 		}
 	}
 	bool has_active_effect() const;
-	void add(int effect, int length);
-	Effect* get(int effect);
-	void step();
+	void add(effect_id effect, int length);
+	Effect* get(effect_id effect);
+	void step(GameState* gs, CombatGameInst* inst);
 
-	void process(lua_State* L, const CombatStats& basestats, EffectiveStats& effective) const;
+	void process(GameState* gs, CombatGameInst* inst,
+			EffectiveStats& effective) const;
 
 	Effect effects[EFFECTS_MAX];
 };

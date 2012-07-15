@@ -1,4 +1,3 @@
-
 #ifndef EFFECT_DATA_H_
 #define EFFECT_DATA_H_
 
@@ -13,13 +12,15 @@
 
 struct EffectEntry {
 	std::string name;
-	LuaValue statmod;
+	LuaValue stat_func;
+	LuaValue init_func;
+	LuaValue step_func;
 	bool additive_duration;
-	EffectEntry(const std::string& name, const std::string& statmod_luaf, bool additive_duration) :
-			name(name), statmod(statmod_luaf), additive_duration(additive_duration) {
-	}
+
 	void init(lua_State* L) {
-		statmod.initialize(L);
+		init_func.initialize(L);
+		stat_func.initialize(L);
+		step_func.initialize(L);
 	}
 };
 

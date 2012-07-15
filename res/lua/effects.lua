@@ -1,4 +1,4 @@
-function haste_statmod(old, new)
+function haste_statmod(effect, obj, old, new)
 	new.speed = new.speed + 2
 	new.strength = new.strength + 5
 	new.magic = new.strength + 5
@@ -7,6 +7,6 @@ function haste_statmod(old, new)
 	new.cooldown_mult = new.cooldown_mult / 1.25
 end
 
-function haste_step(obj)
+function haste_step(effect, obj)
 	obj:heal_hp(10)
 end

@@ -57,7 +57,8 @@ int damage_formula(const EffectiveAttackStats& attacker,
 			+ pdmg * attacker.physical_percentage();
 }
 
-static void factor_in_armour_slot(MTwist& mt, EffectiveStats& effective, const Armour& slot) {
+static void factor_in_armour_slot(MTwist& mt, EffectiveStats& effective,
+		const Armour& slot) {
 	CoreStats& core = effective.core;
 	ArmourEntry& aentry = slot.armour_entry();
 
@@ -78,14 +79,14 @@ static void derive_from_equipment(MTwist& mt, EffectiveStats& effective) {
 	effective.magic.reduction = core.magic_reduction + core.willpower / 2.0;
 }
 
-EffectiveStats effective_stats(GameState* gs, const CombatStats& stats) {
-	lua_State* L = gs->get_luastate();
+EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst,
+		const CombatStats& stats) {
 	EffectiveStats ret;
 	ret.core = stats.core;
 	ret.movespeed = stats.movespeed;
 	derive_from_equipment(gs->rng(), ret);
 	factor_in_equipment(gs->rng(), ret, stats.equipment);
-	stats.effects.process(L, stats, ret);
+	stats.effects.process(gs, inst, ret);
 	return ret;
 }
 

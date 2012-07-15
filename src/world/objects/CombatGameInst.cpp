@@ -35,8 +35,8 @@ void CombatGameInst::update_field_of_view() {
 }
 
 void CombatGameInst::step(GameState* gs) {
-	estats = stats().effective_stats_without_atk(gs);
-	stats().step();
+	estats = stats().effective_stats(gs, this);
+	stats().step(gs, this);
 }
 
 /* Getters */
@@ -179,7 +179,7 @@ void CombatGameInst::equip(item_id item, int amnt) {
 }
 
 void CombatGameInst::init(GameState* gs) {
-	estats = stats().effective_stats_without_atk(gs);
+	estats = stats().effective_stats(gs, this);
 }
 
 static float proportion_in_same_dir(float vx1, float vy1, float vx2,
@@ -264,8 +264,8 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 }
 
 void CombatGameInst::update_position() {
-	x = (int) round(rx); //update based on rounding of true float
-	y = (int) round(ry);
+	x = (int)round(rx); //update based on rounding of true float
+	y = (int)round(ry);
 }
 
 void CombatGameInst::update_position(float newx, float newy) {
@@ -300,7 +300,7 @@ static void combine_stat_hash(unsigned int& hash, CombatStats& stats) {
 }
 unsigned int CombatGameInst::integrity_hash() {
 	unsigned int hash = GameInst::integrity_hash();
-	combine_hash(hash, (unsigned int&) vx, (unsigned int&) vy);
+	combine_hash(hash, (unsigned int&)vx, (unsigned int&)vy);
 	combine_stat_hash(hash, stats());
 	return hash;
 }

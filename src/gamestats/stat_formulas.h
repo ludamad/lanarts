@@ -11,12 +11,13 @@ struct Attack;
 struct CombatStats;
 struct EffectiveAttackStats;
 struct EffectiveStats;
+class CombatGameInst;
 class GameState;
 
 int damage_formula(const EffectiveAttackStats& attacker,
 		const EffectiveStats& defender);
 
-EffectiveStats effective_stats(GameState* gs, const CombatStats& stats);
+EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst, const CombatStats& stats);
 int experience_needed_formula(int xplevel);
 
 #endif /* STAT_FORMULAS_H_ */

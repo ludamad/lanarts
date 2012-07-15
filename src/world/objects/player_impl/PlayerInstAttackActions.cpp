@@ -408,7 +408,7 @@ bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 	return attack_used;
 }
 
-void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
+void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 	WeaponEntry& wentry = weapon().weapon_entry();
 	MTwist& mt = gs->rng();
 	const int MAX_MELEE_HITS = 10;

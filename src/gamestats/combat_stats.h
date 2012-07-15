@@ -15,6 +15,7 @@
 #include "stats.h"
 
 struct lua_State;
+class CombatGameInst;
 class GameState;
 
 /* Represents stats related to a single attack option */
@@ -48,11 +49,11 @@ struct CombatStats {
 					std::vector<AttackStats>(), float movespeed = 0.0f);
 
 	void init();
-	void step();
+	void step(GameState* gs, CombatGameInst* inst);
 
 	bool has_died();
 
-	EffectiveStats effective_stats_without_atk(GameState* gs) const;
+	EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst) const;
 
 	void gain_level();
 	int gain_xp(int amnt);
