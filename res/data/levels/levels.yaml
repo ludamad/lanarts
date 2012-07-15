@@ -1,0 +1,283 @@
+--- 
+
+#Dungeon Markup
+
+default_items: &default_items
+  - { item: Arrow,              chance: 10,  quantity: [2,8]  }
+  - { item: Silver Arrow,       chance: 10,  quantity: [1,4]   }
+  - { item: Short Bow,          chance: 10                     }
+  - { item: Stone,              chance: 10,  quantity: [2,8]   }
+  - { item: Gold,               chance: 75,  quantity: [5,20]  }
+  - { item: Haste Scroll,       chance: 10                     }
+  - { item: Health Potion,      chance: 10                     }
+  - { item: Mana Potion,        chance: 10                     }
+  - { item: Dagger,             chance: 15                     }
+  - { item: Short Sword,        chance: 10                     }
+  - { item: Mace,               chance: 5                      }
+  - { item: Strength Scroll,    chance: 2                      }
+  - { item: Magic Scroll,       chance: 2                      }
+  - { item: Defence Scroll,     chance: 2                      }
+  - { item: Will Scroll,        chance: 2                      }
+
+easy_animals: &easy_animals
+  - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 2 }
+  - { enemy: Giant Bat,         chance: 100                                   }
+  - { enemy: Hound,             chance: 60                                    }
+  - { enemy: Sheep,             chance: 60                                    }
+
+medium_animals: &medium_animals
+  - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 3 }
+  - { enemy: Giant Bat,         chance: 100,  group_chance: 33, group_size: 3 }
+  - { enemy: Hound,             chance: 100                                   }
+  - { enemy: Sheep,             chance: 100                                   }
+  - { enemy: Giant Frog,        chance: 100                                   }
+
+easy_enemies: &easy_enemies
+  - { enemy: Skeleton,          chance: 100                                   }
+  - { enemy: Hound,             chance: 100                                   }
+  - { enemy: Chicken,           chance: 100                                   }
+  - { enemy: Cloud Elemental,   chance: 100,  group_chance: 33, group_size: 2 }
+  - { enemy: Unseen Horror,     chance: 20                                    }
+
+medium_enemies: &medium_enemies
+  - { enemy: Skeleton,          chance: 100                                   }
+  - { enemy: Chicken,           chance: 50                                    }
+  - { enemy: Zombie,            chance: 100                                   }
+  - { enemy: Storm Elemental,   chance: 66,  group_chance: 33, group_size: 2  }
+  - { enemy: Unseen Horror,     chance: 30                                    }
+  - { enemy: Krell,             chance: 30                                    }
+ 
+hard_enemies: &hard_enemies
+ - { enemy: Skeleton,          chance: 50                                    }
+ - { enemy: Storm Elemental,   chance: 66,  group_chance: 33, group_size: 2  }
+ - { enemy: Grue                                                             }
+ - { enemy: Chicken,           chance: 25,  group_chance: 50, group_size: 3  }
+ - { enemy: Super Chicken,     chance: 100                                   }
+ - { enemy: Zombie,            chance: 75                                    }
+ - { enemy: Ciribot,           chance: 75                                    }
+ - { enemy: Golem,             guaranteed_spawns: 1                          }
+ - { enemy: Krell,             chance: 30                                    }
+ - { enemy: Storm Elemental,   chance: 50,  group_chance: 33, group_size: 3  }
+ - { enemy: Hell Forged,       chance: 10                                    }
+ - { enemy: Unseen Horror,     chance: 30,  group_chance: 33, group_size: 2  }
+
+harder_enemies: &harder_enemies
+  - { enemy: Super Chicken,     chance: 50,  group_chance: 33, group_size: [2,4]}
+  - { enemy: Imp,               chance: 50                                    }
+  - { enemy: Ciribot,           chance: 100                                   }
+  - { enemy: Storm Elemental,   chance: 50,  group_chance: 33, group_size: 4  }
+  - { enemy: Grue,              chance: 50,  group_chance: 33, group_size: 2  }
+  - { enemy: Golem,             guaranteed_spawns: 1,  group_chance: 100, group_size: 2}
+  - { enemy: Jester,            chance: 20,                                   }
+  - { enemy: Hell Forged,       chance: 25                                    }
+  - { enemy: Unseen Horror,     chance: 30,  group_chance: 33, group_size: 2  }
+
+layouts:
+      - &test_layout
+        size: [70,70]
+        rooms:    { padding: 1, amount: 1,  size: [60,60]}
+        tunnels:  { padding: 2, width: [1,2], per_room: 0}
+      - &tiny_layout1
+        size: [[35,45],[35,46]] #[width] by [height]
+        rooms:    { padding: 1, amount: 3,  size: [10,10]}
+        tunnels:  { padding: 2, width: [1,2], per_room: 5}
+        
+      - &tiny_layout2
+        size: [[35,45],[35,46]] #[width] by [height]
+        rooms:    { padding: 1, amount: 6,  size: [5,10] }
+        tunnels:  { padding: 2, width: [1,2], per_room: 5}
+
+      - &tiny_layout3
+        size: [20,60]
+        rooms:    { padding: 1, amount: [5,10], size: [4,8] }
+        tunnels:  { padding: 1, width: [1,3],  per_room: [2,3] }
+
+      - &small_layout1
+        size: [40, 40]
+        rooms:    { padding: 0, amount: 40, size: [4,4] }
+        tunnels:  { padding: 0, width: 1,   per_room: 5 }
+
+      - &small_layout2
+        size: [50, 50]
+        rooms:    { padding: 1, amount: 20, size: [10,10]}
+        tunnels:  { padding: 1, width: 1,  per_room: 2   }
+        
+      - &small_layout3
+        size: [64, 64]
+        rooms:    { padding: 1, amount: 23, size: [4,6] }
+        tunnels:  { width: [1,2], per_room: [2, 5]      }
+      
+      - &small_layout4
+        size: [76, 76]
+        rooms:    { padding: 1, amount: 20, size: [8,10]}
+        tunnels:  { width: [1,2], per_room: [2, 5]      }
+      
+      - &small_layout5
+        size: [90, 60]
+        rooms:
+          - { padding: 1, amount: [3,4], size: 15}
+          - { padding: 1, amount: [8,10], size: [8,10] }
+        tunnels:  { width: [1,2], per_room: 2        }
+          
+      - &medium_layout1
+        size: [[60,80], [60,80]]
+        rooms:
+          - { padding: 1, amount: [3,4], size: 5}
+          - { padding: 4, amount: 20, size: [10,30]}
+        tunnels:  { width: [2,6], per_room: [2, 3]      }
+          
+      - &medium_layout2
+        size: [[60,80], [60,80]]
+        rooms:
+          - { padding: 1, amount: [3,4], size: 5}
+          - { padding: 4, amount: 20, size: [10,30]}
+        tunnels:  { width: [1,5], per_room: [2, 20]      }
+
+      - &large_layout1
+        size: [[70,90], [70,90]]
+        rooms:
+          padding: 3
+          amount: 15
+          size: [8,12]
+        tunnels:
+          width: [1, 3]
+          per_room: 9   
+      - &large_layout2
+        size: [[70,90], [70,90]]
+        rooms:
+          padding: 3
+          amount: 15
+          size: [8,12]
+        tunnels:
+          width: [1, 3]
+          per_room: 9
+      - &large_layout3
+        size: [[70,90], [70,90]]
+        rooms:
+          - { padding: 1, amount: [5,10], size: 15}
+          - { padding: 1, amount: [15,20], size: [8,15] }
+        tunnels:
+          width: [1, 3]
+          per_room: 9
+
+tiny_layouts: &tiny_layouts
+  [*tiny_layout1, *tiny_layout2, *tiny_layout3]    
+small_layouts: &small_layouts
+  [*small_layout1, *small_layout2, *small_layout3, *small_layout4, *small_layout5]
+medium_layouts: &medium_layouts
+  [*medium_layout1, *medium_layout2]        
+large_layouts: &large_layouts
+  [*large_layout1, *large_layout2, *large_layout3]
+all_tilesets: &all_tilesets
+  [lair_tiles1, lair_tiles2, cobalt_tiles, pebble_tiles, crystal_tiles, 
+  crystal_tiles_with_marble, cobble]
+
+areas:
+  - branch: main_branch
+    levels:
+#     #Test Level
+#      - layout: [*test_layout]
+#        content:
+#          features: { tileset: [lair_tiles1, lair_tiles2],     stairs_up: 0  }
+#          items:    { amount: 3,  generated: *default_items   }
+#          enemies: { wandering: no, amount: 69, generated: *easy_animals }
+
+#tiny levels with animals
+      #Level 0
+      - layout: [*tiny_layout1]
+        content:
+          features: { tileset: [lair_tiles1, lair_tiles2],     stairs_up: 3  }
+          items:    { amount: 3,  generated: *default_items   }
+          enemies: { wandering: no, amount: 5, generated: *easy_animals }
+          
+      #Level 1
+      - layout: *tiny_layouts
+        content:
+          features: { tileset: [lair_tiles1, lair_tiles2]}
+          items:    { amount: 3,  generated: *default_items   }
+          enemies: { wandering: no, amount: 8, generated: *easy_animals }
+        
+      #Level 2
+      - layout: *tiny_layouts
+        content:
+          features: { tileset: [lair_tiles1, lair_tiles2]}
+          items:    { amount: 3,  generated: *default_items   }          
+          enemies: { 
+            wandering: no, amount: 12, 
+            generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}] 
+          }
+      #Level 3
+      - layout: *small_layouts
+        content:
+          features: { tileset: [lair_tiles1, lair_tiles2, crystal_tiles, crystal_tiles_with_marble]}
+          items:    { amount: 5,  generated: *default_items   }
+          enemies:  { amount: [10,14], generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}]  }      
+          
+#small levels with easy enemies
+      #Level 4
+      - layout: [*small_layout1]
+        content:
+          features: { tileset: [crystal_tiles, crystal_tiles_with_marble]}
+          items:    { amount: 8,  generated: *default_items   }
+          enemies:  { amount: 14,  generated: *easy_enemies    }
+      #Level 5
+      - layout: *small_layouts
+        content:
+          features: { tileset: pebble_tiles}
+          items:    { amount: 5,  generated: *default_items   }
+          enemies: {  amount: 14, generated: *medium_enemies }      
+          
+      #Level 6
+      - layout: *small_layouts 
+        content:
+          features: { tileset: *all_tilesets}
+          items:    { amount: 5,  generated: *default_items   }
+          enemies:
+            amount: 15
+            generated:
+              - {default: *medium_enemies}
+              - {enemy: Red Dragon, guaranteed_spawns: 1}
+          
+      #Level 7
+      - layout: *medium_layouts
+        content:
+          features: { tileset: *all_tilesets}
+          items:    { amount: 5,  generated: *default_items   }
+          enemies:  { amount: 15, generated: *hard_enemies }
+      
+      #Level 8
+      - layout: *medium_layouts
+        content:
+          features: { tileset: *all_tilesets}
+          items:    { amount: 6,  generated: *default_items   }
+          enemies:     
+            amount: 20     
+            generated: *hard_enemies
+      
+      #Level 9
+      - layout: *large_layouts
+        content:
+          features: { tileset: *all_tilesets}
+          items:    { amount: 7,  generated: *default_items   }
+          enemies:   
+            amount: 25       
+            generated: *hard_enemies
+      
+      #Level 10
+      - layout: *large_layouts
+        content:
+          features: { tileset: *all_tilesets}
+          items:    { amount: 8,  generated: *default_items   }
+          enemies:   
+            amount: 30       
+            generated: *harder_enemies
+      #Level 11
+      - layout: *large_layouts
+        content:
+          features: { tileset: *all_tilesets, stairs_down: 0}
+          items:    { amount: 9,  generated: *default_items   }
+          enemies:          
+            amount: 40
+            generated:
+              - {default: *harder_enemies}
+              - {enemy: Zin, guaranteed_spawns: 1}

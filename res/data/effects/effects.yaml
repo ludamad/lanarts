@@ -1,0 +1,11 @@
+--- 
+
+#Effect Markup
+    
+effects:
+  - name: Haste
+    stat_func: haste_statmod
+    testvalue: 1
+  - name: Poison
+    stat_func: poison_statmod
+    step_func: poison_step
