@@ -24,7 +24,7 @@ struct EffectStats {
 		}
 	}
 	bool has_active_effect() const;
-	void add(effect_id effect, int length);
+	LuaValue add(GameState* gs, effect_id effect, int length);
 	Effect* get(effect_id effect);
 	void step(GameState* gs, CombatGameInst* inst);
 

@@ -3,6 +3,7 @@
 
 #include "../data/effect_data.h"
 #include "../data/item_data.h"
+#include "../data/lua_game_data.h"
 
 #include "../gamestats/stats.h"
 
@@ -42,8 +43,17 @@ public:
 		get_stats()->core.heal_fully();
 		return 0;
 	}
-	int hurt(lua_State* L) {
+	int direct_damage(lua_State* L) {
 		get_combat_inst()->damage(lua_get_gamestate(L), lua_tonumber(L, 1));
+		return 0;
+	}
+	int damage(lua_State* L) {
+		EffectiveAttackStats attack;
+		int nargs = lua_gettop(L);
+		attack.power = lua_tonumber(L, 1);
+		attack.damage = lua_tonumber(L, 2);
+		attack.magic_percentage = nargs >= 3 ? lua_tonumber(L, 3) : 1.0f;
+		get_combat_inst()->damage(lua_get_gamestate(L), attack);
 		return 0;
 	}
 	int equip(lua_State* L) {
@@ -61,13 +71,17 @@ public:
 		}
 		return 0;
 	}
-	int hasten(lua_State* L) {
+	int add_effect(lua_State* L) {
 		CombatGameInst* combatinst;
 		if ((combatinst = dynamic_cast<CombatGameInst*>(get_inst()))) {
-			combatinst->effects().add(get_effect_by_name("Haste"),
-					lua_tonumber(L, 1));
+			LuaValue effect = combatinst->effects().add(lua_get_gamestate(L),
+					effect_from_lua(L, 1), lua_tonumber(L, 2));
+			effect.push(L);
+		} else {
+			lua_pushnil(L);
 		}
-		return 0;
+
+		return 1;
 	}
 	int move_to(lua_State* L) {
 		inst->update_position(lua_tonumber(L, 1), lua_tonumber(L, 2));
@@ -168,8 +182,9 @@ static int lua_member_update(lua_State* L) {
 }
 
 meth_t bind_t::methods[] = { LUA_DEF(heal_fully), LUA_DEF(move_to),
-		LUA_DEF(heal_hp), LUA_DEF(heal_mp), LUA_DEF(hurt), LUA_DEF(equip),
-		LUA_DEF(hasten), LUA_DEF(hasten), meth_t(0, 0) };
+		LUA_DEF(heal_hp), LUA_DEF(heal_mp), LUA_DEF(direct_damage),
+		LUA_DEF(damage), LUA_DEF(equip), LUA_DEF(add_effect),
+		LUA_DEF(add_effect), meth_t(0, 0) };
 
 void lua_gameinst_bindings(GameState* gs, lua_State* L) {
 	lunar_t::Register(L);

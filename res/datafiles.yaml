@@ -10,7 +10,7 @@ class_files:
   - classes.yaml
 
 effect_files: 
-  - effects.yaml
+  - effects/effects.yaml
 
 enemy_files: 
   - enemies/animal_enemies.yaml
@@ -24,7 +24,7 @@ item_files:
   - items/items.yaml
 
 level_files: 
-  - levels.yaml
+  - levels/levels.yaml
 
 projectile_files: 
   - projectiles/projectiles.yaml

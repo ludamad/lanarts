@@ -6,6 +6,12 @@
 #include <cstdio>
 #include <typeinfo>
 
+extern "C" {
+#include <lua/lua.h>
+#include <lua/lauxlib.h>
+#include <lua/lualib.h>
+}
+
 #include "../../data/sprite_data.h"
 #include "../../data/projectile_data.h"
 #include "../../data/weapon_data.h"
@@ -16,6 +22,8 @@
 #include "../../util/colour_constants.h"
 
 #include "../../util/world/collision_util.h"
+
+#include "../../lua/lua_api.h"
 
 #include "../utility_objects/AnimatedInst.h"
 
@@ -76,6 +84,20 @@ ProjectileInst* ProjectileInst::clone() const {
 	return new ProjectileInst(*this);
 }
 
+static void lua_hit_callback(lua_State* L, LuaValue& callback,
+		const EffectiveAttackStats& atkstats, GameInst* projectile,
+		GameInst* target) {
+	callback.push(L);
+	if (!lua_isnil(L, -1)) {
+		lua_push_gameinst(L, projectile);
+		lua_push_gameinst(L, target);
+		lua_push_effectiveattackstats(L, atkstats);
+		lua_call(L, 3, 0);
+	} else {
+		lua_pop(L, 1);
+	}
+}
+
 void ProjectileInst::step(GameState* gs) {
 	Pos tile_hit;
 	int newx = (int)round(rx + vx); //update based on rounding of true float
@@ -117,7 +139,14 @@ void ProjectileInst::step(GameState* gs) {
 
 		if (colobj) {
 			EnemyInst* victim = (EnemyInst*)colobj;
-			origin->signal_attacked_successfully();
+			if (origin) {
+				origin->signal_attacked_successfully();
+			}
+
+			lua_hit_callback(gs->get_luastate(),
+					projectile.projectile_entry().on_hit_func, atkstats, this,
+					victim);
+
 			int damage = damage_formula(atkstats, victim->effective_stats());
 			damage *= damage_mult;
 
@@ -151,6 +180,10 @@ void ProjectileInst::step(GameState* gs) {
 			if (origin) {
 				origin->signal_attacked_successfully();
 			}
+
+			lua_hit_callback(gs->get_luastate(),
+					projectile.projectile_entry().on_hit_func, atkstats, this,
+					victim);
 
 			int damage = damage_formula(atkstats, victim->effective_stats());
 			damage *= damage_mult;

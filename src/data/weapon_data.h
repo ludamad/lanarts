@@ -26,11 +26,16 @@ struct WeaponEntry {
 	int range, dmgradius, cooldown;
 	sprite_id item_sprite, attack_sprite;
 	projectile_id created_projectile; // for infinite ammo weapons
+	LuaValue on_hit_func;
 
 	WeaponEntry() :
 			uses_projectile(false), max_targets(0), percentage_magic(0.0f), range(
 					0), dmgradius(0), cooldown(0), item_sprite(-1), attack_sprite(
 					-1), created_projectile(-1) {
+	}
+
+	void init(lua_State* L) {
+		on_hit_func.initialize(L);
 	}
 };
 

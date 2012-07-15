@@ -408,6 +408,18 @@ bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 	return attack_used;
 }
 
+static void lua_hit_callback(lua_State* L, LuaValue& callback, GameInst* user,
+		GameInst* target) {
+	callback.push(L);
+	if (!lua_isnil(L, -1)) {
+		lua_push_gameinst(L, user);
+		lua_push_gameinst(L, target);
+		lua_call(L, 2, 0);
+	} else {
+		lua_pop(L, 1);
+	}
+}
+
 void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 	WeaponEntry& wentry = weapon().weapon_entry();
 	MTwist& mt = gs->rng();
@@ -460,6 +472,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 
 		for (int i = 0; i < numhit; i++) {
 			EnemyInst* e = (EnemyInst*)enemies[i];
+			lua_hit_callback(gs->get_luastate(), wentry.on_hit_func, this, e);
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
 				PlayerController& pc = gs->player_controller();
 				signal_killed_enemy();

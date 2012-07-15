@@ -4,6 +4,7 @@ extern "C" {
 }
 
 #include "../data/effect_data.h"
+#include "../data/lua_game_data.h"
 
 #include "../lua/lua_api.h"
 
@@ -85,14 +86,32 @@ Effect* EffectStats::get(int effect) {
 	return NULL;
 }
 
-void EffectStats::add(int effect, int length) {
+static void lua_init_table(lua_State* L, LuaValue& value, effect_id effect) {
+	value.table_initialize(L);
+	EffectEntry& eentry = game_effect_data.at(effect);
+	value.push(L);
+	/* Set self as metatable*/
+	lua_pushvalue(L, -1);
+	lua_setmetatable(L, -2);
+	/* Set index as effect object */
+	lua_effects.table_push_value(L, eentry.name.c_str());
+	lua_setfield(L, -2, "__index");
+	/* Pop self */
+	lua_pop(L, 1);
+}
+
+LuaValue EffectStats::add(GameState* gs, effect_id effect, int length) {
+	lua_State* L = gs->get_luastate();
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining == 0 || effects[i].effect == effect) {
 			effects[i].effect = effect;
-			effects[i].t_remaining += length;
-			return;
+			effects[i].t_remaining = std::max(effects[i].t_remaining, length);
+			if (effects[i].state.empty()) {
+				lua_init_table(L, effects[i].state, effect);
+			}
+			return effects[i].state;
 		}
 	}
-
+	return LuaValue();
 }
 

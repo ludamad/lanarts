@@ -144,7 +144,6 @@ tileset_id get_tileset_by_name(const char* name) {
 	return get_X_by_name(game_tileset_data, name);
 }
 
-
 //Lua argument getters
 item_id item_from_lua(lua_State* L, int idx) {
 	return get_X_by_name(game_item_data, lua_tostring(L, idx));
@@ -180,35 +179,36 @@ tileset_id tileset_from_lua(lua_State* L, int idx) {
 	return get_X_by_name(game_tileset_data, lua_tostring(L, idx));
 }
 
-LuaValue sprites, armours, enemies, effects, weapons, projectiles, items,
-		dungeon, classes, spells;
+LuaValue lua_sprites, lua_armours, lua_enemies, lua_effects, lua_weapons,
+		lua_projectiles, lua_items, lua_dungeon, lua_classes, lua_spells;
 void init_game_data(lua_State* L) {
 	DataFiles dfiles = load_datafiles_data("res/datafiles.yaml");
 
 //NB: Do not re-order the way resources are loaded unless you know what you're doing
 	load_tile_data(dfiles.tile_files);
-	sprites = load_sprite_data(L, dfiles.sprite_files);
-	sprites.deinitialize(L);
+	lua_sprites = load_sprite_data(L, dfiles.sprite_files);
+	lua_sprites.deinitialize(L);
 	load_tileset_data(dfiles.tileset_files);
 	//TODO: make separate weapons table ?
-	items = load_item_data(L, dfiles.item_files);
+	lua_items = load_item_data(L, dfiles.item_files);
 
-	projectiles = load_projectile_data(L, dfiles.projectile_files, items);
+	lua_projectiles = load_projectile_data(L, dfiles.projectile_files,
+			lua_items);
 	load_projectile_item_entries();
 
-	spells = load_spell_data(L, dfiles.spell_files);
+	lua_spells = load_spell_data(L, dfiles.spell_files);
 
-	load_weapon_data(L, dfiles.weapon_files, &items);
+	load_weapon_data(L, dfiles.weapon_files, &lua_items);
 	load_weapon_item_entries();
 
-	load_armour_data(L, dfiles.armour_files, &items);
+	load_armour_data(L, dfiles.armour_files, &lua_items);
 	load_armour_item_entries();
 
-	effects = load_effect_data(L, dfiles.effect_files);
-	enemies = load_enemy_data(L, dfiles.enemy_files);
-	dungeon = load_dungeon_data(L, dfiles.level_files);
-	dungeon.deinitialize(L);
-	classes = load_class_data(L, dfiles.class_files);
+	lua_effects = load_effect_data(L, dfiles.effect_files);
+	lua_enemies = load_enemy_data(L, dfiles.enemy_files);
+	lua_dungeon = load_dungeon_data(L, dfiles.level_files);
+	lua_dungeon.deinitialize(L);
+	lua_classes = load_class_data(L, dfiles.class_files);
 }
 
 static void register_as_global(lua_State* L, LuaValue& value,
@@ -227,22 +227,24 @@ void init_lua_data(GameState* gs, lua_State* L) {
 	//Lua configuration
 	lua_lanarts_api(gs, L);
 
-	register_as_global(L, enemies, "enemies");
-	register_as_global(L, effects, "effects");
+	register_as_global(L, lua_enemies, "enemies");
+	register_as_global(L, lua_effects, "effects");
 //	register_as_global(L, weapons, "weapons");
-	register_as_global(L, items, "items");
-	register_as_global(L, projectiles, "projectiles");
-	register_as_global(L, spells, "spells");
+	register_as_global(L, lua_items, "items");
+	register_as_global(L, lua_projectiles, "projectiles");
+	register_as_global(L, lua_spells, "spells");
 //	register_as_global(L, sprites, "sprites");
 //	register_as_global(L, dungeon, "dungeon");
-	register_as_global(L, classes, "classes");
+	register_as_global(L, lua_classes, "classes");
 
 	luaL_dofile(L, "res/main.lua");
 
 	__lua_init(L, game_enemy_data);
 	__lua_init(L, game_effect_data);
+	__lua_init(L, game_projectile_data);
 	__lua_init(L, game_item_data);
 	__lua_init(L, game_spell_data);
+	__lua_init(L, game_weapon_data);
 
 //	lua_getglobal(L, "level_tests");
 //	lua_call(L, 0, 0);
@@ -255,14 +257,15 @@ static void luayaml_push(LuaValue& value, lua_State *L, const char* name) {
 	lua_replace(L, tableind);
 }
 void luayaml_push_item(lua_State *L, const char* name) {
-	luayaml_push(items, L, name);
+	luayaml_push(lua_items, L, name);
 }
 void luayaml_push_sprites(lua_State *L, const char* name) {
-	luayaml_push(sprites, L, name);
+	luayaml_push(lua_sprites, L, name);
 }
 void luayaml_push_enemies(lua_State *L, const char* name) {
-	luayaml_push(enemies, L, name);
+	luayaml_push(lua_enemies, L, name);
 }
+
 void luayaml_push_levelinfo(lua_State *L, const char* name) {
-	luayaml_push(dungeon, L, name);
+	luayaml_push(lua_dungeon, L, name);
 }

@@ -164,7 +164,7 @@ bool EnemyInst::within_field_of_view(const Pos & pos) {
 
 void EnemyInst::die(GameState *gs) {
 	if (!destroyed) {
-		gs->add_instance(new AnimatedInst(x, y, etype().enemy_sprite, 15));
+		gs->add_instance(new AnimatedInst(x, y, etype().enemy_sprite, 20));
 		gs->monster_controller().deregister_enemy(this);
 		gs->remove_instance(this);
 		show_defeat_message(gs->game_chat(), etype());

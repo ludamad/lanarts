@@ -12,6 +12,7 @@
 #include "../gamestats/stats.h"
 
 #include "../util/game_basic_structs.h"
+#include "../util/LuaValue.h"
 
 struct ProjectileEntry {
 	std::string name, description;
@@ -29,6 +30,8 @@ struct ProjectileEntry {
 	int number_of_target_bounces;
 	int cooldown, range, radius;
 
+	LuaValue on_hit_func;
+
 	ProjectileEntry() :
 			percentage_magic(0.0f), drop_chance(0), speed(0.0f), can_wall_bounce(
 					false), number_of_target_bounces(0), cooldown(0), range(0), radius(
@@ -38,6 +41,10 @@ struct ProjectileEntry {
 
 	bool is_unarmed() {
 		return weapon_class == "unarmed" || weapon_class == "magic";
+	}
+
+	void init(lua_State* L) {
+		on_hit_func.initialize(L);
 	}
 };
 

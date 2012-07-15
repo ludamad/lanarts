@@ -45,6 +45,7 @@ public:
 	virtual void update_position(float newx, float newy);
 
 	bool damage(GameState* gs, int dmg);
+	bool damage(GameState* gs, const EffectiveAttackStats& attack);
 	bool melee_attack(GameState* gs, CombatGameInst* inst, const Weapon& projectile);
 	bool projectile_attack(GameState* gs, CombatGameInst* inst, const Weapon& weapon, const Projectile& projectile);
 	//bool spell_attack ...

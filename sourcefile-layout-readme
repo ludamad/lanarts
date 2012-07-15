@@ -18,24 +18,22 @@ res:
 	settings.yaml:
 		Defines user configuration options like debug and network options
 	data:
-		YAML files
+		YAML files and lua scripts that define function callbacks. 
+		Lua still needs lots of expansion so that lanarts acts more like a generic engine.
 		
 		levels.yaml:
 			Implements all the level generation descriptions		
 		objects:
-			yaml markup for objects implemented in lua, unused
+			yaml/lua markup for objects implemented in lua, unused
 		projectiles:
 			yaml projectiles, including ones for use in spells, use by enemies, and use as/with weapons
 		spells:
-			yaml markup for spells, needs expansion in code for good use
+			yaml/lua markup for spells, needs expansion in code for good use
 		weapons:
-			yaml markup for weapons, includes items and enemy weapons which may be more abstract		
+			yaml/lua markup for weapons, includes items and enemy weapons which may be more abstract		
 			
 	fonts:
 		font files
-	lua:
-		lua scripts that define function callbacks. 
-		Needs lots of expansion so that lanarts acts more like a generic engine.
 	sprites:
 		All the image files for lanarts except tiles
 	tiles:

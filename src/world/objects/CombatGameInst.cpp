@@ -30,6 +30,10 @@ bool CombatGameInst::damage(GameState* gs, int dmg) {
 	cooldowns().reset_hurt_cooldown(HURT_COOLDOWN);
 	return false;
 }
+bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
+	int dmg = damage_formula(attack, effective_stats());
+	return damage(gs, dmg);
+}
 
 void CombatGameInst::update_field_of_view() {
 }

@@ -26,5 +26,8 @@ sprites:
         
   - name: large fire
     file: res/sprites/effects/cloud_fire2.png
+        
+  - name: book
+    file: res/sprites/items/book.png
 
     

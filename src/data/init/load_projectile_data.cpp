@@ -47,6 +47,9 @@ void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
 	entry.radius = parse_defaulted(node, "radius", 5);
 	entry.range = parse_defaulted(node, "range", 0);
 
+	entry.on_hit_func = LuaValue(
+			parse_defaulted(node, "on_hit_func", std::string()));
+
 	game_projectile_data.push_back(entry);
 	if (value)
 		value->table_set_yaml(L, game_projectile_data.back().name, node);

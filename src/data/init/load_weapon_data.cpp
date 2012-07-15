@@ -65,6 +65,9 @@ void load_weapon_callbackf(const YAML::Node& node, lua_State* L,
 		entry.created_projectile = get_projectile_by_name(name.c_str());
 	}
 
+	entry.on_hit_func = LuaValue(
+			parse_defaulted(node, "on_hit_func", std::string()));
+
 	game_weapon_data.push_back(entry);
 	if (value)
 		value->table_set_yaml(L, game_weapon_data.back().name, node);

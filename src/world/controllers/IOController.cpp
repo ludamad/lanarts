@@ -80,8 +80,8 @@ IOController::IOController() {
 //	// Item choice
 //	bind_key_events(event_bindings, "yuiop67890", IOEvent::USE_ITEM_N, item_mod,
 //			KMOD_NONE, false);
-	bind_key_events(event_bindings, "1234567890", IOEvent::USE_ITEM_N, KMOD_NONE,
-			KMOD_NONE, false);
+	bind_key_events(event_bindings, "1234567890", IOEvent::USE_ITEM_N,
+			KMOD_NONE, KMOD_NONE, false);
 
 	/*Scroll spell up*/
 	{
@@ -90,8 +90,11 @@ IOController::IOController() {
 				SDLKey(0), KMOD_NONE, KMOD_NONE, true);
 		IOEventTrigger trigger2(event, IOEventTrigger::NONE, SDLKey('e'),
 				KMOD_NONE, KMOD_NONE);
+		IOEventTrigger trigger3(event, IOEventTrigger::NONE, SDLKey('.'),
+				KMOD_NONE, KMOD_NONE);
 		event_bindings.push_back(trigger1);
 		event_bindings.push_back(trigger2);
+		event_bindings.push_back(trigger3);
 	}
 	/*Scroll spell down*/
 	{
@@ -100,8 +103,11 @@ IOController::IOController() {
 				SDLKey(0), KMOD_NONE, KMOD_NONE, true);
 		IOEventTrigger trigger2(event, IOEventTrigger::NONE, SDLKey('q'),
 				KMOD_NONE, KMOD_NONE);
+		IOEventTrigger trigger3(event, IOEventTrigger::NONE, SDLKey(','),
+				KMOD_NONE, KMOD_NONE);
 		event_bindings.push_back(trigger1);
 		event_bindings.push_back(trigger2);
+		event_bindings.push_back(trigger3);
 	}
 	/*Use weapon*/
 	{
@@ -109,7 +115,7 @@ IOController::IOController() {
 		IOEventTrigger trigger1(event, IOEventTrigger::MOUSE_MIDDLE_CLICK,
 				SDLKey(0), KMOD_NONE, KMOD_NONE, true);
 		IOEventTrigger trigger2(event, IOEventTrigger::NONE, SDLKey('h'),
-				KMOD_NONE, KMOD_NONE);
+				KMOD_NONE, KMOD_NONE, true);
 		event_bindings.push_back(trigger1);
 		event_bindings.push_back(trigger2);
 	}

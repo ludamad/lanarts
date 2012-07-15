@@ -25,6 +25,7 @@ EffectEntry parse_effect(const YAML::Node& n) {
 void load_effect_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	game_effect_data.push_back(parse_effect(node));
+	value->table_set_yaml(L, parse_str(node["name"]), node);
 }
 
 LuaValue load_effect_data(lua_State* L, const FilenameList& filenames) {

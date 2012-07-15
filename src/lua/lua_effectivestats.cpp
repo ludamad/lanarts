@@ -152,6 +152,20 @@ void lua_push_effectivestats(lua_State* L, GameInst* inst) {
 void lua_push_effectivestats(lua_State* L, const EffectiveStats& stats) {
 	lunar_t::push(L, new EffectiveStatsLuaBinding(stats), true);
 }
+
+void lua_push_effectiveattackstats(lua_State* L,
+		const EffectiveAttackStats& stats) {
+	lua_newtable(L);
+	int tableidx = lua_gettop(L);
+	lua_pushnumber(L, stats.damage);
+	lua_setfield(L, tableidx, "damage");
+	lua_pushnumber(L, stats.power);
+	lua_setfield(L, tableidx, "power");
+	lua_pushnumber(L, stats.magic_percentage);
+	lua_setfield(L, tableidx, "magic_percentage");
+	lua_pushnumber(L, 1.0 - stats.magic_percentage);
+	lua_setfield(L, tableidx, "physical_percentage");
+}
 EffectiveStats& lua_get_effectivestats(lua_State* L, int idx) {
 	return *lunar_t::check(L, idx)->get_stats(L);
 }

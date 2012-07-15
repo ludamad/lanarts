@@ -4,10 +4,10 @@
 
 
 -- Include all other lua files here
-dofile "res/lua/enemies.lua"
-dofile "res/lua/items.lua"
-dofile "res/lua/effects.lua"
-dofile "res/lua/spells.lua"
+dofile "res/data/enemies/enemies.lua"
+dofile "res/data/items/items.lua"
+dofile "res/data/effects/effects.lua"
+dofile "res/data/spells/spells.lua"
 
 -- Balance measurement related files
-dofile "res/lua/tests/progressions.lua"
+dofile "res/tests/progressions.lua"
