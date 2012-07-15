@@ -28,6 +28,6 @@ spells:
     can_cast_with_cooldown: yes
     can_cast_with_held_key: no
     prereq_func: function(obj, x, y) return radius_visible_check(x, y, obj.radius) and not obj_solid_check(obj, x, y, obj.radius) end
-    action_func: function(obj, x, y) obj:move_to(x,y) endo
+    action_func: function(obj, x, y) obj:move_to(x,y) end
     #NB: if the autotarget_func returns nil, the spell is not performed
     autotarget_func: spell_choose_safest_square

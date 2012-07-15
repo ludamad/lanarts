@@ -72,15 +72,15 @@ IOController::IOController() {
 	char action_key = 'j';
 
 	// Spell choice
-	bind_key_events(event_bindings, "yuiop67890", IOEvent::ACTIVATE_SPELL_N,
+	bind_key_events(event_bindings, "yuiop", IOEvent::ACTIVATE_SPELL_N,
 			KMOD_NONE, item_mod/*rejected*/, true);
-	bind_key_events(event_bindings, "12345", IOEvent::ACTIVATE_SPELL_N,
-			KMOD_NONE, item_mod/*rejected*/, true);
+//	bind_key_events(event_bindings, "12345", IOEvent::ACTIVATE_SPELL_N,
+//			KMOD_NONE, item_mod/*rejected*/, true);
 
-	// Item choice
-	bind_key_events(event_bindings, "yuiop67890", IOEvent::USE_ITEM_N, item_mod,
-			KMOD_NONE, false);
-	bind_key_events(event_bindings, "12345", IOEvent::USE_ITEM_N, item_mod,
+//	// Item choice
+//	bind_key_events(event_bindings, "yuiop67890", IOEvent::USE_ITEM_N, item_mod,
+//			KMOD_NONE, false);
+	bind_key_events(event_bindings, "1234567890", IOEvent::USE_ITEM_N, KMOD_NONE,
 			KMOD_NONE, false);
 
 	/*Scroll spell up*/
