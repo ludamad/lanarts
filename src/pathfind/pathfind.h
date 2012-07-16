@@ -5,9 +5,11 @@
 
 #ifndef PATHFIND_H_
 #define PATHFIND_H_
-#include "../util/mtwist.h"
-#include "../util/game_basic_structs.h"
+
 #include <vector>
+
+#include "../util/game_basic_structs.h"
+#include "../util/mtwist.h"
 
 class GameState;
 
@@ -19,10 +21,13 @@ struct PathCoord {
 	PathCoord(short x, short y, int dist) :
 			x(x), y(y), distance(dist) {
 	}
-	void operator=(const PathCoord& o){
+	void operator=(const PathCoord& o) {
 		x = o.x, y = o.y, distance = o.distance;
 	}
-	bool operator<(const PathCoord& o) const{
+	bool operator<(const PathCoord& o) const {
+		if (distance == o.distance) {
+			return this > &o; // Strict weak ordering
+		}
 		return distance > o.distance;
 	}
 };
@@ -33,7 +38,8 @@ struct PathingNode {
 	PathingNode() {
 	}
 	PathingNode(bool solid, bool open, int dx, int dy, int dist) :
-			solid(solid), open(open), marked(false), dx(dx), dy(dy), distance(dist) {
+			solid(solid), open(open), marked(false), dx(dx), dy(dy), distance(
+					dist) {
 	}
 };
 
@@ -43,23 +49,34 @@ public:
 	PathInfo();
 	~PathInfo();
 
-	int width() { return w; }
-	int height() { return h; }
+	int width() {
+		return w;
+	}
+	int height() {
+		return h;
+	}
 
 //Floodfill based API
 	void calculate_path(GameState* gs, int ox, int oy, int radius);
 	//Towards object
-	void interpolated_direction(int x, int y, int w, int h, float speed, float& vx, float& vy);
-	void interpolated_direction(const BBox& bbox, float speed, float& vx, float& vy){
-		interpolated_direction(bbox.x1, bbox.y1, bbox.width(), bbox.height(), speed, vx, vy);
+	void interpolated_direction(int x, int y, int w, int h, float speed,
+			float& vx, float& vy);
+	void interpolated_direction(const BBox& bbox, float speed, float& vx,
+			float& vy) {
+		interpolated_direction(bbox.x1, bbox.y1, bbox.width(), bbox.height(),
+				speed, vx, vy);
 	}
 	//Away from object
-	void random_further_direction(MTwist& mt, int x, int y, int w, int h, float speed, float& vx, float& vy);
-	PathingNode* get(int x, int y) { return &path[alloc_w*y+x]; }
+	void random_further_direction(MTwist& mt, int x, int y, int w, int h,
+			float speed, float& vx, float& vy);
+	PathingNode* get(int x, int y) {
+		LANARTS_ASSERT( x >= 0 && x < w );
+		LANARTS_ASSERT( y >= 0 && y < h );
+		return &path[alloc_w * y + x];
+	}
 	void stake_claim(int x, int y);
 	//Call before 'interpolated_direction'
 	void adjust_for_claims(int x, int y);
-
 
 	void draw(GameState* gs);
 private:
@@ -70,11 +87,9 @@ private:
 	PathingNode* path;
 	int start_x, start_y;
 	int path_x, path_y;
-	int w,h;
+	int w, h;
 	int alloc_w, alloc_h;
 };
-
-
 
 void floodfill(PathingNode* path, int w, int h, int sx, int sy);
 

@@ -1,14 +1,11 @@
 /*
- * CombatInstController.cpp
- *
- *  Created on: Jun 9, 2012
- *      Author: 100397561
+ * CombatInstController.cpp:
+ *  Controls behaviour of CombatGameInst's
  */
 
 #include "CombatInstController.h"
 
 CombatInstController::CombatInstController() {
-	// TODO Auto-generated constructor stub
 
 }
 

@@ -1,5 +1,4 @@
 /*
- * GeneratedLevel.cpp
  * GeneratedLevel.cpp:
  * 	Utility class for room generation functions, stores generated room state & where the rooms are located
  */

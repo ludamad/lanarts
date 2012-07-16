@@ -14,9 +14,10 @@
 
 #include "../../gamestats/stat_formulas.h"
 
-#include "../../util/world/collision_util.h"
+#include "../../util/colour_constants.h"
 #include "../../util/math_util.h"
 #include "../../util/LuaValue.h"
+#include "../../util/world/collision_util.h"
 
 #include "../utility_objects/AnimatedInst.h"
 
@@ -41,6 +42,22 @@ EnemyInst::EnemyInst(int enemytype, int x, int y) :
 }
 
 EnemyInst::~EnemyInst() {
+
+}
+
+static void combine_hash(unsigned int& hash, unsigned int val1, unsigned val2) {
+	hash ^= (hash >> 11) * val1;
+	hash ^= val1;
+	hash ^= (hash >> 11) * val2;
+	hash ^= val2;
+	hash ^= hash << 11;
+}
+unsigned int EnemyInst::integrity_hash() {
+	unsigned int hash = CombatGameInst::integrity_hash();
+	combine_hash(hash, eb.current_node, eb.path_steps);
+	combine_hash(hash, eb.path_start.x, eb.path_start.y);
+	combine_hash(hash, eb.simulation_id, eb.current_action);
+	return hash;
 }
 
 EnemyEntry& EnemyInst::etype() {
@@ -58,7 +75,7 @@ void EnemyInst::init(GameState* gs) {
 //	core_stats().mp += core_stats().mp * ln / 10.0;
 //	core_stats().max_mp += core_stats().max_mp * ln / 10.0;
 
-	lua_gameinstcallback(gs->get_luastate(), etype().init_event, id);
+	lua_gameinstcallback(gs->get_luastate(), etype().init_event, this);
 }
 
 void EnemyInst::step(GameState* gs) {
@@ -77,12 +94,12 @@ static void show_appear_message(GameChat& chat, EnemyEntry& e) {
 		snprintf(buff, 100, "%s%s appears!", a_or_an, e.name.c_str());
 		chat.add_message(buff, Colour(255, 148, 120));
 	} else {
-		chat.add_message(e.appear_msg.c_str(), Colour(255, 148, 120));
+		chat.add_message(e.appear_msg.c_str(), COL_PALE_RED);
 	}
 }
 static void show_defeat_message(GameChat& chat, EnemyEntry& e) {
 	if (!e.defeat_msg.empty()) {
-		chat.add_message(e.defeat_msg, Colour(50, 205, 50));
+		chat.add_message(e.defeat_msg, COL_MUTED_GREEN);
 	}
 
 }
@@ -113,6 +130,7 @@ void EnemyInst::draw(GameState* gs) {
 
 	if (!seen) {
 		seen = true;
+		gs->enemies_seen().mark_as_seen(enemytype);
 		show_appear_message(gs->game_chat(), etype());
 	}
 
@@ -184,8 +202,8 @@ void EnemyInst::die(GameState *gs) {
 		if (etype().death_sprite > -1) {
 			const int DEATH_SPRITE_TIMEOUT = 1600;
 			gs->add_instance(
-					new AnimatedInst(x, y, etype().death_sprite, DEATH_SPRITE_TIMEOUT, 0, 0,
-							ItemInst::DEPTH));
+					new AnimatedInst(x, y, etype().death_sprite,
+							DEATH_SPRITE_TIMEOUT, 0, 0, ItemInst::DEPTH));
 		}
 	}
 }

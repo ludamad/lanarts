@@ -1,0 +1,69 @@
+/*
+ * SpellsContent.cpp:
+ *  Draws known spells in a grid, for the side bar
+ */
+
+#include "SpellsContent.h"
+
+#include "../../../data/spell_data.h"
+#include "../../../data/sprite_data.h"
+
+#include "../../../display/display.h"
+
+#include "../../../gamestats/SpellsKnown.h"
+
+#include "../../../util/colour_constants.h"
+#include "../../../util/content_draw_util.h"
+
+#include "../../GameState.h"
+
+#include "../../objects/PlayerInst.h"
+
+
+static void draw_spells_known(GameState* gs, const BBox& bbox,
+		SpellsKnown& spells, int ind_low, int ind_high) {
+	const int spell_n = spells.amount();
+	int mx = gs->mouse_x(), my = gs->mouse_y();
+	int spellidx = ind_low;
+
+	gl_draw_rectangle_outline(bbox, COL_UNFILLED_OUTLINE);
+
+	int x = bbox.x1, ex = bbox.x2;
+	for (int y = bbox.y1; y < bbox.y2; y += TILE_SIZE) {
+		if (spellidx >= spell_n)
+			break;
+
+		spell_id spell = spells.get(spellidx);
+		SpellEntry& spl_entry = game_spell_data.at(spell);
+		draw_spell_icon_and_name(gs, spl_entry, Colour(), x, y);
+
+		BBox entry_box(x, y, ex - 2, y + TILE_SIZE);
+		if (entry_box.contains(mx, my)) {
+			gl_draw_rectangle_outline(entry_box, COL_FILLED_OUTLINE);
+			draw_console_spell_description(gs, spl_entry);
+		}
+		spellidx++;
+	}
+}
+
+const int SPELLS_PER_PAGE = 40;
+
+void SpellsContent::draw(GameState* gs) const {
+	PlayerInst* p = gs->local_player();
+
+	int min_spell = SPELLS_PER_PAGE * page_number, max_spell = min_spell
+			+ SPELLS_PER_PAGE;
+	draw_spells_known(gs, bbox, p->spells_known(), min_spell, max_spell);
+}
+
+int SpellsContent::amount_of_pages(GameState* gs) {
+	PlayerInst* p = gs->local_player();
+
+	SpellsKnown& spells = p->spells_known();
+	int spells_n = spells.amount();
+	/* Add SPELLS_PER_PAGE - 1 so that 0 spells need 0 pages, 1 spell needs 1 page, etc*/
+	int spell_pages = (spells_n + SPELLS_PER_PAGE - 1) / SPELLS_PER_PAGE;
+
+	return spell_pages;
+}
+

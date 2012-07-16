@@ -1,16 +1,16 @@
 ---
 projectiles:
   - name: Arrow
+    description: A trusty arrow, for use with a bow.
     weapon_class: bows
     spr_item: arrow_item
     spr_attack: arrow_projectile
     #Stats
-    damage: {base: [2,5]}
-    power: {base: 0}
     drop_chance: 75 # % chance
     speed: 6
 
-  - name: Stone Arrow
+  - name: Silver Arrow
+    description: A deadly silver arrow.
     weapon_class: bows
     spr_item: stone_arrow_item
     spr_attack: stone_arrow_projectile
@@ -21,12 +21,13 @@ projectiles:
     speed: 5
 
   - name: Stone
+    description: A fist sized stone, good for throwing.
     weapon_class: unarmed
     spr_item: stone
     drop_chance: 90 # % chance
     #Stats
     range: 400
     speed: 8
-    cooldown: 20
+    cooldown: 45
     damage: {base: [5,8], strength: 1.0}
     power: {base: 2, strength: 0.2}

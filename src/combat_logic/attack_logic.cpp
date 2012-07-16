@@ -3,6 +3,8 @@
  *  Represents melee and spell decisions for an entity
  */
 
+#include <algorithm>
+
 #include "../gamestats/combat_stats.h"
 
 #include "../data/weapon_data.h"

@@ -75,7 +75,7 @@ EnemyGenChance parse_enemy_chance(const YAML::Node& n) {
 	egc.genchance = parse_defaulted(n, "chance", 0);
 	egc.guaranteed = parse_defaulted(n, "guaranteed_spawns", 0);
 	egc.groupchance = parse_defaulted(n, "group_chance", 0);
-	egc.groupsize = parse_defaulted(n, "group_size", Range(0, 0));
+	egc.groupsize = parse_defaulted(n, "group_size", Range(2, 2));
 	return egc;
 }
 EnemyGenSettings parse_enemy_gen(const YAML::Node& node, const char* key) {
@@ -166,6 +166,8 @@ LuaValue load_dungeon_data(lua_State* L, const FilenameList& filenames) {
 		const YAML::Node& node = root["areas"];
 		//First branch should be main branch, using node[0]:
 		parse_dungeon_branch(node[0], game_dungeon_yaml);
+		//TODO: remove this hack when there are proper subbranches
+		game_dungeon_yaml[0].content.features.nstairs_up = 0;
 
 		game_dungeon_data[0] = DungeonBranch(&game_dungeon_yaml[0],
 				game_dungeon_yaml.size());

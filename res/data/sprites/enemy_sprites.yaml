@@ -2,16 +2,28 @@
 sprites:
 #Animals
   - name: giant rat
-    file: res/sprites/monsters/giant_rat.png
+    file: res/sprites/monsters/animals/giant_rat.png
 
   - name: hound
-    file: res/sprites/monsters/hound.png
+    file: res/sprites/monsters/animals/hound.png
 
   - name: sheep
-    file: res/sprites/monsters/sheep.png
+    file: res/sprites/monsters/animals/sheep.png
+
+  - name: porcupine
+    file: res/sprites/monsters/animals/porcupine.png
+
+  - name: giant frog
+    file: res/sprites/monsters/animals/giant_frog.png
 
   - name: chicken
-    file: res/sprites/monsters/chicken.png
+    file: res/sprites/monsters/animals/chicken.png
+
+  - name: super_chicken
+    file: res/sprites/monsters/animals/superchicken.png
+
+  - name: giant bat
+    file: res/sprites/monsters/animals/bat.png
 
 #Undead
   - name: skeleton
@@ -38,9 +50,6 @@ sprites:
 
   - name: jester
     file: res/sprites/monsters/jester.png
-
-  - name: super_chicken
-    file: res/sprites/monsters/superchicken.png
 
   - name: ciribot
     file: res/sprites/monsters/ciribo.png

@@ -76,8 +76,8 @@ ProjectileInst* ProjectileInst::clone() const {
 
 void ProjectileInst::step(GameState* gs) {
 	Pos tile_hit;
-	int newx = (int) round(rx + vx); //update based on rounding of true float
-	int newy = (int) round(ry + vy);
+	int newx = (int) round(rx += vx); //update based on rounding of true float
+	int newy = (int) round(ry += vy);
 	bool collides = gs->tile_radius_test(newx, newy, radius, true, -1,
 			&tile_hit);
 	if (bounce) {
@@ -94,14 +94,12 @@ void ProjectileInst::step(GameState* gs) {
 				vx = -vx;
 				vy = -vy;
 			}
-
-			//    return;
 		}
 	} else if (collides) {
 		gs->remove_instance(this);
 	}
-	x = (int) round(rx += vx); //update based on rounding of true float
-	y = (int) round(ry += vy);
+	x = newx; //update based on rounding of true float
+	y = newy;
 
 	range_left -= speed;
 
@@ -138,7 +136,7 @@ void ProjectileInst::step(GameState* gs) {
 									AnimatedInst::DEPTH, buffstr,
 									Colour(255, 215, 11)));
 				} else
-					gs->skip_next_id();
+					gs->skip_next_instance_id();
 			}
 		}
 	} else {
@@ -172,8 +170,7 @@ void ProjectileInst::step(GameState* gs) {
 				GameInst* enemy = gs->get_instance(mid);
 				if (enemy && enemy != colobj) {
 
-					int dx = enemy->x - x, dy = enemy->y - y;
-					double abs = sqrt(dx * dx + dy * dy);
+					float abs = distance_between(Pos(x,y), Pos(enemy->x, enemy->y));
 					if (abs < 1)
 						abs = 1;
 					if (abs < mindist) {

@@ -4,7 +4,7 @@
 
 default_items: &default_items #Reference with *default_items
   - { item: Arrow,              chance: 10,  quantity: [2,8]  }
-  - { item: Stone Arrow,        chance: 10,  quantity: [1,4]   }
+  - { item: Silver Arrow,        chance: 10,  quantity: [1,4]   }
   - { item: Short Bow,          chance: 10                     }
   - { item: Stone,              chance: 10,  quantity: [2,8]   }
   - { item: Gold,               chance: 75,  quantity: [5,20]  }
@@ -21,14 +21,16 @@ default_items: &default_items #Reference with *default_items
 
 easy_animals: &easy_animals
   - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 2 }
+  - { enemy: Giant Bat,         chance: 100                                   }
   - { enemy: Hound,             chance: 60                                    }
   - { enemy: Sheep,             chance: 60                                    }
 
-easy_animals: &medium_animals
+medium_animals: &medium_animals
   - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 3 }
+  - { enemy: Giant Bat,         chance: 100,  group_chance: 33, group_size: 3 }
   - { enemy: Hound,             chance: 100                                   }
   - { enemy: Sheep,             chance: 100                                   }
-  - { enemy: Chicken,           chance: 75                                    }
+  - { enemy: Giant Frog,        chance: 100                                   }
 
 easy_enemies: &easy_enemies
   - { enemy: Skeleton,          chance: 100                                   }
@@ -54,7 +56,7 @@ medium_enemies2: &hard_enemies
  - { enemy: Hell Forged,       chance: 10                                    }
 
 harder_enemies: &harder_enemies
-  - { enemy: Super Chicken,     chance: 50,  group_chance: 33, group_size: 3  }
+  - { enemy: Super Chicken,     chance: 50,  group_chance: 33, group_size: [2,4]  }
   - { enemy: Imp,               chance: 50                                    }
   - { enemy: Ciribot,           chance: 100                                   }
   - { enemy: Storm Elemental,   chance: 50,  group_chance: 33, group_size: 3  }
@@ -63,6 +65,10 @@ harder_enemies: &harder_enemies
   - { enemy: Hell Forged,       chance: 25                                    }
 
 layouts:
+      - &test_layout
+        size: [70,70]
+        rooms:    { padding: 1, amount: 1,  size: [60,60]}
+        tunnels:  { padding: 2, width: [1,2], per_room: 0}
       - &tiny_layout1
         size: [[35,45],[35,46]] #[width] by [height]
         rooms:    { padding: 1, amount: 3,  size: [10,10]}
@@ -120,28 +126,28 @@ layouts:
           width: [1, 5]
           per_room: [2, 20]  
       - &large_layout1
-        size: [102, 102]
+        size: [95, 95]
         rooms:
           padding: 3
-          amount: 50
-          size: [6,12]
+          amount: 30
+          size: [8,12]
         tunnels:
           width: [1, 3]
           per_room: 9   
       - &large_layout2
-        size: [102, 102]
+        size: [95, 95]
         rooms:
           padding: 3
-          amount: 50
-          size: [6,12]
+          amount: 30
+          size: [8,12]
         tunnels:
           width: [1, 3]
           per_room: 9
       - &large_layout3
-        size: [102, 102]
+        size: [95, 95]
         rooms:
           - { padding: 1, amount: [5,10], size: 15}
-          - { padding: 1, amount: [50,60], size: [8,10] }
+          - { padding: 1, amount: [50,60], size: [8,15] }
         tunnels:
           width: [1, 3]
           per_room: 9
@@ -163,18 +169,24 @@ areas:
     levels:
 #tiny levels with animals
       #Level 1
+#      - layout: [*test_layout]
+#        content:
+#          features: { tileset: [lair_tiles1, lair_tiles2],     stairs_up: 0  }
+#          items:    { amount: 3,  generated: *default_items   }
+#          enemies: { wandering: yes, amount: 69, generated: *easy_animals }
+      #Level 1
       - layout: [*tiny_layout1]
         content:
-          features: { tileset: [lair_tiles1, lair_tiles2],     stairs_up: 0  }
+          features: { tileset: [lair_tiles1, lair_tiles2],     stairs_up: 3  }
           items:    { amount: 3,  generated: *default_items   }
-          enemies: { wandering: no, amount: 3, generated: *easy_animals }
+          enemies: { wandering: yes, amount: 3, generated: *easy_animals }
           
       #Level 2
       - layout: *tiny_layouts
         content:
           features: { tileset: [lair_tiles1, lair_tiles2]}
           items:    { amount: 3,  generated: *default_items   }
-          enemies: { wandering: no, amount: 5, generated: *easy_animals }
+          enemies: { wandering: yes, amount: 5, generated: *easy_animals }
         
       #Level 3
       - layout: *tiny_layouts
@@ -182,7 +194,7 @@ areas:
           features: { tileset: [lair_tiles1, lair_tiles2]}
           items:    { amount: 3,  generated: *default_items   }          
           enemies: { 
-            wandering: no, amount: 8, 
+            wandering: yes, amount: 8, 
             generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}] 
           }
       #Level 4
@@ -190,7 +202,7 @@ areas:
         content:
           features: { tileset: [lair_tiles1, lair_tiles2, crystal_tiles, crystal_tiles_with_marble]}
           items:    { amount: 5,  generated: *default_items   }
-          enemies:  { amount: [7,9], generated: *easy_enemies }      
+          enemies:  { amount: [7,9], generated: *medium_animals }      
           
 #small levels with easy enemies
       #Level 5

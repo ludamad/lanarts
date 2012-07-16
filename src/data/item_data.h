@@ -1,8 +1,7 @@
 /*
- * item_data.h
- *
- *  Created on: Dec 26, 2011
- *      Author: 100397561
+ * item_data.h:
+ *  Describes an item entry.
+ *  This struct is instantiated for every weapon, projectile, and armour entry as well.
  */
 
 #ifndef ITEM_DATA_H_
@@ -18,9 +17,9 @@ struct ItemEntry {
 	enum equip_type {
 		NONE, WEAPON, PROJECTILE, HELMET, SHIELD, ARMOUR, BOOTS
 	};
-	std::string name;
+	std::string name, description;
 	std::string use_message;
-	int sprite_number;
+	int sprite;
 	int radius;
 	LuaValue action_func, prereq_func;
 	bool stackable;
@@ -28,14 +27,15 @@ struct ItemEntry {
 	equip_type equipment_type;
 	int equipment_id;
 
-	ItemEntry(const std::string& name, const std::string& use_message, int rad,
-			int spriten, const std::string& action_luaf,
-			const std::string& prereq_luaf, bool stackable,
-			equip_type equipment_type = NONE, int equipment_id = -1) :
-			name(name), use_message(use_message), sprite_number(spriten), radius(
-					rad), action_func(action_luaf), prereq_func(prereq_luaf), stackable(
-					stackable), equipment_type(equipment_type), equipment_id(
-					equipment_id) {
+	ItemEntry(const std::string& name, const std::string& description,
+			const std::string& use_message, int rad, int spriten,
+			const std::string& action_luaf, const std::string& prereq_luaf,
+			bool stackable, equip_type equipment_type = NONE, int equipment_id =
+					-1) :
+			name(name), description(description), use_message(use_message), sprite(
+					spriten), radius(rad), action_func(action_luaf), prereq_func(
+					prereq_luaf), stackable(stackable), equipment_type(
+					equipment_type), equipment_id(equipment_id) {
 	}
 
 	void init(lua_State* L) {
@@ -44,7 +44,9 @@ struct ItemEntry {
 	}
 };
 
-int get_item_by_name(const char* name, bool error_if_not_found = true);
+const char* equip_type_description(const ItemEntry& ientry);
+
+item_id get_item_by_name(const char* name, bool error_if_not_found = true);
 
 extern std::vector<ItemEntry> game_item_data;
 

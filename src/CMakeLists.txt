@@ -9,6 +9,9 @@ include(FindFreetype)
 include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} ../src_yaml/yaml-cpp/include ../src_net/ ../src_rvo2/RVO2 ../src_lua)
 
 set( lanarts_src
+
+	collision_avoidance/CollisionAvoidance.cpp
+
 	combat_logic/ai_logic.cpp
 	combat_logic/attack_logic.cpp
 	combat_logic/combat_logic.cpp
@@ -16,8 +19,11 @@ set( lanarts_src
 
 	lua/lua_combatstats.cpp
 	lua/lua_effectivestats.cpp
+	
+	config/GameControlSettings.cpp
 
 	data/init/load_armour_data.cpp
+	data/init/load_spell_data.cpp
 	data/init/load_sprite_data.cpp
 	data/init/load_dungeon_data.cpp
 	data/init/load_effect_data.cpp
@@ -49,6 +55,7 @@ set( lanarts_src
 	gamestats/skills.cpp
 	gamestats/stat_formulas.cpp
 	gamestats/stats.cpp	
+	gamestats/SpellsKnown.cpp	
 			
 	lua/lua_api.cpp
 	lua/lua_gameinst.cpp
@@ -67,6 +74,7 @@ set( lanarts_src
 	procedural/levelgen.cpp
 	procedural/tunnelgen.cpp
 	
+	util/content_draw_util.cpp
 	util/math_util.cpp
 	util/mtwist.cpp
 	util/LuaValue.cpp
@@ -81,8 +89,17 @@ set( lanarts_src
 	world/GameWorld.cpp
 	
 	world/ui/GameChat.cpp
+	world/ui/GameTextConsole.cpp
 	world/ui/GameDialogs.cpp
 	world/ui/GameHud.cpp
+	world/ui/detail/ActionBar.cpp
+	world/ui/detail/Sidebar.cpp
+	world/ui/detail/SidebarNavigator.cpp
+	world/ui/detail/SpellsContent.cpp
+	world/ui/detail/EnemiesSeenContent.cpp
+	world/ui/detail/EquipmentContent.cpp
+	world/ui/detail/InventoryContent.cpp
+	world/ui/detail/Minimap.cpp
 	
 	world/controllers/CombatInstController.cpp
 	world/controllers/MonsterController.cpp
@@ -98,17 +115,22 @@ set( lanarts_src
 	world/objects/CombatGameInst.cpp
 	world/objects/EnemyInst.cpp
 	world/objects/GameInst.cpp
+	world/objects/GameInstRef.cpp
 	world/objects/ItemInst.cpp
 	world/objects/ProjectileInst.cpp
 	)
 
 set( lanarts_include
+
+	collision_avoidance/CollisionAvoidance.h
 	
 	combat_logic/ai_logic.h
 	combat_logic/attack_logic.h
 	combat_logic/combat_logic.h
 	combat_logic/movement_logic.h
 
+	config/GameControlSettings.h
+	
 	data/init/yaml_util.h
 	
 	data/armour_data.h
@@ -138,9 +160,11 @@ set( lanarts_include
 	gamestats/items.h
 	gamestats/effects.h
 	gamestats/Equipment.h
+	gamestats/EnemiesSeen.h
 	gamestats/skills.h
 	gamestats/stat_formulas.h
 	gamestats/stats.h
+	gamestats/SpellsKnown.h
 	
 	pathfind/astar_pathfind.h
 	pathfind/pathfind.h
@@ -153,7 +177,9 @@ set( lanarts_include
 	procedural/tunnelgen.h
 	
 	util/callback_util.h
+	util/content_draw_util.h
 	util/game_basic_structs.h
+	util/gheap.h
 	util/hashset_util.h
 	util/math_util.h
 	util/mtwist.h
@@ -177,13 +203,24 @@ set( lanarts_include
 	world/ui/GameChat.h
 	world/ui/GameDialogs.h
 	world/ui/GameHud.h
-
+	world/ui/GameTextConsole.h
+	world/ui/detail/ActionBar.h
+	world/ui/detail/EnemiesSeenContent.h
+	world/ui/detail/EquipmentContent.h
+	world/ui/detail/InventoryContent.h
+	world/ui/detail/Sidebar.h
+	world/ui/detail/SidebarContent.h
+	world/ui/detail/SidebarNavigator.h
+	world/ui/detail/SpellsContent.h
+	world/ui/detail/Minimap.h
+	
 	world/utility_objects/AnimatedInst.h
 	world/utility_objects/ButtonInst.h
 	world/utility_objects/TestInst.h
 			
 	world/objects/CombatGameInst.h	
 	world/objects/GameInst.h
+	world/objects/GameInstRef.h
 	world/objects/PlayerInst.h
 	world/objects/EnemyBehaviour.h
 	world/objects/EnemyInst.h

@@ -13,7 +13,7 @@
 #include "item_data.h"
 
 struct ArmourEntry {
-	std::string name;
+	std::string name, description;
 	sprite_id item_sprite;
 	ItemEntry::equip_type equiptype;
 	CoreStatMultiplier resistance, damage_reduction;

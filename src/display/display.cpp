@@ -1,8 +1,6 @@
 /*
- * Display.cpp
- *
- *  Created on: Jun 8, 2011
- *      Author: 100397561
+ * display.cpp:
+ *  Core image drawing and display functions
  */
 
 #include <cstdlib>
@@ -20,8 +18,44 @@
 #include <algorithm>
 #include "../world/GameView.h"
 
+void gl_draw_image_section(GLimage& img, const BBox& section, int x, int y,
+		const Colour& c) {
+	if (section.width() == 0 || section.height() == 0)
+		return;
+	float xscale = img.texw / img.width, yscale = img.texh / img.height;
+
+	float tx1 = section.x1 * xscale, tx2 = section.x2 * xscale;
+	float ty1 = section.y1 * yscale, ty2 = section.y2 * yscale;
+
+	int x2 = x + section.width(), y2 = y + section.height();
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, img.texture);
+
+	glColor4ub(c.r, c.g, c.b, c.a);
+
+	glBegin(GL_QUADS);
+	//Draw our four points, clockwise.
+	glTexCoord2f(tx1, ty1);
+	glVertex2i(x, y);
+
+	glTexCoord2f(tx2, ty1);
+	glVertex2i(x2, y);
+
+	glTexCoord2f(tx2, ty2);
+	glVertex2i(x2, y2);
+
+	glTexCoord2f(ty1, ty2);
+	glVertex2i(x, y2);
+
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	//Don't use glBindTexture(GL_TEXTURE_2D, NULL);
+}
+
 void gl_draw_image(GLimage& img, int x, int y, const Colour& c) {
-	if (img.width == 0 || img.height == 0) return;
+	if (img.width == 0 || img.height == 0)
+		return;
 	int x2 = x + img.width, y2 = y + img.height;
 
 	glEnable(GL_TEXTURE_2D);
@@ -47,10 +81,11 @@ void gl_draw_image(GLimage& img, int x, int y, const Colour& c) {
 	glDisable(GL_TEXTURE_2D);
 	//Don't use glBindTexture(GL_TEXTURE_2D, NULL);
 }
-void gl_draw_image(const GameView& view, GLimage& img, int x, int y, const Colour& c){
+
+void gl_draw_image(const GameView& view, GLimage& img, int x, int y,
+		const Colour& c) {
 	gl_draw_image(img, x - view.x, y - view.y, c);
 }
-
 
 void update_display() {
 	SDL_GL_SwapBuffers();
@@ -114,7 +149,7 @@ void init_sdl_gl(bool fullscreen, int w, int h) {
 	}
 
 	/* Set the window manager title bar */
-	SDL_WM_SetCaption("RPG", "rpg");
+	SDL_WM_SetCaption("Lanarts", "Lanarts");
 
 	glDisable(GL_TEXTURE_2D);
 }
@@ -144,7 +179,7 @@ void gl_set_drawing_area(int x, int y, int w, int h) {
 	//Clear projection
 
 	//Set up the coordinate system 0 -> w, 0 -> h
-	glOrtho(0.0, (GLdouble) w, (GLdouble) h, 0.0, 0.0, 1.0);
+	glOrtho(0.0, (GLdouble)w, (GLdouble)h, 0.0, 0.0, 1.0);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -165,9 +200,10 @@ void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type) {
 	pth = std::max(4, pth);
 
 	img.width = w, img.height = h;
-	img.texw = w / ((float) ptw);
-	img.texh = h / ((float) pth);
-	if (w == 0 || h == 0) return;
+	img.texw = w / ((float)ptw);
+	img.texh = h / ((float)pth);
+	if (w == 0 || h == 0)
+		return;
 
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, img.texture);
@@ -179,7 +215,6 @@ void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type) {
 	if (!was_init)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, ptw, pth, 0, type,
 				GL_UNSIGNED_BYTE, NULL);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, type, GL_UNSIGNED_BYTE,
-			data);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, type, GL_UNSIGNED_BYTE, data);
 	glDisable(GL_TEXTURE_2D);
 }

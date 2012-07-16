@@ -14,6 +14,7 @@ struct GameSettings {
 	std::string ip, username;
 	int port;
 	connection_type conntype;
+	bool network_debug_mode;
 
 	/*Draw settings*/
 	std::string font;
@@ -27,6 +28,8 @@ struct GameSettings {
 	bool invincible;
 	int classn;
 
+	/*Control settings*/
+	bool stop_controls;
 
 	GameSettings(){
 		//sets defaults
@@ -43,8 +46,11 @@ struct GameSettings {
 		invincible = false;
 		draw_diagnostics = false;
 
+		stop_controls = true;
+
 		port = 0;
 		conntype = NONE;
+		network_debug_mode = false;
 
 	}
 };

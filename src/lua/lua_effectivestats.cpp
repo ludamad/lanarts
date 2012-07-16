@@ -23,26 +23,26 @@ public:
 	static const char className[];
 	static Lunar<EffectiveStatsLuaBinding>::RegType methods[];
 
-	EffectiveStatsLuaBinding(obj_id id) :
-			id(id) {
+	EffectiveStatsLuaBinding(GameInst* inst) :
+			inst(inst) {
 	}
 	EffectiveStatsLuaBinding(const EffectiveStats& value) :
-			id(0), value(value) {
+			value(value) {
 	}
 
 	EffectiveStats* get_stats(lua_State* L) {
-		if (!id)
+		if (!inst.get_instance())
 			return &value;
 		GameState* gs = lua_get_gamestate(L);
-		CombatGameInst* inst = dynamic_cast<CombatGameInst*>(gs->get_instance(
-				id));
-		if (!inst)
+		CombatGameInst* combat_inst =
+				dynamic_cast<CombatGameInst*>(inst.get_instance());
+		if (!combat_inst)
 			return NULL;
-		return &inst->effective_stats();
+		return &combat_inst->effective_stats();
 	}
 
 private:
-	obj_id id; //If id !=0, use object stats
+	GameInstRef inst; //If inst != NULL, use object stats
 	EffectiveStats value; //If id == 0, use this
 };
 
@@ -146,8 +146,8 @@ void lua_effectivestats_bindings(GameState* gs, lua_State* L) {
 	lua_pushcfunction(L, lua_member_update);
 	lua_settable(L, tableind);
 }
-void lua_push_effectivestats(lua_State* L, obj_id id) {
-	lunar_t::push(L, new EffectiveStatsLuaBinding(id), true);
+void lua_push_effectivestats(lua_State* L, GameInst* inst) {
+	lunar_t::push(L, new EffectiveStatsLuaBinding(inst), true);
 }
 void lua_push_effectivestats(lua_State* L, const EffectiveStats& stats) {
 	lunar_t::push(L, new EffectiveStatsLuaBinding(stats), true);

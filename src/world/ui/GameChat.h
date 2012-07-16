@@ -1,8 +1,7 @@
 /*
- * GameChat.h
- *
- *  Created on: May 27, 2012
- *      Author: 100397561
+ * GameChat.h:
+ *  Game HUD component for drawing messages.
+ *  These messages include things like "A monster has appeared!" and chat messages.
  */
 
 #ifndef GAMECHAT_H_
@@ -13,7 +12,7 @@
 #include <vector>
 #include "../../util/game_basic_structs.h"
 
-struct GameState;
+class GameState;
 struct font_data;
 struct NetPacket;
 
@@ -47,6 +46,8 @@ struct ChatMessage {
 
 class GameChat {
 public:
+	GameChat();
+
 	void step(GameState* gs);
 	void draw(GameState* gs) const;
 	void clear();
@@ -60,14 +61,12 @@ public:
 	bool handle_event(GameState* gs, SDL_Event *event);
 	void toggle_chat(GameState* gs);
 
-	GameChat(const std::string& local_sender);
 private:
 	bool handle_special_commands(GameState* gs, const std::string& command);
 
 	void reset_typed_message();
 	void draw_player_chat(GameState* gs) const;
 
-	std::string local_sender;
 	ChatMessage typed_message;
 
 	SDLKey current_key;

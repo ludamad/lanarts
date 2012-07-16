@@ -89,8 +89,9 @@ void CombatGameInst::draw(GameState *gs) {
 	if (target_radius > 16)
 		healthbar_offsety = target_radius + 8;
 	if (ecore.hp < ecore.max_hp) {
-		gl_draw_statbar(view, x - 10, y - healthbar_offsety, 20, 5, ecore.hp,
-				ecore.max_hp);
+		const BBox statbox(x - 10, y - healthbar_offsety, x + 10,
+				y - healthbar_offsety + 5);
+		gl_draw_statbar(view, statbox, ecore.hp, ecore.max_hp);
 	}
 }
 
@@ -176,15 +177,14 @@ void CombatGameInst::equip(item_id item, int amnt) {
 void CombatGameInst::init(GameState* gs) {
 	estats = stats().effective_stats_without_atk(gs);
 }
-
-void CombatGameInst::attempt_move_to_position(GameState *gs, float& newx, float& newy) {
+void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
+		float& newy) {
 	const float ROUNDING_MULTIPLE = 65536.0f;
 
 	float dx = newx - rx, dy = newy - ry;
 	float dist = sqrt(dx * dx + dy * dy);
 
-	bool collided = gs->tile_radius_test(round(newx), round(newy), /*radius+4*/
-	20);
+	bool collided = gs->tile_radius_test(round(newx), round(newy), 20);
 
 	if (!collided) {
 		rx = newx, ry = newy;
@@ -192,8 +192,8 @@ void CombatGameInst::attempt_move_to_position(GameState *gs, float& newx, float&
 		float nx = round(rx + vx), ny = round(ry + vy);
 		bool collided = gs->tile_radius_test(nx, ny, radius);
 		if (collided) {
-			bool hitsx = gs->tile_radius_test(nx, y, radius, true, -1);
-			bool hitsy = gs->tile_radius_test(x, ny, radius, true, -1);
+			bool hitsx = gs->tile_radius_test(nx, y, radius);
+			bool hitsy = gs->tile_radius_test(x, ny, radius);
 			if (hitsy || hitsx || collided) {
 				if (hitsx) {
 					vx = 0;
@@ -229,6 +229,38 @@ void CombatGameInst::update_position() {
 void CombatGameInst::update_position(float newx, float newy) {
 	rx = newx, ry = newy;
 	update_position();
+}
+
+SpellsKnown& CombatGameInst::spells_known() {
+	return stats().spells;
+}
+static void combine_hash(unsigned int& hash, unsigned int val1, unsigned val2) {
+	hash ^= (hash >> 11) * val1;
+	hash ^= val1;
+	hash ^= (hash >> 11) * val2;
+	hash ^= val2;
+	hash ^= hash << 11;
+}
+static void combine_stat_hash(unsigned int& hash, CombatStats& stats) {
+	ClassStats& cstats = stats.class_stats;
+	CoreStats& core = stats.core;
+	Inventory& inventory = stats.equipment.inventory;
+
+	combine_hash(hash, core.hp, core.max_hp);
+	combine_hash(hash, core.mp, core.max_mp);
+	combine_hash(hash, cstats.xp, cstats.classid);
+	for (int i = 0; i < inventory.size(); i++) {
+		if (inventory.slot_filled(i)) {
+			ItemSlot& slot = inventory.get(i);
+			combine_hash(hash, slot.amount, slot.item.id);
+		}
+	}
+}
+unsigned int CombatGameInst::integrity_hash() {
+	unsigned int hash = GameInst::integrity_hash();
+	combine_hash(hash, (unsigned int&) vx, (unsigned int&) vy);
+	combine_stat_hash(hash, stats());
+	return hash;
 }
 
 team_id& CombatGameInst::team() {

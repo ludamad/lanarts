@@ -1,8 +1,6 @@
 /*
- * load_settings_data.cpp
- *
- *  Created on: Mar 26, 2012
- *      Author: 100397561
+ * load_settings_data.cpp:
+ *  Load configuration data.
  */
 
 #include <fstream>
@@ -13,38 +11,6 @@
 
 using namespace std;
 
-DataFiles load_datafiles_data(const char* filename) {
-	DataFiles dfiles;
-
-	fstream file(filename, fstream::in | fstream::binary);
-
-	if (file) {
-		try {
-			YAML::Parser parser(file);
-			YAML::Node root;
-
-			parser.GetNextDocument(root);
-
-			optional_set(root, "armour_files", dfiles.armour_files);
-			optional_set(root, "tile_files", dfiles.tile_files);
-			optional_set(root, "sprite_files", dfiles.sprite_files);
-			optional_set(root, "tileset_files", dfiles.tileset_files);
-			optional_set(root, "enemy_files", dfiles.enemy_files);
-			optional_set(root, "effect_files", dfiles.effect_files);
-			optional_set(root, "item_files", dfiles.item_files);
-			optional_set(root, "weapon_files", dfiles.weapon_files);
-			optional_set(root, "level_files", dfiles.level_files);
-			optional_set(root, "class_files", dfiles.class_files);
-			optional_set(root, "projectile_files", dfiles.projectile_files);
-
-		} catch (const YAML::Exception& parse) {
-			printf("data file lists parsed incorrectly: \n");
-			printf("%s\n", parse.what());
-		}
-	}
-
-	return dfiles;
-}
 
 GameSettings load_settings_data(const char* filename) {
 
@@ -72,6 +38,8 @@ GameSettings load_settings_data(const char* filename) {
 			optional_set(root, "time_per_step", ret.time_per_step);
 			optional_set(root, "draw_diagnostics", ret.draw_diagnostics);
 			optional_set(root, "username", ret.username);
+			optional_set(root, "use_stop_actions", ret.stop_controls);
+			optional_set(root, "network_debug_mode", ret.network_debug_mode);
 
 			if (yaml_has_node(root, "connection_type")) {
 				std::string connname;
@@ -99,3 +67,38 @@ GameSettings load_settings_data(const char* filename) {
 
 	return ret;
 }
+
+DataFiles load_datafiles_data(const char* filename) {
+	DataFiles dfiles;
+
+	fstream file(filename, fstream::in | fstream::binary);
+
+	if (file) {
+		try {
+			YAML::Parser parser(file);
+			YAML::Node root;
+
+			parser.GetNextDocument(root);
+
+			optional_set(root, "armour_files", dfiles.armour_files);
+			optional_set(root, "class_files", dfiles.class_files);
+			optional_set(root, "enemy_files", dfiles.enemy_files);
+			optional_set(root, "effect_files", dfiles.effect_files);
+			optional_set(root, "item_files", dfiles.item_files);
+			optional_set(root, "level_files", dfiles.level_files);
+			optional_set(root, "projectile_files", dfiles.projectile_files);
+			optional_set(root, "spell_files", dfiles.spell_files);
+			optional_set(root, "sprite_files", dfiles.sprite_files);
+			optional_set(root, "tile_files", dfiles.tile_files);
+			optional_set(root, "tileset_files", dfiles.tileset_files);
+			optional_set(root, "weapon_files", dfiles.weapon_files);
+
+		} catch (const YAML::Exception& parse) {
+			printf("data file lists parsed incorrectly: \n");
+			printf("%s\n", parse.what());
+		}
+	}
+
+	return dfiles;
+}
+

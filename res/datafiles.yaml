@@ -28,10 +28,11 @@ projectile_files:
   - projectiles/enemy_projectiles.yaml
   - projectiles/spell_projectiles.yaml
 
-spell_files: spells.yaml
+spell_files: spells/spells.yaml
 
 sprite_files: 
  - sprites/armour_sprites.yaml
+ - sprites/interface_sprites.yaml
  - sprites/item_sprites.yaml
  - sprites/enemy_sprites.yaml
  - sprites/other_sprites.yaml

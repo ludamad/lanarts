@@ -4,12 +4,16 @@
  * 	and which levels are currently being generated
  */
 
+#include <typeinfo>
+
 #include "../data/tile_data.h"
 #include "../data/class_data.h"
 
 #include "../procedural/levelgen.h"
 
+#include "objects/GameInstRef.h"
 #include "objects/PlayerInst.h"
+#include "objects/EnemyInst.h"
 
 #include "GameState.h"
 #include "GameLevelState.h"
@@ -50,7 +54,8 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, int classn,
 	int py = (epos.y + start_y) * TILE_SIZE + TILE_SIZE / 2;
 
 	sprite_id sprite =
-			local ? get_sprite_by_name("wizard") : get_sprite_by_name("fighter");
+			local ? get_sprite_by_name("wizard") : get_sprite_by_name(
+							"fighter");
 
 	if (!inst) {
 		inst = new PlayerInst(c.starting_stats, sprite, px, py, local);
@@ -92,7 +97,7 @@ void GameWorld::spawn_players(GeneratedLevel& genlevel, void** player_instances,
 		}
 	} else {
 		for (int i = 0; i < nplayers; i++) {
-			spawn_player(genlevel, false, 0, (PlayerInst*)player_instances[i]);
+			spawn_player(genlevel, false, 0, (PlayerInst*) player_instances[i]);
 		}
 	}
 }
@@ -119,6 +124,45 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer,
 	return level_states[roomid];
 }
 
+static bool check_level_is_in_sync(GameState* gs, GameLevelState* level) {
+	if (level->level_number == -1 || !level->pc.has_player()
+			|| !gs->net_connection().get_connection()) {
+		return true;
+	}
+
+	int hash_value = level->inst_set.hash();
+
+//	printf("NETWORK: Checking integrity hash=0x%X\n", prehashvalue);
+//	fflush(stdout);
+	if (!gs->net_connection().check_integrity(gs, hash_value)) {
+		std::vector<GameInst*> instances = level->inst_set.to_vector();
+		for (int i = 0; i < instances.size(); i++) {
+			if (!gs->net_connection().check_integrity(gs,
+					instances[i]->integrity_hash())) {
+				GameInst* inst = instances[i];
+				const char* type = typeid(*inst).name();
+				printf("Hashes don't match for instance id=%d, type=%s!\n",
+						inst->id, type);
+				std::vector<Pos> theirs;
+				gs->net_connection().send_and_sync(Pos(inst->x, inst->y),
+						theirs);
+				Pos* theirinst = &theirs[0];
+				EnemyInst* e;
+				if ((e = dynamic_cast<EnemyInst*>(inst))) {
+					Pos vpos(e->vx * 1000, e->vy * 1000);
+					std::vector<Pos> theirs;
+					gs->net_connection().send_and_sync(vpos, theirs);
+					Pos vpos2 = theirs[0];
+				}
+
+			}
+		}
+		printf("Hashes don't match before step, frame %d, level %d\n",
+				gs->frame(), level->level_number);
+		return false;
+	}
+	return true;
+}
 bool GameWorld::pre_step() {
 	if (!game_state->update_iostate())
 		return false;
@@ -126,12 +170,22 @@ bool GameWorld::pre_step() {
 	GameLevelState* current_level = game_state->get_level();
 
 	midstep = true;
-	game_state->frame()++;for
-(	int i = 0; i < level_states.size(); i++) {
+
+	/* Check level sync states */
+	if (game_state->game_settings().network_debug_mode) {
+		for (int i = 0; i < level_states.size(); i++) {
+			check_level_is_in_sync(game_state, level_states[i]);
+		}
+	}
+
+	/* Queue actions for each player */
+	for (int i = 0; i < level_states.size(); i++) {
 		game_state->set_level(level_states[i]);
-		const std::vector<obj_id>& player_ids = game_state->get_level()->pc.player_ids();
+		const std::vector<obj_id>& player_ids =
+				game_state->get_level()->pc.player_ids();
 		for (int i = 0; i < player_ids.size(); i++) {
-			PlayerInst* p = (PlayerInst*)game_state->get_instance(player_ids[i]);
+			PlayerInst* p = (PlayerInst*) game_state->get_instance(
+					player_ids[i]);
 			p->queue_io_actions(game_state);
 			p->performed_actions_for_step() = false;
 		}
@@ -145,20 +199,20 @@ void GameWorld::step() {
 
 	const int STEPS_TO_SIMULATE = 1000;
 	GameLevelState* current_level = game_state->get_level();
-//	current_level->steps_left = STEPS_TO_SIMULATE;
 
-	bool inmenu = (game_state->get_level()->level_number == -1);
 	midstep = true;
 
 	for (int i = 0; i < level_states.size(); i++) {
-		if (level_states[i]->steps_left > 0) {
-			int prehashvalue = game_state->get_level()->inst_set.hash();
+		GameLevelState* level = level_states[i];
+		bool has_player_in_level = level->pc.has_player();
 
-			if (!inmenu && !game_state->net_connection().check_integrity(game_state, prehashvalue)) {
-				printf("Hashes don't match before step, frame %d, level %d\n", game_state->frame(), i);
-			}
+		if (has_player_in_level) {
+			level->steps_left = STEPS_TO_SIMULATE;
+		}
+
+		if (level->steps_left > 0) {
 			//Set so that all the GameState getters are properly updated
-			game_state->set_level(level_states[i]);
+			game_state->set_level(level);
 
 //Clone part1:
 //			GameLevelState* clone = game_state->level()->clone();
@@ -166,11 +220,11 @@ void GameWorld::step() {
 ////			level_states[i] = clone;
 //            game_state->level() = clone;
 
-			game_state->get_level()->pc.pre_step(game_state);
-			game_state->get_level()->mc.pre_step(game_state);
-			game_state->get_level()->inst_set.step(game_state);
-			game_state->get_level()->tiles.step(game_state);
-			game_state->get_level()->steps_left--;
+			level->pc.pre_step(game_state);
+			level->mc.pre_step(game_state);
+			level->inst_set.step(game_state);
+			level->tiles.step(game_state);
+			level->steps_left--;
 //Clone part2:
 ////            if (real == current_level) current_level = clone;
 //            game_state->level() = real;
@@ -178,10 +232,6 @@ void GameWorld::step() {
 //            delete clone;
 
 //
-			int posthashvalue =  game_state->get_level()->inst_set.hash();
-			if (!inmenu &&!game_state->net_connection().check_integrity(game_state, posthashvalue)) {
-				printf("Hashes don't match after step, frame %d, level %d\n", game_state->frame(), i);
-			}
 		}
 	}
 	game_state->set_level(current_level);
@@ -199,29 +249,37 @@ void GameWorld::step() {
 		next_room_id = -1;
 
 		game_state->get_level()->pc.update_fieldsofview(game_state);
-// 		goto redofirststep;// goto top
 	}
 }
 
 void GameWorld::regen_level(int roomid) {
 	GameLevelState* level = get_level(roomid);
-	std::vector<PlayerInst*> player_cache;
+	std::vector<GameInstRef> player_cache;
 	std::vector<obj_id> player_ids = level->pc.player_ids();
+
+	/* Take all players out of level*/
 	for (int i = 0; i < player_ids.size(); i++) {
-		PlayerInst* p = (PlayerInst*)game_state->get_instance(player_ids[i]);
-		game_state->remove_instance(p, false); // Remove but do not deallocate
+		// Get and retain player
+		GameInst* p = game_state->get_instance(player_ids[i]);
 		player_cache.push_back(p);
-		p->core_stats().heal_fully();
+		((PlayerInst*) p)->core_stats().heal_fully();
+
+		// Remove from current level
+		game_state->remove_instance(p);
 	}
+
 	level_states[roomid] = NULL;
-	GameLevelState* newlevel = get_level(roomid, true, (void**)&player_cache[0],
-			player_cache.size());
+
+	GameLevelState* newlevel = get_level(roomid, true,
+			(void**) &player_cache[0], player_cache.size());
+
 	if (game_state->get_level() == level) {
 		game_state->set_level(newlevel);
-		game_state->get_level()->steps_left = 1000;
 		GameInst* p = game_state->get_instance(game_state->local_playerid());
 		game_state->window_view().sharp_center_on(p->x, p->y);
 	}
+
+	//Delete existing level
 	delete level;
 }
 
@@ -232,20 +290,23 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	//set the level context
 	game_state->set_level(state);
 
-	CombatGameInst* inst = (CombatGameInst*)game_state->get_instance(id);
+	//Keep object alive during move
+	GameInstRef gref(game_state->get_instance(id));
+	GameInst* inst = gref.get_instance();
 
-	Pos hitsqr;
-	if (!inst)
+	if (!gref.get_instance()) {
 		return;
-	game_state->remove_instance(inst, false); // Remove but do not deallocate
-	inst->last_x = x, inst->last_y = y;
-	inst->update_position(x, y);
+	}
+
+	game_state->remove_instance(inst);
+	gref->last_x = x, gref->last_y = y;
+	gref->update_position(x, y);
 
 	game_state->set_level(get_level(roomid2));
 	game_state->add_instance(inst);
-	game_state->get_level()->steps_left = 1000;
-
+	//restore the level context
 	game_state->set_level(last);
+
 	PlayerInst* p;
 	if ((p = dynamic_cast<PlayerInst*>(inst)) && p->is_local_player()) {
 		set_current_level_lazy(roomid2);
@@ -273,7 +334,6 @@ void GameWorld::reset(int keep) {
 		}
 		level_states.resize(keep);
 		game_state->set_level(get_level(keep, true /*spawn player*/));
-		game_state->get_level()->steps_left = 1000;
 		game_state->game_chat().clear();
 	}
 	for (int i = 0; i < delete_list.size(); i++) {

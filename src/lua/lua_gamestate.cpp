@@ -20,30 +20,24 @@ public:
 
 	/*Takes GameInst object*/
 	int remove_object(lua_State* L) {
-		obj_id id = lua_gameinst_arg(L, 1);
-		if (id > 0) {
-			GameInst* inst = gs->get_instance(id);
-			if (inst)
-				gs->remove_instance(inst);
-		}
+		//TODO: Ensure correct level
+		gs->remove_instance(lua_gameinst_arg(L, 1));
 		return 0;
 	}
 	int create_projectile(lua_State* L) {
 		int nargs = lua_gettop(L);
-		obj_id origin_id = lua_gameinst_arg(L, 1);
+		GameInst* origin_obj = lua_gameinst_arg(L, 1);
 
 		lua_pushstring(L, "name");
 		lua_gettable(L, 4);
 		sprite_id sprite = get_sprite_by_name(lua_tostring(L, lua_gettop(L)));
 		lua_pop(L, 1);
 
-
 		bool bounce = nargs < 8 ? false : lua_toboolean(L, 8);
 		int hits = nargs < 9 ? 1 : lua_tonumber(L, 9);
-		obj_id target = nargs < 10 ? 0 : lua_gameinst_arg(L, 10);
+		GameInst* target = nargs < 10 ? NULL : lua_gameinst_arg(L, 10);
 
 		obj_id projectile_id = 0;
-		GameInst* origin_obj = gs->get_instance(origin_id);
 
 //		if (s != NULL) {
 ////			ProjectileInst(sprite_id sprite, obj_id originator, float speed, int range,
@@ -56,7 +50,7 @@ public:
 //			projectile_id = gs->add_instance(inst);
 //		}
 
-		lua_push_gameinst(L, projectile_id);
+//		lua_push_gameinst(L, inst);
 		return 0;
 	}
 
@@ -65,7 +59,7 @@ public:
 		lua_createtable(L, 0, 0);
 		int table = lua_gettop(L);
 		for (int i = 0; i < pc.player_ids().size(); i++) {
-			lua_push_gameinst(L, pc.player_ids()[i]);
+			lua_push_gameinst(L, gs->get_instance(pc.player_ids()[i]));
 			//  lua_pushnumber(L, 2);
 			lua_rawseti(L, table, i + 1);
 		}
@@ -77,18 +71,18 @@ public:
 
 		lua_pushnumber(L, 1.0);
 		lua_rawget(L, 1);
-		int min = lua_tonumber(L,lua_gettop(L));
+		int min = lua_tonumber(L, lua_gettop(L));
 		int max = min;
 		lua_pop(L, 1);
 
-		if (nargs > 1){
+		if (nargs > 1) {
 			lua_pushnumber(L, 2.0);
 			lua_rawget(L, 1);
-			max = lua_tonumber(L,lua_gettop(L));
+			max = lua_tonumber(L, lua_gettop(L));
 			lua_pop(L, 1);
 		}
 
-		lua_pushnumber(L, gs->rng().rand(min, max+1));
+		lua_pushnumber(L, gs->rng().rand(min, max + 1));
 		return 1;
 	}
 	GameState* game_state() {
@@ -130,12 +124,8 @@ static int lua_member_lookup(lua_State* L) {
 	return 1;
 }
 
-meth_t bind_t::methods[] = {
-		LUA_DEF(remove_object),
-		LUA_DEF(create_projectile),
-		LUA_DEF(players_in_room),
-		LUA_DEF(rand_range),
-		meth_t(0, 0) };
+meth_t bind_t::methods[] = { LUA_DEF(remove_object), LUA_DEF(create_projectile),
+		LUA_DEF(players_in_room), LUA_DEF(rand_range), meth_t(0, 0) };
 
 GameState* lua_get_gamestate(lua_State* L) {
 	lua_getglobal(L, "world");

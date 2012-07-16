@@ -15,6 +15,7 @@
 #include "../util/game_basic_structs.h"
 
 struct AttackStats;
+struct ClassType;
 class MTwist;
 
 /* Core combat stats*/
@@ -50,7 +51,8 @@ struct CoreStatMultiplier {
 			base(base, base), strength(strength), defence(defence), magic(
 					magic), willpower(willpower) {
 	}
-	float calculate(MTwist& mt, const CoreStats& stats);
+	Range calculate_range(const CoreStats& stats) const;
+	float calculate(MTwist& mt, const CoreStats& stats) const;
 };
 
 /* Derived combat stats, power & damage represent bonuses
@@ -106,10 +108,11 @@ struct CooldownStats {
 	int pickup_cooldown;
 	int rest_cooldown;
 	int hurt_cooldown;
+	int stopaction_timeout;
 
 	CooldownStats() :
 			action_cooldown(0), pickup_cooldown(0), rest_cooldown(0), hurt_cooldown(
-					0) {
+					0), stopaction_timeout(0) {
 	}
 
 	void step();
@@ -126,21 +129,29 @@ struct CooldownStats {
 	bool is_hurting() {
 		return hurt_cooldown > 0;
 	}
+	bool can_do_stopaction() {
+		return stopaction_timeout <= 0;
+	}
 
 	void reset_action_cooldown(int cooldown);
 	void reset_pickup_cooldown(int cooldown);
 	void reset_rest_cooldown(int cooldown);
 	void reset_hurt_cooldown(int cooldown);
+	void reset_stopaction_timeout(int cooldown);
 };
 
 /* Represents class related stats */
 struct ClassStats {
-	class_id classtype;
+	class_id classid;
 	int xp, xpneeded, xplevel;
 	ClassStats(class_id classtype = -1, int xplevel = 0, int xp = 0,
 			int xpneeded = 0) :
-			classtype(classtype), xp(xp), xpneeded(xpneeded), xplevel(xplevel) {
+			classid(classtype), xp(xp), xpneeded(xpneeded), xplevel(xplevel) {
 	}
+	bool has_class() {
+		return classid >= 0;
+	}
+	ClassType& class_type() const;
 };
 
 #endif /* STATS_H_ */

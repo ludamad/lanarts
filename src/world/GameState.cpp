@@ -1,8 +1,6 @@
 /*
- * GameState.cpp
- *
- *  Created on: 2011-09-29
- *      Author: 100397561
+ * GameState.cpp:
+ *  Handle to all the global game data.
  */
 
 #include <SDL.h>
@@ -30,6 +28,7 @@
 #include "net/GameNetConnection.h"
 
 #include "objects/EnemyInst.h"
+#include "objects/GameInst.h"
 #include "objects/PlayerInst.h"
 
 extern "C" {
@@ -39,20 +38,38 @@ extern "C" {
 
 GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 		int viewh, int hudw) :
-		settings(settings), L(L), frame_n(0), chat(settings.username), hud(
-				vieww, 0, hudw, viewh), view(0, 0, vieww, viewh), world(this), mouse_leftdown(
-				0), mouse_rightdown(0), mouse_leftclick(0), mouse_rightclick(0) {
+		settings(settings), L(L), frame_n(0), hud(
+				BBox(vieww, 0, vieww + hudw, viewh), BBox(0, 0, vieww, viewh)), view(
+				0, 0, vieww, viewh), world(this) {
 	memset(key_down_states, 0, sizeof(key_down_states));
-	init_font(&pfont, settings.font.c_str(), 10);
-	init_font(&menufont, settings.font.c_str(), 20);
+
 	dragging_view = false;
+
+	mouse_leftdown = false;
+	mouse_rightdown = false;
+
+	mouse_leftclick = false;
+	mouse_rightclick = false;
+
+	mouse_leftrelease = false;
+	mouse_rightrelease = false;
+
+	init_font(&small_font, settings.font.c_str(), 10);
+	init_font(&large_font, settings.font.c_str(), 20);
+}
+
+GameState::~GameState() {
+	release_font(&small_font);
+	release_font(&large_font);
+
+	lua_gc(L, LUA_GCCOLLECT, 0);
+	lua_close(L);
 }
 
 void GameState::init_game() {
 	time_t systime;
 	time(&systime);
 	int seed = systime;
-
 	init_lua_data(this, L);
 
 	if (settings.conntype == GameSettings::CLIENT) {
@@ -77,26 +94,21 @@ void GameState::init_game() {
 				}
 			}
 		}
+		printf("NETWORK: Recieving seed=0x%X\n", seed);
 	} else if (settings.conntype == GameSettings::HOST) {
 		NetPacket packet;
 		packet.add_int(seed);
 		packet.encode_header();
 		connection.get_connection()->broadcast_packet(packet, true);
+		printf("NETWORK: Broadcasting seed=0x%X\n", seed);
 	}
 	printf("Seed used for RNG = 0x%X\n", seed);
 	mtwist.init_genrand(seed);
 	set_level(world.get_level(0, true));
-	get_level()->steps_left = 1000;
 
 	GameInst* p = get_instance(get_level()->pc.local_playerid());
 	window_view().sharp_center_on(p->x, p->y);
 
-}
-
-GameState::~GameState() {
-	release_font(&pfont);
-	lua_gc(L, LUA_GCCOLLECT, 0); // collected garbage
-	lua_close(L);
 }
 
 void GameState::set_level(GameLevelState* lvl) {
@@ -108,6 +120,17 @@ void GameState::set_level(GameLevelState* lvl) {
 }
 
 /*Handle new characters and exit signals*/
+PlayerInst* GameState::local_player() {
+	GameInst* player = get_instance(local_playerid());
+	LANARTS_ASSERT(!player || dynamic_cast<PlayerInst*>(player));
+	return (PlayerInst*)player;
+}
+
+int GameState::object_radius_test(int x, int y, int radius, col_filterf f,
+		GameInst** objs, int obj_cap) {
+	return object_radius_test(NULL, objs, obj_cap, f, x, y, radius);
+}
+
 int GameState::handle_event(SDL_Event *event) {
 	int done = 0;
 
@@ -116,9 +139,6 @@ int GameState::handle_event(SDL_Event *event) {
 			return done;
 
 		if (hud.handle_event(this, event))
-			return done;
-
-		if (chat.handle_event(this, event))
 			return done;
 	}
 
@@ -153,10 +173,13 @@ int GameState::handle_event(SDL_Event *event) {
 		break;
 	}
 	case SDL_MOUSEBUTTONUP: {
-		if (event->button.button == SDL_BUTTON_LEFT)
+		if (event->button.button == SDL_BUTTON_LEFT) {
 			mouse_leftdown = false;
-		else if (event->button.button == SDL_BUTTON_RIGHT)
+			mouse_leftrelease = true;
+		} else if (event->button.button == SDL_BUTTON_RIGHT) {
 			mouse_rightdown = false;
+			mouse_rightrelease = true;
+		}
 		break;
 	}
 	case SDL_QUIT:
@@ -172,8 +195,12 @@ bool GameState::update_iostate(bool resetprev) {
 		memset(key_press_states, 0, sizeof(key_press_states));
 		mouse_leftclick = false;
 		mouse_rightclick = false;
+
 		mouse_didupwheel = false;
 		mouse_diddownwheel = false;
+
+		mouse_leftrelease = false;
+		mouse_rightrelease = false;
 	}
 	SDL_GetMouseState(&mousex, &mousey);
 	while (SDL_PollEvent(&event)) {
@@ -186,8 +213,9 @@ bool GameState::pre_step() {
 	return world.pre_step();
 }
 void GameState::step() {
-	chat.step(this);
-	world.step(); //Has pointer to this object
+	hud.step(this);
+	world.step(); //Has pointer to this (GameState) object
+	lua_gc(L, LUA_GCSTEP, 0); // collect garbage incrementally
 }
 
 int GameState::key_down_state(int keyval) {
@@ -197,7 +225,7 @@ int GameState::key_press_state(int keyval) {
 	return key_press_states[keyval];
 }
 
-void GameState::handle_dragging() {
+void GameState::adjust_view_to_dragging() {
 	/*Adjust the view if the player is far from view center,
 	 *if we are following the cursor, or if the minimap is clicked */
 	bool is_dragged = false;
@@ -233,7 +261,7 @@ void GameState::handle_dragging() {
 }
 void GameState::draw(bool drawhud) {
 
-	handle_dragging();
+	adjust_view_to_dragging();
 
 	if (drawhud)
 		gl_set_drawing_area(0, 0, view.width, view.height);
@@ -253,7 +281,6 @@ void GameState::draw(bool drawhud) {
 	get_level()->tiles.post_draw(this);
 	if (drawhud) {
 		hud.draw(this);
-		chat.draw(this);
 	}
 
 	update_display();
@@ -266,8 +293,8 @@ obj_id GameState::add_instance(GameInst *inst) {
 	return id;
 }
 
-void GameState::remove_instance(GameInst* inst, bool deallocate) {
-	get_level()->inst_set.remove_instance(inst, deallocate);
+void GameState::remove_instance(GameInst* inst) {
+	get_level()->inst_set.remove_instance(inst);
 	inst->deinit(this);
 }
 
@@ -282,14 +309,6 @@ int GameState::height() {
 GameInst* GameState::get_instance(obj_id id) {
 	return get_level()->inst_set.get_instance(id);
 }
-//
-//static bool sqr_line_test(int x, int y, int w, int h, int sx, int sy,
-//		int size) {
-//
-//}
-//bool GameState::tile_line_test(int x, int y, int w, int h) {
-//	int sx = x / TILE_SIZE, sy = y / TILE_SIZE;
-//}
 
 static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
 		float radsqr) {
@@ -360,7 +379,7 @@ int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 	return get_level()->inst_set.object_radius_test(obj, objs, obj_cap, f, x, y,
 			radius);
 }
-bool GameState::object_visible_test(GameInst* obj, GameInst* player,
+bool GameState::object_visible_test(GameInst* obj, PlayerInst* player,
 		bool canreveal) {
 	const int sub_sqrs = VISION_SUBSQRS;
 	const int subsize = TILE_SIZE / sub_sqrs;
@@ -372,32 +391,70 @@ bool GameState::object_visible_test(GameInst* obj, GameInst* player,
 	int maxgrid_x = (x + rad) / subsize, maxgrid_y = (y + rad) / subsize;
 	int minx = squish(mingrid_x, 0, w), miny = squish(mingrid_y, 0, h);
 	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
-	const std::vector<fov*>& fovs = player_controller().player_fovs();
 
-	if ((canreveal && key_down_state(SDLK_BACKQUOTE)) || fovs.empty())
+	std::vector<obj_id> players = player_controller().player_ids();
+
+	if ((canreveal && key_down_state(SDLK_BACKQUOTE)) || players.empty())
 		return true;
 
-//printf("minx=%d,miny=%d,maxx=%d,maxy=%d\n",minx,miny,maxx,maxy);
 	PlayerController& pc = player_controller();
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			for (int i = 0; i < fovs.size(); i++) {
-				bool isplayer = player == NULL
-						|| (player->id == pc.player_ids()[i]);
-				if (isplayer && fovs[i]->within_fov(xx, yy))
-					return true;
+			if (player && player->field_of_view().within_fov(xx, yy)) {
+				return true;
+			} else if (!player) {
+				for (int i = 0; i < players.size(); i++) {
+					PlayerInst* p = (PlayerInst*)get_instance(players[i]);
+					if (p->field_of_view().within_fov(xx, yy)) {
+						return true;
+					}
+				}
 			}
 		}
 	}
 	return false;
 }
 
-void GameState::ensure_connectivity(int roomid1, int roomid2) {
+void GameState::ensure_level_connectivity(int roomid1, int roomid2) {
 	world.connect_entrance_to_exit(roomid1, roomid2);
 }
 void GameState::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	world.level_move(id, x, y, roomid1, roomid2);
 }
+
+bool GameState::mouse_left_click() {
+	return mouse_leftclick;
+}
+
+/* Mouse click states */
+bool GameState::mouse_right_click() {
+	return mouse_rightclick;
+}
+
+bool GameState::mouse_left_down() {
+	return mouse_leftdown;
+}
+
+bool GameState::mouse_right_down() {
+	return mouse_rightdown;
+}
+
+bool GameState::mouse_left_release() {
+	return mouse_leftrelease;
+}
+
+bool GameState::mouse_right_release() {
+	return mouse_rightrelease;
+}
+
+bool GameState::mouse_upwheel() {
+	return mouse_didupwheel;
+}
+bool GameState::mouse_downwheel() {
+	return mouse_diddownwheel;
+}
+
+/* End mouse click states */
 
 obj_id GameState::local_playerid() {
 	return get_level()->pc.local_playerid();
@@ -414,6 +471,6 @@ MonsterController& GameState::monster_controller() {
 PlayerController& GameState::player_controller() {
 	return get_level()->pc;
 }
-void GameState::skip_next_id() {
+void GameState::skip_next_instance_id() {
 	get_level()->inst_set.skip_next_id();
 }

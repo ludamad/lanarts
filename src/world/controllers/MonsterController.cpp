@@ -17,8 +17,9 @@
 
 #include "../../combat_logic/attack_logic.h"
 
-#include "../../util/world/collision_util.h"
+#include "../../util/colour_constants.h"
 #include "../../util/math_util.h"
+#include "../../util/world/collision_util.h"
 
 #include "../../data/tile_data.h"
 #include "../../data/weapon_data.h"
@@ -55,7 +56,7 @@ void MonsterController::register_enemy(GameInst* enemy) {
 }
 
 void towards_highest(PathInfo& path, Pos& p) {
-	int higest;
+	int highest;
 	for (int y = -1; y <= +1; y++) {
 		for (int x = -1; x <= +1; x++) {
 			path.get(p.x + x, p.y + y);
@@ -227,7 +228,7 @@ void MonsterController::set_monster_headings(GameState* gs,
 		if (pdist < e->target_radius + p->target_radius) {
 			e->vx = 0, e->vy = 0;
 		}
-		int mindist = wentry.range + e->target_radius - TILE_SIZE/8;
+		int mindist = wentry.range + e->target_radius - TILE_SIZE / 8;
 		if (viable_attack) {
 			int mindist = wentry.range + p->target_radius + e->target_radius
 					- TILE_SIZE / 8;
@@ -248,13 +249,13 @@ void MonsterController::deregister_enemy(EnemyInst* enemy) {
 }
 void MonsterController::shift_target(GameState* gs) {
 	if (!targetted)
-		return; //Should auto-target, it no target no possible targets
+		return; //Shouldn't auto-target if no targets are possible
 	int i, j;
 	for (i = 0; i < mids.size(); i++) {
 		if (mids[i] == targetted)
 			break;
 	}
-	GameInst* player = gs->get_instance(gs->local_playerid());
+	PlayerInst* player = gs->local_player();
 
 	for (j = i + 1; j % mids.size() != i; j++) {
 		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[j % mids.size()]);
@@ -281,7 +282,7 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 	int mindistsqr = HUGE_DISTANCE;
 	int closest_player_index = -1;
 	for (int i = 0; i < pids.size(); i++) {
-		GameInst* player = gs->get_instance(pids[i]);
+		PlayerInst* player = (PlayerInst*)gs->get_instance(pids[i]);
 		bool isvisible = gs->object_visible_test(e, player, false);
 		if (isvisible)
 			((PlayerInst*)player)->rest_cooldown() = REST_COOLDOWN;
@@ -328,7 +329,7 @@ void MonsterController::process_players(GameState* gs) {
 
 void MonsterController::pre_step(GameState* gs) {
 
-	GameInst* local_player = gs->get_instance(gs->local_playerid());
+	PlayerInst* local_player = gs->local_player();
 	std::vector<EnemyOfInterest> eois;
 
 	process_players(gs);
@@ -385,7 +386,7 @@ void MonsterController::pre_step(GameState* gs) {
 	for (int i = 0; i < mids.size(); i++) {
 		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[i]);
 		update_velocity(gs, e);
-		lua_gameinstcallback(gs->get_luastate(), e->etype().step_event, e->id);
+		lua_gameinstcallback(gs->get_luastate(), e->etype().step_event, e);
 		set_preferred_velocity(gs, simulator, e);
 	}
 
@@ -426,7 +427,7 @@ void MonsterController::post_draw(GameState* gs) {
 		return;
 	glLineWidth(2);
 	gl_draw_circle(gs->window_view(), target->x, target->y,
-			target->target_radius + 5, Colour(0, 255, 0, 140), true);
+			target->target_radius + 5, COL_GREEN.with_alpha(140), true);
 	glLineWidth(1);
 }
 

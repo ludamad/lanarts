@@ -1,8 +1,7 @@
 /*
- * GameChat.cpp
- *
- *  Created on: May 27, 2012
- *      Author: 100397561
+ * GameChat.cpp:
+ *  Game HUD component for drawing messages.
+ *  These messages include things like "A monster has appeared!" and chat messages.
  */
 
 #include <SDL.h>
@@ -18,9 +17,12 @@ extern "C" {
 
 #include "../../display/display.h"
 
-#include "../../lua/lua_api.h"
+#include "../../util/colour_constants.h"
+#include "../../util/math_util.h"
 
 #include "../../procedural/enemygen.h"
+
+#include "../../lua/lua_api.h"
 
 #include "../objects/PlayerInst.h"
 
@@ -91,10 +93,8 @@ void GameChat::draw_player_chat(GameState* gs) const {
 	int chat_x = 0, chat_y = 0; //h - chat_h - TILE_SIZE;
 	int text_x = chat_x + padding, text_y = chat_y + padding;
 
-	gl_set_drawing_area(0, 0, view_w, view_h);
-
 	gl_draw_rectangle(chat_x, chat_y, chat_w, chat_h,
-			Colour(180, 180, 255, 50 * fade_out));
+			COL_CONSOLE_BOX.with_alpha(50 * fade_out));
 
 	bool draw_typed_message = is_typing || !typed_message.empty();
 
@@ -195,12 +195,12 @@ bool GameChat::handle_special_commands(GameState* gs,
 		const std::string& command) {
 	ChatMessage printed;
 	const char* content;
-	PlayerInst* p = (PlayerInst*)gs->get_instance(gs->local_playerid());
+	PlayerInst* p = gs->local_player();
 
 	//Spawn monster
 	if (starts_with(command, "!spawn ", &content)) {
 		const char* rest = content;
-		int amnt = strtol(content, (char**)&rest, 10);
+		int amnt = strtol(content, (char**) &rest, 10);
 		if (content == rest)
 			amnt = 1;
 		rest = skip_whitespace(rest);
@@ -211,9 +211,19 @@ bool GameChat::handle_special_commands(GameState* gs,
 			printed.message_colour = Colour(255, 50, 50);
 		} else {
 			printed.message = std::string(rest) + " has spawned !";
-			post_generate_enemy(gs, enemy, amnt);
+			generate_enemy_after_level_creation(gs, enemy, amnt);
 			printed.message_colour = Colour(50, 255, 50);
 		}
+		add_message(printed);
+		return true;
+	}
+
+	//Set game speed
+	if (starts_with(command, "!gamespeed ", &content)) {
+		int gamespeed = squish(atoi(content), 1, 200);
+		gs->game_settings().time_per_step = gamespeed;
+		printed.message = std::string("Game speed set.");
+		printed.message_colour = Colour(50, 255, 50);
 		add_message(printed);
 		return true;
 	}
@@ -238,7 +248,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 	//Create item
 	if (starts_with(command, "!item ", &content)) {
 		const char* rest = content;
-		int amnt = strtol(content, (char**)&rest, 10);
+		int amnt = strtol(content, (char**) &rest, 10);
 		if (content == rest)
 			amnt = 1;
 		rest = skip_whitespace(rest);
@@ -260,7 +270,8 @@ bool GameChat::handle_special_commands(GameState* gs,
 	if (starts_with(command, "!killall", &content)) {
 		MonsterController& mc = gs->monster_controller();
 		for (int i = 0; i < mc.monster_ids().size(); i++) {
-			EnemyInst* inst = (EnemyInst*)gs->get_instance(mc.monster_ids()[i]);
+			EnemyInst* inst = (EnemyInst*) gs->get_instance(
+					mc.monster_ids()[i]);
 			if (inst) {
 				inst->damage(gs, 99999);
 			}
@@ -282,9 +293,9 @@ bool GameChat::handle_special_commands(GameState* gs,
 //		lua_pop(L, 1);
 	}
 
-	lua_push_gameinst(L, p->id);
+	lua_push_gameinst(L, p);
 	script_globals.table_pop_value(L, "player");
-	lua_push_combatstats(L, p->id);
+	lua_push_combatstats(L, p);
 	script_globals.table_pop_value(L, "stats");
 
 	//Run lua command
@@ -350,8 +361,8 @@ bool GameChat::handle_special_commands(GameState* gs,
 void GameChat::toggle_chat(GameState* gs) {
 	if (is_typing) {
 		if (!typed_message.message.empty()) {
-			typed_message.sender = local_sender;
-			typed_message.sender_colour = Colour(37, 207, 240);
+			typed_message.sender = gs->game_settings().username;
+			typed_message.sender_colour = COL_BABY_BLUE;
 			if (!handle_special_commands(gs, typed_message.message)) {
 				add_message(typed_message);
 			}
@@ -435,12 +446,14 @@ bool GameChat::handle_event(GameState* gs, SDL_Event *event) {
 	}
 	return false;
 }
+
 void GameChat::reset_typed_message() {
 	typed_message.sender.clear();
 	typed_message.message.clear();
 }
-GameChat::GameChat(const std::string& local_sender) :
-		local_sender(local_sender), typed_message(std::string(), std::string()) {
+
+GameChat::GameChat() :
+		typed_message(std::string(), std::string()) {
 	current_key = SDLK_UNKNOWN;
 	current_mod = KMOD_NONE;
 	reset_typed_message();
@@ -448,16 +461,7 @@ GameChat::GameChat(const std::string& local_sender) :
 	fade_out = 1.0f;
 	fade_out_rate = 0.05f;
 	is_typing = false;
-//	messages.push_back(
-//			ChatMessage("ludamad", "What's up!?\nGo eff off",
-//					Colour(37, 207, 240)));
-//	messages.push_back(ChatMessage("ciribot", "nm u", Colour(255, 69, 0)));
-
-//	char buff[40];
-//	for (int i = 0; i < 14; i++){
-//		snprintf(buff, 40, "Message %d\n", i);
-//		this->add_message(buff);
-//	}
+	repeat_steps_left = 0;
 }
 
 void packet_get_str(NetPacket& packet, std::string& str) {

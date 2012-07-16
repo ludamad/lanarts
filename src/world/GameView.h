@@ -1,5 +1,5 @@
 /*
- * GameView.h
+ * GameView.h:
  *	Represents a section of the game world, bounded by the dimensions of the world, and roughly centred on an object
  */
 

@@ -6,14 +6,31 @@ enemies:
     death_sprite: blood
     radius: 10
     xpaward: 5
+    description: A giant, aggressive vermin.
     appear_message: A hostile large rat approaches!
     defeat_message: Blood splatters as the large rat is destroyed.
     stats:
         attacks: [ {weapon: Basic Melee} ]
-        hp: 14
+        hp: 10
         hpregen: 0.03
         movespeed: 2
         #base stats:
+        strength: 10
+        defence: 5
+        willpower: 5
+              
+  - name: Giant Bat
+    sprite: giant bat
+    death_sprite: blood
+    radius: 12
+    xpaward: 8
+    appear_message: A hungry giant bat surveys the scene.
+    defeat_message: The giant bat has died.
+    stats:
+        attacks: [ {weapon: Fast Melee} ]
+        hp: 12
+        hpregen: 0.03
+        movespeed: 2.5
         strength: 10
         defence: 5
         willpower: 5
@@ -27,7 +44,7 @@ enemies:
     defeat_message: The hound yelps as it is pulverized.
     stats:
         attacks: [ {weapon: Basic Melee} ]
-        hp: 25
+        hp: 20
         hpregen: 0.03
         movespeed: 2.5
         strength: 12
@@ -38,15 +55,31 @@ enemies:
     sprite: sheep
     death_sprite: blood
     radius: 14
-    xpaward: 8
+    xpaward: 10
     appear_message: A hostile sheep approaches!
     defeat_message: The sheep recieves a fatal blow.
     stats:
         attacks: [ {weapon: Basic Melee} ]
-        hp: 20
+        hp: 15
         hpregen: 0.03
         movespeed: 2
         strength: 10
+        defence: 5
+        willpower: 5
+
+  - name: Giant Frog
+    sprite: giant frog
+    death_sprite: green blood
+    radius: 14
+    xpaward: 10
+    appear_message: A giant frog hops onto the scene.
+    defeat_message: The giant frog dies!
+    stats:
+        attacks: [ {weapon: Slow Melee} ]
+        hp: 25
+        hpregen: 0.01
+        movespeed: 3
+        strength: 12
         defence: 5
         willpower: 5
           
@@ -74,7 +107,7 @@ enemies:
     appear_message: An unnaturally glowing chicken appears!
     defeat_message: The glowing chicken recieves a final blow.
     stats:
-        attacks: [ {weapon: Basic Melee} ]
+        attacks: [ {weapon: Fast Melee} ]
         hp: 50
         hpregen: 0.08
         movespeed: 4

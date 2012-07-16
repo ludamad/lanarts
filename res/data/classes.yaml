@@ -3,6 +3,11 @@
 classes:
   - name: Mage
     sprite: mage
+    spells:
+      - level_needed: 1
+        spell: Fire Bolt
+      - level_needed: 3
+        spell: Magic Blast
     start_stats:
         movespeed: 4
         hp: 85
@@ -25,6 +30,9 @@ classes:
 
   - name: Fighter
     sprite: fighter
+    spells:
+      - level_needed: 2
+        spell: Fire Bolt
     start_stats:
         movespeed: 4
         hp: 120
@@ -35,6 +43,12 @@ classes:
         defence: 5
         willpower: 3
         magic: 2
+        equipment:
+          inventory:
+            - item: Short Sword
+            - item: Short Bow
+            - item: Arrow
+              amount: 20
     gain_per_level:
         hp: 30
         mp: 10

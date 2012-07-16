@@ -22,6 +22,7 @@ void load_armour_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemtable);
 void load_weapon_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemstable = NULL);
+LuaValue load_spell_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 		LuaValue& itemstable);
 void load_armour_item_entries();
@@ -72,49 +73,75 @@ static int get_X_by_name(const T& t, const char* name, bool error_if_not_found =
 int get_armour_by_name(const char *name, bool error_if_not_found) {
 	return get_X_by_name(game_armour_data, name, error_if_not_found);
 }
-int get_item_by_name(const char* name, bool error_if_not_found) {
+const char* equip_type_description(const ItemEntry& ientry) {
+	switch (ientry.equipment_type) {
+	case ItemEntry::ARMOUR:
+		return "Armour";
+	case ItemEntry::WEAPON:
+		return "Weapon";
+	case ItemEntry::PROJECTILE: {
+		ProjectileEntry& pentry = game_projectile_data.at(ientry.equipment_id);
+		if (pentry.is_unarmed()) {
+			return "Unarmed Projectile";
+		} else {
+			return "Projectile";
+		}
+	}
+	case ItemEntry::NONE:
+		return "One-time Use";
+	}
+	return "";
+}
+
+item_id get_item_by_name(const char* name, bool error_if_not_found) {
 	return get_X_by_name(game_item_data, name, error_if_not_found);
 }
-int get_class_by_name(const char* name) {
+class_id get_class_by_name(const char* name) {
 	return get_X_by_name(game_class_data, name);
 }
-int get_sprite_by_name(const char* name) {
+sprite_id get_sprite_by_name(const char* name) {
 	return get_X_by_name(game_sprite_data, name);
 }
-int get_tile_by_name(const char* name) {
+spell_id get_spell_by_name(const char* name) {
+	return get_X_by_name(game_spell_data, name);
+}
+tile_id get_tile_by_name(const char* name) {
 	return get_X_by_name(game_tile_data, name);
 }
-int get_effect_by_name(const char* name) {
+effect_id get_effect_by_name(const char* name) {
 	return get_X_by_name(game_effect_data, name);
 }
-int get_enemy_by_name(const char* name, bool error_if_not_found) {
+enemy_id get_enemy_by_name(const char* name, bool error_if_not_found) {
 	return get_X_by_name(game_enemy_data, name, error_if_not_found);
 }
-int get_projectile_by_name(const char* name) {
+projectile_id get_projectile_by_name(const char* name) {
 	return get_X_by_name(game_projectile_data, name);
 }
-int get_weapon_by_name(const char* name) {
+weapon_id get_weapon_by_name(const char* name) {
 	return get_X_by_name(game_weapon_data, name);
 }
 
-int get_tileset_by_name(const char* name) {
+tileset_id get_tileset_by_name(const char* name) {
 	return get_X_by_name(game_tileset_data, name);
 }
 
-LuaValue sprites, armours, enemies, effects, weapons, projectiles, items, dungeon,
-		classes;
+LuaValue sprites, armours, enemies, effects, weapons, projectiles, items,
+		dungeon, classes, spells;
 void init_game_data(lua_State* L) {
 	DataFiles dfiles = load_datafiles_data("res/datafiles.yaml");
 
 //NB: Do not re-order the way resources are loaded unless you know what you're doing
 	load_tile_data(dfiles.tile_files);
 	sprites = load_sprite_data(L, dfiles.sprite_files);
+	sprites.deinitialize(L);
 	load_tileset_data(dfiles.tileset_files);
-	//TODO: make separate weapons table
+	//TODO: make separate weapons table ?
 	items = load_item_data(L, dfiles.item_files);
 
 	projectiles = load_projectile_data(L, dfiles.projectile_files, items);
 	load_projectile_item_entries();
+
+	spells = load_spell_data(L, dfiles.spell_files);
 
 	load_weapon_data(L, dfiles.weapon_files, &items);
 	load_weapon_item_entries();
@@ -125,6 +152,7 @@ void init_game_data(lua_State* L) {
 	effects = load_effect_data(L, dfiles.effect_files);
 	enemies = load_enemy_data(L, dfiles.enemy_files);
 	dungeon = load_dungeon_data(L, dfiles.level_files);
+	dungeon.deinitialize(L);
 	classes = load_class_data(L, dfiles.class_files);
 }
 
@@ -149,8 +177,9 @@ void init_lua_data(GameState* gs, lua_State* L) {
 //	register_as_global(L, weapons, "weapons");
 	register_as_global(L, items, "items");
 	register_as_global(L, projectiles, "projectiles");
-	register_as_global(L, sprites, "sprites");
-	register_as_global(L, dungeon, "dungeon");
+	register_as_global(L, spells, "spells");
+//	register_as_global(L, sprites, "sprites");
+//	register_as_global(L, dungeon, "dungeon");
 	register_as_global(L, classes, "classes");
 
 	luaL_dofile(L, "res/main.lua");

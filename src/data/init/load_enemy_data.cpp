@@ -23,6 +23,7 @@ EnemyEntry parse_enemy_type(const YAML::Node& n) {
 //	LuaValue init_event, step_event;
 
 	entry.name = parse_str(n["name"]);
+	entry.description = parse_defaulted(n, "description", std::string());
 
 	entry.appear_msg = parse_defaulted(n, "appear_message", std::string());
 	entry.defeat_msg = parse_defaulted(n, "defeat_message", std::string());
@@ -44,7 +45,7 @@ EnemyEntry parse_enemy_type(const YAML::Node& n) {
 void load_enemy_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	game_enemy_data.push_back(parse_enemy_type(node));
-	value->table_set_yaml(L, game_enemy_data.back().name, &node);
+	value->table_set_yaml(L, game_enemy_data.back().name, node);
 }
 
 LuaValue load_enemy_data(lua_State* L, const FilenameList& filenames) {

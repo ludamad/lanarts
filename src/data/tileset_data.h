@@ -36,6 +36,6 @@ struct TilesetEntry {
 
 extern std::vector<TilesetEntry> game_tileset_data;
 
-int get_tileset_by_name(const char* name);
+tileset_id get_tileset_by_name(const char* name);
 
 #endif /* TILESET_DATA_H_ */

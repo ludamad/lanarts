@@ -1,34 +1,34 @@
-#include "LuaValue.h"
-#include <string>
-#include <cstring>
-#include <cstdlib>
+#include <yaml-cpp/yaml.h>
 
 extern "C" {
 #include <lua/lua.h>
 #include <lua/lauxlib.h>
 }
 
-#include "../lua/lua_api.h"
+#include "LuaValue.h"
+#include <string>
+#include <cstring>
+#include <cstdlib>
 
-#include <yaml-cpp/yaml.h>
+#include "../lua/lua_api.h"
 
 //YAML related helper functions
 
-static bool nodeis(const YAML::Node* node, const char* str) {
-	return (strcmp(node->Tag().c_str(), str) == 0);
+static bool nodeis(const YAML::Node& node, const char* str) {
+	return (strcmp(node.Tag().c_str(), str) == 0);
 }
-static void push_yaml_node(lua_State* L, const YAML::Node* node) {
+static void push_yaml_node(lua_State* L, const YAML::Node& node) {
 	int table;
 	YAML::Iterator it;
 	std::string str;
-	switch (node->Type()) {
+	switch (node.Type()) {
 	case YAML::NodeType::Null:
 		lua_pushnil(L);
 		break;
 	case YAML::NodeType::Scalar:
-		node->GetScalar(str);
+		node.GetScalar(str);
 		if (nodeis(node, "?")) {
-			char* end;
+			char* end = NULL;
 			double value = strtod(str.c_str(), &end);
 			size_t convchrs = (end - str.c_str());
 			if (convchrs == str.size())
@@ -42,18 +42,18 @@ static void push_yaml_node(lua_State* L, const YAML::Node* node) {
 	case YAML::NodeType::Sequence:
 		lua_newtable(L);
 		table = lua_gettop(L);
-		for (int i = 0; i < node->size(); i++) {
-			push_yaml_node(L, &(*node)[i]);
+		for (int i = 0; i < node.size(); i++) {
+			push_yaml_node(L, node[i]);
 			lua_rawseti(L, table, i + 1);
 		}
 		break;
 	case YAML::NodeType::Map:
 		lua_newtable(L);
 		table = lua_gettop(L);
-		it = node->begin();
-		for (; it != node->end(); ++it) {
-			push_yaml_node(L, &it.first());
-			push_yaml_node(L, &it.second());
+		it = node.begin();
+		for (; it != node.end(); ++it) {
+			push_yaml_node(L, it.first());
+			push_yaml_node(L, it.second());
 			lua_settable(L, table);
 		}
 		break;
@@ -144,7 +144,7 @@ public:
 		lua_pop(L, 1);
 	}
 
-	void table_set_yaml(lua_State* L, const char* key, const YAML::Node* root) {
+	void table_set_yaml(lua_State* L, const char* key, const YAML::Node& root) {
 		push(L); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
 		/*Push a YAML node as a lua value*/
@@ -253,19 +253,17 @@ void LuaValue::table_set_newtable(lua_State* L, const char *key) {
 LuaValue::LuaValue(const LuaValue & value) {
 	impl = value.impl;
 	if (impl) {
-		impl->ref_count()++;
+		impl->ref_count()++;}
 	}
-}
 
 void LuaValue::operator =(const LuaValue & value) {
 	deref(impl);
 	impl = value.impl;
 	if (impl)
-		impl->ref_count()++;
-}
+		impl->ref_count()++;}
 
 void LuaValue::table_set_yaml(lua_State* L, const char *key,
-		const YAML::Node *root) {
+		const YAML::Node& root) {
 	if (empty())
 		table_initialize(L);
 	impl->table_set_yaml(L, key, root);
@@ -286,11 +284,11 @@ bool LuaValue::empty() {
 	return impl == NULL || impl->is_empty();
 }
 
-void lua_gameinstcallback(lua_State* L, LuaValue& value, int id) {
+void lua_gameinstcallback(lua_State* L, LuaValue& value, GameInst* inst) {
 	if (value.empty())
 		return;
 	value.push(L);
-	lua_push_gameinst(L, id);
+	lua_push_gameinst(L, inst);
 	lua_call(L, 1, 0);
 }
 

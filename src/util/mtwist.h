@@ -72,29 +72,29 @@ class MTwist {
 	double genrand_res53(void);
 
 public:
-	int amount_of_randoms;
+	int DEBUG_INFO_amnt_generated;
 	void init_genrand(unsigned int s);
 	void init_by_array(unsigned int init_key[], int key_length);
 
 	MTwist() :
 			mti(N + 1) {
-		amount_of_randoms = 0;
+		DEBUG_INFO_amnt_generated = 0;
 	}
 	MTwist(unsigned int s) :
 			mti(N + 1) {
-		amount_of_randoms = 0;
+		DEBUG_INFO_amnt_generated = 0;
 		init_genrand(s);
 	}
 	MTwist(unsigned int init_key[], int key_length) :
 			mti(N + 1) {
-		amount_of_randoms = 0;
+		DEBUG_INFO_amnt_generated = 0;
 		init_by_array(init_key, key_length);
 	}
 
 	int rand(int max) {
 		if (max == 1)
 			return 0;
-		amount_of_randoms++;
+		DEBUG_INFO_amnt_generated++;
 		return genrand_int32() % max;
 	}
 	int rand(int min, int max) {

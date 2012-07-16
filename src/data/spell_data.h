@@ -1,5 +1,5 @@
 /*
- * spell_data.h
+ * spell_data.h:
  *  Defines the data that goes into a spell
  */
 
@@ -7,21 +7,29 @@
 #define SPELL_DATA_H_
 
 #include <string>
+#include <vector>
 
+#include "../gamestats/items.h"
+
+#include "../util/game_basic_structs.h"
 #include "../util/LuaValue.h"
 
 struct SpellEntry {
-	std::string name;
-	int sprite;
-	LuaValue effect;//Immediate effect
-	LuaValue projectile_init;
-	LuaValue projectile_step;
-	SpellEntry(const std::string& name, int sprite, const std::string& effect);
-	void init(lua_State* L){
-		effect.initialize(L);
+	std::string name, description;
+	sprite_id sprite;
+	int mp_cost;
+	LuaValue action; //Immediate action
+	Projectile projectile; //Projectile used, if any
+	SpellEntry() :
+			sprite(-1), mp_cost(0) {
+	}
+
+	void init(lua_State* L) {
+		action.initialize(L);
 	}
 };
 
 extern std::vector<SpellEntry> game_spell_data;
 
+spell_id get_spell_by_name(const char* name);
 #endif /* SPELL_DATA_H_ */

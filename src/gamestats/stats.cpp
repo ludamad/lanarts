@@ -53,12 +53,16 @@ void CoreStats::heal_mp(float mpgain) {
 		mp = max_mp;
 }
 
-float CoreStatMultiplier::calculate(MTwist& mt, const CoreStats& stats) {
-	int basevalue = mt.rand(base);
-	int stats_sum = stats.strength * strength + stats.defence * defence
+Range CoreStatMultiplier::calculate_range(const CoreStats& stats) const {
+	float stats_sum = stats.strength * strength + stats.defence * defence
 			+ stats.magic * magic + stats.willpower * willpower;
-//	float random_multiplier = (100 + mt.rand(Range(-5, 5))) / 100.0f;
-	return basevalue + stats_sum;// * random_multiplier;
+	return Range(base.min + round(stats_sum), base.max + round(stats_sum));
+}
+
+float CoreStatMultiplier::calculate(MTwist& mt, const CoreStats& stats) const {
+	float stats_sum = stats.strength * strength + stats.defence * defence
+			+ stats.magic * magic + stats.willpower * willpower;
+	return stats_sum + mt.rand(base);
 }
 
 EffectiveAttackStats EffectiveStats::with_attack(MTwist& mt,
@@ -80,6 +84,8 @@ void CooldownStats::step() {
 		pickup_cooldown = 0;
 	if (--hurt_cooldown < 0)
 		hurt_cooldown = 0;
+	if (--stopaction_timeout < 0)
+		stopaction_timeout = 0;
 }
 
 void CooldownStats::reset_action_cooldown(int cooldown) {
@@ -93,6 +99,9 @@ void CooldownStats::reset_pickup_cooldown(int cooldown) {
 void CooldownStats::reset_rest_cooldown(int cooldown) {
 	rest_cooldown = std::max(cooldown, rest_cooldown);
 }
+void CooldownStats::reset_stopaction_timeout(int cooldown) {
+	stopaction_timeout = std::max(cooldown, stopaction_timeout);
+}
 
 bool DerivedStats::operator ==(const DerivedStats & derived) const {
 	return damage == derived.damage && power == derived.power
@@ -104,3 +113,6 @@ void CooldownStats::reset_hurt_cooldown(int cooldown) {
 	hurt_cooldown = std::max(cooldown, hurt_cooldown);
 }
 
+ClassType& ClassStats::class_type() const {
+	return game_class_data.at(classid);
+}

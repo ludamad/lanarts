@@ -1,3 +1,8 @@
+/*
+ * display_util.cpp:
+ *  Image drawing and other drawing related utility functions
+ */
+
 #include <cmath>
 #include <cstring>
 #include <cstdio>
@@ -54,12 +59,13 @@ void gl_draw_rectangle(int x, int y, int w, int h, const Colour& clr) {
 	glEnd();
 }
 
-void gl_draw_statbar(int x, int y, int w, int h, int minstat, int maxstat,
+void gl_draw_statbar(const BBox& bbox, int minstat, int maxstat,
 		const Colour& front, const Colour& back) {
-	int hp_width = (w * minstat) / maxstat;
-	gl_draw_rectangle(x, y, w, h, back);
-	if (hp_width > 0)
-		gl_draw_rectangle(x, y, hp_width, h, front);
+	int bar_width = (bbox.width() * minstat) / maxstat;
+	gl_draw_rectangle(bbox.x1, bbox.y1, bbox.width(), bbox.height(), back);
+	if (bar_width > 0) {
+		gl_draw_rectangle(bbox.x1, bbox.y1, bar_width, bbox.height(), front);
+	}
 }
 void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 		char* flags, const Colour& clr) {
@@ -84,16 +90,16 @@ void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 
 const int UNBOUNDED = 10000;
 
-/*Splits up strings, respecting space boundaries*/
-static std::vector<int> split_up_string(const font_data& font, int max_width,
-		const char* text) {
-	std::vector<int> line_splits;
+/*Splits up strings, respecting space boundaries & returns maximum width */
+static int process_string(const font_data& font, const char* text,
+		int max_width, std::vector<int>& line_splits) {
 	int last_space = 0, ind = 0;
+	int largest_width = 0;
 	int width = 0, width_since_space = 0;
 	unsigned char c;
 
 	while ((c = text[ind]) != '\0') {
-		char_data &cdata = *font.data[c];
+		char_data& cdata = *font.data[c];
 		width += cdata.advance;
 		width_since_space += cdata.advance;
 
@@ -101,54 +107,29 @@ static std::vector<int> split_up_string(const font_data& font, int max_width,
 			last_space = ind;
 			width_since_space = 0;
 		}
-
-		if (width > max_width) {
-			line_splits.push_back(last_space);
+		bool overmax = max_width != -1 && width > max_width;
+		if (c == '\n' || (overmax && !isspace(c))) {
+			line_splits.push_back(last_space+1);
+			largest_width = std::max(width, largest_width);
 			width = width_since_space;
 		}
 		ind++;
 	}
+	line_splits.push_back(ind);
 
-	return line_splits;
+	largest_width = std::max(width, largest_width);
+
+	return largest_width;
 }
 
-//Pos gl_printf_bounded(const font_data& font, const Colour& colour,
-//		const BBox& bounds, const char* text) {
-//	int textlen = strlen(text);
-//	for (int i = 0; i < textlen; i++)
-//		if (text[i] == '\n')
-//			text[i] = '\0';
-//
-//	Pos offset(0, 0);
-//	int len = 0;
-//	const char* iter = text;
-//	while (iter < text + textlen) {
-//		int len = 0;
-//		offset.y += font.h;
-//		for (int i = 0; iter[i]; i++) {
-//			unsigned char chr = iter[i];
-//			char_data &cdata = *font.data[chr];
-//			len += cdata.advance;
-//			gl_draw_image(cdata.img, bounds.x1 + len - (cdata.advance - cdata.left),
-//					bounds.y1 + offset.y - cdata.move_up, colour);
-//		}
-//		offset.x = std::max(len, offset.x);
-//		offset.y += 1;
-//
-//		iter += strlen(iter) + 1;
-//	}
-//	return offset;
-//}
-
-/* printf-like function that draws to the screen, returns width of formatted string*/
 void gl_draw_sprite_entry(const GameView& view, SpriteEntry& entry, int x,
 		int y, float dx, float dy, int steps, const Colour& c) {
 	float PI = 3.1415921;
 	GLimage* img;
 	if (entry.type == SpriteEntry::DIRECTIONAL) {
-		float direction = PI*2.5 + atan2(dy, dx);
+		float direction = PI * 2.5 + atan2(dy, dx);
 		int nimgs = entry.images.size();
-		float bucket_size = PI*2 / nimgs;
+		float bucket_size = PI * 2 / nimgs;
 		int bucket = round(direction / bucket_size);
 		bucket = bucket % nimgs;
 		img = &entry.img(bucket);
@@ -158,40 +139,115 @@ void gl_draw_sprite_entry(const GameView& view, SpriteEntry& entry, int x,
 	gl_draw_image(view, *img, x, y, c);
 }
 
-Pos gl_printf(const font_data& font, const Colour& colour, float x, float y,
-		const char *fmt, ...) {
-	char text[512];
-	va_list ap;
+void gl_draw_sprite(sprite_id sprite, int x, int y, const Colour& c) {
+	GLimage& img = game_sprite_data.at(sprite).img();
+	gl_draw_image(img, x, y, c);
+}
 
-	va_start(ap, fmt);
-#ifdef __GNUC__
-	vsnprintf(text, 512, fmt, ap);
-#else
-	//TODO, add visual studio #if block
-	vsprintf(text, fmt, ap);
+void gl_draw_sprite(sprite_id sprite, const GameView& view, int x, int y,
+		const Colour& c) {
+	gl_draw_sprite(sprite, x - view.x, y - view.y, c);
+}
+
+#ifndef __GNUC__
+#define vsnprintf(text, len, fmt, ap) vsprintf(text, fmt, ap)
 #endif
+
+//
+/* General gl_print function for others to delegate to */
+static Pos gl_print_impl(const font_data& font, const Colour& colour, Pos p,
+		int max_width, bool center_x, bool center_y, const char* fmt,
+		va_list ap) {
+	char text[512];
+	vsnprintf(text, 512, fmt, ap);
 	va_end(ap);
 
-	int textlen = strlen(text);
-	for (int i = 0; i < textlen; i++)
-		if (text[i] == '\n')
-			text[i] = '\0';
 	Pos offset(0, 0);
-	int len = 0;
-	for (char* iter = text; iter < text + textlen;
-			iter += strlen(iter) + 1, len = 0) {
+
+	std::vector<int> line_splits;
+	int measured_width = process_string(font, text, max_width, line_splits);
+
+	if (center_x) {
+		p.x -= measured_width / 2;
+	}
+	if (center_y) {
+		p.y -= font.h / 2;
+	}
+
+	for (int linenum = 0, i = 0; linenum < line_splits.size(); linenum++) {
+		int len = 0;
+		int eol = line_splits[linenum];
+
 		offset.y += font.h;
-		for (int i = 0; iter[i]; i++) {
-			unsigned char chr = iter[i];
+
+		for (; i < eol; i++) {
+			unsigned char chr = text[i];
+			if (chr == '\n') {
+				continue; //skip newline char
+			}
 			char_data &cdata = *font.data[chr];
 			len += cdata.advance;
-			offset.x = std::max(len, offset.x);
-			gl_draw_image(cdata.img, x + len - (cdata.advance - cdata.left),
-					y + offset.y - cdata.move_up, colour);
+			gl_draw_image(cdata.img, p.x + len - (cdata.advance - cdata.left),
+					p.y + offset.y - cdata.move_up, colour);
 		}
+		offset.x = std::max(len, offset.x);
 		offset.y += 1;
 	}
 	return offset;
+}
+/* printf-like function that draws to the screen, returns dimensions of formatted string*/
+Pos gl_printf(const font_data& font, const Colour& colour, float x, float y,
+		const char* fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+
+	return gl_print_impl(font, colour, Pos(x, y), -1, false, false, fmt, ap);
+}
+
+/* printf-like function that draws to the screen, returns width of formatted string*/
+Pos gl_printf_bounded(const font_data& font, const Colour& colour, float x,
+		float y, int max_width, bool center_y, const char *fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+
+	return gl_print_impl(font, colour, Pos(x, y), max_width, false, false, fmt,
+			ap);
+}
+/* printf-like function that draws to the screen, returns width of formatted string*/
+Pos gl_printf_y_centered_bounded(const font_data& font, const Colour& colour, float x,
+		float y, int max_width, bool center_y, const char *fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+
+	return gl_print_impl(font, colour, Pos(x, y), max_width, false, true, fmt,
+			ap);
+}
+
+/* printf-like function that draws to the screen, returns width of formatted string*/
+Pos gl_printf_centered(const font_data& font, const Colour& colour, float x,
+		float y, const char *fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+
+	return gl_print_impl(font, colour, Pos(x, y), -1, true, true, fmt, ap);
+}
+
+/* printf-like function that draws to the screen, returns width of formatted string*/
+Pos gl_printf_y_centered(const font_data& font, const Colour& colour, float x,
+		float y, const char *fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+
+	return gl_print_impl(font, colour, Pos(x, y), -1, false, true, fmt, ap);
+}
+
+/* printf-like function that draws to the screen, returns width of formatted string*/
+Pos gl_printf_x_centered(const font_data& font, const Colour& colour, float x,
+		float y, const char *fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+
+	return gl_print_impl(font, colour, Pos(x, y), -1, true, false, fmt, ap);
 }
 
 void gl_draw_circle(const GameView& view, float x, float y, float radius,
@@ -245,9 +301,9 @@ void gl_draw_line(int x1, int y1, int x2, int y2, const Colour& clr,
 		glLineWidth(1);
 }
 
-void gl_draw_statbar(const GameView& view, int x, int y, int w, int h,
-		int min_stat, int max_stat, const Colour& front, const Colour& back) {
-	gl_draw_statbar(x - view.x, y - view.y, w, h, min_stat, max_stat, front,
-			back);
+void gl_draw_statbar(const GameView& view, const BBox& bbox, int min_stat,
+		int max_stat, const Colour& front, const Colour& back) {
+	gl_draw_statbar(bbox.translated(-view.x, -view.y), min_stat, max_stat,
+			front, back);
 }
 

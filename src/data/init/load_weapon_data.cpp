@@ -37,6 +37,7 @@ void load_weapon_callbackf(const YAML::Node& node, lua_State* L,
 
 	WeaponEntry entry;
 	entry.name = parse_str(node["name"]);
+	entry.description = parse_defaulted(node, "description", std::string());
 	entry.weapon_class = parse_str(node["weapon_class"]);
 	entry.uses_projectile = parse_defaulted(node, "uses_projectile", false);
 	entry.max_targets = parse_defaulted(node, "max_targets", 1);
@@ -64,7 +65,7 @@ void load_weapon_callbackf(const YAML::Node& node, lua_State* L,
 
 	game_weapon_data.push_back(entry);
 	if (value)
-		value->table_set_yaml(L, game_weapon_data.back().name, &node);
+		value->table_set_yaml(L, game_weapon_data.back().name, node);
 }
 
 void load_weapon_data(lua_State* L, const FilenameList& filenames,
@@ -82,7 +83,7 @@ void load_weapon_item_entries() {
 		WeaponEntry& wtype = game_weapon_data[i];
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
 		game_item_data.push_back(
-				ItemEntry(wtype.name, "", default_radius, wtype.item_sprite,
+				ItemEntry(wtype.name, wtype.description, "", default_radius, wtype.item_sprite,
 						"equip", "", false, ItemEntry::WEAPON, i));
 	}
 }
@@ -91,6 +92,7 @@ void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	ProjectileEntry entry;
 	entry.name = parse_str(node["name"]);
+	entry.description = parse_defaulted(node, "description", std::string());
 
 	entry.damage = parse_defaulted(node, "damage", CoreStatMultiplier());
 	entry.power = parse_defaulted(node, "power", CoreStatMultiplier());
@@ -112,7 +114,7 @@ void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
 
 	game_projectile_data.push_back(entry);
 	if (value)
-		value->table_set_yaml(L, game_projectile_data.back().name, &node);
+		value->table_set_yaml(L, game_projectile_data.back().name, node);
 }
 LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 		LuaValue& itemtable) {
@@ -138,7 +140,7 @@ void load_projectile_item_entries() {
 		ProjectileEntry& ptype = game_projectile_data[i];
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
 		game_item_data.push_back(
-				ItemEntry(ptype.name, "", default_radius, ptype.item_sprite,
+				ItemEntry(ptype.name, ptype.description, "", default_radius, ptype.item_sprite,
 						"equip", "", true, ItemEntry::PROJECTILE, i));
 	}
 }

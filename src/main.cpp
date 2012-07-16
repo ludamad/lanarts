@@ -89,11 +89,12 @@ static void menu_loop(GameState* gs, int width, int height) {
 	gs->window_view() = prevview;
 }
 
+
 static void game_loop(GameState* gs) {
 
 	bool paused = false, cont = true;
 
-	unsigned long draw_time = 5 * CLOCKS_PER_SEC / 1000;
+	unsigned long draw_time = 0;
 
 	unsigned long draw_events = 1;
 
@@ -111,9 +112,9 @@ static void game_loop(GameState* gs) {
 			init_game_data(gs->get_luastate());
 			init_lua_data(gs, gs->get_luastate());
 		}
-		if (gs->key_press_state(SDLK_F3)) {
-			gs->game_world().regen_level(gs->get_level()->roomid);
-		}
+//		if (gs->key_press_state(SDLK_F3)) {
+//			gs->game_world().regen_level(gs->get_level()->roomid);
+//		}
 		if (gs->key_press_state(SDLK_F4)) {
 			paused = !paused;
 		}

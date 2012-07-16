@@ -14,6 +14,26 @@
 
 using namespace std;
 
+ClassSpell parse_class_spell(const YAML::Node& n) {
+	ClassSpell spell;
+
+	std::string spellname = parse_str(n["spell"]);
+	spell.spell = get_spell_by_name(spellname.c_str());
+	spell.xplevel_required = parse_int(n["level_needed"]);
+
+	return spell;
+}
+
+ClassSpellProgression parse_class_spell_progression(const YAML::Node& n) {
+	ClassSpellProgression progression;
+
+	for (int i = 0; i < n.size(); i++) {
+		progression.available_spells.push_back(parse_class_spell(n[i]));
+	}
+
+	return progression;
+}
+
 ClassType parse_class(const YAML::Node& n) {
 
 //	std::string name;
@@ -26,7 +46,9 @@ ClassType parse_class(const YAML::Node& n) {
 	const YAML::Node& level = n["gain_per_level"];
 
 	n["name"] >> classtype.name;
+	classtype.spell_progression = parse_class_spell_progression(n["spells"]);
 	classtype.starting_stats = parse_combat_stats(n["start_stats"]);
+
 	level["mp"] >> classtype.mp_perlevel;
 	level["hp"] >> classtype.hp_perlevel;
 
@@ -44,7 +66,7 @@ ClassType parse_class(const YAML::Node& n) {
 void load_class_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	game_class_data.push_back(parse_class(node));
-	value->table_set_yaml(L, game_class_data.back().name, &node);
+	value->table_set_yaml(L, game_class_data.back().name, node);
 }
 
 LuaValue load_class_data(lua_State* L, const FilenameList& filenames) {
@@ -55,7 +77,9 @@ LuaValue load_class_data(lua_State* L, const FilenameList& filenames) {
 			&ret);
 
 	for (int i = 0; i < game_class_data.size(); i++) {
-		game_class_data[i].starting_stats.class_stats.classtype = i;
+		CombatStats& cstats = game_class_data[i].starting_stats;
+		cstats.class_stats.classid = i;
+		cstats.init();
 	}
 
 	return ret;

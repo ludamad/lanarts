@@ -1,8 +1,6 @@
 /*
- * astar_pathfind.h
- *
- *  Created on: Mar 27, 2012
- *      Author: 100397561
+ * astar_pathfind.h:
+ *  Implements A* pathfinding
  */
 
 #ifndef ASTAR_PATHFIND_H_

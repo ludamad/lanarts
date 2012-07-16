@@ -1,5 +1,5 @@
 /*
- * math_util.h
+ * math_util.h:
  *  Defines utility functions for things such as vector normalization, rounding to powers of two, etc
  */
 
@@ -13,6 +13,8 @@ void direction_towards(const Pos& a, const Pos& b, float& rx, float& ry,
 		float speed = 1);
 int squish(int a, int b, int c);
 float distance_between(const Pos& a, const Pos& b);
+float magnitude(float x, float y);
+void normalize(float& x, float& y, float mag = 1);
 
 int round_to_multiple(int num, int mult, bool centered = false);
 int centered_multiple(int num, int mult);

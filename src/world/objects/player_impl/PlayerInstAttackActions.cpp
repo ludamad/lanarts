@@ -16,9 +16,10 @@ extern "C" {
 
 #include "../../../lua/lua_api.h"
 
+#include "../../../util/colour_constants.h"
 #include "../../../util/math_util.h"
-#include "../../../util/world/collision_util.h"
 #include "../../../util/game_basic_structs.h"
+#include "../../../util/world/collision_util.h"
 
 #include "../../GameState.h"
 
@@ -65,13 +66,15 @@ static GameInst* find_closest_from_list(GameState* gs,
 
 static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 		GameInst* targ, float dx, float dy) {
-	WeaponEntry& wentry = p->weapon_type().weapon_entry();
+	WeaponEntry& wentry = p->weapon().weapon_entry();
 	Pos ppos(p->x, p->y);
 	GameInst* inst = NULL;
 	bool ismelee = !(wentry.uses_projectile || p->equipment().has_projectile());
 	int target_range = wentry.range + p->target_radius;
 
-	if (targ && distance_between(Pos(targ->x, targ->y), ppos) - targ->target_radius <= target_range) {
+	if (targ
+			&& distance_between(Pos(targ->x, targ->y), ppos)
+					- targ->target_radius <= target_range) {
 		return targ;
 	}
 
@@ -112,11 +115,10 @@ static bool find_blink_target(PlayerInst* p, GameState* gs, Pos& position) {
 
 	int maxdist = 0;
 	for (int i = 0; i < pc.player_ids().size(); i++) {
-
-		fov* fov = pc.player_fovs()[i];
-		BBox fbox = fov->tiles_covered();
+		PlayerInst* player = (PlayerInst*)gs->get_instance(pc.player_ids()[i]);
+		BBox fbox = player->field_of_view().tiles_covered();
 		FOR_EACH_BBOX(fbox, x, y) {
-			if (fov->within_fov(x, y)) {
+			if (player->field_of_view().within_fov(x, y)) {
 				Pos pos(x * TILE_SIZE + TILE_SIZE / 2,
 						y * TILE_SIZE + TILE_SIZE / 2);
 
@@ -164,7 +166,7 @@ static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
 void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		float dy) {
 	GameView& view = gs->window_view();
-	WeaponEntry& wentry = weapon_type().weapon_entry();
+	WeaponEntry& wentry = weapon().weapon_entry();
 
 	bool mouse_within = gs->mouse_x() < gs->window_view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
@@ -174,9 +176,19 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 
 	//Keyboard-oriented blink
 	if (!spell_used && gs->key_press_state(SDLK_h)) {
+		bool canuse = true;
 		Pos blinkposition;
-		if (core_stats().mp >= 50
-				&& find_blink_target(this, gs, blinkposition)) {
+		if (core_stats().mp < 50) {
+			canuse = false;
+			gs->game_chat().add_message(
+					"You do not have enough mana to blink, 50 MP required!",
+					COL_RED);
+		} else if (!find_blink_target(this, gs, blinkposition)) {
+			canuse = false;
+			gs->game_chat().add_message(
+					"Cannot auto-blink, no hostile targets. Right click to blink manually.");
+		}
+		if (canuse) {
 			queued_actions.push_back(
 					GameAction(id, GameAction::USE_SPELL, frame, level, 2,
 							blinkposition.x, blinkposition.y));
@@ -214,11 +226,16 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		int px = x, py = y;
 		/* set-up x and y for gs->object_visible_test() */
 		x = rmx, y = rmy;
-		if (core_stats().mp >= 50 && !gs->solid_test(this)
-				&& gs->object_visible_test(this)) {
-			queued_actions.push_back(
-					GameAction(id, GameAction::USE_SPELL, frame, level, 2, x,
-							y));
+		if (core_stats().mp >= 50) {
+			if (!gs->solid_test(this) && gs->object_visible_test(this)) {
+				queued_actions.push_back(
+						GameAction(id, GameAction::USE_SPELL, frame, level, 2,
+								x, y));
+			}
+		} else {
+			gs->game_chat().add_message(
+					"You do not have enough mana to blink, 50 MP required!",
+					COL_RED);
 		}
 		/* restore x and y */
 		x = px, y = py;
@@ -256,7 +273,7 @@ void PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 }
 
 void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
-	WeaponEntry& wentry = weapon_type().weapon_entry();
+	WeaponEntry& wentry = weapon().weapon_entry();
 	MTwist& mt = gs->rng();
 	const int MAX_MELEE_HITS = 10;
 	EffectiveStats& estats = effective_stats();
@@ -275,7 +292,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 		item_id item = get_item_by_name(pentry.name.c_str());
 		int weaprange = std::max(wentry.range, pentry.range);
 
-		AttackStats weaponattack(weapon_type());
+		AttackStats weaponattack(weapon());
 		GameInst* bullet = new ProjectileInst(projectile,
 				effective_atk_stats(mt, weaponattack), id, start, actpos,
 				pentry.speed, weaprange);
@@ -285,7 +302,7 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 
 		equipment().use_ammo();
 	} else {
-		int weaprange = wentry.range + this->radius + TILE_SIZE/2;
+		int weaprange = wentry.range + this->radius + TILE_SIZE / 2;
 		float mag = distance_between(actpos, Pos(x, y));
 		if (mag > weaprange) {
 			float dx = actpos.x - x, dy = actpos.y - y;
@@ -310,8 +327,9 @@ void PlayerInst::use_weapon(GameState *gs, const GameAction& action) {
 				if (is_local_player()) {
 					snprintf(buffstr, 32, "%d XP", e->xpworth());
 					gs->add_instance(
-							new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0, AnimatedInst::DEPTH,
-									buffstr, Colour(255, 215, 11)));
+							new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0,
+									AnimatedInst::DEPTH, buffstr,
+									Colour(255, 215, 11)));
 				}
 			}
 
@@ -368,7 +386,7 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	}
 
 	if (action.use_id == 0) {
-		double mult = 1 + (class_stats().xplevel-1) / 10.0;
+		double mult = 1 + (class_stats().xplevel - 1) / 10.0;
 		mult = std::min(2.0, mult);
 		cooldowns().action_cooldown /= mult;
 	} else if (action.use_id == 2) {
