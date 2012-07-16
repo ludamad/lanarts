@@ -273,13 +273,8 @@ void PlayerInst::queue_network_actions(GameState *gs) {
 	bool hasconnection = connection.get_connection() != NULL;
 	NetPacket packet;
 	if (!is_local_player() && hasconnection) {
-		int tries = 0;
 		while (!connection.get_connection()->get_next_packet(packet)) {
-			if ((++tries) % 30000 == 0) {
-				if (!gs->update_iostate(false)) {
-					exit(0);
-				}
-			}
+
 		}
 		bool output1 = true;
 		while (packet.body_length > 0) {
