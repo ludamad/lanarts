@@ -6,8 +6,8 @@ projectiles:
     spr_item: arrow_item
     spr_attack: arrow_projectile
     #Stats
-    drop_chance: 75 # % chance
-    speed: 6
+    drop_chance: 90 # % chance
+    speed: 7
 
   - name: Silver Arrow
     description: A deadly silver arrow.
@@ -17,8 +17,8 @@ projectiles:
     #Stats
     damage: {base: [4,6]}
     power: {base: 2}
-    drop_chance: 90 # % chance
-    speed: 5
+    drop_chance: 95 # % chance
+    speed: 7
 
   - name: Stone
     description: A fist sized stone, good for throwing.
@@ -26,8 +26,8 @@ projectiles:
     spr_item: stone
     drop_chance: 90 # % chance
     #Stats
-    range: 400
-    speed: 8
-    cooldown: 50
-    damage: {base: [1,4], strength: 0.9}
+    range: 300
+    speed: 6
+    cooldown: 35
+    damage: {base: [2,5], strength: .75}
     power: {base: 2, strength: 0.2}

@@ -117,7 +117,7 @@ bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
 
 	int maxdist = 0;
 	for (int i = 0; i < pc.player_ids().size(); i++) {
-		PlayerInst* player = (PlayerInst*)gs->get_instance(pc.player_ids()[i]);
+		PlayerInst* player = (PlayerInst*) gs->get_instance(pc.player_ids()[i]);
 		BBox fbox = player->field_of_view().tiles_covered();
 		FOR_EACH_BBOX(fbox, x, y) {
 			if (player->field_of_view().within_fov(x, y)) {
@@ -380,17 +380,20 @@ bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		bool is_projectile = wentry.uses_projectile
 				|| equipment().has_projectile();
 
-		GameInst* target = NULL;
+		MonsterController& mc = gs->monster_controller();
+		GameInst* target = gs->get_instance(mc.current_target());
 		Pos targ_pos;
 
 		if (is_projectile) {
-			targ_pos = Pos(rmx, rmy);
+			if (mousetarget) {
+				targ_pos = Pos(rmx, rmy);
+			} else if (autotarget && target) {
+				targ_pos = Pos(target->x, target->y);
+			}
 		} else {
 			if (mousetarget) {
 				dx = rmx - x, dy = rmy - y;
-			} else if (autotarget) {
-				MonsterController& mc = gs->monster_controller();
-				target = gs->get_instance(mc.current_target());
+				target = NULL;
 			}
 			target = get_weapon_autotarget(gs, this, target, dx, dy);
 			if (target) {
@@ -398,7 +401,7 @@ bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 			}
 		}
 
-		if (target || is_projectile) {
+		if (target || (is_projectile && mousetarget)) {
 			queued_actions.push_back(
 					GameAction(id, GameAction::USE_WEAPON, frame, level,
 							spellselect, targ_pos.x, targ_pos.y));
@@ -471,7 +474,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		}
 
 		for (int i = 0; i < numhit; i++) {
-			EnemyInst* e = (EnemyInst*)enemies[i];
+			EnemyInst* e = (EnemyInst*) enemies[i];
 			lua_hit_callback(gs->get_luastate(), wentry.on_hit_func, this, e);
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
 				PlayerController& pc = gs->player_controller();
