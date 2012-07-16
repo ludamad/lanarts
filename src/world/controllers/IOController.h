@@ -49,7 +49,7 @@ struct IOEventTrigger {
 		MOUSE_WHEEL_DOWN,
 		MOUSE_MIDDLE_CLICK,
 		NOT_MOVING,
-		STOP_MOVING,
+		STOP_MOVING
 	};
 
 	IOEvent event;

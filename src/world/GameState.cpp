@@ -221,7 +221,7 @@ void GameState::draw(bool drawhud) {
 
 	update_display();
 // XXX: Apparently glFinish is not recommended
-//	glFinish();
+	glFinish();
 }
 
 obj_id GameState::add_instance(GameInst *inst) {

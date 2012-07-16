@@ -23,7 +23,7 @@ spells:
     description:
      A poisonous cloud that causes damage over time.
     mp_cost: 20
-    cooldown: 40
+    cooldown: 50
     spr_spell: poison
     projectile: Poison Cloud
 
