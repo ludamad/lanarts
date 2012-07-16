@@ -90,7 +90,7 @@ void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 		int bucket = round(direction / bucket_size);
 		bucket = bucket % nimgs;
 		img = &entry.img(bucket);
-	} else if (entry.type == SpriteEntry::ANIMATED) {
+	} else { //if (entry.type == SpriteEntry::ANIMATED) {
 		img = &entry.img();
 	}
 	gl_draw_image(view, *img, x, y, c);

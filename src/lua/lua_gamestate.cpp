@@ -69,25 +69,6 @@ public:
 		return 1;
 	}
 
-	int rand_range(lua_State* L) {
-		int nargs = lua_gettop(L);
-
-		lua_pushnumber(L, 1.0);
-		lua_rawget(L, 1);
-		int min = lua_tonumber(L, lua_gettop(L));
-		int max = min;
-		lua_pop(L, 1);
-
-		if (nargs > 1) {
-			lua_pushnumber(L, 2.0);
-			lua_rawget(L, 1);
-			max = lua_tonumber(L, lua_gettop(L));
-			lua_pop(L, 1);
-		}
-
-		lua_pushnumber(L, gs->rng().rand(min, max + 1));
-		return 1;
-	}
 	GameState* game_state() {
 		return gs;
 	}
@@ -128,7 +109,7 @@ static int lua_member_lookup(lua_State* L) {
 }
 
 meth_t bind_t::methods[] = { LUA_DEF(remove_object), LUA_DEF(create_projectile),
-		LUA_DEF(players_in_room), LUA_DEF(rand_range), meth_t(0, 0) };
+		LUA_DEF(players_in_room), meth_t(0, 0) };
 
 GameState* lua_get_gamestate(lua_State* L) {
 	lua_getglobal(L, "world");

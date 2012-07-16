@@ -6,7 +6,7 @@
 void ButtonInst::init(GameState* gs) {
 }
 
-BBox ButtonInst::bounds(GameState *gs) {
+BBox ButtonInst::bounds(GameState* gs) {
 	Pos dims = gl_text_dimensions(gs->menu_font(), "%s", str.c_str());
 	int sx = x - dims.x / 2, sy = y - dims.y / 2;
 	return BBox(sx, sy, sx + dims.x, sy + dims.y);

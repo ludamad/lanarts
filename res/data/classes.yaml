@@ -7,10 +7,12 @@ classes:
       - level_needed: 1
         spell: Fire Bolt
       - level_needed: 1
+        spell: Deathwish
+      - level_needed: 1
         spell: Blink
-      - level_needed: 3
+      - level_needed: 1
         spell: Poison Cloud
-      - level_needed: 4
+      - level_needed: 1
         spell: Magic Blast
     start_stats:
         movespeed: 4

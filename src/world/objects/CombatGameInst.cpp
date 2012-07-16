@@ -31,7 +31,15 @@ bool CombatGameInst::damage(GameState* gs, int dmg) {
 	return false;
 }
 bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
+
 	int dmg = damage_formula(attack, effective_stats());
+
+	char dmgstr[32];
+	snprintf(dmgstr, 32, "%d", dmg);
+	gs->add_instance(
+			new AnimatedInst(x, y, -1, 25, 0, 0, AnimatedInst::DEPTH, dmgstr,
+					Colour(255, 148, 120)));
+
 	return damage(gs, dmg);
 }
 

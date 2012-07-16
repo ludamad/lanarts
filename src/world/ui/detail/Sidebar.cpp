@@ -57,9 +57,9 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 	int x_interval = width / 2;
 	int y_interval = 15;
 
-	gl_printf(gs->primary_font(), COL_GOLD, x + 35, y, "Level %d",
-			class_stats.xplevel);
-	y += y_interval;
+	gl_printf_centered(gs->primary_font(), COL_GOLD, x - 10 + x_interval, 15,
+			"Level %d", class_stats.xplevel);
+//	y += y_interval;
 
 	gl_printf(gs->primary_font(), COL_GOLD, x, y, "Kills %d",
 			player_inst->number_of_kills());

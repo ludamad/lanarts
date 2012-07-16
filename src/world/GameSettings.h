@@ -23,6 +23,9 @@ struct GameSettings {
 	int steps_per_draw;
 	float time_per_step;
 
+	/*Replay settings*/
+	std::string savereplay_file, loadreplay_file;
+
 	/*Gameplay settings*/
 	bool regen_on_death;
 	bool invincible;
@@ -51,7 +54,6 @@ struct GameSettings {
 		port = 0;
 		conntype = NONE;
 		network_debug_mode = false;
-
 	}
 };
 

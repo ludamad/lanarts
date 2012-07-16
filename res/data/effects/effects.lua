@@ -15,7 +15,7 @@ end
 function poison_step(effect, obj)
 	if not effect.steps then 
 		effect.steps = 0
-	elseif effect.steps < 25 then
+	elseif effect.steps < 28 then
 		effect.steps = effect.steps + 1
 	else
 		effect.steps = 0

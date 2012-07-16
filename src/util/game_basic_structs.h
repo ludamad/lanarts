@@ -94,7 +94,8 @@ struct Tile {
 /*Represents an integer x,y pair position*/
 struct Pos {
 	int x, y;
-	Pos() {
+	Pos() :
+			x(0), y(0) {
 	}
 	bool operator==(const Pos& o) const {
 		return o.x == x && o.y == y;
@@ -107,7 +108,8 @@ struct Pos {
 /*Represents a float x,y pair position*/
 struct Posf {
 	float x, y;
-	Posf() {
+	Posf() :
+			x(0.0f), y(0.0f) {
 	}
 	Posf(float x, float y) :
 			x(x), y(y) {
@@ -123,6 +125,7 @@ struct Region {
 	inline Pos pos() {
 		return Pos(x, y);
 	}
+
 };
 
 static const int TILE_SIZE = 32;

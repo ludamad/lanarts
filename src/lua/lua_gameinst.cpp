@@ -48,11 +48,13 @@ public:
 		return 0;
 	}
 	int damage(lua_State* L) {
+		GameState* gs = lua_get_gamestate(L);
 		EffectiveAttackStats attack;
 		int nargs = lua_gettop(L);
-		attack.power = lua_tonumber(L, 1);
-		attack.damage = lua_tonumber(L, 2);
+		attack.power = round(lua_tonumber(L, 1));
+		attack.damage = round(lua_tonumber(L, 2));
 		attack.magic_percentage = nargs >= 3 ? lua_tonumber(L, 3) : 1.0f;
+
 		get_combat_inst()->damage(lua_get_gamestate(L), attack);
 		return 0;
 	}

@@ -30,8 +30,8 @@ spells:
   - name: Deathwish
     description:
      Damages all enemies in your vision.
-    mp_cost: 35
-    cooldown: 40
+    mp_cost: 50
+    cooldown: 100
     spr_spell: book
     action_func: attack_all_seen
 

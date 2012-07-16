@@ -64,11 +64,12 @@ static int monsters_seen(lua_State* L) {
 	lua_newtable(L);
 	int tableidx = lua_gettop(L);
 
+	int valid = 1;
 	for (int i = 0; i < monsters.size(); i++) {
 		GameInst* e = gs->get_instance(monsters[i]);
 		if (e && gs->object_visible_test(e, p, false)) {
 			lua_push_gameinst(L, e);
-			lua_insert(L, tableidx);
+			lua_rawseti(L, tableidx, valid++);
 		}
 	}
 

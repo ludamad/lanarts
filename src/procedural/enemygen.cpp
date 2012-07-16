@@ -46,8 +46,9 @@ static Pos enemy_position_candidate(MTwist& mt, GeneratedLevel& level,
 	do {
 		if (tries++ < 20) {
 			epos = generate_location_in_region(mt, level, region_suggestion);
-		} else
+		} else {
 			epos = generate_location(mt, level);
+		}
 	} while (level.at(epos).near_entrance);
 	return epos;
 }
