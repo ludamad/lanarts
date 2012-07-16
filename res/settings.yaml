@@ -17,7 +17,7 @@ font: res/fonts/Gudea-Regular.ttf
 #Network settings
 network_debug_mode: yes
 connection_type: none #Either 'host', 'client', or 'none'
-ip: localhost
+ip: 192.168.0.16
 port: 6112
 
 #Speed settings
