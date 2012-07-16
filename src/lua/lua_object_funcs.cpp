@@ -43,11 +43,12 @@ static int monsters_in_level(lua_State* L) {
 	lua_newtable(L);
 	int tableidx = lua_gettop(L);
 
+	int valid = 1;
 	for (int i = 0; i < monsters.size(); i++) {
 		GameInst* e = gs->get_instance(monsters[i]);
 		if (e) {
 			lua_push_gameinst(L, e);
-			lua_rawseti(L, tableidx, i);
+			lua_rawseti(L, tableidx, valid++);
 		}
 	}
 
