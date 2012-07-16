@@ -15,10 +15,10 @@ view_height: 720
 font: res/fonts/Gudea-Regular.ttf
 
 #Network settings
-network_debug_mode: yes
+network_debug_mode: no
 #Either 'host', 'client', or 'none'
 #Shouldn't be required anymore: connection_type: client
-ip: localhost
+ip: 173.246.4.128
 port: 6112
 
 #Speed settings
