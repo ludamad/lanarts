@@ -98,10 +98,26 @@ enemies:
         strength: 15
         defence: 7
         willpower: 7
-        
+
+  - name: Horse
+    sprite: horse
+    death_sprite: blood
+    radius: 12
+    xpaward: 15
+    appear_message: A horse comes at full gallop!
+    defeat_message: The horse is beaten.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 35
+        hpregen: 0.02
+        movespeed: 5
+        strength: 25
+        defence: 15
+        willpower: 15
+     
   - name: Super Chicken
     sprite: super_chicken
-    death_sprite: blood
+    death_sprite: green blood
     radius: 14
     xpaward: 20
     appear_message: An unnaturally glowing chicken appears!
@@ -114,3 +130,5 @@ enemies:
         strength: 25
         defence: 10
         willpower: 10
+       
+

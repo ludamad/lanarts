@@ -4,12 +4,18 @@
  *  as well as the generate_features function
  */
 
-#include "featuregen.h"
 #include "../world/GameState.h"
 #include "../world/GameTiles.h"
 #include "../world/GameLevelState.h"
+
+#include "../world/objects/FeatureInst.h"
+
 #include "../data/tile_data.h"
 #include "../data/tileset_data.h"
+
+#include "../util/math_util.h"
+
+#include "featuregen.h"
 
 /* Generate a random subtile for a tile */
 static Tile rltile(MTwist& mt, int tile) {
@@ -125,4 +131,12 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		gs->get_level()->exits.push_back(GameLevelPortal(p, Pos(0, 0)));
 	}
 
+	for (int i = 0; i < 4; i++) {
+		Pos fpos = generate_location(mt, level);
+		fpos.x += start_x;
+		fpos.y += start_y;
+		fpos = centered_multiple(fpos, TILE_SIZE);
+		gs->add_instance(
+				new FeatureInst(fpos.x, fpos.y, FeatureInst::DOOR_CLOSED));
+	}
 }

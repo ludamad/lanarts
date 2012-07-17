@@ -19,5 +19,6 @@ void normalize(float& x, float& y, float mag = 1);
 int round_to_multiple(int num, int mult, bool centered = false);
 int centered_multiple(int num, int mult);
 Pos centered_multiple(const Pos& pos, int mult);
+Pos round_to_multiple(const Pos& pos, int mult, bool centered = false);
 
 #endif /* MATH_UTIL_H_ */

@@ -30,7 +30,6 @@ bool PlayerInst::within_field_of_view(const Pos& pos) {
 }
 
 void PlayerInst::die(GameState* gs) {
-	deaths++;
 	//Let step event handle death
 }
 
@@ -90,6 +89,7 @@ void PlayerInst::step(GameState* gs) {
 		reset_rest_cooldown();
 
 	if (stats().has_died()) {
+		deaths++;
 //		if (is_local_focus())
 		queued_actions.clear();
 //		gs->game_world().reset(0);

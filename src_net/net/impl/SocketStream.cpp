@@ -44,10 +44,6 @@ void socketstream_read_body_handler(SocketStream* ss,
 						new NetPacket(ss->last_message())));
 		ss->get_rmutex().unlock();
 
-		static int msg = 0;
-//		printf("Read queue size '%d' msg#'%d' \n", ss->rmessages().size(), ++msg);
-//		printf("Reading message %d\n", ++msg);
-
 		asio::async_read(
 				ss->get_socket(),
 				asio::buffer(ss->last_message().data, NetPacket::HEADER_LEN),
@@ -62,8 +58,7 @@ void socketstream_read_body_handler(SocketStream* ss,
 void socketstream_write_handler(SocketStream* ss, const asio::error_code& error,
 		bool pop) {
 	if (!error) {
-		static int msg = 0;
-//		printf("Write queue size '%d' msg#'%d' \n", ss->wmessages().size(), ++msg);
+		ss->get_socket().set_option(asio::ip::tcp::no_delay());
 		ss->get_wmutex().lock();
 		if (pop)
 			ss->wmessages().pop_front();
@@ -83,7 +78,6 @@ void socketstream_write_handler(SocketStream* ss, const asio::error_code& error,
 
 SocketStream::SocketStream(asio::io_service & io_service) :
 		io_service(io_service), socket(io_service) {
-	socket.set_option(asio::ip::tcp::no_delay());
 	closed = false;
 }
 

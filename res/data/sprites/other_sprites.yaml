@@ -23,3 +23,10 @@ sprites:
 
   - name: purple blood
     file: res/sprites/effects/blood_purple.png
+    
+  - name: open door
+    file: res/sprites/features/open_door.png
+
+  - name: closed door
+    file: res/sprites/features/closed_door.png
+    

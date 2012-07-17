@@ -122,6 +122,7 @@ set( lanarts_src
 	world/objects/CombatGameInst.cpp
 	world/objects/ScriptedInst.cpp
 	world/objects/EnemyInst.cpp
+	world/objects/FeatureInst.cpp
 	world/objects/GameInst.cpp
 	world/objects/GameInstRef.cpp
 	world/objects/ItemInst.cpp
@@ -235,6 +236,7 @@ set( lanarts_include
 	world/objects/PlayerInst.h
 	world/objects/EnemyBehaviour.h
 	world/objects/EnemyInst.h
+	world/objects/FeatureInst.h
 	world/objects/ScriptedInst.h
 	world/objects/ProjectileInst.h
 )

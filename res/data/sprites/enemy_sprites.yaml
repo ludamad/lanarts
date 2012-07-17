@@ -7,6 +7,9 @@ sprites:
   - name: hound
     file: res/sprites/monsters/animals/hound.png
 
+  - name: horse
+    file: res/sprites/monsters/animals/horse.png
+
   - name: sheep
     file: res/sprites/monsters/animals/sheep.png
 

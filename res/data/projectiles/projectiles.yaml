@@ -18,7 +18,7 @@ projectiles:
     damage: {base: [4,6]}
     power: {base: 2}
     drop_chance: 95 # % chance
-    speed: 7
+    speed: 8
 
   - name: Stone
     description: A fist sized stone, good for throwing.
@@ -29,5 +29,5 @@ projectiles:
     range: 300
     speed: 6
     cooldown: 35
-    damage: {base: [2,5], strength: .75}
-    power: {base: 2, strength: 0.2}
+    damage: {base: [2,4], strength: .75}
+    power: {base: 5, strength: 0.2}

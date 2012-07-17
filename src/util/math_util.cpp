@@ -61,3 +61,8 @@ Pos centered_multiple(const Pos& pos, int mult) {
 	return Pos(centered_multiple(pos.x, mult), centered_multiple(pos.y, mult));
 }
 
+Pos round_to_multiple(const Pos& pos, int mult, bool centered) {
+	return Pos(round_to_multiple(pos.x, mult, centered),
+			round_to_multiple(pos.y, mult, centered));
+}
+
