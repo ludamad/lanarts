@@ -36,6 +36,18 @@ static void continue_as_loner(GameState* gs, GameInst* _, void* flag) {
 	gs->game_settings().conntype = GameSettings::NONE;
 }
 
+static void continue_as_loner_save_replay(GameState* gs, GameInst* _,
+		void* flag) {
+	*(bool*)flag = true;
+	gs->game_settings().conntype = GameSettings::NONE;
+	gs->game_settings().savereplay_file = "replays/replay";
+}
+
+static void continue_as_load_replay(GameState* gs, GameInst* _, void* flag) {
+	*(bool*)flag = true;
+	gs->game_settings().conntype = GameSettings::NONE;
+	gs->game_settings().loadreplay_file = "replays/replay";
+}
 
 static void continue_as_client(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;
@@ -59,11 +71,18 @@ static const char HELP_TEXT[] = "Movement: WASD or Arrow Keys\n"
 
 static void setup_buttons(GameState* gs, bool* exit, int x, int y) {
 	ObjCallback single(continue_as_loner, exit);
+	ObjCallback savereplay(continue_as_loner_save_replay, exit);
+	ObjCallback loadreplay(continue_as_load_replay, exit);
 	ObjCallback client(continue_as_client, exit);
 	ObjCallback server(continue_as_server, exit);
 	gs->add_instance(new ButtonInst("Single-Player", x, y, single));
-	gs->add_instance(new ButtonInst("Client", x, y + 50, client));
-	gs->add_instance(new ButtonInst("Server", x, y + 100, server));
+	y += 50;
+	gs->add_instance(new ButtonInst("Save Replay", x - 95, y, savereplay));
+	gs->add_instance(new ButtonInst("Load Replay", x + 95, y, loadreplay));
+	y += 50;
+	gs->add_instance(new ButtonInst("Client", x - 65, y, client));
+	gs->add_instance(new ButtonInst("Server", x + 65, y, server));
+	y += 50;
 }
 
 void menu_loop(GameState* gs, int width, int height) {

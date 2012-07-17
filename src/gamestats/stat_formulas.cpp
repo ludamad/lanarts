@@ -71,12 +71,13 @@ static void factor_in_equipment(MTwist& mt, EffectiveStats& effective,
 		const Equipment& equipment) {
 	factor_in_armour_slot(mt, effective, equipment.body_armour);
 }
-static void derive_from_equipment(MTwist& mt, EffectiveStats& effective) {
+static void derive_secondary_stats(MTwist& mt, EffectiveStats& effective) {
 	CoreStats& core = effective.core;
-	effective.physical.resistance = core.defence / 2.5f;
-	effective.magic.resistance = core.willpower / 2.5f;
-	effective.physical.reduction = core.physical_reduction + core.defence / 2.0;
-	effective.magic.reduction = core.magic_reduction + core.willpower / 2.0;
+	effective.physical.resistance += core.defence / 2.5f;
+	effective.magic.resistance += core.willpower / 2.5f;
+	effective.physical.reduction += core.physical_reduction
+			+ core.defence / 2.0;
+	effective.magic.reduction += core.magic_reduction + core.willpower / 2.0;
 }
 
 EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst,
@@ -84,9 +85,9 @@ EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst,
 	EffectiveStats ret;
 	ret.core = stats.core;
 	ret.movespeed = stats.movespeed;
-	derive_from_equipment(gs->rng(), ret);
-	factor_in_equipment(gs->rng(), ret, stats.equipment);
 	stats.effects.process(gs, inst, ret);
+	factor_in_equipment(gs->rng(), ret, stats.equipment);
+	derive_secondary_stats(gs->rng(), ret);
 	return ret;
 }
 

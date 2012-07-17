@@ -123,11 +123,12 @@ void EnemyInst::draw(GameState* gs) {
 		snprintf(
 				statbuff,
 				255,
-				"simid=%d nvx=%f vy=%f\n chasetime=%d \n washit=%d didhit=%d \n act=%d, path_steps = %d\npath_cooldown = %d\n",
+				"simid=%d nvx=%f vy=%f\n chasetime=%d \n mdef=%d pdef=%d", // \n act=%d, path_steps = %d\npath_cooldown = %d\n",
 				eb.simulation_id, vx, vy, eb.chase_timeout,
-				eb.randomization.damage_taken_timer,
-				eb.randomization.successful_hit_timer, eb.current_action,
-				eb.path_steps, eb.path_cooldown);
+				(int)effective_stats().magic.resistance,
+				(int)effective_stats().physical.resistance);
+		//eb.current_action,
+		//eb.path_steps, eb.path_cooldown);
 		gl_printf(gs->primary_font(), Colour(255, 255, 255),
 				x - radius - view.x, y - 70 - view.y, statbuff);
 	}

@@ -61,10 +61,10 @@ void GameState::init_game() {
 	time(&systime);
 	int seed = systime;
 	if (!settings.loadreplay_file.empty()) {
-		load_init(this, seed);
+		load_init(this, seed, settings.classn);
 	}
 	if (!settings.savereplay_file.empty()) {
-		save_init(this, seed);
+		save_init(this, seed, settings.classn);
 	}
 
 	init_lua_data(this, L);

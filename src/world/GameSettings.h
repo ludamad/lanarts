@@ -1,13 +1,12 @@
-
 #ifndef GAMESETTINGS_H_
 #define GAMESETTINGS_H_
 #include <string>
 
+#include "../util/game_basic_structs.h"
+
 struct GameSettings {
 	enum connection_type {
-		NONE,
-		CLIENT,
-		SERVER
+		NONE, CLIENT, SERVER
 	};
 
 	/*Multiplayer settings*/
@@ -29,12 +28,12 @@ struct GameSettings {
 	/*Gameplay settings*/
 	bool regen_on_death;
 	bool invincible;
-	int classn;
+	class_id classn;
 
 	/*Control settings*/
 	bool stop_controls;
 
-	GameSettings(){
+	GameSettings() {
 		//sets defaults
 		fullscreen = false;
 		regen_on_death = false;
@@ -56,6 +55,5 @@ struct GameSettings {
 		network_debug_mode = false;
 	}
 };
-
 
 #endif /* GAMESETTINGS_H_ */
