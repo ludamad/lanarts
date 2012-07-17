@@ -60,14 +60,13 @@ static void continue_as_server(GameState* gs, GameInst* _, void* flag) {
 }
 
 static const char HELP_TEXT[] = "Movement: WASD or Arrow Keys\n"
-		"Use Attack or Attack Spell: j or left-click\n"
-		"Switch Auto-Target (for use with 'j'): k\n"
-		"Switch Attack Spell: space\n"
-		"Switch to Melee: m or e\n"
-		"Use Blink: h or right-click\n"
+		"Switch Targetted Enemy: k\n"
+		"Use Weapon: h \n"
+		"Use Current Spell/Weapon: hold j or space or left click\n"
+		"Switch Spell: q/e, mousewheel to toggle, y, u, i, o, p to choose \n"
+		"Use Specific Spell: y, u, i, o, p once to choose, repeat to fire\n"
 		"Use Item: click item or keys 1 through 9\n"
-		"Use Stairs: < and > or mouse wheel\n"
-		"Regenerate: Hold 'r'\n";
+		"Use Stairs: Move onto them without holding other keys\n";
 
 static void setup_buttons(GameState* gs, bool* exit, int x, int y) {
 	ObjCallback single(continue_as_loner, exit);
