@@ -26,6 +26,7 @@ extern "C" {
 
 #include "../lua/lua_api.h"
 
+#include "../util/game_replays.h"
 #include "../util/math_util.h"
 
 #include "GameState.h"
@@ -59,6 +60,13 @@ void GameState::init_game() {
 	time_t systime;
 	time(&systime);
 	int seed = systime;
+	if (!settings.loadreplay_file.empty()) {
+		load_init(this, seed);
+	}
+	if (!settings.savereplay_file.empty()) {
+		save_init(this, seed);
+	}
+
 	init_lua_data(this, L);
 
 	if (settings.conntype == GameSettings::CLIENT) {

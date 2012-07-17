@@ -117,7 +117,7 @@ bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
 
 	int maxdist = 0;
 	for (int i = 0; i < pc.player_ids().size(); i++) {
-		PlayerInst* player = (PlayerInst*) gs->get_instance(pc.player_ids()[i]);
+		PlayerInst* player = (PlayerInst*)gs->get_instance(pc.player_ids()[i]);
 		BBox fbox = player->field_of_view().tiles_covered();
 		FOR_EACH_BBOX(fbox, x, y) {
 			if (player->field_of_view().within_fov(x, y)) {
@@ -264,6 +264,7 @@ bool PlayerInst::queue_io_spell_actions(GameState* gs) {
 	bool chose_spell = false;
 	bool triggered_already = false;
 
+	int newspell = spell_selected();
 	//Spell choice
 	for (int i = 0; i < spells.amount(); i++) {
 		IOEvent event(IOEvent::ACTIVATE_SPELL_N, i);
@@ -276,7 +277,7 @@ bool PlayerInst::queue_io_spell_actions(GameState* gs) {
 				//Double hit a spell switch to quick-perform it
 				perform_spell = true;
 			} else if (!triggered_already) {
-				spell_selected() = i;
+				newspell = i;
 			}
 			break;
 		}
@@ -286,15 +287,22 @@ bool PlayerInst::queue_io_spell_actions(GameState* gs) {
 		previous_spellselect = spell_selected();
 
 		if (io.query_event(IOEvent::TOGGLE_ACTION_UP)) {
-			spell_selected() = (spell_selected() + 1) % spells.amount();
+			newspell = (spell_selected() + 1) % spells.amount();
 		} else if (io.query_event(IOEvent::TOGGLE_ACTION_DOWN)) {
 			if (spell_selected() <= 0) {
-				spell_selected() = spells.amount() - 1;
+				newspell = spells.amount() - 1;
 			} else {
-				spell_selected()--;}
+				newspell = spell_selected() - 1;
 			}
 		}
-bool 	auto_target = true;
+	}
+
+	if (newspell != spell_selected()) {
+		queued_actions.push_back(
+				game_action(gs, this, GameAction::CHOSE_SPELL, newspell));
+	}
+
+	bool auto_target = true;
 	// We don't auto-target unless a mouse is not used
 	if (!perform_spell
 			&& io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION,
@@ -363,18 +371,21 @@ bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 
 	bool weaponuse = spell_selected() == -1;
 
+	// choose & use weapon
 	if (io.query_event(IOEvent::USE_WEAPON)) {
-		spell_selected() = -1;
+		queued_actions.push_back(
+				game_action(gs, this, GameAction::CHOSE_SPELL, -1));
 		autotarget = true;
 		weaponuse = true;
 	}
+
 	if (spell_selected() >= 0
 			&& spells_known().get_entry(spell_selected()).mp_cost
 					> core_stats().mp) {
 		weaponuse = true;
 	}
 
-//Weapon use
+	// weapon use
 	if (!attack_used && weaponuse && (autotarget || mousetarget)) {
 
 		bool is_projectile = wentry.uses_projectile
@@ -398,6 +409,7 @@ bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 			target = get_weapon_autotarget(gs, this, target, dx, dy);
 			if (target) {
 				targ_pos = Pos(target->x, target->y);
+
 			}
 		}
 
@@ -474,7 +486,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		}
 
 		for (int i = 0; i < numhit; i++) {
-			EnemyInst* e = (EnemyInst*) enemies[i];
+			EnemyInst* e = (EnemyInst*)enemies[i];
 			lua_hit_callback(gs->get_luastate(), wentry.on_hit_func, this, e);
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
 				PlayerController& pc = gs->player_controller();

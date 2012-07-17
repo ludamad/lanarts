@@ -25,7 +25,8 @@ struct GameAction {
 		PICKUP_ITEM,
 		DROP_ITEM,
 		DEEQUIP_ITEM,
-		REPOSITION_ITEM
+		REPOSITION_ITEM,
+		CHOSE_SPELL
 	};
 	GameAction() {
 	}

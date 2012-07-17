@@ -18,9 +18,11 @@ extern "C" {
 
 #include "../../../lua/lua_api.h"
 
-#include "../../../util/world/collision_util.h"
-#include "../../../util/math_util.h"
 #include "../../../util/game_basic_structs.h"
+#include "../../../util/game_replays.h"
+#include "../../../util/math_util.h"
+
+#include "../../../util/world/collision_util.h"
 
 #include "../../GameState.h"
 
@@ -132,7 +134,9 @@ void PlayerInst::queue_io_movement_actions(GameState* gs, int& dx, int& dy) {
 		moving = false;
 	}
 }
+
 void PlayerInst::queue_io_actions(GameState* gs) {
+	GameSettings& settings = gs->game_settings();
 	GameView& view = gs->window_view();
 	int level = gs->get_level()->roomid;
 	int frame = gs->frame();
@@ -145,7 +149,9 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 	bool was_moving = moving, do_stopaction = false;
 	IOController& io = gs->io_controller();
 
-	if (is_local_player()) {
+	if (!settings.loadreplay_file.empty()) {
+		load_actions(gs, queued_actions);
+	} else if (is_local_player()) {
 //Resting
 		bool resting = false;
 		// Check for explicit rest
@@ -232,9 +238,15 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 	bool hasconnection = connection.get_connection() != NULL;
 	NetPacket packet;
 
+	for (int i = 0; i < queued_actions.size(); i++) {
+		queued_actions[i].frame = gs->frame();
+	}
+	if (!settings.savereplay_file.empty()) {
+		save_actions(gs, queued_actions);
+	}
+
 	if (is_local_player() && hasconnection) {
 		for (int i = 0; i < queued_actions.size(); i++) {
-			queued_actions[i].frame = gs->frame();
 			packet.add(queued_actions[i]);
 		}
 		packet.encode_header();
@@ -274,7 +286,6 @@ void PlayerInst::queue_network_actions(GameState *gs) {
 	NetPacket packet;
 	if (!is_local_player() && hasconnection) {
 		while (!connection.get_connection()->get_next_packet(packet)) {
-
 		}
 		bool output1 = true;
 		while (packet.body_length > 0) {
@@ -291,9 +302,8 @@ void PlayerInst::queue_network_actions(GameState *gs) {
 	}
 }
 
-void PlayerInst::perform_queued_actions(GameState *gs) {
+void PlayerInst::perform_queued_actions(GameState* gs) {
 	for (int i = 0; i < queued_actions.size(); i++) {
-// 		to_action_file(saved, actions[i]);
 		perform_action(gs, queued_actions[i]);
 	}
 	queued_actions.clear();
@@ -347,6 +357,9 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 		return equipment().deequip(action.use_id);
 	case GameAction::REPOSITION_ITEM:
 		return reposition_item(gs, action);
+	case GameAction::CHOSE_SPELL:
+		spellselect = action.use_id;
+		return;
 	default:
 		printf("PlayerInst::perform_action() error: Invalid action id %d!\n",
 				action.act);

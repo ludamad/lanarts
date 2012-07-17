@@ -105,7 +105,7 @@ public:
    * @par Examples
    * Setting the option:
    * @code
-   * asio::ip::tcp::socket socket(io_service); 
+   * asio::ip::tcp::socket socket(io_service);
    * ...
    * asio::ip::tcp::no_delay option(true);
    * socket.set_option(option);
@@ -114,7 +114,7 @@ public:
    * @par
    * Getting the current option value:
    * @code
-   * asio::ip::tcp::socket socket(io_service); 
+   * asio::ip::tcp::socket socket(io_service);
    * ...
    * asio::ip::tcp::no_delay option;
    * socket.get_option(option);

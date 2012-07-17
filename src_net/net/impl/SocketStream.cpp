@@ -83,6 +83,7 @@ void socketstream_write_handler(SocketStream* ss, const asio::error_code& error,
 
 SocketStream::SocketStream(asio::io_service & io_service) :
 		io_service(io_service), socket(io_service) {
+	socket.set_option(asio::ip::tcp::no_delay());
 	closed = false;
 }
 

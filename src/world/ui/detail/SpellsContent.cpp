@@ -72,8 +72,8 @@ int SpellsContent::amount_of_pages(GameState* gs) {
 	return spell_pages;
 }
 
-static bool handle_io_spells_known(GameState* gs, const BBox& bbox,
-		SpellsKnown& spells, int ind_low, int ind_high) {
+static bool handle_io_spells_known(GameState* gs, ActionQueue& queued_actions,
+		const BBox& bbox, SpellsKnown& spells, int ind_low, int ind_high) {
 	const int spell_n = spells.amount();
 	int mx = gs->mouse_x(), my = gs->mouse_y();
 	int spellidx = ind_low;
@@ -85,7 +85,9 @@ static bool handle_io_spells_known(GameState* gs, const BBox& bbox,
 
 		BBox entry_box(x, y, ex - 2, y + TILE_SIZE);
 		if (entry_box.contains(mx, my) && gs->mouse_left_click()) {
-			gs->local_player()->spell_selected() = spellidx;
+			queued_actions.push_back(
+					game_action(gs, gs->local_player(), GameAction::CHOSE_SPELL,
+							spellidx));
 			return true;
 		}
 		spellidx++;
@@ -98,7 +100,7 @@ bool SpellsContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 
 	int min_spell = SPELLS_PER_PAGE * page_number, max_spell = min_spell
 			+ SPELLS_PER_PAGE;
-	return handle_io_spells_known(gs, bbox, p->spells_known(), min_spell,
-			max_spell);
+	return handle_io_spells_known(gs, queued_actions, bbox, p->spells_known(),
+			min_spell, max_spell);
 }
 

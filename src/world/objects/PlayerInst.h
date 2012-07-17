@@ -55,7 +55,7 @@ public:
 
 	virtual bool within_field_of_view(const Pos& pos);
 
-	int& spell_selected() {
+	int spell_selected() {
 		return spellselect;
 	}
 	int& rest_cooldown() {

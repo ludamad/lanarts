@@ -80,6 +80,7 @@ set( lanarts_src
 
 	util/content_draw_util.cpp
 	util/math_util.cpp
+	util/game_replays.cpp
 	util/mtwist.cpp
 	util/LuaValue.cpp
 	util/world/collision_util.cpp
@@ -187,6 +188,7 @@ set( lanarts_include
 	util/callback_util.h
 	util/content_draw_util.h
 	util/game_basic_structs.h
+	util/game_replays.h
 	util/gheap.h
 	util/hashset_util.h
 	util/math_util.h

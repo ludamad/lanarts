@@ -98,7 +98,7 @@ void GameWorld::spawn_players(GeneratedLevel& genlevel, void** player_instances,
 		}
 	} else {
 		for (int i = 0; i < nplayers; i++) {
-			spawn_player(genlevel, false, 0, (PlayerInst*) player_instances[i]);
+			spawn_player(genlevel, false, 0, (PlayerInst*)player_instances[i]);
 		}
 	}
 }
@@ -141,7 +141,7 @@ static bool check_level_is_in_sync(GameState* gs, GameLevelState* level) {
 			if (!gs->net_connection().check_integrity(gs,
 					instances[i]->integrity_hash())) {
 				GameInst* inst = instances[i];
-				if (!dynamic_cast<AnimatedInst*>(inst)){
+				if (!dynamic_cast<AnimatedInst*>(inst)) {
 					const char* type = typeid(*inst).name();
 					printf("Hashes don't match for instance id=%d, type=%s!\n",
 							inst->id, type);
@@ -187,7 +187,7 @@ bool GameWorld::pre_step() {
 		const std::vector<obj_id>& player_ids =
 				game_state->get_level()->pc.player_ids();
 		for (int i = 0; i < player_ids.size(); i++) {
-			PlayerInst* p = (PlayerInst*) game_state->get_instance(
+			PlayerInst* p = (PlayerInst*)game_state->get_instance(
 					player_ids[i]);
 			p->queue_io_actions(game_state);
 			p->performed_actions_for_step() = false;
@@ -238,6 +238,7 @@ void GameWorld::step() {
 		}
 	}
 	game_state->set_level(current_level);
+	game_state->frame()++;
 
 	midstep = false;
 	if (next_room_id == -2) {
@@ -265,7 +266,7 @@ void GameWorld::regen_level(int roomid) {
 		// Get and retain player
 		GameInst* p = game_state->get_instance(player_ids[i]);
 		player_cache.push_back(p);
-		((PlayerInst*) p)->core_stats().heal_fully();
+		((PlayerInst*)p)->core_stats().heal_fully();
 
 		// Remove from current level
 		game_state->remove_instance(p);
@@ -273,8 +274,8 @@ void GameWorld::regen_level(int roomid) {
 
 	level_states[roomid] = NULL;
 
-	GameLevelState* newlevel = get_level(roomid, true,
-			(void**) &player_cache[0], player_cache.size());
+	GameLevelState* newlevel = get_level(roomid, true, (void**)&player_cache[0],
+			player_cache.size());
 
 	if (game_state->get_level() == level) {
 		game_state->set_level(newlevel);

@@ -83,7 +83,8 @@ static bool handle_equip_slot_io(GameState* gs, PlayerInst* p, const BBox& bbox,
 			&& is_within_equipped_projectile(bbox, mx, my);
 	if (leftdown
 			&& (is_within_equipped_weapon(bbox, mx, my) || selects_projectile)) {
-		p->spell_selected() = -1;
+		queued_actions.push_back(
+				game_action(gs, p, GameAction::CHOSE_SPELL, -1));
 		return true;
 	}
 	return false;
@@ -99,14 +100,16 @@ static bool handle_spell_slot_io(GameState* gs, PlayerInst* p, const BBox& bbox,
 
 	if (leftdown && spell_slot > -1) {
 		if (spell_slot < p->spells_known().amount()) {
-			p->spell_selected() = spell_slot;
+			queued_actions.push_back(
+					game_action(gs, p, GameAction::CHOSE_SPELL, spell_slot));
 		}
 		return true; // Ensures mouse actions are filtered when clicking on action bar
 	}
 
 	if (rightdown && spell_slot > -1) {
 		if (spell_slot < p->spells_known().amount()) {
-			p->spell_selected() = -1;
+			queued_actions.push_back(
+					game_action(gs, p, GameAction::CHOSE_SPELL, -1));
 		}
 		return true; // Ensures mouse actions are filtered when clicking on action bar
 	}
