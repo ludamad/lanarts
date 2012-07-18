@@ -7,20 +7,14 @@
 #ifndef FEATUREGEN_H_
 #define FEATUREGEN_H_
 
+#include "../data/dungeon_data.h"
+
 #include "../util/game_basic_structs.h"
 #include "../util/mtwist.h"
 
 #include "GeneratedLevel.h"
 
 class GameState;
-
-struct FeatureGenSettings {
-	int nstairs_up, nstairs_down;
-	std::vector<tileset_id> tilesets;
-	FeatureGenSettings() :
-			nstairs_up(3), nstairs_down(3) {
-	}
-};
 
 //Generates tiles
 void generate_features(const FeatureGenSettings& rs, MTwist& mt,

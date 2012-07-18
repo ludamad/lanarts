@@ -18,7 +18,7 @@ font: res/fonts/Gudea-Regular.ttf
 network_debug_mode: no
 #Either 'host', 'client', or 'none'
 #Shouldn't be required anymore: connection_type: client
-ip: 173.246.4.128
+ip: 173.246.4.128an
 port: 6112
 
 #Speed settings

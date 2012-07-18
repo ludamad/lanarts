@@ -6,24 +6,15 @@
 #ifndef ITEMGEN_H_
 #define ITEMGEN_H_
 
+#include <vector>
+
+#include "../data/dungeon_data.h"
 #include "../util/mtwist.h"
 #include "GeneratedLevel.h"
-#include <vector>
 
 class GameState;
 
-struct ItemGenChance {
-	int genchance;//Out of 100%
-	int itemtype;
-	Range quantity;
-};
-struct ItemGenSettings {
-	std::vector<ItemGenChance> item_chances;
-	Range num_items;
-};
-
-
-void generate_items(const ItemGenSettings& is, MTwist& mt, GeneratedLevel& level, GameState* gs);
-
+void generate_items(const ItemGenSettings& is, MTwist& mt,
+		GeneratedLevel& level, GameState* gs);
 
 #endif /* ITEMGEN_H_ */
