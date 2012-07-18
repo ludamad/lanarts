@@ -21,6 +21,7 @@ const float DEG2RAD = 3.14159 / 180;
 
 void gl_draw_circle(float x, float y, float radius, const Colour& clr,
 		bool outline) {
+	if(radius<.5)return;
 	if (outline)
 		glBegin(GL_LINE_STRIP);
 	else
