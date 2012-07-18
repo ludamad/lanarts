@@ -16,8 +16,13 @@ struct ItemEntry;
 struct ProjectileEntry;
 struct WeaponEntry;
 
+typedef enum{
+	cursed = 1,
+	golden = 2
+}bonusflags;
 struct Bonuses {
 	DerivedStats magic, physical;
+	bonusflags flags;
 
 	bool operator==(const Bonuses& bonuses) const;
 };
@@ -25,6 +30,8 @@ struct Bonuses {
 struct Armour {
 	armour_id id;
 	Bonuses bonuses;
+
+	Item as_item() const;
 	Armour(armour_id id, Bonuses bonuses = Bonuses()) :
 			id(id), bonuses(bonuses) {
 	}
