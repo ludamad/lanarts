@@ -76,8 +76,6 @@ void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 	glEnd();
 }
 
-const int UNBOUNDED = 10000;
-
 void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 		float dx, float dy, int steps, const Colour& c) {
 	float PI = 3.1415921;

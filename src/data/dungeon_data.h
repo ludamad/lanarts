@@ -14,6 +14,38 @@ enum {
 	DNGN_MAIN_BRANCH = 0
 };
 
+struct RoomGenSettings {
+	int room_padding;
+	Range amount_of_rooms;
+	Range size;
+	RoomGenSettings() :
+			room_padding(1), amount_of_rooms(0,0), size(0, 0) {
+
+	}
+};
+
+struct LayoutGenSettings {
+	Range width, height;
+	TunnelGenSettings tunnels;
+	std::vector<RoomGenSettings> rooms;
+	bool solid_fill;
+	LayoutGenSettings() :
+			solid_fill(true) {
+	}
+};
+
+struct ContentGenSettings {
+	ItemGenSettings items;
+	FeatureGenSettings features;
+	EnemyGenSettings enemies;
+};
+
+struct LevelGenSettings {
+	std::vector<LayoutGenSettings> layouts;
+	ContentGenSettings content;
+};
+
+
 struct DungeonBranch {
 	LevelGenSettings* level_data;
 	int nlevels;

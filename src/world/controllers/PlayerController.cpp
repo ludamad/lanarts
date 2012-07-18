@@ -13,7 +13,8 @@
 
 #include "PlayerController.h"
 
-PlayerController::PlayerController() {
+PlayerController::PlayerController() :
+		local_player(0) {
 }
 
 PlayerController::~PlayerController() {
