@@ -132,11 +132,16 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 	}
 
 	for (int i = 0; i < 4; i++) {
-		Pos fpos = generate_location(mt, level);
-		fpos.x += start_x;
-		fpos.y += start_y;
-		fpos = centered_multiple(fpos, TILE_SIZE);
-		gs->add_instance(
-				new FeatureInst(fpos.x, fpos.y, FeatureInst::DOOR_CLOSED));
+		for (int attempts = 0; attempts < 200; attempts++) {
+			Pos fpos = generate_location(mt, level);
+			if (level.at(fpos).feature != SMALL_CORRIDOR)
+				continue;
+			fpos.x += start_x;
+			fpos.y += start_y;
+			fpos = centered_multiple(fpos, TILE_SIZE);
+			gs->add_instance(
+					new FeatureInst(fpos.x, fpos.y, FeatureInst::DOOR_CLOSED));
+			break;
+		}
 	}
 }

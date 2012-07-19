@@ -26,10 +26,16 @@ void FeatureInst::draw(GameState* gs) {
 	} else if (feature == DOOR_OPEN) {
 		spr = get_sprite_by_name("open door");
 	}
-	gl_draw_sprite(spr, x, y);
+	if (gs->object_visible_test(this)) {
+		gl_draw_sprite(gs->window_view(), spr, x - TILE_SIZE / 2,
+				y - TILE_SIZE / 2);
+	}
 }
 
-void FeatureInst::step(GameState *gs) {
+void FeatureInst::step(GameState* gs) {
+	if (gs->object_radius_test(x, y, TILE_SIZE, player_colfilter)) {
+		player_interact(gs);
+	}
 }
 
 void FeatureInst::copy_to(GameInst *inst) const {
@@ -47,9 +53,10 @@ void FeatureInst::deinit(GameState *gs) {
 	}
 }
 
-void FeatureInst::player_interact(GameState *gs) {
+void FeatureInst::player_interact(GameState* gs) {
 	if (feature == DOOR_CLOSED) {
-
+		gs->tile_grid().set_solid(x / TILE_SIZE, y / TILE_SIZE, false);
+		feature = DOOR_OPEN;
 	}
 }
 
