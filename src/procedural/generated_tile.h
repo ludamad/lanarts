@@ -27,7 +27,8 @@ struct Sqr {
 					roomID) {
 	}
 
-	Sqr() {
+	Sqr() :
+			feature(UNSET) {
 	}
 
 	inline void operator&=(const Sqr& o) {

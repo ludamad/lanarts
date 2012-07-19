@@ -20,14 +20,17 @@ FeatureInst::~FeatureInst() {
 }
 
 void FeatureInst::draw(GameState* gs) {
-	sprite_id spr = spriteid;
-	if (feature == DOOR_CLOSED) {
-		spr = get_sprite_by_name("closed door");
-	} else if (feature == DOOR_OPEN) {
-		spr = get_sprite_by_name("open door");
-	}
 	if (gs->object_visible_test(this)) {
-		gl_draw_sprite(gs->window_view(), spr, x - TILE_SIZE / 2,
+		sprite_id spr = spriteid;
+		if (feature == DOOR_CLOSED) {
+			spr = get_sprite_by_name("closed door");
+		} else if (feature == DOOR_OPEN) {
+			spr = get_sprite_by_name("open door");
+		}
+		last_seen_spr = spr;
+	}
+	if (last_seen_spr > -1) {
+		gl_draw_sprite(gs->window_view(), last_seen_spr, x - TILE_SIZE / 2,
 				y - TILE_SIZE / 2);
 	}
 }

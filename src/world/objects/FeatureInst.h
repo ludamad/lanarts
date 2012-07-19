@@ -20,8 +20,8 @@ public:
 		RADIUS = 15, DEPTH = 100
 	};
 	FeatureInst(int x, int y, feature_t feature, sprite_id spriteid = -1) :
-			GameInst(x, y, solid, false, DEPTH), feature(feature), spriteid(
-					spriteid) {
+			GameInst(x, y, solid, false, DEPTH), feature(feature), last_seen_spr(
+					-1), spriteid(spriteid) {
 	}
 	virtual ~FeatureInst();
 	virtual void init(GameState *gs);
@@ -33,6 +33,7 @@ public:
 	virtual FeatureInst* clone() const;
 private:
 	feature_t feature;
+	sprite_id last_seen_spr;
 	sprite_id spriteid;
 };
 
