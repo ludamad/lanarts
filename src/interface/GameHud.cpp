@@ -12,12 +12,12 @@
 #include "../data/sprite_data.h"
 #include "../data/weapon_data.h"
 
-#include "../gamestats/Inventory.h"
+#include "../stats/Inventory.h"
 
 #include "../util/math_util.h"
 
-#include "../world/GameState.h"
-#include "../world/GameInstSet.h"
+#include "../gamestate/GameState.h"
+#include "../gamestate/GameInstSet.h"
 
 #include "../objects/GameInst.h"
 #include "../objects/player/PlayerInst.h"

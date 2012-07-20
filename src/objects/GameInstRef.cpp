@@ -6,7 +6,7 @@
  *  This will help prevent any circular reference cases between objects.
  */
 
-#include "../world/GameState.h"
+#include "../gamestate/GameState.h"
 
 #include "GameInst.h"
 #include "GameInstRef.h"

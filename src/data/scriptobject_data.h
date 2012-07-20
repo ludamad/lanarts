@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 #include "../util/LuaValue.h"
 
 #include "../objects/GameInst.h"

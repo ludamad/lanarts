@@ -8,14 +8,14 @@
 
 #include "../util/LuaValue.h"
 
-#include "../world/GameSettings.h"
+#include "../gamestate/GameSettings.h"
 
 #include "armour_data.h"
 #include "class_data.h"
 #include "datafiles_data.h"
 #include "dungeon_data.h"
 #include "effect_data.h"
-#include "enemy_data.h"
+#include "../objects/enemy/enemy_data.h"
 #include "item_data.h"
 #include "projectile_data.h"
 #include "scriptobject_data.h"

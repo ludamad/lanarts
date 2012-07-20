@@ -6,7 +6,7 @@
 #ifndef MATH_UTIL_H_
 #define MATH_UTIL_H_
 
-#include "game_basic_structs.h"
+#include "../lanarts_defines.h"
 
 int power_of_two(int input);
 void direction_towards(const Pos& a, const Pos& b, float& rx, float& ry,

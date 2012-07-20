@@ -10,9 +10,9 @@
 #include <cstring>
 #include <yaml-cpp/yaml.h>
 
-#include "../../gamestats/combat_stats.h"
+#include "../../stats/combat_stats.h"
 
-#include "../../util/game_basic_structs.h"
+#include "../../lanarts_defines.h"
 #include "../../util/types_util.h"
 
 #include "../../objects/GameInst.h"

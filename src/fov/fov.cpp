@@ -8,8 +8,8 @@
 #include "fov.h"
 #include <cmath>
 #include <cstdlib>
-#include "../world/GameState.h"
-#include "../world/GameTiles.h"
+#include "../gamestate/GameState.h"
+#include "../gamestate/GameTiles.h"
 #include "../data/tile_data.h"
 
 

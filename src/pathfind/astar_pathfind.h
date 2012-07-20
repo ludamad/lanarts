@@ -6,7 +6,7 @@
 #ifndef ASTAR_PATHFIND_H_
 #define ASTAR_PATHFIND_H_
 #include "../objects/GameInst.h"
-#include "../procedural/GeneratedLevel.h"
+#include "../levelgen/GeneratedLevel.h"
 #include <vector>
 
 struct AStarNode {

@@ -10,7 +10,7 @@
 #undef GL_GLEXT_VERSION
 #include <SDL_opengl.h>
 #include <GL/glu.h>
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 
 struct GLimage;
 struct font_data;

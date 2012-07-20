@@ -9,7 +9,7 @@
 //#include "../procedural/levelgen.h"
 
 #include <vector>
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 
 enum {
 	DNGN_MAIN_BRANCH = 0

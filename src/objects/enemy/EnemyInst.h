@@ -10,9 +10,9 @@
 #include "../GameInst.h"
 #include "EnemyBehaviour.h"
 
-#include "../../gamestats/stats.h"
+#include "../../stats/stats.h"
 
-#include "../../data/enemy_data.h"
+#include "enemy_data.h"
 
 class EnemyInst : public CombatGameInst {
 public:

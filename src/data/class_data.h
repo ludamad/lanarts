@@ -9,9 +9,9 @@
 #include <string>
 #include <vector>
 
-#include "../gamestats/combat_stats.h"
+#include "../stats/combat_stats.h"
 
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 
 struct ClassSpell {
 	int xplevel_required;

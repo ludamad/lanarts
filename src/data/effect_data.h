@@ -6,9 +6,9 @@
 #include <vector>
 
 #include "../util/LuaValue.h"
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 
-#include "../gamestats/stats.h"
+#include "../stats/stats.h"
 
 struct EffectEntry {
 	std::string name;

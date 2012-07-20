@@ -7,12 +7,12 @@
 #include <typeinfo>
 
 #include "../../data/sprite_data.h"
-#include "../../data/enemy_data.h"
+#include "enemy_data.h"
 #include "../../data/weapon_data.h"
 
 #include "../../display/display.h"
 
-#include "../../gamestats/stat_formulas.h"
+#include "../../stats/stat_formulas.h"
 
 #include "../../util/colour_constants.h"
 #include "../../util/content_draw_util.h"
@@ -22,7 +22,7 @@
 
 #include "../AnimatedInst.h"
 
-#include "../../world/GameState.h"
+#include "../../gamestate/GameState.h"
 
 #include "EnemyInst.h"
 #include "../ItemInst.h"

@@ -5,9 +5,9 @@
 #include "../data/item_data.h"
 #include "../data/lua_game_data.h"
 
-#include "../gamestats/stats.h"
+#include "../stats/stats.h"
 
-#include "../world/GameState.h"
+#include "../gamestate/GameState.h"
 #include "../objects/enemy/EnemyInst.h"
 #include "../objects/GameInst.h"
 #include "../objects/player/PlayerInst.h"

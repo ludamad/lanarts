@@ -10,7 +10,7 @@
 
 #include "../../util/ActionQueue.h"
 
-#include "../../world/GameAction.h"
+#include "../../gamestate/GameAction.h"
 
 class SidebarContent;
 

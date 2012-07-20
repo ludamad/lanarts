@@ -8,7 +8,7 @@
 
 #include <vector>
 
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 #include "../util/mtwist.h"
 
 class GameState;

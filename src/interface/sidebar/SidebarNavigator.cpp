@@ -9,7 +9,7 @@
 
 #include "../../util/colour_constants.h"
 
-#include "../../world/GameState.h"
+#include "../../gamestate/GameState.h"
 
 #include "EquipmentContent.h"
 #include "EnemiesSeenContent.h"

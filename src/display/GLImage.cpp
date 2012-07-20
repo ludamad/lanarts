@@ -12,7 +12,7 @@
 #include <SDL_image.h>
 #include <GL/glu.h>
 
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 
 /* Utility function for power-of-two texture creation */
 static int power_of_two(int input) {

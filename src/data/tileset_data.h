@@ -8,7 +8,7 @@
 
 #include <vector>
 #include <string>
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 #include "../display/GLImage.h"
 
 struct TilesetEntry {

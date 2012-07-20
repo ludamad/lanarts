@@ -10,7 +10,7 @@
 
 #include "../../util/colour_constants.h"
 
-#include "../../world/GameState.h"
+#include "../../gamestate/GameState.h"
 
 #include "../../objects/player/PlayerInst.h"
 

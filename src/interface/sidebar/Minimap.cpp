@@ -7,7 +7,7 @@
 
 #include "../../util/math_util.h"
 
-#include "../../world/GameState.h"
+#include "../../gamestate/GameState.h"
 
 #include "../../objects/player/PlayerInst.h"
 

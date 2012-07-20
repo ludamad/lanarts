@@ -9,9 +9,9 @@
 #include <string>
 #include <vector>
 
-#include "../gamestats/stats.h"
+#include "../stats/stats.h"
 
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 #include "../util/LuaValue.h"
 
 struct ProjectileEntry {

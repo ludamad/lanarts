@@ -14,7 +14,7 @@ extern "C" {
 
 #include "../data/lua_game_data.h"
 
-#include "../world/GameState.h"
+#include "../gamestate/GameState.h"
 
 #include "../objects/GameInst.h"
 #include "../objects/ScriptedInst.h"

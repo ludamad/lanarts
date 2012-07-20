@@ -47,15 +47,15 @@ set( lanarts_src
 	fov/fov.cpp
 	fov/impl/permissive-fov.cc
 
-	gamestats/combat_stats.cpp
-	gamestats/effects.cpp
-	gamestats/Equipment.cpp
-	gamestats/Inventory.cpp
-	gamestats/items.cpp
-	gamestats/skills.cpp
-	gamestats/stat_formulas.cpp
-	gamestats/stats.cpp
-	gamestats/SpellsKnown.cpp
+	stats/combat_stats.cpp
+	stats/effects.cpp
+	stats/Equipment.cpp
+	stats/Inventory.cpp
+	stats/items.cpp
+	stats/skills.cpp
+	stats/stat_formulas.cpp
+	stats/stats.cpp
+	stats/SpellsKnown.cpp
 
 	lua/lua_api.cpp
 	lua/lua_collision_checks.cpp
@@ -71,12 +71,12 @@ set( lanarts_src
 	main.cpp
 	main_menu.cpp
 
-	procedural/enemygen.cpp
-	procedural/featuregen.cpp
-	procedural/GeneratedLevel.cpp
-	procedural/itemgen.cpp
-	procedural/levelgen.cpp
-	procedural/tunnelgen.cpp
+	levelgen/enemygen.cpp
+	levelgen/featuregen.cpp
+	levelgen/GeneratedLevel.cpp
+	levelgen/itemgen.cpp
+	levelgen/levelgen.cpp
+	levelgen/tunnelgen.cpp
 
 	util/content_draw_util.cpp
 	util/math_util.cpp
@@ -85,13 +85,13 @@ set( lanarts_src
 	util/LuaValue.cpp
 	util/world/collision_util.cpp
 
-	world/GameAction.cpp
-	world/GameInstSet.cpp
-	world/GameState.cpp
-	world/GameLevelState.cpp
-	world/GameTiles.cpp
-	world/GameView.cpp
-	world/GameWorld.cpp
+	gamestate/GameAction.cpp
+	gamestate/GameInstSet.cpp
+	gamestate/GameState.cpp
+	gamestate/GameLevelState.cpp
+	gamestate/GameTiles.cpp
+	gamestate/GameView.cpp
+	gamestate/GameWorld.cpp
 
 	interface/GameChat.cpp
 	interface/GameTextConsole.cpp
@@ -106,11 +106,11 @@ set( lanarts_src
 	interface/sidebar/InventoryContent.cpp
 	interface/sidebar/Minimap.cpp
 
-	world/controllers/CombatInstController.cpp
-	world/controllers/IOController.cpp
-	world/controllers/MonsterController.cpp
-	world/controllers/MonsterControllerActions.cpp
-	world/controllers/PlayerController.cpp
+	gamestate/controllers/CombatInstController.cpp
+	gamestate/controllers/IOController.cpp
+	objects/enemy/MonsterController.cpp
+	objects/enemy/MonsterControllerActions.cpp
+	objects/player/PlayerController.cpp
 
 	objects/AnimatedInst.cpp
 	interface/ButtonInst.cpp
@@ -142,7 +142,7 @@ set( lanarts_include
 	data/armour_data.h
 	data/class_data.h
 	data/effect_data.h
-	data/enemy_data.h
+	objects/enemy/enemy_data.h
 	data/item_data.h
 	data/lua_game_data.h
 	data/game_data.h
@@ -164,30 +164,30 @@ set( lanarts_include
 	lua/lua_impl_util.h
 
 
-	gamestats/combat_stats.h
-	gamestats/Inventory.h
-	gamestats/items.h
-	gamestats/effects.h
-	gamestats/Equipment.h
-	gamestats/EnemiesSeen.h
-	gamestats/skills.h
-	gamestats/stat_formulas.h
-	gamestats/stats.h
-	gamestats/SpellsKnown.h
+	stats/combat_stats.h
+	stats/Inventory.h
+	stats/items.h
+	stats/effects.h
+	stats/Equipment.h
+	stats/EnemiesSeen.h
+	stats/skills.h
+	stats/stat_formulas.h
+	stats/stats.h
+	stats/SpellsKnown.h
 
 	pathfind/astar_pathfind.h
 	pathfind/pathfind.h
 
-	procedural/enemygen.h
-	procedural/featuregen.h
-	procedural/GeneratedLevel.h
-	procedural/itemgen.h
-	procedural/levelgen.h
-	procedural/tunnelgen.h
+	levelgen/enemygen.h
+	levelgen/featuregen.h
+	levelgen/GeneratedLevel.h
+	levelgen/itemgen.h
+	levelgen/levelgen.h
+	levelgen/tunnelgen.h
 
 	util/callback_util.h
 	util/content_draw_util.h
-	util/game_basic_structs.h
+	lanarts_defines.h
 	util/game_replays.h
 	util/gheap.h
 	util/hashset_util.h
@@ -197,19 +197,19 @@ set( lanarts_include
 
 	net/GameNetConnection.h
 
-	world/GameAction.h
-	world/GameInstSet.h
-	world/GameState.h
-	world/GameLevelState.h
-	world/GameSettings.h
-	world/GameTiles.h
-	world/GameView.h
-	world/GameWorld.h
+	gamestate/GameAction.h
+	gamestate/GameInstSet.h
+	gamestate/GameState.h
+	gamestate/GameLevelState.h
+	gamestate/GameSettings.h
+	gamestate/GameTiles.h
+	gamestate/GameView.h
+	gamestate/GameWorld.h
 
-	world/controllers/IOController.h
-	world/controllers/MonsterController.h
-	world/controllers/PlayerController.h
-	world/controllers/CombatInstController.h
+	gamestate/controllers/IOController.h
+	objects/enemy/MonsterController.h
+	objects/player/PlayerController.h
+	gamestate/controllers/CombatInstController.h
 
 	interface/GameChat.h
 	interface/GameDialogs.h

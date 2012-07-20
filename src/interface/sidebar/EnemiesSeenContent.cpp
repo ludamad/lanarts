@@ -9,8 +9,8 @@
 #include "../../util/colour_constants.h"
 #include "../../util/content_draw_util.h"
 
-#include "../../world/GameState.h"
-#include "../../world/controllers/MonsterController.h"
+#include "../../gamestate/GameState.h"
+#include "../../objects/enemy/MonsterController.h"
 
 const int ENEMIES_PER_PAGE = 40;
 

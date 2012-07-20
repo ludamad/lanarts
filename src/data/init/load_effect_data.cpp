@@ -3,7 +3,7 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "../../gamestats/stats.h"
+#include "../../stats/stats.h"
 
 #include "../effect_data.h"
 #include "../game_data.h"

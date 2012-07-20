@@ -10,7 +10,7 @@
 #include <SDL.h>
 #include <string>
 #include <vector>
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 
 class GameState;
 struct font_data;

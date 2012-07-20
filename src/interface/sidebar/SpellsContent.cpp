@@ -10,12 +10,12 @@
 
 #include "../../display/display.h"
 
-#include "../../gamestats/SpellsKnown.h"
+#include "../../stats/SpellsKnown.h"
 
 #include "../../util/colour_constants.h"
 #include "../../util/content_draw_util.h"
 
-#include "../../world/GameState.h"
+#include "../../gamestate/GameState.h"
 
 #include "../../objects/player/PlayerInst.h"
 

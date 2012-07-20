@@ -4,7 +4,7 @@
  */
 
 #include "ItemInst.h"
-#include "../world/GameState.h"
+#include "../gamestate/GameState.h"
 #include "../util/world/collision_util.h"
 #include "../data/item_data.h"
 #include "../data/sprite_data.h"

@@ -15,7 +15,7 @@ extern "C" {
 
 #include "../util/math_util.h"
 
-#include "../world/GameState.h"
+#include "../gamestate/GameState.h"
 
 #include "../objects/GameInst.h"
 #include "../objects/player/PlayerInst.h"

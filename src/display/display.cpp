@@ -16,7 +16,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <algorithm>
-#include "../world/GameView.h"
+#include "../gamestate/GameView.h"
 
 void gl_draw_image_section(GLimage& img, const BBox& section, int x, int y,
 		const Colour& c) {

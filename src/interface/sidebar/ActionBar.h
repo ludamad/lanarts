@@ -8,11 +8,11 @@
 
 #include <vector>
 
-#include "../../gamestats/items.h"
+#include "../../stats/items.h"
 
 #include "../../util/ActionQueue.h"
 
-#include "../../world/GameAction.h"
+#include "../../gamestate/GameAction.h"
 
 class GameState;
 

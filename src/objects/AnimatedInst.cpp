@@ -4,7 +4,7 @@
  */
 
 #include "AnimatedInst.h"
-#include "../world/GameState.h"
+#include "../gamestate/GameState.h"
 #include "../data/sprite_data.h"
 #include "../display/display.h"
 #include <typeinfo>

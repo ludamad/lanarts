@@ -9,7 +9,7 @@
  */
 
 #include "GameInst.h"
-#include "../world/GameState.h"
+#include "../gamestate/GameState.h"
 #include "../display/display.h"
 
 GameInst::~GameInst() {

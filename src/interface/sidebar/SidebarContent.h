@@ -6,9 +6,9 @@
 #ifndef SIDEBARCONTENT_H_
 #define SIDEBARCONTENT_H_
 
-#include "../../world/GameAction.h"
+#include "../../gamestate/GameAction.h"
 
-#include "../../util/game_basic_structs.h"
+#include "../../lanarts_defines.h"
 
 #include "../../util/ActionQueue.h"
 

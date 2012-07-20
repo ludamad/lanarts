@@ -1,9 +1,9 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
-#include "../../gamestats/stats.h"
+#include "../../stats/stats.h"
 
-#include "../enemy_data.h"
+#include "../../objects/enemy/enemy_data.h"
 #include "../game_data.h"
 
 #include "yaml_util.h"

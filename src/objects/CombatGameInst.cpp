@@ -8,11 +8,11 @@
 #include "../data/projectile_data.h"
 #include "../data/weapon_data.h"
 
-#include "../gamestats/stat_formulas.h"
+#include "../stats/stat_formulas.h"
 
 #include "../util/math_util.h"
 
-#include "../world/GameState.h"
+#include "../gamestate/GameState.h"
 
 #include "AnimatedInst.h"
 

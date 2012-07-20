@@ -10,9 +10,9 @@
 
 #include "../../util/colour_constants.h"
 #include "../../util/content_draw_util.h"
-#include "../../util/game_basic_structs.h"
+#include "../../lanarts_defines.h"
 
-#include "../../world/GameState.h"
+#include "../../gamestate/GameState.h"
 
 #include "../../objects/player/PlayerInst.h"
 

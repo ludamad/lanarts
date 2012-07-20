@@ -5,14 +5,14 @@
 
 #include <algorithm>
 
-#include "../gamestats/combat_stats.h"
+#include "../stats/combat_stats.h"
 
 #include "../data/projectile_data.h"
 #include "../data/weapon_data.h"
 
 #include "../util/math_util.h"
 
-#include "../world/GameState.h"
+#include "../gamestate/GameState.h"
 #include "../objects/CombatGameInst.h"
 
 #include "attack_logic.h"

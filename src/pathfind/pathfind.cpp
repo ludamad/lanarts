@@ -7,8 +7,8 @@
 #include <cmath>
 #include "pathfind.h"
 #include "../data/tile_data.h"
-#include "../world/GameState.h"
-#include "../world/GameTiles.h"
+#include "../gamestate/GameState.h"
+#include "../gamestate/GameTiles.h"
 #include "../util/math_util.h"
 
 using namespace std;

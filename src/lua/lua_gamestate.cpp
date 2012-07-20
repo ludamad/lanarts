@@ -4,8 +4,8 @@
 
 #include "../data/lua_game_data.h"
 
-#include "../world/GameState.h"
-#include "../world/GameLevelState.h"
+#include "../gamestate/GameState.h"
+#include "../gamestate/GameLevelState.h"
 
 #include "../objects/enemy/EnemyInst.h"
 #include "../objects/player/PlayerInst.h"

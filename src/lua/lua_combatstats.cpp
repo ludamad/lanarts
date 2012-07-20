@@ -2,11 +2,11 @@
 
 #include "lua_api.h"
 
-#include "../gamestats/stats.h"
-#include "../gamestats/combat_stats.h"
+#include "../stats/stats.h"
+#include "../stats/combat_stats.h"
 
-#include "../world/GameState.h"
-#include "../world/GameLevelState.h"
+#include "../gamestate/GameState.h"
+#include "../gamestate/GameLevelState.h"
 
 #include "../objects/GameInstRef.h"
 #include "../objects/enemy/EnemyInst.h"

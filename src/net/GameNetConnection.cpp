@@ -5,7 +5,7 @@
  * 	Provides useful behaviour on top of the src_net library.
  */
 
-#include "../world/GameState.h"
+#include "../gamestate/GameState.h"
 
 #include "GameNetConnection.h"
 

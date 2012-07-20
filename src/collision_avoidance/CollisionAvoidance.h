@@ -6,7 +6,7 @@
 #ifndef COLLISIONAVOIDANCE_H_
 #define COLLISIONAVOIDANCE_H_
 
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 
 class CombatGameInst;
 

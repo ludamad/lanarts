@@ -6,9 +6,9 @@
 #ifndef ARMOUR_DATA_H_
 #define ARMOUR_DATA_H_
 
-#include "../gamestats/stats.h"
+#include "../stats/stats.h"
 
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 
 #include "item_data.h"
 

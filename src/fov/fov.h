@@ -6,7 +6,7 @@
 #ifndef FOV_H_
 #define FOV_H_
 
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 
 #include "impl/permissive-fov-cpp.h"
 

@@ -5,7 +5,7 @@ extern "C" {
 #include <lua/lauxlib.h>
 #include <lua/lualib.h>
 }
-#include "../world/GameState.h"
+#include "../gamestate/GameState.h"
 
 void lua_gameinst_bindings(GameState* gs, lua_State* L);
 void lua_gamestate_bindings(GameState* gs, lua_State* L);

@@ -9,9 +9,9 @@
 #include <string>
 #include <vector>
 
-#include "../gamestats/items.h"
+#include "../stats/items.h"
 
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 #include "../util/LuaValue.h"
 
 struct SpellEntry {

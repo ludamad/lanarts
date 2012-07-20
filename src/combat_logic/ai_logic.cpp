@@ -3,7 +3,7 @@
  *  Represents movement and attack decisions for an entity
  */
 
-#include "../gamestats/combat_stats.h"
+#include "../stats/combat_stats.h"
 
 #include "../objects/CombatGameInst.h"
 

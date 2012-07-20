@@ -6,7 +6,7 @@
 #ifndef COLOUR_CONSTANTS_H_
 #define COLOUR_CONSTANTS_H_
 
-#include "game_basic_structs.h"
+#include "../lanarts_defines.h"
 
 /* Colours */
 const Colour COL_YELLOW(255, 255, 0);

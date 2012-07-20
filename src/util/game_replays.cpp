@@ -7,8 +7,8 @@
 
 #include "colour_constants.h"
 
-#include "../world/GameAction.h"
-#include "../world/GameState.h"
+#include "../gamestate/GameAction.h"
+#include "../gamestate/GameState.h"
 
 static FILE* loadfile = NULL;
 static FILE* savefile = NULL;

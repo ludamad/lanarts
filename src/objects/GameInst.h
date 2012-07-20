@@ -13,7 +13,7 @@
 #define GAMEINST_H_
 
 #include <cassert>
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 #include "../util/LuaValue.h"
 
 struct lua_State;

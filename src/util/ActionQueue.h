@@ -8,7 +8,7 @@
 
 #include <deque>
 
-#include "../world/GameAction.h"
+#include "../gamestate/GameAction.h"
 
 typedef std::deque<GameAction> ActionQueue;
 

@@ -12,11 +12,11 @@
 
 #include "../display/display.h"
 
-#include "../gamestats/items.h"
+#include "../stats/items.h"
 
 #include "colour_constants.h"
 
-#include "../world/GameState.h"
+#include "../gamestate/GameState.h"
 #include "../objects/player/PlayerInst.h"
 
 #include "content_draw_util.h"

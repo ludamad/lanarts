@@ -7,7 +7,7 @@
 
 #include "../AnimatedInst.h"
 
-#include "../../world/GameState.h"
+#include "../../gamestate/GameState.h"
 #include "../../data/sprite_data.h"
 #include "../../data/tile_data.h"
 #include "../../data/item_data.h"

@@ -11,8 +11,8 @@
 #include "../data/item_data.h"
 #include "../data/sprite_data.h"
 
-#include "../world/GameTiles.h"
-#include "../world/GameState.h"
+#include "../gamestate/GameTiles.h"
+#include "../gamestate/GameState.h"
 
 #include "FeatureInst.h"
 

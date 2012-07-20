@@ -12,7 +12,7 @@
 
 #include "../data/sprite_data.h"
 
-#include "../world/GameView.h"
+#include "../gamestate/GameView.h"
 
 #include "display.h"
 #include "GLImage.h"

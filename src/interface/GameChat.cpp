@@ -20,13 +20,13 @@ extern "C" {
 #include "../util/colour_constants.h"
 #include "../util/math_util.h"
 
-#include "../procedural/enemygen.h"
+#include "../levelgen/enemygen.h"
 
 #include "../lua/lua_api.h"
 
 #include "../objects/player/PlayerInst.h"
 
-#include "../world/GameState.h"
+#include "../gamestate/GameState.h"
 
 #include "GameChat.h"
 

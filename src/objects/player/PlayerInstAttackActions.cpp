@@ -20,10 +20,10 @@ extern "C" {
 
 #include "../../util/colour_constants.h"
 #include "../../util/math_util.h"
-#include "../../util/game_basic_structs.h"
+#include "../../lanarts_defines.h"
 #include "../../util/world/collision_util.h"
 
-#include "../../world/GameState.h"
+#include "../../gamestate/GameState.h"
 
 #include "../AnimatedInst.h"
 

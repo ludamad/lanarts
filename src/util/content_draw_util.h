@@ -6,7 +6,7 @@
 #ifndef CONTENT_DRAW_UTIL_H_
 #define CONTENT_DRAW_UTIL_H_
 
-#include "game_basic_structs.h"
+#include "../lanarts_defines.h"
 
 struct Item;
 struct ItemEntry;

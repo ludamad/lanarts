@@ -6,7 +6,7 @@
 #ifndef ITEMINST_H_
 #define ITEMINST_H_
 
-#include "../gamestats/items.h"
+#include "../stats/items.h"
 
 #include "GameInst.h"
 

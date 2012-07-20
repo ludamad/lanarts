@@ -17,8 +17,8 @@
 
 #include "../../util/ActionQueue.h"
 
-#include "../../world/GameAction.h"
-#include "../../world/GameLevelState.h"
+#include "../../gamestate/GameAction.h"
+#include "../../gamestate/GameLevelState.h"
 
 #include "../CombatGameInst.h"
 #include "../GameInst.h"

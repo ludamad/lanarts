@@ -12,7 +12,7 @@
 #include "../data/scriptobject_data.h"
 #include "../util/LuaValue.h"
 
-#include "../world/GameState.h"
+#include "../gamestate/GameState.h"
 
 #include "ScriptedInst.h"
 

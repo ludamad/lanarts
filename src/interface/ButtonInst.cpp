@@ -1,5 +1,5 @@
 #include "ButtonInst.h"
-#include "../world/GameState.h"
+#include "../gamestate/GameState.h"
 #include "../display/display.h"
 #include <typeinfo>
 

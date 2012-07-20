@@ -6,7 +6,7 @@
 
 #include "../display/GLImage.h"
 
-#include "../util/game_basic_structs.h"
+#include "../lanarts_defines.h"
 #include "../util/types_util.h"//For FilenameList
 
 struct SpriteEntry {
