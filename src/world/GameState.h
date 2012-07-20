@@ -21,9 +21,9 @@
 #include "controllers/MonsterController.h"
 #include "controllers/PlayerController.h"
 
-#include "ui/GameChat.h"
-#include "ui/GameHud.h"
-#include "ui/GameDialogs.h"
+#include "../interface/GameChat.h"
+#include "../interface/GameHud.h"
+#include "../interface/GameDialogs.h"
 
 #include "GameSettings.h"
 #include "GameView.h"

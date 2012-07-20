@@ -3,17 +3,17 @@
  *  Represents an interactive view of the inventory for the side bar
  */
 
-#include "../../../data/item_data.h"
-#include "../../../data/sprite_data.h"
+#include "../../data/item_data.h"
+#include "../../data/sprite_data.h"
 
-#include "../../../display/display.h"
+#include "../../display/display.h"
 
-#include "../../../util/colour_constants.h"
-#include "../../../util/content_draw_util.h"
+#include "../../util/colour_constants.h"
+#include "../../util/content_draw_util.h"
 
-#include "../../GameState.h"
+#include "../../world/GameState.h"
 
-#include "../../../objects/player/PlayerInst.h"
+#include "../../objects/player/PlayerInst.h"
 
 #include "InventoryContent.h"
 

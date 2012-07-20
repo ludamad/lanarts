@@ -6,10 +6,10 @@
 #ifndef SIDEBAR_H_
 #define SIDEBAR_H_
 
-#include "../../../util/ActionQueue.h"
-#include "../../../util/game_basic_structs.h"
+#include "../../util/ActionQueue.h"
+#include "../../util/game_basic_structs.h"
 
-#include "../../GameAction.h"
+#include "../../world/GameAction.h"
 
 #include "Minimap.h"
 #include "SidebarNavigator.h"

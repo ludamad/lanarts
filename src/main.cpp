@@ -24,7 +24,7 @@ extern "C" {
 #include "objects/enemy/EnemyInst.h"
 
 #include "objects/AnimatedInst.h"
-#include "world/utility_objects/ButtonInst.h"
+#include "interface/ButtonInst.h"
 
 using namespace std;
 

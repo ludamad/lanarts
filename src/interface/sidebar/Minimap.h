@@ -6,8 +6,8 @@
 #ifndef MINIMAP_H_
 #define MINIMAP_H_
 
-#include "../../../util/game_basic_structs.h"
-#include "../../../display/GLImage.h"
+#include "../../util/game_basic_structs.h"
+#include "../../display/GLImage.h"
 
 class GameState;
 

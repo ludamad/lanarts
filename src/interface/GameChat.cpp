@@ -13,20 +13,20 @@ extern "C" {
 
 #include <net/packet.h>
 
-#include "../../data/game_data.h"
+#include "../data/game_data.h"
 
-#include "../../display/display.h"
+#include "../display/display.h"
 
-#include "../../util/colour_constants.h"
-#include "../../util/math_util.h"
+#include "../util/colour_constants.h"
+#include "../util/math_util.h"
 
-#include "../../procedural/enemygen.h"
+#include "../procedural/enemygen.h"
 
-#include "../../lua/lua_api.h"
+#include "../lua/lua_api.h"
 
-#include "../../objects/player/PlayerInst.h"
+#include "../objects/player/PlayerInst.h"
 
-#include "../GameState.h"
+#include "../world/GameState.h"
 
 #include "GameChat.h"
 

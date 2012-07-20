@@ -10,7 +10,7 @@
 #include <SDL.h>
 #include <string>
 #include <vector>
-#include "../../util/game_basic_structs.h"
+#include "../util/game_basic_structs.h"
 
 class GameState;
 struct font_data;

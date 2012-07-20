@@ -6,11 +6,11 @@
 #ifndef SIDEBARCONTENT_H_
 #define SIDEBARCONTENT_H_
 
-#include "../../GameAction.h"
+#include "../../world/GameAction.h"
 
-#include "../../../util/game_basic_structs.h"
+#include "../../util/game_basic_structs.h"
 
-#include "../../../util/ActionQueue.h"
+#include "../../util/ActionQueue.h"
 
 class GameState;
 

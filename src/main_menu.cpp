@@ -29,7 +29,7 @@ extern "C" {
 #include "objects/enemy/EnemyInst.h"
 
 #include "objects/AnimatedInst.h"
-#include "world/utility_objects/ButtonInst.h"
+#include "interface/ButtonInst.h"
 
 static void continue_as_loner(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;

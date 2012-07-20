@@ -4,27 +4,27 @@
  *  Includes inventory manipulation
  */
 
-#include "../../display/display.h"
+#include "../display/display.h"
 
-#include "../../data/tile_data.h"
-#include "../../data/item_data.h"
-#include "../../data/spell_data.h"
-#include "../../data/sprite_data.h"
-#include "../../data/weapon_data.h"
+#include "../data/tile_data.h"
+#include "../data/item_data.h"
+#include "../data/spell_data.h"
+#include "../data/sprite_data.h"
+#include "../data/weapon_data.h"
 
-#include "../../gamestats/Inventory.h"
+#include "../gamestats/Inventory.h"
 
-#include "../../util/math_util.h"
+#include "../util/math_util.h"
 
-#include "../GameState.h"
-#include "../GameInstSet.h"
+#include "../world/GameState.h"
+#include "../world/GameInstSet.h"
 
-#include "../../objects/GameInst.h"
-#include "../../objects/player/PlayerInst.h"
+#include "../objects/GameInst.h"
+#include "../objects/player/PlayerInst.h"
 
 #include "GameHud.h"
 
-#include "detail/SpellsContent.h"
+#include "sidebar/SpellsContent.h"
 
 const int INVENTORY_POSITION = 342;
 

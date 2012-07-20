@@ -4,13 +4,13 @@
  */
 #include "EnemiesSeenContent.h"
 
-#include "../../../data/sprite_data.h"
+#include "../../data/sprite_data.h"
 
-#include "../../../util/colour_constants.h"
-#include "../../../util/content_draw_util.h"
+#include "../../util/colour_constants.h"
+#include "../../util/content_draw_util.h"
 
-#include "../../GameState.h"
-#include "../../controllers/MonsterController.h"
+#include "../../world/GameState.h"
+#include "../../world/controllers/MonsterController.h"
 
 const int ENEMIES_PER_PAGE = 40;
 

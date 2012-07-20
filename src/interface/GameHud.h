@@ -9,21 +9,21 @@
 
 #include <deque>
 
-#include "../../display/display.h"
-#include "../../display/GLImage.h"
+#include "../display/display.h"
+#include "../display/GLImage.h"
 
-#include "../../util/game_basic_structs.h"
-#include "../../util/ActionQueue.h"
+#include "../util/game_basic_structs.h"
+#include "../util/ActionQueue.h"
 
-#include "../../objects/GameInst.h"
+#include "../objects/GameInst.h"
 
-#include "../GameAction.h"
+#include "../world/GameAction.h"
 
 #include "GameTextConsole.h"
 
-#include "detail/ActionBar.h"
-#include "detail/Sidebar.h"
-#include "detail/SidebarNavigator.h"
+#include "sidebar/ActionBar.h"
+#include "sidebar/Sidebar.h"
+#include "sidebar/SidebarNavigator.h"
 
 class PlayerInst;
 

@@ -3,16 +3,16 @@
  *  Represents an interactive view of equipped items for the side bar
  */
 
-#include "../../../data/item_data.h"
-#include "../../../data/sprite_data.h"
+#include "../../data/item_data.h"
+#include "../../data/sprite_data.h"
 
-#include "../../../display/display.h"
+#include "../../display/display.h"
 
-#include "../../../util/colour_constants.h"
+#include "../../util/colour_constants.h"
 
-#include "../../GameState.h"
+#include "../../world/GameState.h"
 
-#include "../../../objects/player/PlayerInst.h"
+#include "../../objects/player/PlayerInst.h"
 
 #include "EquipmentContent.h"
 

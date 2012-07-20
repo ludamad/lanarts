@@ -3,13 +3,13 @@
  *  Handles drawing & state of a minimap
  */
 
-#include "../../../data/tile_data.h"
+#include "../../data/tile_data.h"
 
-#include "../../../util/math_util.h"
+#include "../../util/math_util.h"
 
-#include "../../GameState.h"
+#include "../../world/GameState.h"
 
-#include "../../../objects/player/PlayerInst.h"
+#include "../../objects/player/PlayerInst.h"
 
 #include "Minimap.h"
 

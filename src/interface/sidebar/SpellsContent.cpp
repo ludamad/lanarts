@@ -5,19 +5,19 @@
 
 #include "SpellsContent.h"
 
-#include "../../../data/spell_data.h"
-#include "../../../data/sprite_data.h"
+#include "../../data/spell_data.h"
+#include "../../data/sprite_data.h"
 
-#include "../../../display/display.h"
+#include "../../display/display.h"
 
-#include "../../../gamestats/SpellsKnown.h"
+#include "../../gamestats/SpellsKnown.h"
 
-#include "../../../util/colour_constants.h"
-#include "../../../util/content_draw_util.h"
+#include "../../util/colour_constants.h"
+#include "../../util/content_draw_util.h"
 
-#include "../../GameState.h"
+#include "../../world/GameState.h"
 
-#include "../../../objects/player/PlayerInst.h"
+#include "../../objects/player/PlayerInst.h"
 
 static void draw_spells_known(GameState* gs, const BBox& bbox,
 		SpellsKnown& spells, int ind_low, int ind_high) {

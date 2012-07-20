@@ -8,9 +8,9 @@
 
 #include <vector>
 
-#include "../../../util/ActionQueue.h"
+#include "../../util/ActionQueue.h"
 
-#include "../../GameAction.h"
+#include "../../world/GameAction.h"
 
 class SidebarContent;
 

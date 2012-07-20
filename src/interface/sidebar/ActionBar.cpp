@@ -3,18 +3,18 @@
  *  Handles drawing and state of the action bar.
  */
 
-#include "../../../data/item_data.h"
-#include "../../../data/spell_data.h"
-#include "../../../data/projectile_data.h"
-#include "../../../data/weapon_data.h"
+#include "../../data/item_data.h"
+#include "../../data/spell_data.h"
+#include "../../data/projectile_data.h"
+#include "../../data/weapon_data.h"
 
-#include "../../../util/colour_constants.h"
-#include "../../../util/content_draw_util.h"
-#include "../../../util/game_basic_structs.h"
+#include "../../util/colour_constants.h"
+#include "../../util/content_draw_util.h"
+#include "../../util/game_basic_structs.h"
 
-#include "../../GameState.h"
+#include "../../world/GameState.h"
 
-#include "../../../objects/player/PlayerInst.h"
+#include "../../objects/player/PlayerInst.h"
 
 #include "ActionBar.h"
 

@@ -1,6 +1,6 @@
 #include "ButtonInst.h"
-#include "../GameState.h"
-#include "../../display/display.h"
+#include "../world/GameState.h"
+#include "../display/display.h"
 #include <typeinfo>
 
 void ButtonInst::init(GameState* gs) {

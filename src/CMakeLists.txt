@@ -93,18 +93,18 @@ set( lanarts_src
 	world/GameView.cpp
 	world/GameWorld.cpp
 
-	world/ui/GameChat.cpp
-	world/ui/GameTextConsole.cpp
-	world/ui/GameDialogs.cpp
-	world/ui/GameHud.cpp
-	world/ui/detail/ActionBar.cpp
-	world/ui/detail/Sidebar.cpp
-	world/ui/detail/SidebarNavigator.cpp
-	world/ui/detail/SpellsContent.cpp
-	world/ui/detail/EnemiesSeenContent.cpp
-	world/ui/detail/EquipmentContent.cpp
-	world/ui/detail/InventoryContent.cpp
-	world/ui/detail/Minimap.cpp
+	interface/GameChat.cpp
+	interface/GameTextConsole.cpp
+	interface/GameDialogs.cpp
+	interface/GameHud.cpp
+	interface/sidebar/ActionBar.cpp
+	interface/sidebar/Sidebar.cpp
+	interface/sidebar/SidebarNavigator.cpp
+	interface/sidebar/SpellsContent.cpp
+	interface/sidebar/EnemiesSeenContent.cpp
+	interface/sidebar/EquipmentContent.cpp
+	interface/sidebar/InventoryContent.cpp
+	interface/sidebar/Minimap.cpp
 
 	world/controllers/CombatInstController.cpp
 	world/controllers/IOController.cpp
@@ -113,8 +113,7 @@ set( lanarts_src
 	world/controllers/PlayerController.cpp
 
 	objects/AnimatedInst.cpp
-	world/utility_objects/ButtonInst.cpp
-	world/utility_objects/TestInst.cpp
+	interface/ButtonInst.cpp
 
 	objects/player/PlayerInst.cpp
 	objects/player/PlayerInstActions.cpp
@@ -212,23 +211,22 @@ set( lanarts_include
 	world/controllers/PlayerController.h
 	world/controllers/CombatInstController.h
 
-	world/ui/GameChat.h
-	world/ui/GameDialogs.h
-	world/ui/GameHud.h
-	world/ui/GameTextConsole.h
-	world/ui/detail/ActionBar.h
-	world/ui/detail/EnemiesSeenContent.h
-	world/ui/detail/EquipmentContent.h
-	world/ui/detail/InventoryContent.h
-	world/ui/detail/Sidebar.h
-	world/ui/detail/SidebarContent.h
-	world/ui/detail/SidebarNavigator.h
-	world/ui/detail/SpellsContent.h
-	world/ui/detail/Minimap.h
+	interface/GameChat.h
+	interface/GameDialogs.h
+	interface/GameHud.h
+	interface/GameTextConsole.h
+	interface/sidebar/ActionBar.h
+	interface/sidebar/EnemiesSeenContent.h
+	interface/sidebar/EquipmentContent.h
+	interface/sidebar/InventoryContent.h
+	interface/sidebar/Sidebar.h
+	interface/sidebar/SidebarContent.h
+	interface/sidebar/SidebarNavigator.h
+	interface/sidebar/SpellsContent.h
+	interface/sidebar/Minimap.h
 
 	objects/AnimatedInst.h
-	world/utility_objects/ButtonInst.h
-	world/utility_objects/TestInst.h
+	interface/ButtonInst.h
 
 	objects/CombatGameInst.h
 	objects/GameInst.h
