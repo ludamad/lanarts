@@ -110,20 +110,20 @@ GameLevelState* generate_level(int roomid, MTwist& mt, GeneratedLevel& level,
 	GameLevelState* prevlvl = gs->get_level(); //Save level context
 	gs->set_level(newlvl); //Set level context to new level
 
-	printf("level.init RNG state at %d numbers\n",
+	printf("level.init at %d RNG calls\n",
 			mt.DEBUG_INFO_amnt_generated);
 	for (int i = 0; i < roomsettings.size(); i++) {
 		generate_rooms(roomsettings[i], mt, level);
 	}
-	printf("ROOMS state at %d numbers\n", mt.DEBUG_INFO_amnt_generated);
+	printf("ROOMS state at %d RNG calls\n", mt.DEBUG_INFO_amnt_generated);
 	generate_tunnels(layout.tunnels, mt, level);
-	printf("TUNNELS state at %d numbers\n", mt.DEBUG_INFO_amnt_generated);
+	printf("TUNNELS state at %d RNG calls\n", mt.DEBUG_INFO_amnt_generated);
 	generate_features(content.features, mt, level, gs);
-	printf("FEATURES state at %d numbers\n", mt.DEBUG_INFO_amnt_generated);
+	printf("FEATURES state at %d RNG calls\n", mt.DEBUG_INFO_amnt_generated);
 	generate_enemies(content.enemies, mt, level, gs);
-	printf("ENEMIES state at %d numbers\n", mt.DEBUG_INFO_amnt_generated);
+	printf("ENEMIES state at %d RNG calls\n", mt.DEBUG_INFO_amnt_generated);
 	generate_items(content.items, mt, level, gs);
-	printf("ITEMS state at %d numbers\n", mt.DEBUG_INFO_amnt_generated);
+	printf("ITEMS state at %d RNG calls\n", mt.DEBUG_INFO_amnt_generated);
 	newlvl->rooms = level.rooms();
 
 	gs->set_level(prevlvl); //Restore level context

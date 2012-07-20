@@ -33,6 +33,35 @@ static tileset_id randtileset(MTwist& mt,
 	return tilesets[mt.rand(tilesets.size())];
 }
 
+static void doorify(GameState* gs, GeneratedLevel& l, int x, int y) {
+	GameTiles& tiles = gs->tile_grid();
+	int tw = tiles.tile_width(), th = tiles.tile_height();
+	int lw = l.width(), lh = l.height();
+
+	int start_x = (tw - lw) / 2;
+	int start_y = (th - lh) / 2;
+
+	Sqr& s = l.at(x, y);
+	if (!s.has_instance && s.passable) {
+		s.has_instance = true;
+		Pos fpos(x + start_x, y + start_y);
+		fpos = centered_multiple(fpos, TILE_SIZE);
+		gs->add_instance(
+				new FeatureInst(fpos.x, fpos.y, FeatureInst::DOOR_CLOSED));
+	}
+}
+static void doors_all_around(GameState* gs, GeneratedLevel& l,
+		const BBox& region) {
+	for (int x = region.x1; x < region.x2; x++) {
+		doorify(gs, l, x, region.y1);
+		doorify(gs, l, x, region.y2 - 1);
+	}
+	for (int y = region.y1; y < region.y2; y++) {
+		doorify(gs, l, region.x1, y);
+		doorify(gs, l, region.x2 - 1, y);
+	}
+}
+
 void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		GeneratedLevel& level, GameState* gs) {
 	GameTiles& tiles = gs->tile_grid();
@@ -131,17 +160,25 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		gs->get_level()->exits.push_back(GameLevelPortal(p, Pos(0, 0)));
 	}
 
-	for (int i = 0; i < 4; i++) {
-		for (int attempts = 0; attempts < 200; attempts++) {
-			Pos fpos = generate_location(mt, level);
-			if (level.at(fpos).feature != SMALL_CORRIDOR)
-				continue;
-			fpos.x += start_x;
-			fpos.y += start_y;
-			fpos = centered_multiple(fpos, TILE_SIZE);
-			gs->add_instance(
-					new FeatureInst(fpos.x, fpos.y, FeatureInst::DOOR_CLOSED));
-			break;
-		}
-	}
+	int room = mt.rand(level.rooms().size());
+	Region& r = level.rooms()[room].room_region;
+
+	doors_all_around(gs, level,
+			BBox(r.x - 1, r.y - 1, r.x + r.w + 1, r.y + r.h + 1));
+
+//	for (int i = 0; i < 4; i++) {
+//		for (int attempts = 0; attempts < 200; attempts++) {
+//			Pos fpos = generate_location(mt, level);
+//			Sqr& sqr = level.at(fpos);
+//			if (sqr.roomID || sqr.feature != SMALL_CORRIDOR)
+//				continue;
+//			sqr.has_instance = true;
+//			fpos.x += start_x;
+//			fpos.y += start_y;
+//			fpos = centered_multiple(fpos, TILE_SIZE);
+//			gs->add_instance(
+//					new FeatureInst(fpos.x, fpos.y, FeatureInst::DOOR_CLOSED));
+//			break;
+//		}
+//	}
 }
