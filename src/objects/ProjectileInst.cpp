@@ -25,7 +25,7 @@ extern "C" {
 
 #include "../lua/lua_api.h"
 
-#include "../world/utility_objects/AnimatedInst.h"
+#include "AnimatedInst.h"
 
 #include "../world/GameState.h"
 

@@ -7,9 +7,9 @@
 #define ANIMATEDINST_H_
 #include <string>
 
-#include "../../display/display.h"
+#include "../display/display.h"
 
-#include "../../objects/GameInst.h"
+#include "GameInst.h"
 
 const int DONT_DRAW_SPRITE = -1;
 

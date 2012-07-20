@@ -20,7 +20,7 @@
 #include "../../util/LuaValue.h"
 #include "../../util/world/collision_util.h"
 
-#include "../../world/utility_objects/AnimatedInst.h"
+#include "../AnimatedInst.h"
 
 #include "../../world/GameState.h"
 

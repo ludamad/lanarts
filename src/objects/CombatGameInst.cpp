@@ -14,7 +14,7 @@
 
 #include "../world/GameState.h"
 
-#include "../world/utility_objects/AnimatedInst.h"
+#include "AnimatedInst.h"
 
 #include "CombatGameInst.h"
 #include "ProjectileInst.h"

@@ -4,9 +4,9 @@
  */
 
 #include "AnimatedInst.h"
-#include "../GameState.h"
-#include "../../data/sprite_data.h"
-#include "../../display/display.h"
+#include "../world/GameState.h"
+#include "../data/sprite_data.h"
+#include "../display/display.h"
 #include <typeinfo>
 
 AnimatedInst::~AnimatedInst() {}

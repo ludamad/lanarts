@@ -26,7 +26,7 @@ extern "C" {
 
 #include "../../world/GameState.h"
 
-#include "../../world/utility_objects/AnimatedInst.h"
+#include "../AnimatedInst.h"
 
 #include "PlayerInst.h"
 #include "../enemy/EnemyInst.h"

@@ -112,7 +112,7 @@ set( lanarts_src
 	world/controllers/MonsterControllerActions.cpp
 	world/controllers/PlayerController.cpp
 
-	world/utility_objects/AnimatedInst.cpp
+	objects/AnimatedInst.cpp
 	world/utility_objects/ButtonInst.cpp
 	world/utility_objects/TestInst.cpp
 
@@ -226,7 +226,7 @@ set( lanarts_include
 	world/ui/detail/SpellsContent.h
 	world/ui/detail/Minimap.h
 
-	world/utility_objects/AnimatedInst.h
+	objects/AnimatedInst.h
 	world/utility_objects/ButtonInst.h
 	world/utility_objects/TestInst.h
 
