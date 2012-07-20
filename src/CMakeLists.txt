@@ -37,7 +37,7 @@ set( lanarts_src
 	data/yaml_util.cpp
 
 	data/game_data.cpp
-	data/load_datafilenames.cpp
+	data/loaddata/load_datafilenames.cpp
 
 	display/display_shape.cpp
 	display/display_text.cpp
@@ -147,7 +147,7 @@ set( lanarts_include
 	stats/item_data.h
 	data/lua_game_data.h
 	data/game_data.h
-	data/scriptobject_data.h
+	objects/scriptobject_data.h
 	display/sprite_data.h
 	levelgen/dungeon_data.h
 	display/tile_data.h

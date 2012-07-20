@@ -1,5 +1,5 @@
-#ifndef DATAFILES_DATA_H_
-#define DATAFILES_DATA_H_
+#ifndef DATAFILENAMES_H_
+#define DATAFILENAMESH_
 
 #include "FilenameList.h"//For FilenameList
 /*Specifies locations of various data files*/
@@ -9,4 +9,4 @@ struct DataFiles {
 			sprite_files, tile_files, tileset_files, weapon_files;
 };
 
-#endif /* DATAFILES_DATA_H_ */
+#endif /* DATAFILENAMES_H_ */
