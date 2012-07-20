@@ -5,7 +5,7 @@
 
 #include <algorithm>
 
-#include "../data/tile_data.h"
+#include "../display/tile_data.h"
 
 #include "gheap.h"
 

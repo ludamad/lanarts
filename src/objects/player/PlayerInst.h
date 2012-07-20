@@ -11,7 +11,7 @@
 
 #include "../../fov/fov.h"
 
-#include "../../data/sprite_data.h"
+#include "../../display/sprite_data.h"
 
 #include "../../pathfind/pathfind.h"
 

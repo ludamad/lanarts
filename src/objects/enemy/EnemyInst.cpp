@@ -6,9 +6,9 @@
 #include <cmath>
 #include <typeinfo>
 
-#include "../../data/sprite_data.h"
+#include "../../display/sprite_data.h"
 #include "enemy_data.h"
-#include "../../data/weapon_data.h"
+#include "../../stats/weapon_data.h"
 
 #include "../../display/display.h"
 

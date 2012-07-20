@@ -21,22 +21,23 @@ set( lanarts_src
 	lua/lua_combatstats.cpp
 	lua/lua_effectivestats.cpp
 
-	data/init/load_armour_data.cpp
-	data/init/load_spell_data.cpp
-	data/init/load_sprite_data.cpp
-	data/init/load_dungeon_data.cpp
-	data/init/load_effect_data.cpp
-	data/init/load_enemy_data.cpp
-	data/init/load_item_data.cpp
-	data/init/load_tileset_data.cpp
-	data/init/load_projectile_data.cpp
-	data/init/load_settings_data.cpp
-	data/init/load_weapon_data.cpp
-	data/init/load_class_data.cpp
-	data/init/load_sprite_data.cpp
-	data/init/yaml_util.cpp
+	stats/loaddata/load_armour_data.cpp
+	stats/loaddata/load_spell_data.cpp
+	display/loaddata/load_sprite_data.cpp
+	levelgen/loaddata/load_dungeon_data.cpp
+	stats/loaddata/load_effect_data.cpp
+	objects/loaddata/load_enemy_data.cpp
+	stats/loaddata/load_item_data.cpp
+	gamestate/loaddata/load_tileset_data.cpp
+	stats/loaddata/load_projectile_data.cpp
+	gamestate/loaddata/load_settings_data.cpp
+	stats/loaddata/load_weapon_data.cpp
+	stats/loaddata/load_class_data.cpp
+	display/loaddata/load_sprite_data.cpp
+	data/yaml_util.cpp
 
 	data/game_data.cpp
+	data/load_datafilenames.cpp
 
 	display/display_shape.cpp
 	display/display_text.cpp
@@ -137,21 +138,21 @@ set( lanarts_include
 	combat_logic/combat_logic.h
 	combat_logic/movement_logic.h
 
-	data/init/yaml_util.h
+	data/yaml_util.h
 
-	data/armour_data.h
-	data/class_data.h
-	data/effect_data.h
+	stats/armour_data.h
+	stats/class_data.h
+	stats/effect_data.h
 	objects/enemy/enemy_data.h
-	data/item_data.h
+	stats/item_data.h
 	data/lua_game_data.h
 	data/game_data.h
 	data/scriptobject_data.h
-	data/sprite_data.h
-	data/dungeon_data.h
-	data/tile_data.h
-	data/tileset_data.h
-	data/weapon_data.h
+	display/sprite_data.h
+	levelgen/dungeon_data.h
+	display/tile_data.h
+	gamestate/tileset_data.h
+	stats/weapon_data.h
 
 	display/display.h
 	display/GLImage.h

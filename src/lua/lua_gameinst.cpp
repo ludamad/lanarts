@@ -1,8 +1,8 @@
 #include <cstring>
 #include <lua/lunar.h>
 
-#include "../data/effect_data.h"
-#include "../data/item_data.h"
+#include "../stats/effect_data.h"
+#include "../stats/item_data.h"
 #include "../data/lua_game_data.h"
 
 #include "../stats/stats.h"

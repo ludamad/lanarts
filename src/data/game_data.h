@@ -10,26 +10,26 @@
 
 #include "../gamestate/GameSettings.h"
 
-#include "armour_data.h"
-#include "class_data.h"
+#include "../stats/armour_data.h"
+#include "../stats/class_data.h"
 #include "datafiles_data.h"
-#include "dungeon_data.h"
-#include "effect_data.h"
+#include "../levelgen/dungeon_data.h"
+#include "../stats/effect_data.h"
 #include "../objects/enemy/enemy_data.h"
-#include "item_data.h"
-#include "projectile_data.h"
+#include "../stats/item_data.h"
+#include "../stats/projectile_data.h"
 #include "scriptobject_data.h"
-#include "spell_data.h"
-#include "sprite_data.h"
-#include "tile_data.h"
-#include "tileset_data.h"
-#include "weapon_data.h"
+#include "../stats/spell_data.h"
+#include "../display/sprite_data.h"
+#include "../display/tile_data.h"
+#include "../gamestate/tileset_data.h"
+#include "../stats/weapon_data.h"
 
 struct lua_State;
 
 /* Contain information which guides the rest of the data loading */
 GameSettings load_settings_data(const char* filename);
-DataFiles load_datafiles_data(const char* filename);
+DataFiles load_datafilenames(const char* filename);
 
 void init_game_data(lua_State* L);
 void init_lua_data(GameState* gs, lua_State* L);

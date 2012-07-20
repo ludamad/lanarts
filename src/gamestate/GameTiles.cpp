@@ -1,7 +1,7 @@
 #include <cstring>
 #include <SDL_opengl.h>
 
-#include "../data/tile_data.h"
+#include "../display/tile_data.h"
 
 #include "../display/display.h"
 

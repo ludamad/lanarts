@@ -5,8 +5,8 @@
 
 #include "SpellsContent.h"
 
-#include "../../data/spell_data.h"
-#include "../../data/sprite_data.h"
+#include "../../stats/spell_data.h"
+#include "../../display/sprite_data.h"
 
 #include "../../display/display.h"
 

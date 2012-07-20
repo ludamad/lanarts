@@ -8,7 +8,7 @@
 
 const int MAX_TUNNEL_WIDTH = 4;
 
-#include "../data/dungeon_data.h"
+#include "dungeon_data.h"
 
 #include "../util/mtwist.h"
 

@@ -5,8 +5,8 @@
 
 #include <cmath>
 
-#include "../data/armour_data.h"
-#include "../data/weapon_data.h"
+#include "armour_data.h"
+#include "weapon_data.h"
 
 #include "../gamestate/GameState.h"
 

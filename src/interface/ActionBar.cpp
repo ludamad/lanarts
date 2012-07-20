@@ -3,10 +3,10 @@
  *  Handles drawing and state of the action bar.
  */
 
-#include "../data/item_data.h"
-#include "../data/spell_data.h"
-#include "../data/projectile_data.h"
-#include "../data/weapon_data.h"
+#include "../stats/item_data.h"
+#include "../stats/spell_data.h"
+#include "../stats/projectile_data.h"
+#include "../stats/weapon_data.h"
 
 #include "../display/colour_constants.h"
 #include "console_description_draw.h"

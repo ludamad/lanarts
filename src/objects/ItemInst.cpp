@@ -6,8 +6,8 @@
 #include "ItemInst.h"
 #include "../gamestate/GameState.h"
 #include "collision_filters.h"
-#include "../data/item_data.h"
-#include "../data/sprite_data.h"
+#include "../stats/item_data.h"
+#include "../display/sprite_data.h"
 #include <typeinfo>
 
 ItemInst::~ItemInst() {

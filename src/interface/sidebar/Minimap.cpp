@@ -3,7 +3,7 @@
  *  Handles drawing & state of a minimap
  */
 
-#include "../../data/tile_data.h"
+#include "../../display/tile_data.h"
 
 #include "../../util/math_util.h"
 

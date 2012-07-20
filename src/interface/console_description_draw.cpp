@@ -3,12 +3,12 @@
  *  Common routines for content descriptions and drawing
  */
 
-#include "../data/armour_data.h"
-#include "../data/item_data.h"
-#include "../data/projectile_data.h"
-#include "../data/spell_data.h"
-#include "../data/sprite_data.h"
-#include "../data/weapon_data.h"
+#include "../stats/armour_data.h"
+#include "../stats/item_data.h"
+#include "../stats/projectile_data.h"
+#include "../stats/spell_data.h"
+#include "../display/sprite_data.h"
+#include "../stats/weapon_data.h"
 
 #include "../display/display.h"
 

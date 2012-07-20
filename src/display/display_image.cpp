@@ -1,5 +1,5 @@
 /*
- * display.cpp:
+ * display_image.cpp:
  *  Core image drawing and display functions
  */
 
@@ -7,6 +7,8 @@
 #include <cstdio>
 #include <cstring>
 #include <cmath>
+
+#include "sprite_data.h"
 
 #include "display.h"
 #include "GLImage.h"
@@ -217,4 +219,32 @@ void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type) {
 				GL_UNSIGNED_BYTE, NULL);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, type, GL_UNSIGNED_BYTE, data);
 	glDisable(GL_TEXTURE_2D);
+}
+
+void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
+		float dx, float dy, int steps, const Colour& c) {
+	float PI = 3.1415921;
+	SpriteEntry& entry = game_sprite_data.at(sprite);
+	GLimage* img;
+	if (entry.type == SpriteEntry::DIRECTIONAL) {
+		float direction = PI * 2.5 + atan2(dy, dx);
+		int nimgs = entry.images.size();
+		float bucket_size = PI * 2 / nimgs;
+		int bucket = round(direction / bucket_size);
+		bucket = bucket % nimgs;
+		img = &entry.img(bucket);
+	} else { //if (entry.type == SpriteEntry::ANIMATED) {
+		img = &entry.img();
+	}
+	gl_draw_image(view, *img, x, y, c);
+}
+
+void gl_draw_sprite(sprite_id sprite, int x, int y, const Colour& c) {
+	GLimage& img = game_sprite_data.at(sprite).img();
+	gl_draw_image(img, x, y, c);
+}
+
+void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
+		const Colour& c) {
+	gl_draw_sprite(sprite, x - view.x, y - view.y, c);
 }

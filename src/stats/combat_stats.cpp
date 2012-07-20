@@ -4,9 +4,9 @@
  *  TODO: either rename this or 'stats.h' ?
  */
 
-#include "../data/class_data.h"
-#include "../data/projectile_data.h"
-#include "../data/weapon_data.h"
+#include "class_data.h"
+#include "projectile_data.h"
+#include "weapon_data.h"
 
 #include "combat_stats.h"
 #include "items.h"

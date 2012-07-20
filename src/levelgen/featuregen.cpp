@@ -10,8 +10,8 @@
 
 #include "../objects/FeatureInst.h"
 
-#include "../data/tile_data.h"
-#include "../data/tileset_data.h"
+#include "../display/tile_data.h"
+#include "../gamestate/tileset_data.h"
 
 #include "../util/math_util.h"
 

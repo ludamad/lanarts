@@ -1,6 +1,6 @@
 #include <fstream>
-#include "yaml_util.h"
-#include "../game_data.h"
+#include "../../data/yaml_util.h"
+#include "../../data/game_data.h"
 #include "../item_data.h"
 
 using namespace std;

@@ -3,7 +3,7 @@
  *  Item's held by a player/enemy
  */
 
-#include "../data/item_data.h"
+#include "item_data.h"
 
 #include "Inventory.h"
 

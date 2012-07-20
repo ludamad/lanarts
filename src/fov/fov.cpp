@@ -10,7 +10,7 @@
 #include <cstdlib>
 #include "../gamestate/GameState.h"
 #include "../gamestate/GameTiles.h"
-#include "../data/tile_data.h"
+#include "../display/tile_data.h"
 
 
 using namespace std;

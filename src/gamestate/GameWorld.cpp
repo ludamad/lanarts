@@ -6,8 +6,8 @@
 
 #include <typeinfo>
 
-#include "../data/tile_data.h"
-#include "../data/class_data.h"
+#include "../display/tile_data.h"
+#include "../stats/class_data.h"
 
 #include "../levelgen/levelgen.h"
 

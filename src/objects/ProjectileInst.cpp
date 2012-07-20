@@ -12,9 +12,9 @@ extern "C" {
 #include <lua/lualib.h>
 }
 
-#include "../data/sprite_data.h"
-#include "../data/projectile_data.h"
-#include "../data/weapon_data.h"
+#include "../display/sprite_data.h"
+#include "../stats/projectile_data.h"
+#include "../stats/weapon_data.h"
 
 #include "../stats/stat_formulas.h"
 

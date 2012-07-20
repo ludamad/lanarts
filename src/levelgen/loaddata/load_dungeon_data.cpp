@@ -5,9 +5,9 @@
 
 #include <fstream>
 
-#include "../game_data.h"
+#include "../../data/game_data.h"
 #include <yaml-cpp/yaml.h>
-#include "yaml_util.h"
+#include "../../data/yaml_util.h"
 
 using namespace std;
 

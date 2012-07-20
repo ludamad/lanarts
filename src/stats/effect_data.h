@@ -8,7 +8,7 @@
 #include "../lua/LuaValue.h"
 #include "../lanarts_defines.h"
 
-#include "../stats/stats.h"
+#include "stats.h"
 
 struct EffectEntry {
 	std::string name;

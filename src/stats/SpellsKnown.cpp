@@ -5,7 +5,7 @@
 
 #include <algorithm>
 
-#include "../data/spell_data.h"
+#include "spell_data.h"
 
 #include "SpellsKnown.h"
 

@@ -5,9 +5,9 @@
 
 #include "Equipment.h"
 
-#include "../data/item_data.h"
-#include "../data/projectile_data.h"
-#include "../data/weapon_data.h"
+#include "item_data.h"
+#include "projectile_data.h"
+#include "weapon_data.h"
 
 bool Equipment::valid_to_use_projectile(const Projectile& proj) {
 	if (!proj.valid_projectile())

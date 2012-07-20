@@ -7,7 +7,7 @@
 
 #include "yaml_util.h"
 
-#include "../../stats/stat_formulas.h"
+#include "../stats/stat_formulas.h"
 
 std::vector<const YAML::Node*> flatten_seq_mappings(const YAML::Node & n) {
 	std::vector<const YAML::Node*> ret;

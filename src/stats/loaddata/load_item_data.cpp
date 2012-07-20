@@ -8,9 +8,9 @@
 #include <yaml-cpp/yaml.h>
 
 #include "../item_data.h"
-#include "../game_data.h"
+#include "../../data/game_data.h"
 
-#include "yaml_util.h"
+#include "../../data/yaml_util.h"
 
 using namespace std;
 

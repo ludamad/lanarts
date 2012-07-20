@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#include "../stats/stats.h"
+#include "stats.h"
 
 #include "../lanarts_defines.h"
 #include "../lua/LuaValue.h"

@@ -1,6 +1,6 @@
 /*
- * display_util.cpp:
- *  Image drawing and other drawing related utility functions
+ * display_shape.cpp:
+ *  Shape drawing utility functions
  */
 
 #include <cmath>
@@ -9,8 +9,6 @@
 
 #undef GL_GLEXT_VERSION
 #include <SDL_opengl.h>
-
-#include "../data/sprite_data.h"
 
 #include "../gamestate/GameView.h"
 
@@ -74,34 +72,6 @@ void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 		}
 	}
 	glEnd();
-}
-
-void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
-		float dx, float dy, int steps, const Colour& c) {
-	float PI = 3.1415921;
-	SpriteEntry& entry = game_sprite_data.at(sprite);
-	GLimage* img;
-	if (entry.type == SpriteEntry::DIRECTIONAL) {
-		float direction = PI * 2.5 + atan2(dy, dx);
-		int nimgs = entry.images.size();
-		float bucket_size = PI * 2 / nimgs;
-		int bucket = round(direction / bucket_size);
-		bucket = bucket % nimgs;
-		img = &entry.img(bucket);
-	} else { //if (entry.type == SpriteEntry::ANIMATED) {
-		img = &entry.img();
-	}
-	gl_draw_image(view, *img, x, y, c);
-}
-
-void gl_draw_sprite(sprite_id sprite, int x, int y, const Colour& c) {
-	GLimage& img = game_sprite_data.at(sprite).img();
-	gl_draw_image(img, x, y, c);
-}
-
-void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
-		const Colour& c) {
-	gl_draw_sprite(sprite, x - view.x, y - view.y, c);
 }
 
 void gl_draw_circle(const GameView& view, float x, float y, float radius,

@@ -3,7 +3,7 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-#include "../data/effect_data.h"
+#include "effect_data.h"
 #include "../data/lua_game_data.h"
 
 #include "../lua/lua_api.h"

@@ -15,10 +15,10 @@ extern "C" {
 #include <vector>
 
 #include "../data/game_data.h"
-#include "../data/item_data.h"
-#include "../data/tile_data.h"
-#include "../data/dungeon_data.h"
-#include "../data/class_data.h"
+#include "../stats/item_data.h"
+#include "../display/tile_data.h"
+#include "../levelgen/dungeon_data.h"
+#include "../stats/class_data.h"
 
 #include "../display/display.h"
 

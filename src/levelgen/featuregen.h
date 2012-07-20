@@ -7,7 +7,7 @@
 #ifndef FEATUREGEN_H_
 #define FEATUREGEN_H_
 
-#include "../data/dungeon_data.h"
+#include "dungeon_data.h"
 
 #include "../lanarts_defines.h"
 #include "../util/mtwist.h"

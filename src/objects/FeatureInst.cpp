@@ -8,8 +8,8 @@
 #include "collision_filters.h"
 #include "../util/math_util.h"
 
-#include "../data/item_data.h"
-#include "../data/sprite_data.h"
+#include "../stats/item_data.h"
+#include "../display/sprite_data.h"
 
 #include "../gamestate/GameTiles.h"
 #include "../gamestate/GameState.h"

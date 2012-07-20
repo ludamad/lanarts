@@ -6,10 +6,10 @@
 #ifndef TILE_DATA_H_
 #define TILE_DATA_H_
 
-#include "../display/GLImage.h"
+#include "GLImage.h"
 
 #include "../lanarts_defines.h"
-#include "FilenameList.h"
+#include "../data/FilenameList.h"
 
 struct TileEntry {
 	std::string name;

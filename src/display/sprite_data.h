@@ -4,10 +4,10 @@
 #include <vector>
 #include <string>
 
-#include "../display/GLImage.h"
+#include "GLImage.h"
 
 #include "../lanarts_defines.h"
-#include "FilenameList.h"//For FilenameList
+#include "../data/FilenameList.h"//For FilenameList
 
 struct SpriteEntry {
 	enum sprite_type {

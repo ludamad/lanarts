@@ -5,8 +5,8 @@
  *  without attack choice info, and then attack information is used to complete it.
  */
 
-#include "../data/class_data.h"
-#include "../data/weapon_data.h"
+#include "class_data.h"
+#include "weapon_data.h"
 
 #include "../util/mtwist.h"
 

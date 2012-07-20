@@ -182,7 +182,7 @@ tileset_id tileset_from_lua(lua_State* L, int idx) {
 LuaValue lua_sprites, lua_armours, lua_enemies, lua_effects, lua_weapons,
 		lua_projectiles, lua_items, lua_dungeon, lua_classes, lua_spells;
 void init_game_data(lua_State* L) {
-	DataFiles dfiles = load_datafiles_data("res/datafiles.yaml");
+	DataFiles dfiles = load_datafilenames("res/datafiles.yaml");
 
 //NB: Do not re-order the way resources are loaded unless you know what you're doing
 	load_tile_data(dfiles.tile_files);

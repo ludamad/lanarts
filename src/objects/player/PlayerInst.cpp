@@ -8,10 +8,10 @@
 #include "../AnimatedInst.h"
 
 #include "../../gamestate/GameState.h"
-#include "../../data/sprite_data.h"
-#include "../../data/tile_data.h"
-#include "../../data/item_data.h"
-#include "../../data/weapon_data.h"
+#include "../../display/sprite_data.h"
+#include "../../display/tile_data.h"
+#include "../../stats/item_data.h"
+#include "../../stats/weapon_data.h"
 
 #include "../../display/display.h"
 

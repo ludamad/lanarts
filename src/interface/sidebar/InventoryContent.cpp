@@ -3,8 +3,8 @@
  *  Represents an interactive view of the inventory for the side bar
  */
 
-#include "../../data/item_data.h"
-#include "../../data/sprite_data.h"
+#include "../../stats/item_data.h"
+#include "../../display/sprite_data.h"
 
 #include "../../display/display.h"
 

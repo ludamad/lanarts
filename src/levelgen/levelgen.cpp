@@ -5,7 +5,7 @@
 
 #include <cstdio>
 
-#include "../data/dungeon_data.h"
+#include "dungeon_data.h"
 
 #include "../objects/player/PlayerInst.h"
 

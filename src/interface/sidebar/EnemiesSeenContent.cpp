@@ -4,7 +4,7 @@
  */
 #include "EnemiesSeenContent.h"
 
-#include "../../data/sprite_data.h"
+#include "../../display/sprite_data.h"
 
 #include "../../display/colour_constants.h"
 #include "../console_description_draw.h"

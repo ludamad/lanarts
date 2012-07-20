@@ -21,8 +21,8 @@
 #include "../../util/math_util.h"
 #include "../collision_filters.h"
 
-#include "../../data/tile_data.h"
-#include "../../data/weapon_data.h"
+#include "../../display/tile_data.h"
+#include "../../stats/weapon_data.h"
 
 const int HUGE_DISTANCE = 1000000;
 const int OFFSCREEN_CHASE_TIME = 300;

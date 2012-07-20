@@ -3,7 +3,7 @@
  *  Handles navigation of content in the side bar
  */
 
-#include "../../data/sprite_data.h"
+#include "../../display/sprite_data.h"
 
 #include "../../display/display.h"
 

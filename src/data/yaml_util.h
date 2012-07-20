@@ -10,15 +10,15 @@
 #include <cstring>
 #include <yaml-cpp/yaml.h>
 
-#include "../../stats/combat_stats.h"
+#include "../stats/combat_stats.h"
 
-#include "../../lanarts_defines.h"
-#include "../FilenameList.h"
+#include "../lanarts_defines.h"
+#include "FilenameList.h"
 
-#include "../../objects/GameInst.h"
+#include "../objects/GameInst.h"
 
-#include "../game_data.h"
-#include "../weapon_data.h"
+#include "game_data.h"
+#include "../stats/weapon_data.h"
 
 //Allows for sequence merges to be defined using hash merge syntax in yaml, eg - <<: *handle, in a sequence
 std::vector<const YAML::Node*> flatten_seq_mappings(const YAML::Node & n);

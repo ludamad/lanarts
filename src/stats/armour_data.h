@@ -6,7 +6,7 @@
 #ifndef ARMOUR_DATA_H_
 #define ARMOUR_DATA_H_
 
-#include "../stats/stats.h"
+#include "stats.h"
 
 #include "../lanarts_defines.h"
 

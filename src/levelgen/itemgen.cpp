@@ -7,7 +7,7 @@
 #include "../gamestate/GameState.h"
 #include "../gamestate/GameTiles.h"
 #include "../objects/ItemInst.h"
-#include "../data/item_data.h"
+#include "../stats/item_data.h"
 
 void generate_items(const ItemGenSettings& is, MTwist& mt,
 		GeneratedLevel& level, GameState* gs) {

@@ -5,10 +5,10 @@
 
 #include <fstream>
 
-#include "../game_data.h"
+#include "../../data/game_data.h"
 #include <yaml-cpp/yaml.h>
-#include "yaml_util.h"
-#include "../../stats/stats.h"
+#include "../../data/yaml_util.h"
+#include "../stats.h"
 #include "../../objects/enemy/enemy_data.h"
 #include "../class_data.h"
 
