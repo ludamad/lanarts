@@ -14,7 +14,7 @@
 
 #include "../../GameState.h"
 
-#include "../../objects/PlayerInst.h"
+#include "../../../objects/player/PlayerInst.h"
 
 #include "ActionBar.h"
 

@@ -10,8 +10,8 @@
 
 #include "../../gamestats/EnemiesSeen.h"
 
-#include "../objects/GameInst.h"
-#include "../objects/GameInstRef.h"
+#include "../../objects/GameInst.h"
+#include "../../objects/GameInstRef.h"
 
 class PlayerController {
 public:

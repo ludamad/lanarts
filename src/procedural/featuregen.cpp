@@ -8,7 +8,7 @@
 #include "../world/GameTiles.h"
 #include "../world/GameLevelState.h"
 
-#include "../world/objects/FeatureInst.h"
+#include "../objects/FeatureInst.h"
 
 #include "../data/tile_data.h"
 #include "../data/tileset_data.h"

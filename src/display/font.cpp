@@ -10,7 +10,7 @@
 #include <freetype/ftoutln.h>
 #include <freetype/fttrigon.h>
 #include <stdexcept>
-#include "../display/display.h"
+#include "display.h"
 
 char_data::char_data(char ch, FT_Face face) : img(){
 	// Load The Glyph For Our Character.

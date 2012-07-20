@@ -16,8 +16,8 @@ extern "C" {
 
 #include "../world/GameState.h"
 
-#include "../world/objects/GameInst.h"
-#include "../world/objects/ScriptedInst.h"
+#include "../objects/GameInst.h"
+#include "../objects/ScriptedInst.h"
 
 // Creates object, adding to game world, returns said object
 // Take arguments: objtype, x, y; returns obj

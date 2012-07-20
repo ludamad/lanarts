@@ -5,14 +5,14 @@
 
 #include <typeinfo>
 
-#include "../../util/world/collision_util.h"
-#include "../../util/math_util.h"
+#include "../util/world/collision_util.h"
+#include "../util/math_util.h"
 
-#include "../../data/item_data.h"
-#include "../../data/sprite_data.h"
+#include "../data/item_data.h"
+#include "../data/sprite_data.h"
 
-#include "../GameTiles.h"
-#include "../GameState.h"
+#include "../world/GameTiles.h"
+#include "../world/GameState.h"
 
 #include "FeatureInst.h"
 

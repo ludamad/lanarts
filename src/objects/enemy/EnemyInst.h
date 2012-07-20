@@ -6,8 +6,8 @@
 #ifndef ENEMYINST_H_
 #define ENEMYINST_H_
 
-#include "CombatGameInst.h"
-#include "GameInst.h"
+#include "../CombatGameInst.h"
+#include "../GameInst.h"
 #include "EnemyBehaviour.h"
 
 #include "../../gamestats/stats.h"

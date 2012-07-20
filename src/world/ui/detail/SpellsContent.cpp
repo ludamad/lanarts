@@ -17,7 +17,7 @@
 
 #include "../../GameState.h"
 
-#include "../../objects/PlayerInst.h"
+#include "../../../objects/player/PlayerInst.h"
 
 static void draw_spells_known(GameState* gs, const BBox& bbox,
 		SpellsKnown& spells, int ind_low, int ind_high) {

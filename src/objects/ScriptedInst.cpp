@@ -9,10 +9,10 @@
 
 #include <typeinfo>
 
-#include "../../data/scriptobject_data.h"
-#include "../../util/LuaValue.h"
+#include "../data/scriptobject_data.h"
+#include "../util/LuaValue.h"
 
-#include "../GameState.h"
+#include "../world/GameState.h"
 
 #include "ScriptedInst.h"
 

@@ -3,7 +3,7 @@
 
 #include <GL/glu.h>
 #undef GL_GLEXT_VERSION
-#include "../display/GLImage.h"
+#include "GLImage.h"
 
 #include <ft2build.h>
 #include <freetype/freetype.h>

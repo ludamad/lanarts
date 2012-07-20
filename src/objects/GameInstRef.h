@@ -9,7 +9,7 @@
 #ifndef GAMEINSTREF_H_
 #define GAMEINSTREF_H_
 
-#include "../../util/game_basic_structs.h"
+#include "../util/game_basic_structs.h"
 
 class GameState;
 class GameInst;

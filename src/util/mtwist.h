@@ -44,7 +44,7 @@
 #ifndef MTWIST_H_
 #define MTWIST_H_
 
-#include "../util/game_basic_structs.h"
+#include "game_basic_structs.h"
 
 class MTwist {
 	enum {

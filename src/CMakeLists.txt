@@ -116,17 +116,17 @@ set( lanarts_src
 	world/utility_objects/ButtonInst.cpp
 	world/utility_objects/TestInst.cpp
 
-	world/objects/player_impl/PlayerInst.cpp
-	world/objects/player_impl/PlayerInstActions.cpp
-	world/objects/player_impl/PlayerInstAttackActions.cpp
-	world/objects/CombatGameInst.cpp
-	world/objects/ScriptedInst.cpp
-	world/objects/EnemyInst.cpp
-	world/objects/FeatureInst.cpp
-	world/objects/GameInst.cpp
-	world/objects/GameInstRef.cpp
-	world/objects/ItemInst.cpp
-	world/objects/ProjectileInst.cpp
+	objects/player/PlayerInst.cpp
+	objects/player/PlayerInstActions.cpp
+	objects/player/PlayerInstAttackActions.cpp
+	objects/CombatGameInst.cpp
+	objects/ScriptedInst.cpp
+	objects/enemy/EnemyInst.cpp
+	objects/FeatureInst.cpp
+	objects/GameInst.cpp
+	objects/GameInstRef.cpp
+	objects/ItemInst.cpp
+	objects/ProjectileInst.cpp
 	)
 
 set( lanarts_include
@@ -230,15 +230,15 @@ set( lanarts_include
 	world/utility_objects/ButtonInst.h
 	world/utility_objects/TestInst.h
 
-	world/objects/CombatGameInst.h
-	world/objects/GameInst.h
-	world/objects/GameInstRef.h
-	world/objects/PlayerInst.h
-	world/objects/EnemyBehaviour.h
-	world/objects/EnemyInst.h
-	world/objects/FeatureInst.h
-	world/objects/ScriptedInst.h
-	world/objects/ProjectileInst.h
+	objects/CombatGameInst.h
+	objects/GameInst.h
+	objects/GameInstRef.h
+	objects/player/PlayerInst.h
+	objects/enemy/EnemyBehaviour.h
+	objects/enemy/EnemyInst.h
+	objects/FeatureInst.h
+	objects/ScriptedInst.h
+	objects/ProjectileInst.h
 )
 
 add_executable( lanarts

@@ -5,7 +5,7 @@
 
 #include "../../util/game_basic_structs.h"
 
-#include "GameInst.h"
+#include "../GameInst.h"
 
 struct EnemyRandomization {
 	enum {

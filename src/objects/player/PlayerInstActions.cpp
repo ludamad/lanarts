@@ -8,28 +8,28 @@ extern "C" {
 #include <lua/lua.h>
 }
 
-#include "../../../data/item_data.h"
-#include "../../../data/sprite_data.h"
-#include "../../../data/tile_data.h"
-#include "../../../data/projectile_data.h"
-#include "../../../data/weapon_data.h"
+#include "../../data/item_data.h"
+#include "../../data/sprite_data.h"
+#include "../../data/tile_data.h"
+#include "../../data/projectile_data.h"
+#include "../../data/weapon_data.h"
 
-#include "../../../display/display.h"
+#include "../../display/display.h"
 
-#include "../../../lua/lua_api.h"
+#include "../../lua/lua_api.h"
 
-#include "../../../util/game_basic_structs.h"
-#include "../../../util/game_replays.h"
-#include "../../../util/math_util.h"
+#include "../../util/game_basic_structs.h"
+#include "../../util/game_replays.h"
+#include "../../util/math_util.h"
 
-#include "../../../util/world/collision_util.h"
+#include "../../util/world/collision_util.h"
 
-#include "../../GameState.h"
+#include "../../world/GameState.h"
 
-#include "../../utility_objects/AnimatedInst.h"
+#include "../../world/utility_objects/AnimatedInst.h"
 
-#include "../PlayerInst.h"
-#include "../EnemyInst.h"
+#include "PlayerInst.h"
+#include "../enemy/EnemyInst.h"
 #include "../ItemInst.h"
 
 #include "../ProjectileInst.h"

@@ -7,7 +7,7 @@
 #ifndef ITEM_DATA_H_
 #define ITEM_DATA_H_
 #include <cstdlib>
-#include "../world/objects/GameInst.h"
+#include "../objects/GameInst.h"
 #include <vector>
 #include <string>
 

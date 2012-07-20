@@ -12,7 +12,7 @@
 #include "../util/game_basic_structs.h"
 #include "../util/LuaValue.h"
 
-#include "../world/objects/GameInst.h"
+#include "../objects/GameInst.h"
 
 struct ScriptObjectEntry {
 	enum equip_type {

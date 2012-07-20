@@ -10,7 +10,7 @@
 #include "GameTiles.h"
 #include "GameState.h"
 
-#include "objects/PlayerInst.h"
+#include "../objects/player/PlayerInst.h"
 
 GameTiles::GameTiles(int width, int height) :
 		width(width), height(height), solid_tiles(width * height, true) {

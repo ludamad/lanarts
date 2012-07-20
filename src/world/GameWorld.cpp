@@ -11,9 +11,9 @@
 
 #include "../procedural/levelgen.h"
 
-#include "objects/GameInstRef.h"
-#include "objects/PlayerInst.h"
-#include "objects/EnemyInst.h"
+#include "../objects/GameInstRef.h"
+#include "../objects/player/PlayerInst.h"
+#include "../objects/enemy/EnemyInst.h"
 #include "utility_objects/AnimatedInst.h"
 
 #include "GameState.h"

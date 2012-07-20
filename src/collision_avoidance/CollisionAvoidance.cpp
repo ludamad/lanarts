@@ -5,7 +5,7 @@
 
 #include <rvo2/RVO.h>
 
-#include "../world/objects/CombatGameInst.h"
+#include "../objects/CombatGameInst.h"
 
 #include "CollisionAvoidance.h"
 

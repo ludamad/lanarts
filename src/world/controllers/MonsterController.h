@@ -13,8 +13,8 @@
 #include "../../pathfind/pathfind.h"
 #include "../../pathfind/astar_pathfind.h"
 
-#include "../objects/GameInst.h"
-#include "../objects/EnemyInst.h"
+#include "../../objects/GameInst.h"
+#include "../../objects/enemy/EnemyInst.h"
 
 
 struct EnemyOfInterest {

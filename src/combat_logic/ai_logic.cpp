@@ -5,7 +5,7 @@
 
 #include "../gamestats/combat_stats.h"
 
-#include "../world/objects/CombatGameInst.h"
+#include "../objects/CombatGameInst.h"
 
 #include "ai_logic.h"
 

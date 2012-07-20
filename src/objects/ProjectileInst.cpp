@@ -12,27 +12,27 @@ extern "C" {
 #include <lua/lualib.h>
 }
 
-#include "../../data/sprite_data.h"
-#include "../../data/projectile_data.h"
-#include "../../data/weapon_data.h"
+#include "../data/sprite_data.h"
+#include "../data/projectile_data.h"
+#include "../data/weapon_data.h"
 
-#include "../../gamestats/stat_formulas.h"
+#include "../gamestats/stat_formulas.h"
 
-#include "../../util/math_util.h"
-#include "../../util/colour_constants.h"
+#include "../util/math_util.h"
+#include "../util/colour_constants.h"
 
-#include "../../util/world/collision_util.h"
+#include "../util/world/collision_util.h"
 
-#include "../../lua/lua_api.h"
+#include "../lua/lua_api.h"
 
-#include "../utility_objects/AnimatedInst.h"
+#include "../world/utility_objects/AnimatedInst.h"
 
-#include "../GameState.h"
+#include "../world/GameState.h"
 
-#include "EnemyInst.h"
+#include "enemy/EnemyInst.h"
 #include "ItemInst.h"
 #include "ProjectileInst.h"
-#include "PlayerInst.h"
+#include "player/PlayerInst.h"
 
 ProjectileInst::~ProjectileInst() {
 }

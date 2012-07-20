@@ -9,7 +9,7 @@
 
 #include "../../display/display.h"
 
-#include "../objects/GameInst.h"
+#include "../../objects/GameInst.h"
 
 const int DONT_DRAW_SPRITE = -1;
 

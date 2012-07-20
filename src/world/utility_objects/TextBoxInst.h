@@ -10,7 +10,7 @@
 
 #include "../../util/callback_util.h"
 
-#include "../objects/GameInst.h"
+#include "../../objects/GameInst.h"
 
 class TextBoxInst: public GameInst {
 public:

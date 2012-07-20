@@ -5,7 +5,7 @@
 
 #include "../util/math_util.h"
 
-#include "../world/objects/EnemyInst.h"
+#include "../objects/enemy/EnemyInst.h"
 
 #include "../world/GameState.h"
 #include "../world/GameTiles.h"

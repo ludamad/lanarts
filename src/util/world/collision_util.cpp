@@ -4,10 +4,10 @@
  */
 
 #include "collision_util.h"
-#include "../../world/objects/ItemInst.h"
-#include "../../world/objects/EnemyInst.h"
-#include "../../world/objects/GameInst.h"
-#include "../../world/objects/PlayerInst.h"
+#include "../../objects/ItemInst.h"
+#include "../../objects/enemy/EnemyInst.h"
+#include "../../objects/GameInst.h"
+#include "../../objects/player/PlayerInst.h"
 
 bool item_colfilter(GameInst* self, GameInst* other) {
 	return dynamic_cast<ItemInst*>(other) != NULL;

@@ -5,21 +5,21 @@
 
 #include <typeinfo>
 
-#include "../../utility_objects/AnimatedInst.h"
+#include "../../world/utility_objects/AnimatedInst.h"
 
-#include "../../GameState.h"
-#include "../../../data/sprite_data.h"
-#include "../../../data/tile_data.h"
-#include "../../../data/item_data.h"
-#include "../../../data/weapon_data.h"
+#include "../../world/GameState.h"
+#include "../../data/sprite_data.h"
+#include "../../data/tile_data.h"
+#include "../../data/item_data.h"
+#include "../../data/weapon_data.h"
 
-#include "../../../display/display.h"
+#include "../../display/display.h"
 
-#include "../../../util/math_util.h"
+#include "../../util/math_util.h"
 
-#include "../EnemyInst.h"
+#include "../enemy/EnemyInst.h"
 #include "../ItemInst.h"
-#include "../PlayerInst.h"
+#include "PlayerInst.h"
 #include "../ProjectileInst.h"
 
 PlayerInst::~PlayerInst() {

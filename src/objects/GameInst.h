@@ -13,8 +13,8 @@
 #define GAMEINST_H_
 
 #include <cassert>
-#include "../../util/game_basic_structs.h"
-#include "../../util/LuaValue.h"
+#include "../util/game_basic_structs.h"
+#include "../util/LuaValue.h"
 
 struct lua_State;
 class GameState;

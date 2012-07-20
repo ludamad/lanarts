@@ -17,11 +17,11 @@
 
 #include "../../util/ActionQueue.h"
 
-#include "../GameAction.h"
-#include "../GameLevelState.h"
+#include "../../world/GameAction.h"
+#include "../../world/GameLevelState.h"
 
-#include "CombatGameInst.h"
-#include "GameInst.h"
+#include "../CombatGameInst.h"
+#include "../GameInst.h"
 
 const int REST_COOLDOWN = 200;
 

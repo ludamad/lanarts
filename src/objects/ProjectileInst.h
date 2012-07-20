@@ -7,11 +7,11 @@
 
 #include <cstdlib>
 
-#include "../../gamestats/items.h"
-#include "../../gamestats/stats.h"
+#include "../gamestats/items.h"
+#include "../gamestats/stats.h"
 
-#include "../../util/callback_util.h"
-#include "../../util/game_basic_structs.h"
+#include "../util/callback_util.h"
+#include "../util/game_basic_structs.h"
 
 #include "GameInst.h"
 

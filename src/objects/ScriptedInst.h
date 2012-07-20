@@ -10,7 +10,7 @@
 #ifndef SCRIPTEDINST_H_
 #define SCRIPTEDINST_H_
 
-#include "../../util/game_basic_structs.h"
+#include "../util/game_basic_structs.h"
 
 #include "GameInst.h"
 

@@ -15,8 +15,8 @@
 #include "../world/GameState.h"
 #include "../world/GameLevelState.h"
 
-#include "../world/objects/EnemyInst.h"
-#include "../world/objects/PlayerInst.h"
+#include "../objects/enemy/EnemyInst.h"
+#include "../objects/player/PlayerInst.h"
 
 class EffectiveStatsLuaBinding {
 public:

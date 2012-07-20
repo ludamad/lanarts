@@ -3,22 +3,22 @@
  *  Represents an instance that is affected by combat, ie enemies and players
  */
 
-#include "../../data/sprite_data.h"
-#include "../../data/effect_data.h"
-#include "../../data/projectile_data.h"
-#include "../../data/weapon_data.h"
+#include "../data/sprite_data.h"
+#include "../data/effect_data.h"
+#include "../data/projectile_data.h"
+#include "../data/weapon_data.h"
 
-#include "../../gamestats/stat_formulas.h"
+#include "../gamestats/stat_formulas.h"
 
-#include "../../util/math_util.h"
+#include "../util/math_util.h"
 
-#include "../GameState.h"
+#include "../world/GameState.h"
 
-#include "../utility_objects/AnimatedInst.h"
+#include "../world/utility_objects/AnimatedInst.h"
 
 #include "CombatGameInst.h"
 #include "ProjectileInst.h"
-#include "PlayerInst.h"
+#include "player/PlayerInst.h"
 
 const int HURT_COOLDOWN = 30;
 bool CombatGameInst::damage(GameState* gs, int dmg) {

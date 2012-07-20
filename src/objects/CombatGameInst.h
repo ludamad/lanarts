@@ -6,10 +6,10 @@
 #ifndef COMBATGAMEINST_H_
 #define COMBATGAMEINST_H_
 
-#include "../../gamestats/combat_stats.h"
-#include "../../gamestats/stats.h"
+#include "../gamestats/combat_stats.h"
+#include "../gamestats/stats.h"
 
-#include "../../pathfind/pathfind.h"
+#include "../pathfind/pathfind.h"
 
 #include "GameInst.h"
 

@@ -8,9 +8,9 @@
 #include "../gamestats/stats.h"
 
 #include "../world/GameState.h"
-#include "../world/objects/EnemyInst.h"
-#include "../world/objects/GameInst.h"
-#include "../world/objects/PlayerInst.h"
+#include "../objects/enemy/EnemyInst.h"
+#include "../objects/GameInst.h"
+#include "../objects/player/PlayerInst.h"
 
 #include "lua_api.h"
 

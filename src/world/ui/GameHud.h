@@ -15,7 +15,7 @@
 #include "../../util/game_basic_structs.h"
 #include "../../util/ActionQueue.h"
 
-#include "../objects/GameInst.h"
+#include "../../objects/GameInst.h"
 
 #include "../GameAction.h"
 

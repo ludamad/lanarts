@@ -7,9 +7,9 @@
 #include "../world/GameState.h"
 #include "../world/GameLevelState.h"
 
-#include "../world/objects/EnemyInst.h"
-#include "../world/objects/PlayerInst.h"
-#include "../world/objects/ProjectileInst.h"
+#include "../objects/enemy/EnemyInst.h"
+#include "../objects/player/PlayerInst.h"
+#include "../objects/ProjectileInst.h"
 
 class GameStateLuaBinding {
 public:

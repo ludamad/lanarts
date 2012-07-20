@@ -6,7 +6,7 @@
 #include "itemgen.h"
 #include "../world/GameState.h"
 #include "../world/GameTiles.h"
-#include "../world/objects/ItemInst.h"
+#include "../objects/ItemInst.h"
 #include "../data/item_data.h"
 
 void generate_items(const ItemGenSettings& is, MTwist& mt,

@@ -13,7 +13,7 @@
 #include "../util/math_util.h"
 
 #include "../world/GameState.h"
-#include "../world/objects/CombatGameInst.h"
+#include "../objects/CombatGameInst.h"
 
 #include "attack_logic.h"
 

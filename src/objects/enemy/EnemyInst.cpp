@@ -20,14 +20,14 @@
 #include "../../util/LuaValue.h"
 #include "../../util/world/collision_util.h"
 
-#include "../utility_objects/AnimatedInst.h"
+#include "../../world/utility_objects/AnimatedInst.h"
 
-#include "../GameState.h"
+#include "../../world/GameState.h"
 
 #include "EnemyInst.h"
-#include "ItemInst.h"
-#include "ProjectileInst.h"
-#include "PlayerInst.h"
+#include "../ItemInst.h"
+#include "../ProjectileInst.h"
+#include "../player/PlayerInst.h"
 
 //draw depth, also determines what order objects evaluate in
 static const int DEPTH = 50;

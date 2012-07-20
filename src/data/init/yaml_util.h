@@ -15,7 +15,7 @@
 #include "../../util/game_basic_structs.h"
 #include "../../util/types_util.h"
 
-#include "../../world/objects/GameInst.h"
+#include "../../objects/GameInst.h"
 
 #include "../game_data.h"
 #include "../weapon_data.h"

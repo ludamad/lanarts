@@ -12,8 +12,8 @@
 #include "MonsterController.h"
 #include "PlayerController.h"
 
-#include "../objects/EnemyInst.h"
-#include "../objects/PlayerInst.h"
+#include "../../objects/enemy/EnemyInst.h"
+#include "../../objects/player/PlayerInst.h"
 
 #include "../../combat_logic/attack_logic.h"
 

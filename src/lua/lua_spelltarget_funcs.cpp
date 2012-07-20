@@ -17,8 +17,8 @@ extern "C" {
 
 #include "../world/GameState.h"
 
-#include "../world/objects/GameInst.h"
-#include "../world/objects/PlayerInst.h"
+#include "../objects/GameInst.h"
+#include "../objects/player/PlayerInst.h"
 
 // Take arguments: caster, target; returns x, y
 static int spell_choose_safest_square(lua_State* L) {

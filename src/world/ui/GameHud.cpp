@@ -19,8 +19,8 @@
 #include "../GameState.h"
 #include "../GameInstSet.h"
 
-#include "../objects/GameInst.h"
-#include "../objects/PlayerInst.h"
+#include "../../objects/GameInst.h"
+#include "../../objects/player/PlayerInst.h"
 
 #include "GameHud.h"
 

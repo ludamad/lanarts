@@ -32,9 +32,9 @@ extern "C" {
 #include "GameState.h"
 #include "GameLevelState.h"
 
-#include "objects/EnemyInst.h"
-#include "objects/GameInst.h"
-#include "objects/PlayerInst.h"
+#include "../objects/enemy/EnemyInst.h"
+#include "../objects/GameInst.h"
+#include "../objects/player/PlayerInst.h"
 
 GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 		int viewh, int hudw) :

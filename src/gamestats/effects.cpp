@@ -10,7 +10,7 @@ extern "C" {
 
 #include "../world/GameState.h"
 
-#include "../world/objects/CombatGameInst.h"
+#include "../objects/CombatGameInst.h"
 
 #include "effects.h"
 

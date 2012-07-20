@@ -20,8 +20,8 @@ extern "C" {
 
 #include "world/GameState.h"
 
-#include "world/objects/PlayerInst.h"
-#include "world/objects/EnemyInst.h"
+#include "objects/player/PlayerInst.h"
+#include "objects/enemy/EnemyInst.h"
 
 #include "world/utility_objects/AnimatedInst.h"
 #include "world/utility_objects/ButtonInst.h"

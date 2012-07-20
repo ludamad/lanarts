@@ -14,10 +14,10 @@
 
 #include "../gamestats/items.h"
 
-#include "../util/colour_constants.h"
+#include "colour_constants.h"
 
 #include "../world/GameState.h"
-#include "../world/objects/PlayerInst.h"
+#include "../objects/player/PlayerInst.h"
 
 #include "content_draw_util.h"
 

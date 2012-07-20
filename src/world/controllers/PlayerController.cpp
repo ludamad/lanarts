@@ -6,7 +6,7 @@
 #include "../../util/math_util.h"
 #include "../../fov/fov.h"
 
-#include "../objects/PlayerInst.h"
+#include "../../objects/player/PlayerInst.h"
 
 #include "../GameTiles.h"
 #include "../GameState.h"

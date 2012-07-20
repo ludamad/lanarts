@@ -13,7 +13,7 @@
 #include <cstdlib>
 #include <vector>
 #include "../util/game_basic_structs.h"
-#include "objects/GameInst.h"
+#include "../objects/GameInst.h"
 #include <map>
 
 class GameState;

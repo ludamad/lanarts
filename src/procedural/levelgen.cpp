@@ -7,7 +7,7 @@
 
 #include "../data/dungeon_data.h"
 
-#include "../world/objects/PlayerInst.h"
+#include "../objects/player/PlayerInst.h"
 
 #include "../world/GameState.h"
 

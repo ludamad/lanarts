@@ -5,7 +5,7 @@
 
 #ifndef ASTAR_PATHFIND_H_
 #define ASTAR_PATHFIND_H_
-#include "../world/objects/GameInst.h"
+#include "../objects/GameInst.h"
 #include "../procedural/GeneratedLevel.h"
 #include <vector>
 
