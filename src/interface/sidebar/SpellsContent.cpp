@@ -12,8 +12,8 @@
 
 #include "../../stats/SpellsKnown.h"
 
-#include "../../util/colour_constants.h"
-#include "../../util/content_draw_util.h"
+#include "../../display/colour_constants.h"
+#include "../console_description_draw.h"
 
 #include "../../gamestate/GameState.h"
 

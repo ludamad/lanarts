@@ -11,7 +11,7 @@
 #include <vector>
 #include <string>
 
-#include "../util/LuaValue.h"
+#include "../lua/LuaValue.h"
 
 struct ItemEntry {
 	enum equip_type {

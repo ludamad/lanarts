@@ -17,7 +17,7 @@
 
 #include "../../combat_logic/attack_logic.h"
 
-#include "../../util/colour_constants.h"
+#include "../../display/colour_constants.h"
 #include "../../util/math_util.h"
 #include "../../util/world/collision_util.h"
 

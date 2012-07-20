@@ -10,7 +10,7 @@ extern "C" {
 #include <cstring>
 #include <cstdlib>
 
-#include "../lua/lua_api.h"
+#include "lua_api.h"
 
 //YAML related helper functions
 

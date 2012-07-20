@@ -14,10 +14,10 @@
 
 #include "../../stats/stat_formulas.h"
 
-#include "../../util/colour_constants.h"
-#include "../../util/content_draw_util.h"
+#include "../../display/colour_constants.h"
+#include "../../interface/console_description_draw.h"
 #include "../../util/math_util.h"
-#include "../../util/LuaValue.h"
+#include "../../lua/LuaValue.h"
 #include "../../util/world/collision_util.h"
 
 #include "../AnimatedInst.h"

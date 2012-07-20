@@ -2,7 +2,7 @@
 #define EFFECTS_H
 
 #include "../lanarts_defines.h"
-#include "../util/LuaValue.h"
+#include "../lua/LuaValue.h"
 
 const int EFFECTS_MAX = 40;
 

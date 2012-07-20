@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../util/LuaValue.h"
+#include "../lua/LuaValue.h"
 #include "../lanarts_defines.h"
 
 #include "../stats/stats.h"

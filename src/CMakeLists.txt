@@ -78,11 +78,11 @@ set( lanarts_src
 	levelgen/levelgen.cpp
 	levelgen/tunnelgen.cpp
 
-	util/content_draw_util.cpp
+	interface/console_description_draw.cpp
 	util/math_util.cpp
 	util/game_replays.cpp
 	util/mtwist.cpp
-	util/LuaValue.cpp
+	lua/LuaValue.cpp
 	util/world/collision_util.cpp
 
 	gamestate/GameAction.cpp
@@ -186,7 +186,7 @@ set( lanarts_include
 	levelgen/tunnelgen.h
 
 	util/callback_util.h
-	util/content_draw_util.h
+	interface/console_description_draw.h
 	lanarts_defines.h
 	util/game_replays.h
 	util/gheap.h

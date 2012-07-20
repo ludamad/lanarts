@@ -18,7 +18,7 @@ extern "C" {
 
 #include "../../lua/lua_api.h"
 
-#include "../../util/colour_constants.h"
+#include "../../display/colour_constants.h"
 #include "../../util/math_util.h"
 #include "../../lanarts_defines.h"
 #include "../../util/world/collision_util.h"

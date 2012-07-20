@@ -11,7 +11,7 @@
 #include <cstdio>
 
 #include "../../lanarts_defines.h"
-#include "../../util/LuaValue.h"
+#include "../../lua/LuaValue.h"
 
 #include "../../stats/combat_stats.h"
 

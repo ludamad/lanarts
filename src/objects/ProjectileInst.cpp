@@ -19,7 +19,7 @@ extern "C" {
 #include "../stats/stat_formulas.h"
 
 #include "../util/math_util.h"
-#include "../util/colour_constants.h"
+#include "../display/colour_constants.h"
 
 #include "../util/world/collision_util.h"
 

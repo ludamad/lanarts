@@ -6,7 +6,7 @@
 #ifndef GAME_DATA_H_
 #define GAME_DATA_H_
 
-#include "../util/LuaValue.h"
+#include "../lua/LuaValue.h"
 
 #include "../gamestate/GameSettings.h"
 

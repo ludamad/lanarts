@@ -8,8 +8,8 @@
 #include "../../data/projectile_data.h"
 #include "../../data/weapon_data.h"
 
-#include "../../util/colour_constants.h"
-#include "../../util/content_draw_util.h"
+#include "../../display/colour_constants.h"
+#include "../console_description_draw.h"
 #include "../../lanarts_defines.h"
 
 #include "../../gamestate/GameState.h"

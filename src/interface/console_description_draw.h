@@ -1,10 +1,10 @@
 /*
- * content_draw_util.h:
+ * console_description_draw.h:
  *  Common routines for content descriptions and drawing
  */
 
-#ifndef CONTENT_DRAW_UTIL_H_
-#define CONTENT_DRAW_UTIL_H_
+#ifndef CONSOLE_DESCRIPTION_DRAW_H_
+#define CONSOLE_DESCRIPTION_DRAW_H_
 
 #include "../lanarts_defines.h"
 

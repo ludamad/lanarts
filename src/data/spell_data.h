@@ -12,7 +12,7 @@
 #include "../stats/items.h"
 
 #include "../lanarts_defines.h"
-#include "../util/LuaValue.h"
+#include "../lua/LuaValue.h"
 
 struct SpellEntry {
 	std::string name, description;

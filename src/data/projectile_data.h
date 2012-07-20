@@ -12,7 +12,7 @@
 #include "../stats/stats.h"
 
 #include "../lanarts_defines.h"
-#include "../util/LuaValue.h"
+#include "../lua/LuaValue.h"
 
 struct ProjectileEntry {
 	std::string name, description;

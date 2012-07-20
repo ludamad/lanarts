@@ -17,7 +17,7 @@ extern "C" {
 
 #include "../display/display.h"
 
-#include "../util/colour_constants.h"
+#include "../display/colour_constants.h"
 #include "../util/math_util.h"
 
 #include "../levelgen/enemygen.h"

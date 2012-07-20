@@ -5,7 +5,7 @@
 
 #include <deque>
 
-#include "colour_constants.h"
+#include "../display/colour_constants.h"
 
 #include "../gamestate/GameAction.h"
 #include "../gamestate/GameState.h"

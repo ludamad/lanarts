@@ -14,12 +14,12 @@
 
 #include "../stats/items.h"
 
-#include "colour_constants.h"
+#include "../display/colour_constants.h"
 
 #include "../gamestate/GameState.h"
 #include "../objects/player/PlayerInst.h"
 
-#include "content_draw_util.h"
+#include "console_description_draw.h"
 
 const char* projectile_speed_description(int speed) {
 	if (speed < 1.5) {
