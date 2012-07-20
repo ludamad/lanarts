@@ -9,7 +9,7 @@
 #include <vector>
 #include <SDL/SDL.h>
 
-#include "../../lanarts_defines.h"
+#include "../lanarts_defines.h"
 
 // Multiple keys can refer to same action, in which case multiple
 // GameEventTrigger instances can exist

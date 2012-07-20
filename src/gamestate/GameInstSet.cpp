@@ -12,7 +12,7 @@
 #include <typeinfo>
 
 #include "GameInstSet.h"
-#include "../util/hashset_util.h"
+#include "hashset_util.h"
 #include "../util/math_util.h"
 
 #include "../objects/AnimatedInst.h"

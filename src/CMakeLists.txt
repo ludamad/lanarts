@@ -38,9 +38,9 @@ set( lanarts_src
 
 	data/game_data.cpp
 
-	display/display_util.cpp
+	display/display_shape.cpp
 	display/display_text.cpp
-	display/display.cpp
+	display/display_image.cpp
 	display/font.cpp
 	display/GLImage.cpp
 
@@ -83,7 +83,7 @@ set( lanarts_src
 	util/game_replays.cpp
 	util/mtwist.cpp
 	lua/LuaValue.cpp
-	util/world/collision_util.cpp
+	objects/collision_filters.cpp
 
 	gamestate/GameAction.cpp
 	gamestate/GameInstSet.cpp
@@ -97,7 +97,7 @@ set( lanarts_src
 	interface/GameTextConsole.cpp
 	interface/GameDialogs.cpp
 	interface/GameHud.cpp
-	interface/sidebar/ActionBar.cpp
+	interface/ActionBar.cpp
 	interface/sidebar/Sidebar.cpp
 	interface/sidebar/SidebarNavigator.cpp
 	interface/sidebar/SpellsContent.cpp
@@ -106,8 +106,8 @@ set( lanarts_src
 	interface/sidebar/InventoryContent.cpp
 	interface/sidebar/Minimap.cpp
 
-	gamestate/controllers/CombatInstController.cpp
-	gamestate/controllers/IOController.cpp
+	objects/CombatInstController.cpp
+	gamestate/IOController.cpp
 	objects/enemy/MonsterController.cpp
 	objects/enemy/MonsterControllerActions.cpp
 	objects/player/PlayerController.cpp
@@ -189,11 +189,11 @@ set( lanarts_include
 	interface/console_description_draw.h
 	lanarts_defines.h
 	util/game_replays.h
-	util/gheap.h
-	util/hashset_util.h
+	pathfind/gheap.h
+	gamestate/hashset_util.h
 	util/math_util.h
 	util/mtwist.h
-	util/world/collision_util.h
+	objects/collision_filters.h
 
 	net/GameNetConnection.h
 
@@ -206,16 +206,16 @@ set( lanarts_include
 	gamestate/GameView.h
 	gamestate/GameWorld.h
 
-	gamestate/controllers/IOController.h
+	gamestate/IOController.h
 	objects/enemy/MonsterController.h
 	objects/player/PlayerController.h
-	gamestate/controllers/CombatInstController.h
+	objects/CombatInstController.h
 
 	interface/GameChat.h
 	interface/GameDialogs.h
 	interface/GameHud.h
 	interface/GameTextConsole.h
-	interface/sidebar/ActionBar.h
+	interface/ActionBar.h
 	interface/sidebar/EnemiesSeenContent.h
 	interface/sidebar/EquipmentContent.h
 	interface/sidebar/InventoryContent.h

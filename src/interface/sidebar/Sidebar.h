@@ -6,7 +6,7 @@
 #ifndef SIDEBAR_H_
 #define SIDEBAR_H_
 
-#include "../../util/ActionQueue.h"
+#include "../../gamestate/ActionQueue.h"
 #include "../../lanarts_defines.h"
 
 #include "../../gamestate/GameAction.h"

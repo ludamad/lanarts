@@ -8,7 +8,7 @@
 
 #include <vector>
 
-#include "../../lanarts_defines.h"
+#include "../lanarts_defines.h"
 
 class CombatGameInst;
 class GameState;

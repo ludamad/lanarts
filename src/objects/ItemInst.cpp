@@ -5,7 +5,7 @@
 
 #include "ItemInst.h"
 #include "../gamestate/GameState.h"
-#include "../util/world/collision_util.h"
+#include "collision_filters.h"
 #include "../data/item_data.h"
 #include "../data/sprite_data.h"
 #include <typeinfo>

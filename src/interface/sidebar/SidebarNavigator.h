@@ -8,7 +8,7 @@
 
 #include <vector>
 
-#include "../../util/ActionQueue.h"
+#include "../../gamestate/ActionQueue.h"
 
 #include "../../gamestate/GameAction.h"
 

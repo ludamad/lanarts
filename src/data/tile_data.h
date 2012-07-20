@@ -9,7 +9,7 @@
 #include "../display/GLImage.h"
 
 #include "../lanarts_defines.h"
-#include "../util/types_util.h"
+#include "FilenameList.h"
 
 struct TileEntry {
 	std::string name;

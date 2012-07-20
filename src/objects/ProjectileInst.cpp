@@ -21,7 +21,7 @@ extern "C" {
 #include "../util/math_util.h"
 #include "../display/colour_constants.h"
 
-#include "../util/world/collision_util.h"
+#include "collision_filters.h"
 
 #include "../lua/lua_api.h"
 

@@ -19,7 +19,7 @@
 
 #include "../../display/colour_constants.h"
 #include "../../util/math_util.h"
-#include "../../util/world/collision_util.h"
+#include "../collision_filters.h"
 
 #include "../../data/tile_data.h"
 #include "../../data/weapon_data.h"

@@ -1,7 +1,7 @@
 #ifndef DATAFILES_DATA_H_
 #define DATAFILES_DATA_H_
 
-#include "../util/types_util.h"//For FilenameList
+#include "FilenameList.h"//For FilenameList
 /*Specifies locations of various data files*/
 struct DataFiles {
 	FilenameList class_files, effect_files, enemy_files, item_files,

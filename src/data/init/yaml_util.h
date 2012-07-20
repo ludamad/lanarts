@@ -13,7 +13,7 @@
 #include "../../stats/combat_stats.h"
 
 #include "../../lanarts_defines.h"
-#include "../../util/types_util.h"
+#include "../FilenameList.h"
 
 #include "../../objects/GameInst.h"
 

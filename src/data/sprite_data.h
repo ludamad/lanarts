@@ -7,7 +7,7 @@
 #include "../display/GLImage.h"
 
 #include "../lanarts_defines.h"
-#include "../util/types_util.h"//For FilenameList
+#include "FilenameList.h"//For FilenameList
 
 struct SpriteEntry {
 	enum sprite_type {

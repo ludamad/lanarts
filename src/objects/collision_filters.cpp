@@ -1,13 +1,13 @@
 /*
- * collision_util.cpp:
+ * collision_filters.cpp:
  *  Defines functions that are often used in conjunction with collision detection
  */
 
-#include "collision_util.h"
-#include "../../objects/ItemInst.h"
-#include "../../objects/enemy/EnemyInst.h"
-#include "../../objects/GameInst.h"
-#include "../../objects/player/PlayerInst.h"
+#include "collision_filters.h"
+#include "ItemInst.h"
+#include "enemy/EnemyInst.h"
+#include "GameInst.h"
+#include "player/PlayerInst.h"
 
 bool item_colfilter(GameInst* self, GameInst* other) {
 	return dynamic_cast<ItemInst*>(other) != NULL;

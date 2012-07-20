@@ -13,7 +13,7 @@
 #include "../display/GLImage.h"
 
 #include "../lanarts_defines.h"
-#include "../util/ActionQueue.h"
+#include "../gamestate/ActionQueue.h"
 
 #include "../objects/GameInst.h"
 
@@ -21,7 +21,7 @@
 
 #include "GameTextConsole.h"
 
-#include "sidebar/ActionBar.h"
+#include "ActionBar.h"
 #include "sidebar/Sidebar.h"
 #include "sidebar/SidebarNavigator.h"
 

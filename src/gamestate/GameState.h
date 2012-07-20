@@ -17,7 +17,7 @@
 
 #include "../net/GameNetConnection.h"
 
-#include "controllers/IOController.h"
+#include "IOController.h"
 #include "../objects/enemy/MonsterController.h"
 #include "../objects/player/PlayerController.h"
 

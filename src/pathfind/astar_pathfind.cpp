@@ -7,7 +7,7 @@
 
 #include "../data/tile_data.h"
 
-#include "../util/gheap.h"
+#include "gheap.h"
 
 #include "../gamestate/GameTiles.h"
 #include "../gamestate/GameState.h"

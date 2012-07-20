@@ -15,7 +15,7 @@
 
 #include "../../pathfind/pathfind.h"
 
-#include "../../util/ActionQueue.h"
+#include "../../gamestate/ActionQueue.h"
 
 #include "../../gamestate/GameAction.h"
 #include "../../gamestate/GameLevelState.h"

@@ -5,7 +5,7 @@
 
 #include <typeinfo>
 
-#include "../util/world/collision_util.h"
+#include "collision_filters.h"
 #include "../util/math_util.h"
 
 #include "../data/item_data.h"

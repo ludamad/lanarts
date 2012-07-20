@@ -10,7 +10,7 @@
 
 #include "../../lanarts_defines.h"
 
-#include "../../util/ActionQueue.h"
+#include "../../gamestate/ActionQueue.h"
 
 class GameState;
 

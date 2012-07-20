@@ -18,7 +18,7 @@
 #include "../../interface/console_description_draw.h"
 #include "../../util/math_util.h"
 #include "../../lua/LuaValue.h"
-#include "../../util/world/collision_util.h"
+#include "../collision_filters.h"
 
 #include "../AnimatedInst.h"
 
