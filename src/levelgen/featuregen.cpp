@@ -160,11 +160,12 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		gs->get_level()->exits.push_back(GameLevelPortal(p, Pos(0, 0)));
 	}
 
-	int room = mt.rand(level.rooms().size());
-	Region& r = level.rooms()[room].room_region;
+	for (int i = 0; i < level.rooms().size(); i++) {
+		Region& r = level.rooms()[i].room_region;
 
-	doors_all_around(gs, level,
-			BBox(r.x - 1, r.y - 1, r.x + r.w + 1, r.y + r.h + 1));
+		doors_all_around(gs, level,
+				BBox(r.x - 1, r.y - 1, r.x + r.w + 1, r.y + r.h + 1));
+	}
 
 //	for (int i = 0; i < 4; i++) {
 //		for (int attempts = 0; attempts < 200; attempts++) {
