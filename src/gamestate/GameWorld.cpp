@@ -47,23 +47,20 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, int classn,
 		epos = generate_location(game_state->rng(), genlevel);
 	} while (!genlevel.at(epos).passable || genlevel.at(epos).has_instance);
 
-	int start_x = (tiles.tile_width() - genlevel.width()) / 2;
-	int start_y = (tiles.tile_height() - genlevel.height()) / 2;
-
 	genlevel.at(epos).has_instance = true;
-	int px = (epos.x + start_x) * TILE_SIZE + TILE_SIZE / 2;
-	int py = (epos.y + start_y) * TILE_SIZE + TILE_SIZE / 2;
+	Pos spawn_pos = genlevel.get_world_coordinate(epos);
 
 	sprite_id sprite =
 			local ? get_sprite_by_name("wizard") : get_sprite_by_name(
 							"fighter");
 
 	if (!inst) {
-		inst = new PlayerInst(c.starting_stats, sprite, px, py, local);
+		inst = new PlayerInst(c.starting_stats, sprite, spawn_pos.x,
+				spawn_pos.y, local);
 	}
-	inst->last_x = px;
-	inst->last_y = py;
-	inst->update_position(px, py);
+	inst->last_x = spawn_pos.x;
+	inst->last_y = spawn_pos.y;
+	inst->update_position(spawn_pos.x, spawn_pos.y);
 
 	game_state->add_instance(inst);
 }
