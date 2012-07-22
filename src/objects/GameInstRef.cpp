@@ -13,6 +13,7 @@
 
 static void __retain_ref(GameInst* inst) {
 	if (inst) {
+		LANARTS_ASSERT(inst->reference_count >= 0);
 		inst->retain_reference();
 	}
 }

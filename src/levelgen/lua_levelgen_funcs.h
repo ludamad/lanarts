@@ -8,10 +8,10 @@
 
 #include "GeneratedLevel.h"
 
-struct lua_State* L;
+struct lua_State;
 
-void lua_generatedlevel_push(lua_State* L, GeneratedLevel& level);
-void lua_generatedlevel_invalidate(lua_State* L, int idx);
+void lua_push_generatedlevel(lua_State* L, GeneratedLevel& level);
+void lua_invalidate_generatedlevel(lua_State* L, int idx);
 
 void lua_levelgen_func_bindings(lua_State* L);
 

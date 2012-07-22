@@ -17,8 +17,15 @@
 class GameState;
 class GameLevelState;
 struct GeneratedLevel;
+struct lua_State;
 
-void generate_rooms(const RoomGenSettings& rs, MTwist& mt,
+//return false on failure
+bool generate_room_at(MTwist& mt, GeneratedLevel& level, const Region& r,
+		int padding, int mark);
+bool generate_room(MTwist& mt, GeneratedLevel& level, int rw, int rh,
+		int padding, int mark, int max_attempts);
+
+void generate_rooms(lua_State* L, const RoomGenSettings& rs, MTwist& mt,
 		GeneratedLevel& level);
 GameLevelState* generate_level(int roomid, MTwist& mt, GeneratedLevel& level,
 		GameState* gs);

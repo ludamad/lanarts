@@ -5,6 +5,7 @@
 
 #ifndef LUA_API_H_
 #define LUA_API_H_
+
 #include "../lanarts_defines.h"
 
 struct lua_State;
@@ -28,13 +29,22 @@ CombatStats& lua_get_combatstats(lua_State* L, int narg);
 EffectiveStats& lua_get_effectivestats(lua_State* L, int narg);
 
 GameState* lua_get_gamestate(lua_State* L);
-
+//
 void lua_lanarts_api(GameState* gs, lua_State* L);
 
 //Implemented in data/game_data.cpp
-void luayaml_push_item(lua_State *L, const char* name);
-void luayaml_push_sprites(lua_State *L, const char* name);
-void luayaml_push_enemies(lua_State *L, const char* name);
-void luayaml_push_levelinfo(lua_State *L, const char* name);
+void luayaml_push_item(lua_State* L, const char* name);
+void luayaml_push_sprites(lua_State* L, const char* name);
+void luayaml_push_enemies(lua_State* L, const char* name);
+void luayaml_push_levelinfo(lua_State* L, const char* name);
+
+void lua_push_narray(lua_State* L, const int* nums, int n );
+void lua_tonarray(lua_State* L, int idx, int* nums, int n );
+
+void lua_push_region(lua_State* L, const Region& r );
+Region lua_toregion(lua_State* L, int idx);
+
+void lua_push_colour(lua_State* L, const Colour& r );
+Colour lua_tocolour(lua_State* L, int idx);
 
 #endif /* LUA_API_H_ */

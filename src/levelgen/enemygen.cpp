@@ -13,7 +13,8 @@
 #include "enemygen.h"
 
 //Used for !spawn command
-void generate_enemy_after_level_creation(GameState* gs, enemy_id etype, int amount) {
+void generate_enemy_after_level_creation(GameState* gs, enemy_id etype,
+		int amount) {
 	MTwist& mt = gs->rng();
 	GameTiles& tiles = gs->tile_grid();
 
@@ -29,14 +30,14 @@ void generate_enemy_after_level_creation(GameState* gs, enemy_id etype, int amou
 	}
 }
 
-static Room& enemy_region_candidate(MTwist& mt, GeneratedLevel& level) {
+static Region& enemy_region_candidate(MTwist& mt, GeneratedLevel& level) {
 	std::vector<Room>& rooms = level.rooms();
 	int ind1 = mt.rand(rooms.size()), ind2 = mt.rand(rooms.size());
 	Room& r1 = rooms[ind1], &r2 = rooms[ind2];
 	if (r1.enemies_in_room < r2.enemies_in_room) {
-		return r1;
+		return r1.room_region;
 	} else {
-		return r2;
+		return r2.room_region;
 	}
 }
 static Pos enemy_position_candidate(MTwist& mt, GeneratedLevel& level,
@@ -53,26 +54,19 @@ static Pos enemy_position_candidate(MTwist& mt, GeneratedLevel& level,
 	return epos;
 }
 
-int generate_enemy(const EnemyGenChance& ec, MTwist& mt, GeneratedLevel& level,
-		GameState* gs, int amount) {
-
-	enemy_id etype = ec.enemytype;
-
-	GameTiles& tiles = gs->tile_grid();
-	int start_x = (tiles.tile_width() - level.width()) / 2;
-	int start_y = (tiles.tile_height() - level.height()) / 2;
-
-	Room& r = enemy_region_candidate(mt, level);
+int generate_enemy(GeneratedLevel& level, MTwist& mt, enemy_id etype,
+		const Region& r, int amount) {
 
 	for (int i = 0; i < amount; i++) {
-		Pos epos = enemy_position_candidate(mt, level, r.room_region);
-		level.at(epos).has_instance = true;
-		r.enemies_in_room++;
+		Pos epos = enemy_position_candidate(mt, level, r);
+		Sqr& sqr = level.at(epos);
+		sqr.has_instance = true;
+		if (sqr.roomID) {
+			level.get_room(sqr.roomID - 1).enemies_in_room++;
+		}
 
-		epos.x += start_x, epos.y += start_y;
-
-		Pos world_pos = centered_multiple(epos, TILE_SIZE);
-		gs->add_instance(new EnemyInst(etype, world_pos.x, world_pos.y));
+		Pos world_pos = level.get_world_coordinate(epos);
+		level.add_instance(new EnemyInst(etype, world_pos.x, world_pos.y));
 	}
 	return amount;
 }
@@ -95,7 +89,8 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 	for (int i = 0; i < rs.enemy_chances.size(); i++) {
 		const EnemyGenChance& ec = rs.enemy_chances[i];
 		if (ec.guaranteed_spawns > 0) {
-			generate_enemy(ec, mt, level, gs, ec.guaranteed_spawns);
+			generate_enemy(level, mt, ec.enemytype,
+					enemy_region_candidate(mt, level), ec.guaranteed_spawns);
 		}
 	}
 
@@ -117,6 +112,7 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 			amnt = mt.rand(ec.groupsize);
 		}
 
-		i += generate_enemy(ec, mt, level, gs, amnt);
+		i += generate_enemy(level, mt, ec.enemytype,
+				enemy_region_candidate(mt, level), amnt);
 	}
 }

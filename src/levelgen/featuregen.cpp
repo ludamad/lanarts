@@ -163,8 +163,8 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 	for (int i = 0; i < level.rooms().size(); i++) {
 		Region& r = level.rooms()[i].room_region;
 
-		doors_all_around(gs, level,
-				BBox(r.x - 1, r.y - 1, r.x + r.w + 1, r.y + r.h + 1));
+//		doors_all_around(gs, level,
+//				BBox(r.x - 1, r.y - 1, r.x + r.w + 1, r.y + r.h + 1));
 	}
 
 //	for (int i = 0; i < 4; i++) {

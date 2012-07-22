@@ -36,8 +36,9 @@ GameInstSet::~GameInstSet() {
 
 	for (int i = 0, j = 0; i < unit_capacity; i++) {
 		GameInst* inst = unit_set[i].inst;
-		if (valid_inst(inst))
-			delete inst;
+		if (valid_inst(inst)) {
+			inst->free_reference();
+		}
 	}
 
 	delete[] unit_grid;
@@ -269,7 +270,7 @@ void GameInstSet::copy_to(GameInstSet& inst_set) const {
 					inst->copy_to(oinst);
 				} else
 					inst_set.__remove_instance(state);
-				delete inst;
+				inst->free_reference();
 			}
 
 		}
@@ -333,7 +334,7 @@ void GameInstSet::clear() {
 	for (int i = 0; i < unit_capacity; i++) {
 		GameInst* inst = unit_set[i].inst;
 		if (valid_inst(inst)) {
-			delete inst;
+			inst->free_reference();
 		}
 	}
 	next_id = 1;

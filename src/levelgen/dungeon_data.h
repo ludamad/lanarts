@@ -6,9 +6,8 @@
 #ifndef DUNGEON_DATA_H_
 #define DUNGEON_DATA_H_
 
-//#include "../procedural/levelgen.h"
-
 #include <vector>
+#include "../lua/LuaValue.h"
 #include "../lanarts_defines.h"
 
 enum {
@@ -84,6 +83,7 @@ struct ContentGenSettings {
 struct LevelGenSettings {
 	std::vector<LayoutGenSettings> layouts;
 	ContentGenSettings content;
+	LuaValue gen_level_func;
 };
 
 struct DungeonBranch {

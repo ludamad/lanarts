@@ -8,6 +8,7 @@ dofile "res/data/enemies/enemies.lua"
 dofile "res/data/items/items.lua"
 dofile "res/data/effects/effects.lua"
 dofile "res/data/spells/spells.lua"
+dofile "res/data/levels/levels.lua"
 
 -- Balance measurement related files
 dofile "res/tests/progressions.lua"

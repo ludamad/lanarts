@@ -49,11 +49,9 @@ public:
 	Pos pos() {
 		return Pos(x, y);
 	}
-private:
 	//Used for keeping object from being deleted arbitrarily
 	//Important for lua code
 	int reference_count;
-public:
 	/* Reference counting functions
 	 * NOTE: free_reference employs 'delete this;' */
 	void retain_reference();

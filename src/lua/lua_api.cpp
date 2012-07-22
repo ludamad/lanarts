@@ -7,6 +7,8 @@ extern "C" {
 }
 #include "../gamestate/GameState.h"
 
+#include "../levelgen/lua_levelgen_funcs.h"
+
 void lua_gameinst_bindings(GameState* gs, lua_State* L);
 void lua_gamestate_bindings(GameState* gs, lua_State* L);
 void lua_combatstats_bindings(GameState* gs, lua_State* L);
@@ -45,6 +47,7 @@ void lua_lanarts_api(GameState* state, lua_State* L) {
 	lua_collision_check_bindings(L);
 	lua_spelltarget_bindings(L);
 	lua_object_func_bindings(L);
+	lua_levelgen_func_bindings(L);
 
 	//Use C function name as lua function name:
 #define LUA_FUNC_REGISTER(f) \
@@ -53,3 +56,40 @@ void lua_lanarts_api(GameState* state, lua_State* L) {
 	LUA_FUNC_REGISTER(rand_range);
 }
 
+void lua_push_narray(lua_State* L, const int* nums, int n) {
+	lua_newtable(L);
+	int idx = lua_gettop(L);
+	for (int i = 0; i < n; i++) {
+		lua_pushnumber(L, nums[i]);
+		lua_rawseti(L, idx, i + 1);
+	}
+}
+void lua_tonarray(lua_State* L, int idx, int* nums, int n) {
+	for (int i = 0; i < n; i++) {
+		lua_rawgeti(L, idx, i + 1);
+		if (!lua_isnil(L, -1)) {
+			nums[i] = lua_tonumber(L, -1);
+		}
+		lua_pop(L, 1);
+	}
+}
+
+void lua_push_region(lua_State* L, const Region& r) {
+	lua_push_narray(L, (const int*)&r, sizeof(Region) / sizeof(int));
+}
+
+Region lua_toregion(lua_State* L, int idx) {
+	Region r;
+	lua_tonarray(L, idx, (int*)&r, sizeof(Region) / sizeof(int));
+	return r;
+}
+
+void lua_push_colour(lua_State* L, const Colour& c) {
+	lua_push_narray(L, (const int*)&c, sizeof(Colour) / sizeof(int));
+}
+
+Colour lua_tocolour(lua_State* L, int idx) {
+	Colour c;
+	lua_tonarray(L, idx, (int*)&c, sizeof(Colour) / sizeof(int));
+	return c;
+}

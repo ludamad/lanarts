@@ -76,6 +76,7 @@ set( lanarts_src
 	levelgen/featuregen.cpp
 	levelgen/GeneratedLevel.cpp
 	levelgen/itemgen.cpp
+	levelgen/lua_levelgen_funcs.cpp
 	levelgen/levelgen.cpp
 	levelgen/tunnelgen.cpp
 
@@ -184,6 +185,7 @@ set( lanarts_include
 	levelgen/GeneratedLevel.h
 	levelgen/itemgen.h
 	levelgen/levelgen.h
+	levelgen/lua_levelgen_funcs.h
 	levelgen/tunnelgen.h
 
 	util/callback_util.h

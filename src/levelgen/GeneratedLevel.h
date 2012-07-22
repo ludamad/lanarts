@@ -10,6 +10,7 @@
 
 #include "../util/mtwist.h"
 #include "../lanarts_defines.h"
+#include "../objects/GameInstRef.h"
 
 #include "generated_tile.h"
 
@@ -32,25 +33,35 @@ struct Room {
 class GeneratedLevel {
 public:
 	int width() {
-		return w;
+		return size.w;
 	}
 	int height() {
-		return h;
+		return size.h;
 	}
 	std::vector<Room>& rooms() {
 		return room_list;
 	}
+	std::vector<GameInstRef>& instances() {
+		return instance_list;
+	}
+	void add_instance(GameInst* inst) {
+		return instance_list.push_back(inst);
+	}
+	Room& get_room(int i) {
+		return room_list.at(i);
+	}
 
 	GeneratedLevel() {
 		s = NULL;
-		w = 0, h = 0;
 	}
 
-	void initialize(int w, int h, bool solid = true) {
+	Pos get_world_coordinate(const Pos& p);
+
+	void initialize(int w, int h, const Pos& offset, bool solid = true) {
 		delete[] s;
-		this->w = w;
-		this->h = h;
+		size = Dim(w, h);
 		s = new Sqr[w * h];
+		world_offset = offset;
 		memset(s, 0, sizeof(Sqr) * w * h);
 		if (!solid) {
 			for (int i = 0; i < w * h; i++) {
@@ -61,9 +72,9 @@ public:
 			}
 		}
 	}
-	GeneratedLevel(int w, int h) {
+	GeneratedLevel(int w, int h, const Pos& offset) {
 		s = NULL;
-		initialize(w, h);
+		initialize(w, h, offset);
 	}
 	~GeneratedLevel() {
 		delete[] s;
@@ -85,8 +96,10 @@ public:
 private:
 	GeneratedLevel(const GeneratedLevel&); //DO-NOT-USE
 	Sqr* s;
-	int w, h;
+	Dim size;
+	Pos world_offset;
 	std::vector<Room> room_list;
+	std::vector<GameInstRef> instance_list;
 };
 
 Pos generate_location(MTwist& mt, GeneratedLevel& level);

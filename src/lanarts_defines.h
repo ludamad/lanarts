@@ -37,18 +37,21 @@ struct Colour {
 	}
 };
 
+/*Represents a width & height*/
+struct Dim {
+	int w, h;
+	explicit Dim(int w = 0, int h = 0) :
+			w(w), h(h) {
+		LANARTS_ASSERT(w >= 0 && h >= 0);
+	}
+};
+
 /*Represents a range*/
 struct Range {
 	int min, max;
-	Range() :
-			min(0), max(0) {
-	}
-	Range(int min, int max) :
+	explicit Range(int min = 0, int max = 0) :
 			min(min), max(max) {
 		LANARTS_ASSERT(min <= max);
-	}
-	Range(const Range& r) {
-		min = r.min, max = r.max;
 	}
 };
 
@@ -103,6 +106,15 @@ struct Pos {
 	Pos(int x, int y) :
 			x(x), y(y) {
 	}
+
+	void operator+=(const Pos& p) {
+		x += p.x, y += p.y;
+	}
+	Pos operator+(const Pos& p) const {
+		Pos ret(*this);
+		ret += p;
+		return ret;
+	}
 };
 
 /*Represents a float x,y pair position*/
@@ -119,7 +131,7 @@ struct Posf {
 /*Represents a rectangular region in terms of its start x,y values as well as its dimensions*/
 struct Region {
 	int x, y, w, h;
-	Region(int x, int y, int w, int h) :
+	Region(int x = 0, int y = 0, int w = 0, int h = 0) :
 			x(x), y(y), w(w), h(h) {
 	}
 	inline Pos pos() {
