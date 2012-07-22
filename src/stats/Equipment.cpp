@@ -69,12 +69,14 @@ bool Equipment::valid_to_use(const Item& item) {
 void Equipment::equip(const Item& item, int amnt) {
 	switch (item.item_entry().equipment_type) {
 	case ItemEntry::ARMOUR:
-		if(armour.bonuses.flags&cursed)break;
+		if (armour.properties.flags & CURSED)
+			break;
 		deequip_armour();
 		armour = item.as_armour();
 		break;
 	case ItemEntry::WEAPON:
-		if(weapon.bonuses.flags&cursed)break;
+		if (weapon.properties.flags & CURSED)
+			break;
 		deequip_projectiles();
 		if (has_weapon()) {
 			inventory.add(weapon.as_item(), 1);
@@ -82,7 +84,8 @@ void Equipment::equip(const Item& item, int amnt) {
 		weapon = item.as_weapon();
 		break;
 	case ItemEntry::PROJECTILE:
-		if(projectile.bonuses.flags&cursed)break;
+		if (projectile.properties.flags & CURSED)
+			break;
 		if (!(item.as_projectile() == projectile))
 			deequip_projectiles();
 		projectile = item.as_projectile();

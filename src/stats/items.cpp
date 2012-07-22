@@ -1,6 +1,6 @@
 /*
  * items.cpp:
- *  Define item states. These are defined in terms of a base item, and applied bonuses.
+ *  Define item states. These are defined in terms of a base item, and applied properties.
  */
 
 #include "../data/game_data.h"
@@ -14,7 +14,7 @@ ItemEntry& Projectile::item_entry() const {
 
 Item Projectile::as_item() const {
 	const std::string& name = projectile_entry().name;
-	return Item(get_item_by_name(name.c_str()), bonuses);
+	return Item(get_item_by_name(name.c_str()), properties);
 }
 
 ProjectileEntry& Projectile::projectile_entry() const {
@@ -28,7 +28,7 @@ ItemEntry& Weapon::item_entry() const {
 
 Item Weapon::as_item() const {
 	const std::string& name = weapon_entry().name;
-	return Item(get_item_by_name(name.c_str()), bonuses);
+	return Item(get_item_by_name(name.c_str()), properties);
 }
 
 WeaponEntry& Weapon::weapon_entry() const {
@@ -41,7 +41,7 @@ ItemEntry& Item::item_entry() const {
 }
 
 Armour Item::as_armour() const {
-	return Armour(item_entry().equipment_id, bonuses);
+	return Armour(item_entry().equipment_id, properties);
 }
 
 ArmourEntry& Armour::armour_entry() const {
@@ -50,15 +50,15 @@ ArmourEntry& Armour::armour_entry() const {
 
 Item Armour::as_item() const {
 	const std::string& name = armour_entry().name;
-	return Item(get_item_by_name(name.c_str()), bonuses);
+	return Item(get_item_by_name(name.c_str()), properties);
 }
 
 Projectile Item::as_projectile() const {
-	return Projectile(item_entry().equipment_id, bonuses);
+	return Projectile(item_entry().equipment_id, properties);
 }
 
 Weapon Item::as_weapon() const {
-	return Weapon(item_entry().equipment_id, bonuses);
+	return Weapon(item_entry().equipment_id, properties);
 }
 
 ProjectileEntry& Item::projectile_entry() const {
@@ -87,19 +87,20 @@ bool Item::is_weapon() const {
 	return item_entry().equipment_type == ItemEntry::WEAPON;
 }
 
-bool Bonuses::operator ==(const Bonuses& bonuses) const {
-	return magic == bonuses.magic && physical == bonuses.physical;
+bool ItemProperties::operator ==(const ItemProperties& properties) const {
+	return magic == properties.magic && physical == properties.physical
+			&& flags == properties.flags;
 }
 
 bool Projectile::operator ==(const Projectile& projectile) const {
-	return id == projectile.id && bonuses == projectile.bonuses;
+	return id == projectile.id && properties == projectile.properties;
 }
 
 bool Weapon::operator ==(const Weapon& weapon) const {
-	return id == weapon.id && bonuses == weapon.bonuses;
+	return id == weapon.id && properties == weapon.properties;
 }
 
 bool Item::operator ==(const Item& item) const {
-	return id == item.id && bonuses == item.bonuses;
+	return id == item.id && properties == item.properties;
 }
 

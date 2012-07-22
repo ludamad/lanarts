@@ -63,7 +63,7 @@ Source:
 		Equipment holds the items owned or equipped by a player (or theoretically an enemy)
 		Inventory holds all the items owned but not equipped by a player
 		items.h defines the item structures, Item, Weapon, Projectile. 
-			The Bonuses structure is meant to hold any randomly generated item properties.
+			The properties structure is meant to hold any randomly generated item properties.
 		skills.h defines currently unused skill structures for skill levels
 		SpellsKnown holds spells known by the player (again theoretically enemies too)
 		stat_formulas holds things like experience point needed calculation and the basic damage formula

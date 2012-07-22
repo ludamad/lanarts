@@ -1,6 +1,6 @@
 /*
  * items.h:
- *  Define item states. These are defined in terms of a base item, and applied bonuses.
+ *  Define item states. These are defined in terms of a base item, and applied properties.
  */
 
 #ifndef ITEMS_H_
@@ -16,37 +16,38 @@ struct ItemEntry;
 struct ProjectileEntry;
 struct WeaponEntry;
 
-typedef enum{
-	cursed = 1,
-	golden = 2
-}bonusflags;
-struct Bonuses {
-	DerivedStats magic, physical;
-	bonusflags flags;
+enum item_flags {
+	CURSED = 1, GOLDEN = 2
+};
 
-	bool operator==(const Bonuses& bonuses) const;
+struct ItemProperties {
+	DerivedStats magic, physical;
+	item_flags flags;
+
+	bool operator==(const ItemProperties& properties) const;
 };
 
 struct Armour {
 	armour_id id;
-	Bonuses bonuses;
+	ItemProperties properties;
 
 	Item as_item() const;
-	Armour(armour_id id, Bonuses bonuses = Bonuses()) :
-			id(id), bonuses(bonuses) {
+	Armour(armour_id id, ItemProperties properties = ItemProperties()) :
+			id(id), properties(properties) {
 	}
 	ArmourEntry& armour_entry() const;
 };
 
 struct Projectile {
 	projectile_id id;
-	Bonuses bonuses;
+	ItemProperties properties;
 
 	Item as_item() const;
 	ItemEntry& item_entry() const;
 	ProjectileEntry& projectile_entry() const;
-	Projectile(projectile_id id = -1, Bonuses bonuses = Bonuses()) :
-			id(id), bonuses(bonuses) {
+	Projectile(projectile_id id = -1, ItemProperties properties =
+			ItemProperties()) :
+			id(id), properties(properties) {
 	}
 	bool valid_projectile() const {
 		return id >= 0;
@@ -57,13 +58,13 @@ struct Projectile {
 
 struct Weapon {
 	weapon_id id;
-	Bonuses bonuses;
+	ItemProperties properties;
 
 	Item as_item() const;
 	ItemEntry& item_entry() const;
 	WeaponEntry& weapon_entry() const;
-	Weapon(weapon_id id = 0, Bonuses bonuses = Bonuses()) :
-			id(id), bonuses(bonuses) {
+	Weapon(weapon_id id = 0, ItemProperties properties = ItemProperties()) :
+			id(id), properties(properties) {
 	}
 	bool operator==(const Weapon& weapon) const;
 };
@@ -71,7 +72,7 @@ struct Weapon {
 struct Item {
 	item_id id;
 	bool is_artifact;
-	Bonuses bonuses;
+	ItemProperties properties;
 
 	ItemEntry& item_entry() const;
 	Armour as_armour() const;
@@ -87,8 +88,8 @@ struct Item {
 	bool is_projectile() const;
 	bool is_weapon() const;
 
-	Item(item_id id = -1, Bonuses bonuses = Bonuses()) :
-			id(id), bonuses(bonuses) {
+	Item(item_id id = -1, ItemProperties properties = ItemProperties()) :
+			id(id), properties(properties) {
 	}
 
 	bool operator==(const Item& item) const;

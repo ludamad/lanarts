@@ -55,7 +55,7 @@ struct CoreStatMultiplier {
 	float calculate(MTwist& mt, const CoreStats& stats) const;
 };
 
-/* Derived combat stats, power & damage represent bonuses
+/* Derived combat stats, power & damage represent properties
  * They are not fully determined until EffectiveAttackStats is created */
 struct DerivedStats {
 	float power, resistance;
@@ -89,7 +89,7 @@ struct ActionsAllowed {
 	}
 };
 
-/* Core & derived stats after stat & item bonuses */
+/* Core & derived stats after stat & item properties */
 struct EffectiveStats {
 	CoreStats core;
 	DerivedStats physical, magic;
