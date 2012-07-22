@@ -85,12 +85,12 @@ void generate_rooms(lua_State* L, const RoomGenSettings& rs, MTwist& mt,
 
 			int rw = mt.rand(sizerange), rh = mt.rand(sizerange);
 
-//			if (generate_room(mt, level, rw, rh, rs.room_padding, mark, 20)) {
-//				break;
-//			}
-			if (generate_room_lua(L, level, rw, rh, rs.room_padding, 20)) {
+			if (generate_room(mt, level, rw, rh, rs.room_padding, mark, 20)) {
 				break;
 			}
+//			if (generate_room_lua(L, level, rw, rh, rs.room_padding, 20)) {
+//				break;
+//			}
 			if (failures > TOO_MANY_FAILURES)
 				goto NoMoreRooms;
 			// Goto below
