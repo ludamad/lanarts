@@ -19,16 +19,16 @@ const float DEG2RAD = 3.14159 / 180;
 
 void gl_draw_circle(float x, float y, float radius, const Colour& clr,
 		bool outline) {
+	if(radius<.5)return;
 	if (outline)
 		glBegin(GL_LINE_STRIP);
 	else
 		glBegin(GL_POLYGON);
 	glColor4ub(clr.r, clr.g, clr.b, clr.a);
-	for (int i = 0; i < 360; i++) {
-		float degInRad = i * DEG2RAD;
-		glVertex2f(x + cos(degInRad) * radius, y + sin(degInRad) * radius);
+	float circum=radius*M_PI;
+	for (float a = 0; a < M_PI*2; a+=M_PI*2/circum) {
+		glVertex2f(x + cos(a) * radius, y + sin(a) * radius);
 	}
-
 	glEnd();
 }
 void gl_draw_rectangle(int x, int y, int w, int h, const Colour& clr) {

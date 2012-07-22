@@ -48,6 +48,11 @@ ArmourEntry& Armour::armour_entry() const {
 	return game_armour_data.at(id);
 }
 
+Item Armour::as_item() const {
+	const std::string& name = armour_entry().name;
+	return Item(get_item_by_name(name.c_str()), bonuses);
+}
+
 Projectile Item::as_projectile() const {
 	return Projectile(item_entry().equipment_id, bonuses);
 }
