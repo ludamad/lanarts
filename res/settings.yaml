@@ -8,8 +8,8 @@ username: ludamad
 #Window settings
 fullscreen: no
 regen_level_on_death: yes
-view_width: 1550
-view_height: 800
+view_width: 1250
+view_height: 720
 
 #Font settings
 font: res/fonts/Gudea-Regular.ttf

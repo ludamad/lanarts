@@ -13,13 +13,19 @@ Medium:
 - Straight line AOE spell
 - Lightning Spell that takes up multiple squares
 - Add levels of minimap viewing
-- Add doors and other dungeon features such as keys, destroyable blocks etc
+- Add doors (Doors somewhat done) and other dungeon features such as keys, destroyable blocks etc
+- Add class choice options for main menu
+- Working config tab in side bar
 
 Small:
 - Have a flexible portal system that indicates which level to connect to
 - Add cooldowns to item use
 - Ensure you do not spawn / use stairs and end up right on a monster
 - Add controls overlay when certain button is pressed, so that the control scheme can be seen
+- Add graphics for each class
+- Make mouse jiggling not cause stair case movement
+- Make damage amounts not show off screen
+- Make all ranged enemies have a short range melee option for close kiters
 
 Partial Completion:
 - [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
