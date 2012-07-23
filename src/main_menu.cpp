@@ -35,6 +35,11 @@ static void continue_as_loner(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 }
+static void continue_as_hardcore(GameState* gs, GameInst* _, void* flag) {
+	*(bool*)flag = true;
+	gs->game_settings().conntype = GameSettings::NONE;
+	gs->game_settings().regen_on_death = false;
+}
 
 static void continue_as_loner_save_replay(GameState* gs, GameInst* _,
 		void* flag) {
@@ -70,11 +75,15 @@ static const char HELP_TEXT[] = "Movement: WASD or Arrow Keys\n"
 
 static void setup_buttons(GameState* gs, bool* exit, int x, int y) {
 	ObjCallback single(continue_as_loner, exit);
+	ObjCallback hardcoresingle(continue_as_hardcore, exit);
 	ObjCallback savereplay(continue_as_loner_save_replay, exit);
 	ObjCallback loadreplay(continue_as_load_replay, exit);
 	ObjCallback client(continue_as_client, exit);
 	ObjCallback server(continue_as_server, exit);
 	gs->add_instance(new ButtonInst("Single-Player", x, y, single));
+	y += 50;
+	gs->add_instance(
+			new ButtonInst("Hardcore (No Respawn)", x, y, hardcoresingle));
 	y += 50;
 	gs->add_instance(new ButtonInst("Save Replay", x - 95, y, savereplay));
 	gs->add_instance(new ButtonInst("Load Replay", x + 95, y, loadreplay));

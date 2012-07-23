@@ -90,7 +90,7 @@ static void draw_statmult_with_prefix(GameState* gs, const char* prefix,
 }
 //Drawn only as part of other draw_console_<something>_description functions
 static void draw_projectile_description_overlay(GameState* gs,
-		const Projectile& projectile) {
+		const Projectile& projectile, int cooldown_override = -1) {
 	PlayerInst* p = gs->local_player();
 	EffectiveStats& estats = p->effective_stats();
 
@@ -119,8 +119,9 @@ static void draw_projectile_description_overlay(GameState* gs,
 
 	//Third row
 	if (is_unarmed) {
-		draw_stat_with_prefix(gs, "Cooldown: ", pentry.cooldown, stat_x,
-				stat_sy + interval_y * 2);
+		draw_stat_with_prefix(gs, "Cooldown: ",
+				cooldown_override > -1 ? cooldown_override : pentry.cooldown,
+				stat_x, stat_sy + interval_y * 2);
 		draw_descript_with_prefix(gs, "Range: ",
 				range_description(pentry.range), stat_x + interval_x,
 				stat_sy + interval_y * 2, COL_PALE_YELLOW, COL_PALE_GREEN);
@@ -240,7 +241,8 @@ void draw_console_spell_description(GameState* gs, SpellEntry& spl_entry) {
 			spl_entry.description.c_str());
 
 	if (spl_entry.projectile.valid_projectile()) {
-		draw_projectile_description_overlay(gs, spl_entry.projectile);
+		draw_projectile_description_overlay(gs, spl_entry.projectile,
+				spl_entry.cooldown);
 	}
 }
 

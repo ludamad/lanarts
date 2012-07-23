@@ -51,6 +51,9 @@ sprites:
   - name: skeleton
     file: res/sprites/monsters/undead/skeleton.png
     
+  - name: skeleton fighter
+    file: res/sprites/monsters/undead/skelefighter.png
+    
   - name: zombie
     file: res/sprites/monsters/undead/zombie.png
 

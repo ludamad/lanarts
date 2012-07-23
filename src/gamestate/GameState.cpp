@@ -336,7 +336,7 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 	int minx = squish(mingrid_x, 0, w), miny = squish(mingrid_y, 0, h);
 	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
 
-	std::vector<obj_id> players = player_controller().player_ids();
+	const std::vector<obj_id>& players = player_controller().player_ids();
 
 	if ((canreveal && key_down_state(SDLK_BACKQUOTE)) || players.empty()) {
 		return true;

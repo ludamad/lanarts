@@ -57,29 +57,35 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 	int x_interval = width / 2;
 	int y_interval = 15;
 
-	gl_printf_centered(gs->primary_font(), COL_GOLD, x - 10 + x_interval, 15,
+	gl_printf_centered(gs->primary_font(), COL_WHITE, x - 10 + x_interval, 15,
 			"Level %d", class_stats.xplevel);
 //	y += y_interval;
 
-	gl_printf(gs->primary_font(), COL_GOLD, x, y, "Kills %d",
+	gl_printf(gs->primary_font(), COL_WHITE, x, y, "Kills %d",
 			player_inst->number_of_kills());
-	gl_printf(gs->primary_font(), COL_GOLD, x + x_interval, y, "Deaths %d",
-			player_inst->number_of_deaths());
+	if (gs->game_settings().regen_on_death) {
+		gl_printf(gs->primary_font(), COL_PALE_RED, x + x_interval, y, "Deaths %d",
+				player_inst->number_of_deaths());
+	} else {
+
+		gl_printf(gs->primary_font(), COL_PALE_BLUE, x + x_interval, y,
+				"Hardcore", player_inst->number_of_deaths());
+	}
 	y += y_interval;
 
-	gl_printf(gs->primary_font(), COL_GOLD, x, y, "Floor %d",
+	gl_printf(gs->primary_font(), COL_WHITE, x, y, "Floor %d",
 			gs->get_level()->level_number);
 	gl_printf(gs->primary_font(), COL_GOLD, x + x_interval, y, "Gold %d",
 			player_inst->gold());
 	y += y_interval;
 
-	gl_printf(gs->primary_font(), COL_GOLD, x, y, "Strength %d", core.strength);
-	gl_printf(gs->primary_font(), COL_GOLD, x + x_interval, y, "Magic %d",
+	gl_printf(gs->primary_font(), COL_MUTED_GREEN, x, y, "Strength %d", core.strength);
+	gl_printf(gs->primary_font(), COL_MUTED_GREEN, x + x_interval, y, "Magic %d",
 			core.magic);
 	y += y_interval;
 
-	gl_printf(gs->primary_font(), COL_GOLD, x, y, "Defence %d", core.defence);
-	gl_printf(gs->primary_font(), COL_GOLD, x + x_interval, y, "Will %d",
+	gl_printf(gs->primary_font(), COL_MUTED_GREEN, x, y, "Defence %d", core.defence);
+	gl_printf(gs->primary_font(), COL_MUTED_GREEN, x + x_interval, y, "Will %d",
 			core.willpower);
 	y += y_interval;
 }

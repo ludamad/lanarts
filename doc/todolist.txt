@@ -9,7 +9,6 @@ Large:
 - Add tiered level generation with dungeons inline with overworld
 
 Medium:
-- Add in-game chat support for multiplayer
 - Support for double-sized enemies (2x2 tile size max)
 - Special case pushing for tight corridors ?
 - Straight line AOE spell
@@ -20,6 +19,7 @@ Medium:
 Small:
 - Have a flexible portal system that indicates which level to connect to
 - Add cooldowns to item use
+- Ensure you do not spawn / use stairs and end up right on a monster
 
 Partial Completion:
 - [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
@@ -75,10 +75,12 @@ Completed:
 	- [WONTDO] add attack rate to base stats -> agility
 - [DONE] Add keyboard based blink that moves to furthest point
  
-<08/08/20120:
+<08/07/2012:
 - [DONE] Add in-game chat support for multiplayer
 - [DONE] Add higher level sprite class that handles animation & orientation & multiple tile variations
 - [DONE ENOUGH] Add float coordinate buffering (or make ->x and ->y floats) for all GameInst objects
 - [DONE] Add stat defence multipliers to enemy attacks, maybe create attack types
 - [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization (fixed synch bugs)
 - [DONE] More complete & functional sidebar interface, with tabs
+
+< 22/07/2012:
