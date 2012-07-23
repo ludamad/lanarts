@@ -9,7 +9,6 @@ Large:
 - Add tiered level generation with dungeons inline with overworld
 
 Medium:
-- Support for double-sized enemies (2x2 tile size max)
 - Special case pushing for tight corridors ?
 - Straight line AOE spell
 - Lightning Spell that takes up multiple squares
@@ -20,14 +19,14 @@ Small:
 - Have a flexible portal system that indicates which level to connect to
 - Add cooldowns to item use
 - Ensure you do not spawn / use stairs and end up right on a monster
+- Add controls overlay when certain button is pressed, so that the control scheme can be seen
 
 Partial Completion:
 - [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
 - [STARTED] Classes for players
-- [NEEDS MORE LUA] Make spells not hardcoded
 - [DONE - IMPROVE VISIBILITY] More visual output on the minimap [Stairs etc]
-- [IMPROVED - STILL HARDCODED] Action bar, below screen 
 - [DONE - NEEDS MORE OPTIONS] Add start up screen with networking options
+- [DONE BUT ALWAYS FIT THROUGH SMALL CORRIDORS, TARGET SIZE BIG ONLY] Support for double-sized enemies (2x2 tile size max)
 
 Completed:
 <18/04/2012:
@@ -84,3 +83,5 @@ Completed:
 - [DONE] More complete & functional sidebar interface, with tabs
 
 < 22/07/2012:
+- [DONE] Make spells not hardcoded
+- [DONE] Action bar, below screen 
