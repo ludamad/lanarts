@@ -35,12 +35,13 @@ struct ClassType {
 	std::string name;
 	ClassSpellProgression spell_progression;
 	CombatStats starting_stats;
+	sprite_id sprite;
 	int hp_perlevel, mp_perlevel;
 	int str_perlevel, def_perlevel, mag_perlevel, will_perlevel;
 	float mpregen_perlevel, hpregen_perlevel;
 	ClassType() :
-			hp_perlevel(0), mp_perlevel(0), str_perlevel(0), def_perlevel(0), mag_perlevel(
-					0), will_perlevel(0), mpregen_perlevel(0), hpregen_perlevel(
+			sprite(-1), hp_perlevel(0), mp_perlevel(0), str_perlevel(0), def_perlevel(
+					0), mag_perlevel(0), will_perlevel(0), mpregen_perlevel(0), hpregen_perlevel(
 					0) {
 	}
 };

@@ -42,7 +42,7 @@ void init_system(GameSettings& settings, lua_State* L) {
 	settings = load_settings_data("res/settings.yaml");
 }
 
-void menu_loop(GameState* gs, int width, int height);
+void main_menu_loop(GameState* gs, int width, int height);
 
 const int HUD_WIDTH = 160;
 
@@ -137,7 +137,7 @@ int main(int argc, char** argv) {
 
 	gs->update_iostate(); //for first iteration
 
-	menu_loop(gs, windoww, windowh);
+	main_menu_loop(gs, windoww, windowh);
 
 	gs->init_game();
 

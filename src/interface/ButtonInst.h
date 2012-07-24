@@ -12,13 +12,16 @@ public:
 	enum {
 		RADIUS = 10
 	};
-	ButtonInst(const std::string& str, int x, int y,
-			const ObjCallback& click_callback) :
-			GameInst(x, y, RADIUS), str(str), click_callback(click_callback) {
+	ButtonInst(const std::string& str, sprite_id sprite, int x, int y,
+			const ObjCallback& click_callback, const Colour& hover_colour =
+					Colour(255, 0, 0)) :
+			GameInst(x, y, RADIUS), str(str), click_callback(click_callback), sprite(
+					sprite), hover_colour(hover_colour) {
 	}
 	virtual ~ButtonInst() {
 	}
-	BBox bounds(GameState* gs);
+	BBox text_bounds(GameState* gs);
+	BBox sprite_bounds(GameState* gs);
 	virtual void init(GameState* gs);
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
@@ -26,8 +29,10 @@ public:
 	virtual ButtonInst* clone() const;
 
 private:
+	sprite_id sprite;
 	std::string str;
 	ObjCallback click_callback;
+	Colour hover_colour;
 };
 
 #endif /* BUTTONINST_H_ */

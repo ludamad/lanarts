@@ -91,8 +91,8 @@ public:
 	bool object_visible_test(GameInst* obj, PlayerInst* player = NULL,
 			bool canreveal = true);
 	/* player's field-of-view visibility tests */
-	bool radius_visible_test(int x, int y, int radius, PlayerInst* player = NULL,
-			bool canreveal = true);
+	bool radius_visible_test(int x, int y, int radius,
+			PlayerInst* player = NULL, bool canreveal = true);
 
 	/* GameState components */
 	GameView& window_view() {
@@ -160,6 +160,10 @@ public:
 
 	int mouse_y() {
 		return iocontroller.mouse_y();
+	}
+
+	Pos mouse_pos() {
+		return Pos(mouse_x(), mouse_y());
 	}
 
 	/* Mouse click states */

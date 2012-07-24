@@ -55,45 +55,6 @@ struct Range {
 	}
 };
 
-/*Represents a rectangular region in terms of its start and end x & y values*/
-struct BBox {
-	int x1, y1, x2, y2;
-	BBox(int x1 = 0, int y1 = 0, int x2 = 0, int y2 = 0) :
-			x1(x1), y1(y1), x2(x2), y2(y2) {
-		LANARTS_ASSERT(x1 <= x2 && y1 <= y2);
-	}
-	bool contains(int x, int y) const {
-		return x >= x1 && x < x2 && y >= y1 && y < y2;
-	}
-	int width() const {
-		return x2 - x1;
-	}
-	int height() const {
-		return y2 - y1;
-	}
-	int center_x() const {
-		return (x1 + x2) / 2;
-	}
-	int center_y() const {
-		return (y1 + y2) / 2;
-	}
-	BBox translated(int x, int y) const {
-		return BBox(x1 + x, y1 + y, x2 + x, y2 + y);
-	}
-};
-
-#define FOR_EACH_BBOX(bbox, x, y) \
-	for (int y = (bbox).y1; y < (bbox).y2; y++)\
-		for (int x = (bbox).x1; x < (bbox).x2; x++)
-
-/*Represents a single square tile*/
-struct Tile {
-	unsigned short tile, subtile;
-	Tile(int tile = 0, int subtile = 0) :
-			tile(tile), subtile(subtile) {
-	}
-};
-
 /*Represents an integer x,y pair position*/
 struct Pos {
 	int x, y;
@@ -128,6 +89,54 @@ struct Posf {
 	}
 };
 
+/*Represents a rectangular region in terms of its start and end x & y values*/
+struct BBox {
+	int x1, y1, x2, y2;
+	BBox(int x1 = 0, int y1 = 0, int x2 = 0, int y2 = 0) :
+			x1(x1), y1(y1), x2(x2), y2(y2) {
+		LANARTS_ASSERT(x1 <= x2 && y1 <= y2);
+	}
+	bool contains(int x, int y) const {
+		return x >= x1 && x < x2 && y >= y1 && y < y2;
+	}
+	bool contains(const Pos& p) const {
+		return contains(p.x, p.y);
+	}
+
+	int width() const {
+		return x2 - x1;
+	}
+	int height() const {
+		return y2 - y1;
+	}
+	Dim size() const {
+		return Dim(width(), height());
+	}
+	int center_x() const {
+		return (x1 + x2) / 2;
+	}
+	int center_y() const {
+		return (y1 + y2) / 2;
+	}
+	BBox translated(int x, int y) const {
+		return BBox(x1 + x, y1 + y, x2 + x, y2 + y);
+	}
+};
+
+#define FOR_EACH_BBOX(bbox, x, y) \
+	for (int y = (bbox).y1; y < (bbox).y2; y++)\
+		for (int x = (bbox).x1; x < (bbox).x2; x++)
+
+//TODO remove from lanarts_defines.h
+/*Represents a single square tile*/
+struct Tile {
+	unsigned short tile, subtile;
+	Tile(int tile = 0, int subtile = 0) :
+			tile(tile), subtile(subtile) {
+	}
+};
+
+//TODO replace region with BBox everywhere
 /*Represents a rectangular region in terms of its start x,y values as well as its dimensions*/
 struct Region {
 	int x, y, w, h;

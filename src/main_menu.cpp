@@ -19,6 +19,7 @@ extern "C" {
 
 #include "data/game_data.h"
 
+#include "display/colour_constants.h"
 #include "display/display.h"
 
 #include "lua/lua_api.h"
@@ -32,35 +33,35 @@ extern "C" {
 #include "interface/ButtonInst.h"
 
 static void continue_as_loner(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 }
 static void continue_as_hardcore(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().regen_on_death = false;
 }
 
 static void continue_as_loner_save_replay(GameState* gs, GameInst* _,
 		void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().savereplay_file = "replays/replay";
 }
 
 static void continue_as_load_replay(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().loadreplay_file = "replays/replay";
 }
 
 static void continue_as_client(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().conntype = GameSettings::CLIENT;
 }
 
 static void continue_as_server(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().conntype = GameSettings::SERVER;
 }
 
@@ -73,27 +74,29 @@ static const char HELP_TEXT[] = "Movement: WASD or Arrow Keys\n"
 		"Use Item: click item or keys 1 through 9\n"
 		"Use Stairs: Move onto them without holding other keys\n";
 
-static void setup_buttons(GameState* gs, bool* exit, int x, int y) {
+static void setup_mainmenu_buttons(GameState* gs, bool* exit, int x, int y) {
 	ObjCallback single(continue_as_loner, exit);
 	ObjCallback hardcoresingle(continue_as_hardcore, exit);
 	ObjCallback savereplay(continue_as_loner_save_replay, exit);
 	ObjCallback loadreplay(continue_as_load_replay, exit);
 	ObjCallback client(continue_as_client, exit);
 	ObjCallback server(continue_as_server, exit);
-	gs->add_instance(new ButtonInst("Single-Player", x, y, single));
+	gs->add_instance(new ButtonInst("Single-Player", -1, x, y, single));
 	y += 50;
 	gs->add_instance(
-			new ButtonInst("Hardcore (No Respawn)", x, y, hardcoresingle));
+			new ButtonInst("Hardcore (No Respawn)", -1, x, y, hardcoresingle));
 	y += 50;
-	gs->add_instance(new ButtonInst("Save Replay", x - 95, y, savereplay));
-	gs->add_instance(new ButtonInst("Load Replay", x + 95, y, loadreplay));
+	gs->add_instance(new ButtonInst("Save Replay", -1, x - 95, y, savereplay));
+	gs->add_instance(new ButtonInst("Load Replay", -1, x + 95, y, loadreplay));
 	y += 50;
-	gs->add_instance(new ButtonInst("Client", x - 65, y, client));
-	gs->add_instance(new ButtonInst("Server", x + 65, y, server));
+	gs->add_instance(new ButtonInst("Client", -1, x - 65, y, client));
+	gs->add_instance(new ButtonInst("Server", -1, x + 65, y, server));
 	y += 50;
 }
 
-void menu_loop(GameState* gs, int width, int height) {
+void class_menu_loop(GameState* gs, int width, int height);
+
+void main_menu_loop(GameState* gs, int width, int height) {
 	bool exit = false;
 	int halfw = width / 2;
 
@@ -110,7 +113,77 @@ void menu_loop(GameState* gs, int width, int height) {
 			new AnimatedInst(halfw - 100, 500, -1, -1, 0.0f, 0.0f,
 					AnimatedInst::DEPTH, HELP_TEXT, Colour(255, 255, 255)));
 
-	setup_buttons(gs, &exit, halfw, 300);
+	setup_mainmenu_buttons(gs, &exit, halfw, 300);
+
+	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {
+		gs->get_level()->inst_set.step(gs);
+		gs->draw(false);
+	}
+
+	delete gs->get_level();
+
+	gs->set_level(oldlevel);
+	gs->window_view() = prevview;
+
+	class_menu_loop(gs, width, height);
+}
+
+static void choose_fighter(GameState* gs, GameInst* _, void* flag) {
+	*(bool*) flag = true;
+	gs->game_settings().classn = get_class_by_name("Fighter");
+}
+static void choose_mage(GameState* gs, GameInst* _, void* flag) {
+	*(bool*) flag = true;
+	gs->game_settings().classn = get_class_by_name("Mage");
+}
+static void choose_druid(GameState* gs, GameInst* _, void* flag) {
+//	*(bool*) flag = true;
+//	gs->game_settings().classn = get_class_by_name("Druid");
+}
+static void choose_archer(GameState* gs, GameInst* _, void* flag) {
+//	*(bool*) flag = true;
+//	gs->game_settings().classn = get_class_by_name("Archer");
+}
+
+static void setup_classmenu_buttons(GameState* gs, bool* exit, int x, int y) {
+	ObjCallback chfighter(choose_fighter, exit);
+	ObjCallback chmage(choose_mage, exit);
+	ObjCallback chdruid(choose_druid, exit);
+	ObjCallback charcher(choose_archer, exit);
+
+	x -= 256 - 64;
+	gs->add_instance(
+			new ButtonInst("Mage", get_sprite_by_name("wizard_icon"), x, y,
+					chmage, COL_GOLD));
+	x += 128;
+	gs->add_instance(
+			new ButtonInst("Fighter", get_sprite_by_name("fighter_icon"), x, y,
+					chfighter, COL_GOLD));
+	x += 128;
+	gs->add_instance(
+			new ButtonInst("Druid", get_sprite_by_name("druid_icon"), x, y,
+					chdruid, COL_LIGHT_GRAY));
+	x += 128;
+	gs->add_instance(
+			new ButtonInst("Archer", get_sprite_by_name("archer_icon"), x, y,
+					charcher, COL_LIGHT_GRAY));
+	x += 128;
+}
+
+void class_menu_loop(GameState* gs, int width, int height) {
+	bool exit = false;
+	int halfw = width / 2;
+
+	GameView prevview = gs->window_view();
+	GameLevelState* oldlevel = gs->get_level();
+
+	gs->set_level(new GameLevelState(0, 0, 0, width, height));
+	gs->get_level()->level_number = -1;
+	gs->window_view().x = 0;
+	gs->window_view().y = 0;
+
+	gs->add_instance(new AnimatedInst(halfw, 100, get_sprite_by_name("logo")));
+	setup_classmenu_buttons(gs, &exit, halfw, 300);
 
 	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {
 		gs->get_level()->inst_set.step(gs);

@@ -50,12 +50,8 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, int classn,
 	genlevel.at(epos).has_instance = true;
 	Pos spawn_pos = genlevel.get_world_coordinate(epos);
 
-	sprite_id sprite =
-			local ? get_sprite_by_name("wizard") : get_sprite_by_name(
-							"fighter");
-
 	if (!inst) {
-		inst = new PlayerInst(c.starting_stats, sprite, spawn_pos.x,
+		inst = new PlayerInst(c.starting_stats, spawn_pos.x,
 				spawn_pos.y, local);
 	}
 	inst->last_x = spawn_pos.x;

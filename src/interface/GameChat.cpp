@@ -40,13 +40,13 @@ static void print_dupe_string(const ChatMessage& cm, const font_data& font,
 void ChatMessage::draw(const font_data& font, float alpha, int x, int y) const {
 	Colour sendcol = sender_colour, msgcol = message_colour;
 	sendcol.a *= alpha, msgcol.a *= alpha;
-	Pos offset(0, 0);
+	Dim offset(0, 0);
 	if (!sender.empty()) {
 		offset = gl_printf(font, sendcol, x, y, "%s: ", sender.c_str());
-		x += offset.x;
+		x += offset.w;
 	}
 	offset = gl_printf(font, msgcol, x, y, message.c_str());
-	x += offset.x;
+	x += offset.w;
 	print_dupe_string(*this, font, Pos(x, y), alpha);
 }
 

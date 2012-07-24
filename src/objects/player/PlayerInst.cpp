@@ -10,6 +10,7 @@
 #include "../../gamestate/GameState.h"
 #include "../../display/sprite_data.h"
 #include "../../display/tile_data.h"
+#include "../../stats/class_data.h"
 #include "../../stats/item_data.h"
 #include "../../stats/weapon_data.h"
 
@@ -21,6 +22,14 @@
 #include "../ItemInst.h"
 #include "PlayerInst.h"
 #include "../ProjectileInst.h"
+
+PlayerInst::PlayerInst(const CombatStats& stats, int x, int y,
+		bool local) :
+		CombatGameInst(stats, 0, x, y, RADIUS, true, DEPTH), fieldofview(
+				LINEOFSIGHT), local(local), moving(0), money(0), lives(0), kills(
+				0), deaths(0), previous_spellselect(0), spellselect(-1) {
+	sprite = game_class_data.at(stats.class_stats.classid).sprite;
+}
 
 PlayerInst::~PlayerInst() {
 }

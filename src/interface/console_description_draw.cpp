@@ -52,29 +52,29 @@ const char* monster_speed_description(int speed) {
 static void draw_stat_with_prefix(GameState* gs, const char* prefix, int stat,
 		int x, int y, Colour prefix_col = COL_PALE_YELLOW, Colour stat_col =
 				COL_PALE_RED) {
-	Pos p = gl_printf_y_centered(gs->primary_font(), prefix_col, x, y, "%s",
+	Dim p = gl_printf_y_centered(gs->primary_font(), prefix_col, x, y, "%s",
 			prefix);
-	gl_printf_y_centered(gs->primary_font(), stat_col, p.x + x, y, "%d", stat);
+	gl_printf_y_centered(gs->primary_font(), stat_col, p.w + x, y, "%d", stat);
 }
 static void draw_descript_with_prefix(GameState* gs, const char* prefix,
 		const char* descript, int x, int y, Colour prefix_col = COL_PALE_YELLOW,
 		Colour stat_col = COL_PALE_RED) {
-	Pos p = gl_printf_y_centered(gs->primary_font(), prefix_col, x, y, "%s",
+	Dim p = gl_printf_y_centered(gs->primary_font(), prefix_col, x, y, "%s",
 			prefix);
-	gl_printf_y_centered(gs->primary_font(), stat_col, p.x + x, y, "%s",
+	gl_printf_y_centered(gs->primary_font(), stat_col, p.w + x, y, "%s",
 			descript);
 }
 
 static void draw_range_with_prefix(GameState* gs, const char* prefix,
 		const Range& r, int x, int y, Colour prefix_col = COL_PALE_YELLOW,
 		Colour stat_col = COL_PALE_RED) {
-	Pos p = gl_printf_y_centered(gs->primary_font(), prefix_col, x, y, "%s",
+	Dim p = gl_printf_y_centered(gs->primary_font(), prefix_col, x, y, "%s",
 			prefix);
 	if (r.min == r.max) {
-		gl_printf_y_centered(gs->primary_font(), stat_col, p.x + x, y, "%d",
+		gl_printf_y_centered(gs->primary_font(), stat_col, p.w + x, y, "%d",
 				r.min);
 	} else {
-		gl_printf_y_centered(gs->primary_font(), stat_col, p.x + x, y,
+		gl_printf_y_centered(gs->primary_font(), stat_col, p.w + x, y,
 				"%d to %d", r.min, r.max);
 	}
 }

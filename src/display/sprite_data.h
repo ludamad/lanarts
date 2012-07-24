@@ -8,7 +8,6 @@
 
 #include "../lanarts_defines.h"
 #include "../data/FilenameList.h"//For FilenameList
-
 struct SpriteEntry {
 	enum sprite_type {
 		ANIMATED, DIRECTIONAL
@@ -23,6 +22,9 @@ struct SpriteEntry {
 
 	int height() {
 		return img().height;
+	}
+	Dim size() {
+		return Dim(width(), height());
 	}
 
 	SpriteEntry(const std::string& name, const FilenameList& filenames,

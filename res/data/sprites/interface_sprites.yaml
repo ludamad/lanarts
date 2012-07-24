@@ -26,4 +26,16 @@ sprites:
     
   - name: right_arrow
     file: res/sprites/interface/right_arrow.png
+        
+  - name: archer_icon
+    file: res/sprites/interface/class_icons/archer.png
+    
+  - name: druid_icon
+    file: res/sprites/interface/class_icons/druid.png
+    
+  - name: fighter_icon
+    file: res/sprites/interface/class_icons/fighter.png
+    
+  - name: wizard_icon
+    file: res/sprites/interface/class_icons/wizard.png
     

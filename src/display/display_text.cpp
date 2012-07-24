@@ -56,14 +56,14 @@ static int process_string(const font_data& font, const char* text,
 
 //
 /* General gl_print function for others to delegate to */
-static Pos gl_print_impl(const font_data& font, const Colour& colour, Pos p,
+static Dim gl_print_impl(const font_data& font, const Colour& colour, Pos p,
 		int max_width, bool center_x, bool center_y, bool actually_print,
 		const char* fmt, va_list ap) {
 	char text[512];
 	vsnprintf(text, 512, fmt, ap);
 	va_end(ap);
 
-	Pos offset(0, 0);
+	Dim offset(0, 0);
 
 	std::vector<int> line_splits;
 	int measured_width = process_string(font, text, max_width, line_splits);
@@ -79,7 +79,7 @@ static Pos gl_print_impl(const font_data& font, const Colour& colour, Pos p,
 		int len = 0;
 		int eol = line_splits[linenum];
 
-		offset.y += font.h;
+		offset.h += font.h;
 
 		for (; i < eol; i++) {
 			unsigned char chr = text[i];
@@ -91,16 +91,16 @@ static Pos gl_print_impl(const font_data& font, const Colour& colour, Pos p,
 			if (actually_print) {
 				gl_draw_image(cdata.img,
 						p.x + len - (cdata.advance - cdata.left),
-						p.y + offset.y - cdata.move_up, colour);
+						p.y + offset.h - cdata.move_up, colour);
 			}
 		}
-		offset.x = std::max(len, offset.x);
-		offset.y += 1;
+		offset.w = std::max(len, offset.w);
+		offset.h += 1;
 	}
 	return offset;
 }
 /* printf-like function that draws to the screen, returns dimensions of formatted string*/
-Pos gl_printf(const font_data& font, const Colour& colour, float x, float y,
+Dim gl_printf(const font_data& font, const Colour& colour, float x, float y,
 		const char* fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
@@ -110,7 +110,7 @@ Pos gl_printf(const font_data& font, const Colour& colour, float x, float y,
 }
 
 /* printf-like function that draws to the screen, returns width of formatted string*/
-Pos gl_printf_bounded(const font_data& font, const Colour& colour, float x,
+Dim gl_printf_bounded(const font_data& font, const Colour& colour, float x,
 		float y, int max_width, bool center_y, const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
@@ -119,7 +119,7 @@ Pos gl_printf_bounded(const font_data& font, const Colour& colour, float x,
 			fmt, ap);
 }
 /* printf-like function that draws to the screen, returns width of formatted string*/
-Pos gl_printf_y_centered_bounded(const font_data& font, const Colour& colour,
+Dim gl_printf_y_centered_bounded(const font_data& font, const Colour& colour,
 		float x, float y, int max_width, bool center_y, const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
@@ -128,7 +128,7 @@ Pos gl_printf_y_centered_bounded(const font_data& font, const Colour& colour,
 			fmt, ap);
 }
 
-Pos gl_text_dimensions(const font_data& font, const char *fmt, ...) {
+Dim gl_text_dimensions(const font_data& font, const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
 
@@ -137,7 +137,7 @@ Pos gl_text_dimensions(const font_data& font, const char *fmt, ...) {
 }
 
 /* printf-like function that draws to the screen, returns width of formatted string*/
-Pos gl_printf_centered(const font_data& font, const Colour& colour, float x,
+Dim gl_printf_centered(const font_data& font, const Colour& colour, float x,
 		float y, const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
@@ -146,7 +146,7 @@ Pos gl_printf_centered(const font_data& font, const Colour& colour, float x,
 }
 
 /* printf-like function that draws to the screen, returns width of formatted string*/
-Pos gl_printf_y_centered(const font_data& font, const Colour& colour, float x,
+Dim gl_printf_y_centered(const font_data& font, const Colour& colour, float x,
 		float y, const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
@@ -156,7 +156,7 @@ Pos gl_printf_y_centered(const font_data& font, const Colour& colour, float x,
 }
 
 /* printf-like function that draws to the screen, returns width of formatted string*/
-Pos gl_printf_x_centered(const font_data& font, const Colour& colour, float x,
+Dim gl_printf_x_centered(const font_data& font, const Colour& colour, float x,
 		float y, const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
