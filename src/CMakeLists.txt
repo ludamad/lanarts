@@ -72,6 +72,7 @@ set( lanarts_src
 	main.cpp
 	main_menu.cpp
 
+	levelgen/areagen.h
 	levelgen/enemygen.cpp
 	levelgen/featuregen.cpp
 	levelgen/GeneratedLevel.cpp
@@ -180,6 +181,7 @@ set( lanarts_include
 	pathfind/astar_pathfind.h
 	pathfind/pathfind.h
 
+	levelgen/areagen.h
 	levelgen/enemygen.h
 	levelgen/featuregen.h
 	levelgen/GeneratedLevel.h

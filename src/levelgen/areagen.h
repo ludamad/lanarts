@@ -1,10 +1,10 @@
 /*
- * dungeon_data.h:
- *  Defines dungeon room generation settings
+ * areagen.h:
+ *  Contains procedures related to generating a dungeon area
  */
 
-#ifndef DUNGEON_DATA_H_
-#define DUNGEON_DATA_H_
+#ifndef AREAGEN_H_
+#define AREAGEN_H_
 
 #include <vector>
 #include "../lua/LuaValue.h"
@@ -102,8 +102,4 @@ struct DungeonBranch {
 	}
 };
 
-extern DungeonBranch game_dungeon_data[];
-extern std::vector<LevelGenSettings> game_dungeon_yaml;
-extern size_t game_dungeon_n;
-
-#endif /* DUNGEON_DATA_H_ */
+#endif /* AREAGEN_H_ */
