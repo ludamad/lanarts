@@ -30,3 +30,7 @@ sprites:
   - name: closed door
     file: res/sprites/features/closed_door.png
     
+  - name: berserk_effected
+    colour: [255,255,255,0]
+    file: res/sprites/effects/berserk.png
+    

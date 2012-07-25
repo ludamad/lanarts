@@ -13,6 +13,7 @@ struct SpriteEntry {
 		ANIMATED, DIRECTIONAL
 	};
 	sprite_type type;
+	Colour drawcolour;
 	std::string name;
 	std::vector<GLimage> images;
 
@@ -28,8 +29,8 @@ struct SpriteEntry {
 	}
 
 	SpriteEntry(const std::string& name, const FilenameList& filenames,
-			sprite_type type = ANIMATED) :
-			type(type), name(name) {
+			sprite_type type = ANIMATED, Colour drawcolour = Colour()) :
+			type(type), name(name), drawcolour(drawcolour) {
 		for (int i = 0; i < filenames.size(); i++) {
 			images.push_back(GLimage(filenames[i]));
 		}

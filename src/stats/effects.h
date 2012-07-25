@@ -27,6 +27,7 @@ struct EffectStats {
 	LuaValue add(GameState* gs, effect_id effect, int length);
 	Effect* get(effect_id effect);
 	void step(GameState* gs, CombatGameInst* inst);
+	void draw_effect_sprites(GameState* gs, const Pos& p);
 	Colour effected_colour();
 
 	void process(GameState* gs, CombatGameInst* inst,

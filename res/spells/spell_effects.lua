@@ -21,11 +21,13 @@ function poison_statmod(effect, obj, old, new)
 	new.willpower = math.max(0, new.willpower - 5)
 end
 
-function berserk_statmod(effect, obj, old, new)
-end
-
-function berserk_deinit(effect, obj)
+function berserk_statmod(effect, obj, old, new)	
+	new.strength = new.strength + 5
+	new.defence = new.defence + 5
+	new.cooldown_mult = new.cooldown_mult / 1.25
 end
 
 function exhausted_statmod(effect, obj, old, new)
+	new.speed = new.speed / 2
+	new.cooldown_mult = new.cooldown_mult * 1.25
 end

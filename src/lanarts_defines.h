@@ -35,6 +35,10 @@ struct Colour {
 		ret.a *= alpha;
 		return ret;
 	}
+	Colour multiply(const Colour& o) const {
+		return Colour(r * (o.r + 1) / 256, g * (o.g + 1) / 256,
+				b * (o.b + 1) / 256, a * (o.a + 1) / 256);
+	}
 };
 
 /*Represents a width & height*/
