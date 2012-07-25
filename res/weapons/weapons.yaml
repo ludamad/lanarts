@@ -1,0 +1,51 @@
+---
+weapons:
+  - name: Unarmed
+    description: You are currently fighting with your fists.
+    weapon_class: unarmed
+    spr_item: hand
+    #Damage: { base: <range>, strength: <multiplier>, magic: <multiplier> }
+    damage: {base: [2,5], strength: 1.0}
+    power: {base: 0, strength: 0.2}
+    range: 7
+    cooldown: 30
+
+  - name: Dagger
+    description: A short, swift, pointy blade.
+    weapon_class: short blades
+    damage: {base: [4,6], strength: 1.0}
+    power: {base: 0, strength: 0.2}
+    range: 7
+    cooldown: 30
+    spr_item: dagger
+
+  - name: Short Sword
+    weapon_class: short blades
+    description: An easy-to-wield short sword.
+    max_targets: 2
+    damage: {base: [4,8], strength: 1.0}
+    power: {base: 1, strength: 0.2}
+    range: 7
+    cooldown: 35
+    spr_item: short sword
+
+  - name: Mace
+    weapon_class: maces and flails
+    description: An large, strong mace.
+    max_targets: 2
+    damage: {base: [5,10], strength: 1.25}
+    power: {base: [2,5], strength: 0.5}
+    range: 7
+    cooldown: 55
+    spr_item: mace
+
+  - name: Short Bow
+    description: A handy small bow.
+    weapon_class: bows
+    uses_projectile: yes
+    #Stats
+    damage: {base: [4,6], strength: 1.0}
+    power: {base: 0, strength: 0.2}
+    range: 300
+    cooldown: 40
+    spr_item: bow1

@@ -1,0 +1,73 @@
+---
+#Enemy Markup
+enemies:
+  - name: Skeleton
+    sprite: skeleton
+    radius: 11
+    xpaward: 10
+    appear_message: A re-animated skeleton appears!
+    defeat_message: The skeleton is broken unto a pile of bones.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 50
+        hpregen: 0.03
+        movespeed: 2
+        #base stats:
+        strength: 10
+        defence: 2
+        willpower: 2  
+        
+  - name: Skeleton Fighter
+    sprite: skeleton fighter
+    radius: 14
+    xpaward: 10
+    appear_message: A re-animated skeleton appears!
+    defeat_message: The skeleton is broken unto a pile of bones.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 50
+        hpregen: 0.03
+        movespeed: 2
+        #base stats:
+        strength: 10
+        defence: 2
+        willpower: 2
+        
+  - name: Zombie
+    sprite: zombie
+    death_sprite: green blood
+    appear_message: A re-animated zombie appears!
+    defeat_message: The zombie is beaten into a mess of flesh.
+    radius: 14
+    xpaward: 10
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 60
+        hpregen: 0.05
+        movespeed: 2
+        strength: 20
+        defence: 5  
+        willpower: 5
+      
+  - name: Krell
+    sprite: franken
+    death_sprite: green blood
+    description: A creature of unholy will to live.
+    appear_message: A horrible krell enters the scene.
+    defeat_message: The krell dies at last.
+    radius: 14
+    xpaward: 25
+    step_func: #Inline lua, heal very fast when under 23 hp
+      function(enemy)
+        if enemy.stats.hp < 18 then 
+          enemy.stats.hp = enemy.stats.hp + 1
+        end
+      end
+    stats:
+        attacks: [ {weapon: Slow Melee} ]
+        hp: 80
+        hpregen: 0.05
+        movespeed: 2
+        strength: 30
+        defence: 10
+        willpower: 15

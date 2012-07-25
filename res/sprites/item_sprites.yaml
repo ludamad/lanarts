@@ -1,0 +1,37 @@
+---
+sprites: 
+  - name: ambrosia
+    file: res/sprites/items/misc/ambrosia.png
+
+  - name: amulet
+    file: res/sprites/items/misc/amulet.png
+
+  - name: mana potion
+    file: res/sprites/items/misc/brilliant_blue.png
+
+  - name: stone
+    file: res/sprites/effects/stone.png
+
+  - name: book
+    file: res/sprites/items/misc/book.png
+
+  - name: gold
+    file: res/sprites/items/misc/gold.png
+
+  - name: scroll_haste
+    file: res/sprites/items/scrolls/scroll_haste.png
+
+  - name: scroll_strength
+    file: res/sprites/items/scrolls/scroll_str.png
+
+  - name: scroll_defence
+    file: res/sprites/items/scrolls/scroll_def.png
+
+  - name: scroll_magic
+    file: res/sprites/items/scrolls/scroll_mag.png
+
+  - name: scroll_will
+    file: res/sprites/items/scrolls/scroll_will.png
+
+  - name: health_potion
+    file: res/sprites/items/misc/redpotion.png

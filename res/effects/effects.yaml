@@ -1,0 +1,19 @@
+--- 
+
+#Effect Markup
+    
+effects:
+  - name: Haste
+    stat_func: haste_statmod
+    testvalue: 1
+
+  - name: Poison
+    stat_func: poison_statmod
+    step_func: poison_step
+
+  - name: Berserk
+    stat_func: berserk_statmod
+    deinit_func: berserk_deinit
+
+  - name: Exhausted
+    stat_func: exhausted_statmod

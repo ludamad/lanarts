@@ -1,0 +1,53 @@
+---
+tilesets:
+
+  - tileset: grass_tiles
+    floor_tile: grass
+    wall_tile: grass_tree
+
+  - tileset: sand_tiles
+    floor_tile: sand_rock
+    wall_tile: hive_wall
+
+  - tileset: lair_tiles1
+    floor_tile: lair_floor
+    alt_floor_tile: mesh
+    wall_tile: marble_wall
+
+  - tileset: lair_tiles2
+    floor_tile: lair_floor
+    alt_floor_tile: cobalt_floor
+    wall_tile: hive_wall
+
+  - tileset: cobalt_tiles
+    floor_tile: cobalt_floor
+    alt_floor_tile: mesh
+    corridor_tile: mesh
+    wall_tile: marble_wall
+
+  - tileset: pebble_tiles
+    floor_tile: pebble_brown
+    wall_tile: brick
+    corridor_tile: hive
+    alt_wall_tile: brick
+    alt_floor_tile: hive
+    alt_corridor_tile: hive
+
+  - tileset: crystal_tiles
+    floor_tile: crystal_floor
+    wall_tile: crystal_wall
+    corridor_tile: mesh
+    alt_floor_tile: crystal_floor
+    alt_wall_tile: marble_wall
+    alt_corridor_tile: crystal_floor
+
+  - tileset: crystal_tiles_with_marble
+    floor_tile: crystal_floor
+    wall_tile: marble_wall
+    corridor_tile: mesh
+    alt_wall_tile: crystal_wall
+    
+  - tileset: cobble
+    floor_tile: cobble_blood
+    wall_tile: stone_dark
+    

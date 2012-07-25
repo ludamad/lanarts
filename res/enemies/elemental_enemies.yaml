@@ -1,0 +1,50 @@
+---
+#Enemy Markup
+enemies:
+  - name: Cloud Elemental
+    sprite: cloud elemental
+    appear_message: A cloud elemental floats onto the scene.
+    defeat_message: The cloud elemental dissolves.
+    radius: 12
+    xpaward: 10
+    stats:
+        attacks: [ {projectile: Storm Bolt} ]
+        movespeed: 1.5
+        hp: 45
+        hpregen: 0.02
+        strength: 5
+        magic: 15
+        defence: 5  
+        willpower: 5
+
+  - name: Storm Elemental
+    sprite: storm elemental
+    radius: 14
+    xpaward: 20
+    appear_message: A storm elemental floats onto the scene.
+    defeat_message: The storm elemental dissolves.
+    stats:
+        attacks: [ {projectile: Storm Bolt} ]
+        movespeed: 1
+        hp: 50
+        hpregen: 0.05
+        strength: 5
+        magic: 25
+        defence: 8  
+        willpower: 8
+                
+  - name: Hell Forged
+    sprite: hell_forged
+    radius: 12
+    xpaward: 50
+    appear_message: A hell-forged creature of fire appears before you!
+    defeat_message: The hell-forged is destroyed.
+    stats:
+        attacks: [ {projectile: Slow Fire Bolt} ]
+        movespeed: 3
+        hp: 150
+        hpregen: 0.01
+        strength: 35
+        magic: 35
+        defence: 15
+        willpower: 15

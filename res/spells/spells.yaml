@@ -1,0 +1,49 @@
+---
+spells:
+
+  - name: Fire Bolt
+    description:
+     A fast bolt of fire, hits a single target.
+     The bolt can bounce off walls safely.
+    mp_cost: 10
+    cooldown: 40
+    spr_spell: fire bolt
+    projectile: Fire Bolt
+
+  - name: Magic Blast
+    description:
+     A slow, powerful magic blast of energy.
+     The blast can bounce off an enemy twice before dissipating.
+    mp_cost: 20
+    cooldown: 65
+    spr_spell: magic blast
+    projectile: Magic Blast
+
+  - name: Poison Cloud
+    description:
+     A poisonous cloud that causes damage over time.
+    mp_cost: 20
+    cooldown: 50
+    spr_spell: poison
+    projectile: Poison Cloud
+
+  - name: Deathwish
+    description:
+     Damages all enemies in your vision.
+    mp_cost: 50
+    cooldown: 100
+    spr_spell: book
+    action_func: attack_all_seen
+
+  - name: Blink
+    description:
+     Takes you instantly across a short distance.
+    spr_spell: blink
+    mp_cost: 50
+    cooldown: 130
+    can_cast_with_cooldown: yes
+    can_cast_with_held_key: no
+    prereq_func: function(caster, x, y) return radius_visible_check(x, y, caster.radius) and not obj_solid_check(caster, x, y, caster.radius) end
+    action_func: function(caster, x, y) caster:move_to(x,y) end
+    #NB: if the autotarget_func returns nil, the spell is not performed
+    autotarget_func: spell_choose_safest_square

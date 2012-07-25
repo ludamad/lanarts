@@ -1,0 +1,37 @@
+---
+#Enemy Markup
+enemies:
+  - name: Unseen Horror
+    sprite: unseen horror
+    death_sprite: purple blood
+    description: A creature adept at withstanding powerful magical spells.
+    appear_message: A strange one-eyed creatured approaches ...
+    defeat_message: The horrible one-eyed creatured dies.
+    radius: 14
+    xpaward: 30
+    stats:
+        attacks: [ {weapon: Fast Melee} ]
+        hp: 130
+        hpregen: 0
+        movespeed: 3
+        strength: 25
+        defence: 0
+        willpower: 80 
+
+  - name: Imp
+    sprite: imp
+    death_sprite: blood
+    description: A small demon that regenerates wounds unnaturally fast.
+    appear_message: An imp shows himself!
+    defeat_message: The imp curses your name as he is defeated.
+    radius: 12
+    xpaward: 50
+    stats:
+        attacks: [ {weapon: Slow Melee} ]
+        movespeed: 3.3
+        hp: 50
+        hpregen: 0.25
+        strength: 20
+        magic: 20
+        defence: 10  
+        willpower: 10
