@@ -20,6 +20,8 @@ EffectEntry parse_effect(const YAML::Node& n) {
 			parse_defaulted(n, "finish_func", std::string()));
 	entry.stat_func = LuaValue(parse_defaulted(n, "stat_func", std::string()));
 	entry.step_func = LuaValue(parse_defaulted(n, "step_func", std::string()));
+	entry.effected_colour = parse_defaulted(n, "effected_colour", Colour());
+	entry.effected_sprite = parse_sprite_number(n, "effected_sprite");
 	entry.additive_duration = parse_defaulted(n, "additive_duration", false);
 	return entry;
 }

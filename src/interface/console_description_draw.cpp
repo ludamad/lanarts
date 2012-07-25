@@ -217,6 +217,8 @@ void draw_console_item_description(GameState* gs, const Item& item) {
 		draw_projectile_description_overlay(gs, item.as_projectile());
 	} else if (item.is_weapon()) {
 		draw_weapon_description_overlay(gs, item.as_weapon());
+	} else if (item.is_armour()) {
+//		draw_weapon_description_overlay(gs, item.as_weapon());
 	}
 }
 

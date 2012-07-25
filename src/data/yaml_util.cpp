@@ -118,6 +118,10 @@ static Item parse_as_item(const YAML::Node& n) {
 	std::string s = parse_str(n);
 	return Item(get_item_by_name(s.c_str()));
 }
+static Weapon parse_as_weapon(const YAML::Node& n) {
+	std::string s = parse_str(n);
+	return Weapon(get_weapon_by_name(s.c_str()));
+}
 
 Inventory parse_inventory(const YAML::Node& n) {
 	Inventory ret;
@@ -131,6 +135,9 @@ Inventory parse_inventory(const YAML::Node& n) {
 Equipment parse_equipment(const YAML::Node& n) {
 	Equipment ret;
 	ret.inventory = parse_inventory(n["inventory"]);
+	if (yaml_has_node(n, "weapon")) {
+		ret.weapon = parse_as_weapon(n["weapon"]);
+	}
 	return ret;
 }
 
@@ -198,6 +205,18 @@ AttackStats parse_attack(const YAML::Node & n) {
 		ret.projectile = Projectile(get_projectile_by_name(name.c_str()));
 	}
 	return ret;
+}
+
+const YAML::Node& operator >>(const YAML::Node& n, Colour& colour) {
+	colour.r = parse_int(n[0]);
+	colour.g = parse_int(n[1]);
+	colour.b = parse_int(n[2]);
+	if (n.size() > 3) {
+		colour.a = parse_int(n[3]);
+	} else {
+		colour.a = 255;
+	}
+	return n;
 }
 
 void load_data_impl_template(const FilenameList& filenames,

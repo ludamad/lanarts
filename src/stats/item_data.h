@@ -15,7 +15,7 @@
 
 struct ItemEntry {
 	enum equip_type {
-		NONE, WEAPON, PROJECTILE, HELMET, SHIELD, ARMOUR, BOOTS
+		NONE, WEAPON, PROJECTILE, ARMOUR
 	};
 	std::string name, description;
 	std::string use_message;

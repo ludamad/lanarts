@@ -42,7 +42,8 @@ void load_armour_item_entries() {
 		ArmourEntry& entry = game_armour_data[i];
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
 		game_item_data.push_back(
-				ItemEntry(entry.name, entry.description, "", default_radius, entry.item_sprite,
-						"equip", "", false, entry.equiptype, i));
+				ItemEntry(entry.name, entry.description, "", default_radius,
+						entry.item_sprite, "equip", "", false,
+						ItemEntry::ARMOUR, i));
 	}
 }

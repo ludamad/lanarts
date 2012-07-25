@@ -76,6 +76,7 @@ void CombatGameInst::draw(GameState *gs) {
 	GameView& view = gs->window_view();
 	SpriteEntry& spr = game_sprite_data[sprite];
 	Colour draw_colour(255, 255, 255);
+	draw_colour = effects().effected_colour();
 
 	int haste_effect = get_effect_by_name("Haste");
 	if (effects().get(haste_effect)) {
@@ -88,8 +89,8 @@ void CombatGameInst::draw(GameState *gs) {
 		float s = 1 - hurt_alpha_value(cooldowns().hurt_cooldown);
 		draw_colour = Colour(255, 255 * s, 255 * s);
 	}
-	gl_draw_sprite(view, sprite, x - spr.width() / 2, y - spr.height() / 2,
-			vx, vy, gs->frame(), draw_colour);
+	gl_draw_sprite(view, sprite, x - spr.width() / 2, y - spr.height() / 2, vx,
+			vy, gs->frame(), draw_colour);
 
 	if (is_resting) {
 		GLimage& restimg =

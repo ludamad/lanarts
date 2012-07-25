@@ -1,0 +1,18 @@
+--- 
+
+#Effect Markup
+    
+effects:
+  - name: Poison
+    stat_func: poison_statmod
+    poison_rate: 28
+    init_func: poison_init
+    step_func: poison_step
+
+  - name: Berserk
+    stat_func: berserk_statmod
+    deinit_func: berserk_deinit
+    effected_colour: [255,160,160] #RGB
+
+  - name: Exhausted
+    stat_func: exhausted_statmod

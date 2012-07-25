@@ -7,7 +7,7 @@ default_items: &default_items
   - { item: Silver Arrow,       chance: 10,  quantity: [1,4]   }
   - { item: Short Bow,          chance: 10                     }
   - { item: Stone,              chance: 10,  quantity: [2,8]   }
-  - { item: Gold,               chance: 75,  quantity: [5,20]  }
+  - { item: Gold,               chance: 70,  quantity: [5,20]  }
   - { item: Haste Scroll,       chance: 10                     }
   - { item: Health Potion,      chance: 10                     }
   - { item: Mana Potion,        chance: 10                     }
@@ -18,6 +18,8 @@ default_items: &default_items
   - { item: Magic Scroll,       chance: 2                      }
   - { item: Defence Scroll,     chance: 2                      }
   - { item: Will Scroll,        chance: 2                      }
+  - { item: Leather Armour,     chance: 4                      }
+  - { item: Magic Sword,        chance: 2                      }
 
 easy_animals: &easy_animals
   - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 2 }

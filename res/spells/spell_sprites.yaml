@@ -27,3 +27,6 @@ sprites:
   - name: large fire
     file: res/sprites/effects/cloud_fire2.png
     
+  - name: berserk
+    file: res/sprites/spells/berserk.png
+    

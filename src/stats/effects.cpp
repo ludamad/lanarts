@@ -23,6 +23,19 @@ bool EffectStats::has_active_effect() const {
 	return false;
 }
 
+Colour EffectStats::effected_colour() {
+	int r = 255 * 256, g = 255 * 256, b = 255 * 256, a = 255 * 256;
+	for (int i = 0; i < EFFECTS_MAX; i++) {
+		if (effects[i].t_remaining > 0) {
+			EffectEntry& eentry = game_effect_data.at(effects[i].effect);
+			const Colour& c = eentry.effected_colour;
+			r *= c.r + 1, g *= c.g + 1, b *= c.b + 1, a *= c.a + 1;
+			r /= 256, g /= 256, b /= 256, a /= 256;
+		}
+	}
+	return Colour(r / 256, g / 256, b / 256, a / 256);
+}
+
 void EffectStats::process(GameState* gs, CombatGameInst* inst,
 		EffectiveStats& effective) const {
 	if (!has_active_effect())
@@ -37,12 +50,16 @@ void EffectStats::process(GameState* gs, CombatGameInst* inst,
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining > 0) {
 			game_effect_data.at(effects[i].effect).stat_func.push(L);
-			effects[i].state.push(L);
-			lua_push_gameinst(L, inst);
+			if (!lua_isnil(L, -1)) {
+				effects[i].state.push(L);
+				lua_push_gameinst(L, inst);
 
-			lua_pushvalue(L, baseind);
-			lua_pushvalue(L, affind);
-			lua_call(L, 4, 0);
+				lua_pushvalue(L, baseind);
+				lua_pushvalue(L, affind);
+				lua_call(L, 4, 0);
+			} else {
+				lua_pop(L, 1);
+			}
 		}
 	}
 //	basestats = lua_get_combatstats(L, baseind);

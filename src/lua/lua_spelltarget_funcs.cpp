@@ -26,7 +26,7 @@ static int spell_choose_safest_square(lua_State* L) {
 	PlayerInst* inst = dynamic_cast<PlayerInst*>(lua_gameinst_arg(L, 1));
 	//CombatGameInst* target = dynamic_cast<CombatGameInst*>(lua_gameinst_arg(L, 2));
 	Pos p;
-	if (find_safest_square(inst, gs, p)) {
+	if (!lua_isnil(L, 2) && find_safest_square(inst, gs, p)) {
 		lua_pushnumber(L, round_to_multiple(p.x, TILE_SIZE, true));
 		lua_pushnumber(L, round_to_multiple(p.y, TILE_SIZE, true));
 		return 2;
@@ -40,12 +40,17 @@ static int spell_choose_safest_square(lua_State* L) {
 static int spell_choose_target(lua_State* L) {
 	GameState* gs = lua_get_gamestate(L);
 	//PlayerInst* inst = dynamic_cast<PlayerInst*>(lua_gameinst_arg(L, 1));
-	CombatGameInst* target = dynamic_cast<CombatGameInst*>(lua_gameinst_arg(L,
-			2));
-	if (target) {
-		lua_pushnumber(L, target->x);
-		lua_pushnumber(L, target->y);
-		return 2;
+	if (!lua_isnil(L, 2)) {
+		CombatGameInst* target = dynamic_cast<CombatGameInst*>(lua_gameinst_arg(
+				L, 2));
+		if (target) {
+			lua_pushnumber(L, target->x);
+			lua_pushnumber(L, target->y);
+			return 2;
+		} else {
+			lua_pushnil(L);
+			return 1;
+		}
 	} else {
 		lua_pushnil(L);
 		return 1;

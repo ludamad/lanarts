@@ -11,6 +11,7 @@ class_files:
 
 effect_files: 
   - effects/effects.yaml
+  - spells/spell_effects.yaml
 
 enemy_files: 
   - enemies/animal_enemies.yaml
@@ -27,20 +28,22 @@ level_files:
   - levels/levels.yaml
 
 projectile_files: 
-  - projectiles/projectiles.yaml
-  - projectiles/enemy_projectiles.yaml
-  - projectiles/spell_projectiles.yaml
+  - items/projectiles.yaml
+  - enemies/enemy_projectiles.yaml
+  - spells/spell_projectiles.yaml
 
-spell_files: spells/spells.yaml
+spell_files: 
+  - spells/fighter_spells.yaml
+  - spells/spells.yaml
 
 sprite_files: 
- - sprites/armour_sprites.yaml
- - sprites/interface_sprites.yaml
- - sprites/item_sprites.yaml
- - sprites/enemy_sprites.yaml
- - sprites/other_sprites.yaml
- - sprites/spell_sprites.yaml
- - sprites/weapon_sprites.yaml
+  - sprites/armour_sprites.yaml
+  - sprites/interface_sprites.yaml
+  - sprites/item_sprites.yaml
+  - sprites/enemy_sprites.yaml
+  - sprites/other_sprites.yaml
+  - spells/spell_sprites.yaml
+  - sprites/weapon_sprites.yaml
 
 tile_files: 
   - tiles/tiles.yaml
@@ -49,5 +52,5 @@ tileset_files:
   - tiles/tilesets.yaml
 
 weapon_files: 
-  - weapons/weapons.yaml
-  - weapons/enemy_weapons.yaml
+  - items/weapons.yaml
+  - enemies/enemy_weapons.yaml

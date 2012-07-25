@@ -172,13 +172,15 @@ static bool lua_spell_get_target(GameState* gs, PlayerInst* p, LuaValue& action,
 	lua_State* L = gs->get_luastate();
 	obj_id target_id = gs->monster_controller().current_target();
 	GameInst* target = gs->get_instance(target_id);
-	if (!target) {
-		return false;
-	}
+
 	int beforecall_idx = lua_gettop(L);
 	action.push(L);
 	lua_push_gameinst(L, p);
-	lua_push_gameinst(L, target);
+	if (!target) {
+		lua_pushnil(L);
+	} else {
+		lua_push_gameinst(L, target);
+	}
 
 	// Allow for multiple return values
 	// read the stack size difference to find out how many were returned

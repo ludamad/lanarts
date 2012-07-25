@@ -36,7 +36,9 @@ classes:
 
   - name: Fighter
     sprite: fighter
-    spells: []
+    spells:
+      - spell: Berserk
+        level_needed: 1
     start_stats:
         movespeed: 4
         hp: 100
@@ -48,8 +50,8 @@ classes:
         willpower: 3
         magic: 2
         equipment:
+          weapon: Dagger
           inventory:
-            - item: Dagger
             - item: Short Bow
             - item: Arrow
               amount: 10

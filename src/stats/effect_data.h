@@ -12,11 +12,14 @@
 
 struct EffectEntry {
 	std::string name;
-	LuaValue stat_func;
-	LuaValue init_func;
-	LuaValue finish_func;
-	LuaValue step_func;
+	LuaValue stat_func, init_func, finish_func, step_func;
+	Colour effected_colour;
+	sprite_id effected_sprite;
 	bool additive_duration;
+
+	EffectEntry() :
+			effected_sprite(-1), additive_duration(false) {
+	}
 
 	void init(lua_State* L) {
 		init_func.initialize(L);

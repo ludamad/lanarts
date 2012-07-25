@@ -46,6 +46,8 @@ const YAML::Node& operator >>(const YAML::Node& n, CoreStatMultiplier& sm);
 const YAML::Node& operator >>(const YAML::Node& n, FilenameList& filenames);
 const YAML::Node& operator >>(const YAML::Node& n,
 		std::vector<AttackStats>& attacks);
+const YAML::Node& operator >>(const YAML::Node& n,
+		Colour& colour);
 
 template<class T>
 inline T parse_defaulted(const YAML::Node& n, const char* key, const T& dflt) {
