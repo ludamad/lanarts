@@ -7,7 +7,7 @@
 dofile "res/enemies/enemies.lua"
 dofile "res/items/items.lua"
 dofile "res/effects/effects.lua"
-dofile "res/spell/spell_effects.lua"
+dofile "res/spells/spell_effects.lua"
 dofile "res/spells/spells.lua"
 dofile "res/levels/levels.lua"
 
