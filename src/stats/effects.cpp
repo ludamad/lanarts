@@ -51,9 +51,9 @@ void EffectStats::process(GameState* gs, CombatGameInst* inst,
 	//pop base&affected
 }
 
-static void lua_effectstep_callback(lua_State* L, Effect& effect,
-		CombatGameInst* inst) {
-	game_effect_data.at(effect.effect).step_func.push(L);
+static void lua_effect_func_callback(lua_State* L, LuaValue& value,
+		Effect& effect, CombatGameInst* inst) {
+	value.push(L);
 	if (lua_isnil(L, -1)) {
 		lua_pop(L, 1);
 		return;
@@ -67,9 +67,12 @@ void EffectStats::step(GameState* gs, CombatGameInst* inst) {
 	lua_State* L = gs->get_luastate();
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining > 0) {
+			EffectEntry& eentry = game_effect_data.at(effects[i].effect);
 			effects[i].t_remaining--;
-			lua_effectstep_callback(L, effects[i], inst);
+			lua_effect_func_callback(L, eentry.step_func, effects[i], inst);
 			if (effects[i].t_remaining == 0) {
+				lua_effect_func_callback(L, eentry.finish_func, effects[i],
+						inst);
 				effects[i].state = LuaValue();
 			}
 		}
@@ -86,9 +89,9 @@ Effect* EffectStats::get(int effect) {
 	return NULL;
 }
 
-static void lua_init_table(lua_State* L, LuaValue& value, effect_id effect) {
-	value.table_initialize(L);
+static void lua_init_effect(lua_State* L, LuaValue& value, effect_id effect) {
 	EffectEntry& eentry = game_effect_data.at(effect);
+	value.table_initialize(L);
 	value.push(L);
 	/* Set self as metatable*/
 	lua_pushvalue(L, -1);
@@ -96,6 +99,12 @@ static void lua_init_table(lua_State* L, LuaValue& value, effect_id effect) {
 	/* Set index as effect object */
 	lua_effects.table_push_value(L, eentry.name.c_str());
 	lua_setfield(L, -2, "__index");
+	/* Call init function */
+	if (!eentry.init_func.empty()) {
+		eentry.init_func.push(L);
+		value.push(L);
+		lua_call(L, 1, 0);
+	}
 	/* Pop self */
 	lua_pop(L, 1);
 }
@@ -107,7 +116,7 @@ LuaValue EffectStats::add(GameState* gs, effect_id effect, int length) {
 			effects[i].effect = effect;
 			effects[i].t_remaining = std::max(effects[i].t_remaining, length);
 			if (effects[i].state.empty()) {
-				lua_init_table(L, effects[i].state, effect);
+				lua_init_effect(L, effects[i].state, effect);
 			}
 			return effects[i].state;
 		}

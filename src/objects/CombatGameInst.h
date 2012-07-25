@@ -24,7 +24,7 @@ public:
 	CombatGameInst(const CombatStats& base_stats, sprite_id sprite, int teamid,
 			int x, int y, int radius, bool solid = true, int depth = 0) :
 			GameInst(x, y, radius, solid, depth), rx(x), ry(y), vx(0), vy(0), is_resting(
-					false), teamid(teamid), spriteid(sprite), base_stats(
+					false), teamid(teamid), sprite(sprite), base_stats(
 					base_stats) {
 	}
 	virtual ~CombatGameInst() {
@@ -83,7 +83,7 @@ public:
 protected:
 	bool is_resting;
 	team_id teamid;
-	sprite_id spriteid;
+	sprite_id sprite;
 //	PathInfo path;
 private:
 	void ensure_valid_direction(GameState* gs, float speed);

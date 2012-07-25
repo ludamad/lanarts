@@ -23,12 +23,12 @@
 #include "PlayerInst.h"
 #include "../ProjectileInst.h"
 
-PlayerInst::PlayerInst(const CombatStats& stats, int x, int y,
-		bool local) :
-		CombatGameInst(stats, 0, x, y, RADIUS, true, DEPTH), fieldofview(
-				LINEOFSIGHT), local(local), moving(0), money(0), lives(0), kills(
-				0), deaths(0), previous_spellselect(0), spellselect(-1) {
-	sprite = game_class_data.at(stats.class_stats.classid).sprite;
+PlayerInst::PlayerInst(const CombatStats& stats, int x, int y, bool local) :
+		CombatGameInst(stats,
+				game_class_data.at(stats.class_stats.classid).sprite, 0, x, y,
+				RADIUS, true, DEPTH), fieldofview(LINEOFSIGHT), local(local), moving(
+				0), money(0), lives(0), kills(0), deaths(0), previous_spellselect(
+				0), spellselect(-1) {
 }
 
 PlayerInst::~PlayerInst() {

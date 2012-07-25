@@ -85,6 +85,17 @@ public:
 
 		return 1;
 	}
+	int has_effect(lua_State* L) {
+		CombatGameInst* combatinst;
+		if ((combatinst = dynamic_cast<CombatGameInst*>(get_inst()))) {
+			lua_pushboolean(L,
+					combatinst->effects().get(effect_from_lua(L, 1)) != NULL);
+		} else {
+			lua_pushnil(L);
+		}
+
+		return 1;
+	}
 	int move_to(lua_State* L) {
 		inst->update_position(lua_tonumber(L, 1), lua_tonumber(L, 2));
 		return 0;
@@ -186,7 +197,7 @@ static int lua_member_update(lua_State* L) {
 meth_t bind_t::methods[] = { LUA_DEF(heal_fully), LUA_DEF(move_to),
 		LUA_DEF(heal_hp), LUA_DEF(heal_mp), LUA_DEF(direct_damage),
 		LUA_DEF(damage), LUA_DEF(equip), LUA_DEF(add_effect),
-		LUA_DEF(add_effect), meth_t(0, 0) };
+		LUA_DEF(has_effect), LUA_DEF(add_effect), meth_t(0, 0) };
 
 void lua_gameinst_bindings(GameState* gs, lua_State* L) {
 	lunar_t::Register(L);

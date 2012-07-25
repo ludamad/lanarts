@@ -23,8 +23,8 @@
 //Allows for sequence merges to be defined using hash merge syntax in yaml, eg - <<: *handle, in a sequence
 std::vector<const YAML::Node*> flatten_seq_mappings(const YAML::Node & n);
 
-int parse_sprite_number(const YAML::Node & n, const char* key);
-int parse_enemy_number(const YAML::Node & n, const char* key);
+int parse_sprite_number(const YAML::Node& n, const char* key);
+int parse_enemy_number(const YAML::Node& n, const char* key);
 
 char* tocstring(const std::string & s);
 bool yaml_has_node(const YAML::Node& n, const char* key);

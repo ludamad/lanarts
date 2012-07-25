@@ -1,13 +1,13 @@
 --- 
 
 #Locations of markup files
-#relative to res/data
+#relative to res/
 
 armour_files:
   - armour/armour.yaml
 
 class_files: 
-  - classes.yaml
+  - classes/classes.yaml
 
 effect_files: 
   - effects/effects.yaml
@@ -43,10 +43,10 @@ sprite_files:
  - sprites/weapon_sprites.yaml
 
 tile_files: 
-  - tiles.yaml
+  - tiles/tiles.yaml
 
 tileset_files: 
-  - tilesets.yaml
+  - tiles/tilesets.yaml
 
 weapon_files: 
   - weapons/weapons.yaml

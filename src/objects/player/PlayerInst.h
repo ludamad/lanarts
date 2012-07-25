@@ -110,6 +110,7 @@ private:
 	void pickup_item(GameState* gs, const GameAction& action);
 	void drop_item(GameState* gs, const GameAction& action);
 	void reposition_item(GameState* gs, const GameAction& action);
+
 	ActionQueue queued_actions;
 	fov fieldofview;
 	bool didstep, local, moving;

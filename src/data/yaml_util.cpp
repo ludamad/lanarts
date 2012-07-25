@@ -207,7 +207,7 @@ void load_data_impl_template(const FilenameList& filenames,
 
 	FilenameList::const_iterator it = filenames.begin();
 	for (; it != filenames.end(); ++it) {
-		std::string fname = "res/data/" + *it;
+		std::string fname = "res/" + *it;
 		fstream file(fname.c_str(), fstream::in | fstream::binary);
 
 		if (file) {

@@ -14,11 +14,13 @@ struct EffectEntry {
 	std::string name;
 	LuaValue stat_func;
 	LuaValue init_func;
+	LuaValue finish_func;
 	LuaValue step_func;
 	bool additive_duration;
 
 	void init(lua_State* L) {
 		init_func.initialize(L);
+		finish_func.initialize(L);
 		stat_func.initialize(L);
 		step_func.initialize(L);
 	}

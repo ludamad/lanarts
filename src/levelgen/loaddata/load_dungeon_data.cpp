@@ -157,7 +157,7 @@ LuaValue load_dungeon_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
 	try {
 
-		std::string fname = "res/data/" + filenames[0];
+		std::string fname = "res/" + filenames[0];
 		fstream file(fname.c_str(), fstream::in | fstream::binary);
 
 		YAML::Parser parser(file);
