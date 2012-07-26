@@ -117,7 +117,7 @@ bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
 
 	int maxdist = 0;
 	for (int i = 0; i < pc.player_ids().size(); i++) {
-		PlayerInst* player = (PlayerInst*)gs->get_instance(pc.player_ids()[i]);
+		PlayerInst* player = (PlayerInst*) gs->get_instance(pc.player_ids()[i]);
 		BBox fbox = player->field_of_view().tiles_covered();
 		FOR_EACH_BBOX(fbox, x, y) {
 			if (player->field_of_view().within_fov(x, y)) {
@@ -364,6 +364,7 @@ bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 
 	int level = gs->get_level()->roomid, frame = gs->frame();
 
+	bool is_moving = (dx != 0.0f || dy != 0.0f);
 	IOController& io = gs->io_controller();
 	bool attack_used = queue_io_spell_actions(gs);
 
@@ -394,32 +395,40 @@ bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 				|| equipment().has_projectile();
 
 		MonsterController& mc = gs->monster_controller();
-		GameInst* target = gs->get_instance(mc.current_target());
+		GameInst* curr_target = gs->get_instance(mc.current_target());
+		GameInst* target = NULL;
 		Pos targ_pos;
 
 		if (is_projectile) {
 			if (mousetarget) {
 				targ_pos = Pos(rmx, rmy);
-			} else if (autotarget && target) {
-				targ_pos = Pos(target->x, target->y);
+			} else if (autotarget && curr_target) {
+				targ_pos = curr_target->pos();
 			}
 		} else {
 			if (mousetarget) {
 				dx = rmx - x, dy = rmy - y;
-				target = NULL;
 			}
-			target = get_weapon_autotarget(gs, this, target, dx, dy);
+			target = get_weapon_autotarget(gs, this, curr_target, dx, dy);
 			if (target) {
 				targ_pos = Pos(target->x, target->y);
 
 			}
-		}
+			if (!is_moving && !target && (mousetarget || curr_target)
+					&& !is_projectile) {
+				Posf dir(rmx - x, rmy - y);
+				if (!mousetarget) {
+					dir = Posf(curr_target->x - x, curr_target->y - y);
+				}
+				normalize(dir.x, dir.y);
 
-		if (target || (is_projectile && mousetarget)) {
-			queued_actions.push_back(
-					GameAction(id, GameAction::USE_WEAPON, frame, level,
-							spellselect, targ_pos.x, targ_pos.y));
-			attack_used = true;
+				dir.x *= effective_stats().movespeed;
+				dir.y *= effective_stats().movespeed;
+
+				queued_actions.push_back(
+						GameAction(id, GameAction::MOVE, frame, level,
+								spellselect, floor(dir.x), floor(dir.y)));
+			}
 		}
 	}
 	return attack_used;
@@ -488,7 +497,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		}
 
 		for (int i = 0; i < numhit; i++) {
-			EnemyInst* e = (EnemyInst*)enemies[i];
+			EnemyInst* e = (EnemyInst*) enemies[i];
 			lua_hit_callback(gs->get_luastate(), wentry.on_hit_func, this, e);
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
 				PlayerController& pc = gs->player_controller();
