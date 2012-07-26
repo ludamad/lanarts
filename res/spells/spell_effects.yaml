@@ -12,8 +12,12 @@ effects:
 
   - name: Berserk
     stat_func: berserk_statmod
-    deinit_func: berserk_deinit
-    effected_colour: [255,120,120] #RGB
+    exhausted_duration: 400
+    finish_func: function (effect, obj) obj:add_effect("Exhausted", effect.exhausted_duration) end
+    effected_colour: [255,160,160] #RGB
+    effected_sprite: berserk_effected
 
   - name: Exhausted
     stat_func: exhausted_statmod
+    effected_colour: [160,160,160] #RGB
+

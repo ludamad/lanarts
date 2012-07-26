@@ -181,7 +181,7 @@ void gl_set_drawing_area(int x, int y, int w, int h) {
 	//Clear projection
 
 	//Set up the coordinate system 0 -> w, 0 -> h
-	glOrtho(0.0, (GLdouble)w, (GLdouble)h, 0.0, 0.0, 1.0);
+	glOrtho(0.0, (GLdouble) w, (GLdouble) h, 0.0, 0.0, 1.0);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -202,8 +202,8 @@ void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type) {
 	pth = std::max(4, pth);
 
 	img.width = w, img.height = h;
-	img.texw = w / ((float)ptw);
-	img.texh = h / ((float)pth);
+	img.texw = w / ((float) ptw);
+	img.texh = h / ((float) pth);
 	if (w == 0 || h == 0)
 		return;
 
@@ -240,8 +240,8 @@ void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 }
 
 void gl_draw_sprite(sprite_id sprite, int x, int y, const Colour& c) {
-	GLimage& img = game_sprite_data.at(sprite).img();
-	gl_draw_image(img, x, y, c);
+	SpriteEntry& entry = game_sprite_data.at(sprite);
+	gl_draw_image(entry.img(), x, y, c.multiply(entry.drawcolour));
 }
 
 void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,

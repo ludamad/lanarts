@@ -5,4 +5,3 @@
 effects:
   - name: Haste
     stat_func: haste_statmod
-    testvalue: 1

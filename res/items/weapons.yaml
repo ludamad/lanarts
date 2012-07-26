@@ -7,7 +7,7 @@ weapons:
     #Damage: { base: <range>, strength: <multiplier>, magic: <multiplier> }
     damage: {base: [2,5], strength: 1.0}
     power: {base: 0, strength: 0.2}
-    range: 7
+    range: 8
     cooldown: 30
 
   - name: Dagger
@@ -15,7 +15,7 @@ weapons:
     weapon_class: short blades
     damage: {base: [4,6], strength: 1.0}
     power: {base: 0, strength: 0.2}
-    range: 7
+    range: 8
     cooldown: 30
     spr_item: dagger
 
@@ -24,7 +24,7 @@ weapons:
     description: An easy-to-wield short sword.
     damage: {base: [4,8], strength: 1.0}
     power: {base: 1, strength: 0.2}
-    range: 7
+    range: 8
     cooldown: 35
     spr_item: short sword
 
@@ -33,7 +33,7 @@ weapons:
     description: An large, strong mace.
     damage: {base: [5,10], strength: 1.25}
     power: {base: [2,5], strength: 0.5}
-    range: 7
+    range: 8
     cooldown: 55
     spr_item: mace
 
@@ -42,7 +42,7 @@ weapons:
     description: An enchanted sword that saps your mana reserves, but does greater damage.
     damage: {base: [4,8], strength: 1.0}
     power: {base: 1, strength: 0.2}
-    range: 7
+    range: 8
     on_hit_func: function (user, target) 
         if user.stats.mp > 10 then
           target:damage(5, user.stats.power)

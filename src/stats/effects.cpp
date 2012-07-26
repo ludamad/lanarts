@@ -36,6 +36,18 @@ Colour EffectStats::effected_colour() {
 	return Colour(r / 256, g / 256, b / 256, a / 256);
 }
 
+void EffectStats::draw_effect_sprites(GameState* gs, const Pos& p) {
+	GameView& view = gs->view();
+	for (int i = 0; i < EFFECTS_MAX; i++) {
+		if (effects[i].t_remaining > 0) {
+			EffectEntry& eentry = game_effect_data.at(effects[i].effect);
+			if (eentry.effected_sprite > -1) {
+				gl_draw_sprite(view, eentry.effected_sprite, p.x, p.y);
+			}
+		}
+	}
+}
+
 void EffectStats::process(GameState* gs, CombatGameInst* inst,
 		EffectiveStats& effective) const {
 	if (!has_active_effect())

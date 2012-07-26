@@ -91,8 +91,10 @@ void CombatGameInst::draw(GameState *gs) {
 	if (effects().has_active_effect()) {
 		draw_colour = effects().effected_colour();
 	}
-	gl_draw_sprite(view, sprite, x - spr.width() / 2, y - spr.height() / 2, vx,
-			vy, gs->frame(), draw_colour);
+	int sx = x - spr.width() / 2, sy = y - spr.height() / 2;
+	gl_draw_sprite(view, sprite, sx, sy, vx, vy, gs->frame(), draw_colour);
+
+	effects().draw_effect_sprites(gs, Pos(sx, sy));
 
 	if (is_resting) {
 		GLimage& restimg =
@@ -279,8 +281,8 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 }
 
 void CombatGameInst::update_position() {
-	x = (int)round(rx); //update based on rounding of true float
-	y = (int)round(ry);
+	x = (int) round(rx); //update based on rounding of true float
+	y = (int) round(ry);
 }
 
 void CombatGameInst::update_position(float newx, float newy) {
@@ -315,7 +317,7 @@ static void combine_stat_hash(unsigned int& hash, CombatStats& stats) {
 }
 unsigned int CombatGameInst::integrity_hash() {
 	unsigned int hash = GameInst::integrity_hash();
-	combine_hash(hash, (unsigned int&)vx, (unsigned int&)vy);
+	combine_hash(hash, (unsigned int&) vx, (unsigned int&) vy);
 	combine_stat_hash(hash, stats());
 	return hash;
 }

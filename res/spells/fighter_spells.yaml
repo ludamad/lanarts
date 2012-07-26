@@ -8,10 +8,11 @@ spells:
     mp_cost: 30
     cooldown: 200
     spr_spell: berserk
+    can_cast_with_held_key: no
     prereq_func: 
       function(caster, _, _) 
         return not caster:has_effect("Berserk") and not caster:has_effect("Exhausted")
       end
-    action_func: function(caster, x, y) caster:add_effect("Berserk", 200) end
+    action_func: function(caster, x, y) caster:add_effect("Berserk", 600) end
     autotarget_func: 
       function (caster, _) return caster.x, caster.y end
