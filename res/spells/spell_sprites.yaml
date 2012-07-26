@@ -29,4 +29,6 @@ sprites:
     
   - name: berserk
     file: res/sprites/spells/berserk.png
-    
+        
+  - name: berserk_effected
+    file: res/sprites/effects/berserk.png

@@ -24,7 +24,7 @@ end
 
 function equip(item, obj, _, _, amnt)
 	if obj:is_local_player() and not is_projectile(item) then
-		show_message("You equip the " .. item.name)
+		show_message("You equip the " .. item.name:lower())
 	end
 	obj:equip(item, amnt)
 end

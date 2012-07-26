@@ -48,6 +48,18 @@ void EffectStats::draw_effect_sprites(GameState* gs, const Pos& p) {
 	}
 }
 
+bool EffectStats::can_rest() {
+	for (int i = 0; i < EFFECTS_MAX; i++) {
+		if (effects[i].t_remaining > 0 ) {
+			EffectEntry& eentry = game_effect_data.at(effects[i].effect);
+			if (!eentry.can_rest) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 void EffectStats::process(GameState* gs, CombatGameInst* inst,
 		EffectiveStats& effective) const {
 	if (!has_active_effect())

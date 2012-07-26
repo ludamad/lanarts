@@ -92,7 +92,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 	GameInst* inst = NULL;
 	if (cooldowns().can_pickup()
 			&& gs->object_radius_test(this, &inst, 1, &item_colfilter)) {
-		ItemInst* iteminst = (ItemInst*)inst;
+		ItemInst* iteminst = (ItemInst*) inst;
 		Item& item = iteminst->item_type();
 
 		bool was_dropper = iteminst->last_held_by() == id;
@@ -256,7 +256,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	const int PICKUP_RATE = 10;
-	ItemInst* item = (ItemInst*)gs->get_instance(action.use_id);
+	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
 	if (!item)
 		return;
 	const Item& type = item->item_type();
@@ -414,10 +414,10 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 	}
 
 }
-void PlayerInst::use_rest(GameState *gs, const GameAction& action) {
+void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
 	bool atfull = core_stats().hp >= core_stats().max_hp
 			&& core_stats().mp >= core_stats().max_mp;
-	if (cooldowns().can_rest() && !atfull) {
+	if (cooldowns().can_rest() && !atfull && effects().can_rest()) {
 		core_stats().heal_hp(core_stats().hpregen * 8);
 		core_stats().heal_mp(core_stats().mpregen * 8);
 		is_resting = true;
@@ -434,12 +434,12 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 
 	EnemyInst* target = NULL;
 	//Enemy hitting test for melee
-	gs->object_radius_test(this, (GameInst**)&target, 1, &enemy_colfilter,
+	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_colfilter,
 			x + ddx * 2, y + ddy * 2);
 
 	//Smaller radius enemy pushing test, can intercept enemy radius but not too far
 	EnemyInst* alreadyhitting[5] = { 0, 0, 0, 0, 0 };
-	gs->object_radius_test(this, (GameInst**)alreadyhitting, 5,
+	gs->object_radius_test(this, (GameInst**) alreadyhitting, 5,
 			&enemy_colfilter, x, y, radius);
 	bool already = false;
 	for (int i = 0; i < 5; i++) {

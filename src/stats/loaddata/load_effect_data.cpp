@@ -23,6 +23,7 @@ EffectEntry parse_effect(const YAML::Node& n) {
 	entry.effected_colour = parse_defaulted(n, "effected_colour", Colour());
 	entry.effected_sprite = parse_sprite_number(n, "effected_sprite");
 	entry.additive_duration = parse_defaulted(n, "additive_duration", false);
+	entry.can_rest = parse_defaulted(n, "can_rest", false);
 	return entry;
 }
 

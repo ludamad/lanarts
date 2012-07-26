@@ -141,6 +141,22 @@ GameInst* lua_gameinst_arg(lua_State* L, int narg) {
 	lua_push_combatstats(L, m );\
 }
 
+static void push_inst_name(lua_State* L, GameInst* inst){
+	PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
+	if (p){
+//		lua_pushlstring(L, p->); //TODO
+		lua_pushstring(L, "Your ally");
+	} else {
+		EnemyInst* e = dynamic_cast<EnemyInst*>(inst);
+		if (e) {
+			std::string& name = e->etype().name;
+			lua_pushlstring(L, name.c_str(), name.size());
+		} else {
+			lua_pushnil(L);
+		}
+	}
+}
+
 static int lua_member_lookup(lua_State* L) {
 	bind_t* state = lunar_t::check(L, 1);
 	const char* cstr = lua_tostring(L, 2);
@@ -153,7 +169,9 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_NUM_MEMB_LOOKUP("radius", inst->radius)
 	else IFLUA_NUM_MEMB_LOOKUP("target_radius", inst->target_radius)
 	else IFLUA_STATS_MEMB_LOOKUP("stats", inst)
-	else {
+	else if (strcmp(cstr, "name") == 0) {
+		push_inst_name(L, inst);
+	} else {
 		lua_getglobal(L, bind_t::className);
 		int tableind = lua_gettop(L);
 		lua_pushvalue(L, 2);

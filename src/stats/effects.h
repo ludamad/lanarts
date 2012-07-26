@@ -28,6 +28,7 @@ struct EffectStats {
 	Effect* get(effect_id effect);
 	void step(GameState* gs, CombatGameInst* inst);
 	void draw_effect_sprites(GameState* gs, const Pos& p);
+	bool can_rest();
 	Colour effected_colour();
 
 	void process(GameState* gs, CombatGameInst* inst,
