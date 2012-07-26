@@ -47,7 +47,7 @@ medium_enemies: &medium_enemies
   - { enemy: Zombie,            chance: 100                                   }
   - { enemy: Storm Elemental,   chance: 66,  group_chance: 33, group_size: 2  }
   - { enemy: Unseen Horror,     chance: 30                                    }
-  - { enemy: Krell,             chance: 30                                    }
+  - { enemy: Krell,             chance: 10                                    }
  
 hard_enemies: &hard_enemies
  - { enemy: Skeleton,          chance: 50                                    }
