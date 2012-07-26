@@ -12,7 +12,7 @@ effects:
 
   - name: Berserk
     stat_func: berserk_statmod
-    exhausted_duration: 400
+    exhausted_duration: 200
     finish_func: 
       function (effect, obj) 
         obj:add_effect("Exhausted", effect.exhausted_duration) 
