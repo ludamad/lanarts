@@ -115,7 +115,7 @@ static void show_defeat_message(GameChat& chat, EnemyEntry& e) {
 }
 void EnemyInst::draw(GameState* gs) {
 
-	GameView& view = gs->window_view();
+	GameView& view = gs->view();
 	GLimage& img = game_sprite_data[etype().enemy_sprite].img();
 
 	if (gs->game_settings().draw_diagnostics) {

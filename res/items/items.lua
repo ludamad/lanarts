@@ -23,8 +23,12 @@ function increase_willpower(item, obj)
 end 
 
 function equip(item, obj, _, _, amnt)
+	if obj:is_local_player() and not is_projectile(item) then
+		show_message("You equip the " .. item.name)
+	end
 	obj:equip(item, amnt)
 end
+
 function hasten(item, obj)
 	obj:add_effect(effects.Haste.name, item.duration)
 end

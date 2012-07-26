@@ -95,8 +95,8 @@ public:
 			PlayerInst* player = NULL, bool canreveal = true);
 
 	/* GameState components */
-	GameView& window_view() {
-		return view;
+	GameView& view() {
+		return _view;
 	}
 
 	GameTiles& tile_grid();
@@ -210,7 +210,7 @@ private:
 	GameNetConnection connection;
 	GameDialogs dialogs;
 	GameHud hud;
-	GameView view;
+	GameView _view;
 	GameWorld world;
 	MTwist mtwist;
 	font_data small_font, large_font;

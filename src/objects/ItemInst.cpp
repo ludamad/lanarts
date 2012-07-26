@@ -33,7 +33,7 @@ void ItemInst::step(GameState *gs) {
 }
 
 void ItemInst::draw(GameState* gs) {
-	GameView& view = gs->window_view();
+	GameView& view = gs->view();
 
 	ItemEntry& ientry = item.item_entry();
 	SpriteEntry& spr = game_sprite_data.at(ientry.sprite);

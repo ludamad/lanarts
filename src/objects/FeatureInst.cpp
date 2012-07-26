@@ -30,7 +30,7 @@ void FeatureInst::draw(GameState* gs) {
 		last_seen_spr = spr;
 	}
 	if (last_seen_spr > -1) {
-		gl_draw_sprite(gs->window_view(), last_seen_spr, x - TILE_SIZE / 2,
+		gl_draw_sprite(gs->view(), last_seen_spr, x - TILE_SIZE / 2,
 				y - TILE_SIZE / 2);
 	}
 }

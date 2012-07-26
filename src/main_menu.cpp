@@ -100,13 +100,13 @@ void main_menu_loop(GameState* gs, int width, int height) {
 	bool exit = false;
 	int halfw = width / 2;
 
-	GameView prevview = gs->window_view();
+	GameView prevview = gs->view();
 	GameLevelState* oldlevel = gs->get_level();
 
 	gs->set_level(new GameLevelState(0, 0, 0, width, height));
 	gs->get_level()->level_number = -1;
-	gs->window_view().x = 0;
-	gs->window_view().y = 0;
+	gs->view().x = 0;
+	gs->view().y = 0;
 
 	gs->add_instance(new AnimatedInst(halfw, 100, get_sprite_by_name("logo")));
 	gs->add_instance(
@@ -123,7 +123,7 @@ void main_menu_loop(GameState* gs, int width, int height) {
 	delete gs->get_level();
 
 	gs->set_level(oldlevel);
-	gs->window_view() = prevview;
+	gs->view() = prevview;
 
 	class_menu_loop(gs, width, height);
 }
@@ -174,13 +174,13 @@ void class_menu_loop(GameState* gs, int width, int height) {
 	bool exit = false;
 	int halfw = width / 2;
 
-	GameView prevview = gs->window_view();
+	GameView prevview = gs->view();
 	GameLevelState* oldlevel = gs->get_level();
 
 	gs->set_level(new GameLevelState(0, 0, 0, width, height));
 	gs->get_level()->level_number = -1;
-	gs->window_view().x = 0;
-	gs->window_view().y = 0;
+	gs->view().x = 0;
+	gs->view().y = 0;
 
 	gs->add_instance(new AnimatedInst(halfw, 100, get_sprite_by_name("logo")));
 	setup_classmenu_buttons(gs, &exit, halfw, 300);
@@ -193,5 +193,5 @@ void class_menu_loop(GameState* gs, int width, int height) {
 	delete gs->get_level();
 
 	gs->set_level(oldlevel);
-	gs->window_view() = prevview;
+	gs->view() = prevview;
 }

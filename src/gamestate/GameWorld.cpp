@@ -242,7 +242,7 @@ void GameWorld::step() {
 		set_current_level(next_room_id);
 		GameInst* g = game_state->get_instance(
 				game_state->player_controller().local_playerid());
-		game_state->window_view().sharp_center_on(g->x, g->y);
+		game_state->view().sharp_center_on(g->x, g->y);
 		next_room_id = -1;
 
 		game_state->get_level()->pc.update_fieldsofview(game_state);
@@ -273,7 +273,7 @@ void GameWorld::regen_level(int roomid) {
 	if (game_state->get_level() == level) {
 		game_state->set_level(newlevel);
 		GameInst* p = game_state->get_instance(game_state->local_playerid());
-		game_state->window_view().sharp_center_on(p->x, p->y);
+		game_state->view().sharp_center_on(p->x, p->y);
 	}
 
 	//Delete existing level

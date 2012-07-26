@@ -5,6 +5,10 @@
 
 #include "../../data/yaml_util.h"
 
+extern "C" {
+#include <lua/lua.h>
+}
+
 using namespace std;
 
 static float parse_magic_percentage(const YAML::Node& node, const char* key) {
@@ -69,8 +73,14 @@ void load_weapon_callbackf(const YAML::Node& node, lua_State* L,
 			parse_defaulted(node, "on_hit_func", std::string()));
 
 	game_weapon_data.push_back(entry);
-	if (value)
-		value->table_set_yaml(L, game_weapon_data.back().name, node);
+	if (value) {
+		const std::string& name = game_weapon_data.back().name;
+		value->table_set_yaml(L, name, node);
+		value->table_push_value(L, name);
+		lua_pushstring(L, "weapon");
+		lua_setfield(L, -2, "type");
+		lua_pop(L, 1);
+	}
 }
 
 void load_weapon_data(lua_State* L, const FilenameList& filenames,
@@ -90,6 +100,6 @@ void load_weapon_item_entries() {
 		game_item_data.push_back(
 				ItemEntry(wtype.name, wtype.description, "", default_radius,
 						wtype.item_sprite, "equip", "", false,
-						ItemEntry::WEAPON, i));
+						ItemEntry::ALWAYS_KNOWN, ItemEntry::WEAPON, i));
 	}
 }

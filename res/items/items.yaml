@@ -4,6 +4,7 @@ items:
     sprite: gold
 
   - name: Health Potion
+    type: potion
     sprite: health_potion
     description: A blessed potion of healing infusions, it restores 50 HP to the user.
     action_func: increase_health
@@ -11,6 +12,7 @@ items:
     amount: 50
 
   - name: Mana Potion
+    type: potion
     sprite: mana potion
     description: A magical potion of energizing infusions, it restores 50 MP to the user.
     action_func: increase_mana

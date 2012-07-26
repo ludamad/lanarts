@@ -60,6 +60,7 @@ set( lanarts_src
 
 	lua/lua_api.cpp
 	lua/lua_collision_checks.cpp
+	lua/lua_display_funcs.cpp
 	lua/lua_object_funcs.cpp
 	lua/lua_spelltarget_funcs.cpp
 	lua/lua_gameinst.cpp
@@ -170,6 +171,7 @@ set( lanarts_include
 	stats/combat_stats.h
 	stats/Inventory.h
 	stats/items.h
+	stats/ItemsKnown.h
 	stats/effects.h
 	stats/Equipment.h
 	stats/EnemiesSeen.h

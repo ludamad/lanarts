@@ -120,8 +120,7 @@ public:
 	void table_push_value(lua_State* L, const char* key) {
 		push(L); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
-		lua_pushstring(L, key); /*Push the key*/
-		lua_gettable(L, tableind);
+		lua_getfield(L, tableind, key);
 		lua_replace(L, tableind);
 	}
 

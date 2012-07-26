@@ -39,7 +39,7 @@ extern "C" {
 GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 		int viewh, int hudw) :
 		settings(settings), L(L), frame_n(0), hud(
-				BBox(vieww, 0, vieww + hudw, viewh), BBox(0, 0, vieww, viewh)), view(
+				BBox(vieww, 0, vieww + hudw, viewh), BBox(0, 0, vieww, viewh)), _view(
 				0, 0, vieww, viewh), world(this) {
 
 	dragging_view = false;
@@ -104,15 +104,15 @@ void GameState::init_game() {
 	set_level(world.get_level(0, true));
 
 	GameInst* p = get_instance(get_level()->pc.local_playerid());
-	window_view().sharp_center_on(p->x, p->y);
+	view().sharp_center_on(p->x, p->y);
 
 }
 
 void GameState::set_level(GameLevelState* lvl) {
 	world.set_current_level(lvl);
 	if (lvl != NULL) {
-		view.world_width = lvl->width;
-		view.world_height = lvl->height;
+		_view.world_width = lvl->width;
+		_view.world_height = lvl->height;
 	}
 }
 
@@ -149,7 +149,7 @@ bool GameState::update_iostate(bool resetprev) {
 			return false;
 	}
 	/* Fire IOEvents for the current step*/
-	iocontroller.trigger_events(BBox(0, 0, view.width, view.height));
+	iocontroller.trigger_events(BBox(0, 0, _view.width, _view.height));
 
 	return true;
 }
@@ -174,10 +174,9 @@ void GameState::adjust_view_to_dragging() {
 	 *if we are following the cursor, or if the minimap is clicked */
 	bool is_dragged = false;
 	if (key_down_state(SDLK_x)) {
-		GameView& view = window_view();
-		int nx = mouse_x() + view.x, ny = mouse_y() + view.y;
+		int nx = mouse_x() + _view.x, ny = mouse_y() + _view.y;
 		for (int i = 0; i < 2; i++)
-			view.center_on(nx, ny);
+			_view.center_on(nx, ny);
 		is_dragged = true;
 	} else {
 		if (mouse_right_down()) {
@@ -190,7 +189,7 @@ void GameState::adjust_view_to_dragging() {
 			bool outofy = (my < 0 || my >= mh);
 
 			if (dragging_view || (!outofx && !outofy)) {
-				view.sharp_center_on(mx * width() / mw, my * height() / mh);
+				_view.sharp_center_on(mx * width() / mw, my * height() / mh);
 				is_dragged = true;
 			}
 		}
@@ -199,7 +198,7 @@ void GameState::adjust_view_to_dragging() {
 	/*If we were previously dragging, now snap back to the player position*/
 	if (!is_dragged && dragging_view) {
 		GameInst* p = get_instance(local_playerid());
-		view.sharp_center_on(p->x, p->y);
+		_view.sharp_center_on(p->x, p->y);
 	}
 	dragging_view = is_dragged;
 }
@@ -208,9 +207,9 @@ void GameState::draw(bool drawhud) {
 	adjust_view_to_dragging();
 
 	if (drawhud)
-		gl_set_drawing_area(0, 0, view.width, view.height);
+		gl_set_drawing_area(0, 0, _view.width, _view.height);
 	else
-		gl_set_drawing_area(0, 0, view.width + hud.width(), view.height);
+		gl_set_drawing_area(0, 0, _view.width + hud.width(), _view.height);
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

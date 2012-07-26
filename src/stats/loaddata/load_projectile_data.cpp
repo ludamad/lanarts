@@ -5,6 +5,10 @@
 
 #include "../../data/yaml_util.h"
 
+extern "C" {
+#include <lua/lua.h>
+}
+
 using namespace std;
 
 static float parse_magic_percentage(const YAML::Node& node, const char* key) {
@@ -51,8 +55,13 @@ void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
 			parse_defaulted(node, "on_hit_func", std::string()));
 
 	game_projectile_data.push_back(entry);
-	if (value)
-		value->table_set_yaml(L, game_projectile_data.back().name, node);
+
+	/* Lua loading code */
+	value->table_set_yaml(L, entry.name, node);
+	value->table_push_value(L, entry.name);
+	lua_pushstring(L, "projectile");
+	lua_setfield(L, -2, "type");
+	lua_pop(L, 1);
 }
 LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 		LuaValue& itemtable) {
@@ -79,7 +88,7 @@ void load_projectile_item_entries() {
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
 		game_item_data.push_back(
 				ItemEntry(ptype.name, ptype.description, "", default_radius,
-						ptype.item_sprite, "equip", "", true,
+						ptype.item_sprite, "equip", "", true, ItemEntry::ALWAYS_KNOWN,
 						ItemEntry::PROJECTILE, i));
 	}
 }

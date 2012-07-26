@@ -89,7 +89,7 @@ void PlayerInst::step(GameState* gs) {
 		return;
 
 	CombatGameInst::step(gs);
-	GameView& view = gs->window_view();
+	GameView& view = gs->view();
 
 	queue_network_actions(gs);
 

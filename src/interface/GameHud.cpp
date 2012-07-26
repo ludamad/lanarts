@@ -49,7 +49,7 @@ void GameHud::step(GameState *gs) {
 
 bool GameHud::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	PlayerInst* player = gs->local_player();
-	bool mouse_within_view = gs->mouse_x() < gs->window_view().width;
+	bool mouse_within_view = gs->mouse_x() < gs->view().width;
 	int level = gs->get_level()->roomid, frame = gs->frame();
 
 	Inventory inv = player->inventory();

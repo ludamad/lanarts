@@ -21,7 +21,7 @@ void AnimatedInst::step(GameState* gs){
 void AnimatedInst::draw(GameState* gs){
 	x = round(rx += vx);
 	y = round(ry += vy);
-	GameView& view = gs->window_view();
+	GameView& view = gs->view();
 	if (sprite > -1){
 		GLimage& img = game_sprite_data[sprite].images[0];
 

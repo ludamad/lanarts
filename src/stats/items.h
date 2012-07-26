@@ -17,12 +17,27 @@ struct ProjectileEntry;
 struct WeaponEntry;
 
 enum item_flags {
-	CURSED = 1, GOLDEN = 2
+	NOFLAGS = 0, CURSED = 1, GOLDEN = 2
 };
 
 struct ItemProperties {
 	DerivedStats magic, physical;
 	item_flags flags;
+
+	// Depending on your skill, using an item will lower this property until it is known
+	// XXX: Have a different stat for different players ? (Might be important for PvP)
+	int unknownness;
+
+	bool is_identified() {
+		return unknownness <= 0;
+	}
+	void identify() {
+		unknownness = 0;
+	}
+
+	ItemProperties() :
+			flags(NOFLAGS), unknownness(1) {
+	}
 
 	bool operator==(const ItemProperties& properties) const;
 };

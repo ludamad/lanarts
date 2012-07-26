@@ -157,7 +157,7 @@ std::vector<Pos> AStarPathFind::calculate_AStar_path(GameState *gs, int sx,
 }
 
 void draw_path(GameState* gs, std::vector<Pos>& path) {
-	GameView& view = gs->window_view();
+	GameView& view = gs->view();
 	for (int i = 0; i < path.size(); i++) {
 		int draw_radius = 16;
 		if (view.within_view(path[i].x - draw_radius, path[i].y - draw_radius,

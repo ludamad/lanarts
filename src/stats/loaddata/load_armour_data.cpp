@@ -1,6 +1,12 @@
 #include <fstream>
-#include "../../data/yaml_util.h"
+
+extern "C" {
+#include <lua/lua.h>
+}
+
 #include "../../data/game_data.h"
+#include "../../data/yaml_util.h"
+
 #include "../item_data.h"
 
 using namespace std;
@@ -23,8 +29,12 @@ void load_armour_callbackf(const YAML::Node& node, lua_State* L,
 	entry.item_sprite = parse_sprite_number(node, "spr_item");
 
 	game_armour_data.push_back(entry);
-	if (value)
-		value->table_set_yaml(L, game_armour_data.back().name, node);
+
+	value->table_set_yaml(L, entry.name, node);
+	value->table_push_value(L, entry.name);
+	lua_pushstring(L, "armour");
+	lua_setfield(L, -2, "type");
+	lua_pop(L, 1);
 }
 
 void load_armour_data(lua_State* L, const FilenameList& filenames,
@@ -44,6 +54,6 @@ void load_armour_item_entries() {
 		game_item_data.push_back(
 				ItemEntry(entry.name, entry.description, "", default_radius,
 						entry.item_sprite, "equip", "", false,
-						ItemEntry::ARMOUR, i));
+						ItemEntry::ALWAYS_KNOWN, ItemEntry::ARMOUR, i));
 	}
 }

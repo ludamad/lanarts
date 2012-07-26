@@ -38,7 +38,7 @@ ProjectileInst::~ProjectileInst() {
 }
 
 void ProjectileInst::draw(GameState* gs) {
-	GameView& view = gs->window_view();
+	GameView& view = gs->view();
 	SpriteEntry& spr = game_sprite_data[sprite()];
 	int w = spr.width(), h = spr.height();
 	int xx = x - w / 2, yy = y - h / 2;

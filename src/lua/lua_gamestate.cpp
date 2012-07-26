@@ -90,7 +90,7 @@ static int lua_member_lookup(lua_State* L) {
 	bind_t* state = lunar_t::check(L, 1);
 	GameState* gs = state->game_state();
 	const char* cstr = lua_tostring(L, 2);
-	GameView& view = gs->window_view();
+	GameView& view = gs->view();
 
 	IFLUA_NUM_MEMB_LOOKUP("width", gs->width())
 	else IFLUA_NUM_MEMB_LOOKUP("height", gs->height())

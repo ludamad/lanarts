@@ -44,7 +44,7 @@ static void draw_rect2d(char* buff, int w, int h, int x, int y, int mx, int my,
 static void world2minimapbuffer(GameState* gs, char* buff,
 		const BBox& world_portion, int w, int h, int ptw, int pth) {
 	GameTiles& tiles = gs->tile_grid();
-	GameView& view = gs->window_view();
+	GameView& view = gs->view();
 
 	bool minimap_reveal = gs->key_down_state(SDLK_z)
 			|| gs->key_down_state(SDLK_BACKQUOTE);
@@ -126,7 +126,7 @@ static void init_minimap_buff(char* minimap_arr, int ptw, int pth) {
 void Minimap::draw(GameState* gs, float scale) {
 	//Draw a mini version of the contents of gs->tile_grid()
 	GameTiles& tiles = gs->tile_grid();
-	GameView& view = gs->window_view();
+	GameView& view = gs->view();
 	BBox bbox = minimap_bounds(gs);
 
 	int min_tilex, min_tiley;

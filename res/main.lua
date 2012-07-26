@@ -2,6 +2,13 @@
 -- LUA API CONSTANTS GO HERE
 -- End of Lua API constants
 
+-- Lua API functions
+function is_consumable(item) 	return item.type == "consumable" end
+function is_weapon(item) 		return item.type == "weapon" end
+function is_armour(item) 		return item.type == "armour" end
+function is_projectile(item) 	return item.type == "projectile" end
+
+-- End of Lua API constants
 
 -- Include all other lua files here
 dofile "res/enemies/enemies.lua"

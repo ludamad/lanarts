@@ -6,6 +6,8 @@
 #ifndef LUA_API_H_
 #define LUA_API_H_
 
+#include <string>
+
 #include "../lanarts_defines.h"
 
 struct lua_State;
@@ -23,7 +25,8 @@ void lua_push_gameinst(lua_State* L, GameInst* inst);
 void lua_push_combatstats(lua_State* L, GameInst* inst);
 void lua_push_combatstats(lua_State* L, const CombatStats& stats);
 void lua_push_effectivestats(lua_State* L, const EffectiveStats& stats);
-void lua_push_effectiveattackstats(lua_State* L, const EffectiveAttackStats& stats);
+void lua_push_effectiveattackstats(lua_State* L,
+		const EffectiveAttackStats& stats);
 
 CombatStats& lua_get_combatstats(lua_State* L, int narg);
 EffectiveStats& lua_get_effectivestats(lua_State* L, int narg);
@@ -38,13 +41,14 @@ void luayaml_push_sprites(lua_State* L, const char* name);
 void luayaml_push_enemies(lua_State* L, const char* name);
 void luayaml_push_levelinfo(lua_State* L, const char* name);
 
-void lua_push_narray(lua_State* L, const int* nums, int n );
-void lua_tonarray(lua_State* L, int idx, int* nums, int n );
+void lua_push_narray(lua_State* L, const int* nums, int n);
+void lua_tonarray(lua_State* L, int idx, int* nums, int n);
 
-void lua_push_region(lua_State* L, const Region& r );
+void lua_push_region(lua_State* L, const Region& r);
 Region lua_toregion(lua_State* L, int idx);
 
-void lua_push_colour(lua_State* L, const Colour& r );
+void lua_push_colour(lua_State* L, const Colour& r);
 Colour lua_tocolour(lua_State* L, int idx);
+std::string lua_tocppstring(lua_State* L, int idx);
 
 #endif /* LUA_API_H_ */

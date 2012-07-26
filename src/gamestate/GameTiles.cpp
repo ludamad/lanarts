@@ -65,7 +65,7 @@ void GameTiles::copy_to(GameTiles & t) const {
 }
 
 void GameTiles::pre_draw(GameState* gs) {
-	GameView& view = gs->window_view();
+	GameView& view = gs->view();
 	int min_tilex, min_tiley;
 	int max_tilex, max_tiley;
 
@@ -114,7 +114,7 @@ void GameTiles::step(GameState* gs) {
 	}
 }
 void GameTiles::post_draw(GameState* gs) {
-	GameView& view = gs->window_view();
+	GameView& view = gs->view();
 	int min_tilex, min_tiley;
 	int max_tilex, max_tiley;
 

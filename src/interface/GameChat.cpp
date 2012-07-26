@@ -88,7 +88,7 @@ void GameChat::draw_player_chat(GameState* gs) const {
 	const int padding = 5;
 	int line_sep = font.h + 2;
 
-	int view_w = gs->window_view().width, view_h = gs->window_view().height;
+	int view_w = gs->view().width, view_h = gs->view().height;
 	int chat_w = view_w, chat_h = 100;
 	int chat_x = 0, chat_y = 0; //h - chat_h - TILE_SIZE;
 	int text_x = chat_x + padding, text_y = chat_y + padding;
@@ -410,7 +410,7 @@ void GameChat::toggle_chat(GameState* gs) {
 }
 /*Returns whether has handled event completely or not*/
 bool GameChat::handle_event(GameState* gs, SDL_Event *event) {
-	int view_w = gs->window_view().width, view_h = gs->window_view().height;
+	int view_w = gs->view().width, view_h = gs->view().height;
 	int chat_w = view_w, chat_h = 100;
 	int chat_x = 0, chat_y = 0; //h - chat_h - TILE_SIZE;
 

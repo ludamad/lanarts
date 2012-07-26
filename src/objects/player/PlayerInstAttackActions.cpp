@@ -258,7 +258,7 @@ static void player_use_spell(GameState* gs, PlayerInst* p,
 }
 
 bool PlayerInst::queue_io_spell_actions(GameState* gs) {
-	GameView& view = gs->window_view();
+	GameView& view = gs->view();
 	IOController& io = gs->io_controller();
 	SpellsKnown& spells = spells_known();
 
@@ -356,10 +356,10 @@ bool PlayerInst::queue_io_spell_actions(GameState* gs) {
 // dx & dy indicates moving direction, useful for choosing melee attack targets
 bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		float dy) {
-	GameView& view = gs->window_view();
+	GameView& view = gs->view();
 	WeaponEntry& wentry = weapon().weapon_entry();
 
-	bool mouse_within = gs->mouse_x() < gs->window_view().width;
+	bool mouse_within = gs->mouse_x() < gs->view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
 	int level = gs->get_level()->roomid, frame = gs->frame();

@@ -361,7 +361,7 @@ void PathInfo::stake_claim(int x, int y) {
 }
 
 void PathInfo::draw(GameState* gs) {
-	GameView& view = gs->window_view();
+	GameView& view = gs->view();
 	int min_tilex, min_tiley;
 	int max_tilex, max_tiley;
 

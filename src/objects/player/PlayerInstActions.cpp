@@ -60,8 +60,8 @@ static bool is_wieldable_projectile(Equipment& equipment, const Item& item) {
 }
 
 void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
-	GameView& view = gs->window_view();
-	bool mouse_within = gs->mouse_x() < gs->window_view().width;
+	GameView& view = gs->view();
+	bool mouse_within = gs->mouse_x() < gs->view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
 	int level = gs->get_level()->roomid;
@@ -137,11 +137,11 @@ void PlayerInst::queue_io_movement_actions(GameState* gs, int& dx, int& dy) {
 
 void PlayerInst::queue_io_actions(GameState* gs) {
 	GameSettings& settings = gs->game_settings();
-	GameView& view = gs->window_view();
+	GameView& view = gs->view();
 	int level = gs->get_level()->roomid;
 	int frame = gs->frame();
 	int dx = 0, dy = 0;
-	bool mouse_within = gs->mouse_x() < gs->window_view().width;
+	bool mouse_within = gs->mouse_x() < gs->view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
 	/* If in stop-controls mode, perform some actions when movement has stopped */
