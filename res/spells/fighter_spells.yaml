@@ -6,13 +6,19 @@ spells:
       Allows you to strike powerful blows for a limited duration,
       afterwards you are slower and vulnerable.
     mp_cost: 30
-    cooldown: 200
+    cooldown: 30
     spr_spell: berserk
     can_cast_with_held_key: no
     prereq_func: 
       function(caster, _, _) 
         return not caster:has_effect("Berserk") and not caster:has_effect("Exhausted")
       end
-    action_func: function(caster, x, y) caster:add_effect("Berserk", 600) end
+    action_func: 
+      function(caster, x, y) 
+        caster:add_effect("Berserk", 200) 
+        if caster:is_local_player() then 
+          show_message("You enter a powerful rage!", {200,200,255}) 
+        end
+      end
     autotarget_func: 
       function (caster, _) return caster.x, caster.y end
