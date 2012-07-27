@@ -123,7 +123,7 @@ bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
 
 	int maxdist = 0;
 	for (int i = 0; i < pc.player_ids().size(); i++) {
-		PlayerInst* player = (PlayerInst*)gs->get_instance(pc.player_ids()[i]);
+		PlayerInst* player = (PlayerInst*) gs->get_instance(pc.player_ids()[i]);
 		BBox fbox = player->field_of_view().tiles_covered();
 		FOR_EACH_BBOX(fbox, x, y) {
 			if (player->field_of_view().within_fov(x, y)) {
@@ -456,7 +456,7 @@ bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 				}
 			}
 		}
-		if (target || (is_projectile && mousetarget)) {
+		if (target || (is_projectile && (mousetarget || curr_target))) {
 			queued_actions.push_back(
 					game_action(gs, this, GameAction::USE_WEAPON, spellselect,
 							targ_pos.x, targ_pos.y));
@@ -529,7 +529,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		}
 
 		for (int i = 0; i < numhit; i++) {
-			EnemyInst* e = (EnemyInst*)enemies[i];
+			EnemyInst* e = (EnemyInst*) enemies[i];
 			lua_hit_callback(gs->get_luastate(), wentry.on_hit_func, this, e);
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
 				PlayerController& pc = gs->player_controller();
