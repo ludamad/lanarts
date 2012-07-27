@@ -8,6 +8,7 @@ weapons:
     range: 7
     cooldown: 70
     spr_item: none
+    resist_modifier: 1.6
 
   - name: Basic Melee
     weapon_class: unarmed
@@ -24,3 +25,4 @@ weapons:
     range: 7
     cooldown: 20
     spr_item: none
+    resist_modifier: 0.5
