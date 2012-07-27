@@ -18,7 +18,7 @@ spells:
         caster:add_effect("Berserk", 200) 
         if caster:is_local_player() then 
           show_message("You enter a powerful rage!", {200,200,255}) 
-        else 
+        elseif caster.name == "Your ally" then
           show_message(caster.name .. " enters a powerful rage!", {200,200,255}) 
         end
       end
