@@ -35,3 +35,23 @@ enemies:
         magic: 20
         defence: 10  
         willpower: 10
+
+  - name: Hell Hog
+    sprite: hell hog
+    death_sprite: blood
+    description: An angry hellish pig.
+    appear_message: A hellish pig lets out a loud snort.
+    defeat_message: The hellish pig dies.
+    init_func: enemy_berserker_init 
+    step_func: enemy_berserker_step
+    radius: 12
+    xpaward: 50
+    stats:
+        attacks: [ {weapon: Slow Melee} ]
+        movespeed: 3.3
+        hp: 50
+        hpregen: 0.25
+        strength: 20
+        magic: 20
+        defence: 10  
+        willpower: 10

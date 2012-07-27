@@ -40,7 +40,7 @@ sprite_files:
   - sprites/armour_sprites.yaml
   - sprites/interface_sprites.yaml
   - sprites/item_sprites.yaml
-  - sprites/enemy_sprites.yaml
+  - enemies/enemy_sprites.yaml
   - sprites/other_sprites.yaml
   - spells/spell_sprites.yaml
   - sprites/weapon_sprites.yaml

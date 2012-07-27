@@ -73,6 +73,8 @@ sprites:
 #demonic
   - name: imp
     file: res/sprites/monsters/demonic/cute_imp.png
+  - name: hell hog
+    file: res/sprites/monsters/animals/hell_hog.png
 
   - name: unseen horror
     file: res/sprites/monsters/demonic/unseen_horror.png
