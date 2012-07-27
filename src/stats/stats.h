@@ -73,8 +73,9 @@ struct DerivedStats {
 struct EffectiveAttackStats {
 	int damage, power, cooldown;
 	float magic_percentage;
+	float resist_modifier;
 	EffectiveAttackStats() :
-			damage(0), power(0), cooldown(0), magic_percentage(0.0f) {
+			damage(0), power(0), cooldown(0), magic_percentage(0.0f), resist_modifier(1.0f) {
 	}
 	float physical_percentage() const {
 		return 1.0f - magic_percentage;

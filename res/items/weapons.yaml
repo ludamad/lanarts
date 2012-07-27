@@ -43,12 +43,7 @@ weapons:
     damage: {base: [4,8], strength: 1.0}
     power: {base: 1, strength: 0.2}
     range: 7
-    on_hit_func: function (user, target) 
-        if user.stats.mp > 10 then
-          target:damage(5, user.stats.power)
-          user.stats.mp = user.stats.mp - 10
-        end
-     end
+    on_hit_func: use_magic_sword
     cooldown: 40
     spr_item: magic sword
 

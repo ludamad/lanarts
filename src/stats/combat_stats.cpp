@@ -30,7 +30,8 @@ bool CombatStats::has_died() {
 	return core.hp <= 0;
 }
 
-EffectiveStats CombatStats::effective_stats(GameState* gs, CombatGameInst* inst) const {
+EffectiveStats CombatStats::effective_stats(GameState* gs,
+		CombatGameInst* inst) const {
 	return ::effective_stats(gs, inst, *this);
 }
 
@@ -168,10 +169,15 @@ int AttackStats::atk_power(MTwist& mt, const EffectiveStats& stats) const {
 }
 
 int AttackStats::atk_percentage_magic() const {
-
 	if (weapon.id > 0 || !projectile.valid_projectile()) {
 		return weapon.weapon_entry().percentage_magic;
 	}
 	return projectile.projectile_entry().percentage_magic;
 }
 
+float AttackStats::atk_resist_modifier() const {
+	if (weapon.id > 0 || !projectile.valid_projectile()) {
+		return weapon.weapon_entry().resist_modifier;
+	}
+	return projectile.projectile_entry().resist_modifier;
+}

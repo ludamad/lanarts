@@ -24,6 +24,7 @@ EffectEntry parse_effect(const YAML::Node& n) {
 	entry.effected_sprite = parse_sprite_number(n, "effected_sprite");
 	entry.additive_duration = parse_defaulted(n, "additive_duration", false);
 	entry.can_rest = parse_defaulted(n, "can_rest", false);
+	entry.fades_out = parse_defaulted(n, "fades_out", true);
 	return entry;
 }
 

@@ -83,6 +83,7 @@ set( lanarts_src
 	levelgen/tunnelgen.cpp
 
 	interface/console_description_draw.cpp
+	lanarts_defines.cpp
 	util/math_util.cpp
 	util/game_replays.cpp
 	util/mtwist.cpp

@@ -34,6 +34,15 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
 
 	int dmg = damage_formula(attack, effective_stats());
 
+	if (gs->game_settings().verbose_output) {
+		char buff[100];
+		snprintf(buff, 100, "Attack: [dmg %d pow %d mag %d%%] -> Damage: %d",
+				attack.damage, attack.power, int(attack.magic_percentage * 100),
+				dmg);
+		gs->game_chat().add_message(buff);
+
+	}
+
 	char dmgstr[32];
 	snprintf(dmgstr, 32, "%d", dmg);
 	gs->add_instance(
@@ -75,22 +84,13 @@ static float hurt_alpha_value(int hurt_cooldown) {
 void CombatGameInst::draw(GameState *gs) {
 	GameView& view = gs->view();
 	SpriteEntry& spr = game_sprite_data[sprite];
-	Colour draw_colour(255, 255, 255);
+	Colour draw_colour = effects().effected_colour();
 
-	int haste_effect = get_effect_by_name("Haste");
-	if (effects().get(haste_effect)) {
-		Effect* e = effects().get(haste_effect);
-		float s = e->t_remaining / 200.0;
-		if (s > 1)
-			s = 1;
-		draw_colour = Colour(255 * (1 - s), 255 * (1 - s), 255);
-	} else if (cooldowns().is_hurting()) {
+	if (cooldowns().is_hurting()) {
 		float s = 1 - hurt_alpha_value(cooldowns().hurt_cooldown);
-		draw_colour = Colour(255, 255 * s, 255 * s);
+		draw_colour = draw_colour.multiply(Colour(255, 255 * s, 255 * s));
 	}
-	if (effects().has_active_effect()) {
-		draw_colour = effects().effected_colour();
-	}
+
 	int sx = x - spr.width() / 2, sy = y - spr.height() / 2;
 	gl_draw_sprite(view, sprite, sx, sy, vx, vy, gs->frame(), draw_colour);
 
@@ -281,8 +281,8 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 }
 
 void CombatGameInst::update_position() {
-	x = (int) round(rx); //update based on rounding of true float
-	y = (int) round(ry);
+	x = (int)round(rx); //update based on rounding of true float
+	y = (int)round(ry);
 }
 
 void CombatGameInst::update_position(float newx, float newy) {
@@ -317,7 +317,7 @@ static void combine_stat_hash(unsigned int& hash, CombatStats& stats) {
 }
 unsigned int CombatGameInst::integrity_hash() {
 	unsigned int hash = GameInst::integrity_hash();
-	combine_hash(hash, (unsigned int&) vx, (unsigned int&) vy);
+	combine_hash(hash, (unsigned int&)vx, (unsigned int&)vy);
 	combine_stat_hash(hash, stats());
 	return hash;
 }

@@ -21,8 +21,8 @@ extern "C" {
 // Take arguments: sprite, x, y
 static int draw_sprite(lua_State* L) {
 	GameState* gs = lua_get_gamestate(L);
-	gl_draw_sprite(gs->view(), sprite_from_lua(L, 1), lua_tonumber(L, 2),
-			lua_tonumber(L, 3));
+	gl_draw_sprite(gs->view(), sprite_from_lua(L, 1), lua_tointeger(L, 2),
+			lua_tointeger(L, 3));
 	return 0;
 }
 

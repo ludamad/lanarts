@@ -12,7 +12,7 @@ effects:
 
   - name: Berserk
     stat_func: berserk_statmod
-    exhausted_duration: 200
+    exhausted_duration: 250
     finish_func: 
       function (effect, obj) 
         obj:add_effect("Exhausted", effect.exhausted_duration) 
@@ -20,8 +20,9 @@ effects:
           show_message("You are now exhausted...", {255,200,200}) 
         end
       end
+    fades_out: no
     effected_colour: [255,160,160] #RGB
-    effected_sprite: berserk_effected
+    effected_sprite: berserk effected
 
   - name: Exhausted
     stat_func: exhausted_statmod
@@ -31,5 +32,6 @@ effects:
           show_message("You are no longer exhausted.", {200,200,255}) 
         end
       end
-    effected_colour: [160,160,160] #RGB
+    effected_colour: [120,120,120] #RGB
+    effected_sprite: exhausted effected
 

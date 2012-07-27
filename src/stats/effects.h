@@ -12,7 +12,7 @@ struct GameState;
 struct CombatGameInst;
 
 struct Effect {
-	effect_id effect;
+	effect_id effectid;
 	LuaValue state;
 	int t_remaining;
 };

@@ -23,7 +23,7 @@ extern "C" {
 // Take arguments: objtype, x, y; returns obj
 static int obj_create(lua_State* L) {
 	scriptobj_id scr_obj = scriptobject_from_lua(L, 1);
-	int x = lua_tonumber(L, 2), y = lua_tonumber(L, 3);
+	int x = lua_tointeger(L, 2), y = lua_tointeger(L, 3);
 
 	ScriptedInst* inst = new ScriptedInst(scr_obj, x, y);
 

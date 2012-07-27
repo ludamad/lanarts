@@ -22,9 +22,9 @@ static int obj_solid_check(lua_State* L) {
 	int nargs = lua_gettop(L);
 
 	GameInst* obj = lua_gameinst_arg(L, 1);
-	int x = nargs >= 2 ? lua_tonumber(L, 2) : obj->x;
-	int y = nargs >= 3 ? lua_tonumber(L, 3) : obj->y;
-	int radius = nargs >= 4 ? lua_tonumber(L, 4) : obj->radius;
+	int x = nargs >= 2 ? lua_tointeger(L, 2) : obj->x;
+	int y = nargs >= 3 ? lua_tointeger(L, 3) : obj->y;
+	int radius = nargs >= 4 ? lua_tointeger(L, 4) : obj->radius;
 
 	lua_pushboolean(L, gs->solid_test(obj, x, y, radius));
 	return 1;
@@ -35,9 +35,9 @@ static int radius_visible_check(lua_State* L) {
 	GameState* gs = lua_get_gamestate(L);
 	int nargs = lua_gettop(L);
 
-	int x = lua_tonumber(L, 1);
-	int y = lua_tonumber(L, 2);
-	int radius = lua_tonumber(L, 3);
+	int x = lua_tointeger(L, 1);
+	int y = lua_tointeger(L, 2);
+	int radius = lua_tointeger(L, 3);
 	PlayerInst* observer =
 			nargs >= 4 ?
 					dynamic_cast<PlayerInst*>(lua_gameinst_arg(L, 4)) : NULL;
@@ -59,9 +59,9 @@ static int radius_tile_check(lua_State* L) {
 	GameState* gs = lua_get_gamestate(L);
 	GameInst* obj = lua_gameinst_arg(L, 1);
 
-	int x = lua_tonumber(L, 1);
-	int y = lua_tonumber(L, 2);
-	int radius = lua_tonumber(L, 3);
+	int x = lua_tointeger(L, 1);
+	int y = lua_tointeger(L, 2);
+	int radius = lua_tointeger(L, 3);
 
 	lua_pushboolean(L, gs->tile_radius_test(radius, x, y));
 	return 1;

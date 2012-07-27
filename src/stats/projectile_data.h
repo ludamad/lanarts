@@ -21,6 +21,7 @@ struct ProjectileEntry {
 	sprite_id item_sprite, attack_sprite;
 	CoreStatMultiplier power, damage;
 	float percentage_magic; //Conversely the rest is percentage physical
+	float resist_modifier; // How much resistance can resist this attack, lower for fast attacks
 
 	int drop_chance; //out of 100
 	//If unarmed projectile, range/cooldown used
@@ -33,9 +34,9 @@ struct ProjectileEntry {
 	LuaValue on_hit_func;
 
 	ProjectileEntry() :
-			percentage_magic(0.0f), drop_chance(0), speed(0.0f), can_wall_bounce(
-					false), number_of_target_bounces(0), cooldown(0), range(0), radius(
-					0) {
+			item_sprite(-1), attack_sprite(-1), percentage_magic(0.0f), resist_modifier(
+					1.0f), drop_chance(0), speed(0.0f), can_wall_bounce(false), number_of_target_bounces(
+					0), cooldown(0), range(0), radius(0) {
 
 	}
 

@@ -33,6 +33,7 @@ struct AttackStats {
 	int atk_damage(MTwist& mt, const EffectiveStats& stats) const;
 	int atk_power(MTwist& mt, const EffectiveStats& stats) const;
 	int atk_percentage_magic() const;
+	float atk_resist_modifier() const;
 
 	/* members */
 	Weapon weapon;

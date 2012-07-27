@@ -51,9 +51,10 @@ public:
 		GameState* gs = lua_get_gamestate(L);
 		EffectiveAttackStats attack;
 		int nargs = lua_gettop(L);
-		attack.power = round(lua_tonumber(L, 1));
-		attack.damage = round(lua_tonumber(L, 2));
+		attack.damage = round(lua_tointeger(L, 1));
+		attack.power = round(lua_tointeger(L, 2));
 		attack.magic_percentage = nargs >= 3 ? lua_tonumber(L, 3) : 1.0f;
+		attack.resist_modifier = nargs >= 4 ? lua_tonumber(L, 4) : 1.0f;
 
 		get_combat_inst()->damage(lua_get_gamestate(L), attack);
 		return 0;
@@ -67,7 +68,7 @@ public:
 			lua_gettable(L, 1);
 			const char* itemname = lua_tostring(L, lua_gettop(L));
 			item_id item = get_item_by_name(itemname);
-			int amnt = args >= 2 ? lua_tonumber(L, 2) : 1;
+			int amnt = args >= 2 ? lua_tointeger(L, 2) : 1;
 			combatinst->equip(item, amnt);
 			lua_pop(L, 1);
 		}
@@ -77,13 +78,20 @@ public:
 		CombatGameInst* combatinst;
 		if ((combatinst = dynamic_cast<CombatGameInst*>(get_inst()))) {
 			LuaValue effect = combatinst->effects().add(lua_get_gamestate(L),
-					effect_from_lua(L, 1), lua_tonumber(L, 2));
+					effect_from_lua(L, 1), lua_tointeger(L, 2));
 			effect.push(L);
 		} else {
 			lua_pushnil(L);
 		}
 
 		return 1;
+	}
+	int reset_rest_cooldown(lua_State* L) {
+		PlayerInst* p = dynamic_cast<PlayerInst*>(inst.get_instance());
+		if (p) {
+			p->cooldowns().reset_rest_cooldown(REST_COOLDOWN);
+		}
+		return 0;
 	}
 	int is_local_player(lua_State* L) {
 		PlayerInst* p = dynamic_cast<PlayerInst*>(inst.get_instance());
@@ -111,11 +119,11 @@ public:
 		return 0;
 	}
 	int heal_hp(lua_State* L) {
-		get_stats()->core.heal_hp(lua_tonumber(L, 1));
+		get_stats()->core.heal_hp(lua_tointeger(L, 1));
 		return 0;
 	}
 	int heal_mp(lua_State* L) {
-		get_stats()->core.heal_mp(lua_tonumber(L, 1));
+		get_stats()->core.heal_mp(lua_tointeger(L, 1));
 		return 0;
 	}
 private:
@@ -141,9 +149,9 @@ GameInst* lua_gameinst_arg(lua_State* L, int narg) {
 	lua_push_combatstats(L, m );\
 }
 
-static void push_inst_name(lua_State* L, GameInst* inst){
+static void push_inst_name(lua_State* L, GameInst* inst) {
 	PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
-	if (p){
+	if (p) {
 //		lua_pushlstring(L, p->); //TODO
 		lua_pushstring(L, "Your ally");
 	} else {
@@ -226,7 +234,7 @@ meth_t bind_t::methods[] = { LUA_DEF(heal_fully), LUA_DEF(move_to),
 		LUA_DEF(heal_hp), LUA_DEF(heal_mp), LUA_DEF(direct_damage),
 		LUA_DEF(damage), LUA_DEF(equip), LUA_DEF(add_effect),
 		LUA_DEF(has_effect), LUA_DEF(add_effect), LUA_DEF(is_local_player),
-		meth_t(0, 0) };
+		LUA_DEF(reset_rest_cooldown), meth_t(0, 0) };
 
 void lua_gameinst_bindings(GameState* gs, lua_State* L) {
 	lunar_t::Register(L);

@@ -66,6 +66,12 @@ static GameInst* find_closest_from_list(GameState* gs,
 	return closest;
 }
 
+static GameInst* get_closest_monster(GameState* gs, PlayerInst* p) {
+	std::vector<GameInst*> visible_monsters;
+	get_visible_monsters(gs, visible_monsters, p);
+
+	return find_closest_from_list(gs, visible_monsters, p->pos());
+}
 static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 		GameInst* targ, float dx, float dy) {
 	WeaponEntry& wentry = p->weapon().weapon_entry();
@@ -117,7 +123,7 @@ bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
 
 	int maxdist = 0;
 	for (int i = 0; i < pc.player_ids().size(); i++) {
-		PlayerInst* player = (PlayerInst*) gs->get_instance(pc.player_ids()[i]);
+		PlayerInst* player = (PlayerInst*)gs->get_instance(pc.player_ids()[i]);
 		BBox fbox = player->field_of_view().tiles_covered();
 		FOR_EACH_BBOX(fbox, x, y) {
 			if (player->field_of_view().within_fov(x, y)) {
@@ -190,8 +196,8 @@ static bool lua_spell_get_target(GameState* gs, PlayerInst* p, LuaValue& action,
 	if (nret != 2 || lua_isnil(L, -1)) {
 		nilresult = true;
 	} else if (nret == 2) {
-		pos.x = lua_tonumber(L, -2);
-		pos.y = lua_tonumber(L, -1);
+		pos.x = lua_tointeger(L, -2);
+		pos.y = lua_tointeger(L, -1);
 	}
 
 	lua_pop(L, nret);
@@ -353,6 +359,30 @@ bool PlayerInst::queue_io_spell_actions(GameState* gs) {
 	return false;
 }
 
+static bool decide_attack_movement(const Pos& player, const Pos& target,
+		float threshold, int& vx, int& vy) {
+	float dx = target.x - player.x, dy = target.y - player.y;
+	if (fabs(dx) < threshold) {
+		dx = 0;
+	}
+	if (fabs(dy) < threshold) {
+		dy = 0;
+	}
+	normalize(dx, dy);
+	vx = 0, vy = 0;
+	if (dx > 0.2) {
+		vx = 1;
+	} else if (dx < -0.2) {
+		vx = -1;
+	}
+	if (dy > 0.2) {
+		vy = 1;
+	} else if (dy < -0.2) {
+		vy = -1;
+	}
+	return vx != 0 || vy != 0;
+}
+
 // dx & dy indicates moving direction, useful for choosing melee attack targets
 bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 		float dy) {
@@ -414,21 +444,23 @@ bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 				targ_pos = Pos(target->x, target->y);
 
 			}
-			if (!is_moving && !target && (mousetarget || curr_target)
-					&& !is_projectile) {
-				Posf dir(rmx - x, rmy - y);
-				if (!mousetarget) {
-					dir = Posf(curr_target->x - x, curr_target->y - y);
+			if (!is_moving && !target && !mousetarget && spell_selected() == -1
+					&& curr_target && !is_projectile) {
+				int vx, vy;
+				GameInst* closest = get_closest_monster(gs, this);
+				if (decide_attack_movement(pos(), closest->pos(), TILE_SIZE / 4,
+						vx, vy)) {
+					queued_actions.push_back(
+							game_action(gs, this, GameAction::MOVE, spellselect,
+									round(vx), round(vy)));
 				}
-				normalize(dir.x, dir.y);
-
-				dir.x *= effective_stats().movespeed;
-				dir.y *= effective_stats().movespeed;
-
-				queued_actions.push_back(
-						GameAction(id, GameAction::MOVE, frame, level,
-								spellselect, floor(dir.x), floor(dir.y)));
 			}
+		}
+		if (target || (is_projectile && mousetarget)) {
+			queued_actions.push_back(
+					game_action(gs, this, GameAction::USE_WEAPON, spellselect,
+							targ_pos.x, targ_pos.y));
+			attack_used = true;
 		}
 	}
 	return attack_used;
@@ -497,7 +529,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		}
 
 		for (int i = 0; i < numhit; i++) {
-			EnemyInst* e = (EnemyInst*) enemies[i];
+			EnemyInst* e = (EnemyInst*)enemies[i];
 			lua_hit_callback(gs->get_luastate(), wentry.on_hit_func, this, e);
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
 				PlayerController& pc = gs->player_controller();

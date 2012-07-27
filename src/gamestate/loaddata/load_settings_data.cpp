@@ -42,6 +42,7 @@ GameSettings load_settings_data(const char* filename) {
 			optional_set(root, "network_debug_mode", ret.network_debug_mode);
 			optional_set(root, "savereplay_file", ret.savereplay_file);
 			optional_set(root, "loadreplay_file", ret.loadreplay_file);
+			optional_set(root, "verbose_output", ret.verbose_output);
 
 			if (yaml_has_node(root, "connection_type")) {
 				std::string connname;

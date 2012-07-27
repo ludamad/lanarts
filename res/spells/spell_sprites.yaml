@@ -30,5 +30,8 @@ sprites:
   - name: berserk
     file: res/sprites/spells/berserk.png
         
-  - name: berserk_effected
-    file: res/sprites/effects/berserk.png
+  - name: berserk effected
+    file: res/sprites/effects/berserk.png       
+
+  - name: exhausted effected
+    file: res/sprites/effects/i-slowing.png

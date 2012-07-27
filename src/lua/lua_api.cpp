@@ -21,18 +21,18 @@ void lua_display_func_bindings(lua_State* L);
 int rand_range(lua_State* L) {
 	GameState* gs = lua_get_gamestate(L);
 	int nargs = lua_gettop(L);
-
-	lua_pushnumber(L, 1.0);
-	lua_rawget(L, 1);
-	int min = lua_tonumber(L, lua_gettop(L));
-	int max = min;
-	lua_pop(L, 1);
-
-	if (nargs > 1) {
-		lua_pushnumber(L, 2.0);
-		lua_rawget(L, 1);
-		max = lua_tonumber(L, lua_gettop(L));
-		lua_pop(L, 1);
+	int min = 0, max = 0;
+	if (nargs == 1) {
+		// array[1]
+		lua_rawgeti(L, 1, 1);
+		min = lua_tointeger(L, -1);
+		// array[2]
+		lua_rawgeti(L, 1, 2);
+		max = lua_tointeger(L, -1);
+		lua_pop(L, 2);
+	} else if (nargs > 1) {
+		min = lua_tointeger(L, 1);
+		max = lua_tointeger(L, 2);
 	}
 
 	lua_pushnumber(L, gs->rng().rand(min, max + 1));
@@ -70,7 +70,7 @@ void lua_tonarray(lua_State* L, int idx, int* nums, int n) {
 	for (int i = 0; i < n; i++) {
 		lua_rawgeti(L, idx, i + 1);
 		if (!lua_isnil(L, -1)) {
-			nums[i] = lua_tonumber(L, -1);
+			nums[i] = lua_tointeger(L, -1);
 		}
 		lua_pop(L, 1);
 	}

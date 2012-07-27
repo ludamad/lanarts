@@ -5,3 +5,5 @@
 effects:
   - name: Haste
     stat_func: haste_statmod
+    effected_colour: [160,160,255,240] #RGB
+    effected_sprite: haste effected

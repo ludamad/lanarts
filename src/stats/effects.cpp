@@ -23,12 +23,21 @@ bool EffectStats::has_active_effect() const {
 	return false;
 }
 
+static float draw_alpha(Effect& effect) {
+	EffectEntry& eentry = game_effect_data.at(effect.effectid);
+	if (!eentry.fades_out || effect.t_remaining > 100) {
+		return 1.0f;
+	}
+	return effect.t_remaining / 100.0f;
+}
+
 Colour EffectStats::effected_colour() {
 	int r = 255 * 256, g = 255 * 256, b = 255 * 256, a = 255 * 256;
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining > 0) {
-			EffectEntry& eentry = game_effect_data.at(effects[i].effect);
-			const Colour& c = eentry.effected_colour;
+			EffectEntry& eentry = game_effect_data.at(effects[i].effectid);
+			Colour c = eentry.effected_colour.mute_colour(
+					draw_alpha(effects[i]));
 			r *= c.r + 1, g *= c.g + 1, b *= c.b + 1, a *= c.a + 1;
 			r /= 256, g /= 256, b /= 256, a /= 256;
 		}
@@ -40,9 +49,11 @@ void EffectStats::draw_effect_sprites(GameState* gs, const Pos& p) {
 	GameView& view = gs->view();
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining > 0) {
-			EffectEntry& eentry = game_effect_data.at(effects[i].effect);
+			EffectEntry& eentry = game_effect_data.at(effects[i].effectid);
 			if (eentry.effected_sprite > -1) {
-				gl_draw_sprite(view, eentry.effected_sprite, p.x, p.y);
+				Colour drawcolour(255, 255, 255, 255 * draw_alpha(effects[i]));
+				gl_draw_sprite(view, eentry.effected_sprite, p.x, p.y,
+						drawcolour);
 			}
 		}
 	}
@@ -50,8 +61,8 @@ void EffectStats::draw_effect_sprites(GameState* gs, const Pos& p) {
 
 bool EffectStats::can_rest() {
 	for (int i = 0; i < EFFECTS_MAX; i++) {
-		if (effects[i].t_remaining > 0 ) {
-			EffectEntry& eentry = game_effect_data.at(effects[i].effect);
+		if (effects[i].t_remaining > 0) {
+			EffectEntry& eentry = game_effect_data.at(effects[i].effectid);
 			if (!eentry.can_rest) {
 				return false;
 			}
@@ -73,7 +84,7 @@ void EffectStats::process(GameState* gs, CombatGameInst* inst,
 
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining > 0) {
-			game_effect_data.at(effects[i].effect).stat_func.push(L);
+			game_effect_data.at(effects[i].effectid).stat_func.push(L);
 			if (!lua_isnil(L, -1)) {
 				effects[i].state.push(L);
 				lua_push_gameinst(L, inst);
@@ -108,7 +119,7 @@ void EffectStats::step(GameState* gs, CombatGameInst* inst) {
 	lua_State* L = gs->get_luastate();
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining > 0) {
-			EffectEntry& eentry = game_effect_data.at(effects[i].effect);
+			EffectEntry& eentry = game_effect_data.at(effects[i].effectid);
 			effects[i].t_remaining--;
 			lua_effect_func_callback(L, eentry.step_func, effects[i], inst);
 			if (effects[i].t_remaining == 0) {
@@ -122,7 +133,7 @@ void EffectStats::step(GameState* gs, CombatGameInst* inst) {
 
 Effect* EffectStats::get(int effect) {
 	for (int i = 0; i < EFFECTS_MAX; i++) {
-		if (effects[i].t_remaining > 0 && effects[i].effect == effect) {
+		if (effects[i].t_remaining > 0 && effects[i].effectid == effect) {
 			return &effects[i];
 		}
 	}
@@ -153,8 +164,8 @@ static void lua_init_effect(lua_State* L, LuaValue& value, effect_id effect) {
 LuaValue EffectStats::add(GameState* gs, effect_id effect, int length) {
 	lua_State* L = gs->get_luastate();
 	for (int i = 0; i < EFFECTS_MAX; i++) {
-		if (effects[i].t_remaining == 0 || effects[i].effect == effect) {
-			effects[i].effect = effect;
+		if (effects[i].t_remaining == 0 || effects[i].effectid == effect) {
+			effects[i].effectid = effect;
 			effects[i].t_remaining = std::max(effects[i].t_remaining, length);
 			if (effects[i].state.empty()) {
 				lua_init_effect(L, effects[i].state, effect);

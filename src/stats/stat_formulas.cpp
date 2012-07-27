@@ -32,7 +32,8 @@ static float damage_multiplier(float power, float resistance) {
 static int basic_damage_formula(const EffectiveAttackStats& attacker,
 		const DerivedStats& defender) {
 	float mult = damage_multiplier(attacker.power, defender.resistance);
-	int base = attacker.damage - defender.reduction;
+	float base = attacker.damage
+			- defender.reduction * attacker.resist_modifier;
 	if (base < 0)
 		return 0;
 	return round(mult * base);

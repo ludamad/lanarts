@@ -34,6 +34,7 @@ void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
 	entry.power = parse_defaulted(node, "power", CoreStatMultiplier());
 
 	entry.percentage_magic = parse_magic_percentage(node, "damage_type");
+	entry.resist_modifier = parse_defaulted(node, "resist_modifier", 1.0f);
 
 	entry.item_sprite = parse_sprite_number(node, "spr_item");
 	entry.attack_sprite = entry.item_sprite;

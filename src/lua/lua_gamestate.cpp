@@ -35,7 +35,7 @@ public:
 		lua_pop(L, 1);
 
 		bool bounce = nargs < 8 ? false : lua_toboolean(L, 8);
-		int hits = nargs < 9 ? 1 : lua_tonumber(L, 9);
+		int hits = nargs < 9 ? 1 : lua_tointeger(L, 9);
 		GameInst* target = nargs < 10 ? NULL : lua_gameinst_arg(L, 10);
 
 		obj_id projectile_id = 0;
@@ -46,9 +46,9 @@ public:
 ////			ProjectileInst(sprite_id sprite, obj_id originator, float speed, int range,
 ////					int damage, int x, int y, int tx, int ty, bool bounce = false,
 ////					int hits = 1, obj_id target = NONE);
-//			GameInst* inst = new ProjectileInst(sprite, origin_id, lua_tonumber(L, 5),
-//					lua_tonumber(L, 6), lua_tonumber(L, 7), origin_obj->x, origin_obj->y,
-//					lua_tonumber(L, 2), lua_tonumber(L, 3), bounce,
+//			GameInst* inst = new ProjectileInst(sprite, origin_id, lua_tointeger(L, 5),
+//					lua_tointeger(L, 6), lua_tointeger(L, 7), origin_obj->x, origin_obj->y,
+//					lua_tointeger(L, 2), lua_tointeger(L, 3), bounce,
 //					hits, target);
 //			projectile_id = gs->add_instance(inst);
 //		}

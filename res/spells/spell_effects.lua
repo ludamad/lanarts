@@ -12,7 +12,7 @@ function poison_step(effect, obj)
 		effect.steps = effect.steps + 1
 	else
 		effect.steps = 0
-		obj:damage(effect.power,effect.damage, effect.magic_percentage)
+		obj:damage(effect.damage,effect.power, effect.magic_percentage)
 	end
 end
 
@@ -24,10 +24,14 @@ end
 function berserk_statmod(effect, obj, old, new)	
 	new.strength = new.strength + 5
 	new.defence = new.defence + 5
-	new.cooldown_mult = new.cooldown_mult / 1.35
+	new.cooldown_mult = new.cooldown_mult / 1.5
+	new.speed = new.speed + 1
+	obj:reset_rest_cooldown()
 end
 
 function exhausted_statmod(effect, obj, old, new)
 	new.speed = new.speed / 2
+	new.defence = new.defence - 3
 	new.cooldown_mult = new.cooldown_mult * 1.25
+	obj:reset_rest_cooldown()
 end

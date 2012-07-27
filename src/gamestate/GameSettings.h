@@ -17,12 +17,15 @@ struct GameSettings {
 
 	/*Draw settings*/
 	std::string font;
-	bool fullscreen, draw_diagnostics;
+	bool fullscreen;
 	int view_width, view_height;
 	int steps_per_draw;
 	float time_per_step;
 
-	/*Replay settings*/
+	/*Debug options*/
+	bool draw_diagnostics, verbose_output;
+
+	/*Replay settings, can be set in menu*/
 	std::string savereplay_file, loadreplay_file;
 
 	/*Gameplay settings*/
@@ -53,6 +56,7 @@ struct GameSettings {
 		port = 0;
 		conntype = NONE;
 		network_debug_mode = false;
+		verbose_output = false;
 	}
 };
 

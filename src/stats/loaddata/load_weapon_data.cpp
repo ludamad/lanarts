@@ -50,6 +50,7 @@ void load_weapon_callbackf(const YAML::Node& node, lua_State* L,
 
 	entry.damage = parse_defaulted(node, "damage", CoreStatMultiplier());
 	entry.power = parse_defaulted(node, "power", CoreStatMultiplier());
+	entry.resist_modifier = parse_defaulted(node, "resist_modifier", 1.0f);
 
 	entry.percentage_magic = parse_magic_percentage(node, "damage_type");
 	entry.range = parse_defaulted(node, "range", default_range);

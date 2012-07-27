@@ -15,10 +15,10 @@ struct EffectEntry {
 	LuaValue stat_func, init_func, finish_func, step_func;
 	Colour effected_colour;
 	sprite_id effected_sprite;
-	bool additive_duration, can_rest;
+	bool additive_duration, can_rest, fades_out;
 
 	EffectEntry() :
-			effected_sprite(-1), additive_duration(false), can_rest(false) {
+			effected_sprite(-1), additive_duration(false), can_rest(false), fades_out(true) {
 	}
 
 	void init(lua_State* L) {

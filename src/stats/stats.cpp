@@ -72,6 +72,7 @@ EffectiveAttackStats EffectiveStats::with_attack(MTwist& mt,
 	ret.damage = attack.atk_damage(mt, *this);
 	ret.power = attack.atk_power(mt, *this);
 	ret.magic_percentage = attack.atk_percentage_magic();
+	ret.resist_modifier = attack.atk_resist_modifier();
 	return ret;
 }
 

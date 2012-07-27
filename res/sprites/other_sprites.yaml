@@ -24,6 +24,12 @@ sprites:
   - name: purple blood
     file: res/sprites/effects/blood_purple.png
     
+  - name: small skeleton
+    file: res/sprites/effects/skeleton1.png
+
+  - name: haste effected
+    file: res/sprites/effects/i-speed.png
+    
   - name: open door
     file: res/sprites/features/open_door.png
 
