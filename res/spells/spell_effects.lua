@@ -54,7 +54,7 @@ end
 function berserk_statmod(effect, obj, old, new)	
 	new.strength = new.strength + 2
 	new.defence = new.defence + 4
-	new.cooldown_mult = new.cooldown_mult / 1.25
+	new.cooldown_mult = new.cooldown_mult / 1.35
 	new.speed = new.speed + 1
 	obj:reset_rest_cooldown()
 end
