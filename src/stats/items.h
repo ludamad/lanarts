@@ -47,6 +47,8 @@ struct Armour {
 	ItemProperties properties;
 
 	Item as_item() const;
+	ItemEntry& item_entry() const;
+
 	Armour(armour_id id, ItemProperties properties = ItemProperties()) :
 			id(id), properties(properties) {
 	}

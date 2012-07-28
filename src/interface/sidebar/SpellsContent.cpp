@@ -37,7 +37,7 @@ static void draw_spells_known(GameState* gs, const BBox& bbox,
 		SpellEntry& spl_entry = game_spell_data.at(spell);
 		draw_spell_icon_and_name(gs, spl_entry, Colour(), x, y);
 
-		BBox entry_box(x, y, ex - 2, y + TILE_SIZE);
+		BBox entry_box(x, y, ex, y + TILE_SIZE);
 		if (entry_box.contains(mx, my)) {
 			if (spellidx != selected_spell) {
 				gl_draw_rectangle_outline(entry_box, COL_FILLED_OUTLINE);
