@@ -52,8 +52,8 @@ weapons:
     weapon_class: bows
     uses_projectile: yes
     #Stats
-    damage: {base: [4,6], strength: 1.0}
+    damage: {base: [3,6], strength: 1.0}
     power: {base: 0, strength: 0.2}
     range: 300
-    cooldown: 40
+    cooldown: 45
     spr_item: bow1

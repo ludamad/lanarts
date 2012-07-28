@@ -221,9 +221,11 @@ bool in_corridor_heurestic(GameState* gs, const Pos& p, float vx, float vy) {
 	}
 	return solid >= 4;
 }
+
+const float ROUNDING_MULTIPLE = 65536.0f;
+
 void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 		float& newy) {
-	const float ROUNDING_MULTIPLE = 65536.0f;
 
 	float dx = newx - rx, dy = newy - ry;
 	float dist = sqrt(dx * dx + dy * dy);
@@ -266,15 +268,11 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 
 //		normalize(nx, ny, effective_stats().movespeed);
 
-//		vx = round(vx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-//		vy = round(vy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
+		vx = round(vx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
+		vy = round(vy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
 		rx += vx;
 		ry += vy;
 	}
-
-//	rx = round(rx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-//	ry = round(ry * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-
 	newx = rx, newy = ry;
 
 	update_position();
@@ -286,6 +284,8 @@ void CombatGameInst::update_position() {
 }
 
 void CombatGameInst::update_position(float newx, float newy) {
+	rx = round(newx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
+	ry = round(newy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
 	rx = newx, ry = newy;
 	update_position();
 }
