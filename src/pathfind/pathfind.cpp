@@ -86,6 +86,7 @@ void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
 		if (path)
 			delete[] path;
 		path = new PathingNode[alloc_w * alloc_h];
+		memset(path, 0, alloc_w * alloc_h * sizeof(PathingNode));
 	}
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
@@ -176,7 +177,7 @@ void PathInfo::interpolated_direction(int x, int y, int w, int h, float speed,
 		vx = 0, vy = 0;
 		return;
 	}
-	int ispeed = (int) ceil(speed);
+	int ispeed = (int)ceil(speed);
 	int area = w * h;
 	int mx = x + w, my = y + h;
 	//Set up coordinate min and max
