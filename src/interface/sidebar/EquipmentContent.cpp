@@ -34,7 +34,7 @@ static void draw_armour(GameState* gs, Equipment& eqp, BBox bbox){
 	if(eqp.has_armour()){
 		bbox_col = COL_FILLED_OUTLINE;
 	}
-	draw_item_icon_and_name(gs, eqp.armour.item_entry(), COL_WHITE, bbox.x1, bbox.y1);
+	// draw_item_icon_and_name(gs, eqp.armour.item_entry(), COL_WHITE, bbox.x1, bbox.y1);
 }
 
 void EquipmentContent::draw(GameState* gs) const {
