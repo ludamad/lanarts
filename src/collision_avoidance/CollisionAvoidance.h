@@ -30,7 +30,6 @@ public:
 	void set_position(simul_id, float x, float y);
 	void set_maxspeed(simul_id, float maxspeed);
 	Posf get_position(simul_id);
-
 	void step();
 	void clear();
 
