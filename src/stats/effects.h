@@ -24,7 +24,8 @@ struct EffectStats {
 		}
 	}
 	bool has_active_effect() const;
-	LuaValue add(GameState* gs, effect_id effect, int length);
+	LuaValue add(GameState* gs, CombatGameInst* inst, effect_id effect,
+			int length);
 	Effect* get(effect_id effect);
 	void step(GameState* gs, CombatGameInst* inst);
 	void draw_effect_sprites(GameState* gs, const Pos& p);

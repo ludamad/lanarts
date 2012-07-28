@@ -181,7 +181,10 @@ tileset_id tileset_from_lua(lua_State* L, int idx) {
 
 LuaValue lua_sprites, lua_armours, lua_enemies, lua_effects, lua_weapons,
 		lua_projectiles, lua_items, lua_dungeon, lua_classes, lua_spells;
-void init_game_data(lua_State* L) {
+
+LuaValue lua_settings;
+
+GameSettings init_game_data(lua_State* L) {
 	DataFiles dfiles = load_datafilenames("res/datafiles.yaml");
 
 //NB: Do not re-order the way resources are loaded unless you know what you're doing
@@ -209,6 +212,10 @@ void init_game_data(lua_State* L) {
 	lua_dungeon = load_dungeon_data(L, dfiles.level_files);
 	lua_dungeon.deinitialize(L);
 	lua_classes = load_class_data(L, dfiles.class_files);
+
+	GameSettings settings = load_settings_data("res/settings.yaml", L, &lua_settings);
+
+	return settings;
 }
 
 static void register_as_global(lua_State* L, LuaValue& value,
@@ -236,6 +243,7 @@ void init_lua_data(GameState* gs, lua_State* L) {
 //	register_as_global(L, sprites, "sprites");
 //	register_as_global(L, dungeon, "dungeon");
 	register_as_global(L, lua_classes, "classes");
+	register_as_global(L, lua_settings, "settings");
 
 	luaL_dofile(L, "res/main.lua");
 

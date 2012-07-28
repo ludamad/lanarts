@@ -77,7 +77,7 @@ public:
 	int add_effect(lua_State* L) {
 		CombatGameInst* combatinst;
 		if ((combatinst = dynamic_cast<CombatGameInst*>(get_inst()))) {
-			LuaValue effect = combatinst->effects().add(lua_get_gamestate(L),
+			LuaValue effect = combatinst->effects().add(lua_get_gamestate(L), combatinst,
 					effect_from_lua(L, 1), lua_tointeger(L, 2));
 			effect.push(L);
 		} else {
@@ -176,6 +176,7 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_NUM_MEMB_LOOKUP("id", inst->id)
 	else IFLUA_NUM_MEMB_LOOKUP("radius", inst->radius)
 	else IFLUA_NUM_MEMB_LOOKUP("target_radius", inst->target_radius)
+	else IFLUA_NUM_MEMB_LOOKUP("kills", state->get_combat_inst()->number_of_kills())
 	else IFLUA_STATS_MEMB_LOOKUP("stats", inst)
 	else if (strcmp(cstr, "name") == 0) {
 		push_inst_name(L, inst);

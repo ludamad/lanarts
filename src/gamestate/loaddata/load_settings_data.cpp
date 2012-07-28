@@ -8,11 +8,12 @@
 #include "../../data/game_data.h"
 #include <yaml-cpp/yaml.h>
 #include "../../data/yaml_util.h"
+#include "../../lua/LuaValue.h"
 
 using namespace std;
 
-
-GameSettings load_settings_data(const char* filename) {
+GameSettings load_settings_data(const char* filename, lua_State* L,
+		LuaValue* lua_settings) {
 
 	fstream file(filename, fstream::in | fstream::binary);
 
@@ -61,6 +62,10 @@ GameSettings load_settings_data(const char* filename) {
 				root["class"] >> classname;
 				if (!game_class_data.empty())
 					ret.classn = get_class_by_name(classname.c_str());
+			}
+			if (L && lua_settings) {
+				lua_push_yaml_node(L, root);
+				lua_settings->pop(L);
 			}
 		} catch (const YAML::Exception& parse) {
 			printf("Settings Parsed Incorrectly: \n");

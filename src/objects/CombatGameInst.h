@@ -24,7 +24,7 @@ public:
 	CombatGameInst(const CombatStats& base_stats, sprite_id sprite, int teamid,
 			int x, int y, int radius, bool solid = true, int depth = 0) :
 			GameInst(x, y, radius, solid, depth), rx(x), ry(y), vx(0), vy(0), is_resting(
-					false), teamid(teamid), sprite(sprite), base_stats(
+					false), teamid(teamid), sprite(sprite), kills(0), base_stats(
 					base_stats) {
 	}
 	virtual ~CombatGameInst() {
@@ -56,6 +56,10 @@ public:
 	virtual void signal_was_damaged() {
 	}
 	virtual void signal_killed_enemy() {
+		kills++;
+	}
+	int number_of_kills() {
+		return kills;
 	}
 
 	void equip(item_id item, int amnt = 1);
@@ -84,6 +88,7 @@ protected:
 	bool is_resting;
 	team_id teamid;
 	sprite_id sprite;
+	int kills;
 //	PathInfo path;
 private:
 	void ensure_valid_direction(GameState* gs, float speed);

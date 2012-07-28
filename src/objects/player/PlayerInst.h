@@ -66,10 +66,6 @@ public:
 		return deaths;
 	}
 
-	int number_of_kills() {
-		return kills;
-	}
-
 	Weapon& weapon() {
 		return equipment().weapon;
 	}
@@ -80,10 +76,6 @@ public:
 
 	bool is_local_player() {
 		return local;
-	}
-
-	virtual void signal_killed_enemy() {
-		kills++;
 	}
 
 	bool& performed_actions_for_step() {
@@ -115,7 +107,7 @@ private:
 	fov fieldofview;
 	bool didstep, local, moving;
 
-	int money, lives, deaths, kills;
+	int money, lives, deaths;
 	int previous_spellselect, spellselect;
 };
 

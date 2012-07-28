@@ -121,7 +121,11 @@ void EffectStats::step(GameState* gs, CombatGameInst* inst) {
 		if (effects[i].t_remaining > 0) {
 			EffectEntry& eentry = game_effect_data.at(effects[i].effectid);
 			effects[i].t_remaining--;
+			effects[i].state.table_set_number(L, "time_left",
+					effects[i].t_remaining);
 			lua_effect_func_callback(L, eentry.step_func, effects[i], inst);
+			effects[i].state.table_get_number(L, "time_left",
+					effects[i].t_remaining);
 			if (effects[i].t_remaining == 0) {
 				lua_effect_func_callback(L, eentry.finish_func, effects[i],
 						inst);
@@ -151,17 +155,12 @@ static void lua_init_effect(lua_State* L, LuaValue& value, effect_id effect) {
 	/* Set index as effect object */
 	lua_effects.table_push_value(L, eentry.name.c_str());
 	lua_setfield(L, -2, "__index");
-	/* Call init function */
-	if (!eentry.init_func.empty()) {
-		eentry.init_func.push(L);
-		value.push(L);
-		lua_call(L, 1, 0);
-	}
 	/* Pop self */
 	lua_pop(L, 1);
 }
 
-LuaValue EffectStats::add(GameState* gs, effect_id effect, int length) {
+LuaValue EffectStats::add(GameState* gs, CombatGameInst* inst, effect_id effect,
+		int length) {
 	lua_State* L = gs->get_luastate();
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining == 0 || effects[i].effectid == effect) {
@@ -170,6 +169,11 @@ LuaValue EffectStats::add(GameState* gs, effect_id effect, int length) {
 			if (effects[i].state.empty()) {
 				lua_init_effect(L, effects[i].state, effect);
 			}
+			effects[i].state.table_set_number(L, "time_left",
+					effects[i].t_remaining);
+
+			EffectEntry& eentry = game_effect_data.at(effects[i].effectid);
+			lua_effect_func_callback(L, eentry.init_func, effects[i], inst);
 			return effects[i].state;
 		}
 	}

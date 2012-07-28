@@ -17,7 +17,7 @@ extern "C" {
 static bool nodeis(const YAML::Node& node, const char* str) {
 	return (strcmp(node.Tag().c_str(), str) == 0);
 }
-static void push_yaml_node(lua_State* L, const YAML::Node& node) {
+void lua_push_yaml_node(lua_State* L, const YAML::Node& node) {
 	int table;
 	YAML::Iterator it;
 	std::string str;
@@ -28,13 +28,19 @@ static void push_yaml_node(lua_State* L, const YAML::Node& node) {
 	case YAML::NodeType::Scalar:
 		node.GetScalar(str);
 		if (nodeis(node, "?")) {
-			char* end = NULL;
-			double value = strtod(str.c_str(), &end);
-			size_t convchrs = (end - str.c_str());
-			if (convchrs == str.size())
-				lua_pushnumber(L, value);
-			else
-				lua_pushstring(L, str.c_str());
+			if (str == "yes") {
+				lua_pushboolean(L, true);
+			} else if (str == "no") {
+				lua_pushboolean(L, false);
+			} else { //Else its a number or a string
+				char* end = NULL;
+				double value = strtod(str.c_str(), &end);
+				size_t convchrs = (end - str.c_str());
+				if (convchrs == str.size())
+					lua_pushnumber(L, value);
+				else
+					lua_pushstring(L, str.c_str());
+			}
 		} else {
 			lua_pushstring(L, str.c_str());
 		}
@@ -43,7 +49,7 @@ static void push_yaml_node(lua_State* L, const YAML::Node& node) {
 		lua_newtable(L);
 		table = lua_gettop(L);
 		for (int i = 0; i < node.size(); i++) {
-			push_yaml_node(L, node[i]);
+			lua_push_yaml_node(L, node[i]);
 			lua_rawseti(L, table, i + 1);
 		}
 		break;
@@ -52,8 +58,8 @@ static void push_yaml_node(lua_State* L, const YAML::Node& node) {
 		table = lua_gettop(L);
 		it = node.begin();
 		for (; it != node.end(); ++it) {
-			push_yaml_node(L, it.first());
-			push_yaml_node(L, it.second());
+			lua_push_yaml_node(L, it.first());
+			lua_push_yaml_node(L, it.second());
 			lua_settable(L, table);
 		}
 		break;
@@ -156,7 +162,7 @@ public:
 		push(L); /*Get the associated lua table*/
 		int tableind = lua_gettop(L);
 		/*Push a YAML node as a lua value*/
-		push_yaml_node(L, root);
+		lua_push_yaml_node(L, root);
 		lua_setfield(L, tableind, key);
 		/*Pop table*/
 		lua_pop(L, 1);
@@ -167,9 +173,9 @@ public:
 	}
 
 	void pop(lua_State* L) {
-		int value = lua_gettop(L);
+		int valueidx = lua_gettop(L);
 		lua_pushlightuserdata(L, this); /* push address as key */
-		lua_pushvalue(L, value); /*Clone value*/
+		lua_pushvalue(L, valueidx); /*Clone value*/
 		lua_settable(L, LUA_REGISTRYINDEX);
 
 		lua_pop(L, 1);
@@ -271,6 +277,15 @@ void LuaValue::operator =(const LuaValue & value) {
 	impl = value.impl;
 	if (impl)
 		impl->ref_count()++;}
+
+void LuaValue::table_get_number(lua_State *L, const char *key, double & value) {
+	impl->table_push_value(L, key);
+	value = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+}
+
+void LuaValue::table_copy(lua_State *L, LuaValue & othertable) {
+}
 
 void LuaValue::table_set_yaml(lua_State* L, const char *key,
 		const YAML::Node& root) {

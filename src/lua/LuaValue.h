@@ -42,6 +42,12 @@ public:
 	void table_set_function(lua_State* L, const char* key, lua_CFunction value);
 
 	void table_set_number(lua_State* L, const char* key, double value);
+	void table_get_number(lua_State* L, const char* key, double& value);
+	void table_get_number(lua_State* L, const char* key, int& value) {
+		double val;
+		table_get_number(L, key, val);
+		value = val;
+	}
 	void table_set_newtable(lua_State* L, const char* key);
 	void table_set_yaml(lua_State* L, const char* key, const YAML::Node& root);
 	/* For convenience, since these keys will often be dynamically allocated 'string's */
@@ -55,6 +61,8 @@ public:
 private:
 	LuaValueImpl* impl;
 };
+
+void lua_push_yaml_node(lua_State* L, const YAML::Node& node);
 
 void lua_gameinst_callback(lua_State* L, LuaValue& value, GameInst* inst);
 #endif /* LUAVALUE_H_ */

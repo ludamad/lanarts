@@ -26,12 +26,14 @@
 #include "../stats/weapon_data.h"
 
 struct lua_State;
+class LuaValue;
 
 /* Contain information which guides the rest of the data loading */
-GameSettings load_settings_data(const char* filename);
+GameSettings load_settings_data(const char* filename, lua_State* L = NULL,
+		LuaValue* lua_settings = NULL);
 DataFiles load_datafilenames(const char* filename);
 
-void init_game_data(lua_State* L);
+GameSettings init_game_data(lua_State* L);
 void init_lua_data(GameState* gs, lua_State* L);
 
 #endif /* GAME_DATA_H_ */

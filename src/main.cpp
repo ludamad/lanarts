@@ -38,8 +38,7 @@ void init_system(GameSettings& settings, lua_State* L) {
 		exit(0);
 	}
 	init_sdl_gl(settings.fullscreen, settings.view_width, settings.view_height);
-	init_game_data(L);
-	settings = load_settings_data("res/settings.yaml");
+	settings = init_game_data(L);
 }
 
 void main_menu_loop(GameState* gs, int width, int height);

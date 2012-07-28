@@ -11,8 +11,10 @@ effects:
     step_func: poison_step
 
   - name: Berserk
-    stat_func: berserk_statmod
     exhausted_duration: 250
+    stat_func: berserk_statmod
+    init_func: berserk_init
+    step_func: berserk_step
     finish_func: 
       function (effect, obj) 
         obj:add_effect("Exhausted", effect.exhausted_duration) 
