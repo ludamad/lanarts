@@ -52,6 +52,7 @@ void AStarPathFind::initialize(GameState* gs) {
 			nodes[y * w + x].openset = false;
 			nodes[y * w + x].closedset = false;
 			nodes[y * w + x].previous = NULL;
+			nodes[y * w + x].solid = gs->tile_grid().is_solid(x, y);
 		}
 	}
 }

@@ -12,7 +12,7 @@ function poison_step(effect, obj)
 		effect.steps = effect.steps + 1
 	else
 		effect.steps = 0
-		obj:damage(effect.damage,effect.power, effect.magic_percentage, )
+		obj:damage(effect.damage,effect.power, effect.magic_percentage, 0.25)
 	end
 end
 
