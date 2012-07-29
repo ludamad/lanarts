@@ -32,6 +32,10 @@ public:
 	SidebarContent* current_content();
 	void reset_slot_selected();
 
+	void override_sidebar_contents(SidebarContent* overlay) {
+		content_overlay = overlay;
+	}
+
 private:
 	enum view_t {
 		INVENTORY, SPELLS, EQUIPMENT, STATS, ENEMIES, CONFIG
@@ -54,6 +58,7 @@ private:
 	NavigationSprites sprites;
 	BBox side_bar, main_content;
 	view_t view;
+	SidebarContent* content_overlay;
 	NavigationOption inventory, equipment, spells, enemies, config;
 };
 

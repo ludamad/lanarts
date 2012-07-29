@@ -109,6 +109,7 @@ set( lanarts_src
 	interface/sidebar/EnemiesSeenContent.cpp
 	interface/sidebar/EquipmentContent.cpp
 	interface/sidebar/InventoryContent.cpp
+	interface/sidebar/StoreContent.cpp
 	interface/sidebar/Minimap.cpp
 
 	objects/CombatInstController.cpp
@@ -230,6 +231,7 @@ set( lanarts_include
 	interface/sidebar/Sidebar.h
 	interface/sidebar/SidebarContent.h
 	interface/sidebar/SidebarNavigator.h
+	interface/sidebar/StoreContent.h
 	interface/sidebar/SpellsContent.h
 	interface/sidebar/Minimap.h
 

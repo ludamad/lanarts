@@ -27,6 +27,10 @@ public:
 		navigator.reset_slot_selected();
 	}
 
+	void override_sidebar_contents(SidebarContent* overlay) {
+		navigator.override_sidebar_contents(overlay);
+	}
+
 private:
 	BBox sidebar_bounds;
 	Minimap minimap;

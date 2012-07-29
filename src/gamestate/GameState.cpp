@@ -318,6 +318,11 @@ bool GameState::tile_radius_test(int x, int y, int rad, bool issolid, int ttype,
 	return false;
 }
 
+//int GameState::object_square_test(GameInst** objs, int obj_cap,
+//		col_filterf f, const Pos& pos) {
+//	return get_level()->inst_set.object_square_test(objs, obj_cap, f, pos);
+//}
+
 int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 		col_filterf f, int x, int y, int radius) {
 	return get_level()->inst_set.object_radius_test(obj, objs, obj_cap, f, x, y,

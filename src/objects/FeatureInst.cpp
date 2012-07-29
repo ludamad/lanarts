@@ -20,18 +20,24 @@ FeatureInst::~FeatureInst() {
 }
 
 void FeatureInst::draw(GameState* gs) {
+	Colour drawcolour;
 	if (gs->object_visible_test(this)) {
 		sprite_id spr = spriteid;
 		if (feature == DOOR_CLOSED) {
 			spr = get_sprite_by_name("closed door");
 		} else if (feature == DOOR_OPEN) {
 			spr = get_sprite_by_name("open door");
+		} else if (feature == STORE) {
+			spr = get_sprite_by_name("store");
+			if (gs->object_radius_test(this, NULL, 0, player_colfilter, x, y, 16)) {
+				drawcolour = Colour(100,255,255, 255);
+			}
 		}
 		last_seen_spr = spr;
 	}
 	if (last_seen_spr > -1) {
 		gl_draw_sprite(gs->view(), last_seen_spr, x - TILE_SIZE / 2,
-				y - TILE_SIZE / 2);
+				y - TILE_SIZE / 2, drawcolour);
 	}
 }
 

@@ -3,15 +3,15 @@
 #Dungeon Markup
 
 default_items: &default_items
-  - { item: Arrow,              chance: 10,  quantity: [2,8]  }
-  - { item: Silver Arrow,       chance: 10,  quantity: [1,4]   }
+  - { item: Arrow,              chance: 15,  quantity: [5,15]  }
+  - { item: Silver Arrow,       chance: 15,  quantity: [3,8]   }
   - { item: Short Bow,          chance: 10                     }
-  - { item: Stone,              chance: 10,  quantity: [2,8]   }
-  - { item: Gold,               chance: 70,  quantity: [5,20]  }
+  - { item: Stone,              chance: 15,  quantity: [5,15]   }
+  - { item: Gold,               chance: 35,  quantity: [5,40]  }
   - { item: Haste Scroll,       chance: 10                     }
   - { item: Health Potion,      chance: 10                     }
   - { item: Mana Potion,        chance: 10                     }
-  - { item: Dagger,             chance: 15                     }
+  - { item: Dagger,             chance: 10                     }
   - { item: Short Sword,        chance: 10                     }
   - { item: Mace,               chance: 5                      }
   - { item: Strength Scroll,    chance: 2                      }

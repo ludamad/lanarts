@@ -59,7 +59,8 @@ const int NUM_ICONS_ROW_2 = 2;
 SidebarNavigator::SidebarNavigator(const BBox& sidebar_bounds,
 		const BBox& main_content_bounds) :
 		side_bar(sidebar_bounds), main_content(main_content_bounds), view(
-				INVENTORY), inventory(get_sprite_by_name("inventory_icon"),
+				INVENTORY), content_overlay(NULL), inventory(
+				get_sprite_by_name("inventory_icon"),
 				new InventoryContent(main_content_bounds),
 				icon_bounds(main_content_bounds, 0, NUM_ICONS_ROW_1)), equipment(
 				get_sprite_by_name("equipment_icon"),
@@ -80,21 +81,34 @@ SidebarNavigator::~SidebarNavigator() {
 }
 
 void SidebarNavigator::draw(GameState* gs) {
-	inventory.draw_icon(gs);
-	spells.draw_icon(gs);
-	enemies.draw_icon(gs);
-	equipment.draw_icon(gs);
-	config.draw_icon(gs);
-	current_option().draw_icon(gs, true);
+	SidebarContent* content;
+	if (!content_overlay) {
+		inventory.draw_icon(gs);
+		spells.draw_icon(gs);
+		enemies.draw_icon(gs);
+		equipment.draw_icon(gs);
+		config.draw_icon(gs);
+		current_option().draw_icon(gs, true);
 
-	current_content()->draw(gs);
+		content = current_content();
+	} else {
+		content_overlay->draw(gs);
+		content = content_overlay;
+		content_overlay = NULL;
+	}
+	content->draw(gs);
 	gl_printf_x_centered(gs->primary_font(), COL_FILLED_OUTLINE,
-			main_content.center_x(), main_content.y2 + 3,
-			current_content()->name());
+			main_content.center_x(), main_content.y2 + 3, content->name());
 }
 
 void SidebarNavigator::step(GameState* gs) {
-	current_content()->step(gs);
+	if (!content_overlay) {
+		current_content()->step(gs);
+	} else {
+		content_overlay->step(gs);
+		content_overlay = NULL;
+	}
+
 }
 
 void SidebarNavigator::reset_slot_selected() {

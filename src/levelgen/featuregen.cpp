@@ -10,6 +10,7 @@
 
 #include "../objects/FeatureInst.h"
 
+#include "../display/sprite_data.h"
 #include "../display/tile_data.h"
 #include "../gamestate/tileset_data.h"
 
@@ -167,19 +168,20 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 //				BBox(r.x - 1, r.y - 1, r.x + r.w + 1, r.y + r.h + 1));
 	}
 
-//	for (int i = 0; i < 4; i++) {
-//		for (int attempts = 0; attempts < 200; attempts++) {
-//			Pos fpos = generate_location(mt, level);
-//			Sqr& sqr = level.at(fpos);
-//			if (sqr.roomID || sqr.feature != SMALL_CORRIDOR)
-//				continue;
-//			sqr.has_instance = true;
-//			fpos.x += start_x;
-//			fpos.y += start_y;
-//			fpos = centered_multiple(fpos, TILE_SIZE);
-//			gs->add_instance(
-//					new FeatureInst(fpos.x, fpos.y, FeatureInst::DOOR_CLOSED));
-//			break;
-//		}
-//	}
+	for (int i = 0; i < 4; i++) {
+		for (int attempts = 0; attempts < 200; attempts++) {
+			Pos fpos = generate_location(mt, level);
+			Sqr& sqr = level.at(fpos);
+			if (!sqr.passable || sqr.has_instance)
+				continue;
+			sqr.has_instance = true;
+			fpos.x += start_x;
+			fpos.y += start_y;
+			fpos = centered_multiple(fpos, TILE_SIZE);
+			gs->add_instance(
+					new FeatureInst(fpos.x, fpos.y, FeatureInst::STORE,
+							get_sprite_by_name("store")));
+			break;
+		}
+	}
 }
