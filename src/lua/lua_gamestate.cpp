@@ -40,8 +40,6 @@ public:
 
 		obj_id projectile_id = 0;
 
-
-
 //		if (s != NULL) {
 ////			ProjectileInst(sprite_id sprite, obj_id originator, float speed, int range,
 ////					int damage, int x, int y, int tx, int ty, bool bounce = false,
@@ -58,11 +56,12 @@ public:
 	}
 
 	int players_in_room(lua_State* L) {
-		PlayerController& pc = gs->player_controller();
+		const std::vector<GameInstRef>& players =
+				gs->player_controller().all_players();
 		lua_createtable(L, 0, 0);
 		int table = lua_gettop(L);
-		for (int i = 0; i < pc.player_ids().size(); i++) {
-			lua_push_gameinst(L, gs->get_instance(pc.player_ids()[i]));
+		for (int i = 0; i < players.size(); i++) {
+			lua_push_gameinst(L, players[i].get_instance());
 			//  lua_pushnumber(L, 2);
 			lua_rawseti(L, table, i + 1);
 		}
@@ -97,7 +96,7 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_NUM_MEMB_LOOKUP("mouse_x", gs->mouse_x() + view.x)
 	else IFLUA_NUM_MEMB_LOOKUP("mouse_y", gs->mouse_y() + view.y)
 	else IFLUA_NUM_MEMB_LOOKUP("frame_number", gs->frame())
-	else IFLUA_NUM_MEMB_LOOKUP("level_number", gs->get_level()->level_number)
+	else IFLUA_NUM_MEMB_LOOKUP("level_number", gs->get_level()->levelid)
 	else IFLUA_NUM_MEMB_LOOKUP("monster_num", gs->monster_controller().number_monsters())
 	else {
 		lua_getglobal(L, bind_t::className);

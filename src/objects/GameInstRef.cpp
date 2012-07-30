@@ -48,3 +48,9 @@ void GameInstRef::operator =(const GameInstRef& ref) {
 	inst = ref.inst;
 }
 
+void GameInstRef::operator =(GameInst* ref) {
+	__retain_ref(ref);
+	__free_ref(inst);
+	inst = ref;
+}
+

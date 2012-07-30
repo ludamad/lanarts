@@ -79,7 +79,7 @@ void EnemyInst::init(GameState* gs) {
 	MonsterController& mc = gs->monster_controller();
 	mc.register_enemy(this);
 
-//	int ln = gs->level()->level_number + 1;
+//	int ln = gs->level()->levelid + 1;
 //	core_stats().hp += core_stats().hp * ln / 10.0;
 //	core_stats().max_hp += core_stats().max_hp * ln / 10.0;
 //	core_stats().mp += core_stats().mp * ln / 10.0;

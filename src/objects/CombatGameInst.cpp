@@ -52,7 +52,7 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
 	return damage(gs, dmg);
 }
 
-void CombatGameInst::update_field_of_view() {
+void CombatGameInst::update_field_of_view(GameState* gs) {
 }
 
 void CombatGameInst::step(GameState* gs) {

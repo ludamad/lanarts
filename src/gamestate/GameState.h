@@ -61,7 +61,6 @@ public:
 	//used for synchronization purposes in network play
 	void skip_next_instance_id();
 
-	obj_id local_playerid();
 	PlayerInst* local_player();
 
 	/* Dimensions (in pixels) of game world */
@@ -134,7 +133,13 @@ public:
 
 	/* Instance global controllers */
 	MonsterController& monster_controller();
-	PlayerController& player_controller();
+	std::vector<PlayerInst*> players();
+	bool level_has_player();
+
+	PlayerController& player_controller() {
+		return world.player_controller();
+	}
+
 	EnemiesSeen& enemies_seen() {
 		return world.enemies_seen();
 	}
@@ -207,11 +212,13 @@ private:
 	GameSettings settings;
 	lua_State* L;
 	int frame_n;
+
 	GameNetConnection connection;
 	GameDialogs dialogs;
 	GameHud hud;
 	GameView _view;
 	GameWorld world;
+
 	MTwist mtwist;
 	font_data small_font, large_font;
 	bool dragging_view;

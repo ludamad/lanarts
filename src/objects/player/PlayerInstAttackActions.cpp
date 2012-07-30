@@ -118,15 +118,15 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
 	PlayerController& pc = gs->player_controller();
 
+	std::vector<PlayerInst*> players = gs->players();
 	std::vector<GameInst*> visible_monsters;
 	get_visible_monsters(gs, visible_monsters);
 
 	int maxdist = 0;
-	for (int i = 0; i < pc.player_ids().size(); i++) {
-		PlayerInst* player = (PlayerInst*) gs->get_instance(pc.player_ids()[i]);
-		BBox fbox = player->field_of_view().tiles_covered();
+	for (int i = 0; i < players.size(); i++) {
+		BBox fbox = players[i]->field_of_view().tiles_covered();
 		FOR_EACH_BBOX(fbox, x, y) {
-			if (player->field_of_view().within_fov(x, y)) {
+			if (players[i]->field_of_view().within_fov(x, y)) {
 				Pos pos(x * TILE_SIZE + TILE_SIZE / 2,
 						y * TILE_SIZE + TILE_SIZE / 2);
 
@@ -392,7 +392,7 @@ bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 	bool mouse_within = gs->mouse_x() < gs->view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
-	int level = gs->get_level()->roomid, frame = gs->frame();
+	int level = gs->get_level()->levelid, frame = gs->frame();
 
 	bool is_moving = (dx != 0.0f || dy != 0.0f);
 	IOController& io = gs->io_controller();
@@ -449,8 +449,9 @@ bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 				int vx, vy;
 				GameInst* closest = get_closest_monster(gs, this);
 
-				if (closest && decide_attack_movement(pos(), closest->pos(), TILE_SIZE / 4,
-						vx, vy)) {
+				if (closest
+						&& decide_attack_movement(pos(), closest->pos(),
+								TILE_SIZE / 4, vx, vy)) {
 					queued_actions.push_back(
 							game_action(gs, this, GameAction::MOVE, spellselect,
 									round(vx), round(vy)));
@@ -530,15 +531,16 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		}
 
 		for (int i = 0; i < numhit; i++) {
-			EnemyInst* e = (EnemyInst*) enemies[i];
+			EnemyInst* e = (EnemyInst*)enemies[i];
 			lua_hit_callback(gs->get_luastate(), wentry.on_hit_func, this, e);
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
 				PlayerController& pc = gs->player_controller();
 				signal_killed_enemy();
 
 				char buffstr[32];
-				int amnt = round(double(e->xpworth()) / pc.player_ids().size());
-				gs->player_controller().players_gain_xp(gs, amnt);
+				int amnt = round(
+						double(e->xpworth()) / pc.all_players().size());
+				pc.players_gain_xp(gs, amnt);
 				snprintf(buffstr, 32, "%d XP", amnt);
 				gs->add_instance(
 						new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0,

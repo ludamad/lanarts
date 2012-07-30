@@ -34,6 +34,12 @@ PlayerInst::PlayerInst(const CombatStats& stats, int x, int y, bool local) :
 PlayerInst::~PlayerInst() {
 }
 
+void PlayerInst::update_field_of_view(GameState* gs) {
+	int sx = last_x * VISION_SUBSQRS / TILE_SIZE;
+	int sy = last_y * VISION_SUBSQRS / TILE_SIZE;
+	field_of_view().calculate(gs, sx, sy);
+}
+
 bool PlayerInst::within_field_of_view(const Pos& pos) {
 	return fieldofview.within_fov(pos.x / TILE_SIZE, pos.y / TILE_SIZE);
 }
@@ -44,13 +50,9 @@ void PlayerInst::die(GameState* gs) {
 
 void PlayerInst::init(GameState* gs) {
 	CombatGameInst::init(gs);
-	PlayerController& pc = gs->player_controller();
-	pc.register_player(this->id, is_local_player());
 }
 
 void PlayerInst::deinit(GameState* gs) {
-	PlayerController& pc = gs->player_controller();
-	pc.deregister_player(this->id);
 	CombatGameInst::deinit(gs);
 }
 

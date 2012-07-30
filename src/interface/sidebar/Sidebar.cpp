@@ -74,7 +74,7 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 	y += y_interval;
 
 	gl_printf(gs->primary_font(), COL_WHITE, x, y, "Floor %d",
-			gs->get_level()->level_number);
+			gs->get_level()->levelid);
 	gl_printf(gs->primary_font(), COL_GOLD, x + x_interval, y, "Gold %d",
 			player_inst->gold());
 	y += y_interval;

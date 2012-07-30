@@ -50,7 +50,7 @@ void GameHud::step(GameState *gs) {
 bool GameHud::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	PlayerInst* player = gs->local_player();
 	bool mouse_within_view = gs->mouse_x() < gs->view().width;
-	int level = gs->get_level()->roomid, frame = gs->frame();
+	int level = gs->get_level()->levelid, frame = gs->frame();
 
 	Inventory inv = player->inventory();
 
@@ -80,8 +80,7 @@ void GameHud::draw(GameState* gs) {
 	gl_draw_rectangle(sidebar_box.x1, sidebar_box.y1, width(), height(),
 			bg_colour);
 
-	PlayerInst* player_inst = (PlayerInst*)gs->get_instance(
-			gs->local_playerid());
+	PlayerInst* player_inst = gs->local_player();
 	if (!player_inst)
 		return;
 

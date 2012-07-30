@@ -64,7 +64,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 	bool mouse_within = gs->mouse_x() < gs->view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
-	int level = gs->get_level()->roomid;
+	int level = gs->get_level()->levelid;
 	int frame = gs->frame();
 	bool item_used = false;
 	IOController& io = gs->io_controller();
@@ -92,7 +92,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 	GameInst* inst = NULL;
 	if (cooldowns().can_pickup()
 			&& gs->object_radius_test(this, &inst, 1, &item_colfilter)) {
-		ItemInst* iteminst = (ItemInst*) inst;
+		ItemInst* iteminst = (ItemInst*)inst;
 		Item& item = iteminst->item_type();
 
 		bool was_dropper = iteminst->last_held_by() == id;
@@ -138,7 +138,7 @@ void PlayerInst::queue_io_movement_actions(GameState* gs, int& dx, int& dy) {
 void PlayerInst::queue_io_actions(GameState* gs) {
 	GameSettings& settings = gs->game_settings();
 	GameView& view = gs->view();
-	int level = gs->get_level()->roomid;
+	int level = gs->get_level()->levelid;
 	int frame = gs->frame();
 	int dx = 0, dy = 0;
 	bool mouse_within = gs->mouse_x() < gs->view().width;
@@ -256,7 +256,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	const int PICKUP_RATE = 10;
-	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
+	ItemInst* item = (ItemInst*)gs->get_instance(action.use_id);
 	if (!item)
 		return;
 	const Item& type = item->item_type();
@@ -434,12 +434,12 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 
 	EnemyInst* target = NULL;
 	//Enemy hitting test for melee
-	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_colfilter,
+	gs->object_radius_test(this, (GameInst**)&target, 1, &enemy_colfilter,
 			x + ddx * 2, y + ddy * 2);
 
 	//Smaller radius enemy pushing test, can intercept enemy radius but not too far
 	EnemyInst* alreadyhitting[5] = { 0, 0, 0, 0, 0 };
-	gs->object_radius_test(this, (GameInst**) alreadyhitting, 5,
+	gs->object_radius_test(this, (GameInst**)alreadyhitting, 5,
 			&enemy_colfilter, x, y, radius);
 	bool already = false;
 	for (int i = 0; i < 5; i++) {
@@ -504,14 +504,14 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 		return;
 
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->get_level()->exits.size());
-	gs->ensure_level_connectivity(gs->get_level()->roomid - 1,
-			gs->get_level()->roomid);
+	gs->ensure_level_connectivity(gs->get_level()->levelid - 1,
+			gs->get_level()->levelid);
 	GameLevelPortal* portal = &gs->get_level()->exits[entr_n];
 
 	int px = centered_multiple(portal->exitsqr.x, TILE_SIZE);
 	int py = centered_multiple(portal->exitsqr.y, TILE_SIZE);
-	gs->level_move(id, px, py, gs->get_level()->roomid,
-			gs->get_level()->roomid - 1);
+	gs->level_move(id, px, py, gs->get_level()->levelid,
+			gs->get_level()->levelid - 1);
 
 	reset_rest_cooldown();
 }
@@ -524,25 +524,24 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 		return;
 
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->get_level()->entrances.size());
-	gs->ensure_level_connectivity(gs->get_level()->roomid,
-			gs->get_level()->roomid + 1);
+	gs->ensure_level_connectivity(gs->get_level()->levelid,
+			gs->get_level()->levelid + 1);
 	GameLevelPortal* portal = &gs->get_level()->entrances[entr_n];
 
 	int px = centered_multiple(portal->exitsqr.x, TILE_SIZE);
 	int py = centered_multiple(portal->exitsqr.y, TILE_SIZE);
-	gs->level_move(id, px, py, gs->get_level()->roomid,
-			gs->get_level()->roomid + 1);
+	gs->level_move(id, px, py, gs->get_level()->levelid,
+			gs->get_level()->levelid + 1);
 
 	reset_rest_cooldown();
 }
 
 void PlayerInst::gain_xp(GameState* gs, int xp) {
 	int levels_gained = stats().gain_xp(xp);
-	if (levels_gained > 0 && is_local_player()) {
-//		bool plural = levels_gained > 1;
-
+	if (levels_gained > 0) {
 		char level_gain_str[128];
-		snprintf(level_gain_str, 128, "You have reached level %d!",
+		snprintf(level_gain_str, 128, "%s reached level %d!",
+				is_local_player() ? "You have" : "Your ally has",
 				class_stats().xplevel);
 		gs->game_chat().add_message(level_gain_str, Colour(50, 205, 50));
 	}

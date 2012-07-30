@@ -146,9 +146,9 @@ void Minimap::draw(GameState* gs, float scale) {
 	world2minimapbuffer(gs, minimap_arr, BBox(), bbox.width(), bbox.height(),
 			ptw, pth);
 
-	GameInst* inst = gs->get_instance(gs->local_playerid());
-	if (inst) {
-		int arr_x = (inst->x / TILE_SIZE), arr_y = (inst->y / TILE_SIZE);
+	PlayerInst* player = gs->local_player();
+	if (player) {
+		int arr_x = (player->x / TILE_SIZE), arr_y = (player->y / TILE_SIZE);
 		fill_buff2d(minimap_arr, ptw, pth, arr_x - arr_x % 2, arr_y - arr_y % 2,
 				Colour(255, 180, 99), 2, 2);
 		draw_rect2d(minimap_arr, ptw, pth, min_tilex, min_tiley, max_tilex,

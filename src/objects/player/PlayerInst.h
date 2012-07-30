@@ -44,6 +44,9 @@ public:
 	void queue_io_actions(GameState* gs);
 	void perform_queued_actions(GameState* gs);
 	void perform_action(GameState* gs, const GameAction& action);
+
+	//Field of view
+	virtual void update_field_of_view(GameState* gs);
 	virtual bool within_field_of_view(const Pos& pos);
 
 	int spell_selected() {

@@ -1,0 +1,28 @@
+Please see doc/todolist for a more itemized todo list.
+
+Current direction:
+	Items need work ...
+		- Game needs shops
+		- Needs more items and more variation
+		- More equipment slot types
+		- Auto-use potions, with configuration option (the gears tab)
+
+	Spells need work ...
+		- Fighter needs more abilities
+		- Fighter needs to berserk for longer when levelled up
+		- Make summon spells (blocked by the fact that mobs assume they attack player)
+
+		- Mage needs AOE spell
+
+	Level generation needs work ...
+		- Game needs overworld movement with multiple dungeons
+
+	Interface work:
+		- Implement usable equipment screen
+		- Implement gears tab
+
+	Engine:
+		- Mob teams so summon spells are possible
+		- Testing ? Really need some tests at this point
+		- Need lua data serialization, could do with just numbers for now ...
+		- Explicit synchronization system could be nice for the inevitably failing online synch

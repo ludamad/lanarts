@@ -107,19 +107,18 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 	GameView view(0, 0, PATHING_RADIUS * 2, PATHING_RADIUS * 2, gs->width(),
 			gs->height());
 
-	const std::vector<obj_id>& pids = gs->player_controller().player_ids();
 	//Determine which players we are currently in view of
 	BBox ebox = e->bbox();
 	int mindistsqr = HUGE_DISTANCE;
 	int closest_player_index = -1;
-	for (int i = 0; i < pids.size(); i++) {
-		PlayerInst* player = (PlayerInst*)gs->get_instance(pids[i]);
+	for (int i = 0; i < players.size(); i++) {
+		PlayerInst* player = players[i];
 		bool isvisible = gs->object_visible_test(e, player, false);
 		if (isvisible)
 			((PlayerInst*)player)->rest_cooldown() = REST_COOLDOWN;
 		view.sharp_center_on(player->x, player->y);
 		bool chasing = e->behaviour().chase_timeout > 0
-				&& pids[i] == e->behaviour().chasing_player;
+				&& player->id == e->behaviour().chasing_player;
 		if (view.within_view(ebox) && (chasing || isvisible)) {
 			e->behaviour().current_action = EnemyBehaviour::CHASING_PLAYER;
 
@@ -134,31 +133,28 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 	return closest_player_index;
 }
 void MonsterController::process_players(GameState* gs) {
-	const std::vector<obj_id>& pids = gs->player_controller().player_ids();
 
-	if (player_simids.size() > pids.size()) {
-		int diff = player_simids.size() - pids.size();
+	if (player_simids.size() > players.size()) {
+		int diff = player_simids.size() - players.size();
 		for (int i = 0; i < diff; i++) {
 			coll_avoid.remove_object(player_simids.back());
 			player_simids.pop_back();
 		}
-	} else if (pids.size() > player_simids.size()) {
-		int old_pids = player_simids.size();
-		player_simids.resize(pids.size());
-		for (int i = old_pids; i < gs->player_controller().player_ids().size();
-				i++) {
-			PlayerInst* p = (PlayerInst*)gs->get_instance(pids[i]);
-			player_simids[i] = coll_avoid.add_player_object(p);
+	} else if (players.size() > player_simids.size()) {
+		int old_players = player_simids.size();
+		player_simids.resize(players.size());
+		for (int i = old_players; i < players.size(); i++) {
+			player_simids[i] = coll_avoid.add_player_object(players[i]);
 		}
 	}
 
 	//Create as many paths as there are players
-	resize_paths(pids.size());
-	for (int i = 0; i < pids.size(); i++) {
-		GameInst* player = gs->get_instance(pids[i]);
+	resize_paths(players.size());
+	for (int i = 0; i < players.size(); i++) {
 		if (paths[i] == NULL)
 			paths[i] = new PathInfo;
-		paths[i]->calculate_path(gs, player->x, player->y, PATHING_RADIUS);
+		paths[i]->calculate_path(gs, players[i]->x, players[i]->y,
+				PATHING_RADIUS);
 	}
 }
 
@@ -167,6 +163,7 @@ void MonsterController::pre_step(GameState* gs) {
 	PlayerInst* local_player = gs->local_player();
 	std::vector<EnemyOfInterest> eois;
 
+	players = gs->players();
 	process_players(gs);
 
 	//Make sure targetted object is alive
@@ -216,10 +213,8 @@ void MonsterController::pre_step(GameState* gs) {
 	set_monster_headings(gs, eois);
 
 	//Update player positions for collision avoidance simulator
-	const std::vector<obj_id>& pids = gs->player_controller().player_ids();
-	for (int i = 0; i < pids.size(); i++) {
-		PlayerInst* p = (PlayerInst*)gs->get_instance(
-				gs->player_controller().player_ids()[i]);
+	for (int i = 0; i < players.size(); i++) {
+		PlayerInst* p = players[i];
 		coll_avoid.set_position(player_simids[i], p->x, p->y);
 	}
 
@@ -262,8 +257,8 @@ void MonsterController::post_draw(GameState* gs) {
 	if (!target)
 		return;
 	glLineWidth(2);
-	gl_draw_circle(gs->view(), target->x, target->y,
-			target->target_radius + 5, COL_GREEN.with_alpha(140), true);
+	gl_draw_circle(gs->view(), target->x, target->y, target->target_radius + 5,
+			COL_GREEN.with_alpha(140), true);
 	glLineWidth(1);
 }
 

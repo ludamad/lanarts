@@ -94,10 +94,10 @@ void GameTiles::step(GameState* gs) {
 
 	char matches[sub_sqrs * sub_sqrs];
 
-	const std::vector<obj_id>& pids = gs->player_controller().player_ids();
+	std::vector<PlayerInst*> players = gs->players();
 
-	for (int i = 0; i < pids.size(); i++) {
-		PlayerInst* player = (PlayerInst*)gs->get_instance(pids[i]);
+	for (int i = 0; i < players.size(); i++) {
+		PlayerInst* player = players[i];
 		fov& f = player->field_of_view();
 		BBox fovbox = f.tiles_covered();
 		for (int y = std::max(fovbox.y1, 0);
@@ -127,9 +127,9 @@ void GameTiles::post_draw(GameState* gs) {
 		max_tiley = height - 1;
 	const int sub_sqrs = VISION_SUBSQRS;
 
-	if (gs->key_down_state(SDLK_BACKQUOTE)
-			|| gs->player_controller().player_ids().empty())
+	if (gs->key_down_state(SDLK_BACKQUOTE) || !gs->level_has_player()) {
 		return;
+	}
 
 	fov& mainfov = gs->local_player()->field_of_view();
 	char matches[sub_sqrs * sub_sqrs];
@@ -140,12 +140,10 @@ void GameTiles::post_draw(GameState* gs) {
 			Tile& tile = get(x, y);
 			GLimage& img = game_tile_data[tile.tile].img(tile.subtile);
 
-			const std::vector<obj_id>& pids =
-					gs->player_controller().player_ids();
+			std::vector<PlayerInst*> players = gs->players();
 
-			for (int i = 0; i < pids.size(); i++) {
-				PlayerInst* player = (PlayerInst*)gs->get_instance(pids[i]);
-				fov& f = player->field_of_view();
+			for (int i = 0; i < players.size(); i++) {
+				fov& f = players[i]->field_of_view();
 				f.matches(x, y, matches);
 				for (int i = 0; i < sub_sqrs * sub_sqrs; i++) {
 					if (matches[i]) {

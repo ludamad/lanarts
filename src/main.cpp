@@ -68,7 +68,7 @@ static void game_loop(GameState* gs) {
 			init_lua_data(gs, gs->get_luastate());
 		}
 		if (gs->key_press_state(SDLK_F3)) {
-			gs->game_world().regen_level(gs->get_level()->roomid);
+			gs->game_world().regen_level(gs->get_level()->levelid);
 		}
 		if (gs->key_press_state(SDLK_F4)) {
 			paused = !paused;

@@ -1,6 +1,8 @@
 /* GameWorld:
+ *  Contains player object information
+ *  Contains enemy's seen information
  * 	Contains all the information and functionality of previously generated levels,
- * 	and which levels are currently being generated
+ * 	and which levels are currently being generated.
  */
 
 #ifndef GAMEWORLD_H_
@@ -39,6 +41,9 @@ public:
 	void set_current_level(GameLevelState* level) {
 		lvl = level;
 	}
+	PlayerController& player_controller() {
+		return _player_controller;
+	}
 	EnemiesSeen& enemies_seen() {
 		return _enemies_seen;
 	}
@@ -49,7 +54,10 @@ private:
 			size_t nplayers);
 	bool midstep;
 	int next_room_id;
+
 	EnemiesSeen _enemies_seen;
+	PlayerController _player_controller;
+
 	GameLevelState* lvl;
 	GameState* game_state;
 	std::vector<GameLevelState*> level_states;

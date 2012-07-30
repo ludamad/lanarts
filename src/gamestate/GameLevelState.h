@@ -21,27 +21,30 @@ struct GameLevelPortal {
 };
 
 struct GameLevelState {
-	GameLevelState(int roomid, int branch, int level, int w, int h, bool wandering_flag = true,
+	GameLevelState(level_id levelid, int w, int h, bool wandering_flag = true,
 			bool is_simulation = false);
 	~GameLevelState();
 
 	int room_within(const Pos& p);
 	void copy_to(GameLevelState & level) const;
-	GameLevelState *clone() const;
+	GameLevelState* clone() const;
 
-	int tile_width() { return width / TILE_SIZE; }
-	int tile_height() { return height / TILE_SIZE; }
+	int tile_width() {
+		return width / TILE_SIZE;
+	}
+	int tile_height() {
+		return height / TILE_SIZE;
+	}
 
 	std::vector<GameLevelPortal> exits, entrances;
 	std::vector<Room> rooms;
-	int roomid;
+
+	level_id levelid;
 	int steps_left;
-	int branch_number, level_number;
 	int width, height;
 	GameTiles tiles;
 	GameInstSet inst_set;
 	MonsterController mc;
-	PlayerController pc;
 
 	bool is_simulation;
 };

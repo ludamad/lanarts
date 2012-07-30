@@ -30,6 +30,7 @@ namespace RVO {
 }
 
 struct GameLevelState;
+class PlayerInst;
 
 class MonsterController {
 public:
@@ -76,6 +77,8 @@ private:
 
     AStarPathFind astarcontext;
     obj_id targetted;
+
+    std::vector<PlayerInst*> players;
     std::vector<PathInfo*> paths;
 	std::vector<obj_id> mids;
 	std::vector<int> player_simids;

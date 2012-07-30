@@ -103,7 +103,7 @@ void GameState::init_game() {
 	mtwist.init_genrand(seed);
 	set_level(world.get_level(0, true));
 
-	GameInst* p = get_instance(get_level()->pc.local_playerid());
+	PlayerInst* p = local_player();
 	view().sharp_center_on(p->x, p->y);
 
 }
@@ -118,14 +118,20 @@ void GameState::set_level(GameLevelState* lvl) {
 
 /*Handle new characters and exit signals*/
 PlayerInst* GameState::local_player() {
-	GameInst* player = get_instance(local_playerid());
-	LANARTS_ASSERT(!player || dynamic_cast<PlayerInst*>(player));
-	return (PlayerInst*)player;
+	return player_controller().local_player();
 }
 
 int GameState::object_radius_test(int x, int y, int radius, col_filterf f,
 		GameInst** objs, int obj_cap) {
 	return object_radius_test(NULL, objs, obj_cap, f, x, y, radius);
+}
+
+std::vector<PlayerInst*> GameState::players() {
+	return player_controller().players(world.get_current_level_id());
+}
+
+bool GameState::level_has_player() {
+	return player_controller().level_has_player(world.get_current_level_id());
 }
 
 int GameState::handle_event(SDL_Event* event) {
@@ -197,7 +203,7 @@ void GameState::adjust_view_to_dragging() {
 
 	/*If we were previously dragging, now snap back to the player position*/
 	if (!is_dragged && dragging_view) {
-		GameInst* p = get_instance(local_playerid());
+		PlayerInst* p = local_player();
 		_view.sharp_center_on(p->x, p->y);
 	}
 	dragging_view = is_dragged;
@@ -215,7 +221,6 @@ void GameState::draw(bool drawhud) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	get_level()->tiles.pre_draw(this);
 
-	get_level()->pc.update_fieldsofview(this);
 	std::vector<GameInst*> safe_copy = get_level()->inst_set.to_vector();
 	for (size_t i = 0; i < safe_copy.size(); i++) {
 		safe_copy[i]->draw(this);
@@ -227,12 +232,13 @@ void GameState::draw(bool drawhud) {
 	}
 
 	update_display();
-// XXX: Apparently glFinish is not recommended
-//	glFinish();
+
+//	glFinish();// XXX: Apparently glFinish is not recommended
 }
 
-obj_id GameState::add_instance(GameInst *inst) {
+obj_id GameState::add_instance(GameInst* inst) {
 	obj_id id = get_level()->inst_set.add_instance(inst);
+	inst->current_level = get_level()->levelid;
 	inst->init(this);
 	return id;
 }
@@ -340,7 +346,7 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 	int minx = squish(mingrid_x, 0, w), miny = squish(mingrid_y, 0, h);
 	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
 
-	const std::vector<obj_id>& players = player_controller().player_ids();
+	const std::vector<GameInstRef>& players = player_controller().all_players();
 
 	if ((canreveal && key_down_state(SDLK_BACKQUOTE)) || players.empty()) {
 		return true;
@@ -353,7 +359,7 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 				return true;
 			} else if (!player) {
 				for (int i = 0; i < players.size(); i++) {
-					PlayerInst* p = (PlayerInst*)get_instance(players[i]);
+					PlayerInst* p = (PlayerInst*)players[i].get_instance();
 					if (p->field_of_view().within_fov(xx, yy)) {
 						return true;
 					}
@@ -408,21 +414,12 @@ bool GameState::mouse_downwheel() {
 }
 
 /* End mouse click states */
-
-obj_id GameState::local_playerid() {
-	return get_level()->pc.local_playerid();
-}
-
 GameTiles& GameState::tile_grid() {
 	return get_level()->tiles;
 }
 
 MonsterController& GameState::monster_controller() {
 	return get_level()->mc;
-}
-
-PlayerController& GameState::player_controller() {
-	return get_level()->pc;
 }
 void GameState::skip_next_instance_id() {
 	get_level()->inst_set.skip_next_id();

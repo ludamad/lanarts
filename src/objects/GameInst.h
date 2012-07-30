@@ -25,7 +25,7 @@ public:
 	GameInst(int x, int y, int radius, bool solid = true, int depth = 0) :
 			reference_count(0), id(0), last_x(x), last_y(y), x(x), y(y), radius(
 					radius), target_radius(radius), depth(depth), solid(solid), destroyed(
-					false) {
+					false), current_level(-1) {
 		if (this->radius > 14)
 			this->radius = 14;
 	}
@@ -63,6 +63,7 @@ public:
 	int x, y, radius, target_radius;
 	int depth;
 	bool solid, destroyed;
+	level_id current_level;
 	LuaValue lua_variables;
 };
 

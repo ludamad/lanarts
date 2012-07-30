@@ -13,58 +13,28 @@
 #include "../GameInst.h"
 #include "../GameInstRef.h"
 
+class PlayerInst;
+
+//One instance for all levels
 class PlayerController {
 public:
-	PlayerController();
-	~PlayerController();
 	void update_fieldsofview(GameState* gs);
-	void pre_step(GameState* gs);
 	void clear();
 
-	void register_player(obj_id player, bool islocal);
-	void deregister_player(obj_id player);
+	void register_player(PlayerInst* player);
+	PlayerInst* local_player();
 
-	const std::vector<obj_id>& player_ids() {
-		return pids;
+	const std::vector<GameInstRef>& all_players() {
+		return _players;
 	}
-	obj_id local_playerid() {
-		return local_player;
-	}
-	bool has_player() {
-		return !pids.empty();
-	}
+	bool level_has_player(level_id level);
+	std::vector<PlayerInst*> players(level_id level);
+
 	void players_gain_xp(GameState* gs, int xp);
 	void copy_to(PlayerController& pc) const;
 private:
-	obj_id local_player;
-	std::vector<obj_id> pids;
-};
-
-//One instance for all levels
-class _PlayerController {
-public:
-	_PlayerController();
-	~_PlayerController();
-	void update_fieldsofview(GameState* gs);
-	void pre_step(GameState* gs);
-	void clear();
-
-	void register_player(obj_id player, bool islocal);
-	void deregister_player(obj_id player);
-//
-//	const std::vector<obj_id>& player_ids() {
-//		return pids;
-//	}
-//	obj_id local_playerid() {
-//		return local_player;
-//	}
-	bool has_player() {
-		return !pids.empty();
-	}
-	void copy_to(PlayerController& pc) const;
-private:
-	GameInstRef local_player;
-	std::vector<GameInstRef> pids;
+	GameInstRef _local_player;
+	std::vector<GameInstRef> _players;
 };
 
 #endif /* PLAYERCONTROLLER_H_ */

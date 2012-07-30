@@ -167,6 +167,7 @@ typedef int enemy_id;
 typedef int weapon_id;
 /*Determines what team something belongs to*/
 typedef int team_id;
+typedef int level_id;
 
 /*Type used to store monetary values*/
 typedef int money_t;

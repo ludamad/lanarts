@@ -21,10 +21,11 @@ struct EntityBehaviour {
 
 class CombatGameInst: public GameInst {
 public:
-	CombatGameInst(const CombatStats& base_stats, sprite_id sprite, int teamid,
-			int x, int y, int radius, bool solid = true, int depth = 0) :
+	CombatGameInst(const CombatStats& base_stats, sprite_id sprite,
+			team_id teamid, int x, int y, int radius, bool solid = true,
+			int depth = 0) :
 			GameInst(x, y, radius, solid, depth), rx(x), ry(y), vx(0), vy(0), is_resting(
-					false), teamid(teamid), sprite(sprite), kills(0), base_stats(
+					false), teamid(teamid), mobid(0), sprite(sprite), kills(0), base_stats(
 					base_stats) {
 	}
 	virtual ~CombatGameInst() {
@@ -34,7 +35,7 @@ public:
 	virtual void init(GameState* gs);
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
-	virtual void update_field_of_view();
+	virtual void update_field_of_view(GameState* gs);
 	virtual bool within_field_of_view(const Pos& pos) =0;
 
 	virtual unsigned int integrity_hash();
@@ -46,8 +47,10 @@ public:
 
 	bool damage(GameState* gs, int dmg);
 	bool damage(GameState* gs, const EffectiveAttackStats& attack);
-	bool melee_attack(GameState* gs, CombatGameInst* inst, const Weapon& projectile);
-	bool projectile_attack(GameState* gs, CombatGameInst* inst, const Weapon& weapon, const Projectile& projectile);
+	bool melee_attack(GameState* gs, CombatGameInst* inst,
+			const Weapon& projectile);
+	bool projectile_attack(GameState* gs, CombatGameInst* inst,
+			const Weapon& weapon, const Projectile& projectile);
 	//bool spell_attack ...
 	bool attack(GameState* gs, CombatGameInst* inst, const AttackStats& attack);
 
@@ -69,7 +72,8 @@ public:
 	ClassStats& class_stats();
 
 	/* With attack data */
-	EffectiveAttackStats effective_atk_stats(MTwist& mt, const AttackStats& attack);
+	EffectiveAttackStats effective_atk_stats(MTwist& mt,
+			const AttackStats& attack);
 	/* Damage, power, cooldown not complete without attack specified: */
 	EffectiveStats& effective_stats();
 
@@ -79,14 +83,18 @@ public:
 	Inventory& inventory();
 	Equipment& equipment();
 
-	team_id& team();
+	int& combat_mob_id() {
+		return mobid;
+	}
 
+	team_id& team();
 
 	float vx, vy;
 	float rx, ry;
 protected:
 	bool is_resting;
 	team_id teamid;
+	int mobid;
 	sprite_id sprite;
 	int kills;
 //	PathInfo path;

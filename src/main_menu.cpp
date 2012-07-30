@@ -33,35 +33,35 @@ extern "C" {
 #include "interface/ButtonInst.h"
 
 static void continue_as_loner(GameState* gs, GameInst* _, void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 }
 static void continue_as_hardcore(GameState* gs, GameInst* _, void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().regen_on_death = false;
 }
 
 static void continue_as_loner_save_replay(GameState* gs, GameInst* _,
 		void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().savereplay_file = "replays/replay";
 }
 
 static void continue_as_load_replay(GameState* gs, GameInst* _, void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().loadreplay_file = "replays/replay";
 }
 
 static void continue_as_client(GameState* gs, GameInst* _, void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::CLIENT;
 }
 
 static void continue_as_server(GameState* gs, GameInst* _, void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::SERVER;
 }
 
@@ -103,8 +103,8 @@ void main_menu_loop(GameState* gs, int width, int height) {
 	GameView prevview = gs->view();
 	GameLevelState* oldlevel = gs->get_level();
 
-	gs->set_level(new GameLevelState(0, 0, 0, width, height));
-	gs->get_level()->level_number = -1;
+	gs->set_level(new GameLevelState(0, width, height));
+	gs->get_level()->levelid = -1;
 	gs->view().x = 0;
 	gs->view().y = 0;
 
@@ -129,11 +129,11 @@ void main_menu_loop(GameState* gs, int width, int height) {
 }
 
 static void choose_fighter(GameState* gs, GameInst* _, void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().classn = get_class_by_name("Fighter");
 }
 static void choose_mage(GameState* gs, GameInst* _, void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().classn = get_class_by_name("Mage");
 }
 static void choose_druid(GameState* gs, GameInst* _, void* flag) {
@@ -177,8 +177,8 @@ void class_menu_loop(GameState* gs, int width, int height) {
 	GameView prevview = gs->view();
 	GameLevelState* oldlevel = gs->get_level();
 
-	gs->set_level(new GameLevelState(0, 0, 0, width, height));
-	gs->get_level()->level_number = -1;
+	gs->set_level(new GameLevelState(0, width, height));
+	gs->get_level()->levelid = -1;
 	gs->view().x = 0;
 	gs->view().y = 0;
 

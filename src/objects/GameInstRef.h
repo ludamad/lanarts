@@ -25,6 +25,7 @@ public:
 		return inst;
 	}
 	void operator=(const GameInstRef& ref);
+	void operator=(GameInst* ref);
 	GameInst* operator->() {
 		return inst;
 	}
