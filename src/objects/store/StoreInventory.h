@@ -21,7 +21,8 @@ struct StoreItemSlot {
 
 class StoreInventory {
 public:
-	StoreInventory() {
+	StoreInventory(int maxsize = 40) :
+			items(maxsize) {
 	}
 	void add(const Item& item, int amount, int cost);
 	StoreItemSlot& get(int i) {

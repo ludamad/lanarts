@@ -4,6 +4,8 @@
  *  as well as the generate_features function
  */
 
+#include "../data/game_data.h"
+
 #include "../gamestate/GameState.h"
 #include "../gamestate/GameTiles.h"
 #include "../gamestate/GameLevelState.h"
@@ -180,10 +182,10 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 			fpos.y += start_y;
 			fpos = centered_multiple(fpos, TILE_SIZE);
 			StoreInventory inv;
-//			inv.add(Item());
+			inv.add(Item(get_item_by_name("Short Sword")), 1, 20);
 			gs->add_instance(
 					new StoreInst(fpos.x, fpos.y, false,
-							get_sprite_by_name("store"), StoreInventory()));
+							get_sprite_by_name("store"), inv));
 			break;
 		}
 	}

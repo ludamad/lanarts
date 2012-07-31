@@ -9,6 +9,7 @@
 #include "SidebarContent.h"
 
 class StoreInst;
+class StoreInventory;
 
 class StoreContent: public SidebarContent {
 public:
@@ -27,6 +28,8 @@ public:
 	virtual int amount_of_pages(GameState* gs) {
 		return 1;
 	}
+
+	StoreInventory& store_inventory() const;
 
 	virtual bool handle_io(GameState* gs, ActionQueue& queued_actions);
 

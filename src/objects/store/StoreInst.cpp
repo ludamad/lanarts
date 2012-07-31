@@ -21,7 +21,7 @@ void StoreInst::step(GameState* gs) {
 	}
 	GameInst* player = NULL;
 	gs->object_radius_test(this, &player, 1, player_colfilter, x, y, 16);
-	if (player == (GameInst*)gs->local_player()) {
+	if (player == (GameInst*) gs->local_player()) {
 		gs->game_hud().override_sidebar_contents(&sidebar_display);
 	}
 }
@@ -39,7 +39,11 @@ void StoreInst::draw(GameState* gs) {
 
 void StoreInst::copy_to(GameInst* inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(StoreInst*)inst = *this;
+	*(StoreInst*) inst = *this;
+}
+
+void StoreInst::init(GameState* gs) {
+	sidebar_display.init(this, gs->game_hud().sidebar_content_area());
 }
 
 StoreInst* StoreInst::clone() const {

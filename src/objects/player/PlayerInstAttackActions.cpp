@@ -570,11 +570,6 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	Pos target = Pos(action.action_x, action.action_y);
 	player_use_spell(gs, this, spl_entry, target);
 
-	if (action.use_id == 0) {
-		double mult = 1 + (class_stats().xplevel - 1) / 10.0;
-		mult = std::min(2.0, mult);
-		cooldowns().action_cooldown /= mult;
-	}
 	cooldowns().action_cooldown *= estats.cooldown_mult;
 	cooldowns().reset_rest_cooldown(REST_COOLDOWN);
 }
