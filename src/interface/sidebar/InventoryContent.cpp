@@ -95,7 +95,7 @@ void InventoryContent::draw(GameState* gs) const {
 int InventoryContent::amount_of_pages(GameState* gs) {
 	PlayerInst* p = gs->local_player();
 
-	int items_n = p->inventory().size();
+	int items_n = p->inventory().last_filled_slot();
 	/* Add ITEMS_PER_PAGE - 1 so that 0 spells need 0 pages, 1 spell needs 1 page, etc*/
 	int item_pages = (items_n + ITEMS_PER_PAGE - 1) / ITEMS_PER_PAGE;
 

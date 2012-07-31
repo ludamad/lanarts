@@ -37,7 +37,7 @@ public:
 	size_t max_size() const {
 		return items.size();
 	}
-	size_t size() const;
+	size_t last_filled_slot() const;
 private:
 	std::vector<ItemSlot> items;
 };

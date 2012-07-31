@@ -65,6 +65,10 @@ public:
 		return sidebar.sidebar_content_area();
 	}
 
+	void override_sidebar_contents(SidebarContent* overlay) {
+		sidebar.override_sidebar_contents(overlay);
+	}
+
 	/* Reset the selected item after action is finished, otherwise drawing will lag a step
 	 * Used in PlayerInstActions.cpp*/
 	void reset_slot_selected();

@@ -30,7 +30,7 @@ bool Inventory::add(const Item& item, int amount) {
 	return false;
 }
 
-size_t Inventory::size() const {
+size_t Inventory::last_filled_slot() const {
 	int i = max_size() - 1;
 	for (; i >= 0; i--) {
 		if (items[i].amount > 0) {

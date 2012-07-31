@@ -13,6 +13,7 @@
 
 #include "../../gamestate/GameState.h"
 
+#include "../../objects/store/StoreInst.h"
 #include "../../objects/player/PlayerInst.h"
 
 #include "StoreContent.h"

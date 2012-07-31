@@ -14,13 +14,14 @@
 class FeatureInst: public GameInst {
 public:
 	enum feature_t {
-		DOOR_OPEN, DOOR_CLOSED, STORE, DECORATION
+		DOOR_OPEN, DOOR_CLOSED, DECORATION
 	};
 	enum {
 		RADIUS = 15, DEPTH = 100
 	};
-	FeatureInst(int x, int y, feature_t feature, sprite_id spriteid = -1) :
-			GameInst(x, y, solid, false, DEPTH), feature(feature), last_seen_spr(
+	FeatureInst(int x, int y, feature_t feature, bool solid = false,
+			sprite_id spriteid = -1) :
+			GameInst(x, y, RADIUS, solid, DEPTH), feature(feature), last_seen_spr(
 					-1), spriteid(spriteid) {
 	}
 	virtual ~FeatureInst();

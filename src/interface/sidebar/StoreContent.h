@@ -7,12 +7,17 @@
 #define STORECONTENT_H_
 
 #include "SidebarContent.h"
-#include "../../stats/StoreInventory.h"
+
+class StoreInst;
 
 class StoreContent: public SidebarContent {
 public:
-	StoreContent(const BBox& bbox) :
-			SidebarContent(bbox), slot_selected(-1) {
+	StoreContent(StoreInst* store_object = NULL, const BBox& bbox = BBox()) :
+			SidebarContent(bbox), store_object(store_object), slot_selected(-1) {
+	}
+	void init(StoreInst* store_object, const BBox& bbox) {
+		this->store_object = store_object;
+		this->bbox = bbox;
 	}
 	virtual const char* name() {
 		return "Store";
@@ -30,7 +35,7 @@ public:
 	}
 
 private:
-	StoreInventory store_inventory;
+	StoreInst* store_object;
 	int slot_selected;
 };
 

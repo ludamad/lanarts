@@ -8,6 +8,7 @@
 #include "../gamestate/GameTiles.h"
 #include "../gamestate/GameLevelState.h"
 
+#include "../objects/store/StoreInst.h"
 #include "../objects/FeatureInst.h"
 
 #include "../display/sprite_data.h"
@@ -178,9 +179,11 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 			fpos.x += start_x;
 			fpos.y += start_y;
 			fpos = centered_multiple(fpos, TILE_SIZE);
+			StoreInventory inv;
+//			inv.add(Item());
 			gs->add_instance(
-					new FeatureInst(fpos.x, fpos.y, FeatureInst::STORE,
-							get_sprite_by_name("store")));
+					new StoreInst(fpos.x, fpos.y, false,
+							get_sprite_by_name("store"), StoreInventory()));
 			break;
 		}
 	}

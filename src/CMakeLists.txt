@@ -117,6 +117,9 @@ set( lanarts_src
 	objects/enemy/MonsterController.cpp
 	objects/enemy/MonsterControllerActions.cpp
 	objects/player/PlayerController.cpp
+	
+	objects/store/StoreInventory.cpp
+	objects/store/StoreInst.cpp
 
 	objects/AnimatedInst.cpp
 	interface/ButtonInst.cpp
@@ -238,6 +241,9 @@ set( lanarts_include
 	objects/AnimatedInst.h
 	interface/ButtonInst.h
 
+	objects/store/StoreInventory.h
+	objects/store/StoreInst.h
+	
 	objects/CombatGameInst.h
 	objects/GameInst.h
 	objects/GameInstRef.h
