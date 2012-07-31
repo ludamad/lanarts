@@ -31,6 +31,16 @@ static void draw_store_inventory_slot(GameState* gs, StoreItemSlot& itemslot,
 	}
 }
 
+static void draw_item_cost(GameState* gs, const BBox& bbox, int cost) {
+	PlayerInst* player = gs->local_player();
+	Colour col = COL_PALE_GREEN;
+	if (player->gold() < cost) {
+		col = COL_PALE_RED;
+	}
+	gl_printf_centered(gs->primary_font(), col, bbox.center_x(),
+			bbox.y1 - TILE_SIZE / 2, "Cost: %d", cost);
+}
+
 static void draw_store_inventory(GameState* gs, StoreInventory& inv,
 		const BBox& bbox, int min_slot, int max_slot, int slot_selected = -1) {
 	int mx = gs->mouse_x(), my = gs->mouse_y();
@@ -50,6 +60,7 @@ static void draw_store_inventory(GameState* gs, StoreInventory& inv,
 				if (slotbox.contains(mx, my)) {
 					outline = COL_PALE_YELLOW;
 					draw_console_item_description(gs, itemslot.item);
+					draw_item_cost(gs, bbox, itemslot.cost);
 				}
 			}
 
@@ -78,8 +89,44 @@ StoreInventory& StoreContent::store_inventory() const {
 	return store_object->inventory();
 }
 
-bool StoreContent::handle_io(GameState* gs, ActionQueue & queued_actions) {
+static int get_itemslotn(StoreInventory& inv, const BBox& bbox, int mx,
+		int my) {
+	if (!bbox.contains(mx, my)) {
+		return -1;
+	}
 
-	return true;
+	int posx = (mx - bbox.x1) / TILE_SIZE;
+	int posy = (my - bbox.y1) / TILE_SIZE;
+	int slot = 5 * posy + posx;
+
+	if (slot < 0 || slot >= inv.max_size())
+		return -1;
+
+	return slot;
+}
+
+bool StoreContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
+	PlayerInst* p = gs->local_player();
+	StoreInventory& inv = store_inventory();
+	int mx = gs->mouse_x(), my = gs->mouse_y();
+	bool within_inventory = bbox.contains(mx, my);
+
+	/* Buy an item (left click) */
+	if (gs->mouse_left_click() && within_inventory) {
+
+		int slot = get_itemslotn(inv, bbox, mx, my);
+		if (slot >= 0 && slot < INVENTORY_SIZE && inv.get(slot).amount > 0) {
+			if (p->gold() >= inv.get(slot).cost) {
+				queued_actions.push_back(
+						game_action(gs, p, GameAction::PURCHASE_FROM_STORE,
+								store_object->id, NONE, NONE, slot));
+			} else {
+				gs->game_chat().add_message("You cannot afford it!",
+						COL_PALE_RED);
+			}
+			return true;
+		}
+	}
+	return false;
 }
 

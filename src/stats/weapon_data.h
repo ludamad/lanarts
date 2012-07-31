@@ -18,6 +18,10 @@
 struct WeaponEntry {
 	std::string name, description;
 	std::string weapon_class;
+
+	// Cost when appearing in shops (if an item), if (0,0) will not appear in shops.
+	Range shop_cost;
+
 	bool uses_projectile;
 	int max_targets;
 	CoreStatMultiplier power, damage;

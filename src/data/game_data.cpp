@@ -30,6 +30,7 @@ void load_weapon_item_entries();
 void load_projectile_item_entries();
 
 LuaValue load_item_data(lua_State* L, const FilenameList& filenames);
+LuaValue load_itemgenlist_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_enemy_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_effect_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_dungeon_data(lua_State* L, const FilenameList& filenames);
@@ -42,6 +43,7 @@ std::vector<ClassType> game_class_data;
 std::vector<EffectEntry> game_effect_data;
 std::vector<EnemyEntry> game_enemy_data;
 std::vector<ItemEntry> game_item_data;
+std::vector<ItemGenList> game_itemgenlist_data;
 std::vector<TileEntry> game_tile_data;
 std::vector<TilesetEntry> game_tileset_data;
 std::vector<ProjectileEntry> game_projectile_data;
@@ -133,6 +135,11 @@ effect_id get_effect_by_name(const char* name) {
 enemy_id get_enemy_by_name(const char* name, bool error_if_not_found) {
 	return get_X_by_name(game_enemy_data, name, error_if_not_found);
 }
+
+itemgenlist_id get_itemgenlist_by_name(const char* name,
+		bool error_if_not_found ) {
+	return get_X_by_name(game_itemgenlist_data, name, error_if_not_found);
+}
 projectile_id get_projectile_by_name(const char* name) {
 	return get_X_by_name(game_projectile_data, name);
 }
@@ -213,7 +220,8 @@ GameSettings init_game_data(lua_State* L) {
 	lua_dungeon.deinitialize(L);
 	lua_classes = load_class_data(L, dfiles.class_files);
 
-	GameSettings settings = load_settings_data("res/settings.yaml", L, &lua_settings);
+	GameSettings settings = load_settings_data("res/settings.yaml", L,
+			&lua_settings);
 
 	return settings;
 }

@@ -20,7 +20,7 @@ void StoreInst::step(GameState* gs) {
 		last_seen_spr = spriteid;
 	}
 	GameInst* player = NULL;
-	gs->object_radius_test(this, &player, 1, player_colfilter, x, y, 16);
+	gs->object_radius_test(this, &player, 1, player_colfilter, x, y, 24);
 	if (player == (GameInst*) gs->local_player()) {
 		gs->game_hud().override_sidebar_contents(&sidebar_display);
 	}
@@ -28,7 +28,7 @@ void StoreInst::step(GameState* gs) {
 
 void StoreInst::draw(GameState* gs) {
 	Colour drawcolour;
-	if (gs->object_radius_test(this, NULL, 0, player_colfilter, x, y, 16)) {
+	if (gs->object_radius_test(this, NULL, 0, player_colfilter, x, y, 24)) {
 		drawcolour = Colour(255, 255, 100, 255);
 	}
 	if (last_seen_spr > -1) {

@@ -104,7 +104,7 @@ int InventoryContent::amount_of_pages(GameState* gs) {
 
 bool InventoryContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	PlayerInst* p = gs->local_player();
-	Inventory inv = p->inventory();
+	Inventory& inv = p->inventory();
 	int mx = gs->mouse_x(), my = gs->mouse_y();
 	bool within_inventory = bbox.contains(mx, my);
 

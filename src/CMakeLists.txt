@@ -28,6 +28,7 @@ set( lanarts_src
 	stats/loaddata/load_effect_data.cpp
 	objects/loaddata/load_enemy_data.cpp
 	stats/loaddata/load_item_data.cpp
+	stats/loaddata/load_itemgen_data.cpp
 	gamestate/loaddata/load_tileset_data.cpp
 	stats/loaddata/load_projectile_data.cpp
 	gamestate/loaddata/load_settings_data.cpp
@@ -176,6 +177,7 @@ set( lanarts_include
 	stats/combat_stats.h
 	stats/Inventory.h
 	stats/items.h
+	stats/itemgen_data.h
 	stats/ItemsKnown.h
 	stats/effects.h
 	stats/Equipment.h

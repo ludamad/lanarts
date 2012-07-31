@@ -14,6 +14,10 @@
 
 struct ArmourEntry {
 	std::string name, description;
+
+	// Cost when appearing in shops (if an item), if (0,0) will not appear in shops.
+	Range shop_cost;
+
 	sprite_id item_sprite;
 	ItemEntry::equip_type equiptype;
 	CoreStatMultiplier resistance, damage_reduction;

@@ -31,15 +31,14 @@ static ItemEntry::id_type parse_id_type(const YAML::Node& n) {
 }
 
 ItemEntry parse_item_type(const YAML::Node& n) {
-	return ItemEntry(
-			parse_str(n["name"]),
+	return ItemEntry(parse_str(n["name"]),
 			parse_defaulted(n, "description", std::string()),
 			parse_defaulted(n, "use_message", std::string()),
-			parse_defaulted(n, "radius", 11),
-			parse_sprite_number(n, "sprite"),
+			parse_defaulted(n, "radius", 11), parse_sprite_number(n, "sprite"),
 			parse_defaulted(n, "action_func", std::string()),
 			parse_defaulted(n, "prereq_func", std::string()),
 			parse_defaulted(n, "stackable", true),
+			parse_defaulted(n, "shop_cost", Range()),
 			yaml_has_node(n, "type") ?
 					parse_id_type(n["type"]) : ItemEntry::ALWAYS_KNOWN);
 }

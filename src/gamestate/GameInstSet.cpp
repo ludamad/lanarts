@@ -206,12 +206,6 @@ GameInst* GameInstSet::get_instance(int id) const {
 
 std::vector<GameInst*> GameInstSet::to_vector() const {
 	std::vector<GameInst*> ret(size(), NULL);
-//
-//	for (int i = 0, j = 0; i < unit_capacity; i++) {
-//		GameInst* inst = unit_set[i].inst;
-//		if (valid_inst(inst))
-//			ret[j++] = inst;
-//	}
 
 	DepthMap::const_iterator it = depthlist_map.end();
 	for (int ind = 0; it != depthlist_map.begin();) {
@@ -343,6 +337,7 @@ void GameInstSet::clear() {
 }
 
 //TODO: Make collisionlist entry positions deterministic -or- make collision functions always return the same object
+//this will be important when copying over state updates in client side prediction
 void GameInstSet::__update_collision_position(InstanceState* state,
 		const Pos& p1, const Pos& p2) {
 	GameInst* inst = state->inst;

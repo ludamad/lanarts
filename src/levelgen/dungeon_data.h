@@ -10,15 +10,12 @@
 #include "../lua/LuaValue.h"
 #include "../lanarts_defines.h"
 
+#include "../stats/itemgen_data.h"
+
 enum {
 	DNGN_MAIN_BRANCH = 0
 };
 
-struct ItemGenChance {
-	int genchance; //Out of 100%
-	int itemtype;
-	Range quantity;
-};
 struct ItemGenSettings {
 	std::vector<ItemGenChance> item_chances;
 	Range num_items;

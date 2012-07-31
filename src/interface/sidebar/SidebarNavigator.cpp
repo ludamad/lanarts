@@ -81,7 +81,6 @@ SidebarNavigator::~SidebarNavigator() {
 }
 
 void SidebarNavigator::draw(GameState* gs) {
-	SidebarContent* content;
 	if (!content_overlay) {
 		inventory.draw_icon(gs);
 		spells.draw_icon(gs);
@@ -89,30 +88,22 @@ void SidebarNavigator::draw(GameState* gs) {
 		equipment.draw_icon(gs);
 		config.draw_icon(gs);
 		current_option().draw_icon(gs, true);
-
-		content = current_content();
-	} else {
-		content_overlay->draw(gs);
-		content = content_overlay;
-		content_overlay = NULL;
 	}
-	content->draw(gs);
+
+	current_content()->draw(gs);
 	gl_printf_x_centered(gs->primary_font(), COL_FILLED_OUTLINE,
-			main_content.center_x(), main_content.y2 + 3, content->name());
+			main_content.center_x(), main_content.y2 + 3,
+			current_content()->name());
+
+	content_overlay = NULL;
 }
 
 void SidebarNavigator::step(GameState* gs) {
-	if (!content_overlay) {
-		current_content()->step(gs);
-	} else {
-		content_overlay->step(gs);
-		content_overlay = NULL;
-	}
-
+	current_content()->step(gs);
 }
 
 void SidebarNavigator::reset_slot_selected() {
-	((InventoryContent*)inventory.content)->reset_slot_selected();
+	((InventoryContent*) inventory.content)->reset_slot_selected();
 }
 
 bool SidebarNavigator::handle_icon_io(GameState* gs, NavigationOption& option,
@@ -136,7 +127,11 @@ bool SidebarNavigator::handle_io(GameState* gs, ActionQueue& queued_actions) {
 }
 
 SidebarContent* SidebarNavigator::current_content() {
-	return current_option().content;
+	if (!content_overlay) {
+		return current_option().content;
+	} else {
+		return content_overlay;
+	}
 }
 
 SidebarNavigator::NavigationOption& SidebarNavigator::current_option() {

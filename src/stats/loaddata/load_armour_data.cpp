@@ -16,6 +16,7 @@ void load_armour_callbackf(const YAML::Node& node, lua_State* L,
 	ArmourEntry entry;
 	entry.name = parse_str(node["name"]);
 	entry.description = parse_defaulted(node, "description", std::string());
+	entry.shop_cost = parse_defaulted(node, "shop_cost", Range());
 	entry.damage_reduction = parse_defaulted(node, "reduction",
 			CoreStatMultiplier());
 	entry.resistance = parse_defaulted(node, "resistance",
@@ -53,7 +54,7 @@ void load_armour_item_entries() {
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
 		game_item_data.push_back(
 				ItemEntry(entry.name, entry.description, "", default_radius,
-						entry.item_sprite, "equip", "", false,
+						entry.item_sprite, "equip", "", false, entry.shop_cost,
 						ItemEntry::ALWAYS_KNOWN, ItemEntry::ARMOUR, i));
 	}
 }

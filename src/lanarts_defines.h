@@ -155,6 +155,7 @@ const int NONE = 0;
 /*Indices to the various game data arrays*/
 typedef int class_id;
 typedef int item_id;
+typedef int itemgenlist_id;
 typedef int armour_id;
 typedef int effect_id;
 typedef int projectile_id;

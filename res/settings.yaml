@@ -26,7 +26,7 @@ steps_per_draw: 1 #More is almost guaranteed to make the game faster, 1 is ideal
 time_per_step: 14
 
 #Debug settings
-invincible: no #Feel like exploring ? -> yes
+invincible: yes #Feel like exploring ? -> yes
 draw_diagnostics: no
 verbose_output: no
 

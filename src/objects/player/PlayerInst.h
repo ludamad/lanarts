@@ -61,8 +61,8 @@ public:
 		stats().cooldowns.reset_rest_cooldown(cooldown);
 	}
 
-	int gold() {
-		return money;
+	money_t& gold() {
+		return equipment().money;
 	}
 
 	int number_of_deaths() {
@@ -95,6 +95,7 @@ private:
 	bool queue_io_spell_and_attack_actions(GameState* gs, float dx, float dy);
 	void queue_io_equipment_actions(GameState* gs, bool do_stop_action);
 	void queue_network_actions(GameState* gs);
+	//Game action events
 	void use_move(GameState* gs, const GameAction& action);
 	void use_weapon(GameState* gs, const GameAction& action);
 	void use_dngn_exit(GameState* gs, const GameAction& action);
@@ -105,12 +106,13 @@ private:
 	void pickup_item(GameState* gs, const GameAction& action);
 	void drop_item(GameState* gs, const GameAction& action);
 	void reposition_item(GameState* gs, const GameAction& action);
+	void purchase_from_store(GameState* gs, const GameAction& action);
 
 	ActionQueue queued_actions;
 	fov fieldofview;
 	bool didstep, local, moving;
 
-	int money, lives, deaths;
+	int lives, deaths;
 	int previous_spellselect, spellselect;
 };
 

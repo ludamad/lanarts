@@ -20,6 +20,7 @@ weapons:
     spr_item: dagger
 
   - name: Short Sword
+    shop_cost: [20, 35]
     weapon_class: short blades
     description: An easy-to-wield short sword.
     damage: {base: [4,8], strength: 1.0}

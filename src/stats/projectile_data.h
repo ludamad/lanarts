@@ -18,7 +18,11 @@ struct ProjectileEntry {
 	std::string name, description;
 	std::string weapon_class; //Compatible with this weapon class
 
+	// Cost when appearing in shops (if an item), if (0,0) will not appear in shops.
+	Range shop_cost;
+
 	sprite_id item_sprite, attack_sprite;
+
 	CoreStatMultiplier power, damage;
 	float percentage_magic; //Conversely the rest is percentage physical
 	float resist_modifier; // How much resistance can resist this attack, lower for fast attacks

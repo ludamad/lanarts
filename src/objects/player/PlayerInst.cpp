@@ -27,7 +27,7 @@ PlayerInst::PlayerInst(const CombatStats& stats, int x, int y, bool local) :
 		CombatGameInst(stats,
 				game_class_data.at(stats.class_stats.classid).sprite, 0, x, y,
 				RADIUS, true, DEPTH), fieldofview(LINEOFSIGHT), local(local), moving(
-				0), money(0), lives(0), deaths(0), previous_spellselect(
+				0), lives(0), deaths(0), previous_spellselect(
 				0), spellselect(-1) {
 }
 
@@ -127,15 +127,6 @@ void PlayerInst::step(GameState* gs) {
 
 void PlayerInst::draw(GameState* gs) {
 	CombatGameInst::draw(gs);
-//	Test io event firing
-//	for (int i = 0; i < 5; i++) {
-//
-//		IOEvent event(IOEvent::SWITCH_TO_SPELL_N, i);
-//		if (gs->io_controller().query_event(event)) {
-//			gl_printf(gs->primary_font(), Colour(), x - gs->window_view().x,
-//					y - gs->window_view().y, "%d", i);
-//		}
-//	}
 }
 
 void PlayerInst::copy_to(GameInst *inst) const {
@@ -146,3 +137,4 @@ void PlayerInst::copy_to(GameInst *inst) const {
 PlayerInst *PlayerInst::clone() const {
 	return new PlayerInst(*this);
 }
+

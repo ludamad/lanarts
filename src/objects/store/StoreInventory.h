@@ -12,10 +12,9 @@
 
 struct StoreItemSlot {
 	Item item;
-	int amount;
-	int cost;
+	int amount, cost;
 	StoreItemSlot(const Item& item = Item(), int amount = 0, int cost = 0) :
-			amount(amount), cost(cost) {
+			item(item), amount(amount), cost(cost) {
 	}
 };
 

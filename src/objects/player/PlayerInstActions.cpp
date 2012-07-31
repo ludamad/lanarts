@@ -30,6 +30,7 @@ extern "C" {
 
 #include "PlayerInst.h"
 #include "../enemy/EnemyInst.h"
+#include "../store/StoreInst.h"
 #include "../ItemInst.h"
 
 #include "../ProjectileInst.h"
@@ -92,7 +93,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 	GameInst* inst = NULL;
 	if (cooldowns().can_pickup()
 			&& gs->object_radius_test(this, &inst, 1, &item_colfilter)) {
-		ItemInst* iteminst = (ItemInst*)inst;
+		ItemInst* iteminst = (ItemInst*) inst;
 		Item& item = iteminst->item_type();
 
 		bool was_dropper = iteminst->last_held_by() == id;
@@ -256,14 +257,14 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	const int PICKUP_RATE = 10;
-	ItemInst* item = (ItemInst*)gs->get_instance(action.use_id);
+	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
 	if (!item)
 		return;
 	const Item& type = item->item_type();
 	int amnt = item->item_quantity();
 
 	if (type == get_item_by_name("Gold")) {
-		money += amnt;
+		gold() += amnt;
 	} else {
 		if (is_same_projectile(equipment().projectile, type)) {
 			equipment().projectile_amnt += amnt;
@@ -325,6 +326,17 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 	}
 }
 
+void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
+	StoreInst* store = (StoreInst*) gs->get_instance(action.use_id);
+	StoreInventory& inv = store->inventory();
+	StoreItemSlot& slot = inv.get(action.use_id2);
+	if (gold() >= slot.cost) {
+		inventory().add(slot.item, slot.amount);
+		gold() -= slot.cost;
+		slot.amount = 0;
+	}
+}
+
 void PlayerInst::reposition_item(GameState* gs, const GameAction& action) {
 	ItemSlot& itemslot1 = inventory().get(action.use_id);
 	ItemSlot& itemslot2 = inventory().get(action.use_id2);
@@ -360,6 +372,8 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 	case GameAction::CHOSE_SPELL:
 		spellselect = action.use_id;
 		return;
+	case GameAction::PURCHASE_FROM_STORE:
+		return purchase_from_store(gs, action);
 	default:
 		printf("PlayerInst::perform_action() error: Invalid action id %d!\n",
 				action.act);
@@ -434,12 +448,12 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 
 	EnemyInst* target = NULL;
 	//Enemy hitting test for melee
-	gs->object_radius_test(this, (GameInst**)&target, 1, &enemy_colfilter,
+	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_colfilter,
 			x + ddx * 2, y + ddy * 2);
 
 	//Smaller radius enemy pushing test, can intercept enemy radius but not too far
 	EnemyInst* alreadyhitting[5] = { 0, 0, 0, 0, 0 };
-	gs->object_radius_test(this, (GameInst**)alreadyhitting, 5,
+	gs->object_radius_test(this, (GameInst**) alreadyhitting, 5,
 			&enemy_colfilter, x, y, radius);
 	bool already = false;
 	for (int i = 0; i < 5; i++) {
