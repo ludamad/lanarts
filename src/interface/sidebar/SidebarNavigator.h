@@ -36,6 +36,10 @@ public:
 		content_overlay = overlay;
 	}
 
+	BBox sidebar_content_area() {
+		return main_content;
+	}
+
 private:
 	enum view_t {
 		INVENTORY, SPELLS, EQUIPMENT, STATS, ENEMIES, CONFIG

@@ -35,7 +35,7 @@ PlayerInst* PlayerController::local_player() {
 	return (PlayerInst*)_local_player.get_instance();
 }
 
-std::vector<PlayerInst*> PlayerController::players(level_id level) {
+std::vector<PlayerInst*> PlayerController::players_in_level(level_id level) {
 	std::vector<PlayerInst*> ret;
 	for (int i = 0; i < _players.size(); i++) {
 		GameInst* player = _players[i].get_instance();

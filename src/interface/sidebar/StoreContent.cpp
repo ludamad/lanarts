@@ -18,6 +18,7 @@
 #include "StoreContent.h"
 
 void StoreContent::draw(GameState* gs) const {
+
 }
 
 bool StoreContent::handle_io(GameState* gs, ActionQueue & queued_actions) {

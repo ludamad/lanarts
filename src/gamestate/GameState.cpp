@@ -126,8 +126,8 @@ int GameState::object_radius_test(int x, int y, int radius, col_filterf f,
 	return object_radius_test(NULL, objs, obj_cap, f, x, y, radius);
 }
 
-std::vector<PlayerInst*> GameState::players() {
-	return player_controller().players(world.get_current_level_id());
+std::vector<PlayerInst*> GameState::players_in_level() {
+	return player_controller().players_in_level(world.get_current_level_id());
 }
 
 bool GameState::level_has_player() {

@@ -7,6 +7,7 @@
 #define STORECONTENT_H_
 
 #include "SidebarContent.h"
+#include "../../stats/StoreInventory.h"
 
 class StoreContent: public SidebarContent {
 public:
@@ -29,7 +30,7 @@ public:
 	}
 
 private:
-	int storeid;
+	StoreInventory store_inventory;
 	int slot_selected;
 };
 

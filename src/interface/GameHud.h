@@ -61,6 +61,10 @@ public:
 		return console;
 	}
 
+	BBox sidebar_content_area() {
+		return sidebar.sidebar_content_area();
+	}
+
 	/* Reset the selected item after action is finished, otherwise drawing will lag a step
 	 * Used in PlayerInstActions.cpp*/
 	void reset_slot_selected();

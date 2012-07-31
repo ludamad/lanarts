@@ -133,7 +133,7 @@ public:
 
 	/* Instance global controllers */
 	MonsterController& monster_controller();
-	std::vector<PlayerInst*> players();
+	std::vector<PlayerInst*> players_in_level();
 	bool level_has_player();
 
 	PlayerController& player_controller() {

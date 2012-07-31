@@ -179,7 +179,7 @@ bool GameWorld::pre_step() {
 	/* Queue actions for each player */
 	for (int i = 0; i < level_states.size(); i++) {
 		game_state->set_level(level_states[i]);
-		std::vector<PlayerInst*> players = game_state->players();
+		std::vector<PlayerInst*> players = game_state->players_in_level();
 		for (int i = 0; i < players.size(); i++) {
 			PlayerInst* p = players[i];
 			p->queue_io_actions(game_state);
@@ -191,7 +191,7 @@ bool GameWorld::pre_step() {
 	return true;
 }
 static void update_player_fields_of_view(GameState* gs) {
-	std::vector<PlayerInst*> players = gs->players();
+	std::vector<PlayerInst*> players = gs->players_in_level();
 	for (int i = 0; i < players.size(); i++) {
 		players[i]->update_field_of_view(gs);
 	}
@@ -255,7 +255,7 @@ void GameWorld::step() {
 
 void GameWorld::regen_level(int roomid) {
 	GameLevelState* level = get_level(roomid);
-	std::vector<PlayerInst*> players = player_controller().players(
+	std::vector<PlayerInst*> players = player_controller().players_in_level(
 			roomid);
 
 	/* Take all players out of level*/

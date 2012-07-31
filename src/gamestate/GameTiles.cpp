@@ -94,7 +94,7 @@ void GameTiles::step(GameState* gs) {
 
 	char matches[sub_sqrs * sub_sqrs];
 
-	std::vector<PlayerInst*> players = gs->players();
+	std::vector<PlayerInst*> players = gs->players_in_level();
 
 	for (int i = 0; i < players.size(); i++) {
 		PlayerInst* player = players[i];
@@ -140,7 +140,7 @@ void GameTiles::post_draw(GameState* gs) {
 			Tile& tile = get(x, y);
 			GLimage& img = game_tile_data[tile.tile].img(tile.subtile);
 
-			std::vector<PlayerInst*> players = gs->players();
+			std::vector<PlayerInst*> players = gs->players_in_level();
 
 			for (int i = 0; i < players.size(); i++) {
 				fov& f = players[i]->field_of_view();

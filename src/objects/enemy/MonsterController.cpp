@@ -163,7 +163,7 @@ void MonsterController::pre_step(GameState* gs) {
 	PlayerInst* local_player = gs->local_player();
 	std::vector<EnemyOfInterest> eois;
 
-	players = gs->players();
+	players = gs->players_in_level();
 	process_players(gs);
 
 	//Make sure targetted object is alive

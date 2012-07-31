@@ -118,7 +118,7 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
 	PlayerController& pc = gs->player_controller();
 
-	std::vector<PlayerInst*> players = gs->players();
+	std::vector<PlayerInst*> players = gs->players_in_level();
 	std::vector<GameInst*> visible_monsters;
 	get_visible_monsters(gs, visible_monsters);
 

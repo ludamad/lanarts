@@ -28,7 +28,7 @@ public:
 		return _players;
 	}
 	bool level_has_player(level_id level);
-	std::vector<PlayerInst*> players(level_id level);
+	std::vector<PlayerInst*> players_in_level(level_id level);
 
 	void players_gain_xp(GameState* gs, int xp);
 	void copy_to(PlayerController& pc) const;

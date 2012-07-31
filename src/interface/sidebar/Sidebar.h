@@ -27,6 +27,10 @@ public:
 		navigator.reset_slot_selected();
 	}
 
+	BBox sidebar_content_area() {
+		return navigator.sidebar_content_area();
+	}
+
 	void override_sidebar_contents(SidebarContent* overlay) {
 		navigator.override_sidebar_contents(overlay);
 	}

@@ -172,6 +172,7 @@ typedef int level_id;
 /*Type used to store monetary values*/
 typedef int money_t;
 
+//TODO: Does this really make sense here ?
 /* Cooldown related utility function */
 inline void cooldown_step(int& cooldown) {
 	cooldown = cooldown > 0 ? cooldown - 1 : 0;
