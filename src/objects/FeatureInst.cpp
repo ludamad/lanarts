@@ -40,7 +40,15 @@ void FeatureInst::step(GameState* gs) {
 		last_seen_spr = spr;
 	}
 	if (gs->object_radius_test(x, y, TILE_SIZE, player_colfilter)) {
-		player_interact(gs);
+		if (feature == DOOR_CLOSED) {
+			gs->tile_grid().set_solid(x / TILE_SIZE, y / TILE_SIZE, false);
+			feature = DOOR_OPEN;
+		}
+	} else if (!gs->object_radius_test(x, y, TILE_SIZE)) {
+		if (feature == DOOR_OPEN) {
+			gs->tile_grid().set_solid(x / TILE_SIZE, y / TILE_SIZE, true);
+			feature = DOOR_CLOSED;
+		}
 	}
 }
 
