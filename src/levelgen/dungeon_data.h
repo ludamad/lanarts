@@ -17,7 +17,7 @@ enum {
 };
 
 struct ItemGenSettings {
-	std::vector<ItemGenChance> item_chances;
+	itemgenlist_id itemgenlist;
 	Range num_items;
 };
 

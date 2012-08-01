@@ -19,6 +19,7 @@
 
 #include "../util/math_util.h"
 
+#include "itemgen.h"
 #include "featuregen.h"
 
 /* Generate a random subtile for a tile */
@@ -65,7 +66,32 @@ static void doors_all_around(GameState* gs, GeneratedLevel& l,
 		doorify(gs, l, region.x2 - 1, y);
 	}
 }
+static StoreInventory generate_shop_inventory(MTwist& mt, int itemn) {
+	StoreInventory inv;
+	itemgenlist_id itemgenlist = get_itemgenlist_by_name("Store Items");
+	for (int i = 0; i < itemn; /*below*/) {
+		const ItemGenChance& igc = generate_item_choice(mt, itemgenlist);
+		Item item = Item(igc.itemtype);
+		int cost = mt.rand(item.item_entry().shop_cost);
+		if (cost > 0) {
+			int quantity = mt.rand(igc.quantity);
+			inv.add(item, quantity, quantity * cost);
+			i++;
+		}
+	}
+	return inv;
+}
+static void generate_shop(GameState* gs, GeneratedLevel& level, MTwist& mt,
+		const Pos& p) {
+	Pos worldpos = level.get_world_coordinate(p);
+	level.at(p).has_instance = true;
 
+	int itemn = mt.rand(Range(2, 10));
+	gs->add_instance(
+			new StoreInst(worldpos, false, get_sprite_by_name("store"),
+					generate_shop_inventory(mt, itemn)));
+
+}
 void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		GeneratedLevel& level, GameState* gs) {
 	GameTiles& tiles = gs->tile_grid();
@@ -173,20 +199,11 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 
 	for (int i = 0; i < 4; i++) {
 		for (int attempts = 0; attempts < 200; attempts++) {
-			Pos fpos = generate_location(mt, level);
-			Sqr& sqr = level.at(fpos);
+			Pos pos = generate_location(mt, level);
+			Sqr& sqr = level.at(pos);
 			if (!sqr.passable || sqr.has_instance)
 				continue;
-			sqr.has_instance = true;
-			fpos.x += start_x;
-			fpos.y += start_y;
-			fpos = centered_multiple(fpos, TILE_SIZE);
-			StoreInventory inv;
-			Item item = Item(get_item_by_name("Short Sword"));
-			inv.add(item, 1, mt.rand(item.item_entry().shop_cost));
-			gs->add_instance(
-					new StoreInst(fpos.x, fpos.y, false,
-							get_sprite_by_name("store"), inv));
+			generate_shop(gs, level, mt, pos);
 			break;
 		}
 	}

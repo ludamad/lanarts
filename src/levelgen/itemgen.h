@@ -14,6 +14,9 @@
 
 class GameState;
 
+const ItemGenChance& generate_item_choice(MTwist& mt,
+		itemgenlist_id itemgenlist);
+
 void generate_items(const ItemGenSettings& is, MTwist& mt,
 		GeneratedLevel& level, GameState* gs);
 

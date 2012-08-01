@@ -3,11 +3,34 @@
  *  Defines parameters for item generation as well as the generate_items function
  */
 
-#include "itemgen.h"
 #include "../gamestate/GameState.h"
 #include "../gamestate/GameTiles.h"
+
 #include "../objects/ItemInst.h"
+
 #include "../stats/item_data.h"
+#include "../stats/itemgen_data.h"
+
+#include "itemgen.h"
+
+const ItemGenChance& generate_item_choice(MTwist& mt,
+		itemgenlist_id itemgenlist) {
+	ItemGenList& entry = game_itemgenlist_data.at(itemgenlist);
+	std::vector<ItemGenChance>& items = entry.items;
+	int total_chance = 0;
+
+	for (int i = 0; i < items.size(); i++) {
+		total_chance += items[i].genchance;
+	}
+
+	int item_roll = mt.rand(total_chance);
+	int item_type;
+	int itemn;
+	for (itemn = 0; itemn < items.size() && item_roll > 0; itemn++) {
+		item_roll -= items[itemn].genchance;
+	}
+	return items[itemn];
+}
 
 void generate_items(const ItemGenSettings& is, MTwist& mt,
 		GeneratedLevel& level, GameState* gs) {
@@ -17,12 +40,7 @@ void generate_items(const ItemGenSettings& is, MTwist& mt,
 
 	int amount = mt.rand(is.num_items);
 
-	int total_chance = 0;
-
-	for (int i = 0; i < is.item_chances.size(); i++) {
-		total_chance += is.item_chances[i].genchance;
-	}
-	if (is.item_chances.empty())
+	if (is.itemgenlist <= -1)
 		return;
 
 	//generate gold
@@ -31,19 +49,9 @@ void generate_items(const ItemGenSettings& is, MTwist& mt,
 		int ix = (ipos.x + start_x) * TILE_SIZE + TILE_SIZE / 2;
 		int iy = (ipos.y + start_y) * TILE_SIZE + TILE_SIZE / 2;
 
-		int item_roll = mt.rand(total_chance);
-		int item_type;
-		int itemn;
-		for (itemn = 0; itemn < is.item_chances.size(); itemn++) {
-			item_roll -= is.item_chances[itemn].genchance;
-			item_type = is.item_chances[itemn].itemtype;
-			if (item_roll < 0)
-				break;
-		}
-		const ItemGenChance& igc = is.item_chances[itemn];
+		const ItemGenChance& igc = generate_item_choice(mt, is.itemgenlist);
 		gs->add_instance(
-				new ItemInst(item_type, ix, iy,
-						mt.rand(igc.quantity.min, igc.quantity.max + 1)));
+				new ItemInst(igc.itemtype, ix, iy, mt.rand(igc.quantity)));
 		level.at(ipos).has_instance = true;
 	}
 }

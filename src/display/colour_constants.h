@@ -14,6 +14,7 @@ const Colour COL_PALE_YELLOW(255, 250, 150);
 
 const Colour COL_LIGHT_RED(255, 50, 50);
 const Colour COL_RED(255, 0, 0);
+const Colour COL_MUTED_RED(255, 50, 50);
 const Colour COL_PALE_RED(255, 148, 120);
 
 const Colour COL_MUTED_GREEN(50, 205, 50);

@@ -1,6 +1,7 @@
 ---
 projectiles:
   - name: Arrow
+    shop_cost: [2,3]
     description: A trusty arrow, for use with a bow.
     weapon_class: bows
     spr_item: arrow_item
@@ -10,6 +11,7 @@ projectiles:
     speed: 7
 
   - name: Silver Arrow
+    shop_cost: [5,8]
     description: A deadly silver arrow.
     weapon_class: bows
     spr_item: stone_arrow_item
@@ -21,10 +23,11 @@ projectiles:
     speed: 8
 
   - name: Stone
+    shop_cost: [4,5]
     description: A fist sized stone, good for throwing.
     weapon_class: unarmed
     spr_item: stone
-    drop_chance: 90 # % chance
+    drop_chance: 97 # % chance
     #Stats
     range: 300
     speed: 6

@@ -23,7 +23,10 @@ enemy_files:
 
 item_files: 
   - items/items.yaml
-
+  
+itemgenlist_files:
+  - items/itemgenlists.yaml
+  
 level_files: 
   - levels/levels.yaml
 

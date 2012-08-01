@@ -92,7 +92,7 @@ void GameWorld::spawn_players(GeneratedLevel& genlevel, void** player_instances,
 		}
 	} else {
 		for (int i = 0; i < nplayers; i++) {
-			spawn_player(genlevel, false, 0, (PlayerInst*) player_instances[i]);
+			spawn_player(genlevel, false, 0, (PlayerInst*)player_instances[i]);
 		}
 	}
 }
@@ -268,10 +268,11 @@ void GameWorld::regen_level(int roomid) {
 
 	level_states[roomid] = NULL;
 
-	GameLevelState* newlevel = get_level(roomid, true, (void**) &players[0],
+	GameLevelState* newlevel = get_level(roomid, true, (void**)&players[0],
 			players.size());
 
 	if (game_state->get_level() == level) {
+		game_state->game_hud().override_sidebar_contents(NULL);
 		game_state->set_level(newlevel);
 		GameInst* p = game_state->local_player();
 		game_state->view().sharp_center_on(p->x, p->y);

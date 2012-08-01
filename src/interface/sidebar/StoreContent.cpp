@@ -18,16 +18,26 @@
 
 #include "StoreContent.h"
 
+const int STORE_SLOT_H = TILE_SIZE * 1.25;
+
+//Draw in bottom-right of slot
+static void draw_slot_cost(GameState* gs, money_t cost, int x, int y) {
+	Dim dim = gl_text_dimensions(gs->primary_font(), "%dg", cost);
+	gl_printf_x_centered(gs->primary_font(), COL_PALE_YELLOW, x + TILE_SIZE / 2,
+			y + STORE_SLOT_H - dim.h - 2, "%d", cost);
+}
+
 static void draw_store_inventory_slot(GameState* gs, StoreItemSlot& itemslot,
 		int x, int y) {
 	if (itemslot.amount > 0) {
 		ItemEntry& ientry = itemslot.item.item_entry();
 		GLimage& itemimg = game_sprite_data[ientry.sprite].img();
 		gl_draw_image(itemimg, x, y);
-		if (ientry.stackable) {
+		if (ientry.stackable && itemslot.amount > 1) {
 			gl_printf(gs->primary_font(), Colour(255, 255, 255), x + 1, y + 1,
 					"%d", itemslot.amount);
 		}
+		draw_slot_cost(gs, itemslot.cost, x, y);
 	}
 }
 
@@ -38,22 +48,24 @@ static void draw_item_cost(GameState* gs, const BBox& bbox, int cost) {
 		col = COL_PALE_RED;
 	}
 	gl_printf_centered(gs->primary_font(), col, bbox.center_x(),
-			bbox.y1 - TILE_SIZE / 2, "Cost: %d", cost);
+			bbox.y1 - TILE_SIZE / 2, "Cost: %dg", cost);
 }
-
 static void draw_store_inventory(GameState* gs, StoreInventory& inv,
 		const BBox& bbox, int min_slot, int max_slot, int slot_selected = -1) {
 	int mx = gs->mouse_x(), my = gs->mouse_y();
 	int slot = min_slot;
 	int lastslot = inv.last_filled_slot();
-	for (int y = bbox.y1; y < bbox.y2; y += TILE_SIZE) {
+
+	for (int y = bbox.y1; y + STORE_SLOT_H <= bbox.y2; y += STORE_SLOT_H) {
 		for (int x = bbox.x1; x < bbox.x2; x += TILE_SIZE) {
 			if (slot >= max_slot || slot >= inv.max_size())
 				break;
 
 			StoreItemSlot& itemslot = inv.get(slot);
 
-			BBox slotbox(x, y, x + TILE_SIZE, y + TILE_SIZE);
+			if (slot != slot_selected)
+				draw_store_inventory_slot(gs, itemslot, x, y);
+			BBox slotbox(x, y, x + TILE_SIZE, y + STORE_SLOT_H);
 			Colour outline(COL_UNFILLED_OUTLINE);
 			if (itemslot.amount > 0 && slot != slot_selected) {
 				outline = COL_FILLED_OUTLINE;
@@ -64,8 +76,6 @@ static void draw_store_inventory(GameState* gs, StoreInventory& inv,
 				}
 			}
 
-			if (slot != slot_selected)
-				draw_store_inventory_slot(gs, itemslot, x, y);
 			//draw rectangle over item edges
 			gl_draw_rectangle_outline(slotbox, outline);
 

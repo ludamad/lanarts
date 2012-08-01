@@ -17,9 +17,9 @@ public:
 	enum {
 		RADIUS = 15, DEPTH = 100
 	};
-	StoreInst(int x, int y, bool solid, sprite_id spriteid,
+	StoreInst(const Pos& pos, bool solid, sprite_id spriteid,
 			const StoreInventory& inv) :
-			GameInst(x, y, RADIUS, solid, DEPTH), last_seen_spr(-1), spriteid(
+			GameInst(pos.x, pos.y, RADIUS, solid, DEPTH), last_seen_spr(-1), spriteid(
 					spriteid), inv(inv) {
 	}
 	StoreInventory& inventory() {

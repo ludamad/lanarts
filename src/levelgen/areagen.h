@@ -14,13 +14,8 @@ enum {
 	DNGN_MAIN_BRANCH = 0
 };
 
-struct ItemGenChance {
-	int genchance; //Out of 100%
-	int itemtype;
-	Range quantity;
-};
 struct ItemGenSettings {
-	std::vector<ItemGenChance> item_chances;
+	itemgenlist_id itemgenlist;
 	Range num_items;
 };
 

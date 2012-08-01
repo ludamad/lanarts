@@ -137,7 +137,7 @@ enemy_id get_enemy_by_name(const char* name, bool error_if_not_found) {
 }
 
 itemgenlist_id get_itemgenlist_by_name(const char* name,
-		bool error_if_not_found ) {
+		bool error_if_not_found) {
 	return get_X_by_name(game_itemgenlist_data, name, error_if_not_found);
 }
 projectile_id get_projectile_by_name(const char* name) {
@@ -194,12 +194,15 @@ LuaValue lua_settings;
 GameSettings init_game_data(lua_State* L) {
 	DataFiles dfiles = load_datafilenames("res/datafiles.yaml");
 
-//NB: Do not re-order the way resources are loaded unless you know what you're doing
+//NB: Do not re-order the way resources are loaded unless you know what you're doing!
+//For example, all item data types must be loaded before room generation data
+
 	load_tile_data(dfiles.tile_files);
 	lua_sprites = load_sprite_data(L, dfiles.sprite_files);
 	lua_sprites.deinitialize(L);
 	load_tileset_data(dfiles.tileset_files);
-	//TODO: make separate weapons table ?
+
+	// --- ITEM DATA ---
 	lua_items = load_item_data(L, dfiles.item_files);
 
 	lua_projectiles = load_projectile_data(L, dfiles.projectile_files,
@@ -213,9 +216,12 @@ GameSettings init_game_data(lua_State* L) {
 
 	load_armour_data(L, dfiles.armour_files, &lua_items);
 	load_armour_item_entries();
+	// --- ITEM DATA ---
 
 	lua_effects = load_effect_data(L, dfiles.effect_files);
 	lua_enemies = load_enemy_data(L, dfiles.enemy_files);
+
+	load_itemgenlist_data(L, dfiles.itemgenlist_files);
 	lua_dungeon = load_dungeon_data(L, dfiles.level_files);
 	lua_dungeon.deinitialize(L);
 	lua_classes = load_class_data(L, dfiles.class_files);

@@ -2,25 +2,6 @@
 
 #Dungeon Markup
 
-default_items: &default_items
-  - { item: Arrow,              chance: 15,  quantity: [5,15]  }
-  - { item: Silver Arrow,       chance: 15,  quantity: [3,8]   }
-  - { item: Short Bow,          chance: 10                     }
-  - { item: Stone,              chance: 15,  quantity: [5,15]   }
-  - { item: Gold,               chance: 35,  quantity: [5,40]  }
-  - { item: Haste Scroll,       chance: 10                     }
-  - { item: Health Potion,      chance: 10                     }
-  - { item: Mana Potion,        chance: 10                     }
-  - { item: Dagger,             chance: 10                     }
-  - { item: Short Sword,        chance: 10                     }
-  - { item: Mace,               chance: 5                      }
-  - { item: Strength Scroll,    chance: 2                      }
-  - { item: Magic Scroll,       chance: 2                      }
-  - { item: Defence Scroll,     chance: 2                      }
-  - { item: Will Scroll,        chance: 2                      }
-  - { item: Leather Armour,     chance: 4                      }
-  - { item: Magic Sword,        chance: 2                      }
-
 easy_animals: &easy_animals
   - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 2 }
   - { enemy: Giant Bat,         chance: 100                                   }
@@ -181,7 +162,7 @@ areas:
 #      - layout: [*test_layout]
 #        content:
 #          features: { tileset: [lair_tiles1, lair_tiles2],     stairs_up: 0  }
-#          items:    { amount: 3,  generated: *default_items   }
+#          items:    { amount: 3,  itemgenlist: Basic Items   }
 #          enemies: { wandering: no, amount: 69, generated: *easy_animals }
 
 #tiny levels with animals
@@ -189,21 +170,21 @@ areas:
       - layout: [*tiny_layout1]
         content:
           features: { tileset: [lair_tiles1, lair_tiles2],     stairs_up: 3  }
-          items:    { amount: 3,  generated: *default_items   }
+          items:    { amount: 3,  itemgenlist: Basic Items   }
           enemies: { wandering: no, amount: 5, generated: *easy_animals }
           
       #Level 1
       - layout: *tiny_layouts
         content:
           features: { tileset: [lair_tiles1, lair_tiles2]}
-          items:    { amount: 3,  generated: *default_items   }
+          items:    { amount: 3,  itemgenlist: Basic Items   }
           enemies: { wandering: no, amount: 8, generated: *easy_animals }
         
       #Level 2
       - layout: *tiny_layouts
         content:
           features: { tileset: [lair_tiles1, lair_tiles2]}
-          items:    { amount: 3,  generated: *default_items   }          
+          items:    { amount: 3,  itemgenlist: Basic Items   }          
           enemies: { 
             wandering: no, amount: 12, 
             generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}] 
@@ -212,7 +193,7 @@ areas:
       - layout: *small_layouts
         content:
           features: { tileset: [lair_tiles1, lair_tiles2, crystal_tiles, crystal_tiles_with_marble]}
-          items:    { amount: 5,  generated: *default_items   }
+          items:    { amount: 5,  itemgenlist: Basic Items   }
           enemies:  { amount: [10,14], generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}]  }      
           
 #small levels with easy enemies
@@ -220,20 +201,20 @@ areas:
       - layout: [*small_layout1]
         content:
           features: { tileset: [crystal_tiles, crystal_tiles_with_marble]}
-          items:    { amount: 8,  generated: *default_items   }
+          items:    { amount: 8,  itemgenlist: Basic Items   }
           enemies:  { amount: 14,  generated: *easy_enemies    }
       #Level 5
       - layout: *small_layouts
         content:
           features: { tileset: pebble_tiles}
-          items:    { amount: 5,  generated: *default_items   }
+          items:    { amount: 5,  itemgenlist: Basic Items   }
           enemies: {  amount: 14, generated: *medium_enemies }      
           
       #Level 6
       - layout: *small_layouts 
         content:
           features: { tileset: *all_tilesets}
-          items:    { amount: 5,  generated: *default_items   }
+          items:    { amount: 5,  itemgenlist: Basic Items   }
           enemies:
             amount: 15
             generated:
@@ -244,14 +225,14 @@ areas:
       - layout: *medium_layouts
         content:
           features: { tileset: *all_tilesets}
-          items:    { amount: 5,  generated: *default_items   }
+          items:    { amount: 5,  itemgenlist: Basic Items   }
           enemies:  { amount: 15, generated: *hard_enemies }
       
       #Level 8
       - layout: *medium_layouts
         content:
           features: { tileset: *all_tilesets}
-          items:    { amount: 6,  generated: *default_items   }
+          items:    { amount: 6,  itemgenlist: Basic Items   }
           enemies:     
             amount: 20     
             generated: *hard_enemies
@@ -260,7 +241,7 @@ areas:
       - layout: *large_layouts
         content:
           features: { tileset: *all_tilesets}
-          items:    { amount: 7,  generated: *default_items   }
+          items:    { amount: 7,  itemgenlist: Basic Items   }
           enemies:   
             amount: 25       
             generated: *hard_enemies
@@ -269,7 +250,7 @@ areas:
       - layout: *large_layouts
         content:
           features: { tileset: *all_tilesets}
-          items:    { amount: 8,  generated: *default_items   }
+          items:    { amount: 8,  itemgenlist: Basic Items   }
           enemies:   
             amount: 30       
             generated: *harder_enemies
@@ -277,7 +258,7 @@ areas:
       - layout: *large_layouts
         content:
           features: { tileset: *all_tilesets, stairs_down: 0}
-          items:    { amount: 9,  generated: *default_items   }
+          items:    { amount: 9,  itemgenlist: Basic Items   }
           enemies:          
             amount: 40
             generated:

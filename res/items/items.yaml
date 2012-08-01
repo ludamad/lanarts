@@ -4,6 +4,7 @@ items:
     sprite: gold
 
   - name: Health Potion
+    shop_cost: [15,35]
     type: potion
     sprite: health_potion
     description: A blessed potion of healing infusions, it restores 50 HP to the user.
@@ -12,6 +13,7 @@ items:
     amount: 50
 
   - name: Mana Potion
+    shop_cost: [15,35]
     type: potion
     sprite: mana potion
     description: A magical potion of energizing infusions, it restores 50 MP to the user.
@@ -20,6 +22,7 @@ items:
     amount: 50
 
   - name: Haste Scroll
+    shop_cost: [25,45]
     description: 
       A scroll that captures the power of the winds, 
       it bestows the user with power and speed for a limited duration.
@@ -30,6 +33,7 @@ items:
     amount: 1
 
   - name: Strength Scroll
+    shop_cost: [55,105]
     description:
       A mantra of unnatural modification, 
       it bestows the user with a permanent, albeit small, increase to strength.
@@ -39,6 +43,7 @@ items:
     amount: 1
 
   - name: Defence Scroll
+    shop_cost: [55,105]
     description:
       A mantra of unnatural modification, 
       it bestows the user with a permanent, albeit small, increase to defence.
@@ -48,6 +53,7 @@ items:
     amount: 1
 
   - name: Magic Scroll
+    shop_cost: [55,105]
     description:
       A mantra of unnatural modification, 
       it bestows the user with a permanent, albeit small, increase to magic.
@@ -57,6 +63,7 @@ items:
     amount: 1
 
   - name: Will Scroll
+    shop_cost: [55,105]
     description:
       A mantra of unnatural modification, 
       it bestows the user with a permanent, albeit small, increase to will.

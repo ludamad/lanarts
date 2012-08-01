@@ -29,11 +29,9 @@ static ItemGenChance parse_item_chance(const YAML::Node& n) {
 }
 ItemGenList parse_itemgenlist(const YAML::Node& n) {
 	ItemGenList igs;
-
-	if (yaml_has_node(n, "generated")) {
-		igs.items = parse_named_with_defaults(n["generated"], "item",
-				&parse_item_chance);
-	}
+	igs.name = parse_str(n["name"]);
+	igs.items = parse_named_with_defaults(n["items"], "item",
+			&parse_item_chance);
 	return igs;
 }
 void load_itemlist_callbackf(const YAML::Node& node, lua_State* L,

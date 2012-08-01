@@ -11,22 +11,17 @@
 
 using namespace std;
 
-ItemGenChance parse_item_chance(const YAML::Node& n) {
-	ItemGenChance igc;
-	string itemname;
-	n["item"] >> itemname;
-	igc.itemtype = get_item_by_name(itemname.c_str());
-	n["chance"] >> igc.genchance;
-	igc.quantity = parse_defaulted(n, "quantity", Range(1, 1));
-	return igc;
+itemgenlist_id parse_itemgenlist_id(const YAML::Node& n) {
+	std::string name = parse_str(n);
+	return get_itemgenlist_by_name(name.c_str());
 }
+
 ItemGenSettings parse_item_gen(const YAML::Node& n) {
 	ItemGenSettings igs;
 	igs.num_items = parse_range(n["amount"]);
 
-	if (yaml_has_node(n, "generated")) {
-		igs.item_chances = parse_named_with_defaults(n["generated"], "item",
-				&parse_item_chance);
+	if (yaml_has_node(n, "itemgenlist")) {
+		igs.itemgenlist = parse_itemgenlist_id(n["itemgenlist"]);
 	}
 	return igs;
 }
