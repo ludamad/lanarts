@@ -25,6 +25,7 @@ Small:
 - Make mouse jiggling not cause stair case movement
 - Make damage amounts not show off screen
 - Make all ranged enemies have a short range melee option for close kiters
+- Make haste scrolls not show up as often, fix shop contents to be more varied, add more items
 
 Partial Completion:
 - [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization

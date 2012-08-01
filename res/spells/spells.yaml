@@ -6,7 +6,7 @@ spells:
      A fast bolt of fire, hits a single target.
      The bolt can bounce off walls safely.
     mp_cost: 10
-    cooldown: 33
+    cooldown: 35
     spr_spell: fire bolt
     projectile: Fire Bolt
 

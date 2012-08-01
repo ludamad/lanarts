@@ -14,8 +14,8 @@ projectiles:
   - name: Magic Blast
     weapon_class: magic
     damage_type: { magic: 1.0}
-    damage: { base: [4,12], magic: 1.75 }
-    power: { base: 1, magic: 0.2 }
+    damage: { base: [4,12], magic: 2.0 }
+    power: { base: 2, magic: 0.2 }
     range: 300
     speed: 4
     number_of_target_bounces: 3
