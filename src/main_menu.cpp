@@ -10,8 +10,6 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
-#include <net/timing.h>
-
 extern "C" {
 #include <lua/lua.h>
 #include <lua/lauxlib.h>
@@ -31,6 +29,8 @@ extern "C" {
 
 #include "objects/AnimatedInst.h"
 #include "interface/ButtonInst.h"
+
+#include "util/Timer.h"
 
 static void continue_as_loner(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;

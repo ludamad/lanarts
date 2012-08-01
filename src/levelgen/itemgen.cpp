@@ -24,10 +24,12 @@ const ItemGenChance& generate_item_choice(MTwist& mt,
 	}
 
 	int item_roll = mt.rand(total_chance);
-	int item_type;
 	int itemn;
-	for (itemn = 0; itemn < items.size() && item_roll > 0; itemn++) {
+	for (itemn = 0; itemn < items.size(); itemn++) {
 		item_roll -= items[itemn].genchance;
+		if (item_roll < 0) {
+			break;
+		}
 	}
 	return items[itemn];
 }

@@ -5,8 +5,6 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
-#include <net/timing.h>
-
 extern "C" {
 #include <lua/lua.h>
 #include <lua/lauxlib.h>
@@ -25,6 +23,8 @@ extern "C" {
 
 #include "objects/AnimatedInst.h"
 #include "interface/ButtonInst.h"
+
+#include "util/Timer.h"
 
 using namespace std;
 

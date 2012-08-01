@@ -88,6 +88,7 @@ set( lanarts_src
 	util/math_util.cpp
 	util/game_replays.cpp
 	util/mtwist.cpp
+	util/Timer.cpp
 	lua/LuaValue.cpp
 	objects/collision_filters.cpp
 
@@ -207,6 +208,7 @@ set( lanarts_include
 	gamestate/hashset_util.h
 	util/math_util.h
 	util/mtwist.h
+	util/Timer.h
 	objects/collision_filters.h
 
 	net/GameNetConnection.h
