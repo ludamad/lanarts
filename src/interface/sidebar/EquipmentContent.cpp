@@ -23,18 +23,34 @@
 EquipmentContent::~EquipmentContent() {
 }
 
-static void draw_weapon(GameState* gs, Equipment& eqp, BBox bbox) {
+// Returns true if draws double height slot
+static bool draw_weapon(GameState* gs, Equipment& eqp, BBox bbox) {
 	Colour bbox_col = COL_FILLED_OUTLINE;
+	if (bbox.contains(gs->mouse_pos())) {
+		bbox_col = COL_WHITE;
+	}
+
 	draw_item_icon_and_name(gs, eqp.weapon.item_entry(), COL_WHITE, bbox.x1,
 			bbox.y1);
+	if (eqp.has_projectile()) {
+		bbox = BBox(bbox.x1, bbox.y1, bbox.x2, bbox.y2 + TILE_SIZE);
+		draw_item_icon_and_name(gs, eqp.projectile.item_entry(), COL_WHITE,
+				bbox.x1, bbox.y1 + TILE_SIZE);
+	}
 	gl_draw_rectangle_outline(bbox, bbox_col);
+
+	return eqp.has_projectile();
 }
 
 static void draw_armour(GameState* gs, Equipment& eqp, BBox bbox) {
 	Colour bbox_col = COL_UNFILLED_OUTLINE;
 	if (eqp.has_armour()) {
 		bbox_col = COL_FILLED_OUTLINE;
+		if (bbox.contains(gs->mouse_pos())) {
+			bbox_col = COL_WHITE;
+		}
 	}
+
 	draw_item_icon_and_name(gs, eqp.armour.item_entry(), COL_WHITE, bbox.x1,
 			bbox.y1);
 	gl_draw_rectangle_outline(bbox, bbox_col);
@@ -51,7 +67,8 @@ void EquipmentContent::draw(GameState* gs) const {
 
 	Colour bbox_col = COL_UNFILLED_OUTLINE;
 
-	draw_weapon(gs, eqp, entry_box);
+	if (draw_weapon(gs, eqp, entry_box))
+		entry_box = entry_box.translated(0, TILE_SIZE);
 	entry_box = entry_box.translated(0, TILE_SIZE);
 
 	draw_armour(gs, eqp, entry_box);
@@ -64,6 +81,8 @@ int EquipmentContent::amount_of_pages(GameState* gs) {
 }
 
 bool EquipmentContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
+	BBox entry_box(bbox.x1, bbox.y1, bbox.x2, bbox.y1 + TILE_SIZE);
+
 	return false;
 }
 
