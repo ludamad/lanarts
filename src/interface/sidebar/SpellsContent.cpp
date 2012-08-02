@@ -38,15 +38,17 @@ static void draw_spells_known(GameState* gs, const BBox& bbox,
 		draw_spell_icon_and_name(gs, spl_entry, Colour(), x, y);
 
 		BBox entry_box(x, y, ex, y + TILE_SIZE);
+		Colour bbox_col = COL_FILLED_OUTLINE;
+		if (spellidx == selected_spell) {
+			bbox_col = COL_WHITE;
+		}
 		if (entry_box.contains(mx, my)) {
 			if (spellidx != selected_spell) {
-				gl_draw_rectangle_outline(entry_box, COL_FILLED_OUTLINE);
+				bbox_col = COL_GOLD;
 			}
 			draw_console_spell_description(gs, spl_entry);
 		}
-		if (spellidx == selected_spell) {
-			gl_draw_rectangle_outline(entry_box, COL_WHITE);
-		}
+		gl_draw_rectangle_outline(entry_box, bbox_col);
 		spellidx++;
 	}
 }

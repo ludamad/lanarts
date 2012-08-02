@@ -4,7 +4,7 @@
 #relative to res/
 
 armour_files:
-  - armour/armour.yaml
+  - items/armour.yaml
 
 class_files: 
   - classes/classes.yaml

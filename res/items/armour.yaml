@@ -11,3 +11,10 @@ armours:
     reduction:  { base: 2 }
     magic_reduction: { base: 0 }
     spell_cooldown_multiplier: 1.1
+  - name: Magic Robe
+    spr_item: robe
+    armour_type: body armour
+    resistance: { base: 0 }
+    magic_resistance: { base: 3 }
+    reduction:  { base: 0 }
+    magic_reduction: { base: 1 }

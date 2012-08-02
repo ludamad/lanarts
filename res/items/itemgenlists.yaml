@@ -18,6 +18,7 @@ itemgen_lists:
     - { item: Defence Scroll,     chance: 2                      }
     - { item: Will Scroll,        chance: 2                      }
     - { item: Leather Armour,     chance: 4                      }
+    - { item: Magic Robe,         chance: 4                      }
     - { item: Magic Sword,        chance: 2                      }
   - name: Store Items
     items:
