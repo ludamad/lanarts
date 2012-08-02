@@ -108,7 +108,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 	GameInst* inst = NULL;
 	if (cooldowns().can_pickup()
 			&& gs->object_radius_test(this, &inst, 1, &item_colfilter)) {
-		ItemInst* iteminst = (ItemInst*) inst;
+		ItemInst* iteminst = (ItemInst*)inst;
 		Item& item = iteminst->item_type();
 
 		bool was_dropper = iteminst->last_held_by() == id;
@@ -154,68 +154,68 @@ void PlayerInst::queue_io_movement_actions(GameState* gs, int& dx, int& dy) {
 void PlayerInst::queue_io_actions(GameState* gs) {
 	GameSettings& settings = gs->game_settings();
 	GameView& view = gs->view();
-	int level = gs->get_level()->levelid;
-	int frame = gs->frame();
-	int dx = 0, dy = 0;
-	bool mouse_within = gs->mouse_x() < gs->view().width;
-	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
+	if (is_local_player()) {
+		int dx = 0, dy = 0;
+		bool mouse_within = gs->mouse_x() < gs->view().width;
+		int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
-	bool was_moving = moving, do_stopaction = false;
-	IOController& io = gs->io_controller();
+		bool was_moving = moving, do_stopaction = false;
+		IOController& io = gs->io_controller();
 
-	if (!settings.loadreplay_file.empty()) {
-		load_actions(gs, queued_actions);
-	} else if (is_local_player()) {
-		queue_io_movement_actions(gs, dx, dy);
+		if (!settings.loadreplay_file.empty()) {
+			load_actions(gs, queued_actions);
+		} else if (is_local_player()) {
+			queue_io_movement_actions(gs, dx, dy);
 
-		if (was_moving && !moving && cooldowns().can_do_stopaction()) {
-			do_stopaction = true;
+			if (was_moving && !moving && cooldowns().can_do_stopaction()) {
+				do_stopaction = true;
+			}
 		}
-	}
-	//Shifting target
-	if (gs->key_press_state(SDLK_k)) {
-		gs->monster_controller().shift_target(gs);
-	}
+		//Shifting target
+		if (gs->key_press_state(SDLK_k)) {
+			gs->monster_controller().shift_target(gs);
+		}
 
-	if (gs->key_press_state(SDLK_m))
-		spellselect = -1;
+		if (gs->key_press_state(SDLK_m))
+			spellselect = -1;
 
-	bool attack_used = false;
-	if (!gs->game_hud().handle_io(gs, queued_actions)) {
-		attack_used = queue_io_spell_and_attack_actions(gs, dx, dy);
-		queue_io_equipment_actions(gs, do_stopaction);
-	}
+		bool attack_used = false;
+		if (!gs->game_hud().handle_io(gs, queued_actions)) {
+			attack_used = queue_io_spell_and_attack_actions(gs, dx, dy);
+			queue_io_equipment_actions(gs, do_stopaction);
+		}
 
-	bool action_usage = io.query_event(IOEvent::ACTIVATE_SPELL_N)
-			|| io.query_event(IOEvent::USE_WEAPON)
-			|| io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION)
-			|| io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION);
-	if ((do_stopaction && !action_usage) || gs->key_down_state(SDLK_PERIOD)
-			|| gs->mouse_downwheel()) {
-		Pos hitsqr;
-		if (gs->tile_radius_test(x, y, RADIUS, false,
-				get_tile_by_name("stairs_down"), &hitsqr)) {
+		bool action_usage = io.query_event(IOEvent::ACTIVATE_SPELL_N)
+				|| io.query_event(IOEvent::USE_WEAPON)
+				|| io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION)
+				|| io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION);
+		if ((do_stopaction && !action_usage) || gs->key_down_state(SDLK_PERIOD)
+				|| gs->mouse_downwheel()) {
+			Pos hitsqr;
+			if (gs->tile_radius_test(x, y, RADIUS, false,
+					get_tile_by_name("stairs_down"), &hitsqr)) {
+				queued_actions.push_back(
+						game_action(gs, this, GameAction::USE_ENTRANCE));
+				cooldowns().reset_stopaction_timeout(50);
+			}
+		}
+
+		if ((do_stopaction && !action_usage) || gs->key_down_state(SDLK_COMMA)
+				|| gs->mouse_upwheel()) {
+			Pos hitsqr;
+			if (gs->tile_radius_test(x, y, RADIUS, false,
+					get_tile_by_name("stairs_up"), &hitsqr)) {
+				queued_actions.push_back(
+						game_action(gs, this, GameAction::USE_EXIT));
+				cooldowns().reset_stopaction_timeout(50);
+			}
+		}
+
+		// If we haven't done anything, rest
+		if (queued_actions.empty()) {
 			queued_actions.push_back(
-					GameAction(id, GameAction::USE_ENTRANCE, frame, level));
-			cooldowns().reset_stopaction_timeout(50);
+					game_action(gs, this, GameAction::USE_REST));
 		}
-	}
-
-	if ((do_stopaction && !action_usage) || gs->key_down_state(SDLK_COMMA)
-			|| gs->mouse_upwheel()) {
-		Pos hitsqr;
-		if (gs->tile_radius_test(x, y, RADIUS, false,
-				get_tile_by_name("stairs_up"), &hitsqr)) {
-			queued_actions.push_back(
-					GameAction(id, GameAction::USE_EXIT, frame, level));
-			cooldowns().reset_stopaction_timeout(50);
-		}
-	}
-
-	// If we haven't done anything, rest
-	if (queued_actions.empty()) {
-		queued_actions.push_back(
-				GameAction(id, GameAction::USE_REST, frame, level));
 	}
 	GameNetConnection& connection = gs->net_connection();
 	bool hasconnection = connection.get_connection() != NULL;
@@ -240,7 +240,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	const int PICKUP_RATE = 10;
-	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
+	ItemInst* item = (ItemInst*)gs->get_instance(action.use_id);
 	if (!item)
 		return;
 	const Item& type = item->item_type();
@@ -269,8 +269,8 @@ void PlayerInst::queue_network_actions(GameState *gs) {
 	bool hasconnection = connection.get_connection() != NULL;
 	NetPacket packet;
 
-	printf("Waiting for player action for frame %d\n", gs->frame());
 	if (!is_local_player() && hasconnection) {
+		//	printf("Waiting for player action for frame %d\n", gs->frame());
 		while (!connection.get_connection()->get_next_packet(packet)) {
 		}
 		bool output1 = true;
@@ -312,7 +312,7 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
-	StoreInst* store = (StoreInst*) gs->get_instance(action.use_id);
+	StoreInst* store = (StoreInst*)gs->get_instance(action.use_id);
 	StoreInventory& inv = store->inventory();
 	StoreItemSlot& slot = inv.get(action.use_id2);
 	if (gold() >= slot.cost) {
@@ -432,13 +432,13 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 	float ddy = dy * mag;
 
 	EnemyInst* target = NULL;
-	//Enemy hitting test for melee
-	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_colfilter,
+//Enemy hitting test for melee
+	gs->object_radius_test(this, (GameInst**)&target, 1, &enemy_colfilter,
 			x + ddx * 2, y + ddy * 2);
 
-	//Smaller radius enemy pushing test, can intercept enemy radius but not too far
+//Smaller radius enemy pushing test, can intercept enemy radius but not too far
 	EnemyInst* alreadyhitting[5] = { 0, 0, 0, 0, 0 };
-	gs->object_radius_test(this, (GameInst**) alreadyhitting, 5,
+	gs->object_radius_test(this, (GameInst**)alreadyhitting, 5,
 			&enemy_colfilter, x, y, radius);
 	bool already = false;
 	for (int i = 0; i < 5; i++) {

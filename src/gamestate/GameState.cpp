@@ -346,7 +346,7 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 	int minx = squish(mingrid_x, 0, w), miny = squish(mingrid_y, 0, h);
 	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
 
-	const std::vector<GameInstRef>& players = player_controller().all_players();
+	std::vector<PlayerInst*> players = players_in_level();
 
 	if ((canreveal && key_down_state(SDLK_BACKQUOTE)) || players.empty()) {
 		return true;
@@ -359,8 +359,8 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 				return true;
 			} else if (!player) {
 				for (int i = 0; i < players.size(); i++) {
-					PlayerInst* p = (PlayerInst*)players[i].get_instance();
-					if (p->field_of_view().within_fov(xx, yy)) {
+					fov& fov = players[i]->field_of_view();
+					if (fov.within_fov(xx, yy)) {
 						return true;
 					}
 				}

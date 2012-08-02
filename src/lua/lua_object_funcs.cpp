@@ -17,6 +17,7 @@ extern "C" {
 #include "../gamestate/GameState.h"
 
 #include "../objects/GameInst.h"
+#include "../objects/player/PlayerInst.h"
 #include "../objects/ScriptedInst.h"
 
 // Creates object, adding to game world, returns said object
@@ -35,6 +36,18 @@ static int obj_create(lua_State* L) {
 	return 1;
 }
 
+static int players_in_level(lua_State* L) {
+	GameState* gs = lua_get_gamestate(L);
+	std::vector<PlayerInst*> players = gs->players_in_level();
+	lua_createtable(L, 0, 0);
+	int table = lua_gettop(L);
+	for (int i = 0; i < players.size(); i++) {
+		lua_push_gameinst(L, players[i]);
+		//  lua_pushnumber(L, 2);
+		lua_rawseti(L, table, i + 1);
+	}
+	return 1;
+}
 // Returns monsters in level
 static int monsters_in_level(lua_State* L) {
 	GameState* gs = lua_get_gamestate(L);
@@ -85,5 +98,6 @@ void lua_object_func_bindings(lua_State* L) {
 
 	LUA_FUNC_REGISTER(obj_create);
 	LUA_FUNC_REGISTER(monsters_in_level);
+	LUA_FUNC_REGISTER(players_in_level);
 	LUA_FUNC_REGISTER(monsters_seen);
 }

@@ -55,19 +55,6 @@ public:
 		return 0;
 	}
 
-	int players_in_room(lua_State* L) {
-		const std::vector<GameInstRef>& players =
-				gs->player_controller().all_players();
-		lua_createtable(L, 0, 0);
-		int table = lua_gettop(L);
-		for (int i = 0; i < players.size(); i++) {
-			lua_push_gameinst(L, players[i].get_instance());
-			//  lua_pushnumber(L, 2);
-			lua_rawseti(L, table, i + 1);
-		}
-		return 1;
-	}
-
 	GameState* game_state() {
 		return gs;
 	}
@@ -107,8 +94,7 @@ static int lua_member_lookup(lua_State* L) {
 	return 1;
 }
 
-meth_t bind_t::methods[] = { LUA_DEF(remove_object), LUA_DEF(create_projectile),
-		LUA_DEF(players_in_room), meth_t(0, 0) };
+meth_t bind_t::methods[] = { LUA_DEF(remove_object), LUA_DEF(create_projectile), meth_t(0, 0) };
 
 GameState* lua_get_gamestate(lua_State* L) {
 	lua_getglobal(L, "world");

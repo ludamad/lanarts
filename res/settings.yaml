@@ -19,7 +19,7 @@ autouse_mana_potions: yes # can toggle in game as well
 font: res/fonts/Gudea-Regular.ttf
 
 #Network settings
-ip: 192.168.0.19
+ip: localhost
 port: 6112
 
 #Speed settings
