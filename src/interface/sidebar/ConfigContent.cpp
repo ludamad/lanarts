@@ -17,15 +17,18 @@
 
 static void draw_option(GameState* gs, const BBox& bbox, bool option_set,
 		sprite_id sprite, const char* text) {
-	Colour bbox_col = option_set ? COL_GREEN : COL_PALE_RED;
+	option_set = false;
+	Colour bbox_col = COL_FILLED_OUTLINE;
 	if (bbox.contains(gs->mouse_pos())) {
-		bbox_col = COL_MUTED_GREEN;
+		bbox_col = COL_GOLD;
 	}
 
-	gl_draw_sprite(sprite, bbox.x1, bbox.y1);
+	gl_draw_sprite(sprite, bbox.x1, bbox.y1,
+			COL_WHITE.with_alpha(option_set ? 255 : 122));
 	/* Draw item name */
-	gl_printf_bounded(gs->primary_font(), COL_WHITE, bbox.x1 + TILE_SIZE * 1.25,
-			bbox.y1 + TILE_SIZE / 2, bbox.width() - TILE_SIZE, true, "%s", text);
+	gl_printf_bounded(gs->primary_font(), option_set ? COL_WHITE : COL_GRAY,
+			bbox.x1 + TILE_SIZE * 1.25, bbox.y1 + TILE_SIZE / 2,
+			bbox.width() - TILE_SIZE, true, "%s", text);
 	gl_draw_rectangle_outline(bbox, bbox_col);
 }
 

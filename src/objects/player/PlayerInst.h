@@ -116,7 +116,7 @@ private:
 	fov fieldofview;
 	bool didstep, local, moving;
 
-	bool autouse_mana_potion_try_count;
+	int autouse_mana_potion_try_count;
 	int lives, deaths;
 	int previous_spellselect, spellselect;
 };

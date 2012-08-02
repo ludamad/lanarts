@@ -60,6 +60,8 @@ static bool is_wieldable_projectile(Equipment& equipment, const Item& item) {
 	return equipment.valid_to_use(item);
 }
 
+const int AUTOUSE_HEALTH_POTION_THRESHOLD = 20;
+
 void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 	GameView& view = gs->view();
 	bool mouse_within = gs->mouse_x() < gs->view().width;
@@ -76,15 +78,28 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 	if (targetted)
 		p = Pos(targetted->x, targetted->y);
 
+	// We may have already used an item eg due to auto-use of items
+	bool used_item = io.query_event(IOEvent::USE_ITEM_N);
+
+	if (!used_item && gs->game_settings().autouse_health_potions
+			&& core_stats().hp < AUTOUSE_HEALTH_POTION_THRESHOLD) {
+		int item_slot = inventory().find_slot(
+				get_item_by_name("Health Potion"));
+		if (item_slot > -1) {
+			queued_actions.push_back(
+					game_action(gs, this, GameAction::USE_ITEM, item_slot));
+			used_item = true;
+		}
+	}
+
 	//Item use
-	for (int i = 0; i < 9; i++) {
+	for (int i = 0; i < 9 && !used_item; i++) {
 		if (io.query_event(IOEvent(IOEvent::USE_ITEM_N, i))) {
 			if (inventory().get(i).amount > 0) {
 				item_used = true;
 				queued_actions.push_back(
 						GameAction(id, GameAction::USE_ITEM, frame, level, i,
 								p.x, p.y));
-				break; //Can only use one item/step (until we have item cooldowns)
 			}
 		}
 	}
@@ -93,7 +108,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 	GameInst* inst = NULL;
 	if (cooldowns().can_pickup()
 			&& gs->object_radius_test(this, &inst, 1, &item_colfilter)) {
-		ItemInst* iteminst = (ItemInst*)inst;
+		ItemInst* iteminst = (ItemInst*) inst;
 		Item& item = iteminst->item_type();
 
 		bool was_dropper = iteminst->last_held_by() == id;
@@ -151,86 +166,56 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 	if (!settings.loadreplay_file.empty()) {
 		load_actions(gs, queued_actions);
 	} else if (is_local_player()) {
-//Resting
-		bool resting = false;
-		// Check for explicit rest
-		if (gs->key_down_state(SDLK_r) && cooldowns().can_rest()) {
+		queue_io_movement_actions(gs, dx, dy);
+
+		if (was_moving && !moving && cooldowns().can_do_stopaction()) {
+			do_stopaction = true;
+		}
+	}
+	//Shifting target
+	if (gs->key_press_state(SDLK_k)) {
+		gs->monster_controller().shift_target(gs);
+	}
+
+	if (gs->key_press_state(SDLK_m))
+		spellselect = -1;
+
+	bool attack_used = false;
+	if (!gs->game_hud().handle_io(gs, queued_actions)) {
+		attack_used = queue_io_spell_and_attack_actions(gs, dx, dy);
+		queue_io_equipment_actions(gs, do_stopaction);
+	}
+
+	bool action_usage = io.query_event(IOEvent::ACTIVATE_SPELL_N)
+			|| io.query_event(IOEvent::USE_WEAPON)
+			|| io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION)
+			|| io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION);
+	if ((do_stopaction && !action_usage) || gs->key_down_state(SDLK_PERIOD)
+			|| gs->mouse_downwheel()) {
+		Pos hitsqr;
+		if (gs->tile_radius_test(x, y, RADIUS, false,
+				get_tile_by_name("stairs_down"), &hitsqr)) {
 			queued_actions.push_back(
-					GameAction(id, GameAction::USE_REST, frame, level));
-			resting = true;
+					GameAction(id, GameAction::USE_ENTRANCE, frame, level));
+			cooldowns().reset_stopaction_timeout(50);
 		}
+	}
 
-		if (!resting) {
-			queue_io_movement_actions(gs, dx, dy);
-
-			if (was_moving && !moving && cooldowns().can_do_stopaction()) {
-				do_stopaction = true;
-			}
-		}
-		//Shifting target
-		if (gs->key_press_state(SDLK_k)) {
-			gs->monster_controller().shift_target(gs);
-		}
-
-//		if (gs->key_press_state(SDLK_SPACE)) {
-//			spellselect++;
-//			if (spellselect > 1) {
-//				spellselect = 0;
-//			}
-//			if (spellselect == 1 && class_stats().xplevel < 3)
-//				spellselect = 0;
-//		}
-		if (gs->key_press_state(SDLK_m))
-			spellselect = -1;
-
-//		get_current_actions(gs->frame(), actions);
-
-		bool attack_used = false;
-		if (!resting) {
-			if (!gs->game_hud().handle_io(gs, queued_actions)) {
-				attack_used = queue_io_spell_and_attack_actions(gs, dx, dy);
-				queue_io_equipment_actions(gs, do_stopaction);
-			}
-		}
-
-		bool action_usage = io.query_event(IOEvent::ACTIVATE_SPELL_N)
-				|| io.query_event(IOEvent::USE_WEAPON)
-				|| io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION)
-				|| io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION);
-		if (!resting) {
-			if ((do_stopaction && !action_usage)
-					|| gs->key_down_state(SDLK_PERIOD)
-					|| gs->mouse_downwheel()) {
-				Pos hitsqr;
-				if (gs->tile_radius_test(x, y, RADIUS, false,
-						get_tile_by_name("stairs_down"), &hitsqr)) {
-					queued_actions.push_back(
-							GameAction(id, GameAction::USE_ENTRANCE, frame,
-									level));
-					cooldowns().reset_stopaction_timeout(50);
-				}
-			}
-		}
-
-		if (!resting) {
-			if ((do_stopaction && !action_usage)
-					|| gs->key_down_state(SDLK_COMMA) || gs->mouse_upwheel()) {
-				Pos hitsqr;
-				if (gs->tile_radius_test(x, y, RADIUS, false,
-						get_tile_by_name("stairs_up"), &hitsqr)) {
-					queued_actions.push_back(
-							GameAction(id, GameAction::USE_EXIT, frame, level));
-					cooldowns().reset_stopaction_timeout(50);
-				}
-			}
-		}
-
-		// If we haven't done anything, rest
-		if (queued_actions.empty()) {
+	if ((do_stopaction && !action_usage) || gs->key_down_state(SDLK_COMMA)
+			|| gs->mouse_upwheel()) {
+		Pos hitsqr;
+		if (gs->tile_radius_test(x, y, RADIUS, false,
+				get_tile_by_name("stairs_up"), &hitsqr)) {
 			queued_actions.push_back(
-					GameAction(id, GameAction::USE_REST, frame, level));
-			resting = true;
+					GameAction(id, GameAction::USE_EXIT, frame, level));
+			cooldowns().reset_stopaction_timeout(50);
 		}
+	}
+
+	// If we haven't done anything, rest
+	if (queued_actions.empty()) {
+		queued_actions.push_back(
+				GameAction(id, GameAction::USE_REST, frame, level));
 	}
 	GameNetConnection& connection = gs->net_connection();
 	bool hasconnection = connection.get_connection() != NULL;
@@ -254,7 +239,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	const int PICKUP_RATE = 10;
-	ItemInst* item = (ItemInst*)gs->get_instance(action.use_id);
+	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
 	if (!item)
 		return;
 	const Item& type = item->item_type();
@@ -324,7 +309,7 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
-	StoreInst* store = (StoreInst*)gs->get_instance(action.use_id);
+	StoreInst* store = (StoreInst*) gs->get_instance(action.use_id);
 	StoreInventory& inv = store->inventory();
 	StoreItemSlot& slot = inv.get(action.use_id2);
 	if (gold() >= slot.cost) {
@@ -445,12 +430,12 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 
 	EnemyInst* target = NULL;
 	//Enemy hitting test for melee
-	gs->object_radius_test(this, (GameInst**)&target, 1, &enemy_colfilter,
+	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_colfilter,
 			x + ddx * 2, y + ddy * 2);
 
 	//Smaller radius enemy pushing test, can intercept enemy radius but not too far
 	EnemyInst* alreadyhitting[5] = { 0, 0, 0, 0, 0 };
-	gs->object_radius_test(this, (GameInst**)alreadyhitting, 5,
+	gs->object_radius_test(this, (GameInst**) alreadyhitting, 5,
 			&enemy_colfilter, x, y, radius);
 	bool already = false;
 	for (int i = 0; i < 5; i++) {
@@ -468,11 +453,6 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 	Pos newpos(round(rx + ddx), round(ry + ddy));
 
 	if (!gs->tile_radius_test(newpos.x, newpos.y, radius)) {
-//		float realmag = sqrt(ddx * ddx + ddy * ddy);
-//		if (realmag > 0) {
-//			rx += ddx / realmag * mag;
-//			ry += ddy / realmag * mag;
-//		}
 		rx += ddx;
 		ry += ddy;
 	} else if (!gs->tile_radius_test(newpos.x, y, radius)) {

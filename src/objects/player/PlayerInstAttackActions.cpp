@@ -263,19 +263,11 @@ static void player_use_spell(GameState* gs, PlayerInst* p,
 	}
 }
 
-static int find_item_slot(Inventory& inv, item_id item) {
-	for (int i = 0; i < inv.max_size(); i++) {
-		if (inv.get(i).item.id == item)
-			return i;
-	}
-	return -1;
-
-}
 void PlayerInst::queue_not_enough_mana_actions(GameState* gs) {
-	const int AUTOUSE_MANA_POTION_CNT = 2;
-	int item_slot = find_item_slot(inventory(),
-			get_item_by_name("Mana Potion"));
-	if (autouse_mana_potion_try_count >= AUTOUSE_MANA_POTION_CNT
+	const int AUTOUSE_MANA_POTION_CNT = 4;
+	int item_slot = inventory().find_slot(get_item_by_name("Mana Potion"));
+	if (gs->game_settings().autouse_mana_potions
+			&& autouse_mana_potion_try_count >= AUTOUSE_MANA_POTION_CNT
 			&& item_slot != -1) {
 		queued_actions.push_back(
 				game_action(gs, this, GameAction::USE_ITEM, item_slot));
@@ -365,7 +357,7 @@ bool PlayerInst::queue_io_spell_actions(GameState* gs) {
 			}
 			return false;
 		} else {
-//			autouse_mana_potion_try_count = 0;
+			autouse_mana_potion_try_count = 0;
 		}
 
 		if (can_trigger && can_target) {
@@ -559,7 +551,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		}
 
 		for (int i = 0; i < numhit; i++) {
-			EnemyInst* e = (EnemyInst*)enemies[i];
+			EnemyInst* e = (EnemyInst*) enemies[i];
 			lua_hit_callback(gs->get_luastate(), wentry.on_hit_func, this, e);
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
 				PlayerController& pc = gs->player_controller();

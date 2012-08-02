@@ -115,8 +115,8 @@ Dim gl_printf_bounded(const font_data& font, const Colour& colour, float x,
 	va_list ap;
 	va_start(ap, fmt);
 
-	return gl_print_impl(font, colour, Pos(x, y), max_width, false, false, true,
-			fmt, ap);
+	return gl_print_impl(font, colour, Pos(x, y), max_width, false, center_y,
+			true, fmt, ap);
 }
 /* printf-like function that draws to the screen, returns width of formatted string*/
 Dim gl_printf_y_centered_bounded(const font_data& font, const Colour& colour,

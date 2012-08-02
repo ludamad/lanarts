@@ -102,7 +102,7 @@ static void show_appear_message(GameChat& chat, EnemyEntry& e) {
 		char buff[100];
 		const char* a_or_an = starts_with_vowel(e.name) ? "An " : "A ";
 		snprintf(buff, 100, "%s%s appears!", a_or_an, e.name.c_str());
-		chat.add_message(buff, Colour(255, 148, 120));
+		chat.add_message(buff, COL_PALE_RED);
 	} else {
 		chat.add_message(e.appear_msg.c_str(), COL_PALE_RED);
 	}

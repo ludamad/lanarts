@@ -30,6 +30,14 @@ bool Inventory::add(const Item& item, int amount) {
 	return false;
 }
 
+int Inventory::find_slot(item_id item) {
+	for (int i = 0; i < max_size(); i++) {
+		if (get(i).item.id == item)
+			return i;
+	}
+	return -1;
+}
+
 size_t Inventory::last_filled_slot() const {
 	int i = max_size() - 1;
 	for (; i >= 0; i--) {

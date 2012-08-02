@@ -6,18 +6,16 @@ class: Mage
 username: ludamad
 
 #Window settings
-fullscreen: yes
+fullscreen: no
 regen_level_on_death: yes
-view_width: 1600
-view_height: 900
+view_width: 900
+view_height: 720
 
 #Font settings
 font: res/fonts/Gudea-Regular.ttf
 
 #Network settings
 network_debug_mode: no
-#Either 'host', 'client', or 'none'
-#Shouldn't be required anymore: connection_type: client
 ip: 192.168.0.19
 port: 6112
 
