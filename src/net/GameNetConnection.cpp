@@ -76,7 +76,10 @@ void GameNetConnection::send_and_sync(const NetPacket & packet,
 	if (!connect)
 		return;
 	NetPacket local;
+	printf("Sending synched packet\n");
 	connect->broadcast_packet(packet, send_to_new);
+	printf("Waiting for synched packet\n");
+
 	wait_for_packet(local);
 	received.push_back(local);
 }

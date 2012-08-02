@@ -233,6 +233,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 			packet.add(queued_actions[i]);
 		}
 		packet.encode_header();
+		printf("Sending player action for frame %d\n", gs->frame());
 		connection.get_connection()->broadcast_packet(packet);
 	}
 }
@@ -267,6 +268,8 @@ void PlayerInst::queue_network_actions(GameState *gs) {
 	GameNetConnection& connection = gs->net_connection();
 	bool hasconnection = connection.get_connection() != NULL;
 	NetPacket packet;
+
+	printf("Waiting for player action for frame %d\n", gs->frame());
 	if (!is_local_player() && hasconnection) {
 		while (!connection.get_connection()->get_next_packet(packet)) {
 		}
