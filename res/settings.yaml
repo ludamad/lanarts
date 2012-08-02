@@ -11,11 +11,14 @@ regen_level_on_death: yes
 view_width: 900
 view_height: 720
 
+#Gameplay preferences
+autouse_health_potions: yes # can toggle in game as well
+autouse_mana_potions: yes # can toggle in game as well
+
 #Font settings
 font: res/fonts/Gudea-Regular.ttf
 
 #Network settings
-network_debug_mode: no
 ip: 192.168.0.19
 port: 6112
 
@@ -24,9 +27,8 @@ steps_per_draw: 1 #More is almost guaranteed to make the game faster, 1 is ideal
 time_per_step: 14
 
 #Debug settings
+network_debug_mode: no
 invincible: no #Feel like exploring ? -> yes
 draw_diagnostics: no
 verbose_output: no
 
-#Control options
-use_stop_actions: yes

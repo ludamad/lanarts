@@ -32,6 +32,7 @@ const Colour COL_MEDIUM_PURPLE(123, 104, 238);
 const Colour COL_WHITE(255, 255, 255);
 const Colour COL_GRAY(60, 60, 60);
 const Colour COL_LIGHT_GRAY(180, 180, 180);
+const Colour COL_MID_GRAY(120, 120, 120);
 
 /* Text console constants */
 const Colour COL_CONSOLE_BOX(COL_PALE_BLUE);

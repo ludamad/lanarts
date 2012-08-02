@@ -43,6 +43,10 @@ GameSettings load_settings_data(const char* filename, lua_State* L,
 			optional_set(root, "savereplay_file", ret.savereplay_file);
 			optional_set(root, "loadreplay_file", ret.loadreplay_file);
 			optional_set(root, "verbose_output", ret.verbose_output);
+			optional_set(root, "autouse_health_potions",
+					ret.autouse_health_potions);
+			optional_set(root, "autouse_mana_potions",
+					ret.autouse_mana_potions);
 
 			if (yaml_has_node(root, "connection_type")) {
 				std::string connname;
