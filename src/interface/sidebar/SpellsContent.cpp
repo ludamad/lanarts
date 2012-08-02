@@ -43,9 +43,7 @@ static void draw_spells_known(GameState* gs, const BBox& bbox,
 			bbox_col = COL_WHITE;
 		}
 		if (entry_box.contains(mx, my)) {
-			if (spellidx != selected_spell) {
-				bbox_col = COL_GOLD;
-			}
+			bbox_col = COL_GOLD;
 			draw_console_spell_description(gs, spl_entry);
 		}
 		gl_draw_rectangle_outline(entry_box, bbox_col);
