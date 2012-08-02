@@ -24,17 +24,17 @@ struct GameSettings {
 
 	/*Debug options*/
 	bool draw_diagnostics, verbose_output;
+	bool invincible;
 
 	/*Replay settings, can be set in menu*/
 	std::string savereplay_file, loadreplay_file;
 
-	/*Gameplay settings*/
+	/*Permanent gameplay settings*/
 	bool regen_on_death;
-	bool invincible;
 	class_id classn;
 
-	/*Control settings*/
-	bool stop_controls;
+	/*Gameplay settings changeable in game*/
+	bool autouse_health_potions, autouse_mana_potions;
 
 	GameSettings() {
 		//sets defaults
@@ -51,12 +51,13 @@ struct GameSettings {
 		invincible = false;
 		draw_diagnostics = false;
 
-		stop_controls = true;
-
 		port = 0;
 		conntype = NONE;
 		network_debug_mode = false;
 		verbose_output = false;
+
+		autouse_health_potions = true;
+		autouse_mana_potions = true;
 	}
 };
 

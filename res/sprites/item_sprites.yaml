@@ -6,7 +6,7 @@ sprites:
   - name: amulet
     file: res/sprites/items/misc/amulet.png
 
-  - name: mana potion
+  - name: mana_potion
     file: res/sprites/items/misc/brilliant_blue.png
 
   - name: stone

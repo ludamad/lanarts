@@ -105,6 +105,7 @@ set( lanarts_src
 	interface/GameDialogs.cpp
 	interface/GameHud.cpp
 	interface/ActionBar.cpp
+	interface/sidebar/ConfigContent.cpp
 	interface/sidebar/Sidebar.cpp
 	interface/sidebar/SidebarNavigator.cpp
 	interface/sidebar/SpellsContent.cpp
@@ -232,6 +233,7 @@ set( lanarts_include
 	interface/GameHud.h
 	interface/GameTextConsole.h
 	interface/ActionBar.h
+	interface/sidebar/ConfigContent.h
 	interface/sidebar/EnemiesSeenContent.h
 	interface/sidebar/EquipmentContent.h
 	interface/sidebar/InventoryContent.h

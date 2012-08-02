@@ -57,17 +57,11 @@ enemies:
     defeat_message: The krell dies at last.
     radius: 14
     xpaward: 25
-    step_func: #Inline lua, heal very fast when under 23 hp
-      function(enemy)
-        if enemy.stats.hp < 18 then 
-          enemy.stats.hp = enemy.stats.hp + 1
-        end
-      end
     stats:
         attacks: [ {weapon: Slow Melee} ]
-        hp: 80
-        hpregen: 0.05
+        hp: 30
+        hpregen: 0.25
         movespeed: 2
         strength: 30
         defence: 10
-        willpower: 15
+        willpower: 10

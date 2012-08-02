@@ -113,7 +113,7 @@ typedef enum
 */
 
 /* Use one of these two functions to initialize a mask. Use only one
-/* of the functions. */
+/  of the functions. */
 
 /* Create a mask of the proper dimensions initialized to allow visits
 / of every square. The origin is the player. */

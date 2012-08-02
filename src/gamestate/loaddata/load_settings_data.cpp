@@ -39,7 +39,6 @@ GameSettings load_settings_data(const char* filename, lua_State* L,
 			optional_set(root, "time_per_step", ret.time_per_step);
 			optional_set(root, "draw_diagnostics", ret.draw_diagnostics);
 			optional_set(root, "username", ret.username);
-			optional_set(root, "use_stop_actions", ret.stop_controls);
 			optional_set(root, "network_debug_mode", ret.network_debug_mode);
 			optional_set(root, "savereplay_file", ret.savereplay_file);
 			optional_set(root, "loadreplay_file", ret.loadreplay_file);

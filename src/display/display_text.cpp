@@ -72,7 +72,7 @@ static Dim gl_print_impl(const font_data& font, const Colour& colour, Pos p,
 		p.x -= measured_width / 2;
 	}
 	if (center_y) {
-		p.y -= font.h / 2;
+		p.y -= font.h * line_splits.size() / 2;
 	}
 
 	for (int linenum = 0, i = 0; linenum < line_splits.size(); linenum++) {

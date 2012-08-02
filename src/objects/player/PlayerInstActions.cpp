@@ -93,7 +93,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 	GameInst* inst = NULL;
 	if (cooldowns().can_pickup()
 			&& gs->object_radius_test(this, &inst, 1, &item_colfilter)) {
-		ItemInst* iteminst = (ItemInst*) inst;
+		ItemInst* iteminst = (ItemInst*)inst;
 		Item& item = iteminst->item_type();
 
 		bool was_dropper = iteminst->last_held_by() == id;
@@ -145,8 +145,6 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 	bool mouse_within = gs->mouse_x() < gs->view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
-	/* If in stop-controls mode, perform some actions when movement has stopped */
-	bool stop_controls = gs->game_settings().stop_controls;
 	bool was_moving = moving, do_stopaction = false;
 	IOController& io = gs->io_controller();
 
@@ -165,8 +163,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 		if (!resting) {
 			queue_io_movement_actions(gs, dx, dy);
 
-			if (stop_controls && was_moving && !moving
-					&& cooldowns().can_do_stopaction()) {
+			if (was_moving && !moving && cooldowns().can_do_stopaction()) {
 				do_stopaction = true;
 			}
 		}
@@ -228,8 +225,8 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 			}
 		}
 
-		// If we haven't done anything, and we have stop controls, rest
-		if (stop_controls && queued_actions.empty()) {
+		// If we haven't done anything, rest
+		if (queued_actions.empty()) {
 			queued_actions.push_back(
 					GameAction(id, GameAction::USE_REST, frame, level));
 			resting = true;
@@ -257,7 +254,7 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	const int PICKUP_RATE = 10;
-	ItemInst* item = (ItemInst*) gs->get_instance(action.use_id);
+	ItemInst* item = (ItemInst*)gs->get_instance(action.use_id);
 	if (!item)
 		return;
 	const Item& type = item->item_type();
@@ -327,7 +324,7 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
-	StoreInst* store = (StoreInst*) gs->get_instance(action.use_id);
+	StoreInst* store = (StoreInst*)gs->get_instance(action.use_id);
 	StoreInventory& inv = store->inventory();
 	StoreItemSlot& slot = inv.get(action.use_id2);
 	if (gold() >= slot.cost) {
@@ -448,12 +445,12 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 
 	EnemyInst* target = NULL;
 	//Enemy hitting test for melee
-	gs->object_radius_test(this, (GameInst**) &target, 1, &enemy_colfilter,
+	gs->object_radius_test(this, (GameInst**)&target, 1, &enemy_colfilter,
 			x + ddx * 2, y + ddy * 2);
 
 	//Smaller radius enemy pushing test, can intercept enemy radius but not too far
 	EnemyInst* alreadyhitting[5] = { 0, 0, 0, 0, 0 };
-	gs->object_radius_test(this, (GameInst**) alreadyhitting, 5,
+	gs->object_radius_test(this, (GameInst**)alreadyhitting, 5,
 			&enemy_colfilter, x, y, radius);
 	bool already = false;
 	for (int i = 0; i < 5; i++) {

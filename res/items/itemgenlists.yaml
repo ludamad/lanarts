@@ -3,7 +3,7 @@ itemgen_lists:
   - name: Basic Items
     items: &BasicItems
     - { item: Arrow,              chance: 15,  quantity: [5,15]  }
-    - { item: Silver Arrow,       chance: 15,  quantity: [3,8]   }
+    - { item: Silver Arrow,       chance: 10,  quantity: [3,5]   }
     - { item: Short Bow,          chance: 10                     }
     - { item: Stone,              chance: 15,  quantity: [5,15]  }
     - { item: Gold,               chance: 75,  quantity: [5,40]  }

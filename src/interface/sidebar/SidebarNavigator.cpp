@@ -11,6 +11,7 @@
 
 #include "../../gamestate/GameState.h"
 
+#include "ConfigContent.h"
 #include "EquipmentContent.h"
 #include "EnemiesSeenContent.h"
 #include "InventoryContent.h"
@@ -73,7 +74,7 @@ SidebarNavigator::SidebarNavigator(const BBox& sidebar_bounds,
 				new EnemiesSeenContent(main_content_bounds),
 				icon_bounds(main_content_bounds, 0, NUM_ICONS_ROW_2, 1)), config(
 				get_sprite_by_name("config_icon"),
-				new EquipmentContent(main_content_bounds),
+				new ConfigContent(main_content_bounds),
 				icon_bounds(main_content_bounds, 1, NUM_ICONS_ROW_2, 1)) {
 }
 
@@ -103,7 +104,7 @@ void SidebarNavigator::step(GameState* gs) {
 }
 
 void SidebarNavigator::reset_slot_selected() {
-	((InventoryContent*) inventory.content)->reset_slot_selected();
+	((InventoryContent*)inventory.content)->reset_slot_selected();
 }
 
 bool SidebarNavigator::handle_icon_io(GameState* gs, NavigationOption& option,
@@ -118,7 +119,7 @@ bool SidebarNavigator::handle_icon_io(GameState* gs, NavigationOption& option,
 bool SidebarNavigator::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	if (handle_icon_io(gs, inventory, INVENTORY)
 			|| handle_icon_io(gs, spells, SPELLS)
-//			|| handle_icon_io(gs, config, CONFIG)
+			|| handle_icon_io(gs, config, CONFIG)
 			|| handle_icon_io(gs, enemies, ENEMIES)
 			|| handle_icon_io(gs, equipment, EQUIPMENT)) {
 		return true;
