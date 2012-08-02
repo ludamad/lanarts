@@ -27,7 +27,7 @@ projectiles:
     description: A fist sized stone, good for throwing.
     weapon_class: unarmed
     spr_item: stone
-    drop_chance: 97 # % chance
+    drop_chance: 90 # % chance
     #Stats
     range: 300
     speed: 6

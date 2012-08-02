@@ -263,6 +263,27 @@ static void player_use_spell(GameState* gs, PlayerInst* p,
 	}
 }
 
+static int find_item_slot(Inventory& inv, item_id item) {
+	for (int i = 0; i < inv.max_size(); i++) {
+		if (inv.get(i).item.id == item)
+			return i;
+	}
+	return -1;
+
+}
+void PlayerInst::queue_not_enough_mana_actions(GameState* gs) {
+	const int AUTOUSE_MANA_POTION_CNT = 2;
+	int item_slot = find_item_slot(inventory(),
+			get_item_by_name("Mana Potion"));
+	if (autouse_mana_potion_try_count >= AUTOUSE_MANA_POTION_CNT
+			&& item_slot != -1) {
+		queued_actions.push_back(
+				game_action(gs, this, GameAction::USE_ITEM, item_slot));
+		autouse_mana_potion_try_count = 0;
+	} else {
+		autouse_mana_potion_try_count++;
+	}
+}
 bool PlayerInst::queue_io_spell_actions(GameState* gs) {
 	GameView& view = gs->view();
 	IOController& io = gs->io_controller();
@@ -324,9 +345,7 @@ bool PlayerInst::queue_io_spell_actions(GameState* gs) {
 	}
 	if (spell_selected() > -1 && perform_spell) {
 		SpellEntry& spl_entry = spells.get_entry(spell_selected());
-		if (spl_entry.mp_cost > core_stats().mp) {
-			return false;
-		}
+
 		Pos target;
 		bool can_trigger = !triggered_already
 				|| spl_entry.can_cast_with_held_key;
@@ -338,6 +357,15 @@ bool PlayerInst::queue_io_spell_actions(GameState* gs) {
 			int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 			target = Pos(rmx, rmy);
 			can_target = true;
+		}
+
+		if (spl_entry.mp_cost > core_stats().mp) {
+			if (!triggered_already && can_target) {
+				queue_not_enough_mana_actions(gs);
+			}
+			return false;
+		} else {
+//			autouse_mana_potion_try_count = 0;
 		}
 
 		if (can_trigger && can_target) {

@@ -95,6 +95,8 @@ private:
 	bool queue_io_spell_and_attack_actions(GameState* gs, float dx, float dy);
 	void queue_io_equipment_actions(GameState* gs, bool do_stop_action);
 	void queue_network_actions(GameState* gs);
+	void queue_not_enough_mana_actions(GameState* gs);
+
 	//Game action events
 	void use_move(GameState* gs, const GameAction& action);
 	void use_weapon(GameState* gs, const GameAction& action);
@@ -103,6 +105,8 @@ private:
 	void use_spell(GameState* gs, const GameAction& action);
 	void use_rest(GameState* gs, const GameAction& action);
 	void use_item(GameState* gs, const GameAction& action);
+
+
 	void pickup_item(GameState* gs, const GameAction& action);
 	void drop_item(GameState* gs, const GameAction& action);
 	void reposition_item(GameState* gs, const GameAction& action);
@@ -112,6 +116,7 @@ private:
 	fov fieldofview;
 	bool didstep, local, moving;
 
+	bool autouse_mana_potion_try_count;
 	int lives, deaths;
 	int previous_spellselect, spellselect;
 };

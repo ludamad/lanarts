@@ -13,7 +13,6 @@
 #include "../../stats/class_data.h"
 #include "../../stats/item_data.h"
 #include "../../stats/weapon_data.h"
-
 #include "../../display/display.h"
 
 #include "../../util/math_util.h"
@@ -27,7 +26,7 @@ PlayerInst::PlayerInst(const CombatStats& stats, int x, int y, bool local) :
 		CombatGameInst(stats,
 				game_class_data.at(stats.class_stats.classid).sprite, 0, x, y,
 				RADIUS, true, DEPTH), fieldofview(LINEOFSIGHT), local(local), moving(
-				0), lives(0), deaths(0), previous_spellselect(
+				0), autouse_mana_potion_try_count(0), lives(0), deaths(0), previous_spellselect(
 				0), spellselect(-1) {
 }
 

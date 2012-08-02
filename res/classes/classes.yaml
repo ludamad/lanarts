@@ -24,6 +24,9 @@ classes:
         defence: 3
         willpower: 5
         magic: 5
+        equipment:
+          inventory:
+            - item: Mana Potion
     gain_per_level:
         hp: 15
         mp: 20
