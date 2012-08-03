@@ -264,7 +264,7 @@ static void player_use_spell(GameState* gs, PlayerInst* p,
 }
 
 void PlayerInst::queue_not_enough_mana_actions(GameState* gs) {
-	const int AUTOUSE_MANA_POTION_CNT = 4;
+	const int AUTOUSE_MANA_POTION_CNT = 2;
 	int item_slot = inventory().find_slot(get_item_by_name("Mana Potion"));
 	if (gs->game_settings().autouse_mana_potions
 			&& autouse_mana_potion_try_count >= AUTOUSE_MANA_POTION_CNT

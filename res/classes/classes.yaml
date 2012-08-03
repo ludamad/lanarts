@@ -17,7 +17,7 @@ classes:
     start_stats:
         movespeed: 4
         hp: 85
-        mp: 80
+        mp: 100
         hpregen: 0.033
         mpregen: 0.066
         strength: 3
@@ -44,12 +44,12 @@ classes:
         level_needed: 1
     start_stats:
         movespeed: 4
-        hp: 100
+        hp: 110
         mp: 40
         hpregen: 0.055
         mpregen: 0.044
         strength: 6
-        defence: 5
+        defence: 6
         willpower: 3
         magic: 2
         equipment:
