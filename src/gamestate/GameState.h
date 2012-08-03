@@ -98,7 +98,7 @@ public:
 		return _view;
 	}
 
-	GameTiles& tile_grid();
+	GameTiles& tiles();
 	GameHud& game_hud() {
 		return hud;
 	}

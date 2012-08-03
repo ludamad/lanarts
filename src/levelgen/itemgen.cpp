@@ -36,7 +36,7 @@ const ItemGenChance& generate_item_choice(MTwist& mt,
 
 void generate_items(const ItemGenSettings& is, MTwist& mt,
 		GeneratedLevel& level, GameState* gs) {
-	GameTiles& tiles = gs->tile_grid();
+	GameTiles& tiles = gs->tiles();
 	int start_x = (tiles.tile_width() - level.width()) / 2;
 	int start_y = (tiles.tile_height() - level.height()) / 2;
 

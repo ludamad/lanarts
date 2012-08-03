@@ -190,7 +190,7 @@ void MonsterController::monster_follow_path(GameState* gs, EnemyInst* e) {
 	}
 }
 void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
-	GameTiles& tile = gs->tile_grid();
+	GameTiles& tile = gs->tiles();
 	MTwist& mt = gs->rng();
 	EnemyBehaviour& eb = e->behaviour();
 	e->vx = 0, e->vy = 0;

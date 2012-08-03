@@ -41,12 +41,12 @@ void FeatureInst::step(GameState* gs) {
 	}
 	if (gs->object_radius_test(x, y, TILE_SIZE, player_colfilter)) {
 		if (feature == DOOR_CLOSED) {
-			gs->tile_grid().set_solid(x / TILE_SIZE, y / TILE_SIZE, false);
+			gs->tiles().set_solid(x / TILE_SIZE, y / TILE_SIZE, false);
 			feature = DOOR_OPEN;
 		}
 	} else if (!gs->object_radius_test(x, y, TILE_SIZE)) {
 		if (feature == DOOR_OPEN) {
-			gs->tile_grid().set_solid(x / TILE_SIZE, y / TILE_SIZE, true);
+			gs->tiles().set_solid(x / TILE_SIZE, y / TILE_SIZE, true);
 			feature = DOOR_CLOSED;
 		}
 	}
@@ -54,19 +54,19 @@ void FeatureInst::step(GameState* gs) {
 
 void FeatureInst::init(GameState* gs) {
 	if (feature == DOOR_CLOSED) {
-		gs->tile_grid().set_solid(x / TILE_SIZE, y / TILE_SIZE, true);
+		gs->tiles().set_solid(x / TILE_SIZE, y / TILE_SIZE, true);
 	}
 }
 
 void FeatureInst::deinit(GameState *gs) {
 	if (feature == DOOR_CLOSED) {
-		gs->tile_grid().set_solid(x / TILE_SIZE, y / TILE_SIZE, false);
+		gs->tiles().set_solid(x / TILE_SIZE, y / TILE_SIZE, false);
 	}
 }
 
 void FeatureInst::player_interact(GameState* gs) {
 	if (feature == DOOR_CLOSED) {
-		gs->tile_grid().set_solid(x / TILE_SIZE, y / TILE_SIZE, false);
+		gs->tiles().set_solid(x / TILE_SIZE, y / TILE_SIZE, false);
 		feature = DOOR_OPEN;
 	}
 }

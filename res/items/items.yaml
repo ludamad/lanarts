@@ -71,3 +71,13 @@ items:
     sprite: scroll_will
     action_func: increase_willpower
     amount: 1
+
+  - name: Scroll of Enlightenment
+    shop_cost: [55,105]
+    description:
+      Enlightens the user about his surroundings.
+    use_message: You feel enlightened!
+    sprite: scroll_will
+    action_func: reveal_map
+    amount: 1
+    

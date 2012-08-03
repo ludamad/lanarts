@@ -16,7 +16,7 @@
 void generate_enemy_after_level_creation(GameState* gs, enemy_id etype,
 		int amount) {
 	MTwist& mt = gs->rng();
-	GameTiles& tiles = gs->tile_grid();
+	GameTiles& tiles = gs->tiles();
 
 	for (int i = 0; i < amount; i++) {
 		Pos epos;

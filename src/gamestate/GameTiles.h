@@ -35,6 +35,7 @@ public:
 	bool is_seen(int x, int y);
 	bool is_solid(int x, int y);
 
+	void mark_all_seen();
 
 	void clear();
 	void copy_to(GameTiles& t) const;

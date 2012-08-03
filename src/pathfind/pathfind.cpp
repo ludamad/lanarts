@@ -67,7 +67,7 @@ void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
 	int min_tilex, min_tiley;
 	int max_tilex, max_tiley;
 
-	GameTiles& tile = gs->tile_grid();
+	GameTiles& tile = gs->tiles();
 
 	//Use a temporary 'GameView' object to make use of its helper methods
 	GameView view(0, 0, radius * 2, radius * 2, gs->width(), gs->height());

@@ -51,7 +51,7 @@ fov::~fov() {
 }
 
 int fov::isBlocked(short destX, short destY) {
-	GameTiles & tiles = gs->tile_grid();
+	GameTiles & tiles = gs->tiles();
 	int px = ptx + destX, py = pty + destY;
 	px = (px)/sub_squares; py = (py)/sub_squares;
 	bool outof = (px < 0 || py < 0 || px >= tiles.tile_width()

@@ -39,7 +39,7 @@ static tileset_id randtileset(MTwist& mt,
 }
 
 static void doorify(GameState* gs, GeneratedLevel& l, int x, int y) {
-	GameTiles& tiles = gs->tile_grid();
+	GameTiles& tiles = gs->tiles();
 	int tw = tiles.tile_width(), th = tiles.tile_height();
 	int lw = l.width(), lh = l.height();
 
@@ -94,7 +94,7 @@ static void generate_shop(GameState* gs, GeneratedLevel& level, MTwist& mt,
 }
 void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		GeneratedLevel& level, GameState* gs) {
-	GameTiles& tiles = gs->tile_grid();
+	GameTiles& tiles = gs->tiles();
 	TilesetEntry& tileset = game_tileset_data[randtileset(mt, fs.tilesets)];
 	tiles.clear();
 

@@ -90,6 +90,12 @@ static int monsters_seen(lua_State* L) {
 	return 1;
 }
 
+static int reveal_map(lua_State* L) {
+	GameState* gs = lua_get_gamestate(L);
+	gs->tiles().mark_all_seen();
+	return 0;
+}
+
 void lua_object_func_bindings(lua_State* L) {
 	//Use C function name as lua function name:
 #define LUA_FUNC_REGISTER(f) \
@@ -100,4 +106,5 @@ void lua_object_func_bindings(lua_State* L) {
 	LUA_FUNC_REGISTER(monsters_in_level);
 	LUA_FUNC_REGISTER(players_in_level);
 	LUA_FUNC_REGISTER(monsters_seen);
+	LUA_FUNC_REGISTER(reveal_map);
 }

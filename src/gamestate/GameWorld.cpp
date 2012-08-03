@@ -40,7 +40,7 @@ level_id GameWorld::get_current_level_id() {
 
 void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, int classn,
 		PlayerInst* inst) {
-	GameTiles& tiles = game_state->tile_grid();
+	GameTiles& tiles = game_state->tiles();
 	ClassType& c = game_class_data.at(classn);
 	Pos epos;
 	do {

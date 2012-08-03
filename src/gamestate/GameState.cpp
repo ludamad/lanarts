@@ -414,7 +414,7 @@ bool GameState::mouse_downwheel() {
 }
 
 /* End mouse click states */
-GameTiles& GameState::tile_grid() {
+GameTiles& GameState::tiles() {
 	return get_level()->tiles;
 }
 

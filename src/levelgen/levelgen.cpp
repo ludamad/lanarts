@@ -120,7 +120,7 @@ static const LayoutGenSettings& choose_random_layout(MTwist& mt,
 }
 
 Pos get_level_offset(GameState* gs, int lw, int lh) {
-	GameTiles& tiles = gs->tile_grid();
+	GameTiles& tiles = gs->tiles();
 	int tw = tiles.tile_width(), th = tiles.tile_height();
 
 	return Pos((tw - lw) / 2, (th - lh) / 2);

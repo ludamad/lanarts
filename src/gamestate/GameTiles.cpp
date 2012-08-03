@@ -57,6 +57,10 @@ void GameTiles::clear() {
 	memset(tiles, 0, sizeof(int) * width * height);
 }
 
+void GameTiles::mark_all_seen() {
+	memset(seen_tiles, 1, width * height);
+}
+
 void GameTiles::copy_to(GameTiles & t) const {
 	t.width = width, t.height = height;
 	memcpy(t.seen_tiles, seen_tiles, width * height);

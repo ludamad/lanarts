@@ -210,7 +210,7 @@ static float proportion_in_same_dir(float vx1, float vy1, float vx2,
 bool in_corridor_heurestic(GameState* gs, const Pos& p, float vx, float vy) {
 	bool in_xy = abs(vx) > abs(vy);
 
-	GameTiles& tiles = gs->tile_grid();
+	GameTiles& tiles = gs->tiles();
 	int solid = 0;
 	for (int dy = -1; dy <= 1; dy++) {
 		for (int dx = -1; dx <= 1; dx++) {
