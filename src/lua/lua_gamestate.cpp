@@ -1,6 +1,6 @@
-#include <lua/lunar.h>
 
 #include "lua_api.h"
+#include "lunar.h"
 
 #include "../data/lua_game_data.h"
 

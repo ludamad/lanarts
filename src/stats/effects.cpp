@@ -12,6 +12,8 @@ extern "C" {
 
 #include "../objects/CombatGameInst.h"
 
+#include "../serialize/SerializeBuffer.h"
+
 #include "effects.h"
 
 bool EffectStats::has_active_effect() const {
@@ -145,18 +147,23 @@ Effect* EffectStats::get(int effect) {
 	return NULL;
 }
 
-static void lua_init_effect(lua_State* L, LuaValue& value, effect_id effect) {
-	EffectEntry& eentry = game_effect_data.at(effect);
-	value.table_initialize(L);
+static void lua_init_metatable(lua_State* L, LuaValue& value,
+		effect_id effect) {
 	value.push(L);
 	/* Set self as metatable*/
 	lua_pushvalue(L, -1);
 	lua_setmetatable(L, -2);
 	/* Set index as effect object */
+	EffectEntry& eentry = game_effect_data.at(effect);
 	lua_effects.table_push_value(L, eentry.name.c_str());
 	lua_setfield(L, -2, "__index");
 	/* Pop self */
 	lua_pop(L, 1);
+}
+
+static void lua_init_effect(lua_State* L, LuaValue& value, effect_id effect) {
+	value.table_initialize(L);
+	lua_init_metatable(L, value, effect);
 }
 
 LuaValue EffectStats::add(GameState* gs, CombatGameInst* inst, effect_id effect,
@@ -180,3 +187,25 @@ LuaValue EffectStats::add(GameState* gs, CombatGameInst* inst, effect_id effect,
 	return LuaValue();
 }
 
+void EffectStats::serialize(GameState* gs, SerializeBuffer& serializer) {
+	lua_State* L = gs->get_luastate();
+
+	for (int i = 0; i < EFFECTS_MAX; i++) {
+		serializer.write_int(effects[i].effectid);
+		effects[i].state.serialize(L, serializer);
+		serializer.write_int(effects[i].t_remaining);
+	}
+}
+
+void EffectStats::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	lua_State* L = gs->get_luastate();
+
+	for (int i = 0; i < EFFECTS_MAX; i++) {
+		serializer.read_int(effects[i].effectid);
+		effects[i].state.deserialize(L, serializer);
+		if (!effects[i].state.isnil(L)) {
+			lua_init_metatable(L, effects[i].state, effects[i].effectid);
+		}
+		serializer.read_int(effects[i].t_remaining);
+	}
+}

@@ -34,8 +34,8 @@ PlayerInst::~PlayerInst() {
 }
 
 void PlayerInst::update_field_of_view(GameState* gs) {
-	int sx = last_x * VISION_SUBSQRS / TILE_SIZE;
-	int sy = last_y * VISION_SUBSQRS / TILE_SIZE;
+	int sx = last_x / TILE_SIZE;
+	int sy = last_y / TILE_SIZE;
 	field_of_view().calculate(gs, sx, sy);
 }
 
@@ -131,6 +131,14 @@ void PlayerInst::draw(GameState* gs) {
 void PlayerInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
 	*(PlayerInst*)inst = *this;
+}
+
+void PlayerInst::serialize(GameState* gs, SerializeBuffer& serializer) {
+	CombatGameInst::serialize(gs, serializer);
+}
+
+void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	CombatGameInst::deserialize(gs, serializer);
 }
 
 PlayerInst *PlayerInst::clone() const {

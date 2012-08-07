@@ -79,18 +79,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 		p = Pos(targetted->x, targetted->y);
 
 	// We may have already used an item eg due to auto-use of items
-	bool used_item = io.query_event(IOEvent::USE_ITEM_N);
-
-	if (!used_item && gs->game_settings().autouse_health_potions
-			&& core_stats().hp < AUTOUSE_HEALTH_POTION_THRESHOLD) {
-		int item_slot = inventory().find_slot(
-				get_item_by_name("Health Potion"));
-		if (item_slot > -1) {
-			queued_actions.push_back(
-					game_action(gs, this, GameAction::USE_ITEM, item_slot));
-			used_item = true;
-		}
-	}
+	bool used_item = false;
 
 	//Item use
 	for (int i = 0; i < 9 && !used_item; i++) {
@@ -101,6 +90,16 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 						GameAction(id, GameAction::USE_ITEM, frame, level, i,
 								p.x, p.y));
 			}
+		}
+	}
+	if (!used_item && gs->game_settings().autouse_health_potions
+			&& core_stats().hp < AUTOUSE_HEALTH_POTION_THRESHOLD) {
+		int item_slot = inventory().find_slot(
+				get_item_by_name("Health Potion"));
+		if (item_slot > -1) {
+			queued_actions.push_back(
+					game_action(gs, this, GameAction::USE_ITEM, item_slot));
+			used_item = true;
 		}
 	}
 
@@ -310,7 +309,6 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 		gs->game_hud().reset_slot_selected();
 	}
 }
-
 void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
 	StoreInst* store = (StoreInst*)gs->get_instance(action.use_id);
 	StoreInventory& inv = store->inventory();

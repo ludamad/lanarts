@@ -55,6 +55,14 @@ ScriptedInst* ScriptedInst::clone() const {
 	return new ScriptedInst(*this);
 }
 
+void ScriptedInst::serialize(GameState *gs, SerializeBuffer & serializer)
+{
+}
+
+void ScriptedInst::deserialize(GameState *gs, SerializeBuffer & serializer)
+{
+}
+
 ScriptObjectEntry& ScriptedInst::script_object() {
 	return __S(script_obj_id);
 }

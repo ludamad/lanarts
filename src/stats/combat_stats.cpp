@@ -12,6 +12,8 @@
 #include "items.h"
 #include "stat_formulas.h"
 
+#include "../serialize/SerializeBuffer.h"
+
 CombatStats::CombatStats(const ClassStats& class_stats, const CoreStats& core,
 		const CooldownStats& cooldowns, const Equipment& equipment,
 		const std::vector<AttackStats>& attacks, float movespeed) :
@@ -181,3 +183,36 @@ float AttackStats::atk_resist_modifier() const {
 	}
 	return projectile.projectile_entry().resist_modifier;
 }
+
+void CombatStats::serialize(GameState* gs, SerializeBuffer& serializer) {
+	serializer.write(core);
+	serializer.write(cooldowns);
+	serializer.write(class_stats);
+	equipment.serialize(serializer);
+	effects.serialize(gs, serializer);
+	spells.serialize(serializer);
+	serializer.write_int(attacks.size());
+	for (int i = 0; i < attacks.size(); i++) {
+		attacks[i].projectile.serialize(serializer);
+		attacks[i].weapon.serialize(serializer);
+	}
+	serializer.write(movespeed);
+}
+
+void CombatStats::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	serializer.read(core);
+	serializer.read(cooldowns);
+	serializer.read(class_stats);
+	equipment.deserialize(serializer);
+	effects.deserialize(gs, serializer);
+	spells.deserialize(serializer);
+	int size;
+	serializer.read_int(size);
+	attacks.resize(size);
+	for (int i = 0; i < size; i++) {
+		attacks[i].projectile.deserialize(serializer);
+		attacks[i].weapon.deserialize(serializer);
+	}
+	serializer.read(movespeed);
+}
+

@@ -44,7 +44,6 @@ public:
 	BBox minimap_bbox(GameState* gs);
 
 	GameHud(const BBox& sidebar_box, const BBox& view_box);
-	~GameHud();
 
 	/* Width of overlay */
 	int width() {
@@ -80,8 +79,6 @@ private:
 
 	BBox sidebar_box, view_box;
 	Colour bg_colour;
-	char* minimap_arr;
-	GLimage minimap_buff;
 
 	ActionQueue queued_actions;
 };

@@ -39,6 +39,10 @@ public:
 	bool autopickup_held() {
 		return pickup_by_dropper;
 	}
+
+	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
+	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
+
 private:
 	Item item;
 	int quantity;

@@ -26,6 +26,8 @@ extern "C" {
 
 #include "util/Timer.h"
 
+#include "tests/tests.h"
+
 using namespace std;
 
 #ifdef __WIN32
@@ -73,8 +75,14 @@ static void game_loop(GameState* gs) {
 		if (gs->key_press_state(SDLK_F4)) {
 			paused = !paused;
 		}
+		if (gs->key_press_state(SDLK_F5)) {
+			gs->save_game("savefile.save");
+		}
+		if (gs->key_press_state(SDLK_F6)) {
+			gs->load_game("savefile.save");
+		}
 
-		//Draw event
+//Draw event
 
 		total_timer.start();
 		draw_timer.start();
@@ -121,6 +129,8 @@ static void game_loop(GameState* gs) {
 }
 
 int main(int argc, char** argv) {
+	run_unit_tests();
+
 	lua_State* L = lua_open();
 
 	GameSettings settings;
@@ -139,6 +149,7 @@ int main(int argc, char** argv) {
 	main_menu_loop(gs, windoww, windowh);
 
 	gs->init_game();
+
 
 	game_loop(gs);
 

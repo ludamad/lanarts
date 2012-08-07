@@ -6,6 +6,7 @@
 #include <algorithm>
 
 #include "spell_data.h"
+#include "../serialize/SerializeBuffer.h"
 
 #include "SpellsKnown.h"
 
@@ -29,5 +30,13 @@ bool SpellsKnown::has_spell(spell_id slot) {
 	std::vector<spell_id>::iterator it = std::find(spells.begin(), spells.end(),
 			slot);
 	return (it != spells.end());
+}
+
+void SpellsKnown::serialize(SerializeBuffer& serializer) {
+	serializer.write_vector(spells);
+}
+
+void SpellsKnown::deserialize(SerializeBuffer& serializer) {
+	serializer.read_vector(spells);
 }
 

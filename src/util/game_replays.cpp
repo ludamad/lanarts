@@ -22,7 +22,7 @@ static std::string find_next_nonexistant(std::string* prev,
 	}
 	for (int tries = 2;; tries++) {
 		std::string ret = name + suffix;
-		FILE* f = fopen(ret.c_str(), "r");
+		FILE* f = fopen(ret.c_str(), "rb");
 		if (!f) {
 			return ret;
 		}
@@ -67,7 +67,7 @@ void save_actions(GameState* gs, std::deque<GameAction>& actions) {
 void load_init(GameState* gs, int& seed, class_id& classtype) {
 	std::string last_used_name;
 	find_next_nonexistant(&last_used_name, gs->game_settings().loadreplay_file);
-	loadfile = fopen(last_used_name.c_str(), "r");
+	loadfile = fopen(last_used_name.c_str(), "rb");
 	fread(&seed, sizeof(unsigned int), 1, loadfile);
 	fread(&classtype, sizeof(class_id), 1, loadfile);
 }
@@ -75,7 +75,7 @@ void load_init(GameState* gs, int& seed, class_id& classtype) {
 void save_init(GameState* gs, int seed, class_id classtype) {
 	std::string next_free_name = find_next_nonexistant(NULL,
 			gs->game_settings().savereplay_file);
-	savefile = fopen(next_free_name.c_str(), "w");
+	savefile = fopen(next_free_name.c_str(), "wb");
 	fwrite(&seed, sizeof(unsigned int), 1, savefile);
 	fwrite(&classtype, sizeof(class_id), 1, savefile);
 }

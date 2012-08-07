@@ -14,6 +14,8 @@
 
 #include "../../stats/stat_formulas.h"
 
+#include "../../serialize/SerializeBuffer.h"
+
 #include "../../display/colour_constants.h"
 #include "../../interface/console_description_draw.h"
 #include "../../util/math_util.h"
@@ -70,6 +72,21 @@ unsigned int EnemyInst::integrity_hash() {
 	return hash;
 }
 
+void EnemyInst::serialize(GameState* gs, SerializeBuffer& serializer) {
+	CombatGameInst::serialize(gs, serializer);
+	serializer.write(seen);
+	serializer.write_int(enemytype);
+	eb.serialize(gs, serializer);
+	serializer.write_int(xpgain);
+}
+
+void EnemyInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	CombatGameInst::deserialize(gs, serializer);
+	serializer.read(seen);
+	serializer.read_int(enemytype);
+	eb.deserialize(gs, serializer);
+	serializer.read_int(xpgain);
+}
 EnemyEntry& EnemyInst::etype() {
 	return game_enemy_data.at(enemytype);
 }

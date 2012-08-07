@@ -28,6 +28,9 @@ public:
 	virtual void copy_to(GameInst* inst) const;
 	virtual ScriptedInst* clone() const;
 
+	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
+	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
+
 	ScriptObjectEntry& script_object();
 protected:
 	scriptobj_id script_obj_id;

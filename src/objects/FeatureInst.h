@@ -32,6 +32,10 @@ public:
 	void player_interact(GameState* gs);
 	virtual void copy_to(GameInst* inst) const;
 	virtual FeatureInst* clone() const;
+
+	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
+	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
+
 private:
 	feature_t feature;
 	sprite_id last_seen_spr;

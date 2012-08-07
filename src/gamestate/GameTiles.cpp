@@ -7,21 +7,18 @@
 
 #include "../levelgen/levelgen.h"
 
+#include "../serialize/SerializeBuffer.h"
+
 #include "GameTiles.h"
 #include "GameState.h"
 
 #include "../objects/player/PlayerInst.h"
 
 GameTiles::GameTiles(int width, int height) :
-		width(width), height(height), solid_tiles(width * height, true) {
-	seen_tiles = new char[width * height];
-	tiles = new Tile[width * height];
-	memset(seen_tiles, 0, width * height);
+		width(width), height(height), tiles(width * height) {
 }
 
 GameTiles::~GameTiles() {
-	delete[] tiles;
-	delete[] seen_tiles;
 }
 
 int GameTiles::tile_width() {
@@ -33,39 +30,34 @@ int GameTiles::tile_height() {
 }
 
 Tile& GameTiles::get(int x, int y) {
-	return tiles[y * width + x];
-}
-
-Tile* GameTiles::tile_array() {
-	return tiles;
+	return tiles[y * width + x].tile;
 }
 
 bool GameTiles::is_seen(int x, int y) {
-	return seen_tiles[y * width + x];
+	return tiles[y * width + x].seen;
 }
 
 void GameTiles::set_solid(int x, int y, bool solid) {
-	solid_tiles[y * width + x] = solid;
+	tiles[y * width + x].solid = solid;
 }
 
 bool GameTiles::is_solid(int x, int y) {
-	return solid_tiles[y * width + x];
+	return tiles[y * width + x].solid;
 }
 
 void GameTiles::clear() {
-	memset(seen_tiles, 0, width * height);
-	memset(tiles, 0, sizeof(int) * width * height);
+	memset(&tiles[0], 0, sizeof(TileState) * width * height);
 }
 
 void GameTiles::mark_all_seen() {
-	memset(seen_tiles, 1, width * height);
+	for (int i = 0; i < tiles.size(); i++) {
+		tiles[i].seen = true;
+	}
 }
 
 void GameTiles::copy_to(GameTiles & t) const {
 	t.width = width, t.height = height;
-	memcpy(t.seen_tiles, seen_tiles, width * height);
-	memcpy(t.tiles, tiles, sizeof(int) * width * height);
-	t.solid_tiles = solid_tiles;
+	t.tiles = tiles;
 }
 
 void GameTiles::pre_draw(GameState* gs) {
@@ -85,7 +77,7 @@ void GameTiles::pre_draw(GameState* gs) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
 			Tile& tile = get(x, y);
 			GLimage& img = game_tile_data[tile.tile].img(tile.subtile);
-			if (reveal_enabled || seen_tiles[y * width + x])
+			if (reveal_enabled || is_seen(x, y))
 				gl_draw_image(img, x * TILE_SIZE - view.x,
 						y * TILE_SIZE - view.y);
 		}
@@ -111,7 +103,7 @@ void GameTiles::step(GameState* gs) {
 				f.matches(x, y, matches);
 				for (int i = 0; i < sub_sqrs * sub_sqrs; i++) {
 					if (matches[i])
-						seen_tiles[y * width + x] = 1;
+						tiles[y * width + x].seen = 1;
 				}
 			}
 		}
@@ -164,7 +156,7 @@ void GameTiles::post_draw(GameState* gs) {
 			//Do not draw black if we have a match, and we see a wall
 			if (!has_match) {
 				if (!is_other_match) {
-					if (!seen_tiles[y * width + x]) {
+					if (!is_seen(x, y)) {
 						gl_draw_rectangle(x * TILE_SIZE - view.x,
 								y * TILE_SIZE - view.y, img.width, img.height);
 					} else {
@@ -182,3 +174,19 @@ void GameTiles::post_draw(GameState* gs) {
 	}
 
 }
+
+void GameTiles::serialize(SerializeBuffer& serializer) {
+	serializer.write(width);
+	serializer.write(height);
+	serializer.write_vector(tiles);
+}
+
+void GameTiles::deserialize(SerializeBuffer& serializer) {
+	serializer.read(width);
+	serializer.read(height);
+	for (int i = 0; i < tiles.size(); i ++){
+		tiles[i] = TileState();
+	}
+	serializer.read_vector(tiles);
+}
+

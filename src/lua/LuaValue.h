@@ -17,6 +17,7 @@ class Node;
 class LuaValueImpl;
 class GameInst;
 struct lua_State;
+class SerializeBuffer;
 
 typedef int (*lua_CFunction)(lua_State *L);
 
@@ -58,6 +59,11 @@ public:
 			const YAML::Node& root) {
 		table_set_yaml(L, key.c_str(), root);
 	}
+
+	void serialize(lua_State* L, SerializeBuffer& serializer);
+	void deserialize(lua_State* L, SerializeBuffer& serializer);
+
+	bool isnil(lua_State* L);
 private:
 	LuaValueImpl* impl;
 };

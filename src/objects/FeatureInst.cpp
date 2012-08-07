@@ -85,3 +85,15 @@ bool feature_exists_near(GameState* gs, const Pos& p) {
 	return gs->object_radius_test(midx.x, midx.y, 4);
 }
 
+void FeatureInst::serialize(GameState *gs, SerializeBuffer & serializer)
+{
+}
+
+
+
+void FeatureInst::deserialize(GameState *gs, SerializeBuffer & serializer)
+{
+}
+
+
+

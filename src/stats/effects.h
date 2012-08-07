@@ -10,6 +10,7 @@ struct CombatStats;
 struct EffectiveStats;
 struct GameState;
 struct CombatGameInst;
+class SerializeBuffer;
 
 struct Effect {
 	effect_id effectid;
@@ -31,6 +32,9 @@ struct EffectStats {
 	void draw_effect_sprites(GameState* gs, const Pos& p);
 	bool can_rest();
 	Colour effected_colour();
+
+	void serialize(GameState* gs, SerializeBuffer& serializer);
+	void deserialize(GameState* gs, SerializeBuffer& serializer);
 
 	void process(GameState* gs, CombatGameInst* inst,
 			EffectiveStats& effective) const;

@@ -16,6 +16,8 @@ struct ItemEntry;
 struct ProjectileEntry;
 struct WeaponEntry;
 
+class SerializeBuffer;
+
 enum item_flags {
 	NOFLAGS = 0, CURSED = 1, GOLDEN = 2
 };
@@ -40,6 +42,9 @@ struct ItemProperties {
 	}
 
 	bool operator==(const ItemProperties& properties) const;
+
+	void serialize(SerializeBuffer& serialize);
+	void deserialize(SerializeBuffer& serialize);
 };
 
 struct Armour {
@@ -53,6 +58,9 @@ struct Armour {
 			id(id), properties(properties) {
 	}
 	ArmourEntry& armour_entry() const;
+
+	void serialize(SerializeBuffer& serialize);
+	void deserialize(SerializeBuffer& serialize);
 };
 
 struct Projectile {
@@ -71,6 +79,9 @@ struct Projectile {
 	}
 
 	bool operator==(const Projectile& projectile) const;
+
+	void serialize(SerializeBuffer& serialize);
+	void deserialize(SerializeBuffer& serialize);
 };
 
 struct Weapon {
@@ -84,11 +95,13 @@ struct Weapon {
 			id(id), properties(properties) {
 	}
 	bool operator==(const Weapon& weapon) const;
+
+	void serialize(SerializeBuffer& serialize);
+	void deserialize(SerializeBuffer& serialize);
 };
 
 struct Item {
 	item_id id;
-	bool is_artifact;
 	ItemProperties properties;
 
 	ItemEntry& item_entry() const;
@@ -110,6 +123,9 @@ struct Item {
 	}
 
 	bool operator==(const Item& item) const;
+
+	void serialize(SerializeBuffer& serialize);
+	void deserialize(SerializeBuffer& serialize);
 };
 
 #endif /* ITEMS_H_ */

@@ -30,6 +30,9 @@ public:
 	virtual void copy_to(GameInst* inst) const;
 	virtual ProjectileInst* clone() const;
 
+	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
+	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
+
 	sprite_id sprite() const;
 private:
 	static bool bullet_target_hit2(GameInst* self, GameInst* other);

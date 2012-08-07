@@ -13,6 +13,8 @@
 #include "../GameInst.h"
 #include "../GameInstRef.h"
 
+#include "../serialize/SerializeBuffer.h"
+
 class PlayerInst;
 
 //One instance for all levels
@@ -32,6 +34,9 @@ public:
 
 	void players_gain_xp(GameState* gs, int xp);
 	void copy_to(PlayerController& pc) const;
+
+	void serialize(GameState* gs, SerializeBuffer& serializer);
+	void deserialize(GameState* gs, SerializeBuffer& serializer);
 private:
 	GameInstRef _local_player;
 	std::vector<GameInstRef> _players;

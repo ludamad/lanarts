@@ -62,3 +62,15 @@ ItemInst *ItemInst::clone() const {
 	return new ItemInst(*this);
 }
 
+void ItemInst::serialize(GameState *gs, SerializeBuffer & serializer)
+{
+}
+
+
+
+void ItemInst::deserialize(GameState *gs, SerializeBuffer & serializer)
+{
+}
+
+
+

@@ -4,6 +4,7 @@
  */
 
 #include "../data/game_data.h"
+#include "../serialize/SerializeBuffer.h"
 
 #include "items.h"
 
@@ -107,5 +108,57 @@ bool Weapon::operator ==(const Weapon& weapon) const {
 
 bool Item::operator ==(const Item& item) const {
 	return id == item.id && properties == item.properties;
+}
+
+void ItemProperties::serialize(SerializeBuffer& serializer) {
+	serializer.write(magic);
+	serializer.write(physical);
+	serializer.write_int(flags);
+}
+
+void ItemProperties::deserialize(SerializeBuffer& serializer) {
+	serializer.read(magic);
+	serializer.read(physical);
+	serializer.read_int(flags);
+}
+
+void Armour::serialize(SerializeBuffer& serializer) {
+	serializer.write(id);
+	properties.serialize(serializer);
+}
+
+void Armour::deserialize(SerializeBuffer& serializer) {
+	serializer.read(id);
+	properties.deserialize(serializer);
+}
+
+void Projectile::serialize(SerializeBuffer& serializer) {
+	serializer.write(id);
+	properties.serialize(serializer);
+}
+
+void Projectile::deserialize(SerializeBuffer& serializer) {
+	serializer.read(id);
+	properties.deserialize(serializer);
+}
+
+void Weapon::serialize(SerializeBuffer& serializer) {
+	serializer.write(id);
+	properties.serialize(serializer);
+}
+
+void Weapon::deserialize(SerializeBuffer& serializer) {
+	serializer.read(id);
+	properties.deserialize(serializer);
+}
+
+void Item::serialize(SerializeBuffer& serializer) {
+	serializer.write(id);
+	properties.serialize(serializer);
+}
+
+void Item::deserialize(SerializeBuffer& serializer) {
+	serializer.read(id);
+	properties.deserialize(serializer);
 }
 

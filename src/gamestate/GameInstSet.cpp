@@ -16,6 +16,8 @@
 #include "../util/math_util.h"
 
 #include "../objects/AnimatedInst.h"
+#include "../serialize/SerializeBuffer.h"
+#include "../objects/InstTypeEnum.h"
 
 GameInst* const GAMEINST_TOMBSTONE = (GameInst*)1;
 
@@ -145,6 +147,38 @@ void GameInstSet::remove_instance(GameInst* inst) {
 			unit_capacity);
 	__remove_instance(state);
 	deallocation_list.push_back(inst);
+}
+
+void GameInstSet::serialize(GameState* gs, SerializeBuffer& serializer) {
+	serializer.write_int(size());
+	serializer.write_int(next_id);
+	DepthMap::const_iterator it = depthlist_map.end();
+	for (int ind = 0; it != depthlist_map.begin();) {
+		--it;
+		InstanceState* state = it->second.start_of_list;
+		while (state) {
+			GameInst* inst = state->inst;
+			serializer.write_int(get_inst_type(inst));
+			serializer.write_int(inst->id);
+			inst->serialize(gs, serializer);
+			state = state->next_same_depth;
+		}
+	}
+}
+
+void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	clear();
+	int amnt;
+	serializer.read_int(amnt);
+	serializer.read_int(next_id);
+	for (int i = 0; i < amnt; i++) {
+		InstType type;
+		serializer.read_int(type);
+		GameInst* inst = from_inst_type(type);
+		serializer.read_int(inst->id);
+		inst->deserialize(gs, serializer);
+		add_instance(inst, inst->id);
+	}
 }
 
 bool GameInstSet::within_bounds_check(const Pos& c) {
@@ -333,6 +367,7 @@ void GameInstSet::clear() {
 	}
 	next_id = 1;
 	unit_amnt = 0;
+	depthlist_map.clear();
 	memset(unit_set, 0, unit_capacity * sizeof(InstanceState));
 }
 

@@ -28,6 +28,9 @@ public:
 					false), teamid(teamid), mobid(0), sprite(sprite), kills(0), base_stats(
 					base_stats) {
 	}
+	CombatGameInst() :
+			GameInst(0, 0, 0) {
+	}
 	virtual ~CombatGameInst() {
 	}
 
@@ -37,6 +40,9 @@ public:
 	virtual void draw(GameState* gs);
 	virtual void update_field_of_view(GameState* gs);
 	virtual bool within_field_of_view(const Pos& pos) =0;
+
+	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
+	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
 
 	virtual unsigned int integrity_hash();
 
@@ -89,6 +95,8 @@ public:
 
 	team_id& team();
 
+//members
+public:
 	float vx, vy;
 	float rx, ry;
 protected:
@@ -97,10 +105,7 @@ protected:
 	int mobid;
 	sprite_id sprite;
 	int kills;
-//	PathInfo path;
 private:
-	void ensure_valid_direction(GameState* gs, float speed);
-
 	CombatStats base_stats;
 	EffectiveStats estats;
 };

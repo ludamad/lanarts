@@ -1,3 +1,7 @@
+#include <string>
+#include <cstring>
+#include <cstdlib>
+
 #include <yaml-cpp/yaml.h>
 
 extern "C" {
@@ -5,12 +9,11 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-#include "LuaValue.h"
-#include <string>
-#include <cstring>
-#include <cstdlib>
+#include "../serialize/SerializeBuffer.h"
 
+#include "LuaValue.h"
 #include "lua_api.h"
+#include "lmarshal.h"
 
 //YAML related helper functions
 
@@ -173,6 +176,7 @@ public:
 	}
 
 	void pop(lua_State* L) {
+		this->L = L;
 		int valueidx = lua_gettop(L);
 		lua_pushlightuserdata(L, this); /* push address as key */
 		lua_pushvalue(L, valueidx); /*Clone value*/
@@ -188,6 +192,15 @@ public:
 
 	bool is_empty() {
 		return empty;
+	}
+
+	void serialize(lua_State* L, SerializeBuffer& serializer) {
+		push(L);
+		lua_serialize(serializer, L, -1);
+	}
+	void deserialize(lua_State* L, SerializeBuffer& serializer) {
+		lua_deserialize(serializer, L);
+		pop(L);
 	}
 
 private:
@@ -343,5 +356,36 @@ void lua_gameinst_cached_callback(lua_State* L, LuaValue& cache,
 	cached_gameinst_push(L, cache, inst);
 	lua_pop(L, 1);
 	lua_call(L, 1, 0);
+}
+
+void LuaValue::serialize(lua_State* L, SerializeBuffer& serializer) {
+	if (!impl) {
+		serializer.write((int)0);
+	} else {
+		impl->serialize(L, serializer);
+	}
+}
+
+void LuaValue::deserialize(lua_State* L, SerializeBuffer& serializer) {
+	if (!impl) {
+		int size;
+		serializer.peek(size);
+		if (size == 0) {
+			serializer.read(size);
+			return;
+		}
+		impl = new LuaValueImpl();
+	}
+	impl->deserialize(L, serializer);
+}
+
+bool LuaValue::isnil(lua_State* L) {
+	if (!impl) {
+		return true;
+	}
+	impl->push(L);
+	bool nilval = lua_isnil(L, -1);
+	lua_pop(L, 1);
+	return nilval;
 }
 

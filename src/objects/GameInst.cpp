@@ -9,6 +9,8 @@
  */
 
 #include "GameInst.h"
+
+#include "../serialize/SerializeBuffer.h"
 #include "../gamestate/GameState.h"
 #include "../display/display.h"
 
@@ -26,6 +28,7 @@ void GameInst::init(GameState* gs) {
 
 void GameInst::deinit(GameState* gs) {
 	id = 0;
+	current_level = -1;
 }
 
 unsigned int GameInst::integrity_hash() {
@@ -43,6 +46,20 @@ void GameInst::update_position(float newx, float newy) {
 	this->x = round(newx), this->y = round(newy);
 }
 
+void GameInst::serialize(GameState* gs, SerializeBuffer& serializer) {
+	//Write the plain-old-data region
+	//Dont save reference count or id
+	SERIALIZE_POD_REGION(serializer, this, last_x, current_level);
+	lua_variables.serialize(gs->get_luastate(), serializer);
+}
+
+void GameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	//Read the plain-old-data region
+	//Dont load reference count or id
+	DESERIALIZE_POD_REGION(serializer, this, last_x, current_level);
+	lua_variables.deserialize(gs->get_luastate(), serializer);
+}
+
 void GameInst::free_reference() {
 	reference_count--;
 	if (reference_count <= 0) {
@@ -55,3 +72,4 @@ void GameInst::free_reference() {
 //	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
 //	*inst = *this;
 //}
+

@@ -31,6 +31,10 @@ public:
 	bool has_armour(){ return armour.id > 0; }
 	bool has_projectile(){ return projectile.id > -1; }
 
+
+	void serialize(SerializeBuffer& serializer);
+	void deserialize(SerializeBuffer& serializer);
+
 	Inventory inventory;
 	Weapon weapon;
 	Projectile projectile;

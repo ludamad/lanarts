@@ -9,6 +9,8 @@
 #include "projectile_data.h"
 #include "weapon_data.h"
 
+#include "../serialize/SerializeBuffer.h"
+
 bool Equipment::valid_to_use_projectile(const Projectile& proj) {
 	if (!proj.valid_projectile())
 		return false;
@@ -101,3 +103,22 @@ void Equipment::use_ammo(int amnt) {
 		projectile_amnt = 0;
 	}
 }
+
+void Equipment::serialize(SerializeBuffer& serializer) {
+	inventory.serialize(serializer);
+	weapon.serialize(serializer);
+	projectile.serialize(serializer);
+	serializer.write_int(projectile_amnt);
+	armour.serialize(serializer);
+	serializer.write_int(money);
+}
+
+void Equipment::deserialize(SerializeBuffer& serializer) {
+	inventory.deserialize(serializer);
+	weapon.deserialize(serializer);
+	projectile.deserialize(serializer);
+	serializer.read_int(projectile_amnt);
+	armour.deserialize(serializer);
+	serializer.read_int(money);
+}
+

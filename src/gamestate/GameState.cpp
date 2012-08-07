@@ -20,6 +20,8 @@ extern "C" {
 #include "../levelgen/dungeon_data.h"
 #include "../stats/class_data.h"
 
+#include "../serialize/SerializeBuffer.h"
+
 #include "../display/display.h"
 
 #include "../net/GameNetConnection.h"
@@ -134,11 +136,56 @@ bool GameState::level_has_player() {
 	return player_controller().level_has_player(world.get_current_level_id());
 }
 
+static void safe_deserialize(GameInst* inst, GameState* gs,
+		SerializeBuffer& serializer) {
+	int lx = inst->last_x, ly = inst->last_y;
+	inst->deserialize(gs, serializer);
+	inst->last_x = lx, inst->last_y = ly;
+
+}
+void GameState::save_game(const char* filename) {
+	FILE* file = fopen(filename, "wb");
+	SerializeBuffer serializer = SerializeBuffer::file_writer(file);
+	tiles().serialize(serializer);
+	get_level()->inst_set.serialize(this, serializer);
+
+//	std::vector<GameInst*> insts = get_level()->inst_set.to_vector();
+//	for (size_t i = 0; i < insts.size(); i++) {
+//		insts[i]->serialize(this, serializer);
+//	}
+
+	serializer.flush();
+	fclose(file);
+}
+
+void GameState::load_game(const char* filename) {
+	FILE* file = fopen(filename, "rb");
+	SerializeBuffer serializer = SerializeBuffer::file_reader(file);
+	tiles().deserialize(serializer);
+	get_level()->inst_set.deserialize(this, serializer);
+
+//	std::vector<GameInst*> insts = get_level()->inst_set.to_vector();
+//	for (size_t i = 0; i < insts.size(); i++) {
+//		safe_deserialize(insts[i], this, serializer);
+//	}
+
+	fclose(file);
+}
+
+obj_id GameState::add_instance(level_id level, GameInst* inst) {
+	level_id curr = game_world().get_current_level_id();
+	game_world().set_current_level(level);
+	obj_id id = add_instance(inst);
+	game_world().set_current_level(curr);
+	return id;
+}
+
+GameInst* GameState::get_instance(level_id level, obj_id id) {
+	return game_world().get_level(level)->inst_set.get_instance(id);
+}
+
 int GameState::handle_event(SDL_Event* event) {
 	if (get_level()) {
-		if (dialogs.handle_event(this, event))
-			return 0;
-
 		if (hud.handle_event(this, event))
 			return 0;
 	}
@@ -233,7 +280,7 @@ void GameState::draw(bool drawhud) {
 
 	update_display();
 
-//	glFinish();// XXX: Apparently glFinish is not recommended
+//	glFinish(); // XXX: Apparently glFinish is not recommended
 }
 
 obj_id GameState::add_instance(GameInst* inst) {

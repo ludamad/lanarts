@@ -5,8 +5,7 @@
  *      Author: 100397561
  */
 
-#include <lua/lunar.h>
-
+#include "lunar.h"
 #include "lua_api.h"
 
 #include "../stats/stats.h"

@@ -18,6 +18,7 @@
 
 struct lua_State;
 class GameState;
+class SerializeBuffer;
 //Base class for game instances
 
 class GameInst {
@@ -36,7 +37,11 @@ public:
 	virtual void deinit(GameState* gs);
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
+
 	virtual void copy_to(GameInst* inst) const = 0;
+
+	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
+	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
 	virtual GameInst* clone() const = 0;
 	//Used for integrity checking
 	virtual unsigned int integrity_hash();

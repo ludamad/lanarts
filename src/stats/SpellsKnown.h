@@ -11,6 +11,7 @@
 #include "../lanarts_defines.h"
 
 struct SpellEntry;
+class SerializeBuffer;
 
 class SpellsKnown {
 public:
@@ -26,6 +27,10 @@ public:
 	void add_spell(spell_id slot);
 	void remove_spell(spell_id slot);
 	bool has_spell(spell_id slot);
+
+	void serialize(SerializeBuffer& serializer);
+	void deserialize(SerializeBuffer& serializer);
+
 private:
 	std::vector<spell_id> spells;
 };

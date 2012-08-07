@@ -1,5 +1,4 @@
 #include <cstring>
-#include <lua/lunar.h>
 
 #include "../stats/effect_data.h"
 #include "../stats/item_data.h"
@@ -12,6 +11,7 @@
 #include "../objects/GameInst.h"
 #include "../objects/player/PlayerInst.h"
 
+#include "lunar.h"
 #include "lua_api.h"
 
 class GameInstLuaBinding {

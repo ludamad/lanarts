@@ -31,6 +31,9 @@ public:
 		RADIUS = 10, DEPTH = 75, LINEOFSIGHT = 7
 	};
 	PlayerInst(const CombatStats& stats, int x, int y, bool local = true);
+	PlayerInst() :
+			fieldofview(LINEOFSIGHT) {
+	}
 
 	virtual ~PlayerInst();
 	virtual void init(GameState* gs);
@@ -39,6 +42,10 @@ public:
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
 	virtual void copy_to(GameInst* inst) const;
+
+	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
+	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
+
 	virtual PlayerInst* clone() const;
 	void gain_xp(GameState* gs, int xp);
 	void queue_io_actions(GameState* gs);
@@ -105,7 +112,6 @@ private:
 	void use_spell(GameState* gs, const GameAction& action);
 	void use_rest(GameState* gs, const GameAction& action);
 	void use_item(GameState* gs, const GameAction& action);
-
 
 	void pickup_item(GameState* gs, const GameAction& action);
 	void drop_item(GameState* gs, const GameAction& action);

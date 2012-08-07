@@ -12,24 +12,21 @@
 #include "../gamestate/GameTiles.h"
 #include "../display/tile_data.h"
 
-
 using namespace std;
 
 /*fov::fov(GameState *gs, int radius, int ptx, int pty, int sub_squares) :
-			gs(gs), radius(radius), ptx(ptx), pty(pty), sub_squares(sub_squares),
-		{
+ gs(gs), radius(radius), ptx(ptx), pty(pty), sub_squares(sub_squares),
+ {
 
-}
-*/
-fov::fov(int radius, int sub_squares):
-		gs(NULL), radius(radius), sub_squares(sub_squares),
-		m(radius * sub_squares, radius * sub_squares,
-				radius * sub_squares, radius * sub_squares) {
-	radsub = radius * sub_squares;
+ }
+ */
+fov::fov(int radius) :
+		gs(NULL), radius(radius), m(radius, radius, radius, radius) {
+	radsub = radius;
 	int dim = radsub * 2 + 1;
 	sight_mask = new char[dim * dim];
 }
-void fov::calculate(GameState* gs, int ptx, int pty){
+void fov::calculate(GameState* gs, int ptx, int pty) {
 	this->gs = gs;
 	this->ptx = ptx, this->pty = pty;
 	for (int y = -radsub; y <= radsub; y++) {
@@ -53,7 +50,6 @@ fov::~fov() {
 int fov::isBlocked(short destX, short destY) {
 	GameTiles & tiles = gs->tiles();
 	int px = ptx + destX, py = pty + destY;
-	px = (px)/sub_squares; py = (py)/sub_squares;
 	bool outof = (px < 0 || py < 0 || px >= tiles.tile_width()
 			|| py >= tiles.tile_height());
 	if (outof)
@@ -79,16 +75,16 @@ bool fov::within_fov(int grid_x, int grid_y) {
 	return sight_mask[dy * dim + dx];
 }
 
-void fov::matches(int sqr_x, int sqr_y, char *sub_sqrs) {
-	memset(sub_sqrs, 0, sub_squares*sub_squares);
-	int sx = sqr_x * sub_squares, ex = sx + sub_squares;
-	int sy = sqr_y * sub_squares, ey = sy + sub_squares;
+void fov::matches(int sqr_x, int sqr_y, char* sub_sqrs) {
+	memset(sub_sqrs, 0, 1);
+	int sx = sqr_x, ex = sx + 1;
+	int sy = sqr_y, ey = sy + 1;
 	int dim = radsub * 2 + 1;
-	sx = max(ptx-radsub,sx), ex = min(ex, ptx+radsub+1);
-	sy = max(pty-radsub,sy), ey = min(ey, pty+radsub+1);
+	sx = max(ptx - radsub, sx), ex = min(ex, ptx + radsub + 1);
+	sy = max(pty - radsub, sy), ey = min(ey, pty + radsub + 1);
 	for (int y = sy; y < ey; y++) {
 		for (int x = sx; x < ex; x++) {
-			int sub_ind = (y-sy)*sub_squares + (x - sx);
+			int sub_ind = (y - sy) + (x - sx);
 			int dx = x - ptx + radsub, dy = y - pty + radsub;
 			sub_sqrs[sub_ind] = sight_mask[dim * dy + dx];
 		}
@@ -96,30 +92,29 @@ void fov::matches(int sqr_x, int sqr_y, char *sub_sqrs) {
 
 }
 
-static int alloc_mask_size(int w, int h){
-	static const int BITS_PER_INT = sizeof(int)*8;
+static int alloc_mask_size(int w, int h) {
+	static const int BITS_PER_INT = sizeof(int) * 8;
 
 	int cellCount = w * h;
 	int intCount = cellCount / BITS_PER_INT;
-	if (cellCount % BITS_PER_INT != 0){
-	  ++intCount;
+	if (cellCount % BITS_PER_INT != 0) {
+		++intCount;
 	}
 	return intCount;
 }
 
-
 fov* fov::clone() const {
-	fov* ret = new fov(radius, sub_squares);
+	fov* ret = new fov(radius);
 
 	int dim = radsub * 2 + 1;
-    memcpy(ret->sight_mask, this->sight_mask, dim*dim);
+	memcpy(ret->sight_mask, this->sight_mask, dim * dim);
 
-    ret->gs = this->gs;
-    ret->ptx = this->ptx, ret->pty = this->pty;
+	ret->gs = this->gs;
+	ret->ptx = this->ptx, ret->pty = this->pty;
 
-    permissiveMaskT* mask = ret->m.getMask();
-    int size = alloc_mask_size(mask->width, mask->height);
-    memcpy( ret->m.getMask()->mask, this->m.getMask(), size * sizeof(int));
+	permissiveMaskT* mask = ret->m.getMask();
+	int size = alloc_mask_size(mask->width, mask->height);
+	memcpy(ret->m.getMask()->mask, this->m.getMask(), size * sizeof(int));
 
 	return ret;
 }

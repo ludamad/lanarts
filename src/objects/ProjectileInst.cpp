@@ -238,6 +238,14 @@ sprite_id ProjectileInst::sprite() const {
 	return pentry.attack_sprite;
 }
 
+void ProjectileInst::serialize(GameState *gs, SerializeBuffer & serializer)
+{
+}
+
+void ProjectileInst::deserialize(GameState *gs, SerializeBuffer & serializer)
+{
+}
+
 bool ProjectileInst::bullet_target_hit2(GameInst* self, GameInst* other) {
 	return ((ProjectileInst*)self)->sole_target == other->id;
 }

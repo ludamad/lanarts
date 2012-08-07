@@ -24,7 +24,7 @@ void PlayerController::clear() {
 
 void PlayerController::register_player(PlayerInst* player) {
 	_players.push_back(player);
-	if (player->is_local_player()){
+	if (player->is_local_player()) {
 		_local_player = player;
 	}
 }
@@ -67,6 +67,31 @@ void PlayerController::copy_to(PlayerController& pc) const {
 	pc._local_player = _local_player;
 	pc._players = _players;
 	LANARTS_ASSERT(false /*This has to be fixed to work with object ids!*/);
+}
+
+static void write_inst_ref(GameInstRef& ref, GameState* gs, SerializeBuffer& serializer) {
+	serializer.write_int(ref->id);
+	serializer.write_int(ref->current_level);
+}
+static void read_inst_ref(GameInstRef& ref, GameState* gs, SerializeBuffer& serializer) {
+	int id, level;
+	serializer.read_int(id);
+	serializer.read_int(level);
+	ref = gs->get_instance(level, id);
+}
+void PlayerController::serialize(GameState* gs, SerializeBuffer& serializer) {
+	write_inst_ref(_local_player, gs, serializer);
+	serializer.write_int(_players.size());
+	for (int i = 0; i < _players.size(); i++){
+
+	}
+}
+
+void PlayerController::deserialize(GameState* gs,
+		SerializeBuffer & serializer) {
+
+	serializer.write_int(_local_player->id);
+	serializer.write_int(_local_player->current_level);
 }
 
 //for (int i = 0; i < pids.size(); i++) {

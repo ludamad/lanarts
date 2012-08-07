@@ -17,6 +17,7 @@
 #include <map>
 
 class GameState;
+class SerializeBuffer;
 
 class GameInstSet {
 public:
@@ -57,6 +58,9 @@ public:
 	void copy_to(GameInstSet& inst_set) const;
 
 	void clear();
+
+	void serialize(GameState* gs, SerializeBuffer& serializer);
+	void deserialize(GameState* gs, SerializeBuffer& serializer);
 private:
 
 	//Internal Structures:

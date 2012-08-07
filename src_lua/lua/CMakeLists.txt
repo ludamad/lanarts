@@ -48,7 +48,6 @@ set( lua_src
 	lua.h
 	luaconf.h
 	lualib.h
-	lunar.h
 	lundump.c
 	lundump.h
 	lvm.c

@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <SDL.h>
+#include <cstdio>
 
 #include "../display/font.h"
 
@@ -44,6 +45,8 @@ public:
 	~GameState();
 	/* Call after construction, before game starts: */
 	void init_game();
+	void save_game(const char* filename);
+	void load_game(const char* filename);
 
 	/* Primary events */
 	void draw(bool drawhud = true);
@@ -55,7 +58,9 @@ public:
 
 	/* Instance retrieval and removal functions */
 	GameInst* get_instance(obj_id id);
+	GameInst* get_instance(level_id level, obj_id id);
 	obj_id add_instance(GameInst* inst);
+	obj_id add_instance(level_id level, GameInst* inst);
 	void remove_instance(GameInst* inst);
 	//Skip an instance id as if we were making an instance
 	//used for synchronization purposes in network play
@@ -203,8 +208,6 @@ public:
 	/* Make sure rooms exist & portals point to valid locations in next room */
 	void ensure_level_connectivity(int roomid1, int roomid2);
 
-	void serialize(FILE* file);
-
 private:
 	int handle_event(SDL_Event* event);
 
@@ -214,7 +217,6 @@ private:
 	int frame_n;
 
 	GameNetConnection connection;
-	GameDialogs dialogs;
 	GameHud hud;
 	GameView _view;
 	GameWorld world;

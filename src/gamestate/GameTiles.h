@@ -12,21 +12,20 @@
 #include "../lanarts_defines.h"
 
 class GameState;
+class SerializeBuffer;
 
 class GameTiles {
 public:
 	GameTiles(int width, int height);
 	~GameTiles();
 
-	void step(GameState *gs);
+	void step(GameState* gs);
 
-	void pre_draw(GameState *gs);
-	void post_draw(GameState *gs);
+	void pre_draw(GameState* gs);
+	void post_draw(GameState* gs);
 
 	int tile_width();
 	int tile_height();
-
-	Tile* tile_array();
 
 	Tile& get(int x, int y);
 
@@ -39,11 +38,18 @@ public:
 
 	void clear();
 	void copy_to(GameTiles& t) const;
+	void serialize(SerializeBuffer& serializer);
+	void deserialize(SerializeBuffer& serializer);
 private:
-	char* seen_tiles;
-	Tile* tiles;
+	struct TileState {
+		bool seen, solid;
+		Tile tile;
+		TileState() :
+				seen(0), solid(1) {
+		}
+	};
 	int width, height;
-	std::vector<bool> solid_tiles;
+	std::vector<TileState> tiles;
 };
 
 #endif /* GAMETILES_H_ */

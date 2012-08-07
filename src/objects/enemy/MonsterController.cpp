@@ -222,6 +222,9 @@ void MonsterController::pre_step(GameState* gs) {
 		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[i]);
 		lua_gameinst_callback(gs->get_luastate(), e->etype().step_event, e);
 		update_velocity(gs, e);
+		EnemyBehaviour& eb = e->behaviour();
+		coll_avoid.set_position(eb.simulation_id, e->rx, e->ry);
+		coll_avoid.set_preferred_velocity(eb.simulation_id, e->vx, e->vy);
 	}
 
 	coll_avoid.step();

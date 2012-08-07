@@ -14,7 +14,7 @@ class GameState;
 
 class fov {
 public:
-	fov(int radius, int sub_squares = 1);
+	fov(int radius);
 	~fov();
 	void calculate(GameState* gs, int ptx, int pty);
     bool within_fov(int grid_x, int grid_y);
@@ -27,7 +27,7 @@ private:
     char* sight_mask;
     GameState* gs;
     int radius, radsub;
-    int ptx, pty, sub_squares;
+    int ptx, pty;
     permissive::maskT m;
 public://do-not-use
     int isBlocked(short destX, short destY);

@@ -33,6 +33,9 @@ public:
 
 	virtual bool within_field_of_view(const Pos& pos);
 
+	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
+	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
+
 	EnemyBehaviour& behaviour() { return eb; }
 	EnemyEntry& etype();
 	int xpworth(){

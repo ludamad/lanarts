@@ -17,6 +17,7 @@
 struct lua_State;
 class CombatGameInst;
 class GameState;
+class SerializeBuffer;
 
 /* Represents stats related to a single attack option */
 struct AttackStats {
@@ -58,6 +59,9 @@ struct CombatStats {
 
 	void gain_level();
 	int gain_xp(int amnt);
+
+	void serialize(GameState* gs, SerializeBuffer& serializer);
+	void deserialize(GameState* gs, SerializeBuffer& serializer);
 
 	/* members */
 	CoreStats core;

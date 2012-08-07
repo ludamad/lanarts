@@ -102,10 +102,7 @@ static BBox text_console_area(const BBox& view_box) {
 GameHud::GameHud(const BBox& sidebar_box, const BBox& view_box) :
 		console(text_console_area(view_box)), sidebar(sidebar_box), action_bar(
 				action_bar_area(view_box)), sidebar_box(sidebar_box), view_box(
-				view_box), bg_colour(0, 0, 0), minimap_arr(NULL) {
-}
-GameHud::~GameHud() {
-	delete[] minimap_arr;
+				view_box), bg_colour(0, 0, 0){
 }
 
 void GameHud::reset_slot_selected() {

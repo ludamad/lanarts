@@ -4,6 +4,8 @@
  */
 
 #include "../display/sprite_data.h"
+#include "../serialize/SerializeBuffer.h"
+
 #include "../stats/effect_data.h"
 #include "../stats/projectile_data.h"
 #include "../stats/weapon_data.h"
@@ -320,6 +322,20 @@ unsigned int CombatGameInst::integrity_hash() {
 	combine_hash(hash, (unsigned int&)vx, (unsigned int&)vy);
 	combine_stat_hash(hash, stats());
 	return hash;
+}
+
+void CombatGameInst::serialize(GameState* gs, SerializeBuffer& serializer) {
+	GameInst::serialize(gs, serializer);
+	SERIALIZE_POD_REGION(serializer, this, vx, kills);
+	base_stats.serialize(gs, serializer);
+	serializer.write(estats);
+}
+
+void CombatGameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	GameInst::deserialize(gs, serializer);
+	DESERIALIZE_POD_REGION(serializer, this, vx, kills);
+	base_stats.deserialize(gs, serializer);
+	serializer.read(estats);
 }
 
 team_id& CombatGameInst::team() {

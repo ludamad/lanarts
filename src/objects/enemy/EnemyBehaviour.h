@@ -7,6 +7,8 @@
 
 #include "../GameInst.h"
 
+class SerializeBuffer;
+
 struct EnemyRandomization {
 	enum {
 		SUCCESSFUL_HIT_MAXTIME = 200, DAMAGE_TAKEN_TIMETHRESHOLD = 200
@@ -57,11 +59,12 @@ struct EnemyBehaviour {
 	};
 
 	std::vector<Pos> path;
+	Action current_action;
+
 	int current_node;
 	int path_cooldown;
 
 	float force_x, force_y;
-	Action current_action;
 	int chase_timeout;
 	obj_id chasing_player;
 	int simulation_id;
@@ -71,14 +74,17 @@ struct EnemyBehaviour {
 	Pos path_start;
 	int path_steps;
 	EnemyBehaviour() :
-			current_node(0), path_cooldown(0), force_x(0), force_y(0), current_action(
-					INACTIVE), chase_timeout(0), chasing_player(0), simulation_id(
+			current_action(INACTIVE), current_node(0), path_cooldown(0), force_x(
+					0), force_y(0), chase_timeout(0), chasing_player(0), simulation_id(
 					0), path_start(0, 0), path_steps(0) {
 	}
 	void step() {
 		cooldown_step(chase_timeout);
 		randomization.step();
 	}
+
+	void serialize(GameState* gs, SerializeBuffer& serializer);
+	void deserialize(GameState* gs, SerializeBuffer& serializer);
 };
 
 #endif /* ENEMYBEHAVIOUR_H_ */

@@ -9,6 +9,13 @@ include(FindFreetype)
 
 include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} ../src_yaml/yaml-cpp/include ../src_net/ ../src_rvo2/RVO2 ../src_lua)
 
+set( lanarts_tests
+	tests/tests.h
+	tests/tests.cpp
+	tests/lua_tests.cpp
+	tests/lua_serialize_tests.cpp
+)
+
 set( lanarts_src
 
 	collision_avoidance/CollisionAvoidance.cpp
@@ -18,6 +25,7 @@ set( lanarts_src
 	combat_logic/combat_logic.cpp
 	combat_logic/movement_logic.cpp
 
+	lua/lmarshal.cpp
 	lua/lua_combatstats.cpp
 	lua/lua_effectivestats.cpp
 
@@ -49,6 +57,8 @@ set( lanarts_src
 	fov/fov.cpp
 	fov/impl/permissive-fov.cc
 
+	serialize/SerializeBuffer.cpp
+	
 	stats/combat_stats.cpp
 	stats/effects.cpp
 	stats/Equipment.cpp
@@ -117,6 +127,7 @@ set( lanarts_src
 
 	objects/CombatInstController.cpp
 	gamestate/IOController.cpp
+	objects/enemy/EnemyBehaviour.cpp
 	objects/enemy/MonsterController.cpp
 	objects/enemy/MonsterControllerActions.cpp
 	objects/player/PlayerController.cpp
@@ -172,10 +183,12 @@ set( lanarts_include
 	fov/impl/permissive-fov.h
 	fov/impl/permissive-fov-cpp.h
 
+	lua/lmarshal.h
+	lua/lunar.h
 	lua/lua_api.h
-	lua/lua_impl_util.h
 
-
+	serialize/SerializeBuffer.h
+	
 	stats/combat_stats.h
 	stats/Inventory.h
 	stats/items.h
@@ -227,6 +240,7 @@ set( lanarts_include
 	objects/enemy/MonsterController.h
 	objects/player/PlayerController.h
 	objects/CombatInstController.h
+	objects/InstTypeEnum.h
 
 	interface/GameChat.h
 	interface/GameDialogs.h
@@ -263,7 +277,8 @@ set( lanarts_include
 
 add_executable( lanarts
              ${lanarts_src}
-             ${lanarts_include} )
+             ${lanarts_include}
+             ${lanarts_tests} )
 
 
 target_link_libraries( lanarts

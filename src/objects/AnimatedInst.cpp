@@ -60,3 +60,15 @@ AnimatedInst *AnimatedInst::clone() const {
 	return new AnimatedInst(*this);
 }
 
+void AnimatedInst::serialize(GameState *gs, SerializeBuffer & serializer)
+{
+}
+
+
+
+void AnimatedInst::deserialize(GameState *gs, SerializeBuffer & serializer)
+{
+}
+
+
+

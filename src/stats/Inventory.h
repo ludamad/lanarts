@@ -12,6 +12,8 @@
 
 #include "items.h"
 
+class SerializeBuffer;
+
 const int INVENTORY_SIZE = 40;
 
 struct ItemSlot {
@@ -40,6 +42,9 @@ public:
 
 	int find_slot(item_id item);
 	size_t last_filled_slot() const;
+
+	void serialize(SerializeBuffer& serializer);
+	void deserialize(SerializeBuffer& serializer);
 private:
 	std::vector<ItemSlot> items;
 };
