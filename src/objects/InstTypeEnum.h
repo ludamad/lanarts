@@ -24,7 +24,7 @@ enum InstType {
 	ITEM_INST,
 	PROJECTILE_INST,
 	SCRIPTED_INST,
-	ERROR
+	INVALID_INST
 };
 
 inline InstType get_inst_type(GameInst* inst) {
@@ -45,7 +45,7 @@ inline InstType get_inst_type(GameInst* inst) {
 	} else if (dynamic_cast<ScriptedInst*>(inst)) {
 		return SCRIPTED_INST;
 	}LANARTS_ASSERT(false);
-	return ERROR;
+	return INVALID_INST;
 }
 
 inline bool is_inst_type(GameInst* inst, InstType type) {

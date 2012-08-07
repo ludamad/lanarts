@@ -13,7 +13,7 @@
 #include "../GameInst.h"
 #include "../GameInstRef.h"
 
-#include "../serialize/SerializeBuffer.h"
+#include "../../serialize/SerializeBuffer.h"
 
 class PlayerInst;
 

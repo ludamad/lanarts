@@ -16,10 +16,12 @@
 #include <windows.h>
 const long long DELTA_EPOCH_IN_MICROSECS= 11644473600000000;
 
+#ifndef _TIMEVAL_DEFINED
 struct timeval {
 	int tv_sec; /* seconds */
 	int tv_usec; /* microseconds */
 };
+#endif
 
 int gettimeofday(struct timeval *tv, void* notused) {
 	FILETIME ft;
