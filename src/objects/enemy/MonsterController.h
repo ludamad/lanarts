@@ -64,7 +64,7 @@ public:
     void finish_copy(GameLevelState* level);
 
 private:
-    void set_monster_headings(GameState *gs, std::vector<EnemyOfInterest> & eois);
+    void set_monster_headings(GameState* gs, std::vector<EnemyOfInterest> & eois);
     void update_position(GameState* gs, EnemyInst* e);
     void update_velocity(GameState* gs, EnemyInst* e);
     /*returns an index into the player_simids vector*/

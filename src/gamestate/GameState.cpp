@@ -149,10 +149,7 @@ void GameState::save_game(const char* filename) {
 	tiles().serialize(serializer);
 	get_level()->inst_set.serialize(this, serializer);
 
-//	std::vector<GameInst*> insts = get_level()->inst_set.to_vector();
-//	for (size_t i = 0; i < insts.size(); i++) {
-//		insts[i]->serialize(this, serializer);
-//	}
+	player_controller().serialize(this, serializer);
 
 	serializer.flush();
 	fclose(file);
@@ -164,11 +161,7 @@ void GameState::load_game(const char* filename) {
 	tiles().deserialize(serializer);
 	get_level()->inst_set.deserialize(this, serializer);
 
-//	std::vector<GameInst*> insts = get_level()->inst_set.to_vector();
-//	for (size_t i = 0; i < insts.size(); i++) {
-//		safe_deserialize(insts[i], this, serializer);
-//	}
-
+	player_controller().deserialize(this, serializer);
 	fclose(file);
 }
 

@@ -69,11 +69,13 @@ void PlayerController::copy_to(PlayerController& pc) const {
 	LANARTS_ASSERT(false /*This has to be fixed to work with object ids!*/);
 }
 
-static void write_inst_ref(GameInstRef& ref, GameState* gs, SerializeBuffer& serializer) {
+static void write_inst_ref(GameInstRef& ref, GameState* gs,
+		SerializeBuffer& serializer) {
 	serializer.write_int(ref->id);
 	serializer.write_int(ref->current_level);
 }
-static void read_inst_ref(GameInstRef& ref, GameState* gs, SerializeBuffer& serializer) {
+static void read_inst_ref(GameInstRef& ref, GameState* gs,
+		SerializeBuffer& serializer) {
 	int id, level;
 	serializer.read_int(id);
 	serializer.read_int(level);
@@ -82,16 +84,21 @@ static void read_inst_ref(GameInstRef& ref, GameState* gs, SerializeBuffer& seri
 void PlayerController::serialize(GameState* gs, SerializeBuffer& serializer) {
 	write_inst_ref(_local_player, gs, serializer);
 	serializer.write_int(_players.size());
-	for (int i = 0; i < _players.size(); i++){
-
+	for (int i = 0; i < _players.size(); i++) {
+		write_inst_ref(_players[i], gs, serializer);
 	}
 }
-
 void PlayerController::deserialize(GameState* gs,
 		SerializeBuffer & serializer) {
+	read_inst_ref(_local_player, gs, serializer);
+	int size;
+	serializer.read_int(size);
+	_players.resize(size);
 
-	serializer.write_int(_local_player->id);
-	serializer.write_int(_local_player->current_level);
+	for (int i = 0; i < size; i++) {
+		read_inst_ref(_players[i], gs, serializer);
+	}
+
 }
 
 //for (int i = 0; i < pids.size(); i++) {

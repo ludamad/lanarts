@@ -369,6 +369,7 @@ void GameInstSet::clear() {
 	unit_amnt = 0;
 	depthlist_map.clear();
 	memset(unit_set, 0, unit_capacity * sizeof(InstanceState));
+	memset(unit_grid, 0, grid_w * grid_h * sizeof(InstanceLinkedList));
 }
 
 //TODO: Make collisionlist entry positions deterministic -or- make collision functions always return the same object

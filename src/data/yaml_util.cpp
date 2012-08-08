@@ -164,8 +164,10 @@ CombatStats parse_combat_stats(const YAML::Node& n) {
 	core.magic = parse_defaulted(n, "magic", 0);
 	core.willpower = parse_defaulted(n, "willpower", 0);
 
-	core.physical_reduction = parse_defaulted(n, "reduction", 0);
-	core.magic_reduction = parse_defaulted(n, "magic_reduction", 0);
+//	core.physical_reduction = parse_defaulted(n, "reduction", 0);
+//	LANARTS_ASSERT(core.physical_reduction == 0);
+//	core.magic_reduction = parse_defaulted(n, "magic_reduction", 0);
+//	LANARTS_ASSERT(core.magic_reduction == 0);
 
 	class_stats.xpneeded = parse_defaulted(n, "xpneeded",
 			experience_needed_formula(1));
