@@ -13,11 +13,11 @@ enemies:
     unique: yes
     stats:
         attacks: [ { weapon: Basic Melee}, { projectile: Longer Range Blue Blast} ]
-        movespeed: 2.5
+        movespeed: 3.5
         hp: 150
         hpregen: 0.1
         strength: 25
-        magic: 20
+        magic: 30
         defence: 30
         willpower: 30
 
