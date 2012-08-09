@@ -131,6 +131,7 @@ set( lanarts_src
 	objects/enemy/MonsterController.cpp
 	objects/enemy/MonsterControllerActions.cpp
 	objects/player/PlayerController.cpp
+	objects/TeamRelations.cpp
 	
 	objects/store/StoreInventory.cpp
 	objects/store/StoreInst.cpp
@@ -263,6 +264,7 @@ set( lanarts_include
 
 	objects/store/StoreInventory.h
 	objects/store/StoreInst.h
+	objects/TeamRelations.h
 	
 	objects/CombatGameInst.h
 	objects/GameInst.h

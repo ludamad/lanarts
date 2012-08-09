@@ -87,4 +87,23 @@ struct EnemyBehaviour {
 	void deserialize(GameState* gs, SerializeBuffer& serializer);
 };
 
+struct EnemyAIPath {
+	std::vector<Pos> nodes;
+	Pos start_position;
+	bool path_steps;
+};
+struct EnemyAction {
+
+};
+struct _EnemyAIState {
+	enum Action {
+		INACTIVE = 0, FOLLOWING_PATH = 1, CHASING_PLAYER = 2
+	};
+
+	Action current_action;
+
+	void serialize(GameState* gs, SerializeBuffer& serializer);
+	void deserialize(GameState* gs, SerializeBuffer& serializer);
+};
+
 #endif /* ENEMYBEHAVIOUR_H_ */

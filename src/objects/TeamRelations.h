@@ -6,11 +6,8 @@
 #ifndef TEAMRELATIONS_H_
 #define TEAMRELATIONS_H_
 
+#include <vector>
 #include "../lanarts_defines.h"
-
-struct TeamAllegiances {
-	std::vector<team_id> allied_teams;
-};
 
 class TeamRelations {
 public:
@@ -19,9 +16,24 @@ public:
 	bool are_hostile(team_id team1, team_id team2);
 	bool are_friendly(team_id team1, team_id team2);
 
-	team_id create_team();
+	// Use these until we have good reason to create other teams
+	team_id default_player_team();
+	team_id default_enemy_team();
+
+	team_id create_team(bool default_as_hostile = true,
+			const std::vector<team_id>& exceptions = std::vector<team_id>());
 
 private:
+	struct TeamAllegiances {
+		bool default_as_hostile;
+		std::vector<team_id> exceptions;
+		TeamAllegiances(bool default_as_allied,
+				const std::vector<team_id>& exceptions) :
+				default_as_hostile(default_as_hostile), exceptions(exceptions) {
+		}
+	};
+	team_id player_team, enemy_team;
+
 	std::vector<TeamAllegiances> teams;
 };
 

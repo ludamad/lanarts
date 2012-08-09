@@ -120,8 +120,11 @@ private:
 
 	ActionQueue queued_actions;
 	fov fieldofview;
+	PathInfo paths_to_player;
+
 	bool didstep, local, moving;
 
+	obj_id current_target;
 	int autouse_mana_potion_try_count;
 	int lives, deaths;
 	int previous_spellselect, spellselect;

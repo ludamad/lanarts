@@ -13,6 +13,7 @@
 
 #include "../lanarts_defines.h"
 #include "../stats/EnemiesSeen.h"
+#include "../objects/TeamRelations.h"
 
 class GameState;
 class GameLevelState;
@@ -35,6 +36,10 @@ public:
 	void regen_level(int roomid);
 	void spawn_player(GeneratedLevel& genlevel, bool local = true, int classn =
 			0, PlayerInst* inst = NULL);
+
+	int get_current_level_id();
+	void connect_entrance_to_exit(int roomid1, int roomid2);
+
 	GameLevelState* get_current_level() {
 		return lvl;
 	}
@@ -47,8 +52,9 @@ public:
 	EnemiesSeen& enemies_seen() {
 		return _enemies_seen;
 	}
-	int get_current_level_id();
-	void connect_entrance_to_exit(int roomid1, int roomid2);
+	TeamRelations& team_relations() {
+		return _team_relations;
+	}
 private:
 	void spawn_players(GeneratedLevel& genlevel, void** player_instances,
 			size_t nplayers);
@@ -57,6 +63,7 @@ private:
 
 	EnemiesSeen _enemies_seen;
 	PlayerController _player_controller;
+	TeamRelations _team_relations;
 
 	GameLevelState* lvl;
 	GameState* game_state;
