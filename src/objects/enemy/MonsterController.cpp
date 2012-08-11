@@ -10,7 +10,7 @@
 
 #include "../../gamestate/GameState.h"
 #include "MonsterController.h"
-#include "../player/PlayerController.h"
+#include "../../gamestate/PlayerData.h"
 
 #include "EnemyInst.h"
 #include "../player/PlayerInst.h"

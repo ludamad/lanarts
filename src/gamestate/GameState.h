@@ -20,7 +20,7 @@
 
 #include "IOController.h"
 #include "../objects/enemy/MonsterController.h"
-#include "../objects/player/PlayerController.h"
+#include "PlayerData.h"
 
 #include "../interface/GameChat.h"
 #include "../interface/GameHud.h"
@@ -141,7 +141,7 @@ public:
 	std::vector<PlayerInst*> players_in_level();
 	bool level_has_player();
 
-	PlayerController& player_controller() {
+	PlayerData& player_controller() {
 		return world.player_controller();
 	}
 

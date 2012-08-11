@@ -216,25 +216,26 @@ void PlayerInst::queue_io_actions(GameState* gs) {
 					game_action(gs, this, GameAction::USE_REST));
 		}
 	}
-	GameNetConnection& connection = gs->net_connection();
-	bool hasconnection = connection.get_connection() != NULL;
-	NetPacket packet;
-
-	for (int i = 0; i < queued_actions.size(); i++) {
-		queued_actions[i].frame = gs->frame();
-	}
-	if (!settings.savereplay_file.empty()) {
-		save_actions(gs, queued_actions);
-	}
-
-	if (is_local_player() && hasconnection) {
-		for (int i = 0; i < queued_actions.size(); i++) {
-			packet.add(queued_actions[i]);
-		}
-		packet.encode_header();
-		printf("Sending player action for frame %d\n", gs->frame());
-		connection.get_connection()->broadcast_packet(packet);
-	}
+	//TODO: net redo
+//	GameNetConnection& connection = gs->net_connection();
+//	bool hasconnection = connection.get_connection() != NULL;
+//	NetPacket packet;
+//
+//	for (int i = 0; i < queued_actions.size(); i++) {
+//		queued_actions[i].frame = gs->frame();
+//	}
+//	if (!settings.savereplay_file.empty()) {
+//		save_actions(gs, queued_actions);
+//	}
+//
+//	if (is_local_player() && hasconnection) {
+//		for (int i = 0; i < queued_actions.size(); i++) {
+//			packet.add(queued_actions[i]);
+//		}
+//		packet.encode_header();
+//		printf("Sending player action for frame %d\n", gs->frame());
+//		connection.get_connection()->broadcast_packet(packet);
+//	}
 }
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
@@ -265,26 +266,27 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 
 void PlayerInst::queue_network_actions(GameState *gs) {
 	GameNetConnection& connection = gs->net_connection();
-	bool hasconnection = connection.get_connection() != NULL;
-	NetPacket packet;
-
-	if (!is_local_player() && hasconnection) {
-		//	printf("Waiting for player action for frame %d\n", gs->frame());
-		while (!connection.get_connection()->get_next_packet(packet)) {
-		}
-		bool output1 = true;
-		while (packet.body_length > 0) {
-			GameAction action;
-			packet.get(action);
-			if (output1 && action.frame != gs->frame()) {
-				fprintf(stderr, "action frame %d vs %d\n", action.frame,
-						gs->frame());
-				fflush(stderr);
-				output1 = false;
-			}
-			queued_actions.push_front(action);
-		}
-	}
+	bool hasconnection = connection.connection() != NULL;
+	//TODO: net redo
+//	NetPacket packet;
+//
+//	if (!is_local_player() && hasconnection) {
+//		//	printf("Waiting for player action for frame %d\n", gs->frame());
+//		while (!connection.get_connection()->get_next_packet(packet)) {
+//		}
+//		bool output1 = true;
+//		while (packet.body_length > 0) {
+//			GameAction action;
+//			packet.get(action);
+//			if (output1 && action.frame != gs->frame()) {
+//				fprintf(stderr, "action frame %d vs %d\n", action.frame,
+//						gs->frame());
+//				fflush(stderr);
+//				output1 = false;
+//			}
+//			queued_actions.push_front(action);
+//		}
+//	}
 }
 
 void PlayerInst::perform_queued_actions(GameState* gs) {

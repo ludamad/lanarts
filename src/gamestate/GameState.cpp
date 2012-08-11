@@ -40,7 +40,7 @@ extern "C" {
 
 GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 		int viewh, int hudw) :
-		settings(settings), L(L), frame_n(0), hud(
+		settings(settings), L(L), connection(this), frame_n(0), hud(
 				BBox(vieww, 0, vieww + hudw, viewh), BBox(0, 0, vieww, viewh)), _view(
 				0, 0, vieww, viewh), world(this) {
 
@@ -72,35 +72,32 @@ void GameState::init_game() {
 	init_lua_data(this, L);
 
 	if (settings.conntype == GameSettings::CLIENT) {
-		char port_buffer[50];
-		snprintf(port_buffer, 50, "%d", settings.port);
-		connection.get_connection() = create_client_connection(
-				settings.ip.c_str(), port_buffer);
+		connection.initialize_as_client(settings.ip.c_str(), settings.port);
 	} else if (settings.conntype == GameSettings::SERVER) {
-		connection.get_connection() = create_server_connection(settings.port);
+		connection.initialize_as_server(settings.port);
 	}
-
-	if (settings.conntype == GameSettings::CLIENT) {
-		NetPacket packet;
-		int tries = 0;
-		while (true) {
-			if (connection.get_connection()->get_next_packet(packet)) {
-				seed = packet.get_int();
-				break;
-			} else if ((++tries) % 30000 == 0) {
-				if (!update_iostate()) {
-					exit(0);
-				}
-			}
-		}
-		printf("NETWORK: Recieving seed=0x%X\n", seed);
-	} else if (settings.conntype == GameSettings::SERVER) {
-		NetPacket packet;
-		packet.add_int(seed);
-		packet.encode_header();
-		connection.get_connection()->broadcast_packet(packet, true);
-		printf("NETWORK: Broadcasting seed=0x%X\n", seed);
-	}
+//TODO: net redo
+//	if (settings.conntype == GameSettings::CLIENT) {
+//		NetPacket packet;
+//		int tries = 0;
+//		while (true) {
+//			if (connection.get_connection()->get_next_packet(packet)) {
+//				seed = packet.get_int();
+//				break;
+//			} else if ((++tries) % 30000 == 0) {
+//				if (!update_iostate()) {
+//					exit(0);
+//				}
+//			}
+//		}
+//		printf("NETWORK: Recieving seed=0x%X\n", seed);
+//	} else if (settings.conntype == GameSettings::SERVER) {
+//		NetPacket packet;
+//		packet.add_int(seed);
+//		packet.encode_header();
+//		connection.get_connection()->broadcast_packet(packet, true);
+//		printf("NETWORK: Broadcasting seed=0x%X\n", seed);
+//	}
 	printf("Seed used for RNG = 0x%X\n", seed);
 	mtwist.init_genrand(seed);
 	set_level(world.get_level(0, true));
@@ -399,7 +396,7 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 		return true;
 	}
 
-	PlayerController& pc = player_controller();
+	PlayerData& pc = player_controller();
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
 			if (player && player->field_of_view().within_fov(xx, yy)) {

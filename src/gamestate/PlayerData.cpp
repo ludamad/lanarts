@@ -1,44 +1,45 @@
 /*
- * PlayerController.cpp:
+ * PlayerData.cpp:
  *	Handles network communication of player coordinates, creates input actions for player objects.
  */
 
-#include "../../lanarts_defines.h"
-#include "../../util/math_util.h"
-#include "../../fov/fov.h"
+#include "../lanarts_defines.h"
+#include "../util/math_util.h"
+#include "../fov/fov.h"
 
-#include "PlayerInst.h"
+#include "../objects/player/PlayerInst.h"
 
-#include "../../gamestate/GameTiles.h"
-#include "../../gamestate/GameState.h"
+#include "GameTiles.h"
+#include "GameState.h"
 
-#include "PlayerController.h"
+#include "PlayerData.h"
 
-void PlayerController::update_fieldsofview(GameState* gs) {
+void PlayerData::update_fieldsofview(GameState* gs) {
 }
 
-void PlayerController::clear() {
+void PlayerData::clear() {
 	_local_player = GameInstRef();
 	_players.clear();
 }
 
-void PlayerController::register_player(PlayerInst* player) {
-	_players.push_back(player);
+void PlayerData::register_player(const std::string& name, PlayerInst* player,
+		int net_id) {
+	_players.push_back(PlayerDataEntry(name, player, net_id));
 	if (player->is_local_player()) {
 		_local_player = player;
 	}
 }
 
-PlayerInst* PlayerController::local_player() {
+PlayerInst* PlayerData::local_player() {
 	LANARTS_ASSERT(
 			!_local_player.get_instance() || dynamic_cast<PlayerInst*>(_local_player.get_instance()));
 	return (PlayerInst*)_local_player.get_instance();
 }
 
-std::vector<PlayerInst*> PlayerController::players_in_level(level_id level) {
+std::vector<PlayerInst*> PlayerData::players_in_level(level_id level) {
 	std::vector<PlayerInst*> ret;
 	for (int i = 0; i < _players.size(); i++) {
-		GameInst* player = _players[i].get_instance();
+		GameInst* player = _players[i].player_inst.get_instance();
 		if (player->current_level == level) {
 			LANARTS_ASSERT(!player || dynamic_cast<PlayerInst*>(player));
 			ret.push_back((PlayerInst*)player);
@@ -47,48 +48,49 @@ std::vector<PlayerInst*> PlayerController::players_in_level(level_id level) {
 	return ret;
 }
 
-bool PlayerController::level_has_player(level_id level) {
+bool PlayerData::level_has_player(level_id level) {
 	for (int i = 0; i < _players.size(); i++) {
-		if (_players[i]->current_level == level) {
+		if (_players[i].player_inst->current_level == level) {
 			return true;
 		}
 	}
 	return false;
 }
 
-void PlayerController::players_gain_xp(GameState* gs, int xp) {
+void PlayerData::players_gain_xp(GameState* gs, int xp) {
 	for (int i = 0; i < _players.size(); i++) {
-		PlayerInst* p = (PlayerInst*)_players[i].get_instance();
+		PlayerInst* p = (PlayerInst*)_players[i].player_inst.get_instance();
 		p->gain_xp(gs, xp);
 	}
 }
 
-void PlayerController::copy_to(PlayerController& pc) const {
+void PlayerData::copy_to(PlayerData& pc) const {
 	pc._local_player = _local_player;
 	pc._players = _players;
 	LANARTS_ASSERT(false /*This has to be fixed to work with object ids!*/);
 }
 
-static void write_inst_ref(GameInstRef& ref, GameState* gs, SerializeBuffer& serializer) {
+static void write_inst_ref(GameInstRef& ref, GameState* gs,
+		SerializeBuffer& serializer) {
 	serializer.write_int(ref->id);
 	serializer.write_int(ref->current_level);
 }
-static void read_inst_ref(GameInstRef& ref, GameState* gs, SerializeBuffer& serializer) {
+static void read_inst_ref(GameInstRef& ref, GameState* gs,
+		SerializeBuffer& serializer) {
 	int id, level;
 	serializer.read_int(id);
 	serializer.read_int(level);
 	ref = gs->get_instance(level, id);
 }
-void PlayerController::serialize(GameState* gs, SerializeBuffer& serializer) {
+void PlayerData::serialize(GameState* gs, SerializeBuffer& serializer) {
 	write_inst_ref(_local_player, gs, serializer);
 	serializer.write_int(_players.size());
-	for (int i = 0; i < _players.size(); i++){
+	for (int i = 0; i < _players.size(); i++) {
 
 	}
 }
 
-void PlayerController::deserialize(GameState* gs,
-		SerializeBuffer & serializer) {
+void PlayerData::deserialize(GameState* gs, SerializeBuffer & serializer) {
 
 	serializer.write_int(_local_player->id);
 	serializer.write_int(_local_player->current_level);

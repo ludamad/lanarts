@@ -41,7 +41,7 @@ public:
 	void set_current_level(GameLevelState* level) {
 		lvl = level;
 	}
-	PlayerController& player_controller() {
+	PlayerData& player_controller() {
 		return _player_controller;
 	}
 	EnemiesSeen& enemies_seen() {
@@ -56,7 +56,7 @@ private:
 	int next_room_id;
 
 	EnemiesSeen _enemies_seen;
-	PlayerController _player_controller;
+	PlayerData _player_controller;
 
 	GameLevelState* lvl;
 	GameState* game_state;

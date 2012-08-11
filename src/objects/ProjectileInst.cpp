@@ -160,7 +160,7 @@ void ProjectileInst::step(GameState* gs) {
 
 			if (victim->damage(gs, damage)) {
 				PlayerInst* p = (PlayerInst*)origin;
-				PlayerController& pc = gs->player_controller();
+				PlayerData& pc = gs->player_controller();
 				p->signal_killed_enemy();
 
 				int amnt = round(

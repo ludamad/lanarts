@@ -8,56 +8,47 @@
 #ifndef GAMENETCONNECTION_H_
 #define GAMENETCONNECTION_H_
 
-#include <net/connection.h>
-#include <net/packet.h>
 #include <vector>
 
 class GameState;
+class SerializeBuffer;
+class NetConnection;
 
 class GameNetConnection {
 public:
 	/*Packet types*/
-	enum {
-		//Negative packet types are reserved as implementation details
+	enum packet_type {
 		PACKET_ACTION = 0, PACKET_CHAT_MESSAGE = 1
 	};
-	GameNetConnection(int our_peer_id) {
-		connect = NULL;
-	}
-	GameNetConnection(NetConnection* connect = NULL);
+	GameNetConnection(GameState* gs);
 	~GameNetConnection();
 
-	void add_peer_id(int peer_id);
+	void initialize_as_client(const char* host, int port);
+	void initialize_as_server(int port);
 
-	NetConnection*& get_connection() {
-		return connect;
-	}
-	void wait_for_packet(NetPacket& packet, packet_t type = PACKET_ACTION);
-	bool get_next_packet(NetPacket& packet, packet_t type = PACKET_ACTION);
-	void send_and_sync(const NetPacket& packet,
-			std::vector<NetPacket>& received, bool send_to_new = false);
-
-	template<class T>
-	void send_and_sync(const T& ours, std::vector<T>& theirs, bool send_to_new =
-			false) {
-		NetPacket packet;
-		packet.add(ours);
-		packet.encode_header();
-		std::vector<NetPacket> received;
-		send_and_sync(packet, received, send_to_new);
-		theirs.resize(received.size());
-		for (int i = 0; i < received.size(); i++) {
-			received[i].get(theirs[i]);
-		}
+	bool is_connected() {
+		return _connection != NULL;
 	}
 
-	void broadcast_packet(const NetPacket& packet, bool send_to_new = false);
-	void finalize_connections();
+	NetConnection* connection() {
+		return _connection;
+	}
+
+	SerializeBuffer& grab_cleared_buffer(packet_type type);
+
+	void set_accepting_connections(bool accept);
+
+	void poll();
+	void send_packet(SerializeBuffer& serializer);
 	bool check_integrity(GameState* gs, int value);
+
 private:
-	std::vector<int> peer_ids;
-	int our_peer_id;
-	NetConnection* connect;
+	void receive_packet(const char* msg, size_t len);
+
+	//Keep a back-pointer so that we can alter world state based on messages received
+	GameState* gs;
+	SerializeBuffer* _message_buffer;
+	NetConnection* _connection;
 };
 
 #endif /* GAMENETCONNECTION_H_ */

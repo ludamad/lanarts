@@ -116,7 +116,7 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 	return NULL;
 }
 bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
-	PlayerController& pc = gs->player_controller();
+	PlayerData& pc = gs->player_controller();
 
 	std::vector<PlayerInst*> players = gs->players_in_level();
 	std::vector<GameInst*> visible_monsters;
@@ -554,7 +554,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 			EnemyInst* e = (EnemyInst*) enemies[i];
 			lua_hit_callback(gs->get_luastate(), wentry.on_hit_func, this, e);
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
-				PlayerController& pc = gs->player_controller();
+				PlayerData& pc = gs->player_controller();
 				signal_killed_enemy();
 
 				char buffstr[32];

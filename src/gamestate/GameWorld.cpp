@@ -53,7 +53,7 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, int classn,
 	if (!inst) {
 		inst = new PlayerInst(c.starting_stats, spawn_pos.x, spawn_pos.y,
 				local);
-		player_controller().register_player(inst);
+		player_controller().register_player("", inst, 0);
 	}
 	inst->last_x = spawn_pos.x;
 	inst->last_y = spawn_pos.y;
@@ -72,16 +72,17 @@ void GameWorld::spawn_players(GeneratedLevel& genlevel, void** player_instances,
 		int myclassn = game_state->game_settings().classn;
 
 		static std::vector<int> theirclasses;
-		if (theirclasses.empty() && netconn.get_connection()) {
-			NetPacket classpacket;
-			classpacket.add_int(myclassn);
-			classpacket.encode_header();
-			std::vector<NetPacket> others_classes;
-			netconn.send_and_sync(classpacket, others_classes, true);
-			for (int i = 0; i < others_classes.size(); i++) {
-				theirclasses.push_back(others_classes[i].get_int());
-			}
-		}
+		//TODO: net redo
+//		if (theirclasses.empty() && netconn.get_connection()) {
+//			NetPacket classpacket;
+//			classpacket.add_int(myclassn);
+//			classpacket.encode_header();
+//			std::vector<NetPacket> others_classes;
+//			netconn.send_and_sync(classpacket, others_classes, true);
+//			for (int i = 0; i < others_classes.size(); i++) {
+//				theirclasses.push_back(others_classes[i].get_int());
+//			}
+//		}
 
 		if (theirclasses.empty()) {
 			spawn_player(genlevel, true, myclassn);
@@ -122,7 +123,7 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer,
 static bool check_level_is_in_sync(GameState* gs, GameLevelState* level) {
 	if (level->levelid == -1
 			|| !gs->player_controller().level_has_player(level->levelid)
-			|| !gs->net_connection().get_connection()) {
+			|| !gs->net_connection().connection()) {
 		return true;
 	}
 
@@ -130,35 +131,37 @@ static bool check_level_is_in_sync(GameState* gs, GameLevelState* level) {
 
 //	printf("NETWORK: Checking integrity hash=0x%X\n", prehashvalue);
 //	fflush(stdout);
-	if (!gs->net_connection().check_integrity(gs, hash_value)) {
-		std::vector<GameInst*> instances = level->inst_set.to_vector();
-		for (int i = 0; i < instances.size(); i++) {
-			if (!gs->net_connection().check_integrity(gs,
-					instances[i]->integrity_hash())) {
-				GameInst* inst = instances[i];
-				if (!dynamic_cast<AnimatedInst*>(inst)) {
-					const char* type = typeid(*inst).name();
-					printf("Hashes don't match for instance id=%d, type=%s!\n",
-							inst->id, type);
-					std::vector<Pos> theirs;
-					gs->net_connection().send_and_sync(Pos(inst->x, inst->y),
-							theirs);
-					Pos* theirinst = &theirs[0];
-					EnemyInst* e;
-					if ((e = dynamic_cast<EnemyInst*>(inst))) {
-						Pos vpos(e->vx * 1000, e->vy * 1000);
-						std::vector<Pos> theirs;
-						gs->net_connection().send_and_sync(vpos, theirs);
-						Pos vpos2 = theirs[0];
-					}
-				}
 
-			}
-		}
-		printf("Hashes don't match before step, frame %d, level %d\n",
-				gs->frame(), level->levelid);
-		return false;
-	}
+	//TODO: net redo
+//	if (!gs->net_connection().check_integrity(gs, hash_value)) {
+//		std::vector<GameInst*> instances = level->inst_set.to_vector();
+//		for (int i = 0; i < instances.size(); i++) {
+//			if (!gs->net_connection().check_integrity(gs,
+//					instances[i]->integrity_hash())) {
+//				GameInst* inst = instances[i];
+//				if (!dynamic_cast<AnimatedInst*>(inst)) {
+//					const char* type = typeid(*inst).name();
+//					printf("Hashes don't match for instance id=%d, type=%s!\n",
+//							inst->id, type);
+//					std::vector<Pos> theirs;
+//					gs->net_connection().send_and_sync(Pos(inst->x, inst->y),
+//							theirs);
+//					Pos* theirinst = &theirs[0];
+//					EnemyInst* e;
+//					if ((e = dynamic_cast<EnemyInst*>(inst))) {
+//						Pos vpos(e->vx * 1000, e->vy * 1000);
+//						std::vector<Pos> theirs;
+//						gs->net_connection().send_and_sync(vpos, theirs);
+//						Pos vpos2 = theirs[0];
+//					}
+//				}
+//
+//			}
+//		}
+//		printf("Hashes don't match before step, frame %d, level %d\n",
+//				gs->frame(), level->levelid);
+//		return false;
+//	}
 	return true;
 }
 bool GameWorld::pre_step() {
@@ -239,7 +242,8 @@ void GameWorld::step() {
 	game_state->set_level(current_level);
 	game_state->frame()++;
 
-	midstep = false;
+	midstep
+	= false;
 	if (next_room_id == -2) {
 		reset(0);
 		next_room_id = 0;

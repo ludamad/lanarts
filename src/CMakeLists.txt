@@ -3,6 +3,7 @@ PROJECT(project_lanarts)
 
 FIND_PACKAGE(SDL REQUIRED)
 FIND_PACKAGE(SDL_image REQUIRED)
+FIND_PACKAGE(SDL_net REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
@@ -130,7 +131,7 @@ set( lanarts_src
 	objects/enemy/EnemyBehaviour.cpp
 	objects/enemy/MonsterController.cpp
 	objects/enemy/MonsterControllerActions.cpp
-	objects/player/PlayerController.cpp
+	gamestate/PlayerData.cpp
 	
 	objects/store/StoreInventory.cpp
 	objects/store/StoreInst.cpp
@@ -238,7 +239,7 @@ set( lanarts_include
 
 	gamestate/IOController.h
 	objects/enemy/MonsterController.h
-	objects/player/PlayerController.h
+	gamestate/PlayerData.h
 	objects/CombatInstController.h
 	objects/InstTypeEnum.h
 
@@ -282,13 +283,14 @@ add_executable( lanarts
 
 
 target_link_libraries( lanarts
-			lanarts_tcp
+			lanarts_net
 			yaml-cpp
 			RVO
 			lua
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}
 			${SDLIMAGE_LIBRARY}
+			${SDLNET_LIBRARY}
 			${SDLMAIN_LIBRARY}
 			${FREETYPE_LIBRARIES}
 			)

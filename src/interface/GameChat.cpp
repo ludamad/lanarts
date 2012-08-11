@@ -11,8 +11,6 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-#include <net/packet.h>
-
 #include "../data/game_data.h"
 
 #include "../display/display.h"
@@ -143,22 +141,6 @@ static bool is_typeable_keycode(SDLKey keycode) {
 	return (keycode >= SDLK_SPACE && keycode <= SDLK_z);
 }
 
-static ChatMessage from_net_packet(NetPacket& p) {
-	ChatMessage msg;
-	p.get_str(msg.sender);
-	p.get_str(msg.message);
-	p.get(msg.sender_colour);
-	p.get(msg.message_colour);
-	return msg;
-}
-
-static void chat_to_net_packet(const ChatMessage& msg, NetPacket& p) {
-	p.add(msg.message_colour);
-	p.add(msg.sender_colour);
-	p.add_str(msg.message);
-	p.add_str(msg.sender);
-}
-
 void GameChat::step(GameState* gs) {
 	std::string& msg = typed_message.message;
 
@@ -184,11 +166,12 @@ void GameChat::step(GameState* gs) {
 			repeat_steps_left = NEXT_BACKSPACE_STEP_AMNT;
 		}
 	}
-	NetPacket p;
-	while (gs->net_connection().get_next_packet(p,
-			GameNetConnection::PACKET_CHAT_MESSAGE)) {
-		add_message(from_net_packet(p));
-	}
+	//TODO: net redo
+//	NetPacket p;
+//	while (gs->net_connection().get_next_packet(p,
+//			GameNetConnection::PACKET_CHAT_MESSAGE)) {
+//		add_message(from_net_packet(p));
+//	}
 }
 void GameChat::draw(GameState *gs) const {
 	if (fade_out > 0.0f) {
@@ -387,13 +370,14 @@ void GameChat::toggle_chat(GameState* gs) {
 			typed_message.sender_colour = COL_BABY_BLUE;
 			if (!handle_special_commands(gs, typed_message.message)) {
 				add_message(typed_message);
-				NetPacket p(0, GameNetConnection::PACKET_CHAT_MESSAGE);
-				ChatMessage msg = typed_message;
-				msg.sender_colour = COL_MUTED_GREEN;
-				msg.message_colour = COL_PALE_GREEN;
-				chat_to_net_packet(msg, p);
-				p.encode_header();
-				gs->net_connection().broadcast_packet(p);
+				//TODO: net redo
+//				NetPacket p(0, GameNetConnection::PACKET_CHAT_MESSAGE);
+//				ChatMessage msg = typed_message;
+//				msg.sender_colour = COL_MUTED_GREEN;
+//				msg.message_colour = COL_PALE_GREEN;
+//				chat_to_net_packet(msg, p);
+//				p.encode_header();
+//				gs->net_connection().broadcast_packet(p);
 			}
 		} else {
 			show_chat = false;
@@ -493,16 +477,17 @@ GameChat::GameChat() :
 	repeat_steps_left = 0;
 }
 
-void ChatMessage::packet_add(NetPacket& packet) {
-	packet.add_str(sender);
-	packet.add_str(message);
-	packet.add(sender_colour);
-	packet.add(message_colour);
+void ChatMessage::serialize(SerializeBuffer& serializer) {
+	serializer.write(sender);
+	serializer.write(message);
+	serializer.write(sender_colour);
+	serializer.write(message_colour);
 }
-void ChatMessage::packet_get(NetPacket& packet) {
-	packet.get_str(sender);
-	packet.get_str(message);
-	packet.get(sender_colour);
-	packet.get(message_colour);
+
+void ChatMessage::deserialize(SerializeBuffer& serializer) {
+	serializer.read(sender);
+	serializer.read(message);
+	serializer.read(sender_colour);
+	serializer.read(message_colour);
 }
 

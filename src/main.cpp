@@ -5,6 +5,8 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
+#include <net/lanarts_net.h>
+
 extern "C" {
 #include <lua/lua.h>
 #include <lua/lauxlib.h>
@@ -39,6 +41,7 @@ void init_system(GameSettings& settings, lua_State* L) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		exit(0);
 	}
+	lanarts_net_init(true);
 	init_sdl_gl(settings.fullscreen, settings.view_width, settings.view_height);
 	settings = init_game_data(L);
 }
