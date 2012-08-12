@@ -178,15 +178,15 @@ void GameTiles::post_draw(GameState* gs) {
 void GameTiles::serialize(SerializeBuffer& serializer) {
 	serializer.write(width);
 	serializer.write(height);
-	serializer.write_vector(tiles);
+	serializer.write_container(tiles);
 }
 
 void GameTiles::deserialize(SerializeBuffer& serializer) {
 	serializer.read(width);
 	serializer.read(height);
-	for (int i = 0; i < tiles.size(); i ++){
+	for (int i = 0; i < tiles.size(); i++) {
 		tiles[i] = TileState();
 	}
-	serializer.read_vector(tiles);
+	serializer.read_container(tiles);
 }
 

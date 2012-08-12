@@ -14,7 +14,8 @@
 #include <cstdlib>
 
 typedef int receiver_t;
-typedef void (*packet_recv_callback)(void* context, const char* msg, size_t len);
+typedef void (*packet_recv_callback)(void* context, const char* msg,
+		size_t len);
 
 /**
  * Interface for client & server connections
@@ -32,7 +33,8 @@ public:
 	/*
 	 * Poll for new messages/connections
 	 */
-	virtual bool poll(packet_recv_callback message_handler, void* context = NULL) = 0;
+	virtual bool poll(packet_recv_callback message_handler,
+			void* context = NULL, int timeout = 0) = 0;
 
 	/*
 	 * Applies only to servers, set if this connection will

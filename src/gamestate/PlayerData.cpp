@@ -1,6 +1,6 @@
 /*
  * PlayerData.cpp:
- *	Handles network communication of player coordinates, creates input actions for player objects.
+ *	Holds lists of all players in game, and pointers to their respective PlayerInst's
  */
 
 #include "../lanarts_defines.h"
@@ -14,26 +14,30 @@
 
 #include "PlayerData.h"
 
+PlayerInst* PlayerDataEntry::player() {
+	GameInst* local = player_inst.get_instance();
+	LANARTS_ASSERT(!local || dynamic_cast<PlayerInst*>(local));
+	return (PlayerInst*)local;
+}
+
 void PlayerData::update_fieldsofview(GameState* gs) {
 }
 
 void PlayerData::clear() {
-	_local_player = GameInstRef();
+	_local_player_idx = -1;
 	_players.clear();
 }
 
 void PlayerData::register_player(const std::string& name, PlayerInst* player,
 		int net_id) {
-	_players.push_back(PlayerDataEntry(name, player, net_id));
 	if (player->is_local_player()) {
-		_local_player = player;
+		_local_player_idx = _players.size();
 	}
+	_players.push_back(PlayerDataEntry(name, player, net_id));
 }
 
 PlayerInst* PlayerData::local_player() {
-	LANARTS_ASSERT(
-			!_local_player.get_instance() || dynamic_cast<PlayerInst*>(_local_player.get_instance()));
-	return (PlayerInst*)_local_player.get_instance();
+	return local_player_data().player();
 }
 
 std::vector<PlayerInst*> PlayerData::players_in_level(level_id level) {
@@ -57,15 +61,8 @@ bool PlayerData::level_has_player(level_id level) {
 	return false;
 }
 
-void PlayerData::players_gain_xp(GameState* gs, int xp) {
-	for (int i = 0; i < _players.size(); i++) {
-		PlayerInst* p = (PlayerInst*)_players[i].player_inst.get_instance();
-		p->gain_xp(gs, xp);
-	}
-}
-
 void PlayerData::copy_to(PlayerData& pc) const {
-	pc._local_player = _local_player;
+	pc._local_player_idx = _local_player_idx;
 	pc._players = _players;
 	LANARTS_ASSERT(false /*This has to be fixed to work with object ids!*/);
 }
@@ -82,18 +79,71 @@ static void read_inst_ref(GameInstRef& ref, GameState* gs,
 	serializer.read_int(level);
 	ref = gs->get_instance(level, id);
 }
+
 void PlayerData::serialize(GameState* gs, SerializeBuffer& serializer) {
-	write_inst_ref(_local_player, gs, serializer);
+	write_inst_ref(local_player_data().player_inst, gs, serializer);
 	serializer.write_int(_players.size());
 	for (int i = 0; i < _players.size(); i++) {
-
+		write_inst_ref(_players[i].player_inst, gs, serializer);
 	}
 }
 
-void PlayerData::deserialize(GameState* gs, SerializeBuffer & serializer) {
+PlayerDataEntry& PlayerData::local_player_data() {
+	return _players[_local_player_idx];
+}
 
-	serializer.write_int(_local_player->id);
-	serializer.write_int(_local_player->current_level);
+void PlayerData::deserialize(GameState* gs, SerializeBuffer & serializer) {
+	read_inst_ref(local_player_data().player_inst, gs, serializer);
+
+	int psize;
+	serializer.read_int(psize);
+	for (int i = 0; i < psize; i++) {
+		write_inst_ref(_players.at(i).player_inst, gs, serializer);
+	}
+}
+
+void players_gain_xp(GameState* gs, int xp) {
+	PlayerData& pd = gs->player_data();
+	std::vector<PlayerDataEntry>& players = pd.all_players();
+
+	for (int i = 0; i < players.size(); i++) {
+		players[i].player()->gain_xp(gs, xp);
+	}
+}
+
+int player_get_playernumber(GameState* gs, PlayerInst* p) {
+	PlayerData& pd = gs->player_data();
+	std::vector<PlayerDataEntry>& players = pd.all_players();
+
+	for (int i = 0; i < players.size(); i++) {
+		if (players[i].player() == p) {
+			return i;
+		}
+	}
+
+	LANARTS_ASSERT(false);
+	return -1;
+}
+
+static void player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
+	const int POLL_MS_TIMEOUT = 1 /*millsecond*/;
+
+	while (!pde.player()->actions_set()) {
+		if (pde.player()->is_local_player()) {
+			pde.player()->enqueue_io_actions(gs);
+		} else {
+			gs->net_connection().poll_messages(POLL_MS_TIMEOUT);
+		}
+	}
+}
+
+void players_poll_for_actions(GameState* gs) {
+	PlayerData& pd = gs->player_data();
+	std::vector<PlayerDataEntry>& players = pd.all_players();
+
+	for (int i = 0; i < players.size(); i++) {
+		player_poll_for_actions(gs, players[i]);
+	}
 }
 
 //for (int i = 0; i < pids.size(); i++) {

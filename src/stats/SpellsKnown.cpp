@@ -33,10 +33,10 @@ bool SpellsKnown::has_spell(spell_id slot) {
 }
 
 void SpellsKnown::serialize(SerializeBuffer& serializer) {
-	serializer.write_vector(spells);
+	serializer.write_container(spells);
 }
 
 void SpellsKnown::deserialize(SerializeBuffer& serializer) {
-	serializer.read_vector(spells);
+	serializer.read_container(spells);
 }
 

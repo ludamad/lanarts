@@ -141,8 +141,8 @@ public:
 	std::vector<PlayerInst*> players_in_level();
 	bool level_has_player();
 
-	PlayerData& player_controller() {
-		return world.player_controller();
+	PlayerData& player_data() {
+		return world.player_data();
 	}
 
 	EnemiesSeen& enemies_seen() {

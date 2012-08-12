@@ -8,8 +8,8 @@ username: ludamad
 #Window settings
 fullscreen: no
 regen_level_on_death: yes
-view_width: 640
-view_height: 480
+view_width: 960
+view_height: 720
 
 #Gameplay preferences
 autouse_health_potions: yes # can toggle in game as well

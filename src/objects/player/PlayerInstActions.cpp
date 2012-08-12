@@ -150,92 +150,95 @@ void PlayerInst::queue_io_movement_actions(GameState* gs, int& dx, int& dy) {
 	}
 }
 
-void PlayerInst::queue_io_actions(GameState* gs) {
+void PlayerInst::enqueue_actions(const ActionQueue& queue) {
+	if (!actions_set_for_turn) {
+		LANARTS_ASSERT(queued_actions.empty());
+		queued_actions = queue;
+		actions_set_for_turn = true;
+	}
+}
+
+void PlayerInst::enqueue_io_actions(GameState* gs) {
+	LANARTS_ASSERT(is_local_player());
+
+	if (actions_set_for_turn) {
+		return;
+	}
+
+	actions_set_for_turn = true;
+
 	GameSettings& settings = gs->game_settings();
 	GameView& view = gs->view();
-	if (is_local_player()) {
-		int dx = 0, dy = 0;
-		bool mouse_within = gs->mouse_x() < gs->view().width;
-		int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
+	int dx = 0, dy = 0;
+	bool mouse_within = gs->mouse_x() < gs->view().width;
+	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
-		bool was_moving = moving, do_stopaction = false;
-		IOController& io = gs->io_controller();
+	bool was_moving = moving, do_stopaction = false;
+	IOController& io = gs->io_controller();
 
-		if (!settings.loadreplay_file.empty()) {
-			load_actions(gs, queued_actions);
-		} else if (is_local_player()) {
-			queue_io_movement_actions(gs, dx, dy);
+	if (!settings.loadreplay_file.empty()) {
+		load_actions(gs, queued_actions);
+	} else if (is_local_player()) {
+		queue_io_movement_actions(gs, dx, dy);
 
-			if (was_moving && !moving && cooldowns().can_do_stopaction()) {
-				do_stopaction = true;
-			}
-		}
-		//Shifting target
-		if (gs->key_press_state(SDLK_k)) {
-			gs->monster_controller().shift_target(gs);
-		}
-
-		if (gs->key_press_state(SDLK_m))
-			spellselect = -1;
-
-		bool attack_used = false;
-		if (!gs->game_hud().handle_io(gs, queued_actions)) {
-			attack_used = queue_io_spell_and_attack_actions(gs, dx, dy);
-			queue_io_equipment_actions(gs, do_stopaction);
-		}
-
-		bool action_usage = io.query_event(IOEvent::ACTIVATE_SPELL_N)
-				|| io.query_event(IOEvent::USE_WEAPON)
-				|| io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION)
-				|| io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION);
-		if ((do_stopaction && !action_usage) || gs->key_down_state(SDLK_PERIOD)
-				|| gs->mouse_downwheel()) {
-			Pos hitsqr;
-			if (gs->tile_radius_test(x, y, RADIUS, false,
-					get_tile_by_name("stairs_down"), &hitsqr)) {
-				queued_actions.push_back(
-						game_action(gs, this, GameAction::USE_ENTRANCE));
-				cooldowns().reset_stopaction_timeout(50);
-			}
-		}
-
-		if ((do_stopaction && !action_usage) || gs->key_down_state(SDLK_COMMA)
-				|| gs->mouse_upwheel()) {
-			Pos hitsqr;
-			if (gs->tile_radius_test(x, y, RADIUS, false,
-					get_tile_by_name("stairs_up"), &hitsqr)) {
-				queued_actions.push_back(
-						game_action(gs, this, GameAction::USE_EXIT));
-				cooldowns().reset_stopaction_timeout(50);
-			}
-		}
-
-		// If we haven't done anything, rest
-		if (queued_actions.empty()) {
-			queued_actions.push_back(
-					game_action(gs, this, GameAction::USE_REST));
+		if (was_moving && !moving && cooldowns().can_do_stopaction()) {
+			do_stopaction = true;
 		}
 	}
-	//TODO: net redo
-//	GameNetConnection& connection = gs->net_connection();
-//	bool hasconnection = connection.get_connection() != NULL;
-//	NetPacket packet;
-//
-//	for (int i = 0; i < queued_actions.size(); i++) {
-//		queued_actions[i].frame = gs->frame();
-//	}
-//	if (!settings.savereplay_file.empty()) {
-//		save_actions(gs, queued_actions);
-//	}
-//
-//	if (is_local_player() && hasconnection) {
-//		for (int i = 0; i < queued_actions.size(); i++) {
-//			packet.add(queued_actions[i]);
-//		}
-//		packet.encode_header();
-//		printf("Sending player action for frame %d\n", gs->frame());
-//		connection.get_connection()->broadcast_packet(packet);
-//	}
+	//Shifting target
+	if (gs->key_press_state(SDLK_k)) {
+		gs->monster_controller().shift_target(gs);
+	}
+
+	if (gs->key_press_state(SDLK_m))
+		spellselect = -1;
+
+	bool attack_used = false;
+	if (!gs->game_hud().handle_io(gs, queued_actions)) {
+		attack_used = queue_io_spell_and_attack_actions(gs, dx, dy);
+		queue_io_equipment_actions(gs, do_stopaction);
+	}
+
+	bool action_usage = io.query_event(IOEvent::ACTIVATE_SPELL_N)
+			|| io.query_event(IOEvent::USE_WEAPON)
+			|| io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION)
+			|| io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION);
+	if ((do_stopaction && !action_usage) || gs->key_down_state(SDLK_PERIOD)
+			|| gs->mouse_downwheel()) {
+		Pos hitsqr;
+		if (gs->tile_radius_test(x, y, RADIUS, false,
+				get_tile_by_name("stairs_down"), &hitsqr)) {
+			queued_actions.push_back(
+					game_action(gs, this, GameAction::USE_ENTRANCE));
+			cooldowns().reset_stopaction_timeout(50);
+		}
+	}
+
+	if ((do_stopaction && !action_usage) || gs->key_down_state(SDLK_COMMA)
+			|| gs->mouse_upwheel()) {
+		Pos hitsqr;
+		if (gs->tile_radius_test(x, y, RADIUS, false,
+				get_tile_by_name("stairs_up"), &hitsqr)) {
+			queued_actions.push_back(
+					game_action(gs, this, GameAction::USE_EXIT));
+			cooldowns().reset_stopaction_timeout(50);
+		}
+	}
+
+	// If we haven't done anything, rest
+	if (queued_actions.empty()) {
+		queued_actions.push_back(game_action(gs, this, GameAction::USE_REST));
+	}
+
+	GameNetConnection& net = gs->net_connection();
+	if (net.is_connected()) {
+		net_send_player_actions(net, player_get_playernumber(gs, this),
+				queued_actions);
+	}
+
+	if (settings.saving_to_action_file()) {
+		save_actions(gs, queued_actions);
+	}
 }
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
@@ -267,7 +270,7 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 void PlayerInst::queue_network_actions(GameState *gs) {
 	GameNetConnection& connection = gs->net_connection();
 	bool hasconnection = connection.connection() != NULL;
-	//TODO: net redo
+//TODO: net redo
 //	NetPacket packet;
 //
 //	if (!is_local_player() && hasconnection) {
@@ -294,6 +297,7 @@ void PlayerInst::perform_queued_actions(GameState* gs) {
 		perform_action(gs, queued_actions[i]);
 	}
 	queued_actions.clear();
+	actions_set_for_turn = false;
 }
 
 void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
@@ -311,6 +315,7 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 		gs->game_hud().reset_slot_selected();
 	}
 }
+
 void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
 	StoreInst* store = (StoreInst*)gs->get_instance(action.use_id);
 	StoreInventory& inv = store->inventory();

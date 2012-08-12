@@ -11,6 +11,8 @@
 
 #include "../serialize/SerializeBuffer.h"
 
+#include "../objects/player/PlayerInst.h"
+
 #include "GameNetConnection.h"
 
 GameNetConnection::GameNetConnection(GameState* gs) :
@@ -23,12 +25,7 @@ GameNetConnection::~GameNetConnection() {
 	delete _message_buffer;
 }
 
-void gamenetconnection_packet_callback(void* context, const char* msg,
-		size_t len) {
-	((GameNetConnection*)context);
-}
-
-SerializeBuffer& GameNetConnection::grab_cleared_buffer(packet_type type) {
+SerializeBuffer& GameNetConnection::grab_buffer(message_t type) {
 	_message_buffer->clear();
 	_message_buffer->write_int(type);
 	return *_message_buffer;
@@ -58,15 +55,62 @@ void GameNetConnection::set_accepting_connections(bool accept) {
 	_connection->set_accepting_connections(accept);
 }
 
-void GameNetConnection::receive_packet(const char* msg, size_t len) {
+static void gamenetconnection_packet_callback(void* context, const char* msg,
+		size_t len) {
+	((GameNetConnection*)context)->_handle_message(msg, len);
+}
+void GameNetConnection::poll_messages(int timeout) {
+	_connection->poll(gamenetconnection_packet_callback, (void*)this, timeout);
+}
+
+void GameNetConnection::_handle_message(const char* msg, size_t len) {
+	message_t type;
+
+	// Fill buffer with message
 	_message_buffer->clear();
 	_message_buffer->write_raw(msg, len);
-	packet_type type;
+
+	// Read type from buffer
 	_message_buffer->read_int(type);
+
 	switch (type) {
 
+	case PACKET_ACTION: {
+		int player_number;
+		_message_buffer->read_int(player_number);
+		PlayerData& pd = gs->player_data();
+		PlayerDataEntry& pde = pd.all_players()[player_number];
+		ActionQueue actions;
+
+		_message_buffer->read_container(actions);
+		pde.player()->enqueue_actions(actions);
+
+		break;
+	}
+	case PACKET_CHAT_MESSAGE: {
+		ChatMessage msg;
+		msg.deserialize(*_message_buffer);
+		gs->game_chat().add_message(msg);
+		break;
+	}
 	}
 }
+
+void net_send_player_actions(GameNetConnection& net, int player_number,
+		const ActionQueue& actions) {
+	SerializeBuffer& sb = net.grab_buffer(GameNetConnection::PACKET_ACTION);
+	sb.write_int(player_number);
+	sb.write_container(actions);
+	net.send_packet(sb);
+}
+
+void net_send_chatmessage(GameNetConnection& net, ChatMessage & message) {
+	SerializeBuffer& sb = net.grab_buffer(
+			GameNetConnection::PACKET_CHAT_MESSAGE);
+	message.serialize(sb);
+	net.send_packet(sb);
+}
+
 //TODO: net redo
 //
 //void GameNetConnection::broadcast_packet(const NetPacket & packet,

@@ -32,7 +32,7 @@ void ClientConnection::initialize_connection() {
 	}
 }
 
-bool ClientConnection::poll(packet_recv_callback message_handler, void* context) {
+bool ClientConnection::poll(packet_recv_callback message_handler, void* context, int timeout) {
 	if (_client_socket == NULL) {
 		fprintf(stderr,
 				"ClientConnection::poll: Connection not initialized!\n");
@@ -40,7 +40,8 @@ bool ClientConnection::poll(packet_recv_callback message_handler, void* context)
 	}
 
 	while (true) {
-		int nready = SDLNet_CheckSockets(_socket_set, 0);
+		int nready = SDLNet_CheckSockets(_socket_set, timeout);
+		timeout = 0; // Don't wait again on repeated checks
 		if (nready < 0) {
 			fprintf(stderr, "Error: SDLNet_CheckSockets reported %s\n",
 					SDLNet_GetError());

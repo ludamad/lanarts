@@ -117,7 +117,7 @@ void GameState::set_level(GameLevelState* lvl) {
 
 /*Handle new characters and exit signals*/
 PlayerInst* GameState::local_player() {
-	return player_controller().local_player();
+	return player_data().local_player();
 }
 
 int GameState::object_radius_test(int x, int y, int radius, col_filterf f,
@@ -126,11 +126,11 @@ int GameState::object_radius_test(int x, int y, int radius, col_filterf f,
 }
 
 std::vector<PlayerInst*> GameState::players_in_level() {
-	return player_controller().players_in_level(world.get_current_level_id());
+	return player_data().players_in_level(world.get_current_level_id());
 }
 
 bool GameState::level_has_player() {
-	return player_controller().level_has_player(world.get_current_level_id());
+	return player_data().level_has_player(world.get_current_level_id());
 }
 
 static void safe_deserialize(GameInst* inst, GameState* gs,
@@ -151,6 +151,8 @@ void GameState::save_game(const char* filename) {
 //		insts[i]->serialize(this, serializer);
 //	}
 
+	player_data().serialize(this, serializer);
+
 	serializer.flush();
 	fclose(file);
 }
@@ -166,6 +168,7 @@ void GameState::load_game(const char* filename) {
 //		safe_deserialize(insts[i], this, serializer);
 //	}
 
+	player_data().deserialize(this, serializer);
 	fclose(file);
 }
 
@@ -396,7 +399,7 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 		return true;
 	}
 
-	PlayerData& pc = player_controller();
+	PlayerData& pc = player_data();
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
 			if (player && player->field_of_view().within_fov(xx, yy)) {

@@ -10,14 +10,17 @@
 
 #include <vector>
 
+#include "../gamestate/ActionQueue.h"
+
 class GameState;
 class SerializeBuffer;
 class NetConnection;
+struct ChatMessage;
 
 class GameNetConnection {
 public:
-	/*Packet types*/
-	enum packet_type {
+	/*Message types*/
+	enum message_t {
 		PACKET_ACTION = 0, PACKET_CHAT_MESSAGE = 1
 	};
 	GameNetConnection(GameState* gs);
@@ -34,21 +37,27 @@ public:
 		return _connection;
 	}
 
-	SerializeBuffer& grab_cleared_buffer(packet_type type);
+	SerializeBuffer& grab_buffer(message_t type);
 
 	void set_accepting_connections(bool accept);
 
-	void poll();
+	void poll_messages(int timeout = 0);
+
 	void send_packet(SerializeBuffer& serializer);
 	bool check_integrity(GameState* gs, int value);
 
-private:
-	void receive_packet(const char* msg, size_t len);
+	//Do-not-call-directly:
+	void _handle_message(const char* msg, size_t len);
 
+private:
 	//Keep a back-pointer so that we can alter world state based on messages received
 	GameState* gs;
 	SerializeBuffer* _message_buffer;
 	NetConnection* _connection;
 };
+
+void net_send_player_actions(GameNetConnection& net, int player_number,
+		const ActionQueue& actions);
+void net_send_chatmessage(GameNetConnection& net, ChatMessage& message);
 
 #endif /* GAMENETCONNECTION_H_ */

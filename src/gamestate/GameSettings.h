@@ -59,6 +59,13 @@ struct GameSettings {
 		autouse_health_potions = true;
 		autouse_mana_potions = true;
 	}
+
+	bool saving_to_action_file() {
+		return !savereplay_file.empty();
+	}
+	bool loading_from_action_file() {
+		return !loadreplay_file.empty();
+	}
 };
 
 #endif /* GAMESETTINGS_H_ */

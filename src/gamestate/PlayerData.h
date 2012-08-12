@@ -1,6 +1,6 @@
 /*
  * PlayerData.h:
- *	Handles network communication of player coordinates, creates input actions for player objects.
+ *	Holds lists of all players in game, and pointers to their respective PlayerInst's
  */
 
 #ifndef PLAYERCONTROLLER_H_
@@ -23,6 +23,9 @@ struct PlayerDataEntry {
 	std::string player_name;
 	GameInstRef player_inst;
 	int net_id;
+
+	PlayerInst* player();
+
 	PlayerDataEntry(const std::string& player_name, GameInst* player_inst,
 			int net_id) :
 			player_name(player_name), player_inst(player_inst), net_id(net_id) {
@@ -40,20 +43,26 @@ public:
 	PlayerInst* local_player();
 	PlayerDataEntry& local_player_data();
 
-	const std::vector<PlayerDataEntry>& all_players() {
+	std::vector<PlayerDataEntry>& all_players() {
 		return _players;
 	}
 	bool level_has_player(level_id level);
 	std::vector<PlayerInst*> players_in_level(level_id level);
 
-	void players_gain_xp(GameState* gs, int xp);
 	void copy_to(PlayerData& pc) const;
 
 	void serialize(GameState* gs, SerializeBuffer& serializer);
 	void deserialize(GameState* gs, SerializeBuffer& serializer);
+
 private:
-	GameInstRef _local_player;
+	int _local_player_idx;
 	std::vector<PlayerDataEntry> _players;
 };
+
+int player_get_playernumber(GameState* gs, PlayerInst* p);
+
+void players_gain_xp(GameState* gs, int xp);
+
+void players_poll_for_actions(GameState* gs);
 
 #endif /* PLAYERDATA_H_ */

@@ -41,8 +41,8 @@ public:
 	void set_current_level(GameLevelState* level) {
 		lvl = level;
 	}
-	PlayerData& player_controller() {
-		return _player_controller;
+	PlayerData& player_data() {
+		return _player_data;
 	}
 	EnemiesSeen& enemies_seen() {
 		return _enemies_seen;
@@ -56,10 +56,10 @@ private:
 	int next_room_id;
 
 	EnemiesSeen _enemies_seen;
-	PlayerData _player_controller;
+	PlayerData _player_data;
 
 	GameLevelState* lvl;
-	GameState* game_state;
+	GameState* gs;
 	std::vector<GameLevelState*> level_states;
 };
 

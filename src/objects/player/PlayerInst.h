@@ -48,7 +48,10 @@ public:
 
 	virtual PlayerInst* clone() const;
 	void gain_xp(GameState* gs, int xp);
-	void queue_io_actions(GameState* gs);
+
+	void enqueue_io_actions(GameState* gs);
+	void enqueue_actions(const ActionQueue& queue);
+
 	void perform_queued_actions(GameState* gs);
 	void perform_action(GameState* gs, const GameAction& action);
 
@@ -96,6 +99,10 @@ public:
 		return fieldofview;
 	}
 
+	bool actions_set() {
+		return actions_set_for_turn;
+	}
+
 private:
 	void queue_io_movement_actions(GameState* gs, int& dx, int& dy);
 	bool queue_io_spell_actions(GameState* gs);
@@ -118,6 +125,7 @@ private:
 	void reposition_item(GameState* gs, const GameAction& action);
 	void purchase_from_store(GameState* gs, const GameAction& action);
 
+	bool actions_set_for_turn;
 	ActionQueue queued_actions;
 	fov fieldofview;
 	bool didstep, local, moving;
