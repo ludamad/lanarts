@@ -67,6 +67,10 @@ tiles:
     file: res/tiles/dngn_floor/lair/lair
     variations: 8
     extension: .png
+  - name: spider_floor
+    file: res/tiles/dngn_floor/spider/spider0
+    variations: 10
+    extension: .png
 #Outside floor
   - name: sand_rock
     file: res/tiles/outside_floor/sandrockfloor/floor_sand_rock

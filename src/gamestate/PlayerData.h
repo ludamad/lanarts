@@ -22,24 +22,29 @@ class PlayerInst;
 struct PlayerDataEntry {
 	std::string player_name;
 	GameInstRef player_inst;
+	class_id classtype;
 	int net_id;
 
 	PlayerInst* player();
 
 	PlayerDataEntry(const std::string& player_name, GameInst* player_inst,
-			int net_id) :
-			player_name(player_name), player_inst(player_inst), net_id(net_id) {
+			class_id classtype, int net_id) :
+			player_name(player_name), player_inst(player_inst), classtype(
+					classtype), net_id(net_id) {
 	}
 };
 
 //Global data
 class PlayerData {
 public:
+	PlayerData() :
+			_local_player_idx(0) {
+	}
 	void update_fieldsofview(GameState* gs);
 	void clear();
 
 	void register_player(const std::string& name, PlayerInst* player,
-			int net_id);
+			class_id classtype, int net_id = -1);
 	PlayerInst* local_player();
 	PlayerDataEntry& local_player_data();
 
@@ -48,6 +53,8 @@ public:
 	}
 	bool level_has_player(level_id level);
 	std::vector<PlayerInst*> players_in_level(level_id level);
+
+	PlayerDataEntry& get_entry_by_netid(int netid);
 
 	void copy_to(PlayerData& pc) const;
 

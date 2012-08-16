@@ -14,8 +14,8 @@
 #include <cstdlib>
 
 typedef int receiver_t;
-typedef void (*packet_recv_callback)(void* context, const char* msg,
-		size_t len);
+typedef void (*packet_recv_callback)(receiver_t sender, void* context,
+		const char* msg, size_t len);
 
 /**
  * Interface for client & server connections

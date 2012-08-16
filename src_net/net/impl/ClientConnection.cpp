@@ -32,7 +32,8 @@ void ClientConnection::initialize_connection() {
 	}
 }
 
-bool ClientConnection::poll(packet_recv_callback message_handler, void* context, int timeout) {
+bool ClientConnection::poll(packet_recv_callback message_handler, void* context,
+		int timeout) {
 	if (_client_socket == NULL) {
 		fprintf(stderr,
 				"ClientConnection::poll: Connection not initialized!\n");
@@ -50,10 +51,10 @@ bool ClientConnection::poll(packet_recv_callback message_handler, void* context,
 			break;
 		}
 		while (SDLNet_SocketReady(_client_socket)) {
-			receiver_t receiver = receive_packet(_client_socket,
-					_packet_buffer);
+			receiver_t receiver, sender;
+			receive_packet(_client_socket, _packet_buffer, receiver, sender);
 			if (message_handler) {
-				message_handler(context, &_packet_buffer[HEADER_SIZE],
+				message_handler(sender, context, &_packet_buffer[HEADER_SIZE],
 						_packet_buffer.size() - HEADER_SIZE);
 			}
 		}

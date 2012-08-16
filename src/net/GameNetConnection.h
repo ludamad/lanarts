@@ -10,20 +10,30 @@
 
 #include <vector>
 
+#include "../lanarts_defines.h"
 #include "../gamestate/ActionQueue.h"
 
 class GameState;
+class GameChat;
+class GameStateInitData;
 class SerializeBuffer;
 class NetConnection;
+class PlayerData;
 struct ChatMessage;
 
 class GameNetConnection {
 public:
 	/*Message types*/
 	enum message_t {
-		PACKET_ACTION = 0, PACKET_CHAT_MESSAGE = 1
+		PACKET_CLIENT2SERV_CONNECTION_AFFIRM = 0,
+		PACKET_SERV2CLIENT_INITIALPLAYERDATA = 1,
+		PACKET_ACTION = 2,
+		PACKET_CHAT_MESSAGE = 3
 	};
-	GameNetConnection(GameState* gs);
+	// Initialize with references to structures that are updated by messages
+	// Keep parts of the game-state that are updated explicit
+	GameNetConnection(GameChat& chat, PlayerData& pd,
+			GameStateInitData& init_data);
 	~GameNetConnection();
 
 	void initialize_as_client(const char* host, int port);
@@ -43,19 +53,25 @@ public:
 
 	void poll_messages(int timeout = 0);
 
-	void send_packet(SerializeBuffer& serializer);
+	void send_packet(SerializeBuffer& serializer, int receiver = -1);
 	bool check_integrity(GameState* gs, int value);
 
 	//Do-not-call-directly:
-	void _handle_message(const char* msg, size_t len);
+	void _handle_message(int sender, const char* msg, size_t len);
 
 private:
-	//Keep a back-pointer so that we can alter world state based on messages received
-	GameState* gs;
+	//Keep back-references so that we can alter world state based on messages received
+	GameChat& chat;
+	PlayerData& pd;
+	GameStateInitData& init_data;
+
 	SerializeBuffer* _message_buffer;
 	NetConnection* _connection;
 };
 
+void net_send_connection_affirm(GameNetConnection& net, const std::string& name,
+		class_id classtype);
+void net_send_game_init_data(GameNetConnection& net, PlayerData& pd, int seed);
 void net_send_player_actions(GameNetConnection& net, int player_number,
 		const ActionQueue& actions);
 void net_send_chatmessage(GameNetConnection& net, ChatMessage& message);

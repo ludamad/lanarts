@@ -62,7 +62,7 @@ static bool is_wieldable_projectile(Equipment& equipment, const Item& item) {
 
 const int AUTOUSE_HEALTH_POTION_THRESHOLD = 20;
 
-void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
+void PlayerInst::enqueue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 	GameView& view = gs->view();
 	bool mouse_within = gs->mouse_x() < gs->view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
@@ -127,7 +127,7 @@ void PlayerInst::queue_io_equipment_actions(GameState* gs, bool do_stopaction) {
 							iteminst->id));
 	}
 }
-void PlayerInst::queue_io_movement_actions(GameState* gs, int& dx, int& dy) {
+void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
 	//Arrow/wasd movement
 	if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
 		dy -= 1;
@@ -179,7 +179,7 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 	if (!settings.loadreplay_file.empty()) {
 		load_actions(gs, queued_actions);
 	} else if (is_local_player()) {
-		queue_io_movement_actions(gs, dx, dy);
+		enqueue_io_movement_actions(gs, dx, dy);
 
 		if (was_moving && !moving && cooldowns().can_do_stopaction()) {
 			do_stopaction = true;
@@ -195,8 +195,8 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 
 	bool attack_used = false;
 	if (!gs->game_hud().handle_io(gs, queued_actions)) {
-		attack_used = queue_io_spell_and_attack_actions(gs, dx, dy);
-		queue_io_equipment_actions(gs, do_stopaction);
+		attack_used = enqueue_io_spell_and_attack_actions(gs, dx, dy);
+		enqueue_io_equipment_actions(gs, do_stopaction);
 	}
 
 	bool action_usage = io.query_event(IOEvent::ACTIVATE_SPELL_N)
@@ -267,7 +267,7 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	gs->remove_instance(item);
 }
 
-void PlayerInst::queue_network_actions(GameState *gs) {
+void PlayerInst::enqueue_network_actions(GameState *gs) {
 	GameNetConnection& connection = gs->net_connection();
 	bool hasconnection = connection.connection() != NULL;
 //TODO: net redo

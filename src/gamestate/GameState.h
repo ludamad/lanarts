@@ -37,6 +37,14 @@ struct GameTiles;
 class GameInst;
 class PlayerInst;
 
+struct GameStateInitData {
+	int seed;
+	bool seed_set_by_network_message;
+	GameStateInitData(int seed = 0, bool seed_set_by_network_message = false) :
+			seed(seed), seed_set_by_network_message(seed_set_by_network_message) {
+	}
+};
+
 class GameState {
 public:
 
@@ -44,7 +52,7 @@ public:
 			int viewh = 480, int hudw = 160);
 	~GameState();
 	/* Call after construction, before game starts: */
-	void init_game();
+	void start_game();
 	void save_game(const char* filename);
 	void load_game(const char* filename);
 
@@ -208,6 +216,11 @@ public:
 	/* Make sure rooms exist & portals point to valid locations in next room */
 	void ensure_level_connectivity(int roomid1, int roomid2);
 
+	// Use this to override seed used in start_game()
+	GameStateInitData& game_state_init_data() {
+		return init_data;
+	}
+
 private:
 	int handle_event(SDL_Event* event);
 
@@ -215,6 +228,7 @@ private:
 	GameSettings settings;
 	lua_State* L;
 	int frame_n;
+	GameStateInitData init_data;
 
 	GameNetConnection connection;
 	GameHud hud;

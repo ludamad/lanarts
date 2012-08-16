@@ -11,7 +11,7 @@ set( lanarts_net_tests
 	tests/tests.h
 	tests/tests.cpp
 	tests/unit_tests.cpp
-	main.cpp
+#	main.cpp
 )
 
 set( lanarts_net_src
@@ -29,7 +29,6 @@ set( lanarts_net_include
 )
 
 add_library( lanarts_net
-             ${lanarts_net_src}
-             ${lanarts_net_include})
+             ${lanarts_net_src})
 
 

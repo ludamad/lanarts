@@ -25,9 +25,10 @@
 PlayerInst::PlayerInst(const CombatStats& stats, int x, int y, bool local) :
 		CombatGameInst(stats,
 				game_class_data.at(stats.class_stats.classid).sprite, 0, x, y,
-				RADIUS, true, DEPTH), fieldofview(LINEOFSIGHT), local(local), moving(
-				0), autouse_mana_potion_try_count(0), lives(0), deaths(0), previous_spellselect(
-				0), spellselect(-1) {
+				RADIUS, true, DEPTH), actions_set_for_turn(false), fieldofview(
+				LINEOFSIGHT), local(local), moving(0), autouse_mana_potion_try_count(
+				0), lives(0), deaths(0), previous_spellselect(0), spellselect(
+				-1) {
 }
 
 PlayerInst::~PlayerInst() {
@@ -86,13 +87,13 @@ static void spawn_in_lower_level(GameState* gs, PlayerInst* player) {
 
 void PlayerInst::step(GameState* gs) {
 
-	if (performed_actions_for_step())
+	if (!actions_set_for_turn)
 		return;
 
 	CombatGameInst::step(gs);
 	GameView& view = gs->view();
 
-	queue_network_actions(gs);
+	enqueue_network_actions(gs);
 
 	//Stats/effect step
 	if (cooldowns().is_hurting())
@@ -118,8 +119,6 @@ void PlayerInst::step(GameState* gs) {
 
 	if (!gs->key_down_state(SDLK_x) && is_local_player())
 		view.center_on(last_x, last_y);
-
-	performed_actions_for_step() = true;
 
 	update_position();
 }

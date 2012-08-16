@@ -130,11 +130,11 @@ void main_menu_loop(GameState* gs, int width, int height) {
 
 static void choose_fighter(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;
-	gs->game_settings().classn = get_class_by_name("Fighter");
+	gs->game_settings().classtype = get_class_by_name("Fighter");
 }
 static void choose_mage(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;
-	gs->game_settings().classn = get_class_by_name("Mage");
+	gs->game_settings().classtype = get_class_by_name("Mage");
 }
 static void choose_druid(GameState* gs, GameInst* _, void* flag) {
 //	*(bool*) flag = true;
@@ -171,6 +171,33 @@ static void setup_classmenu_buttons(GameState* gs, bool* exit, int x, int y) {
 }
 
 void class_menu_loop(GameState* gs, int width, int height) {
+	bool exit = false;
+	int halfw = width / 2;
+
+	GameView prevview = gs->view();
+	GameLevelState* oldlevel = gs->get_level();
+
+	gs->set_level(new GameLevelState(0, width, height));
+	gs->get_level()->levelid = -1;
+	gs->view().x = 0;
+	gs->view().y = 0;
+
+	gs->add_instance(new AnimatedInst(halfw, 100, get_sprite_by_name("logo")));
+	setup_classmenu_buttons(gs, &exit, halfw, 300);
+
+	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {
+		gs->get_level()->inst_set.step(gs);
+		gs->draw(false);
+	}
+
+	delete gs->get_level();
+
+	gs->set_level(oldlevel);
+	gs->view() = prevview;
+}
+
+
+void connections_menu(GameState* gs, int width, int height) {
 	bool exit = false;
 	int halfw = width / 2;
 

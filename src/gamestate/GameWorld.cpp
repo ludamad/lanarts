@@ -68,7 +68,7 @@ void GameWorld::spawn_players(GeneratedLevel& genlevel, void** player_instances,
 		bool flocal = (gs->game_settings().conntype == GameSettings::CLIENT);
 		GameSettings& settings = gs->game_settings();
 		GameNetConnection& netconn = gs->net_connection();
-		int myclassn = gs->game_settings().classn;
+		int myclassn = gs->game_settings().classtype;
 
 		static std::vector<int> theirclasses;
 		//TODO: net redo

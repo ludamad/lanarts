@@ -29,11 +29,11 @@ void PlayerData::clear() {
 }
 
 void PlayerData::register_player(const std::string& name, PlayerInst* player,
-		int net_id) {
-	if (player->is_local_player()) {
+		class_id classtype, int net_id) {
+	if (player && player->is_local_player()) {
 		_local_player_idx = _players.size();
 	}
-	_players.push_back(PlayerDataEntry(name, player, net_id));
+	_players.push_back(PlayerDataEntry(name, player, classtype, net_id));
 }
 
 PlayerInst* PlayerData::local_player() {
@@ -90,6 +90,17 @@ void PlayerData::serialize(GameState* gs, SerializeBuffer& serializer) {
 
 PlayerDataEntry& PlayerData::local_player_data() {
 	return _players[_local_player_idx];
+}
+
+PlayerDataEntry& PlayerData::get_entry_by_netid(int netid) {
+	for (int i = 0; i < _players.size(); i++) {
+		if (_players[i].net_id == netid) {
+			return _players[i];
+		}
+	}
+	/* Shouldn't happen */
+	LANARTS_ASSERT(false);
+	return _players.at(0);
 }
 
 void PlayerData::deserialize(GameState* gs, SerializeBuffer & serializer) {

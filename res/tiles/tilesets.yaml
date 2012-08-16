@@ -18,6 +18,11 @@ tilesets:
     floor_tile: lair_floor
     alt_floor_tile: cobalt_floor
     wall_tile: hive_wall
+    
+  - tileset: lair_tiles3
+    floor_tile: spider_floor
+    alt_floor_tile: pebble_brown
+    wall_tile: hive_wall
 
   - tileset: cobalt_tiles
     floor_tile: cobalt_floor

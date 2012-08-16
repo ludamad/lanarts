@@ -1,17 +1,32 @@
-#include "tests.h"
-
 #include <cstring>
 #include <cstdio>
 
-#include "../lanarts_net.h"
-
-#include <string>
 #include <vector>
+#include <string>
+
+#include <net/lanarts_net.h>
+
+#include "../tests.h"
 
 const int TEST_PORT = 6112;
 static int callback_calls;
 
-static void assert_equal_msg(void* teststr, const char* msg, size_t len) {
+/* Enables thread-safety in resource deallocation */
+struct CleanNetConnection {
+	CleanNetConnection(NetConnection* conn = NULL) :
+			conn(conn) {
+	}
+	~CleanNetConnection() {
+		delete conn;
+	}
+	NetConnection* operator->() {
+		return conn;
+	}
+	NetConnection* conn;
+};
+
+static void assert_equal_msg(receiver_t sender, void* teststr, const char* msg,
+		size_t len) {
 	const char* tester = (char*)teststr;
 	callback_calls++;
 	UNIT_TEST_ASSERT(strncmp(tester, msg, len) == 0);
@@ -21,8 +36,9 @@ static void test_simple_client_server_msg() {
 	const char* msg = "Hello World!";
 	callback_calls = 0;
 
-	NetConnection* server = create_server_connection(TEST_PORT);
-	NetConnection* client = create_client_connection("localhost", TEST_PORT);
+	CleanNetConnection server = create_server_connection(TEST_PORT);
+	CleanNetConnection client = create_client_connection("localhost",
+			TEST_PORT);
 
 	server->initialize_connection();
 	client->initialize_connection();
@@ -36,9 +52,6 @@ static void test_simple_client_server_msg() {
 	client->poll(assert_equal_msg, (void*)msg);
 
 	UNIT_TEST_ASSERT(callback_calls == 2);
-
-	delete server;
-	delete client;
 }
 
 static void test_multiple_clients() {
@@ -46,9 +59,11 @@ static void test_multiple_clients() {
 	const char* msgclient = "Client Message";
 	callback_calls = 0;
 
-	NetConnection* server = create_server_connection(TEST_PORT);
-	NetConnection* client1 = create_client_connection("localhost", TEST_PORT);
-	NetConnection* client2 = create_client_connection("localhost", TEST_PORT);
+	CleanNetConnection server = create_server_connection(TEST_PORT);
+	CleanNetConnection client1 = create_client_connection("localhost",
+			TEST_PORT);
+	CleanNetConnection client2 = create_client_connection("localhost",
+			TEST_PORT);
 
 	server->initialize_connection();
 	client1->initialize_connection();
@@ -65,24 +80,23 @@ static void test_multiple_clients() {
 	client2->poll(assert_equal_msg, (void*)msgsrv);
 
 	UNIT_TEST_ASSERT(callback_calls == 3);
-
-	delete server;
-	delete client1;
-	delete client2;
 }
 
-static void append_to_string_vector(void* strvec, const char* msg, size_t len) {
+static void append_to_string_vector(receiver_t sender, void* strvec,
+		const char* msg, size_t len) {
 	std::vector<std::string>* strs = (std::vector<std::string>*)strvec;
 	strs->push_back(std::string(msg, len));
 }
+
 static void test_multiple_messages() {
 	const char* msgs[] = { "Message 1", "Message 2", "Message 3" };
 	const int msg_n = 3;
 
 	callback_calls = 0;
 
-	NetConnection* server = create_server_connection(TEST_PORT);
-	NetConnection* client = create_client_connection("localhost", TEST_PORT);
+	CleanNetConnection server = create_server_connection(TEST_PORT);
+	CleanNetConnection client = create_client_connection("localhost",
+			TEST_PORT);
 
 	server->initialize_connection();
 	client->initialize_connection();
@@ -112,9 +126,6 @@ static void test_multiple_messages() {
 		UNIT_TEST_ASSERT(servermsglist.at(i) == msgs[i]);
 		UNIT_TEST_ASSERT(clientmsglist.at(i) == msgs[i]);
 	}
-
-	delete server;
-	delete client;
 }
 
 void net_unit_tests() {

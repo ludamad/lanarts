@@ -31,7 +31,7 @@ struct GameSettings {
 
 	/*Permanent gameplay settings*/
 	bool regen_on_death;
-	class_id classn;
+	class_id classtype;
 
 	/*Gameplay settings changeable in game*/
 	bool autouse_health_potions, autouse_mana_potions;
@@ -41,7 +41,7 @@ struct GameSettings {
 		fullscreen = false;
 		regen_on_death = false;
 
-		classn = 1;
+		classtype = 1;
 		view_width = 960;
 		view_height = 720;
 		steps_per_draw = 1;

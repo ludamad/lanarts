@@ -24,8 +24,12 @@ Small:
 - Add graphics for each class [DONE - Make multiple options]
 - Make mouse jiggling not cause stair case movement
 - Make damage amounts not show off screen
+- Make enemies drop money/items
+	- Would be best if enemies picked up items - but does lead to paranoid behaviour from player
+		- Should probably not pick up any item the player has interacted with - but unrealistic
 - Make all ranged enemies have a short range melee option for close kiters
-- Make haste scrolls not show up as often, fix shop contents to be more varied, add more items
+- Add items that give free XP but hurt you/ make you exhausted
+	- Amount depends on dungeon depth
 
 Partial Completion:
 - [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
@@ -94,3 +98,6 @@ Completed:
 
 < 01/08/2012:
 - [DONE] Add class choice options for main menu
+
+< 14/08/2012
+- [DONE] Make haste scrolls not show up as often, fix shop contents to be more varied, add more items

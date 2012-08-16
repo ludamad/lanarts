@@ -13,8 +13,14 @@ include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE
 set( lanarts_tests
 	tests/tests.h
 	tests/tests.cpp
+
 	tests/lua_tests.cpp
 	tests/lua_serialize_tests.cpp
+
+	tests/net/net_tests.cpp
+	tests/net/adv_net_tests.cpp
+
+	tests/stats/stat_serialize_tests.cpp
 )
 
 set( lanarts_src

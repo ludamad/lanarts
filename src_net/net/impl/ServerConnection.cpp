@@ -30,7 +30,8 @@ ServerConnection::~ServerConnection() {
 	SDLNet_FreeSocketSet(_socket_set);
 }
 
-bool ServerConnection::poll(packet_recv_callback message_handler, void* context, int timeout) {
+bool ServerConnection::poll(packet_recv_callback message_handler, void* context,
+		int timeout) {
 	if (_server_socket == NULL) {
 		fprintf(stderr,
 				"ServerConnection::poll: Connection not initialized!\n");
@@ -54,16 +55,18 @@ bool ServerConnection::poll(packet_recv_callback message_handler, void* context,
 			// If socket is ready, handle messages
 			while (SDLNet_SocketReady(_socket_list[i])) {
 
-				printf("ServerConnect::poll: client socket %d activity\n",
-						i + 1);
-				receiver_t receiver = receive_packet(_socket_list[i],
-						_packet_buffer);
+//				printf("ServerConnect::poll: client socket %d activity\n",
+//						i + 1);
+				receiver_t receiver, _unused_sender;
+				receive_packet(_socket_list[i], _packet_buffer, receiver,
+						_unused_sender);
 				// Rebroadcast to clients
 				_send_message(_packet_buffer, receiver, receiver_t(i + 1));
 
 				if (receiver == ALL_RECEIVERS || receiver == SERVER_RECEIVER) {
 					if (message_handler) {
-						message_handler(context, &_packet_buffer[HEADER_SIZE],
+						message_handler(i + 1, context,
+								&_packet_buffer[HEADER_SIZE],
 								_packet_buffer.size() - HEADER_SIZE);
 					}
 				}
@@ -71,11 +74,11 @@ bool ServerConnection::poll(packet_recv_callback message_handler, void* context,
 		}
 
 		while (SDLNet_SocketReady(_server_socket)) {
-			printf("ServerConnect::poll: new client connection\n");
+//			printf("ServerConnect::poll: new client connection\n");
 			TCPsocket client_socket = SDLNet_TCP_Accept(_server_socket);
 			if (!client_socket || !_accepting_connections
 					|| _socket_list.size() >= _maximum_sockets) {
-				printf("ServerConnect::poll: client denied\n");
+//				printf("ServerConnect::poll: client denied\n");
 				SDLNet_TCP_Close(client_socket);
 			} else {
 				SDLNet_TCP_AddSocket(_socket_set, client_socket);
@@ -96,10 +99,10 @@ void ServerConnection::set_accepting_connections(bool accept) {
 void ServerConnection::_send_message(PacketBuffer& packet, receiver_t receiver,
 		int originator) {
 	if (receiver == ALL_RECEIVERS) {
-		printf("Sending msg with packet buff size = %d\n", packet.size());
-		std::string msg(&packet.at(8), packet.size() - 8);
-		printf("ServerConnection::_send_message: Sending msg '%s'\n",
-				msg.c_str());
+//		printf("Sending msg with packet buff size = %d\n", packet.size());
+		std::string msg(&packet.at(12), packet.size() - 12);
+//		printf("ServerConnection::_send_message: Sending msg '%s'\n",
+//				msg.c_str());
 		for (int i = 0; i < _socket_list.size(); i++) {
 			if (i + 1 != originator) {
 				send_packet(_socket_list[i], _packet_buffer);

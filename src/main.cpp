@@ -151,8 +151,7 @@ int main(int argc, char** argv) {
 
 	main_menu_loop(gs, windoww, windowh);
 
-	gs->init_game();
-
+	gs->start_game();
 
 	game_loop(gs);
 

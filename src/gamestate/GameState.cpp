@@ -38,16 +38,34 @@ extern "C" {
 #include "../objects/GameInst.h"
 #include "../objects/player/PlayerInst.h"
 
+static int generate_seed() {
+	//the most significant bits of systime are likely to be very similar, mix with clock()
+	int clk = int(clock() << 22);
+	time_t systime;
+	time(&systime);
+	return clk ^ int(systime);
+}
+
 GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 		int viewh, int hudw) :
-		settings(settings), L(L), connection(this), frame_n(0), hud(
-				BBox(vieww, 0, vieww + hudw, viewh), BBox(0, 0, vieww, viewh)), _view(
-				0, 0, vieww, viewh), world(this) {
+		settings(settings), L(L), connection(game_chat(), player_data(),
+				init_data), frame_n(0), hud(BBox(vieww, 0, vieww + hudw, viewh),
+				BBox(0, 0, vieww, viewh)), _view(0, 0, vieww, viewh), world(
+				this) {
 
 	dragging_view = false;
 
 	init_font(&small_font, settings.font.c_str(), 10);
 	init_font(&large_font, settings.font.c_str(), 20);
+
+	if (settings.conntype == GameSettings::SERVER) {
+		connection.initialize_as_server(settings.port);
+	} else if (settings.conntype == GameSettings::CLIENT) {
+		connection.initialize_as_client(settings.ip.c_str(), settings.port);
+		net_send_connection_affirm(connection, settings.username,
+				settings.classtype);
+	}
+	init_data.seed = generate_seed();
 }
 
 GameState::~GameState() {
@@ -58,24 +76,16 @@ GameState::~GameState() {
 	lua_close(L);
 }
 
-void GameState::init_game() {
-	time_t systime;
-	time(&systime);
-	int seed = systime;
+void GameState::start_game() {
 	if (!settings.loadreplay_file.empty()) {
-		load_init(this, seed, settings.classn);
+		load_init(this, init_data.seed, settings.classtype);
 	}
 	if (!settings.savereplay_file.empty()) {
-		save_init(this, seed, settings.classn);
+		save_init(this, init_data.seed, settings.classtype);
 	}
 
 	init_lua_data(this, L);
 
-	if (settings.conntype == GameSettings::CLIENT) {
-		connection.initialize_as_client(settings.ip.c_str(), settings.port);
-	} else if (settings.conntype == GameSettings::SERVER) {
-		connection.initialize_as_server(settings.port);
-	}
 //TODO: net redo
 //	if (settings.conntype == GameSettings::CLIENT) {
 //		NetPacket packet;
@@ -98,13 +108,21 @@ void GameState::init_game() {
 //		connection.get_connection()->broadcast_packet(packet, true);
 //		printf("NETWORK: Broadcasting seed=0x%X\n", seed);
 //	}
-	printf("Seed used for RNG = 0x%X\n", seed);
-	mtwist.init_genrand(seed);
+	if (settings.conntype == GameSettings::CLIENT) {
+		while (!init_data.seed_set_by_network_message) {
+			connection.poll_messages(1 /* milliseconds */);
+		}
+	}
+
+	printf("Seed used for RNG = 0x%X\n", init_data.seed);
+
+	//TODO: net redo : send init data message here
+	mtwist.init_genrand(init_data.seed);
+
 	set_level(world.get_level(0, true));
 
 	PlayerInst* p = local_player();
 	view().sharp_center_on(p->x, p->y);
-
 }
 
 void GameState::set_level(GameLevelState* lvl) {
