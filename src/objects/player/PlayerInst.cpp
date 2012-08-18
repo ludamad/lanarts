@@ -139,16 +139,10 @@ void PlayerInst::copy_to(GameInst *inst) const {
 
 void PlayerInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	CombatGameInst::serialize(gs, serializer);
-	// XXX: Never serialize/deserialize at a point where 'queued_actions' is needed
-	// XXX: Never serialize/deserialize at a point where 'fieldofview' is needed
-	SERIALIZE_POD_REGION(serializer, this, didstep, spellselect);
 }
 
 void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	CombatGameInst::deserialize(gs, serializer);
-	// XXX: Never serialize/deserialize at a point where 'queued_actions' is needed
-	// XXX: Never serialize/deserialize at a point where 'fieldofview' is needed
-	DESERIALIZE_POD_REGION(serializer, this, didstep, spellselect);
 }
 
 PlayerInst *PlayerInst::clone() const {

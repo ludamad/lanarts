@@ -178,8 +178,6 @@ void GameState::save_game(const char* filename) {
 	tiles().serialize(serializer);
 	get_level()->inst_set.serialize(this, serializer);
 
-	player_controller().serialize(this, serializer);
-
 	player_data().serialize(this, serializer);
 
 	serializer.flush();
