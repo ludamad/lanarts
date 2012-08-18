@@ -57,12 +57,8 @@ private:
 	int next_room_id;
 
 	EnemiesSeen _enemies_seen;
-<<<<<<< HEAD
-	PlayerController _player_controller;
 	TeamRelations _team_relations;
-=======
 	PlayerData _player_data;
->>>>>>> dev
 
 	GameLevelState* lvl;
 	GameState* gs;
