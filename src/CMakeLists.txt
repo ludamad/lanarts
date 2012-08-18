@@ -138,12 +138,8 @@ set( lanarts_src
 	objects/enemy/EnemyBehaviour.cpp
 	objects/enemy/MonsterController.cpp
 	objects/enemy/MonsterControllerActions.cpp
-<<<<<<< HEAD
-	objects/player/PlayerController.cpp
 	objects/TeamRelations.cpp
-=======
 	gamestate/PlayerData.cpp
->>>>>>> dev
 	
 	objects/store/StoreInventory.cpp
 	objects/store/StoreInst.cpp
