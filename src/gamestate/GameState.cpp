@@ -58,13 +58,6 @@ GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 	init_font(&small_font, settings.font.c_str(), 10);
 	init_font(&large_font, settings.font.c_str(), 20);
 
-	if (settings.conntype == GameSettings::SERVER) {
-		connection.initialize_as_server(settings.port);
-	} else if (settings.conntype == GameSettings::CLIENT) {
-		connection.initialize_as_client(settings.ip.c_str(), settings.port);
-		net_send_connection_affirm(connection, settings.username,
-				settings.classtype);
-	}
 	init_data.seed = generate_seed();
 }
 
@@ -76,7 +69,28 @@ GameState::~GameState() {
 	lua_close(L);
 }
 
+void GameState::start_connection() {
+	if (settings.conntype == GameSettings::SERVER) {
+		printf("server connected\n");
+		connection.initialize_as_server(settings.port);
+	} else if (settings.conntype == GameSettings::CLIENT) {
+		connection.initialize_as_client(settings.ip.c_str(), settings.port);
+		printf("client connected\n");
+		net_send_connection_affirm(connection, settings.username,
+				settings.classtype);
+	}
+	if (settings.conntype == GameSettings::SERVER
+			|| settings.conntype == GameSettings::NONE) {
+		player_data().set_local_player(0);
+		player_data().register_player(settings.username, NULL,
+				settings.classtype);
+	}
+}
+
 void GameState::start_game() {
+	if (settings.conntype == GameSettings::SERVER) {
+		net_send_game_init_data(connection, player_data(), init_data.seed);
+	}
 	if (!settings.loadreplay_file.empty()) {
 		load_init(this, init_data.seed, settings.classtype);
 	}
@@ -116,7 +130,7 @@ void GameState::start_game() {
 
 	printf("Seed used for RNG = 0x%X\n", init_data.seed);
 
-	//TODO: net redo : send init data message here
+//TODO: net redo : send init data message here
 	mtwist.init_genrand(init_data.seed);
 
 	set_level(world.get_level(0, true));
@@ -228,6 +242,7 @@ bool GameState::pre_step() {
 	return world.pre_step();
 }
 void GameState::step() {
+	connection.poll_messages();
 	hud.step(this);
 	world.step(); //Has pointer to this (GameState) object
 	lua_gc(L, LUA_GCSTEP, 0); // collect garbage incrementally
@@ -290,6 +305,7 @@ void GameState::draw(bool drawhud) {
 	for (size_t i = 0; i < safe_copy.size(); i++) {
 		safe_copy[i]->draw(this);
 	}
+
 	monster_controller().post_draw(this);
 	get_level()->tiles.post_draw(this);
 	if (drawhud) {

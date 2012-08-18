@@ -109,6 +109,7 @@ set( lanarts_src
 	lua/LuaValue.cpp
 	objects/collision_filters.cpp
 
+	gamestate/ActionQueue.cpp
 	gamestate/GameAction.cpp
 	gamestate/GameInstSet.cpp
 	gamestate/GameState.cpp
@@ -234,6 +235,7 @@ set( lanarts_include
 
 	net/GameNetConnection.h
 
+	gamestate/ActionQueue.h
 	gamestate/GameAction.h
 	gamestate/GameInstSet.h
 	gamestate/GameState.h
@@ -254,6 +256,7 @@ set( lanarts_include
 	interface/GameHud.h
 	interface/GameTextConsole.h
 	interface/ActionBar.h
+	interface/DrawCallbackInst.h
 	interface/sidebar/ConfigContent.h
 	interface/sidebar/EnemiesSeenContent.h
 	interface/sidebar/EquipmentContent.h

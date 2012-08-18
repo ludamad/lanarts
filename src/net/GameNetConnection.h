@@ -72,8 +72,8 @@ private:
 void net_send_connection_affirm(GameNetConnection& net, const std::string& name,
 		class_id classtype);
 void net_send_game_init_data(GameNetConnection& net, PlayerData& pd, int seed);
-void net_send_player_actions(GameNetConnection& net, int player_number,
-		const ActionQueue& actions);
+void net_send_player_actions(GameNetConnection& net, int frame,
+		int player_number, const ActionQueue& actions);
 void net_send_chatmessage(GameNetConnection& net, ChatMessage& message);
 
 #endif /* GAMENETCONNECTION_H_ */

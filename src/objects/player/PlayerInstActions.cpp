@@ -62,7 +62,8 @@ static bool is_wieldable_projectile(Equipment& equipment, const Item& item) {
 
 const int AUTOUSE_HEALTH_POTION_THRESHOLD = 20;
 
-void PlayerInst::enqueue_io_equipment_actions(GameState* gs, bool do_stopaction) {
+void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
+		bool do_stopaction) {
 	GameView& view = gs->view();
 	bool mouse_within = gs->mouse_x() < gs->view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
@@ -159,7 +160,7 @@ void PlayerInst::enqueue_actions(const ActionQueue& queue) {
 }
 
 void PlayerInst::enqueue_io_actions(GameState* gs) {
-	LANARTS_ASSERT(is_local_player());
+	LANARTS_ASSERT(is_local_player() && gs->local_player() == this);
 
 	if (actions_set_for_turn) {
 		return;
@@ -232,8 +233,8 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 
 	GameNetConnection& net = gs->net_connection();
 	if (net.is_connected()) {
-		net_send_player_actions(net, player_get_playernumber(gs, this),
-				queued_actions);
+		net_send_player_actions(net, gs->frame(),
+				player_get_playernumber(gs, this), queued_actions);
 	}
 
 	if (settings.saving_to_action_file()) {

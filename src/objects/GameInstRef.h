@@ -26,7 +26,10 @@ public:
 	}
 	void operator=(const GameInstRef& ref);
 	void operator=(GameInst* ref);
-	GameInst* operator->() {
+	bool empty() const {
+		return inst == NULL;
+	}
+	GameInst* operator->() const {
 		return inst;
 	}
 private:

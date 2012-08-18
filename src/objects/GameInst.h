@@ -38,11 +38,11 @@ public:
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
 
-	virtual void copy_to(GameInst* inst) const = 0;
+	virtual void copy_to(GameInst* inst) const;
 
 	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
 	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
-	virtual GameInst* clone() const = 0;
+	virtual GameInst* clone() const;
 	//Used for integrity checking
 	virtual unsigned int integrity_hash();
 	virtual void update_position(float newx, float newy);

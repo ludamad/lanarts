@@ -24,6 +24,7 @@ inline void prepare_packet(PacketBuffer& packet, const char* msg, int len,
 	packet.insert(packet.end(), (char*)&sender, ((char*)&sender) + sizeof(int));
 	packet.insert(packet.end(), (char*)&len, ((char*)&len) + sizeof(int));
 	packet.insert(packet.end(), msg, msg + len);
+//	printf("prepping with %d %d %d\n", receiver, sender, len);
 }
 
 inline void set_packet_sender(PacketBuffer& packet, int sender = 0) {
@@ -40,14 +41,16 @@ inline void receive_packet(TCPsocket socket, PacketBuffer& packet,
 
 	int nread = SDLNet_TCP_Recv(socket, &packet[0], HEADER_SIZE);
 	if (nread < HEADER_SIZE) {
-		//TODO: Error properly
-		fprintf(stderr, "Error while reading packet header!\n", nread);
+		fprintf(stderr, "Connection severed!\n", nread);
 		receiver = -1;
 		sender = -1;
+		exit(0);
 	} else {
 		receiver = *(int*)&packet[0];
-		receiver = *(int*)&packet[sizeof(int)];
+		sender = *(int*)&packet[sizeof(int)];
 		int size = *(int*)&packet[sizeof(int) * 2];
+
+//		printf("recving with %d %d %d\n", receiver, sender, size);
 		int body_read = nread - HEADER_SIZE;
 		packet.resize(size + HEADER_SIZE);
 

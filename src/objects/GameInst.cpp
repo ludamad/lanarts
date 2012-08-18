@@ -60,6 +60,15 @@ void GameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	lua_variables.deserialize(gs->get_luastate(), serializer);
 }
 
+void GameInst::copy_to(GameInst *inst) const {
+	LANARTS_ASSERT(false);
+}
+
+GameInst* GameInst::clone() const {
+	LANARTS_ASSERT(false);
+	return NULL;
+}
+
 void GameInst::free_reference() {
 	reference_count--;
 	if (reference_count <= 0) {

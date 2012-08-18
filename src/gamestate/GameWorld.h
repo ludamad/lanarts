@@ -33,8 +33,7 @@ public:
 	void set_current_level_lazy(int roomid);
 	void reset(int keep = 0);
 	void regen_level(int roomid);
-	void spawn_player(GeneratedLevel& genlevel, bool local = true, int classn =
-			0, PlayerInst* inst = NULL);
+	void place_inst(GeneratedLevel& genlevel, GameInst* inst);
 	GameLevelState* get_current_level() {
 		return lvl;
 	}

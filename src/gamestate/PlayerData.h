@@ -21,6 +21,7 @@ class PlayerInst;
 
 struct PlayerDataEntry {
 	std::string player_name;
+	MultiframeActionQueue action_queue;
 	GameInstRef player_inst;
 	class_id classtype;
 	int net_id;
@@ -44,7 +45,7 @@ public:
 	void clear();
 
 	void register_player(const std::string& name, PlayerInst* player,
-			class_id classtype, int net_id = -1);
+			class_id classtype, int net_id = 0);
 	PlayerInst* local_player();
 	PlayerDataEntry& local_player_data();
 
@@ -55,6 +56,10 @@ public:
 	std::vector<PlayerInst*> players_in_level(level_id level);
 
 	PlayerDataEntry& get_entry_by_netid(int netid);
+
+	void set_local_player(int idx) {
+		_local_player_idx = idx;
+	}
 
 	void copy_to(PlayerData& pc) const;
 

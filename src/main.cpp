@@ -132,7 +132,7 @@ static void game_loop(GameState* gs) {
 }
 
 int main(int argc, char** argv) {
-	run_unit_tests();
+//	run_unit_tests();
 
 	lua_State* L = lua_open();
 

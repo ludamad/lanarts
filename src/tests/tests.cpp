@@ -52,5 +52,6 @@ void run_unit_tests() {
 	fprintf(stdout, "Ran %d tests with %d passes and %d failures\n",
 			unit_test_runs, unit_test_runs - unit_test_failures,
 			unit_test_failures);
+	fflush(stdout);
 }
 

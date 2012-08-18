@@ -60,14 +60,19 @@ bool ServerConnection::poll(packet_recv_callback message_handler, void* context,
 				receiver_t receiver, _unused_sender;
 				receive_packet(_socket_list[i], _packet_buffer, receiver,
 						_unused_sender);
-				// Rebroadcast to clients
-				_send_message(_packet_buffer, receiver, receiver_t(i + 1));
+				if (!_packet_buffer.empty()) {
+					// Rebroadcast to clients
+//					printf("Rebroadcasting message to %d from %d\n", receiver,
+//							i + 1);
+					_send_message(_packet_buffer, receiver, receiver_t(i + 1));
 
-				if (receiver == ALL_RECEIVERS || receiver == SERVER_RECEIVER) {
-					if (message_handler) {
-						message_handler(i + 1, context,
-								&_packet_buffer[HEADER_SIZE],
-								_packet_buffer.size() - HEADER_SIZE);
+					if (receiver == ALL_RECEIVERS
+							|| receiver == SERVER_RECEIVER) {
+						if (message_handler) {
+							message_handler(i + 1, context,
+									&_packet_buffer[HEADER_SIZE],
+									_packet_buffer.size() - HEADER_SIZE);
+						}
 					}
 				}
 			}
@@ -94,13 +99,14 @@ void ServerConnection::set_accepting_connections(bool accept) {
 	_accepting_connections = accept;
 }
 
-#include <string>
+//#include <string>
 
 void ServerConnection::_send_message(PacketBuffer& packet, receiver_t receiver,
 		int originator) {
+	set_packet_sender(packet, originator);
 	if (receiver == ALL_RECEIVERS) {
 //		printf("Sending msg with packet buff size = %d\n", packet.size());
-		std::string msg(&packet.at(12), packet.size() - 12);
+//		std::string msg(&packet.at(12), packet.size() - 12);
 //		printf("ServerConnection::_send_message: Sending msg '%s'\n",
 //				msg.c_str());
 		for (int i = 0; i < _socket_list.size(); i++) {

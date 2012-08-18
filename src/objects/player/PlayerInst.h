@@ -95,11 +95,11 @@ public:
 		return fieldofview;
 	}
 
+private:
 	bool actions_set() {
 		return actions_set_for_turn;
 	}
 
-private:
 	void enqueue_io_movement_actions(GameState* gs, int& dx, int& dy);
 	bool enqueue_io_spell_actions(GameState* gs);
 	bool enqueue_io_spell_and_attack_actions(GameState* gs, float dx, float dy);

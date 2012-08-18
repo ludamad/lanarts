@@ -87,8 +87,10 @@ static void spawn_in_lower_level(GameState* gs, PlayerInst* player) {
 
 void PlayerInst::step(GameState* gs) {
 
-	if (!actions_set_for_turn)
+	if (!actions_set_for_turn) {
+		printf("No actions for turn player id %d\n", id);
 		return;
+	}
 
 	CombatGameInst::step(gs);
 	GameView& view = gs->view();
@@ -103,6 +105,7 @@ void PlayerInst::step(GameState* gs) {
 		deaths++;
 //		if (is_local_focus())
 		queued_actions.clear();
+		actions_set_for_turn = false;
 		if (gs->game_settings().regen_on_death) {
 			stats().core.heal_fully();
 			spawn_in_lower_level(gs, this);

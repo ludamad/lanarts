@@ -51,6 +51,7 @@ public:
 	GameState(const GameSettings& settings, lua_State* L, int vieww = 640,
 			int viewh = 480, int hudw = 160);
 	~GameState();
+	void start_connection();
 	/* Call after construction, before game starts: */
 	void start_game();
 	void save_game(const char* filename);

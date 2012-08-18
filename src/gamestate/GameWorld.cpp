@@ -38,10 +38,8 @@ level_id GameWorld::get_current_level_id() {
 	return gs->get_level()->levelid;
 }
 
-void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, int classn,
-		PlayerInst* inst) {
+void GameWorld::place_inst(GeneratedLevel& genlevel, GameInst* inst) {
 	GameTiles& tiles = gs->tiles();
-	ClassType& c = game_class_data.at(classn);
 	Pos epos;
 	do {
 		epos = generate_location(gs->rng(), genlevel);
@@ -50,11 +48,6 @@ void GameWorld::spawn_player(GeneratedLevel& genlevel, bool local, int classn,
 	genlevel.at(epos).has_instance = true;
 	Pos spawn_pos = genlevel.get_world_coordinate(epos);
 
-	if (!inst) {
-		inst = new PlayerInst(c.starting_stats, spawn_pos.x, spawn_pos.y,
-				local);
-		player_data().register_player("", inst, 0);
-	}
 	inst->last_x = spawn_pos.x;
 	inst->last_y = spawn_pos.y;
 	inst->update_position(spawn_pos.x, spawn_pos.y);
@@ -70,29 +63,22 @@ void GameWorld::spawn_players(GeneratedLevel& genlevel, void** player_instances,
 		GameNetConnection& netconn = gs->net_connection();
 		int myclassn = gs->game_settings().classtype;
 
-		static std::vector<int> theirclasses;
-		//TODO: net redo
-//		if (theirclasses.empty() && netconn.get_connection()) {
-//			NetPacket classpacket;
-//			classpacket.add_int(myclassn);
-//			classpacket.encode_header();
-//			std::vector<NetPacket> others_classes;
-//			netconn.send_and_sync(classpacket, others_classes, true);
-//			for (int i = 0; i < others_classes.size(); i++) {
-//				theirclasses.push_back(others_classes[i].get_int());
-//			}
-//		}
+		for (int i = 0; i < gs->player_data().all_players().size(); i++) {
+			PlayerDataEntry& pde = gs->player_data().all_players()[i];
+			bool islocal = &pde == &gs->player_data().local_player_data();
+			ClassType& c = game_class_data.at(pde.classtype);
 
-		if (theirclasses.empty()) {
-			spawn_player(genlevel, true, myclassn);
-		} else {
-			spawn_player(genlevel, flocal, flocal ? myclassn : theirclasses[0]);
-			spawn_player(genlevel, !flocal,
-					!flocal ? myclassn : theirclasses[0]);
+			if (pde.player_inst.empty()) {
+				pde.player_inst = new PlayerInst(c.starting_stats, 0, 0,
+						islocal);
+			}
+			printf("Spawning for player %d: %s\n", i,
+					islocal ? "local player" : "network player");
+			place_inst(genlevel, pde.player_inst.get_instance());
 		}
 	} else {
 		for (int i = 0; i < nplayers; i++) {
-			spawn_player(genlevel, false, 0, (PlayerInst*)player_instances[i]);
+			place_inst(genlevel, (GameInst*)player_instances[i]);
 		}
 	}
 }

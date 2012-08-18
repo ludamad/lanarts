@@ -30,9 +30,6 @@ void PlayerData::clear() {
 
 void PlayerData::register_player(const std::string& name, PlayerInst* player,
 		class_id classtype, int net_id) {
-	if (player && player->is_local_player()) {
-		_local_player_idx = _players.size();
-	}
 	_players.push_back(PlayerDataEntry(name, player, classtype, net_id));
 }
 
@@ -44,7 +41,7 @@ std::vector<PlayerInst*> PlayerData::players_in_level(level_id level) {
 	std::vector<PlayerInst*> ret;
 	for (int i = 0; i < _players.size(); i++) {
 		GameInst* player = _players[i].player_inst.get_instance();
-		if (player->current_level == level) {
+		if (player && player->current_level == level) {
 			LANARTS_ASSERT(!player || dynamic_cast<PlayerInst*>(player));
 			ret.push_back((PlayerInst*)player);
 		}
@@ -54,7 +51,8 @@ std::vector<PlayerInst*> PlayerData::players_in_level(level_id level) {
 
 bool PlayerData::level_has_player(level_id level) {
 	for (int i = 0; i < _players.size(); i++) {
-		if (_players[i].player_inst->current_level == level) {
+		GameInstRef& p = _players[i].player_inst;
+		if (p.get_instance() && p->current_level == level) {
 			return true;
 		}
 	}
@@ -139,11 +137,17 @@ int player_get_playernumber(GameState* gs, PlayerInst* p) {
 static void player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
 	const int POLL_MS_TIMEOUT = 1 /*millsecond*/;
 
-	while (!pde.player()->actions_set()) {
+	while (true) {
 		if (pde.player()->is_local_player()) {
 			pde.player()->enqueue_io_actions(gs);
-		} else {
+			break;
+		} else if (!pde.action_queue.has_actions_for_frame(gs->frame())) {
 			gs->net_connection().poll_messages(POLL_MS_TIMEOUT);
+		} else {
+			ActionQueue actions;
+			pde.action_queue.extract_actions_for_frame(actions, gs->frame());
+			pde.player()->enqueue_actions(actions);
+			break;
 		}
 	}
 }
@@ -151,6 +155,8 @@ static void player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
 void players_poll_for_actions(GameState* gs) {
 	PlayerData& pd = gs->player_data();
 	std::vector<PlayerDataEntry>& players = pd.all_players();
+
+//	printf("Polling for frame %d\n", gs->frame());
 
 	for (int i = 0; i < players.size(); i++) {
 		player_poll_for_actions(gs, players[i]);

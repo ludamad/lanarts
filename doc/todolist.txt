@@ -30,6 +30,9 @@ Small:
 - Make all ranged enemies have a short range melee option for close kiters
 - Add items that give free XP but hurt you/ make you exhausted
 	- Amount depends on dungeon depth
+	
+Bugs with unknown solutions:
+- Tunnel gen synching error seen again !?
 
 Partial Completion:
 - [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
