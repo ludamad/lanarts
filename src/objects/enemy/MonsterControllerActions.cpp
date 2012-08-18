@@ -10,7 +10,7 @@
 
 #include "../../gamestate/GameState.h"
 #include "MonsterController.h"
-#include "../player/PlayerController.h"
+#include "../../gamestate/PlayerData.h"
 
 #include "EnemyInst.h"
 #include "../player/PlayerInst.h"
@@ -94,7 +94,7 @@ bool potentially_randomize_movement(GameState* gs, EnemyInst* e) {
 void MonsterController::set_monster_headings(GameState* gs,
 		std::vector<EnemyOfInterest>& eois) {
 	//Use a temporary 'GameView' object to make use of its helper methods
-	PlayerController& pc = gs->player_controller();
+	PlayerData& pc = gs->player_data();
 	for (int i = 0; i < eois.size(); i++) {
 		EnemyInst* e = eois[i].e;
 		float movespeed = e->effective_stats().movespeed;

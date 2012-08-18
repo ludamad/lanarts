@@ -10,11 +10,12 @@
 #include <SDL.h>
 #include <string>
 #include <vector>
+
 #include "../lanarts_defines.h"
+#include "../serialize/SerializeBuffer.h"
 
 class GameState;
 struct font_data;
-struct NetPacket;
 
 /*Handle key repeating, in steps*/
 const int INITIAL_REPEAT_STEP_AMNT = 40;
@@ -40,8 +41,8 @@ struct ChatMessage {
 	}
 	void draw(const font_data& font, float alpha, int x, int y) const;
 	bool empty() const;
-	void packet_add(NetPacket& packet);
-	void packet_get(NetPacket& packet);
+	void serialize(SerializeBuffer& serializer);
+	void deserialize(SerializeBuffer& serializer);
 };
 
 class GameChat {

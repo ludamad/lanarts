@@ -40,10 +40,18 @@ bool unit_test(unit_test_function func, const char* fname) {
 }
 
 void lua_unit_tests();
+void net_unit_tests();
+void stat_serialize_tests();
+void adv_net_unit_tests();
 
 void run_unit_tests() {
 	lua_unit_tests();
+	net_unit_tests();
+	stat_serialize_tests();
+	adv_net_unit_tests();
 	fprintf(stdout, "Ran %d tests with %d passes and %d failures\n",
 			unit_test_runs, unit_test_runs - unit_test_failures,
 			unit_test_failures);
+	fflush(stdout);
 }
+

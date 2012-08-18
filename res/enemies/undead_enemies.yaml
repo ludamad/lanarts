@@ -4,7 +4,7 @@ enemies:
   - name: Skeleton
     sprite: skeleton
     radius: 11
-    xpaward: 10
+    xpaward: 20
     appear_message: A re-animated skeleton appears!
     defeat_message: The skeleton is broken unto a pile of bones.
     stats:
@@ -39,7 +39,7 @@ enemies:
     appear_message: A re-animated zombie appears!
     defeat_message: The zombie is beaten into a mess of flesh.
     radius: 14
-    xpaward: 10
+    xpaward: 25
     stats:
         attacks: [ {weapon: Basic Melee} ]
         hp: 60
@@ -56,7 +56,7 @@ enemies:
     appear_message: A horrible krell enters the scene.
     defeat_message: The krell dies at last.
     radius: 14
-    xpaward: 15
+    xpaward: 30
     stats:
         attacks: [ {weapon: Slow Melee} ]
         hp: 35

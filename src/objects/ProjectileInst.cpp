@@ -160,12 +160,12 @@ void ProjectileInst::step(GameState* gs) {
 
 			if (victim->damage(gs, damage)) {
 				PlayerInst* p = (PlayerInst*)origin;
-				PlayerController& pc = gs->player_controller();
+				PlayerData& pc = gs->player_data();
 				p->signal_killed_enemy();
 
 				int amnt = round(
 						double(victim->xpworth()) / pc.all_players().size());
-				pc.players_gain_xp(gs, amnt);
+				players_gain_xp(gs, amnt);
 
 				snprintf(buffstr, 32, "%d XP", amnt);
 				gs->add_instance(

@@ -64,7 +64,7 @@ GameSettings load_settings_data(const char* filename, lua_State* L,
 				std::string classname;
 				root["class"] >> classname;
 				if (!game_class_data.empty())
-					ret.classn = get_class_by_name(classname.c_str());
+					ret.classtype = get_class_by_name(classname.c_str());
 			}
 			if (L && lua_settings) {
 				lua_push_yaml_node(L, root);

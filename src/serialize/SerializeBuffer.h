@@ -28,10 +28,10 @@ public:
 	static SerializeBuffer plain_buffer();
 
 	template<class T>
-	void write_vector(const std::vector<T>& vec) {
-		write((int)vec.size());
-		for (int i = 0; i < vec.size(); i++) {
-			write(vec[i]);
+	void write_container(const T& t) {
+		write((int)t.size());
+		for (typename T::const_iterator it = t.begin(); it != t.end(); ++it) {
+			write(*it);
 		}
 	}
 
@@ -55,12 +55,12 @@ public:
 	}
 
 	template<class T>
-	void read_vector(std::vector<T>& vec) {
+	void read_container(T& t) {
 		int size;
 		read(size);
-		vec.resize(size);
-		for (int i = 0; i < vec.size(); i++) {
-			read(vec[i]);
+		t.resize(size);
+		for (typename T::iterator it = t.begin(); it != t.end(); ++it) {
+			read(*it);
 		}
 	}
 
@@ -99,6 +99,14 @@ public:
 
 	~SerializeBuffer();
 
+	const char* data() const {
+		return &_buffer[0];
+	}
+	size_t size() const {
+		return _buffer.size();
+	}
+
+	void clear();
 	void flush();
 	void fill();
 private:

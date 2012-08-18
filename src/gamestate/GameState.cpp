@@ -38,16 +38,27 @@ extern "C" {
 #include "../objects/GameInst.h"
 #include "../objects/player/PlayerInst.h"
 
+static int generate_seed() {
+	//the most significant bits of systime are likely to be very similar, mix with clock()
+	int clk = int(clock() << 22);
+	time_t systime;
+	time(&systime);
+	return clk ^ int(systime);
+}
+
 GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 		int viewh, int hudw) :
-		settings(settings), L(L), frame_n(0), hud(
-				BBox(vieww, 0, vieww + hudw, viewh), BBox(0, 0, vieww, viewh)), _view(
-				0, 0, vieww, viewh), world(this) {
+		settings(settings), L(L), connection(game_chat(), player_data(),
+				init_data), frame_n(0), hud(BBox(vieww, 0, vieww + hudw, viewh),
+				BBox(0, 0, vieww, viewh)), _view(0, 0, vieww, viewh), world(
+				this) {
 
 	dragging_view = false;
 
 	init_font(&small_font, settings.font.c_str(), 10);
 	init_font(&large_font, settings.font.c_str(), 20);
+
+	init_data.seed = generate_seed();
 }
 
 GameState::~GameState() {
@@ -58,56 +69,74 @@ GameState::~GameState() {
 	lua_close(L);
 }
 
-void GameState::init_game() {
-	time_t systime;
-	time(&systime);
-	int seed = systime;
+void GameState::start_connection() {
+	if (settings.conntype == GameSettings::SERVER) {
+		printf("server connected\n");
+		connection.initialize_as_server(settings.port);
+	} else if (settings.conntype == GameSettings::CLIENT) {
+		connection.initialize_as_client(settings.ip.c_str(), settings.port);
+		printf("client connected\n");
+		net_send_connection_affirm(connection, settings.username,
+				settings.classtype);
+	}
+	if (settings.conntype == GameSettings::SERVER
+			|| settings.conntype == GameSettings::NONE) {
+		player_data().set_local_player(0);
+		player_data().register_player(settings.username, NULL,
+				settings.classtype);
+	}
+}
+
+void GameState::start_game() {
+	if (settings.conntype == GameSettings::SERVER) {
+		net_send_game_init_data(connection, player_data(), init_data.seed);
+	}
 	if (!settings.loadreplay_file.empty()) {
-		load_init(this, seed, settings.classn);
+		load_init(this, init_data.seed, settings.classtype);
 	}
 	if (!settings.savereplay_file.empty()) {
-		save_init(this, seed, settings.classn);
+		save_init(this, init_data.seed, settings.classtype);
 	}
 
 	init_lua_data(this, L);
 
+//TODO: net redo
+//	if (settings.conntype == GameSettings::CLIENT) {
+//		NetPacket packet;
+//		int tries = 0;
+//		while (true) {
+//			if (connection.get_connection()->get_next_packet(packet)) {
+//				seed = packet.get_int();
+//				break;
+//			} else if ((++tries) % 30000 == 0) {
+//				if (!update_iostate()) {
+//					exit(0);
+//				}
+//			}
+//		}
+//		printf("NETWORK: Recieving seed=0x%X\n", seed);
+//	} else if (settings.conntype == GameSettings::SERVER) {
+//		NetPacket packet;
+//		packet.add_int(seed);
+//		packet.encode_header();
+//		connection.get_connection()->broadcast_packet(packet, true);
+//		printf("NETWORK: Broadcasting seed=0x%X\n", seed);
+//	}
 	if (settings.conntype == GameSettings::CLIENT) {
-		char port_buffer[50];
-		snprintf(port_buffer, 50, "%d", settings.port);
-		connection.get_connection() = create_client_connection(
-				settings.ip.c_str(), port_buffer);
-	} else if (settings.conntype == GameSettings::SERVER) {
-		connection.get_connection() = create_server_connection(settings.port);
+		while (!init_data.seed_set_by_network_message) {
+			connection.poll_messages(1 /* milliseconds */);
+		}
 	}
 
-	if (settings.conntype == GameSettings::CLIENT) {
-		NetPacket packet;
-		int tries = 0;
-		while (true) {
-			if (connection.get_connection()->get_next_packet(packet)) {
-				seed = packet.get_int();
-				break;
-			} else if ((++tries) % 30000 == 0) {
-				if (!update_iostate()) {
-					exit(0);
-				}
-			}
-		}
-		printf("NETWORK: Recieving seed=0x%X\n", seed);
-	} else if (settings.conntype == GameSettings::SERVER) {
-		NetPacket packet;
-		packet.add_int(seed);
-		packet.encode_header();
-		connection.get_connection()->broadcast_packet(packet, true);
-		printf("NETWORK: Broadcasting seed=0x%X\n", seed);
-	}
-	printf("Seed used for RNG = 0x%X\n", seed);
-	mtwist.init_genrand(seed);
+	printf("Seed used for RNG = 0x%X\n", init_data.seed);
+
+//TODO: net redo : send init data message here
+	mtwist.init_genrand(init_data.seed);
+
 	set_level(world.get_level(0, true));
 
 	PlayerInst* p = local_player();
 	view().sharp_center_on(p->x, p->y);
-
 }
 
 void GameState::set_level(GameLevelState* lvl) {
@@ -120,7 +149,7 @@ void GameState::set_level(GameLevelState* lvl) {
 
 /*Handle new characters and exit signals*/
 PlayerInst* GameState::local_player() {
-	return player_controller().local_player();
+	return player_data().local_player();
 }
 
 int GameState::object_radius_test(int x, int y, int radius, col_filterf f,
@@ -129,11 +158,11 @@ int GameState::object_radius_test(int x, int y, int radius, col_filterf f,
 }
 
 std::vector<PlayerInst*> GameState::players_in_level() {
-	return player_controller().players_in_level(world.get_current_level_id());
+	return player_data().players_in_level(world.get_current_level_id());
 }
 
 bool GameState::level_has_player() {
-	return player_controller().level_has_player(world.get_current_level_id());
+	return player_data().level_has_player(world.get_current_level_id());
 }
 
 static void safe_deserialize(GameInst* inst, GameState* gs,
@@ -151,6 +180,8 @@ void GameState::save_game(const char* filename) {
 
 	player_controller().serialize(this, serializer);
 
+	player_data().serialize(this, serializer);
+
 	serializer.flush();
 	fclose(file);
 }
@@ -161,7 +192,12 @@ void GameState::load_game(const char* filename) {
 	tiles().deserialize(serializer);
 	get_level()->inst_set.deserialize(this, serializer);
 
-	player_controller().deserialize(this, serializer);
+//	std::vector<GameInst*> insts = get_level()->inst_set.to_vector();
+//	for (size_t i = 0; i < insts.size(); i++) {
+//		safe_deserialize(insts[i], this, serializer);
+//	}
+
+	player_data().deserialize(this, serializer);
 	fclose(file);
 }
 
@@ -203,6 +239,7 @@ bool GameState::pre_step() {
 	return world.pre_step();
 }
 void GameState::step() {
+	connection.poll_messages();
 	hud.step(this);
 	world.step(); //Has pointer to this (GameState) object
 	lua_gc(L, LUA_GCSTEP, 0); // collect garbage incrementally
@@ -265,6 +302,7 @@ void GameState::draw(bool drawhud) {
 	for (size_t i = 0; i < safe_copy.size(); i++) {
 		safe_copy[i]->draw(this);
 	}
+
 	monster_controller().post_draw(this);
 	get_level()->tiles.post_draw(this);
 	if (drawhud) {
@@ -392,7 +430,7 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 		return true;
 	}
 
-	PlayerController& pc = player_controller();
+	PlayerData& pc = player_data();
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
 			if (player && player->field_of_view().within_fov(xx, yy)) {

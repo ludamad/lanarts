@@ -20,7 +20,7 @@
 
 #include "IOController.h"
 #include "../objects/enemy/MonsterController.h"
-#include "../objects/player/PlayerController.h"
+#include "PlayerData.h"
 
 #include "../interface/GameChat.h"
 #include "../interface/GameHud.h"
@@ -37,14 +37,23 @@ struct GameTiles;
 class GameInst;
 class PlayerInst;
 
+struct GameStateInitData {
+	int seed;
+	bool seed_set_by_network_message;
+	GameStateInitData(int seed = 0, bool seed_set_by_network_message = false) :
+			seed(seed), seed_set_by_network_message(seed_set_by_network_message) {
+	}
+};
+
 class GameState {
 public:
 
 	GameState(const GameSettings& settings, lua_State* L, int vieww = 640,
 			int viewh = 480, int hudw = 160);
 	~GameState();
+	void start_connection();
 	/* Call after construction, before game starts: */
-	void init_game();
+	void start_game();
 	void save_game(const char* filename);
 	void load_game(const char* filename);
 
@@ -141,8 +150,8 @@ public:
 	std::vector<PlayerInst*> players_in_level();
 	bool level_has_player();
 
-	PlayerController& player_controller() {
-		return world.player_controller();
+	PlayerData& player_data() {
+		return world.player_data();
 	}
 
 	EnemiesSeen& enemies_seen() {
@@ -208,6 +217,11 @@ public:
 	/* Make sure rooms exist & portals point to valid locations in next room */
 	void ensure_level_connectivity(int roomid1, int roomid2);
 
+	// Use this to override seed used in start_game()
+	GameStateInitData& game_state_init_data() {
+		return init_data;
+	}
+
 private:
 	int handle_event(SDL_Event* event);
 
@@ -215,6 +229,7 @@ private:
 	GameSettings settings;
 	lua_State* L;
 	int frame_n;
+	GameStateInitData init_data;
 
 	GameNetConnection connection;
 	GameHud hud;

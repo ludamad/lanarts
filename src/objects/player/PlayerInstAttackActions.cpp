@@ -116,7 +116,7 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 	return NULL;
 }
 bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
-	PlayerController& pc = gs->player_controller();
+	PlayerData& pc = gs->player_data();
 
 	std::vector<PlayerInst*> players = gs->players_in_level();
 	std::vector<GameInst*> visible_monsters;
@@ -263,7 +263,7 @@ static void player_use_spell(GameState* gs, PlayerInst* p,
 	}
 }
 
-void PlayerInst::queue_not_enough_mana_actions(GameState* gs) {
+void PlayerInst::enqueue_not_enough_mana_actions(GameState* gs) {
 	const int AUTOUSE_MANA_POTION_CNT = 2;
 	int item_slot = inventory().find_slot(get_item_by_name("Mana Potion"));
 	if (gs->game_settings().autouse_mana_potions
@@ -276,7 +276,7 @@ void PlayerInst::queue_not_enough_mana_actions(GameState* gs) {
 		autouse_mana_potion_try_count++;
 	}
 }
-bool PlayerInst::queue_io_spell_actions(GameState* gs) {
+bool PlayerInst::enqueue_io_spell_actions(GameState* gs) {
 	GameView& view = gs->view();
 	IOController& io = gs->io_controller();
 	SpellsKnown& spells = spells_known();
@@ -353,7 +353,7 @@ bool PlayerInst::queue_io_spell_actions(GameState* gs) {
 
 		if (spl_entry.mp_cost > core_stats().mp) {
 			if (!triggered_already && can_target) {
-				queue_not_enough_mana_actions(gs);
+				enqueue_not_enough_mana_actions(gs);
 			}
 			return false;
 		} else {
@@ -404,7 +404,7 @@ static bool decide_attack_movement(const Pos& player, const Pos& target,
 }
 
 // dx & dy indicates moving direction, useful for choosing melee attack targets
-bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
+bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
 		float dy) {
 	GameView& view = gs->view();
 	WeaponEntry& wentry = weapon().weapon_entry();
@@ -416,7 +416,7 @@ bool PlayerInst::queue_io_spell_and_attack_actions(GameState* gs, float dx,
 
 	bool is_moving = (dx != 0.0f || dy != 0.0f);
 	IOController& io = gs->io_controller();
-	bool attack_used = queue_io_spell_actions(gs);
+	bool attack_used = enqueue_io_spell_actions(gs);
 
 	bool autotarget = io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION)
 			|| io.query_event(IOEvent::ACTIVATE_SPELL_N);
@@ -551,16 +551,16 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		}
 
 		for (int i = 0; i < numhit; i++) {
-			EnemyInst* e = (EnemyInst*) enemies[i];
+			EnemyInst* e = (EnemyInst*)enemies[i];
 			lua_hit_callback(gs->get_luastate(), wentry.on_hit_func, this, e);
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
-				PlayerController& pc = gs->player_controller();
+				PlayerData& pc = gs->player_data();
 				signal_killed_enemy();
 
 				char buffstr[32];
 				int amnt = round(
 						double(e->xpworth()) / pc.all_players().size());
-				pc.players_gain_xp(gs, amnt);
+				players_gain_xp(gs, amnt);
 				snprintf(buffstr, 32, "%d XP", amnt);
 				gs->add_instance(
 						new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0,

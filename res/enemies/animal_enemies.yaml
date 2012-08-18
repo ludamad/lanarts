@@ -119,7 +119,7 @@ enemies:
     sprite: super_chicken
     death_sprite: green blood
     radius: 14
-    xpaward: 20
+    xpaward: 25
     appear_message: An unnaturally glowing chicken appears!
     defeat_message: The glowing chicken recieves a final blow.
     stats:

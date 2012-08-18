@@ -29,6 +29,7 @@ extern "C" {
 
 #include "objects/AnimatedInst.h"
 #include "interface/ButtonInst.h"
+#include "interface/DrawCallbackInst.h"
 
 #include "util/Timer.h"
 
@@ -94,6 +95,7 @@ static void setup_mainmenu_buttons(GameState* gs, bool* exit, int x, int y) {
 	y += 50;
 }
 
+void connection_menu_loop(GameState* gs, int width, int height);
 void class_menu_loop(GameState* gs, int width, int height);
 
 void main_menu_loop(GameState* gs, int width, int height) {
@@ -126,15 +128,20 @@ void main_menu_loop(GameState* gs, int width, int height) {
 	gs->view() = prevview;
 
 	class_menu_loop(gs, width, height);
+	gs->start_connection();
+
+	if (gs->game_settings().conntype == GameSettings::SERVER) {
+		connection_menu_loop(gs, width, height);
+	}
 }
 
 static void choose_fighter(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;
-	gs->game_settings().classn = get_class_by_name("Fighter");
+	gs->game_settings().classtype = get_class_by_name("Fighter");
 }
 static void choose_mage(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;
-	gs->game_settings().classn = get_class_by_name("Mage");
+	gs->game_settings().classtype = get_class_by_name("Mage");
 }
 static void choose_druid(GameState* gs, GameInst* _, void* flag) {
 //	*(bool*) flag = true;
@@ -186,6 +193,70 @@ void class_menu_loop(GameState* gs, int width, int height) {
 	setup_classmenu_buttons(gs, &exit, halfw, 300);
 
 	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {
+		gs->get_level()->inst_set.step(gs);
+		gs->draw(false);
+	}
+
+	delete gs->get_level();
+
+	gs->set_level(oldlevel);
+	gs->view() = prevview;
+}
+
+static void start_game_with_current_players(GameState* gs, GameInst* _,
+		void* flag) {
+	*(bool*)flag = true;
+	gs->game_settings().conntype = GameSettings::SERVER;
+}
+
+static void draw_connectors(GameState* gs, GameInst* inst, void* flag) {
+	static Colour colours[] = { COL_MEDIUM_PURPLE, COL_PALE_YELLOW,
+			COL_PALE_RED, COL_PALE_GREEN, COL_PALE_BLUE, COL_LIGHT_GRAY };
+	static const int num_colours = sizeof(colours) / sizeof(Colour);
+
+	PlayerData& pd = gs->player_data();
+	std::vector<PlayerDataEntry>& pdes = pd.all_players();
+
+	gl_printf_x_centered(gs->menu_font(), COL_WHITE, inst->x, inst->y,
+			"Players in Game:");
+
+	for (int i = 0; i < pdes.size(); i++) {
+		Colour& colour = colours[i % num_colours];
+		const char* prefix = i == 0 ? "You, " : "";
+		const char* name = pdes[i].player_name.c_str();
+		const std::string& classname =
+				game_class_data.at(pdes[i].classtype).name;
+		gl_printf_x_centered(gs->primary_font(), colour, inst->x,
+				inst->y + 20 * i + 30, "Player %d: %s%s the %s", (i + 1),
+				prefix, name, classname.c_str());
+	}
+}
+static void setup_connectionmenu_buttons(GameState* gs, bool* exit, int x,
+		int y) {
+	ObjCallback single(start_game_with_current_players, exit);
+	gs->add_instance(
+			new DrawCallbackInst(Pos(x, y), ObjCallback(),
+					ObjCallback(draw_connectors)));
+	y += 200;
+	gs->add_instance(new ButtonInst("Start", -1, x, y, single));
+}
+void connection_menu_loop(GameState* gs, int width, int height) {
+	bool exit = false;
+	int halfw = width / 2;
+
+	GameView prevview = gs->view();
+	GameLevelState* oldlevel = gs->get_level();
+
+	gs->set_level(new GameLevelState(0, width, height));
+	gs->get_level()->levelid = -1;
+	gs->view().x = 0;
+	gs->view().y = 0;
+
+	gs->add_instance(new AnimatedInst(halfw, 100, get_sprite_by_name("logo")));
+	setup_connectionmenu_buttons(gs, &exit, halfw, 300);
+
+	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {
+		gs->net_connection().poll_messages();
 		gs->get_level()->inst_set.step(gs);
 		gs->draw(false);
 	}

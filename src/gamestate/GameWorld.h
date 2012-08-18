@@ -34,20 +34,15 @@ public:
 	void set_current_level_lazy(int roomid);
 	void reset(int keep = 0);
 	void regen_level(int roomid);
-	void spawn_player(GeneratedLevel& genlevel, bool local = true, int classn =
-			0, PlayerInst* inst = NULL);
-
-	int get_current_level_id();
-	void connect_entrance_to_exit(int roomid1, int roomid2);
-
+	void place_inst(GeneratedLevel& genlevel, GameInst* inst);
 	GameLevelState* get_current_level() {
 		return lvl;
 	}
 	void set_current_level(GameLevelState* level) {
 		lvl = level;
 	}
-	PlayerController& player_controller() {
-		return _player_controller;
+	PlayerData& player_data() {
+		return _player_data;
 	}
 	EnemiesSeen& enemies_seen() {
 		return _enemies_seen;
@@ -62,11 +57,15 @@ private:
 	int next_room_id;
 
 	EnemiesSeen _enemies_seen;
+<<<<<<< HEAD
 	PlayerController _player_controller;
 	TeamRelations _team_relations;
+=======
+	PlayerData _player_data;
+>>>>>>> dev
 
 	GameLevelState* lvl;
-	GameState* game_state;
+	GameState* gs;
 	std::vector<GameLevelState*> level_states;
 };
 

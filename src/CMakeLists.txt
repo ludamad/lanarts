@@ -3,6 +3,7 @@ PROJECT(project_lanarts)
 
 FIND_PACKAGE(SDL REQUIRED)
 FIND_PACKAGE(SDL_image REQUIRED)
+FIND_PACKAGE(SDL_net REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
@@ -12,8 +13,14 @@ include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE
 set( lanarts_tests
 	tests/tests.h
 	tests/tests.cpp
+
 	tests/lua_tests.cpp
 	tests/lua_serialize_tests.cpp
+
+	tests/net/net_tests.cpp
+	tests/net/adv_net_tests.cpp
+
+	tests/stats/stat_serialize_tests.cpp
 )
 
 set( lanarts_src
@@ -102,6 +109,7 @@ set( lanarts_src
 	lua/LuaValue.cpp
 	objects/collision_filters.cpp
 
+	gamestate/ActionQueue.cpp
 	gamestate/GameAction.cpp
 	gamestate/GameInstSet.cpp
 	gamestate/GameState.cpp
@@ -130,8 +138,12 @@ set( lanarts_src
 	objects/enemy/EnemyBehaviour.cpp
 	objects/enemy/MonsterController.cpp
 	objects/enemy/MonsterControllerActions.cpp
+<<<<<<< HEAD
 	objects/player/PlayerController.cpp
 	objects/TeamRelations.cpp
+=======
+	gamestate/PlayerData.cpp
+>>>>>>> dev
 	
 	objects/store/StoreInventory.cpp
 	objects/store/StoreInst.cpp
@@ -228,6 +240,7 @@ set( lanarts_include
 
 	net/GameNetConnection.h
 
+	gamestate/ActionQueue.h
 	gamestate/GameAction.h
 	gamestate/GameInstSet.h
 	gamestate/GameState.h
@@ -239,7 +252,7 @@ set( lanarts_include
 
 	gamestate/IOController.h
 	objects/enemy/MonsterController.h
-	objects/player/PlayerController.h
+	gamestate/PlayerData.h
 	objects/CombatInstController.h
 	objects/InstTypeEnum.h
 
@@ -248,6 +261,7 @@ set( lanarts_include
 	interface/GameHud.h
 	interface/GameTextConsole.h
 	interface/ActionBar.h
+	interface/DrawCallbackInst.h
 	interface/sidebar/ConfigContent.h
 	interface/sidebar/EnemiesSeenContent.h
 	interface/sidebar/EquipmentContent.h
@@ -284,13 +298,14 @@ add_executable( lanarts
 
 
 target_link_libraries( lanarts
-			lanarts_tcp
+			lanarts_net
 			yaml-cpp
 			RVO
 			lua
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}
 			${SDLIMAGE_LIBRARY}
+			${SDLNET_LIBRARY}
 			${SDLMAIN_LIBRARY}
 			${FREETYPE_LIBRARIES}
 			)

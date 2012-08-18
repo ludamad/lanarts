@@ -24,6 +24,9 @@ Small:
 - Add graphics for each class [DONEISH - Make multiple options]
 - Make mouse jiggling not cause stair case movement
 - Make damage amounts not show off screen
+- Make enemies drop money/items
+	- Would be best if enemies picked up items - but does lead to paranoid behaviour from player
+		- Should probably not pick up any item the player has interacted with - but unrealistic
 - Make all ranged enemies have a short range melee option for close kiters
 - Fix arrows getting stuck in walls
 - Fix monsters getting stuck in corridors -> give more room for RVO2 disabling
@@ -35,6 +38,11 @@ Small:
 	- give monsters abilities
 	- spawn 'harder' versions of monsters
 		- Dont let chickens & storm clouds spawn on level 9 - player is too strong
+- Add items that give free XP but hurt you/ make you exhausted
+	- Amount depends on dungeon depth
+	
+Bugs with unknown solutions:
+- Tunnel gen synching error seen again !?
 
 Partial Completion:
 - [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization

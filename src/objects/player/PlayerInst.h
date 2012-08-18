@@ -48,7 +48,10 @@ public:
 
 	virtual PlayerInst* clone() const;
 	void gain_xp(GameState* gs, int xp);
-	void queue_io_actions(GameState* gs);
+
+	void enqueue_io_actions(GameState* gs);
+	void enqueue_actions(const ActionQueue& queue);
+
 	void perform_queued_actions(GameState* gs);
 	void perform_action(GameState* gs, const GameAction& action);
 
@@ -88,21 +91,21 @@ public:
 		return local;
 	}
 
-	bool& performed_actions_for_step() {
-		return didstep;
-	}
-
 	fov& field_of_view() {
 		return fieldofview;
 	}
 
 private:
-	void queue_io_movement_actions(GameState* gs, int& dx, int& dy);
-	bool queue_io_spell_actions(GameState* gs);
-	bool queue_io_spell_and_attack_actions(GameState* gs, float dx, float dy);
-	void queue_io_equipment_actions(GameState* gs, bool do_stop_action);
-	void queue_network_actions(GameState* gs);
-	void queue_not_enough_mana_actions(GameState* gs);
+	bool actions_set() {
+		return actions_set_for_turn;
+	}
+
+	void enqueue_io_movement_actions(GameState* gs, int& dx, int& dy);
+	bool enqueue_io_spell_actions(GameState* gs);
+	bool enqueue_io_spell_and_attack_actions(GameState* gs, float dx, float dy);
+	void enqueue_io_equipment_actions(GameState* gs, bool do_stop_action);
+	void enqueue_network_actions(GameState* gs);
+	void enqueue_not_enough_mana_actions(GameState* gs);
 
 	//Game action events
 	void use_move(GameState* gs, const GameAction& action);
@@ -118,11 +121,10 @@ private:
 	void reposition_item(GameState* gs, const GameAction& action);
 	void purchase_from_store(GameState* gs, const GameAction& action);
 
+	bool actions_set_for_turn;
 	ActionQueue queued_actions;
 	fov fieldofview;
-	PathInfo paths_to_player;
-
-	bool didstep, local, moving;
+	bool local, moving;
 
 	obj_id current_target;
 	int autouse_mana_potion_try_count;

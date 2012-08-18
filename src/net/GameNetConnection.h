@@ -8,56 +8,72 @@
 #ifndef GAMENETCONNECTION_H_
 #define GAMENETCONNECTION_H_
 
-#include <net/connection.h>
-#include <net/packet.h>
 #include <vector>
 
+#include "../lanarts_defines.h"
+#include "../gamestate/ActionQueue.h"
+
 class GameState;
+class GameChat;
+class GameStateInitData;
+class SerializeBuffer;
+class NetConnection;
+class PlayerData;
+struct ChatMessage;
 
 class GameNetConnection {
 public:
-	/*Packet types*/
-	enum {
-		//Negative packet types are reserved as implementation details
-		PACKET_ACTION = 0, PACKET_CHAT_MESSAGE = 1
+	/*Message types*/
+	enum message_t {
+		PACKET_CLIENT2SERV_CONNECTION_AFFIRM = 0,
+		PACKET_SERV2CLIENT_INITIALPLAYERDATA = 1,
+		PACKET_ACTION = 2,
+		PACKET_CHAT_MESSAGE = 3
 	};
-	GameNetConnection(int our_peer_id) {
-		connect = NULL;
-	}
-	GameNetConnection(NetConnection* connect = NULL);
+	// Initialize with references to structures that are updated by messages
+	// Keep parts of the game-state that are updated explicit
+	GameNetConnection(GameChat& chat, PlayerData& pd,
+			GameStateInitData& init_data);
 	~GameNetConnection();
 
-	void add_peer_id(int peer_id);
+	void initialize_as_client(const char* host, int port);
+	void initialize_as_server(int port);
 
-	NetConnection*& get_connection() {
-		return connect;
-	}
-	void wait_for_packet(NetPacket& packet, packet_t type = PACKET_ACTION);
-	bool get_next_packet(NetPacket& packet, packet_t type = PACKET_ACTION);
-	void send_and_sync(const NetPacket& packet,
-			std::vector<NetPacket>& received, bool send_to_new = false);
-
-	template<class T>
-	void send_and_sync(const T& ours, std::vector<T>& theirs, bool send_to_new =
-			false) {
-		NetPacket packet;
-		packet.add(ours);
-		packet.encode_header();
-		std::vector<NetPacket> received;
-		send_and_sync(packet, received, send_to_new);
-		theirs.resize(received.size());
-		for (int i = 0; i < received.size(); i++) {
-			received[i].get(theirs[i]);
-		}
+	bool is_connected() {
+		return _connection != NULL;
 	}
 
-	void broadcast_packet(const NetPacket& packet, bool send_to_new = false);
-	void finalize_connections();
+	NetConnection* connection() {
+		return _connection;
+	}
+
+	SerializeBuffer& grab_buffer(message_t type);
+
+	void set_accepting_connections(bool accept);
+
+	void poll_messages(int timeout = 0);
+
+	void send_packet(SerializeBuffer& serializer, int receiver = -1);
 	bool check_integrity(GameState* gs, int value);
+
+	//Do-not-call-directly:
+	void _handle_message(int sender, const char* msg, size_t len);
+
 private:
-	std::vector<int> peer_ids;
-	int our_peer_id;
-	NetConnection* connect;
+	//Keep back-references so that we can alter world state based on messages received
+	GameChat& chat;
+	PlayerData& pd;
+	GameStateInitData& init_data;
+
+	SerializeBuffer* _message_buffer;
+	NetConnection* _connection;
 };
+
+void net_send_connection_affirm(GameNetConnection& net, const std::string& name,
+		class_id classtype);
+void net_send_game_init_data(GameNetConnection& net, PlayerData& pd, int seed);
+void net_send_player_actions(GameNetConnection& net, int frame,
+		int player_number, const ActionQueue& actions);
+void net_send_chatmessage(GameNetConnection& net, ChatMessage& message);
 
 #endif /* GAMENETCONNECTION_H_ */

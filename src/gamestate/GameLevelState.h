@@ -7,7 +7,7 @@
 #define GAMELEVELSTATE_H_
 #include <vector>
 #include "../objects/enemy/MonsterController.h"
-#include "../objects/player/PlayerController.h"
+#include "PlayerData.h"
 #include "GameInstSet.h"
 #include "GameTiles.h"
 #include "../levelgen/GeneratedLevel.h"

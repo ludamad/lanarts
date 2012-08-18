@@ -13,7 +13,7 @@ tiles:
     extension: .png
   - name: hive_wall
     file: res/tiles/dngn_wall/hive/hive
-    variations: 4
+    variations: 8
     extension: .png
   - name: crystal_wall
     file: res/tiles/dngn_wall/crystal/crystal_wall
@@ -66,6 +66,10 @@ tiles:
   - name: lair_floor
     file: res/tiles/dngn_floor/lair/lair
     variations: 8
+    extension: .png
+  - name: spider_floor
+    file: res/tiles/dngn_floor/spider/spider0
+    variations: 10
     extension: .png
 #Outside floor
   - name: sand_rock

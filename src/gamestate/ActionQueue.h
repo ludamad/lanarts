@@ -12,4 +12,22 @@
 
 typedef std::deque<GameAction> ActionQueue;
 
+/* Buffer for actions sent for future frames */
+class MultiframeActionQueue {
+public:
+	void extract_actions_for_frame(ActionQueue& actions, int frame);
+	bool has_actions_for_frame(int frame);
+	void queue_actions_for_frame(const ActionQueue& actions, int frame);
+	void clear() {
+		queue.clear();
+		frames_set.clear();
+	}
+	GameAction& at(int i) {
+		return queue.at(i);
+	}
+private:
+	ActionQueue queue;
+	std::deque<int> frames_set;
+};
+
 #endif /* ACTIONQUEUE_H_ */

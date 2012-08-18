@@ -32,6 +32,11 @@ SerializeBuffer SerializeBuffer::plain_buffer() {
 	return SerializeBuffer(NULL, NULL, NULL);
 }
 
+void SerializeBuffer::clear() {
+	_buffer.clear();
+	_read_position = 0;
+}
+
 SerializeBuffer::SerializeBuffer(void* context, buffer_flushf flushf,
 		buffer_fillf fillf) :
 		_read_position(0), _context(context), _flushf(flushf), _fillf(fillf) {
