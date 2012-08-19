@@ -226,8 +226,7 @@ void GameWorld::step() {
 	gs->set_level(current_level);
 	gs->frame()++;
 
-	midstep
-	= false;
+	midstep	= false;
 	if (next_room_id == -2) {
 		reset(0);
 		next_room_id = 0;
@@ -321,8 +320,8 @@ void GameWorld::reset(int keep) {
 		for (int i = keep; i < level_states.size(); i++) {
 			delete_list.push_back(level_states[i]);
 		}
+		player_data().remove_all_players(gs);
 		level_states.resize(keep);
-		player_data().clear();
 		gs->game_hud().override_sidebar_contents(NULL);
 		gs->set_level(get_level(keep, true /*spawn player*/));
 		gs->game_chat().clear();

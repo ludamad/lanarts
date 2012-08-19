@@ -27,7 +27,7 @@ private:
 	struct TeamAllegiances {
 		bool default_as_hostile;
 		std::vector<team_id> exceptions;
-		TeamAllegiances(bool default_as_allied,
+		TeamAllegiances(bool default_as_hostile,
 				const std::vector<team_id>& exceptions) :
 				default_as_hostile(default_as_hostile), exceptions(exceptions) {
 		}

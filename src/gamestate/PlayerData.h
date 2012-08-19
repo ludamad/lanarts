@@ -43,7 +43,6 @@ public:
 	}
 	void update_fieldsofview(GameState* gs);
 	void clear();
-
 	void register_player(const std::string& name, PlayerInst* player,
 			class_id classtype, int net_id = 0);
 	PlayerInst* local_player();
@@ -61,6 +60,8 @@ public:
 		_local_player_idx = idx;
 	}
 
+	// Used during a game reset
+	void remove_all_players(GameState* gs);
 	void copy_to(PlayerData& pc) const;
 
 	void serialize(GameState* gs, SerializeBuffer& serializer);

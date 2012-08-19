@@ -167,10 +167,10 @@ bool TunnelGenImpl::validate_slice(Sqr* prev_content, TunnelSliceContext* cntxt,
 		int dep) {
 	int dx = cntxt->dx, dy = cntxt->dy;
 	if (cntxt->p.x <= 2
-			|| cntxt->p.x >= s.width() - width - (dx == 0 ? 0 : padding * 2))
+			|| cntxt->p.x >= s.width() - width - (dy == 0 ? 0 : padding * 2))
 		return false;
 	if (cntxt->p.y <= 2
-			|| cntxt->p.y >= s.height() - width - (dy == 0 ? 0 : padding * 2))
+			|| cntxt->p.y >= s.height() - width - (dx == 0 ? 0 : padding * 2))
 		return false;
 
 	cntxt->tunneled = true;
@@ -312,7 +312,7 @@ void __resizebuff(T& t, size_t size) {
 bool TunnelGenImpl::generate(Pos p, int dx, int dy, std::vector<Sqr>& btbuff,
 		std::vector<TunnelSliceContext>& tsbuff) {
 
-	int entry_size = width + padding*2;
+	int entry_size = width + padding * 2;
 
 	__resizebuff(btbuff, entry_size * maxdepth);
 	__resizebuff(tsbuff, maxdepth);

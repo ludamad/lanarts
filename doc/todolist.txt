@@ -42,7 +42,7 @@ Small:
 	- Amount depends on dungeon depth
 	
 Bugs with unknown solutions:
-- Tunnel gen synching error seen again !?
+- Tunnel gen synching error seen again !? [Fixed, hopefully ... ]
 
 Partial Completion:
 - [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization

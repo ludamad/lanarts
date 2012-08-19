@@ -26,6 +26,9 @@ public:
 	}
 	void operator=(const GameInstRef& ref);
 	void operator=(GameInst* ref);
+	void clear() {
+		*this = NULL;
+	}
 	bool empty() const {
 		return inst == NULL;
 	}

@@ -7,10 +7,11 @@
 #include "../util/math_util.h"
 
 Sqr& GeneratedLevel::at(const Pos & p) {
-	return s[p.y * size.w + p.x];
+	return at(p.x, p.y);
 }
 
 Sqr& GeneratedLevel::at(int x, int y) {
+	LANARTS_ASSERT(x >= 0 && x < size.w && y >= 0 && y < size.h);
 	return s[y * size.w + x];
 }
 

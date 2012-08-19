@@ -23,6 +23,19 @@ PlayerInst* PlayerDataEntry::player() {
 void PlayerData::update_fieldsofview(GameState* gs) {
 }
 
+// Used during a game reset
+void PlayerData::remove_all_players(GameState* gs) {
+	for (int i = 0; i < _players.size(); i++) {
+		PlayerInst* p = _players[i].player();
+		if (p) {
+			int oldlevel = gs->game_world().get_current_level_id();
+			gs->game_world().set_current_level(p->current_level);
+			gs->remove_instance(p);
+			gs->game_world().set_current_level(oldlevel);
+		}
+		_players[i].player_inst.clear();
+	}
+}
 void PlayerData::clear() {
 	_local_player_idx = -1;
 	_players.clear();
@@ -87,7 +100,7 @@ void PlayerData::serialize(GameState* gs, SerializeBuffer& serializer) {
 }
 
 PlayerDataEntry& PlayerData::local_player_data() {
-	return _players[_local_player_idx];
+	return _players.at(_local_player_idx);
 }
 
 PlayerDataEntry& PlayerData::get_entry_by_netid(int netid) {
