@@ -30,7 +30,9 @@ public:
 	Tile& get(int x, int y);
 
 	void set_solid(int x, int y, bool solid);
+	void set_seethrough(int x, int y, bool seethrough);
 
+	bool is_seethrough(int x, int y);
 	bool is_seen(int x, int y);
 	bool is_solid(int x, int y);
 
@@ -42,10 +44,10 @@ public:
 	void deserialize(SerializeBuffer& serializer);
 private:
 	struct TileState {
-		bool seen, solid;
+		bool seen, solid, seethrough;
 		Tile tile;
 		TileState() :
-				seen(0), solid(1) {
+				seen(false), solid(true), seethrough(true) {
 		}
 	};
 	int width, height;

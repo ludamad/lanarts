@@ -1,4 +1,3 @@
----
 sprites:
   - name: none
     file: res/sprites/none.png
@@ -29,13 +28,3 @@ sprites:
 
   - name: haste effected
     file: res/sprites/effects/i-speed.png
-    
-  - name: open door
-    file: res/sprites/features/open_door.png
-
-  - name: closed door
-    file: res/sprites/features/closed_door.png
-    
-  - name: store
-    file: res/sprites/features/shop.png
-    

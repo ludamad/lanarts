@@ -143,6 +143,9 @@ struct Region {
 	inline Pos pos() {
 		return Pos(x, y);
 	}
+	Region remove_perimeter(int p = 1) {
+		return Region(x + p, y + p, w - 2 * p, h - 2 * p);
+	}
 
 };
 

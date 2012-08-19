@@ -24,6 +24,12 @@ tilesets:
     alt_floor_tile: pebble_brown
     wall_tile: hive_wall
 
+  - tileset: snake_tiles
+    floor_tile: snake_floor3
+    alt_floor_tile: snake_floor1
+    corridor_tile: snake_floor2
+    wall_tile: snake_wall
+
   - tileset: cobalt_tiles
     floor_tile: cobalt_floor
     alt_floor_tile: mesh

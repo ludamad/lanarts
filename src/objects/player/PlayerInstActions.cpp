@@ -170,6 +170,14 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 
 	GameSettings& settings = gs->game_settings();
 	GameView& view = gs->view();
+
+	PlayerDataEntry& pde = gs->player_data().local_player_data();
+
+	if (pde.action_queue.has_actions_for_frame(gs->frame())) {
+		pde.action_queue.extract_actions_for_frame(queued_actions, gs->frame());
+		return;
+	}
+
 	int dx = 0, dy = 0;
 	bool mouse_within = gs->mouse_x() < gs->view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
@@ -231,15 +239,34 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 		queued_actions.push_back(game_action(gs, this, GameAction::USE_REST));
 	}
 
+	ActionQueue only_passive_actions;
+
+	for (int i = 0; i < queued_actions.size(); i++) {
+		GameAction::action_t act = queued_actions[i].act;
+		if (act == GameAction::MOVE || act == GameAction::USE_REST) {
+			only_passive_actions.push_back(queued_actions[i]);
+		}
+	}
+
 	GameNetConnection& net = gs->net_connection();
 	if (net.is_connected()) {
 		net_send_player_actions(net, gs->frame(),
 				player_get_playernumber(gs, this), queued_actions);
 	}
 
-	if (settings.saving_to_action_file()) {
-		save_actions(gs, queued_actions);
+	for (int i = 1; i <= settings.frame_action_repeat; i++) {
+		for (int j = 0; j < only_passive_actions.size(); j++) {
+			only_passive_actions[j].frame = gs->frame() + i;
+		}
+		pde.action_queue.queue_actions_for_frame(only_passive_actions,
+				gs->frame() + i);
+
+		if (net.is_connected()) {
+			net_send_player_actions(net, gs->frame() + i,
+					player_get_playernumber(gs, this), queued_actions);
+		}
 	}
+
 }
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
@@ -294,6 +321,12 @@ void PlayerInst::enqueue_network_actions(GameState *gs) {
 }
 
 void PlayerInst::perform_queued_actions(GameState* gs) {
+	GameSettings& settings = gs->game_settings();
+
+	if (settings.saving_to_action_file()) {
+		save_actions(gs, queued_actions);
+	}
+
 	for (int i = 0; i < queued_actions.size(); i++) {
 		perform_action(gs, queued_actions[i]);
 	}

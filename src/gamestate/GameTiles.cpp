@@ -37,12 +37,20 @@ bool GameTiles::is_seen(int x, int y) {
 	return tiles[y * width + x].seen;
 }
 
+void GameTiles::set_seethrough(int x, int y, bool seethrough) {
+	tiles[y * width + x].seethrough = seethrough;
+}
+
 void GameTiles::set_solid(int x, int y, bool solid) {
 	tiles[y * width + x].solid = solid;
 }
 
 bool GameTiles::is_solid(int x, int y) {
 	return tiles[y * width + x].solid;
+}
+
+bool GameTiles::is_seethrough(int x, int y) {
+	return tiles[y * width + x].seethrough;
 }
 
 void GameTiles::clear() {

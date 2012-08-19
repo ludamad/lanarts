@@ -3,31 +3,44 @@ tiles:
 #Walls
   - name: stone_wall
     file: res/tiles/dngn_wall/stone_wall/stone_wall.bmp
+
   - name: stone_dark
     file: res/tiles/dngn_wall/stone_dark/stone_dark
     variations: 4
     extension: .png
+
   - name: brick
     file: res/tiles/dngn_wall/brickdark/brick_dark
     variations: 7
     extension: .png
+    
   - name: hive_wall
     file: res/tiles/dngn_wall/hive/hive
     variations: 8
     extension: .png
+    
   - name: crystal_wall
     file: res/tiles/dngn_wall/crystal/crystal_wall
     variations: 14
     extension: .png
+    
   - name: grass_tree
     file: res/tiles/outside_wall/tree/tree.png
+    
   - name: marble_wall
     file: res/tiles/dngn_wall/marble_wall/marble_wall
     variations: 12
     extension: .png
+    
+  - name: snake_wall
+    file: res/tiles/dngn_wall/snake/snake
+    variations: 10
+    extension: .png
+    
 #Features
   - name: stairs_up
     file: res/tiles/features/stairs_up.png
+    
   - name: stairs_down
     file: res/tiles/features/stairs_down.png
 #Floors
@@ -35,47 +48,73 @@ tiles:
     file: res/tiles/dngn_floor/cobalt/black_cobalt
     variations: 12
     extension: .png
+    
   - name: cobble_blood
     file: res/tiles/dngn_floor/cobbleblood/cobble_blood
     variations: 12
     extension: .png
+    
   - name: crystal_floor
     file: res/tiles/dngn_floor/crystal/crystal_floor
     variations: 6
     extension: .png
+    
   - name: demonic_red
     file: res/tiles/dngn_floor/demonic_red/demonic_red
     variations: 9
     extension: .png
+    
   - name: hive
     file: res/tiles/dngn_floor/hive/hive
     variations: 4
     extension: .png
+    
   - name: mesh
     file: res/tiles/dngn_floor/mesh/mesh
     variations: 4
     extension: .png
+    
   - name: pebble_brown
     file: res/tiles/dngn_floor/pebblebrown/pebble_brown
     variations: 9
     extension: .png 
+    
   - name: nerve_floor
     file: res/tiles/dngn_floor/nerves/floor_nerves
     variations: 7
     extension: .png
+    
   - name: lair_floor
     file: res/tiles/dngn_floor/lair/lair
     variations: 8
     extension: .png
+    
   - name: spider_floor
     file: res/tiles/dngn_floor/spider/spider0
     variations: 10
     extension: .png
+    
+  - name: snake_floor1
+    file: res/tiles/dngn_floor/snake/snake-a
+    variations: 4
+    extension: .png
+    
+  - name: snake_floor2
+    file: res/tiles/dngn_floor/snake/snake-c
+    variations: 4
+    extension: .png
+    
+  - name: snake_floor3
+    file: res/tiles/dngn_floor/snake/snake-d
+    variations: 4
+    extension: .png
+    
 #Outside floor
   - name: sand_rock
     file: res/tiles/outside_floor/sandrockfloor/floor_sand_rock
     variations: 4
     extension: .png
+    
   - name: grass
     file: res/tiles/outside_floor/grass/grass
     variations: 12

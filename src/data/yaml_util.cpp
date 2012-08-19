@@ -231,6 +231,14 @@ void load_data_impl_template(const FilenameList& filenames,
 		std::string fname = "res/" + *it;
 		fstream file(fname.c_str(), fstream::in | fstream::binary);
 
+		if (!file) {
+			fprintf(
+					stderr,
+					"Fatal error: File %s not found, ensure you are running from directory with res/ folder.\n",
+					fname.c_str());
+			exit(0);
+		}
+
 		if (file) {
 			try {
 				YAML::Parser parser(file);

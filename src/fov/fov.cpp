@@ -55,7 +55,7 @@ int fov::isBlocked(short destX, short destY) {
 	if (outof)
 		return false;
 
-	return tiles.is_solid(px, py);
+	return !tiles.is_seethrough(px, py);
 }
 
 void fov::visit(short destX, short destY) {

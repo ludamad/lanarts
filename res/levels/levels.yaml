@@ -151,9 +151,12 @@ medium_layouts: &medium_layouts
   [*medium_layout1, *medium_layout2]        
 large_layouts: &large_layouts
   [*large_layout1, *large_layout2, *large_layout3]
-all_tilesets: &all_tilesets
+lair_tilesets: &lair_tilesets
   [lair_tiles1, lair_tiles2, lair_tiles3, cobalt_tiles, pebble_tiles, 
   crystal_tiles, crystal_tiles_with_marble, cobble]
+all_tilesets: &all_tilesets
+  [lair_tiles1, lair_tiles2, lair_tiles3, snake_tiles, cobalt_tiles,
+  pebble_tiles, crystal_tiles, crystal_tiles_with_marble, cobble]
 
 areas:
   - branch: main_branch
@@ -169,21 +172,21 @@ areas:
       #Level 0
       - layout: [*tiny_layout1]
         content:
-          features: { tileset: [lair_tiles1, lair_tiles2, lair_tiles3] }
+          features: { tileset: *lair_tilesets }
           items:    { amount: 3,  itemgenlist: Basic Items   }
           enemies: { wandering: no, amount: 5, generated: *easy_animals }
           
       #Level 1
       - layout: *tiny_layouts
         content:
-          features: { tileset: [lair_tiles1, lair_tiles2, lair_tiles3]}
+          features: { tileset: *lair_tilesets}
           items:    { amount: 3,  itemgenlist: Basic Items   }
           enemies: { wandering: no, amount: 8, generated: *easy_animals }
         
       #Level 2
       - layout: *tiny_layouts
         content:
-          features: { tileset: [lair_tiles1, lair_tiles2, lair_tiles3]}
+          features: { tileset: *lair_tilesets}
           items:    { amount: 3,  itemgenlist: Basic Items   }          
           enemies: { 
             wandering: no, amount: 12, 
@@ -192,11 +195,11 @@ areas:
       #Level 3
       - layout: *small_layouts
         content:
-          features: { tileset: [lair_tiles1, lair_tiles2, crystal_tiles, crystal_tiles_with_marble]}
+          features: { tileset: [lair_tiles1, lair_tiles2, lair_tiles3, crystal_tiles, crystal_tiles_with_marble]}
           items:    { amount: 5,  itemgenlist: Basic Items   }
           enemies:  { amount: [10,14], generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}]  }      
           
-#small levels with easy enemies
+#small levels with easyish enemies
       #Level 4
       - layout: [*small_layout1]
         content:

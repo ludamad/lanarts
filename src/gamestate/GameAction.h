@@ -36,6 +36,7 @@ struct GameAction {
 			int use_id2 = 0);
 	obj_id origin;
 	action_t act;
+	//TODO: Remove frame from GameAction informaiton
 	int frame, level;
 	int use_id, use_id2;
 	int action_x, action_y;

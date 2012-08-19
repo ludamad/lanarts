@@ -19,8 +19,11 @@ struct GameSettings {
 	std::string font;
 	bool fullscreen;
 	int view_width, view_height;
+
+	/* Speed related options */
 	int steps_per_draw;
 	float time_per_step;
+	int frame_action_repeat;
 
 	/*Debug options*/
 	bool draw_diagnostics, verbose_output;
@@ -46,6 +49,7 @@ struct GameSettings {
 		view_height = 720;
 		steps_per_draw = 1;
 		time_per_step = 12;
+		frame_action_repeat = 5;
 
 		font = "res/MateSC-Regular.ttf";
 		invincible = false;

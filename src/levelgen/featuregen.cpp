@@ -51,8 +51,7 @@ static void doorify(GameState* gs, GeneratedLevel& l, int x, int y) {
 		s.has_instance = true;
 		Pos fpos(x + start_x, y + start_y);
 		fpos = centered_multiple(fpos, TILE_SIZE);
-		gs->add_instance(
-				new FeatureInst(fpos.x, fpos.y, FeatureInst::DOOR_CLOSED));
+		gs->add_instance(new FeatureInst(fpos, FeatureInst::DOOR_CLOSED));
 	}
 }
 static void doors_all_around(GameState* gs, GeneratedLevel& l,
@@ -92,6 +91,21 @@ static void generate_shop(GameState* gs, GeneratedLevel& level, MTwist& mt,
 					generate_shop_inventory(mt, itemn)));
 
 }
+static void generate_statue(GameState* gs, GeneratedLevel& level, MTwist& mt,
+		const Pos& p) {
+	Pos worldpos = level.get_world_coordinate(p);
+	level.at(p).has_instance = true;
+
+	int itemn = mt.rand(Range(2, 10));
+	sprite_id spriteid = get_sprite_by_name("statue");
+	SpriteEntry& statue_sprite = game_sprite_data.at(spriteid);
+	int nimages = statue_sprite.images.size();
+	int imgid = mt.rand(nimages);
+	gs->add_instance(
+			new FeatureInst(worldpos, FeatureInst::DECORATION, true, spriteid,
+					imgid));
+}
+
 void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		GeneratedLevel& level, GameState* gs) {
 	GameTiles& tiles = gs->tiles();
@@ -111,6 +125,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		for (int x = start_x; x < end_x; x++) {
 			Sqr& s = level.at(x - start_x, y - start_y);
 			tiles.set_solid(x, y, !s.passable);
+			tiles.set_seethrough(x, y, s.passable);
 			if (s.passable) {
 				tiles.get(x, y) = rltile(mt, tileset.floor);
 				if (s.roomID) {
@@ -190,20 +205,39 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		gs->get_level()->exits.push_back(GameLevelPortal(p, Pos(0, 0)));
 	}
 
-	for (int i = 0; i < level.rooms().size(); i++) {
-		Region& r = level.rooms()[i].room_region;
+	std::vector<Room>& rooms = level.rooms();
+	const int nrooms = rooms.size();
+	for (int i = 0; i < nrooms; i++) {
+		Region& r = rooms[i].room_region;
 		if (mt.rand(100) == 0) {
 			doors_all_around(gs, level,
 					BBox(r.x - 1, r.y - 1, r.x + r.w + 1, r.y + r.h + 1));
 		}
 	}
 
+	int amount_statues = mt.rand(10);
+	for (int attempts = 0; attempts < amount_statues; attempts++) {
+		int ind = mt.rand(rooms.size());
+		Room& r1 = rooms[ind];
+		Region inner = r1.room_region.remove_perimeter();
+		if (inner.w < 2 || inner.h < 2) {
+			continue;
+		}
+		Pos pos = generate_location_in_region(mt, level, inner);
+		Sqr& sqr = level.at(pos);
+		if (!sqr.passable || sqr.has_instance) {
+			continue;
+		}
+		generate_statue(gs, level, mt, pos);
+	}
+
 	if (mt.rand(4) == 0) {
 		for (int attempts = 0; attempts < 200; attempts++) {
 			Pos pos = generate_location(mt, level);
 			Sqr& sqr = level.at(pos);
-			if (!sqr.passable || sqr.has_instance)
+			if (!sqr.passable || sqr.has_instance) {
 				continue;
+			}
 			generate_shop(gs, level, mt, pos);
 			break;
 		}

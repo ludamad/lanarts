@@ -17,6 +17,14 @@ GameSettings load_settings_data(const char* filename, lua_State* L,
 
 	fstream file(filename, fstream::in | fstream::binary);
 
+	if (!file) {
+		fprintf(
+				stderr,
+				"Fatal error: file %s not found, ensure you are running from directory with res/ folder\n.",
+				filename);
+		exit(0);
+	}
+
 	GameSettings ret;
 	if (file) {
 		try {

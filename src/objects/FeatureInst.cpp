@@ -17,14 +17,23 @@
 
 #include "FeatureInst.h"
 
+FeatureInst::FeatureInst(const Pos& pos, feature_t feature, bool solid,
+		sprite_id spriteid, int sprite_frame) :
+		GameInst(pos.x, pos.y, RADIUS, solid, DEPTH), feature(feature), last_seen_spr(
+				-1), spriteid(spriteid), sprite_frame(sprite_frame) {
+
+}
+
 FeatureInst::~FeatureInst() {
 }
 
 void FeatureInst::draw(GameState* gs) {
 	Colour drawcolour = COL_WHITE;
 	if (last_seen_spr > -1) {
-		gl_draw_sprite(gs->view(), last_seen_spr, x - TILE_SIZE / 2,
-				y - TILE_SIZE / 2, drawcolour);
+		SpriteEntry& spr_entry = game_sprite_data.at(spriteid);
+		GLimage& img = spr_entry.img(sprite_frame);
+		gl_draw_image(gs->view(), img, x - TILE_SIZE / 2, y - TILE_SIZE / 2,
+				drawcolour);
 	}
 }
 
@@ -53,13 +62,13 @@ void FeatureInst::step(GameState* gs) {
 }
 
 void FeatureInst::init(GameState* gs) {
-	if (feature == DOOR_CLOSED) {
+	if (feature == DOOR_CLOSED || solid) {
 		gs->tiles().set_solid(x / TILE_SIZE, y / TILE_SIZE, true);
 	}
 }
 
 void FeatureInst::deinit(GameState *gs) {
-	if (feature == DOOR_CLOSED) {
+	if (feature == DOOR_CLOSED || solid) {
 		gs->tiles().set_solid(x / TILE_SIZE, y / TILE_SIZE, false);
 	}
 }
@@ -85,15 +94,9 @@ bool feature_exists_near(GameState* gs, const Pos& p) {
 	return gs->object_radius_test(midx.x, midx.y, 4);
 }
 
-void FeatureInst::serialize(GameState *gs, SerializeBuffer & serializer)
-{
+void FeatureInst::serialize(GameState *gs, SerializeBuffer & serializer) {
 }
 
-
-
-void FeatureInst::deserialize(GameState *gs, SerializeBuffer & serializer)
-{
+void FeatureInst::deserialize(GameState *gs, SerializeBuffer & serializer) {
 }
-
-
 
