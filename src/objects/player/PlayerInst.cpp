@@ -72,6 +72,13 @@ static void spawn_in_lower_level(GameState* gs, PlayerInst* player) {
 	GameLevelState* level2 = gs->game_world().get_level(levelid2);
 	Pos sqr = seen_square_in_area(gs->rng(), level2->tiles);
 
+	for (int i = 0; i < gs->player_data().all_players().size(); i++) {
+		PlayerDataEntry& pde = gs->player_data().all_players()[i];
+		if (pde.player_inst.get_instance() == player) {
+			pde.action_queue.clear();
+		}
+	}
+
 	if (player->is_local_player()) {
 		gs->game_chat().add_message("You have respawned!",
 				Colour(100, 150, 150));

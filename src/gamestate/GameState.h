@@ -222,6 +222,10 @@ public:
 		return init_data;
 	}
 
+	void set_repeat_actions_counter(int repeat_actions_counter) {
+		this->repeat_actions_counter = repeat_actions_counter;
+	}
+
 private:
 	int handle_event(SDL_Event* event);
 
@@ -240,6 +244,8 @@ private:
 	font_data small_font, large_font;
 	bool dragging_view;
 	IOController iocontroller;
+
+	int repeat_actions_counter;
 };
 
 #endif /* GAMESTATE_H_ */

@@ -39,6 +39,20 @@ void IOState::clear() {
 	mouse_middledown = false;
 }
 
+inline void IOState::add_triggered_event(const IOEvent& event,
+		bool triggered_already) {
+	for (int i = 0; i < active_events.size(); i++) {
+		if (active_events[i].event == event) {
+			if (!triggered_already) {
+				active_events[i].triggered_already = false;
+			}
+			return;
+		}
+	}
+
+	active_events.push_back(TriggeredIOEvent(event, triggered_already));
+}
+
 void IOState::clear_for_step() {
 	memset(key_press_states, 0, sizeof(key_press_states));
 
@@ -288,6 +302,7 @@ void IOController::trigger_events(const BBox& playing_area) {
 			__trigger_events(notrigger, SDLKey(i), iostate.keymod, true);
 		}
 	}
+
 	if (playing_area.contains(mouse_x(), mouse_y())) {
 		if (mouse_left_click() || mouse_left_down()) {
 			__trigger_events(IOEventTrigger::MOUSE_LEFT_CLICK, SDLKey(0),
@@ -298,6 +313,7 @@ void IOController::trigger_events(const BBox& playing_area) {
 					iostate.keymod, !mouse_left_click());
 		}
 	}
+
 	if (iostate.mouse_middleclick || iostate.mouse_middledown) {
 		__trigger_events(IOEventTrigger::MOUSE_MIDDLE_CLICK, SDLKey(0),
 				iostate.keymod, !iostate.mouse_middleclick);
@@ -332,7 +348,7 @@ bool IOController::query_event(IOEvent::event_t event,
 		bool* triggered_already) {
 	for (int i = 0; i < iostate.active_events.size(); i++) {
 		if (event == iostate.active_events[i].event.event_type) {
-			if (triggered_already) {
+			if (triggered_already != NULL) {
 				*triggered_already = iostate.active_events[i].triggered_already;
 			}
 			return true;

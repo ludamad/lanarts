@@ -226,7 +226,8 @@ void GameWorld::step() {
 	gs->set_level(current_level);
 	gs->frame()++;
 
-	midstep	= false;
+	midstep
+	= false;
 	if (next_room_id == -2) {
 		reset(0);
 		next_room_id = 0;

@@ -43,6 +43,9 @@ GameSettings load_settings_data(const char* filename, lua_State* L,
 			optional_set(root, "steps_per_draw", ret.steps_per_draw);
 			if (ret.steps_per_draw < 1)
 				ret.steps_per_draw = 1;
+			optional_set(root, "frame_action_repeat", ret.frame_action_repeat);
+			if (ret.frame_action_repeat < 0)
+				ret.frame_action_repeat = 0;
 			optional_set(root, "invincible", ret.invincible);
 			optional_set(root, "time_per_step", ret.time_per_step);
 			optional_set(root, "draw_diagnostics", ret.draw_diagnostics);

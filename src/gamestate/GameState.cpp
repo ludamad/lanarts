@@ -40,7 +40,7 @@ extern "C" {
 
 static int generate_seed() {
 	//the most significant bits of systime are likely to be very similar, mix with clock()
-	int clk = int(clock() << 22);
+	int clk = int(clock()) << 22;
 	time_t systime;
 	time(&systime);
 	return clk ^ int(systime);
@@ -51,7 +51,7 @@ GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 		settings(settings), L(L), connection(game_chat(), player_data(),
 				init_data), frame_n(0), hud(BBox(vieww, 0, vieww + hudw, viewh),
 				BBox(0, 0, vieww, viewh)), _view(0, 0, vieww, viewh), world(
-				this) {
+				this), repeat_actions_counter(0) {
 
 	dragging_view = false;
 
@@ -221,15 +221,21 @@ int GameState::handle_event(SDL_Event* event) {
 bool GameState::update_iostate(bool resetprev) {
 	/* If 'resetprev', clear the io state
 	 * and then poll is currently pressed */
-	iocontroller.update_iostate(resetprev);
+	if (repeat_actions_counter <= 0) {
+		iocontroller.update_iostate(resetprev);
 
-	SDL_Event event;
-	while (SDL_PollEvent(&event)) {
-		if (handle_event(&event))
-			return false;
+		SDL_Event event;
+		while (SDL_PollEvent(&event)) {
+			if (handle_event(&event)) {
+				return false;
+			}
+		}
+		/* Fire IOEvents for the current step*/
+		iocontroller.trigger_events(BBox(0, 0, _view.width, _view.height));
+	} else {
+		iocontroller.update_iostate(false);
+		repeat_actions_counter--;
 	}
-	/* Fire IOEvents for the current step*/
-	iocontroller.trigger_events(BBox(0, 0, _view.width, _view.height));
 
 	return true;
 }

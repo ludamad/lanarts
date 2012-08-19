@@ -49,7 +49,7 @@ struct GameSettings {
 		view_height = 720;
 		steps_per_draw = 1;
 		time_per_step = 12;
-		frame_action_repeat = 5;
+		frame_action_repeat = 0;
 
 		font = "res/MateSC-Regular.ttf";
 		invincible = false;

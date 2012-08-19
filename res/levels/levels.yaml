@@ -152,8 +152,7 @@ medium_layouts: &medium_layouts
 large_layouts: &large_layouts
   [*large_layout1, *large_layout2, *large_layout3]
 lair_tilesets: &lair_tilesets
-  [lair_tiles1, lair_tiles2, lair_tiles3, cobalt_tiles, pebble_tiles, 
-  crystal_tiles, crystal_tiles_with_marble, cobble]
+  [lair_tiles1, lair_tiles2, lair_tiles3]
 all_tilesets: &all_tilesets
   [lair_tiles1, lair_tiles2, lair_tiles3, snake_tiles, cobalt_tiles,
   pebble_tiles, crystal_tiles, crystal_tiles_with_marble, cobble]

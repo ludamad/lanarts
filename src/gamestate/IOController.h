@@ -81,39 +81,18 @@ struct IOState {
 				event(event), triggered_already(triggered_already) {
 		}
 	};
-	/* Keyboard states */
 	char key_down_states[SDLK_LAST];
 	char key_press_states[SDLK_LAST];
 	SDLMod keymod;
-
-	/* Mouse position */
 	int mousex, mousey;
-
-	/* Mouse click states */
 	bool mouse_leftdown, mouse_rightdown;
 	bool mouse_leftclick, mouse_rightclick;
 	bool mouse_middleclick, mouse_middledown;
 	bool mouse_leftrelease, mouse_rightrelease;
 	bool mouse_didupwheel, mouse_diddownwheel;
-
-	/* Action states */
 	std::vector<TriggeredIOEvent> active_events;
-
 	IOState();
-
-	void add_triggered_event(const IOEvent& event, bool triggered_already) {
-		if (!triggered_already) {
-			for (int i = 0; i < active_events.size(); i++) {
-				// This code makes sure that if an event can't be triggered by a held down key
-				// For example, so that a fresh mouse click will still trigger the 'not triggered_already' functionality
-				if (active_events[i].event == event) {
-					active_events[i].triggered_already = false;
-					return;
-				}
-			}
-		}
-		active_events.push_back(TriggeredIOEvent(event, triggered_already));
-	}
+	void add_triggered_event(const IOEvent & event, bool triggered_already);
 	void clear();
 	void clear_for_step();
 };
@@ -143,7 +122,6 @@ public:
 	int key_press_state(int keyval);
 
 	void update_iostate(bool resetprev);
-
 	void trigger_events(const BBox& playing_area);
 
 	int handle_event(SDL_Event* event);

@@ -177,6 +177,7 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 		pde.action_queue.extract_actions_for_frame(queued_actions, gs->frame());
 		return;
 	}
+	gs->set_repeat_actions_counter(settings.frame_action_repeat);
 
 	int dx = 0, dy = 0;
 	bool mouse_within = gs->mouse_x() < gs->view().width;
