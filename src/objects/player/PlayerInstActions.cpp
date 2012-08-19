@@ -264,7 +264,7 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 
 		if (net.is_connected()) {
 			net_send_player_actions(net, gs->frame() + i,
-					player_get_playernumber(gs, this), queued_actions);
+					player_get_playernumber(gs, this), only_passive_actions);
 		}
 	}
 

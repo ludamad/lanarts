@@ -103,7 +103,7 @@ static void generate_statue(GameState* gs, GeneratedLevel& level, MTwist& mt,
 	int imgid = mt.rand(nimages);
 	gs->add_instance(
 			new FeatureInst(worldpos, FeatureInst::DECORATION, true, spriteid,
-					imgid));
+					FeatureInst::DEPTH, imgid));
 }
 
 void generate_features(const FeatureGenSettings& fs, MTwist& mt,

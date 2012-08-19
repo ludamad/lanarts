@@ -18,8 +18,8 @@
 #include "FeatureInst.h"
 
 FeatureInst::FeatureInst(const Pos& pos, feature_t feature, bool solid,
-		sprite_id spriteid, int sprite_frame) :
-		GameInst(pos.x, pos.y, RADIUS, solid, DEPTH), feature(feature), last_seen_spr(
+		sprite_id spriteid, int depth, int sprite_frame) :
+		GameInst(pos.x, pos.y, RADIUS, solid, depth), feature(feature), last_seen_spr(
 				-1), spriteid(spriteid), sprite_frame(sprite_frame) {
 
 }

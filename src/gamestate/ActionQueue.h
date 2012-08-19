@@ -18,9 +18,8 @@ public:
 	void extract_actions_for_frame(ActionQueue& actions, int frame);
 	bool has_actions_for_frame(int frame);
 	void queue_actions_for_frame(const ActionQueue& actions, int frame);
-	void clear() {
+	void clear_actions() {
 		queue.clear();
-		frames_set.clear();
 	}
 	GameAction& at(int i) {
 		return queue.at(i);

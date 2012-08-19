@@ -75,7 +75,7 @@ static void spawn_in_lower_level(GameState* gs, PlayerInst* player) {
 	for (int i = 0; i < gs->player_data().all_players().size(); i++) {
 		PlayerDataEntry& pde = gs->player_data().all_players()[i];
 		if (pde.player_inst.get_instance() == player) {
-			pde.action_queue.clear();
+			pde.action_queue.clear_actions();
 		}
 	}
 

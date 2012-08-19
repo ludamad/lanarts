@@ -36,11 +36,13 @@ extern "C" {
 static void continue_as_loner(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
+	gs->game_settings().frame_action_repeat = 0;
 }
 static void continue_as_hardcore(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().regen_on_death = false;
+	gs->game_settings().frame_action_repeat = 0;
 }
 
 static void continue_as_loner_save_replay(GameState* gs, GameInst* _,
@@ -48,12 +50,14 @@ static void continue_as_loner_save_replay(GameState* gs, GameInst* _,
 	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().savereplay_file = "replays/replay";
+	gs->game_settings().frame_action_repeat = 0;
 }
 
 static void continue_as_load_replay(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().loadreplay_file = "replays/replay";
+	gs->game_settings().frame_action_repeat = 0;
 }
 
 static void continue_as_client(GameState* gs, GameInst* _, void* flag) {

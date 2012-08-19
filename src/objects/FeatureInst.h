@@ -1,7 +1,7 @@
 /*
  * FeatureInst.h:
  *  Represents a permanent feature on the floor.
- *  Can be pure decoration but does not appear like eg AnimatedInst
+ *  Can be pure decoration but does not disappear like eg AnimatedInst
  */
 
 #ifndef FEATUREINST_H_
@@ -20,7 +20,7 @@ public:
 		RADIUS = 15, DEPTH = 100
 	};
 	FeatureInst(const Pos& pos, feature_t feature, bool solid = false,
-			sprite_id spriteid = -1, int sprite_frame = 0);
+			sprite_id spriteid = -1, int depth = DEPTH, int sprite_frame = 0);
 	virtual ~FeatureInst();
 	virtual void init(GameState *gs);
 	virtual void deinit(GameState *gs);

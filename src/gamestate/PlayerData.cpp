@@ -27,7 +27,7 @@ void PlayerData::update_fieldsofview(GameState* gs) {
 void PlayerData::remove_all_players(GameState* gs) {
 	for (int i = 0; i < _players.size(); i++) {
 		PlayerInst* p = _players[i].player();
-		_players[i].action_queue.clear();
+		_players[i].action_queue.clear_actions();
 		if (p) {
 			int oldlevel = gs->game_world().get_current_level_id();
 			gs->game_world().set_current_level(p->current_level);
