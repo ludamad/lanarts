@@ -15,7 +15,7 @@ void MultiframeActionQueue::extract_actions_for_frame(ActionQueue & actions,
 }
 
 bool MultiframeActionQueue::has_actions_for_frame(int frame) {
-	for (int i = 0; i < frames_set.size() || frames_set[i] > frame; i++) {
+	for (int i = 0; i < frames_set.size() && frames_set[i] <= frame; i++) {
 		if (frames_set[i] == frame) {
 			return true;
 		}
