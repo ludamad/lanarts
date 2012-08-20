@@ -8,6 +8,7 @@
 
 #include <string>
 #include <vector>
+
 #include <SDL_net.h>
 
 #include "../NetConnection.h"

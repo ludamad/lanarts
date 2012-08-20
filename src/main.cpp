@@ -7,11 +7,11 @@
 
 #include <net/lanarts_net.h>
 
+
 extern "C" {
 #include <lua/lua.h>
 #include <lua/lauxlib.h>
 }
-
 #include "data/game_data.h"
 
 #include "display/display.h"
@@ -20,11 +20,14 @@ extern "C" {
 
 #include "gamestate/GameState.h"
 
+
 #include "objects/player/PlayerInst.h"
 #include "objects/enemy/EnemyInst.h"
 
 #include "objects/AnimatedInst.h"
 #include "interface/ButtonInst.h"
+
+
 
 #include "util/Timer.h"
 

@@ -7,6 +7,7 @@
 #define SERVERCONNECTION_H_
 
 #include <vector>
+
 #include <SDL_net.h>
 
 #include "../NetConnection.h"
@@ -20,7 +21,8 @@ public:
 
 	virtual void initialize_connection();
 
-	virtual bool poll(packet_recv_callback message_handler, void* context = NULL, int timeout = 0);
+	virtual bool poll(packet_recv_callback message_handler,
+			void* context = NULL, int timeout = 0);
 	virtual void set_accepting_connections(bool accept);
 	virtual void send_message(const char* msg, int len, receiver_t receiver =
 			ALL_RECEIVERS);

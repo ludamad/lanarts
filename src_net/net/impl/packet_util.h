@@ -35,36 +35,47 @@ inline void send_packet(TCPsocket socket, PacketBuffer& packet) {
 	SDLNet_TCP_Send(socket, &packet[0], packet.size());
 }
 
+/* Ensure we can read the header even if we somehow get less than HEADER_SIZE bytes */
+inline void read_n_bytes(TCPsocket socket, PacketBuffer& packet, int nbytes) {
+	int nread = 0;
+	while (nread < nbytes) {
+		int recv = SDLNet_TCP_Recv(socket, &packet[nread], nbytes);
+		if (recv < 0) {
+			fprintf(
+					stderr,
+					"Connection severed, read_n_bytes got error message:\n\t%s\n",
+					SDLNet_GetError());
+			exit(0);
+		}
+		nread += recv;
+	}
+}
+
 inline void receive_packet(TCPsocket socket, PacketBuffer& packet,
 		receiver_t& receiver, receiver_t& sender) {
 	packet.resize(HEADER_SIZE);
 
-	int nread = SDLNet_TCP_Recv(socket, &packet[0], HEADER_SIZE);
-	if (nread < HEADER_SIZE) {
-		fprintf(stderr, "Connection severed!\n", nread);
-		receiver = -1;
-		sender = -1;
-		exit(0);
-	} else {
-		receiver = *(int*)&packet[0];
-		sender = *(int*)&packet[sizeof(int)];
-		int size = *(int*)&packet[sizeof(int) * 2];
+	read_n_bytes(socket, packet, HEADER_SIZE);
+	receiver = *(int*)&packet[0];
+	sender = *(int*)&packet[sizeof(int)];
+	int size = *(int*)&packet[sizeof(int) * 2];
 
 //		printf("recving with %d %d %d\n", receiver, sender, size);
-		int body_read = nread - HEADER_SIZE;
-		packet.resize(size + HEADER_SIZE);
+	int body_read = 0;
+	packet.resize(size + HEADER_SIZE);
 
-		while (size > body_read) {
-			int needed = size - body_read;
-			int nbody = SDLNet_TCP_Recv(socket,
-					&packet[body_read + HEADER_SIZE], needed);
-			if (nbody < 0) {
-				//TODO: Error properly
-				fprintf(stderr, "Error while reading packet body!\n", nbody);
-				return;
-			}
-			body_read += nbody;
+	while (size > body_read) {
+		int needed = size - body_read;
+		int nbody = SDLNet_TCP_Recv(socket, &packet[body_read + HEADER_SIZE],
+				needed);
+		if (nbody < 0) {
+			fprintf(
+					stderr,
+					"Connection severed, receive_packet got error message:\n\t%s\n",
+					SDLNet_GetError());
+			exit(0);
 		}
+		body_read += nbody;
 	}
 }
 
