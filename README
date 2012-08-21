@@ -1,12 +1,12 @@
 YUM packages required:
 SDL-static
 SDL-image
+SDL-net
 freetype-devel
-boost-devel
 cmake
 
 Packages for ubuntu:
-libsdl1.2-dev libsdl-image1.2-dev libfreetype6-dev libboost-dev cmake
+libsdl1.2-dev libsdl-image1.2-dev libsdl-net1.2-dev libfreetype6-dev cmake
 
 The project uses cmake to create plaform independent build files. 
 

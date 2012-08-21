@@ -40,9 +40,9 @@ Small:
 		- Dont let chickens & storm clouds spawn on level 9 - player is too strong
 - Add items that give free XP but hurt you/ make you exhausted
 	- Amount depends on dungeon depth
-	
-Bugs with unknown solutions:
-- Tunnel gen synching error seen again !? [Fixed, hopefully ... ]
+- You can only buy items by clicking on top 32x32 area
+- Sometimes arrows show underneath blood
+- Arrows/ranged weapons dont obey target - they hit closest enemy only
 
 Partial Completion:
 - [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
@@ -115,3 +115,6 @@ Completed:
 < 09/08/2012
 - [DONE] Make haste scrolls not show up as often, fix shop contents to be more varied, add more items
 - [DONE] Working config tab in side bar
+
+< 21/08/2012
+- [FIXED] Tunnel gen synching error seen again 

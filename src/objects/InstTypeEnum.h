@@ -81,7 +81,7 @@ inline GameInst* from_inst_type(InstType type) {
 	case ANIMATED_INST:
 		return new AnimatedInst(NONE, NONE, NONE);
 	case FEATURE_INST:
-		return new FeatureInst(Pos(), FeatureInst::feature_t(NONE));
+		return new FeatureInst(Pos(), FeatureInst::feature_t(NONE), false);
 	case ITEM_INST:
 		return new ItemInst(NONE, NONE, NONE);
 	case PROJECTILE_INST:
