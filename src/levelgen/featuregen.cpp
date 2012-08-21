@@ -38,7 +38,7 @@ static tileset_id randtileset(MTwist& mt,
 	return tilesets[mt.rand(tilesets.size())];
 }
 
-static void doorify(GameState* gs, GeneratedLevel& l, int x, int y) {
+static void create_door(GameState* gs, GeneratedLevel& l, int x, int y) {
 	GameTiles& tiles = gs->tiles();
 	int tw = tiles.tile_width(), th = tiles.tile_height();
 	int lw = l.width(), lh = l.height();
@@ -54,15 +54,39 @@ static void doorify(GameState* gs, GeneratedLevel& l, int x, int y) {
 		gs->add_instance(new FeatureInst(fpos, FeatureInst::DOOR_CLOSED));
 	}
 }
-static void doors_all_around(GameState* gs, GeneratedLevel& l,
+static void remove_wall(GameState* gs, GeneratedLevel& l, int x, int y) {
+	GameTiles& tiles = gs->tiles();
+	int tw = tiles.tile_width(), th = tiles.tile_height();
+	int lw = l.width(), lh = l.height();
+
+	int start_x = (tw - lw) / 2;
+	int start_y = (th - lh) / 2;
+
+	Sqr& s = l.at(x, y);
+	if (!s.passable) {
+		s.passable = true;
+	}
+}
+static void create_doors_all_around(GameState* gs, GeneratedLevel& l,
 		const BBox& region) {
 	for (int x = region.x1; x < region.x2; x++) {
-		doorify(gs, l, x, region.y1);
-		doorify(gs, l, x, region.y2 - 1);
+		create_door(gs, l, x, region.y1);
+		create_door(gs, l, x, region.y2 - 1);
 	}
 	for (int y = region.y1; y < region.y2; y++) {
-		doorify(gs, l, region.x1, y);
-		doorify(gs, l, region.x2 - 1, y);
+		create_door(gs, l, region.x1, y);
+		create_door(gs, l, region.x2 - 1, y);
+	}
+}
+static void remove_all_around(GameState* gs, GeneratedLevel& l,
+		const BBox& region) {
+	for (int x = region.x1 + 1; x < region.x2 - 1; x++) {
+		remove_wall(gs, l, x, region.y1);
+		remove_wall(gs, l, x, region.y2 - 1);
+	}
+	for (int y = region.y1 + 1; y < region.y2 - 1; y++) {
+		remove_wall(gs, l, region.x1, y);
+		remove_wall(gs, l, region.x2 - 1, y);
 	}
 }
 static StoreInventory generate_shop_inventory(MTwist& mt, int itemn) {
@@ -108,6 +132,18 @@ static void generate_statue(GameState* gs, GeneratedLevel& level, MTwist& mt,
 
 void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		GeneratedLevel& level, GameState* gs) {
+
+	std::vector<Room>& rooms = level.rooms();
+	const int nrooms = rooms.size();
+
+	for (int i = 0; i < nrooms; i++) {
+		Region& r = rooms[i].room_region;
+		if (gs->rng().rand(100) == 0) {
+			remove_all_around(gs, level,
+					BBox(r.x - 1, r.y - 1, r.x + r.w + 1, r.y + r.h + 1));
+		}
+	}
+
 	GameTiles& tiles = gs->tiles();
 	TilesetEntry& tileset = game_tileset_data[randtileset(mt, fs.tilesets)];
 	tiles.clear();
@@ -121,8 +157,14 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 	int end_x = start_x + lw;
 	int end_y = start_y + lh;
 
-	for (int y = start_y; y < end_y; y++) {
-		for (int x = start_x; x < end_x; x++) {
+	for (int y = 0; y < th; y++) {
+		for (int x = 0; x < tw; x++) {
+			if (y < start_y || y >= end_y || x < start_x || x >= end_x) {
+				tiles.set_solid(x, y, true);
+				tiles.set_seethrough(x, y, false);
+				tiles.get(x, y) = rltile(mt, tileset.wall);
+				continue;
+			}
 			Sqr& s = level.at(x - start_x, y - start_y);
 			tiles.set_solid(x, y, !s.passable);
 			tiles.set_seethrough(x, y, s.passable);
@@ -205,12 +247,10 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		gs->get_level()->exits.push_back(GameLevelPortal(p, Pos(0, 0)));
 	}
 
-	std::vector<Room>& rooms = level.rooms();
-	const int nrooms = rooms.size();
 	for (int i = 0; i < nrooms; i++) {
 		Region& r = rooms[i].room_region;
 		if (mt.rand(100) == 0) {
-			doors_all_around(gs, level,
+			create_doors_all_around(gs, level,
 					BBox(r.x - 1, r.y - 1, r.x + r.w + 1, r.y + r.h + 1));
 		}
 	}

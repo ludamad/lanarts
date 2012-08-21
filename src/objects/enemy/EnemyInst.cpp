@@ -38,10 +38,10 @@ static EnemyEntry& __E(enemy_id enemytype) {
 	return game_enemy_data.at(enemytype);
 }
 
-EnemyInst::EnemyInst(int enemytype, int x, int y) :
-		CombatGameInst(__E(enemytype).basestats, __E(enemytype).enemy_sprite, 0,
-				x, y, __E(enemytype).radius, true, DEPTH), seen(false), enemytype(
-				enemytype), xpgain(__E(enemytype).xpaward) {
+EnemyInst::EnemyInst(int enemytype, int x, int y, int teamid, int mobid) :
+		CombatGameInst(__E(enemytype).basestats, __E(enemytype).enemy_sprite,
+				teamid, mobid, x, y, __E(enemytype).radius, true, DEPTH), seen(
+				false), enemytype(enemytype), xpgain(__E(enemytype).xpaward) {
 }
 
 EnemyInst::~EnemyInst() {

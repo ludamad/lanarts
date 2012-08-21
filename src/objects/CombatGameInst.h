@@ -22,10 +22,10 @@ struct EntityBehaviour {
 class CombatGameInst: public GameInst {
 public:
 	CombatGameInst(const CombatStats& base_stats, sprite_id sprite,
-			team_id teamid, int x, int y, int radius, bool solid = true,
+			team_id teamid, int mobid, int x, int y, int radius, bool solid = true,
 			int depth = 0) :
 			GameInst(x, y, radius, solid, depth), rx(x), ry(y), vx(0), vy(0), is_resting(
-					false), teamid(teamid), mobid(0), sprite(sprite), kills(0), base_stats(
+					false), teamid(teamid), mobid(mobid), sprite(sprite), kills(0), base_stats(
 					base_stats) {
 	}
 	CombatGameInst() :

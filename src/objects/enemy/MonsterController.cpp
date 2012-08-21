@@ -24,7 +24,6 @@
 #include "../../display/tile_data.h"
 #include "../../stats/weapon_data.h"
 
-const int PATHING_RADIUS = 500;
 const int HUGE_DISTANCE = 1000000;
 
 MonsterController::MonsterController(bool wander) :
@@ -33,7 +32,6 @@ MonsterController::MonsterController(bool wander) :
 }
 
 MonsterController::~MonsterController() {
-	resize_paths(0);
 }
 
 void MonsterController::register_enemy(GameInst* enemy) {
@@ -58,7 +56,6 @@ void towards_highest(PathInfo& path, Pos& p) {
 
 void MonsterController::partial_copy_to(MonsterController & mc) const {
 	mc.mids = this->mids;
-	mc.resize_paths(0); //Automatically built in pre_step
 	mc.player_simids.clear(); //Automatically built in pre_step
 	mc.coll_avoid.clear();
 	mc.targetted = this->targetted;
@@ -104,7 +101,7 @@ void MonsterController::shift_target(GameState* gs) {
 
 int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 	//Use a 'GameView' object to make use of its helper methods
-	GameView view(0, 0, PATHING_RADIUS * 2, PATHING_RADIUS * 2, gs->width(),
+	GameView view(0, 0, PLAYER_PATHING_RADIUS * 2, PLAYER_PATHING_RADIUS * 2, gs->width(),
 			gs->height());
 
 	//Determine which players we are currently in view of
@@ -146,15 +143,6 @@ void MonsterController::process_players(GameState* gs) {
 		for (int i = old_players; i < players.size(); i++) {
 			player_simids[i] = coll_avoid.add_player_object(players[i]);
 		}
-	}
-
-	//Create as many paths as there are players
-	resize_paths(players.size());
-	for (int i = 0; i < players.size(); i++) {
-		if (paths[i] == NULL)
-			paths[i] = new PathInfo;
-		paths[i]->calculate_path(gs, players[i]->x, players[i]->y,
-				PATHING_RADIUS);
 	}
 }
 
@@ -266,6 +254,5 @@ void MonsterController::post_draw(GameState* gs) {
 }
 
 void MonsterController::clear() {
-	resize_paths(0);
 	mids.clear();
 }

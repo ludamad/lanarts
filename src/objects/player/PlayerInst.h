@@ -24,6 +24,7 @@
 #include "../GameInst.h"
 
 const int REST_COOLDOWN = 200;
+const int PLAYER_PATHING_RADIUS = 500;
 
 class PlayerInst: public CombatGameInst {
 public:
@@ -94,6 +95,9 @@ public:
 	fov& field_of_view() {
 		return fieldofview;
 	}
+	PathInfo& path_to_player() {
+		return _path_to_player;
+	}
 
 private:
 	bool actions_set() {
@@ -123,6 +127,7 @@ private:
 
 	bool actions_set_for_turn;
 	ActionQueue queued_actions;
+	PathInfo _path_to_player;
 	fov fieldofview;
 	bool local, moving;
 

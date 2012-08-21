@@ -98,7 +98,7 @@ void net_recv_connection_affirm(SerializeBuffer& sb, int sender,
 	sb.read_int(classtype);
 	printf("connection affirm read\n");
 	pd.register_player(name, NULL, classtype, sender);
-	printf("now there are %d players\n", pd.all_players().size());
+	printf("now there are %d players\n", (int)pd.all_players().size());
 	pd.set_local_player(0);
 }
 

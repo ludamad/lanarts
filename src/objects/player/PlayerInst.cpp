@@ -26,11 +26,17 @@
 
 PlayerInst::PlayerInst(const CombatStats& stats, int x, int y, bool local) :
 		CombatGameInst(stats,
-				game_class_data.at(stats.class_stats.classid).sprite, 0, x, y,
-				RADIUS, true, DEPTH), actions_set_for_turn(false), fieldofview(
+				game_class_data.at(stats.class_stats.classid).sprite, NONE, -1,
+				x, y, RADIUS, true, DEPTH), actions_set_for_turn(false), fieldofview(
 				LINEOFSIGHT), local(local), moving(0), autouse_mana_potion_try_count(
 				0), lives(0), deaths(0), previous_spellselect(0), spellselect(
 				-1) {
+}
+
+void PlayerInst::init(GameState* gs) {
+	CombatGameInst::init(gs);
+	teamid = gs->teams().default_player_team();
+	_path_to_player.calculate_path(gs, x, y, PLAYER_PATHING_RADIUS);
 }
 
 PlayerInst::~PlayerInst() {
@@ -48,10 +54,6 @@ bool PlayerInst::within_field_of_view(const Pos& pos) {
 
 void PlayerInst::die(GameState* gs) {
 	//Let step event handle death
-}
-
-void PlayerInst::init(GameState* gs) {
-	CombatGameInst::init(gs);
 }
 
 void PlayerInst::deinit(GameState* gs) {
@@ -95,6 +97,7 @@ static void spawn_in_lower_level(GameState* gs, PlayerInst* player) {
 }
 
 void PlayerInst::step(GameState* gs) {
+	_path_to_player.calculate_path(gs, x, y, PLAYER_PATHING_RADIUS);
 
 	if (!actions_set_for_turn) {
 		printf("No actions for turn player id %d\n", id);

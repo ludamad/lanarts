@@ -73,7 +73,7 @@ inline bool is_inst_type(GameInst* inst, InstType type) {
 inline GameInst* from_inst_type(InstType type) {
 	switch (type) {
 	case ENEMY_INST:
-		return new EnemyInst(NONE, NONE, NONE);
+		return new EnemyInst(NONE, NONE, NONE, NONE);
 	case PLAYER_INST:
 		return new PlayerInst();
 	case STORE_INST:

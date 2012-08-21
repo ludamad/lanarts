@@ -16,7 +16,7 @@
 
 class EnemyInst : public CombatGameInst {
 public:
-	EnemyInst(int enemytype, int x, int y);
+	EnemyInst(int enemytype, int x, int y, int teamid, int mobid = -1);
 	virtual ~EnemyInst();
 
 	virtual void init(GameState* gs);

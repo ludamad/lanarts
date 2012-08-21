@@ -56,7 +56,8 @@ static int gen_room(lua_State* L) {
 }
 
 static int gen_monster(lua_State* L) {
-	MTwist& mt = lua_get_gamestate(L)->rng();
+	GameState* gs = lua_get_gamestate(L);
+	MTwist& mt = gs->rng();
 	int nargs = lua_gettop(L);
 
 	GeneratedLevel* level = lua_togenlevel(L, 1);
@@ -64,7 +65,8 @@ static int gen_monster(lua_State* L) {
 	Region r = lua_toregion(L, 3);
 	int amount = nargs >= 4 ? lua_tointeger(L, 4) : 1;
 
-	bool success = generate_enemy(*level, mt, etype, r, amount);
+	bool success = generate_enemy(*level, mt, etype, r,
+			gs->teams().default_enemy_team(), amount);
 
 	lua_pushboolean(L, success);
 

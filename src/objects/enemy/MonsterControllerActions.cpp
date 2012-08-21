@@ -110,8 +110,8 @@ void MonsterController::set_monster_headings(GameState* gs,
 		}
 
 		if (!potentially_randomize_movement(gs, e)) {
-			paths[pind]->interpolated_direction(e->bbox(), movespeed, e->vx,
-					e->vy);
+			p->path_to_player().interpolated_direction(e->bbox(), movespeed,
+					e->vx, e->vy);
 		}
 
 		//Compare position to player object

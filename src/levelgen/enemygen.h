@@ -21,9 +21,8 @@ class GameState;
 void generate_enemy_after_level_creation(GameState* gs, enemy_id etype,
 		int amount = 1);
 
-
 int generate_enemy(GeneratedLevel& level, MTwist& mt, enemy_id etype,
-		const Region& r, int amount);
+		const Region& r, team_id teamid, int amount);
 //Generates enemy monsters during level generation
 void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 		GeneratedLevel& level, GameState* gs);

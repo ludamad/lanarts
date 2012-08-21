@@ -26,7 +26,8 @@ void generate_enemy_after_level_creation(GameState* gs, enemy_id etype,
 			int rand_y = mt.rand(tiles.tile_height());
 			epos = centered_multiple(Pos(rand_x, rand_y), TILE_SIZE);
 		} while (gs->solid_test(NULL, epos.x, epos.y, 15));
-		gs->add_instance(new EnemyInst(etype, epos.x, epos.y));
+		team_id teamid = gs->teams().default_enemy_team();
+		gs->add_instance(new EnemyInst(etype, epos.x, epos.y, teamid));
 	}
 }
 
@@ -55,8 +56,9 @@ static Pos enemy_position_candidate(MTwist& mt, GeneratedLevel& level,
 }
 
 int generate_enemy(GeneratedLevel& level, MTwist& mt, enemy_id etype,
-		const Region& r, int amount) {
+		const Region& r, team_id teamid, int amount) {
 
+	int mobid = amount > 1 ? -1 : level.get_next_mob_id();
 	for (int i = 0; i < amount; i++) {
 		Pos epos = enemy_position_candidate(mt, level, r);
 		Sqr& sqr = level.at(epos);
@@ -66,7 +68,9 @@ int generate_enemy(GeneratedLevel& level, MTwist& mt, enemy_id etype,
 		}
 
 		Pos world_pos = level.get_world_coordinate(epos);
-		level.add_instance(new EnemyInst(etype, world_pos.x, world_pos.y));
+
+		level.add_instance(
+				new EnemyInst(etype, world_pos.x, world_pos.y, teamid, mobid));
 	}
 	return amount;
 }
@@ -90,7 +94,8 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 		const EnemyGenChance& ec = rs.enemy_chances[i];
 		if (ec.guaranteed_spawns > 0) {
 			generate_enemy(level, mt, ec.enemytype,
-					enemy_region_candidate(mt, level), ec.guaranteed_spawns);
+					enemy_region_candidate(mt, level),
+					gs->teams().default_enemy_team(), ec.guaranteed_spawns);
 		}
 	}
 
@@ -113,6 +118,7 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 		}
 
 		i += generate_enemy(level, mt, ec.enemytype,
-				enemy_region_candidate(mt, level), amnt);
+				enemy_region_candidate(mt, level),
+				gs->teams().default_enemy_team(), amnt);
 	}
 }

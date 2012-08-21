@@ -47,14 +47,6 @@ public:
 
     void shift_target(GameState* gs);
 
-    void resize_paths(int size){
-    	if (paths.size() > size){
-    		for (int i = size; i < paths.size(); i++)
-    			delete paths[i];
-    	}
-    	paths.resize(size, NULL);
-
-    }
     size_t number_monsters() { return mids.size(); }
     obj_id current_target(){ return targetted; }
     void clear();
@@ -78,7 +70,6 @@ private:
     obj_id targetted;
 
     std::vector<PlayerInst*> players;
-    std::vector<PathInfo*> paths;
 	std::vector<obj_id> mids;
 	std::vector<int> player_simids;
 

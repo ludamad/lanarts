@@ -30,6 +30,8 @@
 #include "GameView.h"
 #include "GameWorld.h"
 
+#include "../objects/TeamRelations.h"
+
 struct lua_State;
 struct GameLevelState;
 struct GameTiles;
@@ -226,6 +228,10 @@ public:
 		this->repeat_actions_counter = repeat_actions_counter;
 	}
 
+	TeamRelations& teams() {
+		return _teams;
+	}
+
 private:
 	int handle_event(SDL_Event* event);
 
@@ -245,6 +251,9 @@ private:
 	bool dragging_view;
 	IOController iocontroller;
 
+	TeamRelations _teams;
+
+	//XXX: This repeats the last action N times, a more elegant solution is needed
 	int repeat_actions_counter;
 };
 

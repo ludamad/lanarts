@@ -67,13 +67,15 @@ public:
 			for (int i = 0; i < w * h; i++) {
 				s[i].passable = true;
 			}
+		} else {
 			for (int i = 0; i < w * h; i++) {
-				s[i].passable = true;
+				s[i].passable = false;
 			}
 		}
 	}
 	GeneratedLevel(int w, int h, const Pos& offset) {
 		s = NULL;
+		number_of_mobs = 0;
 		initialize(w, h, offset);
 	}
 	~GeneratedLevel() {
@@ -93,6 +95,10 @@ public:
 	bool verify(const Region& r, bool check_init = true);
 	int region_groupID(const Region& r, Pos& p);
 
+	int get_next_mob_id() {
+		return number_of_mobs++;
+	}
+
 private:
 	GeneratedLevel(const GeneratedLevel&); //DO-NOT-USE
 	Sqr* s;
@@ -100,6 +106,7 @@ private:
 	Pos world_offset;
 	std::vector<Room> room_list;
 	std::vector<GameInstRef> instance_list;
+	int number_of_mobs;
 };
 
 Pos generate_location(MTwist& mt, GeneratedLevel& level);
