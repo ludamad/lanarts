@@ -133,7 +133,6 @@ set( lanarts_src
 	interface/sidebar/StoreContent.cpp
 	interface/sidebar/Minimap.cpp
 
-	objects/CombatInstController.cpp
 	gamestate/IOController.cpp
 	objects/enemy/EnemyBehaviour.cpp
 	objects/enemy/MonsterController.cpp
@@ -249,7 +248,6 @@ set( lanarts_include
 	gamestate/IOController.h
 	objects/enemy/MonsterController.h
 	gamestate/PlayerData.h
-	objects/CombatInstController.h
 	objects/InstTypeEnum.h
 
 	interface/GameChat.h
