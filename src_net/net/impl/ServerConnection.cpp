@@ -84,6 +84,7 @@ bool ServerConnection::poll(packet_recv_callback message_handler, void* context,
 			if (!client_socket || !_accepting_connections
 					|| _socket_list.size() >= _maximum_sockets) {
 //				printf("ServerConnect::poll: client denied\n");
+				printf("Rejecting attempted connection\n");
 				SDLNet_TCP_Close(client_socket);
 			} else {
 				SDLNet_TCP_AddSocket(_socket_set, client_socket);
@@ -125,6 +126,7 @@ void ServerConnection::send_message(const char* msg, int len,
 		fprintf(
 				stderr,
 				"ServerConnection::send_message: Connection not initialized!\n");
+		fflush(stderr);
 		return;
 	}
 

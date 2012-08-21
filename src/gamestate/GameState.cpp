@@ -90,6 +90,7 @@ void GameState::start_connection() {
 void GameState::start_game() {
 	if (settings.conntype == GameSettings::SERVER) {
 		net_send_game_init_data(connection, player_data(), init_data.seed);
+		connection.set_accepting_connections(false);
 	}
 	if (!settings.loadreplay_file.empty()) {
 		load_init(this, init_data.seed, settings.classtype);

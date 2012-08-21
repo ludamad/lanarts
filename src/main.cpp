@@ -134,6 +134,7 @@ static void game_loop(GameState* gs) {
 	printf("Draw time: %f\n", float(draw_time) / draw_events / 1000);
 }
 
+
 int main(int argc, char** argv) {
 //	run_unit_tests();
 
