@@ -150,14 +150,17 @@ int player_get_playernumber(GameState* gs, PlayerInst* p) {
 
 static void player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
 	const int POLL_MS_TIMEOUT = 1 /*millsecond*/;
-
 	while (true) {
 		if (pde.player()->is_local_player()) {
 			pde.player()->enqueue_io_actions(gs);
 			break;
 		} else if (!pde.action_queue.has_actions_for_frame(gs->frame())) {
+			if (gs->game_settings().verbose_output) {
+				printf("Polling for player %d\n", pde.net_id);
+			}
 			gs->net_connection().poll_messages(POLL_MS_TIMEOUT);
 		} else {
+
 			ActionQueue actions;
 			pde.action_queue.extract_actions_for_frame(actions, gs->frame());
 			pde.player()->enqueue_actions(actions);
@@ -170,7 +173,9 @@ void players_poll_for_actions(GameState* gs) {
 	PlayerData& pd = gs->player_data();
 	std::vector<PlayerDataEntry>& players = pd.all_players();
 
-//	printf("Polling for frame %d\n", gs->frame());
+	if (gs->game_settings().verbose_output) {
+		printf("Polling for frame %d\n", gs->frame());
+	}
 
 	for (int i = 0; i < players.size(); i++) {
 		player_poll_for_actions(gs, players[i]);

@@ -40,11 +40,16 @@ inline void read_n_bytes(TCPsocket socket, PacketBuffer& packet, int nbytes) {
 	int nread = 0;
 	while (nread < nbytes) {
 		int recv = SDLNet_TCP_Recv(socket, &packet[nread], nbytes);
-		if (recv < 0) {
+		if (recv == 0) {
+			fprintf(stderr, "Connection closed!\n");
+			fflush(stderr);
+			exit(0);
+		} else if (recv < 0) {
 			fprintf(
 					stderr,
 					"Connection severed, read_n_bytes got error message:\n\t%s\n",
 					SDLNet_GetError());
+			fflush(stderr);
 			exit(0);
 		}
 		nread += recv;
@@ -68,11 +73,16 @@ inline void receive_packet(TCPsocket socket, PacketBuffer& packet,
 		int needed = size - body_read;
 		int nbody = SDLNet_TCP_Recv(socket, &packet[body_read + HEADER_SIZE],
 				needed);
-		if (nbody < 0) {
+		if (nbody == 0) {
+			fprintf(stderr, "Connection closed!\n");
+			fflush(stderr);
+			exit(0);
+		} else if (nbody < 0) {
 			fprintf(
 					stderr,
 					"Connection severed, receive_packet got error message:\n\t%s\n",
 					SDLNet_GetError());
+			fflush(stderr);
 			exit(0);
 		}
 		body_read += nbody;
