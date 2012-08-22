@@ -35,7 +35,7 @@ void GameWorld::generate_room(GameLevelState* level) {
 }
 
 level_id GameWorld::get_current_level_id() {
-	return gs->get_level()->levelid;
+	return gs->get_level()->id();
 }
 
 void GameWorld::place_inst(GeneratedLevel& genlevel, GameInst* inst) {
@@ -106,13 +106,12 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer,
 }
 
 static bool check_level_is_in_sync(GameState* gs, GameLevelState* level) {
-	if (level->levelid == -1
-			|| !gs->player_data().level_has_player(level->levelid)
+	if (level->id() == -1 || !gs->player_data().level_has_player(level->id())
 			|| !gs->net_connection().connection()) {
 		return true;
 	}
 
-	int hash_value = level->inst_set.hash();
+	int hash_value = level->game_inst_set().hash();
 
 //	printf("NETWORK: Checking integrity hash=0x%X\n", prehashvalue);
 //	fflush(stdout);
@@ -173,16 +172,9 @@ bool GameWorld::pre_step() {
 	midstep = false;
 	return true;
 }
-static void update_player_fields_of_view(GameState* gs) {
-	std::vector<PlayerInst*> players = gs->players_in_level();
-	for (int i = 0; i < players.size(); i++) {
-		players[i]->update_field_of_view(gs);
-	}
-}
 void GameWorld::step() {
 	redofirststep: //I used a goto dont kill mes
 
-	const int STEPS_TO_SIMULATE = 1000;
 	GameLevelState* current_level = gs->get_level();
 
 	midstep = true;
@@ -193,41 +185,11 @@ void GameWorld::step() {
 
 	for (int i = 0; i < level_states.size(); i++) {
 		GameLevelState* level = level_states[i];
-		bool has_player_in_level = player_data().level_has_player(
-				level->levelid);
-
-		if (has_player_in_level) {
-			level->steps_left = STEPS_TO_SIMULATE;
-		}
-
-		if (level->steps_left > 0) {
-			//Set so that all the GameState getters are properly updated
-			gs->set_level(level);
-
-//Clone part1:
-//			GameLevelState* clone = game_state->level()->clone();
-//			GameLevelState* real = game_state->level();
-////			level_states[i] = clone;
-//            game_state->level() = clone;
-			update_player_fields_of_view(gs);
-			level->mc.pre_step(gs);
-			level->inst_set.step(gs);
-			level->tiles.step(gs);
-			level->steps_left--;
-//Clone part2:
-////            if (real == current_level) current_level = clone;
-//            game_state->level() = real;
-//            clone->copy_to(*real);
-//            delete clone;
-
-//
-		}
+		level->step(gs); fix this
 	}
-	gs->set_level(current_level);
 	gs->frame()++;
 
-	midstep
-	= false;
+	midstep = false;
 	if (next_room_id == -2) {
 		reset(0);
 		next_room_id = 0;

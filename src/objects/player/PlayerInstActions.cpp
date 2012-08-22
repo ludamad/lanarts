@@ -68,7 +68,7 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 	bool mouse_within = gs->mouse_x() < gs->view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
-	int level = gs->get_level()->levelid;
+	int level = gs->get_level()->id();
 	int frame = gs->frame();
 	bool item_used = false;
 	IOController& io = gs->io_controller();
@@ -496,23 +496,23 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 	Pos newpos(round(rx + ddx), round(ry + ddy));
 
 	if (!gs->tile_radius_test(newpos.x, newpos.y, radius)) {
-		rx += ddx;
-		ry += ddy;
+		vx = ddx;
+		vy = ddy;
 	} else if (!gs->tile_radius_test(newpos.x, y, radius)) {
-		rx += ddx;
+		vx = ddx;
 	} else if (!gs->tile_radius_test(x, newpos.y, radius)) {
-		ry += ddy;
+		vy = ddy;
 	} else if (ddx != 0 && ddy != 0) {
 		//Alternatives in opposite directions for x & y
-		Pos newpos_alt1(round(rx + ddx), round(ry - ddy));
-		Pos newpos_alt2(round(rx - ddx), round(ry + ddy));
+		Pos newpos_alt1(round(vx + ddx), round(vy - ddy));
+		Pos newpos_alt2(round(vx - ddx), round(vy + ddy));
 		if (!gs->tile_radius_test(newpos_alt1.x, newpos_alt1.y, radius)) {
-			rx += ddx;
-			ry -= ddy;
+			vx += ddx;
+			vy -= ddy;
 		} else if (!gs->tile_radius_test(newpos_alt2.x, newpos_alt2.y,
 				radius)) {
-			rx -= ddx;
-			ry += ddy;
+			vx -= ddx;
+			vy += ddy;
 		}
 
 	}
@@ -538,14 +538,14 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 		return;
 
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->get_level()->exits.size());
-	gs->ensure_level_connectivity(gs->get_level()->levelid - 1,
-			gs->get_level()->levelid);
+	gs->ensure_level_connectivity(gs->get_level()->id() - 1,
+			gs->get_level()->id());
 	GameLevelPortal* portal = &gs->get_level()->exits[entr_n];
 
 	int px = centered_multiple(portal->exitsqr.x, TILE_SIZE);
 	int py = centered_multiple(portal->exitsqr.y, TILE_SIZE);
-	gs->level_move(id, px, py, gs->get_level()->levelid,
-			gs->get_level()->levelid - 1);
+	gs->level_move(id, px, py, gs->get_level()->id(),
+			gs->get_level()->id() - 1);
 
 	reset_rest_cooldown();
 }
@@ -558,14 +558,14 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 		return;
 
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->get_level()->entrances.size());
-	gs->ensure_level_connectivity(gs->get_level()->levelid,
-			gs->get_level()->levelid + 1);
+	gs->ensure_level_connectivity(gs->get_level()->id(),
+			gs->get_level()->id() + 1);
 	GameLevelPortal* portal = &gs->get_level()->entrances[entr_n];
 
 	int px = centered_multiple(portal->exitsqr.x, TILE_SIZE);
 	int py = centered_multiple(portal->exitsqr.y, TILE_SIZE);
-	gs->level_move(id, px, py, gs->get_level()->levelid,
-			gs->get_level()->levelid + 1);
+	gs->level_move(id, px, py, gs->get_level()->id(),
+			gs->get_level()->id() + 1);
 
 	reset_rest_cooldown();
 }

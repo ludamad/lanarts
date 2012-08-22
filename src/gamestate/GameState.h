@@ -33,7 +33,7 @@
 #include "../objects/TeamRelations.h"
 
 struct lua_State;
-struct GameLevelState;
+class GameLevelState;
 struct GameTiles;
 
 class GameInst;

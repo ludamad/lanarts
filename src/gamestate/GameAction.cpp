@@ -23,7 +23,7 @@ GameAction game_action(GameState* gs, GameInst* origin,
 		GameAction::action_t action, int use_id, int action_x, int action_y,
 		int use_id2) {
 	return GameAction(origin->id, action, gs->frame(),
-			gs->get_level()->levelid, use_id, action_x, action_y, use_id2);
+			gs->get_level()->id(), use_id, action_x, action_y, use_id2);
 }
 
 GameAction from_action_file(FILE* f) {

@@ -111,8 +111,7 @@ void main_menu_loop(GameState* gs, int width, int height) {
 	GameView prevview = gs->view();
 	GameLevelState* oldlevel = gs->get_level();
 
-	gs->set_level(new GameLevelState(0, width, height));
-	gs->get_level()->levelid = -1;
+	gs->set_level(new GameLevelState(-1, width, height));
 	gs->view().x = 0;
 	gs->view().y = 0;
 
@@ -124,7 +123,7 @@ void main_menu_loop(GameState* gs, int width, int height) {
 	setup_mainmenu_buttons(gs, &exit, halfw, 300);
 
 	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {
-		gs->get_level()->inst_set.step(gs);
+		gs->get_level()->game_inst_set().step(gs);
 		gs->draw(false);
 	}
 
@@ -190,8 +189,7 @@ void class_menu_loop(GameState* gs, int width, int height) {
 	GameView prevview = gs->view();
 	GameLevelState* oldlevel = gs->get_level();
 
-	gs->set_level(new GameLevelState(0, width, height));
-	gs->get_level()->levelid = -1;
+	gs->set_level(new GameLevelState(-1, width, height));
 	gs->view().x = 0;
 	gs->view().y = 0;
 
@@ -199,7 +197,7 @@ void class_menu_loop(GameState* gs, int width, int height) {
 	setup_classmenu_buttons(gs, &exit, halfw, 300);
 
 	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {
-		gs->get_level()->inst_set.step(gs);
+		gs->get_level()->game_inst_set().step(gs);
 		gs->draw(false);
 	}
 
@@ -253,8 +251,7 @@ void connection_menu_loop(GameState* gs, int width, int height) {
 	GameView prevview = gs->view();
 	GameLevelState* oldlevel = gs->get_level();
 
-	gs->set_level(new GameLevelState(0, width, height));
-	gs->get_level()->levelid = -1;
+	gs->set_level(new GameLevelState(-1, width, height));
 	gs->view().x = 0;
 	gs->view().y = 0;
 
@@ -263,7 +260,7 @@ void connection_menu_loop(GameState* gs, int width, int height) {
 
 	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {
 		gs->net_connection().poll_messages();
-		gs->get_level()->inst_set.step(gs);
+		gs->get_level()->game_inst_set().step(gs);
 		gs->draw(false);
 	}
 
