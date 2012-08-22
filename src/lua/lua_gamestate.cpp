@@ -83,7 +83,7 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_NUM_MEMB_LOOKUP("mouse_x", gs->mouse_x() + view.x)
 	else IFLUA_NUM_MEMB_LOOKUP("mouse_y", gs->mouse_y() + view.y)
 	else IFLUA_NUM_MEMB_LOOKUP("frame_number", gs->frame())
-	else IFLUA_NUM_MEMB_LOOKUP("level_number", gs->get_level()->levelid)
+	else IFLUA_NUM_MEMB_LOOKUP("level_number", gs->get_level()->id())
 	else IFLUA_NUM_MEMB_LOOKUP("monster_num", gs->monster_controller().number_monsters())
 	else {
 		lua_getglobal(L, bind_t::className);

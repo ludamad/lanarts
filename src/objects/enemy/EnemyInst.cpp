@@ -68,7 +68,7 @@ unsigned int EnemyInst::integrity_hash() {
 	unsigned int hash = CombatGameInst::integrity_hash();
 	combine_hash(hash, eb.current_node, eb.path_steps);
 	combine_hash(hash, eb.path_start.x, eb.path_start.y);
-	combine_hash(hash, eb.simulation_id, eb.current_action);
+	combine_hash(hash, collision_simulation_id(), eb.current_action);
 	return hash;
 }
 
@@ -94,13 +94,9 @@ EnemyEntry& EnemyInst::etype() {
 void EnemyInst::init(GameState* gs) {
 	CombatGameInst::init(gs);
 	MonsterController& mc = gs->monster_controller();
+//	collision_simulation_id() = coll_avoid.add_object(e);
 	mc.register_enemy(this);
 
-//	int ln = gs->level()->levelid + 1;
-//	core_stats().hp += core_stats().hp * ln / 10.0;
-//	core_stats().max_hp += core_stats().max_hp * ln / 10.0;
-//	core_stats().mp += core_stats().mp * ln / 10.0;
-//	core_stats().max_mp += core_stats().max_mp * ln / 10.0;
 
 	lua_gameinst_callback(gs->get_luastate(), etype().init_event, this);
 }
@@ -141,7 +137,7 @@ void EnemyInst::draw(GameState* gs) {
 				statbuff,
 				255,
 				"simid=%d nvx=%f vy=%f\n chasetime=%d \n mdef=%d pdef=%d", // \n act=%d, path_steps = %d\npath_cooldown = %d\n",
-				eb.simulation_id, vx, vy, eb.chase_timeout,
+				simulation_id, vx, vy, eb.chase_timeout,
 				(int)effective_stats().magic.resistance,
 				(int)effective_stats().physical.resistance);
 		//eb.current_action,

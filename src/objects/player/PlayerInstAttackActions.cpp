@@ -412,7 +412,7 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
 	bool mouse_within = gs->mouse_x() < gs->view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 
-	int level = gs->get_level()->levelid, frame = gs->frame();
+	int level = gs->get_level()->id(), frame = gs->frame();
 
 	bool is_moving = (dx != 0.0f || dy != 0.0f);
 	IOController& io = gs->io_controller();

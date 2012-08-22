@@ -72,7 +72,7 @@ static void spawn_in_lower_level(GameState* gs, PlayerInst* player) {
 	int levelid1 = gs->game_world().get_current_level_id();
 	int levelid2 = (levelid1 > 0) ? levelid1 - 1 : 0;
 	GameLevelState* level2 = gs->game_world().get_level(levelid2);
-	Pos sqr = seen_square_in_area(gs->rng(), level2->tiles);
+	Pos sqr = seen_square_in_area(gs->rng(), level2->tiles());
 
 	for (int i = 0; i < gs->player_data().all_players().size(); i++) {
 		PlayerDataEntry& pde = gs->player_data().all_players()[i];
@@ -103,6 +103,8 @@ void PlayerInst::step(GameState* gs) {
 		printf("No actions for turn player id %d\n", id);
 		return;
 	}
+
+	vx = 0, vy = 0;
 
 	CombatGameInst::step(gs);
 	GameView& view = gs->view();
@@ -135,7 +137,7 @@ void PlayerInst::step(GameState* gs) {
 	if (!gs->key_down_state(SDLK_x) && is_local_player())
 		view.center_on(last_x, last_y);
 
-	update_position();
+	update_position(rx + vx, ry + vy);
 }
 
 void PlayerInst::draw(GameState* gs) {

@@ -40,8 +40,6 @@ void MonsterController::register_enemy(GameInst* enemy) {
 	EnemyInst* e = (EnemyInst*)enemy;
 	EffectiveStats& estats = e->effective_stats();
 	EnemyBehaviour& eb = e->behaviour();
-
-	eb.simulation_id = coll_avoid.add_object(e);
 }
 
 void towards_highest(PathInfo& path, Pos& p) {
@@ -63,17 +61,17 @@ void MonsterController::partial_copy_to(MonsterController & mc) const {
 
 void MonsterController::finish_copy(GameLevelState* level) {
 	for (int i = 0; i < mids.size(); i++) {
-		EnemyInst* enemy = (EnemyInst*)level->inst_set.get_instance(mids[i]);
-		EnemyBehaviour& eb = enemy->behaviour();
+		EnemyInst* enemy = (EnemyInst*)level->game_inst_set().get_instance(
+				mids[i]);
 		if (!enemy)
 			continue;
 		int simid = coll_avoid.add_object(enemy);
-		eb.simulation_id = simid;
+		enemy->collision_simulation_id() = simid;
 	}
 }
 
 void MonsterController::deregister_enemy(EnemyInst* enemy) {
-	coll_avoid.remove_object(enemy->behaviour().simulation_id);
+	coll_avoid.remove_object(enemy->collision_simulation_id());
 }
 void MonsterController::shift_target(GameState* gs) {
 	if (!targetted)
@@ -101,8 +99,8 @@ void MonsterController::shift_target(GameState* gs) {
 
 int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 	//Use a 'GameView' object to make use of its helper methods
-	GameView view(0, 0, PLAYER_PATHING_RADIUS * 2, PLAYER_PATHING_RADIUS * 2, gs->width(),
-			gs->height());
+	GameView view(0, 0, PLAYER_PATHING_RADIUS * 2, PLAYER_PATHING_RADIUS * 2,
+			gs->width(), gs->height());
 
 	//Determine which players we are currently in view of
 	BBox ebox = e->bbox();
@@ -211,9 +209,9 @@ void MonsterController::pre_step(GameState* gs) {
 		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[i]);
 		lua_gameinst_callback(gs->get_luastate(), e->etype().step_event, e);
 		update_velocity(gs, e);
-		EnemyBehaviour& eb = e->behaviour();
-		coll_avoid.set_position(eb.simulation_id, e->rx, e->ry);
-		coll_avoid.set_preferred_velocity(eb.simulation_id, e->vx, e->vy);
+		simul_id simid = e->collision_simulation_id();
+		coll_avoid.set_position(simid, e->rx, e->ry);
+		coll_avoid.set_preferred_velocity(simid, e->vx, e->vy);
 	}
 
 	coll_avoid.step();
@@ -225,7 +223,6 @@ void MonsterController::pre_step(GameState* gs) {
 }
 
 void MonsterController::update_velocity(GameState* gs, EnemyInst* e) {
-	EnemyBehaviour& eb = e->behaviour();
 	float movespeed = e->effective_stats().movespeed;
 
 	if (e->cooldowns().is_hurting()) {
@@ -233,15 +230,16 @@ void MonsterController::update_velocity(GameState* gs, EnemyInst* e) {
 		movespeed /= 2;
 	}
 
-	coll_avoid.set_preferred_velocity(eb.simulation_id, e->vx, e->vy);
+	coll_avoid.set_preferred_velocity(e->collision_simulation_id(), e->vx,
+			e->vy);
 }
 void MonsterController::update_position(GameState* gs, EnemyInst* e) {
-	EnemyBehaviour& eb = e->behaviour();
-	Posf pos = coll_avoid.get_position(eb.simulation_id);
+	simul_id simid = e->collision_simulation_id();
+	Posf pos = coll_avoid.get_position(simid);
 
 	e->attempt_move_to_position(gs, pos.x, pos.y);
-	coll_avoid.set_position(eb.simulation_id, pos.x, pos.y);
-	coll_avoid.set_maxspeed(eb.simulation_id, e->effective_stats().movespeed);
+	coll_avoid.set_position(simid, pos.x, pos.y);
+	coll_avoid.set_maxspeed(simid, e->effective_stats().movespeed);
 }
 
 void MonsterController::post_draw(GameState* gs) {

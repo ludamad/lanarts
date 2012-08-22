@@ -198,6 +198,7 @@ void CombatGameInst::equip(item_id item, int amnt) {
 }
 
 void CombatGameInst::init(GameState* gs) {
+	GameInst::init(gs);
 	estats = stats().effective_stats(gs, this);
 }
 
@@ -365,3 +366,8 @@ Inventory& CombatGameInst::inventory() {
 Equipment& CombatGameInst::equipment() {
 	return stats().equipment;
 }
+
+simul_id& CombatGameInst::collision_simulation_id() {
+	return simulation_id;
+}
+

@@ -143,8 +143,8 @@ void GameState::start_game() {
 void GameState::set_level(GameLevelState* lvl) {
 	world.set_current_level(lvl);
 	if (lvl != NULL) {
-		_view.world_width = lvl->width;
-		_view.world_height = lvl->height;
+		_view.world_width = lvl->width();
+		_view.world_height = lvl->height();
 	}
 }
 
@@ -177,7 +177,7 @@ void GameState::save_game(const char* filename) {
 	FILE* file = fopen(filename, "wb");
 	SerializeBuffer serializer = SerializeBuffer::file_writer(file);
 	tiles().serialize(serializer);
-	get_level()->inst_set.serialize(this, serializer);
+	get_level()->game_inst_set().serialize(this, serializer);
 
 	player_data().serialize(this, serializer);
 
@@ -189,9 +189,9 @@ void GameState::load_game(const char* filename) {
 	FILE* file = fopen(filename, "rb");
 	SerializeBuffer serializer = SerializeBuffer::file_reader(file);
 	tiles().deserialize(serializer);
-	get_level()->inst_set.deserialize(this, serializer);
+	get_level()->game_inst_set().deserialize(this, serializer);
 
-//	std::vector<GameInst*> insts = get_level()->inst_set.to_vector();
+//	std::vector<GameInst*> insts = get_level()->game_inst_set().to_vector();
 //	for (size_t i = 0; i < insts.size(); i++) {
 //		safe_deserialize(insts[i], this, serializer);
 //	}
@@ -209,7 +209,7 @@ obj_id GameState::add_instance(level_id level, GameInst* inst) {
 }
 
 GameInst* GameState::get_instance(level_id level, obj_id id) {
-	return game_world().get_level(level)->inst_set.get_instance(id);
+	return game_world().get_level(level)->game_inst_set().get_instance(id);
 }
 
 int GameState::handle_event(SDL_Event* event) {
@@ -301,15 +301,15 @@ void GameState::draw(bool drawhud) {
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	get_level()->tiles.pre_draw(this);
+	get_level()->tiles().pre_draw(this);
 
-	std::vector<GameInst*> safe_copy = get_level()->inst_set.to_vector();
+	std::vector<GameInst*> safe_copy = get_level()->game_inst_set().to_vector();
 	for (size_t i = 0; i < safe_copy.size(); i++) {
 		safe_copy[i]->draw(this);
 	}
 
 	monster_controller().post_draw(this);
-	get_level()->tiles.post_draw(this);
+	get_level()->tiles().post_draw(this);
 	if (drawhud) {
 		hud.draw(this);
 	}
@@ -320,27 +320,27 @@ void GameState::draw(bool drawhud) {
 }
 
 obj_id GameState::add_instance(GameInst* inst) {
-	obj_id id = get_level()->inst_set.add_instance(inst);
-	inst->current_level = get_level()->levelid;
+	obj_id id = get_level()->game_inst_set().add_instance(inst);
+	inst->current_level = get_level()->id();
 	inst->init(this);
 	return id;
 }
 
 void GameState::remove_instance(GameInst* inst) {
-	get_level()->inst_set.remove_instance(inst);
+	get_level()->game_inst_set().remove_instance(inst);
 	inst->deinit(this);
 }
 
 int GameState::width() {
-	return get_level()->width;
+	return get_level()->width();
 }
 
 int GameState::height() {
-	return get_level()->height;
+	return get_level()->height();
 }
 
 GameInst* GameState::get_instance(obj_id id) {
-	return get_level()->inst_set.get_instance(id);
+	return get_level()->game_inst_set().get_instance(id);
 }
 
 static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
@@ -377,9 +377,9 @@ bool GameState::tile_radius_test(int x, int y, int rad, bool issolid, int ttype,
 
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			Tile& tile = get_level()->tiles.get(xx, yy);
+			Tile& tile = get_level()->tiles().get(xx, yy);
 			bool istype = (tile.tile == ttype || ttype == -1);
-			bool solidmatch = (get_level()->tiles.is_solid(xx, yy) == issolid);
+			bool solidmatch = (get_level()->tiles().is_solid(xx, yy) == issolid);
 			if (solidmatch && istype) {
 				int offset = TILE_SIZE / 2; //To and from center
 				int cx = int(xx * TILE_SIZE) + offset;
@@ -409,12 +409,12 @@ bool GameState::tile_radius_test(int x, int y, int rad, bool issolid, int ttype,
 
 //int GameState::object_square_test(GameInst** objs, int obj_cap,
 //		col_filterf f, const Pos& pos) {
-//	return get_level()->inst_set.object_square_test(objs, obj_cap, f, pos);
+//	return get_level()->game_inst_set().object_square_test(objs, obj_cap, f, pos);
 //}
 
 int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 		col_filterf f, int x, int y, int radius) {
-	return get_level()->inst_set.object_radius_test(obj, objs, obj_cap, f, x, y,
+	return get_level()->game_inst_set().object_radius_test(obj, objs, obj_cap, f, x, y,
 			radius);
 }
 
@@ -498,12 +498,12 @@ bool GameState::mouse_downwheel() {
 
 /* End mouse click states */
 GameTiles& GameState::tiles() {
-	return get_level()->tiles;
+	return get_level()->tiles();
 }
 
 MonsterController& GameState::monster_controller() {
-	return get_level()->mc;
+	return get_level()->monster_controller();
 }
 void GameState::skip_next_instance_id() {
-	get_level()->inst_set.skip_next_id();
+	get_level()->game_inst_set().skip_next_id();
 }

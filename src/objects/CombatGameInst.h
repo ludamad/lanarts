@@ -6,6 +6,8 @@
 #ifndef COMBATGAMEINST_H_
 #define COMBATGAMEINST_H_
 
+#include "../collision_avoidance/CollisionAvoidance.h"
+
 #include "../stats/combat_stats.h"
 #include "../stats/stats.h"
 
@@ -15,18 +17,20 @@
 
 struct AttackStats;
 
-struct EntityBehaviour {
-	int simulation_id; // For collision-avoidance
+struct CollisionAvoidanceParameters {
+	simul_id collision_simulation_id;
+	int avoidance_radius;
+
 };
 
 class CombatGameInst: public GameInst {
 public:
 	CombatGameInst(const CombatStats& base_stats, sprite_id sprite,
-			team_id teamid, int mobid, int x, int y, int radius, bool solid = true,
-			int depth = 0) :
+			team_id teamid, int mobid, int x, int y, int radius, bool solid =
+					true, int depth = 0) :
 			GameInst(x, y, radius, solid, depth), rx(x), ry(y), vx(0), vy(0), is_resting(
-					false), teamid(teamid), mobid(mobid), sprite(sprite), kills(0), base_stats(
-					base_stats) {
+					false), teamid(teamid), mobid(mobid), sprite(sprite), simulation_id(
+					-1), kills(0), base_stats(base_stats) {
 	}
 	CombatGameInst() :
 			GameInst(0, 0, 0) {
@@ -94,7 +98,7 @@ public:
 	}
 
 	team_id& team();
-
+	simul_id& collision_simulation_id();
 //members
 public:
 	float vx, vy;
@@ -104,6 +108,7 @@ protected:
 	team_id teamid;
 	int mobid;
 	sprite_id sprite;
+	simul_id simulation_id;
 	int kills;
 private:
 	CombatStats base_stats;

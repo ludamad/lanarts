@@ -28,7 +28,7 @@ namespace RVO {
 struct RVOSimulator;
 }
 
-struct GameLevelState;
+class GameLevelState;
 class PlayerInst;
 
 class EnemyController {

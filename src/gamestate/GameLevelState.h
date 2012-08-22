@@ -6,11 +6,18 @@
 #ifndef GAMELEVELSTATE_H_
 #define GAMELEVELSTATE_H_
 #include <vector>
-#include "../objects/enemy/MonsterController.h"
+
 #include "PlayerData.h"
 #include "GameInstSet.h"
 #include "GameTiles.h"
+
+#include "../collision_avoidance/CollisionAvoidance.h"
+
+#include "../objects/enemy/MonsterController.h"
+
 #include "../levelgen/GeneratedLevel.h"
+
+class GameState;
 
 struct GameLevelPortal {
 	Pos entrancesqr;
@@ -20,7 +27,8 @@ struct GameLevelPortal {
 	}
 };
 
-struct GameLevelState {
+class GameLevelState {
+public:
 	GameLevelState(level_id levelid, int w, int h, bool wandering_flag = true,
 			bool is_simulation = false);
 	~GameLevelState();
@@ -29,24 +37,54 @@ struct GameLevelState {
 	void copy_to(GameLevelState & level) const;
 	GameLevelState* clone() const;
 
+	int width() {
+		return _width;
+	}
+	int height() {
+		return _height;
+	}
+	GameTiles& tiles() {
+		return _tiles;
+	}
+
+	GameInstSet& game_inst_set() {
+		return _inst_set;
+	}
 	int tile_width() {
-		return width / TILE_SIZE;
+		return _width / TILE_SIZE;
 	}
 	int tile_height() {
-		return height / TILE_SIZE;
+		return _height / TILE_SIZE;
 	}
 
+	level_id id() {
+		return _levelid;
+	}
+
+	MonsterController& monster_controller() {
+		return _monster_controller;
+	}
+
+	CollisionAvoidance& collision_avoidance() {
+		return _collision_avoidance;
+	}
+
+	void step(GameState* gs);
+
+public:
 	std::vector<GameLevelPortal> exits, entrances;
 	std::vector<Room> rooms;
+private:
 
-	level_id levelid;
-	int steps_left;
-	int width, height;
-	GameTiles tiles;
-	GameInstSet inst_set;
-	MonsterController mc;
+	level_id _levelid;
+	int _steps_left;
+	int _width, _height;
+	GameTiles _tiles;
+	GameInstSet _inst_set;
+	MonsterController _monster_controller;
+	CollisionAvoidance _collision_avoidance;
 
-	bool is_simulation;
+	bool _is_simulation;
 };
 
 #endif /* GAMELEVELSTATE_H_ */

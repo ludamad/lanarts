@@ -18,12 +18,36 @@ CollisionAvoidance::~CollisionAvoidance() {
 	delete simulator;
 }
 
+simul_id CollisionAvoidance::add_active_object(const Pos& pos, int radius,
+		float movespeed) {
+	const int MAX_NEIGHBOURS = 10;
+	const float TIME_HORIZON = 8.0f, TIME_STEP = 1.0f;
+	const float neighbour_dist = radius * 2;
+
+	RVO::Vector2 position(pos.x, pos.y);
+
+	return simulator->addAgent(position, neighbour_dist, MAX_NEIGHBOURS,
+			TIME_HORIZON, TIME_STEP, radius, movespeed);
+}
+
+simul_id CollisionAvoidance::add_passive_object(const Pos& pos, int radius) {
+	const int MAX_NEIGHBOURS = 10;
+	const float TIME_HORIZON = 0.0f, TIME_STEP = 1.0f;
+	const float NEIGHBOUR_DIST = 0.0f;
+	const float MOVESPEED = 0.0f;
+
+	RVO::Vector2 position(pos.x, pos.y);
+
+	return simulator->addAgent(position, NEIGHBOUR_DIST, MAX_NEIGHBOURS,
+			TIME_HORIZON, TIME_STEP, radius, MOVESPEED);
+}
+
 simul_id CollisionAvoidance::add_object(CombatGameInst* inst) {
 	RVO::Vector2 enemy_position(inst->x, inst->y);
 	EffectiveStats& estats = inst->effective_stats();
 
-	return simulator->addAgent(enemy_position, inst->target_radius*2, 10, 8.0f, 1.0f, inst->target_radius,
-			estats.movespeed);
+	return simulator->addAgent(enemy_position, inst->target_radius * 2, 10,
+			8.0f, 1.0f, inst->target_radius, estats.movespeed);
 }
 simul_id CollisionAvoidance::add_player_object(CombatGameInst* inst) {
 	RVO::Vector2 enemy_position(inst->x, inst->y);
@@ -64,3 +88,9 @@ void CollisionAvoidance::clear() {
 	simulator->setTimeStep(1.0f);
 }
 
+void avoid_object_collisions(CollisionAvoidance& colavoid,
+		const std::vector<CombatGameInst*>& objects) {
+	for (int i = 0; i < objects.size(); i++) {
+
+	}
+}
