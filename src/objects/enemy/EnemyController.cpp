@@ -1,253 +1,253 @@
-///*
-// * EnemyController.cpp:
-// *  Centralized location of all pathing decisions of enemies, with collision avoidance
-// */
+/*
+ * EnemyController.cpp:
+ *  Centralized location of all pathing decisions of enemies, with collision avoidance
+ */
+
+#include <algorithm>
+#include <cmath>
+
+#include <rvo2/RVO.h>
+
+#include "../../gamestate/GameState.h"
+#include "../../gamestate/PlayerData.h"
+
+#include "EnemyInst.h"
+#include "../player/PlayerInst.h"
+
+#include "../../combat_logic/attack_logic.h"
+
+#include "../../display/colour_constants.h"
+#include "../../util/math_util.h"
+#include "../collision_filters.h"
+
+#include "../../display/tile_data.h"
+#include "../../stats/weapon_data.h"
+
+#include "EnemyController.h"
+
+const int PATHING_RADIUS = 500;
+const int HUGE_DISTANCE = 1000000;
+
+//EnemyController::EnemyController(bool wander) :
+//		monsters_wandering_flag(wander) {
+//	targetted = 0;
+//}
 //
-//#include <algorithm>
-//#include <cmath>
+//EnemyController::~EnemyController() {
+//	resize_paths(0);
+//}
 //
-//#include <rvo2/RVO.h>
+//void EnemyController::register_enemy(GameInst* enemy) {
+//	mids.push_back(enemy->id);
+//	RVO::Vector2 enemy_position(enemy->x, enemy->y);
+//	EnemyInst* e = (EnemyInst*)enemy;
+//	EffectiveStats& estats = e->effective_stats();
+//	EnemyBehaviour& eb = e->behaviour();
 //
-//#include "../../gamestate/GameState.h"
-//#include "../../gamestate/PlayerData.h"
+//	eb.simulation_id = coll_avoid.add_object(e);
+//}
 //
-//#include "EnemyInst.h"
-//#include "../player/PlayerInst.h"
+//void towards_highest(PathInfo& path, Pos& p) {
+//	int highest;
+//	for (int y = -1; y <= +1; y++) {
+//		for (int x = -1; x <= +1; x++) {
+//			path.get(p.x + x, p.y + y);
+//		}
+//	}
 //
-//#include "../../combat_logic/attack_logic.h"
+//}
 //
-//#include "../../display/colour_constants.h"
-//#include "../../util/math_util.h"
-//#include "../collision_filters.h"
+//void EnemyController::deregister_enemy(EnemyInst* enemy) {
+//	coll_avoid.remove_object(enemy->behaviour().simulation_id);
+//}
+//void EnemyController::shift_target(GameState* gs) {
+//	if (!targetted)
+//		return; //Shouldn't auto-target if no targets are possible
+//	int i, j;
+//	for (i = 0; i < mids.size(); i++) {
+//		if (mids[i] == targetted)
+//			break;
+//	}
+//	PlayerInst* player = gs->local_player();
 //
-//#include "../../display/tile_data.h"
-//#include "../../stats/weapon_data.h"
+//	for (j = i + 1; j % mids.size() != i; j++) {
+//		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[j % mids.size()]);
+//		if (e == NULL)
+//			continue;
 //
-//#include "EnemyController.h"
+//		bool isvisible = gs->object_visible_test(e, player, false);
+//		if (isvisible) {
+//			targetted = e->id;
+//			return;
+//		}
+//	}
 //
-//const int PATHING_RADIUS = 500;
-//const int HUGE_DISTANCE = 1000000;
+//}
 //
-////EnemyController::EnemyController(bool wander) :
-////		monsters_wandering_flag(wander) {
-////	targetted = 0;
-////}
-////
-////EnemyController::~EnemyController() {
-////	resize_paths(0);
-////}
-////
-////void EnemyController::register_enemy(GameInst* enemy) {
-////	mids.push_back(enemy->id);
-////	RVO::Vector2 enemy_position(enemy->x, enemy->y);
-////	EnemyInst* e = (EnemyInst*)enemy;
-////	EffectiveStats& estats = e->effective_stats();
-////	EnemyBehaviour& eb = e->behaviour();
-////
-////	eb.simulation_id = coll_avoid.add_object(e);
-////}
-////
-////void towards_highest(PathInfo& path, Pos& p) {
-////	int highest;
-////	for (int y = -1; y <= +1; y++) {
-////		for (int x = -1; x <= +1; x++) {
-////			path.get(p.x + x, p.y + y);
-////		}
-////	}
-////
-////}
-////
-////void EnemyController::deregister_enemy(EnemyInst* enemy) {
-////	coll_avoid.remove_object(enemy->behaviour().simulation_id);
-////}
-////void EnemyController::shift_target(GameState* gs) {
-////	if (!targetted)
-////		return; //Shouldn't auto-target if no targets are possible
-////	int i, j;
-////	for (i = 0; i < mids.size(); i++) {
-////		if (mids[i] == targetted)
-////			break;
-////	}
-////	PlayerInst* player = gs->local_player();
-////
-////	for (j = i + 1; j % mids.size() != i; j++) {
-////		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[j % mids.size()]);
-////		if (e == NULL)
-////			continue;
-////
-////		bool isvisible = gs->object_visible_test(e, player, false);
-////		if (isvisible) {
-////			targetted = e->id;
-////			return;
-////		}
-////	}
-////
-////}
-////
-////int EnemyController::find_player_to_target(GameState* gs, EnemyInst* e) {
-////	//Use a 'GameView' object to make use of its helper methods
-////	GameView view(0, 0, PATHING_RADIUS * 2, PATHING_RADIUS * 2, gs->width(),
-////			gs->height());
-////
-////	//Determine which players we are currently in view of
-////	BBox ebox = e->bbox();
-////	int mindistsqr = HUGE_DISTANCE;
-////	int closest_player_index = -1;
-////	for (int i = 0; i < players.size(); i++) {
-////		PlayerInst* player = players[i];
-////		bool isvisible = gs->object_visible_test(e, player, false);
-////		if (isvisible)
-////			((PlayerInst*)player)->rest_cooldown() = REST_COOLDOWN;
-////		view.sharp_center_on(player->x, player->y);
-////		bool chasing = e->behaviour().chase_timeout > 0
-////				&& player->id == e->behaviour().chasing_player;
-////		if (view.within_view(ebox) && (chasing || isvisible)) {
-////			e->behaviour().current_action = EnemyBehaviour::CHASING_PLAYER;
-////
-////			int dx = e->x - player->x, dy = e->y - player->y;
-////			int distsqr = dx * dx + dy * dy;
-////			if (distsqr > 0 /*overflow check*/&& distsqr < mindistsqr) {
-////				mindistsqr = distsqr;
-////				closest_player_index = i;
-////			}
-////		}
-////	}
-////	return closest_player_index;
-////}
-////void EnemyController::process_players(GameState* gs) {
-////
-////	if (player_simids.size() > players.size()) {
-////		int diff = player_simids.size() - players.size();
-////		for (int i = 0; i < diff; i++) {
-////			coll_avoid.remove_object(player_simids.back());
-////			player_simids.pop_back();
-////		}
-////	} else if (players.size() > player_simids.size()) {
-////		int old_players = player_simids.size();
-////		player_simids.resize(players.size());
-////		for (int i = old_players; i < players.size(); i++) {
-////			player_simids[i] = coll_avoid.add_player_object(players[i]);
-////		}
-////	}
-////
-////	//Create as many paths as there are players
-////	resize_paths(players.size());
-////	for (int i = 0; i < players.size(); i++) {
-////		if (paths[i] == NULL)
-////			paths[i] = new PathInfo;
-////		paths[i]->calculate_path(gs, players[i]->x, players[i]->y,
-////				PATHING_RADIUS);
-////	}
-////}
-////
-////void EnemyController::pre_step(GameState* gs) {
-////
-////	PlayerInst* local_player = gs->local_player();
-////	std::vector<EnemyOfInterest> eois;
-////
-////	players = gs->players_in_level();
-////	process_players(gs);
-////
-////	//Make sure targetted object is alive
-////	if (targetted && !gs->get_instance(targetted)) {
-////		targetted = 0;
-////	}
-////
-////	//Update 'mids' to only hold live objects
-////	std::vector<obj_id> mids2;
-////	mids2.reserve(mids.size());
-////	mids.swap(mids2);
-////	for (int i = 0; i < mids2.size(); i++) {
-////		EnemyInst* e = (EnemyInst*)gs->get_instance(mids2[i]);
-////		if (e == NULL)
-////			continue;
-////		EnemyBehaviour& eb = e->behaviour();
-////		eb.step();
-////
-////		bool isvisibleToLocal = gs->object_visible_test(e, local_player, false);
-////		if (isvisibleToLocal && !targetted)
-////			targetted = e->id;
-////		if (!isvisibleToLocal && targetted == e->id)
-////			targetted = 0;
-////
-////		//Add live instances back to monster id list
-////		mids.push_back(mids2[i]);
-////
-////		int closest_player_index = find_player_to_target(gs, e);
-////
-////		if (eb.current_action == EnemyBehaviour::INACTIVE
-////				&& e->cooldowns().is_hurting()) {
-////			eb.current_action = EnemyBehaviour::CHASING_PLAYER;
-////		}
-////		if (closest_player_index == -1
-////				&& eb.current_action == EnemyBehaviour::CHASING_PLAYER) {
-////			eb.current_action = EnemyBehaviour::INACTIVE;
-////		}
-////
-////		if (eb.current_action == EnemyBehaviour::CHASING_PLAYER)
-////			eois.push_back(EnemyOfInterest(e, closest_player_index));
-////		else if (eb.current_action == EnemyBehaviour::INACTIVE)
-////			monster_wandering(gs, e);
-////		else
-////			//if (eb.current_action == EnemyBehaviour::FOLLOWING_PATH)
-////			monster_follow_path(gs, e);
-////	}
-////	set_monster_headings(gs, eois);
-////
-////	//Update player positions for collision avoidance simulator
-////	for (int i = 0; i < players.size(); i++) {
-////		PlayerInst* p = players[i];
-////		coll_avoid.set_position(player_simids[i], p->x, p->y);
-////	}
-////
-////	for (int i = 0; i < mids.size(); i++) {
-////		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[i]);
-////		lua_gameinst_callback(gs->get_luastate(), e->etype().step_event, e);
-////		update_velocity(gs, e);
-////		EnemyBehaviour& eb = e->behaviour();
-////		coll_avoid.set_position(eb.simulation_id, e->rx, e->ry);
-////		coll_avoid.set_preferred_velocity(eb.simulation_id, e->vx, e->vy);
-////	}
-////
-////	coll_avoid.step();
-////
-////	for (int i = 0; i < mids.size(); i++) {
-////		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[i]);
-////		update_position(gs, e);
-////	}
-////}
-////
-////void EnemyController::update_velocity(GameState* gs, EnemyInst* e) {
-////	EnemyBehaviour& eb = e->behaviour();
-////	float movespeed = e->effective_stats().movespeed;
-////
-////	if (e->cooldowns().is_hurting()) {
-////		e->vx /= 2, e->vy /= 2;
-////		movespeed /= 2;
-////	}
-////
-////	coll_avoid.set_preferred_velocity(eb.simulation_id, e->vx, e->vy);
-////}
-////void EnemyController::update_position(GameState* gs, EnemyInst* e) {
-////	EnemyBehaviour& eb = e->behaviour();
-////	Posf pos = coll_avoid.get_position(eb.simulation_id);
-////
-////	e->attempt_move_to_position(gs, pos.x, pos.y);
-////	coll_avoid.set_position(eb.simulation_id, pos.x, pos.y);
-////	coll_avoid.set_maxspeed(eb.simulation_id, e->effective_stats().movespeed);
-////}
-////
-////void EnemyController::post_draw(GameState* gs) {
-////	EnemyInst* target = (EnemyInst*)gs->get_instance(targetted);
-////	if (!target)
-////		return;
-////	glLineWidth(2);
-////	gl_draw_circle(gs->view(), target->x, target->y, target->target_radius + 5,
-////			COL_GREEN.with_alpha(140), true);
-////	glLineWidth(1);
-////}
-////
-////void EnemyController::clear() {
-////	resize_paths(0);
-////	mids.clear();
-////}
+//int EnemyController::find_player_to_target(GameState* gs, EnemyInst* e) {
+//	//Use a 'GameView' object to make use of its helper methods
+//	GameView view(0, 0, PATHING_RADIUS * 2, PATHING_RADIUS * 2, gs->width(),
+//			gs->height());
+//
+//	//Determine which players we are currently in view of
+//	BBox ebox = e->bbox();
+//	int mindistsqr = HUGE_DISTANCE;
+//	int closest_player_index = -1;
+//	for (int i = 0; i < players.size(); i++) {
+//		PlayerInst* player = players[i];
+//		bool isvisible = gs->object_visible_test(e, player, false);
+//		if (isvisible)
+//			((PlayerInst*)player)->rest_cooldown() = REST_COOLDOWN;
+//		view.sharp_center_on(player->x, player->y);
+//		bool chasing = e->behaviour().chase_timeout > 0
+//				&& player->id == e->behaviour().chasing_player;
+//		if (view.within_view(ebox) && (chasing || isvisible)) {
+//			e->behaviour().current_action = EnemyBehaviour::CHASING_PLAYER;
+//
+//			int dx = e->x - player->x, dy = e->y - player->y;
+//			int distsqr = dx * dx + dy * dy;
+//			if (distsqr > 0 /*overflow check*/&& distsqr < mindistsqr) {
+//				mindistsqr = distsqr;
+//				closest_player_index = i;
+//			}
+//		}
+//	}
+//	return closest_player_index;
+//}
+//void EnemyController::process_players(GameState* gs) {
+//
+//	if (player_simids.size() > players.size()) {
+//		int diff = player_simids.size() - players.size();
+//		for (int i = 0; i < diff; i++) {
+//			coll_avoid.remove_object(player_simids.back());
+//			player_simids.pop_back();
+//		}
+//	} else if (players.size() > player_simids.size()) {
+//		int old_players = player_simids.size();
+//		player_simids.resize(players.size());
+//		for (int i = old_players; i < players.size(); i++) {
+//			player_simids[i] = coll_avoid.add_player_object(players[i]);
+//		}
+//	}
+//
+//	//Create as many paths as there are players
+//	resize_paths(players.size());
+//	for (int i = 0; i < players.size(); i++) {
+//		if (paths[i] == NULL)
+//			paths[i] = new PathInfo;
+//		paths[i]->calculate_path(gs, players[i]->x, players[i]->y,
+//				PATHING_RADIUS);
+//	}
+//}
+//
+//void EnemyController::pre_step(GameState* gs) {
+//
+//	PlayerInst* local_player = gs->local_player();
+//	std::vector<EnemyOfInterest> eois;
+//
+//	players = gs->players_in_level();
+//	process_players(gs);
+//
+//	//Make sure targetted object is alive
+//	if (targetted && !gs->get_instance(targetted)) {
+//		targetted = 0;
+//	}
+//
+//	//Update 'mids' to only hold live objects
+//	std::vector<obj_id> mids2;
+//	mids2.reserve(mids.size());
+//	mids.swap(mids2);
+//	for (int i = 0; i < mids2.size(); i++) {
+//		EnemyInst* e = (EnemyInst*)gs->get_instance(mids2[i]);
+//		if (e == NULL)
+//			continue;
+//		EnemyBehaviour& eb = e->behaviour();
+//		eb.step();
+//
+//		bool isvisibleToLocal = gs->object_visible_test(e, local_player, false);
+//		if (isvisibleToLocal && !targetted)
+//			targetted = e->id;
+//		if (!isvisibleToLocal && targetted == e->id)
+//			targetted = 0;
+//
+//		//Add live instances back to monster id list
+//		mids.push_back(mids2[i]);
+//
+//		int closest_player_index = find_player_to_target(gs, e);
+//
+//		if (eb.current_action == EnemyBehaviour::INACTIVE
+//				&& e->cooldowns().is_hurting()) {
+//			eb.current_action = EnemyBehaviour::CHASING_PLAYER;
+//		}
+//		if (closest_player_index == -1
+//				&& eb.current_action == EnemyBehaviour::CHASING_PLAYER) {
+//			eb.current_action = EnemyBehaviour::INACTIVE;
+//		}
+//
+//		if (eb.current_action == EnemyBehaviour::CHASING_PLAYER)
+//			eois.push_back(EnemyOfInterest(e, closest_player_index));
+//		else if (eb.current_action == EnemyBehaviour::INACTIVE)
+//			monster_wandering(gs, e);
+//		else
+//			//if (eb.current_action == EnemyBehaviour::FOLLOWING_PATH)
+//			monster_follow_path(gs, e);
+//	}
+//	set_monster_headings(gs, eois);
+//
+//	//Update player positions for collision avoidance simulator
+//	for (int i = 0; i < players.size(); i++) {
+//		PlayerInst* p = players[i];
+//		coll_avoid.set_position(player_simids[i], p->x, p->y);
+//	}
+//
+//	for (int i = 0; i < mids.size(); i++) {
+//		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[i]);
+//		lua_gameinst_callback(gs->get_luastate(), e->etype().step_event, e);
+//		update_velocity(gs, e);
+//		EnemyBehaviour& eb = e->behaviour();
+//		coll_avoid.set_position(eb.simulation_id, e->rx, e->ry);
+//		coll_avoid.set_preferred_velocity(eb.simulation_id, e->vx, e->vy);
+//	}
+//
+//	coll_avoid.step();
+//
+//	for (int i = 0; i < mids.size(); i++) {
+//		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[i]);
+//		update_position(gs, e);
+//	}
+//}
+//
+//void EnemyController::update_velocity(GameState* gs, EnemyInst* e) {
+//	EnemyBehaviour& eb = e->behaviour();
+//	float movespeed = e->effective_stats().movespeed;
+//
+//	if (e->cooldowns().is_hurting()) {
+//		e->vx /= 2, e->vy /= 2;
+//		movespeed /= 2;
+//	}
+//
+//	coll_avoid.set_preferred_velocity(eb.simulation_id, e->vx, e->vy);
+//}
+//void EnemyController::update_position(GameState* gs, EnemyInst* e) {
+//	EnemyBehaviour& eb = e->behaviour();
+//	Posf pos = coll_avoid.get_position(eb.simulation_id);
+//
+//	e->attempt_move_to_position(gs, pos.x, pos.y);
+//	coll_avoid.set_position(eb.simulation_id, pos.x, pos.y);
+//	coll_avoid.set_maxspeed(eb.simulation_id, e->effective_stats().movespeed);
+//}
+//
+//void EnemyController::post_draw(GameState* gs) {
+//	EnemyInst* target = (EnemyInst*)gs->get_instance(targetted);
+//	if (!target)
+//		return;
+//	glLineWidth(2);
+//	gl_draw_circle(gs->view(), target->x, target->y, target->target_radius + 5,
+//			COL_GREEN.with_alpha(140), true);
+//	glLineWidth(1);
+//}
+//
+//void EnemyController::clear() {
+//	resize_paths(0);
+//	mids.clear();
+//}

@@ -24,24 +24,6 @@
 #include "../GameInst.h"
 #include "EnemyInst.h"
 
-struct EnemyBehaviour {
-	int successful_hit_timer;
-	int damage_taken_timer;
-	EnemyBehaviour() :
-			successful_hit_timer(successful_hit_timer), damage_taken_timer(
-					damage_taken_timer) {
-
-	}
-};
-
-struct EnemyOfInterest {
-	EnemyInst* e;
-	int closest_player_index;
-	EnemyOfInterest(EnemyInst* e, int player_index) :
-			e(e), closest_player_index(player_index) {
-	}
-};
-
 namespace RVO {
 struct RVOSimulator;
 }
@@ -70,16 +52,6 @@ public:
 	void serialize(GameState* gs, SerializeBuffer& serializer);
 	void deserialize(GameState* gs, SerializeBuffer& serializer);
 private:
-	void set_monster_headings(GameState* gs,
-			std::vector<EnemyOfInterest> & eois);
-	void update_position(GameState* gs, EnemyInst* e);
-	void update_velocity(GameState* gs, EnemyInst* e);
-	/*returns an index into the player_simids vector*/
-	int find_player_to_target(GameState* gs, EnemyInst* e);
-	void process_players(GameState* gs);
-	void monster_wandering(GameState *gs, EnemyInst *e);
-	void monster_follow_path(GameState *gs, EnemyInst *e);
-	void monster_get_to_stairs(GameState *gs, EnemyInst *e);
 
 	struct Combatant {
 		CombatGameInst* inst;
@@ -95,5 +67,43 @@ private:
 	CollisionAvoidance coll_avoid;
 	bool monsters_wandering_flag;
 };
+
+CombatGameInst* find_closest_hostile(GameState* gs, CombatGameInst* obj,
+		const std::vector<CombatGameInst*>& candidates);
+
+obj_id find_closest_hostile(GameState* gs, CombatGameInst* obj,
+		const std::vector<CombatGameInst*>& candidates);
+
+
+int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
+	//Use a 'GameView' object to make use of its helper methods
+	GameView view(0, 0, PLAYER_PATHING_RADIUS * 2, PLAYER_PATHING_RADIUS * 2,
+			gs->width(), gs->height());
+
+	//Determine which players we are currently in view of
+	BBox ebox = e->bbox();
+	int mindistsqr = HUGE_DISTANCE;
+	int closest_player_index = -1;
+	for (int i = 0; i < players.size(); i++) {
+		PlayerInst* player = players[i];
+		bool isvisible = gs->object_visible_test(e, player, false);
+		if (isvisible)
+			((PlayerInst*)player)->rest_cooldown() = REST_COOLDOWN;
+		view.sharp_center_on(player->x, player->y);
+		bool chasing = e->behaviour().chase_timeout > 0
+				&& player->id == e->behaviour().chasing_player;
+		if (view.within_view(ebox) && (chasing || isvisible)) {
+			e->behaviour().current_action = EnemyBehaviour::CHASING_PLAYER;
+
+			int dx = e->x - player->x, dy = e->y - player->y;
+			int distsqr = dx * dx + dy * dy;
+			if (distsqr > 0 /*overflow check*/&& distsqr < mindistsqr) {
+				mindistsqr = distsqr;
+				closest_player_index = i;
+			}
+		}
+	}
+	return closest_player_index;
+}
 
 #endif /* ENEMYCONTROLLER_H_ */

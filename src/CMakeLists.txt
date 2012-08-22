@@ -151,7 +151,9 @@ set( lanarts_src
 	objects/player/PlayerInstAttackActions.cpp
 	objects/CombatGameInst.cpp
 	objects/ScriptedInst.cpp
+	objects/enemy/EnemyAIState.cpp
 	objects/enemy/EnemyInst.cpp
+	objects/enemy/EnemyController.cpp
 	objects/FeatureInst.cpp
 	objects/GameInst.cpp
 	objects/GameInstRef.cpp
@@ -278,8 +280,10 @@ set( lanarts_include
 	objects/GameInst.h
 	objects/GameInstRef.h
 	objects/player/PlayerInst.h
+	objects/enemy/EnemyAIState.h
 	objects/enemy/EnemyBehaviour.h
 	objects/enemy/EnemyInst.h
+	objects/enemy/EnemyController.h
 	objects/FeatureInst.h
 	objects/ScriptedInst.h
 	objects/ProjectileInst.h

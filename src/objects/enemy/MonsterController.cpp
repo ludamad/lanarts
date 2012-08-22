@@ -129,6 +129,7 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 	}
 	return closest_player_index;
 }
+
 void MonsterController::process_players(GameState* gs) {
 
 	if (player_simids.size() > players.size()) {
