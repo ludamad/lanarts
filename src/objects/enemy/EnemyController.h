@@ -71,39 +71,4 @@ private:
 CombatGameInst* find_closest_hostile(GameState* gs, CombatGameInst* obj,
 		const std::vector<CombatGameInst*>& candidates);
 
-obj_id find_closest_hostile(GameState* gs, CombatGameInst* obj,
-		const std::vector<CombatGameInst*>& candidates);
-
-
-int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
-	//Use a 'GameView' object to make use of its helper methods
-	GameView view(0, 0, PLAYER_PATHING_RADIUS * 2, PLAYER_PATHING_RADIUS * 2,
-			gs->width(), gs->height());
-
-	//Determine which players we are currently in view of
-	BBox ebox = e->bbox();
-	int mindistsqr = HUGE_DISTANCE;
-	int closest_player_index = -1;
-	for (int i = 0; i < players.size(); i++) {
-		PlayerInst* player = players[i];
-		bool isvisible = gs->object_visible_test(e, player, false);
-		if (isvisible)
-			((PlayerInst*)player)->rest_cooldown() = REST_COOLDOWN;
-		view.sharp_center_on(player->x, player->y);
-		bool chasing = e->behaviour().chase_timeout > 0
-				&& player->id == e->behaviour().chasing_player;
-		if (view.within_view(ebox) && (chasing || isvisible)) {
-			e->behaviour().current_action = EnemyBehaviour::CHASING_PLAYER;
-
-			int dx = e->x - player->x, dy = e->y - player->y;
-			int distsqr = dx * dx + dy * dy;
-			if (distsqr > 0 /*overflow check*/&& distsqr < mindistsqr) {
-				mindistsqr = distsqr;
-				closest_player_index = i;
-			}
-		}
-	}
-	return closest_player_index;
-}
-
 #endif /* ENEMYCONTROLLER_H_ */
