@@ -81,3 +81,11 @@ items:
     action_func: reveal_map
     amount: 1
     
+  - name: Scroll of Escape
+    shop_cost: [80,85]
+    description: Brings you to a nearby exit.
+    use_message: You feel closer to escaping!
+    sprite: scroll escape
+    action_func: function (item, obj) obj_to_exit(obj) end 
+    amount: 1
+    

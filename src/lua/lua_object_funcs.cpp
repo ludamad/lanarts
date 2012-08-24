@@ -14,11 +14,15 @@ extern "C" {
 
 #include "../data/lua_game_data.h"
 
+#include "../display/colour_constants.h"
+
 #include "../gamestate/GameState.h"
 
 #include "../objects/GameInst.h"
 #include "../objects/player/PlayerInst.h"
 #include "../objects/ScriptedInst.h"
+
+#include "../util/math_util.h"
 
 // Creates object, adding to game world, returns said object
 // Take arguments: objtype, x, y; returns obj
@@ -96,6 +100,30 @@ static int reveal_map(lua_State* L) {
 	return 0;
 }
 
+static int obj_to_exit(lua_State* L) {
+
+	GameState* gs = lua_get_gamestate(L);
+	GameLevelState* level = gs->get_level();
+	GameInst* user = lua_gameinst_arg(L, 1);
+	MTwist& mt = gs->rng();
+	int nexits = level->exits.size();
+	if (nexits == 0) {
+		gs->game_chat().add_message("You feel disoriented! You do not move.",
+				COL_PALE_RED);
+		return 0;
+	}
+	int exit = mt.rand(nexits);
+	Pos p = level->exits[exit].entrancesqr;
+	p = centered_multiple(p, TILE_SIZE);
+	user->update_position(p.x, p.y);
+	gs->game_chat().add_message("You are yanked to the exit!", COL_PALE_GREEN);
+
+	PlayerInst* player = dynamic_cast<PlayerInst*>(user);
+	gs->view().sharp_center_on(player->pos());
+
+	return 0;
+}
+
 void lua_object_func_bindings(lua_State* L) {
 	//Use C function name as lua function name:
 #define LUA_FUNC_REGISTER(f) \
@@ -107,4 +135,5 @@ void lua_object_func_bindings(lua_State* L) {
 	LUA_FUNC_REGISTER(players_in_level);
 	LUA_FUNC_REGISTER(monsters_seen);
 	LUA_FUNC_REGISTER(reveal_map);
+	LUA_FUNC_REGISTER(obj_to_exit);
 }

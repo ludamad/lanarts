@@ -15,6 +15,9 @@ effects:
     stat_func: berserk_statmod
     init_func: berserk_init
     step_func: berserk_step
+    can_use_rest: no
+    can_use_spells: no
+    can_use_stairs: no
     finish_func: 
       function (effect, obj) 
         obj:add_effect("Exhausted", effect.exhausted_duration) 
@@ -28,6 +31,7 @@ effects:
 
   - name: Exhausted
     stat_func: exhausted_statmod
+    can_use_rest: no
     finish_func: 
       function (effect, obj) 
         if obj:is_local_player() then 

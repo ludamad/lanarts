@@ -578,6 +578,9 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
+	if (!effective_stats().allowed_actions.can_use_spells) {
+		return;
+	}
 	MTwist& mt = gs->rng();
 	EffectiveStats& estats = effective_stats();
 

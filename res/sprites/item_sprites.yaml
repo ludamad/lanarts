@@ -32,5 +32,8 @@ sprites:
   - name: scroll_will
     file: res/sprites/items/scrolls/scroll_will.png
 
+  - name: scroll escape
+    file: res/sprites/items/scrolls/scroll_escape.png
+
   - name: health_potion
     file: res/sprites/items/misc/redpotion.png

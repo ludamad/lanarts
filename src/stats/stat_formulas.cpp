@@ -85,6 +85,7 @@ EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst,
 	EffectiveStats ret;
 	ret.core = stats.core;
 	ret.movespeed = stats.movespeed;
+	ret.allowed_actions = stats.effects.allowed_actions(gs);
 	stats.effects.process(gs, inst, ret);
 	factor_in_equipment(gs->rng(), ret, stats.equipment);
 	derive_secondary_stats(gs->rng(), ret);

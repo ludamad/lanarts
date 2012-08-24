@@ -200,6 +200,7 @@ set( lanarts_include
 
 	serialize/SerializeBuffer.h
 	
+	stats/AllowedActions.h
 	stats/combat_stats.h
 	stats/Inventory.h
 	stats/items.h

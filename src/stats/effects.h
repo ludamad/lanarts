@@ -1,8 +1,11 @@
 #ifndef EFFECTS_H
 #define EFFECTS_H
 
-#include "../lanarts_defines.h"
 #include "../lua/LuaValue.h"
+
+#include "../lanarts_defines.h"
+
+#include "AllowedActions.h"
 
 const int EFFECTS_MAX = 40;
 
@@ -32,6 +35,8 @@ struct EffectStats {
 	void draw_effect_sprites(GameState* gs, const Pos& p);
 	bool can_rest();
 	Colour effected_colour();
+
+	AllowedActions allowed_actions(GameState* gs) const;
 
 	void serialize(GameState* gs, SerializeBuffer& serializer);
 	void deserialize(GameState* gs, SerializeBuffer& serializer);

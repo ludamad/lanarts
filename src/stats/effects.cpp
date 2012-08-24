@@ -65,12 +65,21 @@ bool EffectStats::can_rest() {
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining > 0) {
 			EffectEntry& eentry = game_effect_data.at(effects[i].effectid);
-			if (!eentry.can_rest) {
-				return false;
-			}
+			return false;
 		}
 	}
 	return true;
+}
+
+AllowedActions EffectStats::allowed_actions(GameState* gs) const {
+	AllowedActions actions;
+	for (int i = 0; i < EFFECTS_MAX; i++) {
+		if (effects[i].t_remaining > 0) {
+			EffectEntry& ee = game_effect_data.at(effects[i].effectid);
+			actions = actions.only_in_both(ee.allowed_actions);
+		}
+	}
+	return actions;
 }
 
 void EffectStats::process(GameState* gs, CombatGameInst* inst,

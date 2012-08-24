@@ -432,6 +432,9 @@ static void item_do_lua_action(lua_State* L, ItemEntry& type, GameInst* user,
 	lua_call(L, 5, 0);
 }
 void PlayerInst::use_item(GameState* gs, const GameAction& action) {
+	if (!effective_stats().allowed_actions.can_use_items) {
+		return;
+	}
 	ItemSlot& itemslot = inventory().get(action.use_id);
 	ItemEntry& type = itemslot.item.item_entry();
 
@@ -454,6 +457,9 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 
 }
 void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
+	if (!effective_stats().allowed_actions.can_use_rest) {
+		return;
+	}
 	bool atfull = core_stats().hp >= core_stats().max_hp
 			&& core_stats().mp >= core_stats().max_mp;
 	if (cooldowns().can_rest() && !atfull && effects().can_rest()) {
@@ -530,6 +536,12 @@ static int scan_entrance(const std::vector<GameLevelPortal>& portals,
 }
 
 void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
+	if (!effective_stats().allowed_actions.can_use_stairs) {
+		if (is_local_player()) {
+			gs->game_chat().add_message("You cannot use the stairs in this state!");
+		}
+		return;
+	}
 	Pos hitpos;
 	bool didhit = gs->tile_radius_test(x, y, radius, false,
 			get_tile_by_name("stairs_up"), &hitpos);
@@ -550,6 +562,12 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 	reset_rest_cooldown();
 }
 void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
+	if (!effective_stats().allowed_actions.can_use_stairs) {
+		if (is_local_player()) {
+			gs->game_chat().add_message("You cannot use the stairs in this state!");
+		}
+		return;
+	}
 	Pos hitpos;
 	bool didhit = gs->tile_radius_test(x, y, radius, false,
 			get_tile_by_name("stairs_down"), &hitpos);

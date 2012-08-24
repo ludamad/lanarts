@@ -14,6 +14,8 @@
 
 #include "../lanarts_defines.h"
 
+#include "AllowedActions.h"
+
 struct AttackStats;
 struct ClassType;
 class MTwist;
@@ -95,6 +97,7 @@ struct EffectiveStats {
 	CoreStats core;
 	DerivedStats physical, magic;
 	float cooldown_mult, movespeed;
+	AllowedActions allowed_actions;
 	EffectiveStats() :
 			cooldown_mult(1.0f), movespeed(0.0f) {
 	}
