@@ -47,7 +47,7 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 	GameView& view = gs->view();
 
 	bool minimap_reveal = gs->key_down_state(SDLK_z)
-			|| gs->key_down_state(SDLK_BACKQUOTE);
+			/*|| gs->key_down_state(SDLK_BACKQUOTE)*/;
 
 	int stairs_down = get_tile_by_name("stairs_down");
 	int stairs_up = get_tile_by_name("stairs_up");

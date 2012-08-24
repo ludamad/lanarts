@@ -241,12 +241,23 @@ GameInst* GameInstSet::get_instance(int id) const {
 std::vector<GameInst*> GameInstSet::to_vector() const {
 	std::vector<GameInst*> ret(size(), NULL);
 
+	//Begin with a large positive number
+	int draw_depth_check = (1 << 20);
+
 	DepthMap::const_iterator it = depthlist_map.end();
 	for (int ind = 0; it != depthlist_map.begin();) {
 		--it;
 		InstanceState* state = it->second.start_of_list;
 		while (state) {
 			ret[ind++] = state->inst;
+#ifndef NDEBUG
+			if (state->inst->depth > draw_depth_check) {
+				printf(
+						"WARNING instance depth out of order for instance: %d, depth %d vs %d\n",
+						state->inst->id, state->inst->depth, draw_depth_check);
+			}
+			draw_depth_check = state->inst->depth;
+#endif
 			state = state->next_same_depth;
 		}
 	}

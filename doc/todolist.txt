@@ -7,18 +7,28 @@ Large:
 	-Performance hit reasonable
 - Improve room generation with more patterns & room connectivity tests
 - Add tiered level generation with dungeons inline with overworld
+- Add skill system eg Bows, Melee, <schools of magic>
+	- Skill system should provide all stat bonuses
 
 Medium:
+- Refactor code so that GameState -> global data, GameWorld -> per game data, GameLevelState -> per level data
 - Special case pushing for tight corridors ?
 - Straight line AOE spell
 - Lightning Spell that takes up multiple squares
 - Add levels of minimap viewing
 - Add doors (Doors somewhat done) and other dungeon features such as keys, destroyable blocks etc
 - Fix so monsters dont swarm like hell around stairs (complex issue)
+- Keep equipped items in inventory, providing a uniform interface for de-equipping any items
+- Levels take too long to generate
+	- Use BSP scheme
+	- Don't crowd the level with too many room placements
+- Add elemental damage types and mixed elemental type creatures/monsters/attacks
+- Unify all equipment type code paths
 
 Small:
 - Have a flexible portal system that indicates which level to connect to
 - Add cooldowns to item use
+- Add cooldowns for each spell individually -and- have them show visually
 - Ensure you do not spawn / use stairs and end up right on a monster
 - Add controls overlay when certain button is pressed, so that the control scheme can be seen
 - Add graphics for each class [DONEISH - Make multiple options]
@@ -30,10 +40,6 @@ Small:
 - Make all ranged enemies have a short range melee option for close kiters
 - Fix arrows getting stuck in walls
 - Fix monsters getting stuck in corridors -> give more room for RVO2 disabling
-- Make Zin stronger!	
-- Levels take too long to generate
-	- Use BSP scheme
-	- Don't crowd the level with too many room placements
 - Monsters too weak as game progresses
 	- give monsters abilities
 	- spawn 'harder' versions of monsters
@@ -41,8 +47,7 @@ Small:
 - Add items that give free XP but hurt you/ make you exhausted
 	- Amount depends on dungeon depth
 - You can only buy items by clicking on top 32x32 area
-- Sometimes arrows show underneath blood
-- Arrows/ranged weapons dont obey target - they hit closest enemy only
+- Sometimes arrows show underneath blood [CAN'T REPRODUCE ? ADDED ASSERT]
 
 Partial Completion:
 - [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
@@ -118,3 +123,7 @@ Completed:
 
 < 21/08/2012
 - [FIXED] Tunnel gen synching error seen again 
+- [DONE] Make Zin stronger!	
+
+< 24/08/2012
+- [COULD NOT REPRODUCE] Arrows/ranged weapons dont obey target - they hit closest enemy only

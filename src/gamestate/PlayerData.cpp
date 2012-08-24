@@ -48,6 +48,9 @@ void PlayerData::register_player(const std::string& name, PlayerInst* player,
 }
 
 PlayerInst* PlayerData::local_player() {
+	if (_local_player_idx >= _players.size()) {
+		return NULL;
+	}
 	return local_player_data().player();
 }
 

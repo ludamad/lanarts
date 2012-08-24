@@ -19,7 +19,6 @@
 #include "../net/GameNetConnection.h"
 
 #include "IOController.h"
-#include "../objects/enemy/MonsterController.h"
 #include "PlayerData.h"
 
 #include "../interface/GameChat.h"
@@ -30,7 +29,6 @@
 #include "GameView.h"
 #include "GameWorld.h"
 
-#include "../objects/TeamRelations.h"
 
 struct lua_State;
 class GameLevelState;
@@ -38,6 +36,8 @@ struct GameTiles;
 
 class GameInst;
 class PlayerInst;
+class CollisionAvoidance;
+class MonsterController;
 
 struct GameStateInitData {
 	int seed;
@@ -228,9 +228,15 @@ public:
 		this->repeat_actions_counter = repeat_actions_counter;
 	}
 
-	TeamRelations& teams() {
-		return _teams;
+	EnemyController& enemy_controller() {
+		return world.enemy_controller();
 	}
+
+	TeamRelations& teams() {
+		return world.teams();
+	}
+
+	CollisionAvoidance& collision_avoidance();
 
 private:
 	int handle_event(SDL_Event* event);
@@ -250,8 +256,6 @@ private:
 	font_data small_font, large_font;
 	bool dragging_view;
 	IOController iocontroller;
-
-	TeamRelations _teams;
 
 	//XXX: This repeats the last action N times, a more elegant solution is needed
 	int repeat_actions_counter;

@@ -97,6 +97,9 @@ void EnemyInst::init(GameState* gs) {
 //	collision_simulation_id() = coll_avoid.add_object(e);
 	mc.register_enemy(this);
 
+	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
+	collision_simulation_id() = coll_avoid.add_active_object(pos(),
+			target_radius, effective_stats().movespeed);
 
 	lua_gameinst_callback(gs->get_luastate(), etype().init_event, this);
 }
@@ -181,6 +184,10 @@ void EnemyInst::die(GameState *gs) {
 		gs->add_instance(new AnimatedInst(x, y, etype().enemy_sprite, 20));
 		gs->monster_controller().deregister_enemy(this);
 		gs->remove_instance(this);
+
+		CollisionAvoidance& coll_avoid = gs->collision_avoidance();
+		coll_avoid.remove_object(collision_simulation_id());
+
 		show_defeat_message(gs->game_chat(), etype());
 		if (etype().death_sprite > -1) {
 			const int DEATH_SPRITE_TIMEOUT = 1600;

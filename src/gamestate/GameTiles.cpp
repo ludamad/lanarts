@@ -7,6 +7,8 @@
 
 #include "../levelgen/levelgen.h"
 
+#include "../util/math_util.h"
+
 #include "../serialize/SerializeBuffer.h"
 
 #include "GameTiles.h"
@@ -80,12 +82,12 @@ void GameTiles::pre_draw(GameState* gs) {
 		max_tilex = width - 1;
 	if (max_tiley >= height)
 		max_tiley = height - 1;
-	bool reveal_enabled = gs->key_down_state(SDLK_BACKQUOTE);
+//	bool reveal_enabled = gs->key_down_state(SDLK_BACKQUOTE);
 	for (int y = min_tiley; y <= max_tiley; y++) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
 			Tile& tile = get(x, y);
 			GLimage& img = game_tile_data[tile.tile].img(tile.subtile);
-			if (reveal_enabled || is_seen(x, y))
+			if (/*reveal_enabled ||*/ is_seen(x, y))
 				gl_draw_image(img, x * TILE_SIZE - view.x,
 						y * TILE_SIZE - view.y);
 		}
@@ -131,7 +133,7 @@ void GameTiles::post_draw(GameState* gs) {
 		max_tiley = height - 1;
 	const int sub_sqrs = VISION_SUBSQRS;
 
-	if (gs->key_down_state(SDLK_BACKQUOTE) || !gs->level_has_player()) {
+	if (/*gs->key_down_state(SDLK_BACKQUOTE) ||*/ !gs->level_has_player()) {
 		return;
 	}
 
@@ -187,6 +189,71 @@ void GameTiles::serialize(SerializeBuffer& serializer) {
 	serializer.write(width);
 	serializer.write(height);
 	serializer.write_container(tiles);
+}
+
+static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
+		float radsqr) {
+	int dx, dy, t, rt, ddist;
+	dx = qx - px;
+	dy = qy - py;
+	ddist = dx * dx + dy * dy;
+	t = -((px - cx) * dx + (py - cy) * dy);
+	//;/ ddist;
+
+	/* Restrict t to within the limits of the line segment */
+	if (t < 0)
+		t = 0;
+	else if (t > ddist)
+		t = ddist;
+
+	dx = (px + t * (qx - px) / ddist) - cx;
+	dy = (py + t * (qy - py) / ddist) - cy;
+	rt = (dx * dx) + (dy * dy);
+	return rt < (radsqr);
+}
+
+bool GameTiles::radius_test(int x, int y, int rad, bool issolid, int ttype,
+		Pos* hitloc) {
+	int distsqr = (TILE_SIZE / 2 + rad), radsqr = rad * rad;
+	distsqr *= distsqr; //sqr it
+
+	int mingrid_x = (x - rad) / TILE_SIZE, mingrid_y = (y - rad) / TILE_SIZE;
+	int maxgrid_x = (x + rad) / TILE_SIZE, maxgrid_y = (y + rad) / TILE_SIZE;
+	int minx = squish(mingrid_x, 0, width), miny = squish(mingrid_y, 0, height);
+	int maxx = squish(maxgrid_x, 0, width), maxy = squish(maxgrid_y, 0, height);
+
+	for (int yy = miny; yy <= maxy; yy++) {
+		for (int xx = minx; xx <= maxx; xx++) {
+			TileState& tilestate = tiles[yy * width + xx];
+			Tile& tile = tilestate.tile;
+
+			bool istype = (tile.tile == ttype || ttype == -1);
+			bool solidmatch = (tilestate.solid == issolid);
+			if (solidmatch && istype) {
+				int offset = TILE_SIZE / 2; //To and from center
+				int cx = int(xx * TILE_SIZE) + offset;
+				int cy = int(yy * TILE_SIZE) + offset;
+				int ydist = cy - y;
+				int xdist = cx - x;
+				double ddist = ydist * ydist + xdist * xdist;
+				if (ddist < distsqr
+						|| circle_line_test(cx - offset, cy - offset,
+								cx + offset, cy - offset, x, y, radsqr)
+						|| circle_line_test(cx - offset, cy - offset,
+								cx - offset, cy + offset, x, y, radsqr)
+						|| circle_line_test(cx - offset, cy + offset,
+								cx + offset, cy + offset, x, y, radsqr)
+						|| circle_line_test(cx + offset, cy - offset,
+								cx + offset, cy + offset, x, y, radsqr)) {
+					if (hitloc)
+						*hitloc = Pos(xx, yy);
+					return true;
+				}
+			}
+		}
+		//printf("\n");
+	}
+	return false;
 }
 
 void GameTiles::deserialize(SerializeBuffer& serializer) {

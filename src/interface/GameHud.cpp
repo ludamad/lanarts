@@ -50,7 +50,7 @@ void GameHud::step(GameState *gs) {
 bool GameHud::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	PlayerInst* player = gs->local_player();
 	bool mouse_within_view = gs->mouse_x() < gs->view().width;
-	int level = gs->get_level()->levelid, frame = gs->frame();
+	int level = gs->get_level()->id(), frame = gs->frame();
 
 	Inventory inv = player->inventory();
 
@@ -102,7 +102,7 @@ static BBox text_console_area(const BBox& view_box) {
 GameHud::GameHud(const BBox& sidebar_box, const BBox& view_box) :
 		console(text_console_area(view_box)), sidebar(sidebar_box), action_bar(
 				action_bar_area(view_box)), sidebar_box(sidebar_box), view_box(
-				view_box), bg_colour(0, 0, 0){
+				view_box), bg_colour(0, 0, 0) {
 }
 
 void GameHud::reset_slot_selected() {

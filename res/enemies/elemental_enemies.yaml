@@ -32,12 +32,28 @@ enemies:
         magic: 25
         defence: 8  
         willpower: 8
+       
+  - name: Hell Storm
+    sprite: hell storm
+    radius: 14
+    xpaward: 35
+    appear_message: A raging storm elemental appears!
+    defeat_message: The raging storm elemental dissipates.
+    stats:
+        attacks: [ {projectile: Storm Bolt} ]
+        movespeed: 2
+        hp: 100
+        hpregen: 0.05
+        strength: 5
+        magic: 35
+        defence: 10
+        willpower: 10
                 
   - name: Hell Forged
-    sprite: hell_forged
+    sprite: hell forged
     radius: 12
-    xpaward: 50
-    appear_message: A hell-forged creature of fire appears before you!
+    xpaward: 45
+    appear_message: A hell-forged creature appears before you!
     defeat_message: The hell-forged is destroyed.
     stats:
         attacks: [ {projectile: Slow Fire Bolt} ]

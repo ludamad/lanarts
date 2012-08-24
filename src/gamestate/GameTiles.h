@@ -38,6 +38,8 @@ public:
 
 	void mark_all_seen();
 
+	bool radius_test(int x, int y, int rad, bool issolid = true, int ttype = -1,
+			Pos* hitloc = NULL);
 	void clear();
 	void copy_to(GameTiles& t) const;
 	void serialize(SerializeBuffer& serializer);

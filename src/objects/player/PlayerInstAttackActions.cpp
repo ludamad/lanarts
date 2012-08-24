@@ -80,10 +80,12 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 	bool ismelee = !(wentry.uses_projectile || p->equipment().has_projectile());
 	int target_range = wentry.range + p->target_radius;
 
-	if (targ
-			&& distance_between(Pos(targ->x, targ->y), ppos)
-					- targ->target_radius <= target_range) {
-		return targ;
+	if (targ) {
+		int dist = distance_between(Pos(targ->x, targ->y), ppos)
+				- targ->target_radius;
+		if (dist <= target_range) {
+			return targ;
+		}
 	}
 
 	if (ismelee) {
@@ -176,7 +178,7 @@ static bool lua_spell_get_target(GameState* gs, PlayerInst* p, LuaValue& action,
 		Pos& pos) {
 	bool nilresult = false;
 	lua_State* L = gs->get_luastate();
-	obj_id target_id = gs->monster_controller().current_target();
+	obj_id target_id = p->target();
 	GameInst* target = gs->get_instance(target_id);
 
 	int beforecall_idx = lua_gettop(L);
@@ -445,7 +447,7 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
 				|| equipment().has_projectile();
 
 		MonsterController& mc = gs->monster_controller();
-		GameInst* curr_target = gs->get_instance(mc.current_target());
+		GameInst* curr_target = gs->get_instance(current_target);
 		GameInst* target = NULL;
 		Pos targ_pos;
 

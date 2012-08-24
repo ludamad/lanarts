@@ -120,6 +120,9 @@ private:
 	void use_rest(GameState* gs, const GameAction& action);
 	void use_item(GameState* gs, const GameAction& action);
 
+	//Either finds new target or shifts target
+	void shift_autotarget(GameState* gs);
+
 	void pickup_item(GameState* gs, const GameAction& action);
 	void drop_item(GameState* gs, const GameAction& action);
 	void reposition_item(GameState* gs, const GameAction& action);
@@ -131,7 +134,6 @@ private:
 	fov fieldofview;
 	bool local, moving;
 
-	obj_id current_target;
 	int autouse_mana_potion_try_count;
 	int lives, deaths;
 	int previous_spellselect, spellselect;

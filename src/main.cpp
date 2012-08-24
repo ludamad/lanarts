@@ -7,7 +7,6 @@
 
 #include <net/lanarts_net.h>
 
-
 extern "C" {
 #include <lua/lua.h>
 #include <lua/lauxlib.h>
@@ -20,14 +19,11 @@ extern "C" {
 
 #include "gamestate/GameState.h"
 
-
 #include "objects/player/PlayerInst.h"
 #include "objects/enemy/EnemyInst.h"
 
 #include "objects/AnimatedInst.h"
 #include "interface/ButtonInst.h"
-
-
 
 #include "util/Timer.h"
 
@@ -76,7 +72,7 @@ static void game_loop(GameState* gs) {
 			init_lua_data(gs, gs->get_luastate());
 		}
 		if (gs->key_press_state(SDLK_F3)) {
-			gs->game_world().regen_level(gs->get_level()->levelid);
+			gs->game_world().regen_level(gs->get_level()->id());
 		}
 		if (gs->key_press_state(SDLK_F4)) {
 			paused = !paused;
@@ -133,7 +129,6 @@ static void game_loop(GameState* gs) {
 	printf("Step time: %f\n", float(step_time) / step_events / 1000);
 	printf("Draw time: %f\n", float(draw_time) / draw_events / 1000);
 }
-
 
 int main(int argc, char** argv) {
 //	run_unit_tests();

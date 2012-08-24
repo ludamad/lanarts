@@ -45,10 +45,10 @@ public:
 	void register_enemy(GameInst* enemy);
 	void deregister_enemy(EnemyInst* enemy);
 
-    void shift_target(GameState* gs);
+//    void shift_target(GameState* gs);
 
     size_t number_monsters() { return mids.size(); }
-    obj_id current_target(){ return targetted; }
+//    obj_id current_target(){ return targetted; }
     void clear();
     //Copy everything but RVO::Simulator
     void partial_copy_to(MonsterController& mc) const;
@@ -61,19 +61,15 @@ private:
     void update_velocity(GameState* gs, EnemyInst* e);
     /*returns an index into the player_simids vector*/
     int find_player_to_target(GameState* gs, EnemyInst* e);
-    void process_players(GameState* gs);
     void monster_wandering(GameState *gs, EnemyInst *e);
     void monster_follow_path(GameState *gs, EnemyInst *e);
     void monster_get_to_stairs(GameState *gs, EnemyInst *e);
 
     AStarPathFind astarcontext;
-    obj_id targetted;
 
     std::vector<PlayerInst*> players;
 	std::vector<obj_id> mids;
-	std::vector<int> player_simids;
 
-	CollisionAvoidance coll_avoid;
 	bool monsters_wandering_flag;
 };
 

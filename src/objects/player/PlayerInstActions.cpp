@@ -74,7 +74,7 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 	IOController& io = gs->io_controller();
 
 	Pos p(gs->mouse_x() + view.x, gs->mouse_y() + view.y);
-	obj_id target = gs->monster_controller().current_target();
+	obj_id target = this->current_target;
 	GameInst* targetted = gs->get_instance(target);
 	if (targetted)
 		p = Pos(targetted->x, targetted->y);
@@ -197,7 +197,7 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 	}
 	//Shifting target
 	if (gs->key_press_state(SDLK_k)) {
-		gs->monster_controller().shift_target(gs);
+		shift_autotarget(gs);
 	}
 
 	if (gs->key_press_state(SDLK_m))

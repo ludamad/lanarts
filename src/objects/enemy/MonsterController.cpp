@@ -28,7 +28,6 @@ const int HUGE_DISTANCE = 1000000;
 
 MonsterController::MonsterController(bool wander) :
 		monsters_wandering_flag(wander) {
-	targetted = 0;
 }
 
 MonsterController::~MonsterController() {
@@ -54,9 +53,7 @@ void towards_highest(PathInfo& path, Pos& p) {
 
 void MonsterController::partial_copy_to(MonsterController & mc) const {
 	mc.mids = this->mids;
-	mc.player_simids.clear(); //Automatically built in pre_step
-	mc.coll_avoid.clear();
-	mc.targetted = this->targetted;
+//	mc.coll_avoid.clear();
 }
 
 void MonsterController::finish_copy(GameLevelState* level) {
@@ -65,37 +62,37 @@ void MonsterController::finish_copy(GameLevelState* level) {
 				mids[i]);
 		if (!enemy)
 			continue;
-		int simid = coll_avoid.add_object(enemy);
-		enemy->collision_simulation_id() = simid;
+//		int simid = coll_avoid.add_object(enemy);
+//		enemy->collision_simulation_id() = simid;
 	}
 }
 
 void MonsterController::deregister_enemy(EnemyInst* enemy) {
-	coll_avoid.remove_object(enemy->collision_simulation_id());
+//	coll_avoid.remove_object(enemy->collision_simulation_id());
 }
-void MonsterController::shift_target(GameState* gs) {
-	if (!targetted)
-		return; //Shouldn't auto-target if no targets are possible
-	int i, j;
-	for (i = 0; i < mids.size(); i++) {
-		if (mids[i] == targetted)
-			break;
-	}
-	PlayerInst* player = gs->local_player();
-
-	for (j = i + 1; j % mids.size() != i; j++) {
-		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[j % mids.size()]);
-		if (e == NULL)
-			continue;
-
-		bool isvisible = gs->object_visible_test(e, player, false);
-		if (isvisible) {
-			targetted = e->id;
-			return;
-		}
-	}
-
-}
+//void MonsterController::shift_target(GameState* gs) {
+//	if (!targetted)
+//		return; //Shouldn't auto-target if no targets are possible
+//	int i, j;
+//	for (i = 0; i < mids.size(); i++) {
+//		if (mids[i] == targetted)
+//			break;
+//	}
+//	PlayerInst* player = gs->local_player();
+//
+//	for (j = i + 1; j % mids.size() != i; j++) {
+//		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[j % mids.size()]);
+//		if (e == NULL)
+//			continue;
+//
+//		bool isvisible = gs->object_visible_test(e, player, false);
+//		if (isvisible) {
+//			targetted = e->id;
+//			return;
+//		}
+//	}
+//
+//}
 
 int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 	//Use a 'GameView' object to make use of its helper methods
@@ -128,35 +125,13 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 	return closest_player_index;
 }
 
-void MonsterController::process_players(GameState* gs) {
-
-	if (player_simids.size() > players.size()) {
-		int diff = player_simids.size() - players.size();
-		for (int i = 0; i < diff; i++) {
-			coll_avoid.remove_object(player_simids.back());
-			player_simids.pop_back();
-		}
-	} else if (players.size() > player_simids.size()) {
-		int old_players = player_simids.size();
-		player_simids.resize(players.size());
-		for (int i = old_players; i < players.size(); i++) {
-			player_simids[i] = coll_avoid.add_player_object(players[i]);
-		}
-	}
-}
-
 void MonsterController::pre_step(GameState* gs) {
 
+	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
 	PlayerInst* local_player = gs->local_player();
 	std::vector<EnemyOfInterest> eois;
 
 	players = gs->players_in_level();
-	process_players(gs);
-
-	//Make sure targetted object is alive
-	if (targetted && !gs->get_instance(targetted)) {
-		targetted = 0;
-	}
 
 	//Update 'mids' to only hold live objects
 	std::vector<obj_id> mids2;
@@ -168,12 +143,6 @@ void MonsterController::pre_step(GameState* gs) {
 			continue;
 		EnemyBehaviour& eb = e->behaviour();
 		eb.step();
-
-		bool isvisibleToLocal = gs->object_visible_test(e, local_player, false);
-		if (isvisibleToLocal && !targetted)
-			targetted = e->id;
-		if (!isvisibleToLocal && targetted == e->id)
-			targetted = 0;
 
 		//Add live instances back to monster id list
 		mids.push_back(mids2[i]);
@@ -202,7 +171,7 @@ void MonsterController::pre_step(GameState* gs) {
 	//Update player positions for collision avoidance simulator
 	for (int i = 0; i < players.size(); i++) {
 		PlayerInst* p = players[i];
-		coll_avoid.set_position(player_simids[i], p->x, p->y);
+		coll_avoid.set_position(p->collision_simulation_id(), p->x, p->y);
 	}
 
 	for (int i = 0; i < mids.size(); i++) {
@@ -230,10 +199,12 @@ void MonsterController::update_velocity(GameState* gs, EnemyInst* e) {
 		movespeed /= 2;
 	}
 
+	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
 	coll_avoid.set_preferred_velocity(e->collision_simulation_id(), e->vx,
 			e->vy);
 }
 void MonsterController::update_position(GameState* gs, EnemyInst* e) {
+	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
 	simul_id simid = e->collision_simulation_id();
 	Posf pos = coll_avoid.get_position(simid);
 
@@ -243,9 +214,14 @@ void MonsterController::update_position(GameState* gs, EnemyInst* e) {
 }
 
 void MonsterController::post_draw(GameState* gs) {
-	EnemyInst* target = (EnemyInst*)gs->get_instance(targetted);
-	if (!target)
+	PlayerInst* player = gs->local_player();
+	if (!player) {
 		return;
+	}
+	EnemyInst* target = (EnemyInst*)gs->get_instance(player->target());
+	if (!target) {
+		return;
+	}
 	glLineWidth(2);
 	gl_draw_circle(gs->view(), target->x, target->y, target->target_radius + 5,
 			COL_GREEN.with_alpha(140), true);

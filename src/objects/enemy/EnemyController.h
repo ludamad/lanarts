@@ -33,15 +33,12 @@ class PlayerInst;
 
 class EnemyController {
 public:
-	EnemyController(bool wander = true);
-	~EnemyController();
+//	EnemyController(bool wander = true);
+//	~EnemyController();
 
 	// Occurs for current level
 	void pre_step(GameState* gs);
 	void post_draw(GameState* gs);
-
-	void register_enemy(GameInst* enemy);
-	void deregister_enemy(EnemyInst* enemy);
 
 	std::vector<EnemyInst*> enemies_in_level(level_id level);
 
@@ -53,22 +50,8 @@ public:
 	void deserialize(GameState* gs, SerializeBuffer& serializer);
 private:
 
-	struct Combatant {
-		CombatGameInst* inst;
-		bool already_moved;
-	};
-	//Cleared every step
-	struct InstCache {
-		AStarPathFind astarcontext;
-		std::vector<Combatant> combatants;
-	};
-	InstCache cache;
-
-	CollisionAvoidance coll_avoid;
-	bool monsters_wandering_flag;
+	// These are set every step and do not need to be serialized
+	std::vector<CombatGameInst*> enemies;
+	std::vector<CombatGameInst*> players;
 };
-
-CombatGameInst* find_closest_hostile(GameState* gs, CombatGameInst* obj,
-		const std::vector<CombatGameInst*>& candidates);
-
 #endif /* ENEMYCONTROLLER_H_ */

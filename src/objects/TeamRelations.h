@@ -9,6 +9,8 @@
 #include <vector>
 #include "../lanarts_defines.h"
 
+class CombatGameInst;
+
 class TeamRelations {
 public:
 	TeamRelations();
@@ -36,5 +38,8 @@ private:
 
 	std::vector<TeamAllegiances> teams;
 };
+
+bool insts_are_hostile(TeamRelations& teams, CombatGameInst* inst1, CombatGameInst* inst2);
+
 
 #endif /* TEAMRELATIONS_H_ */

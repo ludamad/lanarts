@@ -30,7 +30,7 @@ public:
 					true, int depth = 0) :
 			GameInst(x, y, radius, solid, depth), rx(x), ry(y), vx(0), vy(0), is_resting(
 					false), teamid(teamid), mobid(mobid), sprite(sprite), simulation_id(
-					-1), kills(0), base_stats(base_stats) {
+					-1), kills(0), current_target(NONE), base_stats(base_stats) {
 	}
 	CombatGameInst() :
 			GameInst(0, 0, 0) {
@@ -99,6 +99,10 @@ public:
 
 	team_id& team();
 	simul_id& collision_simulation_id();
+
+	obj_id& target() {
+		return current_target;
+	}
 //members
 public:
 	float vx, vy;
@@ -110,6 +114,7 @@ protected:
 	sprite_id sprite;
 	simul_id simulation_id;
 	int kills;
+	obj_id current_target;
 private:
 	CombatStats base_stats;
 	EffectiveStats estats;

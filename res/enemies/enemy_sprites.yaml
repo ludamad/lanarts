@@ -61,13 +61,16 @@ sprites:
   - name: storm elemental
     file: res/sprites/monsters/elemental/storm_elemental.png
 
+  - name: hell storm
+    file: res/sprites/monsters/elemental/hell_storm.png
+
   - name: cloud elemental
     file: res/sprites/monsters/elemental/cloud_elemental.png
 
   - name: water elemental
     file: res/sprites/monsters/elemental/waterelemental.png
 
-  - name: hell_forged
+  - name: hell forged
     file: res/sprites/monsters/elemental/hellforged.png
 
 #demonic

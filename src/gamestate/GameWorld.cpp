@@ -185,7 +185,7 @@ void GameWorld::step() {
 
 	for (int i = 0; i < level_states.size(); i++) {
 		GameLevelState* level = level_states[i];
-		level->step(gs); fix this
+		level->step(gs);
 	}
 	gs->frame()++;
 

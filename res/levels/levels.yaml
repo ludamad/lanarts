@@ -32,9 +32,9 @@ medium_enemies: &medium_enemies
  
 hard_enemies: &hard_enemies
  - { enemy: Skeleton,          chance: 50                                    }
- - { enemy: Storm Elemental,   chance: 66,  group_chance: 33, group_size: 2  }
+ - { enemy: Storm Elemental,   chance: 5,  group_chance: 100, group_size: 3   }
+ - { enemy: Hell Storm,        chance: 20, group_chance: 33, group_size: 2   }
  - { enemy: Grue                                                             }
- - { enemy: Chicken,           chance: 25,  group_chance: 50, group_size: 3  }
  - { enemy: Super Chicken,     chance: 100                                   }
  - { enemy: Zombie,            chance: 75                                    }
  - { enemy: Ciribot,           chance: 75                                    }
@@ -48,7 +48,8 @@ harder_enemies: &harder_enemies
   - { enemy: Super Chicken,     chance: 50,  group_chance: 33, group_size: [2,4]}
   - { enemy: Imp,               chance: 50                                    }
   - { enemy: Ciribot,           chance: 100                                   }
-  - { enemy: Storm Elemental,   chance: 50,  group_chance: 33, group_size: 4  }
+  - { enemy: Storm Elemental,   chance: 5,  group_chance: 100, group_size: 4  }
+  - { enemy: Hell Storm,        chance: 20, group_chance: 33, group_size: 3   }
   - { enemy: Grue,              chance: 50,  group_chance: 33, group_size: 2  }
   - { enemy: Golem,             guaranteed_spawns: 1,  group_chance: 100, group_size: 2}
   - { enemy: Jester,            chance: 20,                                   }

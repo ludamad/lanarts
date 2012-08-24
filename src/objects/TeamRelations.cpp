@@ -3,7 +3,9 @@
  *  Handles allocation of team IDs and team allegiances
  */
 
+#include "CombatGameInst.h"
 #include "TeamRelations.h"
+
 #include <algorithm>
 
 TeamRelations::TeamRelations() {
@@ -42,5 +44,10 @@ team_id TeamRelations::create_team(bool default_as_hostile,
 		}
 	}
 	return ret_id;
+}
+
+bool insts_are_hostile(TeamRelations& teams, CombatGameInst* inst1,
+		CombatGameInst* inst2) {
+	return teams.are_hostile(inst1->team(), inst2->team());
 }
 

@@ -37,6 +37,7 @@ void PlayerInst::init(GameState* gs) {
 	CombatGameInst::init(gs);
 	teamid = gs->teams().default_player_team();
 	_path_to_player.calculate_path(gs, x, y, PLAYER_PATHING_RADIUS);
+	simulation_id = gs->collision_avoidance().add_player_object(this);
 }
 
 PlayerInst::~PlayerInst() {
@@ -58,6 +59,8 @@ void PlayerInst::die(GameState* gs) {
 
 void PlayerInst::deinit(GameState* gs) {
 	CombatGameInst::deinit(gs);
+	current_target = NONE;
+	gs->collision_avoidance().remove_object(simulation_id);
 }
 
 static Pos seen_square_in_area(MTwist& mt, GameTiles& tiles) {
@@ -96,8 +99,56 @@ static void spawn_in_lower_level(GameState* gs, PlayerInst* player) {
 	}
 }
 
+//Either finds new or shifts target
+void PlayerInst::shift_autotarget(GameState* gs) {
+	const std::vector<obj_id>& mids = gs->monster_controller().monster_ids();
+	int i = 0, j = 0;
+	bool has_target = current_target != NONE;
+	if (has_target) {
+		for (i = 0; i < mids.size(); i++) {
+			if (mids[i] == current_target) {
+				break;
+			}
+		}
+		j = i + 1;
+	}
+
+	while (true) {
+		if (j >= mids.size()) {
+			// Exit when we end the list if we didn't have a target
+			if (!has_target) {
+				return;
+			}
+			j -= mids.size();
+		}
+		if (j == i && has_target) {
+			// Exit when we wrap around if we have a target
+			return;
+		}
+		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[j]);
+		bool isvisible = e != NULL && gs->object_visible_test(e, this, false);
+		if (isvisible) {
+			current_target = e->id;
+			return;
+		}
+		j++;
+
+	}
+
+}
+
 void PlayerInst::step(GameState* gs) {
 	_path_to_player.calculate_path(gs, x, y, PLAYER_PATHING_RADIUS);
+
+	GameInst* target_inst = gs->get_instance(current_target);
+	bool visible = target_inst != NULL
+			&& gs->object_visible_test(target_inst, this, false);
+	if (!visible) {
+		current_target = NONE;
+	}
+	if (current_target == NONE) {
+		shift_autotarget(gs);
+	}
 
 	if (!actions_set_for_turn) {
 		printf("No actions for turn player id %d\n", id);

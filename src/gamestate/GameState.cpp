@@ -212,6 +212,10 @@ GameInst* GameState::get_instance(level_id level, obj_id id) {
 	return game_world().get_level(level)->game_inst_set().get_instance(id);
 }
 
+CollisionAvoidance & GameState::collision_avoidance() {
+	return get_level()->collision_avoidance();
+}
+
 int GameState::handle_event(SDL_Event* event) {
 	if (get_level()) {
 		if (hud.handle_event(this, event))
@@ -343,68 +347,9 @@ GameInst* GameState::get_instance(obj_id id) {
 	return get_level()->game_inst_set().get_instance(id);
 }
 
-static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
-		float radsqr) {
-	int dx, dy, t, rt, ddist;
-	dx = qx - px;
-	dy = qy - py;
-	ddist = dx * dx + dy * dy;
-	t = -((px - cx) * dx + (py - cy) * dy);
-	//;/ ddist;
-
-	/* Restrict t to within the limits of the line segment */
-	if (t < 0)
-		t = 0;
-	else if (t > ddist)
-		t = ddist;
-
-	dx = (px + t * (qx - px) / ddist) - cx;
-	dy = (py + t * (qy - py) / ddist) - cy;
-	rt = (dx * dx) + (dy * dy);
-	return rt < (radsqr);
-}
-
 bool GameState::tile_radius_test(int x, int y, int rad, bool issolid, int ttype,
 		Pos* hitloc) {
-	int w = width() / TILE_SIZE, h = height() / TILE_SIZE;
-	int distsqr = (TILE_SIZE / 2 + rad), radsqr = rad * rad;
-	distsqr *= distsqr; //sqr it
-
-	int mingrid_x = (x - rad) / TILE_SIZE, mingrid_y = (y - rad) / TILE_SIZE;
-	int maxgrid_x = (x + rad) / TILE_SIZE, maxgrid_y = (y + rad) / TILE_SIZE;
-	int minx = squish(mingrid_x, 0, w), miny = squish(mingrid_y, 0, h);
-	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
-
-	for (int yy = miny; yy <= maxy; yy++) {
-		for (int xx = minx; xx <= maxx; xx++) {
-			Tile& tile = get_level()->tiles().get(xx, yy);
-			bool istype = (tile.tile == ttype || ttype == -1);
-			bool solidmatch = (get_level()->tiles().is_solid(xx, yy) == issolid);
-			if (solidmatch && istype) {
-				int offset = TILE_SIZE / 2; //To and from center
-				int cx = int(xx * TILE_SIZE) + offset;
-				int cy = int(yy * TILE_SIZE) + offset;
-				int ydist = cy - y;
-				int xdist = cx - x;
-				double ddist = ydist * ydist + xdist * xdist;
-				if (ddist < distsqr
-						|| circle_line_test(cx - offset, cy - offset,
-								cx + offset, cy - offset, x, y, radsqr)
-						|| circle_line_test(cx - offset, cy - offset,
-								cx - offset, cy + offset, x, y, radsqr)
-						|| circle_line_test(cx - offset, cy + offset,
-								cx + offset, cy + offset, x, y, radsqr)
-						|| circle_line_test(cx + offset, cy - offset,
-								cx + offset, cy + offset, x, y, radsqr)) {
-					if (hitloc)
-						*hitloc = Pos(xx, yy);
-					return true;
-				}
-			}
-		}
-		//printf("\n");
-	}
-	return false;
+	return tiles().radius_test(x, y, rad, issolid, ttype, hitloc);
 }
 
 //int GameState::object_square_test(GameInst** objs, int obj_cap,
@@ -414,8 +359,8 @@ bool GameState::tile_radius_test(int x, int y, int rad, bool issolid, int ttype,
 
 int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 		col_filterf f, int x, int y, int radius) {
-	return get_level()->game_inst_set().object_radius_test(obj, objs, obj_cap, f, x, y,
-			radius);
+	return get_level()->game_inst_set().object_radius_test(obj, objs, obj_cap,
+			f, x, y, radius);
 }
 
 bool GameState::radius_visible_test(int x, int y, int radius,
@@ -431,7 +376,7 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 
 	std::vector<PlayerInst*> players = players_in_level();
 
-	if ((canreveal && key_down_state(SDLK_BACKQUOTE)) || players.empty()) {
+	if (/*(canreveal && key_down_state(SDLK_BACKQUOTE)) ||*/players.empty()) {
 		return true;
 	}
 
