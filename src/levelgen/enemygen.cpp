@@ -92,10 +92,11 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 
 	for (int i = 0; i < rs.enemy_chances.size(); i++) {
 		const EnemyGenChance& ec = rs.enemy_chances[i];
-		if (ec.guaranteed_spawns > 0) {
+		int amnt_spawns = mt.rand(ec.guaranteed_spawns);
+		if (amnt_spawns > 0) {
 			generate_enemy(level, mt, ec.enemytype,
 					enemy_region_candidate(mt, level),
-					gs->teams().default_enemy_team(), ec.guaranteed_spawns);
+					gs->teams().default_enemy_team(), amnt_spawns);
 		}
 	}
 

@@ -68,11 +68,15 @@ static void game_loop(GameState* gs) {
 	for (int i = 1; cont; i++) {
 
 		if (gs->key_press_state(SDLK_F2)) {
-			init_game_data(gs->get_luastate());
-			init_lua_data(gs, gs->get_luastate());
+			if (gs->player_data().all_players().size() == 1) {
+				init_game_data(gs->get_luastate());
+				init_lua_data(gs, gs->get_luastate());
+			}
 		}
 		if (gs->key_press_state(SDLK_F3)) {
-			gs->game_world().regen_level(gs->get_level()->id());
+			if (gs->player_data().all_players().size() == 1) {
+				gs->game_world().regen_level(gs->get_level()->id());
+			}
 		}
 		if (gs->key_press_state(SDLK_F4)) {
 			paused = !paused;
@@ -81,7 +85,9 @@ static void game_loop(GameState* gs) {
 			gs->save_game("savefile.save");
 		}
 		if (gs->key_press_state(SDLK_F6)) {
-			gs->load_game("savefile.save");
+			if (gs->player_data().all_players().size() == 1) {
+				gs->load_game("savefile.save");
+			}
 		}
 
 //Draw event

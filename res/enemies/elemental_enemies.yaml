@@ -14,7 +14,7 @@ enemies:
         hpregen: 0.02
         strength: 5
         magic: 15
-        defence: 5  
+        defence: 4
         willpower: 5
 
   - name: Storm Elemental
@@ -30,7 +30,7 @@ enemies:
         hpregen: 0.05
         strength: 5
         magic: 25
-        defence: 8  
+        defence: 6  
         willpower: 8
        
   - name: Hell Storm
@@ -46,7 +46,7 @@ enemies:
         hpregen: 0.05
         strength: 5
         magic: 35
-        defence: 10
+        defence: 8
         willpower: 10
                 
   - name: Hell Forged
@@ -63,4 +63,4 @@ enemies:
         strength: 35
         magic: 35
         defence: 15
-        willpower: 15
+        willpower: 12

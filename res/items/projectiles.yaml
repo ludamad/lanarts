@@ -11,7 +11,7 @@ projectiles:
     speed: 7
 
   - name: Silver Arrow
-    shop_cost: [5,8]
+    shop_cost: [3,4]
     description: A deadly silver arrow.
     weapon_class: bows
     spr_item: stone_arrow_item
@@ -23,7 +23,7 @@ projectiles:
     speed: 8
 
   - name: Stone
-    shop_cost: [4,5]
+    shop_cost: 2
     description: A fist sized stone, good for throwing.
     weapon_class: unarmed
     spr_item: stone

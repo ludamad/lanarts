@@ -40,7 +40,6 @@ hard_enemies: &hard_enemies
  - { enemy: Ciribot,           chance: 75                                    }
  - { enemy: Golem,             guaranteed_spawns: 1                          }
  - { enemy: Krell,             chance: 30                                    }
- - { enemy: Storm Elemental,   chance: 50,  group_chance: 33, group_size: 3  }
  - { enemy: Hell Forged,       chance: 10                                    }
  - { enemy: Unseen Horror,     chance: 30,  group_chance: 33, group_size: 2  }
 
@@ -79,16 +78,16 @@ layouts:
       - &small_layout1
         size: [40, 40]
         rooms:    { padding: 0, amount: 40, size: [4,4] }
-        tunnels:  { padding: 0, width: 1,   per_room: 5 }
+        tunnels:  { padding: 0, width: [1,2],   per_room: 5 }
 
       - &small_layout2
         size: [50, 50]
         rooms:    { padding: 1, amount: 20, size: [10,10]}
-        tunnels:  { padding: 1, width: 1,  per_room: 2   }
+        tunnels:  { padding: 1, width: [1,2],  per_room: 2   }
         
       - &small_layout3
         size: [64, 64]
-        rooms:    { padding: 1, amount: 23, size: [4,6] }
+        rooms:    { padding: 1, amount: 23, size: [5,7] }
         tunnels:  { width: [1,2], per_room: [2, 5]      }
       
       - &small_layout4
@@ -197,7 +196,10 @@ areas:
         content:
           features: { tileset: [lair_tiles1, lair_tiles2, lair_tiles3, crystal_tiles, crystal_tiles_with_marble]}
           items:    { amount: 5,  itemgenlist: Basic Items   }
-          enemies:  { amount: [10,14], generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}]  }      
+          enemies:
+            amount: [10,14]
+            generated:
+              - default: *medium_animals
           
 #small levels with easyish enemies
       #Level 4
@@ -205,13 +207,19 @@ areas:
         content:
           features: { tileset: [crystal_tiles, crystal_tiles_with_marble]}
           items:    { amount: 8,  itemgenlist: Basic Items   }
-          enemies:  { amount: 14,  generated: *easy_enemies    }
+          enemies:
+            amount: [12,15]
+            generated:
+              - default: *easy_enemies
       #Level 5
       - layout: *small_layouts
         content:
           features: { tileset: pebble_tiles}
           items:    { amount: 5,  itemgenlist: Basic Items   }
-          enemies: {  amount: 14, generated: *medium_enemies }      
+          enemies:
+            amount: [12,15]
+            generated:
+              - default: *medium_enemies
           
       #Level 6
       - layout: *small_layouts 
@@ -229,16 +237,22 @@ areas:
         content:
           features: { tileset: *all_tilesets}
           items:    { amount: 5,  itemgenlist: Basic Items   }
-          enemies:  { amount: 15, generated: *hard_enemies }
+          enemies:
+            amount: [14,16]
+            generated:
+              - default: *hard_enemies
+              - {enemy: Orc Warrior, guaranteed_spawns: [0,1]}  
       
       #Level 8
       - layout: *medium_layouts
         content:
           features: { tileset: *all_tilesets}
           items:    { amount: 6,  itemgenlist: Basic Items   }
-          enemies:     
-            amount: 20     
-            generated: *hard_enemies
+          enemies:
+            amount: [18,22]
+            generated:
+              - default: *hard_enemies
+              - {enemy: Orc Warrior, guaranteed_spawns: [0,1]}  
       
       #Level 9
       - layout: *large_layouts

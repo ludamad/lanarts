@@ -8,6 +8,9 @@ sprites:
   - name: magic sword
     file: res/sprites/items/weapons/magic_sword.png
 
+  - name: battle axe
+    file: res/sprites/items/weapons/battle_axe.png
+
   - name: mace
     file: res/sprites/items/weapons/mace.png
 

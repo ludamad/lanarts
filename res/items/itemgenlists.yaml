@@ -13,6 +13,7 @@ itemgen_lists:
     - { item: Dagger,             chance: 10                     }
     - { item: Short Sword,        chance: 10                     }
     - { item: Mace,               chance: 5                      }
+    - { item: Battle Axe,         chance: 2                     }
     - { item: Strength Scroll,    chance: 2                      }
     - { item: Scroll of Escape,   chance: 3                      }
     - { item: Magic Scroll,       chance: 2                      }

@@ -82,6 +82,29 @@ sprites:
   - name: unseen horror
     file: res/sprites/monsters/demonic/unseen_horror.png
 
+#humanoid
+  - name: orc priest
+    file: res/sprites/monsters/humanoid/orc_priest.png
+   
+  - name: orc sorceror
+    file: res/sprites/monsters/humanoid/orc_sorcerer.png
+    
+  - name: orc warlord
+    file: res/sprites/monsters/humanoid/orc_warlord.png
+    
+  - name: orc high priest
+    file: res/sprites/monsters/humanoid/orc_high_priest.png
+    
+  - name: orc warrior
+    file: res/sprites/monsters/humanoid/orc_warrior.png
+    
+  - name: orc knight
+    file: res/sprites/monsters/humanoid/orc_knight.png
+    
+  - name: orc wizard
+    file: res/sprites/monsters/humanoid/orc_wizard.png
+
+
 #other
   - name: grue
     file: res/sprites/monsters/grue.png

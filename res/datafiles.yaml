@@ -20,6 +20,7 @@ enemy_files:
   - enemies/elemental_enemies.yaml
   - enemies/misc_enemies.yaml
   - enemies/undead_enemies.yaml
+  - enemies/humanoid_enemies.yaml
 
 item_files: 
   - items/items.yaml
