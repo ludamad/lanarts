@@ -177,6 +177,8 @@ void GameState::serialize(SerializeBuffer& serializer) {
 	serializer.write_int(this->frame_n);
 	world.serialize(serializer);
 
+	player_data().serialize(this, serializer);
+
 //	player_data().serialize(this, serializer);
 //	std::vector<GameInst*> insts = get_level()->game_inst_set().to_vector();
 
@@ -189,7 +191,7 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 
 //	std::vector<GameInst*> insts = get_level()->game_inst_set().to_vector();
 
-//	player_data().deserialize(this, serializer);
+	player_data().deserialize(this, serializer);
 }
 
 obj_id GameState::add_instance(level_id level, GameInst* inst) {

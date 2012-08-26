@@ -174,7 +174,7 @@ static void safe_deserialize(GameInst* inst, GameState* gs,
 
 }
 void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
-//	clear();
+	clear();
 	int amnt;
 	serializer.read_int(amnt);
 	serializer.read_int(next_id);
@@ -192,8 +192,8 @@ void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
 			inst->last_x = inst->x;
 			inst->last_y = inst->y;
 			inst->id = id;
-			delete inst;
-//			add_instance(inst, inst->id);
+//			delete inst;
+			add_instance(inst, inst->id);
 		} else {
 			safe_deserialize(inst, gs, serializer);
 		}

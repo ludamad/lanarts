@@ -91,10 +91,11 @@ void GameWorld::spawn_players(GeneratedLevel& genlevel, void** player_instances,
 			PlayerDataEntry& pde = gs->player_data().all_players()[i];
 			bool islocal = &pde == &gs->player_data().local_player_data();
 			ClassType& c = game_class_data.at(pde.classtype);
+			int spriteidx = gs->rng().rand(c.sprites.size());
 
 			if (pde.player_inst.empty()) {
-				pde.player_inst = new PlayerInst(c.starting_stats, 0, 0,
-						islocal);
+				pde.player_inst = new PlayerInst(c.starting_stats,
+						c.sprites[spriteidx], 0, 0, islocal);
 			}
 			printf("Spawning for player %d: %s\n", i,
 					islocal ? "local player" : "network player");

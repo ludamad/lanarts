@@ -3,9 +3,13 @@ sprites:
     file: res/sprites/none.png
     
   - name: fighter
+    file: res/sprites/player/fighter.png
+  - name: fighter2
     file: res/sprites/player/fighter2.png
 
   - name: wizard
+    file: res/sprites/player/wizard.png
+  - name: wizard2
     file: res/sprites/player/wizard2.png
     
   - name: resting

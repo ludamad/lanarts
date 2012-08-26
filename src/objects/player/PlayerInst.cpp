@@ -24,11 +24,10 @@
 #include "PlayerInst.h"
 #include "../ProjectileInst.h"
 
-PlayerInst::PlayerInst(const CombatStats& stats, int x, int y, bool local) :
-		CombatGameInst(stats,
-				game_class_data.at(stats.class_stats.classid).sprite, NONE, -1,
-				x, y, RADIUS, true, DEPTH), actions_set_for_turn(false), fieldofview(
-				LINEOFSIGHT), local(local), moving(0), autouse_mana_potion_try_count(
+PlayerInst::PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y,
+		bool local) :
+		CombatGameInst(stats, sprite, NONE, -1, x, y, RADIUS, true, DEPTH), actions_set_for_turn(
+				false), fieldofview(LINEOFSIGHT), local(local), moving(0), autouse_mana_potion_try_count(
 				0), lives(0), deaths(0), previous_spellselect(0), spellselect(
 				-1) {
 }

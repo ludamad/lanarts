@@ -60,7 +60,10 @@ ClassType parse_class(const YAML::Node& n) {
 	level["mpregen"] >> classtype.mpregen_perlevel;
 	level["hpregen"] >> classtype.hpregen_perlevel;
 
-	classtype.sprite = parse_sprite_number(n, "sprite");
+	const YAML::Node& sprites = n["sprites"];
+	for (int i = 0; i < sprites.size(); i++) {
+		classtype.sprites.push_back(parse_sprite_number(sprites[i]));
+	}
 
 	return classtype;
 }

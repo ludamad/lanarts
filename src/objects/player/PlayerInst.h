@@ -31,9 +31,10 @@ public:
 	enum {
 		RADIUS = 10, DEPTH = 75, LINEOFSIGHT = 7
 	};
-	PlayerInst(const CombatStats& stats, int x, int y, bool local = true);
+	PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y,
+			bool local = true);
 	PlayerInst() :
-			fieldofview(LINEOFSIGHT) {
+			fieldofview(LINEOFSIGHT), local(false) {
 	}
 
 	virtual ~PlayerInst();

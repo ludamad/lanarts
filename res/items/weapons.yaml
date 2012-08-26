@@ -54,8 +54,8 @@ weapons:
     shop_cost: [97, 102]
     weapon_class: short blades
     description: A slow powerful axe that decimates the weak.
-    damage: {base: [6,12], strength: 1.3 }
-    power: {base: 4, strength: 0.35}
+    damage: {base: [6,10], strength: 1.25 }
+    power: {base: 6, strength: 0.2}
     range: 7
     cooldown: 65
     spr_item: battle axe 

@@ -2,7 +2,7 @@
 
 classes:
   - name: Mage
-    sprite: wizard
+    sprites: [wizard, wizard2]
     spells:
       - spell: Fire Bolt
         level_needed: 1
@@ -38,7 +38,7 @@ classes:
         willpower: 2
 
   - name: Fighter
-    sprite: fighter
+    sprites: [fighter, fighter2]
     spells:
       - spell: Berserk
         level_needed: 1

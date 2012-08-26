@@ -26,6 +26,13 @@ std::vector<const YAML::Node*> flatten_seq_mappings(const YAML::Node & n) {
 	return ret;
 }
 
+int parse_sprite_number(const YAML::Node & n) {
+	std::string s;
+	n >> s;
+	return get_sprite_by_name(s.c_str());
+}
+
+
 int parse_sprite_number(const YAML::Node & n, const char *key) {
 	if (!yaml_has_node(n, key))
 		return -1;
