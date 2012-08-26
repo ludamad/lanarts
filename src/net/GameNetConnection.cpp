@@ -173,6 +173,13 @@ void net_send_chatmessage(GameNetConnection& net, ChatMessage & message) {
 	net.send_packet(sb);
 }
 
+
+void net_send_chatmessage(GameNetConnection& net, GameState* gs) {
+	SerializeBuffer& sb = net.grab_buffer(
+			GameNetConnection::PACKET_CHAT_MESSAGE);
+	net.send_packet(sb);
+}
+
 void GameNetConnection::_handle_message(int sender, const char* msg,
 		size_t len) {
 	message_t type;

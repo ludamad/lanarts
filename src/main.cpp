@@ -82,11 +82,11 @@ static void game_loop(GameState* gs) {
 			paused = !paused;
 		}
 		if (gs->key_press_state(SDLK_F5)) {
-			gs->save_game("savefile.save");
+//			gs->serialize("savefile.save");
 		}
 		if (gs->key_press_state(SDLK_F6)) {
 			if (gs->player_data().all_players().size() == 1) {
-				gs->load_game("savefile.save");
+//				gs->load_game("savefile.save");
 			}
 		}
 

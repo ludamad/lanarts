@@ -38,6 +38,7 @@ class GameInst;
 class PlayerInst;
 class CollisionAvoidance;
 class MonsterController;
+class Serializer;
 
 struct GameStateInitData {
 	int seed;
@@ -56,8 +57,8 @@ public:
 	void start_connection();
 	/* Call after construction, before game starts: */
 	void start_game();
-	void save_game(const char* filename);
-	void load_game(const char* filename);
+	void serialize(SerializeBuffer& serializer);
+	void deserialize(SerializeBuffer& serializer);
 
 	/* Primary events */
 	void draw(bool drawhud = true);

@@ -173,21 +173,18 @@ static void safe_deserialize(GameInst* inst, GameState* gs,
 	inst->last_x = lx, inst->last_y = ly;
 
 }
-void GameState::save_game(const char* filename) {
-	FILE* file = fopen(filename, "wb");
-	SerializeBuffer serializer = SerializeBuffer::file_writer(file);
+void GameState::serialize(SerializeBuffer& serializer) {
+	serializer.write_int(this->frame_n);
 	tiles().serialize(serializer);
 	get_level()->game_inst_set().serialize(this, serializer);
 
 	player_data().serialize(this, serializer);
 
 	serializer.flush();
-	fclose(file);
 }
 
-void GameState::load_game(const char* filename) {
-	FILE* file = fopen(filename, "rb");
-	SerializeBuffer serializer = SerializeBuffer::file_reader(file);
+void GameState::deserialize(SerializeBuffer& serializer)  {
+	serializer.read_int(this->frame_n);
 	tiles().deserialize(serializer);
 	get_level()->game_inst_set().deserialize(this, serializer);
 
@@ -197,7 +194,6 @@ void GameState::load_game(const char* filename) {
 //	}
 
 	player_data().deserialize(this, serializer);
-	fclose(file);
 }
 
 obj_id GameState::add_instance(level_id level, GameInst* inst) {
