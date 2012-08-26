@@ -91,6 +91,10 @@ public:
 		init_by_array(init_key, key_length);
 	}
 
+	int rand() {
+		DEBUG_INFO_amnt_generated++;
+		return genrand_int32();
+	}
 	int rand(int max) {
 		if (max == 1)
 			return 0;

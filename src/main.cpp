@@ -82,6 +82,7 @@ static void game_loop(GameState* gs) {
 			paused = !paused;
 		}
 		if (gs->key_press_state(SDLK_F5)) {
+			net_send_synch_data(gs->net_connection(), gs);
 //			gs->serialize("savefile.save");
 		}
 		if (gs->key_press_state(SDLK_F6)) {

@@ -58,6 +58,8 @@ public:
 	}
 	int get_current_level_id();
 	void connect_entrance_to_exit(int roomid1, int roomid2);
+	void serialize(SerializeBuffer& serializer);
+	void deserialize(SerializeBuffer& serializer);
 private:
 	void spawn_players(GeneratedLevel& genlevel, void** player_instances,
 			size_t nplayers);

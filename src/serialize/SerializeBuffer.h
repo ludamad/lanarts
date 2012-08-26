@@ -67,8 +67,7 @@ public:
 	void read_raw(char* bytes, size_t n) {
 		if (_buffer.size() - _read_position < n) {
 			fill();
-		}
-		LANARTS_ASSERT(_buffer.size() >= n + _read_position);
+		}LANARTS_ASSERT(_buffer.size() >= n + _read_position);
 		memcpy(bytes, &_buffer[_read_position], n);
 		_read_position += n;
 	}
@@ -109,6 +108,9 @@ public:
 	void clear();
 	void flush();
 	void fill();
+	bool empty() const {
+		return _buffer.empty();
+	}
 private:
 	SerializeBuffer(void* context, buffer_flushf flushf, buffer_fillf fillf);
 

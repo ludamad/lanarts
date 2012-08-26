@@ -48,7 +48,7 @@ static int generate_seed() {
 
 GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 		int viewh, int hudw) :
-		settings(settings), L(L), connection(game_chat(), player_data(),
+		settings(settings), L(L), connection(this, game_chat(), player_data(),
 				init_data), frame_n(0), hud(BBox(vieww, 0, vieww + hudw, viewh),
 				BBox(0, 0, vieww, viewh)), _view(0, 0, vieww, viewh), world(
 				this), repeat_actions_counter(0) {
@@ -175,25 +175,21 @@ static void safe_deserialize(GameInst* inst, GameState* gs,
 }
 void GameState::serialize(SerializeBuffer& serializer) {
 	serializer.write_int(this->frame_n);
-	tiles().serialize(serializer);
-	get_level()->game_inst_set().serialize(this, serializer);
+	world.serialize(serializer);
 
-	player_data().serialize(this, serializer);
+//	player_data().serialize(this, serializer);
+//	std::vector<GameInst*> insts = get_level()->game_inst_set().to_vector();
 
 	serializer.flush();
 }
 
-void GameState::deserialize(SerializeBuffer& serializer)  {
+void GameState::deserialize(SerializeBuffer& serializer) {
 	serializer.read_int(this->frame_n);
-	tiles().deserialize(serializer);
-	get_level()->game_inst_set().deserialize(this, serializer);
+	world.deserialize(serializer);
 
 //	std::vector<GameInst*> insts = get_level()->game_inst_set().to_vector();
-//	for (size_t i = 0; i < insts.size(); i++) {
-//		safe_deserialize(insts[i], this, serializer);
-//	}
 
-	player_data().deserialize(this, serializer);
+//	player_data().deserialize(this, serializer);
 }
 
 obj_id GameState::add_instance(level_id level, GameInst* inst) {
@@ -248,6 +244,7 @@ void GameState::step() {
 	hud.step(this);
 	world.step(); //Has pointer to this (GameState) object
 	lua_gc(L, LUA_GCSTEP, 0); // collect garbage incrementally
+	connection.consume_sync_messages();
 }
 
 int GameState::key_down_state(int keyval) {

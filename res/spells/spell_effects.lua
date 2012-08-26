@@ -1,6 +1,7 @@
 function poison_statmod(effect, obj, old, new)
 	new.defence = math.max(0, new.defence - 5)
 	new.willpower = math.max(0, new.willpower - 5)
+	new.speed = new.speed * 1.66
 end
 
 function poison_init(effect, obj)

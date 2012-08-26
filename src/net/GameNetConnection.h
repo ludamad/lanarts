@@ -28,11 +28,12 @@ public:
 		PACKET_CLIENT2SERV_CONNECTION_AFFIRM = 0,
 		PACKET_SERV2CLIENT_INITIALPLAYERDATA = 1,
 		PACKET_ACTION = 2,
-		PACKET_CHAT_MESSAGE = 3
+		PACKET_CHAT_MESSAGE = 3,
+		PACKET_FORCE_SYNC = 4
 	};
 	// Initialize with references to structures that are updated by messages
 	// Keep parts of the game-state that are updated explicit
-	GameNetConnection(GameChat& chat, PlayerData& pd,
+	GameNetConnection(GameState* gs, GameChat& chat, PlayerData& pd,
 			GameStateInitData& init_data);
 	~GameNetConnection();
 
@@ -52,6 +53,7 @@ public:
 	void set_accepting_connections(bool accept);
 
 	void poll_messages(int timeout = 0);
+	bool consume_sync_messages();
 
 	void send_packet(SerializeBuffer& serializer, int receiver = -1);
 	bool check_integrity(GameState* gs, int value);
@@ -61,14 +63,17 @@ public:
 
 private:
 	//Keep back-references so that we can alter world state based on messages received
+	GameState* gs;
 	GameChat& chat;
 	PlayerData& pd;
 	GameStateInitData& init_data;
 
+	SerializeBuffer* _synch_buffer;
 	SerializeBuffer* _message_buffer;
 	NetConnection* _connection;
 };
 
+void net_send_synch_data(GameNetConnection& net, GameState* gs);
 void net_send_connection_affirm(GameNetConnection& net, const std::string& name,
 		class_id classtype);
 void net_send_game_init_data(GameNetConnection& net, PlayerData& pd, int seed);

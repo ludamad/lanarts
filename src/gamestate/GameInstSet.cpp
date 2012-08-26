@@ -166,18 +166,37 @@ void GameInstSet::serialize(GameState* gs, SerializeBuffer& serializer) {
 	}
 }
 
+static void safe_deserialize(GameInst* inst, GameState* gs,
+		SerializeBuffer& serializer) {
+	int lx = inst->last_x, ly = inst->last_y;
+	inst->deserialize(gs, serializer);
+	inst->last_x = lx, inst->last_y = ly;
+
+}
 void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
-	clear();
+//	clear();
 	int amnt;
 	serializer.read_int(amnt);
 	serializer.read_int(next_id);
 	for (int i = 0; i < amnt; i++) {
 		InstType type;
+		int id;
 		serializer.read_int(type);
-		GameInst* inst = from_inst_type(type);
-		serializer.read_int(inst->id);
-		inst->deserialize(gs, serializer);
-		add_instance(inst, inst->id);
+		serializer.read_int(id);
+		printf("Deserializing id=%d\n", id);
+		GameInst* inst = get_instance(id);
+		bool has_inst = inst != NULL;
+		if (!has_inst) {
+			inst = from_inst_type(type);
+			inst->deserialize(gs, serializer);
+			inst->last_x = inst->x;
+			inst->last_y = inst->y;
+			inst->id = id;
+			delete inst;
+//			add_instance(inst, inst->id);
+		} else {
+			safe_deserialize(inst, gs, serializer);
+		}
 	}
 }
 

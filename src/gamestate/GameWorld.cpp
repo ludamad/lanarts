@@ -55,6 +55,30 @@ void GameWorld::place_inst(GeneratedLevel& genlevel, GameInst* inst) {
 	gs->add_instance(inst);
 }
 
+void GameWorld::serialize(SerializeBuffer& serializer) {
+	GameLevelState* original = gs->get_level();
+
+	for (int i = 0; i < level_states.size(); i++) {
+		gs->set_level(level_states[i]);
+		gs->tiles().serialize(serializer);
+		level_states[i]->game_inst_set().serialize(gs, serializer);
+	}
+
+	gs->set_level(original);
+}
+
+void GameWorld::deserialize(SerializeBuffer& serializer) {
+	GameLevelState* original = gs->get_level();
+
+	for (int i = 0; i < level_states.size(); i++) {
+		gs->set_level(level_states[i]);
+		gs->tiles().deserialize(serializer);
+		level_states[i]->game_inst_set().deserialize(gs, serializer);
+	}
+
+	gs->set_level(original);
+}
+
 void GameWorld::spawn_players(GeneratedLevel& genlevel, void** player_instances,
 		size_t nplayers) {
 	if (!player_instances) {
@@ -189,7 +213,8 @@ void GameWorld::step() {
 	}
 	gs->frame()++;
 
-	midstep = false;
+	midstep
+	= false;
 	if (next_room_id == -2) {
 		reset(0);
 		next_room_id = 0;

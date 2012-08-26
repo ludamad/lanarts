@@ -15,15 +15,17 @@
 
 #include "GameNetConnection.h"
 
-GameNetConnection::GameNetConnection(GameChat& chat, PlayerData& pd,
-		GameStateInitData& init_data) :
-		chat(chat), pd(pd), init_data(init_data), _connection(NULL) {
+GameNetConnection::GameNetConnection(GameState* gs, GameChat& chat,
+		PlayerData& pd, GameStateInitData& init_data) :
+		gs(gs), chat(chat), pd(pd), init_data(init_data), _connection(NULL) {
 	_message_buffer = new SerializeBuffer(SerializeBuffer::plain_buffer());
+	_synch_buffer = new SerializeBuffer(SerializeBuffer::plain_buffer());
 }
 
 GameNetConnection::~GameNetConnection() {
 	delete _connection;
 	delete _message_buffer;
+	delete _synch_buffer;
 }
 
 SerializeBuffer& GameNetConnection::grab_buffer(message_t type) {
@@ -34,6 +36,7 @@ SerializeBuffer& GameNetConnection::grab_buffer(message_t type) {
 
 void GameNetConnection::send_packet(SerializeBuffer& serializer, int receiver) {
 	_connection->send_message(serializer.data(), serializer.size(), receiver);
+
 }
 
 bool GameNetConnection::check_integrity(GameState* gs, int value) {
@@ -166,13 +169,32 @@ void net_send_game_init_data(GameNetConnection& net, PlayerData& pd, int seed) {
 	}
 }
 
+void net_send_synch_data(GameNetConnection& net, GameState* gs) {
+	SerializeBuffer& sb = net.grab_buffer(GameNetConnection::PACKET_FORCE_SYNC);
+	if (!net.is_connected())
+		return;
+	int mtwistseed = gs->rng().rand();
+	gs->rng().init_genrand(mtwistseed);
+	sb.write_int(mtwistseed);
+	std::vector<PlayerDataEntry>& pdes = gs->player_data().all_players();
+	gs->serialize(sb);
+	net.send_packet(sb, NetConnection::ALL_RECEIVERS);
+}
+
+void net_recv_synch_data(SerializeBuffer& sb, GameState* gs) {
+	int mtwistseed;
+	sb.read_int(mtwistseed);
+	gs->rng().init_genrand(mtwistseed);
+	std::vector<PlayerDataEntry>& pdes = gs->player_data().all_players();
+	gs->deserialize(sb);
+}
+
 void net_send_chatmessage(GameNetConnection& net, ChatMessage & message) {
 	SerializeBuffer& sb = net.grab_buffer(
 			GameNetConnection::PACKET_CHAT_MESSAGE);
 	message.serialize(sb);
 	net.send_packet(sb);
 }
-
 
 void net_send_chatmessage(GameNetConnection& net, GameState* gs) {
 	SerializeBuffer& sb = net.grab_buffer(
@@ -212,7 +234,22 @@ void GameNetConnection::_handle_message(int sender, const char* msg,
 		chat.add_message(msg);
 		break;
 	}
+
+	case PACKET_FORCE_SYNC: {
+		std::swap(_synch_buffer, _message_buffer);
+		break;
 	}
+	}
+
+}
+bool GameNetConnection::consume_sync_messages() {
+	if (_synch_buffer->empty()) {
+		return false;
+	}
+	printf("Receiving\n");
+	net_recv_synch_data(*_synch_buffer, gs);
+	_synch_buffer->clear();
+	return true;
 }
 
 //TODO: net redo
