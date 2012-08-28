@@ -24,6 +24,8 @@ Medium:
 	- Don't crowd the level with too many room placements
 - Add elemental damage types and mixed elemental type creatures/monsters/attacks
 - Unify all equipment type code paths
+- Fighters too weak later on - give them lots of equipment only they can wear
+	- can simply require X and X skill for magic items - weak system
 
 Small:
 - Have a flexible portal system that indicates which level to connect to

@@ -164,6 +164,11 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 
 	WeaponEntry& wentry = weapon.weapon_entry();
 	ProjectileEntry& pentry = projectile.projectile_entry();
+	AttackStats attack;
+	if (!pentry.is_unarmed()) {
+		attack.weapon = weapon;
+	}
+	attack.projectile = projectile;
 	EffectiveAttackStats atkstats = effective_atk_stats(mt,
 			AttackStats(weapon, projectile));
 

@@ -124,13 +124,16 @@ void PlayerData::deserialize(GameState* gs, SerializeBuffer & serializer) {
 	int psize;
 	serializer.read_int(psize);
 	for (int i = 0; i < psize; i++) {
-		write_inst_ref(_players.at(i).player_inst, gs, serializer);
+		PlayerDataEntry& pde = _players.at(i);
+		read_inst_ref(pde.player_inst, gs, serializer);
+		pde.action_queue.clear();
 	}
+
 }
 
 void players_gain_xp(GameState* gs, int xp) {
 	PlayerData& pd = gs->player_data();
-	std::vector<PlayerDataEntry>& players = pd.all_players();
+	std::vector<PlayerDataEntry> &players = pd.all_players();
 
 	for (int i = 0; i < players.size(); i++) {
 		players[i].player()->gain_xp(gs, xp);
@@ -139,7 +142,7 @@ void players_gain_xp(GameState* gs, int xp) {
 
 int player_get_playernumber(GameState* gs, PlayerInst* p) {
 	PlayerData& pd = gs->player_data();
-	std::vector<PlayerDataEntry>& players = pd.all_players();
+	std::vector<PlayerDataEntry> &players = pd.all_players();
 
 	for (int i = 0; i < players.size(); i++) {
 		if (players[i].player() == p) {
@@ -174,7 +177,7 @@ static void player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
 
 void players_poll_for_actions(GameState* gs) {
 	PlayerData& pd = gs->player_data();
-	std::vector<PlayerDataEntry>& players = pd.all_players();
+	std::vector<PlayerDataEntry> &players = pd.all_players();
 
 	if (gs->game_settings().verbose_output) {
 		printf("Polling for frame %d\n", gs->frame());
@@ -182,6 +185,22 @@ void players_poll_for_actions(GameState* gs) {
 
 	for (int i = 0; i < players.size(); i++) {
 		player_poll_for_actions(gs, players[i]);
+	}
+}
+
+void PlayerData::set_local_player_idx(int idx) {
+	if (_local_player_idx != -1) {
+		PlayerInst* oldlocal = local_player();
+		if (oldlocal) {
+			oldlocal->set_local_player(false);
+		}
+	}
+	_local_player_idx = idx;
+	if (_local_player_idx != -1) {
+		PlayerInst* newlocal = local_player();
+		if (newlocal) {
+			newlocal->set_local_player(true);
+		}
 	}
 }
 

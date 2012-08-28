@@ -18,11 +18,12 @@
 #include "../levelgen/GeneratedLevel.h"
 
 class GameState;
+class SerializeBuffer;
 
 struct GameLevelPortal {
 	Pos entrancesqr;
 	Pos exitsqr; //0,0 if undecided
-	GameLevelPortal(Pos entrance, Pos exit) :
+	GameLevelPortal(const Pos& entrance = Pos(), const Pos& exit = Pos()) :
 			entrancesqr(entrance), exitsqr(exit) {
 	}
 };
@@ -68,6 +69,9 @@ public:
 	CollisionAvoidance& collision_avoidance() {
 		return _collision_avoidance;
 	}
+
+	void serialize(GameState* gs, SerializeBuffer& serializer);
+	void deserialize(GameState* gs, SerializeBuffer& serializer);
 
 	void step(GameState* gs);
 

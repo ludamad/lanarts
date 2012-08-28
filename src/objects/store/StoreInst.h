@@ -30,6 +30,9 @@ public:
 	virtual void draw(GameState* gs);
 	virtual void copy_to(GameInst* inst) const;
 	virtual StoreInst* clone() const;
+
+	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
+	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
 private:
 	StoreContent sidebar_display;
 	StoreInventory inv;

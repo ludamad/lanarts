@@ -259,9 +259,9 @@ bool GameTiles::radius_test(int x, int y, int rad, bool issolid, int ttype,
 void GameTiles::deserialize(SerializeBuffer& serializer) {
 	serializer.read(width);
 	serializer.read(height);
-	for (int i = 0; i < tiles.size(); i++) {
-		tiles[i] = TileState();
-	}
+//	for (int i = 0; i < tiles.size(); i++) {
+//		tiles[i] = TileState();
+//	}
 	serializer.read_container(tiles);
 }
 

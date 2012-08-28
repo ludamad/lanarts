@@ -15,7 +15,10 @@ sprites:
     file: res/sprites/items/weapons/mace.png
 
   - name: bow1
-    file: res/sprites/items/weapons/bow1.png
+    file: res/sprites/items/weapons/ranged/bow1.png
+
+  - name: long bow
+    file: res/sprites/items/weapons/ranged/longbow.png
 
   - name: big stone
     file: res/sprites/effects/big_stone.png
@@ -32,6 +35,12 @@ sprites:
   - name: stone_arrow_projectile
     type: directional
     file: res/sprites/items/weapons/projectiles/bolt
+    variations: 8
+    extension: .png
+
+  - name: crystal_projectile
+    type: directional
+    file: res/sprites/items/weapons/projectiles/crystal/crystal_spear
     variations: 8
     extension: .png
 

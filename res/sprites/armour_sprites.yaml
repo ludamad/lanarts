@@ -8,4 +8,4 @@ sprites:
   - name: robe
     file: res/sprites/items/armour/robe.png
   - name: platemail
-    file: res/sprites/items/armour/platemail.png
+    file: res/sprites/items/armour/plate2.png

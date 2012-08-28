@@ -30,7 +30,7 @@ struct NetUpdatedState {
 	GameStateInitData init;
 	PlayerData pd;
 	NetUpdatedState() :
-			conn(NULL, chat, pd, init) {
+			conn(chat, pd, init) {
 	}
 };
 

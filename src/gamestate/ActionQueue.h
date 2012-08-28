@@ -21,6 +21,10 @@ public:
 	void clear_actions() {
 		queue.clear();
 	}
+	void clear() {
+		queue.clear();
+		frames_set.clear();
+	}
 	GameAction& at(int i) {
 		return queue.at(i);
 	}

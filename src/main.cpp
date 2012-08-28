@@ -45,6 +45,20 @@ void init_system(GameSettings& settings, lua_State* L) {
 	settings = init_game_data(L);
 }
 
+void save_game_to_file(GameState* gs, const char* filename) {
+	FILE* file = fopen(filename, "wb");
+	SerializeBuffer sb = SerializeBuffer::file_writer(file);
+	gs->serialize(sb);
+	sb.flush();
+	fclose(file);
+}
+void load_game_from_file(GameState* gs, const char* filename) {
+	FILE* file = fopen(filename, "rb");
+	SerializeBuffer sb = SerializeBuffer::file_reader(file);
+	gs->deserialize(sb);
+	fclose(file);
+}
+
 void main_menu_loop(GameState* gs, int width, int height);
 
 const int HUD_WIDTH = 160;
@@ -83,11 +97,12 @@ static void game_loop(GameState* gs) {
 		}
 		if (gs->key_press_state(SDLK_F5)) {
 			net_send_synch_data(gs->net_connection(), gs);
-//			gs->serialize("savefile.save");
+			save_game_to_file(gs, "savefile.save");
 		}
+		gs->net_connection().consume_sync_messages(gs);
 		if (gs->key_press_state(SDLK_F6)) {
 			if (gs->player_data().all_players().size() == 1) {
-//				gs->load_game("savefile.save");
+				load_game_from_file(gs, "savefile.save");
 			}
 		}
 

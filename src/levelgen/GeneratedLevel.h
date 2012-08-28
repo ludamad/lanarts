@@ -22,6 +22,9 @@ struct Room {
 	Region room_region;
 	int groupID;
 	int enemies_in_room;
+	Room() :
+			groupID(0), enemies_in_room(0) {
+	}
 	Room(const Region& r, int groupID) :
 			room_region(r), groupID(groupID), enemies_in_room(0) {
 	}

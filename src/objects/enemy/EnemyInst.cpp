@@ -86,6 +86,9 @@ void EnemyInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read_int(enemytype);
 	eb.deserialize(gs, serializer);
 	serializer.read_int(xpgain);
+	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
+	collision_simulation_id() = coll_avoid.add_active_object(pos(),
+			target_radius, effective_stats().movespeed);
 }
 EnemyEntry& EnemyInst::etype() {
 	return game_enemy_data.at(enemytype);
@@ -182,7 +185,6 @@ bool EnemyInst::within_field_of_view(const Pos & pos) {
 void EnemyInst::die(GameState *gs) {
 	if (!destroyed) {
 		gs->add_instance(new AnimatedInst(x, y, etype().enemy_sprite, 20));
-		gs->monster_controller().deregister_enemy(this);
 		gs->remove_instance(this);
 
 		CollisionAvoidance& coll_avoid = gs->collision_avoidance();

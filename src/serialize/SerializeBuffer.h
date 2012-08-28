@@ -54,6 +54,15 @@ public:
 		write(i);
 	}
 
+	void write_byte(int i) {
+		write((char)i);
+	}
+	void read_byte(int& i) {
+		char byte;
+		read(byte);
+		i = byte;
+	}
+
 	template<class T>
 	void read_container(T& t) {
 		int size;
@@ -131,5 +140,12 @@ private:
 #define DESERIALIZE_POD_REGION(serializer, obj, member1, member2) \
 	serializer.read_raw( (char*) (& obj-> member1 ),\
 		(char*)(1 + & obj-> member2) - (char*)(& obj-> member1))
+
+template<typename T>
+inline bool serializer_equals_read(SerializeBuffer& sb, const T& value) {
+	T t;
+	sb.read(t);
+	return t == value;
+}
 
 #endif /* SERIALIZEBUFFER_H_ */

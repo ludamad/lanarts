@@ -30,9 +30,8 @@ GameInstSet::GameInstSet(int w, int h, int capacity) {
 	next_id = 1;
 	unit_amnt = 0;
 	unit_capacity = capacity;
-	unit_set = new InstanceState[unit_capacity];
-	memset(unit_set, 0, unit_capacity * sizeof(InstanceState));
-	unit_grid = new InstanceLinkedList[grid_w * grid_h];
+	unit_set.resize(unit_capacity);
+	unit_grid.resize(grid_w * grid_h);
 }
 GameInstSet::~GameInstSet() {
 
@@ -43,8 +42,6 @@ GameInstSet::~GameInstSet() {
 		}
 	}
 
-	delete[] unit_grid;
-	delete[] unit_set;
 	for (int i = 0; i < deallocation_list.size(); i++) {
 		deallocation_list[i]->free_reference();
 	}
@@ -84,31 +81,28 @@ void GameInstSet::update_statepointer_for_reallocate_(
 		InstanceState** stateptr) {
 	if (*stateptr)
 		*stateptr = tset_find<GameInstSetFunctions>((*stateptr)->inst->id,
-				unit_set, unit_capacity);
+				&unit_set[0], unit_capacity);
 }
 void GameInstSet::update_depthlist_for_reallocate_(InstanceLinkedList& list) {
 	update_statepointer_for_reallocate_(&list.start_of_list);
 	update_statepointer_for_reallocate_(&list.end_of_list);
 }
 void GameInstSet::reallocate_internal_data() {
-	unit_capacity *= 2;
-	InstanceState* old_set = unit_set, *new_set =
-			new InstanceState[unit_capacity];
-	for (int i = 0; i < unit_capacity; i++) {
-		new_set[i].inst = NULL;
+	{
+		unit_capacity *= 2;
+		std::vector<InstanceState> new_set(unit_capacity);
+
+		tset_add_all<GameInstSetFunctions>(&unit_set[0], unit_capacity / 2,
+				&new_set[0], unit_capacity);
+		unit_set.swap(new_set);
 	}
-
-	tset_add_all<GameInstSetFunctions>(old_set, unit_capacity / 2, new_set,
-			unit_capacity);
-	unit_set = new_set;
-
 	//Fix pointers for grid
 	for (int i = 0; i < unit_capacity; i++) {
-		if (new_set[i].inst) {
-			update_statepointer_for_reallocate_(&new_set[i].prev_in_grid);
-			update_statepointer_for_reallocate_(&new_set[i].next_in_grid);
-			update_statepointer_for_reallocate_(&new_set[i].prev_same_depth);
-			update_statepointer_for_reallocate_(&new_set[i].next_same_depth);
+		if (unit_set[i].inst) {
+			update_statepointer_for_reallocate_(&unit_set[i].prev_in_grid);
+			update_statepointer_for_reallocate_(&unit_set[i].next_in_grid);
+			update_statepointer_for_reallocate_(&unit_set[i].prev_same_depth);
+			update_statepointer_for_reallocate_(&unit_set[i].next_same_depth);
 		}
 	}
 	DepthMap::iterator it = depthlist_map.begin();
@@ -119,9 +113,6 @@ void GameInstSet::reallocate_internal_data() {
 	for (int i = 0; i < grid_w * grid_h; i++) {
 		update_depthlist_for_reallocate_(unit_grid[i]);
 	}
-
-	delete[] old_set;
-
 }
 static int get_xyind(const Pos& c, int grid_w) {
 	return (c.y / GameInstSet::REGION_SIZE) * grid_w
@@ -143,13 +134,16 @@ void GameInstSet::remove_instance(GameInst* inst) {
 	if (inst->destroyed)
 		return;
 	inst->destroyed = true;
-	InstanceState* state = tset_find<GameInstSetFunctions>(inst->id, unit_set,
-			unit_capacity);
+	InstanceState* state = tset_find<GameInstSetFunctions>(inst->id,
+			&unit_set[0], unit_capacity);
 	__remove_instance(state);
 	deallocation_list.push_back(inst);
 }
 
 void GameInstSet::serialize(GameState* gs, SerializeBuffer& serializer) {
+	serializer.write_int(grid_w);
+	serializer.write_int(grid_h);
+
 	serializer.write_int(size());
 	serializer.write_int(next_id);
 	DepthMap::const_iterator it = depthlist_map.end();
@@ -161,6 +155,7 @@ void GameInstSet::serialize(GameState* gs, SerializeBuffer& serializer) {
 			serializer.write_int(get_inst_type(inst));
 			serializer.write_int(inst->id);
 			inst->serialize(gs, serializer);
+			serializer.write_int(0x9a3e);
 			state = state->next_same_depth;
 		}
 	}
@@ -174,10 +169,17 @@ static void safe_deserialize(GameInst* inst, GameState* gs,
 
 }
 void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	serializer.read_int(grid_w);
+	serializer.read_int(grid_h);
+
+	//Resize and clear
+	unit_grid.resize(grid_w * grid_h);
 	clear();
+
 	int amnt;
 	serializer.read_int(amnt);
 	serializer.read_int(next_id);
+
 	for (int i = 0; i < amnt; i++) {
 		InstType type;
 		int id;
@@ -192,8 +194,9 @@ void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
 			inst->last_x = inst->x;
 			inst->last_y = inst->y;
 			inst->id = id;
-//			delete inst;
 			add_instance(inst, inst->id);
+
+			LANARTS_ASSERT( serializer_equals_read(serializer, 0x9a3e));
 		} else {
 			safe_deserialize(inst, gs, serializer);
 		}
@@ -211,7 +214,7 @@ obj_id GameInstSet::add_instance(GameInst* inst, int id) {
 
 	Pos c(inst->last_x, inst->last_y);
 	//Will be set to the current state object in 'add'
-	InstanceState* state = unit_set;
+	InstanceState* state = &unit_set[0];
 
 	if (id == 0 && inst->id != 0) {
 		fprintf(stderr, "Adding instance with id of %d; not 0!\n", inst->id);
@@ -250,7 +253,7 @@ void GameInstSet::step(GameState* gs) {
 	}
 }
 GameInst* GameInstSet::get_instance(int id) const {
-	InstanceState* is = tset_find<GameInstSetFunctions>(id, unit_set,
+	InstanceState* is = tset_find<GameInstSetFunctions>(id, &unit_set[0],
 			unit_capacity);
 	if (is)
 		return is->inst;
@@ -398,8 +401,8 @@ void GameInstSet::clear() {
 	next_id = 1;
 	unit_amnt = 0;
 	depthlist_map.clear();
-	memset(unit_set, 0, unit_capacity * sizeof(InstanceState));
-	memset(unit_grid, 0, grid_w * grid_h * sizeof(InstanceLinkedList));
+	memset(&unit_set[0], 0, unit_capacity * sizeof(InstanceState));
+	memset(&unit_grid[0], 0, grid_w * grid_h * sizeof(InstanceLinkedList));
 }
 
 //TODO: Make collisionlist entry positions deterministic -or- make collision functions always return the same object

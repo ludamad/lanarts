@@ -15,9 +15,9 @@
 
 #include "GameNetConnection.h"
 
-GameNetConnection::GameNetConnection(GameState* gs, GameChat& chat,
-		PlayerData& pd, GameStateInitData& init_data) :
-		gs(gs), chat(chat), pd(pd), init_data(init_data), _connection(NULL) {
+GameNetConnection::GameNetConnection(GameChat& chat, PlayerData& pd,
+		GameStateInitData& init_data) :
+		chat(chat), pd(pd), init_data(init_data), _connection(NULL) {
 	_message_buffer = new SerializeBuffer(SerializeBuffer::plain_buffer());
 	_synch_buffer = new SerializeBuffer(SerializeBuffer::plain_buffer());
 }
@@ -102,7 +102,7 @@ void net_recv_connection_affirm(SerializeBuffer& sb, int sender,
 	printf("connection affirm read\n");
 	pd.register_player(name, NULL, classtype, sender);
 	printf("now there are %d players\n", (int)pd.all_players().size());
-	pd.set_local_player(0);
+	pd.set_local_player_idx(0);
 }
 
 void net_send_connection_affirm(GameNetConnection& net, const std::string& name,
@@ -124,7 +124,7 @@ void net_recv_game_init_data(SerializeBuffer& sb, int sender,
 	//Read player data
 	int localidx;
 	sb.read_int(localidx);
-	pd.set_local_player(localidx);
+	pd.set_local_player_idx(localidx);
 	int playern;
 	sb.read_int(playern);
 	LANARTS_ASSERT(pd.all_players().empty());
@@ -185,8 +185,13 @@ void net_recv_synch_data(SerializeBuffer& sb, GameState* gs) {
 	int mtwistseed;
 	sb.read_int(mtwistseed);
 	gs->rng().init_genrand(mtwistseed);
-	std::vector<PlayerDataEntry>& pdes = gs->player_data().all_players();
+	int nplayer = gs->player_data().get_local_player_idx();
 	gs->deserialize(sb);
+	std::vector<PlayerDataEntry>& pdes = gs->player_data().all_players();
+	for (int i = 0; i < pdes.size(); i++) {
+		pdes[i].player()->set_local_player(false);
+	}
+	gs->player_data().set_local_player_idx(nplayer);
 }
 
 void net_send_chatmessage(GameNetConnection& net, ChatMessage & message) {
@@ -242,7 +247,7 @@ void GameNetConnection::_handle_message(int sender, const char* msg,
 	}
 
 }
-bool GameNetConnection::consume_sync_messages() {
+bool GameNetConnection::consume_sync_messages(GameState* gs) {
 	if (_synch_buffer->empty()) {
 		return false;
 	}

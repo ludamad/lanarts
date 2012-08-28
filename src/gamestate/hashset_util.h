@@ -94,11 +94,11 @@ int tset_add_allv(K* src, size_t srcn, V* dst, size_t dstn) {
 }
 
 template<class D, class V, class K>
-V* tset_find(const K& key, V* data, size_t entryn) {
+V* tset_find(const K& key, const V* data, size_t entryn) {
 	size_t start = D::hash(key) & (entryn - 1);
 	size_t index = start;
 	for (;;) {
-		V* entry = data + index;
+		V* entry = (V*)(data + index);
 		if (D::isNull(*entry)) {
 			return NULL;
 		} else if (D::equal(*entry, key)) {

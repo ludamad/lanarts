@@ -444,7 +444,7 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 			&& item_check_lua_prereq(L, type, this)) {
 		item_do_lua_action(L, type, this, Pos(action.action_x, action.action_y),
 				itemslot.amount);
-		if (!type.use_message.empty()) {
+		if (is_local_player() && !type.use_message.empty()) {
 			gs->game_chat().add_message(type.use_message,
 					Colour(100, 100, 255));
 		}
@@ -538,7 +538,8 @@ static int scan_entrance(const std::vector<GameLevelPortal>& portals,
 void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 	if (!effective_stats().allowed_actions.can_use_stairs) {
 		if (is_local_player()) {
-			gs->game_chat().add_message("You cannot use the stairs in this state!");
+			gs->game_chat().add_message(
+					"You cannot use the stairs in this state!");
 		}
 		return;
 	}
@@ -564,7 +565,8 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 	if (!effective_stats().allowed_actions.can_use_stairs) {
 		if (is_local_player()) {
-			gs->game_chat().add_message("You cannot use the stairs in this state!");
+			gs->game_chat().add_message(
+					"You cannot use the stairs in this state!");
 		}
 		return;
 	}

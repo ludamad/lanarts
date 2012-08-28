@@ -5,6 +5,8 @@
 
 #include "StoreInventory.h"
 
+#include "../../serialize/SerializeBuffer.h"
+
 void StoreInventory::add(const Item & item, int amount, int cost) {
 	StoreItemSlot newslot(item, amount, cost);
 
@@ -28,5 +30,13 @@ size_t StoreInventory::last_filled_slot() const {
 	}
 
 	return 0;
+}
+
+void StoreInventory::serialize(SerializeBuffer& serializer) {
+	serializer.write_container(items);
+}
+
+void StoreInventory::deserialize(SerializeBuffer& serializer) {
+	serializer.read_container(items);
 }
 

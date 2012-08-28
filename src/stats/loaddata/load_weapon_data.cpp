@@ -10,7 +10,6 @@ extern "C" {
 }
 
 using namespace std;
-
 static float parse_magic_percentage(const YAML::Node& node, const char* key) {
 	if (yaml_has_node(node, key)) {
 		float magic_percentage = parse_defaulted(node[key], "magic", 0.0f);

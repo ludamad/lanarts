@@ -238,12 +238,18 @@ sprite_id ProjectileInst::sprite() const {
 	return pentry.attack_sprite;
 }
 
-void ProjectileInst::serialize(GameState *gs, SerializeBuffer & serializer)
-{
+void ProjectileInst::serialize(GameState* gs, SerializeBuffer& serializer) {
+	GameInst::serialize(gs, serializer);
+	SERIALIZE_POD_REGION(serializer, this, rx, sole_target);
+	projectile.serialize(serializer);
+	SERIALIZE_POD_REGION(serializer, this, atkstats, damage_mult);
 }
 
-void ProjectileInst::deserialize(GameState *gs, SerializeBuffer & serializer)
-{
+void ProjectileInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	GameInst::deserialize(gs, serializer);
+	DESERIALIZE_POD_REGION(serializer, this, rx, sole_target);
+	projectile.deserialize(serializer);
+	DESERIALIZE_POD_REGION(serializer, this, atkstats, damage_mult);
 }
 
 bool ProjectileInst::bullet_target_hit2(GameInst* self, GameInst* other) {

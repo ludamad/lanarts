@@ -48,19 +48,19 @@ void ScriptedInst::draw(GameState* gs) {
 
 void ScriptedInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(ScriptedInst*) inst = *this;
+	*(ScriptedInst*)inst = *this;
 }
 
 ScriptedInst* ScriptedInst::clone() const {
 	return new ScriptedInst(*this);
 }
 
-void ScriptedInst::serialize(GameState *gs, SerializeBuffer & serializer)
-{
+void ScriptedInst::serialize(GameState *gs, SerializeBuffer & serializer) {
+	LANARTS_ASSERT(false);
 }
 
-void ScriptedInst::deserialize(GameState *gs, SerializeBuffer & serializer)
-{
+void ScriptedInst::deserialize(GameState *gs, SerializeBuffer & serializer) {
+	LANARTS_ASSERT(false);
 }
 
 ScriptObjectEntry& ScriptedInst::script_object() {

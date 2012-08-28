@@ -36,7 +36,8 @@ void PlayerInst::init(GameState* gs) {
 	CombatGameInst::init(gs);
 	teamid = gs->teams().default_player_team();
 	_path_to_player.calculate_path(gs, x, y, PLAYER_PATHING_RADIUS);
-	simulation_id = gs->collision_avoidance().add_player_object(this);
+	collision_simulation_id() = gs->collision_avoidance().add_player_object(
+			this);
 }
 
 PlayerInst::~PlayerInst() {
@@ -59,7 +60,7 @@ void PlayerInst::die(GameState* gs) {
 void PlayerInst::deinit(GameState* gs) {
 	CombatGameInst::deinit(gs);
 	current_target = NONE;
-	gs->collision_avoidance().remove_object(simulation_id);
+	gs->collision_avoidance().remove_object(collision_simulation_id());
 }
 
 static Pos seen_square_in_area(MTwist& mt, GameTiles& tiles) {
@@ -204,7 +205,7 @@ void PlayerInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write(actions_set_for_turn);
 	serializer.write_container(queued_actions);
 
-	SERIALIZE_POD_REGION(serializer, this, moving, spellselect);
+	SERIALIZE_POD_REGION(serializer, this, local, spellselect);
 }
 
 void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
@@ -213,7 +214,10 @@ void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read_container(queued_actions);
 	_path_to_player.calculate_path(gs, x, y, PLAYER_PATHING_RADIUS);
 	update_field_of_view(gs);
-	DESERIALIZE_POD_REGION(serializer, this, moving, spellselect);
+	DESERIALIZE_POD_REGION(serializer, this, local, spellselect);
+
+	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
+	collision_simulation_id() = coll_avoid.add_player_object(this);
 }
 
 PlayerInst *PlayerInst::clone() const {

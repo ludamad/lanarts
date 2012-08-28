@@ -92,6 +92,9 @@ public:
 	bool is_local_player() {
 		return local;
 	}
+	void set_local_player(bool islocal) {
+		local = islocal;
+	}
 
 	fov& field_of_view() {
 		return fieldofview;

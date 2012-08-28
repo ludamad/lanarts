@@ -18,6 +18,8 @@ struct StoreItemSlot {
 	}
 };
 
+class SerializeBuffer;
+
 class StoreInventory {
 public:
 	StoreInventory(int maxsize = 40) :
@@ -34,6 +36,9 @@ public:
 		return items.size();
 	}
 	size_t last_filled_slot() const;
+
+	void serialize(SerializeBuffer& serializer);
+	void deserialize(SerializeBuffer& serializer);
 private:
 	std::vector<StoreItemSlot> items;
 };

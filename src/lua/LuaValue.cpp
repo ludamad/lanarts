@@ -195,10 +195,15 @@ public:
 	}
 
 	void serialize(lua_State* L, SerializeBuffer& serializer) {
+
+		serializer.write(lua_expression);
+		serializer.write(empty);
 		push(L);
 		lua_serialize(serializer, L, -1);
 	}
 	void deserialize(lua_State* L, SerializeBuffer& serializer) {
+		serializer.read(lua_expression);
+		serializer.read(empty);
 		lua_deserialize(serializer, L);
 		pop(L);
 	}
@@ -359,21 +364,23 @@ void lua_gameinst_cached_callback(lua_State* L, LuaValue& cache,
 }
 
 void LuaValue::serialize(lua_State* L, SerializeBuffer& serializer) {
-	if (!impl) {
-		serializer.write((int)0);
-	} else {
+	serializer.write_byte(impl != NULL);
+	if (impl) {
 		impl->serialize(L, serializer);
 	}
 }
 
 void LuaValue::deserialize(lua_State* L, SerializeBuffer& serializer) {
+	// Handle empty LuaValue's:
+	int is_on;
+	serializer.read_byte(is_on);
+	if (!is_on) {
+		delete impl;
+		impl = NULL;
+		return;
+	}
+
 	if (!impl) {
-		int size;
-		serializer.peek(size);
-		if (size == 0) {
-			serializer.read(size);
-			return;
-		}
 		impl = new LuaValueImpl();
 	}
 	impl->deserialize(L, serializer);

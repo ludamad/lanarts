@@ -34,8 +34,6 @@ public:
 
 	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
 	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
-
-
 private:
 	Colour textcol;
 	float rx, ry, vx, vy;

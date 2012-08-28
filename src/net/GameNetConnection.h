@@ -33,7 +33,7 @@ public:
 	};
 	// Initialize with references to structures that are updated by messages
 	// Keep parts of the game-state that are updated explicit
-	GameNetConnection(GameState* gs, GameChat& chat, PlayerData& pd,
+	GameNetConnection(GameChat& chat, PlayerData& pd,
 			GameStateInitData& init_data);
 	~GameNetConnection();
 
@@ -53,7 +53,7 @@ public:
 	void set_accepting_connections(bool accept);
 
 	void poll_messages(int timeout = 0);
-	bool consume_sync_messages();
+	bool consume_sync_messages(GameState* gs);
 
 	void send_packet(SerializeBuffer& serializer, int receiver = -1);
 	bool check_integrity(GameState* gs, int value);
@@ -63,7 +63,6 @@ public:
 
 private:
 	//Keep back-references so that we can alter world state based on messages received
-	GameState* gs;
 	GameChat& chat;
 	PlayerData& pd;
 	GameStateInitData& init_data;

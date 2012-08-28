@@ -186,7 +186,7 @@ areas:
       - layout: *tiny_layouts
         content:
           features: { tileset: *lair_tilesets}
-          items:    { amount: 3,  itemgenlist: Basic Items   }          
+          items:    { amount: 4,  itemgenlist: Basic Items   }          
           enemies: { 
             wandering: no, amount: 12, 
             generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}] 
@@ -206,7 +206,7 @@ areas:
       - layout: [*small_layout1]
         content:
           features: { tileset: [crystal_tiles, crystal_tiles_with_marble]}
-          items:    { amount: 8,  itemgenlist: Basic Items   }
+          items:    { amount: 7,  itemgenlist: Basic Items   }
           enemies:
             amount: [12,15]
             generated:
@@ -215,7 +215,7 @@ areas:
       - layout: *small_layouts
         content:
           features: { tileset: pebble_tiles}
-          items:    { amount: 5,  itemgenlist: Basic Items   }
+          items:    { amount: 8,  itemgenlist: Basic Items   }
           enemies:
             amount: [12,15]
             generated:
@@ -225,7 +225,7 @@ areas:
       - layout: *small_layouts 
         content:
           features: { tileset: *all_tilesets}
-          items:    { amount: 5,  itemgenlist: Basic Items   }
+          items:    { amount: 8,  itemgenlist: Basic Items   }
           enemies:
             amount: 15
             generated:
@@ -236,7 +236,7 @@ areas:
       - layout: *medium_layouts
         content:
           features: { tileset: *all_tilesets}
-          items:    { amount: 5,  itemgenlist: Basic Items   }
+          items:    { amount: 8,  itemgenlist: Basic Items   }
           enemies:
             amount: [14,16]
             generated:
@@ -247,7 +247,7 @@ areas:
       - layout: *medium_layouts
         content:
           features: { tileset: *all_tilesets}
-          items:    { amount: 6,  itemgenlist: Basic Items   }
+          items:    { amount: 8,  itemgenlist: Basic Items   }
           enemies:
             amount: [18,22]
             generated:
@@ -258,7 +258,7 @@ areas:
       - layout: *large_layouts
         content:
           features: { tileset: *all_tilesets}
-          items:    { amount: 7,  itemgenlist: Basic Items   }
+          items:    { amount: 10,  itemgenlist: Basic Items   }
           enemies:   
             amount: 25       
             generated: *hard_enemies
@@ -267,7 +267,7 @@ areas:
       - layout: *large_layouts
         content:
           features: { tileset: *all_tilesets}
-          items:    { amount: 8,  itemgenlist: Basic Items   }
+          items:    { amount: 12,  itemgenlist: Basic Items   }
           enemies:   
             amount: 30       
             generated: *harder_enemies
@@ -275,7 +275,7 @@ areas:
       - layout: *large_layouts
         content:
           features: { tileset: *all_tilesets, stairs_down: 0}
-          items:    { amount: 9,  itemgenlist: Basic Items   }
+          items:    { amount: 14,  itemgenlist: Basic Items   }
           enemies:          
             amount: 40
             generated:

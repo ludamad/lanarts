@@ -67,32 +67,16 @@ void MonsterController::finish_copy(GameLevelState* level) {
 	}
 }
 
-void MonsterController::deregister_enemy(EnemyInst* enemy) {
-//	coll_avoid.remove_object(enemy->collision_simulation_id());
+void MonsterController::serialize(SerializeBuffer& serializer) {
+	serializer.write_container(mids);
+	serializer.write(monsters_wandering_flag);
 }
-//void MonsterController::shift_target(GameState* gs) {
-//	if (!targetted)
-//		return; //Shouldn't auto-target if no targets are possible
-//	int i, j;
-//	for (i = 0; i < mids.size(); i++) {
-//		if (mids[i] == targetted)
-//			break;
-//	}
-//	PlayerInst* player = gs->local_player();
-//
-//	for (j = i + 1; j % mids.size() != i; j++) {
-//		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[j % mids.size()]);
-//		if (e == NULL)
-//			continue;
-//
-//		bool isvisible = gs->object_visible_test(e, player, false);
-//		if (isvisible) {
-//			targetted = e->id;
-//			return;
-//		}
-//	}
-//
-//}
+
+void MonsterController::deserialize(
+		SerializeBuffer& serializer) {
+	serializer.read_container(mids);
+	serializer.read(monsters_wandering_flag);
+}
 
 int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 	//Use a 'GameView' object to make use of its helper methods

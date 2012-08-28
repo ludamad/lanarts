@@ -56,11 +56,10 @@ public:
 
 	PlayerDataEntry& get_entry_by_netid(int netid);
 
-	void set_local_player(int idx) {
-		_local_player_idx = idx;
+	void set_local_player_idx(int idx);
+	int get_local_player_idx() {
+		return _local_player_idx;
 	}
-
-	// Used during a game reset
 	void remove_all_players(GameState* gs);
 	void copy_to(PlayerData& pc) const;
 
@@ -77,5 +76,6 @@ int player_get_playernumber(GameState* gs, PlayerInst* p);
 void players_gain_xp(GameState* gs, int xp);
 
 void players_poll_for_actions(GameState* gs);
+
 
 #endif /* PLAYERDATA_H_ */

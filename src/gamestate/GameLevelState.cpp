@@ -7,6 +7,8 @@
 
 #include "GameState.h"
 
+#include "../serialize/SerializeBuffer.h"
+
 #include "../objects/player/PlayerInst.h"
 
 GameLevelState::GameLevelState(int levelid, int w, int h, bool wandering_flag,
@@ -57,6 +59,38 @@ static void update_player_fields_of_view(GameState* gs) {
 	for (int i = 0; i < players.size(); i++) {
 		players[i]->update_field_of_view(gs);
 	}
+}
+
+void GameLevelState::serialize(GameState* gs, SerializeBuffer& serializer) {
+	serializer.write_container(exits);
+	serializer.write_container(entrances);
+	serializer.write_container(rooms);
+	serializer.write(_levelid);
+	serializer.write(_steps_left);
+	serializer.write(_width);
+	serializer.write(_height);
+	serializer.write(_is_simulation);
+
+	tiles().serialize(serializer);
+	game_inst_set().serialize(gs, serializer);
+	monster_controller().serialize(serializer);
+}
+
+void GameLevelState::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	serializer.read_container(exits);
+	serializer.read_container(entrances);
+	serializer.read_container(rooms);
+	serializer.read(_levelid);
+	serializer.read(_steps_left);
+	serializer.read(_width);
+	serializer.read(_height);
+	serializer.read(_is_simulation);
+
+	tiles().deserialize(serializer);
+	collision_avoidance().clear();
+	game_inst_set().deserialize(gs, serializer);
+	monster_controller().deserialize(serializer);
+
 }
 
 void GameLevelState::step(GameState* gs) {

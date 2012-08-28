@@ -105,12 +105,12 @@ private:
 
 	// Hashset portion
 	int next_id, unit_amnt, unit_capacity;
-	InstanceState* unit_set;
+	std::vector<InstanceState> unit_set;
 
 	// Grid portion
 	int grid_w, grid_h;
 	//Holds units IDs, 0 if empty
-	InstanceLinkedList* unit_grid;
+	std::vector<InstanceLinkedList> unit_grid;
 
 	// Internal structure upkeep functions
 	void __remove_instance(InstanceState* state);

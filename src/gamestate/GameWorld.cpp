@@ -56,27 +56,51 @@ void GameWorld::place_inst(GeneratedLevel& genlevel, GameInst* inst) {
 }
 
 void GameWorld::serialize(SerializeBuffer& serializer) {
+	_enemies_seen.serialize(serializer);
+
+	serializer.write_int(get_current_level_id());
+	serializer.write_int(level_states.size());
 	GameLevelState* original = gs->get_level();
 
 	for (int i = 0; i < level_states.size(); i++) {
-		gs->set_level(level_states[i]);
-		gs->tiles().serialize(serializer);
-		level_states[i]->game_inst_set().serialize(gs, serializer);
+		GameLevelState* lvl = level_states[i];
+		serializer.write(lvl->width());
+		serializer.write(lvl->height());
+		gs->set_level(lvl);
+		lvl->serialize(gs, serializer);
 	}
 
 	gs->set_level(original);
 }
 
 void GameWorld::deserialize(SerializeBuffer& serializer) {
+	_enemies_seen.deserialize(serializer);
+
+	int nlevels, currlevel;
+	serializer.read_int(currlevel);
+
+	serializer.read_int(nlevels);
+	for (int i = nlevels; i < level_states.size(); i++) {
+		delete level_states.at(i);
+	}
+	level_states.resize(nlevels, NULL);
+
 	GameLevelState* original = gs->get_level();
 
 	for (int i = 0; i < level_states.size(); i++) {
+		int width, height;
+		serializer.read(width);
+		serializer.read(height);
+		if (level_states[i] == NULL) {
+			level_states[i] = new GameLevelState(i, width, height, false,
+					false);
+		}
 		gs->set_level(level_states[i]);
-		gs->tiles().deserialize(serializer);
-		level_states[i]->game_inst_set().deserialize(gs, serializer);
+		level_states[i]->deserialize(gs, serializer);
 	}
 
-	gs->set_level(original);
+	gs->set_level(level_states.at(currlevel));
+	midstep = false;
 }
 
 void GameWorld::spawn_players(GeneratedLevel& genlevel, void** player_instances,

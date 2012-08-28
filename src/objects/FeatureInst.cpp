@@ -98,9 +98,19 @@ bool feature_exists_near(GameState* gs, const Pos& p) {
 	return gs->object_radius_test(midx.x, midx.y, 4);
 }
 
-void FeatureInst::serialize(GameState *gs, SerializeBuffer & serializer) {
+void FeatureInst::serialize(GameState* gs, SerializeBuffer& serializer) {
+	GameInst::serialize(gs, serializer);
+	serializer.write_int(feature);
+	serializer.write_int(last_seen_spr);
+	serializer.write_int(spriteid);
+	serializer.write_int(sprite_frame);
 }
 
-void FeatureInst::deserialize(GameState *gs, SerializeBuffer & serializer) {
+void FeatureInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	GameInst::deserialize(gs, serializer);
+	serializer.read_int(feature);
+	serializer.read_int(last_seen_spr);
+	serializer.read_int(spriteid);
+	serializer.read_int(sprite_frame);
 }
 

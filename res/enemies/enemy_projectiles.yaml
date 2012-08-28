@@ -2,6 +2,7 @@
 projectiles:
   - name: Storm Bolt
     weapon_class: magic
+    damage_type: {magic: 1.0}
     damage: { magic: 1.0 }    # 100% magic
     power:  { magic: 0.2 }   
     range: 130

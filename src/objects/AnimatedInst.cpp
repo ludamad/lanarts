@@ -56,19 +56,19 @@ void AnimatedInst::copy_to(GameInst *inst) const {
 	*(AnimatedInst*)inst = *this;
 }
 
-AnimatedInst *AnimatedInst::clone() const {
+AnimatedInst* AnimatedInst::clone() const {
 	return new AnimatedInst(*this);
 }
 
-void AnimatedInst::serialize(GameState *gs, SerializeBuffer & serializer)
-{
+void AnimatedInst::serialize(GameState* gs, SerializeBuffer& serializer) {
+	GameInst::serialize(gs, serializer);
+	SERIALIZE_POD_REGION(serializer, this, textcol, animatetime);
+	serializer.write(text);
 }
 
-
-
-void AnimatedInst::deserialize(GameState *gs, SerializeBuffer & serializer)
-{
+void AnimatedInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	GameInst::deserialize(gs, serializer);
+	DESERIALIZE_POD_REGION(serializer, this, textcol, animatetime);
+	serializer.read(text);
 }
-
-
 

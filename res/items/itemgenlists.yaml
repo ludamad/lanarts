@@ -2,24 +2,32 @@
 itemgen_lists:
   - name: Basic Items
     items: &BasicItems
+    - { item: Gold,               chance: 125, quantity: [5,15]  }
+    #Projectiles
     - { item: Arrow,              chance: 15,  quantity: [5,15]  }
     - { item: Silver Arrow,       chance: 10,  quantity: [3,5]   }
-    - { item: Short Bow,          chance: 10                     }
     - { item: Stone,              chance: 15,  quantity: [5,15]  }
-    - { item: Gold,               chance: 75,  quantity: [5,15]  }
-    - { item: Haste Scroll,       chance: 3                      }
-    - { item: Health Potion,      chance: 10                     }
-    - { item: Mana Potion,        chance: 10                     }
+    - { item: Battle Axe,         chance: 2                      }
+    #Weapons
+    - { item: Short Bow,          chance: 10                     }
+    - { item: Long Bow,           chance: 2                      }
     - { item: Dagger,             chance: 10                     }
     - { item: Short Sword,        chance: 10                     }
     - { item: Mace,               chance: 5                      }
-    - { item: Battle Axe,         chance: 2                     }
+    #Scrolls
+    - { item: Haste Scroll,       chance: 3                      }
     - { item: Strength Scroll,    chance: 2                      }
     - { item: Scroll of Escape,   chance: 3                      }
     - { item: Magic Scroll,       chance: 2                      }
     - { item: Defence Scroll,     chance: 2                      }
     - { item: Will Scroll,        chance: 2                      }
+    #Potions
+    - { item: Health Potion,      chance: 10                     }
+    - { item: Mana Potion,        chance: 10                     }
+    #Armours
     - { item: Leather Armour,     chance: 4                      }
+    - { item: Chainmail,          chance: 2                      }
+    - { item: Platemail,          chance: 1                      }
     - { item: Magic Robe,         chance: 4                      }
     - { item: Magic Sword,        chance: 2                      }
   - name: Store Items

@@ -8,6 +8,8 @@
 
 #include <set>
 
+#include "../serialize/SerializeBuffer.h"
+
 #include "../lanarts_defines.h"
 
 class EnemiesSeen {
@@ -29,6 +31,22 @@ public:
 
 	int amount() const {
 		return enemies_seen.size();
+	}
+	void serialize(SerializeBuffer& serializer) {
+		serializer.write_int(amount());
+		for (iterator it = begin(); it != end(); it++) {
+			serializer.write(*it);
+		}
+	}
+	void deserialize(SerializeBuffer& serializer) {
+		enemies_seen.clear();
+		int amnt;
+		serializer.read_int(amnt);
+		for (int i = 0; i < amnt; i++) {
+			enemy_id id;
+			serializer.read(id);
+			enemies_seen.insert(id);
+		}
 	}
 
 private:

@@ -9,6 +9,8 @@
 #include "../collision_filters.h"
 #include "../../util/math_util.h"
 
+#include "../../serialize/SerializeBuffer.h"
+
 #include "../../stats/item_data.h"
 #include "../../display/colour_constants.h"
 #include "../../display/sprite_data.h"
@@ -21,7 +23,7 @@ void StoreInst::step(GameState* gs) {
 	}
 	GameInst* player = NULL;
 	gs->object_radius_test(this, &player, 1, player_colfilter, x, y, 24);
-	if (player == (GameInst*) gs->local_player()) {
+	if (player == (GameInst*)gs->local_player()) {
 		gs->game_hud().override_sidebar_contents(&sidebar_display);
 	}
 }
@@ -39,7 +41,7 @@ void StoreInst::draw(GameState* gs) {
 
 void StoreInst::copy_to(GameInst* inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(StoreInst*) inst = *this;
+	*(StoreInst*)inst = *this;
 }
 
 void StoreInst::init(GameState* gs) {
@@ -48,5 +50,20 @@ void StoreInst::init(GameState* gs) {
 
 StoreInst* StoreInst::clone() const {
 	return new StoreInst(*this);
+}
+
+void StoreInst::serialize(GameState* gs, SerializeBuffer& serializer) {
+	GameInst::serialize(gs, serializer);
+	inv.serialize(serializer);
+	serializer.write(last_seen_spr);
+	serializer.write(spriteid);
+}
+
+void StoreInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	GameInst::deserialize(gs, serializer);
+	sidebar_display.init(this, gs->game_hud().sidebar_content_area());
+	inv.deserialize(serializer);
+	serializer.read(last_seen_spr);
+	serializer.read(spriteid);
 }
 
