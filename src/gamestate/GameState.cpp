@@ -178,6 +178,7 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	serializer.read_int(this->frame_n);
 	world.deserialize(serializer);
 	player_data().deserialize(this, serializer);
+
 	_view.sharp_center_on(local_player()->pos());
 }
 

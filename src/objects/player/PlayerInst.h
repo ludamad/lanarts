@@ -103,10 +103,10 @@ public:
 		return _path_to_player;
 	}
 
-private:
-	bool actions_set() {
+	bool& actions_set() {
 		return actions_set_for_turn;
 	}
+private:
 
 	void enqueue_io_movement_actions(GameState* gs, int& dx, int& dy);
 	bool enqueue_io_spell_actions(GameState* gs);

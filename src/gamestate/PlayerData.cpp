@@ -17,7 +17,7 @@
 PlayerInst* PlayerDataEntry::player() {
 	GameInst* local = player_inst.get_instance();
 	LANARTS_ASSERT(!local || dynamic_cast<PlayerInst*>(local));
-	return (PlayerInst*)local;
+	return (PlayerInst*) local;
 }
 
 void PlayerData::update_fieldsofview(GameState* gs) {
@@ -60,7 +60,7 @@ std::vector<PlayerInst*> PlayerData::players_in_level(level_id level) {
 		GameInst* player = _players[i].player_inst.get_instance();
 		if (player && player->current_level == level) {
 			LANARTS_ASSERT(!player || dynamic_cast<PlayerInst*>(player));
-			ret.push_back((PlayerInst*)player);
+			ret.push_back((PlayerInst*) player);
 		}
 	}
 	return ret;
@@ -156,7 +156,8 @@ int player_get_playernumber(GameState* gs, PlayerInst* p) {
 
 static void player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
 	const int POLL_MS_TIMEOUT = 1 /*millsecond*/;
-	while (true) {
+	GameNetConnection& net = gs->net_connection();
+	while (!net.has_incoming_sync()) {
 		if (pde.player()->is_local_player()) {
 			pde.player()->enqueue_io_actions(gs);
 			break;

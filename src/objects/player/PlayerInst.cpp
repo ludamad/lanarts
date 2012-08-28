@@ -125,7 +125,7 @@ void PlayerInst::shift_autotarget(GameState* gs) {
 			// Exit when we wrap around if we have a target
 			return;
 		}
-		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[j]);
+		EnemyInst* e = (EnemyInst*) gs->get_instance(mids[j]);
 		bool isvisible = e != NULL && gs->object_visible_test(e, this, false);
 		if (isvisible) {
 			current_target = e->id;
@@ -197,13 +197,13 @@ void PlayerInst::draw(GameState* gs) {
 
 void PlayerInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(PlayerInst*)inst = *this;
+	*(PlayerInst*) inst = *this;
 }
 
 void PlayerInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	CombatGameInst::serialize(gs, serializer);
 	serializer.write(actions_set_for_turn);
-	serializer.write_container(queued_actions);
+//	serializer.write_container(queued_actions);
 
 	SERIALIZE_POD_REGION(serializer, this, local, spellselect);
 }
@@ -211,7 +211,8 @@ void PlayerInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	CombatGameInst::deserialize(gs, serializer);
 	serializer.read(actions_set_for_turn);
-	serializer.read_container(queued_actions);
+//	serializer.read_container(queued_actions);
+	queued_actions.clear();
 	_path_to_player.calculate_path(gs, x, y, PLAYER_PATHING_RADIUS);
 	update_field_of_view(gs);
 	DESERIALIZE_POD_REGION(serializer, this, local, spellselect);

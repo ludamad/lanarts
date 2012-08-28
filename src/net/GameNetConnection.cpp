@@ -61,11 +61,11 @@ void GameNetConnection::set_accepting_connections(bool accept) {
 
 static void gamenetconnection_packet_callback(receiver_t sender, void* context,
 		const char* msg, size_t len) {
-	((GameNetConnection*)context)->_handle_message(sender, msg, len);
+	((GameNetConnection*) context)->_handle_message(sender, msg, len);
 }
 void GameNetConnection::poll_messages(int timeout) {
 	if (_connection) {
-		_connection->poll(gamenetconnection_packet_callback, (void*)this,
+		_connection->poll(gamenetconnection_packet_callback, (void*) this,
 				timeout);
 	}
 }
@@ -101,7 +101,7 @@ void net_recv_connection_affirm(SerializeBuffer& sb, int sender,
 	sb.read_int(classtype);
 	printf("connection affirm read\n");
 	pd.register_player(name, NULL, classtype, sender);
-	printf("now there are %d players\n", (int)pd.all_players().size());
+	printf("now there are %d players\n", (int) pd.all_players().size());
 	pd.set_local_player_idx(0);
 }
 
@@ -169,6 +169,16 @@ void net_send_game_init_data(GameNetConnection& net, PlayerData& pd, int seed) {
 	}
 }
 
+static void post_synch(GameState* gs) {
+	std::vector<PlayerDataEntry>& pdes = gs->player_data().all_players();
+	for (int i = 0; i < pdes.size(); i++) {
+		pdes[i].action_queue.clear();
+		pdes[i].action_queue.queue_actions_for_frame(ActionQueue(),
+				gs->frame());
+	}
+	gs->local_player()->actions_set() = true;
+}
+
 void net_send_synch_data(GameNetConnection& net, GameState* gs) {
 	SerializeBuffer& sb = net.grab_buffer(GameNetConnection::PACKET_FORCE_SYNC);
 	if (!net.is_connected())
@@ -177,8 +187,14 @@ void net_send_synch_data(GameNetConnection& net, GameState* gs) {
 	gs->rng().init_genrand(mtwistseed);
 	sb.write_int(mtwistseed);
 	std::vector<PlayerDataEntry>& pdes = gs->player_data().all_players();
+	gs->local_player()->actions_set() = false;
 	gs->serialize(sb);
 	net.send_packet(sb, NetConnection::ALL_RECEIVERS);
+	post_synch(gs);
+	// Wait for clients to receive the synch data before continuing
+	net.wait_for_ack(GameNetConnection::PACKET_SYNC_ACK, true);
+
+	net_send_synch_ack(net, NetConnection::ALL_RECEIVERS);
 }
 
 void net_recv_synch_data(SerializeBuffer& sb, GameState* gs) {
@@ -194,6 +210,27 @@ void net_recv_synch_data(SerializeBuffer& sb, GameState* gs) {
 	gs->player_data().set_local_player_idx(nplayer);
 }
 
+void net_send_synch_ack(GameNetConnection& net, int sender) {
+	SerializeBuffer& sb = net.grab_buffer(GameNetConnection::PACKET_SYNC_ACK);
+	net.send_packet(sb);
+}
+
+bool GameNetConnection::consume_sync_messages(GameState* gs) {
+	if (_synch_buffer->empty()) {
+		return false;
+	}
+	printf("Receiving\n");
+	net_recv_synch_data(*_synch_buffer, gs);
+	_synch_buffer->clear();
+
+	net_send_synch_ack(*this, NetConnection::ALL_RECEIVERS);
+	post_synch(gs);
+	// Wait for server to receive acks for all clients before continuing
+	wait_for_ack(PACKET_SYNC_ACK);
+
+	return true;
+}
+
 void net_send_chatmessage(GameNetConnection& net, ChatMessage & message) {
 	SerializeBuffer& sb = net.grab_buffer(
 			GameNetConnection::PACKET_CHAT_MESSAGE);
@@ -201,10 +238,53 @@ void net_send_chatmessage(GameNetConnection& net, ChatMessage & message) {
 	net.send_packet(sb);
 }
 
-void net_send_chatmessage(GameNetConnection& net, GameState* gs) {
-	SerializeBuffer& sb = net.grab_buffer(
-			GameNetConnection::PACKET_CHAT_MESSAGE);
-	net.send_packet(sb);
+struct recv_ack_helper {
+	int mynetid;
+	std::vector<bool> received;
+	GameNetConnection::message_t expected;
+	recv_ack_helper(int mynetid, int nplayers, GameNetConnection::message_t exp) :
+			mynetid(mynetid), received(nplayers), expected(exp) {
+	}
+	bool received_all() {
+		for (int i = 0; i < received.size(); i++) {
+			if (!received[i] && i != mynetid)
+				return false;
+		}
+		return true;
+	}
+	bool received_one() {
+		for (int i = 0; i < received.size(); i++) {
+			if (received[i])
+				return true;
+		}
+		return false;
+	}
+
+};
+static void gamenetconnection_recv_ack(receiver_t sender, void* context,
+		const char* msg, size_t len) {
+	int type = *(int*) msg;
+	recv_ack_helper* helper = (recv_ack_helper*) context;
+	if (type == helper->expected) {
+		helper->received[sender] = true;
+	}
+}
+
+void GameNetConnection::wait_for_ack(message_t msg, bool from_all) {
+	const int timeout = 10;
+	PlayerDataEntry& pde = pd.local_player_data();
+	recv_ack_helper helper(pde.net_id, pd.all_players().size(), msg);
+	while (true) {
+		_connection->poll(gamenetconnection_recv_ack, (void*) &helper, timeout);
+		if (helper.received_one() && !from_all)
+			break;
+		if (helper.received_all() && from_all)
+			break;
+	}
+}
+
+bool GameNetConnection::has_incoming_sync() {
+	return !_synch_buffer->empty();
 }
 
 void GameNetConnection::_handle_message(int sender, const char* msg,
@@ -241,84 +321,10 @@ void GameNetConnection::_handle_message(int sender, const char* msg,
 	}
 
 	case PACKET_FORCE_SYNC: {
+		printf("Receiving synch message\n");
 		std::swap(_synch_buffer, _message_buffer);
 		break;
 	}
 	}
 
 }
-bool GameNetConnection::consume_sync_messages(GameState* gs) {
-	if (_synch_buffer->empty()) {
-		return false;
-	}
-	printf("Receiving\n");
-	net_recv_synch_data(*_synch_buffer, gs);
-	_synch_buffer->clear();
-	return true;
-}
-
-//TODO: net redo
-//
-//void GameNetConnection::broadcast_packet(const NetPacket & packet,
-//		bool send_to_new) {
-//	if (connect) {
-//		connect->broadcast_packet(packet, send_to_new);
-//	}
-//}
-//
-//void GameNetConnection::finalize_connections() {
-//	if (connect) {
-//		connect->finalize_connections();
-//	}
-//}
-//
-//void GameNetConnection::wait_for_packet(NetPacket& packet, int packettype) {
-//	if (!connect) {
-//		return;
-//	}
-//	while (!connect->get_next_packet(packet)) {
-//		//Continue until condition is true
-//	}
-//}
-//
-//bool GameNetConnection::get_next_packet(NetPacket& packet, packet_t type) {
-//	if (!connect) {
-//		return false;
-//	}
-//	return connect->get_next_packet(packet, type);
-//}
-//
-//bool GameNetConnection::check_integrity(GameState* gs, int value) {
-//	NetPacket packet;
-//	packet.add_int(value);
-//	packet.encode_header();
-//	std::vector<NetPacket> packets;
-//	gs->net_connection().send_and_sync(packet, packets, false);
-//	for (int i = 0; i < packets.size(); i++) {
-//		NetPacket& p = packets[i];
-//		int theirvalue = p.get_int();
-//		if (theirvalue != value) {
-//			fprintf(
-//					stderr,
-//					"Conflicting value theirs 0x%X vs ours 0x%X for sender %d\n",
-//					theirvalue, value, i);
-//			fflush(stderr);
-//			return false;
-//		}
-//	}
-//	return true;
-//}
-//
-//void GameNetConnection::send_and_sync(const NetPacket & packet,
-//		std::vector<NetPacket>& received, bool send_to_new) {
-//	if (!connect)
-//		return;
-//	NetPacket local;
-//	printf("Sending synched packet\n");
-//	connect->broadcast_packet(packet, send_to_new);
-//	printf("Waiting for synched packet\n");
-//
-//	wait_for_packet(local);
-//	received.push_back(local);
-//}
-
