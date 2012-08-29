@@ -1,5 +1,4 @@
 Large:
-- Versatile save format that allows for resuming a networked game 
 - Add allied monsters that stay close to their 'owner' and shoot at nearby enemies
 	Details:
 	-May need two pathfinds per monster
@@ -24,7 +23,7 @@ Medium:
 	- Don't crowd the level with too many room placements
 - Add elemental damage types and mixed elemental type creatures/monsters/attacks
 - Unify all equipment type code paths
-- Fighters too weak later on - give them lots of equipment only they can wear
+- [FIX ATTEMPTED] Fighters too weak later on - give them lots of equipment only they can wear
 	- can simply require X and X skill for magic items - weak system
 
 Small:
@@ -129,3 +128,6 @@ Completed:
 
 < 24/08/2012
 - [COULD NOT REPRODUCE] Arrows/ranged weapons dont obey target - they hit closest enemy only
+
+< 29/08/2012
+- [DONE] Versatile save format that allows for resuming a networked game 

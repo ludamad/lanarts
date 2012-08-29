@@ -79,23 +79,24 @@ struct GameInstSetFunctions { //Helper class
 
 void GameInstSet::update_statepointer_for_reallocate_(
 		InstanceState** stateptr) {
-	if (*stateptr)
+	if (*stateptr) {
 		*stateptr = tset_find<GameInstSetFunctions>((*stateptr)->inst->id,
 				&unit_set[0], unit_capacity);
+		LANARTS_ASSERT(*stateptr != NULL);
+	}
 }
 void GameInstSet::update_depthlist_for_reallocate_(InstanceLinkedList& list) {
 	update_statepointer_for_reallocate_(&list.start_of_list);
 	update_statepointer_for_reallocate_(&list.end_of_list);
 }
 void GameInstSet::reallocate_internal_data() {
-	{
-		unit_capacity *= 2;
-		std::vector<InstanceState> new_set(unit_capacity);
+	unit_capacity *= 2;
+	std::vector<InstanceState> new_set(unit_capacity);
 
-		tset_add_all<GameInstSetFunctions>(&unit_set[0], unit_capacity / 2,
-				&new_set[0], unit_capacity);
-		unit_set.swap(new_set);
-	}
+	tset_add_all<GameInstSetFunctions>(&unit_set[0], unit_set.size(),
+			&new_set[0], new_set.size());
+	unit_set.swap(new_set);
+
 	//Fix pointers for grid
 	for (int i = 0; i < unit_capacity; i++) {
 		if (unit_set[i].inst) {
@@ -105,6 +106,7 @@ void GameInstSet::reallocate_internal_data() {
 			update_statepointer_for_reallocate_(&unit_set[i].next_same_depth);
 		}
 	}
+
 	DepthMap::iterator it = depthlist_map.begin();
 	for (; it != depthlist_map.end(); it++) {
 		update_depthlist_for_reallocate_(it->second);

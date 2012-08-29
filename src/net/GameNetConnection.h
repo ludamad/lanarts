@@ -61,7 +61,7 @@ public:
 
 	void set_accepting_connections(bool accept);
 
-	void wait_for_ack(message_t msg, bool from_all = true);
+	void wait_for_ack(message_t msg);
 	void poll_messages(int timeout = 0);
 	bool consume_sync_messages(GameState* gs);
 	bool has_incoming_sync();
@@ -71,8 +71,9 @@ public:
 
 	//Do-not-call-directly:
 	void _queue_message(SerializeBuffer* serializer, int receiver = -1);
-	bool _handle_async_message(int sender, SerializeBuffer& serializer);
-	void _handle_message(int sender, const char* msg, size_t len);
+	// Returns true if message was consumed
+	bool _handle_message(int sender, SerializeBuffer& serializer);
+	void _message_callback(int sender, const char* msg, size_t len, bool queue_messages = false);
 
 private:
 	//Keep back-references so that we can alter world state based on messages received
@@ -86,7 +87,7 @@ private:
 	NetConnection* _connection;
 };
 
-void net_send_sync_ack(GameNetConnection& net, int sender);
+void net_send_sync_ack(GameNetConnection& net);
 void net_send_synch_data(GameNetConnection& net, GameState* gs);
 void net_send_connection_affirm(GameNetConnection& net, const std::string& name,
 		class_id classtype);

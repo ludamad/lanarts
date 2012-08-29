@@ -106,7 +106,7 @@ static int get_itemslotn(StoreInventory& inv, const BBox& bbox, int mx,
 	}
 
 	int posx = (mx - bbox.x1) / TILE_SIZE;
-	int posy = (my - bbox.y1) / TILE_SIZE;
+	int posy = (my - bbox.y1) / STORE_SLOT_H;
 	int slot = 5 * posy + posx;
 
 	if (slot < 0 || slot >= inv.max_size())
