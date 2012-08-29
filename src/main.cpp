@@ -95,10 +95,6 @@ static void game_loop(GameState* gs) {
 		if (gs->key_press_state(SDLK_F4)) {
 			paused = !paused;
 		}
-		if (gs->key_press_state(SDLK_F5)) {
-			net_send_synch_data(gs->net_connection(), gs);
-			save_game_to_file(gs, "savefile.save");
-		}
 		gs->net_connection().consume_sync_messages(gs);
 		if (gs->key_press_state(SDLK_F6)) {
 			if (gs->player_data().all_players().size() == 1) {
@@ -131,6 +127,14 @@ static void game_loop(GameState* gs) {
 			step_events++;
 			step_time += step_timer.get_microseconds();
 
+			// Do not move this. It is done after the step event,
+			// but before actions are queued for the next turn
+			if (gs->key_press_state(SDLK_F5)) {
+				net_send_state_and_sync(gs->net_connection(), gs);
+				save_game_to_file(gs, "savefile.save");
+			}
+
+			// The following will queue actions for the next step
 			bool is_done = (!paused && !gs->pre_step())
 					|| (paused && !gs->update_iostate());
 			if (is_done) {

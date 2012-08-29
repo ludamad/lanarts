@@ -233,7 +233,6 @@ void GameWorld::step() {
 		GameLevelState* level = level_states[i];
 		level->step(gs);
 	}
-	gs->frame()++;
 
 	midstep
 	= false;

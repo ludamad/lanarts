@@ -88,7 +88,7 @@ private:
 };
 
 void net_send_sync_ack(GameNetConnection& net);
-void net_send_synch_data(GameNetConnection& net, GameState* gs);
+void net_send_state_and_sync(GameNetConnection& net, GameState* gs);
 void net_send_connection_affirm(GameNetConnection& net, const std::string& name,
 		class_id classtype);
 void net_send_game_init_data(GameNetConnection& net, PlayerData& pd, int seed);

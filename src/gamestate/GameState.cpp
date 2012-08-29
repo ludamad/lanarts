@@ -235,6 +235,7 @@ void GameState::step() {
 	hud.step(this);
 	world.step(); //Has pointer to this (GameState) object
 	lua_gc(L, LUA_GCSTEP, 0); // collect garbage incrementally
+	frame_n++;
 }
 
 int GameState::key_down_state(int keyval) {

@@ -92,7 +92,7 @@ void net_recv_connection_affirm(SerializeBuffer& sb, int sender,
 	sb.read_int(classtype);
 	printf("connection affirm read\n");
 	pd.register_player(name, NULL, classtype, sender);
-	printf("now there are %d players\n", (int)pd.all_players().size());
+	printf("now there are %d players\n", (int) pd.all_players().size());
 	pd.set_local_player_idx(0);
 }
 
@@ -163,22 +163,26 @@ void net_send_game_init_data(GameNetConnection& net, PlayerData& pd, int seed) {
 static void post_synch(GameState* gs) {
 	std::vector<PlayerDataEntry>& pdes = gs->player_data().all_players();
 	for (int i = 0; i < pdes.size(); i++) {
-		pdes[i].action_queue.clear();
-		pdes[i].action_queue.queue_actions_for_frame(ActionQueue(),
-				gs->frame());
+		PlayerDataEntry& pde = pdes[i];
+		pde.action_queue.clear();
+		pde.action_queue.queue_actions_for_frame(ActionQueue(), gs->frame());
+		pde.player()->actions_set() = true;
 	}
-	gs->local_player()->actions_set() = true;
 }
 
-void net_send_synch_data(GameNetConnection& net, GameState* gs) {
+void net_send_state_and_sync(GameNetConnection& net, GameState* gs) {
 	SerializeBuffer& sb = net.grab_buffer(GameNetConnection::PACKET_FORCE_SYNC);
 	if (!net.is_connected())
 		return;
+	// Make sure we don't receive any stray actions after sync.
+	gs->local_player()->enqueue_io_actions(gs);
+	players_poll_for_actions(gs);
+
+	// Make sure we are all sync'd with the same rng, even if we have to contrive a state.
 	int mtwistseed = gs->rng().rand();
 	gs->rng().init_genrand(mtwistseed);
 	sb.write_int(mtwistseed);
-	std::vector<PlayerDataEntry>& pdes = gs->player_data().all_players();
-	gs->local_player()->actions_set() = false;
+
 	gs->serialize(sb);
 	net.send_packet(sb, NetConnection::ALL_RECEIVERS);
 
@@ -218,7 +222,7 @@ static bool extract_message(QueuedMessage& qm,
 			delayed_messages.erase(delayed_messages.begin() + i);
 			return true;
 		}
-		msg->move_read_position(-(int)sizeof(int));
+		msg->move_read_position(-(int) sizeof(int));
 	}
 	return false;
 }
@@ -229,7 +233,7 @@ static bool has_message(std::vector<QueuedMessage>& delayed_messages,
 		SerializeBuffer* msg = delayed_messages[i].message;
 		int msg_type;
 		msg->read_int(msg_type);
-		msg->move_read_position(-(int)sizeof(int));
+		msg->move_read_position(-(int) sizeof(int));
 		if (type == msg_type) {
 			return true;
 		}
@@ -243,6 +247,10 @@ bool GameNetConnection::consume_sync_messages(GameState* gs) {
 	if (!extract_message(qm, _delayed_messages, PACKET_FORCE_SYNC)) {
 		return false;
 	}
+	// Make sure we don't receive any stray actions after sync.
+//	gs->local_player()->enqueue_io_actions(gs);
+//	players_poll_for_actions(gs);
+
 	printf("Found sync buffer!\n");
 	net_recv_sync_data(*qm.message, gs);
 	delete qm.message;
@@ -299,7 +307,7 @@ bool GameNetConnection::_handle_message(int sender,
 		break;
 	}
 	default:
-		serializer.move_read_position(-(int)sizeof(int));
+		serializer.move_read_position(-(int) sizeof(int));
 		return false;
 	}
 	return true;
@@ -324,7 +332,7 @@ void GameNetConnection::_message_callback(int sender, const char* msg,
 
 static void gamenetconnection_consume_message(receiver_t sender, void* context,
 		const char* msg, size_t len) {
-	((GameNetConnection*)context)->_message_callback(sender, msg, len, false);
+	((GameNetConnection*) context)->_message_callback(sender, msg, len, false);
 }
 
 void GameNetConnection::poll_messages(int timeout) {
@@ -337,14 +345,14 @@ void GameNetConnection::poll_messages(int timeout) {
 				i--;
 			}
 		}
-		_connection->poll(gamenetconnection_consume_message, (void*)this,
+		_connection->poll(gamenetconnection_consume_message, (void*) this,
 				timeout);
 	}
 }
 
 static void gamenetconnection_queue_message(receiver_t sender, void* context,
 		const char* msg, size_t len) {
-	((GameNetConnection*)context)->_message_callback(sender, msg, len, true);
+	((GameNetConnection*) context)->_message_callback(sender, msg, len, true);
 }
 
 void GameNetConnection::wait_for_ack(message_t msg) {
@@ -359,7 +367,7 @@ void GameNetConnection::wait_for_ack(message_t msg) {
 
 	bool all_ack = false;
 	while (!all_ack) {
-		_connection->poll(gamenetconnection_queue_message, (void*)this,
+		_connection->poll(gamenetconnection_queue_message, (void*) this,
 				timeout);
 
 		while (extract_message(qm, _delayed_messages, msg)) {
