@@ -272,11 +272,15 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	const int PICKUP_RATE = 10;
-	ItemInst* item = (ItemInst*)gs->get_instance(action.use_id);
-	if (!item)
+	GameInst* inst = gs->get_instance(action.use_id);
+	if (!inst) {
 		return;
-	const Item& type = item->item_type();
-	int amnt = item->item_quantity();
+	}
+	ItemInst* iteminst = dynamic_cast<ItemInst*>(inst);
+	LANARTS_ASSERT(iteminst);
+
+	const Item& type = iteminst->item_type();
+	int amnt = iteminst->item_quantity();
 
 	if (type == get_item_by_name("Gold")) {
 		gold() += amnt;
@@ -293,7 +297,7 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	}
 
 	cooldowns().reset_pickup_cooldown(PICKUP_RATE);
-	gs->remove_instance(item);
+	gs->remove_instance(iteminst);
 }
 
 void PlayerInst::enqueue_network_actions(GameState *gs) {
@@ -353,6 +357,10 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 
 void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
 	StoreInst* store = (StoreInst*)gs->get_instance(action.use_id);
+	if (!store) {
+		return;
+	}
+	LANARTS_ASSERT(dynamic_cast<StoreInst*>(gs->get_instance(action.use_id)));
 	StoreInventory& inv = store->inventory();
 	StoreItemSlot& slot = inv.get(action.use_id2);
 	if (gold() >= slot.cost) {
