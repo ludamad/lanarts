@@ -95,10 +95,10 @@ static StoreInventory generate_shop_inventory(MTwist& mt, int itemn) {
 	for (int i = 0; i < itemn; /*below*/) {
 		const ItemGenChance& igc = generate_item_choice(mt, itemgenlist);
 		Item item = Item(igc.itemtype);
-		int cost = mt.rand(item.item_entry().shop_cost);
+		int quantity = mt.rand(igc.quantity);
+		int cost = mt.rand(item.item_entry().shop_cost.multiply(quantity));
 		if (cost > 0) {
-			int quantity = mt.rand(igc.quantity);
-			inv.add(item, quantity, quantity * cost);
+			inv.add(item, quantity, cost);
 			i++;
 		}
 	}
@@ -109,7 +109,7 @@ static void generate_shop(GameState* gs, GeneratedLevel& level, MTwist& mt,
 	Pos worldpos = level.get_world_coordinate(p);
 	level.at(p).has_instance = true;
 
-	int itemn = mt.rand(Range(2, 10));
+	int itemn = mt.rand(Range(2, 14));
 	gs->add_instance(
 			new StoreInst(worldpos, false, get_sprite_by_name("store"),
 					generate_shop_inventory(mt, itemn)));

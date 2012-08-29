@@ -58,7 +58,6 @@ void GameWorld::place_inst(GeneratedLevel& genlevel, GameInst* inst) {
 void GameWorld::serialize(SerializeBuffer& serializer) {
 	_enemies_seen.serialize(serializer);
 
-	serializer.write_int(get_current_level_id());
 	serializer.write_int(level_states.size());
 	GameLevelState* original = gs->get_level();
 
@@ -76,9 +75,7 @@ void GameWorld::serialize(SerializeBuffer& serializer) {
 void GameWorld::deserialize(SerializeBuffer& serializer) {
 	_enemies_seen.deserialize(serializer);
 
-	int nlevels, currlevel;
-	serializer.read_int(currlevel);
-
+	int nlevels;
 	serializer.read_int(nlevels);
 	for (int i = nlevels; i < level_states.size(); i++) {
 		delete level_states.at(i);
@@ -99,7 +96,7 @@ void GameWorld::deserialize(SerializeBuffer& serializer) {
 		level_states[i]->deserialize(gs, serializer);
 	}
 
-	gs->set_level(level_states.at(currlevel));
+	gs->set_level(original);
 	midstep = false;
 }
 

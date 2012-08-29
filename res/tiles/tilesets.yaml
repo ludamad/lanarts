@@ -9,6 +9,10 @@ tilesets:
     floor_tile: sand_rock
     wall_tile: hive_wall
 
+  - tileset: crypt_tiles
+    floor_tile: crypt_floor
+    wall_tile: crypt_wall
+
   - tileset: lair_tiles1
     floor_tile: lair_floor
     alt_floor_tile: mesh

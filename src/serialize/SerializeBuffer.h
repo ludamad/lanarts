@@ -99,11 +99,11 @@ public:
 	void read(T& t) {
 		read_raw((char*)&t, sizeof(T));
 	}
-	template<class T>
-	void peek(T& t) {
-		read(t);
-		_read_position -= sizeof(T);
-	}
+//	template<class T>
+//	void peek(T& t) {
+//		read(t);
+//		_read_position -= sizeof(T);
+//	}
 
 	~SerializeBuffer();
 
@@ -117,6 +117,10 @@ public:
 	void clear();
 	void flush();
 	void fill();
+	void move_read_position(int len) {
+		_read_position += len;
+		LANARTS_ASSERT(_read_position >= 0);
+	}
 	bool empty() const {
 		return _buffer.empty();
 	}

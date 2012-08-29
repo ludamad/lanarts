@@ -5,6 +5,7 @@ armours:
     armour_type: none
 
   - name: Leather Armour
+    shop_cost: [15, 25]
     description: A durable, flexible armour.
     spr_item: leather armour
     armour_type: body armour
@@ -15,6 +16,7 @@ armours:
     spell_cooldown_multiplier: 1.1
 
   - name: Chainmail
+    shop_cost: [45, 60]
     description: A strong armour with limited flexibility.
     spr_item: chainmail
     armour_type: body armour
@@ -25,6 +27,7 @@ armours:
     spell_cooldown_multiplier: 1.1
 
   - name: Platemail
+    shop_cost: [95, 105]
     description: A strong, heavy armour.
     spr_item: platemail
     armour_type: body armour
@@ -35,6 +38,7 @@ armours:
     spell_cooldown_multiplier: 1.1
 
   - name: Magic Robe
+    shop_cost: [10, 20]
     description: A robe that guards against magic attacks.
     spr_item: robe
     armour_type: body armour

@@ -154,7 +154,7 @@ large_layouts: &large_layouts
 lair_tilesets: &lair_tilesets
   [lair_tiles1, lair_tiles2, lair_tiles3]
 all_tilesets: &all_tilesets
-  [lair_tiles1, lair_tiles2, lair_tiles3, snake_tiles, cobalt_tiles,
+  [lair_tiles1, lair_tiles2, lair_tiles3, snake_tiles, cobalt_tiles, crypt_tiles, 
   pebble_tiles, crystal_tiles, crystal_tiles_with_marble, cobble]
 
 areas:
@@ -205,7 +205,7 @@ areas:
       #Level 4
       - layout: [*small_layout1]
         content:
-          features: { tileset: [crystal_tiles, crystal_tiles_with_marble]}
+          features: { tileset: [crystal_tiles, crystal_tiles_with_marble, crypt_tiles]}
           items:    { amount: 7,  itemgenlist: Basic Items   }
           enemies:
             amount: [12,15]

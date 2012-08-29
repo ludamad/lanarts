@@ -24,6 +24,7 @@ void GameInst::draw(GameState* gs) {
 }
 
 void GameInst::init(GameState* gs) {
+	current_level = gs->game_world().get_current_level_id();
 }
 
 void GameInst::deinit(GameState* gs) {

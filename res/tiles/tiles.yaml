@@ -13,6 +13,11 @@ tiles:
     file: res/tiles/dngn_wall/brickdark/brick_dark
     variations: 7
     extension: .png
+
+  - name: crypt_wall
+    file: res/tiles/dngn_wall/crypt/crypt
+    variations: 15
+    extension: .png
     
   - name: hive_wall
     file: res/tiles/dngn_wall/hive/hive
@@ -44,6 +49,12 @@ tiles:
   - name: stairs_down
     file: res/tiles/features/stairs_down.png
 #Floors
+
+  - name: crypt_floor
+    file: res/tiles/dngn_floor/crypt2/crypt
+    variations: 8
+    extension: .png
+
   - name: cobalt_floor
     file: res/tiles/dngn_floor/cobalt/black_cobalt
     variations: 12

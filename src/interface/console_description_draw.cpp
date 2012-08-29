@@ -56,6 +56,14 @@ static void draw_stat_with_prefix(GameState* gs, const char* prefix, int stat,
 			prefix);
 	gl_printf_y_centered(gs->primary_font(), stat_col, p.w + x, y, "%d", stat);
 }
+static void draw_stat_with_formatted_prefix(GameState* gs, const char* prefix,
+		const char* format, int stat, int x, int y, Colour prefix_col =
+				COL_PALE_YELLOW, Colour stat_col = COL_PALE_RED) {
+	Dim p = gl_printf_y_centered(gs->primary_font(), prefix_col, x, y, "%s",
+			prefix);
+	gl_printf_y_centered(gs->primary_font(), stat_col, p.w + x, y, format,
+			stat);
+}
 static void draw_descript_with_prefix(GameState* gs, const char* prefix,
 		const char* descript, int x, int y, Colour prefix_col = COL_PALE_YELLOW,
 		Colour stat_col = COL_PALE_RED) {
@@ -153,6 +161,13 @@ static void draw_weapon_description_overlay(GameState* gs,
 			stat_x, stat_sy + interval_y);
 	draw_statmult_with_prefix(gs, "Power: ", wentry.power, estats.core,
 			stat_x + interval_x, stat_sy + interval_y);
+
+	// Damage penetration
+	int piercing = round(100 - wentry.resist_modifier * 100);
+	Colour statcol = piercing < 0 ? COL_PALE_RED : COL_PALE_GREEN;
+	draw_stat_with_formatted_prefix(gs, "Piercing: ", "%d%%", piercing,
+			stat_x + interval_x * 2, stat_sy + interval_y, COL_PALE_YELLOW,
+			statcol);
 
 	//Third row
 	draw_stat_with_prefix(gs, "Cooldown: ", wentry.cooldown, stat_x,

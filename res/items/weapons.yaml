@@ -6,6 +6,7 @@ weapons:
     spr_item: hand
     #Damage: { base: <range>, strength: <multiplier>, magic: <multiplier> }
     damage: {base: [2,5], strength: 0.75}
+    resist_modifier: 0.75
     power: {base: 0, strength: 0.2}
     range: 7
     cooldown: 30
@@ -13,7 +14,8 @@ weapons:
   - name: Dagger
     description: A short, swift, pointy blade.
     weapon_class: short blades
-    damage: {base: [4,6], strength: 0.876}
+    damage: {base: [4,6], strength: 0.875}
+    resist_modifier: 0.875
     power: {base: 0, strength: 0.2}
     range: 7
     cooldown: 35
@@ -30,20 +32,22 @@ weapons:
     spr_item: short sword
 
   - name: Mace
-    shop_cost: [30, 45]
+    shop_cost: [35, 50]
     weapon_class: maces and flails
     description: An large, strong mace.
     damage: {base: [5,10], strength: 1.25}
+    resist_modifier: 1.1
     power: {base: [2,5], strength: 0.5}
     range: 7
     cooldown: 55
     spr_item: mace
 
   - name: Magic Sword
-    shop_cost: [60, 80]
+    shop_cost: [75,95]
     weapon_class: short blades
     description: An enchanted sword that saps your mana reserves, but does greater damage.
-    damage: {base: [4,8], strength: 1.1}
+    damage: {base: [4,8], strength: 1.0, magic: 0.2}
+    resist_modifier: 1.1
     power: {base: 1, strength: 0.2}
     range: 7
     on_hit_func: use_magic_sword
@@ -51,10 +55,11 @@ weapons:
     spr_item: magic sword
 
   - name: Battle Axe
-    shop_cost: [97, 102]
+    shop_cost: [85,105]
     weapon_class: short blades
     description: A slow powerful axe that decimates the weak.
     damage: {base: [8,12], strength: 1.4 }
+    resist_modifier: 1.4
     power: {base: 6, strength: 0.35}
     range: 7
     cooldown: 65
@@ -73,13 +78,14 @@ weapons:
     spr_item: bow1
 
   - name: Long Bow
-    shop_cost: [10, 20]
+    shop_cost: [75, 85]
     description: A powerful long-bow.
     weapon_class: bows
     uses_projectile: yes
     #Stats
     damage: {base: [3,6], strength: 1.2}
+    resist_modifier: 1.2
     power: {base: 2, strength: 0.24}
     range: 400
     cooldown: 55
-    spr_item: bow1
+    spr_item: long bow

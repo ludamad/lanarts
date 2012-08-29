@@ -178,6 +178,7 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	serializer.read_int(this->frame_n);
 	world.deserialize(serializer);
 	player_data().deserialize(this, serializer);
+	world.set_current_level(local_player()->current_level);
 
 	_view.sharp_center_on(local_player()->pos());
 }
@@ -307,7 +308,6 @@ void GameState::draw(bool drawhud) {
 
 obj_id GameState::add_instance(GameInst* inst) {
 	obj_id id = get_level()->game_inst_set().add_instance(inst);
-	inst->current_level = get_level()->id();
 	inst->init(this);
 	return id;
 }

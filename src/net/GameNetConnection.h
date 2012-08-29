@@ -21,6 +21,14 @@ class NetConnection;
 class PlayerData;
 struct ChatMessage;
 
+struct QueuedMessage {
+	SerializeBuffer* message;
+	int sender;
+	QueuedMessage(SerializeBuffer* message = NULL, int sender = -1) :
+			message(message), sender(sender) {
+	}
+};
+
 class GameNetConnection {
 public:
 	/*Message types*/
@@ -53,7 +61,7 @@ public:
 
 	void set_accepting_connections(bool accept);
 
-	void wait_for_ack(message_t msg, bool from_all = false);
+	void wait_for_ack(message_t msg, bool from_all = true);
 	void poll_messages(int timeout = 0);
 	bool consume_sync_messages(GameState* gs);
 	bool has_incoming_sync();
@@ -62,6 +70,8 @@ public:
 	bool check_integrity(GameState* gs, int value);
 
 	//Do-not-call-directly:
+	void _queue_message(SerializeBuffer* serializer, int receiver = -1);
+	bool _handle_async_message(int sender, SerializeBuffer& serializer);
 	void _handle_message(int sender, const char* msg, size_t len);
 
 private:
@@ -70,12 +80,13 @@ private:
 	PlayerData& pd;
 	GameStateInitData& init_data;
 
-	SerializeBuffer* _synch_buffer;
+	std::vector<QueuedMessage> _delayed_messages;
+
 	SerializeBuffer* _message_buffer;
 	NetConnection* _connection;
 };
 
-void net_send_synch_ack(GameNetConnection& net, int sender);
+void net_send_sync_ack(GameNetConnection& net, int sender);
 void net_send_synch_data(GameNetConnection& net, GameState* gs);
 void net_send_connection_affirm(GameNetConnection& net, const std::string& name,
 		class_id classtype);

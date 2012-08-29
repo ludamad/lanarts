@@ -50,6 +50,9 @@ struct Range {
 			min(min), max(max) {
 		LANARTS_ASSERT(min <= max);
 	}
+	Range multiply(int n) const {
+		return Range(min * n, max * n);
+	}
 };
 
 /*Represents an integer x,y pair position*/

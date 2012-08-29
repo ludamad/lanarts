@@ -533,6 +533,12 @@ void lua_serialize(SerializeBuffer& serialize, lua_State* L, int idx) {
 }
 
 void lua_deserialize(SerializeBuffer& serialize, lua_State* L) {
+
+	if (!global_buffer_initialized) {
+		buf_init(L, &global_mar_buffer);
+		global_buffer_initialized = true;
+	}
+
 	int size;
 	serialize.read_int(size);
 
