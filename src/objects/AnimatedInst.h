@@ -26,6 +26,7 @@ public:
 					y), vx(vx), vy(vy), orientx(orientx), orienty(orienty), sprite(
 					sprite), timeleft(animatetime), animatetime(animatetime), text(
 					text) {
+		LANARTS_ASSERT(animatetime!= 0);
 	}
 	virtual ~AnimatedInst();
 	virtual void step(GameState* gs);

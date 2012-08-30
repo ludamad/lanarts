@@ -65,7 +65,7 @@ void ProjectileInst::deinit(GameState* gs) {
 
 void ProjectileInst::copy_to(GameInst* inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(ProjectileInst*)inst = *this;
+	*(ProjectileInst*) inst = *this;
 }
 
 ProjectileInst::ProjectileInst(const Projectile& projectile,
@@ -100,8 +100,8 @@ static void lua_hit_callback(lua_State* L, LuaValue& callback,
 
 void ProjectileInst::step(GameState* gs) {
 	Pos tile_hit;
-	int newx = (int)round(rx + vx); //update based on rounding of true float
-	int newy = (int)round(ry + vy);
+	int newx = (int) round(rx + vx); //update based on rounding of true float
+	int newy = (int) round(ry + vy);
 	bool collides = gs->tile_radius_test(newx, newy, radius, true, -1,
 			&tile_hit);
 	if (bounce) {
@@ -123,13 +123,13 @@ void ProjectileInst::step(GameState* gs) {
 		gs->remove_instance(this);
 	}
 
-	x = (int)round(rx += vx); //update based on rounding of true float
-	y = (int)round(ry += vy);
+	x = (int) round(rx += vx); //update based on rounding of true float
+	y = (int) round(ry += vy);
 
 	range_left -= speed;
 
 	GameInst* colobj = NULL;
-	CombatGameInst* origin = (CombatGameInst*)gs->get_instance(origin_id);
+	CombatGameInst* origin = (CombatGameInst*) gs->get_instance(origin_id);
 
 	if (dynamic_cast<PlayerInst*>(origin)) {
 		if (sole_target)
@@ -138,7 +138,7 @@ void ProjectileInst::step(GameState* gs) {
 			gs->object_radius_test(this, &colobj, 1, &enemy_colfilter);
 
 		if (colobj) {
-			EnemyInst* victim = (EnemyInst*)colobj;
+			EnemyInst* victim = (EnemyInst*) colobj;
 			if (origin) {
 				origin->signal_attacked_successfully();
 			}
@@ -156,11 +156,11 @@ void ProjectileInst::step(GameState* gs) {
 			float ry = vy / speed * .5;
 			gs->add_instance(
 					new AnimatedInst(victim->x - 5 + rx * 5, victim->y + ry * 5,
-							0, 0, -1, 25, rx, ry, AnimatedInst::DEPTH,
+							-1, 25, rx, ry, 0, 0, AnimatedInst::DEPTH,
 							buffstr));
 
 			if (victim->damage(gs, damage)) {
-				PlayerInst* p = (PlayerInst*)origin;
+				PlayerInst* p = (PlayerInst*) origin;
 				PlayerData& pc = gs->player_data();
 				p->signal_killed_enemy();
 
@@ -177,7 +177,7 @@ void ProjectileInst::step(GameState* gs) {
 	} else {
 		gs->object_radius_test(this, &colobj, 1, &player_colfilter);
 		if (colobj) {
-			CombatGameInst* victim = (CombatGameInst*)colobj;
+			CombatGameInst* victim = (CombatGameInst*) colobj;
 			if (origin) {
 				origin->signal_attacked_successfully();
 			}
@@ -255,6 +255,6 @@ void ProjectileInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 }
 
 bool ProjectileInst::bullet_target_hit2(GameInst* self, GameInst* other) {
-	return ((ProjectileInst*)self)->sole_target == other->id;
+	return ((ProjectileInst*) self)->sole_target == other->id;
 }
 
