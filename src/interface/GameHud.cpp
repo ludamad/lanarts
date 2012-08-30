@@ -26,8 +26,6 @@
 
 #include "sidebar/SpellsContent.h"
 
-const int INVENTORY_POSITION = 342;
-
 BBox GameHud::minimap_bbox(GameState* gs) {
 	int minimap_relposx = 20, minimap_relposy = 64 + 45;
 	int sx = sidebar_box.x1 + minimap_relposx, sy = sidebar_box.y1
@@ -51,8 +49,6 @@ bool GameHud::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	PlayerInst* player = gs->local_player();
 	bool mouse_within_view = gs->mouse_x() < gs->view().width;
 	int level = gs->get_level()->id(), frame = gs->frame();
-
-	Inventory inv = player->inventory();
 
 	for (int i = 0; i < this->queued_actions.size(); i++) {
 		queued_actions.push_back(this->queued_actions[i]);

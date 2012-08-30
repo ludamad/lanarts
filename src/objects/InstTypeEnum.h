@@ -81,7 +81,7 @@ inline GameInst* from_inst_type(InstType type) {
 	case STORE_INST:
 		return new StoreInst(Pos(), NONE, NONE, StoreInventory());
 	case ANIMATED_INST:
-		return new AnimatedInst(Pos(), NONE, NONE);
+		return new AnimatedInst(Pos(), NONE);
 	case FEATURE_INST:
 		return new FeatureInst(Pos(), FeatureInst::feature_t(NONE), false);
 	case ITEM_INST:

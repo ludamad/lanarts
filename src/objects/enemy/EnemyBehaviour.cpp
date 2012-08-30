@@ -2,6 +2,7 @@
 
 #include "../../serialize/SerializeBuffer.h"
 
+
 void EnemyBehaviour::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write_container(path);
 	serializer.write_int(current_action);

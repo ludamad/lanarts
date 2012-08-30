@@ -72,7 +72,7 @@ ProjectileInst::ProjectileInst(const Projectile& projectile,
 		const EffectiveAttackStats& atkstats, obj_id origin_id,
 		const Pos& start, const Pos& target, float speed, int range,
 		obj_id sole_target, bool bounce, int hits) :
-		GameInst(start.x, start.y, projectile.projectile_entry().radius, false), rx(
+		GameInst(start.x, start.y, projectile.projectile_entry().radius, false, DEPTH), rx(
 				start.x), ry(start.y), speed(speed), team(
 				0 /*TODO: properly init*/), origin_id(origin_id), sole_target(
 				sole_target), projectile(projectile), atkstats(atkstats), range_left(

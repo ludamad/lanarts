@@ -68,7 +68,8 @@ unsigned int EnemyInst::integrity_hash() {
 	unsigned int hash = CombatGameInst::integrity_hash();
 	combine_hash(hash, eb.current_node, eb.path_steps);
 	combine_hash(hash, eb.path_start.x, eb.path_start.y);
-	combine_hash(hash, collision_simulation_id(), eb.current_action);
+// TODO: hash the content of the simulation object, the id is a bad thing to hash
+//	combine_hash(hash, collision_simulation_id(), eb.current_action);
 	return hash;
 }
 
