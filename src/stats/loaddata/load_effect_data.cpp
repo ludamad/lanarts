@@ -19,6 +19,7 @@ EffectEntry parse_effect(const YAML::Node& n) {
 	entry.finish_func = LuaValue(
 			parse_defaulted(n, "finish_func", std::string()));
 	entry.stat_func = LuaValue(parse_defaulted(n, "stat_func", std::string()));
+	entry.attack_stat_func = LuaValue(parse_defaulted(n, "attack_stat_func", std::string()));
 	entry.step_func = LuaValue(parse_defaulted(n, "step_func", std::string()));
 
 	entry.allowed_actions.can_use_stairs = parse_defaulted(n, "can_use_stairs", true);

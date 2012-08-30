@@ -173,7 +173,7 @@ areas:
         content:
           features: { tileset: *lair_tilesets }
           items:    { amount: 3,  itemgenlist: Basic Items   }
-          enemies: { wandering: no, amount: 5, generated: *easy_animals }
+          enemies: { wandering: no, amount: 6, generated: *easy_animals }
           
       #Level 1
       - layout: *tiny_layouts

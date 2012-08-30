@@ -1,11 +1,16 @@
 ---
 spells:
 
-  - name: Berserk
+  - name: Magic Arrow
     description: 
-      Allows you to strike powerful blows for a limited duration,
-      afterwards you are slower and vulnerable.
-    mp_cost: 0
-    cooldown: 30
-    spr_spell: berserk
-    can_cast_with_held_key: no
+      Allows you to create an arrow of pure energy, requires a bow. 
+      Does well against strudy opponents.
+    mp_cost: 10
+    cooldown: 45
+    prereq_func: 
+      function(caster, _, _) 
+        return caster.stats.weapon_type == "bows"
+      end
+    resist_modifier: 0.5
+    spr_spell: magic arrow
+    projectile: Magic Arrow

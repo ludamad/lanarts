@@ -13,6 +13,8 @@
 
 #include "stats.h"
 
+#include "../lua/LuaValue.h"
+
 #include "../lanarts_defines.h"
 
 struct WeaponEntry {

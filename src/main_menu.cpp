@@ -115,7 +115,7 @@ void main_menu_loop(GameState* gs, int width, int height) {
 
 	gs->add_instance(new AnimatedInst(halfw, 100, get_sprite_by_name("logo")));
 	gs->add_instance(
-			new AnimatedInst(halfw - 100, 500, -1, -1, 0.0f, 0.0f,
+			new AnimatedInst(halfw - 100, 500, -1, -1, 0.0f, 0.0f, 0.0f, 0.0f,
 					AnimatedInst::DEPTH, HELP_TEXT, Colour(255, 255, 255)));
 
 	setup_mainmenu_buttons(gs, &exit, halfw, 300);

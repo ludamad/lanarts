@@ -1,6 +1,8 @@
 #include "lunar.h"
 #include "lua_api.h"
 
+#include "../stats/weapon_data.h"
+
 #include "../stats/stats.h"
 #include "../stats/combat_stats.h"
 
@@ -49,6 +51,10 @@ static int lua_member_lookup(lua_State* L) {
 		if (strncmp(cstr, n, sizeof(n))==0){\
 		lua_pushnumber(L, m );\
 	}
+#define IFLUA_STR_MEMB_LOOKUP(n, m) \
+		if (strncmp(cstr, n, sizeof(n))==0){\
+		lua_pushlstring(L, m.c_str(), m.size() );\
+	}
 
 	bind_t* state = lunar_t::check(L, 1);
 	const char* cstr = lua_tostring(L, 2);
@@ -71,6 +77,7 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_NUM_MEMB_LOOKUP("xp", stats->class_stats.xp)
 	else IFLUA_NUM_MEMB_LOOKUP("xpneeded", stats->class_stats.xpneeded)
 	else IFLUA_NUM_MEMB_LOOKUP("level", stats->class_stats.xplevel)
+	else IFLUA_STR_MEMB_LOOKUP("weapon_type", stats->equipment.weapon.weapon_entry().weapon_class)
 	else {
 		lua_getglobal(L, bind_t::className);
 		int tableind = lua_gettop(L);

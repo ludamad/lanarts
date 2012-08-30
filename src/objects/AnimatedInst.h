@@ -19,12 +19,13 @@ public:
 		RADIUS = 10, VISION_SUBSQRS = 1, DEPTH = -100
 	};
 	AnimatedInst(int x, int y, sprite_id sprite, int animatetime = -1,
-			float vx = 0, float vy = 0, int depth = DEPTH,
-			const std::string& text = std::string(),
+			float vx = 0, float vy = 0, float orientx = 0, float orienty = 0,
+			int depth = DEPTH, const std::string& text = std::string(),
 			Colour textcol = Colour(255, 0, 0)) :
 			GameInst(x, y, RADIUS, false, depth), textcol(textcol), rx(x), ry(
-					y), vx(vx), vy(vy), sprite(sprite), timeleft(animatetime), animatetime(
-					animatetime), text(text) {
+					y), vx(vx), vy(vy), orientx(orientx), orienty(orienty), sprite(
+					sprite), timeleft(animatetime), animatetime(animatetime), text(
+					text) {
 	}
 	virtual ~AnimatedInst();
 	virtual void step(GameState* gs);
@@ -36,7 +37,7 @@ public:
 	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
 private:
 	Colour textcol;
-	float rx, ry, vx, vy;
+	float rx, ry, vx, vy, orientx, orienty;
 	int sprite, timeleft, animatetime;
 	std::string text;
 };

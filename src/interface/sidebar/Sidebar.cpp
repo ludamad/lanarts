@@ -64,8 +64,8 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 	gl_printf(gs->primary_font(), COL_WHITE, x, y, "Kills %d",
 			player_inst->number_of_kills());
 	if (gs->game_settings().regen_on_death) {
-		gl_printf(gs->primary_font(), COL_PALE_RED, x + x_interval, y, "Deaths %d",
-				player_inst->number_of_deaths());
+		gl_printf(gs->primary_font(), COL_PALE_RED, x + x_interval, y,
+				"Deaths %d", player_inst->number_of_deaths());
 	} else {
 
 		gl_printf(gs->primary_font(), COL_PALE_BLUE, x + x_interval, y,
@@ -79,15 +79,20 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 			player_inst->gold());
 	y += y_interval;
 
-	gl_printf(gs->primary_font(), COL_MUTED_GREEN, x, y, "Strength %d", core.strength);
-	gl_printf(gs->primary_font(), COL_MUTED_GREEN, x + x_interval, y, "Magic %d",
-			core.magic);
+	gl_printf(gs->primary_font(), COL_MUTED_GREEN, x, y, "Strength %d",
+			core.strength);
+	gl_printf(gs->primary_font(), COL_MUTED_GREEN, x + x_interval, y,
+			"Magic %d", core.magic);
 	y += y_interval;
 
-	gl_printf(gs->primary_font(), COL_MUTED_GREEN, x, y, "Defence %d", core.defence);
+	gl_printf(gs->primary_font(), COL_MUTED_GREEN, x, y, "Defence %d",
+			core.defence);
 	gl_printf(gs->primary_font(), COL_MUTED_GREEN, x + x_interval, y, "Will %d",
 			core.willpower);
 	y += y_interval;
+//	gl_printf(gs->primary_font(), COL_MUTED_GREEN, x, y, "Hash 0x%X",
+//			gs->get_level()->game_inst_set().hash());
+//	y += y_interval;
 }
 
 static BBox content_area_box(const BBox& sidebar_box) {

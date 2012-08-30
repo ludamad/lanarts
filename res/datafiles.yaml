@@ -35,10 +35,12 @@ projectile_files:
   - items/projectiles.yaml
   - enemies/enemy_projectiles.yaml
   - spells/spell_projectiles.yaml
+  - spells/archer/projectiles.yaml
 
 spell_files: 
   - spells/fighter_spells.yaml
   - spells/spells.yaml
+  - spells/archer/spells.yaml
 
 sprite_files: 
   - classes/class_sprites.yaml

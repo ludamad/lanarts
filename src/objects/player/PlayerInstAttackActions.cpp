@@ -502,6 +502,7 @@ static void lua_hit_callback(lua_State* L, LuaValue& callback, GameInst* user,
 	}
 }
 
+#include "../../data/game_data.h"
 void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 	WeaponEntry& wentry = weapon().weapon_entry();
 	MTwist& mt = gs->rng();
@@ -525,9 +526,34 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		int weaprange = std::max(wentry.range, pentry.range);
 
 		AttackStats weaponattack(weapon());
+
+		bool wallbounce = false;
+		int nbounces = 0;
+		float movespeed = pentry.speed;
+		//XXX: Horrible hack REMOVE THIS LATER
+		if (class_stats().class_type().name == "Archer"
+				&& pentry.weapon_class == "bows") {
+			int xplevel = class_stats().xplevel;
+			float movebonus = class_stats().xplevel / 4.0f;
+			if (movebonus > 2)
+				movebonus = 2;
+			movespeed += movebonus;
+			if (xplevel >= 3) {
+				wallbounce = true;
+			}
+
+			if (core_stats().mp >= 10 && xplevel >= 4) {
+				nbounces = 3;
+				core_stats().mp -= 10;
+			} else if (core_stats().mp >= 5) {
+				nbounces = 2;
+				core_stats().mp -= 5;
+			}
+		}
+
 		GameInst* bullet = new ProjectileInst(projectile,
 				effective_atk_stats(mt, weaponattack), id, start, actpos,
-				pentry.speed, weaprange);
+				movespeed, weaprange, NONE, wallbounce, nbounces);
 		gs->add_instance(bullet);
 		cooldowns().reset_action_cooldown(
 				std::max(wentry.cooldown, pentry.cooldown));
@@ -565,7 +591,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 				players_gain_xp(gs, amnt);
 				snprintf(buffstr, 32, "%d XP", amnt);
 				gs->add_instance(
-						new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0,
+						new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0, 0, 0,
 								AnimatedInst::DEPTH, buffstr,
 								Colour(255, 215, 11)));
 			}

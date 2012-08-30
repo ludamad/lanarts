@@ -14,7 +14,7 @@
 
 struct EffectEntry {
 	std::string name;
-	LuaValue stat_func, init_func, finish_func, step_func;
+	LuaValue stat_func, attack_stat_func, init_func, finish_func, step_func;
 	Colour effected_colour;
 	sprite_id effected_sprite;
 	AllowedActions allowed_actions;
@@ -28,6 +28,7 @@ struct EffectEntry {
 		init_func.initialize(L);
 		finish_func.initialize(L);
 		stat_func.initialize(L);
+		attack_stat_func.initialize(L);
 		step_func.initialize(L);
 	}
 };

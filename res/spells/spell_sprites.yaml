@@ -5,6 +5,15 @@ sprites:
 
   - name: magic bolt
     file: res/sprites/effects/bolt05.png
+    
+  - name: crystal spear
+    type: directional
+    file: res/sprites/items/weapons/projectiles/crystal/crystal_spear
+    variations: 8
+    extension: .png
+    
+  - name: magic arrow
+    file: res/sprites/spells/magic_arrow.png
 
   - name: storm bolt
     file: res/sprites/effects/bolt07.png

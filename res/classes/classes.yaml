@@ -55,8 +55,7 @@ classes:
         equipment:
           weapon: Dagger
           inventory:
-            - item: Short Bow
-            - item: Arrow
+            - item: Stone
               amount: 10
     gain_per_level:
         hp: 25
@@ -70,12 +69,14 @@ classes:
    
   - name: Archer
     sprites: [archer]
-    spells: []
+    spells: 
+      - spell: Magic Arrow
+        level_needed: 2
     start_stats:
         movespeed: 4
-        hp: 110
-        mp: 40
-        hpregen: 0.055
+        hp: 80
+        mp: 80
+        hpregen: 0.044
         mpregen: 0.044
         strength: 6
         defence: 6
@@ -87,12 +88,12 @@ classes:
           inventory:
             - item: Dagger
     gain_per_level:
-        hp: 25
-        mp: 10
+        hp: 20
+        mp: 15
         hpregen: 0.010
         mpregen: 0.007
         strength: 2
-        magic: 1
-        defence: 2
+        magic: 2
+        defence: 1
         willpower: 1
    

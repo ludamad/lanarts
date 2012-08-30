@@ -13,6 +13,8 @@ AnimatedInst::~AnimatedInst() {
 }
 
 void AnimatedInst::step(GameState* gs) {
+	x = round(rx += vx);
+	y = round(ry += vy);
 	if (timeleft != -1 && --timeleft < 0) {
 		timeleft = 0;
 		gs->remove_instance(this);
@@ -20,11 +22,9 @@ void AnimatedInst::step(GameState* gs) {
 
 }
 void AnimatedInst::draw(GameState* gs) {
-	x = round(rx += vx);
-	y = round(ry += vy);
 	GameView& view = gs->view();
 	if (sprite > -1) {
-		GLimage& img = game_sprite_data[sprite].images[0];
+		GLimage& img = game_sprite_data[sprite].img();
 
 		int w = img.width, h = img.height;
 		int xx = x - w / 2, yy = y - h / 2;
@@ -35,7 +35,9 @@ void AnimatedInst::draw(GameState* gs) {
 			return;
 
 		Colour alphacol(255, 255, 255, 255 * timeleft / animatetime);
-		gl_draw_image(img, xx - view.x, yy - view.y, alphacol);
+
+		gl_draw_sprite(view, sprite, xx, yy, orientx, orienty, gs->frame(),
+				alphacol);
 	}
 	Colour wd(255 - textcol.r, 255 - textcol.g, 255 - textcol.b);
 	if (text.size() > 0) {
