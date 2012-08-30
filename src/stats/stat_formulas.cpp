@@ -51,7 +51,6 @@ static int magic_damage_formula(const EffectiveAttackStats& attacker,
 
 int damage_formula(const EffectiveAttackStats& attacker,
 		const EffectiveStats& defender) {
-	return 10;
 	float mdmg = magic_damage_formula(attacker, defender);
 	float pdmg = physical_damage_formula(attacker, defender);
 
