@@ -34,12 +34,12 @@ extern "C" {
 #include "util/Timer.h"
 
 static void continue_as_loner(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().frame_action_repeat = 0;
 }
 static void continue_as_hardcore(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().regen_on_death = false;
 	gs->game_settings().frame_action_repeat = 0;
@@ -47,26 +47,26 @@ static void continue_as_hardcore(GameState* gs, GameInst* _, void* flag) {
 
 static void continue_as_loner_save_replay(GameState* gs, GameInst* _,
 		void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().savereplay_file = "replays/replay";
 	gs->game_settings().frame_action_repeat = 0;
 }
 
 static void continue_as_load_replay(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().loadreplay_file = "replays/replay";
 	gs->game_settings().frame_action_repeat = 0;
 }
 
 static void continue_as_client(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().conntype = GameSettings::CLIENT;
 }
 
 static void continue_as_server(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().conntype = GameSettings::SERVER;
 }
 
@@ -113,9 +113,10 @@ void main_menu_loop(GameState* gs, int width, int height) {
 	gs->view().x = 0;
 	gs->view().y = 0;
 
-	gs->add_instance(new AnimatedInst(halfw, 100, get_sprite_by_name("logo")));
 	gs->add_instance(
-			new AnimatedInst(halfw - 100, 500, -1, -1, 0.0f, 0.0f, 0.0f, 0.0f,
+			new AnimatedInst(Pos(halfw, 100), get_sprite_by_name("logo")));
+	gs->add_instance(
+			new AnimatedInst(Pos(halfw - 100, 500), -1, -1, Posf(), Posf(),
 					AnimatedInst::DEPTH, HELP_TEXT, Colour(255, 255, 255)));
 
 	setup_mainmenu_buttons(gs, &exit, halfw, 300);
@@ -139,11 +140,11 @@ void main_menu_loop(GameState* gs, int width, int height) {
 }
 
 static void choose_fighter(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().classtype = get_class_by_name("Fighter");
 }
 static void choose_mage(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().classtype = get_class_by_name("Mage");
 }
 static void choose_druid(GameState* gs, GameInst* _, void* flag) {
@@ -151,7 +152,7 @@ static void choose_druid(GameState* gs, GameInst* _, void* flag) {
 //	gs->game_settings().classtype = get_class_by_name("Druid");
 }
 static void choose_archer(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().classtype = get_class_by_name("Archer");
 }
 
@@ -191,7 +192,8 @@ void class_menu_loop(GameState* gs, int width, int height) {
 	gs->view().x = 0;
 	gs->view().y = 0;
 
-	gs->add_instance(new AnimatedInst(halfw, 100, get_sprite_by_name("logo")));
+	gs->add_instance(
+			new AnimatedInst(Pos(halfw, 100), get_sprite_by_name("logo")));
 	setup_classmenu_buttons(gs, &exit, halfw, 300);
 
 	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {
@@ -207,7 +209,7 @@ void class_menu_loop(GameState* gs, int width, int height) {
 
 static void start_game_with_current_players(GameState* gs, GameInst* _,
 		void* flag) {
-	*(bool*)flag = true;
+	*(bool*) flag = true;
 	gs->game_settings().conntype = GameSettings::SERVER;
 }
 
@@ -253,7 +255,8 @@ void connection_menu_loop(GameState* gs, int width, int height) {
 	gs->view().x = 0;
 	gs->view().y = 0;
 
-	gs->add_instance(new AnimatedInst(halfw, 100, get_sprite_by_name("logo")));
+	gs->add_instance(
+			new AnimatedInst(Pos(halfw, 100), get_sprite_by_name("logo")));
 	setup_connectionmenu_buttons(gs, &exit, halfw, 300);
 
 	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {

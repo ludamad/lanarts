@@ -48,7 +48,7 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
 	char dmgstr[32];
 	snprintf(dmgstr, 32, "%d", dmg);
 	gs->add_instance(
-			new AnimatedInst(x, y, -1, 25, 0, 0, 0, 0, AnimatedInst::DEPTH,
+			new AnimatedInst(Pos(), -1, 25, Posf(), Posf(), AnimatedInst::DEPTH,
 					dmgstr, Colour(255, 148, 120)));
 
 	return damage(gs, dmg);
@@ -139,8 +139,8 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 	float rx, ry;
 	direction_towards(Pos(x, y), Pos(inst->x, inst->y), rx, ry, 0.5);
 	gs->add_instance(
-			new AnimatedInst(inst->x - 5 + rx * 5, inst->y + ry * 5, -1, 25, rx,
-					ry, 0, 0, AnimatedInst::DEPTH, dmgstr,
+			new AnimatedInst(Pos(inst->x - 5 + rx * 5, inst->y + ry * 5), -1,
+					25, Posf(rx, ry), Posf(), AnimatedInst::DEPTH, dmgstr,
 					Colour(255, 148, 120)));
 
 	cooldowns().reset_action_cooldown(atkstats.cooldown);
@@ -149,7 +149,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 	WeaponEntry wentry = weapon.weapon_entry();
 	if (wentry.name != "none") {
 		gs->add_instance(
-				new AnimatedInst(inst->x, inst->y, wentry.attack_sprite, 25));
+				new AnimatedInst(inst->pos(), wentry.attack_sprite, 25));
 	}
 
 	signal_attacked_successfully();
@@ -288,8 +288,8 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 }
 
 void CombatGameInst::update_position() {
-	x = (int)round(rx); //update based on rounding of true float
-	y = (int)round(ry);
+	x = (int) round(rx); //update based on rounding of true float
+	y = (int) round(ry);
 }
 
 void CombatGameInst::update_position(float newx, float newy) {
@@ -326,7 +326,7 @@ static void combine_stat_hash(unsigned int& hash, CombatStats& stats) {
 }
 unsigned int CombatGameInst::integrity_hash() {
 	unsigned int hash = GameInst::integrity_hash();
-	combine_hash(hash, (unsigned int&)vx, (unsigned int&)vy);
+	combine_hash(hash, (unsigned int&) vx, (unsigned int&) vy);
 	combine_stat_hash(hash, stats());
 	return hash;
 }

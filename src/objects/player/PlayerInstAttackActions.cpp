@@ -579,7 +579,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		}
 
 		for (int i = 0; i < numhit; i++) {
-			EnemyInst* e = (EnemyInst*)enemies[i];
+			EnemyInst* e = (EnemyInst*) enemies[i];
 			lua_hit_callback(gs->get_luastate(), wentry.on_hit_func, this, e);
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
 				PlayerData& pc = gs->player_data();
@@ -591,8 +591,8 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 				players_gain_xp(gs, amnt);
 				snprintf(buffstr, 32, "%d XP", amnt);
 				gs->add_instance(
-						new AnimatedInst(e->x - 5, e->y - 5, -1, 25, 0, 0, 0, 0,
-								AnimatedInst::DEPTH, buffstr,
+						new AnimatedInst(Pos(e->x - 5, e->y - 5), -1, 25,
+								Posf(), Posf(), AnimatedInst::DEPTH, buffstr,
 								Colour(255, 215, 11)));
 			}
 		}

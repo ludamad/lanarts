@@ -18,14 +18,14 @@ public:
 	enum {
 		RADIUS = 10, VISION_SUBSQRS = 1, DEPTH = -100
 	};
-	AnimatedInst(int x, int y, sprite_id sprite, int animatetime = -1,
-			float vx = 0, float vy = 0, float orientx = 0, float orienty = 0,
+	AnimatedInst(const Pos& pos, sprite_id sprite, int animatetime = -1,
+			const Posf& speed = Posf(), const Posf& orientation = Posf(),
 			int depth = DEPTH, const std::string& text = std::string(),
 			Colour textcol = Colour(255, 0, 0)) :
-			GameInst(x, y, RADIUS, false, depth), textcol(textcol), rx(x), ry(
-					y), vx(vx), vy(vy), orientx(orientx), orienty(orienty), sprite(
-					sprite), timeleft(animatetime), animatetime(animatetime), text(
-					text) {
+			GameInst(pos.x, pos.y, RADIUS, false, depth), textcol(textcol), rx(
+					pos.x), ry(pos.y), vx(speed.x), vy(speed.y), orientx(
+					orientation.x), orienty(orientation.y), sprite(sprite), timeleft(
+					animatetime), animatetime(animatetime), text(text) {
 		LANARTS_ASSERT(animatetime!= 0);
 	}
 	virtual ~AnimatedInst();

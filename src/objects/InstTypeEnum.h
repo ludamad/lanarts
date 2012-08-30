@@ -44,7 +44,8 @@ inline InstType get_inst_type(GameInst* inst) {
 		return PROJECTILE_INST;
 	} else if (dynamic_cast<ScriptedInst*>(inst)) {
 		return SCRIPTED_INST;
-	}LANARTS_ASSERT(false);
+	}
+	LANARTS_ASSERT(false);
 	return INVALID_INST;
 }
 
@@ -66,7 +67,8 @@ inline bool is_inst_type(GameInst* inst, InstType type) {
 		return dynamic_cast<ProjectileInst*>(inst) != NULL;
 	case SCRIPTED_INST:
 		return dynamic_cast<ScriptedInst*>(inst) != NULL;
-	}LANARTS_ASSERT(false);
+	}
+	LANARTS_ASSERT(false);
 	return false;
 }
 
@@ -79,7 +81,7 @@ inline GameInst* from_inst_type(InstType type) {
 	case STORE_INST:
 		return new StoreInst(Pos(), NONE, NONE, StoreInventory());
 	case ANIMATED_INST:
-		return new AnimatedInst(NONE, NONE, NONE);
+		return new AnimatedInst(Pos(), NONE, NONE);
 	case FEATURE_INST:
 		return new FeatureInst(Pos(), FeatureInst::feature_t(NONE), false);
 	case ITEM_INST:
@@ -89,7 +91,8 @@ inline GameInst* from_inst_type(InstType type) {
 				Pos(), Pos(), NONE, NONE);
 	case SCRIPTED_INST:
 		return new ScriptedInst(NONE, NONE, NONE);
-	}LANARTS_ASSERT(false);
+	}
+	LANARTS_ASSERT(false);
 	return NULL;
 }
 

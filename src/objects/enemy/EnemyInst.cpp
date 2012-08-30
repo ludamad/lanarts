@@ -139,13 +139,11 @@ void EnemyInst::draw(GameState* gs) {
 
 	if (gs->game_settings().draw_diagnostics) {
 		char statbuff[255];
-		snprintf(
-				statbuff,
-				255,
+		snprintf(statbuff, 255,
 				"simid=%d nvx=%f vy=%f\n chasetime=%d \n mdef=%d pdef=%d", // \n act=%d, path_steps = %d\npath_cooldown = %d\n",
 				simulation_id, vx, vy, eb.chase_timeout,
-				(int)effective_stats().magic.resistance,
-				(int)effective_stats().physical.resistance);
+				(int) effective_stats().magic.resistance,
+				(int) effective_stats().physical.resistance);
 		//eb.current_action,
 		//eb.path_steps, eb.path_cooldown);
 		gl_printf(gs->primary_font(), Colour(255, 255, 255),
@@ -184,7 +182,7 @@ bool EnemyInst::within_field_of_view(const Pos & pos) {
 
 void EnemyInst::die(GameState *gs) {
 	if (!destroyed) {
-		gs->add_instance(new AnimatedInst(x, y, etype().enemy_sprite, 20));
+		gs->add_instance(new AnimatedInst(pos(), etype().enemy_sprite, 20));
 		gs->remove_instance(this);
 
 		CollisionAvoidance& coll_avoid = gs->collision_avoidance();
@@ -194,13 +192,14 @@ void EnemyInst::die(GameState *gs) {
 		if (etype().death_sprite > -1) {
 			const int DEATH_SPRITE_TIMEOUT = 1600;
 			gs->add_instance(
-					new AnimatedInst(x, y, etype().death_sprite,
-							DEATH_SPRITE_TIMEOUT, 0, 0, ItemInst::DEPTH));
+					new AnimatedInst(pos(), etype().death_sprite,
+							DEATH_SPRITE_TIMEOUT, Posf(), Posf(),
+							ItemInst::DEPTH));
 		}
 	}
 }
 
 void EnemyInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(EnemyInst*)inst = *this;
+	*(EnemyInst*) inst = *this;
 }
