@@ -1,0 +1,11 @@
+---
+spells:
+
+  - name: Berserk
+    description: 
+      Allows you to strike powerful blows for a limited duration,
+      afterwards you are slower and vulnerable.
+    mp_cost: 0
+    cooldown: 30
+    spr_spell: berserk
+    can_cast_with_held_key: no

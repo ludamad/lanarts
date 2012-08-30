@@ -27,6 +27,7 @@ Medium:
 	- can simply require X and X skill for magic items - weak system
 
 Small:
+- Fix up menu to not use escape to continue (or do it consistently) and to not display the class select where it does not make sense
 - Have a flexible portal system that indicates which level to connect to
 - Add cooldowns to item use
 - Add cooldowns for each spell individually -and- have them show visually

@@ -68,3 +68,31 @@ classes:
         defence: 2
         willpower: 1
    
+  - name: Archer
+    sprites: [archer]
+    spells: []
+    start_stats:
+        movespeed: 4
+        hp: 110
+        mp: 40
+        hpregen: 0.055
+        mpregen: 0.044
+        strength: 6
+        defence: 6
+        willpower: 3
+        magic: 2
+        equipment:
+          weapon: Short Bow
+          projectile: { item: Arrow, amount: 20 } 
+          inventory:
+            - item: Dagger
+    gain_per_level:
+        hp: 25
+        mp: 10
+        hpregen: 0.010
+        mpregen: 0.007
+        strength: 2
+        magic: 1
+        defence: 2
+        willpower: 1
+   

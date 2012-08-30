@@ -32,7 +32,6 @@ int parse_sprite_number(const YAML::Node & n) {
 	return get_sprite_by_name(s.c_str());
 }
 
-
 int parse_sprite_number(const YAML::Node & n, const char *key) {
 	if (!yaml_has_node(n, key))
 		return -1;
@@ -129,6 +128,10 @@ static Weapon parse_as_weapon(const YAML::Node& n) {
 	std::string s = parse_str(n);
 	return Weapon(get_weapon_by_name(s.c_str()));
 }
+static Projectile parse_as_projectile(const YAML::Node& n) {
+	std::string s = parse_str(n);
+	return Projectile(get_projectile_by_name(s.c_str()));
+}
 
 Inventory parse_inventory(const YAML::Node& n) {
 	Inventory ret;
@@ -144,6 +147,11 @@ Equipment parse_equipment(const YAML::Node& n) {
 	ret.inventory = parse_inventory(n["inventory"]);
 	if (yaml_has_node(n, "weapon")) {
 		ret.weapon = parse_as_weapon(n["weapon"]);
+	}
+	if (yaml_has_node(n, "projectile")) {
+		const YAML::Node& pentry = n["projectile"];
+		ret.projectile = parse_as_projectile(pentry["item"]);
+		ret.projectile_amnt = parse_int(pentry["amount"]);
 	}
 	return ret;
 }

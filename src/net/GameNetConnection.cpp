@@ -175,8 +175,8 @@ void net_send_state_and_sync(GameNetConnection& net, GameState* gs) {
 	if (!net.is_connected())
 		return;
 	// Make sure we don't receive any stray actions after sync.
-	gs->local_player()->enqueue_io_actions(gs);
-	players_poll_for_actions(gs);
+//	gs->local_player()->enqueue_io_actions(gs);
+//	players_poll_for_actions(gs);
 
 	// Make sure we are all sync'd with the same rng, even if we have to contrive a state.
 	int mtwistseed = gs->rng().rand();

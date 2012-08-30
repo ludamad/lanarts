@@ -41,13 +41,15 @@ spell_files:
   - spells/spells.yaml
 
 sprite_files: 
+  - classes/class_sprites.yaml
+  - enemies/enemy_sprites.yaml
+  - spells/spell_sprites.yaml
+
   - sprites/armour_sprites.yaml
   - sprites/interface_sprites.yaml
   - sprites/item_sprites.yaml
   - sprites/feature_sprites.yaml
-  - enemies/enemy_sprites.yaml
   - sprites/other_sprites.yaml
-  - spells/spell_sprites.yaml
   - sprites/weapon_sprites.yaml
 
 tile_files: 

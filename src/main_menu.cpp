@@ -15,14 +15,12 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-
 #include "data/game_data.h"
 
 #include "display/colour_constants.h"
 #include "display/display.h"
 
 #include "lua/lua_api.h"
-
 
 #include "gamestate/GameState.h"
 
@@ -150,11 +148,11 @@ static void choose_mage(GameState* gs, GameInst* _, void* flag) {
 }
 static void choose_druid(GameState* gs, GameInst* _, void* flag) {
 //	*(bool*) flag = true;
-//	gs->game_settings().classn = get_class_by_name("Druid");
+//	gs->game_settings().classtype = get_class_by_name("Druid");
 }
 static void choose_archer(GameState* gs, GameInst* _, void* flag) {
-//	*(bool*) flag = true;
-//	gs->game_settings().classn = get_class_by_name("Archer");
+	*(bool*)flag = true;
+	gs->game_settings().classtype = get_class_by_name("Archer");
 }
 
 static void setup_classmenu_buttons(GameState* gs, bool* exit, int x, int y) {
@@ -173,12 +171,12 @@ static void setup_classmenu_buttons(GameState* gs, bool* exit, int x, int y) {
 					chfighter, COL_GOLD));
 	x += 128;
 	gs->add_instance(
-			new ButtonInst("Druid", get_sprite_by_name("druid_icon"), x, y,
-					chdruid, COL_LIGHT_GRAY));
+			new ButtonInst("Archer", get_sprite_by_name("archer_icon"), x, y,
+					charcher, COL_GOLD));
 	x += 128;
 	gs->add_instance(
-			new ButtonInst("Archer", get_sprite_by_name("archer_icon"), x, y,
-					charcher, COL_LIGHT_GRAY));
+			new ButtonInst("Druid", get_sprite_by_name("druid_icon"), x, y,
+					chdruid, COL_LIGHT_GRAY));
 	x += 128;
 }
 
