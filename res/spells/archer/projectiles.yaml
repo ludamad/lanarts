@@ -1,0 +1,11 @@
+---
+projectiles:
+  - name: Magic Arrow
+    weapon_class: magic
+    damage_type: {magic: 1.0}
+    damage: { base: [2,6], magic: 1.0 }
+    power: { base: 1, magic: 0.2 }
+    range: 300
+    speed: 9
+    spr_item: none
+    spr_attack: crystal spear
