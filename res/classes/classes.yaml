@@ -78,10 +78,10 @@ classes:
         mp: 80
         hpregen: 0.044
         mpregen: 0.044
-        strength: 6
-        defence: 6
+        strength: 4
+        defence: 5
         willpower: 3
-        magic: 2
+        magic: 4
         equipment:
           weapon: Short Bow
           projectile: { item: Arrow, amount: 20 } 

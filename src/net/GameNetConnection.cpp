@@ -11,6 +11,7 @@
 
 #include "../serialize/SerializeBuffer.h"
 
+#include "../objects/AnimatedInst.h"
 #include "../objects/player/PlayerInst.h"
 
 #include "GameNetConnection.h"
@@ -40,7 +41,55 @@ void GameNetConnection::send_packet(SerializeBuffer& serializer, int receiver) {
 
 }
 
-bool GameNetConnection::check_integrity(GameState* gs, int value) {
+static void write_or_assert_hash(SerializeBuffer& sb, unsigned int hash,
+		bool is_writing) {
+	if (is_writing) {
+		sb.write_int(hash);
+	} else {
+		LANARTS_ASSERT(serializer_equals_read(sb, hash));
+	}
+}
+
+static void process_level_hash(GameState* gs, GameLevelState* level,
+		SerializeBuffer& sb, bool isw) {
+	if (level->id() == -1)
+		return;
+
+	std::vector<GameInst*> instances = level->game_inst_set().to_vector();
+	for (int i = 0; i < instances.size(); i++) {
+		GameInst* inst = instances[i];
+		if (!dynamic_cast<AnimatedInst*>(inst)) {
+			write_or_assert_hash(sb, inst->integrity_hash(), isw);
+		}
+	}
+	//compare magic number marker
+	write_or_assert_hash(sb, 0xABCDFFFF, isw);
+	write_or_assert_hash(sb, level->game_inst_set().hash(), isw);
+}
+
+static void process_game_hash(GameState* gs, SerializeBuffer& sb, bool isw) {
+	for (int i = 0; i < gs->game_world().number_of_levels(); i++) {
+		process_level_hash(gs, gs->game_world().get_level(i), sb, isw);
+	}
+}
+bool GameNetConnection::check_integrity(GameState* gs) {
+	if (!_connection) {
+		return true;
+	}
+	SerializeBuffer& sb = grab_buffer(PACKET_CHECK_SYNC_INTEGRITY);
+
+	// Write out hashes
+	process_game_hash(gs, sb, true);
+	send_packet(sb);
+
+	std::vector<QueuedMessage> qms = sync_on_message(
+			PACKET_CHECK_SYNC_INTEGRITY);
+	for (int i = 0; i < qms.size(); i++) {
+		// Compare hashes
+		process_game_hash(gs, *qms[i].message, false);
+		delete qms[i].message;
+	}
+
 	return true;
 }
 
@@ -92,7 +141,7 @@ void net_recv_connection_affirm(SerializeBuffer& sb, int sender,
 	sb.read_int(classtype);
 	printf("connection affirm read\n");
 	pd.register_player(name, NULL, classtype, sender);
-	printf("now there are %d players\n", (int) pd.all_players().size());
+	printf("now there are %d players\n", (int)pd.all_players().size());
 	pd.set_local_player_idx(0);
 }
 
@@ -139,8 +188,8 @@ void net_send_game_init_data(GameNetConnection& net, PlayerData& pd, int seed) {
 			continue; // Don't send to self
 		}
 
-		//Send a version to each player detailing which player entry is theirs
-		//This is a necessary (slight) evil
+		// Send a version to each player detailing which player entry is theirs
+		// This is a necessary (slight) evil
 
 		SerializeBuffer& sb = net.grab_buffer(
 				GameNetConnection::PACKET_SERV2CLIENT_INITIALPLAYERDATA);
@@ -159,8 +208,16 @@ void net_send_game_init_data(GameNetConnection& net, PlayerData& pd, int seed) {
 		net.send_packet(sb, net_id);
 	}
 }
+static void net_sync_and_discard(GameNetConnection& net,
+		GameNetConnection::message_t) {
+	std::vector<QueuedMessage> qms = net.sync_on_message(
+			GameNetConnection::PACKET_SYNC_ACK);
+	for (int i = 0; i < qms.size(); i++) {
+		delete qms[i].message;
+	}
+}
 
-static void post_synch(GameState* gs) {
+static void post_sync(GameState* gs) {
 	std::vector<PlayerDataEntry>& pdes = gs->player_data().all_players();
 	for (int i = 0; i < pdes.size(); i++) {
 		PlayerDataEntry& pde = pdes[i];
@@ -187,8 +244,8 @@ void net_send_state_and_sync(GameNetConnection& net, GameState* gs) {
 	net.send_packet(sb, NetConnection::ALL_RECEIVERS);
 
 	// Wait for clients to receive the synch data before continuing
-	net.wait_for_ack(GameNetConnection::PACKET_SYNC_ACK);
-	post_synch(gs);
+	net_sync_and_discard(net, GameNetConnection::PACKET_SYNC_ACK);
+	post_sync(gs);
 	net_send_sync_ack(net);
 }
 
@@ -222,7 +279,7 @@ static bool extract_message(QueuedMessage& qm,
 			delayed_messages.erase(delayed_messages.begin() + i);
 			return true;
 		}
-		msg->move_read_position(-(int) sizeof(int));
+		msg->move_read_position(-(int)sizeof(int));
 	}
 	return false;
 }
@@ -233,7 +290,7 @@ static bool has_message(std::vector<QueuedMessage>& delayed_messages,
 		SerializeBuffer* msg = delayed_messages[i].message;
 		int msg_type;
 		msg->read_int(msg_type);
-		msg->move_read_position(-(int) sizeof(int));
+		msg->move_read_position(-(int)sizeof(int));
 		if (type == msg_type) {
 			return true;
 		}
@@ -256,9 +313,9 @@ bool GameNetConnection::consume_sync_messages(GameState* gs) {
 	delete qm.message;
 
 	net_send_sync_ack(*this);
-	post_synch(gs);
+	post_sync(gs);
 	// Wait for server to receive acks for all clients before continuing
-	wait_for_ack(PACKET_SYNC_ACK);
+	net_sync_and_discard(*this, PACKET_SYNC_ACK);
 
 	return true;
 }
@@ -307,7 +364,7 @@ bool GameNetConnection::_handle_message(int sender,
 		break;
 	}
 	default:
-		serializer.move_read_position(-(int) sizeof(int));
+		serializer.move_read_position(-(int)sizeof(int));
 		return false;
 	}
 	return true;
@@ -332,7 +389,7 @@ void GameNetConnection::_message_callback(int sender, const char* msg,
 
 static void gamenetconnection_consume_message(receiver_t sender, void* context,
 		const char* msg, size_t len) {
-	((GameNetConnection*) context)->_message_callback(sender, msg, len, false);
+	((GameNetConnection*)context)->_message_callback(sender, msg, len, false);
 }
 
 void GameNetConnection::poll_messages(int timeout) {
@@ -345,21 +402,21 @@ void GameNetConnection::poll_messages(int timeout) {
 				i--;
 			}
 		}
-		_connection->poll(gamenetconnection_consume_message, (void*) this,
+		_connection->poll(gamenetconnection_consume_message, (void*)this,
 				timeout);
 	}
 }
 
 static void gamenetconnection_queue_message(receiver_t sender, void* context,
 		const char* msg, size_t len) {
-	((GameNetConnection*) context)->_message_callback(sender, msg, len, true);
+	((GameNetConnection*)context)->_message_callback(sender, msg, len, true);
 }
 
-void GameNetConnection::wait_for_ack(message_t msg) {
+std::vector<QueuedMessage> GameNetConnection::sync_on_message(message_t msg) {
+	std::vector<QueuedMessage> responses;
 	if (!_connection) {
-		return;
+		return responses;
 	}
-
 	QueuedMessage qm;
 	const int timeout = 1;
 	PlayerDataEntry& pde = pd.local_player_data();
@@ -367,12 +424,12 @@ void GameNetConnection::wait_for_ack(message_t msg) {
 
 	bool all_ack = false;
 	while (!all_ack) {
-		_connection->poll(gamenetconnection_queue_message, (void*) this,
+		_connection->poll(gamenetconnection_queue_message, (void*)this,
 				timeout);
 
 		while (extract_message(qm, _delayed_messages, msg)) {
 			received[qm.sender] = true;
-			delete qm.message;
+			responses.push_back(qm);
 		}
 
 		all_ack = true;
@@ -383,4 +440,5 @@ void GameNetConnection::wait_for_ack(message_t msg) {
 			}
 		}
 	}
+	return responses;
 }

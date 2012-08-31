@@ -90,22 +90,33 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 	gl_printf(gs->primary_font(), COL_MUTED_GREEN, x + x_interval, y, "Will %d",
 			core.willpower);
 	y += y_interval;
-	for (int i = 0; i < gs->player_data().all_players().size(); i++) {
-		gl_printf(gs->primary_font(), COL_MUTED_GREEN, x, y, "P%d 0x%X", i + 1,
-				gs->player_data().all_players()[i].player()->integrity_hash());
+
+	// Draw hashes if in network debug mode
+	if (gs->game_settings().network_debug_mode) {
+		// Draw level hash
+		gl_printf(gs->primary_font(), COL_MUTED_GREEN, x, y, "Hash 0x%X",
+				gs->get_level()->game_inst_set().hash());
 		y += y_interval;
-	}
-	for (int i = 0; i < gs->monster_controller().monster_ids().size(); i++) {
-		GameInst* inst = gs->get_instance(
-				gs->monster_controller().monster_ids()[i]);
-		if (inst) {
-			gl_printf(gs->primary_font(), COL_MUTED_GREEN, 0, i * y_interval,
-					"M%d 0x%X", i + 1, inst->integrity_hash());
+		// Draw player hashes
+		for (int i = 0; i < gs->player_data().all_players().size(); i++) {
+			unsigned int hash =
+					gs->player_data().all_players()[i].player()->integrity_hash();
+			gl_printf(gs->primary_font(), COL_MUTED_GREEN, x, y, "P%d 0x%X",
+					i + 1, hash);
+			y += y_interval;
+		}
+		// Draw monster hashes (note, takes up a lot of screen space)
+		for (int i = 0; i < gs->monster_controller().monster_ids().size();
+				i++) {
+			GameInst* inst = gs->get_instance(
+					gs->monster_controller().monster_ids()[i]);
+			if (inst) {
+				gl_printf(gs->primary_font(), COL_MUTED_GREEN, 0,
+						i * y_interval, "M%d 0x%X", i + 1,
+						inst->integrity_hash());
+			}
 		}
 	}
-	gl_printf(gs->primary_font(), COL_MUTED_GREEN, x, y, "Hash 0x%X",
-			gs->get_level()->game_inst_set().hash());
-	y += y_interval;
 }
 
 static BBox content_area_box(const BBox& sidebar_box) {

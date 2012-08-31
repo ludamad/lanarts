@@ -231,6 +231,9 @@ bool GameState::pre_step() {
 	return world.pre_step();
 }
 void GameState::step() {
+	if (game_settings().network_debug_mode) {
+		connection.check_integrity(this);
+	}
 	connection.poll_messages();
 	hud.step(this);
 	world.step(); //Has pointer to this (GameState) object

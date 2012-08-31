@@ -38,7 +38,8 @@ public:
 		PACKET_ACTION = 2,
 		PACKET_CHAT_MESSAGE = 3,
 		PACKET_FORCE_SYNC = 4,
-		PACKET_SYNC_ACK = 5
+		PACKET_SYNC_ACK = 5,
+		PACKET_CHECK_SYNC_INTEGRITY = 6
 	};
 	// Initialize with references to structures that are updated by messages
 	// Keep parts of the game-state that are updated explicit
@@ -61,19 +62,20 @@ public:
 
 	void set_accepting_connections(bool accept);
 
-	void wait_for_ack(message_t msg);
+	std::vector<QueuedMessage> sync_on_message(message_t msg);
 	void poll_messages(int timeout = 0);
 	bool consume_sync_messages(GameState* gs);
 	bool has_incoming_sync();
 
 	void send_packet(SerializeBuffer& serializer, int receiver = -1);
-	bool check_integrity(GameState* gs, int value);
+	bool check_integrity(GameState* gs);
 
 	//Do-not-call-directly:
 	void _queue_message(SerializeBuffer* serializer, int receiver = -1);
 	// Returns true if message was consumed
 	bool _handle_message(int sender, SerializeBuffer& serializer);
-	void _message_callback(int sender, const char* msg, size_t len, bool queue_messages = false);
+	void _message_callback(int sender, const char* msg, size_t len,
+			bool queue_messages = false);
 
 private:
 	//Keep back-references so that we can alter world state based on messages received

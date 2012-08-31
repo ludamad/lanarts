@@ -4,8 +4,8 @@
  * Life cycle of GameInst initialization:
  * ->Constructor
  * ->GameState::add_instance(obj) called
- * 		->GameInstSet::add(obj) called from add_instance, sets id
- * 		->GameInst::init(GameState) called from add_instance, does further initialization
+ * 		->GameInstSet::add_instance(obj) called from GameState::add_instance, sets id
+ * 		->GameInst::init(GameState) called from GameState::add_instance, does further initialization
  * ->
  */
 

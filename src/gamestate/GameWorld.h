@@ -49,12 +49,14 @@ public:
 	EnemiesSeen& enemies_seen() {
 		return _enemies_seen;
 	}
-
 	EnemyController& enemy_controller() {
 		return _enemy_controller;
 	}
 	TeamRelations& teams() {
 		return _teams;
+	}
+	int number_of_levels() {
+		return level_states.size();
 	}
 	int get_current_level_id();
 	void connect_entrance_to_exit(int roomid1, int roomid2);

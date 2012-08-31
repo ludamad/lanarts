@@ -3,11 +3,10 @@
 #Dungeon Markup
 
 easy_animals: &easy_animals
-  - { enemy: Storm Elemental,   chance: 5,  group_chance: 100, group_size: 3   }
-#  - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 2 }
-#  - { enemy: Giant Bat,         chance: 100                                   }
-#  - { enemy: Hound,             chance: 60                                    }
-#  - { enemy: Sheep,             chance: 60                                    }
+  - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 2 }
+  - { enemy: Giant Bat,         chance: 100                                   }
+  - { enemy: Hound,             chance: 60                                    }
+  - { enemy: Sheep,             chance: 60                                    }
 
 medium_animals: &medium_animals
   - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 3 }
@@ -174,7 +173,7 @@ areas:
         content:
           features: { tileset: *lair_tilesets }
           items:    { amount: 3,  itemgenlist: Basic Items   }
-          enemies: { wandering: no, amount: 90, generated: *easy_animals }
+          enemies: { wandering: no, amount: 5, generated: *easy_animals }
           
       #Level 1
       - layout: *tiny_layouts
