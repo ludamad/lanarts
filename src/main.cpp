@@ -72,6 +72,7 @@ static void game_loop(GameState* gs) {
 	unsigned long draw_events = 1;
 
 	unsigned long step_time = 0;
+	unsigned long accumulated_time = 0;
 	unsigned long step_events = 1;
 
 	GameSettings& settings = gs->game_settings();
@@ -80,6 +81,7 @@ static void game_loop(GameState* gs) {
 
 	gs->pre_step();
 	for (int i = 1; cont; i++) {
+		total_timer.start();
 
 		if (gs->key_press_state(SDLK_F2)) {
 			if (gs->player_data().all_players().size() == 1) {
@@ -104,11 +106,11 @@ static void game_loop(GameState* gs) {
 
 //Draw event
 
-		total_timer.start();
 		draw_timer.start();
 		bool draw_this_step = (i > 1 && i % settings.steps_per_draw == 0);
-		if (draw_this_step)
+		if (draw_this_step) {
 			gs->draw();
+		}
 
 		draw_events++;
 		draw_time += draw_timer.get_microseconds();
@@ -142,13 +144,16 @@ static void game_loop(GameState* gs) {
 				break;
 			}
 		}
-
-		long microwait = settings.time_per_step * 1000
-				- total_timer.get_microseconds();
-		if (draw_this_step && microwait > 0) {
+		accumulated_time += float(step_time) / step_events + float(draw_time) / draw_events ;//total_timer.get_microseconds();
+		long microwait = settings.time_per_step * 1000 * settings.steps_per_draw
+				- accumulated_time;
+		if (draw_this_step) {
 			long delayms = microwait / 1000;
-			if (delayms > 0)
+			if (delayms > 0) {
+				printf("Delaying by %d ms\n", delayms);
 				SDL_Delay(delayms);
+			}
+			accumulated_time = 0;
 		}
 	}
 

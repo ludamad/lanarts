@@ -214,7 +214,7 @@ static void start_game_with_current_players(GameState* gs, GameInst* _,
 }
 
 static void draw_connectors(GameState* gs, GameInst* inst, void* flag) {
-	static Colour colours[] = { COL_MEDIUM_PURPLE, COL_PALE_YELLOW,
+	static Colour colours[] = { COL_BABY_BLUE, COL_PALE_YELLOW,
 			COL_PALE_RED, COL_PALE_GREEN, COL_PALE_BLUE, COL_LIGHT_GRAY };
 	static const int num_colours = sizeof(colours) / sizeof(Colour);
 

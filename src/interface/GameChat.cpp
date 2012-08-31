@@ -166,12 +166,6 @@ void GameChat::step(GameState* gs) {
 			repeat_steps_left = NEXT_BACKSPACE_STEP_AMNT;
 		}
 	}
-	//TODO: net redo
-//	NetPacket p;
-//	while (gs->net_connection().get_next_packet(p,
-//			GameNetConnection::PACKET_CHAT_MESSAGE)) {
-//		add_message(from_net_packet(p));
-//	}
 }
 void GameChat::draw(GameState *gs) const {
 	if (fade_out > 0.0f) {
@@ -205,7 +199,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 	//Spawn monster
 	if (starts_with(command, "!spawn ", &content)) {
 		const char* rest = content;
-		int amnt = strtol(content, (char**)&rest, 10);
+		int amnt = strtol(content, (char**) &rest, 10);
 		if (content == rest)
 			amnt = 1;
 		rest = skip_whitespace(rest);
@@ -253,7 +247,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 	//Create item
 	if (starts_with(command, "!item ", &content)) {
 		const char* rest = content;
-		int amnt = strtol(content, (char**)&rest, 10);
+		int amnt = strtol(content, (char**) &rest, 10);
 		if (content == rest)
 			amnt = 1;
 		rest = skip_whitespace(rest);
@@ -275,7 +269,8 @@ bool GameChat::handle_special_commands(GameState* gs,
 	if (starts_with(command, "!killall", &content)) {
 		MonsterController& mc = gs->monster_controller();
 		for (int i = 0; i < mc.monster_ids().size(); i++) {
-			EnemyInst* inst = (EnemyInst*)gs->get_instance(mc.monster_ids()[i]);
+			EnemyInst* inst = (EnemyInst*) gs->get_instance(
+					mc.monster_ids()[i]);
 			if (inst) {
 				inst->damage(gs, 99999);
 			}
@@ -363,21 +358,21 @@ bool GameChat::handle_special_commands(GameState* gs,
 	return false;
 }
 
+static const Colour player_colours[] = { COL_BABY_BLUE, COL_PALE_YELLOW,
+		COL_PALE_RED, COL_PALE_GREEN, COL_PALE_BLUE, COL_LIGHT_GRAY };
+static const int player_colours_n = sizeof(player_colours) / sizeof(Colour);
+
 void GameChat::toggle_chat(GameState* gs) {
 	if (is_typing) {
 		if (!typed_message.message.empty()) {
 			typed_message.sender = gs->game_settings().username;
-			typed_message.sender_colour = COL_BABY_BLUE;
+			int colour_idx = gs->player_data().local_player_data().net_id
+					% player_colours_n;
+			typed_message.sender_colour = player_colours[colour_idx];
+
 			if (!handle_special_commands(gs, typed_message.message)) {
 				add_message(typed_message);
-				//TODO: net redo
-//				NetPacket p(0, GameNetConnection::PACKET_CHAT_MESSAGE);
-//				ChatMessage msg = typed_message;
-//				msg.sender_colour = COL_MUTED_GREEN;
-//				msg.message_colour = COL_PALE_GREEN;
-//				chat_to_net_packet(msg, p);
-//				p.encode_header();
-//				gs->net_connection().broadcast_packet(p);
+				net_send_chatmessage(gs->net_connection(), typed_message);
 			}
 		} else {
 			show_chat = false;
