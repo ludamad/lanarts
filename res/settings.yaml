@@ -2,10 +2,10 @@
 username: ludamad
 
 #Window settings
-fullscreen: no
+fullscreen: yes
 regen_level_on_death: yes
-view_width: 1600
-view_height: 900
+view_width: 800
+view_height: 600
 
 #Gameplay preferences
 autouse_health_potions: yes # can toggle in game as well
@@ -20,7 +20,7 @@ port: 6112
 
 #Speed settings
 steps_per_draw: 1 #More is almost guaranteed to make the game faster, 1 is ideal
-time_per_step: 12
+time_per_step: 14
 frame_action_repeat: 0 #Default = 0. Ignored in single player, improves multiplayer latency in exchange for controlability
 
 #Debug settings
@@ -28,4 +28,3 @@ network_debug_mode: no
 invincible: no #Feel like exploring ? -> yes
 draw_diagnostics: no
 verbose_output: no
-

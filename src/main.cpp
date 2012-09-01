@@ -73,6 +73,8 @@ static void game_loop(GameState* gs) {
 
 	unsigned long step_time = 0;
 	unsigned long accumulated_time = 0;
+	unsigned long accumulated_time_n = 0;
+
 	unsigned long step_events = 1;
 
 	GameSettings& settings = gs->game_settings();
@@ -144,16 +146,21 @@ static void game_loop(GameState* gs) {
 				break;
 			}
 		}
-		accumulated_time += float(step_time) / step_events + float(draw_time) / draw_events ;//total_timer.get_microseconds();
+		if (accumulated_time_n > 10) {
+			accumulated_time = accumulated_time * 2 / accumulated_time_n;
+			accumulated_time_n = 2;
+		}
+		accumulated_time += total_timer.get_microseconds();
+		accumulated_time_n++;
+
 		long microwait = settings.time_per_step * 1000 * settings.steps_per_draw
-				- accumulated_time;
+				- accumulated_time / accumulated_time_n;
 		if (draw_this_step) {
 			long delayms = microwait / 1000;
 			if (delayms > 0) {
-				printf("Delaying by %d ms\n", delayms);
+				printf("Delaying by %d ms\n", (int)delayms);
 				SDL_Delay(delayms);
 			}
-			accumulated_time = 0;
 		}
 	}
 

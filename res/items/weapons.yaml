@@ -71,10 +71,10 @@ weapons:
     weapon_class: bows
     uses_projectile: yes
     #Stats
-    damage: {base: [3,6], strength: 1.0}
-    power: {base: 0, strength: 0.2}
+    damage: {base: [3,6], strength: 1.1}
+    power: {base: 1, strength: 0.2}
     range: 300
-    cooldown: 45
+    cooldown: 50
     spr_item: bow1
 
   - name: Long Bow
@@ -83,9 +83,9 @@ weapons:
     weapon_class: bows
     uses_projectile: yes
     #Stats
-    damage: {base: [3,6], strength: 1.2}
-    resist_modifier: 1.2
-    power: {base: 2, strength: 0.24}
+    damage: {base: [4,7], strength: 1.20}
+    resist_modifier: 1.1
+    power: {base: 5, strength: 0.2}
     range: 400
     cooldown: 55
     spr_item: long bow

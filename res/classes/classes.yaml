@@ -74,13 +74,13 @@ classes:
         level_needed: 2
     start_stats:
         movespeed: 4
-        hp: 80
-        mp: 80
-        hpregen: 0.044
-        mpregen: 0.044
+        hp: 85
+        mp: 65
+        hpregen: 0.05
+        mpregen: 0.05
         strength: 4
-        defence: 5
-        willpower: 3
+        defence: 4
+        willpower: 4
         magic: 4
         equipment:
           weapon: Short Bow
@@ -93,7 +93,7 @@ classes:
         hpregen: 0.010
         mpregen: 0.007
         strength: 2
-        magic: 2
+        magic: 1
         defence: 1
-        willpower: 1
+        willpower: 2
    

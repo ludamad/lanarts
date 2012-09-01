@@ -5,7 +5,7 @@ spells:
     description: 
       Allows you to create an arrow of pure energy, requires a bow. 
       Does well against strudy opponents.
-    mp_cost: 10
+    mp_cost: 20
     cooldown: 45
     prereq_func: 
       function(caster, _, _) 

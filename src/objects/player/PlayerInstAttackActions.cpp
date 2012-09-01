@@ -519,6 +519,8 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		return;
 	}
 
+	int cooldown = 0;
+
 	if (equipment().has_projectile()) {
 		const Projectile& projectile = equipment().projectile;
 		ProjectileEntry& pentry = projectile.projectile_entry();
@@ -530,22 +532,24 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		bool wallbounce = false;
 		int nbounces = 0;
 		float movespeed = pentry.speed;
+
+		cooldown = std::max(wentry.cooldown, pentry.cooldown);
+
 		//XXX: Horrible hack REMOVE THIS LATER
 		if (class_stats().class_type().name == "Archer"
 				&& pentry.weapon_class == "bows") {
 			int xplevel = class_stats().xplevel;
 			float movebonus = class_stats().xplevel / 4.0f;
-			if (movebonus > 2)
+			if (movebonus > 2) {
 				movebonus = 2;
-			movespeed += movebonus;
-			if (xplevel >= 3) {
-				wallbounce = true;
 			}
-
-			if (core_stats().mp >= 10 && xplevel >= 4) {
-				nbounces = 3;
-				core_stats().mp -= 10;
-			} else if (core_stats().mp >= 5) {
+			float cooldown_mult = 1.0f - (class_stats().xplevel - 1) / 20.0f;
+			if (cooldown_mult <= 0.85) {
+				cooldown_mult = 0.85;
+			}
+			cooldown *= cooldown_mult;
+			movespeed += movebonus;
+			if (xplevel >= 3 && core_stats().mp >= 5) {
 				nbounces = 2;
 				core_stats().mp -= 5;
 			}
@@ -555,9 +559,6 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 				effective_atk_stats(mt, weaponattack), id, start, actpos,
 				movespeed, weaprange, NONE, wallbounce, nbounces);
 		gs->add_instance(bullet);
-		cooldowns().reset_action_cooldown(
-				std::max(wentry.cooldown, pentry.cooldown));
-
 		equipment().use_ammo();
 	} else {
 		int weaprange = wentry.range + this->radius + TILE_SIZE / 2;
@@ -596,10 +597,11 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 								Colour(255, 215, 11)));
 			}
 		}
-		cooldowns().reset_action_cooldown(wentry.cooldown);
+		cooldown = wentry.cooldown;
 	}
 
-	cooldowns().action_cooldown *= estats.cooldown_mult;
+	cooldowns().reset_action_cooldown(cooldown * estats.cooldown_mult);
+
 	reset_rest_cooldown();
 }
 
