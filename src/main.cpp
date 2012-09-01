@@ -146,9 +146,9 @@ static void game_loop(GameState* gs) {
 				break;
 			}
 		}
-		if (accumulated_time_n > 10) {
-			accumulated_time = accumulated_time * 2 / accumulated_time_n;
-			accumulated_time_n = 2;
+		if (accumulated_time_n > 1) {
+			accumulated_time = 0;//accumulated_time * 2 / accumulated_time_n;
+			accumulated_time_n = 0;
 		}
 		accumulated_time += total_timer.get_microseconds();
 		accumulated_time_n++;
