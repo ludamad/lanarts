@@ -15,7 +15,8 @@
 #include "display.h"
 #include "GLImage.h"
 
-const float DEG2RAD = 3.14159 / 180;
+const float PI = 3.141592f;
+const float DEG2RAD = PI / 180.0f;
 
 void gl_draw_circle(float x, float y, float radius, const Colour& clr,
 		bool outline) {
@@ -25,8 +26,8 @@ void gl_draw_circle(float x, float y, float radius, const Colour& clr,
 	else
 		glBegin(GL_POLYGON);
 	glColor4ub(clr.r, clr.g, clr.b, clr.a);
-	float circum=radius*M_PI;
-	for (float a = 0; a < M_PI*2; a+=M_PI*2/circum) {
+	float circum=radius*PI;
+	for (float a = 0; a < PI*2; a+=PI*2/circum) {
 		glVertex2f(x + cos(a) * radius, y + sin(a) * radius);
 	}
 	glEnd();

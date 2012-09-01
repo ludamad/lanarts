@@ -158,7 +158,7 @@ static void game_loop(GameState* gs) {
 		if (draw_this_step) {
 			long delayms = microwait / 1000;
 			if (delayms > 0) {
-				printf("Delaying by %d ms\n", (int)delayms);
+				//printf("Delaying by %d ms\n", (int)delayms);
 				SDL_Delay(delayms);
 			}
 		}

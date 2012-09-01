@@ -16,7 +16,7 @@
 #include <windows.h>
 const long long DELTA_EPOCH_IN_MICROSECS= 11644473600000000;
 
-#ifndef _TIMEVAL_DEFINED
+#if !defined(_TIMEVAL_DEFINED) && !defined(_MSC_VER)
 struct timeval {
 	int tv_sec; /* seconds */
 	int tv_usec; /* microseconds */

@@ -11,8 +11,8 @@ const int EFFECTS_MAX = 40;
 
 struct CombatStats;
 struct EffectiveStats;
-struct GameState;
-struct CombatGameInst;
+class GameState;
+class CombatGameInst;
 class SerializeBuffer;
 
 struct Effect {
