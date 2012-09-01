@@ -321,6 +321,9 @@ bool GameNetConnection::consume_sync_messages(GameState* gs) {
 }
 
 void net_send_chatmessage(GameNetConnection& net, ChatMessage & message) {
+	if (!net.connection()) {
+		return;
+	}
 	SerializeBuffer& sb = net.grab_buffer(
 			GameNetConnection::PACKET_CHAT_MESSAGE);
 	message.serialize(sb);
