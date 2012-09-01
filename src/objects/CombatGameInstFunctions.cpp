@@ -41,10 +41,24 @@ float estimate_inst_path_distance(CombatGameInst* inst1,
 	PlayerInst* p;
 	if ((p = dynamic_cast<PlayerInst*>(inst1))) {
 		return player_inst_path_distance(p, inst2);
-	} else if ((p = dynamic_cast<PlayerInst*>(inst1))) {
-		return player_inst_path_distance(p, inst2);
+	} else if ((p = dynamic_cast<PlayerInst*>(inst2))) {
+		return player_inst_path_distance(p, inst1);
 	} else {
 		return inst_distance(inst1, inst2);
+	}
+}
+
+static bool player_inst_can_see(PlayerInst* player, CombatGameInst* inst2) {
+	return player->within_field_of_view(inst2->pos());
+}
+bool inst_can_see(CombatGameInst *inst1, CombatGameInst *inst2) {
+	PlayerInst* p;
+	if ((p = dynamic_cast<PlayerInst*>(inst1))) {
+		return player_inst_can_see(p, inst2);
+	} else if ((p = dynamic_cast<PlayerInst*>(inst2))) {
+		return player_inst_can_see(p, inst1);
+	} else {
+		return true;
 	}
 }
 
@@ -55,6 +69,9 @@ CombatGameInst* find_closest_hostile(GameState* gs, CombatGameInst* inst,
 	CombatGameInst* closest_inst = NULL;
 
 	for (int i = 0; i < candidates.size(); i++) {
+		if (inst_can_see(inst, candidates[i])){
+			continue;
+		}
 //		if (!insts_are_hostile(teams, inst, candidates[i])) {
 //			continue;
 //		}

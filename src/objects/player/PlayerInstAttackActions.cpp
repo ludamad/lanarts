@@ -310,7 +310,9 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs) {
 		previous_spellselect = spell_selected();
 
 		if (io.query_event(IOEvent::TOGGLE_ACTION_UP)) {
-			newspell = (spell_selected() + 1) % spells.amount();
+			if (spells.amount() > 0) {
+				newspell = (spell_selected() + 1) % spells.amount();
+			}
 		} else if (io.query_event(IOEvent::TOGGLE_ACTION_DOWN)) {
 			if (spell_selected() <= 0) {
 				newspell = spells.amount() - 1;
@@ -580,7 +582,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		}
 
 		for (int i = 0; i < numhit; i++) {
-			EnemyInst* e = (EnemyInst*) enemies[i];
+			EnemyInst* e = (EnemyInst*)enemies[i];
 			lua_hit_callback(gs->get_luastate(), wentry.on_hit_func, this, e);
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
 				PlayerData& pc = gs->player_data();

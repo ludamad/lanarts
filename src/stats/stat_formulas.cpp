@@ -93,7 +93,7 @@ EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst,
 }
 
 int experience_needed_formula(int xplevel) {
-	float proportion = pow(xplevel, 1.8);
+	float proportion = pow(xplevel, 2.0);
 	return round(proportion) * 75 + 50;
 }
 

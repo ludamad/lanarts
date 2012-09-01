@@ -10,6 +10,7 @@
 
 class CombatGameInst;
 
+bool inst_can_see(CombatGameInst* inst1, CombatGameInst* inst2);
 float inst_distance(CombatGameInst* inst1, CombatGameInst* inst2);
 
 /* Provides the best (lower bound) estimate possible cheaply */

@@ -33,16 +33,11 @@ class PlayerInst;
 
 class EnemyController {
 public:
-//	EnemyController(bool wander = true);
-//	~EnemyController();
-
 	// Occurs for current level
 	void pre_step(GameState* gs);
 	void post_draw(GameState* gs);
 
 	std::vector<EnemyInst*> enemies_in_level(level_id level);
-
-	void shift_target(GameState* gs);
 
 	void clear();
 
