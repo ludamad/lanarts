@@ -14,7 +14,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
-const long long DELTA_EPOCH_IN_MICROSECS= 11644473600000000;
+const long long DELTA_EPOCH_IN_MICROSECS= 11644473600000000LL;
 
 #if !defined(_TIMEVAL_DEFINED) && !defined(_MSC_VER)
 struct timeval {

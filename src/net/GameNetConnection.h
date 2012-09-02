@@ -13,6 +13,7 @@
 #include "../lanarts_defines.h"
 #include "../gamestate/ActionQueue.h"
 
+
 class GameState;
 class GameChat;
 class GameStateInitData;

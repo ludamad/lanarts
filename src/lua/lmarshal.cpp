@@ -40,7 +40,7 @@ extern "C" {
 
 #include "lmarshal.h"
 
-#define UINT32_MAX 4294967296
+#define UINT32_MAX 4294967296ul
 
 #define MAR_TREF 1
 #define MAR_TVAL 2

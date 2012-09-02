@@ -2,6 +2,7 @@
  * lanarts_net.h:
  *  Primary functions for lanarts_net library
  */
+#include <SDL_net.h>
 
 #include "../lanarts_net.h"
 
