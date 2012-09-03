@@ -1,15 +1,15 @@
 #Online settings
-username: ludamad
+username: gigimoi
 
 #Window settings
 fullscreen: no
 regen_level_on_death: yes
-view_width: 1200
-view_height: 800
+view_width: 640
+view_height: 480
 
 #Gameplay preferences
 autouse_health_potions: yes # can toggle in game as well
-autouse_mana_potions: yes # can toggle in game as well
+autouse_mana_potions: no # can toggle in game as well
 
 #Font settings
 font: res/fonts/Gudea-Regular.ttf
