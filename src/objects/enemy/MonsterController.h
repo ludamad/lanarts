@@ -21,8 +21,12 @@
 struct EnemyOfInterest {
 	EnemyInst* e;
 	int closest_player_index;
-	EnemyOfInterest(EnemyInst* e, int player_index) :
-			e(e), closest_player_index(player_index) {
+	int distance;
+	EnemyOfInterest(EnemyInst* e, int player_index, int distance) :
+			e(e), closest_player_index(player_index), distance(distance) {
+	}
+	bool operator<(const EnemyOfInterest& eoi) const {
+		return distance < eoi.distance;
 	}
 };
 

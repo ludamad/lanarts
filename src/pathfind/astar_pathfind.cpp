@@ -27,7 +27,7 @@ public:
 	}
 };
 
-static int heurestic_distance(Pos s, Pos e) {
+static inline int heurestic_distance(const Pos& s, const Pos& e) {
 	int h_diagonal = min(abs(s.x - e.x), abs(s.y - e.y));
 	int h_straight = (abs(s.x - e.x) + abs(s.y - e.y));
 	return 114 * h_diagonal + 100 * (h_straight - 2 * h_diagonal);
@@ -37,6 +37,7 @@ static int heurestic_distance(Pos s, Pos e) {
 }
 
 void AStarPathFind::initialize(GameState* gs) {
+	perf_timer_begin(FUNCNAME);
 	if (!nodes) {
 		w = gs->width() / TILE_SIZE;
 		h = gs->height() / TILE_SIZE;
@@ -55,6 +56,8 @@ void AStarPathFind::initialize(GameState* gs) {
 			nodes[y * w + x].solid = gs->tiles().is_solid(x, y);
 		}
 	}
+
+	perf_timer_end(FUNCNAME);
 }
 
 bool AStarPathFind::can_cross(const Pos& s, const Pos& e) {
@@ -74,8 +77,9 @@ static std::vector<AStarNode*>::iterator find_heap_position(
 }
 
 /*Used to make sure all interpolated directions are possible*/
-std::vector<Pos> AStarPathFind::calculate_AStar_path(GameState *gs, int sx,
+std::vector<Pos> AStarPathFind::calculate_AStar_path(GameState* gs, int sx,
 		int sy, int ex, int ey) {
+	perf_timer_begin(FUNCNAME);
 	initialize(gs);
 
 	AStarOrderNodes orderfunc;
@@ -154,6 +158,8 @@ std::vector<Pos> AStarPathFind::calculate_AStar_path(GameState *gs, int sx,
 		positions.push_back(p);
 	}
 	reverse(positions.begin(), positions.end());
+	perf_timer_end(FUNCNAME);
+
 	return positions;
 }
 

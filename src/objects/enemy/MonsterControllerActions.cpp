@@ -91,10 +91,28 @@ bool potentially_randomize_movement(GameState* gs, EnemyInst* e) {
 	return randomized;
 }
 
+static bool same_target_and_moved_colfilter(GameInst* self, GameInst* other) {
+	EnemyInst* e1 = (EnemyInst*)self;
+	EnemyInst* e2 = dynamic_cast<EnemyInst*>(other);
+	if (!e2) {
+		return false;
+	}
+	if (e1->behaviour().chasing_player != e2->behaviour().chasing_player) {
+		return false;
+	}
+	return (e2->behaviour().movement_decided);
+}
+
 void MonsterController::set_monster_headings(GameState* gs,
 		std::vector<EnemyOfInterest>& eois) {
+	perf_timer_begin(FUNCNAME);
+
 	//Use a temporary 'GameView' object to make use of its helper methods
 	PlayerData& pc = gs->player_data();
+	std::sort(eois.begin(), eois.end());
+	for (int i = 0; i < eois.size(); i++) {
+		eois[i].e->behaviour().movement_decided = false;
+	}
 	for (int i = 0; i < eois.size(); i++) {
 		EnemyInst* e = eois[i].e;
 		float movespeed = e->effective_stats().movespeed;
@@ -136,7 +154,18 @@ void MonsterController::set_monster_headings(GameState* gs,
 			e->attack(gs, p, attack);
 
 		}
+		if (gs->tile_radius_test(e->x, e->y, TILE_SIZE / 2 + 4)) {
+			if (gs->object_radius_test(e, NULL, 0,
+					same_target_and_moved_colfilter, e->x, e->y,
+					e->radius - e->effective_stats().movespeed - 2)) {
+				e->vx = 0, e->vy = 0;
+			}
+		}
+
+		eb.movement_decided = true;
 	}
+
+	perf_timer_end(FUNCNAME);
 }
 
 //returns true if will be exactly on target
@@ -194,8 +223,12 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	MTwist& mt = gs->rng();
 	EnemyBehaviour& eb = e->behaviour();
 	e->vx = 0, e->vy = 0;
-	if (!monsters_wandering_flag)
+
+	if (!monsters_wandering_flag) {
 		return;
+	}
+
+	perf_timer_begin(FUNCNAME);
 	bool is_fullpath = true;
 	if (eb.path_cooldown > 0) {
 		eb.path_cooldown--;
@@ -226,4 +259,5 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 
 	eb.path_steps = 0;
 	eb.path_start = Pos(e->x, e->y);
+	perf_timer_end(FUNCNAME);
 }

@@ -79,6 +79,7 @@ void EnemyInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write_int(enemytype);
 	eb.serialize(gs, serializer);
 	serializer.write_int(xpgain);
+//	ai_state.serialize(gs, serializer);
 }
 
 void EnemyInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
@@ -90,6 +91,7 @@ void EnemyInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
 	collision_simulation_id() = coll_avoid.add_active_object(pos(),
 			target_radius, effective_stats().movespeed);
+//	ai_state.deserialize(gs, serializer);
 }
 EnemyEntry& EnemyInst::etype() {
 	return game_enemy_data.at(enemytype);
@@ -106,12 +108,6 @@ void EnemyInst::init(GameState* gs) {
 			target_radius, effective_stats().movespeed);
 
 	lua_gameinst_callback(gs->get_luastate(), etype().init_event, this);
-}
-
-void EnemyInst::step(GameState* gs) {
-	//Much of the monster implementation resides in MonsterController
-	CombatGameInst::step(gs);
-	update_position();
 }
 static bool starts_with_vowel(const std::string& name) {
 	char c = tolower(name[0]);
@@ -133,6 +129,18 @@ static void show_defeat_message(GameChat& chat, EnemyEntry& e) {
 	}
 
 }
+
+void EnemyInst::step(GameState* gs) {
+	//Much of the monster implementation resides in MonsterController
+	CombatGameInst::step(gs);
+	update_position();
+
+	if (!seen && !gs->object_visible_test(this, gs->local_player())) {
+		seen = true;
+		gs->enemies_seen().mark_as_seen(enemytype);
+		show_appear_message(gs->game_chat(), etype());
+	}
+}
 void EnemyInst::draw(GameState* gs) {
 
 	GameView& view = gs->view();
@@ -140,11 +148,13 @@ void EnemyInst::draw(GameState* gs) {
 
 	if (gs->game_settings().draw_diagnostics) {
 		char statbuff[255];
-		snprintf(statbuff, 255,
+		snprintf(
+				statbuff,
+				255,
 				"simid=%d nvx=%f vy=%f\n chasetime=%d \n mdef=%d pdef=%d", // \n act=%d, path_steps = %d\npath_cooldown = %d\n",
 				simulation_id, vx, vy, eb.chase_timeout,
-				(int) effective_stats().magic.resistance,
-				(int) effective_stats().physical.resistance);
+				(int)effective_stats().magic.resistance,
+				(int)effective_stats().physical.resistance);
 		//eb.current_action,
 		//eb.path_steps, eb.path_cooldown);
 		gl_printf(gs->primary_font(), Colour(255, 255, 255),
@@ -158,12 +168,6 @@ void EnemyInst::draw(GameState* gs) {
 		return;
 	if (!gs->object_visible_test(this))
 		return;
-
-	if (!seen) {
-		seen = true;
-		gs->enemies_seen().mark_as_seen(enemytype);
-		show_appear_message(gs->game_chat(), etype());
-	}
 
 	BBox ebox(xx, yy, xx + w, yy + h);
 	if (ebox.contains(gs->mouse_x() + view.x, gs->mouse_y() + view.y)) {
@@ -202,5 +206,5 @@ void EnemyInst::die(GameState *gs) {
 
 void EnemyInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(EnemyInst*) inst = *this;
+	*(EnemyInst*)inst = *this;
 }

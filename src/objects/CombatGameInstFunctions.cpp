@@ -64,24 +64,36 @@ bool inst_can_see(CombatGameInst *inst1, CombatGameInst *inst2) {
 
 CombatGameInst* find_closest_hostile(GameState* gs, CombatGameInst* inst,
 		const std::vector<CombatGameInst*>& candidates) {
+	//Use a 'GameView' object to make use of its helper methods
+	GameView view(0, 0, PATHING_RADIUS * 2, PATHING_RADIUS * 2, gs->width(),
+			gs->height());
+
 	TeamRelations& teams = gs->teams();
 	float min_dist = HUGE_DISTANCE;
 	CombatGameInst* closest_inst = NULL;
 
 	for (int i = 0; i < candidates.size(); i++) {
-		if (inst_can_see(inst, candidates[i])){
+		CombatGameInst* other = candidates[i];
+		bool keep_chasing = false;
+		if (other->id == inst->target()) {
+			view.sharp_center_on(other->x, other->y);
+			if (view.within_view(inst->bbox())) {
+				keep_chasing = true;
+			}
+
+		}
+
+		if (!keep_chasing && !inst_can_see(inst, candidates[i])) {
 			continue;
 		}
-//		if (!insts_are_hostile(teams, inst, candidates[i])) {
-//			continue;
-//		}
-		float dist = estimate_inst_path_distance(inst, candidates[i]);
-		printf("dist %f vs mindist %f\n", dist, min_dist);
+		if (!insts_are_hostile(teams, inst, candidates[i])) {
+			continue;
+		}
+		float dist = inst_distance(inst, candidates[i]);
 		if (dist < min_dist) {
 			min_dist = dist;
 			closest_inst = candidates[i];
 		}
 	}
-	printf("closest_inst: %d\n", int(long(inst)));
 	return closest_inst;
 }

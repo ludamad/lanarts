@@ -36,7 +36,7 @@ enemies:
   - name: Hell Storm
     sprite: hell storm
     radius: 14
-    xpaward: 35
+    xpaward: 40
     appear_message: A raging storm elemental appears!
     defeat_message: The raging storm elemental dissipates.
     stats:
@@ -52,7 +52,7 @@ enemies:
   - name: Hell Forged
     sprite: hell forged
     radius: 12
-    xpaward: 45
+    xpaward: 50
     appear_message: A hell-forged creature appears before you!
     defeat_message: The hell-forged is destroyed.
     stats:

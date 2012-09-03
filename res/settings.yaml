@@ -2,7 +2,7 @@
 username: ludamad
 
 #Window settings
-fullscreen: yes
+fullscreen: no
 regen_level_on_death: yes
 view_width: 800
 view_height: 600

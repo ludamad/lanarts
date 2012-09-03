@@ -8,13 +8,26 @@
 #include <cassert>
 #include <cstdlib>
 
-//These file should be included if there are issues with Microsoft's compiler
+// If this file is not included there may be issues with Microsoft's compiler
 #ifdef _MSC_VER
 #define snprintf _snprintf
 #define round(x) floor((x)+0.5f)
 #endif
 
+// The preferred assert statement to use, for ease of re-implementation
 #define LANARTS_ASSERT(x) assert(x)
+
+// Define a cross-platform function name identifier
+#ifdef _MSC_VER
+#define FUNCNAME __FUNCSIG__
+#else
+#ifdef __GNUC__
+#define FUNCNAME __PRETTY_FUNCTION__
+#else
+#define FUNCNAME __func__
+#endif
+#endif
+
 
 /*Represents a Canadian colour*/
 struct Colour {
@@ -184,5 +197,9 @@ typedef int money_t;
 inline void cooldown_step(int& cooldown) {
 	cooldown = cooldown > 0 ? cooldown - 1 : 0;
 }
+
+void perf_timer_begin(const char* funcname);
+void perf_timer_end(const char* funcname);
+void perf_print_results();
 
 #endif
