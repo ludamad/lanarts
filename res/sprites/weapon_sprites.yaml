@@ -5,6 +5,9 @@ sprites:
   - name: short sword
     file: res/sprites/items/weapons/shortsword.png
     
+  - name: iron broadsword
+    file: res/sprites/items/weapons/iron_broadsword.png
+    
   - name: magic sword
     file: res/sprites/items/weapons/magic_sword.png
 
