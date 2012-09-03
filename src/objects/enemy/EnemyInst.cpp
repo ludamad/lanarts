@@ -135,7 +135,7 @@ void EnemyInst::step(GameState* gs) {
 	CombatGameInst::step(gs);
 	update_position();
 
-	if (!seen && !gs->object_visible_test(this, gs->local_player())) {
+	if (!seen && gs->object_visible_test(this, gs->local_player())) {
 		seen = true;
 		gs->enemies_seen().mark_as_seen(enemytype);
 		show_appear_message(gs->game_chat(), etype());

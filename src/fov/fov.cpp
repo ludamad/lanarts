@@ -21,7 +21,8 @@ using namespace std;
  }
  */
 fov::fov(int radius) :
-		gs(NULL), radius(radius), m(radius, radius, radius, radius) {
+		gs(NULL), radius(radius), m(radius, radius, radius, radius), ptx(0), pty(
+				0) {
 	radsub = radius;
 	int dim = radsub * 2 + 1;
 	sight_mask = new char[dim * dim];
@@ -56,6 +57,25 @@ int fov::isBlocked(short destX, short destY) {
 		return false;
 
 	return !tiles.is_seethrough(px, py);
+}
+
+bool fov::within_fov(const BBox& bbox) {
+	if (bbox.x2 < ptx - radsub || bbox.x1 > ptx + radsub
+			|| bbox.y2 < pty - radsub || bbox.y1 > pty + radsub) {
+		return false;
+	}
+	int dim = radsub * 2 + 1;
+	char* mask = sight_mask + (bbox.y1 - pty + radsub) * dim;
+	mask -= ptx - radsub;
+	for (int y = bbox.y1; y <= bbox.y2; y++) {
+		for (int x = bbox.x1; x <= bbox.x2; x++) {
+			if (mask[x]) {
+				return true;
+			}
+		}
+		mask += dim;
+	}
+	return false;
 }
 
 void fov::visit(short destX, short destY) {

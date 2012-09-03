@@ -104,6 +104,7 @@ void GameLevelState::step(GameState* gs) {
 	if (_steps_left <= 0) {
 		return;
 	}
+	perf_timer_begin(FUNCNAME);
 
 	GameLevelState* previous_level = gs->get_level();
 	gs->set_level(this);
@@ -115,4 +116,6 @@ void GameLevelState::step(GameState* gs) {
 	_steps_left--;
 
 	gs->set_level(previous_level);
+
+	perf_timer_end(FUNCNAME);
 }

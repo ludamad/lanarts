@@ -71,6 +71,7 @@ void GameTiles::copy_to(GameTiles & t) const {
 }
 
 void GameTiles::pre_draw(GameState* gs) {
+	perf_timer_begin(FUNCNAME);
 	GameView& view = gs->view();
 	int min_tilex, min_tiley;
 	int max_tilex, max_tiley;
@@ -87,12 +88,13 @@ void GameTiles::pre_draw(GameState* gs) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
 			Tile& tile = get(x, y);
 			GLimage& img = game_tile_data[tile.tile].img(tile.subtile);
-			if (/*reveal_enabled ||*/ is_seen(x, y))
+			if (/*reveal_enabled ||*/is_seen(x, y))
 				gl_draw_image(img, x * TILE_SIZE - view.x,
 						y * TILE_SIZE - view.y);
 		}
 	}
 
+	perf_timer_end(FUNCNAME);
 }
 
 void GameTiles::step(GameState* gs) {
@@ -120,6 +122,7 @@ void GameTiles::step(GameState* gs) {
 	}
 }
 void GameTiles::post_draw(GameState* gs) {
+
 	GameView& view = gs->view();
 	int min_tilex, min_tiley;
 	int max_tilex, max_tiley;
@@ -133,9 +136,10 @@ void GameTiles::post_draw(GameState* gs) {
 		max_tiley = height - 1;
 	const int sub_sqrs = VISION_SUBSQRS;
 
-	if (/*gs->key_down_state(SDLK_BACKQUOTE) ||*/ !gs->level_has_player()) {
+	if (/*gs->key_down_state(SDLK_BACKQUOTE) ||*/!gs->level_has_player()) {
 		return;
 	}
+	perf_timer_begin(FUNCNAME);
 
 	fov& mainfov = gs->local_player()->field_of_view();
 	char matches[sub_sqrs * sub_sqrs];
@@ -182,7 +186,7 @@ void GameTiles::post_draw(GameState* gs) {
 			}
 		}
 	}
-
+	perf_timer_end(FUNCNAME);
 }
 
 void GameTiles::serialize(SerializeBuffer& serializer) {

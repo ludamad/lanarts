@@ -18,6 +18,7 @@ public:
 	~fov();
 	void calculate(GameState* gs, int ptx, int pty);
     bool within_fov(int grid_x, int grid_y);
+    bool within_fov(const BBox& bbox);
     void matches(int sqr_x, int sqr_y, char* sub_sqrs);
     BBox tiles_covered() {
     	return BBox( ptx - radius, pty - radius, ptx + radius, pty + radius);

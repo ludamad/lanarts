@@ -141,6 +141,7 @@ Sidebar::Sidebar(const BBox& sidebar_bounds) :
 }
 
 void Sidebar::draw(GameState* gs) {
+	perf_timer_begin(FUNCNAME);
 	const int STATBAR_OFFSET_X = 32, STATBAR_OFFSET_Y = 32;
 
 	PlayerInst* p = gs->local_player();
@@ -151,6 +152,7 @@ void Sidebar::draw(GameState* gs) {
 	draw_player_statbars(gs, p, sidebar_bounds.x1 + STATBAR_OFFSET_X,
 			sidebar_bounds.y1 + STATBAR_OFFSET_Y);
 	navigator.draw(gs);
+	perf_timer_end(FUNCNAME);
 }
 
 void Sidebar::step(GameState* gs) {

@@ -181,7 +181,7 @@ void gl_set_drawing_area(int x, int y, int w, int h) {
 	//Clear projection
 
 	//Set up the coordinate system 0 -> w, 0 -> h
-	glOrtho(0.0, (GLdouble) w, (GLdouble) h, 0.0, 0.0, 1.0);
+	glOrtho(0.0, (GLdouble)w, (GLdouble)h, 0.0, 0.0, 1.0);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -189,6 +189,20 @@ void gl_set_drawing_area(int x, int y, int w, int h) {
 
 	//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 	//update_display();
+}
+
+void gl_subimage_from_bytes(GLimage& img, const BBox& region, char* data,
+		int type) {
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, img.texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, region.x1, region.y1, region.width(),
+			region.height(), type, GL_UNSIGNED_BYTE, data);
+	glDisable(GL_TEXTURE_2D);
 }
 
 void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type) {
@@ -202,8 +216,8 @@ void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type) {
 	pth = std::max(4, pth);
 
 	img.width = w, img.height = h;
-	img.texw = w / ((float) ptw);
-	img.texh = h / ((float) pth);
+	img.texw = w / ((float)ptw);
+	img.texh = h / ((float)pth);
 	if (w == 0 || h == 0)
 		return;
 
@@ -217,7 +231,10 @@ void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type) {
 	if (!was_init)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, ptw, pth, 0, type,
 				GL_UNSIGNED_BYTE, NULL);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, type, GL_UNSIGNED_BYTE, data);
+	if (data) {
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, type, GL_UNSIGNED_BYTE,
+				data);
+	}
 	glDisable(GL_TEXTURE_2D);
 }
 

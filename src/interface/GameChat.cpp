@@ -82,6 +82,7 @@ void GameChat::clear() {
 }
 
 void GameChat::draw_player_chat(GameState* gs) const {
+	perf_timer_begin(FUNCNAME);
 	const font_data& font = gs->primary_font();
 	const int padding = 5;
 	int line_sep = font.h + 2;
@@ -115,6 +116,7 @@ void GameChat::draw_player_chat(GameState* gs) const {
 				Colour(200, 200, 200, fade_out * 180));
 		typed_message.draw(font, fade_out, text_x, type_y + padding - 1);
 	}
+	perf_timer_end(FUNCNAME);
 }
 
 static char keycode_to_char(SDLKey keycode, SDLMod keymod) {
@@ -199,7 +201,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 	//Spawn monster
 	if (starts_with(command, "!spawn ", &content)) {
 		const char* rest = content;
-		int amnt = strtol(content, (char**) &rest, 10);
+		int amnt = strtol(content, (char**)&rest, 10);
 		if (content == rest)
 			amnt = 1;
 		rest = skip_whitespace(rest);
@@ -247,7 +249,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 	//Create item
 	if (starts_with(command, "!item ", &content)) {
 		const char* rest = content;
-		int amnt = strtol(content, (char**) &rest, 10);
+		int amnt = strtol(content, (char**)&rest, 10);
 		if (content == rest)
 			amnt = 1;
 		rest = skip_whitespace(rest);
@@ -269,8 +271,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 	if (starts_with(command, "!killall", &content)) {
 		MonsterController& mc = gs->monster_controller();
 		for (int i = 0; i < mc.monster_ids().size(); i++) {
-			EnemyInst* inst = (EnemyInst*) gs->get_instance(
-					mc.monster_ids()[i]);
+			EnemyInst* inst = (EnemyInst*)gs->get_instance(mc.monster_ids()[i]);
 			if (inst) {
 				inst->damage(gs, 99999);
 			}

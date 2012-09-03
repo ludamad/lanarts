@@ -242,6 +242,8 @@ obj_id GameInstSet::add_instance(GameInst* inst, int id) {
 }
 
 void GameInstSet::step(GameState* gs) {
+
+	perf_timer_begin(FUNCNAME);
 	for (int i = 0; i < deallocation_list.size(); i++) {
 		deallocation_list[i]->free_reference();
 	}
@@ -254,6 +256,7 @@ void GameInstSet::step(GameState* gs) {
 			update_instance_for_step(&unit_set[i], inst);
 		}
 	}
+	perf_timer_end(FUNCNAME);
 }
 GameInst* GameInstSet::get_instance(int id) const {
 	InstanceState* is = tset_find<GameInstSetFunctions>(id, &unit_set[0],

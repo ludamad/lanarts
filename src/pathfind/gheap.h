@@ -160,7 +160,7 @@ private:
       const LessComparer &less_comparer, const size_t children_count,
       const size_t item_index, const size_t child_index)
   {
-    assert(child_index == get_child_index(item_index));
+//    assert(child_index == get_child_index(item_index));
 
     typedef typename std::iterator_traits<RandomAccessIterator>::value_type
         value_type;
@@ -300,7 +300,7 @@ public:
       } while (i-- > 0);
     }
 
-    assert(is_heap(first, last, less_comparer));
+//    assert(is_heap(first, last, less_comparer));
   }
 
   // Makes max heap from items [first ... last) using operator< for items'
@@ -319,7 +319,7 @@ public:
       const RandomAccessIterator &last, const LessComparer &less_comparer)
   {
     assert(last > first);
-    assert(is_heap(first, last - 1, less_comparer));
+//    assert(is_heap(first, last - 1, less_comparer));
 
     const size_t heap_size = last - first;
     if (heap_size > 1) {
@@ -327,7 +327,7 @@ public:
       _sift_up(first, less_comparer, 0, u);
     }
 
-    assert(is_heap(first, last, less_comparer));
+//    assert(is_heap(first, last, less_comparer));
   }
 
   // Pushes the item *(last - 1) into max heap [first ... last - 1)
@@ -346,14 +346,14 @@ public:
       const RandomAccessIterator &last, const LessComparer &less_comparer)
   {
     assert(last > first);
-    assert(is_heap(first, last, less_comparer));
+//    assert(is_heap(first, last, less_comparer));
 
     const size_t heap_size = last - first;
     if (heap_size > 1) {
       _pop_max_item(first, less_comparer, heap_size - 1);
     }
 
-    assert(is_heap(first, last - 1, less_comparer));
+//    assert(is_heap(first, last - 1, less_comparer));
   }
 
   // Pops the maximum item from max heap [first ... last) into
@@ -399,14 +399,14 @@ public:
       const LessComparer &less_comparer)
   {
     assert(first < last);
-    assert(is_heap(first, last, less_comparer));
+//    assert(is_heap(first, last, less_comparer));
 
     const size_t heap_size = last - first;
 
     _swap(item, first[0]);
     _sift_down(first, less_comparer, heap_size, 0);
 
-    assert(is_heap(first, last, less_comparer));
+//    assert(is_heap(first, last, less_comparer));
   }
 
   // Swaps the item outside the heap with the maximum item inside
@@ -428,14 +428,14 @@ public:
       const LessComparer &less_comparer)
   {
     assert(item >= first);
-    assert(is_heap(first, item, less_comparer));
+//    assert(is_heap(first, item, less_comparer));
 
     const size_t item_index = item - first;
     if (item_index > 0) {
       _sift_up(first, less_comparer, 0, item_index);
     }
 
-    assert(is_heap(first, item + 1, less_comparer));
+//    assert(is_heap(first, item + 1, less_comparer));
   }
 
   // Restores max heap invariant after item's value has been increased,
@@ -458,13 +458,13 @@ public:
     assert(last > first);
     assert(item >= first);
     assert(item < last);
-    assert(is_heap(first, item, less_comparer));
+//    assert(is_heap(first, item, less_comparer));
 
     const size_t heap_size = last - first;
     const size_t item_index = item - first;
     _sift_down(first, less_comparer, heap_size, item_index);
 
-    assert(is_heap(first, last, less_comparer));
+//    assert(is_heap(first, last, less_comparer));
   }
 
   // Restores max heap invariant after item's value has been decreased,
@@ -488,7 +488,7 @@ public:
     assert(last > first);
     assert(item >= first);
     assert(item < last);
-    assert(is_heap(first, last, less_comparer));
+//    assert(is_heap(first, last, less_comparer));
 
     const size_t new_heap_size = last - first - 1;
     const size_t item_index = item - first;
@@ -502,7 +502,7 @@ public:
       }
     }
 
-    assert(is_heap(first, last - 1, less_comparer));
+//    assert(is_heap(first, last - 1, less_comparer));
   }
 
   // Removes the given item from the heap and puts it into *(last - 1).

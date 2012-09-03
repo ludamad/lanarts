@@ -6,6 +6,8 @@
 #ifndef DISPLAY_H_
 #define DISPLAY_H_
 
+#include <cstdlib>
+
 #include <SDL.h>
 #undef GL_GLEXT_VERSION
 #include <SDL_opengl.h>
@@ -23,8 +25,15 @@ void init_sdl_gl(bool fullscreen, int w, int h);
 void update_display();
 void SDL_GL_diagnostics();
 
+void gl_subimage_from_bytes(GLimage& img, const BBox& region, char* data,
+		int type = GL_BGRA);
 void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type =
 		GL_BGRA);
+
+inline void gl_init_image(GLimage& img, int w, int h, int type =
+		GL_BGRA) {
+	gl_image_from_bytes(img, w, h, NULL, type);
+}
 
 void gl_draw_image(GLimage& img, int x, int y,
 		const Colour& c = Colour(255, 255, 255));
@@ -36,9 +45,8 @@ void gl_draw_sprite(sprite_id sprite, int x, int y,
 		const Colour& c = Colour(255, 255, 255));
 void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 		const Colour& c = Colour(255, 255, 255));
-void gl_draw_sprite(const GameView& view, sprite_id sprite, int x,
-		int y, float dx, float dy, int steps,
-		const Colour& c = Colour(255, 255, 255));
+void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
+		float dx, float dy, int steps, const Colour& c = Colour(255, 255, 255));
 
 void gl_draw_circle(float x, float y, float radius, const Colour& colour =
 		Colour(0, 0, 0), bool outline = false);
@@ -70,7 +78,6 @@ void gl_draw_statbar(const GameView& view, const BBox& bbox, int min_stat,
 
 void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
 		char* flags, const Colour& colour = Colour(0, 0, 0));
-
 
 Dim gl_text_dimensions(const font_data& font, const char *fmt, ...);
 //Will print out text at window coordinates x,y, using the font ft_font.

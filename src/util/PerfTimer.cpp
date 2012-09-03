@@ -29,7 +29,7 @@ void PerfTimer::print_results() {
 		float total = mpp.total_microseconds / 1000.0f;
 		float avg = total / mpp.total_calls;
 		printf(
-				"%s():\n\tAVG %.4fms\tTOTAL\t %.4fms\tCALLS\t %d\n",
+				"%s:\n\tAVG %.4fms\tTOTAL\t %.4fms\tCALLS\t %d\n",
 				it->first, avg, total, mpp.total_calls);
 	}
 }

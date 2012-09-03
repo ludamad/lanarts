@@ -282,6 +282,7 @@ void GameState::adjust_view_to_dragging() {
 	dragging_view = is_dragged;
 }
 void GameState::draw(bool drawhud) {
+	perf_timer_begin(FUNCNAME);
 
 	adjust_view_to_dragging();
 
@@ -308,6 +309,7 @@ void GameState::draw(bool drawhud) {
 	update_display();
 
 //	glFinish(); // XXX: Apparently glFinish is not recommended
+	perf_timer_end(FUNCNAME);
 }
 
 obj_id GameState::add_instance(GameInst* inst) {
@@ -349,6 +351,11 @@ int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 			f, x, y, radius);
 }
 
+static bool player_radius_visible_test(PlayerInst* player, const BBox& bbox) {
+	fov& fov = player->field_of_view();
+	return fov.within_fov(bbox);
+}
+
 bool GameState::radius_visible_test(int x, int y, int radius,
 		PlayerInst* player, bool canreveal) {
 	const int sub_sqrs = VISION_SUBSQRS;
@@ -359,29 +366,32 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 	int maxgrid_x = (x + radius) / subsize, maxgrid_y = (y + radius) / subsize;
 	int minx = squish(mingrid_x, 0, w), miny = squish(mingrid_y, 0, h);
 	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
+	/*
+	 if (canreveal && key_down_state(SDLK_BACKQUOTE)) {
+	 return true;
+	 }*/
 
-	std::vector<PlayerInst*> players = players_in_level();
+	if (player) {
+		if (player->current_level != game_world().get_current_level_id()) {
+			return false;
+		}
 
-	if (/*(canreveal && key_down_state(SDLK_BACKQUOTE)) ||*/players.empty()) {
-		return true;
+		return player_radius_visible_test(player, BBox(minx, miny, maxx, maxy));
 	}
 
+	bool has_player = false;
 	PlayerData& pc = player_data();
-	for (int yy = miny; yy <= maxy; yy++) {
-		for (int xx = minx; xx <= maxx; xx++) {
-			if (player && player->field_of_view().within_fov(xx, yy)) {
+	std::vector<PlayerDataEntry>& pdes = pc.all_players();
+	for (int i = 0; i < pdes.size(); i++) {
+		PlayerInst* p = (PlayerInst*)pdes[i].player_inst.get_instance();
+		if (p->current_level == game_world().get_current_level_id()) {
+			has_player = true;
+			if (player_radius_visible_test(p, BBox(minx, miny, maxx, maxy))) {
 				return true;
-			} else if (!player) {
-				for (int i = 0; i < players.size(); i++) {
-					fov& fov = players[i]->field_of_view();
-					if (fov.within_fov(xx, yy)) {
-						return true;
-					}
-				}
 			}
 		}
 	}
-	return false;
+	return (!has_player);
 }
 bool GameState::object_visible_test(GameInst* obj, PlayerInst* player,
 		bool canreveal) {

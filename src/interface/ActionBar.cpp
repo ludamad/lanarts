@@ -229,11 +229,13 @@ static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 
 // Frame event handling
 void ActionBar::draw(GameState* gs) const {
+	perf_timer_begin(FUNCNAME);
 	PlayerInst* player = gs->local_player();
 
 	draw_player_weapon_actionbar(gs, player, bbox.x1, bbox.y1);
 	draw_player_spell_actionbar(gs, player,
 			BBox(bbox.x1 + EQUIP_SLOT_WIDTH, bbox.y1, bbox.x2, bbox.y2));
+	perf_timer_end(FUNCNAME);
 }
 
 void ActionBar::step(GameState* gs) {
