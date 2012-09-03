@@ -118,6 +118,9 @@ sprites:
   - name: green slime
     file: res/sprites/monsters/green_slime.png
 
+  - name: red slime
+    file: res/sprites/monsters/red_slime.png
+
   - name: jester
     file: res/sprites/monsters/jester.png
 

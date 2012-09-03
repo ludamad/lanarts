@@ -3,58 +3,61 @@
 #Dungeon Markup
 
 easy_animals: &easy_animals
-  - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 2 }
-  - { enemy: Giant Bat,         chance: 100                                   }
-  - { enemy: Hound,             chance: 60                                    }
-  - { enemy: Sheep,             chance: 60                                    }
+  - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 2          }
+  - { enemy: Green Slime,       chance: 60,   group_chance: 10, group_size: 2          }
+  - { enemy: Giant Bat,         chance: 100                                            }
+  - { enemy: Hound,             chance: 60                                             }
+  - { enemy: Sheep,             chance: 60                                             }
 
 medium_animals: &medium_animals
-  - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 3 }
-  - { enemy: Giant Bat,         chance: 100,  group_chance: 33, group_size: 3 }
-  - { enemy: Giant Spider,      chance: 100,                                  }
-  - { enemy: Hound,             chance: 100                                   }
-  - { enemy: Sheep,             chance: 100                                   }
-  - { enemy: Giant Frog,        chance: 100                                   }
+  - { enemy: Giant Rat,         chance: 100, group_chance: 33, group_size: 3           }
+  - { enemy: Giant Bat,         chance: 100, group_chance: 33, group_size: 3           }
+  - { enemy: Giant Spider,      chance: 100,                                           }
+  - { enemy: Hound,             chance: 100                                            }
+  - { enemy: Sheep,             chance: 100                                            }
+  - { enemy: Giant Frog,        chance: 100                                            }
 
 easy_enemies: &easy_enemies
-  - { enemy: Skeleton,          chance: 100                                   }
-  - { enemy: Hound,             chance: 100                                   }
-  - { enemy: Chicken,           chance: 100                                   }
-  - { enemy: Cloud Elemental,   chance: 100,  group_chance: 33, group_size: 2 }
-  - { enemy: Unseen Horror,     chance: 20                                    }
+  - { enemy: Skeleton,          chance: 100                                            }
+  - { enemy: Hound,             chance: 100                                            }
+  - { enemy: Chicken,           chance: 100                                            }
+  - { enemy: Cloud Elemental,   chance: 100, group_chance: 33, group_size: 2           }
+  - { enemy: Green Slime,       chance: 66, group_chance: 10, group_size: 2            }
+  - { enemy: Unseen Horror,     chance: 20                                             }
 
 medium_enemies: &medium_enemies
-  - { enemy: Skeleton,          chance: 100                                   }
-  - { enemy: Chicken,           chance: 50                                    }
-  - { enemy: Zombie,            chance: 100                                   }
-  - { enemy: Storm Elemental,   chance: 66,  group_chance: 33, group_size: 2  }
-  - { enemy: Unseen Horror,     chance: 30                                    }
-  - { enemy: Krell,             chance: 10                                    }
+  - { enemy: Skeleton,          chance: 100                                            }
+  - { enemy: Zombie,            chance: 100                                            }
+  - { enemy: Storm Elemental,   chance: 66, group_chance: 33, group_size: 2            }
+  - { enemy: Red Slime,         chance: 66, group_chance: 10, group_size: 2            }
+  - { enemy: Chicken,           chance: 50                                             }
+  - { enemy: Unseen Horror,     chance: 30                                             }
+  - { enemy: Krell,             chance: 10                                             }
  
 hard_enemies: &hard_enemies
- - { enemy: Skeleton,          chance: 50                                    }
- - { enemy: Storm Elemental,   chance: 5,  group_chance: 100, group_size: 3   }
- - { enemy: Hell Storm,        chance: 20, group_chance: 33, group_size: 2   }
- - { enemy: Grue                                                             }
- - { enemy: Super Chicken,     chance: 100                                   }
- - { enemy: Zombie,            chance: 75                                    }
- - { enemy: Ciribot,           chance: 75                                    }
- - { enemy: Golem,             guaranteed_spawns: 1                          }
- - { enemy: Krell,             chance: 30                                    }
- - { enemy: Hell Forged,       chance: 10                                    }
- - { enemy: Unseen Horror,     chance: 30,  group_chance: 33, group_size: 2  }
+ - { enemy: Skeleton,          chance: 50                                              }
+ - { enemy: Storm Elemental,   chance: 5, group_chance: 100, group_size: 3             }
+ - { enemy: Hell Storm,        chance: 20, group_chance: 33, group_size: 2             }
+ - { enemy: Grue                                                                       }
+ - { enemy: Super Chicken,     chance: 100                                             }
+ - { enemy: Zombie,            chance: 75                                              }
+ - { enemy: Ciribot,           chance: 75                                              }
+ - { enemy: Golem,             guaranteed_spawns: 1                                    }
+ - { enemy: Krell,             chance: 30                                              }
+ - { enemy: Hell Forged,       chance: 10                                              }
+ - { enemy: Unseen Horror,     chance: 30, group_chance: 33, group_size: 2             }
 
 harder_enemies: &harder_enemies
-  - { enemy: Super Chicken,     chance: 50,  group_chance: 33, group_size: [2,4]}
-  - { enemy: Imp,               chance: 50                                    }
-  - { enemy: Ciribot,           chance: 100                                   }
-  - { enemy: Storm Elemental,   chance: 5,  group_chance: 100, group_size: 4  }
-  - { enemy: Hell Storm,        chance: 20, group_chance: 33, group_size: 3   }
-  - { enemy: Grue,              chance: 50,  group_chance: 33, group_size: 2  }
-  - { enemy: Golem,             guaranteed_spawns: 1,  group_chance: 100, group_size: 2}
-  - { enemy: Jester,            chance: 20,                                   }
-  - { enemy: Hell Forged,       chance: 25                                    }
-  - { enemy: Unseen Horror,     chance: 30,  group_chance: 33, group_size: 2  }
+  - { enemy: Super Chicken,     chance: 50, group_chance: 33, group_size: [2,4]        }
+  - { enemy: Imp,               chance: 50                                             }
+  - { enemy: Ciribot,           chance: 100                                            }
+  - { enemy: Storm Elemental,   chance: 5, group_chance: 100, group_size: 4            }
+  - { enemy: Hell Storm,        chance: 20, group_chance: 33, group_size: 3            }
+  - { enemy: Grue,              chance: 50, group_chance: 33, group_size: 2            }
+  - { enemy: Golem,             guaranteed_spawns: 1, group_chance: 100, group_size: 2 }
+  - { enemy: Jester,            chance: 20                                             }
+  - { enemy: Hell Forged,       chance: 25                                             }
+  - { enemy: Unseen Horror,     chance: 30, group_chance: 33, group_size: 2            }
 
 layouts:
       - &test_layout
