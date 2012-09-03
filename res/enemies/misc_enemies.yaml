@@ -64,3 +64,35 @@ enemies:
         strength: 35
         defence: 20
         willpower: 20
+  - name: Green Slime
+    sprite: green slime
+    death_sprite: green blood
+    description: Oozing ball of slime
+    appear_message: A green ball of goop slides into view
+    defeat_message: The green goop falls apart
+    radius: 14
+    xpaward: 10
+    stats:
+      attacks: [ {weapon: Fast Melee} ]
+      hp: 12
+      hpregen: 0.1
+      movespeed: 2
+      strength: 4
+      defence: 2
+      willpower: 3
+  - name: Red Slime
+    sprite: red slime
+    death_sprite: green blood #TODO: Red blood
+    description: Oozing ball of slime
+    appear_message: A red ball of goop slides into view
+    defeat_message: The red goop falls apart
+    radius: 14
+    xpaward: 20
+    stats:
+      attacks: [ {weapon: Fast Melee} ]
+      hp: 30
+      hpregen: 0.15
+      movespeed: 3
+      strength: 7
+      defence: 5
+      willpower: 6

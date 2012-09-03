@@ -1,12 +1,12 @@
 ---
 items:
   - name: Gold #Gold must be named 'Gold' for the time being
-    sprite: gold
+    spr_item: gold
 
   - name: Health Potion
     shop_cost: [15,35]
     type: potion
-    sprite: health_potion
+    spr_item: health_potion
     description: A blessed potion of healing infusions, it restores 50 HP to the user.
     action_func: increase_health
     prereq_func: function (item, obj) return obj.stats.hp < obj.stats.max_hp end 
@@ -15,7 +15,7 @@ items:
   - name: Mana Potion
     shop_cost: [15,35]
     type: potion
-    sprite: mana_potion
+    spr_item: mana_potion
     description: A magical potion of energizing infusions, it restores 50 MP to the user.
     action_func: increase_mana
     prereq_func: function (item, obj) return obj.stats.mp < obj.stats.max_mp end 
@@ -27,7 +27,7 @@ items:
       A scroll that captures the power of the winds, 
       it bestows the user with power and speed for a limited duration.
     use_message: You feel yourself moving faster and faster!
-    sprite: scroll_haste
+    spr_item: scroll_haste
     action_func: hasten
     duration: 400
     amount: 1
@@ -38,7 +38,7 @@ items:
       A mantra of unnatural modification, 
       it bestows the user with a permanent, albeit small, increase to strength.
     use_message: Strength is bestowed upon you!
-    sprite: scroll_strength
+    spr_item: scroll_strength
     action_func: increase_strength
     amount: 1
 
@@ -48,7 +48,7 @@ items:
       A mantra of unnatural modification, 
       it bestows the user with a permanent, albeit small, increase to defence.
     use_message: Defence is bestowed upon you!
-    sprite: scroll_defence
+    spr_item: scroll_defence
     action_func: increase_defence
     amount: 1
 
@@ -58,7 +58,7 @@ items:
       A mantra of unnatural modification, 
       it bestows the user with a permanent, albeit small, increase to magic.
     use_message: Magic is bestowed upon you!
-    sprite: scroll_magic
+    spr_item: scroll_magic
     action_func: increase_magic
     amount: 1
 
@@ -68,7 +68,7 @@ items:
       A mantra of unnatural modification, 
       it bestows the user with a permanent, albeit small, increase to will.
     use_message: Will is bestowed upon you!
-    sprite: scroll_will
+    spr_item: scroll_will
     action_func: increase_willpower
     amount: 1
 
@@ -77,7 +77,7 @@ items:
     description:
       Enlightens the user about his surroundings.
     use_message: You feel enlightened!
-    sprite: scroll_will
+    spr_item: scroll_will
     action_func: reveal_map
     amount: 1
     
@@ -85,7 +85,7 @@ items:
     shop_cost: [80,85]
     description: Brings you to a nearby exit.
     use_message: You feel closer to escaping!
-    sprite: scroll escape
+    spr_item: scroll escape
     action_func: function (item, obj) obj_to_exit(obj) end 
     amount: 1
     

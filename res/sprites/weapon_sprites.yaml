@@ -5,6 +5,12 @@ sprites:
   - name: short sword
     file: res/sprites/items/weapons/shortsword.png
     
+  - name: samuri sabre
+    file: res/sprites/items/weapons/samuri_sabre.png
+    
+  - name: iron broadsword
+    file: res/sprites/items/weapons/iron_broadsword.png
+    
   - name: magic sword
     file: res/sprites/items/weapons/magic_sword.png
 
@@ -16,6 +22,9 @@ sprites:
 
   - name: bow1
     file: res/sprites/items/weapons/ranged/bow1.png
+  
+  - name: iron scimitar
+    file: res/sprites/items/weapons/scimitar.png
 
   - name: long bow
     file: res/sprites/items/weapons/ranged/longbow.png

@@ -32,9 +32,6 @@ bool yaml_has_node(const YAML::Node& n, const char* key);
 //
 //void optional_set(const YAML::Node& node, const char* key, bool& value);
 
-AttackStats parse_attack(const YAML::Node& n);
-CombatStats parse_combat_stats(const YAML::Node& n);
-
 Range parse_range(const YAML::Node& n);
 
 //const char* parse_cstr(const YAML::Node & n);
@@ -43,10 +40,7 @@ int parse_int(const YAML::Node & n);
 
 const YAML::Node& operator >>(const YAML::Node& n, bool& r);
 const YAML::Node& operator >>(const YAML::Node& n, Range& r);
-const YAML::Node& operator >>(const YAML::Node& n, CoreStatMultiplier& sm);
 const YAML::Node& operator >>(const YAML::Node& n, FilenameList& filenames);
-const YAML::Node& operator >>(const YAML::Node& n,
-		std::vector<AttackStats>& attacks);
 const YAML::Node& operator >>(const YAML::Node& n,
 		Colour& colour);
 

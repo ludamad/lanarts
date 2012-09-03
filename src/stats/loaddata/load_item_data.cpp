@@ -71,6 +71,7 @@ LuaValue _load_item_data(lua_State* L, const FilenameList& filenames) {
 void parse_item_entry(const YAML::Node& n, ItemEntry& entry) {
 	entry.name = parse_str(n["name"]);
 	entry.description = parse_defaulted(n, "description", std::string());
+	entry.shop_cost = parse_defaulted(n, "shop_cost", Range());
 
 	entry.use_action.success_message = parse_defaulted(n, "use_message",
 			std::string());
@@ -79,7 +80,7 @@ void parse_item_entry(const YAML::Node& n, ItemEntry& entry) {
 	entry.use_action.action_func = parse_defaulted(n, "action_func",
 			std::string());
 
-	entry.item_sprite = parse_sprite_number(n, "sprite");
+	entry.item_sprite = parse_sprite_number(n, "spr_item");
 	parse_defaulted(n, "prereq_func", std::string());
 	entry.stackable = parse_defaulted(n, "stackable", true);
 	parse_defaulted(n, "shop_cost", Range());

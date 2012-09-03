@@ -28,11 +28,11 @@ void load_armour_data(lua_State* L, const FilenameList& filenames,
 void load_weapon_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemstable = NULL);
 LuaValue load_spell_data(lua_State* L, const FilenameList& filenames);
-LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
+LuaValue _load_projectile_data(lua_State* L, const FilenameList& filenames,
 		LuaValue& itemstable);
 void load_armour_item_entries();
 void load_weapon_item_entries();
-void load_projectile_item_entries();
+void _load_projectile_item_entries();
 
 LuaValue _load_item_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_itemgenlist_data(lua_State* L, const FilenameList& filenames);
@@ -210,9 +210,9 @@ GameSettings init_game_data(lua_State* L) {
 	// --- ITEM DATA ---
 	lua_items = _load_item_data(L, dfiles.item_files);
 
-	lua_projectiles = load_projectile_data(L, dfiles.projectile_files,
+	lua_projectiles = _load_projectile_data(L, dfiles.projectile_files,
 			lua_items);
-	load_projectile_item_entries();
+	_load_projectile_item_entries();
 
 	lua_spells = load_spell_data(L, dfiles.spell_files);
 

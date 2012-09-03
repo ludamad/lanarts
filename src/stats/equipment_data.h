@@ -104,7 +104,7 @@ struct AttackStats {
 	int projectile_speed;
 };
 
-struct EquipmentEntry {
+struct _EquipmentEntry {
 	enum equipslot_t {
 		UNEQUIPPED, WEAPON, PROJECTILE, BODY_ARMOUR, HELMET, RING
 	};
@@ -138,12 +138,12 @@ struct EquipmentEntry {
 		return type == UNEQUIPPED || type == RING;
 	}
 
-	EquipmentEntry() :
+	_EquipmentEntry() :
 			type(UNEQUIPPED), item_sprite(0), usage_sprite(0) {
 	}
 };
 
-typedef EquipmentEntry ProjectileEntry;
-typedef EquipmentEntry WeaponEntry;
+typedef _EquipmentEntry ProjectileEntry;
+typedef _EquipmentEntry WeaponEntry;
 
 #endif /* EQUIPMENT_DATA_H_ */

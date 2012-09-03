@@ -156,42 +156,6 @@ Equipment parse_equipment(const YAML::Node& n) {
 	return ret;
 }
 
-CombatStats parse_combat_stats(const YAML::Node& n) {
-	CombatStats ret;
-	ClassStats& class_stats = ret.class_stats;
-	CoreStats& core = ret.core;
-
-	n["movespeed"] >> ret.movespeed;
-
-	if (yaml_has_node(n, "equipment")) {
-		ret.equipment = parse_equipment(n["equipment"]);
-	}
-	core.max_mp = parse_defaulted(n, "mp", 0);
-	core.max_hp = parse_int(n["hp"]);
-	core.hpregen = parse_defaulted(n, "hpregen", 0.0);
-	core.mpregen = parse_defaulted(n, "mpregen", 0.0);
-	core.hp = core.max_hp;
-	core.mp = core.max_hp;
-
-	core.strength = parse_defaulted(n, "strength", 0);
-	core.defence = parse_defaulted(n, "defence", 0);
-
-	core.magic = parse_defaulted(n, "magic", 0);
-	core.willpower = parse_defaulted(n, "willpower", 0);
-
-//	core.physical_reduction = parse_defaulted(n, "reduction", 0);
-//	LANARTS_ASSERT(core.physical_reduction == 0);
-//	core.magic_reduction = parse_defaulted(n, "magic_reduction", 0);
-//	LANARTS_ASSERT(core.magic_reduction == 0);
-
-	class_stats.xpneeded = parse_defaulted(n, "xpneeded",
-			experience_needed_formula(1));
-	class_stats.xplevel = parse_defaulted(n, "xplevel", 1);
-	ret.attacks = parse_defaulted(n, "attacks", std::vector<AttackStats>());
-
-	return ret;
-}
-
 const YAML::Node& operator >>(const YAML::Node& n, CoreStatMultiplier& sm) {
 	sm.base = parse_defaulted(n, "base", Range(0, 0));
 	sm.strength = parse_defaulted(n, "strength", 0.0f);
@@ -199,29 +163,6 @@ const YAML::Node& operator >>(const YAML::Node& n, CoreStatMultiplier& sm) {
 	sm.defence = parse_defaulted(n, "defence", 0.0f);
 	sm.willpower = parse_defaulted(n, "willpower", 0.0f);
 	return n;
-}
-
-const YAML::Node& operator >>(const YAML::Node& n,
-		std::vector<AttackStats>& attacks) {
-	for (int i = 0; i < n.size(); i++) {
-		attacks.push_back(parse_attack(n[i]));
-	}
-	return n;
-}
-
-AttackStats parse_attack(const YAML::Node & n) {
-	std::string name;
-	AttackStats ret;
-
-	if (yaml_has_node(n, "weapon")) {
-		name = parse_str(n["weapon"]);
-		ret.weapon = _Weapon(get_weapon_by_name(name.c_str()));
-	}
-	if (yaml_has_node(n, "projectile")) {
-		name = parse_str(n["projectile"]);
-		ret.projectile = _Projectile(get_projectile_by_name(name.c_str()));
-	}
-	return ret;
 }
 
 const YAML::Node& operator >>(const YAML::Node& n, Colour& colour) {

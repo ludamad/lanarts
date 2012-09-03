@@ -1,13 +1,14 @@
+extern "C" {
+#include <lua/lua.h>
+}
+
 #include <fstream>
 
+#include "../items/ProjectileEntry.h"
 #include "../../data/game_data.h"
 #include "../../data/yaml_util.h"
 
 #include "../item_data.h"
-
-extern "C" {
-#include <lua/lua.h>
-}
 
 using namespace std;
 
@@ -24,7 +25,7 @@ static float parse_magic_percentage(const YAML::Node& node, const char* key) {
 	}
 }
 
-void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
+void _load_projectile_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	_ProjectileEntry entry;
 	entry.name = parse_str(node["name"]);
@@ -65,14 +66,14 @@ void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
 	lua_setfield(L, -2, "type");
 	lua_pop(L, 1);
 }
-LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
+LuaValue _load_projectile_data(lua_State* L, const FilenameList& filenames,
 		LuaValue& itemtable) {
 	LuaValue ret;
 	ret.table_initialize(L);
 
 	game_projectile_data.clear();
-	load_data_impl_template(filenames, "projectiles", load_projectile_callbackf,
-			L, &itemtable);
+	load_data_impl_template(filenames, "projectiles",
+			_load_projectile_callbackf, L, &itemtable);
 
 	for (int i = 0; i < game_projectile_data.size(); i++) {
 		itemtable.table_push_value(L, game_projectile_data[i].name.c_str());
@@ -81,7 +82,7 @@ LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 	return ret;
 }
 
-void load_projectile_item_entries() {
+void _load_projectile_item_entries() {
 	const int default_radius = 15;
 
 	//Create items from projectiles
@@ -93,4 +94,78 @@ void load_projectile_item_entries() {
 						entry.item_sprite, "equip", "", true, entry.shop_cost,
 						_ItemEntry::ALWAYS_KNOWN, _ItemEntry::PROJECTILE, i));
 	}
+}
+
+void parse_item_entry(const YAML::Node& n, ItemEntry& entry);
+
+DamageModifiers parse_damage_modifier(const YAML::Node& n) {
+	DamageModifiers dmg;
+
+	dmg.damage = parse_defaulted(n, "damage", CoreStatMultiplier());
+	dmg.power = parse_defaulted(n, "power", CoreStatMultiplier());
+
+	dmg.magic_percentage = parse_magic_percentage(n, "damage_type");
+	dmg.physical_percentage = 1.0f - dmg.magic_percentage;
+
+	dmg.resistability = parse_defaulted(n, "resist_modifier", 1.0f);
+
+	return dmg;
+}
+
+Attack parse_attack_(const YAML::Node& n) {
+	Attack atk;
+	atk.damage = parse_damage_modifier(n);
+	atk.cooldown = parse_defaulted(n, "cooldown", 0);
+	atk.range = parse_defaulted(n, "range", 0);
+	atk.attack_action.action_func = LuaValue(
+			parse_defaulted(n, "on_hit_func", std::string()));
+	return atk;
+}
+
+void parse_projectile_entry(const YAML::Node& n, ProjectileEntry& entry) {
+	parse_item_entry(n, entry);
+	entry.stackable = true;
+	entry.attack = parse_attack_(n);
+	entry.attack.attack_sprite = entry.item_sprite;
+	if (yaml_has_node(n, "spr_attack")) {
+		entry.attack.attack_sprite = parse_sprite_number(n, "spr_attack");
+	}
+
+	entry.drop_chance = parse_defaulted(n, "drop_chance", 0);
+	entry.weapon_class = parse_str(n["weapon_class"]);
+
+	entry.speed = parse_defaulted(n, "speed", 4.0f);
+	entry.number_of_target_bounces = parse_defaulted(n,
+			"number_of_target_bounces", 0);
+	entry.can_wall_bounce = parse_defaulted(n, "can_wall_bounce", false);
+	entry.radius = parse_defaulted(n, "radius", 5);
+}
+
+void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
+		LuaValue* value) {
+	ProjectileEntry* entry = new ProjectileEntry;
+	parse_projectile_entry(node, *entry);
+
+	game_item_data.push_back(entry);
+	/* Lua loading code */
+	value->table_set_yaml(L, entry->name, node);
+	value->table_push_value(L, entry->name);
+	lua_pushstring(L, "projectile");
+	lua_setfield(L, -2, "type");
+	lua_pop(L, 1);
+
+}
+LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
+		LuaValue& itemtable) {
+	LuaValue ret;
+	ret.table_initialize(L);
+
+	load_data_impl_template(filenames, "projectiles",
+			_load_projectile_callbackf, L, &itemtable);
+
+	for (int i = 0; i < game_projectile_data.size(); i++) {
+		itemtable.table_push_value(L, game_projectile_data[i].name.c_str());
+		ret.table_pop_value(L, game_projectile_data[i].name.c_str());
+	}
+	return ret;
 }
