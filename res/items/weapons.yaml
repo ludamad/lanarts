@@ -69,10 +69,10 @@ weapons:
     shop_cost: [100,150]
     weapon_class: blades
     description: Slice quickly and efficiently
-    damage: {base: [4,12], strength: 1.4 }
+    damage: {base: [1,9], strength: 1.2 }
     resist_modifier: 0.9
     power: {base: 6, strength: 0.35}
-    range: 6
+    range: 5
     cooldown: 15
     spr_item: iron scimitar
 
