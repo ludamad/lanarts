@@ -42,6 +42,9 @@ sprites:
 
   - name: giant bat
     file: res/sprites/monsters/animals/bat.png
+    
+  - name: giant spider
+    file: res/sprites/monsters/animals/spider.png
 
 #Undead
 

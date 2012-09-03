@@ -26,3 +26,20 @@ weapons:
     cooldown: 20
     spr_item: none
     resist_modifier: 0.5
+    
+  - name: Fast Melee Poison
+    weapon_class: unarmed
+    damage: { base: [2,4], strength: 0.5 } # 50 % strength
+    power: {  base: 0,     strength: 0.2 }
+    range: 7
+    cooldown: 20
+    spr_item: none
+    resist_modifier: 0.5
+    on_hit_func: 
+      function(projectile, target, atkstats) 
+        local effect = target:add_effect(effects.Poison.name, 150, atkstats) 
+        effect.damage = atkstats.damage
+        effect.power = atkstats.power
+        effect.magic_percentage = atkstats.magic_percentage
+        effect.physical = atkstats.physical
+      end

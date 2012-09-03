@@ -11,6 +11,7 @@ easy_animals: &easy_animals
 medium_animals: &medium_animals
   - { enemy: Giant Rat,         chance: 100,  group_chance: 33, group_size: 3 }
   - { enemy: Giant Bat,         chance: 100,  group_chance: 33, group_size: 3 }
+  - { enemy: Giant Spider,      chance: 100,                                  }
   - { enemy: Hound,             chance: 100                                   }
   - { enemy: Sheep,             chance: 100                                   }
   - { enemy: Giant Frog,        chance: 100                                   }

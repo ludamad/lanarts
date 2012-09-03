@@ -34,6 +34,22 @@ enemies:
         strength: 10
         defence: 5
         willpower: 5
+        
+  - name: Giant Spider
+    sprite: giant spider
+    death_sprite: blood
+    radius: 18
+    xpaward: 12
+    appear_message: A giant spider crawls towards you
+    defeat_message: The giant spider has been squashed.
+    stats:
+        attacks: [ {weapon: Fast Melee Poison} ]
+        hp: 20
+        hpregen: 0.04
+        movespeed: 4
+        strength: 12
+        defence: 4
+        willpower: 10
        
   - name: Hound
     sprite: hound
