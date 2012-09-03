@@ -5,6 +5,9 @@ sprites:
   - name: short sword
     file: res/sprites/items/weapons/shortsword.png
     
+  - name: samuri sabre
+    file: res/sprites/items/weapons/samuri_sabre.png
+    
   - name: iron broadsword
     file: res/sprites/items/weapons/iron_broadsword.png
     
