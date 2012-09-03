@@ -14,8 +14,7 @@
 
 #include "EnemyInst.h"
 #include "../player/PlayerInst.h"
-
-#include "../../combat_logic/attack_logic.h"
+#include "../CombatGameInstFunctions.h"
 
 #include "../../display/colour_constants.h"
 #include "../../util/math_util.h"
@@ -72,8 +71,7 @@ void MonsterController::serialize(SerializeBuffer& serializer) {
 	serializer.write(monsters_wandering_flag);
 }
 
-void MonsterController::deserialize(
-		SerializeBuffer& serializer) {
+void MonsterController::deserialize(SerializeBuffer& serializer) {
 	serializer.read_container(mids);
 	serializer.read(monsters_wandering_flag);
 }
@@ -110,6 +108,7 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 }
 
 void MonsterController::pre_step(GameState* gs) {
+	perf_timer_begin(FUNCNAME);
 
 	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
 	PlayerInst* local_player = gs->local_player();
@@ -121,6 +120,8 @@ void MonsterController::pre_step(GameState* gs) {
 	std::vector<obj_id> mids2;
 	mids2.reserve(mids.size());
 	mids.swap(mids2);
+
+
 	for (int i = 0; i < mids2.size(); i++) {
 		EnemyInst* e = (EnemyInst*)gs->get_instance(mids2[i]);
 		if (e == NULL)
@@ -140,16 +141,20 @@ void MonsterController::pre_step(GameState* gs) {
 		if (closest_player_index == -1
 				&& eb.current_action == EnemyBehaviour::CHASING_PLAYER) {
 			eb.current_action = EnemyBehaviour::INACTIVE;
+			e->target() = NONE;
 		}
 
 		if (eb.current_action == EnemyBehaviour::CHASING_PLAYER)
-			eois.push_back(EnemyOfInterest(e, closest_player_index));
+			eois.push_back(
+					EnemyOfInterest(e, closest_player_index,
+							inst_distance(e, players[closest_player_index])));
 		else if (eb.current_action == EnemyBehaviour::INACTIVE)
 			monster_wandering(gs, e);
 		else
 			//if (eb.current_action == EnemyBehaviour::FOLLOWING_PATH)
 			monster_follow_path(gs, e);
 	}
+
 	set_monster_headings(gs, eois);
 
 	//Update player positions for collision avoidance simulator
@@ -173,6 +178,8 @@ void MonsterController::pre_step(GameState* gs) {
 		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[i]);
 		update_position(gs, e);
 	}
+
+	perf_timer_end(FUNCNAME);
 }
 
 void MonsterController::update_velocity(GameState* gs, EnemyInst* e) {

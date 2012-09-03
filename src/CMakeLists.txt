@@ -7,6 +7,7 @@ FIND_PACKAGE(SDL_net REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
+#add_definitions(-DNDEBUG)
 
 include_directories(${SDL_INCLUDE_DIR} ${OpenGL_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} ../src_yaml/yaml-cpp/include ../src_net/ ../src_rvo2/RVO2 ../src_lua)
 
@@ -26,11 +27,6 @@ set( lanarts_tests
 set( lanarts_src
 
 	collision_avoidance/CollisionAvoidance.cpp
-
-	combat_logic/ai_logic.cpp
-	combat_logic/attack_logic.cpp
-	combat_logic/combat_logic.cpp
-	combat_logic/movement_logic.cpp
 
 	lua/lmarshal.cpp
 	lua/lua_combatstats.cpp
@@ -106,6 +102,7 @@ set( lanarts_src
 	util/game_replays.cpp
 	util/mtwist.cpp
 	util/Timer.cpp
+	util/PerfTimer.cpp
 	lua/LuaValue.cpp
 	objects/collision_filters.cpp
 
@@ -165,11 +162,6 @@ set( lanarts_src
 set( lanarts_include
 
 	collision_avoidance/CollisionAvoidance.h
-
-	combat_logic/ai_logic.h
-	combat_logic/attack_logic.h
-	combat_logic/combat_logic.h
-	combat_logic/movement_logic.h
 
 	data/yaml_util.h
 
@@ -235,6 +227,7 @@ set( lanarts_include
 	util/math_util.h
 	util/mtwist.h
 	util/Timer.h
+	util/PerfTimer.h
 	objects/collision_filters.h
 
 	net/GameNetConnection.h

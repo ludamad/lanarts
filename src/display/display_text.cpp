@@ -18,6 +18,29 @@
 #include "font.h"
 #include "GLImage.h"
 
+static void gl_draw_glyph(const font_data& font, char glyph, int x, int y,
+		Colour c) {
+	const GLimage& img = font.font_img;
+	const char_data& data = font.data[glyph];
+	if (data.w == 0 || data.h == 0) {
+		return;
+	}
+	int x2 = x + data.w, y2 = y + data.h;
+
+	//Draw our four points, clockwise.
+	glTexCoord2f(data.tx1, data.ty1);
+	glVertex2i(x, y);
+
+	glTexCoord2f(data.tx2, data.ty1);
+	glVertex2i(x2, y);
+
+	glTexCoord2f(data.tx2, data.ty2);
+	glVertex2i(x2, y2);
+
+	glTexCoord2f(data.tx1, data.ty2);
+	glVertex2i(x, y2);
+}
+
 /*Splits up strings, respecting space boundaries & returns maximum width */
 static int process_string(const font_data& font, const char* text,
 		int max_width, std::vector<int>& line_splits) {
@@ -27,7 +50,7 @@ static int process_string(const font_data& font, const char* text,
 	unsigned char c;
 
 	while ((c = text[ind]) != '\0') {
-		char_data& cdata = *font.data[c];
+		const char_data& cdata = font.data[c];
 		width += cdata.advance;
 		width_since_space += cdata.advance;
 
@@ -56,9 +79,10 @@ static int process_string(const font_data& font, const char* text,
 
 //
 /* General gl_print function for others to delegate to */
-static Dim gl_print_impl(const font_data& font, const Colour& colour, Pos p,
+static Dim gl_print_impl(const font_data& font, const Colour& c, Pos p,
 		int max_width, bool center_x, bool center_y, bool actually_print,
 		const char* fmt, va_list ap) {
+	perf_timer_begin(FUNCNAME);
 	char text[512];
 	vsnprintf(text, 512, fmt, ap);
 	va_end(ap);
@@ -75,6 +99,11 @@ static Dim gl_print_impl(const font_data& font, const Colour& colour, Pos p,
 		p.y -= font.h * line_splits.size() / 2;
 	}
 
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, font.font_img.texture);
+
+	glColor4ub(c.r, c.g, c.b, c.a);
+	glBegin(GL_QUADS);
 	for (int linenum = 0, i = 0; linenum < line_splits.size(); linenum++) {
 		int len = 0;
 		int eol = line_splits[linenum];
@@ -86,17 +115,20 @@ static Dim gl_print_impl(const font_data& font, const Colour& colour, Pos p,
 			if (chr == '\n') {
 				continue; //skip newline char
 			}
-			char_data &cdata = *font.data[chr];
+			const char_data& cdata = font.data[chr];
 			len += cdata.advance;
 			if (actually_print) {
-				gl_draw_image(cdata.img,
+				gl_draw_glyph(font, chr,
 						p.x + len - (cdata.advance - cdata.left),
-						p.y + offset.h - cdata.move_up, colour);
+						p.y + offset.h - cdata.move_up, c);
 			}
 		}
 		offset.w = std::max(len, offset.w);
 		offset.h += 1;
 	}
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	perf_timer_end(FUNCNAME);
 	return offset;
 }
 /* printf-like function that draws to the screen, returns dimensions of formatted string*/

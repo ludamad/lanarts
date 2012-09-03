@@ -138,6 +138,7 @@ void PlayerInst::shift_autotarget(GameState* gs) {
 }
 
 void PlayerInst::step(GameState* gs) {
+	perf_timer_begin(FUNCNAME);
 	_path_to_player.calculate_path(gs, x, y, PLAYER_PATHING_RADIUS);
 
 	GameInst* target_inst = gs->get_instance(current_target);
@@ -152,6 +153,7 @@ void PlayerInst::step(GameState* gs) {
 
 	if (!actions_set_for_turn) {
 		printf("No actions for turn player id %d\n", id);
+		perf_timer_end(FUNCNAME);
 		return;
 	}
 
@@ -179,6 +181,7 @@ void PlayerInst::step(GameState* gs) {
 		}
 //		else
 //			gs->remove_instance(this);
+		perf_timer_end(FUNCNAME);
 		return;
 	}
 
@@ -189,6 +192,7 @@ void PlayerInst::step(GameState* gs) {
 		view.center_on(last_x, last_y);
 
 	update_position(rx + vx, ry + vy);
+	perf_timer_end(FUNCNAME);
 }
 
 void PlayerInst::draw(GameState* gs) {

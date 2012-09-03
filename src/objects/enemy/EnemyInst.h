@@ -8,6 +8,7 @@
 
 #include "../CombatGameInst.h"
 #include "../GameInst.h"
+#include "EnemyAIState.h"
 #include "EnemyBehaviour.h"
 
 #include "../../stats/stats.h"
@@ -45,6 +46,7 @@ protected:
 	bool seen;
 	int enemytype;
 	EnemyBehaviour eb;
+//	EnemyAIState ai_state;
 	int xpgain;
 };
 

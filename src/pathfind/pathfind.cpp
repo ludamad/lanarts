@@ -3,7 +3,7 @@
  *  Utilities for flood-fill based pathfinding
  */
 
-#include <algorithm>
+#include "gheap.h"
 #include <cmath>
 #include "pathfind.h"
 #include "../display/tile_data.h"
@@ -22,7 +22,7 @@ void floodfill(PathingNode* path, int w, int h, int sx, int sy, int alloc_w) {
 	while (heap != heap_end) {
 		PathCoord curr = *heap;
 		PathCoord next;
-		pop_heap(heap, heap_end--);
+		gheap<>::pop_heap(heap, heap_end--);
 		for (int dy = -1; dy <= +1; dy++) {
 			for (int dx = -1; dx <= +1; dx++) {
 				int nx = curr.x + dx, ny = curr.y + dy;
@@ -43,7 +43,7 @@ void floodfill(PathingNode* path, int w, int h, int sx, int sy, int alloc_w) {
 						p->dx = -dx, p->dy = -dy;
 						p->distance = dist;
 						*(heap_end++) = PathCoord(nx, ny, dist);
-						push_heap(heap, heap_end);
+						gheap<>::push_heap(heap, heap_end);
 					}
 				}
 			}
@@ -64,6 +64,7 @@ PathInfo::~PathInfo() {
 	delete[] path;
 }
 void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
+	perf_timer_begin(FUNCNAME);
 	int min_tilex, min_tiley;
 	int max_tilex, max_tiley;
 
@@ -102,6 +103,7 @@ void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
 	int tx = ox / TILE_SIZE - min_tilex, ty = oy / TILE_SIZE - min_tiley;
 	floodfill(path, w, h, tx, ty, alloc_w);
 	path_x = tx, path_y = ty;
+	perf_timer_end(FUNCNAME);
 }
 
 static bool is_solid_or_out_of_bounds(PathInfo& path, int x, int y) {

@@ -5,6 +5,7 @@
 
 #include <rvo2/RVO.h>
 
+#include "../util/PerfTimer.h"
 #include "../objects/CombatGameInst.h"
 
 #include "CollisionAvoidance.h"
@@ -75,7 +76,9 @@ void CollisionAvoidance::set_maxspeed(simul_id id, float maxspeed) {
 }
 
 void CollisionAvoidance::step() {
+	perf_timer_begin(FUNCNAME);
 	simulator->doStep();
+	perf_timer_end(FUNCNAME);
 }
 
 Posf CollisionAvoidance::get_position(simul_id id) {

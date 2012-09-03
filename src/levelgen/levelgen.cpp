@@ -17,7 +17,6 @@ extern "C" {
 
 #include "lua_levelgen_funcs.h"
 #include "GeneratedLevel.h"
-#include "shapefill.h"
 #include "levelgen.h"
 
 const int TOO_MANY_FAILURES = 100;
