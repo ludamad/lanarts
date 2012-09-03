@@ -3,13 +3,13 @@
  *  Utilities for flood-fill based pathfinding
  */
 
-#include "gheap.h"
-#include <cmath>
-#include "pathfind.h"
 #include "../display/tile_data.h"
+#include <cmath>
 #include "../gamestate/GameState.h"
 #include "../gamestate/GameTiles.h"
 #include "../util/math_util.h"
+#include "gheap.h"
+#include "pathfind.h"
 
 using namespace std;
 

@@ -8,17 +8,17 @@
 #include <cstring>
 #include <cmath>
 
-#include "sprite_data.h"
-
-#include "display.h"
-#include "GLImage.h"
+#include "../gamestate/GameView.h"
 
 #include "../util/math_util.h"
+#include "GLImage.h"
+
+#include "display.h"
 
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <algorithm>
-#include "../gamestate/GameView.h"
+#include "sprite_data.h"
 
 void gl_draw_image_section(GLimage& img, const BBox& section, int x, int y,
 		const Colour& c) {

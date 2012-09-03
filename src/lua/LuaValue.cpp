@@ -12,8 +12,8 @@ extern "C" {
 #include "../serialize/SerializeBuffer.h"
 
 #include "LuaValue.h"
-#include "lua_api.h"
 #include "lmarshal.h"
+#include "lua_api.h"
 
 //YAML related helper functions
 

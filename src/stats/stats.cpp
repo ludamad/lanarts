@@ -5,13 +5,13 @@
  *  without attack choice info, and then attack information is used to complete it.
  */
 
-#include "class_data.h"
-#include "weapon_data.h"
-
 #include "../util/mtwist.h"
+#include "class_data.h"
 
 #include "combat_stats.h"
+
 #include "stats.h"
+#include "weapon_data.h"
 
 bool CoreStats::hurt(int dmg) {
 	hp -= dmg;

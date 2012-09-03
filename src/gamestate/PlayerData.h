@@ -8,14 +8,14 @@
 
 #include <vector>
 
-#include "ActionQueue.h"
-
-#include "../stats/EnemiesSeen.h"
-
 #include "../objects/GameInst.h"
+
 #include "../objects/GameInstRef.h"
 
 #include "../serialize/SerializeBuffer.h"
+#include "../stats/EnemiesSeen.h"
+
+#include "ActionQueue.h"
 
 class PlayerInst;
 

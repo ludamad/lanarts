@@ -8,9 +8,9 @@
 
 #include "../lanarts_defines.h"
 
-#include "items.h"
-
 #include "Inventory.h"
+
+#include "items.h"
 
 class Equipment {
 public:

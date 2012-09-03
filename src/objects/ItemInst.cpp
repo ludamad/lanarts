@@ -3,11 +3,11 @@
  *  Represents an item on the floor
  */
 
-#include "ItemInst.h"
-#include "../gamestate/GameState.h"
-#include "collision_filters.h"
-#include "../stats/item_data.h"
 #include "../display/sprite_data.h"
+#include "../gamestate/GameState.h"
+#include "../stats/item_data.h"
+#include "ItemInst.h"
+#include "collision_filters.h"
 #include <typeinfo>
 
 ItemInst::~ItemInst() {

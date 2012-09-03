@@ -8,9 +8,9 @@
 
 #include <vector>
 #include "../lua/LuaValue.h"
-#include "../lanarts_defines.h"
-
 #include "../stats/itemgen_data.h"
+
+#include "../lanarts_defines.h"
 
 enum {
 	DNGN_MAIN_BRANCH = 0

@@ -4,16 +4,16 @@
  */
 #include <typeinfo>
 
-#include "../../gamestate/GameState.h"
+#include "../../display/colour_constants.h"
 
-#include "../collision_filters.h"
-#include "../../util/math_util.h"
+#include "../../display/sprite_data.h"
+#include "../../gamestate/GameState.h"
 
 #include "../../serialize/SerializeBuffer.h"
 
 #include "../../stats/item_data.h"
-#include "../../display/colour_constants.h"
-#include "../../display/sprite_data.h"
+#include "../../util/math_util.h"
+#include "../collision_filters.h"
 
 #include "StoreInst.h"
 

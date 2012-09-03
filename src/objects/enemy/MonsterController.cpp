@@ -8,20 +8,20 @@
 
 #include <rvo2/RVO.h>
 
+#include "../../display/colour_constants.h"
+#include "../../display/tile_data.h"
 #include "../../gamestate/GameState.h"
-#include "MonsterController.h"
-#include "../../gamestate/PlayerData.h"
 
-#include "EnemyInst.h"
+#include "../../gamestate/PlayerData.h"
+#include "../../stats/weapon_data.h"
+#include "../../util/math_util.h"
+
 #include "../player/PlayerInst.h"
 #include "../CombatGameInstFunctions.h"
-
-#include "../../display/colour_constants.h"
-#include "../../util/math_util.h"
 #include "../collision_filters.h"
 
-#include "../../display/tile_data.h"
-#include "../../stats/weapon_data.h"
+#include "EnemyInst.h"
+#include "MonsterController.h"
 
 const int HUGE_DISTANCE = 1000000;
 

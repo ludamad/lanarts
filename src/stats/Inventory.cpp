@@ -3,11 +3,11 @@
  *  Item's held by a player/enemy
  */
 
-#include "item_data.h"
+#include "../serialize/SerializeBuffer.h"
 
 #include "Inventory.h"
 
-#include "../serialize/SerializeBuffer.h"
+#include "item_data.h"
 
 bool Inventory::add(const Item& item, int amount) {
 	ItemEntry& ientry = item.item_entry();

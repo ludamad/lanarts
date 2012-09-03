@@ -3,16 +3,16 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-#include "effect_data.h"
 #include "../data/lua_game_data.h"
+#include "../gamestate/GameState.h"
 
 #include "../lua/lua_api.h"
-
-#include "../gamestate/GameState.h"
 
 #include "../objects/CombatGameInst.h"
 
 #include "../serialize/SerializeBuffer.h"
+
+#include "effect_data.h"
 
 #include "effects.h"
 

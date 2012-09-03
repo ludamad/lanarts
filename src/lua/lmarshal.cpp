@@ -38,7 +38,7 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-#include "lmarshal.h"
+#include "../serialize/SerializeBuffer.h"
 
 #define UINT32_MAX 4294967296ul
 
@@ -514,7 +514,7 @@ int mar_clone(lua_State* L) {
 }
 
 /* Lanarts adapter code starts here */
-#include "../serialize/SerializeBuffer.h"
+#include "lmarshal.h"
 
 void lua_serialize(SerializeBuffer& serialize, lua_State* L, int idx) {
 	if (lua_isnil(L,idx)) {

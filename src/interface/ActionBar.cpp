@@ -3,20 +3,20 @@
  *  Handles drawing and state of the action bar.
  */
 
+#include "../display/colour_constants.h"
+#include "../gamestate/GameState.h"
+#include "../objects/player/PlayerInst.h"
 #include "../stats/item_data.h"
-#include "../stats/spell_data.h"
+
 #include "../stats/projectile_data.h"
+#include "../stats/spell_data.h"
 #include "../stats/weapon_data.h"
 
-#include "../display/colour_constants.h"
-#include "console_description_draw.h"
 #include "../lanarts_defines.h"
 
-#include "../gamestate/GameState.h"
-
-#include "../objects/player/PlayerInst.h"
-
 #include "ActionBar.h"
+
+#include "console_description_draw.h"
 
 ActionBar::ActionBar(const BBox& bbox, int max_actions) :
 		bbox(bbox), actions(max_actions) {

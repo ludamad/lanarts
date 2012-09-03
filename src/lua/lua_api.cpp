@@ -1,13 +1,13 @@
-#include "lua_api.h"
+#include "../gamestate/GameState.h"
 
 extern "C" {
 #include <lua/lua.h>
 #include <lua/lauxlib.h>
 #include <lua/lualib.h>
 }
-#include "../gamestate/GameState.h"
-
 #include "../levelgen/lua_levelgen_funcs.h"
+
+#include "lua_api.h"
 
 void lua_gameinst_bindings(GameState* gs, lua_State* L);
 void lua_gamestate_bindings(GameState* gs, lua_State* L);

@@ -1,9 +1,9 @@
 #include <fstream>
 
-#include "../item_data.h"
 #include "../../data/game_data.h"
-
 #include "../../data/yaml_util.h"
+
+#include "../item_data.h"
 
 extern "C" {
 #include <lua/lua.h>

@@ -6,13 +6,13 @@
 #ifndef LEVELGEN_H_
 #define LEVELGEN_H_
 
-#include "itemgen.h"
-#include "featuregen.h"
-#include "tunnelgen.h"
-#include "enemygen.h"
-
-#include "dungeon_data.h"
 #include "../util/mtwist.h"
+#include "dungeon_data.h"
+#include "enemygen.h"
+#include "featuregen.h"
+
+#include "itemgen.h"
+#include "tunnelgen.h"
 
 class GameState;
 class GameLevelState;

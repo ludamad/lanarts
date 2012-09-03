@@ -34,7 +34,7 @@ spells:
     cooldown: 100
     spr_spell: book
     action_func: attack_all_seen
-
+  
   - name: Blink
     description:
      Takes you instantly across a short distance.

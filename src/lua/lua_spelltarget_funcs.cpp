@@ -9,16 +9,16 @@ extern "C" {
 #include <lua/lualib.h>
 }
 
-#include "lua_api.h"
-
 #include "../data/lua_game_data.h"
-
-#include "../util/math_util.h"
 
 #include "../gamestate/GameState.h"
 
-#include "../objects/GameInst.h"
 #include "../objects/player/PlayerInst.h"
+
+#include "../objects/GameInst.h"
+
+#include "../util/math_util.h"
+#include "lua_api.h"
 
 // Take arguments: caster, target; returns x, y
 static int spell_choose_safest_square(lua_State* L) {

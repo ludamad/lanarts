@@ -8,12 +8,12 @@
 
 #include <vector>
 
-#include "dungeon_data.h"
-
-#include "../lanarts_defines.h"
 #include "../util/mtwist.h"
 
+#include "../lanarts_defines.h"
 #include "GeneratedLevel.h"
+
+#include "dungeon_data.h"
 
 class GameState;
 

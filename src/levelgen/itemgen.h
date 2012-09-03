@@ -8,9 +8,9 @@
 
 #include <vector>
 
-#include "dungeon_data.h"
 #include "../util/mtwist.h"
 #include "GeneratedLevel.h"
+#include "dungeon_data.h"
 
 class GameState;
 

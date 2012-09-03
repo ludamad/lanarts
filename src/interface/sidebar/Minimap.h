@@ -6,8 +6,8 @@
 #ifndef MINIMAP_H_
 #define MINIMAP_H_
 
-#include "../../lanarts_defines.h"
 #include "../../display/GLImage.h"
+#include "../../lanarts_defines.h"
 
 class GameState;
 

@@ -1,8 +1,8 @@
 #include <typeinfo>
 
-#include "../gamestate/GameState.h"
 #include "../display/display.h"
 #include "../display/sprite_data.h"
+#include "../gamestate/GameState.h"
 
 #include "ButtonInst.h"
 

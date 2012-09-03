@@ -1,25 +1,20 @@
 /*
- * fov.cpp
- *
- *  Created on: 2011-11-05
- *      Author: 100397561
+ * fov.cpp:
+ *  Represents a field of view
  */
 
-#include "fov.h"
 #include <cmath>
 #include <cstdlib>
+
+#include "../display/tile_data.h"
+
 #include "../gamestate/GameState.h"
 #include "../gamestate/GameTiles.h"
-#include "../display/tile_data.h"
+
+#include "fov.h"
 
 using namespace std;
 
-/*fov::fov(GameState *gs, int radius, int ptx, int pty, int sub_squares) :
- gs(gs), radius(radius), ptx(ptx), pty(pty), sub_squares(sub_squares),
- {
-
- }
- */
 fov::fov(int radius) :
 		gs(NULL), radius(radius), m(radius, radius, radius, radius), ptx(0), pty(
 				0) {
@@ -27,6 +22,7 @@ fov::fov(int radius) :
 	int dim = radsub * 2 + 1;
 	sight_mask = new char[dim * dim];
 }
+
 void fov::calculate(GameState* gs, int ptx, int pty) {
 	this->gs = gs;
 	this->ptx = ptx, this->pty = pty;

@@ -1,12 +1,12 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
-#include "../../stats/stats.h"
-
-#include "../enemy/enemy_data.h"
 #include "../../data/game_data.h"
 
 #include "../../data/yaml_util.h"
+#include "../../stats/stats.h"
+
+#include "../enemy/enemy_data.h"
 
 using namespace std;
 

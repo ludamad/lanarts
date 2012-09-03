@@ -9,8 +9,8 @@
 #include <vector>
 #include <string>
 
-#include "../lanarts_defines.h"
 #include "../lua/LuaValue.h"
+#include "../lanarts_defines.h"
 
 #include "GameInst.h"
 

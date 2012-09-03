@@ -1,4 +1,4 @@
-#include "font.h"
+#include "../util/math_util.h"
 
 #include <SDL.h>
 #include <GL/glu.h>
@@ -12,7 +12,7 @@
 #include <stdexcept>
 #include "display.h"
 
-#include "../util/math_util.h"
+#include "font.h"
 
 void char_data::init(char ch, FT_Face face) {
 	// Load The Glyph For Our Character.

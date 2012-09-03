@@ -8,12 +8,12 @@
 
 #include <vector>
 
-#include "../../serialize/SerializeBuffer.h"
-
 #include "../../collision_avoidance/CollisionAvoidance.h"
 
-#include "../../pathfind/pathfind.h"
 #include "../../pathfind/astar_pathfind.h"
+
+#include "../../pathfind/pathfind.h"
+#include "../../serialize/SerializeBuffer.h"
 
 #include "../GameInst.h"
 #include "EnemyInst.h"

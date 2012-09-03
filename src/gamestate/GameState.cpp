@@ -15,28 +15,28 @@ extern "C" {
 #include <vector>
 
 #include "../data/game_data.h"
-#include "../stats/item_data.h"
+#include "../display/display.h"
 #include "../display/tile_data.h"
 #include "../levelgen/dungeon_data.h"
-#include "../stats/class_data.h"
-
-#include "../serialize/SerializeBuffer.h"
-
-#include "../display/display.h"
+#include "../lua/lua_api.h"
 
 #include "../net/GameNetConnection.h"
 
-#include "../lua/lua_api.h"
-
-#include "../util/game_replays.h"
-#include "../util/math_util.h"
-
-#include "GameState.h"
-#include "GameLevelState.h"
-
 #include "../objects/enemy/EnemyInst.h"
-#include "../objects/GameInst.h"
+
 #include "../objects/player/PlayerInst.h"
+
+#include "../objects/GameInst.h"
+
+#include "../serialize/SerializeBuffer.h"
+#include "../stats/class_data.h"
+
+#include "../stats/item_data.h"
+#include "../util/game_replays.h"
+
+#include "../util/math_util.h"
+#include "GameLevelState.h"
+#include "GameState.h"
 
 static int generate_seed() {
 	//the most significant bits of systime are likely to be very similar, mix with clock()

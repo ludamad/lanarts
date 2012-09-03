@@ -16,11 +16,11 @@ extern "C" {
 
 #include <net/lanarts_net.h>
 
-#include "../tests.h"
+#include "../../gamestate/GameState.h"
 
 #include "../../gamestate/PlayerData.h"
-#include "../../gamestate/GameState.h"
 #include "../../net/GameNetConnection.h"
+#include "../tests.h"
 
 static lua_State* L = NULL;
 

@@ -9,12 +9,12 @@ extern "C" {
 #include <lua/lualib.h>
 }
 
-#include "lua_api.h"
-
 #include "../gamestate/GameState.h"
 
-#include "../objects/GameInst.h"
 #include "../objects/player/PlayerInst.h"
+
+#include "../objects/GameInst.h"
+#include "lua_api.h"
 
 // Takes obj returns bool
 static int obj_solid_check(lua_State* L) {

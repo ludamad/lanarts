@@ -2,15 +2,15 @@
  * EnemiesSeenContent.h:
  *  Displays all the enemies players have seen, allowing them to see descriptions.
  */
-#include "EnemiesSeenContent.h"
+#include "../../display/colour_constants.h"
 
 #include "../../display/sprite_data.h"
 
-#include "../../display/colour_constants.h"
-#include "../console_description_draw.h"
-
 #include "../../gamestate/GameState.h"
 #include "../../objects/enemy/MonsterController.h"
+
+#include "../console_description_draw.h"
+#include "EnemiesSeenContent.h"
 
 const int ENEMIES_PER_PAGE = 40;
 

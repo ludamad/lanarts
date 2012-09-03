@@ -10,9 +10,9 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-#include "game_data.h"
-
 #include "../lua/lua_api.h"
+
+#include "game_data.h"
 
 /* Components of init_game_data */
 void load_tile_data(const FilenameList& filenames);

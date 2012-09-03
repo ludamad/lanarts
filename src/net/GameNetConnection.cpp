@@ -9,10 +9,10 @@
 
 #include "../gamestate/GameState.h"
 
-#include "../serialize/SerializeBuffer.h"
+#include "../objects/player/PlayerInst.h"
 
 #include "../objects/AnimatedInst.h"
-#include "../objects/player/PlayerInst.h"
+#include "../serialize/SerializeBuffer.h"
 
 #include "GameNetConnection.h"
 

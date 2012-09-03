@@ -7,30 +7,32 @@ extern "C" {
 #include <lua/lua.h>
 }
 
-#include "../../stats/item_data.h"
-#include "../../stats/spell_data.h"
+#include "../../data/game_data.h"
+#include "../../display/colour_constants.h"
+#include "../../display/display.h"
 #include "../../display/sprite_data.h"
 #include "../../display/tile_data.h"
-#include "../../stats/projectile_data.h"
-#include "../../stats/weapon_data.h"
-
-#include "../../display/display.h"
+#include "../../gamestate/GameState.h"
 
 #include "../../lua/lua_api.h"
 
-#include "../../display/colour_constants.h"
-#include "../../util/math_util.h"
-#include "../../lanarts_defines.h"
-#include "../collision_filters.h"
+#include "../../stats/item_data.h"
 
-#include "../../gamestate/GameState.h"
+#include "../../stats/projectile_data.h"
+#include "../../stats/spell_data.h"
+#include "../../stats/weapon_data.h"
+#include "../../util/math_util.h"
+
+#include "../../lanarts_defines.h"
+
+#include "../enemy/EnemyInst.h"
 
 #include "../AnimatedInst.h"
-
-#include "PlayerInst.h"
-#include "../enemy/EnemyInst.h"
 #include "../ItemInst.h"
 #include "../ProjectileInst.h"
+#include "../collision_filters.h"
+
+#include "PlayerInst.h"
 
 static void get_visible_monsters(GameState* gs,
 		std::vector<GameInst*>& visible_monsters, PlayerInst* p = NULL) {
@@ -504,7 +506,7 @@ static void lua_hit_callback(lua_State* L, LuaValue& callback, GameInst* user,
 	}
 }
 
-#include "../../data/game_data.h"
+#include "PlayerInst.h"
 void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 	WeaponEntry& wentry = weapon().weapon_entry();
 	MTwist& mt = gs->rng();

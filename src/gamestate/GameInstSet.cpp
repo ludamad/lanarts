@@ -11,13 +11,13 @@
 #include <cstdio>
 #include <typeinfo>
 
+#include "../objects/AnimatedInst.h"
+#include "../objects/InstTypeEnum.h"
+#include "../serialize/SerializeBuffer.h"
+
+#include "../util/math_util.h"
 #include "GameInstSet.h"
 #include "hashset_util.h"
-#include "../util/math_util.h"
-
-#include "../objects/AnimatedInst.h"
-#include "../serialize/SerializeBuffer.h"
-#include "../objects/InstTypeEnum.h"
 
 GameInst* const GAMEINST_TOMBSTONE = (GameInst*) 1;
 

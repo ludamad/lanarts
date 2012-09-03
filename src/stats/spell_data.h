@@ -9,10 +9,10 @@
 #include <string>
 #include <vector>
 
-#include "items.h"
+#include "../lua/LuaValue.h"
 
 #include "../lanarts_defines.h"
-#include "../lua/LuaValue.h"
+#include "items.h"
 
 struct SpellEntry {
 	std::string name, description;

@@ -7,10 +7,10 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "../itemgen_data.h"
 #include "../../data/game_data.h"
-
 #include "../../data/yaml_util.h"
+
+#include "../itemgen_data.h"
 
 extern "C" {
 #include <lua/lua.h>

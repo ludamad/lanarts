@@ -8,11 +8,11 @@
 
 const int MAX_TUNNEL_WIDTH = 4;
 
-#include "dungeon_data.h"
-
 #include "../util/mtwist.h"
 
 #include "GeneratedLevel.h"
+
+#include "dungeon_data.h"
 
 void generate_entrance(const Region& r, MTwist& mt, int len, Pos& p, bool& axis,
 		bool& more);

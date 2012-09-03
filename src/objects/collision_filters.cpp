@@ -3,11 +3,11 @@
  *  Defines functions that are often used in conjunction with collision detection
  */
 
-#include "collision_filters.h"
-#include "ItemInst.h"
 #include "enemy/EnemyInst.h"
-#include "GameInst.h"
 #include "player/PlayerInst.h"
+#include "GameInst.h"
+#include "ItemInst.h"
+#include "collision_filters.h"
 
 bool item_colfilter(GameInst* self, GameInst* other) {
 	return dynamic_cast<ItemInst*>(other) != NULL;

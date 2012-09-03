@@ -3,12 +3,12 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "../stats.h"
-
-#include "../effect_data.h"
 #include "../../data/game_data.h"
 
 #include "../../data/yaml_util.h"
+#include "../effect_data.h"
+
+#include "../stats.h"
 
 using namespace std;
 

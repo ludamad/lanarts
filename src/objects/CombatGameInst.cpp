@@ -4,23 +4,23 @@
  */
 
 #include "../display/sprite_data.h"
-#include "../serialize/SerializeBuffer.h"
+#include "../gamestate/GameState.h"
 
+#include "../serialize/SerializeBuffer.h"
 #include "../stats/effect_data.h"
 #include "../stats/projectile_data.h"
-#include "../stats/weapon_data.h"
 
 #include "../stats/stat_formulas.h"
 
+#include "../stats/weapon_data.h"
+
 #include "../util/math_util.h"
 
-#include "../gamestate/GameState.h"
+#include "player/PlayerInst.h"
 
 #include "AnimatedInst.h"
-
 #include "CombatGameInst.h"
 #include "ProjectileInst.h"
-#include "player/PlayerInst.h"
 
 const int HURT_COOLDOWN = 30;
 bool CombatGameInst::damage(GameState* gs, int dmg) {

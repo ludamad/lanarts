@@ -3,10 +3,10 @@
  *  Represents an object that displays on the screen for a fixed amount of time before removing itself
  */
 
-#include "AnimatedInst.h"
-#include "../gamestate/GameState.h"
-#include "../display/sprite_data.h"
 #include "../display/display.h"
+#include "../display/sprite_data.h"
+#include "../gamestate/GameState.h"
+#include "AnimatedInst.h"
 #include <typeinfo>
 
 AnimatedInst::~AnimatedInst() {

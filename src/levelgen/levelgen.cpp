@@ -9,15 +9,15 @@ extern "C" {
 
 #include <cstdio>
 
-#include "dungeon_data.h"
+#include "../gamestate/GameState.h"
 
 #include "../objects/player/PlayerInst.h"
 
-#include "../gamestate/GameState.h"
-
-#include "lua_levelgen_funcs.h"
 #include "GeneratedLevel.h"
+
+#include "dungeon_data.h"
 #include "levelgen.h"
+#include "lua_levelgen_funcs.h"
 
 const int TOO_MANY_FAILURES = 100;
 

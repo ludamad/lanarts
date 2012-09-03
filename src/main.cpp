@@ -15,19 +15,19 @@ extern "C" {
 
 #include "display/display.h"
 
-#include "lua/lua_api.h"
-
 #include "gamestate/GameState.h"
 
-#include "objects/player/PlayerInst.h"
-#include "objects/enemy/EnemyInst.h"
-
-#include "objects/AnimatedInst.h"
 #include "interface/ButtonInst.h"
 
-#include "util/Timer.h"
+#include "lua/lua_api.h"
+#include "objects/enemy/EnemyInst.h"
+
+#include "objects/player/PlayerInst.h"
+#include "objects/AnimatedInst.h"
 
 #include "tests/tests.h"
+
+#include "util/Timer.h"
 
 using namespace std;
 
@@ -73,7 +73,6 @@ static void game_loop(GameState* gs) {
 
 	unsigned long step_time = 0;
 	unsigned long accumulated_time = 0;
-	unsigned long accumulated_time_n = 0;
 
 	unsigned long step_events = 1;
 
@@ -146,21 +145,17 @@ static void game_loop(GameState* gs) {
 				break;
 			}
 		}
-		if (accumulated_time_n >= 1) {
-			accumulated_time = 0;//accumulated_time * 2 / accumulated_time_n;
-			accumulated_time_n = 0;
-		}
+
 		accumulated_time += total_timer.get_microseconds();
-		accumulated_time_n++;
 
 		long microwait = settings.time_per_step * 1000 * settings.steps_per_draw
-				- accumulated_time / accumulated_time_n;
+				- accumulated_time;
 		if (draw_this_step) {
 			long delayms = microwait / 1000;
 			if (delayms > 0) {
-				//printf("Delaying by %d ms\n", (int)delayms);
 				SDL_Delay(delayms);
 			}
+			accumulated_time = 0;
 		}
 	}
 

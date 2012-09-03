@@ -5,8 +5,8 @@
 
 #include <rvo2/RVO.h>
 
-#include "../util/PerfTimer.h"
 #include "../objects/CombatGameInst.h"
+#include "../util/PerfTimer.h"
 
 #include "CollisionAvoidance.h"
 

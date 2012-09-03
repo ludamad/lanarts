@@ -3,12 +3,12 @@
  *  Enemy spawning routines
  */
 
-#include "../util/math_util.h"
+#include "../gamestate/GameState.h"
+
+#include "../gamestate/GameTiles.h"
 
 #include "../objects/enemy/EnemyInst.h"
-
-#include "../gamestate/GameState.h"
-#include "../gamestate/GameTiles.h"
+#include "../util/math_util.h"
 
 #include "enemygen.h"
 

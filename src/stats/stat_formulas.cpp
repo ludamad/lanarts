@@ -5,14 +5,14 @@
 
 #include <cmath>
 
-#include "armour_data.h"
-#include "weapon_data.h"
-
 #include "../gamestate/GameState.h"
+#include "armour_data.h"
 
 #include "combat_stats.h"
+
 #include "stat_formulas.h"
 #include "stats.h"
+#include "weapon_data.h"
 
 /* What power, resistance difference causes damage to be raised by 100% */
 const int POWER_MULTIPLE_INTERVAL = 50;

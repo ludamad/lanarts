@@ -6,14 +6,14 @@
 
 #include <net/lanarts_net.h>
 
-#include "../tests.h"
+#include "../../data/game_data.h"
 
 #include "../../serialize/SerializeBuffer.h"
 
-#include "../../stats/Inventory.h"
 #include "../../stats/Equipment.h"
+#include "../../stats/Inventory.h"
 #include "../../stats/combat_stats.h"
-#include "../../data/game_data.h"
+#include "../tests.h"
 
 static void assert_equal(DerivedStats& d1, DerivedStats& d2) {
 	UNIT_TEST_ASSERT(d1.damage == d2.damage);
