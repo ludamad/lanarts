@@ -64,3 +64,18 @@ enemies:
         strength: 35
         defence: 20
         willpower: 20
+  - name: Green Slime
+    sprite: green slime
+    description: Oozing ball of slime
+    appear_message: A ball of goop slides into view
+    defeat_message: The goop falls apart
+    radius: 14
+    xpaward: 10
+    stats:
+      attacks: [ {weapon: Fast Melee} ]
+      hp: 15
+      hpregen: 0.1
+      movespeed: 2
+      strength: 4
+      defence: 2
+      willpower: 3

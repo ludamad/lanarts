@@ -108,12 +108,15 @@ sprites:
     file: res/sprites/monsters/humanoid/orc_wizard.png
 
 
-#other
+#misc
   - name: grue
     file: res/sprites/monsters/grue.png
 
   - name: golem
     file: res/sprites/monsters/golem.png
+  
+  - name: green slime
+    file: res/sprites/monsters/green_slime.png
 
   - name: jester
     file: res/sprites/monsters/jester.png
