@@ -11,6 +11,8 @@
  *    	AND you are both chasing the same hostile (This is a special case for tight corridors)
  */
 
+// TODO: this is a pending rewrite of MonsterController
+
 #ifndef ENEMYCONTROLLER_H_
 #define ENEMYCONTROLLER_H_
 

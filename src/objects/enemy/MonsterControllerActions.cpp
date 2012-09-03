@@ -15,13 +15,12 @@
 #include "EnemyInst.h"
 #include "../player/PlayerInst.h"
 
-#include "../../combat_logic/attack_logic.h"
-
 #include "../../display/colour_constants.h"
 #include "../../util/math_util.h"
 #include "../collision_filters.h"
 
 #include "../../display/tile_data.h"
+#include "../../stats/projectile_data.h"
 #include "../../stats/weapon_data.h"
 
 const int HUGE_DISTANCE = 1000000;
@@ -102,6 +101,39 @@ static bool same_target_and_moved_colfilter(GameInst* self, GameInst* other) {
 	}
 	return (e2->behaviour().movement_decided);
 }
+
+const int TOO_LARGE_RANGE = 99999;
+static bool attack_ai_choice(GameState* gs, CombatGameInst* inst,
+		CombatGameInst* target, AttackStats& attack) {
+	CombatStats& stats = inst->stats();
+	std::vector<AttackStats>& attacks = stats.attacks;
+
+	int attack_id = -1;
+	int smallest_range = TOO_LARGE_RANGE;
+	float dist = distance_between(Pos(inst->x, inst->y),
+			Pos(target->x, target->y));
+	int radii = inst->target_radius + target->target_radius;
+
+	for (int i = 0; i < attacks.size(); i++) {
+		WeaponEntry& wentry = attacks[i].weapon.weapon_entry();
+		int range = wentry.range;
+		if (attacks[i].projectile.valid_projectile()) {
+			ProjectileEntry& pentry = attacks[i].projectile.projectile_entry();
+			range = std::max(range, pentry.range);
+		}
+		if (radii + range >= dist && range < smallest_range) {
+			attack_id = i;
+			smallest_range = range;
+		}
+	}
+
+	if (attack_id > -1) {
+		attack = attacks[attack_id];
+		return true;
+	}
+	return false;
+}
+
 
 void MonsterController::set_monster_headings(GameState* gs,
 		std::vector<EnemyOfInterest>& eois) {

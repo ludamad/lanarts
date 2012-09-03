@@ -3,6 +3,8 @@
  *  Contains procedures related to generating a dungeon area
  */
 
+//TODO: Rewrite pending here with tiered level generation
+
 #ifndef AREAGEN_H_
 #define AREAGEN_H_
 

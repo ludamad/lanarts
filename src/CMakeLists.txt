@@ -28,11 +28,6 @@ set( lanarts_src
 
 	collision_avoidance/CollisionAvoidance.cpp
 
-	combat_logic/ai_logic.cpp
-	combat_logic/attack_logic.cpp
-	combat_logic/combat_logic.cpp
-	combat_logic/movement_logic.cpp
-
 	lua/lmarshal.cpp
 	lua/lua_combatstats.cpp
 	lua/lua_effectivestats.cpp
@@ -167,11 +162,6 @@ set( lanarts_src
 set( lanarts_include
 
 	collision_avoidance/CollisionAvoidance.h
-
-	combat_logic/ai_logic.h
-	combat_logic/attack_logic.h
-	combat_logic/combat_logic.h
-	combat_logic/movement_logic.h
 
 	data/yaml_util.h
 

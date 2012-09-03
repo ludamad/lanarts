@@ -14,8 +14,6 @@
 #include "EnemyInst.h"
 #include "../player/PlayerInst.h"
 
-#include "../../combat_logic/attack_logic.h"
-
 #include "../../display/colour_constants.h"
 #include "../../util/math_util.h"
 #include "../collision_filters.h"
