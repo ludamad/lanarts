@@ -50,33 +50,33 @@ void Equipment::deequip_armour() {
 
 void Equipment::deequip(int equipment_type) {
 	switch (equipment_type) {
-	case ItemEntry::PROJECTILE:
+	case _ItemEntry::PROJECTILE:
 		deequip_projectiles();
 		break;
-	case ItemEntry::WEAPON:
+	case _ItemEntry::WEAPON:
 		deequip_weapon();
 		break;
-	case ItemEntry::ARMOUR:
+	case _ItemEntry::ARMOUR:
 		deequip_armour();
 		break;
 	}
 }
 bool Equipment::valid_to_use(const Item& item) {
 	switch (item.item_entry().equipment_type) {
-	case ItemEntry::PROJECTILE:
+	case _ItemEntry::PROJECTILE:
 		return valid_to_use_projectile(item.as_projectile());
 	}
 	return true;
 }
 void Equipment::equip(const Item& item, int amnt) {
 	switch (item.item_entry().equipment_type) {
-	case ItemEntry::ARMOUR:
+	case _ItemEntry::ARMOUR:
 		if (armour.properties.flags & CURSED)
 			break;
 		deequip_armour();
 		armour = item.as_armour();
 		break;
-	case ItemEntry::WEAPON:
+	case _ItemEntry::WEAPON:
 		if (weapon.properties.flags & CURSED)
 			break;
 		deequip_projectiles();
@@ -85,7 +85,7 @@ void Equipment::equip(const Item& item, int amnt) {
 		}
 		weapon = item.as_weapon();
 		break;
-	case ItemEntry::PROJECTILE:
+	case _ItemEntry::PROJECTILE:
 		if (projectile.properties.flags & CURSED)
 			break;
 		if (!(item.as_projectile() == projectile))

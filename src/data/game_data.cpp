@@ -42,7 +42,7 @@ std::vector<ArmourEntry> game_armour_data;
 std::vector<ClassType> game_class_data;
 std::vector<EffectEntry> game_effect_data;
 std::vector<EnemyEntry> game_enemy_data;
-std::vector<ItemEntry> game_item_data;
+std::vector<_ItemEntry> game_item_data;
 std::vector<ItemGenList> game_itemgenlist_data;
 std::vector<TileEntry> game_tile_data;
 std::vector<TilesetEntry> game_tileset_data;
@@ -51,7 +51,7 @@ std::vector<ScriptObjectEntry> game_scriptobject_data;
 std::vector<SpellEntry> game_spell_data;
 std::vector<SpriteEntry> game_sprite_data;
 std::vector<LevelGenSettings> game_dungeon_yaml;
-std::vector<WeaponEntry> game_weapon_data;
+std::vector<_WeaponEntry> game_weapon_data;
 
 DungeonBranch game_dungeon_data[1] = { };
 
@@ -90,13 +90,13 @@ static E& get_X_ref_by_name(std::vector<E>& t, const char* name) {
 int get_armour_by_name(const char *name, bool error_if_not_found) {
 	return get_X_by_name(game_armour_data, name, error_if_not_found);
 }
-const char* equip_type_description(const ItemEntry& ientry) {
+const char* equip_type_description(const _ItemEntry& ientry) {
 	switch (ientry.equipment_type) {
-	case ItemEntry::ARMOUR:
+	case _ItemEntry::ARMOUR:
 		return "Armour";
-	case ItemEntry::WEAPON:
+	case _ItemEntry::WEAPON:
 		return "Weapon";
-	case ItemEntry::PROJECTILE: {
+	case _ItemEntry::PROJECTILE: {
 		ProjectileEntry& pentry = game_projectile_data.at(ientry.equipment_id);
 		if (pentry.is_unarmed()) {
 			return "Unarmed Projectile";
@@ -104,7 +104,7 @@ const char* equip_type_description(const ItemEntry& ientry) {
 			return "Projectile";
 		}
 	}
-	case ItemEntry::NONE:
+	case _ItemEntry::NONE:
 		return "One-time Use";
 	}
 	return "";

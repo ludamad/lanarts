@@ -20,7 +20,7 @@
 static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot, int x,
 		int y) {
 	if (itemslot.amount > 0) {
-		ItemEntry& ientry = itemslot.item.item_entry();
+		_ItemEntry& ientry = itemslot.item.item_entry();
 		GLimage& itemimg = game_sprite_data[ientry.sprite].img();
 		gl_draw_image(itemimg, x, y);
 		if (ientry.stackable) {

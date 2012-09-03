@@ -26,7 +26,7 @@ struct AttackStats {
 	}
 
 	bool is_ranged() const;
-	WeaponEntry& weapon_entry() const;
+	_WeaponEntry& weapon_entry() const;
 	ProjectileEntry& projectile_entry() const;
 
 	int atk_cooldown() const;

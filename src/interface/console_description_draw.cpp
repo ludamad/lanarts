@@ -142,7 +142,7 @@ static void draw_weapon_description_overlay(GameState* gs,
 	PlayerInst* p = gs->local_player();
 	EffectiveStats& estats = p->effective_stats();
 
-	WeaponEntry& wentry = weapon.weapon_entry();
+	_WeaponEntry& wentry = weapon.weapon_entry();
 	GameTextConsole& console = gs->game_console();
 
 	BBox bbox(console.bounding_box());
@@ -177,7 +177,7 @@ static void draw_weapon_description_overlay(GameState* gs,
 			COL_PALE_GREEN);
 }
 
-void draw_item_icon_and_name(GameState* gs, ItemEntry& ientry, Colour col,
+void draw_item_icon_and_name(GameState* gs, _ItemEntry& ientry, Colour col,
 		int x, int y) {
 	gl_draw_sprite(ientry.sprite, x, y);
 	gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE,
@@ -213,7 +213,7 @@ void draw_console_item_description(GameState* gs, const Item& item) {
 	if (console.has_content_already()) {
 		return;
 	}
-	ItemEntry& ientry = item.item_entry();
+	_ItemEntry& ientry = item.item_entry();
 	console.draw_box(gs);
 	BBox bbox(console.bounding_box());
 	draw_item_icon_and_name(gs, ientry, Colour(), bbox.x1 + 4, bbox.y1 + 4);

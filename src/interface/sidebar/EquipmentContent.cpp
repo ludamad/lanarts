@@ -87,7 +87,7 @@ bool EquipmentContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	if (gs->mouse_right_click() && weapon_bbox.contains(mouse)) {
 		queued_actions.push_back(
 				game_action(gs, p, GameAction::DEEQUIP_ITEM,
-						ItemEntry::WEAPON));
+						_ItemEntry::WEAPON));
 	}
 
 	// Check if we are de-equipping our armour
@@ -95,7 +95,7 @@ bool EquipmentContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	if (gs->mouse_right_click() && armour_bbox.contains(mouse)) {
 		queued_actions.push_back(
 				game_action(gs, p, GameAction::DEEQUIP_ITEM,
-						ItemEntry::ARMOUR));
+						_ItemEntry::ARMOUR));
 	}
 
 	return false;

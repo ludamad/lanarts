@@ -18,20 +18,20 @@ extern "C" {
 
 using namespace std;
 
-static ItemEntry::id_type parse_id_type(const YAML::Node& n) {
+static _ItemEntry::id_type parse_id_type(const YAML::Node& n) {
 	std::string str = parse_str(n);
 	if (str == "potion") {
-		return ItemEntry::POTION;
+		return _ItemEntry::POTION;
 	} else if (str == "scroll") {
-		return ItemEntry::SCROLL;
+		return _ItemEntry::SCROLL;
 	} else {
 		LANARTS_ASSERT(false);
-		return ItemEntry::ALWAYS_KNOWN;
+		return _ItemEntry::ALWAYS_KNOWN;
 	}
 }
 
-ItemEntry parse_item_type(const YAML::Node& n) {
-	return ItemEntry(parse_str(n["name"]),
+_ItemEntry parse_item_type(const YAML::Node& n) {
+	return _ItemEntry(parse_str(n["name"]),
 			parse_defaulted(n, "description", std::string()),
 			parse_defaulted(n, "use_message", std::string()),
 			parse_defaulted(n, "radius", 11), parse_sprite_number(n, "sprite"),
@@ -40,7 +40,7 @@ ItemEntry parse_item_type(const YAML::Node& n) {
 			parse_defaulted(n, "stackable", true),
 			parse_defaulted(n, "shop_cost", Range()),
 			yaml_has_node(n, "type") ?
-					parse_id_type(n["type"]) : ItemEntry::ALWAYS_KNOWN);
+					parse_id_type(n["type"]) : _ItemEntry::ALWAYS_KNOWN);
 }
 
 void load_item_callbackf(const YAML::Node& node, lua_State* L,

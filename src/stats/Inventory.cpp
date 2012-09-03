@@ -10,7 +10,7 @@
 #include "item_data.h"
 
 bool Inventory::add(const Item& item, int amount) {
-	ItemEntry& ientry = item.item_entry();
+	_ItemEntry& ientry = item.item_entry();
 	if (ientry.stackable) {
 		/* Try to merge with existing entry */
 		for (int i = 0; i < items.size(); i++) {

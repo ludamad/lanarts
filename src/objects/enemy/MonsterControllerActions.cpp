@@ -115,7 +115,7 @@ static bool attack_ai_choice(GameState* gs, CombatGameInst* inst,
 	int radii = inst->target_radius + target->target_radius;
 
 	for (int i = 0; i < attacks.size(); i++) {
-		WeaponEntry& wentry = attacks[i].weapon.weapon_entry();
+		_WeaponEntry& wentry = attacks[i].weapon.weapon_entry();
 		int range = wentry.range;
 		if (attacks[i].projectile.valid_projectile()) {
 			ProjectileEntry& pentry = attacks[i].projectile.projectile_entry();
@@ -169,7 +169,7 @@ void MonsterController::set_monster_headings(GameState* gs,
 
 		AttackStats attack;
 		bool viable_attack = attack_ai_choice(gs, e, p, attack);
-		WeaponEntry& wentry = attack.weapon.weapon_entry();
+		_WeaponEntry& wentry = attack.weapon.weapon_entry();
 
 		if (pdist < e->target_radius + p->target_radius) {
 			e->vx = 0, e->vy = 0;

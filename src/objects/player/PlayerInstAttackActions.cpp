@@ -76,7 +76,7 @@ static GameInst* get_closest_monster(GameState* gs, PlayerInst* p) {
 }
 static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 		GameInst* targ, float dx, float dy) {
-	WeaponEntry& wentry = p->weapon().weapon_entry();
+	_WeaponEntry& wentry = p->weapon().weapon_entry();
 	Pos ppos(p->x, p->y);
 	GameInst* inst = NULL;
 	bool ismelee = !(wentry.uses_projectile || p->equipment().has_projectile());
@@ -413,7 +413,7 @@ static bool decide_attack_movement(const Pos& player, const Pos& target,
 bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
 		float dy) {
 	GameView& view = gs->view();
-	WeaponEntry& wentry = weapon().weapon_entry();
+	_WeaponEntry& wentry = weapon().weapon_entry();
 
 	bool mouse_within = gs->mouse_x() < gs->view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
@@ -508,7 +508,7 @@ static void lua_hit_callback(lua_State* L, LuaValue& callback, GameInst* user,
 
 #include "PlayerInst.h"
 void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
-	WeaponEntry& wentry = weapon().weapon_entry();
+	_WeaponEntry& wentry = weapon().weapon_entry();
 	MTwist& mt = gs->rng();
 	const int MAX_MELEE_HITS = 10;
 	EffectiveStats& estats = effective_stats();

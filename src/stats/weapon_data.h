@@ -17,7 +17,7 @@
 
 #include "stats.h"
 
-struct WeaponEntry {
+struct _WeaponEntry {
 	std::string name, description;
 	std::string weapon_class;
 
@@ -35,7 +35,7 @@ struct WeaponEntry {
 	projectile_id created_projectile; // for infinite ammo weapons
 	LuaValue on_hit_func;
 
-	WeaponEntry() :
+	_WeaponEntry() :
 			uses_projectile(false), max_targets(0), percentage_magic(0.0f), resist_modifier(
 					1.0f), range(0), dmgradius(0), cooldown(0), item_sprite(-1), attack_sprite(
 					-1), created_projectile(-1) {
@@ -46,7 +46,7 @@ struct WeaponEntry {
 	}
 };
 
-extern std::vector<WeaponEntry> game_weapon_data;
+extern std::vector<_WeaponEntry> game_weapon_data;
 
 weapon_id get_weapon_by_name(const char* name);
 

@@ -53,8 +53,8 @@ void load_armour_item_entries() {
 		ArmourEntry& entry = game_armour_data[i];
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
 		game_item_data.push_back(
-				ItemEntry(entry.name, entry.description, "", default_radius,
+				_ItemEntry(entry.name, entry.description, "", default_radius,
 						entry.item_sprite, "equip", "", false, entry.shop_cost,
-						ItemEntry::ALWAYS_KNOWN, ItemEntry::ARMOUR, i));
+						_ItemEntry::ALWAYS_KNOWN, _ItemEntry::ARMOUR, i));
 	}
 }

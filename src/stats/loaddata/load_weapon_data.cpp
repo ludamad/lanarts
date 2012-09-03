@@ -40,7 +40,7 @@ void load_weapon_callbackf(const YAML::Node& node, lua_State* L,
 	const int default_range = 18;
 	const int default_damage_radius = 3;
 
-	WeaponEntry entry;
+	_WeaponEntry entry;
 	entry.name = parse_str(node["name"]);
 	entry.description = parse_defaulted(node, "description", std::string());
 	entry.shop_cost = parse_defaulted(node, "shop_cost", Range());
@@ -97,11 +97,11 @@ void load_weapon_item_entries() {
 
 	//Create items from weapons
 	for (int i = 0; i < game_weapon_data.size(); i++) {
-		WeaponEntry& entry = game_weapon_data[i];
+		_WeaponEntry& entry = game_weapon_data[i];
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
 		game_item_data.push_back(
-				ItemEntry(entry.name, entry.description, "", default_radius,
+				_ItemEntry(entry.name, entry.description, "", default_radius,
 						entry.item_sprite, "equip", "", false, entry.shop_cost,
-						ItemEntry::ALWAYS_KNOWN, ItemEntry::WEAPON, i));
+						_ItemEntry::ALWAYS_KNOWN, _ItemEntry::WEAPON, i));
 	}
 }

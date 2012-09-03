@@ -53,7 +53,7 @@ static void assert_equal(Equipment& e1, Equipment& e2) {
 static void serialize_inventory() {
 	const int TEST_N = 10;
 	//mock up some item data
-	game_item_data.resize(TEST_N, ItemEntry("", "", "", 0, 0, "", "", false));
+	game_item_data.resize(TEST_N, _ItemEntry("", "", "", 0, 0, "", "", false));
 
 	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
 	Inventory inv1, inv2;
@@ -72,7 +72,7 @@ static void serialize_inventory() {
 static void serialize_equipment() {
 	const int TEST_N = 10;
 	//mock up some item data
-	game_item_data.resize(TEST_N, ItemEntry("", "", "", 0, 0, "", "", false));
+	game_item_data.resize(TEST_N, _ItemEntry("", "", "", 0, 0, "", "", false));
 	game_weapon_data.resize(TEST_N);
 	game_armour_data.resize(TEST_N);
 

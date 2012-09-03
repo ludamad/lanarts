@@ -12,9 +12,9 @@
 
 struct Item;
 struct ArmourEntry;
-struct ItemEntry;
+struct _ItemEntry;
 struct ProjectileEntry;
-struct WeaponEntry;
+struct _WeaponEntry;
 
 class SerializeBuffer;
 
@@ -52,7 +52,7 @@ struct Armour {
 	ItemProperties properties;
 
 	Item as_item() const;
-	ItemEntry& item_entry() const;
+	_ItemEntry& item_entry() const;
 
 	Armour(armour_id id, ItemProperties properties = ItemProperties()) :
 			id(id), properties(properties) {
@@ -68,7 +68,7 @@ struct Projectile {
 	ItemProperties properties;
 
 	Item as_item() const;
-	ItemEntry& item_entry() const;
+	_ItemEntry& item_entry() const;
 	ProjectileEntry& projectile_entry() const;
 	Projectile(projectile_id id = -1, ItemProperties properties =
 			ItemProperties()) :
@@ -89,8 +89,8 @@ struct Weapon {
 	ItemProperties properties;
 
 	Item as_item() const;
-	ItemEntry& item_entry() const;
-	WeaponEntry& weapon_entry() const;
+	_ItemEntry& item_entry() const;
+	_WeaponEntry& weapon_entry() const;
 	Weapon(weapon_id id = 0, ItemProperties properties = ItemProperties()) :
 			id(id), properties(properties) {
 	}
@@ -104,14 +104,14 @@ struct Item {
 	item_id id;
 	ItemProperties properties;
 
-	ItemEntry& item_entry() const;
+	_ItemEntry& item_entry() const;
 	Armour as_armour() const;
 	Projectile as_projectile() const;
 	Weapon as_weapon() const;
 
 //	ArmourEntry& armour_entry();
 	ProjectileEntry& projectile_entry() const;
-	WeaponEntry& weapon_entry() const;
+	_WeaponEntry& weapon_entry() const;
 
 	bool is_normal_item() const;
 	bool is_armour() const;

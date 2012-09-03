@@ -16,7 +16,7 @@
 
 #include "../lanarts_defines.h"
 
-struct ItemEntry {
+struct _ItemEntry {
 	enum equip_type {
 		NONE, WEAPON, PROJECTILE, ARMOUR
 	};
@@ -37,7 +37,7 @@ struct ItemEntry {
 	int equipment_id;
 	id_type identify_type;
 
-	ItemEntry(const std::string& name, const std::string& description,
+	_ItemEntry(const std::string& name, const std::string& description,
 			const std::string& use_message, int rad, int spriten,
 			const std::string& action_luaf, const std::string& prereq_luaf,
 			bool stackable, const Range& shop_cost = Range(),
@@ -56,10 +56,10 @@ struct ItemEntry {
 	}
 };
 
-const char* equip_type_description(const ItemEntry& ientry);
+const char* equip_type_description(const _ItemEntry& ientry);
 
 item_id get_item_by_name(const char* name, bool error_if_not_found = true);
 
-extern std::vector<ItemEntry> game_item_data;
+extern std::vector<_ItemEntry> game_item_data;
 
 #endif /* ITEM_DATA_H_ */

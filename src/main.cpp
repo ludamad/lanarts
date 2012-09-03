@@ -82,6 +82,7 @@ static void game_loop(GameState* gs) {
 
 	gs->pre_step();
 	for (int i = 1; cont; i++) {
+		perf_timer_begin("**Game Frame**");
 		total_timer.start();
 
 		if (gs->key_press_state(SDLK_F2)) {
@@ -157,6 +158,7 @@ static void game_loop(GameState* gs) {
 			}
 			accumulated_time = 0;
 		}
+		perf_timer_end("**Game Frame**");
 	}
 
 	perf_print_results();

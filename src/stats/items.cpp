@@ -8,7 +8,7 @@
 
 #include "items.h"
 
-ItemEntry& Projectile::item_entry() const {
+_ItemEntry& Projectile::item_entry() const {
 	const std::string& name = projectile_entry().name;
 	return game_item_data.at(get_item_by_name(name.c_str()));
 }
@@ -22,7 +22,7 @@ ProjectileEntry& Projectile::projectile_entry() const {
 	return game_projectile_data.at(id);
 }
 
-ItemEntry& Weapon::item_entry() const {
+_ItemEntry& Weapon::item_entry() const {
 	const std::string& name = weapon_entry().name;
 	return game_item_data.at(get_item_by_name(name.c_str()));
 }
@@ -32,11 +32,11 @@ Item Weapon::as_item() const {
 	return Item(get_item_by_name(name.c_str()), properties);
 }
 
-WeaponEntry& Weapon::weapon_entry() const {
+_WeaponEntry& Weapon::weapon_entry() const {
 	return game_weapon_data.at(id);
 }
 
-ItemEntry& Item::item_entry() const {
+_ItemEntry& Item::item_entry() const {
 	LANARTS_ASSERT(id > -1);
 	return game_item_data.at(id);
 }
@@ -45,7 +45,7 @@ Armour Item::as_armour() const {
 	return Armour(item_entry().equipment_id, properties);
 }
 
-ItemEntry& Armour::item_entry() const {
+_ItemEntry& Armour::item_entry() const {
 	const std::string& name = armour_entry().name;
 	return game_item_data.at(get_item_by_name(name.c_str()));
 }
@@ -72,25 +72,25 @@ ProjectileEntry& Item::projectile_entry() const {
 	return game_projectile_data.at(item_entry().equipment_id);
 }
 
-WeaponEntry& Item::weapon_entry() const {
+_WeaponEntry& Item::weapon_entry() const {
 	LANARTS_ASSERT(is_weapon());
 	return game_weapon_data.at(item_entry().equipment_id);
 }
 
 bool Item::is_normal_item() const {
-	return item_entry().equipment_type == ItemEntry::NONE;
+	return item_entry().equipment_type == _ItemEntry::NONE;
 }
 
 bool Item::is_armour() const {
-	return item_entry().equipment_type == ItemEntry::ARMOUR;
+	return item_entry().equipment_type == _ItemEntry::ARMOUR;
 }
 
 bool Item::is_projectile() const {
-	return item_entry().equipment_type == ItemEntry::PROJECTILE;
+	return item_entry().equipment_type == _ItemEntry::PROJECTILE;
 }
 
 bool Item::is_weapon() const {
-	return item_entry().equipment_type == ItemEntry::WEAPON;
+	return item_entry().equipment_type == _ItemEntry::WEAPON;
 }
 
 bool ItemProperties::operator ==(const ItemProperties& properties) const {

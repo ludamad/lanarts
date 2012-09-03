@@ -414,7 +414,7 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 	}
 }
 
-static bool item_check_lua_prereq(lua_State* L, ItemEntry& type,
+static bool item_check_lua_prereq(lua_State* L, _ItemEntry& type,
 		GameInst* user) {
 	if (type.prereq_func.empty())
 		return true;
@@ -429,7 +429,7 @@ static bool item_check_lua_prereq(lua_State* L, ItemEntry& type,
 
 	return ret;
 }
-static void item_do_lua_action(lua_State* L, ItemEntry& type, GameInst* user,
+static void item_do_lua_action(lua_State* L, _ItemEntry& type, GameInst* user,
 		const Pos& p, int amnt) {
 	type.action_func.push(L);
 	luayaml_push_item(L, type.name.c_str());
@@ -444,7 +444,7 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 		return;
 	}
 	ItemSlot& itemslot = inventory().get(action.use_id);
-	ItemEntry& type = itemslot.item.item_entry();
+	_ItemEntry& type = itemslot.item.item_entry();
 
 	lua_State* L = gs->get_luastate();
 
@@ -456,7 +456,7 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 			gs->game_chat().add_message(type.use_message,
 					Colour(100, 100, 255));
 		}
-		if (type.equipment_type == ItemEntry::PROJECTILE)
+		if (type.equipment_type == _ItemEntry::PROJECTILE)
 			itemslot.amount = 0;
 		else
 			itemslot.amount--;

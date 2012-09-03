@@ -64,7 +64,7 @@ static bool handle_equip_slot_io(GameState* gs, PlayerInst* p, const BBox& bbox,
 	if (rightdown && is_within_equipped_weapon(bbox, mx, my)) {
 		queued_actions.push_back(
 				game_action(gs, p, GameAction::DEEQUIP_ITEM,
-						ItemEntry::WEAPON));
+						_ItemEntry::WEAPON));
 		return true;
 	}
 
@@ -73,7 +73,7 @@ static bool handle_equip_slot_io(GameState* gs, PlayerInst* p, const BBox& bbox,
 		if (p->projectile().valid_projectile()) {
 			queued_actions.push_back(
 					game_action(gs, p, GameAction::DEEQUIP_ITEM,
-							ItemEntry::PROJECTILE));
+							_ItemEntry::PROJECTILE));
 			return true;
 		}
 	}
@@ -160,7 +160,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 	}
 
 	/* Draw weapon*/
-	WeaponEntry& wentry = weapon.weapon_entry();
+	_WeaponEntry& wentry = weapon.weapon_entry();
 	gl_draw_image(game_sprite_data[wentry.item_sprite].img(), x, y);
 
 	if (draw_with_projectile) {

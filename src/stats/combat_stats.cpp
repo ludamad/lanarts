@@ -95,7 +95,7 @@ bool AttackStats::is_ranged() const {
 			|| weapon.weapon_entry().uses_projectile;
 }
 
-WeaponEntry& AttackStats::weapon_entry() const {
+_WeaponEntry& AttackStats::weapon_entry() const {
 	return weapon.weapon_entry();
 }
 
@@ -116,7 +116,7 @@ int AttackStats::atk_cooldown() const {
 	return weapon.weapon_entry().cooldown;
 }
 
-static bool is_compatible_projectile(WeaponEntry& wentry,
+static bool is_compatible_projectile(_WeaponEntry& wentry,
 		ProjectileEntry& pentry) {
 	return wentry.weapon_class != "unarmed"
 			&& wentry.weapon_class == pentry.weapon_class;
@@ -124,7 +124,7 @@ static bool is_compatible_projectile(WeaponEntry& wentry,
 int AttackStats::atk_damage(MTwist& mt, const EffectiveStats& stats) const {
 	const CoreStats& core = stats.core;
 	bool hasprojectile = projectile.valid_projectile();
-	WeaponEntry& wentry = weapon.weapon_entry();
+	_WeaponEntry& wentry = weapon.weapon_entry();
 	int dmg = 0;
 
 	if (!hasprojectile
@@ -148,12 +148,12 @@ int AttackStats::atk_damage(MTwist& mt, const EffectiveStats& stats) const {
 int AttackStats::atk_power(MTwist& mt, const EffectiveStats& stats) const {
 	const CoreStats& core = stats.core;
 	bool hasprojectile = projectile.valid_projectile();
-	WeaponEntry& wentry = weapon.weapon_entry();
+	_WeaponEntry& wentry = weapon.weapon_entry();
 	int pow = 0;
 
 	if (!hasprojectile
 			|| is_compatible_projectile(wentry, projectile.projectile_entry())) {
-		WeaponEntry& wentry = weapon.weapon_entry();
+		_WeaponEntry& wentry = weapon.weapon_entry();
 		pow += wentry.power.calculate(mt, core);
 		pow += round(wentry.percentage_magic * stats.magic.power);
 		pow += round((1.0f - wentry.percentage_magic) * stats.physical.power);

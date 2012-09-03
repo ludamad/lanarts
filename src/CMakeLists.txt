@@ -165,6 +165,7 @@ set( lanarts_include
 	lanarts_defines.h
 	collision_avoidance/CollisionAvoidance.h
 
+	data/BaseDataEntry.h
 	data/game_data.h
 	data/lua_game_data.h
 	data/yaml_util.h

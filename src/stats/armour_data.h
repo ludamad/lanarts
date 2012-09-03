@@ -19,13 +19,13 @@ struct ArmourEntry {
 	Range shop_cost;
 
 	sprite_id item_sprite;
-	ItemEntry::equip_type equiptype;
+	_ItemEntry::equip_type equiptype;
 	CoreStatMultiplier resistance, damage_reduction;
 	CoreStatMultiplier magic_resistance, magic_reduction;
 	float spell_cooldown_multiplier;
 
 	ArmourEntry() :
-			item_sprite(0), equiptype(ItemEntry::NONE), spell_cooldown_multiplier(
+			item_sprite(0), equiptype(_ItemEntry::NONE), spell_cooldown_multiplier(
 					1.0f) {
 	}
 };
