@@ -41,20 +41,20 @@ _ItemEntry& _Item::item_entry() const {
 	return _game_item_data.at(id);
 }
 
-Armour _Item::as_armour() const {
-	return Armour(item_entry().equipment_id, properties);
+_Armour _Item::as_armour() const {
+	return _Armour(item_entry().equipment_id, properties);
 }
 
-_ItemEntry& Armour::item_entry() const {
+_ItemEntry& _Armour::item_entry() const {
 	const std::string& name = armour_entry().name;
 	return _game_item_data.at(_get_item_by_name(name.c_str()));
 }
 
-ArmourEntry& Armour::armour_entry() const {
+_ArmourEntry& _Armour::armour_entry() const {
 	return game_armour_data.at(id);
 }
 
-_Item Armour::as_item() const {
+_Item _Armour::as_item() const {
 	const std::string& name = armour_entry().name;
 	return _Item(_get_item_by_name(name.c_str()), properties);
 }
@@ -93,7 +93,7 @@ bool _Item::is_weapon() const {
 	return item_entry().equipment_type == _ItemEntry::WEAPON;
 }
 
-bool ItemProperties::operator ==(const ItemProperties& properties) const {
+bool _ItemProperties::operator ==(const _ItemProperties& properties) const {
 	return magic == properties.magic && physical == properties.physical
 			&& flags == properties.flags;
 }
@@ -110,24 +110,24 @@ bool _Item::operator ==(const _Item& item) const {
 	return id == item.id && properties == item.properties;
 }
 
-void ItemProperties::serialize(SerializeBuffer& serializer) {
+void _ItemProperties::serialize(SerializeBuffer& serializer) {
 	serializer.write(magic);
 	serializer.write(physical);
 	serializer.write_int(flags);
 }
 
-void ItemProperties::deserialize(SerializeBuffer& serializer) {
+void _ItemProperties::deserialize(SerializeBuffer& serializer) {
 	serializer.read(magic);
 	serializer.read(physical);
 	serializer.read_int(flags);
 }
 
-void Armour::serialize(SerializeBuffer& serializer) {
+void _Armour::serialize(SerializeBuffer& serializer) {
 	serializer.write(id);
 	properties.serialize(serializer);
 }
 
-void Armour::deserialize(SerializeBuffer& serializer) {
+void _Armour::deserialize(SerializeBuffer& serializer) {
 	serializer.read(id);
 	properties.deserialize(serializer);
 }

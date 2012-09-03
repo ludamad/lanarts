@@ -12,6 +12,11 @@ extern "C" {
 
 #include "../lua/lua_api.h"
 
+#include "../stats/items/EquipmentEntry.h"
+#include "../stats/items/ItemEntry.h"
+#include "../stats/items/ProjectileEntry.h"
+#include "../stats/items/WeaponEntry.h"
+
 #include "game_data.h"
 
 /* Components of init_game_data */
@@ -29,7 +34,7 @@ void load_armour_item_entries();
 void load_weapon_item_entries();
 void load_projectile_item_entries();
 
-LuaValue load_item_data(lua_State* L, const FilenameList& filenames);
+LuaValue _load_item_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_itemgenlist_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_enemy_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_effect_data(lua_State* L, const FilenameList& filenames);
@@ -38,12 +43,11 @@ LuaValue load_class_data(lua_State* L, const FilenameList& filenames);
 
 /* Definition of game data */
 
-std::vector<ArmourEntry> game_armour_data;
+std::vector<_ArmourEntry> game_armour_data;
 std::vector<ClassType> game_class_data;
 std::vector<EffectEntry> game_effect_data;
 std::vector<EnemyEntry> game_enemy_data;
 std::vector<_ItemEntry> _game_item_data;
-std::vector<ItemEntry> game_item_data;
 std::vector<ItemGenList> game_itemgenlist_data;
 std::vector<TileEntry> game_tile_data;
 std::vector<TilesetEntry> game_tileset_data;
@@ -113,10 +117,6 @@ const char* equip_type_description(const _ItemEntry& ientry) {
 
 item_id _get_item_by_name(const char* name, bool error_if_not_found) {
 	return get_X_by_name(_game_item_data, name, error_if_not_found);
-}
-
-item_id get_item_by_name(const char* name, bool error_if_not_found) {
-	return get_X_by_name(game_item_data, name, error_if_not_found);
 }
 class_id get_class_by_name(const char* name) {
 	return get_X_by_name(game_class_data, name);
@@ -208,7 +208,7 @@ GameSettings init_game_data(lua_State* L) {
 	load_tileset_data(dfiles.tileset_files);
 
 	// --- ITEM DATA ---
-	lua_items = load_item_data(L, dfiles.item_files);
+	lua_items = _load_item_data(L, dfiles.item_files);
 
 	lua_projectiles = load_projectile_data(L, dfiles.projectile_files,
 			lua_items);

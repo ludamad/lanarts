@@ -3,6 +3,10 @@
  *  Implements item loading routines from YAML datafiles
  */
 
+extern "C" {
+#include <lua/lua.h>
+}
+
 #include <fstream>
 
 #include <yaml-cpp/yaml.h>
@@ -12,13 +16,11 @@
 
 #include "../item_data.h"
 
-extern "C" {
-#include <lua/lua.h>
-}
+#include "../items/ItemEntry.h"
 
 using namespace std;
 
-static _ItemEntry::id_type parse_id_type(const YAML::Node& n) {
+static _ItemEntry::id_type _parse_id_type(const YAML::Node& n) {
 	std::string str = parse_str(n);
 	if (str == "potion") {
 		return _ItemEntry::POTION;
@@ -31,19 +33,21 @@ static _ItemEntry::id_type parse_id_type(const YAML::Node& n) {
 }
 
 _ItemEntry parse_item_type(const YAML::Node& n) {
-	return _ItemEntry(parse_str(n["name"]),
+	return _ItemEntry(
+			parse_str(n["name"]),
 			parse_defaulted(n, "description", std::string()),
 			parse_defaulted(n, "use_message", std::string()),
-			parse_defaulted(n, "radius", 11), parse_sprite_number(n, "sprite"),
+			parse_defaulted(n, "radius", 11),
+			parse_sprite_number(n, "sprite"),
 			parse_defaulted(n, "action_func", std::string()),
 			parse_defaulted(n, "prereq_func", std::string()),
 			parse_defaulted(n, "stackable", true),
 			parse_defaulted(n, "shop_cost", Range()),
 			yaml_has_node(n, "type") ?
-					parse_id_type(n["type"]) : _ItemEntry::ALWAYS_KNOWN);
+					_parse_id_type(n["type"]) : _ItemEntry::ALWAYS_KNOWN);
 }
 
-void load_item_callbackf(const YAML::Node& node, lua_State* L,
+void _load_item_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	_game_item_data.push_back(parse_item_type(node));
 	const std::string& name = _game_item_data.back().name;
@@ -54,12 +58,48 @@ void load_item_callbackf(const YAML::Node& node, lua_State* L,
 //	lua_pop(L, 1);
 }
 
-LuaValue load_item_data(lua_State* L, const FilenameList& filenames) {
+LuaValue _load_item_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
 
 	_game_item_data.clear();
+
+	load_data_impl_template(filenames, "items", _load_item_callbackf, L, &ret);
+
+	return ret;
+}
+
+void parse_item_entry(const YAML::Node& n, ItemEntry& entry) {
+	entry.name = parse_str(n["name"]);
+	entry.description = parse_defaulted(n, "description", std::string());
+
+	entry.use_action.success_message = parse_defaulted(n, "use_message",
+			std::string());
+	entry.use_action.success_message = parse_defaulted(n, "cant_use_message",
+			std::string());
+	entry.use_action.action_func = parse_defaulted(n, "action_func",
+			std::string());
+
+	entry.item_sprite = parse_sprite_number(n, "sprite");
+	parse_defaulted(n, "prereq_func", std::string());
+	entry.stackable = parse_defaulted(n, "stackable", true);
+	parse_defaulted(n, "shop_cost", Range());
+}
+
+static void load_item_callbackf(const YAML::Node& node, lua_State* L,
+		LuaValue* value) {
+	ItemEntry* entry = new ItemEntry;
+	parse_item_entry(node, *entry);
+	game_item_data.push_back(entry);
+	value->table_set_yaml(L, entry->name, node);
+}
+
+LuaValue load_item_data(lua_State* L, const FilenameList& filenames) {
+	LuaValue ret;
+
+	clear_item_data(game_item_data);
 
 	load_data_impl_template(filenames, "items", load_item_callbackf, L, &ret);
 
 	return ret;
 }
+

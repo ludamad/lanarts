@@ -21,7 +21,7 @@ static void assert_equal(DerivedStats& d1, DerivedStats& d2) {
 	UNIT_TEST_ASSERT(d1.reduction == d2.reduction);
 	UNIT_TEST_ASSERT(d1.resistance == d2.resistance);
 }
-static void assert_equal(ItemProperties& ip1, ItemProperties& ip2) {
+static void assert_equal(_ItemProperties& ip1, _ItemProperties& ip2) {
 	UNIT_TEST_ASSERT(ip1.flags == ip2.flags);
 	UNIT_TEST_ASSERT(ip1.unknownness == ip2.unknownness);
 	assert_equal(ip1.magic, ip2.magic);
@@ -78,7 +78,7 @@ static void serialize_equipment() {
 
 	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
 	Equipment e1, e2;
-	e1.armour = Armour(1);
+	e1.armour = _Armour(1);
 	e1.weapon = _Weapon(1);
 	e1.projectile = _Projectile(1);
 	e1.inventory.add(_Item(1), 1);

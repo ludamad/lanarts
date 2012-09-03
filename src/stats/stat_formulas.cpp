@@ -59,9 +59,9 @@ int damage_formula(const EffectiveAttackStats& attacker,
 }
 
 static void factor_in_armour_slot(MTwist& mt, EffectiveStats& effective,
-		const Armour& slot) {
+		const _Armour& slot) {
 	CoreStats& core = effective.core;
-	ArmourEntry& aentry = slot.armour_entry();
+	_ArmourEntry& aentry = slot.armour_entry();
 
 	effective.physical.resistance += aentry.resistance.calculate(mt, core);
 	effective.magic.resistance += aentry.magic_resistance.calculate(mt, core);

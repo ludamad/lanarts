@@ -12,7 +12,7 @@
 
 #include "stats.h"
 
-struct ArmourEntry {
+struct _ArmourEntry {
 	std::string name, description;
 
 	// Cost when appearing in shops (if an item), if (0,0) will not appear in shops.
@@ -24,7 +24,7 @@ struct ArmourEntry {
 	CoreStatMultiplier magic_resistance, magic_reduction;
 	float spell_cooldown_multiplier;
 
-	ArmourEntry() :
+	_ArmourEntry() :
 			item_sprite(0), equiptype(_ItemEntry::NONE), spell_cooldown_multiplier(
 					1.0f) {
 	}
@@ -32,9 +32,9 @@ struct ArmourEntry {
 
 int get_armour_by_name(const char* name, bool error_if_not_found = true);
 
-extern std::vector<ArmourEntry> game_armour_data;
+extern std::vector<_ArmourEntry> game_armour_data;
 
-inline ArmourEntry& armour_entry(armour_id id) {
+inline _ArmourEntry& armour_entry(armour_id id) {
 	return game_armour_data.at(id);
 }
 

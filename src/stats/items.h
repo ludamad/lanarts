@@ -11,7 +11,7 @@
 #include "stats.h"
 
 struct _Item;
-struct ArmourEntry;
+struct _ArmourEntry;
 struct _ItemEntry;
 struct _ProjectileEntry;
 struct _WeaponEntry;
@@ -22,7 +22,7 @@ enum item_flags {
 	NOFLAGS = 0, CURSED = 1, GOLDEN = 2
 };
 
-struct ItemProperties {
+struct _ItemProperties {
 	DerivedStats magic, physical;
 	item_flags flags;
 
@@ -37,27 +37,27 @@ struct ItemProperties {
 		unknownness = 0;
 	}
 
-	ItemProperties() :
+	_ItemProperties() :
 			flags(NOFLAGS), unknownness(1) {
 	}
 
-	bool operator==(const ItemProperties& properties) const;
+	bool operator==(const _ItemProperties& properties) const;
 
 	void serialize(SerializeBuffer& serialize);
 	void deserialize(SerializeBuffer& serialize);
 };
 
-struct Armour {
+struct _Armour {
 	armour_id id;
-	ItemProperties properties;
+	_ItemProperties properties;
 
 	_Item as_item() const;
 	_ItemEntry& item_entry() const;
 
-	Armour(armour_id id, ItemProperties properties = ItemProperties()) :
+	_Armour(armour_id id, _ItemProperties properties = _ItemProperties()) :
 			id(id), properties(properties) {
 	}
-	ArmourEntry& armour_entry() const;
+	_ArmourEntry& armour_entry() const;
 
 	void serialize(SerializeBuffer& serialize);
 	void deserialize(SerializeBuffer& serialize);
@@ -65,13 +65,13 @@ struct Armour {
 
 struct _Projectile {
 	projectile_id id;
-	ItemProperties properties;
+	_ItemProperties properties;
 
 	_Item as_item() const;
 	_ItemEntry& item_entry() const;
 	_ProjectileEntry& projectile_entry() const;
-	_Projectile(projectile_id id = -1, ItemProperties properties =
-			ItemProperties()) :
+	_Projectile(projectile_id id = -1, _ItemProperties properties =
+			_ItemProperties()) :
 			id(id), properties(properties) {
 	}
 	bool valid_projectile() const {
@@ -86,12 +86,12 @@ struct _Projectile {
 
 struct _Weapon {
 	weapon_id id;
-	ItemProperties properties;
+	_ItemProperties properties;
 
 	_Item as_item() const;
 	_ItemEntry& item_entry() const;
 	_WeaponEntry& weapon_entry() const;
-	_Weapon(weapon_id id = 0, ItemProperties properties = ItemProperties()) :
+	_Weapon(weapon_id id = 0, _ItemProperties properties = _ItemProperties()) :
 			id(id), properties(properties) {
 	}
 	bool operator==(const _Weapon& weapon) const;
@@ -102,10 +102,10 @@ struct _Weapon {
 
 struct _Item {
 	item_id id;
-	ItemProperties properties;
+	_ItemProperties properties;
 
 	_ItemEntry& item_entry() const;
-	Armour as_armour() const;
+	_Armour as_armour() const;
 	_Projectile as_projectile() const;
 	_Weapon as_weapon() const;
 
@@ -118,7 +118,7 @@ struct _Item {
 	bool is_projectile() const;
 	bool is_weapon() const;
 
-	_Item(item_id id = -1, ItemProperties properties = ItemProperties()) :
+	_Item(item_id id = -1, _ItemProperties properties = _ItemProperties()) :
 			id(id), properties(properties) {
 	}
 

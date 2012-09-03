@@ -8,8 +8,10 @@
 #ifndef ITEMENTRY_H_
 #define ITEMENTRY_H_
 
+#include <vector>
 #include <string>
 
+#include "../../lanarts_defines.h"
 #include "../../data/BaseDataEntry.h"
 
 #include "../LuaAction.h"
@@ -17,7 +19,7 @@
 class ItemEntry: public BaseDataEntry {
 public:
 	ItemEntry() :
-			stackable(true) {
+			item_sprite(-1), stackable(true) {
 	}
 	virtual ~ItemEntry() {
 	}
@@ -31,9 +33,12 @@ public:
 	// Cost when appearing in shops, if (0,0) will not appear in shops.
 	Range shop_cost;
 	LuaAction use_action;
+	sprite_id item_sprite;
 	bool stackable;
 };
 
-extern std::vector<ItemEntry> game_item_data;
+extern std::vector<ItemEntry*> game_item_data;
+
+void clear_item_data(std::vector<ItemEntry*>& items);
 
 #endif /* ITEMENTRY_H_ */

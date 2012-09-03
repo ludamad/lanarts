@@ -13,7 +13,7 @@ using namespace std;
 
 void load_armour_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
-	ArmourEntry entry;
+	_ArmourEntry entry;
 	entry.name = parse_str(node["name"]);
 	entry.description = parse_defaulted(node, "description", std::string());
 	entry.shop_cost = parse_defaulted(node, "shop_cost", Range());
@@ -50,7 +50,7 @@ void load_armour_item_entries() {
 
 	//Create items from armours
 	for (int i = 0; i < game_armour_data.size(); i++) {
-		ArmourEntry& entry = game_armour_data[i];
+		_ArmourEntry& entry = game_armour_data[i];
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
 		_game_item_data.push_back(
 				_ItemEntry(entry.name, entry.description, "", default_radius,

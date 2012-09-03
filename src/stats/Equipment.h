@@ -39,7 +39,7 @@ public:
 	_Weapon weapon;
 	_Projectile projectile;
 	int projectile_amnt;
-	Armour armour;
+	_Armour armour;
 	money_t money;
 };
 
