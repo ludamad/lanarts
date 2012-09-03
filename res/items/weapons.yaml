@@ -65,16 +65,16 @@ weapons:
     cooldown: 65
     spr_item: battle axe 
     
-  - name: Iron Schimitar
+  - name: Iron Scimitar
     shop_cost: [100,150]
     weapon_class: blades
     description: Slice quickly and efficiently
     damage: {base: [4,12], strength: 1.4 }
-    resist_modifier: 1.4
+    resist_modifier: 0.9
     power: {base: 6, strength: 0.35}
-    range: 7
-    cooldown: 10
-    spr_item: battle axe 
+    range: 6
+    cooldown: 15
+    spr_item: iron scimitar
 
   - name: Short Bow
     shop_cost: [10, 20]

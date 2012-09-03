@@ -16,6 +16,9 @@ sprites:
 
   - name: bow1
     file: res/sprites/items/weapons/ranged/bow1.png
+  
+  - name: iron scimitar
+    file: res/sprites/items/weapons/scimitar.png
 
   - name: long bow
     file: res/sprites/items/weapons/ranged/longbow.png

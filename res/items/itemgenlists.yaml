@@ -14,6 +14,7 @@ itemgen_lists:
     - { item: Dagger,             chance: 10                     }
     - { item: Short Sword,        chance: 10                     }
     - { item: Mace,               chance: 5                      }
+    - { item: Iron Scimitar,      chance: 3                      }
     #Scrolls
     - { item: Haste Scroll,       chance: 3                      }
     - { item: Strength Scroll,    chance: 2                      }
