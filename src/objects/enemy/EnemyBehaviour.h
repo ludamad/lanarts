@@ -72,10 +72,11 @@ struct EnemyBehaviour {
 
 	Pos path_start;
 	int path_steps;
+	bool movement_decided;
 	EnemyBehaviour() :
 			current_action(INACTIVE), current_node(0), path_cooldown(0), force_x(
 					0), force_y(0), chase_timeout(0), chasing_player(0), path_start(
-					0, 0), path_steps(0) {
+					0, 0), path_steps(0), movement_decided(false) {
 	}
 	void step() {
 		cooldown_step(chase_timeout);

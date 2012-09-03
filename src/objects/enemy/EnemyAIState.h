@@ -34,7 +34,6 @@ struct EnemyAction {
 
 	action_t current_action;
 	EnemyAIPath path;
-	obj_id chasing_object;
 
 	EnemyAction() :
 			current_action(SLEEPING) {
@@ -55,8 +54,8 @@ struct EnemyCounters {
 };
 
 struct EnemyAIState {
+	EnemyCounters counters;
 	EnemyAction action;
-	int simulation_id;
 
 	void serialize(GameState* gs, SerializeBuffer& serializer);
 	void deserialize(GameState* gs, SerializeBuffer& serializer);

@@ -8,11 +8,11 @@ enemies:
     appear_message: A strange blue metallic creature appears!
     defeat_message: The blue metallic creature is broken into scrap.
     stats:
-        attacks: [ {projectile: Magic Bolt} ]
+        attacks: [ {weapon: Slow Melee}, {projectile: Magic Bolt} ]
         movespeed: 3
         hp: 75
         hpregen: 0.05
-        strength: 25
+        strength: 20
         magic: 25
         defence: 10  
         willpower: 12
@@ -55,9 +55,9 @@ enemies:
     appear_message: A golem eyes you with a cold gaze!
     defeat_message: The golem breaks apart.
     radius: 14
-    xpaward: 45
+    xpaward: 55
     stats:
-        attacks: [ {projectile: Big Stone} ]
+        attacks: [ {weapon: Fast Melee}, {projectile: Big Stone} ]
         hp: 200
         hpregen: 0
         movespeed: 1

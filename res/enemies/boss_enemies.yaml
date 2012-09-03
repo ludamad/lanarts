@@ -18,8 +18,8 @@ enemies:
         hpregen: 0.1
         strength: 25
         magic: 30
-        defence: 30
-        willpower: 30
+        defence: 20
+        willpower: 20
 
   - name: Red Dragon
     appear_message: 
