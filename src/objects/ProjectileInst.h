@@ -20,7 +20,7 @@ class ProjectileInst: public GameInst {
 		DEPTH = 0
 	};
 public:
-	ProjectileInst(const Projectile& projectile,
+	ProjectileInst(const _Projectile& projectile,
 			const EffectiveAttackStats& atkstats, obj_id origin_id, const Pos& start,
 			const Pos& target, float speed, int range, obj_id sole_target = 0, bool bounce = false, int hits = 1);
 	~ProjectileInst();
@@ -44,7 +44,7 @@ private:
 	obj_id origin_id, sole_target;
 
 	/* Projectile used */
-	Projectile projectile;
+	_Projectile projectile;
 
 	/* Stats at time of projectile creation */
 	EffectiveAttackStats atkstats;

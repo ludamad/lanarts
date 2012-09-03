@@ -22,7 +22,7 @@ static ItemGenChance parse_item_chance(const YAML::Node& n) {
 	ItemGenChance igc;
 	string itemname;
 	n["item"] >> itemname;
-	igc.itemtype = get_item_by_name(itemname.c_str());
+	igc.itemtype = _get_item_by_name(itemname.c_str());
 	n["chance"] >> igc.genchance;
 	igc.quantity = parse_defaulted(n, "quantity", Range(1, 1));
 	return igc;
@@ -37,7 +37,7 @@ ItemGenList parse_itemgenlist(const YAML::Node& n) {
 void load_itemlist_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	game_itemgenlist_data.push_back(parse_itemgenlist(node));
-	const std::string& name = game_item_data.back().name;
+	const std::string& name = _game_item_data.back().name;
 	value->table_set_yaml(L, name, node);
 }
 

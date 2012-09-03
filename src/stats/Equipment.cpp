@@ -11,10 +11,10 @@
 
 #include "weapon_data.h"
 
-bool Equipment::valid_to_use_projectile(const Projectile& proj) {
+bool Equipment::valid_to_use_projectile(const _Projectile& proj) {
 	if (!proj.valid_projectile())
 		return false;
-	ProjectileEntry& pentry = proj.projectile_entry();
+	_ProjectileEntry& pentry = proj.projectile_entry();
 	if (pentry.weapon_class == "unarmed")
 		return true;
 	if (pentry.weapon_class == weapon.weapon_entry().weapon_class)
@@ -33,7 +33,7 @@ void Equipment::deequip_projectiles() {
 void Equipment::deequip_weapon() {
 	if (has_weapon()) {
 		inventory.add(weapon.as_item(), 1);
-		weapon = Weapon(NONE);
+		weapon = _Weapon(NONE);
 
 		if (!valid_to_use_projectile(projectile)) {
 			deequip_projectiles();
@@ -61,14 +61,14 @@ void Equipment::deequip(int equipment_type) {
 		break;
 	}
 }
-bool Equipment::valid_to_use(const Item& item) {
+bool Equipment::valid_to_use(const _Item& item) {
 	switch (item.item_entry().equipment_type) {
 	case _ItemEntry::PROJECTILE:
 		return valid_to_use_projectile(item.as_projectile());
 	}
 	return true;
 }
-void Equipment::equip(const Item& item, int amnt) {
+void Equipment::equip(const _Item& item, int amnt) {
 	switch (item.item_entry().equipment_type) {
 	case _ItemEntry::ARMOUR:
 		if (armour.properties.flags & CURSED)
@@ -99,7 +99,7 @@ void Equipment::equip(const Item& item, int amnt) {
 void Equipment::use_ammo(int amnt) {
 	projectile_amnt -= amnt;
 	if (projectile_amnt <= 0) {
-		projectile = Projectile(-1);
+		projectile = _Projectile(-1);
 		projectile_amnt = 0;
 	}
 }

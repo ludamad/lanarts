@@ -58,8 +58,8 @@ struct _ItemEntry {
 
 const char* equip_type_description(const _ItemEntry& ientry);
 
-item_id get_item_by_name(const char* name, bool error_if_not_found = true);
+item_id _get_item_by_name(const char* name, bool error_if_not_found = true);
 
-extern std::vector<_ItemEntry> game_item_data;
+extern std::vector<_ItemEntry> _game_item_data;
 
 #endif /* ITEM_DATA_H_ */

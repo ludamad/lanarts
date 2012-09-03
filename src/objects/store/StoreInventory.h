@@ -11,9 +11,9 @@
 #include "../../stats/items.h"
 
 struct StoreItemSlot {
-	Item item;
+	_Item item;
 	int amount, cost;
-	StoreItemSlot(const Item& item = Item(), int amount = 0, int cost = 0) :
+	StoreItemSlot(const _Item& item = _Item(), int amount = 0, int cost = 0) :
 			item(item), amount(amount), cost(cost) {
 	}
 };
@@ -25,7 +25,7 @@ public:
 	StoreInventory(int maxsize = 40) :
 			items(maxsize) {
 	}
-	void add(const Item& item, int amount, int cost);
+	void add(const _Item& item, int amount, int cost);
 	StoreItemSlot& get(int i) {
 		return items.at(i);
 	}

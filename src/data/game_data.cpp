@@ -42,11 +42,12 @@ std::vector<ArmourEntry> game_armour_data;
 std::vector<ClassType> game_class_data;
 std::vector<EffectEntry> game_effect_data;
 std::vector<EnemyEntry> game_enemy_data;
-std::vector<_ItemEntry> game_item_data;
+std::vector<_ItemEntry> _game_item_data;
+std::vector<ItemEntry> game_item_data;
 std::vector<ItemGenList> game_itemgenlist_data;
 std::vector<TileEntry> game_tile_data;
 std::vector<TilesetEntry> game_tileset_data;
-std::vector<ProjectileEntry> game_projectile_data;
+std::vector<_ProjectileEntry> game_projectile_data;
 std::vector<ScriptObjectEntry> game_scriptobject_data;
 std::vector<SpellEntry> game_spell_data;
 std::vector<SpriteEntry> game_sprite_data;
@@ -97,7 +98,7 @@ const char* equip_type_description(const _ItemEntry& ientry) {
 	case _ItemEntry::WEAPON:
 		return "Weapon";
 	case _ItemEntry::PROJECTILE: {
-		ProjectileEntry& pentry = game_projectile_data.at(ientry.equipment_id);
+		_ProjectileEntry& pentry = game_projectile_data.at(ientry.equipment_id);
 		if (pentry.is_unarmed()) {
 			return "Unarmed Projectile";
 		} else {
@@ -108,6 +109,10 @@ const char* equip_type_description(const _ItemEntry& ientry) {
 		return "One-time Use";
 	}
 	return "";
+}
+
+item_id _get_item_by_name(const char* name, bool error_if_not_found) {
+	return get_X_by_name(_game_item_data, name, error_if_not_found);
 }
 
 item_id get_item_by_name(const char* name, bool error_if_not_found) {
@@ -153,7 +158,7 @@ tileset_id get_tileset_by_name(const char* name) {
 
 //Lua argument getters
 item_id item_from_lua(lua_State* L, int idx) {
-	return get_X_by_name(game_item_data, lua_tostring(L, idx));
+	return get_X_by_name(_game_item_data, lua_tostring(L, idx));
 }
 class_id class_from_lua(lua_State* L, int idx) {
 	return get_X_by_name(game_class_data, lua_tostring(L, idx));
@@ -264,7 +269,7 @@ void init_lua_data(GameState* gs, lua_State* L) {
 	__lua_init(L, game_enemy_data);
 	__lua_init(L, game_effect_data);
 	__lua_init(L, game_projectile_data);
-	__lua_init(L, game_item_data);
+	__lua_init(L, _game_item_data);
 	__lua_init(L, game_spell_data);
 	__lua_init(L, game_weapon_data);
 

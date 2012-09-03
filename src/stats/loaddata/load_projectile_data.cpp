@@ -26,7 +26,7 @@ static float parse_magic_percentage(const YAML::Node& node, const char* key) {
 
 void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
-	ProjectileEntry entry;
+	_ProjectileEntry entry;
 	entry.name = parse_str(node["name"]);
 	entry.description = parse_defaulted(node, "description", std::string());
 	entry.shop_cost = parse_defaulted(node, "shop_cost", Range());
@@ -86,9 +86,9 @@ void load_projectile_item_entries() {
 
 	//Create items from projectiles
 	for (int i = 0; i < game_projectile_data.size(); i++) {
-		ProjectileEntry& entry = game_projectile_data[i];
+		_ProjectileEntry& entry = game_projectile_data[i];
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
-		game_item_data.push_back(
+		_game_item_data.push_back(
 				_ItemEntry(entry.name, entry.description, "", default_radius,
 						entry.item_sprite, "equip", "", true, entry.shop_cost,
 						_ItemEntry::ALWAYS_KNOWN, _ItemEntry::PROJECTILE, i));

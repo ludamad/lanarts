@@ -45,8 +45,8 @@ _ItemEntry parse_item_type(const YAML::Node& n) {
 
 void load_item_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
-	game_item_data.push_back(parse_item_type(node));
-	const std::string& name = game_item_data.back().name;
+	_game_item_data.push_back(parse_item_type(node));
+	const std::string& name = _game_item_data.back().name;
 	value->table_set_yaml(L, name, node);
 //	value->table_push_value(L, name);
 //	lua_pushstring(L, "consumable");
@@ -57,7 +57,7 @@ void load_item_callbackf(const YAML::Node& node, lua_State* L,
 LuaValue load_item_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
 
-	game_item_data.clear();
+	_game_item_data.clear();
 
 	load_data_impl_template(filenames, "items", load_item_callbackf, L, &ret);
 

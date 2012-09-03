@@ -52,7 +52,7 @@ void load_armour_item_entries() {
 	for (int i = 0; i < game_armour_data.size(); i++) {
 		ArmourEntry& entry = game_armour_data[i];
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
-		game_item_data.push_back(
+		_game_item_data.push_back(
 				_ItemEntry(entry.name, entry.description, "", default_radius,
 						entry.item_sprite, "equip", "", false, entry.shop_cost,
 						_ItemEntry::ALWAYS_KNOWN, _ItemEntry::ARMOUR, i));

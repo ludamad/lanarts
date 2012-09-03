@@ -58,9 +58,9 @@ public:
 	bool damage(GameState* gs, int dmg);
 	bool damage(GameState* gs, const EffectiveAttackStats& attack);
 	bool melee_attack(GameState* gs, CombatGameInst* inst,
-			const Weapon& projectile);
+			const _Weapon& projectile);
 	bool projectile_attack(GameState* gs, CombatGameInst* inst,
-			const Weapon& weapon, const Projectile& projectile);
+			const _Weapon& weapon, const _Projectile& projectile);
 	//bool spell_attack ...
 	bool attack(GameState* gs, CombatGameInst* inst, const AttackStats& attack);
 

@@ -52,7 +52,7 @@ void ProjectileInst::draw(GameState* gs) {
 }
 
 void ProjectileInst::deinit(GameState* gs) {
-	ProjectileEntry& pentry = projectile.projectile_entry();
+	_ProjectileEntry& pentry = projectile.projectile_entry();
 	int break_roll = gs->rng().rand(100);
 	if (pentry.drop_chance > break_roll) {
 		int nx = round_to_multiple(x, TILE_SIZE, true), ny = round_to_multiple(
@@ -68,7 +68,7 @@ void ProjectileInst::copy_to(GameInst* inst) const {
 	*(ProjectileInst*) inst = *this;
 }
 
-ProjectileInst::ProjectileInst(const Projectile& projectile,
+ProjectileInst::ProjectileInst(const _Projectile& projectile,
 		const EffectiveAttackStats& atkstats, obj_id origin_id,
 		const Pos& start, const Pos& target, float speed, int range,
 		obj_id sole_target, bool bounce, int hits) :
@@ -240,7 +240,7 @@ void ProjectileInst::step(GameState* gs) {
 }
 
 sprite_id ProjectileInst::sprite() const {
-	ProjectileEntry& pentry = projectile.projectile_entry();
+	_ProjectileEntry& pentry = projectile.projectile_entry();
 	return pentry.attack_sprite;
 }
 

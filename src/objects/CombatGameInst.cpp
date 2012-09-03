@@ -117,7 +117,7 @@ void CombatGameInst::draw(GameState *gs) {
 }
 
 bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
-		const Weapon& weapon) {
+		const _Weapon& weapon) {
 	bool isdead = false;
 	if (!cooldowns().can_doaction())
 		return false;
@@ -158,13 +158,13 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 }
 
 bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
-		const Weapon& weapon, const Projectile& projectile) {
+		const _Weapon& weapon, const _Projectile& projectile) {
 	if (!cooldowns().can_doaction())
 		return false;
 	MTwist& mt = gs->rng();
 
 	_WeaponEntry& wentry = weapon.weapon_entry();
-	ProjectileEntry& pentry = projectile.projectile_entry();
+	_ProjectileEntry& pentry = projectile.projectile_entry();
 	AttackStats attack;
 	if (!pentry.is_unarmed()) {
 		attack.weapon = weapon;

@@ -14,7 +14,7 @@
 #include "../lanarts_defines.h"
 #include "stats.h"
 
-struct ProjectileEntry {
+struct _ProjectileEntry {
 	std::string name, description;
 	std::string weapon_class; //Compatible with this weapon class
 
@@ -37,7 +37,7 @@ struct ProjectileEntry {
 
 	LuaValue on_hit_func;
 
-	ProjectileEntry() :
+	_ProjectileEntry() :
 			item_sprite(-1), attack_sprite(-1), percentage_magic(0.0f), resist_modifier(
 					1.0f), drop_chance(0), speed(0.0f), can_wall_bounce(false), number_of_target_bounces(
 					0), cooldown(0), range(0), radius(0) {
@@ -53,7 +53,7 @@ struct ProjectileEntry {
 	}
 };
 
-extern std::vector<ProjectileEntry> game_projectile_data;
+extern std::vector<_ProjectileEntry> game_projectile_data;
 
 projectile_id get_projectile_by_name(const char* name);
 

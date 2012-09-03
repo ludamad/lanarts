@@ -98,11 +98,11 @@ static void draw_statmult_with_prefix(GameState* gs, const char* prefix,
 }
 //Drawn only as part of other draw_console_<something>_description functions
 static void draw_projectile_description_overlay(GameState* gs,
-		const Projectile& projectile, int cooldown_override = -1) {
+		const _Projectile& projectile, int cooldown_override = -1) {
 	PlayerInst* p = gs->local_player();
 	EffectiveStats& estats = p->effective_stats();
 
-	ProjectileEntry& pentry = projectile.projectile_entry();
+	_ProjectileEntry& pentry = projectile.projectile_entry();
 	GameTextConsole& console = gs->game_console();
 
 	BBox bbox(console.bounding_box());
@@ -138,7 +138,7 @@ static void draw_projectile_description_overlay(GameState* gs,
 
 //Drawn only as part of other draw_console_<something>_description functions
 static void draw_weapon_description_overlay(GameState* gs,
-		const Weapon& weapon) {
+		const _Weapon& weapon) {
 	PlayerInst* p = gs->local_player();
 	EffectiveStats& estats = p->effective_stats();
 
@@ -207,7 +207,7 @@ static void draw_labelled_sprite(GameState* gs, sprite_id sprite,
 			y + TILE_SIZE / 2, "%s", text);
 }
 
-void draw_console_item_description(GameState* gs, const Item& item) {
+void draw_console_item_description(GameState* gs, const _Item& item) {
 	GameTextConsole& console = gs->game_console();
 
 	if (console.has_content_already()) {

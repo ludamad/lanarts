@@ -10,9 +10,9 @@
 
 #include <string>
 
-#include "../data/BaseDataEntry.h"
+#include "../../data/BaseDataEntry.h"
 
-#include "LuaAction.h"
+#include "../LuaAction.h"
 
 class ItemEntry: public BaseDataEntry {
 public:
@@ -21,23 +21,19 @@ public:
 	}
 	virtual ~ItemEntry() {
 	}
+	virtual void init(lua_State* L) {
+		use_action.init(L);
+	}
 
-	enum equip_type {
-		NONE, WEAPON, PROJECTILE, ARMOUR
-	};
 	enum id_type {
 		ALWAYS_KNOWN, POTION, SCROLL
 	};
 	// Cost when appearing in shops, if (0,0) will not appear in shops.
 	Range shop_cost;
-
 	LuaAction use_action;
-
 	bool stackable;
-	// Extra information if this item is a piece of equipment
-	equip_type equipment_type;
-	int equipment_id;
-	id_type identify_type;
 };
+
+extern std::vector<ItemEntry> game_item_data;
 
 #endif /* ITEMENTRY_H_ */

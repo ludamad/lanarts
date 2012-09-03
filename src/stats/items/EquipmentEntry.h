@@ -6,51 +6,27 @@
 #ifndef EQUIPMENTENTRY_H_
 #define EQUIPMENTENTRY_H_
 
-#include "ItemEntry.h"
-
 #include "../../lanarts_defines.h"
 
-struct DamageModifiers {
-	CoreStatMultiplier power, damage;
-	float magic_percentage, physical_percentage;
-	float resistability;
-	DamageModifiers() :
-			magic_percentage(0.0f), physical_percentage(0.0f), resistability(
-					1.0f) {
-	}
-};
+#include "../stat_modifiers.h"
 
-struct DefenceModifiers {
-	CoreStatMultiplier resistance, damage_reduction;
-	CoreStatMultiplier magic_resistance, magic_reduction;
-};
-
-//Stat modifiers that trivially stack
-struct StatModifiers {
-	// additive
-	CoreStats core_mod;
-	DamageModifiers damage_mod;
-	DefenceModifiers defence_mod;
-	// multiplicative
-	float spell_cooldown_mult, melee_cooldown_mult;
-	StatModifiers() :
-			spell_cooldown_mult(0.0f), melee_cooldown_mult(0.0f) {
-	}
-};
-
-struct StatusEffectModifiers {
-	std::vector<effect_id> status_effects;
-};
+#include "ItemEntry.h"
 
 class EquipmentEntry: public ItemEntry {
 public:
 	enum equip_type {
-		NONE, WEAPON, PROJECTILE, ARMOUR
+		NONE, WEAPON, PROJECTILE, ARMOUR, RING
 	};
+	EquipmentEntry(equip_type type = NONE) :
+			type(type) {
+
+	}
 	virtual ~EquipmentEntry() {
 	}
+	equip_type type;
 	// Stat modifiers while wearing this equipment
 	StatModifiers stat_modifiers;
+	CooldownModifiers cooldown_modifiers;
 	// Status effects from wearing this armour
 	StatusEffectModifiers effect_modifiers;
 };

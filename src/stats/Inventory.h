@@ -17,7 +17,7 @@ class SerializeBuffer;
 const int INVENTORY_SIZE = 40;
 
 struct ItemSlot {
-	Item item;
+	_Item item;
 	int amount;
 	ItemSlot() :
 			amount(0) {
@@ -29,7 +29,7 @@ public:
 	Inventory(int size = INVENTORY_SIZE) {
 		items.resize(size);
 	}
-	bool add(const Item& item, int amount);
+	bool add(const _Item& item, int amount);
 	ItemSlot& get(int i) {
 		return items.at(i);
 	}

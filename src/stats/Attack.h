@@ -6,18 +6,24 @@
 #ifndef ATTACK_H_
 #define ATTACK_H_
 
+#include "stat_modifiers.h"
+#include "LuaAction.h"
+
 class Attack {
 public:
-	bool uses_projectile;
-	int max_targets;
-	CoreStatMultiplier power, damage;
-	float percentage_magic; //Conversely the rest is percentage physical
-	float resist_modifier; // How much resistance can resist this attack, lower for fast attacks
+	DamageModifiers damage;
 
-	int range, dmgradius, cooldown;
-	sprite_id item_sprite, attack_sprite;
-	projectile_id created_projectile; // for infinite ammo weapons
-	LuaValue on_hit_func;
+	int range, cooldown;
+	sprite_id attack_sprite;
+	LuaAction attack_action;
+
+	Attack() :
+			range(0), cooldown(0), attack_sprite(-1) {
+	}
+
+	void init(lua_State* L) {
+		attack_action.init(L);
+	}
 };
 
 #endif /* ATTACK_H_ */

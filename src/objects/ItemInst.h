@@ -15,7 +15,7 @@ public:
 	enum {
 		RADIUS = 15, DEPTH = 100
 	};
-	ItemInst(const Item& item, int x, int y, int quantity = 1,
+	ItemInst(const _Item& item, int x, int y, int quantity = 1,
 			obj_id dropped_by = 0, bool pickup_by_dropper = false) :
 			GameInst(x, y, RADIUS, false, DEPTH), item(item), quantity(
 					quantity), dropped_by(dropped_by), pickup_by_dropper(
@@ -27,7 +27,7 @@ public:
 	virtual void copy_to(GameInst* inst) const;
 	virtual ItemInst* clone() const;
 
-	Item& item_type() {
+	_Item& item_type() {
 		return item;
 	}
 	int& item_quantity() {
@@ -44,7 +44,7 @@ public:
 	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
 
 private:
-	Item item;
+	_Item item;
 	int quantity;
 	obj_id dropped_by;
 	bool pickup_by_dropper;

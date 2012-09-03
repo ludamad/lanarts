@@ -137,7 +137,7 @@ bool ActionBar::handle_io(GameState* gs, ActionQueue& queued_actions) {
 static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 		int x, int y) {
 	int mx = gs->mouse_x(), my = gs->mouse_y();
-	Weapon& weapon = player->weapon();
+	_Weapon& weapon = player->weapon();
 	bool weapon_selected = player->spell_selected() == -1;
 	Colour outline =
 			weapon_selected ? COL_SELECTED_OUTLINE : COL_FILLED_OUTLINE;
@@ -166,13 +166,13 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 	if (draw_with_projectile) {
 		BBox projectilebox(weaponbox.translated(TILE_SIZE, 0));
 
-		Projectile& projectile = player->projectile();
+		_Projectile& projectile = player->projectile();
 
 		if (projectilebox.contains(mx, my)) {
 			draw_console_item_description(gs, projectile.as_item());
 		}
 
-		ProjectileEntry& ptype = projectile.projectile_entry();
+		_ProjectileEntry& ptype = projectile.projectile_entry();
 		gl_draw_image(game_sprite_data[ptype.item_sprite].img(), x + TILE_SIZE,
 				y);
 		/* Draw projectile amount */

@@ -67,7 +67,7 @@ public:
 			lua_pushstring(L, "name");
 			lua_gettable(L, 1);
 			const char* itemname = lua_tostring(L, lua_gettop(L));
-			item_id item = get_item_by_name(itemname);
+			item_id item = _get_item_by_name(itemname);
 			int amnt = args >= 2 ? lua_tointeger(L, 2) : 1;
 			combatinst->equip(item, amnt);
 			lua_pop(L, 1);

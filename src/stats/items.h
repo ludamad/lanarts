@@ -10,10 +10,10 @@
 
 #include "stats.h"
 
-struct Item;
+struct _Item;
 struct ArmourEntry;
 struct _ItemEntry;
-struct ProjectileEntry;
+struct _ProjectileEntry;
 struct _WeaponEntry;
 
 class SerializeBuffer;
@@ -51,7 +51,7 @@ struct Armour {
 	armour_id id;
 	ItemProperties properties;
 
-	Item as_item() const;
+	_Item as_item() const;
 	_ItemEntry& item_entry() const;
 
 	Armour(armour_id id, ItemProperties properties = ItemProperties()) :
@@ -63,14 +63,14 @@ struct Armour {
 	void deserialize(SerializeBuffer& serialize);
 };
 
-struct Projectile {
+struct _Projectile {
 	projectile_id id;
 	ItemProperties properties;
 
-	Item as_item() const;
+	_Item as_item() const;
 	_ItemEntry& item_entry() const;
-	ProjectileEntry& projectile_entry() const;
-	Projectile(projectile_id id = -1, ItemProperties properties =
+	_ProjectileEntry& projectile_entry() const;
+	_Projectile(projectile_id id = -1, ItemProperties properties =
 			ItemProperties()) :
 			id(id), properties(properties) {
 	}
@@ -78,39 +78,39 @@ struct Projectile {
 		return id >= 0;
 	}
 
-	bool operator==(const Projectile& projectile) const;
+	bool operator==(const _Projectile& projectile) const;
 
 	void serialize(SerializeBuffer& serialize);
 	void deserialize(SerializeBuffer& serialize);
 };
 
-struct Weapon {
+struct _Weapon {
 	weapon_id id;
 	ItemProperties properties;
 
-	Item as_item() const;
+	_Item as_item() const;
 	_ItemEntry& item_entry() const;
 	_WeaponEntry& weapon_entry() const;
-	Weapon(weapon_id id = 0, ItemProperties properties = ItemProperties()) :
+	_Weapon(weapon_id id = 0, ItemProperties properties = ItemProperties()) :
 			id(id), properties(properties) {
 	}
-	bool operator==(const Weapon& weapon) const;
+	bool operator==(const _Weapon& weapon) const;
 
 	void serialize(SerializeBuffer& serialize);
 	void deserialize(SerializeBuffer& serialize);
 };
 
-struct Item {
+struct _Item {
 	item_id id;
 	ItemProperties properties;
 
 	_ItemEntry& item_entry() const;
 	Armour as_armour() const;
-	Projectile as_projectile() const;
-	Weapon as_weapon() const;
+	_Projectile as_projectile() const;
+	_Weapon as_weapon() const;
 
 //	ArmourEntry& armour_entry();
-	ProjectileEntry& projectile_entry() const;
+	_ProjectileEntry& projectile_entry() const;
 	_WeaponEntry& weapon_entry() const;
 
 	bool is_normal_item() const;
@@ -118,11 +118,11 @@ struct Item {
 	bool is_projectile() const;
 	bool is_weapon() const;
 
-	Item(item_id id = -1, ItemProperties properties = ItemProperties()) :
+	_Item(item_id id = -1, ItemProperties properties = ItemProperties()) :
 			id(id), properties(properties) {
 	}
 
-	bool operator==(const Item& item) const;
+	bool operator==(const _Item& item) const;
 
 	void serialize(SerializeBuffer& serialize);
 	void deserialize(SerializeBuffer& serialize);

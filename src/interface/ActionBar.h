@@ -23,15 +23,15 @@ struct ActionSlot {
 	ActionSlot(spell_id spell) :
 			is_spell(true), spell(spell) {
 	}
-	ActionSlot(const Item& item, const Projectile& projectile) :
+	ActionSlot(const _Item& item, const _Projectile& projectile) :
 			is_spell(false), spell(-1), item(item), projectile(projectile) {
 	}
 
 	bool is_spell;
 	spell_id spell; //Specifies spell to use
-	Item item; //Specifies item to search for in inventory and use
+	_Item item; //Specifies item to search for in inventory and use
 	//If item is a weapon, this specifies a projectile to equip as well
-	Projectile projectile;
+	_Projectile projectile;
 };
 
 const int MAX_ACTIONS = 32;

@@ -13,6 +13,7 @@
 #include "stat_formulas.h"
 
 #include "weapon_data.h"
+#include "items/WeaponEntry.h"
 
 CombatStats::CombatStats(const ClassStats& class_stats, const CoreStats& core,
 		const CooldownStats& cooldowns, const Equipment& equipment,
@@ -99,7 +100,7 @@ _WeaponEntry& AttackStats::weapon_entry() const {
 	return weapon.weapon_entry();
 }
 
-ProjectileEntry& AttackStats::projectile_entry() const {
+_ProjectileEntry& AttackStats::projectile_entry() const {
 	LANARTS_ASSERT(is_ranged());
 	if (projectile.valid_projectile())
 		return projectile.projectile_entry();
@@ -117,7 +118,7 @@ int AttackStats::atk_cooldown() const {
 }
 
 static bool is_compatible_projectile(_WeaponEntry& wentry,
-		ProjectileEntry& pentry) {
+		_ProjectileEntry& pentry) {
 	return wentry.weapon_class != "unarmed"
 			&& wentry.weapon_class == pentry.weapon_class;
 }
@@ -134,7 +135,7 @@ int AttackStats::atk_damage(MTwist& mt, const EffectiveStats& stats) const {
 		dmg += round((1.0f - wentry.percentage_magic) * stats.physical.damage);
 	}
 	if (hasprojectile) {
-		ProjectileEntry& pentry = projectile.projectile_entry();
+		_ProjectileEntry& pentry = projectile.projectile_entry();
 		dmg += projectile.projectile_entry().damage.calculate(mt, core);
 		if (!is_compatible_projectile(wentry, pentry)) {
 			dmg += round(pentry.percentage_magic * stats.magic.damage);
@@ -159,7 +160,7 @@ int AttackStats::atk_power(MTwist& mt, const EffectiveStats& stats) const {
 		pow += round((1.0f - wentry.percentage_magic) * stats.physical.power);
 	}
 	if (hasprojectile) {
-		ProjectileEntry& pentry = projectile.projectile_entry();
+		_ProjectileEntry& pentry = projectile.projectile_entry();
 		pow += projectile.projectile_entry().power.calculate(mt, core);
 		if (!is_compatible_projectile(wentry, pentry)) {
 			pow += round(pentry.percentage_magic * stats.magic.power);

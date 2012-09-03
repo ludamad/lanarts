@@ -260,6 +260,12 @@ set( lanarts_include
 
 	serialize/SerializeBuffer.h
 
+    stats/items/EquipmentEntry.h
+    stats/items/ItemEntry.h
+    stats/items/ProjectileEntry.h
+    stats/items/WeaponEntry.h
+    
+    stats/Attack.h
 	stats/AllowedActions.h
 	stats/armour_data.h
 	stats/class_data.h
@@ -273,6 +279,7 @@ set( lanarts_include
 	stats/itemgen_data.h
 	stats/items.h
 	stats/ItemsKnown.h
+	stats/LuaAction.h
 	stats/skills.h
 	stats/SpellsKnown.h
 	stats/stat_formulas.h

@@ -53,12 +53,12 @@ static void assert_equal(Equipment& e1, Equipment& e2) {
 static void serialize_inventory() {
 	const int TEST_N = 10;
 	//mock up some item data
-	game_item_data.resize(TEST_N, _ItemEntry("", "", "", 0, 0, "", "", false));
+	_game_item_data.resize(TEST_N, _ItemEntry("", "", "", 0, 0, "", "", false));
 
 	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
 	Inventory inv1, inv2;
 	for (int i = 0; i < TEST_N; i++) {
-		inv1.add(Item(i), 1);
+		inv1.add(_Item(i), 1);
 	}
 
 	inv1.serialize(serializer);
@@ -66,29 +66,29 @@ static void serialize_inventory() {
 
 	assert_equal(inv1, inv2);
 
-	game_item_data.clear();
+	_game_item_data.clear();
 }
 
 static void serialize_equipment() {
 	const int TEST_N = 10;
 	//mock up some item data
-	game_item_data.resize(TEST_N, _ItemEntry("", "", "", 0, 0, "", "", false));
+	_game_item_data.resize(TEST_N, _ItemEntry("", "", "", 0, 0, "", "", false));
 	game_weapon_data.resize(TEST_N);
 	game_armour_data.resize(TEST_N);
 
 	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
 	Equipment e1, e2;
 	e1.armour = Armour(1);
-	e1.weapon = Weapon(1);
-	e1.projectile = Projectile(1);
-	e1.inventory.add(Item(1), 1);
+	e1.weapon = _Weapon(1);
+	e1.projectile = _Projectile(1);
+	e1.inventory.add(_Item(1), 1);
 	e1.serialize(serializer);
 
 	e2.deserialize(serializer);
 
 	assert_equal(e1, e2);
 
-	game_item_data.clear();
+	_game_item_data.clear();
 	game_weapon_data.clear();
 	game_armour_data.clear();
 }

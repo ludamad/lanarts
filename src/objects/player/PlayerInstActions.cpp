@@ -35,7 +35,7 @@ extern "C" {
 
 #include "PlayerInst.h"
 
-static bool is_same_projectile(const Projectile& projectile, const Item& item) {
+static bool is_same_projectile(const _Projectile& projectile, const _Item& item) {
 	if (projectile.valid_projectile()) {
 		if (item.is_projectile()) {
 			return (item.as_projectile() == projectile);
@@ -44,12 +44,12 @@ static bool is_same_projectile(const Projectile& projectile, const Item& item) {
 	return false;
 }
 
-static bool is_wieldable_projectile(Equipment& equipment, const Item& item) {
+static bool is_wieldable_projectile(Equipment& equipment, const _Item& item) {
 	if (is_same_projectile(equipment.projectile, item))
 		return true;
 
 	if (item.is_projectile()) {
-		ProjectileEntry& pentry = item.projectile_entry();
+		_ProjectileEntry& pentry = item.projectile_entry();
 		if (pentry.weapon_class == "unarmed")
 			return false;
 	}
@@ -96,7 +96,7 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 	if (!used_item && gs->game_settings().autouse_health_potions
 			&& core_stats().hp < AUTOUSE_HEALTH_POTION_THRESHOLD) {
 		int item_slot = inventory().find_slot(
-				get_item_by_name("Health Potion"));
+				_get_item_by_name("Health Potion"));
 		if (item_slot > -1) {
 			queued_actions.push_back(
 					game_action(gs, this, GameAction::USE_ITEM, item_slot));
@@ -109,7 +109,7 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 	if (cooldowns().can_pickup()
 			&& gs->object_radius_test(this, &inst, 1, &item_colfilter)) {
 		ItemInst* iteminst = (ItemInst*)inst;
-		Item& item = iteminst->item_type();
+		_Item& item = iteminst->item_type();
 
 		bool was_dropper = iteminst->last_held_by() == id;
 		bool dropper_autopickup = iteminst->autopickup_held();
@@ -279,10 +279,10 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	ItemInst* iteminst = dynamic_cast<ItemInst*>(inst);
 	LANARTS_ASSERT(iteminst);
 
-	const Item& type = iteminst->item_type();
+	const _Item& type = iteminst->item_type();
 	int amnt = iteminst->item_quantity();
 
-	if (type == get_item_by_name("Gold")) {
+	if (type == _get_item_by_name("Gold")) {
 		gold() += amnt;
 	} else {
 		if (is_same_projectile(equipment().projectile, type)) {

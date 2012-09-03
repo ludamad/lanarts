@@ -99,7 +99,7 @@ void load_weapon_item_entries() {
 	for (int i = 0; i < game_weapon_data.size(); i++) {
 		_WeaponEntry& entry = game_weapon_data[i];
 		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
-		game_item_data.push_back(
+		_game_item_data.push_back(
 				_ItemEntry(entry.name, entry.description, "", default_radius,
 						entry.item_sprite, "equip", "", false, entry.shop_cost,
 						_ItemEntry::ALWAYS_KNOWN, _ItemEntry::WEAPON, i));
