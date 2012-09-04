@@ -23,7 +23,8 @@ enemy_files:
   - enemies/humanoid/humanoid_enemies.yaml
 
 item_files: 
-  - items/items.yaml
+  - items/misc/misc.yaml
+  - items/scrolls/scrolls.yaml
   
 itemgenlist_files:
   - items/itemgenlists.yaml
