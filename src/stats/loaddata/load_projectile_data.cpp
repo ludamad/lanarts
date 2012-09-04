@@ -100,7 +100,7 @@ void _load_projectile_item_entries() {
 void parse_projectile_entry(const YAML::Node& n, ProjectileEntry& entry) {
 	parse_equipment_entry(n, entry);
 	entry.stackable = true;
-	entry.attack = parse_attack_(n);
+	entry.attack = parse_attack(n);
 	entry.attack.attack_sprite = entry.item_sprite;
 	if (yaml_has_node(n, "spr_attack")) {
 		entry.attack.attack_sprite = parse_sprite_number(n, "spr_attack");
@@ -114,6 +114,7 @@ void parse_projectile_entry(const YAML::Node& n, ProjectileEntry& entry) {
 			"number_of_target_bounces", 0);
 	entry.can_wall_bounce = parse_defaulted(n, "can_wall_bounce", false);
 	entry.radius = parse_defaulted(n, "radius", 5);
+	entry.type = EquipmentEntry::PROJECTILE;
 }
 
 void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
@@ -135,8 +136,8 @@ LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 	LuaValue ret;
 	ret.table_initialize(L);
 
-	load_data_impl_template(filenames, "projectiles",
-			_load_projectile_callbackf, L, &itemtable);
+	load_data_impl_template(filenames, "projectiles", load_projectile_callbackf,
+			L, &itemtable);
 
 	for (int i = 0; i < game_projectile_data.size(); i++) {
 		itemtable.table_push_value(L, game_projectile_data[i].name.c_str());

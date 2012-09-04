@@ -69,10 +69,11 @@ void parse_equipment_entry(const YAML::Node& n, EquipmentEntry& entry) {
 	entry.use_action = LuaAction(LuaValue("equip"));
 	entry.stat_modifiers = parse_stat_modifiers(n);
 	entry.cooldown_modifiers = parse_cooldown_modifiers(n);
+	entry.type = EquipmentEntry::ARMOUR;
 //  entry.type; TODO
 }
 
-void load_armour_callbackf(const YAML::Node& node, lua_State* L,
+void load_equipment_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	EquipmentEntry* entry = new EquipmentEntry;
 	parse_equipment_entry(node, *entry);
@@ -87,8 +88,8 @@ void load_armour_callbackf(const YAML::Node& node, lua_State* L,
 
 }
 
-void load_armour_dataa(lua_State* L, const FilenameList& filenames,
+void load_equipment_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemtable) {
-	load_data_impl_template(filenames, "armours", load_armour_callbackf, L,
+	load_data_impl_template(filenames, "armours", load_equipment_callbackf, L,
 			itemtable);
 }

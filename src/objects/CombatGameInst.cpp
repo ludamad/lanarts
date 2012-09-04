@@ -146,10 +146,10 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 	cooldowns().reset_action_cooldown(atkstats.cooldown);
 	cooldowns().action_cooldown += gs->rng().rand(-4, 5);
 
-	_WeaponEntry wentry = weapon.weapon_entry();
+	WeaponEntry& wentry = weapon.weapon_entry();
 	if (wentry.name != "none") {
 		gs->add_instance(
-				new AnimatedInst(inst->pos(), wentry.attack_sprite, 25));
+				new AnimatedInst(inst->pos(), wentry.attack.attack_sprite, 25));
 	}
 
 	signal_attacked_successfully();
@@ -163,7 +163,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 		return false;
 	MTwist& mt = gs->rng();
 
-	_WeaponEntry& wentry = weapon.weapon_entry();
+	WeaponEntry& wentry = weapon.weapon_entry();
 	_ProjectileEntry& pentry = projectile.projectile_entry();
 	AttackStats attack;
 	if (!pentry.is_unarmed()) {

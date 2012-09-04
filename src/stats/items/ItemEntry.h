@@ -39,6 +39,7 @@ public:
 
 extern std::vector<ItemEntry*> game_item_data;
 
+item_id get_item_by_name(const char* name, bool error_if_not_found = true);
 void clear_item_data(std::vector<ItemEntry*>& items);
 
 #endif /* ITEMENTRY_H_ */

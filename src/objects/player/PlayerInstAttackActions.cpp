@@ -76,11 +76,11 @@ static GameInst* get_closest_monster(GameState* gs, PlayerInst* p) {
 }
 static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 		GameInst* targ, float dx, float dy) {
-	_WeaponEntry& wentry = p->weapon().weapon_entry();
+	WeaponEntry& wentry = p->weapon().weapon_entry();
 	Pos ppos(p->x, p->y);
 	GameInst* inst = NULL;
 	bool ismelee = !(wentry.uses_projectile || p->equipment().has_projectile());
-	int target_range = wentry.range + p->target_radius;
+	int target_range = wentry.range() + p->target_radius;
 
 	if (targ) {
 		int dist = distance_between(Pos(targ->x, targ->y), ppos)
@@ -413,7 +413,7 @@ static bool decide_attack_movement(const Pos& player, const Pos& target,
 bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
 		float dy) {
 	GameView& view = gs->view();
-	_WeaponEntry& wentry = weapon().weapon_entry();
+	WeaponEntry& wentry = weapon().weapon_entry();
 
 	bool mouse_within = gs->mouse_x() < gs->view().width;
 	int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
@@ -508,7 +508,7 @@ static void lua_hit_callback(lua_State* L, LuaValue& callback, GameInst* user,
 
 #include "PlayerInst.h"
 void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
-	_WeaponEntry& wentry = weapon().weapon_entry();
+	WeaponEntry& wentry = weapon().weapon_entry();
 	MTwist& mt = gs->rng();
 	const int MAX_MELEE_HITS = 10;
 	EffectiveStats& estats = effective_stats();
@@ -529,7 +529,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		const _Projectile& projectile = equipment().projectile;
 		_ProjectileEntry& pentry = projectile.projectile_entry();
 		item_id item = _get_item_by_name(pentry.name.c_str());
-		int weaprange = std::max(wentry.range, pentry.range);
+		int weaprange = std::max(wentry.range(), pentry.range);
 
 		AttackStats weaponattack(weapon());
 
@@ -537,7 +537,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		int nbounces = 0;
 		float movespeed = pentry.speed;
 
-		cooldown = std::max(wentry.cooldown, pentry.cooldown);
+		cooldown = std::max(wentry.cooldown(), pentry.cooldown);
 
 		//XXX: Horrible hack REMOVE THIS LATER
 		if (class_stats().class_type().name == "Archer"
@@ -565,7 +565,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		gs->add_instance(bullet);
 		equipment().use_ammo();
 	} else {
-		int weaprange = wentry.range + this->radius + TILE_SIZE / 2;
+		int weaprange = wentry.range() + this->radius + TILE_SIZE / 2;
 		float mag = distance_between(actpos, Pos(x, y));
 		if (mag > weaprange) {
 			float dx = actpos.x - x, dy = actpos.y - y;
@@ -574,9 +574,10 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 
 		GameInst* enemies[MAX_MELEE_HITS];
 
-		int max_targets = std::min(MAX_MELEE_HITS, wentry.max_targets);
+		const int max_targets = 1;
+		const int dmgradius = 4;
 
-		int numhit = get_targets(gs, this, actpos.x, actpos.y, wentry.dmgradius,
+		int numhit = get_targets(gs, this, actpos.x, actpos.y, dmgradius,
 				enemies, max_targets);
 
 		if (numhit == 0) {
@@ -585,7 +586,8 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 
 		for (int i = 0; i < numhit; i++) {
 			EnemyInst* e = (EnemyInst*)enemies[i];
-			lua_hit_callback(gs->get_luastate(), wentry.on_hit_func, this, e);
+			lua_hit_callback(gs->get_luastate(),
+					wentry.attack.attack_action.action_func, this, e);
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
 				PlayerData& pc = gs->player_data();
 				signal_killed_enemy();
@@ -601,7 +603,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 								Colour(255, 215, 11)));
 			}
 		}
-		cooldown = wentry.cooldown;
+		cooldown = wentry.cooldown();
 	}
 
 	cooldowns().reset_action_cooldown(cooldown * estats.cooldown_mult);

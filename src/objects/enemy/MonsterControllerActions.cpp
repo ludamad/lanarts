@@ -115,8 +115,8 @@ static bool attack_ai_choice(GameState* gs, CombatGameInst* inst,
 	int radii = inst->target_radius + target->target_radius;
 
 	for (int i = 0; i < attacks.size(); i++) {
-		_WeaponEntry& wentry = attacks[i].weapon.weapon_entry();
-		int range = wentry.range;
+		WeaponEntry& wentry = attacks[i].weapon.weapon_entry();
+		int range = wentry.range();
 		if (attacks[i].projectile.valid_projectile()) {
 			_ProjectileEntry& pentry = attacks[i].projectile.projectile_entry();
 			range = std::max(range, pentry.range);
@@ -169,14 +169,14 @@ void MonsterController::set_monster_headings(GameState* gs,
 
 		AttackStats attack;
 		bool viable_attack = attack_ai_choice(gs, e, p, attack);
-		_WeaponEntry& wentry = attack.weapon.weapon_entry();
+		WeaponEntry& wentry = attack.weapon.weapon_entry();
 
 		if (pdist < e->target_radius + p->target_radius) {
 			e->vx = 0, e->vy = 0;
 		}
-		int mindist = wentry.range + e->target_radius - TILE_SIZE / 8;
+		int mindist = wentry.range() + e->target_radius - TILE_SIZE / 8;
 		if (viable_attack) {
-			int mindist = wentry.range + p->target_radius + e->target_radius
+			int mindist = wentry.range() + p->target_radius + e->target_radius
 					- TILE_SIZE / 8;
 			if (!attack.is_ranged()) {
 				e->vx = 0, e->vy = 0;

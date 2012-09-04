@@ -26,14 +26,15 @@ struct AttackStats {
 	}
 
 	bool is_ranged() const;
-	_WeaponEntry& weapon_entry() const;
+	WeaponEntry& weapon_entry() const;
 	_ProjectileEntry& projectile_entry() const;
 
 	int atk_cooldown() const;
 
 	int atk_damage(MTwist& mt, const EffectiveStats& stats) const;
 	int atk_power(MTwist& mt, const EffectiveStats& stats) const;
-	int atk_percentage_magic() const;
+	float atk_percentage_magic() const;
+	float atk_percentage_physical() const;
 	float atk_resist_modifier() const;
 
 	/* members */

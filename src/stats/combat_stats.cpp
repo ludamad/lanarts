@@ -96,28 +96,28 @@ bool AttackStats::is_ranged() const {
 			|| weapon.weapon_entry().uses_projectile;
 }
 
-_WeaponEntry& AttackStats::weapon_entry() const {
+WeaponEntry& AttackStats::weapon_entry() const {
 	return weapon.weapon_entry();
 }
 
 _ProjectileEntry& AttackStats::projectile_entry() const {
 	LANARTS_ASSERT(is_ranged());
-	if (projectile.valid_projectile())
-		return projectile.projectile_entry();
+	LANARTS_ASSERT(projectile.valid_projectile());
+	return projectile.projectile_entry();
 
-	int created = weapon.weapon_entry().created_projectile;
-	LANARTS_ASSERT(created > -1);
-	return game_projectile_data.at(created);
+//	int created = weapon.weapon_entry().created_projectile;
+//	LANARTS_ASSERT(created > -1);
+//	return game_projectile_data.at(created);
 }
 
 int AttackStats::atk_cooldown() const {
 	if (projectile.valid_projectile()) {
 		return projectile.projectile_entry().cooldown;
 	}
-	return weapon.weapon_entry().cooldown;
+	return weapon.weapon_entry().cooldown();
 }
 
-static bool is_compatible_projectile(_WeaponEntry& wentry,
+static bool is_compatible_projectile(WeaponEntry& wentry,
 		_ProjectileEntry& pentry) {
 	return wentry.weapon_class != "unarmed"
 			&& wentry.weapon_class == pentry.weapon_class;
@@ -125,14 +125,15 @@ static bool is_compatible_projectile(_WeaponEntry& wentry,
 int AttackStats::atk_damage(MTwist& mt, const EffectiveStats& stats) const {
 	const CoreStats& core = stats.core;
 	bool hasprojectile = projectile.valid_projectile();
-	_WeaponEntry& wentry = weapon.weapon_entry();
+	WeaponEntry& wentry = weapon.weapon_entry();
 	int dmg = 0;
 
 	if (!hasprojectile
 			|| is_compatible_projectile(wentry, projectile.projectile_entry())) {
-		dmg += wentry.damage.calculate(mt, core);
-		dmg += round(wentry.percentage_magic * stats.magic.damage);
-		dmg += round((1.0f - wentry.percentage_magic) * stats.physical.damage);
+		const DamageModifiers& dmgmod = wentry.attack.damage;
+		dmg += dmgmod.damage.calculate(mt, core);
+		dmg += round(dmgmod.magic_percentage * stats.magic.damage);
+		dmg += round(dmgmod.physical_percentage * stats.physical.damage);
 	}
 	if (hasprojectile) {
 		_ProjectileEntry& pentry = projectile.projectile_entry();
@@ -149,15 +150,16 @@ int AttackStats::atk_damage(MTwist& mt, const EffectiveStats& stats) const {
 int AttackStats::atk_power(MTwist& mt, const EffectiveStats& stats) const {
 	const CoreStats& core = stats.core;
 	bool hasprojectile = projectile.valid_projectile();
-	_WeaponEntry& wentry = weapon.weapon_entry();
+	WeaponEntry& wentry = weapon.weapon_entry();
 	int pow = 0;
 
 	if (!hasprojectile
 			|| is_compatible_projectile(wentry, projectile.projectile_entry())) {
-		_WeaponEntry& wentry = weapon.weapon_entry();
-		pow += wentry.power.calculate(mt, core);
-		pow += round(wentry.percentage_magic * stats.magic.power);
-		pow += round((1.0f - wentry.percentage_magic) * stats.physical.power);
+		WeaponEntry& wentry = weapon.weapon_entry();
+		const DamageModifiers& dmgmod = wentry.attack.damage;
+		pow += dmgmod.power.calculate(mt, core);
+		pow += round(dmgmod.magic_percentage * stats.magic.power);
+		pow += round(dmgmod.physical_percentage * stats.physical.power);
 	}
 	if (hasprojectile) {
 		_ProjectileEntry& pentry = projectile.projectile_entry();
@@ -171,16 +173,29 @@ int AttackStats::atk_power(MTwist& mt, const EffectiveStats& stats) const {
 	return pow;
 }
 
-int AttackStats::atk_percentage_magic() const {
+float AttackStats::atk_percentage_magic() const {
 	if (weapon.id > 0 || !projectile.valid_projectile()) {
-		return weapon.weapon_entry().percentage_magic;
+		WeaponEntry& wentry = weapon.weapon_entry();
+		DamageModifiers& dmgmod = wentry.attack.damage;
+		return dmgmod.magic_percentage;
 	}
 	return projectile.projectile_entry().percentage_magic;
 }
 
+float AttackStats::atk_percentage_physical() const {
+	if (weapon.id > 0 || !projectile.valid_projectile()) {
+		WeaponEntry& wentry = weapon.weapon_entry();
+		DamageModifiers& dmgmod = wentry.attack.damage;
+		return dmgmod.physical_percentage;
+	}
+	return 1.0f - projectile.projectile_entry().percentage_magic;
+}
+
 float AttackStats::atk_resist_modifier() const {
 	if (weapon.id > 0 || !projectile.valid_projectile()) {
-		return weapon.weapon_entry().resist_modifier;
+		WeaponEntry& wentry = weapon.weapon_entry();
+		DamageModifiers& dmgmod = wentry.attack.damage;
+		return dmgmod.resistability;
 	}
 	return projectile.projectile_entry().resist_modifier;
 }

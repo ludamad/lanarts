@@ -32,8 +32,8 @@ _Item _Weapon::as_item() const {
 	return _Item(_get_item_by_name(name.c_str()), properties);
 }
 
-_WeaponEntry& _Weapon::weapon_entry() const {
-	return game_weapon_data.at(id);
+WeaponEntry& _Weapon::weapon_entry() const {
+	return get_weapon_entry(id);
 }
 
 _ItemEntry& _Item::item_entry() const {
@@ -72,9 +72,9 @@ _ProjectileEntry& _Item::projectile_entry() const {
 	return game_projectile_data.at(item_entry().equipment_id);
 }
 
-_WeaponEntry& _Item::weapon_entry() const {
+WeaponEntry& _Item::weapon_entry() const {
 	LANARTS_ASSERT(is_weapon());
-	return game_weapon_data.at(item_entry().equipment_id);
+	return get_weapon_entry(item_entry().equipment_id);
 }
 
 bool _Item::is_normal_item() const {

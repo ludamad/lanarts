@@ -160,7 +160,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 	}
 
 	/* Draw weapon*/
-	_WeaponEntry& wentry = weapon.weapon_entry();
+	WeaponEntry& wentry = weapon.weapon_entry();
 	gl_draw_image(game_sprite_data[wentry.item_sprite].img(), x, y);
 
 	if (draw_with_projectile) {

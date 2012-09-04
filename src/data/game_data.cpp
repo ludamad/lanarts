@@ -25,13 +25,21 @@ void load_tileset_data(const FilenameList& filenames);
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames);
 void _load_armour_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemtable);
+
+/// NEW EQUIPMENT CODE
+LuaValue load_item_data(lua_State* L, const FilenameList& filenames);
+void load_equipment_data(lua_State* L, const FilenameList& filenames,
+		LuaValue* itemtable);
+LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
+		LuaValue& itemstable);
+/// NEW EQUIPMENT CODE
+
 void load_weapon_data(lua_State* L, const FilenameList& filenames,
-		LuaValue* itemstable = NULL);
+		LuaValue* itemstable = NULL); //new
 LuaValue load_spell_data(lua_State* L, const FilenameList& filenames);
 LuaValue _load_projectile_data(lua_State* L, const FilenameList& filenames,
 		LuaValue& itemstable);
 void _load_armour_item_entries();
-void load_weapon_item_entries();
 void _load_projectile_item_entries();
 
 LuaValue _load_item_data(lua_State* L, const FilenameList& filenames);
@@ -56,7 +64,6 @@ std::vector<ScriptObjectEntry> game_scriptobject_data;
 std::vector<SpellEntry> game_spell_data;
 std::vector<SpriteEntry> game_sprite_data;
 std::vector<LevelGenSettings> game_dungeon_yaml;
-std::vector<_WeaponEntry> game_weapon_data;
 
 DungeonBranch game_dungeon_data[1] = { };
 
@@ -148,9 +155,6 @@ itemgenlist_id get_itemgenlist_by_name(const char* name,
 projectile_id get_projectile_by_name(const char* name) {
 	return get_X_by_name(game_projectile_data, name);
 }
-weapon_id get_weapon_by_name(const char* name) {
-	return get_X_by_name(game_weapon_data, name);
-}
 
 tileset_id get_tileset_by_name(const char* name) {
 	return get_X_by_name(game_tileset_data, name);
@@ -185,14 +189,15 @@ projectile_id projectile_from_lua(lua_State* L, int idx) {
 	return get_X_by_name(game_projectile_data, lua_tostring(L, idx));
 }
 weapon_id weapon_from_lua(lua_State* L, int idx) {
-	return get_X_by_name(game_weapon_data, lua_tostring(L, idx));
+	return get_weapon_by_name(lua_tostring(L, idx));
 }
 tileset_id tileset_from_lua(lua_State* L, int idx) {
 	return get_X_by_name(game_tileset_data, lua_tostring(L, idx));
 }
 
 LuaValue lua_sprites, lua_armours, lua_enemies, lua_effects, lua_weapons,
-		lua_projectiles, lua_items, lua_dungeon, lua_classes, lua_spells;
+		_lua_projectiles, lua_projectiles, _lua_items, lua_items, lua_dungeon,
+		lua_classes, lua_spells;
 
 LuaValue lua_settings;
 
@@ -208,18 +213,22 @@ GameSettings init_game_data(lua_State* L) {
 	load_tileset_data(dfiles.tileset_files);
 
 	// --- ITEM DATA ---
-	lua_items = _load_item_data(L, dfiles.item_files);
+	_lua_items = _load_item_data(L, dfiles.item_files);
+	lua_items = load_item_data(L, dfiles.item_files); //new
 
-	lua_projectiles = _load_projectile_data(L, dfiles.projectile_files,
-			lua_items);
+	_lua_projectiles = _load_projectile_data(L, dfiles.projectile_files,
+			_lua_items);
+	lua_projectiles = load_projectile_data(L, dfiles.projectile_files,
+			lua_items); //new
 	_load_projectile_item_entries();
 
 	lua_spells = load_spell_data(L, dfiles.spell_files);
 
-	load_weapon_data(L, dfiles.weapon_files, &lua_items);
-	load_weapon_item_entries();
+	load_weapon_data(L, dfiles.weapon_files, &lua_items); //new
+	_load_weapon_item_entries();
 
-	_load_armour_data(L, dfiles.armour_files, &lua_items);
+	_load_armour_data(L, dfiles.armour_files, &_lua_items);
+	load_equipment_data(L, dfiles.armour_files, &lua_items);
 	_load_armour_item_entries();
 	// --- ITEM DATA ---
 
@@ -256,8 +265,8 @@ void init_lua_data(GameState* gs, lua_State* L) {
 	register_as_global(L, lua_enemies, "enemies");
 	register_as_global(L, lua_effects, "effects");
 //	register_as_global(L, weapons, "weapons");
-	register_as_global(L, lua_items, "items");
-	register_as_global(L, lua_projectiles, "projectiles");
+	register_as_global(L, _lua_items, "items");
+	register_as_global(L, _lua_projectiles, "projectiles");
 	register_as_global(L, lua_spells, "spells");
 //	register_as_global(L, sprites, "sprites");
 //	register_as_global(L, dungeon, "dungeon");
@@ -271,7 +280,10 @@ void init_lua_data(GameState* gs, lua_State* L) {
 	__lua_init(L, game_projectile_data);
 	__lua_init(L, _game_item_data);
 	__lua_init(L, game_spell_data);
-	__lua_init(L, game_weapon_data);
+
+	for (int i = 0; i < game_item_data.size(); i++) {
+		game_item_data[i]->init(L);
+	}
 
 //	lua_getglobal(L, "level_tests");
 //	lua_call(L, 0, 0);
@@ -284,7 +296,7 @@ static void luayaml_push(LuaValue& value, lua_State *L, const char* name) {
 	lua_replace(L, tableind);
 }
 void luayaml_push_item(lua_State *L, const char* name) {
-	luayaml_push(lua_items, L, name);
+	luayaml_push(_lua_items, L, name);
 }
 void luayaml_push_sprites(lua_State *L, const char* name) {
 	luayaml_push(lua_sprites, L, name);
