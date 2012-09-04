@@ -5,6 +5,7 @@
 
 #include "../../data/yaml_util.h"
 #include "../../stats/stats.h"
+#include "../../stats/loaddata/load_stats.h"
 
 #include "../enemy/enemy_data.h"
 

@@ -10,6 +10,9 @@
 
 #include "../stats.h"
 
+#include "load_stats.h"
+
+
 using namespace std;
 
 EffectEntry parse_effect(const YAML::Node& n) {

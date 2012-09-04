@@ -9,6 +9,8 @@
 
 #include "../../data/yaml_util.h"
 
+#include "load_stats.h"
+
 using namespace std;
 
 _Projectile parse_projectile_name(const YAML::Node& n) {

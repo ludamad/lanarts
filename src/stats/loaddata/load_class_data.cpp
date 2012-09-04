@@ -12,6 +12,9 @@
 #include "../class_data.h"
 #include "../stats.h"
 
+#include "load_stats.h"
+
+
 using namespace std;
 
 ClassSpell parse_class_spell(const YAML::Node& n) {

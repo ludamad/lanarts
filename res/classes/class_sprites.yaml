@@ -1,14 +1,14 @@
 sprites:
   - name: fighter
-    file: res/sprites/classes/fighter.png
+    file: res/classes/sprites/fighter.png
   - name: fighter2
-    file: res/sprites/classes/fighter2.png
+    file: res/classes/sprites/fighter2.png
 
   - name: wizard
-    file: res/sprites/classes/wizard.png
+    file: res/classes/sprites/wizard.png
   - name: wizard2
-    file: res/sprites/classes/wizard2.png
+    file: res/classes/sprites/wizard2.png
   
   - name: archer
-    file: res/sprites/classes/archer.png
+    file: res/classes/sprites/archer.png
     

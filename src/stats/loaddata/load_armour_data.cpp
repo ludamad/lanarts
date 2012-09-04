@@ -9,6 +9,8 @@ extern "C" {
 
 #include "../item_data.h"
 
+#include "load_stats.h"
+
 using namespace std;
 
 void load_armour_callbackf(const YAML::Node& node, lua_State* L,

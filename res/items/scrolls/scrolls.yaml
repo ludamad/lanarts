@@ -1,26 +1,5 @@
 ---
 items:
-  - name: Gold #Gold must be named 'Gold' for the time being
-    spr_item: gold
-
-  - name: Health Potion
-    shop_cost: [15,35]
-    type: potion
-    spr_item: health_potion
-    description: A blessed potion of healing infusions, it restores 50 HP to the user.
-    action_func: increase_health
-    prereq_func: function (item, obj) return obj.stats.hp < obj.stats.max_hp end 
-    amount: 50
-
-  - name: Mana Potion
-    shop_cost: [15,35]
-    type: potion
-    spr_item: mana_potion
-    description: A magical potion of energizing infusions, it restores 50 MP to the user.
-    action_func: increase_mana
-    prereq_func: function (item, obj) return obj.stats.mp < obj.stats.max_mp end 
-    amount: 50
-
   - name: Haste Scroll
     shop_cost: [25,45]
     description: 
@@ -88,4 +67,3 @@ items:
     spr_item: scroll escape
     action_func: function (item, obj) obj_to_exit(obj) end 
     amount: 1
-    

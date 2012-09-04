@@ -4,7 +4,7 @@
 #relative to res/
 
 armour_files:
-  - items/armour.yaml
+  - items/armour/armour.yaml
 
 class_files: 
   - classes/classes.yaml
@@ -14,16 +14,17 @@ effect_files:
   - spells/spell_effects.yaml
 
 enemy_files: 
-  - enemies/animal_enemies.yaml
-  - enemies/boss_enemies.yaml
-  - enemies/demonic_enemies.yaml
-  - enemies/elemental_enemies.yaml
-  - enemies/misc_enemies.yaml
-  - enemies/undead_enemies.yaml
-  - enemies/humanoid_enemies.yaml
+  - enemies/animals/animal_enemies.yaml
+  - enemies/bosses/boss_enemies.yaml
+  - enemies/demonic/demonic_enemies.yaml
+  - enemies/elemental/elemental_enemies.yaml
+  - enemies/misc/misc_enemies.yaml
+  - enemies/undead/undead_enemies.yaml
+  - enemies/humanoid/humanoid_enemies.yaml
 
 item_files: 
-  - items/items.yaml
+  - items/misc/misc.yaml
+  - items/scrolls/scrolls.yaml
   
 itemgenlist_files:
   - items/itemgenlists.yaml
@@ -46,13 +47,12 @@ sprite_files:
   - classes/class_sprites.yaml
   - enemies/enemy_sprites.yaml
   - spells/spell_sprites.yaml
-
-  - sprites/armour_sprites.yaml
-  - sprites/interface_sprites.yaml
-  - sprites/item_sprites.yaml
-  - sprites/feature_sprites.yaml
-  - sprites/other_sprites.yaml
-  - sprites/weapon_sprites.yaml
+  - items/armour/armour_sprites.yaml
+  - interface/interface_sprites.yaml
+  - items/item_sprites.yaml
+  - features/feature_sprites.yaml
+  - effects/effect_sprites.yaml
+  - items/weapons/weapon_sprites.yaml
 
 tile_files: 
   - tiles/tiles.yaml
@@ -61,5 +61,5 @@ tileset_files:
   - tiles/tilesets.yaml
 
 weapon_files: 
-  - items/weapons.yaml
+  - items/weapons/weapons.yaml
   - enemies/enemy_weapons.yaml
