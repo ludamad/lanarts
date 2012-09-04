@@ -11,8 +11,8 @@
 #include <string>
 #include <vector>
 
-#include "../lanarts_defines.h"
 #include "../serialize/SerializeBuffer.h"
+#include "../lanarts_defines.h"
 
 class GameState;
 struct font_data;

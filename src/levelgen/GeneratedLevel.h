@@ -8,9 +8,9 @@
 #include <cstring>
 #include <vector>
 
+#include "../objects/GameInstRef.h"
 #include "../util/mtwist.h"
 #include "../lanarts_defines.h"
-#include "../objects/GameInstRef.h"
 
 #include "generated_tile.h"
 

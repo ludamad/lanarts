@@ -5,17 +5,17 @@
 
 #include <typeinfo>
 
-#include "collision_filters.h"
-#include "../util/math_util.h"
-
-#include "../stats/item_data.h"
 #include "../display/colour_constants.h"
 #include "../display/sprite_data.h"
 
-#include "../gamestate/GameTiles.h"
 #include "../gamestate/GameState.h"
+#include "../gamestate/GameTiles.h"
+#include "../stats/item_data.h"
 
+#include "../util/math_util.h"
 #include "FeatureInst.h"
+
+#include "collision_filters.h"
 
 FeatureInst::FeatureInst(const Pos& pos, feature_t feature, bool solid,
 		sprite_id spriteid, int depth, int sprite_frame) :

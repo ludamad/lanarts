@@ -3,9 +3,9 @@
  * 	Represents the contents of a store.
  */
 
-#include "StoreInventory.h"
-
 #include "../../serialize/SerializeBuffer.h"
+
+#include "StoreInventory.h"
 
 void StoreInventory::add(const Item & item, int amount, int cost) {
 	StoreItemSlot newslot(item, amount, cost);

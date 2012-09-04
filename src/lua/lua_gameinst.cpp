@@ -1,18 +1,18 @@
 #include <cstring>
 
-#include "../stats/effect_data.h"
-#include "../stats/item_data.h"
 #include "../data/lua_game_data.h"
-
-#include "../stats/stats.h"
-
 #include "../gamestate/GameState.h"
 #include "../objects/enemy/EnemyInst.h"
-#include "../objects/GameInst.h"
+
 #include "../objects/player/PlayerInst.h"
 
-#include "lunar.h"
+#include "../objects/GameInst.h"
+#include "../stats/effect_data.h"
+#include "../stats/item_data.h"
+#include "../stats/stats.h"
+
 #include "lua_api.h"
+#include "lunar.h"
 
 class GameInstLuaBinding {
 public:

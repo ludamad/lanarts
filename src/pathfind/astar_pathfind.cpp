@@ -7,12 +7,12 @@
 
 #include "../display/tile_data.h"
 
-#include "gheap.h"
-
-#include "../gamestate/GameTiles.h"
 #include "../gamestate/GameState.h"
 
+#include "../gamestate/GameTiles.h"
 #include "astar_pathfind.h"
+
+#include "gheap.h"
 
 using namespace std;
 

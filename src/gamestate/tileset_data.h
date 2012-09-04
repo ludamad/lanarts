@@ -8,8 +8,8 @@
 
 #include <vector>
 #include <string>
-#include "../lanarts_defines.h"
 #include "../display/GLImage.h"
+#include "../lanarts_defines.h"
 
 struct TilesetEntry {
 	std::string name;

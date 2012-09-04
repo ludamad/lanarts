@@ -9,11 +9,11 @@ extern "C" {
 #include <lua/lualib.h>
 }
 
-#include "lua_api.h"
-
 #include "../data/lua_game_data.h"
 
 #include "../gamestate/GameState.h"
+
+#include "lua_api.h"
 
 // Creates object, adding to game world, returns said object
 // Must ensure that it is being called during the draw phase

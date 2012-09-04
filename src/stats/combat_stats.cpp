@@ -4,15 +4,15 @@
  *  TODO: either rename this or 'stats.h' ?
  */
 
+#include "../serialize/SerializeBuffer.h"
 #include "class_data.h"
-#include "projectile_data.h"
-#include "weapon_data.h"
-
 #include "combat_stats.h"
+
 #include "items.h"
+#include "projectile_data.h"
 #include "stat_formulas.h"
 
-#include "../serialize/SerializeBuffer.h"
+#include "weapon_data.h"
 
 CombatStats::CombatStats(const ClassStats& class_stats, const CoreStats& core,
 		const CooldownStats& cooldowns, const Equipment& equipment,

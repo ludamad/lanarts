@@ -3,21 +3,21 @@
  *  Draws known spells in a grid, for the side bar
  */
 
-#include "SpellsContent.h"
-
-#include "../../stats/spell_data.h"
-#include "../../display/sprite_data.h"
+#include "../../display/colour_constants.h"
 
 #include "../../display/display.h"
-
-#include "../../stats/SpellsKnown.h"
-
-#include "../../display/colour_constants.h"
-#include "../console_description_draw.h"
+#include "../../display/sprite_data.h"
 
 #include "../../gamestate/GameState.h"
 
 #include "../../objects/player/PlayerInst.h"
+
+#include "../../stats/SpellsKnown.h"
+#include "../../stats/spell_data.h"
+
+#include "../console_description_draw.h"
+
+#include "SpellsContent.h"
 
 static void draw_spells_known(GameState* gs, const BBox& bbox,
 		SpellsKnown& spells, int ind_low, int ind_high) {

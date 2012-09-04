@@ -3,14 +3,14 @@
  *	Holds lists of all players in game, and pointers to their respective PlayerInst's
  */
 
-#include "../lanarts_defines.h"
-#include "../util/math_util.h"
 #include "../fov/fov.h"
-
 #include "../objects/player/PlayerInst.h"
+#include "../util/math_util.h"
 
-#include "GameTiles.h"
+#include "../lanarts_defines.h"
+
 #include "GameState.h"
+#include "GameTiles.h"
 
 #include "PlayerData.h"
 

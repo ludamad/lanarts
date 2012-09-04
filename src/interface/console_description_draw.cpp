@@ -3,21 +3,21 @@
  *  Common routines for content descriptions and drawing
  */
 
-#include "../stats/armour_data.h"
-#include "../stats/item_data.h"
-#include "../stats/projectile_data.h"
-#include "../stats/spell_data.h"
-#include "../display/sprite_data.h"
-#include "../stats/weapon_data.h"
-
+#include "../display/colour_constants.h"
 #include "../display/display.h"
+#include "../display/sprite_data.h"
+#include "../gamestate/GameState.h"
+#include "../objects/player/PlayerInst.h"
+#include "../stats/armour_data.h"
+
+#include "../stats/item_data.h"
 
 #include "../stats/items.h"
 
-#include "../display/colour_constants.h"
+#include "../stats/projectile_data.h"
 
-#include "../gamestate/GameState.h"
-#include "../objects/player/PlayerInst.h"
+#include "../stats/spell_data.h"
+#include "../stats/weapon_data.h"
 
 #include "console_description_draw.h"
 

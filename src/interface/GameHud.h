@@ -9,21 +9,21 @@
 
 #include <deque>
 
-#include "../display/display.h"
 #include "../display/GLImage.h"
+#include "../display/display.h"
 
-#include "../lanarts_defines.h"
 #include "../gamestate/ActionQueue.h"
+#include "../gamestate/GameAction.h"
 
 #include "../objects/GameInst.h"
 
-#include "../gamestate/GameAction.h"
+#include "../lanarts_defines.h"
 
-#include "GameTextConsole.h"
-
-#include "ActionBar.h"
 #include "sidebar/Sidebar.h"
+
 #include "sidebar/SidebarNavigator.h"
+#include "ActionBar.h"
+#include "GameTextConsole.h"
 
 class PlayerInst;
 

@@ -6,25 +6,25 @@
 
 #include "../display/display.h"
 
-#include "../display/tile_data.h"
-#include "../stats/item_data.h"
-#include "../stats/spell_data.h"
 #include "../display/sprite_data.h"
-#include "../stats/weapon_data.h"
+#include "../display/tile_data.h"
+#include "../gamestate/GameInstSet.h"
+#include "../gamestate/GameState.h"
+#include "../objects/player/PlayerInst.h"
+
+#include "../objects/GameInst.h"
 
 #include "../stats/Inventory.h"
 
+#include "../stats/item_data.h"
+#include "../stats/spell_data.h"
+
+#include "../stats/weapon_data.h"
 #include "../util/math_util.h"
 
-#include "../gamestate/GameState.h"
-#include "../gamestate/GameInstSet.h"
-
-#include "../objects/GameInst.h"
-#include "../objects/player/PlayerInst.h"
+#include "sidebar/SpellsContent.h"
 
 #include "GameHud.h"
-
-#include "sidebar/SpellsContent.h"
 
 BBox GameHud::minimap_bbox(GameState* gs) {
 	int minimap_relposx = 20, minimap_relposy = 64 + 45;

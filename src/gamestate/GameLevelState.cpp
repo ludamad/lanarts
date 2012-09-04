@@ -3,13 +3,13 @@
  *  Contains game level state information
  */
 
-#include "GameLevelState.h"
-
-#include "GameState.h"
+#include "../objects/player/PlayerInst.h"
 
 #include "../serialize/SerializeBuffer.h"
 
-#include "../objects/player/PlayerInst.h"
+#include "GameLevelState.h"
+
+#include "GameState.h"
 
 GameLevelState::GameLevelState(int levelid, int w, int h, bool wandering_flag,
 		bool is_simulation) :

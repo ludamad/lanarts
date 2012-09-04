@@ -6,21 +6,21 @@
 
 #include "../data/game_data.h"
 
-#include "../gamestate/GameState.h"
-#include "../gamestate/GameTiles.h"
+#include "../display/sprite_data.h"
+#include "../display/tile_data.h"
 #include "../gamestate/GameLevelState.h"
 
+#include "../gamestate/GameState.h"
+#include "../gamestate/GameTiles.h"
+
+#include "../gamestate/tileset_data.h"
 #include "../objects/store/StoreInst.h"
 #include "../objects/FeatureInst.h"
 
-#include "../display/sprite_data.h"
-#include "../display/tile_data.h"
-#include "../gamestate/tileset_data.h"
-
 #include "../util/math_util.h"
 
-#include "itemgen.h"
 #include "featuregen.h"
+#include "itemgen.h"
 
 /* Generate a random subtile for a tile */
 static Tile rltile(MTwist& mt, int tile) {

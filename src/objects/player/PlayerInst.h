@@ -9,16 +9,16 @@
 
 #include <deque>
 
-#include "../../fov/fov.h"
-
 #include "../../display/sprite_data.h"
 
-#include "../../pathfind/pathfind.h"
+#include "../../fov/fov.h"
 
 #include "../../gamestate/ActionQueue.h"
 
 #include "../../gamestate/GameAction.h"
+
 #include "../../gamestate/GameLevelState.h"
+#include "../../pathfind/pathfind.h"
 
 #include "../CombatGameInst.h"
 #include "../GameInst.h"

@@ -13,10 +13,10 @@ extern "C" {
 
 #include "../data/game_data.h"
 
-#include "../display/display.h"
-
 #include "../display/colour_constants.h"
-#include "../util/math_util.h"
+
+#include "../display/display.h"
+#include "../gamestate/GameState.h"
 
 #include "../levelgen/enemygen.h"
 
@@ -24,7 +24,7 @@ extern "C" {
 
 #include "../objects/player/PlayerInst.h"
 
-#include "../gamestate/GameState.h"
+#include "../util/math_util.h"
 
 #include "GameChat.h"
 

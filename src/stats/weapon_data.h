@@ -11,11 +11,11 @@
 #include <string>
 #include <vector>
 
-#include "stats.h"
-
 #include "../lua/LuaValue.h"
 
 #include "../lanarts_defines.h"
+
+#include "stats.h"
 
 struct WeaponEntry {
 	std::string name, description;

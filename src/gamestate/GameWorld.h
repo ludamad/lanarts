@@ -11,11 +11,15 @@
 #include <vector>
 #include <cstdlib>
 
-#include "../lanarts_defines.h"
-#include "../stats/EnemiesSeen.h"
+#include "../objects/enemy/EnemyController.h"
 
 #include "../objects/TeamRelations.h"
-#include "../objects/enemy/EnemyController.h"
+
+#include "../stats/EnemiesSeen.h"
+
+#include "../lanarts_defines.h"
+
+#include "PlayerData.h"
 
 class GameState;
 class GameLevelState;

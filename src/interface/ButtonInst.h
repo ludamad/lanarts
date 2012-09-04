@@ -3,9 +3,9 @@
 
 #include <string>
 
-#include "../util/callback_util.h"
-
 #include "../objects/GameInst.h"
+
+#include "../util/callback_util.h"
 
 class ButtonInst: public GameInst {
 public:

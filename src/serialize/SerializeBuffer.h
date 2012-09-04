@@ -11,9 +11,9 @@
 #include <vector>
 #include <cstdio>
 
-#include "../lanarts_defines.h"
-
 #include "../util/callback_util.h"
+
+#include "../lanarts_defines.h"
 
 const int MAX_BUFFER_SIZE = 128 * 1024; //128kb
 

@@ -6,11 +6,11 @@
 #ifndef ARMOUR_DATA_H_
 #define ARMOUR_DATA_H_
 
-#include "stats.h"
-
 #include "../lanarts_defines.h"
 
 #include "item_data.h"
+
+#include "stats.h"
 
 struct ArmourEntry {
 	std::string name, description;

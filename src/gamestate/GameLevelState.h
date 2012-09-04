@@ -7,15 +7,15 @@
 #define GAMELEVELSTATE_H_
 #include <vector>
 
-#include "PlayerData.h"
-#include "GameInstSet.h"
-#include "GameTiles.h"
-
 #include "../collision_avoidance/CollisionAvoidance.h"
-
+#include "../levelgen/GeneratedLevel.h"
 #include "../objects/enemy/MonsterController.h"
 
-#include "../levelgen/GeneratedLevel.h"
+#include "GameInstSet.h"
+
+#include "GameTiles.h"
+
+#include "PlayerData.h"
 
 class GameState;
 class SerializeBuffer;

@@ -3,8 +3,8 @@
  * 	Utility class for room generation functions, stores generated room state & where the rooms are located
  */
 
-#include "GeneratedLevel.h"
 #include "../util/math_util.h"
+#include "GeneratedLevel.h"
 
 Sqr& GeneratedLevel::at(const Pos & p) {
 	return at(p.x, p.y);

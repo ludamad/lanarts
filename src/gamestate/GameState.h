@@ -14,20 +14,20 @@
 
 #include "../fov/fov.h"
 
-#include "../util/mtwist.h"
-
-#include "../net/GameNetConnection.h"
-
-#include "IOController.h"
-#include "PlayerData.h"
-
 #include "../interface/GameChat.h"
-#include "../interface/GameHud.h"
+
 #include "../interface/GameDialogs.h"
 
+#include "../interface/GameHud.h"
+#include "../net/GameNetConnection.h"
+
+#include "../util/mtwist.h"
 #include "GameSettings.h"
 #include "GameView.h"
+
 #include "GameWorld.h"
+#include "IOController.h"
+#include "PlayerData.h"
 
 
 struct lua_State;

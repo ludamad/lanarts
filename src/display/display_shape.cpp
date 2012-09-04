@@ -12,8 +12,8 @@
 
 #include "../gamestate/GameView.h"
 
-#include "display.h"
 #include "GLImage.h"
+#include "display.h"
 
 const float PI = 3.141592f;
 const float DEG2RAD = PI / 180.0f;

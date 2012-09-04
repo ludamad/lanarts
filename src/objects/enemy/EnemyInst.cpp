@@ -6,30 +6,30 @@
 #include <cmath>
 #include <typeinfo>
 
-#include "../../display/sprite_data.h"
-#include "enemy_data.h"
-#include "../../stats/weapon_data.h"
-
-#include "../../display/display.h"
-
-#include "../../stats/stat_formulas.h"
-
-#include "../../serialize/SerializeBuffer.h"
-
 #include "../../display/colour_constants.h"
-#include "../../interface/console_description_draw.h"
-#include "../../util/math_util.h"
-#include "../../lua/LuaValue.h"
-#include "../collision_filters.h"
-
-#include "../AnimatedInst.h"
+#include "../../display/display.h"
+#include "../../display/sprite_data.h"
 
 #include "../../gamestate/GameState.h"
 
-#include "EnemyInst.h"
-#include "../ItemInst.h"
-#include "../ProjectileInst.h"
+#include "../../interface/console_description_draw.h"
+
+#include "../../lua/LuaValue.h"
+
+#include "../../serialize/SerializeBuffer.h"
+#include "../../stats/stat_formulas.h"
+#include "../../stats/weapon_data.h"
+#include "../../util/math_util.h"
 #include "../player/PlayerInst.h"
+
+#include "../AnimatedInst.h"
+
+#include "../ItemInst.h"
+
+#include "../ProjectileInst.h"
+#include "../collision_filters.h"
+#include "EnemyInst.h"
+#include "enemy_data.h"
 
 //draw depth, also determines what order objects evaluate in
 static const int DEPTH = 50;

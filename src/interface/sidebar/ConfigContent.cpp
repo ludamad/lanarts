@@ -3,17 +3,17 @@
  *  Visual toggle of configuration options in side bar
  */
 
-#include "ConfigContent.h"
-
-#include "../../display/sprite_data.h"
+#include "../../display/colour_constants.h"
 
 #include "../../display/display.h"
 
-#include "../../display/colour_constants.h"
+#include "../../display/sprite_data.h"
+
+#include "../../gamestate/GameState.h"
 
 #include "../console_description_draw.h"
 
-#include "../../gamestate/GameState.h"
+#include "ConfigContent.h"
 
 static void draw_option(GameState* gs, const BBox& bbox, bool option_set,
 		sprite_id sprite, const char* text) {

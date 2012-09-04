@@ -7,14 +7,14 @@ extern "C" {
 #include <lua/lua.h>
 }
 
-#include "lua_api.h"
-
 #include "../data/lua_game_data.h"
 
 #include "../gamestate/GameState.h"
 
 #include "../objects/GameInst.h"
+
 #include "../objects/ScriptedInst.h"
+#include "lua_api.h"
 //
 //// Returns monsters seen
 //// Take arguments: optional player, otherwise all players seen by; returns objects

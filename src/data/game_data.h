@@ -6,25 +6,25 @@
 #ifndef GAME_DATA_H_
 #define GAME_DATA_H_
 
-#include "../lua/LuaValue.h"
+#include "../display/sprite_data.h"
+
+#include "../display/tile_data.h"
 
 #include "../gamestate/GameSettings.h"
-
+#include "../gamestate/tileset_data.h"
+#include "../levelgen/dungeon_data.h"
+#include "../lua/LuaValue.h"
+#include "../objects/enemy/enemy_data.h"
+#include "../objects/scriptobject_data.h"
 #include "../stats/armour_data.h"
 #include "../stats/class_data.h"
-#include "datafilenames.h"
-#include "../levelgen/dungeon_data.h"
 #include "../stats/effect_data.h"
-#include "../objects/enemy/enemy_data.h"
 #include "../stats/item_data.h"
 #include "../stats/itemgen_data.h"
 #include "../stats/projectile_data.h"
-#include "../objects/scriptobject_data.h"
 #include "../stats/spell_data.h"
-#include "../display/sprite_data.h"
-#include "../display/tile_data.h"
-#include "../gamestate/tileset_data.h"
 #include "../stats/weapon_data.h"
+#include "datafilenames.h"
 
 struct lua_State;
 class LuaValue;

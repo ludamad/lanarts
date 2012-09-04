@@ -1,20 +1,20 @@
 #include <cstring>
 #include <SDL_opengl.h>
 
-#include "../display/tile_data.h"
-
 #include "../display/display.h"
+
+#include "../display/tile_data.h"
 
 #include "../levelgen/levelgen.h"
 
-#include "../util/math_util.h"
+#include "../objects/player/PlayerInst.h"
 
 #include "../serialize/SerializeBuffer.h"
 
-#include "GameTiles.h"
+#include "../util/math_util.h"
 #include "GameState.h"
 
-#include "../objects/player/PlayerInst.h"
+#include "GameTiles.h"
 
 GameTiles::GameTiles(int width, int height) :
 		width(width), height(height), tiles(width * height) {

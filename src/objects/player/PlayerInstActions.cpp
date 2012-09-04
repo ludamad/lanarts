@@ -8,32 +8,32 @@ extern "C" {
 #include <lua/lua.h>
 }
 
-#include "../../stats/item_data.h"
+#include "../../display/display.h"
 #include "../../display/sprite_data.h"
 #include "../../display/tile_data.h"
-#include "../../stats/projectile_data.h"
-#include "../../stats/weapon_data.h"
-
-#include "../../display/display.h"
-
+#include "../../gamestate/GameState.h"
 #include "../../lua/lua_api.h"
 
-#include "../../lanarts_defines.h"
+#include "../../stats/item_data.h"
+
+#include "../../stats/projectile_data.h"
+
+#include "../../stats/weapon_data.h"
 #include "../../util/game_replays.h"
 #include "../../util/math_util.h"
 
-#include "../collision_filters.h"
+#include "../../lanarts_defines.h"
 
-#include "../../gamestate/GameState.h"
+#include "../enemy/EnemyInst.h"
+
+#include "../store/StoreInst.h"
 
 #include "../AnimatedInst.h"
+#include "../ItemInst.h"
+#include "../ProjectileInst.h"
+#include "../collision_filters.h"
 
 #include "PlayerInst.h"
-#include "../enemy/EnemyInst.h"
-#include "../store/StoreInst.h"
-#include "../ItemInst.h"
-
-#include "../ProjectileInst.h"
 
 static bool is_same_projectile(const Projectile& projectile, const Item& item) {
 	if (projectile.valid_projectile()) {

@@ -5,24 +5,24 @@
 
 #include <typeinfo>
 
-#include "../AnimatedInst.h"
+#include "../../display/display.h"
 
-#include "../../gamestate/GameState.h"
 #include "../../display/sprite_data.h"
 #include "../../display/tile_data.h"
+#include "../../gamestate/GameState.h"
+#include "../../serialize/SerializeBuffer.h"
 #include "../../stats/class_data.h"
 #include "../../stats/item_data.h"
 #include "../../stats/weapon_data.h"
-#include "../../display/display.h"
-
-#include "../../serialize/SerializeBuffer.h"
 
 #include "../../util/math_util.h"
 
 #include "../enemy/EnemyInst.h"
+
+#include "../AnimatedInst.h"
 #include "../ItemInst.h"
-#include "PlayerInst.h"
 #include "../ProjectileInst.h"
+#include "PlayerInst.h"
 
 PlayerInst::PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y,
 		bool local) :

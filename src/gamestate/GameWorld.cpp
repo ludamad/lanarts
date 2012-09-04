@@ -7,17 +7,17 @@
 #include <typeinfo>
 
 #include "../display/tile_data.h"
-#include "../stats/class_data.h"
-
 #include "../levelgen/levelgen.h"
 
-#include "../objects/GameInstRef.h"
-#include "../objects/player/PlayerInst.h"
 #include "../objects/enemy/EnemyInst.h"
-#include "../objects/AnimatedInst.h"
 
-#include "GameState.h"
+#include "../objects/player/PlayerInst.h"
+#include "../objects/AnimatedInst.h"
+#include "../objects/GameInstRef.h"
+#include "../stats/class_data.h"
+
 #include "GameLevelState.h"
+#include "GameState.h"
 #include "GameWorld.h"
 
 GameWorld::GameWorld(GameState* gs) :

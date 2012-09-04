@@ -7,9 +7,9 @@
 #define SIDEBAR_H_
 
 #include "../../gamestate/ActionQueue.h"
-#include "../../lanarts_defines.h"
-
 #include "../../gamestate/GameAction.h"
+
+#include "../../lanarts_defines.h"
 
 #include "Minimap.h"
 #include "SidebarNavigator.h"

@@ -5,11 +5,11 @@
 
 #include "../../display/tile_data.h"
 
-#include "../../util/math_util.h"
-
 #include "../../gamestate/GameState.h"
 
 #include "../../objects/player/PlayerInst.h"
+
+#include "../../util/math_util.h"
 
 #include "Minimap.h"
 

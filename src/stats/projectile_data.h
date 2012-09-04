@@ -9,10 +9,10 @@
 #include <string>
 #include <vector>
 
-#include "stats.h"
+#include "../lua/LuaValue.h"
 
 #include "../lanarts_defines.h"
-#include "../lua/LuaValue.h"
+#include "stats.h"
 
 struct ProjectileEntry {
 	std::string name, description;

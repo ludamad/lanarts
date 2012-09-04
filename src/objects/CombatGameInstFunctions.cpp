@@ -11,13 +11,13 @@
 #include "../gamestate/GameState.h"
 #include "../gamestate/PlayerData.h"
 
-#include "enemy/EnemyInst.h"
-#include "player/PlayerInst.h"
-
 #include "../util/math_util.h"
-#include "collision_filters.h"
+#include "enemy/EnemyInst.h"
 
+#include "player/PlayerInst.h"
 #include "CombatGameInstFunctions.h"
+
+#include "collision_filters.h"
 
 const int HUGE_DISTANCE = 1000000;
 const int PATHING_RADIUS = 500;

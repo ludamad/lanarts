@@ -6,11 +6,11 @@
 #ifndef SIDEBARCONTENT_H_
 #define SIDEBARCONTENT_H_
 
+#include "../../gamestate/ActionQueue.h"
+
 #include "../../gamestate/GameAction.h"
 
 #include "../../lanarts_defines.h"
-
-#include "../../gamestate/ActionQueue.h"
 
 class GameState;
 

@@ -9,9 +9,9 @@
 
 #include <vector>
 
-#include "effects.h"
 #include "Equipment.h"
 #include "SpellsKnown.h"
+#include "effects.h"
 #include "stats.h"
 
 struct lua_State;

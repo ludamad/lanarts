@@ -14,9 +14,9 @@
 #include <freetype/ftoutln.h>
 #include <freetype/fttrigon.h>
 
+#include "GLImage.h"
 #include "display.h"
 #include "font.h"
-#include "GLImage.h"
 
 static void gl_draw_glyph(const font_data& font, char glyph, int x, int y,
 		Colour c) {

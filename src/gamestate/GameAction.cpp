@@ -4,11 +4,11 @@
  *  Formatted for sending over network.
  */
 
+#include "../objects/GameInst.h"
 #include "GameAction.h"
-#include "GameState.h"
 #include "GameLevelState.h"
 
-#include "../objects/GameInst.h"
+#include "GameState.h"
 
 GameAction::GameAction(obj_id origin, action_t act, int frame, int level,
 		int use_id, int action_x, int action_y, int use_id2) :

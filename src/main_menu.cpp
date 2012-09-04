@@ -20,16 +20,16 @@ extern "C" {
 #include "display/colour_constants.h"
 #include "display/display.h"
 
-#include "lua/lua_api.h"
-
 #include "gamestate/GameState.h"
 
-#include "objects/player/PlayerInst.h"
-#include "objects/enemy/EnemyInst.h"
-
-#include "objects/AnimatedInst.h"
 #include "interface/ButtonInst.h"
+
 #include "interface/DrawCallbackInst.h"
+#include "lua/lua_api.h"
+
+#include "objects/enemy/EnemyInst.h"
+#include "objects/player/PlayerInst.h"
+#include "objects/AnimatedInst.h"
 
 #include "util/Timer.h"
 

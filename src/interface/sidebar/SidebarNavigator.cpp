@@ -3,21 +3,21 @@
  *  Handles navigation of content in the side bar
  */
 
-#include "../../display/sprite_data.h"
+#include "../../display/colour_constants.h"
 
 #include "../../display/display.h"
 
-#include "../../display/colour_constants.h"
+#include "../../display/sprite_data.h"
 
 #include "../../gamestate/GameState.h"
 
 #include "ConfigContent.h"
-#include "EquipmentContent.h"
 #include "EnemiesSeenContent.h"
+#include "EquipmentContent.h"
 #include "InventoryContent.h"
 #include "SidebarContent.h"
-#include "SpellsContent.h"
 #include "SidebarNavigator.h"
+#include "SpellsContent.h"
 
 NavigationSprites::NavigationSprites() :
 		left_arrow(get_sprite_by_name("left_arrow")), right_arrow(

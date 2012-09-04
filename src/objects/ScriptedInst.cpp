@@ -9,12 +9,12 @@
 
 #include <typeinfo>
 
-#include "scriptobject_data.h"
+#include "../gamestate/GameState.h"
 #include "../lua/LuaValue.h"
 
-#include "../gamestate/GameState.h"
-
 #include "ScriptedInst.h"
+
+#include "scriptobject_data.h"
 
 static inline ScriptObjectEntry& __S(scriptobj_id script_obj_id) {
 	return game_scriptobject_data.at(script_obj_id);

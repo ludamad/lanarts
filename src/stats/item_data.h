@@ -10,11 +10,11 @@
 #include <vector>
 #include <string>
 
+#include "../lua/LuaValue.h"
+
 #include "../objects/GameInst.h"
 
 #include "../lanarts_defines.h"
-
-#include "../lua/LuaValue.h"
 
 struct ItemEntry {
 	enum equip_type {

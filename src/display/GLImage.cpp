@@ -3,7 +3,7 @@
  *  A convenient OpenGL image wrapper
  */
 
-#include "GLImage.h"
+#include "../lanarts_defines.h"
 #include <SDL.h>
 #include <SDL_opengl.h>
 
@@ -12,7 +12,7 @@
 #include <SDL_image.h>
 #include <GL/glu.h>
 
-#include "../lanarts_defines.h"
+#include "GLImage.h"
 
 /* Utility function for power-of-two texture creation */
 static int power_of_two(int input) {

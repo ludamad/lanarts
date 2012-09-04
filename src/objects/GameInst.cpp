@@ -8,11 +8,11 @@
  * 		->GameInst::init(GameState) called from add_instance, does further initialization
  */
 
-#include "GameInst.h"
-
-#include "../serialize/SerializeBuffer.h"
-#include "../gamestate/GameState.h"
 #include "../display/display.h"
+
+#include "../gamestate/GameState.h"
+#include "../serialize/SerializeBuffer.h"
+#include "GameInst.h"
 
 GameInst::~GameInst() {
 }

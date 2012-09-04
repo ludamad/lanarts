@@ -1,15 +1,15 @@
 
-#include "lua_api.h"
-#include "lunar.h"
-
 #include "../data/lua_game_data.h"
+#include "../gamestate/GameLevelState.h"
 
 #include "../gamestate/GameState.h"
-#include "../gamestate/GameLevelState.h"
 
 #include "../objects/enemy/EnemyInst.h"
 #include "../objects/player/PlayerInst.h"
+
 #include "../objects/ProjectileInst.h"
+#include "lua_api.h"
+#include "lunar.h"
 
 class GameStateLuaBinding {
 public:

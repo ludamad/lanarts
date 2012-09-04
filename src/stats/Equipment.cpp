@@ -3,13 +3,13 @@
  *  Represents all the possessions and equipped items of a player
  */
 
-#include "Equipment.h"
+#include "../serialize/SerializeBuffer.h"
 
+#include "Equipment.h"
 #include "item_data.h"
 #include "projectile_data.h"
-#include "weapon_data.h"
 
-#include "../serialize/SerializeBuffer.h"
+#include "weapon_data.h"
 
 bool Equipment::valid_to_use_projectile(const Projectile& proj) {
 	if (!proj.valid_projectile())

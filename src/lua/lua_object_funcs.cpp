@@ -10,19 +10,19 @@ extern "C" {
 #include <lua/lualib.h>
 }
 
-#include "lua_api.h"
-
 #include "../data/lua_game_data.h"
 
 #include "../display/colour_constants.h"
 
 #include "../gamestate/GameState.h"
 
-#include "../objects/GameInst.h"
 #include "../objects/player/PlayerInst.h"
-#include "../objects/ScriptedInst.h"
 
+#include "../objects/GameInst.h"
+#include "../objects/ScriptedInst.h"
 #include "../util/math_util.h"
+
+#include "lua_api.h"
 
 // Creates object, adding to game world, returns said object
 // Take arguments: objtype, x, y; returns obj

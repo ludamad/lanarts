@@ -1,6 +1,6 @@
-#include "EnemyBehaviour.h"
-
 #include "../../serialize/SerializeBuffer.h"
+
+#include "EnemyBehaviour.h"
 
 
 void EnemyBehaviour::serialize(GameState* gs, SerializeBuffer& serializer) {

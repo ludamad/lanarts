@@ -8,9 +8,9 @@
 #include "../../data/game_data.h"
 #include <yaml-cpp/yaml.h>
 #include "../../data/yaml_util.h"
-#include "../stats.h"
 #include "../../objects/enemy/enemy_data.h"
 #include "../class_data.h"
+#include "../stats.h"
 
 using namespace std;
 

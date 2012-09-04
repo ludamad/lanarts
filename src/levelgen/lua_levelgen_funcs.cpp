@@ -8,13 +8,13 @@ extern "C" {
 #include <lua/lauxlib.h>
 #include <lua/lualib.h>
 }
-#include "../lua/lua_api.h"
-
 #include "../data/lua_game_data.h"
-#include "lua_levelgen_funcs.h"
-#include "levelgen.h"
 
 #include "../gamestate/GameState.h"
+#include "../lua/lua_api.h"
+#include "levelgen.h"
+
+#include "lua_levelgen_funcs.h"
 
 static GeneratedLevel* lua_togenlevel(lua_State* L, int idx) {
 	return *((GeneratedLevel**)lua_touserdata(L, idx));

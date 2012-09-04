@@ -3,18 +3,18 @@
  *  Represents an interactive view of a store for the side bar
  */
 
-#include "../../stats/item_data.h"
-#include "../../display/sprite_data.h"
-
+#include "../../display/colour_constants.h"
 #include "../../display/display.h"
 
-#include "../../display/colour_constants.h"
-#include "../console_description_draw.h"
+#include "../../display/sprite_data.h"
 
 #include "../../gamestate/GameState.h"
+#include "../../objects/player/PlayerInst.h"
 
 #include "../../objects/store/StoreInst.h"
-#include "../../objects/player/PlayerInst.h"
+
+#include "../../stats/item_data.h"
+#include "../console_description_draw.h"
 
 #include "StoreContent.h"
 

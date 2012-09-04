@@ -3,10 +3,10 @@
  *	Represents a section of the game world, bounded by the dimensions of the world, and roughly centred on an object
  */
 
-#include "GameView.h"
+#include "GameTiles.h"
 #include <cmath>
 #include <algorithm>
-#include "GameTiles.h"
+#include "GameView.h"
 
 static const int VIEW_SUBW = 100, VIEW_SUBH = 100;
 static const int VIEW_SPEED = 8;

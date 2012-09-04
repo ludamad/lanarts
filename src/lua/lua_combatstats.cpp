@@ -1,17 +1,17 @@
-#include "lunar.h"
-#include "lua_api.h"
+#include "../gamestate/GameLevelState.h"
+#include "../gamestate/GameState.h"
+
+#include "../objects/enemy/EnemyInst.h"
+
+#include "../objects/player/PlayerInst.h"
+#include "../objects/GameInstRef.h"
+
+#include "../stats/combat_stats.h"
+#include "../stats/stats.h"
 
 #include "../stats/weapon_data.h"
-
-#include "../stats/stats.h"
-#include "../stats/combat_stats.h"
-
-#include "../gamestate/GameState.h"
-#include "../gamestate/GameLevelState.h"
-
-#include "../objects/GameInstRef.h"
-#include "../objects/enemy/EnemyInst.h"
-#include "../objects/player/PlayerInst.h"
+#include "lua_api.h"
+#include "lunar.h"
 
 class CombatStatsLuaBinding {
 public:
