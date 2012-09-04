@@ -16,6 +16,9 @@ sprites:
 
   - name: battle axe
     file: res/items/weapons/sprites/battle_axe.png
+  
+  - name: orc axe
+    file: res/items/weapons/sprites/orc_axe.png
 
   - name: mace
     file: res/items/weapons/sprites/mace.png

@@ -16,6 +16,7 @@ itemgen_lists:
     - { item: Iron Scimitar,      chance: 2                      }
     - { item: Samuri Sabre,       chance: 2                      }
     - { item: Battle Axe,         chance: 2                      }
+    - { item: Orc Axe,            chance: 1                      }
     - { item: Iron Broadsword,    chance: 2                      }
     - { item: Mace,               chance: 5                      }
     #Scrolls
