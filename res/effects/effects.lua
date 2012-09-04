@@ -1,5 +1,6 @@
 function haste_statmod(effect, obj, old, new)
 	new.speed = new.speed + 2
+	show_message("Speed put at "..new.speed)
 	new.strength = new.strength + 2
 	new.magic = new.magic + 2
 	new.defence = new.defence + 4
