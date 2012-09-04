@@ -103,4 +103,3 @@ LuaValue load_item_data(lua_State* L, const FilenameList& filenames) {
 
 	return ret;
 }
-

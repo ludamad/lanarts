@@ -3,6 +3,10 @@
  *  Implements item loading routines from YAML datafiles
  */
 
+extern "C" {
+#include <lua/lua.h>
+}
+
 #include <fstream>
 
 #include <yaml-cpp/yaml.h>
@@ -12,9 +16,6 @@
 
 #include "../itemgen_data.h"
 
-extern "C" {
-#include <lua/lua.h>
-}
 
 using namespace std;
 

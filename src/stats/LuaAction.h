@@ -17,6 +17,9 @@ struct LuaAction {
 		action_func.initialize(L);
 		prereq_func.initialize(L);
 	}
+	LuaAction(const LuaValue& action_func = LuaValue()) :
+			action_func(action_func) {
+	}
 };
 
 #endif /* LUAACTION_H_ */

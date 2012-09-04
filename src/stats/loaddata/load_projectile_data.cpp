@@ -97,34 +97,8 @@ void _load_projectile_item_entries() {
 	}
 }
 
-void parse_item_entry(const YAML::Node& n, ItemEntry& entry);
-
-DamageModifiers parse_damage_modifier(const YAML::Node& n) {
-	DamageModifiers dmg;
-
-	dmg.damage = parse_defaulted(n, "damage", CoreStatMultiplier());
-	dmg.power = parse_defaulted(n, "power", CoreStatMultiplier());
-
-	dmg.magic_percentage = parse_magic_percentage(n, "damage_type");
-	dmg.physical_percentage = 1.0f - dmg.magic_percentage;
-
-	dmg.resistability = parse_defaulted(n, "resist_modifier", 1.0f);
-
-	return dmg;
-}
-
-Attack parse_attack_(const YAML::Node& n) {
-	Attack atk;
-	atk.damage = parse_damage_modifier(n);
-	atk.cooldown = parse_defaulted(n, "cooldown", 0);
-	atk.range = parse_defaulted(n, "range", 0);
-	atk.attack_action.action_func = LuaValue(
-			parse_defaulted(n, "on_hit_func", std::string()));
-	return atk;
-}
-
 void parse_projectile_entry(const YAML::Node& n, ProjectileEntry& entry) {
-	parse_item_entry(n, entry);
+	parse_equipment_entry(n, entry);
 	entry.stackable = true;
 	entry.attack = parse_attack_(n);
 	entry.attack.attack_sprite = entry.item_sprite;

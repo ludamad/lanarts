@@ -13,7 +13,7 @@ extern "C" {
 
 using namespace std;
 
-void _load_armour_callbackff(const YAML::Node& node, lua_State* L,
+void _load_armour_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	_ArmourEntry entry;
 	entry.name = parse_str(node["name"]);
@@ -40,10 +40,10 @@ void _load_armour_callbackff(const YAML::Node& node, lua_State* L,
 	lua_pop(L, 1);
 }
 
-void _load_armour_dataa(lua_State* L, const FilenameList& filenames,
+void _load_armour_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemtable) {
 	game_armour_data.clear();
-	load_data_impl_template(filenames, "armours",_load_armour_callbackfkf, L,
+	load_data_impl_template(filenames, "armours", _load_armour_callbackf, L,
 			itemtable);
 }
 
@@ -59,4 +59,36 @@ void _load_armour_item_entries() {
 						entry.item_sprite, "equip", "", false, entry.shop_cost,
 						_ItemEntry::ALWAYS_KNOWN, _ItemEntry::ARMOUR, i));
 	}
+}
+
+
+void parse_equipment_entry(const YAML::Node& n, EquipmentEntry& entry) {
+	parse_item_entry(n, entry);
+	entry.stackable = false;
+//	entry.effect_modifiers; TODO
+	entry.use_action = LuaAction(LuaValue("equip"));
+	entry.stat_modifiers = parse_stat_modifiers(n);
+	entry.cooldown_modifiers = parse_cooldown_modifiers(n);
+//  entry.type; TODO
+}
+
+void load_armour_callbackf(const YAML::Node& node, lua_State* L,
+		LuaValue* value) {
+	EquipmentEntry* entry = new EquipmentEntry;
+	parse_equipment_entry(node, *entry);
+
+	game_item_data.push_back(entry);
+	/* Lua loading code */
+	value->table_set_yaml(L, entry->name, node);
+	value->table_push_value(L, entry->name);
+	lua_pushstring(L, "armour");
+	lua_setfield(L, -2, "type");
+	lua_pop(L, 1);
+
+}
+
+void load_armour_dataa(lua_State* L, const FilenameList& filenames,
+		LuaValue* itemtable) {
+	load_data_impl_template(filenames, "armours", load_armour_callbackf, L,
+			itemtable);
 }
