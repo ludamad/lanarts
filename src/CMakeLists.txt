@@ -139,6 +139,7 @@ set( lanarts_src
 	stats/loaddata/load_itemgen_data.cpp
 	stats/loaddata/load_projectile_data.cpp
 	stats/loaddata/load_spell_data.cpp
+	stats/loaddata/load_stats.cpp
 	stats/loaddata/load_weapon_data.cpp
 	
 	
@@ -264,6 +265,8 @@ set( lanarts_include
 
 	serialize/SerializeBuffer.h
 
+	stats/loaddata/load_stats.h
+	
     stats/items/EquipmentEntry.h
     stats/items/ItemEntry.h
     stats/items/ProjectileEntry.h

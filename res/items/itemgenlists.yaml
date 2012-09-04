@@ -16,7 +16,6 @@ itemgen_lists:
     - { item: Samuri Sabre,       chance: 2                      }
     - { item: Iron Broadsword,    chance: 2                      }
     - { item: Mace,               chance: 5                      }
-    - { item: Iron Scimitar,      chance: 7                      }
     #Scrolls
     - { item: Haste Scroll,       chance: 3                      }
     - { item: Strength Scroll,    chance: 2                      }

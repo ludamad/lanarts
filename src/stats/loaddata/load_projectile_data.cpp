@@ -9,6 +9,7 @@ extern "C" {
 #include "../../data/yaml_util.h"
 
 #include "../item_data.h"
+#include "load_stats.h"
 
 using namespace std;
 

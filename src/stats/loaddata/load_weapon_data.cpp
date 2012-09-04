@@ -1,3 +1,6 @@
+extern "C" {
+#include <lua/lua.h>
+}
 #include <fstream>
 
 #include "../../data/game_data.h"
@@ -5,9 +8,7 @@
 
 #include "../item_data.h"
 
-extern "C" {
-#include <lua/lua.h>
-}
+#include "load_stats.h"
 
 using namespace std;
 static float parse_magic_percentage(const YAML::Node& node, const char* key) {

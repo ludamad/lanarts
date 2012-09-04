@@ -38,7 +38,7 @@ _ItemEntry parse_item_type(const YAML::Node& n) {
 			parse_defaulted(n, "description", std::string()),
 			parse_defaulted(n, "use_message", std::string()),
 			parse_defaulted(n, "radius", 11),
-			parse_sprite_number(n, "sprite"),
+			parse_sprite_number(n, "spr_item"),
 			parse_defaulted(n, "action_func", std::string()),
 			parse_defaulted(n, "prereq_func", std::string()),
 			parse_defaulted(n, "stackable", true),

@@ -13,7 +13,7 @@ extern "C" {
 
 using namespace std;
 
-void load_armour_callbackf(const YAML::Node& node, lua_State* L,
+void _load_armour_callbackff(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	_ArmourEntry entry;
 	entry.name = parse_str(node["name"]);
@@ -40,14 +40,14 @@ void load_armour_callbackf(const YAML::Node& node, lua_State* L,
 	lua_pop(L, 1);
 }
 
-void load_armour_data(lua_State* L, const FilenameList& filenames,
+void _load_armour_dataa(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemtable) {
 	game_armour_data.clear();
-	load_data_impl_template(filenames, "armours", load_armour_callbackf, L,
+	load_data_impl_template(filenames, "armours",_load_armour_callbackfkf, L,
 			itemtable);
 }
 
-void load_armour_item_entries() {
+void _load_armour_item_entries() {
 	const int default_radius = 11;
 
 	//Create items from armours

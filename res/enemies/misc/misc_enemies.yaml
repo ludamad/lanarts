@@ -64,6 +64,7 @@ enemies:
         strength: 35
         defence: 20
         willpower: 20
+
   - name: Green Slime
     sprite: green slime
     death_sprite: green blood
@@ -80,6 +81,7 @@ enemies:
       strength: 4
       defence: 2
       willpower: 3
+
   - name: Red Slime
     sprite: red slime
     death_sprite: green blood #TODO: Red blood

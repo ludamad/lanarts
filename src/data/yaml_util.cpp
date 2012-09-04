@@ -120,51 +120,6 @@ const YAML::Node & operator >>(const YAML::Node& n, bool& r) {
 	return n;
 }
 
-static _Item parse_as_item(const YAML::Node& n) {
-	std::string s = parse_str(n);
-	return _Item(_get_item_by_name(s.c_str()));
-}
-static _Weapon parse_as_weapon(const YAML::Node& n) {
-	std::string s = parse_str(n);
-	return _Weapon(get_weapon_by_name(s.c_str()));
-}
-static _Projectile parse_as_projectile(const YAML::Node& n) {
-	std::string s = parse_str(n);
-	return _Projectile(get_projectile_by_name(s.c_str()));
-}
-
-Inventory parse_inventory(const YAML::Node& n) {
-	Inventory ret;
-	for (int i = 0; i < n.size(); i++) {
-		const YAML::Node& slot = n[i];
-		ret.add(parse_as_item(slot["item"]),
-				parse_defaulted(slot, "amount", 1));
-	}
-	return ret;
-}
-Equipment parse_equipment(const YAML::Node& n) {
-	Equipment ret;
-	ret.inventory = parse_inventory(n["inventory"]);
-	if (yaml_has_node(n, "weapon")) {
-		ret.weapon = parse_as_weapon(n["weapon"]);
-	}
-	if (yaml_has_node(n, "projectile")) {
-		const YAML::Node& pentry = n["projectile"];
-		ret.projectile = parse_as_projectile(pentry["item"]);
-		ret.projectile_amnt = parse_int(pentry["amount"]);
-	}
-	return ret;
-}
-
-const YAML::Node& operator >>(const YAML::Node& n, CoreStatMultiplier& sm) {
-	sm.base = parse_defaulted(n, "base", Range(0, 0));
-	sm.strength = parse_defaulted(n, "strength", 0.0f);
-	sm.magic = parse_defaulted(n, "magic", 0.0f);
-	sm.defence = parse_defaulted(n, "defence", 0.0f);
-	sm.willpower = parse_defaulted(n, "willpower", 0.0f);
-	return n;
-}
-
 const YAML::Node& operator >>(const YAML::Node& n, Colour& colour) {
 	colour.r = parse_int(n[0]);
 	colour.g = parse_int(n[1]);

@@ -23,14 +23,14 @@ extern "C" {
 void load_tile_data(const FilenameList& filenames);
 void load_tileset_data(const FilenameList& filenames);
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames);
-void load_armour_data(lua_State* L, const FilenameList& filenames,
+void _load_armour_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemtable);
 void load_weapon_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemstable = NULL);
 LuaValue load_spell_data(lua_State* L, const FilenameList& filenames);
 LuaValue _load_projectile_data(lua_State* L, const FilenameList& filenames,
 		LuaValue& itemstable);
-void load_armour_item_entries();
+void _load_armour_item_entries();
 void load_weapon_item_entries();
 void _load_projectile_item_entries();
 
@@ -219,8 +219,8 @@ GameSettings init_game_data(lua_State* L) {
 	load_weapon_data(L, dfiles.weapon_files, &lua_items);
 	load_weapon_item_entries();
 
-	load_armour_data(L, dfiles.armour_files, &lua_items);
-	load_armour_item_entries();
+	_load_armour_data(L, dfiles.armour_files, &lua_items);
+	_load_armour_item_entries();
 	// --- ITEM DATA ---
 
 	lua_effects = load_effect_data(L, dfiles.effect_files);
