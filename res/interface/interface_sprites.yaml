@@ -1,0 +1,40 @@
+sprites:
+  - name: logo
+    file: res/interface/sprites/lanarts_logo.png
+    
+  - name: inventory_icon
+    file: res/interface/sprites/items.png
+    
+  - name: equipment_icon
+    file: res/interface/sprites/equipment.png
+    
+  - name: spells_icon
+    file: res/interface/sprites/magic.png
+    
+  - name: config_icon
+    file: res/interface/sprites/config.png
+    
+  - name: enemies_icon
+    file: res/interface/sprites/enemies.png
+    
+  - name: stats_icon
+    file: res/interface/sprites/stats.png
+    
+  - name: left_arrow
+    file: res/interface/sprites/left_arrow.png
+    
+  - name: right_arrow
+    file: res/interface/sprites/right_arrow.png
+        
+  - name: archer_icon
+    file: res/interface/sprites/class_icons/archer.png
+    
+  - name: druid_icon
+    file: res/interface/sprites/class_icons/druid.png
+    
+  - name: fighter_icon
+    file: res/interface/sprites/class_icons/fighter.png
+    
+  - name: wizard_icon
+    file: res/interface/sprites/class_icons/wizard.png
+    

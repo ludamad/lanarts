@@ -1,46 +1,46 @@
 ---
 sprites: 
   - name: fire bolt
-    file: res/sprites/effects/bolt04.png
+    file: res/effects/sprites/bolt04.png
 
   - name: magic bolt
-    file: res/sprites/effects/bolt05.png
+    file: res/effects/sprites/bolt05.png
     
   - name: crystal spear
     type: directional
-    file: res/sprites/items/weapons/projectiles/crystal/crystal_spear
+    file: res/items/weapons/sprites/projectiles/crystal/crystal_spear
     variations: 8
     extension: .png
     
   - name: magic arrow
-    file: res/sprites/spells/magic_arrow.png
+    file: res/spells/sprites/magic_arrow.png
 
   - name: storm bolt
-    file: res/sprites/effects/bolt07.png
+    file: res/effects/sprites/bolt07.png
 
   - name: blue blast
-    file: res/sprites/effects/blueblast.png
+    file: res/effects/sprites/blueblast.png
 
   - name: poison
-    file: res/sprites/effects/cloud_poison2.png
+    file: res/effects/sprites/cloud_poison2.png
 
   - name: fire storm
-    file: res/sprites/effects/firestorm.png
+    file: res/effects/sprites/firestorm.png
 
   - name: magic blast
-    file: res/sprites/effects/orb.png
+    file: res/effects/sprites/orb.png
     
   - name: blink
-    file: res/sprites/spells/blink.png
+    file: res/spells/sprites/blink.png
         
   - name: large fire
-    file: res/sprites/effects/cloud_fire2.png
+    file: res/effects/sprites/cloud_fire2.png
     
   - name: berserk
-    file: res/sprites/spells/berserk.png
+    file: res/spells/sprites/berserk.png
         
   - name: berserk effected
-    file: res/sprites/effects/berserk.png       
+    file: res/effects/sprites/berserk.png       
 
   - name: exhausted effected
-    file: res/sprites/effects/i-slowing.png
+    file: res/effects/sprites/i-slowing.png
