@@ -2,136 +2,135 @@
 sprites:
 #Animals
   - name: giant rat
-    file: res/enemies/sprites/animals/giant_rat.png
+    file: res/enemies/animals/sprites/giant_rat.png
 
   - name: hound
-    file: res/enemies/sprites/animals/hound.png
+    file: res/enemies/animals/sprites/hound.png
 
   - name: horse
-    file: res/enemies/sprites/animals/horse.png
+    file: res/enemies/animals/sprites/horse.png
 
   - name: sheep
-    file: res/enemies/sprites/animals/sheep.png
+    file: res/enemies/animals/sprites/sheep.png
 
   - name: porcupine
-    file: res/enemies/sprites/animals/porcupine.png
+    file: res/enemies/animals/sprites/porcupine.png
 
   - name: giant frog
-    file: res/enemies/sprites/animals/giant_frog.png
+    file: res/enemies/animals/sprites/giant_frog.png
 
   - name: chicken
-    file: res/enemies/sprites/animals/chicken.png
+    file: res/enemies/animals/sprites/chicken.png
 
   - name: goliath beetle
-    file: res/enemies/sprites/animals/goliath_beetle.png
-
-  - name: hell hog
-    file: res/enemies/sprites/animals/hell_hog.png
+    file: res/enemies/animals/sprites/goliath_beetle.png
 
   - name: hound
-    file: res/enemies/sprites/animals/hound.png
+    file: res/enemies/animals/sprites/hound.png
 
   - name: lava fish
-    file: res/enemies/sprites/animals/lava_fish.png
+    file: res/enemies/animals/sprites/lava_fish.png
 
   - name: porcupine
-    file: res/enemies/sprites/animals/porcupine.png
+    file: res/enemies/animals/sprites/porcupine.png
 
   - name: super_chicken
-    file: res/enemies/sprites/animals/superchicken.png
+    file: res/enemies/animals/sprites/superchicken.png
 
   - name: giant bat
-    file: res/enemies/sprites/animals/bat.png
+    file: res/enemies/animals/sprites/bat.png
     
   - name: giant spider
-    file: res/enemies/sprites/animals/spider.png
+    file: res/enemies/animals/sprites/spider.png
 
 #Undead
 
   - name: exec
-    file: res/enemies/sprites/undead/exec.png
+    file: res/enemies/undead/sprites/exec.png
 
   - name: skeleton
-    file: res/enemies/sprites/undead/skeleton.png
+    file: res/enemies/undead/sprites/skeleton.png
     
   - name: skeleton fighter
-    file: res/enemies/sprites/undead/skelefighter.png
+    file: res/enemies/undead/sprites/skelefighter.png
     
   - name: zombie
-    file: res/enemies/sprites/undead/zombie.png
+    file: res/enemies/undead/sprites/zombie.png
 
 #elemental
   - name: storm elemental
-    file: res/enemies/sprites/elemental/storm_elemental.png
+    file: res/enemies/elemental/sprites/storm_elemental.png
 
   - name: hell storm
-    file: res/enemies/sprites/elemental/hell_storm.png
+    file: res/enemies/elemental/sprites/hell_storm.png
 
   - name: cloud elemental
-    file: res/enemies/sprites/elemental/cloud_elemental.png
+    file: res/enemies/elemental/sprites/cloud_elemental.png
 
   - name: water elemental
-    file: res/enemies/sprites/elemental/waterelemental.png
+    file: res/enemies/elemental/sprites/waterelemental.png
 
   - name: hell forged
-    file: res/enemies/sprites/elemental/hellforged.png
+    file: res/enemies/elemental/sprites/hellforged.png
 
 #demonic
   - name: imp
-    file: res/enemies/sprites/demonic/cute_imp.png
+    file: res/enemies/demonic/sprites/cute_imp.png
+    
   - name: hell hog
-    file: res/enemies/sprites/animals/hell_hog.png
+    file: res/enemies/demonic/sprites/hell_hog.png
 
   - name: unseen horror
-    file: res/enemies/sprites/demonic/unseen_horror.png
+    file: res/enemies/demonic/sprites/unseen_horror.png
 
 #humanoid
   - name: orc priest
-    file: res/enemies/sprites/humanoid/orc_priest.png
+    file: res/enemies/humanoid/sprites/orc_priest.png
    
   - name: orc sorceror
-    file: res/enemies/sprites/humanoid/orc_sorcerer.png
+    file: res/enemies/humanoid/sprites/orc_sorcerer.png
     
   - name: orc warlord
-    file: res/enemies/sprites/humanoid/orc_warlord.png
+    file: res/enemies/humanoid/sprites/orc_warlord.png
     
   - name: orc high priest
-    file: res/enemies/sprites/humanoid/orc_high_priest.png
+    file: res/enemies/humanoid/sprites/orc_high_priest.png
     
   - name: orc warrior
-    file: res/enemies/sprites/humanoid/orc_warrior.png
+    file: res/enemies/humanoid/sprites/orc_warrior.png
     
   - name: orc knight
-    file: res/enemies/sprites/humanoid/orc_knight.png
+    file: res/enemies/humanoid/sprites/orc_knight.png
     
   - name: orc wizard
-    file: res/enemies/sprites/humanoid/orc_wizard.png
+    file: res/enemies/humanoid/sprites/orc_wizard.png
 
 
 #misc
   - name: grue
-    file: res/enemies/sprites/grue.png
+    file: res/enemies/misc/sprites/grue.png
 
   - name: golem
-    file: res/enemies/sprites/golem.png
+    file: res/enemies/misc/sprites/golem.png
   
   - name: green slime
-    file: res/enemies/sprites/green_slime.png
+    file: res/enemies/misc/sprites/green_slime.png
 
   - name: red slime
-    file: res/enemies/sprites/red_slime.png
+    file: res/enemies/misc/sprites/red_slime.png
 
   - name: jester
-    file: res/enemies/sprites/jester.png
+    file: res/enemies/misc/sprites/jester.png
 
   - name: ciribot
-    file: res/enemies/sprites/ciribo.png
+    file: res/enemies/misc/sprites/ciribo.png
 
   - name: franken
-    file: res/enemies/sprites/ciribo_zombie.png
+    file: res/enemies/misc/sprites/ciribo_zombie.png
     
+#Bosses
   - name: zin
-    file: res/enemies/sprites/bosses/zin.png 
+    file: res/enemies/bosses/sprites/zin.png 
    
   - name: red dragon
-    file: res/enemies/sprites/bosses/reddragon.png
+    file: res/enemies/bosses/sprites/reddragon.png
