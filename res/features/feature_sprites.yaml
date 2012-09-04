@@ -1,0 +1,15 @@
+sprites:    
+  - name: open door
+    file: res/features/sprites/open_door.png
+
+  - name: closed door
+    file: res/features/sprites/closed_door.png
+
+  - name: store
+    file: res/features/sprites/shop.png
+
+  - name: statue
+    file: res/features/sprites/statues/statue
+    extension: .png
+    variations: 18
+    

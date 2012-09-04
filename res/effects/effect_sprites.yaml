@@ -1,0 +1,24 @@
+sprites:
+  - name: none
+    file: res/effects/sprites/none.png
+    
+  - name: resting
+    file: res/effects/sprites/resting.png
+
+  - name: haste
+    file: res/effects/sprites/haste.png
+
+  - name: blood
+    file: res/effects/sprites/blood.png
+    
+  - name: green blood
+    file: res/effects/sprites/blood_green.png
+
+  - name: purple blood
+    file: res/effects/sprites/blood_purple.png
+    
+  - name: small skeleton
+    file: res/effects/sprites/skeleton1.png
+
+  - name: haste effected
+    file: res/effects/sprites/i-speed.png
