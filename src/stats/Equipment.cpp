@@ -33,7 +33,7 @@ void Equipment::deequip_projectiles() {
 void Equipment::deequip_weapon() {
 	if (has_weapon()) {
 		inventory.add(weapon.as_item(), 1);
-		weapon = _Weapon(NONE);
+		weapon = _Weapon();
 
 		if (!valid_to_use_projectile(projectile)) {
 			deequip_projectiles();

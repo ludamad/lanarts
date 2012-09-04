@@ -1,6 +1,6 @@
 ---
 weapons:
-  - name: Unarmed
+  - name: Unarmed #Must be called Unarmed, default weapon
     description: You are currently fighting with your fists.
     weapon_class: unarmed
     spr_item: hand

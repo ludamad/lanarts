@@ -132,6 +132,10 @@ set( lanarts_src
 	
 	serialize/SerializeBuffer.cpp
 	
+	stats/items/ItemEntry.cpp
+	stats/items/items.cpp
+    stats/items/WeaponEntry.cpp
+	
 	stats/loaddata/load_armour_data.cpp
 	stats/loaddata/load_class_data.cpp
 	stats/loaddata/load_effect_data.cpp
@@ -141,10 +145,6 @@ set( lanarts_src
 	stats/loaddata/load_spell_data.cpp
 	stats/loaddata/load_stats.cpp
 	stats/loaddata/load_weapon_data.cpp
-	
-	
-	stats/items/ItemEntry.cpp
-	stats/items/items.cpp
 	
 	stats/combat_stats.cpp
 	stats/effects.cpp

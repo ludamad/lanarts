@@ -55,3 +55,21 @@ void load_weapon_data(lua_State* L, const FilenameList& filenames,
 	load_data_impl_template(filenames, "weapons", load_weapon_callbackf, L,
 			itemtable);
 }
+
+void _load_weapon_item_entries() {
+	const int default_radius = 11;
+
+	//Create items from weapons
+	for (int i = 0; i < game_item_data.size(); i++) {
+		ItemEntry& ientry = get_item_entry(i);
+		if (dynamic_cast<WeaponEntry*>(&ientry)) {
+			WeaponEntry& entry = get_weapon_entry(i);
+			//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
+			_game_item_data.push_back(
+					_ItemEntry(entry.name, entry.description, "", default_radius,
+							entry.item_sprite, "equip", "", false,
+							entry.shop_cost, _ItemEntry::ALWAYS_KNOWN,
+							_ItemEntry::WEAPON, i));
+		}
+	}
+}

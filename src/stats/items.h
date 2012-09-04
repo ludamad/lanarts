@@ -91,7 +91,7 @@ struct _Weapon {
 	_Item as_item() const;
 	_ItemEntry& item_entry() const;
 	WeaponEntry& weapon_entry() const;
-	_Weapon(weapon_id id = 0, _ItemProperties properties = _ItemProperties()) :
+	_Weapon(weapon_id id = -1, _ItemProperties properties = _ItemProperties()) :
 			id(id), properties(properties) {
 	}
 	bool operator==(const _Weapon& weapon) const;
