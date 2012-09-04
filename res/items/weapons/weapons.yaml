@@ -90,11 +90,11 @@ weapons:
     shop_cost: [100,150]
     weapon_class: blades
     description: Slice quickly and efficiently
-    damage: {base: [1,5], strength: 1.2 }
+    damage: {base: [1,5], strength: 1.1 }
     resist_modifier: 0.9
-    power: {base: 6, strength: 0.35}
+    power: {base: 5, strength: 0.35}
     range: 5
-    cooldown: 20
+    cooldown: 25
     spr_item: iron scimitar
 
   - name: Short Bow
