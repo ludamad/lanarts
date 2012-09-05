@@ -1,0 +1,8 @@
+---
+sprites:
+
+  - name: zin
+    file: res/enemies/bosses/sprites/zin.png 
+   
+  - name: red dragon
+    file: res/enemies/bosses/sprites/reddragon.png

@@ -1,0 +1,43 @@
+---
+sprites:
+  - name: giant rat
+    file: res/enemies/animals/sprites/giant_rat.png
+
+  - name: hound
+    file: res/enemies/animals/sprites/hound.png
+
+  - name: horse
+    file: res/enemies/animals/sprites/horse.png
+
+  - name: sheep
+    file: res/enemies/animals/sprites/sheep.png
+
+  - name: porcupine
+    file: res/enemies/animals/sprites/porcupine.png
+
+  - name: giant frog
+    file: res/enemies/animals/sprites/giant_frog.png
+
+  - name: chicken
+    file: res/enemies/animals/sprites/chicken.png
+
+  - name: goliath beetle
+    file: res/enemies/animals/sprites/goliath_beetle.png
+
+  - name: hound
+    file: res/enemies/animals/sprites/hound.png
+
+  - name: lava fish
+    file: res/enemies/animals/sprites/lava_fish.png
+
+  - name: porcupine
+    file: res/enemies/animals/sprites/porcupine.png
+
+  - name: super_chicken
+    file: res/enemies/animals/sprites/superchicken.png
+
+  - name: giant bat
+    file: res/enemies/animals/sprites/bat.png
+    
+  - name: giant spider
+    file: res/enemies/animals/sprites/spider.png

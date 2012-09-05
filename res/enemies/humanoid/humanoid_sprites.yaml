@@ -1,0 +1,23 @@
+---
+sprites:
+
+  - name: orc priest
+    file: res/enemies/humanoid/sprites/orc_priest.png
+   
+  - name: orc sorceror
+    file: res/enemies/humanoid/sprites/orc_sorcerer.png
+    
+  - name: orc warlord
+    file: res/enemies/humanoid/sprites/orc_warlord.png
+    
+  - name: orc high priest
+    file: res/enemies/humanoid/sprites/orc_high_priest.png
+    
+  - name: orc warrior
+    file: res/enemies/humanoid/sprites/orc_warrior.png
+    
+  - name: orc knight
+    file: res/enemies/humanoid/sprites/orc_knight.png
+    
+  - name: orc wizard
+    file: res/enemies/humanoid/sprites/orc_wizard.png
