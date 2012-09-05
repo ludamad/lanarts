@@ -13,10 +13,12 @@
 #include "../../gamestate/GameState.h"
 
 #include "../../gamestate/PlayerData.h"
-#include "../../stats/projectile_data.h"
 
-#include "../../stats/weapon_data.h"
+#include "../../stats/items/ProjectileEntry.h"
+#include "../../stats/items/WeaponEntry.h"
+
 #include "../../util/math_util.h"
+
 #include "../player/PlayerInst.h"
 
 #include "../collision_filters.h"
@@ -133,7 +135,6 @@ static bool attack_ai_choice(GameState* gs, CombatGameInst* inst,
 	}
 	return false;
 }
-
 
 void MonsterController::set_monster_headings(GameState* gs,
 		std::vector<EnemyOfInterest>& eois) {

@@ -16,14 +16,17 @@
 #include "../lua/LuaValue.h"
 #include "../objects/enemy/enemy_data.h"
 #include "../objects/scriptobject_data.h"
-#include "../stats/armour_data.h"
+
+#include "../stats/items/EquipmentEntry.h"
+#include "../stats/items/ProjectileEntry.h"
+#include "../stats/items/WeaponEntry.h"
+
 #include "../stats/class_data.h"
 #include "../stats/effect_data.h"
 #include "../stats/item_data.h"
 #include "../stats/itemgen_data.h"
-#include "../stats/projectile_data.h"
 #include "../stats/spell_data.h"
-#include "../stats/weapon_data.h"
+
 #include "datafilenames.h"
 
 struct lua_State;

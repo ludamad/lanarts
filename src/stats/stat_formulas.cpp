@@ -6,13 +6,14 @@
 #include <cmath>
 
 #include "../gamestate/GameState.h"
-#include "armour_data.h"
+
+#include "items/EquipmentEntry.h"
+#include "items/WeaponEntry.h"
 
 #include "combat_stats.h"
 
 #include "stat_formulas.h"
 #include "stats.h"
-#include "weapon_data.h"
 
 /* What power, resistance difference causes damage to be raised by 100% */
 const int POWER_MULTIPLE_INTERVAL = 50;
@@ -65,7 +66,8 @@ static void factor_in_armour_slot(MTwist& mt, EffectiveStats& effective,
 
 	effective.physical.resistance += aentry.resistance().calculate(mt, core);
 	effective.magic.resistance += aentry.magic_resistance().calculate(mt, core);
-	effective.physical.reduction += aentry.damage_reduction().calculate(mt, core);
+	effective.physical.reduction += aentry.damage_reduction().calculate(mt,
+			core);
 	effective.magic.reduction += aentry.magic_reduction().calculate(mt, core);
 }
 static void factor_in_equipment(MTwist& mt, EffectiveStats& effective,

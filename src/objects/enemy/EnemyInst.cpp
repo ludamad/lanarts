@@ -17,8 +17,10 @@
 #include "../../lua/LuaValue.h"
 
 #include "../../serialize/SerializeBuffer.h"
+
+#include "../../stats/items/WeaponEntry.h"
 #include "../../stats/stat_formulas.h"
-#include "../../stats/weapon_data.h"
+
 #include "../../util/math_util.h"
 #include "../player/PlayerInst.h"
 

@@ -8,16 +8,16 @@
 #include "../display/sprite_data.h"
 #include "../gamestate/GameState.h"
 #include "../objects/player/PlayerInst.h"
-#include "../stats/armour_data.h"
+
+#include "../stats/items/EquipmentEntry.h"
+#include "../stats/items/ProjectileEntry.h"
+#include "../stats/items/WeaponEntry.h"
 
 #include "../stats/item_data.h"
-
 #include "../stats/items.h"
 
-#include "../stats/projectile_data.h"
-
 #include "../stats/spell_data.h"
-#include "../stats/weapon_data.h"
+
 
 #include "console_description_draw.h"
 

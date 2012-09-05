@@ -11,9 +11,11 @@
 #include "../../display/tile_data.h"
 #include "../../gamestate/GameState.h"
 #include "../../serialize/SerializeBuffer.h"
+
+#include "../../stats/items/WeaponEntry.h"
+
 #include "../../stats/class_data.h"
 #include "../../stats/item_data.h"
-#include "../../stats/weapon_data.h"
 
 #include "../../util/math_util.h"
 

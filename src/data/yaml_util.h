@@ -12,8 +12,10 @@
 
 #include "../objects/GameInst.h"
 
+
+#include "../stats/items/WeaponEntry.h"
+
 #include "../stats/combat_stats.h"
-#include "../stats/weapon_data.h"
 
 #include "../lanarts_defines.h"
 

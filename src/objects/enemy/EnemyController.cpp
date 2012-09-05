@@ -14,8 +14,10 @@
 #include "../../gamestate/GameState.h"
 #include "../../gamestate/PlayerData.h"
 
-#include "../../stats/weapon_data.h"
+#include "../../stats/items/WeaponEntry.h"
+
 #include "../../util/math_util.h"
+
 #include "../player/PlayerInst.h"
 
 #include "../collision_filters.h"

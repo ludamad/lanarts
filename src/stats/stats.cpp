@@ -6,12 +6,14 @@
  */
 
 #include "../util/mtwist.h"
+
+#include "items/WeaponEntry.h"
+
 #include "class_data.h"
 
 #include "combat_stats.h"
 
 #include "stats.h"
-#include "weapon_data.h"
 
 bool CoreStats::hurt(int dmg) {
 	hp -= dmg;

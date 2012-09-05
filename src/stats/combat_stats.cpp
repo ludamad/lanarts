@@ -5,15 +5,16 @@
  */
 
 #include "../serialize/SerializeBuffer.h"
+
+#include "items/ProjectileEntry.h"
+#include "items/WeaponEntry.h"
+
 #include "class_data.h"
 #include "combat_stats.h"
 
 #include "items.h"
-#include "projectile_data.h"
-#include "stat_formulas.h"
 
-#include "weapon_data.h"
-#include "items/WeaponEntry.h"
+#include "stat_formulas.h"
 
 CombatStats::CombatStats(const ClassStats& class_stats, const CoreStats& core,
 		const CooldownStats& cooldowns, const Equipment& equipment,
@@ -165,7 +166,7 @@ int AttackStats::atk_power(MTwist& mt, const EffectiveStats& stats) const {
 		pow += projectile.projectile_entry().power_stats().calculate(mt, core);
 		if (!is_compatible_projectile(wentry, pentry)) {
 			pow += round(pentry.magic_percentage() * stats.magic.power);
-			pow += round(pentry.physical_percentage()* stats.physical.power);
+			pow += round(pentry.physical_percentage() * stats.physical.power);
 		}
 	}
 	return pow;

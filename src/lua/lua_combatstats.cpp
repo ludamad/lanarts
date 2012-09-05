@@ -6,10 +6,11 @@
 #include "../objects/player/PlayerInst.h"
 #include "../objects/GameInstRef.h"
 
+#include "../stats/items/WeaponEntry.h"
+
 #include "../stats/combat_stats.h"
 #include "../stats/stats.h"
 
-#include "../stats/weapon_data.h"
 #include "lua_api.h"
 #include "lunar.h"
 

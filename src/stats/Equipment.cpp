@@ -5,11 +5,11 @@
 
 #include "../serialize/SerializeBuffer.h"
 
+#include "items/ProjectileEntry.h"
+#include "items/WeaponEntry.h"
+
 #include "Equipment.h"
 #include "item_data.h"
-#include "projectile_data.h"
-
-#include "weapon_data.h"
 
 bool Equipment::valid_to_use_projectile(const _Projectile& proj) {
 	if (!proj.valid_projectile())
@@ -44,7 +44,7 @@ void Equipment::deequip_weapon() {
 void Equipment::deequip_armour() {
 	if (has_armour()) {
 		inventory.add(armour.as_item(), 1);
-		armour =  EquipmentItem();
+		armour = EquipmentItem();
 	}
 }
 

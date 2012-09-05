@@ -18,9 +18,11 @@ extern "C" {
 
 #include "../../stats/item_data.h"
 
-#include "../../stats/projectile_data.h"
+#include "../../stats/items/ProjectileEntry.h"
+#include "../../stats/items/WeaponEntry.h"
+
 #include "../../stats/spell_data.h"
-#include "../../stats/weapon_data.h"
+
 #include "../../util/math_util.h"
 
 #include "../../lanarts_defines.h"

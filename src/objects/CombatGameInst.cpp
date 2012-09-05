@@ -7,12 +7,13 @@
 #include "../gamestate/GameState.h"
 
 #include "../serialize/SerializeBuffer.h"
+
+
+#include "../stats/items/ProjectileEntry.h"
+#include "../stats/items/WeaponEntry.h"
+
 #include "../stats/effect_data.h"
-#include "../stats/projectile_data.h"
-
 #include "../stats/stat_formulas.h"
-
-#include "../stats/weapon_data.h"
 
 #include "../util/math_util.h"
 

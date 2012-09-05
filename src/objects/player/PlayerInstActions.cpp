@@ -16,9 +16,9 @@ extern "C" {
 
 #include "../../stats/item_data.h"
 
-#include "../../stats/projectile_data.h"
+#include "../../stats/items/ProjectileEntry.h"
+#include "../../stats/items/WeaponEntry.h"
 
-#include "../../stats/weapon_data.h"
 #include "../../util/game_replays.h"
 #include "../../util/math_util.h"
 
@@ -35,7 +35,8 @@ extern "C" {
 
 #include "PlayerInst.h"
 
-static bool is_same_projectile(const _Projectile& projectile, const _Item& item) {
+static bool is_same_projectile(const _Projectile& projectile,
+		const _Item& item) {
 	if (projectile.valid_projectile()) {
 		if (item.is_projectile()) {
 			return (item.as_projectile() == projectile);
@@ -359,8 +360,7 @@ void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
 	StoreInst* store = (StoreInst*)gs->get_instance(action.use_id);
 	if (!store) {
 		return;
-	}
-	LANARTS_ASSERT(dynamic_cast<StoreInst*>(gs->get_instance(action.use_id)));
+	}LANARTS_ASSERT(dynamic_cast<StoreInst*>(gs->get_instance(action.use_id)));
 	StoreInventory& inv = store->inventory();
 	StoreItemSlot& slot = inv.get(action.use_id2);
 	if (gold() >= slot.cost) {

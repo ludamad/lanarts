@@ -277,7 +277,6 @@ set( lanarts_include
     
     stats/Attack.h
 	stats/AllowedActions.h
-	stats/armour_data.h
 	stats/class_data.h
 	stats/combat_stats.h
 	stats/effect_data.h
@@ -294,7 +293,6 @@ set( lanarts_include
 	stats/SpellsKnown.h
 	stats/stat_formulas.h
 	stats/stats.h
-	stats/weapon_data.h
 
 	util/callback_util.h
 	util/game_replays.h
