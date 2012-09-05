@@ -14,13 +14,13 @@ effect_files:
   - spells/spell_effects.yaml
 
 enemy_files: 
-  - enemies/animals/animal_enemies.yaml
-  - enemies/bosses/boss_enemies.yaml
-  - enemies/demonic/demonic_enemies.yaml
-  - enemies/elemental/elemental_enemies.yaml
-  - enemies/misc/misc_enemies.yaml
-  - enemies/undead/undead_enemies.yaml
-  - enemies/humanoid/humanoid_enemies.yaml
+  - enemies/animals/animals.yaml
+  - enemies/bosses/bosses.yaml
+  - enemies/demonic/demonic.yaml
+  - enemies/elemental/elemental.yaml
+  - enemies/humanoid/humanoid.yaml
+  - enemies/misc/misc.yaml
+  - enemies/undead/undead.yaml
 
 item_files: 
   - items/misc/misc.yaml
@@ -45,11 +45,18 @@ spell_files:
 
 sprite_files: 
   - classes/class_sprites.yaml
-  - enemies/enemy_sprites.yaml
+  - enemies/animals/animal_sprites.yaml
+  - enemies/bosses/boss_sprites.yaml
+  - enemies/demonic/demonic_sprites.yaml
+  - enemies/elemental/elemental_sprites.yaml
+  - enemies/humanoid/humanoid_sprites.yaml
+  - enemies/misc/misc_sprites.yaml
+  - enemies/undead/undead_sprites.yaml
   - spells/spell_sprites.yaml
   - items/armour/armour_sprites.yaml
   - interface/interface_sprites.yaml
-  - items/item_sprites.yaml
+  - items/misc/misc_sprites.yaml
+  - items/scrolls/scroll_sprites.yaml
   - features/feature_sprites.yaml
   - effects/effect_sprites.yaml
   - items/weapons/weapon_sprites.yaml

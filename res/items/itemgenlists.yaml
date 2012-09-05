@@ -7,13 +7,16 @@ itemgen_lists:
     - { item: Arrow,              chance: 15,  quantity: [5,15]  }
     - { item: Silver Arrow,       chance: 10,  quantity: [3,5]   }
     - { item: Stone,              chance: 15,  quantity: [3,20]  }
-    - { item: Battle Axe,         chance: 2                      }
-    #Weapons
+    #Ranged Weapons
     - { item: Short Bow,          chance: 10                     }
     - { item: Long Bow,           chance: 2                      }
+    #Melee Weapons
     - { item: Dagger,             chance: 10                     }
     - { item: Short Sword,        chance: 10                     }
+    - { item: Iron Scimitar,      chance: 2                      }
     - { item: Samuri Sabre,       chance: 2                      }
+    - { item: Battle Axe,         chance: 2                      }
+    - { item: Orc Axe,            chance: 1                      }
     - { item: Iron Broadsword,    chance: 2                      }
     - { item: Mace,               chance: 5                      }
     #Scrolls
