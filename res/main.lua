@@ -13,7 +13,7 @@ function is_projectile(item) 	return item.type == "projectile" end
 -- Include all other lua files here
 dofile "res/enemies/enemies.lua"
 dofile "res/items/items.lua"
-dofile "res/items/weapons.lua"
+dofile "res/items/weapons/weapons.lua"
 dofile "res/effects/effects.lua"
 dofile "res/spells/spell_effects.lua"
 dofile "res/spells/spells.lua"
@@ -21,3 +21,4 @@ dofile "res/levels/levels.lua"
 
 -- Balance measurement related files
 dofile "res/tests/progressions.lua"
+
