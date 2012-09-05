@@ -75,8 +75,8 @@ enemies:
     xpaward: 10
     stats:
       attacks: [ {weapon: Fast Melee} ]
-      hp: 12
-      hpregen: 0.1
+      hp: 10
+      hpregen: 0.05
       movespeed: 2
       strength: 4
       defence: 2
@@ -92,8 +92,8 @@ enemies:
     xpaward: 20
     stats:
       attacks: [ {weapon: Fast Melee} ]
-      hp: 30
-      hpregen: 0.15
+      hp: 25
+      hpregen: 0.1
       movespeed: 3
       strength: 7
       defence: 5
