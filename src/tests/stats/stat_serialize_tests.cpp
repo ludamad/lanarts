@@ -73,12 +73,10 @@ static void serialize_equipment() {
 	const int TEST_N = 10;
 	//mock up some item data
 	_game_item_data.resize(TEST_N, _ItemEntry("", "", "", 0, 0, "", "", false));
-//	_game_weapon_data.resize(TEST_N);
-	game_armour_data.resize(TEST_N);
 
 	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
 	Equipment e1, e2;
-	e1.armour = _Armour(1);
+	e1.armour = EquipmentItem(1);
 	e1.weapon = _Weapon(1);
 	e1.projectile = _Projectile(1);
 	e1.inventory.add(_Item(1), 1);
@@ -89,8 +87,6 @@ static void serialize_equipment() {
 	assert_equal(e1, e2);
 
 	_game_item_data.clear();
-//	_game_weapon_data.clear();
-	game_armour_data.clear();
 }
 
 static void serialize_combat_stats() {

@@ -10,7 +10,7 @@
 
 #include "stats.h"
 struct _Item;
-struct _ArmourEntry;
+class EquipmentEntry;
 struct _ItemEntry;
 class ProjectileEntry;
 class WeaponEntry;
@@ -46,17 +46,17 @@ struct _ItemProperties {
 	void deserialize(SerializeBuffer& serialize);
 };
 
-struct _Armour {
+struct EquipmentItem {
 	armour_id id;
 	_ItemProperties properties;
 
 	_Item as_item() const;
 	_ItemEntry& item_entry() const;
 
-	_Armour(armour_id id, _ItemProperties properties = _ItemProperties()) :
+	EquipmentItem(armour_id id = NO_ITEM, _ItemProperties properties = _ItemProperties()) :
 			id(id), properties(properties) {
 	}
-	_ArmourEntry& armour_entry() const;
+	EquipmentEntry& armour_entry() const;
 
 	void serialize(SerializeBuffer& serialize);
 	void deserialize(SerializeBuffer& serialize);
@@ -104,7 +104,7 @@ struct _Item {
 	_ItemProperties properties;
 
 	_ItemEntry& item_entry() const;
-	_Armour as_armour() const;
+	EquipmentItem as_armour() const;
 	_Projectile as_projectile() const;
 	_Weapon as_weapon() const;
 

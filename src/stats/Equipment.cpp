@@ -44,7 +44,7 @@ void Equipment::deequip_weapon() {
 void Equipment::deequip_armour() {
 	if (has_armour()) {
 		inventory.add(armour.as_item(), 1);
-		armour = _Armour(NONE);
+		armour =  EquipmentItem();
 	}
 }
 

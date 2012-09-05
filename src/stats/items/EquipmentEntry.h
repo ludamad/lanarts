@@ -34,6 +34,19 @@ public:
 		return stat_modifiers.armour_mod;
 	}
 
+	CoreStatMultiplier& resistance() {
+		return armour_modifier().resistance;
+	}
+	CoreStatMultiplier& damage_reduction() {
+		return armour_modifier().damage_reduction;
+	}
+	CoreStatMultiplier& magic_resistance() {
+		return armour_modifier().magic_resistance;
+	}
+	CoreStatMultiplier& magic_reduction() {
+		return armour_modifier().magic_reduction;
+	}
+
 	equip_type type;
 	// Stat modifiers while wearing this equipment
 	StatModifiers stat_modifiers;

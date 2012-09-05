@@ -23,8 +23,6 @@ extern "C" {
 void load_tile_data(const FilenameList& filenames);
 void load_tileset_data(const FilenameList& filenames);
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames);
-void _load_armour_data(lua_State* L, const FilenameList& filenames,
-		LuaValue* itemtable);
 
 /// NEW EQUIPMENT CODE
 LuaValue load_item_data(lua_State* L, const FilenameList& filenames);
@@ -32,10 +30,10 @@ void load_equipment_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemtable);
 LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 		LuaValue& itemstable);
+void load_weapon_data(lua_State* L, const FilenameList& filenames,
+		LuaValue* itemstable = NULL);
 /// NEW EQUIPMENT CODE
 
-void load_weapon_data(lua_State* L, const FilenameList& filenames,
-		LuaValue* itemstable = NULL); //new
 LuaValue load_spell_data(lua_State* L, const FilenameList& filenames);
 void _load_armour_item_entries();
 void _load_projectile_item_entries();
@@ -50,7 +48,6 @@ LuaValue load_class_data(lua_State* L, const FilenameList& filenames);
 
 /* Definition of game data */
 
-std::vector<_ArmourEntry> game_armour_data;
 std::vector<ClassType> game_class_data;
 std::vector<EffectEntry> game_effect_data;
 std::vector<EnemyEntry> game_enemy_data;
@@ -97,9 +94,6 @@ static E& get_X_ref_by_name(std::vector<E>& t, const char* name) {
 	return t.at(-1); /* throws */
 }
 
-int get_armour_by_name(const char *name, bool error_if_not_found) {
-	return get_X_by_name(game_armour_data, name, error_if_not_found);
-}
 const char* equip_type_description(const _ItemEntry& ientry) {
 	switch (ientry.equipment_type) {
 	case _ItemEntry::ARMOUR:
@@ -221,8 +215,7 @@ GameSettings init_game_data(lua_State* L) {
 	load_weapon_data(L, dfiles.weapon_files, &_lua_items); //new
 	_load_weapon_item_entries();
 
-	_load_armour_data(L, dfiles.armour_files, &_lua_items);
-	load_equipment_data(L, dfiles.armour_files, &lua_items);
+	load_equipment_data(L, dfiles.armour_files, &_lua_items);
 	_load_armour_item_entries();
 	// --- ITEM DATA ---
 

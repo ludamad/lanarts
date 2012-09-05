@@ -15,7 +15,7 @@
 class Equipment {
 public:
 	Equipment() :
-			projectile_amnt(0), armour(0), money(0) {
+			projectile_amnt(0), money(0) {
 	}
 	bool valid_to_use_projectile(const _Projectile& proj);
 	bool valid_to_use(const _Item& item);
@@ -28,13 +28,13 @@ public:
 	void use_ammo(int amnt = 1);
 
 	bool has_weapon() {
-		return weapon.id > -1;
+		return weapon.id > NO_ITEM;
 	}
 	bool has_armour() {
-		return armour.id > 0;
+		return armour.id > NO_ITEM;
 	}
 	bool has_projectile() {
-		return projectile.id > -1;
+		return projectile.id > NO_ITEM;
 	}
 
 	void serialize(SerializeBuffer& serializer);
@@ -44,7 +44,7 @@ public:
 	_Weapon weapon;
 	_Projectile projectile;
 	int projectile_amnt;
-	_Armour armour;
+	EquipmentItem armour;
 	money_t money;
 };
 

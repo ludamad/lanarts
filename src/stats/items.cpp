@@ -41,20 +41,20 @@ _ItemEntry& _Item::item_entry() const {
 	return _game_item_data.at(id);
 }
 
-_Armour _Item::as_armour() const {
-	return _Armour(item_entry().equipment_id, properties);
+EquipmentItem _Item::as_armour() const {
+	return EquipmentItem(item_entry().equipment_id, properties);
 }
 
-_ItemEntry& _Armour::item_entry() const {
+_ItemEntry& EquipmentItem::item_entry() const {
 	const std::string& name = armour_entry().name;
 	return _game_item_data.at(_get_item_by_name(name.c_str()));
 }
 
-_ArmourEntry& _Armour::armour_entry() const {
-	return game_armour_data.at(id);
+EquipmentEntry& EquipmentItem::armour_entry() const {
+	return get_equipment_entry(id);
 }
 
-_Item _Armour::as_item() const {
+_Item EquipmentItem::as_item() const {
 	const std::string& name = armour_entry().name;
 	return _Item(_get_item_by_name(name.c_str()), properties);
 }
@@ -122,12 +122,12 @@ void _ItemProperties::deserialize(SerializeBuffer& serializer) {
 	serializer.read_int(flags);
 }
 
-void _Armour::serialize(SerializeBuffer& serializer) {
+void EquipmentItem::serialize(SerializeBuffer& serializer) {
 	serializer.write(id);
 	properties.serialize(serializer);
 }
 
-void _Armour::deserialize(SerializeBuffer& serializer) {
+void EquipmentItem::deserialize(SerializeBuffer& serializer) {
 	serializer.read(id);
 	properties.deserialize(serializer);
 }
