@@ -285,7 +285,7 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 		} else if (!equipment().has_projectile()
 				&& is_wieldable_projectile(equipment(), type)) {
 			equipment().deequip_projectiles();
-			equipment().equip(type, amnt);
+			equipment().equip(type);
 		} else {
 			inventory().add(type);
 		}

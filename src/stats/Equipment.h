@@ -19,7 +19,7 @@ public:
 	}
 	bool valid_to_use_projectile(const Item& proj);
 	bool valid_to_use(const Item& item);
-	void equip(const Item& item, int amnt = 1);
+	void equip(const Item& item);
 	void deequip_projectiles();
 	void deequip_weapon();
 	void deequip_armour();

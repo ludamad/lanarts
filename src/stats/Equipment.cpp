@@ -72,15 +72,17 @@ bool Equipment::valid_to_use(const Item& item) {
 	}
 	return true;
 }
-void Equipment::equip(const Item& item, int amnt) {
+void Equipment::equip(const Item& item) {
 	switch (item.equipment_entry().type) {
 	case EquipmentEntry::ARMOUR:
+		LANARTS_ASSERT(item.amount == 1);
 		if (armour.properties.flags & CURSED)
 			break;
 		deequip_armour();
 		armour = item;
 		break;
 	case EquipmentEntry::WEAPON:
+		LANARTS_ASSERT(item.amount == 1);
 		if (weapon.properties.flags & CURSED)
 			break;
 		deequip_projectiles();
@@ -94,8 +96,7 @@ void Equipment::equip(const Item& item, int amnt) {
 			break;
 		if (!(item.is_same_item(projectile)))
 			deequip_projectiles();
-		projectile = item;
-		projectile.amount = amnt;
+		projectile.add_copies(item.amount);
 		break;
 	}
 }
