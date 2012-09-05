@@ -1,9 +1,5 @@
 ---
 armours:
-  - name: No Armour
-    spr_item: none
-    armour_type: none
-
   - name: Leather Armour
     shop_cost: [15, 25]
     description: A durable, flexible armour.

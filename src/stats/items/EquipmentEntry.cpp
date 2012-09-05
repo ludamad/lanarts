@@ -16,11 +16,11 @@ equipment_id get_equipment_by_name(const char* name) {
 	return (equipment_id)id;
 }
 
-ProjectileEntry& get_projectile_entry(projectile_id id) {
+EquipmentEntry& get_equipment_entry(projectile_id id) {
 	if (id == NO_ITEM) {
-		return get_projectile_entry(get_item_by_name("Nothing"));
+		return get_equipment_entry(get_item_by_name("Nothing"));
 	}
 	ItemEntry* item = game_item_data.at(id);
 
-	return dynamic_cast<ProjectileEntry&>(*item);
+	return dynamic_cast<EquipmentEntry&>(*item);
 }

@@ -135,6 +135,7 @@ set( lanarts_src
 	
 	stats/items/ItemEntry.cpp
 	stats/items/items.cpp
+    stats/items/EquipmentEntry.cpp
     stats/items/ProjectileEntry.cpp
     stats/items/WeaponEntry.cpp
 	

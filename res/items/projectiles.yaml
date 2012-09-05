@@ -1,5 +1,10 @@
 ---
 projectiles:
+# This entry is used as the basic 'nothing' equipment slot.
+  - name: Nothing # This must be named nothing.
+    weapon_class: none
+    spr_item: none
+
   - name: Arrow
     shop_cost: [2,3]
     description: A trusty arrow, for use with a bow.

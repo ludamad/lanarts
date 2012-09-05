@@ -50,17 +50,20 @@ void _load_armour_data(lua_State* L, const FilenameList& filenames,
 void _load_armour_item_entries() {
 	const int default_radius = 11;
 
-	//Create items from armours
-	for (int i = 0; i < game_armour_data.size(); i++) {
-		_ArmourEntry& entry = game_armour_data[i];
-		//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
-		_game_item_data.push_back(
-				_ItemEntry(entry.name, entry.description, "", default_radius,
-						entry.item_sprite, "equip", "", false, entry.shop_cost,
-						_ItemEntry::ALWAYS_KNOWN, _ItemEntry::ARMOUR, i));
+	//Create items from projectiles
+	for (int i = 0; i < game_item_data.size(); i++) {
+		ItemEntry& ientry = get_item_entry(i);
+		if (dynamic_cast<EquipmentEntry*>(&ientry)) {
+			EquipmentEntry& entry = get_equipment_entry(i);
+			//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
+			_game_item_data.push_back(
+					_ItemEntry(entry.name, entry.description, "",
+							default_radius, entry.item_sprite, "equip", "",
+							false, entry.shop_cost, _ItemEntry::ALWAYS_KNOWN,
+							_ItemEntry::ARMOUR, i));
+		}
 	}
 }
-
 
 void parse_equipment_entry(const YAML::Node& n, EquipmentEntry& entry) {
 	parse_item_entry(n, entry);
