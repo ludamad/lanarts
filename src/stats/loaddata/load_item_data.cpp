@@ -14,7 +14,7 @@ extern "C" {
 #include "../../data/game_data.h"
 #include "../../data/yaml_util.h"
 
-#include "../item_data.h"
+#include "../items/ItemEntry.h"
 
 #include "../items/ItemEntry.h"
 
@@ -30,9 +30,10 @@ void parse_item_entry(const YAML::Node& n, ItemEntry& entry) {
 			std::string());
 	entry.use_action.action_func = parse_defaulted(n, "action_func",
 			std::string());
-
+	entry.use_action.prereq_func = parse_defaulted(n, "prereq_func",
+			std::string());
 	entry.item_sprite = parse_sprite_number(n, "spr_item");
-	parse_defaulted(n, "prereq_func", std::string());
+
 	entry.stackable = parse_defaulted(n, "stackable", true);
 	parse_defaulted(n, "shop_cost", Range());
 }

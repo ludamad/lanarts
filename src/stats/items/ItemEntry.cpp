@@ -8,7 +8,18 @@
 #include <cstdio>
 #include <typeinfo>
 
+#include "../../display/sprite_data.h"
+
 #include "ItemEntry.h"
+#include "EquipmentEntry.h"
+#include "ProjectileEntry.h"
+
+SpriteEntry& ItemEntry::item_sprite_entry() {
+	return game_sprite_data.at(item_sprite);
+}
+GLimage& ItemEntry::item_image() {
+	return item_sprite_entry().img();
+}
 
 std::vector<ItemEntry*> game_item_data;
 

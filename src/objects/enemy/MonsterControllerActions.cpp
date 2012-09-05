@@ -119,7 +119,7 @@ static bool attack_ai_choice(GameState* gs, CombatGameInst* inst,
 	for (int i = 0; i < attacks.size(); i++) {
 		WeaponEntry& wentry = attacks[i].weapon.weapon_entry();
 		int range = wentry.range();
-		if (attacks[i].projectile.valid_projectile()) {
+		if (!attacks[i].projectile.empty()) {
 			ProjectileEntry& pentry = attacks[i].projectile_entry();
 			range = std::max(range, pentry.range());
 		}

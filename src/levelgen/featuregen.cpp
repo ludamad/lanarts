@@ -98,7 +98,7 @@ static StoreInventory generate_shop_inventory(MTwist& mt, int itemn) {
 		Item item = Item(igc.itemtype, quantity);
 		int cost = mt.rand(item.item_entry().shop_cost.multiply(quantity));
 		if (cost > 0) {
-			inv.add(item, quantity, cost);
+			inv.add(item, cost);
 			i++;
 		}
 	}

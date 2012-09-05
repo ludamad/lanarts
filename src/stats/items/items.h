@@ -1,6 +1,6 @@
 /*
  * items.h:
- *  Define item state. These are defined in terms of a base item, and applied properties.
+ *  Define item state. These are defined in terms of a base item, applied properties, and a quantity.
  */
 
 #ifndef ITEMS_H_
@@ -53,6 +53,7 @@ struct ItemProperties {
 	void deserialize(SerializeBuffer& serializer);
 };
 
+// Defined in terms of a base item, applied properties, and a quantity.
 struct Item {
 	item_id id;
 	ItemProperties properties;
@@ -63,12 +64,16 @@ struct Item {
 	ProjectileEntry& projectile_entry() const;
 	WeaponEntry& weapon_entry() const;
 
-	bool is_normalItem() const;
+	bool is_normal_item() const;
 	bool is_equipment() const;
 	bool is_projectile() const;
 	bool is_weapon() const;
 	bool empty() const {
-		return amount == 0 || id == NO_ITEM;
+		return amount == 0 && id == NO_ITEM;
+	}
+
+	Item with_amount(int new_amount) const {
+		return Item(id, new_amount, properties);
 	}
 
 	void add_copies(int amount) {
@@ -78,18 +83,23 @@ struct Item {
 	void remove_copies(int amount) {
 		this->amount -= amount;
 		LANARTS_ASSERT(this->amount >= 0);
-		if (this->amount == 0){
+		if (this->amount == 0) {
 			clear();
 		}
 	}
+	bool operator==(const Item& item) const;
 
 	void clear() {
 		id = NO_ITEM;
 		properties = ItemProperties();
 	}
 
-	explicit Item(item_id id = NO_ITEM, int amount = 0, ItemProperties properties = ItemProperties()) :
+	explicit Item(item_id id = NO_ITEM, int amount = 1,
+			ItemProperties properties = ItemProperties()) :
 			id(id), properties(properties), amount(amount) {
+		if (id == NO_ITEM) {
+			this->amount = 0;
+		}
 	}
 
 	bool is_same_item(const Item& item) const;
@@ -97,5 +107,9 @@ struct Item {
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
 };
+
+typedef Item Weapon;
+typedef Item Projectile;
+typedef Item Equippable;
 
 #endif /* ITEMS_H_ */

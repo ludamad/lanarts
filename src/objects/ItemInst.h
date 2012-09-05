@@ -6,7 +6,7 @@
 #ifndef ITEMINST_H_
 #define ITEMINST_H_
 
-#include "../stats/items.h"
+#include "../stats/items/items.h"
 
 #include "GameInst.h"
 
@@ -15,11 +15,10 @@ public:
 	enum {
 		RADIUS = 15, DEPTH = 100
 	};
-	ItemInst(const Item& item, int x, int y, int quantity = 1,
-			obj_id dropped_by = 0, bool pickup_by_dropper = false) :
-			GameInst(x, y, RADIUS, false, DEPTH), item(item), quantity(
-					quantity), dropped_by(dropped_by), pickup_by_dropper(
-					pickup_by_dropper) {
+	ItemInst(const Item& item, int x, int y, obj_id dropped_by = 0,
+			bool pickup_by_dropper = false) :
+			GameInst(x, y, RADIUS, false, DEPTH), item(item), dropped_by(
+					dropped_by), pickup_by_dropper(pickup_by_dropper) {
 	}
 	virtual ~ItemInst();
 	virtual void step(GameState* gs);
@@ -31,7 +30,7 @@ public:
 		return item;
 	}
 	int& item_quantity() {
-		return quantity;
+		return item.amount;
 	}
 	obj_id last_held_by() {
 		return dropped_by;
@@ -45,7 +44,6 @@ public:
 
 private:
 	Item item;
-	int quantity;
 	obj_id dropped_by;
 	bool pickup_by_dropper;
 };

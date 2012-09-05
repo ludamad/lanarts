@@ -13,8 +13,8 @@
 #include "../stats/items/ProjectileEntry.h"
 #include "../stats/items/WeaponEntry.h"
 
-#include "../stats/item_data.h"
-#include "../stats/items.h"
+#include "../stats/items/ItemEntry.h"
+#include "../stats/items/items.h"
 
 #include "../stats/spell_data.h"
 
@@ -177,7 +177,7 @@ static void draw_weapon_description_overlay(GameState* gs,
 			COL_PALE_GREEN);
 }
 
-void drawItem_icon_and_name(GameState* gs, ItemEntry& ientry, Colour col,
+void draw_item_icon_and_name(GameState* gs, ItemEntry& ientry, Colour col,
 		int x, int y) {
 	gl_draw_sprite(ientry.item_sprite, x, y);
 	gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE,

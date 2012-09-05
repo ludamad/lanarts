@@ -8,7 +8,7 @@
 
 #include "../objects/ItemInst.h"
 
-#include "../stats/item_data.h"
+#include "../stats/items/ItemEntry.h"
 #include "../stats/itemgen_data.h"
 
 #include "itemgen.h"
@@ -52,8 +52,8 @@ void generate_items(const ItemGenSettings& is, MTwist& mt,
 		int iy = (ipos.y + start_y) * TILE_SIZE + TILE_SIZE / 2;
 
 		const ItemGenChance& igc = generate_item_choice(mt, is.itemgenlist);
-		gs->add_instance(
-				new ItemInst(igc.itemtype, ix, iy, mt.rand(igc.quantity)));
+		int quantity = mt.rand(igc.quantity);
+		gs->add_instance(new ItemInst(Item(igc.itemtype, quantity), ix, iy));
 		level.at(ipos).has_instance = true;
 	}
 }

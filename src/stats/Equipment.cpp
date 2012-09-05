@@ -5,12 +5,13 @@
 
 #include "../serialize/SerializeBuffer.h"
 
+#include "items/ItemEntry.h"
 #include "items/ProjectileEntry.h"
 #include "items/WeaponEntry.h"
+
 #include "items/items.h"
 
 #include "Equipment.h"
-#include "item_data.h"
 
 bool Equipment::valid_to_use_projectile(const Item& proj) {
 	if (proj.empty())
@@ -62,6 +63,9 @@ void Equipment::deequip(int equipment_type) {
 	}
 }
 bool Equipment::valid_to_use(const Item& item) {
+	if (item.is_normal_item()) {
+		return true;
+	}
 	switch (item.equipment_entry().type) {
 	case EquipmentEntry::PROJECTILE:
 		return valid_to_use_projectile(item);
@@ -90,8 +94,8 @@ void Equipment::equip(const Item& item, int amnt) {
 			break;
 		if (!(item.is_same_item(projectile)))
 			deequip_projectiles();
-		item.amount = amnt;
 		projectile = item;
+		projectile.amount = amnt;
 		break;
 	}
 }

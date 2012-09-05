@@ -13,34 +13,27 @@ AttackStats parse_attack_stats(const YAML::Node & n) {
 
 	if (yaml_has_node(n, "weapon")) {
 		name = parse_str(n["weapon"]);
-		ret.weapon = _Weapon(get_weapon_by_name(name.c_str()));
+		ret.weapon = Weapon(get_weapon_by_name(name.c_str()));
 	}
 	if (yaml_has_node(n, "projectile")) {
 		name = parse_str(n["projectile"]);
-		ret.projectile = Item(get_projectile_by_name(name.c_str()));
+		ret.projectile = Projectile(get_projectile_by_name(name.c_str()));
 	}
 	return ret;
 }
 
-static _Item parse_as_item(const YAML::Node& n) {
-	std::string s = parse_str(n);
-	return _Item(_get_item_by_name(s.c_str()));
-}
-static _Weapon parse_as_weapon(const YAML::Node& n) {
-	std::string s = parse_str(n);
-	return _Weapon(get_weapon_by_name(s.c_str()));
-}
-static Item parse_as_projectile(const YAML::Node& n) {
-	std::string s = parse_str(n);
-	return Item(get_projectile_by_name(s.c_str()));
+
+static Item parse_as_item(const YAML::Node& n, const char* key = "item") {
+	std::string s = parse_str(n[key]);
+	int amount = parse_defaulted(n, "amount", 1);
+	return Item(get_item_by_name(s.c_str()), amount);
 }
 
 Inventory parse_inventory(const YAML::Node& n) {
 	Inventory ret;
 	for (int i = 0; i < n.size(); i++) {
 		const YAML::Node& slot = n[i];
-		ret.add(parse_as_item(slot["item"]),
-				parse_defaulted(slot, "amount", 1));
+		ret.add(parse_as_item(slot));
 	}
 	return ret;
 }
@@ -48,12 +41,11 @@ Equipment parse_equipment(const YAML::Node& n) {
 	Equipment ret;
 	ret.inventory = parse_inventory(n["inventory"]);
 	if (yaml_has_node(n, "weapon")) {
-		ret.weapon = parse_as_weapon(n["weapon"]);
+		ret.weapon = parse_as_item(n, "weapon");
 	}
 	if (yaml_has_node(n, "projectile")) {
 		const YAML::Node& pentry = n["projectile"];
-		ret.projectile = parse_as_projectile(pentry["item"]);
-		ret.projectile_amnt = parse_int(pentry["amount"]);
+		ret.projectile = parse_as_item(pentry);
 	}
 	return ret;
 }

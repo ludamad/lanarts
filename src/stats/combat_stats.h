@@ -38,7 +38,8 @@ struct AttackStats {
 	float atk_resist_modifier() const;
 
 	/* members */
-	Item weapon, projectile;
+	Weapon weapon;
+	Projectile projectile;
 };
 
 /* Represents all the stats used by a combat entity */

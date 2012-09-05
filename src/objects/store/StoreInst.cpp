@@ -11,7 +11,7 @@
 
 #include "../../serialize/SerializeBuffer.h"
 
-#include "../../stats/item_data.h"
+#include "../../stats/items/ItemEntry.h"
 #include "../../util/math_util.h"
 #include "../collision_filters.h"
 

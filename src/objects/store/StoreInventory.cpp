@@ -7,8 +7,8 @@
 
 #include "StoreInventory.h"
 
-void StoreInventory::add(const Item & item, int amount, int cost) {
-	StoreItemSlot newslot(item, amount, cost);
+void StoreInventory::add(const Item & item, int cost) {
+	StoreItemSlot newslot(item, cost);
 
 	/* Try to add to new slot */
 	for (int i = 0; i < items.size(); i++) {
@@ -24,7 +24,7 @@ void StoreInventory::add(const Item & item, int amount, int cost) {
 size_t StoreInventory::last_filled_slot() const {
 	int i = max_size() - 1;
 	for (; i >= 0; i--) {
-		if (items[i].amount > 0) {
+		if (!items[i].empty()) {
 			return i + 1;
 		}
 	}

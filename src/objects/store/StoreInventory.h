@@ -8,13 +8,21 @@
 
 #include <vector>
 
-#include "../../stats/items.h"
+#include "../../stats/items/items.h"
 
 struct StoreItemSlot {
 	Item item;
-	int amount, cost;
-	StoreItemSlot(const Item& item = Item(), int amount = 0, int cost = 0) :
-			item(item), amount(amount), cost(cost) {
+	int cost;
+	StoreItemSlot(const Item& item = Item(), int cost = 0) :
+			item(item), cost(cost) {
+	}
+
+	bool empty() const {
+		return item.empty();
+	}
+	void clear() {
+		item.clear();
+		cost = 0;
 	}
 };
 
@@ -25,12 +33,12 @@ public:
 	StoreInventory(int maxsize = 40) :
 			items(maxsize) {
 	}
-	void add(const Item& item, int amount, int cost);
+	void add(const Item& item, int cost);
 	StoreItemSlot& get(int i) {
 		return items.at(i);
 	}
 	bool slot_filled(int i) const {
-		return items.at(i).amount > 0;
+		return !items.at(i).item.empty();
 	}
 	size_t max_size() const {
 		return items.size();

@@ -18,7 +18,7 @@
 
 #include "../stats/items/WeaponEntry.h"
 
-#include "../stats/item_data.h"
+#include "../stats/items/ItemEntry.h"
 #include "../stats/spell_data.h"
 
 #include "../util/math_util.h"

@@ -10,7 +10,7 @@
 #include "../stats/items/ProjectileEntry.h"
 #include "../stats/items/WeaponEntry.h"
 
-#include "../stats/item_data.h"
+#include "../stats/items/ItemEntry.h"
 #include "../stats/spell_data.h"
 
 #include "../lanarts_defines.h"

@@ -153,7 +153,6 @@ set( lanarts_src
 	stats/effects.cpp
 	stats/Equipment.cpp
 	stats/Inventory.cpp
-	stats/items.cpp
 	stats/skills.cpp
 	stats/SpellsKnown.cpp
 	stats/stat_formulas.cpp
@@ -284,9 +283,7 @@ set( lanarts_include
 	stats/EnemiesSeen.h
 	stats/Equipment.h
 	stats/Inventory.h
-	stats/item_data.h
 	stats/itemgen_data.h
-	stats/items.h
 	stats/ItemsKnown.h
 	stats/LuaAction.h
 	stats/skills.h

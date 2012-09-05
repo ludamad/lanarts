@@ -12,7 +12,7 @@
 #include "class_data.h"
 #include "combat_stats.h"
 
-#include "items.h"
+#include "items/items.h"
 
 #include "stat_formulas.h"
 
@@ -93,7 +93,7 @@ int CombatStats::gain_xp(int amnt) {
 }
 
 bool AttackStats::is_ranged() const {
-	return projectile.valid_projectile()
+	return !projectile.empty()
 			|| weapon.weapon_entry().uses_projectile;
 }
 
@@ -103,7 +103,7 @@ WeaponEntry& AttackStats::weapon_entry() const {
 
 ProjectileEntry& AttackStats::projectile_entry() const {
 	LANARTS_ASSERT(is_ranged());
-	LANARTS_ASSERT(projectile.valid_projectile());
+	LANARTS_ASSERT(!projectile.empty());
 	return projectile.projectile_entry();
 
 //	int created = weapon.weapon_entry().created_projectile;
@@ -112,7 +112,7 @@ ProjectileEntry& AttackStats::projectile_entry() const {
 }
 
 int AttackStats::atk_cooldown() const {
-	if (projectile.valid_projectile()) {
+	if (!projectile.empty()) {
 		return projectile.projectile_entry().cooldown();
 	}
 	return weapon.weapon_entry().cooldown();
@@ -125,18 +125,18 @@ static bool is_compatible_projectile(WeaponEntry& wentry,
 }
 int AttackStats::atk_damage(MTwist& mt, const EffectiveStats& stats) const {
 	const CoreStats& core = stats.core;
-	bool hasprojectile = projectile.valid_projectile();
+	bool has_projectile = !projectile.empty();
 	WeaponEntry& wentry = weapon.weapon_entry();
 	int dmg = 0;
 
-	if (!hasprojectile
+	if (!has_projectile
 			|| is_compatible_projectile(wentry, projectile.projectile_entry())) {
 		const DamageStats& dmgmod = wentry.attack.damage_modifiers;
 		dmg += dmgmod.damage_stats.calculate(mt, core);
 		dmg += round(dmgmod.magic_percentage * stats.magic.damage);
 		dmg += round(dmgmod.physical_percentage * stats.physical.damage);
 	}
-	if (hasprojectile) {
+	if (has_projectile) {
 		ProjectileEntry& pentry = projectile.projectile_entry();
 		dmg += projectile.projectile_entry().damage_stats().calculate(mt, core);
 		if (!is_compatible_projectile(wentry, pentry)) {
@@ -149,11 +149,11 @@ int AttackStats::atk_damage(MTwist& mt, const EffectiveStats& stats) const {
 
 int AttackStats::atk_power(MTwist& mt, const EffectiveStats& stats) const {
 	const CoreStats& core = stats.core;
-	bool hasprojectile = projectile.valid_projectile();
+	bool has_projectile = !projectile.empty();
 	WeaponEntry& wentry = weapon.weapon_entry();
 	int pow = 0;
 
-	if (!hasprojectile
+	if (!has_projectile
 			|| is_compatible_projectile(wentry, projectile.projectile_entry())) {
 		WeaponEntry& wentry = weapon.weapon_entry();
 		const DamageStats& dmgmod = wentry.attack.damage_modifiers;
@@ -161,7 +161,7 @@ int AttackStats::atk_power(MTwist& mt, const EffectiveStats& stats) const {
 		pow += round(dmgmod.magic_percentage * stats.magic.power);
 		pow += round(dmgmod.physical_percentage * stats.physical.power);
 	}
-	if (hasprojectile) {
+	if (has_projectile) {
 		ProjectileEntry& pentry = projectile.projectile_entry();
 		pow += projectile.projectile_entry().power_stats().calculate(mt, core);
 		if (!is_compatible_projectile(wentry, pentry)) {
@@ -173,7 +173,7 @@ int AttackStats::atk_power(MTwist& mt, const EffectiveStats& stats) const {
 }
 
 float AttackStats::atk_percentage_magic() const {
-	if (weapon.id > 0 || !projectile.valid_projectile()) {
+	if (weapon.id > 0 || projectile.empty()) {
 		WeaponEntry& wentry = weapon.weapon_entry();
 		DamageStats& dmgmod = wentry.attack.damage_modifiers;
 		return dmgmod.magic_percentage;
@@ -182,7 +182,7 @@ float AttackStats::atk_percentage_magic() const {
 }
 
 float AttackStats::atk_percentage_physical() const {
-	if (weapon.id > 0 || !projectile.valid_projectile()) {
+	if (weapon.id > 0 || projectile.empty()) {
 		WeaponEntry& wentry = weapon.weapon_entry();
 		DamageStats& dmgmod = wentry.attack.damage_modifiers;
 		return dmgmod.physical_percentage;
@@ -191,7 +191,7 @@ float AttackStats::atk_percentage_physical() const {
 }
 
 float AttackStats::atk_resist_modifier() const {
-	if (weapon.id > 0 || !projectile.valid_projectile()) {
+	if (weapon.id > 0 || projectile.empty()) {
 		WeaponEntry& wentry = weapon.weapon_entry();
 		DamageStats& dmgmod = wentry.attack.damage_modifiers;
 		return dmgmod.resistability;

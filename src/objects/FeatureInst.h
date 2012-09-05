@@ -7,7 +7,7 @@
 #ifndef FEATUREINST_H_
 #define FEATUREINST_H_
 
-#include "../stats/items.h"
+#include "../stats/items/items.h"
 
 #include "GameInst.h"
 

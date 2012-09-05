@@ -187,8 +187,7 @@ tileset_id tileset_from_lua(lua_State* L, int idx) {
 }
 
 LuaValue lua_sprites, lua_armours, lua_enemies, lua_effects, lua_weapons,
-		_lua_projectiles, lua_projectiles, _lua_items, lua_items, lua_dungeon,
-		lua_classes, lua_spells;
+		lua_projectiles, lua_items, lua_dungeon, lua_classes, lua_spells;
 
 LuaValue lua_settings;
 
@@ -204,20 +203,16 @@ GameSettings init_game_data(lua_State* L) {
 	load_tileset_data(dfiles.tileset_files);
 
 	// --- ITEM DATA ---
-	_lua_items = _load_item_data(L, dfiles.item_files);
 	lua_items = load_item_data(L, dfiles.item_files); //new
 
 	lua_projectiles = load_projectile_data(L, dfiles.projectile_files,
-			_lua_items); //new
-	_load_projectile_item_entries();
+			lua_items);
 
 	lua_spells = load_spell_data(L, dfiles.spell_files);
 
-	load_weapon_data(L, dfiles.weapon_files, &_lua_items); //new
-	_load_weapon_item_entries();
+	load_weapon_data(L, dfiles.weapon_files, &lua_items);
 
-	load_equipment_data(L, dfiles.armour_files, &_lua_items);
-	_load_armour_item_entries();
+	load_equipment_data(L, dfiles.armour_files, &lua_items);
 	// --- ITEM DATA ---
 
 	lua_effects = load_effect_data(L, dfiles.effect_files);
@@ -253,8 +248,8 @@ void init_lua_data(GameState* gs, lua_State* L) {
 	register_as_global(L, lua_enemies, "enemies");
 	register_as_global(L, lua_effects, "effects");
 //	register_as_global(L, weapons, "weapons");
-	register_as_global(L, _lua_items, "items");
-	register_as_global(L, _lua_projectiles, "projectiles");
+	register_as_global(L, lua_items, "items");
+	register_as_global(L, lua_projectiles, "projectiles");
 	register_as_global(L, lua_spells, "spells");
 //	register_as_global(L, sprites, "sprites");
 //	register_as_global(L, dungeon, "dungeon");
@@ -283,14 +278,18 @@ static void luayaml_push(LuaValue& value, lua_State* L, const char* name) {
 }
 void luayaml_push_item(lua_State* L, const char* name) {
 	luayaml_push(lua_items, L, name);
+	LANARTS_ASSERT(!lua_isnil(L, -1));
 }
 void luayaml_push_sprites(lua_State* L, const char* name) {
 	luayaml_push(lua_sprites, L, name);
+	LANARTS_ASSERT(!lua_isnil(L, -1));
 }
 void luayaml_push_enemies(lua_State* L, const char* name) {
 	luayaml_push(lua_enemies, L, name);
+	LANARTS_ASSERT(!lua_isnil(L, -1));
 }
 
 void luayaml_push_levelinfo(lua_State* L, const char* name) {
 	luayaml_push(lua_dungeon, L, name);
+	LANARTS_ASSERT(!lua_isnil(L, -1));
 }

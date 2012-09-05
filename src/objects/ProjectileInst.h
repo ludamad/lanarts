@@ -7,7 +7,7 @@
 
 #include <cstdlib>
 
-#include "../stats/items.h"
+#include "../stats/items/items.h"
 #include "../stats/stats.h"
 
 #include "../util/callback_util.h"

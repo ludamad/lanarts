@@ -11,7 +11,7 @@
 #include "../../gamestate/GameState.h"
 #include "../../objects/player/PlayerInst.h"
 
-#include "../../stats/item_data.h"
+#include "../../stats/items/ItemEntry.h"
 
 #include "../console_description_draw.h"
 

@@ -5,7 +5,7 @@
 
 #include "../display/sprite_data.h"
 #include "../gamestate/GameState.h"
-#include "../stats/item_data.h"
+#include "../stats/items/ItemEntry.h"
 #include "ItemInst.h"
 #include "collision_filters.h"
 #include <typeinfo>
@@ -17,7 +17,8 @@ static bool same_item_colfilter(GameInst* self, GameInst* other) {
 	LANARTS_ASSERT(dynamic_cast<ItemInst*>(self));
 	ItemInst* other_item = dynamic_cast<ItemInst*>(other);
 	return other_item
-			&& ((ItemInst*)self)->item_type() == other_item->item_type();
+			&& ((ItemInst*)self)->item_type().is_same_item(
+					other_item->item_type());
 }
 void ItemInst::step(GameState *gs) {
 	GameInst* other_item = NULL;
@@ -25,9 +26,9 @@ void ItemInst::step(GameState *gs) {
 	if (ientry.stackable
 			&& gs->object_radius_test(this, &other_item, 1, same_item_colfilter)) {
 		ItemInst* oinst = (ItemInst*)other_item;
-		if (oinst->item == item && id < oinst->id) {
+		if (oinst->item.is_same_item(item) && id < oinst->id) {
 			gs->remove_instance(oinst);
-			quantity += oinst->item_quantity();
+			item.amount += oinst->item_quantity();
 		}
 	}
 }
@@ -47,9 +48,9 @@ void ItemInst::draw(GameState* gs) {
 		return;
 
 	gl_draw_sprite(view, ientry.item_sprite, xx, yy, 0, 0, gs->frame());
-	if (ientry.stackable && quantity > 1) {
+	if (ientry.stackable && item_quantity() > 1) {
 		gl_printf(gs->primary_font(), Colour(255, 255, 255), xx - view.x + 1,
-				yy - view.y + 1, "%d", quantity);
+				yy - view.y + 1, "%d", item_quantity());
 	}
 }
 
@@ -65,7 +66,6 @@ ItemInst *ItemInst::clone() const {
 void ItemInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	GameInst::serialize(gs, serializer);
 	item.serialize(serializer);
-	serializer.write(quantity);
 	serializer.write(dropped_by);
 	serializer.write(pickup_by_dropper);
 }
@@ -73,7 +73,6 @@ void ItemInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 void ItemInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	GameInst::deserialize(gs, serializer);
 	item.deserialize(serializer);
-	serializer.read(quantity);
 	serializer.read(dropped_by);
 	serializer.read(pickup_by_dropper);
 }

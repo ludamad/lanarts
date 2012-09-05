@@ -7,7 +7,7 @@ extern "C" {
 #include "../../data/game_data.h"
 #include "../../data/yaml_util.h"
 
-#include "../item_data.h"
+#include "../items/ItemEntry.h"
 
 #include "load_stats.h"
 

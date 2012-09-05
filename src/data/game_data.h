@@ -23,7 +23,7 @@
 
 #include "../stats/class_data.h"
 #include "../stats/effect_data.h"
-#include "../stats/item_data.h"
+#include "../stats/items/ItemEntry.h"
 #include "../stats/itemgen_data.h"
 #include "../stats/spell_data.h"
 

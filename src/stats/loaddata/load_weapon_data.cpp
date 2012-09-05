@@ -8,7 +8,7 @@ extern "C" {
 
 #include "../items/WeaponEntry.h"
 
-#include "../item_data.h"
+#include "../items/ItemEntry.h"
 
 #include "load_stats.h"
 

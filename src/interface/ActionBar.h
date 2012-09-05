@@ -12,7 +12,7 @@
 
 #include "../gamestate/GameAction.h"
 
-#include "../stats/items.h"
+#include "../stats/items/items.h"
 
 class GameState;
 

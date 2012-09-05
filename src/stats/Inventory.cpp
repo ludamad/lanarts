@@ -5,9 +5,10 @@
 
 #include "../serialize/SerializeBuffer.h"
 
+#include "items/ItemEntry.h"
+
 #include "Inventory.h"
 
-#include "item_data.h"
 
 bool Inventory::add(const Item& item) {
 	ItemEntry& ientry = item.item_entry();

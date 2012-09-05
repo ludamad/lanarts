@@ -16,7 +16,7 @@ extern "C" {
 
 #include "../../lua/lua_api.h"
 
-#include "../../stats/item_data.h"
+#include "../../stats/items/ItemEntry.h"
 
 #include "../../stats/items/ProjectileEntry.h"
 #include "../../stats/items/WeaponEntry.h"
@@ -241,10 +241,10 @@ static bool lua_spell_check_prereq(GameState* gs, PlayerInst* p,
 }
 
 static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
-		SpellEntry& spl_entry, const Item& projectile,
+		SpellEntry& spl_entry, const Projectile& projectile,
 		const Pos& target) {
 	MTwist& mt = gs->rng();
-	AttackStats projectile_attack(_Weapon(), projectile);
+	AttackStats projectile_attack(Weapon(), projectile);
 	ProjectileEntry& pentry = projectile.projectile_entry();
 	bool wallbounce = pentry.can_wall_bounce;
 	int nbounces = pentry.number_of_target_bounces;
@@ -271,7 +271,7 @@ static void player_use_spell(GameState* gs, PlayerInst* p,
 
 void PlayerInst::enqueue_not_enough_mana_actions(GameState* gs) {
 	const int AUTOUSE_MANA_POTION_CNT = 2;
-	int item_slot = inventory().find_slot(_get_item_by_name("Mana Potion"));
+	int item_slot = inventory().find_slot(get_item_by_name("Mana Potion"));
 	if (gs->game_settings().autouse_mana_potions
 			&& autouse_mana_potion_try_count >= AUTOUSE_MANA_POTION_CNT
 			&& item_slot != -1) {
@@ -530,7 +530,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 	if (equipment().has_projectile()) {
 		const Item& projectile = equipment().projectile;
 		ProjectileEntry& pentry = projectile.projectile_entry();
-		item_id item = _get_item_by_name(pentry.name.c_str());
+		item_id item = get_item_by_name(pentry.name.c_str());
 		int weaprange = std::max(wentry.range(), pentry.range());
 
 		AttackStats weaponattack(weapon());

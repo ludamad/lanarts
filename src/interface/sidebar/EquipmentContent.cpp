@@ -14,7 +14,7 @@
 
 #include "../../stats/items/WeaponEntry.h"
 
-#include "../../stats/item_data.h"
+#include "../../stats/items/ItemEntry.h"
 
 #include "../console_description_draw.h"
 

@@ -11,7 +11,6 @@
 #include "Inventory.h"
 
 #include "items/items.h"
-#include "items.h"
 
 class Equipment {
 public:
@@ -42,7 +41,9 @@ public:
 	void deserialize(SerializeBuffer& serializer);
 
 	Inventory inventory;
-	Item weapon, projectile, armour;
+	Weapon weapon;
+	Projectile projectile;
+	Item armour;
 	money_t money;
 };
 

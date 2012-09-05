@@ -10,7 +10,7 @@
 
 #include "../gamestate/GameState.h"
 #include "../gamestate/GameTiles.h"
-#include "../stats/item_data.h"
+#include "../stats/items/ItemEntry.h"
 
 #include "../util/math_util.h"
 #include "FeatureInst.h"

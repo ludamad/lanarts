@@ -13,7 +13,7 @@
 
 #include "../../objects/store/StoreInst.h"
 
-#include "../../stats/item_data.h"
+#include "../../stats/items/ItemEntry.h"
 #include "../console_description_draw.h"
 
 #include "StoreContent.h"
@@ -29,13 +29,14 @@ static void draw_slot_cost(GameState* gs, money_t cost, int x, int y) {
 
 static void draw_store_inventory_slot(GameState* gs, StoreItemSlot& itemslot,
 		int x, int y) {
-	if (itemslot.amount > 0) {
+	if (!itemslot.empty()) {
 		ItemEntry& ientry = itemslot.item.item_entry();
 		GLimage& itemimg = ientry.item_image();
 		gl_draw_image(itemimg, x, y);
-		if (ientry.stackable && itemslot.amount > 1) {
+		int amnt = itemslot.item.amount;
+		if (ientry.stackable && amnt > 1) {
 			gl_printf(gs->primary_font(), Colour(255, 255, 255), x + 1, y + 1,
-					"%d", itemslot.amount);
+					"%d", amnt);
 		}
 		draw_slot_cost(gs, itemslot.cost, x, y);
 	}
@@ -67,7 +68,7 @@ static void draw_store_inventory(GameState* gs, StoreInventory& inv,
 				draw_store_inventory_slot(gs, itemslot, x, y);
 			BBox slotbox(x, y, x + TILE_SIZE, y + STORE_SLOT_H);
 			Colour outline(COL_UNFILLED_OUTLINE);
-			if (itemslot.amount > 0 && slot != slot_selected) {
+			if (!itemslot.empty() && slot != slot_selected) {
 				outline = COL_FILLED_OUTLINE;
 				if (slotbox.contains(mx, my)) {
 					outline = COL_PALE_YELLOW;
@@ -125,7 +126,7 @@ bool StoreContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	if (gs->mouse_left_click() && within_inventory) {
 
 		int slot = get_itemslotn(inv, bbox, mx, my);
-		if (slot >= 0 && slot < INVENTORY_SIZE && inv.get(slot).amount > 0) {
+		if (slot >= 0 && slot < INVENTORY_SIZE && !inv.get(slot).empty()) {
 			if (p->gold() >= inv.get(slot).cost) {
 				queued_actions.push_back(
 						game_action(gs, p, GameAction::PURCHASE_FROM_STORE,

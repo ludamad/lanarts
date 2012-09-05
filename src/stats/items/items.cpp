@@ -23,8 +23,7 @@ bool ItemProperties::operator ==(const ItemProperties& properties) const {
 			sizeof(StatModifiers) != 0)) {
 		return false;
 	}
-	if (memcmp(&properties.damage, &this->damage,
-			sizeof(DamageStats) != 0)) {
+	if (memcmp(&properties.damage, &this->damage, sizeof(DamageStats) != 0)) {
 		return false;
 	}
 	if (properties.effect_modifiers.status_effects
@@ -62,18 +61,18 @@ ItemEntry& Item::item_entry() const {
 }
 
 EquipmentEntry& Item::equipment_entry() const {
-	return dynamic_cast<EquipmentEntry&>(item_entry());
+	return get_equipment_entry(id);
 }
 
 ProjectileEntry& Item::projectile_entry() const {
-	return dynamic_cast<ProjectileEntry&>(item_entry());
+	return get_projectile_entry(id);
 }
 
 WeaponEntry& Item::weapon_entry() const {
-	return dynamic_cast<WeaponEntry&>(item_entry());
+	return get_weapon_entry(id);
 }
 
-bool Item::is_normalItem() const {
+bool Item::is_normal_item() const {
 	ItemEntry* item_entry = game_item_data.at(id);
 	return (dynamic_cast<EquipmentEntry*>(item_entry) == NULL);
 }
@@ -101,6 +100,10 @@ void Item::serialize(SerializeBuffer & serializer) {
 	serializer.write_int(id);
 	serializer.write_int(amount);
 	properties.serialize(serializer);
+}
+
+bool Item::operator ==(const Item & item) const {
+	return is_same_item(item) && amount == item.amount;
 }
 
 void Item::deserialize(SerializeBuffer & serializer) {
