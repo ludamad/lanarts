@@ -1,9 +1,9 @@
 #Online settings
-username: SETME
+username: User
 
 #Window settings
 fullscreen: no
-regen_level_on_death: yes
+regen_level_on_death: no
 view_width: 800
 view_height: 600
 

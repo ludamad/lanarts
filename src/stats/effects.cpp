@@ -97,7 +97,6 @@ void EffectStats::process(GameState* gs, CombatGameInst* inst,
 		if (effects[i].t_remaining > 0) {
 			game_effect_data.at(effects[i].effectid).stat_func.push(L);
 			if (!lua_isnil(L, -1)) {
-				printf("EFFECT\n");
 				effects[i].state.push(L);
 				lua_push_gameinst(L, inst);
 
