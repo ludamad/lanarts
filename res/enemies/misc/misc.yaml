@@ -77,9 +77,9 @@ enemies:
       attacks: [ {weapon: Fast Melee} ]
       hp: 10
       hpregen: 0.05
-      movespeed: 2
-      strength: 4
-      defence: 2
+      movespeed: 1
+      strength: 3
+      defence: 1
       willpower: 3
 
   - name: Red Slime
@@ -94,7 +94,7 @@ enemies:
       attacks: [ {weapon: Fast Melee} ]
       hp: 25
       hpregen: 0.1
-      movespeed: 3
-      strength: 7
-      defence: 5
+      movespeed: 1
+      strength: 6
+      defence: 4
       willpower: 6
