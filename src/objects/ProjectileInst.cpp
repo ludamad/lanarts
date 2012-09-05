@@ -52,7 +52,7 @@ void ProjectileInst::draw(GameState* gs) {
 }
 
 void ProjectileInst::deinit(GameState* gs) {
-	_ProjectileEntry& pentry = projectile.projectile_entry();
+	ProjectileEntry& pentry = projectile.projectile_entry();
 	int break_roll = gs->rng().rand(100);
 	if (pentry.drop_chance > break_roll) {
 		int nx = round_to_multiple(x, TILE_SIZE, true), ny = round_to_multiple(
@@ -144,7 +144,7 @@ void ProjectileInst::step(GameState* gs) {
 			}
 
 			lua_hit_callback(gs->get_luastate(),
-					projectile.projectile_entry().on_hit_func, atkstats, this,
+					projectile.projectile_entry().action_func(), atkstats, this,
 					victim);
 
 			int damage = damage_formula(atkstats, victim->effective_stats());
@@ -184,7 +184,7 @@ void ProjectileInst::step(GameState* gs) {
 			}
 
 			lua_hit_callback(gs->get_luastate(),
-					projectile.projectile_entry().on_hit_func, atkstats, this,
+					projectile.projectile_entry().action_func(), atkstats, this,
 					victim);
 
 			int damage = damage_formula(atkstats, victim->effective_stats());
@@ -240,8 +240,8 @@ void ProjectileInst::step(GameState* gs) {
 }
 
 sprite_id ProjectileInst::sprite() const {
-	_ProjectileEntry& pentry = projectile.projectile_entry();
-	return pentry.attack_sprite;
+	ProjectileEntry& pentry = projectile.projectile_entry();
+	return pentry.attack_sprite();
 }
 
 void ProjectileInst::serialize(GameState* gs, SerializeBuffer& serializer) {

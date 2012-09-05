@@ -172,7 +172,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 			draw_console_item_description(gs, projectile.as_item());
 		}
 
-		_ProjectileEntry& ptype = projectile.projectile_entry();
+		ProjectileEntry& ptype = projectile.projectile_entry();
 		gl_draw_image(game_sprite_data[ptype.item_sprite].img(), x + TILE_SIZE,
 				y);
 		/* Draw projectile amount */

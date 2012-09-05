@@ -149,7 +149,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 	WeaponEntry& wentry = weapon.weapon_entry();
 	if (wentry.name != "none") {
 		gs->add_instance(
-				new AnimatedInst(inst->pos(), wentry.attack.attack_sprite, 25));
+				new AnimatedInst(inst->pos(), wentry.attack_sprite(), 25));
 	}
 
 	signal_attacked_successfully();
@@ -164,7 +164,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 	MTwist& mt = gs->rng();
 
 	WeaponEntry& wentry = weapon.weapon_entry();
-	_ProjectileEntry& pentry = projectile.projectile_entry();
+	ProjectileEntry& pentry = projectile.projectile_entry();
 	AttackStats attack;
 	if (!pentry.is_unarmed()) {
 		attack.weapon = weapon;
@@ -182,9 +182,9 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 	}
 
 	GameInst* bullet = new ProjectileInst(projectile, atkstats, id, Pos(x, y),
-			p, pentry.speed, pentry.range);
+			p, pentry.speed, pentry.range());
 	gs->add_instance(bullet);
-	cooldowns().reset_action_cooldown(pentry.cooldown);
+	cooldowns().reset_action_cooldown(pentry.cooldown());
 	cooldowns().action_cooldown += gs->rng().rand(-4, 5);
 	return false;
 }
@@ -288,8 +288,8 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 }
 
 void CombatGameInst::update_position() {
-	x = (int) round(rx); //update based on rounding of true float
-	y = (int) round(ry);
+	x = (int)round(rx); //update based on rounding of true float
+	y = (int)round(ry);
 }
 
 void CombatGameInst::update_position(float newx, float newy) {
@@ -326,7 +326,7 @@ static void combine_stat_hash(unsigned int& hash, CombatStats& stats) {
 }
 unsigned int CombatGameInst::integrity_hash() {
 	unsigned int hash = GameInst::integrity_hash();
-	combine_hash(hash, (unsigned int&) vx, (unsigned int&) vy);
+	combine_hash(hash, (unsigned int&)vx, (unsigned int&)vy);
 	combine_stat_hash(hash, stats());
 	return hash;
 }

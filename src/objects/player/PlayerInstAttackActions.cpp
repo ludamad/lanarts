@@ -243,13 +243,13 @@ static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
 		const Pos& target) {
 	MTwist& mt = gs->rng();
 	AttackStats projectile_attack(_Weapon(), projectile);
-	_ProjectileEntry& pentry = projectile.projectile_entry();
+	ProjectileEntry& pentry = projectile.projectile_entry();
 	bool wallbounce = pentry.can_wall_bounce;
 	int nbounces = pentry.number_of_target_bounces;
 
 	GameInst* pinst = new ProjectileInst(projectile,
 			p->effective_atk_stats(mt, projectile_attack), p->id,
-			Pos(p->x, p->y), target, pentry.speed, pentry.range, NONE,
+			Pos(p->x, p->y), target, pentry.speed, pentry.range(), NONE,
 			wallbounce, nbounces);
 	gs->add_instance(pinst);
 }
@@ -527,9 +527,9 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 
 	if (equipment().has_projectile()) {
 		const _Projectile& projectile = equipment().projectile;
-		_ProjectileEntry& pentry = projectile.projectile_entry();
+		ProjectileEntry& pentry = projectile.projectile_entry();
 		item_id item = _get_item_by_name(pentry.name.c_str());
-		int weaprange = std::max(wentry.range(), pentry.range);
+		int weaprange = std::max(wentry.range(), pentry.range());
 
 		AttackStats weaponattack(weapon());
 
@@ -537,7 +537,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		int nbounces = 0;
 		float movespeed = pentry.speed;
 
-		cooldown = std::max(wentry.cooldown(), pentry.cooldown);
+		cooldown = std::max(wentry.cooldown(), pentry.cooldown());
 
 		//XXX: Horrible hack REMOVE THIS LATER
 		if (class_stats().class_type().name == "Archer"
@@ -586,8 +586,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 
 		for (int i = 0; i < numhit; i++) {
 			EnemyInst* e = (EnemyInst*)enemies[i];
-			lua_hit_callback(gs->get_luastate(),
-					wentry.attack.attack_action.action_func, this, e);
+			lua_hit_callback(gs->get_luastate(), wentry.action_func(), this, e);
 			if (attack(gs, e, AttackStats(equipment().weapon))) {
 				PlayerData& pc = gs->player_data();
 				signal_killed_enemy();

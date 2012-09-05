@@ -11,19 +11,38 @@
 
 class Attack {
 public:
-	DamageModifiers damage;
-
-	int range, cooldown;
-	sprite_id attack_sprite;
-	LuaAction attack_action;
-
 	Attack() :
 			range(0), cooldown(0), attack_sprite(-1) {
+	}
+
+	CoreStatMultiplier& damage_stats() {
+		return damage_modifiers.damage_stats;
+	}
+
+	CoreStatMultiplier& power_stats() {
+		return damage_modifiers.power_stats;
+	}
+
+	float magic_percentage() {
+		return damage_modifiers.magic_percentage;
+	}
+	float physical_percentage() {
+		return damage_modifiers.physical_percentage;
+	}
+
+	float resistability() {
+		return damage_modifiers.resistability;
 	}
 
 	void init(lua_State* L) {
 		attack_action.init(L);
 	}
+
+	DamageStats damage_modifiers;
+
+	int range, cooldown;
+	sprite_id attack_sprite;
+	LuaAction attack_action;
 };
 
 #endif /* ATTACK_H_ */

@@ -37,8 +37,6 @@ LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 void load_weapon_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemstable = NULL); //new
 LuaValue load_spell_data(lua_State* L, const FilenameList& filenames);
-LuaValue _load_projectile_data(lua_State* L, const FilenameList& filenames,
-		LuaValue& itemstable);
 void _load_armour_item_entries();
 void _load_projectile_item_entries();
 void _load_weapon_item_entries();
@@ -60,7 +58,6 @@ std::vector<_ItemEntry> _game_item_data;
 std::vector<ItemGenList> game_itemgenlist_data;
 std::vector<TileEntry> game_tile_data;
 std::vector<TilesetEntry> game_tileset_data;
-std::vector<_ProjectileEntry> game_projectile_data;
 std::vector<ScriptObjectEntry> game_scriptobject_data;
 std::vector<SpellEntry> game_spell_data;
 std::vector<SpriteEntry> game_sprite_data;
@@ -110,7 +107,7 @@ const char* equip_type_description(const _ItemEntry& ientry) {
 	case _ItemEntry::WEAPON:
 		return "Weapon";
 	case _ItemEntry::PROJECTILE: {
-		_ProjectileEntry& pentry = game_projectile_data.at(ientry.equipment_id);
+		ProjectileEntry& pentry = get_projectile_entry(ientry.equipment_id);
 		if (pentry.is_unarmed()) {
 			return "Unarmed Projectile";
 		} else {
@@ -153,9 +150,6 @@ itemgenlist_id get_itemgenlist_by_name(const char* name,
 		bool error_if_not_found) {
 	return get_X_by_name(game_itemgenlist_data, name, error_if_not_found);
 }
-projectile_id get_projectile_by_name(const char* name) {
-	return get_X_by_name(game_projectile_data, name);
-}
 
 tileset_id get_tileset_by_name(const char* name) {
 	return get_X_by_name(game_tileset_data, name);
@@ -187,7 +181,7 @@ enemy_id enemy_from_lua(lua_State* L, int idx) {
 	return get_X_by_name(game_enemy_data, lua_tostring(L, idx));
 }
 projectile_id projectile_from_lua(lua_State* L, int idx) {
-	return get_X_by_name(game_projectile_data, lua_tostring(L, idx));
+	return get_projectile_by_name(lua_tostring(L, idx));
 }
 weapon_id weapon_from_lua(lua_State* L, int idx) {
 	return get_weapon_by_name(lua_tostring(L, idx));
@@ -217,11 +211,10 @@ GameSettings init_game_data(lua_State* L) {
 	_lua_items = _load_item_data(L, dfiles.item_files);
 	lua_items = load_item_data(L, dfiles.item_files); //new
 
-	_lua_projectiles = _load_projectile_data(L, dfiles.projectile_files,
-			_lua_items);
 	lua_projectiles = load_projectile_data(L, dfiles.projectile_files,
-			lua_items); //new
+			_lua_items); //new
 	_load_projectile_item_entries();
+
 
 	lua_spells = load_spell_data(L, dfiles.spell_files);
 
@@ -278,7 +271,6 @@ void init_lua_data(GameState* gs, lua_State* L) {
 
 	__lua_init(L, game_enemy_data);
 	__lua_init(L, game_effect_data);
-	__lua_init(L, game_projectile_data);
 	__lua_init(L, _game_item_data);
 	__lua_init(L, game_spell_data);
 

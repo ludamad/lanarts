@@ -49,7 +49,7 @@ static bool is_wieldable_projectile(Equipment& equipment, const _Item& item) {
 		return true;
 
 	if (item.is_projectile()) {
-		_ProjectileEntry& pentry = item.projectile_entry();
+		ProjectileEntry& pentry = item.projectile_entry();
 		if (pentry.weapon_class == "unarmed")
 			return false;
 	}

@@ -23,6 +23,17 @@ public:
 	}
 	virtual ~EquipmentEntry() {
 	}
+
+	CoreStats& core_stat_modifier() {
+		return stat_modifiers.core_mod;
+	}
+	DamageStats& damage_modifier() {
+		return stat_modifiers.damage_mod;
+	}
+	ArmourStats& armour_modifier() {
+		return stat_modifiers.armour_mod;
+	}
+
 	equip_type type;
 	// Stat modifiers while wearing this equipment
 	StatModifiers stat_modifiers;
@@ -30,5 +41,8 @@ public:
 	// Status effects from wearing this armour
 	StatusEffectModifiers effect_modifiers;
 };
+
+equipment_id get_equipment_by_name(const char* name);
+EquipmentEntry& get_equipment_entry(projectile_id id);
 
 #endif /* EQUIPMENTENTRY_H_ */

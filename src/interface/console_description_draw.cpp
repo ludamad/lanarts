@@ -102,7 +102,7 @@ static void draw_projectile_description_overlay(GameState* gs,
 	PlayerInst* p = gs->local_player();
 	EffectiveStats& estats = p->effective_stats();
 
-	_ProjectileEntry& pentry = projectile.projectile_entry();
+	ProjectileEntry& pentry = projectile.projectile_entry();
 	GameTextConsole& console = gs->game_console();
 
 	BBox bbox(console.bounding_box());
@@ -120,18 +120,18 @@ static void draw_projectile_description_overlay(GameState* gs,
 
 	//Second row
 	draw_statmult_with_prefix(gs, is_unarmed ? "Damage: " : "Damage Bonus: ",
-			pentry.damage, estats.core, stat_x, stat_sy + interval_y);
+			pentry.damage_stats(), estats.core, stat_x, stat_sy + interval_y);
 	draw_statmult_with_prefix(gs, is_unarmed ? "Power: " : "Power Bonus: ",
-			pentry.power, estats.core, stat_x + interval_x,
+			pentry.power_stats(), estats.core, stat_x + interval_x,
 			stat_sy + interval_y);
 
 	//Third row
 	if (is_unarmed) {
 		draw_stat_with_prefix(gs, "Cooldown: ",
-				cooldown_override > -1 ? cooldown_override : pentry.cooldown,
+				cooldown_override > -1 ? cooldown_override : pentry.cooldown(),
 				stat_x, stat_sy + interval_y * 2);
 		draw_descript_with_prefix(gs, "Range: ",
-				range_description(pentry.range), stat_x + interval_x,
+				range_description(pentry.range()), stat_x + interval_x,
 				stat_sy + interval_y * 2, COL_PALE_YELLOW, COL_PALE_GREEN);
 	}
 }
@@ -157,24 +157,24 @@ static void draw_weapon_description_overlay(GameState* gs,
 //			stat_sy, COL_PALE_YELLOW, COL_PALE_GREEN);
 
 //Second row
-	draw_statmult_with_prefix(gs, "Damage: ", wentry.attack.damage.damage,
+	draw_statmult_with_prefix(gs, "Damage: ", wentry.damage_stats(),
 			estats.core, stat_x, stat_sy + interval_y);
-	draw_statmult_with_prefix(gs, "Power: ", wentry.attack.damage.power,
-			estats.core, stat_x + interval_x, stat_sy + interval_y);
+	draw_statmult_with_prefix(gs, "Power: ", wentry.power_stats(), estats.core,
+			stat_x + interval_x, stat_sy + interval_y);
 
 	// Damage penetration
-	int piercing = round(100 - wentry.attack.damage.resistability * 100);
+	int piercing = round(100 - wentry.resistability() * 100);
 	Colour statcol = piercing < 0 ? COL_PALE_RED : COL_PALE_GREEN;
 	draw_stat_with_formatted_prefix(gs, "Piercing: ", "%d%%", piercing,
 			stat_x + interval_x * 2, stat_sy + interval_y, COL_PALE_YELLOW,
 			statcol);
 
 	//Third row
-	draw_stat_with_prefix(gs, "Cooldown: ", wentry.attack.cooldown, stat_x,
+	draw_stat_with_prefix(gs, "Cooldown: ", wentry.cooldown(), stat_x,
 			stat_sy + interval_y * 2);
-	draw_descript_with_prefix(gs, "Range: ",
-			range_description(wentry.attack.range), stat_x + interval_x,
-			stat_sy + interval_y * 2, COL_PALE_YELLOW, COL_PALE_GREEN);
+	draw_descript_with_prefix(gs, "Range: ", range_description(wentry.range()),
+			stat_x + interval_x, stat_sy + interval_y * 2, COL_PALE_YELLOW,
+			COL_PALE_GREEN);
 }
 
 void draw_item_icon_and_name(GameState* gs, _ItemEntry& ientry, Colour col,

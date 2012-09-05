@@ -120,6 +120,7 @@ set( lanarts_src
 	objects/TeamRelations.cpp
 	
 	objects/loaddata/load_enemy_data.cpp
+	
 	objects/player/PlayerInstActions.cpp
 	objects/player/PlayerInstAttackActions.cpp
 	objects/player/PlayerInst.cpp
@@ -134,6 +135,7 @@ set( lanarts_src
 	
 	stats/items/ItemEntry.cpp
 	stats/items/items.cpp
+    stats/items/ProjectileEntry.cpp
     stats/items/WeaponEntry.cpp
 	
 	stats/loaddata/load_armour_data.cpp

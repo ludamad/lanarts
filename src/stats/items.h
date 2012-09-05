@@ -9,11 +9,10 @@
 #include "../lanarts_defines.h"
 
 #include "stats.h"
-
 struct _Item;
 struct _ArmourEntry;
 struct _ItemEntry;
-struct _ProjectileEntry;
+class ProjectileEntry;
 class WeaponEntry;
 
 class SerializeBuffer;
@@ -69,7 +68,7 @@ struct _Projectile {
 
 	_Item as_item() const;
 	_ItemEntry& item_entry() const;
-	_ProjectileEntry& projectile_entry() const;
+	ProjectileEntry& projectile_entry() const;
 	_Projectile(projectile_id id = -1, _ItemProperties properties =
 			_ItemProperties()) :
 			id(id), properties(properties) {
@@ -110,7 +109,7 @@ struct _Item {
 	_Weapon as_weapon() const;
 
 //	ArmourEntry& armour_entry();
-	_ProjectileEntry& projectile_entry() const;
+	ProjectileEntry& projectile_entry() const;
 	WeaponEntry& weapon_entry() const;
 
 	bool is_normal_item() const;

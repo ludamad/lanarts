@@ -14,7 +14,7 @@
 bool Equipment::valid_to_use_projectile(const _Projectile& proj) {
 	if (!proj.valid_projectile())
 		return false;
-	_ProjectileEntry& pentry = proj.projectile_entry();
+	ProjectileEntry& pentry = proj.projectile_entry();
 	if (pentry.weapon_class == "unarmed")
 		return true;
 	if (pentry.weapon_class == weapon.weapon_entry().weapon_class)
