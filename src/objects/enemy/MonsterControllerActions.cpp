@@ -135,6 +135,19 @@ static bool attack_ai_choice(GameState* gs, CombatGameInst* inst,
 	}
 	return false;
 }
+static bool go_towards_if_free_in_direction(GameState* gs, CombatGameInst* inst,
+		float vx, float vy) {
+	float tx = vx, ty = vy;
+	normalize(tx, ty, TILE_SIZE);
+	normalize(vx, vy, inst->effective_stats().movespeed);
+	float nx = inst->rx + tx, ny = inst->ry + ty;
+	if (!gs->solid_test(inst, round(nx), round(ny), inst->radius)) {
+		inst->vx = vx, inst->vy = vy;
+		printf("going %f %f\n", vx, vy);
+		return true;
+	}
+	return false;
+}
 
 void MonsterController::set_monster_headings(GameState* gs,
 		std::vector<EnemyOfInterest>& eois) {
@@ -190,8 +203,12 @@ void MonsterController::set_monster_headings(GameState* gs,
 		if (gs->tile_radius_test(e->x, e->y, TILE_SIZE / 2 + 4)) {
 			if (gs->object_radius_test(e, NULL, 0,
 					same_target_and_moved_colfilter, e->x, e->y,
-					e->radius - e->effective_stats().movespeed - 2)) {
-				e->vx = 0, e->vy = 0;
+					e->target_radius - e->effective_stats().movespeed - 2)) {
+				float dx = p->rx - e->rx, dy = p->ry - e->ry;
+				if (!go_towards_if_free_in_direction(gs, e, -dy, dx)
+						&& !go_towards_if_free_in_direction(gs, e, dy, -dx)) {
+					e->vx = 0, e->vy = 0;
+				}
 			}
 		}
 

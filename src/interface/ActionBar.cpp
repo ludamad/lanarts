@@ -7,10 +7,10 @@
 #include "../gamestate/GameState.h"
 #include "../objects/player/PlayerInst.h"
 
+#include "../stats/items/ProjectileEntry.h"
 #include "../stats/items/WeaponEntry.h"
 
 #include "../stats/item_data.h"
-#include "../stats/projectile_data.h"
 #include "../stats/spell_data.h"
 
 #include "../lanarts_defines.h"
