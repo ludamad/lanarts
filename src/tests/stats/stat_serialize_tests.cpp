@@ -21,7 +21,7 @@ static void assert_equal(DerivedStats& d1, DerivedStats& d2) {
 	UNIT_TEST_ASSERT(d1.reduction == d2.reduction);
 	UNIT_TEST_ASSERT(d1.resistance == d2.resistance);
 }
-static void assert_equal(_ItemProperties& ip1, _ItemProperties& ip2) {
+static void assert_equal(ItemProperties& ip1, ItemProperties& ip2) {
 	UNIT_TEST_ASSERT(ip1.flags == ip2.flags);
 	UNIT_TEST_ASSERT(ip1.unknownness == ip2.unknownness);
 	assert_equal(ip1.magic, ip2.magic);
@@ -53,7 +53,7 @@ static void assert_equal(Equipment& e1, Equipment& e2) {
 static void serialize_inventory() {
 	const int TEST_N = 10;
 	//mock up some item data
-	_game_item_data.resize(TEST_N, _ItemEntry("", "", "", 0, 0, "", "", false));
+	game_item_data.resize(TEST_N, _ItemEntry("", "", "", 0, 0, "", "", false));
 
 	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
 	Inventory inv1, inv2;
@@ -66,19 +66,19 @@ static void serialize_inventory() {
 
 	assert_equal(inv1, inv2);
 
-	_game_item_data.clear();
+	game_item_data.clear();
 }
 
 static void serialize_equipment() {
 	const int TEST_N = 10;
 	//mock up some item data
-	_game_item_data.resize(TEST_N, _ItemEntry("", "", "", 0, 0, "", "", false));
+	game_item_data.resize(TEST_N, _ItemEntry("", "", "", 0, 0, "", "", false));
 
 	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
 	Equipment e1, e2;
 	e1.armour = EquipmentItem(1);
 	e1.weapon = _Weapon(1);
-	e1.projectile = _Projectile(1);
+	e1.projectile = Item(1);
 	e1.inventory.add(_Item(1), 1);
 	e1.serialize(serializer);
 
@@ -86,7 +86,7 @@ static void serialize_equipment() {
 
 	assert_equal(e1, e2);
 
-	_game_item_data.clear();
+	game_item_data.clear();
 }
 
 static void serialize_combat_stats() {

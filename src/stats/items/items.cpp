@@ -73,7 +73,7 @@ WeaponEntry& Item::weapon_entry() const {
 	return dynamic_cast<WeaponEntry&>(item_entry());
 }
 
-bool Item::is_normal_item() const {
+bool Item::is_normalItem() const {
 	ItemEntry* item_entry = game_item_data.at(id);
 	return (dynamic_cast<EquipmentEntry*>(item_entry) == NULL);
 }
@@ -93,18 +93,19 @@ bool Item::is_weapon() const {
 	return (dynamic_cast<WeaponEntry*>(item_entry) != NULL);
 }
 
-bool Item::operator ==(const Item & item) const {
-	return true;
-//	return id == item.id && properties == item.properties;
+bool Item::is_same_item(const Item & item) const {
+	return id == item.id && properties == item.properties;
 }
 
 void Item::serialize(SerializeBuffer & serializer) {
 	serializer.write_int(id);
+	serializer.write_int(amount);
 	properties.serialize(serializer);
 }
 
 void Item::deserialize(SerializeBuffer & serializer) {
 	serializer.read_int(id);
+	serializer.read_int(amount);
 	properties.deserialize(serializer);
 }
 

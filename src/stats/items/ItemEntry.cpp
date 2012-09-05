@@ -38,3 +38,33 @@ item_id get_item_by_name(const char* name, bool error_if_not_found) {
 	}
 	return -1;
 }
+
+bool is_item_projectile(ItemEntry & ientry) {
+	return dynamic_cast<ProjectileEntry*>(&ientry) != NULL;
+}
+
+const char* equip_type_description(ItemEntry& ientry) {
+	EquipmentEntry* eentry = dynamic_cast<EquipmentEntry*>(&ientry);
+	if (!eentry) {
+		return "One-time Use";
+	}
+
+	switch (eentry->type) {
+	case EquipmentEntry::ARMOUR:
+		return "Armour";
+	case EquipmentEntry::WEAPON:
+		return "Weapon";
+	case EquipmentEntry::PROJECTILE: {
+		ProjectileEntry* pentry = dynamic_cast<ProjectileEntry*>(eentry);
+		if (pentry->is_unarmed()) {
+			return "Unarmed Projectile";
+		} else {
+			return "Projectile";
+		}
+	}
+	case EquipmentEntry::NONE:
+		return "One-time Use";
+	}
+	return "";
+}
+

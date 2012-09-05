@@ -65,22 +65,22 @@ static bool handle_equip_slot_io(GameState* gs, PlayerInst* p, const BBox& bbox,
 	if (rightdown && is_within_equipped_weapon(bbox, mx, my)) {
 		queued_actions.push_back(
 				game_action(gs, p, GameAction::DEEQUIP_ITEM,
-						_ItemEntry::WEAPON));
+						EquipmentEntry::WEAPON));
 		return true;
 	}
 
 	/* Check whether to de-equip projectile */
 	if (rightdown && is_within_equipped_projectile(bbox, mx, my)) {
-		if (p->projectile().valid_projectile()) {
+		if (!p->projectile().empty()) {
 			queued_actions.push_back(
 					game_action(gs, p, GameAction::DEEQUIP_ITEM,
-							_ItemEntry::PROJECTILE));
+							EquipmentEntry::PROJECTILE));
 			return true;
 		}
 	}
 
 	/* Check whether to select weapon as active action */
-	bool selects_projectile = p->projectile().valid_projectile()
+	bool selects_projectile = !p->projectile().empty()
 			&& is_within_equipped_projectile(bbox, mx, my);
 	if (leftdown
 			&& (is_within_equipped_weapon(bbox, mx, my) || selects_projectile)) {
@@ -138,13 +138,13 @@ bool ActionBar::handle_io(GameState* gs, ActionQueue& queued_actions) {
 static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 		int x, int y) {
 	int mx = gs->mouse_x(), my = gs->mouse_y();
-	_Weapon& weapon = player->weapon();
+	Item& weapon = player->weapon();
 	bool weapon_selected = player->spell_selected() == -1;
 	Colour outline =
 			weapon_selected ? COL_SELECTED_OUTLINE : COL_FILLED_OUTLINE;
 
 	/* Draw only enough space for weapon if no projectile used */
-	bool draw_with_projectile = player->projectile().valid_projectile();
+	bool draw_with_projectile = !player->projectile().empty();
 
 	BBox weaponbox(x + 1, y, x + 1 + TILE_SIZE, y + TILE_SIZE);
 	BBox equipbox(weaponbox);
@@ -157,7 +157,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 	}
 
 	if (weaponbox.contains(mx, my)) {
-		draw_console_item_description(gs, weapon.as_item());
+		draw_console_item_description(gs, weapon);
 	}
 
 	/* Draw weapon*/
@@ -167,10 +167,10 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 	if (draw_with_projectile) {
 		BBox projectilebox(weaponbox.translated(TILE_SIZE, 0));
 
-		_Projectile& projectile = player->projectile();
+		Item& projectile = player->projectile();
 
 		if (projectilebox.contains(mx, my)) {
-			draw_console_item_description(gs, projectile.as_item());
+			draw_console_item_description(gs, projectile);
 		}
 
 		ProjectileEntry& ptype = projectile.projectile_entry();
@@ -178,7 +178,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 				y);
 		/* Draw projectile amount */
 		gl_printf(gs->primary_font(), Colour(255, 255, 255), x + TILE_SIZE + 1,
-				y + 1, "%d", player->equipment().projectile_amnt);
+				y + 1, "%d", player->projectile().amount);
 	}
 
 	gl_draw_rectangle_outline(equipbox, outline);

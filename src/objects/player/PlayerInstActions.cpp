@@ -35,8 +35,8 @@ extern "C" {
 
 #include "PlayerInst.h"
 
-static bool is_same_projectile(const _Projectile& projectile,
-		const _Item& item) {
+static bool is_same_projectile(const Item& projectile,
+		const Item& item) {
 	if (projectile.valid_projectile()) {
 		if (item.is_projectile()) {
 			return (item.as_projectile() == projectile);
@@ -45,7 +45,7 @@ static bool is_same_projectile(const _Projectile& projectile,
 	return false;
 }
 
-static bool is_wieldable_projectile(Equipment& equipment, const _Item& item) {
+static bool is_wieldable_projectile(Equipment& equipment, const Item& item) {
 	if (is_same_projectile(equipment.projectile, item))
 		return true;
 
@@ -110,7 +110,7 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 	if (cooldowns().can_pickup()
 			&& gs->object_radius_test(this, &inst, 1, &item_colfilter)) {
 		ItemInst* iteminst = (ItemInst*)inst;
-		_Item& item = iteminst->item_type();
+		Item& item = iteminst->item_type();
 
 		bool was_dropper = iteminst->last_held_by() == id;
 		bool dropper_autopickup = iteminst->autopickup_held();
@@ -280,7 +280,7 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	ItemInst* iteminst = dynamic_cast<ItemInst*>(inst);
 	LANARTS_ASSERT(iteminst);
 
-	const _Item& type = iteminst->item_type();
+	const Item& type = iteminst->item_type();
 	int amnt = iteminst->item_quantity();
 
 	if (type == _get_item_by_name("Gold")) {
@@ -414,7 +414,7 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 	}
 }
 
-static bool item_check_lua_prereq(lua_State* L, _ItemEntry& type,
+static bool item_check_lua_prereq(lua_State* L, ItemEntry& type,
 		GameInst* user) {
 	if (type.prereq_func.empty())
 		return true;
@@ -429,7 +429,7 @@ static bool item_check_lua_prereq(lua_State* L, _ItemEntry& type,
 
 	return ret;
 }
-static void item_do_lua_action(lua_State* L, _ItemEntry& type, GameInst* user,
+static void item_do_lua_action(lua_State* L, ItemEntry& type, GameInst* user,
 		const Pos& p, int amnt) {
 	type.action_func.push(L);
 	luayaml_push_item(L, type.name.c_str());
@@ -443,12 +443,12 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 	if (!effective_stats().allowed_actions.can_use_items) {
 		return;
 	}
-	ItemSlot& itemslot = inventory().get(action.use_id);
-	_ItemEntry& type = itemslot.item.item_entry();
+	Item& itemslot = inventory().get(action.use_id);
+	ItemEntry& type = itemslot.item_entry();
 
 	lua_State* L = gs->get_luastate();
 
-	if (itemslot.amount > 0 && equipment().valid_to_use(itemslot.item)
+	if (itemslot.amount > 0 && equipment().valid_to_use(itemslot)
 			&& item_check_lua_prereq(L, type, this)) {
 		item_do_lua_action(L, type, this, Pos(action.action_x, action.action_y),
 				itemslot.amount);
@@ -456,7 +456,7 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 			gs->game_chat().add_message(type.use_message,
 					Colour(100, 100, 255));
 		}
-		if (type.equipment_type == _ItemEntry::PROJECTILE)
+		if (type.equipment_type == EquipmentEntry::PROJECTILE)
 			itemslot.amount = 0;
 		else
 			itemslot.amount--;

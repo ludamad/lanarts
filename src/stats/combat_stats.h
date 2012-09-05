@@ -21,7 +21,7 @@ class SerializeBuffer;
 
 /* Represents stats related to a single attack option */
 struct AttackStats {
-	AttackStats(_Weapon weapon = _Weapon(), _Projectile projectile = _Projectile()) :
+	AttackStats(Item weapon = Item(), Item projectile = Item()) :
 			weapon(weapon), projectile(projectile) {
 	}
 
@@ -38,8 +38,7 @@ struct AttackStats {
 	float atk_resist_modifier() const;
 
 	/* members */
-	_Weapon weapon;
-	_Projectile projectile;
+	Item weapon, projectile;
 };
 
 /* Represents all the stats used by a combat entity */

@@ -17,11 +17,11 @@
 
 #include "InventoryContent.h"
 
-static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot, int x,
+static void draw_player_inventory_slot(GameState* gs, Item& itemslot, int x,
 		int y) {
 	if (itemslot.amount > 0) {
-		_ItemEntry& ientry = itemslot.item.item_entry();
-		GLimage& itemimg = game_sprite_data[ientry.sprite].img();
+		ItemEntry& ientry = itemslot.item_entry();
+		GLimage& itemimg = ientry.item_image();
 		gl_draw_image(itemimg, x, y);
 		if (ientry.stackable) {
 			gl_printf(gs->primary_font(), Colour(255, 255, 255), x + 1, y + 1,
@@ -39,7 +39,7 @@ static void draw_player_inventory(GameState* gs, Inventory& inv,
 			if (slot >= max_slot)
 				break;
 
-			ItemSlot& itemslot = inv.get(slot);
+			Item& itemslot = inv.get(slot);
 
 			BBox slotbox(x, y, x + TILE_SIZE, y + TILE_SIZE);
 			Colour outline(COL_UNFILLED_OUTLINE);
@@ -47,7 +47,7 @@ static void draw_player_inventory(GameState* gs, Inventory& inv,
 				outline = COL_FILLED_OUTLINE;
 				if (slotbox.contains(mx, my)) {
 					outline = COL_PALE_YELLOW;
-					draw_console_item_description(gs, itemslot.item);
+					draw_console_item_description(gs, itemslot);
 				}
 			}
 

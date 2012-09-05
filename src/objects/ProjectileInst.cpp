@@ -68,7 +68,7 @@ void ProjectileInst::copy_to(GameInst* inst) const {
 	*(ProjectileInst*)inst = *this;
 }
 
-ProjectileInst::ProjectileInst(const _Projectile& projectile,
+ProjectileInst::ProjectileInst(const Item& projectile,
 		const EffectiveAttackStats& atkstats, obj_id origin_id,
 		const Pos& start, const Pos& target, float speed, int range,
 		obj_id sole_target, bool bounce, int hits) :

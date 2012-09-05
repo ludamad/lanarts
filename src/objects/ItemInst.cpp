@@ -21,7 +21,7 @@ static bool same_item_colfilter(GameInst* self, GameInst* other) {
 }
 void ItemInst::step(GameState *gs) {
 	GameInst* other_item = NULL;
-	_ItemEntry& ientry = item.item_entry();
+	ItemEntry& ientry = item.item_entry();
 	if (ientry.stackable
 			&& gs->object_radius_test(this, &other_item, 1, same_item_colfilter)) {
 		ItemInst* oinst = (ItemInst*)other_item;
@@ -35,8 +35,8 @@ void ItemInst::step(GameState *gs) {
 void ItemInst::draw(GameState* gs) {
 	GameView& view = gs->view();
 
-	_ItemEntry& ientry = item.item_entry();
-	SpriteEntry& spr = game_sprite_data.at(ientry.sprite);
+	ItemEntry& ientry = item.item_entry();
+	SpriteEntry& spr = ientry.item_sprite_entry();
 
 	int w = spr.width(), h = spr.height();
 	int xx = x - w / 2, yy = y - h / 2;
@@ -46,7 +46,7 @@ void ItemInst::draw(GameState* gs) {
 	if (!gs->object_visible_test(this))
 		return;
 
-	gl_draw_sprite(view, ientry.sprite, xx, yy, 0, 0, gs->frame());
+	gl_draw_sprite(view, ientry.item_sprite, xx, yy, 0, 0, gs->frame());
 	if (ientry.stackable && quantity > 1) {
 		gl_printf(gs->primary_font(), Colour(255, 255, 255), xx - view.x + 1,
 				yy - view.y + 1, "%d", quantity);

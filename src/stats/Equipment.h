@@ -10,16 +10,17 @@
 
 #include "Inventory.h"
 
+#include "items/items.h"
 #include "items.h"
 
 class Equipment {
 public:
 	Equipment() :
-			projectile_amnt(0), money(0) {
+			money(0) {
 	}
-	bool valid_to_use_projectile(const _Projectile& proj);
-	bool valid_to_use(const _Item& item);
-	void equip(const _Item& item, int amnt = 1);
+	bool valid_to_use_projectile(const Item& proj);
+	bool valid_to_use(const Item& item);
+	void equip(const Item& item, int amnt = 1);
 	void deequip_projectiles();
 	void deequip_weapon();
 	void deequip_armour();
@@ -41,10 +42,7 @@ public:
 	void deserialize(SerializeBuffer& serializer);
 
 	Inventory inventory;
-	_Weapon weapon;
-	_Projectile projectile;
-	int projectile_amnt;
-	EquipmentItem armour;
+	Item weapon, projectile, armour;
 	money_t money;
 };
 

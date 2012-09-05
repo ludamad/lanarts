@@ -254,13 +254,13 @@ bool GameChat::handle_special_commands(GameState* gs,
 			amnt = 1;
 		rest = skip_whitespace(rest);
 
-		int item = _get_item_by_name(rest, false);
+		item_id item = get_item_by_name(rest, false);
 		if (item == -1) {
 			printed.message = "No such item, '" + std::string(rest) + "'!";
 			printed.message_colour = Colour(255, 50, 50);
 		} else {
 			printed.message = std::string(rest) + " put in your inventory !";
-			p->stats().equipment.inventory.add(_Item(item), amnt);
+			p->stats().equipment.inventory.add(Item(item, amnt));
 			printed.message_colour = Colour(50, 255, 50);
 		}
 		add_message(printed);

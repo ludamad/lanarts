@@ -56,26 +56,46 @@ struct ItemProperties {
 struct Item {
 	item_id id;
 	ItemProperties properties;
+	int amount;
 
 	ItemEntry& item_entry() const;
 	EquipmentEntry& equipment_entry() const;
 	ProjectileEntry& projectile_entry() const;
 	WeaponEntry& weapon_entry() const;
 
-	bool is_normal_item() const;
+	bool is_normalItem() const;
 	bool is_equipment() const;
 	bool is_projectile() const;
 	bool is_weapon() const;
-
-	Item(item_id id = -1, ItemProperties properties = ItemProperties()) :
-			id(id), properties(properties) {
+	bool empty() const {
+		return amount == 0 || id == NO_ITEM;
 	}
 
-	bool operator==(const Item& item) const;
+	void add_copies(int amount) {
+		this->amount += amount;
+	}
+
+	void remove_copies(int amount) {
+		this->amount -= amount;
+		LANARTS_ASSERT(this->amount >= 0);
+		if (this->amount == 0){
+			clear();
+		}
+	}
+
+	void clear() {
+		id = NO_ITEM;
+		properties = ItemProperties();
+	}
+
+	explicit Item(item_id id = NO_ITEM, int amount = 0, ItemProperties properties = ItemProperties()) :
+			id(id), properties(properties), amount(amount) {
+	}
+
+	bool is_same_item(const Item& item) const;
 
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
 };
-
 
 #endif /* ITEMS_H_ */

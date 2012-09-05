@@ -56,7 +56,7 @@ public:
 		return attack.attack_action.action_func;
 	}
 
-	bool is_unarmed() {
+	bool is_unarmed() const {
 		return weapon_class == "unarmed";
 	}
 

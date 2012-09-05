@@ -10,27 +10,19 @@
 
 #include "../lanarts_defines.h"
 
-#include "items.h"
+#include "items/items.h"
 
 class SerializeBuffer;
 
 const int INVENTORY_SIZE = 40;
-
-struct ItemSlot {
-	_Item item;
-	int amount;
-	ItemSlot() :
-			amount(0) {
-	}
-};
 
 class Inventory {
 public:
 	Inventory(int size = INVENTORY_SIZE) {
 		items.resize(size);
 	}
-	bool add(const _Item& item, int amount);
-	ItemSlot& get(int i) {
+	bool add(const Item& item);
+	Item& get(int i) {
 		return items.at(i);
 	}
 	bool slot_filled(int i) const {
@@ -46,7 +38,7 @@ public:
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
 private:
-	std::vector<ItemSlot> items;
+	std::vector<Item> items;
 };
 
 #endif // INVENTORY_H

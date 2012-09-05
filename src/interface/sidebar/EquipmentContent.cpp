@@ -40,7 +40,7 @@ static void draw_weapon(GameState* gs, Equipment& eqp, const BBox& bbox) {
 	Colour bbox_col = COL_FILLED_OUTLINE;
 	if (bbox.contains(gs->mouse_pos())) {
 		bbox_col = COL_WHITE;
-		draw_console_item_description(gs, eqp.weapon.as_item());
+		draw_console_item_description(gs, eqp.weapon);
 	}
 
 	draw_item_icon_and_name(gs, eqp.weapon.item_entry(), COL_WHITE, bbox.x1,
@@ -60,7 +60,7 @@ static void draw_armour(GameState* gs, Equipment& eqp, BBox bbox) {
 		bbox_col = COL_FILLED_OUTLINE;
 		if (bbox.contains(gs->mouse_pos())) {
 			bbox_col = COL_WHITE;
-			draw_console_item_description(gs, eqp.armour.as_item());
+			draw_console_item_description(gs, eqp.armour);
 		}
 	}
 
@@ -87,7 +87,7 @@ bool EquipmentContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	if (gs->mouse_right_click() && weapon_bbox.contains(mouse)) {
 		queued_actions.push_back(
 				game_action(gs, p, GameAction::DEEQUIP_ITEM,
-						_ItemEntry::WEAPON));
+						EquipmentEntry::WEAPON));
 	}
 
 	// Check if we are de-equipping our armour
@@ -95,7 +95,7 @@ bool EquipmentContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	if (gs->mouse_right_click() && armour_bbox.contains(mouse)) {
 		queued_actions.push_back(
 				game_action(gs, p, GameAction::DEEQUIP_ITEM,
-						_ItemEntry::ARMOUR));
+						EquipmentEntry::ARMOUR));
 	}
 
 	return false;

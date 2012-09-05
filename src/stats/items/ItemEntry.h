@@ -16,6 +16,9 @@
 
 #include "../LuaAction.h"
 
+struct GLimage;
+struct SpriteEntry;
+
 class ItemEntry: public BaseDataEntry {
 public:
 	ItemEntry() :
@@ -30,6 +33,22 @@ public:
 	enum id_type {
 		ALWAYS_KNOWN, POTION, SCROLL
 	};
+	SpriteEntry& item_sprite_entry();
+	GLimage& item_image();
+
+	LuaValue& inventory_use_func() {
+		return use_action.action_func;
+	}
+	LuaValue& inventory_use_prereq_func() {
+		return use_action.prereq_func;
+	}
+	const std::string& inventory_use_message() {
+		return use_action.success_message;
+	}
+	const std::string& inventory_use_fail_message() {
+		return use_action.failure_message;
+	}
+
 	// Cost when appearing in shops, if (0,0) will not appear in shops.
 	Range shop_cost;
 	LuaAction use_action;
@@ -42,5 +61,9 @@ extern std::vector<ItemEntry*> game_item_data;
 ItemEntry& get_item_entry(item_id id);
 item_id get_item_by_name(const char* name, bool error_if_not_found = true);
 void clear_item_data(std::vector<ItemEntry*>& items);
+
+bool is_item_projectile(ItemEntry& ientry);
+
+const char* equip_type_description(ItemEntry& ientry);
 
 #endif /* ITEMENTRY_H_ */

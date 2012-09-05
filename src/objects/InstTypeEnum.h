@@ -85,9 +85,9 @@ inline GameInst* from_inst_type(InstType type) {
 	case FEATURE_INST:
 		return new FeatureInst(Pos(), FeatureInst::feature_t(NONE), false);
 	case ITEM_INST:
-		return new ItemInst(NONE, NONE, NONE);
+		return new ItemInst(Item(), NONE, NONE);
 	case PROJECTILE_INST:
-		return new ProjectileInst(_Projectile(0), EffectiveAttackStats(), NONE,
+		return new ProjectileInst(Item(0), EffectiveAttackStats(), NONE,
 				Pos(), Pos(), NONE, NONE);
 	case SCRIPTED_INST:
 		return new ScriptedInst(NONE, NONE, NONE);

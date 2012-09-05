@@ -118,7 +118,7 @@ void CombatGameInst::draw(GameState *gs) {
 }
 
 bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
-		const _Weapon& weapon) {
+		const Item& weapon) {
 	bool isdead = false;
 	if (!cooldowns().can_doaction())
 		return false;
@@ -159,7 +159,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 }
 
 bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
-		const _Weapon& weapon, const _Projectile& projectile) {
+		const Item& weapon, const Item& projectile) {
 	if (!cooldowns().can_doaction())
 		return false;
 	MTwist& mt = gs->rng();

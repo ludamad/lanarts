@@ -30,8 +30,8 @@ static void draw_slot_cost(GameState* gs, money_t cost, int x, int y) {
 static void draw_store_inventory_slot(GameState* gs, StoreItemSlot& itemslot,
 		int x, int y) {
 	if (itemslot.amount > 0) {
-		_ItemEntry& ientry = itemslot.item.item_entry();
-		GLimage& itemimg = game_sprite_data[ientry.sprite].img();
+		ItemEntry& ientry = itemslot.item.item_entry();
+		GLimage& itemimg = ientry.item_image();
 		gl_draw_image(itemimg, x, y);
 		if (ientry.stackable && itemslot.amount > 1) {
 			gl_printf(gs->primary_font(), Colour(255, 255, 255), x + 1, y + 1,

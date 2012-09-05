@@ -7,7 +7,7 @@
 
 #include "StoreInventory.h"
 
-void StoreInventory::add(const _Item & item, int amount, int cost) {
+void StoreInventory::add(const Item & item, int amount, int cost) {
 	StoreItemSlot newslot(item, amount, cost);
 
 	/* Try to add to new slot */

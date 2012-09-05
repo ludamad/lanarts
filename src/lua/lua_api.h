@@ -13,7 +13,7 @@
 struct lua_State;
 class GameState;
 class GameInst;
-struct _ItemEntry;
+struct ItemEntry;
 struct EffectEntry;
 struct CombatStats;
 struct EffectiveStats;

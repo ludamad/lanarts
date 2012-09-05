@@ -98,7 +98,7 @@ static void draw_statmult_with_prefix(GameState* gs, const char* prefix,
 }
 //Drawn only as part of other draw_console_<something>_description functions
 static void draw_projectile_description_overlay(GameState* gs,
-		const _Projectile& projectile, int cooldown_override = -1) {
+		const Item& projectile, int cooldown_override = -1) {
 	PlayerInst* p = gs->local_player();
 	EffectiveStats& estats = p->effective_stats();
 
@@ -138,7 +138,7 @@ static void draw_projectile_description_overlay(GameState* gs,
 
 //Drawn only as part of other draw_console_<something>_description functions
 static void draw_weapon_description_overlay(GameState* gs,
-		const _Weapon& weapon) {
+		const Item& weapon) {
 	PlayerInst* p = gs->local_player();
 	EffectiveStats& estats = p->effective_stats();
 
@@ -177,9 +177,9 @@ static void draw_weapon_description_overlay(GameState* gs,
 			COL_PALE_GREEN);
 }
 
-void draw_item_icon_and_name(GameState* gs, _ItemEntry& ientry, Colour col,
+void drawItem_icon_and_name(GameState* gs, ItemEntry& ientry, Colour col,
 		int x, int y) {
-	gl_draw_sprite(ientry.sprite, x, y);
+	gl_draw_sprite(ientry.item_sprite, x, y);
 	gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE,
 			COL_PALE_YELLOW.with_alpha(50));
 	/* Draw item name */
@@ -207,13 +207,13 @@ static void draw_labelled_sprite(GameState* gs, sprite_id sprite,
 			y + TILE_SIZE / 2, "%s", text);
 }
 
-void draw_console_item_description(GameState* gs, const _Item& item) {
+void draw_console_item_description(GameState* gs, const Item& item) {
 	GameTextConsole& console = gs->game_console();
 
 	if (console.has_content_already()) {
 		return;
 	}
-	_ItemEntry& ientry = item.item_entry();
+	ItemEntry& ientry = item.item_entry();
 	console.draw_box(gs);
 	BBox bbox(console.bounding_box());
 	draw_item_icon_and_name(gs, ientry, Colour(), bbox.x1 + 4, bbox.y1 + 4);
@@ -229,10 +229,10 @@ void draw_console_item_description(GameState* gs, const _Item& item) {
 			ientry.description.c_str());
 
 	if (item.is_projectile()) {
-		draw_projectile_description_overlay(gs, item.as_projectile());
+		draw_projectile_description_overlay(gs, item);
 	} else if (item.is_weapon()) {
-		draw_weapon_description_overlay(gs, item.as_weapon());
-	} else if (item.is_armour()) {
+		draw_weapon_description_overlay(gs, item);
+//	} else if (item.is_armour()) {
 //		draw_weapon_description_overlay(gs, item.as_weapon());
 	}
 }
@@ -257,7 +257,7 @@ void draw_console_spell_description(GameState* gs, SpellEntry& spl_entry) {
 			bbox.x1 + x_offset, bbox.y1 + y_offset, max_width, "%s",
 			spl_entry.description.c_str());
 
-	if (spl_entry.projectile.valid_projectile()) {
+	if (!spl_entry.projectile.empty()) {
 		draw_projectile_description_overlay(gs, spl_entry.projectile,
 				spl_entry.cooldown);
 	}

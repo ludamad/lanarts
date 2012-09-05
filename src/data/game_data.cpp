@@ -51,7 +51,6 @@ LuaValue load_class_data(lua_State* L, const FilenameList& filenames);
 std::vector<ClassType> game_class_data;
 std::vector<EffectEntry> game_effect_data;
 std::vector<EnemyEntry> game_enemy_data;
-std::vector<_ItemEntry> _game_item_data;
 std::vector<ItemGenList> game_itemgenlist_data;
 std::vector<TileEntry> game_tile_data;
 std::vector<TilesetEntry> game_tileset_data;
@@ -94,29 +93,32 @@ static E& get_X_ref_by_name(std::vector<E>& t, const char* name) {
 	return t.at(-1); /* throws */
 }
 
-const char* equip_type_description(const _ItemEntry& ientry) {
-	switch (ientry.equipment_type) {
-	case _ItemEntry::ARMOUR:
+const char* equip_type_description(const ItemEntry& ientry) {
+	const EquipmentEntry* eentry = dynamic_cast<const EquipmentEntry*>(&ientry);
+	if (!eentry) {
+		return "One-time Use";
+	}
+
+	switch (eentry->type) {
+	case EquipmentEntry::ARMOUR:
 		return "Armour";
-	case _ItemEntry::WEAPON:
+	case EquipmentEntry::WEAPON:
 		return "Weapon";
-	case _ItemEntry::PROJECTILE: {
-		ProjectileEntry& pentry = get_projectile_entry(ientry.equipment_id);
-		if (pentry.is_unarmed()) {
+	case EquipmentEntry::PROJECTILE: {
+		const ProjectileEntry* pentry =
+				dynamic_cast<const ProjectileEntry*>(eentry);
+		if (pentry->is_unarmed()) {
 			return "Unarmed Projectile";
 		} else {
 			return "Projectile";
 		}
 	}
-	case _ItemEntry::NONE:
+	case EquipmentEntry::NONE:
 		return "One-time Use";
 	}
 	return "";
 }
 
-item_id _get_item_by_name(const char* name, bool error_if_not_found) {
-	return get_X_by_name(_game_item_data, name, error_if_not_found);
-}
 class_id get_class_by_name(const char* name) {
 	return get_X_by_name(game_class_data, name);
 }
@@ -151,7 +153,7 @@ tileset_id get_tileset_by_name(const char* name) {
 
 //Lua argument getters
 item_id item_from_lua(lua_State* L, int idx) {
-	return get_X_by_name(_game_item_data, lua_tostring(L, idx));
+	return get_item_by_name(lua_tostring(L, idx));
 }
 class_id class_from_lua(lua_State* L, int idx) {
 	return get_X_by_name(game_class_data, lua_tostring(L, idx));
@@ -209,7 +211,6 @@ GameSettings init_game_data(lua_State* L) {
 			_lua_items); //new
 	_load_projectile_item_entries();
 
-
 	lua_spells = load_spell_data(L, dfiles.spell_files);
 
 	load_weapon_data(L, dfiles.weapon_files, &_lua_items); //new
@@ -264,7 +265,6 @@ void init_lua_data(GameState* gs, lua_State* L) {
 
 	__lua_init(L, game_enemy_data);
 	__lua_init(L, game_effect_data);
-	__lua_init(L, _game_item_data);
 	__lua_init(L, game_spell_data);
 
 	for (int i = 0; i < game_item_data.size(); i++) {
@@ -275,22 +275,22 @@ void init_lua_data(GameState* gs, lua_State* L) {
 //	lua_call(L, 0, 0);
 }
 
-static void luayaml_push(LuaValue& value, lua_State *L, const char* name) {
+static void luayaml_push(LuaValue& value, lua_State* L, const char* name) {
 	value.push(L);
 	int tableind = lua_gettop(L);
 	lua_getfield(L, tableind, name);
 	lua_replace(L, tableind);
 }
-void luayaml_push_item(lua_State *L, const char* name) {
-	luayaml_push(_lua_items, L, name);
+void luayaml_push_item(lua_State* L, const char* name) {
+	luayaml_push(lua_items, L, name);
 }
-void luayaml_push_sprites(lua_State *L, const char* name) {
+void luayaml_push_sprites(lua_State* L, const char* name) {
 	luayaml_push(lua_sprites, L, name);
 }
-void luayaml_push_enemies(lua_State *L, const char* name) {
+void luayaml_push_enemies(lua_State* L, const char* name) {
 	luayaml_push(lua_enemies, L, name);
 }
 
-void luayaml_push_levelinfo(lua_State *L, const char* name) {
+void luayaml_push_levelinfo(lua_State* L, const char* name) {
 	luayaml_push(lua_dungeon, L, name);
 }

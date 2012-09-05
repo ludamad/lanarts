@@ -241,7 +241,7 @@ static bool lua_spell_check_prereq(GameState* gs, PlayerInst* p,
 }
 
 static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
-		SpellEntry& spl_entry, const _Projectile& projectile,
+		SpellEntry& spl_entry, const Item& projectile,
 		const Pos& target) {
 	MTwist& mt = gs->rng();
 	AttackStats projectile_attack(_Weapon(), projectile);
@@ -528,7 +528,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 	int cooldown = 0;
 
 	if (equipment().has_projectile()) {
-		const _Projectile& projectile = equipment().projectile;
+		const Item& projectile = equipment().projectile;
 		ProjectileEntry& pentry = projectile.projectile_entry();
 		item_id item = _get_item_by_name(pentry.name.c_str());
 		int weaprange = std::max(wentry.range(), pentry.range());

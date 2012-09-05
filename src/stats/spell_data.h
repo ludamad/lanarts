@@ -21,7 +21,7 @@ struct SpellEntry {
 	LuaValue action_func; //Immediate action
 	LuaValue autotarget_func; //Auto-target func
 	LuaValue prereq_func; //Pre-req to casting
-	_Projectile projectile; //Projectile used, if any
+	Item projectile; //Projectile used, if any
 	bool can_cast_with_cooldown, can_cast_with_held_key;
 	SpellEntry() :
 			sprite(-1), mp_cost(0), cooldown(0), can_cast_with_cooldown(false), can_cast_with_held_key(
@@ -34,7 +34,7 @@ struct SpellEntry {
 		prereq_func.initialize(L);
 	}
 	bool uses_projectile() {
-		return projectile.valid_projectile();
+		return !projectile.empty();
 	}
 };
 

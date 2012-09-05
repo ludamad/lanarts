@@ -13,10 +13,10 @@
 
 using namespace std;
 
-_Projectile parse_projectile_name(const YAML::Node& n) {
+Item parse_projectile_name(const YAML::Node& n) {
 	std::string projectile_name = parse_str(n);
 	int projectile_id = get_projectile_by_name(projectile_name.c_str());
-	return _Projectile(projectile_id);
+	return Item(projectile_id);
 }
 
 const std::string default_autotarget_func = "spell_choose_target";

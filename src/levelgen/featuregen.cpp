@@ -94,8 +94,8 @@ static StoreInventory generate_shop_inventory(MTwist& mt, int itemn) {
 	itemgenlist_id itemgenlist = get_itemgenlist_by_name("Store Items");
 	for (int i = 0; i < itemn; /*below*/) {
 		const ItemGenChance& igc = generate_item_choice(mt, itemgenlist);
-		_Item item = _Item(igc.itemtype);
 		int quantity = mt.rand(igc.quantity);
+		Item item = Item(igc.itemtype, quantity);
 		int cost = mt.rand(item.item_entry().shop_cost.multiply(quantity));
 		if (cost > 0) {
 			inv.add(item, quantity, cost);

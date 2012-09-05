@@ -9,23 +9,21 @@
 
 #include "item_data.h"
 
-bool Inventory::add(const _Item& item, int amount) {
-	_ItemEntry& ientry = item.item_entry();
+bool Inventory::add(const Item& item) {
+	ItemEntry& ientry = item.item_entry();
 	if (ientry.stackable) {
 		/* Try to merge with existing entry */
 		for (int i = 0; i < items.size(); i++) {
-			if (items[i].item == item && items[i].amount > 0) {
-				items[i].item = item;
-				items[i].amount += amount;
+			if (items[i].is_same_item(item) && !items[i].empty()) {
+				items[i].amount += item.amount;
 				return true;
 			}
 		}
 	}
 	/* Try to add to new slot */
 	for (int i = 0; i < items.size(); i++) {
-		if (items[i].amount == 0) {
-			items[i].item = item;
-			items[i].amount += amount;
+		if (items[i].empty()) {
+			items[i] = item;
 			return true;
 		}
 	}
@@ -34,7 +32,7 @@ bool Inventory::add(const _Item& item, int amount) {
 
 int Inventory::find_slot(item_id item) {
 	for (int i = 0; i < max_size(); i++) {
-		if (get(i).item.id == item)
+		if (get(i).id == item)
 			return i;
 	}
 	return -1;
@@ -54,7 +52,7 @@ size_t Inventory::last_filled_slot() const {
 void Inventory::serialize(SerializeBuffer& serializer) {
 	serializer.write_int(items.size());
 	for (int i = 0; i < items.size(); i++) {
-		items[i].item.serialize(serializer);
+		items[i].serialize(serializer);
 		serializer.write_int(items[i].amount);
 	}
 }
@@ -64,7 +62,7 @@ void Inventory::deserialize(SerializeBuffer& serializer) {
 	serializer.read_int(size);
 	items.resize(size);
 	for (int i = 0; i < items.size(); i++) {
-		items[i].item.deserialize(serializer);
+		items[i].deserialize(serializer);
 		serializer.read_int(items[i].amount);
 	}
 }

@@ -7,12 +7,13 @@
 
 #include "items/ProjectileEntry.h"
 #include "items/WeaponEntry.h"
+#include "items/items.h"
 
 #include "Equipment.h"
 #include "item_data.h"
 
-bool Equipment::valid_to_use_projectile(const _Projectile& proj) {
-	if (!proj.valid_projectile())
+bool Equipment::valid_to_use_projectile(const Item& proj) {
+	if (proj.empty())
 		return false;
 	ProjectileEntry& pentry = proj.projectile_entry();
 	if (pentry.weapon_class == "unarmed")
@@ -23,17 +24,16 @@ bool Equipment::valid_to_use_projectile(const _Projectile& proj) {
 }
 
 void Equipment::deequip_projectiles() {
-	if (projectile.valid_projectile()) {
-		inventory.add(projectile.as_item(), projectile_amnt);
-		projectile = -1;
-		projectile_amnt = 0;
+	if (!projectile.empty()) {
+		inventory.add(projectile);
+		projectile.clear();
 	}
 }
 
 void Equipment::deequip_weapon() {
 	if (has_weapon()) {
-		inventory.add(weapon.as_item(), 1);
-		weapon = _Weapon();
+		inventory.add(weapon);
+		weapon.clear();
 
 		if (!valid_to_use_projectile(projectile)) {
 			deequip_projectiles();
@@ -43,72 +43,67 @@ void Equipment::deequip_weapon() {
 
 void Equipment::deequip_armour() {
 	if (has_armour()) {
-		inventory.add(armour.as_item(), 1);
-		armour = EquipmentItem();
+		inventory.add(armour);
+		armour.clear();
 	}
 }
 
 void Equipment::deequip(int equipment_type) {
 	switch (equipment_type) {
-	case _ItemEntry::PROJECTILE:
+	case EquipmentEntry::PROJECTILE:
 		deequip_projectiles();
 		break;
-	case _ItemEntry::WEAPON:
+	case EquipmentEntry::WEAPON:
 		deequip_weapon();
 		break;
-	case _ItemEntry::ARMOUR:
+	case EquipmentEntry::ARMOUR:
 		deequip_armour();
 		break;
 	}
 }
-bool Equipment::valid_to_use(const _Item& item) {
-	switch (item.item_entry().equipment_type) {
-	case _ItemEntry::PROJECTILE:
-		return valid_to_use_projectile(item.as_projectile());
+bool Equipment::valid_to_use(const Item& item) {
+	switch (item.equipment_entry().type) {
+	case EquipmentEntry::PROJECTILE:
+		return valid_to_use_projectile(item);
 	}
 	return true;
 }
-void Equipment::equip(const _Item& item, int amnt) {
-	switch (item.item_entry().equipment_type) {
-	case _ItemEntry::ARMOUR:
+void Equipment::equip(const Item& item, int amnt) {
+	switch (item.equipment_entry().type) {
+	case EquipmentEntry::ARMOUR:
 		if (armour.properties.flags & CURSED)
 			break;
 		deequip_armour();
-		armour = item.as_armour();
+		armour = item;
 		break;
-	case _ItemEntry::WEAPON:
+	case EquipmentEntry::WEAPON:
 		if (weapon.properties.flags & CURSED)
 			break;
 		deequip_projectiles();
 		if (has_weapon()) {
-			inventory.add(weapon.as_item(), 1);
+			inventory.add(weapon);
 		}
-		weapon = item.as_weapon();
+		weapon = item;
 		break;
-	case _ItemEntry::PROJECTILE:
+	case EquipmentEntry::PROJECTILE:
 		if (projectile.properties.flags & CURSED)
 			break;
-		if (!(item.as_projectile() == projectile))
+		if (!(item.is_same_item(projectile)))
 			deequip_projectiles();
-		projectile = item.as_projectile();
-		projectile_amnt += amnt;
+		item.amount = amnt;
+		projectile = item;
 		break;
 	}
 }
 
 void Equipment::use_ammo(int amnt) {
-	projectile_amnt -= amnt;
-	if (projectile_amnt <= 0) {
-		projectile = _Projectile(-1);
-		projectile_amnt = 0;
-	}
+	projectile.remove_copies(amnt);
 }
 
 void Equipment::serialize(SerializeBuffer& serializer) {
 	inventory.serialize(serializer);
 	weapon.serialize(serializer);
 	projectile.serialize(serializer);
-	serializer.write_int(projectile_amnt);
 	armour.serialize(serializer);
 	serializer.write_int(money);
 }
@@ -117,7 +112,6 @@ void Equipment::deserialize(SerializeBuffer& serializer) {
 	inventory.deserialize(serializer);
 	weapon.deserialize(serializer);
 	projectile.deserialize(serializer);
-	serializer.read_int(projectile_amnt);
 	armour.deserialize(serializer);
 	serializer.read_int(money);
 }

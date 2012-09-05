@@ -13,23 +13,6 @@ extern "C" {
 
 using namespace std;
 
-void _load_projectile_item_entries() {
-	const int default_radius = 15;
-
-	//Create items from projectiles
-	for (int i = 0; i < game_item_data.size(); i++) {
-		ItemEntry& ientry = get_item_entry(i);
-		if (dynamic_cast<ProjectileEntry*>(&ientry)) {
-			ProjectileEntry& entry = get_projectile_entry(i);
-			//printf("index = %d, sprite = '%s'\n", game_item_data.size(), wtype->name);
-			_game_item_data.push_back(
-					_ItemEntry(entry.name, entry.description, "",
-							default_radius, entry.item_sprite, "equip", "",
-							true, entry.shop_cost, _ItemEntry::ALWAYS_KNOWN,
-							_ItemEntry::PROJECTILE, i));
-		}
-	}
-}
 
 void parse_projectile_entry(const YAML::Node& n, ProjectileEntry& entry) {
 	parse_equipment_entry(n, entry);
