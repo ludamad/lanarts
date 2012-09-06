@@ -17,6 +17,7 @@
 
 #include "../util/math_util.h"
 #include "GameInstSet.h"
+#include "GameState.h"
 #include "hashset_util.h"
 
 GameInst* const GAMEINST_TOMBSTONE = (GameInst*)1;
