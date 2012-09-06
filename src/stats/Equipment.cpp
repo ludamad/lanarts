@@ -17,7 +17,7 @@ bool Equipment::valid_to_use_projectile(const Item& proj) {
 	if (proj.empty())
 		return false;
 	ProjectileEntry& pentry = proj.projectile_entry();
-	if (pentry.weapon_class == "unarmed")
+	if (pentry.is_unarmed())
 		return true;
 	if (pentry.weapon_class == weapon.weapon_entry().weapon_class)
 		return true;
@@ -94,9 +94,12 @@ void Equipment::equip(const Item& item) {
 	case EquipmentEntry::PROJECTILE:
 		if (projectile.properties.flags & CURSED)
 			break;
-		if (!(item.is_same_item(projectile)))
+		if (!(item.is_same_item(projectile))) {
 			deequip_projectiles();
-		projectile.add_copies(item.amount);
+			projectile = item;
+		} else {
+			projectile.add_copies(item.amount);
+		}
 		break;
 	}
 }

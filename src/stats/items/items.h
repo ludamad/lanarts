@@ -73,16 +73,19 @@ struct Item {
 	}
 
 	Item with_amount(int new_amount) const {
+		LANARTS_ASSERT(this->id != NO_ITEM);
 		return Item(id, new_amount, properties);
 	}
 
 	void add_copies(int amount) {
+		LANARTS_ASSERT(this->id != NO_ITEM);
 		this->amount += amount;
 	}
 
 	void remove_copies(int amount) {
+		LANARTS_ASSERT(this->id != NO_ITEM);
+		LANARTS_ASSERT(this->amount >= amount);
 		this->amount -= amount;
-		LANARTS_ASSERT(this->amount >= 0);
 		if (this->amount == 0) {
 			clear();
 		}
@@ -107,6 +110,7 @@ struct Item {
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
 };
+
 
 typedef Item Weapon;
 typedef Item Projectile;
