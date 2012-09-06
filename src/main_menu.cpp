@@ -36,6 +36,7 @@ extern "C" {
 static void continue_as_loner(GameState* gs, GameInst* _, void* flag) {
 	*(bool*) flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
+	gs->game_settings().regen_on_death = true;
 	gs->game_settings().frame_action_repeat = 0;
 }
 static void continue_as_hardcore(GameState* gs, GameInst* _, void* flag) {
