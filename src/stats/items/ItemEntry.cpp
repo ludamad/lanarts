@@ -12,6 +12,7 @@
 
 #include "ItemEntry.h"
 #include "EquipmentEntry.h"
+#include "WeaponEntry.h"
 #include "ProjectileEntry.h"
 
 SpriteEntry& ItemEntry::item_sprite_entry() {
@@ -52,6 +53,14 @@ item_id get_item_by_name(const char* name, bool error_if_not_found) {
 
 bool is_item_projectile(ItemEntry & ientry) {
 	return dynamic_cast<ProjectileEntry*>(&ientry) != NULL;
+}
+
+bool is_item_weapon(ItemEntry & ientry) {
+	return dynamic_cast<WeaponEntry*>(&ientry) != NULL;
+}
+
+bool is_item_equipment(ItemEntry & ientry) {
+	return dynamic_cast<EquipmentEntry*>(&ientry) != NULL;
 }
 
 const char* equip_type_description(ItemEntry& ientry) {

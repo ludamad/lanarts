@@ -28,23 +28,38 @@ public:
 	void use_ammo(int amnt = 1);
 
 	bool has_weapon() {
-		return weapon.id > NO_ITEM;
+		return _weapon.id > NO_ITEM;
 	}
 	bool has_armour() {
-		return armour.id > NO_ITEM;
+		return _armour.id > NO_ITEM;
 	}
 	bool has_projectile() {
-		return projectile.id > NO_ITEM;
+		return _projectile.id > NO_ITEM;
+	}
+
+	Item& get_item(itemslot_t i) {
+		return inventory.get(i);
 	}
 
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
 
+	Weapon& weapon() {
+		return _weapon;
+	}
+	Projectile& projectile() {
+		return _projectile;
+	}
+	Equipment& armour() {
+		return _armour;
+	}
+
 	Inventory inventory;
-	Weapon weapon;
-	Projectile projectile;
-	Item armour;
 	money_t money;
+private:
+	Weapon _weapon;
+	Projectile _projectile;
+	Equipment _armour;
 };
 
 #endif /* EQUIPMENTSTATS_H_ */

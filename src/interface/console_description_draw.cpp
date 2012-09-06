@@ -18,7 +18,6 @@
 
 #include "../stats/spell_data.h"
 
-
 #include "console_description_draw.h"
 
 const char* projectile_speed_description(int speed) {
@@ -98,7 +97,7 @@ static void draw_statmult_with_prefix(GameState* gs, const char* prefix,
 }
 //Drawn only as part of other draw_console_<something>_description functions
 static void draw_projectile_description_overlay(GameState* gs,
-		const Item& projectile, int cooldown_override = -1) {
+		const Projectile& projectile, int cooldown_override = -1) {
 	PlayerInst* p = gs->local_player();
 	EffectiveStats& estats = p->effective_stats();
 
@@ -138,7 +137,7 @@ static void draw_projectile_description_overlay(GameState* gs,
 
 //Drawn only as part of other draw_console_<something>_description functions
 static void draw_weapon_description_overlay(GameState* gs,
-		const Item& weapon) {
+		const Weapon& weapon) {
 	PlayerInst* p = gs->local_player();
 	EffectiveStats& estats = p->effective_stats();
 
@@ -207,13 +206,13 @@ static void draw_labelled_sprite(GameState* gs, sprite_id sprite,
 			y + TILE_SIZE / 2, "%s", text);
 }
 
-void draw_console_item_description(GameState* gs, const Item& item) {
+void draw_console_item_description(GameState* gs, const Item& item,
+		ItemEntry& ientry) {
 	GameTextConsole& console = gs->game_console();
 
 	if (console.has_content_already()) {
 		return;
 	}
-	ItemEntry& ientry = item.item_entry();
 	console.draw_box(gs);
 	BBox bbox(console.bounding_box());
 	draw_item_icon_and_name(gs, ientry, Colour(), bbox.x1 + 4, bbox.y1 + 4);
@@ -228,9 +227,9 @@ void draw_console_item_description(GameState* gs, const Item& item) {
 			bbox.x1 + x_offset, bbox.y1 + y_offset, max_width, "%s",
 			ientry.description.c_str());
 
-	if (item.is_projectile()) {
+	if (is_item_projectile(ientry)) {
 		draw_projectile_description_overlay(gs, item);
-	} else if (item.is_weapon()) {
+	} else if (is_item_weapon(ientry)) {
 		draw_weapon_description_overlay(gs, item);
 //	} else if (item.is_armour()) {
 //		draw_weapon_description_overlay(gs, item.as_weapon());

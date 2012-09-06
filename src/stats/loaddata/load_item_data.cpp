@@ -16,8 +16,6 @@ extern "C" {
 
 #include "../items/ItemEntry.h"
 
-#include "../items/ItemEntry.h"
-
 using namespace std;
 void parse_item_entry(const YAML::Node& n, ItemEntry& entry) {
 	entry.name = parse_str(n["name"]);
@@ -26,7 +24,7 @@ void parse_item_entry(const YAML::Node& n, ItemEntry& entry) {
 
 	entry.use_action.success_message = parse_defaulted(n, "use_message",
 			std::string());
-	entry.use_action.success_message = parse_defaulted(n, "cant_use_message",
+	entry.use_action.failure_message = parse_defaulted(n, "cant_use_message",
 			std::string());
 	entry.use_action.action_func = parse_defaulted(n, "action_func",
 			std::string());

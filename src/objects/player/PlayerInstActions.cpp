@@ -40,7 +40,7 @@ static bool is_same_projectile(const Item& projectile, const Item& item) {
 }
 
 static bool is_wieldable_projectile(EquipmentStats& equipment, const Item& item) {
-	if (is_same_projectile(equipment.projectile, item))
+	if (is_same_projectile(equipment.projectile(), item))
 		return true;
 
 	if (item.is_projectile()) {
@@ -280,8 +280,8 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	if (type.id == get_item_by_name("Gold")) {
 		gold() += amnt;
 	} else {
-		if (is_same_projectile(equipment().projectile, type)) {
-			equipment().projectile.add_copies(amnt);
+		if (is_same_projectile(equipment().projectile(), type)) {
+			equipment().projectile().add_copies(amnt);
 		} else if (!equipment().has_projectile()
 				&& is_wieldable_projectile(equipment(), type)) {
 			equipment().deequip_projectiles();

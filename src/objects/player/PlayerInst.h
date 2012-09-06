@@ -81,12 +81,12 @@ public:
 		return deaths;
 	}
 
-	Item& weapon() {
-		return equipment().weapon;
+	Weapon& weapon() {
+		return equipment().weapon();
 	}
 
-	Item& projectile() {
-		return equipment().projectile;
+	Projectile& projectile() {
+		return equipment().projectile();
 	}
 
 	bool is_local_player() {

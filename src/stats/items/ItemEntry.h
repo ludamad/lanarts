@@ -63,6 +63,8 @@ item_id get_item_by_name(const char* name, bool error_if_not_found = true);
 void clear_item_data(std::vector<ItemEntry*>& items);
 
 bool is_item_projectile(ItemEntry& ientry);
+bool is_item_weapon(ItemEntry& ientry);
+bool is_item_equipment(ItemEntry& ientry);
 
 const char* equip_type_description(ItemEntry& ientry);
 

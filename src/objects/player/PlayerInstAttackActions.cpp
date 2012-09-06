@@ -528,7 +528,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 	int cooldown = 0;
 
 	if (equipment().has_projectile()) {
-		const Item& projectile = equipment().projectile;
+		const Item& projectile = equipment().projectile();
 		ProjectileEntry& pentry = projectile.projectile_entry();
 		item_id item = get_item_by_name(pentry.name.c_str());
 		int weaprange = std::max(wentry.range(), pentry.range());
@@ -589,7 +589,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		for (int i = 0; i < numhit; i++) {
 			EnemyInst* e = (EnemyInst*)enemies[i];
 			lua_hit_callback(gs->get_luastate(), wentry.action_func(), this, e);
-			if (attack(gs, e, AttackStats(equipment().weapon))) {
+			if (attack(gs, e, AttackStats(equipment().weapon()))) {
 				PlayerData& pc = gs->player_data();
 				signal_killed_enemy();
 

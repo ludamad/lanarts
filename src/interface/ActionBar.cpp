@@ -157,7 +157,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 	}
 
 	if (weaponbox.contains(mx, my)) {
-		draw_console_item_description(gs, weapon);
+		draw_console_item_description(gs, weapon, weapon.weapon_entry());
 	}
 
 	/* Draw weapon*/
@@ -167,10 +167,11 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 	if (draw_with_projectile) {
 		BBox projectilebox(weaponbox.translated(TILE_SIZE, 0));
 
-		Item& projectile = player->projectile();
+		Projectile& projectile = player->projectile();
 
 		if (projectilebox.contains(mx, my)) {
-			draw_console_item_description(gs, projectile);
+			draw_console_item_description(gs, projectile,
+					projectile.projectile_entry());
 		}
 
 		ProjectileEntry& ptype = projectile.projectile_entry();

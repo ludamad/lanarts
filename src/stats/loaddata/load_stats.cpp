@@ -41,11 +41,11 @@ EquipmentStats parse_equipment(const YAML::Node& n) {
 	EquipmentStats ret;
 	ret.inventory = parse_inventory(n["inventory"]);
 	if (yaml_has_node(n, "weapon")) {
-		ret.weapon = parse_as_item(n, "weapon");
+		ret.weapon() = parse_as_item(n, "weapon");
 	}
 	if (yaml_has_node(n, "projectile")) {
 		const YAML::Node& pentry = n["projectile"];
-		ret.projectile = parse_as_item(pentry);
+		ret.projectile() = parse_as_item(pentry);
 	}
 	return ret;
 }

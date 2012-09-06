@@ -72,7 +72,7 @@ static void factor_in_armour_slot(MTwist& mt, EffectiveStats& effective,
 }
 static void factor_in_equipment(MTwist& mt, EffectiveStats& effective,
 		const EquipmentStats& equipment) {
-	factor_in_armour_slot(mt, effective, equipment.armour);
+	factor_in_armour_slot(mt, effective, ((EquipmentStats&)equipment).armour());
 }
 static void derive_secondary_stats(MTwist& mt, EffectiveStats& effective) {
 	CoreStats& core = effective.core;

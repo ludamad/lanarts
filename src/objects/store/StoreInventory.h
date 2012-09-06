@@ -17,6 +17,9 @@ struct StoreItemSlot {
 			item(item), cost(cost) {
 	}
 
+	ItemEntry& item_entry () {
+		return item.item_entry();
+	}
 	bool empty() const {
 		return item.empty();
 	}

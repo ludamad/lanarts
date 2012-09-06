@@ -19,24 +19,24 @@ bool EquipmentStats::valid_to_use_projectile(const Item& proj) {
 	ProjectileEntry& pentry = proj.projectile_entry();
 	if (pentry.is_unarmed())
 		return true;
-	if (pentry.weapon_class == weapon.weapon_entry().weapon_class)
+	if (pentry.weapon_class == _weapon.weapon_entry().weapon_class)
 		return true;
 	return false;
 }
 
 void EquipmentStats::deequip_projectiles() {
-	if (!projectile.empty()) {
-		inventory.add(projectile);
-		projectile.clear();
+	if (!_projectile.empty()) {
+		inventory.add(_projectile);
+		_projectile.clear();
 	}
 }
 
 void EquipmentStats::deequip_weapon() {
 	if (has_weapon()) {
-		inventory.add(weapon);
-		weapon.clear();
+		inventory.add(_weapon);
+		_weapon.clear();
 
-		if (!valid_to_use_projectile(projectile)) {
+		if (!valid_to_use_projectile(_projectile)) {
 			deequip_projectiles();
 		}
 	}
@@ -44,8 +44,8 @@ void EquipmentStats::deequip_weapon() {
 
 void EquipmentStats::deequip_armour() {
 	if (has_armour()) {
-		inventory.add(armour);
-		armour.clear();
+		inventory.add(_armour);
+		_armour.clear();
 	}
 }
 
@@ -76,51 +76,51 @@ void EquipmentStats::equip(const Item& item) {
 	switch (item.equipment_entry().type) {
 	case EquipmentEntry::ARMOUR:
 		LANARTS_ASSERT(item.amount == 1);
-		if (armour.properties.flags & CURSED)
+		if (_armour.properties.flags & CURSED)
 			break;
 		deequip_armour();
-		armour = item;
+		_armour = item;
 		break;
 	case EquipmentEntry::WEAPON:
 		LANARTS_ASSERT(item.amount == 1);
-		if (weapon.properties.flags & CURSED)
+		if (_weapon.properties.flags & CURSED)
 			break;
 		deequip_projectiles();
 		if (has_weapon()) {
-			inventory.add(weapon);
+			inventory.add(_weapon);
 		}
-		weapon = item;
+		_weapon = item;
 		break;
 	case EquipmentEntry::PROJECTILE:
-		if (projectile.properties.flags & CURSED)
+		if (_projectile.properties.flags & CURSED)
 			break;
-		if (!(item.is_same_item(projectile))) {
+		if (!(item.is_same_item(_projectile))) {
 			deequip_projectiles();
-			projectile = item;
+			_projectile = item;
 		} else {
-			projectile.add_copies(item.amount);
+			_projectile.add_copies(item.amount);
 		}
 		break;
 	}
 }
 
 void EquipmentStats::use_ammo(int amnt) {
-	projectile.remove_copies(amnt);
+	_projectile.remove_copies(amnt);
 }
 
 void EquipmentStats::serialize(SerializeBuffer& serializer) {
 	inventory.serialize(serializer);
-	weapon.serialize(serializer);
-	projectile.serialize(serializer);
-	armour.serialize(serializer);
+	_weapon.serialize(serializer);
+	_projectile.serialize(serializer);
+	_armour.serialize(serializer);
 	serializer.write_int(money);
 }
 
 void EquipmentStats::deserialize(SerializeBuffer& serializer) {
 	inventory.deserialize(serializer);
-	weapon.deserialize(serializer);
-	projectile.deserialize(serializer);
-	armour.deserialize(serializer);
+	_weapon.deserialize(serializer);
+	_projectile.deserialize(serializer);
+	_armour.deserialize(serializer);
 	serializer.read_int(money);
 }
 

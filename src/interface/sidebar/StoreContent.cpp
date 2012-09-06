@@ -72,7 +72,8 @@ static void draw_store_inventory(GameState* gs, StoreInventory& inv,
 				outline = COL_FILLED_OUTLINE;
 				if (slotbox.contains(mx, my)) {
 					outline = COL_PALE_YELLOW;
-					draw_console_item_description(gs, itemslot.item);
+					draw_console_item_description(gs, itemslot.item,
+							itemslot.item_entry());
 					draw_item_cost(gs, bbox, itemslot.cost);
 				}
 			}

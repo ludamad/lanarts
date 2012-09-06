@@ -45,9 +45,12 @@ static void draw_player_inventory(GameState* gs, Inventory& inv,
 			Colour outline(COL_UNFILLED_OUTLINE);
 			if (itemslot.amount > 0 && slot != slot_selected) {
 				outline = COL_FILLED_OUTLINE;
+				if (slot == min_slot) {
+					outline = COL_PALE_GREEN;
+				}
 				if (slotbox.contains(mx, my)) {
 					outline = COL_PALE_YELLOW;
-					draw_console_item_description(gs, itemslot);
+					draw_console_item_description(gs, itemslot, itemslot.item_entry());
 				}
 			}
 

@@ -94,6 +94,7 @@ struct Item {
 
 	void clear() {
 		id = NO_ITEM;
+		amount = 0;
 		properties = ItemProperties();
 	}
 
@@ -103,6 +104,9 @@ struct Item {
 		if (id == NO_ITEM) {
 			this->amount = 0;
 		}
+		if (id == 0) {
+			this->id = 0;
+		}
 	}
 
 	bool is_same_item(const Item& item) const;
@@ -110,7 +114,6 @@ struct Item {
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
 };
-
 
 typedef Item Weapon;
 typedef Item Projectile;

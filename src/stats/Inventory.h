@@ -16,13 +16,15 @@ class SerializeBuffer;
 
 const int INVENTORY_SIZE = 40;
 
+typedef int itemslot_t;
+
 class Inventory {
 public:
 	Inventory(int size = INVENTORY_SIZE) {
 		items.resize(size);
 	}
 	bool add(const Item& item);
-	Item& get(int i) {
+	Item& get(itemslot_t i) {
 		return items.at(i);
 	}
 	bool slot_filled(int i) const {
