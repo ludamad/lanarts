@@ -27,6 +27,7 @@ Medium:
 	- can simply require X and X skill for magic items - weak system
 
 Small:
+- Make it so enemies with long ranged cooldowns can still do a quick melee action
 - Fix up menu to not use escape to continue (or do it consistently) and to not display the class select where it does not make sense
 - Have a flexible portal system that indicates which level to connect to
 - Add cooldowns to item use
@@ -39,21 +40,18 @@ Small:
 - Make enemies drop money/items
 	- Would be best if enemies picked up items - but does lead to paranoid behaviour from player
 		- Should probably not pick up any item the player has interacted with - but unrealistic
-- Make all ranged enemies have a short range melee option for close kiters
 - Fix arrows getting stuck in walls
 - Fix monsters getting stuck in corridors -> give more room for RVO2 disabling
-- Monsters too weak as game progresses
+- [MOSTLY FIXED] Monsters too weak as game progresses
 	- give monsters abilities
 	- spawn 'harder' versions of monsters
 		- Dont let chickens & storm clouds spawn on level 9 - player is too strong
 - Add items that give free XP but hurt you/ make you exhausted
 	- Amount depends on dungeon depth
-- You can only buy items by clicking on top 32x32 area
 - Sometimes arrows show underneath blood [CAN'T REPRODUCE ? ADDED ASSERT]
 
 Partial Completion:
 - [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
-- [STARTED] Classes for players
 - [DONE - IMPROVE VISIBILITY] More visual output on the minimap [Stairs etc]
 - [DONE - NEEDS MORE OPTIONS] Add start up screen with networking options
 - [DONE BUT ALWAYS FIT THROUGH SMALL CORRIDORS, TARGET SIZE BIG ONLY] Support for double-sized enemies (2x2 tile size max)
@@ -132,3 +130,8 @@ Completed:
 
 < 29/08/2012
 - [DONE] Versatile save format that allows for resuming a networked game 
+
+< 06/09/2012
+- [DONE] Classes for players ("Done" in the sense that when I first formulated this it was no where near done)
+- [DONE FOR MOST] Make all ranged enemies have a short range melee option for close kiters
+- [FIXED] You can only buy items by clicking on top 32x32 area
