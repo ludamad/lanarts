@@ -62,7 +62,8 @@ set( lanarts_src
 	interface/GameChat.cpp
 	interface/GameDialogs.cpp
 	interface/GameHud.cpp
-	interface/GameTextConsole.cpp
+	interface/GameTextConsole.cpp	
+	interface/TextField.h
 	
 	interface/sidebar/ConfigContent.cpp
 	interface/sidebar/EnemiesSeenContent.cpp
@@ -208,6 +209,7 @@ set( lanarts_include
 	interface/GameDialogs.h
 	interface/GameHud.h
 	interface/GameTextConsole.h
+	interface/TextField.h
 
 	interface/sidebar/ConfigContent.h
 	interface/sidebar/EnemiesSeenContent.h
