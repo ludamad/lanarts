@@ -384,7 +384,7 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 	std::vector<PlayerDataEntry>& pdes = pc.all_players();
 	for (int i = 0; i < pdes.size(); i++) {
 		PlayerInst* p = (PlayerInst*)pdes[i].player_inst.get_instance();
-		if (p->current_level == game_world().get_current_level_id()) {
+		if (p && p->current_level == game_world().get_current_level_id()) {
 			has_player = true;
 			if (player_radius_visible_test(p, BBox(minx, miny, maxx, maxy))) {
 				return true;
