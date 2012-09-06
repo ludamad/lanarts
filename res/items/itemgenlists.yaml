@@ -13,12 +13,8 @@ itemgen_lists:
     #Melee Weapons
     - { item: Dagger,             chance: 10                     }
     - { item: Short Sword,        chance: 10                     }
-    - { item: Iron Scimitar,      chance: 2                      }
-    - { item: Samuri Sabre,       chance: 2                      }
-    - { item: Battle Axe,         chance: 2                      }
-    - { item: Orc Axe,            chance: 1                      }
-    - { item: Iron Broadsword,    chance: 2                      }
     - { item: Mace,               chance: 5                      }
+    - { item: Samurai Sabre,      chance: 1                      }
     #Scrolls
     - { item: Haste Scroll,       chance: 3                      }
     - { item: Strength Scroll,    chance: 2                      }
@@ -38,3 +34,7 @@ itemgen_lists:
   - name: Store Items
     items:
     - default: *BasicItems
+#    - { item: Iron Scimitar,      chance: 2                      }
+#    - { item: Battle Axe,         chance: 2                      }
+#    - { item: Orc Axe,            chance: 1                      }
+ #   - { item: Iron Broadsword,    chance: 2                      }
