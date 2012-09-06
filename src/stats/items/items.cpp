@@ -42,8 +42,6 @@ void ItemProperties::serialize(SerializeBuffer& serializer) {
 	serializer.write(this->damage);
 	serializer.write_int(this->flags);
 	serializer.write(this->unknownness);
-
-	serializer.write(this->unknownness);
 	serializer.write_container(this->effect_modifiers.status_effects);
 }
 

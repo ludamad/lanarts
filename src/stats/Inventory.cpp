@@ -54,7 +54,6 @@ void Inventory::serialize(SerializeBuffer& serializer) {
 	serializer.write_int(items.size());
 	for (int i = 0; i < items.size(); i++) {
 		items[i].serialize(serializer);
-		serializer.write_int(items[i].amount);
 	}
 }
 
@@ -64,7 +63,6 @@ void Inventory::deserialize(SerializeBuffer& serializer) {
 	items.resize(size);
 	for (int i = 0; i < items.size(); i++) {
 		items[i].deserialize(serializer);
-		serializer.read_int(items[i].amount);
 	}
 }
 
