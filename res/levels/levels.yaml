@@ -172,69 +172,69 @@ areas:
 
 #tiny levels with animals
       #Level 0
-#      - layout: [*tiny_layout1]
-#        content:
-#          features: { tileset: *lair_tilesets }
-#          items:    { amount: 3,  itemgenlist: Basic Items   }
-#          enemies: { wandering: no, amount: 5, generated: *easy_animals }
-#          
-#      #Level 1
-#      - layout: *tiny_layouts
-#        content:
-#          features: { tileset: *lair_tilesets}
-#          items:    { amount: 3,  itemgenlist: Basic Items   }
-#          enemies: { wandering: no, amount: 8, generated: *easy_animals }
-#        
-#      #Level 2
-#      - layout: *tiny_layouts
-#        content:
-#          features: { tileset: *lair_tilesets}
-#          items:    { amount: 4,  itemgenlist: Basic Items   }          
-#          enemies: { 
-#            wandering: no, amount: 12, 
-#            generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}] 
-#          }
-#      #Level 3
-#      - layout: *small_layouts
-#        content:
-#          features: { tileset: [lair_tiles1, lair_tiles2, lair_tiles3, crystal_tiles, crystal_tiles_with_marble]}
-#          items:    { amount: 5,  itemgenlist: Basic Items   }
-#          enemies:
-#            amount: [10,14]
-#            generated:
-#              - default: *medium_animals
-#          
-##small levels with easyish enemies
-#      #Level 4
-#      - layout: [*small_layout1]
-#        content:
-#          features: { tileset: [crystal_tiles, crystal_tiles_with_marble, crypt_tiles]}
-#          items:    { amount: 7,  itemgenlist: Basic Items   }
-#          enemies:
-#            amount: [12,15]
-#            generated:
-#              - default: *easy_enemies
-#      #Level 5
-#      - layout: *small_layouts
-#        content:
-#          features: { tileset: pebble_tiles}
-#          items:    { amount: 8,  itemgenlist: Basic Items   }
-#          enemies:
-#            amount: [12,15]
-#            generated:
-#              - default: *medium_enemies
-#          
-#      #Level 6
-#      - layout: *small_layouts 
-#        content:
-#          features: { tileset: *all_tilesets}
-#          items:    { amount: 8,  itemgenlist: Basic Items   }
-#          enemies:
-#            amount: 15
-#            generated:
-#              - {default: *medium_enemies}
-#              - {enemy: Red Dragon, guaranteed_spawns: 1}
-#          
+      - layout: [*tiny_layout1]
+        content:
+          features: { tileset: *lair_tilesets }
+          items:    { amount: 3,  itemgenlist: Basic Items   }
+          enemies: { wandering: no, amount: 5, generated: *easy_animals }
+          
+      #Level 1
+      - layout: *tiny_layouts
+        content:
+          features: { tileset: *lair_tilesets}
+          items:    { amount: 3,  itemgenlist: Basic Items   }
+          enemies: { wandering: no, amount: 8, generated: *easy_animals }
+        
+      #Level 2
+      - layout: *tiny_layouts
+        content:
+          features: { tileset: *lair_tilesets}
+          items:    { amount: 4,  itemgenlist: Basic Items   }          
+          enemies: { 
+            wandering: no, amount: 12, 
+            generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}] 
+          }
+      #Level 3
+      - layout: *small_layouts
+        content:
+          features: { tileset: [lair_tiles1, lair_tiles2, lair_tiles3, crystal_tiles, crystal_tiles_with_marble]}
+          items:    { amount: 5,  itemgenlist: Basic Items   }
+          enemies:
+            amount: [10,14]
+            generated:
+              - default: *medium_animals
+          
+#small levels with easyish enemies
+      #Level 4
+      - layout: [*small_layout1]
+        content:
+          features: { tileset: [crystal_tiles, crystal_tiles_with_marble, crypt_tiles]}
+          items:    { amount: 7,  itemgenlist: Basic Items   }
+          enemies:
+            amount: [12,15]
+            generated:
+              - default: *easy_enemies
+      #Level 5
+      - layout: *small_layouts
+        content:
+          features: { tileset: pebble_tiles}
+          items:    { amount: 8,  itemgenlist: Basic Items   }
+          enemies:
+            amount: [12,15]
+            generated:
+              - default: *medium_enemies
+          
+      #Level 6
+      - layout: *small_layouts 
+        content:
+          features: { tileset: *all_tilesets}
+          items:    { amount: 8,  itemgenlist: Basic Items   }
+          enemies:
+            amount: 15
+            generated:
+              - {default: *medium_enemies}
+              - {enemy: Red Dragon, guaranteed_spawns: 1}
+          
       #Level 7
       - layout: *medium_layouts
         content:
