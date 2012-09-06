@@ -79,7 +79,9 @@ bool GameNetConnection::check_integrity(GameState* gs) {
 	SerializeBuffer& sb = grab_buffer(PACKET_CHECK_SYNC_INTEGRITY);
 
 	// Write out hashes
-	process_game_hash(gs, sb, true);
+	if (gs->game_settings().network_debug_mode) {
+		process_game_hash(gs, sb, true);
+	}
 	send_packet(sb);
 
 	std::vector<QueuedMessage> qms = sync_on_message(
