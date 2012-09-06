@@ -91,7 +91,7 @@ public:
 	SpellsKnown& spells_known();
 	EffectStats& effects();
 	Inventory& inventory();
-	Equipment& equipment();
+	EquipmentStats& equipment();
 
 	int& combat_mob_id() {
 		return mobid;

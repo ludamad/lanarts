@@ -71,7 +71,7 @@ static void factor_in_armour_slot(MTwist& mt, EffectiveStats& effective,
 	effective.magic.reduction += aentry.magic_reduction().calculate(mt, core);
 }
 static void factor_in_equipment(MTwist& mt, EffectiveStats& effective,
-		const Equipment& equipment) {
+		const EquipmentStats& equipment) {
 	factor_in_armour_slot(mt, effective, equipment.armour);
 }
 static void derive_secondary_stats(MTwist& mt, EffectiveStats& effective) {

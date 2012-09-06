@@ -39,7 +39,7 @@ static bool is_same_projectile(const Item& projectile, const Item& item) {
 	return !projectile.empty() && projectile.is_same_item(item);
 }
 
-static bool is_wieldable_projectile(Equipment& equipment, const Item& item) {
+static bool is_wieldable_projectile(EquipmentStats& equipment, const Item& item) {
 	if (is_same_projectile(equipment.projectile, item))
 		return true;
 

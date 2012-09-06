@@ -41,7 +41,7 @@ static void assert_equal(Inventory& i1, Inventory& i2) {
 	}
 }
 
-static void assert_equal(Equipment& e1, Equipment& e2) {
+static void assert_equal(EquipmentStats& e1, EquipmentStats& e2) {
 	UNIT_TEST_ASSERT(e1.weapon == e2.weapon);
 	UNIT_TEST_ASSERT(e1.armour == e2.armour);
 	UNIT_TEST_ASSERT(e1.projectile ==  e2.projectile);
@@ -75,7 +75,7 @@ static void serialize_equipment() {
 	game_item_data.resize(TEST_N, &mock_item);
 
 	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
-	Equipment e1, e2;
+	EquipmentStats e1, e2;
 	e1.armour = Equippable(1);
 	e1.weapon = Weapon(1);
 	e1.projectile = Projectile(1);

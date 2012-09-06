@@ -17,7 +17,7 @@
 #include "stat_formulas.h"
 
 CombatStats::CombatStats(const ClassStats& class_stats, const CoreStats& core,
-		const CooldownStats& cooldowns, const Equipment& equipment,
+		const CooldownStats& cooldowns, const EquipmentStats& equipment,
 		const std::vector<AttackStats>& attacks, float movespeed) :
 		core(core), cooldowns(cooldowns), class_stats(class_stats), equipment(
 				equipment), attacks(attacks), movespeed(movespeed) {

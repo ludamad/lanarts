@@ -13,7 +13,7 @@
 
 #include "Equipment.h"
 
-bool Equipment::valid_to_use_projectile(const Item& proj) {
+bool EquipmentStats::valid_to_use_projectile(const Item& proj) {
 	if (proj.empty())
 		return false;
 	ProjectileEntry& pentry = proj.projectile_entry();
@@ -24,14 +24,14 @@ bool Equipment::valid_to_use_projectile(const Item& proj) {
 	return false;
 }
 
-void Equipment::deequip_projectiles() {
+void EquipmentStats::deequip_projectiles() {
 	if (!projectile.empty()) {
 		inventory.add(projectile);
 		projectile.clear();
 	}
 }
 
-void Equipment::deequip_weapon() {
+void EquipmentStats::deequip_weapon() {
 	if (has_weapon()) {
 		inventory.add(weapon);
 		weapon.clear();
@@ -42,14 +42,14 @@ void Equipment::deequip_weapon() {
 	}
 }
 
-void Equipment::deequip_armour() {
+void EquipmentStats::deequip_armour() {
 	if (has_armour()) {
 		inventory.add(armour);
 		armour.clear();
 	}
 }
 
-void Equipment::deequip(int equipment_type) {
+void EquipmentStats::deequip(int equipment_type) {
 	switch (equipment_type) {
 	case EquipmentEntry::PROJECTILE:
 		deequip_projectiles();
@@ -62,7 +62,7 @@ void Equipment::deequip(int equipment_type) {
 		break;
 	}
 }
-bool Equipment::valid_to_use(const Item& item) {
+bool EquipmentStats::valid_to_use(const Item& item) {
 	if (item.is_normal_item()) {
 		return true;
 	}
@@ -72,7 +72,7 @@ bool Equipment::valid_to_use(const Item& item) {
 	}
 	return true;
 }
-void Equipment::equip(const Item& item) {
+void EquipmentStats::equip(const Item& item) {
 	switch (item.equipment_entry().type) {
 	case EquipmentEntry::ARMOUR:
 		LANARTS_ASSERT(item.amount == 1);
@@ -104,11 +104,11 @@ void Equipment::equip(const Item& item) {
 	}
 }
 
-void Equipment::use_ammo(int amnt) {
+void EquipmentStats::use_ammo(int amnt) {
 	projectile.remove_copies(amnt);
 }
 
-void Equipment::serialize(SerializeBuffer& serializer) {
+void EquipmentStats::serialize(SerializeBuffer& serializer) {
 	inventory.serialize(serializer);
 	weapon.serialize(serializer);
 	projectile.serialize(serializer);
@@ -116,7 +116,7 @@ void Equipment::serialize(SerializeBuffer& serializer) {
 	serializer.write_int(money);
 }
 
-void Equipment::deserialize(SerializeBuffer& serializer) {
+void EquipmentStats::deserialize(SerializeBuffer& serializer) {
 	inventory.deserialize(serializer);
 	weapon.deserialize(serializer);
 	projectile.deserialize(serializer);

@@ -12,9 +12,9 @@
 
 #include "items/items.h"
 
-class Equipment {
+class EquipmentStats {
 public:
-	Equipment() :
+	EquipmentStats() :
 			money(0) {
 	}
 	bool valid_to_use_projectile(const Item& proj);

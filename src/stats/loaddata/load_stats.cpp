@@ -37,8 +37,8 @@ Inventory parse_inventory(const YAML::Node& n) {
 	}
 	return ret;
 }
-Equipment parse_equipment(const YAML::Node& n) {
-	Equipment ret;
+EquipmentStats parse_equipment(const YAML::Node& n) {
+	EquipmentStats ret;
 	ret.inventory = parse_inventory(n["inventory"]);
 	if (yaml_has_node(n, "weapon")) {
 		ret.weapon = parse_as_item(n, "weapon");

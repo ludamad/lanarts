@@ -47,7 +47,7 @@ struct CombatStats {
 	CombatStats(const ClassStats& class_stats = ClassStats(),
 			const CoreStats& core = CoreStats(),
 			const CooldownStats& cooldowns = CooldownStats(),
-			const Equipment& equipment = Equipment(),
+			const EquipmentStats& equipment = EquipmentStats(),
 			const std::vector<AttackStats>& attacks =
 					std::vector<AttackStats>(), float movespeed = 0.0f);
 
@@ -68,7 +68,7 @@ struct CombatStats {
 	CoreStats core;
 	CooldownStats cooldowns;
 	ClassStats class_stats;
-	Equipment equipment;
+	EquipmentStats equipment;
 	EffectStats effects;
 	SpellsKnown spells;
 

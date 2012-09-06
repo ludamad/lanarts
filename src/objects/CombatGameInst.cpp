@@ -370,7 +370,7 @@ Inventory& CombatGameInst::inventory() {
 	return stats().equipment.inventory;
 }
 
-Equipment& CombatGameInst::equipment() {
+EquipmentStats& CombatGameInst::equipment() {
 	return stats().equipment;
 }
 

@@ -36,7 +36,7 @@ static BBox armour_slot_bbox(GameState* gs, const BBox& bbox) {
 			weapon_bbox.y2 + TILE_SIZE);
 }
 
-static void draw_weapon(GameState* gs, Equipment& eqp, const BBox& bbox) {
+static void draw_weapon(GameState* gs, EquipmentStats& eqp, const BBox& bbox) {
 	Colour bbox_col = COL_FILLED_OUTLINE;
 	if (bbox.contains(gs->mouse_pos())) {
 		bbox_col = COL_WHITE;
@@ -54,7 +54,7 @@ static void draw_weapon(GameState* gs, Equipment& eqp, const BBox& bbox) {
 	gl_draw_rectangle_outline(bbox, bbox_col);
 }
 
-static void draw_armour(GameState* gs, Equipment& eqp, BBox bbox) {
+static void draw_armour(GameState* gs, EquipmentStats& eqp, BBox bbox) {
 	Colour bbox_col = COL_UNFILLED_OUTLINE;
 	if (eqp.has_armour()) {
 		bbox_col = COL_FILLED_OUTLINE;
@@ -72,7 +72,7 @@ static void draw_armour(GameState* gs, Equipment& eqp, BBox bbox) {
 void EquipmentContent::draw(GameState* gs) const {
 	PlayerInst* p = gs->local_player();
 
-	Equipment& eqp = p->equipment();
+	EquipmentStats& eqp = p->equipment();
 
 	gl_draw_rectangle_outline(bbox, COL_UNFILLED_OUTLINE);
 	draw_weapon(gs, eqp, weapon_slot_bbox(gs, bbox));
