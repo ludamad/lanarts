@@ -31,22 +31,22 @@ weapons:
     cooldown: 40
     spr_item: short sword
     
-  - name: Samuri Sabre
-    shop_cost: [100, 140]
+  - name: Samurai Sabre
+    shop_cost: [70, 100]
     weapon_class: short blades
-    description: Once owned by a powerful warrior.
+    description: A swift blade once owned by a powerful warrior.
     damage: {base: [7,11], strength: 1.1}
-    power: {base: 1, strength: 2}
+    power: {base: 4, strength: 0.3}
     range: 7
-    cooldown: 30
-    spr_item: samuri sabre
+    cooldown: 40
+    spr_item: samurai sabre
     
   - name: Iron Broadsword
     shop_cost: [70,100]
     weapon_class: blades
-    description: Long and Heavy, but effective
+    description: Long and Heavy, but effective.
     damage: {base: [5,10], strength: 1.3 }
-    resist_modifier: 0.9
+    resist_modifier: 1.0
     power: {base: 6, strength: 0.35}
     range: 10
     cooldown: 60
@@ -67,7 +67,7 @@ weapons:
     shop_cost: [75,95]
     weapon_class: short blades
     description: An enchanted sword that saps your mana reserves, but does greater damage.
-    damage: {base: [4,8], strength: 1.0, magic: 0.2}
+    damage: {base: [4,8], strength: 1.1, magic: 0.2}
     resist_modifier: 1.1
     power: {base: 1, strength: 0.2}
     range: 7

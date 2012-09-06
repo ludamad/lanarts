@@ -25,6 +25,6 @@ frame_action_repeat: 1 #Default = 1. Ignored in single player, improves multipla
 
 #Debug settings
 network_debug_mode: no
-invincible: yes #Feel like exploring ? -> yes
+invincible: no #Feel like exploring ? -> yes
 draw_diagnostics: no
 verbose_output: no
