@@ -42,7 +42,7 @@ struct GameSettings {
 	GameSettings() {
 		//sets defaults
 		fullscreen = false;
-		regen_on_death = false;
+		regen_on_death = true;
 
 		classtype = 1;
 		view_width = 960;

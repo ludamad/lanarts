@@ -3,7 +3,6 @@ username: User
 
 #Window settings
 fullscreen: no
-regen_level_on_death: yes
 view_width: 1200
 view_height: 800
 
