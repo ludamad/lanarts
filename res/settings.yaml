@@ -5,7 +5,7 @@ username: User
 fullscreen: no
 regen_level_on_death: no
 view_width: 1200
-view_height: 900
+view_height: 800
 
 #Gameplay preferences
 autouse_health_potions: yes # can toggle in game as well

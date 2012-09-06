@@ -66,7 +66,7 @@ static void draw_armour(GameState* gs, EquipmentStats& eqp, BBox bbox) {
 		}
 	}
 
-	draw_item_icon_and_name(gs, eqp.armour().item_entry(), COL_WHITE, bbox.x1,
+	draw_item_icon_and_name(gs, eqp.armour().equipment_entry(), COL_WHITE, bbox.x1,
 			bbox.y1);
 	gl_draw_rectangle_outline(bbox, bbox_col);
 }
