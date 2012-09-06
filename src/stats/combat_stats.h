@@ -9,7 +9,7 @@
 
 #include <vector>
 
-#include "Equipment.h"
+#include "EquipmentStats.h"
 #include "SpellsKnown.h"
 #include "effects.h"
 #include "stats.h"

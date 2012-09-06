@@ -60,7 +60,7 @@ int damage_formula(const EffectiveAttackStats& attacker,
 }
 
 static void factor_in_armour_slot(MTwist& mt, EffectiveStats& effective,
-		const Equippable& slot) {
+		const Equipment& slot) {
 	CoreStats& core = effective.core;
 	EquipmentEntry& aentry = slot.equipment_entry();
 

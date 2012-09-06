@@ -1,5 +1,5 @@
 /*
- * Equipment.cpp
+ * EquipmentStats.cpp
  *  Represents all the possessions and equipped items of a player
  */
 
@@ -11,7 +11,7 @@
 
 #include "items/items.h"
 
-#include "Equipment.h"
+#include "EquipmentStats.h"
 
 bool EquipmentStats::valid_to_use_projectile(const Item& proj) {
 	if (proj.empty())

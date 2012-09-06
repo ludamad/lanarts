@@ -151,7 +151,7 @@ set( lanarts_src
 	
 	stats/combat_stats.cpp
 	stats/effects.cpp
-	stats/Equipment.cpp
+	stats/EquipmentStats.cpp
 	stats/Inventory.cpp
 	stats/skills.cpp
 	stats/SpellsKnown.cpp
@@ -281,7 +281,7 @@ set( lanarts_include
 	stats/effect_data.h
 	stats/effects.h
 	stats/EnemiesSeen.h
-	stats/Equipment.h
+	stats/EquipmentStats.h
 	stats/Inventory.h
 	stats/itemgen_data.h
 	stats/ItemsKnown.h

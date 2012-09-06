@@ -114,6 +114,6 @@ struct Item {
 
 typedef Item Weapon;
 typedef Item Projectile;
-typedef Item Equippable;
+typedef Item Equipment;
 
 #endif /* ITEMS_H_ */

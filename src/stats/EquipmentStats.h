@@ -1,10 +1,10 @@
 /*
- * Equipment.h:
+ * EquipmentStats.h:
  *  Represents all the possessions and equipped items of a player
  */
 
-#ifndef EQUIPMENT_H_
-#define EQUIPMENT_H_
+#ifndef EQUIPMENTSTATS_H_
+#define EQUIPMENTSTATS_H_
 
 #include "../lanarts_defines.h"
 
@@ -47,4 +47,4 @@ public:
 	money_t money;
 };
 
-#endif /* EQUIPMENT_H_ */
+#endif /* EQUIPMENTSTATS_H_ */
