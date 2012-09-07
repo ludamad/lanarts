@@ -73,16 +73,16 @@ static void process_game_hash(GameState* gs, SerializeBuffer& sb, bool isw) {
 	}
 }
 bool GameNetConnection::check_integrity(GameState* gs) {
+	return true; // Turn these off for now
 	if (!_connection) {
 		return true;
 	}
-	SerializeBuffer& sb = grab_buffer(PACKET_CHECK_SYNC_INTEGRITY);
 
 	// Write out hashes
-	if (gs->game_settings().network_debug_mode) {
-		process_game_hash(gs, sb, true);
-	}
+	SerializeBuffer& sb = grab_buffer(PACKET_CHECK_SYNC_INTEGRITY);
+	process_game_hash(gs, sb, true);
 	send_packet(sb);
+	printf("Sent integrity frame %d\n", gs->frame());
 
 	std::vector<QueuedMessage> qms = sync_on_message(
 			PACKET_CHECK_SYNC_INTEGRITY);
@@ -91,7 +91,6 @@ bool GameNetConnection::check_integrity(GameState* gs) {
 		process_game_hash(gs, *qms[i].message, false);
 		delete qms[i].message;
 	}
-
 	return true;
 }
 
@@ -230,6 +229,10 @@ static void post_sync(GameState* gs) {
 }
 
 void net_send_state_and_sync(GameNetConnection& net, GameState* gs) {
+	if (gs->game_settings().network_debug_mode) {
+		net.check_integrity(gs);
+	}
+	printf("Sent sync on frame %d\n", gs->frame());
 	SerializeBuffer& sb = net.grab_buffer(GameNetConnection::PACKET_FORCE_SYNC);
 	if (!net.is_connected())
 		return;
@@ -252,6 +255,7 @@ void net_send_state_and_sync(GameNetConnection& net, GameState* gs) {
 }
 
 void net_recv_sync_data(SerializeBuffer& sb, GameState* gs) {
+	printf("Got sync on frame %d\n", gs->frame());
 	int mtwistseed;
 	sb.read_int(mtwistseed);
 	gs->rng().init_genrand(mtwistseed);

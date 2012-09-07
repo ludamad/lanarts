@@ -39,14 +39,14 @@ enemies:
     sprite: giant spider
     death_sprite: blood
     radius: 14
-    xpaward: 20
+    xpaward: 10
     appear_message: A giant spider crawls towards you
     defeat_message: The giant spider has been squashed.
     stats:
         attacks: [ {weapon: Fast Melee} ]
-        hp: 10
+        hp: 20
         hpregen: 0.04
-        movespeed: 4
+        movespeed: 5
         strength: 12
         defence: 4
         willpower: 10
