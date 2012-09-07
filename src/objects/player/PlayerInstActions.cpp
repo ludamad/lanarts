@@ -451,9 +451,9 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 					Colour(100, 100, 255));
 		}
 		if (itemslot.is_projectile())
-			itemslot.amount = 0;
+			itemslot.clear();
 		else
-			itemslot.amount--;
+			itemslot.remove_copies(1);
 		reset_rest_cooldown();
 	}
 

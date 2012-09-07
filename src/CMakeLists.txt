@@ -60,10 +60,11 @@ set( lanarts_src
 	interface/ButtonInst.cpp
 	interface/console_description_draw.cpp
 	interface/GameChat.cpp
+	interface/GameChatCheatCodes.cpp
 	interface/GameDialogs.cpp
 	interface/GameHud.cpp
 	interface/GameTextConsole.cpp	
-	interface/TextField.h
+	interface/TextField.cpp
 	
 	interface/sidebar/ConfigContent.cpp
 	interface/sidebar/EnemiesSeenContent.cpp

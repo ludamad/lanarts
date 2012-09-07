@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+#include "TextField.h"
+
 #include "../serialize/SerializeBuffer.h"
 #include "../lanarts_defines.h"
 
@@ -27,7 +29,8 @@ struct ChatMessage {
 	std::string sender, message;
 	Colour sender_colour, message_colour;
 	int exact_copies;
-	ChatMessage(const std::string& sender = std::string(), const std::string& message = std::string(),
+	ChatMessage(const std::string& sender = std::string(),
+			const std::string& message = std::string(),
 			const Colour& sender_colour = Colour(255, 255, 255),
 			const Colour& message_colour = Colour(255, 255, 255)) :
 			sender(sender), message(message), sender_colour(sender_colour), message_colour(
@@ -63,21 +66,17 @@ public:
 	void toggle_chat(GameState* gs);
 
 private:
+	ChatMessage get_field_as_chat_message(GameState* gs,
+			bool include_username) const;
 	bool handle_special_commands(GameState* gs, const std::string& command);
 
 	void reset_typed_message();
 	void draw_player_chat(GameState* gs) const;
-
-	ChatMessage typed_message;
-
-	SDLKey current_key;
-	SDLMod current_mod;
-	int repeat_steps_left;
+	TextField typing_field;
 
 	std::vector<ChatMessage> messages;
 	bool show_chat, is_typing;
 	float fade_out, fade_out_rate;
-
 };
 
 #endif /* GAMECHAT_H_ */

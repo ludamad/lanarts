@@ -6,25 +6,10 @@
 
 #include <SDL.h>
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-}
-
-#include "../data/game_data.h"
-
 #include "../display/colour_constants.h"
 
 #include "../display/display.h"
 #include "../gamestate/GameState.h"
-
-#include "../levelgen/enemygen.h"
-
-#include "../lua/lua_api.h"
-
-#include "../objects/player/PlayerInst.h"
-
-#include "../util/math_util.h"
 
 #include "GameChat.h"
 
@@ -81,6 +66,24 @@ void GameChat::clear() {
 	messages.clear();
 }
 
+static const Colour player_colours[] = { COL_BABY_BLUE, COL_PALE_YELLOW,
+		COL_PALE_RED, COL_PALE_GREEN, COL_PALE_BLUE, COL_LIGHT_GRAY };
+static const int player_colours_n = sizeof(player_colours) / sizeof(Colour);
+
+ChatMessage GameChat::get_field_as_chat_message(GameState* gs,
+		bool include_username) const {
+	int colour_idx = gs->player_data().local_player_data().net_id
+			% player_colours_n;
+
+	ChatMessage typed_message;
+	if (include_username) {
+		typed_message.sender = gs->game_settings().username;
+	}
+	typed_message.sender_colour = player_colours[colour_idx];
+	typed_message.message = typing_field.text();
+	return typed_message;
+}
+
 void GameChat::draw_player_chat(GameState* gs) const {
 	perf_timer_begin(FUNCNAME);
 	const font_data& font = gs->primary_font();
@@ -95,7 +98,7 @@ void GameChat::draw_player_chat(GameState* gs) const {
 	gl_draw_rectangle(chat_x, chat_y, chat_w, chat_h,
 			COL_CONSOLE_BOX.with_alpha(50 * fade_out));
 
-	bool draw_typed_message = is_typing || !typed_message.empty();
+	bool draw_typed_message = is_typing || !typing_field.empty();
 
 	int start_msg = 0;
 	int message_space = chat_h - padding * 2
@@ -114,59 +117,19 @@ void GameChat::draw_player_chat(GameState* gs) const {
 		int type_y = chat_y + chat_h - padding - line_sep;
 		gl_draw_line(chat_x, type_y, chat_x + chat_w, type_y,
 				Colour(200, 200, 200, fade_out * 180));
+		ChatMessage typed_message = get_field_as_chat_message(gs, false);
 		typed_message.draw(font, fade_out, text_x, type_y + padding - 1);
 	}
 	perf_timer_end(FUNCNAME);
 }
 
-static char keycode_to_char(SDLKey keycode, SDLMod keymod) {
-	const char DIGIT_SYMBOLS[] = { ')', '!', '@', '#', '$', '%', '^', '&', '*',
-			'(' };
-	const char MISC_SYMBOLS[][2] = { { '`', '~' }, { ',', '<' }, { '.', '>' }, {
-			'/', '?' }, { ';', ':' }, { '\'', '"' }, { '[', '{' }, { ']', '}' },
-			{ '\\', '|' }, { '-', '_' }, { '=', '+' } };
-	bool hitcaps = (keymod & KMOD_CAPS);
-	bool hitshift = (keymod & (KMOD_LSHIFT | KMOD_RSHIFT));
-	if ((hitcaps != hitshift) && isalpha(keycode)) {
-		return toupper(keycode);
-	} else if (hitshift) {
-		if (isdigit(keycode))
-			return DIGIT_SYMBOLS[keycode - '0'];
-		for (int i = 0; i < sizeof(MISC_SYMBOLS) / sizeof(char) / 2; i++) {
-			if (keycode == MISC_SYMBOLS[i][0])
-				return MISC_SYMBOLS[i][1];
-		}
-	}
-	return keycode;
-}
-static bool is_typeable_keycode(SDLKey keycode) {
-	return (keycode >= SDLK_SPACE && keycode <= SDLK_z);
-}
-
 void GameChat::step(GameState* gs) {
-	std::string& msg = typed_message.message;
-
 	if (show_chat)
 		fade_out = 1.0f;
 	else if (fade_out > 0.0f)
 		fade_out -= fade_out_rate;
-
-	if (repeat_steps_left > 0)
-		repeat_steps_left--;
-	else if (current_key != SDLK_FIRST) {
-		/*Handle keys being held down*/
-		if (is_typeable_keycode(current_key)) {
-			msg += keycode_to_char(current_key, current_mod);
-			repeat_steps_left = NEXT_REPEAT_STEP_AMNT;
-		} else if (current_key == SDLK_BACKSPACE) {
-			if (msg.empty()) {
-				reset_typed_message();
-				is_typing = false;
-			} else {
-				msg.resize(msg.size() - 1);
-			}
-			repeat_steps_left = NEXT_BACKSPACE_STEP_AMNT;
-		}
+	if (is_typing) {
+		typing_field.step();
 	}
 }
 void GameChat::draw(GameState *gs) const {
@@ -175,202 +138,10 @@ void GameChat::draw(GameState *gs) const {
 	}
 }
 
-static const char* skip_whitespace(const char* cstr) {
-	while (*cstr != '\0' && isspace(*cstr)) {
-		cstr++;
-	}
-	return cstr;
-}
-static bool starts_with(const std::string& str, const char* prefix,
-		const char** content) {
-	int length = strlen(prefix);
-	bool hasprefix = strncmp(str.c_str(), prefix, length) == 0;
-	if (hasprefix) {
-		*content = skip_whitespace(str.c_str() + length);
-		return true;
-	}
-	return false;
-}
-
-bool GameChat::handle_special_commands(GameState* gs,
-		const std::string& command) {
-	ChatMessage printed;
-	const char* content;
-	PlayerInst* p = gs->local_player();
-
-	//Spawn monster
-	if (starts_with(command, "!spawn ", &content)) {
-		const char* rest = content;
-		int amnt = strtol(content, (char**)&rest, 10);
-		if (content == rest)
-			amnt = 1;
-		rest = skip_whitespace(rest);
-
-		int enemy = get_enemy_by_name(rest, false);
-		if (enemy == -1) {
-			printed.message = "No such monster, '" + std::string(rest) + "'!";
-			printed.message_colour = Colour(255, 50, 50);
-		} else {
-			printed.message = std::string(rest) + " has spawned !";
-			generate_enemy_after_level_creation(gs, enemy, amnt);
-			printed.message_colour = Colour(50, 255, 50);
-		}
-		add_message(printed);
-		return true;
-	}
-
-	//Set game speed
-	if (starts_with(command, "!gamespeed ", &content)) {
-		int gamespeed = squish(atoi(content), 1, 200);
-		gs->game_settings().time_per_step = gamespeed;
-		printed.message = std::string("Game speed set.");
-		printed.message_colour = Colour(50, 255, 50);
-		add_message(printed);
-		return true;
-	}
-
-	//Gain XP
-	if (starts_with(command, "!gainxp ", &content)) {
-		int xp = atoi(content);
-		if (xp > 0 && xp < 999999) {
-			printed.message = std::string("You have gained ") + content
-					+ " experience.";
-			printed.message_colour = Colour(50, 255, 50);
-			add_message(printed);
-			p->gain_xp(gs, xp);
-		} else {
-			printed.message = "Invalid experience amount!";
-			printed.message_colour = Colour(255, 50, 50);
-			add_message(printed);
-		}
-		return true;
-	}
-
-	//Create item
-	if (starts_with(command, "!item ", &content)) {
-		const char* rest = content;
-		int amnt = strtol(content, (char**)&rest, 10);
-		if (content == rest)
-			amnt = 1;
-		rest = skip_whitespace(rest);
-
-		item_id item = get_item_by_name(rest, false);
-		if (item == -1) {
-			printed.message = "No such item, '" + std::string(rest) + "'!";
-			printed.message_colour = Colour(255, 50, 50);
-		} else {
-			printed.message = std::string(rest) + " put in your inventory !";
-			p->stats().equipment.inventory.add(Item(item, amnt));
-			printed.message_colour = Colour(50, 255, 50);
-		}
-		add_message(printed);
-		return true;
-	}
-
-	//Kill all monsters
-	if (starts_with(command, "!killall", &content)) {
-		MonsterController& mc = gs->monster_controller();
-		for (int i = 0; i < mc.monster_ids().size(); i++) {
-			EnemyInst* inst = (EnemyInst*)gs->get_instance(mc.monster_ids()[i]);
-			if (inst) {
-				inst->damage(gs, 99999);
-			}
-		}
-		printed.message = "Killed all monsters.";
-		printed.message_colour = Colour(50, 255, 50);
-		add_message(printed);
-		return true;
-	}
-
-	lua_State* L = gs->get_luastate();
-	static LuaValue script_globals;
-	if (script_globals.empty()) {
-		script_globals.table_initialize(L);
-//		script_globals.push(L);
-//		int script = lua_gettop(L);
-//		lua_pushvalue(L, LUA_GLOBALSINDEX);
-//		lua_setmetatable(L, script);
-//		lua_pop(L, 1);
-	}
-
-	lua_push_gameinst(L, p);
-	script_globals.table_pop_value(L, "player");
-	lua_push_combatstats(L, p);
-	script_globals.table_pop_value(L, "stats");
-
-	//Run lua command
-	if (starts_with(command, "!lua ", &content)) {
-//		std::string luafunc = std::string(content);
-
-		int prior_top = lua_gettop(L);
-
-		luaL_loadstring(L, content);
-		if (lua_isstring(L, -1)) {
-			const char* val = lua_tostring(L, -1);
-			add_message(val, /*iserr ? Colour(255,50,50) :*/
-			Colour(120, 120, 255));
-			return true;
-		}
-
-		int lfunc = lua_gettop(L);
-		script_globals.push(L);
-		lua_setfenv(L, lfunc);
-
-		bool iserr = (lua_pcall(L, 0, LUA_MULTRET, 0) != 0);
-
-		int current_top = lua_gettop(L);
-
-		for (; prior_top < current_top; prior_top++) {
-			if (lua_isstring(L, -1)) {
-				const char* val = lua_tostring(L, -1);
-				add_message(val,
-						iserr ? Colour(255, 50, 50) : Colour(120, 120, 255));
-			}
-			lua_pop(L, 1);
-		}
-
-		return true;
-	}
-	//Run lua file
-	if (starts_with(command, "!luafile ", &content)) {
-		int prior_top = lua_gettop(L);
-
-		int err_func = luaL_loadfile(L, content);
-		if (err_func) {
-			const char* val = lua_tostring(L, -1);
-			add_message(val, Colour(120, 120, 255));
-			lua_pop(L, 1);
-			return true;
-		}
-
-		int lfunc = lua_gettop(L);
-		script_globals.push(L);
-		lua_setfenv(L, lfunc);
-
-		bool err_call = (lua_pcall(L, 0, 0, 0) != 0);
-		if (err_call) {
-			const char* val = lua_tostring(L, -1);
-			add_message(val, Colour(120, 120, 255));
-			lua_pop(L, 1);
-		}
-		return true;
-	}
-
-	return false;
-}
-
-static const Colour player_colours[] = { COL_BABY_BLUE, COL_PALE_YELLOW,
-		COL_PALE_RED, COL_PALE_GREEN, COL_PALE_BLUE, COL_LIGHT_GRAY };
-static const int player_colours_n = sizeof(player_colours) / sizeof(Colour);
-
 void GameChat::toggle_chat(GameState* gs) {
 	if (is_typing) {
-		if (!typed_message.message.empty()) {
-			typed_message.sender = gs->game_settings().username;
-			int colour_idx = gs->player_data().local_player_data().net_id
-					% player_colours_n;
-			typed_message.sender_colour = player_colours[colour_idx];
-
+		if (!typing_field.empty()) {
+			ChatMessage typed_message = get_field_as_chat_message(gs, true);
 			if (!handle_special_commands(gs, typed_message.message)) {
 				add_message(typed_message);
 				net_send_chatmessage(gs->net_connection(), typed_message);
@@ -396,7 +167,12 @@ bool GameChat::handle_event(GameState* gs, SDL_Event *event) {
 
 	SDLKey keycode = event->key.keysym.sym;
 	SDLMod keymod = event->key.keysym.mod;
-	current_mod = keymod;
+
+	bool did_typing = false;
+	if (is_typing) {
+		did_typing = (typing_field.handle_event(event));
+	}
+
 	switch (event->type) {
 	case SDL_MOUSEBUTTONDOWN: {
 //		if (show_chat && event->button.button == SDL_BUTTON_LEFT
@@ -406,37 +182,16 @@ bool GameChat::handle_event(GameState* gs, SDL_Event *event) {
 //		}
 		break;
 	}
-	case SDL_KEYUP: {
-		if (current_key == keycode)
-			current_key = SDLK_FIRST;
-		/*Let GameState handle this as well*/
-		break;
-	}
 	case SDL_KEYDOWN: {
 		if (keycode == SDLK_RETURN) {
 			toggle_chat(gs);
 			return true;
 		}
 		if (is_typing) {
-			std::string& msg = typed_message.message;
-			if (is_typeable_keycode(keycode)) {
-				msg += keycode_to_char(keycode, keymod);
-				if (current_key != keycode) {
-					current_key = keycode;
-					repeat_steps_left = INITIAL_REPEAT_STEP_AMNT;
-				}
-				return true;
-			}
 			if (keycode == SDLK_BACKSPACE) {
-				if (msg.empty()) {
+				if (typing_field.empty()) {
 					reset_typed_message();
 					is_typing = false;
-				} else {
-					msg.resize(msg.size() - 1);
-				}
-				if (current_key != keycode) {
-					current_key = keycode;
-					repeat_steps_left = INITIAL_REPEAT_STEP_AMNT;
 				}
 				return true;
 			}
@@ -453,24 +208,20 @@ bool GameChat::handle_event(GameState* gs, SDL_Event *event) {
 		break;
 	}
 	}
-	return false;
+	return did_typing;
 }
 
 void GameChat::reset_typed_message() {
-	typed_message.sender.clear();
-	typed_message.message.clear();
+	typing_field.clear();
 }
 
+static const int TEXT_FIELD_LIMIT = 250;
 GameChat::GameChat() :
-		typed_message(std::string(), std::string()) {
-	current_key = SDLK_UNKNOWN;
-	current_mod = KMOD_NONE;
-	reset_typed_message();
+		typing_field(TEXT_FIELD_LIMIT) {
 	show_chat = true;
 	fade_out = 1.0f;
 	fade_out_rate = 0.05f;
 	is_typing = false;
-	repeat_steps_left = 0;
 }
 
 void ChatMessage::serialize(SerializeBuffer& serializer) {
