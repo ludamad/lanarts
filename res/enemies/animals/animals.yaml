@@ -44,9 +44,9 @@ enemies:
     defeat_message: The giant spider has been squashed.
     stats:
         attacks: [ {weapon: Fast Melee} ]
-        hp: 20
+        hp: 15
         hpregen: 0.04
-        movespeed: 5
+        movespeed: 4
         strength: 12
         defence: 4
         willpower: 10
