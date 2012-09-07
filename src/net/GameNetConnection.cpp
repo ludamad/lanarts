@@ -73,7 +73,6 @@ static void process_game_hash(GameState* gs, SerializeBuffer& sb, bool isw) {
 	}
 }
 bool GameNetConnection::check_integrity(GameState* gs) {
-	return true; // Turn these off for now
 	if (!_connection) {
 		return true;
 	}
