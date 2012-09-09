@@ -12,19 +12,19 @@
 
 #include "../util/callback_util.h"
 
-#include "DrawCallbackInst.h"
+#include "TextField.h"
 
-class TextBoxInst: public DrawCallbackInst {
+class TextBoxInst: public GameInst {
 public:
 	enum {
-		RADIUS = 10
+		RADIUS = 1
 	};
-	TextBoxInst(const Pos& p, const ObjCallback& stepcallback,
-			const ObjCallback& drawcallback, int max_length,
-			const std::string defaultstr = std::string(),
+	TextBoxInst(const BBox& bbox, int max_length,
+			const std::string& defaultstr = std::string(),
 			const ObjCallback& enter_callback = ObjCallback()) :
-			DrawCallbackInst(p, stepcallback, drawcallback), data(defaultstr), enter_callback(
-					enter_callback) {
+			GameInst(bbox.x1, bbox.y1, RADIUS, false), bbox(bbox), enter_callback(
+					enter_callback), selected(false), text_field(max_length,
+					defaultstr) {
 	}
 	virtual ~TextBoxInst() {
 	}
@@ -36,8 +36,10 @@ public:
 	virtual TextBoxInst* clone() const;
 
 private:
-	std::string data;
+	BBox bbox;
 	ObjCallback enter_callback;
+	bool selected;
+	TextField text_field;
 };
 
 #endif /* TEXTBOXINST_H_ */

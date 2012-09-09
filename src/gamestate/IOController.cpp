@@ -68,6 +68,7 @@ void IOState::clear_for_step() {
 	mouse_didupwheel = false;
 	mouse_diddownwheel = false;
 
+	sdl_events.clear();
 }
 
 static void bind_key_events(std::vector<IOEventTrigger>& bindings,
@@ -216,6 +217,7 @@ int IOController::mouse_y() {
 int IOController::handle_event(SDL_Event* event) {
 	int done = 0;
 	iostate.keymod = event->key.keysym.mod;
+	iostate.sdl_events.push_back(*event);
 	SDLKey key = event->key.keysym.sym;
 
 	switch (event->type) {
@@ -278,6 +280,10 @@ void IOController::update_iostate(bool resetprev) {
 	}
 	SDL_GetMouseState(&iostate.mousex, &iostate.mousey);
 }
+std::vector<SDL_Event>& IOController::get_events() {
+	return iostate.sdl_events;
+}
+
 void IOController::__trigger_events(IOEventTrigger::trigger_t trigger,
 		SDLKey trigger_key, SDLMod mod, bool holding_key) {
 	for (int i = 0; i < event_bindings.size(); i++) {

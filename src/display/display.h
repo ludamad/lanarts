@@ -30,8 +30,7 @@ void gl_subimage_from_bytes(GLimage& img, const BBox& region, char* data,
 void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type =
 		GL_BGRA);
 
-inline void gl_init_image(GLimage& img, int w, int h, int type =
-		GL_BGRA) {
+inline void gl_init_image(GLimage& img, int w, int h, int type = GL_BGRA) {
 	gl_image_from_bytes(img, w, h, NULL, type);
 }
 
@@ -52,6 +51,11 @@ void gl_draw_circle(float x, float y, float radius, const Colour& colour =
 		Colour(0, 0, 0), bool outline = false);
 void gl_draw_rectangle(int x, int y, int w, int h, const Colour& colour =
 		Colour(0, 0, 0));
+
+inline void gl_draw_rectangle(const BBox& bbox,
+		const Colour& clr = Colour(255, 255, 255)) {
+	gl_draw_rectangle(bbox.x1, bbox.y1, bbox.width(), bbox.height(), clr);
+}
 void gl_draw_circle(const GameView& view, float x, float y, float radius,
 		const Colour& colour = Colour(0, 0, 0), bool outline = false);
 void gl_draw_rectangle(const GameView& view, int x, int y, int w, int h,

@@ -28,3 +28,4 @@ invincible: no #Feel like exploring ? -> yes
 draw_diagnostics: no
 verbose_output: no
 keep_event_log: no
+#comparison_event_log: logs/game_event_log something something

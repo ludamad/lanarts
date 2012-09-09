@@ -98,8 +98,8 @@ void GameState::start_game() {
 	char filename[512];
 	const char* input_log = NULL;
 	const char* output_log = NULL;
-	if (settings.comparison_log.empty()) {
-		input_log = settings.comparison_log.c_str();
+	if (!settings.comparison_event_log.empty()) {
+		input_log = settings.comparison_event_log.c_str();
 	}
 	if (settings.keep_event_log) {
 		time_t t;
@@ -130,7 +130,6 @@ void GameState::start_game() {
 	printf("Seed used for RNG = 0x%X\n", init_data.seed);
 
 	mtwist.init_genrand(init_data.seed);
-
 
 	set_level(world.get_level(0, true));
 
@@ -198,7 +197,8 @@ CollisionAvoidance & GameState::collision_avoidance() {
 }
 
 int GameState::handle_event(SDL_Event* event) {
-	if (get_level()) {
+	GameLevelState* level = get_level();
+	if (level && level->id() != -1) {
 		if (hud.handle_event(this, event))
 			return 0;
 	}

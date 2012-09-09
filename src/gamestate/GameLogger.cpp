@@ -16,11 +16,18 @@ void GameLogger::initialize_logs(GameState* gs, const char* input_log,
 		const char* output_log) {
 	this->gs = gs;
 	if (input_log) {
+		printf("Comparing to log file %s\n", input_log);
 		input_log_file.open(input_log, std::ios_base::in);
+		if (!input_log_file) {
+			printf("Failed to open log file %s\n", input_log);
+		}
 	}
 	if (output_log) {
 		printf("Logging to file %s\n", output_log);
 		output_log_file.open(output_log, std::ios_base::out);
+		if (!output_log_file) {
+			printf("Failed to open log file %s\n", input_log);
+		}
 	}
 }
 
@@ -48,8 +55,13 @@ void GameLogger::event_log(const char *fmt, va_list ap) {
 	output_log_file.write(text, strlen(text));
 	if (input_log_file) {
 		std::getline(input_log_file, line);
-		line += '\n';
-		LANARTS_ASSERT(line == text);
+		if (!line.empty()) {
+			line += '\n';
+			LANARTS_ASSERT(line == text);
+		}
+		if (input_log_file.eof()) {
+			input_log_file.close();
+		}
 	}
 }
 

@@ -8,25 +8,26 @@
 
 #include "TextField.h"
 
-/*Handle key repeating, in steps*/
-const int INITIAL_REPEAT_STEP_AMNT = 40;
-const int NEXT_REPEAT_STEP_AMNT = 5;
-const int NEXT_BACKSPACE_STEP_AMNT = 3;
+/*Handle key repeating, in milliseconds*/
+const int INITIAL_REPEAT_STEP_AMNT = 560;
+const int NEXT_REPEAT_STEP_AMNT = 70;
+const int NEXT_BACKSPACE_STEP_AMNT = 42;
+const int NO_REPEAT_AMNT = -1;
 
 TextField::TextField(int max_length, const std::string & default_text) :
 		_max_length(max_length), _text(default_text) {
-	_current_key = SDLK_UNKNOWN;
-	_current_mod = KMOD_NONE;
-	_repeat_cooldown = 0;
+	clear_keystate();
 }
 
+void TextField::clear_keystate() {
+	_current_key = SDLK_UNKNOWN;
+	_current_mod = KMOD_NONE;
+	_repeat_cooldown = NO_REPEAT_AMNT;
+}
 void TextField::clear() {
 	_text.clear();
-	_current_key = SDLK_UNKNOWN;
-	_current_mod = KMOD_NONE;
-	_repeat_cooldown = 0;
+	clear_keystate();
 }
-
 
 static char keycode_to_char(SDLKey keycode, SDLMod keymod) {
 	const char DIGIT_SYMBOLS[] = { ')', '!', '@', '#', '$', '%', '^', '&', '*',
@@ -52,20 +53,31 @@ static bool is_typeable_keycode(SDLKey keycode) {
 	return (keycode >= SDLK_SPACE && keycode <= SDLK_z);
 }
 
+bool TextField::_has_repeat_cooldown() {
+	int ms = _repeat_timer.get_microseconds() / 1000;
+	bool has_cooldown = ms < _repeat_cooldown;
+	return has_cooldown;
+}
+
+void TextField::_reset_repeat_cooldown(int cooldownms) {
+	_repeat_timer.start();
+	_repeat_cooldown = cooldownms;
+
+}
 /*Returns whether has handled event*/
 void TextField::step() {
-	if (_repeat_cooldown > 0) {
-		_repeat_cooldown--;
-	} else if (_current_key != SDLK_FIRST) {
+	if (!_has_repeat_cooldown() && _current_key != SDLK_FIRST) {
 		/*Handle keys being held down*/
 		if (is_typeable_keycode(_current_key)) {
-			_text += keycode_to_char(_current_key, _current_mod);
-			_repeat_cooldown = NEXT_REPEAT_STEP_AMNT;
+			if (_text.size() < _max_length) {
+				_text += keycode_to_char(_current_key, _current_mod);
+			}
+			_reset_repeat_cooldown(NEXT_REPEAT_STEP_AMNT);
 		} else if (_current_key == SDLK_BACKSPACE) {
 			if (!_text.empty()) {
 				_text.resize(_text.size() - 1);
 			}
-			_repeat_cooldown = NEXT_BACKSPACE_STEP_AMNT;
+			_reset_repeat_cooldown(NEXT_BACKSPACE_STEP_AMNT);
 		}
 	}
 }
@@ -84,10 +96,12 @@ bool TextField::handle_event(SDL_Event* event) {
 	}
 	case SDL_KEYDOWN: {
 		if (is_typeable_keycode(keycode)) {
-			_text += keycode_to_char(keycode, keymod);
+			if (_text.size() < _max_length) {
+				_text += keycode_to_char(keycode, keymod);
+			}
 			if (_current_key != keycode) {
 				_current_key = keycode;
-				_repeat_cooldown = INITIAL_REPEAT_STEP_AMNT;
+				_reset_repeat_cooldown(INITIAL_REPEAT_STEP_AMNT);
 			}
 			return true;
 		}
@@ -97,7 +111,7 @@ bool TextField::handle_event(SDL_Event* event) {
 			}
 			if (_current_key != keycode) {
 				_current_key = keycode;
-				_repeat_cooldown = INITIAL_REPEAT_STEP_AMNT;
+				_reset_repeat_cooldown(INITIAL_REPEAT_STEP_AMNT);
 			}
 			return true;
 		}

@@ -15,32 +15,33 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-#include "data/game_data.h"
+#include "../data/game_data.h"
 
-#include "display/colour_constants.h"
-#include "display/display.h"
+#include "../display/colour_constants.h"
+#include "../display/display.h"
 
-#include "gamestate/GameState.h"
+#include "../gamestate/GameState.h"
 
-#include "interface/ButtonInst.h"
+#include "../interface/ButtonInst.h"
+#include "../interface/TextBoxInst.h"
 
-#include "interface/DrawCallbackInst.h"
-#include "lua/lua_api.h"
+#include "../interface/DrawCallbackInst.h"
+#include "../lua/lua_api.h"
 
-#include "objects/enemy/EnemyInst.h"
-#include "objects/player/PlayerInst.h"
-#include "objects/AnimatedInst.h"
+#include "../objects/enemy/EnemyInst.h"
+#include "../objects/player/PlayerInst.h"
+#include "../objects/AnimatedInst.h"
 
-#include "util/Timer.h"
+#include "../util/Timer.h"
 
 static void continue_as_loner(GameState* gs, GameInst* _, void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().regen_on_death = true;
 	gs->game_settings().frame_action_repeat = 0;
 }
 static void continue_as_hardcore(GameState* gs, GameInst* _, void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().regen_on_death = false;
 	gs->game_settings().frame_action_repeat = 0;
@@ -48,26 +49,26 @@ static void continue_as_hardcore(GameState* gs, GameInst* _, void* flag) {
 
 static void continue_as_loner_save_replay(GameState* gs, GameInst* _,
 		void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().savereplay_file = "replays/replay";
 	gs->game_settings().frame_action_repeat = 0;
 }
 
 static void continue_as_load_replay(GameState* gs, GameInst* _, void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
 	gs->game_settings().loadreplay_file = "replays/replay";
 	gs->game_settings().frame_action_repeat = 0;
 }
 
 static void continue_as_client(GameState* gs, GameInst* _, void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::CLIENT;
 }
 
 static void continue_as_server(GameState* gs, GameInst* _, void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::SERVER;
 }
 
@@ -116,13 +117,14 @@ void main_menu_loop(GameState* gs, int width, int height) {
 
 	gs->add_instance(
 			new AnimatedInst(Pos(halfw, 100), get_sprite_by_name("logo")));
+//	gs->add_instance(new TextBoxInst(BBox(10, 10, 100, 200), 20, "TEST"));
 	gs->add_instance(
 			new AnimatedInst(Pos(halfw - 100, 500), -1, -1, Posf(), Posf(),
 					AnimatedInst::DEPTH, HELP_TEXT, Colour(255, 255, 255)));
 
 	setup_mainmenu_buttons(gs, &exit, halfw, 300);
 
-	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {
+	for (; gs->update_iostate() && !exit;) {
 		gs->get_level()->game_inst_set().step(gs);
 		gs->draw(false);
 	}
@@ -141,11 +143,11 @@ void main_menu_loop(GameState* gs, int width, int height) {
 }
 
 static void choose_fighter(GameState* gs, GameInst* _, void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().classtype = get_class_by_name("Fighter");
 }
 static void choose_mage(GameState* gs, GameInst* _, void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().classtype = get_class_by_name("Mage");
 }
 static void choose_druid(GameState* gs, GameInst* _, void* flag) {
@@ -153,7 +155,7 @@ static void choose_druid(GameState* gs, GameInst* _, void* flag) {
 //	gs->game_settings().classtype = get_class_by_name("Druid");
 }
 static void choose_archer(GameState* gs, GameInst* _, void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().classtype = get_class_by_name("Archer");
 }
 
@@ -197,7 +199,7 @@ void class_menu_loop(GameState* gs, int width, int height) {
 			new AnimatedInst(Pos(halfw, 100), get_sprite_by_name("logo")));
 	setup_classmenu_buttons(gs, &exit, halfw, 300);
 
-	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {
+	for (; gs->update_iostate() && !exit;) {
 		gs->get_level()->game_inst_set().step(gs);
 		gs->draw(false);
 	}
@@ -210,13 +212,13 @@ void class_menu_loop(GameState* gs, int width, int height) {
 
 static void start_game_with_current_players(GameState* gs, GameInst* _,
 		void* flag) {
-	*(bool*) flag = true;
+	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::SERVER;
 }
 
 static void draw_connectors(GameState* gs, GameInst* inst, void* flag) {
-	static Colour colours[] = { COL_BABY_BLUE, COL_PALE_YELLOW,
-			COL_PALE_RED, COL_PALE_GREEN, COL_PALE_BLUE, COL_LIGHT_GRAY };
+	static Colour colours[] = { COL_BABY_BLUE, COL_PALE_YELLOW, COL_PALE_RED,
+			COL_PALE_GREEN, COL_PALE_BLUE, COL_LIGHT_GRAY };
 	static const int num_colours = sizeof(colours) / sizeof(Colour);
 
 	PlayerData& pd = gs->player_data();
@@ -260,7 +262,7 @@ void connection_menu_loop(GameState* gs, int width, int height) {
 			new AnimatedInst(Pos(halfw, 100), get_sprite_by_name("logo")));
 	setup_connectionmenu_buttons(gs, &exit, halfw, 300);
 
-	for (; gs->update_iostate() && !gs->key_down_state(SDLK_RETURN) && !exit;) {
+	for (; gs->update_iostate() && !exit;) {
 		gs->net_connection().poll_messages();
 		gs->get_level()->game_inst_set().step(gs);
 		gs->draw(false);

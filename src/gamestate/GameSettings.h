@@ -29,7 +29,7 @@ struct GameSettings {
 	bool draw_diagnostics, verbose_output;
 	bool invincible;
 	bool keep_event_log;
-	std::string comparison_log;
+	std::string comparison_event_log;
 
 	/*Replay settings, can be set in menu*/
 	std::string savereplay_file, loadreplay_file;

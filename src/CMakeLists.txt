@@ -65,6 +65,7 @@ set( lanarts_src
 	interface/GameDialogs.cpp
 	interface/GameHud.cpp
 	interface/GameTextConsole.cpp	
+	interface/TextBoxInst.cpp
 	interface/TextField.cpp
 	
 	interface/sidebar/ConfigContent.cpp
@@ -168,7 +169,7 @@ set( lanarts_src
 	util/Timer.cpp
 	
 	main.cpp
-	main_menu.cpp
+	menu/main_menu.cpp
 )
 
 set( lanarts_include
@@ -212,6 +213,7 @@ set( lanarts_include
 	interface/GameDialogs.h
 	interface/GameHud.h
 	interface/GameTextConsole.h
+	interface/TextBoxInst.h
 	interface/TextField.h
 
 	interface/sidebar/ConfigContent.h

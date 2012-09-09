@@ -10,6 +10,8 @@
 #include <string>
 #include <SDL.h>
 
+#include "../util/Timer.h"
+
 class GameState;
 
 class TextField {
@@ -25,14 +27,18 @@ public:
     }
     void step();
     void clear();
+    void clear_keystate();
 	bool handle_event(SDL_Event *event);
 private:
+	bool _has_repeat_cooldown();
+	void _reset_repeat_cooldown(int cooldownms);
 	SDLKey _current_key;
 	SDLMod _current_mod;
 
 	std::string _text;
 	int _max_length;
 	int _repeat_cooldown;
+	Timer _repeat_timer;
 };
 
 #endif /* TEXTFIELD_H_ */

@@ -91,6 +91,8 @@ struct IOState {
 	bool mouse_leftrelease, mouse_rightrelease;
 	bool mouse_didupwheel, mouse_diddownwheel;
 	std::vector<TriggeredIOEvent> active_events;
+	std::vector<SDL_Event> sdl_events;
+
 	IOState();
 	void add_triggered_event(const IOEvent & event, bool triggered_already);
 	void clear();
@@ -120,6 +122,8 @@ public:
 
 	int key_down_state(int keyval);
 	int key_press_state(int keyval);
+
+	std::vector<SDL_Event>& get_events();
 
 	void update_iostate(bool resetprev);
 	void trigger_events(const BBox& playing_area);
