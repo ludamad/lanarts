@@ -102,6 +102,10 @@ set( lanarts_src
 	lua/lua_spelltarget_funcs.cpp
 	lua/LuaValue.cpp
 	
+	menu/gameconfig_menu.cpp
+	menu/lobby_menu.cpp
+	menu/start_menu.cpp
+	
 	net/GameNetConnection.cpp
 	
 	objects/enemy/EnemyAIState.cpp
@@ -169,7 +173,6 @@ set( lanarts_src
 	util/Timer.cpp
 	
 	main.cpp
-	menu/main_menu.cpp
 )
 
 set( lanarts_include
@@ -240,6 +243,8 @@ set( lanarts_include
 	lua/lmarshal.h
 	lua/lua_api.h
 	lua/lunar.h
+
+	menu/menus.h
 
 	net/GameNetConnection.h
 

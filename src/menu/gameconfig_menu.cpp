@@ -34,6 +34,8 @@ extern "C" {
 
 #include "../util/Timer.h"
 
+#include "menus.h"
+
 static void continue_as_loner(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;
 	gs->game_settings().conntype = GameSettings::NONE;
@@ -101,47 +103,6 @@ static void setup_mainmenu_buttons(GameState* gs, bool* exit, int x, int y) {
 	y += 50;
 }
 
-void connection_menu_loop(GameState* gs, int width, int height);
-void class_menu_loop(GameState* gs, int width, int height);
-
-void main_menu_loop(GameState* gs, int width, int height) {
-	bool exit = false;
-	int halfw = width / 2;
-
-	GameView prevview = gs->view();
-	GameLevelState* oldlevel = gs->get_level();
-
-	gs->set_level(new GameLevelState(-1, width, height));
-	gs->view().x = 0;
-	gs->view().y = 0;
-
-	gs->add_instance(
-			new AnimatedInst(Pos(halfw, 100), get_sprite_by_name("logo")));
-//	gs->add_instance(new TextBoxInst(BBox(10, 10, 100, 200), 20, "TEST"));
-	gs->add_instance(
-			new AnimatedInst(Pos(halfw - 100, 500), -1, -1, Posf(), Posf(),
-					AnimatedInst::DEPTH, HELP_TEXT, Colour(255, 255, 255)));
-
-	setup_mainmenu_buttons(gs, &exit, halfw, 300);
-
-	for (; gs->update_iostate() && !exit;) {
-		gs->get_level()->game_inst_set().step(gs);
-		gs->draw(false);
-	}
-
-	delete gs->get_level();
-
-	gs->set_level(oldlevel);
-	gs->view() = prevview;
-
-	class_menu_loop(gs, width, height);
-	gs->start_connection();
-
-	if (gs->game_settings().conntype == GameSettings::SERVER) {
-		connection_menu_loop(gs, width, height);
-	}
-}
-
 static void choose_fighter(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;
 	gs->game_settings().classtype = get_class_by_name("Fighter");
@@ -184,7 +145,7 @@ static void setup_classmenu_buttons(GameState* gs, bool* exit, int x, int y) {
 	x += 128;
 }
 
-void class_menu_loop(GameState* gs, int width, int height) {
+void class_menu(GameState* gs, int width, int height) {
 	bool exit = false;
 	int halfw = width / 2;
 

@@ -545,17 +545,17 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		if (class_stats().class_type().name == "Archer"
 				&& pentry.weapon_class == "bows") {
 			int xplevel = class_stats().xplevel;
-			float movebonus = class_stats().xplevel / 4.0f;
-			if (movebonus > 2) {
-				movebonus = 2;
+			float movebonus = (class_stats().xplevel-1) / 4.0f;
+			if (movebonus > 0.5) {
+				movebonus = 0.5;
 			}
-			float cooldown_mult = 1.0f - (class_stats().xplevel - 1) / 20.0f;
+			float cooldown_mult = 1.0f - (class_stats().xplevel - 1) / 25.0f;
 			if (cooldown_mult <= 0.85) {
 				cooldown_mult = 0.85;
 			}
 			cooldown *= cooldown_mult;
 			movespeed += movebonus;
-			if (xplevel >= 3 && core_stats().mp >= 5) {
+			if (xplevel >= 4 && core_stats().mp >= 5) {
 				nbounces = 2;
 				core_stats().mp -= 5;
 			}

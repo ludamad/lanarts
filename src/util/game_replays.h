@@ -17,5 +17,7 @@ void save_actions(GameState* gs, std::deque<GameAction>& actions);
 void load_init(GameState* gs, int& seed, class_id& classtype);
 void save_init(GameState* gs, int seed, class_id classtype);
 
+bool replay_exists(GameState* gs);
+
 
 #endif /* GAME_REPLAYS_H_ */

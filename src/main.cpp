@@ -29,6 +29,8 @@ extern "C" {
 
 #include "util/Timer.h"
 
+#include "menu/menus.h"
+
 using namespace std;
 
 #ifdef __WIN32
@@ -185,7 +187,7 @@ int main(int argc, char** argv) {
 
 	gs->update_iostate(); //for first iteration
 
-	main_menu_loop(gs, windoww, windowh);
+	main_menu(gs, windoww, windowh);
 
 	gs->start_game();
 

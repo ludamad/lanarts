@@ -78,9 +78,9 @@ enemies:
       hp: 10
       hpregen: 0.05
       movespeed: 1
-      strength: 3
-      defence: 1
-      willpower: 3
+      strength: 15
+      defence: 0
+      willpower: 0
 
   - name: Red Slime
     sprite: red slime

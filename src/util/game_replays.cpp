@@ -79,3 +79,13 @@ void save_init(GameState* gs, int seed, class_id classtype) {
 	fwrite(&seed, sizeof(unsigned int), 1, savefile);
 	fwrite(&classtype, sizeof(class_id), 1, savefile);
 }
+
+bool replay_exists(GameState* gs) {
+	FILE* f = fopen(gs->game_settings().loadreplay_file.c_str(), "r");
+	if (f != NULL) {
+		fclose(f);
+		return true;
+	}
+	return false;
+}
+
