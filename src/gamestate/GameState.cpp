@@ -1,6 +1,8 @@
 /*
  * GameState.cpp:
- *  Handle to all the global game data.
+ *  Handle to all the global game data. Note this is somewhat of a 'god class'.
+ *  This is tolerated mainly as it simply forwards a lot of calls to various components,
+ *  without making the caller worry about which component does what.
  */
 
 extern "C" {
@@ -15,9 +17,12 @@ extern "C" {
 #include <vector>
 
 #include "../data/game_data.h"
+
 #include "../display/display.h"
 #include "../display/tile_data.h"
+
 #include "../levelgen/dungeon_data.h"
+
 #include "../lua/lua_api.h"
 
 #include "../net/GameNetConnection.h"
@@ -29,12 +34,14 @@ extern "C" {
 #include "../objects/GameInst.h"
 
 #include "../serialize/SerializeBuffer.h"
+
 #include "../stats/class_data.h"
 
 #include "../stats/items/ItemEntry.h"
-#include "../util/game_replays.h"
 
+#include "../util/game_replays.h"
 #include "../util/math_util.h"
+
 #include "GameLevelState.h"
 #include "GameState.h"
 
@@ -88,6 +95,20 @@ void GameState::start_connection() {
 }
 
 void GameState::start_game() {
+	char filename[512];
+	const char* input_log = NULL;
+	const char* output_log = NULL;
+	if (settings.comparison_log.empty()) {
+		input_log = settings.comparison_log.c_str();
+	}
+	if (settings.keep_event_log) {
+		time_t t;
+		time(&t);
+		snprintf(filename, sizeof(filename), "logs/game_event_log%d", t);
+		output_log = filename;
+	}
+	event_log_initialize(this, input_log, output_log);
+
 	if (settings.conntype == GameSettings::SERVER) {
 		net_send_game_init_data(connection, player_data(), init_data.seed);
 		connection.set_accepting_connections(false);
@@ -100,29 +121,6 @@ void GameState::start_game() {
 	}
 
 	init_lua_data(this, L);
-
-//TODO: net redo
-//	if (settings.conntype == GameSettings::CLIENT) {
-//		NetPacket packet;
-//		int tries = 0;
-//		while (true) {
-//			if (connection.get_connection()->get_next_packet(packet)) {
-//				seed = packet.get_int();
-//				break;
-//			} else if ((++tries) % 30000 == 0) {
-//				if (!update_iostate()) {
-//					exit(0);
-//				}
-//			}
-//		}
-//		printf("NETWORK: Recieving seed=0x%X\n", seed);
-//	} else if (settings.conntype == GameSettings::SERVER) {
-//		NetPacket packet;
-//		packet.add_int(seed);
-//		packet.encode_header();
-//		connection.get_connection()->broadcast_packet(packet, true);
-//		printf("NETWORK: Broadcasting seed=0x%X\n", seed);
-//	}
 	if (settings.conntype == GameSettings::CLIENT) {
 		while (!init_data.seed_set_by_network_message) {
 			connection.poll_messages(1 /* milliseconds */);
@@ -131,8 +129,8 @@ void GameState::start_game() {
 
 	printf("Seed used for RNG = 0x%X\n", init_data.seed);
 
-//TODO: net redo : send init data message here
 	mtwist.init_genrand(init_data.seed);
+
 
 	set_level(world.get_level(0, true));
 
@@ -315,10 +313,15 @@ void GameState::draw(bool drawhud) {
 obj_id GameState::add_instance(GameInst* inst) {
 	obj_id id = get_level()->game_inst_set().add_instance(inst);
 	inst->init(this);
+	event_log("Adding instance id: %d x: %d y: %d target_radius: %d depth %d\n",
+			inst->id, inst->x, inst->y, inst->target_radius, inst->depth);
 	return id;
 }
 
 void GameState::remove_instance(GameInst* inst) {
+	event_log(
+			"Removing instance id: %d x: %d y: %d target_radius: %d depth %d\n",
+			inst->id, inst->x, inst->y, inst->target_radius, inst->depth);
 	get_level()->game_inst_set().remove_instance(inst);
 	inst->deinit(this);
 }

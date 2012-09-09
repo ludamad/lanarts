@@ -257,6 +257,7 @@ void GameInstSet::step(GameState* gs) {
 		GameInst* inst = unit_set[i].inst;
 		if (valid_inst(inst)) {
 			inst->destroyed = false;
+			event_log("Step-event for id %d\n", inst->id);
 			inst->step(gs);
 			update_instance_for_step(&unit_set[i], inst);
 		}

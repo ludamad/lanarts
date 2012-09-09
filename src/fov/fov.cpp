@@ -17,27 +17,34 @@ using namespace std;
 
 fov::fov(int radius) :
 		gs(NULL), radius(radius), m(radius, radius, radius, radius), ptx(0), pty(
-				0) {
-	radsub = radius;
-	int dim = radsub * 2 + 1;
-	sight_mask = new char[dim * dim];
+				0), sx(0), sy(0) {
+	diameter = radius * 2 + 1;
+	sight_mask = new char[diameter * diameter];
 }
 
 void fov::calculate(GameState* gs, int ptx, int pty) {
+	perf_timer_begin(FUNCNAME);
+
 	this->gs = gs;
 	this->ptx = ptx, this->pty = pty;
-	for (int y = -radsub; y <= radsub; y++) {
-		for (int x = -radsub; x <= radsub; x++) {
-			if (x * x + y * y < radsub * radsub)
+	this->sx = ptx - radius, this->sy = pty - radius;
+
+	int radius_squared = radius * radius;
+
+	for (int y = -radius; y <= radius; y++) {
+		for (int x = -radius; x <= radius; x++) {
+			if (x * x + y * y < radius_squared) {
 				m.set(x, y);
-			else
+			} else {
 				m.clear(x, y);
+			}
 		}
 	}
 
-	int dim = radsub * 2 + 1;
-	memset(sight_mask, 0, dim * dim);
+	memset(sight_mask, 0, diameter * diameter);
 	permissive::fov(0, 0, m, *this);
+
+	perf_timer_end(FUNCNAME);
 }
 
 fov::~fov() {
@@ -54,55 +61,54 @@ int fov::isBlocked(short destX, short destY) {
 
 	return !tiles.is_seethrough(px, py);
 }
-
 bool fov::within_fov(const BBox& bbox) {
-	if (bbox.x2 < ptx - radsub || bbox.x1 > ptx + radsub
-			|| bbox.y2 < pty - radsub || bbox.y1 > pty + radsub) {
+	int ex = sx + diameter, ey = sy + diameter;
+	if (bbox.x2 < sx || bbox.x1 >= ex || bbox.y2 < sy || bbox.y1 >= ey) {
 		return false;
 	}
-	int dim = radsub * 2 + 1;
-	char* mask = sight_mask + (bbox.y1 - pty + radsub) * dim;
-	mask -= ptx - radsub;
-	for (int y = bbox.y1; y <= bbox.y2; y++) {
-		for (int x = bbox.x1; x <= bbox.x2; x++) {
-			if (mask[x]) {
+	BBox sbox(std::max(bbox.x1, sx), std::max(bbox.y1, sy),
+			std::min(bbox.x2, ex - 1), std::min(bbox.y2, ey - 1));
+	char* mask = sight_mask + (sbox.y1 - sy) * diameter;
+	for (int y = sbox.y1; y <= sbox.y2; y++) {
+		for (int x = sbox.x1; x <= sbox.x2; x++) {
+			LANARTS_ASSERT(
+					!(x < ptx - radius || x > ptx + radius || y < pty - radius || y > pty + radius));
+			if (mask[x - sx]) {
 				return true;
 			}
 		}
-		mask += dim;
+		mask += diameter;
 	}
 	return false;
 }
 
 void fov::visit(short destX, short destY) {
-	int dim = radsub * 2 + 1;
-	int dx = radsub + destX, dy = radsub + destY;
-	sight_mask[dy * dim + dx] = 1;
+	int dx = radius + destX, dy = radius + destY;
+	sight_mask[dy * diameter + dx] = 1;
 }
 
 bool fov::within_fov(int grid_x, int grid_y) {
-	if (grid_x < ptx - radsub || grid_x > ptx + radsub || grid_y < pty - radsub
-			|| grid_y > pty + radsub)
+	if (grid_x < ptx - radius || grid_x > ptx + radius || grid_y < pty - radius
+			|| grid_y > pty + radius)
 		return false;
 
-	int dim = radsub * 2 + 1;
-	int dx = grid_x - ptx + radsub;
-	int dy = grid_y - pty + radsub;
-	return sight_mask[dy * dim + dx];
+	int dx = grid_x - ptx + radius;
+	int dy = grid_y - pty + radius;
+	return sight_mask[dy * diameter + dx];
 }
 
 void fov::matches(int sqr_x, int sqr_y, char* sub_sqrs) {
 	memset(sub_sqrs, 0, 1);
 	int sx = sqr_x, ex = sx + 1;
 	int sy = sqr_y, ey = sy + 1;
-	int dim = radsub * 2 + 1;
-	sx = max(ptx - radsub, sx), ex = min(ex, ptx + radsub + 1);
-	sy = max(pty - radsub, sy), ey = min(ey, pty + radsub + 1);
+
+	sx = max(ptx - radius, sx), ex = min(ex, ptx + radius + 1);
+	sy = max(pty - radius, sy), ey = min(ey, pty + radius + 1);
 	for (int y = sy; y < ey; y++) {
 		for (int x = sx; x < ex; x++) {
 			int sub_ind = (y - sy) + (x - sx);
-			int dx = x - ptx + radsub, dy = y - pty + radsub;
-			sub_sqrs[sub_ind] = sight_mask[dim * dy + dx];
+			int dx = x - ptx + radius, dy = y - pty + radius;
+			sub_sqrs[sub_ind] = sight_mask[diameter * dy + dx];
 		}
 	}
 
@@ -122,8 +128,7 @@ static int alloc_mask_size(int w, int h) {
 fov* fov::clone() const {
 	fov* ret = new fov(radius);
 
-	int dim = radsub * 2 + 1;
-	memcpy(ret->sight_mask, this->sight_mask, dim * dim);
+	memcpy(ret->sight_mask, this->sight_mask, diameter * diameter);
 
 	ret->gs = this->gs;
 	ret->ptx = this->ptx, ret->pty = this->pty;

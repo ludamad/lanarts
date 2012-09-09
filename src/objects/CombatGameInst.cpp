@@ -8,7 +8,6 @@
 
 #include "../serialize/SerializeBuffer.h"
 
-
 #include "../stats/items/ProjectileEntry.h"
 #include "../stats/items/WeaponEntry.h"
 
@@ -201,7 +200,7 @@ bool CombatGameInst::attack(GameState* gs, CombatGameInst* inst,
 }
 
 void CombatGameInst::equip(item_id item, int amnt) {
-	equipment().equip(Item(item,amnt));
+	equipment().equip(Item(item, amnt));
 }
 
 void CombatGameInst::init(GameState* gs) {
@@ -263,20 +262,6 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 				}
 			}
 		}
-//		else {
-//			if (in_corridor_heurestic(gs,
-//					Pos(rx / TILE_SIZE, ry / TILE_SIZE))) {
-//				float proportion = proportion_in_same_dir(dx, dy, vx, vy);
-//				if (!gs->tile_radius_test(round(rx + vx * proportion),
-//						round(ry + vy * proportion), radius)) {
-//					vx *= proportion, vy *= proportion;
-//				} else {
-//					vx = 0.0f, vy = 0.0f;
-//				}
-//			}
-//		}
-
-//		normalize(nx, ny, effective_stats().movespeed);
 
 		vx = round(vx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
 		vy = round(vy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
@@ -291,12 +276,14 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 void CombatGameInst::update_position() {
 	x = (int)round(rx); //update based on rounding of true float
 	y = (int)round(ry);
+	event_log("Instance id %d integer positions set to (%d,%d)\n", id, x, y);
 }
 
 void CombatGameInst::update_position(float newx, float newy) {
 	rx = round(newx * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
 	ry = round(newy * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
 	rx = newx, ry = newy;
+	event_log("Instance id %d float positions set to (%f,%f)\n", id, rx, ry);
 	update_position();
 }
 

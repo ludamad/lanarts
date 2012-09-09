@@ -223,7 +223,7 @@ GameSettings init_game_data(lua_State* L) {
 	lua_dungeon.deinitialize(L);
 	lua_classes = load_class_data(L, dfiles.class_files);
 
-	GameSettings settings = load_settings_data("res/settings.yaml", L,
+	GameSettings settings = load_settings_data("settings.yaml", L,
 			&lua_settings);
 
 	return settings;

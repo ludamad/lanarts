@@ -56,11 +56,13 @@ public:
 
 	GeneratedLevel() {
 		s = NULL;
+		number_of_mobs = 0;
 	}
 
 	Pos get_world_coordinate(const Pos& p);
 
 	void initialize(int w, int h, const Pos& offset, bool solid = true) {
+		number_of_mobs = 0;
 		delete[] s;
 		size = Dim(w, h);
 		s = new Sqr[w * h];

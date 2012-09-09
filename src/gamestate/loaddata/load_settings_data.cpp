@@ -58,6 +58,7 @@ GameSettings load_settings_data(const char* filename, lua_State* L,
 					ret.autouse_health_potions);
 			optional_set(root, "autouse_mana_potions",
 					ret.autouse_mana_potions);
+			optional_set(root, "keep_event_log", ret.keep_event_log);
 
 			if (yaml_has_node(root, "connection_type")) {
 				std::string connname;

@@ -1,6 +1,8 @@
 /*
  * GameState.h:
- *  Handle to all the global game data.
+ *  Handle to all the global game data. Note this is somewhat of a 'god class'.
+ *  This is tolerated mainly as it simply forwards a lot of calls to various components,
+ *  without making the caller worry about which component does what.
  */
 
 #ifndef GAMESTATE_H_
@@ -22,13 +24,13 @@
 #include "../net/GameNetConnection.h"
 
 #include "../util/mtwist.h"
+#include "GameLogger.h"
 #include "GameSettings.h"
 #include "GameView.h"
 
 #include "GameWorld.h"
 #include "IOController.h"
 #include "PlayerData.h"
-
 
 struct lua_State;
 class GameLevelState;
@@ -238,7 +240,6 @@ public:
 	}
 
 	CollisionAvoidance& collision_avoidance();
-
 private:
 	int handle_event(SDL_Event* event);
 

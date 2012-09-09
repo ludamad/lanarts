@@ -27,7 +27,8 @@ public:
 private:
     char* sight_mask;
     GameState* gs;
-    int radius, radsub;
+    int radius, diameter;
+    int sx, sy;
     int ptx, pty;
     permissive::maskT m;
 public://do-not-use

@@ -39,3 +39,18 @@ enemies:
         magic: 25
         defence: 15
         willpower: 15
+
+  - name: Pisilohe
+    sprite: pisilohe
+    radius: 30
+    xpaward: 150
+    unique: yes
+    stats:
+        attacks: [ {weapon: Basic Melee}, { projectile: Large Fire Ball} ]
+        hp: 150
+        hpregen: 0.1
+        movespeed: 2.5
+        strength: 25
+        magic: 25
+        defence: 15
+        willpower: 15

@@ -65,7 +65,7 @@ static int gen_monster(lua_State* L) {
 	Region r = lua_toregion(L, 3);
 	int amount = nargs >= 4 ? lua_tointeger(L, 4) : 1;
 
-	bool success = generate_enemy(*level, mt, etype, r,
+	bool success = generate_enemy(gs, *level, mt, etype, r,
 			gs->teams().default_enemy_team(), amount);
 
 	lua_pushboolean(L, success);

@@ -36,7 +36,7 @@ using namespace std;
 #endif
 
 void init_system(GameSettings& settings, lua_State* L) {
-	settings = load_settings_data("res/settings.yaml");
+	settings = load_settings_data("settings.yaml");
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		exit(0);
 	}

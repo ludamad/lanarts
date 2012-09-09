@@ -59,7 +59,7 @@ static void process_level_hash(GameState* gs, GameLevelState* level,
 	for (int i = 0; i < instances.size(); i++) {
 		GameInst* inst = instances[i];
 		if (!dynamic_cast<AnimatedInst*>(inst)) {
-			write_or_assert_hash(sb, inst->integrity_hash(), isw);
+ 			write_or_assert_hash(sb, inst->integrity_hash(), isw);
 		}
 	}
 	//compare magic number marker

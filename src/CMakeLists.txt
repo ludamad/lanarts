@@ -44,6 +44,7 @@ set( lanarts_src
 	gamestate/ActionQueue.cpp
 	gamestate/GameAction.cpp
 	gamestate/GameInstSet.cpp
+	gamestate/GameLogger.cpp
 	gamestate/GameLevelState.cpp
 	gamestate/GameState.cpp
 	gamestate/GameTiles.cpp
@@ -192,6 +193,7 @@ set( lanarts_include
 	gamestate/GameAction.h
 	gamestate/GameInstSet.h
 	gamestate/GameLevelState.h
+	gamestate/GameLogger.h
 	gamestate/GameSettings.h
 	gamestate/GameState.h
 	gamestate/GameTiles.h

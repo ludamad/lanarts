@@ -55,8 +55,8 @@ static Pos enemy_position_candidate(MTwist& mt, GeneratedLevel& level,
 	return epos;
 }
 
-int generate_enemy(GeneratedLevel& level, MTwist& mt, enemy_id etype,
-		const Region& r, team_id teamid, int amount) {
+int generate_enemy(GameState* gs, GeneratedLevel& level, MTwist& mt,
+		enemy_id etype, const Region& r, team_id teamid, int amount) {
 
 	int mobid = amount > 1 ? -1 : level.get_next_mob_id();
 	for (int i = 0; i < amount; i++) {
@@ -69,6 +69,8 @@ int generate_enemy(GeneratedLevel& level, MTwist& mt, enemy_id etype,
 
 		Pos world_pos = level.get_world_coordinate(epos);
 
+		event_log("Generating enemy %d at %d %d for team %d mob %d\n", etype,
+				world_pos.x, world_pos.y, teamid, mobid);
 		level.add_instance(
 				new EnemyInst(etype, world_pos.x, world_pos.y, teamid, mobid));
 	}
@@ -94,7 +96,7 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 		const EnemyGenChance& ec = rs.enemy_chances[i];
 		int amnt_spawns = mt.rand(ec.guaranteed_spawns);
 		if (amnt_spawns > 0) {
-			generate_enemy(level, mt, ec.enemytype,
+			generate_enemy(gs, level, mt, ec.enemytype,
 					enemy_region_candidate(mt, level),
 					gs->teams().default_enemy_team(), amnt_spawns);
 		}
@@ -118,7 +120,7 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 			amnt = mt.rand(ec.groupsize);
 		}
 
-		i += generate_enemy(level, mt, ec.enemytype,
+		i += generate_enemy(gs, level, mt, ec.enemytype,
 				enemy_region_candidate(mt, level),
 				gs->teams().default_enemy_team(), amnt);
 	}

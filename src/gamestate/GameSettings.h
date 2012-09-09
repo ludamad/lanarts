@@ -28,6 +28,8 @@ struct GameSettings {
 	/*Debug options*/
 	bool draw_diagnostics, verbose_output;
 	bool invincible;
+	bool keep_event_log;
+	std::string comparison_log;
 
 	/*Replay settings, can be set in menu*/
 	std::string savereplay_file, loadreplay_file;
@@ -62,6 +64,8 @@ struct GameSettings {
 
 		autouse_health_potions = true;
 		autouse_mana_potions = true;
+
+		keep_event_log = false;
 	}
 
 	bool saving_to_action_file() {

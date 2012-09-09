@@ -143,7 +143,6 @@ static bool go_towards_if_free_in_direction(GameState* gs, CombatGameInst* inst,
 	float nx = inst->rx + tx, ny = inst->ry + ty;
 	if (!gs->solid_test(inst, round(nx), round(ny), inst->radius)) {
 		inst->vx = vx, inst->vy = vy;
-		printf("going %f %f\n", vx, vy);
 		return true;
 	}
 	return false;
@@ -309,5 +308,9 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 
 	eb.path_steps = 0;
 	eb.path_start = Pos(e->x, e->y);
+
+	event_log(
+			"Path for instance id: %d, (%d path steps), x: %d y: %d target_radius: %d depth %d\n",
+			e->id, eb.path.size(), e->x, e->y, e->target_radius, e->depth);
 	perf_timer_end(FUNCNAME);
 }
