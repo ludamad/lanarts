@@ -39,7 +39,8 @@ static bool is_same_projectile(const Item& projectile, const Item& item) {
 	return !projectile.empty() && projectile.is_same_item(item);
 }
 
-static bool is_wieldable_projectile(EquipmentStats& equipment, const Item& item) {
+static bool is_wieldable_projectile(EquipmentStats& equipment,
+		const Item& item) {
 	if (is_same_projectile(equipment.projectile(), item))
 		return true;
 
@@ -80,7 +81,7 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 	//Item use
 	for (int i = 0; i < 9 && !used_item; i++) {
 		if (io.query_event(IOEvent(IOEvent::USE_ITEM_N, i))) {
-			if (inventory().get(i).amount > 0) {
+			if (inventory().get(i).amount() > 0) {
 				item_used = true;
 				queued_actions.push_back(
 						GameAction(id, GameAction::USE_ITEM, frame, level, i,
@@ -335,14 +336,14 @@ void PlayerInst::perform_queued_actions(GameState* gs) {
 }
 
 void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
-	Item& itemslot = inventory().get(action.use_id);
+	ItemSlot& itemslot = inventory().get(action.use_id);
 	int dropx = round_to_multiple(x, TILE_SIZE, true), dropy =
 			round_to_multiple(y, TILE_SIZE, true);
-	int amnt = itemslot.amount;
+	int amnt = itemslot.amount();
 	bool already_item_here = gs->object_radius_test(dropx, dropy,
 			ItemInst::RADIUS, item_colfilter);
 	if (!already_item_here) {
-		gs->add_instance(new ItemInst(itemslot, dropx, dropy, id));
+		gs->add_instance(new ItemInst(itemslot.item, dropx, dropy, id));
 		itemslot.clear();
 	}
 	if (this->local) {
@@ -365,8 +366,8 @@ void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::reposition_item(GameState* gs, const GameAction& action) {
-	Item& itemslot1 = inventory().get(action.use_id);
-	Item& itemslot2 = inventory().get(action.use_id2);
+	ItemSlot& itemslot1 = inventory().get(action.use_id);
+	ItemSlot& itemslot2 = inventory().get(action.use_id2);
 
 	std::swap(itemslot1, itemslot2);
 	gs->game_hud().reset_slot_selected();
@@ -437,23 +438,24 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 	if (!effective_stats().allowed_actions.can_use_items) {
 		return;
 	}
-	Item& itemslot = inventory().get(action.use_id);
+	ItemSlot& itemslot = inventory().get(action.use_id);
+	Item& item = itemslot.item;
 	ItemEntry& type = itemslot.item_entry();
 
 	lua_State* L = gs->get_luastate();
 
-	if (itemslot.amount > 0 && equipment().valid_to_use(itemslot)
+	if (item.amount > 0 && equipment().valid_to_use(item)
 			&& item_check_lua_prereq(L, type, this)) {
 		item_do_lua_action(L, type, this, Pos(action.action_x, action.action_y),
-				itemslot.amount);
+				item.amount);
 		if (is_local_player() && !type.inventory_use_message().empty()) {
 			gs->game_chat().add_message(type.inventory_use_message(),
 					Colour(100, 100, 255));
 		}
-		if (itemslot.is_projectile())
+		if (item.is_projectile())
 			itemslot.clear();
 		else
-			itemslot.remove_copies(1);
+			item.remove_copies(1);
 		reset_rest_cooldown();
 	}
 

@@ -2,7 +2,7 @@
 username: User
 
 #Window settings
-fullscreen: yes
+fullscreen: no
 view_width: 800
 view_height: 600
 

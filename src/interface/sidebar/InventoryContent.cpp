@@ -17,15 +17,15 @@
 
 #include "InventoryContent.h"
 
-static void draw_player_inventory_slot(GameState* gs, Item& itemslot, int x,
+static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot, int x,
 		int y) {
-	if (itemslot.amount > 0) {
+	if (itemslot.amount() > 0) {
 		ItemEntry& ientry = itemslot.item_entry();
 		GLimage& itemimg = ientry.item_image();
 		gl_draw_image(itemimg, x, y);
 		if (ientry.stackable) {
 			gl_printf(gs->primary_font(), Colour(255, 255, 255), x + 1, y + 1,
-					"%d", itemslot.amount);
+					"%d", itemslot.amount());
 		}
 	}
 }
@@ -39,18 +39,19 @@ static void draw_player_inventory(GameState* gs, Inventory& inv,
 			if (slot >= max_slot)
 				break;
 
-			Item& itemslot = inv.get(slot);
+			ItemSlot& itemslot = inv.get(slot);
 
 			BBox slotbox(x, y, x + TILE_SIZE, y + TILE_SIZE);
 			Colour outline(COL_UNFILLED_OUTLINE);
-			if (itemslot.amount > 0 && slot != slot_selected) {
+			if (itemslot.amount() > 0 && slot != slot_selected) {
 				outline = COL_FILLED_OUTLINE;
 				if (slot == min_slot) {
 					outline = COL_PALE_GREEN;
 				}
 				if (slotbox.contains(mx, my)) {
 					outline = COL_PALE_YELLOW;
-					draw_console_item_description(gs, itemslot, itemslot.item_entry());
+					draw_console_item_description(gs, itemslot.item,
+							itemslot.item_entry());
 				}
 			}
 
@@ -115,7 +116,7 @@ bool InventoryContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	if (gs->mouse_left_click() && within_inventory) {
 
 		int slot = get_itemslotn(inv, bbox, mx, my);
-		if (slot >= 0 && slot < INVENTORY_SIZE && inv.get(slot).amount > 0) {
+		if (slot >= 0 && slot < INVENTORY_SIZE && inv.get(slot).amount() > 0) {
 			queued_actions.push_back(
 					game_action(gs, p, GameAction::USE_ITEM, slot, p->x, p->y));
 			return true;

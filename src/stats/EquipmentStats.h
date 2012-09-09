@@ -37,7 +37,7 @@ public:
 		return _projectile.id > NO_ITEM;
 	}
 
-	Item& get_item(itemslot_t i) {
+	ItemSlot& get_item(itemslot_t i) {
 		return inventory.get(i);
 	}
 

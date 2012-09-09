@@ -307,8 +307,8 @@ static void combine_stat_hash(unsigned int& hash, CombatStats& stats) {
 	combine_hash(hash, cstats.xp, cstats.classid);
 	for (int i = 0; i < inventory.max_size(); i++) {
 		if (inventory.slot_filled(i)) {
-			Item& itemslot = inventory.get(i);
-			combine_hash(hash, itemslot.amount, itemslot.id);
+			ItemSlot& itemslot = inventory.get(i);
+			combine_hash(hash, itemslot.amount(), itemslot.id());
 		}
 	}
 }

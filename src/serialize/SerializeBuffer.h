@@ -57,7 +57,8 @@ public:
 	void write_byte(int i) {
 		write((char)i);
 	}
-	void read_byte(int& i) {
+	template<class T>
+	void read_byte(T& i) {
 		char byte;
 		read(byte);
 		i = byte;
