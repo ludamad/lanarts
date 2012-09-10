@@ -1,0 +1,10 @@
+---
+equipment:
+  - name: Leather Boots
+    description: Sturdy leather boots that provide your feet 
+      with much needed protection.
+    shop_cost: [15, 25]
+    spr_item: leather boots
+    equipment_type: boots
+    resistance: { base: 1 }
+    reduction:  { base: 1 }

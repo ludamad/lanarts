@@ -72,14 +72,20 @@ const char* equip_type_description(ItemEntry& ientry) {
 	switch (eentry->type) {
 	case EquipmentEntry::ARMOUR:
 		return "Armour";
+	case EquipmentEntry::BOOTS:
+		return "Boots";
+	case EquipmentEntry::HELMET:
+		return "Helmet";
+	case EquipmentEntry::RING:
+		return "Ring";
 	case EquipmentEntry::WEAPON:
 		return "Weapon";
 	case EquipmentEntry::PROJECTILE: {
 		ProjectileEntry* pentry = dynamic_cast<ProjectileEntry*>(eentry);
 		if (pentry->is_unarmed()) {
-			return "Unarmed Projectile";
+			return "Throwing Weapon";
 		} else {
-			return "Projectile";
+			return "Ammunition";
 		}
 	}
 	case EquipmentEntry::NONE:

@@ -156,7 +156,9 @@ const YAML::Node& operator >>(const YAML::Node& n,
 
 StatModifiers parse_stat_modifiers(const YAML::Node & n) {
 	StatModifiers stats;
-	stats.damage_mod = parse_damage_modifier(n);
+	if (yaml_has_node(n, "damage_bonuses")) {
+		stats.damage_mod = parse_damage_modifier(n["damage_bonuses"]);
+	}
 	stats.core_mod = parse_defaulted(n, "stat_bonuses", CoreStats());
 	stats.armour_mod = parse_defence_modifiers(n);
 	return stats;

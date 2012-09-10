@@ -22,8 +22,9 @@ projectiles:
     spr_item: stone_arrow_item
     spr_attack: stone_arrow_projectile
     #Stats
-    damage: {base: [4,6]}
-    power: {base: 2}
+    damage_bonuses:
+      damage: {base: [4,6]}
+      power: {base: 2}
     drop_chance: 95 # % chance
     speed: 6.5
 
@@ -37,5 +38,5 @@ projectiles:
     range: 300
     speed: 6
     cooldown: 35
-    damage: {base: [1,3], strength: .75}
-    power: {base: 2, strength: 0.2}
+    damage: {base: [1,3], strength: .85}
+    power: {base: 0, strength: 0.2}

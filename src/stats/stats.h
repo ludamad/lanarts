@@ -53,6 +53,10 @@ struct CoreStatMultiplier {
 			base(base, base), strength(strength), defence(defence), magic(
 					magic), willpower(willpower) {
 	}
+	bool is_empty() {
+		return base.min == 0 && base.max == 0 && strength == 0 && defence == 0
+				&& magic == 0 && willpower == 0;
+	}
 	Range calculate_range(const CoreStats& stats) const;
 	float calculate(MTwist& mt, const CoreStats& stats) const;
 };

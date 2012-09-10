@@ -16,4 +16,7 @@ sprites:
 
   - name: iron helmet
     file: res/items/armour/sprites/iron_helmet.png
+
+  - name: leather boots
+    file: res/items/armour/sprites/leather_boots.png
     

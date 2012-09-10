@@ -25,17 +25,21 @@ itemgen_lists:
     #Potions
     - { item: Health Potion,      chance: 10                     }
     - { item: Mana Potion,        chance: 10                     }
-    #Armours
+    #Body Armour
     - { item: Leather Armour,     chance: 4                      }
     - { item: Chainmail,          chance: 2                      }
     - { item: Platemail,          chance: 1                      }
     - { item: Magic Robe,         chance: 4                      }
     - { item: Magic Sword,        chance: 2                      }
+    #Helmets
+    - { item: Iron Helmet,        chance: 4                      }
     #Rings
     - { item: Magician's Ring,    chance: 3                      }
     - { item: Ring of Vitality,   chance: 3                      }
     - { item: Ring of Stone,      chance: 3                      }
     - { item: Ogre's Ring,        chance: 3                      }
+    #Boots
+    - { item: Leather Boots,      chance: 3                      }
   - name: Store Items
     items:
     - default: *BasicItems
