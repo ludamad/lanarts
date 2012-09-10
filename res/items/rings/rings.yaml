@@ -2,10 +2,39 @@
 equipment:
   - name: Magician's Ring
     equipment_type: ring
-    shop_cost: [15, 25]
+    shop_cost: [35, 55]
     description: 
       A ring bound with magical energies, giving the user increased mana reserves. 
-      Grants 15 mana.
+      Grants 10 mana.
     spr_item: magicians ring
     stat_bonuses: 
-      mp: 15
+      mp: 10
+
+  - name: Ogre's Ring
+    equipment_type: ring
+    shop_cost: [35, 55]
+    description: 
+      A large ring that grants the user brutish force. Grants 3 strength.
+    spr_item: ogres ring
+    stat_bonuses: 
+      strength: 3
+
+  - name: Ring of Vitality
+    equipment_type: ring
+    shop_cost: [35, 55]
+    description: 
+      A ring of bound with life-extending mantras.
+      Grants 10 health.
+    spr_item: ring of vitality
+    stat_bonuses: 
+      hp: 10
+
+  - name: Ring of Stone
+    equipment_type: ring
+    shop_cost: [35, 55]
+    description: 
+      A ring that causes thickening of the skin. Grants 2 resistance & damage reduction.
+    spr_item: ring of stone
+    resistance: { base: 2 }
+    reduction:  { base: 2 }
+      

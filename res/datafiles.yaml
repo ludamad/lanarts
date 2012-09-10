@@ -4,7 +4,8 @@
 #relative to res/
 
 equipment_files:
-  - items/armour/armour.yaml
+  - items/armour/body_armour.yaml
+  - items/armour/helmets.yaml
   - items/rings/rings.yaml
 
 class_files: 

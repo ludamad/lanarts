@@ -24,8 +24,9 @@ CombatStats::CombatStats(const ClassStats& class_stats, const CoreStats& core,
 
 }
 
-void CombatStats::step(GameState* gs, CombatGameInst* inst) {
-	core.step();
+void CombatStats::step(GameState* gs, CombatGameInst* inst,
+		const EffectiveStats& effective_stats) {
+	core.step(effective_stats.core);
 	cooldowns.step();
 	effects.step(gs, inst);
 }
@@ -93,8 +94,7 @@ int CombatStats::gain_xp(int amnt) {
 }
 
 bool AttackStats::is_ranged() const {
-	return !projectile.empty()
-			|| weapon.weapon_entry().uses_projectile;
+	return !projectile.empty() || weapon.weapon_entry().uses_projectile;
 }
 
 WeaponEntry& AttackStats::weapon_entry() const {

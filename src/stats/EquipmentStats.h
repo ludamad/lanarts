@@ -49,7 +49,6 @@ public:
 
 	Inventory inventory;
 	money_t money;
-private:
 };
 
 #endif /* EQUIPMENTSTATS_H_ */

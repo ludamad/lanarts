@@ -52,7 +52,8 @@ struct CombatStats {
 					std::vector<AttackStats>(), float movespeed = 0.0f);
 
 	void init();
-	void step(GameState* gs, CombatGameInst* inst);
+	void step(GameState* gs, CombatGameInst* inst,
+			const EffectiveStats& effective_stats);
 
 	bool has_died();
 

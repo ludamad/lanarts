@@ -1,11 +1,19 @@
 sprites: 
   - name: leather armour
     file: res/items/armour/sprites/leather_armour2.png
+
   - name: gloves
     file: res/items/armour/sprites/gloves.png
+
   - name: chainmail
     file: res/items/armour/sprites/chainmail.png
+
   - name: robe
     file: res/items/armour/sprites/robe.png
+
   - name: platemail
     file: res/items/armour/sprites/plate2.png
+
+  - name: iron helmet
+    file: res/items/armour/sprites/iron_helmet.png
+    

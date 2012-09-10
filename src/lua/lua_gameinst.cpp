@@ -119,11 +119,19 @@ public:
 		return 0;
 	}
 	int heal_hp(lua_State* L) {
-		get_stats()->core.heal_hp(lua_tointeger(L, 1));
+		CombatGameInst* cinst = get_combat_inst();
+		CoreStats& core = cinst->core_stats();
+		CoreStats& ecore = cinst->effective_stats().core;
+		core.heal_hp(lua_tointeger(L, 1), ecore.max_hp);
+		ecore.hp = core.hp;
 		return 0;
 	}
 	int heal_mp(lua_State* L) {
-		get_stats()->core.heal_mp(lua_tointeger(L, 1));
+		CombatGameInst* cinst = get_combat_inst();
+		CoreStats& core = cinst->core_stats();
+		CoreStats& ecore = cinst->effective_stats().core;
+		core.heal_mp(lua_tointeger(L, 1), ecore.max_mp);
+		ecore.mp = core.mp;
 		return 0;
 	}
 private:

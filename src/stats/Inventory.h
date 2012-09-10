@@ -62,7 +62,7 @@ struct ItemSlot {
 	void add_copies(int copies) {
 		item.add_copies(copies);
 	}
-	bool is_equipped() {
+	bool is_equipped() const {
 		return equipped;
 	}
 	int id() const {

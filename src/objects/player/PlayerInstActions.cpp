@@ -472,11 +472,14 @@ void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
 	if (!effective_stats().allowed_actions.can_use_rest) {
 		return;
 	}
-	bool atfull = core_stats().hp >= core_stats().max_hp
-			&& core_stats().mp >= core_stats().max_mp;
+	CoreStats& ecore = effective_stats().core;
+	int emax_hp = ecore.max_hp, emax_mp = ecore.max_mp;
+	bool atfull = core_stats().hp >= emax_hp && core_stats().mp >= emax_mp;
 	if (cooldowns().can_rest() && !atfull && effects().can_rest()) {
-		core_stats().heal_hp(core_stats().hpregen * 8);
-		core_stats().heal_mp(core_stats().mpregen * 8);
+		core_stats().heal_hp(ecore.hpregen * 8, emax_hp);
+		core_stats().heal_mp(ecore.mpregen * 8, emax_mp);
+		ecore.hp = core_stats().hp;
+		ecore.mp = core_stats().mp;
 		is_resting = true;
 	}
 }

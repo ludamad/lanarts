@@ -33,12 +33,13 @@ struct CoreStats {
 					0) {
 	}
 
-	void step();
+	void step(const CoreStats& effective_stats);
 
 	bool hurt(int dmg);
 	void heal_fully();
-	void heal_hp(float hpgain);
-	void heal_mp(float mpgain);
+	void heal_hp(float hpgain, int maxhp);
+	void heal_mp(float mpgain, int maxmp);
+	void apply_as_bonus(const CoreStats& bonus_stats);
 private:
 	float hp_regened, mp_regened;
 };

@@ -59,7 +59,11 @@ void CombatGameInst::update_field_of_view(GameState* gs) {
 
 void CombatGameInst::step(GameState* gs) {
 	estats = stats().effective_stats(gs, this);
-	stats().step(gs, this);
+	stats().step(gs, this, estats);
+	// XXX: If we do not sync the new mp & hp values
+	// we can get drawing artifacts
+	estats.core.hp = stats().core.hp;
+	estats.core.mp = stats().core.mp;
 }
 
 /* Getters */

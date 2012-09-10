@@ -31,6 +31,11 @@ itemgen_lists:
     - { item: Platemail,          chance: 1                      }
     - { item: Magic Robe,         chance: 4                      }
     - { item: Magic Sword,        chance: 2                      }
+    #Rings
+    - { item: Magician's Ring,    chance: 3                      }
+    - { item: Ring of Vitality,   chance: 3                      }
+    - { item: Ring of Stone,      chance: 3                      }
+    - { item: Ogre's Ring,        chance: 3                      }
   - name: Store Items
     items:
     - default: *BasicItems

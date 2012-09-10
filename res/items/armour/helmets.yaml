@@ -1,0 +1,9 @@
+---
+equipment:
+  - name: Iron Helmet
+    description: A basic, durable iron helmet.
+    shop_cost: [15, 25]
+    spr_item: iron helmet
+    equipment_type: helmet
+    resistance: { base: 1 }
+    reduction:  { base: 1 }

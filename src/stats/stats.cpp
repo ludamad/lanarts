@@ -30,29 +30,46 @@ void CoreStats::heal_fully() {
 	mp = max_mp;
 }
 
-void CoreStats::heal_hp(float hpgain) {
+void CoreStats::heal_hp(float hpgain, int maxhp) {
 	hp_regened += hpgain;
 	if (hp_regened > 0) {
 		hp += floor(hp_regened);
 		hp_regened -= floor(hp_regened);
 	}
-	if (hp > max_hp)
-		hp = max_hp;
+	if (hp > maxhp)
+		hp = maxhp;
 }
 
-void CoreStats::step() {
-	heal_hp(hpregen);
-	heal_mp(mpregen);
+void CoreStats::step(const CoreStats& effective_stats) {
+	heal_hp(hpregen, effective_stats.max_hp);
+	heal_mp(mpregen, effective_stats.max_mp);
 }
 
-void CoreStats::heal_mp(float mpgain) {
+void CoreStats::heal_mp(float mpgain, int maxmp) {
 	mp_regened += mpgain;
 	if (mp_regened > 0) {
 		mp += floor(mp_regened);
 		mp_regened -= floor(mp_regened);
 	}
-	if (mp > max_mp)
-		mp = max_mp;
+
+	if (mp > maxmp)
+		mp = maxmp;
+}
+
+void CoreStats::apply_as_bonus(const CoreStats& bonus_stats) {
+//	hp += bonus_stats.hp;
+	max_hp += bonus_stats.max_hp;
+
+//	mp += bonus_stats.mp;
+	max_mp += bonus_stats.max_mp;
+
+	strength += bonus_stats.strength;
+	defence += bonus_stats.defence;
+	magic += bonus_stats.magic;
+	willpower += bonus_stats.willpower;
+
+	hpregen += bonus_stats.hpregen;
+	mpregen += bonus_stats.mpregen;
 }
 
 Range CoreStatMultiplier::calculate_range(const CoreStats& stats) const {
@@ -119,3 +136,4 @@ void CooldownStats::reset_hurt_cooldown(int cooldown) {
 ClassType& ClassStats::class_type() const {
 	return game_class_data.at(classid);
 }
+
