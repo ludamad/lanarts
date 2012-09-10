@@ -5,6 +5,7 @@
 
 equipment_files:
   - items/armour/armour.yaml
+  - items/rings/rings.yaml
 
 class_files: 
   - classes/classes.yaml
@@ -54,6 +55,7 @@ sprite_files:
   - enemies/undead/undead_sprites.yaml
   - spells/spell_sprites.yaml
   - items/armour/armour_sprites.yaml
+  - items/rings/ring_sprites.yaml
   - interface/interface_sprites.yaml
   - items/misc/misc_sprites.yaml
   - items/scrolls/scroll_sprites.yaml

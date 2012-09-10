@@ -1,5 +1,5 @@
 ---
-armours:
+equipment:
   - name: Magician's Ring
     equipment_type: ring
     shop_cost: [15, 25]
