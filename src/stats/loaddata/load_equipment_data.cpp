@@ -20,8 +20,16 @@ void parse_equipment_entry(const YAML::Node& n, EquipmentEntry& entry) {
 	entry.use_action = LuaAction(LuaValue());
 	entry.stat_modifiers = parse_stat_modifiers(n);
 	entry.cooldown_modifiers = parse_cooldown_modifiers(n);
-	entry.type = EquipmentEntry::ARMOUR;
-//  entry.type; TODO
+	std::string type = parse_defaulted(n, "equipment_type", std::string());
+	if (type == "armour") {
+		entry.type = EquipmentEntry::ARMOUR;
+	} else if (type == "ring") {
+		entry.type = EquipmentEntry::RING;
+	} else if (type == "boots") {
+		entry.type = EquipmentEntry::BOOTS;
+	} else if (type == "helmet") {
+		entry.type = EquipmentEntry::HELMET;
+	}
 }
 
 void load_equipment_callbackf(const YAML::Node& node, lua_State* L,

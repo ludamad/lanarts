@@ -1,0 +1,11 @@
+---
+armours:
+  - name: Magician's Ring
+    equipment_type: ring
+    shop_cost: [15, 25]
+    description: 
+      A ring bound with magical energies, giving the user increased mana reserves. 
+      Grants 15 mana.
+    spr_item: magicians ring
+    stat_bonuses: 
+      mp: 15

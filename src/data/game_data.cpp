@@ -212,7 +212,7 @@ GameSettings init_game_data(lua_State* L) {
 
 	load_weapon_data(L, dfiles.weapon_files, &lua_items);
 
-	load_equipment_data(L, dfiles.armour_files, &lua_items);
+	load_equipment_data(L, dfiles.equipment_files, &lua_items);
 	// --- ITEM DATA ---
 
 	lua_effects = load_effect_data(L, dfiles.effect_files);

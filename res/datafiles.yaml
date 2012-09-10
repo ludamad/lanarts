@@ -3,7 +3,7 @@
 #Locations of markup files
 #relative to res/
 
-armour_files:
+equipment_files:
   - items/armour/armour.yaml
 
 class_files: 
