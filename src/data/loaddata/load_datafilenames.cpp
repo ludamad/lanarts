@@ -23,7 +23,7 @@ DataFiles load_datafilenames(const char* filename) {
 
 			parser.GetNextDocument(root);
 
-			optional_set(root, "armour_files", dfiles.armour_files);
+			optional_set(root, "equipment_files", dfiles.equipment_files);
 			optional_set(root, "class_files", dfiles.class_files);
 			optional_set(root, "enemy_files", dfiles.enemy_files);
 			optional_set(root, "effect_files", dfiles.effect_files);
