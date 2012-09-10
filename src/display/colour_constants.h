@@ -30,6 +30,7 @@ const Colour COL_GOLD(255, 215, 0);
 const Colour COL_MEDIUM_PURPLE(123, 104, 238);
 
 const Colour COL_WHITE(255, 255, 255);
+const Colour COL_DARK_GRAY(40, 40, 40);
 const Colour COL_GRAY(60, 60, 60);
 const Colour COL_LIGHT_GRAY(180, 180, 180);
 const Colour COL_MID_GRAY(120, 120, 120);

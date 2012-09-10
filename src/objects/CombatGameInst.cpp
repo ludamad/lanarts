@@ -199,10 +199,6 @@ bool CombatGameInst::attack(GameState* gs, CombatGameInst* inst,
 	}
 }
 
-void CombatGameInst::equip(item_id item, int amnt) {
-	equipment().equip(Item(item, amnt));
-}
-
 void CombatGameInst::init(GameState* gs) {
 	GameInst::init(gs);
 	estats = stats().effective_stats(gs, this);

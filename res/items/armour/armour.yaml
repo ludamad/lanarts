@@ -1,5 +1,5 @@
 ---
-armours:
+equipment:
   - name: Leather Armour
     shop_cost: [15, 25]
     description: A durable, flexible armour.

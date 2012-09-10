@@ -81,11 +81,11 @@ public:
 		return deaths;
 	}
 
-	Weapon& weapon() {
+	Weapon weapon() {
 		return equipment().weapon();
 	}
 
-	Projectile& projectile() {
+	Projectile projectile() {
 		return equipment().projectile();
 	}
 

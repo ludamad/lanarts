@@ -75,8 +75,6 @@ public:
 		return kills;
 	}
 
-	void equip(item_id item, int amnt = 1);
-
 	CombatStats& stats();
 	CoreStats& core_stats();
 	ClassStats& class_stats();

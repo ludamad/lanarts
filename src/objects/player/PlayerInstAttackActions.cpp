@@ -528,7 +528,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 	int cooldown = 0;
 
 	if (equipment().has_projectile()) {
-		const Item& projectile = equipment().projectile();
+		Projectile projectile = equipment().projectile();
 		ProjectileEntry& pentry = projectile.projectile_entry();
 		item_id item = get_item_by_name(pentry.name.c_str());
 		int weaprange = std::max(wentry.range(), pentry.range());
@@ -545,7 +545,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		if (class_stats().class_type().name == "Archer"
 				&& pentry.weapon_class == "bows") {
 			int xplevel = class_stats().xplevel;
-			float movebonus = (class_stats().xplevel-1) / 4.0f;
+			float movebonus = (class_stats().xplevel - 1) / 4.0f;
 			if (movebonus > 0.5) {
 				movebonus = 0.5;
 			}

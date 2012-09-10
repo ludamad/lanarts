@@ -147,7 +147,7 @@ set( lanarts_src
     stats/items/ProjectileEntry.cpp
     stats/items/WeaponEntry.cpp
 	
-	stats/loaddata/load_armour_data.cpp
+	stats/loaddata/load_equipment_data.cpp
 	stats/loaddata/load_class_data.cpp
 	stats/loaddata/load_effect_data.cpp
 	stats/loaddata/load_item_data.cpp

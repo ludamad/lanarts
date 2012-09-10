@@ -47,6 +47,13 @@ public:
 		return armour_modifier().magic_reduction;
 	}
 
+	int number_of_equip_slots() {
+		if (type == RING) {
+			return 2;
+		}
+		return 1;
+	}
+
 	equip_type type;
 	// Stat modifiers while wearing this equipment
 	StatModifiers stat_modifiers;

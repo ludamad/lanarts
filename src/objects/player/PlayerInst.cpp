@@ -181,8 +181,6 @@ void PlayerInst::step(GameState* gs) {
 		} else {
 			gs->game_world().reset(0);
 		}
-//		else
-//			gs->remove_instance(this);
 		perf_timer_end(FUNCNAME);
 		return;
 	}

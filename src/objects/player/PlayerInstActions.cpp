@@ -35,14 +35,11 @@ extern "C" {
 
 #include "PlayerInst.h"
 
-static bool is_same_projectile(const Item& projectile, const Item& item) {
-	return !projectile.empty() && projectile.is_same_item(item);
-}
-
 static bool is_wieldable_projectile(EquipmentStats& equipment,
 		const Item& item) {
-	if (is_same_projectile(equipment.projectile(), item))
+	if (equipment.projectile().is_same_item(item)) {
 		return true;
+	}
 
 	if (item.is_projectile()) {
 		ProjectileEntry& pentry = item.projectile_entry();
@@ -278,18 +275,18 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	const Item& type = iteminst->item_type();
 	int amnt = iteminst->item_quantity();
 
+	bool equip_as_well = false;
+
 	if (type.id == get_item_by_name("Gold")) {
 		gold() += amnt;
 	} else {
-		if (is_same_projectile(equipment().projectile(), type)) {
-			equipment().projectile().add_copies(amnt);
-		} else if (!equipment().has_projectile()
+//		if (is_same_projectile(equipment().projectile(), type)) {
+//			equipment().projectile_slot().add_copies(amnt);
+		if (!equipment().has_projectile()
 				&& is_wieldable_projectile(equipment(), type)) {
-			equipment().deequip_projectiles();
-			equipment().equip(type);
-		} else {
-			inventory().add(type);
+			equip_as_well = true;
 		}
+		inventory().add(type, equip_as_well);
 	}
 
 	cooldowns().reset_pickup_cooldown(PICKUP_RATE);
@@ -394,7 +391,7 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 	case GameAction::DROP_ITEM:
 		return drop_item(gs, action);
 	case GameAction::DEEQUIP_ITEM:
-		return equipment().deequip(action.use_id);
+		return equipment().deequip_type(action.use_id);
 	case GameAction::REPOSITION_ITEM:
 		return reposition_item(gs, action);
 	case GameAction::CHOSE_SPELL:
@@ -438,27 +435,38 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 	if (!effective_stats().allowed_actions.can_use_items) {
 		return;
 	}
-	ItemSlot& itemslot = inventory().get(action.use_id);
+	itemslot_t slot = action.use_id;
+	ItemSlot& itemslot = inventory().get(slot);
 	Item& item = itemslot.item;
 	ItemEntry& type = itemslot.item_entry();
 
 	lua_State* L = gs->get_luastate();
 
-	if (item.amount > 0 && equipment().valid_to_use(item)
-			&& item_check_lua_prereq(L, type, this)) {
-		item_do_lua_action(L, type, this, Pos(action.action_x, action.action_y),
-				item.amount);
-		if (is_local_player() && !type.inventory_use_message().empty()) {
-			gs->game_chat().add_message(type.inventory_use_message(),
-					Colour(100, 100, 255));
+	if (item.amount > 0) {
+		if (item.is_equipment()) {
+			if (itemslot.is_equipped()) {
+				itemslot.deequip();
+			} else {
+				if (!item.is_projectile()
+						|| equipment().valid_to_use_projectile(item)) {
+					equipment().equip(slot);
+				}
+			}
+		} else if (equipment().valid_to_use(item)
+				&& item_check_lua_prereq(L, type, this)) {
+			item_do_lua_action(L, type, this,
+					Pos(action.action_x, action.action_y), item.amount);
+			if (is_local_player() && !type.inventory_use_message().empty()) {
+				gs->game_chat().add_message(type.inventory_use_message(),
+						Colour(100, 100, 255));
+			}
+			if (item.is_projectile())
+				itemslot.clear();
+			else
+				item.remove_copies(1);
+			reset_rest_cooldown();
 		}
-		if (item.is_projectile())
-			itemslot.clear();
-		else
-			item.remove_copies(1);
-		reset_rest_cooldown();
 	}
-
 }
 void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
 	if (!effective_stats().allowed_actions.can_use_rest) {

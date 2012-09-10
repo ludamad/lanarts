@@ -36,7 +36,7 @@ static void draw_player_inventory(GameState* gs, Inventory& inv,
 	int slot = min_slot;
 	for (int y = bbox.y1; y < bbox.y2; y += TILE_SIZE) {
 		for (int x = bbox.x1; x < bbox.x2; x += TILE_SIZE) {
-			if (slot >= max_slot)
+			if (slot >= max_slot || slot >= inv.max_size())
 				break;
 
 			ItemSlot& itemslot = inv.get(slot);
@@ -44,10 +44,11 @@ static void draw_player_inventory(GameState* gs, Inventory& inv,
 			BBox slotbox(x, y, x + TILE_SIZE, y + TILE_SIZE);
 			Colour outline(COL_UNFILLED_OUTLINE);
 			if (itemslot.amount() > 0 && slot != slot_selected) {
-				outline = COL_FILLED_OUTLINE;
-				if (slot == min_slot) {
-					outline = COL_PALE_GREEN;
+				if (itemslot.is_equipped()) {
+					gl_draw_rectangle(slotbox, Colour(25, 50, 10));
 				}
+				outline = COL_FILLED_OUTLINE;
+
 				if (slotbox.contains(mx, my)) {
 					outline = COL_PALE_YELLOW;
 					draw_console_item_description(gs, itemslot.item,

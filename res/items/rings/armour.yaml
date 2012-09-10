@@ -1,0 +1,12 @@
+---
+armours:
+  - name: Leather Armour
+    shop_cost: [15, 25]
+    description: A durable, flexible armour.
+    spr_item: leather armour
+    armour_type: body armour
+    resistance: { base: 2 }
+    magic_resistance: { base: 0 }
+    reduction:  { base: 2 }
+    magic_reduction: { base: 0 }
+    spell_cooldown_multiplier: 1.1

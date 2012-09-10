@@ -19,8 +19,9 @@ const int INVENTORY_SIZE = 40;
 typedef int itemslot_t;
 
 struct ItemSlot {
+	friend class Inventory;
+
 	Item item;
-	bool equipped;
 	bool empty() const {
 		return item.empty();
 	}
@@ -34,11 +35,35 @@ struct ItemSlot {
 	ItemEntry& item_entry() {
 		return item.item_entry();
 	}
+	EquipmentEntry& equipment_entry() {
+		return item.equipment_entry();
+	}
+	WeaponEntry& weapon_entry() {
+		return item.weapon_entry();
+	}
+	ProjectileEntry& projectile_entry() {
+		return item.projectile_entry();
+	}
 	ItemProperties& properties() {
 		return item.properties;
 	}
 	bool is_same_item(const Item& item) const {
 		return this->item.is_same_item(item);
+	}
+	void deequip() {
+		equipped = false;
+	}
+	void remove_copies(int copies) {
+		item.remove_copies(copies);
+		if (item.amount == 0) {
+			equipped = false;
+		}
+	}
+	void add_copies(int copies) {
+		item.add_copies(copies);
+	}
+	bool is_equipped() {
+		return equipped;
 	}
 	int id() const {
 		return item.id;
@@ -49,6 +74,8 @@ struct ItemSlot {
 	bool operator==(const ItemSlot& itemslot) const {
 		return item == itemslot.item && equipped == itemslot.equipped;
 	}
+private:
+	bool equipped;
 };
 
 class Inventory {
@@ -56,10 +83,15 @@ public:
 	Inventory(int size = INVENTORY_SIZE) {
 		items.resize(size);
 	}
-	bool add(const Item& item);
+	bool add(const Item& item, bool equip_as_well = false);
 	ItemSlot& get(itemslot_t i) {
 		return items.at(i);
 	}
+
+	const ItemSlot& get(itemslot_t i) const {
+		return items.at(i);
+	}
+
 	bool slot_filled(int i) const {
 		return items.at(i).amount() > 0;
 	}
@@ -72,6 +104,9 @@ public:
 
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
+	void equip(itemslot_t i);
+	void deequip_type(int type);
+	itemslot_t get_equipped(int type, itemslot_t last_slot = -1) const;
 private:
 	std::vector<ItemSlot> items;
 };

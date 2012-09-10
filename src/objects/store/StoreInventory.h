@@ -33,7 +33,7 @@ class SerializeBuffer;
 
 class StoreInventory {
 public:
-	StoreInventory(int maxsize = 40) :
+	StoreInventory(int maxsize = 20) :
 			items(maxsize) {
 	}
 	void add(const Item& item, int cost);

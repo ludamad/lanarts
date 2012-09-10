@@ -42,9 +42,9 @@ static void assert_equal(Inventory& i1, Inventory& i2) {
 }
 
 static void assert_equal(EquipmentStats& e1, EquipmentStats& e2) {
-	UNIT_TEST_ASSERT(e1.weapon() == e2.weapon());
-	UNIT_TEST_ASSERT(e1.armour() == e2.armour());
-	UNIT_TEST_ASSERT(e1.projectile() ==  e2.projectile());
+	UNIT_TEST_ASSERT(e1.weapon_slot() == e2.weapon_slot());
+	UNIT_TEST_ASSERT(e1.armour_slot() == e2.armour_slot());
+	UNIT_TEST_ASSERT(e1.projectile_slot() ==  e2.projectile_slot());
 	assert_equal(e1.inventory, e2.inventory);
 }
 
@@ -76,9 +76,9 @@ static void serialize_equipment() {
 
 	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
 	EquipmentStats e1, e2;
-	e1.armour() = Equipment(1);
-	e1.weapon() = Weapon(1);
-	e1.projectile() = Projectile(1);
+//	e1.armour_slot() = Equipment(1);
+//	e1.weapon_slot() = Weapon(1);
+//	e1.projectile_slot() = Projectile(1);
 	e1.inventory.add(Item(1));
 	e1.serialize(serializer);
 

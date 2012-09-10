@@ -22,7 +22,6 @@ AttackStats parse_attack_stats(const YAML::Node & n) {
 	return ret;
 }
 
-
 static Item parse_as_item(const YAML::Node& n, const char* key = "item") {
 	std::string s = parse_str(n[key]);
 	int amount = parse_defaulted(n, "amount", 1);
@@ -41,11 +40,13 @@ EquipmentStats parse_equipment(const YAML::Node& n) {
 	EquipmentStats ret;
 	ret.inventory = parse_inventory(n["inventory"]);
 	if (yaml_has_node(n, "weapon")) {
-		ret.weapon() = parse_as_item(n, "weapon");
+		Item item = parse_as_item(n, "weapon");
+		ret.inventory.add(item, true);
 	}
 	if (yaml_has_node(n, "projectile")) {
 		const YAML::Node& pentry = n["projectile"];
-		ret.projectile() = parse_as_item(pentry);
+		Item item = parse_as_item(pentry);
+		ret.inventory.add(item, true);
 	}
 	return ret;
 }

@@ -19,23 +19,18 @@ public:
 	}
 	bool valid_to_use_projectile(const Item& proj);
 	bool valid_to_use(const Item& item);
-	void equip(const Item& item);
+
+	void equip(itemslot_t slot);
 	void deequip_projectiles();
 	void deequip_weapon();
 	void deequip_armour();
-	void deequip(int equipment_type);
+	void deequip_type(int equipment_type);
 
 	void use_ammo(int amnt = 1);
 
-	bool has_weapon() {
-		return _weapon.id > NO_ITEM;
-	}
-	bool has_armour() {
-		return _armour.id > NO_ITEM;
-	}
-	bool has_projectile() {
-		return _projectile.id > NO_ITEM;
-	}
+	bool has_weapon();
+	bool has_armour();
+	bool has_projectile();
 
 	ItemSlot& get_item(itemslot_t i) {
 		return inventory.get(i);
@@ -44,22 +39,17 @@ public:
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
 
-	Weapon& weapon() {
-		return _weapon;
-	}
-	Projectile& projectile() {
-		return _projectile;
-	}
-	Equipment& armour() {
-		return _armour;
-	}
+	ItemSlot& weapon_slot();
+	ItemSlot& projectile_slot();
+	ItemSlot& armour_slot();
+
+	Weapon weapon() const;
+	Projectile projectile() const;
+	Equipment armour() const;
 
 	Inventory inventory;
 	money_t money;
 private:
-	Weapon _weapon;
-	Projectile _projectile;
-	Equipment _armour;
 };
 
 #endif /* EQUIPMENTSTATS_H_ */

@@ -59,26 +59,26 @@ public:
 		get_combat_inst()->damage(lua_get_gamestate(L), attack);
 		return 0;
 	}
-	int equip(lua_State* L) {
-		CombatGameInst* combatinst;
-		if ((combatinst = dynamic_cast<CombatGameInst*>(get_inst()))) {
-			int args = lua_gettop(L);
-
-			lua_pushstring(L, "name");
-			lua_gettable(L, 1);
-			const char* itemname = lua_tostring(L, lua_gettop(L));
-			item_id item = get_item_by_name(itemname);
-			int amnt = args >= 2 ? lua_tointeger(L, 2) : 1;
-			combatinst->equip(item, amnt);
-			lua_pop(L, 1);
-		}
-		return 0;
-	}
+//	int equip(lua_State* L) {
+//		CombatGameInst* combatinst;
+//		if ((combatinst = dynamic_cast<CombatGameInst*>(get_inst()))) {
+//			int args = lua_gettop(L);
+//
+//			lua_pushstring(L, "name");
+//			lua_gettable(L, 1);
+//			const char* itemname = lua_tostring(L, lua_gettop(L));
+//			item_id item = get_item_by_name(itemname);
+//			int amnt = args >= 2 ? lua_tointeger(L, 2) : 1;
+//			combatinst->equip(item, amnt);
+//			lua_pop(L, 1);
+//		}
+//		return 0;
+//	}
 	int add_effect(lua_State* L) {
 		CombatGameInst* combatinst;
 		if ((combatinst = dynamic_cast<CombatGameInst*>(get_inst()))) {
-			LuaValue effect = combatinst->effects().add(lua_get_gamestate(L), combatinst,
-					effect_from_lua(L, 1), lua_tointeger(L, 2));
+			LuaValue effect = combatinst->effects().add(lua_get_gamestate(L),
+					combatinst, effect_from_lua(L, 1), lua_tointeger(L, 2));
 			effect.push(L);
 		} else {
 			lua_pushnil(L);
@@ -233,8 +233,8 @@ static int lua_member_update(lua_State* L) {
 
 meth_t bind_t::methods[] = { LUA_DEF(heal_fully), LUA_DEF(move_to),
 		LUA_DEF(heal_hp), LUA_DEF(heal_mp), LUA_DEF(direct_damage),
-		LUA_DEF(damage), LUA_DEF(equip), LUA_DEF(add_effect),
-		LUA_DEF(has_effect), LUA_DEF(add_effect), LUA_DEF(is_local_player),
+		LUA_DEF(damage), LUA_DEF(add_effect), LUA_DEF(has_effect),
+		LUA_DEF(add_effect), LUA_DEF(is_local_player),
 		LUA_DEF(reset_rest_cooldown), meth_t(0, 0) };
 
 void lua_gameinst_bindings(GameState* gs, lua_State* L) {

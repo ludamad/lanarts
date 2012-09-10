@@ -19,12 +19,14 @@ fov::fov(int radius) :
 		gs(NULL), radius(radius), m(radius, radius, radius, radius), ptx(0), pty(
 				0), sx(0), sy(0) {
 	diameter = radius * 2 + 1;
+	has_been_calculated = false;
 	sight_mask = new char[diameter * diameter];
 }
 
 void fov::calculate(GameState* gs, int ptx, int pty) {
 	perf_timer_begin(FUNCNAME);
 
+	this->has_been_calculated = true;
 	this->gs = gs;
 	this->ptx = ptx, this->pty = pty;
 	this->sx = ptx - radius, this->sy = pty - radius;
@@ -62,6 +64,9 @@ int fov::isBlocked(short destX, short destY) {
 	return !tiles.is_seethrough(px, py);
 }
 bool fov::within_fov(const BBox& bbox) {
+	if (!has_been_calculated) {
+		return false;
+	}
 	int ex = sx + diameter, ey = sy + diameter;
 	if (bbox.x2 < sx || bbox.x1 >= ex || bbox.y2 < sy || bbox.y1 >= ey) {
 		return false;

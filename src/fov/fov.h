@@ -25,6 +25,7 @@ public:
     }
     fov* clone() const;
 private:
+    bool has_been_calculated;
     char* sight_mask;
     GameState* gs;
     int radius, diameter;
