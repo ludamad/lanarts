@@ -8,7 +8,7 @@
 #include "../serialize/SerializeBuffer.h"
 #include "SpellsKnown.h"
 
-#include "spell_data.h"
+#include "SpellEntry.h"
 
 void SpellsKnown::add_spell(spell_id slot) {
 	spells.push_back(slot);

@@ -13,7 +13,7 @@
 #include "../../objects/player/PlayerInst.h"
 
 #include "../../stats/SpellsKnown.h"
-#include "../../stats/spell_data.h"
+#include "../../stats/SpellEntry.h"
 
 #include "../console_description_draw.h"
 

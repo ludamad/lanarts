@@ -16,7 +16,7 @@
 #include "../stats/items/ItemEntry.h"
 #include "../stats/items/items.h"
 
-#include "../stats/spell_data.h"
+#include "../stats/SpellEntry.h"
 
 #include "console_description_draw.h"
 

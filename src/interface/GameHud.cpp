@@ -19,7 +19,7 @@
 #include "../stats/items/WeaponEntry.h"
 
 #include "../stats/items/ItemEntry.h"
-#include "../stats/spell_data.h"
+#include "../stats/SpellEntry.h"
 
 #include "../util/math_util.h"
 

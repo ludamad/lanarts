@@ -11,7 +11,7 @@
 #include "../stats/items/WeaponEntry.h"
 
 #include "../stats/items/ItemEntry.h"
-#include "../stats/spell_data.h"
+#include "../stats/SpellEntry.h"
 
 #include "../lanarts_defines.h"
 

@@ -1,10 +1,10 @@
 /*
- * spell_data.h:
+ * SpellEntry.h:
  *  Defines the data that goes into a spell
  */
 
-#ifndef SPELL_DATA_H_
-#define SPELL_DATA_H_
+#ifndef SPELLENTRY_H_
+#define SPELLENTRY_H_
 
 #include <string>
 #include <vector>
@@ -42,4 +42,4 @@ struct SpellEntry {
 extern std::vector<SpellEntry> game_spell_data;
 
 spell_id get_spell_by_name(const char* name);
-#endif /* SPELL_DATA_H_ */
+#endif /* SPELLENTRY_H_ */

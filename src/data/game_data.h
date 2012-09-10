@@ -25,7 +25,7 @@
 #include "../stats/effect_data.h"
 #include "../stats/items/ItemEntry.h"
 #include "../stats/itemgen_data.h"
-#include "../stats/spell_data.h"
+#include "../stats/SpellEntry.h"
 
 #include "datafilenames.h"
 
