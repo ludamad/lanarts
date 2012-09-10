@@ -9,14 +9,15 @@
 #include <string>
 #include <vector>
 
+#include "../data/BaseDataEntry.h"
+
 #include "../lua/LuaValue.h"
 
 #include "../lanarts_defines.h"
 
 #include "items/items.h"
 
-struct SpellEntry {
-	std::string name, description;
+struct SpellEntry: public BaseDataEntry {
 	sprite_id sprite;
 	int mp_cost, cooldown;
 	LuaValue action_func; //Immediate action
