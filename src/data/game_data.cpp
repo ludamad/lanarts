@@ -107,7 +107,7 @@ const char* equip_type_description(const ItemEntry& ientry) {
 	case EquipmentEntry::PROJECTILE: {
 		const ProjectileEntry* pentry =
 				dynamic_cast<const ProjectileEntry*>(eentry);
-		if (pentry->is_unarmed()) {
+		if (pentry->is_standalone()) {
 			return "Unarmed Projectile";
 		} else {
 			return "Projectile";

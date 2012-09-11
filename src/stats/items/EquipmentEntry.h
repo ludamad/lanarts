@@ -21,6 +21,9 @@ public:
 			type(type) {
 
 	}
+
+	virtual const char* entry_type();
+
 	virtual ~EquipmentEntry() {
 	}
 

@@ -14,7 +14,7 @@
 #include "../gamestate/tileset_data.h"
 #include "../levelgen/dungeon_data.h"
 #include "../lua/LuaValue.h"
-#include "../objects/enemy/enemy_data.h"
+#include "../objects/enemy/EnemyEntry.h"
 #include "../objects/scriptobject_data.h"
 
 #include "../stats/items/EquipmentEntry.h"

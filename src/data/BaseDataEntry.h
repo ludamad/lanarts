@@ -8,11 +8,15 @@
 
 #include <string>
 
+#include "../lanarts_defines.h"
+
 class BaseDataEntry {
 public:
 	std::string name, description;
 	virtual ~BaseDataEntry() {
 	}
+	virtual sprite_id get_sprite() = 0;
+	virtual const char* entry_type() = 0;
 };
 
 #endif /* BASEDATAENTRY_H_ */

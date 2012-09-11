@@ -7,7 +7,7 @@
 #include "../../stats/stats.h"
 #include "../../stats/loaddata/load_stats.h"
 
-#include "../enemy/enemy_data.h"
+#include "../enemy/EnemyEntry.h"
 
 using namespace std;
 

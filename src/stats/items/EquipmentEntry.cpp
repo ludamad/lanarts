@@ -1,11 +1,12 @@
 /*
- * ProjectileEntry.cpp:
+ * EquipmentEntry.cpp:
  *  Represents an equippable item.
  */
 
 #include <cstring>
 
 #include "EquipmentEntry.h"
+#include "ProjectileEntry.h"
 
 equipment_id get_equipment_by_name(const char* name) {
 	if (strcmp(name, "Nothing") == 0) {
@@ -24,3 +25,30 @@ EquipmentEntry& get_equipment_entry(projectile_id id) {
 
 	return dynamic_cast<EquipmentEntry&>(*item);
 }
+
+const char* EquipmentEntry::entry_type() {
+	switch (type) {
+	case EquipmentEntry::ARMOUR:
+		return "Armour";
+	case EquipmentEntry::BOOTS:
+		return "Boots";
+	case EquipmentEntry::HELMET:
+		return "Helmet";
+	case EquipmentEntry::RING:
+		return "Ring";
+	case EquipmentEntry::WEAPON:
+		return "Weapon";
+	case EquipmentEntry::PROJECTILE: {
+		ProjectileEntry* pentry = dynamic_cast<ProjectileEntry*>(this);
+		if (pentry->is_standalone()) {
+			return "Throwing Weapon";
+		} else {
+			return "Ammunition";
+		}
+	}
+	case EquipmentEntry::NONE:
+		return "One-time Use";
+	}
+	return "";
+}
+

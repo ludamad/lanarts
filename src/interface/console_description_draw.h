@@ -20,7 +20,7 @@ const char* monster_speed_description(int speed);
 void draw_spell_icon_and_name(GameState* gs, SpellEntry& spl_entry, Colour col,
 		int x, int y);
 
-Dim draw_item_icon_and_name(GameState* gs, ItemEntry& ientry, Colour col, int x,
+Dim draw_icon_and_name(GameState* gs, BaseDataEntry& entry, Colour col, int x,
 		int y, int xoffset = TILE_SIZE * 1.25, int yoffset = TILE_SIZE / 2);
 
 void draw_console_spell_description(GameState* gs, SpellEntry& spl_entry);

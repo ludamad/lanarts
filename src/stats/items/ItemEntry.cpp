@@ -62,35 +62,3 @@ bool is_item_weapon(ItemEntry & ientry) {
 bool is_item_equipment(ItemEntry & ientry) {
 	return dynamic_cast<EquipmentEntry*>(&ientry) != NULL;
 }
-
-const char* equip_type_description(ItemEntry& ientry) {
-	EquipmentEntry* eentry = dynamic_cast<EquipmentEntry*>(&ientry);
-	if (!eentry) {
-		return "One-time Use";
-	}
-
-	switch (eentry->type) {
-	case EquipmentEntry::ARMOUR:
-		return "Armour";
-	case EquipmentEntry::BOOTS:
-		return "Boots";
-	case EquipmentEntry::HELMET:
-		return "Helmet";
-	case EquipmentEntry::RING:
-		return "Ring";
-	case EquipmentEntry::WEAPON:
-		return "Weapon";
-	case EquipmentEntry::PROJECTILE: {
-		ProjectileEntry* pentry = dynamic_cast<ProjectileEntry*>(eentry);
-		if (pentry->is_unarmed()) {
-			return "Throwing Weapon";
-		} else {
-			return "Ammunition";
-		}
-	}
-	case EquipmentEntry::NONE:
-		return "One-time Use";
-	}
-	return "";
-}
-

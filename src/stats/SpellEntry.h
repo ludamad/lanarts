@@ -29,6 +29,12 @@ struct SpellEntry: public BaseDataEntry {
 			sprite(-1), mp_cost(0), cooldown(0), can_cast_with_cooldown(false), can_cast_with_held_key(
 					false) {
 	}
+	virtual const char* entry_type() {
+		return "Spell";
+	}
+	virtual sprite_id get_sprite() {
+		return sprite;
+	}
 
 	void init(lua_State* L) {
 		action_func.initialize(L);

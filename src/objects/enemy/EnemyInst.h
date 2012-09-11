@@ -13,7 +13,7 @@
 
 #include "EnemyBehaviour.h"
 
-#include "enemy_data.h"
+#include "EnemyEntry.h"
 
 class EnemyInst : public CombatGameInst {
 public:

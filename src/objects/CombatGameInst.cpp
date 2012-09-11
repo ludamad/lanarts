@@ -170,7 +170,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 	WeaponEntry& wentry = weapon.weapon_entry();
 	ProjectileEntry& pentry = projectile.projectile_entry();
 	AttackStats attack;
-	if (!pentry.is_unarmed()) {
+	if (!pentry.is_standalone()) {
 		attack.weapon = weapon;
 	}
 	attack.projectile = projectile;

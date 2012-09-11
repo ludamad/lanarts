@@ -31,7 +31,7 @@
 #include "../ProjectileInst.h"
 #include "../collision_filters.h"
 #include "EnemyInst.h"
-#include "enemy_data.h"
+#include "EnemyEntry.h"
 
 //draw depth, also determines what order objects evaluate in
 static const int DEPTH = 50;

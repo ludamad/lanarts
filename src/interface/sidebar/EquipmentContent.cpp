@@ -45,11 +45,11 @@ static void draw_weapon(GameState* gs, EquipmentStats& eqp, const BBox& bbox) {
 				eqp.weapon().weapon_entry());
 	}
 
-	draw_item_icon_and_name(gs, eqp.weapon().weapon_entry(), COL_WHITE, bbox.x1,
+	draw_icon_and_name(gs, eqp.weapon().weapon_entry(), COL_WHITE, bbox.x1,
 			bbox.y1);
 
 	if (eqp.has_projectile()) {
-		draw_item_icon_and_name(gs, eqp.projectile().projectile_entry(),
+		draw_icon_and_name(gs, eqp.projectile().projectile_entry(),
 				COL_WHITE, bbox.x1, bbox.y1 + TILE_SIZE);
 		gl_draw_line(bbox.x1, bbox.center_y(), bbox.x2, bbox.center_y(),
 				COL_UNFILLED_OUTLINE);
@@ -68,7 +68,7 @@ static void draw_armour(GameState* gs, EquipmentStats& eqp, BBox bbox) {
 		}
 	}
 
-	draw_item_icon_and_name(gs, eqp.armour().equipment_entry(), COL_WHITE,
+	draw_icon_and_name(gs, eqp.armour().equipment_entry(), COL_WHITE,
 			bbox.x1, bbox.y1);
 	gl_draw_rectangle_outline(bbox, bbox_col);
 }

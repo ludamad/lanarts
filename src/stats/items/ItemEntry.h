@@ -24,10 +24,18 @@ public:
 	ItemEntry() :
 			item_sprite(-1), stackable(true) {
 	}
+
+	virtual const char* entry_type() {
+		return "One-time Use";
+	}
 	virtual ~ItemEntry() {
 	}
 	virtual void init(lua_State* L) {
 		use_action.init(L);
+	}
+
+	virtual sprite_id get_sprite() {
+		return item_sprite;
 	}
 
 	enum id_type {
@@ -65,7 +73,5 @@ void clear_item_data(std::vector<ItemEntry*>& items);
 bool is_item_projectile(ItemEntry& ientry);
 bool is_item_weapon(ItemEntry& ientry);
 bool is_item_equipment(ItemEntry& ientry);
-
-const char* equip_type_description(ItemEntry& ientry);
 
 #endif /* ITEMENTRY_H_ */

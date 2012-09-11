@@ -8,7 +8,7 @@
 #include "../../data/game_data.h"
 #include <yaml-cpp/yaml.h>
 #include "../../data/yaml_util.h"
-#include "../../objects/enemy/enemy_data.h"
+#include "../../objects/enemy/EnemyEntry.h"
 #include "../class_data.h"
 #include "../stats.h"
 

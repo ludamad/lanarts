@@ -17,7 +17,7 @@ bool EquipmentStats::valid_to_use_projectile(const Item& proj) {
 	if (proj.empty())
 		return false;
 	ProjectileEntry& pentry = proj.projectile_entry();
-	if (pentry.is_unarmed())
+	if (pentry.is_standalone())
 		return true;
 	if (pentry.weapon_class == weapon_slot().weapon_entry().weapon_class)
 		return true;

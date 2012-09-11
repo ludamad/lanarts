@@ -251,7 +251,7 @@ set( lanarts_include
 	objects/enemy/EnemyAIState.h
 	objects/enemy/EnemyBehaviour.h
 	objects/enemy/EnemyController.h
-	objects/enemy/enemy_data.h
+	objects/enemy/EnemyEntry.h
 	objects/enemy/EnemyInst.h
 	objects/enemy/MonsterController.h
 

@@ -14,7 +14,7 @@ class ProjectileEntry: public EquipmentEntry {
 public:
 	ProjectileEntry() :
 			radius(0), drop_chance(0), number_of_target_bounces(0), can_wall_bounce(
-					false), standalone_projectile(false) {
+					false) {
 	}
 	virtual ~ProjectileEntry() {
 	}
@@ -56,8 +56,8 @@ public:
 		return attack.attack_action.action_func;
 	}
 
-	bool is_unarmed() const {
-		return weapon_class == "unarmed";
+	bool is_standalone() const {
+		return weapon_class == "unarmed" || weapon_class == "magic";
 	}
 
 	std::string weapon_class;
@@ -66,8 +66,6 @@ public:
 	//XXX: remove these and put into lua
 	int number_of_target_bounces;
 	bool can_wall_bounce;
-	// Is it usable without a weapon ?
-	bool standalone_projectile;
 };
 
 projectile_id get_projectile_by_name(const char* name);
