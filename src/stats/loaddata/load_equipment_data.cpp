@@ -22,13 +22,17 @@ void parse_equipment_entry(const YAML::Node& n, EquipmentEntry& entry) {
 	entry.cooldown_modifiers = parse_cooldown_modifiers(n);
 	std::string type = parse_defaulted(n, "equipment_type", std::string());
 	if (type == "armour") {
-		entry.type = EquipmentEntry::ARMOUR;
+		entry.type = EquipmentEntry::BODY_ARMOUR;
 	} else if (type == "ring") {
 		entry.type = EquipmentEntry::RING;
 	} else if (type == "boots") {
 		entry.type = EquipmentEntry::BOOTS;
 	} else if (type == "helmet") {
 		entry.type = EquipmentEntry::HELMET;
+	} else if (type == "gloves") {
+		entry.type = EquipmentEntry::GLOVES;
+	} else {
+		LANARTS_ASSERT(type.empty());
 	}
 }
 

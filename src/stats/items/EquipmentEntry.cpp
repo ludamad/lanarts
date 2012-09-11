@@ -28,12 +28,14 @@ EquipmentEntry& get_equipment_entry(projectile_id id) {
 
 const char* EquipmentEntry::entry_type() {
 	switch (type) {
-	case EquipmentEntry::ARMOUR:
+	case EquipmentEntry::BODY_ARMOUR:
 		return "Armour";
 	case EquipmentEntry::BOOTS:
 		return "Boots";
 	case EquipmentEntry::HELMET:
 		return "Helmet";
+	case EquipmentEntry::GLOVES:
+		return "Gloves";
 	case EquipmentEntry::RING:
 		return "Ring";
 	case EquipmentEntry::WEAPON:

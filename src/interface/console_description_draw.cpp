@@ -49,13 +49,14 @@ const char* monster_speed_description(int speed) {
 }
 
 const int WIDTH_THRESHOLD = 600; // Represents an 800 width resolution typically
+const int MAX_WIDTH = 800; // Represents an 1000 width resolution typically
 class DescriptionBoxHelper {
 public:
 	DescriptionBoxHelper(const BBox& bbox) :
 			bbox(bbox), draw_index(0) {
 		cols_per_row = 4;
-		if (bbox.width() > WIDTH_THRESHOLD) {
-			cols_per_row += (bbox.width() - WIDTH_THRESHOLD) / 200;
+		if (this->bbox.width() > MAX_WIDTH) {
+			this->bbox.x2 = this->bbox.x1 + MAX_WIDTH;
 		}
 	}
 	void draw_prefix(GameState* gs, const Colour& col, const char* fmt, ...) {

@@ -2,9 +2,6 @@ sprites:
   - name: leather armour
     file: res/items/armour/sprites/leather_armour2.png
 
-  - name: gloves
-    file: res/items/armour/sprites/gloves.png
-
   - name: chainmail
     file: res/items/armour/sprites/chainmail.png
 
@@ -20,3 +17,11 @@ sprites:
   - name: leather boots
     file: res/items/armour/sprites/leather_boots.png
     
+  - name: leather gloves
+    file: res/items/armour/sprites/leather_gloves.png
+
+  - name: steel gloves
+    file: res/items/armour/sprites/steel_gloves.png
+    
+  - name: runed gloves
+    file: res/items/armour/sprites/runed_gloves.png

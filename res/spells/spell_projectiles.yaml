@@ -26,7 +26,7 @@ projectiles:
   - name: Poison Cloud
     weapon_class: magic
     damage_type: { magic: 1.0}
-    damage: { base: 2, magic: .25 }
+    damage: { base: 2, magic: .2 }
     power: { base: 1, magic: 0.2 }
     range: 300
     speed: 4
@@ -34,7 +34,7 @@ projectiles:
     spr_attack: poison
     on_hit_func: 
       function(projectile, target, atkstats) 
-        local effect = target:add_effect(effects.Poison.name, 150, atkstats) 
+        local effect = target:add_effect(effects.Poison.name, 135, atkstats) 
         effect.damage = atkstats.damage
         effect.power = atkstats.power
         effect.magic_percentage = atkstats.magic_percentage

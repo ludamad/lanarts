@@ -37,7 +37,7 @@ itemgen_lists:
     - { item: Magician's Ring,    chance: 3                      }
     - { item: Ring of Vitality,   chance: 3                      }
     - { item: Ring of Stone,      chance: 3                      }
-    - { item: Ogre's Ring,        chance: 3                      }
+    - { item: Ogre's Ring,        chance: 1                      }
     #Boots
     - { item: Leather Boots,      chance: 3                      }
   - name: Store Items

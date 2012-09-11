@@ -39,35 +39,6 @@ bool EquipmentStats::valid_to_use(const Item& item) {
 }
 void EquipmentStats::equip(itemslot_t slot) {
 	inventory.equip(slot);
-//	switch (item.equipment_entry().type) {
-//	case EquipmentEntry::ARMOUR:
-//		LANARTS_ASSERT(item.amount == 1);
-//		if (_armour.properties.flags & CURSED)
-//			break;
-//		deequip_armour();
-//		_armour = item;
-//		break;
-//	case EquipmentEntry::WEAPON:
-//		LANARTS_ASSERT(item.amount == 1);
-//		if (_weapon.properties.flags & CURSED)
-//			break;
-//		deequip_projectiles();
-//		if (has_weapon()) {
-//			inventory.add(_weapon);
-//		}
-//		_weapon = item;
-//		break;
-//	case EquipmentEntry::PROJECTILE:
-//		if (_projectile.properties.flags & CURSED)
-//			break;
-//		if (!(item.is_same_item(_projectile))) {
-//			deequip_projectiles();
-//			_projectile = item;
-//		} else {
-//			_projectile.add_copies(item.amount);
-//		}
-//		break;
-//	}
 }
 
 void EquipmentStats::use_ammo(int amnt) {
@@ -96,7 +67,7 @@ bool EquipmentStats::has_weapon() {
 }
 
 bool EquipmentStats::has_armour() {
-	return inventory.get_equipped(EquipmentEntry::ARMOUR) != -1;
+	return inventory.get_equipped(EquipmentEntry::BODY_ARMOUR) != -1;
 }
 
 bool EquipmentStats::has_projectile() {
@@ -114,7 +85,7 @@ ItemSlot& EquipmentStats::projectile_slot() {
 }
 
 ItemSlot& EquipmentStats::armour_slot() {
-	itemslot_t slot = inventory.get_equipped(EquipmentEntry::ARMOUR);
+	itemslot_t slot = inventory.get_equipped(EquipmentEntry::BODY_ARMOUR);
 	return inventory.get(slot);
 }
 
@@ -137,7 +108,7 @@ Projectile EquipmentStats::projectile() const {
 }
 
 Equipment EquipmentStats::armour() const {
-	itemslot_t slot = inventory.get_equipped(EquipmentEntry::ARMOUR);
+	itemslot_t slot = inventory.get_equipped(EquipmentEntry::BODY_ARMOUR);
 	if (slot != -1) {
 		return inventory.get(slot).item;
 	} else {

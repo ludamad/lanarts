@@ -100,7 +100,7 @@ const char* equip_type_description(const ItemEntry& ientry) {
 	}
 
 	switch (eentry->type) {
-	case EquipmentEntry::ARMOUR:
+	case EquipmentEntry::BODY_ARMOUR:
 		return "Armour";
 	case EquipmentEntry::WEAPON:
 		return "Weapon";

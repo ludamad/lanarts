@@ -99,7 +99,7 @@ bool EquipmentContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	if (gs->mouse_right_click() && armour_bbox.contains(mouse)) {
 		queued_actions.push_back(
 				game_action(gs, p, GameAction::DEEQUIP_ITEM,
-						EquipmentEntry::ARMOUR));
+						EquipmentEntry::BODY_ARMOUR));
 	}
 
 	return false;
