@@ -38,3 +38,5 @@ sprites:
   - name: wizard_icon
     file: res/interface/sprites/class_icons/wizard.png
     
+  - name: speed setting icon
+    file: res/interface/sprites/config/speed_setting.png

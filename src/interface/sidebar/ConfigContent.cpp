@@ -15,20 +15,42 @@
 
 #include "ConfigContent.h"
 
-static void draw_option(GameState* gs, const BBox& bbox, bool option_set,
+static void draw_setting_box(GameState* gs, const BBox& bbox,
+		const Colour& bbox_col, sprite_id sprite, const Colour& sprite_col,
+		const char* text, const Colour& text_col) {
+	gl_draw_sprite(sprite, bbox.x1, bbox.y1, sprite_col);
+	/* Draw item name */
+	gl_printf_bounded(gs->primary_font(), text_col, bbox.x1 + TILE_SIZE * 1.25,
+			bbox.y1 + TILE_SIZE / 2, bbox.width() - TILE_SIZE, true, "%s",
+			text);
+	gl_draw_rectangle_outline(bbox, bbox_col);
+}
+static void draw_option_box(GameState* gs, const BBox& bbox, bool option_set,
 		sprite_id sprite, const char* text) {
 	Colour bbox_col = option_set ? COL_WHITE : COL_FILLED_OUTLINE;
 	if (bbox.contains(gs->mouse_pos())) {
 		bbox_col = COL_GOLD;
 	}
+	draw_setting_box(gs, bbox, bbox_col, sprite,
+			COL_WHITE.with_alpha(option_set ? 255 : 100), text,
+			option_set ? COL_WHITE : COL_MID_GRAY);
+}
 
-	gl_draw_sprite(sprite, bbox.x1, bbox.y1,
-			COL_WHITE.with_alpha(option_set ? 255 : 100));
-	/* Draw item name */
-	gl_printf_bounded(gs->primary_font(), option_set ? COL_WHITE : COL_MID_GRAY,
-			bbox.x1 + TILE_SIZE * 1.25, bbox.y1 + TILE_SIZE / 2,
-			bbox.width() - TILE_SIZE, true, "%s", text);
-	gl_draw_rectangle_outline(bbox, bbox_col);
+static void draw_speed_box(GameState* gs, const BBox& bbox) {
+	GameSettings& settings = gs->game_settings();
+	const char* text = "Speed: Slow ";
+	if (settings.time_per_step <= 10) {
+		text = "Speed: Very Fast";
+	} else if (settings.time_per_step <= 12) {
+		text = "Speed: Fast";
+	} else if (settings.time_per_step <= 14) {
+		text = "Speed: Normal";
+	}
+	int diff = settings.time_per_step - 10;
+	draw_setting_box(gs, bbox,
+			bbox.contains(gs->mouse_pos()) ? COL_GOLD : COL_WHITE,
+			get_sprite_by_name("speed setting icon"),
+			COL_WHITE.with_alpha(255 - diff * 33), text, COL_WHITE);
 }
 
 void ConfigContent::draw(GameState* gs) const {
@@ -36,11 +58,13 @@ void ConfigContent::draw(GameState* gs) const {
 	gl_draw_rectangle_outline(bbox, COL_UNFILLED_OUTLINE);
 
 	BBox entry_box(bbox.x1, bbox.y1, bbox.x2, bbox.y1 + TILE_SIZE);
-	draw_option(gs, entry_box, settings.autouse_mana_potions,
+	draw_option_box(gs, entry_box, settings.autouse_mana_potions,
 			get_sprite_by_name("mana_potion"), "Auto-Use Mana Potions");
 	entry_box = entry_box.translated(0, TILE_SIZE);
-	draw_option(gs, entry_box, settings.autouse_health_potions,
+	draw_option_box(gs, entry_box, settings.autouse_health_potions,
 			get_sprite_by_name("health_potion"), "Auto-Use Health Potions");
+	entry_box = entry_box.translated(0, TILE_SIZE);
+	draw_speed_box(gs, entry_box);
 }
 
 bool ConfigContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
@@ -55,6 +79,13 @@ bool ConfigContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	entry_box = entry_box.translated(0, TILE_SIZE);
 	if (leftclick && entry_box.contains(mpos)) {
 		settings.autouse_health_potions = !settings.autouse_health_potions;
+	}
+	entry_box = entry_box.translated(0, TILE_SIZE);
+	if (leftclick && entry_box.contains(mpos)) {
+		settings.time_per_step -= 2;
+		if (settings.time_per_step < 10) {
+			settings.time_per_step = 16;
+		}
 	}
 
 	return false;
