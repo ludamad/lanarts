@@ -24,17 +24,28 @@
 EquipmentContent::~EquipmentContent() {
 }
 
-static BBox weapon_slot_bbox(GameState* gs, const BBox& bbox) {
-	BBox entry_box(bbox.x1, bbox.y1, bbox.x2, bbox.y1 + TILE_SIZE);
-	if (gs->local_player()->equipment().has_projectile()) {
-		entry_box.y2 += TILE_SIZE;
+static void draw_equipment_slot(GameState* gs, Inventory& inventory,
+		itemslot_t ind, BBox bbox, const char* noslot) {
+	Colour bbox_col = COL_UNFILLED_OUTLINE;
+	if (ind != -1) {
+		ItemSlot& itemslot = inventory.get(ind);
+		EquipmentEntry& entry = itemslot.equipment_entry();
+		bbox_col = COL_FILLED_OUTLINE;
+		if (bbox.contains(gs->mouse_pos())) {
+			bbox_col = COL_WHITE;
+			draw_console_item_description(gs, itemslot.item,
+					itemslot.equipment_entry());
+		}
+		draw_icon_and_name(gs, entry, COL_WHITE, bbox.x1, bbox.y1);
+	} else {
+		gl_draw_rectangle_outline(bbox.x1, bbox.y1, TILE_SIZE, TILE_SIZE,
+				COL_PALE_YELLOW.with_alpha(50));
+		/* Draw item name */
+		int xoffset = TILE_SIZE * 1.25, yoffset = TILE_SIZE / 2;
+		gl_printf_y_centered(gs->primary_font(), COL_GRAY, bbox.x1 + xoffset,
+				bbox.y1 + yoffset, "%s", noslot);
 	}
-	return entry_box;
-}
-static BBox armour_slot_bbox(GameState* gs, const BBox& bbox) {
-	BBox weapon_bbox = weapon_slot_bbox(gs, bbox);
-	return BBox(weapon_bbox.x1, weapon_bbox.y2, weapon_bbox.x2,
-			weapon_bbox.y2 + TILE_SIZE);
+	gl_draw_rectangle_outline(bbox, bbox_col);
 }
 
 static void draw_weapon(GameState* gs, EquipmentStats& eqp, const BBox& bbox) {
@@ -47,61 +58,86 @@ static void draw_weapon(GameState* gs, EquipmentStats& eqp, const BBox& bbox) {
 
 	draw_icon_and_name(gs, eqp.weapon().weapon_entry(), COL_WHITE, bbox.x1,
 			bbox.y1);
-
-	if (eqp.has_projectile()) {
-		draw_icon_and_name(gs, eqp.projectile().projectile_entry(),
-				COL_WHITE, bbox.x1, bbox.y1 + TILE_SIZE);
-		gl_draw_line(bbox.x1, bbox.center_y(), bbox.x2, bbox.center_y(),
-				COL_UNFILLED_OUTLINE);
-	}
 	gl_draw_rectangle_outline(bbox, bbox_col);
 }
 
-static void draw_armour(GameState* gs, EquipmentStats& eqp, BBox bbox) {
-	Colour bbox_col = COL_UNFILLED_OUTLINE;
-	if (eqp.has_armour()) {
-		bbox_col = COL_FILLED_OUTLINE;
-		if (bbox.contains(gs->mouse_pos())) {
-			bbox_col = COL_WHITE;
-			draw_console_item_description(gs, eqp.armour(),
-					eqp.armour_slot().equipment_entry());
-		}
-	}
+struct SlotAndDefault {
+	EquipmentEntry::equip_type type;
+	const char* empty_msg;
 
-	draw_icon_and_name(gs, eqp.armour().equipment_entry(), COL_WHITE,
-			bbox.x1, bbox.y1);
-	gl_draw_rectangle_outline(bbox, bbox_col);
-}
+	SlotAndDefault(EquipmentEntry::equip_type type, const char* empty_msg) :
+			type(type), empty_msg(empty_msg) {
+	}
+};
+
+const SlotAndDefault slot_data[] = { SlotAndDefault(EquipmentEntry::PROJECTILE,
+		"No Projectile"), SlotAndDefault(EquipmentEntry::BODY_ARMOUR,
+		"No Armour"), SlotAndDefault(EquipmentEntry::BOOTS, "No Boots"),
+		SlotAndDefault(EquipmentEntry::GLOVES, "No Gloves"), SlotAndDefault(
+				EquipmentEntry::HELMET, "No Helmet"), };
+const size_t slot_data_n = sizeof(slot_data) / sizeof(SlotAndDefault);
 
 void EquipmentContent::draw(GameState* gs) const {
 	PlayerInst* p = gs->local_player();
 
 	EquipmentStats& eqp = p->equipment();
 
+	BBox other_bbox(bbox.x1, bbox.y1, bbox.x2, bbox.y1 + TILE_SIZE);
 	gl_draw_rectangle_outline(bbox, COL_UNFILLED_OUTLINE);
-	draw_weapon(gs, eqp, weapon_slot_bbox(gs, bbox));
-	draw_armour(gs, eqp, armour_slot_bbox(gs, bbox));
+	draw_weapon(gs, eqp, other_bbox);
+
+	for (int i = 0; i < slot_data_n; i++) {
+		other_bbox.translate(0, TILE_SIZE);
+		draw_equipment_slot(gs, eqp.inventory,
+				eqp.inventory.get_equipped(slot_data[i].type), other_bbox,
+				slot_data[i].empty_msg);
+	}
+
+	int ring1 = eqp.inventory.get_equipped(EquipmentEntry::RING);
+	int ring2 = eqp.inventory.get_equipped(EquipmentEntry::RING, ring1);
+
+	other_bbox.translate(0, TILE_SIZE);
+	draw_equipment_slot(gs, eqp.inventory, ring1, other_bbox, "No First Ring");
+	// TODO: Refactor so this isn't a (mostly) cut-n-paste of above
+	other_bbox.translate(0, TILE_SIZE);
+	draw_equipment_slot(gs, eqp.inventory, ring2, other_bbox, "No Second Ring");
 }
 
 bool EquipmentContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	PlayerInst* p = gs->local_player();
-	BBox weapon_bbox(weapon_slot_bbox(gs, bbox));
+	Inventory& inv = p->inventory();
+	BBox other_bbox(bbox.x1, bbox.y1, bbox.x2, bbox.y1 + TILE_SIZE);
 	// Check if we are de-equipping our weapon
 	Pos mouse = gs->mouse_pos();
-	if (gs->mouse_right_click() && weapon_bbox.contains(mouse)) {
+	if (gs->mouse_right_click() && other_bbox.contains(mouse)) {
 		queued_actions.push_back(
 				game_action(gs, p, GameAction::DEEQUIP_ITEM,
 						EquipmentEntry::WEAPON));
 	}
 
 	// Check if we are de-equipping our armour
-	BBox armour_bbox(armour_slot_bbox(gs, bbox));
-	if (gs->mouse_right_click() && armour_bbox.contains(mouse)) {
-		queued_actions.push_back(
-				game_action(gs, p, GameAction::DEEQUIP_ITEM,
-						EquipmentEntry::BODY_ARMOUR));
+	for (int i = 0; i < slot_data_n; i++) {
+		other_bbox.translate(0, TILE_SIZE);
+		if (gs->mouse_right_click() && other_bbox.contains(mouse)) {
+			queued_actions.push_back(
+					game_action(gs, p, GameAction::DEEQUIP_ITEM,
+							slot_data[i].type));
+		}
 	}
 
+	int ring1 = inv.get_equipped(EquipmentEntry::RING);
+	int ring2 = inv.get_equipped(EquipmentEntry::RING, ring1);
+	other_bbox.translate(0, TILE_SIZE);
+	if (ring1 >= 0 && gs->mouse_right_click() && other_bbox.contains(mouse)) {
+		queued_actions.push_back(
+				game_action(gs, p, GameAction::USE_ITEM, ring1));
+	}
+	// TODO: Refactor so this isn't a mostly cut-n-paste of above
+	other_bbox.translate(0, TILE_SIZE);
+	if (ring2 >= 0 && gs->mouse_right_click() && other_bbox.contains(mouse)) {
+		queued_actions.push_back(
+				game_action(gs, p, GameAction::USE_ITEM, ring2));
+	}
 	return false;
 }
 

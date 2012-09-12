@@ -50,7 +50,7 @@ static void draw_speed_box(GameState* gs, const BBox& bbox) {
 	draw_setting_box(gs, bbox,
 			bbox.contains(gs->mouse_pos()) ? COL_GOLD : COL_WHITE,
 			get_sprite_by_name("speed setting icon"),
-			COL_WHITE.with_alpha(255 - diff * 33), text, COL_WHITE);
+			COL_WHITE.with_alpha(255 - diff * 36), text, COL_WHITE);
 }
 
 void ConfigContent::draw(GameState* gs) const {

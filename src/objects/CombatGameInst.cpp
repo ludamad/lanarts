@@ -147,7 +147,9 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 					25, Posf(rx, ry), Posf(), AnimatedInst::DEPTH, dmgstr,
 					Colour(255, 148, 120)));
 
-	cooldowns().reset_action_cooldown(atkstats.cooldown);
+	cooldowns().reset_action_cooldown(
+			atkstats.cooldown
+					* estats.cooldown_modifiers.melee_cooldown_multiplier);
 	cooldowns().action_cooldown += gs->rng().rand(-4, 5);
 
 	WeaponEntry& wentry = weapon.weapon_entry();

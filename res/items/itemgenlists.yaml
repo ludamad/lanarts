@@ -40,6 +40,10 @@ itemgen_lists:
     - { item: Ogre's Ring,        chance: 1                      }
     #Boots
     - { item: Leather Boots,      chance: 3                      }
+    #Gloves
+    - { item: Leather Gloves,     chance: 3                      }
+    - { item: Steel Gloves,       chance: 1                      }
+    - { item: Runed Gloves,       chance: 1                      }
   - name: Store Items
     items:
     - default: *BasicItems

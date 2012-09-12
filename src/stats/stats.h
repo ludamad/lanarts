@@ -97,9 +97,29 @@ struct ActionsAllowed {
 	}
 };
 
+struct CooldownModifiers {
+	float rest_cooldown_multiplier;
+	float spell_cooldown_multiplier;
+	float melee_cooldown_multiplier;
+	float ranged_cooldown_multiplier;
+	CooldownModifiers() :
+			rest_cooldown_multiplier(1.0f), spell_cooldown_multiplier(1.0f), melee_cooldown_multiplier(
+					1.0f), ranged_cooldown_multiplier(1.0f) {
+	}
+	void apply(const CooldownModifiers& cooldown_modifiers) {
+		rest_cooldown_multiplier *= cooldown_modifiers.rest_cooldown_multiplier;
+		spell_cooldown_multiplier *=
+				cooldown_modifiers.spell_cooldown_multiplier;
+		melee_cooldown_multiplier *=
+				cooldown_modifiers.melee_cooldown_multiplier;
+		ranged_cooldown_multiplier *=
+				cooldown_modifiers.ranged_cooldown_multiplier;
+	}
+};
 /* Core & derived stats after stat & item properties */
 struct EffectiveStats {
 	CoreStats core;
+	CooldownModifiers cooldown_modifiers;
 	DerivedStats physical, magic;
 	float cooldown_mult, movespeed;
 	AllowedActions allowed_actions;

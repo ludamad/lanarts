@@ -72,6 +72,8 @@ static void factor_in_equipment_derived_stats(MTwist& mt,
 	CoreStats& core = effective.core;
 	EquipmentEntry& entry = item.equipment_entry();
 
+	effective.cooldown_modifiers.apply(entry.cooldown_modifiers);
+
 	effective.physical.resistance += entry.resistance().calculate(mt, core);
 	effective.magic.resistance += entry.magic_resistance().calculate(mt, core);
 	effective.physical.reduction += entry.damage_reduction().calculate(mt,

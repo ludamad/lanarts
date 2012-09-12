@@ -157,11 +157,20 @@ void draw_spell_icon_and_name(GameState* gs, SpellEntry& spl_entry, Colour col,
 //Drawn only as part of other draw_console_<something>_description functions
 static void draw_value(GameState* gs, DescriptionBoxHelper& dbh,
 		const char* name, int bonus, const Colour& prefixcol = COL_GREEN,
-		const Colour& valuecol = COL_PALE_GREEN, bool optional = true) {
-	if (!optional || bonus > 0) {
+		const Colour& valuecol = COL_PALE_GREEN, bool optional = true,
+		bool draw_plus_sign = false) {
+	if (!optional || bonus != 0) {
 		dbh.draw_prefix(gs, prefixcol, "%s", name);
-		dbh.draw_value(gs, valuecol, "%d", bonus);
+		dbh.draw_value(gs, valuecol,
+				(bonus > 0 && draw_plus_sign) ? "+%d" : "%d", bonus);
 	}
+}
+//Drawn only as part of other draw_console_<something>_description functions
+static void draw_bonus(GameState* gs, DescriptionBoxHelper& dbh,
+		const char* name, int bonus, const Colour& prefixcol = COL_GREEN,
+		const Colour& valuecol = COL_PALE_GREEN, bool optional = true) {
+	draw_value(gs, dbh, name, bonus, bonus > 0 ? prefixcol : COL_MUTED_RED,
+			bonus > 0 ? valuecol : COL_PALE_RED, optional, true);
 }
 static void draw_statmult(GameState* gs, DescriptionBoxHelper& dbh,
 		const char* name, CoreStatMultiplier& mult, CoreStats& core,
@@ -181,13 +190,38 @@ static void draw_statmult(GameState* gs, DescriptionBoxHelper& dbh,
 
 static void draw_stat_bonuses_overlay(GameState* gs, DescriptionBoxHelper& dbh,
 		CoreStats& core) {
-	draw_value(gs, dbh, "+HP: ", core.max_hp);
-	draw_value(gs, dbh, "+MP: ", core.max_mp);
-	draw_value(gs, dbh, "+Strength: ", core.strength);
-	draw_value(gs, dbh, "+Defence: ", core.defence);
-	draw_value(gs, dbh, "+Magic: ", core.magic);
-	draw_value(gs, dbh, "+Will: ", core.willpower);
+	draw_bonus(gs, dbh, "HP: ", core.max_hp);
+	draw_bonus(gs, dbh, "MP: ", core.max_mp);
+	draw_bonus(gs, dbh, "Strength: ", core.strength);
+	draw_bonus(gs, dbh, "Defence: ", core.defence);
+	draw_bonus(gs, dbh, "Magic: ", core.magic);
+	draw_bonus(gs, dbh, "Will: ", core.willpower);
 }
+
+static void draw_percentage_modifier(GameState* gs, DescriptionBoxHelper& dbh,
+		float modifier, const char* prefix, const Colour& prefixcol = COL_GREEN,
+		const Colour& valuecol = COL_PALE_GREEN, bool optional = true) {
+	int percentage_mod = round(modifier * 100 - 100);
+	bool negative = percentage_mod < 0;
+	if (!optional || percentage_mod != 0) {
+		dbh.draw_prefix(gs, negative ? COL_MUTED_RED : prefixcol, "%s", prefix);
+		Colour statcol = percentage_mod < 0 ? COL_PALE_RED : valuecol;
+		dbh.draw_value(gs, statcol, percentage_mod > 0 ? "+%d%%" : "%d%%",
+				percentage_mod);
+	}
+}
+static void draw_cooldown_modifiers_overlay(GameState* gs,
+		DescriptionBoxHelper& dbh, CooldownModifiers& cooldown) {
+	draw_percentage_modifier(gs, dbh, 1.0f / cooldown.melee_cooldown_multiplier,
+			"Attack Rate: ");
+	draw_percentage_modifier(gs, dbh, 1.0f / cooldown.spell_cooldown_multiplier,
+			"Casting Rate: ");
+	draw_percentage_modifier(gs, dbh,
+			1.0f / cooldown.ranged_cooldown_multiplier, "Firing Rate: ");
+	draw_percentage_modifier(gs, dbh, 1.0f / cooldown.rest_cooldown_multiplier,
+			"Resting Cooloff: ");
+}
+
 static void draw_defence_bonuses_overlay(GameState* gs,
 		DescriptionBoxHelper& dbh, ArmourStats& armour) {
 	PlayerInst* p = gs->local_player();
@@ -222,6 +256,7 @@ static void draw_equipment_description_overlay(GameState* gs,
 	draw_stat_bonuses_overlay(gs, dbh, entry.core_stat_modifier());
 	draw_defence_bonuses_overlay(gs, dbh, entry.armour_modifier());
 	draw_damage_bonuses_overlay(gs, dbh, entry.damage_modifier());
+	draw_cooldown_modifiers_overlay(gs, dbh, entry.cooldown_modifiers);
 }
 
 static void draw_attack_description_overlay(GameState* gs,

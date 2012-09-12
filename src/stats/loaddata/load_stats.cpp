@@ -168,8 +168,8 @@ CooldownModifiers parse_cooldown_modifiers(const YAML::Node & n) {
 	CooldownModifiers cm;
 	cm.melee_cooldown_multiplier = parse_defaulted(n,
 			"melee_cooldown_multiplier", 1.0f);
-	cm.projectile_cooldown_multiplier = parse_defaulted(n,
-			"projectile_cooldown_multiplier", 1.0f);
+	cm.ranged_cooldown_multiplier = parse_defaulted(n,
+			"ranged_cooldown_multiplier", 1.0f);
 	cm.rest_cooldown_multiplier = parse_defaulted(n, "rest_cooldown_multiplier",
 			1.0f);
 	cm.spell_cooldown_multiplier = parse_defaulted(n,

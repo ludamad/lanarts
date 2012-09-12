@@ -24,6 +24,7 @@ struct GameAction {
 		USE_WEAPON,
 		PICKUP_ITEM,
 		DROP_ITEM,
+		//TODO: Ensure this doesn't duplicate purpose of use-item <equipped>
 		DEEQUIP_ITEM,
 		REPOSITION_ITEM,
 		CHOSE_SPELL,
@@ -42,8 +43,9 @@ struct GameAction {
 	int action_x, action_y;
 };
 
-GameAction game_action(GameState* gs, GameInst* origin, GameAction::action_t action,
-		int use_id = 0, int action_x = 0, int action_y = 0, int use_id2 = 0);
+GameAction game_action(GameState* gs, GameInst* origin,
+		GameAction::action_t action, int use_id = 0, int action_x = 0,
+		int action_y = 0, int use_id2 = 0);
 
 void to_action_file(FILE* f, const GameAction& action);
 GameAction from_action_file(FILE* f);

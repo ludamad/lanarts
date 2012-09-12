@@ -27,17 +27,6 @@ struct ArmourStats {
 	CoreStatMultiplier magic_resistance, magic_reduction;
 };
 
-struct CooldownModifiers {
-	float rest_cooldown_multiplier;
-	float spell_cooldown_multiplier;
-	float melee_cooldown_multiplier;
-	float projectile_cooldown_multiplier;
-	CooldownModifiers() :
-			rest_cooldown_multiplier(1.0f), spell_cooldown_multiplier(1.0f), melee_cooldown_multiplier(
-					1.0f), projectile_cooldown_multiplier(1.0f) {
-	}
-};
-
 //Stat modifiers that trivially stack
 struct StatModifiers {
 	// additive

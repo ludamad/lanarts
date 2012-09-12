@@ -4,7 +4,7 @@ equipment:
     description: Gloves, unmistakenably made from gnoll leather.
     shop_cost: [15, 25]
     spr_item: leather gloves
-    equipment_type: boots
+    equipment_type: gloves
     resistance: { base: 1 }
     reduction:  { base: 1 }
 
@@ -12,7 +12,7 @@ equipment:
     description: Gloves made from steel, slightly unwieldy.
     shop_cost: [55, 75]
     spr_item: steel gloves
-    equipment_type: boots
+    equipment_type: gloves
     resistance: { base: 3 }
     reduction:  { base: 1 }
 
@@ -20,7 +20,7 @@ equipment:
     description: Gloves made of a unnaturally strong cloth material, covered in magic runes.
     shop_cost: [95, 125]
     spr_item: runed gloves
-    equipment_type: boots
+    equipment_type: gloves
     stat_bonuses:
       strength: 1
       magic: 1

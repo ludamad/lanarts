@@ -13,10 +13,11 @@ equipment:
     equipment_type: ring
     shop_cost: [95, 125]
     description: 
-      A large ring that grants the user brutish force. Grants 3 strength.
+      A large ring that grants the user brutish force, at the cost of some defences.
     spr_item: ogres ring
     stat_bonuses: 
       strength: 3
+      defence: -1
 
   - name: Ring of Vitality
     equipment_type: ring

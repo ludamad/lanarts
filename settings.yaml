@@ -3,8 +3,8 @@ username: User
 
 #Window settings
 fullscreen: no
-view_width: 1280
-view_height: 768
+view_width: 1200
+view_height: 800
 
 #Gameplay preferences
 autouse_health_potions: yes # can toggle in game as well
