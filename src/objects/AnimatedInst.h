@@ -43,4 +43,10 @@ private:
 	std::string text;
 };
 
+inline AnimatedInst* animated_inst(const Pos& pos, const std::string& text,
+		const Colour& textcol, int animatetime = -1) {
+	return new AnimatedInst(pos, -1, -1, Posf(), Posf(), AnimatedInst::DEPTH,
+			text, textcol);
+}
+
 #endif /* ANIMATEDINST_H_ */

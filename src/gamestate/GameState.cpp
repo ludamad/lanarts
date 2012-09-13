@@ -63,7 +63,7 @@ GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 	dragging_view = false;
 
 	init_font(&small_font, settings.font.c_str(), 10);
-	init_font(&large_font, settings.font.c_str(), 20);
+	init_font(&large_font, settings.menu_font.c_str(), 20);
 
 	init_data.seed = generate_seed();
 }
@@ -275,7 +275,9 @@ void GameState::adjust_view_to_dragging() {
 	/*If we were previously dragging, now snap back to the player position*/
 	if (!is_dragged && dragging_view) {
 		PlayerInst* p = local_player();
-		_view.sharp_center_on(p->x, p->y);
+		if (p) {
+			_view.sharp_center_on(p->x, p->y);
+		}
 	}
 	dragging_view = is_dragged;
 }

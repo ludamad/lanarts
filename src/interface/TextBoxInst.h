@@ -12,6 +12,8 @@
 
 #include "../util/callback_util.h"
 
+#include "../util/Timer.h"
+
 #include "TextField.h"
 
 class TextBoxInst: public GameInst {
@@ -21,9 +23,11 @@ public:
 	};
 	TextBoxInst(const BBox& bbox, int max_length,
 			const std::string& defaultstr = std::string(),
-			const ObjCallback& enter_callback = ObjCallback()) :
-			GameInst(bbox.x1, bbox.y1, RADIUS, false), bbox(bbox), enter_callback(
-					enter_callback), selected(false), text_field(max_length,
+			const ObjCallback& update_callback = ObjCallback(),
+			const ObjCallback& deselect_callback = ObjCallback()) :
+			GameInst(bbox.x1, bbox.y1, RADIUS, false), bbox(bbox), update_callback(
+					update_callback), deselect_callback(deselect_callback), selected(
+					false), valid_string(true), text_field(max_length,
 					defaultstr) {
 	}
 	virtual ~TextBoxInst() {
@@ -35,10 +39,23 @@ public:
 	virtual void copy_to(GameInst* inst) const;
 	virtual TextBoxInst* clone() const;
 
+	void select(GameState* gs);
+	void deselect(GameState* gs);
+	void mark_validity(bool valid) {
+		valid_string = valid;
+	}
+	void set_text(const std::string& txt) {
+		text_field.set_text(txt);
+	}
+	const std::string& text() const {
+		return text_field.text();
+	}
+
 private:
 	BBox bbox;
-	ObjCallback enter_callback;
-	bool selected;
+	ObjCallback update_callback, deselect_callback;
+	bool selected, valid_string;
+	Timer blink_timer;
 	TextField text_field;
 };
 

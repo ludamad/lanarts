@@ -16,7 +16,7 @@ struct GameSettings {
 	bool network_debug_mode;
 
 	/*Draw settings*/
-	std::string font;
+	std::string font, menu_font;
 	bool fullscreen;
 	int view_width, view_height;
 
@@ -53,7 +53,9 @@ struct GameSettings {
 		time_per_step = 12;
 		frame_action_repeat = 0;
 
-		font = "res/MateSC-Regular.ttf";
+		font = "res/fonts/Gudea-Regular.ttf";
+		menu_font = "res/fonts/MateSC-Regular.ttf";
+
 		invincible = false;
 		draw_diagnostics = false;
 

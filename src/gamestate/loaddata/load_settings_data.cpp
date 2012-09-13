@@ -34,6 +34,7 @@ GameSettings load_settings_data(const char* filename, lua_State* L,
 			parser.GetNextDocument(root);
 
 			optional_set(root, "font", ret.font);
+			optional_set(root, "menu_font", ret.menu_font);
 			optional_set(root, "fullscreen", ret.fullscreen);
 			optional_set(root, "regen_level_on_death", ret.regen_on_death);
 			optional_set(root, "view_width", ret.view_width);
@@ -59,7 +60,8 @@ GameSettings load_settings_data(const char* filename, lua_State* L,
 			optional_set(root, "autouse_mana_potions",
 					ret.autouse_mana_potions);
 			optional_set(root, "keep_event_log", ret.keep_event_log);
-			optional_set(root, "comparison_event_log", ret.comparison_event_log);
+			optional_set(root, "comparison_event_log",
+					ret.comparison_event_log);
 
 			if (yaml_has_node(root, "connection_type")) {
 				std::string connname;

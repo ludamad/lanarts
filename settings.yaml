@@ -12,6 +12,7 @@ autouse_mana_potions: yes # can toggle in game as well
 
 #Font settings
 font: res/fonts/Gudea-Regular.ttf
+menu_font: res/fonts/Alegreya-Regular.ttf
 
 #Network settings
 ip: localhost

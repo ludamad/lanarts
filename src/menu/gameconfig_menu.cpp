@@ -102,14 +102,95 @@ static void draw_speed_toggle(GameState* gs, GameInst* inst, void* _) {
 	}
 }
 
+static void draw_choose_class_to_begin(GameState* gs, GameInst* inst, void* _) {
+	// We cheat here and bundle step and draw actions
+	// The interface will always be drawn once a step
+	GameSettings& settings = gs->game_settings();
+	gl_printf_centered(gs->menu_font(), COL_WHITE, inst->x, inst->y,
+			"Choose your Class!");
+}
+
+static void __setup_next_field_location(int& x, int& y) {
+
+	x += CONFIG_MENU_AREA_WIDTH / 2; // SETTINGS_BOX_WIDTH / 2;
+	if (x > CONFIG_MENU_AREA_WIDTH) {
+		x -= CONFIG_MENU_AREA_WIDTH;
+		y += TILE_SIZE * 1.5;
+	}
+}
+
+static void text_update_string(GameState* gs, GameInst* inst, void* strp) {
+	TextBoxInst* textbox = dynamic_cast<TextBoxInst*>(inst);
+	std::string * strptr = (std::string*)strp;
+	LANARTS_ASSERT(textbox);
+	*strptr = textbox->text();
+}
+
+static void text_update_int(GameState* gs, GameInst* inst, void* intp) {
+	TextBoxInst* textbox = dynamic_cast<TextBoxInst*>(inst);
+	const std::string& text = textbox->text();
+	int* intptr = (int*)intp;
+	LANARTS_ASSERT(textbox);
+	// Check if valid string of all digits:
+	bool valid = !text.empty();
+	for (int i = 0; i < text.size(); i++) {
+		if (!isdigit(text[i])) {
+			valid = false;
+		}
+	}
+	textbox->mark_validity(valid);
+	// Only convert if valid
+	if (valid) {
+		*intptr = atoi(text.c_str());
+	}
+}
+static void setup_username_field(GameState* gs, int x, int y) {
+	GameSettings& settings = gs->game_settings();
+	gs->add_instance(animated_inst(Pos(x, y), "Enter your name:", COL_YELLOW));
+	y += 20;
+	ObjCallback callback(text_update_string, &settings.username);
+	TextBoxInst* textbox = new TextBoxInst(
+			BBox(x, y, x + SETTINGS_BOX_WIDTH, y + TILE_SIZE), 20,
+			settings.username, callback);
+	gs->add_instance(textbox);
+
+}
+static void text_sync_int(GameState* gs, GameInst* inst, void* intp) {
+	char buff[32];
+	TextBoxInst* textbox = dynamic_cast<TextBoxInst*>(inst);
+	int* intptr = (int*)intp;
+	snprintf(buff, 32, "%d", *intptr);
+	textbox->set_text(buff);
+	textbox->mark_validity(true);
+}
+
+static void setup_port_field(GameState* gs, int x, int y) {
+	GameSettings& settings = gs->game_settings();
+	gs->add_instance(animated_inst(Pos(x, y), "Connection port:", COL_YELLOW));
+	y += 20;
+	ObjCallback typing_callback(text_update_int, &settings.port);
+	ObjCallback deselect_callback(text_sync_int, &settings.port);
+	TextBoxInst* textbox = new TextBoxInst(
+			BBox(x, y, x + SETTINGS_BOX_WIDTH, y + TILE_SIZE), 20,
+			settings.username, typing_callback, deselect_callback);
+	text_sync_int(gs, textbox, &settings.port);
+	gs->add_instance(textbox);
+
+}
 static void setup_classmenu_buttons(GameState* gs, bool* exit, int x, int y) {
 	ObjCallback chfighter(choose_fighter, exit);
 	ObjCallback chmage(choose_mage, exit);
 	ObjCallback chdruid(choose_druid, exit);
 	ObjCallback charcher(choose_archer, exit);
 
-	int icons_x = x - 192;
+	int start_x = x;
+	int start_y = y;
+	int icons_x = start_x - 192;
 	y += 128;
+
+	gs->add_instance(
+			new DrawCallbackInst(Pos(x, start_y + TILE_SIZE), ObjCallback(),
+					draw_choose_class_to_begin));
 
 	gs->add_instance(
 			new ButtonInst("Mage", get_sprite_by_name("wizard_icon"), icons_x,
@@ -129,16 +210,22 @@ static void setup_classmenu_buttons(GameState* gs, bool* exit, int x, int y) {
 	icons_x += 128;
 
 	y += 128 + TILE_SIZE;
-	int opt_x = x - CONFIG_MENU_AREA_WIDTH / 4 - SETTINGS_BOX_WIDTH / 2;
+	int opt_start_x = x - CONFIG_MENU_AREA_WIDTH / 4 - SETTINGS_BOX_WIDTH / 2;
+	int opt_x = opt_start_x;
 	if (gs->game_settings().conntype == GameSettings::NONE) {
 		gs->add_instance(
 				new DrawCallbackInst(Pos(opt_x, y), ObjCallback(),
 						draw_respawn_toggle));
-		opt_x += CONFIG_MENU_AREA_WIDTH / 2; // SETTINGS_BOX_WIDTH / 2;
+		__setup_next_field_location(opt_x, y);
 	}
 	gs->add_instance(
 			new DrawCallbackInst(Pos(opt_x, y), ObjCallback(),
 					draw_speed_toggle));
+	opt_x = opt_start_x;
+	y += TILE_SIZE * 1.5;
+	setup_username_field(gs, opt_x, y);
+	__setup_next_field_location(opt_x, y);
+	setup_port_field(gs, opt_x, y);
 }
 
 static void logo_add(GameState* gs, int classx, int classy) {

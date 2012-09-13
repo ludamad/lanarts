@@ -18,6 +18,9 @@ class TextField {
 public:
 	TextField(int max_length, const std::string& default_text = std::string());
 
+	void set_text(const std::string& txt) {
+		_text = txt;
+	}
     const std::string& text() const {
         return _text;
     }
