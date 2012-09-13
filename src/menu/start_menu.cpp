@@ -92,7 +92,7 @@ static void setup_mainmenu_buttons(GameState* gs, bool* exit, int x, int y) {
 }
 
 void main_menu(GameState* gs, int width, int height) {
-	bool exit = false;
+	setup_menu_again: bool exit = false;
 	int halfw = width / 2;
 
 	GameView prevview = gs->view();
@@ -105,12 +105,14 @@ void main_menu(GameState* gs, int width, int height) {
 	gs->add_instance(
 			new AnimatedInst(Pos(halfw, 100), get_sprite_by_name("logo")));
 	gs->add_instance(
-			new AnimatedInst(Pos(halfw - 100, 500), -1, -1, Posf(), Posf(),
-					AnimatedInst::DEPTH, HELP_TEXT, Colour(255, 255, 255)));
-
+			animated_inst(Pos(halfw - 100, 500), HELP_TEXT,
+					Colour(255, 255, 255)));
 	setup_mainmenu_buttons(gs, &exit, halfw, 300);
 
-	for (; gs->update_iostate() && !exit;) {
+	for (; !exit;) {
+		if (!gs->update_iostate()) {
+			::exit(0);
+		}
 		gs->get_level()->game_inst_set().step(gs);
 		gs->draw(false);
 	}
@@ -120,7 +122,10 @@ void main_menu(GameState* gs, int width, int height) {
 	gs->set_level(oldlevel);
 	gs->view() = prevview;
 
-	class_menu(gs, width, height);
+	int exitcode = class_menu(gs, width, height);
+	if (exitcode < 0) {
+		goto setup_menu_again;
+	}
 	gs->start_connection();
 
 	if (gs->game_settings().conntype == GameSettings::SERVER) {

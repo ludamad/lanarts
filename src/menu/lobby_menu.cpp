@@ -89,7 +89,10 @@ void lobby_menu(GameState* gs, int width, int height) {
 			new AnimatedInst(Pos(halfw, 100), get_sprite_by_name("logo")));
 	setup_connectionmenu_buttons(gs, &exit, halfw, 300);
 
-	for (; gs->update_iostate() && !exit;) {
+	for (; !exit;) {
+		if (!gs->update_iostate()) {
+			::exit(0);
+		}
 		gs->net_connection().poll_messages();
 		gs->get_level()->game_inst_set().step(gs);
 		gs->draw(false);

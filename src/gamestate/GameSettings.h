@@ -46,7 +46,7 @@ struct GameSettings {
 		fullscreen = false;
 		regen_on_death = true;
 
-		classtype = 1;
+		classtype = -1;
 		view_width = 960;
 		view_height = 720;
 		steps_per_draw = 1;

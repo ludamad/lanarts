@@ -196,6 +196,10 @@ CollisionAvoidance & GameState::collision_avoidance() {
 	return get_level()->collision_avoidance();
 }
 
+bool GameState::in_menu_screen() {
+	return get_level()->id() == -1;
+}
+
 int GameState::handle_event(SDL_Event* event) {
 	GameLevelState* level = get_level();
 	if (level && level->id() != -1) {
@@ -250,7 +254,7 @@ void GameState::adjust_view_to_dragging() {
 	/*Adjust the view if the player is far from view center,
 	 *if we are following the cursor, or if the minimap is clicked */
 	bool is_dragged = false;
-	if (key_down_state(SDLK_x)) {
+	if (key_down_state(SDLK_x) && !in_menu_screen()) {
 		int nx = mouse_x() + _view.x, ny = mouse_y() + _view.y;
 		for (int i = 0; i < 2; i++)
 			_view.center_on(nx, ny);

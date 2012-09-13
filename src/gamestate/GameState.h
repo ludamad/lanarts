@@ -184,6 +184,8 @@ public:
 		return iocontroller.mouse_y();
 	}
 
+	bool in_menu_screen();
+
 	Pos mouse_pos() {
 		return Pos(mouse_x(), mouse_y());
 	}

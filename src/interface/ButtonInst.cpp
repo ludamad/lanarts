@@ -25,7 +25,7 @@ BBox ButtonInst::text_bounds(GameState* gs) {
 	int sx = x - dims.w / 2, sy = y - dims.h / 2;
 	if (sprite > -1) {
 		sy += sprite_bounds(gs).height();
-//		sy += dims.h;
+		sy -= dims.h;
 	}
 
 	return BBox(sx, sy, sx + dims.w, sy + dims.h);
@@ -45,10 +45,10 @@ void ButtonInst::step(GameState* gs) {
 }
 
 void ButtonInst::draw(GameState* gs) {
+	draw_callback.call(gs, this);
 	BBox tbounds(text_bounds(gs));
 	BBox sbounds(sprite_bounds(gs));
-	Colour col = (hovered(gs, this)) ? hover_colour : Colour(255, 255, 255);
-//	gl_draw_rectangle(bounding.x1, bounding.y1, bounding.width(), bounding.height(),  Colour(0,255,0));
+	Colour col = (hovered(gs, this)) ? _hover_colour : _draw_colour;
 	if (sprite > -1) {
 		gl_draw_sprite(sprite, sbounds.x1, sbounds.y1, col);
 	}
@@ -58,7 +58,7 @@ void ButtonInst::draw(GameState* gs) {
 
 void ButtonInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(ButtonInst*) inst = *this;
+	*(ButtonInst*)inst = *this;
 }
 ButtonInst *ButtonInst::clone() const {
 	return new ButtonInst(*this);
