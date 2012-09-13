@@ -76,6 +76,12 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_NUM_MEMB_LOOKUP("speed", stats->movespeed)
 	else IFLUA_NUM_MEMB_LOOKUP("damage", stats->physical.damage)
 	else IFLUA_NUM_MEMB_LOOKUP("cooldown_mult", stats->cooldown_mult)
+	else IFLUA_NUM_MEMB_LOOKUP("melee_cooldown_multiplier",
+			stats->cooldown_modifiers.melee_cooldown_multiplier)
+	else IFLUA_NUM_MEMB_LOOKUP("ranged_cooldown_multiplier",
+			stats->cooldown_modifiers.ranged_cooldown_multiplier)
+	else IFLUA_NUM_MEMB_LOOKUP("spell_cooldown_multiplier",
+			stats->cooldown_modifiers.spell_cooldown_multiplier)
 	else IFLUA_NUM_MEMB_LOOKUP("power", stats->physical.power)
 	else IFLUA_NUM_MEMB_LOOKUP("reduction", stats->physical.reduction)
 	else IFLUA_NUM_MEMB_LOOKUP("resistance", stats->physical.resistance)
@@ -112,6 +118,12 @@ static int lua_member_update(lua_State* L) {
 	else IFLUA_NUM_MEMB_UPDATE("willpower", stats->core.willpower)
 	else IFLUA_NUM_MEMB_UPDATE("speed", stats->movespeed)
 	else IFLUA_NUM_MEMB_UPDATE("cooldown_mult", stats->cooldown_mult)
+	else IFLUA_NUM_MEMB_UPDATE("melee_cooldown_multiplier",
+			stats->cooldown_modifiers.melee_cooldown_multiplier)
+	else IFLUA_NUM_MEMB_UPDATE("ranged_cooldown_multiplier",
+			stats->cooldown_modifiers.ranged_cooldown_multiplier)
+	else IFLUA_NUM_MEMB_UPDATE("spell_cooldown_multiplier",
+			stats->cooldown_modifiers.spell_cooldown_multiplier)
 	else IFLUA_NUM_MEMB_UPDATE("damage", stats->physical.damage)
 	else IFLUA_NUM_MEMB_UPDATE("power", stats->physical.power)
 	else IFLUA_NUM_MEMB_UPDATE("reduction", stats->physical.reduction)

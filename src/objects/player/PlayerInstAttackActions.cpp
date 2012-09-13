@@ -259,7 +259,10 @@ static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
 static void player_use_spell(GameState* gs, PlayerInst* p,
 		SpellEntry& spl_entry, const Pos& target) {
 	p->core_stats().mp -= spl_entry.mp_cost;
-	p->cooldowns().reset_action_cooldown(spl_entry.cooldown);
+	float spell_cooldown_mult =
+			p->effective_stats().cooldown_modifiers.spell_cooldown_multiplier;
+	p->cooldowns().reset_action_cooldown(
+			spl_entry.cooldown * spell_cooldown_mult);
 	if (spl_entry.uses_projectile()) {
 		player_use_projectile_spell(gs, p, spl_entry, spl_entry.projectile,
 				target);
@@ -607,7 +610,13 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		cooldown = wentry.cooldown();
 	}
 
-	cooldowns().reset_action_cooldown(cooldown * estats.cooldown_mult);
+	float cooldown_mult;
+	if (equipment().has_projectile()) {
+		cooldown_mult = estats.cooldown_modifiers.ranged_cooldown_multiplier;
+	} else {
+		cooldown_mult = estats.cooldown_modifiers.melee_cooldown_multiplier;
+	}
+	cooldowns().reset_action_cooldown(cooldown * cooldown_mult);
 
 	reset_rest_cooldown();
 }

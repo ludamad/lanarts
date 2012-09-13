@@ -7,7 +7,7 @@ equipment:
     equipment_type: armour
     resistance: { base: 2 }
     reduction:  { base: 2 }
-    spell_cooldown_multiplier: 1.05
+    spell_cooldown_multiplier: 1.1
 
   - name: Chainmail
     description: A strong armour with limited flexibility.
@@ -16,8 +16,8 @@ equipment:
     equipment_type: armour
     resistance: { base: 4 }
     reduction:  { base: 2 }
-    spell_cooldown_multiplier: 1.1
-    ranged_cooldown_multiplier: 1.1
+    spell_cooldown_multiplier: 1.15
+    ranged_cooldown_multiplier: 1.15
 
   - name: Platemail
     description: A strong, heavy armour.
@@ -27,8 +27,8 @@ equipment:
     armour_type: body armour
     resistance: { base: 6 }
     reduction:  { base: 4 }
-    spell_cooldown_multiplier: 1.15
-    ranged_cooldown_multiplier: 1.15
+    spell_cooldown_multiplier: 1.25
+    ranged_cooldown_multiplier: 1.25
 
   - name: Magic Robe
     description: A robe that guards against magic attacks.

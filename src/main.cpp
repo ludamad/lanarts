@@ -60,9 +60,6 @@ void load_game_from_file(GameState* gs, const char* filename) {
 	gs->deserialize(sb);
 	fclose(file);
 }
-
-void main_menu_loop(GameState* gs, int width, int height);
-
 const int HUD_WIDTH = 160;
 
 static void game_loop(GameState* gs) {

@@ -18,8 +18,6 @@
 
 #include "../interface/GameChat.h"
 
-#include "../interface/GameDialogs.h"
-
 #include "../interface/GameHud.h"
 #include "../net/GameNetConnection.h"
 

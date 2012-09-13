@@ -106,6 +106,13 @@ struct CooldownModifiers {
 			rest_cooldown_multiplier(1.0f), spell_cooldown_multiplier(1.0f), melee_cooldown_multiplier(
 					1.0f), ranged_cooldown_multiplier(1.0f) {
 	}
+	void apply(float mult) {
+
+		rest_cooldown_multiplier *= mult;
+		spell_cooldown_multiplier *= mult;
+		melee_cooldown_multiplier *= mult;
+		ranged_cooldown_multiplier *= mult;
+	}
 	void apply(const CooldownModifiers& cooldown_modifiers) {
 		rest_cooldown_multiplier *= cooldown_modifiers.rest_cooldown_multiplier;
 		spell_cooldown_multiplier *=

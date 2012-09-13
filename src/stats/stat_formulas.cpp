@@ -114,6 +114,7 @@ EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst,
 	stats.effects.process(gs, inst, ret);
 	factor_in_equipment_stats(gs->rng(), ret, stats.equipment);
 	derive_secondary_stats(gs->rng(), ret);
+	ret.cooldown_modifiers.apply(ret.cooldown_mult);
 	return ret;
 }
 

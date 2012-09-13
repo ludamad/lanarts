@@ -42,12 +42,6 @@ static void continue_as_loner(GameState* gs, GameInst* _, void* flag) {
 	gs->game_settings().regen_on_death = true;
 	gs->game_settings().frame_action_repeat = 0;
 }
-static void continue_as_hardcore(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
-	gs->game_settings().conntype = GameSettings::NONE;
-	gs->game_settings().regen_on_death = false;
-	gs->game_settings().frame_action_repeat = 0;
-}
 
 static void continue_as_loner_save_replay(GameState* gs, GameInst* _,
 		void* flag) {
@@ -83,15 +77,11 @@ static const char HELP_TEXT[] = "Movement: WASD or Arrow Keys\n"
 
 static void setup_mainmenu_buttons(GameState* gs, bool* exit, int x, int y) {
 	ObjCallback single(continue_as_loner, exit);
-	ObjCallback hardcoresingle(continue_as_hardcore, exit);
 	ObjCallback savereplay(continue_as_loner_save_replay, exit);
 	ObjCallback loadreplay(continue_as_load_replay, exit);
 	ObjCallback client(continue_as_client, exit);
 	ObjCallback server(continue_as_server, exit);
 	gs->add_instance(new ButtonInst("Single-Player", -1, x, y, single));
-	y += 50;
-	gs->add_instance(
-			new ButtonInst("Hardcore (No Respawn)", -1, x, y, hardcoresingle));
 	y += 50;
 	gs->add_instance(new ButtonInst("Save Replay", -1, x - 95, y, savereplay));
 	gs->add_instance(new ButtonInst("Load Replay", -1, x + 95, y, loadreplay));
@@ -114,7 +104,6 @@ void main_menu(GameState* gs, int width, int height) {
 
 	gs->add_instance(
 			new AnimatedInst(Pos(halfw, 100), get_sprite_by_name("logo")));
-//	gs->add_instance(new TextBoxInst(BBox(10, 10, 100, 200), 20, "TEST"));
 	gs->add_instance(
 			new AnimatedInst(Pos(halfw - 100, 500), -1, -1, Posf(), Posf(),
 					AnimatedInst::DEPTH, HELP_TEXT, Colour(255, 255, 255)));
@@ -138,5 +127,4 @@ void main_menu(GameState* gs, int width, int height) {
 		lobby_menu(gs, width, height);
 	}
 }
-
 

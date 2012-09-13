@@ -40,3 +40,9 @@ sprites:
     
   - name: speed setting icon
     file: res/interface/sprites/config/speed_setting.png
+    
+  - name: hardcore setting icon
+    file: res/interface/sprites/config/hardcore_setting.png
+    
+  - name: respawn setting icon
+    file: res/interface/sprites/config/respawn_setting.png

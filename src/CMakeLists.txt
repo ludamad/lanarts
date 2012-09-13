@@ -60,9 +60,9 @@ set( lanarts_src
 	interface/ActionBar.cpp
 	interface/ButtonInst.cpp
 	interface/console_description_draw.cpp
+	interface/components_draw.cpp
 	interface/GameChat.cpp
 	interface/GameChatCheatCodes.cpp
-	interface/GameDialogs.cpp
 	interface/GameHud.cpp
 	interface/GameTextConsole.cpp	
 	interface/TextBoxInst.cpp
@@ -211,9 +211,9 @@ set( lanarts_include
 	interface/ActionBar.h
 	interface/ButtonInst.h
 	interface/console_description_draw.h
+	interface/components_draw.h
 	interface/DrawCallbackInst.h
 	interface/GameChat.h
-	interface/GameDialogs.h
 	interface/GameHud.h
 	interface/GameTextConsole.h
 	interface/TextBoxInst.h

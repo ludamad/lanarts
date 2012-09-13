@@ -150,7 +150,6 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 	cooldowns().reset_action_cooldown(
 			atkstats.cooldown
 					* estats.cooldown_modifiers.melee_cooldown_multiplier);
-	cooldowns().action_cooldown += gs->rng().rand(-4, 5);
 
 	WeaponEntry& wentry = weapon.weapon_entry();
 	if (wentry.name != "none") {
@@ -190,7 +189,9 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 	GameInst* bullet = new ProjectileInst(projectile, atkstats, id, Pos(x, y),
 			p, pentry.speed, pentry.range());
 	gs->add_instance(bullet);
-	cooldowns().reset_action_cooldown(pentry.cooldown());
+	cooldowns().reset_action_cooldown(
+			pentry.cooldown()
+					* estats.cooldown_modifiers.ranged_cooldown_multiplier);
 	cooldowns().action_cooldown += gs->rng().rand(-4, 5);
 	return false;
 }
