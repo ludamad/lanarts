@@ -16,6 +16,14 @@ DataFiles load_datafilenames(const char* filename) {
 
 	fstream file(filename, fstream::in | fstream::binary);
 
+	if (!file) {
+		fprintf(
+				stderr,
+				"Fatal error: file %s not found, ensure you are running from directory with res/ folder\n.",
+				filename);
+		exit(0);
+	}
+
 	if (file) {
 		try {
 			YAML::Parser parser(file);

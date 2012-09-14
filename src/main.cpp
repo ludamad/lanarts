@@ -38,13 +38,13 @@ using namespace std;
 #endif
 
 void init_system(GameSettings& settings, lua_State* L) {
-	settings = load_settings_data("settings.yaml");
+	load_settings_data(settings, "settings.yaml");
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		exit(0);
 	}
 	lanarts_net_init(true);
 	init_sdl_gl(settings.fullscreen, settings.view_width, settings.view_height);
-	settings = init_game_data(L);
+	init_game_data(settings, L);
 }
 
 void save_game_to_file(GameState* gs, const char* filename) {
@@ -86,7 +86,7 @@ static void game_loop(GameState* gs) {
 
 		if (gs->key_press_state(SDLK_F2)) {
 			if (gs->player_data().all_players().size() == 1) {
-				init_game_data(gs->get_luastate());
+				init_game_data(settings, gs->get_luastate());
 				init_lua_data(gs, gs->get_luastate());
 			}
 		}

@@ -33,11 +33,10 @@ struct lua_State;
 class LuaValue;
 
 /* Contain information which guides the rest of the data loading */
-GameSettings load_settings_data(const char* filename, lua_State* L = NULL,
-		LuaValue* lua_settings = NULL);
+void load_settings_data(GameSettings& settings, const char* filename);
 DataFiles load_datafilenames(const char* filename);
 
-GameSettings init_game_data(lua_State* L);
+void init_game_data(GameSettings& settings, lua_State* L);
 void init_lua_data(GameState* gs, lua_State* L);
 
 #endif /* GAME_DATA_H_ */

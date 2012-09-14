@@ -191,7 +191,7 @@ LuaValue lua_sprites, lua_armours, lua_enemies, lua_effects, lua_weapons,
 
 LuaValue lua_settings;
 
-GameSettings init_game_data(lua_State* L) {
+void init_game_data(GameSettings& settings, lua_State* L) {
 	DataFiles dfiles = load_datafilenames("res/datafiles.yaml");
 
 //NB: Do not re-order the way resources are loaded unless you know what you're doing!
@@ -223,10 +223,8 @@ GameSettings init_game_data(lua_State* L) {
 	lua_dungeon.deinitialize(L);
 	lua_classes = load_class_data(L, dfiles.class_files);
 
-	GameSettings settings = load_settings_data("settings.yaml", L,
-			&lua_settings);
-
-	return settings;
+	load_settings_data(settings, "settings.yaml");
+	load_settings_data(settings, "saved_settings.yaml");
 }
 
 static void register_as_global(lua_State* L, LuaValue& value,

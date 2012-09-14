@@ -22,3 +22,5 @@ dofile "res/levels/levels.lua"
 -- Balance measurement related files
 dofile "res/tests/progressions.lua"
 
+settings = {verbose_output = false}
+

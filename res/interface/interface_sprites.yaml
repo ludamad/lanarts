@@ -46,3 +46,13 @@ sprites:
     
   - name: respawn setting icon
     file: res/interface/sprites/config/respawn_setting.png
+    
+    #network settings
+  - name: client setting icon
+    file: res/interface/sprites/config/client_icon.png
+    
+  - name: server setting icon
+    file: res/interface/sprites/config/server_icon.png
+    
+  - name: single player setting icon
+    file: res/interface/sprites/config/single_player_icon.png

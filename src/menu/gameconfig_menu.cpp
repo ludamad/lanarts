@@ -126,7 +126,7 @@ static void draw_respawn_toggle(GameState* gs, GameInst* inst, void* _) {
 	// We cheat here and bundle step and draw actions
 	// The interface will always be drawn once a step
 	const int width = SETTINGS_BOX_WIDTH;
-	const int height = TILE_SIZE + 8;
+	const int height = TILE_SIZE + 2;
 	GameSettings& settings = gs->game_settings();
 	BBox bbox(inst->x, inst->y, inst->x + width, inst->y + height);
 	sprite_id hardcore = get_sprite_by_name("hardcore setting icon");
@@ -138,7 +138,7 @@ static void draw_respawn_toggle(GameState* gs, GameInst* inst, void* _) {
 		draw_setting_box(gs, bbox, bbox_col, respawn, COL_WHITE,
 				"Respawn on Death", COL_WHITE);
 	} else {
-		Colour bbox_col = hover ? COL_GOLD : COL_RED;
+		Colour bbox_col = hover ? COL_GOLD : COL_MUTED_RED;
 		draw_setting_box(gs, bbox, bbox_col, hardcore, COL_PALE_RED,
 				"Hardcore (No respawn!)", COL_PALE_RED);
 	}
@@ -147,11 +147,40 @@ static void draw_respawn_toggle(GameState* gs, GameInst* inst, void* _) {
 	}
 }
 
+static void draw_connection_toggle(GameState* gs, GameInst* inst, void* _) {
+	// We cheat here and bundle step and draw actions
+	// The interface will always be drawn once a step
+	const int width = SETTINGS_BOX_WIDTH;
+	const int height = TILE_SIZE + 2;
+	GameSettings& settings = gs->game_settings();
+	BBox bbox(inst->x, inst->y, inst->x + width, inst->y + height);
+	bool hover = bbox.contains(gs->mouse_pos());
+	bool clicked = hover && gs->mouse_left_click();
+
+	sprite_id client = get_sprite_by_name("client setting icon");
+	sprite_id server = get_sprite_by_name("server setting icon");
+	sprite_id single_player = get_sprite_by_name("single player setting icon");
+	Colour bbox_col = hover ? COL_GOLD : COL_WHITE;
+
+	if (settings.conntype == GameSettings::CLIENT) {
+		draw_setting_box(gs, bbox, bbox_col, client, COL_WHITE,
+				"Connect to a Game", COL_WHITE);
+	} else {
+		draw_setting_box(gs, bbox, bbox_col, client, COL_WHITE,
+				"Host a game", COL_WHITE);
+	}
+
+	if (hover && clicked) {
+		settings.conntype = GameSettings::connection_type(
+				(settings.conntype + 1) % 3);
+	}
+}
+
 static void draw_speed_toggle(GameState* gs, GameInst* inst, void* _) {
 	// We cheat here and bundle step and draw actions
 	// The interface will always be drawn once a step
 	const int width = SETTINGS_BOX_WIDTH;
-	const int height = TILE_SIZE + 8;
+	const int height = TILE_SIZE + 2;
 	GameSettings& settings = gs->game_settings();
 	BBox bbox(inst->x, inst->y, inst->x + width, inst->y + height);
 	draw_speed_box(gs, bbox);
@@ -171,7 +200,7 @@ static void __setup_next_field_location(bool& on_first_row, int& x, int& y) {
 	x += CONFIG_MENU_AREA_WIDTH / 2; // SETTINGS_BOX_WIDTH / 2;
 	if (on_first_row) {
 		x -= CONFIG_MENU_AREA_WIDTH;
-		y += TILE_SIZE * 1.5;
+		y += TILE_SIZE * 2;
 	}
 }
 
@@ -202,8 +231,8 @@ static void text_update_int(GameState* gs, GameInst* inst, void* intp) {
 }
 static void setup_username_field(GameState* gs, int x, int y) {
 	GameSettings& settings = gs->game_settings();
-	gs->add_instance(animated_inst(Pos(x, y), "Enter your name:", COL_YELLOW));
-	y += 20;
+	gs->add_instance(
+			animated_inst(Pos(x, y - 20), "Enter your name:", COL_YELLOW));
 	ObjCallback callback(text_update_string, &settings.username);
 	TextBoxInst* textbox = new TextBoxInst(
 			BBox(x, y, x + SETTINGS_BOX_WIDTH, y + TILE_SIZE), 20,
@@ -222,8 +251,8 @@ static void text_sync_int(GameState* gs, GameInst* inst, void* intp) {
 
 static void setup_port_field(GameState* gs, int x, int y) {
 	GameSettings& settings = gs->game_settings();
-	gs->add_instance(animated_inst(Pos(x, y), "Connection port:", COL_YELLOW));
-	y += 20;
+	gs->add_instance(
+			animated_inst(Pos(x, y - 20), "Connection port:", COL_YELLOW));
 	ObjCallback typing_callback(text_update_int, &settings.port);
 	ObjCallback deselect_callback(text_sync_int, &settings.port);
 	TextBoxInst* textbox = new TextBoxInst(
@@ -242,6 +271,12 @@ static void setup_config_options(GameState* gs, int* exitcode, int x, int y) {
 	int opt_start_x = x - CONFIG_MENU_AREA_WIDTH / 4 - SETTINGS_BOX_WIDTH / 2;
 	int opt_x = opt_start_x;
 	bool on_first_row = true;
+
+	gs->add_instance(
+			new DrawCallbackInst(Pos(opt_x, y), ObjCallback(),
+					draw_connection_toggle));
+	__setup_next_field_location(on_first_row, opt_x, y);
+
 	if (gs->game_settings().conntype == GameSettings::NONE) {
 		gs->add_instance(
 				new DrawCallbackInst(Pos(opt_x, y), ObjCallback(),
@@ -251,12 +286,14 @@ static void setup_config_options(GameState* gs, int* exitcode, int x, int y) {
 	gs->add_instance(
 			new DrawCallbackInst(Pos(opt_x, y), ObjCallback(),
 					draw_speed_toggle));
-	opt_x = opt_start_x;
-	y += TILE_SIZE * 2;
-	setup_username_field(gs, opt_x, y);
-	on_first_row = true;
 	__setup_next_field_location(on_first_row, opt_x, y);
-	setup_port_field(gs, opt_x, y);
+
+	setup_username_field(gs, opt_x, y);
+	__setup_next_field_location(on_first_row, opt_x, y);
+	if (gs->game_settings().conntype != GameSettings::NONE) {
+		setup_port_field(gs, opt_x, y);
+	}
+
 	setup_config_exit_options(gs, exitcode, start_x,
 			start_y + CONFIG_MENU_AREA_HEIGHT - 192);
 }

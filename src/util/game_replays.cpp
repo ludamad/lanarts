@@ -68,16 +68,27 @@ void load_init(GameState* gs, int& seed, class_id& classtype) {
 	std::string last_used_name;
 	find_next_nonexistant(&last_used_name, gs->game_settings().loadreplay_file);
 	loadfile = fopen(last_used_name.c_str(), "rb");
-	fread(&seed, sizeof(unsigned int), 1, loadfile);
-	fread(&classtype, sizeof(class_id), 1, loadfile);
+	if (!savefile) {
+		printf("Cannot open %s!\n", last_used_name.c_str());
+		gs->game_settings().loadreplay_file = "";
+	} else {
+		fread(&seed, sizeof(unsigned int), 1, loadfile);
+		fread(&classtype, sizeof(class_id), 1, loadfile);
+	}
 }
 
 void save_init(GameState* gs, int seed, class_id classtype) {
 	std::string next_free_name = find_next_nonexistant(NULL,
 			gs->game_settings().savereplay_file);
+
 	savefile = fopen(next_free_name.c_str(), "wb");
-	fwrite(&seed, sizeof(unsigned int), 1, savefile);
-	fwrite(&classtype, sizeof(class_id), 1, savefile);
+	if (!savefile) {
+		printf("Cannot open %s!\n", next_free_name.c_str());
+		gs->game_settings().savereplay_file = "";
+	} else {
+		fwrite(&seed, sizeof(unsigned int), 1, savefile);
+		fwrite(&classtype, sizeof(class_id), 1, savefile);
+	}
 }
 
 bool replay_exists(GameState* gs) {
