@@ -14,8 +14,8 @@ enemies:
     stats:
         attacks: [ { weapon: Basic Melee}, { projectile: Longer Range Blue Blast} ]
         movespeed: 3.5
-        hp: 150
-        hpregen: 0.1
+        hp: 250
+        hpregen: 0.15
         strength: 25
         magic: 30
         defence: 20

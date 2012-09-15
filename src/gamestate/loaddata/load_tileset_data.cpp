@@ -1,8 +1,6 @@
 /*
- * load_sprite_data.cpp
- *
- *  Created on: Mar 25, 2012
- *      Author: 100397561
+ * load_tileset_data.cpp:
+ *  Load tile data
  */
 #include <fstream>
 

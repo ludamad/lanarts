@@ -138,7 +138,7 @@ static void draw_respawn_toggle(GameState* gs, GameInst* inst, void* _) {
 		draw_setting_box(gs, bbox, bbox_col, respawn, COL_WHITE,
 				"Respawn on Death", COL_WHITE);
 	} else {
-		Colour bbox_col = hover ? COL_GOLD : COL_MUTED_RED;
+		Colour bbox_col = hover ? COL_GOLD : COL_PALE_RED;
 		draw_setting_box(gs, bbox, bbox_col, hardcore, COL_PALE_RED,
 				"Hardcore (No respawn!)", COL_PALE_RED);
 	}
@@ -160,14 +160,20 @@ static void draw_connection_toggle(GameState* gs, GameInst* inst, void* _) {
 	sprite_id client = get_sprite_by_name("client setting icon");
 	sprite_id server = get_sprite_by_name("server setting icon");
 	sprite_id single_player = get_sprite_by_name("single player setting icon");
-	Colour bbox_col = hover ? COL_GOLD : COL_WHITE;
 
 	if (settings.conntype == GameSettings::CLIENT) {
-		draw_setting_box(gs, bbox, bbox_col, client, COL_WHITE,
-				"Connect to a Game", COL_WHITE);
+		Colour bbox_col = hover ? COL_GOLD : COL_MUTED_GREEN;
+
+		draw_setting_box(gs, bbox, bbox_col, client, COL_MUTED_GREEN,
+				"Connect to a Game", COL_MUTED_GREEN);
+	} else if (settings.conntype == GameSettings::SERVER) {
+		Colour bbox_col = hover ? COL_GOLD : COL_PALE_RED;
+		draw_setting_box(gs, bbox, bbox_col, server, COL_PALE_RED,
+				"Host a game", COL_PALE_RED);
 	} else {
-		draw_setting_box(gs, bbox, bbox_col, client, COL_WHITE,
-				"Host a game", COL_WHITE);
+		Colour bbox_col = hover ? COL_GOLD : COL_BABY_BLUE;
+		draw_setting_box(gs, bbox, bbox_col, single_player, COL_BABY_BLUE,
+				"Single-player", COL_BABY_BLUE);
 	}
 
 	if (hover && clicked) {
@@ -211,12 +217,49 @@ static void text_update_string(GameState* gs, GameInst* inst, void* strp) {
 	*strptr = textbox->text();
 }
 
+static bool is_valid_ip(const std::string& ip) {
+	int dots = 0;
+	const char* section_start = &ip[0];
+	int section_has_digit = false;
+	for (int i = 0; i < ip.size(); i++) {
+		if (ip[i] == '.') {
+			if (!section_has_digit)
+				return false;
+//			int amnt = atoi(section_start);
+//			if (amnt < 0 || amnt > 255) {
+//				return false;
+//			}
+			section_start = &ip[i + 1];
+			dots++;
+		} else if (isdigit(ip[i])) {
+			section_has_digit = true;
+		} else {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+static void text_update_ip(GameState* gs, GameInst* inst, void* strp) {
+	TextBoxInst* textbox = dynamic_cast<TextBoxInst*>(inst);
+	LANARTS_ASSERT(textbox);
+	std::string * strptr = (std::string*)strp;
+// Check if valid IP or hostname like localhost
+	bool valid = is_valid_ip(textbox->text().c_str())
+			|| textbox->text() == "localhost";
+	textbox->mark_validity(valid);
+	if (valid) {
+		*strptr = textbox->text();
+	}
+}
+
 static void text_update_int(GameState* gs, GameInst* inst, void* intp) {
 	TextBoxInst* textbox = dynamic_cast<TextBoxInst*>(inst);
 	const std::string& text = textbox->text();
 	int* intptr = (int*)intp;
 	LANARTS_ASSERT(textbox);
-	// Check if valid string of all digits:
+// Check if valid string of all digits:
 	bool valid = !text.empty();
 	for (int i = 0; i < text.size(); i++) {
 		if (!isdigit(text[i])) {
@@ -224,7 +267,7 @@ static void text_update_int(GameState* gs, GameInst* inst, void* intp) {
 		}
 	}
 	textbox->mark_validity(valid);
-	// Only convert if valid
+// Only convert if valid
 	if (valid) {
 		*intptr = atoi(text.c_str());
 	}
@@ -248,6 +291,12 @@ static void text_sync_int(GameState* gs, GameInst* inst, void* intp) {
 	textbox->set_text(buff);
 	textbox->mark_validity(true);
 }
+static void text_sync_string(GameState* gs, GameInst* inst, void* intp) {
+	char buff[32];
+	TextBoxInst* textbox = dynamic_cast<TextBoxInst*>(inst);
+	textbox->set_text(gs->game_settings().ip);
+	textbox->mark_validity(true);
+}
 
 static void setup_port_field(GameState* gs, int x, int y) {
 	GameSettings& settings = gs->game_settings();
@@ -256,9 +305,21 @@ static void setup_port_field(GameState* gs, int x, int y) {
 	ObjCallback typing_callback(text_update_int, &settings.port);
 	ObjCallback deselect_callback(text_sync_int, &settings.port);
 	TextBoxInst* textbox = new TextBoxInst(
-			BBox(x, y, x + SETTINGS_BOX_WIDTH, y + TILE_SIZE), 20,
-			settings.username, typing_callback, deselect_callback);
+			BBox(x, y, x + SETTINGS_BOX_WIDTH, y + TILE_SIZE), 20, "",
+			typing_callback, deselect_callback);
 	text_sync_int(gs, textbox, &settings.port);
+	gs->add_instance(textbox);
+}
+
+static void setup_ip_field(GameState* gs, int x, int y) {
+	GameSettings& settings = gs->game_settings();
+	gs->add_instance(animated_inst(Pos(x, y - 20), "Host IP:", COL_YELLOW));
+	ObjCallback typing_callback(text_update_ip, &settings.ip);
+	ObjCallback deselect_callback(text_sync_string, &settings.ip);
+	TextBoxInst* textbox = new TextBoxInst(
+			BBox(x, y, x + SETTINGS_BOX_WIDTH, y + TILE_SIZE), 20, "",
+			typing_callback, deselect_callback);
+	text_sync_string(gs, textbox, &settings.ip);
 	gs->add_instance(textbox);
 }
 
@@ -292,8 +353,11 @@ static void setup_config_options(GameState* gs, int* exitcode, int x, int y) {
 	__setup_next_field_location(on_first_row, opt_x, y);
 	if (gs->game_settings().conntype != GameSettings::NONE) {
 		setup_port_field(gs, opt_x, y);
+		__setup_next_field_location(on_first_row, opt_x, y);
 	}
-
+	if (gs->game_settings().conntype == GameSettings::CLIENT) {
+		setup_ip_field(gs, opt_x, y);
+	}
 	setup_config_exit_options(gs, exitcode, start_x,
 			start_y + CONFIG_MENU_AREA_HEIGHT - 192);
 }
@@ -309,7 +373,7 @@ static void logo_add(GameState* gs, int classx, int classy) {
 }
 
 int class_menu(GameState* gs, int width, int height) {
-	int exitcode = 0;
+	setup_menu_again: int exitcode = 0;
 	int halfw = width / 2;
 
 	GameView prevview = gs->view();
@@ -323,13 +387,20 @@ int class_menu(GameState* gs, int width, int height) {
 
 	logo_add(gs, classx, classy);
 	setup_config_options(gs, &exitcode, classx, classy);
+	GameSettings::connection_type conntype = gs->game_settings().conntype;
 
 	for (; exitcode == 0;) {
 		if (!gs->update_iostate()) {
 			exit(0);
 		}
+		if (conntype != gs->game_settings().conntype) {
+			delete gs->get_level();
+			gs->set_level(oldlevel);
+			goto setup_menu_again;
+		}
 		gs->get_level()->game_inst_set().step(gs);
 		gs->draw(false);
+
 	}
 
 	delete gs->get_level();

@@ -106,7 +106,6 @@ static void game_loop(GameState* gs) {
 		}
 
 //Draw event
-
 		draw_timer.start();
 		bool draw_this_step = (i > 1 && i % settings.steps_per_draw == 0);
 		if (draw_this_step) {

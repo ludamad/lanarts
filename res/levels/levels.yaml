@@ -36,8 +36,8 @@ medium_enemies: &medium_enemies
  
 hard_enemies: &hard_enemies
  - { enemy: Skeleton,          chance: 50                                              }
- - { enemy: Storm Elemental,   chance: 5,    group_chance: 100, group_size: 3          }
- - { enemy: Hell Storm,        chance: 20,   group_chance: 33, group_size: 2           }
+ - { enemy: Storm Elemental,   chance: 20,    group_chance: 100, group_size: 3          }
+ - { enemy: Hell Storm,        chance: 5,   group_chance: 33, group_size: 2           }
  - { enemy: Grue                                                                       }
  - { enemy: Super Chicken,     chance: 100                                             }
  - { enemy: Zombie,            chance: 75                                              }

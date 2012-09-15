@@ -81,14 +81,14 @@ static void setup_mainmenu_buttons(GameState* gs, bool* exit, int x, int y) {
 	ObjCallback loadreplay(continue_as_load_replay, exit);
 	ObjCallback client(continue_as_client, exit);
 	ObjCallback server(continue_as_server, exit);
-	gs->add_instance(new ButtonInst("Single-Player", -1, x, y, single));
 	y += 50;
-	gs->add_instance(new ButtonInst("Save Replay", -1, x - 95, y, savereplay));
-	gs->add_instance(new ButtonInst("Load Replay", -1, x + 95, y, loadreplay));
-	y += 50;
-	gs->add_instance(new ButtonInst("Client", -1, x - 65, y, client));
-	gs->add_instance(new ButtonInst("Server", -1, x + 65, y, server));
-	y += 50;
+	gs->add_instance(new ButtonInst("Start", -1, x, y, single));
+//	gs->add_instance(new ButtonInst("Save Replay", -1, x - 95, y, savereplay));
+//	gs->add_instance(new ButtonInst("Load Replay", -1, x + 95, y, loadreplay));
+//	y += 50;
+//	gs->add_instance(new ButtonInst("Client", -1, x - 65, y, client));
+//	gs->add_instance(new ButtonInst("Server", -1, x + 65, y, server));
+//	y += 50;
 }
 
 void main_menu(GameState* gs, int width, int height) {
@@ -105,11 +105,11 @@ void main_menu(GameState* gs, int width, int height) {
 	gs->add_instance(
 			new AnimatedInst(Pos(halfw, 100), get_sprite_by_name("logo")));
 	gs->add_instance(
-			animated_inst(Pos(halfw - 100, 500), HELP_TEXT,
+			animated_inst(Pos(halfw - 100, 460), HELP_TEXT,
 					Colour(255, 255, 255)));
 	setup_mainmenu_buttons(gs, &exit, halfw, 300);
 
-	for (; !exit;) {
+	for (; !exit && !gs->key_press_state(SDLK_RETURN);) {
 		if (!gs->update_iostate()) {
 			::exit(0);
 		}

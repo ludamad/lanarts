@@ -3,9 +3,10 @@
  *  Defines utility functions for things such as vector normalization, rounding to powers of two, etc
  */
 
-#include "math_util.h"
 #include <cmath>
 #include <algorithm>
+
+#include "math_util.h"
 
 int power_of_two(int input) {
 	int value = 1;
