@@ -16,7 +16,6 @@ enum feature_t {
 	DOOR = 4,
 	STAIR_UP = 5,
 	STAIR_DOWN = 6
-
 };
 
 struct Sqr {
