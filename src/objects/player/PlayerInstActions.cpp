@@ -445,10 +445,10 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 	if (item.amount > 0) {
 		if (item.is_equipment()) {
 			if (itemslot.is_equipped()) {
-				itemslot.deequip();
+				inventory().deequip(slot);
 			} else {
 				if (!item.is_projectile()
-						|| equipment().valid_to_use_projectile(item)) {
+						|| valid_to_use_projectile(inventory(), item)) {
 					equipment().equip(slot);
 				}
 			}

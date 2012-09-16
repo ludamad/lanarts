@@ -13,17 +13,6 @@
 
 #include "EquipmentStats.h"
 
-bool EquipmentStats::valid_to_use_projectile(const Item& proj) {
-	if (proj.empty())
-		return false;
-	ProjectileEntry& pentry = proj.projectile_entry();
-	if (pentry.is_standalone())
-		return true;
-	if (pentry.weapon_class == weapon().weapon_entry().weapon_class)
-		return true;
-	return false;
-}
-
 void EquipmentStats::deequip_type(int equipment_type) {
 	inventory.deequip_type(equipment_type);
 }
@@ -33,7 +22,7 @@ bool EquipmentStats::valid_to_use(const Item& item) {
 	}
 	switch (item.equipment_entry().type) {
 	case EquipmentEntry::PROJECTILE:
-		return valid_to_use_projectile(item);
+		return valid_to_use_projectile(inventory, item);
 	}
 	return true;
 }
@@ -90,29 +79,14 @@ ItemSlot& EquipmentStats::armour_slot() {
 }
 
 Weapon EquipmentStats::weapon() const {
-	itemslot_t slot = inventory.get_equipped(EquipmentEntry::WEAPON);
-	if (slot != -1) {
-		return inventory.get(slot).item;
-	} else {
-		return Weapon();
-	}
+	return equipped_weapon(inventory);
 }
 
 Projectile EquipmentStats::projectile() const {
-	itemslot_t slot = inventory.get_equipped(EquipmentEntry::PROJECTILE);
-	if (slot != -1) {
-		return inventory.get(slot).item;
-	} else {
-		return Projectile();
-	}
+	return equipped_projectile(inventory);
 }
 
 Equipment EquipmentStats::armour() const {
-	itemslot_t slot = inventory.get_equipped(EquipmentEntry::BODY_ARMOUR);
-	if (slot != -1) {
-		return inventory.get(slot).item;
-	} else {
-		return Equipment();
-	}
+	return equipped_armour(inventory);
 }
 

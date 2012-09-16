@@ -7,6 +7,8 @@
 
 #include "items/ItemEntry.h"
 #include "items/EquipmentEntry.h"
+#include "items/ProjectileEntry.h"
+#include "items/WeaponEntry.h"
 
 #include "Inventory.h"
 
@@ -79,6 +81,16 @@ void Inventory::deserialize(SerializeBuffer& serializer) {
 	}
 }
 
+void Inventory::__dequip_projectile_if_invalid() {
+	itemslot_t slot = get_equipped(EquipmentEntry::PROJECTILE);
+	if (slot != -1) {
+		ItemSlot& itemslot = get(slot);
+		if (!valid_to_use_projectile(*this, itemslot.item)) {
+			get(slot).deequip();
+		}
+	}
+}
+
 void Inventory::equip(itemslot_t i) {
 	ItemSlot& slot = get(i);
 	EquipmentEntry& eentry = slot.item.equipment_entry();
@@ -101,15 +113,22 @@ void Inventory::equip(itemslot_t i) {
 		get(last_slot).equipped = false;
 	}
 	slot.equipped = true;
+	__dequip_projectile_if_invalid();
 }
-
 // Returns NULL if nothing equipped
 // pass previous result for slots that can have multiple items equipped
 void Inventory::deequip_type(int type) {
 	itemslot_t slot = get_equipped(type);
 	if (slot != -1) {
 		get(slot).deequip();
+		__dequip_projectile_if_invalid();
 	}
+}
+
+void Inventory::deequip(itemslot_t i) {
+	ItemSlot& slot = get(i);
+	slot.deequip();
+	__dequip_projectile_if_invalid();
 }
 
 itemslot_t Inventory::get_equipped(int type, itemslot_t last_slot) const {
@@ -124,5 +143,46 @@ itemslot_t Inventory::get_equipped(int type, itemslot_t last_slot) const {
 		}
 	}
 	return -1;
+}
+
+bool valid_to_use_projectile(const Inventory& inventory,
+		const Projectile& proj) {
+
+	if (proj.empty())
+		return false;
+	ProjectileEntry& pentry = proj.projectile_entry();
+	if (pentry.is_standalone())
+		return true;
+	Weapon weapon = equipped_weapon(inventory);
+	if (pentry.weapon_class == weapon.weapon_entry().weapon_class)
+		return true;
+	return false;
+}
+
+Weapon equipped_weapon(const Inventory & inventory) {
+	itemslot_t slot = inventory.get_equipped(EquipmentEntry::WEAPON);
+	if (slot != -1) {
+		return inventory.get(slot).item;
+	} else {
+		return Weapon();
+	}
+}
+
+Projectile equipped_projectile(const Inventory & inventory) {
+	itemslot_t slot = inventory.get_equipped(EquipmentEntry::PROJECTILE);
+	if (slot != -1) {
+		return inventory.get(slot).item;
+	} else {
+		return Projectile();
+	}
+}
+
+Equipment equipped_armour(const Inventory & inventory) {
+	itemslot_t slot = inventory.get_equipped(EquipmentEntry::BODY_ARMOUR);
+	if (slot != -1) {
+		return inventory.get(slot).item;
+	} else {
+		return Equipment();
+	}
 }
 

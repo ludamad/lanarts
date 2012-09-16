@@ -17,7 +17,6 @@ public:
 	EquipmentStats() :
 			money(0) {
 	}
-	bool valid_to_use_projectile(const Item& proj);
 	bool valid_to_use(const Item& item);
 
 	void equip(itemslot_t slot);

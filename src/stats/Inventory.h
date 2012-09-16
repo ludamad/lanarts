@@ -50,9 +50,6 @@ struct ItemSlot {
 	bool is_same_item(const Item& item) const {
 		return this->item.is_same_item(item);
 	}
-	void deequip() {
-		equipped = false;
-	}
 	void remove_copies(int copies) {
 		item.remove_copies(copies);
 		if (item.amount == 0) {
@@ -75,6 +72,9 @@ struct ItemSlot {
 		return item == itemslot.item && equipped == itemslot.equipped;
 	}
 private:
+	void deequip() {
+		equipped = false;
+	}
 	bool equipped;
 };
 
@@ -104,11 +104,21 @@ public:
 
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
+
 	void equip(itemslot_t i);
+	void deequip(itemslot_t i);
 	void deequip_type(int type);
+
 	itemslot_t get_equipped(int type, itemslot_t last_slot = -1) const;
 private:
+	void __dequip_projectile_if_invalid();
 	std::vector<ItemSlot> items;
 };
+
+
+bool valid_to_use_projectile(const Inventory& inventory, const Projectile& proj);
+Weapon equipped_weapon(const Inventory& inventory);
+Projectile equipped_projectile(const Inventory& inventory);
+Equipment equipped_armour(const Inventory& inventory);
 
 #endif // INVENTORY_H

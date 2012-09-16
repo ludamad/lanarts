@@ -132,4 +132,3 @@ void main_menu(GameState* gs, int width, int height) {
 		lobby_menu(gs, width, height);
 	}
 }
-
