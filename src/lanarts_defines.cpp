@@ -32,6 +32,10 @@ void perf_timer_begin(const char* funcname) {
 	__global_timer.begin(funcname);
 }
 
+void perf_timer_clear() {
+	__global_timer.clear();
+}
+
 void perf_timer_end(const char* funcname) {
 	__global_timer.end(funcname);
 }

@@ -27,6 +27,7 @@ public:
 	void begin(const char* method);
 	void end(const char* method);
 	void print_results();
+	void clear();
 private:
 	typedef std::map<const char*, MethodPerfProfile> MethodPerfProfileMap;
 	std::map<const char*, MethodPerfProfile> perf_map;

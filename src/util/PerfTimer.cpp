@@ -29,9 +29,13 @@ void PerfTimer::print_results() {
 		MethodPerfProfile& mpp = it->second;
 		float total = mpp.total_microseconds / 1000.0f;
 		float avg = total / mpp.total_calls;
-		printf(
-				"%s:\n\tAVG %.4fms\tTOTAL\t %.4fms\tCALLS\t %d\n",
-				it->first, avg, total, mpp.total_calls);
+		printf("%s:\n\tAVG %.4fms\tTOTAL\t %.4fms\tCALLS\t %d\n", it->first,
+				avg, total, mpp.total_calls);
 	}
 	printf("**** END PERFORMANCE STATS ****\n");
 }
+
+void PerfTimer::clear() {
+	perf_map.clear();
+}
+

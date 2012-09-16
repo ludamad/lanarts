@@ -76,6 +76,7 @@ static void game_loop(GameState* gs) {
 	unsigned long step_events = 1;
 
 	GameSettings& settings = gs->game_settings();
+	perf_timer_clear();
 
 	Timer total_timer, step_timer, draw_timer;
 
@@ -178,17 +179,18 @@ int main(int argc, char** argv) {
 
 	//Initialize the game state and start the level
 	//GameState claims ownership of the passed lua_State*
-
 	GameState* gs = new GameState(settings, L, vieww, viewh);
 
 	gs->update_iostate(); //for first iteration
+	int exitcode = main_menu(gs, windoww, windowh);
 
-	main_menu(gs, windoww, windowh);
+	if (exitcode == 0) {
+		gs->start_game();
 
-	gs->start_game();
+		game_loop(gs);
+	}
 
-	game_loop(gs);
-
+	save_settings_data(gs->game_settings(), "saved_settings.yaml");
 	SDL_Quit();
 
 	return 0;

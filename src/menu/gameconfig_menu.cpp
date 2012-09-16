@@ -391,7 +391,7 @@ int class_menu(GameState* gs, int width, int height) {
 
 	for (; exitcode == 0;) {
 		if (!gs->update_iostate()) {
-			exit(0);
+			return +1;
 		}
 		if (conntype != gs->game_settings().conntype) {
 			delete gs->get_level();
@@ -407,6 +407,9 @@ int class_menu(GameState* gs, int width, int height) {
 
 	gs->set_level(oldlevel);
 	gs->view() = prevview;
+	if (exitcode > 0) {
+		return 0;
+	}
 	return exitcode;
 }
 

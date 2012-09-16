@@ -12,9 +12,38 @@
 
 using namespace std;
 
+template<typename T>
+static void save_yaml_attr(fstream& file, const char* key, const T& value) {
+	file << key << ": " << value << '\n';
+}
+
+// Saves certain settings to a file
+void save_settings_data(GameSettings& settings, const char* filename) {
+	fstream file(filename, fstream::out);
+
+	if (file) {
+		file << "# See settings.yaml for details\n";
+		save_yaml_attr(file, "ip", settings.ip);
+		save_yaml_attr(file, "username", settings.username);
+		save_yaml_attr(file, "steps_per_draw", settings.steps_per_draw);
+		save_yaml_attr(file, "time_per_step", settings.time_per_step);
+
+		save_yaml_attr(file, "port", settings.port);
+		save_yaml_attr(file, "regen_level_on_death",
+				settings.regen_on_death ? "yes" : "no");
+		save_yaml_attr(file, "autouse_health_potions",
+				settings.autouse_health_potions ? "yes" : "no");
+		save_yaml_attr(file, "autouse_mana_potions",
+				settings.autouse_mana_potions ? "yes" : "no");
+		const char* connection_strings[] = { "none", "client", "server" };
+		save_yaml_attr(file, "connection_type",
+				connection_strings[settings.conntype]);
+	}
+
+}
 void load_settings_data(GameSettings& settings, const char* filename) {
 
-	fstream file(filename, fstream::in | fstream::binary);
+	fstream file(filename, fstream::in);
 
 	if (file) {
 		try {
@@ -62,7 +91,7 @@ void load_settings_data(GameSettings& settings, const char* filename) {
 					settings.conntype = GameSettings::NONE;
 				} else if (connname == "client") {
 					settings.conntype = GameSettings::CLIENT;
-				} else if (connname == "host") {
+				} else if (connname == "server") {
 					settings.conntype = GameSettings::SERVER;
 				}
 			}

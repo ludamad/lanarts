@@ -3,4 +3,5 @@ logs/*
 replays/*
 CMakeCache.txt
 Makefile
+saved_settings.yaml
 CMakeLists.txt.orig

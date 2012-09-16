@@ -36,11 +36,8 @@ extern "C" {
 
 #include "menus.h"
 
-static void continue_as_loner(GameState* gs, GameInst* _, void* flag) {
+static void start_game(GameState* gs, GameInst* _, void* flag) {
 	*(bool*)flag = true;
-	gs->game_settings().conntype = GameSettings::NONE;
-	gs->game_settings().regen_on_death = true;
-	gs->game_settings().frame_action_repeat = 0;
 }
 
 static void continue_as_loner_save_replay(GameState* gs, GameInst* _,
@@ -58,14 +55,6 @@ static void continue_as_load_replay(GameState* gs, GameInst* _, void* flag) {
 	gs->game_settings().frame_action_repeat = 0;
 }
 
-static void continue_as_client(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
-	gs->game_settings().conntype = GameSettings::CLIENT;
-}
-static void continue_as_server(GameState* gs, GameInst* _, void* flag) {
-	*(bool*)flag = true;
-	gs->game_settings().conntype = GameSettings::SERVER;
-}
 static const char HELP_TEXT[] = "Movement: WASD or Arrow Keys\n"
 		"Switch Targetted Enemy: k\n"
 		"Use Weapon: h \n"
@@ -76,11 +65,9 @@ static const char HELP_TEXT[] = "Movement: WASD or Arrow Keys\n"
 		"Use Stairs: Move onto them without holding other keys\n";
 
 static void setup_mainmenu_buttons(GameState* gs, bool* exit, int x, int y) {
-	ObjCallback single(continue_as_loner, exit);
+	ObjCallback single(start_game, exit);
 	ObjCallback savereplay(continue_as_loner_save_replay, exit);
 	ObjCallback loadreplay(continue_as_load_replay, exit);
-	ObjCallback client(continue_as_client, exit);
-	ObjCallback server(continue_as_server, exit);
 	y += 50;
 	gs->add_instance(new ButtonInst("Start", -1, x, y, single));
 //	gs->add_instance(new ButtonInst("Save Replay", -1, x - 95, y, savereplay));
@@ -91,7 +78,7 @@ static void setup_mainmenu_buttons(GameState* gs, bool* exit, int x, int y) {
 //	y += 50;
 }
 
-void main_menu(GameState* gs, int width, int height) {
+int main_menu(GameState* gs, int width, int height) {
 	setup_menu_again: bool exit = false;
 	int halfw = width / 2;
 
@@ -111,7 +98,7 @@ void main_menu(GameState* gs, int width, int height) {
 
 	for (; !exit && !gs->key_press_state(SDLK_RETURN);) {
 		if (!gs->update_iostate()) {
-			::exit(0);
+			return +1;
 		}
 		gs->get_level()->game_inst_set().step(gs);
 		gs->draw(false);
@@ -125,10 +112,13 @@ void main_menu(GameState* gs, int width, int height) {
 	int exitcode = class_menu(gs, width, height);
 	if (exitcode < 0) {
 		goto setup_menu_again;
+	} else if (exitcode > 0) {
+		return exitcode;
 	}
 	gs->start_connection();
 
 	if (gs->game_settings().conntype == GameSettings::SERVER) {
 		lobby_menu(gs, width, height);
 	}
+	return 0;
 }

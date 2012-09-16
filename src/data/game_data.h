@@ -34,6 +34,7 @@ class LuaValue;
 
 /* Contain information which guides the rest of the data loading */
 void load_settings_data(GameSettings& settings, const char* filename);
+void save_settings_data(GameSettings& settings, const char* filename);
 DataFiles load_datafilenames(const char* filename);
 
 void init_game_data(GameSettings& settings, lua_State* L);
