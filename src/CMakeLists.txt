@@ -81,6 +81,7 @@ set( lanarts_src
 	lanarts_defines.cpp
 	
 	levelgen/areagen.h
+	levelgen/AreaTemplate.h
 	levelgen/enemygen.cpp
 	levelgen/featuregen.cpp
 	levelgen/GeneratedLevel.cpp
@@ -231,6 +232,7 @@ set( lanarts_include
 	interface/sidebar/StoreContent.h
 
 	levelgen/areagen.h
+	levelgen/AreaTemplate.h
 	levelgen/dungeon_data.h
 	levelgen/enemygen.h
 	levelgen/featuregen.h

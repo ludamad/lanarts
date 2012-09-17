@@ -103,6 +103,7 @@ static void game_loop(GameState* gs) {
 		if (gs->key_press_state(SDLK_F6)) {
 			if (gs->player_data().all_players().size() == 1) {
 				load_game_from_file(gs, "savefile.save");
+				gs->update_iostate(true);
 			}
 		}
 

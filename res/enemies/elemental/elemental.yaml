@@ -42,7 +42,7 @@ enemies:
     stats:
         attacks: [ {projectile: Storm Bolt} ]
         movespeed: 2
-        hp: 100
+        hp: 75
         hpregen: 0.05
         strength: 5
         magic: 35
