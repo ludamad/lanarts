@@ -158,9 +158,9 @@ void GameInstSet::serialize(GameState* gs, SerializeBuffer& serializer) {
 			serializer.write_int(get_inst_type(inst));
 			serializer.write_int(inst->id);
 			inst->serialize(gs, serializer);
-			if (gs->game_settings().network_debug_mode) {
+//			if (gs->game_settings().network_debug_mode) {
 				serializer.write_int(inst->integrity_hash());
-			}
+//			}
 			state = state->next_same_depth;
 		}
 	}
@@ -204,10 +204,10 @@ void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
 		} else {
 			safe_deserialize(inst, gs, serializer);
 		}
-		if (gs->game_settings().network_debug_mode) {
+//		if (gs->game_settings().network_debug_mode) {
 			LANARTS_ASSERT(
 					serializer_equals_read(serializer, inst->integrity_hash()));
-		}
+//		}
 	}
 }
 
