@@ -17,11 +17,6 @@ function poison_step(effect, obj)
 	end
 end
 
-function poison_statmod(effect, obj, old, new)
-	new.defence = math.max(0, new.defence - 5)
-	new.willpower = math.max(0, new.willpower - 5)
-end
-
 local function berserk_extension(effect) 
 	if effect.extensions < 1 then
 		return 40

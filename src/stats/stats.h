@@ -33,7 +33,7 @@ struct CoreStats {
 					0) {
 	}
 
-	void step(const CoreStats& effective_stats);
+	void step(const CoreStats& effective_stats, float hp_regen_mod = 1, float mp_regen_mod = 1);
 
 	bool hurt(int dmg);
 	void heal_fully();

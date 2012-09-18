@@ -140,7 +140,7 @@ enemies:
     defeat_message: The glowing chicken recieves a final blow.
     stats:
         attacks: [ {weapon: Fast Melee} ]
-        hp: 50
+        hp: 40
         hpregen: 0.08
         movespeed: 4
         strength: 25

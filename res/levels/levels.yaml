@@ -264,7 +264,7 @@ areas:
           features: { tileset: *all_tilesets}
           items:    { amount: 10,  itemgenlist: Basic Items   }
           enemies:   
-            amount: 25       
+            amount: 22       
             generated: *hard_enemies
       
       #Level 10
@@ -273,15 +273,15 @@ areas:
           features: { tileset: *all_tilesets}
           items:    { amount: 12,  itemgenlist: Basic Items   }
           enemies:   
-            amount: 30       
+            amount: 25       
             generated: *harder_enemies
       #Level 11
       - layout: *large_layouts
         content:
           features: { tileset: *all_tilesets, stairs_down: 0}
           items:    { amount: 14,  itemgenlist: Basic Items   }
-          enemies:          
-            amount: 40
+          enemies: 
+            amount: 30 
             generated:
               - {default: *harder_enemies}
               - {enemy: Zin, guaranteed_spawns: 1}

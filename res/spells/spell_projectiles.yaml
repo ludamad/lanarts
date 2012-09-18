@@ -34,7 +34,7 @@ projectiles:
     spr_attack: poison
     on_hit_func: 
       function(projectile, target, atkstats) 
-        local effect = target:add_effect(effects.Poison.name, 135, atkstats) 
+        local effect = target:add_effect(effects.Poison.name, 200, atkstats) 
         effect.damage = atkstats.damage
         effect.power = atkstats.power
         effect.magic_percentage = atkstats.magic_percentage

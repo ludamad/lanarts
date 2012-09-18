@@ -40,9 +40,9 @@ void CoreStats::heal_hp(float hpgain, int maxhp) {
 		hp = maxhp;
 }
 
-void CoreStats::step(const CoreStats& effective_stats) {
-	heal_hp(hpregen, effective_stats.max_hp);
-	heal_mp(mpregen, effective_stats.max_mp);
+void CoreStats::step(const CoreStats& effective_stats, float hp_regen_mod, float mp_regen_mod) {
+	heal_hp(hpregen * hp_regen_mod, effective_stats.max_hp);
+	heal_mp(mpregen * mp_regen_mod, effective_stats.max_mp);
 }
 
 void CoreStats::heal_mp(float mpgain, int maxmp) {

@@ -42,12 +42,12 @@ enemies:
     xpaward: 25
     stats:
         attacks: [ {weapon: Basic Melee} ]
-        hp: 60
+        hp: 40
         hpregen: 0.05
         movespeed: 2
         strength: 20
-        defence: 5  
-        willpower: 5
+        defence: 8  
+        willpower: 8
       
   - name: Krell
     sprite: franken
