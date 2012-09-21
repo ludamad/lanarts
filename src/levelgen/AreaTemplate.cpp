@@ -5,16 +5,14 @@
  *  They can be rotated randomly or not.
  */
 
+#include <cstdio>
+
 #include "AreaTemplate.h"
+#include "GeneratedLevel.h"
 
-AreaTemplate::AreaTemplate() :
-		_width(0), _height(0) {
-}
-
-void AreaTemplate::initialize(const char* data, int width, int height,
-		const std::vector<Glyph>& glyphs) {
-	_width = width;
-	_height = height;
+AreaTemplate::AreaTemplate(const std::string& name, const char* data, int width,
+		int height, const std::vector<Glyph>& glyphs) :
+		_name(name), _width(width), _height(height) {
 	int len = _width * _height;
 	_data.resize(len, '\0');
 	for (int y = 0; y < height; y++) {
@@ -50,7 +48,7 @@ void generate_area(GeneratedLevel& level, AreaTemplate& area_template,
 	Room room(Region(offset.x, offset.y, w, h), roomid);
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			int ind = w*y + x;
+			int ind = w * y + x;
 			Sqr& sqr = level.at(x + offset.x, y + offset.y);
 			sqr.groupID = roomid;
 			sqr.roomID = roomid;
@@ -65,3 +63,35 @@ void generate_area(GeneratedLevel& level, AreaTemplate& area_template,
 
 	level.rooms().push_back(room);
 }
+
+static std::vector<AreaTemplate*> area_template_data;
+
+areatemplate_id get_area_template_by_name(const char* name) {
+	for (int i = 0; i < area_template_data.size(); i++) {
+		if (name == area_template_data.at(i)->name()) {
+			return i;
+		}
+	}
+	/*Error if resource not found*/
+	fprintf(stderr, "Failed to load resource!\nname: %s, of type %s\n", name,
+			"AreaTemplate");
+	fflush(stderr);
+	LANARTS_ASSERT(false /*resource not found*/);
+	return -1;
+}
+
+AreaTemplate& get_area_template(areatemplate_id id) {
+	return *area_template_data.at(id);
+}
+
+void clear_area_templates() {
+	for (int i = 0; i < area_template_data.size(); i++) {
+		delete area_template_data[i];
+	}
+	area_template_data.clear();
+}
+
+void add_area_template(AreaTemplate* area_template) {
+	area_template_data.push_back(area_template);
+}
+

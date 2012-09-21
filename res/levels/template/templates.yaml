@@ -4,7 +4,6 @@ templates:
   legend:
     - glyph: D
       enemy: Red Dragon
-  width: 36
   # height implicitly defined
   data:
     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

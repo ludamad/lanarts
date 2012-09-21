@@ -179,6 +179,8 @@ typedef int class_id;
 typedef int item_id;
 const item_id NO_ITEM = -1;
 
+typedef int area_id;
+typedef int areatemplate_id;
 typedef int itemgenlist_id;
 typedef int armour_id;
 typedef int effect_id;

@@ -35,9 +35,6 @@ void load_weapon_data(lua_State* L, const FilenameList& filenames,
 /// NEW EQUIPMENT CODE
 
 LuaValue load_spell_data(lua_State* L, const FilenameList& filenames);
-void _load_armour_item_entries();
-void _load_projectile_item_entries();
-void _load_weapon_item_entries();
 
 LuaValue _load_item_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_itemgenlist_data(lua_State* L, const FilenameList& filenames);
@@ -45,6 +42,8 @@ LuaValue load_enemy_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_effect_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_dungeon_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_class_data(lua_State* L, const FilenameList& filenames);
+
+void load_area_template_data(const FilenameList& filenames);
 
 /* Definition of game data */
 
@@ -220,6 +219,7 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 
 	load_itemgenlist_data(L, dfiles.itemgenlist_files);
 	lua_dungeon = load_dungeon_data(L, dfiles.level_files);
+	load_area_template_data(dfiles.level_template_files);
 	lua_dungeon.deinitialize(L);
 	lua_classes = load_class_data(L, dfiles.class_files);
 

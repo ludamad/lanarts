@@ -80,13 +80,14 @@ set( lanarts_src
 	
 	lanarts_defines.cpp
 	
-	levelgen/areagen.h
-	levelgen/AreaTemplate.h
+	levelgen/areagen.cpp
+	levelgen/AreaTemplate.cpp
 	levelgen/enemygen.cpp
 	levelgen/featuregen.cpp
 	levelgen/GeneratedLevel.cpp
 	levelgen/itemgen.cpp
 	levelgen/levelgen.cpp
+	levelgen/loaddata/load_area_template.cpp
 	levelgen/loaddata/load_dungeon_data.cpp
 	levelgen/lua_levelgen_funcs.cpp
 	levelgen/tunnelgen.cpp

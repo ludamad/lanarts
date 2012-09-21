@@ -9,6 +9,7 @@
 #include <vector>
 #include "../lua/LuaValue.h"
 #include "../stats/itemgen_data.h"
+#include "AreaTemplate.h"
 
 #include "../lanarts_defines.h"
 
