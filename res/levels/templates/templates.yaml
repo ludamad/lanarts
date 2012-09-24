@@ -1,33 +1,33 @@
 templates:
-  name: dome
-  rotatable: yes
-  legend:
-    - glyph: D
-      enemy: Red Dragon
-  # height implicitly defined
-  data:
-    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    xx...xxxxxxxxxxxxxxxxxxxxxxxxx...xx
-    x.....xxxxxxxxxx...xxxxxxxxxx.....x
-    x..>..+.......+.....+.......+.....x
-    x.....xxxxxxxxx..D..xxxxxxxxx.....x
-    xx...xxxxx....+.....+....xxxxx...xx
-    xxxxxxx....xxxxx...xxxxx....xxxxxxx
-    xxxxxx..xxxxxxxxxxxxxxxxxxx..xxxxxx
-    xxxxx..xxxxxxxxxx.xxxxxxxxxx..xxxxx
-    xxxxx+xxxxxxxxxx...xxxxxxxxxx+xxxxx
-    xxx...xxxxxxxx.......xxxxxxxx...xxx
-    xx.....xxxxxx.........xxxxxx.....xx
-    xx.....+....+....<....+....+.....xx
-    xx.....xxxxxx.........xxxxxx.....xx
-    xxx...xxxxxxxx.......xxxxxxxx...xxx
-    xxx+x+xxxxxxxxxx...xxxxxxxxxx+x+xxx
-    xxx.x..xxxxxxxxxx-xxxxxxxxxx..x.xxx
-    xxx.xx..xxxxxxxxxxxxxxxxxxx..xx.xxx
-    xxx+xxx....xxxxx...xxxxx....xxx+xxx
-    xx...xxxxx....+.....+....xxxxx...xx
-    x.....xxxxxxxxx.....xxxxxxxxx.....x
-    x.....xxxxxxxxx.....xxxxxxxxx.....x
-    x.....xxxxxxxxxx...xxxxxxxxxx.....x
-    xx...xxxxxxxxxxxxxxxxxxxxxxxxx...xx
-    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  - name: dome
+    rotatable: yes
+    legend:
+      - glyph: D
+        enemy: Red Dragon
+    # height implicitly defined
+    data:
+      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      xx...xxxxxxxxxxxxxxxxxxxxxxxxx...xx
+      x.....xxxxxxxxxx...xxxxxxxxxx.....x
+      x..>..+.......+.....+.......+.....x
+      x.....xxxxxxxxx..D..xxxxxxxxx.....x
+      xx...xxxxx....+.....+....xxxxx...xx
+      xxxxxxx....xxxxx...xxxxx....xxxxxxx
+      xxxxxx..xxxxxxxxxxxxxxxxxxx..xxxxxx
+      xxxxx..xxxxxxxxxx.xxxxxxxxxx..xxxxx
+      xxxxx+xxxxxxxxxx...xxxxxxxxxx+xxxxx
+      xxx...xxxxxxxx.......xxxxxxxx...xxx
+      xx.....xxxxxx.........xxxxxx.....xx
+      xx.....+....+....<....+....+.....xx
+      xx.....xxxxxx.........xxxxxx.....xx
+      xxx...xxxxxxxx.......xxxxxxxx...xxx
+      xxx+x+xxxxxxxxxx...xxxxxxxxxx+x+xxx
+      xxx.x..xxxxxxxxxx-xxxxxxxxxx..x.xxx
+      xxx.xx..xxxxxxxxxxxxxxxxxxx..xx.xxx
+      xxx+xxx....xxxxx...xxxxx....xxx+xxx
+      xx...xxxxx....+.....+....xxxxx...xx
+      x.....xxxxxxxxx.....xxxxxxxxx.....x
+      x.....xxxxxxxxx.....xxxxxxxxx.....x
+      x.....xxxxxxxxxx...xxxxxxxxxx.....x
+      xx...xxxxxxxxxxxxxxxxxxxxxxxxx...xx
+      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

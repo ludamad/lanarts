@@ -38,7 +38,7 @@ DataFiles load_datafilenames(const char* filename) {
 			optional_set(root, "item_files", dfiles.item_files);
 			optional_set(root, "itemgenlist_files", dfiles.itemgenlist_files);
 			optional_set(root, "level_files", dfiles.level_files);
-			optional_set(root, "level_template_files", dfiles.level_files);
+			optional_set(root, "level_template_files", dfiles.level_template_files);
 			optional_set(root, "projectile_files", dfiles.projectile_files);
 			optional_set(root, "spell_files", dfiles.spell_files);
 			optional_set(root, "sprite_files", dfiles.sprite_files);
