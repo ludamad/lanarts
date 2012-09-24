@@ -61,6 +61,7 @@ static void load_area_template_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* _) {
 	std::vector<Glyph> glyphs = load_template_legend(node, "legend");
 	std::string name = parse_str(node["name"]), data = parse_str(node["data"]);
+	printf("Loading template: %s\n", name.c_str());
 	int width = strlinewidth(data);
 	int height = strlineheight(data, width);
 	AreaTemplate* area_template = new AreaTemplate(name, data.c_str(), width,

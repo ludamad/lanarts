@@ -25,6 +25,9 @@ enemy_files:
   - enemies/humanoid/humanoid.yaml
   - enemies/misc/misc.yaml
   - enemies/undead/undead.yaml
+  
+level_template_files:
+  - levels/templates/templates.yaml
 
 item_files: 
   - items/misc/misc.yaml

@@ -218,8 +218,8 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 	lua_enemies = load_enemy_data(L, dfiles.enemy_files);
 
 	load_itemgenlist_data(L, dfiles.itemgenlist_files);
-	lua_dungeon = load_dungeon_data(L, dfiles.level_files);
 	load_area_template_data(dfiles.level_template_files);
+	lua_dungeon = load_dungeon_data(L, dfiles.level_files);
 	lua_dungeon.deinitialize(L);
 	lua_classes = load_class_data(L, dfiles.class_files);
 

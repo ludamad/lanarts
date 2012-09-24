@@ -84,6 +84,7 @@ struct ContentGenSettings {
 };
 
 struct LevelGenSettings {
+	std::vector<areatemplate_id> area_templates;
 	std::vector<LayoutGenSettings> layouts;
 	ContentGenSettings content;
 	LuaValue gen_level_func;

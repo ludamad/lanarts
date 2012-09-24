@@ -129,6 +129,14 @@ LevelGenSettings parse_level_gen(const YAML::Node& n) {
 	} else {
 		level.layouts.push_back(parse_layout_gen(layouts));
 	}
+	if (yaml_has_node(n, "templates")) {
+		const YAML::Node& templates = n["templates"];
+		for (int i = 0; i < templates.size(); i++) {
+			std::string template_name = parse_str(templates[i]);
+			level.area_templates.push_back(
+					get_area_template_by_name(template_name.c_str()));
+		}
+	}
 	level.gen_level_func = LuaValue(
 			parse_defaulted(n, "gen_level_func", std::string()));
 	return level;

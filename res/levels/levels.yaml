@@ -173,12 +173,12 @@ areas:
 
 #tiny levels with animals
       #Test level
-#      - layout: {size: [50,50], rooms: [], tunnels:  { width: 0, per_room: 0} }
-#        template: Dome
-#        content:
-#          features: { tileset: *lair_tilesets }
-#          items:    { amount: 3,  itemgenlist: Basic Items   }
-#          enemies: { wandering: no, amount: 5, generated: *easy_animals }
+      - layout: {size: [50,50], rooms: [], tunnels:  { width: 0, per_room: 0} }
+        templates: [Dome]
+        content:
+          features: { tileset: *lair_tilesets }
+          items:    { amount: 3,  itemgenlist: Basic Items   }
+          enemies: { wandering: no, amount: 5, generated: *easy_animals }
       #Level 0
       - layout: [*tiny_layout1]
         content:
