@@ -10,15 +10,19 @@
 #include "AreaTemplate.h"
 #include "GeneratedLevel.h"
 
-AreaTemplate::AreaTemplate(const std::string& name, const char* data, int width,
+AreaTemplate::AreaTemplate(const std::string& name, const char* data, int data_width, int width,
 		int height, const std::vector<Glyph>& glyphs) :
 		_name(name), _width(width), _height(height) {
+	LANARTS_ASSERT(_width > 0);
+	LANARTS_ASSERT(data_width >= _width);
+	LANARTS_ASSERT(_height > 0);
 	int len = _width * _height;
 	_data.resize(len, '\0');
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
-			int ind = y * width + x;
-			char glyph = data[ind];
+			int ind1 = y * data_width + x;
+			char glyph = data[ind1];
+
 			char result = EMPTY_GLYPH;
 			if (glyph == 'x') {
 				result = WALL_GLYPH;
@@ -31,7 +35,9 @@ AreaTemplate::AreaTemplate(const std::string& name, const char* data, int width,
 			} else if (glyph == '+') {
 				result = DOOR_GLYPH;
 			}
-			_data[ind] = result;
+
+			int ind2 = y * width + x;
+			_data[ind2] = result;
 		}
 	}
 }

@@ -40,8 +40,8 @@ public:
 	enum {
 		EMPTY_GLYPH, WALL_GLYPH, STAIRDOWN_GLYPH, STAIRUP_GLYPH, DOOR_GLYPH
 	};
-	AreaTemplate(const std::string& name, const char* data, int width,
-			int height, const std::vector<Glyph>& glyphs);
+	AreaTemplate(const std::string& name, const char* data, int data_width,
+			int width, int height, const std::vector<Glyph>& glyphs);
 	~AreaTemplate();
 
 	char* data() {
@@ -68,7 +68,7 @@ void generate_area(GeneratedLevel& level, AreaTemplate& area_template,
 		const Pos& offset);
 
 areatemplate_id get_area_template_by_name(const char* name);
-AreaTemplate& get_area_template(const char* name);
+AreaTemplate& get_area_template(areatemplate_id id);
 
 // For use with data loading ONLY:
 void clear_area_templates();

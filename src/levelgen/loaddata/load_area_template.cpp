@@ -41,16 +41,13 @@ static int strlineheight(const std::string& data, int width) {
 	int height = 0;
 	for (int i = 0; i < data.size(); i++) {
 		if (isspace(data[i])) {
-			//TODO: Throw exception that won't be turned off in debug mode
-			printf("%d vs %d\n", chars_since_space, width);
+			//TODO: throw exception that won't be turned off in debug mode
 			LANARTS_ASSERT(chars_since_space == width);
 			chars_since_space = 0;
 			do {
 				i++;
 			} while (isspace(data[i]));
 			height++;
-		} else {
-			i++;
 		}
 		chars_since_space++;
 	}
@@ -61,11 +58,13 @@ static void load_area_template_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* _) {
 	std::vector<Glyph> glyphs = load_template_legend(node, "legend");
 	std::string name = parse_str(node["name"]), data = parse_str(node["data"]);
-	printf("Loading template: %s\n", name.c_str());
 	int width = strlinewidth(data);
 	int height = strlineheight(data, width);
-	AreaTemplate* area_template = new AreaTemplate(name, data.c_str(), width,
-			height, glyphs);
+	printf("w: %d, h:%d\n", width, height);
+	LANARTS_ASSERT(width > 0 && height > 0);
+	int data_width = width + 1;
+	AreaTemplate* area_template = new AreaTemplate(name, data.c_str(),
+			data_width, width, height, glyphs);
 	add_area_template(area_template);
 
 }
