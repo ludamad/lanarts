@@ -154,7 +154,7 @@ GameLevelState* generate_level(int roomid, MTwist& mt, GeneratedLevel& level,
 	printf("level.init at %d RNG calls\n", mt.DEBUG_INFO_amnt_generated);
 	for (int i = 0; i < ls.area_templates.size(); i++) {
 		AreaTemplate& area_template = get_area_template(ls.area_templates[i]);
-		generate_area(level, area_template, Pos(2, 2));
+		generate_area(level, area_template, Pos(2, 2), mt.rand(2), mt.rand(2));
 	}
 	for (int i = 0; i < roomsettings.size(); i++) {
 		generate_rooms(L, roomsettings[i], mt, level);

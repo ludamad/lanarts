@@ -46,7 +46,7 @@ AreaTemplate::~AreaTemplate() {
 }
 
 void generate_area(GeneratedLevel& level, AreaTemplate& area_template,
-		const Pos& offset) {
+		const Pos& offset, bool flipX, bool flipY) {
 	char* data = area_template.data();
 	int w = area_template.width(), h = area_template.height();
 
@@ -55,7 +55,9 @@ void generate_area(GeneratedLevel& level, AreaTemplate& area_template,
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
 			int ind = w * y + x;
-			Sqr& sqr = level.at(x + offset.x, y + offset.y);
+			int sqrx = flipX ? w - x - 1 : x;
+			int sqry = flipY ? h - y - 1 : y;
+			Sqr& sqr = level.at(sqrx + offset.x, sqry + offset.y);
 			sqr.groupID = roomid;
 			sqr.roomID = roomid;
 			if (data[ind] != AreaTemplate::WALL_GLYPH) {

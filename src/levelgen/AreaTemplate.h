@@ -65,7 +65,7 @@ private:
 };
 
 void generate_area(GeneratedLevel& level, AreaTemplate& area_template,
-		const Pos& offset);
+		const Pos& offset, bool flipX = false, bool flipY = false);
 
 areatemplate_id get_area_template_by_name(const char* name);
 AreaTemplate& get_area_template(areatemplate_id id);
