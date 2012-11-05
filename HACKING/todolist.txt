@@ -1,0 +1,137 @@
+Large:
+- Add allied monsters that stay close to their 'owner' and shoot at nearby enemies
+	Details:
+	-May need two pathfinds per monster
+	-More if we support double-sized enemies
+	-Performance hit reasonable
+- Improve room generation with more patterns & room connectivity tests
+- Add tiered level generation with dungeons inline with overworld
+- Add skill system eg Bows, Melee, <schools of magic>
+	- Skill system should provide all stat bonuses
+
+Medium:
+- Refactor code so that GameState -> global data, GameWorld -> per game data, GameLevelState -> per level data
+- Special case pushing for tight corridors ?
+- Straight line AOE spell
+- Lightning Spell that takes up multiple squares
+- Add levels of minimap viewing
+- Add doors (Doors somewhat done) and other dungeon features such as keys, destroyable blocks etc
+- Fix so monsters dont swarm like hell around stairs (complex issue)
+- Keep equipped items in inventory, providing a uniform interface for de-equipping any items
+- Levels take too long to generate
+	- Use BSP scheme
+	- Don't crowd the level with too many room placements
+- Add elemental damage types and mixed elemental type creatures/monsters/attacks
+- Unify all equipment type code paths
+- [FIX ATTEMPTED] Fighters too weak later on - give them lots of equipment only they can wear
+	- can simply require X and X skill for magic items - weak system
+
+Small:
+- Make it so enemies with long ranged cooldowns can still do a quick melee action
+- Fix up menu to not use escape to continue (or do it consistently) and to not display the class select where it does not make sense
+- Have a flexible portal system that indicates which level to connect to
+- Add cooldowns to item use
+- Add cooldowns for each spell individually -and- have them show visually
+- Ensure you do not spawn / use stairs and end up right on a monster
+- Add controls overlay when certain button is pressed, so that the control scheme can be seen
+- Add graphics for each class [DONEISH - Make multiple options]
+- Make mouse jiggling not cause stair case movement
+- Make damage amounts not show off screen
+- Make enemies drop money/items
+	- Would be best if enemies picked up items - but does lead to paranoid behaviour from player
+		- Should probably not pick up any item the player has interacted with - but unrealistic
+- Fix arrows getting stuck in walls
+- Fix monsters getting stuck in corridors -> give more room for RVO2 disabling
+- [MOSTLY FIXED] Monsters too weak as game progresses
+	- give monsters abilities
+	- spawn 'harder' versions of monsters
+		- Dont let chickens & storm clouds spawn on level 9 - player is too strong
+- Add items that give free XP but hurt you/ make you exhausted
+	- Amount depends on dungeon depth
+- Sometimes arrows show underneath blood [CAN'T REPRODUCE ? ADDED ASSERT]
+
+Partial Completion:
+- [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
+- [DONE - IMPROVE VISIBILITY] More visual output on the minimap [Stairs etc]
+- [DONE - NEEDS MORE OPTIONS] Add start up screen with networking options
+- [DONE BUT ALWAYS FIT THROUGH SMALL CORRIDORS, TARGET SIZE BIG ONLY] Support for double-sized enemies (2x2 tile size max)
+
+Completed:
+<18/04/2012:
+- [DONE] Refactor room generation with tiered room, tunnel, feature, item generation.
+- [DONE] Move out of combat
+- [DONE] Melee attack animation 
+- [DONE] versatile markup format that allows for human edit-able game objects (YAML?)
+
+
+>18/04/2012:
+- [DONE] Refactor away all enum's for resources so order no longer matters
+- [DONE] Actions for players & action replay
+- [DONE] Weapons spawn on ground
+- [DONE] Weapons are usable, with graphical validation (unhardcode them)
+- [MOSTLY DONE] Enemies fan out & walk away from player, some edge cases have it turn off
+
+23/04/2012:
+- [DONE WITH BUGS/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization
+- [DONE]Fix random appearance of offscreen tiles -> GameTiles may be the culprit
+- [DONE] Fix items on border of view not being visible -> subtract away from player and check visibility??
+- [DONE] Put tile-set information in the YAML files for level generation
+- [DONE] Add dropping of objects & dont always autopickup
+
+30/04/2012:
+- [DONE] Add LUA integration for specification of actions, make sure all data remains in YAML files
+
+
+03/05/2012:
+- [DONE] Broadcast RNG seed & class information
+- [DONE] Add a resting animation
+- [DONE] Fix melee attacks -> add to action bar and make them not based on running into enemies, instead holding j/mouse
+
+
+17/05/2012:
+- [DONE] Specify a draw order (or draw & execution order) for objects based on a depth parameter & object id
+- [DONE] Support for multiple PlayerInst (Maybe re-use PlayerInst for summoned monsters ?)
+
+
+<14/06/2012:
+- [DONE] Unification of code-path's for PlayerInst/EnemyInst ?
+- [DONE - SHOULD BE FIXED] Fix monsters getting stuck due to random movement 
+- [IMPROVED - STILL HARDCODED] Action bar, below screen 
+- [DONE] Add item use preconditions so items are not wasted when they cannot be used
+- [DONE] Make game based on Strength/Defence/Agility and Magic/Resistance
+	- [WONTDO] add attack rate to base stats -> agility
+- [DONE] Add keyboard based blink that moves to furthest point
+ 
+<08/07/2012:
+- [DONE] Add in-game chat support for multiplayer
+- [DONE] Add higher level sprite class that handles animation & orientation & multiple tile variations
+- [DONE ENOUGH] Add float coordinate buffering (or make ->x and ->y floats) for all GameInst objects
+- [DONE] Add stat defence multipliers to enemy attacks, maybe create attack types
+- [DONE/LACKS SOPHISTICATION] Networked play over LAN with action-based synchronization (fixed synch bugs)
+- [DONE] More complete & functional sidebar interface, with tabs
+
+< 22/07/2012:
+- [DONE] Make spells not hardcoded
+- [DONE] Action bar, below screen (was hardcoded)
+
+< 01/08/2012:
+- [DONE] Add class choice options for main menu
+
+< 09/08/2012
+- [DONE] Make haste scrolls not show up as often, fix shop contents to be more varied, add more items
+- [DONE] Working config tab in side bar
+
+< 21/08/2012
+- [FIXED] Tunnel gen synching error seen again 
+- [DONE] Make Zin stronger!	
+
+< 24/08/2012
+- [COULD NOT REPRODUCE] Arrows/ranged weapons dont obey target - they hit closest enemy only
+
+< 29/08/2012
+- [DONE] Versatile save format that allows for resuming a networked game 
+
+< 06/09/2012
+- [DONE] Classes for players ("Done" in the sense that when I first formulated this it was no where near done)
+- [DONE FOR MOST] Make all ranged enemies have a short range melee option for close kiters
+- [FIXED] You can only buy items by clicking on top 32x32 area

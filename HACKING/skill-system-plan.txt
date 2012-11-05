@@ -1,0 +1,77 @@
+physical/elemental/hex damage
+
+Weapons can do any type of damage.
+Each has sub-schools.
+
+
+
+Hex damage is eg a curse
+
+physical:
+	- crushing/piercing etc ??
+hex:
+	- curses
+	- 
+elemental:
+	- force: irresistable
+	- ice/air/fire/earth subschools
+	
+superskills:
+melee:
+ranged:
+	bows
+	projectiles
+magic:
+
+
+scrap this ...
+
+fighting: <- provides HP, generic fighting improvements
+	- defence 
+	- melee
+	- ranged
+spellcasting: <- provides MP, generic spellcasting improvements
+	- enchantment
+	- conjurations
+elementalism: <- provides generic element resistance
+	- fire
+	- ice
+religion: <- improves god abilities? generic rebuking
+	- holy 
+	- dark
+	
+Ice elementalist profile:
+
+fighting low
+
+spellcasting high as possible
+	all rest min...
+elementalism high <- could make it an inferred stat. 
+	all rest min -> overlap. if theres only two options, the generic skill is redundant.
+
+generic skill experience = [lowest skill xp] * [number of skills]
+
+elementalism: 10
+	- fire: 8
+	- ice: 12
+
+religion low
+
+Ice elementalist profile:
+fighting low
+spellcasting maxed -> min improvement
+
+improving a generic skill -> balances existing skills
+	-> convenient way to play a 'simpler' game
+Care must be taken -> generalists get a free skill, specialists cant ignore bottom line
+
+take 2:
+
+generic skill = (weighted) average skill level
+bias generic skills so relatively high skill levels mean more -> but only allow generic == highest for all same stat
+This allows a reasonable specialization, while occasionally makes dumping skills to become more generic useful.
+Generally it should be geared so a certain skill can reasonably be left at 0. 
+Specializing should be very powerful, but give you less 'oomph' from higher level abilities that use many skills at once.
+Allows things to rely directly on the generic skill. A fighter shouldn't worry too much about specializing in a religious pursuit.
+
+Eg: Magic flaming holy sword -> takes spellcasting/fire/holy skills into account

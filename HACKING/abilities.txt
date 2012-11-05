@@ -1,0 +1,24 @@
+Abilities need to show on the action bar - these need to be both passive & active 
+
+Maybe divide up the action bar as such:
+
+Constant use | Buffs | Passive
+
+Should passive abilities be defined as spells ?
+
+This seems to be in the domain of effects.
+
+Items & spells & effects might benefit from a merger.
+
+Effects -> equipment without an equipment slot
+
+lua components:
+	Prereq func, Use func.
+
+
+Extra stats:
+- Ranged cooldown mult
+- Spell cooldown mult
+^ Essentially, stats need a attackmod function.
+	^ Don't make the mistake of adding this to C++. Monsters don't need ranged/spell buffs.
+	Do as much as possible in lua.
