@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lua)
 
 set( lua_src
