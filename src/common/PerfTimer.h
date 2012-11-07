@@ -33,4 +33,10 @@ private:
 	std::map<const char*, MethodPerfProfile> perf_map;
 };
 
+
+void perf_timer_begin(const char* funcname);
+void perf_timer_end(const char* funcname);
+void perf_timer_clear();
+void perf_print_results();
+
 #endif /* PERFTIMER_H_ */
