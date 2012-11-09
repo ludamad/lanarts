@@ -1,4 +1,3 @@
-#include "util/PerfTimer.h"
 #include "lanarts_defines.h"
 
 Colour Colour::mute_colour(float val) const {
@@ -24,23 +23,5 @@ Colour Colour::mult_alpha(float alpha) const {
 Colour Colour::multiply(const Colour & o) const {
 	return Colour(r * (o.r + 1) / 256, g * (o.g + 1) / 256, b * (o.b + 1) / 256,
 			a * (o.a + 1) / 256);
-}
-
-static PerfTimer __global_timer;
-
-void perf_timer_begin(const char* funcname) {
-	__global_timer.begin(funcname);
-}
-
-void perf_timer_clear() {
-	__global_timer.clear();
-}
-
-void perf_timer_end(const char* funcname) {
-	__global_timer.end(funcname);
-}
-
-void perf_print_results() {
-	__global_timer.print_results();
 }
 

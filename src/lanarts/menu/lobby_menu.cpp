@@ -15,6 +15,8 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
+#include <common/Timer.h>
+
 #include "../data/game_data.h"
 
 #include "../display/colour_constants.h"
@@ -31,8 +33,6 @@ extern "C" {
 #include "../objects/enemy/EnemyInst.h"
 #include "../objects/player/PlayerInst.h"
 #include "../objects/AnimatedInst.h"
-
-#include "../util/Timer.h"
 
 #include "menus.h"
 

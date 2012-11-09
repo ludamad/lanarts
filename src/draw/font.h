@@ -1,5 +1,5 @@
-#ifndef FONT_DATA_H_
-#define FONT_DATA_H_
+#ifndef FONT_H_
+#define FONT_H_
 
 #include <cstring>
 #include <GL/glu.h>
@@ -12,14 +12,14 @@
 /*Stores everything needed to render a character glyph in opengl */
 struct char_data {
 	int imgoffset;
-	int w,h;
+	int w, h;
 	int advance;
 	int left;
 	int move_up;
-	unsigned char * data;
+	unsigned char* data;
 	float tx1, tx2, ty1, ty2;
 
-	char_data(){
+	char_data() {
 		memset(this, 0, sizeof(char_data));
 	}
 	void init(char ch, FT_Face face);
@@ -30,7 +30,7 @@ struct char_data {
 struct font_data {
 	GLImage font_img;
 	char_data data[128];
-	float h;//Height of the font
+	float h; //Height of the font
 	font_data() {
 		h = 0;
 	}
@@ -40,5 +40,4 @@ struct font_data {
 void init_font(font_data* fd, const char * fname, unsigned int h);
 void release_font(font_data* fd);
 
-
-#endif /* FONT_DATA_H_ */
+#endif /* FONT_H_ */

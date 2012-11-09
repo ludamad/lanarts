@@ -3,8 +3,9 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
+#include <common/unittest.h>
+
 #include "../lua/LuaValue.h"
-#include "tests.h"
 
 
 void lua_serialize_tests(lua_State* L);

@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 
+#include <common/unittest.h>
+
 #include <net/lanarts_net.h>
 
 #include "../../data/game_data.h"
@@ -13,7 +15,6 @@
 #include "../../stats/EquipmentStats.h"
 #include "../../stats/Inventory.h"
 #include "../../stats/combat_stats.h"
-#include "../tests.h"
 
 static void assert_equal(DerivedStats& d1, DerivedStats& d2) {
 	UNIT_TEST_ASSERT(d1.damage == d2.damage);
@@ -42,9 +43,9 @@ static void assert_equal(Inventory& i1, Inventory& i2) {
 }
 
 static void assert_equal(EquipmentStats& e1, EquipmentStats& e2) {
-	UNIT_TEST_ASSERT(e1.weapon_slot() == e2.weapon_slot());
-	UNIT_TEST_ASSERT(e1.armour_slot() == e2.armour_slot());
-	UNIT_TEST_ASSERT(e1.projectile_slot() ==  e2.projectile_slot());
+	UNIT_TEST_ASSERT(e1.weapon() == e2.weapon());
+	UNIT_TEST_ASSERT(e1.armour() == e2.armour());
+	UNIT_TEST_ASSERT(e1.projectile() ==  e2.projectile());
 	assert_equal(e1.inventory, e2.inventory);
 }
 

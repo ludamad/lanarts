@@ -12,7 +12,7 @@
 #include <stdexcept>
 
 #include "opengl/GLImage.h"
-#include "font_data.h"
+#include "font.h"
 
 void char_data::init(char ch, FT_Face face) {
 	// Load The Glyph For Our Character.

@@ -8,11 +8,11 @@
 
 #include <string>
 
+#include <common/Timer.h>
+
 #include "../objects/GameInst.h"
 
 #include "../util/callback_util.h"
-
-#include "../util/Timer.h"
 
 #include "TextField.h"
 

@@ -6,10 +6,9 @@
 #include <common/lcommon_defines.h>
 #include <common/math.h>
 
-#include <SDL.h>
 #include <SDL_opengl.h>
 
-//Surpress some multiple defintion warnings:
+//Surpress some multiple definition warnings:
 #undef GL_GLEXT_VERSION
 #include <SDL_image.h>
 #include <GL/glu.h>

@@ -11,6 +11,9 @@ extern "C" {
 #include <lua/lua.h>
 #include <lua/lauxlib.h>
 }
+
+#include <common/Timer.h>
+
 #include "data/game_data.h"
 
 #include "display/display.h"
@@ -26,8 +29,6 @@ extern "C" {
 #include "objects/AnimatedInst.h"
 
 #include "tests/tests.h"
-
-#include "util/Timer.h"
 
 #include "menu/menus.h"
 
@@ -168,7 +169,7 @@ static void game_loop(GameState* gs) {
 }
 
 int main(int argc, char** argv) {
-//	run_unit_tests();
+	run_unit_tests();
 
 	lua_State* L = lua_open();
 

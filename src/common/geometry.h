@@ -15,6 +15,12 @@ struct Dim {
 			w(w), h(h) {
 		LCOMMON_ASSERT(w >= 0 && h >= 0);
 	}
+	bool operator==(const Dim& o) const {
+		return o.w == w && o.h == h;
+	}
+	bool operator!=(const Dim& o) const {
+		return !(*this == o);
+	}
 };
 
 /*Represents an integer x,y pair position*/
@@ -25,6 +31,9 @@ struct Pos {
 	}
 	bool operator==(const Pos& o) const {
 		return o.x == x && o.y == y;
+	}
+	bool operator!=(const Pos& o) const {
+		return !(*this == o);
 	}
 	Pos(int x, int y) :
 			x(x), y(y) {
@@ -57,7 +66,9 @@ struct BBox {
 	bool operator==(const BBox& bbox) const {
 		return x1 == bbox.x1 && y1 == bbox.y1 && x2 == bbox.x2 && y2 == bbox.y2;
 	}
-
+	bool operator!=(const BBox& o) const {
+		return !(*this == o);
+	}
 	int width() const {
 		return x2 - x1;
 	}
@@ -107,6 +118,13 @@ struct Posf {
 	Posf(const Pos& pos) :
 			x(pos.x), y(pos.y) {
 	}
+
+	bool operator==(const Posf& o) const {
+		return o.x == x && o.y == y;
+	}
+	bool operator!=(const Posf& o) const {
+		return !(*this == o);
+	}
 };
 
 /*Represents a width & heigh, with floats t*/
@@ -119,6 +137,12 @@ struct DimF {
 	DimF(const Dim& dim) :
 			w(dim.w), h(dim.h) {
 		LCOMMON_ASSERT(w >= 0 && h >= 0);
+	}
+	bool operator==(const Dim& o) const {
+		return o.w == w && o.h == h;
+	}
+	bool operator!=(const Dim& o) const {
+		return !(*this == o);
 	}
 };
 
@@ -135,6 +159,9 @@ struct BBoxF {
 	}
 	bool operator==(const BBoxF& bbox) const {
 		return x1 == bbox.x1 && y1 == bbox.y1 && x2 == bbox.x2 && y2 == bbox.y2;
+	}
+	bool operator!=(const BBoxF& o) const {
+		return !(*this == o);
 	}
 	bool contains(float x, float y) const {
 		return x >= x1 && x < x2 && y >= y1 && y < y2;

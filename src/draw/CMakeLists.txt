@@ -10,11 +10,15 @@ FIND_PACKAGE(SDL_net REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
+set( SRC ../)
+set( LIBS ../../libs)
+
 include_directories(
 	${SDL_INCLUDE_DIR} 
 	${OpenGL_INCLUDE_DIRS} 		
 	${FREETYPE_INCLUDE_DIRS} 
-	../ #/common 
+	${SRC} #/common 
+	${LIBS} #/lua and /slb 
 )
 
 set( ldraw_examples
@@ -22,8 +26,8 @@ set( ldraw_examples
 )
 
 set( ldraw_src
-  font_data.h
-  font_data.cpp
+  font.h
+  font.cpp
 
   DrawOptions.h
   DrawOptions.cpp

@@ -181,8 +181,6 @@ set( lanarts_src
 	util/game_replays.cpp
 	util/math_util.cpp
 	util/mtwist.cpp
-	util/PerfTimer.cpp
-	util/Timer.cpp
 	
 	main.cpp
 )
@@ -320,8 +318,6 @@ set( lanarts_include
 	util/game_replays.h
 	util/math_util.h
 	util/mtwist.h
-	util/PerfTimer.h
-	util/Timer.h
 )
 
 add_executable( lanarts
@@ -335,6 +331,7 @@ target_link_libraries( lanarts
 			yaml-cpp
 			RVO
 			lua
+			lcommon
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}
 			${SDLIMAGE_LIBRARY}

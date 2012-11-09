@@ -6,7 +6,7 @@
 
 #include <net/lanarts_net.h>
 
-#include "../tests.h"
+#include <common/unittest.h>
 
 const int TEST_PORT = 6112;
 static int callback_calls;

@@ -10,7 +10,7 @@
 #include <string>
 #include <SDL.h>
 
-#include "../util/Timer.h"
+#include <common/Timer.h>
 
 class GameState;
 
