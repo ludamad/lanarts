@@ -13,6 +13,9 @@ struct Colour {
 	bool operator==(const Colour& col) const {
 		return r == col.r && g == col.g && b == col.b && a == col.a;
 	}
+	bool operator!=(const Colour& col) const {
+		return !(*this == col);
+	}
 	Colour with_alpha(int alpha) const;
 	Colour scale(float val) const;
 

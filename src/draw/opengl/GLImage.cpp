@@ -210,7 +210,10 @@ void GLImage::draw(const ldraw::DrawOptions& options, const Posf& pos) {
 	if (draw_region.empty()) {
 		return;
 	}
-	gl_draw_image(texture, options.draw_colour,
+	gl_draw_image(
+			texture,
+			options.draw_colour,
 			draw_region.scaled(texw / width, texh / height),
-			draw_region.translated(pos));
+			adjusted_for_origin(draw_region.translated(pos),
+					options.draw_origin));
 }

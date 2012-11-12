@@ -1,6 +1,8 @@
 cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lcommon)
 
+set(CMAKE_BUILD_TYPE MinSizeRel)
+
 FIND_PACKAGE(SDL REQUIRED)
 
 set( SRC ../)
@@ -13,9 +15,6 @@ include_directories(${SDL_INCLUDE_DIR}
 
 set( lcommon_src
 	geometry.h
-	lua_geometry.h
-	lua_numarray.h
-	lua_geometry.cpp
 	lcommon_defines.h
 	math.cpp
 	math.h
@@ -27,26 +26,42 @@ set( lcommon_src
 	Timer.h
 	unittest.cpp
 	unittest.h
+	
+	lua/lua_geometry.h
+	lua/lua_lcommon.h
+	lua/lua_lcommon.cpp
+    lua/lua_range.h
+    lua/lua_timer.cpp
+    lua/lua_timer.h
+    lua/lua_unittest.cpp
+    lua/lua_unittest.h
+    lua/lua_vector.h
+    lua/slb_funcproperty.h
+    lua/slb_mutabletable.h
+    lua/slb_valuetype.h
+	
 )
 
-#add_library( lcommon
-#             ${lcommon_src} )
+add_library( lcommon
+             ${lcommon_src} )
 
 set( lcommon_tests
-	tests/lua_tests.cpp
-	tests/tests.cpp
-	tests/tests.h
+	tests/lcommon_tests.cpp
+	tests/lcommon_tests.h
+	tests/lua_geometry_tests.cpp
+	tests/lua_range_tests.cpp
+	tests/lua_vector_tests.cpp
 )
 
-add_executable( lcommon
+add_executable( lcommon_tests
              ${lcommon_src}
              ${lcommon_tests}
               )
 
 target_link_libraries( 
-			lcommon			
-			"/home/adomurad/lanarts-git/lanarts_build/libs/lua/liblua.a"
+			lcommon_tests
 			"/home/adomurad/lanarts-git/lanarts_build/libs/slb/libslb.a"
+			"/home/adomurad/lanarts-git/lanarts_build/libs/lua/liblua.a"
 			#lua
 			#slb
 )

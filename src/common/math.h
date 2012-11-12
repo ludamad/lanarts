@@ -3,9 +3,9 @@
  *  Math utility functions
  */
 
-#ifndef MATH_H_
-#define MATH_H_
+#ifndef LCOMMON_MATH_H_
+#define LCOMMON_MATH_H_
 
 int power_of_two(int input);
 
-#endif /* MATH_H_ */
+#endif /* LCOMMON_MATH_H_ */

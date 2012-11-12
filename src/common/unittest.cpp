@@ -1,6 +1,7 @@
 #include "unittest.h"
 #include <cstdio>
 #include <stdexcept>
+#include <cassert>
 
 struct Failure {
 	std::string msg;
@@ -28,11 +29,11 @@ bool unit_test(unit_test_function func, const char* fname) {
 		printf("Test %s passed.\n", fname);
 		return true;
 	} catch (const Failure& f) {
-		fprintf(stderr, "Failure in test %s:\n\t%s\n", fname, f.msg.c_str());
+		fprintf(stderr, "Failure in test %s:\n%s\n", fname, f.msg.c_str());
 	} catch (const std::exception& e) {
-		fprintf(stderr, "Exception in test %s:\n\t%s\n", fname, e.what());
+		fprintf(stderr, "Exception in test %s:\n%s\n", fname, e.what());
 	} catch (...) {
-		fprintf(stderr, "Exception in test %s:\n\tUnknown exception type\n",
+		fprintf(stderr, "Exception in test %s:\nUnknown exception type\n",
 				fname);
 	}
 	unit_test_failures++;

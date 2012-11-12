@@ -3,8 +3,8 @@
  *  Represents a range
  */
 
-#ifndef RANGE_H_
-#define RANGE_H_
+#ifndef LCOMMON_RANGE_H_
+#define LCOMMON_RANGE_H_
 
 #include "lcommon_defines.h"
 
@@ -14,6 +14,12 @@ struct Range {
 	explicit Range(int min = 0, int max = 0) :
 			min(min), max(max) {
 		LCOMMON_ASSERT(min <= max);
+	}
+	bool operator==(const Range& r) const {
+		return min == r.min && max == r.max;
+	}
+	bool operator!=(const Range& r) const {
+		return !(*this == r);
 	}
 	Range multiply(int n) const {
 		return Range(min * n, max * n);
@@ -28,6 +34,13 @@ struct RangeF {
 		LCOMMON_ASSERT(min <= max);
 	}
 
+	bool operator==(const RangeF& r) const {
+		return min == r.min && max == r.max;
+	}
+	bool operator!=(const RangeF& r) const {
+		return !(*this == r);
+	}
+
 	explicit RangeF(const Range& r) :
 			min(r.min), max(r.max) {
 		LCOMMON_ASSERT(min <= max);
@@ -37,4 +50,4 @@ struct RangeF {
 	}
 };
 
-#endif /* RANGE_H_ */
+#endif /* LCOMMON_RANGE_H_ */

@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 2.6 )
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE MinSizeRel)
 
 PROJECT(project_ldraw)
 
@@ -18,7 +18,8 @@ include_directories(
 	${OpenGL_INCLUDE_DIRS} 		
 	${FREETYPE_INCLUDE_DIRS} 
 	${SRC} #/common 
-	${LIBS} #/lua and /slb 
+	${LIBS} #/lua 
+	${LIBS}/slb/include
 )
 
 set( ldraw_examples
@@ -26,8 +27,8 @@ set( ldraw_examples
 )
 
 set( ldraw_src
-  font.h
-  font.cpp
+  Font.h
+  Font.cpp
 
   DrawOptions.h
   DrawOptions.cpp
@@ -48,14 +49,47 @@ set( ldraw_src
 
   Image.h
   Image.cpp
+  
+  ldraw_assert.h
+  
+  lua/lua_colour.h
+  lua/lua_image.h
+  lua/lua_ldraw.h
+  lua/lua_ldraw.cpp
+  lua/lua_drawoptions.h
+  lua/lua_drawoptions.cpp
+  lua/lua_image.h
+  lua/lua_image.cpp
+)
+
+set( ldraw_tests
+  tests/lua_colour_tests.cpp
+  tests/lua_image_tests.cpp
+  tests/ldraw_tests.cpp
+  tests/ldraw_tests.h
 )
 
 #add_library( ldraw
 #             ${ldraw_src} )
 add_executable( ldraw_ex ${ldraw_src} ${ldraw_examples} )
 
+
 target_link_libraries( ldraw_ex
-			/home/adomurad/eclipsecommon/liblcommon.a
+			"/home/adomurad/lanarts-git/lanarts_build/src/common/liblcommon.a"
+			"/home/adomurad/lanarts-git/lanarts_build/libs/slb/libslb.a"
+			"/home/adomurad/lanarts-git/lanarts_build/libs/lua/liblua.a"
+			${OPENGL_gl_LIBRARY}
+			${SDL_LIBRARY}
+			${SDLIMAGE_LIBRARY}
+			${SDLMAIN_LIBRARY}
+			${FREETYPE_LIBRARIES}
+			)
+
+add_executable( ldraw_tests ${ldraw_src} ${ldraw_tests} )
+target_link_libraries( ldraw_tests
+			"/home/adomurad/lanarts-git/lanarts_build/src/common/liblcommon.a"
+			"/home/adomurad/lanarts-git/lanarts_build/libs/slb/libslb.a"
+			"/home/adomurad/lanarts-git/lanarts_build/libs/lua/liblua.a"
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}
 			${SDLIMAGE_LIBRARY}

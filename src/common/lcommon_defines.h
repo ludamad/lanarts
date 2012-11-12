@@ -1,5 +1,5 @@
 /* lcommon_defines.h:
- *  Defines simple structures that are used throughout the lanarts components
+ *  Defines simple macros that are used throughout the code
  */
 
 #ifndef LCOMMON_DEFINES_H_
@@ -8,11 +8,6 @@
 #include <cassert>
 #include <cstdlib>
 
-// If this file is not included there may be issues with Microsoft's compiler
-#ifdef _MSC_VER
-#define snprintf _snprintf
-#define round(x) floor((x)+0.5f)
-#endif
 
 // The preferred assert statement to use, for ease of re-implementation
 #define LCOMMON_ASSERT(x) assert(x)

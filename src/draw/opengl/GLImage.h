@@ -19,6 +19,14 @@ struct GLImage {
 	GLImage() {
 		texture = 0;
 	}
+	GLImage(const std::string& filename) {
+		texture = 0;
+		initialize(filename);
+	}
+	GLImage(const Dim& size, int type = GL_BGRA) {
+		texture = 0;
+		initialize(size, type);
+	}
 	~GLImage();
 
 	void initialize(const std::string& filename);

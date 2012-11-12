@@ -1,4 +1,6 @@
 /*
+ * A pointer adapted from yasper, original license follows:
+ *
  * yasper - A non-intrusive reference counted pointer.
  *	    Version: 1.04
  *
@@ -43,19 +45,29 @@ struct NullPointerException: public std::exception {
 	}
 
 	const char* what() const throw () {
-		return "Attempted to dereference null smart pointer";
+		return "Attempted to dereference null smartptr";
 	}
 };
 
-struct Counter {
-	Counter(unsigned c = 1) :
-			count(c) {
-	}
-	unsigned count;
-};
-
+/* A smart pointer adapted from yasper that allows for definition on incomplete types */
 template<typename X>
 class smartptr {
+private:
+	// Keep function around for deletion purposes so that we can work on incomplete types
+	typedef void (*delete_function_ptr)(void* ptr);
+	template<typename T>
+	static void delete_function(void* ptr) {
+		delete (T*)ptr;
+	}
+
+	struct RefHandler {
+		RefHandler(delete_function_ptr deleter) :
+				deleter(deleter), count(1) {
+		}
+		delete_function_ptr deleter;
+		unsigned count;
+
+	};
 
 public:
 	typedef X element_type;
@@ -70,32 +82,32 @@ public:
 	 - don't create Counter
 	 */
 	smartptr() :
-			rawPtr(0), counter(0) {
+			rawPtr(0), refhandler(0) {
 	}
 
 	/*
 	 Construct from a raw pointer
 	 */
-	smartptr(X* raw, Counter* c = 0) :
-			rawPtr(0), counter(0) {
+	smartptr(X* raw, RefHandler* c = 0) :
+			rawPtr(0), refhandler(0) {
 		if (raw) {
 			rawPtr = raw;
 			if (c)
 				acquire(c);
 			else
-				counter = new Counter;
+				refhandler = new RefHandler(delete_function<X>);
 		}
 	}
 
 	template<typename Y>
-	explicit smartptr(Y* raw, Counter* c = 0) :
-			rawPtr(0), counter(0) {
+	explicit smartptr(Y* raw, RefHandler* c = 0) :
+			rawPtr(0), refhandler(0) {
 		if (raw) {
 			rawPtr = static_cast<X*>(raw);
 			if (c)
 				acquire(c);
 			else
-				counter = new Counter;
+				refhandler = new RefHandler(delete_function<X>);
 		}
 	}
 
@@ -103,13 +115,13 @@ public:
 	 Copy constructor
 	 */
 	smartptr(const smartptr<X>& otherPtr) {
-		acquire(otherPtr.counter);
+		acquire(otherPtr.refhandler);
 		rawPtr = otherPtr.rawPtr;
 	}
 
 	template<typename Y>
 	explicit smartptr(const smartptr<Y>& otherPtr) :
-			rawPtr(0), counter(0) {
+			rawPtr(0), refhandler(0) {
 		acquire(otherPtr.counter);
 		rawPtr = static_cast<X*>(otherPtr.get());
 	}
@@ -128,7 +140,7 @@ public:
 	smartptr& operator=(const smartptr<X>& otherPtr) {
 		if (this != &otherPtr) {
 			release();
-			acquire(otherPtr.counter);
+			acquire(otherPtr.refhandler);
 			rawPtr = otherPtr.rawPtr;
 		}
 		return *this;
@@ -155,7 +167,7 @@ public:
 
 		if (raw) {
 			release();
-			counter = new Counter;
+			refhandler = new RefHandler(delete_function<X>);
 			rawPtr = raw;
 		}
 		return *this;
@@ -165,7 +177,7 @@ public:
 	smartptr& operator=(Y* raw) {
 		if (raw) {
 			release();
-			counter = new Counter;
+			refhandler = new RefHandler(delete_function<X>);
 			rawPtr = static_cast<X*>(raw);
 		}
 		return *this;
@@ -187,7 +199,7 @@ public:
 		else //assign raw pointer by conversion
 		{
 			release();
-			counter = new Counter;
+			refhandler = new RefHandler(delete_function<X>);
 			rawPtr = reinterpret_cast<X*>(num);
 		}
 
@@ -220,7 +232,7 @@ public:
 	operator smartptr<Y>() {
 		//new ptr must also take our counter or else the reference counts
 		//will go out of sync
-		return smartptr<Y>(rawPtr, counter);
+		return smartptr<Y>(rawPtr, refhandler);
 	}
 
 	/*
@@ -237,31 +249,30 @@ public:
 	 Is there only one reference on the counter?
 	 */
 	bool is_unique() const {
-		if (counter && counter->count == 1)
+		if (refhandler && refhandler->count == 1)
 			return true;
 		return false;
 	}
 
 	bool is_valid() const {
-		if (counter && rawPtr)
+		if (refhandler && rawPtr)
 			return true;
 		return false;
 	}
 
-	unsigned GetCount() const {
-		if (counter)
-			return counter->count;
+	unsigned get_count() const {
+		if (refhandler)
+			return refhandler->count;
 		return 0;
 	}
 
 private:
 	X* rawPtr;
-
-	Counter* counter;
+	RefHandler* refhandler;
 
 	// increment the count
-	void acquire(Counter* c) {
-		counter = c;
+	void acquire(RefHandler* c) {
+		refhandler = c;
 		if (c) {
 			(c->count)++;
 		}
@@ -269,15 +280,15 @@ private:
 
 	// decrement the count, delete if it is 0
 	void release() {
-		if (counter) {
-			(counter->count)--;
+		if (refhandler) {
+			(refhandler->count)--;
 
-			if (counter->count == 0) {
-				delete counter;
-				delete rawPtr;
+			if (refhandler->count == 0) {
+				refhandler->deleter(rawPtr);
+				delete refhandler;
 			}
 		}
-		counter = 0;
+		refhandler = 0;
 		rawPtr = 0;
 
 	}

@@ -8,10 +8,10 @@
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in
   all copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -19,7 +19,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
-  
+
   Jose L. Hidalgo (www.pplux.com)
   pplux@pplux.com
 */
@@ -83,7 +83,7 @@ namespace SLB {
 
     /** Copy from one lua_State to another:
       - for basic types it will make a basic copy
-      - returns true if copy was made, otherwise returns false. 
+      - returns true if copy was made, otherwise returns false.
       - doesn't touch the original element
 
       ** WARNING **
@@ -135,11 +135,11 @@ namespace SLB {
     static Manager *_default;
     friend class ClassInfo;
   };
-  
+
   //--------------------------------------------------------------------
   // Inline implementations:
   //--------------------------------------------------------------------
-  
+
   template<class D, class B>
   struct ClassConversor
   {
@@ -149,7 +149,7 @@ namespace SLB {
       B* base = derived;
       return (void*) base;
     }
-    
+
     static void* convertToDerived(void *raw_b)
     {
       B* base = reinterpret_cast<B*>(raw_b);
@@ -168,7 +168,7 @@ namespace SLB {
     {
       return &static_cast<B>(*ptr);
     }
-    
+
   };
 
   template<class D, class B>
@@ -200,7 +200,7 @@ namespace SLB {
     if (C1 == C2)
     {
       SLB_DEBUG(11, "same class");
-      return obj; 
+      return obj;
     }
 
     ConversionsMap::iterator i = _conversions.find( ConversionsMap::key_type(C1,C2) );
@@ -211,7 +211,7 @@ namespace SLB {
     }
 
     //The _conversions map only hold direct conversions added via .inherits<> or .static_inherits<>.
-    // recursiveConvert can extract implied conversions from the _conversions table (but much less 
+    // recursiveConvert can extract implied conversions from the _conversions table (but much less
     // efficiently than a direct conversion).  For example if a direct conversion from Animal to Dog
     // exists and a conversion from Dog to Poodle exists, then recursiveConvert can convert an
     // Animal to a Poodle.

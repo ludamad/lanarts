@@ -52,7 +52,11 @@ struct Pos {
 /*Represents a rectangular region in terms of its start and end x & y values*/
 struct BBox {
 	int x1, y1, x2, y2;
-	BBox(int x1 = 0, int y1 = 0, int x2 = 0, int y2 = 0) :
+
+	BBox() :
+			x1(0), y1(0), x2(0), y2(0) {
+	}
+	BBox(int x1, int y1, int x2, int y2) :
 			x1(x1), y1(y1), x2(x2), y2(y2) {
 		LCOMMON_ASSERT(x1 <= x2 && y1 <= y2);
 	}
@@ -138,10 +142,10 @@ struct DimF {
 			w(dim.w), h(dim.h) {
 		LCOMMON_ASSERT(w >= 0 && h >= 0);
 	}
-	bool operator==(const Dim& o) const {
+	bool operator==(const DimF& o) const {
 		return o.w == w && o.h == h;
 	}
-	bool operator!=(const Dim& o) const {
+	bool operator!=(const DimF& o) const {
 		return !(*this == o);
 	}
 };
@@ -149,7 +153,10 @@ struct DimF {
 /*Represents a rectangular region in terms of its start and end x & y values, with floats*/
 struct BBoxF {
 	float x1, y1, x2, y2;
-	BBoxF(float x1 = 0, float y1 = 0, float x2 = 0, float y2 = 0) :
+	BBoxF() :
+			x1(0), y1(0), x2(0), y2(0) {
+	}
+	BBoxF(float x1, float y1, float x2, float y2) :
 			x1(x1), y1(y1), x2(x2), y2(y2) {
 		LCOMMON_ASSERT(x1 <= x2 && y1 <= y2);
 	}
@@ -168,6 +175,12 @@ struct BBoxF {
 	}
 	bool contains(const Posf& p) const {
 		return contains(p.x, p.y);
+	}
+
+	BBoxF subregion(const BBoxF& bboxf) const {
+		int w = width(), h = height();
+		return BBoxF(x1 + w * bboxf.x1, y1 + h * bboxf.y1, x1 + w * bboxf.x2,
+				y1 + h * bboxf.y2);
 	}
 
 	float width() const {
