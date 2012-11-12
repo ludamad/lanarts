@@ -17,7 +17,8 @@ static void lua_image_bind_test() {
 	using namespace ldraw;
 
 	lua_State* L = lua_open();
-	Image image(NULL, BBoxF(0, 0, 10, 10));
+	Image image;
+	image.draw_region() = BBoxF(0, 0, 10, 10);
 
 	Manager m;
 	m.registerSLB(L);

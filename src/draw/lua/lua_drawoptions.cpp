@@ -4,8 +4,10 @@
  */
 
 #include <common/lua/slb_valuetype.h>
+#include <common/lua/lua_geometry.h>
 #include <lua/lua.h>
 
+#include "lua_colour.h"
 #include "lua_drawoptions.h"
 
 void lua_push_drawoptions(lua_State *L, const ldraw::DrawOptions & options) {
@@ -27,5 +29,24 @@ ldraw::DrawOptions lua_get_drawoptions(lua_State *L, int idx) {
 
 bool lua_check_drawoptions(lua_State *L, int idx) {
 	return lua_istable(L, idx);
+}
+
+void lua_register_draworigin_constants(lua_State *L, SLB::Table* table) {
+	using namespace ldraw;
+#define BIND_ORIGIN_CONST(origin) \
+	lua_pushstring(L, #origin);\
+	lua_pushnumber(L, int(origin)); \
+	table->setCache(L)
+
+	BIND_ORIGIN_CONST(LEFT_TOP);
+	BIND_ORIGIN_CONST(LEFT_CENTER);
+	BIND_ORIGIN_CONST(LEFT_BOTTOM);
+	BIND_ORIGIN_CONST(CENTER_TOP);
+	BIND_ORIGIN_CONST(CENTER);
+	BIND_ORIGIN_CONST(CENTER_BOTTOM);
+	BIND_ORIGIN_CONST(RIGHT_TOP);
+	BIND_ORIGIN_CONST(RIGHT_CENTER);
+	BIND_ORIGIN_CONST(RIGHT_BOTTOM);
+
 }
 

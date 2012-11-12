@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 2.6 )
 
-set(CMAKE_BUILD_TYPE MinSizeRel)
+set(CMAKE_BUILD_TYPE Debug)
 
 PROJECT(project_ldraw)
 
@@ -53,7 +53,7 @@ set( ldraw_src
   ldraw_assert.h
   
   lua/lua_colour.h
-  lua/lua_image.h
+  lua/lua_colour.cpp
   lua/lua_ldraw.h
   lua/lua_ldraw.cpp
   lua/lua_drawoptions.h
@@ -64,6 +64,7 @@ set( ldraw_src
 
 set( ldraw_tests
   tests/lua_colour_tests.cpp
+  tests/lua_drawoptions_tests.cpp
   tests/lua_image_tests.cpp
   tests/ldraw_tests.cpp
   tests/ldraw_tests.h

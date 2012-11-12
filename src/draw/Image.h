@@ -42,8 +42,12 @@ public:
 	float height() const {
 		return _draw_region.height();
 	}
-	DimF size() {
+	DimF size() const {
 		return _draw_region.size();
+	}
+
+	BBoxF& draw_region() {
+		return _draw_region;
 	}
 
 	void initialize(const std::string& filename, const BBoxF& draw_region =

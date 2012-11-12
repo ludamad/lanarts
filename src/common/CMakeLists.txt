@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lcommon)
 
-set(CMAKE_BUILD_TYPE MinSizeRel)
+set(CMAKE_BUILD_TYPE Debug)
 
 FIND_PACKAGE(SDL REQUIRED)
 
