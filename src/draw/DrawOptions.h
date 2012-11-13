@@ -26,11 +26,9 @@ enum DrawOrigin {
 
 //Assumes left-top origin bbox
 BBoxF adjusted_for_origin(const BBoxF& bbox, DrawOrigin origin);
+Posf adjusted_for_origin(const Posf& pos, const DimF& size, DrawOrigin origin);
 
 struct DrawOptions {
-	DrawOptions(DrawOrigin origin = LEFT_TOP) :
-			draw_origin(origin) {
-	}
 	DrawOptions(const Colour& draw_colour) :
 			draw_origin(LEFT_TOP), draw_colour(draw_colour) {
 	}
@@ -39,8 +37,8 @@ struct DrawOptions {
 			draw_origin(LEFT_TOP), draw_region(draw_region) {
 	}
 
-	DrawOptions(DrawOrigin origin, const Colour& draw_colour,
-			const BBoxF& draw_region) :
+	DrawOptions(DrawOrigin origin = LEFT_TOP, const Colour& draw_colour =
+			Colour(), const BBoxF& draw_region = BBoxF()) :
 			draw_origin(origin), draw_colour(draw_colour), draw_region(
 					draw_region) {
 	}

@@ -21,6 +21,7 @@
 #include "../display.h"
 #include "../draw.h"
 #include "../Image.h"
+#include "../Font.h"
 
 static bool handle_event(SDL_Event* event) {
 	SDLKey keycode = event->key.keysym.sym;
@@ -76,6 +77,15 @@ static void draw_images() {
 	}
 }
 
+ldraw::Font font;
+
+static void draw_text() {
+	font.draw(COL_WHITE, Pos(0, 0), "Hello World!");
+	font.draw_wrapped(ldraw::DrawOptions(ldraw::CENTER, COL_PALE_RED),
+			Pos(200, 200), 250,
+			"This text is wrapped because it's sort of long.");
+}
+
 lua_State* L;
 SLB::Manager m;
 SLB::MutableTable* globals;
@@ -99,8 +109,11 @@ static void setup_lua_state() {
 int main() {
 	ldraw::display_initialize(__FILE__, Dim(400, 400), false);
 	image.initialize("sample.png");
+	font.initialize("sample.ttf", 20);
+
 	draw_loop(draw_shapes);
 	draw_loop(draw_images);
+	draw_loop(draw_text);
 
 	setup_lua_state();
 
@@ -108,6 +121,10 @@ int main() {
 	draw_loop(draw_script);
 
 	luaL_dofile(L, "scripts/draw_images.lua");
+	draw_loop(draw_script);
+
+	luaL_dofile(L, "scripts/draw_text.lua");
+	printf(lua_tostring(L,-1));
 	draw_loop(draw_script);
 
 	lua_close(L);

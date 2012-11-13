@@ -1,4 +1,6 @@
-#include <common/math.h>
+#include <algorithm>
+#include <stdexcept>
+#include <vector>
 
 #include <GL/glu.h>
 
@@ -7,17 +9,21 @@
 #include <freetype/ftglyph.h>
 #include <freetype/ftoutln.h>
 #include <freetype/fttrigon.h>
-#include <stdexcept>
 
-#include "opengl/GLImage.h"
+#include <common/math.h>
+#include <common/PerfTimer.h>
+#include <common/strformat.h>
+
 #include "Font.h"
+#include "ldraw_assert.h"
 
-#include <GL/glu.h>
-#undef GL_GLEXT_VERSION
 #include "opengl/GLImage.h"
 
-#include <ft2build.h>
-#include <freetype/freetype.h>
+namespace ldraw {
+
+/******************************************************************
+ *  Initialization routines                                       *
+ ******************************************************************/
 
 /*Stores everything needed to render a character glyph in opengl */
 struct char_data {
@@ -85,12 +91,12 @@ char_data::~char_data() {
 
 /*Initialize a font of size 'h' from a font file.*/
 void init_font(font_data* fd, const char* fname, unsigned int h) {
+	FT_Library library;
 	fd->h = h;
 
-	FT_Library library;
-
-	if (FT_Init_FreeType(&library))
+	if (FT_Init_FreeType(&library)) {
 		throw std::runtime_error("FT_Init_FreeType failed");
+	}
 
 	FT_Face face;
 
@@ -139,22 +145,153 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
 
 }
 
+/******************************************************************
+ *  Text display routines & helper functions                      *
+ ******************************************************************/
 
+static void gl_draw_glyph(const font_data& font, char glyph, int x, int y,
+		Colour c) {
+	const GLImage& img = font.font_img;
+	const char_data& data = font.data[glyph];
+	if (data.w == 0 || data.h == 0) {
+		return;
+	}
+	int x2 = x + data.w, y2 = y + data.h;
 
+	//Draw our four points, clockwise.
+	glTexCoord2f(data.tx1, data.ty1);
+	glVertex2i(x, y);
 
-#ifdef _MSC_VER
-#define snprintf _snprintf
-#define round(x) floor((x)+0.5f)
+	glTexCoord2f(data.tx2, data.ty1);
+	glVertex2i(x2, y);
+
+	glTexCoord2f(data.tx2, data.ty2);
+	glVertex2i(x2, y2);
+
+	glTexCoord2f(data.tx1, data.ty2);
+	glVertex2i(x, y2);
+}
+
+/*Splits up strings, respecting space boundaries & returns maximum width */
+static int process_string(const font_data& font, const char* text,
+		int max_width, std::vector<int>& line_splits) {
+	int last_space = 0, ind = 0;
+	int largest_width = 0;
+	int width = 0, width_since_space = 0;
+	unsigned char c;
+
+	while ((c = text[ind]) != '\0') {
+		const char_data& cdata = font.data[c];
+		width += cdata.advance;
+		width_since_space += cdata.advance;
+
+		if (isspace(c)) {
+			last_space = ind;
+			width_since_space = 0;
+		}
+		bool overmax = max_width != -1 && width > max_width;
+		if (c == '\n' || (overmax && !isspace(c))) {
+			line_splits.push_back(last_space + 1);
+			largest_width = std::max(width, largest_width);
+			width = width_since_space;
+		}
+		ind++;
+	}
+	line_splits.push_back(ind);
+
+	largest_width = std::max(width, largest_width);
+
+	return largest_width;
+}
+
+#ifndef __GNUC__
+#define vsnprintf(text, len, fmt, ap) vsprintf(text, fmt, ap)
 #endif
 
-namespace ldraw {
+//
+/* General gl_print function for others to delegate to */
+static DimF gl_print_impl(const DrawOptions& options, const font_data& font,
+		Posf p, int maxwidth, bool actually_print, const char* text) {
+	perf_timer_begin(FUNCNAME);
 
-void Font::initialize(const std::string& filename, int height) {
+	LDRAW_ASSERT(options.draw_region == BBoxF());
+
+	std::vector<int> line_splits;
+	int measured_width = process_string(font, text, maxwidth, line_splits);
+	int height = font.h * line_splits.size();
+
+	p = adjusted_for_origin(p, DimF(measured_width, height),
+			options.draw_origin);
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, font.font_img.texture);
+
+	const Colour& c = options.draw_colour;
+	glColor4ub(c.r, c.g, c.b, c.a);
+	glBegin(GL_QUADS);
+
+	Dim size(0, 0);
+	for (int linenum = 0, i = 0; linenum < line_splits.size(); linenum++) {
+		int len = 0;
+		int eol = line_splits[linenum];
+
+		size.h += font.h;
+
+		for (; i < eol; i++) {
+			unsigned char chr = text[i];
+			if (chr == '\n') {
+				continue; //skip newline char
+			}
+			const char_data& cdata = font.data[chr];
+			len += cdata.advance;
+			if (actually_print) {
+				gl_draw_glyph(font, chr,
+						p.x + len - (cdata.advance - cdata.left),
+						p.y + size.h - cdata.move_up, c);
+			}
+		}
+		size.w = std::max(len, size.w);
+		size.h += 1;
+	}
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	perf_timer_end(FUNCNAME);
+	return size;
+}
+
+/******************************************************************
+ *  Font class functions                                          *
+ ******************************************************************/
+
+void Font::initialize(const char* filename, int height) {
+	_font = new font_data;
+	init_font(_font.get(), filename, height);
+}
+void Font::draw_wrapped(const DrawOptions& options, const Posf& position,
+		int maxwidth, const char* str) const {
+	gl_print_impl(options, *_font, position, maxwidth, true, str);
+}
+
+void Font::drawf_wrapped(const DrawOptions& options, const Posf& position,
+		int maxwidth, const char* fmt, ...) const {
+	VARARG_STR_FORMAT(_print_buffer, fmt);
+	draw_wrapped(options, position, maxwidth, _print_buffer);
+}
+
+void Font::draw(const DrawOptions& options, const Posf& position,
+		const char* str) const {
+	draw_wrapped(options, position, -1, str);
+}
+
+void Font::drawf(const DrawOptions& options, const Posf& position,
+		const char* fmt, ...) const {
+	VARARG_STR_FORMAT(_print_buffer, fmt);
+	draw(options, position, _print_buffer);
+}
+
+DimF Font::get_draw_size(const char* str, int maxwidth) const {
+	return gl_print_impl(DrawOptions(), *_font, Posf(), maxwidth, false, str);
+}
 
 }
 
-void Font::render(const DrawOptions& options, const Posf & position,
-		const std::string & str) {
-}
-
-}

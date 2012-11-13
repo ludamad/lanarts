@@ -8,7 +8,14 @@
 namespace ldraw {
 
 BBoxF adjusted_for_origin(const BBoxF & bbox, DrawOrigin origin) {
-	float w = bbox.width(), h = bbox.height();
+	DimF size = bbox.size();
+	Posf new_lefttop = adjusted_for_origin(bbox.left_top(), size, origin);
+	return BBoxF(new_lefttop, size);
+}
+
+Posf adjusted_for_origin(const Posf & pos, const DimF & size,
+		DrawOrigin origin) {
+	float w = size.w, h = size.h;
 	float xtranslate = 0, ytranslate = 0;
 
 	if (origin >= CENTER_TOP && origin <= CENTER_BOTTOM) {
@@ -23,7 +30,7 @@ BBoxF adjusted_for_origin(const BBoxF & bbox, DrawOrigin origin) {
 			|| origin == RIGHT_BOTTOM) {
 		ytranslate = -h;
 	}
-	return bbox.translated(xtranslate, ytranslate);
+	return Posf(pos.x + xtranslate, pos.y + ytranslate);
 }
 
 }

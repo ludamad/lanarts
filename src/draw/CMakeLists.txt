@@ -56,6 +56,8 @@ set( ldraw_src
   lua/lua_colour.cpp
   lua/lua_ldraw.h
   lua/lua_ldraw.cpp
+  lua/lua_font.h
+  lua/lua_font.cpp
   lua/lua_drawoptions.h
   lua/lua_drawoptions.cpp
   lua/lua_image.h

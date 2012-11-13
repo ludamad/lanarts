@@ -56,6 +56,10 @@ struct BBox {
 	BBox() :
 			x1(0), y1(0), x2(0), y2(0) {
 	}
+	BBox(const Pos& pos, const Dim& dim) :
+			x1(pos.x), y1(pos.y), x2(pos.x + dim.w), y2(pos.y + dim.h) {
+		LCOMMON_ASSERT(x1 <= x2 && y1 <= y2);
+	}
 	BBox(int x1, int y1, int x2, int y2) :
 			x1(x1), y1(y1), x2(x2), y2(y2) {
 		LCOMMON_ASSERT(x1 <= x2 && y1 <= y2);
@@ -78,6 +82,10 @@ struct BBox {
 	}
 	int height() const {
 		return y2 - y1;
+	}
+
+	Pos left_top() const {
+		return Pos(x1, y1);
 	}
 	Dim size() const {
 		return Dim(width(), height());
@@ -160,6 +168,10 @@ struct BBoxF {
 			x1(x1), y1(y1), x2(x2), y2(y2) {
 		LCOMMON_ASSERT(x1 <= x2 && y1 <= y2);
 	}
+	BBoxF(const Posf& pos, const DimF& dim) :
+			x1(pos.x), y1(pos.y), x2(pos.x + dim.w), y2(pos.y + dim.h) {
+		LCOMMON_ASSERT(x1 <= x2 && y1 <= y2);
+	}
 	BBoxF(const BBoxF& bbox) :
 			x1(bbox.x1), y1(bbox.y1), x2(bbox.x2), y2(bbox.y2) {
 		LCOMMON_ASSERT(x1 <= x2 && y1 <= y2);
@@ -194,6 +206,9 @@ struct BBoxF {
 	}
 	BBoxF scaled(float w, float h) const {
 		return BBoxF(x1 * w, y1 * h, x2 * w, y2 * h);
+	}
+	Posf left_top() const {
+		return Posf(x1, y1);
 	}
 	float center_x() const {
 		return (x1 + x2) / 2;

@@ -17,6 +17,10 @@ static ldraw::Image load_image(const std::string& filename) {
 	return ldraw::Image(filename);
 }
 
+static ldraw::Font load_font(const std::string& filename, int height) {
+	return ldraw::Font(filename, height);
+}
+
 void lua_register_ldraw(lua_State* L, SLB::Table* table) {
 	using namespace ldraw;
 #define BIND_FUNC(f)\
@@ -27,8 +31,10 @@ void lua_register_ldraw(lua_State* L, SLB::Table* table) {
 	BIND_FUNC(draw_circle_outline);
 	BIND_FUNC(draw_rectangle_outline);
 	BIND_FUNC(load_image);
+	BIND_FUNC(load_font);
 
 	lua_register_image(L);
+	lua_register_font(L);
 	lua_register_draworigin_constants(L, table);
 	lua_register_colour_constants(L, table);
 }

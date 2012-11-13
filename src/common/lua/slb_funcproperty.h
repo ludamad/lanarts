@@ -10,6 +10,7 @@
 #include <SLB/ClassInfo.hpp>
 
 typedef void (*lua_getsetf)(lua_State *L, int idx);
+
 template<typename T, typename V, V (T::*func)() const>
 inline void lua_get_membfunc(lua_State *L, int idx) {
 	// get object at T

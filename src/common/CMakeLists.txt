@@ -26,6 +26,8 @@ set( lcommon_src
 	Timer.h
 	unittest.cpp
 	unittest.h
+	strformat.cpp
+	strformat.h
 	
 	lua/lua_geometry.h
 	lua/lua_lcommon.h
@@ -51,6 +53,7 @@ set( lcommon_tests
 	tests/lua_geometry_tests.cpp
 	tests/lua_range_tests.cpp
 	tests/lua_vector_tests.cpp
+	tests/strformat_tests.cpp
 )
 
 add_executable( lcommon_tests
