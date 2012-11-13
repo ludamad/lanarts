@@ -14,6 +14,7 @@ include_directories(${SDL_INCLUDE_DIR}
 
 
 set( lcommon_src
+	geometry.cpp
 	geometry.h
 	lcommon_defines.h
 	math.cpp
@@ -56,15 +57,15 @@ set( lcommon_tests
 	tests/strformat_tests.cpp
 )
 
-add_executable( lcommon_tests
-             ${lcommon_src}
-             ${lcommon_tests}
-              )
+#add_executable( lcommon_tests
+#             ${lcommon_src}
+#             ${lcommon_tests}
+#              )
 
-target_link_libraries( 
-			lcommon_tests
-			"/home/adomurad/lanarts-git/lanarts_build/libs/slb/libslb.a"
-			"/home/adomurad/lanarts-git/lanarts_build/libs/lua/liblua.a"
+#target_link_libraries( 
+#			lcommon_tests
+#			"/home/adomurad/lanarts-git/lanarts_build/libs/slb/libslb.a"
+#			"/home/adomurad/lanarts-git/lanarts_build/libs/lua/liblua.a"
 			#lua
 			#slb
-)
+#)

@@ -1,0 +1,10 @@
+- Make skill trees with evasion based abilities
+- Spells on same skill tree 
+- Have specialized dungeon rooms
+- Dashing / pushing / teleporting as exclusive techs?
+	- What will druid-likes use ? 
+	(Dashing -> tied to dexterous skills, 
+	teleporting -> tied to translocation skills,
+	pushing -> tied to brute skills)
+- Berserk tech tree -> honestly it progresses pretty naturally ...
+	-> make it tied to severe spellcasting penalties

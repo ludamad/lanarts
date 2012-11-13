@@ -29,6 +29,10 @@ static int luacfunc_draw(lua_State* L) {
 	if (nargs == 2) {
 		Pos p = get<Pos>(L, 2);
 		img->draw(p);
+	} else if (nargs == 3) {
+		DrawOptions options = get<DrawOptions>(L, 2);
+		Pos p = get<Pos>(L, 3);
+		img->draw(options, p);
 	} else {
 		luaL_error(L, LERR_MSG);
 	}

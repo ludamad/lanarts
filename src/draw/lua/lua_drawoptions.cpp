@@ -15,15 +15,19 @@ void lua_push_drawoptions(lua_State *L, const ldraw::DrawOptions & options) {
 	int tblidx = lua_gettop(L);
 
 	SLB::table_set(L, tblidx, "origin", int(options.draw_origin));
-	SLB::table_set(L, tblidx, "colour", options.draw_colour);
+	SLB::table_set(L, tblidx, "color", options.draw_colour);
 	SLB::table_set(L, tblidx, "region", options.draw_region);
+	SLB::table_set(L, tblidx, "scale", options.draw_scale);
+	SLB::table_set(L, tblidx, "angle", options.draw_angle);
 }
 
 ldraw::DrawOptions lua_get_drawoptions(lua_State *L, int idx) {
 	ldraw::DrawOptions options;
 	SLB::table_get<int>(L, idx, "origin", options.draw_origin);
-	SLB::table_get(L, idx, "colour", options.draw_colour);
+	SLB::table_get(L, idx, "color", options.draw_colour);
 	SLB::table_get(L, idx, "region", options.draw_region);
+	SLB::table_get(L, idx, "scale", options.draw_scale);
+	SLB::table_get(L, idx, "angle", options.draw_angle);
 	return options;
 }
 

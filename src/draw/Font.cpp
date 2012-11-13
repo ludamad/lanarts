@@ -149,27 +149,27 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
  *  Text display routines & helper functions                      *
  ******************************************************************/
 
-static void gl_draw_glyph(const font_data& font, char glyph, int x, int y,
-		Colour c) {
+static void gl_draw_glyph(const font_data& font, char glyph, const Posf& pos,
+		const DimF& scale) {
 	const GLImage& img = font.font_img;
 	const char_data& data = font.data[glyph];
 	if (data.w == 0 || data.h == 0) {
 		return;
 	}
-	int x2 = x + data.w, y2 = y + data.h;
+	float x2 = pos.x + data.w * scale.w, y2 = pos.y + data.h * scale.h;
 
 	//Draw our four points, clockwise.
 	glTexCoord2f(data.tx1, data.ty1);
-	glVertex2i(x, y);
+	glVertex2i(pos.x, pos.y);
 
 	glTexCoord2f(data.tx2, data.ty1);
-	glVertex2i(x2, y);
+	glVertex2i(x2, pos.y);
 
 	glTexCoord2f(data.tx2, data.ty2);
 	glVertex2i(x2, y2);
 
 	glTexCoord2f(data.tx1, data.ty2);
-	glVertex2i(x, y2);
+	glVertex2i(pos.x, y2);
 }
 
 /*Splits up strings, respecting space boundaries & returns maximum width */
@@ -215,6 +215,7 @@ static DimF gl_print_impl(const DrawOptions& options, const font_data& font,
 	perf_timer_begin(FUNCNAME);
 
 	LDRAW_ASSERT(options.draw_region == BBoxF());
+	LDRAW_ASSERT(options.draw_angle == 0.0f);
 
 	std::vector<int> line_splits;
 	int measured_width = process_string(font, text, maxwidth, line_splits);
@@ -245,9 +246,9 @@ static DimF gl_print_impl(const DrawOptions& options, const font_data& font,
 			const char_data& cdata = font.data[chr];
 			len += cdata.advance;
 			if (actually_print) {
-				gl_draw_glyph(font, chr,
-						p.x + len - (cdata.advance - cdata.left),
-						p.y + size.h - cdata.move_up, c);
+				Pos drawpos(p.x + len - (cdata.advance - cdata.left),
+						p.y + size.h - cdata.move_up);
+				gl_draw_glyph(font, chr, drawpos, options.draw_scale);
 			}
 		}
 		size.w = std::max(len, size.w);

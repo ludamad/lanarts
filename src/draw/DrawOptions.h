@@ -30,22 +30,27 @@ Posf adjusted_for_origin(const Posf& pos, const DimF& size, DrawOrigin origin);
 
 struct DrawOptions {
 	DrawOptions(const Colour& draw_colour) :
-			draw_origin(LEFT_TOP), draw_colour(draw_colour) {
+			draw_origin(LEFT_TOP), draw_scale(1.0f, 1.0f), draw_colour(
+					draw_colour), draw_angle(0.0f) {
 	}
 
 	DrawOptions(const BBoxF& draw_region) :
-			draw_origin(LEFT_TOP), draw_region(draw_region) {
+			draw_origin(LEFT_TOP), draw_scale(1.0f, 1.0f), draw_region(
+					draw_region), draw_angle(0.0f) {
 	}
 
 	DrawOptions(DrawOrigin origin = LEFT_TOP, const Colour& draw_colour =
-			Colour(), const BBoxF& draw_region = BBoxF()) :
-			draw_origin(origin), draw_colour(draw_colour), draw_region(
-					draw_region) {
+			Colour(), const DimF& draw_scale = DimF(1.0f, 1.0f),
+			const BBoxF& draw_region = BBoxF(), float angle = 0.0f) :
+			draw_origin(origin), draw_colour(draw_colour), draw_scale(
+					draw_scale), draw_region(draw_region), draw_angle(angle) {
 	}
 
 	DrawOrigin draw_origin;
-	BBoxF draw_region;
 	Colour draw_colour;
+	DimF draw_scale;
+	BBoxF draw_region;
+	float draw_angle;
 };
 
 }

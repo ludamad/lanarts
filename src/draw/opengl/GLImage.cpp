@@ -190,6 +190,34 @@ static void gl_draw_image(GLuint texture, const Colour& c, const BBoxF& texbox,
 	glDisable(GL_TEXTURE_2D);
 }
 
+static void glVertex(const Posf& pos) {
+	glVertex2i(pos.x, pos.y);
+}
+static void gl_draw_image(GLuint texture, const Colour& c, const BBoxF& texbox,
+		const QuadF& imgbox) {
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glColor4ub(c.r, c.g, c.b, c.a);
+
+	glBegin(GL_QUADS);
+	//Draw our four points, clockwise.
+	glTexCoord2f(texbox.x1, texbox.y1);
+	glVertex(imgbox.pos[0]);
+
+	glTexCoord2f(texbox.x2, texbox.y1);
+	glVertex(imgbox.pos[1]);
+
+	glTexCoord2f(texbox.x2, texbox.y2);
+	glVertex(imgbox.pos[2]);
+
+	glTexCoord2f(texbox.x1, texbox.y2);
+	glVertex(imgbox.pos[3]);
+
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+}
+
 void GLImage::subimage_from_bytes(const BBox& region, char* data, int type) {
 	gl_subimage_from_bytes(*this, region, data, type);
 }
@@ -210,10 +238,13 @@ void GLImage::draw(const ldraw::DrawOptions& options, const Posf& pos) {
 	if (draw_region.empty()) {
 		return;
 	}
+	BBoxF adjusted = adjusted_for_origin(draw_region, options.draw_origin).scaled(
+			options.draw_scale);
+	QuadF quad(adjusted, options.draw_angle);
+
 	gl_draw_image(
 			texture,
 			options.draw_colour,
 			draw_region.scaled(texw / width, texh / height),
-			adjusted_for_origin(draw_region.translated(pos),
-					options.draw_origin));
+			quad.translated(pos));
 }

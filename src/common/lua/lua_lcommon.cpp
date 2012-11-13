@@ -5,8 +5,15 @@
 
 #include "lua_timer.h"
 
-void lua_register_lcommon(lua_State* L) {
-	lua_register_timer(L);
-}
+#include <SLB/Manager.hpp>
+#include <SLB/Table.hpp>
 
+//TODO: Don't expose SLB at all in lua/ folder
+//Use it instead as the impl. behind the bindings
+//Maybe expose a LuaValue everywhere??
+void lua_register_lcommon(lua_State* L, SLB::Table* module) {
+	lua_register_timer(L);
+	SLB::Manager* m = SLB::Manager::getInstance(L);
+//	module->set("Timer", m->getGlobals()->get("Timer"));
+}
 

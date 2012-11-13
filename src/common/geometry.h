@@ -130,6 +130,8 @@ struct Posf {
 	Posf(const Pos& pos) :
 			x(pos.x), y(pos.y) {
 	}
+	void rotate(float angle);
+	Posf rotated(float angle) const;
 
 	bool operator==(const Posf& o) const {
 		return o.x == x && o.y == y;
@@ -207,6 +209,10 @@ struct BBoxF {
 	BBoxF scaled(float w, float h) const {
 		return BBoxF(x1 * w, y1 * h, x2 * w, y2 * h);
 	}
+
+	BBoxF scaled(const DimF& scale) const {
+		return scaled(scale.w, scale.h);
+	}
 	Posf left_top() const {
 		return Posf(x1, y1);
 	}
@@ -230,6 +236,19 @@ struct BBoxF {
 	BBoxF translated(const Posf& pos) const {
 		return BBoxF(x1 + pos.x, y1 + pos.y, x2 + pos.x, y2 + pos.y);
 	}
+};
+
+struct QuadF {
+	Posf pos[4];
+
+	QuadF(){
+	}
+	QuadF(const BBoxF& bbox, float angle = 0.0f);
+
+	void rotate(float angle);
+	QuadF rotated(float angle) const;
+	void translate(const Posf& p);
+	QuadF translated(const Posf& p) const;
 };
 
 #endif /* GEOMETRY_H_ */

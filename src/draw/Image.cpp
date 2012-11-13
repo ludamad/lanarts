@@ -36,7 +36,7 @@ void Image::initialize(const Dim& size, const BBoxF& draw_region) {
 void Image::draw(const DrawOptions& options, const Posf& pos) const {
 	DrawOptions adjusted_options(options);
 	adjusted_options.draw_region = options.draw_region.subregion(
-			_draw_region.scaled(width(), height()));
+			_draw_region.scaled(1.0f / width(), 1.0f / height()));
 	return _image->draw(options, pos);
 }
 }

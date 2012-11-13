@@ -11,6 +11,9 @@
 #include <SLB/Table.hpp>
 
 #include <common/lua/slb_mutabletable.h>
+#include <common/lua/lua_lcommon.h>
+
+#include <lua/lualib.h>
 
 #include "../lua/lua_ldraw.h"
 
@@ -103,10 +106,13 @@ static void setup_lua_state() {
 	globals->push(L);
 	lua_replace(L, LUA_GLOBALSINDEX);
 
+	luaL_openlibs(L);
+	lua_register_lcommon(L, globals);
+
 	lua_register_ldraw(L, globals);
 }
 
-int main() {
+int main(int argc, const char** argv) {
 	ldraw::display_initialize(__FILE__, Dim(400, 400), false);
 	image.initialize("sample.png");
 	font.initialize("sample.ttf", 20);
@@ -124,6 +130,9 @@ int main() {
 	draw_loop(draw_script);
 
 	luaL_dofile(L, "scripts/draw_text.lua");
+	draw_loop(draw_script);
+
+	luaL_dofile(L, "scripts/draw_animated.lua");
 	printf(lua_tostring(L,-1));
 	draw_loop(draw_script);
 
