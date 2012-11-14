@@ -8,10 +8,10 @@
 
 #include <SLB/Script.hpp>
 #include <SLB/LuaCall.hpp>
-#include <SLB/Table.hpp>
+#include <SLB/Manager.hpp>
 
-#include <common/lua/slb_mutabletable.h>
 #include <common/lua/lua_lcommon.h>
+#include <common/lua/LuaValue.h>
 
 #include <lua/lualib.h>
 
@@ -91,7 +91,6 @@ static void draw_text() {
 
 lua_State* L;
 SLB::Manager m;
-SLB::MutableTable* globals;
 
 static void draw_script() {
 	SLB::LuaCall<void()> drawfunc(L, "draw");
@@ -101,15 +100,14 @@ static void draw_script() {
 static void setup_lua_state() {
 	L = lua_open();
 	m.registerSLB(L);
-
-	globals = new SLB::MutableTable;
-	globals->push(L);
-	lua_replace(L, LUA_GLOBALSINDEX);
-
 	luaL_openlibs(L);
-	lua_register_lcommon(L, globals);
+
+	LuaValue globals(L, LUA_GLOBALSINDEX);
 
 	lua_register_ldraw(L, globals);
+	lua_register_lcommon(L, globals);
+
+	printf("Final lua stack: %d\n", lua_gettop(L));
 }
 
 int main(int argc, const char** argv) {

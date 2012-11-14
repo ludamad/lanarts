@@ -2,10 +2,13 @@
  * lua_drawoptions.cpp:
  *  Bindings for drawing options <-> lua table
  */
+extern "C" {
+#include <lua/lua.h>
+}
 
 #include <common/lua/slb_valuetype.h>
 #include <common/lua/lua_geometry.h>
-#include <lua/lua.h>
+#include <common/lua/LuaValue.h>
 
 #include "lua_colour.h"
 #include "lua_drawoptions.h"
@@ -35,12 +38,11 @@ bool lua_check_drawoptions(lua_State *L, int idx) {
 	return lua_istable(L, idx);
 }
 
-void lua_register_draworigin_constants(lua_State *L, SLB::Table* table) {
+void lua_register_draworigin_constants(lua_State *L, LuaValue& module) {
 	using namespace ldraw;
 #define BIND_ORIGIN_CONST(origin) \
-	lua_pushstring(L, #origin);\
 	lua_pushnumber(L, int(origin)); \
-	table->setCache(L)
+	module.table_pop_value(L, #origin)
 
 	BIND_ORIGIN_CONST(LEFT_TOP);
 	BIND_ORIGIN_CONST(LEFT_CENTER);

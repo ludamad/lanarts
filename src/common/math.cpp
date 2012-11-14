@@ -13,3 +13,5 @@ int power_of_two(int input) {
 	}
 	return value;
 }
+
+

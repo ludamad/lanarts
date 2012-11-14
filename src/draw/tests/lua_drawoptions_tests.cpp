@@ -9,6 +9,8 @@
 #include <common/lua/lua_unittest.h>
 #include <common/lua/lua_geometry.h>
 
+#include <common/lua/LuaValue.h>
+
 #include "../lua/lua_colour.h"
 #include "../lua/lua_drawoptions.h"
 
@@ -36,8 +38,9 @@ static void lua_drawoptions_bind_test() {
 
 	SLB::Manager m;
 	m.registerSLB(L);
+	LuaValue globals(L, LUA_GLOBALSINDEX);
 
-	lua_register_draworigin_constants(L, m.getGlobals());
+	lua_register_draworigin_constants(L, globals);
 	m.set("drawoptions_func_difforigin",
 			SLB::FuncCall::create(drawoptions_func_difforigin));
 	m.set("drawoptions_func_defaults",

@@ -17,7 +17,8 @@
 #include "lua_drawoptions.h"
 #include "lua_font.h"
 
+class LuaValue;
 // Registers functions into table on top of stack
-void lua_register_ldraw(lua_State* L, SLB::Table* table);
+void lua_register_ldraw(lua_State* L, LuaValue& module);
 
 #endif /* LUA_LDRAW_LIB_H_ */

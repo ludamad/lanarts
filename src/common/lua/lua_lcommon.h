@@ -13,6 +13,7 @@
 #include "lua_vector.h"
 #include "lua_geometry.h"
 
-void lua_register_lcommon(lua_State* L, SLB::Table* module);
+class LuaValue;
+void lua_register_lcommon(lua_State* L, LuaValue& module);
 
 #endif /* LUA_LCOMMON_H_ */

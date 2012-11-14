@@ -60,7 +60,7 @@ void Timer::start() {
 #endif
 }
 
-unsigned long Timer::get_microseconds() {
+unsigned long Timer::get_microseconds() const {
 	Timer now;
 	return now.microseconds_since_epoch - microseconds_since_epoch;
 }

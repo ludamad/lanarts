@@ -30,8 +30,8 @@ Posf adjusted_for_origin(const Posf& pos, const DimF& size, DrawOrigin origin);
 
 struct DrawOptions {
 	DrawOptions(const Colour& draw_colour) :
-			draw_origin(LEFT_TOP), draw_scale(1.0f, 1.0f), draw_colour(
-					draw_colour), draw_angle(0.0f) {
+			draw_origin(LEFT_TOP), draw_colour(draw_colour), draw_scale(1.0f,
+					1.0f), draw_angle(0.0f) {
 	}
 
 	DrawOptions(const BBoxF& draw_region) :

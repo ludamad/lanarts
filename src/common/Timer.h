@@ -12,7 +12,7 @@ class Timer {
 public:
 	Timer();
 	void start();
-	unsigned long get_microseconds();
+	unsigned long get_microseconds() const;
 private:
 	long long microseconds_since_epoch;
 };

@@ -229,7 +229,7 @@ void GLImage::image_from_bytes(const Dim& size, char* data, int type) {
 void GLImage::draw(const ldraw::DrawOptions& options, const Posf& pos) {
 	BBoxF draw_region(0, 0, width, height);
 	if (!options.draw_region.empty()) {
-		LDRAW_ASSERT(options.draw_region.x1 > 0 && options.draw_region.y1 > 0);
+		LDRAW_ASSERT(options.draw_region.x1 >= 0 && options.draw_region.y1 >= 0);
 		LDRAW_ASSERT(options.draw_region.x2 <= width);
 		LDRAW_ASSERT(options.draw_region.y2 <= height);
 

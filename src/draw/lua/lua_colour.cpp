@@ -3,15 +3,16 @@
  *  Bindings for Colour
  */
 
+#include <common/lua/LuaValue.h>
+
 #include "lua_colour.h"
 
 #include "../colour_constants.h"
 
-void lua_register_colour_constants(lua_State *L, SLB::Table* table) {
+void lua_register_colour_constants(lua_State *L, LuaValue& module) {
 #define BIND_COLOUR(col) \
-	lua_pushstring(L, #col);\
 	SLB::push(L, col); \
-	table->setCache(L)
+	module.table_pop_value(L, #col)
 
 	BIND_COLOUR(COL_GOLD);
 	BIND_COLOUR(COL_YELLOW);

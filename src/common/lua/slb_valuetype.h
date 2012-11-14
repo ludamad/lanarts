@@ -66,8 +66,7 @@ inline bool table_get(lua_State *L, int idx, const char* key, V& value) {
 	bool isnil = lua_isnil(L, -1);
 	if (!isnil) {
 		value = V(get<T>(L, -1));
-	}
-	lua_pop(L, 1);
+	}lua_pop(L, 1);
 	return isnil;
 }
 
@@ -79,8 +78,7 @@ inline bool table_get(lua_State *L, int idx, const char* key, V& value) {
 	bool isnil = lua_isnil(L, -1);
 	if (!isnil) {
 		value = get<V>(L, -1);
-	}
-	lua_pop(L, 1);
+	}lua_pop(L, 1);
 	return isnil;
 }
 template<typename V>

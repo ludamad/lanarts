@@ -8,8 +8,9 @@
 
 #include "../Timer.h"
 
+class LuaValue;
 struct lua_State;
 
-void lua_register_timer(lua_State* L);
+void lua_register_timer(lua_State* L, LuaValue& module);
 
 #endif /* LUA_TIMER_H_ */

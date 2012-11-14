@@ -29,6 +29,9 @@ struct Pos {
 	Pos() :
 			x(0), y(0) {
 	}
+	explicit Pos(const Dim& dim) :
+			x(dim.w), y(dim.h) {
+	}
 	bool operator==(const Pos& o) const {
 		return o.x == x && o.y == y;
 	}
@@ -37,15 +40,6 @@ struct Pos {
 	}
 	Pos(int x, int y) :
 			x(x), y(y) {
-	}
-
-	void operator+=(const Pos& p) {
-		x += p.x, y += p.y;
-	}
-	Pos operator+(const Pos& p) const {
-		Pos ret(*this);
-		ret += p;
-		return ret;
 	}
 };
 
@@ -118,29 +112,6 @@ struct BBox {
 
 //Float versions of above structures
 
-/*Represents a float x,y pair position*/
-struct Posf {
-	float x, y;
-	Posf() :
-			x(0.0f), y(0.0f) {
-	}
-	Posf(float x, float y) :
-			x(x), y(y) {
-	}
-	Posf(const Pos& pos) :
-			x(pos.x), y(pos.y) {
-	}
-	void rotate(float angle);
-	Posf rotated(float angle) const;
-
-	bool operator==(const Posf& o) const {
-		return o.x == x && o.y == y;
-	}
-	bool operator!=(const Posf& o) const {
-		return !(*this == o);
-	}
-};
-
 /*Represents a width & heigh, with floats t*/
 struct DimF {
 	float w, h;
@@ -160,6 +131,31 @@ struct DimF {
 	}
 };
 
+/*Represents a float x,y pair position*/
+struct Posf {
+	float x, y;
+	Posf() :
+			x(0.0f), y(0.0f) {
+	}
+	Posf(float x, float y) :
+			x(x), y(y) {
+	}
+	explicit Posf(const DimF& dim) :
+			x(dim.w), y(dim.h) {
+	}
+	Posf(const Pos& pos) :
+			x(pos.x), y(pos.y) {
+	}
+	void rotate(float angle);
+	Posf rotated(float angle) const;
+
+	bool operator==(const Posf& o) const {
+		return o.x == x && o.y == y;
+	}
+	bool operator!=(const Posf& o) const {
+		return !(*this == o);
+	}
+};
 /*Represents a rectangular region in terms of its start and end x & y values, with floats*/
 struct BBoxF {
 	float x1, y1, x2, y2;
@@ -241,7 +237,7 @@ struct BBoxF {
 struct QuadF {
 	Posf pos[4];
 
-	QuadF(){
+	QuadF() {
 	}
 	QuadF(const BBoxF& bbox, float angle = 0.0f);
 
@@ -250,5 +246,31 @@ struct QuadF {
 	void translate(const Posf& p);
 	QuadF translated(const Posf& p) const;
 };
+
+/* Convenience operators for working with positions */
+Pos operator+(const Pos& p1, const Pos& p2);
+void operator+=(Pos& p1, const Pos& p2);
+
+Pos operator-(const Pos& p1, const Pos& p2);
+void operator-=(Pos& p1, const Pos& p2);
+
+Dim operator+(const Dim& p1, const Dim& p2);
+void operator+=(Dim& p1, const Dim& p2);
+
+Dim operator-(const Dim& p1, const Dim& p2);
+void operator-=(Dim& p1, const Dim& p2);
+
+/* Floating point versions of the above */
+Posf operator+(const Posf& p1, const Posf& p2);
+void operator+=(Posf& p1, const Posf& p2);
+
+Posf operator-(const Posf& p1, const Posf& p2);
+void operator-=(Posf& p1, const Posf& p2);
+
+DimF operator+(const DimF& p1, const DimF& p2);
+void operator+=(DimF& p1, const DimF& p2);
+
+DimF operator-(const DimF& p1, const DimF& p2);
+void operator-=(DimF& p1, const DimF& p2);
 
 #endif /* GEOMETRY_H_ */

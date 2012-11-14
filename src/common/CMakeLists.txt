@@ -21,6 +21,8 @@ set( lcommon_src
 	math.h
 	PerfTimer.cpp
 	PerfTimer.h
+	SerializeBuffer.cpp
+	SerializeBuffer.h
 	range.h
 	smartptr.h
 	Timer.cpp
@@ -34,6 +36,10 @@ set( lcommon_src
 	lua/lua_lcommon.h
 	lua/lua_lcommon.cpp
     lua/lua_range.h
+    lua/LuaValue.h
+    lua/LuaValue.cpp
+    lua/lua_serialize.h
+    lua/lua_serialize.cpp
     lua/lua_timer.cpp
     lua/lua_timer.h
     lua/lua_unittest.cpp
@@ -57,15 +63,15 @@ set( lcommon_tests
 	tests/strformat_tests.cpp
 )
 
-#add_executable( lcommon_tests
-#             ${lcommon_src}
-#             ${lcommon_tests}
-#              )
+add_executable( lcommon_tests
+             ${lcommon_src}
+             ${lcommon_tests}
+              )
 
-#target_link_libraries( 
-#			lcommon_tests
-#			"/home/adomurad/lanarts-git/lanarts_build/libs/slb/libslb.a"
-#			"/home/adomurad/lanarts-git/lanarts_build/libs/lua/liblua.a"
+target_link_libraries( 
+			lcommon_tests
+			"/home/adomurad/lanarts-git/lanarts_build/libs/slb/libslb.a"
+			"/home/adomurad/lanarts-git/lanarts_build/libs/lua/liblua.a"
 			#lua
 			#slb
-#)
+)
