@@ -14,6 +14,8 @@
 class GameState;
 class SerializeBuffer;
 
+struct Pos;
+
 class GameTiles {
 public:
 	GameTiles(int width, int height);

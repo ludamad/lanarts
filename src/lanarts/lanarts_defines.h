@@ -5,33 +5,15 @@
 #ifndef LANARTS_DEFINES_H_
 #define LANARTS_DEFINES_H_
 
-#include <common/geometry.h>
 #include <common/lcommon_defines.h>
-#include <common/PerfTimer.h>
+#include <common/func_timer.h>
 #include <common/range.h>
 
 #include <cassert>
 #include <cstdlib>
 
-// If this file is not included there may be issues with Microsoft's compiler
-#ifdef _MSC_VER
-#define snprintf _snprintf
-#define round(x) floor((x)+0.5f)
-#endif
-
 // The preferred assert statement to use, for ease of re-implementation
 #define LANARTS_ASSERT(x) assert(x)
-
-// Define a cross-platform function name identifier
-#ifdef _MSC_VER
-#define FUNCNAME __FUNCSIG__
-#else
-#ifdef __GNUC__
-#define FUNCNAME __PRETTY_FUNCTION__
-#else
-#define FUNCNAME __func__
-#endif
-#endif
 
 /*Represents a Canadian colour*/
 struct Colour {
@@ -57,22 +39,6 @@ struct Tile {
 	Tile(int tile = 0, int subtile = 0) :
 			tile(tile), subtile(subtile) {
 	}
-};
-
-//TODO replace region with BBox everywhere
-/*Represents a rectangular region in terms of its start x,y values as well as its dimensions*/
-struct Region {
-	int x, y, w, h;
-	Region(int x = 0, int y = 0, int w = 0, int h = 0) :
-			x(x), y(y), w(w), h(h) {
-	}
-	inline Pos pos() {
-		return Pos(x, y);
-	}
-	Region remove_perimeter(int p = 1) {
-		return Region(x + p, y + p, w - 2 * p, h - 2 * p);
-	}
-
 };
 
 static const int TILE_SIZE = 32;

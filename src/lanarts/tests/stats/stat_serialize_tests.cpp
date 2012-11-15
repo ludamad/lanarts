@@ -10,7 +10,7 @@
 
 #include "../../data/game_data.h"
 
-#include "../../serialize/SerializeBuffer.h"
+#include <common/SerializeBuffer.h>
 
 #include "../../stats/EquipmentStats.h"
 #include "../../stats/Inventory.h"

@@ -13,7 +13,7 @@
 
 #include "../../data/BaseDataEntry.h"
 
-#include "../../lua/LuaValue.h"
+#include <common/lua/LuaValue.h>
 #include "../../stats/combat_stats.h"
 
 #include "../../lanarts_defines.h"

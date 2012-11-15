@@ -11,6 +11,8 @@
 
 #include "../lanarts_defines.h"
 
+struct BBox;
+
 // Multiple keys can refer to same action, in which case multiple
 // GameEventTrigger instances can exist
 struct IOEvent {

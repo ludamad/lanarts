@@ -12,6 +12,8 @@
 #include "../util/mtwist.h"
 #include "../lanarts_defines.h"
 
+#include "../region.h"
+
 #include "generated_tile.h"
 
 struct Room {

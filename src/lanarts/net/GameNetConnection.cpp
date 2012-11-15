@@ -12,7 +12,7 @@
 #include "../objects/player/PlayerInst.h"
 
 #include "../objects/AnimatedInst.h"
-#include "../serialize/SerializeBuffer.h"
+#include <common/SerializeBuffer.h>
 
 #include "GameNetConnection.h"
 

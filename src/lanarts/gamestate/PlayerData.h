@@ -12,7 +12,7 @@
 
 #include "../objects/GameInstRef.h"
 
-#include "../serialize/SerializeBuffer.h"
+#include <common/SerializeBuffer.h>
 #include "../stats/EnemiesSeen.h"
 
 #include "ActionQueue.h"

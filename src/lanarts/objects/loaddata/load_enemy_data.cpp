@@ -4,6 +4,7 @@
 #include "../../data/game_data.h"
 
 #include "../../data/yaml_util.h"
+#include "../../lua/lua_yaml.h"
 #include "../../stats/stats.h"
 #include "../../stats/loaddata/load_stats.h"
 
@@ -45,12 +46,14 @@ EnemyEntry parse_enemy_type(const YAML::Node& n) {
 
 void load_enemy_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
-	game_enemy_data.push_back(parse_enemy_type(node));
-	value->table_set_yaml(L, game_enemy_data.back().name, node);
+	EnemyEntry entry = parse_enemy_type(node);
+	game_enemy_data.push_back(entry);
+	value->get(L, entry.name) = node;
 }
 
 LuaValue load_enemy_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
+	ret.table_initialize(L);
 
 	game_enemy_data.clear();
 	load_data_impl_template(filenames, "enemies", load_enemy_callbackf, L,

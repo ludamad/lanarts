@@ -7,7 +7,7 @@
 #define DUNGEON_DATA_H_
 
 #include <vector>
-#include "../lua/LuaValue.h"
+#include <common/lua/LuaValue.h>
 #include "../stats/itemgen_data.h"
 #include "AreaTemplate.h"
 

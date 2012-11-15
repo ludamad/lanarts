@@ -7,11 +7,11 @@
 #define DISPLAY_H_
 
 #include <cstdlib>
-
-#include <SDL.h>
-#undef GL_GLEXT_VERSION
 #include <SDL_opengl.h>
 #include <GL/glu.h>
+
+#include <common/geometry.h>
+
 #include "../lanarts_defines.h"
 
 struct GLimage;

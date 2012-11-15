@@ -33,7 +33,7 @@ extern "C" {
 
 #include "../objects/GameInst.h"
 
-#include "../serialize/SerializeBuffer.h"
+#include <common/SerializeBuffer.h>
 
 #include "../stats/class_data.h"
 
@@ -104,7 +104,7 @@ void GameState::start_game() {
 	if (settings.keep_event_log) {
 		time_t t;
 		time(&t);
-		snprintf(filename, sizeof(filename), "logs/game_event_log%d", t);
+		snprintf(filename, sizeof(filename), "logs/game_event_log%d", (int)t);
 		output_log = filename;
 	}
 	event_log_initialize(this, input_log, output_log);

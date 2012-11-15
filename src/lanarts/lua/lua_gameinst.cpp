@@ -265,4 +265,12 @@ void lua_push_gameinst(lua_State* L, GameInst* inst) {
 	lunar_t::push(L, new bind_t(inst), true);
 }
 
+void lua_gameinst_callback(lua_State* L, LuaValue& value, GameInst* inst) {
+	if (value.empty())
+		return;
+	value.push(L);
+	lua_push_gameinst(L, inst);
+	lua_call(L, 1, 0);
+}
+
 const char GameInstLuaBinding::className[] = "GameInst";

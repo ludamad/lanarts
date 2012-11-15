@@ -4,6 +4,7 @@
  */
 
 #include <common/lua/LuaValue.h>
+#include <common/lua/luacpp.h>
 
 #include "lua_colour.h"
 
@@ -11,8 +12,7 @@
 
 void lua_register_colour_constants(lua_State *L, LuaValue& module) {
 #define BIND_COLOUR(col) \
-	SLB::push(L, col); \
-	module.table_pop_value(L, #col)
+	module.get(L, #col) = col
 
 	BIND_COLOUR(COL_GOLD);
 	BIND_COLOUR(COL_YELLOW);

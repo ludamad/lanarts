@@ -5,7 +5,7 @@
 
 #include "../objects/player/PlayerInst.h"
 
-#include "../serialize/SerializeBuffer.h"
+#include <common/SerializeBuffer.h>
 
 #include "GameLevelState.h"
 

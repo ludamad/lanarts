@@ -4,8 +4,10 @@
 #include <yaml-cpp/yaml.h>
 
 #include "../../data/game_data.h"
-
 #include "../../data/yaml_util.h"
+
+#include "../../lua/lua_yaml.h"
+
 #include "../effect_data.h"
 
 #include "../stats.h"
@@ -39,12 +41,15 @@ EffectEntry parse_effect(const YAML::Node& n) {
 
 void load_effect_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
-	game_effect_data.push_back(parse_effect(node));
-	value->table_set_yaml(L, parse_str(node["name"]), node);
+	EffectEntry entry = parse_effect(node);
+	game_effect_data.push_back(entry);
+	value->get(L, entry.name) = node;
 }
 
 LuaValue load_effect_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
+	ret.table_initialize(L);
+
 	game_effect_data.clear();
 
 	load_data_impl_template(filenames, "effects", load_effect_callbackf, L,

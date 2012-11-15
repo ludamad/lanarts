@@ -10,7 +10,7 @@
 #include "../../display/sprite_data.h"
 #include "../../display/tile_data.h"
 #include "../../gamestate/GameState.h"
-#include "../../serialize/SerializeBuffer.h"
+#include <common/SerializeBuffer.h>
 
 #include "../../stats/items/WeaponEntry.h"
 

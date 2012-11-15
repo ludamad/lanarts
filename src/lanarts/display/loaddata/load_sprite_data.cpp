@@ -1,13 +1,12 @@
 /*
- * load_sprite_data.cpp
- *
- *  Created on: Mar 25, 2012
- *      Author: 100397561
+ * load_sprite_data.cpp:
+ *   Loads sprite data from
  */
 #include <fstream>
-
-#include "../../data/game_data.h"
 #include <yaml-cpp/yaml.h>
+
+#include "../../lua/lua_yaml.h"
+#include "../../data/game_data.h"
 #include "../../data/yaml_util.h"
 
 using namespace std;
@@ -59,14 +58,16 @@ static SpriteEntry::sprite_type type_from_str(const std::string& type) {
 void load_sprite_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	std::string type = parse_defaulted(node, "type", std::string());
-	game_sprite_data.push_back(
-			SpriteEntry(parse_str(node["name"]), parse_imgfilelist(node),
-					type_from_str(type),
-					parse_defaulted(node, "colour", Colour())));
-	value->table_set_yaml(L, game_sprite_data.back().name.c_str(), node);
+	SpriteEntry entry = SpriteEntry(parse_str(node["name"]),
+			parse_imgfilelist(node), type_from_str(type),
+			parse_defaulted(node, "colour", Colour()));
+	game_sprite_data.push_back(entry);
+
+	value->get(L, entry.name) = node;
 }
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
+	ret.table_initialize(L);
 
 	game_sprite_data.clear();
 

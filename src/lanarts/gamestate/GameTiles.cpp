@@ -9,7 +9,7 @@
 
 #include "../objects/player/PlayerInst.h"
 
-#include "../serialize/SerializeBuffer.h"
+#include <common/SerializeBuffer.h>
 
 #include "../util/math_util.h"
 #include "GameState.h"

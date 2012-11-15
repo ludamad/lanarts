@@ -6,6 +6,7 @@
 #ifndef COLLISIONAVOIDANCE_H_
 #define COLLISIONAVOIDANCE_H_
 
+#include <common/geometry.h>
 #include <vector>
 
 #include "../lanarts_defines.h"

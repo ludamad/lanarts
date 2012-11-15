@@ -19,6 +19,7 @@ include_directories(
 	${SRC} #/common and /net
 	${LIBS}/yaml-cpp/include 
 	${LIBS} #/lua and /rvo2 
+	${LIBS}/slb/include
 	)
 
 set( lanarts_tests
@@ -26,7 +27,6 @@ set( lanarts_tests
 	tests/tests.cpp
 
 	tests/lua_tests.cpp
-	tests/lua_serialize_tests.cpp
 
 	tests/net/net_tests.cpp
 	tests/net/adv_net_tests.cpp
@@ -102,7 +102,6 @@ set( lanarts_src
 	levelgen/lua_levelgen_funcs.cpp
 	levelgen/tunnelgen.cpp
 	
-	lua/lmarshal.cpp
 	lua/lua_api.cpp
 	lua/lua_collision_checks.cpp
 	lua/lua_combatstats.cpp
@@ -112,7 +111,7 @@ set( lanarts_src
 	lua/lua_gamestate.cpp
 	lua/lua_object_funcs.cpp
 	lua/lua_spelltarget_funcs.cpp
-	lua/LuaValue.cpp
+	lua/lua_yaml.cpp
 	
 	menu/gameconfig_menu.cpp
 	menu/lobby_menu.cpp
@@ -150,8 +149,6 @@ set( lanarts_src
 	
 	pathfind/astar_pathfind.cpp
 	pathfind/pathfind.cpp
-	
-	serialize/SerializeBuffer.cpp
 	
 	stats/items/ItemEntry.cpp
 	stats/items/items.cpp
@@ -251,9 +248,10 @@ set( lanarts_include
 	levelgen/lua_levelgen_funcs.h
 	levelgen/tunnelgen.h
 
-	lua/lmarshal.h
 	lua/lua_api.h
 	lua/lunar.h
+	lua/lua_yaml.h
+	lua/lua_gameinst.h
 
 	menu/menus.h
 
@@ -287,8 +285,6 @@ set( lanarts_include
 	pathfind/astar_pathfind.h
 	pathfind/gheap.h
 	pathfind/pathfind.h
-
-	serialize/SerializeBuffer.h
 
 	stats/loaddata/load_stats.h
 	

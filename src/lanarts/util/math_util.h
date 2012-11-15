@@ -8,6 +8,8 @@
 
 #include "../lanarts_defines.h"
 
+struct Pos;
+
 int power_of_two(int input);
 void direction_towards(const Pos& a, const Pos& b, float& rx, float& ry,
 		float speed = 1);

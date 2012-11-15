@@ -14,6 +14,8 @@ extern "C" {
 #include "../../data/game_data.h"
 #include "../../data/yaml_util.h"
 
+#include "../../lua/lua_yaml.h"
+
 #include "../items/ItemEntry.h"
 
 using namespace std;
@@ -41,11 +43,13 @@ static void load_item_callbackf(const YAML::Node& node, lua_State* L,
 	ItemEntry* entry = new ItemEntry;
 	parse_item_entry(node, *entry);
 	game_item_data.push_back(entry);
-	value->table_set_yaml(L, entry->name, node);
+
+	value->get(L, entry->name) = node;
 }
 
 LuaValue load_item_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
+	ret.table_initialize(L);
 
 	clear_item_data(game_item_data);
 

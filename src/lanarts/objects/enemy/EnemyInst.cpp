@@ -6,17 +6,17 @@
 #include <cmath>
 #include <typeinfo>
 
+#include <common/lua/LuaValue.h>
+#include <common/SerializeBuffer.h>
+
+#include "../../lua/lua_gameinst.h"
+
 #include "../../display/colour_constants.h"
 #include "../../display/display.h"
 #include "../../display/sprite_data.h"
 
 #include "../../gamestate/GameState.h"
-
 #include "../../interface/console_description_draw.h"
-
-#include "../../lua/LuaValue.h"
-
-#include "../../serialize/SerializeBuffer.h"
 
 #include "../../stats/items/WeaponEntry.h"
 #include "../../stats/stat_formulas.h"
@@ -30,6 +30,7 @@
 
 #include "../ProjectileInst.h"
 #include "../collision_filters.h"
+
 #include "EnemyInst.h"
 #include "EnemyEntry.h"
 

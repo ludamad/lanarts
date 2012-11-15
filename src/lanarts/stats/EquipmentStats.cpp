@@ -3,7 +3,7 @@
  *  Represents all the possessions and equipped items of a player
  */
 
-#include "../serialize/SerializeBuffer.h"
+#include <common/SerializeBuffer.h>
 
 #include "items/ItemEntry.h"
 #include "items/ProjectileEntry.h"

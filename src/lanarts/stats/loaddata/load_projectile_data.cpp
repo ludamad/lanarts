@@ -8,11 +8,12 @@ extern "C" {
 #include "../../data/game_data.h"
 #include "../../data/yaml_util.h"
 
+#include "../../lua/lua_yaml.h"
+
 #include "../items/ItemEntry.h"
 #include "load_stats.h"
 
 using namespace std;
-
 
 void parse_projectile_entry(const YAML::Node& n, ProjectileEntry& entry) {
 	parse_equipment_entry(n, entry);
@@ -34,33 +35,31 @@ void parse_projectile_entry(const YAML::Node& n, ProjectileEntry& entry) {
 	entry.type = EquipmentEntry::PROJECTILE;
 }
 
-void load_projectile_callbackf(const YAML::Node& node, lua_State* L,
+static void load_projectile(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	ProjectileEntry* entry = new ProjectileEntry;
 	parse_projectile_entry(node, *entry);
 
 	game_item_data.push_back(entry);
 	/* Lua loading code */
-	value->table_set_yaml(L, entry->name, node);
-	value->table_push_value(L, entry->name);
-	lua_pushstring(L, "projectile");
-	lua_setfield(L, -2, "type");
-	lua_pop(L, 1);
 
+	LuaValue nodetable = lua_yaml(L, node);
+	value->get(L, entry->name) = nodetable;
+	nodetable.get(L, "type") = "projectile";
 }
 LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 		LuaValue& itemtable) {
 	LuaValue ret;
 	ret.table_initialize(L);
 
-	load_data_impl_template(filenames, "projectiles", load_projectile_callbackf,
-			L, &itemtable);
+	load_data_impl_template(filenames, "projectiles", load_projectile, L,
+			&itemtable);
 	for (int i = 0; i < game_item_data.size(); i++) {
 		ItemEntry& ientry = get_item_entry(i);
 		if (dynamic_cast<ProjectileEntry*>(&ientry)) {
 			ProjectileEntry& entry = get_projectile_entry(i);
-			itemtable.table_push_value(L, entry.name.c_str());
-			ret.table_pop_value(L, entry.name.c_str());
+
+			ret.get(L, entry.name) = itemtable.get(L, entry.name);
 		}
 	}
 	return ret;

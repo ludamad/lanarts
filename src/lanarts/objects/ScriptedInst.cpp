@@ -8,9 +8,10 @@
  */
 
 #include <typeinfo>
+#include <common/lua/LuaValue.h>
 
+#include "../lua/lua_gameinst.h"
 #include "../gamestate/GameState.h"
-#include "../lua/LuaValue.h"
 
 #include "ScriptedInst.h"
 

@@ -13,7 +13,7 @@
 
 #include "../objects/AnimatedInst.h"
 #include "../objects/InstTypeEnum.h"
-#include "../serialize/SerializeBuffer.h"
+#include <common/SerializeBuffer.h>
 
 #include "../util/math_util.h"
 #include "GameInstSet.h"

@@ -26,7 +26,7 @@ void lua_register_ldraw(lua_State* L, LuaValue& module) {
 	using namespace ldraw;
 #define BIND_FUNC(f)\
 	SLB::FuncCall::create(f)->push(L); \
-	module.table_pop_value(L, #f)
+	module.get(L, #f).pop()
 
 	BIND_FUNC(draw_rectangle);
 	BIND_FUNC(draw_circle);

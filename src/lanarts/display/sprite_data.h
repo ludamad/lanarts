@@ -4,10 +4,14 @@
 #include <vector>
 #include <string>
 
+#include <common/geometry.h>
+
 #include "../data/FilenameList.h"//For FilenameList
 
 #include "../lanarts_defines.h"
+
 #include "GLImage.h"
+
 struct SpriteEntry {
 	enum sprite_type {
 		ANIMATED, DIRECTIONAL

@@ -8,7 +8,7 @@
 #include "../../data/game_data.h"
 #include <yaml-cpp/yaml.h>
 #include "../../data/yaml_util.h"
-#include "../../lua/LuaValue.h"
+#include <common/lua/LuaValue.h>
 
 using namespace std;
 

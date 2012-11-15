@@ -14,6 +14,7 @@ include_directories(${SDL_INCLUDE_DIR}
 
 
 set( lcommon_src
+    func_timer.h
 	geometry.cpp
 	geometry.h
 	lcommon_defines.h
@@ -60,6 +61,8 @@ set( lcommon_tests
 	tests/lua_geometry_tests.cpp
 	tests/lua_range_tests.cpp
 	tests/lua_vector_tests.cpp
+	tests/luavalue_tests.cpp
+    tests/lua_serialize_tests.cpp
 	tests/strformat_tests.cpp
 )
 
@@ -70,8 +73,6 @@ add_executable( lcommon_tests
 
 target_link_libraries( 
 			lcommon_tests
-			"/home/adomurad/lanarts-git/lanarts_build/libs/slb/libslb.a"
-			"/home/adomurad/lanarts-git/lanarts_build/libs/lua/liblua.a"
-			#lua
-			#slb
+			lua
+			slb
 )

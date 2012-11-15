@@ -86,7 +86,7 @@ public:
 		return bbox.height();
 	}
 private:
-	static const int SX = TILE_SIZE / 2, SY = TILE_SIZE * 1.5 + 4;
+	static const int SX = TILE_SIZE / 2, SY = TILE_SIZE * 3 / 2 + 4;
 
 	Pos get_next_draw_position() {
 		int xinterval = bbox.width() / cols_per_row;

@@ -6,6 +6,8 @@
 #ifndef GAME_DATA_H_
 #define GAME_DATA_H_
 
+#include <common/lua/LuaValue.h>
+
 #include "../display/sprite_data.h"
 
 #include "../display/tile_data.h"
@@ -13,7 +15,6 @@
 #include "../gamestate/GameSettings.h"
 #include "../gamestate/tileset_data.h"
 #include "../levelgen/dungeon_data.h"
-#include "../lua/LuaValue.h"
 #include "../objects/enemy/EnemyEntry.h"
 #include "../objects/scriptobject_data.h"
 

@@ -8,7 +8,7 @@
 
 #include <set>
 
-#include "../serialize/SerializeBuffer.h"
+#include <common/SerializeBuffer.h>
 
 #include "../lanarts_defines.h"
 

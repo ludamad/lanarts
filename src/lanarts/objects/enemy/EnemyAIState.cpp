@@ -3,6 +3,7 @@
  *  State information that affects enemy AI decisions
  */
 
+#include <common/SerializeBuffer.h>
 #include "EnemyAIState.h"
 
 

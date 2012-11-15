@@ -8,7 +8,11 @@
 
 #include <string>
 
+#include <common/geometry.h>
+
 #include "../lanarts_defines.h"
+
+#include "../region.h"
 
 struct lua_State;
 class GameState;

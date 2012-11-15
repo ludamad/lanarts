@@ -9,7 +9,7 @@
 #define AREAGEN_H_
 
 #include <vector>
-#include "../lua/LuaValue.h"
+#include <common/lua/LuaValue.h>
 #include "../lanarts_defines.h"
 
 enum {

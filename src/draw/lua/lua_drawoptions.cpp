@@ -9,6 +9,7 @@ extern "C" {
 #include <common/lua/slb_valuetype.h>
 #include <common/lua/lua_geometry.h>
 #include <common/lua/LuaValue.h>
+#include <common/lua/luacpp.h>
 
 #include "lua_colour.h"
 #include "lua_drawoptions.h"
@@ -41,8 +42,7 @@ bool lua_check_drawoptions(lua_State *L, int idx) {
 void lua_register_draworigin_constants(lua_State *L, LuaValue& module) {
 	using namespace ldraw;
 #define BIND_ORIGIN_CONST(origin) \
-	lua_pushnumber(L, int(origin)); \
-	module.table_pop_value(L, #origin)
+	module.get(L, #origin) = +origin
 
 	BIND_ORIGIN_CONST(LEFT_TOP);
 	BIND_ORIGIN_CONST(LEFT_CENTER);

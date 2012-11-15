@@ -8,12 +8,13 @@
 
 #include <cstring>
 #include <vector>
+#include <common/SerializeBuffer.h>
 
 #include "../../collision_avoidance/CollisionAvoidance.h"
 
-#include "../../serialize/SerializeBuffer.h"
-
 #include "../../lanarts_defines.h"
+
+class GameState;
 
 struct EnemyAIPath {
 	std::vector<Pos> nodes;

@@ -14,6 +14,8 @@ extern "C" {
 #include "../../data/game_data.h"
 #include "../../data/yaml_util.h"
 
+#include "../../lua/lua_yaml.h"
+
 #include "../items/ItemEntry.h"
 
 #include "../itemgen_data.h"
@@ -36,19 +38,21 @@ ItemGenList parse_itemgenlist(const YAML::Node& n) {
 			&parse_item_chance);
 	return igs;
 }
-void load_itemlist_callbackf(const YAML::Node& node, lua_State* L,
+static void load_itemlist(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
-	game_itemgenlist_data.push_back(parse_itemgenlist(node));
-	const std::string& name = game_itemgenlist_data.back().name;
-	value->table_set_yaml(L, name, node);
+	ItemGenList igl = parse_itemgenlist(node);
+	game_itemgenlist_data.push_back(igl);
+
+	value->get(L, igl.name) = node;
 }
 
 LuaValue load_itemgenlist_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
+	ret.table_initialize(L);
 
 	game_itemgenlist_data.clear();
 
-	load_data_impl_template(filenames, "itemgen_lists", load_itemlist_callbackf,
+	load_data_impl_template(filenames, "itemgen_lists", load_itemlist,
 			L, &ret);
 
 	return ret;

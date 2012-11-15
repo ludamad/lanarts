@@ -3,7 +3,7 @@
  *  Item's held by a player/enemy
  */
 
-#include "../serialize/SerializeBuffer.h"
+#include <common/SerializeBuffer.h>
 
 #include "items/ItemEntry.h"
 #include "items/EquipmentEntry.h"

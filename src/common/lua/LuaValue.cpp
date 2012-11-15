@@ -12,6 +12,8 @@ extern "C" {
 #include "LuaValue.h"
 #include "lua_serialize.h"
 
+using namespace LCommonPrivate;
+
 static std::string format_expression_string(const std::string& str) {
 	const char prefix[] = "return ";
 	if (str.empty())
@@ -21,14 +23,14 @@ static std::string format_expression_string(const std::string& str) {
 	return "return " + str;
 }
 
-class LuaValueImpl {
-public:
+namespace LCommonPrivate {
 
-	LuaValueImpl(const std::string& expr = std::string()) :
+struct _LuaValueImpl {
+	_LuaValueImpl(const std::string& expr = std::string()) :
 			L(NULL), lua_expression(format_expression_string(expr)), refcount(
 					1), empty(true) {
 	}
-	~LuaValueImpl() {
+	~_LuaValueImpl() {
 		if (L) {
 			deinitialize(L);
 		}
@@ -63,13 +65,6 @@ public:
 		lua_settable(L, LUA_REGISTRYINDEX);
 		lua_expression.clear();
 	}
-	void table_initialize(lua_State* L) {
-		empty = false;
-		this->L = L;
-		lua_pushlightuserdata(L, this); /* push address as key */
-		lua_newtable(L);
-		lua_settable(L, LUA_REGISTRYINDEX);
-	}
 
 	void push(lua_State* L) const {
 		LCOMMON_ASSERT(L == this->L);
@@ -89,14 +84,6 @@ public:
 		/*Pop value*/
 	}
 
-	size_t& ref_count() {
-		return refcount;
-	}
-
-	bool is_empty() const {
-		return empty;
-	}
-
 	void serialize(lua_State* L, SerializeBuffer& serializer) {
 
 		serializer.write(lua_expression);
@@ -111,15 +98,16 @@ public:
 		pop(L);
 	}
 
-private:
 	lua_State* L;
 	std::string lua_expression;
 	size_t refcount;
 	bool empty;
 };
 
-static void deref(LuaValueImpl* impl) {
-	if (impl && --impl->ref_count() == 0)
+}
+
+static void deref(_LuaValueImpl* impl) {
+	if (impl && --impl->refcount == 0)
 		delete impl;
 }
 
@@ -127,7 +115,7 @@ LuaValue::LuaValue(const std::string & expr) {
 	if (expr.empty())
 		impl = NULL;
 	else
-		impl = new LuaValueImpl(expr);
+		impl = new _LuaValueImpl(expr);
 }
 
 LuaValue::LuaValue(lua_State* L, int pos) {
@@ -150,8 +138,9 @@ void LuaValue::initialize(lua_State* L) {
 
 void LuaValue::table_initialize(lua_State* L) {
 	if (!impl)
-		impl = new LuaValueImpl();
-	impl->table_initialize(L);
+		impl = new _LuaValueImpl();
+	lua_newtable(L);
+	impl->pop(L);
 }
 
 void LuaValue::deinitialize(lua_State* L) {
@@ -169,71 +158,33 @@ void LuaValue::push(lua_State* L) const {
 
 void LuaValue::set(lua_State *L, int pos) {
 	if (!impl)
-		impl = new LuaValueImpl();
+		impl = new _LuaValueImpl();
 	impl->set(L, pos);
 }
 
 void LuaValue::pop(lua_State* L) {
 	if (!impl)
-		impl = new LuaValueImpl();
+		impl = new _LuaValueImpl();
 	impl->pop(L);
-}
-
-void LuaValue::table_set_function(lua_State* L, const char *key,
-		lua_CFunction value) {
-	LCOMMON_ASSERT(!empty());
-	push(L); /*Get the associated lua table*/
-	int tableind = lua_gettop(L);
-	/*Push the C function*/
-	lua_pushcfunction(L, value);
-	lua_setfield(L, tableind, key);
-	/*Pop table*/
-	lua_pop(L, 1);
-}
-
-void LuaValue::table_set_newtable(lua_State* L, const char *key) {
-	LCOMMON_ASSERT(!empty());
-	push(L);
-	int tableind = lua_gettop(L);
-	lua_newtable(L);
-	/*Push a new table*/
-	lua_setfield(L, tableind, key);
-	/*Pop table*/
-	lua_pop(L, 1);
 }
 
 LuaValue::LuaValue(const LuaValue & value) {
 	impl = value.impl;
 	if (impl) {
-		impl->ref_count()++;}
+		impl->refcount++;
 	}
+}
 
 void LuaValue::operator =(const LuaValue & value) {
 	deref(impl);
 	impl = value.impl;
-	if (impl)
-		impl->ref_count()++;}
-
-void LuaValue::table_pop_value(lua_State* L, const char *key) {
-	LCOMMON_ASSERT(!empty());
-	int value = lua_gettop(L);
-	push(L); /*Get the associated lua table*/
-	int tableind = lua_gettop(L);
-	lua_pushvalue(L, value); /*Clone value*/
-	lua_setfield(L, tableind, key);
-	/*Pop table and value*/
-	lua_pop(L, 2);
-}
-void LuaValue::table_push_value(lua_State* L, const char *key) {
-	LCOMMON_ASSERT(!empty());
-	push(L); /*Get the associated lua table*/
-	int tableind = lua_gettop(L);
-	lua_getfield(L, tableind, key);
-	lua_replace(L, tableind);
+	if (impl) {
+		impl->refcount++;
+	}
 }
 
 bool LuaValue::empty() const {
-	return impl == NULL || impl->is_empty();
+	return impl == NULL || impl->empty;
 }
 
 void LuaValue::serialize(lua_State* L, SerializeBuffer& serializer) {
@@ -254,7 +205,7 @@ void LuaValue::deserialize(lua_State* L, SerializeBuffer& serializer) {
 	}
 
 	if (!impl) {
-		impl = new LuaValueImpl();
+		impl = new _LuaValueImpl();
 	}
 	impl->deserialize(L, serializer);
 }
@@ -267,5 +218,49 @@ bool LuaValue::isnil(lua_State* L) {
 	bool nilval = lua_isnil(L, -1);
 	lua_pop(L, 1);
 	return nilval;
+}
+
+void luafield_pop(lua_State* L, const LuaValue& value, const char* key) {
+	value.push(L);
+	LCOMMON_ASSERT(!lua_isnil(L, -1));
+
+	lua_pushvalue(L, -2);
+	lua_setfield(L, -2, key);
+	/*Pop table and value*/
+	lua_pop(L, 2);
+}
+void luafield_push(lua_State* L, const LuaValue& value, const char* key) {
+	value.push(L); /*Get the associated lua table*/
+	LCOMMON_ASSERT(!lua_isnil(L, -1));
+
+	int tableind = lua_gettop(L);
+	lua_getfield(L, tableind, key);
+	lua_replace(L, tableind);
+}
+
+LuaValue::LuaValue(const _LuaFieldValue & cstrfield) {
+	impl = new _LuaValueImpl();
+	cstrfield.push();
+	impl->pop(cstrfield.L);
+}
+
+namespace LCommonPrivate {
+
+void _LuaFieldValue::operator =(const LuaValue & value) {
+	value.push(L);
+	pop();
+}
+
+void _LuaFieldValue::operator =(lua_CFunction func) {
+	lua_pushcfunction(L, func);
+	pop();
+}
+
+}
+
+void _LuaFieldValue::operator =(const _LuaFieldValue & field) {
+	LCOMMON_ASSERT(L == field.L);
+	field.push();
+	pop();
 }
 

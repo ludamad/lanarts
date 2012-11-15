@@ -1,7 +1,7 @@
 #ifndef EFFECTS_H
 #define EFFECTS_H
 
-#include "../lua/LuaValue.h"
+#include <common/lua/LuaValue.h>
 
 #include "../lanarts_defines.h"
 
@@ -14,6 +14,8 @@ struct EffectiveStats;
 class GameState;
 class CombatGameInst;
 class SerializeBuffer;
+
+struct Pos;
 
 struct Effect {
 	effect_id effectid;

@@ -9,6 +9,8 @@
 
 #include "../../data/yaml_util.h"
 
+#include "../../lua/lua_yaml.h"
+
 #include "load_stats.h"
 
 using namespace std;
@@ -46,11 +48,14 @@ SpellEntry parse_spell_type(const YAML::Node& n) {
 
 void load_spell_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
-	game_spell_data.push_back(parse_spell_type(node));
-	value->table_set_yaml(L, game_spell_data.back().name, node);
+	SpellEntry entry = parse_spell_type(node);
+	game_spell_data.push_back(entry);
+
+	value->get(L, entry.name) = node;
 }
 LuaValue load_spell_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
+	ret.table_initialize(L);
 
 	game_spell_data.clear();
 

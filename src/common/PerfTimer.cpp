@@ -5,6 +5,7 @@
 
 #include "PerfTimer.h"
 
+
 void MethodPerfProfile::begin_timer() {
 	timer.start();
 }

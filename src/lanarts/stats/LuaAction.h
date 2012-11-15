@@ -6,7 +6,7 @@
 #ifndef LUAACTION_H_
 #define LUAACTION_H_
 
-#include "../lua/LuaValue.h"
+#include <common/lua/LuaValue.h>
 
 struct LuaAction {
 	std::string success_message;

@@ -11,7 +11,7 @@
 #include "../display/display.h"
 
 #include "../gamestate/GameState.h"
-#include "../serialize/SerializeBuffer.h"
+#include <common/SerializeBuffer.h>
 #include "GameInst.h"
 
 GameInst::~GameInst() {

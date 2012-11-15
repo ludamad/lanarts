@@ -4,7 +4,7 @@
  *  TODO: either rename this or 'stats.h' ?
  */
 
-#include "../serialize/SerializeBuffer.h"
+#include <common/SerializeBuffer.h>
 
 #include "items/ProjectileEntry.h"
 #include "items/WeaponEntry.h"

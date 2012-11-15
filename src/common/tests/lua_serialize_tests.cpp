@@ -3,10 +3,10 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-#include <common/unittest.h>
+#include "../unittest.h"
 
 #include "../lua/LuaValue.h"
-#include "../serialize/SerializeBuffer.h"
+#include "../SerializeBuffer.h"
 
 static lua_State* L;
 
@@ -96,11 +96,11 @@ static void lua_serialize_nested_table() {
 	lua_pop(L, 3);
 }
 
-void lua_serialize_tests(lua_State* LS) {
-	L = LS;
+void lua_serialize_tests() {
+	L = lua_open();
 	UNIT_TEST(lua_serialize_novalue);
 	UNIT_TEST(lua_serialize_number);
 	UNIT_TEST(lua_serialize_table);
 	UNIT_TEST(lua_serialize_nested_table);
-	L = NULL;
+	lua_close(L);
 }

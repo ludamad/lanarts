@@ -4,7 +4,9 @@
 void lua_geometry_tests();
 void lua_range_tests();
 void lua_vector_tests();
+void lua_serialize_tests();
 void strformat_tests();
+void luavalue_tests();
 
 void run_lcommon_tests() {
 	unit_test_reset_counts();
@@ -12,7 +14,9 @@ void run_lcommon_tests() {
 	lua_geometry_tests();
 	lua_range_tests();
 	lua_vector_tests();
+	lua_serialize_tests();
 	strformat_tests();
+	luavalue_tests();
 
 	unit_test_print_count();
 }

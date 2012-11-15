@@ -127,9 +127,9 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 	}
 
 	lua_push_gameinst(L, p);
-	script_globals.table_pop_value(L, "player");
+	script_globals.get(L, "player").pop();
 	lua_push_combatstats(L, p);
-	script_globals.table_pop_value(L, "stats");
+	script_globals.get(L, "stats").pop();
 
 	//Run lua command
 	if (starts_with(command, "!lua ", &content)) {

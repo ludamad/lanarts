@@ -107,7 +107,6 @@ static void setup_lua_state() {
 	lua_register_ldraw(L, globals);
 	lua_register_lcommon(L, globals);
 
-	printf("Final lua stack: %d\n", lua_gettop(L));
 }
 
 int main(int argc, const char** argv) {

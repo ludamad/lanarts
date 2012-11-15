@@ -9,7 +9,7 @@
 #include "../../display/sprite_data.h"
 #include "../../gamestate/GameState.h"
 
-#include "../../serialize/SerializeBuffer.h"
+#include <common/SerializeBuffer.h>
 
 #include "../../stats/items/ItemEntry.h"
 #include "../../util/math_util.h"

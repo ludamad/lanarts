@@ -4,6 +4,7 @@ extern "C" {
 #include <lua/lua.h>
 }
 
+#include "../../lua/lua_yaml.h"
 #include "../../data/game_data.h"
 #include "../../data/yaml_util.h"
 
@@ -43,8 +44,9 @@ void load_equipment_callbackf(const YAML::Node& node, lua_State* L,
 
 	game_item_data.push_back(entry);
 	/* Lua loading code */
-	value->table_set_yaml(L, entry->name, node);
-	value->table_push_value(L, entry->name);
+	lua_pushyaml(L, node);
+	lua_pushvalue(L, -1); // Duplicate
+	value->get(L, entry->name).pop();
 	lua_pushstring(L, "armour");
 	lua_setfield(L, -2, "type");
 	lua_pop(L, 1);

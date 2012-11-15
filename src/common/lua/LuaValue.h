@@ -10,17 +10,68 @@
 
 #include <string>
 
-class LuaValueImpl;
 struct lua_State;
 class SerializeBuffer;
+class LuaValue;
 
 typedef int (*lua_CFunction)(lua_State *L);
+
+void luafield_pop(lua_State* L, const LuaValue& value, const char* key);
+
+inline void luafield_pop(lua_State* L, const LuaValue& value,
+		const std::string& key) {
+	luafield_pop(L, value, key.c_str());
+}
+
+void luafield_push(lua_State* L, const LuaValue& value, const char* key);
+
+inline void luafield_push(lua_State* L, const LuaValue& value,
+		const std::string& key) {
+	luafield_push(L, value, key.c_str());
+}
+
+namespace LCommonPrivate {
+
+struct _LuaValueImpl;
+
+struct _LuaFieldValue {
+	_LuaFieldValue(lua_State* L, const LuaValue& value, const char* key) :
+			L(L), value(value), key(key) {
+	}
+	void push() const {
+		luafield_push(L, value, key);
+	}
+	void pop() const {
+		luafield_pop(L, value, key);
+	}
+
+	lua_State* L;
+	const LuaValue& value;
+	const char* key;
+	template<typename T>
+	operator T();
+
+	template<typename T>
+	void operator=(const T& value);
+	void operator=(const LuaValue& value);
+	void operator=(lua_CFunction func);
+	void operator=(const _LuaFieldValue& field);
+
+private:
+	friend class ::LuaValue;
+	_LuaFieldValue(const _LuaFieldValue& field) :
+			L(field.L), value(field.value), key(field.key) {
+	}
+};
+
+}
 
 class LuaValue {
 public:
 	LuaValue(const std::string& expr);
 	LuaValue(const LuaValue& value);
 	LuaValue(lua_State* L, int pos);
+	LuaValue(const LCommonPrivate::_LuaFieldValue& cstrfield);
 	LuaValue();
 	~LuaValue();
 
@@ -34,21 +85,22 @@ public:
 	bool empty() const;
 
 	void table_initialize(lua_State* L);
-	void table_pop_value(lua_State* L, const char* key);
-	void table_push_value(lua_State* L, const char* key);
-	void table_set_function(lua_State* L, const char* key, lua_CFunction value);
 
-	void table_set_newtable(lua_State* L, const char* key);
-	/* For convenience, since these keys will often be dynamically allocated 'string's */
-	void table_push_value(lua_State* L, const std::string& key) {
-		table_push_value(L, key.c_str());
-	}
 	void serialize(lua_State* L, SerializeBuffer& serializer);
 	void deserialize(lua_State* L, SerializeBuffer& serializer);
 
+	LCommonPrivate::_LuaFieldValue get(lua_State* L, const char* key) const {
+		return LCommonPrivate::_LuaFieldValue(L, *this, key);
+	}
+	//NB: it is unsafe to have 'std::string& key' be const here!
+	//This would result potentially in a char* ptr being used outside of its scope
+	LCommonPrivate::_LuaFieldValue get(lua_State* L, std::string& key) const {
+		return get(L, key.c_str());
+	}
+
 	bool isnil(lua_State* L);
 private:
-	LuaValueImpl* impl;
+	LCommonPrivate::_LuaValueImpl* impl;
 };
 
 #endif /* LCOMMON_LUAVALUE_H_ */

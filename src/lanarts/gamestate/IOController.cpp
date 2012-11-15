@@ -3,6 +3,8 @@
  *  Handles dispatch of events bound to keyboard keys
  */
 
+#include <common/geometry.h>
+
 #include "IOController.h"
 
 bool IOEventTrigger::should_trigger(IOEventTrigger::trigger_t trigger,

@@ -5,7 +5,7 @@
 
 #include <cstring>
 
-#include "../../serialize/SerializeBuffer.h"
+#include <common/SerializeBuffer.h>
 
 #include "EquipmentEntry.h"
 #include "ItemEntry.h"

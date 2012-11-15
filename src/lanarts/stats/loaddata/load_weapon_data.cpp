@@ -6,6 +6,8 @@ extern "C" {
 #include "../../data/game_data.h"
 #include "../../data/yaml_util.h"
 
+#include "../../lua/lua_yaml.h"
+
 #include "../items/WeaponEntry.h"
 
 #include "../items/ItemEntry.h"
@@ -42,11 +44,9 @@ void load_weapon_callbackf(const YAML::Node& node, lua_State* L,
 	game_item_data.push_back(entry);
 	if (value) {
 		/* Lua loading code */
-		value->table_set_yaml(L, entry->name, node);
-		value->table_push_value(L, entry->name);
-		lua_pushstring(L, "weapon");
-		lua_setfield(L, -2, "type");
-		lua_pop(L, 1);
+		LuaValue nodetable = lua_yaml(L, node);
+		nodetable.get(L, "type") = "weapon";
+		value->get(L, entry->name) = nodetable;
 	}
 }
 

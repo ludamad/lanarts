@@ -4,16 +4,19 @@
  */
 
 #include <fstream>
+#include <yaml-cpp/yaml.h>
 
 #include "../../data/game_data.h"
-#include <yaml-cpp/yaml.h>
 #include "../../data/yaml_util.h"
+
 #include "../../objects/enemy/EnemyEntry.h"
+
+#include "../../lua/lua_yaml.h"
+
 #include "../class_data.h"
 #include "../stats.h"
 
 #include "load_stats.h"
-
 
 using namespace std;
 
@@ -73,12 +76,14 @@ ClassType parse_class(const YAML::Node& n) {
 
 void load_class_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
-	game_class_data.push_back(parse_class(node));
-	value->table_set_yaml(L, game_class_data.back().name, node);
+	ClassType entry = parse_class(node);
+	value->get(L, entry.name) = node;
+	game_class_data.push_back(entry);
 }
 
 LuaValue load_class_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
+	ret.table_initialize(L);
 
 	game_class_data.clear();
 	load_data_impl_template(filenames, "classes", load_class_callbackf, L,

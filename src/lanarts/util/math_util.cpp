@@ -6,6 +6,8 @@
 #include <cmath>
 #include <algorithm>
 
+#include <common/geometry.h>
+
 #include "math_util.h"
 
 int power_of_two(int input) {

@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 
+#include <common/geometry.h>
+
 #include "../util/mtwist.h"
 #include "../lanarts_defines.h"
 #include "../stats/items/items.h"

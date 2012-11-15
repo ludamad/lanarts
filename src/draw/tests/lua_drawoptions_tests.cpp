@@ -19,18 +19,24 @@ static void drawoptions_func_defaults(const ldraw::DrawOptions& options) {
 	UNIT_TEST_ASSERT(options.draw_colour == defaults.draw_colour);
 	UNIT_TEST_ASSERT(options.draw_origin == defaults.draw_origin);
 	UNIT_TEST_ASSERT(options.draw_region == defaults.draw_region);
+	UNIT_TEST_ASSERT(options.draw_scale == defaults.draw_scale);
+	UNIT_TEST_ASSERT(options.draw_angle == defaults.draw_angle);
 }
 static void drawoptions_func_difforigin(const ldraw::DrawOptions& options) {
 	ldraw::DrawOptions defaults;
 	UNIT_TEST_ASSERT(options.draw_colour == defaults.draw_colour);
 	UNIT_TEST_ASSERT(options.draw_origin == ldraw::CENTER);
 	UNIT_TEST_ASSERT(options.draw_region == defaults.draw_region);
+	UNIT_TEST_ASSERT(options.draw_scale == defaults.draw_scale);
+	UNIT_TEST_ASSERT(options.draw_angle == defaults.draw_angle);
 }
 
 static void drawoptions_func_diffall(const ldraw::DrawOptions& options) {
 	UNIT_TEST_ASSERT(options.draw_colour == Colour(1,2,3,4));
 	UNIT_TEST_ASSERT(options.draw_origin == ldraw::CENTER);
 	UNIT_TEST_ASSERT(options.draw_region == BBoxF(1,2,3,4));
+	UNIT_TEST_ASSERT(options.draw_scale == DimF(1,2));
+	UNIT_TEST_ASSERT(options.draw_angle == 1.0f);
 }
 
 static void lua_drawoptions_bind_test() {
@@ -48,18 +54,18 @@ static void lua_drawoptions_bind_test() {
 	m.set("drawoptions_func_diffall",
 			SLB::FuncCall::create(drawoptions_func_diffall));
 	{
-		const char* code =
-				"SLB.drawoptions_func_defaults({})\n";
+		const char* code = "SLB.drawoptions_func_defaults({})\n";
 		lua_assert_valid_dostring(L, code);
 	}
 	{
 		const char* code =
-				"SLB.drawoptions_func_difforigin({origin = SLB.CENTER})\n";
+				"SLB.drawoptions_func_difforigin({origin = CENTER})\n";
 		lua_assert_valid_dostring(L, code);
 	}
 	{
 		const char* code =
-				"SLB.drawoptions_func_diffall({colour = {1,2,3,4}, region = {1,2,3,4}, origin = SLB.CENTER})\n";
+				"SLB.drawoptions_func_diffall({color = {1,2,3,4}, region = {1,2,3,4}, "
+						" origin = CENTER, scale = {1,2}, angle = 1})\n";
 		lua_assert_valid_dostring(L, code);
 	}
 	lua_close(L);
