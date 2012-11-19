@@ -21,6 +21,7 @@ static void drawoptions_func_defaults(const ldraw::DrawOptions& options) {
 	UNIT_TEST_ASSERT(options.draw_region == defaults.draw_region);
 	UNIT_TEST_ASSERT(options.draw_scale == defaults.draw_scale);
 	UNIT_TEST_ASSERT(options.draw_angle == defaults.draw_angle);
+	UNIT_TEST_ASSERT(options.draw_frame == defaults.draw_frame);
 }
 static void drawoptions_func_difforigin(const ldraw::DrawOptions& options) {
 	ldraw::DrawOptions defaults;
@@ -29,6 +30,7 @@ static void drawoptions_func_difforigin(const ldraw::DrawOptions& options) {
 	UNIT_TEST_ASSERT(options.draw_region == defaults.draw_region);
 	UNIT_TEST_ASSERT(options.draw_scale == defaults.draw_scale);
 	UNIT_TEST_ASSERT(options.draw_angle == defaults.draw_angle);
+	UNIT_TEST_ASSERT(options.draw_frame == defaults.draw_frame);
 }
 
 static void drawoptions_func_diffall(const ldraw::DrawOptions& options) {
@@ -37,36 +39,38 @@ static void drawoptions_func_diffall(const ldraw::DrawOptions& options) {
 	UNIT_TEST_ASSERT(options.draw_region == BBoxF(1,2,3,4));
 	UNIT_TEST_ASSERT(options.draw_scale == DimF(1,2));
 	UNIT_TEST_ASSERT(options.draw_angle == 1.0f);
+	UNIT_TEST_ASSERT(options.draw_frame == 1.0f);
 }
 
 static void lua_drawoptions_bind_test() {
 	lua_State* L = lua_open();
+	{
+		SLB::Manager m;
+		m.registerSLB(L);
+		LuaValue globals(L, LUA_GLOBALSINDEX);
 
-	SLB::Manager m;
-	m.registerSLB(L);
-	LuaValue globals(L, LUA_GLOBALSINDEX);
-
-	lua_register_draworigin_constants(L, globals);
-	m.set("drawoptions_func_difforigin",
-			SLB::FuncCall::create(drawoptions_func_difforigin));
-	m.set("drawoptions_func_defaults",
-			SLB::FuncCall::create(drawoptions_func_defaults));
-	m.set("drawoptions_func_diffall",
-			SLB::FuncCall::create(drawoptions_func_diffall));
-	{
-		const char* code = "SLB.drawoptions_func_defaults({})\n";
-		lua_assert_valid_dostring(L, code);
-	}
-	{
-		const char* code =
-				"SLB.drawoptions_func_difforigin({origin = CENTER})\n";
-		lua_assert_valid_dostring(L, code);
-	}
-	{
-		const char* code =
-				"SLB.drawoptions_func_diffall({color = {1,2,3,4}, region = {1,2,3,4}, "
-						" origin = CENTER, scale = {1,2}, angle = 1})\n";
-		lua_assert_valid_dostring(L, code);
+		lua_register_draworigin_constants(L, globals);
+		m.set("drawoptions_func_difforigin",
+				SLB::FuncCall::create(drawoptions_func_difforigin));
+		m.set("drawoptions_func_defaults",
+				SLB::FuncCall::create(drawoptions_func_defaults));
+		m.set("drawoptions_func_diffall",
+				SLB::FuncCall::create(drawoptions_func_diffall));
+		{
+			const char* code = "SLB.drawoptions_func_defaults({})\n";
+			lua_assert_valid_dostring(L, code);
+		}
+		{
+			const char* code =
+					"SLB.drawoptions_func_difforigin({origin = CENTER})\n";
+			lua_assert_valid_dostring(L, code);
+		}
+		{
+			const char* code =
+					"SLB.drawoptions_func_diffall({color = {1,2,3,4}, region = {1,2,3,4}, "
+							" origin = CENTER, scale = {1,2}, angle = 1, frame = 1})\n";
+			lua_assert_valid_dostring(L, code);
+		}
 	}
 	lua_close(L);
 }

@@ -36,6 +36,7 @@ bool unit_test(unit_test_function func, const char* fname) {
 		fprintf(stderr, "Exception in test %s:\nUnknown exception type\n",
 				fname);
 	}
+	printf("Test %s FAILED!\n", fname);
 	unit_test_failures++;
 	return false;
 }

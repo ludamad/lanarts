@@ -11,7 +11,8 @@
 #include <freetype/fttrigon.h>
 
 #include <common/math.h>
-#include <common/PerfTimer.h>
+
+#include <common/func_timer.h>
 #include <common/strformat.h>
 
 #include "Font.h"
@@ -216,6 +217,7 @@ static DimF gl_print_impl(const DrawOptions& options, const font_data& font,
 
 	LDRAW_ASSERT(options.draw_region == BBoxF());
 	LDRAW_ASSERT(options.draw_angle == 0.0f);
+	LDRAW_ASSERT(options.draw_frame == 0.0f);
 
 	std::vector<int> line_splits;
 	int measured_width = process_string(font, text, maxwidth, line_splits);
@@ -268,6 +270,7 @@ void Font::initialize(const char* filename, int height) {
 	_font = new font_data;
 	init_font(_font.get(), filename, height);
 }
+
 void Font::draw_wrapped(const DrawOptions& options, const Posf& position,
 		int maxwidth, const char* str) const {
 	gl_print_impl(options, *_font, position, maxwidth, true, str);

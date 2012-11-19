@@ -1,4 +1,4 @@
-#include <typeinfo>lua_lua_serialize_testsserialize_tests
+#include <typeinfo>
 
 #include <SLB/Manager.hpp>
 #include <SLB/Script.hpp>

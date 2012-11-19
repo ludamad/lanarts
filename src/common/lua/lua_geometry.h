@@ -8,13 +8,14 @@
 
 #include "../geometry.h"
 
-#include "slb_valuetype.h"
+#include "slb_numvectortype.h"
 
-SLB_WRAP_VALUE_TYPE_AS_NUMARR(Pos, int);
-SLB_WRAP_VALUE_TYPE_AS_NUMARR(Posf, float);
-SLB_WRAP_VALUE_TYPE_AS_NUMARR(Dim, int);
-SLB_WRAP_VALUE_TYPE_AS_NUMARR(DimF, float);
-SLB_WRAP_VALUE_TYPE_AS_NUMARR(BBox, int);
-SLB_WRAP_VALUE_TYPE_AS_NUMARR(BBoxF, float);
+SLB_NUMERIC_VECTOR(Pos, int);
+SLB_NUMERIC_VECTOR(Posf, float);
+SLB_NUMERIC_VECTOR(Dim, int);
+SLB_NUMERIC_VECTOR(DimF, float);
+SLB_NUMERIC_VECTOR(BBox, int);
+SLB_NUMERIC_VECTOR(BBoxF, float);
+
 
 #endif /* LUA_GEOMETRY_H_ */

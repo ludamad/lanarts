@@ -3,7 +3,7 @@
  *  Common routines for content descriptions and drawing
  */
 
-#include "../display/colour_constants.h"
+#include "../draw/colour_constants.h"
 #include "../display/display.h"
 #include "../display/sprite_data.h"
 #include "../gamestate/GameState.h"
@@ -169,7 +169,7 @@ static void draw_value(GameState* gs, DescriptionBoxHelper& dbh,
 static void draw_bonus(GameState* gs, DescriptionBoxHelper& dbh,
 		const char* name, int bonus, const Colour& prefixcol = COL_GREEN,
 		const Colour& valuecol = COL_PALE_GREEN, bool optional = true) {
-	draw_value(gs, dbh, name, bonus, bonus > 0 ? prefixcol : COL_MUTED_RED,
+	draw_value(gs, dbh, name, bonus, bonus > 0 ? prefixcol : COL_LIGHT_RED,
 			bonus > 0 ? valuecol : COL_PALE_RED, optional, true);
 }
 static void draw_statmult(GameState* gs, DescriptionBoxHelper& dbh,
@@ -204,7 +204,7 @@ static void draw_percentage_modifier(GameState* gs, DescriptionBoxHelper& dbh,
 	int percentage_mod = round(modifier * 100 - 100);
 	bool negative = percentage_mod < 0;
 	if (!optional || percentage_mod != 0) {
-		dbh.draw_prefix(gs, negative ? COL_MUTED_RED : prefixcol, "%s", prefix);
+		dbh.draw_prefix(gs, negative ? COL_LIGHT_RED : prefixcol, "%s", prefix);
 		Colour statcol = percentage_mod < 0 ? COL_PALE_RED : valuecol;
 		dbh.draw_value(gs, statcol, percentage_mod > 0 ? "+%d%%" : "%d%%",
 				percentage_mod);

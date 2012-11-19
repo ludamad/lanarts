@@ -3,7 +3,7 @@
  *  Represents an interactive text-box.
  */
 
-#include "../display/colour_constants.h"
+#include "../draw/colour_constants.h"
 
 #include "../gamestate/GameState.h"
 
@@ -64,7 +64,7 @@ void TextBoxInst::draw(GameState* gs) {
 	}
 	gl_draw_rectangle(bbox, COL_DARKER_GRAY);
 	int text_x = bbox.x1 + 4, text_y = bbox.center_y();
-	Colour textcol = valid_string ? COL_MUTED_GREEN : COL_MUTED_RED;
+	Colour textcol = valid_string ? COL_MUTED_GREEN : COL_LIGHT_RED;
 	Dim offset = gl_printf_y_centered(gs->primary_font(), textcol, text_x,
 			text_y, "%s", text_field.text().c_str());
 	if (selected && blink_timer.get_microseconds() / 1000 > BLINK_TIME_MS) {

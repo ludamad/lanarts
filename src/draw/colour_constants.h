@@ -3,8 +3,8 @@
  * 	Various constants for colours used through-out the program.
  */
 
-#ifndef COLOUR_CONSTANTS_H_
-#define COLOUR_CONSTANTS_H_
+#ifndef LDRAW_COLOUR_CONSTANTS_H_
+#define LDRAW_COLOUR_CONSTANTS_H_
 
 #include "Colour.h"
 
@@ -36,4 +36,4 @@ const Colour COL_MID_GRAY(120, 120, 120);
 const Colour COL_LIGHT_GRAY(180, 180, 180);
 const Colour COL_WHITE(255, 255, 255);
 
-#endif /* COLOUR_CONSTANTS_H_ */
+#endif /* LDRAW_COLOUR_CONSTANTS_H_ */

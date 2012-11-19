@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "../display/colour_constants.h"
+#include "../draw/colour_constants.h"
 
 #include "../objects/GameInst.h"
 
@@ -18,7 +18,7 @@ public:
 			const ObjCallback& click_callback,
 			const ObjCallback& draw_callback = ObjCallback(),
 			const Colour& draw_colour = Colour(255, 255, 255),
-			const Colour& hover_colour = COL_MUTED_RED) :
+			const Colour& hover_colour = COL_LIGHT_RED) :
 			GameInst(x, y, RADIUS), str(str), draw_callback(draw_callback), click_callback(
 					click_callback), sprite(sprite), _draw_colour(draw_colour), _hover_colour(
 					hover_colour) {

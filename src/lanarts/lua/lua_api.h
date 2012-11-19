@@ -7,6 +7,7 @@
 #define LUA_API_H_
 
 #include <string>
+#include <draw/Colour.h>
 
 #include <common/geometry.h>
 

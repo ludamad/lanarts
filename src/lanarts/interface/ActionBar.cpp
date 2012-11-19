@@ -3,7 +3,7 @@
  *  Handles drawing and state of the action bar.
  */
 
-#include "../display/colour_constants.h"
+#include "../draw/colour_constants.h"
 #include "../gamestate/GameState.h"
 #include "../objects/player/PlayerInst.h"
 

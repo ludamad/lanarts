@@ -6,7 +6,7 @@
 
 #include <SDL.h>
 
-#include "../display/colour_constants.h"
+#include "../draw/colour_constants.h"
 
 #include "../display/display.h"
 #include "../gamestate/GameState.h"

@@ -35,7 +35,6 @@ void lua_register_ldraw(lua_State* L, LuaValue& module) {
 	BIND_FUNC(load_image);
 	BIND_FUNC(load_font);
 
-	lua_register_image(L);
 	lua_register_font(L);
 	lua_register_draworigin_constants(L, module);
 	lua_register_colour_constants(L, module);

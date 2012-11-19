@@ -15,23 +15,6 @@
 // The preferred assert statement to use, for ease of re-implementation
 #define LANARTS_ASSERT(x) assert(x)
 
-/*Represents a Canadian colour*/
-struct Colour {
-	int r, g, b, a;
-	Colour(int r = 255, int g = 255, int b = 255, int a = 255) :
-			r(r), g(g), b(b), a(a) {
-	}
-	bool operator==(const Colour& col) const {
-		return r == col.r && g == col.g && b == col.b && a == col.a;
-	}
-	Colour with_alpha(int alpha) const;
-	Colour scale(float val) const;
-
-	Colour inverse() const;
-	Colour mute_colour(float val) const;
-	Colour mult_alpha(float alpha) const;
-	Colour multiply(const Colour& o) const;
-};
 //TODO remove from lanarts_defines.h
 /*Represents a single square tile*/
 struct Tile {

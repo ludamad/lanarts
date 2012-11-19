@@ -165,34 +165,10 @@ static void gl_image_from_bytes(GLImage& img, const Dim& size, char* data,
 	glDisable(GL_TEXTURE_2D);
 }
 
-static void gl_draw_image(GLuint texture, const Colour& c, const BBoxF& texbox,
-		const BBoxF& imgbox) {
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glColor4ub(c.r, c.g, c.b, c.a);
-
-	glBegin(GL_QUADS);
-	//Draw our four points, clockwise.
-	glTexCoord2f(texbox.x1, texbox.y1);
-	glVertex2i(imgbox.x1, imgbox.y1);
-
-	glTexCoord2f(texbox.x2, texbox.y1);
-	glVertex2i(imgbox.x2, imgbox.y1);
-
-	glTexCoord2f(texbox.x2, texbox.y2);
-	glVertex2i(imgbox.x2, imgbox.y2);
-
-	glTexCoord2f(texbox.x1, texbox.y2);
-	glVertex2i(imgbox.x1, imgbox.y2);
-
-	glEnd();
-	glDisable(GL_TEXTURE_2D);
-}
-
 static void glVertex(const Posf& pos) {
 	glVertex2i(pos.x, pos.y);
 }
+
 static void gl_draw_image(GLuint texture, const Colour& c, const BBoxF& texbox,
 		const QuadF& imgbox) {
 	glEnable(GL_TEXTURE_2D);
@@ -228,8 +204,13 @@ void GLImage::image_from_bytes(const Dim& size, char* data, int type) {
 
 void GLImage::draw(const ldraw::DrawOptions& options, const Posf& pos) {
 	BBoxF draw_region(0, 0, width, height);
+
+	//Assert so unused settings don't pass through silently
+	LDRAW_ASSERT(options.draw_frame == 0.0f);
+
 	if (!options.draw_region.empty()) {
-		LDRAW_ASSERT(options.draw_region.x1 >= 0 && options.draw_region.y1 >= 0);
+		LDRAW_ASSERT(
+				options.draw_region.x1 >= 0 && options.draw_region.y1 >= 0);
 		LDRAW_ASSERT(options.draw_region.x2 <= width);
 		LDRAW_ASSERT(options.draw_region.y2 <= height);
 
@@ -238,13 +219,13 @@ void GLImage::draw(const ldraw::DrawOptions& options, const Posf& pos) {
 	if (draw_region.empty()) {
 		return;
 	}
-	BBoxF adjusted = adjusted_for_origin(draw_region, options.draw_origin).scaled(
-			options.draw_scale);
+
+	BBoxF adjusted = adjusted_for_origin(BBoxF(Posf(), draw_region.size()),
+			options.draw_origin).scaled(options.draw_scale);
+
 	QuadF quad(adjusted, options.draw_angle);
 
-	gl_draw_image(
-			texture,
-			options.draw_colour,
+	gl_draw_image(texture, options.draw_colour,
 			draw_region.scaled(texw / width, texh / height),
 			quad.translated(pos));
 }

@@ -4,8 +4,6 @@ set(CMAKE_BUILD_TYPE Debug)
 
 #add_definitions(-DNDEBUG)
 
-set( MAKECOMMAND make -j6)
-
 option(MSVC_SHARED_RT "MSVC: Build with shared runtime libs (/MD)" ON)
 option(MSVC_STHREADED_RT "MSVC: Build with single-threaded static runtime libs (/ML until VS .NET 2003)" OFF)
 

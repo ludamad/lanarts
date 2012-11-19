@@ -3,7 +3,7 @@
  *  Handles drawing & state of side bar
  */
 
-#include "../../display/colour_constants.h"
+#include "../../draw/colour_constants.h"
 
 #include "../../display/display.h"
 

@@ -1,58 +1,74 @@
 /*
  * lua_image.cpp:
  * 	Bindings for ldraw::Image
+ * 	A specialization of the bindings for Drawable
  */
 
-#include <SLB/Class.hpp>
-#include <SLB/Manager.hpp>
+#include <new>
 
-#include <common/lua/slb_funcproperty.h>
+#include <common/lua/luacpp.h>
 
+#include "../DrawableBase.h"
+#include "../ldraw_assert.h"
 #include "../Image.h"
 
-#include "lua_ldraw.h"
+#include "lua_drawable.h"
+#include "lua_drawoptions.h"
 
-static int luacfunc_draw(lua_State* L) {
+namespace ldraw {
+
+void lua_pushimage(lua_State* L, const Image& image) {
+	Drawable drawable(new Image(image));
+	lua_pushdrawable(L, drawable);
+}
+
+const Image& lua_getimage(lua_State* L, int idx) {
+	Image* img = dynamic_cast<Image*>(lua_getdrawable(L, idx).get_ref().get());
+	LDRAW_ASSERT(img);
+	return *img;
+}
+
+bool lua_checkimage(lua_State* L, int idx) {
+	if (lua_type(L, idx) != LUA_TUSERDATA) {
+		return false;
+	}
+	return dynamic_cast<Image*>(lua_getdrawable(L, idx).get_ref().get());
+}
+
+static const char IMAGE[] = "LDraw::Image";
+static int luaimage_index(lua_State *L) {
 	using namespace ldraw;
+
 	using namespace SLB;
 
-	const char* LERR_MSG =
-			"Incorrect Image::draw usage, use img:draw(position) or img:draw(options, position)";
-
-	int nargs = lua_gettop(L);
-	const Image* img = get<const Image*>(L, 1);
-	if (!img) {
-		luaL_error(L, LERR_MSG);
+	if (!lua_checkimage(L, 1)) {
+		luaL_error(L, "Error indexing supposed Image object -- not an image.");
 		return 0;
 	}
-
-	if (nargs == 2) {
-		Pos p = get<Pos>(L, 2);
-		img->draw(p);
-	} else if (nargs == 3) {
-		DrawOptions options = get<DrawOptions>(L, 2);
-		Pos p = get<Pos>(L, 3);
-		img->draw(options, p);
+	const Image & image = lua_getimage(L, 1);
+	const char* member = lua_tostring(L, 2);
+	if (strcmp(member, "width") == 0) {
+		lua_pushnumber(L, image.width());
+	} else if (strcmp(member, "height") == 0) {
+		lua_pushnumber(L, image.height());
+	} else if (strcmp(member, "size") == 0) {
+		luacpp_push(L, image.size());
 	} else {
-		luaL_error(L, LERR_MSG);
+		return luadrawablebase_index(L, image, member);
 	}
 
-	return 0;
+	return 1;
 }
 
-void lua_register_image(lua_State* L) {
-	using namespace SLB;
-	using namespace ldraw;
-
-	Manager* m = Manager::getInstance(L);
-	typedef void (Image::*PosFunc)(const Posf& pos) const;
-	Class<Image>("Image", m);
-//	.set("draw", static_cast<PosFunc>(&Image::draw));
-
-	ClassInfo* class_info = m->getClass("Image");
-	addFuncProperty<Image, float, &Image::width>(class_info, "width");
-	addFuncProperty<Image, float, &Image::height>(class_info, "height");
-
-	class_info->set("draw", FuncCall::create(luacfunc_draw));
+void Image::push_metatable(lua_State *L) const {
+	lua_getfield(L, LUA_REGISTRYINDEX, IMAGE);
+	if (!lua_isnil(L, -1)) {
+		return; // Cached table is pushed
+	}lua_pop(L, 1);
+	luaL_newmetatable(L, IMAGE);
+	int metatable = lua_gettop(L);
+	lua_pushcfunction(L, luaimage_index);
+	lua_setfield(L, metatable, "__index");
 }
 
+}

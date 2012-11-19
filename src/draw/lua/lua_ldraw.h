@@ -16,6 +16,7 @@
 #include "lua_colour.h"
 #include "lua_drawoptions.h"
 #include "lua_font.h"
+#include "lua_drawable.h"
 
 class LuaValue;
 // Registers functions into table on top of stack

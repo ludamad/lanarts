@@ -3,7 +3,7 @@
  *  Holds game chat/information messages, as well as descriptions while hovering over items.
  */
 
-#include "../display/colour_constants.h"
+#include "../draw/colour_constants.h"
 
 #include "../display/display.h"
 

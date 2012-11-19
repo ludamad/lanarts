@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lanarts)
 
 FIND_PACKAGE(SDL REQUIRED)
@@ -328,6 +328,7 @@ target_link_libraries( lanarts
 			RVO
 			lua
 			lcommon
+			ldraw
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}
 			${SDLIMAGE_LIBRARY}

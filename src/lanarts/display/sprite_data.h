@@ -5,9 +5,9 @@
 #include <string>
 
 #include <common/geometry.h>
+#include <draw/Colour.h>
 
 #include "../data/FilenameList.h"//For FilenameList
-
 #include "../lanarts_defines.h"
 
 #include "GLImage.h"

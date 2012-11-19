@@ -3,7 +3,7 @@
  *  Visual toggle of configuration options in side bar
  */
 
-#include "../../display/colour_constants.h"
+#include "../../draw/colour_constants.h"
 
 #include "../../display/sprite_data.h"
 

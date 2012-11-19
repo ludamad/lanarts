@@ -2,7 +2,7 @@
  * EnemiesSeenContent.h:
  *  Displays all the enemies players have seen, allowing them to see descriptions.
  */
-#include "../../display/colour_constants.h"
+#include "../../draw/colour_constants.h"
 
 #include "../../display/sprite_data.h"
 

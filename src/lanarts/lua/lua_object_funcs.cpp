@@ -12,7 +12,7 @@ extern "C" {
 
 #include "../data/lua_game_data.h"
 
-#include "../display/colour_constants.h"
+#include "../draw/colour_constants.h"
 
 #include "../gamestate/GameState.h"
 

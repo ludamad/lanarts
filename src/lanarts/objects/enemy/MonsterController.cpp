@@ -8,7 +8,7 @@
 
 #include <rvo2/RVO.h>
 
-#include "../../display/colour_constants.h"
+#include "../../draw/colour_constants.h"
 #include "../../display/tile_data.h"
 #include "../../gamestate/GameState.h"
 

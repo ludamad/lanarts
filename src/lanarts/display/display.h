@@ -11,6 +11,7 @@
 #include <GL/glu.h>
 
 #include <common/geometry.h>
+#include <draw/Colour.h>
 
 #include "../lanarts_defines.h"
 

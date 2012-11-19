@@ -3,7 +3,7 @@
  *  Draws known spells in a grid, for the side bar
  */
 
-#include "../../display/colour_constants.h"
+#include "../../draw/colour_constants.h"
 
 #include "../../display/display.h"
 #include "../../display/sprite_data.h"

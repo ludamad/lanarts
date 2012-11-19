@@ -34,8 +34,10 @@ set( lcommon_src
 	strformat.h
 	
 	lua/lua_geometry.h
+	lua/lua_geometry.cpp
 	lua/lua_lcommon.h
 	lua/lua_lcommon.cpp
+    lua/lua_range.cpp
     lua/lua_range.h
     lua/LuaValue.h
     lua/LuaValue.cpp
@@ -48,6 +50,7 @@ set( lcommon_src
     lua/lua_vector.h
     lua/slb_funcproperty.h
     lua/slb_mutabletable.h
+    lua/slb_numvectortype.h
     lua/slb_valuetype.h
 	
 )
@@ -73,6 +76,9 @@ add_executable( lcommon_tests
 
 target_link_libraries( 
 			lcommon_tests
-			lua
-			slb
+			
+			"/home/adomurad/lanarts-git/lanarts_build/libs/slb/libslb.a"
+			"/home/adomurad/lanarts-git/lanarts_build/libs/lua/liblua.a"
+#			lua
+#			slb
 )

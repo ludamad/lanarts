@@ -10,8 +10,11 @@
 #include <SLB/LuaCall.hpp>
 #include <SLB/Manager.hpp>
 
+#include <common/Timer.h>
 #include <common/lua/lua_lcommon.h>
 #include <common/lua/LuaValue.h>
+
+#include <common/math.h>
 
 #include <lua/lualib.h>
 
@@ -24,6 +27,8 @@
 #include "../display.h"
 #include "../draw.h"
 #include "../Image.h"
+#include "../Animation.h"
+#include "../DirectionalDrawable.h"
 #include "../Font.h"
 
 static bool handle_event(SDL_Event* event) {
@@ -53,7 +58,11 @@ static bool handle_event(SDL_Event* event) {
 typedef void (*DrawFunc)();
 
 static void draw_loop(DrawFunc draw_func) {
+	ldraw::Font fpsfont("sample.ttf", 40);
+	Timer timer;
+	int frames = 0;
 	while (1) {
+		frames += 1;
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
 			if (!handle_event(&event)) {
@@ -62,6 +71,9 @@ static void draw_loop(DrawFunc draw_func) {
 		}
 		ldraw::draw_start();
 		draw_func();
+		double seconds = timer.get_microseconds() / 1000.0 / 1000.0;
+		fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::RIGHT_BOTTOM),
+				Posf(400, 400), "%d", int(frames / seconds));
 		ldraw::draw_finish();
 	}
 }
@@ -76,17 +88,42 @@ ldraw::Image image;
 static void draw_images() {
 	BBox box(0, 0, 10, 10);
 	FOR_EACH_BBOX(box, x, y) {
-		image.draw(Pos(x * 40, y * 40));
+		image.draw(Posf(x * 40, y * 40));
 	}
 }
 
 ldraw::Font font;
 
 static void draw_text() {
+	using namespace ldraw;
+
 	font.draw(COL_WHITE, Pos(0, 0), "Hello World!");
-	font.draw_wrapped(ldraw::DrawOptions(ldraw::CENTER, COL_PALE_RED),
+	font.draw_wrapped(DrawOptions().origin(CENTER).colour(COL_PALE_RED),
 			Pos(200, 200), 250,
 			"This text is wrapped because it's sort of long.");
+}
+
+ldraw::Drawable arrow;
+
+static void draw_directional() {
+	using namespace ldraw;
+	Posf center(200, 200);
+	BBox box(0, 0, 10, 10);
+	FOR_EACH_BBOX(box, x, y) {
+		Posf pos(x * 40 + 20, y * 40 + 20);
+		float dir = compute_direction(pos, center);
+		arrow.draw(DrawOptions().angle(dir).origin(CENTER), pos);
+	}
+}
+
+ldraw::Drawable animation;
+float frame = 0.0f;
+
+static void draw_animation() {
+	using namespace ldraw;
+	Posf center(200, 200);
+	frame += 1.0f;
+	animation.draw(DrawOptions().origin(CENTER).frame(frame), center);
 }
 
 lua_State* L;
@@ -110,13 +147,25 @@ static void setup_lua_state() {
 }
 
 int main(int argc, const char** argv) {
-	ldraw::display_initialize(__FILE__, Dim(400, 400), false);
+	using namespace ldraw;
+
+	display_initialize(__FILE__, Dim(400, 400), false);
 	image.initialize("sample.png");
 	font.initialize("sample.ttf", 20);
+
+	std::vector<Image> arr_images = split_image(Image("arrows.png"),
+			DimF(32, 32));
+	arrow = new DirectionalDrawable(arr_images, FLOAT_PI / 2);
+
+	std::vector<Image> anim_images = split_image(Image("animation.png"),
+			DimF(480.0f / 6, 120));
+	animation = new Animation(anim_images, 0.01f);
 
 	draw_loop(draw_shapes);
 	draw_loop(draw_images);
 	draw_loop(draw_text);
+	draw_loop(draw_directional);
+	draw_loop(draw_animation);
 
 	setup_lua_state();
 

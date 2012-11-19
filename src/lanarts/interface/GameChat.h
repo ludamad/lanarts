@@ -11,9 +11,11 @@
 #include <string>
 #include <vector>
 
+#include <common/SerializeBuffer.h>
+#include <draw/Colour.h>
+
 #include "TextField.h"
 
-#include <common/SerializeBuffer.h>
 #include "../lanarts_defines.h"
 
 class GameState;

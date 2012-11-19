@@ -6,13 +6,11 @@
 #ifndef LUA_COLOUR_H_
 #define LUA_COLOUR_H_
 
-#include <common/lua/slb_valuetype.h>
+#include <common/lua/slb_numvectortype.h>
 
 #include "../Colour.h"
 
-SLB_WRAP_VALUE_TYPE(Colour, (lua_push_as_numarray<Colour, int>),
-		(lua_get_from_numarray<Colour, int, 255>),
-		(lua_check_as_numarray<Colour, int, 1>));
+SLB_NUMERIC_VECTOR_WITH_PARAMS(Colour, int, 1 /*allowed missing*/, 255 /*default*/);
 
 class LuaValue;
 

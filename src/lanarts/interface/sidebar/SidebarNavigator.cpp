@@ -3,7 +3,7 @@
  *  Handles navigation of content in the side bar
  */
 
-#include "../../display/colour_constants.h"
+#include "../../draw/colour_constants.h"
 
 #include "../../display/display.h"
 
