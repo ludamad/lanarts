@@ -79,12 +79,17 @@ set( ldraw_src
 )
 
 set( ldraw_tests
-  tests/lua_colour_tests.cpp
-  tests/lua_drawoptions_tests.cpp
-  tests/lua_image_tests.cpp
-  tests/lua_font_tests.cpp
-  tests/ldraw_tests.cpp
-  tests/ldraw_tests.h
+    tests/animation_tests.cpp
+    tests/directionaldrawable_tests.cpp
+    tests/DrawableMock.h
+    tests/image_tests.cpp
+    tests/ldraw_tests.cpp
+    tests/ldraw_tests.h
+    tests/lua_colour_tests.cpp
+    tests/lua_drawable_tests.cpp
+    tests/lua_drawoptions_tests.cpp
+    tests/lua_font_tests.cpp
+    tests/lua_image_tests.cpp
 )
 
 add_library( ldraw

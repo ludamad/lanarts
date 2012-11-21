@@ -50,8 +50,8 @@ set( lcommon_src
     lua/lua_vector.h
     lua/slb_funcproperty.h
     lua/slb_mutabletable.h
-    lua/slb_numvectortype.h
-    lua/slb_valuetype.h
+    lua/luacpp_wrap_numeric.h
+    lua/luacpp_wrap.h
 	
 )
 

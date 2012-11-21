@@ -9,7 +9,12 @@
 #include "../Font.h"
 
 struct lua_State;
+class LuaValue;
 
-void lua_register_font(lua_State* L);
+namespace ldraw {
+
+void lua_register_font(lua_State* L, const LuaValue& module);
+
+}
 
 #endif /* LUA_FONT_H_ */

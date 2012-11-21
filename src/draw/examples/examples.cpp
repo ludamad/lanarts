@@ -75,6 +75,7 @@ static void draw_loop(DrawFunc draw_func) {
 		fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::RIGHT_BOTTOM),
 				Posf(400, 400), "%d", int(frames / seconds));
 		ldraw::draw_finish();
+		SDL_Delay(5);
 	}
 }
 
@@ -107,6 +108,7 @@ ldraw::Drawable arrow;
 
 static void draw_directional() {
 	using namespace ldraw;
+	draw_rectangle(COL_BABY_BLUE, BBoxF(0, 0, 400, 400));
 	Posf center(200, 200);
 	BBox box(0, 0, 10, 10);
 	FOR_EACH_BBOX(box, x, y) {
@@ -130,11 +132,16 @@ lua_State* L;
 SLB::Manager m;
 
 static void draw_script() {
+	ldraw::Font fpsfont("sample.ttf", 40);
 	SLB::LuaCall<void()> drawfunc(L, "draw");
 	drawfunc();
+	fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::LEFT_BOTTOM),
+			Posf(0, 400), "Lua");
 }
 
 static void setup_lua_state() {
+	using namespace ldraw;
+
 	L = lua_open();
 	m.registerSLB(L);
 	luaL_openlibs(L);
@@ -146,6 +153,13 @@ static void setup_lua_state() {
 
 }
 
+static void draw_luascript(lua_State* L, const char* file) {
+	luaL_dofile(L, file);
+	draw_loop(draw_script);
+	if (lua_tostring(L,-1))
+		printf("%s\n", lua_tostring(L,-1));
+}
+
 int main(int argc, const char** argv) {
 	using namespace ldraw;
 
@@ -153,11 +167,11 @@ int main(int argc, const char** argv) {
 	image.initialize("sample.png");
 	font.initialize("sample.ttf", 20);
 
-	std::vector<Image> arr_images = split_image(Image("arrows.png"),
+	std::vector<Image> arr_images = image_split(Image("arrows.png"),
 			DimF(32, 32));
 	arrow = new DirectionalDrawable(arr_images, FLOAT_PI / 2);
 
-	std::vector<Image> anim_images = split_image(Image("animation.png"),
+	std::vector<Image> anim_images = image_split(Image("animation.png"),
 			DimF(480.0f / 6, 120));
 	animation = new Animation(anim_images, 0.01f);
 
@@ -169,18 +183,12 @@ int main(int argc, const char** argv) {
 
 	setup_lua_state();
 
-	luaL_dofile(L, "scripts/draw_shapes.lua");
-	draw_loop(draw_script);
-
-	luaL_dofile(L, "scripts/draw_images.lua");
-	draw_loop(draw_script);
-
-	luaL_dofile(L, "scripts/draw_text.lua");
-	draw_loop(draw_script);
-
-	luaL_dofile(L, "scripts/draw_animated.lua");
-	printf(lua_tostring(L,-1));
-	draw_loop(draw_script);
+	draw_luascript(L, "scripts/draw_shapes.lua");
+	draw_luascript(L, "scripts/draw_images.lua");
+	draw_luascript(L, "scripts/draw_text.lua");
+	draw_luascript(L, "scripts/draw_directional.lua");
+	draw_luascript(L, "scripts/draw_animation.lua");
+	draw_luascript(L, "scripts/draw_custom.lua");
 
 	lua_close(L);
 }

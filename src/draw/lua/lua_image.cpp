@@ -7,6 +7,9 @@
 #include <new>
 
 #include <common/lua/luacpp.h>
+#include <common/lua/LuaValue.h>
+#include <common/lua/lua_geometry.h>
+#include <common/lua/lua_vector.h>
 
 #include "../DrawableBase.h"
 #include "../ldraw_assert.h"
@@ -14,6 +17,9 @@
 
 #include "lua_drawable.h"
 #include "lua_drawoptions.h"
+#include "lua_image.h"
+
+SLB_WRAP_VALUE_DECLARATION(ldraw::Image);
 
 namespace ldraw {
 
@@ -71,4 +77,17 @@ void Image::push_metatable(lua_State *L) const {
 	lua_setfield(L, metatable, "__index");
 }
 
+static Image image_load(const std::string& filename) {
+	return Image(filename);
 }
+
+void lua_register_image(lua_State *L, const LuaValue & module) {
+#define BIND_FUNC(f)\
+	SLB::FuncCall::create(f)->push(L); \
+	module.get(L, #f).pop()
+	BIND_FUNC(image_load);
+	BIND_FUNC(image_split);
+}
+
+}
+

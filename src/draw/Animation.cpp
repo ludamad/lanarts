@@ -32,7 +32,7 @@ void Animation::draw(const DrawOptions& options, const Posf& pos) const {
 	float fidx = options.draw_frame * _animation_speed;
 	int nframes = frames.size();
 
-	int idx = round2int(fidx * nframes) % nframes;
+	int idx = round2int(fidx) % nframes;
 
 	if (idx < 0) { // % can leave negative values
 		idx += nframes;

@@ -43,6 +43,8 @@ static void drawoptions_func_diffall(const ldraw::DrawOptions& options) {
 }
 
 static void lua_drawoptions_bind_test() {
+	using namespace ldraw;
+
 	lua_State* L = lua_open();
 	{
 		SLB::Manager m;

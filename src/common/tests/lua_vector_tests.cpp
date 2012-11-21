@@ -3,6 +3,9 @@
 #include <SLB/Manager.hpp>
 #include <SLB/Script.hpp>
 
+#include <SLB/FuncCall.hpp>
+#include <SLB/LuaCall.hpp>
+
 #include "../lua/lua_unittest.h"
 
 #include "../lua/lua_geometry.h"
@@ -53,6 +56,31 @@ static void lua_vector_test() {
 	lua_generic_vector_test("{{1,2}, {3,4}}", Pos(1, 2), Pos(3, 4));
 }
 
+static void lua_vector_luacall_test() {
+	lua_State* L = lua_open();
+	{
+		SLB::Manager m;
+		m.registerSLB(L);
+		m.set("assert", SLB::FuncCall::create(unit_test_assert));
+
+		std::vector<int> nums;
+		nums.push_back(1);
+		nums.push_back(2);
+
+		const char* code = "function func(b) "
+				"SLB.assert(\"List passed differs\", b[1] == 1)"
+				"SLB.assert(\"List passed differs\", b[2] == 2)"
+				"end";
+
+		lua_assert_valid_dostring(L, code);
+
+		SLB::LuaCall<void(const std::vector<int>&)> call(L, "func");
+		call(nums);
+	}
+	lua_close(L);
+}
+
 void lua_vector_tests() {
 	UNIT_TEST(lua_vector_test);
+	UNIT_TEST(lua_vector_luacall_test);
 }

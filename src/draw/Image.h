@@ -58,7 +58,7 @@ public:
 		return _draw_region;
 	}
 
-	virtual void draw(const DrawOptions& options, const Posf& pos) const;
+	void draw(const DrawOptions& options, const Posf& pos) const;
 
 	void initialize(const std::string& filename, const BBoxF& draw_region =
 			BBoxF());
@@ -74,7 +74,7 @@ private:
 	BBoxF _draw_region;
 };
 
-std::vector<Image> split_image(const Image& image, const DimF& size);
+std::vector<Image> image_split(const Image& image, const DimF& size);
 
 // Implemented in lua_drawable.cpp
 void lua_pushimage(lua_State* L, const ldraw::Image& image);

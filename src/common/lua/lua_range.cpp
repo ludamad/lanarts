@@ -5,5 +5,5 @@
 
 #include "lua_range.h"
 
-SLB_NUMERIC_VECTOR_DECLARATION(Range, int);
-SLB_NUMERIC_VECTOR_DECLARATION(RangeF, float);
+LUACPP_WRAP_AS_NUMARRAY_IMPL(Range, int);
+LUACPP_WRAP_AS_NUMARRAY_IMPL(RangeF, float);

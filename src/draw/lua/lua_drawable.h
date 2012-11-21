@@ -7,15 +7,22 @@
 #ifndef LRAW_LUA_DRAWABLE_H_
 #define LRAW_LUA_DRAWABLE_H_
 
-#include <common/lua/slb_valuetype.h>
+#include <common/lua/luacpp_wrap.h>
 #include "../Drawable.h"
 
-SLB_WRAP_VALUE_TYPE(ldraw::Drawable, ldraw::lua_pushdrawable,
+class LuaValue;
+
+LUACPP_TYPE_WRAP(ldraw::Drawable, ldraw::lua_pushdrawable,
 		ldraw::lua_getdrawable, ldraw::lua_checkdrawable);
 
 namespace ldraw {
 int luadrawablebase_index(lua_State* L, const DrawableBase& drawable,
 		const char* member);
+
+// Register assorted drawable helper functions:
+// directional_create, drawable_create, animation_create
+void lua_register_drawables(lua_State* L, const LuaValue& module);
+
 }
 
 #endif /* LRAW_LUA_DRAWABLE_H_ */

@@ -6,14 +6,17 @@
 #ifndef LUA_COLOUR_H_
 #define LUA_COLOUR_H_
 
-#include <common/lua/slb_numvectortype.h>
+#include <common/lua/luacpp_wrap_numeric.h>
 
 #include "../Colour.h"
 
-SLB_NUMERIC_VECTOR_WITH_PARAMS(Colour, int, 1 /*allowed missing*/, 255 /*default*/);
+LUACPP_WRAP_AS_NUMARRAY2(Colour, int, 1 /*allowed missing*/,
+		255 /*default*/);
 
 class LuaValue;
 
-void lua_register_colour_constants(lua_State *L, LuaValue& module);
+namespace ldraw {
+void lua_register_colour_constants(lua_State *L, const LuaValue& module);
+}
 
 #endif /* LUA_COLOUR_H_ */

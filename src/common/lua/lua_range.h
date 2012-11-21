@@ -8,9 +8,9 @@
 
 #include "../range.h"
 
-#include "slb_numvectortype.h"
+#include "luacpp_wrap_numeric.h"
 
-SLB_NUMERIC_VECTOR(Range, int);
-SLB_NUMERIC_VECTOR(RangeF, float);
+LUACPP_WRAP_AS_NUMARRAY(Range, int);
+LUACPP_WRAP_AS_NUMARRAY(RangeF, float);
 
 #endif /* LUA_RANGE_H_ */

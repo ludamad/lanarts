@@ -8,14 +8,14 @@
 
 #include "../geometry.h"
 
-#include "slb_numvectortype.h"
+#include "luacpp_wrap_numeric.h"
 
-SLB_NUMERIC_VECTOR(Pos, int);
-SLB_NUMERIC_VECTOR(Posf, float);
-SLB_NUMERIC_VECTOR(Dim, int);
-SLB_NUMERIC_VECTOR(DimF, float);
-SLB_NUMERIC_VECTOR(BBox, int);
-SLB_NUMERIC_VECTOR(BBoxF, float);
+LUACPP_WRAP_AS_NUMARRAY(Pos, int);
+LUACPP_WRAP_AS_NUMARRAY(Posf, float);
+LUACPP_WRAP_AS_NUMARRAY(Dim, int);
+LUACPP_WRAP_AS_NUMARRAY(DimF, float);
+LUACPP_WRAP_AS_NUMARRAY(BBox, int);
+LUACPP_WRAP_AS_NUMARRAY(BBoxF, float);
 
 
 #endif /* LUA_GEOMETRY_H_ */

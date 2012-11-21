@@ -20,6 +20,8 @@
 
 class LuaValue;
 // Registers functions into table on top of stack
-void lua_register_ldraw(lua_State* L, LuaValue& module);
+namespace ldraw {
+void lua_register_ldraw(lua_State* L, const LuaValue& module);
+}
 
 #endif /* LUA_LDRAW_LIB_H_ */

@@ -1,10 +1,10 @@
 /*
- * lua_property_util.h:
+ * slb_funcproperty.h:
  *  Utility for binding arbitrary properties
  */
 
-#ifndef LUA_PROPERTY_UTIL_H_
-#define LUA_PROPERTY_UTIL_H_
+#ifndef SLB_FUNCPROPERTY_H_
+#define SLB_FUNCPROPERTY_H_
 
 #include <SLB/Property.hpp>
 #include <SLB/ClassInfo.hpp>
@@ -56,4 +56,4 @@ void addFuncProperty(ClassInfo* class_info, const char* name) {
 }
 }
 
-#endif /* LUA_PROPERTY_UTIL_H_ */
+#endif /* SLB_FUNCPROPERTY_H_ */

@@ -8,7 +8,7 @@
 
 #include <vector>
 
-#include "slb_valuetype.h"
+#include "luacpp_wrap.h"
 
 template<typename T>
 inline void lua_push_vector(lua_State* L, const std::vector<T>& value) {
@@ -49,10 +49,10 @@ bool lua_check_vector(lua_State *L, int idx) {
 	return valid;
 }
 
-SLB_PRIVATE_TYPE_SPECIALIZATION( typename T, std::vector<T>, std::vector<T>,
+LUACPP_GENERAL_WRAP( typename T, std::vector<T>, std::vector<T>,
 		lua_push_vector<T>, lua_get_vector<T>, lua_check_vector<T>);
 
-SLB_PRIVATE_TYPE_SPECIALIZATION( typename T, const std::vector<T>&,
+LUACPP_GENERAL_WRAP( typename T, const std::vector<T>&,
 		std::vector<T>, lua_push_vector<T>, lua_get_vector<T>,
 		lua_check_vector<T>);
 

@@ -12,53 +12,55 @@ extern "C" {
 
 #include <common/lua/luacpp.h>
 #include <common/lua/lua_geometry.h>
+#include <common/lua/lua_vector.h>
+#include <common/lua/LuaValue.h>
 
+#include "../Animation.h"
 #include "../DrawableBase.h"
+#include "../DirectionalDrawable.h"
 #include "../ldraw_assert.h"
 #include "../Image.h"
 
 #include "lua_drawable.h"
 #include "lua_drawoptions.h"
 
+SLB_WRAP_VALUE_DECLARATION(ldraw::Drawable);
+
 namespace ldraw {
 
 void lua_pushdrawable(lua_State* L, const Drawable& drawable) {
-	Drawable* luadrawable = (Drawable*)lua_newuserdata(L, sizeof(Drawable));
-	//Construct a drawable in this location:
+	Drawable* luadrawable = (Drawable*)(lua_newuserdata(L, sizeof(Drawable)));
 	new (luadrawable) Drawable(drawable);
 	drawable.get_ref()->push_metatable(L);
 	lua_setmetatable(L, -2);
 }
 
-const Drawable& lua_getdrawable(lua_State* L, int idx) {
-	Drawable* luadrawable = (Drawable*)lua_touserdata(L, idx);
+const Drawable & lua_getdrawable(lua_State *L, int idx) {
+	Drawable *luadrawable = (Drawable*)(lua_touserdata(L, idx));
 	return *luadrawable;
 }
 
-bool lua_checkdrawable(lua_State* L, int idx) {
+bool lua_checkdrawable(lua_State *L, int idx) {
 	int type = lua_type(L, idx);
 	if (type != LUA_TUSERDATA && type != LUA_TFUNCTION) {
 		return false;
 	}
-	//TODO: Figure out a way to check for the various metatables
 	return true;
 }
 
-static int luacfunc_draw(lua_State* L) {
+static int luacfunc_draw(lua_State *L) {
 	using namespace ldraw;
+
 	using namespace SLB;
 
-	const char* LERR_MSG =
+	const char *LERR_MSG =
 			"Incorrect Image::draw usage, use img:draw(position) or img:draw(options, position)";
-
 	int nargs = lua_gettop(L);
-
 	if (!lua_checkdrawable(L, 1)) {
 		luaL_error(L, LERR_MSG);
 		return 0;
 	}
-	const Drawable& drawable = lua_getdrawable(L, 1);
-
+	const Drawable & drawable = lua_getdrawable(L, 1);
 	if (nargs == 2) {
 		Posf p = get<Posf>(L, 2);
 		drawable.draw(p);
@@ -73,13 +75,10 @@ static int luacfunc_draw(lua_State* L) {
 	return 0;
 }
 
-//Metatable implementation
 static const char DRAWABLEBASE[] = "LDraw::DrawableBase";
-
-static void drawable_base_push_metatable(lua_State* L);
-
-int luadrawablebase_index(lua_State* L, const DrawableBase& drawable,
-		const char* member) {
+static void drawable_base_push_metatable(lua_State *L);
+int luadrawablebase_index(lua_State *L, const DrawableBase & drawable,
+		const char *member) {
 	if (strcmp(member, "duration") == 0) {
 		float duration = drawable.animation_duration();
 		if (duration == 0.0f) {
@@ -98,7 +97,7 @@ int luadrawablebase_index(lua_State* L, const DrawableBase& drawable,
 	return 1;
 }
 
-static int luadrawable_index(lua_State* L) {
+static int luadrawable_index(lua_State *L) {
 	using namespace SLB;
 
 	if (!lua_checkdrawable(L, 1)) {
@@ -106,31 +105,44 @@ static int luadrawable_index(lua_State* L) {
 				"Error indexing supposed Drawable object -- not a Drawable.");
 		return 0;
 	}
-	const Drawable& drawable = lua_getdrawable(L, 1);
+	const Drawable & drawable = lua_getdrawable(L, 1);
 	const char* member = lua_tostring(L, 2);
-
 	return luadrawablebase_index(L, *drawable.get_ref().get(), member);
 }
 
-static void drawable_base_push_metatable(lua_State* L) {
+static void drawable_base_push_metatable(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, DRAWABLEBASE);
-
 	if (!lua_isnil(L, -1)) {
 		return; // Cached table is pushed
 	}lua_pop(L, 1);
-	//pop nil
-
 	luaL_newmetatable(L, DRAWABLEBASE);
-
 	int metatable = lua_gettop(L);
 	lua_pushcfunction(L, luadrawable_index);
-	lua_setfield(L, metatable, "__index"); /*Set self as index*/
+	lua_setfield(L, metatable, "__index");
 	lua_pushcfunction(L, luacfunc_draw);
 	lua_setfield(L, metatable, "draw");
 }
 
-void DrawableBase::push_metatable(lua_State* L) const {
+void DrawableBase::push_metatable(lua_State *L) const {
 	drawable_base_push_metatable(L);
+}
+
+static Drawable directional_create(const std::vector<Drawable>& directions,
+		float angle_offset) {
+	return Drawable(new DirectionalDrawable(directions, angle_offset));
+}
+
+static Drawable animation_create(const std::vector<Drawable>& frames,
+		float animation_speed) {
+	return Drawable(new Animation(frames, animation_speed));
+}
+
+void lua_register_drawables(lua_State *L, const LuaValue & module) {
+#define BIND_FUNC(f)\
+	SLB::FuncCall::create(f)->push(L); \
+	module.get(L, #f).pop()
+	BIND_FUNC(directional_create);
+	BIND_FUNC(animation_create);
 }
 
 }

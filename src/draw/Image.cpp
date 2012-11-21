@@ -58,7 +58,7 @@ void Image::draw(const DrawOptions& options, const Posf& pos) const {
 	return _image->draw(adjusted_options, pos);
 }
 
-std::vector<Image> split_image(const Image & image, const DimF & size) {
+std::vector<Image> image_split(const Image & image, const DimF & size) {
 	std::vector<Image> results;
 
 	BBoxF bounds(image.draw_region());

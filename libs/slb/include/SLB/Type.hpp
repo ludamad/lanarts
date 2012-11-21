@@ -8,10 +8,10 @@
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in
   all copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -19,7 +19,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
-  
+
   Jose L. Hidalgo (www.pplux.com)
   pplux@pplux.com
 */
@@ -47,7 +47,7 @@ namespace Private {
 
     static ClassInfo *getClass(lua_State *L)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(10,"getClass '%s'", _TIW(T).name());
       ClassInfo *c = SLB::Manager::getInstance(L)->getClass(_TIW(T));
       return c;
@@ -55,21 +55,21 @@ namespace Private {
 
     static void push(lua_State *L,const T &obj)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(8,"Push<T=%s>(L=%p, obj =%p)", _TIW(T).name(), L, &obj);
       getClass(L)->push_copy(L, (void*) &obj);
     }
 
     static T get(lua_State *L, int pos)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(8,"Get<T=%s>(L=%p, pos = %i)", _TIW(T).name(), L, pos);
-      const T* obj = reinterpret_cast<const T*>( getClass(L)->get_const_ptr(L, pos) );  
+      const T* obj = reinterpret_cast<const T*>( getClass(L)->get_const_ptr(L, pos) );
       SLB_DEBUG(9,"obj = %p", obj);
       return *obj; //<-- copy ---
     }
 
-    static bool check(lua_State *L, int pos) 
+    static bool check(lua_State *L, int pos)
     {
       SLB_DEBUG_CALL;
       ClassInfo *c = SLB::Manager::getInstance(L)->getClass(_TIW(T));
@@ -84,7 +84,7 @@ namespace Private {
     typedef T* GetType;
     static ClassInfo *getClass(lua_State *L)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(10,"getClass '%s'", _TIW(T).name());
       ClassInfo *c = SLB::Manager::getInstance(L)->getClass(_TIW(T));
       return c;
@@ -92,7 +92,7 @@ namespace Private {
 
     static void push(lua_State *L, T *obj)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(10,"push '%s' of %p",
           _TIW(T).name(),
           obj);
@@ -101,32 +101,32 @@ namespace Private {
         lua_pushnil(L);
         return;
       }
-      // use this class...  
+      // use this class...
       getClass(L)->push_ptr(L, (void*) obj);
     }
 
     static T* get(lua_State *L, int pos)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(10,"get '%s' at pos %d", _TIW(T).name(), pos);
       return reinterpret_cast<T*>( getClass(L)->get_ptr(L, pos) );
     }
 
-    static bool check(lua_State *L, int pos) 
+    static bool check(lua_State *L, int pos)
     {
       SLB_DEBUG_CALL;
       ClassInfo *c = SLB::Manager::getInstance(L)->getClass(_TIW(T));
       return (lua_isnil(L,pos) || ((c != NULL) && (c->get_ptr(L, pos) != NULL)));
     }
   };
-  
+
   template<class T>
   struct Type<const T*>
   {
     typedef const T* GetType;
     static ClassInfo *getClass(lua_State *L)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(10,"getClass '%s'", _TIW(T).name());
       ClassInfo *c = SLB::Manager::getInstance(L)->getClass(_TIW(T));
       return c;
@@ -134,25 +134,25 @@ namespace Private {
 
     static void push(lua_State *L,const T *obj)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(10,"push '%s' of %p", _TIW(T).name(), obj);
       if (obj == 0)
       {
         lua_pushnil(L);
         return;
       }
-      
+
       getClass(L)->push_const_ptr(L, (const void*) obj);
     }
 
     static const T* get(lua_State *L, int pos)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(10,"get '%s' at pos %d", _TIW(T).name(), pos);
       return reinterpret_cast<const T*>( getClass(L)->get_const_ptr(L, pos) );
     }
 
-    static bool check(lua_State *L, int pos) 
+    static bool check(lua_State *L, int pos)
     {
       SLB_DEBUG_CALL;
       ClassInfo *c = SLB::Manager::getInstance(L)->getClass(_TIW(T));
@@ -167,14 +167,14 @@ namespace Private {
     typedef const T& GetType;
     static void push(lua_State *L,const T &obj)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(10,"push '%s' of %p(const ref)", _TIW(T).name(), &obj);
       Type<const T*>::push(L, &obj);
     }
 
     static const T& get(lua_State *L, int pos)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(10,"get '%s' at pos %d", _TIW(T).name(), pos);
       const T* obj = Type<const T*>::get(L,pos);
       return *(obj);
@@ -185,14 +185,14 @@ namespace Private {
     }
 
   };
-  
+
   template<class T>
   struct Type<T&>
   {
     typedef T& GetType;
     static ClassInfo *getClass(lua_State *L)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(10,"getClass '%s'", _TIW(T).name());
       ClassInfo *c = SLB::Manager::getInstance(L)->getClass(_TIW(T));
       return c;
@@ -200,14 +200,14 @@ namespace Private {
 
     static void push(lua_State *L,T &obj)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(10,"push '%s' of %p (reference)", _TIW(T).name(), &obj);
       getClass(L)->push_ref(L, (void*) &obj);
     }
 
     static T& get(lua_State *L, int pos)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(10,"get '%s' at pos %d", _TIW(T).name(), pos);
       return *(Type<T*>::get(L,pos));
     }
@@ -226,7 +226,7 @@ namespace Private {
     typedef void* GetType;
     static void push(lua_State *L,void* obj)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       if (obj == 0) lua_pushnil(L);
       else
       {
@@ -237,7 +237,7 @@ namespace Private {
 
     static void *get(lua_State *L, int pos)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(8,"Get<void*> (L=%p, pos=%i ) =%p)",L, pos, lua_touserdata(L,pos));
       if (lua_islightuserdata(L,pos)) return lua_touserdata(L,pos);
       //TODO: Check here if is an userdata and convert it to void
@@ -257,13 +257,13 @@ namespace Private {
     typedef char GetType;
     static void push(lua_State *L, char v)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(6, "Push char = %d",v);
       lua_pushinteger(L,v);
     }
     static char get(lua_State *L, int p)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       char v = (char) lua_tointeger(L,p);
       SLB_DEBUG(6,"Get char (pos %d) = %d",p,v);
       return v;
@@ -283,13 +283,13 @@ namespace Private {
     typedef unsigned char GetType;
     static void push(lua_State *L, unsigned char v)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(6, "Push unsigned char = %d",v);
       lua_pushinteger(L,v);
     }
     static unsigned char get(lua_State *L, int p)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       unsigned char v = (unsigned char) lua_tointeger(L,p);
       SLB_DEBUG(6,"Get unsigned char (pos %d) = %d",p,v);
       return v;
@@ -308,13 +308,13 @@ namespace Private {
     typedef short GetType;
     static void push(lua_State *L, short v)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(6, "Push short = %d",v);
       lua_pushinteger(L,v);
     }
     static short get(lua_State *L, int p)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       short v = (short) lua_tointeger(L,p);
       SLB_DEBUG(6,"Get short (pos %d) = %d",p,v);
       return v;
@@ -335,13 +335,13 @@ namespace Private {
 
     static void push(lua_State *L, unsigned short v)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(6, "Push unsigned short = %d",v);
       lua_pushinteger(L,v);
     }
     static unsigned short get(lua_State *L, int p)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       unsigned short v = (unsigned short) lua_tointeger(L,p);
       SLB_DEBUG(6,"Get unsigned short (pos %d) = %d",p,v);
       return v;
@@ -361,13 +361,13 @@ namespace Private {
     typedef int GetType;
     static void push(lua_State *L, int v)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(6, "Push integer = %d",v);
       lua_pushinteger(L,v);
     }
     static int get(lua_State *L, int p)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       int v = (int) lua_tointeger(L,p);
       SLB_DEBUG(6,"Get integer (pos %d) = %d",p,v);
       return v;
@@ -387,13 +387,13 @@ namespace Private {
     typedef unsigned int GetType;
     static void push(lua_State *L, unsigned int v)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(6, "Push unsigned integer = %d",v);
       lua_pushinteger(L,v);
     }
     static unsigned int get(lua_State *L, int p)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       unsigned int v = static_cast<unsigned int>(lua_tointeger(L,p));
       SLB_DEBUG(6,"Get unsigned integer (pos %d) = %d",p,v);
       return v;
@@ -405,7 +405,7 @@ namespace Private {
 
   template<> struct Type<unsigned int&> : public Type<unsigned int> {};
   template<> struct Type<const unsigned int&> : public Type<unsigned int> {};
-  
+
 
   template<>
   struct Type<long>
@@ -413,13 +413,13 @@ namespace Private {
     typedef long GetType;
     static void push(lua_State *L, long v)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(6, "Push long = %ld",v);
       lua_pushinteger(L,v);
     }
     static long get(lua_State *L, int p)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       long v = (long) lua_tointeger(L,p);
       SLB_DEBUG(6,"Get long (pos %d) = %ld",p,v);
       return v;
@@ -431,7 +431,7 @@ namespace Private {
 
   template<> struct Type<long&> : public Type<long> {};
   template<> struct Type<const long&> : public Type<long> {};
-  
+
 
   /* unsigned long == unsigned int */
   template<>
@@ -440,14 +440,14 @@ namespace Private {
     typedef unsigned long GetType;
     static void push(lua_State *L, unsigned long v)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(6, "Push unsigned long = %lu",v);
       lua_pushnumber(L,v);
     }
 
     static unsigned long get(lua_State *L, int p)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       unsigned long v = (unsigned long) lua_tonumber(L,p);
       SLB_DEBUG(6,"Get unsigned long (pos %d) = %lu",p,v);
       return v;
@@ -459,7 +459,7 @@ namespace Private {
 
   template<> struct Type<unsigned long&> : public Type<unsigned long> {};
   template<> struct Type<const unsigned long&> : public Type<unsigned long> {};
-  
+
 
   template<>
   struct Type<unsigned long long>
@@ -467,14 +467,14 @@ namespace Private {
     typedef unsigned long long GetType;
     static void push(lua_State *L, unsigned long long v)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(6, "Push unsigned long long = %llu",v);
       lua_pushnumber(L,(lua_Number) v);
     }
 
     static unsigned long long get(lua_State *L, int p)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       unsigned long long v = (unsigned long long) lua_tonumber(L,p);
       SLB_DEBUG(6,"Get unsigned long long (pos %d) = %llu",p,v);
       return v;
@@ -486,7 +486,7 @@ namespace Private {
 
   template<> struct Type<unsigned long long&> : public Type<unsigned long long> {};
   template<> struct Type<const unsigned long long&> : public Type<unsigned long long> {};
-  
+
   // Type specialization for <double>
   template<>
   struct Type<double>
@@ -494,13 +494,13 @@ namespace Private {
     typedef double GetType;
     static void push(lua_State *L, double v)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(6, "Push double = %f",v);
       lua_pushnumber(L,v);
     }
     static double get(lua_State *L, int p)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       double v = (double) lua_tonumber(L,p);
       SLB_DEBUG(6,"Get double (pos %d) = %f",p,v);
       return v;
@@ -512,7 +512,7 @@ namespace Private {
 
   template<> struct Type<double&> : public Type<double> {};
   template<> struct Type<const double&> : public Type<double> {};
-  
+
   // Type specialization for <float>
   template<>
   struct Type<float>
@@ -520,14 +520,14 @@ namespace Private {
     typedef float GetType;
     static void push(lua_State *L, float v)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(6, "Push float = %f",v);
       lua_pushnumber(L,v);
     }
 
     static float get(lua_State *L, int p)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       float v = (float) lua_tonumber(L,p);
       SLB_DEBUG(6,"Get float (pos %d) = %f",p,v);
       return v;
@@ -539,8 +539,8 @@ namespace Private {
 
   template<> struct Type<float&> : public Type<float> {};
   template<> struct Type<const float&> : public Type<float> {};
-  
-  
+
+
   // Type specialization for <bool>
   template<>
   struct Type<bool>
@@ -548,13 +548,13 @@ namespace Private {
     typedef bool GetType;
     static void push(lua_State *L, bool v)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(6, "Push bool = %d",(int)v);
       lua_pushboolean(L,v);
     }
     static bool get(lua_State *L, int p)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       bool v = (lua_toboolean(L,p) != 0);
       SLB_DEBUG(6,"Get bool (pos %d) = %d",p,v);
       return v;
@@ -574,14 +574,14 @@ namespace Private {
     typedef std::string GetType;
     static void push(lua_State *L, const std::string &v)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       SLB_DEBUG(6, "Push const std::string& = %s",v.c_str());
       lua_pushlstring(L, v.data(), v.size());
     }
 
     static std::string get(lua_State *L, int p)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       size_t len;
       const char* v = (const char*) lua_tolstring(L,p, &len);
       SLB_DEBUG(6,"Get std::string (pos %d) = %s",p,v);
@@ -603,7 +603,7 @@ namespace Private {
     typedef const char* GetType;
     static void push(lua_State *L, const char* v)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       if (v)
       {
         SLB_DEBUG(6, "Push const char* = %s",v);
@@ -618,7 +618,7 @@ namespace Private {
 
     static const char* get(lua_State *L, int p)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       const char* v = (const char*) lua_tostring(L,p);
       SLB_DEBUG(6,"Get const char* (pos %d) = %s",p,v);
       return v;
@@ -634,7 +634,7 @@ namespace Private {
     typedef const unsigned char* GetType;
     static void push(lua_State *L, const unsigned char* v)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       if (v)
       {
         SLB_DEBUG(6, "Push const unsigned char* = %s",v);
@@ -649,7 +649,7 @@ namespace Private {
 
     static const unsigned char* get(lua_State *L, int p)
     {
-      SLB_DEBUG_CALL; 
+      SLB_DEBUG_CALL;
       const unsigned char* v = (const unsigned char*) lua_tostring(L,p);
       SLB_DEBUG(6,"Get const unsigned char* (pos %d) = %s",p,v);
       return v;

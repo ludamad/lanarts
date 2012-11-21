@@ -1,10 +1,10 @@
 /*
- * slb_numvectortype.h:
+ * luacpp_wrap_numeric.h:
  *  Helpers for defining numeric vector types
  */
 
-#ifndef SLB_NUMVECTORTYPE_H_
-#define SLB_NUMVECTORTYPE_H_
+#ifndef LUACPP_WRAP_NUMERIC_H_
+#define LUACPP_WRAP_NUMERIC_H_
 
 #include <SLB/Type.hpp>
 #include <SLB/PushGet.hpp>
@@ -13,7 +13,7 @@ extern "C" {
 #include <lua/lua.h>
 }
 
-#include "slb_valuetype.h"
+#include "luacpp_wrap.h"
 
 template<typename T, typename Num, int allowed_missing = 0, int default_value =
 		0>
@@ -64,20 +64,22 @@ public:
 };
 
 
-#define SLB_NUMERIC_VECTOR(T, V) \
+#define LUACPP_WRAP_AS_NUMARRAY(T, V) \
 		extern template class LuaNumarrayImpl<T, V>; \
-		SLB_WRAP_VALUE_TYPE(T, (LuaNumarrayImpl<T, V>::push),(LuaNumarrayImpl<T, V>::get),(LuaNumarrayImpl<T, V>::check))
+		LUACPP_TYPE_WRAP(T, (LuaNumarrayImpl<T, V>::push),(LuaNumarrayImpl<T, V>::get),(LuaNumarrayImpl<T, V>::check))
 
-#define SLB_NUMERIC_VECTOR_WITH_PARAMS(T, V, allowed_missing, default_value) \
+#define LUACPP_WRAP_AS_NUMARRAY2(T, V, allowed_missing, default_value) \
 		extern template class LuaNumarrayImpl<T, V, allowed_missing, default_value>; \
-		SLB_WRAP_VALUE_TYPE(T, (LuaNumarrayImpl<T, V, allowed_missing, default_value>::push),\
+		LUACPP_TYPE_WRAP(T, (LuaNumarrayImpl<T, V, allowed_missing, default_value>::push),\
 				(LuaNumarrayImpl<T, V, allowed_missing, default_value>::get),\
 				(LuaNumarrayImpl<T, V, allowed_missing, default_value>::check))
 
-#define SLB_NUMERIC_VECTOR_DECLARATION(T,V) \
-		template class LuaNumarrayImpl<T, V>
+#define LUACPP_WRAP_AS_NUMARRAY_IMPL(T,V) \
+		template class LuaNumarrayImpl<T, V> ; \
+		SLB_WRAP_VALUE_DECLARATION(T)
 
-#define SLB_NUMERIC_VECTOR_WITH_PARAMS_DECLARATION(T,V, allowed_missing, default_value) \
-		template class LuaNumarrayImpl<T, V, allowed_missing, default_value>
+#define LUACPP_WRAP_AS_NUMARRAY2_IMPL(T,V, allowed_missing, default_value) \
+		template class LuaNumarrayImpl<T, V, allowed_missing, default_value>; \
+		SLB_WRAP_VALUE_DECLARATION(T)
 
-#endif /* SLB_NUMVECTORTYPE_H_ */
+#endif /* LUACPP_WRAP_NUMERIC_H_ */

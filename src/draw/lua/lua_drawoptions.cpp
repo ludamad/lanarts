@@ -6,13 +6,15 @@ extern "C" {
 #include <lua/lua.h>
 }
 
-#include <common/lua/slb_valuetype.h>
+#include <common/lua/luacpp_wrap.h>
 #include <common/lua/lua_geometry.h>
 #include <common/lua/LuaValue.h>
 #include <common/lua/luacpp.h>
 
 #include "lua_colour.h"
 #include "lua_drawoptions.h"
+
+SLB_WRAP_VALUE_DECLARATION(ldraw::DrawOptions);
 
 void lua_push_drawoptions(lua_State *L, const ldraw::DrawOptions & options) {
 	lua_newtable(L);
@@ -41,7 +43,7 @@ bool lua_check_drawoptions(lua_State *L, int idx) {
 	return lua_istable(L, idx);
 }
 
-void lua_register_draworigin_constants(lua_State *L, LuaValue& module) {
+void ldraw::lua_register_draworigin_constants(lua_State *L, const LuaValue& module) {
 	using namespace ldraw;
 #define BIND_ORIGIN_CONST(origin) \
 	module.get(L, #origin) = +origin

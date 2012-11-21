@@ -10,9 +10,9 @@
 
 #include "../colour_constants.h"
 
-SLB_NUMERIC_VECTOR_WITH_PARAMS_DECLARATION(Colour, int, 1 /*allowed missing*/, 255 /*default*/);
+LUACPP_WRAP_AS_NUMARRAY2_IMPL(Colour, int, 1 /*allowed missing*/, 255 /*default*/);
 
-void lua_register_colour_constants(lua_State *L, LuaValue& module) {
+void ldraw::lua_register_colour_constants(lua_State *L, const LuaValue& module) {
 #define BIND_COLOUR(col) \
 	module.get(L, #col) = col
 

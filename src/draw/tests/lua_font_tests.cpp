@@ -8,6 +8,7 @@
 #include <SLB/FuncCall.hpp>
 #include <SLB/LuaCall.hpp>
 #include <common/lua/lua_unittest.h>
+#include <common/lua/LuaValue.h>
 
 #include "../Image.h"
 #include "../lua/lua_font.h"
@@ -21,15 +22,16 @@ static void lua_font_bind_test() {
 		Font f;
 		Manager m;
 		m.registerSLB(L);
-		lua_register_font(L);
+		lua_register_font(L, LuaValue(L, LUA_GLOBALSINDEX));
 		m.set("assert", FuncCall::create(unit_test_assert));
 
 		//Cant really test methods, just assert they exist:
-		const char* code2 = "function testFontProperties(font)\n"
-				"SLB.assert('draw does not exist', font.draw ~= nil)\n"
-				"SLB.assert('draw_wrapped does not exist', font.draw_wrapped ~= nil)\n"
-				"SLB.assert('get_draw_size does not exist', font.get_draw_size ~= nil)\n"
-				"end\n";
+		const char* code2 =
+				"function testFontProperties(font)\n"
+						"SLB.assert('draw does not exist', font.draw ~= nil)\n"
+						"SLB.assert('draw_wrapped does not exist', font.draw_wrapped ~= nil)\n"
+						"SLB.assert('get_draw_size does not exist', font.get_draw_size ~= nil)\n"
+						"end\n";
 
 		lua_assert_valid_dostring(L, code2);
 		{
