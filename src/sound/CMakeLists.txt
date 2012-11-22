@@ -78,9 +78,9 @@ add_executable( ldraw_ex ${ldraw_src} ${ldraw_examples} )
 
 
 target_link_libraries( ldraw_ex
-			"/home/adomurad/lanarts-git/lanarts_build/src/common/liblcommon.a"
-			"/home/adomurad/lanarts-git/lanarts_build/libs/slb/libslb.a"
-			"/home/adomurad/lanarts-git/lanarts_build/libs/lua/liblua.a"
+			"${CMAKE_BINARY_DIR}/src/common/liblcommon.a"
+			"${CMAKE_BINARY_DIR}/libs/slb/libslb.a"
+			"${CMAKE_BINARY_DIR}/libs/lua/liblua.a"
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}
 			${SDLIMAGE_LIBRARY}
@@ -90,9 +90,9 @@ target_link_libraries( ldraw_ex
 
 add_executable( ldraw_tests ${ldraw_src} ${ldraw_tests} )
 target_link_libraries( ldraw_tests
-			"/home/adomurad/lanarts-git/lanarts_build/src/common/liblcommon.a"
-			"/home/adomurad/lanarts-git/lanarts_build/libs/slb/libslb.a"
-			"/home/adomurad/lanarts-git/lanarts_build/libs/lua/liblua.a"
+			"${CMAKE_BINARY_DIR}/src/common/liblcommon.a"
+			"${CMAKE_BINARY_DIR}/libs/slb/libslb.a"
+			"${CMAKE_BINARY_DIR}/libs/lua/liblua.a"
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}
 			${SDLIMAGE_LIBRARY}

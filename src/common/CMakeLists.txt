@@ -77,8 +77,8 @@ add_executable( lcommon_tests
 target_link_libraries( 
 			lcommon_tests
 			
-			"/home/adomurad/lanarts-git/lanarts_build/libs/slb/libslb.a"
-			"/home/adomurad/lanarts-git/lanarts_build/libs/lua/liblua.a"
+			"${CMAKE_BINARY_DIR}/libs/slb/libslb.a"
+			"${CMAKE_BINARY_DIR}/libs/lua/liblua.a"
 #			lua
 #			slb
 )
