@@ -20,12 +20,6 @@ struct font_data;
 struct GameView;
 struct SpriteEntry;
 
-void gl_set_drawing_area(int x, int y, int w, int h);
-void init_sdl_gl(bool fullscreen, int w, int h);
-
-void update_display();
-void SDL_GL_diagnostics();
-
 void gl_subimage_from_bytes(GLimage& img, const BBox& region, char* data,
 		int type = GL_BGRA);
 void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type =
@@ -34,6 +28,7 @@ void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type =
 inline void gl_init_image(GLimage& img, int w, int h, int type = GL_BGRA) {
 	gl_image_from_bytes(img, w, h, NULL, type);
 }
+
 
 void gl_draw_image(GLimage& img, int x, int y,
 		const Colour& c = Colour(255, 255, 255));
@@ -70,19 +65,12 @@ inline void gl_draw_rectangle_outline(const BBox& bbox, const Colour& clr =
 	gl_draw_rectangle_outline(bbox.x1, bbox.y1, bbox.width(), bbox.height(),
 			clr, linewidth);
 }
-
-void gl_draw_line(int x1, int y1, int x2, int y2,
-		const Colour& clr = Colour(255, 255, 255), int linewidth = 1);
-
 void gl_draw_statbar(const BBox& bbox, int min_stat, int max_stat,
 		const Colour& front = Colour(0, 255, 0),
 		const Colour& back = Colour(255, 0, 0));
 void gl_draw_statbar(const GameView& view, const BBox& bbox, int min_stat,
 		int max_stat, const Colour& front = Colour(0, 255, 0),
 		const Colour& back = Colour(255, 0, 0));
-
-void gl_draw_rectangle_parts(int x, int y, int w, int h, int sub_parts,
-		char* flags, const Colour& colour = Colour(0, 0, 0));
 
 Dim gl_text_dimensions(const font_data& font, const char *fmt, ...);
 //Will print out text at window coordinates x,y, using the font ft_font.

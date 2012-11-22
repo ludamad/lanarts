@@ -4,6 +4,8 @@
  *  Includes inventory manipulation
  */
 
+#include <draw/display.h>
+
 #include "../display/display.h"
 
 #include "../display/sprite_data.h"
@@ -74,7 +76,7 @@ bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 
 void GameHud::draw(GameState* gs) {
 	perf_timer_begin(FUNCNAME);
-	gl_set_drawing_area(0, 0, sidebar_box.x2, sidebar_box.y2);
+	ldraw::display_set_drawing_region(BBoxF(0, 0, sidebar_box.x2, sidebar_box.y2));
 	gl_draw_rectangle(sidebar_box.x1, sidebar_box.y1, width(), height(),
 			bg_colour);
 

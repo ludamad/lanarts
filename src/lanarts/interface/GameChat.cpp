@@ -6,6 +6,8 @@
 
 #include <SDL.h>
 
+#include <draw/draw.h>
+
 #include "../draw/colour_constants.h"
 
 #include "../display/display.h"
@@ -115,8 +117,8 @@ void GameChat::draw_player_chat(GameState* gs) const {
 
 	if (draw_typed_message) {
 		int type_y = chat_y + chat_h - padding - line_sep;
-		gl_draw_line(chat_x, type_y, chat_x + chat_w, type_y,
-				Colour(200, 200, 200, fade_out * 180));
+		ldraw::draw_line(Colour(200, 200, 200, fade_out * 180),
+				Posf(chat_x, type_y), Posf(chat_x + chat_w, type_y));
 		ChatMessage typed_message = get_field_as_chat_message(gs, false);
 		typed_message.draw(font, fade_out, text_x, type_y + padding - 1);
 	}

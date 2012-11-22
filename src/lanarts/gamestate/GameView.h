@@ -10,6 +10,7 @@
 
 struct GameView {
 	int x, y, width, height, world_width, world_height;
+
 	GameView(int x, int y, int width, int height, int world_width = 0,
 			int world_height = 0) :
 			x(x), y(y), width(width), height(height), world_width(world_width), world_height(
@@ -40,6 +41,9 @@ struct GameView {
 	}
 	void move_delta(int dx, int dy) {
 		move_towards(x + dx, y + dy);
+	}
+	Pos on_screen(const Pos& p) {
+		return Pos(p.x - x, p.y - y);
 	}
 	void min_tile_within(int& px, int& py) const;
 	void max_tile_within(int& px, int& py) const;

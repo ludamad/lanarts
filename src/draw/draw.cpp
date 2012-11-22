@@ -71,3 +71,20 @@ void ldraw::draw_circle_outline(const Colour& clr, const Posf& pos,
 		glLineWidth(1);
 }
 
+void ldraw::draw_line(const Colour& clr, const Posf& p1, const Posf& p2,
+		int linewidth) {
+
+	if (linewidth != 1)
+		glLineWidth(linewidth);
+
+	glBegin(GL_LINES);
+	glColor4ub(clr.r, clr.g, clr.b, clr.a);
+
+	glVertex2i(p1.x, p1.y);
+	glVertex2i(p2.x, p2.y);
+
+	glEnd();
+
+	if (linewidth != 1)
+		glLineWidth(1);
+}

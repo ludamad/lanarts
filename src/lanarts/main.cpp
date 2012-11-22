@@ -5,6 +5,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
+#include <draw/display.h>
 #include <net/lanarts_net.h>
 
 extern "C" {
@@ -44,7 +45,7 @@ void init_system(GameSettings& settings, lua_State* L) {
 		exit(0);
 	}
 	lanarts_net_init(true);
-	init_sdl_gl(settings.fullscreen, settings.view_width, settings.view_height);
+	ldraw::display_initialize("Lanarts", Dim(settings.view_width, settings.view_height), settings.fullscreen);
 	init_game_data(settings, L);
 }
 

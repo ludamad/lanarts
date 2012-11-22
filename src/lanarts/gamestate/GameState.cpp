@@ -17,6 +17,7 @@ extern "C" {
 #include <vector>
 
 #include <common/SerializeBuffer.h>
+#include <draw/display.h>
 
 #include "../data/game_data.h"
 
@@ -288,12 +289,17 @@ void GameState::adjust_view_to_dragging() {
 void GameState::draw(bool drawhud) {
 	perf_timer_begin(FUNCNAME);
 
+	ldraw::display_draw_start();
+
 	adjust_view_to_dragging();
 
-	if (drawhud)
-		gl_set_drawing_area(0, 0, _view.width, _view.height);
-	else
-		gl_set_drawing_area(0, 0, _view.width + hud.width(), _view.height);
+	if (drawhud) {
+		ldraw::display_set_drawing_region(
+				BBoxF(0, 0, _view.width, _view.height));
+	} else {
+		ldraw::display_set_drawing_region(
+				BBoxF(0, 0, _view.width + hud.width(), _view.height));
+	}
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -310,7 +316,7 @@ void GameState::draw(bool drawhud) {
 		hud.draw(this);
 	}
 
-	update_display();
+	ldraw::display_draw_finish();
 
 //	glFinish(); // XXX: Apparently glFinish is not recommended
 	perf_timer_end(FUNCNAME);

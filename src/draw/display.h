@@ -4,10 +4,12 @@
  *  you are done drawing.
  */
 
-#ifndef DISPLAY_H_
-#define DISPLAY_H_
+#ifndef LDRAW_DISPLAY_H_
+#define LDRAW_DISPLAY_H_
 
-#include <common/geometry.h>
+
+struct Dim;
+struct BBoxF;
 
 namespace ldraw {
 
@@ -17,8 +19,8 @@ void display_set_fullscreen(bool fullscreen);
 bool display_is_fullscreen();
 void display_set_drawing_region(const BBoxF& bbox);
 
-void draw_finish();
-void draw_start();
+void display_draw_finish();
+void display_draw_start();
 
 }
 

@@ -69,12 +69,12 @@ static void draw_loop(DrawFunc draw_func) {
 				return; // Exit draw loop
 			}
 		}
-		ldraw::draw_start();
+		ldraw::display_draw_start();
 		draw_func();
 		double seconds = timer.get_microseconds() / 1000.0 / 1000.0;
 		fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::RIGHT_BOTTOM),
 				Posf(400, 400), "%d", int(frames / seconds));
-		ldraw::draw_finish();
+		ldraw::display_draw_finish();
 		SDL_Delay(5);
 	}
 }

@@ -8,6 +8,8 @@
 #include <SDL_opengl.h>
 #include <GL/glu.h>
 
+#include <common/geometry.h>
+
 #include "display.h"
 
 static void gl_set_drawing_area(int x, int y, int w, int h) {
@@ -119,10 +121,10 @@ bool ldraw::display_is_fullscreen() {
 	return (surface->flags & SDL_FULLSCREEN);
 }
 
-void ldraw::draw_start() {
+void ldraw::display_draw_start() {
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
-void ldraw::draw_finish() {
+void ldraw::display_draw_finish() {
 	SDL_GL_SwapBuffers();
 }
