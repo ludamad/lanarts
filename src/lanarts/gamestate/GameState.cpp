@@ -16,6 +16,8 @@ extern "C" {
 #include <ctime>
 #include <vector>
 
+#include <common/SerializeBuffer.h>
+
 #include "../data/game_data.h"
 
 #include "../display/display.h"
@@ -32,8 +34,6 @@ extern "C" {
 #include "../objects/player/PlayerInst.h"
 
 #include "../objects/GameInst.h"
-
-#include <common/SerializeBuffer.h>
 
 #include "../stats/class_data.h"
 

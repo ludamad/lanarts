@@ -273,4 +273,8 @@ void operator+=(DimF& p1, const DimF& p2);
 DimF operator-(const DimF& p1, const DimF& p2);
 void operator-=(DimF& p1, const DimF& p2);
 
+inline BBox remove_perimeter(const BBox& bbox, int p = 1) {
+	return BBox(bbox.x1 + p, bbox.y1 + p, bbox.x2 - p*2, bbox.y2 - p*2);
+}
+
 #endif /* GEOMETRY_H_ */
