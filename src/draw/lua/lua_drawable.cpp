@@ -8,6 +8,7 @@ extern "C" {
 #include <lua/lua.h>
 }
 
+#include <stdexcept>
 #include <new>
 
 #include <common/lua/luacpp.h>
@@ -18,13 +19,16 @@ extern "C" {
 #include "../Animation.h"
 #include "../DrawableBase.h"
 #include "../DirectionalDrawable.h"
+#include "../LuaDrawable.h"
 #include "../ldraw_assert.h"
 #include "../Image.h"
 
 #include "lua_drawable.h"
+#include "lua_luadrawable.h"
 #include "lua_drawoptions.h"
 
-SLB_WRAP_VALUE_DECLARATION(ldraw::Drawable);
+LUACPP_TYPE_WRAP_IMPL(ldraw::Drawable);
+LUACPP_TYPE_WRAP_IMPL(ldraw::LuaDrawable);
 
 namespace ldraw {
 
@@ -35,7 +39,13 @@ void lua_pushdrawable(lua_State* L, const Drawable& drawable) {
 	lua_setmetatable(L, -2);
 }
 
-const Drawable & lua_getdrawable(lua_State *L, int idx) {
+Drawable lua_getdrawable(lua_State *L, int idx) {
+	if (lua_isfunction(L, idx)) {
+		return Drawable(new LuaDrawable(L, LuaValue(L, idx)));
+	} else if (!lua_isuserdata(L, idx)) {
+		throw std::runtime_error(
+				"Attempt to pass incompatible type as drawable");
+	}
 	Drawable *luadrawable = (Drawable*)(lua_touserdata(L, idx));
 	return *luadrawable;
 }
@@ -107,7 +117,7 @@ static int luadrawable_index(lua_State *L) {
 	}
 	const Drawable & drawable = lua_getdrawable(L, 1);
 	const char* member = lua_tostring(L, 2);
-	return luadrawablebase_index(L, *drawable.get_ref().get(), member);
+	return luadrawablebase_index(L, *drawable.ptr(), member);
 }
 
 static void drawable_base_push_metatable(lua_State *L) {
@@ -137,12 +147,55 @@ static Drawable animation_create(const std::vector<Drawable>& frames,
 	return Drawable(new Animation(frames, animation_speed));
 }
 
+void lua_pushluadrawable(lua_State* L, const LuaDrawable& image) {
+	lua_pushdrawable(L, Drawable(new LuaDrawable(image)));
+}
+
+LuaDrawable lua_getluadrawable(lua_State* L, int idx) {
+	return *dynamic_cast<LuaDrawable*>(lua_getdrawable(L, idx).ptr());
+}
+bool lua_checkluadrawable(lua_State* L, int idx) {
+	if (lua_checkdrawable(L, idx)) {
+		if (lua_isuserdata(L, idx)) {
+			return dynamic_cast<LuaDrawable*>(lua_getdrawable(L, idx).ptr());
+		}
+		return true;
+	}
+	return false;
+}
+
+//Creates a LuaDrawable
+static int drawable_create(lua_State* L) {
+
+	int nargs = lua_gettop(L);
+	if (nargs == 0 || nargs > 2 || !lua_isfunction(L,1)) {
+		return luaL_error(L, "drawable_create used incorrectly: "
+				" expects (function [, animation duration])");
+	}
+
+	LuaValue drawclosure(L, 1);
+	float animation_duration = 0.0f;
+
+	if (nargs == 2) {
+		animation_duration = lua_tonumber(L, 2);
+	}
+
+	LuaDrawable* ldrawable = new LuaDrawable(L, drawclosure,
+			animation_duration);
+
+	lua_pushdrawable(L, Drawable(ldrawable));
+
+	return 1;
+}
+
 void lua_register_drawables(lua_State *L, const LuaValue & module) {
+	SLB::Manager* m = SLB::Manager::getInstance(L);
 #define BIND_FUNC(f)\
 	SLB::FuncCall::create(f)->push(L); \
 	module.get(L, #f).pop()
 	BIND_FUNC(directional_create);
 	BIND_FUNC(animation_create);
+	BIND_FUNC(drawable_create);
 }
 
 }

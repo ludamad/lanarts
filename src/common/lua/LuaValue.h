@@ -98,9 +98,13 @@ public:
 		return get(L, key.c_str());
 	}
 
+	bool operator==(const LuaValue& o) const;
+	bool operator!=(const LuaValue& o) const;
+
 	bool isnil(lua_State* L);
 private:
 	LCommonPrivate::_LuaValueImpl* impl;
 };
+
 
 #endif /* LCOMMON_LUAVALUE_H_ */

@@ -43,14 +43,14 @@ extern "C" {
 		LUACPP_GENERAL_WRAP(/*Nothings*/, const T &, T, pushf, getf, checkf)
 
 
-#define SLB_WRAP_VALUE_DECLARATION(T) \
+#define LUACPP_TYPE_WRAP_IMPL(T) \
 		template T SLB::get<T>(lua_State *L, int pos); \
 		template bool SLB::check<T>(lua_State *L, int pos); \
 		template void SLB::push<T>(lua_State *L, T v); \
 		template bool SLB::check<const T &>(lua_State *L, int pos); \
-		template void SLB::push<const T &>(lua_State *L, const T& v);
+		template void SLB::push<const T &>(lua_State *L, const T& v)
 
-#define SLB_WRAP_VALUE_TYPE_IMPLCLAS(T, Impl) \
-		LUACPP_TYPE_WRAP(T, Impl::push, Impl::get, Impl::check)
+//#define SLB_WRAP_VALUE_TYPE_IMPLCLAS(T, Impl) \
+//		LUACPP_TYPE_WRAP(T, Impl::push, Impl::get, Impl::check)
 
 #endif /* LUA_WRAP_UTIL_H_ */

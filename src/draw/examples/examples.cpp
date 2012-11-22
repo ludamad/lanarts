@@ -139,6 +139,19 @@ static void draw_script() {
 			Posf(0, 400), "Lua");
 }
 
+static void draw_script_from_drawable() {
+	using namespace ldraw;
+	using namespace SLB;
+
+	ldraw::Font fpsfont("sample.ttf", 40);
+	lua_getglobal(L, "drawable");
+	Drawable drawable = get<Drawable>(L, -1);
+	drawable.draw(Posf());
+
+	fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::LEFT_BOTTOM),
+			Posf(0, 400), "LuaDrawable");
+}
+
 static void setup_lua_state() {
 	using namespace ldraw;
 
@@ -173,7 +186,7 @@ int main(int argc, const char** argv) {
 
 	std::vector<Image> anim_images = image_split(Image("animation.png"),
 			DimF(480.0f / 6, 120));
-	animation = new Animation(anim_images, 0.01f);
+	animation = new Animation(anim_images, 0.1f);
 
 	draw_loop(draw_shapes);
 	draw_loop(draw_images);
@@ -189,6 +202,7 @@ int main(int argc, const char** argv) {
 	draw_luascript(L, "scripts/draw_directional.lua");
 	draw_luascript(L, "scripts/draw_animation.lua");
 	draw_luascript(L, "scripts/draw_custom.lua");
+	draw_loop(draw_script_from_drawable);
 
 	lua_close(L);
 }

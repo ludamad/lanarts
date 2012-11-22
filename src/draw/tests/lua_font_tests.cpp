@@ -39,6 +39,8 @@ static void lua_font_bind_test() {
 			call(f);
 		}
 	}
+
+	UNIT_TEST_ASSERT(lua_gettop(L) == 0);
 	lua_close(L);
 }
 

@@ -33,6 +33,9 @@ public:
 	smartptr<DrawableBase> get_ref() const {
 		return ref;
 	}
+	DrawableBase* ptr() const {
+		return ref.get();
+	}
 
 private:
 	smartptr<DrawableBase> ref;
@@ -41,7 +44,7 @@ private:
 // Implemented in lua_drawable.cpp
 // Pushes with a different metatable based on the concrete type
 void lua_pushdrawable(lua_State* L, const Drawable& drawable);
-const Drawable& lua_getdrawable(lua_State* L, int idx);
+Drawable lua_getdrawable(lua_State* L, int idx);
 bool lua_checkdrawable(lua_State* L, int idx);
 
 }

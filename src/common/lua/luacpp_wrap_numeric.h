@@ -76,10 +76,10 @@ public:
 
 #define LUACPP_WRAP_AS_NUMARRAY_IMPL(T,V) \
 		template class LuaNumarrayImpl<T, V> ; \
-		SLB_WRAP_VALUE_DECLARATION(T)
+		LUACPP_TYPE_WRAP_IMPL(T)
 
 #define LUACPP_WRAP_AS_NUMARRAY2_IMPL(T,V, allowed_missing, default_value) \
 		template class LuaNumarrayImpl<T, V, allowed_missing, default_value>; \
-		SLB_WRAP_VALUE_DECLARATION(T)
+		LUACPP_TYPE_WRAP_IMPL(T)
 
 #endif /* LUACPP_WRAP_NUMERIC_H_ */

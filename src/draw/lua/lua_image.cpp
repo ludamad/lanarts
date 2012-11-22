@@ -19,7 +19,7 @@
 #include "lua_drawoptions.h"
 #include "lua_image.h"
 
-SLB_WRAP_VALUE_DECLARATION(ldraw::Image);
+LUACPP_TYPE_WRAP_IMPL(ldraw::Image);
 
 namespace ldraw {
 

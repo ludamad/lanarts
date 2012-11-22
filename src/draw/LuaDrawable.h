@@ -14,22 +14,32 @@ struct lua_State;
 
 namespace ldraw {
 
-class LuaDrawable: public ldraw::DrawableBase {
+class LuaDrawable: public DrawableBase {
 public:
-	LuaDrawable(const LuaValue& draw_closure = LuaValue(),
+	LuaDrawable(lua_State* L, const LuaValue& draw_closure = LuaValue(),
 			float _animation_duration = 0);
-	virtual ~LuaDrawable();
+	~LuaDrawable();
 
-	virtual void draw(const DrawOptions& options, const Posf& pos) const;
+	void draw(const DrawOptions& options, const Posf& pos) const;
 
-	virtual float animation_duration() const {
+	float animation_duration() const {
 		return _animation_duration;
 	}
 
+	bool operator==(const LuaDrawable& o) const;
+	bool operator!=(const LuaDrawable& o) const;
+
+
 private:
+	lua_State* L;
 	LuaValue draw_closure;
 	float _animation_duration;
 };
+
+// Implemented in lua_drawable.cpp
+void lua_pushluadrawable(lua_State* L, const LuaDrawable& image);
+LuaDrawable lua_getluadrawable(lua_State* L, int idx);
+bool lua_checkluadrawable(lua_State* L, int idx);
 
 }
 #endif

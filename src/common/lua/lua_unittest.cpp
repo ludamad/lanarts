@@ -28,5 +28,7 @@ void lua_assert_invalid_dostring(lua_State* L, const char* code) {
 		failmsg += code;
 		failmsg += "\n... but code completed!\n";
 		unit_test_fail(failmsg);
+	} else {
+		lua_pop(L, 1);
 	}
 }

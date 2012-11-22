@@ -9,7 +9,7 @@
 #include "../lua/luacpp.h"
 #include "../lua/lua_lcommon.h"
 
-static void luavalue_test_opsyntax() {
+static void luavalue_test_proxy_class() {
 	lua_State* L = lua_open();
 	SLB::Manager* m = new SLB::Manager;
 	m->registerSLB(L);
@@ -35,9 +35,27 @@ static void luavalue_test_opsyntax() {
 
 	globals.deinitialize(L);
 	value.deinitialize(L);
+
+	UNIT_TEST_ASSERT(lua_gettop(L) == 0);
+	lua_close(L);
+}
+
+static void luavalue_test_value_equality() {
+	lua_State* L = lua_open();
+	{
+		lua_newtable(L);
+		LuaValue v1(L, -1), v2(L, -1);
+		v1.push(L);
+		v2.push(L);
+		UNIT_TEST_ASSERT(lua_equal(L, -1, -2));
+		lua_pop(L, 3);
+	}
+
+	UNIT_TEST_ASSERT(lua_gettop(L) == 0);
 	lua_close(L);
 }
 
 void luavalue_tests() {
-	UNIT_TEST(luavalue_test_opsyntax);
+	UNIT_TEST(luavalue_test_proxy_class);
+	UNIT_TEST(luavalue_test_value_equality);
 }

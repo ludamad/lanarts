@@ -74,6 +74,8 @@ static void lua_drawoptions_bind_test() {
 			lua_assert_valid_dostring(L, code);
 		}
 	}
+
+	UNIT_TEST_ASSERT(lua_gettop(L) == 0);
 	lua_close(L);
 }
 void lua_drawoptions_tests() {

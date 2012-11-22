@@ -36,6 +36,8 @@ static void lua_colour_bind_test() {
 		const char* code = "SLB.colour_func({1,2,3,255,255})\n";
 		lua_assert_invalid_dostring(L, code);
 	}
+
+	UNIT_TEST_ASSERT(lua_gettop(L) == 0);
 	lua_close(L);
 }
 void lua_colour_tests() {

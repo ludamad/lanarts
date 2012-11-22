@@ -37,11 +37,12 @@ struct _LuaValueImpl {
 	}
 
 	void set(lua_State* L, int pos) {
+		lua_pushvalue(L, pos); /*push value*/
 		this->L = L;
 		empty = false;
 		int valueidx = lua_gettop(L);
 		lua_pushlightuserdata(L, this); /* push address as key */
-		lua_pushvalue(L, pos); /*push value*/
+		lua_insert(L, -2);
 		lua_settable(L, LUA_REGISTRYINDEX);
 	}
 
@@ -262,5 +263,13 @@ void _LuaFieldValue::operator =(const _LuaFieldValue & field) {
 	LCOMMON_ASSERT(L == field.L);
 	field.push();
 	pop();
+}
+
+bool LuaValue::operator ==(const LuaValue & o) const {
+	return impl == o.impl;
+}
+
+bool LuaValue::operator !=(const LuaValue & o) const {
+	return impl != o.impl;
 }
 

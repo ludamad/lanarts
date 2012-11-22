@@ -14,7 +14,7 @@ extern "C" {
 #include "lua_colour.h"
 #include "lua_drawoptions.h"
 
-SLB_WRAP_VALUE_DECLARATION(ldraw::DrawOptions);
+LUACPP_TYPE_WRAP_IMPL(ldraw::DrawOptions);
 
 void lua_push_drawoptions(lua_State *L, const ldraw::DrawOptions & options) {
 	lua_newtable(L);

@@ -38,3 +38,25 @@ How to wrap Drawable to lua ?
 			-Class name is convenient ... for now
 How to determine if enemy should be drawn ? (using radius should be OK)
 
+
+How to support multiple layers at different depths ?
+<- Have a DrawClosure
+	<- Union of:
+		obj_id id
+		draw function
+		Closure
+	if (id == 0):
+		<- object removed
+		<- closure deleted
+20 bytes / shadow (example):
+	RAM is cheap ... thankfully
+
+
+Example usage:
+
+static bool draw_shadow(GameInst* obj) {
+	return true;
+}
+class MyGameInst {
+	...
+}
