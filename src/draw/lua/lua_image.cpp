@@ -77,7 +77,7 @@ void Image::push_metatable(lua_State *L) const {
 	lua_setfield(L, metatable, "__index");
 }
 
-static Image image_load(const std::string& filename) {
+static Image image_load(const std::string & filename) {
 	return Image(filename);
 }
 
@@ -85,7 +85,9 @@ void lua_register_image(lua_State *L, const LuaValue & module) {
 #define BIND_FUNC(f)\
 	SLB::FuncCall::create(f)->push(L); \
 	module.get(L, #f).pop()
+
 	BIND_FUNC(image_load);
+	BIND_FUNC(image_split);
 	BIND_FUNC(image_split);
 }
 

@@ -64,6 +64,10 @@ public:
 			BBoxF());
 	void initialize(const Dim& size, const BBoxF& draw_region = BBoxF());
 
+
+	void from_bytes(const BBox& region, char* data);
+	void from_bytes(const Dim& size, char* data);
+
 	/* Pushes metatable to be used with a userdata object, which encapsulates a Drawable.
 	 * Implemented in lua_image.cpp
 	 */

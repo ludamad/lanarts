@@ -65,7 +65,7 @@ set( lcommon_tests
 	tests/lua_range_tests.cpp
 	tests/lua_vector_tests.cpp
 	tests/luavalue_tests.cpp
-    tests/lua_serialize_tests.cpp
+        tests/lua_serialize_tests.cpp
 	tests/strformat_tests.cpp
 )
 
@@ -76,9 +76,6 @@ add_executable( lcommon_tests
 
 target_link_libraries( 
 			lcommon_tests
-			
-			"${CMAKE_BINARY_DIR}/libs/slb/libslb.a"
-			"${CMAKE_BINARY_DIR}/libs/lua/liblua.a"
-#			lua
-#			slb
+			lua
+			slb
 )

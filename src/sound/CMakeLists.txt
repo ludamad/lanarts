@@ -78,9 +78,9 @@ add_executable( ldraw_ex ${ldraw_src} ${ldraw_examples} )
 
 
 target_link_libraries( ldraw_ex
-			"${CMAKE_BINARY_DIR}/src/common/liblcommon.a"
-			"${CMAKE_BINARY_DIR}/libs/slb/libslb.a"
-			"${CMAKE_BINARY_DIR}/libs/lua/liblua.a"
+			lcommon
+			slb
+			lua
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}
 			${SDLIMAGE_LIBRARY}
@@ -90,9 +90,9 @@ target_link_libraries( ldraw_ex
 
 add_executable( ldraw_tests ${ldraw_src} ${ldraw_tests} )
 target_link_libraries( ldraw_tests
-			"${CMAKE_BINARY_DIR}/src/common/liblcommon.a"
-			"${CMAKE_BINARY_DIR}/libs/slb/libslb.a"
-			"${CMAKE_BINARY_DIR}/libs/lua/liblua.a"
+			lcommon
+			slb
+			lua
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}
 			${SDLIMAGE_LIBRARY}

@@ -58,6 +58,19 @@ void Image::draw(const DrawOptions& options, const Posf& pos) const {
 	return _image->draw(adjusted_options, pos);
 }
 
+void Image::from_bytes(const BBox& region, char* data) {
+	LDRAW_ASSERT(!_image.get());
+	_image->subimage_from_bytes(region, data);
+
+}
+
+void Image::from_bytes(const Dim& size, char* data) {
+	if (!_image.get()) {
+		_image = smartptr<GLImage>(new GLImage(size));
+	}
+	_image->image_from_bytes(size, data);
+}
+
 std::vector<Image> image_split(const Image & image, const DimF & size) {
 	std::vector<Image> results;
 

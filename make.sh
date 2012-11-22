@@ -1,7 +1,7 @@
 mkdir -p ../lanarts_build
 cd ../lanarts_build
 
-CXX=/usr/bin/clang++ CC=/usr/bin/clang cmake ../lanarts
+cmake ../lanarts
 
 ## START TIMER CODE
 T="$(date +%s%N)"
