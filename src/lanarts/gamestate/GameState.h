@@ -12,6 +12,10 @@
 #include <SDL.h>
 #include <cstdio>
 
+#include <common/random/mtwist.h>
+
+#include <draw/Font.h>
+
 #include "../display/font.h"
 
 #include "../fov/fov.h"
@@ -21,7 +25,6 @@
 #include "../interface/GameHud.h"
 #include "../net/GameNetConnection.h"
 
-#include "../util/mtwist.h"
 #include "GameLogger.h"
 #include "GameSettings.h"
 #include "GameView.h"

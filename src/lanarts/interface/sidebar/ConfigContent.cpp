@@ -3,6 +3,8 @@
  *  Visual toggle of configuration options in side bar
  */
 
+#include <draw/draw.h>
+
 #include "../../draw/colour_constants.h"
 
 #include "../../display/sprite_data.h"
@@ -15,7 +17,7 @@
 
 void ConfigContent::draw(GameState* gs) const {
 	GameSettings& settings = gs->game_settings();
-	gl_draw_rectangle_outline(bbox, COL_UNFILLED_OUTLINE);
+	ldraw::draw_rectangle_outline(COL_UNFILLED_OUTLINE, bbox);
 
 	BBox entry_box(bbox.x1, bbox.y1, bbox.x2, bbox.y1 + TILE_SIZE);
 	draw_option_box(gs, entry_box, settings.autouse_mana_potions,

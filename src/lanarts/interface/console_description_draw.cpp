@@ -3,6 +3,8 @@
  *  Common routines for content descriptions and drawing
  */
 
+#include <draw/draw.h>
+
 #include "../draw/colour_constants.h"
 #include "../display/display.h"
 #include "../display/sprite_data.h"
@@ -137,8 +139,8 @@ static void draw_base_entry_overlay(GameState* gs, BaseDataEntry& entry) {
 Dim draw_icon_and_name(GameState* gs, BaseDataEntry& entry, Colour col, int x,
 		int y, int xoffset, int yoffset) {
 	gl_draw_sprite(entry.get_sprite(), x, y);
-	gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE,
-			COL_PALE_YELLOW.with_alpha(50));
+	ldraw::draw_rectangle_outline(COL_PALE_YELLOW.with_alpha(50),
+			BBox(x, y, TILE_SIZE, TILE_SIZE));
 	/* Draw item name */
 	return gl_printf_y_centered(gs->primary_font(), col, x + xoffset,
 			y + yoffset, "%s", entry.name.c_str());
@@ -147,8 +149,9 @@ Dim draw_icon_and_name(GameState* gs, BaseDataEntry& entry, Colour col, int x,
 void draw_spell_icon_and_name(GameState* gs, SpellEntry& spl_entry, Colour col,
 		int x, int y) {
 	gl_draw_sprite(spl_entry.sprite, x, y);
-	gl_draw_rectangle_outline(x, y, TILE_SIZE, TILE_SIZE,
-			COL_PALE_YELLOW.with_alpha(50));
+
+	ldraw::draw_rectangle_outline(COL_PALE_YELLOW.with_alpha(50),
+			BBox(x, y, TILE_SIZE, TILE_SIZE));
 	/* Draw spell name */
 	gl_printf_y_centered(gs->primary_font(), col, x + TILE_SIZE * 1.25,
 			y + TILE_SIZE / 2, "%s", spl_entry.name.c_str());

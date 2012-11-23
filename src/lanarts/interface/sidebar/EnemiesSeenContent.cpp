@@ -2,6 +2,9 @@
  * EnemiesSeenContent.h:
  *  Displays all the enemies players have seen, allowing them to see descriptions.
  */
+
+#include <draw/draw.h>
+
 #include "../../draw/colour_constants.h"
 
 #include "../../display/sprite_data.h"
@@ -50,7 +53,7 @@ static void draw_enemies_seen(GameState* gs, EnemiesSeen& es, const BBox& bbox,
 			}
 			//draw rectangle over edges
 
-			gl_draw_rectangle_outline(slotbox, outline);
+			ldraw::draw_rectangle_outline(outline, slotbox);
 			slot++;
 		}
 	}

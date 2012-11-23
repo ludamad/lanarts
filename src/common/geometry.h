@@ -170,7 +170,7 @@ struct BBoxF {
 			x1(pos.x), y1(pos.y), x2(pos.x + dim.w), y2(pos.y + dim.h) {
 		LCOMMON_ASSERT(x1 <= x2 && y1 <= y2);
 	}
-	BBoxF(const BBoxF& bbox) :
+	BBoxF(const BBox& bbox) :
 			x1(bbox.x1), y1(bbox.y1), x2(bbox.x2), y2(bbox.y2) {
 		LCOMMON_ASSERT(x1 <= x2 && y1 <= y2);
 	}

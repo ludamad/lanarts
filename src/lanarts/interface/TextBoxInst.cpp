@@ -3,6 +3,8 @@
  *  Represents an interactive text-box.
  */
 
+#include <draw/draw.h>
+
 #include "../draw/colour_constants.h"
 
 #include "../gamestate/GameState.h"
@@ -52,6 +54,7 @@ void TextBoxInst::step(GameState* gs) {
 		text_field.clear_keystate();
 	}
 }
+
 const int BLINK_TIME_MS = 600;
 const int BLINK_HELD_MS = 600;
 void TextBoxInst::draw(GameState* gs) {
@@ -62,8 +65,11 @@ void TextBoxInst::draw(GameState* gs) {
 	} else if (hovered(gs, this)) {
 		drawcol = COL_FILLED_OUTLINE;
 	}
-	gl_draw_rectangle(bbox, COL_DARKER_GRAY);
+	ldraw::draw_rectangle(COL_DARKER_GRAY, bbox);
+
 	int text_x = bbox.x1 + 4, text_y = bbox.center_y();
+
+	/* Draw the text differently if the string is valid */
 	Colour textcol = valid_string ? COL_MUTED_GREEN : COL_LIGHT_RED;
 	Dim offset = gl_printf_y_centered(gs->primary_font(), textcol, text_x,
 			text_y, "%s", text_field.text().c_str());
@@ -77,7 +83,7 @@ void TextBoxInst::draw(GameState* gs) {
 	} else if (!selected) {
 		blink_timer.start();
 	}
-	gl_draw_rectangle_outline(bbox, drawcol);
+	ldraw::draw_rectangle_outline(drawcol, bbox);
 }
 
 void TextBoxInst::copy_to(GameInst* inst) const {

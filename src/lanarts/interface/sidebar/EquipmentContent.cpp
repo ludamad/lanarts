@@ -3,6 +3,8 @@
  *  Represents an interactive view of equipped items for the side bar
  */
 
+#include <draw/draw.h>
+
 #include "../../draw/colour_constants.h"
 #include "../../display/display.h"
 
@@ -38,14 +40,14 @@ static void draw_equipment_slot(GameState* gs, Inventory& inventory,
 		}
 		draw_icon_and_name(gs, entry, COL_WHITE, bbox.x1, bbox.y1);
 	} else {
-		gl_draw_rectangle_outline(bbox.x1, bbox.y1, TILE_SIZE, TILE_SIZE,
-				COL_PALE_YELLOW.with_alpha(50));
+		ldraw::draw_rectangle_outline(COL_PALE_YELLOW.with_alpha(50),
+				BBox(bbox.left_top(), Dim(TILE_SIZE, TILE_SIZE)));
 		/* Draw item name */
 		int xoffset = TILE_SIZE * 1.25, yoffset = TILE_SIZE / 2;
 		gl_printf_y_centered(gs->primary_font(), COL_GRAY, bbox.x1 + xoffset,
 				bbox.y1 + yoffset, "%s", noslot);
 	}
-	gl_draw_rectangle_outline(bbox, bbox_col);
+	ldraw::draw_rectangle_outline(bbox_col, bbox);
 }
 
 static void draw_weapon(GameState* gs, EquipmentStats& eqp, const BBox& bbox) {
@@ -58,7 +60,7 @@ static void draw_weapon(GameState* gs, EquipmentStats& eqp, const BBox& bbox) {
 
 	draw_icon_and_name(gs, eqp.weapon().weapon_entry(), COL_WHITE, bbox.x1,
 			bbox.y1);
-	gl_draw_rectangle_outline(bbox, bbox_col);
+	ldraw::draw_rectangle_outline(bbox_col, bbox);
 }
 
 struct SlotAndDefault {
@@ -70,11 +72,14 @@ struct SlotAndDefault {
 	}
 };
 
-const SlotAndDefault slot_data[] = { SlotAndDefault(EquipmentEntry::PROJECTILE,
-		"No Projectile"), SlotAndDefault(EquipmentEntry::BODY_ARMOUR,
-		"No Armour"), SlotAndDefault(EquipmentEntry::BOOTS, "No Boots"),
-		SlotAndDefault(EquipmentEntry::GLOVES, "No Gloves"), SlotAndDefault(
-				EquipmentEntry::HELMET, "No Helmet"), };
+const SlotAndDefault slot_data[] = {
+		SlotAndDefault(EquipmentEntry::PROJECTILE, "No Projectile"),
+		SlotAndDefault(EquipmentEntry::BODY_ARMOUR, "No Armour"),
+		SlotAndDefault(EquipmentEntry::BOOTS, "No Boots"),
+		SlotAndDefault(EquipmentEntry::GLOVES, "No Gloves"),
+		SlotAndDefault(EquipmentEntry::HELMET, "No Helmet"),
+};
+
 const size_t slot_data_n = sizeof(slot_data) / sizeof(SlotAndDefault);
 
 void EquipmentContent::draw(GameState* gs) const {
@@ -83,7 +88,7 @@ void EquipmentContent::draw(GameState* gs) const {
 	EquipmentStats& eqp = p->equipment();
 
 	BBox other_bbox(bbox.x1, bbox.y1, bbox.x2, bbox.y1 + TILE_SIZE);
-	gl_draw_rectangle_outline(bbox, COL_UNFILLED_OUTLINE);
+	ldraw::draw_rectangle_outline(COL_UNFILLED_OUTLINE, bbox);
 	draw_weapon(gs, eqp, other_bbox);
 
 	for (int i = 0; i < slot_data_n; i++) {

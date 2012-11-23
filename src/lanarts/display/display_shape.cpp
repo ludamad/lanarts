@@ -18,6 +18,7 @@
 const float PI = 3.141592f;
 const float DEG2RAD = PI / 180.0f;
 
+
 void gl_draw_circle(float x, float y, float radius, const Colour& clr,
 		bool outline) {
 	if(radius<.5)return;

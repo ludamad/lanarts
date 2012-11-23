@@ -5,6 +5,7 @@
  */
 
 #include <draw/display.h>
+#include <draw/draw.h>
 
 #include "../display/display.h"
 
@@ -76,9 +77,9 @@ bool GameHud::handle_event(GameState* gs, SDL_Event* event) {
 
 void GameHud::draw(GameState* gs) {
 	perf_timer_begin(FUNCNAME);
-	ldraw::display_set_drawing_region(BBoxF(0, 0, sidebar_box.x2, sidebar_box.y2));
-	gl_draw_rectangle(sidebar_box.x1, sidebar_box.y1, width(), height(),
-			bg_colour);
+	ldraw::display_set_drawing_region(
+			BBoxF(0, 0, sidebar_box.x2, sidebar_box.y2));
+	ldraw::draw_rectangle(bg_colour, sidebar_box);
 
 	PlayerInst* player_inst = gs->local_player();
 	if (!player_inst)

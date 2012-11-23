@@ -8,6 +8,8 @@
 
 #include <rvo2/RVO.h>
 
+#include <draw/draw.h>
+
 #include "../../draw/colour_constants.h"
 #include "../../display/tile_data.h"
 #include "../../gamestate/GameState.h"
@@ -15,7 +17,6 @@
 #include "../../gamestate/PlayerData.h"
 
 #include "../../stats/items/WeaponEntry.h"
-
 
 #include "../../lua/lua_gameinst.h"
 #include "../../util/math_util.h"
@@ -125,7 +126,6 @@ void MonsterController::pre_step(GameState* gs) {
 	mids2.reserve(mids.size());
 	mids.swap(mids2);
 
-
 	for (int i = 0; i < mids2.size(); i++) {
 		EnemyInst* e = (EnemyInst*)gs->get_instance(mids2[i]);
 		if (e == NULL)
@@ -217,10 +217,9 @@ void MonsterController::post_draw(GameState* gs) {
 	if (!target) {
 		return;
 	}
-	glLineWidth(2);
-	gl_draw_circle(gs->view(), target->x, target->y, target->target_radius + 5,
-			COL_GREEN.with_alpha(140), true);
-	glLineWidth(1);
+
+	ldraw::draw_circle_outline(COL_GREEN.with_alpha(140),
+			on_screen(gs, target->pos()), target->target_radius + 5, 2);
 }
 
 void MonsterController::clear() {

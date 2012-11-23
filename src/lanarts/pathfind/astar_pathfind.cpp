@@ -4,6 +4,7 @@
  */
 
 #include <algorithm>
+#include <draw/draw.h>
 
 #include "../display/tile_data.h"
 
@@ -71,8 +72,7 @@ static std::vector<AStarNode*>::iterator find_heap_position(
 		if (*it == node) {
 			return it;
 		}
-	}
-	LANARTS_ASSERT(false);
+	}LANARTS_ASSERT(false);
 	return heap.end();
 }
 
@@ -169,8 +169,8 @@ void draw_path(GameState* gs, std::vector<Pos>& path) {
 		int draw_radius = 16;
 		if (view.within_view(path[i].x - draw_radius, path[i].y - draw_radius,
 				draw_radius * 2, draw_radius * 2)) {
-			gl_draw_circle(view, path[i].x, path[i].y, draw_radius,
-					Colour(255, 0, 0));
+			ldraw::draw_circle(Colour(255, 0, 0), on_screen(gs, path[i]),
+					draw_radius);
 		}
 	}
 }

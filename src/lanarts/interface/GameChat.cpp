@@ -22,17 +22,17 @@ static void print_dupe_string(const ChatMessage& cm, const font_data& font,
 				location.y, " x%d", cm.exact_copies);
 }
 
-void ChatMessage::draw(const font_data& font, float alpha, int x, int y) const {
+void ChatMessage::draw(const font_data& font, float alpha, Pos pos) const {
 	Colour sendcol = sender_colour, msgcol = message_colour;
 	sendcol.a *= alpha, msgcol.a *= alpha;
 	Dim offset(0, 0);
 	if (!sender.empty()) {
-		offset = gl_printf(font, sendcol, x, y, "%s: ", sender.c_str());
-		x += offset.w;
+		offset = gl_printf(font, sendcol, pos.x, pos.y, "%s: ", sender.c_str());
+		pos.x += offset.w;
 	}
-	offset = gl_printf(font, msgcol, x, y, message.c_str());
-	x += offset.w;
-	print_dupe_string(*this, font, Pos(x, y), alpha);
+	offset = gl_printf(font, msgcol, pos.x, pos.y, message.c_str());
+	pos.x += offset.w;
+	print_dupe_string(*this, font, pos, alpha);
 }
 
 bool ChatMessage::empty() const {
@@ -92,18 +92,18 @@ void GameChat::draw_player_chat(GameState* gs) const {
 	const int padding = 5;
 	int line_sep = font.h + 2;
 
-	int view_w = gs->view().width, view_h = gs->view().height;
-	int chat_w = view_w, chat_h = 100;
-	int chat_x = 0, chat_y = 0; //h - chat_h - TILE_SIZE;
-	int text_x = chat_x + padding, text_y = chat_y + padding;
+	Dim vsize(gs->view().size());
+	Dim chat_size(vsize.w, 100);
+	Pos chat_pos(0, 0);
+	Pos text_pos(chat_pos.x + padding, chat_pos.y + padding);
 
-	gl_draw_rectangle(chat_x, chat_y, chat_w, chat_h,
-			COL_CONSOLE_BOX.with_alpha(50 * fade_out));
+	ldraw::draw_rectangle(COL_CONSOLE_BOX.with_alpha(50 * fade_out),
+			BBox(chat_pos, chat_size));
 
 	bool draw_typed_message = is_typing || !typing_field.empty();
 
 	int start_msg = 0;
-	int message_space = chat_h - padding * 2
+	int message_space = chat_size.h - padding * 2
 			- (draw_typed_message ? line_sep : 0);
 	int msgs_in_screen = message_space / line_sep;
 	if (messages.size() > msgs_in_screen) {
@@ -111,16 +111,17 @@ void GameChat::draw_player_chat(GameState* gs) const {
 	}
 
 	for (int i = start_msg; i < messages.size(); i++) {
-		messages[i].draw(font, fade_out, text_x, text_y);
-		text_y += line_sep;
+		messages[i].draw(font, fade_out, text_pos);
+		text_pos.y += line_sep;
 	}
 
 	if (draw_typed_message) {
-		int type_y = chat_y + chat_h - padding - line_sep;
+		int type_y = chat_pos.y + chat_size.h - padding - line_sep;
+
 		ldraw::draw_line(Colour(200, 200, 200, fade_out * 180),
-				Posf(chat_x, type_y), Posf(chat_x + chat_w, type_y));
+				Pos(chat_pos.x, type_y), Pos(chat_pos.x + chat_size.w, type_y));
 		ChatMessage typed_message = get_field_as_chat_message(gs, false);
-		typed_message.draw(font, fade_out, text_x, type_y + padding - 1);
+		typed_message.draw(font, fade_out, Pos(text_pos.x, type_y + padding - 1));
 	}
 	perf_timer_end(FUNCNAME);
 }

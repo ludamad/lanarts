@@ -10,6 +10,8 @@ include(FindFreetype)
 set( SRC ../)
 set( LIBS ../../libs)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 #add_definitions(-DNDEBUG)
 
 include_directories(
@@ -47,6 +49,8 @@ set( lanarts_src
 	display/GLImage.cpp
 	display/loaddata/load_sprite_data.cpp
 	display/loaddata/load_sprite_data.cpp
+    
+    draw/draw_statbar.cpp
 	
 	fov/fov.cpp
 	fov/impl/permissive-fov.cc
@@ -177,7 +181,6 @@ set( lanarts_src
 	
 	util/game_replays.cpp
 	util/math_util.cpp
-	util/mtwist.cpp
 	
 	main.cpp
 )
@@ -195,6 +198,9 @@ set( lanarts_include
 	display/GLImage.h
 	display/sprite_data.h
 	display/tile_data.h
+
+	draw/draw_statbar.h
+    draw/colour_constants.h
 
 	fov/fov.h
 	fov/impl/permissive-fov-cpp.h
@@ -313,7 +319,6 @@ set( lanarts_include
 	util/callback_util.h
 	util/game_replays.h
 	util/math_util.h
-	util/mtwist.h
 )
 
 add_executable( lanarts

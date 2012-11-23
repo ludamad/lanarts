@@ -44,7 +44,7 @@
 #ifndef MTWIST_H_
 #define MTWIST_H_
 
-#include "../lanarts_defines.h"
+#include "../Range.h"
 
 class MTwist {
 	enum {
@@ -72,33 +72,46 @@ class MTwist {
 	double genrand_res53(void);
 
 public:
+#ifndef NDEBUG
 	int DEBUG_INFO_amnt_generated;
+#endif
+
 	void init_genrand(unsigned int s);
 	void init_by_array(unsigned int init_key[], int key_length);
 
 	MTwist() :
 			mti(N + 1) {
+#ifndef NDEBUG
 		DEBUG_INFO_amnt_generated = 0;
+#endif
 	}
 	MTwist(unsigned int s) :
 			mti(N + 1) {
+#ifndef NDEBUG
 		DEBUG_INFO_amnt_generated = 0;
+#endif
 		init_genrand(s);
 	}
 	MTwist(unsigned int init_key[], int key_length) :
 			mti(N + 1) {
+#ifndef NDEBUG
 		DEBUG_INFO_amnt_generated = 0;
+#endif
 		init_by_array(init_key, key_length);
 	}
 
 	int rand() {
+#ifndef NDEBUG
 		DEBUG_INFO_amnt_generated++;
+#endif
 		return genrand_int32();
 	}
 	int rand(int max) {
 		if (max == 1)
 			return 0;
+#ifndef NDEBUG
 		DEBUG_INFO_amnt_generated++;
+#endif
 		return genrand_int32() % max;
 	}
 	int rand(int min, int max) {
@@ -107,6 +120,9 @@ public:
 
 	int rand(const Range& r) {
 		return rand(r.min, r.max + 1);
+	}
+	float rand(const RangeF& r) {
+		return (r.max - r.min) * genrand_real1() + r.min;
 	}
 };
 

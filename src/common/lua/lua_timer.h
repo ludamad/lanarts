@@ -11,6 +11,6 @@
 class LuaValue;
 struct lua_State;
 
-void lua_register_timer(lua_State* L, LuaValue& module);
+void lua_register_timer(lua_State* L, const LuaValue& module);
 
 #endif /* LUA_TIMER_H_ */

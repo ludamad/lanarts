@@ -3,10 +3,12 @@
  *  Represents an instance that is affected by combat, ie enemies and players
  */
 
+#include <common/SerializeBuffer.h>
+
+#include "../draw/draw_statbar.h"
+
 #include "../display/sprite_data.h"
 #include "../gamestate/GameState.h"
-
-#include <common/SerializeBuffer.h>
 
 #include "../stats/items/ProjectileEntry.h"
 #include "../stats/items/WeaponEntry.h"
@@ -116,7 +118,7 @@ void CombatGameInst::draw(GameState *gs) {
 	if (ecore.hp < ecore.max_hp) {
 		const BBox statbox(x - 10, y - healthbar_offsety, x + 10,
 				y - healthbar_offsety + 5);
-		gl_draw_statbar(view, statbox, ecore.hp, ecore.max_hp);
+		draw_statbar(on_screen(gs, statbox), float(ecore.hp) / ecore.max_hp);
 	}
 }
 

@@ -14,6 +14,6 @@
 #include "lua_geometry.h"
 
 class LuaValue;
-void lua_register_lcommon(lua_State* L, LuaValue& module);
+void lua_register_lcommon(lua_State* L, const LuaValue& module);
 
 #endif /* LUA_LCOMMON_H_ */

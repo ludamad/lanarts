@@ -3,6 +3,8 @@
  *  Represents an interactive view of the inventory for the side bar
  */
 
+#include <draw/draw.h>
+
 #include "../../draw/colour_constants.h"
 #include "../../display/display.h"
 
@@ -42,15 +44,15 @@ static void draw_player_inventory(GameState* gs, Inventory& inv,
 			ItemSlot& itemslot = inv.get(slot);
 
 			BBox slotbox(x, y, x + TILE_SIZE, y + TILE_SIZE);
-			Colour outline(COL_UNFILLED_OUTLINE);
+			Colour outline_col(COL_UNFILLED_OUTLINE);
 			if (itemslot.amount() > 0 && slot != slot_selected) {
 				if (itemslot.is_equipped()) {
-					gl_draw_rectangle(slotbox, Colour(25, 50, 10));
+					ldraw::draw_rectangle(Colour(25, 50, 10), slotbox);
 				}
-				outline = COL_FILLED_OUTLINE;
+				outline_col = COL_FILLED_OUTLINE;
 
 				if (slotbox.contains(mx, my)) {
-					outline = COL_PALE_YELLOW;
+					outline_col = COL_PALE_YELLOW;
 					draw_console_item_description(gs, itemslot.item,
 							itemslot.item_entry());
 				}
@@ -59,7 +61,7 @@ static void draw_player_inventory(GameState* gs, Inventory& inv,
 			if (slot != slot_selected)
 				draw_player_inventory_slot(gs, itemslot, x, y);
 			//draw rectangle over item edges
-			gl_draw_rectangle_outline(slotbox, outline);
+			ldraw::draw_rectangle_outline(outline_col, slotbox);
 
 			slot++;
 		}

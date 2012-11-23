@@ -1,6 +1,8 @@
 #include <cstring>
 #include <SDL_opengl.h>
 
+#include <draw/draw.h>
+
 #include "../display/display.h"
 
 #include "../display/tile_data.h"
@@ -169,19 +171,17 @@ void GameTiles::post_draw(GameState* gs) {
 
 			//Do not draw black if we have a match, and we see a wall
 			if (!has_match) {
+				BBox tilebox(Pos(x * TILE_SIZE - view.x,
+								y * TILE_SIZE - view.y), Dim(img.width, img.height));
 				if (!is_other_match) {
 					if (!is_seen(x, y)) {
-						gl_draw_rectangle(x * TILE_SIZE - view.x,
-								y * TILE_SIZE - view.y, img.width, img.height);
+						ldraw::draw_rectangle(Colour(0,0,0), tilebox);
 					} else {
-						gl_draw_rectangle(x * TILE_SIZE - view.x,
-								y * TILE_SIZE - view.y, img.width, img.height,
-								Colour(0, 0, 0, 180));
+						// Previously seen
+						ldraw::draw_rectangle(Colour(0,0,0, 180), tilebox);
 					}
 				} else {
-					gl_draw_rectangle(x * TILE_SIZE - view.x,
-							y * TILE_SIZE - view.y, img.width, img.height,
-							Colour(0, 0, 0, 60));
+					ldraw::draw_rectangle(Colour(0,0,0, 60), tilebox);
 				}
 			}
 		}

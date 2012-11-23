@@ -1,16 +1,18 @@
 #ifndef LDRAW_FONT_H_
 #define LDRAW_FONT_H_
 
+#include <string>
 #include <common/smartptr.h>
-#include <common/geometry.h>
 
-#include "Colour.h"
-#include "DrawOptions.h"
+struct Colour;
+struct Posf;
+struct DimF;
 
 namespace ldraw {
 
 //private structure:
 struct font_data;
+struct DrawOptions;
 
 class Font {
 public:
@@ -52,9 +54,7 @@ public:
 
 	// Return the size that would be drawn
 	DimF get_draw_size(const char* str, int maxwidth = -1) const;
-	DimF get_draw_size(const std::string& str, int maxwidth = -1) const {
-		return get_draw_size(str.c_str(), maxwidth);
-	}
+	DimF get_draw_size(const std::string& str, int maxwidth = -1) const;
 private:
 	mutable std::string _print_buffer;
 	smartptr<font_data> _font;

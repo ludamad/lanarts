@@ -44,7 +44,7 @@ struct ChatMessage {
 				&& sender_colour == cm.sender_colour
 				&& message_colour == cm.message_colour;
 	}
-	void draw(const font_data& font, float alpha, int x, int y) const;
+	void draw(const font_data& font, float alpha, Pos pos) const;
 	bool empty() const;
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);

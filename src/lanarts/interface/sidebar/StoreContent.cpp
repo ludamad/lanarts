@@ -3,6 +3,8 @@
  *  Represents an interactive view of a store for the side bar
  */
 
+#include <draw/draw.h>
+
 #include "../../draw/colour_constants.h"
 #include "../../display/display.h"
 
@@ -67,11 +69,11 @@ static void draw_store_inventory(GameState* gs, StoreInventory& inv,
 			if (slot != slot_selected)
 				draw_store_inventory_slot(gs, itemslot, x, y);
 			BBox slotbox(x, y, x + TILE_SIZE, y + STORE_SLOT_H);
-			Colour outline(COL_UNFILLED_OUTLINE);
+			Colour outline_col(COL_UNFILLED_OUTLINE);
 			if (!itemslot.empty() && slot != slot_selected) {
-				outline = COL_FILLED_OUTLINE;
+				outline_col = COL_FILLED_OUTLINE;
 				if (slotbox.contains(mx, my)) {
-					outline = COL_PALE_YELLOW;
+					outline_col = COL_PALE_YELLOW;
 					draw_console_item_description(gs, itemslot.item,
 							itemslot.item_entry());
 					draw_item_cost(gs, bbox, itemslot.cost);
@@ -79,7 +81,7 @@ static void draw_store_inventory(GameState* gs, StoreInventory& inv,
 			}
 
 			//draw rectangle over item edges
-			gl_draw_rectangle_outline(slotbox, outline);
+			ldraw::draw_rectangle_outline(outline_col, slotbox);
 
 			slot++;
 		}

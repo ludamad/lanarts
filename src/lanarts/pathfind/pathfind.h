@@ -8,8 +8,7 @@
 
 #include <vector>
 
-#include "../util/mtwist.h"
-#include "../lanarts_defines.h"
+#include <common/random/mtwist.h>
 
 class GameState;
 

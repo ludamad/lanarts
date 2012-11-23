@@ -3,7 +3,10 @@
  *  Handles drawing & state of side bar
  */
 
+#include <draw/draw.h>
+
 #include "../../draw/colour_constants.h"
+#include "../../draw/draw_statbar.h"
 
 #include "../../display/display.h"
 
@@ -16,10 +19,9 @@
 static void draw_statbar_with_text(GameState* gs, const BBox& bbox, int statmin,
 		int statmax, Colour statcol, Colour backcol,
 		Colour textcol = Colour(0, 0, 0)) {
-	gl_draw_statbar(bbox, statmin, statmax, statcol, backcol);
+	draw_statbar(bbox, float(statmin)	 / statmax, statcol, backcol);
 	gl_printf_centered(gs->primary_font(), textcol, bbox.center_x(),
 			bbox.center_y(), "%d/%d", statmin, statmax);
-
 }
 
 /* Helper method for drawing stat bars */
@@ -41,7 +43,7 @@ static void draw_player_statbars(GameState* gs, PlayerInst* player, int x,
 
 	float ratio = player->rest_cooldown() / float(REST_COOLDOWN);
 	Colour col(200 * ratio, 200 * (1.0f - ratio), 0);
-	gl_draw_rectangle(x, y + 45, 100, 10, col);
+	ldraw::draw_rectangle(col, BBox(x, y + 45, x + 100, y + 55));
 
 	if (player->rest_cooldown() == 0)
 		gl_printf(gs->primary_font(), Colour(0, 0, 0), x + 25, y + 44,

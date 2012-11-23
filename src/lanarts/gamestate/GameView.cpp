@@ -56,3 +56,26 @@ void GameView::sharp_center_on(int px, int py) {
 	x = px - width / 2;
 	y = py - height / 2;
 }
+
+// Helper functions
+
+#include "GameState.h"
+
+Pos on_screen(GameState* gs, const Pos& p) {
+	GameView& view = gs->view();
+	return Pos(p.x - view.x, p.y - view.y);
+}
+BBox on_screen(GameState* gs, const BBox& b) {
+	GameView& view = gs->view();
+	return b.translated(-view.x, -view.y);
+
+}
+Posf on_screen(GameState* gs, const Posf& p) {
+	GameView& view = gs->view();
+	return Posf(p.x - view.x, p.y - view.y);
+
+}
+BBoxF on_screen(GameState* gs, const BBoxF& b) {
+	GameView& view = gs->view();
+	return b.translated(-view.x, -view.y);
+}

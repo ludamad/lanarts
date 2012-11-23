@@ -6,7 +6,7 @@
 #ifndef LUA_RANGE_H_
 #define LUA_RANGE_H_
 
-#include "../range.h"
+#include "../Range.h"
 
 #include "luacpp_wrap_numeric.h"
 

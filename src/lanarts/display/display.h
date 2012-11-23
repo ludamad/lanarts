@@ -45,32 +45,8 @@ void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 
 void gl_draw_circle(float x, float y, float radius, const Colour& colour =
 		Colour(0, 0, 0), bool outline = false);
-void gl_draw_rectangle(int x, int y, int w, int h, const Colour& colour =
-		Colour(0, 0, 0));
-
-inline void gl_draw_rectangle(const BBox& bbox,
-		const Colour& clr = Colour(255, 255, 255)) {
-	gl_draw_rectangle(bbox.x1, bbox.y1, bbox.width(), bbox.height(), clr);
-}
 void gl_draw_circle(const GameView& view, float x, float y, float radius,
 		const Colour& colour = Colour(0, 0, 0), bool outline = false);
-void gl_draw_rectangle(const GameView& view, int x, int y, int w, int h,
-		const Colour& colour = Colour(0, 0, 0));
-
-void gl_draw_rectangle_outline(int x, int y, int w, int h, const Colour& clr =
-		Colour(255, 255, 255), int linewidth = 1);
-
-inline void gl_draw_rectangle_outline(const BBox& bbox, const Colour& clr =
-		Colour(255, 255, 255), int linewidth = 1) {
-	gl_draw_rectangle_outline(bbox.x1, bbox.y1, bbox.width(), bbox.height(),
-			clr, linewidth);
-}
-void gl_draw_statbar(const BBox& bbox, int min_stat, int max_stat,
-		const Colour& front = Colour(0, 255, 0),
-		const Colour& back = Colour(255, 0, 0));
-void gl_draw_statbar(const GameView& view, const BBox& bbox, int min_stat,
-		int max_stat, const Colour& front = Colour(0, 255, 0),
-		const Colour& back = Colour(255, 0, 0));
 
 Dim gl_text_dimensions(const font_data& font, const char *fmt, ...);
 //Will print out text at window coordinates x,y, using the font ft_font.

@@ -51,10 +51,13 @@ static void gl_draw_circle(const Colour& clr, const Posf& pos, float radius,
 	else
 		glBegin(GL_POLYGON);
 	glColor4ub(clr.r, clr.g, clr.b, clr.a);
+
 	float circum = radius * PI;
-	for (float a = 0; a < PI * 2; a += PI * 2 / circum) {
+	float iter = PI * 2 / circum;
+	for (float a = 0; a < PI * 2 + iter; a += iter) {
 		glVertex2f(pos.x + cos(a) * radius, pos.y + sin(a) * radius);
 	}
+
 	glEnd();
 }
 

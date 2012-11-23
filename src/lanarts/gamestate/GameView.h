@@ -42,9 +42,7 @@ struct GameView {
 	void move_delta(int dx, int dy) {
 		move_towards(x + dx, y + dy);
 	}
-	Pos on_screen(const Pos& p) {
-		return Pos(p.x - x, p.y - y);
-	}
+
 	void min_tile_within(int& px, int& py) const;
 	void max_tile_within(int& px, int& py) const;
 
@@ -57,6 +55,19 @@ struct GameView {
 		max_tile_within(ret.x2, ret.y2);
 		return ret;
 	}
+
+	Dim size() {
+		return Dim(width, height);
+	}
 };
+
+class GameState;
+
+// Helper functions
+
+Pos on_screen(GameState* gs, const Pos& p);
+BBox on_screen(GameState* gs, const BBox& p);
+Posf on_screen(GameState* gs, const Posf& p);
+BBoxF on_screen(GameState* gs, const BBoxF& p);
 
 #endif /* GAMEVIEW_H_ */

@@ -8,7 +8,7 @@
 
 #include <vector>
 
-#include "../util/mtwist.h"
+#include <common/random/mtwist.h>
 #include "GeneratedLevel.h"
 #include "dungeon_data.h"
 

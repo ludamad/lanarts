@@ -11,9 +11,12 @@
 #include <freetype/fttrigon.h>
 
 #include <common/math.h>
+#include <common/geometry.h>
 
-#include <common/func_timer.h>
+#include <common/perf_timer.h>
 #include <common/strformat.h>
+
+#include <draw/DrawOptions.h>
 
 #include "Font.h"
 #include "ldraw_assert.h"
@@ -205,10 +208,6 @@ static int process_string(const font_data& font, const char* text,
 	return largest_width;
 }
 
-#ifndef __GNUC__
-#define vsnprintf(text, len, fmt, ap) vsprintf(text, fmt, ap)
-#endif
-
 //
 /* General gl_print function for others to delegate to */
 static DimF gl_print_impl(const DrawOptions& options, const font_data& font,
@@ -218,6 +217,7 @@ static DimF gl_print_impl(const DrawOptions& options, const font_data& font,
 	LDRAW_ASSERT(options.draw_region == BBoxF());
 	LDRAW_ASSERT(options.draw_angle == 0.0f);
 	LDRAW_ASSERT(options.draw_frame == 0.0f);
+	LDRAW_ASSERT(options.draw_scale == DimF());
 
 	std::vector<int> line_splits;
 	int measured_width = process_string(font, text, maxwidth, line_splits);
@@ -295,6 +295,10 @@ void Font::drawf(const DrawOptions& options, const Posf& position,
 
 DimF Font::get_draw_size(const char* str, int maxwidth) const {
 	return gl_print_impl(DrawOptions(), *_font, Posf(), maxwidth, false, str);
+}
+
+DimF Font::get_draw_size(const std::string& str, int maxwidth) const {
+	return get_draw_size(str.c_str(), maxwidth);
 }
 
 }

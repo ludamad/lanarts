@@ -1,5 +1,5 @@
 /*
- * range.h:
+ * Range.h:
  *  Represents a range
  */
 

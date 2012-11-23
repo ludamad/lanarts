@@ -10,7 +10,7 @@
 #include "lua_timer.h"
 #include "luacpp.h"
 
-void lua_register_timer(lua_State *L, LuaValue& module) {
+void lua_register_timer(lua_State *L, const LuaValue& module) {
 	const char CLASSNAME[] = "Timer";
 	using namespace SLB;
 

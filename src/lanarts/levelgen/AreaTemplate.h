@@ -12,9 +12,9 @@
 #include <string>
 #include <vector>
 
+#include <common/random/mtwist.h>
 #include <common/geometry.h>
 
-#include "../util/mtwist.h"
 #include "../lanarts_defines.h"
 #include "../stats/items/items.h"
 

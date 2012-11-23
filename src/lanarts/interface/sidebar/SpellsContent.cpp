@@ -3,6 +3,8 @@
  *  Draws known spells in a grid, for the side bar
  */
 
+#include <draw/draw.h>
+
 #include "../../draw/colour_constants.h"
 
 #include "../../display/display.h"
@@ -26,7 +28,7 @@ static void draw_spells_known(GameState* gs, const BBox& bbox,
 	int spellidx = ind_low;
 	int selected_spell = gs->local_player()->spell_selected();
 
-	gl_draw_rectangle_outline(bbox, COL_UNFILLED_OUTLINE);
+	ldraw::draw_rectangle_outline(COL_UNFILLED_OUTLINE, bbox);
 
 	int x = bbox.x1, ex = bbox.x2;
 	for (int y = bbox.y1; y < bbox.y2; y += TILE_SIZE) {
@@ -46,7 +48,7 @@ static void draw_spells_known(GameState* gs, const BBox& bbox,
 			bbox_col = COL_GOLD;
 			draw_console_spell_description(gs, spl_entry);
 		}
-		gl_draw_rectangle_outline(entry_box, bbox_col);
+		ldraw::draw_rectangle_outline(bbox_col, entry_box);
 		spellidx++;
 	}
 }

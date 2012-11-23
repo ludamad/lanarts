@@ -6,8 +6,8 @@
 #define LANARTS_DEFINES_H_
 
 #include <common/lcommon_defines.h>
-#include <common/func_timer.h>
-#include <common/range.h>
+#include <common/perf_timer.h>
+#include <common/Range.h>
 
 #include <cassert>
 #include <cstdlib>

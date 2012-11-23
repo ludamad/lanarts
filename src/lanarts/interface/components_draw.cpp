@@ -2,6 +2,7 @@
  * components_draw.cpp:
  *  Helper methods for common interface components
  */
+#include <draw/draw.h>
 
 #include "../display/display.h"
 #include "../draw/colour_constants.h"
@@ -20,7 +21,7 @@ void draw_setting_box(GameState* gs, const BBox& bbox, const Colour& bbox_col,
 	gl_printf_bounded(gs->primary_font(), text_col, bbox.x1 + TILE_SIZE * 1.25,
 			bbox.y1 + y_offset + TILE_SIZE / 2, bbox.width() - TILE_SIZE, true,
 			"%s", text);
-	gl_draw_rectangle_outline(bbox, bbox_col);
+	ldraw::draw_rectangle_outline(bbox_col, bbox);
 }
 void draw_option_box(GameState* gs, const BBox& bbox, bool option_set,
 		sprite_id sprite, const char* text) {

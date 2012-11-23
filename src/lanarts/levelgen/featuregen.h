@@ -7,7 +7,7 @@
 #ifndef FEATUREGEN_H_
 #define FEATUREGEN_H_
 
-#include "../util/mtwist.h"
+#include <common/random/mtwist.h>
 
 #include "../lanarts_defines.h"
 #include "GeneratedLevel.h"

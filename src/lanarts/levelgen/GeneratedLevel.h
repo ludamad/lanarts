@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "../objects/GameInstRef.h"
-#include "../util/mtwist.h"
+#include <common/random/mtwist.h>
 #include "../lanarts_defines.h"
 
 #include "../region.h"

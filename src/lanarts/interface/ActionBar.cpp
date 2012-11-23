@@ -3,6 +3,8 @@
  *  Handles drawing and state of the action bar.
  */
 
+#include <draw/draw.h>
+
 #include "../draw/colour_constants.h"
 #include "../gamestate/GameState.h"
 #include "../objects/player/PlayerInst.h"
@@ -140,7 +142,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 	int mx = gs->mouse_x(), my = gs->mouse_y();
 	Weapon weapon = player->weapon();
 	bool weapon_selected = player->spell_selected() == -1;
-	Colour outline =
+	Colour outline_col =
 			weapon_selected ? COL_SELECTED_OUTLINE : COL_FILLED_OUTLINE;
 
 	/* Draw only enough space for weapon if no projectile used */
@@ -153,7 +155,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 	}
 
 	if (equipbox.contains(mx, my) && !weapon_selected) {
-		outline = COL_PALE_YELLOW;
+		outline_col = COL_PALE_YELLOW;
 	}
 
 	if (weaponbox.contains(mx, my)) {
@@ -182,7 +184,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 				y + 1, "%d", player->projectile().amount);
 	}
 
-	gl_draw_rectangle_outline(equipbox, outline);
+	ldraw::draw_rectangle_outline(outline_col, equipbox);
 }
 
 static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
@@ -204,23 +206,23 @@ static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 	for (int x = sx, spellidx = 0; x < bounds.x2; x += TILE_SIZE, spellidx++) {
 		BBox spellbox(x, sy, x + TILE_SIZE, sy + TILE_SIZE);
 		bool is_selected = spellidx == player->spell_selected();
-		Colour outline = COL_UNFILLED_OUTLINE;
+		Colour outline_col = COL_UNFILLED_OUTLINE;
 
 		if (spellidx < spell_n) {
 			spell_id spell = spells.get(spellidx);
 			SpellEntry& spl_entry = game_spell_data.at(spell);
 
-			outline = is_selected ? COL_SELECTED_OUTLINE : COL_FILLED_OUTLINE;
+			outline_col = is_selected ? COL_SELECTED_OUTLINE : COL_FILLED_OUTLINE;
 
 			if (spellbox.contains(mx, my)) {
 				draw_console_spell_description(gs, spl_entry);
 				if (!is_selected) {
-					outline = COL_PALE_YELLOW;
+					outline_col = COL_PALE_YELLOW;
 				}
 			}
 		}
 
-		gl_draw_rectangle_outline(spellbox, outline);
+		ldraw::draw_rectangle_outline(outline_col, spellbox);
 
 //		if (spellidx <= 9) {
 //			gl_printf(gs->primary_font(), Colour(100, 255, 255),

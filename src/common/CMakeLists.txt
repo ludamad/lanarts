@@ -2,6 +2,7 @@ cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lcommon)
 
 set(CMAKE_BUILD_TYPE Debug)
+#add_definitions(-DNDEBUG)
 
 FIND_PACKAGE(SDL REQUIRED)
 
@@ -14,7 +15,7 @@ include_directories(${SDL_INCLUDE_DIR}
 
 
 set( lcommon_src
-    func_timer.h
+    perf_timer.h
 	geometry.cpp
 	geometry.h
 	lcommon_defines.h
@@ -24,7 +25,7 @@ set( lcommon_src
 	PerfTimer.h
 	SerializeBuffer.cpp
 	SerializeBuffer.h
-	range.h
+	Range.h
 	smartptr.h
 	Timer.cpp
 	Timer.h
@@ -53,6 +54,8 @@ set( lcommon_src
     lua/luacpp_wrap_numeric.h
     lua/luacpp_wrap.h
 	
+	random/mtwist.cpp
+	random/mtwist.h
 )
 
 add_library( lcommon

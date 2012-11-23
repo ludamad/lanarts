@@ -1,0 +1,5 @@
+whereitwas=$(pwd)
+mkdir -p ~/eclipselanarts
+cd ~/eclipselanarts
+
+CC=/usr/bin/gcc CXX=/usr/bin/g++ MAKEFLAGS='-j5' cmake -G"Eclipse CDT4 - Unix Makefiles" $whereitwas
