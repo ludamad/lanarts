@@ -2,7 +2,7 @@ cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lcommon)
 
 #set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Debug)
 #add_definitions(-DNDEBUG)
 
 FIND_PACKAGE(SDL REQUIRED)

@@ -86,7 +86,7 @@ static std::string format_expression_string(const char* str) {
 
 static LuaValue parse_luacode(lua_State* L, const char* code) {
 	perf_timer_begin(FUNCNAME);
-	printf("Parsing '%s':\n", code);
+
 	std::string retcode = format_expression_string(code);
 
 	LuaValue ret;

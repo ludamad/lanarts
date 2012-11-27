@@ -105,6 +105,6 @@ private:
 	LCommonPrivate::_LuaValueImpl* impl;
 };
 
-//LuaValue luavalue_eval(lua_State* L, const std::string& code);
+LuaValue luavalue_eval(lua_State* L, const std::string& code);
 
 #endif /* LCOMMON_LUAVALUE_H_ */

@@ -5,7 +5,7 @@ include_directories( ../ "include/" )
 
 add_definitions(-DSLB_USE_EXCEPTIONS=1)
 
-set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Debug)
 
 set( slb_src
 	src/Debug.cpp

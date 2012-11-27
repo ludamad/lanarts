@@ -99,14 +99,13 @@ static void lua_perf_test() {
 
 	perf_timer_begin("lua_dostring_with_luavalue");
 	for (int i = 0; i < 10000; i++) {
-		//TODO: Readd
-//		LuaValue val = luavalue_eval(L, "function(a) return {} end");
+		LuaValue val = luavalue_eval(L, "function(a) return {} end");
 	}
 	perf_timer_end("lua_dostring_with_luavalue");
 
 	perf_timer_begin("lua_store_string_with_luavalue");
 	for (int i = 0; i < 10000; i++) {
-//		LuaValue val = luavalue_eval(L, "function(a) return {} end");
+		LuaValue val = luavalue_eval(L, "function(a) return {} end");
 	}
 	perf_timer_end("lua_store_string_with_luavalue");
 
