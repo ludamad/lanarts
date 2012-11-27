@@ -68,7 +68,7 @@ private:
 
 class LuaValue {
 public:
-	LuaValue(const std::string& expr);
+	LuaValue(lua_State* L, const char* global);
 	LuaValue(const LuaValue& value);
 	LuaValue(lua_State* L, int pos);
 	LuaValue(const LCommonPrivate::_LuaFieldValue& cstrfield);
@@ -77,7 +77,6 @@ public:
 
 	void operator=(const LuaValue& value);
 
-	void initialize(lua_State* L);
 	void deinitialize(lua_State* L);
 	void push(lua_State* L) const;
 	void pop(lua_State* L);
@@ -106,5 +105,6 @@ private:
 	LCommonPrivate::_LuaValueImpl* impl;
 };
 
+//LuaValue luavalue_eval(lua_State* L, const std::string& code);
 
 #endif /* LCOMMON_LUAVALUE_H_ */

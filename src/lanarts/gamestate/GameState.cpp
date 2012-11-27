@@ -63,17 +63,13 @@ GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 
 	dragging_view = false;
 
-	init_font(&small_font, settings.font.c_str(), 10);
-	init_font(&large_font, settings.menu_font.c_str(), 20);
+	normal_font.initialize(settings.font, 10);
+	_large_font.initialize(settings.menu_font, 20);
 
 	init_data.seed = generate_seed();
 }
 
 GameState::~GameState() {
-	release_font(&small_font);
-	release_font(&large_font);
-
-	lua_gc(L, LUA_GCCOLLECT, 0);
 	lua_close(L);
 }
 
@@ -240,7 +236,8 @@ void GameState::step() {
 	connection.poll_messages();
 	hud.step(this);
 	world.step(); //Has pointer to this (GameState) object
-	lua_gc(L, LUA_GCSTEP, 0); // collect garbage incrementally
+//TODO: Spend remaining time collecting garbage instead of doing SDL_Delay
+//	lua_gc(L, LUA_GCSTEP, 0); // this was used here mistakenly, Lua GC is already incremental
 	frame_n++;
 }
 

@@ -4,6 +4,8 @@
  */
 
 #include <draw/draw.h>
+#include <draw/Font.h>
+#include <draw/DrawOptions.h>
 
 #include "../draw/colour_constants.h"
 
@@ -57,7 +59,10 @@ void TextBoxInst::step(GameState* gs) {
 
 const int BLINK_TIME_MS = 600;
 const int BLINK_HELD_MS = 600;
+
 void TextBoxInst::draw(GameState* gs) {
+	using namespace ldraw;
+
 	Colour drawcol = COL_UNFILLED_OUTLINE;
 
 	if (selected) {
@@ -65,25 +70,31 @@ void TextBoxInst::draw(GameState* gs) {
 	} else if (hovered(gs, this)) {
 		drawcol = COL_FILLED_OUTLINE;
 	}
-	ldraw::draw_rectangle(COL_DARKER_GRAY, bbox);
+	draw_rectangle(COL_DARKER_GRAY, bbox);
 
-	int text_x = bbox.x1 + 4, text_y = bbox.center_y();
+	Pos textpos(bbox.x1 + 4, bbox.center_y());
 
 	/* Draw the text differently if the string is valid */
 	Colour textcol = valid_string ? COL_MUTED_GREEN : COL_LIGHT_RED;
-	Dim offset = gl_printf_y_centered(gs->primary_font(), textcol, text_x,
-			text_y, "%s", text_field.text().c_str());
+	DrawOptions opt(LEFT_CENTER, textcol);
+	const Font& font = gs->font();
+
+	int offset = font.draw(opt, textpos, text_field.text());
+
 	if (selected && blink_timer.get_microseconds() / 1000 > BLINK_TIME_MS) {
-		gl_printf_y_centered(gs->primary_font(), textcol, text_x + offset.w,
-				text_y, "|");
+		textpos.x += offset;
+		font.draw(opt, textpos, "|");
+
 		if (blink_timer.get_microseconds() / 1000
 				> BLINK_TIME_MS + BLINK_HELD_MS) {
 			blink_timer.start();
 		}
+
 	} else if (!selected) {
 		blink_timer.start();
 	}
-	ldraw::draw_rectangle_outline(drawcol, bbox);
+
+	draw_rectangle_outline(drawcol, bbox);
 }
 
 void TextBoxInst::copy_to(GameInst* inst) const {

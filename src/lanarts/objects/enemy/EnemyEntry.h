@@ -11,10 +11,13 @@
 #include <string>
 #include <cstdio>
 
+#include <common/lua/LuaValue.h>
+
 #include "../../data/BaseDataEntry.h"
 
-#include <common/lua/LuaValue.h>
 #include "../../stats/combat_stats.h"
+
+#include "../../lua/luaexpr.h"
 
 #include "../../lanarts_defines.h"
 
@@ -39,8 +42,8 @@ struct EnemyEntry: public BaseDataEntry {
 	}
 
 	void init(lua_State* L) {
-		init_event.initialize(L);
-		step_event.initialize(L);
+		luavalue_call_and_store(L, init_event);
+		luavalue_call_and_store(L, step_event);
 	}
 };
 

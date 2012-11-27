@@ -180,8 +180,8 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 		gl_draw_image(game_sprite_data[ptype.item_sprite].img(), x + TILE_SIZE,
 				y);
 		/* Draw projectile amount */
-		gl_printf(gs->primary_font(), Colour(255, 255, 255), x + TILE_SIZE + 1,
-				y + 1, "%d", player->projectile().amount);
+		gs->font().drawf(Colour(255, 255, 255), Pos(x + TILE_SIZE + 1, y + 1),
+				"%d", player->projectile().amount);
 	}
 
 	ldraw::draw_rectangle_outline(outline_col, equipbox);
@@ -212,7 +212,8 @@ static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 			spell_id spell = spells.get(spellidx);
 			SpellEntry& spl_entry = game_spell_data.at(spell);
 
-			outline_col = is_selected ? COL_SELECTED_OUTLINE : COL_FILLED_OUTLINE;
+			outline_col =
+					is_selected ? COL_SELECTED_OUTLINE : COL_FILLED_OUTLINE;
 
 			if (spellbox.contains(mx, my)) {
 				draw_console_spell_description(gs, spl_entry);
@@ -225,7 +226,7 @@ static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 		ldraw::draw_rectangle_outline(outline_col, spellbox);
 
 //		if (spellidx <= 9) {
-//			gl_printf(gs->primary_font(), Colour(100, 255, 255),
+//			gs->font().drawf(, Colour(100, 255, 255),
 //					x + TILE_SIZE - 12, sy + TILE_SIZE - 12, "%d", spellidx);
 //		}
 	}

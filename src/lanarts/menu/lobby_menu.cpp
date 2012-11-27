@@ -16,6 +16,8 @@ extern "C" {
 }
 
 #include <common/Timer.h>
+#include <draw/Font.h>
+#include <draw/DrawOptions.h>
 
 #include "../data/game_data.h"
 
@@ -50,7 +52,7 @@ static void draw_connectors(GameState* gs, GameInst* inst, void* flag) {
 	PlayerData& pd = gs->player_data();
 	std::vector<PlayerDataEntry>& pdes = pd.all_players();
 
-	gl_printf_x_centered(gs->menu_font(), COL_WHITE, inst->x, inst->y,
+	gs->menu_font().draw(ldraw::DrawOptions(ldraw::CENTER_TOP), inst->pos(),
 			"Players in Game:");
 
 	for (int i = 0; i < pdes.size(); i++) {
@@ -59,9 +61,12 @@ static void draw_connectors(GameState* gs, GameInst* inst, void* flag) {
 		const char* name = pdes[i].player_name.c_str();
 		const std::string& classname =
 				game_class_data.at(pdes[i].classtype).name;
-		gl_printf_x_centered(gs->primary_font(), colour, inst->x,
-				inst->y + 20 * i + 30, "Player %d: %s%s the %s", (i + 1),
-				prefix, name, classname.c_str());
+
+		using namespace ldraw;
+		const Font& font = gs->font();
+		font.drawf(DrawOptions(CENTER_TOP, COL_FILLED_OUTLINE),
+				Pos(inst->x, inst->y + 20 * i + 30), "Player %d: %s%s the %s",
+				(i + 1), prefix, name, classname.c_str());
 	}
 }
 static void setup_connectionmenu_buttons(GameState* gs, bool* exit, int x,

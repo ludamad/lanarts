@@ -13,6 +13,7 @@ extern "C" {
 #include <lua/lua.h>
 }
 
+#include "../lanarts_defines.h"
 #include "lua_yaml.h"
 
 //YAML related helper functions
@@ -74,5 +75,56 @@ LuaValue lua_yaml(lua_State *L, const YAML::Node & node) {
 	lua_pushyaml(L, node);
 	ret.pop(L);
 	return ret;
+}
+
+static std::string format_expression_string(const char* str) {
+	const char prefix[] = "return ";
+	if (strncmp(str, prefix, sizeof(prefix)) == 0)
+		return str;
+	return std::string("return ") + str;
+}
+
+static LuaValue parse_luacode(lua_State* L, const char* code) {
+	perf_timer_begin(FUNCNAME);
+	printf("Parsing '%s':\n", code);
+	std::string retcode = format_expression_string(code);
+
+	LuaValue ret;
+
+	int ntop = lua_gettop(L);
+	if (luaL_loadstring(L, retcode.c_str())) {
+		printf("Error while parsing lua expression:\n%s\nFor expression:\n%s",
+				lua_tostring(L, -1), retcode.c_str());
+		exit(0);
+	}
+	LANARTS_ASSERT(lua_gettop(L) - ntop == 1);
+
+	ret.pop(L);
+
+	perf_timer_end(FUNCNAME);
+	return ret;
+}
+
+LuaValue parse_luacode(lua_State* L, const YAML::Node& node) {
+	std::string code;
+	node.GetScalar(code);
+	return parse_luacode(L, code.c_str());
+}
+
+LuaValue parse_luacode(lua_State *L, const YAML::Node& node, const char* key) {
+	const YAML::Node* child = node.FindValue(key);
+	if (child) {
+		return parse_luacode(L, *child);
+	}
+	return LuaValue();
+}
+
+LuaValue parse_luacode(lua_State *L, const YAML::Node& node, const char* key,
+		const char* default_code) {
+	LuaValue value = parse_luacode(L, node, key);
+	if (value.empty()) {
+		return parse_luacode(L, default_code);
+	}
+	return value;
 }
 

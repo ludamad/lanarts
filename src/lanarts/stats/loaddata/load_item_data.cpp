@@ -19,7 +19,7 @@ extern "C" {
 #include "../items/ItemEntry.h"
 
 using namespace std;
-void parse_item_entry(const YAML::Node& n, ItemEntry& entry) {
+void parse_item_entry(lua_State* L, const YAML::Node& n, ItemEntry& entry) {
 	entry.name = parse_str(n["name"]);
 	entry.description = parse_defaulted(n, "description", std::string());
 	entry.shop_cost = parse_defaulted(n, "shop_cost", Range());
@@ -28,10 +28,9 @@ void parse_item_entry(const YAML::Node& n, ItemEntry& entry) {
 			std::string());
 	entry.use_action.failure_message = parse_defaulted(n, "cant_use_message",
 			std::string());
-	entry.use_action.action_func = parse_defaulted(n, "action_func",
-			std::string());
-	entry.use_action.prereq_func = parse_defaulted(n, "prereq_func",
-			std::string());
+
+	entry.use_action.action_func = parse_luacode(L, n, "action_func");
+	entry.use_action.prereq_func =  parse_luacode(L, n, "prereq_func");
 	entry.item_sprite = parse_sprite_number(n, "spr_item");
 
 	entry.stackable = parse_defaulted(n, "stackable", true);
@@ -41,7 +40,7 @@ void parse_item_entry(const YAML::Node& n, ItemEntry& entry) {
 static void load_item_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	ItemEntry* entry = new ItemEntry;
-	parse_item_entry(node, *entry);
+	parse_item_entry(L, node, *entry);
 	game_item_data.push_back(entry);
 
 	value->get(L, entry->name) = node;

@@ -14,6 +14,7 @@ extern "C" {
 #include <common/lua/luacpp.h>
 #include <common/lua/lua_geometry.h>
 #include <common/lua/lua_vector.h>
+#include <common/lua/slb.h>
 #include <common/lua/LuaValue.h>
 
 #include "../Animation.h"
@@ -189,7 +190,7 @@ static int drawable_create(lua_State* L) {
 }
 
 void lua_register_drawables(lua_State *L, const LuaValue & module) {
-	SLB::Manager* m = SLB::Manager::getInstance(L);
+	SLB::Manager* m = SLB::getOrCreateManager(L);
 #define BIND_FUNC(f)\
 	SLB::FuncCall::create(f)->push(L); \
 	module.get(L, #f).pop()

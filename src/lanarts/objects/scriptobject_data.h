@@ -10,6 +10,7 @@
 #include <string>
 
 #include <common/lua/LuaValue.h>
+#include "../lua/luaexpr.h"
 #include "../lanarts_defines.h"
 
 #include "GameInst.h"
@@ -23,8 +24,8 @@ struct ScriptObjectEntry {
 	LuaValue init_event, step_event;
 
 	void init(lua_State* L) {
-		init_event.initialize(L);
-		step_event.initialize(L);
+		luavalue_call_and_store(L, init_event);
+		luavalue_call_and_store(L, step_event);
 	}
 };
 

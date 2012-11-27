@@ -5,6 +5,8 @@
 
 #include <fstream>
 
+#include <common/perf_timer.h>
+
 #include "../stats/stat_formulas.h"
 
 #include "yaml_util.h"
@@ -137,6 +139,10 @@ void load_data_impl_template(const FilenameList& filenames,
 		lua_State* L, LuaValue* value) {
 	using namespace std;
 
+//	std::string perfname = std::string("LOADING ") + resource;
+
+	perf_timer_begin(FUNCNAME);
+
 	FilenameList::const_iterator it = filenames.begin();
 	for (; it != filenames.end(); ++it) {
 		std::string fname = "res/" + *it;
@@ -172,5 +178,7 @@ void load_data_impl_template(const FilenameList& filenames,
 			fflush(stdout);
 		}
 	}
+
+	perf_timer_end(FUNCNAME);
 }
 

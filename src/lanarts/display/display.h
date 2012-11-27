@@ -43,35 +43,4 @@ void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 		float dx, float dy, int steps, const Colour& c = Colour(255, 255, 255));
 
-void gl_draw_circle(float x, float y, float radius, const Colour& colour =
-		Colour(0, 0, 0), bool outline = false);
-void gl_draw_circle(const GameView& view, float x, float y, float radius,
-		const Colour& colour = Colour(0, 0, 0), bool outline = false);
-
-Dim gl_text_dimensions(const font_data& font, const char *fmt, ...);
-//Will print out text at window coordinates x,y, using the font ft_font.
-//The current modelview matrix will also be applied to the text.
-Dim gl_printf(const font_data &ft_font, const Colour& colour, float x, float y,
-		const char *fmt, ...);
-/* printf-like function that draws to the screen, returns width of formatted string
- * bounded within 'max_width' */
-Dim gl_printf_bounded(const font_data& font, const Colour& colour, float x,
-		float y, int max_width, bool center_y, const char *fmt, ...);
-/* printf-like function that draws to the screen, returns width of formatted string
- * bounded within 'max_width' & centered on y */
-Dim gl_printf_y_centered_bounded(const font_data& font, const Colour& colour,
-		float x, float y, int max_width, bool center_y, const char *fmt, ...);
-/* printf-like function that draws to the screen, returns width of formatted string
- * centered on x and y */
-Dim gl_printf_centered(const font_data& font, const Colour& colour, float x,
-		float y, const char *fmt, ...);
-/* printf-like function that draws to the screen, returns width of formatted string
- * dentered on x */
-Dim gl_printf_x_centered(const font_data& font, const Colour& colour, float x,
-		float y, const char *fmt, ...);
-/* printf-like function that draws to the screen, returns width of formatted string
- * centered on y */
-Dim gl_printf_y_centered(const font_data& font, const Colour& colour, float x,
-		float y, const char *fmt, ...);
-
 #endif /* DISPLAY_H_ */

@@ -13,6 +13,9 @@
 #include "lua_vector.h"
 #include "lua_geometry.h"
 
+// Exits on error:
+void lua_safe_dostring(lua_State* L, const char* code);
+
 class LuaValue;
 void lua_register_lcommon(lua_State* L, const LuaValue& module);
 

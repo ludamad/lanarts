@@ -1,6 +1,7 @@
 cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lcommon)
 
+#set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_BUILD_TYPE Debug)
 #add_definitions(-DNDEBUG)
 
@@ -18,7 +19,7 @@ set( lcommon_src
     perf_timer.h
 	geometry.cpp
 	geometry.h
-	lcommon_defines.h
+	lcommon_assert.h
 	math.cpp
 	math.h
 	PerfTimer.cpp
@@ -51,6 +52,7 @@ set( lcommon_src
     lua/lua_vector.h
     lua/slb_funcproperty.h
     lua/slb_mutabletable.h
+    lua/slb.h
     lua/luacpp_wrap_numeric.h
     lua/luacpp_wrap.h
 	

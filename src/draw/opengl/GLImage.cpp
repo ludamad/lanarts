@@ -3,7 +3,6 @@
  *  A convenient OpenGL image wrapper
  */
 
-#include <common/lcommon_defines.h>
 #include <common/math.h>
 
 #include <SDL_opengl.h>

@@ -264,6 +264,7 @@ void GameInstSet::step(GameState* gs) {
 	}
 	perf_timer_end(FUNCNAME);
 }
+
 GameInst* GameInstSet::get_instance(int id) const {
 	InstanceState* is = tset_find<GameInstSetFunctions>(id, &unit_set[0],
 			unit_capacity);

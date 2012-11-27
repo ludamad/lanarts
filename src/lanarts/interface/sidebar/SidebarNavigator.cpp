@@ -3,6 +3,10 @@
  *  Handles navigation of content in the side bar
  */
 
+#include <draw/draw.h>
+#include <draw/Font.h>
+#include <draw/DrawOptions.h>
+
 #include "../../draw/colour_constants.h"
 
 #include "../../display/display.h"
@@ -92,8 +96,11 @@ void SidebarNavigator::draw(GameState* gs) {
 	}
 
 	current_content()->draw(gs);
-	gl_printf_x_centered(gs->primary_font(), COL_FILLED_OUTLINE,
-			main_content.center_x(), main_content.y2 + 3,
+
+	using namespace ldraw;
+	const Font& font = gs->font();
+	font.draw(DrawOptions(CENTER_TOP, COL_FILLED_OUTLINE),
+			Pos(main_content.center_x(), main_content.y2 + 3),
 			current_content()->name());
 
 	content_overlay = NULL;

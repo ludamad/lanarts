@@ -36,7 +36,6 @@ void load_weapon_data(lua_State* L, const FilenameList& filenames,
 
 LuaValue load_spell_data(lua_State* L, const FilenameList& filenames);
 
-LuaValue _load_item_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_itemgenlist_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_enemy_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_effect_data(lua_State* L, const FilenameList& filenames);
@@ -255,7 +254,6 @@ void init_lua_data(GameState* gs, lua_State* L) {
 	register_as_global(L, lua_settings, "settings");
 
 	luaL_dofile(L, "res/main.lua");
-
 	__lua_init(L, game_enemy_data);
 	__lua_init(L, game_effect_data);
 	__lua_init(L, game_spell_data);
@@ -264,8 +262,6 @@ void init_lua_data(GameState* gs, lua_State* L) {
 		game_item_data[i]->init(L);
 	}
 
-//	lua_getglobal(L, "level_tests");
-//	lua_call(L, 0, 0);
 }
 
 static void luayaml_push(LuaValue& value, lua_State* L, const char* name) {

@@ -78,7 +78,6 @@ static void game_loop(GameState* gs) {
 	unsigned long step_events = 1;
 
 	GameSettings& settings = gs->game_settings();
-	perf_timer_clear();
 
 	Timer total_timer, step_timer, draw_timer;
 
@@ -89,8 +88,8 @@ static void game_loop(GameState* gs) {
 
 		if (gs->key_press_state(SDLK_F2)) {
 			if (gs->player_data().all_players().size() == 1) {
-				init_game_data(settings, gs->get_luastate());
 				init_lua_data(gs, gs->get_luastate());
+				init_game_data(settings, gs->get_luastate());
 			}
 		}
 		if (gs->key_press_state(SDLK_F3)) {

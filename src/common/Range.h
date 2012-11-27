@@ -6,7 +6,7 @@
 #ifndef LCOMMON_RANGE_H_
 #define LCOMMON_RANGE_H_
 
-#include "lcommon_defines.h"
+#include "lcommon_assert.h"
 
 /*Represents a range*/
 struct Range {

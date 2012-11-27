@@ -6,6 +6,7 @@
 #include <SLB/Manager.hpp>
 #include <SLB/Class.hpp>
 
+#include <common/lua/slb.h>
 #include <common/lua/LuaValue.h>
 #include <common/lua/lua_geometry.h>
 
@@ -23,8 +24,8 @@ void lua_register_font(lua_State* L, const LuaValue& module) {
 	using namespace SLB;
 	using namespace ldraw;
 
-	Manager* m = Manager::getInstance(L);
-	typedef void (Font::*DrawFunc)(const DrawOptions& options,
+	Manager* m = getOrCreateManager(L);
+	typedef int (Font::*DrawFunc)(const DrawOptions& options,
 			const Posf& position, const char* str) const;
 	typedef void (Font::*DrawWrappedFunc)(const DrawOptions& options,
 			const Posf& position, int maxwidth, const char* str) const;

@@ -10,7 +10,7 @@
 #include <SLB/Type.hpp>
 #include <SLB/PushGet.hpp>
 
-#include "../lcommon_defines.h"
+#include "../lcommon_assert.h"
 
 #include "LuaValue.h"
 
@@ -21,6 +21,14 @@ inline void luacpp_push(lua_State* L, const T& value) {
 inline void luacpp_push(lua_State* L, const char* key) {
 	lua_pushstring(L, key);
 }
+
+//template<typename T>
+//inline LuaValue luavalue(lua_State* L, const T& value) {
+//	SLB::push<T>(L, value);
+//	LuaValue val(L, -1);
+//	lua_pop(L, 1);
+//	return val;
+//}
 
 template<typename T>
 inline LuaValue luacpp(lua_State* L, const T& value) {
@@ -58,36 +66,34 @@ inline void luafield_get(lua_State* L, const LuaValue& value, const char* key,
 
 template<typename V>
 inline bool luatable_get(lua_State *L, int idx, const char* key, V& value) {
-       lua_pushstring(L, key);
-       lua_gettable(L, idx);
+	lua_pushstring(L, key);
+	lua_gettable(L, idx);
 
-       bool isnil = lua_isnil(L, -1);
-       if (!isnil) {
-               value = luacpp_get<V>(L, -1);
-       }
-       lua_pop(L, 1);
-       return isnil;
+	bool isnil = lua_isnil(L, -1);
+	if (!isnil) {
+		value = luacpp_get<V>(L, -1);
+	}lua_pop(L, 1);
+	return isnil;
 }
 template<typename T, typename V>
 inline bool luatable_get(lua_State *L, int idx, const char* key, V& value) {
-       lua_pushstring(L, key);
-       lua_gettable(L, idx);
+	lua_pushstring(L, key);
+	lua_gettable(L, idx);
 
-       bool isnil = lua_isnil(L, -1);
-       if (!isnil) {
-               value = V(luacpp_get<T>(L, -1));
-       }
-       lua_pop(L, 1);
-       return isnil;
+	bool isnil = lua_isnil(L, -1);
+	if (!isnil) {
+		value = V(luacpp_get<T>(L, -1));
+	}lua_pop(L, 1);
+	return isnil;
 }
 
 template<typename V>
-inline void luatable_set(lua_State *L, int idx, const char* key, const V& value) {
-       lua_pushstring(L, key);
-       luacpp_push(L, value);
-       lua_settable(L, idx);
+inline void luatable_set(lua_State *L, int idx, const char* key,
+		const V& value) {
+	lua_pushstring(L, key);
+	luacpp_push(L, value);
+	lua_settable(L, idx);
 }
-
 
 namespace LCommonPrivate {
 

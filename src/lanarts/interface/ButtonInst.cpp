@@ -1,5 +1,8 @@
 #include <typeinfo>
 
+#include <draw/DrawOptions.h>
+#include <draw/Font.h>
+
 #include "../display/display.h"
 #include "../display/sprite_data.h"
 #include "../gamestate/GameState.h"
@@ -21,7 +24,7 @@ BBox ButtonInst::sprite_bounds(GameState* gs) {
 }
 
 BBox ButtonInst::text_bounds(GameState* gs) {
-	Dim dims = gl_text_dimensions(gs->menu_font(), "%s", str.c_str());
+	DimF dims = gs->menu_font().get_draw_size(str);
 	int sx = x - dims.w / 2, sy = y - dims.h / 2;
 	if (sprite > -1) {
 		sy += sprite_bounds(gs).height();
@@ -46,14 +49,14 @@ void ButtonInst::step(GameState* gs) {
 
 void ButtonInst::draw(GameState* gs) {
 	draw_callback.call(gs, this);
-	BBox tbounds(text_bounds(gs));
 	BBox sbounds(sprite_bounds(gs));
 	Colour col = (hovered(gs, this)) ? _hover_colour : _draw_colour;
 	if (sprite > -1) {
 		gl_draw_sprite(sprite, sbounds.x1, sbounds.y1, col);
 	}
-	gl_printf_centered(gs->menu_font(), col, tbounds.center_x(),
-			tbounds.center_y(), "%s", str.c_str());
+	using namespace ldraw;
+	gs->menu_font().draw(DrawOptions(col).origin(CENTER),
+			text_bounds(gs).center(), str);
 }
 
 void ButtonInst::copy_to(GameInst *inst) const {

@@ -1,4 +1,4 @@
-image = image_load("sample.png");
+image = image_load("sample.png")
 function draw()
 	for y=0,9 do 
 		for x=0,9 do 

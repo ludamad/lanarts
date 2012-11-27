@@ -31,11 +31,11 @@ public:
 	}
 
 	// Standard font draw functions
-	void draw(const DrawOptions& options, const Posf& position,
+	int draw(const DrawOptions& options, const Posf& position,
 			const char* str) const;
-	void draw(const DrawOptions& options, const Posf& position,
+	int draw(const DrawOptions& options, const Posf& position,
 			const std::string& str) const {
-		draw(options, position, str.c_str());
+		return draw(options, position, str.c_str());
 	}
 
 	// Wrap over a maxwidth:
@@ -47,7 +47,7 @@ public:
 	}
 
 	//These operate similar to printf:
-	void drawf(const DrawOptions& options, const Posf& position,
+	int drawf(const DrawOptions& options, const Posf& position,
 			const char* fmt, ...) const;
 	void drawf_wrapped(const DrawOptions& options, const Posf& position,
 			int maxwidth, const char* fmt, ...) const;
@@ -55,6 +55,9 @@ public:
 	// Return the size that would be drawn
 	DimF get_draw_size(const char* str, int maxwidth = -1) const;
 	DimF get_draw_size(const std::string& str, int maxwidth = -1) const;
+
+	int height() const;
+
 private:
 	mutable std::string _print_buffer;
 	smartptr<font_data> _font;

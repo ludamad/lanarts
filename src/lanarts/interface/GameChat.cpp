@@ -7,6 +7,8 @@
 #include <SDL.h>
 
 #include <draw/draw.h>
+#include <draw/Font.h>
+#include <draw/DrawOptions.h>
 
 #include "../draw/colour_constants.h"
 
@@ -15,23 +17,21 @@
 
 #include "GameChat.h"
 
-static void print_dupe_string(const ChatMessage& cm, const font_data& font,
+static void print_dupe_string(const ChatMessage& cm, const ldraw::Font& font,
 		const Pos& location, float alpha) {
-	if (cm.exact_copies > 1)
-		gl_printf(font, Colour(0, 191, 255, alpha * 255), location.x,
-				location.y, " x%d", cm.exact_copies);
+	if (cm.exact_copies > 1) {
+		font.drawf(Colour(0, 191, 255, alpha * 255), location, " x%d",
+				cm.exact_copies);
+	}
 }
 
-void ChatMessage::draw(const font_data& font, float alpha, Pos pos) const {
+void ChatMessage::draw(const ldraw::Font& font, float alpha, Pos pos) const {
 	Colour sendcol = sender_colour, msgcol = message_colour;
 	sendcol.a *= alpha, msgcol.a *= alpha;
-	Dim offset(0, 0);
 	if (!sender.empty()) {
-		offset = gl_printf(font, sendcol, pos.x, pos.y, "%s: ", sender.c_str());
-		pos.x += offset.w;
+		pos.x += font.drawf(sendcol, pos, "%s: ", sender.c_str());
 	}
-	offset = gl_printf(font, msgcol, pos.x, pos.y, message.c_str());
-	pos.x += offset.w;
+	pos.x += font.draw(msgcol, pos, message);
 	print_dupe_string(*this, font, pos, alpha);
 }
 
@@ -88,9 +88,9 @@ ChatMessage GameChat::get_field_as_chat_message(GameState* gs,
 
 void GameChat::draw_player_chat(GameState* gs) const {
 	perf_timer_begin(FUNCNAME);
-	const font_data& font = gs->primary_font();
+	const ldraw::Font& font = gs->font();
 	const int padding = 5;
-	int line_sep = font.h + 2;
+	int line_sep = font.height() + 2;
 
 	Dim vsize(gs->view().size());
 	Dim chat_size(vsize.w, 100);
@@ -121,7 +121,8 @@ void GameChat::draw_player_chat(GameState* gs) const {
 		ldraw::draw_line(Colour(200, 200, 200, fade_out * 180),
 				Pos(chat_pos.x, type_y), Pos(chat_pos.x + chat_size.w, type_y));
 		ChatMessage typed_message = get_field_as_chat_message(gs, false);
-		typed_message.draw(font, fade_out, Pos(text_pos.x, type_y + padding - 1));
+		typed_message.draw(font, fade_out,
+				Pos(text_pos.x, type_y + padding - 1));
 	}
 	perf_timer_end(FUNCNAME);
 }

@@ -14,11 +14,11 @@ extern "C" {
 
 #include "load_stats.h"
 
-void parse_weapon_entry(const YAML::Node& n, WeaponEntry& entry) {
-	parse_equipment_entry(n, entry);
+void parse_weapon_entry(lua_State* L, const YAML::Node& n, WeaponEntry& entry) {
+	parse_equipment_entry(L, n, entry);
 	entry.stackable = false;
 	entry.weapon_class = parse_str(n["weapon_class"]);
-	entry.attack = parse_attack(n);
+	entry.attack = parse_attack(L, n);
 	entry.attack.attack_sprite = entry.item_sprite;
 	if (yaml_has_node(n, "spr_attack")) {
 		entry.attack.attack_sprite = parse_sprite_number(n, "spr_attack");
@@ -39,7 +39,7 @@ void load_weapon_callbackf(const YAML::Node& node, lua_State* L,
 	const int default_range = 18;
 	const int default_damage_radius = 3;
 	WeaponEntry* entry = new WeaponEntry;
-	parse_weapon_entry(node, *entry);
+	parse_weapon_entry(L, node, *entry);
 
 	game_item_data.push_back(entry);
 	if (value) {

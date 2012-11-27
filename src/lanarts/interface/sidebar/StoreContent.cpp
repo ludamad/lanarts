@@ -4,6 +4,8 @@
  */
 
 #include <draw/draw.h>
+#include <draw/Font.h>
+#include <draw/DrawOptions.h>
 
 #include "../../draw/colour_constants.h"
 #include "../../display/display.h"
@@ -24,9 +26,9 @@ const int STORE_SLOT_H = TILE_SIZE * 1.25;
 
 //Draw in bottom-right of slot
 static void draw_slot_cost(GameState* gs, money_t cost, int x, int y) {
-	Dim dim = gl_text_dimensions(gs->primary_font(), "%dg", cost);
-	gl_printf_x_centered(gs->primary_font(), COL_PALE_YELLOW, x + TILE_SIZE / 2,
-			y + STORE_SLOT_H - dim.h - 2, "%d", cost);
+	using namespace ldraw;
+	gs->font().drawf(DrawOptions(COL_PALE_YELLOW).origin(CENTER_BOTTOM),
+			Pos(x + TILE_SIZE / 2, y + STORE_SLOT_H - 2), "%d", cost);
 }
 
 static void draw_store_inventory_slot(GameState* gs, StoreItemSlot& itemslot,
@@ -37,8 +39,8 @@ static void draw_store_inventory_slot(GameState* gs, StoreItemSlot& itemslot,
 		gl_draw_image(itemimg, x, y);
 		int amnt = itemslot.item.amount;
 		if (ientry.stackable && amnt > 1) {
-			gl_printf(gs->primary_font(), Colour(255, 255, 255), x + 1, y + 1,
-					"%d", amnt);
+			gs->font().drawf(Colour(255, 255, 255), Pos(x + 1, y + 1), "%d",
+					amnt);
 		}
 		draw_slot_cost(gs, itemslot.cost, x, y);
 	}
@@ -50,8 +52,11 @@ static void draw_item_cost(GameState* gs, const BBox& bbox, int cost) {
 	if (player->gold() < cost) {
 		col = COL_PALE_RED;
 	}
-	gl_printf_centered(gs->primary_font(), col, bbox.center_x(),
-			bbox.y1 - TILE_SIZE / 2, "Cost: %dg", cost);
+
+	using namespace ldraw;
+	const Font& font = gs->font();
+	font.drawf(DrawOptions(CENTER, col),
+			Pos(bbox.center_x(), bbox.y1 - TILE_SIZE / 2), "Cost: %dg", cost);
 }
 static void draw_store_inventory(GameState* gs, StoreInventory& inv,
 		const BBox& bbox, int min_slot, int max_slot, int slot_selected = -1) {

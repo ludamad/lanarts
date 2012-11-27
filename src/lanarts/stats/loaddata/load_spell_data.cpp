@@ -21,9 +21,9 @@ Projectile parse_projectile_name(const YAML::Node& n) {
 	return Projectile(id);
 }
 
-const std::string default_autotarget_func = "spell_choose_target";
+const char* default_autotarget_func = "spell_choose_target";
 
-SpellEntry parse_spell_type(const YAML::Node& n) {
+SpellEntry parse_spell_type(lua_State* L, const YAML::Node& n) {
 	SpellEntry entry;
 	entry.name = parse_str(n["name"]);
 	entry.description = parse_defaulted(n, "description", std::string());
@@ -33,12 +33,9 @@ SpellEntry parse_spell_type(const YAML::Node& n) {
 	if (yaml_has_node(n, "projectile")) {
 		entry.projectile = parse_projectile_name(n["projectile"]);
 	}
-	entry.action_func = LuaValue(
-			parse_defaulted(n, "action_func", std::string()));
-	entry.autotarget_func = LuaValue(
-			parse_defaulted(n, "autotarget_func", default_autotarget_func));
-	entry.prereq_func = LuaValue(
-			parse_defaulted(n, "prereq_func", std::string()));
+	entry.action_func = parse_luacode(L, n, "action_func");
+	entry.autotarget_func = parse_luacode(L, n, "autotarget_func", default_autotarget_func);
+	entry.prereq_func = parse_luacode(L, n, "prereq_func");
 	entry.can_cast_with_cooldown = parse_defaulted(n, "can_cast_with_cooldown",
 			false);
 	entry.can_cast_with_held_key = parse_defaulted(n, "can_cast_with_held_key",
@@ -48,7 +45,7 @@ SpellEntry parse_spell_type(const YAML::Node& n) {
 
 void load_spell_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
-	SpellEntry entry = parse_spell_type(node);
+	SpellEntry entry = parse_spell_type(L, node);
 	game_spell_data.push_back(entry);
 
 	value->get(L, entry.name) = node;

@@ -14,8 +14,8 @@ extern "C" {
 
 using namespace std;
 
-void parse_equipment_entry(const YAML::Node& n, EquipmentEntry& entry) {
-	parse_item_entry(n, entry);
+void parse_equipment_entry(lua_State* L, const YAML::Node& n, EquipmentEntry& entry) {
+	parse_item_entry(L, n, entry);
 	entry.stackable = false;
 //	entry.effect_modifiers; TODO
 	entry.use_action = LuaAction(LuaValue());
@@ -40,7 +40,7 @@ void parse_equipment_entry(const YAML::Node& n, EquipmentEntry& entry) {
 void load_equipment_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	EquipmentEntry* entry = new EquipmentEntry;
-	parse_equipment_entry(node, *entry);
+	parse_equipment_entry(L, node, *entry);
 
 	game_item_data.push_back(entry);
 	/* Lua loading code */

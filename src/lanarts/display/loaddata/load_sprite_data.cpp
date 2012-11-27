@@ -5,6 +5,7 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
+#include <common/lua/luacpp.h>
 #include "../../lua/lua_yaml.h"
 #include "../../data/game_data.h"
 #include "../../data/yaml_util.h"

@@ -3,6 +3,8 @@
  *  Helper methods for common interface components
  */
 #include <draw/draw.h>
+#include <draw/Font.h>
+#include <draw/DrawOptions.h>
 
 #include "../display/display.h"
 #include "../draw/colour_constants.h"
@@ -17,11 +19,14 @@ void draw_setting_box(GameState* gs, const BBox& bbox, const Colour& bbox_col,
 		const Colour& text_col) {
 	int y_offset = (bbox.height() - TILE_SIZE) / 2;
 	gl_draw_sprite(sprite, bbox.x1, bbox.y1 + y_offset, sprite_col);
-	/* Draw item name */
-	gl_printf_bounded(gs->primary_font(), text_col, bbox.x1 + TILE_SIZE * 1.25,
-			bbox.y1 + y_offset + TILE_SIZE / 2, bbox.width() - TILE_SIZE, true,
-			"%s", text);
-	ldraw::draw_rectangle_outline(bbox_col, bbox);
+
+	Pos pos(bbox.x1 + TILE_SIZE * 1.25, bbox.y1 + y_offset + TILE_SIZE / 2);
+
+	using namespace ldraw;
+	const Font& font = gs->font();
+	font.draw_wrapped(text_col, pos, bbox.width() - TILE_SIZE, text);
+
+	draw_rectangle_outline(bbox_col, bbox);
 }
 void draw_option_box(GameState* gs, const BBox& bbox, bool option_set,
 		sprite_id sprite, const char* text) {

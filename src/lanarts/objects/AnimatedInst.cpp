@@ -3,11 +3,18 @@
  *  Represents an object that displays on the screen for a fixed amount of time before removing itself
  */
 
+#include <draw/colour_constants.h>
+#include <draw/DrawOptions.h>
+
+#include <typeinfo>
+
 #include "../display/display.h"
 #include "../display/sprite_data.h"
+
 #include "../gamestate/GameState.h"
+#include "../gamestate/GameView.h"
+
 #include "AnimatedInst.h"
-#include <typeinfo>
 
 AnimatedInst::~AnimatedInst() {
 }
@@ -48,8 +55,8 @@ void AnimatedInst::draw(GameState* gs) {
 					textcol.g + fade * wd.g / 100,
 					textcol.b + fade * wd.b / 100, 255 - fade);
 		}
-		gl_printf(gs->primary_font(), alphacol, x - view.x, y - view.y, "%s",
-				text.c_str());
+
+		gs->font().draw(alphacol, on_screen(gs, pos()), text);
 	}
 }
 

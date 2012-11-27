@@ -6,6 +6,8 @@
 #include <vector>
 
 #include <common/lua/LuaValue.h>
+
+#include "../lua/luaexpr.h"
 #include "../lanarts_defines.h"
 
 #include "AllowedActions.h"
@@ -25,11 +27,11 @@ struct EffectEntry {
 	}
 
 	void init(lua_State* L) {
-		init_func.initialize(L);
-		finish_func.initialize(L);
-		stat_func.initialize(L);
-		attack_stat_func.initialize(L);
-		step_func.initialize(L);
+		luavalue_call_and_store(L, init_func);
+		luavalue_call_and_store(L, finish_func);
+		luavalue_call_and_store(L, stat_func);
+		luavalue_call_and_store(L, attack_stat_func);
+		luavalue_call_and_store(L, step_func);
 	}
 };
 

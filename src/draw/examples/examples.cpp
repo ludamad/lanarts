@@ -99,6 +99,9 @@ static void draw_text() {
 	using namespace ldraw;
 
 	font.draw(COL_WHITE, Pos(0, 0), "Hello World!");
+	int w = font.draw(COL_BLUE, Pos(0, 100), "Hello ");
+	font.draw(COL_RED, Pos(w, 100), "World!");
+
 	font.draw_wrapped(DrawOptions().origin(CENTER).colour(COL_PALE_RED),
 			Pos(200, 200), 250,
 			"This text is wrapped because it's sort of long.");
@@ -169,8 +172,9 @@ static void setup_lua_state() {
 static void draw_luascript(lua_State* L, const char* file) {
 	luaL_dofile(L, file);
 	draw_loop(draw_script);
-	if (lua_tostring(L,-1))
+	if (lua_tostring(L,-1)) {
 		printf("%s\n", lua_tostring(L,-1));
+	}
 }
 
 int main(int argc, const char** argv) {

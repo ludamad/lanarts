@@ -15,10 +15,10 @@ extern "C" {
 
 using namespace std;
 
-void parse_projectile_entry(const YAML::Node& n, ProjectileEntry& entry) {
-	parse_equipment_entry(n, entry);
+void parse_projectile_entry(lua_State* L, const YAML::Node& n, ProjectileEntry& entry) {
+	parse_equipment_entry(L, n, entry);
 	entry.stackable = true;
-	entry.attack = parse_attack(n);
+	entry.attack = parse_attack(L, n);
 	entry.attack.attack_sprite = entry.item_sprite;
 	if (yaml_has_node(n, "spr_attack")) {
 		entry.attack.attack_sprite = parse_sprite_number(n, "spr_attack");
@@ -38,7 +38,7 @@ void parse_projectile_entry(const YAML::Node& n, ProjectileEntry& entry) {
 static void load_projectile(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	ProjectileEntry* entry = new ProjectileEntry;
-	parse_projectile_entry(node, *entry);
+	parse_projectile_entry(L, node, *entry);
 
 	game_item_data.push_back(entry);
 	/* Lua loading code */

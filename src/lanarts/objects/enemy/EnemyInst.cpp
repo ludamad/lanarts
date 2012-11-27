@@ -9,6 +9,10 @@
 #include <common/lua/LuaValue.h>
 #include <common/SerializeBuffer.h>
 
+#include <draw/draw.h>
+#include <draw/Font.h>
+#include <draw/DrawOptions.h>
+
 #include "../../lua/lua_gameinst.h"
 
 #include "../../draw/colour_constants.h"
@@ -160,8 +164,8 @@ void EnemyInst::draw(GameState* gs) {
 				(int)effective_stats().physical.resistance);
 		//eb.current_action,
 		//eb.path_steps, eb.path_cooldown);
-		gl_printf(gs->primary_font(), Colour(255, 255, 255),
-				x - radius - view.x, y - 70 - view.y, statbuff);
+		gs->font().draw(COL_WHITE,
+				Pos(x - radius - view.x, y - 70 - view.y), statbuff);
 	}
 
 	int w = img.width, h = img.height;

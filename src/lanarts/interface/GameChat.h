@@ -13,18 +13,19 @@
 
 #include <common/SerializeBuffer.h>
 #include <draw/Colour.h>
+#include <draw/ldrawfwd.h>
 
 #include "TextField.h"
 
 #include "../lanarts_defines.h"
 
 class GameState;
-struct font_data;
 
 /*Handle key repeating, in steps*/
 const int INITIAL_REPEAT_STEP_AMNT = 40;
 const int NEXT_REPEAT_STEP_AMNT = 5;
 const int NEXT_BACKSPACE_STEP_AMNT = 3;
+
 
 /*Represents a coloured message in chat*/
 struct ChatMessage {
@@ -44,7 +45,7 @@ struct ChatMessage {
 				&& sender_colour == cm.sender_colour
 				&& message_colour == cm.message_colour;
 	}
-	void draw(const font_data& font, float alpha, Pos pos) const;
+	void draw(const ldraw::Font& font, float alpha, Pos pos) const;
 	bool empty() const;
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);

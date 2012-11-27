@@ -26,8 +26,7 @@ static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot, int x,
 		GLimage& itemimg = ientry.item_image();
 		gl_draw_image(itemimg, x, y);
 		if (ientry.stackable) {
-			gl_printf(gs->primary_font(), Colour(255, 255, 255), x + 1, y + 1,
-					"%d", itemslot.amount());
+			gs->font().drawf(COL_WHITE, Pos(x+1, y+1), "%d", itemslot.amount());
 		}
 	}
 }

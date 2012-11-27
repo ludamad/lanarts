@@ -14,23 +14,25 @@
 
 #include "load_stats.h"
 
-
 using namespace std;
 
-EffectEntry parse_effect(const YAML::Node& n) {
+EffectEntry parse_effect(lua_State* L, const YAML::Node& n) {
 	EffectEntry entry;
 	entry.name = parse_str(n["name"]);
-	entry.init_func = LuaValue(parse_defaulted(n, "init_func", std::string()));
-	entry.finish_func = LuaValue(
-			parse_defaulted(n, "finish_func", std::string()));
-	entry.stat_func = LuaValue(parse_defaulted(n, "stat_func", std::string()));
-	entry.attack_stat_func = LuaValue(parse_defaulted(n, "attack_stat_func", std::string()));
-	entry.step_func = LuaValue(parse_defaulted(n, "step_func", std::string()));
+	entry.init_func = parse_luacode(L, n, "init_func");
+	entry.finish_func = parse_luacode(L, n, "finish_func");
+	entry.stat_func = parse_luacode(L, n, "stat_func");
+	entry.attack_stat_func = parse_luacode(L, n, "attack_stat_func");
+	entry.step_func = parse_luacode(L, n, "step_func");
 
-	entry.allowed_actions.can_use_stairs = parse_defaulted(n, "can_use_stairs", true);
-	entry.allowed_actions.can_use_rest = parse_defaulted(n, "can_use_rest", true);
-	entry.allowed_actions.can_use_spells = parse_defaulted(n, "can_use_spells", true);
-	entry.allowed_actions.can_use_items = parse_defaulted(n, "can_use_items", true);
+	entry.allowed_actions.can_use_stairs = parse_defaulted(n, "can_use_stairs",
+			true);
+	entry.allowed_actions.can_use_rest = parse_defaulted(n, "can_use_rest",
+			true);
+	entry.allowed_actions.can_use_spells = parse_defaulted(n, "can_use_spells",
+			true);
+	entry.allowed_actions.can_use_items = parse_defaulted(n, "can_use_items",
+			true);
 
 	entry.effected_colour = parse_defaulted(n, "effected_colour", Colour());
 	entry.effected_sprite = parse_sprite_number(n, "effected_sprite");
@@ -41,7 +43,7 @@ EffectEntry parse_effect(const YAML::Node& n) {
 
 void load_effect_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
-	EffectEntry entry = parse_effect(node);
+	EffectEntry entry = parse_effect(L, node);
 	game_effect_data.push_back(entry);
 	value->get(L, entry.name) = node;
 }

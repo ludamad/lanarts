@@ -16,6 +16,8 @@ extern "C" {
 }
 
 #include <common/Timer.h>
+#include <draw/Font.h>
+#include <draw/DrawOptions.h>
 
 #include "../data/game_data.h"
 
@@ -90,7 +92,10 @@ static void draw_choose_class_to_begin(GameState* gs, GameInst* inst, void* _) {
 	// The interface will always be drawn once a step
 	GameSettings& settings = gs->game_settings();
 	if (settings.classtype == -1) {
-		gl_printf_centered(gs->primary_font(), COL_PALE_RED, inst->x, inst->y,
+
+		using namespace ldraw;
+		const Font& font = gs->font();
+		font.draw(DrawOptions(CENTER, COL_PALE_RED), inst->pos(),
 				"Choose your Class!");
 	}
 }

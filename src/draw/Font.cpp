@@ -217,7 +217,7 @@ static DimF gl_print_impl(const DrawOptions& options, const font_data& font,
 	LDRAW_ASSERT(options.draw_region == BBoxF());
 	LDRAW_ASSERT(options.draw_angle == 0.0f);
 	LDRAW_ASSERT(options.draw_frame == 0.0f);
-	LDRAW_ASSERT(options.draw_scale == DimF());
+	LDRAW_ASSERT(options.draw_scale == DimF(1.0f, 1.0f));
 
 	std::vector<int> line_splits;
 	int measured_width = process_string(font, text, maxwidth, line_splits);
@@ -282,15 +282,17 @@ void Font::drawf_wrapped(const DrawOptions& options, const Posf& position,
 	draw_wrapped(options, position, maxwidth, _print_buffer);
 }
 
-void Font::draw(const DrawOptions& options, const Posf& position,
+int Font::draw(const DrawOptions& options, const Posf& position,
 		const char* str) const {
-	draw_wrapped(options, position, -1, str);
+	Colour c = options.draw_colour;
+	DimF size = gl_print_impl(options, *_font, position, -1, true, str);
+	return size.w;
 }
 
-void Font::drawf(const DrawOptions& options, const Posf& position,
+int Font::drawf(const DrawOptions& options, const Posf& position,
 		const char* fmt, ...) const {
 	VARARG_STR_FORMAT(_print_buffer, fmt);
-	draw(options, position, _print_buffer);
+	return draw(options, position, _print_buffer);
 }
 
 DimF Font::get_draw_size(const char* str, int maxwidth) const {
@@ -299,6 +301,9 @@ DimF Font::get_draw_size(const char* str, int maxwidth) const {
 
 DimF Font::get_draw_size(const std::string& str, int maxwidth) const {
 	return get_draw_size(str.c_str(), maxwidth);
+}
+int Font::height() const {
+	return _font->h;
 }
 
 }

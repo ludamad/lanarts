@@ -5,6 +5,8 @@
 
 #include "load_stats.h"
 
+#include "../../lua/lua_yaml.h"
+
 #include "../stat_formulas.h"
 
 AttackStats parse_attack_stats(const YAML::Node & n) {
@@ -136,13 +138,12 @@ ArmourStats parse_defence_modifiers(const YAML::Node& n) {
 	return def;
 }
 
-Attack parse_attack(const YAML::Node& n) {
+Attack parse_attack(lua_State *L, const YAML::Node& n) {
 	Attack atk;
 	atk.damage_modifiers = parse_damage_modifier(n);
 	atk.cooldown = parse_defaulted(n, "cooldown", 0);
 	atk.range = parse_defaulted(n, "range", 0);
-	atk.attack_action.action_func = LuaValue(
-			parse_defaulted(n, "on_hit_func", std::string()));
+	atk.attack_action.action_func = parse_luacode(L, n, "on_hit_func");
 	return atk;
 }
 

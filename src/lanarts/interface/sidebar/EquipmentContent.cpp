@@ -43,9 +43,9 @@ static void draw_equipment_slot(GameState* gs, Inventory& inventory,
 		ldraw::draw_rectangle_outline(COL_PALE_YELLOW.with_alpha(50),
 				BBox(bbox.left_top(), Dim(TILE_SIZE, TILE_SIZE)));
 		/* Draw item name */
-		int xoffset = TILE_SIZE * 1.25, yoffset = TILE_SIZE / 2;
-		gl_printf_y_centered(gs->primary_font(), COL_GRAY, bbox.x1 + xoffset,
-				bbox.y1 + yoffset, "%s", noslot);
+		Pos offset(TILE_SIZE * 1.25, TILE_SIZE / 2);
+		gs->font().draw(ldraw::DrawOptions(COL_GRAY).origin(ldraw::LEFT_CENTER),
+				bbox.left_top() + offset, noslot);
 	}
 	ldraw::draw_rectangle_outline(bbox_col, bbox);
 }
@@ -72,13 +72,11 @@ struct SlotAndDefault {
 	}
 };
 
-const SlotAndDefault slot_data[] = {
-		SlotAndDefault(EquipmentEntry::PROJECTILE, "No Projectile"),
-		SlotAndDefault(EquipmentEntry::BODY_ARMOUR, "No Armour"),
-		SlotAndDefault(EquipmentEntry::BOOTS, "No Boots"),
-		SlotAndDefault(EquipmentEntry::GLOVES, "No Gloves"),
-		SlotAndDefault(EquipmentEntry::HELMET, "No Helmet"),
-};
+const SlotAndDefault slot_data[] = { SlotAndDefault(EquipmentEntry::PROJECTILE,
+		"No Projectile"), SlotAndDefault(EquipmentEntry::BODY_ARMOUR,
+		"No Armour"), SlotAndDefault(EquipmentEntry::BOOTS, "No Boots"),
+		SlotAndDefault(EquipmentEntry::GLOVES, "No Gloves"), SlotAndDefault(
+				EquipmentEntry::HELMET, "No Helmet"), };
 
 const size_t slot_data_n = sizeof(slot_data) / sizeof(SlotAndDefault);
 

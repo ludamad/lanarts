@@ -13,6 +13,7 @@
 
 #include <common/lua/LuaValue.h>
 
+#include "../lua/luaexpr.h"
 #include "../lanarts_defines.h"
 
 #include "items/items.h"
@@ -37,9 +38,9 @@ struct SpellEntry: public BaseDataEntry {
 	}
 
 	void init(lua_State* L) {
-		action_func.initialize(L);
-		autotarget_func.initialize(L);
-		prereq_func.initialize(L);
+		luavalue_call_and_store(L, action_func);
+		luavalue_call_and_store(L, autotarget_func);
+		luavalue_call_and_store(L, prereq_func);
 	}
 	bool uses_projectile() {
 		return projectile.id != NO_ITEM;

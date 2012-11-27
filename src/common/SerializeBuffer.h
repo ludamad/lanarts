@@ -11,7 +11,7 @@
 #include <vector>
 #include <cstdio>
 
-#include "lcommon_defines.h"
+#include "lcommon_assert.h"
 
 const int MAX_BUFFER_SIZE = 128 * 1024; //128kb
 

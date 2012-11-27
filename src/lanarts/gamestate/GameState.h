@@ -12,11 +12,10 @@
 #include <SDL.h>
 #include <cstdio>
 
+#include <common/smartptr.h>
 #include <common/random/mtwist.h>
 
 #include <draw/Font.h>
-
-#include "../display/font.h"
 
 #include "../fov/fov.h"
 
@@ -164,13 +163,12 @@ public:
 		return world.enemies_seen();
 	}
 
-	/* Font getters */
-	const font_data& primary_font() {
-		return small_font;
+	const ldraw::Font& font() {
+		return normal_font;
 	}
 
-	const font_data& menu_font() {
-		return large_font;
+	const ldraw::Font& menu_font() {
+		return _large_font;
 	}
 
 	/* IO & action controller */
@@ -258,7 +256,7 @@ private:
 	GameWorld world;
 
 	MTwist mtwist;
-	font_data small_font, large_font;
+	ldraw::Font normal_font, _large_font;
 	bool dragging_view;
 	IOController iocontroller;
 

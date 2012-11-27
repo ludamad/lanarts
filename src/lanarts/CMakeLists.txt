@@ -43,9 +43,6 @@ set( lanarts_src
 	data/loaddata/load_datafilenames.cpp
 	data/yaml_util.cpp
 	display/display_image.cpp
-	display/display_shape.cpp
-	display/display_text.cpp
-	display/font.cpp
 	display/GLImage.cpp
 	display/loaddata/load_sprite_data.cpp
 	display/loaddata/load_sprite_data.cpp
@@ -116,6 +113,7 @@ set( lanarts_src
 	lua/lua_object_funcs.cpp
 	lua/lua_spelltarget_funcs.cpp
 	lua/lua_yaml.cpp
+	lua/luaexpr.cpp
 	
 	menu/gameconfig_menu.cpp
 	menu/lobby_menu.cpp
@@ -258,6 +256,7 @@ set( lanarts_include
 	lua/lunar.h
 	lua/lua_yaml.h
 	lua/lua_gameinst.h
+	lua/luaexpr.h
 
 	menu/menus.h
 
@@ -331,9 +330,10 @@ target_link_libraries( lanarts
 			lanarts_net
 			yaml-cpp
 			RVO
-			lua
-			lcommon
 			ldraw
+			lcommon
+			slb
+			lua
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}
 			${SDLIMAGE_LIBRARY}

@@ -1,6 +1,7 @@
 /*
  * ActionQueue.h:
  *  Provides ActionQueue class, which is an alias for a deque.
+ *  As well provides MultiframeActionQueue, which queues actions for specific frames.
  */
 
 #ifndef ACTIONQUEUE_H_

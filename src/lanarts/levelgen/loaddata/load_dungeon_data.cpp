@@ -5,8 +5,10 @@
 
 #include <fstream>
 
-#include "../../data/game_data.h"
 #include <yaml-cpp/yaml.h>
+
+#include "../../lua/lua_yaml.h"
+#include "../../data/game_data.h"
 #include "../../data/yaml_util.h"
 
 using namespace std;
@@ -117,7 +119,7 @@ LayoutGenSettings parse_layout_gen(const YAML::Node& n) {
 	return lgs;
 }
 
-LevelGenSettings parse_level_gen(const YAML::Node& n) {
+LevelGenSettings parse_level_gen(lua_State* L, const YAML::Node& n) {
 	LevelGenSettings level;
 	level.content = parse_content_gen(n["content"]);
 
@@ -137,17 +139,16 @@ LevelGenSettings parse_level_gen(const YAML::Node& n) {
 					get_area_template_by_name(template_name.c_str()));
 		}
 	}
-	level.gen_level_func = LuaValue(
-			parse_defaulted(n, "gen_level_func", std::string()));
+	level.gen_level_func = parse_luacode(L, n, "gen_level_func");
 	return level;
 
 }
-void parse_dungeon_branch(const YAML::Node& n,
+void parse_dungeon_branch(lua_State* L, const YAML::Node& n,
 		std::vector<LevelGenSettings>& levels) {
 	const YAML::Node& lnodes = n["levels"];
 	for (int i = 0; i < lnodes.size(); i++) {
 		//printf("Loading level\n");
-		levels.push_back(parse_level_gen(lnodes[i]));
+		levels.push_back(parse_level_gen(L, lnodes[i]));
 	}
 }
 
@@ -170,7 +171,7 @@ LuaValue load_dungeon_data(lua_State* L, const FilenameList& filenames) {
 
 		const YAML::Node& node = root["areas"];
 		//First branch should be main branch, using node[0]:
-		parse_dungeon_branch(node[0], game_dungeon_yaml);
+		parse_dungeon_branch(L, node[0], game_dungeon_yaml);
 		//TODO: remove this hack when there are proper subbranches
 		game_dungeon_yaml[0].content.features.nstairs_up = 0;
 

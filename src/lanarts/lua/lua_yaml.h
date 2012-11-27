@@ -19,4 +19,8 @@ LuaValue lua_yaml(lua_State* L, const YAML::Node& node);
 inline void luacpp_push(lua_State* L, const YAML::Node& node) {
 	lua_pushyaml(L, node);
 }
+
+LuaValue parse_luacode(lua_State* L, const YAML::Node& node);
+LuaValue parse_luacode(lua_State* L, const YAML::Node& node, const char* key);
+LuaValue parse_luacode(lua_State* L, const YAML::Node& node, const char* key, const char* default_code);
 #endif /* LUA_YAML_H_ */

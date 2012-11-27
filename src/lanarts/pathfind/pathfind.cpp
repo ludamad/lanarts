@@ -3,11 +3,18 @@
  *  Utilities for flood-fill based pathfinding
  */
 
-#include "../display/tile_data.h"
 #include <cmath>
+
+#include <draw/colour_constants.h>
+#include <draw/DrawOptions.h>
+
+#include "../display/tile_data.h"
+
 #include "../gamestate/GameState.h"
 #include "../gamestate/GameTiles.h"
+
 #include "../util/math_util.h"
+
 #include "gheap.h"
 #include "pathfind.h"
 
@@ -375,15 +382,18 @@ void PathInfo::draw(GameState* gs) {
 		for (int x = 0; x < w; x++) {
 			PathingNode* node = get(x, y);
 			if (false && !node->solid)
-				gl_printf(gs->primary_font(), Colour(255, 255, 255),
-						(x + start_x) * TILE_SIZE - view.x,
-						(y + start_y) * TILE_SIZE - view.y, "%d,%d", node->dx,
-						node->dy);
-			if (!node->solid)
-				gl_printf(gs->primary_font(), Colour(255, 255, 255),
-						(x + start_x) * TILE_SIZE - view.x,
-						(y + start_y) * TILE_SIZE - view.y, "%d",
+				gs->font().drawf(
+						COL_WHITE,
+						Pos((x + start_x) * TILE_SIZE - view.x,
+								(y + start_y) * TILE_SIZE - view.y), "%d,%d",
+						node->dx, node->dy);
+			if (!node->solid) {
+				gs->font().drawf(
+						COL_WHITE,
+						Pos((x + start_x) * TILE_SIZE - view.x,
+								(y + start_y) * TILE_SIZE - view.y), "%d",
 						node->distance);
+			}
 		}
 	}
 }

@@ -1,3 +1,8 @@
+#include <stdexcept>
+
+#include <common/lua/lua_lcommon.h>
+#include <draw/lua/lua_ldraw.h>
+
 #include "../gamestate/GameState.h"
 
 extern "C" {
@@ -39,8 +44,19 @@ int rand_range(lua_State* L) {
 	return 1;
 }
 
+static int lua_lanarts_panic(lua_State* L) {
+	throw std::runtime_error("Lanarts Lua panic!");
+	return 0;
+}
+
 void lua_lanarts_api(GameState* state, lua_State* L) {
 	luaL_openlibs(L);
+	LuaValue globals(L, LUA_GLOBALSINDEX);
+	lua_register_lcommon(L, globals);
+	ldraw::lua_register_ldraw(L, globals);
+
+	lua_atpanic(L, lua_lanarts_panic);
+
 	lua_gamestate_bindings(state, L);
 	lua_gameinst_bindings(state, L);
 	lua_combatstats_bindings(state, L);

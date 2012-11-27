@@ -49,12 +49,13 @@ struct NullPointerException: public std::exception {
 	}
 };
 
+typedef void (*delete_function_ptr)(void* ptr);
+
 /* A smart pointer adapted from yasper that allows for definition on incomplete types */
 template<typename X>
 class smartptr {
 private:
 	// Keep function around for deletion purposes so that we can work on incomplete types
-	typedef void (*delete_function_ptr)(void* ptr);
 	template<typename T>
 	static void delete_function(void* ptr) {
 		delete (T*)ptr;
@@ -108,6 +109,15 @@ public:
 				acquire(c);
 			else
 				refhandler = new RefHandler(delete_function<X>);
+		}
+	}
+
+	template<typename Y>
+	explicit smartptr(Y* raw, delete_function_ptr destructor) :
+			rawPtr(0), refhandler(0) {
+		if (raw) {
+			rawPtr = static_cast<X*>(raw);
+			refhandler = new RefHandler(destructor);
 		}
 	}
 

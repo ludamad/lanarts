@@ -5,7 +5,6 @@
 #ifndef LANARTS_DEFINES_H_
 #define LANARTS_DEFINES_H_
 
-#include <common/lcommon_defines.h>
 #include <common/perf_timer.h>
 #include <common/Range.h>
 

@@ -4,6 +4,8 @@
  */
 
 #include <draw/draw.h>
+#include <draw/Font.h>
+#include <draw/DrawOptions.h>
 
 #include "../draw/colour_constants.h"
 #include "../display/display.h"
@@ -68,9 +70,9 @@ public:
 		va_start(ap, fmt);
 		vsnprintf(buff, 512, fmt, ap);
 		va_end(ap);
-		Dim value_offset = gl_printf_y_centered(gs->primary_font(), col, pos.x,
-				pos.y, "%s", buff);
-		value_draw_pos = Pos(pos.x + value_offset.w, pos.y);
+		int offset = gs->font().draw(
+				ldraw::DrawOptions(col).origin(ldraw::LEFT_CENTER), pos, buff);
+		value_draw_pos = Pos(pos.x + offset, pos.y);
 	}
 	void draw_value(GameState* gs, const Colour& col, const char* fmt, ...) {
 		Pos pos = value_draw_pos;
@@ -79,7 +81,8 @@ public:
 		va_start(ap, fmt);
 		vsnprintf(buff, 512, fmt, ap);
 		va_end(ap);
-		gl_printf_y_centered(gs->primary_font(), col, pos.x, pos.y, "%s", buff);
+		gs->font().draw(ldraw::DrawOptions(col).origin(ldraw::LEFT_CENTER), pos,
+				buff);
 	}
 	int width() const {
 		return bbox.width();
@@ -111,10 +114,11 @@ static void draw_base_entry_overlay(GameState* gs, BaseDataEntry& entry) {
 	GameTextConsole& console = gs->game_console();
 	BBox bbox(console.bounding_box());
 	int descriptxoff = TILE_SIZE * 1.25;
-	Dim itemdim = draw_icon_and_name(gs, entry, Colour(), bbox.x1 + 4,
+	int itemoffset = draw_icon_and_name(gs, entry, Colour(), bbox.x1 + 4,
 			bbox.y1 + 4, TILE_SIZE * 1.25 - 4, TILE_SIZE / 4);
-	Dim typedim = gl_printf_y_centered(gs->primary_font(), COL_LIGHT_GRAY,
-			bbox.x1 + descriptxoff, bbox.y1 + TILE_SIZE * .75 + 4, "%s",
+	int typeoffset = gs->font().drawf(
+			ldraw::DrawOptions(COL_LIGHT_GRAY).origin(ldraw::LEFT_CENTER),
+			Pos(bbox.x1 + descriptxoff, bbox.y1 + TILE_SIZE * .75 + 4),
 			entry.entry_type());
 
 	const int x_offset = bbox.width() / 6, y_offset = 4 + TILE_SIZE / 2;
@@ -124,26 +128,27 @@ static void draw_base_entry_overlay(GameState* gs, BaseDataEntry& entry) {
 	if (descript_xoffset < WIDTH_THRESHOLD / 6) {
 		descript_xoffset = WIDTH_THRESHOLD / 6;
 	}
-	if (descript_xoffset < itemdim.w + descriptxoff + 4) {
-		descript_xoffset = itemdim.w + descriptxoff + 4;
+	if (descript_xoffset < itemoffset + descriptxoff + 4) {
+		descript_xoffset = itemoffset + descriptxoff + 4;
 	}
-	if (descript_xoffset < typedim.w + descriptxoff + 4) {
-		descript_xoffset = typedim.w + descriptxoff + 4;
+	if (descript_xoffset < typeoffset + descriptxoff + 4) {
+		descript_xoffset = typeoffset + descriptxoff + 4;
 	}
 
-	gl_printf_y_centered_bounded(gs->primary_font(), COL_LIGHT_GRAY,
-			bbox.x1 + descript_xoffset, bbox.y1 + y_offset, max_width, "%s",
-			entry.description.c_str());
+	using namespace ldraw;
+
+	gs->font().draw_wrapped(DrawOptions(COL_LIGHT_GRAY).origin(LEFT_CENTER),
+			bbox.left_top() + Pos(descript_xoffset, y_offset), max_width,
+			entry.description);
 }
 
-Dim draw_icon_and_name(GameState* gs, BaseDataEntry& entry, Colour col, int x,
+int draw_icon_and_name(GameState* gs, BaseDataEntry& entry, Colour col, int x,
 		int y, int xoffset, int yoffset) {
 	gl_draw_sprite(entry.get_sprite(), x, y);
 	ldraw::draw_rectangle_outline(COL_PALE_YELLOW.with_alpha(50),
-			BBox(x, y, TILE_SIZE, TILE_SIZE));
+			BBox(x, y, x+TILE_SIZE, y+TILE_SIZE));
 	/* Draw item name */
-	return gl_printf_y_centered(gs->primary_font(), col, x + xoffset,
-			y + yoffset, "%s", entry.name.c_str());
+	return gs->font().draw(ldraw::DrawOptions(col).origin(ldraw::LEFT_CENTER), Pos(x + xoffset, y + yoffset), entry.name);
 }
 
 void draw_spell_icon_and_name(GameState* gs, SpellEntry& spl_entry, Colour col,
@@ -151,10 +156,10 @@ void draw_spell_icon_and_name(GameState* gs, SpellEntry& spl_entry, Colour col,
 	gl_draw_sprite(spl_entry.sprite, x, y);
 
 	ldraw::draw_rectangle_outline(COL_PALE_YELLOW.with_alpha(50),
-			BBox(x, y, TILE_SIZE, TILE_SIZE));
+			BBox(x, y, x+TILE_SIZE, y+TILE_SIZE));
 	/* Draw spell name */
-	gl_printf_y_centered(gs->primary_font(), col, x + TILE_SIZE * 1.25,
-			y + TILE_SIZE / 2, "%s", spl_entry.name.c_str());
+	gs->font().draw(ldraw::DrawOptions(col).origin(ldraw::LEFT_CENTER),
+			Pos(x + TILE_SIZE * 1.25, y + TILE_SIZE / 2), spl_entry.name);
 }
 
 //Drawn only as part of other draw_console_<something>_description functions

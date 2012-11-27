@@ -15,13 +15,15 @@
 #include "../combat_stats.h"
 #include "../stat_modifiers.h"
 
+struct lua_State;
+
 // In load_item_data.cpp:
-void parse_item_entry(const YAML::Node& n, ItemEntry& entry);
+void parse_item_entry(lua_State* L, const YAML::Node& n, ItemEntry& entry);
 
 // In load_armour_data.cpp:
-void parse_equipment_entry(const YAML::Node& n, EquipmentEntry& entry);
+void parse_equipment_entry(lua_State* L, const YAML::Node& n, EquipmentEntry& entry);
 
-Attack parse_attack(const YAML::Node& n);
+Attack parse_attack(lua_State* L, const YAML::Node& n);
 
 CoreStats parse_core_stats(const YAML::Node& n);
 AttackStats parse_attack_stats(const YAML::Node& n);

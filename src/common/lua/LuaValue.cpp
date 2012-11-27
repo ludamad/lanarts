@@ -9,26 +9,17 @@ extern "C" {
 
 #include "../SerializeBuffer.h"
 
+#include "lua_lcommon.h"
 #include "LuaValue.h"
 #include "lua_serialize.h"
 
 using namespace LCommonPrivate;
 
-static std::string format_expression_string(const std::string& str) {
-	const char prefix[] = "return ";
-	if (str.empty())
-		return str;
-	if (strncmp(str.c_str(), prefix, sizeof(prefix)) == 0)
-		return str;
-	return "return " + str;
-}
-
 namespace LCommonPrivate {
 
 struct _LuaValueImpl {
-	_LuaValueImpl(const std::string& expr = std::string()) :
-			L(NULL), lua_expression(format_expression_string(expr)), refcount(
-					1), empty(true) {
+	_LuaValueImpl() :
+			L(NULL), refcount(1) {
 	}
 	~_LuaValueImpl() {
 		if (L) {
@@ -39,7 +30,6 @@ struct _LuaValueImpl {
 	void set(lua_State* L, int pos) {
 		lua_pushvalue(L, pos); /*push value*/
 		this->L = L;
-		empty = false;
 		int valueidx = lua_gettop(L);
 		lua_pushlightuserdata(L, this); /* push address as key */
 		lua_insert(L, -2);
@@ -47,24 +37,11 @@ struct _LuaValueImpl {
 	}
 
 	void deinitialize(lua_State* L) {
-		if (!empty) {
-			LCOMMON_ASSERT(L == this->L);
-			lua_pushlightuserdata(L, this); /* push address as key */
-			lua_pushnil(L); /* push nil as value */
-			lua_settable(L, LUA_REGISTRYINDEX);
-			this->L = NULL;
-		}
-	}
-
-	void initialize(lua_State* L) {
-		if (lua_expression.empty())
-			return;
-		this->L = L;
-		empty = false;
+		LCOMMON_ASSERT(L == this->L);
 		lua_pushlightuserdata(L, this); /* push address as key */
-		luaL_dostring(L, lua_expression.c_str());
+		lua_pushnil(L); /* push nil as value */
 		lua_settable(L, LUA_REGISTRYINDEX);
-		lua_expression.clear();
+		this->L = NULL;
 	}
 
 	void push(lua_State* L) const {
@@ -75,7 +52,6 @@ struct _LuaValueImpl {
 
 	void pop(lua_State* L) {
 		this->L = L;
-		empty = false;
 		int valueidx = lua_gettop(L);
 		lua_pushlightuserdata(L, this); /* push address as key */
 		lua_pushvalue(L, valueidx); /*Clone value*/
@@ -86,23 +62,16 @@ struct _LuaValueImpl {
 	}
 
 	void serialize(lua_State* L, SerializeBuffer& serializer) {
-
-		serializer.write(lua_expression);
-		serializer.write(empty);
 		push(L);
 		lua_serialize(serializer, L, -1);
 	}
 	void deserialize(lua_State* L, SerializeBuffer& serializer) {
-		serializer.read(lua_expression);
-		serializer.read(empty);
 		lua_deserialize(serializer, L);
 		pop(L);
 	}
 
 	lua_State* L;
-	std::string lua_expression;
 	size_t refcount;
-	bool empty;
 };
 
 }
@@ -112,11 +81,11 @@ static void deref(_LuaValueImpl* impl) {
 		delete impl;
 }
 
-LuaValue::LuaValue(const std::string & expr) {
-	if (expr.empty())
-		impl = NULL;
-	else
-		impl = new _LuaValueImpl(expr);
+LuaValue::LuaValue(lua_State* L, const char* global) {
+	impl = NULL;
+	lua_getglobal(L, global);
+	set(L, -1);
+	lua_pop(L, 1);
 }
 
 LuaValue::LuaValue(lua_State* L, int pos) {
@@ -130,11 +99,6 @@ LuaValue::LuaValue() {
 
 LuaValue::~LuaValue() {
 	deref(impl);
-}
-
-void LuaValue::initialize(lua_State* L) {
-	if (impl)
-		impl->initialize(L);
 }
 
 void LuaValue::table_initialize(lua_State* L) {
@@ -185,7 +149,7 @@ void LuaValue::operator =(const LuaValue & value) {
 }
 
 bool LuaValue::empty() const {
-	return impl == NULL || impl->empty;
+	return impl == NULL;
 }
 
 void LuaValue::serialize(lua_State* L, SerializeBuffer& serializer) {
@@ -273,3 +237,24 @@ bool LuaValue::operator !=(const LuaValue & o) const {
 	return impl != o.impl;
 }
 
+static std::string format_expression_string(const std::string& str) {
+	const char prefix[] = "return ";
+	if (strncmp(str.c_str(), prefix, sizeof(prefix)) == 0)
+		return str;
+	return "return " + str;
+}
+
+LuaValue luavalue_eval(lua_State* L, const std::string& code) {
+	if (code.empty()) {
+		return LuaValue();
+	}
+	std::string expr = format_expression_string(code);
+	int ntop = lua_gettop(L);
+	lua_safe_dostring(L, expr.c_str());
+	LCOMMON_ASSERT(lua_gettop(L) - ntop == 1);
+
+	LuaValue val(L, -1);
+	lua_pop(L, 1);
+
+	return val;
+}

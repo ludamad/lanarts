@@ -16,12 +16,12 @@
 #include "../../stats/Inventory.h"
 #include "../../stats/combat_stats.h"
 
-static void assert_equal(DerivedStats& d1, DerivedStats& d2) {
-	UNIT_TEST_ASSERT(d1.damage == d2.damage);
-	UNIT_TEST_ASSERT(d1.power == d2.power);
-	UNIT_TEST_ASSERT(d1.reduction == d2.reduction);
-	UNIT_TEST_ASSERT(d1.resistance == d2.resistance);
-}
+//static void assert_equal(DerivedStats& d1, DerivedStats& d2) {
+//	UNIT_TEST_ASSERT(d1.damage == d2.damage);
+//	UNIT_TEST_ASSERT(d1.power == d2.power);
+//	UNIT_TEST_ASSERT(d1.reduction == d2.reduction);
+//	UNIT_TEST_ASSERT(d1.resistance == d2.resistance);
+//}
 //static void assert_equal(ItemProperties& ip1, ItemProperties& ip2) {
 //	UNIT_TEST_ASSERT(ip1.flags == ip2.flags);
 //	UNIT_TEST_ASSERT(ip1.unknownness == ip2.unknownness);

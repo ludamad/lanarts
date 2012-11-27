@@ -3,6 +3,11 @@
  *  Represents an item on the floor
  */
 
+#include <draw/draw.h>
+#include <draw/Font.h>
+#include <draw/DrawOptions.h>
+#include <draw/colour_constants.h>
+
 #include "../display/sprite_data.h"
 #include "../gamestate/GameState.h"
 #include "../stats/items/ItemEntry.h"
@@ -49,8 +54,8 @@ void ItemInst::draw(GameState* gs) {
 
 	gl_draw_sprite(view, ientry.item_sprite, xx, yy, 0, 0, gs->frame());
 	if (ientry.stackable && item_quantity() > 1) {
-		gl_printf(gs->primary_font(), Colour(255, 255, 255), xx - view.x + 1,
-				yy - view.y + 1, "%d", item_quantity());
+		gs->font().drawf(COL_WHITE, Pos(xx - view.x + 1,
+				yy - view.y + 1), "%d", item_quantity());
 	}
 }
 
