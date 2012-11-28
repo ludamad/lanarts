@@ -24,30 +24,22 @@ include_directories(
 	${LIBS}/slb/include
 	)
 
-set( lanarts_tests
-	tests/tests.h
-	tests/tests.cpp
-
-	tests/lua_tests.cpp
-
-	tests/net/net_tests.cpp
-	tests/net/adv_net_tests.cpp
-
-	tests/stats/stat_serialize_tests.cpp
-)
-
 set( lanarts_src
 	collision_avoidance/CollisionAvoidance.cpp
 	
 	data/game_data.cpp
 	data/loaddata/load_datafilenames.cpp
+	data/parse.cpp
 	data/yaml_util.cpp
+	data/FilenameList.cpp
+	
 	display/display_image.cpp
 	display/GLImage.cpp
 	display/loaddata/load_sprite_data.cpp
 	display/loaddata/load_sprite_data.cpp
     
-    draw/draw_statbar.cpp
+	draw/draw_statbar.cpp
+	draw/parse_drawable.cpp
 	
 	fov/fov.cpp
 	fov/impl/permissive-fov.cc
@@ -154,9 +146,9 @@ set( lanarts_src
 	
 	stats/items/ItemEntry.cpp
 	stats/items/items.cpp
-    stats/items/EquipmentEntry.cpp
-    stats/items/ProjectileEntry.cpp
-    stats/items/WeaponEntry.cpp
+	stats/items/EquipmentEntry.cpp
+	stats/items/ProjectileEntry.cpp
+	stats/items/WeaponEntry.cpp
 	
 	stats/loaddata/load_equipment_data.cpp
 	stats/loaddata/load_class_data.cpp
@@ -190,6 +182,8 @@ set( lanarts_include
 	data/BaseDataEntry.h
 	data/game_data.h
 	data/lua_game_data.h
+	data/parse.h
+	data/parse_with_defaults.h
 	data/yaml_util.h
 
 	display/display.h
@@ -198,7 +192,8 @@ set( lanarts_include
 	display/tile_data.h
 
 	draw/draw_statbar.h
-    draw/colour_constants.h
+	draw/colour_constants.h
+	draw/parse_drawable.h
 
 	fov/fov.h
 	fov/impl/permissive-fov-cpp.h
@@ -293,12 +288,12 @@ set( lanarts_include
 
 	stats/loaddata/load_stats.h
 	
-    stats/items/EquipmentEntry.h
-    stats/items/ItemEntry.h
-    stats/items/ProjectileEntry.h
-    stats/items/WeaponEntry.h
+	stats/items/EquipmentEntry.h
+	stats/items/ItemEntry.h
+	stats/items/ProjectileEntry.h
+	stats/items/WeaponEntry.h
     
-    stats/Attack.h
+	stats/Attack.h
 	stats/AllowedActions.h
 	stats/class_data.h
 	stats/combat_stats.h
@@ -320,24 +315,41 @@ set( lanarts_include
 	util/math_util.h
 )
 
+set( lanarts_tests
+       tests/tests.h
+       tests/tests.cpp
+       tests/parse_tests.cpp
+
+       tests/lua_tests.cpp
+
+       tests/net/net_tests.cpp
+       tests/net/adv_net_tests.cpp
+
+       tests/stats/stat_serialize_tests.cpp
+)
+
+
 add_executable( lanarts
              ${lanarts_src}
              ${lanarts_include}
              ${lanarts_tests} )
 
+set (libraries 
+	lanarts_net
+	yaml-cpp
+	RVO
+	ldraw
+	lcommon
+	slb
+	lua
+	${OPENGL_gl_LIBRARY}
+	${SDL_LIBRARY}
+	${SDLIMAGE_LIBRARY}
+	${SDLNET_LIBRARY}
+	${SDLMAIN_LIBRARY}
+	${FREETYPE_LIBRARIES}
+)
 
-target_link_libraries( lanarts
-			lanarts_net
-			yaml-cpp
-			RVO
-			ldraw
-			lcommon
-			slb
-			lua
-			${OPENGL_gl_LIBRARY}
-			${SDL_LIBRARY}
-			${SDLIMAGE_LIBRARY}
-			${SDLNET_LIBRARY}
-			${SDLMAIN_LIBRARY}
-			${FREETYPE_LIBRARIES}
-			)
+target_link_libraries( lanarts 
+    ${libraries}
+)

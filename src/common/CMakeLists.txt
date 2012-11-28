@@ -17,6 +17,8 @@ include_directories(${SDL_INCLUDE_DIR}
 
 set( lcommon_src
     perf_timer.h
+    fatal_error.h
+    fatal_error.cpp
 	geometry.cpp
 	geometry.h
 	lcommon_assert.h
@@ -63,16 +65,9 @@ set( lcommon_src
 add_library( lcommon
              ${lcommon_src} )
 
-set( lcommon_tests
-	tests/lcommon_tests.cpp
-	tests/lcommon_tests.h
-	tests/lua_geometry_tests.cpp
-	tests/lua_range_tests.cpp
-	tests/lua_vector_tests.cpp
-	tests/luavalue_tests.cpp
-        tests/lua_serialize_tests.cpp
-	tests/strformat_tests.cpp
-)
+AUX_SOURCE_DIRECTORY(tests lcommon_tests) 
+
+
 
 add_executable( lcommon_tests
              ${lcommon_src}

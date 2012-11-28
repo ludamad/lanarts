@@ -9,6 +9,7 @@
 
 #include "../stats/stat_formulas.h"
 
+#include "parse.h"
 #include "yaml_util.h"
 
 std::vector<const YAML::Node*> flatten_seq_mappings(const YAML::Node & n) {
@@ -57,16 +58,6 @@ const char* parse_cstr(const YAML::Node& n) {
 	std::string s;
 	n >> s;
 	return tocstring(s);
-}
-int parse_int(const YAML::Node& n) {
-	int val;
-	n >> val;
-	return val;
-}
-std::string parse_str(const YAML::Node& n) {
-	std::string s;
-	n >> s;
-	return s;
 }
 
 Range parse_range(const YAML::Node& n) {

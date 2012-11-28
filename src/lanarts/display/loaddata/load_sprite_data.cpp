@@ -6,8 +6,11 @@
 #include <yaml-cpp/yaml.h>
 
 #include <common/lua/luacpp.h>
+#include <common/strformat.h>
+
 #include "../../lua/lua_yaml.h"
 #include "../../data/game_data.h"
+#include "../../data/parse.h"
 #include "../../data/yaml_util.h"
 
 using namespace std;
@@ -22,17 +25,17 @@ static FilenameList parse_imgfilelist(const YAML::Node& node) {
 
 	if (is_seq) {
 		std::string tilefile = parse_str(node["file"]);
+		std::string ext = parse_str(node["extension"]);
 		for (int i = 0; i < seq; i++) {
-			char number[32];
-			snprintf(number, 32, "%d", i);
 			filenames.push_back(
-					tilefile + number + parse_str(node["extension"]));
+					format("%s%d%s", tilefile.c_str(), i, ext.c_str()));
 		}
 	} else {
 		node["file"] >> filenames;
 	}
 	return filenames;
 }
+
 
 void load_tile_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {

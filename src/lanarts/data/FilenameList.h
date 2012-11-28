@@ -1,6 +1,6 @@
 /*
  * FilenameList.h:
- *  Convenient type alias for stl container
+ *  Functions for lists of files, and a convenient type alias for an stl container
  */
 
 #ifndef FILENAMELIST_H_
@@ -10,5 +10,7 @@
 #include <string>
 
 typedef std::vector<std::string> FilenameList;
+
+void filenames_from_pattern(FilenameList & filenames, const std::string& str);
 
 #endif /* FILENAMELIST_H_ */

@@ -171,17 +171,18 @@ void GameTiles::post_draw(GameState* gs) {
 
 			//Do not draw black if we have a match, and we see a wall
 			if (!has_match) {
-				BBox tilebox(Pos(x * TILE_SIZE - view.x,
-								y * TILE_SIZE - view.y), Dim(img.width, img.height));
+				BBox tilebox(
+						Pos(x * TILE_SIZE - view.x, y * TILE_SIZE - view.y),
+						Dim(img.width, img.height));
 				if (!is_other_match) {
 					if (!is_seen(x, y)) {
-						ldraw::draw_rectangle(Colour(0,0,0), tilebox);
+						ldraw::draw_rectangle(Colour(0, 0, 0), tilebox);
 					} else {
 						// Previously seen
-						ldraw::draw_rectangle(Colour(0,0,0, 180), tilebox);
+						ldraw::draw_rectangle(Colour(0, 0, 0, 180), tilebox);
 					}
 				} else {
-					ldraw::draw_rectangle(Colour(0,0,0, 60), tilebox);
+					ldraw::draw_rectangle(Colour(0, 0, 0, 60), tilebox);
 				}
 			}
 		}

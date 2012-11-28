@@ -6,8 +6,12 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
-#include "../AreaTemplate.h"
+#include "../../data/FilenameList.h"
+#include "../../data/parse.h"
 #include "../../data/yaml_util.h"
+
+#include "../../objects/enemy/EnemyEntry.h"
+
 static std::vector<Glyph> load_template_legend(const YAML::Node& root,
 		const char* key) {
 	std::vector<Glyph> glyphs;
@@ -17,7 +21,7 @@ static std::vector<Glyph> load_template_legend(const YAML::Node& root,
 			const YAML::Node& n = node[i];
 			std::string glyph_char = parse_str(n["glyph"]);
 			LANARTS_ASSERT(glyph_char.size() == 1);
-			std::string enemytype = parse_defaulted(n, "enemy", std::string());
+			std::string enemytype = parse_optional(n, "enemy", std::string());
 			glyphs.push_back(
 					Glyph(glyph_char.at(0),
 							get_enemy_by_name(enemytype.c_str())));

@@ -9,6 +9,7 @@
 
 #include "../../lua/lua_yaml.h"
 #include "../../data/game_data.h"
+#include "../../data/parse_with_defaults.h"
 #include "../../data/yaml_util.h"
 
 using namespace std;

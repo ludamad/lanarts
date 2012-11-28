@@ -6,6 +6,7 @@ extern "C" {
 
 #include "../items/ProjectileEntry.h"
 #include "../../data/game_data.h"
+#include "../../data/parse.h"
 #include "../../data/yaml_util.h"
 
 #include "../../lua/lua_yaml.h"
@@ -24,14 +25,14 @@ void parse_projectile_entry(lua_State* L, const YAML::Node& n, ProjectileEntry& 
 		entry.attack.attack_sprite = parse_sprite_number(n, "spr_attack");
 	}
 
-	entry.drop_chance = parse_defaulted(n, "drop_chance", 0);
+	entry.drop_chance = parse_optional(n, "drop_chance", 0);
 	entry.weapon_class = parse_str(n["weapon_class"]);
 
-	entry.speed = parse_defaulted(n, "speed", 4.0f);
-	entry.number_of_target_bounces = parse_defaulted(n,
+	entry.speed = parse_optional(n, "speed", 4.0f);
+	entry.number_of_target_bounces = parse_optional(n,
 			"number_of_target_bounces", 0);
-	entry.can_wall_bounce = parse_defaulted(n, "can_wall_bounce", false);
-	entry.radius = parse_defaulted(n, "radius", 5);
+	entry.can_wall_bounce = parse_optional(n, "can_wall_bounce", false);
+	entry.radius = parse_optional(n, "radius", 5);
 	entry.type = EquipmentEntry::PROJECTILE;
 }
 
