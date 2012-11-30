@@ -18,7 +18,7 @@
 struct lua_State;
 class GameState;
 class GameInst;
-struct ItemEntry;
+class ItemEntry;
 struct EffectEntry;
 struct CombatStats;
 struct EffectiveStats;

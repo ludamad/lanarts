@@ -16,7 +16,7 @@
 
 class GameState;
 class GameChat;
-class GameStateInitData;
+struct GameStateInitData;
 class SerializeBuffer;
 class NetConnection;
 class PlayerData;

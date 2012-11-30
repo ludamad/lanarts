@@ -5,6 +5,8 @@
 
 #include <deque>
 
+#include <common/strformat.h>
+
 #include "../draw/colour_constants.h"
 
 #include "../gamestate/GameAction.h"
@@ -16,7 +18,7 @@ static std::deque<GameAction> loadbuffer;
 
 static std::string find_next_nonexistant(std::string* prev,
 		const std::string& name) {
-	char suffix[32] = ".rep";
+	std::string suffix = ".rep";
 	if (prev) {
 		*prev = name + suffix;
 	}
@@ -27,7 +29,7 @@ static std::string find_next_nonexistant(std::string* prev,
 			return ret;
 		}
 		fclose(f);
-		snprintf(suffix, 32, "%d.rep", tries);
+		format(suffix, "%d.rep", tries);
 		if (prev) {
 			*prev = ret;
 		}

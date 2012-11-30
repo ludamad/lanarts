@@ -14,6 +14,10 @@
 // The preferred assert statement to use, for ease of re-implementation
 #define LANARTS_ASSERT(x) assert(x)
 
+#ifdef _MSC_VER
+#define round(x) floor(x + 0.5f)
+#endif
+
 //TODO remove from lanarts_defines.h
 /*Represents a single square tile*/
 struct Tile {

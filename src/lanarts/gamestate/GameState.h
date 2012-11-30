@@ -34,7 +34,7 @@
 
 struct lua_State;
 class GameLevelState;
-struct GameTiles;
+class GameTiles;
 
 class GameInst;
 class PlayerInst;

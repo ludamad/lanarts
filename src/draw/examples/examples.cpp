@@ -209,4 +209,5 @@ int main(int argc, const char** argv) {
 	draw_loop(draw_script_from_drawable);
 
 	lua_close(L);
+	return 0;
 }

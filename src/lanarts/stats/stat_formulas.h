@@ -7,7 +7,7 @@
 #define STAT_FORMULAS_H_
 
 struct lua_State;
-struct Attack;
+class Attack;
 struct CombatStats;
 struct EffectiveAttackStats;
 struct EffectiveStats;
