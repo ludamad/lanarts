@@ -13,6 +13,6 @@
 struct __FatalError {
 };
 
-void fatal_error();
+void fatal_error(const char* msg = (const char*)0);
 
 #endif /* LCOMMON_FATAL_ERROR_H_ */

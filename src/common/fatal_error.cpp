@@ -5,9 +5,14 @@
  *  recover from basic errors. This error is only caught for testing purposes.
  */
 
+#include <cstdio>
+
 #include "fatal_error.h"
 
-void fatal_error() {
+void fatal_error(const char* msg) {
+	if (msg) {
+		printf("%s", msg);
+	}
 	throw __FatalError();
 }
 

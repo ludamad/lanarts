@@ -57,6 +57,7 @@ set( lcommon_src
     lua/slb.h
     lua/luacpp_wrap_numeric.h
     lua/luacpp_wrap.h
+    lua/luacpp_wrap_function.h
 	
 	random/mtwist.cpp
 	random/mtwist.h
@@ -70,12 +71,12 @@ AUX_SOURCE_DIRECTORY(tests lcommon_tests)
 
 
 add_executable( lcommon_tests
-             ${lcommon_src}
              ${lcommon_tests}
               )
 
 target_link_libraries( 
 			lcommon_tests
+			lcommon
 			lua
 			slb
 )

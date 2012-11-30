@@ -9,8 +9,21 @@
 #include <string>
 
 namespace YAML {
-	class Node;
+class Node;
 }
+
+struct lua_State;
+
+struct GlobalParserContext {
+	GlobalParserContext();
+	void setup(lua_State* L);
+	void finish();
+private:
+	lua_State* L;
+};
+
+
+extern GlobalParserContext global_parser_context;
 
 bool yaml_has_node(const YAML::Node& node, const char* child);
 const YAML::Node* yaml_find_node(const YAML::Node& node, const char* child);
@@ -18,7 +31,7 @@ const YAML::Node* yaml_find_node(const YAML::Node& node, const char* child);
 std::string parse_str(const YAML::Node& node);
 int parse_int(const YAML::Node& node);
 
-template <typename T>
+template<typename T>
 inline T parse(const YAML::Node& node) {
 	T val;
 	node >> val;
@@ -26,7 +39,8 @@ inline T parse(const YAML::Node& node) {
 }
 
 template<class T>
-inline T parse_optional(const YAML::Node& n, const char* key, const T& dflt = T()) {
+inline T parse_optional(const YAML::Node& n, const char* key, const T& dflt =
+		T()) {
 	T ret;
 	if (const YAML::Node* sptr = yaml_find_node(n, key)) {
 		*sptr >> ret;

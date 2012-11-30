@@ -22,13 +22,13 @@ inline void luacpp_push(lua_State* L, const char* key) {
 	lua_pushstring(L, key);
 }
 
-//template<typename T>
-//inline LuaValue luavalue(lua_State* L, const T& value) {
-//	SLB::push<T>(L, value);
-//	LuaValue val(L, -1);
-//	lua_pop(L, 1);
-//	return val;
-//}
+template<typename T>
+inline LuaValue luavalue(lua_State* L, const T& value) {
+	SLB::push<T>(L, value);
+	LuaValue val(L, -1);
+	lua_pop(L, 1);
+	return val;
+}
 
 template<typename T>
 inline LuaValue luacpp(lua_State* L, const T& value) {

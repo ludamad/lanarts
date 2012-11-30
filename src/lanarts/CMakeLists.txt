@@ -30,6 +30,7 @@ set( lanarts_src
 	data/game_data.cpp
 	data/loaddata/load_datafilenames.cpp
 	data/parse.cpp
+	data/parse_context.cpp
 	data/yaml_util.cpp
 	data/FilenameList.cpp
 	
@@ -171,8 +172,6 @@ set( lanarts_src
 	
 	util/game_replays.cpp
 	util/math_util.cpp
-	
-	main.cpp
 )
 
 set( lanarts_include
@@ -183,6 +182,7 @@ set( lanarts_include
 	data/game_data.h
 	data/lua_game_data.h
 	data/parse.h
+	data/parse_context.h
 	data/parse_with_defaults.h
 	data/yaml_util.h
 
@@ -319,6 +319,7 @@ set( lanarts_tests
        tests/tests.h
        tests/tests.cpp
        tests/parse_tests.cpp
+       tests/parse_drawable_tests.cpp
 
        tests/lua_tests.cpp
 
@@ -328,20 +329,32 @@ set( lanarts_tests
        tests/stats/stat_serialize_tests.cpp
 )
 
+add_library( lanartslib
+             ${lanarts_src}
+             ${lanarts_include} 
+            )
 
 add_executable( lanarts
-             ${lanarts_src}
-             ${lanarts_include}
-             ${lanarts_tests} )
+	        main.cpp
+	        )
+	        
+add_executable( lanarts_tests
+             ${lanarts_tests} 
+	        )
+
+add_executable( lanarts_examples
+             tests/examples/lanarts_examples.cpp
+	        )
 
 set (libraries 
+    lanartslib
+	ldraw
+	lcommon
+	lua
+	slb
 	lanarts_net
 	yaml-cpp
 	RVO
-	ldraw
-	lcommon
-	slb
-	lua
 	${OPENGL_gl_LIBRARY}
 	${SDL_LIBRARY}
 	${SDLIMAGE_LIBRARY}
@@ -351,5 +364,12 @@ set (libraries
 )
 
 target_link_libraries( lanarts 
+    ${libraries}
+)
+
+target_link_libraries( lanarts_tests
+    ${libraries}
+)
+target_link_libraries( lanarts_examples
     ${libraries}
 )

@@ -94,13 +94,14 @@ set( ldraw_tests
 
 add_library( ldraw
              ${ldraw_src} )
-add_executable( ldraw_ex ${ldraw_src} ${ldraw_examples} )
+add_executable( ldraw_ex ${ldraw_examples} )
 
 
 target_link_libraries( ldraw_ex
-            lcommon
-            slb
-            lua
+			ldraw
+			lcommon
+			slb
+			lua
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}
 			${SDLIMAGE_LIBRARY}
@@ -108,11 +109,12 @@ target_link_libraries( ldraw_ex
 			${FREETYPE_LIBRARIES}
 			)
 
-add_executable( ldraw_tests ${ldraw_src} ${ldraw_tests} )
+add_executable( ldraw_tests ${ldraw_tests} )
 target_link_libraries( ldraw_tests
+			ldraw
 			lcommon
-            slb
-            lua
+			slb
+			lua
 			${OPENGL_gl_LIBRARY}
 			${SDL_LIBRARY}
 			${SDLIMAGE_LIBRARY}

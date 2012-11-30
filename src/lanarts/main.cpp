@@ -169,7 +169,6 @@ static void game_loop(GameState* gs) {
 }
 
 int main(int argc, char** argv) {
-	run_unit_tests();
 	lua_State* L = lua_open();
 
 	GameSettings settings;
@@ -181,6 +180,7 @@ int main(int argc, char** argv) {
 	//Initialize the game state and start the level
 	//GameState claims ownership of the passed lua_State*
 	GameState* gs = new GameState(settings, L, vieww, viewh);
+
 
 	gs->update_iostate(); //for first iteration
 	int exitcode = main_menu(gs, windoww, windowh);

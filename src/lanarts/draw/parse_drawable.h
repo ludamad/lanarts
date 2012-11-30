@@ -18,11 +18,15 @@ namespace YAML {
 class Node;
 }
 
-void filenames_from_pattern(FilenameList& filenames, const std::string& str);
-
+// Expects map, 'file:' indicates file to load
 ldraw::Image parse_image(const YAML::Node& node);
+
+// Expects map, 'frames:' indicate Drawable frames
 ldraw::Animation parse_animation(const YAML::Node& node);
+
+// Expects map, 'function:' is parsed as lua
 ldraw::LuaDrawable parse_luadrawable(const YAML::Node& node);
+
 ldraw::DirectionalDrawable parse_directional(const YAML::Node& node);
 
 // If node is a string, loads multiple images based on a pattern
@@ -33,8 +37,8 @@ std::vector<ldraw::Drawable> parse_drawable_list(const YAML::Node& node);
 // If node is a list, calls parse_image on individual entries
 std::vector<ldraw::Image> parse_image_list(const YAML::Node& node);
 
-// If node is a string, loads as image
-// If node is a map, 'type:' indicates drawable type
+// Expects map, 'type:' indicates drawable type
+// By default, 'type:' is 'image'
 ldraw::Drawable parse_drawable(const YAML::Node& node);
 
 #endif /* PARSE_DRAWABLE_H_ */

@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include <common/perf_timer.h>
+#include <common/fatal_error.h>
 
 #include "../stats/stat_formulas.h"
 
@@ -140,11 +141,10 @@ void load_data_impl_template(const FilenameList& filenames,
 		fstream file(fname.c_str(), fstream::in | fstream::binary);
 
 		if (!file) {
-			fprintf(
-					stderr,
-					"Fatal error: File %s not found, ensure you are running from directory with res/ folder.\n",
+			fprintf(stderr,
+					"Fatal error: File %s not found, ensure you are running from the directory with res/ folder.\n",
 					fname.c_str());
-			exit(0);
+			fatal_error();
 		}
 
 		if (file) {

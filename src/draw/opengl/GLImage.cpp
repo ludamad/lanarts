@@ -4,6 +4,7 @@
  */
 
 #include <common/math.h>
+#include <common/fatal_error.h>
 
 #include <SDL_opengl.h>
 
@@ -89,13 +90,15 @@ void GLImage::initialize(const std::string& filename) {
 	SDL_Surface* image;
 	GLfloat texcoord[4];
 
-	if (filename.empty() || texture != 0)
+	if (filename.empty() || texture != 0) {
 		return;
+	}
+
 	/* Load the image using SDL_image library */
 	image = IMG_Load(filename.c_str());
 	if (image == NULL) {
 		printf("Image '%s' could not be loaded\n", filename.c_str());
-		return;
+		fatal_error();
 	}
 
 	width = image->w;
@@ -107,6 +110,7 @@ void GLImage::initialize(const std::string& filename) {
 	if (!texture) {
 		printf("Texture from image '%s' could not be loaded\n",
 				filename.c_str());
+		fatal_error();
 	}
 
 	texw = texcoord[2];

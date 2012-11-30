@@ -7,6 +7,7 @@
 #ifndef LUADRAWABLE_H_
 #define LUADRAWABLE_H_
 
+#include <string>
 #include <common/lua/LuaValue.h>
 #include "DrawableBase.h"
 
@@ -18,6 +19,8 @@ class LuaDrawable: public DrawableBase {
 public:
 	LuaDrawable(lua_State* L, const LuaValue& draw_closure = LuaValue(),
 			float _animation_duration = 0);
+	LuaDrawable(lua_State* L, const std::string& draw_closure_src,
+			float _animation_duration = 0);
 	~LuaDrawable();
 
 	void draw(const DrawOptions& options, const Posf& pos) const;
@@ -26,13 +29,16 @@ public:
 		return _animation_duration;
 	}
 
+
 	bool operator==(const LuaDrawable& o) const;
 	bool operator!=(const LuaDrawable& o) const;
 
-
 private:
+	void _push_closure() const;
+
 	lua_State* L;
-	LuaValue draw_closure;
+	mutable LuaValue draw_closure;
+	mutable std::string draw_closure_src; // Cached on first draw operation
 	float _animation_duration;
 };
 
