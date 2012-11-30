@@ -4,12 +4,14 @@
  *  These can be automatically diff'ed to see differences in online play.
  */
 
+#include <common/strformat.h>
+
 #include "GameState.h"
 #include "GameLevelState.h"
 #include "GameLogger.h"
 
 GameLogger::GameLogger() :
-		gs(NULL), input_log_file(NULL), output_log_file(NULL) {
+		gs(NULL), input_log_file(), output_log_file() {
 }
 
 void GameLogger::initialize_logs(GameState* gs, const char* input_log,
@@ -41,23 +43,26 @@ GameLogger::~GameLogger() {
 }
 
 void GameLogger::event_log(const char *fmt, va_list ap) {
+	static std::string logline;
+
 	if (!gs || !output_log_file || gs->get_level()->id() == -1) {
 		va_end(ap);
 		return;
 	}
-	int len = 0;
-	char text[512];
-	len += snprintf(text, sizeof(text), "Frame %d Level %d Hash %X: ",
+	format(logline, "Frame %d Level %d Hash %X: ",
 			gs->frame(), gs->get_level()->id(),
 			gs->get_level()->game_inst_set().hash());
-	vsnprintf(text + len, sizeof(text), fmt, ap);
+	char text[512];
+	vsnprintf(text, sizeof(text), fmt, ap);
 	va_end(ap);
-	output_log_file.write(text, strlen(text));
+
+	logline += text;
+	output_log_file.write(logline.c_str(), logline.size());
 	if (input_log_file) {
 		std::getline(input_log_file, line);
 		if (!line.empty()) {
 			line += '\n';
-			LANARTS_ASSERT(line == text);
+			LANARTS_ASSERT(line == logline);
 		}
 		if (input_log_file.eof()) {
 			input_log_file.close();

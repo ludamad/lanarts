@@ -63,6 +63,8 @@ public:
 	}
 };
 
+// We rely on the GCC semantics of extern template, so ignore if not in GCC:
+#ifdef __GNUC__ 
 
 #define LUACPP_WRAP_AS_NUMARRAY(T, V) \
 		extern template class LuaNumarrayImpl<T, V>; \
@@ -81,5 +83,24 @@ public:
 #define LUACPP_WRAP_AS_NUMARRAY2_IMPL(T,V, allowed_missing, default_value) \
 		template class LuaNumarrayImpl<T, V, allowed_missing, default_value>; \
 		LUACPP_TYPE_WRAP_IMPL(T)
+#else
+
+// The below are copies of the above with 'template...' removed
+
+#define LUACPP_WRAP_AS_NUMARRAY(T, V) \
+		LUACPP_TYPE_WRAP(T, (LuaNumarrayImpl<T, V>::push),(LuaNumarrayImpl<T, V>::get),(LuaNumarrayImpl<T, V>::check))
+
+#define LUACPP_WRAP_AS_NUMARRAY2(T, V, allowed_missing, default_value) \
+		LUACPP_TYPE_WRAP(T, (LuaNumarrayImpl<T, V, allowed_missing, default_value>::push),\
+				(LuaNumarrayImpl<T, V, allowed_missing, default_value>::get),\
+				(LuaNumarrayImpl<T, V, allowed_missing, default_value>::check))
+
+#define LUACPP_WRAP_AS_NUMARRAY_IMPL(T,V) \
+		LUACPP_TYPE_WRAP_IMPL(T)
+
+#define LUACPP_WRAP_AS_NUMARRAY2_IMPL(T,V, allowed_missing, default_value) \
+		LUACPP_TYPE_WRAP_IMPL(T)
+
+#endif
 
 #endif /* LUACPP_WRAP_NUMERIC_H_ */
