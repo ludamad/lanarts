@@ -66,6 +66,7 @@ void char_data::init(char ch, FT_Face face) {
 	if (FT_Get_Glyph(face->glyph, &glyph))
 		throw std::runtime_error("FT_Get_Glyph failed");
 
+
 	// Convert The Glyph To A Bitmap.
 	FT_Glyph_To_Bitmap(&glyph, ft_render_mode_normal, 0, 1);
 	FT_BitmapGlyph bitmap_glyph = (FT_BitmapGlyph)glyph;
@@ -77,9 +78,9 @@ void char_data::init(char ch, FT_Face face) {
 	w = bitmap.width;
 	h = bitmap.rows;
 	move_up = bitmap_glyph->top; //-bitmap.rows;
-
+//
 	data = new unsigned char[4 * w * h];
-	for (int y = 0; y < h; y++)
+	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
 			const int my = y; //h-1-y;
 			data[4 * (x + w * my)] = 255;
@@ -87,6 +88,8 @@ void char_data::init(char ch, FT_Face face) {
 			data[4 * (x + w * my) + 2] = 255;
 			data[4 * (x + w * my) + 3] = bitmap.buffer[x + w * y];
 		}
+	}
+	FT_Done_Glyph(glyph);
 }
 
 char_data::~char_data() {
@@ -99,7 +102,7 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
 	fd->h = h;
 
 	if (FT_Init_FreeType(&library)) {
-		throw std::runtime_error("FT_Init_FreeType failed");
+		throw std::runtime_error(std::string("Font initialization for '") + fname + "' failed!");
 	}
 
 	FT_Face face;
@@ -114,8 +117,7 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
 	//For some twisted reason, Freetype measures font size
 	//in terms of 1/64ths of pixels.  Thus, to make a font
 	//h pixels high, we need to request a size of h*64.
-	//(h << 6 is just a prettier way of writting h*64)
-	FT_Set_Char_Size(face, h << 6, h << 6, 96, 96);
+	FT_Set_Char_Size(face, h * 64, h * 64, 96, 96);
 
 	int maxw = 0;
 	int maxh = 0;
@@ -126,6 +128,7 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
 		maxw += data.w;
 		maxh = std::max(maxh, data.h);
 	}
+
 
 	float ptw = power_of_two(maxw), pth = power_of_two(maxh);
 	fd->font_img.initialize(Dim(ptw, pth));

@@ -211,7 +211,7 @@ LUA_API void lua_replace (lua_State *L, int idx) {
   api_checkvalidindex(L, o);
   if (idx == LUA_ENVIRONINDEX) {
     Closure *func = curr_func(L);
-    api_check(L, ttistable(L->top - 1));
+    api_check(L, ttistable(L->top - 1)); 
     func->c.env = hvalue(L->top - 1);
     luaC_barrier(L, func, L->top - 1);
   }

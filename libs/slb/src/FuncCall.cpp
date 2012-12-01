@@ -64,7 +64,6 @@ namespace SLB {
     }
     catch ( std::exception &e )
     {
-    	printf("Exception squelch\n");
       luaL_error(L, e.what());
     }
     return 0;

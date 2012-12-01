@@ -14,7 +14,7 @@
 #include "FilenameList.h"
 
 bool filenames_from_pattern(FilenameList & filenames, const std::string& str) {
-	size_t pos1 = str.find_first_of("[]");
+	size_t pos1 = str.find_first_of("()");
 
 	if (pos1 == std::string::npos) {
 		filenames.push_back(str);
@@ -22,11 +22,11 @@ bool filenames_from_pattern(FilenameList & filenames, const std::string& str) {
 	}
 
 	int pos2 = -1, min = -1, max = -1;
-	int num_set = sscanf(&str[pos1 + 1], "%d-%d]%n", &min, &max, &pos2);
+	int num_set = sscanf(&str[pos1 + 1], "%d-%d)%n", &min, &max, &pos2);
 
 	if (str[pos1] == ']' || pos2 == -1) {
 		printf("Bad file pattern '%s', expected "
-				"something like 'filename[0-9].png'\n", str.c_str());
+				"something like 'filename(0-9).png'\n", str.c_str());
 		fatal_error();
 	}
 

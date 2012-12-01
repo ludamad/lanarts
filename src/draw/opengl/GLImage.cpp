@@ -81,7 +81,7 @@ static GLuint SDL_GL_LoadTexture(SDL_Surface *surface, GLfloat *texcoord) {
 
 GLImage::~GLImage() {
 	if (texture) {
-		glDeleteTextures(1, (GLuint*)&texture);
+		glDeleteTextures(1, &texture);
 	}
 }
 

@@ -90,7 +90,7 @@ std::vector<Drawable> parse_drawable_list(const YAML::Node& node) {
 	// Error if map
 	if (node.Type() == YAML::NodeType::Map) {
 		throw YAML::RepresentationException(node.GetMark(),
-				"Drawable list expected, map was given.");
+				"Expected list (eg [\"file.png\"]), or pattern (eg \"file(0-9).png\").");
 	}
 
 	// Interpret as file pattern if string
@@ -175,4 +175,3 @@ Drawable parse_drawable(const YAML::Node& node) {
 	}
 
 }
-

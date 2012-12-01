@@ -68,10 +68,11 @@ static bool handle_event(SDL_Event* event) {
 typedef void (*DrawFunc)();
 
 static void draw_loop(DrawFunc draw_func) {
-	ldraw::Font fpsfont("res/sample.ttf", 40);
 	Timer timer;
 	int frames = 0;
+
 	while (1) {
+		ldraw::Font fpsfont("res/sample.ttf", 40);
 		frames += 1;
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
@@ -85,7 +86,7 @@ static void draw_loop(DrawFunc draw_func) {
 		fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::RIGHT_BOTTOM),
 				Posf(400, 400), "%d", int(frames / seconds));
 		ldraw::display_draw_finish();
-		SDL_Delay(5);
+//		SDL_Delay(5);
 	}
 }
 
@@ -97,7 +98,8 @@ static void draw_script() {
 			Posf(0, 400), "Lua");
 }
 static void draw_luascript(lua_State* L, const char* file) {
-	luaL_dofile(L, file);
+	lua_safe_dofile(L, file);
+
 	draw_loop(draw_script);
 	if (lua_tostring(L,-1)) {
 		printf("%s\n", lua_tostring(L,-1));
@@ -147,7 +149,7 @@ int main(int argc, const char** argv) {
 	using namespace ldraw;
 
 	if (argc < 2) {
-		printf("Requires script file to run as argument! Exitting ...\n");
+		printf("Requires script file to run as argument! Exiting ...\n");
 		exit(1);
 	}
 

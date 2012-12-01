@@ -17,6 +17,8 @@ extern "C" {
 #include <vector>
 
 #include <common/SerializeBuffer.h>
+#include <common/strformat.h>
+
 #include <draw/display.h>
 
 #include "../data/game_data.h"
@@ -91,20 +93,29 @@ void GameState::start_connection() {
 	}
 }
 
-void GameState::start_game() {
-	char filename[512];
+static void _event_log_initialize(GameState* gs, GameSettings& settings) {
+
+	std::string input_log_name_buffer;
+
 	const char* input_log = NULL;
 	const char* output_log = NULL;
+
 	if (!settings.comparison_event_log.empty()) {
 		input_log = settings.comparison_event_log.c_str();
 	}
+
 	if (settings.keep_event_log) {
 		time_t t;
 		time(&t);
-		snprintf(filename, sizeof(filename), "logs/game_event_log%d", (int)t);
-		output_log = filename;
+		format(input_log_name_buffer, "logs/game_event_log%d", (int)t);
+		output_log = input_log_name_buffer.c_str();
 	}
-	event_log_initialize(this, input_log, output_log);
+
+	event_log_initialize(gs, input_log, output_log);
+}
+
+void GameState::start_game() {
+	_event_log_initialize(this, settings);
 
 	if (settings.conntype == GameSettings::SERVER) {
 		net_send_game_init_data(connection, player_data(), init_data.seed);

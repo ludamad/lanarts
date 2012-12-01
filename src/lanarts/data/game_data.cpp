@@ -10,6 +10,8 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
+#include <common/lua/lua_lcommon.h>
+
 #include "../lua/lua_api.h"
 
 #include "../stats/items/EquipmentEntry.h"
@@ -253,7 +255,7 @@ void init_lua_data(GameState* gs, lua_State* L) {
 	register_as_global(L, lua_classes, "classes");
 	register_as_global(L, lua_settings, "settings");
 
-	luaL_dofile(L, "res/main.lua");
+	lua_safe_dofile(L, "res/main.lua");
 	__lua_init(L, game_enemy_data);
 	__lua_init(L, game_effect_data);
 	__lua_init(L, game_spell_data);

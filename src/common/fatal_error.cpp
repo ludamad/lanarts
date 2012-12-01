@@ -13,6 +13,8 @@ void fatal_error(const char* msg) {
 	if (msg) {
 		printf("%s", msg);
 	}
+	fflush(stdout);
+	fflush(stderr);
 	throw __FatalError();
 }
 

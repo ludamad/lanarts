@@ -11,7 +11,7 @@
 
 typedef std::vector<std::string> FilenameList;
 
-/** Expands a pattern of the form 'file[0-9].png' into a list of filenames.
+/** Expands a pattern of the form 'file(0-9).png' into a list of filenames.
  *  If the pattern syntax (square brackets) are not found, false is returned,
  *  and only the string is pushed.
  */
