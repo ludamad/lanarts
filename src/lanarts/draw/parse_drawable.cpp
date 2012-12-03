@@ -63,17 +63,75 @@ DirectionalDrawable parse_directional(const YAML::Node& node) {
 	return DirectionalDrawable(parse_drawable_list(*framenode));
 }
 
-static bool filepattern_to_image_list(std::vector<Image>& images,
-		const YAML::Node& node) {
-	FilenameList files;
-	bool was_pattern = filenames_from_pattern(files, parse_str(node));
+static bool parse_image_split_pattern(const std::string& pattern, Dim* size,
+		std::string* filename) {
+	int pos1 = pattern.find('%');
 
-	for (int i = 0; i < files.size(); i++) {
-		images.push_back(Image(files[i]));
+	if (pos1 == std::string::npos) {
+		return false;
 	}
 
-	return was_pattern;
+	int pos2 = -1;
+	int num_set = sscanf(&pattern[pos1 + 1], "%dx%d%n", &size->w, &size->h,
+			&pos2);
+
+	if (pos2 + pos1 + 1 != pattern.size()) {
+		printf("Bad file pattern '%s', expected "
+				"something like 'filename.png%%32x32'\n", pattern.c_str());
+		fatal_error();
+	}
+
+	*filename = pattern.substr(0, pos1);
+
+	return true;
 }
+
+bool filepattern_to_image_list(std::vector<Image>& images,
+		const std::string& pattern) {
+	// Try range pattern
+	FilenameList files;
+	bool was_range_pattern = filenames_from_pattern(files, pattern);
+
+	if (was_range_pattern) {
+		for (int i = 0; i < files.size(); i++) {
+			images.push_back(Image(files[i]));
+		}
+		return true;
+	}
+
+	// Try split pattern
+	Dim size;
+	std::string filename;
+
+	bool was_split_pattern = parse_image_split_pattern(pattern, &size,
+			&filename);
+
+	if (was_split_pattern) {
+		// Split
+		std::vector<Image> split_images = image_split(Image(filename), size);
+
+		for (int i = 0; i < split_images.size(); i++) {
+			images.push_back(split_images[i]);
+		}
+		return true;
+	}
+
+	// Treat as normal filename
+	images.push_back(Image(pattern));
+
+	return false;
+}
+//static bool filepattern_to_image_list(std::vector<Image>& images,
+//		const YAML::Node& node) {
+//	FilenameList files;
+//	bool was_pattern = filenames_from_pattern(files, parse_str(node));
+//
+//	for (int i = 0; i < files.size(); i++) {
+//		images.push_back(Image(files[i]));
+//	}
+//
+//	return was_pattern;
+//}
 
 static void images_to_drawable_list(std::vector<Drawable>& drawable,
 		const std::vector<Image>& images) {
@@ -97,7 +155,7 @@ std::vector<Drawable> parse_drawable_list(const YAML::Node& node) {
 	if (node.Type() == YAML::NodeType::Scalar) {
 		std::vector<Image> images;
 
-		if (!filepattern_to_image_list(images, node)) {
+		if (!filepattern_to_image_list(images, parse_str(node))) {
 			throw YAML::RepresentationException(node.GetMark(),
 					"Expected list (eg [\"file.png\"]), or pattern (eg \"file(0-9).png\").");
 		}
@@ -114,7 +172,7 @@ std::vector<Drawable> parse_drawable_list(const YAML::Node& node) {
 		// Expand any file patterns, or image file names
 		if (child.Type() == YAML::NodeType::Scalar) {
 			std::vector<Image> images;
-			filepattern_to_image_list(images, child);
+			filepattern_to_image_list(images, parse_str(child));
 			images_to_drawable_list(drawables, images);
 		} else {
 			parse_drawable(child);
@@ -131,7 +189,7 @@ std::vector<Image> parse_image_list(const YAML::Node& node) {
 
 	// Interpret as file pattern if string
 	if (node.Type() == YAML::NodeType::Scalar) {
-		if (!filepattern_to_image_list(images, node)) {
+		if (!filepattern_to_image_list(images, parse_str(node))) {
 			throw YAML::RepresentationException(node.GetMark(),
 					"Expected list (eg [\"file.png\"]), or pattern (eg \"file(0-9).png\").");
 		}
@@ -141,7 +199,7 @@ std::vector<Image> parse_image_list(const YAML::Node& node) {
 	// Accumulate from list
 	int size = node.size();
 	for (int i = 0; i < size; i++) {
-		filepattern_to_image_list(images, node[i]);
+		filepattern_to_image_list(images, parse_str(node[i]));
 	}
 
 	return images;

@@ -10,6 +10,7 @@
 
 #include "luacpp_wrap_numeric.h"
 
+
 LUACPP_WRAP_AS_NUMARRAY(Pos, int);
 LUACPP_WRAP_AS_NUMARRAY(Posf, float);
 LUACPP_WRAP_AS_NUMARRAY(Dim, int);

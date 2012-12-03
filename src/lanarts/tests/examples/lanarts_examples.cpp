@@ -86,7 +86,7 @@ static void draw_loop(DrawFunc draw_func) {
 		fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::RIGHT_BOTTOM),
 				Posf(400, 400), "%d", int(frames / seconds));
 		ldraw::display_draw_finish();
-//		SDL_Delay(5);
+		SDL_Delay(5);
 	}
 }
 

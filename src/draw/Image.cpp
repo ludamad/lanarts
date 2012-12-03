@@ -20,13 +20,19 @@ static BBoxF fullimagebounds(const smartptr<GLImage>& image) {
 
 namespace ldraw {
 
-void Image::initialize(const std::string& filename, const BBoxF& draw_region) {
+Image::Image() :
+		_rotates(false) {
+}
+
+void Image::initialize(const std::string& filename, const BBoxF& draw_region,
+		bool rotates) {
 	_image = new GLImage(filename);
 	if (draw_region.empty()) {
 		_draw_region = BBoxF(0, 0, _image->width, _image->height);
 	} else {
 		_draw_region = draw_region;
 	}
+	_rotates = rotates;
 }
 
 Image::Image(const Image & image, const BBoxF & draw_region) :
@@ -34,15 +40,18 @@ Image::Image(const Image & image, const BBoxF & draw_region) :
 	if (_draw_region.empty()) {
 		_draw_region = image.draw_region();
 	}
+	_rotates = image._rotates;
 }
 
-void Image::initialize(const Dim& size, const BBoxF& draw_region) {
+void Image::initialize(const Dim& size, const BBoxF& draw_region,
+		bool rotates) {
 	_image = new GLImage(size);
 	if (draw_region.empty()) {
 		_draw_region = fullimagebounds(_image);
 	} else {
 		_draw_region = draw_region;
 	}
+	_rotates = rotates;
 }
 
 void Image::draw(const DrawOptions& options, const Posf& pos) const {
@@ -55,6 +64,11 @@ void Image::draw(const DrawOptions& options, const Posf& pos) const {
 	adjusted_options.draw_region = region.subregion(
 			_draw_region.scaled(1.0f / width(), 1.0f / height()));
 	adjusted_options.draw_region = _draw_region;
+
+	if (!_rotates) {
+		adjusted_options.draw_angle = 0.0f;
+	}
+
 	return _image->draw(adjusted_options, pos);
 }
 

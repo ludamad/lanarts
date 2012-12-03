@@ -7,6 +7,7 @@ void lua_vector_tests();
 void lua_serialize_tests();
 void strformat_tests();
 void luavalue_tests();
+void luameta_tests();
 
 void run_lcommon_tests() {
 	unit_test_reset_counts();
@@ -17,6 +18,7 @@ void run_lcommon_tests() {
 	lua_serialize_tests();
 	strformat_tests();
 	luavalue_tests();
+	luameta_tests();
 
 	unit_test_print_count();
 }

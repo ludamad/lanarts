@@ -2,7 +2,7 @@ cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lcommon)
 
 #set(CMAKE_BUILD_TYPE Release)
-#set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Debug)
 #add_definitions(-DNDEBUG)
 
 FIND_PACKAGE(SDL REQUIRED)
@@ -57,6 +57,8 @@ set( lcommon_src
     lua/slb.h
     lua/luacpp_wrap_numeric.h
     lua/luacpp_wrap.h
+    lua/luacpp_metatable.cpp
+    lua/luacpp_metatable.h
     lua/luacpp_wrap_function.h
 	
 	random/mtwist.cpp
@@ -67,8 +69,6 @@ add_library( lcommon
              ${lcommon_src} )
 
 AUX_SOURCE_DIRECTORY(tests lcommon_tests) 
-
-
 
 add_executable( lcommon_tests
              ${lcommon_tests}

@@ -13,13 +13,14 @@ extern "C" {
 #include <lua/lua.h>
 }
 
-#define LUACPP_GENERAL_WRAP(ParamTypes, SpecType, T, pushImpl, getImpl, checkImpl) \
+
+#define LUACPP_GENERAL_WRAP(ParamTypes, PassedType, SpecType, T, pushImpl, getImpl, checkImpl) \
 	namespace SLB {	\
 	namespace Private {	\
 	template< ParamTypes > 	\
 	struct Type<SpecType> { \
 		typedef SpecType GetType; \
-		static void push(lua_State *L, const T& p) { \
+		static void push(lua_State *L, PassedType p) { \
 			pushImpl(L, p); \
 		} \
 		static T get(lua_State *L, int idx) { \
@@ -33,19 +34,19 @@ extern "C" {
 	}
 
 // We rely on the GCC semantics of extern template, so ignore if not in GCC:
-#ifdef __GNUC__ 
+#ifdef __GNUC__
 #define LUACPP_TYPE_WRAP(T, pushf, getf, checkf) \
 		extern template T SLB::get<T>(lua_State *L, int pos); \
 		extern template bool SLB::check<T>(lua_State *L, int pos); \
 		extern template void SLB::push<T>(lua_State *L, T v); \
 		extern template bool SLB::check<const T &>(lua_State *L, int pos); \
 		extern template void SLB::push<const T &>(lua_State *L, const T& v); \
-		LUACPP_GENERAL_WRAP(,T, T, pushf, getf, checkf) \
-		LUACPP_GENERAL_WRAP(/*Nothing*/, const T &, T, pushf, getf, checkf)
+		LUACPP_GENERAL_WRAP(, const T&, T, T, pushf, getf, checkf) \
+		LUACPP_GENERAL_WRAP(/*Nothing*/, const T&, const T &, T, pushf, getf, checkf)
 #else
 #define LUACPP_TYPE_WRAP(T, pushf, getf, checkf) \
-		LUACPP_GENERAL_WRAP(,T, T, pushf, getf, checkf) \
-		LUACPP_GENERAL_WRAP(/*Nothing*/, const T &, T, pushf, getf, checkf)
+		LUACPP_GENERAL_WRAP(, const T&, T, T, pushf, getf, checkf) \
+		LUACPP_GENERAL_WRAP(/*Nothing*/,  const T&, const T &, T, pushf, getf, checkf)
 #endif
 
 #ifdef __GNUC__

@@ -1,4 +1,4 @@
-image = image_load("sample.png")
+image = image_load("sample.png", true)
 
 angle = 0.0
 pi = math.pi

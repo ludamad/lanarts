@@ -223,6 +223,13 @@ void _LuaFieldValue::operator =(lua_CFunction func) {
 
 }
 
+LCommonPrivate::_LuaFieldValue::operator LuaValue() {
+	push();
+	LuaValue val(L, -1);
+	lua_pop(L, 1);
+	return val;
+}
+
 void _LuaFieldValue::operator =(const _LuaFieldValue & field) {
 	LCOMMON_ASSERT(L == field.L);
 	field.push();
