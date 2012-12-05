@@ -1,6 +1,8 @@
 #include <SLB/Manager.hpp>
 #include <SLB/Script.hpp>
 
+#include <SLB/LuaCall.hpp>
+
 #include "../lua/lua_unittest.h"
 
 #include "../lua/lua_range.h"
@@ -28,6 +30,26 @@ static void lua_range_bind_test() {
 	lua_close(L);
 }
 
+static void lua_range_call_test() {
+	using namespace SLB;
+	lua_State* L = lua_open();
+	luaL_openlibs(L);
+
+	Manager m;
+	m.registerSLB(L);
+	{
+		const char* code = "function id(a)\n"
+				"return id\n"
+				"end\n";
+
+		lua_assert_valid_dostring(L, code);
+		LuaCall<void(const RangeF&)> call(L, "id");
+		call(RangeF());
+	}
+	lua_close(L);
+}
+
 void lua_range_tests() {
 	UNIT_TEST(lua_range_bind_test);
+	UNIT_TEST(lua_range_call_test);
 }

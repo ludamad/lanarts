@@ -10,8 +10,7 @@
 #include <common/lua/lua_unittest.h>
 
 #include "../Image.h"
-#include "../lua/lua_drawable.h"
-#include "../lua/lua_luadrawable.h"
+#include "../lua/lua_ldraw.h"
 
 static void lua_drawable_bind_test() {
 	using namespace SLB;

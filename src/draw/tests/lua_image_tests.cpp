@@ -5,8 +5,9 @@
 
 #include <SLB/Manager.hpp>
 
-#include <SLB/FuncCall.hpp>
 #include <SLB/LuaCall.hpp>
+#include <SLB/FuncCall.hpp>
+
 #include <common/lua/lua_unittest.h>
 #include <common/lua/LuaValue.h>
 #include "../lua/lua_ldraw.h"

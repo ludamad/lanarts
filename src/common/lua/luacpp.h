@@ -9,15 +9,12 @@
 
 #include <SLB/Type.hpp>
 #include <SLB/PushGet.hpp>
+#include <SLB/SLB_luacpp_hack.h>
 
 #include "../lcommon_assert.h"
 
 #include "LuaValue.h"
 
-template<typename T>
-inline void luacpp_push(lua_State* L, const T& value) {
-	SLB::push<T>(L, value);
-}
 inline void luacpp_push(lua_State* L, const char* key) {
 	lua_pushstring(L, key);
 }
@@ -41,13 +38,9 @@ inline LuaValue luacpp(lua_State* L, const T& value) {
 
 template<typename T>
 inline T luacpp_get(lua_State* L, int pos) {
-	return SLB::get<T>(L, pos);
-}
-
-template<typename T>
-inline void luacpp_get(lua_State* L, int pos, T& value) {
-	LCOMMON_ASSERT(SLB::check<T>(L, pos));
-	value = SLB::get<T>(L, pos);
+	T val;
+	luacpp_get(L, pos, val);
+	return val;
 }
 
 template<typename T>

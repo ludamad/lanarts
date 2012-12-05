@@ -8,7 +8,7 @@
 #include <SLB/FuncCall.hpp>
 #include <common/lua/lua_unittest.h>
 
-#include "../lua/lua_colour.h"
+#include "../lua/lua_ldraw.h"
 
 static void colour_func(const Colour& range) {
 	UNIT_TEST_ASSERT(range == Colour(1,2,3,255));

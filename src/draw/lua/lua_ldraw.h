@@ -6,13 +6,13 @@
 #ifndef LUA_LDRAW_LIB_H_
 #define LUA_LDRAW_LIB_H_
 
+#include "lua_image.h"
 #include <SLB/Manager.hpp>
 #include <SLB/Table.hpp>
 
 #include <common/lua/lua_geometry.h>
 #include <common/lua/lua_range.h>
 
-#include "lua_image.h"
 #include "lua_colour.h"
 #include "lua_drawoptions.h"
 #include "lua_font.h"

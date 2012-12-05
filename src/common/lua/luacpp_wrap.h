@@ -33,7 +33,7 @@ extern "C" {
 	}
 
 // We rely on the GCC semantics of extern template, so ignore if not in GCC:
-#ifdef __GNUC__ 
+#ifdef __GNUC__
 #define LUACPP_TYPE_WRAP(T, pushf, getf, checkf) \
 		extern template T SLB::get<T>(lua_State *L, int pos); \
 		extern template bool SLB::check<T>(lua_State *L, int pos); \
@@ -41,7 +41,7 @@ extern "C" {
 		extern template bool SLB::check<const T &>(lua_State *L, int pos); \
 		extern template void SLB::push<const T &>(lua_State *L, const T& v); \
 		LUACPP_GENERAL_WRAP(,T, T, pushf, getf, checkf) \
-		LUACPP_GENERAL_WRAP(/*Nothing*/, const T &, T, pushf, getf, checkf)
+		LUACPP_GENERAL_WRAP(/*Nothing*/, T const &, T, pushf, getf, checkf)
 #else
 #define LUACPP_TYPE_WRAP(T, pushf, getf, checkf) \
 		LUACPP_GENERAL_WRAP(,T, T, pushf, getf, checkf) \

@@ -192,6 +192,7 @@ int main(int argc, const char** argv) {
 			DimF(480.0f / 6, 120));
 	animation = new Animation(anim_images, 0.1f);
 
+
 	draw_loop(draw_shapes);
 	draw_loop(draw_images);
 	draw_loop(draw_text);

@@ -9,6 +9,7 @@
 #include <SLB/LuaCall.hpp>
 #include <common/lua/lua_unittest.h>
 #include <common/lua/LuaValue.h>
+#include "../lua/lua_ldraw.h"
 
 #include "../Image.h"
 #include "../lua/lua_font.h"

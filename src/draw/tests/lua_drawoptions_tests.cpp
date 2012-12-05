@@ -8,6 +8,7 @@
 
 #include <common/lua/lua_unittest.h>
 #include <common/lua/lua_geometry.h>
+#include "../lua/lua_ldraw.h"
 
 #include <common/lua/LuaValue.h>
 

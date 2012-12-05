@@ -6,10 +6,9 @@
 #include <common/unittest.h>
 #include <common/lua/lua_unittest.h>
 #include <SLB/LuaCall.hpp>
+#include "../lua/lua_ldraw.h"
 
 #include "../Image.h"
-
-#include "../lua/lua_image.h"
 
 static void ldraw_image_test() {
 	using namespace ldraw;
