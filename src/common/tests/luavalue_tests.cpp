@@ -131,5 +131,5 @@ static void lua_perf_test() {
 void luavalue_tests() {
 	UNIT_TEST(luavalue_test_proxy_class);
 	UNIT_TEST(luavalue_test_value_equality);
-	UNIT_TEST(lua_perf_test);
+//	UNIT_TEST(lua_perf_test);
 }

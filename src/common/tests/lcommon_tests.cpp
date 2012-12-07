@@ -7,9 +7,14 @@ void lua_vector_tests();
 void lua_serialize_tests();
 void strformat_tests();
 void luavalue_tests();
+void luawrap_tests();
+void luawrap_function_tests();
 
 void run_lcommon_tests() {
 	unit_test_reset_counts();
+
+	luawrap_tests();
+	luawrap_function_tests();
 
 	lua_geometry_tests();
 	lua_range_tests();

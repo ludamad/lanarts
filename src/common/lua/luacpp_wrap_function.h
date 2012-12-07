@@ -6,6 +6,9 @@
 #ifndef LUACPP_WRAP_FUNCTION_H_
 #define LUACPP_WRAP_FUNCTION_H_
 
+extern "C" {
+#include <lua/lua.h>
+}
 #include <SLB/FuncCall.hpp>
 
 /**

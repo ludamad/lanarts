@@ -2,7 +2,7 @@ cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lcommon)
 
 #set(CMAKE_BUILD_TYPE Release)
-#set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Debug)
 #add_definitions(-DNDEBUG)
 
 FIND_PACKAGE(SDL REQUIRED)
@@ -36,6 +36,15 @@ set( lcommon_src
 	unittest.h
 	strformat.cpp
 	strformat.h
+
+    luawrap/predefined_helper.cpp
+    luawrap/functions.cpp
+    luawrap/types.h
+    luawrap/predefined_helper.h
+    luawrap/types.cpp
+    luawrap/func_helper.h
+    luawrap/luawrap.h
+    luawrap/functions.h
 	
 	lua/lua_geometry.h
 	lua/lua_geometry.cpp
