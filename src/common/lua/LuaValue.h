@@ -51,6 +51,8 @@ struct _LuaFieldValue {
 	template<typename T>
 	operator T();
 
+	operator LuaValue();
+
 	template<typename T>
 	void operator=(const T& value);
 	void operator=(const LuaValue& value);

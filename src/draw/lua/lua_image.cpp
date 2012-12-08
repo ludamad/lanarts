@@ -70,15 +70,28 @@ void Image::push_metatable(lua_State *L) const {
 	lua_getfield(L, LUA_REGISTRYINDEX, IMAGE);
 	if (!lua_isnil(L, -1)) {
 		return; // Cached table is pushed
-	}lua_pop(L, 1);
+	}
+	lua_pop(L, 1);
 	luaL_newmetatable(L, IMAGE);
 	int metatable = lua_gettop(L);
 	lua_pushcfunction(L, luaimage_index);
 	lua_setfield(L, metatable, "__index");
 }
 
-static Image image_load(const std::string & filename) {
-	return Image(filename);
+static int image_load(lua_State *L) {
+	int nargs = lua_gettop(L);
+	bool rotatable = false;
+
+	if (nargs < 1 || nargs > 2) {
+		luaL_error(L, "Invalid usage of image_load(filename [, rotatable])");
+	}
+
+	if (nargs == 2) {
+		rotatable = lua_toboolean(L, 2);
+	}
+
+	lua_pushimage(L, Image(lua_tostring(L, 1), BBoxF(), rotatable));
+	return 1;
 }
 
 void lua_register_image(lua_State *L, const LuaValue & module) {

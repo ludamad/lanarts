@@ -49,10 +49,11 @@ bool lua_check_vector(lua_State *L, int idx) {
 	return valid;
 }
 
-LUACPP_GENERAL_WRAP( typename T, std::vector<T>, std::vector<T>,
-		lua_push_vector<T>, lua_get_vector<T>, lua_check_vector<T>);
+LUACPP_GENERAL_WRAP( typename T, const std::vector<T>&, std::vector<T>,
+		std::vector<T>, lua_push_vector<T>, lua_get_vector<T>,
+		lua_check_vector<T>);
 
-LUACPP_GENERAL_WRAP( typename T, const std::vector<T>&,
+LUACPP_GENERAL_WRAP( typename T, const std::vector<T>&, const std::vector<T>&,
 		std::vector<T>, lua_push_vector<T>, lua_get_vector<T>,
 		lua_check_vector<T>);
 

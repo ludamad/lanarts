@@ -10,6 +10,7 @@ void luavalue_tests();
 void luawrap_tests();
 void luawrap_function_tests();
 void luawrap_type_tests();
+void luameta_tests();
 
 void run_lcommon_tests() {
 	unit_test_reset_counts();
@@ -24,6 +25,7 @@ void run_lcommon_tests() {
 	UNIT_TEST_SUITE(strformat_tests);
 	UNIT_TEST_SUITE(luavalue_tests);
 	UNIT_TEST_SUITE(luawrap_type_tests);
+	UNIT_TEST_SUITE(luameta_tests);
 
 	unit_test_print_count();
 }
