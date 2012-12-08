@@ -26,17 +26,27 @@ struct Callbacks {
 	Callbacks();
 };
 
-template<typename T> class CallbackStore {
+// Generic callback storage
+template<typename T> struct CallbackStore {
 	static Callbacks callbacks;
 };
 
 template<typename T> Callbacks CallbackStore<T>::callbacks;
+
+// Install callbacks in concrete location
 void install_callbacks(Callbacks& cb, push_t pushcallback, get_t getcallback,
 		check_t checkcallback);
 
-template<typename R, R (*func)(lua_State* L, int idx)>
-void getcallback_adapter(lua_State* L, int idx, void* data) {
-	new (data) R(func(L, idx));
+// Adapt common push-format to desired format
+template<typename T, typename Conv, void (*func)(lua_State* L, Conv)>
+static inline void pushcallback_adapter(lua_State* L, const void* data) {
+	func(L, *(const T*)data);
+}
+
+// Adapt common get-format to desired format
+template<typename T, T (*func)(lua_State* L, int idx)>
+static inline void getcallback_adapter(lua_State* L, int idx, void* data) {
+	new (data) T(func(L, idx));
 }
 
 }
@@ -44,13 +54,22 @@ void getcallback_adapter(lua_State* L, int idx, void* data) {
 
 namespace luawrap {
 
-template<typename T, typename V>
-void install_type(void (*pushfunc)(lua_State*, const V*),
-		void (*getfunc)(lua_State*, int, V*),
-		bool (*checkfunc)(lua_State*, int)) {
+template<typename T, void (*pushfunc)(lua_State*, const T&), T (*getfunc)(
+		lua_State* L, int idx), bool (*checkfunc)(lua_State*, int)>
+static inline void install_type() {
 	using namespace _private;
-	install_callbacks(CallbackStore<T>::callbacks, (push_t)pushfunc,
-			(get_t)getfunc, (check_t)checkfunc);
+	install_callbacks(CallbackStore<T>::callbacks,
+			(push_t)pushcallback_adapter<T, const T&, pushfunc>,
+			(get_t)getcallback_adapter<T, getfunc>, (check_t)checkfunc);
+}
+
+template<typename T, void (*pushfunc)(lua_State*, T), T (*getfunc)(lua_State* L,
+		int idx), bool (*checkfunc)(lua_State*, int)>
+static inline void install_type() {
+	using namespace _private;
+	install_callbacks(CallbackStore<T>::callbacks,
+			(push_t)&pushcallback_adapter<T, T, pushfunc>,
+			(get_t)&getcallback_adapter<T, getfunc>, (check_t)checkfunc);
 }
 
 }

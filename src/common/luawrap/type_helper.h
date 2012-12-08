@@ -32,9 +32,9 @@ public:
 		CallbackStore<T>::callbacks.pushcallback(L, (const void*)&val);
 	}
 	static T get(lua_State* L, int idx) {
-		T* valptr = NULL;
-		CallbackStore<T>::callbacks.getcallback(L, idx, (void*)valptr);
-		return *valptr;
+		char valbuffer[sizeof(T)];
+		CallbackStore<T>::callbacks.getcallback(L, idx, (void*)valbuffer);
+		return *(T*)valbuffer;
 	}
 	static bool check(lua_State *L, int idx) {
 		return CallbackStore<T>::callbacks.checkcallback(L, idx);

@@ -37,14 +37,14 @@ set( lcommon_src
 	strformat.cpp
 	strformat.h
 
-    luawrap/predefined_helper.cpp
+    luawrap/type_helper.cpp
+    luawrap/type_helper.h
     luawrap/functions.cpp
+    luawrap/functions.h
     luawrap/types.h
-    luawrap/predefined_helper.h
     luawrap/types.cpp
     luawrap/func_helper.h
     luawrap/luawrap.h
-    luawrap/functions.h
 	
 	lua/lua_geometry.h
 	lua/lua_geometry.cpp

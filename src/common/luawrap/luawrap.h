@@ -5,6 +5,10 @@
  *   - push: push on lua stack
  *   - get: get from lua index
  *   - check: check that index is desired object
+ *
+ *  Basic idea -> const T& and T are value types and operate on callbacks bound to T
+ *  T* and T& are reference types and operate on callbacks bound to T*
+ *
  */
 
 #ifndef LUAWRAP_H_
@@ -63,6 +67,6 @@ inline LuaValue value(lua_State* L, const T& val) {
 
 }
 
-#include "predefined_helper.h"
+#include "type_helper.h"
 
 #endif /* LUAWRAP_H_ */

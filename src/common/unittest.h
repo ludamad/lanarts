@@ -22,6 +22,8 @@ void unit_test_assert(const std::string& msg, bool condition);
 
 bool unit_test(unit_test_function func, const char* fname);
 #define UNIT_TEST(func) unit_test(func, #func )
+bool unit_test_suite(unit_test_function func, const char* fname);
+#define UNIT_TEST_SUITE(func) unit_test_suite(func, #func )
 
 void unit_test_reset_counts();
 void unit_test_print_count();

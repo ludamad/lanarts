@@ -7,7 +7,7 @@
 
 #include <cstdio>
 
-#include "predefined_helper.h"
+#include "type_helper.h"
 
 namespace luawrap {
 namespace _private {

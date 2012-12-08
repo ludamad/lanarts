@@ -9,19 +9,21 @@ void strformat_tests();
 void luavalue_tests();
 void luawrap_tests();
 void luawrap_function_tests();
+void luawrap_type_tests();
 
 void run_lcommon_tests() {
 	unit_test_reset_counts();
 
-	luawrap_tests();
-	luawrap_function_tests();
+	UNIT_TEST_SUITE(luawrap_tests);
+	UNIT_TEST_SUITE(luawrap_function_tests);
 
-	lua_geometry_tests();
-	lua_range_tests();
-	lua_vector_tests();
-	lua_serialize_tests();
-	strformat_tests();
-	luavalue_tests();
+	UNIT_TEST_SUITE(lua_geometry_tests);
+	UNIT_TEST_SUITE(lua_range_tests);
+	UNIT_TEST_SUITE(lua_vector_tests);
+	UNIT_TEST_SUITE(lua_serialize_tests);
+	UNIT_TEST_SUITE(strformat_tests);
+	UNIT_TEST_SUITE(luavalue_tests);
+	UNIT_TEST_SUITE(luawrap_type_tests);
 
 	unit_test_print_count();
 }
