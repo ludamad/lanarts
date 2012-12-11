@@ -7,7 +7,7 @@
 //
 //#include <draw/Drawable.h>
 //
-//#include <common/lua/luacpp.h>
+//#include <luawrap/luawrap.h>
 //#include <common/strformat.h>
 //
 //#include "../../lua/lua_yaml.h"

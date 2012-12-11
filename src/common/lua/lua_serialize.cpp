@@ -1,6 +1,10 @@
 /*
  * Adapted from lmarshal.c:
  * A Lua library for serializing and deserializing Lua values
+ * Original license follows.
+ */
+
+/*
  * Richard Hundt <richardhundt@gmail.com>
  *
  * License: MIT
@@ -32,11 +36,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lualib.h>
-#include <lua/lauxlib.h>
-}
+#include <lua.hpp>
 
 #include "lua_serialize.h"
 #include "../SerializeBuffer.h"
@@ -267,7 +267,8 @@ void mar_encode_value(lua_State *L, mar_Buffer *buf, int val, size_t *idx) {
 				lua_call(L, 1, 1);
 				if (!lua_isfunction(L, -1)) {
 					luaL_error(L, "__persist must return a function");
-				}lua_newtable(L);
+				}
+				lua_newtable(L);
 				lua_pushvalue(L, -2);
 				lua_rawseti(L, -2, 1);
 				lua_remove(L, -2);
@@ -389,7 +390,8 @@ void mar_decode_value(lua_State *L, const char *buf, size_t len, const char **p,
 			for (i = 1; i <= nups; i++) {
 				lua_rawgeti(L, -1, i);
 				lua_setupvalue(L, -3, i);
-			}lua_pop(L, 1);
+			}
+			lua_pop(L, 1);
 			mar_incr_ptr(l);
 		}
 		break;
@@ -560,3 +562,29 @@ void lua_deserialize(SerializeBuffer& serialize, lua_State* L) {
 
 	lua_call(L, 0, 1);
 }
+
+#include <luawrap/LuaValue.h>
+
+void lua_serialize(SerializeBuffer& serializer, lua_State* L,
+		const LuaValue& value) {
+	serializer.write_byte(value.empty());
+
+	if (!value.empty()) {
+		value.push(L);
+		lua_serialize(serializer, L, -1);
+	}
+}
+
+void lua_deserialize(SerializeBuffer& serializer, lua_State* L,
+		LuaValue& value) {
+	bool isnull;
+	serializer.read_byte(isnull);
+
+	if (!isnull) {
+		lua_serialize(serializer, L, -1);
+		value.pop(L);
+	} else {
+		value = LuaValue();
+	}
+}
+

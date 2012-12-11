@@ -4,18 +4,17 @@
  *  Bound with a different metatable based on concrete type.
  */
 
-extern "C" {
-#include <lua/lua.h>
-}
+#include <cstring>
+
+#include <lua.hpp>
 
 #include <stdexcept>
 #include <new>
 
-#include <common/lua/luacpp.h>
-#include <common/lua/lua_geometry.h>
-#include <common/lua/lua_vector.h>
-#include <common/lua/slb.h>
-#include <common/lua/LuaValue.h>
+#include <luawrap/LuaValue.h>
+#include <luawrap/luawrap.h>
+#include <luawrap/types.h>
+#include <luawrap/functions.h>
 
 #include "../Animation.h"
 #include "../DrawableBase.h"
@@ -25,11 +24,7 @@ extern "C" {
 #include "../Image.h"
 
 #include "lua_drawable.h"
-#include "lua_luadrawable.h"
 #include "lua_drawoptions.h"
-
-LUACPP_TYPE_WRAP_IMPL(ldraw::Drawable);
-LUACPP_TYPE_WRAP_IMPL(ldraw::LuaDrawable);
 
 namespace ldraw {
 
@@ -61,8 +56,7 @@ bool lua_checkdrawable(lua_State *L, int idx) {
 
 static int luacfunc_draw(lua_State *L) {
 	using namespace ldraw;
-
-	using namespace SLB;
+	using namespace luawrap;
 
 	const char *LERR_MSG =
 			"Incorrect Image::draw usage, use img:draw(position) or img:draw(options, position)";
@@ -76,7 +70,7 @@ static int luacfunc_draw(lua_State *L) {
 		Posf p = get<Posf>(L, 2);
 		drawable.draw(p);
 	} else if (nargs == 3) {
-		DrawOptions options = luacpp_get<DrawOptions>(L, 2);
+		DrawOptions options = luawrap::get<DrawOptions>(L, 2);
 		Posf p = get<Posf>(L, 3);
 		drawable.draw(options, p);
 	} else {
@@ -109,8 +103,6 @@ int luadrawablebase_index(lua_State *L, const DrawableBase & drawable,
 }
 
 static int luadrawable_index(lua_State *L) {
-	using namespace SLB;
-
 	if (!lua_checkdrawable(L, 1)) {
 		luaL_error(L,
 				"Error indexing supposed Drawable object -- not a Drawable.");
@@ -190,10 +182,14 @@ static int drawable_create(lua_State* L) {
 }
 
 void lua_register_drawables(lua_State *L, const LuaValue & module) {
-	SLB::Manager* m = SLB::getOrCreateManager(L);
+	luawrap::install_type<Drawable, ldraw::lua_pushdrawable,
+			ldraw::lua_getdrawable, ldraw::lua_checkdrawable>();
+	luawrap::install_type<LuaDrawable, lua_pushluadrawable, lua_getluadrawable,
+			lua_checkluadrawable>();
+
 #define BIND_FUNC(f)\
-	SLB::FuncCall::create(f)->push(L); \
-	module.get(L, #f).pop()
+	module.get(L, #f) = luawrap::function(L, f)
+
 	BIND_FUNC(directional_create);
 	BIND_FUNC(animation_create);
 	BIND_FUNC(drawable_create);

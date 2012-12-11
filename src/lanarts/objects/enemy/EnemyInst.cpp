@@ -6,7 +6,7 @@
 #include <cmath>
 #include <typeinfo>
 
-#include <common/lua/LuaValue.h>
+#include <luawrap/LuaValue.h>
 #include <common/SerializeBuffer.h>
 
 #include <draw/draw.h>

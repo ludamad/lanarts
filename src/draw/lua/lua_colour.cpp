@@ -3,16 +3,23 @@
  *  Bindings for Colour
  */
 
-#include <common/lua/LuaValue.h>
-#include <common/lua/luacpp.h>
+#include <luawrap/LuaValue.h>
+#include <luawrap/luawrap.h>
+#include <luawrap/types.h>
 
-#include "lua_colour.h"
+#include <common/lua/lua_numeric_tuple_helper.h>
 
 #include "../colour_constants.h"
 
-LUACPP_WRAP_AS_NUMARRAY2_IMPL(Colour, int, 1 /*allowed missing*/, 255 /*default*/);
+#include "lua_colour.h"
 
-void ldraw::lua_register_colour_constants(lua_State *L, const LuaValue& module) {
+void ldraw::lua_register_colour(lua_State *L,
+		const LuaValue& module) {
+
+	typedef LuaNumericTupleFunctions<Colour, int, 1 /*allowed missing*/, 255 /*default*/> ImplClass;
+	luawrap::install_type<Colour, ImplClass::push, ImplClass::get,
+			ImplClass::check>();
+
 #define BIND_COLOUR(col) \
 	module.get(L, #col) = col
 

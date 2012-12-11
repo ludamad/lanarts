@@ -3,46 +3,46 @@
  *  Test ldraw::image bindings in lua
  */
 
-#include <SLB/Manager.hpp>
+#include <luawrap/testutils.h>
+#include <luawrap/LuaValue.h>
+#include <luawrap/calls.h>
+#include <luawrap/functions.h>
 
-#include <SLB/FuncCall.hpp>
-#include <SLB/LuaCall.hpp>
-#include <common/lua/lua_unittest.h>
-#include <common/lua/LuaValue.h>
+#include <common/unittest.h>
+
 #include "../lua/lua_ldraw.h"
 
 #include "../Image.h"
 #include "../lua/lua_font.h"
 
 static void lua_font_bind_test() {
-	using namespace SLB;
 	using namespace ldraw;
 
-	lua_State* L = lua_open();
-	{
-		Font f;
-		Manager m;
-		m.registerSLB(L);
-		lua_register_font(L, LuaValue(L, LUA_GLOBALSINDEX));
-		m.set("assert", FuncCall::create(unit_test_assert));
+	TestLuaState L;
+	LuaValue globals = LuaValue::globals(L);
 
-		//Cant really test methods, just assert they exist:
-		const char* code2 =
-				"function testFontProperties(font)\n"
-						"SLB.assert('draw does not exist', font.draw ~= nil)\n"
-						"SLB.assert('draw_wrapped does not exist', font.draw_wrapped ~= nil)\n"
-						"SLB.assert('get_draw_size does not exist', font.get_draw_size ~= nil)\n"
-						"end\n";
+	Font f;
+	lua_register_font(L, globals);
 
-		lua_assert_valid_dostring(L, code2);
-		{
-			LuaCall<void(const Font&)> call(L, "testFontProperties");
-			call(f);
-		}
-	}
+	luawrap::push<Font>(L, f);
+	UNIT_TEST_ASSERT(lua_isuserdata(L, -1));
+	lua_pop(L, 1);
 
-	UNIT_TEST_ASSERT(lua_gettop(L) == 0);
-	lua_close(L);
+	globals.get(L, "assert") = luawrap::function(L, unit_test_assert);
+
+	//Cant really test methods, just assert they exist:
+	const char* code2 =
+			"function testFontProperties(font)\n"
+					"assert('draw does not exist', font.draw ~= nil)\n"
+					"assert('draw_wrapped does not exist', font.draw_wrapped ~= nil)\n"
+					"assert('get_draw_size does not exist', font.get_draw_size ~= nil)\n"
+					"end\n";
+
+	lua_assert_valid_dostring(L, code2);
+	globals.get(L, "testFontProperties").push();
+	luawrap::call<void>(L, f);
+
+	L.finish_check();
 }
 
 void lua_font_tests() {

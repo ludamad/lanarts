@@ -7,16 +7,23 @@
 #include <cstring>
 #include <cstdlib>
 
-#include <yaml-cpp/yaml.h>
+#include <luawrap/types.h>
 
-extern "C" {
-#include <lua/lua.h>
-}
+#include <lua.hpp>
+
+#include <yaml-cpp/yaml.h>
 
 #include "../lanarts_defines.h"
 #include "lua_yaml.h"
 
 //YAML related helper functions
+
+// Calls install_type:
+struct __LuaYAMLInitializer {
+	__LuaYAMLInitializer() {
+		luawrap::install_type<YAML::Node, lua_pushyaml>();
+	}
+} __initializer;
 
 static bool nodeis(const YAML::Node& node, const char* str) {
 	return (strcmp(node.Tag().c_str(), str) == 0);

@@ -11,7 +11,7 @@
 #include <string>
 #include <cstdio>
 
-#include <common/lua/LuaValue.h>
+#include <luawrap/LuaValue.h>
 
 #include "../../data/BaseDataEntry.h"
 

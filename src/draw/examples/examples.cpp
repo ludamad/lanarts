@@ -6,17 +6,15 @@
 #include <SDL.h>
 #include <GL/glu.h>
 
-#include <SLB/Script.hpp>
-#include <SLB/LuaCall.hpp>
-#include <SLB/Manager.hpp>
+#include <lua.hpp>
 
 #include <common/Timer.h>
 #include <common/lua/lua_lcommon.h>
-#include <common/lua/LuaValue.h>
-
 #include <common/math.h>
 
-#include <lua/lualib.h>
+#include <luawrap/LuaValue.h>
+#include <luawrap/calls.h>
+#include <luawrap/functions.h>
 
 #include "../lua/lua_ldraw.h"
 
@@ -132,19 +130,20 @@ static void draw_animation() {
 }
 
 lua_State* L;
-SLB::Manager m;
 
 static void draw_script() {
 	ldraw::Font fpsfont("sample.ttf", 40);
-	SLB::LuaCall<void()> drawfunc(L, "draw");
-	drawfunc();
+
+	LuaValue::globals(L).get(L, "draw").push();
+	luawrap::call<void>(L);
+
 	fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::LEFT_BOTTOM),
 			Posf(0, 400), "Lua");
 }
 
 static void draw_script_from_drawable() {
 	using namespace ldraw;
-	using namespace SLB;
+	using namespace luawrap;
 
 	ldraw::Font fpsfont("sample.ttf", 40);
 	lua_getglobal(L, "drawable");
@@ -159,10 +158,9 @@ static void setup_lua_state() {
 	using namespace ldraw;
 
 	L = lua_open();
-	m.registerSLB(L);
 	luaL_openlibs(L);
 
-	LuaValue globals(L, LUA_GLOBALSINDEX);
+	LuaValue globals = LuaValue::globals(L);
 
 	lua_register_ldraw(L, globals);
 	lua_register_lcommon(L, globals);
@@ -191,7 +189,6 @@ int main(int argc, const char** argv) {
 	std::vector<Image> anim_images = image_split(Image("animation.png"),
 			DimF(480.0f / 6, 120));
 	animation = new Animation(anim_images, 0.1f);
-
 
 	draw_loop(draw_shapes);
 	draw_loop(draw_images);

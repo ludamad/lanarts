@@ -3,17 +3,16 @@
  *  Test drawoptions bindings in lua
  */
 
-#include <SLB/Manager.hpp>
-#include <SLB/FuncCall.hpp>
+#include <luawrap/testutils.h>
+#include <luawrap/LuaValue.h>
+#include <luawrap/calls.h>
+#include <luawrap/functions.h>
 
-#include <common/lua/lua_unittest.h>
-#include <common/lua/lua_geometry.h>
+#include <common/unittest.h>
+
+#include "../DrawOptions.h"
+
 #include "../lua/lua_ldraw.h"
-
-#include <common/lua/LuaValue.h>
-
-#include "../lua/lua_colour.h"
-#include "../lua/lua_drawoptions.h"
 
 static void drawoptions_func_defaults(const ldraw::DrawOptions& options) {
 	ldraw::DrawOptions defaults;
@@ -46,38 +45,36 @@ static void drawoptions_func_diffall(const ldraw::DrawOptions& options) {
 static void lua_drawoptions_bind_test() {
 	using namespace ldraw;
 
-	lua_State* L = lua_open();
-	{
-		SLB::Manager m;
-		m.registerSLB(L);
-		LuaValue globals(L, LUA_GLOBALSINDEX);
+	TestLuaState L;
+	LuaValue globals = LuaValue::globals(L);
 
-		lua_register_draworigin_constants(L, globals);
-		m.set("drawoptions_func_difforigin",
-				SLB::FuncCall::create(drawoptions_func_difforigin));
-		m.set("drawoptions_func_defaults",
-				SLB::FuncCall::create(drawoptions_func_defaults));
-		m.set("drawoptions_func_diffall",
-				SLB::FuncCall::create(drawoptions_func_diffall));
-		{
-			const char* code = "SLB.drawoptions_func_defaults({})\n";
-			lua_assert_valid_dostring(L, code);
-		}
-		{
-			const char* code =
-					"SLB.drawoptions_func_difforigin({origin = CENTER})\n";
-			lua_assert_valid_dostring(L, code);
-		}
-		{
-			const char* code =
-					"SLB.drawoptions_func_diffall({color = {1,2,3,4}, region = {1,2,3,4}, "
-							" origin = CENTER, scale = {1,2}, angle = 1, frame = 1})\n";
-			lua_assert_valid_dostring(L, code);
-		}
+	lua_register_ldraw(L, globals);
+
+	globals.get(L, "drawoptions_func_difforigin") = luawrap::function(L,
+			drawoptions_func_difforigin);
+
+	globals.get(L, "drawoptions_func_defaults") = luawrap::function(L,
+			drawoptions_func_defaults);
+
+	globals.get(L, "drawoptions_func_diffall") = luawrap::function(L,
+			drawoptions_func_diffall);
+
+	{
+		const char* code = "drawoptions_func_defaults({})\n";
+		lua_assert_valid_dostring(L, code);
+	}
+	{
+		const char* code = "drawoptions_func_difforigin({origin = CENTER})\n";
+		lua_assert_valid_dostring(L, code);
+	}
+	{
+		const char* code =
+				"drawoptions_func_diffall({color = {1,2,3,4}, region = {1,2,3,4}, "
+						" origin = CENTER, scale = {1,2}, angle = 1, frame = 1})\n";
+		lua_assert_valid_dostring(L, code);
 	}
 
-	UNIT_TEST_ASSERT(lua_gettop(L) == 0);
-	lua_close(L);
+	L.finish_check();
 }
 void lua_drawoptions_tests() {
 	UNIT_TEST(lua_drawoptions_bind_test);

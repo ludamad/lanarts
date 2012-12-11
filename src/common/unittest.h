@@ -28,4 +28,6 @@ bool unit_test_suite(unit_test_function func, const char* fname);
 void unit_test_reset_counts();
 void unit_test_print_count();
 
+int run_unittests();
+
 #endif /* UNITTEST_H_ */

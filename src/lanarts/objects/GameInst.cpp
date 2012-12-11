@@ -8,10 +8,13 @@
  * 		->GameInst::init(GameState) called from add_instance, does further initialization
  */
 
+#include <common/SerializeBuffer.h>
+#include <common/lua/lua_serialize.h>
+
 #include "../display/display.h"
 
 #include "../gamestate/GameState.h"
-#include <common/SerializeBuffer.h>
+
 #include "GameInst.h"
 
 GameInst::~GameInst() {
@@ -51,14 +54,14 @@ void GameInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	//Write the plain-old-data region
 	//Dont save reference count or id
 	SERIALIZE_POD_REGION(serializer, this, last_x, current_level);
-	lua_variables.serialize(gs->get_luastate(), serializer);
+	lua_serialize(serializer, gs->get_luastate(), lua_variables);
 }
 
 void GameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	//Read the plain-old-data region
 	//Dont load reference count or id
 	DESERIALIZE_POD_REGION(serializer, this, last_x, current_level);
-	lua_variables.deserialize(gs->get_luastate(), serializer);
+	lua_deserialize(serializer, gs->get_luastate(), lua_variables);
 }
 
 void GameInst::copy_to(GameInst *inst) const {

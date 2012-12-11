@@ -11,7 +11,7 @@
 
 #include "../data/BaseDataEntry.h"
 
-#include <common/lua/LuaValue.h>
+#include <luawrap/LuaValue.h>
 
 #include "../lua/luaexpr.h"
 #include "../lanarts_defines.h"

@@ -8,7 +8,7 @@
 #define LUADRAWABLE_H_
 
 #include <string>
-#include <common/lua/LuaValue.h>
+#include <luawrap/LuaValue.h>
 #include "DrawableBase.h"
 
 struct lua_State;

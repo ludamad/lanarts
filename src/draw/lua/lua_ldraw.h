@@ -3,25 +3,13 @@
  *  Bindings for the ldraw library in lua.
  */
 
-#ifndef LUA_LDRAW_LIB_H_
-#define LUA_LDRAW_LIB_H_
-
-#include "lua_image.h"
-#include <SLB/Manager.hpp>
-#include <SLB/Table.hpp>
-
-#include <common/lua/lua_geometry.h>
-#include <common/lua/lua_range.h>
-
-#include "lua_colour.h"
-#include "lua_drawoptions.h"
-#include "lua_font.h"
-#include "lua_drawable.h"
+#ifndef LDRAW_LUA_LDRAW_H_
+#define LDRAW_LUA_LDRAW_H_
 
 class LuaValue;
-// Registers functions into table on top of stack
+
 namespace ldraw {
 void lua_register_ldraw(lua_State* L, const LuaValue& module);
 }
 
-#endif /* LUA_LDRAW_LIB_H_ */
+#endif /* LDRAW_LUA_LDRAW_H_ */

@@ -243,7 +243,7 @@ static DimF gl_print_impl(const DrawOptions& options, const font_data& font,
 
 		size.h += font.h;
 
-		for (; i < eol; i++) {
+		for (; i < eol && text[i]; i++) {
 			unsigned char chr = text[i];
 			if (chr == '\n') {
 				continue; //skip newline char

@@ -6,8 +6,7 @@
 #ifndef LUA_YAML_H_
 #define LUA_YAML_H_
 
-#include <common/lua/LuaValue.h>
-#include <common/lua/luacpp.h>
+#include <luawrap/LuaValue.h>
 
 namespace YAML {
 class Node;

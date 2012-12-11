@@ -1,11 +1,10 @@
-#include <SLB/Manager.hpp>
-#include <SLB/Script.hpp>
-
-#include <SLB/LuaCall.hpp>
-
-#include "../lua/lua_unittest.h"
+#include <luawrap/luawrap.h>
+#include <luawrap/functions.h>
+#include <luawrap/calls.h>
+#include <luawrap/testutils.h>
 
 #include "../lua/lua_range.h"
+#include "../unittest.h"
 
 static void range_func(const Range& range) {
 	UNIT_TEST_ASSERT(range == Range(1,2));
@@ -15,38 +14,30 @@ static void rangef_func(const RangeF& rangef) {
 }
 
 static void lua_range_bind_test() {
-	lua_State* L = lua_open();
-	luaL_openlibs(L);
+	TestLuaState L;
+	LuaValue globals = LuaValue::globals(L);
+	lua_register_range(L, globals);
 
-	SLB::Manager m;
-	m.registerSLB(L);
-	{
-		m.set("range_func", SLB::FuncCall::create(range_func));
-		m.set("rangef_func", SLB::FuncCall::create(rangef_func));
-		const char* code = "SLB.range_func({1,2})\n"
-				"SLB.rangef_func({.5,1.5})\n";
-		lua_assert_valid_dostring(L, code);
-	}
-	lua_close(L);
+	globals.get(L, "range_func") = luawrap::function(L, range_func);
+	globals.get(L, "rangef_func") = luawrap::function(L, rangef_func);
+	const char* code = "range_func({1,2})\n"
+			"rangef_func({.5,1.5})\n";
+	lua_assert_valid_dostring(L, code);
 }
 
 static void lua_range_call_test() {
-	using namespace SLB;
-	lua_State* L = lua_open();
-	luaL_openlibs(L);
+	TestLuaState L;
+	LuaValue globals = LuaValue::globals(L);
+	lua_register_range(L, globals);
 
-	Manager m;
-	m.registerSLB(L);
-	{
-		const char* code = "function id(a)\n"
-				"return id\n"
-				"end\n";
+	const char* code = "function id(a)\n"
+			"return id\n"
+			"end\n";
 
-		lua_assert_valid_dostring(L, code);
-		LuaCall<void(const RangeF&)> call(L, "id");
-		call(RangeF());
-	}
-	lua_close(L);
+	lua_assert_valid_dostring(L, code);
+
+	globals.get(L, "id").push();
+	luawrap::call<void>(L, RangeF());
 }
 
 void lua_range_tests() {

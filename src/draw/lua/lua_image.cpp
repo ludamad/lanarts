@@ -4,12 +4,14 @@
  * 	A specialization of the bindings for Drawable
  */
 
+#include <cstring>
 #include <new>
 
-#include <common/lua/luacpp.h>
-#include <common/lua/LuaValue.h>
-#include <common/lua/lua_geometry.h>
-#include <common/lua/lua_vector.h>
+#include <lua.hpp>
+
+#include <luawrap/LuaValue.h>
+#include <luawrap/functions.h>
+#include <luawrap/types.h>
 
 #include "../DrawableBase.h"
 #include "../ldraw_assert.h"
@@ -18,8 +20,6 @@
 #include "lua_drawable.h"
 #include "lua_drawoptions.h"
 #include "lua_image.h"
-
-LUACPP_TYPE_WRAP_IMPL(ldraw::Image);
 
 namespace ldraw {
 
@@ -34,6 +34,10 @@ const Image& lua_getimage(lua_State* L, int idx) {
 	return *img;
 }
 
+Image lua_getimage2(lua_State* L, int idx) {
+	return lua_getimage(L, idx);
+}
+
 bool lua_checkimage(lua_State* L, int idx) {
 	if (lua_type(L, idx) != LUA_TUSERDATA) {
 		return false;
@@ -44,8 +48,6 @@ bool lua_checkimage(lua_State* L, int idx) {
 static const char IMAGE[] = "LDraw::Image";
 static int luaimage_index(lua_State *L) {
 	using namespace ldraw;
-
-	using namespace SLB;
 
 	if (!lua_checkimage(L, 1)) {
 		luaL_error(L, "Error indexing supposed Image object -- not an image.");
@@ -58,7 +60,7 @@ static int luaimage_index(lua_State *L) {
 	} else if (strcmp(member, "height") == 0) {
 		lua_pushnumber(L, image.height());
 	} else if (strcmp(member, "size") == 0) {
-		luacpp_push(L, image.size());
+		luawrap::push(L, image.size());
 	} else {
 		return luadrawablebase_index(L, image, member);
 	}
@@ -95,9 +97,11 @@ static int image_load(lua_State *L) {
 }
 
 void lua_register_image(lua_State *L, const LuaValue & module) {
+	luawrap::install_type<ldraw::Image, lua_pushimage, lua_getimage2,
+			lua_checkimage>();
+
 #define BIND_FUNC(f)\
-	SLB::FuncCall::create(f)->push(L); \
-	module.get(L, #f).pop()
+	module.get(L, #f) = luawrap::function(L, f);
 
 	BIND_FUNC(image_load);
 	BIND_FUNC(image_split);

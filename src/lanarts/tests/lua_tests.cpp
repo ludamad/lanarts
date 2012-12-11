@@ -5,7 +5,7 @@ extern "C" {
 
 #include <common/unittest.h>
 
-#include <common/lua/LuaValue.h>
+#include <luawrap/LuaValue.h>
 
 
 void lua_unit_tests() {

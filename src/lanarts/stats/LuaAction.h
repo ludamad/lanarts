@@ -6,7 +6,7 @@
 #ifndef LUAACTION_H_
 #define LUAACTION_H_
 
-#include <common/lua/LuaValue.h>
+#include <luawrap/LuaValue.h>
 
 #include "../lua/luaexpr.h"
 

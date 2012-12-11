@@ -7,11 +7,12 @@ set(CMAKE_BUILD_TYPE Debug)
 
 FIND_PACKAGE(SDL REQUIRED)
 
-set( SRC ../)
+set( SRC "..")
 set( LIBS ../../libs)
 include_directories(${SDL_INCLUDE_DIR}
-	${LIBS} #/lua 
-	${LIBS}/slb/include
+	${LIBS}/UnitTest++ 
+	${LIBS}/lua 
+	../luawrap/include
 )
 
 
@@ -36,15 +37,6 @@ set( lcommon_src
 	unittest.h
 	strformat.cpp
 	strformat.h
-
-    luawrap/type_helper.cpp
-    luawrap/type_helper.h
-    luawrap/functions.cpp
-    luawrap/functions.h
-    luawrap/types.h
-    luawrap/types.cpp
-    luawrap/func_helper.h
-    luawrap/luawrap.h
 	
 	lua/lua_geometry.h
 	lua/lua_geometry.cpp
@@ -52,23 +44,11 @@ set( lcommon_src
 	lua/lua_lcommon.cpp
     lua/lua_range.cpp
     lua/lua_range.h
-    lua/LuaValue.h
-    lua/LuaValue.cpp
     lua/lua_serialize.h
     lua/lua_serialize.cpp
     lua/lua_timer.cpp
     lua/lua_timer.h
-    lua/lua_unittest.cpp
-    lua/lua_unittest.h
-    lua/lua_vector.h
-    lua/slb_funcproperty.h
-    lua/slb_mutabletable.h
-    lua/slb.h
-    lua/luacpp_wrap_numeric.h
-    lua/luacpp_wrap.h
-    lua/luacpp_metatable.cpp
-    lua/luacpp_metatable.h
-    lua/luacpp_wrap_function.h
+    lua/lua_numeric_tuple_helper.h
 	
 	random/mtwist.cpp
 	random/mtwist.h
@@ -86,6 +66,7 @@ add_executable( lcommon_tests
 target_link_libraries( 
 			lcommon_tests
 			lcommon
+			UnitTest++
+			luawrap
 			lua
-			slb
 )

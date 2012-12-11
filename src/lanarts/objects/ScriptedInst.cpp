@@ -8,7 +8,7 @@
  */
 
 #include <typeinfo>
-#include <common/lua/LuaValue.h>
+#include <luawrap/LuaValue.h>
 
 #include "../lua/lua_gameinst.h"
 #include "../gamestate/GameState.h"

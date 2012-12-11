@@ -6,7 +6,7 @@
 #ifndef GAME_DATA_H_
 #define GAME_DATA_H_
 
-#include <common/lua/LuaValue.h>
+#include <luawrap/LuaValue.h>
 
 #include "../display/sprite_data.h"
 

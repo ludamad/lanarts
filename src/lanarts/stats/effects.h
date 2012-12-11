@@ -1,7 +1,7 @@
 #ifndef EFFECTS_H
 #define EFFECTS_H
 
-#include <common/lua/LuaValue.h>
+#include <luawrap/LuaValue.h>
 #include <draw/Colour.h>
 
 #include "../lanarts_defines.h"

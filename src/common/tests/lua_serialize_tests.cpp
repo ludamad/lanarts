@@ -1,11 +1,11 @@
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-}
+#include <lua.hpp>
+
+#include <luawrap/LuaValue.h>
+
+#include "../lua/lua_serialize.h"
 
 #include "../unittest.h"
 
-#include "../lua/LuaValue.h"
 #include "../SerializeBuffer.h"
 
 static lua_State* L;
@@ -18,9 +18,9 @@ static void lua_serialize_number() {
 	lua_pushnumber(L, testnumber);
 
 	value.pop(L);
-	value.serialize(L, serializer);
+	lua_serialize(serializer, L, value);
 
-	result.deserialize(L, serializer);
+	lua_deserialize(serializer, L, result);
 	result.push(L);
 
 	UNIT_TEST_ASSERT(lua_isnumber(L, -1));
@@ -43,9 +43,9 @@ static void lua_serialize_table() {
 		//serialize it
 		LuaValue value, result;
 		value.pop(L);
-		value.serialize(L, serializer);
+		lua_serialize(serializer, L, value);
 		//deserialize it
-		result.deserialize(L, serializer);
+		lua_deserialize(serializer, L, result);
 		result.push(L);
 	}
 
@@ -59,8 +59,8 @@ static void lua_serialize_table() {
 static void lua_serialize_novalue() {
 	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
 	LuaValue value, result;
-	value.serialize(L, serializer);
-	result.deserialize(L, serializer);
+	lua_serialize(serializer, L, value);
+	lua_deserialize(serializer, L, result);
 	result.push(L);
 	UNIT_TEST_ASSERT(lua_isnil(L, -1));
 
@@ -81,8 +81,8 @@ static void lua_serialize_nested_table() {
 		//serialize it
 		LuaValue value, result;
 		value.pop(L);
-		value.serialize(L, serializer);
-		result.deserialize(L, serializer);
+		lua_serialize(serializer, L, value);
+		lua_deserialize(serializer, L, result);
 		result.push(L);
 	}
 

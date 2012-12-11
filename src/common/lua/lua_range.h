@@ -8,9 +8,10 @@
 
 #include "../Range.h"
 
-#include "luacpp_wrap_numeric.h"
+struct lua_State;
+class LuaValue;
 
-LUACPP_WRAP_AS_NUMARRAY(Range, int);
-LUACPP_WRAP_AS_NUMARRAY(RangeF, float);
+// lua state & module is not currently used but passed for future-proofing
+void lua_register_range(lua_State* L, const LuaValue& module);
 
 #endif /* LUA_RANGE_H_ */

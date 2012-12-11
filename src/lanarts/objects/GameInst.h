@@ -14,7 +14,7 @@
 
 #include <cassert>
 
-#include <common/lua/LuaValue.h>
+#include <luawrap/LuaValue.h>
 #include <common/geometry.h>
 
 #include "../lanarts_defines.h"

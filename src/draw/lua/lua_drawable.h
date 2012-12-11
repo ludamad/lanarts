@@ -7,13 +7,9 @@
 #ifndef LRAW_LUA_DRAWABLE_H_
 #define LRAW_LUA_DRAWABLE_H_
 
-#include <common/lua/luacpp_wrap.h>
 #include "../Drawable.h"
 
 class LuaValue;
-
-LUACPP_TYPE_WRAP(ldraw::Drawable, ldraw::lua_pushdrawable,
-		ldraw::lua_getdrawable, ldraw::lua_checkdrawable);
 
 namespace ldraw {
 int luadrawablebase_index(lua_State* L, const DrawableBase& drawable,

@@ -5,7 +5,7 @@ extern "C" {
 
 #include <common/unittest.h>
 
-#include <common/lua/LuaValue.h>
+#include <luawrap/LuaValue.h>
 #include <common/SerializeBuffer.h>
 
 //TODO

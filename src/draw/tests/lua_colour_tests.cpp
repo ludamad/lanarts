@@ -3,10 +3,15 @@
  *  Test colour bindings in lua
  */
 
-#include <SLB/Manager.hpp>
+#include <lua.hpp>
 
-#include <SLB/FuncCall.hpp>
-#include <common/lua/lua_unittest.h>
+#include <common/unittest.h>
+
+#include <luawrap/testutils.h>
+#include <luawrap/LuaValue.h>
+#include <luawrap/functions.h>
+
+#include "../Colour.h"
 
 #include "../lua/lua_ldraw.h"
 
@@ -15,30 +20,30 @@ static void colour_func(const Colour& range) {
 }
 
 static void lua_colour_bind_test() {
-	lua_State* L = lua_open();
+	TestLuaState L;
 
-	SLB::Manager m;
-	m.registerSLB(L);
-	m.set("colour_func", SLB::FuncCall::create(colour_func));
+	LuaValue globals = LuaValue::globals(L);
+
+	ldraw::lua_register_ldraw(L, globals);
+
+	globals.get(L, "colour_func") = luawrap::function(L, colour_func);
 	{
-		const char* code = "SLB.colour_func({1,2,3,255})\n";
+		const char* code = "colour_func({1,2,3,255})\n";
 		lua_assert_valid_dostring(L, code);
 	}
 	{
-		const char* code = "SLB.colour_func({1,2,3})\n";
+		const char* code = "colour_func({1,2,3})\n";
 		lua_assert_valid_dostring(L, code);
 	}
 	{
-		const char* code = "SLB.colour_func({1,2})\n";
+		const char* code = "colour_func({1,2})\n";
 		lua_assert_invalid_dostring(L, code);
 	}
 	{
-		const char* code = "SLB.colour_func({1,2,3,255,255})\n";
+		const char* code = "colour_func({1,2,3,255,255})\n";
 		lua_assert_invalid_dostring(L, code);
 	}
-
-	UNIT_TEST_ASSERT(lua_gettop(L) == 0);
-	lua_close(L);
+	L.finish_check();
 }
 void lua_colour_tests() {
 	UNIT_TEST(lua_colour_bind_test);

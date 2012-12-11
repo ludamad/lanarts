@@ -18,12 +18,8 @@ include_directories(
 	${OpenGL_INCLUDE_DIRS} 		
 	${FREETYPE_INCLUDE_DIRS} 
 	${SRC} #/common 
-	${LIBS} #/lua 
-	${LIBS}/slb/include
-)
-
-set( ldraw_examples
-    examples/examples.cpp
+	${LIBS}/lua
+	../luawrap/include
 )
 
 set( ldraw_src
@@ -78,7 +74,11 @@ set( ldraw_src
     lua/lua_image.cpp
 )
 
+set( ldraw_examples
+    examples/examples.cpp
+)
 set( ldraw_tests
+
     tests/animation_tests.cpp
     tests/directionaldrawable_tests.cpp
     tests/DrawableMock.h
@@ -94,30 +94,21 @@ set( ldraw_tests
 
 add_library( ldraw
              ${ldraw_src} )
+
+set(LINKEDLIBS
+	ldraw
+	luawrap
+	lcommon
+	lua
+	${OPENGL_gl_LIBRARY}
+	${SDL_LIBRARY}
+	${SDLIMAGE_LIBRARY}
+	${SDLMAIN_LIBRARY}
+	${FREETYPE_LIBRARIES}
+)
+
 add_executable( ldraw_ex ${ldraw_examples} )
-
-
-target_link_libraries( ldraw_ex
-			ldraw
-			lcommon
-			slb
-			lua
-			${OPENGL_gl_LIBRARY}
-			${SDL_LIBRARY}
-			${SDLIMAGE_LIBRARY}
-			${SDLMAIN_LIBRARY}
-			${FREETYPE_LIBRARIES}
-			)
-
 add_executable( ldraw_tests ${ldraw_tests} )
-target_link_libraries( ldraw_tests
-			ldraw
-			lcommon
-			slb
-			lua
-			${OPENGL_gl_LIBRARY}
-			${SDL_LIBRARY}
-			${SDLIMAGE_LIBRARY}
-			${SDLMAIN_LIBRARY}
-			${FREETYPE_LIBRARIES}
-			)
+
+target_link_libraries( ldraw_ex ${LINKEDLIBS} )
+target_link_libraries( ldraw_tests ${LINKEDLIBS} UnitTest++ )

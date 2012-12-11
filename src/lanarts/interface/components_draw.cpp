@@ -24,7 +24,8 @@ void draw_setting_box(GameState* gs, const BBox& bbox, const Colour& bbox_col,
 
 	using namespace ldraw;
 	const Font& font = gs->font();
-	font.draw_wrapped(text_col, pos, bbox.width() - TILE_SIZE, text);
+	font.draw_wrapped(DrawOptions().origin(LEFT_CENTER).colour(text_col), pos,
+			bbox.width() - TILE_SIZE, text);
 
 	draw_rectangle_outline(bbox_col, bbox);
 }

@@ -7,7 +7,7 @@
 #define SKILL_DATA_H_
 
 #include <string>
-#include <common/lua/LuaValue.h>
+#include <luawrap/LuaValue.h>
 
 struct SkillEntry {
 	std::string name;

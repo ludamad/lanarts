@@ -3,13 +3,14 @@
  *  Lua bindings for lcommon library
  */
 
-#include <SLB/Manager.hpp>
-#include <SLB/Table.hpp>
+
+#include <lua.hpp>
+#include <luawrap/LuaValue.h>
 
 #include "../fatal_error.h"
 
 #include "lua_timer.h"
-#include "LuaValue.h"
+#include "lua_geometry.h"
 
 static int lua_error_handler(lua_State* L) {
 	int nargs = lua_gettop(L);
@@ -27,7 +28,6 @@ static int lua_error_handler(lua_State* L) {
 }
 
 void lua_safe_dostring(lua_State* L, const char* code) {
-	int stackn = lua_gettop(L);
 	if (luaL_dostring(L, code)) {
 		std::string failmsg;
 
@@ -47,7 +47,8 @@ void lua_safe_dofile(lua_State* L, const char* fname) {
 		exit(0);
 	}
 	if (lua_pcall(L, 0, 0, 0)) {
-		printf("Fatal error when running lua file %s:\n%s\n", fname, lua_tostring(L, -1));
+		printf("Fatal error when running lua file %s:\n%s\n", fname,
+				lua_tostring(L, -1));
 		fatal_error();
 	}
 
@@ -64,5 +65,7 @@ void lua_register_lcommon(lua_State* L, const LuaValue& module) {
 	lua_register_timer(L, module);
 	lua_pushcfunction(L, lua_safe_dofile);
 	lua_setglobal(L, "dofile");
+
+	lua_register_geometry(L, module);
 }
 

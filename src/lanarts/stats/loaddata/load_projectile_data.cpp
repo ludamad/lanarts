@@ -4,6 +4,8 @@ extern "C" {
 
 #include <fstream>
 
+#include <luawrap/luawrap.h>
+
 #include "../items/ProjectileEntry.h"
 #include "../../data/game_data.h"
 #include "../../data/parse.h"

@@ -3,9 +3,11 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
+#include <luawrap/luawrap.h>
+
 #include <common/geometry.h>
 #include <common/SerializeBuffer.h>
-#include <common/lua/luacpp.h>
+#include <common/lua/lua_serialize.h>
 
 #include "../data/lua_game_data.h"
 #include "../gamestate/GameState.h"
@@ -203,7 +205,7 @@ void EffectStats::serialize(GameState* gs, SerializeBuffer& serializer) {
 
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		serializer.write_int(effects[i].effectid);
-		effects[i].state.serialize(L, serializer);
+		lua_serialize(serializer, L, effects[i].state);
 		serializer.write_int(effects[i].t_remaining);
 	}
 }
@@ -213,7 +215,7 @@ void EffectStats::deserialize(GameState* gs, SerializeBuffer& serializer) {
 
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		serializer.read_int(effects[i].effectid);
-		effects[i].state.deserialize(L, serializer);
+		lua_deserialize(serializer, L, effects[i].state);
 		if (!effects[i].state.isnil(L)) {
 			lua_init_metatable(L, effects[i].state, effects[i].effectid);
 		}

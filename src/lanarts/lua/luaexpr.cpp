@@ -4,7 +4,7 @@
  */
 
 #include <cstdio>
-#include <common/lua/LuaValue.h>
+#include <luawrap/LuaValue.h>
 #include <common/perf_timer.h>
 
 #include "../lanarts_defines.h"

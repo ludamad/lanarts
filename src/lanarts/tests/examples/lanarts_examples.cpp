@@ -6,21 +6,17 @@
 #include <SDL.h>
 #include <GL/glu.h>
 
-extern "C" {
-#include <lua/lualib.h>
-}
+#include <lua.hpp>
 
 #include <yaml-cpp/yaml.h>
 
-#include <SLB/Script.hpp>
-#include <SLB/LuaCall.hpp>
-#include <SLB/Manager.hpp>
-
 #include <common/math.h>
 #include <common/Timer.h>
-#include <common/lua/LuaValue.h>
-#include <common/lua/luacpp.h>
-#include <common/lua/luacpp_wrap_function.h>
+
+#include <luawrap/LuaValue.h>
+#include <luawrap/luawrap.h>
+#include <luawrap/functions.h>
+#include <luawrap/calls.h>
 
 #include <common/lua/lua_lcommon.h>
 
@@ -92,8 +88,9 @@ static void draw_loop(DrawFunc draw_func) {
 
 static void draw_script() {
 	ldraw::Font fpsfont("res/sample.ttf", 40);
-	SLB::LuaCall<void()> drawfunc(L, "draw");
-	drawfunc();
+	LuaValue::globals(L).get(L, "draw").push();
+	luawrap::call<void>(L);
+
 	fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::LEFT_BOTTOM),
 			Posf(0, 400), "Lua");
 }
@@ -126,7 +123,6 @@ static std::vector<ldraw::Drawable> drawablelist_parse(const std::string& str) {
 	return parse_drawable_list(root);
 }
 
-
 static void setup_lua_state() {
 	using namespace ldraw;
 
@@ -140,8 +136,9 @@ static void setup_lua_state() {
 
 	// Expose additional functions needed for examples
 	// This allows us to code the examples fully in lua:
-	globals.get(L, "drawable_parse") = luavalue_from_function(L, drawable_parse);
-	globals.get(L, "drawablelist_parse") = luavalue_from_function(L, drawablelist_parse);
+	globals.get(L, "drawable_parse") = luawrap::function(L, drawable_parse);
+	globals.get(L, "drawablelist_parse") = luawrap::function(L,
+			drawablelist_parse);
 
 }
 

@@ -8,15 +8,10 @@
 
 #include "../geometry.h"
 
-#include "luacpp_wrap_numeric.h"
+struct lua_State;
+class LuaValue;
 
-
-LUACPP_WRAP_AS_NUMARRAY(Pos, int);
-LUACPP_WRAP_AS_NUMARRAY(Posf, float);
-LUACPP_WRAP_AS_NUMARRAY(Dim, int);
-LUACPP_WRAP_AS_NUMARRAY(DimF, float);
-LUACPP_WRAP_AS_NUMARRAY(BBox, int);
-LUACPP_WRAP_AS_NUMARRAY(BBoxF, float);
-
+// lua state & module is not currently used but passed for future-proofing
+void lua_register_geometry(lua_State* L, const LuaValue& module);
 
 #endif /* LUA_GEOMETRY_H_ */

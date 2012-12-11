@@ -3,36 +3,23 @@
  *  Test metatable binding helpers
  */
 
+#include <lua.hpp>
+
+#include <luawrap/luawrap.h>
+#include <luawrap/luameta.h>
+#include <luawrap/functions.h>
+#include <luawrap/members.h>
+#include <luawrap/types.h>
+#include <luawrap/testutils.h>
+
 #include "../unittest.h"
-#include "../lua/lua_unittest.h"
-
-#include "../lua/luacpp.h"
-#include "../lua/luacpp_wrap.h"
-#include "../lua/luacpp_wrap_function.h"
-#include "../lua/luacpp_metatable.h"
-
-static LuaValue foo_newmetatable(lua_State* L);
 
 struct Foo {
 	int bar;
 
-	static Foo& get(lua_State* L, int idx) {
-		return *(Foo*)lua_touserdata(L, idx);
-	}
-	static void push(lua_State* L, const Foo& foo) {
-		Foo* f = (Foo*)lua_newuserdata(L, sizeof(Foo));
-		*f = foo;
-		luameta_pushcached(L, foo_newmetatable);
-		lua_setmetatable(L, -2);
-	}
-	static bool check(lua_State* L, int idx) {
-		return lua_isuserdata(L, idx);
-	}
-
 	int& get_bar() {
 		return bar;
 	}
-
 	void set_bar(int b) {
 		bar = b;
 	}
@@ -43,23 +30,45 @@ struct Foo {
 
 };
 
-//LUACPP_TYPE_WRAP(Foo*, Foo::push, Foo::get, Foo::check);
-LUACPP_GENERAL_WRAP(, const Foo&, Foo&, Foo&, Foo::push, Foo::get, Foo::check);
-LUACPP_GENERAL_WRAP(, const Foo&, Foo, Foo, Foo::push, Foo::get, Foo::check);
-//LUACPP_TYPE_WRAP_IMPL(Foo*);
-
-static LuaValue foo_newmetatable(lua_State* L) {
+LuaValue foo_newmetatable(lua_State* L) {
 	LuaValue metatable = luameta_new(L, "Foo");
-	luameta_member<Foo, int, &Foo::bar>(L, metatable, "bar");
-	luameta_member<Foo, int, &Foo::get_bar>(L, metatable, "bar2");
-	luameta_setter_member<Foo, int, &Foo::set_bar>(L, metatable, "bar3");
-	luameta_getter_member<Foo, int, &Foo::bar>(L, metatable, "bar3");
+	LuaValue methods = luameta_methods(L, metatable);
+	LuaValue getters = luameta_getters(L, metatable);
+	LuaValue setters = luameta_setters(L, metatable);
+
+	getters.get(L, "bar") = &luawrap::getter<Foo, int, &Foo::bar>;
+	setters.get(L, "bar") = &luawrap::setter<Foo, int, &Foo::bar>;
+
+	getters.get(L, "bar2") = &luawrap::getter<Foo, int, &Foo::get_bar>;
+	setters.get(L, "bar2") = &luawrap::setter<Foo, int, &Foo::get_bar>;
+
+	getters.get(L, "bar3") = &luawrap::getter<Foo, int, &Foo::bar>;
+	setters.get(L, "bar3") = &luawrap::setter<Foo, int, &Foo::set_bar>;
+
 	return metatable;
 }
 
-static int foo_unbox(Foo& f) {
+static void install_types() {
+	luawrap::install_userdata_type<Foo, foo_newmetatable>();
+}
+
+static int foo_unbox1(Foo& f) {
 	return f.bar;
 }
+
+static int foo_unbox2(const Foo& f) {
+	return f.bar;
+}
+static int foo_unbox3(Foo* f) {
+	return f->bar;
+}
+static int foo_unbox4(Foo f) {
+	return f.bar;
+}
+static int foo_unbox5(const Foo* f) {
+	return f->bar;
+}
+
 static Foo foo_box(int bar) {
 	Foo f = { bar };
 	return f;
@@ -69,19 +78,27 @@ static lua_State* luasetup() {
 	lua_State* L = lua_open();
 	LuaValue globals(L, LUA_GLOBALSINDEX);
 
-	luaL_openlibs(L);
 
-	globals.get(L, "assert") = luavalue_from_function(L, unit_test_assert);
-	globals.get(L, "foo_unbox") = luavalue_from_function(L, foo_unbox);
-	globals.get(L, "foo_box") = luavalue_from_function(L, foo_box);
+	globals.get(L, "assert") = luawrap::function(L, unit_test_assert);
+	globals.get(L, "foo_unbox1") = luawrap::function(L, foo_unbox1);
+	globals.get(L, "foo_unbox2") = luawrap::function(L, foo_unbox2);
+	globals.get(L, "foo_unbox3") = luawrap::function(L, foo_unbox3);
+	globals.get(L, "foo_unbox4") = luawrap::function(L, foo_unbox4);
+	globals.get(L, "foo_unbox5") = luawrap::function(L, foo_unbox5);
+	globals.get(L, "foo_box") = luawrap::function(L, foo_box);
 
 	return L;
 }
+
 static void foo_bind_test() { // sanity check
 	lua_State* L = luasetup();
 
 	lua_assert_valid_dostring(L, " local f = foo_box(1)\n"
-			"assert(\"unboxed foo not equivalent\", foo_unbox(f) == 1)\n");
+			"assert(\"unboxed foo not equivalent\", foo_unbox1(f) == 1)\n"
+			"assert(\"unboxed foo not equivalent\", foo_unbox2(f) == 1)\n"
+			"assert(\"unboxed foo not equivalent\", foo_unbox3(f) == 1)\n"
+			"assert(\"unboxed foo not equivalent\", foo_unbox4(f) == 1)\n"
+			"assert(\"unboxed foo not equivalent\", foo_unbox5(f) == 1)\n");
 
 	UNIT_TEST_ASSERT(lua_gettop(L) == 0);
 	lua_close(L);
@@ -125,6 +142,7 @@ static void test_luameta_property_setter2() {
 }
 
 void luameta_tests() {
+	install_types();
 	UNIT_TEST(foo_bind_test);
 	UNIT_TEST(test_luameta_getter);
 	UNIT_TEST(test_luameta_setter);

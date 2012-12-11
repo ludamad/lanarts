@@ -29,13 +29,17 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef LMARSHALL_H_
-#define LMARSHALL_H_
+#ifndef LCOMMON_LUA_SERIALIZE_H_
+#define LCOMMON_LUA_SERIALIZE_H_
 
 class SerializeBuffer;
 struct lua_State;
+class LuaValue;
 
-void lua_serialize(SerializeBuffer& serialize, lua_State* L, int idx);
-void lua_deserialize(SerializeBuffer& serialize, lua_State* L);
+void lua_serialize(SerializeBuffer& serializer, lua_State* L, int idx);
+void lua_deserialize(SerializeBuffer& serializer, lua_State* L);
 
-#endif /* LMARSHALL_H_ */
+void lua_serialize(SerializeBuffer& serializer, lua_State* L, const LuaValue& value);
+void lua_deserialize(SerializeBuffer& serializer, lua_State* L, LuaValue& value);
+
+#endif /* LCOMMON_LUA_SERIALIZE_H_ */

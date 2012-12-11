@@ -7,7 +7,7 @@ FIND_PACKAGE(SDL_net REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
-set( SRC ../)
+set( SRC ..)
 set( LIBS ../../libs)
 
 set(CMAKE_BUILD_TYPE Debug)
@@ -19,6 +19,7 @@ include_directories(
 	${OpenGL_INCLUDE_DIRS} 		
 	${FREETYPE_INCLUDE_DIRS} 
 	${SRC} #/common and /net
+	..//luawrap/include
 	${LIBS}/yaml-cpp/include 
 	${LIBS} #/lua and /rvo2 
 	${LIBS}/slb/include
@@ -351,7 +352,7 @@ set (libraries
 	ldraw
 	lcommon
 	lua
-	slb
+	luawrap
 	lanarts_net
 	yaml-cpp
 	RVO
@@ -369,6 +370,7 @@ target_link_libraries( lanarts
 
 target_link_libraries( lanarts_tests
     ${libraries}
+	UnitTest++
 )
 target_link_libraries( lanarts_examples
     ${libraries}
