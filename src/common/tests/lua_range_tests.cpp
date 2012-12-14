@@ -3,8 +3,8 @@
 #include <luawrap/calls.h>
 #include <luawrap/testutils.h>
 
-#include "../lua/lua_range.h"
-#include "../unittest.h"
+#include "lua_range.h"
+#include "unittest.h"
 
 static void range_func(const Range& range) {
 	UNIT_TEST_ASSERT(range == Range(1,2));

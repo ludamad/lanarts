@@ -10,9 +10,9 @@
 
 #include <common/unittest.h>
 
-#include "../DrawOptions.h"
+#include "DrawOptions.h"
 
-#include "../lua/lua_ldraw.h"
+#include "lua_ldraw.h"
 
 static void drawoptions_func_defaults(const ldraw::DrawOptions& options) {
 	ldraw::DrawOptions defaults;

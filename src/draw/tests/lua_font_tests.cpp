@@ -10,10 +10,10 @@
 
 #include <common/unittest.h>
 
-#include "../lua/lua_ldraw.h"
+#include "lua_ldraw.h"
 
-#include "../Image.h"
-#include "../lua/lua_font.h"
+#include "Image.h"
+#include "lua_font.h"
 
 static void lua_font_bind_test() {
 	using namespace ldraw;

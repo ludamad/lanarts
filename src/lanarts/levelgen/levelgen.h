@@ -6,7 +6,7 @@
 #ifndef LEVELGEN_H_
 #define LEVELGEN_H_
 
-#include <common/random/mtwist.h>
+#include <common/mtwist.h>
 #include "dungeon_data.h"
 #include "enemygen.h"
 #include "featuregen.h"

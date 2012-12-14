@@ -118,7 +118,7 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 	lua_State* L = gs->get_luastate();
 	static LuaValue script_globals;
 	if (script_globals.empty()) {
-		script_globals.table_initialize(L);
+		script_globals.newtable(L);
 //		script_globals.push(L);
 //		int script = lua_gettop(L);
 //		lua_pushvalue(L, LUA_GLOBALSINDEX);

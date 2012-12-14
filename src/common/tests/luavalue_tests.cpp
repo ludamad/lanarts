@@ -6,10 +6,10 @@
 #include <luawrap/luawrap.h>
 #include <luawrap/testutils.h>
 
-#include "../lua/lua_lcommon.h"
+#include "lua_lcommon.h"
 
-#include "../unittest.h"
-#include "../geometry.h"
+#include "unittest.h"
+#include "geometry.h"
 
 static void luavalue_test_get() {
 	TestLuaState L;
@@ -18,7 +18,7 @@ static void luavalue_test_get() {
 	lua_register_lcommon(L, globals);
 
 	LuaValue value;
-	value.table_initialize(L);
+	value.newtable(L);
 
 	{
 		int input = 1337;
@@ -52,7 +52,7 @@ static void luavalue_test_value_equality() {
 	lua_pop(L, 3);
 }
 
-#include "../perf_timer.h"
+#include "perf_timer.h"
 static void lua_perf_test() {
 	TestLuaState L;
 

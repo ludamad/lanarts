@@ -12,7 +12,7 @@
 #include <luawrap/types.h>
 #include <luawrap/testutils.h>
 
-#include "../unittest.h"
+#include "unittest.h"
 
 struct Foo {
 	int bar;

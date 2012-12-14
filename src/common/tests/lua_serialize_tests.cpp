@@ -2,11 +2,11 @@
 
 #include <luawrap/LuaValue.h>
 
-#include "../lua/lua_serialize.h"
+#include "lua_serialize.h"
 
-#include "../unittest.h"
+#include "unittest.h"
 
-#include "../SerializeBuffer.h"
+#include "SerializeBuffer.h"
 
 static lua_State* L;
 

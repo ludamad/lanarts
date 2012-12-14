@@ -45,7 +45,7 @@ void load_enemy_callbackf(const YAML::Node& node, lua_State* L,
 
 LuaValue load_enemy_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
-	ret.table_initialize(L);
+	ret.newtable(L);
 
 	game_enemy_data.clear();
 	load_data_impl_template(filenames, "enemies", load_enemy_callbackf, L,

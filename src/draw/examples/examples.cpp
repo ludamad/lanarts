@@ -9,25 +9,25 @@
 #include <lua.hpp>
 
 #include <common/Timer.h>
-#include <common/lua/lua_lcommon.h>
-#include <common/math.h>
+#include <common/lua_lcommon.h>
+#include <common/mathutil.h>
 
 #include <luawrap/LuaValue.h>
 #include <luawrap/calls.h>
 #include <luawrap/functions.h>
 
-#include "../lua/lua_ldraw.h"
+#include "lua_ldraw.h"
 
-#include "../Colour.h"
+#include "Colour.h"
 
-#include "../colour_constants.h"
+#include "colour_constants.h"
 
-#include "../display.h"
-#include "../draw.h"
-#include "../Image.h"
-#include "../Animation.h"
-#include "../DirectionalDrawable.h"
-#include "../Font.h"
+#include "display.h"
+#include "draw.h"
+#include "Image.h"
+#include "Animation.h"
+#include "DirectionalDrawable.h"
+#include "Font.h"
 
 static bool handle_event(SDL_Event* event) {
 	SDLKey keycode = event->key.keysym.sym;

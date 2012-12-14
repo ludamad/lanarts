@@ -145,7 +145,7 @@ static void draw_base_entry_overlay(GameState* gs, BaseDataEntry& entry) {
 int draw_icon_and_name(GameState* gs, BaseDataEntry& entry, Colour col, int x,
 		int y, int xoffset, int yoffset) {
 	gl_draw_sprite(entry.get_sprite(), x, y);
-	ldraw::draw_rectangle_outline(COL_PALE_YELLOW.with_alpha(50),
+	ldraw::draw_rectangle_outline(COL_PALE_YELLOW.alpha(50),
 			BBox(x, y, x+TILE_SIZE, y+TILE_SIZE));
 	/* Draw item name */
 	return gs->font().draw(ldraw::DrawOptions(col).origin(ldraw::LEFT_CENTER), Pos(x + xoffset, y + yoffset), entry.name);
@@ -155,7 +155,7 @@ void draw_spell_icon_and_name(GameState* gs, SpellEntry& spl_entry, Colour col,
 		int x, int y) {
 	gl_draw_sprite(spl_entry.sprite, x, y);
 
-	ldraw::draw_rectangle_outline(COL_PALE_YELLOW.with_alpha(50),
+	ldraw::draw_rectangle_outline(COL_PALE_YELLOW.alpha(50),
 			BBox(x, y, x+TILE_SIZE, y+TILE_SIZE));
 	/* Draw spell name */
 	gs->font().draw(ldraw::DrawOptions(col).origin(ldraw::LEFT_CENTER),

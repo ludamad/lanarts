@@ -53,7 +53,7 @@ void load_spell_callbackf(const YAML::Node& node, lua_State* L,
 }
 LuaValue load_spell_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
-	ret.table_initialize(L);
+	ret.newtable(L);
 
 	game_spell_data.clear();
 

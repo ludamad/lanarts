@@ -15,7 +15,7 @@ SUITE (LuaValue) {
 		LuaValue globals = LuaValue::globals(L);
 
 		LuaValue value;
-		value.table_initialize(L);
+		value.newtable(L);
 
 		{
 			int input = 1337;

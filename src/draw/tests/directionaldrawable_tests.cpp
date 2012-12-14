@@ -4,12 +4,12 @@
  */
 
 #include <common/unittest.h>
-#include <common/math.h>
+#include <common/mathutil.h>
 
 #include "DrawableMock.h"
 
-#include "../Image.h"
-#include "../DirectionalDrawable.h"
+#include "Image.h"
+#include "DirectionalDrawable.h"
 
 static void ldraw_directionaldrawable_properties_test() {
 	using namespace ldraw;

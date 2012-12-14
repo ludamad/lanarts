@@ -228,7 +228,7 @@ static int lua_member_update(lua_State* L) {
 	}
 	if (!had_member) {
 		if (inst->lua_variables.empty())
-			inst->lua_variables.table_initialize(L);
+			inst->lua_variables.newtable(L);
 		inst->lua_variables.push(L);
 		int tableind = lua_gettop(L);
 		lua_pushvalue(L, 2);

@@ -7,7 +7,7 @@ extern "C" {
 
 #include <common/geometry.h>
 #include <common/SerializeBuffer.h>
-#include <common/lua/lua_serialize.h>
+#include <common/lua_serialize.h>
 
 #include "../data/lua_game_data.h"
 #include "../gamestate/GameState.h"
@@ -176,7 +176,7 @@ static void lua_init_metatable(lua_State* L, LuaValue& value,
 }
 
 static void lua_init_effect(lua_State* L, LuaValue& value, effect_id effect) {
-	value.table_initialize(L);
+	value.newtable(L);
 	lua_init_metatable(L, value, effect);
 }
 

@@ -83,7 +83,7 @@ void load_class_callbackf(const YAML::Node& node, lua_State* L,
 
 LuaValue load_class_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
-	ret.table_initialize(L);
+	ret.newtable(L);
 
 	game_class_data.clear();
 	load_data_impl_template(filenames, "classes", load_class_callbackf, L,

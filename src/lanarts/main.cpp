@@ -57,12 +57,14 @@ void save_game_to_file(GameState* gs, const char* filename) {
 	sb.flush();
 	fclose(file);
 }
+
 void load_game_from_file(GameState* gs, const char* filename) {
 	FILE* file = fopen(filename, "rb");
 	SerializeBuffer sb = SerializeBuffer::file_reader(file);
 	gs->deserialize(sb);
 	fclose(file);
 }
+
 const int HUD_WIDTH = 160;
 
 static void game_loop(GameState* gs) {

@@ -49,7 +49,7 @@ static void load_itemlist(const YAML::Node& node, lua_State* L,
 
 LuaValue load_itemgenlist_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret;
-	ret.table_initialize(L);
+	ret.newtable(L);
 
 	game_itemgenlist_data.clear();
 

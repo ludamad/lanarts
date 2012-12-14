@@ -6,7 +6,6 @@ PROJECT(project_ldraw)
 
 FIND_PACKAGE(SDL REQUIRED)
 FIND_PACKAGE(SDL_image REQUIRED)
-FIND_PACKAGE(SDL_net REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
@@ -14,82 +13,27 @@ set( SRC ../)
 set( LIBS ../../libs)
 
 include_directories(
+    include/draw/
+	${SRC}/common/include
+	${SRC}/luawrap/include
+	${LIBS}/lua
 	${SDL_INCLUDE_DIR} 
 	${OpenGL_INCLUDE_DIRS} 		
 	${FREETYPE_INCLUDE_DIRS} 
-	${SRC} #/common 
-	${LIBS}/lua
-	../luawrap/include
 )
 
-set( ldraw_src
-    Animation.cpp
-    Animation.h
-    
-    colour_constants.h
-    
-    Colour.cpp
-    Colour.h
-    
-    DirectionalDrawable.cpp
-    DirectionalDrawable.h
-    
-    display.cpp
-    display.h
-    
-    DrawableBase.h
-    Drawable.cpp
-    Drawable.h
-    
-    draw.cpp
-    draw.h
-    
-    DrawOptions.cpp
-    DrawOptions.h
-    
-    Font.cpp
-    Font.h
-    
-    Image.cpp
-    Image.h
-    
-    ldraw_assert.h
-    
-    LuaDrawable.cpp
-    LuaDrawable.h
-    
-    opengl/GLImage.h
-    opengl/GLImage.cpp
-  
-    lua/lua_colour.h
-    lua/lua_colour.cpp
-    lua/lua_ldraw.h
-    lua/lua_ldraw.cpp
-    lua/lua_drawable.cpp
-    lua/lua_font.h
-    lua/lua_font.cpp
-    lua/lua_drawoptions.h
-    lua/lua_drawoptions.cpp
-    lua/lua_image.h
-    lua/lua_image.cpp
+file(GLOB ldraw_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+    src/* 
+    src/lua/* 
+    src/opengl/* 
+    include/draw/* 
 )
 
 set( ldraw_examples
     examples/examples.cpp
 )
-set( ldraw_tests
-
-    tests/animation_tests.cpp
-    tests/directionaldrawable_tests.cpp
-    tests/DrawableMock.h
-    tests/image_tests.cpp
-    tests/ldraw_tests.cpp
-    tests/ldraw_tests.h
-    tests/lua_colour_tests.cpp
-    tests/lua_drawable_tests.cpp
-    tests/lua_drawoptions_tests.cpp
-    tests/lua_font_tests.cpp
-    tests/lua_image_tests.cpp
+file(GLOB ldraw_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+    tests/*
 )
 
 add_library( ldraw
@@ -112,3 +56,6 @@ add_executable( ldraw_tests ${ldraw_tests} )
 
 target_link_libraries( ldraw_ex ${LINKEDLIBS} )
 target_link_libraries( ldraw_tests ${LINKEDLIBS} UnitTest++ )
+
+enable_testing()
+add_test(NAME ldraw_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/ldraw_tests )

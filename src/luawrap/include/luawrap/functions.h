@@ -6,6 +6,7 @@
 #ifndef LUAWRAP_FUNCTIONS_H_
 #define LUAWRAP_FUNCTIONS_H_
 
+#include <typeinfo>
 #include <lua.hpp>
 
 #include <luawrap/config.h>

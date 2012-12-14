@@ -9,7 +9,7 @@
  */
 
 #include <common/SerializeBuffer.h>
-#include <common/lua/lua_serialize.h>
+#include <common/lua_serialize.h>
 
 #include "../display/display.h"
 

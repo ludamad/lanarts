@@ -11,16 +11,17 @@
  *
  */
 
-#include <typeinfo>
-#include <cstdio>
-
 #ifndef LUAWRAP_LUAWRAP_H_
 #define LUAWRAP_LUAWRAP_H_
+
+#include <cstdio>
 
 #include <lua.hpp>
 
 #include <luawrap/config.h>
+
 #include <luawrap/LuaValue.h>
+#include <luawrap/LuaStackValue.h>
 
 // Include internal header
 #include "../../src/pushget_helper.h"
@@ -109,27 +110,38 @@ namespace luawrap {
 			lua_pop(L, 1);
 		}
 	}
-
-
-	LuaValue eval(lua_State* L, const std::string& code);
 }
 
 // LuaValue related
 namespace _luawrap_private {
 
 	template<typename T>
-	inline _LuaFieldValue::operator T() {
+	inline _LuaField::operator T() {
 		luawrap::_private::PopHack delayedpop(L);
 		luafield_push(L, value, key);
 		return luawrap::get<T>(L, -1);
 	}
 
 	template<typename T>
-	inline void _LuaFieldValue::operator=(const T& t) {
+	inline void _LuaField::operator=(const T& t) {
 		luawrap::push<T>(L, t);
 		luafield_pop(L, value, key);
 	}
 
+	template<typename T>
+	inline _LuaStackField::operator T() {
+		lua_State* L = value.luastate();
+		luawrap::_private::PopHack delayedpop(L);
+		lua_getfield(L, value.index(), key);
+		return luawrap::get<T>(L, -1);
+	}
+
+	template<typename T>
+	inline void _LuaStackField::operator=(const T& t) {
+		lua_State* L = value.luastate();
+		luawrap::push<T>(L, t);
+		lua_setfield(L, value.index(), key);
+	}
 }
 
 #include "../../src/predefined_helper.h"

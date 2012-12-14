@@ -6,3 +6,4 @@ add_subdirectory( common )
 add_subdirectory( draw )
 add_subdirectory( net )
 
+enable_testing()

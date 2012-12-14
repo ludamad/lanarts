@@ -53,7 +53,7 @@ static void load_projectile(const YAML::Node& node, lua_State* L,
 LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 		LuaValue& itemtable) {
 	LuaValue ret;
-	ret.table_initialize(L);
+	ret.newtable(L);
 
 	load_data_impl_template(filenames, "projectiles", load_projectile, L,
 			&itemtable);

@@ -1,5 +1,5 @@
-#include "../unittest.h"
-#include "../strformat.h"
+#include "unittest.h"
+#include "strformat.h"
 
 static void vararg_str_format_macro_test(std::string& str, const char* fmt, ...) {
 	VARARG_STR_FORMAT(str, fmt);

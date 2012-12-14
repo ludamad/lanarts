@@ -18,7 +18,7 @@ class GameState;
 
 struct ActionSlot {
 	ActionSlot() :
-			is_spell(false) {
+			is_spell(false), spell(-1) {
 	}
 	ActionSlot(spell_id spell) :
 			is_spell(true), spell(spell) {

@@ -11,9 +11,9 @@
 #include <luawrap/LuaValue.h>
 #include <luawrap/functions.h>
 
-#include "../Colour.h"
+#include "Colour.h"
 
-#include "../lua/lua_ldraw.h"
+#include "lua_ldraw.h"
 
 static void colour_func(const Colour& range) {
 	UNIT_TEST_ASSERT(range == Colour(1,2,3,255));

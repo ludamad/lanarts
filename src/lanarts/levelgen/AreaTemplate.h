@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include <common/random/mtwist.h>
+#include <common/mtwist.h>
 #include <common/geometry.h>
 
 #include "../lanarts_defines.h"

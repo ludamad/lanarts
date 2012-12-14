@@ -13,7 +13,7 @@
 #include <cstdio>
 
 #include <common/smartptr.h>
-#include <common/random/mtwist.h>
+#include <common/mtwist.h>
 
 #include <draw/Font.h>
 

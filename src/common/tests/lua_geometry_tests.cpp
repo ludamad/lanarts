@@ -4,8 +4,8 @@
 #include <luawrap/functions.h>
 #include <luawrap/testutils.h>
 
-#include "../lua/lua_geometry.h"
-#include "../unittest.h"
+#include "lua_geometry.h"
+#include "unittest.h"
 
 template<typename T>
 void lua_generic_pushget_test(lua_State* L, const T& value) {

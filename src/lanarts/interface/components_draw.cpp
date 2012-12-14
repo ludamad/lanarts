@@ -36,7 +36,7 @@ void draw_option_box(GameState* gs, const BBox& bbox, bool option_set,
 		bbox_col = COL_GOLD;
 	}
 	draw_setting_box(gs, bbox, bbox_col, sprite,
-			COL_WHITE.with_alpha(option_set ? 255 : 100), text,
+			COL_WHITE.alpha(option_set ? 255 : 100), text,
 			option_set ? COL_WHITE : COL_MID_GRAY);
 }
 
@@ -54,5 +54,5 @@ void draw_speed_box(GameState* gs, const BBox& bbox) {
 	draw_setting_box(gs, bbox,
 			bbox.contains(gs->mouse_pos()) ? COL_GOLD : COL_WHITE,
 			get_sprite_by_name("speed setting icon"),
-			COL_WHITE.with_alpha(255 - diff * 30), text, COL_WHITE);
+			COL_WHITE.alpha(255 - diff * 30), text, COL_WHITE);
 }

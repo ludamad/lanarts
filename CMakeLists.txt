@@ -9,3 +9,6 @@ option(MSVC_STHREADED_RT "MSVC: Build with single-threaded static runtime libs (
 
 add_subdirectory( src ) 
 add_subdirectory( libs ) 
+
+# Enable tests
+enable_testing()

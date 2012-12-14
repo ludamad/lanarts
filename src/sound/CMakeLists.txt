@@ -1,101 +1,49 @@
 cmake_minimum_required( VERSION 2.6 )
-
-set(CMAKE_BUILD_TYPE Debug)
-
-PROJECT(project_ldraw)
+PROJECT(project_lsound)
 
 FIND_PACKAGE(SDL REQUIRED)
-FIND_PACKAGE(SDL_image REQUIRED)
-FIND_PACKAGE(SDL_net REQUIRED)
-FIND_PACKAGE(OpenGL REQUIRED)
-include(FindFreetype)
+FIND_PACKAGE(SDL_mixer REQUIRED)
 
-set( SRC ../)
+#set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
+#add_definitions(-DNDEBUG)
+
 set( LIBS ../../libs)
+set( SRC ..)
 
 include_directories(
-	${SDL_INCLUDE_DIR} 
-	${OpenGL_INCLUDE_DIRS} 		
-	${FREETYPE_INCLUDE_DIRS} 
-	${SRC} #/common 
-	${LIBS} #/lua 
-	${LIBS}/slb/include
+    "include/"
+    ${SDL_INCLUDE_DIR} 
+    ${LIBS}/lua
+    ${SRC}/luawrap
+    ${SRC}/
 )
 
-set( ldraw_examples
-  examples/examples.cpp
+# Library target
+aux_source_directory("src/" lsound_src) #Find source files
+aux_source_directory("include/" lsound_inc) #Find source files
+
+add_library( lsound
+             ${lsound_src} 
+             ${lsound_inc} )
+
+# Test runner target
+aux_source_directory(tests lsound_testsrc) 
+
+set(LINKEDLIBS
+	lsound
+	luawrap
+	lcommon
+	lua
+	${SDL_LIBRARY}
+	${SDLMIXER_LIBRARY}
 )
 
-set( ldraw_src
-  Font.h
-  Font.cpp
+add_executable( lsound_tests main.cpp)
 
-  DrawOptions.h
-  DrawOptions.cpp
+target_link_libraries(lsound_tests ${LINKEDLIBS})
 
-  opengl/GLImage.h
-  opengl/GLImage.cpp
+# Enable tests
+#enable_testing()
 
-  colour_constants.h
-
-  display.h
-  display.cpp
-  
-  draw.h
-  draw.cpp
-
-  Colour.h
-  Colour.cpp
-
-  Image.h
-  Image.cpp
-  
-  ldraw_assert.h
-  
-  lua/lua_colour.h
-  lua/lua_colour.cpp
-  lua/lua_ldraw.h
-  lua/lua_ldraw.cpp
-  lua/lua_font.h
-  lua/lua_font.cpp
-  lua/lua_drawoptions.h
-  lua/lua_drawoptions.cpp
-  lua/lua_image.h
-  lua/lua_image.cpp
-)
-
-set( ldraw_tests
-  tests/lua_colour_tests.cpp
-  tests/lua_drawoptions_tests.cpp
-  tests/lua_image_tests.cpp
-  tests/ldraw_tests.cpp
-  tests/ldraw_tests.h
-)
-
-#add_library( ldraw
-#             ${ldraw_src} )
-add_executable( ldraw_ex ${ldraw_src} ${ldraw_examples} )
-
-
-target_link_libraries( ldraw_ex
-			lcommon
-			slb
-			lua
-			${OPENGL_gl_LIBRARY}
-			${SDL_LIBRARY}
-			${SDLIMAGE_LIBRARY}
-			${SDLMAIN_LIBRARY}
-			${FREETYPE_LIBRARIES}
-			)
-
-add_executable( ldraw_tests ${ldraw_src} ${ldraw_tests} )
-target_link_libraries( ldraw_tests
-			lcommon
-			slb
-			lua
-			${OPENGL_gl_LIBRARY}
-			${SDL_LIBRARY}
-			${SDLIMAGE_LIBRARY}
-			${SDLMAIN_LIBRARY}
-			${FREETYPE_LIBRARIES}
-			)
+#add_test(NAME lsound_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/lsound_tests )

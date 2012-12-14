@@ -12,9 +12,9 @@
 #include <luawrap/calls.h>
 #include <luawrap/functions.h>
 
-#include "../Image.h"
-#include "../Drawable.h"
-#include "../lua/lua_ldraw.h"
+#include "Image.h"
+#include "Drawable.h"
+#include "lua_ldraw.h"
 
 static void lua_drawable_bind_test() {
 	using namespace ldraw;
@@ -52,7 +52,7 @@ static void lua_drawable_bind_test() {
 	L.finish_check();
 }
 
-#include "../LuaDrawable.h"
+#include "LuaDrawable.h"
 
 static void lua_luadrawable_bind_test() {
 	using namespace ldraw;

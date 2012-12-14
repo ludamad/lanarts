@@ -1,0 +1,66 @@
+lanarts ideas:
+	> Need a clean, easy to understand instance model
+	> Combat instance = combat stats + states
+	> projectiles = scripted objects with interactions with combat instances
+
+Motivation:
+	Eschew the idea of a generic melee attack completely in favour of lua driven actions
+	The action triggers an attacking state, which at the end triggers an attack attempt
+
+States:
+	> Generalization of (and better term for) 'effects'
+	> Include mutually exclusive concepts, such as attacks
+		* Need some mechanism to disallow certain actions, have interruptible states, etc
+		* A long casting sequence should be interruptible (eg channeling)
+	> Can attach arbitrary variables to stats
+	> 'draw' function that transforms a DrawOptions object as well as potentially drawing overlays
+		?? Might need to be draw-transform as well as draw to allow for overlays
+		?? Might need to allow for specifying depth for more advanced effects (will need support for drawing at multiple depths)
+	> States should be able to be associated with wearing certain items
+		* Boolean result of step() determines if it still exists ?
+	> States should be counted, or stacking:
+		* Example, fire resistance effect is a 'state'
+			* Applications are counted, and count is used for effect
+		* Or, they can stack and each state acts independently
+	> States may need priority over each other
+
+Be flexible enough to cover: Attacking, Casting, Channeling, Berserking, Exhausted, Poisoned, Blinking
+
+Open question is efficient representation for many instances
+	- Enemies outside current room do not need many states (especially recurring/permanent ones)
+	- Not really a major concern. Getting agile development outweighs all else.
+
+Actions:
+	> Can divide themselves into a hierarchy (probably fixed, explicit variables can fine tune past this), eg 
+		general actions 
+			-> use item
+				-> equip
+				-> potion
+				-> scroll
+				->> specific item
+			-> movement
+				-> using stairs
+			-> attacks 
+				-> melee
+				-> weapons
+				-> weapon abilities
+				-> spells
+				-> innate abilities
+				->> specific weapon types/ spell types/ ability types
+		So something like [major type] [minor type] [category of specific action] [specific action]
+	> Prereq function
+		* Can query states and variables set by states
+		* Possibly can be explicitly disallowed by certain states
+	> Action function
+		* Sets states
+
+
+Sample logic for basic attack:
+	> Player inputs key
+	> hotkeyed action triggers if check passes:
+		query if attack state is active
+		stats.cooldown < target cooldown
+
+	> The attack action completes and attempts to hit a target.
+		>> For autotargetting this means the current target or next closest enemy
+		>> For manual targetting this means a target in the general targetted

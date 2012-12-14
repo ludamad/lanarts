@@ -18,8 +18,10 @@ include_directories(
 	${SDL_INCLUDE_DIR} 
 	${OpenGL_INCLUDE_DIRS} 		
 	${FREETYPE_INCLUDE_DIRS} 
-	${SRC} #/common and /net
-	..//luawrap/include
+	${SRC}/common/include
+	${SRC}/draw/include
+	${SRC}#/net
+	${SRC}/luawrap/include
 	${LIBS}/yaml-cpp/include 
 	${LIBS} #/lua and /rvo2 
 	${LIBS}/slb/include

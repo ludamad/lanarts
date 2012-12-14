@@ -10,7 +10,7 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include <common/math.h>
+#include <common/mathutil.h>
 #include <common/Timer.h>
 
 #include <luawrap/LuaValue.h>
@@ -18,7 +18,7 @@
 #include <luawrap/functions.h>
 #include <luawrap/calls.h>
 
-#include <common/lua/lua_lcommon.h>
+#include <common/lua_lcommon.h>
 
 #include <draw/Animation.h>
 #include <draw/DirectionalDrawable.h>
@@ -30,7 +30,7 @@
 #include <draw/Image.h>
 #include <draw/Font.h>
 
-#include <draw/lua/lua_ldraw.h>
+#include <draw/lua_ldraw.h>
 
 #include "../../draw/parse_drawable.h"
 #include "../../data/parse_context.h"

@@ -5,6 +5,7 @@
 #include <lua.hpp>
 
 #include <luawrap/LuaValue.h>
+#include <luawrap/luawraperror.h>
 
 #include "luawrapassert.h"
 
@@ -87,7 +88,7 @@ LuaValue::~LuaValue() {
 	deref(impl);
 }
 
-void LuaValue::table_initialize(lua_State* L) {
+void LuaValue::newtable(lua_State* L) {
 	if (!impl)
 		impl = new _LuaValueImpl();
 	lua_newtable(L);
@@ -158,7 +159,7 @@ void luafield_pop(lua_State* L, const LuaValue& value, const char* key) {
 	lua_pop(L, 2);
 }
 void luafield_push(lua_State* L, const LuaValue& value, const char* key) {
-	value.push(L); /*Get the associated lua table*/
+	value.push(L); /*Get the associatedb lua table*/
 	LUAWRAP_ASSERT(!lua_isnil(L, -1));
 
 	int tableind = lua_gettop(L);
@@ -166,39 +167,34 @@ void luafield_push(lua_State* L, const LuaValue& value, const char* key) {
 	lua_replace(L, tableind);
 }
 
-LuaValue::LuaValue(const _LuaFieldValue & cstrfield) {
-	impl = new _LuaValueImpl();
-	cstrfield.push();
-	impl->pop(cstrfield.L);
-}
 
 namespace _luawrap_private {
 
-	void _LuaFieldValue::operator =(const LuaValue & value) {
+	void _LuaField::operator =(const LuaValue & value) {
 		value.push(L);
 		pop();
 	}
 
-	void _LuaFieldValue::operator =(lua_CFunction func) {
+	void _LuaField::operator =(lua_CFunction func) {
 		lua_pushcfunction(L, func);
 		pop();
 	}
 
-	void _LuaFieldValue::operator =(const char* value) {
+	void _LuaField::operator =(const char* value) {
 		lua_pushstring(L, value);
 		pop();
 	}
 
 }
 
-_luawrap_private::_LuaFieldValue::operator LuaValue() {
+_luawrap_private::_LuaField::operator LuaValue() {
 	push();
 	LuaValue val(L, -1);
 	lua_pop(L, 1);
 	return val;
 }
 
-void _LuaFieldValue::operator =(const _LuaFieldValue & field) {
+void _LuaField::operator =(const _LuaField & field) {
 	LUAWRAP_ASSERT(L == field.L);
 	field.push();
 	pop();
@@ -216,3 +212,39 @@ LuaValue LuaValue::globals(lua_State* L) {
 	return LuaValue(L, LUA_GLOBALSINDEX);
 }
 
+static std::string format_expression_string(const std::string& str) {
+	const char prefix[] = "return ";
+	if (strncmp(str.c_str(), prefix, sizeof(prefix)) == 0)
+		return str;
+	return "return " + str;
+}
+
+namespace luawrap {
+
+LuaValue eval(lua_State* L, const std::string& code) {
+	if (code.empty()) {
+		return LuaValue();
+	}
+	std::string expr = format_expression_string(code);
+	int ntop = lua_gettop(L);
+
+	if (luaL_dostring(L, expr.c_str())) {
+		std::string failmsg;
+
+		failmsg += "\nWhen running ... \n";
+		failmsg += code;
+		failmsg += "\n... an error occurred in lua's runtime:\n";
+		failmsg += lua_tostring(L, -1);
+
+		luawrap::error(failmsg.c_str());
+	}
+
+	LUAWRAP_ASSERT(lua_gettop(L) - ntop == 1);
+
+	LuaValue val(L, -1);
+	lua_pop(L, 1);
+
+	return val;
+}
+
+}

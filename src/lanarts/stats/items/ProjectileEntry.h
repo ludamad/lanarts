@@ -13,7 +13,7 @@
 class ProjectileEntry: public EquipmentEntry {
 public:
 	ProjectileEntry() :
-			radius(0), drop_chance(0), number_of_target_bounces(0), can_wall_bounce(
+			radius(0), drop_chance(0), speed(0), number_of_target_bounces(0), can_wall_bounce(
 					false) {
 	}
 	virtual ~ProjectileEntry() {

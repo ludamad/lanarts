@@ -5,7 +5,7 @@
 
 #include <common/unittest.h>
 
-#include "../Image.h"
+#include "Image.h"
 
 static void ldraw_image_test() {
 	using namespace ldraw;

@@ -68,14 +68,14 @@ LuaValue luameta_new(lua_State* L, const char* classname) {
 	int pretop = lua_gettop(L);
 
 	LuaValue methodtable;
-	methodtable.table_initialize(L);
+	methodtable.newtable(L);
 
 	LuaValue metatable;
-	metatable.table_initialize(L);
+	metatable.newtable(L);
 
 	{ // Set up 'getter' lookup, falls back to 'membertable'
 		LuaValue gettertable;
-		gettertable.table_initialize(L);
+		gettertable.newtable(L);
 
 		lua_pushstring(L, classname);
 		gettertable.get(L, "__typename").pop();
@@ -90,7 +90,7 @@ LuaValue luameta_new(lua_State* L, const char* classname) {
 
 	{ // Set up 'setter' function table
 		LuaValue settertable;
-		settertable.table_initialize(L);
+		settertable.newtable(L);
 
 		lua_pushstring(L, classname);
 		settertable.get(L, "__typename").pop();

@@ -63,6 +63,7 @@ void floodfill(PathingNode* path, int w, int h, int sx, int sy, int alloc_w) {
 
 PathInfo::PathInfo() {
 	path = NULL;
+	path_x = 0, path_y = 0;
 	w = 0, h = 0;
 	alloc_w = 0, alloc_h = 0;
 	start_x = 0, start_y = 0;
@@ -382,14 +383,12 @@ void PathInfo::draw(GameState* gs) {
 		for (int x = 0; x < w; x++) {
 			PathingNode* node = get(x, y);
 			if (false && !node->solid)
-				gs->font().drawf(
-						COL_WHITE,
+				gs->font().drawf(COL_WHITE,
 						Pos((x + start_x) * TILE_SIZE - view.x,
 								(y + start_y) * TILE_SIZE - view.y), "%d,%d",
 						node->dx, node->dy);
 			if (!node->solid) {
-				gs->font().drawf(
-						COL_WHITE,
+				gs->font().drawf(COL_WHITE,
 						Pos((x + start_x) * TILE_SIZE - view.x,
 								(y + start_y) * TILE_SIZE - view.y), "%d",
 						node->distance);

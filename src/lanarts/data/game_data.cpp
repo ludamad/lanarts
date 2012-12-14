@@ -10,7 +10,7 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
-#include <common/lua/lua_lcommon.h>
+#include <common/lua_lcommon.h>
 
 #include "../lua/lua_api.h"
 

@@ -14,6 +14,9 @@
 
 #include <string>
 
+#include <luawrap/config.h>
+#include <luawrap/LuaStackValue.h>
+
 struct lua_State;
 class LuaValue;
 
@@ -37,8 +40,8 @@ namespace _luawrap_private {
 
 	struct _LuaValueImpl;
 
-	struct _LuaFieldValue {
-		_LuaFieldValue(lua_State* L, const LuaValue& value, const char* key) :
+	struct _LuaField {
+		_LuaField(lua_State* L, const LuaValue& value, const char* key) :
 				L(L), value(value), key(key) {
 		}
 		void push() const {
@@ -61,11 +64,11 @@ namespace _luawrap_private {
 		void operator=(const LuaValue& value);
 		void operator=(const char* value);
 		void operator=(lua_CFunction func);
-		void operator=(const _LuaFieldValue& field);
+		void operator=(const _LuaField& field);
 
 	private:
 		friend class ::LuaValue;
-		_LuaFieldValue(const _LuaFieldValue& field) :
+		_LuaField(const _LuaField& field) :
 				L(field.L), value(field.value), key(field.key) {
 		}
 	};
@@ -77,9 +80,11 @@ public:
 	LuaValue(lua_State* L, const char* global);
 	LuaValue(const LuaValue& value);
 	LuaValue(lua_State* L, int pos);
-	LuaValue(const _luawrap_private::_LuaFieldValue& cstrfield);
+//	LuaValue(const _luawrap_private::_LuaField& cstrfield);
 	LuaValue();
 	~LuaValue();
+
+	void newtable(lua_State* L);
 
 	void operator=(const LuaValue& value);
 
@@ -89,14 +94,13 @@ public:
 	void set(lua_State* L, int pos);
 	bool empty() const;
 
-	void table_initialize(lua_State* L);
 
-	_luawrap_private::_LuaFieldValue get(lua_State* L, const char* key) const {
-		return _luawrap_private::_LuaFieldValue(L, *this, key);
+	_luawrap_private::_LuaField get(lua_State* L, const char* key) const {
+		return _luawrap_private::_LuaField(L, *this, key);
 	}
 	//NB: it is unsafe to have 'std::string& key' be const here!
 	//This would result potentially in a char* ptr being used outside of its scope
-	_luawrap_private::_LuaFieldValue get(lua_State* L, std::string& key) const {
+	_luawrap_private::_LuaField get(lua_State* L, std::string& key) const {
 		return get(L, key.c_str());
 	}
 
@@ -109,5 +113,9 @@ public:
 private:
 	_luawrap_private::_LuaValueImpl* impl;
 };
+
+namespace luawrap {
+	LuaValue eval(lua_State* L, const std::string& code);
+}
 
 #endif /* LUAWRAP_LUAVALUE_H_ */

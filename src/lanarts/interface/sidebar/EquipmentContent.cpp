@@ -40,7 +40,7 @@ static void draw_equipment_slot(GameState* gs, Inventory& inventory,
 		}
 		draw_icon_and_name(gs, entry, COL_WHITE, bbox.x1, bbox.y1);
 	} else {
-		ldraw::draw_rectangle_outline(COL_PALE_YELLOW.with_alpha(50),
+		ldraw::draw_rectangle_outline(COL_PALE_YELLOW.alpha(50),
 				BBox(bbox.left_top(), Dim(TILE_SIZE, TILE_SIZE)));
 		/* Draw item name */
 		Pos offset(TILE_SIZE * 1.25, TILE_SIZE / 2);

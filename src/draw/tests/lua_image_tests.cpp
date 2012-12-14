@@ -10,11 +10,11 @@
 
 #include <common/unittest.h>
 
-#include "../lua/lua_ldraw.h"
+#include "lua_ldraw.h"
 
-#include "../Image.h"
-#include "../lua/lua_image.h"
-#include "../lua/lua_drawable.h"
+#include "Image.h"
+#include "lua_image.h"
+#include "lua_drawable.h"
 
 static ldraw::Image img_identity_function(const ldraw::Image& img) {
 	return img;

@@ -5,7 +5,7 @@
  *  without attack choice info, and then attack information is used to complete it.
  */
 
-#include <common/random/mtwist.h>
+#include <common/mtwist.h>
 
 #include "items/WeaponEntry.h"
 

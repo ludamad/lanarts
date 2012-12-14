@@ -1,7 +1,7 @@
 #include <stdexcept>
 
-#include <common/lua/lua_lcommon.h>
-#include <draw/lua/lua_ldraw.h>
+#include <common/lua_lcommon.h>
+#include <draw/lua_ldraw.h>
 
 #include "../gamestate/GameState.h"
 

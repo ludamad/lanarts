@@ -8,7 +8,7 @@
 
 #include <vector>
 
-#include <common/random/mtwist.h>
+#include <common/mtwist.h>
 
 #include "../lanarts_defines.h"
 #include "GeneratedLevel.h"

@@ -3,7 +3,7 @@
  *  Tunnel generation algorithms
  */
 
-#include <common/random/mtwist.h>
+#include <common/mtwist.h>
 #include "tunnelgen.h"
 #include <cassert>
 #include <vector>

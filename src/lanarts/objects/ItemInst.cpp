@@ -3,6 +3,10 @@
  *  Represents an item on the floor
  */
 
+#include <typeinfo>
+
+#include <common/mathutil.h>
+
 #include <draw/draw.h>
 #include <draw/Font.h>
 #include <draw/DrawOptions.h>
@@ -10,10 +14,11 @@
 
 #include "../display/sprite_data.h"
 #include "../gamestate/GameState.h"
+#include "../gamestate/GameView.h"
 #include "../stats/items/ItemEntry.h"
+
 #include "ItemInst.h"
 #include "collision_filters.h"
-#include <typeinfo>
 
 ItemInst::~ItemInst() {
 }
@@ -29,7 +34,8 @@ void ItemInst::step(GameState *gs) {
 	GameInst* other_item = NULL;
 	ItemEntry& ientry = item.item_entry();
 	if (ientry.stackable
-			&& gs->object_radius_test(this, &other_item, 1, same_item_colfilter)) {
+			&& gs->object_radius_test(this, &other_item, 1,
+					same_item_colfilter)) {
 		ItemInst* oinst = (ItemInst*)other_item;
 		if (oinst->item.is_same_item(item) && id < oinst->id) {
 			gs->remove_instance(oinst);
@@ -52,11 +58,18 @@ void ItemInst::draw(GameState* gs) {
 	if (!gs->object_visible_test(this))
 		return;
 
+	Pos p = round_to_multiple(pos(), TILE_SIZE);
+
+	ldraw::draw_rectangle_outline(COL_WHITE.alpha(25),
+			on_screen(gs, BBox(p, Dim(TILE_SIZE, TILE_SIZE))));
+
 	gl_draw_sprite(view, ientry.item_sprite, xx, yy, 0, 0, gs->frame());
+
 	if (ientry.stackable && item_quantity() > 1) {
-		gs->font().drawf(COL_WHITE, Pos(xx - view.x + 1,
-				yy - view.y + 1), "%d", item_quantity());
+		gs->font().drawf(COL_WHITE, Pos(xx - view.x + 1, yy - view.y + 1), "%d",
+				item_quantity());
 	}
+
 }
 
 void ItemInst::copy_to(GameInst *inst) const {
@@ -64,7 +77,7 @@ void ItemInst::copy_to(GameInst *inst) const {
 	*(ItemInst*)inst = *this;
 }
 
-ItemInst *ItemInst::clone() const {
+ItemInst* ItemInst::clone() const {
 	return new ItemInst(*this);
 }
 

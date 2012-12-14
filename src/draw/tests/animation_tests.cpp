@@ -7,8 +7,8 @@
 
 #include "DrawableMock.h"
 
-#include "../Image.h"
-#include "../Animation.h"
+#include "Image.h"
+#include "Animation.h"
 
 static void ldraw_animation_properties_test() {
 	using namespace ldraw;

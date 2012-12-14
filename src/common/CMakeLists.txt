@@ -10,48 +10,17 @@ FIND_PACKAGE(SDL REQUIRED)
 set( SRC "..")
 set( LIBS ../../libs)
 include_directories(${SDL_INCLUDE_DIR}
+    include/common/
 	${LIBS}/UnitTest++ 
 	${LIBS}/lua 
-	../luawrap/include
+	${SRC}/luawrap/include
 )
 
 
-set( lcommon_src
-    perf_timer.h
-    fatal_error.h
-    fatal_error.cpp
-	geometry.cpp
-	geometry.h
-	lcommon_assert.h
-	math.cpp
-	math.h
-	PerfTimer.cpp
-	PerfTimer.h
-	SerializeBuffer.cpp
-	SerializeBuffer.h
-	Range.h
-	smartptr.h
-	Timer.cpp
-	Timer.h
-	unittest.cpp
-	unittest.h
-	strformat.cpp
-	strformat.h
-	
-	lua/lua_geometry.h
-	lua/lua_geometry.cpp
-	lua/lua_lcommon.h
-	lua/lua_lcommon.cpp
-    lua/lua_range.cpp
-    lua/lua_range.h
-    lua/lua_serialize.h
-    lua/lua_serialize.cpp
-    lua/lua_timer.cpp
-    lua/lua_timer.h
-    lua/lua_numeric_tuple_helper.h
-	
-	random/mtwist.cpp
-	random/mtwist.h
+file(GLOB lcommon_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+    src/* 
+    src/lua/* 
+    include/common/* 
 )
 
 add_library( lcommon
@@ -70,3 +39,8 @@ target_link_libraries(
 			luawrap
 			lua
 )
+
+# Enable tests
+enable_testing()
+
+add_test(NAME lcommon_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/lcommon_tests )

@@ -97,7 +97,7 @@ void GameChat::draw_player_chat(GameState* gs) const {
 	Pos chat_pos(0, 0);
 	Pos text_pos(chat_pos.x + padding, chat_pos.y + padding);
 
-	ldraw::draw_rectangle(COL_CONSOLE_BOX.with_alpha(50 * fade_out),
+	ldraw::draw_rectangle(COL_CONSOLE_BOX.alpha(50 * fade_out),
 			BBox(chat_pos, chat_size));
 
 	bool draw_typed_message = is_typing || !typing_field.empty();

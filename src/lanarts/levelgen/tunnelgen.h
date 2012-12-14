@@ -8,7 +8,7 @@
 
 const int MAX_TUNNEL_WIDTH = 4;
 
-#include <common/random/mtwist.h>
+#include <common/mtwist.h>
 
 #include "GeneratedLevel.h"
 

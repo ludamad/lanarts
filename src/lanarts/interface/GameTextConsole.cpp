@@ -22,7 +22,7 @@ void GameTextConsole::step(GameState *gs) {
 
 void GameTextConsole::draw_box(GameState *gs) {
 	content_already_drawn = true;
-	ldraw::draw_rectangle(COL_CONSOLE_BOX.with_alpha(50), bbox);
+	ldraw::draw_rectangle(COL_CONSOLE_BOX.alpha(50), bbox);
 }
 
 void GameTextConsole::draw(GameState* gs) {
