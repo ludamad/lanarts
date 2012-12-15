@@ -49,11 +49,11 @@ void load_spell_callbackf(const YAML::Node& node, lua_State* L,
 	SpellEntry entry = parse_spell_type(L, node);
 	game_spell_data.push_back(entry);
 
-	value->get(L, entry.name) = node;
+	(*value)[entry.name] = node;
 }
 LuaValue load_spell_data(lua_State* L, const FilenameList& filenames) {
-	LuaValue ret;
-	ret.newtable(L);
+	LuaValue ret(L);
+	ret.newtable();
 
 	game_spell_data.clear();
 

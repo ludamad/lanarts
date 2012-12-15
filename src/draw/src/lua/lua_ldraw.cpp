@@ -26,7 +26,7 @@ namespace ldraw {
 void lua_register_ldraw(lua_State* L, const LuaValue& module) {
 	using namespace ldraw;
 #define BIND_FUNC(f)\
-	module.get(L, #f) = luawrap::function(L, f)
+	module[#f] = luawrap::function(L, f)
 
 	lua_register_lcommon(L, module);
 

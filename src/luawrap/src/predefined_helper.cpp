@@ -13,7 +13,7 @@ namespace luawrap {
 	namespace _private {
 
 		void TypeImpl<LuaValue>::push(lua_State* L, const LuaValue& val) {
-			val.push(L);
+			val.push();
 		}
 
 		LuaValue TypeImpl<LuaValue>::get(lua_State* L, int idx) {

@@ -101,7 +101,7 @@ void lua_register_image(lua_State *L, const LuaValue & module) {
 			lua_checkimage>();
 
 #define BIND_FUNC(f)\
-	module.get(L, #f) = luawrap::function(L, f);
+	module[#f] = luawrap::function(L, f);
 
 	BIND_FUNC(image_load);
 	BIND_FUNC(image_split);

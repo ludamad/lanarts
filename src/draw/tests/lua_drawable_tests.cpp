@@ -25,9 +25,9 @@ static void lua_drawable_bind_test() {
 	image.draw_region() = BBoxF(0, 0, 10, 10);
 	Drawable drawable(new Image(image));
 
-	LuaValue globals = LuaValue::globals(L);
+	LuaValue globals = luawrap::globals(L);
 
-	globals.get(L, "assert") = luawrap::function(L, unit_test_assert);
+	globals["assert"] = luawrap::function(L, unit_test_assert);
 
 	const char* code2 = "function testImgProperties(img)\n"
 			"assert('width does not exist', img.width ~= nil)\n"
@@ -40,12 +40,12 @@ static void lua_drawable_bind_test() {
 
 	lua_assert_valid_dostring(L, code2);
 	{
-		globals.get(L, "testImgProperties").push();
+		globals["testImgProperties"].push();
 		luawrap::call<void>(L, image);
 	}
 	//Drawable should be equivalent
 	{
-		globals.get(L, "testImgProperties").push();
+		globals["testImgProperties"].push();
 		luawrap::call<void>(L, drawable);
 	}
 
@@ -59,9 +59,9 @@ static void lua_luadrawable_bind_test() {
 
 	TestLuaState L;
 
-	LuaValue globals = LuaValue::globals(L);
+	LuaValue globals = luawrap::globals(L);
 
-	globals.get(L, "assert") = luawrap::function(L, unit_test_assert);
+	globals["assert"] = luawrap::function(L, unit_test_assert);
 
 	const char* code = "function drawfunc() end";
 	lua_assert_valid_dostring(L, code);

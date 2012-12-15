@@ -199,7 +199,7 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 
 	load_tile_data(dfiles.tile_files);
 	lua_sprites = load_sprite_data(L, dfiles.sprite_files);
-	lua_sprites.deinitialize(L);
+	lua_sprites.clear();
 	load_tileset_data(dfiles.tileset_files);
 
 	// --- ITEM DATA ---
@@ -221,7 +221,7 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 	load_itemgenlist_data(L, dfiles.itemgenlist_files);
 	load_area_template_data(dfiles.level_template_files);
 	lua_dungeon = load_dungeon_data(L, dfiles.level_files);
-	lua_dungeon.deinitialize(L);
+	lua_dungeon.clear();
 	lua_classes = load_class_data(L, dfiles.class_files);
 
 	load_settings_data(settings, "settings.yaml");
@@ -230,8 +230,10 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 
 static void register_as_global(lua_State* L, LuaValue& value,
 		const char* name) {
-	value.push(L);
-	lua_setglobal(L, name);
+	if (!value.empty()) {
+		value.push();
+		lua_setglobal(L, name);
+	}
 }
 
 template<class T>
@@ -267,7 +269,7 @@ void init_lua_data(GameState* gs, lua_State* L) {
 }
 
 static void luayaml_push(LuaValue& value, lua_State* L, const char* name) {
-	value.push(L);
+	value.push();
 	int tableind = lua_gettop(L);
 	lua_getfield(L, tableind, name);
 	lua_replace(L, tableind);

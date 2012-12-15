@@ -12,6 +12,8 @@
 
 #include "display.h"
 
+#include "opengl/gl_extensions.h"
+
 static void gl_set_drawing_area(int x, int y, int w, int h) {
 	glViewport(x, y, w, h);
 
@@ -33,9 +35,9 @@ static void gl_set_drawing_area(int x, int y, int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
+
 // Set up sane 2D drawing defaults
-static void gl_sdl_initialize(const char* window_name, int w, int h,
-		bool fullscreen) {
+static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullscreen) {
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
@@ -73,6 +75,8 @@ static void gl_sdl_initialize(const char* window_name, int w, int h,
 	SDL_WM_SetCaption(window_name, window_name);
 
 	glDisable(GL_TEXTURE_2D);
+
+	gl_set_vsync(false);
 
 	gl_set_drawing_area(0, 0, w, h);
 }

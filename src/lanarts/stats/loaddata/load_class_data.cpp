@@ -77,13 +77,13 @@ ClassType parse_class(const YAML::Node& n) {
 void load_class_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	ClassType entry = parse_class(node);
-	value->get(L, entry.name) = node;
+	(*value)[entry.name] = node;
 	game_class_data.push_back(entry);
 }
 
 LuaValue load_class_data(lua_State* L, const FilenameList& filenames) {
-	LuaValue ret;
-	ret.newtable(L);
+	LuaValue ret(L);
+	ret.newtable();
 
 	game_class_data.clear();
 	load_data_impl_template(filenames, "classes", load_class_callbackf, L,

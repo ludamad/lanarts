@@ -14,14 +14,14 @@ static void lua_serialize_number() {
 	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
 	const double testnumber = 1.1;
 
-	LuaValue value, result;
+	LuaValue value(L), result(L);
 	lua_pushnumber(L, testnumber);
 
-	value.pop(L);
+	value.pop();
 	lua_serialize(serializer, L, value);
 
 	lua_deserialize(serializer, L, result);
-	result.push(L);
+	result.push();
 
 	UNIT_TEST_ASSERT(lua_isnumber(L, -1));
 	UNIT_TEST_ASSERT(lua_tonumber(L, -1) == testnumber);
@@ -41,12 +41,12 @@ static void lua_serialize_table() {
 
 	{
 		//serialize it
-		LuaValue value, result;
-		value.pop(L);
+		LuaValue value(L), result(L);
+		value.pop();
 		lua_serialize(serializer, L, value);
 		//deserialize it
 		lua_deserialize(serializer, L, result);
-		result.push(L);
+		result.push();
 	}
 
 	UNIT_TEST_ASSERT(lua_istable(L, -1));
@@ -58,10 +58,10 @@ static void lua_serialize_table() {
 }
 static void lua_serialize_novalue() {
 	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
-	LuaValue value, result;
+	LuaValue value(L), result(L);
 	lua_serialize(serializer, L, value);
 	lua_deserialize(serializer, L, result);
-	result.push(L);
+	result.push();
 	UNIT_TEST_ASSERT(lua_isnil(L, -1));
 
 }
@@ -79,11 +79,11 @@ static void lua_serialize_nested_table() {
 
 	{
 		//serialize it
-		LuaValue value, result;
-		value.pop(L);
+		LuaValue value(L), result(L);
+		value.pop();
 		lua_serialize(serializer, L, value);
 		lua_deserialize(serializer, L, result);
-		result.push(L);
+		result.push();
 	}
 
 	UNIT_TEST_ASSERT(lua_istable(L, -1));

@@ -118,7 +118,8 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 	lua_State* L = gs->get_luastate();
 	static LuaValue script_globals;
 	if (script_globals.empty()) {
-		script_globals.newtable(L);
+		script_globals.init(L);
+		script_globals.newtable();
 //		script_globals.push(L);
 //		int script = lua_gettop(L);
 //		lua_pushvalue(L, LUA_GLOBALSINDEX);
@@ -127,9 +128,9 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 	}
 
 	lua_push_gameinst(L, p);
-	script_globals.get(L, "player").pop();
+	script_globals["player"].pop();
 	lua_push_combatstats(L, p);
-	script_globals.get(L, "stats").pop();
+	script_globals["stats"].pop();
 
 	//Run lua command
 	if (starts_with(command, "!lua ", &content)) {
@@ -146,7 +147,7 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 		}
 
 		int lfunc = lua_gettop(L);
-		script_globals.push(L);
+		script_globals.push();
 		lua_setfenv(L, lfunc);
 
 		bool iserr = (lua_pcall(L, 0, LUA_MULTRET, 0) != 0);
@@ -177,7 +178,7 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 		}
 
 		int lfunc = lua_gettop(L);
-		script_globals.push(L);
+		script_globals.push();
 		lua_setfenv(L, lfunc);
 
 		bool err_call = (lua_pcall(L, 0, 0, 0) != 0);

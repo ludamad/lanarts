@@ -56,7 +56,7 @@ void ldraw::lua_register_drawoptions(lua_State *L,
 			lua_get_drawoptions, lua_check_drawoptions>();
 
 #define BIND_ORIGIN_CONST(origin) \
-	module.get(L, #origin) = +origin
+	module[#origin] = +origin
 
 	BIND_ORIGIN_CONST(LEFT_TOP);
 	BIND_ORIGIN_CONST(LEFT_CENTER);

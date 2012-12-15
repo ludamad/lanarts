@@ -19,7 +19,7 @@ void lua_generic_pushget_test(lua_State* L, const T& value) {
 
 static void lua_geo_pushget_test() {
 	TestLuaState L;
-	lua_register_geometry(L, LuaValue::globals(L));
+	lua_register_geometry(L, luawrap::globals(L));
 
 	lua_generic_pushget_test(L, Posf(0.5, 1.5));
 	lua_generic_pushget_test(L, Pos(1, 2));
@@ -43,8 +43,9 @@ static void lua_pos_bind_test() {
 	LuaValue globals(L, LUA_GLOBALSINDEX);
 	lua_register_geometry(L, globals);
 
-	globals.get(L, "pos_func1") = luawrap::function(L, pos_func1);
-	globals.get(L, "pos_func2") = luawrap::function(L, pos_func2);
+	globals["pos_func1"].bind_function(pos_func1);
+	globals["pos_func2"].bind_function(pos_func2);
+
 	const char* code = "pos_func1({1,2})\n"
 			"pos_func2({1,2})\n";
 	lua_assert_valid_dostring(L, code);
@@ -62,8 +63,9 @@ static void lua_posf_bind_test() {
 	LuaValue globals(L, LUA_GLOBALSINDEX);
 	lua_register_geometry(L, globals);
 
-	globals.get(L, "posf_func1") = luawrap::function(L, posf_func1);
-	globals.get(L, "posf_func2") = luawrap::function(L, posf_func2);
+	globals["posf_func1"].bind_function(posf_func1);
+	globals["posf_func2"].bind_function(posf_func2);
+
 	const char* code = "posf_func1({.5,1.5})\n"
 			"posf_func2({.5,1.5})\n";
 	lua_assert_valid_dostring(L, code);
@@ -78,7 +80,7 @@ static void lua_bbox_bind_test() {
 	LuaValue globals(L, LUA_GLOBALSINDEX);
 	lua_register_geometry(L, globals);
 
-	globals.get(L, "bbox_func") = luawrap::function(L, bbox_func);
+	globals["bbox_func"].bind_function(bbox_func);
 	const char* code1 = "bbox_func({1,2,3,4})\n";
 	lua_assert_valid_dostring(L, code1);
 	const char* code2 = "bbox_func({1,2,3})\n";
@@ -94,7 +96,7 @@ static void lua_bboxf_bind_test() {
 	LuaValue globals(L, LUA_GLOBALSINDEX);
 	lua_register_geometry(L, globals);
 
-	globals.get(L, "bboxf_func") = luawrap::function(L, bboxf_func);
+	globals["bboxf_func"].bind_function(bboxf_func);
 
 	const char* code1 = "bboxf_func({.5, 1.5, 2.5, 3.5})\n";
 	lua_assert_valid_dostring(L, code1);
@@ -111,7 +113,7 @@ static void lua_dim_bind_test() {
 	LuaValue globals(L, LUA_GLOBALSINDEX);
 	lua_register_geometry(L, globals);
 
-	globals.get(L, "dim_func") = luawrap::function(L, dim_func);
+	globals["dim_func"].bind_function(dim_func);
 
 	const char* code1 = "dim_func({1,2})\n";
 	lua_assert_valid_dostring(L, code1);
@@ -127,7 +129,7 @@ static void lua_dimf_bind_test() {
 	LuaValue globals(L, LUA_GLOBALSINDEX);
 	lua_register_geometry(L, globals);
 
-	globals.get(L, "dimf_func") = luawrap::function(L, dimf_func);
+	globals["dimf_func"].bind_function(dimf_func);
 
 	const char* code1 = "dimf_func({.5,1.5})\n";
 	lua_assert_valid_dostring(L, code1);

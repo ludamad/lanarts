@@ -19,7 +19,7 @@ static void lua_font_bind_test() {
 	using namespace ldraw;
 
 	TestLuaState L;
-	LuaValue globals = LuaValue::globals(L);
+	LuaValue globals = luawrap::globals(L);
 
 	Font f;
 	lua_register_font(L, globals);
@@ -28,7 +28,7 @@ static void lua_font_bind_test() {
 	UNIT_TEST_ASSERT(lua_isuserdata(L, -1));
 	lua_pop(L, 1);
 
-	globals.get(L, "assert") = luawrap::function(L, unit_test_assert);
+	globals["assert"] = luawrap::function(L, unit_test_assert);
 
 	//Cant really test methods, just assert they exist:
 	const char* code2 =
@@ -39,7 +39,7 @@ static void lua_font_bind_test() {
 					"end\n";
 
 	lua_assert_valid_dostring(L, code2);
-	globals.get(L, "testFontProperties").push();
+	globals["testFontProperties"].push();
 	luawrap::call<void>(L, f);
 
 	L.finish_check();

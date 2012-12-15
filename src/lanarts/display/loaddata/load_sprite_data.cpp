@@ -67,11 +67,11 @@ void load_sprite_callbackf(const YAML::Node& node, lua_State* L,
 			parse_defaulted(node, "colour", Colour()));
 	game_sprite_data.push_back(entry);
 
-	value->get(L, entry.name) = node;
+	(*value)[entry.name] = node;
 }
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames) {
-	LuaValue ret;
-	ret.newtable(L);
+	LuaValue ret(L);
+	ret.newtable();
 
 	game_sprite_data.clear();
 

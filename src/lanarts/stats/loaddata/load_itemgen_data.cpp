@@ -44,12 +44,12 @@ static void load_itemlist(const YAML::Node& node, lua_State* L,
 	ItemGenList igl = parse_itemgenlist(node);
 	game_itemgenlist_data.push_back(igl);
 
-	value->get(L, igl.name) = node;
+	(*value)[igl.name] = node;
 }
 
 LuaValue load_itemgenlist_data(lua_State* L, const FilenameList& filenames) {
-	LuaValue ret;
-	ret.newtable(L);
+	LuaValue ret(L);
+	ret.newtable();
 
 	game_itemgenlist_data.clear();
 

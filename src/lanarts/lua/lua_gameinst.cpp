@@ -79,7 +79,7 @@ public:
 		if ((combatinst = dynamic_cast<CombatGameInst*>(get_inst()))) {
 			LuaValue effect = combatinst->effects().add(lua_get_gamestate(L),
 					combatinst, effect_from_lua(L, 1), lua_tointeger(L, 2));
-			effect.push(L);
+			effect.push();
 		} else {
 			lua_pushnil(L);
 		}
@@ -197,7 +197,7 @@ static int lua_member_lookup(lua_State* L) {
 		if (lua_isnil(L, -1)) {
 			lua_pop(L, 1);
 
-			inst->lua_variables.push(L);
+			inst->lua_variables.push();
 			tableind = lua_gettop(L);
 			lua_pushvalue(L, 2);
 			lua_gettable(L, tableind);
@@ -227,9 +227,12 @@ static int lua_member_update(lua_State* L) {
 			had_member = false;
 	}
 	if (!had_member) {
-		if (inst->lua_variables.empty())
-			inst->lua_variables.newtable(L);
-		inst->lua_variables.push(L);
+		LuaValue& vars = inst->lua_variables;
+		if (vars.empty()) {
+			vars.init(L);
+			vars.newtable();
+		}
+		vars.push();
 		int tableind = lua_gettop(L);
 		lua_pushvalue(L, 2);
 		lua_pushvalue(L, 3);
@@ -268,7 +271,7 @@ void lua_push_gameinst(lua_State* L, GameInst* inst) {
 void lua_gameinst_callback(lua_State* L, LuaValue& value, GameInst* inst) {
 	if (value.empty())
 		return;
-	value.push(L);
+	value.push();
 	lua_push_gameinst(L, inst);
 	lua_call(L, 1, 0);
 }

@@ -22,7 +22,7 @@ void luavalue_call_and_store(lua_State* L, LuaValue& eval) {
 		return;
 	}
 
-	eval.push(L);
+	eval.push();
 
 	if (lua_pcall(L, 0, 1, 0 /*no errfunc*/)) {
 		printf("Error while evaluating lua expression:\n%s\n",
@@ -30,6 +30,6 @@ void luavalue_call_and_store(lua_State* L, LuaValue& eval) {
 		exit(0);
 	}
 
-	eval.pop(L);
+	eval.pop();
 	perf_timer_end(FUNCNAME);
 }

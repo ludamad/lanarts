@@ -32,7 +32,7 @@ LuaDrawable::~LuaDrawable() {
 }
 
 void LuaDrawable::_push_closure() const {
-	_draw_closure.get(L).push(L);
+	_draw_closure.get(L).push();
 }
 
 void LuaDrawable::draw(const DrawOptions & options, const Posf & pos) const {

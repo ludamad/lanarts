@@ -24,7 +24,7 @@ static void lua_generic_vector_test(const char* luastr, const T& t1,
 	vec.push_back(t1);
 	vec.push_back(t2);
 
-	globals.get(L, "vector_func") = luawrap::function(L, vector_func<T>);
+	globals["vector_func"].bind_function(vector_func<T>);
 
 	std::string code = "return vector_func(";
 	code += luastr;
@@ -56,7 +56,7 @@ SUITE (luawrap_vector_tests) {
 
 		LuaValue globals(L, LUA_GLOBALSINDEX);
 
-		globals.get(L, "assert") = luawrap::function(L, unit_test_assert);
+		globals["assert"].bind_function(unit_test_assert);
 
 		std::vector<int> nums;
 		nums.push_back(1);
@@ -69,7 +69,7 @@ SUITE (luawrap_vector_tests) {
 
 		lua_assert_valid_dostring(L, code);
 
-		globals.get(L, "func").push();
+		globals["func"].push();
 		luawrap::call<void>(L, nums);
 
 		L.finish_check();

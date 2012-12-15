@@ -15,11 +15,11 @@ static void rangef_func(const RangeF& rangef) {
 
 static void lua_range_bind_test() {
 	TestLuaState L;
-	LuaValue globals = LuaValue::globals(L);
+	LuaValue globals = luawrap::globals(L);
 	lua_register_range(L, globals);
 
-	globals.get(L, "range_func") = luawrap::function(L, range_func);
-	globals.get(L, "rangef_func") = luawrap::function(L, rangef_func);
+	globals["range_func"].bind_function(range_func);
+	globals["rangef_func"].bind_function(rangef_func);
 	const char* code = "range_func({1,2})\n"
 			"rangef_func({.5,1.5})\n";
 	lua_assert_valid_dostring(L, code);
@@ -27,7 +27,7 @@ static void lua_range_bind_test() {
 
 static void lua_range_call_test() {
 	TestLuaState L;
-	LuaValue globals = LuaValue::globals(L);
+	LuaValue globals = luawrap::globals(L);
 	lua_register_range(L, globals);
 
 	const char* code = "function id(a)\n"
@@ -36,7 +36,7 @@ static void lua_range_call_test() {
 
 	lua_assert_valid_dostring(L, code);
 
-	globals.get(L, "id").push();
+	globals["id"].push();
 	luawrap::call<void>(L, RangeF());
 }
 

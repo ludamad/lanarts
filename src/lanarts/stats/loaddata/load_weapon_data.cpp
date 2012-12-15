@@ -46,8 +46,8 @@ void load_weapon_callbackf(const YAML::Node& node, lua_State* L,
 	if (value) {
 		/* Lua loading code */
 		LuaValue nodetable = lua_yaml(L, node);
-		nodetable.get(L, "type") = "weapon";
-		value->get(L, entry->name) = nodetable;
+		nodetable["type"] = "weapon";
+		(*value)[entry->name] = nodetable;
 	}
 }
 

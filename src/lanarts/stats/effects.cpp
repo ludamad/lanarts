@@ -99,16 +99,14 @@ void EffectStats::process(GameState* gs, CombatGameInst* inst,
 
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining > 0) {
-			game_effect_data.at(effects[i].effectid).stat_func.push(L);
-			if (!lua_isnil(L, -1)) {
-				effects[i].state.push(L);
+			game_effect_data.at(effects[i].effectid).stat_func.push();
+			if (!effects[i].state.empty()) {
+				effects[i].state.push();
 				lua_push_gameinst(L, inst);
 
 				lua_pushvalue(L, baseind);
 				lua_pushvalue(L, affind);
 				lua_call(L, 4, 0);
-			} else {
-				lua_pop(L, 1);
 			}
 		}
 	}
@@ -120,12 +118,12 @@ void EffectStats::process(GameState* gs, CombatGameInst* inst,
 
 static void lua_effect_func_callback(lua_State* L, LuaValue& value,
 		Effect& effect, CombatGameInst* inst) {
-	value.push(L);
-	if (lua_isnil(L, -1)) {
-		lua_pop(L, 1);
+	if (value.empty()) {
 		return;
 	}
-	effect.state.push(L);
+
+	value.push();
+	effect.state.push();
 	lua_push_gameinst(L, inst);
 	lua_call(L, 2, 0);
 }
@@ -139,9 +137,9 @@ void EffectStats::step(GameState* gs, CombatGameInst* inst) {
 
 			EffectEntry& eentry = game_effect_data.at(e.effectid);
 
-			e.state.get(L, "time_left") = e.t_remaining;
+			e.state["time_left"] = e.t_remaining;
 			lua_effect_func_callback(L, eentry.step_func, e, inst);
-			e.t_remaining = e.state.get(L, "time_left");
+			e.t_remaining = e.state["time_left"];
 
 			if (e.t_remaining == 0) {
 				lua_effect_func_callback(L, eentry.finish_func, e, inst);
@@ -162,21 +160,22 @@ Effect* EffectStats::get(int effect) {
 
 static void lua_init_metatable(lua_State* L, LuaValue& value,
 		effect_id effect) {
-	value.push(L);
+	value.push();
 	/* Set self as metatable*/
 	lua_pushvalue(L, -1);
 	lua_setmetatable(L, -2);
 
 	/* Set index as effect object */
 	EffectEntry& eentry = game_effect_data.at(effect);
-	lua_effects.get(L, eentry.name).push();
+	lua_effects[eentry.name].push();
 	lua_setfield(L, -2, "__index");
 	/* Pop self */
 	lua_pop(L, 1);
 }
 
 static void lua_init_effect(lua_State* L, LuaValue& value, effect_id effect) {
-	value.newtable(L);
+	value.init(L);
+	value.newtable();
 	lua_init_metatable(L, value, effect);
 }
 
@@ -190,7 +189,7 @@ LuaValue EffectStats::add(GameState* gs, CombatGameInst* inst, effect_id effect,
 			e.t_remaining = std::max(e.t_remaining, length);
 			lua_init_effect(L, e.state, effect);
 
-			e.state.get(L, "time_left") = e.t_remaining;
+			e.state["time_left"] = e.t_remaining;
 
 			EffectEntry& eentry = game_effect_data.at(e.effectid);
 			lua_effect_func_callback(L, eentry.init_func, e, inst);
@@ -216,7 +215,7 @@ void EffectStats::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		serializer.read_int(effects[i].effectid);
 		lua_deserialize(serializer, L, effects[i].state);
-		if (!effects[i].state.isnil(L)) {
+		if (!effects[i].state.empty()) {
 			lua_init_metatable(L, effects[i].state, effects[i].effectid);
 		}
 		serializer.read_int(effects[i].t_remaining);

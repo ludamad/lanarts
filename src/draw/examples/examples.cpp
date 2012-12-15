@@ -134,7 +134,7 @@ lua_State* L;
 static void draw_script() {
 	ldraw::Font fpsfont("sample.ttf", 40);
 
-	LuaValue::globals(L).get(L, "draw").push();
+	luawrap::globals(L)["draw"].push();
 	luawrap::call<void>(L);
 
 	fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::LEFT_BOTTOM),
@@ -160,7 +160,7 @@ static void setup_lua_state() {
 	L = lua_open();
 	luaL_openlibs(L);
 
-	LuaValue globals = LuaValue::globals(L);
+	LuaValue globals = luawrap::globals(L);
 
 	lua_register_ldraw(L, globals);
 	lua_register_lcommon(L, globals);

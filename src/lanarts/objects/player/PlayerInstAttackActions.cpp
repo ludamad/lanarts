@@ -186,7 +186,7 @@ static bool lua_spell_get_target(GameState* gs, PlayerInst* p, LuaValue& action,
 	GameInst* target = gs->get_instance(target_id);
 
 	int beforecall_idx = lua_gettop(L);
-	action.push(L);
+	action.push();
 	lua_push_gameinst(L, p);
 	if (!target) {
 		lua_pushnil(L);
@@ -214,7 +214,7 @@ static bool lua_spell_get_target(GameState* gs, PlayerInst* p, LuaValue& action,
 static void player_use_luacallback_spell(GameState* gs, PlayerInst* p,
 		SpellEntry& spl_entry, LuaValue& action, const Pos& target) {
 	lua_State* L = gs->get_luastate();
-	action.push(L);
+	action.push();
 	lua_push_gameinst(L, p);
 	lua_pushnumber(L, target.x);
 	lua_pushnumber(L, target.y);
@@ -226,17 +226,16 @@ static bool lua_spell_check_prereq(GameState* gs, PlayerInst* p,
 	lua_State* L = gs->get_luastate();
 	bool passes = true;
 
-	action.push(L);
-	if (!lua_isnil(L, -1)) {
+	if (!action.empty()) {
+		action.push();
 		lua_push_gameinst(L, p);
 		lua_pushnumber(L, target.x);
 		lua_pushnumber(L, target.y);
 		lua_call(L, 3, 1);
 		passes = lua_toboolean(L, -1);
+		lua_pop(L, 1);
 	}
 
-	/*Pop either the nill or the boolean*/
-	lua_pop(L, 1);
 	return passes;
 }
 
@@ -501,13 +500,11 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
 
 static void lua_hit_callback(lua_State* L, LuaValue& callback, GameInst* user,
 		GameInst* target) {
-	callback.push(L);
-	if (!lua_isnil(L, -1)) {
+	if (!callback.empty()) {
+		callback.push();
 		lua_push_gameinst(L, user);
 		lua_push_gameinst(L, target);
 		lua_call(L, 2, 0);
-	} else {
-		lua_pop(L, 1);
 	}
 }
 

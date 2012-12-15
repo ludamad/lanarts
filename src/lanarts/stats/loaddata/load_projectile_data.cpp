@@ -47,13 +47,13 @@ static void load_projectile(const YAML::Node& node, lua_State* L,
 	/* Lua loading code */
 
 	LuaValue nodetable = lua_yaml(L, node);
-	value->get(L, entry->name) = nodetable;
-	nodetable.get(L, "type") = "projectile";
+	nodetable["type"] = "projectile";
+	(*value)[entry->name] = nodetable;
 }
 LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 		LuaValue& itemtable) {
-	LuaValue ret;
-	ret.newtable(L);
+	LuaValue ret(L);
+	ret.newtable();
 
 	load_data_impl_template(filenames, "projectiles", load_projectile, L,
 			&itemtable);
@@ -62,7 +62,7 @@ LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 		if (dynamic_cast<ProjectileEntry*>(&ientry)) {
 			ProjectileEntry& entry = get_projectile_entry(i);
 
-			ret.get(L, entry.name) = itemtable.get(L, entry.name);
+			ret[entry.name] = itemtable[entry.name];
 		}
 	}
 	return ret;

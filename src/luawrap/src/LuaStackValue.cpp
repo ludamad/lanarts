@@ -18,30 +18,43 @@
 #include <lua.hpp>
 
 #include <luawrap/LuaStackValue.h>
+#include <luawrap/LuaValue.h>
 
 using namespace _luawrap_private;
 
 namespace _luawrap_private {
 
 	void _LuaStackField::push() const {
+		lua_getfield(value.luastate(), value.index(), key);
 	}
 
 	void _LuaStackField::pop() const {
+		lua_setfield(value.luastate(), value.index(), key);
 	}
 
 	void _LuaStackField::operator =(const LuaValue& value) {
+		value.push();
+		pop();
 	}
 
-	void _LuaStackField::operator =(const char* value) {
+	void _LuaStackField::operator =(const char* str) {
+		lua_pushstring(value.luastate(), str);
+		pop();
 	}
 
 	void _LuaStackField::operator =(lua_CFunction func) {
+		lua_pushcfunction(value.luastate(), func);
+		pop();
 	}
 
 	void _LuaStackField::operator =(const _LuaField& field) {
+		field.push();
+		pop();
 	}
 
 	void _LuaStackField::operator =(const _LuaStackField& field) {
+		field.push();
+		pop();
 	}
 }
 
@@ -62,7 +75,7 @@ bool LuaStackValue::empty() const {
 	return L == NULL;
 }
 
-LuaStackValue luawrap::globals(lua_State* L) {
-	return LuaStackValue(L, LUA_GLOBALSINDEX);
+LuaSpecialValue luawrap::globals(lua_State* L) {
+	return LuaSpecialValue(L, LUA_GLOBALSINDEX);
 }
 

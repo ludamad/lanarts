@@ -12,27 +12,27 @@ SUITE (LuaValue) {
 	TEST(luavalue_test_get) {
 		TestLuaState L;
 
-		LuaValue globals = LuaValue::globals(L);
+		LuaValue globals = luawrap::globals(L);
 
-		LuaValue value;
-		value.newtable(L);
+		LuaValue value(L);
+		value.newtable();
 
 		{
 			int input = 1337;
-			value.get(L, "hello") = input;
-			int output = value.get(L, "hello");
+			value["hello"] = input;
+			int output = value["hello"];
 			CHECK_EQUAL(input, output);
 		}
 
 		{
 			std::string input = "test";
-			value.get(L, "hello") = input;
-			std::string output = value.get(L, "hello");
+			value["hello"] = input;
+			std::string output = value["hello"];
 			CHECK(input == output);
 		}
 
-		globals.deinitialize(L);
-		value.deinitialize(L);
+		globals.clear();
+		value.clear();
 		L.finish_check();
 	}
 
@@ -41,8 +41,8 @@ SUITE (LuaValue) {
 
 		lua_newtable(L);
 		LuaValue v1(L, -1), v2(L, -1);
-		v1.push(L);
-		v2.push(L);
+		v1.push();
+		v2.push();
 		CHECK(lua_equal(L, -1, -2));
 		lua_pop(L, 3);
 		L.finish_check();

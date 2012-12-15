@@ -570,7 +570,7 @@ void lua_serialize(SerializeBuffer& serializer, lua_State* L,
 	serializer.write_byte(value.empty());
 
 	if (!value.empty()) {
-		value.push(L);
+		value.push();
 		lua_serialize(serializer, L, -1);
 	}
 }
@@ -582,9 +582,9 @@ void lua_deserialize(SerializeBuffer& serializer, lua_State* L,
 
 	if (!isnull) {
 		lua_serialize(serializer, L, -1);
-		value.pop(L);
+		value.pop();
 	} else {
-		value = LuaValue();
+		value.clear();
 	}
 }
 

@@ -22,11 +22,11 @@ static void colour_func(const Colour& range) {
 static void lua_colour_bind_test() {
 	TestLuaState L;
 
-	LuaValue globals = LuaValue::globals(L);
+	LuaValue globals = luawrap::globals(L);
 
 	ldraw::lua_register_ldraw(L, globals);
 
-	globals.get(L, "colour_func") = luawrap::function(L, colour_func);
+	globals["colour_func"] = luawrap::function(L, colour_func);
 	{
 		const char* code = "colour_func({1,2,3,255})\n";
 		lua_assert_valid_dostring(L, code);

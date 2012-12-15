@@ -46,7 +46,7 @@ void load_equipment_callbackf(const YAML::Node& node, lua_State* L,
 	/* Lua loading code */
 	lua_pushyaml(L, node);
 	lua_pushvalue(L, -1); // Duplicate
-	value->get(L, entry->name).pop();
+	(*value)[entry->name].pop();
 	lua_pushstring(L, "armour");
 	lua_setfield(L, -2, "type");
 	lua_pop(L, 1);

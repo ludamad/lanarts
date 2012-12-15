@@ -49,7 +49,7 @@
 //			parse_defaulted(node, "colour", Colour()));
 //	game_sprite_data.push_back(entry);
 //
-//	value->get(L, entry.name) = node;
+//	(*value)[entry.name] = node;
 //}
 //
 //LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames) {

@@ -39,9 +39,9 @@ LuaValue lua_fontmetatable(lua_State* L) {
 	LuaValue val = luameta_new(L, "Font");
 	LuaValue methods = luameta_methods(L, val);
 
-	methods.get(L, "draw") = luawrap::function(L, font_draw);
-	methods.get(L, "draw_wrapped") = luawrap::function(L, font_draw_wrapped);
-	methods.get(L, "get_draw_size") = luawrap::function(L, font_get_draw_size);
+	methods["draw"] = luawrap::function(L, font_draw);
+	methods["draw_wrapped"] = luawrap::function(L, font_draw_wrapped);
+	methods["get_draw_size"] = luawrap::function(L, font_get_draw_size);
 
 	return val;
 }
@@ -50,7 +50,7 @@ void lua_register_font(lua_State* L, const LuaValue& module) {
 	using namespace ldraw;
 	luawrap::install_userdata_type<Font, lua_fontmetatable>();
 
-	module.get(L, "font_load") = luawrap::function(L, font_load);
+	module["font_load"] = luawrap::function(L, font_load);
 }
 
 }

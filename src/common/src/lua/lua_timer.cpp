@@ -22,9 +22,8 @@ LuaValue lua_timermetatable(lua_State* L) {
 	LuaValue val = luameta_new(L, "Timer");
 	LuaValue methods = luameta_methods(L, val);
 
-	methods.get(L, "start") = luawrap::function(L, "start", start);
-	methods.get(L, "get_microseconds") = luawrap::function(L,
-			"get_microseconds", get_microseconds);
+	methods["start"].bind_function(start);
+	methods["get_microseconds"].bind_function(get_microseconds);
 
 	return val;
 }

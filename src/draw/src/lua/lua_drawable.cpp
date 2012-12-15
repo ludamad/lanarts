@@ -188,7 +188,7 @@ void lua_register_drawables(lua_State *L, const LuaValue & module) {
 			lua_checkluadrawable>();
 
 #define BIND_FUNC(f)\
-	module.get(L, #f) = luawrap::function(L, f)
+	module[#f] = luawrap::function(L, f)
 
 	BIND_FUNC(directional_create);
 	BIND_FUNC(animation_create);

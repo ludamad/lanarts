@@ -88,7 +88,7 @@ static void draw_loop(DrawFunc draw_func) {
 
 static void draw_script() {
 	ldraw::Font fpsfont("res/sample.ttf", 40);
-	LuaValue::globals(L).get(L, "draw").push();
+	luawrap::globals(L)["draw"].push();
 	luawrap::call<void>(L);
 
 	fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::LEFT_BOTTOM),
@@ -136,10 +136,8 @@ static void setup_lua_state() {
 
 	// Expose additional functions needed for examples
 	// This allows us to code the examples fully in lua:
-	globals.get(L, "drawable_parse") = luawrap::function(L, drawable_parse);
-	globals.get(L, "drawablelist_parse") = luawrap::function(L,
-			drawablelist_parse);
-
+	globals["drawable_parse"].bind_function(drawable_parse);
+	globals["drawablelist_parse"].bind_function(drawablelist_parse);
 }
 
 int main(int argc, const char** argv) {

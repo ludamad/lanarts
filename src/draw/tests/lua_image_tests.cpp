@@ -24,7 +24,7 @@ static void SLB_sanity_test() {
 	using namespace ldraw;
 
 	TestLuaState L;
-	LuaValue globals = LuaValue::globals(L);
+	LuaValue globals = luawrap::globals(L);
 	ldraw::lua_register_image(L, globals);
 
 	const char* code = "function checksanity()\n"
@@ -32,16 +32,16 @@ static void SLB_sanity_test() {
 
 	lua_assert_valid_dostring(L, code);
 	{
-		globals.get(L, "checksanity").push();
+		globals["checksanity"].push();
 		luawrap::call<void>(L);
 	}
 	{
-		globals.get(L, "checksanity").push();
+		globals["checksanity"].push();
 		luawrap::call<void>(L, (int) 1); // Smoke test
 	}
 	{
 		Image image;
-		globals.get(L, "checksanity").push();
+		globals["checksanity"].push();
 		luawrap::call<void>(L, image); // Smoke test
 	}
 	{

@@ -14,29 +14,29 @@
 static void luavalue_test_get() {
 	TestLuaState L;
 
-	LuaValue globals = LuaValue::globals(L);
+	LuaValue globals = luawrap::globals(L);
 	lua_register_lcommon(L, globals);
 
-	LuaValue value;
-	value.newtable(L);
+	LuaValue value(L);
+	value.newtable();
 
 	{
 		int input = 1337;
-		value.get(L, "hello") = input;
-		int output = value.get(L, "hello");
+		value["hello"] = input;
+		int output = value["hello"];
 		UNIT_TEST_ASSERT(input == output);
 	}
 
 
 	{
 		Pos inpos(1, 2);
-		value.get(L, "hello") = inpos;
-		Pos outpos = value.get(L, "hello");
+		value["hello"] = inpos;
+		Pos outpos = value["hello"];
 		UNIT_TEST_ASSERT(inpos == outpos);
 	}
 
-	globals.deinitialize(L);
-	value.deinitialize(L);
+	globals.clear();
+	value.clear();
 
 	UNIT_TEST_ASSERT(lua_gettop(L) == 0);
 }
@@ -46,8 +46,8 @@ static void luavalue_test_value_equality() {
 
 	lua_newtable(L);
 	LuaValue v1(L, -1), v2(L, -1);
-	v1.push(L);
-	v2.push(L);
+	v1.push();
+	v2.push();
 	UNIT_TEST_ASSERT(lua_equal(L, -1, -2));
 	lua_pop(L, 3);
 }
@@ -104,14 +104,14 @@ static void lua_perf_test() {
 	LuaValue value(L, LUA_GLOBALSINDEX);
 	for (int i = 0; i < 10000; i++) {
 		Pos inpos(1, 2);
-		value.get(L, "hello") = inpos;
-		Pos outpos = value.get(L, "hello");
+		value["hello"] = inpos;
+		Pos outpos = value["hello"];
 	}
 	perf_timer_end("lua_get_set_pos");
 
 	perf_timer_begin("lua_get_pos");
 	for (int i = 0; i < 10000; i++) {
-		Pos outpos = value.get(L, "hello");
+		Pos outpos = value["hello"];
 	}
 	perf_timer_end("lua_get_pos");
 

@@ -24,8 +24,8 @@ static int luameta_get_member(lua_State* L) {
 			return 1;
 		}
 
-		LuaValue tbl(L, lua_upvalueindex(1));
-		tbl.get(L, "__typename").push();
+		LuaStackValue tbl(L, lua_upvalueindex(1));
+		tbl["__typename"].push();
 		return luaL_error(L, "Type '%s' does not have a '%s' member!\n",
 				lua_tostring(L, -1), lua_tostring(L, 2));
 	}
@@ -45,8 +45,8 @@ static int luameta_set_member(lua_State* L) {
 	lua_gettable(L, lua_upvalueindex(1)); // Push setter
 
 	if (lua_isnil(L, -1)) {
-		LuaValue tbl(L, lua_upvalueindex(1));
-		tbl.get(L, "__typename").push();
+		LuaStackValue tbl(L, lua_upvalueindex(1));
+		tbl["__typename"].push();
 		return luaL_error(L,
 				"Type '%s' does not have a '%s' member, or it is read-only!\n",
 				lua_tostring(L, -1), lua_tostring(L, 2));
@@ -67,39 +67,39 @@ static int luameta_set_member(lua_State* L) {
 LuaValue luameta_new(lua_State* L, const char* classname) {
 	int pretop = lua_gettop(L);
 
-	LuaValue methodtable;
-	methodtable.newtable(L);
+	LuaValue methodtable(L);
+	methodtable.newtable();
 
-	LuaValue metatable;
-	metatable.newtable(L);
+	LuaValue metatable(L);
+	metatable.newtable();
 
 	{ // Set up 'getter' lookup, falls back to 'membertable'
-		LuaValue gettertable;
-		gettertable.newtable(L);
+		LuaValue gettertable(L);
+		gettertable.newtable();
 
 		lua_pushstring(L, classname);
-		gettertable.get(L, "__typename").pop();
+		gettertable["__typename"].pop();
 
-		gettertable.push(L);
-		methodtable.push(L);
+		gettertable.push();
+		methodtable.push();
 		lua_pushcclosure(L, luameta_get_member, 2);
-		metatable.get(L, "__index").pop();
+		metatable["__index"].pop();
 
-		metatable.get(L, "__getters") = gettertable;
+		metatable["__getters"] = gettertable;
 	}
 
 	{ // Set up 'setter' function table
-		LuaValue settertable;
-		settertable.newtable(L);
+		LuaValue settertable(L);
+		settertable.newtable();
 
 		lua_pushstring(L, classname);
-		settertable.get(L, "__typename").pop();
+		settertable["__typename"].pop();
 
-		settertable.push(L);
+		settertable.push();
 		lua_pushcclosure(L, luameta_set_member, 1);
-		metatable.get(L, "__newindex").pop();
+		metatable["__newindex"].pop();
 
-		metatable.get(L, "__setters") = settertable;
+		metatable["__setters"] = settertable;
 	}
 
 //	methodtable.push(L); // Set consttable as its own metatable
@@ -108,7 +108,7 @@ LuaValue luameta_new(lua_State* L, const char* classname) {
 //	lua_pop(L, 1);
 	/*pop metatable*/
 
-	metatable.get(L, "__methods") = methodtable;
+	metatable["__methods"] = methodtable;
 
 	LUAWRAP_ASSERT(lua_gettop(L) == pretop);
 
@@ -116,15 +116,15 @@ LuaValue luameta_new(lua_State* L, const char* classname) {
 }
 
 LuaValue luameta_getters(lua_State* L, const LuaValue& metatable) {
-	return metatable.get(L, "__getters");
+	return metatable["__getters"];
 }
 
 LuaValue luameta_setters(lua_State* L, const LuaValue& metatable) {
-	return metatable.get(L, "__setters");
+	return metatable["__setters"];
 }
 
 LuaValue luameta_methods(lua_State* L, const LuaValue& metatable) {
-	return metatable.get(L, "__methods");
+	return metatable["__methods"];
 }
 
 /*
@@ -137,10 +137,10 @@ void luameta_push(lua_State* L, luameta_initializer initfunc) {
 		lua_pop(L, 1);
 		LuaValue metatable = initfunc(L);
 		lua_pushlightuserdata(L, (void*)initfunc);
-		metatable.push(L);
+		metatable.push();
 		lua_settable(L, LUA_REGISTRYINDEX);
 
-		metatable.push(L);
+		metatable.push();
 	}
 }
 

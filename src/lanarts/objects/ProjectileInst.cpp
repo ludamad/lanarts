@@ -87,14 +87,12 @@ ProjectileInst* ProjectileInst::clone() const {
 static void lua_hit_callback(lua_State* L, LuaValue& callback,
 		const EffectiveAttackStats& atkstats, GameInst* projectile,
 		GameInst* target) {
-	callback.push(L);
-	if (!lua_isnil(L, -1)) {
+	if (!callback.empty()) {
+		callback.push();
 		lua_push_gameinst(L, projectile);
 		lua_push_gameinst(L, target);
 		lua_push_effectiveattackstats(L, atkstats);
 		lua_call(L, 3, 0);
-	} else {
-		lua_pop(L, 1);
 	}
 }
 

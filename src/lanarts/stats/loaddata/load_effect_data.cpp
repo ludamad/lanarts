@@ -45,12 +45,12 @@ void load_effect_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	EffectEntry entry = parse_effect(L, node);
 	game_effect_data.push_back(entry);
-	value->get(L, entry.name) = node;
+	(*value)[entry.name] = node;
 }
 
 LuaValue load_effect_data(lua_State* L, const FilenameList& filenames) {
-	LuaValue ret;
-	ret.newtable(L);
+	LuaValue ret(L);
+	ret.newtable();
 
 	game_effect_data.clear();
 

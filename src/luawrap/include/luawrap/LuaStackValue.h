@@ -20,8 +20,6 @@
 
 #include <string>
 
-#include <luawrap/LuaValue.h>
-
 struct lua_State;
 class LuaValue;
 class LuaStackValue;
@@ -48,13 +46,13 @@ namespace _luawrap_private {
 
 		void operator=(const LuaValue& value);
 
-		void operator=(const char* value);
+		void operator=(const char* str);
 		void operator=(lua_CFunction func);
 		void operator=(const _LuaField& field);
 		void operator=(const _LuaStackField& field);
 
 		template<typename Function>
-		void function(Function func);
+		void bind_function(Function func);
 
 	private:
 		const LuaStackValue& value;

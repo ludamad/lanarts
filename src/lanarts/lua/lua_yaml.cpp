@@ -78,10 +78,8 @@ void lua_pushyaml(lua_State* L, const YAML::Node& node) {
 }
 
 LuaValue lua_yaml(lua_State *L, const YAML::Node & node) {
-	LuaValue ret;
 	lua_pushyaml(L, node);
-	ret.pop(L);
-	return ret;
+	return LuaValue::pop_value(L);
 }
 
 static std::string format_expression_string(const char* str) {
@@ -96,8 +94,6 @@ static LuaValue parse_luacode(lua_State* L, const char* code) {
 
 	std::string retcode = format_expression_string(code);
 
-	LuaValue ret;
-
 	int ntop = lua_gettop(L);
 	if (luaL_loadstring(L, retcode.c_str())) {
 		printf("Error while parsing lua expression:\n%s\nFor expression:\n%s",
@@ -106,10 +102,8 @@ static LuaValue parse_luacode(lua_State* L, const char* code) {
 	}
 	LANARTS_ASSERT(lua_gettop(L) - ntop == 1);
 
-	ret.pop(L);
-
 	perf_timer_end(FUNCNAME);
-	return ret;
+	return LuaValue::pop_value(L);
 }
 
 LuaValue parse_luacode(lua_State* L, const YAML::Node& node) {

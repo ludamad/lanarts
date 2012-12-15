@@ -78,8 +78,8 @@ namespace luawrap {
 	template<typename T>
 	inline LuaValue value(lua_State* L, const T& val) {
 		push<T>(L, val);
-		LuaValue lval;
-		lval.pop(L);
+		LuaValue lval(L);
+		lval.pop();
 		return lval;
 	}
 
@@ -117,6 +117,7 @@ namespace _luawrap_private {
 
 	template<typename T>
 	inline _LuaField::operator T() {
+		lua_State* L = value.luastate();
 		luawrap::_private::PopHack delayedpop(L);
 		luafield_push(L, value, key);
 		return luawrap::get<T>(L, -1);
@@ -124,6 +125,7 @@ namespace _luawrap_private {
 
 	template<typename T>
 	inline void _LuaField::operator=(const T& t) {
+		lua_State* L = value.luastate();
 		luawrap::push<T>(L, t);
 		luafield_pop(L, value, key);
 	}

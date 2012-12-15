@@ -46,17 +46,17 @@ static void lua_drawoptions_bind_test() {
 	using namespace ldraw;
 
 	TestLuaState L;
-	LuaValue globals = LuaValue::globals(L);
+	LuaValue globals = luawrap::globals(L);
 
 	lua_register_ldraw(L, globals);
 
-	globals.get(L, "drawoptions_func_difforigin") = luawrap::function(L,
+	globals["drawoptions_func_difforigin"] = luawrap::function(L,
 			drawoptions_func_difforigin);
 
-	globals.get(L, "drawoptions_func_defaults") = luawrap::function(L,
+	globals["drawoptions_func_defaults"] = luawrap::function(L,
 			drawoptions_func_defaults);
 
-	globals.get(L, "drawoptions_func_diffall") = luawrap::function(L,
+	globals["drawoptions_func_diffall"] = luawrap::function(L,
 			drawoptions_func_diffall);
 
 	{

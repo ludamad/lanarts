@@ -36,14 +36,14 @@ LuaValue foo_newmetatable(lua_State* L) {
 	LuaValue getters = luameta_getters(L, metatable);
 	LuaValue setters = luameta_setters(L, metatable);
 
-	getters.get(L, "bar") = &luawrap::getter<Foo, int, &Foo::bar>;
-	setters.get(L, "bar") = &luawrap::setter<Foo, int, &Foo::bar>;
+	getters["bar"] = &luawrap::getter<Foo, int, &Foo::bar>;
+	setters["bar"] = &luawrap::setter<Foo, int, &Foo::bar>;
 
-	getters.get(L, "bar2") = &luawrap::getter<Foo, int, &Foo::get_bar>;
-	setters.get(L, "bar2") = &luawrap::setter<Foo, int, &Foo::get_bar>;
+	getters["bar2"] = &luawrap::getter<Foo, int, &Foo::get_bar>;
+	setters["bar2"] = &luawrap::setter<Foo, int, &Foo::get_bar>;
 
-	getters.get(L, "bar3") = &luawrap::getter<Foo, int, &Foo::bar>;
-	setters.get(L, "bar3") = &luawrap::setter<Foo, int, &Foo::set_bar>;
+	getters["bar3"] = &luawrap::getter<Foo, int, &Foo::bar>;
+	setters["bar3"] = &luawrap::setter<Foo, int, &Foo::set_bar>;
 
 	return metatable;
 }
@@ -79,13 +79,13 @@ static lua_State* luasetup() {
 	LuaValue globals(L, LUA_GLOBALSINDEX);
 
 
-	globals.get(L, "assert") = luawrap::function(L, unit_test_assert);
-	globals.get(L, "foo_unbox1") = luawrap::function(L, foo_unbox1);
-	globals.get(L, "foo_unbox2") = luawrap::function(L, foo_unbox2);
-	globals.get(L, "foo_unbox3") = luawrap::function(L, foo_unbox3);
-	globals.get(L, "foo_unbox4") = luawrap::function(L, foo_unbox4);
-	globals.get(L, "foo_unbox5") = luawrap::function(L, foo_unbox5);
-	globals.get(L, "foo_box") = luawrap::function(L, foo_box);
+	globals["assert"].bind_function(unit_test_assert);
+	globals["foo_unbox1"].bind_function(foo_unbox1);
+	globals["foo_unbox2"].bind_function(foo_unbox2);
+	globals["foo_unbox3"].bind_function(foo_unbox3);
+	globals["foo_unbox4"].bind_function(foo_unbox4);
+	globals["foo_unbox5"].bind_function(foo_unbox5);
+	globals["foo_box"].bind_function(foo_box);
 
 	return L;
 }

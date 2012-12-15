@@ -21,7 +21,7 @@ void ldraw::lua_register_colour(lua_State *L,
 			ImplClass::check>();
 
 #define BIND_COLOUR(col) \
-	module.get(L, #col) = col
+	module[#col] = col
 
 	BIND_COLOUR(COL_GOLD);
 	BIND_COLOUR(COL_YELLOW);

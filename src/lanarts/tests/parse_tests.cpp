@@ -14,7 +14,7 @@ void filenames_from_pattern_test() {
 	}
 	{
 		FilenameList testfiles, expectedfiles;
-		filenames_from_pattern(testfiles, "test[0-2]");
+		filenames_from_pattern(testfiles, "test(0-2)");
 		expectedfiles.push_back("test0");
 		expectedfiles.push_back("test1");
 		expectedfiles.push_back("test2");
@@ -22,7 +22,7 @@ void filenames_from_pattern_test() {
 	}
 	{
 		FilenameList testfiles, expectedfiles;
-		filenames_from_pattern(testfiles, "test[0-2].png");
+		filenames_from_pattern(testfiles, "test(0-2).png");
 		expectedfiles.push_back("test0.png");
 		expectedfiles.push_back("test1.png");
 		expectedfiles.push_back("test2.png");
@@ -31,7 +31,7 @@ void filenames_from_pattern_test() {
 
 	{
 		FilenameList testfiles, expectedfiles;
-		filenames_from_pattern(testfiles, "test[2-2]");
+		filenames_from_pattern(testfiles, "test(2-2)");
 		expectedfiles.push_back("test2");
 		UNIT_TEST_ASSERT(testfiles == expectedfiles);
 	}
@@ -41,7 +41,7 @@ void filenames_from_pattern_test() {
 		try {
 			FilenameList testfiles;
 			printf("NB: Next failure expected ...\n");
-			filenames_from_pattern(testfiles, "test[2-2");
+			filenames_from_pattern(testfiles, "test(2-2");
 		} catch (const __FatalError& _) {
 			failed = true;
 		}
@@ -53,7 +53,7 @@ void filenames_from_pattern_test() {
 		try {
 			FilenameList testfiles;
 			printf("NB: Next failure expected ...\n");
-			filenames_from_pattern(testfiles, "test2-2]");
+			filenames_from_pattern(testfiles, "test2-2)");
 		} catch (const __FatalError& _) {
 			failed = true;
 		}

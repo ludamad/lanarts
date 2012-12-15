@@ -44,12 +44,12 @@ static void load_item_callbackf(const YAML::Node& node, lua_State* L,
 	parse_item_entry(L, node, *entry);
 	game_item_data.push_back(entry);
 
-	value->get(L, entry->name) = node;
+	(*value)[entry->name] = node;
 }
 
 LuaValue load_item_data(lua_State* L, const FilenameList& filenames) {
-	LuaValue ret;
-	ret.newtable(L);
+	LuaValue ret(L);
+	ret.newtable();
 
 	clear_item_data(game_item_data);
 
