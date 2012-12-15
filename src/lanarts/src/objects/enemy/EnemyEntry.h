@@ -15,11 +15,11 @@
 
 #include "../../data/BaseDataEntry.h"
 
-#include "../../stats/combat_stats.h"
+#include "stats/combat_stats.h"
 
 #include "../../lua/luaexpr.h"
 
-#include "../../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 struct EnemyEntry: public BaseDataEntry {
 	std::string appear_msg, defeat_msg;

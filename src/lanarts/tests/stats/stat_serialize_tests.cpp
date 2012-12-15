@@ -4,13 +4,13 @@
 #include <vector>
 #include <string>
 
-#include <common/unittest.h>
+#include <lcommon/unittest.h>
 
 #include <net/lanarts_net.h>
 
 #include "../../src/data/game_data.h"
 
-#include <common/SerializeBuffer.h>
+#include <lcommon/SerializeBuffer.h>
 
 #include "../../src/stats/EquipmentStats.h"
 #include "../../src/stats/Inventory.h"

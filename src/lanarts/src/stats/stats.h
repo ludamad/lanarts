@@ -12,7 +12,7 @@
 #include <cmath>
 #include <cstring>
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "AllowedActions.h"
 

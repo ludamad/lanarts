@@ -9,7 +9,7 @@
 
 #include "../collision_avoidance/CollisionAvoidance.h"
 #include "../levelgen/GeneratedLevel.h"
-#include "../objects/enemy/MonsterController.h"
+#include "objects/enemy/MonsterController.h"
 
 #include "GameInstSet.h"
 

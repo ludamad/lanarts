@@ -8,7 +8,7 @@
 #define LUADRAWABLE_H_
 
 #include <string>
-#include <common/LuaLazyValue.h>
+#include <lcommon/LuaLazyValue.h>
 #include <luawrap/LuaValue.h>
 
 #include "DrawableBase.h"

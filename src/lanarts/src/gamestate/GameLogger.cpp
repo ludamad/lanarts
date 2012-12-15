@@ -4,7 +4,7 @@
  *  These can be automatically diff'ed to see differences in online play.
  */
 
-#include <common/strformat.h>
+#include <lcommon/strformat.h>
 
 #include "GameState.h"
 #include "GameLevelState.h"

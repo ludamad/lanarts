@@ -7,9 +7,9 @@
 #ifndef FEATUREGEN_H_
 #define FEATUREGEN_H_
 
-#include <common/mtwist.h>
+#include <lcommon/mtwist.h>
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 #include "GeneratedLevel.h"
 
 #include "dungeon_data.h"

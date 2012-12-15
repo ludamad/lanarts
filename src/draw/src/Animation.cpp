@@ -3,7 +3,7 @@
  *  Represents a string of frames creating an animation
  */
 
-#include <common/mathutil.h>
+#include <lcommon/mathutil.h>
 
 #include "ldraw_assert.h"
 #include "Animation.h"

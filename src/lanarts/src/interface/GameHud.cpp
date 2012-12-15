@@ -4,27 +4,27 @@
  *  Includes inventory manipulation
  */
 
-#include <draw/display.h>
-#include <draw/draw.h>
+#include <ldraw/display.h>
+#include <ldraw/draw.h>
 
 #include "../display/display.h"
 
 #include "../display/sprite_data.h"
 #include "../display/tile_data.h"
-#include "../gamestate/GameInstSet.h"
-#include "../gamestate/GameState.h"
-#include "../objects/player/PlayerInst.h"
+#include "gamestate/GameInstSet.h"
+#include "gamestate/GameState.h"
+#include "objects/player/PlayerInst.h"
 
-#include "../objects/GameInst.h"
+#include "objects/GameInst.h"
 
-#include "../stats/Inventory.h"
+#include "stats/Inventory.h"
 
-#include "../stats/items/WeaponEntry.h"
+#include "stats/items/WeaponEntry.h"
 
-#include "../stats/items/ItemEntry.h"
-#include "../stats/SpellEntry.h"
+#include "stats/items/ItemEntry.h"
+#include "stats/SpellEntry.h"
 
-#include "../util/math_util.h"
+#include "util/math_util.h"
 
 #include "sidebar/SpellsContent.h"
 

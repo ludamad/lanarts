@@ -1,8 +1,6 @@
 #include <fstream>
 
-extern "C" {
-#include <lua/lua.h>
-}
+#include <lua.hpp>
 
 #include "../../lua/lua_yaml.h"
 #include "../../data/game_data.h"

@@ -11,11 +11,11 @@
 #include <cstdio>
 #include <typeinfo>
 
-#include "../objects/AnimatedInst.h"
-#include "../objects/InstTypeEnum.h"
-#include <common/SerializeBuffer.h>
+#include "objects/AnimatedInst.h"
+#include "objects/InstTypeEnum.h"
+#include <lcommon/SerializeBuffer.h>
 
-#include "../util/math_util.h"
+#include "util/math_util.h"
 #include "GameInstSet.h"
 #include "GameState.h"
 #include "hashset_util.h"

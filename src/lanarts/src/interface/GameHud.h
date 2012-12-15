@@ -12,12 +12,12 @@
 #include "../display/GLImage.h"
 #include "../display/display.h"
 
-#include "../gamestate/ActionQueue.h"
-#include "../gamestate/GameAction.h"
+#include "gamestate/ActionQueue.h"
+#include "gamestate/GameAction.h"
 
-#include "../objects/GameInst.h"
+#include "objects/GameInst.h"
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "sidebar/Sidebar.h"
 

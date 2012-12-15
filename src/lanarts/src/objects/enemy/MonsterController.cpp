@@ -8,18 +8,18 @@
 
 #include <rvo2/RVO.h>
 
-#include <draw/draw.h>
+#include <ldraw/draw.h>
 
 #include "../../draw/colour_constants.h"
 #include "../../display/tile_data.h"
-#include "../../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
-#include "../../gamestate/PlayerData.h"
+#include "gamestate/PlayerData.h"
 
-#include "../../stats/items/WeaponEntry.h"
+#include "stats/items/WeaponEntry.h"
 
 #include "../../lua/lua_gameinst.h"
-#include "../../util/math_util.h"
+#include "util/math_util.h"
 
 #include "../player/PlayerInst.h"
 #include "../CombatGameInstFunctions.h"

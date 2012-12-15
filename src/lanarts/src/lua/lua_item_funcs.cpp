@@ -3,17 +3,15 @@
  *  Functions callable from lua that query various item properties
  */
 
-extern "C" {
-#include <lua/lua.h>
-}
+#include <lua.hpp>
 
 #include "../data/lua_game_data.h"
 
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
-#include "../objects/GameInst.h"
+#include "objects/GameInst.h"
 
-#include "../objects/ScriptedInst.h"
+#include "objects/ScriptedInst.h"
 #include "lua_api.h"
 //
 //// Returns monsters seen

@@ -3,8 +3,8 @@
  *  A convenient OpenGL image wrapper
  */
 
-#include <common/mathutil.h>
-#include <common/fatal_error.h>
+#include <lcommon/mathutil.h>
+#include <lcommon/fatal_error.h>
 
 #include <SDL_opengl.h>
 

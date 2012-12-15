@@ -12,11 +12,11 @@
 #include <string>
 #include <vector>
 
-#include <common/mtwist.h>
-#include <common/geometry.h>
+#include <lcommon/mtwist.h>
+#include <lcommon/geometry.h>
 
-#include "../lanarts_defines.h"
-#include "../stats/items/items.h"
+#include "lanarts_defines.h"
+#include "stats/items/items.h"
 
 class GeneratedLevel;
 

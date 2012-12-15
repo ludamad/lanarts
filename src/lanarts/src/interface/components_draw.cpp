@@ -2,15 +2,15 @@
  * components_draw.cpp:
  *  Helper methods for common interface components
  */
-#include <draw/draw.h>
-#include <draw/Font.h>
-#include <draw/DrawOptions.h>
+#include <ldraw/draw.h>
+#include <ldraw/Font.h>
+#include <ldraw/DrawOptions.h>
 
 #include "../display/display.h"
 #include "../draw/colour_constants.h"
 #include "../display/sprite_data.h"
 
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
 #include "components_draw.h"
 

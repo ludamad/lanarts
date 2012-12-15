@@ -6,7 +6,7 @@
 #ifndef REGION_H_
 #define REGION_H_
 
-#include <common/geometry.h>
+#include <lcommon/geometry.h>
 
 
 //TODO replace region with BBox everywhere

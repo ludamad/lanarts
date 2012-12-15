@@ -7,12 +7,12 @@
 
 #include <net/lanarts_net.h>
 
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
-#include "../objects/player/PlayerInst.h"
+#include "objects/player/PlayerInst.h"
 
-#include "../objects/AnimatedInst.h"
-#include <common/SerializeBuffer.h>
+#include "objects/AnimatedInst.h"
+#include <lcommon/SerializeBuffer.h>
 
 #include "GameNetConnection.h"
 

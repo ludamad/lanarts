@@ -1,12 +1,12 @@
 #include <cstdio>
 #include <sstream>
 
-#include <common/unittest.h>
-#include <common/fatal_error.h>
+#include <lcommon/unittest.h>
+#include <lcommon/fatal_error.h>
 
 #include <yaml-cpp/yaml.h>
 
-#include "../src/draw/parse_drawable.h"
+#include "draw/parse_drawable.h"
 
 using namespace ldraw;
 

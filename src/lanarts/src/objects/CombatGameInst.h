@@ -9,9 +9,9 @@
 #include "../collision_avoidance/CollisionAvoidance.h"
 
 #include "../pathfind/pathfind.h"
-#include "../stats/combat_stats.h"
+#include "stats/combat_stats.h"
 
-#include "../stats/stats.h"
+#include "stats/stats.h"
 
 #include "GameInst.h"
 

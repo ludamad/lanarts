@@ -1,11 +1,11 @@
 #include <typeinfo>
 
-#include <draw/DrawOptions.h>
-#include <draw/Font.h>
+#include <ldraw/DrawOptions.h>
+#include <ldraw/Font.h>
 
 #include "../display/display.h"
 #include "../display/sprite_data.h"
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
 #include "ButtonInst.h"
 

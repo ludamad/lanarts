@@ -11,13 +11,13 @@
 #include <vector>
 #include <cstdlib>
 
-#include "../objects/enemy/EnemyController.h"
+#include "objects/enemy/EnemyController.h"
 
-#include "../objects/TeamRelations.h"
+#include "objects/TeamRelations.h"
 
-#include "../stats/EnemiesSeen.h"
+#include "stats/EnemiesSeen.h"
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "PlayerData.h"
 

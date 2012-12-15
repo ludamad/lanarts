@@ -4,7 +4,7 @@
  *  A draw duration of 0 (or nil in lua) signifies a non-animated drawable.
  */
 
-#include <common/lua_geometry.h>
+#include <lcommon/lua_geometry.h>
 
 #include <luawrap/luawrap.h>
 #include <luawrap/calls.h>

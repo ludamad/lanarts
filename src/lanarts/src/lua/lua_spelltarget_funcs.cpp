@@ -3,21 +3,17 @@
  *  Functions for spell auto-targetting
  */
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-#include <lua/lualib.h>
-}
+#include <lua.hpp>
 
 #include "../data/lua_game_data.h"
 
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
-#include "../objects/player/PlayerInst.h"
+#include "objects/player/PlayerInst.h"
 
-#include "../objects/GameInst.h"
+#include "objects/GameInst.h"
 
-#include "../util/math_util.h"
+#include "util/math_util.h"
 #include "lua_api.h"
 
 // Take arguments: caster, target; returns x, y

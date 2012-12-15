@@ -8,9 +8,9 @@
 
 #include <set>
 
-#include <common/SerializeBuffer.h>
+#include <lcommon/SerializeBuffer.h>
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 class EnemiesSeen {
 public:

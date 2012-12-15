@@ -8,9 +8,9 @@
 #include <cstring>
 #include <vector>
 
-#include "../objects/GameInstRef.h"
-#include <common/mtwist.h>
-#include "../lanarts_defines.h"
+#include "objects/GameInstRef.h"
+#include <lcommon/mtwist.h>
+#include "lanarts_defines.h"
 
 #include "../region.h"
 

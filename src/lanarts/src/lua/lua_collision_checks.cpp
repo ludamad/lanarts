@@ -3,17 +3,14 @@
  *  Small collision check api callable form lua
  */
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-#include <lua/lualib.h>
-}
+#include <lua.hpp>
 
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
-#include "../objects/player/PlayerInst.h"
+#include "objects/player/PlayerInst.h"
 
-#include "../objects/GameInst.h"
+#include "objects/GameInst.h"
+
 #include "lua_api.h"
 
 // Takes obj returns bool

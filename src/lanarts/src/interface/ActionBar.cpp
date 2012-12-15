@@ -3,19 +3,19 @@
  *  Handles drawing and state of the action bar.
  */
 
-#include <draw/draw.h>
+#include <ldraw/draw.h>
 
 #include "../draw/colour_constants.h"
-#include "../gamestate/GameState.h"
-#include "../objects/player/PlayerInst.h"
+#include "gamestate/GameState.h"
+#include "objects/player/PlayerInst.h"
 
-#include "../stats/items/ProjectileEntry.h"
-#include "../stats/items/WeaponEntry.h"
+#include "stats/items/ProjectileEntry.h"
+#include "stats/items/WeaponEntry.h"
 
-#include "../stats/items/ItemEntry.h"
-#include "../stats/SpellEntry.h"
+#include "stats/items/ItemEntry.h"
+#include "stats/SpellEntry.h"
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "ActionBar.h"
 

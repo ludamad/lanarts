@@ -3,7 +3,7 @@
  *  A convenient OpenGL image wrapper
  */
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 #include <SDL.h>
 #include <SDL_opengl.h>
 

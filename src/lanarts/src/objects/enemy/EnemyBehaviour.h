@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "../../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "../GameInst.h"
 

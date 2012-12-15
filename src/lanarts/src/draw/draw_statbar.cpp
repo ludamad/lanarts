@@ -3,9 +3,9 @@
  *  Function to draw a simple stat bar, consisting of two rectangles.
  */
 
-#include <draw/Colour.h>
-#include <draw/draw.h>
-#include <common/geometry.h>
+#include <ldraw/Colour.h>
+#include <ldraw/draw.h>
+#include <lcommon/geometry.h>
 
 #include "../display/display.h"
 #include "draw_statbar.h"

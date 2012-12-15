@@ -7,7 +7,7 @@
 #ifndef WEAPONENTRY_H_
 #define WEAPONENTRY_H_
 
-#include "../../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "../Attack.h"
 #include "../LuaAction.h"

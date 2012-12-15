@@ -7,7 +7,7 @@
 #define GAME_REPLAYS_H_
 
 #include <deque>
-#include "../gamestate/GameAction.h"
+#include "gamestate/GameAction.h"
 
 class GameState;
 

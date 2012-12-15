@@ -9,7 +9,7 @@
 
 #include <cstring>
 #include <vector>
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 class GameState;
 class SerializeBuffer;

@@ -8,10 +8,10 @@
 
 #include <vector>
 #include <luawrap/LuaValue.h>
-#include "../stats/itemgen_data.h"
+#include "stats/itemgen_data.h"
 #include "AreaTemplate.h"
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 enum {
 	DNGN_MAIN_BRANCH = 0

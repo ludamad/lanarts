@@ -8,12 +8,12 @@
 
 #include <vector>
 
-#include "../objects/GameInst.h"
+#include "objects/GameInst.h"
 
-#include "../objects/GameInstRef.h"
+#include "objects/GameInstRef.h"
 
-#include <common/SerializeBuffer.h>
-#include "../stats/EnemiesSeen.h"
+#include <lcommon/SerializeBuffer.h>
+#include "stats/EnemiesSeen.h"
 
 #include "ActionQueue.h"
 

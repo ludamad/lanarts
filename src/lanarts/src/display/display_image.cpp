@@ -8,9 +8,9 @@
 #include <cstring>
 #include <cmath>
 
-#include "../gamestate/GameView.h"
+#include "gamestate/GameView.h"
 
-#include "../util/math_util.h"
+#include "util/math_util.h"
 #include "GLImage.h"
 
 #include "display.h"

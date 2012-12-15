@@ -5,10 +5,10 @@
 
 #include <fstream>
 
-#include <common/perf_timer.h>
-#include <common/fatal_error.h>
+#include <lcommon/perf_timer.h>
+#include <lcommon/fatal_error.h>
 
-#include "../stats/stat_formulas.h"
+#include "stats/stat_formulas.h"
 
 #include "parse.h"
 #include "yaml_util.h"

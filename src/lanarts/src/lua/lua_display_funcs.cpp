@@ -3,15 +3,11 @@
  *  Functions that generally affect the visual state of the game
  */
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-#include <lua/lualib.h>
-}
+#include <lua.hpp>
 
 #include "../data/lua_game_data.h"
 
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
 #include "lua_api.h"
 

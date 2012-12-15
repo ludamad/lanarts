@@ -8,7 +8,7 @@
 
 #include <vector>
 
-#include "../../stats/items/items.h"
+#include "stats/items/items.h"
 
 struct StoreItemSlot {
 	Item item;

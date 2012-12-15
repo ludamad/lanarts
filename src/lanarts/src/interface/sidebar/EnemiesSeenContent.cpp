@@ -3,14 +3,14 @@
  *  Displays all the enemies players have seen, allowing them to see descriptions.
  */
 
-#include <draw/draw.h>
+#include <ldraw/draw.h>
 
 #include "../../draw/colour_constants.h"
 
 #include "../../display/sprite_data.h"
 
-#include "../../gamestate/GameState.h"
-#include "../../objects/enemy/MonsterController.h"
+#include "gamestate/GameState.h"
+#include "objects/enemy/MonsterController.h"
 
 #include "../console_description_draw.h"
 #include "EnemiesSeenContent.h"

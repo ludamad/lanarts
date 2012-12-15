@@ -5,9 +5,9 @@
 
 #include "../draw/colour_constants.h"
 
-#include "../objects/GameInst.h"
+#include "objects/GameInst.h"
 
-#include "../util/callback_util.h"
+#include "util/callback_util.h"
 
 class ButtonInst: public GameInst {
 public:

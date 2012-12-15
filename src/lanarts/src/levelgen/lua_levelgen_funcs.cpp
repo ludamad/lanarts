@@ -3,14 +3,11 @@
  *  Lua level gen callbacks
  */
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-#include <lua/lualib.h>
-}
+#include <lua.hpp>
+
 #include "../data/lua_game_data.h"
 
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 #include "../lua/lua_api.h"
 #include "levelgen.h"
 

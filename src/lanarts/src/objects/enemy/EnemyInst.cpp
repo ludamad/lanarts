@@ -7,11 +7,11 @@
 #include <typeinfo>
 
 #include <luawrap/LuaValue.h>
-#include <common/SerializeBuffer.h>
+#include <lcommon/SerializeBuffer.h>
 
-#include <draw/draw.h>
-#include <draw/Font.h>
-#include <draw/DrawOptions.h>
+#include <ldraw/draw.h>
+#include <ldraw/Font.h>
+#include <ldraw/DrawOptions.h>
 
 #include "../../lua/lua_gameinst.h"
 
@@ -19,13 +19,13 @@
 #include "../../display/display.h"
 #include "../../display/sprite_data.h"
 
-#include "../../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 #include "../../interface/console_description_draw.h"
 
-#include "../../stats/items/WeaponEntry.h"
-#include "../../stats/stat_formulas.h"
+#include "stats/items/WeaponEntry.h"
+#include "stats/stat_formulas.h"
 
-#include "../../util/math_util.h"
+#include "util/math_util.h"
 #include "../player/PlayerInst.h"
 
 #include "../AnimatedInst.h"

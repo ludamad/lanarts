@@ -7,7 +7,7 @@
 #define MINIMAP_H_
 
 #include "../../display/GLImage.h"
-#include "../../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 class GameState;
 

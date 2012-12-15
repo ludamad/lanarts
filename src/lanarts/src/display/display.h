@@ -10,10 +10,10 @@
 #include <SDL_opengl.h>
 #include <GL/glu.h>
 
-#include <common/geometry.h>
-#include <draw/Colour.h>
+#include <lcommon/geometry.h>
+#include <ldraw/Colour.h>
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 struct GLimage;
 struct font_data;

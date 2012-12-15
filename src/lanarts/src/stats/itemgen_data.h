@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 struct ItemGenChance {
 	int genchance; //Out of 100%

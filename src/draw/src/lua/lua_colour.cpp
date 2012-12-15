@@ -7,7 +7,7 @@
 #include <luawrap/luawrap.h>
 #include <luawrap/types.h>
 
-#include <common/lua_numeric_tuple_helper.h>
+#include <lcommon/lua_numeric_tuple_helper.h>
 
 #include "colour_constants.h"
 

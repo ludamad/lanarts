@@ -6,7 +6,7 @@
 #ifndef LDRAW_DRAWABLEBASE_H_
 #define LDRAW_DRAWABLEBASE_H_
 
-#include <common/geometry.h>
+#include <lcommon/geometry.h>
 #include "DrawOptions.h"
 
 struct lua_State;

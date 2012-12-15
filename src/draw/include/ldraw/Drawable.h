@@ -6,7 +6,7 @@
 #ifndef LDRAW_DRAWABLE_H_
 #define LDRAW_DRAWABLE_H_
 
-#include <common/smartptr.h>
+#include <lcommon/smartptr.h>
 
 struct Posf;
 struct lua_State;

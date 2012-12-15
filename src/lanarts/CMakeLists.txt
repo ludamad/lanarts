@@ -12,18 +12,21 @@ set( LIBS ../../libs)
 
 set(CMAKE_BUILD_TYPE Debug)
 
+
 #add_definitions(-DNDEBUG)
 
 include_directories(
 	${SDL_INCLUDE_DIR} 
 	${OpenGL_INCLUDE_DIRS} 		
-	${FREETYPE_INCLUDE_DIRS} 
+	${FREETYPE_INCLUDE_DIRS}
+	src/
 	${SRC}/common/include
 	${SRC}/draw/include
 	${SRC}#/net
 	${SRC}/luawrap/include
 	${LIBS}/yaml-cpp/include 
-	${LIBS} #/lua and /rvo2 
+	${LIBS}/lua 
+	${LIBS}#/rvo2 
 	${LIBS}/slb/include
 	)
 

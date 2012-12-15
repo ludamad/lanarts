@@ -10,21 +10,18 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-}
+#include <lua.hpp>
 
-#include <common/Timer.h>
-#include <draw/Font.h>
-#include <draw/DrawOptions.h>
+#include <lcommon/Timer.h>
+#include <ldraw/Font.h>
+#include <ldraw/DrawOptions.h>
 
 #include "../data/game_data.h"
 
 #include "../draw/colour_constants.h"
 #include "../display/display.h"
 
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
 #include "../interface/ButtonInst.h"
 #include "../interface/TextBoxInst.h"
@@ -32,9 +29,9 @@ extern "C" {
 #include "../interface/DrawCallbackInst.h"
 #include "../lua/lua_api.h"
 
-#include "../objects/enemy/EnemyInst.h"
-#include "../objects/player/PlayerInst.h"
-#include "../objects/AnimatedInst.h"
+#include "objects/enemy/EnemyInst.h"
+#include "objects/player/PlayerInst.h"
+#include "objects/AnimatedInst.h"
 
 #include "menus.h"
 

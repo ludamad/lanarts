@@ -3,9 +3,9 @@
  *  Contains game level state information
  */
 
-#include "../objects/player/PlayerInst.h"
+#include "objects/player/PlayerInst.h"
 
-#include <common/SerializeBuffer.h>
+#include <lcommon/SerializeBuffer.h>
 
 #include "GameLevelState.h"
 

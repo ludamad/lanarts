@@ -5,14 +5,12 @@
 
 #include <cstdio>
 #include <luawrap/LuaValue.h>
-#include <common/perf_timer.h>
+#include <lcommon/perf_timer.h>
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 #include "luaexpr.h"
 
-extern "C" {
-#include <lua/lua.h>
-}
+#include <lua.hpp>
 
 void luavalue_call_and_store(lua_State* L, LuaValue& eval) {
 	perf_timer_begin(FUNCNAME);

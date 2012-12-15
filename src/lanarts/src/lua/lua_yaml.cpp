@@ -13,7 +13,7 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 #include "lua_yaml.h"
 
 //YAML related helper functions

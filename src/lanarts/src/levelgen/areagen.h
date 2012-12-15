@@ -10,7 +10,7 @@
 
 #include <vector>
 #include <luawrap/LuaValue.h>
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 enum {
 	DNGN_MAIN_BRANCH = 0

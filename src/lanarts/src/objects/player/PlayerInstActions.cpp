@@ -4,25 +4,23 @@
  *  as well as networking communication of actions
  */
 
-extern "C" {
-#include <lua/lua.h>
-}
+#include <lua.hpp>
 
 #include "../../display/display.h"
 #include "../../display/sprite_data.h"
 #include "../../display/tile_data.h"
-#include "../../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 #include "../../lua/lua_api.h"
 
-#include "../../stats/items/ItemEntry.h"
+#include "stats/items/ItemEntry.h"
 
-#include "../../stats/items/ProjectileEntry.h"
-#include "../../stats/items/WeaponEntry.h"
+#include "stats/items/ProjectileEntry.h"
+#include "stats/items/WeaponEntry.h"
 
-#include "../../util/game_replays.h"
-#include "../../util/math_util.h"
+#include "util/game_replays.h"
+#include "util/math_util.h"
 
-#include "../../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "../enemy/EnemyInst.h"
 

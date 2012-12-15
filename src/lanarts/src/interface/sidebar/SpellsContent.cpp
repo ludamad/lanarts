@@ -3,19 +3,19 @@
  *  Draws known spells in a grid, for the side bar
  */
 
-#include <draw/draw.h>
+#include <ldraw/draw.h>
 
 #include "../../draw/colour_constants.h"
 
 #include "../../display/display.h"
 #include "../../display/sprite_data.h"
 
-#include "../../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
-#include "../../objects/player/PlayerInst.h"
+#include "objects/player/PlayerInst.h"
 
-#include "../../stats/SpellsKnown.h"
-#include "../../stats/SpellEntry.h"
+#include "stats/SpellsKnown.h"
+#include "stats/SpellEntry.h"
 
 #include "../console_description_draw.h"
 

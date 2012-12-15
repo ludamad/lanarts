@@ -3,18 +3,18 @@
  *  Handles drawing & state of side bar
  */
 
-#include <draw/draw.h>
-#include <draw/Font.h>
-#include <draw/DrawOptions.h>
+#include <ldraw/draw.h>
+#include <ldraw/Font.h>
+#include <ldraw/DrawOptions.h>
 
 #include "../../draw/colour_constants.h"
 #include "../../draw/draw_statbar.h"
 
 #include "../../display/display.h"
 
-#include "../../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
-#include "../../objects/player/PlayerInst.h"
+#include "objects/player/PlayerInst.h"
 
 #include "Sidebar.h"
 

@@ -8,7 +8,7 @@
 #include <luawrap/calls.h>
 #include <luawrap/functions.h>
 
-#include <common/unittest.h>
+#include <lcommon/unittest.h>
 
 #include "lua_ldraw.h"
 

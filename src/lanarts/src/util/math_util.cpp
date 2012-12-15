@@ -6,7 +6,7 @@
 #include <cmath>
 #include <algorithm>
 
-#include <common/geometry.h>
+#include <lcommon/geometry.h>
 
 #include "math_util.h"
 

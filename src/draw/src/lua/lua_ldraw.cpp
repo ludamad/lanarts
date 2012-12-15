@@ -6,8 +6,8 @@
 #include <luawrap/LuaValue.h>
 #include <luawrap/functions.h>
 
-#include <common/lua_geometry.h>
-#include <common/lua_lcommon.h>
+#include <lcommon/lua_geometry.h>
+#include <lcommon/lua_lcommon.h>
 
 #include "colour_constants.h"
 #include "draw.h"

@@ -5,19 +5,16 @@
 
 #include <typeinfo>
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-}
+#include <lua.hpp>
 
-#include <common/lua_lcommon.h>
+#include <lcommon/lua_lcommon.h>
 
 #include "../lua/lua_api.h"
 
-#include "../stats/items/EquipmentEntry.h"
-#include "../stats/items/ItemEntry.h"
-#include "../stats/items/ProjectileEntry.h"
-#include "../stats/items/WeaponEntry.h"
+#include "stats/items/EquipmentEntry.h"
+#include "stats/items/ItemEntry.h"
+#include "stats/items/ProjectileEntry.h"
+#include "stats/items/WeaponEntry.h"
 
 #include "game_data.h"
 

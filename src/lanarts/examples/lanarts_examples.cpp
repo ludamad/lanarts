@@ -10,30 +10,30 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include <common/mathutil.h>
-#include <common/Timer.h>
+#include <lcommon/mathutil.h>
+#include <lcommon/Timer.h>
 
 #include <luawrap/LuaValue.h>
 #include <luawrap/luawrap.h>
 #include <luawrap/functions.h>
 #include <luawrap/calls.h>
 
-#include <common/lua_lcommon.h>
+#include <lcommon/lua_lcommon.h>
 
-#include <draw/Animation.h>
-#include <draw/DirectionalDrawable.h>
-#include <draw/Drawable.h>
-#include <draw/Colour.h>
-#include <draw/colour_constants.h>
-#include <draw/display.h>
-#include <draw/draw.h>
-#include <draw/Image.h>
-#include <draw/Font.h>
+#include <ldraw/Animation.h>
+#include <ldraw/DirectionalDrawable.h>
+#include <ldraw/Drawable.h>
+#include <ldraw/Colour.h>
+#include <ldraw/colour_constants.h>
+#include <ldraw/display.h>
+#include <ldraw/draw.h>
+#include <ldraw/Image.h>
+#include <ldraw/Font.h>
 
-#include <draw/lua_ldraw.h>
+#include <ldraw/lua_ldraw.h>
 
-#include "../src/draw/parse_drawable.h"
-#include "../src/data/parse_context.h"
+#include "draw/parse_drawable.h"
+#include "data/parse_context.h"
 
 static lua_State* L;
 

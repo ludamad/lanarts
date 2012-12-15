@@ -4,7 +4,7 @@
  *  Formatted for sending over network.
  */
 
-#include "../objects/GameInst.h"
+#include "objects/GameInst.h"
 #include "GameAction.h"
 #include "GameLevelState.h"
 

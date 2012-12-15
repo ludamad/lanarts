@@ -1,6 +1,4 @@
-extern "C" {
-#include <lua/lua.h>
-}
+#include <lua.hpp>
 
 #include <fstream>
 

@@ -6,7 +6,7 @@
 
 #include <cstdlib>
 
-#include <common/fatal_error.h>
+#include <lcommon/fatal_error.h>
 
 #include "parse_context.h"
 

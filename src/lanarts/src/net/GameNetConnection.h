@@ -10,8 +10,8 @@
 
 #include <vector>
 
-#include "../gamestate/ActionQueue.h"
-#include "../lanarts_defines.h"
+#include "gamestate/ActionQueue.h"
+#include "lanarts_defines.h"
 
 
 class GameState;

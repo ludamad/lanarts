@@ -3,20 +3,17 @@
  *  Implementation of special codes that can be typed in the chat
  */
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-}
+#include <lua.hpp>
 
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
-#include "../util/math_util.h"
+#include "util/math_util.h"
 
-#include "../stats/items/ItemEntry.h"
+#include "stats/items/ItemEntry.h"
 
 #include "../levelgen/enemygen.h"
 
-#include "../objects/player/PlayerInst.h"
+#include "objects/player/PlayerInst.h"
 
 #include "../lua/lua_api.h"
 

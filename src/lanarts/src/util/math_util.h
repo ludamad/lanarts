@@ -6,9 +6,9 @@
 #ifndef MATH_UTIL_H_
 #define MATH_UTIL_H_
 
-#include <common/mathutil.h>
+#include <lcommon/mathutil.h>
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 struct Pos;
 

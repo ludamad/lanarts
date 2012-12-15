@@ -6,14 +6,14 @@
 
 #include <SDL.h>
 
-#include <draw/draw.h>
-#include <draw/Font.h>
-#include <draw/DrawOptions.h>
+#include <ldraw/draw.h>
+#include <ldraw/Font.h>
+#include <ldraw/DrawOptions.h>
 
 #include "../draw/colour_constants.h"
 
 #include "../display/display.h"
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
 #include "GameChat.h"
 

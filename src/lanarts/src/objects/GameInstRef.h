@@ -9,7 +9,7 @@
 #ifndef GAMEINSTREF_H_
 #define GAMEINSTREF_H_
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 class GameState;
 class GameInst;

@@ -5,15 +5,12 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
-#include <draw/display.h>
+#include <ldraw/display.h>
 #include <net/lanarts_net.h>
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-}
+#include <lua.hpp>
 
-#include <common/Timer.h>
+#include <lcommon/Timer.h>
 
 #include "data/game_data.h"
 

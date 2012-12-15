@@ -9,7 +9,7 @@
 #include "../../data/game_data.h"
 #include "../../data/parse.h"
 
-#include "../../objects/enemy/EnemyEntry.h"
+#include "objects/enemy/EnemyEntry.h"
 
 #include "../../lua/lua_yaml.h"
 

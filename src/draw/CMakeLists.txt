@@ -13,7 +13,7 @@ set( SRC ../)
 set( LIBS ../../libs)
 
 include_directories(
-    include/draw/
+    include/ldraw/
 	${SRC}/common/include
 	${SRC}/luawrap/include
 	${LIBS}/lua

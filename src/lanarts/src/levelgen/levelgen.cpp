@@ -3,15 +3,14 @@
  *  Contains procedures related to generating a full dungeon level
  */
 
-extern "C" {
-#include <lua/lua.h>
-}
+
+#include <lua.hpp>
 
 #include <cstdio>
 
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
-#include "../objects/player/PlayerInst.h"
+#include "objects/player/PlayerInst.h"
 
 #include "GeneratedLevel.h"
 

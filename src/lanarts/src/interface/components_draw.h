@@ -6,7 +6,7 @@
 #ifndef COMPONENTS_DRAW_H_
 #define COMPONENTS_DRAW_H_
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 class GameState;
 

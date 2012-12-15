@@ -1,20 +1,17 @@
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-}
+#include <lua.hpp>
 
 #include <luawrap/luawrap.h>
 
-#include <common/geometry.h>
-#include <common/SerializeBuffer.h>
-#include <common/lua_serialize.h>
+#include <lcommon/geometry.h>
+#include <lcommon/SerializeBuffer.h>
+#include <lcommon/lua_serialize.h>
 
 #include "../data/lua_game_data.h"
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
 #include "../lua/lua_api.h"
 
-#include "../objects/CombatGameInst.h"
+#include "objects/CombatGameInst.h"
 
 #include "effect_data.h"
 

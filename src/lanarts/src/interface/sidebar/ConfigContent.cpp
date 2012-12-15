@@ -3,13 +3,13 @@
  *  Visual toggle of configuration options in side bar
  */
 
-#include <draw/draw.h>
+#include <ldraw/draw.h>
 
 #include "../../draw/colour_constants.h"
 
 #include "../../display/sprite_data.h"
 
-#include "../../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
 #include "../components_draw.h"
 

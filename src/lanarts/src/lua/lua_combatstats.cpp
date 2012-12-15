@@ -1,15 +1,15 @@
-#include "../gamestate/GameLevelState.h"
-#include "../gamestate/GameState.h"
+#include "gamestate/GameLevelState.h"
+#include "gamestate/GameState.h"
 
-#include "../objects/enemy/EnemyInst.h"
+#include "objects/enemy/EnemyInst.h"
 
-#include "../objects/player/PlayerInst.h"
-#include "../objects/GameInstRef.h"
+#include "objects/player/PlayerInst.h"
+#include "objects/GameInstRef.h"
 
-#include "../stats/items/WeaponEntry.h"
+#include "stats/items/WeaponEntry.h"
 
-#include "../stats/combat_stats.h"
-#include "../stats/stats.h"
+#include "stats/combat_stats.h"
+#include "stats/stats.h"
 
 #include "lua_api.h"
 #include "lunar.h"

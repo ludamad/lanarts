@@ -8,7 +8,7 @@
 #define GAMEACTION_H_
 #include <cstdio>
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 class GameInst;
 class GameState;

@@ -10,11 +10,11 @@
 #include <freetype/ftoutln.h>
 #include <freetype/fttrigon.h>
 
-#include <common/mathutil.h>
-#include <common/geometry.h>
+#include <lcommon/mathutil.h>
+#include <lcommon/geometry.h>
 
-#include <common/perf_timer.h>
-#include <common/strformat.h>
+#include <lcommon/perf_timer.h>
+#include <lcommon/strformat.h>
 
 #include "DrawOptions.h"
 

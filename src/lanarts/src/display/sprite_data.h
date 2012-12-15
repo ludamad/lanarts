@@ -4,11 +4,11 @@
 #include <vector>
 #include <string>
 
-#include <common/geometry.h>
-#include <draw/Colour.h>
+#include <lcommon/geometry.h>
+#include <ldraw/Colour.h>
 
 #include "../data/FilenameList.h"//For FilenameList
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "GLImage.h"
 

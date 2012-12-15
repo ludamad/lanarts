@@ -6,8 +6,8 @@
 #include <yaml-cpp/yaml.h>
 #include <yaml-cpp/exceptions.h>
 
-#include <common/strformat.h>
-#include <common/fatal_error.h>
+#include <lcommon/strformat.h>
+#include <lcommon/fatal_error.h>
 
 #include "../data/FilenameList.h"
 #include "../data/parse.h"

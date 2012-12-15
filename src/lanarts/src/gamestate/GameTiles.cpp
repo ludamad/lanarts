@@ -1,7 +1,7 @@
 #include <cstring>
 #include <SDL_opengl.h>
 
-#include <draw/draw.h>
+#include <ldraw/draw.h>
 
 #include "../display/display.h"
 
@@ -9,11 +9,11 @@
 
 #include "../levelgen/levelgen.h"
 
-#include "../objects/player/PlayerInst.h"
+#include "objects/player/PlayerInst.h"
 
-#include <common/SerializeBuffer.h>
+#include <lcommon/SerializeBuffer.h>
 
-#include "../util/math_util.h"
+#include "util/math_util.h"
 #include "GameState.h"
 
 #include "GameTiles.h"

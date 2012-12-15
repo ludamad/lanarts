@@ -8,9 +8,9 @@
 
 #include <string>
 
-#include "../objects/GameInst.h"
+#include "objects/GameInst.h"
 
-#include "../util/callback_util.h"
+#include "util/callback_util.h"
 
 class DrawCallbackInst: public GameInst {
 public:

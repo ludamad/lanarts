@@ -9,7 +9,7 @@
 #include <vector>
 #include <SDL/SDL.h>
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 struct BBox;
 

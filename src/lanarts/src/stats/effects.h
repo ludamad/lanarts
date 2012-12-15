@@ -2,9 +2,9 @@
 #define EFFECTS_H
 
 #include <luawrap/LuaValue.h>
-#include <draw/Colour.h>
+#include <ldraw/Colour.h>
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "AllowedActions.h"
 

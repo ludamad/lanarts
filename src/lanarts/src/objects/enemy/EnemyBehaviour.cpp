@@ -1,4 +1,4 @@
-#include <common/SerializeBuffer.h>
+#include <lcommon/SerializeBuffer.h>
 
 #include "EnemyBehaviour.h"
 

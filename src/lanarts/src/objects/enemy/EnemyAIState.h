@@ -8,11 +8,11 @@
 
 #include <cstring>
 #include <vector>
-#include <common/SerializeBuffer.h>
+#include <lcommon/SerializeBuffer.h>
 
 #include "../../collision_avoidance/CollisionAvoidance.h"
 
-#include "../../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 class GameState;
 

@@ -9,12 +9,12 @@
 #include "../display/tile_data.h"
 #include "../levelgen/levelgen.h"
 
-#include "../objects/enemy/EnemyInst.h"
+#include "objects/enemy/EnemyInst.h"
 
-#include "../objects/player/PlayerInst.h"
-#include "../objects/AnimatedInst.h"
-#include "../objects/GameInstRef.h"
-#include "../stats/class_data.h"
+#include "objects/player/PlayerInst.h"
+#include "objects/AnimatedInst.h"
+#include "objects/GameInstRef.h"
+#include "stats/class_data.h"
 
 #include "GameLevelState.h"
 #include "GameState.h"

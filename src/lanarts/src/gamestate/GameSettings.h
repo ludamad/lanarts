@@ -2,7 +2,7 @@
 #define GAMESETTINGS_H_
 #include <string>
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 struct GameSettings {
 	enum connection_type {

@@ -8,7 +8,7 @@
 #include <SDL_opengl.h>
 #include <GL/glu.h>
 
-#include <common/geometry.h>
+#include <lcommon/geometry.h>
 
 #include "display.h"
 

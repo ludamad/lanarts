@@ -10,7 +10,7 @@
 #include "../../data/parse.h"
 #include "../../data/yaml_util.h"
 
-#include "../../objects/enemy/EnemyEntry.h"
+#include "objects/enemy/EnemyEntry.h"
 
 static std::vector<Glyph> load_template_legend(const YAML::Node& root,
 		const char* key) {

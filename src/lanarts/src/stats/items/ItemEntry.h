@@ -11,7 +11,7 @@
 #include <vector>
 #include <string>
 
-#include "../../lanarts_defines.h"
+#include "lanarts_defines.h"
 #include "../../data/BaseDataEntry.h"
 
 #include "../LuaAction.h"

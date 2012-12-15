@@ -3,7 +3,7 @@
  *  Test ldraw::Animation properties
  */
 
-#include <common/unittest.h>
+#include <lcommon/unittest.h>
 
 #include "DrawableMock.h"
 

@@ -3,8 +3,8 @@
  *  Test ldraw::DirectionalDrawable properties
  */
 
-#include <common/unittest.h>
-#include <common/mathutil.h>
+#include <lcommon/unittest.h>
+#include <lcommon/mathutil.h>
 
 #include "DrawableMock.h"
 

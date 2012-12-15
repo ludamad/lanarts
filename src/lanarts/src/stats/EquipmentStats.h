@@ -6,7 +6,7 @@
 #ifndef EQUIPMENTSTATS_H_
 #define EQUIPMENTSTATS_H_
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "Inventory.h"
 

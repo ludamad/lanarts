@@ -13,7 +13,7 @@
 #include "../../pathfind/astar_pathfind.h"
 
 #include "../../pathfind/pathfind.h"
-#include <common/SerializeBuffer.h>
+#include <lcommon/SerializeBuffer.h>
 
 #include "../GameInst.h"
 #include "EnemyInst.h"

@@ -8,12 +8,12 @@
  * 		->GameInst::init(GameState) called from add_instance, does further initialization
  */
 
-#include <common/SerializeBuffer.h>
-#include <common/lua_serialize.h>
+#include <lcommon/SerializeBuffer.h>
+#include <lcommon/lua_serialize.h>
 
 #include "../display/display.h"
 
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
 #include "GameInst.h"
 

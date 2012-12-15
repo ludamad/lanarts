@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include <common/geometry.h>
+#include <lcommon/geometry.h>
 
 #include <SDL.h>
 #include <SDL_opengl.h>

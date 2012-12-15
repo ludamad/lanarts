@@ -3,7 +3,7 @@
  * 	Represents the contents of a store.
  */
 
-#include <common/SerializeBuffer.h>
+#include <lcommon/SerializeBuffer.h>
 
 #include "StoreInventory.h"
 

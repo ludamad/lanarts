@@ -2,7 +2,7 @@
 #define LDRAW_FONT_H_
 
 #include <string>
-#include <common/smartptr.h>
+#include <lcommon/smartptr.h>
 
 struct Colour;
 struct Posf;

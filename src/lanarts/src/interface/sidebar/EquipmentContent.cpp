@@ -3,21 +3,21 @@
  *  Represents an interactive view of equipped items for the side bar
  */
 
-#include <draw/draw.h>
+#include <ldraw/draw.h>
 
 #include "../../draw/colour_constants.h"
 #include "../../display/display.h"
 
 #include "../../display/sprite_data.h"
 
-#include "../../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
-#include "../../objects/player/PlayerInst.h"
+#include "objects/player/PlayerInst.h"
 
-#include "../../stats/items/WeaponEntry.h"
+#include "stats/items/WeaponEntry.h"
 
-#include "../../stats/items/ItemEntry.h"
-#include "../../stats/items/ProjectileEntry.h"
+#include "stats/items/ItemEntry.h"
+#include "stats/items/ProjectileEntry.h"
 
 #include "../console_description_draw.h"
 

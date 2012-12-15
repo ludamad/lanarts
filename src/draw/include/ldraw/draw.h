@@ -6,7 +6,7 @@
 #ifndef LDRAW_DRAW_H_
 #define LDRAW_DRAW_H_
 
-#include <common/geometry.h>
+#include <lcommon/geometry.h>
 #include "DrawOptions.h"
 
 namespace ldraw {

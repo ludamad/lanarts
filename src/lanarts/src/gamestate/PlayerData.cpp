@@ -4,10 +4,10 @@
  */
 
 #include "../fov/fov.h"
-#include "../objects/player/PlayerInst.h"
-#include "../util/math_util.h"
+#include "objects/player/PlayerInst.h"
+#include "util/math_util.h"
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "GameState.h"
 #include "GameTiles.h"

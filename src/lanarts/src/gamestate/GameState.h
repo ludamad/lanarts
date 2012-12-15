@@ -12,10 +12,10 @@
 #include <SDL.h>
 #include <cstdio>
 
-#include <common/smartptr.h>
-#include <common/mtwist.h>
+#include <lcommon/smartptr.h>
+#include <lcommon/mtwist.h>
 
-#include <draw/Font.h>
+#include <ldraw/Font.h>
 
 #include "../fov/fov.h"
 

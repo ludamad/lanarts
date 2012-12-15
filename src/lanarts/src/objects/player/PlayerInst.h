@@ -13,11 +13,11 @@
 
 #include "../../fov/fov.h"
 
-#include "../../gamestate/ActionQueue.h"
+#include "gamestate/ActionQueue.h"
 
-#include "../../gamestate/GameAction.h"
+#include "gamestate/GameAction.h"
 
-#include "../../gamestate/GameLevelState.h"
+#include "gamestate/GameLevelState.h"
 #include "../../pathfind/pathfind.h"
 
 #include "../CombatGameInst.h"

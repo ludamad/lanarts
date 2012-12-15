@@ -12,21 +12,21 @@
 
 #include "../display/tile_data.h"
 
-#include "../gamestate/GameSettings.h"
-#include "../gamestate/tileset_data.h"
+#include "gamestate/GameSettings.h"
+#include "gamestate/tileset_data.h"
 #include "../levelgen/dungeon_data.h"
-#include "../objects/enemy/EnemyEntry.h"
-#include "../objects/scriptobject_data.h"
+#include "objects/enemy/EnemyEntry.h"
+#include "objects/scriptobject_data.h"
 
-#include "../stats/items/EquipmentEntry.h"
-#include "../stats/items/ProjectileEntry.h"
-#include "../stats/items/WeaponEntry.h"
+#include "stats/items/EquipmentEntry.h"
+#include "stats/items/ProjectileEntry.h"
+#include "stats/items/WeaponEntry.h"
 
-#include "../stats/class_data.h"
-#include "../stats/effect_data.h"
-#include "../stats/items/ItemEntry.h"
-#include "../stats/itemgen_data.h"
-#include "../stats/SpellEntry.h"
+#include "stats/class_data.h"
+#include "stats/effect_data.h"
+#include "stats/items/ItemEntry.h"
+#include "stats/itemgen_data.h"
+#include "stats/SpellEntry.h"
 
 #include "datafilenames.h"
 

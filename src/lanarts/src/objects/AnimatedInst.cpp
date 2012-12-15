@@ -3,16 +3,16 @@
  *  Represents an object that displays on the screen for a fixed amount of time before removing itself
  */
 
-#include <draw/colour_constants.h>
-#include <draw/DrawOptions.h>
+#include <ldraw/colour_constants.h>
+#include <ldraw/DrawOptions.h>
 
 #include <typeinfo>
 
 #include "../display/display.h"
 #include "../display/sprite_data.h"
 
-#include "../gamestate/GameState.h"
-#include "../gamestate/GameView.h"
+#include "gamestate/GameState.h"
+#include "gamestate/GameView.h"
 
 #include "AnimatedInst.h"
 

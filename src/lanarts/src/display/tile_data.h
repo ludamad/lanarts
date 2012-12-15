@@ -8,7 +8,7 @@
 
 #include "../data/FilenameList.h"
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 #include "GLImage.h"
 
 struct TileEntry {

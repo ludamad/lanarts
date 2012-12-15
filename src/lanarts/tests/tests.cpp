@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <stdexcept>
 
-#include <common/unittest.h>
+#include <lcommon/unittest.h>
 
 void lua_unit_tests();
 void net_unit_tests();

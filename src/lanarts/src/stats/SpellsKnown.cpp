@@ -5,7 +5,7 @@
 
 #include <algorithm>
 
-#include <common/SerializeBuffer.h>
+#include <lcommon/SerializeBuffer.h>
 #include "SpellsKnown.h"
 
 #include "SpellEntry.h"

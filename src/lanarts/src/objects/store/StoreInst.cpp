@@ -7,12 +7,12 @@
 #include "../../draw/colour_constants.h"
 
 #include "../../display/sprite_data.h"
-#include "../../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
-#include <common/SerializeBuffer.h>
+#include <lcommon/SerializeBuffer.h>
 
-#include "../../stats/items/ItemEntry.h"
-#include "../../util/math_util.h"
+#include "stats/items/ItemEntry.h"
+#include "util/math_util.h"
 #include "../collision_filters.h"
 
 #include "StoreInst.h"

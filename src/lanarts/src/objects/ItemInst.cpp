@@ -5,17 +5,17 @@
 
 #include <typeinfo>
 
-#include <common/mathutil.h>
+#include <lcommon/mathutil.h>
 
-#include <draw/draw.h>
-#include <draw/Font.h>
-#include <draw/DrawOptions.h>
-#include <draw/colour_constants.h>
+#include <ldraw/draw.h>
+#include <ldraw/Font.h>
+#include <ldraw/DrawOptions.h>
+#include <ldraw/colour_constants.h>
 
 #include "../display/sprite_data.h"
-#include "../gamestate/GameState.h"
-#include "../gamestate/GameView.h"
-#include "../stats/items/ItemEntry.h"
+#include "gamestate/GameState.h"
+#include "gamestate/GameView.h"
+#include "stats/items/ItemEntry.h"
 
 #include "ItemInst.h"
 #include "collision_filters.h"

@@ -6,7 +6,7 @@
 #ifndef LANARTS_COLOUR_CONSTANTS_H_
 #define LANARTS_COLOUR_CONSTANTS_H_
 
-#include <draw/colour_constants.h>
+#include <ldraw/colour_constants.h>
 
 /* Text console constants */
 const Colour COL_CONSOLE_BOX(COL_PALE_BLUE);

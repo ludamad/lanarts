@@ -8,8 +8,8 @@
 
 #include "../display/tile_data.h"
 
-#include "../gamestate/GameState.h"
-#include "../gamestate/GameTiles.h"
+#include "gamestate/GameState.h"
+#include "gamestate/GameTiles.h"
 
 #include "fov.h"
 

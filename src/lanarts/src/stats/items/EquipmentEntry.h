@@ -6,7 +6,7 @@
 #ifndef EQUIPMENTENTRY_H_
 #define EQUIPMENTENTRY_H_
 
-#include "../../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "../stat_modifiers.h"
 

@@ -1,15 +1,15 @@
 #include <cstring>
 
 #include "../data/lua_game_data.h"
-#include "../gamestate/GameState.h"
-#include "../objects/enemy/EnemyInst.h"
+#include "gamestate/GameState.h"
+#include "objects/enemy/EnemyInst.h"
 
-#include "../objects/player/PlayerInst.h"
+#include "objects/player/PlayerInst.h"
 
-#include "../objects/GameInst.h"
-#include "../stats/effect_data.h"
-#include "../stats/items/ItemEntry.h"
-#include "../stats/stats.h"
+#include "objects/GameInst.h"
+#include "stats/effect_data.h"
+#include "stats/items/ItemEntry.h"
+#include "stats/stats.h"
 
 #include "lua_api.h"
 #include "lunar.h"

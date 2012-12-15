@@ -3,13 +3,13 @@
  *  Defines parameters for item generation as well as the generate_items function
  */
 
-#include "../gamestate/GameState.h"
-#include "../gamestate/GameTiles.h"
+#include "gamestate/GameState.h"
+#include "gamestate/GameTiles.h"
 
-#include "../objects/ItemInst.h"
+#include "objects/ItemInst.h"
 
-#include "../stats/items/ItemEntry.h"
-#include "../stats/itemgen_data.h"
+#include "stats/items/ItemEntry.h"
+#include "stats/itemgen_data.h"
 
 #include "itemgen.h"
 

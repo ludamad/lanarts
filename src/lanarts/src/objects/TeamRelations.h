@@ -7,7 +7,7 @@
 #define TEAMRELATIONS_H_
 
 #include <vector>
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 class CombatGameInst;
 

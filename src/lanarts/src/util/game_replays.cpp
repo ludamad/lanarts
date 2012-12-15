@@ -5,12 +5,12 @@
 
 #include <deque>
 
-#include <common/strformat.h>
+#include <lcommon/strformat.h>
 
 #include "../draw/colour_constants.h"
 
-#include "../gamestate/GameAction.h"
-#include "../gamestate/GameState.h"
+#include "gamestate/GameAction.h"
+#include "gamestate/GameState.h"
 
 static FILE* loadfile = NULL;
 static FILE* savefile = NULL;

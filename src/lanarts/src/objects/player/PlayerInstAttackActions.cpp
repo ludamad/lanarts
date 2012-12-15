@@ -3,29 +3,27 @@
  *  Implements the various attack and misc spell actions the player can perform.
  */
 
-extern "C" {
-#include <lua/lua.h>
-}
+#include <lua.hpp>
 
 #include "../../data/game_data.h"
 #include "../../draw/colour_constants.h"
 #include "../../display/display.h"
 #include "../../display/sprite_data.h"
 #include "../../display/tile_data.h"
-#include "../../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
 #include "../../lua/lua_api.h"
 
-#include "../../stats/items/ItemEntry.h"
+#include "stats/items/ItemEntry.h"
 
-#include "../../stats/items/ProjectileEntry.h"
-#include "../../stats/items/WeaponEntry.h"
+#include "stats/items/ProjectileEntry.h"
+#include "stats/items/WeaponEntry.h"
 
-#include "../../stats/SpellEntry.h"
+#include "stats/SpellEntry.h"
 
-#include "../../util/math_util.h"
+#include "util/math_util.h"
 
-#include "../../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "../enemy/EnemyInst.h"
 

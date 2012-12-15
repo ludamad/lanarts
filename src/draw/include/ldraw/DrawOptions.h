@@ -6,7 +6,7 @@
 #ifndef DRAWOPTIONS_H_
 #define DRAWOPTIONS_H_
 
-#include <common/geometry.h>
+#include <lcommon/geometry.h>
 
 #include "Colour.h"
 

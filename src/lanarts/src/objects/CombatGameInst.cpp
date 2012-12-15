@@ -3,20 +3,20 @@
  *  Represents an instance that is affected by combat, ie enemies and players
  */
 
-#include <common/SerializeBuffer.h>
+#include <lcommon/SerializeBuffer.h>
 
 #include "../draw/draw_statbar.h"
 
 #include "../display/sprite_data.h"
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
-#include "../stats/items/ProjectileEntry.h"
-#include "../stats/items/WeaponEntry.h"
+#include "stats/items/ProjectileEntry.h"
+#include "stats/items/WeaponEntry.h"
 
-#include "../stats/effect_data.h"
-#include "../stats/stat_formulas.h"
+#include "stats/effect_data.h"
+#include "stats/stat_formulas.h"
 
-#include "../util/math_util.h"
+#include "util/math_util.h"
 
 #include "player/PlayerInst.h"
 

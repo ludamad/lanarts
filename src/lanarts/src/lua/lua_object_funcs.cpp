@@ -4,23 +4,19 @@
  *  GameInst objects.
  */
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-#include <lua/lualib.h>
-}
+#include <lua.hpp>
 
 #include "../data/lua_game_data.h"
 
 #include "../draw/colour_constants.h"
 
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
-#include "../objects/player/PlayerInst.h"
+#include "objects/player/PlayerInst.h"
 
-#include "../objects/GameInst.h"
-#include "../objects/ScriptedInst.h"
-#include "../util/math_util.h"
+#include "objects/GameInst.h"
+#include "objects/ScriptedInst.h"
+#include "util/math_util.h"
 
 #include "lua_api.h"
 

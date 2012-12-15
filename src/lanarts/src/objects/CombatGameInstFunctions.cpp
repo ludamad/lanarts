@@ -8,10 +8,10 @@
 
 #include <rvo2/RVO.h>
 
-#include "../gamestate/GameState.h"
-#include "../gamestate/PlayerData.h"
+#include "gamestate/GameState.h"
+#include "gamestate/PlayerData.h"
 
-#include "../util/math_util.h"
+#include "util/math_util.h"
 #include "enemy/EnemyInst.h"
 
 #include "player/PlayerInst.h"

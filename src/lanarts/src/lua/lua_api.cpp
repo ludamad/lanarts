@@ -1,15 +1,12 @@
 #include <stdexcept>
 
-#include <common/lua_lcommon.h>
-#include <draw/lua_ldraw.h>
+#include <lcommon/lua_lcommon.h>
+#include <ldraw/lua_ldraw.h>
 
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-#include <lua/lualib.h>
-}
+#include <lua.hpp>
+
 #include "../levelgen/lua_levelgen_funcs.h"
 
 #include "lua_api.h"

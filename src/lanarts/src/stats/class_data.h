@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "combat_stats.h"
 

@@ -3,7 +3,7 @@
  *  Handles dispatch of events bound to keyboard keys
  */
 
-#include <common/geometry.h>
+#include <lcommon/geometry.h>
 
 #include "IOController.h"
 

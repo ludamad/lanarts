@@ -3,10 +3,10 @@
  *  A stable interface for collision avoidance
  */
 
-#include <common/PerfTimer.h>
+#include <lcommon/PerfTimer.h>
 #include <rvo2/RVO.h>
 
-#include "../objects/CombatGameInst.h"
+#include "objects/CombatGameInst.h"
 
 #include "CollisionAvoidance.h"
 

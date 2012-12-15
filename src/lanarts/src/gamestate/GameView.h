@@ -6,7 +6,7 @@
 #ifndef GAMEVIEW_H_
 #define GAMEVIEW_H_
 
-#include <common/geometry.h>
+#include <lcommon/geometry.h>
 
 struct GameView {
 	int x, y, width, height, world_width, world_height;

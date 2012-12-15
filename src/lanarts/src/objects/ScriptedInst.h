@@ -10,7 +10,7 @@
 #ifndef SCRIPTEDINST_H_
 #define SCRIPTEDINST_H_
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "GameInst.h"
 

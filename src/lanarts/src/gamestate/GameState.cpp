@@ -5,10 +5,8 @@
  *  without making the caller worry about which component does what.
  */
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-}
+
+#include <lua.hpp>
 #include <SDL.h>
 #include <cmath>
 #include <SDL_opengl.h>
@@ -16,10 +14,10 @@ extern "C" {
 #include <ctime>
 #include <vector>
 
-#include <common/SerializeBuffer.h>
-#include <common/strformat.h>
+#include <lcommon/SerializeBuffer.h>
+#include <lcommon/strformat.h>
 
-#include <draw/display.h>
+#include <ldraw/display.h>
 
 #include "../data/game_data.h"
 
@@ -32,18 +30,18 @@ extern "C" {
 
 #include "../net/GameNetConnection.h"
 
-#include "../objects/enemy/EnemyInst.h"
+#include "objects/enemy/EnemyInst.h"
 
-#include "../objects/player/PlayerInst.h"
+#include "objects/player/PlayerInst.h"
 
-#include "../objects/GameInst.h"
+#include "objects/GameInst.h"
 
-#include "../stats/class_data.h"
+#include "stats/class_data.h"
 
-#include "../stats/items/ItemEntry.h"
+#include "stats/items/ItemEntry.h"
 
-#include "../util/game_replays.h"
-#include "../util/math_util.h"
+#include "util/game_replays.h"
+#include "util/math_util.h"
 
 #include "GameLevelState.h"
 #include "GameState.h"

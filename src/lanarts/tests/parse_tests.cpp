@@ -1,9 +1,9 @@
 #include <cstdio>
 
-#include <common/unittest.h>
-#include <common/fatal_error.h>
+#include <lcommon/unittest.h>
+#include <lcommon/fatal_error.h>
 
-#include "../src/data/FilenameList.h"
+#include "data/FilenameList.h"
 
 void filenames_from_pattern_test() {
 	{

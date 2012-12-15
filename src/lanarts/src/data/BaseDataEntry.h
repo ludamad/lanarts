@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 class BaseDataEntry {
 public:

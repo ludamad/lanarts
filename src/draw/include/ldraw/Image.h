@@ -10,8 +10,8 @@
 #include <vector>
 #include <string>
 
-#include <common/geometry.h>
-#include <common/smartptr.h>
+#include <lcommon/geometry.h>
+#include <lcommon/smartptr.h>
 
 #include "DrawOptions.h"
 #include "DrawableBase.h"

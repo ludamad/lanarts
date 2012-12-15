@@ -5,7 +5,7 @@
 
 #include <cmath>
 
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
 #include "items/EquipmentEntry.h"
 #include "items/WeaponEntry.h"

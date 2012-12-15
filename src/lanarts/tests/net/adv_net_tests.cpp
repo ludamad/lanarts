@@ -9,14 +9,11 @@
 #include <vector>
 #include <string>
 
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-}
+#include <lua.hpp>
 
 #include <net/lanarts_net.h>
 
-#include <common/unittest.h>
+#include <lcommon/unittest.h>
 
 #include "../../src/gamestate/GameState.h"
 

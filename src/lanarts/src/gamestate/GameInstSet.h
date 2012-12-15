@@ -12,8 +12,8 @@
 
 #include <cstdlib>
 #include <vector>
-#include "../objects/GameInst.h"
-#include "../lanarts_defines.h"
+#include "objects/GameInst.h"
+#include "lanarts_defines.h"
 #include <map>
 
 class GameState;

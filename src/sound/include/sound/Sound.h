@@ -8,7 +8,7 @@
 
 #include <string>
 #include <cstdio>
-#include <common/smartptr.h>
+#include <lcommon/smartptr.h>
 
 struct _Mix_Music;
 typedef struct _Mix_Music Mix_Music;

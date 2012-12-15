@@ -9,15 +9,15 @@
 
 #include "../../display/sprite_data.h"
 #include "../../display/tile_data.h"
-#include "../../gamestate/GameState.h"
-#include <common/SerializeBuffer.h>
+#include "gamestate/GameState.h"
+#include <lcommon/SerializeBuffer.h>
 
-#include "../../stats/items/WeaponEntry.h"
+#include "stats/items/WeaponEntry.h"
 
-#include "../../stats/class_data.h"
-#include "../../stats/items/ItemEntry.h"
+#include "stats/class_data.h"
+#include "stats/items/ItemEntry.h"
 
-#include "../../util/math_util.h"
+#include "util/math_util.h"
 
 #include "../enemy/EnemyInst.h"
 

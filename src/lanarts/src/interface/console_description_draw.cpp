@@ -3,24 +3,24 @@
  *  Common routines for content descriptions and drawing
  */
 
-#include <draw/draw.h>
-#include <draw/Font.h>
-#include <draw/DrawOptions.h>
+#include <ldraw/draw.h>
+#include <ldraw/Font.h>
+#include <ldraw/DrawOptions.h>
 
 #include "../draw/colour_constants.h"
 #include "../display/display.h"
 #include "../display/sprite_data.h"
-#include "../gamestate/GameState.h"
-#include "../objects/player/PlayerInst.h"
+#include "gamestate/GameState.h"
+#include "objects/player/PlayerInst.h"
 
-#include "../stats/items/EquipmentEntry.h"
-#include "../stats/items/ProjectileEntry.h"
-#include "../stats/items/WeaponEntry.h"
+#include "stats/items/EquipmentEntry.h"
+#include "stats/items/ProjectileEntry.h"
+#include "stats/items/WeaponEntry.h"
 
-#include "../stats/items/ItemEntry.h"
-#include "../stats/items/items.h"
+#include "stats/items/ItemEntry.h"
+#include "stats/items/items.h"
 
-#include "../stats/SpellEntry.h"
+#include "stats/SpellEntry.h"
 
 #include "console_description_draw.h"
 

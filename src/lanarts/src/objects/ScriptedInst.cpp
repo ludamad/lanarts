@@ -11,7 +11,7 @@
 #include <luawrap/LuaValue.h>
 
 #include "../lua/lua_gameinst.h"
-#include "../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
 #include "ScriptedInst.h"
 

@@ -8,9 +8,9 @@
 
 #include <lua.hpp>
 
-#include <common/Timer.h>
-#include <common/lua_lcommon.h>
-#include <common/mathutil.h>
+#include <lcommon/Timer.h>
+#include <lcommon/lua_lcommon.h>
+#include <lcommon/mathutil.h>
 
 #include <luawrap/LuaValue.h>
 #include <luawrap/calls.h>

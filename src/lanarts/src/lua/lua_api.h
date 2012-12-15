@@ -7,11 +7,11 @@
 #define LUA_API_H_
 
 #include <string>
-#include <draw/Colour.h>
+#include <ldraw/Colour.h>
 
-#include <common/geometry.h>
+#include <lcommon/geometry.h>
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "../region.h"
 

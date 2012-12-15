@@ -1,9 +1,6 @@
-extern "C" {
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-}
+#include <lua.hpp>
 
-#include <common/unittest.h>
+#include <lcommon/unittest.h>
 
 #include <luawrap/LuaValue.h>
 

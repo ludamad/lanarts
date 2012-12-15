@@ -6,7 +6,7 @@
 #ifndef CONSOLE_DESCRIPTION_DRAW_H_
 #define CONSOLE_DESCRIPTION_DRAW_H_
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 struct Item;
 struct ItemEntry;

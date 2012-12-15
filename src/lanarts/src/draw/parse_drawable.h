@@ -6,12 +6,12 @@
 #ifndef PARSE_DRAWABLE_H_
 #define PARSE_DRAWABLE_H_
 
-#include <draw/LuaDrawable.h>
-#include <draw/Image.h>
-#include <draw/Animation.h>
-#include <draw/DirectionalDrawable.h>
-#include <draw/Image.h>
-#include <draw/Drawable.h> // Generic wrapper
+#include <ldraw/LuaDrawable.h>
+#include <ldraw/Image.h>
+#include <ldraw/Animation.h>
+#include <ldraw/DirectionalDrawable.h>
+#include <ldraw/Image.h>
+#include <ldraw/Drawable.h> // Generic wrapper
 #include "../data/FilenameList.h"
 
 namespace YAML {

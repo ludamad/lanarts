@@ -5,7 +5,7 @@
 
 #include <lua.hpp>
 
-#include <common/lua_geometry.h>
+#include <lcommon/lua_geometry.h>
 
 #include <luawrap/LuaValue.h>
 #include <luawrap/luameta.h>

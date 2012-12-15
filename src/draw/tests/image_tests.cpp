@@ -3,7 +3,7 @@
  *  Test ldraw::Image properties
  */
 
-#include <common/unittest.h>
+#include <lcommon/unittest.h>
 
 #include "Image.h"
 

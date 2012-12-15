@@ -10,14 +10,14 @@
 #include <cstring>
 #include <yaml-cpp/yaml.h>
 
-#include "../objects/GameInst.h"
+#include "objects/GameInst.h"
 
 
-#include "../stats/items/WeaponEntry.h"
+#include "stats/items/WeaponEntry.h"
 
-#include "../stats/combat_stats.h"
+#include "stats/combat_stats.h"
 
-#include "../lanarts_defines.h"
+#include "lanarts_defines.h"
 
 #include "FilenameList.h"
 #include "game_data.h"

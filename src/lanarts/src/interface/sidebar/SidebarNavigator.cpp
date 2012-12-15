@@ -3,9 +3,9 @@
  *  Handles navigation of content in the side bar
  */
 
-#include <draw/draw.h>
-#include <draw/Font.h>
-#include <draw/DrawOptions.h>
+#include <ldraw/draw.h>
+#include <ldraw/Font.h>
+#include <ldraw/DrawOptions.h>
 
 #include "../../draw/colour_constants.h"
 
@@ -13,7 +13,7 @@
 
 #include "../../display/sprite_data.h"
 
-#include "../../gamestate/GameState.h"
+#include "gamestate/GameState.h"
 
 #include "ConfigContent.h"
 #include "EnemiesSeenContent.h"

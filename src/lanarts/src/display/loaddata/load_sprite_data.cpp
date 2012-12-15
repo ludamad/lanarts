@@ -6,7 +6,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include <luawrap/luawrap.h>
-#include <common/strformat.h>
+#include <lcommon/strformat.h>
 
 #include "../../lua/lua_yaml.h"
 #include "../../data/game_data.h"
