@@ -7,7 +7,7 @@
 #include "data/game_data.h"
 
 #include "display/sprite_data.h"
-#include "display/tile_data.h"
+#include "display/TileEntry.h"
 #include "gamestate/GameLevelState.h"
 
 #include "gamestate/GameState.h"

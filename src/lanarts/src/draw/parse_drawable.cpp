@@ -107,7 +107,6 @@ bool filepattern_to_image_list(std::vector<Image>& images,
 			&filename);
 
 	if (was_split_pattern) {
-		printf("Split pattern\n!");
 		// Split
 		std::vector<Image> split_images = image_split(Image(filename), size);
 

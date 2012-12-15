@@ -310,6 +310,7 @@ static int read_line (lua_State *L, FILE *f) {
       return 1;  /* read at least an `eol' */
     }
   }
+  return 0;
 }
 
 

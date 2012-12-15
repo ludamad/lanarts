@@ -24,3 +24,10 @@ dofile "res/tests/progressions.lua"
 
 settings = {verbose_output = false}
 
+
+-- lanarts main loop
+-- this controls the games behaviour every step!
+function main_loop() 
+
+
+end

@@ -3,7 +3,7 @@
  *  Handles drawing & state of a minimap
  */
 
-#include "display/tile_data.h"
+#include "display/TileEntry.h"
 
 #include "gamestate/GameState.h"
 

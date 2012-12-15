@@ -9,7 +9,7 @@
 #include "draw/colour_constants.h"
 #include "display/display.h"
 #include "display/sprite_data.h"
-#include "display/tile_data.h"
+#include "display/TileEntry.h"
 #include "gamestate/GameState.h"
 
 #include "lua/lua_api.h"

@@ -9,6 +9,9 @@
 #include <lcommon/strformat.h>
 
 #include "lua/lua_yaml.h"
+
+#include "draw/parse_drawable.h"
+
 #include "data/game_data.h"
 #include "data/parse.h"
 #include "data/yaml_util.h"
@@ -39,18 +42,17 @@ static FilenameList parse_imgfilelist(const YAML::Node& node) {
 
 void load_tile_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
-	game_tile_data.push_back(
-			TileEntry(parse_str(node["name"]), parse_imgfilelist(node)));
+	TileEntry entry;
+	entry.name = parse_str(node["name"]);
+	entry.images =parse_image_list(node["files"]);
+
+	game_tile_data.push_back(entry);
 }
 
 void load_tile_data(const FilenameList& filenames) {
 	game_tile_data.clear();
 
 	load_data_impl_template(filenames, "tiles", load_tile_callbackf);
-
-	for (int i = 0; i < game_tile_data.size(); i++) {
-		game_tile_data[i].init();
-	}
 }
 
 static SpriteEntry::sprite_type type_from_str(const std::string& type) {

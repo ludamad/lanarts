@@ -74,7 +74,7 @@ public:
 	LuaStackValue(lua_State* L, int idx);
 	LuaStackValue();
 
-	void push(lua_State* L) const;
+	void push() const;
 
 	bool empty() const;
 
@@ -105,6 +105,7 @@ typedef LuaStackValue LuaSpecialValue;
 
 namespace luawrap {
 	LuaSpecialValue globals(lua_State* L);
+	LuaSpecialValue registry(lua_State* L);
 }
 
 #endif /* LUAWRAP_LUASTACKVALUE_H_ */

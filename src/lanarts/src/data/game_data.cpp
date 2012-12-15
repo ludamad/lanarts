@@ -132,6 +132,11 @@ spell_id get_spell_by_name(const char* name) {
 tile_id get_tile_by_name(const char* name) {
 	return get_X_by_name(game_tile_data, name);
 }
+
+TileEntry& get_tile_entry(tile_id id) {
+	return game_tile_data.at(id);
+}
+
 effect_id get_effect_by_name(const char* name) {
 	return get_X_by_name(game_effect_data, name);
 }

@@ -70,7 +70,7 @@ LuaStackValue::LuaStackValue() :
 	/* idx is undefined and should not be used */
 }
 
-void LuaStackValue::push(lua_State* L) const {
+void LuaStackValue::push() const {
 	lua_pushvalue(L, idx);
 }
 
@@ -80,5 +80,9 @@ bool LuaStackValue::empty() const {
 
 LuaSpecialValue luawrap::globals(lua_State* L) {
 	return LuaSpecialValue(L, LUA_GLOBALSINDEX);
+}
+
+LuaSpecialValue luawrap::registry(lua_State* L) {
+	return LuaSpecialValue(L, LUA_REGISTRYINDEX);
 }
 

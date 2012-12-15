@@ -22,7 +22,7 @@
 #include "data/game_data.h"
 
 #include "display/display.h"
-#include "display/tile_data.h"
+#include "display/TileEntry.h"
 
 #include "levelgen/dungeon_data.h"
 

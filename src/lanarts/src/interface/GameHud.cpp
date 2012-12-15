@@ -10,7 +10,7 @@
 #include "display/display.h"
 
 #include "display/sprite_data.h"
-#include "display/tile_data.h"
+#include "display/TileEntry.h"
 #include "gamestate/GameInstSet.h"
 #include "gamestate/GameState.h"
 #include "objects/player/PlayerInst.h"

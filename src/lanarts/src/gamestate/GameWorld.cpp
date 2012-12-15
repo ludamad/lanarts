@@ -6,7 +6,7 @@
 
 #include <typeinfo>
 
-#include "display/tile_data.h"
+#include "display/TileEntry.h"
 #include "levelgen/levelgen.h"
 
 #include "objects/enemy/EnemyInst.h"

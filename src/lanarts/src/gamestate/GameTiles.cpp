@@ -5,7 +5,7 @@
 
 #include "display/display.h"
 
-#include "display/tile_data.h"
+#include "display/TileEntry.h"
 
 #include "levelgen/levelgen.h"
 
@@ -89,10 +89,10 @@ void GameTiles::pre_draw(GameState* gs) {
 	for (int y = min_tiley; y <= max_tiley; y++) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
 			Tile& tile = get(x, y);
-			GLimage& img = game_tile_data[tile.tile].img(tile.subtile);
-			if (/*reveal_enabled ||*/is_seen(x, y))
-				gl_draw_image(img, x * TILE_SIZE - view.x,
-						y * TILE_SIZE - view.y);
+			const ldraw::Image& img = get_tile_entry(tile.tile).img(tile.subtile);
+			if (/*reveal_enabled ||*/is_seen(x, y)) {
+				img.draw(on_screen(gs, Pos(x * TILE_SIZE, y * TILE_SIZE)));
+			}
 		}
 	}
 
@@ -150,7 +150,6 @@ void GameTiles::post_draw(GameState* gs) {
 			bool has_match = false, has_free = false;
 			bool is_other_match = false;
 			Tile& tile = get(x, y);
-			GLimage& img = game_tile_data[tile.tile].img(tile.subtile);
 
 			std::vector<PlayerInst*> players = gs->players_in_level();
 
@@ -173,7 +172,7 @@ void GameTiles::post_draw(GameState* gs) {
 			if (!has_match) {
 				BBox tilebox(
 						Pos(x * TILE_SIZE - view.x, y * TILE_SIZE - view.y),
-						Dim(img.width, img.height));
+						get_tile_entry(tile.tile).size());
 				if (!is_other_match) {
 					if (!is_seen(x, y)) {
 						ldraw::draw_rectangle(Colour(0, 0, 0), tilebox);
