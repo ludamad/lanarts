@@ -3,10 +3,16 @@
  *  Math utility functions for lcommon
  */
 
+#include <algorithm>
+
 #include <cmath>
 #include "mathutil.h"
 
 #include "geometry.h"
+
+int squish(int a, int b, int c) {
+	return std::min(std::max(a, b), c - 1);
+}
 
 int power_of_two(int input) {
 	int value = 1;

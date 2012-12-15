@@ -3,6 +3,8 @@
  *  Defines a colour structure
  */
 
+#include <lcommon/mathutil.h>
+
 #include "Colour.h"
 
 Colour Colour::mute_colour(float val) const {
@@ -29,3 +31,9 @@ Colour Colour::multiply(const Colour & o) const {
 	return Colour(r * (o.r + 1) / 256, g * (o.g + 1) / 256, b * (o.b + 1) / 256,
 			a * (o.a + 1) / 256);
 }
+
+Colour Colour::clamp() const {
+	return Colour(squish(r, 0, 256), squish(g, 0, 256), squish(b, 0, 256),
+			squish(a, 0, 256));
+}
+

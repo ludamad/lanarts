@@ -5,6 +5,7 @@
 
 #include <luawrap/LuaValue.h>
 #include <luawrap/luawrap.h>
+#include <luawrap/functions.h>
 #include <luawrap/types.h>
 
 #include <lcommon/lua_numeric_tuple_helper.h>
@@ -13,12 +14,18 @@
 
 #include "lua_colour.h"
 
+static Colour color_alpha(const Colour& c, float alpha) {
+	return c.mult_alpha(alpha);
+}
+
 void ldraw::lua_register_colour(lua_State *L,
 		const LuaValue& module) {
 
 	typedef LuaNumericTupleFunctions<Colour, int, 1 /*allowed missing*/, 255 /*default*/> ImplClass;
 	luawrap::install_type<Colour, ImplClass::push, ImplClass::get,
 			ImplClass::check>();
+
+	module["color_alpha"].bind_function(color_alpha);
 
 #define BIND_COLOUR(col) \
 	module[#col] = col

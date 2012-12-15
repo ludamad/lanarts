@@ -144,6 +144,18 @@ namespace _luawrap_private {
 		luawrap::push<T>(L, t);
 		lua_setfield(L, value.index(), key);
 	}
+
+	template<typename T>
+	inline void _LuaField::optionalget(T& val) {
+		lua_State* L = value.luastate();
+		value.push();
+		luawrap::getoptfield(L, -1, key, val);
+		lua_pop(L, 1);
+	}
+	template<typename T>
+	inline void _LuaStackField::optionalget(T& val) {
+		luawrap::getoptfield(value.luastate(), value.index(), key, val);
+	}
 }
 
 #include "../../src/predefined_helper.h"

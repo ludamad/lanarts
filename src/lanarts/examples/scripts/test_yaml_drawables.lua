@@ -9,8 +9,8 @@ local function drawargs()
 	return {origin=CENTER, angle=angle, frame=frame}
 end
 
-function test_draw_function()
-	split_animation:draw({frame=frame, alpha=0.5}, {200,50})
+function test_draw_function(opts, pos)
+	split_animation:draw(opts, pos)
 end
 
 function draw()
@@ -21,5 +21,6 @@ function draw()
 	animation:draw({frame=frame}, {200,150})
 	split_animation:draw({frame=frame}, {200,100})
 	local luadrawable = drawable_parse("{ type: lua, function: test_draw_function }")
+	luadrawable:draw( { color = color_alpha(COL_WHITE, angle % math.pi) }, { 200, 50 } )
 	
 end

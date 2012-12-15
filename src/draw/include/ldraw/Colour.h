@@ -23,6 +23,7 @@ struct Colour {
 	Colour mute_colour(float val) const;
 	Colour mult_alpha(float alpha) const;
 	Colour multiply(const Colour& o) const;
+	Colour clamp() const;
 };
 
 #endif /* COLOUR_H_ */

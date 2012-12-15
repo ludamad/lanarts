@@ -41,6 +41,10 @@ namespace _luawrap_private {
 		template<typename T>
 		operator T();
 
+		// get if not nil
+		template<typename T>
+		void optionalget(T& value);
+
 		template<typename T>
 		void operator=(const T& value);
 
@@ -88,9 +92,9 @@ public:
 
 	//NB: it is unsafe to have 'std::string& key' be const here!
 	//This would result potentially in a char* ptr being used outside of its scope
-//	_luawrap_private::_LuaStackField operator[](std::string& key) const {
-//		return operator[](key.c_str);
-//	}
+	_luawrap_private::_LuaStackField operator[](std::string& key) const {
+		return operator[](key.c_str());
+	}
 
 private:
 	lua_State* L;

@@ -18,8 +18,6 @@ struct Pos;
 void direction_towards(const Pos& a, const Pos& b, float& rx, float& ry,
 		float speed = 1);
 #pragma deprecated
-int squish(int a, int b, int c);
-#pragma deprecated
 float distance_between(const Pos& a, const Pos& b);
 #pragma deprecated
 float magnitude(float x, float y);

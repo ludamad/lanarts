@@ -34,6 +34,7 @@ __inline long int round2int (float flt) {
 }
 #endif
 
+int squish(int a, int b, int c);
 
 Pos centered_multiple(const Pos& pos, int mult);
 Pos round_to_multiple(const Pos& pos, int mult, bool centered = false);

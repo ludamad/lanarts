@@ -42,7 +42,7 @@ Animation parse_animation(const YAML::Node& node) {
 LuaDrawable parse_luadrawable(const YAML::Node& node) {
 	lua_State* L = ParseContext::luastate();
 
-	const YAML::Node* funcnode = yaml_find_node(node, "file");
+	const YAML::Node* funcnode = yaml_find_node(node, "function");
 
 	if (!funcnode) {
 		throw YAML::RepresentationException(node.GetMark(),
@@ -107,6 +107,7 @@ bool filepattern_to_image_list(std::vector<Image>& images,
 			&filename);
 
 	if (was_split_pattern) {
+		printf("Split pattern\n!");
 		// Split
 		std::vector<Image> split_images = image_split(Image(filename), size);
 
@@ -226,7 +227,7 @@ Drawable parse_drawable(const YAML::Node& node) {
 		return Drawable(new Animation(parse_animation(node)));
 	} else if (type == "directional") {
 		return Drawable(new DirectionalDrawable(parse_directional(node)));
-	} else if (type == "directional") {
+	} else if (type == "lua") {
 		return Drawable(new LuaDrawable(parse_luadrawable(node)));
 	} else {
 		throw YAML::RepresentationException(node.GetMark(), err);

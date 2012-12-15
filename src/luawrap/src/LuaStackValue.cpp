@@ -60,6 +60,9 @@ namespace _luawrap_private {
 
 LuaStackValue::LuaStackValue(lua_State* L, int idx) :
 		L(L), idx(idx) {
+	if (idx > LUA_REGISTRYINDEX + 100 && idx < 1) {
+		this->idx += lua_gettop(L) + 1; // Convert relative negative position to 'absolute' stack position
+	}
 }
 
 LuaStackValue::LuaStackValue() :

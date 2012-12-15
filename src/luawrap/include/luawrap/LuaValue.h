@@ -52,6 +52,11 @@ namespace _luawrap_private {
 		const char* key;
 		template<typename T> operator T();
 		operator LuaValue();
+
+		// get if not nil
+		template<typename T>
+		void optionalget(T& value);
+
 		template<typename T> void operator =(const T& value);
 		void operator =(const LuaValue& value);
 		void operator =(const char* str);

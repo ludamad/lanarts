@@ -14,14 +14,15 @@
 
 void lua_push_drawoptions(lua_State *L, const ldraw::DrawOptions & options) {
 	lua_newtable(L);
-	int tblidx = lua_gettop(L);
+	LuaStackValue table(L, -1);
 
-	luawrap::setfield(L, tblidx, "origin", int(options.draw_origin));
-	luawrap::setfield(L, tblidx, "color", options.draw_colour);
-	luawrap::setfield(L, tblidx, "region", options.draw_region);
-	luawrap::setfield(L, tblidx, "scale", options.draw_scale);
-	luawrap::setfield(L, tblidx, "angle", options.draw_angle);
-	luawrap::setfield(L, tblidx, "frame", options.draw_frame);
+	table["origin"] = (int) options.draw_origin;
+
+	table["color"] = options.draw_colour.clamp();
+	table["region"] = options.draw_region;
+	table["scale"] = options.draw_scale;
+	table["angle"] = options.draw_angle;
+	table["frame"] = options.draw_frame;
 }
 
 ldraw::DrawOptions lua_get_drawoptions(lua_State *L, int idx) {
@@ -33,15 +34,23 @@ ldraw::DrawOptions lua_get_drawoptions(lua_State *L, int idx) {
 		Colour col = luawrap::get<Colour>(L, idx);
 		return col;
 	}
-	ldraw::DrawOptions options;
-	options.draw_origin = (ldraw::DrawOrigin) luawrap::getfield<int>(L, idx,
-			"origin");
 
-	luawrap::getoptfield(L, idx, "color", options.draw_colour);
-	luawrap::getoptfield(L, idx, "region", options.draw_region);
-	luawrap::getoptfield(L, idx, "scale", options.draw_scale);
-	luawrap::getoptfield(L, idx, "angle", options.draw_angle);
-	luawrap::getoptfield(L, idx, "frame", options.draw_frame);
+	LuaStackValue table(L, idx);
+
+	ldraw::DrawOptions options;
+
+	table["origin"].push();
+	if (!lua_isnil(L, -1)) {
+		options.draw_origin = (ldraw::DrawOrigin)lua_tonumber(L, -1);
+	}
+	lua_pop(L, 1);
+
+	table["color"].optionalget(options.draw_colour);
+	table["region"].optionalget(options.draw_region);
+	table["scale"].optionalget(options.draw_scale);
+	table["angle"].optionalget(options.draw_angle);
+	table["frame"].optionalget(options.draw_frame);
+
 	return options;
 }
 
