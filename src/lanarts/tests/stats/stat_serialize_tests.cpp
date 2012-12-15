@@ -8,13 +8,13 @@
 
 #include <net/lanarts_net.h>
 
-#include "../../data/game_data.h"
+#include "../../src/data/game_data.h"
 
 #include <common/SerializeBuffer.h>
 
-#include "../../stats/EquipmentStats.h"
-#include "../../stats/Inventory.h"
-#include "../../stats/combat_stats.h"
+#include "../../src/stats/EquipmentStats.h"
+#include "../../src/stats/Inventory.h"
+#include "../../src/stats/combat_stats.h"
 
 //static void assert_equal(DerivedStats& d1, DerivedStats& d2) {
 //	UNIT_TEST_ASSERT(d1.damage == d2.damage);

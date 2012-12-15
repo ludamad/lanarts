@@ -29,7 +29,7 @@ extern "C" {
 #include "objects/player/PlayerInst.h"
 #include "objects/AnimatedInst.h"
 
-#include "tests/tests.h"
+#include "../tests/tests.h"
 
 
 #include "menu/menus.h"

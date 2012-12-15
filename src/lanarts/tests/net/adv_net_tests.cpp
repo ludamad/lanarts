@@ -18,10 +18,10 @@ extern "C" {
 
 #include <common/unittest.h>
 
-#include "../../gamestate/GameState.h"
+#include "../../src/gamestate/GameState.h"
 
-#include "../../gamestate/PlayerData.h"
-#include "../../net/GameNetConnection.h"
+#include "../../src/gamestate/PlayerData.h"
+#include "../../src/net/GameNetConnection.h"
 
 static lua_State* L = NULL;
 

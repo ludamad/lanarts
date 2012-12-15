@@ -6,3 +6,4 @@ Makefile
 saved_settings.yaml
 CMakeLists.txt.orig
 *.gch
+*.save

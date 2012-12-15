@@ -32,8 +32,8 @@
 
 #include <draw/lua_ldraw.h>
 
-#include "../../draw/parse_drawable.h"
-#include "../../data/parse_context.h"
+#include "../src/draw/parse_drawable.h"
+#include "../src/data/parse_context.h"
 
 static lua_State* L;
 

@@ -6,7 +6,7 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "../draw/parse_drawable.h"
+#include "../src/draw/parse_drawable.h"
 
 using namespace ldraw;
 

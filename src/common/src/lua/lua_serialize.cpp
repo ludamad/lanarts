@@ -581,7 +581,8 @@ void lua_deserialize(SerializeBuffer& serializer, lua_State* L,
 	serializer.read_byte(isnull);
 
 	if (!isnull) {
-		lua_serialize(serializer, L, -1);
+		value.init(L);
+		lua_deserialize(serializer, L);
 		value.pop();
 	} else {
 		value.clear();
