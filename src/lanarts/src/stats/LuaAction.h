@@ -8,7 +8,7 @@
 
 #include <luawrap/LuaValue.h>
 
-#include "../lua/luaexpr.h"
+#include "lua/luaexpr.h"
 
 struct LuaAction {
 	std::string success_message;

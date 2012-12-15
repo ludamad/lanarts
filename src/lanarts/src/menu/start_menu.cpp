@@ -14,18 +14,18 @@
 
 #include <lcommon/Timer.h>
 
-#include "../data/game_data.h"
+#include "data/game_data.h"
 
-#include "../draw/colour_constants.h"
-#include "../display/display.h"
+#include "draw/colour_constants.h"
+#include "display/display.h"
 
 #include "gamestate/GameState.h"
 
-#include "../interface/ButtonInst.h"
-#include "../interface/TextBoxInst.h"
+#include "interface/ButtonInst.h"
+#include "interface/TextBoxInst.h"
 
-#include "../interface/DrawCallbackInst.h"
-#include "../lua/lua_api.h"
+#include "interface/DrawCallbackInst.h"
+#include "lua/lua_api.h"
 
 #include "objects/enemy/EnemyInst.h"
 #include "objects/player/PlayerInst.h"

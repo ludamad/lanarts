@@ -10,7 +10,7 @@
 #include <vector>
 #include <lcommon/SerializeBuffer.h>
 
-#include "../../collision_avoidance/CollisionAvoidance.h"
+#include "collision_avoidance/CollisionAvoidance.h"
 
 #include "lanarts_defines.h"
 

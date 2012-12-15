@@ -5,7 +5,7 @@
 
 #include <ldraw/draw.h>
 
-#include "../draw/colour_constants.h"
+#include "draw/colour_constants.h"
 #include "gamestate/GameState.h"
 #include "objects/player/PlayerInst.h"
 

@@ -8,7 +8,7 @@
 #include <cstdio>
 #include <typeinfo>
 
-#include "../../display/sprite_data.h"
+#include "display/sprite_data.h"
 
 #include "ItemEntry.h"
 #include "EquipmentEntry.h"

@@ -9,7 +9,7 @@
 
 #include <lcommon/lua_lcommon.h>
 
-#include "../lua/lua_api.h"
+#include "lua/lua_api.h"
 
 #include "stats/items/EquipmentEntry.h"
 #include "stats/items/ItemEntry.h"

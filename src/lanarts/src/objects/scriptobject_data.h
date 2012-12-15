@@ -10,7 +10,7 @@
 #include <string>
 
 #include <luawrap/LuaValue.h>
-#include "../lua/luaexpr.h"
+#include "lua/luaexpr.h"
 #include "lanarts_defines.h"
 
 #include "GameInst.h"

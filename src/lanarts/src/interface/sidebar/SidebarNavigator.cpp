@@ -7,11 +7,11 @@
 #include <ldraw/Font.h>
 #include <ldraw/DrawOptions.h>
 
-#include "../../draw/colour_constants.h"
+#include "draw/colour_constants.h"
 
-#include "../../display/display.h"
+#include "display/display.h"
 
-#include "../../display/sprite_data.h"
+#include "display/sprite_data.h"
 
 #include "gamestate/GameState.h"
 

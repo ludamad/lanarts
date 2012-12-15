@@ -9,11 +9,11 @@
 #include <string>
 #include <vector>
 
-#include "../data/BaseDataEntry.h"
+#include "data/BaseDataEntry.h"
 
 #include <luawrap/LuaValue.h>
 
-#include "../lua/luaexpr.h"
+#include "lua/luaexpr.h"
 #include "lanarts_defines.h"
 
 #include "items/items.h"

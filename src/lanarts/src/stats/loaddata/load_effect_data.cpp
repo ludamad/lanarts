@@ -3,10 +3,10 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "../../data/game_data.h"
-#include "../../data/parse.h"
+#include "data/game_data.h"
+#include "data/parse.h"
 
-#include "../../lua/lua_yaml.h"
+#include "lua/lua_yaml.h"
 
 #include "../effect_data.h"
 

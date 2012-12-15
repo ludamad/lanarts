@@ -6,7 +6,7 @@
 #ifndef TILE_DATA_H_
 #define TILE_DATA_H_
 
-#include "../data/FilenameList.h"
+#include "data/FilenameList.h"
 
 #include "lanarts_defines.h"
 #include "GLImage.h"

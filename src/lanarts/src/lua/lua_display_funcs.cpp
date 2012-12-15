@@ -5,7 +5,7 @@
 
 #include <lua.hpp>
 
-#include "../data/lua_game_data.h"
+#include "data/lua_game_data.h"
 
 #include "gamestate/GameState.h"
 

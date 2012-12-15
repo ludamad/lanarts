@@ -16,19 +16,19 @@
 #include <ldraw/Font.h>
 #include <ldraw/DrawOptions.h>
 
-#include "../data/game_data.h"
+#include "data/game_data.h"
 
-#include "../draw/colour_constants.h"
-#include "../display/display.h"
+#include "draw/colour_constants.h"
+#include "display/display.h"
 
 #include "gamestate/GameState.h"
 
-#include "../interface/ButtonInst.h"
-#include "../interface/TextBoxInst.h"
+#include "interface/ButtonInst.h"
+#include "interface/TextBoxInst.h"
 
-#include "../interface/components_draw.h"
-#include "../interface/DrawCallbackInst.h"
-#include "../lua/lua_api.h"
+#include "interface/components_draw.h"
+#include "interface/DrawCallbackInst.h"
+#include "lua/lua_api.h"
 
 #include "objects/enemy/EnemyInst.h"
 #include "objects/player/PlayerInst.h"

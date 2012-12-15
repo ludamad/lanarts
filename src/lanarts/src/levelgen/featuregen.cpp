@@ -4,10 +4,10 @@
  *  as well as the generate_features function
  */
 
-#include "../data/game_data.h"
+#include "data/game_data.h"
 
-#include "../display/sprite_data.h"
-#include "../display/tile_data.h"
+#include "display/sprite_data.h"
+#include "display/tile_data.h"
 #include "gamestate/GameLevelState.h"
 
 #include "gamestate/GameState.h"

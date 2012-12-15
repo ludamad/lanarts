@@ -17,12 +17,12 @@
 
 #include <ldraw/Font.h>
 
-#include "../fov/fov.h"
+#include "fov/fov.h"
 
-#include "../interface/GameChat.h"
+#include "interface/GameChat.h"
 
-#include "../interface/GameHud.h"
-#include "../net/GameNetConnection.h"
+#include "interface/GameHud.h"
+#include "net/GameNetConnection.h"
 
 #include "GameLogger.h"
 #include "GameSettings.h"

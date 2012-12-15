@@ -13,11 +13,11 @@
 
 #include <luawrap/LuaValue.h>
 
-#include "../../data/BaseDataEntry.h"
+#include "data/BaseDataEntry.h"
 
 #include "stats/combat_stats.h"
 
-#include "../../lua/luaexpr.h"
+#include "lua/luaexpr.h"
 
 #include "lanarts_defines.h"
 

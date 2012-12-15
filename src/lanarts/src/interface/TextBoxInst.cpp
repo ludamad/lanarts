@@ -7,7 +7,7 @@
 #include <ldraw/Font.h>
 #include <ldraw/DrawOptions.h>
 
-#include "../draw/colour_constants.h"
+#include "draw/colour_constants.h"
 
 #include "gamestate/GameState.h"
 

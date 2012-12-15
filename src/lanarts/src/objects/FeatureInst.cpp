@@ -5,8 +5,8 @@
 
 #include <typeinfo>
 
-#include "../draw/colour_constants.h"
-#include "../display/sprite_data.h"
+#include "draw/colour_constants.h"
+#include "display/sprite_data.h"
 
 #include "gamestate/GameState.h"
 #include "gamestate/GameTiles.h"

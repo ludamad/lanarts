@@ -5,11 +5,11 @@
 #include <luawrap/luawrap.h>
 
 #include "../items/ProjectileEntry.h"
-#include "../../data/game_data.h"
-#include "../../data/parse.h"
-#include "../../data/yaml_util.h"
+#include "data/game_data.h"
+#include "data/parse.h"
+#include "data/yaml_util.h"
 
-#include "../../lua/lua_yaml.h"
+#include "lua/lua_yaml.h"
 
 #include "../items/ItemEntry.h"
 #include "load_stats.h"

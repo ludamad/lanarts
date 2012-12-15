@@ -7,7 +7,7 @@
 #define ANIMATEDINST_H_
 #include <string>
 
-#include "../display/display.h"
+#include "display/display.h"
 
 #include "GameInst.h"
 

@@ -5,10 +5,10 @@
 
 #include <lua.hpp>
 
-#include "../data/lua_game_data.h"
+#include "data/lua_game_data.h"
 
 #include "gamestate/GameState.h"
-#include "../lua/lua_api.h"
+#include "lua/lua_api.h"
 #include "levelgen.h"
 
 #include "lua_levelgen_funcs.h"

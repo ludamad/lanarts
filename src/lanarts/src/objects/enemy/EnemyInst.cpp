@@ -13,14 +13,14 @@
 #include <ldraw/Font.h>
 #include <ldraw/DrawOptions.h>
 
-#include "../../lua/lua_gameinst.h"
+#include "lua/lua_gameinst.h"
 
-#include "../../draw/colour_constants.h"
-#include "../../display/display.h"
-#include "../../display/sprite_data.h"
+#include "draw/colour_constants.h"
+#include "display/display.h"
+#include "display/sprite_data.h"
 
 #include "gamestate/GameState.h"
-#include "../../interface/console_description_draw.h"
+#include "interface/console_description_draw.h"
 
 #include "stats/items/WeaponEntry.h"
 #include "stats/stat_formulas.h"

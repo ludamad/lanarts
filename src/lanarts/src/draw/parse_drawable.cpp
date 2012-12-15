@@ -9,9 +9,9 @@
 #include <lcommon/strformat.h>
 #include <lcommon/fatal_error.h>
 
-#include "../data/FilenameList.h"
-#include "../data/parse.h"
-#include "../data/parse_context.h"
+#include "data/FilenameList.h"
+#include "data/parse.h"
+#include "data/parse_context.h"
 
 #include "parse_drawable.h"
 

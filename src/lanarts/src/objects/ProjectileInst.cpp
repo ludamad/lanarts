@@ -8,11 +8,11 @@
 
 #include <lua.hpp>
 
-#include "../draw/colour_constants.h"
-#include "../display/sprite_data.h"
+#include "draw/colour_constants.h"
+#include "display/sprite_data.h"
 #include "gamestate/GameState.h"
 
-#include "../lua/lua_api.h"
+#include "lua/lua_api.h"
 
 #include "stats/items/ProjectileEntry.h"
 #include "stats/items/WeaponEntry.h"

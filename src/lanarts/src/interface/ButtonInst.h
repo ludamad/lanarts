@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "../draw/colour_constants.h"
+#include "draw/colour_constants.h"
 
 #include "objects/GameInst.h"
 

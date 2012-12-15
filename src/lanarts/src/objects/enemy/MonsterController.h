@@ -8,11 +8,11 @@
 
 #include <vector>
 
-#include "../../collision_avoidance/CollisionAvoidance.h"
+#include "collision_avoidance/CollisionAvoidance.h"
 
-#include "../../pathfind/astar_pathfind.h"
+#include "pathfind/astar_pathfind.h"
 
-#include "../../pathfind/pathfind.h"
+#include "pathfind/pathfind.h"
 #include <lcommon/SerializeBuffer.h>
 
 #include "../GameInst.h"

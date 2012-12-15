@@ -12,7 +12,7 @@
 #include <ldraw/DrawOptions.h>
 #include <ldraw/colour_constants.h>
 
-#include "../display/sprite_data.h"
+#include "display/sprite_data.h"
 #include "gamestate/GameState.h"
 #include "gamestate/GameView.h"
 #include "stats/items/ItemEntry.h"

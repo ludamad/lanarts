@@ -3,7 +3,7 @@
  *	Holds lists of all players in game, and pointers to their respective PlayerInst's
  */
 
-#include "../fov/fov.h"
+#include "fov/fov.h"
 #include "objects/player/PlayerInst.h"
 #include "util/math_util.h"
 

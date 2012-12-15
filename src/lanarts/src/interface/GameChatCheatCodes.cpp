@@ -11,11 +11,11 @@
 
 #include "stats/items/ItemEntry.h"
 
-#include "../levelgen/enemygen.h"
+#include "levelgen/enemygen.h"
 
 #include "objects/player/PlayerInst.h"
 
-#include "../lua/lua_api.h"
+#include "lua/lua_api.h"
 
 #include "GameChat.h"
 

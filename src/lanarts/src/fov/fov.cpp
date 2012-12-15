@@ -6,7 +6,7 @@
 #include <cmath>
 #include <cstdlib>
 
-#include "../display/tile_data.h"
+#include "display/tile_data.h"
 
 #include "gamestate/GameState.h"
 #include "gamestate/GameTiles.h"

@@ -1,5 +1,5 @@
 
-#include "../data/lua_game_data.h"
+#include "data/lua_game_data.h"
 #include "gamestate/GameLevelState.h"
 
 #include "gamestate/GameState.h"

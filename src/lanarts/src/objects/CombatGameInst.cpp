@@ -5,9 +5,9 @@
 
 #include <lcommon/SerializeBuffer.h>
 
-#include "../draw/draw_statbar.h"
+#include "draw/draw_statbar.h"
 
-#include "../display/sprite_data.h"
+#include "display/sprite_data.h"
 #include "gamestate/GameState.h"
 
 #include "stats/items/ProjectileEntry.h"

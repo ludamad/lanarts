@@ -6,7 +6,7 @@
 #ifndef LOAD_STATS_H_
 #define LOAD_STATS_H_
 
-#include "../../data/yaml_util.h"
+#include "data/yaml_util.h"
 
 #include "../items/EquipmentEntry.h"
 #include "../items/ItemEntry.h"

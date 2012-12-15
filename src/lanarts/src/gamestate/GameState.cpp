@@ -19,16 +19,16 @@
 
 #include <ldraw/display.h>
 
-#include "../data/game_data.h"
+#include "data/game_data.h"
 
-#include "../display/display.h"
-#include "../display/tile_data.h"
+#include "display/display.h"
+#include "display/tile_data.h"
 
-#include "../levelgen/dungeon_data.h"
+#include "levelgen/dungeon_data.h"
 
-#include "../lua/lua_api.h"
+#include "lua/lua_api.h"
 
-#include "../net/GameNetConnection.h"
+#include "net/GameNetConnection.h"
 
 #include "objects/enemy/EnemyInst.h"
 

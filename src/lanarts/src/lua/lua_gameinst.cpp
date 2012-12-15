@@ -1,6 +1,6 @@
 #include <cstring>
 
-#include "../data/lua_game_data.h"
+#include "data/lua_game_data.h"
 #include "gamestate/GameState.h"
 #include "objects/enemy/EnemyInst.h"
 

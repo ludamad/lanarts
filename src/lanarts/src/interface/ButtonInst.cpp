@@ -3,8 +3,8 @@
 #include <ldraw/DrawOptions.h>
 #include <ldraw/Font.h>
 
-#include "../display/display.h"
-#include "../display/sprite_data.h"
+#include "display/display.h"
+#include "display/sprite_data.h"
 #include "gamestate/GameState.h"
 
 #include "ButtonInst.h"

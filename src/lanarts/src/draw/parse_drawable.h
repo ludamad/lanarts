@@ -12,7 +12,7 @@
 #include <ldraw/DirectionalDrawable.h>
 #include <ldraw/Image.h>
 #include <ldraw/Drawable.h> // Generic wrapper
-#include "../data/FilenameList.h"
+#include "data/FilenameList.h"
 
 namespace YAML {
 class Node;

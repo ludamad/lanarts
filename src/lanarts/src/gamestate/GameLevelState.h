@@ -7,8 +7,8 @@
 #define GAMELEVELSTATE_H_
 #include <vector>
 
-#include "../collision_avoidance/CollisionAvoidance.h"
-#include "../levelgen/GeneratedLevel.h"
+#include "collision_avoidance/CollisionAvoidance.h"
+#include "levelgen/GeneratedLevel.h"
 #include "objects/enemy/MonsterController.h"
 
 #include "GameInstSet.h"

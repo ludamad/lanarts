@@ -10,15 +10,15 @@
 
 #include <ldraw/draw.h>
 
-#include "../../draw/colour_constants.h"
-#include "../../display/tile_data.h"
+#include "draw/colour_constants.h"
+#include "display/tile_data.h"
 #include "gamestate/GameState.h"
 
 #include "gamestate/PlayerData.h"
 
 #include "stats/items/WeaponEntry.h"
 
-#include "../../lua/lua_gameinst.h"
+#include "lua/lua_gameinst.h"
 #include "util/math_util.h"
 
 #include "../player/PlayerInst.h"

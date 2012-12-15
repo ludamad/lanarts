@@ -7,7 +7,7 @@
 
 #include <lua.hpp>
 
-#include "../levelgen/lua_levelgen_funcs.h"
+#include "levelgen/lua_levelgen_funcs.h"
 
 #include "lua_api.h"
 

@@ -6,9 +6,9 @@
 
 #include <lua.hpp>
 
-#include "../data/lua_game_data.h"
+#include "data/lua_game_data.h"
 
-#include "../draw/colour_constants.h"
+#include "draw/colour_constants.h"
 
 #include "gamestate/GameState.h"
 

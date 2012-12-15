@@ -6,7 +6,7 @@
 #ifndef STOREINST_H_
 #define STOREINST_H_
 
-#include "../../interface/sidebar/StoreContent.h"
+#include "interface/sidebar/StoreContent.h"
 
 #include "../GameInst.h"
 

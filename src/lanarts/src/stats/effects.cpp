@@ -6,10 +6,10 @@
 #include <lcommon/SerializeBuffer.h>
 #include <lcommon/lua_serialize.h>
 
-#include "../data/lua_game_data.h"
+#include "data/lua_game_data.h"
 #include "gamestate/GameState.h"
 
-#include "../lua/lua_api.h"
+#include "lua/lua_api.h"
 
 #include "objects/CombatGameInst.h"
 

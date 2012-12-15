@@ -8,13 +8,13 @@
 
 #include <luawrap/LuaValue.h>
 
-#include "../display/sprite_data.h"
+#include "display/sprite_data.h"
 
-#include "../display/tile_data.h"
+#include "display/tile_data.h"
 
 #include "gamestate/GameSettings.h"
 #include "gamestate/tileset_data.h"
-#include "../levelgen/dungeon_data.h"
+#include "levelgen/dungeon_data.h"
 #include "objects/enemy/EnemyEntry.h"
 #include "objects/scriptobject_data.h"
 

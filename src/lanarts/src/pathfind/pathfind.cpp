@@ -8,7 +8,7 @@
 #include <ldraw/colour_constants.h>
 #include <ldraw/DrawOptions.h>
 
-#include "../display/tile_data.h"
+#include "display/tile_data.h"
 
 #include "gamestate/GameState.h"
 #include "gamestate/GameTiles.h"

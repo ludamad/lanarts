@@ -10,9 +10,9 @@
 //#include <luawrap/luawrap.h>
 //#include <lcommon/strformat.h>
 //
-//#include "../../lua/lua_yaml.h"
-//#include "../../data/game_data.h"
-//#include "../../data/yaml_util.h"
+//#include "lua/lua_yaml.h"
+//#include "data/game_data.h"
+//#include "data/yaml_util.h"
 //
 //using namespace std;
 //using namespace ldraw;

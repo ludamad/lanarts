@@ -5,14 +5,14 @@
 
 #include <lua.hpp>
 
-#include "../../data/game_data.h"
-#include "../../draw/colour_constants.h"
-#include "../../display/display.h"
-#include "../../display/sprite_data.h"
-#include "../../display/tile_data.h"
+#include "data/game_data.h"
+#include "draw/colour_constants.h"
+#include "display/display.h"
+#include "display/sprite_data.h"
+#include "display/tile_data.h"
 #include "gamestate/GameState.h"
 
-#include "../../lua/lua_api.h"
+#include "lua/lua_api.h"
 
 #include "stats/items/ItemEntry.h"
 

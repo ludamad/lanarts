@@ -5,9 +5,9 @@
 
 #include <ldraw/draw.h>
 
-#include "../../draw/colour_constants.h"
+#include "draw/colour_constants.h"
 
-#include "../../display/sprite_data.h"
+#include "display/sprite_data.h"
 
 #include "gamestate/GameState.h"
 

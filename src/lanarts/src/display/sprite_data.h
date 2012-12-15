@@ -7,7 +7,7 @@
 #include <lcommon/geometry.h>
 #include <ldraw/Colour.h>
 
-#include "../data/FilenameList.h"//For FilenameList
+#include "data/FilenameList.h"//For FilenameList
 #include "lanarts_defines.h"
 
 #include "GLImage.h"

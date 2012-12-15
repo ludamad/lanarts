@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <ldraw/draw.h>
 
-#include "../display/tile_data.h"
+#include "display/tile_data.h"
 
 #include "gamestate/GameState.h"
 

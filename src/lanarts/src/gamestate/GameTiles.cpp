@@ -3,11 +3,11 @@
 
 #include <ldraw/draw.h>
 
-#include "../display/display.h"
+#include "display/display.h"
 
-#include "../display/tile_data.h"
+#include "display/tile_data.h"
 
-#include "../levelgen/levelgen.h"
+#include "levelgen/levelgen.h"
 
 #include "objects/player/PlayerInst.h"
 

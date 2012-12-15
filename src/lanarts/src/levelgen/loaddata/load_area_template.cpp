@@ -6,9 +6,9 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
-#include "../../data/FilenameList.h"
-#include "../../data/parse.h"
-#include "../../data/yaml_util.h"
+#include "data/FilenameList.h"
+#include "data/parse.h"
+#include "data/yaml_util.h"
 
 #include "objects/enemy/EnemyEntry.h"
 

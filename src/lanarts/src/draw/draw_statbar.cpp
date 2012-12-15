@@ -7,7 +7,7 @@
 #include <ldraw/draw.h>
 #include <lcommon/geometry.h>
 
-#include "../display/display.h"
+#include "display/display.h"
 #include "draw_statbar.h"
 
 void draw_statbar(const BBoxF& bbox, float fill, const Colour& front,
