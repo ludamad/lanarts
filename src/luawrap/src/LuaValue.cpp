@@ -108,7 +108,7 @@ LuaValue::~LuaValue() {
 	deref(impl);
 }
 
-void LuaValue::newtable() {
+void LuaValue::newtable() const {
 	lua_newtable(impl->L);
 	impl->pop();
 }
@@ -202,6 +202,25 @@ namespace _luawrap_private {
 
 	void _LuaField::operator =(const char* str) {
 		lua_pushstring(value.luastate(), str);
+		pop();
+	}
+
+	LuaValue _LuaField::ensure_table() const {
+		lua_State* L = value.luastate();
+		push();
+
+		if (!lua_istable(L, -1)) {
+			lua_pop(L, 1);
+			lua_newtable(L);
+			lua_pushvalue(L, -1);
+			pop();
+		}
+
+		return LuaValue::pop_value(L);
+	}
+
+	void _LuaField::bind_function(lua_CFunction func) {
+		lua_pushcfunction(value.luastate(), func);
 		pop();
 	}
 

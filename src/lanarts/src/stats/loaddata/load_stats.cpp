@@ -144,7 +144,7 @@ Attack parse_attack(lua_State *L, const YAML::Node& n) {
 	atk.damage_modifiers = parse_damage_modifier(n);
 	atk.cooldown = parse_defaulted(n, "cooldown", 0);
 	atk.range = parse_defaulted(n, "range", 0);
-	atk.attack_action.action_func = parse_luacode(L, n, "on_hit_func");
+	atk.attack_action.action_func = parse_luaexpr(L, n, "on_hit_func");
 	return atk;
 }
 

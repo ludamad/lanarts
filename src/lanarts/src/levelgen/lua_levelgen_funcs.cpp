@@ -28,7 +28,7 @@ static Range lua_torange(lua_State* L, int idx) {
 }
 
 static int gen_room(lua_State* L) {
-	MTwist& mt = lua_get_gamestate(L)->rng();
+	MTwist& mt = lua_api::gamestate(L)->rng();
 	int nargs = lua_gettop(L);
 
 	GeneratedLevel* level = lua_togenlevel(L, 1);
@@ -40,7 +40,7 @@ static int gen_room(lua_State* L) {
 	if (mt.rand(4) < 3)
 		mark = 0;
 
-	bool success = generate_room(lua_get_gamestate(L)->rng(), *level, size.w,
+	bool success = generate_room(lua_api::gamestate(L)->rng(), *level, size.w,
 			size.h, room_padding, mark, max_attempts);
 
 	if (success) {
@@ -53,7 +53,7 @@ static int gen_room(lua_State* L) {
 }
 
 static int gen_monster(lua_State* L) {
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	MTwist& mt = gs->rng();
 	int nargs = lua_gettop(L);
 

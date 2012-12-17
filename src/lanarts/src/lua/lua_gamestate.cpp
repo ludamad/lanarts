@@ -96,16 +96,6 @@ static int lua_member_lookup(lua_State* L) {
 
 meth_t bind_t::methods[] = { LUA_DEF(remove_object), LUA_DEF(create_projectile), meth_t(0, 0) };
 
-GameState* lua_get_gamestate(lua_State* L) {
-	lua_getglobal(L, "world");
-	int idx = lua_gettop(L);
-	bind_t* obj = lunar_t::check(L, idx);
-	lua_pop(L, 1);
-	if (!obj)
-		return NULL;
-	return obj->game_state();
-}
-
 void lua_gamestate_bindings(GameState* gs, lua_State* L) {
 	lunar_t::Register(L);
 

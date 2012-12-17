@@ -149,4 +149,40 @@ namespace luawrap {
 
 }
 
+/* Analogous type helper*/
+namespace luawrap {
+
+	namespace _private {
+		template <typename T>
+		class PushGetCheckWrap;
+	}
+
+	template<typename T> void push(lua_State* L, const T& val);
+
+	template<typename T>
+	inline typename _private::PushGetCheckWrap<T>::RetType get(lua_State* L,
+			int idx);
+
+	template<typename T>
+	inline bool check(lua_State* L, int idx);
+
+	namespace _private {
+		template<typename To, typename From>
+		inline To get_casted(lua_State* L, int idx) {
+			return (To)luawrap::get<From>(L, idx);
+		}
+
+		template<typename To, typename From>
+		inline void push_casted(lua_State* L, const To& val) {
+			luawrap::push<From>(L, (From)val);
+		}
+	}
+	template<typename To, typename From>
+	static inline void install_casted_type() {
+		using namespace _private;
+
+		install_type<To, &push_casted<To, From>,
+				&get_casted<To, From>, &luawrap::check<From> >();
+	}
+}
 #endif /* LUAWRAP_TYPES_H_ */

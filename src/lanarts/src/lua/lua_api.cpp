@@ -1,6 +1,8 @@
 #include <stdexcept>
 
 #include <lcommon/lua_lcommon.h>
+#include <lcommon/strformat.h>
+
 #include <ldraw/lua_ldraw.h>
 
 #include "gamestate/GameState.h"
@@ -8,6 +10,8 @@
 #include <lua.hpp>
 
 #include "levelgen/lua_levelgen_funcs.h"
+
+#include "lua_api/lua_newapi.h"
 
 #include "lua_api.h"
 
@@ -21,7 +25,7 @@ void lua_object_func_bindings(lua_State* L);
 void lua_display_func_bindings(lua_State* L);
 
 int rand_range(lua_State* L) {
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	int nargs = lua_gettop(L);
 	int min = 0, max = 0;
 	if (nargs == 1) {
@@ -42,7 +46,7 @@ int rand_range(lua_State* L) {
 }
 
 static int lua_lanarts_panic(lua_State* L) {
-	throw std::runtime_error("Lanarts Lua panic!");
+	throw std::runtime_error(format("LUA PANIC: %s", lua_tostring(L, -1)));
 	return 0;
 }
 
@@ -63,6 +67,7 @@ void lua_lanarts_api(GameState* state, lua_State* L) {
 	lua_spelltarget_bindings(L);
 	lua_object_func_bindings(L);
 	lua_levelgen_func_bindings(L);
+	lua_api::register_api(state, L);
 
 	//Use C function name as lua function name:
 #define LUA_FUNC_REGISTER(f) \

@@ -142,7 +142,7 @@ public:
 		return connection;
 	}
 
-	lua_State* get_luastate() {
+	lua_State* luastate() {
 		return L;
 	}
 	/* A single mersenne twister state is used for all random number generation */

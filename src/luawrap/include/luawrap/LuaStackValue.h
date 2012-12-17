@@ -55,8 +55,14 @@ namespace _luawrap_private {
 		void operator=(const _LuaField& field);
 		void operator=(const _LuaStackField& field);
 
+		LuaValue ensure_table() const;
+
 		template<typename Function>
 		void bind_function(Function func);
+		void bind_function(lua_CFunction func);
+
+		template<typename T, typename V> void bind_getter(V T::*member);
+		template<typename T, typename V> void bind_setter(V T::*member);
 
 	private:
 		const LuaStackValue& value;
@@ -85,6 +91,10 @@ public:
 	int index() const {
 		return idx;
 	}
+
+	// Convert to any type
+	template<typename T>
+	T as() const;
 
 	_luawrap_private::_LuaStackField operator[](const char* key) const {
 		return _luawrap_private::_LuaStackField(*this, key);

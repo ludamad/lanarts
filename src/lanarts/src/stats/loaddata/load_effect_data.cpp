@@ -19,11 +19,11 @@ using namespace std;
 EffectEntry parse_effect(lua_State* L, const YAML::Node& n) {
 	EffectEntry entry;
 	entry.name = parse_str(n["name"]);
-	entry.init_func = parse_luacode(L, n, "init_func");
-	entry.finish_func = parse_luacode(L, n, "finish_func");
-	entry.stat_func = parse_luacode(L, n, "stat_func");
-	entry.attack_stat_func = parse_luacode(L, n, "attack_stat_func");
-	entry.step_func = parse_luacode(L, n, "step_func");
+	entry.init_func = parse_luaexpr(L, n, "init_func");
+	entry.finish_func = parse_luaexpr(L, n, "finish_func");
+	entry.stat_func = parse_luaexpr(L, n, "stat_func");
+	entry.attack_stat_func = parse_luaexpr(L, n, "attack_stat_func");
+	entry.step_func = parse_luaexpr(L, n, "step_func");
 
 	entry.allowed_actions.can_use_stairs = parse_defaulted(n, "can_use_stairs",
 			true);

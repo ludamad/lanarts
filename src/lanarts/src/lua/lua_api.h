@@ -14,6 +14,7 @@
 #include "lanarts_defines.h"
 
 #include "../region.h"
+#include "lua_api/lua_newapi.h"
 
 struct lua_State;
 class GameState;
@@ -36,8 +37,6 @@ void lua_push_effectiveattackstats(lua_State* L,
 CombatStats& lua_get_combatstats(lua_State* L, int narg);
 EffectiveStats& lua_get_effectivestats(lua_State* L, int narg);
 
-GameState* lua_get_gamestate(lua_State* L);
-//
 void lua_lanarts_api(GameState* gs, lua_State* L);
 
 //Implemented in data/game_data.cpp

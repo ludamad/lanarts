@@ -36,14 +36,15 @@ static DimF font_get_draw_size(const Font& f, const char* str, int maxwidth) {
 }
 
 LuaValue lua_fontmetatable(lua_State* L) {
-	LuaValue val = luameta_new(L, "Font");
-	LuaValue methods = luameta_methods(L, val);
+	LuaValue meta = luameta_new(L, "Font");
+	LuaValue methods = luameta_methods(meta);
 
-	methods["draw"] = luawrap::function(L, font_draw);
-	methods["draw_wrapped"] = luawrap::function(L, font_draw_wrapped);
-	methods["get_draw_size"] = luawrap::function(L, font_get_draw_size);
+	methods["draw"].bind_function(font_draw);
+	methods["draw_wrapped"].bind_function(font_draw_wrapped);
+	methods["get_draw_size"].bind_function(font_get_draw_size);
 
-	return val;
+
+	return meta;
 }
 
 void lua_register_font(lua_State* L, const LuaValue& module) {

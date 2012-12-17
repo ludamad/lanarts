@@ -115,15 +115,15 @@ LuaValue luameta_new(lua_State* L, const char* classname) {
 	return metatable;
 }
 
-LuaValue luameta_getters(lua_State* L, const LuaValue& metatable) {
+LuaValue luameta_getters(const LuaValue& metatable) {
 	return metatable["__getters"];
 }
 
-LuaValue luameta_setters(lua_State* L, const LuaValue& metatable) {
+LuaValue luameta_setters(const LuaValue& metatable) {
 	return metatable["__setters"];
 }
 
-LuaValue luameta_methods(lua_State* L, const LuaValue& metatable) {
+LuaValue luameta_methods(const LuaValue& metatable) {
 	return metatable["__methods"];
 }
 
@@ -154,4 +154,12 @@ void* luameta_newuserdata(lua_State* L, luameta_initializer initfunc,
 	luameta_push(L, initfunc);
 	lua_setmetatable(L, -2);
 	return ret;
+}
+
+
+/*
+ * Set up the __gc hook
+ */
+void luameta_gc(const LuaValue& metatable, lua_CFunction func) {
+	metatable["__gc"].bind_function(func);
 }

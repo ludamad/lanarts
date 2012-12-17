@@ -24,6 +24,18 @@ namespace luawrap {
 			return true;
 		}
 
+		void TypeImpl<LuaStackValue>::push(lua_State* L, const LuaStackValue& val) {
+			val.push();
+		}
+
+		LuaStackValue TypeImpl<LuaStackValue>::get(lua_State* L, int idx) {
+			return LuaStackValue(L, idx);
+		}
+
+		bool TypeImpl<LuaStackValue>::check(lua_State* L, int idx) {
+			return true;
+		}
+
 		void TypeImpl<bool>::push(lua_State* L, bool val) {
 			lua_pushboolean(L, val);
 		}

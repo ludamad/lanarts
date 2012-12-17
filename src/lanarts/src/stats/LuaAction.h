@@ -6,19 +6,18 @@
 #ifndef LUAACTION_H_
 #define LUAACTION_H_
 
-#include <luawrap/LuaValue.h>
-
-#include "lua/luaexpr.h"
+#include <lcommon/LuaLazyValue.h>
 
 struct LuaAction {
 	std::string success_message;
 	std::string failure_message; // If does not pass pre-req function
-	LuaValue action_func, prereq_func;
+	LuaLazyValue action_func, prereq_func;
 
 	void init(lua_State* L) {
-		luavalue_call_and_store(L, action_func);
-		luavalue_call_and_store(L, prereq_func);
+		action_func.initialize(L);
+		prereq_func.initialize(L);
 	}
+
 	LuaAction(const LuaValue& action_func = LuaValue()) :
 			action_func(action_func) {
 	}

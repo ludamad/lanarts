@@ -9,8 +9,7 @@
 #include <vector>
 #include <string>
 
-#include <luawrap/LuaValue.h>
-#include "lua/luaexpr.h"
+#include <lcommon/LuaLazyValue.h>
 #include "lanarts_defines.h"
 
 #include "GameInst.h"
@@ -21,12 +20,7 @@ struct ScriptObjectEntry {
 	};
 	std::string name;
 	int sprite, radius;
-	LuaValue init_event, step_event;
-
-	void init(lua_State* L) {
-		luavalue_call_and_store(L, init_event);
-		luavalue_call_and_store(L, step_event);
-	}
+	LuaLazyValue init_event, step_event;
 };
 
 scriptobj_id get_scriptobject_by_name(const char* name,

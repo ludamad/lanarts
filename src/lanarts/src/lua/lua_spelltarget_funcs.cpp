@@ -18,7 +18,7 @@
 
 // Take arguments: caster, target; returns x, y
 static int spell_choose_safest_square(lua_State* L) {
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	PlayerInst* inst = dynamic_cast<PlayerInst*>(lua_gameinst_arg(L, 1));
 	//CombatGameInst* target = dynamic_cast<CombatGameInst*>(lua_gameinst_arg(L, 2));
 	Pos p;
@@ -34,7 +34,7 @@ static int spell_choose_safest_square(lua_State* L) {
 
 // Take arguments: obj, x, y; returns x, y
 static int spell_choose_target(lua_State* L) {
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	//PlayerInst* inst = dynamic_cast<PlayerInst*>(lua_gameinst_arg(L, 1));
 	if (!lua_isnil(L, 2)) {
 		CombatGameInst* target = dynamic_cast<CombatGameInst*>(lua_gameinst_arg(

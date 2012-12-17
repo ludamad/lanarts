@@ -10,15 +10,17 @@
 
 class LuaLazyValue {
 public:
-	LuaLazyValue(const std::string& expr);
-	LuaLazyValue(const LuaValue& value);
+	explicit LuaLazyValue(const std::string& expr);
+	explicit LuaLazyValue(const LuaValue& value);
+	LuaLazyValue();
 	~LuaLazyValue();
 
 	// Grabs or initializes value
-	const LuaValue& get(lua_State* L);
+	LuaValue& get(lua_State* L);
 
 	// Ensure value is initialized
 	void initialize(lua_State* L);
+	bool empty() const;
 
 	bool is_initialized() const;
 private:

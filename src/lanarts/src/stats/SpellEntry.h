@@ -11,9 +11,8 @@
 
 #include "data/BaseDataEntry.h"
 
-#include <luawrap/LuaValue.h>
+#include <lcommon/LuaLazyValue.h>
 
-#include "lua/luaexpr.h"
 #include "lanarts_defines.h"
 
 #include "items/items.h"
@@ -21,9 +20,9 @@
 struct SpellEntry: public BaseDataEntry {
 	sprite_id sprite;
 	int mp_cost, cooldown;
-	LuaValue action_func; //Immediate action
-	LuaValue autotarget_func; //Auto-target func
-	LuaValue prereq_func; //Pre-req to casting
+	LuaLazyValue action_func; //Immediate action
+	LuaLazyValue autotarget_func; //Auto-target func
+	LuaLazyValue prereq_func; //Pre-req to casting
 	Projectile projectile; //Projectile used, if any
 	bool can_cast_with_cooldown, can_cast_with_held_key;
 	SpellEntry() :
@@ -38,9 +37,9 @@ struct SpellEntry: public BaseDataEntry {
 	}
 
 	void init(lua_State* L) {
-		luavalue_call_and_store(L, action_func);
-		luavalue_call_and_store(L, autotarget_func);
-		luavalue_call_and_store(L, prereq_func);
+		action_func.initialize(L);
+		autotarget_func.initialize(L);
+		prereq_func.initialize(L);
 	}
 	bool uses_projectile() {
 		return projectile.id != NO_ITEM;

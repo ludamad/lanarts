@@ -44,11 +44,11 @@ public:
 		return 0;
 	}
 	int direct_damage(lua_State* L) {
-		get_combat_inst()->damage(lua_get_gamestate(L), lua_tonumber(L, 1));
+		get_combat_inst()->damage(lua_api::gamestate(L), lua_tonumber(L, 1));
 		return 0;
 	}
 	int damage(lua_State* L) {
-		GameState* gs = lua_get_gamestate(L);
+		GameState* gs = lua_api::gamestate(L);
 		EffectiveAttackStats attack;
 		int nargs = lua_gettop(L);
 		attack.damage = round(lua_tointeger(L, 1));
@@ -56,7 +56,7 @@ public:
 		attack.magic_percentage = nargs >= 3 ? lua_tonumber(L, 3) : 1.0f;
 		attack.resist_modifier = nargs >= 4 ? lua_tonumber(L, 4) : 1.0f;
 
-		get_combat_inst()->damage(lua_get_gamestate(L), attack);
+		get_combat_inst()->damage(lua_api::gamestate(L), attack);
 		return 0;
 	}
 //	int equip(lua_State* L) {
@@ -77,7 +77,7 @@ public:
 	int add_effect(lua_State* L) {
 		CombatGameInst* combatinst;
 		if ((combatinst = dynamic_cast<CombatGameInst*>(get_inst()))) {
-			LuaValue effect = combatinst->effects().add(lua_get_gamestate(L),
+			LuaValue effect = combatinst->effects().add(lua_api::gamestate(L),
 					combatinst, effect_from_lua(L, 1), lua_tointeger(L, 2));
 			effect.push();
 		} else {

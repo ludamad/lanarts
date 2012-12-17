@@ -63,8 +63,15 @@ namespace _luawrap_private {
 		void operator =(lua_CFunction func);
 		void operator =(const _LuaField& field);
 
+		LuaValue ensure_table() const;
+
 		// Registers a CPP function
 		template<typename Function> void bind_function(Function func);
+		void bind_function(lua_CFunction func);
+
+		template<typename T, typename V> void bind_getter(V T::*member);
+		template<typename T, typename V> void bind_setter(V T::*member);
+
 	private:
 		friend class ::LuaValue;
 		_LuaField(const _LuaField& field) :
@@ -88,7 +95,7 @@ public:
 
 	void init(lua_State* L);
 
-	void newtable();
+	void newtable() const;
 
 	void operator=(const LuaValue& value);
 
@@ -99,6 +106,10 @@ public:
 	void push() const;
 	bool empty() const;
 	bool isnil() const;
+
+	// Convert to any type
+	template<typename T>
+	T as() const;
 
 	// Mainly for low-level routines, do not depend on too heavily
 	lua_State* luastate() const;
@@ -124,6 +135,5 @@ private:
 namespace luawrap {
 	LuaValue eval(lua_State* L, const std::string& code);
 }
-
 
 #endif /* LUAWRAP_LUAVALUE_H_ */

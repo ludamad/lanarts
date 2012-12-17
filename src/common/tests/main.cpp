@@ -6,7 +6,6 @@ void lua_range_tests();
 void lua_serialize_tests();
 void strformat_tests();
 void luavalue_tests();
-void luameta_tests();
 
 void run_lcommon_tests() {
 	unit_test_reset_counts();
@@ -16,7 +15,6 @@ void run_lcommon_tests() {
 	UNIT_TEST_SUITE(lua_serialize_tests);
 	UNIT_TEST_SUITE(strformat_tests);
 	UNIT_TEST_SUITE(luavalue_tests);
-	UNIT_TEST_SUITE(luameta_tests);
 
 	unit_test_print_count();
 }

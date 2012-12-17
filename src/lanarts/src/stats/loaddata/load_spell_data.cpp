@@ -34,9 +34,9 @@ SpellEntry parse_spell_type(lua_State* L, const YAML::Node& n) {
 	if (yaml_has_node(n, "projectile")) {
 		entry.projectile = parse_projectile_name(n["projectile"]);
 	}
-	entry.action_func = parse_luacode(L, n, "action_func");
-	entry.autotarget_func = parse_luacode(L, n, "autotarget_func", default_autotarget_func);
-	entry.prereq_func = parse_luacode(L, n, "prereq_func");
+	entry.action_func = parse_luaexpr(L, n, "action_func");
+	entry.autotarget_func = parse_luaexpr(L, n, "autotarget_func", default_autotarget_func);
+	entry.prereq_func = parse_luaexpr(L, n, "prereq_func");
 	entry.can_cast_with_cooldown = parse_defaulted(n, "can_cast_with_cooldown",
 			false);
 	entry.can_cast_with_held_key = parse_defaulted(n, "can_cast_with_held_key",

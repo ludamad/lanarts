@@ -52,15 +52,21 @@ namespace luawrap {
 			}
 		};
 
-
-
-
 		/* Lua value -> matches any value! */
 		template<>
 		class TypeImpl<LuaValue> {
 		public:
 			static void push(lua_State* L, const LuaValue& val);
 			static LuaValue get(lua_State* L, int idx);
+			static bool check(lua_State *L, int idx);
+		};
+
+		/* Lua stack value -> matches any value! */
+		template<>
+		class TypeImpl<LuaStackValue> {
+		public:
+			static void push(lua_State* L, const LuaStackValue& val);
+			static LuaStackValue get(lua_State* L, int idx);
 			static bool check(lua_State *L, int idx);
 		};
 

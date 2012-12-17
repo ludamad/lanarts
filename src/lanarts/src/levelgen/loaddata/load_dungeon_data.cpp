@@ -140,7 +140,7 @@ LevelGenSettings parse_level_gen(lua_State* L, const YAML::Node& n) {
 					get_area_template_by_name(template_name.c_str()));
 		}
 	}
-	level.gen_level_func = parse_luacode(L, n, "gen_level_func");
+	level.gen_level_func = parse_luaexpr(L, n, "gen_level_func");
 	return level;
 
 }

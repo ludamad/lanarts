@@ -22,12 +22,82 @@ dofile "res/levels/levels.lua"
 -- Balance measurement related files
 dofile "res/tests/progressions.lua"
 
-settings = {verbose_output = false}
-
+local paused = false
 
 -- lanarts main loop
 -- this controls the games behaviour every step!
 function main_loop() 
+		local single_player = (#world.players() == 1)
+	
+		perf_timer_begin("**Game Frame**")
+
+		local total_timer = timer()
+	
+		if key_pressed(keys.F2) then
+			if single_player then gamestate.resources_reload() end
+		end
+
+		if key_pressed(keys.F3) then
+			if single_player then gamestate.level_regenerate() end
+		end
+
+		if key_pressed(keys.F4) then
+			paused = not paused
+		end
+
+		net.sync_message_consume()
+
+		if key_pressed(keys.F6) then
+			if single_player then gamestate.level_regenerate() end
+		end
+
+		perf_timer_end("**Game Frame**")
+end
 
 
+local timer = timer_create()
+local paused = false
+
+function main_loop_simple()
+	local single_player = (settings.connection_type == net.NONE)
+
+	perf_timer_begin("**Game Frame**")
+
+	if key_pressed(keys.F2) and single_player then 
+		game.resources_load()
+	end
+
+	if key_pressed(keys.F3) and single_player then 
+		level.regenerate()
+	end
+
+	if key_pressed(keys.F4) then 
+		paused = not paused
+	end
+
+	net.sync_message_consume()
+
+	if key_pressed(keys.F6) and single_player then
+		game.load("savefile.save")
+		game.input_capture(true) -- capture new input
+	end
+
+	timer:start()
+
+	game.draw()
+	game.step()
+
+	if not game.input_handle() then 
+		return false 
+	end
+
+	local surplus = settings.time_per_step - timer:get_microseconds() / 1000
+
+	if surplus > 0 then 
+		game.wait(surplus) 
+	end
+
+	perf_timer_end("**Game Frame**")
+	
+	return true;
 end

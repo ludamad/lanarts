@@ -114,7 +114,9 @@ void EnemyInst::init(GameState* gs) {
 	collision_simulation_id() = coll_avoid.add_active_object(pos(),
 			target_radius, effective_stats().movespeed);
 
-	lua_gameinst_callback(gs->get_luastate(), etype().init_event, this);
+	lua_State* L = gs->luastate();
+
+	lua_gameinst_callback(L, etype().init_event.get(L), this);
 }
 static bool starts_with_vowel(const std::string& name) {
 	char c = tolower(name[0]);

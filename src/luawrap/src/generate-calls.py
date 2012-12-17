@@ -10,7 +10,7 @@ template<typename R{SEP}{template}>
     static inline R call(lua_State* L{SEP}{args}) {{
     _private::PopHack delayedpop(L);
 {pushes}
-    lua_call(L, {I}, 1);
+    _private::luacall_with_traceback(L, {I});
     _private::luacall_return_check(check<R>(L, -1)); 
     return get<R>(L, -1);
 }}'''

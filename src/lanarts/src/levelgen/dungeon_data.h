@@ -7,7 +7,7 @@
 #define DUNGEON_DATA_H_
 
 #include <vector>
-#include <luawrap/LuaValue.h>
+#include <lcommon/LuaLazyValue.h>
 #include "stats/itemgen_data.h"
 #include "AreaTemplate.h"
 
@@ -83,11 +83,12 @@ struct ContentGenSettings {
 	EnemyGenSettings enemies;
 };
 
+
 struct LevelGenSettings {
 	std::vector<areatemplate_id> area_templates;
 	std::vector<LayoutGenSettings> layouts;
 	ContentGenSettings content;
-	LuaValue gen_level_func;
+	LuaLazyValue gen_level_func;
 };
 
 struct DungeonBranch {

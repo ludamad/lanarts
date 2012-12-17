@@ -179,7 +179,7 @@ static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
 static bool lua_spell_get_target(GameState* gs, PlayerInst* p, LuaValue& action,
 		Pos& pos) {
 	bool nilresult = false;
-	lua_State* L = gs->get_luastate();
+	lua_State* L = gs->luastate();
 	obj_id target_id = p->target();
 	GameInst* target = gs->get_instance(target_id);
 
@@ -211,7 +211,7 @@ static bool lua_spell_get_target(GameState* gs, PlayerInst* p, LuaValue& action,
 
 static void player_use_luacallback_spell(GameState* gs, PlayerInst* p,
 		SpellEntry& spl_entry, LuaValue& action, const Pos& target) {
-	lua_State* L = gs->get_luastate();
+	lua_State* L = gs->luastate();
 	action.push();
 	lua_push_gameinst(L, p);
 	lua_pushnumber(L, target.x);
@@ -221,7 +221,7 @@ static void player_use_luacallback_spell(GameState* gs, PlayerInst* p,
 
 static bool lua_spell_check_prereq(GameState* gs, PlayerInst* p,
 		SpellEntry& spl_entry, LuaValue& action, const Pos& target) {
-	lua_State* L = gs->get_luastate();
+	lua_State* L = gs->luastate();
 	bool passes = true;
 
 	if (!action.empty()) {
@@ -255,6 +255,8 @@ static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
 
 static void player_use_spell(GameState* gs, PlayerInst* p,
 		SpellEntry& spl_entry, const Pos& target) {
+	lua_State* L = gs->luastate();
+
 	p->core_stats().mp -= spl_entry.mp_cost;
 	float spell_cooldown_mult =
 			p->effective_stats().cooldown_modifiers.spell_cooldown_multiplier;
@@ -264,7 +266,7 @@ static void player_use_spell(GameState* gs, PlayerInst* p,
 		player_use_projectile_spell(gs, p, spl_entry, spl_entry.projectile,
 				target);
 	} else {
-		player_use_luacallback_spell(gs, p, spl_entry, spl_entry.action_func,
+		player_use_luacallback_spell(gs, p, spl_entry, spl_entry.action_func.get(L),
 				target);
 	}
 }
@@ -283,6 +285,8 @@ void PlayerInst::enqueue_not_enough_mana_actions(GameState* gs) {
 	}
 }
 bool PlayerInst::enqueue_io_spell_actions(GameState* gs) {
+	lua_State* L = gs->luastate();
+
 	GameView& view = gs->view();
 	IOController& io = gs->io_controller();
 	SpellsKnown& spells = spells_known();
@@ -352,7 +356,7 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs) {
 		bool can_target;
 		if (auto_target) {
 			can_target = lua_spell_get_target(gs, this,
-					spl_entry.autotarget_func, target);
+					spl_entry.autotarget_func.get(L), target);
 		} else {
 			int rmx = view.x + gs->mouse_x(), rmy = view.y + gs->mouse_y();
 			target = Pos(rmx, rmy);
@@ -370,7 +374,7 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs) {
 
 		if (can_trigger && can_target) {
 			bool can_use = lua_spell_check_prereq(gs, this, spl_entry,
-					spl_entry.prereq_func, target);
+					spl_entry.prereq_func.get(L), target);
 			if (can_use) {
 				queued_actions.push_back(
 						game_action(gs, this, GameAction::USE_SPELL,
@@ -508,6 +512,8 @@ static void lua_hit_callback(lua_State* L, LuaValue& callback, GameInst* user,
 
 #include "PlayerInst.h"
 void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
+	lua_State* L = gs->luastate();
+
 	WeaponEntry& wentry = weapon().weapon_entry();
 	MTwist& mt = gs->rng();
 	const int MAX_MELEE_HITS = 10;
@@ -586,7 +592,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 
 		for (int i = 0; i < numhit; i++) {
 			EnemyInst* e = (EnemyInst*)enemies[i];
-			lua_hit_callback(gs->get_luastate(), wentry.action_func(), this, e);
+			lua_hit_callback(gs->luastate(), wentry.action_func().get(L), this, e);
 			if (attack(gs, e, AttackStats(equipment().weapon()))) {
 				PlayerData& pc = gs->player_data();
 				signal_killed_enemy();

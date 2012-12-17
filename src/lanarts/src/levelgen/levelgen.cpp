@@ -136,7 +136,7 @@ GameLevelState* generate_level(int roomid, MTwist& mt, GeneratedLevel& level,
 	int w = mt.rand(layout.width), h = mt.rand(layout.height);
 	bool wandering = content.enemies.wandering;
 
-	lua_State* L = gs->get_luastate();
+	lua_State* L = gs->luastate();
 
 	int LEVEL_BORDER_PAD = 10;
 	int lw = std::min(128, w + LEVEL_BORDER_PAD), lh = std::min(128,

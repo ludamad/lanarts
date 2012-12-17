@@ -7,6 +7,7 @@
 #define LUA_YAML_H_
 
 #include <luawrap/LuaValue.h>
+#include <lcommon/LuaLazyValue.h>
 
 namespace YAML {
 class Node;
@@ -19,7 +20,7 @@ inline void luacpp_push(lua_State* L, const YAML::Node& node) {
 	lua_pushyaml(L, node);
 }
 
-LuaValue parse_luacode(lua_State* L, const YAML::Node& node);
-LuaValue parse_luacode(lua_State* L, const YAML::Node& node, const char* key);
-LuaValue parse_luacode(lua_State* L, const YAML::Node& node, const char* key, const char* default_code);
+LuaLazyValue parse_luaexpr(lua_State* L, const YAML::Node& node);
+LuaLazyValue parse_luaexpr(lua_State* L, const YAML::Node& node, const char* key);
+LuaLazyValue parse_luaexpr(lua_State* L, const YAML::Node& node, const char* key, const char* default_code);
 #endif /* LUA_YAML_H_ */

@@ -16,7 +16,6 @@ include_directories(${SDL_INCLUDE_DIR}
 	${SRC}/luawrap/include
 )
 
-
 file(GLOB lcommon_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
     src/* 
     src/lua/* 

@@ -89,7 +89,7 @@ static std::string format_expression_string(const char* str) {
 	return std::string("return ") + str;
 }
 
-static LuaValue parse_luacode(lua_State* L, const char* code) {
+static LuaValue parse_luaexpr(lua_State* L, const char* code) {
 	perf_timer_begin(FUNCNAME);
 
 	std::string retcode = format_expression_string(code);
@@ -106,26 +106,27 @@ static LuaValue parse_luacode(lua_State* L, const char* code) {
 	return LuaValue::pop_value(L);
 }
 
-LuaValue parse_luacode(lua_State* L, const YAML::Node& node) {
+LuaLazyValue parse_luaexpr(lua_State* L, const YAML::Node& node) {
 	std::string code;
 	node.GetScalar(code);
-	return parse_luacode(L, code.c_str());
+	return LuaLazyValue(code);
 }
 
-LuaValue parse_luacode(lua_State *L, const YAML::Node& node, const char* key) {
+LuaLazyValue parse_luaexpr(lua_State *L, const YAML::Node& node,
+		const char* key) {
 	const YAML::Node* child = node.FindValue(key);
 	if (child) {
-		return parse_luacode(L, *child);
+		return parse_luaexpr(L, *child);
 	}
-	return LuaValue();
+	return LuaLazyValue();
 }
 
-LuaValue parse_luacode(lua_State *L, const YAML::Node& node, const char* key,
-		const char* default_code) {
-	LuaValue value = parse_luacode(L, node, key);
-	if (value.empty()) {
-		return parse_luacode(L, default_code);
+LuaLazyValue parse_luaexpr(lua_State *L, const YAML::Node& node,
+		const char* key, const char* default_code) {
+	const YAML::Node* child = node.FindValue(key);
+	if (child) {
+		return parse_luaexpr(L, *child);
 	}
-	return value;
+	return LuaLazyValue(default_code);
 }
 

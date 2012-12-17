@@ -29,7 +29,7 @@ static int obj_create(lua_State* L) {
 	ScriptedInst* inst = new ScriptedInst(scr_obj, x, y);
 
 	// Add to world and return
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	gs->add_instance(inst);
 	lua_push_gameinst(L, inst);
 
@@ -37,7 +37,7 @@ static int obj_create(lua_State* L) {
 }
 
 static int players_in_level(lua_State* L) {
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	std::vector<PlayerInst*> players = gs->players_in_level();
 	lua_createtable(L, 0, 0);
 	int table = lua_gettop(L);
@@ -50,7 +50,7 @@ static int players_in_level(lua_State* L) {
 }
 // Returns monsters in level
 static int monsters_in_level(lua_State* L) {
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	const std::vector<obj_id>& monsters =
 			gs->monster_controller().monster_ids();
 	lua_newtable(L);
@@ -70,7 +70,7 @@ static int monsters_in_level(lua_State* L) {
 // Returns monsters seen
 // Take arguments: optional player, otherwise all players seen by; returns objects
 static int monsters_seen(lua_State* L) {
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	int narg = lua_gettop(L);
 	PlayerInst* p = narg >= 1 ? (PlayerInst*)lua_gameinst_arg(L, 1) : NULL;
 	const std::vector<obj_id>& monsters =
@@ -91,14 +91,14 @@ static int monsters_seen(lua_State* L) {
 }
 
 static int reveal_map(lua_State* L) {
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	gs->tiles().mark_all_seen();
 	return 0;
 }
 
 static int obj_to_exit(lua_State* L) {
 
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	GameLevelState* level = gs->get_level();
 	GameInst* user = lua_gameinst_arg(L, 1);
 	MTwist& mt = gs->rng();

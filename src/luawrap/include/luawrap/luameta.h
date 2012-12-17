@@ -7,8 +7,7 @@
 #ifndef LUAWRAP_LUAMETA_H_
 #define LUAWRAP_LUAMETA_H_
 
-struct LuaState;
-
+#include <lua.hpp>
 #include <luawrap/LuaValue.h>
 
 /*
@@ -39,16 +38,33 @@ void* luameta_newuserdata(lua_State* L, luameta_initializer initfunc, size_t siz
 /*
  * Retrieve the getter-table.
  */
-LuaValue luameta_getters(lua_State* L, const LuaValue& metatable);
+LuaValue luameta_getters(const LuaValue& metatable);
 
 /*
  * Retrieve the setter-table.
  */
-LuaValue luameta_setters(lua_State* L, const LuaValue& metatable);
+LuaValue luameta_setters(const LuaValue& metatable);
 
 /*
  * Retrieve the method (and class variable) table.
  */
-LuaValue luameta_methods(lua_State* L, const LuaValue& metatable);
+LuaValue luameta_methods(const LuaValue& metatable);
+
+// Helper gc hook for freeing objects of type T
+template <typename T>
+inline int __luameta_destroy(lua_State* L) {
+	((T*)lua_touserdata(L, 1))->~T();
+	return 0;
+}
+
+/*
+ * Set up the __gc hook
+ */
+void luameta_gc(const LuaValue& metatable, lua_CFunction func);
+
+template <typename T>
+inline void luameta_gc(const LuaValue& metatable) {
+	luameta_gc(metatable, __luameta_destroy<T>);
+}
 
 #endif /* LUAWRAP_LUAMETA_H_ */

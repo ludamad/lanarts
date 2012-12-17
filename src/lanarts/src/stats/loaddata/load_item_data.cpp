@@ -28,8 +28,8 @@ void parse_item_entry(lua_State* L, const YAML::Node& n, ItemEntry& entry) {
 	entry.use_action.failure_message = parse_optional(n, "cant_use_message",
 			std::string());
 
-	entry.use_action.action_func = parse_luacode(L, n, "action_func");
-	entry.use_action.prereq_func =  parse_luacode(L, n, "prereq_func");
+	entry.use_action.action_func = parse_luaexpr(L, n, "action_func");
+	entry.use_action.prereq_func =  parse_luaexpr(L, n, "prereq_func");
 	entry.item_sprite = parse_sprite_number(n, "spr_item");
 
 	entry.stackable = parse_optional(n, "stackable", true);

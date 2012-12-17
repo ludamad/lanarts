@@ -406,7 +406,7 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 
 static bool item_check_lua_prereq(lua_State* L, ItemEntry& type,
 		GameInst* user) {
-	LuaValue& prereq = type.inventory_use_prereq_func();
+	LuaValue& prereq = type.inventory_use_prereq_func().get(L);
 	if (prereq.empty())
 		return true;
 
@@ -422,7 +422,7 @@ static bool item_check_lua_prereq(lua_State* L, ItemEntry& type,
 }
 static void item_do_lua_action(lua_State* L, ItemEntry& type, GameInst* user,
 		const Pos& p, int amnt) {
-	LuaValue& usefunc = type.inventory_use_func();
+	LuaValue& usefunc = type.inventory_use_func().get(L);
 	usefunc.push();
 	luayaml_push_item(L, type.name.c_str());
 	lua_push_gameinst(L, user);
@@ -440,7 +440,7 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 	Item& item = itemslot.item;
 	ItemEntry& type = itemslot.item_entry();
 
-	lua_State* L = gs->get_luastate();
+	lua_State* L = gs->luastate();
 
 	if (item.amount > 0) {
 		if (item.is_equipment()) {

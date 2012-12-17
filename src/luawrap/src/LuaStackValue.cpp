@@ -52,9 +52,29 @@ namespace _luawrap_private {
 		pop();
 	}
 
+
 	void _LuaStackField::operator =(const _LuaStackField& field) {
 		field.push();
 		pop();
+	}
+
+	void _LuaStackField::bind_function(lua_CFunction func) {
+		lua_pushcfunction(value.luastate(), func);
+		pop();
+	}
+
+	LuaValue _LuaStackField::ensure_table() const {
+		lua_State* L = value.luastate();
+		push();
+
+		if (!lua_istable(L, -1)) {
+			lua_pop(L, 1);
+			lua_newtable(L);
+			lua_pushvalue(L, -1);
+			pop();
+		}
+
+		return LuaValue::pop_value(L);
 	}
 }
 

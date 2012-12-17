@@ -38,17 +38,17 @@ static void mymethod(Foo& f, int abc) {
 
 LuaValue foo_newmetatable(lua_State* L) {
 	LuaValue metatable = luameta_new(L, "Foo");
-	LuaValue methods = luameta_methods(L, metatable);
-	LuaValue getters = luameta_getters(L, metatable);
-	LuaValue setters = luameta_setters(L, metatable);
+	LuaValue methods = luameta_methods(metatable);
+	LuaValue getters = luameta_getters(metatable);
+	LuaValue setters = luameta_setters(metatable);
 
-	getters["bar"] = &luawrap::getter<Foo, int, &Foo::bar>;
-	setters["bar"] = &luawrap::setter<Foo, int, &Foo::bar>;
+	getters["bar"].bind_getter(&Foo::bar);
+	setters["bar"].bind_setter(&Foo::bar);
 
 	getters["bar2"] = &luawrap::getter<Foo, int, &Foo::get_bar>;
 	setters["bar2"] = &luawrap::setter<Foo, int, &Foo::get_bar>;
 
-	getters["bar3"] = &luawrap::getter<Foo, int, &Foo::bar>;
+	getters["bar3"].bind_getter(&Foo::bar);
 	setters["bar3"] = &luawrap::setter<Foo, int, &Foo::set_bar>;
 
 	methods["mymethod"].bind_function(mymethod);

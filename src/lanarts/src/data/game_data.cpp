@@ -7,6 +7,8 @@
 
 #include <lua.hpp>
 
+#include <luawrap/luawrap.h>
+
 #include <lcommon/lua_lcommon.h>
 
 #include "lua/lua_api.h"
@@ -194,6 +196,8 @@ LuaValue lua_sprites, lua_armours, lua_enemies, lua_effects, lua_weapons,
 LuaValue lua_settings;
 
 void init_game_data(GameSettings& settings, lua_State* L) {
+	LuaValue globals = luawrap::globals(L);
+
 	DataFiles dfiles = load_datafilenames("res/datafiles.yaml");
 
 //NB: Do not re-order the way resources are loaded unless you know what you're doing!
@@ -228,6 +232,7 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 
 	load_settings_data(settings, "settings.yaml");
 	load_settings_data(settings, "saved_settings.yaml");
+
 }
 
 static void register_as_global(lua_State* L, LuaValue& value,

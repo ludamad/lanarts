@@ -44,10 +44,10 @@ public:
 	SpriteEntry& item_sprite_entry();
 	GLimage& item_image();
 
-	LuaValue& inventory_use_func() {
+	LuaLazyValue& inventory_use_func() {
 		return use_action.action_func;
 	}
-	LuaValue& inventory_use_prereq_func() {
+	LuaLazyValue& inventory_use_prereq_func() {
 		return use_action.prereq_func;
 	}
 	const std::string& inventory_use_message() {

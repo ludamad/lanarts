@@ -93,6 +93,8 @@ static void lua_hit_callback(lua_State* L, LuaValue& callback,
 }
 
 void ProjectileInst::step(GameState* gs) {
+	lua_State* L = gs->luastate();
+
 	Pos tile_hit;
 	int newx = (int)round(rx + vx); //update based on rounding of true float
 	int newy = (int)round(ry + vy);
@@ -137,8 +139,8 @@ void ProjectileInst::step(GameState* gs) {
 				origin->signal_attacked_successfully();
 			}
 
-			lua_hit_callback(gs->get_luastate(),
-					projectile.projectile_entry().action_func(), atkstats, this,
+			lua_hit_callback(L,
+					projectile.projectile_entry().action_func().get(L), atkstats, this,
 					victim);
 
 			int damage = damage_formula(atkstats, victim->effective_stats());
@@ -177,8 +179,8 @@ void ProjectileInst::step(GameState* gs) {
 				origin->signal_attacked_successfully();
 			}
 
-			lua_hit_callback(gs->get_luastate(),
-					projectile.projectile_entry().action_func(), atkstats, this,
+			lua_hit_callback(L,
+					projectile.projectile_entry().action_func().get(L), atkstats, this,
 					victim);
 
 			int damage = damage_formula(atkstats, victim->effective_stats());

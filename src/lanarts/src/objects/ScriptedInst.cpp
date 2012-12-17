@@ -29,17 +29,17 @@ ScriptedInst::~ScriptedInst() {
 }
 
 void ScriptedInst::init(GameState* gs) {
-	lua_State* L = gs->get_luastate();
+	lua_State* L = gs->luastate();
 	ScriptObjectEntry& scr_obj = script_object();
 	//Init the object
-	lua_gameinst_callback(L, scr_obj.init_event, this);
+	lua_gameinst_callback(L, scr_obj.init_event.get(L), this);
 }
 
 void ScriptedInst::step(GameState* gs) {
-	lua_State* L = gs->get_luastate();
+	lua_State* L = gs->luastate();
 	ScriptObjectEntry& scr_obj = script_object();
 	//Step the object
-	lua_gameinst_callback(L, scr_obj.step_event, this);
+	lua_gameinst_callback(L, scr_obj.step_event.get(L), this);
 }
 
 void ScriptedInst::draw(GameState* gs) {

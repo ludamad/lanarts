@@ -13,10 +13,13 @@ LuaLazyValue::LuaLazyValue(const LuaValue& value) :
 		_value(value) {
 }
 
+LuaLazyValue::LuaLazyValue() {
+}
+
 LuaLazyValue::~LuaLazyValue() {
 }
 
-const LuaValue& LuaLazyValue::get(lua_State* L) {
+LuaValue& LuaLazyValue::get(lua_State* L) {
 	initialize(L);
 	return _value;
 }
@@ -26,6 +29,10 @@ void LuaLazyValue::initialize(lua_State* L) {
 		_value = luawrap::eval(L, _expression);
 		_expression = std::string(); // free string
 	}
+}
+
+bool LuaLazyValue::empty() const {
+	return _expression.empty() && _value.empty();
 }
 
 bool LuaLazyValue::is_initialized() const {

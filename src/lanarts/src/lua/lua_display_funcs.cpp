@@ -16,14 +16,14 @@
 // TODO: Some sort of step/draw check that throws a panic ?
 // Take arguments: sprite, x, y
 static int draw_sprite(lua_State* L) {
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	gl_draw_sprite(gs->view(), sprite_from_lua(L, 1), lua_tointeger(L, 2),
 			lua_tointeger(L, 3));
 	return 0;
 }
 
 static int show_message(lua_State* L) {
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	int nargs = lua_gettop(L);
 	Colour col = nargs >= 2 ? lua_tocolour(L, 2) : Colour();
 	gs->game_chat().add_message(lua_tocppstring(L, 1), col);

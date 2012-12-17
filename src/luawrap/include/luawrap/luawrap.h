@@ -22,6 +22,7 @@
 
 #include <luawrap/LuaValue.h>
 #include <luawrap/LuaStackValue.h>
+#include <luawrap/luawraperror.h>
 
 // Include internal header
 #include "../../src/pushget_helper.h"
@@ -156,6 +157,25 @@ namespace _luawrap_private {
 	inline void _LuaStackField::optionalget(T& val) {
 		luawrap::getoptfield(value.luastate(), value.index(), key, val);
 	}
+}
+
+template<typename T>
+inline T LuaStackValue::as() const {
+	if (!luawrap::check<T>(L, idx)) {
+		luawrap::error("Error converting type!");
+	}
+	return luawrap::get<T>(L, idx);
+}
+
+template<typename T>
+inline T LuaValue::as() const {
+	push();
+
+	if (!luawrap::check<T>(luastate(), -1)) {
+		luawrap::error("Error converting type!");
+	}
+
+	return luawrap::pop<T>(luastate());
 }
 
 #include "../../src/predefined_helper.h"

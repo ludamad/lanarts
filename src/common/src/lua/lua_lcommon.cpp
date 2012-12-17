@@ -12,21 +12,6 @@
 #include "lua_timer.h"
 #include "lua_geometry.h"
 
-static int lua_error_handler(lua_State* L) {
-	int nargs = lua_gettop(L);
-	std::string failmsg = "An error occurred in lua's runtime:\n";
-
-	for (int i = 0; i < nargs; i++) {
-		failmsg += lua_tostring(L, i);
-		failmsg += '\n';
-	}
-	printf(failmsg.c_str());
-
-	fatal_error();
-
-	return 0;
-}
-
 void lua_safe_dostring(lua_State* L, const char* code) {
 	if (luaL_dostring(L, code)) {
 		std::string failmsg;

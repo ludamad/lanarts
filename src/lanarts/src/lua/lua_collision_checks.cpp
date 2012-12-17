@@ -15,7 +15,7 @@
 
 // Takes obj returns bool
 static int obj_solid_check(lua_State* L) {
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	int nargs = lua_gettop(L);
 
 	GameInst* obj = lua_gameinst_arg(L, 1);
@@ -29,7 +29,7 @@ static int obj_solid_check(lua_State* L) {
 
 // Takes x, y, rad, [player observer] returns bool
 static int radius_visible_check(lua_State* L) {
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	int nargs = lua_gettop(L);
 
 	int x = lua_tointeger(L, 1);
@@ -45,7 +45,7 @@ static int radius_visible_check(lua_State* L) {
 
 // Takes obj returns bool
 static int obj_tile_check(lua_State* L) {
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	GameInst* obj = lua_gameinst_arg(L, 1);
 	lua_pushboolean(L, gs->tile_radius_test(obj->radius, obj->x, obj->y));
 	return 1;
@@ -53,7 +53,7 @@ static int obj_tile_check(lua_State* L) {
 
 // Takes obj returns bool
 static int radius_tile_check(lua_State* L) {
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	GameInst* obj = lua_gameinst_arg(L, 1);
 
 	int x = lua_tointeger(L, 1);
@@ -66,7 +66,7 @@ static int radius_tile_check(lua_State* L) {
 
 // Takes obj returns obj
 static int obj_enemy_check(lua_State* L) {
-	GameState* gs = lua_get_gamestate(L);
+	GameState* gs = lua_api::gamestate(L);
 	GameInst* obj = lua_gameinst_arg(L, 1);
 	GameInst* enemy = NULL;
 	if (gs->object_radius_test(obj, &enemy, 1)) {

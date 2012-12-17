@@ -30,8 +30,8 @@ EnemyEntry parse_enemy_type(lua_State* L, const YAML::Node& n) {
 	entry.basestats = parse_combat_stats(n["stats"]);
 	entry.unique = parse_defaulted(n, "unique", false);
 
-	entry.init_event = parse_luacode(L, n, "init_func");
-	entry.step_event = parse_luacode(L, n, "step_func");
+	entry.init_event = parse_luaexpr(L, n, "init_func");
+	entry.step_event = parse_luaexpr(L, n, "step_func");
 
 	return entry;
 }

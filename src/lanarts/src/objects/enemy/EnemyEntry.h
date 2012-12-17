@@ -11,13 +11,11 @@
 #include <string>
 #include <cstdio>
 
-#include <luawrap/LuaValue.h>
+#include <lcommon/LuaLazyValue.h>
 
 #include "data/BaseDataEntry.h"
 
 #include "stats/combat_stats.h"
-
-#include "lua/luaexpr.h"
 
 #include "lanarts_defines.h"
 
@@ -28,22 +26,21 @@ struct EnemyEntry: public BaseDataEntry {
 	CombatStats basestats;
 	bool unique;
 
-	LuaValue init_event, step_event;
+	LuaLazyValue init_event, step_event;
 
 	EnemyEntry() :
 			radius(15), xpaward(0), enemy_sprite(-1), death_sprite(-1), unique(
 					false) {
+	}
+	void init(lua_State* L) {
+		init_event.initialize(L);
+		step_event.initialize(L);
 	}
 	virtual const char* entry_type() {
 		return "Enemy";
 	}
 	virtual sprite_id get_sprite() {
 		return enemy_sprite;
-	}
-
-	void init(lua_State* L) {
-		luavalue_call_and_store(L, init_event);
-		luavalue_call_and_store(L, step_event);
 	}
 };
 

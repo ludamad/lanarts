@@ -9,6 +9,8 @@
 #include <net/lanarts_net.h>
 
 #include <lua.hpp>
+#include <luawrap/luawrap.h>
+#include <luawrap/calls.h>
 
 #include <lcommon/Timer.h>
 
@@ -27,7 +29,6 @@
 #include "objects/AnimatedInst.h"
 
 #include "../tests/tests.h"
-
 
 #include "menu/menus.h"
 
@@ -83,13 +84,20 @@ static void game_loop(GameState* gs) {
 
 	gs->pre_step();
 	for (int i = 1; cont; i++) {
+		lua_State* L = gs->luastate();
+		luawrap::globals(L)["main_loop_simple"].push();
+		if (!luawrap::call<bool>(L)) {
+			break;
+		}
+
+		continue;
 		perf_timer_begin("**Game Frame**");
 		total_timer.start();
 
 		if (gs->key_press_state(SDLK_F2)) {
 			if (gs->player_data().all_players().size() == 1) {
-				init_lua_data(gs, gs->get_luastate());
-				init_game_data(settings, gs->get_luastate());
+				init_lua_data(gs, gs->luastate());
+				init_game_data(settings, gs->luastate());
 			}
 		}
 		if (gs->key_press_state(SDLK_F3)) {

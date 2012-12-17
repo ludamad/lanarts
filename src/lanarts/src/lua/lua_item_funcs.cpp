@@ -17,7 +17,7 @@
 //// Returns monsters seen
 //// Take arguments: optional player, otherwise all players seen by; returns objects
 //static int item_is_weapon(lua_State* L) {
-//	GameState* gs = lua_get_gamestate(L);
+//	GameState* gs = lua_api::gamestate(L);
 //	int narg = lua_gettop(L);
 //	PlayerInst* p = narg >= 1 ? (PlayerInst*)lua_gameinst_arg(L, 1) : NULL;
 //	const std::vector<obj_id>& monsters =

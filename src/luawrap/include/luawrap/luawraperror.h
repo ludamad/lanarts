@@ -1,6 +1,6 @@
 /*
  * luawraperror.h:
- *  Exception thrown when conversions fail.
+ *  Error functions used on conversion failure and lua runtime failure.
  */
 
 #ifndef LUAWRAP_LUAWRAPERROR_H_
@@ -12,6 +12,8 @@
 
 #include <stdexcept>
 
+struct lua_State;
+
 namespace luawrap {
 	class Exception: public std::runtime_error {
 	public:
@@ -20,12 +22,12 @@ namespace luawrap {
 
 		}
 	};
-}
 
-namespace luawrap {
 	inline void error(const char* msg) {
-		throw new Exception(msg);
+		throw Exception(msg);
 	}
+
+	int errorfunc(lua_State *L);
 }
 
 #else

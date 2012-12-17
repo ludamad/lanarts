@@ -52,7 +52,7 @@ public:
 	sprite_id attack_sprite() {
 		return attack.attack_sprite;
 	}
-	LuaValue& action_func() {
+	LuaLazyValue& action_func() {
 		return attack.attack_action.action_func;
 	}
 
