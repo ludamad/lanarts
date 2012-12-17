@@ -15,6 +15,5 @@ file(GLOB PLAT_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/${PLAT_DIR}/*.cpp s
 source_group(${PLAT_DIR} FILES ${PLAT_SRCS})
 
 # create the lib
-add_library(UnitTestPP STATIC ${SRCS} ${PLAT_SRCS})
-set_target_properties(UnitTestPP PROPERTIES OUTPUT_NAME UnitTest++)
+add_library(UnitTest++ STATIC ${SRCS} ${PLAT_SRCS})
 include_directories(src)

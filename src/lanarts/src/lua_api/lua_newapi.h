@@ -20,6 +20,9 @@ namespace lua_api {
 
 	void register_io_api(lua_State* L);
 
+	/* Functions for visual results in the lanarts world, eg drawing text */
+	void register_display_api(lua_State* L);
+
 	// Special-case functions such as save_game, load_game, regen_level.
 	// Some of these are for testing purposes only.
 	void register_gamestate_api(lua_State* L);
@@ -32,6 +35,10 @@ namespace lua_api {
 
 	// Register all the lanarts API functions and types
 	void register_api(GameState* gs, lua_State* L);
+
+	// Callbacks into the lua VM:
+	void luacall_main(lua_State* L);
+	void luacall_postdraw(lua_State* L);
 }
 
 

@@ -241,6 +241,8 @@ void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type) {
 void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 		float dx, float dy, int steps, const Colour& c) {
 	float PI = 3.1415921;
+	float ang = PI * 2.5 + atan2(dy, dx);
+
 	SpriteEntry& entry = game_sprite_data.at(sprite);
 	GLimage* img;
 	if (entry.type == SpriteEntry::DIRECTIONAL) {

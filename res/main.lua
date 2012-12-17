@@ -66,7 +66,7 @@ function main()
 		if key_pressed(keys.F2) and single_player then 
 			game.resources_load()
 		end
-	
+
 		if key_pressed(keys.F3) and single_player then 
 			level.regenerate()
 		end
@@ -74,14 +74,19 @@ function main()
 		if key_pressed(keys.F4) then 
 			paused = not paused
 		end
-		
+
 		if key_pressed(keys.F6) and single_player then
 			game.load("savefile.save")
-			game.input_capture(true) -- capture new input
+			game.input_capture(true) -- reset input
 		end
 
 		if not mainloop(false) then
 			break
+		end
+
+		if key_pressed(keys.F5) then
+			net.sync_message_send()
+			game.save("savefile.save")
 		end
 	end
 

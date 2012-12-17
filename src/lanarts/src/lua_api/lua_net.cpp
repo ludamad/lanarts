@@ -1,5 +1,5 @@
 /*
- * lua_io.cpp:
+ * lua_net.cpp:
  *  Bindings for network-play related actions
  */
 

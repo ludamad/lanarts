@@ -27,6 +27,7 @@
 #include "levelgen/dungeon_data.h"
 
 #include "lua/lua_api.h"
+#include "lua_api/lua_newapi.h"
 
 #include "net/GameNetConnection.h"
 
@@ -321,6 +322,8 @@ void GameState::draw(bool drawhud) {
 	if (drawhud) {
 		hud.draw(this);
 	}
+
+	lua_api::luacall_postdraw(L); // Used for debug purposes
 
 	ldraw::display_draw_finish();
 

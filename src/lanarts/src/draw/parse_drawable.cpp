@@ -213,6 +213,9 @@ Drawable parse_drawable(const YAML::Node& node) {
 					"-or- frames: <drawable list or file pattern>\n"
 					"         Note: file patterns are of the form filename(min-max).extension\n"
 					"-or- function: <lua function>";
+	if (node.Type() == YAML::NodeType::Scalar) {
+		return Drawable(new Image(parse_str(node)));
+	}
 
 	if (node.Type() != YAML::NodeType::Map) {
 		throw YAML::RepresentationException(node.GetMark(), err);

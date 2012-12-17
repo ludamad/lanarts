@@ -43,6 +43,7 @@ LuaValue lua_fontmetatable(lua_State* L) {
 	methods["draw_wrapped"].bind_function(font_draw_wrapped);
 	methods["get_draw_size"].bind_function(font_get_draw_size);
 
+	luameta_gc<Font>(meta);
 
 	return meta;
 }
