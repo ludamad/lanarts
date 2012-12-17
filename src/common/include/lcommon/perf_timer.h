@@ -20,6 +20,7 @@
 
 void perf_timer_begin(const char* funcname);
 void perf_timer_end(const char* funcname);
+double perf_timer_average_time(const char* funcname);
 void perf_timer_clear();
 void perf_print_results();
 

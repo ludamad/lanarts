@@ -82,98 +82,95 @@ static void game_loop(GameState* gs) {
 
 	Timer total_timer, step_timer, draw_timer;
 
-	gs->pre_step();
-	for (int i = 1; cont; i++) {
-		lua_State* L = gs->luastate();
-		luawrap::globals(L)["main_loop_simple"].push();
-		if (!luawrap::call<bool>(L)) {
-			break;
-		}
-
-		continue;
-		perf_timer_begin("**Game Frame**");
-		total_timer.start();
-
-		if (gs->key_press_state(SDLK_F2)) {
-			if (gs->player_data().all_players().size() == 1) {
-				init_lua_data(gs, gs->luastate());
-				init_game_data(settings, gs->luastate());
-			}
-		}
-		if (gs->key_press_state(SDLK_F3)) {
-			if (gs->player_data().all_players().size() == 1) {
-				gs->game_world().regen_level(gs->get_level()->id());
-			}
-		}
-		if (gs->key_press_state(SDLK_F4)) {
-			paused = !paused;
-		}
-		gs->net_connection().consume_sync_messages(gs);
-		if (gs->key_press_state(SDLK_F6)) {
-			if (gs->player_data().all_players().size() == 1) {
-				load_game_from_file(gs, "savefile.save");
-				gs->update_iostate(true);
-			}
-		}
-
-//Draw event
-		draw_timer.start();
-		bool draw_this_step = (i > 1 && i % settings.steps_per_draw == 0);
-		if (draw_this_step) {
-			gs->draw();
-		}
-
-		draw_events++;
-		draw_time += draw_timer.get_microseconds();
-
-		int repeat_amount = 1;
-		if (gs->key_down_state(SDLK_F1))
-			repeat_amount = 4;
-
-		for (int repeat = 0; repeat < repeat_amount; repeat++) {
-			//Step event
-
-			step_timer.start();
-			if (!paused) {
-				gs->step();
-			}
-			step_events++;
-			step_time += step_timer.get_microseconds();
-
-			// Do not move this. It is done after the step event,
-			// but before actions are queued for the next turn
-			if (gs->key_press_state(SDLK_F5)) {
-				net_send_state_and_sync(gs->net_connection(), gs);
-				save_game_to_file(gs, "savefile.save");
-			}
-
-			// The following will queue actions for the next step
-			bool is_done = (!paused && !gs->pre_step())
-					|| (paused && !gs->update_iostate());
-			if (is_done) {
-				cont = false;
-				break;
-			}
-		}
-
-		accumulated_time += total_timer.get_microseconds();
-
-		long microwait = settings.time_per_step * 1000 * settings.steps_per_draw
-				- accumulated_time;
-		if (draw_this_step) {
-			long delayms = microwait / 1000;
-			if (delayms > 0) {
-				SDL_Delay(delayms);
-			}
-			accumulated_time = 0;
-		}
-		perf_timer_end("**Game Frame**");
-	}
-
-	perf_print_results();
-
-	printf("Step time: %f\n", float(step_time) / step_events / 1000);
-	printf("Draw time: %f\n", float(draw_time) / draw_events / 1000);
+	lua_State* L = gs->luastate();
+	luawrap::globals(L)["main"].push();
+	luawrap::call<void>(L);
+	fflush(stdout);
+//	gs->pre_step();
+//	for (int i = 1; cont; i++) {
+//		perf_timer_begin("**Game Frame**");
+//		total_timer.start();
+//
+//		if (gs->key_press_state(SDLK_F2)) {
+//			if (gs->player_data().all_players().size() == 1) {
+//				init_lua_data(gs, gs->luastate());
+//				init_game_data(settings, gs->luastate());
+//			}
+//		}
+//		if (gs->key_press_state(SDLK_F3)) {
+//			if (gs->player_data().all_players().size() == 1) {
+//				gs->game_world().regen_level(gs->get_level()->id());
+//			}
+//		}
+//		if (gs->key_press_state(SDLK_F4)) {
+//			paused = !paused;
+//		}
+//		gs->net_connection().consume_sync_messages(gs);
+//		if (gs->key_press_state(SDLK_F6)) {
+//			if (gs->player_data().all_players().size() == 1) {
+//				load_game_from_file(gs, "savefile.save");
+//				gs->update_iostate(true);
+//			}
+//		}
+//
+////Draw event
+//		draw_timer.start();
+//		bool draw_this_step = (i > 1 && i % settings.steps_per_draw == 0);
+//		if (draw_this_step) {
+//			gs->draw();
+//		}
+//
+//		draw_events++;
+//		draw_time += draw_timer.get_microseconds();
+//
+//		int repeat_amount = 1;
+//		if (gs->key_down_state(SDLK_F1))
+//			repeat_amount = 4;
+//
+//		for (int repeat = 0; repeat < repeat_amount; repeat++) {
+//			//Step event
+//
+//			step_timer.start();
+//			if (!paused) {
+//				gs->step();
+//			}
+//			step_events++;
+//			step_time += step_timer.get_microseconds();
+//
+//			// Do not move this. It is done after the step event,
+//			// but before actions are queued for the next turn
+//			if (gs->key_press_state(SDLK_F5)) {
+//				net_send_state_and_sync(gs->net_connection(), gs);
+//				save_game_to_file(gs, "savefile.save");
+//			}
+//
+//			// The following will queue actions for the next step
+//			bool is_done = (!paused && !gs->pre_step())
+//					|| (paused && !gs->update_iostate());
+//			if (is_done) {
+//				cont = false;
+//				break;
+//			}
+//		}
+//
+//		accumulated_time += total_timer.get_microseconds();
+//
+//		long microwait = settings.time_per_step * 1000 * settings.steps_per_draw
+//				- accumulated_time;
+//		if (draw_this_step) {
+//			long delayms = microwait / 1000;
+//			if (delayms > 0) {
+//				SDL_Delay(delayms);
+//			}
+//			accumulated_time = 0;
+//		}
+//		perf_timer_end("**Game Frame**");
+//	}
+//
+//	perf_print_results();
+//
+//	printf("Step time: %f\n", float(step_time) / step_events / 1000);
+//	printf("Draw time: %f\n", float(draw_time) / draw_events / 1000);
 }
 
 int main(int argc, char** argv) {
@@ -196,7 +193,9 @@ int main(int argc, char** argv) {
 	if (exitcode == 0) {
 		gs->start_game();
 
-		game_loop(gs);
+		luawrap::globals(L)["main"].push();
+		luawrap::call<void>(L);
+		fflush(stdout);
 	}
 
 	save_settings_data(gs->game_settings(), "saved_settings.yaml");

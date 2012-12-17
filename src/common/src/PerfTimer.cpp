@@ -36,6 +36,12 @@ void PerfTimer::print_results() {
 	printf("**** END PERFORMANCE STATS ****\n");
 }
 
+double PerfTimer::average_time(const char* method) {
+	MethodPerfProfile& mpp = perf_map[method];
+	float total = mpp.total_microseconds / 1000.0f;
+	return total / mpp.total_calls;
+}
+
 void PerfTimer::clear() {
 	perf_map.clear();
 }
@@ -53,6 +59,10 @@ void perf_timer_clear() {
 
 void perf_timer_end(const char* funcname) {
 	__global_timer.end(funcname);
+}
+
+double perf_timer_average_time(const char* funcname) {
+	return __global_timer.average_time(funcname);
 }
 
 void perf_print_results() {

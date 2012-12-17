@@ -26,6 +26,7 @@ public:
 	// Note: Does not work with recursive methods
 	void begin(const char* method);
 	void end(const char* method);
+	double average_time(const char* method);
 	void print_results();
 	void clear();
 private:

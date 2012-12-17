@@ -28,7 +28,8 @@ void lua_safe_dostring(lua_State* L, const char* code) {
 
 void lua_safe_dofile(lua_State* L, const char* fname) {
 	if (luaL_loadfile(L, fname) != 0) {
-		printf("Fatal error when loading lua file %s\n", fname);
+		printf("Fatal error when loading lua file %s:\n%s\n", fname,
+				lua_tostring(L, -1));
 		exit(0);
 	}
 	if (lua_pcall(L, 0, 0, 0)) {

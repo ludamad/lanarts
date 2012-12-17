@@ -6,4 +6,4 @@ fi
 # Run lanarts
 
 cd ../lanarts
-vblank_mode=0 ../lanarts_build/src/lanarts/lanarts
+../lanarts_build/src/lanarts/lanarts

@@ -19,12 +19,18 @@ static unsigned long get_microseconds(Timer* timer) {
 	return timer->get_microseconds();
 }
 
+static double get_milliseconds(Timer* timer) {
+	return timer->get_microseconds() / 1000.0;
+}
+
+
 LuaValue lua_timermetatable(lua_State* L) {
 	LuaValue meta = luameta_new(L, "Timer");
 	LuaValue methods = luameta_methods(meta);
 
 	methods["start"].bind_function(start);
 	methods["get_microseconds"].bind_function(get_microseconds);
+	methods["get_milliseconds"].bind_function(get_milliseconds);
 
 	luameta_gc<Timer>(meta);
 
@@ -40,9 +46,12 @@ void lua_register_timer(lua_State *L, const LuaValue& module) {
 
 	module["timer_create"].bind_function(newtimer);
 
-	module["perf_timer_begin"].bind_function(perf_timer_begin);
-	module["perf_timer_end"].bind_function(perf_timer_end);
-	module["perf_timer_clear"].bind_function(perf_timer_clear);
-	module["perf_print_results"].bind_function(perf_print_results);
+	LuaValue perf_timer = module["perf"].ensure_table();
+
+	perf_timer["timing_begin"].bind_function(perf_timer_begin);
+	perf_timer["timing_end"].bind_function(perf_timer_end);
+	perf_timer["timing_clear"].bind_function(perf_timer_clear);
+	perf_timer["get_timing"].bind_function(perf_timer_average_time);
+	perf_timer["timing_print"].bind_function(perf_print_results);
 }
 

@@ -24,80 +24,69 @@ dofile "res/tests/progressions.lua"
 
 local paused = false
 
--- lanarts main loop
--- this controls the games behaviour every step!
-function main_loop() 
-		local single_player = (#world.players() == 1)
-	
-		perf_timer_begin("**Game Frame**")
-
-		local total_timer = timer()
-	
-		if key_pressed(keys.F2) then
-			if single_player then gamestate.resources_reload() end
-		end
-
-		if key_pressed(keys.F3) then
-			if single_player then gamestate.level_regenerate() end
-		end
-
-		if key_pressed(keys.F4) then
-			paused = not paused
-		end
-
-		net.sync_message_consume()
-
-		if key_pressed(keys.F6) then
-			if single_player then gamestate.level_regenerate() end
-		end
-
-		perf_timer_end("**Game Frame**")
-end
-
-
-local timer = timer_create()
-local paused = false
-
-function main_loop_simple()
-	local single_player = (settings.connection_type == net.NONE)
-
-	perf_timer_begin("**Game Frame**")
-
-	if key_pressed(keys.F2) and single_player then 
-		game.resources_load()
-	end
-
-	if key_pressed(keys.F3) and single_player then 
-		level.regenerate()
-	end
-
-	if key_pressed(keys.F4) then 
-		paused = not paused
-	end
+local function mainloop(steponly)
+	perf.timing_begin("**Game Frame**")
 
 	net.sync_message_consume()
 
-	if key_pressed(keys.F6) and single_player then
-		game.load("savefile.save")
-		game.input_capture(true) -- capture new input
+	local timer = timer_create()
+
+	if not steponly then
+		perf.timing_begin("**Draw**")
+		game.draw()
+		perf.timing_end("**Draw**")
 	end
 
-	timer:start()
-
-	game.draw()
+	perf.timing_begin("**Step**")
 	game.step()
+	perf.timing_end("**Step**")
 
 	if not game.input_handle() then 
 		return false 
 	end
 
-	local surplus = settings.time_per_step - timer:get_microseconds() / 1000
+	local surplus = settings.time_per_step - timer:get_milliseconds()
 
 	if surplus > 0 then 
 		game.wait(surplus) 
 	end
 
-	perf_timer_end("**Game Frame**")
-	
+	perf.timing_end("**Game Frame**")
+
 	return true;
+end
+
+function main()
+
+	game.input_capture()
+
+	while true do 
+		local single_player = (settings.connection_type == net.NONE)
+	
+		if key_pressed(keys.F2) and single_player then 
+			game.resources_load()
+		end
+	
+		if key_pressed(keys.F3) and single_player then 
+			level.regenerate()
+		end
+	
+		if key_pressed(keys.F4) then 
+			paused = not paused
+		end
+		
+		if key_pressed(keys.F6) and single_player then
+			game.load("savefile.save")
+			game.input_capture(true) -- capture new input
+		end
+
+		if not mainloop(false) then
+			break
+		end
+	end
+
+	perf.timing_print()
+
+	print( "Step time: " .. string.format("%f", perf.get_timing("**Step**")) )
+	print( "Draw time: " .. string.format("%f", perf.get_timing("**Draw**")) )
 end
