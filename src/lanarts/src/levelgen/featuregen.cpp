@@ -6,7 +6,7 @@
 
 #include "data/game_data.h"
 
-#include "display/sprite_data.h"
+#include "display/SpriteEntry.h"
 #include "display/TileEntry.h"
 #include "gamestate/GameLevelState.h"
 
@@ -123,7 +123,9 @@ static void generate_statue(GameState* gs, GeneratedLevel& level, MTwist& mt,
 	int itemn = mt.rand(Range(2, 10));
 	sprite_id spriteid = get_sprite_by_name("statue");
 	SpriteEntry& statue_sprite = game_sprite_data.at(spriteid);
-	int nimages = statue_sprite.images.size();
+	ldraw::Drawable& sprite = res::sprite(spriteid);
+	int nimages = (int)sprite.animation_duration();
+	if (nimages <= 0) nimages = 1;
 	int imgid = mt.rand(nimages);
 	gs->add_instance(
 			new FeatureInst(worldpos, FeatureInst::DECORATION, true, spriteid,

@@ -33,6 +33,8 @@ public:
 		draw(DrawOptions(), pos);
 	}
 
+	virtual DimF size() const;
+
 	/* Pushes metatable to be used with a userdata object, which encapsulates a Drawable.
 	 * Implemented in LuaDrawable.cpp
 	 */

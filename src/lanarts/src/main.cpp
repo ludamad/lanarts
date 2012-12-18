@@ -6,6 +6,7 @@
 #include <SDL_opengl.h>
 
 #include <ldraw/display.h>
+#include <ldraw/lua_ldraw.h>
 #include <net/lanarts_net.h>
 
 #include <lua.hpp>
@@ -46,6 +47,7 @@ static void init_system(GameSettings& settings, lua_State* L) {
 		exit(0);
 	}
 	lanarts_net_init(true);
+	ldraw::lua_register_ldraw(L, luawrap::globals(L));
 	ldraw::display_initialize("Lanarts", Dim(settings.view_width, settings.view_height), settings.fullscreen);
 	init_game_data(settings, L);
 }

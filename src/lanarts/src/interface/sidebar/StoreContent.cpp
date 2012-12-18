@@ -10,7 +10,7 @@
 #include "draw/colour_constants.h"
 #include "display/display.h"
 
-#include "display/sprite_data.h"
+#include "display/SpriteEntry.h"
 
 #include "gamestate/GameState.h"
 #include "objects/player/PlayerInst.h"
@@ -35,8 +35,7 @@ static void draw_store_inventory_slot(GameState* gs, StoreItemSlot& itemslot,
 		int x, int y) {
 	if (!itemslot.empty()) {
 		ItemEntry& ientry = itemslot.item.item_entry();
-		GLimage& itemimg = ientry.item_image();
-		gl_draw_image(itemimg, x, y);
+		ientry.item_image().draw(Pos(x,y));
 		int amnt = itemslot.item.amount;
 		if (ientry.stackable && amnt > 1) {
 			gs->font().drawf(Colour(255, 255, 255), Pos(x + 1, y + 1), "%d",

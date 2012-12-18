@@ -6,7 +6,7 @@
 #ifndef LUA_YAML_H_
 #define LUA_YAML_H_
 
-#include <luawrap/LuaValue.h>
+#include <luawrap/luawrap.h>
 #include <lcommon/LuaLazyValue.h>
 
 namespace YAML {

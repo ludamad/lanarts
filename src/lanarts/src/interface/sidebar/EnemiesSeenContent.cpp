@@ -4,10 +4,11 @@
  */
 
 #include <ldraw/draw.h>
+#include <ldraw/DrawOptions.h>
 
 #include "draw/colour_constants.h"
 
-#include "display/sprite_data.h"
+#include "display/SpriteEntry.h"
 
 #include "gamestate/GameState.h"
 #include "objects/enemy/MonsterController.h"
@@ -17,11 +18,9 @@
 
 const int ENEMIES_PER_PAGE = 40;
 
-static void draw_sprite_in_box(sprite_id sprite, const BBox& slotbox) {
+static void draw_sprite_in_box(sprite_id spr_idx, const BBox& slotbox) {
 	BBox section(0, 0, slotbox.width(), slotbox.height());
-	SpriteEntry& spr_entry = game_sprite_data.at(sprite);
-	GLimage& img = spr_entry.img();
-	gl_draw_image_section(img, section, slotbox.x1, slotbox.y1);
+	res::sprite(spr_idx).draw(ldraw::DrawOptions().region(section), slotbox.left_top());
 }
 
 static void draw_enemies_seen(GameState* gs, EnemiesSeen& es, const BBox& bbox,

@@ -17,7 +17,7 @@
 
 #include "draw/colour_constants.h"
 #include "display/display.h"
-#include "display/sprite_data.h"
+#include "display/SpriteEntry.h"
 
 #include "gamestate/GameState.h"
 #include "interface/console_description_draw.h"
@@ -153,7 +153,7 @@ void EnemyInst::step(GameState* gs) {
 void EnemyInst::draw(GameState* gs) {
 
 	GameView& view = gs->view();
-	GLimage& img = game_sprite_data[etype().enemy_sprite].img();
+	ldraw::Drawable& spr = res::sprite(etype().enemy_sprite);
 
 	if (gs->game_settings().draw_diagnostics) {
 		char statbuff[255];
@@ -170,7 +170,7 @@ void EnemyInst::draw(GameState* gs) {
 				Pos(x - radius - view.x, y - 70 - view.y), statbuff);
 	}
 
-	int w = img.width, h = img.height;
+	int w = spr.size().w, h = spr.size().h;
 	int xx = x - w / 2, yy = y - h / 2;
 
 	if (!view.within_view(xx, yy, w, h))

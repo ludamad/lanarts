@@ -164,7 +164,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 
 	/* Draw weapon*/
 	WeaponEntry& wentry = weapon.weapon_entry();
-	gl_draw_image(game_sprite_data[wentry.item_sprite].img(), x, y);
+	res::sprite(wentry.item_sprite).draw(Pos(x,y));
 
 	if (draw_with_projectile) {
 		BBox projectilebox(weaponbox.translated(TILE_SIZE, 0));
@@ -177,8 +177,7 @@ static void draw_player_weapon_actionbar(GameState* gs, PlayerInst* player,
 		}
 
 		ProjectileEntry& ptype = projectile.projectile_entry();
-		gl_draw_image(game_sprite_data[ptype.item_sprite].img(), x + TILE_SIZE,
-				y);
+		res::sprite(ptype.item_sprite).draw(Pos(x + TILE_SIZE, y));
 		/* Draw projectile amount */
 		gs->font().drawf(Colour(255, 255, 255), Pos(x + TILE_SIZE + 1, y + 1),
 				"%d", player->projectile().amount);
@@ -200,7 +199,7 @@ static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 		spell_id spell = spells.get(i);
 		SpellEntry& spl_entry = game_spell_data.at(spell);
 		SpriteEntry& spr_entry = game_sprite_data.at(spl_entry.sprite);
-		gl_draw_image(spr_entry.img(), sx + i * TILE_SIZE, sy);
+		res::sprite(spl_entry.sprite).draw(Pos(sx + i * TILE_SIZE, sy));
 	}
 
 	for (int x = sx, spellidx = 0; x < bounds.x2; x += TILE_SIZE, spellidx++) {

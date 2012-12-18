@@ -7,6 +7,7 @@
 #define LDRAW_DRAWABLE_H_
 
 #include <lcommon/smartptr.h>
+#include <lcommon/geometry.h>
 
 struct Posf;
 struct lua_State;
@@ -36,6 +37,8 @@ public:
 	DrawableBase* ptr() const {
 		return ref.get();
 	}
+
+	DimF size() const;
 
 private:
 	smartptr<DrawableBase> ref;

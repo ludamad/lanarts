@@ -3,6 +3,8 @@
  *  Misc. functions that have limited general usage
  */
 
+#include <ldraw/lua_ldraw.h>
+
 #include <lua.hpp>
 #include <luawrap/luawrap.h>
 #include <luawrap/functions.h>
@@ -33,6 +35,7 @@ static void game_load(LuaStackValue filename) {
 
 static int game_resources_load(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
+	ldraw::lua_register_ldraw(L, luawrap::globals(L));
 	init_lua_data(gs, gs->luastate());
 	init_game_data(gs->game_settings(), gs->luastate());
 	return 0;

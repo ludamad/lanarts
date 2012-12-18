@@ -9,7 +9,7 @@
 
 #include "display/display.h"
 
-#include "display/sprite_data.h"
+#include "display/SpriteEntry.h"
 #include "display/TileEntry.h"
 #include "gamestate/GameInstSet.h"
 #include "gamestate/GameState.h"

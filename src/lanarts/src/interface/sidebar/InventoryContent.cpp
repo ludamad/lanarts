@@ -8,7 +8,7 @@
 #include "draw/colour_constants.h"
 #include "display/display.h"
 
-#include "display/sprite_data.h"
+#include "display/SpriteEntry.h"
 
 #include "gamestate/GameState.h"
 #include "objects/player/PlayerInst.h"
@@ -23,8 +23,7 @@ static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot, int x,
 		int y) {
 	if (itemslot.amount() > 0) {
 		ItemEntry& ientry = itemslot.item_entry();
-		GLimage& itemimg = ientry.item_image();
-		gl_draw_image(itemimg, x, y);
+		ientry.item_image().draw(Pos(x,y));
 		if (ientry.stackable) {
 			gs->font().drawf(COL_WHITE, Pos(x+1, y+1), "%d", itemslot.amount());
 		}

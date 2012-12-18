@@ -18,6 +18,9 @@
 
 struct GLimage;
 struct SpriteEntry;
+namespace ldraw {
+class Drawable;
+}
 
 class ItemEntry: public BaseDataEntry {
 public:
@@ -42,7 +45,7 @@ public:
 		ALWAYS_KNOWN, POTION, SCROLL
 	};
 	SpriteEntry& item_sprite_entry();
-	GLimage& item_image();
+	ldraw::Drawable& item_image();
 
 	LuaLazyValue& inventory_use_func() {
 		return use_action.action_func;

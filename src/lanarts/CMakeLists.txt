@@ -15,6 +15,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 #add_definitions(-DNDEBUG)
 
+
 include_directories(
 	${SDL_INCLUDE_DIR} 
 	${OpenGL_INCLUDE_DIRS} 		

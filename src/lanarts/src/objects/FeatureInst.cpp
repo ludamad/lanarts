@@ -5,8 +5,10 @@
 
 #include <typeinfo>
 
+#include <ldraw/DrawOptions.h>
+
 #include "draw/colour_constants.h"
-#include "display/sprite_data.h"
+#include "display/SpriteEntry.h"
 
 #include "gamestate/GameState.h"
 #include "gamestate/GameTiles.h"
@@ -31,9 +33,7 @@ void FeatureInst::draw(GameState* gs) {
 	Colour drawcolour = COL_WHITE;
 	if (last_seen_spr > -1) {
 		SpriteEntry& spr_entry = game_sprite_data.at(last_seen_spr);
-		GLimage& img = spr_entry.img(sprite_frame);
-		gl_draw_image(gs->view(), img, x - TILE_SIZE / 2, y - TILE_SIZE / 2,
-				drawcolour);
+		res::sprite(sprite_frame).draw(ldraw::DrawOptions().origin(ldraw::CENTER).colour(drawcolour), on_screen(gs,pos()));;
 	}
 }
 

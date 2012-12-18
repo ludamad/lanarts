@@ -8,6 +8,8 @@
 #include <cstring>
 #include <cmath>
 
+#include <ldraw/DrawOptions.h>
+
 #include "gamestate/GameView.h"
 
 #include "util/math_util.h"
@@ -18,7 +20,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <algorithm>
-#include "sprite_data.h"
+#include "SpriteEntry.h"
 
 void gl_draw_image_section(GLimage& img, const BBox& section, int x, int y,
 		const Colour& c) {
@@ -240,27 +242,20 @@ void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type) {
 
 void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 		float dx, float dy, int steps, const Colour& c) {
+	using namespace ldraw;
+
 	float PI = 3.1415921;
-	float ang = PI * 2.5 + atan2(dy, dx);
+	float direction = PI * 2.5 + atan2(dy, dx);
 
 	SpriteEntry& entry = game_sprite_data.at(sprite);
-	GLimage* img;
-	if (entry.type == SpriteEntry::DIRECTIONAL) {
-		float direction = PI * 2.5 + atan2(dy, dx);
-		int nimgs = entry.images.size();
-		float bucket_size = PI * 2 / nimgs;
-		int bucket = round(direction / bucket_size);
-		bucket = bucket % nimgs;
-		img = &entry.img(bucket);
-	} else { //if (entry.type == SpriteEntry::ANIMATED) {
-		img = &entry.img();
-	}
-	gl_draw_image(view, *img, x, y, c);
+	entry.sprite.draw(DrawOptions().colour(c).angle(direction).frame(steps), Pos(x,y));
 }
 
 void gl_draw_sprite(sprite_id sprite, int x, int y, const Colour& c) {
+	using namespace ldraw;
+
 	SpriteEntry& entry = game_sprite_data.at(sprite);
-	gl_draw_image(entry.img(), x, y, c.multiply(entry.drawcolour));
+	entry.sprite.draw(DrawOptions().colour(c.multiply(entry.drawcolour)), Pos(x,y));
 }
 
 void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,

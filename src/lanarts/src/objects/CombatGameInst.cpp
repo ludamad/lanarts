@@ -3,11 +3,13 @@
  *  Represents an instance that is affected by combat, ie enemies and players
  */
 
+#include <ldraw/DrawOptions.h>
+
 #include <lcommon/SerializeBuffer.h>
 
 #include "draw/draw_statbar.h"
 
-#include "display/sprite_data.h"
+#include "display/SpriteEntry.h"
 #include "gamestate/GameState.h"
 
 #include "stats/items/ProjectileEntry.h"
@@ -105,9 +107,7 @@ void CombatGameInst::draw(GameState *gs) {
 	effects().draw_effect_sprites(gs, Pos(sx, sy));
 
 	if (is_resting) {
-		GLimage& restimg =
-				game_sprite_data[get_sprite_by_name("resting")].img();
-		gl_draw_image(view, restimg, x - spr.width() / 2, y - spr.height() / 2);
+		res::sprite("resting").draw(ldraw::DrawOptions(ldraw::CENTER), on_screen(gs, pos()));
 	}
 	CoreStats& ecore = effective_stats().core;
 

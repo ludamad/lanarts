@@ -9,7 +9,7 @@
 #include <lua.hpp>
 
 #include "draw/colour_constants.h"
-#include "display/sprite_data.h"
+#include "display/SpriteEntry.h"
 #include "gamestate/GameState.h"
 
 #include "lua/lua_api.h"

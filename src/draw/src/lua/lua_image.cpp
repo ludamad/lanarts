@@ -100,12 +100,8 @@ void lua_register_image(lua_State *L, const LuaValue & module) {
 	luawrap::install_type<ldraw::Image, lua_pushimage, lua_getimage2,
 			lua_checkimage>();
 
-#define BIND_FUNC(f)\
-	module[#f] = luawrap::function(L, f);
-
-	BIND_FUNC(image_load);
-	BIND_FUNC(image_split);
-	BIND_FUNC(image_split);
+	module["image_load"].bind_function(image_load);
+	module["image_split"].bind_function(image_split);
 }
 
 }

@@ -6,6 +6,7 @@
 #ifndef LDRAW_LUA_LDRAW_H_
 #define LDRAW_LUA_LDRAW_H_
 
+struct lua_State;
 class LuaValue;
 
 namespace ldraw {

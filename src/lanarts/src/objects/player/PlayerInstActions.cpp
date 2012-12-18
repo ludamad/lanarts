@@ -7,7 +7,7 @@
 #include <lua.hpp>
 
 #include "display/display.h"
-#include "display/sprite_data.h"
+#include "display/SpriteEntry.h"
 #include "display/TileEntry.h"
 #include "gamestate/GameState.h"
 #include "lua/lua_api.h"

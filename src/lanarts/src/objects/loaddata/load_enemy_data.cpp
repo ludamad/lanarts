@@ -41,6 +41,7 @@ void load_enemy_callbackf(const YAML::Node& node, lua_State* L,
 	EnemyEntry entry = parse_enemy_type(L, node);
 	game_enemy_data.push_back(entry);
 
+
 	(*value)[entry.name] = node;
 }
 

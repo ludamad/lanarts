@@ -9,7 +9,7 @@
 #include <typeinfo>
 
 #include "display/display.h"
-#include "display/sprite_data.h"
+#include "display/SpriteEntry.h"
 
 #include "gamestate/GameState.h"
 #include "gamestate/GameView.h"
@@ -31,12 +31,12 @@ void AnimatedInst::step(GameState* gs) {
 void AnimatedInst::draw(GameState* gs) {
 	GameView& view = gs->view();
 	if (sprite > -1) {
-		GLimage& img = game_sprite_data[sprite].img();
+		ldraw::Drawable& spr = res::sprite(sprite);
 
-		int w = img.width, h = img.height;
-		int xx = x - w / 2, yy = y - h / 2;
+		DimF size = spr.size();
+		int xx = x - size.w / 2, yy = y - size.h / 2;
 
-		if (!view.within_view(xx, yy, w, h))
+		if (!view.within_view(xx, yy, size.w, size.h))
 			return;
 		if (!gs->object_visible_test(this))
 			return;

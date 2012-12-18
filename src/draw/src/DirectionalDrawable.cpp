@@ -51,31 +51,16 @@ void DirectionalDrawable::draw(const DrawOptions& options,
 
 	directions[idx].draw(DrawOptions(options).angle(0), pos);
 }
-//
-//DirectionalDrawable DirectionalDrawable::split_image(const Image & image,
-//		const DimF & size, float angle_offset) {
-//	DirectionalDrawable dirdrawable(angle_offset);
-//	float w = image.size().w, h = image.size().h;
-//	int nwidth = ceil(w / size.w);
-//	int nheight = ceil(h / size.h);
-//	for (int y = 0; y < nheight; y++) {
-//		for (int x = 0; x < nwidth; x++) {
-//			float xx = x * size.w;
-//			float yy = y * size.h;
-//			BBoxF region(xx, yy, std::min(w, xx + size.w),
-//					std::min(h, yy + size.h));
-//			dirdrawable.add(Drawable(new Image(image, region)));
-//		}
-//	}
-//
-//	return dirdrawable;
-//}
 
 void DirectionalDrawable::add(const Drawable & direction) {
 	if (_duration_was_set) {
 		set_animation_duration(direction.animation_duration());
 	}
 	directions.push_back(direction);
+}
+
+DimF DirectionalDrawable::size() const {
+	return directions.at(0).size();
 }
 
 }

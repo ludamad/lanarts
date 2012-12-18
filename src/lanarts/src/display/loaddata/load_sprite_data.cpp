@@ -65,11 +65,11 @@ void load_sprite_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	std::string type = parse_defaulted(node, "type", std::string());
 	SpriteEntry entry = SpriteEntry(parse_str(node["name"]),
-			parse_imgfilelist(node), type_from_str(type),
+			parse_drawable(node), type_from_str(type),
 			parse_defaulted(node, "colour", Colour()));
 	game_sprite_data.push_back(entry);
 
-	(*value)[entry.name] = node;
+	(*value)[entry.name] = entry.sprite;
 }
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret(L);
@@ -79,10 +79,6 @@ LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames) {
 
 	load_data_impl_template(filenames, "sprites", load_sprite_callbackf, L,
 			&ret);
-
-	for (int i = 0; i < game_sprite_data.size(); i++) {
-		game_sprite_data[i].init();
-	}
 
 	return ret;
 }

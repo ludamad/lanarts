@@ -8,7 +8,7 @@
 
 #include <luawrap/LuaValue.h>
 
-#include "display/sprite_data.h"
+#include "display/SpriteEntry.h"
 
 #include "display/TileEntry.h"
 
