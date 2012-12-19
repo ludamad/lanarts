@@ -126,9 +126,8 @@ weapons:
     weapon_class: bows
     uses_projectile: yes
     #Stats
-    damage: {base: [4,7], strength: 1.20}
-    resist_modifier: 1.1
-    power: {base: 5, strength: 0.2}
-    range: 400
+    damage: {base: [7,10], strength: 1.20}
+    power: {base: 5, strength: 0.3}
+    range: 300
     cooldown: 55
     spr_item: long bow

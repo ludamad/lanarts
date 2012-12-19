@@ -72,14 +72,14 @@ void load_sprite_callbackf(const YAML::Node& node, lua_State* L,
 	(*value)[entry.name] = entry.sprite;
 }
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames) {
-	LuaValue ret(L);
-	ret.newtable();
+	LuaValue lsprites = luawrap::globals(L)["sprites"].ensure_table();
 
 	game_sprite_data.clear();
 
 	load_data_impl_template(filenames, "sprites", load_sprite_callbackf, L,
-			&ret);
+			&lsprites);
 
-	return ret;
+
+	return lsprites;
 }
 

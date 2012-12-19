@@ -21,6 +21,7 @@
 // Calls install_type:
 struct __LuaYAMLInitializer {
 	__LuaYAMLInitializer() {
+		printf("installing yaml\n");
 		luawrap::install_type<YAML::Node, lua_pushyaml>();
 	}
 } __initializer;

@@ -64,6 +64,7 @@ void Image::draw(const DrawOptions& options, const Posf& pos) const {
 	adjusted_options.draw_region = region.subregion(
 			_draw_region.scaled(1.0f / width(), 1.0f / height()));
 	adjusted_options.draw_region = _draw_region;
+	adjusted_options.draw_frame = 0; // GLImage does not accept this
 
 	if (!_rotates) {
 		adjusted_options.draw_angle = 0.0f;

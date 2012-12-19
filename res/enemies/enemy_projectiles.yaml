@@ -1,5 +1,16 @@
 ---
 projectiles:
+  - name: Dark Arrows
+    weapon_class: magic
+    damage_type: {physical: 1.0}
+    damage: { strength: 1.0 }    # 100% physical
+    power:  { strength: 0.2 }   
+    range: 300
+    cooldown: 30
+    speed: 9
+    spr_item: none
+    spr_attack: nessos arrows
+
   - name: Storm Bolt
     weapon_class: magic
     damage_type: {magic: 1.0}

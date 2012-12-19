@@ -67,7 +67,6 @@ void lua_lanarts_api(GameState* state, lua_State* L) {
 	lua_spelltarget_bindings(L);
 	lua_object_func_bindings(L);
 	lua_levelgen_func_bindings(L);
-	lua_api::register_api(state, L);
 
 	//Use C function name as lua function name:
 #define LUA_FUNC_REGISTER(f) \

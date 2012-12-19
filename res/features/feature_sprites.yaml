@@ -9,7 +9,5 @@ sprites:
     file: res/features/sprites/shop.png
 
   - name: statue
-    file: res/features/sprites/statues/statue
-    extension: .png
-    variations: 18
-    
+    type: animation
+    frames: res/features/sprites/statues/statue(0-17).png    

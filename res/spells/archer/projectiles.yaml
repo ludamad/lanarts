@@ -4,7 +4,7 @@ projectiles:
     weapon_class: magic
     damage_type: {magic: 1.0}
     damage: { base: [3,7], magic: 0.6, strength: 0.6 }
-    power: { base: 4, magic: 0.15, strength: 0.15 }
+    power: { base: 4, magic: 0.25, strength: 0.25 }
     range: 150
     speed: 9
     spr_item: none

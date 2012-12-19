@@ -32,7 +32,7 @@ medium_enemies: &medium_enemies
   - { enemy: Red Slime,         chance: 50,  group_chance: 33, group_size: [2,3]       }
   - { enemy: Chicken,           chance: 50                                             }
   - { enemy: Unseen Horror,     chance: 10                                             }
-  - { enemy: Krell,             chance: 10                                             }
+  - { enemy: Dark Centaur,      chance: 10                                             }
  
 hard_enemies: &hard_enemies
  - { enemy: Skeleton,          chance: 50                                              }
@@ -43,7 +43,7 @@ hard_enemies: &hard_enemies
  - { enemy: Zombie,            chance: 75                                              }
  - { enemy: Ciribot,           chance: 75                                              }
  - { enemy: Golem,             guaranteed_spawns: 1                                    }
- - { enemy: Krell,             chance: 30                                              }
+ - { enemy: Dark Centaur,      chance: 30                                              }
  - { enemy: Hell Forged,       chance: 10                                              }
  - { enemy: Unseen Horror,     chance: 10,   group_chance: 33, group_size: 2           }
 

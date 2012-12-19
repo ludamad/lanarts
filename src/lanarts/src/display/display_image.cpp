@@ -248,7 +248,7 @@ void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 	float direction = PI * 2.5 + atan2(dy, dx);
 
 	SpriteEntry& entry = game_sprite_data.at(sprite);
-	entry.sprite.draw(DrawOptions().colour(c).angle(direction).frame(steps), Pos(x,y));
+	entry.sprite.draw(DrawOptions().colour(c).angle(direction).frame(steps), Pos(x-view.x,y-view.y));
 }
 
 void gl_draw_sprite(sprite_id sprite, int x, int y, const Colour& c) {

@@ -24,6 +24,7 @@
 #include "interface/ButtonInst.h"
 
 #include "lua/lua_api.h"
+#include "lua/lua_yaml.h"
 #include "lua_api/lua_newapi.h"
 
 #include "objects/enemy/EnemyInst.h"
@@ -42,14 +43,21 @@ using namespace std;
 #endif
 
 static void init_system(GameSettings& settings, lua_State* L) {
-	load_settings_data(settings, "settings.yaml");
+	load_settings_data(settings, "settings.yaml"); // Load the initial settings
+
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		exit(0);
 	}
+
+	ldraw::display_initialize("Lanarts",
+			Dim(settings.view_width, settings.view_height),
+			settings.fullscreen);
+
 	lanarts_net_init(true);
-	ldraw::lua_register_ldraw(L, luawrap::globals(L));
-	ldraw::display_initialize("Lanarts", Dim(settings.view_width, settings.view_height), settings.fullscreen);
+	lua_api::preinit_state(L);
+
 	init_game_data(settings, L);
+
 }
 
 int main(int argc, char** argv) {
@@ -59,13 +67,11 @@ int main(int argc, char** argv) {
 	GameSettings settings;
 	init_system(settings, L);
 
+	//GameState claims ownership of the passed lua_State*
 	int windoww = settings.view_width, windowh = settings.view_height;
 	int vieww = windoww - HUD_WIDTH, viewh = windowh;
-
-	//Initialize the game state and start the level
-	//GameState claims ownership of the passed lua_State*
 	GameState* gs = new GameState(settings, L, vieww, viewh);
-
+	lua_api::register_api(gs, L);
 
 	gs->update_iostate(); //for first iteration
 	int exitcode = main_menu(gs, windoww, windowh);
@@ -78,6 +84,10 @@ int main(int argc, char** argv) {
 
 	save_settings_data(gs->game_settings(), "saved_settings.yaml");
 	SDL_Quit();
+
+	delete gs;
+
+//	lua_close(L); // TODO: To exit cleanly we must clear all resource vectors explicitly
 
 	return 0;
 }

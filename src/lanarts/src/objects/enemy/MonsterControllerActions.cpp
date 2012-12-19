@@ -182,19 +182,29 @@ void MonsterController::set_monster_headings(GameState* gs,
 
 		AttackStats attack;
 		bool viable_attack = attack_ai_choice(gs, e, p, attack);
-		WeaponEntry& wentry = attack.weapon.weapon_entry();
+		WeaponEntry& wentry = attack.weapon_entry();
+		bool hasproj = attack.projectile.id != NO_ITEM;
 
 		if (pdist < e->target_radius + p->target_radius) {
 			e->vx = 0, e->vy = 0;
 		}
-		int mindist = wentry.range() + e->target_radius - TILE_SIZE / 8;
+
 		if (viable_attack) {
 			int mindist = wentry.range() + p->target_radius + e->target_radius
 					- TILE_SIZE / 8;
+			if (hasproj) {
+				mindist = attack.projectile_entry().range();
+			}
 			if (!attack.is_ranged()) {
 				e->vx = 0, e->vy = 0;
-			} else if (pdist < std::min(mindist, 40)) {
-				e->vx = 0, e->vy = 0;
+			} else {
+				int close = 40;
+				if (e->etype().name == "Dark Centaur") { // hack for now
+					close = 150;
+				}
+				if (pdist < std::min(mindist, close)) {
+					e->vx = 0, e->vy = 0;
+				}
 			}
 			e->attack(gs, p, attack);
 

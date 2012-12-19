@@ -31,6 +31,23 @@ enemies:
         strength: 35
         defence: 12
         willpower: 6
+
+  - name: Dark Centaur
+    sprite: nessos
+    death_sprite: blood
+    radius: 12
+    xpaward: 30
+    appear_message: A dark centaur readies his bow.
+    defeat_message: The dark centaur has been defeated.
+    stats:
+        attacks: [ {projectile: Dark Arrows} ]
+        hp: 80
+        hpregen: 0.01
+        movespeed: 4
+        strength: 20
+        defence: 8
+        willpower: 3
+
 #    
 #  - name: Orc Knight
 #    sprite: orc knight

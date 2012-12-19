@@ -23,12 +23,15 @@
 
 namespace ldraw {
 
-void lua_register_ldraw(lua_State* L, const LuaValue& module) {
+void lua_register_ldraw(lua_State* L, const LuaValue& module, bool register_lcommon) {
 	using namespace ldraw;
+
+	if (register_lcommon) {
+		lua_register_lcommon(L, module);
+	}
+
 #define BIND_FUNC(f)\
 	module[#f] = luawrap::function(L, f)
-
-	lua_register_lcommon(L, module);
 
 	BIND_FUNC(draw_rectangle);
 	BIND_FUNC(draw_circle);

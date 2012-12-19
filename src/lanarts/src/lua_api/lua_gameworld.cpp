@@ -6,6 +6,7 @@
 #include <lua.hpp>
 #include <luawrap/luawrap.h>
 #include <luawrap/functions.h>
+#include <luawrap/types.h>
 
 #include <SDL.h>
 
@@ -14,6 +15,7 @@
 #include "gamestate/GameSettings.h"
 
 #include "lua_newapi.h"
+#include "lua_api.h"
 
 static int level_regenerate(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
@@ -27,9 +29,17 @@ static int level_regenerate(lua_State* L) {
 	return 0;
 }
 
+static int objects(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	gs->get_level()->game_inst_set().to_vector();
+	return 0;
+
+}
+
 namespace lua_api {
 	void register_gameworld_api(lua_State* L) {
 		LuaValue globals = luawrap::globals(L);
+		luawrap::install_type<GameInst*>();
 
 		LuaValue world = globals["world"].ensure_table();
 		LuaValue level = globals["level"].ensure_table();

@@ -18,7 +18,12 @@ namespace lua_api {
 	// Convenience function that performs above on captured lua state
 	GameState* gamestate(const LuaStackValue& val);
 
+	void preinit_state(lua_State* L); // TODO: This should be removed some time
+
 	void register_io_api(lua_State* L);
+
+	/* Register general utility functions */
+	void register_general_api(lua_State* L) ;
 
 	/* Functions for visual results in the lanarts world, eg drawing text */
 	void register_display_api(lua_State* L);

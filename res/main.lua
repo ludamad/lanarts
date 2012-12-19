@@ -56,6 +56,9 @@ local function mainloop(steponly)
 	return true;
 end
 
+function postdraw()
+end
+
 function main()
 
 	game.input_capture()

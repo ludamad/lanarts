@@ -21,3 +21,10 @@ sprites:
     
   - name: orc wizard
     file: res/enemies/humanoid/sprites/orc_wizard.png
+
+  - name: nessos
+    file: res/enemies/humanoid/sprites/nessos.png
+
+  - name: nessos arrows
+    type: directional
+    frames: res/enemies/humanoid/sprites/nessos-arrows.png%32x32

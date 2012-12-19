@@ -1,16 +1,16 @@
 ---
 sprites: 
   - name: fire bolt
-    file: res/effects/sprites/bolt04.png
+    type: directional
+    frames: res/spells/sprites/fireball.png%32x32
+#    file: res/effects/sprites/bolt04.png
 
   - name: magic bolt
     file: res/effects/sprites/bolt05.png
     
   - name: crystal spear
     type: directional
-    file: res/items/weapons/sprites/projectiles/crystal/crystal_spear
-    variations: 8
-    extension: .png
+    frames: res/items/weapons/sprites/projectiles/crystal/crystal_spear(0-7).png
     
   - name: magic arrow
     file: res/spells/sprites/magic_arrow.png

@@ -111,18 +111,15 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 	ChatMessage printed;
 	const char* content;
 	PlayerInst* p = gs->local_player();
-
 	lua_State* L = gs->luastate();
-	static LuaValue script_globals;
-	if (script_globals.empty()) {
-		script_globals.init(L);
-		script_globals.newtable();
-//		script_globals.push(L);
-//		int script = lua_gettop(L);
-//		lua_pushvalue(L, LUA_GLOBALSINDEX);
-//		lua_setmetatable(L, script);
-//		lua_pop(L, 1);
-	}
+
+	LuaValue script_globals(L);
+
+	lua_newtable(L);
+	lua_pushvalue(L, -1);
+	lua_setmetatable(L, -2);
+	script_globals.pop();
+	script_globals["__index"] = luawrap::globals(L);
 
 	lua_push_gameinst(L, p);
 	script_globals["player"].pop();

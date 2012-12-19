@@ -70,9 +70,7 @@ GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 	init_data.seed = generate_seed();
 }
 
-GameState::~GameState() {
-	lua_close(L);
-}
+GameState::~GameState() {}
 
 void GameState::start_connection() {
 	if (settings.conntype == GameSettings::SERVER) {

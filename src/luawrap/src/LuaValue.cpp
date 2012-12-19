@@ -219,6 +219,11 @@ namespace _luawrap_private {
 		return LuaValue::pop_value(L);
 	}
 
+	void _LuaField::operator =(const LuaStackValue& value) {
+		value.push();
+		pop();
+	}
+
 	void _LuaField::bind_function(lua_CFunction func) {
 		lua_pushcfunction(value.luastate(), func);
 		pop();

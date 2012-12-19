@@ -40,15 +40,11 @@ sprites:
 
   - name: arrow_projectile
     type: directional
-    file: res/items/weapons/sprites/projectiles/arrow
-    variations: 8
-    extension: .png
+    frames: res/items/weapons/sprites/projectiles/arrow(0-7).png
 
   - name: stone_arrow_projectile
     type: directional
-    file: res/items/weapons/sprites/projectiles/bolt
-    variations: 8
-    extension: .png
+    frames: res/items/weapons/sprites/projectiles/bolt(0-7).png
 
   - name: arrow_item
     file: res/items/weapons/sprites/arrow.png

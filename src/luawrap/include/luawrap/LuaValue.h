@@ -59,6 +59,7 @@ namespace _luawrap_private {
 
 		template<typename T> void operator =(const T& value);
 		void operator =(const LuaValue& value);
+		void operator =(const LuaStackValue& value);
 		void operator =(const char* str);
 		void operator =(lua_CFunction func);
 		void operator =(const _LuaField& field);

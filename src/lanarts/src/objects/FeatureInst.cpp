@@ -33,7 +33,9 @@ void FeatureInst::draw(GameState* gs) {
 	Colour drawcolour = COL_WHITE;
 	if (last_seen_spr > -1) {
 		SpriteEntry& spr_entry = game_sprite_data.at(last_seen_spr);
-		res::sprite(sprite_frame).draw(ldraw::DrawOptions().origin(ldraw::CENTER).colour(drawcolour), on_screen(gs,pos()));;
+		res::sprite(last_seen_spr).draw(
+				ldraw::DrawOptions().origin(ldraw::CENTER).frame(sprite_frame).colour(
+						drawcolour), on_screen(gs, pos()));
 	}
 }
 
