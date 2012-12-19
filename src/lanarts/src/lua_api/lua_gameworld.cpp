@@ -39,7 +39,6 @@ static int objects(lua_State* L) {
 namespace lua_api {
 	void register_gameworld_api(lua_State* L) {
 		LuaValue globals = luawrap::globals(L);
-		luawrap::install_type<GameInst*>();
 
 		LuaValue world = globals["world"].ensure_table();
 		LuaValue level = globals["level"].ensure_table();
