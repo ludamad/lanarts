@@ -15,7 +15,7 @@
 #include "gamestate/GameSettings.h"
 
 #include "lua_newapi.h"
-#include "lua_api.h"
+#include "lua/lua_api.h"
 
 static int level_regenerate(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
