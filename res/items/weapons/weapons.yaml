@@ -35,10 +35,10 @@ weapons:
     shop_cost: [70, 100]
     weapon_class: short blades
     description: A swift blade once owned by a powerful warrior.
-    damage: {base: [7,11], strength: 1.1}
+    damage: {base: [5,11], strength: 1.1}
     power: {base: 4, strength: 0.3}
     range: 7
-    cooldown: 40
+    cooldown: 50
     spr_item: samurai sabre
     
   - name: Iron Broadsword
