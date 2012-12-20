@@ -10,7 +10,7 @@ function is_projectile(item) 	return item.type == "projectile" end
 
 -- End of Lua API constants
 
-dofile "res/actors/actors.lua"
+-- dofile "res/actors/actors.lua"
 
 -- Include all other lua files here
 --dofile "res/projectiles.lua"
