@@ -44,6 +44,9 @@ namespace lua_api {
 	// Callbacks into the lua VM:
 	void luacall_main(lua_State* L);
 	void luacall_postdraw(lua_State* L);
+
+	// Lua utilities:
+	int l_itervalues(lua_State* L);
 }
 
 

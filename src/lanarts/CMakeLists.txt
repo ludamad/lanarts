@@ -28,7 +28,6 @@ include_directories(
 	${LIBS}/yaml-cpp/include 
 	${LIBS}/lua 
 	${LIBS}#/rvo2 
-	${LIBS}/slb/include
 	)
 
 file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 

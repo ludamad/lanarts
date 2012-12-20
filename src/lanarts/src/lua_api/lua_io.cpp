@@ -47,12 +47,34 @@ static bool key_held(const LuaStackValue& value) {
 	return gs->key_down_state(lua_tokeycode(value));
 }
 
+static int mouse_coords(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	luawrap::push(L, gs->mouse_pos());
+	return 1;
+}
+
+static Pos screen_coords(const LuaStackValue& value) {
+	GameState* gs = lua_api::gamestate(value);
+	return on_screen(gs, value.as<Pos>());
+}
+
+static Pos world_coords(const LuaStackValue& value) {
+	GameState* gs = lua_api::gamestate(value);
+	Pos p = value.as<Pos>();
+	p.x += gs->view().x;
+	p.y += gs->view().y;
+	return p;
+}
+
 namespace lua_api {
 	void register_io_api(lua_State* L) {
 		LuaValue globals = luawrap::globals(L);
 
 		globals["key_pressed"].bind_function(key_pressed);
 		globals["key_held"].bind_function(key_held);
+		globals["mouse_coords"].bind_function(mouse_coords);
+		globals["screen_coords"].bind_function(screen_coords);
+		globals["world_coords"].bind_function(world_coords);
 
 		LuaValue keys = globals["keys"].ensure_table();
 

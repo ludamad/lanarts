@@ -33,8 +33,8 @@ void floodfill(PathingNode* path, int w, int h, int sx, int sy, int alloc_w) {
 		for (int dy = -1; dy <= +1; dy++) {
 			for (int dx = -1; dx <= +1; dx++) {
 				int nx = curr.x + dx, ny = curr.y + dy;
-				LANARTS_ASSERT(
-						curr.x >= 0 && curr.x < w && curr.y >= 0 && curr.y < h);
+				//LANARTS_ASSERT(
+				//		curr.x >= 0 && curr.x < w && curr.y >= 0 && curr.y < h);
 				if (nx < 0 || nx >= w || ny < 0 || ny >= h)
 					continue;
 				int coord = ny * alloc_w + nx;

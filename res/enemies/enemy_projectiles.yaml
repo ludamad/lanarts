@@ -62,7 +62,7 @@ projectiles:
     cooldown: 70
     speed: 6
     spr_item: none
-    spr_attack: fire bolt    
+    spr_attack: fire ball
 
   - name: Big Stone
     weapon_class: physical

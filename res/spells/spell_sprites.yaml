@@ -3,7 +3,9 @@ sprites:
   - name: fire bolt
     type: directional
     frames: res/spells/sprites/fireball.png%32x32
-#    file: res/effects/sprites/bolt04.png
+
+  - name: fire ball
+    file: res/spells/sprites/fireball2.png
 
   - name: magic bolt
     file: res/effects/sprites/bolt05.png

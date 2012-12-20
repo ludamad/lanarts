@@ -10,7 +10,10 @@ function is_projectile(item) 	return item.type == "projectile" end
 
 -- End of Lua API constants
 
+dofile "res/actors/actors.lua"
+
 -- Include all other lua files here
+--dofile "res/projectiles.lua"
 dofile "res/enemies/enemies.lua"
 dofile "res/items/items.lua"
 dofile "res/items/weapons/weapons.lua"
@@ -88,6 +91,7 @@ function main()
 		end
 
 		if key_pressed(keys.F5) then
+			game.input_capture(true) -- reset input
 			net.sync_message_send()
 			game.save("savefile.save")
 		end

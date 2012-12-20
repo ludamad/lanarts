@@ -288,7 +288,7 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	}
 
 	perf_timer_begin(FUNCNAME);
-	bool is_fullpath = true;
+	bool is_fullpath = false;
 	if (eb.path_cooldown > 0) {
 		eb.path_cooldown--;
 		is_fullpath = false;
@@ -297,6 +297,7 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 
 	do {
 		int targx, targy;
+		int tries_left = 35; // arbitrary number
 		do {
 			if (!is_fullpath) {
 				targx = ex + mt.rand(-3, 4);
@@ -305,13 +306,17 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 				targx = mt.rand(tile.tile_width());
 				targy = mt.rand(tile.tile_height());
 			}
-		} while (tile.is_solid(targx, targy));
+			tries_left--;
+		} while (tries_left > 0 && tile.is_solid(targx, targy));
+
+		if (tries_left == 0) {
+			return; // Avoid pathological cases
+		}
 
 		eb.current_node = 0;
 		eb.path = astarcontext.calculate_AStar_path(gs, ex, ey, targx, targy);
 		if (is_fullpath) {
-			eb.path_cooldown = mt.rand(
-					EnemyBehaviour::RANDOM_WALK_COOLDOWN * 2);
+			eb.path_cooldown = EnemyBehaviour::RANDOM_WALK_COOLDOWN/2 + mt.rand(EnemyBehaviour::RANDOM_WALK_COOLDOWN);
 		}
 		eb.current_action = EnemyBehaviour::FOLLOWING_PATH;
 	} while (eb.path.size() <= 1);
