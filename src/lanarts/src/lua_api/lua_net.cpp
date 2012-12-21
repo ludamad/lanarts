@@ -3,6 +3,7 @@
  *  Bindings for network-play related actions
  */
 
+#include <vector>
 #include <lua.hpp>
 #include <luawrap/luawrap.h>
 #include <luawrap/functions.h>

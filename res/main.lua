@@ -30,7 +30,9 @@ local paused = false
 local function mainloop(steponly)
 	perf.timing_begin("**Game Frame**")
 
+	perf.timing_begin("**Sync Message**")
 	net.sync_message_consume()
+	perf.timing_end("**Sync Message**")
 
 	local timer = timer_create()
 
@@ -51,7 +53,9 @@ local function mainloop(steponly)
 	local surplus = settings.time_per_step - timer:get_milliseconds()
 
 	if surplus > 0 then 
+		perf.timing_begin("**Surplus**")
 		game.wait(surplus) 
+		perf.timing_end("**Surplus**")
 	end
 
 	perf.timing_end("**Game Frame**")

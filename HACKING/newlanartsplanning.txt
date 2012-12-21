@@ -8,3 +8,40 @@
 	pushing -> tied to brute skills)
 - Berserk tech tree -> honestly it progresses pretty naturally ...
 	-> make it tied to severe spellcasting penalties
+
+
+Observation, it is actually more expressive if objects have some hard-coded category of interactions
+this way we can deal with different types of objects with some invariants for their behaviour
+Different objects:
+GameInst
+	> ActorInst
+		> PlayerInst
+		> MonsterInst -- everything that isnt a monster, eg helper allies, too
+	> MapFeatureInst
+		> We need some kind of type that can be used to implement traps, etc
+		> It shouldn't be locked in C++ too strongly (new interactive objects must be definable)
+		> Common feature: persist on map once out of view
+			> Doors, items, stores, etc
+	> SpriteInst
+		> only a drawing presence
+	> ProjectileInst
+		> Created by spells, temporary, dynamic
+ScriptedInst is stupid, never had an identity
+
+Different drawables/object:
+	> It would be nice if the objects could draw at different depths
+	> not worth it
+
+
+local function draw_halo():
+	--etc
+	
+create() # Call -after- init ? needs args ...
+# Maybe this should be init() and read already-set projectile stuff
+# Therefore each object type has a predefined set of input ... hm
+destroy()
+step()
+draw()
+
+function draw():
+	draw_at_depth(depths.ITEM_LAYER+2, draw_halo) # Probably better to just have 'children' objects for this purpose

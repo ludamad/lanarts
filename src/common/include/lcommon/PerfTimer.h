@@ -12,9 +12,11 @@
 struct MethodPerfProfile {
 	Timer timer;
 	int total_calls;
+	long max_microseconds;
 	long long total_microseconds;
-	MethodPerfProfile(int total_calls = 0, long long total_microseconds = 0) :
-			total_calls(total_calls), total_microseconds(total_microseconds) {
+	double qvalue; // used in formula standard deviation = square root of (Q / total calls)
+	MethodPerfProfile() :
+			total_calls(0), max_microseconds(0), total_microseconds(0), qvalue(0) {
 	}
 	void begin_timer();
 	void end_timer();

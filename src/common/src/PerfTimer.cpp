@@ -3,16 +3,27 @@
  *  Provides timing information on a per-method basis
  */
 
+#include <algorithm>
 #include "PerfTimer.h"
-
 
 void MethodPerfProfile::begin_timer() {
 	timer.start();
 }
 
 void MethodPerfProfile::end_timer() {
+	long timemicro = timer.get_microseconds();
+
+	// Note, converting to float can be pricey
+	double ftime = timemicro;
+	double ftotal = total_microseconds;
+	double avg1 = ftotal / total_calls;
+	double avg2 = (ftotal + timemicro) / (total_calls + 1);
+
 	total_calls++;
-	total_microseconds += timer.get_microseconds();
+	max_microseconds = std::max(max_microseconds, timemicro);
+	total_microseconds += timemicro;
+	qvalue += (ftime - avg1) * (ftime - avg2);
+
 }
 
 void PerfTimer::begin(const char* method) {
@@ -46,7 +57,6 @@ void PerfTimer::clear() {
 	perf_map.clear();
 }
 
-
 static PerfTimer __global_timer;
 
 void perf_timer_begin(const char* funcname) {
@@ -68,5 +78,4 @@ double perf_timer_average_time(const char* funcname) {
 void perf_print_results() {
 	__global_timer.print_results();
 }
-
 
