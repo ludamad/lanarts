@@ -3,6 +3,7 @@
  *  Provides timing information on a per-method basis
  */
 
+#include <cmath>
 #include <algorithm>
 #include "PerfTimer.h"
 
@@ -40,9 +41,11 @@ void PerfTimer::print_results() {
 	for (; it != perf_map.end(); ++it) {
 		MethodPerfProfile& mpp = it->second;
 		float total = mpp.total_microseconds / 1000.0f;
+		float max = mpp.max_microseconds / 1000.0f;
 		float avg = total / mpp.total_calls;
-		printf("%s:\n\tAVG %.4fms\tTOTAL\t %.4fms\tCALLS\t %d\n", it->first,
-				avg, total, mpp.total_calls);
+		float stddev = sqrt(mpp.qvalue / mpp.total_calls) / 1000.0f;
+		printf("%s:\n\tAVG %.4fms\tTOTAL\t %.4fms\tCALLS\t %d\tMAX %.4fms\tSTDDEV %.4fms\n", it->first,
+				avg, total, mpp.total_calls, max, stddev);
 	}
 	printf("**** END PERFORMANCE STATS ****\n");
 }
