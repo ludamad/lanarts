@@ -13,18 +13,16 @@ void MethodPerfProfile::begin_timer() {
 
 void MethodPerfProfile::end_timer() {
 	long timemicro = timer.get_microseconds();
+	total_calls++;
+	total_microseconds += timemicro;
 
 	// Note, converting to float can be pricey
 	double ftime = timemicro;
-	double ftotal = total_microseconds;
-	double avg1 = ftotal / total_calls;
-	double avg2 = (ftotal + timemicro) / (total_calls + 1);
+	double avg2 = total_microseconds / double(total_calls);
 
-	total_calls++;
 	max_microseconds = std::max(max_microseconds, timemicro);
-	total_microseconds += timemicro;
-	qvalue += (ftime - avg1) * (ftime - avg2);
-
+	qvalue += (ftime - avg) * (ftime - avg2); // Part of a standard deviation formula, hell if I understand it
+	avg = avg2;
 }
 
 void PerfTimer::begin(const char* method) {
@@ -44,8 +42,17 @@ void PerfTimer::print_results() {
 		float max = mpp.max_microseconds / 1000.0f;
 		float avg = total / mpp.total_calls;
 		float stddev = sqrt(mpp.qvalue / mpp.total_calls) / 1000.0f;
-		printf("%s:\n\tAVG %.4fms\tTOTAL\t %.4fms\tCALLS\t %d\tMAX %.4fms\tSTDDEV %.4fms\n", it->first,
-				avg, total, mpp.total_calls, max, stddev);
+		float stddev_percentage = (stddev / avg) * 100.0f;
+		printf("%s:\n\tAVG %.4fms"
+				"\tTOTAL\t %.4fms"
+				"\tCALLS\t %d"
+				"\n\tSTDDEV +-%.4fms, +-%.2f%%"
+				"\tMAX %.4fms\n",
+				it->first, avg,
+				total,
+				mpp.total_calls,
+				stddev, stddev_percentage,
+				max);
 	}
 	printf("**** END PERFORMANCE STATS ****\n");
 }

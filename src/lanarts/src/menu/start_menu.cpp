@@ -94,7 +94,7 @@ int main_menu(GameState* gs, int width, int height) {
 	setup_mainmenu_buttons(gs, &exit, halfw, 300);
 
 	for (; !exit && !gs->key_press_state(SDLK_RETURN);) {
-		if (!gs->update_iostate()) {
+		if (!gs->update_iostate() || gs->key_press_state(SDLK_ESCAPE)) {
 			return +1;
 		}
 		gs->get_level()->game_inst_set().step(gs);

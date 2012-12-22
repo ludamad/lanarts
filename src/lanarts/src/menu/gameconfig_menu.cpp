@@ -392,7 +392,7 @@ int class_menu(GameState* gs, int width, int height) {
 	GameSettings::connection_type conntype = gs->game_settings().conntype;
 
 	for (; exitcode == 0;) {
-		if (!gs->update_iostate()) {
+		if (!gs->update_iostate() || gs->key_press_state(SDLK_ESCAPE)) {
 			return +1;
 		}
 		if (conntype != gs->game_settings().conntype) {

@@ -92,7 +92,7 @@ void lobby_menu(GameState* gs, int width, int height) {
 	setup_connectionmenu_buttons(gs, &exit, halfw, 300);
 
 	for (; !exit;) {
-		if (!gs->update_iostate()) {
+		if (!gs->update_iostate() || gs->key_press_state(SDLK_ESCAPE)) {
 			::exit(0);
 		}
 		gs->net_connection().poll_messages();

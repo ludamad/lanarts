@@ -221,13 +221,15 @@ int IOController::handle_event(SDL_Event* event) {
 	iostate.keymod = event->key.keysym.mod;
 	iostate.sdl_events.push_back(*event);
 	SDLKey key = event->key.keysym.sym;
+	bool shift_held = (iostate.keymod & KMOD_LSHIFT) || (iostate.keymod & KMOD_RSHIFT);
+	bool ctrl_held = (iostate.keymod & KMOD_LCTRL) || (iostate.keymod & KMOD_RCTRL);
 
 	switch (event->type) {
 	case SDL_ACTIVEEVENT:
 		break;
 
 	case SDL_KEYDOWN: {
-		if (key == SDLK_ESCAPE) {
+		if (shift_held && key == SDLK_ESCAPE) {
 			done = 1;
 		}
 		iostate.key_down_states[key] = 1;

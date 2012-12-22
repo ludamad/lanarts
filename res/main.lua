@@ -90,6 +90,10 @@ function main()
 			game.input_capture(true) -- reset input
 		end
 
+		if key_pressed(keys.ESCAPE) then 
+			show_message("Press Shift + Esc to exit, any unsaved progress will be lost!")
+		end
+
 		if not mainloop(false) then
 			break
 		end

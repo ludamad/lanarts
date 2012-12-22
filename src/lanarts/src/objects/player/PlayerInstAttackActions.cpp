@@ -536,8 +536,12 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		ProjectileEntry& pentry = projectile.projectile_entry();
 		item_id item = get_item_by_name(pentry.name.c_str());
 		int weaprange = std::max(wentry.range(), pentry.range());
+		Weapon w = weapon();
+		if (w.weapon_entry().weapon_class != pentry.weapon_class) {
+			w = Weapon(); // Do not take into account weapon if it mismatches the projectile
+		}
 
-		AttackStats weaponattack(weapon());
+		AttackStats weaponattack(w);
 
 		bool wallbounce = false;
 		int nbounces = 0;

@@ -14,9 +14,10 @@ struct MethodPerfProfile {
 	int total_calls;
 	long max_microseconds;
 	long long total_microseconds;
+	double avg;
 	double qvalue; // used in formula standard deviation = square root of (Q / total calls)
 	MethodPerfProfile() :
-			total_calls(0), max_microseconds(0), total_microseconds(0), qvalue(0) {
+			total_calls(0), max_microseconds(0), total_microseconds(0), avg(0), qvalue(0) {
 	}
 	void begin_timer();
 	void end_timer();
