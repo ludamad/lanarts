@@ -137,6 +137,11 @@ private:
 	fov fieldofview;
 	bool local, moving;
 
+	// Used when eg run out of projectiles.
+	// We will switch to another weapon type but want to
+	// switch back the moment we pick up a projectile
+	std::string last_chosen_weaponclass;
+
 	int autouse_mana_potion_try_count;
 	int lives, deaths;
 	int previous_spellselect, spellselect;

@@ -32,6 +32,7 @@ PlayerInst::PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y,
 				false), fieldofview(LINEOFSIGHT), local(local), moving(0), autouse_mana_potion_try_count(
 				0), lives(0), deaths(0), previous_spellselect(0), spellselect(
 				-1) {
+	last_chosen_weaponclass = "unarmed";
 }
 
 void PlayerInst::init(GameState* gs) {

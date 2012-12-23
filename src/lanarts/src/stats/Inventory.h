@@ -32,16 +32,16 @@ struct ItemSlot {
 	int amount() const {
 		return item.amount;
 	}
-	ItemEntry& item_entry() {
+	ItemEntry& item_entry() const {
 		return item.item_entry();
 	}
-	EquipmentEntry& equipment_entry() {
+	EquipmentEntry& equipment_entry() const {
 		return item.equipment_entry();
 	}
-	WeaponEntry& weapon_entry() {
+	WeaponEntry& weapon_entry() const {
 		return item.weapon_entry();
 	}
-	ProjectileEntry& projectile_entry() {
+	ProjectileEntry& projectile_entry() const {
 		return item.projectile_entry();
 	}
 	ItemProperties& properties() {
@@ -115,8 +115,12 @@ private:
 	std::vector<ItemSlot> items;
 };
 
-
 bool valid_to_use_projectile(const Inventory& inventory, const Projectile& proj);
+// returns -1 if no such item
+itemslot_t projectile_compatible_weapon(const Inventory& inventory, const Projectile& proj);
+// returns false if not possible
+bool projectile_smart_equip(Inventory& inventory, itemslot_t itemslot);
+
 Weapon equipped_weapon(const Inventory& inventory);
 Projectile equipped_projectile(const Inventory& inventory);
 Equipment equipped_armour(const Inventory& inventory);

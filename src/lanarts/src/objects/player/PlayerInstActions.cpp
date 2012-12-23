@@ -411,6 +411,7 @@ static void item_do_lua_action(lua_State* L, ItemEntry& type, GameInst* user,
 	lua_pushnumber(L, amnt);
 	lua_call(L, 5, 0);
 }
+
 void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 	if (!effective_stats().allowed_actions.can_use_items) {
 		return;
@@ -427,9 +428,23 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 			if (itemslot.is_equipped()) {
 				inventory().deequip(slot);
 			} else {
-				if (!item.is_projectile()
-						|| valid_to_use_projectile(inventory(), item)) {
+				if (item.is_projectile()) {
+					// Best-effort to equip, may not be possible:
+					projectile_smart_equip(inventory(), slot);
+				} else if (item.is_weapon()) {
+					const Projectile& p = equipment().projectile();
+					if (!p.empty()) {
+						if (p.projectile_entry().is_standalone()) {
+							inventory().deequip_type(EquipmentEntry::PROJECTILE);
+						}
+					}
 					equipment().equip(slot);
+				} else {
+					equipment().equip(slot);
+				}
+
+				if (item.is_weapon() || item.is_projectile()) {
+					last_chosen_weaponclass = weapon().weapon_entry().weapon_class;
 				}
 			}
 		} else if (equipment().valid_to_use(item)

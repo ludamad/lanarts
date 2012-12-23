@@ -177,6 +177,38 @@ Projectile equipped_projectile(const Inventory & inventory) {
 	}
 }
 
+itemslot_t projectile_compatible_weapon(const Inventory& inventory,
+		const Projectile& proj) {
+	ProjectileEntry& pentry = proj.projectile_entry();
+	int size = inventory.max_size();
+	// -- first try option that works with preferred weapon type
+	for (itemslot_t i = 0; i < size; i++) {
+		const ItemSlot& slot = inventory.get(i);
+		if (!slot.empty() && slot.item.is_weapon()) {
+			if (slot.weapon_entry().weapon_class == pentry.weapon_class) {
+				return i;
+			}
+		}
+	}
+	return -1;
+}
+
+bool projectile_smart_equip(Inventory& inventory,
+		itemslot_t itemslot) {
+	const Projectile& proj = inventory.get(itemslot).item;
+	if (valid_to_use_projectile(inventory, proj)) {
+		inventory.equip(itemslot);
+		return true;
+	}
+	itemslot_t weapon_slot = projectile_compatible_weapon(inventory, proj);
+	if (weapon_slot != -1) {
+		inventory.equip(weapon_slot);
+		inventory.equip(itemslot);
+		return true;
+	}
+	return false;
+}
+
 Equipment equipped_armour(const Inventory & inventory) {
 	itemslot_t slot = inventory.get_equipped(EquipmentEntry::BODY_ARMOUR);
 	if (slot != -1) {

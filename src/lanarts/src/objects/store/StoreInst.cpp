@@ -17,14 +17,21 @@
 
 #include "StoreInst.h"
 
+const int MAX_PLAYERS_IN_STORE = 25;
+
 void StoreInst::step(GameState* gs) {
 	if (gs->object_visible_test(this)) {
 		last_seen_spr = spriteid;
 	}
-	GameInst* player = NULL;
-	gs->object_radius_test(this, &player, 1, player_colfilter, x, y, 24);
-	if (player == (GameInst*)gs->local_player()) {
-		gs->game_hud().override_sidebar_contents(&sidebar_display);
+	GameInst* players[MAX_PLAYERS_IN_STORE];
+
+	int nplayers = gs->object_radius_test(this, players, MAX_PLAYERS_IN_STORE,
+			player_colfilter, x, y, 24);
+
+	for (int i = 0; i < nplayers; i++ ) {
+		if ((PlayerInst*)players[i] == gs->local_player()) {
+			gs->game_hud().override_sidebar_contents(&sidebar_display);
+		}
 	}
 }
 

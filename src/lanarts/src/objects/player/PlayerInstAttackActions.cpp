@@ -266,8 +266,8 @@ static void player_use_spell(GameState* gs, PlayerInst* p,
 		player_use_projectile_spell(gs, p, spl_entry, spl_entry.projectile,
 				target);
 	} else {
-		player_use_luacallback_spell(gs, p, spl_entry, spl_entry.action_func.get(L),
-				target);
+		player_use_luacallback_spell(gs, p, spl_entry,
+				spl_entry.action_func.get(L), target);
 	}
 }
 
@@ -510,7 +510,21 @@ static void lua_hit_callback(lua_State* L, LuaValue& callback, GameInst* user,
 	}
 }
 
-#include "PlayerInst.h"
+// Happens when you use up a projectile
+// -- next try option some other weapon projectile
+// -- next try unarmed projectile (redundant if already prefer unarmed)
+// -- next try melee weapons
+// -- next try unarmed melee
+static void exhaust_projectile_autoequip(PlayerInst* player,
+		const std::string& preferred_class) {
+	Inventory& inv = player->inventory();
+	size_t size = inv.max_size();
+	// -- first try option that works with preferred weapon type
+	for (itemslot_t i = 0; i < size; i++) {
+		ItemSlot& slot = inv.get(i);
+	}
+}
+
 void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 	lua_State* L = gs->luastate();
 
@@ -596,7 +610,8 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 
 		for (int i = 0; i < numhit; i++) {
 			EnemyInst* e = (EnemyInst*)enemies[i];
-			lua_hit_callback(gs->luastate(), wentry.action_func().get(L), this, e);
+			lua_hit_callback(gs->luastate(), wentry.action_func().get(L), this,
+					e);
 			if (attack(gs, e, AttackStats(equipment().weapon()))) {
 				PlayerData& pc = gs->player_data();
 				signal_killed_enemy();

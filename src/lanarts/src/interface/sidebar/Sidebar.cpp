@@ -64,7 +64,7 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 	int x_interval = width / 2;
 	int y_interval = 15;
 
-	gs->font().drawf(COL_WHITE, Pos(x - 10 + x_interval, 15), "Level %d",
+	gs->font().drawf(ldraw::DrawOptions(COL_WHITE).origin(ldraw::CENTER), Pos(x - 10 + x_interval, 15), "Level %d",
 			class_stats.xplevel);
 
 //	y += y_interval;
