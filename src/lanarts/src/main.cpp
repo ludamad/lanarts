@@ -38,10 +38,6 @@
 
 using namespace std;
 
-#ifdef __WIN32
-#define main SDL_main
-#endif
-
 static void init_system(GameSettings& settings, lua_State* L) {
 	load_settings_data(settings, "settings.yaml"); // Load the initial settings
 
@@ -60,6 +56,7 @@ static void init_system(GameSettings& settings, lua_State* L) {
 
 }
 
+extern "C" {
 int main(int argc, char** argv) {
 	const int HUD_WIDTH = 160;
 	lua_State* L = lua_open();
@@ -90,4 +87,5 @@ int main(int argc, char** argv) {
 //	lua_close(L); // TODO: To exit cleanly we must clear all resource vectors explicitly
 
 	return 0;
+}
 }

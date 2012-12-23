@@ -16,6 +16,7 @@
 
 #ifdef _MSC_VER
 #define round(x) floor(x + 0.5f)
+#define snprintf _snprintf
 #endif
 
 //TODO remove from lanarts_defines.h

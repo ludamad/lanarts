@@ -19,7 +19,7 @@ void run_lcommon_tests() {
 	unit_test_print_count();
 }
 
-int main() {
+int main(int argc, char** argv) {
 	run_lcommon_tests();
 	return unit_test_has_failure();
 }

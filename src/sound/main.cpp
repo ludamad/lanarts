@@ -13,7 +13,7 @@ lsound::Sound music2;
 void handleKey(SDL_KeyboardEvent key);
 void musicDone();
 
-int main(void) {
+int main(int argc, char** argv) {
 
 	SDL_Surface *screen;
 	SDL_Event event;

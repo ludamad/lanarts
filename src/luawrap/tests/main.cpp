@@ -10,6 +10,6 @@ void unit_test_assert(const std::string& msg, bool condition) {
 	}
 }
 
-int main() {
+int main(int argc, char** argv) {
 	return UnitTest::RunAllTests();
 }

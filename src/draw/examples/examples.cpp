@@ -175,7 +175,7 @@ static void draw_luascript(lua_State* L, const char* file) {
 	}
 }
 
-int main(int argc, const char** argv) {
+int main(int argc, char** argv) {
 	using namespace ldraw;
 
 	display_initialize(__FILE__, Dim(400, 400), false);

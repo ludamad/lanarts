@@ -33,26 +33,29 @@ static bool query_ext_string(const std::string& extension,
 
 #if (defined (WIN32) || defined (_WIN32))
 
-//TODO: Test this on windows!
+#define WIN32_LEAN_AND_MEAN 1
+#include <windows.h>
+#include "wglext.h"
 
-#include <GL/wglext.h>
-
-static bool wgl_check_extension(const std::string& extension) {
-    // this is pointer to function which returns pointer to string with list of all wgl extensions
-    PFNWGLGETEXTENSIONSSTRINGEXTPROC _wglGetExtensionsStringEXT = NULL;
-
-    // determine pointer to wglGetExtensionsStringEXT function
-    _wglGetExtensionsStringEXT = (PFNWGLGETEXTENSIONSSTRINGEXTPROC) wglGetProcAddress("wglGetExtensionsStringEXT");
-
-    return query_ext_string(extension, _wglGetExtensionsString());
-}
 // Attempts to enable/disable vsync, returns false if it is unable to do so
 bool gl_set_vsync(bool state) {
-	PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = NULL;
-	if (!wgl_check_extension("WGL_EXT_swap_control")) return false;
+	typedef BOOL (APIENTRY *PFNWGLSWAPINTERVALFARPROC)( int );
+	PFNWGLSWAPINTERVALFARPROC wglSwapIntervalEXT = 0;
 
-    wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC) LogGetProcAddress("wglSwapIntervalEXT");
-    wglSwapIntervalEXT(state);
+	const char* extensions = (const char*)glGetString( GL_EXTENSIONS );
+	//TODOL correctly query wglExtension string
+	if (false && !query_ext_string("WGL_EXT_swap_control", extensions)) {
+		return false;
+	}
+
+	wglSwapIntervalEXT = (PFNWGLSWAPINTERVALFARPROC)wglGetProcAddress( "wglSwapIntervalEXT" );
+
+	if (!wglSwapIntervalEXT) {
+		return false;
+	}
+
+	wglSwapIntervalEXT(state);
+
     return true;
 }
 

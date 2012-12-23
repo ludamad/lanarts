@@ -76,7 +76,9 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
 
 	glDisable(GL_TEXTURE_2D);
 
-	gl_set_vsync(false);
+	if (!gl_set_vsync(false) ) {
+		printf("Disabling vsync not supported, please do this in graphics card settings for best performance.\n");
+	}
 
 	gl_set_drawing_area(0, 0, w, h);
 }

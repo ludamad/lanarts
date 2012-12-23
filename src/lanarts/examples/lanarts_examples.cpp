@@ -140,7 +140,8 @@ static void setup_lua_state() {
 	globals["drawablelist_parse"].bind_function(drawablelist_parse);
 }
 
-int main(int argc, const char** argv) {
+// Must be char** argv to play nice with SDL on windows!
+int main(int argc, char** argv) {
 	using namespace ldraw;
 
 	if (argc < 2) {
@@ -156,4 +157,3 @@ int main(int argc, const char** argv) {
 
 	lua_close(L);
 }
-

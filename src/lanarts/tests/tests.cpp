@@ -24,7 +24,7 @@ void run_unit_tests() {
 }
 
 
-int main() {
+int main(int argc, char** argv) {
 	run_unit_tests();
 	return 0;
 }
