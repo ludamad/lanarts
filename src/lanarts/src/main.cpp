@@ -7,6 +7,7 @@
 
 #include <ldraw/display.h>
 #include <ldraw/lua_ldraw.h>
+#include <luawrap/calls.h>
 #include <net/lanarts_net.h>
 
 #include <lua.hpp>
@@ -56,7 +57,6 @@ static void init_system(GameSettings& settings, lua_State* L) {
 
 }
 
-extern "C" {
 int main(int argc, char** argv) {
 	const int HUD_WIDTH = 160;
 	lua_State* L = lua_open();
@@ -75,7 +75,8 @@ int main(int argc, char** argv) {
 
 	if (exitcode == 0) {
 		gs->start_game();
-		lua_api::luacall_main(L);
+		lua_getglobal(L, "main");
+		luawrap::call<void>(L);
 		fflush(stdout);
 	}
 
@@ -87,5 +88,4 @@ int main(int argc, char** argv) {
 //	lua_close(L); // TODO: To exit cleanly we must clear all resource vectors explicitly
 
 	return 0;
-}
 }

@@ -98,7 +98,7 @@ struct IOState {
 	IOState();
 	void add_triggered_event(const IOEvent & event, bool triggered_already);
 	void clear();
-	void clear_for_step();
+	void clear_for_step(bool resetprev = true);
 };
 
 class IOController {

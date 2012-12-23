@@ -61,11 +61,6 @@ namespace lua_api {
 		register_display_api(L);
 	}
 
-	void luacall_main(lua_State* L) {
-		luawrap::globals(L)["main"].push();
-		luawrap::call<void>(L);
-	}
-
 	void luacall_postdraw(lua_State* L) {
 		luawrap::globals(L)["postdraw"].push();
 		if (lua_isnil(L, -1)) {

@@ -42,7 +42,6 @@ namespace lua_api {
 	void register_api(GameState* gs, lua_State* L);
 
 	// Callbacks into the lua VM:
-	void luacall_main(lua_State* L);
 	void luacall_postdraw(lua_State* L);
 
 	// Lua utilities:

@@ -55,10 +55,12 @@ inline void IOState::add_triggered_event(const IOEvent& event,
 	active_events.push_back(TriggeredIOEvent(event, triggered_already));
 }
 
-void IOState::clear_for_step() {
+void IOState::clear_for_step(bool resetprev) {
 	memset(key_press_states, 0, sizeof(key_press_states));
 
-	active_events.clear();
+	if (resetprev) {
+		active_events.clear();
+	}
 
 	mouse_leftclick = false;
 	mouse_rightclick = false;
@@ -221,8 +223,10 @@ int IOController::handle_event(SDL_Event* event) {
 	iostate.keymod = event->key.keysym.mod;
 	iostate.sdl_events.push_back(*event);
 	SDLKey key = event->key.keysym.sym;
-	bool shift_held = (iostate.keymod & KMOD_LSHIFT) || (iostate.keymod & KMOD_RSHIFT);
-	bool ctrl_held = (iostate.keymod & KMOD_LCTRL) || (iostate.keymod & KMOD_RCTRL);
+	bool shift_held = (iostate.keymod & KMOD_LSHIFT)
+			|| (iostate.keymod & KMOD_RSHIFT);
+	bool ctrl_held = (iostate.keymod & KMOD_LCTRL)
+			|| (iostate.keymod & KMOD_RCTRL);
 
 	switch (event->type) {
 	case SDL_ACTIVEEVENT:
@@ -279,9 +283,7 @@ int IOController::handle_event(SDL_Event* event) {
 }
 
 void IOController::update_iostate(bool resetprev) {
-	if (resetprev) {
-		iostate.clear_for_step();
-	}
+	iostate.clear_for_step(resetprev);
 	SDL_GetMouseState(&iostate.mousex, &iostate.mousey);
 }
 std::vector<SDL_Event>& IOController::get_events() {
