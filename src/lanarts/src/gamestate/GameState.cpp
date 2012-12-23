@@ -214,8 +214,8 @@ int GameState::handle_event(SDL_Event* event) {
 	return iocontroller.handle_event(event);
 }
 bool GameState::update_iostate(bool resetprev) {
-	/* If 'resetprev', clear the io state
-	 * and then poll is currently pressed */
+	/* If 'resetprev', clear the io state for held keys
+	 * and then poll what's currently pressed */
 	if (repeat_actions_counter <= 0) {
 		iocontroller.update_iostate(resetprev);
 

@@ -20,14 +20,14 @@ static int lua_tokeycode(const LuaStackValue& value) {
 	lua_State* L = value.luastate();
 	int idx = value.index();
 
-	if (lua_isnumber(L,idx)) {
+	if (lua_type(L,idx) == LUA_TNUMBER) {
 		return lua_tonumber(L, idx);
 	}
 
 	if (lua_isstring(L, idx)) {
 		size_t size;
 		const char* str = lua_tolstring(L, idx, &size);
-		if (size != -1) {
+		if (size != 1) {
 			luaL_error(L, "Expected key number or one-character string for keycode, but got \"%s\".", str);
 			return 0;
 		}

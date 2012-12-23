@@ -164,8 +164,6 @@ void PlayerInst::step(GameState* gs) {
 	CombatGameInst::step(gs);
 	GameView& view = gs->view();
 
-	enqueue_network_actions(gs);
-
 	//Stats/effect step
 	if (cooldowns().is_hurting())
 		reset_rest_cooldown();

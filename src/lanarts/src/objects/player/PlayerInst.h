@@ -112,7 +112,6 @@ private:
 	bool enqueue_io_spell_actions(GameState* gs);
 	bool enqueue_io_spell_and_attack_actions(GameState* gs, float dx, float dy);
 	void enqueue_io_equipment_actions(GameState* gs, bool do_stop_action);
-	void enqueue_network_actions(GameState* gs);
 	void enqueue_not_enough_mana_actions(GameState* gs);
 
 	//Game action events

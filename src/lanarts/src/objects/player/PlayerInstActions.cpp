@@ -157,6 +157,8 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 		return;
 	}
 
+	bool single_player = (gs->player_data().all_players().size() <= 1);
+
 	actions_set_for_turn = true;
 
 	GameSettings& settings = gs->game_settings();
@@ -168,7 +170,7 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 		pde.action_queue.extract_actions_for_frame(queued_actions, gs->frame());
 		return;
 	}
-	if (gs->player_data().all_players().size() > 1) {
+	if (!single_player) {
 		gs->set_repeat_actions_counter(settings.frame_action_repeat);
 	}
 
@@ -248,7 +250,8 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 				player_get_playernumber(gs, this), queued_actions);
 	}
 
-	for (int i = 1; i <= settings.frame_action_repeat; i++) {
+	int repeat = single_player ? 0 : settings.frame_action_repeat;
+	for (int i = 1; i <= repeat; i++) {
 		for (int j = 0; j < only_passive_actions.size(); j++) {
 			only_passive_actions[j].frame = gs->frame() + i;
 		}
@@ -291,31 +294,6 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 
 	cooldowns().reset_pickup_cooldown(PICKUP_RATE);
 	gs->remove_instance(iteminst);
-}
-
-void PlayerInst::enqueue_network_actions(GameState *gs) {
-	GameNetConnection& connection = gs->net_connection();
-	bool hasconnection = connection.connection() != NULL;
-//TODO: net redo
-//	NetPacket packet;
-//
-//	if (!is_local_player() && hasconnection) {
-//		//	printf("Waiting for player action for frame %d\n", gs->frame());
-//		while (!connection.get_connection()->get_next_packet(packet)) {
-//		}
-//		bool output1 = true;
-//		while (packet.body_length > 0) {
-//			GameAction action;
-//			packet.get(action);
-//			if (output1 && action.frame != gs->frame()) {
-//				fprintf(stderr, "action frame %d vs %d\n", action.frame,
-//						gs->frame());
-//				fflush(stderr);
-//				output1 = false;
-//			}
-//			queued_actions.push_front(action);
-//		}
-//	}
 }
 
 void PlayerInst::perform_queued_actions(GameState* gs) {
