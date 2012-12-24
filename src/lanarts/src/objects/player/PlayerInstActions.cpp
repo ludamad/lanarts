@@ -33,20 +33,27 @@
 
 #include "PlayerInst.h"
 
-static bool is_wieldable_projectile(EquipmentStats& equipment,
-		const Item& item) {
+// Determines if a projectile should be wielded from the ground
+static bool projectile_should_autowield(EquipmentStats& equipment,
+		const Item& item, const std::string& preferred_class) {
+	if (!item.is_projectile())
+		return false;
+
 	if (equipment.projectile().is_same_item(item)) {
 		return true;
 	}
 
-	if (item.is_projectile()) {
-		ProjectileEntry& pentry = item.projectile_entry();
-		if (pentry.weapon_class == "unarmed")
-			return false;
+	ProjectileEntry& pentry = item.projectile_entry();
+
+	if (pentry.weapon_class == "unarmed") {
+		return false;
 	}
 
-	if (!item.is_projectile())
-		return false;
+	if (pentry.weapon_class == preferred_class) {
+		if (projectile_compatible_weapon(equipment.inventory, item) != -1) {
+			return true;
+		}
+	}
 
 	return equipment.valid_to_use(item);
 }
@@ -70,10 +77,10 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 	if (targetted)
 		p = Pos(targetted->x, targetted->y);
 
-	// We may have already used an item eg due to auto-use of items
+// We may have already used an item eg due to auto-use of items
 	bool used_item = false;
 
-	//Item use
+//Item use
 	for (int i = 0; i < 9 && !used_item; i++) {
 		if (io.query_event(IOEvent(IOEvent::USE_ITEM_N, i))) {
 			if (inventory().get(i).amount() > 0) {
@@ -95,7 +102,7 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 		}
 	}
 
-	//Item pickup
+//Item pickup
 	GameInst* inst = NULL;
 	if (cooldowns().can_pickup()
 			&& gs->object_radius_test(this, &inst, 1, &item_colfilter)) {
@@ -108,7 +115,8 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 		bool autopickup = (item.is_normal_item() && !was_dropper
 				&& !dropper_autopickup) || (was_dropper && dropper_autopickup);
 
-		bool wieldable_projectile = is_wieldable_projectile(equipment(), item);
+		bool wieldable_projectile = projectile_should_autowield(equipment(),
+				item, this->last_chosen_weaponclass);
 
 		bool pickup_io = gs->key_down_state(SDLK_LSHIFT)
 				|| gs->key_down_state(SDLK_RSHIFT);
@@ -120,7 +128,7 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 	}
 }
 void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
-	//Arrow/wasd movement
+//Arrow/wasd movement
 	if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
 		dy -= 1;
 	}
@@ -190,7 +198,7 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 			do_stopaction = true;
 		}
 	}
-	//Shifting target
+//Shifting target
 	if (gs->key_press_state(SDLK_k)) {
 		shift_autotarget(gs);
 	}
@@ -230,7 +238,7 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 		}
 	}
 
-	// If we haven't done anything, rest
+// If we haven't done anything, rest
 	if (queued_actions.empty()) {
 		queued_actions.push_back(game_action(gs, this, GameAction::USE_REST));
 	}
@@ -278,22 +286,23 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	const Item& type = iteminst->item_type();
 	int amnt = iteminst->item_quantity();
 
-	bool equip_as_well = false;
-
+	bool inventory_full = false;
 	if (type.id == get_item_by_name("Gold")) {
 		gold() += amnt;
 	} else {
-//		if (is_same_projectile(equipment().projectile(), type)) {
-//			equipment().projectile_slot().add_copies(amnt);
-		if (!equipment().has_projectile()
-				&& is_wieldable_projectile(equipment(), type)) {
-			equip_as_well = true;
+		itemslot_t slot = inventory().add(type);
+		if (slot == -1) {
+			inventory_full = true;
+		} else if (projectile_should_autowield(equipment(), type,
+				this->last_chosen_weaponclass)) {
+			projectile_smart_equip(inventory(), slot);
 		}
-		inventory().add(type, equip_as_well);
 	}
 
-	cooldowns().reset_pickup_cooldown(PICKUP_RATE);
-	gs->remove_instance(iteminst);
+	if (!inventory_full) {
+		cooldowns().reset_pickup_cooldown(PICKUP_RATE);
+		gs->remove_instance(iteminst);
+	}
 }
 
 void PlayerInst::perform_queued_actions(GameState* gs) {
@@ -330,7 +339,8 @@ void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
 	StoreInst* store = (StoreInst*)gs->get_instance(action.use_id);
 	if (!store) {
 		return;
-	}LANARTS_ASSERT(dynamic_cast<StoreInst*>(gs->get_instance(action.use_id)));
+	}
+	LANARTS_ASSERT(dynamic_cast<StoreInst*>(gs->get_instance(action.use_id)));
 	StoreInventory& inv = store->inventory();
 	StoreItemSlot& slot = inv.get(action.use_id2);
 	if (gold() >= slot.cost) {
@@ -434,8 +444,9 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 				} else if (item.is_weapon()) {
 					const Projectile& p = equipment().projectile();
 					if (!p.empty()) {
-						if (p.projectile_entry().is_standalone()) {
-							inventory().deequip_type(EquipmentEntry::PROJECTILE);
+						if (!p.projectile_entry().is_standalone()) {
+							inventory().deequip_type(
+									EquipmentEntry::PROJECTILE);
 						}
 					}
 					equipment().equip(slot);
@@ -444,7 +455,8 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 				}
 
 				if (item.is_weapon() || item.is_projectile()) {
-					last_chosen_weaponclass = weapon().weapon_entry().weapon_class;
+					last_chosen_weaponclass =
+							weapon().weapon_entry().weapon_class;
 				}
 			}
 		} else if (equipment().valid_to_use(item)

@@ -25,7 +25,8 @@ public:
 	void deequip_armour();
 	void deequip_type(int equipment_type);
 
-	void use_ammo(int amnt = 1);
+	// returns true if has ammo left afterwards
+	bool use_ammo(int amnt = 1);
 
 	bool has_weapon();
 	bool has_armour();

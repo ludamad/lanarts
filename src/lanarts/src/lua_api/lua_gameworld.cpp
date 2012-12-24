@@ -18,12 +18,23 @@
 
 #include "lua/lua_api.h"
 
+// Keep all documentation in doc/level.luadoc
+
+// game world functions
+static int world_player_local(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	luawrap::push(L, (GameInst*)gs->local_player());
+	return 1;
+}
+
+// level functions
+
 static int level_regenerate(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	int levelid = gs->get_level()->id();
 
 	if (lua_gettop(L) > 0) {
-		levelid = lua_tonumber(L, 1);
+		levelid = luaL_checknumber(L, 1);
 	}
 
 	gs->game_world().regen_level(levelid);
@@ -41,6 +52,31 @@ static int level_objects(lua_State* L) {
 	lua_pushcfunction(L, lua_api::l_itervalues);
 	level_objects_list(L);
 	lua_call(L, 1, 1);
+	return 1;
+}
+
+static int level_monsters_list(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	const std::vector<obj_id>& mons = gs->monster_controller().monster_ids();
+	lua_newtable(L);
+	for (int i = 0; i < mons.size(); i++) {
+		luawrap::push(L, gs->get_instance(mons[i]));
+		lua_rawseti(L, -2, i+1);
+	}
+	return 1;
+}
+
+static int level_monsters(lua_State* L) {
+	lua_pushcfunction(L, lua_api::l_itervalues);
+	level_monsters_list(L);
+	lua_call(L, 1, 1);
+	return 1;
+}
+
+// Look up a specific instance given an id
+static int level_instance(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	luawrap::push(L, gs->get_instance(luaL_checkinteger(L, 1)));
 	return 1;
 }
 
@@ -80,7 +116,7 @@ bool temporary_isgameinst(lua_State* L, int idx) {
 	return lua_isuserdata(L, idx);
 }
 
-//TODO Figure out how other levels can be queried
+//TODO Figure out how other levels should be queried
 
 namespace lua_api {
 	void register_gameworld_api(lua_State* L) {
@@ -88,6 +124,9 @@ namespace lua_api {
 		luawrap::install_type<GameInst*, lua_push_gameinst, lua_gameinst_arg, temporary_isgameinst>();
 
 		LuaValue world = globals["world"].ensure_table();
+
+		world["player_local"].bind_function(world_player_local);
+
 		LuaValue level = globals["level"].ensure_table();
 
 		// Debug/special-case-only functions:
@@ -96,6 +135,11 @@ namespace lua_api {
 		// Query functions:
 		level["objects_list"].bind_function(level_objects_list);
 		level["objects"].bind_function(level_objects);
+
+		level["instance"].bind_function(level_instance);
+
+		level["monsters_list"].bind_function(level_monsters_list);
+		level["monsters"].bind_function(level_monsters);
 
 		level["object_visible"].bind_function(level_object_visible);
 		level["object_place_free"].bind_function(level_object_place_free);

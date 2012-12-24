@@ -106,9 +106,5 @@ void lua_gamestate_bindings(GameState* gs, lua_State* L) {
 	lua_pushstring(L, "__index");
 	lua_pushcfunction(L, lua_member_lookup);
 	lua_settable(L, tableind);
-
-	lunar_t::push(L, new bind_t(gs), true);
-
-	lua_setglobal(L, "world");
 }
 const char GameStateLuaBinding::className[] = "GameWorld";

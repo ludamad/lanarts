@@ -24,10 +24,10 @@ struct SpellEntry: public BaseDataEntry {
 	LuaLazyValue autotarget_func; //Auto-target func
 	LuaLazyValue prereq_func; //Pre-req to casting
 	Projectile projectile; //Projectile used, if any
-	bool can_cast_with_cooldown, can_cast_with_held_key;
+	bool can_cast_with_cooldown, can_cast_with_held_key, fallback_to_melee;
 	SpellEntry() :
 			sprite(-1), mp_cost(0), cooldown(0), can_cast_with_cooldown(false), can_cast_with_held_key(
-					false) {
+					false), fallback_to_melee(false) {
 	}
 	virtual const char* entry_type() {
 		return "Spell";

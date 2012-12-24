@@ -19,10 +19,11 @@ struct EffectEntry {
 	Colour effected_colour;
 	sprite_id effected_sprite;
 	AllowedActions allowed_actions;
-	bool additive_duration, fades_out;
+	int fade_out;
+	bool additive_duration;
 
 	EffectEntry() :
-			effected_sprite(-1), additive_duration(false), fades_out(false) {
+			effected_sprite(-1), additive_duration(false), fade_out(0) {
 	}
 
 	void init(lua_State* L) {

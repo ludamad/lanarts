@@ -40,9 +40,10 @@ spells:
      Takes you instantly across a short distance.
     spr_spell: blink
     mp_cost: 50
-    cooldown: 130
+    cooldown: 50
     can_cast_with_cooldown: yes
     can_cast_with_held_key: no
+    fallback_to_melee: no
     prereq_func: function(caster, x, y) return radius_visible_check(x, y, caster.radius) and not obj_solid_check(caster, x, y, caster.radius) end
     action_func: function(caster, x, y) caster:move_to(x,y) end
     #NB: if the autotarget_func returns nil, the spell is not performed

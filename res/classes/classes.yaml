@@ -42,6 +42,8 @@ classes:
     spells:
       - spell: Berserk
         level_needed: 1
+      - spell: Power Strike
+        level_needed: 2
     start_stats:
         movespeed: 4
         hp: 110
@@ -84,7 +86,7 @@ classes:
         magic: 4
         equipment:
           weapon: Short Bow
-          projectile: { item: Arrow, amount: 20 } 
+          projectile: { item: Arrow, amount: 40 } 
           inventory:
             - item: Dagger
     gain_per_level:

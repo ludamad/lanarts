@@ -12,7 +12,7 @@
 
 #include "Inventory.h"
 
-bool Inventory::add(const Item& item, bool equip_as_well) {
+itemslot_t Inventory::add(const Item& item, bool equip_as_well) {
 	itemslot_t slot = -1;
 	ItemEntry& ientry = item.item_entry();
 	if (ientry.stackable) {
@@ -37,11 +37,11 @@ bool Inventory::add(const Item& item, bool equip_as_well) {
 		}
 	}
 
-	if (equip_as_well) {
+	if (equip_as_well && slot != -1) {
 		equip(slot);
 	}
 
-	return false;
+	return slot;
 }
 
 int Inventory::find_slot(item_id item) {
@@ -85,7 +85,7 @@ void Inventory::__dequip_projectile_if_invalid() {
 	itemslot_t slot = get_equipped(EquipmentEntry::PROJECTILE);
 	if (slot != -1) {
 		ItemSlot& itemslot = get(slot);
-		if (!valid_to_use_projectile(*this, itemslot.item)) {
+		if (!projectile_valid_to_equip(*this, itemslot.item)) {
 			get(slot).deequip();
 		}
 	}
@@ -145,7 +145,7 @@ itemslot_t Inventory::get_equipped(int type, itemslot_t last_slot) const {
 	return -1;
 }
 
-bool valid_to_use_projectile(const Inventory& inventory,
+bool projectile_valid_to_equip(const Inventory& inventory,
 		const Projectile& proj) {
 
 	if (proj.empty())
@@ -193,10 +193,9 @@ itemslot_t projectile_compatible_weapon(const Inventory& inventory,
 	return -1;
 }
 
-bool projectile_smart_equip(Inventory& inventory,
-		itemslot_t itemslot) {
+bool projectile_smart_equip(Inventory& inventory, itemslot_t itemslot) {
 	const Projectile& proj = inventory.get(itemslot).item;
-	if (valid_to_use_projectile(inventory, proj)) {
+	if (projectile_valid_to_equip(inventory, proj)) {
 		inventory.equip(itemslot);
 		return true;
 	}
@@ -207,6 +206,65 @@ bool projectile_smart_equip(Inventory& inventory,
 		return true;
 	}
 	return false;
+}
+
+// Tries to use any available projectiles, returning false if no candidates
+bool projectile_smart_equip(Inventory& inventory,
+		const std::string& preferred_class) {
+	size_t size = inventory.max_size();
+
+	// first try option that works with preferred weapon type
+	for (itemslot_t i = 0; i < size; i++) {
+		ItemSlot& slot = inventory.get(i);
+		if (!slot.empty() && slot.item.is_projectile()
+				&& slot.projectile_entry().weapon_class == preferred_class) {
+			bool equipped = projectile_smart_equip(inventory, i);
+			LANARTS_ASSERT(equipped);
+			return true;
+		}
+	}
+
+	// next try any non-standalone projectile
+	for (itemslot_t i = 0; i < size; i++) {
+		ItemSlot& slot = inventory.get(i);
+		if (!slot.empty() && slot.item.is_projectile()
+				&& !slot.projectile_entry().is_standalone()) {
+			if (projectile_smart_equip(inventory, i)) {
+				return true;
+			}
+		}
+	}
+
+	// next try any standalone projectile
+	for (itemslot_t i = 0; i < size; i++) {
+		ItemSlot& slot = inventory.get(i);
+		if (!slot.empty() && slot.item.is_projectile()) {
+			if (projectile_smart_equip(inventory, i)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+// Tries first available melee weapon
+// Since we can always go unarmed, does not fail
+// TODO: Figure out how curses might play into this
+void weapon_smart_equip(Inventory& inventory) {
+	size_t size = inventory.max_size();
+	// first try any weapon that does not require a projectile
+	for (itemslot_t i = 0; i < size; i++) {
+		ItemSlot& slot = inventory.get(i);
+		if (!slot.empty() && slot.item.is_weapon()
+				&& !slot.weapon_entry().uses_projectile) {
+			inventory.equip(i);
+			return;
+		}
+	}
+	// Next just go unarmed
+	inventory.deequip_type(EquipmentEntry::WEAPON);
+	inventory.deequip_type(EquipmentEntry::PROJECTILE);
 }
 
 Equipment equipped_armour(const Inventory & inventory) {

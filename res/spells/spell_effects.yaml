@@ -13,9 +13,9 @@ effects:
 
   - name: Berserk
     exhausted_duration: 250
-    stat_func: berserk_statmod
-    init_func: berserk_init
-    step_func: berserk_step
+    stat_func: berserk_effect.stat
+    init_func: berserk_effect.init
+    step_func: berserk_effect.step
     can_use_rest: no
     can_use_spells: no
     can_use_stairs: no
@@ -26,12 +26,12 @@ effects:
           show_message("You are now exhausted...", {255,200,200}) 
         end
       end
-    fades_out: no
+    fade_out: 5
     effected_colour: [255,160,160] #RGB
-    effected_sprite: berserk effected
+    effected_sprite: berserk_effected
 
   - name: Exhausted
-    stat_func: exhausted_statmod
+    stat_func: exhausted_effect.stat
     can_use_rest: no
     finish_func: 
       function (effect, obj) 
@@ -40,5 +40,22 @@ effects:
         end
       end
     effected_colour: [120,120,120] #RGB
-    effected_sprite: exhausted effected
+    effected_sprite: exhausted_effected
 
+  - name: Charge
+    can_use_spells: no
+    init_func: charge_effect.init
+    stat_func: charge_effect.stat
+    finish_func: charge_effect.finish
+    effected_colour: [255,0,0] #RGB
+    effected_sprite: charge_effected
+    fade_out: 0
+
+  - name: Thrown
+    can_use_spells: no
+    init_func: thrown_effect.init
+    step_func: thrown_effect.step
+    stat_func: thrown_effect.stat
+    effected_sprite: thrown_effected
+    effected_colour: [200,200,200] #RGB
+    fade_out: 5

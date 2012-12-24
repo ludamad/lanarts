@@ -38,7 +38,7 @@ static void test_state_helper(NetUpdatedState& netstate, const char* servername,
 
 	UNIT_TEST_ASSERT(pdes.size() == 3);
 	for (int i = 0; i < pdes.size(); i++) {
-		UNIT_TEST_ASSERT(pdes[i].player_inst.get_instance() == NULL);
+		UNIT_TEST_ASSERT(pdes[i].player_inst.get() == NULL);
 		UNIT_TEST_ASSERT(pdes[i].net_id == i);
 	}
 	/* test expected names */

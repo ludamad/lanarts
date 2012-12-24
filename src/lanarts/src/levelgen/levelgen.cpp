@@ -170,7 +170,7 @@ GameLevelState* generate_level(int roomid, MTwist& mt, GeneratedLevel& level,
 	newlvl->rooms = level.rooms();
 
 	for (int i = 0; i < level.instances().size(); i++) {
-		gs->add_instance(level.instances()[i].get_instance());
+		gs->add_instance(level.instances()[i].get());
 	}
 
 	gs->set_level(prevlvl); //Restore level context

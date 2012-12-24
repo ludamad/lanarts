@@ -22,7 +22,7 @@ bool EquipmentStats::valid_to_use(const Item& item) {
 	}
 	switch (item.equipment_entry().type) {
 	case EquipmentEntry::PROJECTILE:
-		return valid_to_use_projectile(inventory, item);
+		return projectile_valid_to_equip(inventory, item);
 	}
 	return true;
 }
@@ -30,9 +30,9 @@ void EquipmentStats::equip(itemslot_t slot) {
 	inventory.equip(slot);
 }
 
-void EquipmentStats::use_ammo(int amnt) {
+bool EquipmentStats::use_ammo(int amnt) {
 	LANARTS_ASSERT(has_projectile());
-	projectile_slot().remove_copies(amnt);
+	return projectile_slot().remove_copies(amnt);
 }
 
 void EquipmentStats::serialize(SerializeBuffer& serializer) {

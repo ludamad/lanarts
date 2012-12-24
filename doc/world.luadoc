@@ -1,0 +1,6 @@
+--- Functions not specific to the current level
+module "world"
+
+--- Returns the local player.
+-- In single player games this is the only player.
+function player_local() 

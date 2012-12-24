@@ -30,11 +30,11 @@ public:
 	}
 
 	EffectiveStats* get_stats(lua_State* L) {
-		if (!inst.get_instance())
+		if (!inst.get())
 			return &value;
 		GameState* gs = lua_api::gamestate(L);
 		CombatGameInst* combat_inst =
-				dynamic_cast<CombatGameInst*>(inst.get_instance());
+				dynamic_cast<CombatGameInst*>(inst.get());
 		if (!combat_inst)
 			return NULL;
 		return &combat_inst->effective_stats();

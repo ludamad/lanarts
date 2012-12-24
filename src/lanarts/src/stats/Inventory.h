@@ -6,6 +6,7 @@
 #ifndef INVENTORY_H
 #define INVENTORY_H
 
+#include <string>
 #include <vector>
 
 #include "lanarts_defines.h"
@@ -50,11 +51,13 @@ struct ItemSlot {
 	bool is_same_item(const Item& item) const {
 		return this->item.is_same_item(item);
 	}
-	void remove_copies(int copies) {
+	bool remove_copies(int copies) {
 		item.remove_copies(copies);
-		if (item.amount == 0) {
+		if (item.amount <= 0) {
 			equipped = false;
+			return false;
 		}
+		return true;
 	}
 	void add_copies(int copies) {
 		item.add_copies(copies);
@@ -83,7 +86,8 @@ public:
 	Inventory(int size = INVENTORY_SIZE) {
 		items.resize(size);
 	}
-	bool add(const Item& item, bool equip_as_well = false);
+	// returns -1 if full
+	itemslot_t add(const Item& item, bool equip_as_well = false);
 	ItemSlot& get(itemslot_t i) {
 		return items.at(i);
 	}
@@ -115,11 +119,17 @@ private:
 	std::vector<ItemSlot> items;
 };
 
-bool valid_to_use_projectile(const Inventory& inventory, const Projectile& proj);
+bool projectile_valid_to_equip(const Inventory& inventory, const Projectile& proj);
 // returns -1 if no such item
 itemslot_t projectile_compatible_weapon(const Inventory& inventory, const Projectile& proj);
 // returns false if not possible
 bool projectile_smart_equip(Inventory& inventory, itemslot_t itemslot);
+bool projectile_smart_equip(Inventory& inventory, const std::string& preferred_class);
+
+// Tries first available melee weapon
+// Since we can always go unarmed, does not fail
+// TODO: Figure out how curses might play into this
+void weapon_smart_equip(Inventory& inventory);
 
 Weapon equipped_weapon(const Inventory& inventory);
 Projectile equipped_projectile(const Inventory& inventory);

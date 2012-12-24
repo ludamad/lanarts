@@ -30,7 +30,7 @@ sprites:
     file: res/effects/sprites/firestorm.png
 
   - name: magic blast
-    file: res/effects/sprites/orb.png
+    file: res/spells/sprites/orb_of_destruction.png
     
   - name: blink
     file: res/spells/sprites/blink.png
@@ -40,9 +40,18 @@ sprites:
     
   - name: berserk
     file: res/spells/sprites/berserk.png
+
+  - name: chargestrike
+    file: res/spells/sprites/chargehand.png
         
-  - name: berserk effected
+  - name: berserk_effected
     file: res/effects/sprites/berserk.png       
 
-  - name: exhausted effected
+  - name: exhausted_effected
     file: res/effects/sprites/i-slowing.png
+
+  - name: charge_effected
+    file: res/spells/sprites/poof.gif
+
+  - name: thrown_effected
+    file: res/spells/sprites/fleeing.png

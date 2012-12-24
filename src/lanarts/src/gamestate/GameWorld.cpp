@@ -120,7 +120,7 @@ void GameWorld::spawn_players(GeneratedLevel& genlevel, void** player_instances,
 			}
 			printf("Spawning for player %d: %s\n", i,
 					islocal ? "local player" : "network player");
-			place_inst(genlevel, pde.player_inst.get_instance());
+			place_inst(genlevel, pde.player_inst.get());
 		}
 	} else {
 		for (int i = 0; i < nplayers; i++) {
@@ -285,9 +285,9 @@ void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 
 	//Keep object alive during move
 	GameInstRef gref(gs->get_instance(id));
-	GameInst* inst = gref.get_instance();
+	GameInst* inst = gref.get();
 
-	if (!gref.get_instance()) {
+	if (!gref.get()) {
 		return;
 	}
 

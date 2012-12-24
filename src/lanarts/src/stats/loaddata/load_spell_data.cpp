@@ -40,7 +40,9 @@ SpellEntry parse_spell_type(lua_State* L, const YAML::Node& n) {
 	entry.can_cast_with_cooldown = parse_defaulted(n, "can_cast_with_cooldown",
 			false);
 	entry.can_cast_with_held_key = parse_defaulted(n, "can_cast_with_held_key",
-			true);
+				true);
+	entry.fallback_to_melee = parse_defaulted(n, "fallback_to_melee",
+				true);
 	return entry;
 }
 

@@ -123,9 +123,9 @@ void CombatGameInst::draw(GameState *gs) {
 }
 
 bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
-		const Item& weapon) {
+		const Item& weapon, bool ignore_cooldowns) {
 	bool isdead = false;
-	if (!cooldowns().can_doaction())
+	if (!ignore_cooldowns && !cooldowns().can_doaction())
 		return false;
 
 	MTwist& mt = gs->rng();
@@ -149,9 +149,11 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 					25, Posf(rx, ry), Posf(), AnimatedInst::DEPTH, dmgstr,
 					Colour(255, 148, 120)));
 
-	cooldowns().reset_action_cooldown(
-			atkstats.cooldown
-					* estats.cooldown_modifiers.melee_cooldown_multiplier);
+	if (!ignore_cooldowns) {
+		cooldowns().reset_action_cooldown(
+				atkstats.cooldown
+						* estats.cooldown_modifiers.melee_cooldown_multiplier);
+	}
 
 	WeaponEntry& wentry = weapon.weapon_entry();
 	if (wentry.name != "none") {
@@ -183,6 +185,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 	Pos p(inst->x, inst->y);
 	p.x += gs->rng().rand(-12, +13);
 	p.y += gs->rng().rand(-12, +13);
+
 	if (gs->tile_radius_test(p.x, p.y, 10)) {
 		p.x = inst->x;
 		p.y = inst->y;
@@ -213,28 +216,6 @@ void CombatGameInst::init(GameState* gs) {
 	estats = stats().effective_stats(gs, this);
 }
 
-static float proportion_in_same_dir(float vx1, float vy1, float vx2,
-		float vy2) {
-	float dir1 = atan2(vy1, vx1);
-	float dir2 = atan2(vy2, vx2);
-
-	return cos(dir2 - dir1);
-}
-
-bool in_corridor_heurestic(GameState* gs, const Pos& p, float vx, float vy) {
-	bool in_xy = abs(vx) > abs(vy);
-
-	GameTiles& tiles = gs->tiles();
-	int solid = 0;
-	for (int dy = -1; dy <= 1; dy++) {
-		for (int dx = -1; dx <= 1; dx++) {
-			if (tiles.is_solid(p.x + dx, p.y + dy)) {
-				solid++;
-			}
-		}
-	}
-	return solid >= 4;
-}
 
 const float ROUNDING_MULTIPLE = 256.0f;
 

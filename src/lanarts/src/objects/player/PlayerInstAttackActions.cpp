@@ -271,7 +271,7 @@ static void player_use_spell(GameState* gs, PlayerInst* p,
 	}
 }
 
-void PlayerInst::enqueue_not_enough_mana_actions(GameState* gs) {
+bool PlayerInst::enqueue_not_enough_mana_actions(GameState* gs) {
 	const int AUTOUSE_MANA_POTION_CNT = 2;
 	int item_slot = inventory().find_slot(get_item_by_name("Mana Potion"));
 	if (gs->game_settings().autouse_mana_potions
@@ -280,11 +280,13 @@ void PlayerInst::enqueue_not_enough_mana_actions(GameState* gs) {
 		queued_actions.push_back(
 				game_action(gs, this, GameAction::USE_ITEM, item_slot));
 		autouse_mana_potion_try_count = 0;
+		return true;
 	} else {
 		autouse_mana_potion_try_count++;
+		return false;
 	}
 }
-bool PlayerInst::enqueue_io_spell_actions(GameState* gs) {
+bool PlayerInst::enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee) {
 	lua_State* L = gs->luastate();
 
 	GameView& view = gs->view();
@@ -303,13 +305,14 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs) {
 			chose_spell = true;
 			// Use the remembered choice to determine if its appropriate to cast this spell
 			// This makes sure the key must be hit once to switch spell, and again to use it
-			if (spell_selected() == i
-					&& previous_spellselect == spell_selected()) {
+//			if (spell_selected() == i ) {
+				// NB: Commenting out double hit for now, remove other comments when this is deemed superior
+//					&& previous_spellselect == spell_selected()) {
 				//Double hit a spell switch to quick-perform it
 				perform_spell = true;
-			} else if (!triggered_already) {
+//			} else if (!triggered_already) {
 				newspell = i;
-			}
+//			}
 			break;
 		}
 	}
@@ -347,8 +350,11 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs) {
 		perform_spell = io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION,
 				&triggered_already);
 	}
-	if (spell_selected() > -1 && perform_spell) {
-		SpellEntry& spl_entry = spells.get_entry(spell_selected());
+
+	*fallback_to_melee = false;
+
+	if (newspell > -1 && perform_spell) {
+		SpellEntry& spl_entry = spells.get_entry(newspell);
 
 		Pos target;
 		bool can_trigger = !triggered_already
@@ -365,7 +371,11 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs) {
 
 		if (spl_entry.mp_cost > core_stats().mp) {
 			if (!triggered_already && can_target) {
-				enqueue_not_enough_mana_actions(gs);
+				if (!enqueue_not_enough_mana_actions(gs)) {
+					*fallback_to_melee = spl_entry.fallback_to_melee;
+				}
+			} else {
+				*fallback_to_melee = spl_entry.fallback_to_melee;
 			}
 			return false;
 		} else {
@@ -378,14 +388,17 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs) {
 			if (can_use) {
 				queued_actions.push_back(
 						game_action(gs, this, GameAction::USE_SPELL,
-								spell_selected(), target.x, target.y));
+								newspell, target.x, target.y));
 				return true;
 			} else if (!auto_target) {
 				gs->game_chat().add_message("Target location is not valid.");
+			} else {
+				*fallback_to_melee = spl_entry.fallback_to_melee;
 			}
 		} else if (!triggered_already && !can_target) {
 			gs->game_chat().add_message(
 					"Cannot currently auto-target spell. Use manual controls (with mouse).");
+			*fallback_to_melee = spl_entry.fallback_to_melee;
 		}
 	}
 	return false;
@@ -428,7 +441,10 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
 
 	bool is_moving = (dx != 0.0f || dy != 0.0f);
 	IOController& io = gs->io_controller();
-	bool attack_used = enqueue_io_spell_actions(gs);
+
+	bool fallback_to_melee = false;
+
+	bool attack_used = enqueue_io_spell_actions(gs, &fallback_to_melee);
 
 	bool autotarget = io.query_event(IOEvent::AUTOTARGET_CURRENT_ACTION)
 			|| io.query_event(IOEvent::ACTIVATE_SPELL_N);
@@ -444,9 +460,7 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
 		weaponuse = true;
 	}
 
-	if (spell_selected() >= 0
-			&& spells_known().get_entry(spell_selected()).mp_cost
-					> core_stats().mp) {
+	if (fallback_to_melee) {
 		weaponuse = true;
 	}
 
@@ -517,12 +531,10 @@ static void lua_hit_callback(lua_State* L, LuaValue& callback, GameInst* user,
 // -- next try unarmed melee
 static void exhaust_projectile_autoequip(PlayerInst* player,
 		const std::string& preferred_class) {
-	Inventory& inv = player->inventory();
-	size_t size = inv.max_size();
-	// -- first try option that works with preferred weapon type
-	for (itemslot_t i = 0; i < size; i++) {
-		ItemSlot& slot = inv.get(i);
+	if (projectile_smart_equip(player->inventory(), preferred_class)) {
+		return;
 	}
+	weapon_smart_equip(player->inventory());
 }
 
 void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
@@ -587,7 +599,9 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 				effective_atk_stats(mt, weaponattack), id, start, actpos,
 				movespeed, weaprange, NONE, wallbounce, nbounces);
 		gs->add_instance(bullet);
-		equipment().use_ammo();
+		if (!equipment().use_ammo()) {
+			exhaust_projectile_autoequip(this, this->last_chosen_weaponclass);
+		}
 	} else {
 		int weaprange = wentry.range() + this->radius + TILE_SIZE / 2;
 		float mag = distance_between(actpos, Pos(x, y));

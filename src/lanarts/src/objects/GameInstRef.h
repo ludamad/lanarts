@@ -21,7 +21,7 @@ public:
 	GameInstRef(GameState* gs, obj_id id);
 	~GameInstRef();
 
-	GameInst* get_instance() const {
+	GameInst* get() const {
 		return inst;
 	}
 	void operator=(const GameInstRef& ref);

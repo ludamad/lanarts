@@ -27,11 +27,11 @@ public:
 	}
 
 	CombatStats* get_stats(lua_State* L) {
-		if (!inst.get_instance())
+		if (!inst.get())
 			return &value;
 		GameState* gs = lua_api::gamestate(L);
 		CombatGameInst* combat_inst =
-				dynamic_cast<CombatGameInst*>(inst.get_instance());
+				dynamic_cast<CombatGameInst*>(inst.get());
 		if (!combat_inst)
 			return NULL;
 		return &combat_inst->stats();
@@ -78,6 +78,7 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_NUM_MEMB_LOOKUP("xp", stats->class_stats.xp)
 	else IFLUA_NUM_MEMB_LOOKUP("xpneeded", stats->class_stats.xpneeded)
 	else IFLUA_NUM_MEMB_LOOKUP("level", stats->class_stats.xplevel)
+	else IFLUA_NUM_MEMB_LOOKUP("attack_cooldown", stats->cooldowns.action_cooldown)
 	else IFLUA_STR_MEMB_LOOKUP("weapon_type", stats->equipment.weapon_slot().weapon_entry().weapon_class)
 	else {
 		lua_getglobal(L, bind_t::className);
@@ -110,6 +111,7 @@ static int lua_member_update(lua_State* L) {
 	else IFLUA_NUM_MEMB_UPDATE("xp", stats->class_stats.xp)
 	else IFLUA_NUM_MEMB_UPDATE("xpneeded", stats->class_stats.xpneeded)
 	else IFLUA_NUM_MEMB_UPDATE("level", stats->class_stats.xplevel)
+	else IFLUA_NUM_MEMB_UPDATE("attack_cooldown", stats->cooldowns.action_cooldown)
 	else {
 		lua_getglobal(L, bind_t::className);
 		int tableind = lua_gettop(L);

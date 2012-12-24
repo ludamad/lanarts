@@ -9,6 +9,7 @@ spells:
     cooldown: 30
     spr_spell: berserk
     can_cast_with_held_key: no
+    fallback_to_melee: no
     prereq_func: 
       function(caster, _, _) 
         return not caster:has_effect("Berserk") and not caster:has_effect("Exhausted")
@@ -21,6 +22,44 @@ spells:
         elseif caster.name == "Your ally" then
           show_message(caster.name .. " enters a powerful rage!", {200,200,255}) 
         end
+      end
+    autotarget_func: 
+      function (caster, _) return caster.x, caster.y end
+
+  - name: Power Strike
+    description: 
+      A powerful charged strike. Deals stunning blows to all surrounding enemies, knocking them back.
+    mp_cost: 30
+    cooldown: 30
+    spr_spell: chargestrike
+    can_cast_with_cooldown: yes
+    can_cast_with_held_key: no
+    fallback_to_melee: no
+    prereq_func: 
+      function(caster, _, _) 
+        for mon in level.monsters() do
+          if distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 40 then
+            return true
+          end
+        end
+        return false
+      end
+    action_func: 
+      function(caster, _, _) 
+        if caster:is_local_player() then 
+          show_message("You strike wildly in all directions!", {200,200,255}) 
+        elseif caster.name == "Your ally" then
+          show_message(caster.name .. " strikes wildly in all directions!", {200,200,255}) 
+        end
+        caster:add_effect("Charge", 8).callback = 
+          function (effect, caster)
+            for mon in level.monsters() do
+              if distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 35 then
+                caster:melee(mon)
+                mon:add_effect("Thrown", 50).angle = direction({caster.x, caster.y}, {mon.x, mon.y})
+              end
+            end
+          end
       end
     autotarget_func: 
       function (caster, _) return caster.x, caster.y end

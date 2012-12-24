@@ -135,8 +135,11 @@ IOController::IOController() {
 				SDLKey(0), KMOD_NONE, KMOD_NONE, true);
 		IOEventTrigger trigger2(event, IOEventTrigger::NONE, SDLKey('h'),
 				KMOD_NONE, KMOD_NONE, true);
+		IOEventTrigger trigger3(event, IOEventTrigger::NONE, SDLKey('t'),
+				KMOD_NONE, KMOD_NONE, true);
 		event_bindings.push_back(trigger1);
 		event_bindings.push_back(trigger2);
+		event_bindings.push_back(trigger3);
 	}
 
 	/*Do autotarget action */

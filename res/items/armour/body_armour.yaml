@@ -25,16 +25,18 @@ equipment:
     spr_item: platemail
     equipment_type: armour
     armour_type: body armour
-    resistance: { base: 6 }
-    reduction:  { base: 4 }
-    spell_cooldown_multiplier: 1.25
-    ranged_cooldown_multiplier: 1.25
+    resistance: { base: 5 }
+    reduction:  { base: 3 }
+    spell_cooldown_multiplier: 1.35
+    ranged_cooldown_multiplier: 1.35
 
-  - name: Magic Robe
-    description: A robe that guards against magic attacks.
+  - name: Robe
+    description: A lightly protective, uninhibited robe.
     shop_cost: [10, 20]
     spr_item: robe
     equipment_type: armour
     armour_type: body armour
-    magic_resistance: { base: 3 }
+    resistance: { base: 1 }
+    reduction:  { base: 1 }
+    magic_resistance: { base: 1 }
     magic_reduction: { base: 1 }

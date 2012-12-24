@@ -1,0 +1,9 @@
+--- Returns an iterable for the values of an array 
+-- @param table a lua array
+function values(array)
+
+--- Calculates the direction from <code>pos1</code> to <code>pos2</code>, in radians
+function direction(pos1, pos2)
+
+--- Calculates the distance from <code>pos1</code> to <code>pos2</code>
+function distance(pos1, pos2)

@@ -28,10 +28,10 @@ bool EffectStats::has_active_effect() const {
 
 static float draw_alpha(Effect& effect) {
 	EffectEntry& eentry = game_effect_data.at(effect.effectid);
-	if (!eentry.fades_out || effect.t_remaining > 100) {
+	if (effect.t_remaining >= eentry.fade_out) {
 		return 1.0f;
 	}
-	return effect.t_remaining / 100.0f;
+	return effect.t_remaining / eentry.fade_out;
 }
 
 Colour EffectStats::effected_colour() {
@@ -115,7 +115,7 @@ void EffectStats::process(GameState* gs, CombatGameInst* inst,
 
 static void lua_effect_func_callback(lua_State* L, LuaValue& value,
 		Effect& effect, CombatGameInst* inst) {
-	if (value.empty()) {
+	if (value.empty() || value.isnil()) {
 		return;
 	}
 

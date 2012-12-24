@@ -37,7 +37,7 @@ EffectEntry parse_effect(lua_State* L, const YAML::Node& n) {
 	entry.effected_colour = parse_defaulted(n, "effected_colour", Colour());
 	entry.effected_sprite = parse_sprite_number(n, "effected_sprite");
 	entry.additive_duration = parse_defaulted(n, "additive_duration", false);
-	entry.fades_out = parse_defaulted(n, "fades_out", true);
+	entry.fade_out = parse_defaulted(n, "fade_out", 100);
 	return entry;
 }
 

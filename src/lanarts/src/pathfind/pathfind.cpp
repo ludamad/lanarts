@@ -182,7 +182,7 @@ void PathInfo::random_further_direction(MTwist& mt, int x, int y, int w, int h,
 }
 
 void PathInfo::interpolated_direction(int x, int y, int w, int h, float speed,
-		float& vx, float& vy) {
+		float& vx, float& vy, bool lenient) {
 	if (!path) {
 		vx = 0, vy = 0;
 		return;
@@ -211,7 +211,7 @@ void PathInfo::interpolated_direction(int x, int y, int w, int h, float speed,
 			if (!p->solid) {
 				int sub_area = (ex - sx) * (ey - sy) + 1;
 				/*Make sure all interpolated directions are possible*/
-				if (can_head(x, y, mx, my, ispeed, p->dx, p->dy)) {
+				if (lenient || can_head(x, y, mx, my, ispeed, p->dx, p->dy)) {
 					acc_x += p->dx * sub_area;
 					acc_y += p->dy * sub_area;
 				}
@@ -220,7 +220,13 @@ void PathInfo::interpolated_direction(int x, int y, int w, int h, float speed,
 	}
 	float mag = sqrt(float(acc_x * acc_x + acc_y * acc_y));
 	if (mag == 0) {
-		vx = 0, vy = 0;
+		if (!lenient) {
+			interpolated_direction(x, y, w, h, speed, vx, vy, true);
+		} else {
+			vx = 0;
+			vy = 0;
+			fprintf(stderr, "pathfind.cpp: Monster cannot move despite leniency!\n");
+		}
 	} else {
 		vx = speed * float(acc_x) / mag;
 		vy = speed * float(acc_y) / mag;

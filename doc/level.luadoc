@@ -1,0 +1,43 @@
+--- Functions for querying the current level.
+module "level"
+
+--- For debug purposes, regenerates  the current level.
+function regenerate ()
+
+--- Get a table with all the game objects in the current level.
+function objects_list ()
+
+--- Get an iterable with all the game objects in the current level.
+-- @usage for obj in level.objects() ...
+function objects()
+
+--- Get a table with all the monsters in the current level.
+function monsters_list ()
+
+--- Get an iterable with all the monsters in the current level.
+-- @usage for obj in level.monsters() ...
+function monsters()
+
+--- Return whether the current object is in the field of view of any player.
+-- @param obj the object to test for
+function object_visible (obj)
+
+--- Return the game object with the given <code>id</code>, or <code>nil if the object does not exist.
+-- <code>nil</code> may be returned if the object never existed or was destroyed.
+-- @param id the unique, numeric, identifier of the object
+function instance (id)
+
+--- Return whether <code>obj</code> would collide with any walls or other objects at <code>pos</code> .
+-- If <code>pos</code> is not given, tests the object's current location.
+-- @param obj the object to test for, will use the object's size for tests, and will not report any self-collisions
+-- @param pos <i>optional</i>, the position to test at, given as {x,y}
+function object_place_free (obj, pos)
+
+--- Return whether there are any walls or other objects at the given at <code>pos</code>.
+-- @param pos the position to test at, given as {x,y}
+function place_free (pos)
+
+--- Return whether there are any walls or other within <code>radius</code>, centered around <code>pos</code>.
+-- @param pos the radius to test within
+-- @param pos the position to test at, given as {x,y}
+function radius_place_free (radius, pos)

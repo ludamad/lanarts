@@ -1,5 +1,7 @@
 #include <cstring>
 
+#include <luawrap/luawrap.h>
+
 #include "data/lua_game_data.h"
 #include "gamestate/GameState.h"
 #include "objects/enemy/EnemyInst.h"
@@ -24,7 +26,7 @@ public:
 	}
 
 	GameInst* get_inst() {
-		return inst.get_instance();
+		return inst.get();
 	}
 
 	CombatGameInst* get_combat_inst() {
@@ -59,21 +61,14 @@ public:
 		get_combat_inst()->damage(lua_api::gamestate(L), attack);
 		return 0;
 	}
-//	int equip(lua_State* L) {
-//		CombatGameInst* combatinst;
-//		if ((combatinst = dynamic_cast<CombatGameInst*>(get_inst()))) {
-//			int args = lua_gettop(L);
-//
-//			lua_pushstring(L, "name");
-//			lua_gettable(L, 1);
-//			const char* itemname = lua_tostring(L, lua_gettop(L));
-//			item_id item = get_item_by_name(itemname);
-//			int amnt = args >= 2 ? lua_tointeger(L, 2) : 1;
-//			combatinst->equip(item, amnt);
-//			lua_pop(L, 1);
-//		}
-//		return 0;
-//	}
+	int melee(lua_State* L) {
+		CombatGameInst* attacker_inst = get_combat_inst();
+		CombatGameInst* attacked_inst = dynamic_cast<CombatGameInst*>(luawrap::get<GameInst*>(L, 1));
+		Weapon w = attacker_inst->equipment().weapon();
+		bool dead = attacker_inst->melee_attack(lua_api::gamestate(L), attacked_inst, w, true);
+		lua_pushboolean(L, dead);
+		return 1;
+	}
 	int add_effect(lua_State* L) {
 		CombatGameInst* combatinst;
 		if ((combatinst = dynamic_cast<CombatGameInst*>(get_inst()))) {
@@ -87,14 +82,14 @@ public:
 		return 1;
 	}
 	int reset_rest_cooldown(lua_State* L) {
-		PlayerInst* p = dynamic_cast<PlayerInst*>(inst.get_instance());
+		PlayerInst* p = dynamic_cast<PlayerInst*>(inst.get());
 		if (p) {
 			p->cooldowns().reset_rest_cooldown(REST_COOLDOWN);
 		}
 		return 0;
 	}
 	int is_local_player(lua_State* L) {
-		PlayerInst* p = dynamic_cast<PlayerInst*>(inst.get_instance());
+		PlayerInst* p = dynamic_cast<PlayerInst*>(inst.get());
 		if (p) {
 			lua_pushboolean(L, p->is_local_player());
 		} else {
@@ -158,10 +153,16 @@ GameInst* lua_gameinst_arg(lua_State* L, int narg) {
 }
 
 static void push_inst_name(lua_State* L, GameInst* inst) {
+	GameState* gs = lua_api::gamestate(L);
 	PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
 	if (p) {
-//		lua_pushlstring(L, p->); //TODO
-		lua_pushstring(L, "Your ally");
+		std::vector<PlayerDataEntry>& players = gs->player_data().all_players();
+		for (int i = 0; i < players.size(); i++) {
+			if (players[i].player_inst.get() == p) {
+				const std::string& name = players[i].player_name;
+				lua_pushlstring(L, name.c_str(), name.size());
+			}
+		}
 	} else {
 		EnemyInst* e = dynamic_cast<EnemyInst*>(inst);
 		if (e) {
@@ -218,9 +219,17 @@ static int lua_member_update(lua_State* L) {
 	const char* cstr = lua_tostring(L, 2);
 
 	bool had_member = true;
-	IFLUA_NUM_MEMB_UPDATE("x", inst->x)
-	else IFLUA_NUM_MEMB_UPDATE("y", inst->y)
-	else if (combatinst) {
+	if (strcmp(cstr, "x") == 0) {
+		inst->x = lua_tonumber(L, 3 );
+		if (combatinst) {
+			combatinst->update_position(lua_tonumber(L, 3 ), combatinst->ry);
+		}
+	} else if (strcmp(cstr, "y") == 0) {
+		inst->y = lua_tonumber(L, 3 );
+		if (combatinst) {
+			combatinst->update_position(combatinst->rx, lua_tonumber(L, 3 ));
+		}
+	} else if (combatinst) {
 		IFLUA_NUM_MEMB_UPDATE("vx", combatinst->vx)
 		else IFLUA_NUM_MEMB_UPDATE("vy", combatinst->vy)
 		else
@@ -245,7 +254,7 @@ static int lua_member_update(lua_State* L) {
 meth_t bind_t::methods[] = { LUA_DEF(heal_fully), LUA_DEF(move_to),
 		LUA_DEF(heal_hp), LUA_DEF(heal_mp), LUA_DEF(direct_damage),
 		LUA_DEF(damage), LUA_DEF(add_effect), LUA_DEF(has_effect),
-		LUA_DEF(add_effect), LUA_DEF(is_local_player),
+		LUA_DEF(add_effect), LUA_DEF(is_local_player), LUA_DEF(melee),
 		LUA_DEF(reset_rest_cooldown), meth_t(0, 0) };
 
 void lua_gameinst_bindings(GameState* gs, lua_State* L) {

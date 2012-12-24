@@ -59,7 +59,7 @@ public:
 	void calculate_path(GameState* gs, int ox, int oy, int radius);
 	//Towards object
 	void interpolated_direction(int x, int y, int w, int h, float speed,
-			float& vx, float& vy);
+			float& vx, float& vy, bool lenient = false);
 	void interpolated_direction(const BBox& bbox, float speed, float& vx,
 			float& vy) {
 		interpolated_direction(bbox.x1, bbox.y1, bbox.width(), bbox.height(),

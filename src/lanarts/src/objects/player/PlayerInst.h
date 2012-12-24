@@ -109,10 +109,10 @@ public:
 private:
 
 	void enqueue_io_movement_actions(GameState* gs, int& dx, int& dy);
-	bool enqueue_io_spell_actions(GameState* gs);
+	bool enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee);
 	bool enqueue_io_spell_and_attack_actions(GameState* gs, float dx, float dy);
 	void enqueue_io_equipment_actions(GameState* gs, bool do_stop_action);
-	void enqueue_not_enough_mana_actions(GameState* gs);
+	bool enqueue_not_enough_mana_actions(GameState* gs);
 
 	//Game action events
 	void use_move(GameState* gs, const GameAction& action);

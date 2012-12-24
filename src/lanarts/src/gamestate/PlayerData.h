@@ -7,12 +7,12 @@
 #define PLAYERCONTROLLER_H_
 
 #include <vector>
+#include <lcommon/SerializeBuffer.h>
 
 #include "objects/GameInst.h"
 
 #include "objects/GameInstRef.h"
 
-#include <lcommon/SerializeBuffer.h>
 #include "stats/EnemiesSeen.h"
 
 #include "ActionQueue.h"

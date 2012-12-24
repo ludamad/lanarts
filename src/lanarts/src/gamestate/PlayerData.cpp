@@ -15,7 +15,7 @@
 #include "PlayerData.h"
 
 PlayerInst* PlayerDataEntry::player() {
-	GameInst* local = player_inst.get_instance();
+	GameInst* local = player_inst.get();
 	LANARTS_ASSERT(!local || dynamic_cast<PlayerInst*>(local));
 	return (PlayerInst*) local;
 }
@@ -57,7 +57,7 @@ PlayerInst* PlayerData::local_player() {
 std::vector<PlayerInst*> PlayerData::players_in_level(level_id level) {
 	std::vector<PlayerInst*> ret;
 	for (int i = 0; i < _players.size(); i++) {
-		GameInst* player = _players[i].player_inst.get_instance();
+		GameInst* player = _players[i].player_inst.get();
 		if (player && player->current_level == level) {
 			LANARTS_ASSERT(!player || dynamic_cast<PlayerInst*>(player));
 			ret.push_back((PlayerInst*) player);
@@ -69,7 +69,7 @@ std::vector<PlayerInst*> PlayerData::players_in_level(level_id level) {
 bool PlayerData::level_has_player(level_id level) {
 	for (int i = 0; i < _players.size(); i++) {
 		GameInstRef& p = _players[i].player_inst;
-		if (p.get_instance() && p->current_level == level) {
+		if (p.get() && p->current_level == level) {
 			return true;
 		}
 	}
