@@ -4,10 +4,6 @@ PROJECT(project_lsound)
 FIND_PACKAGE(SDL REQUIRED)
 FIND_PACKAGE(SDL_mixer REQUIRED)
 
-#set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
-#add_definitions(-DNDEBUG)
-
 set( LIBS ../../libs)
 set( SRC ..)
 

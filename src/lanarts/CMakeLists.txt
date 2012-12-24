@@ -7,14 +7,10 @@ FIND_PACKAGE(SDL_net REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
+add_definitions(-mwindows)
+
 set( SRC ..)
 set( LIBS ../../libs)
-
-set(CMAKE_BUILD_TYPE Debug)
-
-
-#add_definitions(-DNDEBUG)
-
 
 include_directories(
 	${SDL_INCLUDE_DIR} 
@@ -126,6 +122,7 @@ set (libraries
 
 target_link_libraries( lanarts 
     ${libraries}
+    -mwindows
 )
 
 target_link_libraries( lanarts_tests
