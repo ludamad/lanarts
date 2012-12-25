@@ -38,7 +38,7 @@ weapons:
     damage: {base: [5,11], strength: 1.1}
     power: {base: 4, strength: 0.3}
     range: 7
-    cooldown: 50
+    cooldown: 45
     spr_item: samurai sabre
     
   - name: Iron Broadsword
@@ -126,7 +126,7 @@ weapons:
     weapon_class: bows
     uses_projectile: yes
     #Stats
-    damage: {base: [7,10], strength: 1.20}
+    damage: {base: [5,9], strength: 1.20}
     power: {base: 5, strength: 0.3}
     range: 300
     cooldown: 55

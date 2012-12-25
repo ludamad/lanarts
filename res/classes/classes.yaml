@@ -43,7 +43,7 @@ classes:
       - spell: Berserk
         level_needed: 1
       - spell: Power Strike
-        level_needed: 2
+        level_needed: 3
     start_stats:
         movespeed: 4
         hp: 110
