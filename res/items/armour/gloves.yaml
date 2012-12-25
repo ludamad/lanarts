@@ -5,7 +5,6 @@ equipment:
     shop_cost: [15, 25]
     spr_item: leather gloves
     equipment_type: gloves
-    resistance: { base: 1 }
     reduction:  { base: 1 }
 
   - name: Steel Gloves
@@ -13,7 +12,7 @@ equipment:
     shop_cost: [55, 75]
     spr_item: steel gloves
     equipment_type: gloves
-    resistance: { base: 3 }
+    resistance: { base: 2 }
     reduction:  { base: 1 }
 
   - name: Runed Gloves
@@ -26,7 +25,7 @@ equipment:
       magic: 1
       willpower: 1
       defence: 1
-    resistance: { base: 3 }
+    resistance: { base: 2 }
     reduction:  { base: 1 }
     magic_resistance: { base: 1 }
     magic_reduction:  { base: 1 }

@@ -1,6 +1,6 @@
 ---
 equipment:
-  - name: Magician's Ring
+  - name: Ring of Spells
     equipment_type: ring
     shop_cost: [35, 55]
     description: 
@@ -13,11 +13,11 @@ equipment:
     equipment_type: ring
     shop_cost: [95, 125]
     description: 
-      A large ring that grants the user brutish force, at the cost of some defences.
+      A large ring that grants the user brutish force, at the cost of physical defences.
     spr_item: ogres ring
     stat_bonuses: 
       strength: 3
-      defence: -1
+      defence: -2
 
   - name: Ring of Vitality
     equipment_type: ring
@@ -36,4 +36,14 @@ equipment:
     spr_item: ring of stone
     resistance: { base: 2 }
     reduction:  { base: 2 }
+
+  - name: Magician's Ring
+    equipment_type: ring
+    shop_cost: [95, 125]
+    description: 
+      A glowing ring that grants the user magical power, at the cost of magical defences.
+    spr_item: magicians ring
+    stat_bonuses: 
+      strength: 3
+      willpower: -2
       
