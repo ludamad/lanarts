@@ -45,6 +45,18 @@ static EnemyEntry& __E(enemy_id enemytype) {
 	return game_enemy_data.at(enemytype);
 }
 
+float monster_difficulty_multiplier(GameState* gs, EnemyEntry& etype) {
+	size_t size = gs->player_data().all_players().size();
+	if (size > 6) {
+		size = 6; // A group larger than 6 will probably be split up considerably
+	}
+	float mult = log(size);//NB: natural log, base e ~ 2.718...
+	if (etype.unique) {
+		return mult; // Can reasonably expect all players to be part of a boss fight
+	}
+	return mult / 4;
+}
+
 EnemyInst::EnemyInst(int enemytype, int x, int y, int teamid, int mobid) :
 		CombatGameInst(__E(enemytype).basestats, __E(enemytype).enemy_sprite,
 				teamid, mobid, x, y, __E(enemytype).radius, true, DEPTH), seen(
@@ -89,6 +101,7 @@ void EnemyInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 //	ai_state.serialize(gs, serializer);
 }
 
+
 void EnemyInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	CombatGameInst::deserialize(gs, serializer);
 	serializer.read(seen);
@@ -115,6 +128,10 @@ void EnemyInst::init(GameState* gs) {
 			target_radius, effective_stats().movespeed);
 
 	lua_State* L = gs->luastate();
+
+	float diffmult = monster_difficulty_multiplier(gs, etype());
+	core_stats().hp *= diffmult;
+	core_stats().max_hp *= diffmult;
 
 	lua_gameinst_callback(L, etype().init_event.get(L), this);
 }

@@ -179,6 +179,7 @@ static int lua_member_lookup(lua_State* L) {
 	const char* cstr = lua_tostring(L, 2);
 
 	GameInst* inst = state->get_inst();
+	EnemyInst* enemyinst = dynamic_cast<EnemyInst*>(inst);
 
 	IFLUA_NUM_MEMB_LOOKUP("x", inst->x)
 	else IFLUA_NUM_MEMB_LOOKUP("y", inst->y)
@@ -189,6 +190,8 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_STATS_MEMB_LOOKUP("stats", inst)
 	else if (strcmp(cstr, "name") == 0) {
 		push_inst_name(L, inst);
+	} else if (strcmp(cstr, "unique") && enemyinst != NULL){
+		lua_pushboolean(L, enemyinst->etype().unique);
 	} else {
 		lua_getglobal(L, bind_t::className);
 		int tableind = lua_gettop(L);

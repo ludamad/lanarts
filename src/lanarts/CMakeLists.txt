@@ -7,8 +7,6 @@ FIND_PACKAGE(SDL_net REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
-add_definitions(-mwindows)
-
 set( SRC ..)
 set( LIBS ../../libs)
 
@@ -25,6 +23,7 @@ include_directories(
 	${LIBS}/lua 
 	${LIBS}#/rvo2 
 	)
+
 
 file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
     src/include/* 
@@ -122,7 +121,6 @@ set (libraries
 
 target_link_libraries( lanarts 
     ${libraries}
-    -mwindows
 )
 
 target_link_libraries( lanarts_tests

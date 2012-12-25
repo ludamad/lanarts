@@ -1,3 +1,5 @@
+module "global functions"
+
 --- Returns an iterable for the values of an array 
 -- @param table a lua array
 function values(array)
