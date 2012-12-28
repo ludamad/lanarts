@@ -12,6 +12,7 @@ set( LIBS ../../libs)
 
 include_directories(
 	${SDL_INCLUDE_DIR} 
+	${SDLIMAGE_INCLUDE_DIR}
 	${OpenGL_INCLUDE_DIRS} 		
 	${FREETYPE_INCLUDE_DIRS}
 	src/

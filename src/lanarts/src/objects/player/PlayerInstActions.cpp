@@ -450,6 +450,15 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 						}
 					}
 					equipment().equip(slot);
+					// Try and equip a projectile
+					WeaponEntry& wentry = item.weapon_entry();
+					if (wentry.uses_projectile) {
+						const Projectile& p = equipment().projectile();
+						if (p.empty()) {
+							projectile_smart_equip(inventory(),
+									wentry.weapon_class);
+						}
+					}
 				} else {
 					equipment().equip(slot);
 				}

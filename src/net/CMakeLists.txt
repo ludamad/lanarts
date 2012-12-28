@@ -4,7 +4,7 @@ PROJECT(project_lanarts_net)
 FIND_PACKAGE(SDL REQUIRED)
 FIND_PACKAGE(SDL_net REQUIRED)
 
-include_directories(${SDL_INCLUDE_DIR} )
+include_directories(${SDL_INCLUDE_DIR} ${SDLNET_INCLUDE_DIR} )
 
 
 set( lanarts_net_tests

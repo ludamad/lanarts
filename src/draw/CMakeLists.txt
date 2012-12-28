@@ -16,6 +16,7 @@ include_directories(
 	${SRC}/luawrap/include
 	${LIBS}/lua
 	${SDL_INCLUDE_DIR} 
+	${SDLIMAGE_INCLUDE_DIR} 
 	${OpenGL_INCLUDE_DIRS} 		
 	${FREETYPE_INCLUDE_DIRS} 
 )

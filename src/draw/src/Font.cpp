@@ -119,6 +119,10 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
 	//h pixels high, we need to request a size of h*64.
 	FT_Set_Char_Size(face, h * 64, h * 64, 96, 96);
 
+	int oldalignment;
+	glGetIntegerv(GL_UNPACK_ALIGNMENT, &oldalignment);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
 	int maxw = 0;
 	int maxh = 0;
 	for (int i = 0; i < 128; i++) {
@@ -149,6 +153,8 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
 	FT_Done_Face(face);
 
 	FT_Done_FreeType(library);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, oldalignment);
 
 }
 

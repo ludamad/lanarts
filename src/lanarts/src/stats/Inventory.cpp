@@ -195,6 +195,10 @@ itemslot_t projectile_compatible_weapon(const Inventory& inventory,
 
 bool projectile_smart_equip(Inventory& inventory, itemslot_t itemslot) {
 	const Projectile& proj = inventory.get(itemslot).item;
+	itemslot_t slot = inventory.get_equipped(EquipmentEntry::PROJECTILE);
+	if (slot != -1 && !proj.is_same_item(inventory.get(slot).item)) {
+		return false;
+	}
 	if (projectile_valid_to_equip(inventory, proj)) {
 		inventory.equip(itemslot);
 		return true;
