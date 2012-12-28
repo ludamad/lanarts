@@ -18,7 +18,7 @@ public:
 	ItemInst(const Item& item, int x, int y, obj_id dropped_by = 0,
 			bool pickup_by_dropper = false) :
 			GameInst(x, y, RADIUS, false, DEPTH), item(item), dropped_by(
-					dropped_by), pickup_by_dropper(pickup_by_dropper) {
+					dropped_by), pickup_by_dropper(pickup_by_dropper), was_seen(false) {
 	}
 	virtual ~ItemInst();
 	virtual void step(GameState* gs);
@@ -45,7 +45,7 @@ public:
 private:
 	Item item;
 	obj_id dropped_by;
-	bool pickup_by_dropper;
+	bool pickup_by_dropper, was_seen;
 };
 
 #endif /* ITEMINST_H_ */

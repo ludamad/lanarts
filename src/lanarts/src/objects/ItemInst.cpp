@@ -55,8 +55,10 @@ void ItemInst::draw(GameState* gs) {
 
 	if (!view.within_view(xx, yy, w, h))
 		return;
-	if (!gs->object_visible_test(this))
+	if (!was_seen && !gs->object_visible_test(this))
 		return;
+
+	was_seen = true;
 
 	Pos p = round_to_multiple(pos(), TILE_SIZE);
 
