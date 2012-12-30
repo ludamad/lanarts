@@ -3,13 +3,9 @@
  *  A smart reference to a sound file.
  */
 
-#include <sound/Sound.h>
 #include <SDL/SDL_mixer.h>
-
-/* Controls the smart pointer deletion */
-static void freemusic_callback(void* mm) {
-	Mix_FreeMusic((Mix_Music*)mm);
-}
+#include <Sound.h>
+#include <SoundBase.h>
 
 namespace lsound {
 
@@ -19,34 +15,23 @@ namespace lsound {
 	Sound::~Sound() {
 	}
 
-	Sound::Sound(const std::string& filename) {
-		init(filename);
-	}
-
-	void Sound::init(const std::string& filename) {
-		Mix_Music* mm = Mix_LoadMUS(filename.c_str());
-		clear();
-		if (mm) {
-			_music = smartptr<Mix_Music>(mm, freemusic_callback);
-		}
-	}
-
-	void Sound::play() const {
-		if (_music) {
-			Mix_PlayMusic(_music.get(), 0);
-		}
-	}
-	void Sound::clear() {
-		_music = smartptr<Mix_Music>();
+	Sound::Sound(const smartptr<SoundBase>& _sound) :
+			_sound(_sound) {
 	}
 
 	bool Sound::empty() const {
-		return !_music.is_valid();
+		return _sound.is_valid();
+	}
+
+	void Sound::play() const {
+		return _sound->play();
 	}
 
 	void Sound::loop() const {
-		if (_music) {
-			Mix_PlayMusic(_music.get(), -1);
-		}
+		return _sound->loop();
+	}
+
+	void Sound::clear() {
+		_sound = smartptr<SoundBase>();
 	}
 }

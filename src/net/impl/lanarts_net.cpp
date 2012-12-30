@@ -32,6 +32,10 @@ NetConnection* create_server_connection(int port) {
 	return new ServerConnection(port);
 }
 
+void lanarts_net_quit() {
+	SDLNet_Quit();
+}
+
 /**
  * Create a client that will connect to a server with 'host' via 'port'.
  * Note that you must first call initialize_connection().

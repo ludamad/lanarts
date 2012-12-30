@@ -7,6 +7,8 @@
 
 #include <ldraw/display.h>
 #include <ldraw/lua_ldraw.h>
+#include <lsound/lsound.h>
+
 #include <luawrap/calls.h>
 #include <net/lanarts_net.h>
 
@@ -42,7 +44,7 @@ using namespace std;
 static void init_system(GameSettings& settings, lua_State* L) {
 	load_settings_data(settings, "settings.yaml"); // Load the initial settings
 
-	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+	if (SDL_Init(0) < 0) {
 		exit(0);
 	}
 
@@ -52,6 +54,7 @@ static void init_system(GameSettings& settings, lua_State* L) {
 
 	lanarts_net_init(true);
 	lua_api::preinit_state(L);
+	lsound::init();
 
 	init_game_data(settings, L);
 
@@ -81,7 +84,8 @@ int main(int argc, char** argv) {
 	}
 
 	save_settings_data(gs->game_settings(), "saved_settings.yaml");
-	SDL_Quit();
+
+	lanarts_quit();
 
 	delete gs;
 

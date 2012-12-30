@@ -7,6 +7,8 @@
 #include <luawrap/luawrap.h>
 #include <luawrap/functions.h>
 
+#include <lsound/lua_lsound.h>
+
 #include <SDL.h>
 
 #include "gamestate/GameState.h"
@@ -68,6 +70,8 @@ static Pos world_coords(const LuaStackValue& value) {
 
 namespace lua_api {
 	void register_io_api(lua_State* L) {
+		lua_register_lsound(L);
+
 		LuaValue globals = luawrap::globals(L);
 
 		globals["key_pressed"].bind_function(key_pressed);

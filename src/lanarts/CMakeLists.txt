@@ -4,6 +4,7 @@ PROJECT(project_lanarts)
 FIND_PACKAGE(SDL REQUIRED)
 FIND_PACKAGE(SDL_image REQUIRED)
 FIND_PACKAGE(SDL_net REQUIRED)
+FIND_PACKAGE(SDL_mixer REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
@@ -20,6 +21,7 @@ include_directories(
 	${SRC}/draw/include
 	${SRC}#/net
 	${SRC}/luawrap/include
+	${SRC}/sound/include
 	${LIBS}/yaml-cpp/include 
 	${LIBS}/lua 
 	${LIBS}#/rvo2 
@@ -72,6 +74,8 @@ file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     src/stats/loaddata/*
 
     src/util/*
+
+    src/lanarts_defines.cpp
 )
 
 file(GLOB lanarts_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
@@ -107,12 +111,14 @@ set (libraries
     lanartslib
 	ldraw
 	lcommon
+	lsound
 	lua
 	luawrap
 	lanarts_net
 	yaml-cpp
 	RVO
 	${OPENGL_gl_LIBRARY}
+	${SDLMIXER_LIBRARY}
 	${SDL_LIBRARY}
 	${SDLIMAGE_LIBRARY}
 	${SDLNET_LIBRARY}

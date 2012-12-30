@@ -69,4 +69,14 @@ namespace lua_api {
 			luawrap::call<void>(L);
 		}
 	}
+
+	void luacall_hitsound(lua_State* L) {
+		luawrap::globals(L)["play_hit_sound"].push();
+		if (lua_isnil(L, -1)) {
+			lua_pop(L, 1);
+		} else {
+			luawrap::call<void>(L);
+		}
+	}
+
 }

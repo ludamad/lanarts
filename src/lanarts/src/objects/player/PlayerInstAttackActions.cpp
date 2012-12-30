@@ -13,6 +13,7 @@
 #include "gamestate/GameState.h"
 
 #include "lua/lua_api.h"
+#include "lua_api/lua_newapi.h"
 
 #include "stats/items/ItemEntry.h"
 
@@ -621,6 +622,8 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		if (numhit == 0) {
 			return;
 		}
+
+		lua_api::luacall_hitsound(gs->luastate());
 
 		for (int i = 0; i < numhit; i++) {
 			EnemyInst* e = (EnemyInst*)enemies[i];

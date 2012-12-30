@@ -39,8 +39,9 @@ static bool projectile_should_autowield(EquipmentStats& equipment,
 	if (!item.is_projectile())
 		return false;
 
-	if (equipment.projectile().is_same_item(item)) {
-		return true;
+	Projectile& equipped_projectile = equipment.projectile();
+	if (!equipped_projectile.empty()) {
+		return equipped_projectile.is_same_item(item);
 	}
 
 	ProjectileEntry& pentry = item.projectile_entry();

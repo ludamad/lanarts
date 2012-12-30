@@ -10,28 +10,21 @@
 #include <cstdio>
 #include <lcommon/smartptr.h>
 
-struct _Mix_Music;
-typedef struct _Mix_Music Mix_Music;
-
 namespace lsound {
+	class SoundBase;
 
 	class Sound {
 	public:
 		Sound();
 		~Sound();
-		Sound(const std::string& filename);
-
-		void init(const std::string& filename);
-
-		/* Clear the reference*/
-		void clear();
+		Sound(const smartptr<SoundBase>& _sound);
 
 		bool empty() const;
-
 		void play() const;
 		void loop() const;
+		void clear();
 	private:
-		smartptr<Mix_Music> _music;
+		smartptr<SoundBase> _sound;
 	};
 
 }

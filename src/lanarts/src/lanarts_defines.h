@@ -65,4 +65,9 @@ typedef int money_t;
 inline void cooldown_step(int& cooldown) {
 	cooldown = cooldown > 0 ? cooldown - 1 : 0;
 }
+
+// This is required to ensure we do proper cleanup without hanging on exit
+// This does NOT abort
+void lanarts_quit();
+
 #endif

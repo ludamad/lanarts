@@ -190,7 +190,7 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_STATS_MEMB_LOOKUP("stats", inst)
 	else if (strcmp(cstr, "name") == 0) {
 		push_inst_name(L, inst);
-	} else if (strcmp(cstr, "unique") && enemyinst != NULL){
+	} else if (strcmp(cstr, "unique") == 0 && enemyinst != NULL){
 		lua_pushboolean(L, enemyinst->etype().unique);
 	} else {
 		lua_getglobal(L, bind_t::className);
@@ -257,7 +257,7 @@ static int lua_member_update(lua_State* L) {
 meth_t bind_t::methods[] = { LUA_DEF(heal_fully), LUA_DEF(move_to),
 		LUA_DEF(heal_hp), LUA_DEF(heal_mp), LUA_DEF(direct_damage),
 		LUA_DEF(damage), LUA_DEF(add_effect), LUA_DEF(has_effect),
-		LUA_DEF(add_effect), LUA_DEF(is_local_player), LUA_DEF(melee),
+		LUA_DEF(is_local_player), LUA_DEF(melee),
 		LUA_DEF(reset_rest_cooldown), meth_t(0, 0) };
 
 void lua_gameinst_bindings(GameState* gs, lua_State* L) {

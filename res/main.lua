@@ -3,6 +3,9 @@
 -- End of Lua API constants
 
 -- Lua API functions
+
+dofile "res/sound.lua"
+
 function is_consumable(item) 	return item.type == "consumable" end
 function is_weapon(item) 		return item.type == "weapon" end
 function is_armour(item) 		return item.type == "armour" end
@@ -66,9 +69,12 @@ end
 function postdraw()
 end
 
+--local music = music_optional_load("res/sound/Chapter Objectives.ogg")
+
 function main()
 
 	game.input_capture()
+	--music:play()
 
 	while true do 
 		local single_player = (settings.connection_type == net.NONE)

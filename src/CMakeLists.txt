@@ -5,5 +5,6 @@ add_subdirectory( lanarts )
 add_subdirectory( common )
 add_subdirectory( draw )
 add_subdirectory( net )
+add_subdirectory( sound )
 
 enable_testing()

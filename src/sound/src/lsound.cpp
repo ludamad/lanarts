@@ -7,7 +7,7 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_mixer.h>
 
-#include <sound/lsound.h>
+#include "lsound.h"
 
 namespace lsound {
 	int init(int nchannels) {
@@ -34,6 +34,7 @@ namespace lsound {
 	}
 
 	void deinit() {
+
 		Mix_CloseAudio();
 	}
 

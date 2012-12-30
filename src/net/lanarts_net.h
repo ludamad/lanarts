@@ -13,6 +13,8 @@
  * return true on success
  */
 bool lanarts_net_init(bool print_error = true);
+// NB: does not abort
+void lanarts_net_quit();
 
 /**
  * Create a server at 'port'.

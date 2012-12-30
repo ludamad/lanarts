@@ -8,19 +8,22 @@ set( LIBS ../../libs)
 set( SRC ..)
 
 include_directories(
-    "include/"
+    "include/lsound"
     ${SDL_INCLUDE_DIR} 
     ${LIBS}/lua
-    ${SRC}/luawrap
-    ${SRC}/
+    ${SRC}/luawrap/include
+    ${SRC}/common/include
 )
+
 
 # Library target
 aux_source_directory("src/" lsound_src) #Find source files
-aux_source_directory("include/" lsound_inc) #Find source files
+aux_source_directory("src/lua" lua_lsound_src) #Find source files
+aux_source_directory("include/lsound" lsound_inc) #Find source files
 
 add_library( lsound
              ${lsound_src} 
+             ${lua_lsound_src}
              ${lsound_inc} )
 
 # Test runner target
@@ -35,9 +38,9 @@ set(LINKEDLIBS
 	${SDLMIXER_LIBRARY}
 )
 
-add_executable( lsound_tests main.cpp)
+#add_executable( lsound_tests main.cpp)
 
-target_link_libraries(lsound_tests ${LINKEDLIBS})
+#target_link_libraries(lsound_tests ${LINKEDLIBS})
 
 # Enable tests
 #enable_testing()

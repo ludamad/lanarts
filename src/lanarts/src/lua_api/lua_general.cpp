@@ -31,16 +31,13 @@ static int lapi_values_aux(lua_State* L) {
 
 
 namespace lua_api {
-
 	int l_itervalues(lua_State* L) {
-		lua_pushvalue(L, 1); // array
-		lua_pushlightuserdata(L, (void*)1); // initial index
-		lua_pushlightuserdata(L, (void*)lua_objlen(L, 1)); // last index
+		lua_pushvalue(L, 1);
+		lua_pushlightuserdata(L, (void*)(1));
+		lua_pushlightuserdata(L, (void*)(lua_objlen(L, 1)));
 		lua_pushcclosure(L, lapi_values_aux, 3);
 		return 1;
 	}
-
-	/* Register general utility functions */
 	void register_general_api(lua_State* L) {
 		LuaValue globals = luawrap::globals(L);
 		globals["values"].bind_function(l_itervalues);
