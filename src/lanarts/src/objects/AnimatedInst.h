@@ -26,6 +26,7 @@ public:
 					pos.x), ry(pos.y), vx(speed.x), vy(speed.y), orientx(
 					orientation.x), orienty(orientation.y), sprite(sprite), timeleft(
 					animatetime), animatetime(animatetime), text(text) {
+		animateframe = -1;
 		LANARTS_ASSERT(animatetime!= 0);
 	}
 	virtual ~AnimatedInst();
@@ -33,6 +34,9 @@ public:
 	virtual void draw(GameState* gs);
 	virtual void copy_to(GameInst* inst) const;
 	virtual AnimatedInst* clone() const;
+	void frame(float frame) {
+		animateframe = frame;
+	}
 
 	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
 	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
@@ -40,6 +44,7 @@ private:
 	Colour textcol;
 	float rx, ry, vx, vy, orientx, orienty;
 	int sprite, timeleft, animatetime;
+	float animateframe;
 	std::string text;
 };
 

@@ -73,9 +73,6 @@ public:
 		//LANARTS_ASSERT( y >= 0 && y < h );
 		return &path[alloc_w * y + x];
 	}
-	void stake_claim(int x, int y);
-	//Call before 'interpolated_direction'
-	void adjust_for_claims(int x, int y);
 
 	void draw(GameState* gs);
 private:

@@ -200,6 +200,16 @@ static void draw_stat_bonuses_overlay(GameState* gs, DescriptionBoxHelper& dbh,
 		CoreStats& core) {
 	draw_bonus(gs, dbh, "HP: ", core.max_hp);
 	draw_bonus(gs, dbh, "MP: ", core.max_mp);
+	if (core.hpregen > 0) {
+		dbh.draw_prefix(gs, COL_PALE_RED, "+HP/second: ");
+		dbh.draw_value(gs, COL_PALE_GREEN, "%.2f", core.hpregen*60.f);
+	}
+	if (core.mpregen > 0) {
+		dbh.draw_prefix(gs, COL_PALE_BLUE, "+MP/second: ");
+		dbh.draw_value(gs, COL_PALE_GREEN, "%.2f", core.mpregen*60.f);
+	}
+
+	draw_bonus(gs, dbh, "MP+: ", core.hpregen);
 	draw_bonus(gs, dbh, "Strength: ", core.strength);
 	draw_bonus(gs, dbh, "Defence: ", core.defence);
 	draw_bonus(gs, dbh, "Magic: ", core.magic);

@@ -81,7 +81,7 @@ weapons:
     description: A slow powerful axe that decimates the weak.
     damage: {base: [8,12], strength: 1.4 }
     resist_modifier: 1.4
-    power: {base: 6, strength: 0.35}
+    power: {base: 6, strength: 0.25}
     range: 7
     cooldown: 65
     spr_item: battle axe 
@@ -92,7 +92,7 @@ weapons:
     description: An axe built from orc hide
     damage: {base: [10,14], strength: 1.4 }
     resist_modifier: 1.4
-    power: {base: 6, strength: 0.5}
+    power: {base: 6, strength: 0.3}
     range: 8
     cooldown: 65
     spr_item: orc axe 
@@ -100,10 +100,10 @@ weapons:
   - name: Iron Scimitar
     shop_cost: [100,150]
     weapon_class: blades
-    description: Slice quickly and efficiently
+    description: A scimitar of iron, slices quickly and efficiently.
     damage: {base: [1,5], strength: 1.1 }
     resist_modifier: 0.9
-    power: {base: 5, strength: 0.35}
+    power: {base: 5, strength: 0.3}
     range: 5
     cooldown: 25
     spr_item: iron scimitar
@@ -115,7 +115,7 @@ weapons:
     uses_projectile: yes
     #Stats
     damage: {base: [3,6], strength: 1.15}
-    power: {base: 3, strength: 0.3}
+    power: {base: 3, strength: 0.2}
     range: 300
     cooldown: 50
     spr_item: bow1
@@ -127,7 +127,7 @@ weapons:
     uses_projectile: yes
     #Stats
     damage: {base: [5,9], strength: 1.20}
-    power: {base: 5, strength: 0.3}
+    power: {base: 5, strength: 0.25}
     range: 300
     cooldown: 55
     spr_item: long bow

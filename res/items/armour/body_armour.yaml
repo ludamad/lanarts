@@ -6,7 +6,7 @@ equipment:
     spr_item: leather armour
     equipment_type: armour
     resistance: { base: 2 }
-    reduction:  { base: 2 }
+    reduction:  { base: 1 }
     spell_cooldown_multiplier: 1.1
 
   - name: Chainmail
@@ -14,7 +14,7 @@ equipment:
     shop_cost: [45, 60]
     spr_item: chainmail
     equipment_type: armour
-    resistance: { base: 4 }
+    resistance: { base: 3 }
     reduction:  { base: 2 }
     spell_cooldown_multiplier: 1.15
     ranged_cooldown_multiplier: 1.15
@@ -25,7 +25,7 @@ equipment:
     spr_item: platemail
     equipment_type: armour
     armour_type: body armour
-    resistance: { base: 5 }
+    resistance: { base: 4 }
     reduction:  { base: 3 }
     spell_cooldown_multiplier: 1.35
     ranged_cooldown_multiplier: 1.35
@@ -40,3 +40,29 @@ equipment:
     reduction:  { base: 1 }
     magic_resistance: { base: 1 }
     magic_reduction: { base: 1 }
+
+  - name: Magician's Robe
+    description: An enchanted robe of protection and magical power.
+    shop_cost: [45, 60]
+    spr_item: enchanted robe
+    equipment_type: armour
+    armour_type: body armour
+    resistance: { base: 1 }
+    reduction:  { base: 1 }
+    stat_bonuses: 
+      magic: 1
+    magic_resistance: { base: 1 }
+    magic_reduction: { base: 2 }
+
+  - name: Runed Robe
+    description: A heavily enchanted robe of protection and magical power.
+    shop_cost: [95, 105]
+    spr_item: runed robe
+    equipment_type: armour
+    armour_type: body armour
+    resistance: { base: 2 }
+    reduction:  { base: 2 }
+    stat_bonuses: 
+      magic: 1
+    magic_resistance: { base: 2 }
+    magic_reduction: { base: 2 }

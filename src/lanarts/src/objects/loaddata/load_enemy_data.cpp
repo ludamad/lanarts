@@ -32,6 +32,7 @@ EnemyEntry parse_enemy_type(lua_State* L, const YAML::Node& n) {
 
 	entry.init_event = parse_luaexpr(L, n, "init_func");
 	entry.step_event = parse_luaexpr(L, n, "step_func");
+	entry.draw_event = parse_luaexpr(L, n, "draw_func");
 
 	return entry;
 }

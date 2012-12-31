@@ -201,11 +201,13 @@ static int lua_member_lookup(lua_State* L) {
 		if (lua_isnil(L, -1)) {
 			lua_pop(L, 1);
 
-			inst->lua_variables.push();
-			tableind = lua_gettop(L);
-			lua_pushvalue(L, 2);
-			lua_gettable(L, tableind);
-			lua_replace(L, tableind);
+			if (!inst->lua_variables.empty()) {
+				inst->lua_variables.push();
+				tableind = lua_gettop(L);
+				lua_pushvalue(L, 2);
+				lua_gettable(L, tableind);
+				lua_replace(L, tableind);
+			}
 		}
 	}
 	return 1;

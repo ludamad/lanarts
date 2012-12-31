@@ -31,7 +31,7 @@ function powerstrike_spell.action(caster, _, _)
             	print(tostring(mon) .. ", " .. tostring(mon.add_effect))
                 mon:add_effect("Thrown", 45 + 2 * caster.stats.level).angle = direction({caster.x, caster.y}, {mon.x, mon.y})
                 if caster:is_local_player() then 
-                  show_message("The target is thrown back!", {200,200,255}) 
+                  show_message("The " .. mon.name .." is thrown back!", {200,200,255}) 
                 end
             end
           end

@@ -26,6 +26,7 @@ CombatStats::CombatStats(const ClassStats& class_stats, const CoreStats& core,
 
 void CombatStats::step(GameState* gs, CombatGameInst* inst,
 		const EffectiveStats& effective_stats) {
+
 	core.step(effective_stats.core);
 	cooldowns.step();
 	effects.step(gs, inst);

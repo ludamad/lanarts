@@ -43,7 +43,9 @@ void AnimatedInst::draw(GameState* gs) {
 
 		Colour alphacol(255, 255, 255, 255 * timeleft / animatetime);
 
-		gl_draw_sprite(view, sprite, xx, yy, orientx, orienty, gs->frame(),
+		float frame = animateframe != -1 ? animateframe : gs->frame();
+
+		gl_draw_sprite(view, sprite, xx, yy, orientx, orienty, frame,
 				alphacol);
 	}
 	Colour wd(255 - textcol.r, 255 - textcol.g, 255 - textcol.b);

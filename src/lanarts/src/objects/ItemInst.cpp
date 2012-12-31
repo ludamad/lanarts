@@ -63,7 +63,7 @@ void ItemInst::draw(GameState* gs) {
 	Pos p = round_to_multiple(pos(), TILE_SIZE);
 
 	ldraw::draw_rectangle_outline(COL_WHITE.alpha(45),
-			on_screen(gs, BBox(p, Dim(TILE_SIZE, TILE_SIZE))));
+			on_screen(gs, BBox(p.x + 1, p.y + 1, p.x + TILE_SIZE, p.y + TILE_SIZE)));
 
 	gl_draw_sprite(view, ientry.item_sprite, xx, yy, 0, 0, gs->frame());
 

@@ -41,6 +41,6 @@ void gl_draw_sprite(sprite_id sprite, int x, int y,
 void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 		const Colour& c = Colour(255, 255, 255));
 void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
-		float dx, float dy, int steps, const Colour& c = Colour(255, 255, 255));
+		float dx, float dy, float frame, const Colour& c = Colour(255, 255, 255));
 
 #endif /* DISPLAY_H_ */

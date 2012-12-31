@@ -24,6 +24,7 @@ projectiles:
     
   - name: Magic Bolt
     weapon_class: magic
+    damage_type: {magic: 1.0}
     damage: { magic: 1.0 }    # 100% magic
     power:  { magic: 0.2 }    
     range: 65
@@ -34,6 +35,7 @@ projectiles:
  
   - name: Blue Blast
     weapon_class: magic
+    damage_type: {magic: 1.0}
     damage: { magic: 1.5 }    # 150% magic
     power:  { magic: 0.3 }    
     range: 65

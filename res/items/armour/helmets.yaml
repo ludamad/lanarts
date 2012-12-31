@@ -5,5 +5,52 @@ equipment:
     shop_cost: [15, 25]
     spr_item: iron helmet
     equipment_type: helmet
+    reduction:  { base: 1 }
+    spell_cooldown_multiplier: 1.05
+
+  - name: Runed Helmet
+    description: An enchanted helmet enscribed with ancient, magical text.
+    shop_cost: [45, 65]
+    spr_item: runed helmet
+    equipment_type: helmet
+    resistance: { base: 1 }
+    reduction:  { base: 1 }
+    magic_reduction:  { base: 1 }
+    spell_cooldown_multiplier: 1.05
+
+  - name: Wizard's Hat
+    description: A basic, mildly magical, wizards hat.
+    shop_cost: [15, 25]
+    spr_item: wizard hat
+    equipment_type: helmet
+    magic_reduction:  { base: 1 }
+ 
+  - name: Crown of Mars
+    description: An artifact covered in runes of battle.
+    shop_cost: [45, 55]
+    spr_item: mars crown
+    equipment_type: helmet
+    stat_bonuses: 
+      strength: 1 
+      magic: 1 
+    reduction:  { base: 1 }
+
+  - name: Diana's Diadem
+    description: An artifact gifted by the god Diana, embued with defensive magic.
+    shop_cost: [45, 55]
+    spr_item: dianas crown
+    equipment_type: helmet
+    resistance: { base: 1 }
+    reduction:  { base: 1 }
+    magic_resistance:  { base: 1 }
+    magic_reduction:  { base: 1 }
+
+  - name: Crown of Orcus
+    description: A runed crown of bone carved in the name of Orcus, granting life regeneration.
+    shop_cost: [45, 55]
+    spr_item: orcus crown
+    equipment_type: helmet
+    stat_bonuses: 
+      hpregen: 0.01666
     resistance: { base: 1 }
     reduction:  { base: 1 }

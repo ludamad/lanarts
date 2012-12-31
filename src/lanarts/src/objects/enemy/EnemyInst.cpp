@@ -7,6 +7,7 @@
 #include <typeinfo>
 
 #include <luawrap/LuaValue.h>
+#include <luawrap/calls.h>
 #include <lcommon/SerializeBuffer.h>
 
 #include <ldraw/draw.h>
@@ -195,12 +196,24 @@ void EnemyInst::draw(GameState* gs) {
 	if (!gs->object_visible_test(this))
 		return;
 
-	BBox ebox(xx, yy, xx + w, yy + h);
-	if (ebox.contains(gs->mouse_x() + view.x, gs->mouse_y() + view.y)) {
-		draw_console_enemy_description(gs, etype());
-	}
+// TODO: fix enemy mouseover descriptions ?
+//	BBox ebox(xx, yy, xx + w, yy + h);
+//	if (ebox.contains(gs->mouse_x() + view.x, gs->mouse_y() + view.y)) {
+//		draw_console_enemy_description(gs, etype());
+//	}
 
-	CombatGameInst::draw(gs);
+	if (etype().draw_event.empty()) {
+		float frame = gs->frame();
+		if (etype().name == "Hydra") {
+			frame = floor( core_stats().hp / float(core_stats().max_hp) * 4);
+			if (frame >= 4) frame = 4;
+		}
+		CombatGameInst::draw(gs, frame);
+	} else {
+		lua_State* L = gs->luastate();
+		etype().draw_event.get(L).push();
+		luawrap::call<void>(L, (GameInst*)this);
+	}
 }
 
 EnemyInst* EnemyInst::clone() const {
@@ -213,7 +226,9 @@ bool EnemyInst::within_field_of_view(const Pos & pos) {
 
 void EnemyInst::die(GameState *gs) {
 	if (!destroyed) {
-		gs->add_instance(new AnimatedInst(pos(), etype().enemy_sprite, 20));
+		AnimatedInst* anim = new AnimatedInst(pos(), etype().enemy_sprite, 20);
+		anim->frame(0);
+		gs->add_instance(anim);
 		gs->remove_instance(this);
 
 		CollisionAvoidance& coll_avoid = gs->collision_avoidance();

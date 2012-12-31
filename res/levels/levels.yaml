@@ -38,7 +38,6 @@ hard_enemies: &hard_enemies
  - { enemy: Skeleton,          chance: 50                                              }
  - { enemy: Storm Elemental,   chance: 20,    group_chance: 100, group_size: 3          }
  - { enemy: Hell Storm,        chance: 5,   group_chance: 33, group_size: 2           }
- - { enemy: Grue                                                                       }
  - { enemy: Super Chicken,     chance: 100                                             }
  - { enemy: Zombie,            chance: 75                                              }
  - { enemy: Ciribot,           chance: 75                                              }
@@ -56,6 +55,7 @@ harder_enemies: &harder_enemies
   - { enemy: Grue,              chance: 50,  group_chance: 33, group_size: 2           }
   - { enemy: Golem,             guaranteed_spawns: 1, group_chance: 100, group_size: 2 }
   - { enemy: Jester,            chance: 20                                             }
+  - { enemy: Hydra,             guaranteed_spawns: 1, group_chance: 50, group_size: 2  }
   - { enemy: Hell Forged,       chance: 25                                             }
   - { enemy: Unseen Horror,     chance: 10,  group_chance: 33, group_size: 2           }
 
@@ -205,7 +205,7 @@ areas:
       - layout: *small_layouts
         content:
           features: { tileset: [lair_tiles1, lair_tiles2, lair_tiles3, crystal_tiles, crystal_tiles_with_marble]}
-          items:    { amount: 5,  itemgenlist: Basic Items   }
+          items:    { amount: 5,  itemgenlist: Enchanted Items   }
           enemies:
             amount: [10,14]
             generated:
@@ -216,7 +216,7 @@ areas:
       - layout: [*small_layout1]
         content:
           features: { tileset: [crystal_tiles, crystal_tiles_with_marble, crypt_tiles]}
-          items:    { amount: 7,  itemgenlist: Basic Items   }
+          items:    { amount: 7,  itemgenlist: Enchanted Items   }
           enemies:
             amount: [12,15]
             generated:
@@ -225,7 +225,7 @@ areas:
       - layout: *small_layouts
         content:
           features: { tileset: pebble_tiles}
-          items:    { amount: 8,  itemgenlist: Basic Items   }
+          items:    { amount: 8,  itemgenlist: Enchanted Items   }
           enemies:
             amount: [12,15]
             generated:
@@ -235,7 +235,7 @@ areas:
       - layout: *small_layouts 
         content:
           features: { tileset: *all_tilesets}
-          items:    { amount: 8,  itemgenlist: Basic Items   }
+          items:    { amount: 8,  itemgenlist: Enchanted Items   }
           enemies:
             amount: 15
             generated:
@@ -246,7 +246,7 @@ areas:
       - layout: *medium_layouts
         content:
           features: { tileset: *all_tilesets}
-          items:    { amount: 8,  itemgenlist: Basic Items   }
+          items:    { amount: 8,  itemgenlist: Enchanted Items   }
           enemies:
             amount: [14,16]
             generated:
@@ -257,7 +257,7 @@ areas:
       - layout: *medium_layouts
         content:
           features: { tileset: *all_tilesets}
-          items:    { amount: 8,  itemgenlist: Basic Items   }
+          items:    { amount: 8,  itemgenlist: Enchanted Items   }
           enemies:
             amount: [18,22]
             generated:
@@ -268,7 +268,7 @@ areas:
       - layout: *large_layouts
         content:
           features: { tileset: *all_tilesets}
-          items:    { amount: 10,  itemgenlist: Basic Items   }
+          items:    { amount: 10,  itemgenlist: Enchanted Items   }
           enemies:   
             amount: 22       
             generated: *hard_enemies
@@ -277,7 +277,7 @@ areas:
       - layout: *large_layouts
         content:
           features: { tileset: *all_tilesets}
-          items:    { amount: 12,  itemgenlist: Basic Items   }
+          items:    { amount: 12,  itemgenlist: Enchanted Items   }
           enemies:   
             amount: 25       
             generated: *harder_enemies
@@ -285,7 +285,7 @@ areas:
       - layout: *large_layouts
         content:
           features: { tileset: *all_tilesets, stairs_down: 0}
-          items:    { amount: 14,  itemgenlist: Basic Items   }
+          items:    { amount: 14,  itemgenlist: Enchanted Items   }
           enemies: 
             amount: 30 
             generated:

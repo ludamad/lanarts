@@ -38,6 +38,10 @@ sprites:
 
   - name: giant bat
     file: res/enemies/animals/sprites/bat.png
-    
+
   - name: giant spider
     file: res/enemies/animals/sprites/spider.png
+
+  - name: hydra
+    type: animation
+    frames: res/enemies/animals/sprites/hydra.png%32x48

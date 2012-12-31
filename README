@@ -1,5 +1,21 @@
+CONTROLS:
+
+Spells - yuiop for spell slots
+Use Weapon - t or h
+Inventory - 1 through 9 for item slots
+Mouse use - click to use last weapon/spell, note mouse use is currently unwieldy and not recommended
+Using stairs, picking up items - Simply stop on top of them
+
+DEVELOPMENT:
+
+The game is actively seeking new contributors!
+
 Discuss the game development/play at #lanarts on Freenode!
-Want to script the game with lua ? Check out http://ludamad.github.com !
+Want to script the game with lua (no recompilation needed) ? Check out http://ludamad.github.com !
+
+The standard lua library is available for use too, see the function index at http://www.lua.org/manual/5.1/
+
+COMPILING
 
 For Fedora/yum dependencies check out fedora-deps.sh!
 
@@ -21,6 +37,6 @@ cmake ../lanarts
 
 Copy the exe from 'lanarts_build/src/lanarts/src' into the 'lanarts' folder and run it from there.
 
-CREATING ECLIPSE PROJECT FILES:
+USING ECLIPSE:
 Go to folder where you want eclipse project files:
 cmake -G"Eclipse CDT4 - Unix Makefiles" <path to lanarts source>

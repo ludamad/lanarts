@@ -66,6 +66,22 @@ enemies:
         strength: 12
         defence: 5
         willpower: 5
+       
+  - name: Hydra
+    sprite: hydra
+    death_sprite: blood
+    radius: 17
+    xpaward: 10
+    appear_message: A hydra appears!
+    defeat_message: The hydra is vanquished.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 100
+        hpregen: 0.05
+        movespeed: 3.0
+        strength: 20
+        defence: 12
+        willpower: 4
 
   - name: Sheep
     sprite: sheep
@@ -146,5 +162,3 @@ enemies:
         strength: 25
         defence: 10
         willpower: 10
-       
-

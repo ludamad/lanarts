@@ -26,7 +26,7 @@ struct EnemyEntry: public BaseDataEntry {
 	CombatStats basestats;
 	bool unique;
 
-	LuaLazyValue init_event, step_event;
+	LuaLazyValue init_event, step_event, draw_event;
 
 	EnemyEntry() :
 			radius(15), xpaward(0), enemy_sprite(-1), death_sprite(-1), unique(
@@ -35,6 +35,7 @@ struct EnemyEntry: public BaseDataEntry {
 	void init(lua_State* L) {
 		init_event.initialize(L);
 		step_event.initialize(L);
+		draw_event.initialize(L);
 	}
 	virtual const char* entry_type() {
 		return "Enemy";

@@ -241,14 +241,14 @@ void gl_image_from_bytes(GLimage& img, int w, int h, char* data, int type) {
 }
 
 void gl_draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
-		float dx, float dy, int steps, const Colour& c) {
+		float dx, float dy, float frame, const Colour& c) {
 	using namespace ldraw;
 
 	float PI = 3.1415921;
 	float direction = PI * 2.5 + atan2(dy, dx);
 
 	SpriteEntry& entry = game_sprite_data.at(sprite);
-	entry.sprite.draw(DrawOptions().colour(c).angle(direction).frame(steps), Pos(x-view.x,y-view.y));
+	entry.sprite.draw(DrawOptions().colour(c).angle(direction).frame(frame), Pos(x-view.x,y-view.y));
 }
 
 void gl_draw_sprite(sprite_id sprite, int x, int y, const Colour& c) {

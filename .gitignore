@@ -9,3 +9,6 @@ CMakeLists.txt.orig
 *.save
 *.ogg
 *.wav
+*.exe
+stdout.txt
+stderr.txt

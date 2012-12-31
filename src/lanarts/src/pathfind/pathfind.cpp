@@ -225,7 +225,6 @@ void PathInfo::interpolated_direction(int x, int y, int w, int h, float speed,
 		} else {
 			vx = 0;
 			vy = 0;
-			fprintf(stderr, "pathfind.cpp: Monster cannot move despite leniency!\n");
 		}
 	} else {
 		vx = speed * float(acc_x) / mag;
@@ -329,52 +328,6 @@ void PathInfo::fix_distances(int sx, int sy) {
 		}
 	}
 	fixed_node->distance = min_distance;
-}
-void PathInfo::adjust_for_claims(int x, int y) {
-	x = x / TILE_SIZE - start_x, y = y / TILE_SIZE - start_y;
-	if (x < 0 || x >= width() || y < 0 || y >= height())
-		return;
-	int minx = squish(x - 1, 0, width()), miny = squish(y - 1, 0, height());
-	int maxx = squish(x + 1, 0, width()), maxy = squish(y + 1, 0, height());
-	for (int yy = miny; yy <= maxy; yy++) {
-		for (int xx = minx; xx <= maxx; xx++) {
-			this->point_to_local_min(xx, yy);
-		}
-	}
-}
-void PathInfo::stake_claim(int x, int y) {
-	x = x / TILE_SIZE - start_x, y = y / TILE_SIZE - start_y;
-	if (x < 0 || x >= width() || y < 0 || y >= height())
-		return;
-
-	PathingNode* start_node = get(x, y);
-	x += start_node->dx, y += start_node->dy;
-	//Don't claim the player's square
-	if (x == path_x && y == path_y) {
-		//Backtrack, and stake our current square
-		x -= start_node->dx, y -= start_node->dy;
-	}
-	PathingNode* stake_node = get(x, y);
-
-	//Make distance some arbitrarily large number
-	stake_node->distance = HUGE_DISTANCE;
-	stake_node->marked = true;
-//	stake_node->solid = true;
-
-	int minx = squish(x - 1, 0, width()), miny = squish(y - 1, 0, height());
-	int maxx = squish(x + 1, 0, width()), maxy = squish(y + 1, 0, height());
-	for (int yy = miny; yy <= maxy; yy++) {
-		for (int xx = minx; xx <= maxx; xx++) {
-			this->fix_distances(xx, yy);
-		}
-	}
-	for (int yy = miny; yy <= maxy; yy++) {
-		for (int xx = minx; xx <= maxx; xx++) {
-			this->point_to_local_min(xx, yy);
-		}
-	}
-
-//	stake_node->solid = false;
 }
 
 void PathInfo::draw(GameState* gs) {

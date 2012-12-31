@@ -91,7 +91,7 @@ static float hurt_alpha_value(int hurt_cooldown) {
 		return (HURT_COOLDOWN - hurt_cooldown) / 10 * 0.7f + 0.3f;
 }
 
-void CombatGameInst::draw(GameState *gs) {
+void CombatGameInst::draw(GameState *gs, float frame) {
 	GameView& view = gs->view();
 	SpriteEntry& spr = game_sprite_data[sprite];
 	Colour draw_colour = effects().effected_colour();
@@ -102,7 +102,7 @@ void CombatGameInst::draw(GameState *gs) {
 	}
 
 	int sx = x - spr.width() / 2, sy = y - spr.height() / 2;
-	gl_draw_sprite(view, sprite, sx, sy, vx, vy, gs->frame(), draw_colour);
+	gl_draw_sprite(view, sprite, sx, sy, vx, vy, frame, draw_colour);
 
 	effects().draw_effect_sprites(gs, Pos(sx, sy));
 

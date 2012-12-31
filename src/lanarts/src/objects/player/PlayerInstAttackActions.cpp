@@ -576,7 +576,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 
 		cooldown = std::max(wentry.cooldown(), pentry.cooldown());
 
-		//XXX: Horrible hack REMOVE THIS LATER
+		//XXX: Horrible Archer hack REMOVE THIS LATER
 		if (class_stats().class_type().name == "Archer"
 				&& pentry.weapon_class == "bows") {
 			int xplevel = class_stats().xplevel;
@@ -594,7 +594,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 				nbounces = 2;
 				core_stats().mp -= 5;
 			}
-		}
+		}//XXX: Horrible archer hack end
 
 		GameInst* bullet = new ProjectileInst(projectile,
 				effective_atk_stats(mt, weaponattack), id, start, actpos,
@@ -622,8 +622,6 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		if (numhit == 0) {
 			return;
 		}
-
-		lua_api::luacall_hitsound(gs->luastate());
 
 		for (int i = 0; i < numhit; i++) {
 			EnemyInst* e = (EnemyInst*)enemies[i];

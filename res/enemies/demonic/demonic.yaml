@@ -10,7 +10,7 @@ enemies:
     radius: 14
     xpaward: 30
     stats:
-        attacks: [ {weapon: Fast Melee} ]
+        attacks: [ {weapon: Fast Magic Melee} ]
         hp: 130
         hpregen: 0
         movespeed: 3
