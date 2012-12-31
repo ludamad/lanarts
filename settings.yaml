@@ -30,10 +30,3 @@ draw_diagnostics: no
 verbose_output: no
 keep_event_log: no
 #comparison_event_log: logs/game_event_log #Uncomment for verbose logs
-
-fullscreen: yes
-view_width: 1920
-view_height: 1080
-fullscreen: no
-view_width: 640
-view_height: 480
