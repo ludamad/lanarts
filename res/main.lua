@@ -106,7 +106,7 @@ function main()
 
 		if key_pressed(keys.F5) then
 			game.input_capture(true) -- reset input
-			--net.sync_message_send()
+			net.sync_message_send()
 			game.save("savefile.save")
 		end
 	end
