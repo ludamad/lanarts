@@ -55,7 +55,7 @@ harder_enemies: &harder_enemies
   - { enemy: Grue,              chance: 50,  group_chance: 33, group_size: 2           }
   - { enemy: Golem,             guaranteed_spawns: 1, group_chance: 100, group_size: 2 }
   - { enemy: Jester,            chance: 20                                             }
-  - { enemy: Hydra,             guaranteed_spawns: 1, group_chance: 50, group_size: 2  }
+  - { enemy: Hydra,             chance: 20                                             }
   - { enemy: Hell Forged,       chance: 25                                             }
   - { enemy: Unseen Horror,     chance: 10,  group_chance: 33, group_size: 2           }
 

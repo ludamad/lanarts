@@ -3,7 +3,7 @@ projectiles:
   - name: Fire Bolt
     weapon_class: magic
     damage_type: {magic: 1.0}
-    damage: { base: [2,6], magic: 1.25 }
+    damage: { base: [2,6], magic: 1.05 }
     power: { base: 1, magic: 0.2 }
     range: 300
     speed: 7
@@ -14,7 +14,7 @@ projectiles:
   - name: Magic Blast
     weapon_class: magic
     damage_type: { magic: 1.0}
-    damage: { base: [3,18], magic: 2.5 }
+    damage: { base: [3,14], magic: 2.1 }
     power: { base: 2, magic: 0.2 }
     range: 300
     speed: 4
@@ -26,7 +26,7 @@ projectiles:
   - name: Poison Cloud
     weapon_class: magic
     damage_type: { magic: 1.0}
-    damage: { base: 5, magic: .2 }
+    damage: { base: 3, magic: .2 }
     power: { base: 1, magic: 0.2 }
     range: 300
     speed: 4
@@ -34,7 +34,7 @@ projectiles:
     spr_attack: poison
     on_hit_func: 
       function(projectile, target, atkstats) 
-        local effect = target:add_effect(effects.Poison.name, 300, atkstats) 
+        local effect = target:add_effect(effects.Poison.name, 200, atkstats) 
         effect.damage = atkstats.damage
         effect.power = atkstats.power
         effect.magic_percentage = atkstats.magic_percentage

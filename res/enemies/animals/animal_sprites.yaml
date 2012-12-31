@@ -45,3 +45,7 @@ sprites:
   - name: hydra
     type: animation
     frames: res/enemies/animals/sprites/hydra.png%32x48
+
+  - name: dead hydra
+    file: res/enemies/animals/sprites/deadhydra.png
+

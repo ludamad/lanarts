@@ -207,8 +207,11 @@ void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
 			safe_deserialize(inst, gs, serializer);
 		}
 //		if (gs->game_settings().network_debug_mode) {
-			LANARTS_ASSERT(
-					serializer_equals_read(serializer, inst->integrity_hash()));
+		bool seq = serializer_equals_read(serializer, inst->integrity_hash());
+		if (!seq) {
+			lanarts_quit();
+			abort();
+		}
 //		}
 	}
 }

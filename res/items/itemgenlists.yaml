@@ -41,7 +41,7 @@ itemgen_lists:
     items: &EnchantedItems
     - default: *BasicItems
     #Projectiles
-    - { item: Silver Arrow,       chance: 10,  quantity: [4,6]   }
+    - { item: Silver Arrow,       chance: 10,  quantity: [2,6]   }
     #Ranged Weapons
     - { item: Long Bow,           chance: 2                      }
     #Melee Weapons
