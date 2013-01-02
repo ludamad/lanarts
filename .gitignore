@@ -10,5 +10,6 @@ CMakeLists.txt.orig
 *.ogg
 *.wav
 *.exe
+*.zip
 stdout.txt
 stderr.txt
