@@ -90,7 +90,7 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 		GeneratedLevel& level, GameState* gs) {
 	int nplayers = gs->player_data().all_players().size();
 
-	int nmons = round(mt.rand(rs.num_monsters) * sqrt(nplayers));
+	int nmons = round(mt.rand(rs.num_monsters) * (1 + log(nplayers) / 4));
 	int total_chance = get_total_chance(rs);
 
 	for (int i = 0; i < rs.enemy_chances.size(); i++) {

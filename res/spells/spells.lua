@@ -28,7 +28,6 @@ function powerstrike_spell.action(caster, _, _)
             caster:melee(mon)
             local chance = math.max(25, 100 - (num-1) * 20) 
             if rand_range(0, 100) < chance then -- decreasing chance of knockback
-            	print(tostring(mon) .. ", " .. tostring(mon.add_effect))
                 mon:add_effect("Thrown", 45 + 2 * caster.stats.level).angle = direction({caster.x, caster.y}, {mon.x, mon.y})
                 if caster:is_local_player() then 
                   show_message("The " .. mon.name .." is thrown back!", {200,200,255}) 

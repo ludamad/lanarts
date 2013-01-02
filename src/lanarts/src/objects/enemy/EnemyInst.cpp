@@ -53,9 +53,9 @@ float monster_difficulty_multiplier(GameState* gs, EnemyEntry& etype) {
 	}
 	float mult = log(size);//NB: natural log, base e ~ 2.718...
 	if (etype.unique) {
-		return 1+mult; // Can reasonably expect all players to be part of a boss fight
+		return 1+mult / 8; // Can reasonably expect all players to be part of a boss fight
 	}
-	return 1+mult / 4;
+	return 1+mult / 16;
 }
 
 EnemyInst::EnemyInst(int enemytype, int x, int y, int teamid, int mobid) :
