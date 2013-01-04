@@ -5,12 +5,15 @@
 
 #include <typeinfo>
 
+#include <lcommon/SerializeBuffer.h>
+#include <lcommon/strformat.h>
+
+#include "draw/colour_constants.h"
 #include "display/display.h"
 
 #include "display/SpriteEntry.h"
 #include "display/TileEntry.h"
 #include "gamestate/GameState.h"
-#include <lcommon/SerializeBuffer.h>
 
 #include "stats/items/WeaponEntry.h"
 
@@ -35,12 +38,32 @@ PlayerInst::PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y,
 	last_chosen_weaponclass = "unarmed";
 }
 
+std::string player_name(GameState* gs, PlayerInst* p) {
+	std::vector<PlayerDataEntry>& players = gs->player_data().all_players();
+	for (int i = 0; i < players.size(); i++) {
+		if (players[i].player_inst.get() == p) {
+			return players[i].player_name;
+		}
+	}
+	LANARTS_ASSERT(false);
+	return "";
+}
+
 void PlayerInst::init(GameState* gs) {
+	int previous_level = current_level;
 	CombatGameInst::init(gs);
 	teamid = gs->teams().default_player_team();
 	_path_to_player.calculate_path(gs, x, y, PLAYER_PATHING_RADIUS);
 	collision_simulation_id() = gs->collision_avoidance().add_player_object(
 			this);
+	if (!is_local_player() && current_level > 0) {
+		std::string pname = player_name(gs, this);
+		gs->game_chat().add_message(
+				format(
+						current_level < previous_level ?
+								"%s ascends to floor %d" : "%s descends to floor %d",
+						pname.c_str(), current_level), COL_PALE_BLUE);
+	}
 }
 
 PlayerInst::~PlayerInst() {
@@ -128,7 +151,7 @@ void PlayerInst::shift_autotarget(GameState* gs) {
 			// Exit when we wrap around if we have a target
 			return;
 		}
-		EnemyInst* e = (EnemyInst*) gs->get_instance(mids[j]);
+		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[j]);
 		bool isvisible = e != NULL && gs->object_visible_test(e, this, false);
 		if (isvisible) {
 			current_target = e->id;
@@ -200,7 +223,7 @@ void PlayerInst::draw(GameState* gs) {
 
 void PlayerInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(PlayerInst*) inst = *this;
+	*(PlayerInst*)inst = *this;
 }
 
 void PlayerInst::serialize(GameState* gs, SerializeBuffer& serializer) {

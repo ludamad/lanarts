@@ -120,6 +120,7 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 	}
 	return NULL;
 }
+
 bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
 	PlayerData& pc = gs->player_data();
 

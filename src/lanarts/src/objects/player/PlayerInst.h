@@ -148,6 +148,7 @@ private:
 	int previous_spellselect, spellselect;
 };
 
+std::string player_name(GameState* gs, PlayerInst* p);
 bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position);
 
 #endif /* PLAYERINST_H_ */
