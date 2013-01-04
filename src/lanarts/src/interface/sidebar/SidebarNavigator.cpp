@@ -23,13 +23,9 @@
 #include "SidebarNavigator.h"
 #include "SpellsContent.h"
 
-NavigationSprites::NavigationSprites() :
-		left_arrow(get_sprite_by_name("left_arrow")), right_arrow(
-				get_sprite_by_name("right_arrow")) {
-}
-SidebarNavigator::NavigationOption::NavigationOption(sprite_id icon,
+SidebarNavigator::NavigationOption::NavigationOption(const std::string& icon,
 		SidebarContent* content, const BBox& icon_bbox) :
-		icon(icon), content(content), icon_bbox(icon_bbox) {
+		iconsprite(icon), content(content), icon_bbox(icon_bbox) {
 }
 
 SidebarNavigator::NavigationOption::~NavigationOption() {
@@ -44,7 +40,7 @@ void SidebarNavigator::NavigationOption::draw_icon(GameState* gs,
 	} else if (icon_bbox.contains(gs->mouse_x(), gs->mouse_y())) {
 		col = COL_HOVER_VIEWICON;
 	}
-	gl_draw_sprite(icon, icon_bbox.x1, icon_bbox.y1, col);
+	gl_draw_sprite(get_sprite_by_name(iconsprite.c_str()), icon_bbox.x1, icon_bbox.y1, col);
 }
 
 static BBox icon_bounds(const BBox& main_content_bounds, int icon_n,
@@ -64,21 +60,16 @@ const int NUM_ICONS_ROW_2 = 2;
 SidebarNavigator::SidebarNavigator(const BBox& sidebar_bounds,
 		const BBox& main_content_bounds) :
 		side_bar(sidebar_bounds), main_content(main_content_bounds), view(
-				INVENTORY), content_overlay(NULL), inventory(
-				get_sprite_by_name("inventory_icon"),
+				INVENTORY), content_overlay(NULL), inventory("inventory_icon",
 				new InventoryContent(main_content_bounds),
 				icon_bounds(main_content_bounds, 0, NUM_ICONS_ROW_1)), equipment(
-				get_sprite_by_name("equipment_icon"),
-				new EquipmentContent(main_content_bounds),
+				"equipment_icon", new EquipmentContent(main_content_bounds),
 				icon_bounds(main_content_bounds, 1, NUM_ICONS_ROW_1)), spells(
-				get_sprite_by_name("spells_icon"),
-				new SpellsContent(main_content_bounds),
+				"spells_icon", new SpellsContent(main_content_bounds),
 				icon_bounds(main_content_bounds, 2, NUM_ICONS_ROW_1)), enemies(
-				get_sprite_by_name("enemies_icon"),
-				new EnemiesSeenContent(main_content_bounds),
+				"enemies_icon", new EnemiesSeenContent(main_content_bounds),
 				icon_bounds(main_content_bounds, 0, NUM_ICONS_ROW_2, 1)), config(
-				get_sprite_by_name("config_icon"),
-				new ConfigContent(main_content_bounds),
+				"config_icon", new ConfigContent(main_content_bounds),
 				icon_bounds(main_content_bounds, 1, NUM_ICONS_ROW_2, 1)) {
 }
 

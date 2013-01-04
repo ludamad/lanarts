@@ -41,30 +41,6 @@
 
 static lua_State* L;
 
-static bool handle_event(SDL_Event* event) {
-	SDLKey keycode = event->key.keysym.sym;
-	SDLMod keymod = event->key.keysym.mod;
-
-	switch (event->type) {
-	case SDL_MOUSEBUTTONDOWN: {
-		break;
-	}
-	case SDL_QUIT: {
-		return false;
-	}
-	case SDL_KEYDOWN: {
-		if (keycode == SDLK_RETURN || keycode == SDLK_ESCAPE) {
-			return false;
-		}
-		if (keycode == SDLK_F1) {
-			ldraw::display_set_fullscreen(!ldraw::display_is_fullscreen());
-		}
-	}
-		break;
-	}
-	return true;
-}
-
 typedef void (*DrawFunc)();
 
 static void draw_loop(DrawFunc draw_func) {
@@ -74,12 +50,11 @@ static void draw_loop(DrawFunc draw_func) {
 	while (1) {
 		ldraw::Font fpsfont("res/sample.ttf", 40);
 		frames += 1;
-		SDL_Event event;
-		while (SDL_PollEvent(&event)) {
-			if (!handle_event(&event)) {
-				return; // Exit draw loop
-			}
+
+		if (!lua_api::gamestate(L)->update_iostate()) {
+			break;
 		}
+
 		ldraw::display_draw_start();
 		draw_func();
 		double seconds = timer.get_microseconds() / 1000.0 / 1000.0;

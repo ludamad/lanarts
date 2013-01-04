@@ -52,7 +52,7 @@ static int game_draw(lua_State* L) {
 }
 
 static int game_input_capture(lua_State* L) {
-	bool reset_previous = false;//lua_gettop(L) == 0 || lua_toboolean(L, 1);
+	bool reset_previous = lua_gettop(L) == 0 || lua_toboolean(L, 1);
 	bool quit = lua_api::gamestate(L)->update_iostate(reset_previous);
 	lua_pushboolean(L, quit);
 	return 1;

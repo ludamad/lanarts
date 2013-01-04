@@ -34,7 +34,7 @@ end
 
 obj = create(GameObject)
 
-function draw() 
+function draw()
 	obj:step()
 	obj:draw()
 end
