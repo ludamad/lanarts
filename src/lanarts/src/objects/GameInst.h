@@ -26,6 +26,10 @@ class SerializeBuffer;
 
 class GameInst {
 public:
+	/* Reference count functions*/
+	static void retain_reference(GameInst* inst);
+	static void free_reference(GameInst* inst);
+
 	GameInst(int x, int y, int radius, bool solid = true, int depth = 0) :
 			reference_count(0), id(0), last_x(x), last_y(y), x(x), y(y), radius(
 					radius), target_radius(radius), depth(depth), solid(solid), destroyed(
@@ -33,6 +37,7 @@ public:
 		if (this->radius > 14)
 			this->radius = 14;
 	}
+
 	virtual ~GameInst();
 	/* Initialize the object further, 'id' will be set*/
 	virtual void init(GameState* gs);
@@ -60,10 +65,6 @@ public:
 	//Used for keeping object from being deleted arbitrarily
 	//Important for lua code
 	int reference_count;
-	/* Reference counting functions
-	 * NOTE: free_reference employs 'delete this;' */
-	void retain_reference();
-	void free_reference();
 
 	/*Should probably keep these public, many functions operate on these*/
 	obj_id id;

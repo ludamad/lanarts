@@ -41,12 +41,12 @@ GameInstSet::~GameInstSet() {
 	for (int i = 0, j = 0; i < unit_capacity; i++) {
 		GameInst* inst = unit_set[i].inst;
 		if (valid_inst(inst)) {
-			inst->free_reference();
+			GameInst::free_reference(inst);
 		}
 	}
 
 	for (int i = 0; i < deallocation_list.size(); i++) {
-		deallocation_list[i]->free_reference();
+		GameInst::free_reference(deallocation_list[i]);
 	}
 }
 struct GameInstSetFunctions { //Helper class
@@ -246,7 +246,7 @@ obj_id GameInstSet::add_instance(GameInst* inst, int id) {
 	}
 	add_to_depthlist(state, depthlist_map[inst->depth]);
 
-	inst->retain_reference();
+	GameInst::retain_reference(inst);
 
 	return inst->id;
 }
@@ -255,7 +255,7 @@ void GameInstSet::step(GameState* gs) {
 
 	perf_timer_begin(FUNCNAME);
 	for (int i = 0; i < deallocation_list.size(); i++) {
-		deallocation_list[i]->free_reference();
+		GameInst::free_reference(deallocation_list[i]);
 	}
 	deallocation_list.clear();
 	for (int i = 0; i < unit_capacity; i++) {
@@ -349,7 +349,7 @@ void GameInstSet::copy_to(GameInstSet& inst_set) const {
 					inst->copy_to(oinst);
 				} else
 					inst_set.__remove_instance(state);
-				inst->free_reference();
+				GameInst::free_reference(inst);
 			}
 
 		}
@@ -413,7 +413,7 @@ void GameInstSet::clear() {
 	for (int i = 0; i < unit_capacity; i++) {
 		GameInst* inst = unit_set[i].inst;
 		if (valid_inst(inst)) {
-			inst->free_reference();
+			GameInst::free_reference(inst);
 		}
 	}
 	next_id = 1;

@@ -5,14 +5,14 @@ equipment:
     shop_cost: [15, 25]
     spr_item: leather gloves
     equipment_type: gloves
-    reduction:  { base: 1 }
+    resistance:  { base: 1 }
 
   - name: Steel Gloves
     description: Gloves made from steel, slightly unwieldy.
     shop_cost: [55, 75]
     spr_item: steel gloves
     equipment_type: gloves
-    resistance: { base: 2 }
+    resistance: { base: 1 }
     reduction:  { base: 1 }
 
   - name: Runed Gloves
@@ -22,10 +22,6 @@ equipment:
     equipment_type: gloves
     stat_bonuses:
       strength: 1
-      magic: 1
-      willpower: 1
-      defence: 1
-    resistance: { base: 2 }
+    resistance: { base: 1 }
     reduction:  { base: 1 }
     magic_resistance: { base: 1 }
-    magic_reduction:  { base: 1 }

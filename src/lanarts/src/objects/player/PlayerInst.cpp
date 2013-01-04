@@ -206,6 +206,7 @@ void PlayerInst::copy_to(GameInst *inst) const {
 void PlayerInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	CombatGameInst::serialize(gs, serializer);
 	serializer.write(actions_set_for_turn);
+	serializer.write(last_chosen_weaponclass);
 //	serializer.write_container(queued_actions);
 
 	SERIALIZE_POD_REGION(serializer, this, local, spellselect);
@@ -214,6 +215,7 @@ void PlayerInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	CombatGameInst::deserialize(gs, serializer);
 	serializer.read(actions_set_for_turn);
+	serializer.read(last_chosen_weaponclass);
 //	serializer.read_container(queued_actions);
 	queued_actions.clear();
 	_path_to_player.calculate_path(gs, x, y, PLAYER_PATHING_RADIUS);

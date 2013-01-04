@@ -163,13 +163,9 @@ public:
 		return world.enemies_seen();
 	}
 
-	const ldraw::Font& font() {
-		return normal_font;
-	}
+	const ldraw::Font& font();
 
-	const ldraw::Font& menu_font() {
-		return _large_font;
-	}
+	const ldraw::Font& menu_font();
 
 	/* IO & action controller */
 	IOController& io_controller() {
@@ -256,7 +252,6 @@ private:
 	GameWorld world;
 
 	MTwist mtwist;
-	ldraw::Font normal_font, _large_font;
 	bool dragging_view;
 	IOController iocontroller;
 

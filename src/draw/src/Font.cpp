@@ -315,5 +315,9 @@ int Font::height() const {
 	return _font->h;
 }
 
+void Font::clear() {
+	_font = smartptr<font_data>();
+}
+
 }
 

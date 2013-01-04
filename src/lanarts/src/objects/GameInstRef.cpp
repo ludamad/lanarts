@@ -14,12 +14,12 @@
 static void __retain_ref(GameInst* inst) {
 	if (inst) {
 		LANARTS_ASSERT(inst->reference_count >= 0);
-		inst->retain_reference();
+		GameInst::retain_reference(inst);
 	}
 }
 static void __free_ref(GameInst* inst) {
 	if (inst) {
-		inst->free_reference();
+		GameInst::free_reference(inst);
 	}
 }
 

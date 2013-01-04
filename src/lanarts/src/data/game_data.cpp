@@ -11,6 +11,8 @@
 
 #include <lcommon/lua_lcommon.h>
 
+#include "draw/fonts.h"
+
 #include "lua/lua_api.h"
 
 #include "stats/items/EquipmentEntry.h"
@@ -232,6 +234,9 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 
 	load_settings_data(settings, "settings.yaml");
 	load_settings_data(settings, "saved_settings.yaml");
+
+	res::font_primary().initialize(settings.font, 10);
+	res::font_menu().initialize(settings.menu_font, 20);
 
 }
 

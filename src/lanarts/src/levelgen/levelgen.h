@@ -7,10 +7,10 @@
 #define LEVELGEN_H_
 
 #include <lcommon/mtwist.h>
+
 #include "dungeon_data.h"
 #include "enemygen.h"
 #include "featuregen.h"
-
 #include "itemgen.h"
 #include "tunnelgen.h"
 

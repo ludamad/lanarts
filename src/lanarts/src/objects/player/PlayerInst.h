@@ -135,13 +135,14 @@ private:
 	ActionQueue queued_actions;
 	PathInfo _path_to_player;
 	fov fieldofview;
-	bool local, moving;
 
 	// Used when eg run out of projectiles.
 	// We will switch to another weapon type but want to
 	// switch back the moment we pick up a projectile
 	std::string last_chosen_weaponclass;
 
+	// NB: local to spell select is assumed to be a POD region by serialize/deserialize
+	bool local, moving;
 	int autouse_mana_potion_try_count;
 	int lives, deaths;
 	int previous_spellselect, spellselect;

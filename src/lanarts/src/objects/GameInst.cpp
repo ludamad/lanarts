@@ -42,8 +42,8 @@ unsigned int GameInst::integrity_hash() {
 	return hash;
 }
 
-void GameInst::retain_reference() {
-	reference_count++;
+void GameInst::retain_reference(GameInst* inst) {
+	inst->reference_count++;
 }
 
 void GameInst::update_position(float newx, float newy) {
@@ -73,10 +73,10 @@ GameInst* GameInst::clone() const {
 	return NULL;
 }
 
-void GameInst::free_reference() {
-	reference_count--;
-	if (reference_count <= 0) {
-		delete this;
+void GameInst::free_reference(GameInst* inst) {
+	inst->reference_count--;
+	if (inst->reference_count <= 0) {
+		delete inst;
 	}
 }
 

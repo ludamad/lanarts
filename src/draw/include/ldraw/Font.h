@@ -58,6 +58,8 @@ public:
 
 	int height() const;
 
+	void clear();
+
 private:
 	mutable std::string _print_buffer;
 	smartptr<font_data> _font;

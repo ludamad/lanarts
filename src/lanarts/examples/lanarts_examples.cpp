@@ -35,6 +35,10 @@
 #include "draw/parse_drawable.h"
 #include "data/parse_context.h"
 
+#include "gamestate/GameState.h"
+
+#include "lua_api/lua_newapi.h"
+
 static lua_State* L;
 
 static bool handle_event(SDL_Event* event) {
@@ -127,12 +131,14 @@ static void setup_lua_state() {
 	using namespace ldraw;
 
 	L = lua_open();
-	luaL_openlibs(L);
+
+	GameSettings settings;
+
+	//GameState claims ownership of the passed lua_State*
+	GameState* gs = new GameState(settings, L, 200, 200);
+	lua_api::register_api(gs, L);
 
 	LuaValue globals(L, LUA_GLOBALSINDEX);
-
-	lua_register_ldraw(L, globals);
-	lua_register_lcommon(L, globals);
 
 	// Expose additional functions needed for examples
 	// This allows us to code the examples fully in lua:

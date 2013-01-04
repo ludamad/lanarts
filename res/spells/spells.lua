@@ -21,12 +21,12 @@ function powerstrike_spell.action(caster, _, _)
     end
     caster:add_effect("Charge", 8).callback = 
       function (effect, caster)
-        local mons = level.monsters_list()
-        for num=1,#mons do
-          local mon = mons[num]
+      	local num = 0
+        for mon in level.monsters() do
           if distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 35 then
+            num = num + 1
             caster:melee(mon)
-            local chance = math.max(25, 100 - (num-1) * 20) 
+            local chance = math.max(25, 100 - num * 20) 
             if rand_range(0, 100) < chance then -- decreasing chance of knockback
                 mon:add_effect("Thrown", 45 + 2 * caster.stats.level).angle = direction({caster.x, caster.y}, {mon.x, mon.y})
                 if caster:is_local_player() then 

@@ -5,7 +5,6 @@
  *  without making the caller worry about which component does what.
  */
 
-
 #include <lua.hpp>
 #include <SDL.h>
 #include <cmath>
@@ -19,6 +18,7 @@
 
 #include <ldraw/display.h>
 
+#include "draw/fonts.h"
 #include "data/game_data.h"
 
 #include "display/display.h"
@@ -64,13 +64,11 @@ GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
 
 	dragging_view = false;
 
-	normal_font.initialize(settings.font, 10);
-	_large_font.initialize(settings.menu_font, 20);
-
 	init_data.seed = generate_seed();
 }
 
-GameState::~GameState() {}
+GameState::~GameState() {
+}
 
 void GameState::start_connection() {
 	if (settings.conntype == GameSettings::SERVER) {
@@ -169,6 +167,8 @@ bool GameState::level_has_player() {
 }
 
 void GameState::serialize(SerializeBuffer& serializer) {
+	serializer.write(mtwist); // Save RNG state
+
 	serializer.write_int(this->frame_n);
 	world.serialize(serializer);
 
@@ -177,6 +177,8 @@ void GameState::serialize(SerializeBuffer& serializer) {
 }
 
 void GameState::deserialize(SerializeBuffer& serializer) {
+	serializer.read(mtwist); // Load RNG state
+
 	serializer.read_int(this->frame_n);
 	world.deserialize(serializer);
 	player_data().deserialize(this, serializer);
@@ -203,6 +205,14 @@ CollisionAvoidance & GameState::collision_avoidance() {
 
 bool GameState::in_menu_screen() {
 	return get_level()->id() == -1;
+}
+
+const ldraw::Font& GameState::font() {
+	return res::font_primary();
+}
+
+const ldraw::Font& GameState::menu_font() {
+	return res::font_menu();
 }
 
 int GameState::handle_event(SDL_Event* event) {

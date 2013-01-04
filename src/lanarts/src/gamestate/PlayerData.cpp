@@ -96,7 +96,7 @@ static void read_inst_ref(GameInstRef& ref, GameState* gs,
 }
 
 void PlayerData::serialize(GameState* gs, SerializeBuffer& serializer) {
-	write_inst_ref(local_player_data().player_inst, gs, serializer);
+	serializer.write_int(_local_player_idx);
 	serializer.write_int(_players.size());
 	for (int i = 0; i < _players.size(); i++) {
 		write_inst_ref(_players[i].player_inst, gs, serializer);
@@ -119,7 +119,7 @@ PlayerDataEntry& PlayerData::get_entry_by_netid(int netid) {
 }
 
 void PlayerData::deserialize(GameState* gs, SerializeBuffer & serializer) {
-	read_inst_ref(local_player_data().player_inst, gs, serializer);
+	serializer.read_int(_local_player_idx);
 
 	int psize;
 	serializer.read_int(psize);
