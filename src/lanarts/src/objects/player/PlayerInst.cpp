@@ -6,9 +6,7 @@
 #include <typeinfo>
 
 #include <lcommon/SerializeBuffer.h>
-#include <lcommon/strformat.h>
 
-#include "draw/colour_constants.h"
 #include "display/display.h"
 
 #include "display/SpriteEntry.h"
@@ -50,20 +48,13 @@ std::string player_name(GameState* gs, PlayerInst* p) {
 }
 
 void PlayerInst::init(GameState* gs) {
+	//XXX: this seems to be set wrong, fix this
 	int previous_level = current_level;
 	CombatGameInst::init(gs);
 	teamid = gs->teams().default_player_team();
 	_path_to_player.calculate_path(gs, x, y, PLAYER_PATHING_RADIUS);
 	collision_simulation_id() = gs->collision_avoidance().add_player_object(
 			this);
-	if (!is_local_player() && current_level > 0) {
-		std::string pname = player_name(gs, this);
-		gs->game_chat().add_message(
-				format(
-						current_level < previous_level ?
-								"%s ascends to floor %d" : "%s descends to floor %d",
-						pname.c_str(), current_level), COL_PALE_BLUE);
-	}
 }
 
 PlayerInst::~PlayerInst() {
@@ -110,13 +101,10 @@ static void spawn_in_lower_level(GameState* gs, PlayerInst* player) {
 		}
 	}
 
-	if (player->is_local_player()) {
-		gs->game_chat().add_message("You have respawned!",
-				Colour(100, 150, 150));
-	} else {
-		gs->game_chat().add_message("Your ally has respawned!",
-				Colour(100, 150, 150));
-	}
+	gs->game_chat().add_message(
+			player->is_local_player() ?
+					"You have respawned!" : "Your ally has respawned!",
+			Colour(100, 150, 150));
 	if (levelid1 != levelid2) {
 		gs->game_world().level_move(player->id, sqr.x, sqr.y, levelid1,
 				levelid2);

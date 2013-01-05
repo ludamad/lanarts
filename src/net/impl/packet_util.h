@@ -36,31 +36,34 @@ inline void send_packet(TCPsocket socket, PacketBuffer& packet) {
 }
 
 /* Ensure we can read the header even if we somehow get less than HEADER_SIZE bytes */
-inline void read_n_bytes(TCPsocket socket, PacketBuffer& packet, int nbytes) {
+inline bool read_n_bytes(TCPsocket socket, PacketBuffer& packet, int nbytes) {
 	int nread = 0;
 	while (nread < nbytes) {
 		int recv = SDLNet_TCP_Recv(socket, &packet[nread], nbytes);
 		if (recv == 0) {
 			fprintf(stderr, "Connection closed!\n");
 			fflush(stderr);
-			exit(0);
+			return false;
 		} else if (recv < 0) {
-			fprintf(
-					stderr,
+			fprintf(stderr,
 					"Connection severed, read_n_bytes got error message:\n\t%s\n",
 					SDLNet_GetError());
 			fflush(stderr);
-			exit(0);
+			return false;
 		}
 		nread += recv;
 	}
+	return true;
 }
 
-inline void receive_packet(TCPsocket socket, PacketBuffer& packet,
+inline bool receive_packet(TCPsocket socket, PacketBuffer& packet,
 		receiver_t& receiver, receiver_t& sender) {
 	packet.resize(HEADER_SIZE);
 
-	read_n_bytes(socket, packet, HEADER_SIZE);
+	if (!read_n_bytes(socket, packet, HEADER_SIZE)) {
+		return false;
+	}
+
 	receiver = *(int*)&packet[0];
 	sender = *(int*)&packet[sizeof(int)];
 	int size = *(int*)&packet[sizeof(int) * 2];
@@ -76,17 +79,17 @@ inline void receive_packet(TCPsocket socket, PacketBuffer& packet,
 		if (nbody == 0) {
 			fprintf(stderr, "Connection closed!\n");
 			fflush(stderr);
-			exit(0);
+			return false;
 		} else if (nbody < 0) {
-			fprintf(
-					stderr,
+			fprintf(stderr,
 					"Connection severed, receive_packet got error message:\n\t%s\n",
 					SDLNet_GetError());
 			fflush(stderr);
-			exit(0);
+			return false;
 		}
 		body_read += nbody;
 	}
+	return true;
 }
 
 #endif /* PACKET_UTIL_H_ */

@@ -64,7 +64,8 @@ public:
 	void set_accepting_connections(bool accept);
 
 	std::vector<QueuedMessage> sync_on_message(message_t msg);
-	void poll_messages(int timeout = 0);
+	/* On false, exit; on true, continue*/
+	bool poll_messages(int timeout = 0);
 	bool consume_sync_messages(GameState* gs);
 	bool has_incoming_sync();
 

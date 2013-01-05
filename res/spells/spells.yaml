@@ -22,8 +22,8 @@ spells:
   - name: Poison Cloud
     description:
      A poisonous cloud that causes damage over time.
-    mp_cost: 20
-    cooldown: 50
+    mp_cost: 25
+    cooldown: 60
     spr_spell: poison
     projectile: Poison Cloud
 

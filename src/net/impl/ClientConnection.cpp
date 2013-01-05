@@ -52,7 +52,11 @@ bool ClientConnection::poll(packet_recv_callback message_handler, void* context,
 		}
 		while (SDLNet_SocketReady(_client_socket)) {
 			receiver_t receiver, sender;
-			receive_packet(_client_socket, _packet_buffer, receiver, sender);
+
+			if (!receive_packet(_client_socket, _packet_buffer, receiver, sender)) {
+				return false;
+			}
+
 			if (message_handler && !_packet_buffer.empty()) {
 				message_handler(sender, context, &_packet_buffer[HEADER_SIZE],
 						_packet_buffer.size() - HEADER_SIZE);

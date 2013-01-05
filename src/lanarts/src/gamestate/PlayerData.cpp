@@ -3,6 +3,8 @@
  *	Holds lists of all players in game, and pointers to their respective PlayerInst's
  */
 
+#include <lcommon/perf_timer.h>
+
 #include "fov/fov.h"
 #include "objects/player/PlayerInst.h"
 #include "util/math_util.h"
@@ -154,7 +156,7 @@ int player_get_playernumber(GameState* gs, PlayerInst* p) {
 	return -1;
 }
 
-static void player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
+static bool player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
 	const int POLL_MS_TIMEOUT = 1 /*millsecond*/;
 	GameNetConnection& net = gs->net_connection();
 	while (!net.has_incoming_sync()) {
@@ -165,7 +167,9 @@ static void player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
 			if (gs->game_settings().verbose_output) {
 				printf("Polling for player %d\n", pde.net_id);
 			}
-			gs->net_connection().poll_messages(POLL_MS_TIMEOUT);
+			if (!gs->net_connection().poll_messages(POLL_MS_TIMEOUT)) {
+				return false;
+			}
 		} else {
 
 			ActionQueue actions;
@@ -174,9 +178,12 @@ static void player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
 			break;
 		}
 	}
+	return true;
 }
 
-void players_poll_for_actions(GameState* gs) {
+bool players_poll_for_actions(GameState* gs) {
+	perf_timer_begin("*** NETWORK WAIT ***");
+
 	PlayerData& pd = gs->player_data();
 	std::vector<PlayerDataEntry> &players = pd.all_players();
 
@@ -185,8 +192,14 @@ void players_poll_for_actions(GameState* gs) {
 	}
 
 	for (int i = 0; i < players.size(); i++) {
-		player_poll_for_actions(gs, players[i]);
+		if (!player_poll_for_actions(gs, players[i])) {
+			perf_timer_end("*** NETWORK WAIT ***");
+			return false;
+		}
 	}
+
+	perf_timer_end("*** NETWORK WAIT ***");
+	return true;
 }
 
 void PlayerData::set_local_player_idx(int idx) {

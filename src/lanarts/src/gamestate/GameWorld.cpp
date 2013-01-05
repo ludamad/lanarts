@@ -218,7 +218,7 @@ bool GameWorld::pre_step() {
 	midstep = false;
 	return true;
 }
-void GameWorld::step() {
+bool GameWorld::step() {
 	redofirststep: //I used a goto dont kill mes
 
 	GameLevelState* current_level = gs->get_level();
@@ -226,8 +226,11 @@ void GameWorld::step() {
 	midstep = true;
 
 	/* Queue all actions for players */
-	/* This will result in a network poll for other players actions */
-	players_poll_for_actions(gs);
+	/* This will result in a network poll for other players actions
+	 * Return false on network failure */
+	if (!players_poll_for_actions(gs)) {
+		return false;
+	}
 
 	for (int i = 0; i < level_states.size(); i++) {
 		GameLevelState* level = level_states[i];
@@ -245,6 +248,8 @@ void GameWorld::step() {
 		gs->view().sharp_center_on(gs->local_player()->pos());
 		next_room_id = -1;
 	}
+
+	return true;
 }
 
 void GameWorld::regen_level(int roomid) {

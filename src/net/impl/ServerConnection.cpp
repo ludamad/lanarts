@@ -58,8 +58,11 @@ bool ServerConnection::poll(packet_recv_callback message_handler, void* context,
 //				printf("ServerConnect::poll: client socket %d activity\n",
 //						i + 1);
 				receiver_t receiver, _unused_sender;
-				receive_packet(_socket_list[i], _packet_buffer, receiver,
-						_unused_sender);
+				if (!receive_packet(_socket_list[i], _packet_buffer, receiver,
+						_unused_sender)) {
+					return false;
+				}
+
 				if (!_packet_buffer.empty()) {
 					// Rebroadcast to clients
 //					printf("Rebroadcasting message to %d from %d\n", receiver,

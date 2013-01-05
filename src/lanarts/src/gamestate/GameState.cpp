@@ -109,7 +109,7 @@ static void _event_log_initialize(GameState* gs, GameSettings& settings) {
 	event_log_initialize(gs, input_log, output_log);
 }
 
-void GameState::start_game() {
+bool GameState::start_game() {
 	_event_log_initialize(this, settings);
 
 	if (settings.conntype == GameSettings::SERVER) {
@@ -126,7 +126,9 @@ void GameState::start_game() {
 	init_lua_data(this, L);
 	if (settings.conntype == GameSettings::CLIENT) {
 		while (!init_data.seed_set_by_network_message) {
-			connection.poll_messages(1 /* milliseconds */);
+			if (!connection.poll_messages(1 /* milliseconds */)) {
+				return false;
+			}
 		}
 	}
 
@@ -138,6 +140,7 @@ void GameState::start_game() {
 
 	PlayerInst* p = local_player();
 	view().sharp_center_on(p->x, p->y);
+	return true;
 }
 
 void GameState::set_level(GameLevelState* lvl) {
@@ -247,16 +250,22 @@ bool GameState::update_iostate(bool resetprev) {
 bool GameState::pre_step() {
 	return world.pre_step();
 }
-void GameState::step() {
+
+bool GameState::step() {
 	if (game_settings().network_debug_mode) {
 		connection.check_integrity(this);
 	}
-	connection.poll_messages();
+
+	if (!connection.poll_messages()) {
+		return false;
+	}
 	hud.step(this);
-	world.step(); //Has pointer to this (GameState) object
-//TODO: Spend remaining time collecting garbage instead of doing SDL_Delay
-//	lua_gc(L, LUA_GCSTEP, 0); // this was used here mistakenly, Lua GC is already incremental
+	if (!world.step()) {
+		return false;
+	}
+
 	frame_n++;
+	return true;
 }
 
 int GameState::key_down_state(int keyval) {

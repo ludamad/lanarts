@@ -46,7 +46,9 @@ local function mainloop(steponly)
 	end
 
 	perf.timing_begin("**Step**")
-	game.step()
+	if not game.step() then 
+		return false 
+	end
 	perf.timing_end("**Step**")
 
 	if not game.input_handle() then 
@@ -69,12 +71,12 @@ end
 function postdraw()
 end
 
---local music = music_optional_load("res/sound/Chapter Objectives.ogg")
+local music = music_optional_load("res/sound/lanarts1.ogg")
 
 function main()
 
 	game.input_capture()
-	--music:play()
+	music:loop()
 
 	while true do 
 		local single_player = (settings.connection_type == net.NONE)

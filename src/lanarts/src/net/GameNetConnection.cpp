@@ -400,7 +400,7 @@ static void gamenetconnection_consume_message(receiver_t sender, void* context,
 	((GameNetConnection*)context)->_message_callback(sender, msg, len, false);
 }
 
-void GameNetConnection::poll_messages(int timeout) {
+bool GameNetConnection::poll_messages(int timeout) {
 	if (_connection) {
 		for (int i = 0; i < _delayed_messages.size(); i++) {
 			QueuedMessage& qm = _delayed_messages[i];
@@ -410,9 +410,12 @@ void GameNetConnection::poll_messages(int timeout) {
 				i--;
 			}
 		}
-		_connection->poll(gamenetconnection_consume_message, (void*)this,
-				timeout);
+		if (!_connection->poll(gamenetconnection_consume_message, (void*)this,
+				timeout)) {
+			return false;
+		}
 	}
+	return true;
 }
 
 static void gamenetconnection_queue_message(receiver_t sender, void* context,

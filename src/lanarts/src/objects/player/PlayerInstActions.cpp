@@ -6,9 +6,14 @@
 
 #include <lua.hpp>
 
+#include <lcommon/strformat.h>
+
 #include "display/display.h"
 #include "display/SpriteEntry.h"
 #include "display/TileEntry.h"
+
+#include "draw/colour_constants.h"
+
 #include "gamestate/GameState.h"
 #include "lua/lua_api.h"
 
@@ -589,8 +594,22 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 
 	int px = centered_multiple(portal->exitsqr.x, TILE_SIZE);
 	int py = centered_multiple(portal->exitsqr.y, TILE_SIZE);
-	gs->level_move(id, px, py, gs->get_level()->id(),
-			gs->get_level()->id() - 1);
+
+	int newlevel = gs->get_level()->id() - 1;
+	std::string verb = "You ascend";
+	if (!is_local_player()) {
+		verb = player_name(gs, this) + " ascends";
+	}
+
+	if (newlevel == 0) {
+		verb += " to the top floor";
+	} else {
+		verb = format("%s to the floor %d", verb.c_str(), newlevel);
+	}
+	gs->game_chat().add_message(verb, COL_PALE_BLUE);
+
+
+	gs->level_move(id, px, py, gs->get_level()->id(), newlevel);
 
 	reset_rest_cooldown();
 }
@@ -616,8 +635,22 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 
 	int px = centered_multiple(portal->exitsqr.x, TILE_SIZE);
 	int py = centered_multiple(portal->exitsqr.y, TILE_SIZE);
-	gs->level_move(id, px, py, gs->get_level()->id(),
-			gs->get_level()->id() + 1);
+
+	int newlevel = gs->get_level()->id() + 1;
+
+	std::string verb = "You descend";
+	if (!is_local_player()) {
+		verb = player_name(gs, this) + " descends";
+	}
+
+	if (newlevel == 0) {
+		verb += " to the top floor";
+	} else {
+		verb = format("%s to the floor %d", verb.c_str(), newlevel);
+	}
+	gs->game_chat().add_message(verb, COL_PALE_BLUE);
+
+	gs->level_move(id, px, py, gs->get_level()->id(), newlevel);
 
 	reset_rest_cooldown();
 }

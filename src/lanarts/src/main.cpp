@@ -76,8 +76,7 @@ int main(int argc, char** argv) {
 	gs->update_iostate(); //for first iteration
 	int exitcode = main_menu(gs, windoww, windowh);
 
-	if (exitcode == 0) {
-		gs->start_game();
+	if (exitcode == 0 && gs->start_game()) {
 		lua_getglobal(L, "main");
 		luawrap::call<void>(L);
 		fflush(stdout);

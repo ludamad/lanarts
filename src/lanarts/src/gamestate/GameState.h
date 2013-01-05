@@ -57,15 +57,20 @@ public:
 			int viewh = 480, int hudw = 160);
 	~GameState();
 	void start_connection();
-	/* Call after construction, before game starts: */
-	void start_game();
+
+	/* Call after construction, before game starts
+	 * Returns false on failure */
+	bool start_game();
+
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
 
 	/* Primary events */
 	void draw(bool drawhud = true);
 	bool pre_step();
-	void step();
+
+	/* Return false if game should exit*/
+	bool step();
 	bool update_iostate(bool resetprev = true);
 
 	void adjust_view_to_dragging();

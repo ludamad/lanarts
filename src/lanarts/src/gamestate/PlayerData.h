@@ -75,7 +75,7 @@ int player_get_playernumber(GameState* gs, PlayerInst* p);
 
 void players_gain_xp(GameState* gs, int xp);
 
-void players_poll_for_actions(GameState* gs);
+bool players_poll_for_actions(GameState* gs);
 
 
 #endif /* PLAYERDATA_H_ */

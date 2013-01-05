@@ -34,7 +34,7 @@ public:
 	GameLevelState* get_level(int roomid, bool spawnplayer = false,
 			void** player_instances = NULL, size_t nplayers = 0);
 	bool pre_step();
-	void step();
+	bool step();
 	void level_move(int id, int x, int y, int roomid1, int roomid2);
 	void set_current_level(int roomid);
 	void set_current_level_lazy(int roomid);
