@@ -1,0 +1,30 @@
+--- Various game-state handling functions
+-- Most of these are not appropriate for programming game logic,
+-- except for in the game's main loop
+module "game"
+
+function resources_load()
+
+-- Save the current game state to a file
+function save(file)
+
+-- Load a game state from a file
+function load(file)
+
+function step()
+function draw()
+function wait(milliseconds)
+
+--- Capture new input actions from the keyboard and mouse
+function input_capture()
+
+--- Capture new input actions from the keyboard and mouse
+-- As well, process these input actions into game actions
+function input_handle()
+
+--- Create a copy of the current game state (in memory)
+function state_fork()
+--- Return to a previously forked game state copy, invalidating it (a fork call must have been used)
+function state_join()
+--- Returns whether a forked game state copy exists
+function state_forked()
