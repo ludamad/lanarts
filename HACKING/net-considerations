@@ -1,0 +1,27 @@
+-- Currently 2 player has half the latency of 3 player because actions are not broadcast to everyone
+	-- Many-to-many connection probably infeasible, with CSP this amounts to double frames of false reality
+	-- Probably best to keep server as authority and live with this, many-to-many does not scale (but 3player scales like a charm)
+
+-- Action dropping - smooth gameplay with horrific implications
+- (Very) rudimentary smoothness implementation, alternative to fixed frame-skip (actually both at once is good ideas)
+- Defined by maximum lag allowable, care _must_ be taken so that a client doesn't go ahead and simulate the frame
+
+> In the beginning, everyone syncs times with server.
+
+Algorithm:
+ - everyone send actions, timestamp with action (by server)
+ - everyone waits, determines amount of time already passed 
+ - once enough time has passed, everyone simply duplicates movement (ideally, all held actions -- this is a good idea for CSP too)
+ - What happens if one person jumps ship ?
+	- I didn't see any actions coming in, aborted 
+	- other guy saw my action, saw his, kept going
+		- Might be unresolvable without CSP, which would defeat the purpose
+	- Server is the base truth -- ergo it can decide
+		- If server doesn't see all responses, no one does
+		- Skip the actions, let everyone time out double the time later
+			- real ugly, probably not worth it, CSP wouldn't need a timestamp
+
+Considerations:
+ - Raw action events should be sent, not resolved actions (with potentially horrific implications)
+	- or do they need to be ? resolved actions are probably more accurate anyway
+ - 

@@ -1,0 +1,18 @@
+
+// lets say we want to take GameInst* and write an ID
+
+template <typename T>
+void serialize(Struct s, T& serializer) {
+	serializer.writeread(s.foo);
+	serializer.write(s.inst->id)
+	serializer.gamestate().get_instance(serializer.read<int>());
+}
+
+
+
+> How can this implement copy_to() ??
+> seems it needs lots of 'repeating oneself'
+> Can just implement copy_to independently ...
+	> What is copy_to needed for ?
+	> Cloning a level state, no endianness issues, can often be a simple *this = *that
+
