@@ -8,9 +8,9 @@
 
 #include <lcommon/strformat.h>
 
-#include "display/display.h"
-#include "display/SpriteEntry.h"
-#include "display/TileEntry.h"
+#include "draw/draw_sprite.h"
+#include "draw/SpriteEntry.h"
+#include "draw/TileEntry.h"
 
 #include "draw/colour_constants.h"
 
@@ -226,7 +226,7 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 			|| gs->mouse_downwheel()) {
 		Pos hitsqr;
 		if (gs->tile_radius_test(x, y, RADIUS, false,
-				get_tile_by_name("stairs_down"), &hitsqr)) {
+				res::tileid("stairs_down"), &hitsqr)) {
 			queued_actions.push_back(
 					game_action(gs, this, GameAction::USE_ENTRANCE));
 			cooldowns().reset_stopaction_timeout(50);
@@ -237,7 +237,7 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 			|| gs->mouse_upwheel()) {
 		Pos hitsqr;
 		if (gs->tile_radius_test(x, y, RADIUS, false,
-				get_tile_by_name("stairs_up"), &hitsqr)) {
+				res::tileid("stairs_up"), &hitsqr)) {
 			queued_actions.push_back(
 					game_action(gs, this, GameAction::USE_EXIT));
 			cooldowns().reset_stopaction_timeout(50);
@@ -582,7 +582,7 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 	}
 	Pos hitpos;
 	bool didhit = gs->tile_radius_test(x, y, radius, false,
-			get_tile_by_name("stairs_up"), &hitpos);
+			res::tileid("stairs_up"), &hitpos);
 	int entr_n = scan_entrance(gs->get_level()->exits, hitpos);
 	if (!didhit || entr_n == -1)
 		return;
@@ -623,7 +623,7 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 	}
 	Pos hitpos;
 	bool didhit = gs->tile_radius_test(x, y, radius, false,
-			get_tile_by_name("stairs_down"), &hitpos);
+			res::tileid("stairs_down"), &hitpos);
 	int entr_n = scan_entrance(gs->get_level()->entrances, hitpos);
 	if (!didhit || entr_n == -1)
 		return;

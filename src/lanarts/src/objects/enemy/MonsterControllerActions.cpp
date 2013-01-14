@@ -9,7 +9,7 @@
 #include <rvo2/RVO.h>
 
 #include "draw/colour_constants.h"
-#include "display/TileEntry.h"
+#include "draw/TileEntry.h"
 #include "gamestate/GameState.h"
 
 #include "gamestate/PlayerData.h"

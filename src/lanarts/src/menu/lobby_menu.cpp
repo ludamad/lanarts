@@ -19,7 +19,7 @@
 #include "data/game_data.h"
 
 #include "draw/colour_constants.h"
-#include "display/display.h"
+#include "draw/draw_sprite.h"
 
 #include "gamestate/GameState.h"
 
@@ -88,7 +88,7 @@ void lobby_menu(GameState* gs, int width, int height) {
 	gs->view().y = 0;
 
 	gs->add_instance(
-			new AnimatedInst(Pos(halfw, 100), get_sprite_by_name("logo")));
+			new AnimatedInst(Pos(halfw, 100), res::spriteid("logo")));
 	setup_connectionmenu_buttons(gs, &exit, halfw, 300);
 
 	for (; !exit;) {

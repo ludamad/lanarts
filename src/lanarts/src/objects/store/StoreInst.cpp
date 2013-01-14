@@ -6,7 +6,7 @@
 
 #include "draw/colour_constants.h"
 
-#include "display/SpriteEntry.h"
+#include "draw/SpriteEntry.h"
 #include "gamestate/GameState.h"
 
 #include <lcommon/SerializeBuffer.h>
@@ -41,7 +41,7 @@ void StoreInst::draw(GameState* gs) {
 		drawcolour = Colour(255, 255, 100, 255);
 	}
 	if (last_seen_spr > -1) {
-		gl_draw_sprite(gs->view(), last_seen_spr, x - TILE_SIZE / 2,
+		draw_sprite(gs->view(), last_seen_spr, x - TILE_SIZE / 2,
 				y - TILE_SIZE / 2, drawcolour);
 	}
 }

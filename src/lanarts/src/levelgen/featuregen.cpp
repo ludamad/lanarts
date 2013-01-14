@@ -6,8 +6,8 @@
 
 #include "data/game_data.h"
 
-#include "display/SpriteEntry.h"
-#include "display/TileEntry.h"
+#include "draw/SpriteEntry.h"
+#include "draw/TileEntry.h"
 #include "gamestate/GameLevelState.h"
 
 #include "gamestate/GameState.h"
@@ -111,7 +111,7 @@ static void generate_shop(GameState* gs, GeneratedLevel& level, MTwist& mt,
 
 	int itemn = mt.rand(Range(2, 14));
 	gs->add_instance(
-			new StoreInst(worldpos, false, get_sprite_by_name("store"),
+			new StoreInst(worldpos, false, res::spriteid("store"),
 					generate_shop_inventory(mt, itemn)));
 
 }
@@ -121,7 +121,7 @@ static void generate_statue(GameState* gs, GeneratedLevel& level, MTwist& mt,
 	level.at(p).has_instance = true;
 
 	int itemn = mt.rand(Range(2, 10));
-	sprite_id spriteid = get_sprite_by_name("statue");
+	sprite_id spriteid = res::spriteid("statue");
 	SpriteEntry& statue_sprite = game_sprite_data.at(spriteid);
 	ldraw::Drawable& sprite = res::sprite(spriteid);
 	int nimages = (int)sprite.animation_duration();
@@ -222,7 +222,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		p.x += start_x;
 		p.y += start_y;
 
-		tiles.get(p.x, p.y) = rltile(mt, get_tile_by_name("stairs_down"));
+		tiles.get(p.x, p.y) = rltile(mt, res::tileid("stairs_down"));
 
 		gs->get_level()->entrances.push_back(GameLevelPortal(p, Pos(0, 0)));
 	}
@@ -245,7 +245,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		p.x += start_x;
 		p.y += start_y;
 
-		tiles.get(p.x, p.y) = rltile(mt, get_tile_by_name("stairs_up"));
+		tiles.get(p.x, p.y) = rltile(mt, res::tileid("stairs_up"));
 		gs->get_level()->exits.push_back(GameLevelPortal(p, Pos(0, 0)));
 	}
 

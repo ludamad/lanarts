@@ -11,8 +11,6 @@
 #include "data/FilenameList.h"//For FilenameList
 #include "lanarts_defines.h"
 
-#include "GLImage.h"
-
 struct SpriteEntry {
 	enum sprite_type {
 		ANIMATED, DIRECTIONAL
@@ -45,10 +43,12 @@ extern std::vector<SpriteEntry> game_sprite_data;
 
 namespace res {
 	ldraw::Drawable& sprite(sprite_id idx);
+
 	ldraw::Drawable& sprite(const char* name);
 	ldraw::Drawable& sprite(const std::string& name);
-}
 
-sprite_id get_sprite_by_name(const char* name);
+	sprite_id spriteid(const char* name);
+	sprite_id spriteid(const std::string& name);
+}
 
 #endif /* SPRITEENTRY_H_ */

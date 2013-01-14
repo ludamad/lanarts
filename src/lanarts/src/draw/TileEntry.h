@@ -11,7 +11,6 @@
 #include "data/FilenameList.h"
 
 #include "lanarts_defines.h"
-#include "GLImage.h"
 
 struct TileEntry {
 	std::string name;
@@ -30,7 +29,14 @@ struct TileEntry {
 
 extern std::vector<TileEntry> game_tile_data;
 
-tile_id get_tile_by_name(const char* name);
-TileEntry& get_tile_entry(tile_id id);
+namespace res {
+	TileEntry& tile(tile_id idx);
+
+	TileEntry& tile(const char* name);
+	TileEntry& tile(const std::string& name);
+
+	tile_id tileid(const char* name);
+	tile_id tileid(const std::string& name);
+}
 
 #endif /* TILEENTRY_H_ */

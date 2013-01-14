@@ -7,10 +7,10 @@
 #include <ldraw/display.h>
 #include <ldraw/draw.h>
 
-#include "display/display.h"
+#include "draw/draw_sprite.h"
 
-#include "display/SpriteEntry.h"
-#include "display/TileEntry.h"
+#include "draw/SpriteEntry.h"
+#include "draw/TileEntry.h"
 #include "gamestate/GameInstSet.h"
 #include "gamestate/GameState.h"
 #include "objects/player/PlayerInst.h"

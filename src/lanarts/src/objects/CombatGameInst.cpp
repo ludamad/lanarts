@@ -9,7 +9,7 @@
 
 #include "draw/draw_statbar.h"
 
-#include "display/SpriteEntry.h"
+#include "draw/SpriteEntry.h"
 #include "gamestate/GameState.h"
 
 #include "stats/items/ProjectileEntry.h"
@@ -102,7 +102,7 @@ void CombatGameInst::draw(GameState *gs, float frame) {
 	}
 
 	int sx = x - spr.width() / 2, sy = y - spr.height() / 2;
-	gl_draw_sprite(view, sprite, sx, sy, vx, vy, frame, draw_colour);
+	draw_sprite(view, sprite, sx, sy, vx, vy, frame, draw_colour);
 
 	effects().draw_effect_sprites(gs, Pos(sx, sy));
 

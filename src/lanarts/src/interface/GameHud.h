@@ -9,8 +9,7 @@
 
 #include <deque>
 
-#include "display/GLImage.h"
-#include "display/display.h"
+#include "draw/draw_sprite.h"
 
 #include "gamestate/ActionQueue.h"
 #include "gamestate/GameAction.h"

@@ -12,7 +12,7 @@
 #include <ldraw/DrawOptions.h>
 #include <ldraw/colour_constants.h>
 
-#include "display/SpriteEntry.h"
+#include "draw/SpriteEntry.h"
 #include "gamestate/GameState.h"
 #include "gamestate/GameView.h"
 #include "stats/items/ItemEntry.h"
@@ -65,7 +65,7 @@ void ItemInst::draw(GameState* gs) {
 	ldraw::draw_rectangle_outline(COL_WHITE.alpha(45),
 			on_screen(gs, BBox(p.x + 1, p.y + 1, p.x + TILE_SIZE, p.y + TILE_SIZE)));
 
-	gl_draw_sprite(view, ientry.item_sprite, xx, yy, 0, 0, gs->frame());
+	draw_sprite(view, ientry.item_sprite, xx, yy, 0, 0, gs->frame());
 
 	if (ientry.stackable && item_quantity() > 1) {
 		gs->font().drawf(COL_WHITE, Pos(xx - view.x + 1, yy - view.y + 1), "%d",

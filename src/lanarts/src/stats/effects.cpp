@@ -55,7 +55,7 @@ void EffectStats::draw_effect_sprites(GameState* gs, const Pos& p) {
 			EffectEntry& eentry = game_effect_data.at(effects[i].effectid);
 			if (eentry.effected_sprite > -1) {
 				Colour drawcolour(255, 255, 255, 255 * draw_alpha(effects[i]));
-				gl_draw_sprite(view, eentry.effected_sprite, p.x, p.y,
+				draw_sprite(view, eentry.effected_sprite, p.x, p.y,
 						drawcolour);
 			}
 		}

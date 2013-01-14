@@ -10,6 +10,7 @@
 #ifndef GAMEINSTSET_H_
 #define GAMEINSTSET_H_
 
+#include <cstring>
 #include <cstdlib>
 #include <vector>
 #include "objects/GameInst.h"

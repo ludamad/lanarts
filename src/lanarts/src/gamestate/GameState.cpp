@@ -21,8 +21,8 @@
 #include "draw/fonts.h"
 #include "data/game_data.h"
 
-#include "display/display.h"
-#include "display/TileEntry.h"
+#include "draw/draw_sprite.h"
+#include "draw/TileEntry.h"
 
 #include "levelgen/dungeon_data.h"
 

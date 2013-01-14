@@ -43,7 +43,7 @@ namespace lsound {
 	}
 
 	bool SoundEffect::empty() const {
-		return !_soundeffect.is_valid();
+		return _soundeffect.empty();
 	}
 
 	void SoundEffect::loop() const {

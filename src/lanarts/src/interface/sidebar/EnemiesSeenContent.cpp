@@ -8,7 +8,7 @@
 
 #include "draw/colour_constants.h"
 
-#include "display/SpriteEntry.h"
+#include "draw/SpriteEntry.h"
 
 #include "gamestate/GameState.h"
 #include "objects/enemy/MonsterController.h"

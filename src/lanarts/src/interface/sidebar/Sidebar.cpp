@@ -10,7 +10,7 @@
 #include "draw/colour_constants.h"
 #include "draw/draw_statbar.h"
 
-#include "display/display.h"
+#include "draw/draw_sprite.h"
 
 #include "gamestate/GameState.h"
 

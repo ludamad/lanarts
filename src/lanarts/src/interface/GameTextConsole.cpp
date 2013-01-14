@@ -7,7 +7,7 @@
 
 #include "draw/colour_constants.h"
 
-#include "display/display.h"
+#include "draw/draw_sprite.h"
 
 #include "GameTextConsole.h"
 

@@ -8,9 +8,9 @@
 
 #include <luawrap/LuaValue.h>
 
-#include "display/SpriteEntry.h"
+#include "draw/SpriteEntry.h"
 
-#include "display/TileEntry.h"
+#include "draw/TileEntry.h"
 
 #include "gamestate/GameSettings.h"
 #include "gamestate/tileset_data.h"

@@ -17,7 +17,7 @@
 // Take arguments: sprite, x, y
 static int draw_sprite(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
-	gl_draw_sprite(gs->view(), sprite_from_lua(L, 1), lua_tointeger(L, 2),
+	draw_sprite(gs->view(), sprite_from_lua(L, 1), lua_tointeger(L, 2),
 			lua_tointeger(L, 3));
 	return 0;
 }

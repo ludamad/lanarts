@@ -7,10 +7,10 @@
 
 #include <lcommon/SerializeBuffer.h>
 
-#include "display/display.h"
+#include "draw/draw_sprite.h"
 
-#include "display/SpriteEntry.h"
-#include "display/TileEntry.h"
+#include "draw/SpriteEntry.h"
+#include "draw/TileEntry.h"
 #include "gamestate/GameState.h"
 
 #include "stats/items/WeaponEntry.h"

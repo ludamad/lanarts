@@ -8,8 +8,8 @@
 #include <ldraw/DrawOptions.h>
 
 #include "draw/colour_constants.h"
-#include "display/display.h"
-#include "display/SpriteEntry.h"
+#include "draw/draw_sprite.h"
+#include "draw/SpriteEntry.h"
 #include "gamestate/GameState.h"
 #include "objects/player/PlayerInst.h"
 
@@ -144,7 +144,7 @@ static void draw_base_entry_overlay(GameState* gs, BaseDataEntry& entry) {
 
 int draw_icon_and_name(GameState* gs, BaseDataEntry& entry, Colour col, int x,
 		int y, int xoffset, int yoffset) {
-	gl_draw_sprite(entry.get_sprite(), x, y);
+	draw_sprite(entry.get_sprite(), x, y);
 	ldraw::draw_rectangle_outline(COL_PALE_YELLOW.alpha(50),
 			BBox(x, y, x+TILE_SIZE, y+TILE_SIZE));
 	/* Draw item name */
@@ -153,7 +153,7 @@ int draw_icon_and_name(GameState* gs, BaseDataEntry& entry, Colour col, int x,
 
 void draw_spell_icon_and_name(GameState* gs, SpellEntry& spl_entry, Colour col,
 		int x, int y) {
-	gl_draw_sprite(spl_entry.sprite, x, y);
+	draw_sprite(spl_entry.sprite, x, y);
 
 	ldraw::draw_rectangle_outline(COL_PALE_YELLOW.alpha(50),
 			BBox(x, y, x+TILE_SIZE, y+TILE_SIZE));

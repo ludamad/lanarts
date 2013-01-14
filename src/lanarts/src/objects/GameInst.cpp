@@ -11,7 +11,7 @@
 #include <lcommon/SerializeBuffer.h>
 #include <lcommon/lua_serialize.h>
 
-#include "display/display.h"
+#include "draw/draw_sprite.h"
 
 #include "gamestate/GameState.h"
 

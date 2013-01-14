@@ -44,7 +44,7 @@ void ScriptedInst::step(GameState* gs) {
 
 void ScriptedInst::draw(GameState* gs) {
 	ScriptObjectEntry& scr_obj = script_object();
-	gl_draw_sprite(scr_obj.sprite, x, y);
+	draw_sprite(scr_obj.sprite, x, y);
 }
 
 void ScriptedInst::copy_to(GameInst *inst) const {

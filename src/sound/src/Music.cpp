@@ -43,7 +43,7 @@ namespace lsound {
 	}
 
 	bool Music::empty() const {
-		return !_music.is_valid();
+		return _music.empty();
 	}
 
 	void Music::loop() const {

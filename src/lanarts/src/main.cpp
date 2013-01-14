@@ -5,37 +5,27 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
-#include <ldraw/display.h>
-#include <ldraw/lua_ldraw.h>
+#include <lua.hpp>
+
+#include <net/lanarts_net.h>
 #include <lsound/lsound.h>
 
-#include <luawrap/calls.h>
-#include <net/lanarts_net.h>
+#include <ldraw/display.h>
+#include <ldraw/lua_ldraw.h>
 
-#include <lua.hpp>
 #include <luawrap/luawrap.h>
 #include <luawrap/calls.h>
 
-#include <lcommon/Timer.h>
-
 #include "data/game_data.h"
 
-#include "display/display.h"
+#include "draw/window.h"
+#include "draw/draw_sprite.h"
 
 #include "gamestate/GameState.h"
-
-#include "interface/ButtonInst.h"
 
 #include "lua/lua_api.h"
 #include "lua/lua_yaml.h"
 #include "lua_api/lua_newapi.h"
-
-#include "objects/enemy/EnemyInst.h"
-
-#include "objects/player/PlayerInst.h"
-#include "objects/AnimatedInst.h"
-
-#include "../tests/tests.h"
 
 #include "menu/menus.h"
 
@@ -48,9 +38,10 @@ static void init_system(GameSettings& settings, lua_State* L) {
 		exit(0);
 	}
 
-	ldraw::display_initialize("Lanarts",
-			Dim(settings.view_width, settings.view_height),
-			settings.fullscreen);
+	Dim window_size(settings.view_width, settings.view_height);
+	ldraw::display_initialize("Lanarts", window_size, settings.fullscreen);
+
+	window_set_information(window_size, settings.fullscreen);
 
 	lanarts_net_init(true);
 	lua_api::preinit_state(L);

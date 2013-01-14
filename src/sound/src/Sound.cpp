@@ -20,7 +20,7 @@ namespace lsound {
 	}
 
 	bool Sound::empty() const {
-		return _sound.is_valid();
+		return _sound.empty();
 	}
 
 	void Sound::play() const {

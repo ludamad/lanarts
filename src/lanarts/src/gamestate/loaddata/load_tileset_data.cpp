@@ -15,12 +15,12 @@ static Range parse_tile_range(const YAML::Node& n) {
 	if (n.Type() == YAML::NodeType::Sequence) {
 		std::vector<std::string> components;
 		n >> components;
-		gr.min = get_tile_by_name(components[0].c_str());
-		gr.max = get_tile_by_name(components[1].c_str());
+		gr.min = res::tileid(components[0]);
+		gr.max = res::tileid(components[1]);
 	} else {
 		std::string s;
 		n >> s;
-		gr.min = get_tile_by_name(s.c_str());
+		gr.min = res::tileid(s);
 		gr.max = gr.min;
 	}
 	return gr;

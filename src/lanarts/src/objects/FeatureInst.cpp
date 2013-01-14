@@ -8,7 +8,7 @@
 #include <ldraw/DrawOptions.h>
 
 #include "draw/colour_constants.h"
-#include "display/SpriteEntry.h"
+#include "draw/SpriteEntry.h"
 
 #include "gamestate/GameState.h"
 #include "gamestate/GameTiles.h"
@@ -44,9 +44,9 @@ void FeatureInst::step(GameState* gs) {
 	if (gs->object_visible_test(this)) {
 		sprite_id spr = spriteid;
 		if (feature == DOOR_CLOSED) {
-			spr = get_sprite_by_name("closed door");
+			spr = res::spriteid("closed door");
 		} else if (feature == DOOR_OPEN) {
-			spr = get_sprite_by_name("open door");
+			spr = res::spriteid("open door");
 		}
 		last_seen_spr = spr;
 	}

@@ -8,8 +8,8 @@
 
 #include <typeinfo>
 
-#include "display/display.h"
-#include "display/SpriteEntry.h"
+#include "draw/draw_sprite.h"
+#include "draw/SpriteEntry.h"
 
 #include "gamestate/GameState.h"
 #include "gamestate/GameView.h"
@@ -45,8 +45,9 @@ void AnimatedInst::draw(GameState* gs) {
 
 		float frame = animateframe != -1 ? animateframe : gs->frame();
 
-		gl_draw_sprite(view, sprite, xx, yy, orientx, orienty, frame,
+		draw_sprite(view, sprite, xx, yy, orientx, orienty, frame,
 				alphacol);
+
 	}
 	Colour wd(255 - textcol.r, 255 - textcol.g, 255 - textcol.b);
 	if (text.size() > 0) {

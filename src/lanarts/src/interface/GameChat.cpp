@@ -12,7 +12,7 @@
 
 #include "draw/colour_constants.h"
 
-#include "display/display.h"
+#include "draw/draw_sprite.h"
 #include "gamestate/GameState.h"
 
 #include "GameChat.h"

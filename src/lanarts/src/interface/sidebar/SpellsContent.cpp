@@ -7,8 +7,8 @@
 
 #include "draw/colour_constants.h"
 
-#include "display/display.h"
-#include "display/SpriteEntry.h"
+#include "draw/draw_sprite.h"
+#include "draw/SpriteEntry.h"
 
 #include "gamestate/GameState.h"
 

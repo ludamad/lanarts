@@ -19,7 +19,7 @@
 #include "data/game_data.h"
 
 #include "draw/colour_constants.h"
-#include "display/display.h"
+#include "draw/draw_sprite.h"
 
 #include "gamestate/GameState.h"
 
@@ -59,7 +59,7 @@ static void draw_class_option(GameState* gs, GameInst* inst, void* name) {
 static void setup_class_selection_button(GameState* gs, int x, int y,
 		const char* icon, const char* name) {
 	gs->add_instance(
-			new ButtonInst(name, get_sprite_by_name(icon), x, y,
+			new ButtonInst(name, res::spriteid(icon), x, y,
 					ObjCallback(choose_class, (void*)name),
 					ObjCallback(draw_class_option, (void*)name), COL_WHITE,
 					COL_GOLD));
@@ -131,8 +131,8 @@ static void draw_respawn_toggle(GameState* gs, GameInst* inst, void* _) {
 	const int height = TILE_SIZE + 2;
 	GameSettings& settings = gs->game_settings();
 	BBox bbox(inst->x, inst->y, inst->x + width, inst->y + height);
-	sprite_id hardcore = get_sprite_by_name("hardcore setting icon");
-	sprite_id respawn = get_sprite_by_name("respawn setting icon");
+	sprite_id hardcore = res::spriteid("hardcore setting icon");
+	sprite_id respawn = res::spriteid("respawn setting icon");
 	bool hover = bbox.contains(gs->mouse_pos());
 	bool clicked = hover && gs->mouse_left_click();
 	if (settings.regen_on_death) {
@@ -159,9 +159,9 @@ static void draw_connection_toggle(GameState* gs, GameInst* inst, void* _) {
 	bool hover = bbox.contains(gs->mouse_pos());
 	bool clicked = hover && gs->mouse_left_click();
 
-	sprite_id client = get_sprite_by_name("client setting icon");
-	sprite_id server = get_sprite_by_name("server setting icon");
-	sprite_id single_player = get_sprite_by_name("single player setting icon");
+	sprite_id client = res::spriteid("client setting icon");
+	sprite_id server = res::spriteid("server setting icon");
+	sprite_id single_player = res::spriteid("single player setting icon");
 
 	if (settings.conntype == GameSettings::CLIENT) {
 		Colour bbox_col = hover ? COL_GOLD : COL_MUTED_GREEN;
@@ -365,7 +365,7 @@ static void setup_config_options(GameState* gs, int* exitcode, int x, int y) {
 }
 
 static void logo_add(GameState* gs, int classx, int classy) {
-	sprite_id logosprite = get_sprite_by_name("logo");
+	sprite_id logosprite = res::spriteid("logo");
 	SpriteEntry& entry = game_sprite_data.at(logosprite);
 	int logoh = entry.height();
 	int logoy = classy - logoh / 2;

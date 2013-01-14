@@ -9,7 +9,7 @@
 #include <lua.hpp>
 
 #include "draw/colour_constants.h"
-#include "display/SpriteEntry.h"
+#include "draw/SpriteEntry.h"
 #include "gamestate/GameState.h"
 
 #include "lua/lua_api.h"
@@ -44,7 +44,7 @@ void ProjectileInst::draw(GameState* gs) {
 	if (!gs->object_visible_test(this))
 		return;
 
-	gl_draw_sprite(view, sprite(), xx, yy, vx, vy, 0);
+	draw_sprite(view, sprite(), xx, yy, vx, vy, 0);
 }
 
 void ProjectileInst::deinit(GameState* gs) {

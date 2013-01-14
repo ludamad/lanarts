@@ -9,9 +9,9 @@
 
 #include "draw/colour_constants.h"
 
-#include "display/display.h"
+#include "draw/draw_sprite.h"
 
-#include "display/SpriteEntry.h"
+#include "draw/SpriteEntry.h"
 
 #include "gamestate/GameState.h"
 
@@ -40,7 +40,7 @@ void SidebarNavigator::NavigationOption::draw_icon(GameState* gs,
 	} else if (icon_bbox.contains(gs->mouse_x(), gs->mouse_y())) {
 		col = COL_HOVER_VIEWICON;
 	}
-	gl_draw_sprite(get_sprite_by_name(iconsprite.c_str()), icon_bbox.x1, icon_bbox.y1, col);
+	draw_sprite(res::spriteid(iconsprite.c_str()), icon_bbox.x1, icon_bbox.y1, col);
 }
 
 static BBox icon_bounds(const BBox& main_content_bounds, int icon_n,

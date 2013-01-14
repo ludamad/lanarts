@@ -33,7 +33,7 @@ std::vector<const YAML::Node*> flatten_seq_mappings(const YAML::Node & n) {
 int parse_sprite_number(const YAML::Node & n) {
 	std::string s;
 	n >> s;
-	return get_sprite_by_name(s.c_str());
+	return res::spriteid(s.c_str());
 }
 
 int parse_sprite_number(const YAML::Node & n, const char *key) {
@@ -42,7 +42,7 @@ int parse_sprite_number(const YAML::Node & n, const char *key) {
 
 	std::string s;
 	n[key] >> s;
-	return get_sprite_by_name(s.c_str());
+	return res::spriteid(s.c_str());
 }
 
 int parse_enemy_number(const YAML::Node& n, const char *key) {

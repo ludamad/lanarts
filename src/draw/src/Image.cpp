@@ -74,16 +74,17 @@ void Image::draw(const DrawOptions& options, const Posf& pos) const {
 }
 
 void Image::from_bytes(const BBox& region, char* data) {
-	LDRAW_ASSERT(!_image.get());
+	LDRAW_ASSERT(!_image.empty());
 	_image->subimage_from_bytes(region, data);
 
 }
 
 void Image::from_bytes(const Dim& size, char* data) {
-	if (!_image.get()) {
+	if (_image.empty()) {
 		_image = smartptr<GLImage>(new GLImage(size));
 	}
 	_image->image_from_bytes(size, data);
+	_draw_region = BBoxF(0, 0, _image->width, _image->height);
 }
 
 std::vector<Image> image_split(const Image & image, const DimF & size) {

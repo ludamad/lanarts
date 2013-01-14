@@ -3,9 +3,9 @@
 
 #include <ldraw/draw.h>
 
-#include "display/display.h"
+#include "draw/draw_sprite.h"
 
-#include "display/TileEntry.h"
+#include "draw/TileEntry.h"
 
 #include "levelgen/levelgen.h"
 
@@ -89,7 +89,7 @@ void GameTiles::pre_draw(GameState* gs) {
 	for (int y = min_tiley; y <= max_tiley; y++) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
 			Tile& tile = get(x, y);
-			const ldraw::Image& img = get_tile_entry(tile.tile).img(tile.subtile);
+			const ldraw::Image& img = res::tile(tile.tile).img(tile.subtile);
 			if (/*reveal_enabled ||*/is_seen(x, y)) {
 				img.draw(on_screen(gs, Pos(x * TILE_SIZE, y * TILE_SIZE)));
 			}
@@ -172,7 +172,7 @@ void GameTiles::post_draw(GameState* gs) {
 			if (!has_match) {
 				BBox tilebox(
 						Pos(x * TILE_SIZE - view.x, y * TILE_SIZE - view.y),
-						get_tile_entry(tile.tile).size());
+						res::tile(tile.tile).size());
 				if (!is_other_match) {
 					if (!is_seen(x, y)) {
 						ldraw::draw_rectangle(Colour(0, 0, 0), tilebox);

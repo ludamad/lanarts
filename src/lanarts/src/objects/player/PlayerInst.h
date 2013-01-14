@@ -9,7 +9,7 @@
 
 #include <deque>
 
-#include "display/SpriteEntry.h"
+#include "draw/SpriteEntry.h"
 
 #include "fov/fov.h"
 

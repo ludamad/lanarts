@@ -8,7 +8,7 @@
 #include <cstdio>
 #include <typeinfo>
 
-#include "display/SpriteEntry.h"
+#include "draw/SpriteEntry.h"
 
 #include "ItemEntry.h"
 #include "EquipmentEntry.h"

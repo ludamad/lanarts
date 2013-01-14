@@ -3,8 +3,8 @@
 #include <ldraw/DrawOptions.h>
 #include <ldraw/Font.h>
 
-#include "display/display.h"
-#include "display/SpriteEntry.h"
+#include "draw/draw_sprite.h"
+#include "draw/SpriteEntry.h"
 #include "gamestate/GameState.h"
 
 #include "ButtonInst.h"
@@ -52,7 +52,7 @@ void ButtonInst::draw(GameState* gs) {
 	BBox sbounds(sprite_bounds(gs));
 	Colour col = (hovered(gs, this)) ? _hover_colour : _draw_colour;
 	if (sprite > -1) {
-		gl_draw_sprite(sprite, sbounds.x1, sbounds.y1, col);
+		draw_sprite(sprite, sbounds.x1, sbounds.y1, col);
 	}
 	using namespace ldraw;
 	gs->menu_font().draw(DrawOptions(col).origin(CENTER),

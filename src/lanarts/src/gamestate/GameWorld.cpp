@@ -6,7 +6,7 @@
 
 #include <typeinfo>
 
-#include "display/TileEntry.h"
+#include "draw/TileEntry.h"
 #include "levelgen/levelgen.h"
 
 #include "objects/enemy/EnemyInst.h"

@@ -6,9 +6,9 @@
 #include <ldraw/Font.h>
 #include <ldraw/DrawOptions.h>
 
-#include "display/display.h"
+#include "draw/draw_sprite.h"
 #include "draw/colour_constants.h"
-#include "display/SpriteEntry.h"
+#include "draw/SpriteEntry.h"
 
 #include "gamestate/GameState.h"
 
@@ -18,7 +18,7 @@ void draw_setting_box(GameState* gs, const BBox& bbox, const Colour& bbox_col,
 		sprite_id sprite, const Colour& sprite_col, const char* text,
 		const Colour& text_col) {
 	int y_offset = (bbox.height() - TILE_SIZE) / 2;
-	gl_draw_sprite(sprite, bbox.x1, bbox.y1 + y_offset, sprite_col);
+	draw_sprite(sprite, bbox.x1, bbox.y1 + y_offset, sprite_col);
 
 	Pos pos(bbox.x1 + TILE_SIZE * 1.25, bbox.y1 + y_offset + TILE_SIZE / 2);
 
@@ -53,6 +53,6 @@ void draw_speed_box(GameState* gs, const BBox& bbox) {
 	int diff = settings.time_per_step - 10;
 	draw_setting_box(gs, bbox,
 			bbox.contains(gs->mouse_pos()) ? COL_GOLD : COL_WHITE,
-			get_sprite_by_name("speed setting icon"),
+			res::spriteid("speed setting icon"),
 			COL_WHITE.alpha(255 - diff * 30), text, COL_WHITE);
 }

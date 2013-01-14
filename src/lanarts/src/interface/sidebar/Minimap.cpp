@@ -3,7 +3,7 @@
  *  Handles drawing & state of a minimap
  */
 
-#include "display/TileEntry.h"
+#include "draw/TileEntry.h"
 
 #include "gamestate/GameState.h"
 
@@ -49,8 +49,8 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 	bool minimap_reveal = gs->key_down_state(SDLK_z)
 			/*|| gs->key_down_state(SDLK_BACKQUOTE)*/;
 
-	int stairs_down = get_tile_by_name("stairs_down");
-	int stairs_up = get_tile_by_name("stairs_up");
+	int stairs_down = res::tileid("stairs_down");
+	int stairs_up = res::tileid("stairs_up");
 	for (int y = 0; y < h; y++) {
 		char* iter = buff + y * ptw * 4;
 		for (int x = 0; x < w; x++) {
@@ -154,9 +154,8 @@ void Minimap::draw(GameState* gs, float scale) {
 		draw_rect2d(minimap_arr, ptw, pth, min_tilex, min_tiley, max_tilex,
 				max_tiley, Colour(255, 180, 99)); //
 	}
+	minimap_buff.from_bytes(Dim(ptw, pth), minimap_arr);
 
-	gl_image_from_bytes(minimap_buff, ptw, pth, minimap_arr);
-
-	gl_draw_image(minimap_buff, bbox.x1, bbox.y1);
+	minimap_buff.draw(bbox.left_top());
 }
 

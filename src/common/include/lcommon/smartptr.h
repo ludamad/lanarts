@@ -235,7 +235,7 @@ public:
 	 */
 
 	operator bool() const {
-		return is_valid();
+		return !empty();
 	}
 
 	template<typename Y>
@@ -264,10 +264,8 @@ public:
 		return false;
 	}
 
-	bool is_valid() const {
-		if (refhandler && rawPtr)
-			return true;
-		return false;
+	bool empty() const {
+		return !rawPtr;
 	}
 
 	unsigned get_count() const {
