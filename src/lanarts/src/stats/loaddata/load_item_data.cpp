@@ -13,7 +13,7 @@
 #include "data/parse.h"
 #include "data/yaml_util.h"
 
-#include "lua/lua_yaml.h"
+#include "lua_api/lua_yaml.h"
 
 #include "../items/ItemEntry.h"
 

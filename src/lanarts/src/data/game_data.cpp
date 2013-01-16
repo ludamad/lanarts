@@ -13,7 +13,7 @@
 
 #include "draw/fonts.h"
 
-#include "lua/lua_api.h"
+#include "lua_api/lua_api.h"
 
 #include "stats/items/EquipmentEntry.h"
 #include "stats/items/ItemEntry.h"
@@ -55,7 +55,6 @@ std::vector<EnemyEntry> game_enemy_data;
 std::vector<ItemGenList> game_itemgenlist_data;
 std::vector<TileEntry> game_tile_data;
 std::vector<TilesetEntry> game_tileset_data;
-std::vector<ScriptObjectEntry> game_scriptobject_data;
 std::vector<SpellEntry> game_spell_data;
 std::vector<SpriteEntry> game_sprite_data;
 std::vector<LevelGenSettings> game_dungeon_yaml;
@@ -123,10 +122,6 @@ const char* equip_type_description(const ItemEntry& ientry) {
 class_id get_class_by_name(const char* name) {
 	return get_X_by_name(game_class_data, name);
 }
-scriptobj_id get_scriptobject_by_name(const char* name,
-		bool error_if_not_found) {
-	return get_X_by_name(game_scriptobject_data, name, error_if_not_found);
-}
 sprite_id get_sprite_by_name(const char* name) {
 	return get_X_by_name(game_sprite_data, name);
 }
@@ -163,9 +158,6 @@ item_id item_from_lua(lua_State* L, int idx) {
 }
 class_id class_from_lua(lua_State* L, int idx) {
 	return get_X_by_name(game_class_data, lua_tostring(L, idx));
-}
-scriptobj_id scriptobject_from_lua(lua_State* L, int idx) {
-	return get_X_by_name(game_scriptobject_data, lua_tostring(L, idx));
 }
 sprite_id sprite_from_lua(lua_State* L, int idx) {
 	return get_X_by_name(game_sprite_data, lua_tostring(L, idx));

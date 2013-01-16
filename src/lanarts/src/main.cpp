@@ -18,13 +18,12 @@
 
 #include "data/game_data.h"
 
-#include "draw/window.h"
 #include "draw/draw_sprite.h"
 
 #include "gamestate/GameState.h"
 
-#include "lua/lua_api.h"
-#include "lua/lua_yaml.h"
+#include "lua_api/lua_api.h"
+#include "lua_api/lua_yaml.h"
 #include "lua_api/lua_newapi.h"
 
 #include "menu/menus.h"
@@ -40,8 +39,6 @@ static void init_system(GameSettings& settings, lua_State* L) {
 
 	Dim window_size(settings.view_width, settings.view_height);
 	ldraw::display_initialize("Lanarts", window_size, settings.fullscreen);
-
-	window_set_information(window_size, settings.fullscreen);
 
 	lanarts_net_init(true);
 	lua_api::preinit_state(L);

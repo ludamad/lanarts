@@ -15,7 +15,7 @@
 
 #include "objects/player/PlayerInst.h"
 
-#include "lua/lua_api.h"
+#include "lua_api/lua_api.h"
 
 #include "GameChat.h"
 

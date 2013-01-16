@@ -16,7 +16,6 @@
 
 #include "dungeon_data.h"
 #include "levelgen.h"
-#include "lua_levelgen_funcs.h"
 
 const int TOO_MANY_FAILURES = 100;
 
@@ -52,21 +51,6 @@ bool generate_room(MTwist& mt, GeneratedLevel& level, int rw, int rh,
 		}
 	}
 	return false;
-}
-
-static bool generate_room_lua(lua_State* L, GeneratedLevel& level, int rw,
-		int rh, int padding, int max_attempts) {
-
-	lua_getfield(L, LUA_GLOBALSINDEX, "gen_room");
-	lua_push_generatedlevel(L, level);
-	lua_pushnumber(L, padding);
-	lua_pushnumber(L, rw);
-	lua_pushnumber(L, rh);
-	lua_pushnumber(L, max_attempts);
-	lua_call(L, 5, 1);
-	bool ret = !lua_isnil(L, -1);
-	lua_pop(L, 1);
-	return ret;
 }
 
 void generate_rooms(lua_State* L, const RoomGenSettings& rs, MTwist& mt,

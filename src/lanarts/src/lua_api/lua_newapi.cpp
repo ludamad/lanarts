@@ -7,8 +7,8 @@
 #include <luawrap/calls.h>
 #include <ldraw/lua_ldraw.h>
 
-#include "lua/lua_yaml.h"
-#include "lua/lua_api.h"
+#include "lua_api/lua_yaml.h"
+#include "lua_api/lua_api.h"
 
 #include "lua_newapi.h"
 

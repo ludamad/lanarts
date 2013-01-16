@@ -28,7 +28,7 @@
 
 #include "interface/components_draw.h"
 #include "interface/DrawCallbackInst.h"
-#include "lua/lua_api.h"
+#include "lua_api/lua_api.h"
 
 #include "objects/enemy/EnemyInst.h"
 #include "objects/player/PlayerInst.h"

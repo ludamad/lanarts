@@ -7,9 +7,7 @@
 #ifndef LDRAW_DISPLAY_H_
 #define LDRAW_DISPLAY_H_
 
-
-struct Dim;
-struct BBoxF;
+#include <lcommon/geometry.h>
 
 namespace ldraw {
 
@@ -21,6 +19,8 @@ void display_set_drawing_region(const BBoxF& bbox);
 
 void display_draw_finish();
 void display_draw_start();
+
+Dim display_size();
 
 }
 

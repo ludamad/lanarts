@@ -233,10 +233,6 @@ public:
 		this->repeat_actions_counter = repeat_actions_counter;
 	}
 
-	EnemyController& enemy_controller() {
-		return world.enemy_controller();
-	}
-
 	TeamRelations& teams() {
 		return world.teams();
 	}

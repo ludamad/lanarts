@@ -8,7 +8,7 @@
 
 #include "collision_avoidance/CollisionAvoidance.h"
 
-#include "pathfind/pathfind.h"
+#include "pathfind/flood_pathfind.h"
 #include "stats/combat_stats.h"
 
 #include "stats/stats.h"

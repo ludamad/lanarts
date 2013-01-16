@@ -11,7 +11,7 @@
 
 #include "objects/enemy/EnemyEntry.h"
 
-#include "lua/lua_yaml.h"
+#include "lua_api/lua_yaml.h"
 
 #include "../class_data.h"
 #include "../stats.h"

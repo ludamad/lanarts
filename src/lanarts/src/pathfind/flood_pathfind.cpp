@@ -1,5 +1,5 @@
 /*
- * pathfind.cpp:
+ * flood_pathfind.cpp:
  *  Utilities for flood-fill based pathfinding
  */
 
@@ -16,7 +16,7 @@
 #include "util/math_util.h"
 
 #include "gheap.h"
-#include "pathfind.h"
+#include "flood_pathfind.h"
 
 using namespace std;
 

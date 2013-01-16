@@ -11,7 +11,6 @@
 
 #include "objects/GameInst.h"
 
-#include "objects/ScriptedInst.h"
 #include "lua_api.h"
 //
 //// Returns monsters seen

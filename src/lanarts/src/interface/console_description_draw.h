@@ -9,10 +9,11 @@
 #include "lanarts_defines.h"
 
 struct Item;
-struct ItemEntry;
-struct EnemyEntry;
-struct SpellEntry;
+class ItemEntry;
+class EnemyEntry;
+class SpellEntry;
 class GameState;
+class BaseDataEntry;
 
 const char* projectile_speed_description(int speed);
 const char* monster_speed_description(int speed);

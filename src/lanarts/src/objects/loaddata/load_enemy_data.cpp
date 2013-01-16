@@ -5,7 +5,7 @@
 
 #include "data/parse.h"
 
-#include "lua/lua_yaml.h"
+#include "lua_api/lua_yaml.h"
 #include "stats/stats.h"
 #include "stats/loaddata/load_stats.h"
 

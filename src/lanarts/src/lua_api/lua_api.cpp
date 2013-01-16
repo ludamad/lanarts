@@ -9,8 +9,6 @@
 
 #include <lua.hpp>
 
-#include "levelgen/lua_levelgen_funcs.h"
-
 #include "lua_api/lua_newapi.h"
 
 #include "lua_api.h"
@@ -66,7 +64,6 @@ void lua_lanarts_api(GameState* state, lua_State* L) {
 	lua_collision_check_bindings(L);
 	lua_spelltarget_bindings(L);
 	lua_object_func_bindings(L);
-	lua_levelgen_func_bindings(L);
 
 	//Use C function name as lua function name:
 #define LUA_FUNC_REGISTER(f) \

@@ -134,3 +134,9 @@ void ldraw::display_draw_start() {
 void ldraw::display_draw_finish() {
 	SDL_GL_SwapBuffers();
 }
+
+Dim ldraw::display_size() {
+	const SDL_Surface* surface = SDL_GetVideoSurface();
+	return Dim(surface->w, surface->h);
+}
+

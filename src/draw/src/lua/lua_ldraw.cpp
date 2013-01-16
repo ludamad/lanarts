@@ -11,6 +11,7 @@
 
 #include "colour_constants.h"
 #include "draw.h"
+#include "display.h"
 #include "Image.h"
 
 #include "lua_image.h"
@@ -31,12 +32,13 @@ void lua_register_ldraw(lua_State* L, const LuaValue& module, bool register_lcom
 	}
 
 #define BIND_FUNC(f)\
-	module[#f] = luawrap::function(L, f)
+	module[#f].bind_function(f)
 
 	BIND_FUNC(draw_rectangle);
 	BIND_FUNC(draw_circle);
 	BIND_FUNC(draw_circle_outline);
 	BIND_FUNC(draw_rectangle_outline);
+	module["window_size"].bind_function(display_size);
 
 	lua_register_font(L, module);
 	lua_register_image(L, module);

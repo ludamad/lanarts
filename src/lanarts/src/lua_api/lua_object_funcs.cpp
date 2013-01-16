@@ -15,26 +15,9 @@
 #include "objects/player/PlayerInst.h"
 
 #include "objects/GameInst.h"
-#include "objects/ScriptedInst.h"
 #include "util/math_util.h"
 
 #include "lua_api.h"
-
-// Creates object, adding to game world, returns said object
-// Take arguments: objtype, x, y; returns obj
-static int obj_create(lua_State* L) {
-	scriptobj_id scr_obj = scriptobject_from_lua(L, 1);
-	int x = lua_tointeger(L, 2), y = lua_tointeger(L, 3);
-
-	ScriptedInst* inst = new ScriptedInst(scr_obj, x, y);
-
-	// Add to world and return
-	GameState* gs = lua_api::gamestate(L);
-	gs->add_instance(inst);
-	lua_push_gameinst(L, inst);
-
-	return 1;
-}
 
 static int players_in_level(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
@@ -126,7 +109,6 @@ void lua_object_func_bindings(lua_State* L) {
 	lua_pushcfunction(L, f); \
 	lua_setfield(L, LUA_GLOBALSINDEX, #f);
 
-	LUA_FUNC_REGISTER(obj_create);
 	LUA_FUNC_REGISTER(monsters_in_level);
 	LUA_FUNC_REGISTER(players_in_level);
 	LUA_FUNC_REGISTER(monsters_seen);

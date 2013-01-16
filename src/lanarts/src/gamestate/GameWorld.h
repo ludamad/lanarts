@@ -11,8 +11,6 @@
 #include <vector>
 #include <cstdlib>
 
-#include "objects/enemy/EnemyController.h"
-
 #include "objects/TeamRelations.h"
 
 #include "stats/EnemiesSeen.h"
@@ -53,9 +51,6 @@ public:
 	EnemiesSeen& enemies_seen() {
 		return _enemies_seen;
 	}
-	EnemyController& enemy_controller() {
-		return _enemy_controller;
-	}
 	TeamRelations& teams() {
 		return _teams;
 	}
@@ -74,7 +69,6 @@ private:
 
 	EnemiesSeen _enemies_seen;
 	PlayerData _player_data;
-	EnemyController _enemy_controller;
 	TeamRelations _teams;
 
 	GameLevelState* lvl;

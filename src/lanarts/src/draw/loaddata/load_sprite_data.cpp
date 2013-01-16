@@ -8,7 +8,7 @@
 #include <luawrap/luawrap.h>
 #include <lcommon/strformat.h>
 
-#include "lua/lua_yaml.h"
+#include "lua_api/lua_yaml.h"
 
 #include "draw/parse_drawable.h"
 

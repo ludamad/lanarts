@@ -19,7 +19,7 @@
 
 #include "stats/items/WeaponEntry.h"
 
-#include "lua/lua_gameinst.h"
+#include "lua_api/lua_gameinst.h"
 #include "util/math_util.h"
 
 #include "../player/PlayerInst.h"

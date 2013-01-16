@@ -108,7 +108,23 @@ static void register_gamesettings(lua_State* L) {
 	luawrap::globals(L)["settings"] = &lua_api::gamestate(L)->game_settings();
 }
 
+static int game_frame(lua_State* L) {
+	lua_pushnumber(L, lua_api::gamestate(L)->frame());
+	return 1;
+}
+
+static void register_game_metatable(lua_State* L, LuaValue& game) {
+	LuaValue meta = luameta_new(L, "__game");
+	luameta_getters(meta)["frame"].bind_function(game_frame);
+
+	game.push();
+	meta.push();
+	lua_setmetatable(L, -2);
+	lua_pop(L, 1);
+}
+
 namespace lua_api {
+
 	void register_gamestate_api(lua_State* L) {
 		register_gamesettings(L);
 
@@ -127,5 +143,6 @@ namespace lua_api {
 		game["input_capture"].bind_function(game_input_capture);
 		game["input_handle"].bind_function(game_input_handle);
 
+		register_game_metatable(L, game);
 	}
 }

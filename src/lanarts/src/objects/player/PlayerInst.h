@@ -18,7 +18,7 @@
 #include "gamestate/GameAction.h"
 
 #include "gamestate/GameLevelState.h"
-#include "pathfind/pathfind.h"
+#include "pathfind/flood_pathfind.h"
 
 #include "../CombatGameInst.h"
 #include "../GameInst.h"

@@ -12,7 +12,7 @@
 
 #include "pathfind/astar_pathfind.h"
 
-#include "pathfind/pathfind.h"
+#include "pathfind/flood_pathfind.h"
 #include <lcommon/SerializeBuffer.h>
 
 #include "../GameInst.h"

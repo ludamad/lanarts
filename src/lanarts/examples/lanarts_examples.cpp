@@ -48,7 +48,6 @@ static void draw_loop(DrawFunc draw_func) {
 	int frames = 0;
 
 	while (1) {
-		ldraw::Font fpsfont("res/sample.ttf", 40);
 		frames += 1;
 
 		if (!lua_api::gamestate(L)->update_iostate()) {
@@ -58,20 +57,15 @@ static void draw_loop(DrawFunc draw_func) {
 		ldraw::display_draw_start();
 		draw_func();
 		double seconds = timer.get_microseconds() / 1000.0 / 1000.0;
-		fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::RIGHT_BOTTOM),
-				Posf(400, 400), "%d", int(frames / seconds));
+
 		ldraw::display_draw_finish();
 		SDL_Delay(5);
 	}
 }
 
 static void draw_script() {
-	ldraw::Font fpsfont("res/sample.ttf", 40);
 	luawrap::globals(L)["draw"].push();
 	luawrap::call<void>(L);
-
-	fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::LEFT_BOTTOM),
-			Posf(0, 400), "Lua");
 }
 static void draw_luascript(lua_State* L, const char* file) {
 	lua_safe_dofile(L, file);
@@ -130,7 +124,7 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-	display_initialize("Lanarts Example", Dim(400, 400), false);
+	display_initialize("Lanarts Example", Dim(640, 480), false);
 
 	setup_lua_state();
 

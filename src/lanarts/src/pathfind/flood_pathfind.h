@@ -1,10 +1,10 @@
 /*
- * pathfind.h:
+ * flood_pathfind.h:
  *  Utilities for flood-fill based pathfinding
  */
 
-#ifndef PATHFIND_H_
-#define PATHFIND_H_
+#ifndef FLOOD_PATHFIND_H_
+#define FLOOD_PATHFIND_H_
 
 #include <vector>
 
@@ -89,4 +89,4 @@ private:
 
 void floodfill(PathingNode* path, int w, int h, int sx, int sy);
 
-#endif /* PATHFIND_H_ */
+#endif /* FLOOD_PATHFIND_H_ */

@@ -12,7 +12,7 @@
 #include "draw/SpriteEntry.h"
 #include "gamestate/GameState.h"
 
-#include "lua/lua_api.h"
+#include "lua_api/lua_api.h"
 
 #include "stats/items/ProjectileEntry.h"
 #include "stats/items/WeaponEntry.h"
