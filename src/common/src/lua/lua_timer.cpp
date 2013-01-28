@@ -26,7 +26,7 @@ static double get_milliseconds(Timer* timer) {
 
 LuaValue lua_timermetatable(lua_State* L) {
 	LuaValue meta = luameta_new(L, "Timer");
-	LuaValue methods = luameta_methods(meta);
+	LuaValue methods = luameta_constants(meta);
 
 	methods["start"].bind_function(start);
 	methods["get_microseconds"].bind_function(get_microseconds);

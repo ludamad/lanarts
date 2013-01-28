@@ -7,6 +7,7 @@
 #ifndef LUAWRAP_TYPES_H_
 #define LUAWRAP_TYPES_H_
 
+#include <typeinfo>
 #include <lua.hpp>
 
 #include <new>
@@ -103,6 +104,14 @@ namespace luawrap {
 namespace luawrap {
 
 	namespace _private {
+
+		template<typename T>
+		LuaValue plaindata_initializer(lua_State* L) {
+			LuaValue meta = luameta_new(L, typeid(T).name());
+			luameta_gc<T>(meta);
+			return meta;
+		}
+
 		bool check_is_luametatype(lua_State* L, int idx,
 				luameta_initializer meta);
 
@@ -111,6 +120,7 @@ namespace luawrap {
 		static inline bool check_userdata(lua_State* L, int idx) {
 			return check_is_luametatype(L, idx, meta);
 		}
+
 		// Adapt common get-format to desired format
 		template<typename T>
 		static inline void get_userdata(lua_State* L, int idx, void* data) {
@@ -141,10 +151,19 @@ namespace luawrap {
 		install_callbacks(CallbackStore<T*>::callbacks, NULL,
 				&get_userdata_ptr<T>, &check_userdata<meta>);
 	}
+
 	template<typename T, luameta_initializer meta>
 	static inline void install_userdata_type() {
 		using namespace _private;
 		install_userdata_type<T, &push_userdata<T, meta>, meta>();
+	}
+
+	template<typename T>
+	static inline void install_plaindata_type() {
+		using namespace _private;
+		install_userdata_type<T,
+				&push_userdata<T, plaindata_initializer<T> >,
+				plaindata_initializer<T> >();
 	}
 
 }
@@ -153,7 +172,7 @@ namespace luawrap {
 namespace luawrap {
 
 	namespace _private {
-		template <typename T>
+		template<typename T>
 		class PushGetCheckWrap;
 	}
 
@@ -181,8 +200,8 @@ namespace luawrap {
 	static inline void install_casted_type() {
 		using namespace _private;
 
-		install_type<To, &push_casted<To, From>,
-				&get_casted<To, From>, &luawrap::check<From> >();
+		install_type<To, &push_casted<To, From>, &get_casted<To, From>,
+				&luawrap::check<From> >();
 	}
 }
 #endif /* LUAWRAP_TYPES_H_ */

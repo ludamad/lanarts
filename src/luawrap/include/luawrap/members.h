@@ -36,6 +36,13 @@ namespace luawrap {
 		return 1;
 	}
 
+	template<typename T, typename V, V (T::*member)() const>
+	static int getter(lua_State* L) {
+		T& object = get<T&>(L, 1);
+		push<V>(L, (object.*member)());
+		return 1;
+	}
+
 	namespace _private {
 		template<typename T, typename V>
 		inline int getter(lua_State* L) {

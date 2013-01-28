@@ -68,8 +68,11 @@ static int game_input_handle(lua_State* L) {
 LuaValue luaapi_settings_proxy(lua_State* L) {
 	LuaValue meta = luameta_new(L, "Settings");
 	LuaValue getters = luameta_getters(meta);
+	LuaValue setters = luameta_setters(meta);
 
-#define BIND(x) getters[#x].bind_getter(&GameSettings::x)
+#define BIND(x) getters[#x].bind_getter(&GameSettings::x); \
+	setters[#x].bind_setter(&GameSettings::x)
+
 	BIND(font);
 	BIND(menu_font);
 	BIND(fullscreen);
@@ -98,6 +101,7 @@ LuaValue luaapi_settings_proxy(lua_State* L) {
 	// This is not ideal but better than accidentally not casting to int or writing more boilerplate
 	luawrap::install_casted_type<GameSettings::connection_type, int>();
 	getters["connection_type"].bind_getter(&GameSettings::conntype);
+	setters["connection_type"].bind_setter(&GameSettings::conntype);
 
 	return meta;
 }

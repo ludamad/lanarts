@@ -65,7 +65,7 @@ local function mainloop(steponly)
 
 	perf.timing_end("**Game Frame**")
 
-	return true;
+	return true
 end
 
 function postdraw()

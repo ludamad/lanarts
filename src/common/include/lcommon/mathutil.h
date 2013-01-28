@@ -42,4 +42,10 @@ Pos round_to_multiple(const Pos& pos, int mult, bool centered = false);
 int round_to_multiple(int num, int mult, bool centered = false);
 int centered_multiple(int num, int mult);
 
+void direction_towards(const Pos& a, const Pos& b, float& rx, float& ry,
+		float speed = 1);
+float distance_between(const Pos& a, const Pos& b);
+float magnitude(float x, float y);
+void normalize(float& x, float& y, float mag = 1);
+
 #endif /* LCOMMON_MATH_H_ */

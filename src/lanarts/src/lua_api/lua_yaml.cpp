@@ -21,7 +21,6 @@
 // Calls install_type:
 struct __LuaYAMLInitializer {
 	__LuaYAMLInitializer() {
-		printf("installing yaml\n");
 		luawrap::install_type<YAML::Node, lua_pushyaml>();
 	}
 } __initializer;
@@ -80,30 +79,6 @@ void lua_pushyaml(lua_State* L, const YAML::Node& node) {
 
 LuaValue lua_yaml(lua_State *L, const YAML::Node & node) {
 	lua_pushyaml(L, node);
-	return LuaValue::pop_value(L);
-}
-
-static std::string format_expression_string(const char* str) {
-	const char prefix[] = "return ";
-	if (strncmp(str, prefix, sizeof(prefix)) == 0)
-		return str;
-	return std::string("return ") + str;
-}
-
-static LuaValue parse_luaexpr(lua_State* L, const char* code) {
-	perf_timer_begin(FUNCNAME);
-
-	std::string retcode = format_expression_string(code);
-
-	int ntop = lua_gettop(L);
-	if (luaL_loadstring(L, retcode.c_str())) {
-		printf("Error while parsing lua expression:\n%s\nFor expression:\n%s",
-				lua_tostring(L, -1), retcode.c_str());
-		exit(0);
-	}
-	LANARTS_ASSERT(lua_gettop(L) - ntop == 1);
-
-	perf_timer_end(FUNCNAME);
 	return LuaValue::pop_value(L);
 }
 

@@ -32,7 +32,12 @@ public:
     void clear();
     void clear_keystate();
 	bool handle_event(SDL_Event *event);
+	int max_length() const {
+		return _max_length;
+	}
 private:
+	void _handle_backspace();
+
 	bool _has_repeat_cooldown();
 	void _reset_repeat_cooldown(int cooldownms);
 	SDLKey _current_key;

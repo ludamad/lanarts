@@ -254,14 +254,15 @@ LuaValue::LuaValue(lua_State* L) {
 }
 
 void LuaValue::init(lua_State* L) {
-	if (!impl) {
-		impl = new _LuaValueImpl(L);
-	} else if (impl->is_uniquely_referenced()) {
-		impl->L = L;
-	} else {
+	if (impl) {
+		if (impl->is_uniquely_referenced()) {
+			lua_pushnil(L);
+			impl->pop();
+			return;
+		}
 		deref(impl);
-		impl = new _LuaValueImpl(L);
 	}
+	impl = new _LuaValueImpl(L);
 }
 
 static std::string format_expression_string(const std::string& str) {

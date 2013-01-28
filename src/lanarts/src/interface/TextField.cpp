@@ -9,10 +9,10 @@
 #include "TextField.h"
 
 /*Handle key repeating, in milliseconds*/
-const int INITIAL_REPEAT_STEP_AMNT = 560;
-const int NEXT_REPEAT_STEP_AMNT = 70;
-const int NEXT_BACKSPACE_STEP_AMNT = 42;
-const int NO_REPEAT_AMNT = -1;
+static const int INITIAL_REPEAT_MS = 360;
+static const int NEXT_REPEAT_MS = 50;
+static const int NEXT_BACKSPACE_MS = 30;
+static const int NO_REPEAT = -1;
 
 TextField::TextField(int max_length, const std::string & default_text) :
 		_max_length(max_length), _text(default_text) {
@@ -22,7 +22,7 @@ TextField::TextField(int max_length, const std::string & default_text) :
 void TextField::clear_keystate() {
 	_current_key = SDLK_UNKNOWN;
 	_current_mod = KMOD_NONE;
-	_repeat_cooldown = NO_REPEAT_AMNT;
+	_repeat_cooldown = NO_REPEAT;
 }
 void TextField::clear() {
 	_text.clear();
@@ -59,11 +59,27 @@ bool TextField::_has_repeat_cooldown() {
 	return has_cooldown;
 }
 
+void TextField::_handle_backspace() {
+	bool control_pressed = (_current_mod & (KMOD_LCTRL | KMOD_RCTRL));
+
+	if (!_text.empty()) {
+		// if control held, remove 'word', ie string of numbers&digits
+		if (control_pressed && isalnum(_text[_text.size() - 1])) {
+			while (!_text.empty() && isalnum(_text[_text.size() - 1])) {
+				_text.resize(_text.size() - 1);
+			}
+		} else { // else remove one character
+			_text.resize(_text.size() - 1);
+		}
+	}
+}
+
 void TextField::_reset_repeat_cooldown(int cooldownms) {
 	_repeat_timer.start();
 	_repeat_cooldown = cooldownms;
 
 }
+
 /*Returns whether has handled event*/
 void TextField::step() {
 	if (!_has_repeat_cooldown() && _current_key != SDLK_FIRST) {
@@ -72,12 +88,10 @@ void TextField::step() {
 			if (_text.size() < _max_length) {
 				_text += keycode_to_char(_current_key, _current_mod);
 			}
-			_reset_repeat_cooldown(NEXT_REPEAT_STEP_AMNT);
+			_reset_repeat_cooldown(NEXT_REPEAT_MS);
 		} else if (_current_key == SDLK_BACKSPACE) {
-			if (!_text.empty()) {
-				_text.resize(_text.size() - 1);
-			}
-			_reset_repeat_cooldown(NEXT_BACKSPACE_STEP_AMNT);
+			_handle_backspace();
+			_reset_repeat_cooldown(NEXT_BACKSPACE_MS);
 		}
 	}
 }
@@ -101,18 +115,19 @@ bool TextField::handle_event(SDL_Event* event) {
 			}
 			if (_current_key != keycode) {
 				_current_key = keycode;
-				_reset_repeat_cooldown(INITIAL_REPEAT_STEP_AMNT);
+				_reset_repeat_cooldown(INITIAL_REPEAT_MS);
 			}
 			return true;
 		}
 		if (keycode == SDLK_BACKSPACE) {
-			if (!_text.empty()) {
-				_text.resize(_text.size() - 1);
-			}
+
+			_handle_backspace();
+
 			if (_current_key != keycode) {
 				_current_key = keycode;
-				_reset_repeat_cooldown(INITIAL_REPEAT_STEP_AMNT);
+				_reset_repeat_cooldown(INITIAL_REPEAT_MS);
 			}
+
 			return true;
 		}
 		if (keycode == SDLK_DELETE) {

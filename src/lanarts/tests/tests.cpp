@@ -9,6 +9,7 @@ void stat_serialize_tests();
 void adv_net_unit_tests();
 void parse_unit_tests();
 void parse_drawable_tests();
+void lua_api_tests();
 
 void run_unit_tests() {
 	unit_test_reset_counts();
@@ -19,6 +20,7 @@ void run_unit_tests() {
 	adv_net_unit_tests();
 	parse_unit_tests();
 	parse_drawable_tests();
+	lua_api_tests();
 
 	unit_test_print_count();
 }

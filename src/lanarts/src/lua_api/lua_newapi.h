@@ -10,6 +10,7 @@ class GameState;
 struct lua_State;
 class LuaStackValue;
 class LuaValue;
+union SDL_Event;
 
 namespace lua_api {
 	// Grab the GameState back-pointer
@@ -17,6 +18,15 @@ namespace lua_api {
 	GameState* gamestate(lua_State* L);
 	// Convenience function that performs above on captured lua state
 	GameState* gamestate(const LuaStackValue& val);
+
+	LuaValue global_getters(lua_State* L);
+	LuaValue global_setters(lua_State* L);
+	void globals_set_mutability(lua_State* L, bool mutability);
+	bool globals_get_mutability(lua_State* L);
+
+	/* Creates a lua state with a custom global metatable.
+	 * All further registration assumes the lua state was created with this function. */
+	lua_State* create_luastate();
 
 	void preinit_state(lua_State* L); // TODO: This should be removed some time
 
@@ -43,6 +53,7 @@ namespace lua_api {
 
 	// Callbacks into the lua VM:
 	void luacall_postdraw(lua_State* L);
+	bool luacall_handle_event(lua_State* L, SDL_Event* e);
 	void luacall_hitsound(lua_State* L);
 
 	// Lua utilities:

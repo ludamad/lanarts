@@ -46,9 +46,19 @@ LuaValue luameta_getters(const LuaValue& metatable);
 LuaValue luameta_setters(const LuaValue& metatable);
 
 /*
+ * Install a default catch-all setter.
+ */
+void luameta_defaultsetter(const LuaValue& metatable, const LuaValue& setter);
+
+/*
+ * Install a default catch-all getter.
+ */
+void luameta_defaultgetter(const LuaValue& metatable, const LuaValue& getter);
+
+/*
  * Retrieve the method (and class variable) table.
  */
-LuaValue luameta_methods(const LuaValue& metatable);
+LuaValue luameta_constants(const LuaValue& metatable);
 
 // Helper gc hook for freeing objects of type T
 template <typename T>

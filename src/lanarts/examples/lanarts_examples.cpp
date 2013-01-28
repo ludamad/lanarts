@@ -19,6 +19,7 @@
 #include <luawrap/calls.h>
 
 #include <lcommon/lua_lcommon.h>
+#include <lcommon/fatal_error.h>
 
 #include <ldraw/Animation.h>
 #include <ldraw/DirectionalDrawable.h>
@@ -41,36 +42,13 @@
 
 static lua_State* L;
 
-typedef void (*DrawFunc)();
-
-static void draw_loop(DrawFunc draw_func) {
-	Timer timer;
-	int frames = 0;
-
-	while (1) {
-		frames += 1;
-
-		if (!lua_api::gamestate(L)->update_iostate()) {
-			break;
-		}
-
-		ldraw::display_draw_start();
-		draw_func();
-		double seconds = timer.get_microseconds() / 1000.0 / 1000.0;
-
-		ldraw::display_draw_finish();
-		SDL_Delay(5);
-	}
-}
-
-static void draw_script() {
-	luawrap::globals(L)["draw"].push();
-	luawrap::call<void>(L);
-}
 static void draw_luascript(lua_State* L, const char* file) {
 	lua_safe_dofile(L, file);
+	lua_api::globals_set_mutability(L, false);
 
-	draw_loop(draw_script);
+	luawrap::globals(L)["main"].push();
+	luawrap::call<void>(L);
+
 	if (lua_tostring(L,-1)) {
 		printf("%s\n", lua_tostring(L,-1));
 	}
@@ -96,10 +74,12 @@ static std::vector<ldraw::Drawable> drawablelist_parse(const std::string& str) {
 	return parse_drawable_list(root);
 }
 
+int read_eval_print(lua_State *L);
+
 static void setup_lua_state() {
 	using namespace ldraw;
 
-	L = lua_open();
+	L = lua_api::create_luastate();
 
 	GameSettings settings;
 
@@ -113,22 +93,26 @@ static void setup_lua_state() {
 	// This allows us to code the examples fully in lua:
 	globals["drawable_parse"].bind_function(drawable_parse);
 	globals["drawablelist_parse"].bind_function(drawablelist_parse);
+	globals["read_eval_print"].bind_function(read_eval_print);
 }
 
 // Must be char** argv to play nice with SDL on windows!
 int main(int argc, char** argv) {
-	using namespace ldraw;
+	try {
+		using namespace ldraw;
 
-	if (argc < 2) {
-		printf("Requires script file to run as argument! Exiting ...\n");
-		exit(1);
+		if (argc < 2) {
+			printf("Requires script file to run as argument! Exiting ...\n");
+			exit(1);
+		}
+
+		setup_lua_state();
+		ldraw::display_initialize("Lanarts Example Runner", Dim(640, 480));
+
+		draw_luascript(L, argv[1]);
+
+		lua_close(L);
+	} catch (const __FatalError& err) {
+		printf("Fatal error, exiting ... \n");
 	}
-
-	display_initialize("Lanarts Example", Dim(640, 480), false);
-
-	setup_lua_state();
-
-	draw_luascript(L, argv[1]);
-
-	lua_close(L);
 }

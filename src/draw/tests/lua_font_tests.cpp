@@ -35,7 +35,7 @@ static void lua_font_bind_test() {
 			"function testFontProperties(font)\n"
 					"assert('draw does not exist', font.draw ~= nil)\n"
 					"assert('draw_wrapped does not exist', font.draw_wrapped ~= nil)\n"
-					"assert('get_draw_size does not exist', font.get_draw_size ~= nil)\n"
+					"assert('draw_size does not exist', font.draw_size ~= nil)\n"
 					"end\n";
 
 	lua_assert_valid_dostring(L, code2);

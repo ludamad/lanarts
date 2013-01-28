@@ -219,11 +219,18 @@ const ldraw::Font& GameState::menu_font() {
 }
 
 int GameState::handle_event(SDL_Event* event) {
-	GameLevelState* level = get_level();
-	if (level && level->id() != -1) {
-		if (hud.handle_event(this, event))
-			return 0;
+	if (lua_api::luacall_handle_event(luastate(), event)) {
+		return false;
 	}
+
+	GameLevelState* level = get_level();
+
+	if (level && level->id() != -1) {
+		if (hud.handle_event(this, event)) {
+			return false;
+		}
+	}
+
 	return iocontroller.handle_event(event);
 }
 bool GameState::update_iostate(bool resetprev) {

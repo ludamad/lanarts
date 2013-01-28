@@ -22,9 +22,9 @@
 class GameState;
 
 /*Handle key repeating, in steps*/
-const int INITIAL_REPEAT_STEP_AMNT = 40;
-const int NEXT_REPEAT_STEP_AMNT = 5;
-const int NEXT_BACKSPACE_STEP_AMNT = 3;
+const int INITIAL_REPEAT_MS = 40;
+const int NEXT_REPEAT_MS = 5;
+const int NEXT_BACKSPACE_MS = 3;
 
 
 /*Represents a coloured message in chat*/

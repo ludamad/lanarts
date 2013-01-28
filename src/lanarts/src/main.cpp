@@ -50,7 +50,7 @@ static void init_system(GameSettings& settings, lua_State* L) {
 
 int main(int argc, char** argv) {
 	const int HUD_WIDTH = 160;
-	lua_State* L = lua_open();
+	lua_State* L = lua_api::create_luastate();
 
 	GameSettings settings;
 	init_system(settings, L);

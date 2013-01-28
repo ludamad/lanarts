@@ -58,6 +58,22 @@ bool lua_check_drawoptions(lua_State *L, int idx) {
 	return lua_istable(L, idx);
 }
 
+static int shift_origin(lua_State* L) {
+	using namespace ldraw;
+	bool bboxcall = lua_gettop(L) <= 2;
+	if (bboxcall) {
+		BBoxF bbox = luawrap::get<BBoxF>(L, 1);
+		DrawOrigin origin = (DrawOrigin)luaL_checknumber(L, 2);
+		luawrap::push(L, adjusted_for_origin(bbox, origin));
+	} else {
+		Posf pos = luawrap::get<Posf>(L, 1);
+		DimF dim = luawrap::get<DimF>(L, 2);
+		DrawOrigin origin = (DrawOrigin)luaL_checknumber(L, 3);
+		luawrap::push(L, adjusted_for_origin(pos, dim, origin));
+	}
+	return 1;
+}
+
 void ldraw::lua_register_drawoptions(lua_State *L,
 		const LuaValue& module) {
 	using namespace ldraw;
@@ -76,6 +92,8 @@ void ldraw::lua_register_drawoptions(lua_State *L,
 	BIND_ORIGIN_CONST(RIGHT_TOP);
 	BIND_ORIGIN_CONST(RIGHT_CENTER);
 	BIND_ORIGIN_CONST(RIGHT_BOTTOM);
+
+	module["shift_origin"].bind_function(shift_origin);
 
 }
 

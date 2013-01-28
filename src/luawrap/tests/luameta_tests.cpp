@@ -38,7 +38,7 @@ static void mymethod(Foo& f, int abc) {
 
 LuaValue foo_newmetatable(lua_State* L) {
 	LuaValue metatable = luameta_new(L, "Foo");
-	LuaValue methods = luameta_methods(metatable);
+	LuaValue methods = luameta_constants(metatable);
 	LuaValue getters = luameta_getters(metatable);
 	LuaValue setters = luameta_setters(metatable);
 

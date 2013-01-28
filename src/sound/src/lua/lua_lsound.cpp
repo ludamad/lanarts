@@ -25,7 +25,7 @@ static void clear(Sound& snd) {
 
 LuaValue lua_soundmetatable(lua_State* L) {
 	LuaValue meta = luameta_new(L, "Sound");
-	LuaValue methods = luameta_methods(meta);
+	LuaValue methods = luameta_constants(meta);
 
 	methods["play"].bind_function(play);
 	methods["loop"].bind_function(loop);

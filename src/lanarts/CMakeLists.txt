@@ -11,7 +11,6 @@ include(FindFreetype)
 set( SRC ..)
 set( LIBS ../../libs)
 
-
 include_directories(
 	${SDL_INCLUDE_DIR} 
 	${SDLIMAGE_INCLUDE_DIR}
@@ -85,11 +84,13 @@ file(GLOB lanarts_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
        tests/net/*
 
        tests/stats/*
+       tests/lua_api/*
 )
 
 file(GLOB lanarts_examples RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
        examples/*
 )
+
 
 add_library( lanartslib
              ${lanarts_src}
