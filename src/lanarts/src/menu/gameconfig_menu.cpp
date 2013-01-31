@@ -39,7 +39,7 @@
 // **************  Class selection button functions ************** ///
 static void choose_class(GameState* gs, GameInst* _, void* name) {
 	class_id classn = get_class_by_name((const char*)name);
-	class_id& settings_class = gs->game_settings().classtype;
+	class_id& settings_class = gs->game_settings().class_type;
 	if (settings_class == classn) {
 		settings_class = -1;
 	} else {
@@ -48,7 +48,7 @@ static void choose_class(GameState* gs, GameInst* _, void* name) {
 }
 static void draw_class_option(GameState* gs, GameInst* inst, void* name) {
 	ButtonInst* button = dynamic_cast<ButtonInst*>(inst);
-	if (gs->game_settings().classtype == get_class_by_name((const char*)name)) {
+	if (gs->game_settings().class_type == get_class_by_name((const char*)name)) {
 		button->draw_colour() = COL_GOLD;
 		button->hover_colour() = COL_GOLD;
 	} else {
@@ -65,7 +65,7 @@ static void setup_class_selection_button(GameState* gs, int x, int y,
 					COL_GOLD));
 }
 static void setup_class_selection_buttons(GameState* gs, int x, int y) {
-	gs->game_settings().classtype = -1; // Make sure class is not set
+	gs->game_settings().class_type = -1; // Make sure class is not set
 	setup_class_selection_button(gs, x, y, "wizard_icon", "Mage");
 	x += 128;
 	setup_class_selection_button(gs, x, y, "fighter_icon", "Fighter");
@@ -88,7 +88,7 @@ static void draw_choose_class_to_begin(GameState* gs, GameInst* inst, void* _) {
 	// We cheat here and bundle step and draw actions
 	// The interface will always be drawn once a step
 	GameSettings& settings = gs->game_settings();
-	if (settings.classtype == -1) {
+	if (settings.class_type == -1) {
 
 		using namespace ldraw;
 		const Font& font = gs->font();
@@ -102,7 +102,7 @@ static void onclick_goback(GameState* gs, GameInst* inst, void* exitcode) {
 }
 static void onclick_start(GameState* gs, GameInst* inst, void* exitcode) {
 	GameSettings& settings = gs->game_settings();
-	if (settings.classtype != -1) {
+	if (settings.class_type != -1) {
 		*(int*)exitcode = +1;
 	}
 }

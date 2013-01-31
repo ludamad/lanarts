@@ -35,5 +35,6 @@ const Colour COL_GRAY(60, 60, 60);
 const Colour COL_MID_GRAY(120, 120, 120);
 const Colour COL_LIGHT_GRAY(180, 180, 180);
 const Colour COL_WHITE(255, 255, 255);
+const Colour COL_INVISIBLE(0, 0, 0, 0);
 
 #endif /* LDRAW_COLOUR_CONSTANTS_H_ */

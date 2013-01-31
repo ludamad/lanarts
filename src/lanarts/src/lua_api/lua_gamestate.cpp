@@ -87,6 +87,7 @@ LuaValue luaapi_settings_proxy(lua_State* L) {
 	BIND(time_per_step);
 	BIND(draw_diagnostics);
 	BIND(username);
+	BIND(class_type);
 	BIND(network_debug_mode);
 	BIND(savereplay_file);
 	BIND(loadreplay_file);

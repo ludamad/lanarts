@@ -106,7 +106,7 @@ void GameWorld::spawn_players(GeneratedLevel& genlevel, void** player_instances,
 		bool flocal = (gs->game_settings().conntype == GameSettings::CLIENT);
 		GameSettings& settings = gs->game_settings();
 		GameNetConnection& netconn = gs->net_connection();
-		int myclassn = gs->game_settings().classtype;
+		int myclassn = gs->game_settings().class_type;
 
 		for (int i = 0; i < gs->player_data().all_players().size(); i++) {
 			PlayerDataEntry& pde = gs->player_data().all_players()[i];

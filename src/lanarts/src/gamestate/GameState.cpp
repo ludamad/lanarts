@@ -78,13 +78,13 @@ void GameState::start_connection() {
 		connection.initialize_as_client(settings.ip.c_str(), settings.port);
 		printf("client connected\n");
 		net_send_connection_affirm(connection, settings.username,
-				settings.classtype);
+				settings.class_type);
 	}
 	if (settings.conntype == GameSettings::SERVER
 			|| settings.conntype == GameSettings::NONE) {
 		player_data().set_local_player_idx(0);
 		player_data().register_player(settings.username, NULL,
-				settings.classtype);
+				settings.class_type);
 	}
 }
 
@@ -117,10 +117,10 @@ bool GameState::start_game() {
 		connection.set_accepting_connections(false);
 	}
 	if (!settings.loadreplay_file.empty()) {
-		load_init(this, init_data.seed, settings.classtype);
+		load_init(this, init_data.seed, settings.class_type);
 	}
 	if (!settings.savereplay_file.empty()) {
-		save_init(this, init_data.seed, settings.classtype);
+		save_init(this, init_data.seed, settings.class_type);
 	}
 
 	init_lua_data(this, L);

@@ -99,7 +99,7 @@ void load_settings_data(GameSettings& settings, const char* filename) {
 				std::string classname;
 				root["class"] >> classname;
 				if (!game_class_data.empty())
-					settings.classtype = get_class_by_name(classname.c_str());
+					settings.class_type = get_class_by_name(classname.c_str());
 			}
 		} catch (const YAML::Exception& parse) {
 			printf("Settings Parsed Incorrectly: \n");

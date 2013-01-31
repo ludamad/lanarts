@@ -57,5 +57,6 @@ void ldraw::lua_register_colour(lua_State *L,
 	BIND_COLOUR(COL_MID_GRAY);
 	BIND_COLOUR(COL_LIGHT_GRAY);
 	BIND_COLOUR(COL_WHITE);
+	BIND_COLOUR(COL_INVISIBLE);
 
 }
