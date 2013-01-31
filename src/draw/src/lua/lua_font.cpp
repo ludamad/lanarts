@@ -34,7 +34,8 @@ static void font_draw_wrapped(const Font& f, const DrawOptions& options,
 
 static int font_height(lua_State* L) {
 	Font* f = luawrap::get<Font*>(L, 1);
-	return f->height();
+	lua_pushinteger(L, f->height());
+	return 1;
 }
 
 static int font_get_draw_size(lua_State* L) {
