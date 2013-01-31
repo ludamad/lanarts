@@ -3,6 +3,7 @@
  *  Exercises some of the hard-to-unit test code
  */
 
+#include <cstdio>
 #include <SDL.h>
 #include <GL/glu.h>
 
@@ -80,6 +81,7 @@ static void setup_lua_state() {
 	using namespace ldraw;
 
 	L = lua_api::create_luastate();
+	lua_api::add_search_path(L, "src/?.lua;scripts/?.lua;scripts/menu-redo/?.lua");
 
 	GameSettings settings;
 
@@ -106,7 +108,9 @@ int main(int argc, char** argv) {
 			exit(1);
 		}
 
+		Timer timer;
 		setup_lua_state();
+
 		ldraw::display_initialize("Lanarts Example Runner", Dim(640, 480));
 
 		draw_luascript(L, argv[1]);

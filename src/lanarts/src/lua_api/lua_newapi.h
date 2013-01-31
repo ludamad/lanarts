@@ -24,6 +24,8 @@ namespace lua_api {
 	void globals_set_mutability(lua_State* L, bool mutability);
 	bool globals_get_mutability(lua_State* L);
 
+	/* Add a path for searching with the 'require' function. */
+	void add_search_path(lua_State* L, const char* path);
 	/* Creates a lua state with a custom global metatable.
 	 * All further registration assumes the lua state was created with this function. */
 	lua_State* create_luastate();

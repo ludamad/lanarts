@@ -12,7 +12,7 @@
 #include "lua_numeric_tuple_helper.h"
 
 template<typename T, typename V>
-void install_numeric_tuple() {
+static void install_numeric_tuple() {
 	typedef LuaNumericTupleFunctions<T, V> ImplClass;
 	luawrap::install_type<T, ImplClass::push, ImplClass::get, ImplClass::check>();
 }

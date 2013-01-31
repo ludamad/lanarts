@@ -12,17 +12,23 @@
 
 namespace ldraw {
 
-enum DrawOrigin {
-	LEFT_TOP = 0,
-	LEFT_CENTER = 1,
-	LEFT_BOTTOM = 2,
-	CENTER_TOP = 3,
-	CENTER = 4,
-	CENTER_BOTTOM = 5,
-	RIGHT_TOP = 6,
-	RIGHT_CENTER = 7,
-	RIGHT_BOTTOM = 8
+struct DrawOrigin {
+	float placement_x, placement_y;
+
+	DrawOrigin(float px = 0, float py = 0)  {
+		placement_x = px;
+		placement_y = py;
+	}
+
+	inline bool operator==( const DrawOrigin& o ) const {
+		return o.placement_x == placement_x && o.placement_y == placement_y;
+	}
 };
+
+const extern DrawOrigin
+	LEFT_TOP, LEFT_CENTER, LEFT_BOTTOM,
+	CENTER_TOP, CENTER, CENTER_BOTTOM,
+	RIGHT_TOP, RIGHT_CENTER, RIGHT_BOTTOM;
 
 //Assumes left-top origin bbox
 BBoxF adjusted_for_origin(const BBoxF& bbox, DrawOrigin origin);

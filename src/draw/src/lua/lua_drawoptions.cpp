@@ -9,6 +9,8 @@
 #include <luawrap/luawrap.h>
 #include <luawrap/types.h>
 
+#include <lcommon/lua_numeric_tuple_helper.h>
+
 #include "lua_colour.h"
 #include "lua_drawoptions.h"
 
@@ -16,7 +18,7 @@ void lua_push_drawoptions(lua_State *L, const ldraw::DrawOptions & options) {
 	lua_newtable(L);
 	LuaStackValue table(L, -1);
 
-	table["origin"] = (int) options.draw_origin;
+	table["origin"] = options.draw_origin;
 
 	table["color"] = options.draw_colour.clamp();
 	table["region"] = options.draw_region;
@@ -41,9 +43,8 @@ ldraw::DrawOptions lua_get_drawoptions(lua_State *L, int idx) {
 
 	table["origin"].push();
 	if (!lua_isnil(L, -1)) {
-		options.draw_origin = (ldraw::DrawOrigin)lua_tonumber(L, -1);
+		options.draw_origin = luawrap::pop<ldraw::DrawOrigin>(L);
 	}
-	lua_pop(L, 1);
 
 	table["color"].optionalget(options.draw_colour);
 	table["region"].optionalget(options.draw_region);
@@ -63,25 +64,34 @@ static int shift_origin(lua_State* L) {
 	bool bboxcall = lua_gettop(L) <= 2;
 	if (bboxcall) {
 		BBoxF bbox = luawrap::get<BBoxF>(L, 1);
-		DrawOrigin origin = (DrawOrigin)luaL_checknumber(L, 2);
+		DrawOrigin origin = luawrap::get<DrawOrigin>(L, 2);
 		luawrap::push(L, adjusted_for_origin(bbox, origin));
 	} else {
 		Posf pos = luawrap::get<Posf>(L, 1);
 		DimF dim = luawrap::get<DimF>(L, 2);
-		DrawOrigin origin = (DrawOrigin)luaL_checknumber(L, 3);
+		DrawOrigin origin = luawrap::get<DrawOrigin>(L, 3);
 		luawrap::push(L, adjusted_for_origin(pos, dim, origin));
 	}
 	return 1;
 }
 
+
+template<typename T, typename V>
+static void install_numeric_tuple() {
+	typedef LuaNumericTupleFunctions<T, V> ImplClass;
+	luawrap::install_type<T, ImplClass::push, ImplClass::get, ImplClass::check>();
+}
+
+
 void ldraw::lua_register_drawoptions(lua_State *L,
 		const LuaValue& module) {
 	using namespace ldraw;
+	install_numeric_tuple<DrawOrigin, float>();
 	luawrap::install_type<DrawOptions, lua_push_drawoptions,
 			lua_get_drawoptions, lua_check_drawoptions>();
 
 #define BIND_ORIGIN_CONST(origin) \
-	module[#origin] = +origin
+	module[#origin] = origin
 
 	BIND_ORIGIN_CONST(LEFT_TOP);
 	BIND_ORIGIN_CONST(LEFT_CENTER);

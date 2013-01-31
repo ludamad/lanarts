@@ -32,6 +32,21 @@ namespace lua_api {
 		return luameta_setters(globalsmeta);
 	}
 
+	void add_search_path(lua_State* L, const char* path) {
+		LuaValue package = luawrap::globals(L)["package"];
+		package["path"].push();
+		lua_pushfstring(L, ";%s", path);
+		lua_concat(L, -2);
+		package["path"].pop();
+	}
+
+	static void configure_lua_packages(lua_State* L) {
+		LuaValue package = luawrap::globals(L)["package"];
+		lua_pushnil(L);
+		package["loadlib"].pop(); // Remove for now
+		package["path"] = "./?.lua";
+	}
+
 	/* Creates a lua state with a custom global metatable.
 	 * All further registration assumes the lua state was created with this function. */
 	lua_State* create_luastate() {
@@ -46,6 +61,8 @@ namespace lua_api {
 
 		// Do openlibs before making globals table a proxy
 		luaL_openlibs(L);
+
+		configure_lua_packages(L);
 
 		luameta_defaultsetter(globalsmeta, contents);
 		luameta_defaultgetter(globalsmeta, contents);
