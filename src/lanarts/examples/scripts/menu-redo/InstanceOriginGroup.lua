@@ -1,33 +1,42 @@
--- Places instances on a certain origin 
+-- Places instances on a certain origin, an optional offset can also be specified
 
 require "utils"
 require "InstanceGroup"
 
 InstanceOriginGroup = newtype()
 
-function InstanceOriginGroup:init(size)
-    self.instances = InstanceGroup.create()
-    self.size = size
+function InstanceOriginGroup:init(params)
+    self._instances = InstanceGroup.create()
+    self.size = params.size
 end
 
 function InstanceOriginGroup:step(xy) 
-    self.instances:step()
+    self._instances:step(xy)
 end
 
-function InstanceOriginGroup:draw(xy) 
-    self.instances:draw()
+function InstanceOriginGroup:draw(xy)
+    self._instances:draw(xy)
     DEBUG_BOX_DRAW(self, xy)
 end
 
-function InstanceOriginGroup:add_instance(obj, origin)
-    assert( origin_valid(origin), "InstanceOriginGroup: Expected origin coordinates between [0,0] and [1,1]")  
+function InstanceOriginGroup:instances(xy)
+    return self._instances:instances(xy)
+end
 
-    local xy = { ( self.size[1] - obj.size[1] ) * origin[1], 
-                 ( self.size[2] - obj.size[2] ) * origin[2] }
+function InstanceOriginGroup:add_instance(obj, origin, --[[Optional]] offset)
+    assert( origin_valid(origin), "InstanceOriginGroup: Expected origin coordinates between [0,0] and [1,1]") 
 
-    self.instances:add_instance( obj, xy )
+    offset = offset or {0, 0}
+
+    local self_w, self_h = unpack(self.size)
+    local obj_w, obj_h = unpack(obj.size)
+
+    local xy = { ( self_w - obj_w ) * origin[1] + offset[1],
+                 ( self_h - obj_h ) * origin[2] + offset[2] }
+
+    self._instances:add_instance( obj, xy )
 end
 
 function InstanceOriginGroup:__tostring()
-    return "[InstanceOriginGroup]"
+    return "[InstanceOriginGroup " .. toaddress(self) .. "]"
 end

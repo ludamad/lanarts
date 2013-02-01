@@ -102,4 +102,9 @@ function TextInputBox:draw(xy)
     end
 
     draw_rectangle_outline(boxcolor, bbox_create(xy, self.size), 1)
+    DEBUG_BOX_DRAW(self, xy)
+end
+
+function TextInputBox:__tostring()
+    return "[TextInputBox " .. toaddress(self) .. "]" 
 end

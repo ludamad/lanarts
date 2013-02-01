@@ -2,6 +2,7 @@ require "utils"
 require "InstanceGroup"
 require "InstanceGridGroup"
 require "TextInputBox"
+require "Sprite"
 
 local SETTINGS_BOX_MAXCHARS = 18
 local SETTINGS_BOX_SIZE = {180, 34}
@@ -9,6 +10,7 @@ local SETTINGS_BOX_SIZE = {180, 34}
 local CONFIG_MENU_SIZE = {640, 480}
 
 local SETTINGS_FONT = font_cached_load("res/sample.ttf", 10)
+local BIG_SETTINGS_FONT = font_cached_load("res/sample.ttf", 20)
 
 local function text_field_create(label_text, default_text, callbacks)
 
@@ -187,47 +189,62 @@ local function speed_toggle_create()
     return toggle
 end
 
--- Simple layout built on top of InstanceGroup
-local function column_instance_group_create(parameters) 
-    local column_amount = parameters.columns
-    local dx, dy = parameters.size[1] / column_amount, parameters.dy
+local function label_button_create(params, onclick)
+    local sprite = Sprite.create(params.sprite, { color = COL_WHITE })
+    local label = TextLabel.create(params.font, {}, params.text)
 
-    local instance_group = InstanceGroup.create()
-    local column, row = 0, 0
+    local size = params.size
 
-    local new_group = {
-        size = parameters.size
-    }
+    local label_button = InstanceOriginGroup.create( params )
 
-    function new_group:draw(xy) 
-        instance_group:draw(xy)
-        DEBUG_BOX_DRAW(self, xy)
-    end
-    function new_group:step(xy) 
-        instance_group:step(xy) 
-    end
+    label_button:add_instance( sprite, CENTER_TOP )
+    label_button:add_instance( label, CENTER_BOTTOM )
+    
+    function label_button:step(xy) -- Makeshift inheritance
+        InstanceOriginGroup.step(self, xy)
+        local mouse_is_over = mouse_over(xy, self.size)
+        local color = mouse_is_over and COL_GOLD or COL_WHITE
 
-    function new_group:add_instance(obj) 
-        instance_group:add_instance(obj, {column * dx, row * dy} )
-
-        column = column + 1
-        if column >= column_amount then
-            column = 0
-            row = row + 1
+        if mouse_is_over and mouse_left_pressed then
+            if onclick then onclick() end
         end
+
+        sprite.options.color = color
+        label.options.color = color
     end
 
-    function new_group:add_instances(...) 
-        for instance in values{...} do 
-            self:add_instance(instance) 
-        end
-    end
-
-    return new_group
+    return label_button
 end
 
-function game_settings_menu_create()
-    local menu = InstanceGridGroup.create( {size = { 400, 192 }, dimensions = { 2, 3 }} )
+local function class_choice_buttons_create()
+    local sprite_base = "res/sprites/class_icons/"
+    local x_padding, y_padding = 32, 16
+    local font = BIG_SETTINGS_FONT
+
+    local buttons = { 
+        { "Fighter", sprite_base .. "fighter.png"},
+        { "Mage", sprite_base .. "wizard.png"},
+        { "Archer", sprite_base .. "archer.png"}
+    }
+    local button_size = { 96, 96 + y_padding + font.height }
+    local row_size = { (button_size[1] + x_padding) * #buttons, button_size[2] }
+
+    local button_row = InstanceGridGroup.create( { size = row_size, dimensions = {#buttons, 1} } )
+
+    for button in values(buttons) do
+        local params = { size = button_size,
+                         font = font,
+                         text = button[1],
+                         sprite = image_cached_load(button[2]) }
+
+        button_row:add_instance( label_button_create(params) )
+    end
+
+    return button_row
+end
+
+local function center_setting_fields_create()
+    local fields = InstanceGridGroup.create( {size = { 400, 192 }, size = { 400, 192 }, dimensions = { 2, 3 }} )
 
     local components = {
         name_field_create(), 
@@ -238,8 +255,60 @@ function game_settings_menu_create()
     }
 
     for obj in values(components) do
-        menu:add_instance(obj)
+        fields:add_instance(obj)
     end
 
-    return menu
+    return fields
+end
+
+local function choose_class_message_create()
+    local label = TextLabel.create(SETTINGS_FONT, {}, "Choose your Class!")
+
+    function label:step(xy) -- Makeshift inheritance
+        TextLabel.step(self, xy)
+        label.options.color = settings.class_type == -1 and COL_PALE_RED or COL_INVISIBLE
+    end
+    
+    return label
+end
+
+local function back_and_continue_options_create(on_back_click, on_start_click)
+    local font = BIG_SETTINGS_FONT
+    local options = InstanceGridGroup.create( { size = { 200, font.height }, spacing = {200, font.height}, dimensions = { 2, 1 } } )
+
+    -- associate each label with a handler
+    -- we make use of the ability to have objects as keys
+    local components = {
+        [ TextLabel.create(BIG_SETTINGS_FONT, { origin = CENTER_TOP }, "BACK") ] = on_back_click or do_nothing ,  
+        [ TextLabel.create(BIG_SETTINGS_FONT, { origin = CENTER_TOP }, "START") ] = on_start_click or do_nothing
+    }
+
+    for obj, handler in pairs(components) do
+        options:add_instance(obj)
+    end
+
+    function options:step(xy) -- Makeshift inheritance
+        InstanceGridGroup.step(self, xy)
+        for obj, obj_xy in self:instances(xy) do
+            local click_handler = components[obj]
+
+            local mouse_is_over = obj:mouse_over(obj_xy)
+            obj.options.color = mouse_is_over and COL_GOLD or COL_WHITE
+
+            if mouse_is_over and mouse_left_pressed then click_handler() end
+        end
+    end
+
+    return options
+end
+
+function game_settings_menu_create()
+    local fields = InstanceOriginGroup.create( {size = { 640, 480 } } )
+
+    fields:add_instance( class_choice_buttons_create(), CENTER_TOP, --[[Down 10 pixels]] { 0, 10 } )
+    fields:add_instance( center_setting_fields_create(), {0.50, 0.70} )
+    fields:add_instance( back_and_continue_options_create(), CENTER_BOTTOM, --[[Up 10 pixels]] { 0, -10 } )
+    fields:add_instance( choose_class_message_create(), CENTER_BOTTOM, --[[Up 40 pixels]] { 0, -40 }  )
+
+    return fields
 end

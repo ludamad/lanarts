@@ -225,6 +225,24 @@ static int lapi_string_split(lua_State *L) {
 	return 1; /* return the table */
 }
 
+static int lapi_setglobal(lua_State *L) {
+	bool prev = lua_api::globals_get_mutability(L);
+
+	lua_api::globals_set_mutability(L, true);
+	lua_settable(L, LUA_GLOBALSINDEX); // use params 1 & 2
+	lua_api::globals_set_mutability(L, prev);
+
+	return 1; /* return the table */
+}
+
+static int lapi_toaddress(lua_State *L) {
+	char address[64];
+	snprintf(address, 64, "0x%X", lua_topointer(L, 1));
+	lua_pushstring(L, address);
+	return 1; /* return the table */
+}
+
+
 namespace lua_api {
 
 	int l_itervalues(lua_State* L) {
@@ -242,6 +260,8 @@ namespace lua_api {
 		globals["distance"].bind_function(distance_between);
 		globals["newtype"].bind_function(lapi_newtype);
 		globals["string_split"].bind_function(lapi_string_split);
+		globals["setglobal"].bind_function(lapi_setglobal);
+		globals["toaddress"].bind_function(lapi_toaddress);
 
 		lua_newtable(L);
 		lua_pushcclosure(L, lapi_import, 1);

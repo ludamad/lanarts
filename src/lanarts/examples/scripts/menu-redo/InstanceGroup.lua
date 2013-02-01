@@ -5,44 +5,65 @@
 InstanceGroup = newtype()
 
 function InstanceGroup:init()
-    self.instances = {}
-end
-
-function InstanceGroup.get:size() 
-    error("InstanceGroup does not have a size!") 
+    self._instances = {}
 end
 
 -- Requires 'obj' to have 'size' member if 'origin' is specified
 function InstanceGroup:add_instance(obj, xy )
-    self.instances[#self.instances + 1] = { obj, unpack(xy) }
+    self._instances[#self._instances + 1] = { obj, xy }
 end
 
 function InstanceGroup:step(xy)
-    xy = xy or {0,0}
-
     local step_xy = {} -- shared array for performance
 
-    for instance in values(self.instances) do
-        local obj, x, y = unpack(instance)
+    for instance in values(self._instances) do
+        local obj, obj_xy = unpack(instance)
 
-        step_xy[1] = x + xy[1]
-        step_xy[2] = y + xy[2]
+        step_xy[1] = obj_xy[1] + xy[1]
+        step_xy[2] = obj_xy[2] + xy[2]
 
         obj:step(step_xy)
     end
 end
 
-function InstanceGroup:draw(xy)
+-- Iterate the values in a fairly implementation-change-proof way
+function InstanceGroup:instances(xy)
     xy = xy or {0,0}
 
+    local adjusted_xy = {} -- shared array for performance
+
+    local iter = values(self._instances)
+
+    return function() 
+        local val = iter()
+
+        if val == nil then
+            return nil 
+        end
+        
+        local obj, obj_xy = unpack(val)
+        
+        adjusted_xy[1] = obj_xy[1] + xy[1]
+        adjusted_xy[2] = obj_xy[2] + xy[2]
+
+        return obj, adjusted_xy
+    end
+end
+
+function InstanceGroup:draw(xy)
     local draw_xy = {} -- shared array for performance
 
-    for instance in values(self.instances) do
-        local obj, x, y = unpack(instance)
+    for instance in values(self._instances) do
+        local obj, obj_xy = unpack(instance)
 
-        draw_xy[1] = x + xy[1]
-        draw_xy[2] = y + xy[2]
+        draw_xy[1] = obj_xy[1] + xy[1]
+        draw_xy[2] = obj_xy[2] + xy[2]
 
         obj:draw(draw_xy)
     end
+end
+
+
+function InstanceGroup:__tostring()
+    return "[InstanceGroup " .. toaddress(self) .. "]"
 end

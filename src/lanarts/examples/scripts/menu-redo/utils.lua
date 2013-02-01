@@ -26,13 +26,24 @@ function memoized(func, separator)
     end
 end
 
-function vector_scale(v1, v2)
+function vector_multiply(v1, v2)
     local length = # v1
 
-    assert(length == #v2, "vector_scale(): Vector lengths do not match!")
+    assert(length == #v2, "vector_multiply(): Vector lengths do not match!")
 
     local ret = {}
     for i = 1,length do ret[i] = v1[i] * v2[i] end
+
+    return ret
+end
+
+function vector_divide(v1, v2)
+    local length = # v1
+
+    assert(length == #v2, "vector_divide(): Vector lengths do not match!")
+
+    local ret = {}
+    for i = 1,length do ret[i] = v1[i] / v2[i] end
 
     return ret
 end
@@ -64,8 +75,12 @@ function DEBUG_BOX_DRAW(self, xy)
         local mouse_is_over = mouse_over(xy, self.size)
         local color = mouse_is_over and COL_PALE_BLUE or COL_YELLOW
         local line_width = mouse_is_over and 5 or 2
-        local alpha = mouse_is_over and 1.0 or 0.5
-        DEBUG_FONT:draw( { color = with_alpha(color, alpha), origin = LEFT_BOTTOM }, xy, tostring(self) )
-        draw_rectangle_outline(with_alpha(color, alpha / 2), bbox_create(xy, self.size), line_width )
+        local alpha = mouse_is_over and 0.5 or 0.25
+
+        if mouse_is_over then
+            DEBUG_FONT:draw( { color = COL_WHITE, origin = LEFT_BOTTOM }, xy, tostring(self) )
+        end
+
+        draw_rectangle_outline(with_alpha(color, alpha), bbox_create(xy, self.size), line_width )
     end
 end
