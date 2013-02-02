@@ -3,28 +3,36 @@
 require "utils"
 require "InstanceGroup"
 
-InstanceOriginGroup = newtype()
+InstanceBox = newtype()
 
-function InstanceOriginGroup:init(params)
+function InstanceBox:init(params)
     self._instances = InstanceGroup.create()
     self.size = params.size
 end
 
-function InstanceOriginGroup:step(xy) 
+function InstanceBox:step(xy) 
     self._instances:step(xy)
 end
 
-function InstanceOriginGroup:draw(xy)
+function InstanceBox:draw(xy)
     self._instances:draw(xy)
     DEBUG_BOX_DRAW(self, xy)
 end
 
-function InstanceOriginGroup:instances(xy)
+function InstanceBox:remove(obj)
+    self._instances:remove(obj)
+end
+
+function InstanceBox:clear()
+    self._instances:clear()
+end
+
+function InstanceBox:instances(xy)
     return self._instances:instances(xy)
 end
 
-function InstanceOriginGroup:add_instance(obj, origin, --[[Optional]] offset)
-    assert( origin_valid(origin), "InstanceOriginGroup: Expected origin coordinates between [0,0] and [1,1]") 
+function InstanceBox:add_instance(obj, origin, --[[Optional]] offset)
+    assert( origin_valid(origin), "InstanceBox: Expected origin coordinates between [0,0] and [1,1]") 
 
     offset = offset or {0, 0}
 
@@ -37,6 +45,10 @@ function InstanceOriginGroup:add_instance(obj, origin, --[[Optional]] offset)
     self._instances:add_instance( obj, xy )
 end
 
-function InstanceOriginGroup:__tostring()
-    return "[InstanceOriginGroup " .. toaddress(self) .. "]"
+function InstanceBox:mouse_over(xy)
+    return mouse_over(xy, self.size)
+end
+
+function InstanceBox:__tostring()
+    return "[InstanceBox " .. toaddress(self) .. "]"
 end

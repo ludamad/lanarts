@@ -50,6 +50,23 @@ function InstanceGroup:instances(xy)
     end
 end
 
+function InstanceGroup:remove(obj)
+    local insts = self._instances
+
+    for i = 1, #insts do
+        if insts[i] == obj then
+            table.remove(insts, i)
+            return true
+        end
+    end
+
+    return false
+end
+
+function InstanceGroup:clear()
+    self._instances = {}
+end
+
 function InstanceGroup:draw(xy)
     local draw_xy = {} -- shared array for performance
 

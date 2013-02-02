@@ -1,6 +1,6 @@
 require "utils"
 require "InstanceGroup"
-require "InstanceGridGroup"
+require "InstanceLine"
 require "TextInputBox"
 require "Sprite"
 
@@ -36,6 +36,8 @@ local function text_field_create(label_text, default_text, callbacks)
         ),
        {0, 0} -- position
     )
+
+    field.size = SETTINGS_BOX_SIZE
 
     return field
 end
@@ -146,6 +148,46 @@ local function connection_toggle_create()
     return toggle
 end
 
+local function respawn_toggle_create()
+    local toggle = { 
+        size = SETTINGS_BOX_SIZE,
+        font = SETTINGS_FONT,
+    }
+
+    local respawn = image_cached_load("res/sprites/config/respawn_setting.png")
+    local hardcore = image_cached_load("res/sprites/config/hardcore_setting.png")
+
+    function toggle:step(xy)
+        -- Toggle the connection type
+        if mouse_left_pressed and mouse_over(xy, self.size) then
+            settings.regen_on_death = not settings.regen_on_death
+        end
+    end
+
+    function toggle:draw(xy)
+        local sprite = settings.regen_on_death and respawn or hardcore
+
+        local x,y = unpack(xy)
+        local w, h = unpack(self.size)
+
+        local text = settings.regen_on_death and "Respawn on Death" or "Hardcore (No respawn!)"
+        local text_color = settings.regen_on_death and COL_WHITE or COL_PALE_RED
+        local sprite_color = settings.regen_on_death and COL_WHITE or COL_RED
+        local box_color = sprite_color
+
+        if mouse_over(xy, self.size) then 
+            box_color = COL_GOLD 
+        end
+
+        sprite:draw( {origin = LEFT_CENTER, color = sprite_color}, { x, y + h / 2 } )
+        self.font:draw( {origin = LEFT_CENTER, color = text_color}, { x + 8 + sprite.size[2], y + h / 2 }, text )
+    
+        draw_rectangle_outline(box_color, bbox_create(xy, self.size), 1)
+    end
+
+    return toggle
+end
+
 local function speed_toggle_create()
     local toggle = { 
         size = SETTINGS_BOX_SIZE,
@@ -189,26 +231,25 @@ local function speed_toggle_create()
     return toggle
 end
 
-local function label_button_create(params, onclick)
+local function label_button_create(params, color_formula, on_click)
     local sprite = Sprite.create(params.sprite, { color = COL_WHITE })
     local label = TextLabel.create(params.font, {}, params.text)
 
     local size = params.size
 
-    local label_button = InstanceOriginGroup.create( params )
+    local label_button = InstanceBox.create( params )
 
     label_button:add_instance( sprite, CENTER_TOP )
     label_button:add_instance( label, CENTER_BOTTOM )
     
     function label_button:step(xy) -- Makeshift inheritance
-        InstanceOriginGroup.step(self, xy)
-        local mouse_is_over = mouse_over(xy, self.size)
-        local color = mouse_is_over and COL_GOLD or COL_WHITE
+        InstanceBox.step(self, xy)
 
-        if mouse_is_over and mouse_left_pressed then
-            if onclick then onclick() end
+        if self:mouse_over(xy) and mouse_left_pressed then 
+            on_click(self, xy)
         end
 
+        local color = color_formula(self, xy)
         sprite.options.color = color
         label.options.color = color
     end
@@ -226,36 +267,73 @@ local function class_choice_buttons_create()
         { "Mage", sprite_base .. "wizard.png"},
         { "Archer", sprite_base .. "archer.png"}
     }
+
     local button_size = { 96, 96 + y_padding + font.height }
-    local row_size = { (button_size[1] + x_padding) * #buttons, button_size[2] }
+    local button_row = InstanceLine.create( { dx = button_size[1] + x_padding } )
 
-    local button_row = InstanceGridGroup.create( { size = row_size, dimensions = {#buttons, 1} } )
+    for i = 1, #buttons do
+        local button = buttons[i]
 
-    for button in values(buttons) do
-        local params = { size = button_size,
-                         font = font,
-                         text = button[1],
-                         sprite = image_cached_load(button[2]) }
+        button_row:add_instance( 
+            label_button_create(
+                { size = button_size,
+                  font = font,
+                  text = button[1],
+                  sprite = image_cached_load(button[2]) 
+                },
+                function(self, xy) -- color_formula
+                    if settings.class_type == i then
+                        return COL_GOLD
+                    else 
+                        return self:mouse_over(xy) and COL_PALE_YELLOW or COL_WHITE
+                    end
+                end,
+                function(self, xy) -- on_click
+                    settings.class_type = i 
+                end
+             ) 
+         )
 
-        button_row:add_instance( label_button_create(params) )
     end
 
     return button_row
 end
 
 local function center_setting_fields_create()
-    local fields = InstanceGridGroup.create( {size = { 400, 192 }, size = { 400, 192 }, dimensions = { 2, 3 }} )
+    local fields = InstanceLine.create( {force_size = {500, 162}, dx = 320, dy = 64, per_row = 2} )
+    local current_setting 
 
-    local components = {
-        name_field_create(), 
-        connection_toggle_create(), 
-        host_IP_field_create(),
-        connection_port_field_create(),
-        speed_toggle_create()
-    }
+    local function add_fields()
+        current_setting = settings.connection_type
 
-    for obj in values(components) do
-        fields:add_instance(obj)
+        fields:clear()
+
+        fields:add_instance( connection_toggle_create() )
+
+        if current_setting == net.NONE then
+            fields:add_instance( respawn_toggle_create() )
+        end
+
+        fields:add_instance( speed_toggle_create() )
+        fields:add_instance( name_field_create() )
+        
+        if current_setting ~= net.NONE then
+            fields:add_instance( host_IP_field_create() )
+        end
+
+        if current_setting == net.CLIENT then
+            fields:add_instance( connection_port_field_create() )
+        end
+
+    end
+    
+    add_fields() -- Do initial creation
+
+    function fields:step(xy) -- Makeshift inheritance
+        InstanceLine.step(self, xy)
+        if current_setting ~= settings.connection_type then
+            add_fields()
+        end
     end
 
     return fields
@@ -274,13 +352,13 @@ end
 
 local function back_and_continue_options_create(on_back_click, on_start_click)
     local font = BIG_SETTINGS_FONT
-    local options = InstanceGridGroup.create( { size = { 200, font.height }, spacing = {200, font.height}, dimensions = { 2, 1 } } )
+    local options = InstanceLine.create( { dx = 200 } )
 
     -- associate each label with a handler
     -- we make use of the ability to have objects as keys
     local components = {
-        [ TextLabel.create(BIG_SETTINGS_FONT, { origin = CENTER_TOP }, "BACK") ] = on_back_click or do_nothing ,  
-        [ TextLabel.create(BIG_SETTINGS_FONT, { origin = CENTER_TOP }, "START") ] = on_start_click or do_nothing
+        [ TextLabel.create(BIG_SETTINGS_FONT, "Back") ] = on_back_click or do_nothing ,  
+        [ TextLabel.create(BIG_SETTINGS_FONT, "Start") ] = on_start_click or do_nothing
     }
 
     for obj, handler in pairs(components) do
@@ -288,7 +366,7 @@ local function back_and_continue_options_create(on_back_click, on_start_click)
     end
 
     function options:step(xy) -- Makeshift inheritance
-        InstanceGridGroup.step(self, xy)
+        InstanceLine.step(self, xy)
         for obj, obj_xy in self:instances(xy) do
             local click_handler = components[obj]
 
@@ -302,13 +380,24 @@ local function back_and_continue_options_create(on_back_click, on_start_click)
     return options
 end
 
-function game_settings_menu_create()
-    local fields = InstanceOriginGroup.create( {size = { 640, 480 } } )
+function game_settings_menu_create(on_back_click, on_start_click)
+    local fields = InstanceBox.create( {size = { 640, 480 } } )
 
-    fields:add_instance( class_choice_buttons_create(), CENTER_TOP, --[[Down 10 pixels]] { 0, 10 } )
-    fields:add_instance( center_setting_fields_create(), {0.50, 0.70} )
-    fields:add_instance( back_and_continue_options_create(), CENTER_BOTTOM, --[[Up 10 pixels]] { 0, -10 } )
-    fields:add_instance( choose_class_message_create(), CENTER_BOTTOM, --[[Up 40 pixels]] { 0, -40 }  )
+    fields:add_instance( 
+        class_choice_buttons_create(), 
+        CENTER_TOP, --[[Down 50 pixels]] { 0, 50 } )
+
+    fields:add_instance( 
+        center_setting_fields_create(), 
+        {0.50, 0.70} )
+
+    fields:add_instance( 
+        back_and_continue_options_create(on_back_click, on_start_click), 
+        CENTER_BOTTOM, --[[Up 20 pixels]] { 0, -20 } )
+
+    fields:add_instance( 
+        choose_class_message_create(), 
+        CENTER_BOTTOM, --[[Up 50 pixels]] { 0, -50 }  )
 
     return fields
 end

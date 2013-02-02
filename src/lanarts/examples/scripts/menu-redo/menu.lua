@@ -1,18 +1,23 @@
 require "utils"
-require "InstanceOriginGroup"
+require "InstanceBox"
 require "TextInputBox"
 require "TextLabel"
 require "game_settings_menu"
 
 DEBUG_LAYOUTS = false
+WINDOW_SIZE = { 1200, 900 }
 
 -- MAIN --
 
 function main()
-    display.initialize("Lanarts Example", {640, 480}, false)
+    display.initialize("Lanarts Example", WINDOW_SIZE, false)
 
-    local frame = InstanceOriginGroup.create( { size = {640, 480} } )
-    frame:add_instance(game_settings_menu_create(), CENTER)
+    local frame = InstanceBox.create( { size = display.window_size } )
+    frame:add_instance(
+        game_settings_menu_create(
+            function() print("BACK CLICKED") end, 
+            function() print("START CLICKED") end), 
+            CENTER)
 
     local timer = timer_create()
     while game.input_capture() do

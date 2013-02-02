@@ -11,6 +11,7 @@
 
 #include <luawrap/luawrap.h>
 #include <luawrap/functions.h>
+#include <luawrap/calls.h>
 
 #include "lua_newapi.h"
 
@@ -68,12 +69,12 @@ static int lapi_newtype_index(lua_State* L) {
 		return 1;
 	}
 
-	LuaSpecialValue metatable(L, lua_upvalueindex(2));
-	metatable["typename"].push();
+	luawrap::globals(L)["tostring"].push();
+	std::string tostring = luawrap::call<std::string>(L, LuaStackValue(L, 1));
 
 	return luaL_error(L,
-			"Type '%s': Cannot read '%s', member does not exist!\n",
-			lua_tostring(L, -1), lua_tostring(L, 2));
+			"Class object '%s': Cannot read '%s', member does not exist!\n",
+			tostring.c_str(), lua_tostring(L, 2));
 }
 
 static int lapi_newtype_newindex(lua_State* L) {

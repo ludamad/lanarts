@@ -2,10 +2,13 @@ require "utils" -- import utils for 'do_nothing'
 
 TextLabel = newtype( )
 
-function TextLabel:init(font, options, text)
+function TextLabel:init(font, arg1, arg2)
     self.font = font
-    self.options = options
-    self.text = text
+    if arg2 then
+        self.options, self.text = arg1, arg2
+    else 
+        self.options, self.text = {}, arg1
+    end
 end
 
 TextLabel.step = do_nothing
