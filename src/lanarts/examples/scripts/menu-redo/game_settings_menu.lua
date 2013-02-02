@@ -9,8 +9,8 @@ local SETTINGS_BOX_SIZE = {180, 34}
 
 local CONFIG_MENU_SIZE = {640, 480}
 
-local SETTINGS_FONT = font_cached_load("res/sample.ttf", 10)
-local BIG_SETTINGS_FONT = font_cached_load("res/sample.ttf", 20)
+local SETTINGS_FONT = font_cached_load(settings.font, 10)
+local BIG_SETTINGS_FONT = font_cached_load(settings.menu_font, 20)
 
 local function text_field_create(label_text, default_text, callbacks)
 
@@ -100,9 +100,9 @@ end
 
 local function connection_toggle_create()
 
-    local client_option_image = image_cached_load("res/sprites/config/client_icon.png")
-    local server_option_image = image_cached_load("res/sprites/config/server_icon.png")
-    local single_player_option_image = image_cached_load("res/sprites/config/single_player_icon.png")
+    local client_option_image = image_cached_load("res/interface/sprites/config/client_icon.png")
+    local server_option_image = image_cached_load("res/interface/sprites/config/server_icon.png")
+    local single_player_option_image = image_cached_load("res/interface/sprites/config/single_player_icon.png")
 
     local toggle = { 
         size = SETTINGS_BOX_SIZE,
@@ -154,8 +154,8 @@ local function respawn_toggle_create()
         font = SETTINGS_FONT,
     }
 
-    local respawn = image_cached_load("res/sprites/config/respawn_setting.png")
-    local hardcore = image_cached_load("res/sprites/config/hardcore_setting.png")
+    local respawn = image_cached_load("res/interface/sprites/config/respawn_setting.png")
+    local hardcore = image_cached_load("res/interface/sprites/config/hardcore_setting.png")
 
     function toggle:step(xy)
         -- Toggle the connection type
@@ -192,7 +192,7 @@ local function speed_toggle_create()
     local toggle = { 
         size = SETTINGS_BOX_SIZE,
         font = SETTINGS_FONT,
-        sprite = image_cached_load("res/sprites/config/speed_setting.png")
+        sprite = image_cached_load("res/interface/sprites/config/speed_setting.png")
     }
 
     function toggle:step(xy)
@@ -258,7 +258,7 @@ local function label_button_create(params, color_formula, on_click)
 end
 
 local function class_choice_buttons_create()
-    local sprite_base = "res/sprites/class_icons/"
+    local sprite_base = "res/interface/sprites/class_icons/"
     local x_padding, y_padding = 32, 16
     local font = BIG_SETTINGS_FONT
 

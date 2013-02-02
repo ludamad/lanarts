@@ -102,7 +102,7 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
 	fd->h = h;
 
 	if (FT_Init_FreeType(&library)) {
-		throw std::runtime_error(std::string("Font initialization for '") + fname + "' failed!");
+		throw std::runtime_error( format("Font initialization for '%s' failed!", fname) );
 	}
 
 	FT_Face face;
@@ -110,9 +110,10 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
 	//This is where we load in the font information from the file.
 	//Of all the places where the code might die, this is the most likely,
 	//as FT_New_Face will die if the font file does not exist or is somehow broken.
-	if (FT_New_Face(library, fname, 0, &face))
+	if (FT_New_Face(library, fname, 0, &face)) {
 		throw std::runtime_error(
-				"FT_New_Face failed (there is probably a problem with your font file)");
+				 format("Font '%s' does not exist, or is an invalid font file!", fname));
+	}
 
 	//For some twisted reason, Freetype measures font size
 	//in terms of 1/64ths of pixels.  Thus, to make a font

@@ -61,6 +61,13 @@ function bbox_mouse_over(bbox, origin)
     return bbox_contains( shift_origin(bbox, origin or LEFT_TOP), mouse_xy  )
 end
 
+function bbox_padded(xy, size, pad) 
+    return { xy[1] - pad, 
+             xy[2] - pad, 
+             xy[1] + size[1] + pad, 
+             xy[2] + size[2] + pad }
+end
+
 function mouse_over(xy, size, origin)
     return bbox_mouse_over(bbox_create(xy, size), origin)
 end
@@ -68,7 +75,7 @@ end
 font_cached_load = memoized(font_load)
 image_cached_load = memoized(image_load)
 
-local DEBUG_FONT = font_cached_load("res/sample.ttf", 10)
+local DEBUG_FONT = font_cached_load(settings.menu_font, 10)
 
 function DEBUG_BOX_DRAW(self, xy)
     if DEBUG_LAYOUTS then

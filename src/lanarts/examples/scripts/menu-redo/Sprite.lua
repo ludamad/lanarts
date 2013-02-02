@@ -5,9 +5,13 @@ require "utils" -- import utils for 'do_nothing'
 
 Sprite = newtype()
 
+function Sprite.image_create(filename, options)
+    return Sprite.create( image_cached_load(filename), options )
+end
+
 function Sprite:init(sprite, options)
     self.sprite = sprite
-    self.options = options
+    self.options = options or {}
     if self.options.frame == nil then
        self.options.frame = 1
     end

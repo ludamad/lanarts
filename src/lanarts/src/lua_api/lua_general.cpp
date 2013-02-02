@@ -263,6 +263,7 @@ namespace lua_api {
 		globals["string_split"].bind_function(lapi_string_split);
 		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);
+		globals["search_path_add"].bind_function(lua_api::add_search_path);
 
 		lua_newtable(L);
 		lua_pushcclosure(L, lapi_import, 1);
