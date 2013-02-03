@@ -82,7 +82,7 @@ int main_menu(GameState* gs, int width, int height) {
 	GameView prevview = gs->view();
 	GameLevelState* oldlevel = gs->get_level();
 
-	gs->set_level(new GameLevelState(-1, width, height));
+	gs->set_level(new GameLevelState(-1, Dim(width, height)));
 	gs->view().x = 0;
 	gs->view().y = 0;
 
@@ -115,7 +115,7 @@ int main_menu(GameState* gs, int width, int height) {
 	gs->start_connection();
 
 	if (gs->game_settings().conntype == GameSettings::SERVER) {
-		lobby_menu(gs, width, height);
+		lobby_menu(gs);
 	}
 	return 0;
 }

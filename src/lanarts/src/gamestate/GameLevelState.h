@@ -7,6 +7,8 @@
 #define GAMELEVELSTATE_H_
 #include <vector>
 
+#include <lcommon/geometry.h>
+
 #include "collision_avoidance/CollisionAvoidance.h"
 #include "levelgen/GeneratedLevel.h"
 #include "objects/enemy/MonsterController.h"
@@ -30,7 +32,7 @@ struct GameLevelPortal {
 
 class GameLevelState {
 public:
-	GameLevelState(level_id levelid, int w, int h, bool wandering_flag = true,
+	GameLevelState(level_id levelid, const Dim& size, bool wandering_flag = true,
 			bool is_simulation = false);
 	~GameLevelState();
 

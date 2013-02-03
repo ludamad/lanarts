@@ -21,7 +21,8 @@
 #include "GameWorld.h"
 
 GameWorld::GameWorld(GameState* gs) :
-		gs(gs), next_room_id(-1) {
+		gs(gs),
+		next_room_id(-1) {
 	midstep = false;
 	lvl = NULL;
 }
@@ -63,8 +64,7 @@ void GameWorld::serialize(SerializeBuffer& serializer) {
 
 	for (int i = 0; i < level_states.size(); i++) {
 		GameLevelState* lvl = level_states[i];
-		serializer.write(lvl->width());
-		serializer.write(lvl->height());
+		serializer.write( Dim(lvl->width(), lvl->height()) );
 		gs->set_level(lvl);
 		lvl->serialize(gs, serializer);
 	}
@@ -85,12 +85,10 @@ void GameWorld::deserialize(SerializeBuffer& serializer) {
 	GameLevelState* original = gs->get_level();
 
 	for (int i = 0; i < level_states.size(); i++) {
-		int width, height;
-		serializer.read(width);
-		serializer.read(height);
+		Dim size;
+		serializer.read(size);
 		if (level_states[i] == NULL) {
-			level_states[i] = new GameLevelState(i, width, height, false,
-					false);
+			level_states[i] = new GameLevelState(i, size, false, false);
 		}
 		gs->set_level(level_states[i]);
 		level_states[i]->deserialize(gs, serializer);
@@ -237,8 +235,7 @@ bool GameWorld::step() {
 		level->step(gs);
 	}
 
-	midstep
-	= false;
+	midstep = false;
 	if (next_room_id == -2) {
 		reset(0);
 		next_room_id = 0;

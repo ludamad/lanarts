@@ -248,8 +248,8 @@ namespace lua_api {
 
 	int l_itervalues(lua_State* L) {
 		lua_pushvalue(L, 1);
-		lua_pushlightuserdata(L, (void*)(1));
-		lua_pushlightuserdata(L, (void*)(lua_objlen(L, 1)));
+		lua_pushlightuserdata(L, (void*)((1)));
+		lua_pushlightuserdata(L, (void*)((lua_objlen(L, 1))));
 		lua_pushcclosure(L, lapi_values_aux, 3);
 		return 1;
 	}
@@ -263,7 +263,6 @@ namespace lua_api {
 		globals["string_split"].bind_function(lapi_string_split);
 		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);
-		globals["search_path_add"].bind_function(lua_api::add_search_path);
 
 		lua_newtable(L);
 		lua_pushcclosure(L, lapi_import, 1);

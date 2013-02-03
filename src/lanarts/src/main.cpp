@@ -30,8 +30,15 @@
 
 using namespace std;
 
-static void init_system(GameSettings& settings, lua_State* L) {
-	load_settings_data(settings, "settings.yaml"); // Load the initial settings
+static GameState* init_gamestate() {
+
+	lua_State* L = lua_api::create_luastate();
+	lua_api::add_search_path(L, "res/?.lua");
+	lua_api::add_search_path(L, "res/start_menu/?.lua");
+
+	GameSettings settings; // Initialized with defaults
+	load_settings_data(settings, "settings.yaml"); // Load the manual settings
+	load_settings_data(settings, "saved_settings.yaml"); // Override with remembered settings
 
 	if (SDL_Init(0) < 0) {
 		exit(0);
@@ -44,33 +51,44 @@ static void init_system(GameSettings& settings, lua_State* L) {
 	lua_api::preinit_state(L);
 	lsound::init();
 
-	init_game_data(settings, L);
-
-}
-
-int main(int argc, char** argv) {
-	const int HUD_WIDTH = 160;
-	lua_State* L = lua_api::create_luastate();
-
-	GameSettings settings;
-	init_system(settings, L);
-
 	//GameState claims ownership of the passed lua_State*
+	const int HUD_WIDTH = 160;
 	int windoww = settings.view_width, windowh = settings.view_height;
 	int vieww = windoww - HUD_WIDTH, viewh = windowh;
-	GameState* gs = new GameState(settings, L, vieww, viewh);
+
+	GameState* gs = new GameState(settings, L);
 	lua_api::register_api(gs, L);
 
-	gs->update_iostate(); //for first iteration
-	int exitcode = main_menu(gs, windoww, windowh);
+	return gs;
+}
 
-	if (exitcode == 0 && gs->start_game()) {
-		lua_getglobal(L, "main");
-		luawrap::call<void>(L);
-		fflush(stdout);
+/* Must take (int, char**) to play nice with SDL */
+int main(int argc, char** argv) {
+
+	GameState* gs = init_gamestate();
+	lua_State* L = gs->luastate();
+
+
+	lua_api::require(L, "start_menu"); // loads start_menu.lua
+	lua_getglobal(L, "start_menu_show");
+	bool hit_start = luawrap::call<bool>(L);
+
+
+	if (hit_start) {
+		save_settings_data(gs->game_settings(), "saved_settings.yaml");
+		init_game_data(gs->game_settings(), L);
+		gs->start_connection();
+
+		if (gs->game_settings().conntype == GameSettings::SERVER) {
+			lobby_menu(gs);
+		}
+
+		if (gs->start_game()) {
+			lua_getglobal(L, "main");
+			luawrap::call<void>(L);
+		}
 	}
 
-	save_settings_data(gs->game_settings(), "saved_settings.yaml");
 
 	lanarts_quit();
 

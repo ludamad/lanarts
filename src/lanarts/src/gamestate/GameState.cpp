@@ -55,12 +55,18 @@ static int generate_seed() {
 	return clk ^ int(systime);
 }
 
-GameState::GameState(const GameSettings& settings, lua_State* L, int vieww,
-		int viewh, int hudw) :
-		settings(settings), L(L), connection(game_chat(), player_data(),
-				init_data), frame_n(0), hud(BBox(vieww, 0, vieww + hudw, viewh),
-				BBox(0, 0, vieww, viewh)), _view(0, 0, vieww, viewh), world(
-				this), repeat_actions_counter(0) {
+static const int GAME_SIDEBAR_WIDTH = 160;
+
+GameState::GameState(const GameSettings& settings, lua_State* L) :
+		settings(settings),
+		L(L),
+		connection(game_chat(), player_data(), init_data),
+		frame_n(0),
+		hud(BBox(settings.view_width - GAME_SIDEBAR_WIDTH, 0, settings.view_width, settings.view_height),
+			BBox(0, 0, settings.view_width - GAME_SIDEBAR_WIDTH, settings.view_height)),
+		_view(0, 0, settings.view_width - GAME_SIDEBAR_WIDTH, settings.view_height),
+		world(this),
+		repeat_actions_counter(0) {
 
 	dragging_view = false;
 
@@ -140,6 +146,7 @@ bool GameState::start_game() {
 
 	PlayerInst* p = local_player();
 	view().sharp_center_on(p->x, p->y);
+
 	return true;
 }
 

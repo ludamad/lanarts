@@ -127,7 +127,7 @@ GameLevelState* generate_level(int roomid, MTwist& mt, GeneratedLevel& level,
 			h + LEVEL_BORDER_PAD);
 	int pxw = lw * TILE_SIZE, pxh = lh * TILE_SIZE;
 
-	GameLevelState* newlvl = new GameLevelState(roomid, pxw, pxh, wandering);
+	GameLevelState* newlvl = new GameLevelState(roomid, Dim(pxw, pxh), wandering);
 
 	GameLevelState* prevlvl = gs->get_level(); //Save level context
 	gs->set_level(newlvl); //Set level context to new level

@@ -224,8 +224,8 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 	lua_dungeon.clear();
 	lua_classes = load_class_data(L, dfiles.class_files);
 
-	load_settings_data(settings, "settings.yaml");
-	load_settings_data(settings, "saved_settings.yaml");
+//	load_settings_data(settings, "settings.yaml");
+//	load_settings_data(settings, "saved_settings.yaml");
 
 	res::font_primary().initialize(settings.font, 10);
 	res::font_menu().initialize(settings.menu_font, 20);
@@ -259,7 +259,6 @@ void init_lua_data(GameState* gs, lua_State* L) {
 //	register_as_global(L, sprites, "sprites");
 //	register_as_global(L, dungeon, "dungeon");
 	register_as_global(L, lua_classes, "classes");
-	register_as_global(L, lua_settings, "settings");
 
 	lua_safe_dofile(L, "res/main.lua");
 	__lua_init(L, game_enemy_data);

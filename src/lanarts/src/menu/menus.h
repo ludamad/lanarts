@@ -8,7 +8,7 @@
 
 class GameState;
 
-void lobby_menu(GameState* gs, int width, int height);
+void lobby_menu(GameState* gs);
 int class_menu(GameState* gs, int width, int height);
 int main_menu(GameState* gs, int width, int height);
 

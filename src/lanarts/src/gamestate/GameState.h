@@ -53,8 +53,7 @@ struct GameStateInitData {
 class GameState {
 public:
 
-	GameState(const GameSettings& settings, lua_State* L, int vieww = 640,
-			int viewh = 480, int hudw = 160);
+	GameState(const GameSettings& settings, lua_State* L);
 	~GameState();
 	void start_connection();
 

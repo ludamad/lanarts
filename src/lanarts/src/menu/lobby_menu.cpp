@@ -15,6 +15,7 @@
 #include <lcommon/Timer.h>
 #include <ldraw/Font.h>
 #include <ldraw/DrawOptions.h>
+#include <ldraw/display.h>
 
 #include "data/game_data.h"
 
@@ -61,7 +62,7 @@ static void draw_connectors(GameState* gs, GameInst* inst, void* flag) {
 
 		using namespace ldraw;
 		const Font& font = gs->font();
-		font.drawf(DrawOptions(CENTER_TOP, COL_FILLED_OUTLINE),
+		font.drawf(DrawOptions(CENTER_TOP, colour),
 				Pos(inst->x, inst->y + 20 * i + 30), "Player %d: %s%s the %s",
 				(i + 1), prefix, name, classname.c_str());
 	}
@@ -76,14 +77,14 @@ static void setup_connectionmenu_buttons(GameState* gs, bool* exit, int x,
 	gs->add_instance(new ButtonInst("Start", -1, x, y, single));
 }
 
-void lobby_menu(GameState* gs, int width, int height) {
+void lobby_menu(GameState* gs) {
 	bool exit = false;
-	int halfw = width / 2;
+	int halfw = ldraw::display_size().w / 2;
 
 	GameView prevview = gs->view();
 	GameLevelState* oldlevel = gs->get_level();
 
-	gs->set_level(new GameLevelState(-1, width, height));
+	gs->set_level(new GameLevelState(-1, ldraw::display_size() ));
 	gs->view().x = 0;
 	gs->view().y = 0;
 

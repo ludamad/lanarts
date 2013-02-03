@@ -25,8 +25,7 @@ dofile "res/spells/spell_effects.lua"
 dofile "res/spells/spells.lua"
 dofile "res/levels/levels.lua"
 
--- Balance measurement related files
-dofile "res/tests/progressions.lua"
+require "start_menu"
 
 local paused = false
 
@@ -74,7 +73,6 @@ end
 local music = music_optional_load("res/sound/lanarts1.ogg")
 
 function main()
-
 	game.input_capture()
 	music:loop()
 

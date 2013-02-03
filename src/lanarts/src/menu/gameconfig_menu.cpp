@@ -381,7 +381,7 @@ int class_menu(GameState* gs, int width, int height) {
 	GameView prevview = gs->view();
 	GameLevelState* oldlevel = gs->get_level();
 
-	gs->set_level(new GameLevelState(-1, width, height));
+	gs->set_level(new GameLevelState(-1, Dim(width, height)));
 	gs->view().x = 0;
 	gs->view().y = 0;
 	int classx = halfw;

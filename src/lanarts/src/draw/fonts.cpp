@@ -1,5 +1,6 @@
 /*
  * fonts.cpp:
+ *  Accessors for the fonts used by the game.
  */
 
 #include "fonts.h"

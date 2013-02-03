@@ -35,9 +35,15 @@ namespace lua_api {
 	void add_search_path(lua_State* L, const char* path) {
 		LuaValue package = luawrap::globals(L)["package"];
 		package["path"].push();
-		lua_pushfstring(L, ";%s", path);
-		lua_concat(L, -2);
+		lua_pushfstring(L, "%s;%s", lua_tostring(L, -1), path);
 		package["path"].pop();
+		lua_pop(L, 1);
+	}
+
+	void require(lua_State* L, const char* path) {
+		lua_getglobal(L, "require");
+		lua_pushstring(L, path);
+		lua_call(L, 1, 0);
 	}
 
 	static void configure_lua_packages(lua_State* L) {

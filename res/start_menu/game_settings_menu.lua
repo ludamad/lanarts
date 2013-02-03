@@ -2,6 +2,7 @@ require "utils"
 require "InstanceGroup"
 require "InstanceLine"
 require "TextInputBox"
+require "TextLabel"
 require "Sprite"
 
 local SETTINGS_BOX_MAXCHARS = 18
@@ -171,8 +172,8 @@ local function respawn_toggle_create()
         local w, h = unpack(self.size)
 
         local text = settings.regen_on_death and "Respawn on Death" or "Hardcore (No respawn!)"
-        local text_color = settings.regen_on_death and COL_WHITE or COL_PALE_RED
-        local sprite_color = settings.regen_on_death and COL_WHITE or COL_RED
+        local text_color = settings.regen_on_death and COL_WHITE or COL_LIGHT_RED
+        local sprite_color = settings.regen_on_death and COL_WHITE or COL_LIGHT_RED
         local box_color = sprite_color
 
         if mouse_over(xy, self.size) then 
@@ -253,7 +254,6 @@ local function label_button_create(params, color_formula, on_click)
         sprite.options.color = color
         label.options.color = color
     end
-    
 
     return label_button
 end
@@ -264,8 +264,8 @@ local function class_choice_buttons_create()
     local font = BIG_SETTINGS_FONT
 
     local buttons = { 
-        { "Fighter", sprite_base .. "fighter.png"},
         { "Mage", sprite_base .. "wizard.png"},
+        { "Fighter", sprite_base .. "fighter.png"},
         { "Archer", sprite_base .. "archer.png"}
     }
 
@@ -283,14 +283,14 @@ local function class_choice_buttons_create()
                   sprite = image_cached_load(button[2]) 
                 },
                 function(self, xy) -- color_formula
-                    if settings.class_type == i then
+                    if settings.class_type == i-1 then
                         return COL_GOLD
                     else 
                         return self:mouse_over(xy) and COL_PALE_YELLOW or COL_WHITE
                     end
                 end,
                 function(self, xy) -- on_click
-                    settings.class_type = i 
+                    settings.class_type = i-1
                 end
              ) 
          )
@@ -343,17 +343,17 @@ end
 local function choose_class_message_create()
     local label = TextLabel.create(SETTINGS_FONT, {}, "Choose your Class!")
 
-    function label:set_color() -- Makeshift inheritance
+    function label:step(xy) -- Makeshift inheritance
+        TextLabel.step(self, xy)
+        self:set_color()
+    end
+
+    function label:set_color()
         label.options.color = settings.class_type == -1 and COL_PALE_RED or COL_INVISIBLE
     end
 
     label:set_color() -- Ensure correct starting color
 
-    function label:step(xy) -- Makeshift inheritance
-        TextLabel.step(self, xy)
-        self:set_color()
-    end
-    
     return label
 end
 

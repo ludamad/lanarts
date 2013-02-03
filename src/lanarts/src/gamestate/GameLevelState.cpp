@@ -11,11 +11,16 @@
 
 #include "GameState.h"
 
-GameLevelState::GameLevelState(int levelid, int w, int h, bool wandering_flag,
-		bool is_simulation) :
-		_levelid(levelid), _steps_left(0), _width(w), _height(h), _tiles(
-				w / TILE_SIZE, h / TILE_SIZE), _inst_set(w, h), _monster_controller(
-				wandering_flag), _is_simulation(is_simulation) {
+GameLevelState::GameLevelState(int levelid, const Dim& size,
+		bool wandering_flag, bool is_simulation) :
+		_levelid(levelid),
+		_steps_left(0),
+		_width(size.w),
+		_height(size.h),
+		_tiles(size.w / TILE_SIZE, size.h / TILE_SIZE),
+		_inst_set(size.w, size.h),
+		_monster_controller(wandering_flag),
+		_is_simulation(is_simulation) {
 }
 
 GameLevelState::~GameLevelState() {
@@ -48,7 +53,7 @@ int GameLevelState::room_within(const Pos& p) {
 }
 
 GameLevelState* GameLevelState::clone() const {
-	GameLevelState* state = new GameLevelState(_levelid, _width, _height,
+	GameLevelState* state = new GameLevelState(_levelid, Dim(_width, _height),
 			_is_simulation);
 	copy_to(*state);
 	return state;

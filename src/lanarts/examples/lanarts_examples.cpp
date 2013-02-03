@@ -86,7 +86,7 @@ static void setup_lua_state() {
 	GameSettings settings;
 
 	//GameState claims ownership of the passed lua_State*
-	GameState* gs = new GameState(settings, L, 200, 200);
+	GameState* gs = new GameState(settings, L);
 	lua_api::register_api(gs, L);
 
 	LuaValue globals(L, LUA_GLOBALSINDEX);
