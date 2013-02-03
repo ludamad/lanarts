@@ -28,6 +28,12 @@ static int net_sync_message_send(lua_State* L) {
 	return 0;
 }
 
+static int net_connections_poll(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	gs->net_connection().poll_messages();
+	return 0;
+}
+
 namespace lua_api {
 	void register_net_api(lua_State* L) {
 		LuaValue module = luawrap::globals(L)["net"].ensure_table();
@@ -38,5 +44,6 @@ namespace lua_api {
 
 		module["sync_message_consume"].bind_function(net_sync_message_consume);
 		module["sync_message_send"].bind_function(net_sync_message_send);
+		module["connections_poll"].bind_function(net_connections_poll);
 	}
 }

@@ -318,11 +318,11 @@ local function center_setting_fields_create()
         fields:add_instance( speed_toggle_create() )
         fields:add_instance( name_field_create() )
         
-        if current_setting ~= net.NONE then
+        if current_setting == net.CLIENT then
             fields:add_instance( host_IP_field_create() )
         end
 
-        if current_setting == net.CLIENT then
+        if current_setting ~= net.NONE then
             fields:add_instance( connection_port_field_create() )
         end
 
@@ -349,7 +349,7 @@ local function choose_class_message_create()
     end
 
     function label:set_color()
-        label.options.color = settings.class_type == -1 and COL_PALE_RED or COL_INVISIBLE
+        self.options.color = settings.class_type == -1 and COL_PALE_RED or COL_INVISIBLE
     end
 
     label:set_color() -- Ensure correct starting color

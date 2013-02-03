@@ -2,44 +2,29 @@ require "game_settings_menu"
 
 require "InstanceBox"
 require "Sprite"
+require "TextLabel"
 require "utils"
 
-local TextButton = newtype()
+-- START SCREEN -- 
 
-function TextButton:init(text, action)
-    self.font = font_cached_load(settings.menu_font, 20)
+local function text_button_create(text, on_click)
+	local font = font_cached_load(settings.menu_font, 20)
+	local label = TextLabel.create(font, { color=COL_WHITE }, text)
+	local padding = 5
 
-    self.size = self.font:draw_size(text)
-    self.text = text
+    function label:step(xy) -- Makeshift inheritance
+        TextLabel.step(self, xy)
 
-    self.action = action
+   		local bbox = bbox_padded( xy, self.size, padding )
+    	self.options.color = bbox_mouse_over( bbox ) and COL_RED or COL_WHITE
 
-    self.padding = 5
-end
-
-function TextButton:_click_area(xy) 
-    return bbox_padded( xy, self.size, self.padding )
-end
-
-function TextButton:step(xy)
-    if mouse_left_pressed and self.action ~= nil then
-        if bbox_mouse_over( self:_click_area(xy)) then
-            self.action()
-        end
-    end
-end
-
-function TextButton:draw(xy)
-    local text_color = COL_WHITE
-
-    if bbox_mouse_over( self:_click_area(xy) ) then 
-        text_color = COL_RED
+    	if mouse_left_pressed and bbox_mouse_over( bbox ) then
+    		on_click()
+    	end
     end
 
-    self.font:draw( {color = text_color }, xy, self.text )
+    return label
 end
-
--- MENUS -- 
 
 local function start_menu_create(on_start_click)
     local menu = InstanceBox.create( { size = display.window_size } )
@@ -52,22 +37,114 @@ local function start_menu_create(on_start_click)
     )
 
     menu:add_instance(
-        TextButton.create("Start a New Game", on_start_click),
+        text_button_create("Start a New Game", on_start_click),
         CENTER
     )
 
     return menu
 end
 
+-- LOBBY SCREEN --
+
+local PLAYER_COLOURS = { 
+    COL_BABY_BLUE, COL_PALE_YELLOW, COL_PALE_RED,
+    COL_PALE_GREEN, COL_PALE_BLUE, COL_LIGHT_GRAY 
+}
+
+local test_values = { 
+    { name = "ludamad", class_name = "Mage" }, 
+    { name = "putterson", class_name = "Archer" }, 
+    { name = "azsc", class_name = "Fighter" },
+    { name = "thetest", class_name = "Mage" },
+    { name = "is", class_name = "Archer" },
+    { name = "ON!", class_name = "Fighter" },
+    { name = "is", class_name = "Archer" },
+    { name = "ON!", class_name = "Fighter" }
+}
+
+local function lobby_joined_players_list_create()
+    local font = font_cached_load(settings.menu_font, 20)
+    local group = InstanceGroup.create()
+    group.size = {200, 400}
+
+    group:add_instance( 
+        TextLabel.create(font, {color=COL_WHITE, origin = CENTER_TOP}, "Players In Game:"), 
+        {100, 30}
+    )
+
+    local lobby_list = { step = do_nothing }
+
+    function lobby_list:draw(xy)
+        local font = font_cached_load(settings.font, 10)
+        local x, y = unpack(xy)
+    
+        for idx, player in ipairs(game.players) do
+            local color_idx = ( (idx -1) % #PLAYER_COLOURS ) + 1
+            local color = PLAYER_COLOURS[ color_idx ]
+
+            local text = "Player " .. idx .. ": "
+            if idx == 1 then -- Slot 1 always local player
+                text = text .. "You, " 
+            end
+            text = text .. player.name .. " the " .. player.class_name
+
+            font:draw( 
+                { color = color, origin = CENTER_TOP }, 
+                { x, y + (idx - 1) * 20 }, 
+                text
+            )
+        end    
+    end
+
+    group:add_instance( lobby_list, {100, 70} )
+
+    return group
+end
+
+local function lobby_menu_create(on_start_click)
+    local menu = InstanceBox.create( { size = display.window_size } )
+    local logo = Sprite.image_create("res/interface/sprites/lanarts_logo.png")
+
+    menu:add_instance(
+        logo, 
+        CENTER_TOP,
+        --[[Down 10 pixels]]
+        {0, 10}
+    )
+
+    menu:add_instance(
+        lobby_joined_players_list_create(), 
+        CENTER_TOP,
+        {0, 10 + logo.size[2]}
+    )
+
+    menu:add_instance(
+        text_button_create("Start the Game!", on_start_click),
+        CENTER_BOTTOM,
+        --[[Up 40 pixels]]
+        {0, -40}
+    )
+
+    return menu
+end
+
+
+-- MAIN --
 
 DEBUG_LAYOUTS = false
 WINDOW_SIZE = { 1200, 700 }
 
--- MAIN --
 
 local menu_state = { }
+
+local exit_menu -- forward declare
 local setup_start_menu -- forward declare
 local setup_settings_menu -- forward declare
+local setup_lobby_menu -- forward declare
+
+function exit_menu()
+    menu_state.menu = nil -- Signals event loop that menu is finished
+end
 
 function setup_start_menu()
     menu_state.menu = InstanceBox.create( { size = display.window_size } )
@@ -81,28 +158,34 @@ function setup_settings_menu()
     menu_state.menu = InstanceBox.create( { size = display.window_size } )
     menu_state.menu:add_instance(
         game_settings_menu_create( --[[Back Button]] setup_start_menu,
-        	 --[[Start Game Button]] function()
-        		if settings.class_type ~= -1 then
-                	menu_state.menu = nil -- Signals event loop that menu is finished
-        		end
+                 --[[Start Game Button]] function()
+                if settings.class_type ~= -1 then
+                    exit_menu()
+                end
             end
         ), 
         CENTER
     )
 end
 
-function start_menu_show()
-    display.initialize("Lanarts Example", WINDOW_SIZE, false)
+function setup_lobby_menu()
+    menu_state.menu = InstanceBox.create( { size = display.window_size } )
+    menu_state.menu:add_instance(
+        lobby_menu_create( --[[New Game Button]] exit_menu ),
+        CENTER
+    )
+end
 
-    setup_start_menu()
-
-    local timer = timer_create()
+local function menu_loop(should_poll)
     while game.input_capture() and not key_pressed(keys.ESCAPE) do
-
         if key_pressed(keys.F9) then
             -- note, globals are usually protected against being changed
             -- but a bypass is allowed for cases where it must be done
             setglobal("DEBUG_LAYOUTS", not DEBUG_LAYOUTS) -- flip on/off
+        end
+
+        if should_poll then
+            net.connections_poll()
         end
 
         menu_state.menu:step( {0, 0} )
@@ -119,5 +202,22 @@ function start_menu_show()
         game.wait(10)
     end
 
-	return false
+    return false -- User has quit the game
 end
+
+function start_menu_show()
+    display.initialize("Lanarts Example", WINDOW_SIZE, false)
+
+    setup_start_menu()
+
+	return menu_loop(--[[Do not poll connections]] false)
+end
+
+
+function lobby_menu_show()
+    setup_lobby_menu()
+
+    return menu_loop(--[[Poll connections]] true)
+end
+
+main = start_menu_show

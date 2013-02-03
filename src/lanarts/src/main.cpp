@@ -68,28 +68,29 @@ int main(int argc, char** argv) {
 	GameState* gs = init_gamestate();
 	lua_State* L = gs->luastate();
 
-
 	lua_api::require(L, "start_menu"); // loads start_menu.lua
+
 	lua_getglobal(L, "start_menu_show");
-	bool hit_start = luawrap::call<bool>(L);
+	bool did_exit = !luawrap::call<bool>(L);
+	if (did_exit) goto label_Quit; /* User has quit! */
 
+	save_settings_data(gs->game_settings(), "saved_settings.yaml");
 
-	if (hit_start) {
-		save_settings_data(gs->game_settings(), "saved_settings.yaml");
-		init_game_data(gs->game_settings(), L);
-		gs->start_connection();
+	gs->start_connection();
+	init_game_data(gs->game_settings(), L);
 
-		if (gs->game_settings().conntype == GameSettings::SERVER) {
-			lobby_menu(gs);
-		}
-
-		if (gs->start_game()) {
-			lua_getglobal(L, "main");
-			luawrap::call<void>(L);
-		}
+	if (gs->game_settings().conntype == GameSettings::SERVER) {
+		lua_getglobal(L, "lobby_menu_show");
+		bool did_exit = !luawrap::call<bool>(L);
+		if (did_exit) goto label_Quit; /* User has quit! */
 	}
 
+	if (gs->start_game()) {
+		lua_getglobal(L, "main");
+		luawrap::call<void>(L);
+	}
 
+	label_Quit:
 	lanarts_quit();
 
 	delete gs;

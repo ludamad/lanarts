@@ -118,19 +118,73 @@ static int game_frame(lua_State* L) {
 	return 1;
 }
 
-static void register_game_metatable(lua_State* L, LuaValue& game) {
-	LuaValue meta = luameta_new(L, "__game");
-	luameta_getters(meta)["frame"].bind_function(game_frame);
+// A bit of a hack, but its OK and at least self-contained:
+struct PlayerDataProxy {
 
-	game.push();
-	meta.push();
-	lua_setmetatable(L, -2);
-	lua_pop(L, 1);
+	int index;
+	PlayerDataProxy(int index = 0) :
+			index(index) {
+	}
+
+	static PlayerDataEntry& _entry(const LuaStackValue& proxy) {
+		PlayerDataProxy* pdp = proxy.as<PlayerDataProxy*>();
+		std::vector<PlayerDataEntry>& players = lua_api::gamestate(proxy)->player_data().all_players();
+		return players.at(pdp->index);
+	}
+
+	static const char* name(const LuaStackValue& proxy) {
+		return _entry(proxy).player_name.c_str();
+	}
+
+	static const char* class_name(const LuaStackValue& proxy) {
+		return game_class_data.at(_entry(proxy).classtype).name.c_str();
+	}
+
+	static GameInst* instance(const LuaStackValue& proxy) {
+		return (GameInst*)_entry(proxy).player();
+	}
+
+	static LuaValue metatable(lua_State* L) {
+		LuaValue meta = luameta_new(L, "PlayerData");
+		LuaValue getters = luameta_getters(meta);
+
+		getters["name"].bind_function(PlayerDataProxy::name);
+		getters["instance"].bind_function(PlayerDataProxy::instance);
+		getters["class_name"].bind_function(PlayerDataProxy::class_name);
+
+		return meta;
+	}
+};
+
+static int game_players(lua_State* L) {
+	int nplayers = lua_api::gamestate(L)->player_data().all_players().size();
+	lua_newtable(L);
+	for (int i = 0; i < nplayers; i++) {
+		luawrap::push<PlayerDataProxy>(L, PlayerDataProxy(i));
+		lua_rawseti(L, -2, i + 1);
+	}
+	return 1;
 }
 
 namespace lua_api {
 
+	static void register_game_getters(lua_State* L, LuaValue& game) {
+		LuaValue meta = luameta_new(L, "__game");
+		LuaValue getters = luameta_getters(meta);
+
+		getters["frame"].bind_function(game_frame);
+		getters["players"].bind_function(game_players);
+
+		game.push();
+		meta.push();
+		lua_setmetatable(L, -2);
+		lua_pop(L, 1);
+	}
+
 	void register_gamestate_api(lua_State* L) {
+		luawrap::install_userdata_type<PlayerDataProxy,
+				PlayerDataProxy::metatable>();
+
 		register_gamesettings(L);
 
 		LuaValue globals = luawrap::globals(L);
@@ -148,6 +202,6 @@ namespace lua_api {
 		game["input_capture"].bind_function(game_input_capture);
 		game["input_handle"].bind_function(game_input_handle);
 
-		register_game_metatable(L, game);
+		register_game_getters(L, game);
 	}
 }
