@@ -20,10 +20,11 @@ struct GameSettings {
 	bool fullscreen;
 	int view_width, view_height;
 
-	/* Speed related options */
+	/* Performance related options */
 	int steps_per_draw;
 	float time_per_step;
 	int frame_action_repeat;
+	bool free_memory_while_idle;
 
 	/*Debug options*/
 	bool draw_diagnostics, verbose_output;
@@ -52,6 +53,7 @@ struct GameSettings {
 		steps_per_draw = 1;
 		time_per_step = 12;
 		frame_action_repeat = 0;
+		free_memory_while_idle = false;
 
 		font = "res/fonts/Gudea-Regular.ttf";
 		menu_font = "res/fonts/Gudea-Regular.ttf";

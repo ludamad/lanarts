@@ -38,6 +38,7 @@ void lua_register_ldraw(lua_State* L, const LuaValue& module, bool register_lcom
 	BIND_FUNC(draw_circle);
 	BIND_FUNC(draw_circle_outline);
 	BIND_FUNC(draw_rectangle_outline);
+	BIND_FUNC(draw_line);
 
 	lua_register_font(L, module);
 	lua_register_image(L, module);

@@ -132,8 +132,6 @@ end
 -- MAIN --
 
 DEBUG_LAYOUTS = false
-WINDOW_SIZE = { 1200, 700 }
-
 
 local menu_state = { }
 
@@ -206,8 +204,6 @@ local function menu_loop(should_poll)
 end
 
 function start_menu_show()
-    display.initialize("Lanarts Example", WINDOW_SIZE, false)
-
     setup_start_menu()
 
 	return menu_loop(--[[Do not poll connections]] false)
@@ -219,5 +215,3 @@ function lobby_menu_show()
 
     return menu_loop(--[[Poll connections]] true)
 end
-
-main = start_menu_show

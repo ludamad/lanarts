@@ -29,7 +29,7 @@ require "start_menu"
 
 local paused = false
 
-local function mainloop(steponly)
+local function main_loop(steponly)
 	perf.timing_begin("**Game Frame**")
 
 	perf.timing_begin("**Sync Message**")
@@ -56,11 +56,9 @@ local function mainloop(steponly)
 
 	local surplus = settings.time_per_step - timer:get_milliseconds()
 
-	if surplus > 0 then 
-		perf.timing_begin("**Surplus**")
-		game.wait(surplus) 
-		perf.timing_end("**Surplus**")
-	end
+	perf.timing_begin("**Surplus**")
+	game.wait(surplus) 
+	perf.timing_end("**Surplus**")
 
 	perf.timing_end("**Game Frame**")
 
@@ -100,7 +98,7 @@ function main()
 			show_message("Press Shift + Esc to exit, any unsaved progress will be lost!")
 		end
 
-		if not mainloop(false) then
+		if not main_loop(false) then
 			break
 		end
 

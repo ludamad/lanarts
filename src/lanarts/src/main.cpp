@@ -19,14 +19,13 @@
 #include "data/game_data.h"
 
 #include "draw/draw_sprite.h"
+#include "draw/fonts.h"
 
 #include "gamestate/GameState.h"
 
 #include "lua_api/lua_api.h"
 #include "lua_api/lua_yaml.h"
 #include "lua_api/lua_newapi.h"
-
-#include "menu/menus.h"
 
 using namespace std;
 
@@ -47,6 +46,9 @@ static GameState* init_gamestate() {
 	Dim window_size(settings.view_width, settings.view_height);
 	ldraw::display_initialize("Lanarts", window_size, settings.fullscreen);
 
+	res::font_primary().initialize(settings.font, 10);
+	res::font_menu().initialize(settings.menu_font, 20);
+
 	lanarts_net_init(true);
 	lua_api::preinit_state(L);
 	lsound::init();
@@ -58,6 +60,7 @@ static GameState* init_gamestate() {
 
 	GameState* gs = new GameState(settings, L);
 	lua_api::register_api(gs, L);
+
 
 	return gs;
 }
@@ -74,7 +77,7 @@ int main(int argc, char** argv) {
 	bool did_exit = !luawrap::call<bool>(L);
 	if (did_exit) goto label_Quit; /* User has quit! */
 
-	save_settings_data(gs->game_settings(), "saved_settings.yaml");
+	save_settings_data(gs->game_settings(), "saved_settings.yaml"); // Save partial settings in case of failure
 
 	gs->start_connection();
 	init_game_data(gs->game_settings(), L);
@@ -89,6 +92,8 @@ int main(int argc, char** argv) {
 		lua_getglobal(L, "main");
 		luawrap::call<void>(L);
 	}
+
+	save_settings_data(gs->game_settings(), "saved_settings.yaml"); // Save full in-game results
 
 	label_Quit:
 	lanarts_quit();

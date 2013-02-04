@@ -83,6 +83,7 @@ LuaValue luaapi_settings_proxy(lua_State* L) {
 	BIND(port);
 	BIND(steps_per_draw);
 	BIND(frame_action_repeat);
+	BIND(free_memory_while_idle);
 	BIND(invincible);
 	BIND(time_per_step);
 	BIND(draw_diagnostics);
@@ -166,6 +167,29 @@ static int game_players(lua_State* L) {
 	return 1;
 }
 
+static void lapi_wait(LuaStackValue wait_time) {
+
+	lua_State* L = wait_time.luastate();
+	long wait_micro = wait_time.as<double>() * 1000;
+
+	Timer timer;
+
+	GameSettings& settings = lua_api::gamestate(wait_time)->game_settings();
+	if (settings.free_memory_while_idle) {
+		while (timer.get_microseconds() < wait_micro) {
+			if (lua_gc(L, LUA_GCSTEP, 0)) {
+				break;
+			}
+		}
+	}
+
+	long remaining_wait_ms = (wait_micro - (long)timer.get_microseconds()) / 1000;
+
+	if (remaining_wait_ms > 0) {
+		SDL_Delay(remaining_wait_ms);
+	}
+}
+
 namespace lua_api {
 
 	static void register_game_getters(lua_State* L, LuaValue& game) {
@@ -197,7 +221,7 @@ namespace lua_api {
 
 		game["step"].bind_function(game_step);
 		game["draw"].bind_function(game_draw);
-		game["wait"].bind_function(SDL_Delay);
+		game["wait"].bind_function(lapi_wait);
 
 		game["input_capture"].bind_function(game_input_capture);
 		game["input_handle"].bind_function(game_input_handle);

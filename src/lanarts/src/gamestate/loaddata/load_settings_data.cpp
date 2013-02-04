@@ -64,6 +64,8 @@ void load_settings_data(GameSettings& settings, const char* filename) {
 				settings.steps_per_draw = 1;
 			optional_set(root, "frame_action_repeat",
 					settings.frame_action_repeat);
+			optional_set(root, "free_memory_while_idle",
+					settings.free_memory_while_idle);
 			if (settings.frame_action_repeat < 0)
 				settings.frame_action_repeat = 0;
 			optional_set(root, "invincible", settings.invincible);

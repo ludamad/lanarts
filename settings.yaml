@@ -18,10 +18,11 @@ menu_font: res/fonts/Gudea-Regular.ttf
 ip: localhost
 port: 6112
 
-#Speed settings
+#Performance settings
 steps_per_draw: 1 #More is almost guaranteed to make the game faster, 1 is ideal
 time_per_step: 14
 frame_action_repeat: 1 #Default = 0. Ignored in single player, improves multiplayer latency in exchange for controlability
+free_memory_while_idle: yes # Gameplay is smoother, but CPU usage is increased. Keep off mainly if trying to stretch battery life of laptop.
 
 #Debug settings
 network_debug_mode: no

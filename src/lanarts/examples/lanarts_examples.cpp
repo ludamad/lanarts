@@ -81,7 +81,7 @@ static void setup_lua_state() {
 	using namespace ldraw;
 
 	L = lua_api::create_luastate();
-	lua_api::add_search_path(L, "res/?.lua;res/start_menu/?.lua");
+	lua_api::add_search_path(L, "res/?.lua;res/start_menu/?.lua;res/balance_simulation/?.lua");
 
 	GameSettings settings;
 

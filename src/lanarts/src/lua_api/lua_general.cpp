@@ -7,6 +7,7 @@
 
 #include <lua.hpp>
 
+#include <lcommon/Timer.h>
 #include <lcommon/mathutil.h>
 
 #include <luawrap/luawrap.h>
@@ -171,24 +172,6 @@ static int lapi_newtype(lua_State* L) {
 	return 1; // return new type metatable
 }
 
-// Assumes paths do not change root
-static int lapi_import(lua_State* L) {
-	lua_pushvalue(L, 1);
-	lua_gettable(L, lua_upvalueindex(1));
-
-	if (lua_isnil(L, -1)) {
-		luawrap::globals(L)["dofile"].push();
-		lua_pushvalue(L, 1);
-		lua_call(L, 1, 0);
-	}
-
-	lua_pushvalue(L, 1);
-	lua_pushboolean(L, true);
-	lua_settable(L, lua_upvalueindex(1));
-
-	return 1;
-}
-
 static int lapi_string_split(lua_State *L) {
 	size_t str_size;
 	const char* tail = luaL_checklstring(L, 1, &str_size);
@@ -243,7 +226,6 @@ static int lapi_toaddress(lua_State *L) {
 	return 1; /* return the table */
 }
 
-
 namespace lua_api {
 
 	int l_itervalues(lua_State* L) {
@@ -263,10 +245,6 @@ namespace lua_api {
 		globals["string_split"].bind_function(lapi_string_split);
 		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);
-
-		lua_newtable(L);
-		lua_pushcclosure(L, lapi_import, 1);
-		globals["import"].pop();
 
 		globals["system"].ensure_table();
 	}
