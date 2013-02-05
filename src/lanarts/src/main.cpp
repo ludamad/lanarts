@@ -2,6 +2,8 @@
 #include <vector>
 #include <ctime>
 
+#include <lcommon/fatal_error.h>
+
 #include <SDL.h>
 #include <SDL_opengl.h>
 
@@ -36,7 +38,11 @@ static GameState* init_gamestate() {
 	lua_api::add_search_path(L, "res/start_menu/?.lua");
 
 	GameSettings settings; // Initialized with defaults
-	load_settings_data(settings, "settings.yaml"); // Load the manual settings
+	// Load the manual settings
+	if (!load_settings_data(settings, "settings.yaml")) {
+		fatal_error("Fatal error: settings.yaml not found, the game is probably being loaded from the wrong place.\n");
+	}
+
 	load_settings_data(settings, "saved_settings.yaml"); // Override with remembered settings
 
 	if (SDL_Init(0) < 0) {

@@ -40,7 +40,7 @@ void save_settings_data(GameSettings& settings, const char* filename) {
 	}
 
 }
-void load_settings_data(GameSettings& settings, const char* filename) {
+bool load_settings_data(GameSettings& settings, const char* filename) {
 
 	fstream file(filename, fstream::in);
 
@@ -107,5 +107,8 @@ void load_settings_data(GameSettings& settings, const char* filename) {
 			printf("Settings Parsed Incorrectly: \n");
 			printf("%s\n", parse.what());
 		}
+
+		return true; /* File did exist */
 	}
+	return false; /* File did not exist */
 }

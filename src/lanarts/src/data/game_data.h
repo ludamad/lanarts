@@ -33,7 +33,7 @@ struct lua_State;
 class LuaValue;
 
 /* Contain information which guides the rest of the data loading */
-void load_settings_data(GameSettings& settings, const char* filename);
+bool load_settings_data(GameSettings& settings, const char* filename);
 void save_settings_data(GameSettings& settings, const char* filename);
 DataFiles load_datafilenames(const char* filename);
 
