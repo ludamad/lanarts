@@ -18,7 +18,7 @@
 #include "gamestate/GameAction.h"
 
 #include "gamestate/GameLevelState.h"
-#include "pathfind/flood_pathfind.h"
+#include "pathfind/FloodFillPaths.h"
 
 #include "../CombatGameInst.h"
 #include "../GameInst.h"
@@ -99,7 +99,7 @@ public:
 	fov& field_of_view() {
 		return fieldofview;
 	}
-	PathInfo& path_to_player() {
+	FloodFillPaths& path_to_player() {
 		return _path_to_player;
 	}
 
@@ -133,7 +133,7 @@ private:
 
 	bool actions_set_for_turn;
 	ActionQueue queued_actions;
-	PathInfo _path_to_player;
+	FloodFillPaths _path_to_player;
 	fov fieldofview;
 
 	// Used when eg run out of projectiles.

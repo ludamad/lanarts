@@ -15,23 +15,23 @@ void ButtonInst::init(GameState* gs) {
 BBox ButtonInst::sprite_bounds(GameState* gs) {
 	if (sprite > -1) {
 		SpriteEntry& spr_entry = game_sprite_data.at(sprite);
-		Dim dims = spr_entry.size();
-		int sx = x - dims.w / 2, sy = y - dims.h / 2;
-		return BBox(sx, sy, sx + dims.w, sy + dims.h);
+		Size size = spr_entry.size();
+		int sx = x - size.w / 2, sy = y - size.h / 2;
+		return BBox(sx, sy, sx + size.w, sy + size.h);
 	} else {
 		return BBox();
 	}
 }
 
 BBox ButtonInst::text_bounds(GameState* gs) {
-	DimF dims = gs->menu_font().get_draw_size(str);
-	int sx = x - dims.w / 2, sy = y - dims.h / 2;
+	SizeF size = gs->menu_font().get_draw_size(str);
+	int sx = x - size.w / 2, sy = y - size.h / 2;
 	if (sprite > -1) {
 		sy += sprite_bounds(gs).height();
-		sy -= dims.h;
+		sy -= size.h;
 	}
 
-	return BBox(sx, sy, sx + dims.w, sy + dims.h);
+	return BBox(sx, sy, sx + size.w, sy + size.h);
 }
 
 static bool hovered(GameState* gs, ButtonInst* button) {

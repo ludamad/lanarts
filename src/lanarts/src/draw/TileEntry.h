@@ -20,10 +20,10 @@ struct TileEntry {
 		return images.at(ind);
 	}
 
-	Dim size() const {
+	Size size() const {
 		// Assert this for now so we can catch when its not true
 		LANARTS_ASSERT(img().width() == TILE_SIZE && img().height() == TILE_SIZE);
-		return Dim(img().width(), img().height());
+		return Size(img().width(), img().height());
 	}
 };
 

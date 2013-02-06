@@ -1,10 +1,10 @@
 /*
- * flood_pathfind.h:
+ * FloodFillPaths.h:
  *  Utilities for flood-fill based pathfinding
  */
 
-#ifndef FLOOD_PATHFIND_H_
-#define FLOOD_PATHFIND_H_
+#ifndef FLOODFILLPATHS_H_
+#define FLOODFILLPATHS_H_
 
 #include <vector>
 
@@ -12,18 +12,18 @@
 
 class GameState;
 
-struct PathCoord {
+struct FloodFillCoord {
 	int x, y;
 	int distance;
-	PathCoord() {
+	FloodFillCoord() {
 	}
-	PathCoord(short x, short y, int dist) :
+	FloodFillCoord(short x, short y, int dist) :
 			x(x), y(y), distance(dist) {
 	}
-	void operator=(const PathCoord& o) {
+	void operator=(const FloodFillCoord& o) {
 		x = o.x, y = o.y, distance = o.distance;
 	}
-	bool operator<(const PathCoord& o) const {
+	bool operator<(const FloodFillCoord& o) const {
 		if (distance == o.distance) {
 			return this > &o; // Strict weak ordering
 		}
@@ -31,22 +31,21 @@ struct PathCoord {
 	}
 };
 
-struct PathingNode {
+struct FloodFillNode {
 	bool solid, open, marked;
 	int dx, dy, distance;
-	PathingNode() {
+	FloodFillNode() {
 	}
-	PathingNode(bool solid, bool open, int dx, int dy, int dist) :
+	FloodFillNode(bool solid, bool open, int dx, int dy, int dist) :
 			solid(solid), open(open), marked(false), dx(dx), dy(dy), distance(
 					dist) {
 	}
 };
 
-//Used for floodfill or AStar
-class PathInfo {
+class FloodFillPaths {
 public:
-	PathInfo();
-	~PathInfo();
+	FloodFillPaths();
+	~FloodFillPaths();
 
 	int width() {
 		return w;
@@ -68,25 +67,30 @@ public:
 	//Away from object
 	void random_further_direction(MTwist& mt, int x, int y, int w, int h,
 			float speed, float& vx, float& vy);
-	PathingNode* get(int x, int y) {
-		//LANARTS_ASSERT( x >= 0 && x < w );
-		//LANARTS_ASSERT( y >= 0 && y < h );
+	FloodFillNode* get(int x, int y) {
+		LANARTS_ASSERT( x >= 0 && x < w );
+		LANARTS_ASSERT( y >= 0 && y < h );
 		return &path[alloc_w * y + x];
 	}
 
-	void draw(GameState* gs);
+	BBox location() {
+		return BBox(start_x, start_y, start_x + w, start_y + h);
+	}
+
+	void debug_draw(GameState* gs);
 private:
 	void point_to_local_min(int sx, int sy);
 	void point_to_random_further(MTwist& mt, int sx, int sy);
 	void fix_distances(int sx, int sy);
 	bool can_head(int sx, int sy, int ex, int ey, int speed, int dx, int dy);
-	PathingNode* path;
+
+	FloodFillNode* path;
 	int start_x, start_y;
 	int path_x, path_y;
 	int w, h;
 	int alloc_w, alloc_h;
 };
 
-void floodfill(PathingNode* path, int w, int h, int sx, int sy);
+void floodfill(FloodFillNode* path, int w, int h, int sx, int sy);
 
-#endif /* FLOOD_PATHFIND_H_ */
+#endif /* FLOODFILLPATHS_H_ */

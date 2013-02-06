@@ -135,8 +135,8 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
 	}
 
 
-	float ptw = power_of_two(maxw), pth = power_of_two(maxh);
-	fd->font_img.initialize(Dim(ptw, pth));
+	float ptw = power_of_two_round(maxw), pth = power_of_two_round(maxh);
+	fd->font_img.initialize(Size(ptw, pth));
 	for (int i = 0; i < 128; i++) {
 		char_data& data = fd->data[i];
 		int offset = data.imgoffset;
@@ -164,7 +164,7 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
  ******************************************************************/
 
 static void gl_draw_glyph(const font_data& font, char glyph, const Posf& pos,
-		const DimF& scale) {
+		const SizeF& scale) {
 	const GLImage& img = font.font_img;
 	const char_data& data = font.data[glyph];
 	if (data.w == 0 || data.h == 0) {
@@ -220,20 +220,20 @@ static int process_string(const font_data& font, const char* text,
 
 //
 /* General gl_print function for others to delegate to */
-static DimF gl_print_impl(const DrawOptions& options, const font_data& font,
+static SizeF gl_print_impl(const DrawOptions& options, const font_data& font,
 		Posf p, int maxwidth, bool actually_print, const char* text) {
 	perf_timer_begin(FUNCNAME);
 
 	LDRAW_ASSERT(options.draw_region == BBoxF());
 	LDRAW_ASSERT(options.draw_angle == 0.0f);
 	LDRAW_ASSERT(options.draw_frame == 0.0f);
-	LDRAW_ASSERT(options.draw_scale == DimF(1.0f, 1.0f));
+	LDRAW_ASSERT(options.draw_scale == SizeF(1.0f, 1.0f));
 
 	std::vector<int> line_splits;
 	int measured_width = process_string(font, text, maxwidth, line_splits);
 	int height = font.h * line_splits.size();
 
-	p = adjusted_for_origin(p, DimF(measured_width, height),
+	p = adjusted_for_origin(p, SizeF(measured_width, height),
 			options.draw_origin);
 
 	glEnable(GL_TEXTURE_2D);
@@ -243,7 +243,7 @@ static DimF gl_print_impl(const DrawOptions& options, const font_data& font,
 	glColor4ub(c.r, c.g, c.b, c.a);
 	glBegin(GL_QUADS);
 
-	Dim size(0, 0);
+	Size size(0, 0);
 	for (int linenum = 0, i = 0; linenum < line_splits.size(); linenum++) {
 		int len = 0;
 		int eol = line_splits[linenum];
@@ -295,7 +295,7 @@ void Font::drawf_wrapped(const DrawOptions& options, const Posf& position,
 int Font::draw(const DrawOptions& options, const Posf& position,
 		const char* str) const {
 	Colour c = options.draw_colour;
-	DimF size = gl_print_impl(options, *_font, position, -1, true, str);
+	SizeF size = gl_print_impl(options, *_font, position, -1, true, str);
 	return size.w;
 }
 
@@ -305,11 +305,11 @@ int Font::drawf(const DrawOptions& options, const Posf& position,
 	return draw(options, position, _print_buffer);
 }
 
-DimF Font::get_draw_size(const char* str, int maxwidth) const {
+SizeF Font::get_draw_size(const char* str, int maxwidth) const {
 	return gl_print_impl(DrawOptions(), *_font, Posf(), maxwidth, false, str);
 }
 
-DimF Font::get_draw_size(const std::string& str, int maxwidth) const {
+SizeF Font::get_draw_size(const std::string& str, int maxwidth) const {
 	return get_draw_size(str.c_str(), maxwidth);
 }
 int Font::height() const {

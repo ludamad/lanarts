@@ -49,7 +49,7 @@ static GameState* init_gamestate() {
 		exit(0);
 	}
 
-	Dim window_size(settings.view_width, settings.view_height);
+	Size window_size(settings.view_width, settings.view_height);
 	ldraw::display_initialize("Lanarts", window_size, settings.fullscreen);
 
 	res::font_primary().initialize(settings.font, 10);

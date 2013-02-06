@@ -108,7 +108,7 @@ static void gl_set_fullscreen(bool fullscreen) {
 }
 
 void ldraw::display_initialize(const char* window_name,
-		const Dim& draw_area_size, bool fullscreen) {
+		const Size& draw_area_size, bool fullscreen) {
 	//TODO: Allow passing video flags, esp. SDL_NOFRAME
 	gl_sdl_initialize(window_name, draw_area_size.w, draw_area_size.h,
 			fullscreen);
@@ -135,8 +135,8 @@ void ldraw::display_draw_finish() {
 	SDL_GL_SwapBuffers();
 }
 
-Dim ldraw::display_size() {
+Size ldraw::display_size() {
 	const SDL_Surface* surface = SDL_GetVideoSurface();
-	return Dim(surface->w, surface->h);
+	return Size(surface->w, surface->h);
 }
 

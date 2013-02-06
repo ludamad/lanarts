@@ -63,7 +63,7 @@ DirectionalDrawable parse_directional(const YAML::Node& node) {
 	return DirectionalDrawable(parse_drawable_list(*framenode));
 }
 
-static bool parse_image_split_pattern(const std::string& pattern, Dim* size,
+static bool parse_image_split_pattern(const std::string& pattern, Size* size,
 		std::string* filename) {
 	int pos1 = pattern.find('%');
 
@@ -100,7 +100,7 @@ bool filepattern_to_image_list(std::vector<Image>& images,
 	}
 
 	// Try split pattern
-	Dim size;
+	Size size;
 	std::string filename;
 
 	bool was_split_pattern = parse_image_split_pattern(pattern, &size,

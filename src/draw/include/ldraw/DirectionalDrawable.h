@@ -43,7 +43,7 @@ public:
 		return _animation_duration;
 	}
 
-	virtual DimF size() const;
+	virtual SizeF size() const;
 
 	void set_animation_duration(float duration) {
 		_animation_duration = duration;

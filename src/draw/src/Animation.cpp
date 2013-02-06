@@ -45,7 +45,7 @@ void Animation::add(const Drawable & frame) {
 	frames.push_back(frame);
 }
 
-DimF Animation::size() const {
+SizeF Animation::size() const {
 	return frames.at(0).size();
 }
 

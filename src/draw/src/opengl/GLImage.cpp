@@ -27,8 +27,8 @@ static GLuint SDL_GL_LoadTexture(SDL_Surface *surface, GLfloat *texcoord) {
 	Uint8 saved_alpha;
 
 	/* Use the surface width and height expanded to powers of 2 */
-	w = power_of_two(surface->w);
-	h = power_of_two(surface->h);
+	w = power_of_two_round(surface->w);
+	h = power_of_two_round(surface->h);
 	texcoord[0] = 0.0f; /* Min X */
 	texcoord[1] = 0.0f; /* Min Y */
 	texcoord[2] = (GLfloat)surface->w / w; /* Max X */
@@ -134,14 +134,14 @@ static void gl_subimage_from_bytes(GLImage& img, const BBox& region, char* data,
 	glDisable(GL_TEXTURE_2D);
 }
 
-static void gl_image_from_bytes(GLImage& img, const Dim& size, char* data,
+static void gl_image_from_bytes(GLImage& img, const Size& size, char* data,
 		int type) {
 	bool was_init = img.texture;
 	// allocate a texture name
 	if (!was_init)
 		glGenTextures(1, &img.texture);
 
-	int ptw = power_of_two(size.w), pth = power_of_two(size.h);
+	int ptw = power_of_two_round(size.w), pth = power_of_two_round(size.h);
 	ptw = std::max(4, ptw);
 	pth = std::max(4, pth);
 
@@ -201,7 +201,7 @@ void GLImage::subimage_from_bytes(const BBox& region, char* data, int type) {
 	gl_subimage_from_bytes(*this, region, data, type);
 }
 
-void GLImage::image_from_bytes(const Dim& size, char* data, int type) {
+void GLImage::image_from_bytes(const Size& size, char* data, int type) {
 	gl_image_from_bytes(*this, size, data, type);
 }
 

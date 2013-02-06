@@ -14,7 +14,7 @@ void draw_statbar(const BBoxF& bbox, float fill, const Colour& front,
 		const Colour& back) {
 	ldraw::draw_rectangle(back, bbox);
 	ldraw::draw_rectangle(front,
-			BBoxF(bbox.left_top(), DimF(bbox.width() * fill, bbox.height())));
+			BBoxF(bbox.left_top(), SizeF(bbox.width() * fill, bbox.height())));
 }
 
 void draw_statbar(const BBoxF & bbox, float fill) {

@@ -28,9 +28,9 @@ struct SpriteEntry {
 		return size().h;
 	}
 
-	Dim size() const {
-		DimF sz = sprite.size();
-		return Dim(sz.w, sz.h);
+	Size size() const {
+		SizeF sz = sprite.size();
+		return Size(sz.w, sz.h);
 	}
 
 	SpriteEntry(const std::string& name, const ldraw::Drawable& sprite,

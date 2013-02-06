@@ -40,7 +40,7 @@ bool Drawable::is_animated() const {
 	return ref->is_animated();
 }
 
-DimF Drawable::size() const {
+SizeF Drawable::size() const {
 	return ref->size();
 }
 

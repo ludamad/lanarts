@@ -59,7 +59,7 @@ void DirectionalDrawable::add(const Drawable & direction) {
 	directions.push_back(direction);
 }
 
-DimF DirectionalDrawable::size() const {
+SizeF DirectionalDrawable::size() const {
 	return directions.at(0).size();
 }
 

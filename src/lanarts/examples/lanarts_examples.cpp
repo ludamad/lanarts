@@ -111,7 +111,7 @@ int main(int argc, char** argv) {
 		Timer timer;
 		setup_lua_state();
 
-		ldraw::display_initialize("Lanarts Example Runner", Dim(640, 480));
+		ldraw::display_initialize("Lanarts Example Runner", Size(640, 480));
 
 		draw_luascript(L, argv[1]);
 

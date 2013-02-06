@@ -30,8 +30,8 @@ float inst_distance(CombatGameInst* inst1, CombatGameInst* inst2) {
 /* Provides the exact path cost to the player */
 static float player_inst_path_distance(PlayerInst* player,
 		CombatGameInst* inst) {
-	PathInfo& p = player->path_to_player();
-	PathingNode* pn = p.get(inst->x / TILE_SIZE, inst->y / TILE_SIZE);
+	FloodFillPaths& p = player->path_to_player();
+	FloodFillNode* pn = p.get(inst->x / TILE_SIZE, inst->y / TILE_SIZE);
 	return pn->distance * TILE_SIZE;
 }
 

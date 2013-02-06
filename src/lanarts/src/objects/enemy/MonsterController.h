@@ -10,9 +10,9 @@
 
 #include "collision_avoidance/CollisionAvoidance.h"
 
-#include "pathfind/astar_pathfind.h"
+#include "pathfind/AStarPath.h"
 
-#include "pathfind/flood_pathfind.h"
+#include "pathfind/FloodFillPaths.h"
 #include <lcommon/SerializeBuffer.h>
 
 #include "../GameInst.h"
@@ -75,7 +75,7 @@ private:
 	void monster_follow_path(GameState *gs, EnemyInst *e);
 	void monster_get_to_stairs(GameState *gs, EnemyInst *e);
 
-	AStarPathFind astarcontext;
+	AStarPath astarcontext;
 
 	std::vector<PlayerInst*> players;
 	std::vector<obj_id> mids;

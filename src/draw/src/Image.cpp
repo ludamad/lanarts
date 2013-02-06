@@ -43,7 +43,7 @@ Image::Image(const Image & image, const BBoxF & draw_region) :
 	_rotates = image._rotates;
 }
 
-void Image::initialize(const Dim& size, const BBoxF& draw_region,
+void Image::initialize(const Size& size, const BBoxF& draw_region,
 		bool rotates) {
 	_image = new GLImage(size);
 	if (draw_region.empty()) {
@@ -79,7 +79,7 @@ void Image::from_bytes(const BBox& region, char* data) {
 
 }
 
-void Image::from_bytes(const Dim& size, char* data) {
+void Image::from_bytes(const Size& size, char* data) {
 	if (_image.empty()) {
 		_image = smartptr<GLImage>(new GLImage(size));
 	}
@@ -87,7 +87,7 @@ void Image::from_bytes(const Dim& size, char* data) {
 	_draw_region = BBoxF(0, 0, _image->width, _image->height);
 }
 
-std::vector<Image> image_split(const Image & image, const DimF & size) {
+std::vector<Image> image_split(const Image & image, const SizeF & size) {
 	std::vector<Image> results;
 
 	BBoxF bounds(image.draw_region());

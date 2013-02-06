@@ -11,7 +11,7 @@
 
 #include "GameState.h"
 
-GameLevelState::GameLevelState(int levelid, const Dim& size,
+GameLevelState::GameLevelState(int levelid, const Size& size,
 		bool wandering_flag, bool is_simulation) :
 		_levelid(levelid),
 		_steps_left(0),
@@ -53,7 +53,7 @@ int GameLevelState::room_within(const Pos& p) {
 }
 
 GameLevelState* GameLevelState::clone() const {
-	GameLevelState* state = new GameLevelState(_levelid, Dim(_width, _height),
+	GameLevelState* state = new GameLevelState(_levelid, Size(_width, _height),
 			_is_simulation);
 	copy_to(*state);
 	return state;

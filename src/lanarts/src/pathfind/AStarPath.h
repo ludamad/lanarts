@@ -1,10 +1,11 @@
 /*
- * astar_pathfind.h:
+ * AStarPath.h:
  *  Implements A* pathfinding
  */
 
 #ifndef ASTAR_PATHFIND_H_
 #define ASTAR_PATHFIND_H_
+
 #include "levelgen/GeneratedLevel.h"
 #include "objects/GameInst.h"
 #include <vector>
@@ -16,14 +17,15 @@ struct AStarNode {
 	bool closedset;
 	bool solid;
 };
-class AStarPathFind{
+
+class AStarPath {
 public:
-	AStarPathFind(){
+	AStarPath(){
 		nodes = NULL;
 		w = 0, h = 0;
 	}
 
-	~AStarPathFind(){
+	~AStarPath(){
 		delete[] nodes;
 	}
 	//outputs in real-world waypoints

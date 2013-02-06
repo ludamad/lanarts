@@ -33,7 +33,7 @@ void AnimatedInst::draw(GameState* gs) {
 	if (sprite > -1) {
 		ldraw::Drawable& spr = res::sprite(sprite);
 
-		DimF size = spr.size();
+		SizeF size = spr.size();
 		int xx = x - size.w / 2, yy = y - size.h / 2;
 
 		if (!view.within_view(xx, yy, size.w, size.h))

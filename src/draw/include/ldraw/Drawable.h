@@ -38,7 +38,7 @@ public:
 		return ref.get();
 	}
 
-	DimF size() const;
+	SizeF size() const;
 
 private:
 	smartptr<DrawableBase> ref;

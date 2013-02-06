@@ -68,9 +68,9 @@ static int shift_origin(lua_State* L) {
 		luawrap::push(L, adjusted_for_origin(bbox, origin));
 	} else {
 		Posf pos = luawrap::get<Posf>(L, 1);
-		DimF dim = luawrap::get<DimF>(L, 2);
+		SizeF size = luawrap::get<SizeF>(L, 2);
 		DrawOrigin origin = luawrap::get<DrawOrigin>(L, 3);
-		luawrap::push(L, adjusted_for_origin(pos, dim, origin));
+		luawrap::push(L, adjusted_for_origin(pos, size, origin));
 	}
 	return 1;
 }

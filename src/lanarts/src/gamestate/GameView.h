@@ -56,8 +56,8 @@ struct GameView {
 		return ret;
 	}
 
-	Dim size() {
-		return Dim(width, height);
+	Size size() {
+		return Size(width, height);
 	}
 };
 

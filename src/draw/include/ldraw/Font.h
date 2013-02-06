@@ -6,7 +6,7 @@
 
 struct Colour;
 struct Posf;
-struct DimF;
+struct SizeF;
 
 namespace ldraw {
 
@@ -53,8 +53,8 @@ public:
 			int maxwidth, const char* fmt, ...) const;
 
 	// Return the size that would be drawn
-	DimF get_draw_size(const char* str, int maxwidth = -1) const;
-	DimF get_draw_size(const std::string& str, int maxwidth = -1) const;
+	SizeF get_draw_size(const char* str, int maxwidth = -1) const;
+	SizeF get_draw_size(const std::string& str, int maxwidth = -1) const;
 
 	int height() const;
 

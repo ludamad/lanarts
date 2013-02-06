@@ -20,7 +20,7 @@ static void install_numeric_tuple() {
 static bool bbox_contains(const BBoxF& bbox, const Posf& pos) {
 	return bbox.contains(pos);
 }
-static BBoxF bbox_create(const Posf& pos, const DimF& size) {
+static BBoxF bbox_create(const Posf& pos, const SizeF& size) {
 	return BBoxF(pos, size);
 }
 
@@ -28,8 +28,8 @@ static BBoxF bbox_create(const Posf& pos, const DimF& size) {
 void lua_register_geometry(lua_State* L, const LuaValue& module) {
 	install_numeric_tuple<Pos, int>();
 	install_numeric_tuple<Posf, float>();
-	install_numeric_tuple<Dim, int>();
-	install_numeric_tuple<DimF, float>();
+	install_numeric_tuple<Size, int>();
+	install_numeric_tuple<SizeF, float>();
 	install_numeric_tuple<BBox, int>();
 	install_numeric_tuple<BBoxF, float>();
 	module["bbox_contains"].bind_function(bbox_contains);

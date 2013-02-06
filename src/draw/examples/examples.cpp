@@ -178,16 +178,16 @@ static void draw_luascript(lua_State* L, const char* file) {
 int main(int argc, char** argv) {
 	using namespace ldraw;
 
-	display_initialize(__FILE__, Dim(400, 400), false);
+	display_initialize(__FILE__, Size(400, 400), false);
 	image.initialize("sample.png");
 	font.initialize("sample.ttf", 20);
 
 	std::vector<Image> arr_images = image_split(Image("arrows.png"),
-			DimF(32, 32));
+			SizeF(32, 32));
 	arrow = new DirectionalDrawable(arr_images, FLOAT_PI / 2);
 
 	std::vector<Image> anim_images = image_split(Image("animation.png"),
-			DimF(480.0f / 6, 120));
+			SizeF(480.0f / 6, 120));
 	animation = new Animation(anim_images, 0.1f);
 
 	draw_loop(draw_shapes);

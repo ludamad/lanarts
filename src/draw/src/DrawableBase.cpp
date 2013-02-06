@@ -9,9 +9,9 @@
 
 namespace ldraw {
 
-DimF DrawableBase::size() const {
+SizeF DrawableBase::size() const {
 	fatal_error("DrawableBase::size not implemented!\n");
-	return DimF();
+	return SizeF();
 }
 
 }

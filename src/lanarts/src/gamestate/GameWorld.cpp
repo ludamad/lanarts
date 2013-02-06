@@ -64,7 +64,7 @@ void GameWorld::serialize(SerializeBuffer& serializer) {
 
 	for (int i = 0; i < level_states.size(); i++) {
 		GameLevelState* lvl = level_states[i];
-		serializer.write( Dim(lvl->width(), lvl->height()) );
+		serializer.write( Size(lvl->width(), lvl->height()) );
 		gs->set_level(lvl);
 		lvl->serialize(gs, serializer);
 	}
@@ -85,7 +85,7 @@ void GameWorld::deserialize(SerializeBuffer& serializer) {
 	GameLevelState* original = gs->get_level();
 
 	for (int i = 0; i < level_states.size(); i++) {
-		Dim size;
+		Size size;
 		serializer.read(size);
 		if (level_states[i] == NULL) {
 			level_states[i] = new GameLevelState(i, size, false, false);

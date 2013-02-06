@@ -7,18 +7,18 @@
 #define GEOMETRY_H_
 
 /*Represents a width & height*/
-struct Dim {
+struct Size {
 	int w, h;
-	explicit Dim(int w = 0, int h = 0);
-	bool operator==(const Dim& o) const;
-	bool operator!=(const Dim& o) const;
+	explicit Size(int w = 0, int h = 0);
+	bool operator==(const Size& o) const;
+	bool operator!=(const Size& o) const;
 };
 
 /*Represents an integer x,y pair position*/
 struct Pos {
 	int x, y;
 	Pos();
-	explicit Pos(const Dim& dim);
+	explicit Pos(const Size& size);
 	bool operator==(const Pos& o) const;
 	bool operator!=(const Pos& o) const;
 	Pos(int x, int y);
@@ -29,7 +29,7 @@ struct BBox {
 	int x1, y1, x2, y2;
 
 	BBox();
-	BBox(const Pos& pos, const Dim& dim);
+	BBox(const Pos& pos, const Size& size);
 	BBox(int x1, int y1, int x2, int y2);
 	bool contains(int x, int y) const;
 	bool contains(const Pos& p) const;
@@ -41,7 +41,7 @@ struct BBox {
 
 	Pos left_top() const;
 	Pos center() const;
-	Dim size() const;
+	Size size() const;
 	int center_x() const;
 	int center_y() const;
 	void translate(int x, int y);
@@ -58,12 +58,12 @@ struct BBox {
 //Float versions of above structures
 
 /*Represents a width & heigh, with floats t*/
-struct DimF {
+struct SizeF {
 	float w, h;
-	explicit DimF(float w = 0, float h = 0);
-	DimF(const Dim& dim);
-	bool operator==(const DimF& o) const;
-	bool operator!=(const DimF& o) const;
+	explicit SizeF(float w = 0, float h = 0);
+	SizeF(const Size& size);
+	bool operator==(const SizeF& o) const;
+	bool operator!=(const SizeF& o) const;
 };
 
 /*Represents a float x,y pair position*/
@@ -71,7 +71,7 @@ struct Posf {
 	float x, y;
 	Posf();
 	Posf(float x, float y);
-	explicit Posf(const DimF& dim);
+	explicit Posf(const SizeF& size);
 	Posf(const Pos& pos);
 	void rotate(float angle);
 	Posf rotated(float angle) const;
@@ -84,7 +84,7 @@ struct BBoxF {
 	float x1, y1, x2, y2;
 	BBoxF();
 	BBoxF(float x1, float y1, float x2, float y2);
-	BBoxF(const Posf& pos, const DimF& dim);
+	BBoxF(const Posf& pos, const SizeF& size);
 	BBoxF(const BBox& bbox);
 	bool operator==(const BBoxF& bbox) const;
 	bool operator!=(const BBoxF& o) const;
@@ -95,10 +95,10 @@ struct BBoxF {
 
 	float width() const;
 	float height() const;
-	DimF size() const;
+	SizeF size() const;
 	BBoxF scaled(float w, float h) const;
 
-	BBoxF scaled(const DimF& scale) const;
+	BBoxF scaled(const SizeF& scale) const;
 	Posf left_top() const;
 
 	Posf center() const;
@@ -131,11 +131,11 @@ void operator+=(Pos& p1, const Pos& p2);
 Pos operator-(const Pos& p1, const Pos& p2);
 void operator-=(Pos& p1, const Pos& p2);
 
-Dim operator+(const Dim& p1, const Dim& p2);
-void operator+=(Dim& p1, const Dim& p2);
+Size operator+(const Size& p1, const Size& p2);
+void operator+=(Size& p1, const Size& p2);
 
-Dim operator-(const Dim& p1, const Dim& p2);
-void operator-=(Dim& p1, const Dim& p2);
+Size operator-(const Size& p1, const Size& p2);
+void operator-=(Size& p1, const Size& p2);
 
 /* Floating point versions of the above */
 Posf operator+(const Posf& p1, const Posf& p2);
@@ -144,10 +144,10 @@ void operator+=(Posf& p1, const Posf& p2);
 Posf operator-(const Posf& p1, const Posf& p2);
 void operator-=(Posf& p1, const Posf& p2);
 
-DimF operator+(const DimF& p1, const DimF& p2);
-void operator+=(DimF& p1, const DimF& p2);
+SizeF operator+(const SizeF& p1, const SizeF& p2);
+void operator+=(SizeF& p1, const SizeF& p2);
 
-DimF operator-(const DimF& p1, const DimF& p2);
-void operator-=(DimF& p1, const DimF& p2);
+SizeF operator-(const SizeF& p1, const SizeF& p2);
+void operator-=(SizeF& p1, const SizeF& p2);
 
 #endif /* GEOMETRY_H_ */

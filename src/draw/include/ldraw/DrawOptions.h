@@ -32,7 +32,7 @@ const extern DrawOrigin
 
 //Assumes left-top origin bbox
 BBoxF adjusted_for_origin(const BBoxF& bbox, DrawOrigin origin);
-Posf adjusted_for_origin(const Posf& pos, const DimF& size, DrawOrigin origin);
+Posf adjusted_for_origin(const Posf& pos, const SizeF& size, DrawOrigin origin);
 
 struct DrawOptions {
 	DrawOptions(const Colour& draw_colour) :
@@ -46,7 +46,7 @@ struct DrawOptions {
 	}
 
 	DrawOptions(DrawOrigin origin = LEFT_TOP, const Colour& draw_colour =
-			Colour(), const DimF& draw_scale = DimF(1.0f, 1.0f),
+			Colour(), const SizeF& draw_scale = SizeF(1.0f, 1.0f),
 			const BBoxF& draw_region = BBoxF(), float angle = 0.0f,
 			float frame = 0.0f) :
 			draw_origin(origin), draw_colour(draw_colour), draw_scale(
@@ -73,7 +73,7 @@ struct DrawOptions {
 		return *this;
 	}
 
-	DrawOptions& scale(const DimF& draw_scale) {
+	DrawOptions& scale(const SizeF& draw_scale) {
 		this->draw_scale = draw_scale;
 		return *this;
 	}
@@ -85,7 +85,7 @@ struct DrawOptions {
 
 	DrawOrigin draw_origin;
 	Colour draw_colour;
-	DimF draw_scale;
+	SizeF draw_scale;
 	BBoxF draw_region;
 	float draw_angle;
 	float draw_frame;

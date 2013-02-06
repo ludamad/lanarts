@@ -38,12 +38,12 @@ public:
 
 	Image(const Image& image, const BBoxF& draw_region = BBoxF());
 
-	Image(const Dim& size, const BBoxF& draw_region = BBoxF(), bool rotates =
+	Image(const Size& size, const BBoxF& draw_region = BBoxF(), bool rotates =
 			false) {
 		initialize(size, draw_region, rotates);
 	}
 
-	virtual DimF size() const {
+	virtual SizeF size() const {
 		return _draw_region.size();
 	}
 
@@ -70,10 +70,10 @@ public:
 	void draw(const DrawOptions& options, const Posf& pos) const;
 	void initialize(const std::string& filename, const BBoxF& draw_region =
 			BBoxF(), bool rotates = false);
-	void initialize(const Dim& size, const BBoxF& draw_region = BBoxF(),
+	void initialize(const Size& size, const BBoxF& draw_region = BBoxF(),
 			bool rotates = false);
 	void from_bytes(const BBox& region, char* data);
-	void from_bytes(const Dim& size, char* data);
+	void from_bytes(const Size& size, char* data);
 
 	virtual void push_metatable(lua_State* L) const;
 
@@ -83,7 +83,7 @@ private:
 	BBoxF _draw_region;
 };
 
-std::vector<Image> image_split(const Image& image, const DimF& size);
+std::vector<Image> image_split(const Image& image, const SizeF& size);
 
 // Implemented in lua_drawable.cpp
 void lua_pushimage(lua_State* L, const ldraw::Image& image);

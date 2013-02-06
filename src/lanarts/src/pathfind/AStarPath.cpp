@@ -1,5 +1,5 @@
 /*
- * astar_pathfind.cpp:
+ * AStarPath.cpp:
  *  Implements A* pathfinding
  */
 
@@ -11,7 +11,7 @@
 #include "gamestate/GameState.h"
 
 #include "gamestate/GameTiles.h"
-#include "astar_pathfind.h"
+#include "AStarPath.h"
 
 #include "gheap.h"
 
@@ -37,7 +37,7 @@ static inline int heurestic_distance(const Pos& s, const Pos& e) {
 	 return sqrt(dx*dx+dy*dy);*/
 }
 
-void AStarPathFind::initialize(GameState* gs) {
+void AStarPath::initialize(GameState* gs) {
 	perf_timer_begin(FUNCNAME);
 	if (!nodes) {
 		w = gs->width() / TILE_SIZE;
@@ -61,7 +61,7 @@ void AStarPathFind::initialize(GameState* gs) {
 	perf_timer_end(FUNCNAME);
 }
 
-bool AStarPathFind::can_cross(const Pos& s, const Pos& e) {
+bool AStarPath::can_cross(const Pos& s, const Pos& e) {
 	return !at(s.x, e.y)->solid && !at(e.x, s.y)->solid;
 }
 
@@ -77,7 +77,7 @@ static std::vector<AStarNode*>::iterator find_heap_position(
 }
 
 /*Used to make sure all interpolated directions are possible*/
-std::vector<Pos> AStarPathFind::calculate_AStar_path(GameState* gs, int sx,
+std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, int sx,
 		int sy, int ex, int ey) {
 	perf_timer_begin(FUNCNAME);
 	initialize(gs);

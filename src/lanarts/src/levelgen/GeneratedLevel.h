@@ -66,7 +66,7 @@ public:
 	void initialize(int w, int h, const Pos& offset, bool solid = true) {
 		number_of_mobs = 0;
 		delete[] s;
-		size = Dim(w, h);
+		size = Size(w, h);
 		s = new Sqr[w * h];
 		world_offset = offset;
 		memset(s, 0, sizeof(Sqr) * w * h);
@@ -109,7 +109,7 @@ public:
 private:
 	GeneratedLevel(const GeneratedLevel&); //DO-NOT-USE
 	Sqr* s;
-	Dim size;
+	Size size;
 	Pos world_offset;
 	std::vector<Room> room_list;
 	std::vector<GameInstRef> instance_list;

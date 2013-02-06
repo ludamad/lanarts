@@ -43,8 +43,8 @@ static int font_get_draw_size(lua_State* L) {
 	const char* str = luaL_checkstring(L, 2);
 	int maxwidth = (lua_gettop(L) >= 3) ? luaL_checkinteger(L, 3) : -1;
 
-	DimF dim = f.get_draw_size(str, maxwidth);
-	luawrap::push(L, dim);
+	SizeF size = f.get_draw_size(str, maxwidth);
+	luawrap::push(L, size);
 	return 1;
 }
 

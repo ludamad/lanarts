@@ -46,7 +46,7 @@ void MonsterController::register_enemy(GameInst* enemy) {
 	EnemyBehaviour& eb = e->behaviour();
 }
 
-void towards_highest(PathInfo& path, Pos& p) {
+void towards_highest(FloodFillPaths& path, Pos& p) {
 	int highest;
 	for (int y = -1; y <= +1; y++) {
 		for (int x = -1; x <= +1; x++) {

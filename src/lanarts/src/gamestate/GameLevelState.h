@@ -32,7 +32,7 @@ struct GameLevelPortal {
 
 class GameLevelState {
 public:
-	GameLevelState(level_id levelid, const Dim& size, bool wandering_flag = true,
+	GameLevelState(level_id levelid, const Size& size, bool wandering_flag = true,
 			bool is_simulation = false);
 	~GameLevelState();
 

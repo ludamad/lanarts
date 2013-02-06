@@ -92,8 +92,8 @@ void GameChat::draw_player_chat(GameState* gs) const {
 	const int padding = 5;
 	int line_sep = font.height() + 2;
 
-	Dim vsize(gs->view().size());
-	Dim chat_size(vsize.w, 100);
+	Size vsize(gs->view().size());
+	Size chat_size(vsize.w, 100);
 	Pos chat_pos(0, 0);
 	Pos text_pos(chat_pos.x + padding, chat_pos.y + padding);
 

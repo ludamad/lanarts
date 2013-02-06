@@ -24,8 +24,8 @@ static void lua_geo_pushget_test() {
 	lua_generic_pushget_test(L, Posf(0.5, 1.5));
 	lua_generic_pushget_test(L, Pos(1, 2));
 
-	lua_generic_pushget_test(L, DimF(0.5, 1.5));
-	lua_generic_pushget_test(L, Dim(1, 2));
+	lua_generic_pushget_test(L, SizeF(0.5, 1.5));
+	lua_generic_pushget_test(L, Size(1, 2));
 
 	lua_generic_pushget_test(L, BBoxF(0.5, 1.5, 2.5, 3.5));
 	lua_generic_pushget_test(L, BBox(1, 2, 3, 4));
@@ -104,36 +104,36 @@ static void lua_bboxf_bind_test() {
 	lua_assert_invalid_dostring(L, code2);
 }
 
-static void dim_func(const Dim& dim) {
-	UNIT_TEST_ASSERT(dim == Dim(1,2));
+static void size_func(const Size& size) {
+	UNIT_TEST_ASSERT(size == Size(1,2));
 }
 
-static void lua_dim_bind_test() {
+static void lua_size_bind_test() {
 	TestLuaState L;
 	LuaValue globals(L, LUA_GLOBALSINDEX);
 	lua_register_geometry(L, globals);
 
-	globals["dim_func"].bind_function(dim_func);
+	globals["size_func"].bind_function(size_func);
 
-	const char* code1 = "dim_func({1,2})\n";
+	const char* code1 = "size_func({1,2})\n";
 	lua_assert_valid_dostring(L, code1);
-	const char* code2 = "dim_func({1})\n";
+	const char* code2 = "size_func({1})\n";
 	lua_assert_invalid_dostring(L, code2);
 }
 
-static void dimf_func(const DimF& dim) {
-	UNIT_TEST_ASSERT(dim == DimF(.5,1.5));
+static void sizef_func(const SizeF& size) {
+	UNIT_TEST_ASSERT(size == SizeF(.5,1.5));
 }
-static void lua_dimf_bind_test() {
+static void lua_sizef_bind_test() {
 	TestLuaState L;
 	LuaValue globals(L, LUA_GLOBALSINDEX);
 	lua_register_geometry(L, globals);
 
-	globals["dimf_func"].bind_function(dimf_func);
+	globals["sizef_func"].bind_function(sizef_func);
 
-	const char* code1 = "dimf_func({.5,1.5})\n";
+	const char* code1 = "sizef_func({.5,1.5})\n";
 	lua_assert_valid_dostring(L, code1);
-	const char* code2 = "dimf_func(.5})\n";
+	const char* code2 = "sizef_func(.5})\n";
 	lua_assert_invalid_dostring(L, code2);
 }
 
@@ -143,6 +143,6 @@ void lua_geometry_tests() {
 	UNIT_TEST(lua_posf_bind_test);
 	UNIT_TEST(lua_bbox_bind_test);
 	UNIT_TEST(lua_bboxf_bind_test);
-	UNIT_TEST(lua_dim_bind_test);
-	UNIT_TEST(lua_dimf_bind_test);
+	UNIT_TEST(lua_size_bind_test);
+	UNIT_TEST(lua_sizef_bind_test);
 }

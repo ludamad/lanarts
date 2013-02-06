@@ -37,7 +37,7 @@ static void drawoptions_func_diffall(const ldraw::DrawOptions& options) {
 	UNIT_TEST_ASSERT(options.draw_colour == Colour(1,2,3,4));
 	UNIT_TEST_ASSERT(options.draw_origin == ldraw::CENTER);
 	UNIT_TEST_ASSERT(options.draw_region == BBoxF(1,2,3,4));
-	UNIT_TEST_ASSERT(options.draw_scale == DimF(1,2));
+	UNIT_TEST_ASSERT(options.draw_scale == SizeF(1,2));
 	UNIT_TEST_ASSERT(options.draw_angle == 1.0f);
 	UNIT_TEST_ASSERT(options.draw_frame == 1.0f);
 }

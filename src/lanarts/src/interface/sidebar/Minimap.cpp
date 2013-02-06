@@ -135,7 +135,7 @@ void Minimap::draw(GameState* gs, float scale) {
 	view.min_tile_within(min_tilex, min_tiley);
 	view.max_tile_within(max_tilex, max_tiley);
 
-	int ptw = power_of_two(MINIMAP_SIZEMAX), pth = power_of_two(
+	int ptw = power_of_two_round(MINIMAP_SIZEMAX), pth = power_of_two_round(
 			MINIMAP_SIZEMAX);
 	if (!minimap_arr) {
 		minimap_arr = new char[ptw * pth * 4];
@@ -154,7 +154,7 @@ void Minimap::draw(GameState* gs, float scale) {
 		draw_rect2d(minimap_arr, ptw, pth, min_tilex, min_tiley, max_tilex,
 				max_tiley, Colour(255, 180, 99)); //
 	}
-	minimap_buff.from_bytes(Dim(ptw, pth), minimap_arr);
+	minimap_buff.from_bytes(Size(ptw, pth), minimap_arr);
 
 	minimap_buff.draw(bbox.left_top());
 }

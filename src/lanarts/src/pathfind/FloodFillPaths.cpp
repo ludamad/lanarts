@@ -1,5 +1,5 @@
 /*
- * flood_pathfind.cpp:
+ * FloodFillPaths.cpp:
  *  Utilities for flood-fill based pathfinding
  */
 
@@ -16,19 +16,19 @@
 #include "util/math_util.h"
 
 #include "gheap.h"
-#include "flood_pathfind.h"
+#include "FloodFillPaths.h"
 
 using namespace std;
 
-void floodfill(PathingNode* path, int w, int h, int sx, int sy, int alloc_w) {
-	PathCoord* heap = new PathCoord[w * h];
-	PathCoord* heap_end = heap + 1;
+void floodfill(FloodFillNode* path, int w, int h, int sx, int sy, int alloc_w) {
+	FloodFillCoord* heap = new FloodFillCoord[w * h];
+	FloodFillCoord* heap_end = heap + 1;
 
-	heap[0] = PathCoord(sx, sy, 0); //Start coordinate
-	path[sy * alloc_w + sx] = PathingNode(false, false, 0, 0, 0);
+	heap[0] = FloodFillCoord(sx, sy, 0); //Start coordinate
+	path[sy * alloc_w + sx] = FloodFillNode(false, false, 0, 0, 0);
 	while (heap != heap_end) {
-		PathCoord curr = *heap;
-		PathCoord next;
+		FloodFillCoord curr = *heap;
+		FloodFillCoord next;
 		gheap<>::pop_heap(heap, heap_end--);
 		for (int dy = -1; dy <= +1; dy++) {
 			for (int dx = -1; dx <= +1; dx++) {
@@ -40,7 +40,7 @@ void floodfill(PathingNode* path, int w, int h, int sx, int sy, int alloc_w) {
 				int coord = ny * alloc_w + nx;
 				bool is_diag = (abs(dx) == abs(dy));
 				int dist = curr.distance + (is_diag ? 140 : 100);
-				PathingNode* p = &path[coord];
+				FloodFillNode* p = &path[coord];
 				if (p->open && !p->solid) {
 					bool cant_cross = is_diag
 							&& (path[curr.y * alloc_w + nx].solid
@@ -49,7 +49,7 @@ void floodfill(PathingNode* path, int w, int h, int sx, int sy, int alloc_w) {
 						p->open = false;
 						p->dx = -dx, p->dy = -dy;
 						p->distance = dist;
-						*(heap_end++) = PathCoord(nx, ny, dist);
+						*(heap_end++) = FloodFillCoord(nx, ny, dist);
 						gheap<>::push_heap(heap, heap_end);
 					}
 				}
@@ -61,17 +61,17 @@ void floodfill(PathingNode* path, int w, int h, int sx, int sy, int alloc_w) {
 	delete[] heap;
 }
 
-PathInfo::PathInfo() {
+FloodFillPaths::FloodFillPaths() {
 	path = NULL;
 	path_x = 0, path_y = 0;
 	w = 0, h = 0;
 	alloc_w = 0, alloc_h = 0;
 	start_x = 0, start_y = 0;
 }
-PathInfo::~PathInfo() {
+FloodFillPaths::~FloodFillPaths() {
 	delete[] path;
 }
-void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
+void FloodFillPaths::calculate_path(GameState* gs, int ox, int oy, int radius) {
 	perf_timer_begin(FUNCNAME);
 	int min_tilex, min_tiley;
 	int max_tilex, max_tiley;
@@ -90,16 +90,17 @@ void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
 	int ww = max_tilex - min_tilex, hh = max_tiley - min_tiley;
 	w = ww, h = hh;
 	if (!path || w < alloc_w || h < alloc_h) {
-		alloc_w = max(alloc_w, power_of_two(w));
-		alloc_h = max(alloc_h, power_of_two(h));
-		if (path)
+		alloc_w = max(alloc_w, power_of_two_round(w));
+		alloc_h = max(alloc_h, power_of_two_round(h));
+		if (path) {
 			delete[] path;
-		path = new PathingNode[alloc_w * alloc_h];
-		memset(path, 0, alloc_w * alloc_h * sizeof(PathingNode));
+		}
+		path = new FloodFillNode[alloc_w * alloc_h];
+		memset(path, 0, alloc_w * alloc_h * sizeof(FloodFillNode));
 	}
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			PathingNode* node = get(x, y);
+			FloodFillNode* node = get(x, y);
 			node->solid = tile.is_solid(x + min_tilex, y + min_tiley);
 			node->open = true;
 			node->dx = 0;
@@ -114,13 +115,13 @@ void PathInfo::calculate_path(GameState* gs, int ox, int oy, int radius) {
 	perf_timer_end(FUNCNAME);
 }
 
-static bool is_solid_or_out_of_bounds(PathInfo& path, int x, int y) {
+static bool is_solid_or_out_of_bounds(FloodFillPaths& path, int x, int y) {
 	if (x < 0 || x >= path.width() || y < 0 || y >= path.height())
 		return true;
 	return path.get(x, y)->solid;
 }
 
-bool PathInfo::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
+bool FloodFillPaths::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
 		int dy) {
 	bool is_diag = (abs(dx) == abs(dy));
 
@@ -151,7 +152,7 @@ bool PathInfo::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
 }
 
 //Away from object
-void PathInfo::random_further_direction(MTwist& mt, int x, int y, int w, int h,
+void FloodFillPaths::random_further_direction(MTwist& mt, int x, int y, int w, int h,
 		float speed, float& vx, float& vy) {
 	if (!path) {
 		vx = 0, vy = 0;
@@ -172,7 +173,7 @@ void PathInfo::random_further_direction(MTwist& mt, int x, int y, int w, int h,
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
 			int px = xx - start_x, py = yy - start_y;
-			PathingNode* p = get(px, py);
+			FloodFillNode* p = get(px, py);
 			if (!p->solid) {
 				point_to_random_further(mt, px, py);
 			}
@@ -181,7 +182,7 @@ void PathInfo::random_further_direction(MTwist& mt, int x, int y, int w, int h,
 	interpolated_direction(x, y, w, h, speed, vx, vy);
 }
 
-void PathInfo::interpolated_direction(int x, int y, int w, int h, float speed,
+void FloodFillPaths::interpolated_direction(int x, int y, int w, int h, float speed,
 		float& vx, float& vy, bool lenient) {
 	if (!path) {
 		vx = 0, vy = 0;
@@ -207,7 +208,7 @@ void PathInfo::interpolated_direction(int x, int y, int w, int h, float speed,
 			int ex = min((xx + 1) * TILE_SIZE, mx), ey = min(
 					(yy + 1) * TILE_SIZE, my);
 			int px = xx - start_x, py = yy - start_y;
-			PathingNode* p = get(px, py);
+			FloodFillNode* p = get(px, py);
 			if (!p->solid) {
 				int sub_area = (ex - sx) * (ey - sy) + 1;
 				/*Make sure all interpolated directions are possible*/
@@ -234,8 +235,8 @@ void PathInfo::interpolated_direction(int x, int y, int w, int h, float speed,
 
 const int HUGE_DISTANCE = 1000000;
 
-void PathInfo::point_to_local_min(int sx, int sy) {
-	PathingNode* fixed_node = get(sx, sy);
+void FloodFillPaths::point_to_local_min(int sx, int sy) {
+	FloodFillNode* fixed_node = get(sx, sy);
 
 	int minx = squish(sx - 1, 0, width()), miny = squish(sy - 1, 0, height());
 	int maxx = squish(sx + 1, 0, width()), maxy = squish(sy + 1, 0, height());
@@ -248,7 +249,7 @@ void PathInfo::point_to_local_min(int sx, int sy) {
 			for (int xx = minx; xx <= maxx; xx++) {
 				if (sx == xx && sy == yy)
 					continue;
-				PathingNode* p = get(xx, yy);
+				FloodFillNode* p = get(xx, yy);
 				if (p->solid)
 					continue;
 				int dist = p->distance
@@ -269,8 +270,8 @@ void PathInfo::point_to_local_min(int sx, int sy) {
 //	}
 }
 
-void PathInfo::point_to_random_further(MTwist& mt, int sx, int sy) {
-	PathingNode* fixed_node = get(sx, sy);
+void FloodFillPaths::point_to_random_further(MTwist& mt, int sx, int sy) {
+	FloodFillNode* fixed_node = get(sx, sy);
 
 	int minx = squish(sx - 1, 0, width()), miny = squish(sy - 1, 0, height());
 	int maxx = squish(sx + 1, 0, width()), maxy = squish(sy + 1, 0, height());
@@ -284,7 +285,7 @@ void PathInfo::point_to_random_further(MTwist& mt, int sx, int sy) {
 			for (int xx = minx; xx <= maxx; xx++) {
 				if (sx == xx && sy == yy)
 					continue;
-				PathingNode* p = get(xx, yy);
+				FloodFillNode* p = get(xx, yy);
 				if (p->solid)
 					continue;
 				int dist = p->distance;
@@ -304,8 +305,8 @@ void PathInfo::point_to_random_further(MTwist& mt, int sx, int sy) {
 //	}
 }
 
-void PathInfo::fix_distances(int sx, int sy) {
-	PathingNode* fixed_node = get(sx, sy);
+void FloodFillPaths::fix_distances(int sx, int sy) {
+	FloodFillNode* fixed_node = get(sx, sy);
 
 	int minx = squish(sx - 1, 0, width()), miny = squish(sy - 1, 0, height());
 	int maxx = squish(sx + 1, 0, width()), maxy = squish(sy + 1, 0, height());
@@ -318,7 +319,7 @@ void PathInfo::fix_distances(int sx, int sy) {
 		for (int xx = minx; xx <= maxx; xx++) {
 			if (sx == xx && sy == yy)
 				continue;
-			PathingNode* p = get(xx, yy);
+			FloodFillNode* p = get(xx, yy);
 			if (p->solid)
 				continue;
 			int dist = p->distance + (abs(xx - sx) == abs(yy - sy) ? 140 : 100);
@@ -330,7 +331,7 @@ void PathInfo::fix_distances(int sx, int sy) {
 	fixed_node->distance = min_distance;
 }
 
-void PathInfo::draw(GameState* gs) {
+void FloodFillPaths::debug_draw(GameState* gs) {
 	GameView& view = gs->view();
 	int min_tilex, min_tiley;
 	int max_tilex, max_tiley;
@@ -340,7 +341,7 @@ void PathInfo::draw(GameState* gs) {
 
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			PathingNode* node = get(x, y);
+			FloodFillNode* node = get(x, y);
 			if (false && !node->solid)
 				gs->font().drawf(COL_WHITE,
 						Pos((x + start_x) * TILE_SIZE - view.x,
