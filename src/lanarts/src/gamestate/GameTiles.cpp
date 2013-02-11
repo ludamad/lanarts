@@ -259,7 +259,9 @@ bool GameTiles::radius_test(const Pos& xy, int rad, bool issolid, int ttype,
 			Tile& tile = tilestate.tile;
 
 			bool istype = (tile.tile == ttype || ttype == -1);
-			if (_solidity->raw_get(idx) && istype) {
+			bool solidity_match = _solidity->raw_get(idx) == issolid;
+
+			if (solidity_match && istype) {
 				int offset = TILE_SIZE / 2; //To and from center
 				int cx = int(xx * TILE_SIZE) + offset;
 				int cy = int(yy * TILE_SIZE) + offset;
