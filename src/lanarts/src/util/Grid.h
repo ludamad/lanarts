@@ -86,6 +86,18 @@ public:
 		return _size;
 	}
 
+	int width() const {
+		return _size.w;
+	}
+
+	int height() const {
+		return _size.h;
+	}
+
+	bool empty() const {
+		return _size.w == 0 && _size.h == 0;
+	}
+
 	V* begin() {
 		return &_contents[0];
 	}

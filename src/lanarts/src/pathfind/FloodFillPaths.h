@@ -48,15 +48,8 @@ struct FloodFillNode {
 
 class FloodFillPaths {
 public:
-	FloodFillPaths();
+	FloodFillPaths(BoolGridRef solidity = BoolGridRef());
 	~FloodFillPaths();
-
-	int width() {
-		return w;
-	}
-	int height() {
-		return h;
-	}
 
 //Floodfill based API
 	void calculate_path(GameState* gs, int ox, int oy, int radius);
@@ -72,13 +65,20 @@ public:
 	void random_further_direction(MTwist& mt, int x, int y, int w, int h,
 			float speed, float& vx, float& vy);
 	FloodFillNode* get(int x, int y) {
-		LANARTS_ASSERT( x >= 0 && x < w );
-		LANARTS_ASSERT( y >= 0 && y < h );
-		return &path[alloc_w * y + x];
+		LANARTS_ASSERT( x >= 0 && x < _size.w );
+		LANARTS_ASSERT( y >= 0 && y < _size.h );
+		return &path[Pos(x, y)];
 	}
 
 	BBox location() {
-		return BBox(start_x, start_y, start_x + w, start_y + h);
+		return BBox(start_x, start_y, start_x + _size.w, start_y + _size.h);
+	}
+
+	int width() const {
+		return _size.w;
+	}
+	int height() const {
+		return _size.h;
 	}
 
 	void debug_draw(GameState* gs);
@@ -88,13 +88,13 @@ private:
 	void fix_distances(int sx, int sy);
 	bool can_head(int sx, int sy, int ex, int ey, int speed, int dx, int dy);
 
-	FloodFillNode* path;
+	/* Shared with game tile structure! */
+	BoolGridRef _solidity;
+
+	Grid<FloodFillNode> path;
 	int start_x, start_y;
 	int path_x, path_y;
-	int w, h;
-	int alloc_w, alloc_h;
+	/* Grid has own internal size, this is size actually used */
+	Size _size;
 };
-
-void floodfill(FloodFillNode* path, int w, int h, int sx, int sy);
-
 #endif /* FLOODFILLPATHS_H_ */

@@ -20,12 +20,14 @@
 
 using namespace std;
 
-void floodfill(FloodFillNode* path, int w, int h, int sx, int sy, int alloc_w) {
-	FloodFillCoord* heap = new FloodFillCoord[w * h];
+static void floodfill(Grid<FloodFillNode>& path, Size size, int sx, int sy) {
+	FloodFillCoord* heap = new FloodFillCoord[size.area()];
 	FloodFillCoord* heap_end = heap + 1;
 
+	Size alloc_size = path.size();
+
 	heap[0] = FloodFillCoord(sx, sy, 0); //Start coordinate
-	path[sy * alloc_w + sx] = FloodFillNode(false, false, 0, 0, 0);
+	path[Pos(sx, sy)] = FloodFillNode(false, false, 0, 0, 0);
 	while (heap != heap_end) {
 		FloodFillCoord curr = *heap;
 		FloodFillCoord next;
@@ -35,16 +37,16 @@ void floodfill(FloodFillNode* path, int w, int h, int sx, int sy, int alloc_w) {
 				int nx = curr.x + dx, ny = curr.y + dy;
 				//LANARTS_ASSERT(
 				//		curr.x >= 0 && curr.x < w && curr.y >= 0 && curr.y < h);
-				if (nx < 0 || nx >= w || ny < 0 || ny >= h)
+				if (nx < 0 || nx >= size.w || ny < 0 || ny >= size.h)
 					continue;
-				int coord = ny * alloc_w + nx;
+				int coord = ny * alloc_size.w + nx;
 				bool is_diag = (abs(dx) == abs(dy));
 				int dist = curr.distance + (is_diag ? 140 : 100);
-				FloodFillNode* p = &path[coord];
+				FloodFillNode* p = &path.raw_get(coord);
 				if (p->open && !p->solid) {
 					bool cant_cross = is_diag
-							&& (path[curr.y * alloc_w + nx].solid
-									|| path[ny * alloc_w + curr.x].solid);
+							&& (path[Pos(nx, curr.y)].solid
+									|| path[Pos(curr.x, ny)].solid);
 					if (!cant_cross) {
 						p->open = false;
 						p->dx = -dx, p->dy = -dy;
@@ -61,16 +63,15 @@ void floodfill(FloodFillNode* path, int w, int h, int sx, int sy, int alloc_w) {
 	delete[] heap;
 }
 
-FloodFillPaths::FloodFillPaths() {
-	path = NULL;
+FloodFillPaths::FloodFillPaths(BoolGridRef solidity) :
+		_solidity(solidity) {
 	path_x = 0, path_y = 0;
-	w = 0, h = 0;
-	alloc_w = 0, alloc_h = 0;
 	start_x = 0, start_y = 0;
 }
+
 FloodFillPaths::~FloodFillPaths() {
-	delete[] path;
 }
+
 void FloodFillPaths::calculate_path(GameState* gs, int ox, int oy, int radius) {
 	perf_timer_begin(FUNCNAME);
 	int min_tilex, min_tiley;
@@ -87,19 +88,17 @@ void FloodFillPaths::calculate_path(GameState* gs, int ox, int oy, int radius) {
 
 	start_x = min_tilex, start_y = min_tiley;
 
-	int ww = max_tilex - min_tilex, hh = max_tiley - min_tiley;
-	w = ww, h = hh;
-	if (!path || w < alloc_w || h < alloc_h) {
-		alloc_w = max(alloc_w, power_of_two_round(w));
-		alloc_h = max(alloc_h, power_of_two_round(h));
-		if (path) {
-			delete[] path;
-		}
-		path = new FloodFillNode[alloc_w * alloc_h];
-		memset(path, 0, alloc_w * alloc_h * sizeof(FloodFillNode));
+	_size = Size(max_tilex - min_tilex, max_tiley - min_tiley);
+
+	if (path.empty() || _size.w < path.width() || _size.h < path.height()) {
+		int alloc_w = max(path.width(), power_of_two_round(_size.w));
+		int alloc_h = max(path.height(), power_of_two_round(_size.h));
+		path.resize(Size(alloc_w, alloc_h));
+		memset(path.begin(), 0, alloc_w * alloc_h * sizeof(FloodFillNode));
 	}
-	for (int y = 0; y < h; y++) {
-		for (int x = 0; x < w; x++) {
+
+	for (int y = 0; y < _size.h; y++) {
+		for (int x = 0; x < _size.w; x++) {
 			FloodFillNode* node = get(x, y);
 			node->solid = tile.is_solid(Pos(x + min_tilex, y + min_tiley));
 			node->open = true;
@@ -109,8 +108,9 @@ void FloodFillPaths::calculate_path(GameState* gs, int ox, int oy, int radius) {
 			node->distance = 0;
 		}
 	}
+
 	int tx = ox / TILE_SIZE - min_tilex, ty = oy / TILE_SIZE - min_tiley;
-	floodfill(path, w, h, tx, ty, alloc_w);
+	floodfill(path, _size, tx, ty);
 	path_x = tx, path_y = ty;
 	perf_timer_end(FUNCNAME);
 }
@@ -152,12 +152,14 @@ bool FloodFillPaths::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
 }
 
 //Away from object
-void FloodFillPaths::random_further_direction(MTwist& mt, int x, int y, int w, int h,
-		float speed, float& vx, float& vy) {
-	if (!path) {
+void FloodFillPaths::random_further_direction(MTwist& mt, int x, int y, int w,
+		int h, float speed, float& vx, float& vy) {
+
+	if (path.empty()) {
 		vx = 0, vy = 0;
 		return;
 	}
+
 	int mx = x + w, my = y + h;
 	//Set up coordinate min and max
 	int mingrid_x = x / TILE_SIZE, mingrid_y = y / TILE_SIZE;
@@ -182,12 +184,14 @@ void FloodFillPaths::random_further_direction(MTwist& mt, int x, int y, int w, i
 	interpolated_direction(x, y, w, h, speed, vx, vy);
 }
 
-void FloodFillPaths::interpolated_direction(int x, int y, int w, int h, float speed,
-		float& vx, float& vy, bool lenient) {
-	if (!path) {
+void FloodFillPaths::interpolated_direction(int x, int y, int w, int h,
+		float speed, float& vx, float& vy, bool lenient) {
+
+	if (path.empty()) {
 		vx = 0, vy = 0;
 		return;
 	}
+
 	int ispeed = (int)ceil(speed);
 	int area = w * h;
 	int mx = x + w, my = y + h;
@@ -273,8 +277,8 @@ void FloodFillPaths::point_to_local_min(int sx, int sy) {
 void FloodFillPaths::point_to_random_further(MTwist& mt, int sx, int sy) {
 	FloodFillNode* fixed_node = get(sx, sy);
 
-	int minx = squish(sx - 1, 0, width()), miny = squish(sy - 1, 0, height());
-	int maxx = squish(sx + 1, 0, width()), maxy = squish(sy + 1, 0, height());
+	int minx = squish(sx - 1, 0, _size.w), miny = squish(sy - 1, 0, _size.h);
+	int maxx = squish(sx + 1, 0, _size.w), maxy = squish(sy + 1, 0, _size.h);
 
 	int dx = 0, dy = 0;
 	int compare_distance = fixed_node->distance;
@@ -308,8 +312,8 @@ void FloodFillPaths::point_to_random_further(MTwist& mt, int sx, int sy) {
 void FloodFillPaths::fix_distances(int sx, int sy) {
 	FloodFillNode* fixed_node = get(sx, sy);
 
-	int minx = squish(sx - 1, 0, width()), miny = squish(sy - 1, 0, height());
-	int maxx = squish(sx + 1, 0, width()), maxy = squish(sy + 1, 0, height());
+	int minx = squish(sx - 1, 0, _size.w), miny = squish(sy - 1, 0, _size.h);
+	int maxx = squish(sx + 1, 0, _size.w), maxy = squish(sy + 1, 0, _size.h);
 
 	int min_distance = fixed_node->distance;
 	if (fixed_node->marked)
@@ -339,8 +343,8 @@ void FloodFillPaths::debug_draw(GameState* gs) {
 	view.min_tile_within(min_tilex, min_tiley);
 	view.max_tile_within(max_tilex, max_tiley);
 
-	for (int y = 0; y < h; y++) {
-		for (int x = 0; x < w; x++) {
+	for (int y = 0; y < _size.h; y++) {
+		for (int x = 0; x < _size.w; x++) {
 			FloodFillNode* node = get(x, y);
 			if (false && !node->solid)
 				gs->font().drawf(COL_WHITE,

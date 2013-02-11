@@ -303,3 +303,17 @@ void GameTiles::deserialize(SerializeBuffer& serializer) {
 	serializer.read_container(_seen->_internal_vector());
 	serializer.read_container(_seethrough->_internal_vector());
 }
+
+BoolGridRef GameTiles::solidity_map() const {
+	return _solidity;
+}
+
+
+BoolGridRef GameTiles::previously_seen_map() const {
+	return _seen;
+}
+
+
+BoolGridRef GameTiles::seethrough_map() const {
+	return _seethrough;
+}

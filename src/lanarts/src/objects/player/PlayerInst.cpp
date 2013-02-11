@@ -207,6 +207,7 @@ void PlayerInst::step(GameState* gs) {
 
 void PlayerInst::draw(GameState* gs) {
 	CombatGameInst::draw(gs);
+	_path_to_player.debug_draw(gs);
 }
 
 void PlayerInst::copy_to(GameInst *inst) const {
