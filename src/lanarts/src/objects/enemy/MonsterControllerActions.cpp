@@ -17,7 +17,7 @@
 #include "stats/items/ProjectileEntry.h"
 #include "stats/items/WeaponEntry.h"
 
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 
 #include "../player/PlayerInst.h"
 

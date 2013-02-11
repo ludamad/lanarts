@@ -8,7 +8,7 @@
 #include "gamestate/GameTiles.h"
 
 #include "objects/enemy/EnemyInst.h"
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 
 #include "enemygen.h"
 

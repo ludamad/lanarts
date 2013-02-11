@@ -1,5 +1,0 @@
-Put a rough chronology of features here ?
--18/04/2012
-	Game is quite nice now, able to push away enemies, enemies stay spread out for the most part
--14/06/2012
-	Major stats refactoring, good lua support, online, YAML parsing (online & YAML have been around for a while by this point)

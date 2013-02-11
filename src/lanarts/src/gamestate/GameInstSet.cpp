@@ -16,7 +16,7 @@
 #include "objects/AnimatedInst.h"
 #include "objects/InstTypeEnum.h"
 
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 
 #include "GameInstSet.h"
 #include "GameState.h"

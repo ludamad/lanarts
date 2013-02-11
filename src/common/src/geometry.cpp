@@ -128,6 +128,9 @@ bool Size::operator ==(const Size& o) const {
 bool Size::operator !=(const Size& o) const {
 	return !(*this == o);
 }
+int Size::area() const {
+	return w * h;
+}
 
 Pos::Pos() :
 		x(0), y(0) {
@@ -240,6 +243,10 @@ bool SizeF::operator ==(const SizeF& o) const {
 
 bool SizeF::operator !=(const SizeF& o) const {
 	return !(*this == o);
+}
+
+float SizeF::area() const {
+	return w * h;
 }
 
 Posf::Posf() :
@@ -359,3 +366,4 @@ BBoxF BBoxF::translated(float x, float y) const {
 BBoxF BBoxF::translated(const Posf& pos) const {
 	return BBoxF(x1 + pos.x, y1 + pos.y, x2 + pos.x, y2 + pos.y);
 }
+

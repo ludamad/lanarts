@@ -6,7 +6,7 @@
 #include <algorithm>
 
 #include <cmath>
-#include "mathutil.h"
+#include "math_util.h"
 
 #include "geometry.h"
 
@@ -71,4 +71,9 @@ void normalize(float& x, float& y, float mag) {
 		return;
 	x *= mag / curr_mag;
 	y *= mag / curr_mag;
+}
+
+/* Integer division, but rounding up instead of down */
+int round_up_divide(int value, int divisor) {
+	return (value + divisor - 1) / divisor;
 }

@@ -1,0 +1,41 @@
+Lanarts naming convention:
+
+- All classes, enums, unions & structs should all start with a capital letter and be in CamelCase.
+	examples: 
+		class GameState { };
+		struct SomeSimpleStruct { };
+		enum Origin { LEFT, CENTER, RIGHT };
+
+	Additional guidelines:
+		- Type names should be as descriptive as possible, however 
+
+- Variables, functions, methods & namespaces should all be written in all lower-case letters, and be separated by underscores.
+  Member variables in a class should generally all be private, and begin with an underscore, especially if they have an associated getter.
+  Member variables in a struct should generally all be public, and not begin with an underscore.
+  Private methods do not need to start with an underscore.
+
+	examples:
+		int player_score = 0;
+		struct MyPair {
+			int first_number, second_number;
+		};
+
+		class MyPair {
+		public:
+			int first_number() const {
+				return _first_number;
+			}
+			int second_number() const {
+				return _second_number;
+			}
+		private:
+			int _first_number, _second_number;
+		}
+
+
+- Constants and members of an enum should generally be written in all capitals, separated with underscores.
+	examples:
+		const int AI_SEARCH_TIMEOUT = 100;
+
+- Typedefs of primitive types can be lowercase, if they simply represent a specific type of integer.
+	typedef int money_t;

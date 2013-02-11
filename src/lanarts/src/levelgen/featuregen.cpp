@@ -17,7 +17,7 @@
 #include "objects/store/StoreInst.h"
 #include "objects/FeatureInst.h"
 
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 
 #include "featuregen.h"
 #include "itemgen.h"

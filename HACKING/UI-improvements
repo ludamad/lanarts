@@ -1,9 +1,0 @@
-
-Move to next available item.
--- when you equip a ranged item, always equip the first (inventory slot-wise) options that can 'fit'. So when you equip an arrow, and have a bow, equip the first bow you see.
--- when you run out of projectiles immediately switch to the most fitting. First try projectiles that use the currently wielded weapon (eg dont wield weapon if none) and then try other ranged items, and then melee weapons. 
--- </if you dequip any weapon try the first other choice/>
-	-- how do you get unarmed then??
-	-- key to toggle item choices is superior
--- somehow must support running out of stones and having them auto-equip
--- add a key to toggle between weapons

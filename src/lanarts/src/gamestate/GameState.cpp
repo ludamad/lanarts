@@ -42,7 +42,7 @@
 #include "stats/items/ItemEntry.h"
 
 #include "util/game_replays.h"
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 
 #include "GameLevelState.h"
 #include "GameState.h"

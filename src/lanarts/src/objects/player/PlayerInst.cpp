@@ -18,7 +18,7 @@
 #include "stats/class_data.h"
 #include "stats/items/ItemEntry.h"
 
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 
 #include "../enemy/EnemyInst.h"
 

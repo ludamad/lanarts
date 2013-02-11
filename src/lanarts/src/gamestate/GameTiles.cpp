@@ -1,3 +1,10 @@
+/*
+ * GameTiles.cpp:
+ *   Handles drawing of the tiles of the game, drawing of the fog-of-war,
+ *   storage of tile information for a level. Stores if a tile has already
+ *   been seen.
+ */
+
 #include <cstring>
 #include <SDL_opengl.h>
 
@@ -13,78 +20,89 @@
 
 #include <lcommon/SerializeBuffer.h>
 
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 #include "GameState.h"
 
 #include "GameTiles.h"
 
-GameTiles::GameTiles(int width, int height) :
-		width(width), height(height), tiles(width * height) {
+GameTiles::GameTiles(const Size& size) :
+		tiles(size) {
+
+	_solidity = new Grid<bool>(size, true);
 }
 
 GameTiles::~GameTiles() {
 }
 
 int GameTiles::tile_width() {
-	return width;
+	return tiles.size().w;
 }
 
 int GameTiles::tile_height() {
-	return height;
+	return tiles.size().h;
+}
+
+Size GameTiles::size() const {
+	return tiles.size();
 }
 
 Tile& GameTiles::get(int x, int y) {
-	return tiles[y * width + x].tile;
+	return tiles[Pos(x,y)].tile;
 }
 
 bool GameTiles::is_seen(int x, int y) {
-	return tiles[y * width + x].seen;
+	return tiles[Pos(x,y)].seen;
 }
 
 void GameTiles::set_seethrough(int x, int y, bool seethrough) {
-	tiles[y * width + x].seethrough = seethrough;
+	tiles[Pos(x,y)].seethrough = seethrough;
 }
 
 void GameTiles::set_solid(int x, int y, bool solid) {
-	tiles[y * width + x].solid = solid;
+	(*_solidity)[Pos(x,y)] = solid;
 }
 
 bool GameTiles::is_solid(int x, int y) {
-	return tiles[y * width + x].solid;
+	return (*_solidity)[Pos(x,y)];
 }
 
 bool GameTiles::is_seethrough(int x, int y) {
-	return tiles[y * width + x].seethrough;
+	return tiles[Pos(x,y)].seethrough;
 }
 
 void GameTiles::clear() {
-	memset(&tiles[0], 0, sizeof(TileState) * width * height);
+	memset(tiles.begin(), 0, sizeof(TileState) * size().area());
+	_solidity->fill(false);
 }
 
 void GameTiles::mark_all_seen() {
-	for (int i = 0; i < tiles.size(); i++) {
-		tiles[i].seen = true;
+	TileState* end = tiles.end();
+	for (TileState* iter = tiles.begin(); iter != end; iter++) {
+		iter->seen = true;
 	}
 }
 
 void GameTiles::copy_to(GameTiles & t) const {
-	t.width = width, t.height = height;
+	t._solidity = _solidity;
 	t.tiles = tiles;
 }
 
 void GameTiles::pre_draw(GameState* gs) {
 	perf_timer_begin(FUNCNAME);
+
+	Size size = this->size();
 	GameView& view = gs->view();
+
 	int min_tilex, min_tiley;
 	int max_tilex, max_tiley;
 
 	view.min_tile_within(min_tilex, min_tiley);
 	view.max_tile_within(max_tilex, max_tiley);
 
-	if (max_tilex >= width)
-		max_tilex = width - 1;
-	if (max_tiley >= height)
-		max_tiley = height - 1;
+	if (max_tilex >= size.w)
+		max_tilex = size.w - 1;
+	if (max_tiley >= size.h)
+		max_tiley = size.h - 1;
 //	bool reveal_enabled = gs->key_down_state(SDLK_BACKQUOTE);
 	for (int y = min_tiley; y <= max_tiley; y++) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
@@ -106,18 +124,20 @@ void GameTiles::step(GameState* gs) {
 
 	std::vector<PlayerInst*> players = gs->players_in_level();
 
+	Size size = this->size();
+
 	for (int i = 0; i < players.size(); i++) {
 		PlayerInst* player = players[i];
 		fov& f = player->field_of_view();
 		BBox fovbox = f.tiles_covered();
 		for (int y = std::max(fovbox.y1, 0);
-				y <= std::min(fovbox.y2, height - 1); y++) {
+				y <= std::min(fovbox.y2, size.h - 1); y++) {
 			for (int x = std::max(fovbox.x1, 0);
-					x <= std::min(fovbox.x2, width - 1); x++) {
+					x <= std::min(fovbox.x2, size.w - 1); x++) {
 				f.matches(x, y, matches);
 				for (int i = 0; i < sub_sqrs * sub_sqrs; i++) {
 					if (matches[i])
-						tiles[y * width + x].seen = 1;
+						tiles[Pos(x,y)].seen = 1;
 				}
 			}
 		}
@@ -125,6 +145,7 @@ void GameTiles::step(GameState* gs) {
 }
 void GameTiles::post_draw(GameState* gs) {
 
+	Size size = this->size();
 	GameView& view = gs->view();
 	int min_tilex, min_tiley;
 	int max_tilex, max_tiley;
@@ -132,10 +153,10 @@ void GameTiles::post_draw(GameState* gs) {
 	view.min_tile_within(min_tilex, min_tiley);
 	view.max_tile_within(max_tilex, max_tiley);
 
-	if (max_tilex >= width)
-		max_tilex = width - 1;
-	if (max_tiley >= height)
-		max_tiley = height - 1;
+	if (max_tilex >= size.w)
+		max_tilex = size.w - 1;
+	if (max_tiley >= size.h)
+		max_tiley = size.h - 1;
 	const int sub_sqrs = VISION_SUBSQRS;
 
 	if (/*gs->key_down_state(SDLK_BACKQUOTE) ||*/!gs->level_has_player()) {
@@ -190,9 +211,9 @@ void GameTiles::post_draw(GameState* gs) {
 }
 
 void GameTiles::serialize(SerializeBuffer& serializer) {
-	serializer.write(width);
-	serializer.write(height);
-	serializer.write_container(tiles);
+	serializer.write(size());
+	serializer.write_container(tiles._internal_vector());
+	serializer.write_container(_solidity->_internal_vector());
 }
 
 static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
@@ -221,19 +242,22 @@ bool GameTiles::radius_test(int x, int y, int rad, bool issolid, int ttype,
 	int distsqr = (TILE_SIZE / 2 + rad), radsqr = rad * rad;
 	distsqr *= distsqr; //sqr it
 
+	Size size = this->size();
+
 	int mingrid_x = (x - rad) / TILE_SIZE, mingrid_y = (y - rad) / TILE_SIZE;
 	int maxgrid_x = (x + rad) / TILE_SIZE, maxgrid_y = (y + rad) / TILE_SIZE;
-	int minx = squish(mingrid_x, 0, width), miny = squish(mingrid_y, 0, height);
-	int maxx = squish(maxgrid_x, 0, width), maxy = squish(maxgrid_y, 0, height);
+	int minx = squish(mingrid_x, 0, size.w), miny = squish(mingrid_y, 0, size.h);
+	int maxx = squish(maxgrid_x, 0, size.w), maxy = squish(maxgrid_y, 0, size.h);
 
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			TileState& tilestate = tiles[yy * width + xx];
+			int idx = yy * size.w + xx;
+
+			TileState& tilestate = tiles.raw_get(idx);
 			Tile& tile = tilestate.tile;
 
 			bool istype = (tile.tile == ttype || ttype == -1);
-			bool solidmatch = (tilestate.solid == issolid);
-			if (solidmatch && istype) {
+			if (_solidity->raw_get(idx) && istype) {
 				int offset = TILE_SIZE / 2; //To and from center
 				int cx = int(xx * TILE_SIZE) + offset;
 				int cy = int(yy * TILE_SIZE) + offset;
@@ -261,11 +285,11 @@ bool GameTiles::radius_test(int x, int y, int rad, bool issolid, int ttype,
 }
 
 void GameTiles::deserialize(SerializeBuffer& serializer) {
-	serializer.read(width);
-	serializer.read(height);
-//	for (int i = 0; i < tiles.size(); i++) {
-//		tiles[i] = TileState();
-//	}
-	serializer.read_container(tiles);
+	Size newsize;
+	serializer.read(newsize);
+	tiles.resize(newsize);
+	_solidity->resize(newsize);
+	serializer.read_container(tiles._internal_vector());
+	serializer.read_container(_solidity->_internal_vector());
 }
 

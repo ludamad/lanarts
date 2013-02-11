@@ -18,7 +18,7 @@
 #include "stats/effect_data.h"
 #include "stats/stat_formulas.h"
 
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 
 #include "player/PlayerInst.h"
 

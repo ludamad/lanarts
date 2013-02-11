@@ -3,7 +3,7 @@
  *  A convenient OpenGL image wrapper
  */
 
-#include <lcommon/mathutil.h>
+#include <lcommon/math_util.h>
 #include <lcommon/fatal_error.h>
 
 #include <SDL_opengl.h>

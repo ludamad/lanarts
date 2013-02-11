@@ -11,7 +11,7 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include <lcommon/mathutil.h>
+#include <lcommon/math_util.h>
 #include <lcommon/Timer.h>
 
 #include <luawrap/LuaValue.h>

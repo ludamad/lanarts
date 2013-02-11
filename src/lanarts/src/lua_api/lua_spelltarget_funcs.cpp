@@ -13,7 +13,7 @@
 
 #include "objects/GameInst.h"
 
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 #include "lua_api.h"
 
 // Take arguments: caster, target; returns x, y

@@ -12,7 +12,7 @@
 
 #include "gamestate/GameView.h"
 
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 
 #include "draw_sprite.h"
 

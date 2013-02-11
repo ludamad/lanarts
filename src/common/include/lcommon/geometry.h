@@ -12,6 +12,7 @@ struct Size {
 	explicit Size(int w = 0, int h = 0);
 	bool operator==(const Size& o) const;
 	bool operator!=(const Size& o) const;
+	int area() const;
 };
 
 /*Represents an integer x,y pair position*/
@@ -64,6 +65,7 @@ struct SizeF {
 	SizeF(const Size& size);
 	bool operator==(const SizeF& o) const;
 	bool operator!=(const SizeF& o) const;
+	float area() const;
 };
 
 /*Represents a float x,y pair position*/

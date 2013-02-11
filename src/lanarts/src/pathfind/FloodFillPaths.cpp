@@ -13,7 +13,7 @@
 #include "gamestate/GameState.h"
 #include "gamestate/GameTiles.h"
 
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 
 #include "gheap.h"
 #include "FloodFillPaths.h"

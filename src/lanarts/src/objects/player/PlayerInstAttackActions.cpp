@@ -22,7 +22,7 @@
 
 #include "stats/SpellEntry.h"
 
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 
 #include "lanarts_defines.h"
 

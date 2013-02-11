@@ -89,6 +89,13 @@ public:
 		}
 	}
 
+	// For vector<bool>! Blah.
+	void read(std::vector<bool>::reference ref) {
+		bool bit;
+		read(bit);
+		ref = bit;
+	}
+
 	template<class T>
 	void read_int(T& t) {
 		int i;

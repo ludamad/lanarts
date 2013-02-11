@@ -10,7 +10,7 @@
 #include <freetype/ftoutln.h>
 #include <freetype/fttrigon.h>
 
-#include <lcommon/mathutil.h>
+#include <lcommon/math_util.h>
 #include <lcommon/geometry.h>
 
 #include <lcommon/perf_timer.h>

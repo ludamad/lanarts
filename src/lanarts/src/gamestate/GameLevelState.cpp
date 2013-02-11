@@ -17,7 +17,7 @@ GameLevelState::GameLevelState(int levelid, const Size& size,
 		_steps_left(0),
 		_width(size.w),
 		_height(size.h),
-		_tiles(size.w / TILE_SIZE, size.h / TILE_SIZE),
+		_tiles(Size(size.w / TILE_SIZE, size.h / TILE_SIZE)),
 		_inst_set(size.w, size.h),
 		_monster_controller(wandering_flag),
 		_is_simulation(is_simulation) {

@@ -5,7 +5,7 @@
 
 #include <algorithm>
 #include <cmath>
-#include <lcommon/mathutil.h>
+#include <lcommon/math_util.h>
 
 #include "DirectionalDrawable.h"
 #include "Image.h"

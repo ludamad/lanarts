@@ -1,4 +1,0 @@
->> pathfinding could be slow performance culprit with > 3 players, low number of calls with 1.38ms/each??
->> 20ms/step ... does it time the sync ?
->> archer needs work
->> monsters may scale too much with more players

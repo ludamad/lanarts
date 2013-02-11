@@ -29,13 +29,24 @@
 
 #include <lcommon/geometry.h>
 
+#include "util/Grid.h"
+
+#include "SolidityGridRef.h"
 #include "FloodFillPaths.h"
 
 const int STEPS_BEFORE_RECALCULATE = 100;
 
+enum WanderDirection {
+	WANDER_AWAY,
+	WANDER_TOWARDS
+};
+
 struct WanderMapSource {
 	Pos xy;
 	int expiry_frame; // When to regenerate this source
+	WanderMapSource() {
+		expiry_frame = 0;
+	}
 };
 
 struct WanderMapSquare {
@@ -45,23 +56,36 @@ struct WanderMapSquare {
 
 class WanderMap {
 public:
-	WanderMap(const Size& size);
+	WanderMap(const Size& size, const Size& division_size = Size(10, 10));
 	~WanderMap();
 
+	// Returns a reference from the Cache
+	const std::vector<Pos>& candidates(const Pos& xy, WanderDirection direction);
+
+	/* Step a frame */
+	void step();
 
 private:
 	WanderMapSquare& get(const Pos& xy);
 
+
+	void ensure_square_valid(const Pos& xy);
+
 	struct Cache { // Data that can be freed if needed, not serialized
-		FloodFillPaths _paths_from_source;
-		std::vector<Pos> _candidates;
+		FloodFillPaths paths_from_source;
+		std::vector<Pos> candidates;
 	};
 
 	Cache _cache;
 
-	Size _size;
-	std::vector<WanderMapSource> _sources;
-	std::vector<WanderMapSquare> _squares;
+	int _frame; // Used to invalidate previous entries
+
+	Size _division_size;
+
+	Grid<WanderMapSquare> _squares;
+
+	// There is one source for each 'division_size' squares
+	Grid<WanderMapSource> _sources;
 };
 
 #endif /* WANDERMAP_H_ */

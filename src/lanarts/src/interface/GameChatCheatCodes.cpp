@@ -7,7 +7,7 @@
 
 #include "gamestate/GameState.h"
 
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 
 #include "stats/items/ItemEntry.h"
 

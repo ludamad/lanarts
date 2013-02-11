@@ -5,7 +5,7 @@
 
 #include <typeinfo>
 
-#include <lcommon/mathutil.h>
+#include <lcommon/math_util.h>
 
 #include <ldraw/draw.h>
 #include <ldraw/Font.h>

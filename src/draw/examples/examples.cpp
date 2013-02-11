@@ -10,7 +10,7 @@
 
 #include <lcommon/Timer.h>
 #include <lcommon/lua_lcommon.h>
-#include <lcommon/mathutil.h>
+#include <lcommon/math_util.h>
 
 #include <luawrap/LuaValue.h>
 #include <luawrap/calls.h>

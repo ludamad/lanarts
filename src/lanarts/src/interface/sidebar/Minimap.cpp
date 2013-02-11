@@ -9,7 +9,7 @@
 
 #include "objects/player/PlayerInst.h"
 
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 
 #include "Minimap.h"
 

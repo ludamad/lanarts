@@ -14,7 +14,7 @@
 #include "gamestate/GameTiles.h"
 #include "stats/items/ItemEntry.h"
 
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 #include "FeatureInst.h"
 
 #include "collision_filters.h"

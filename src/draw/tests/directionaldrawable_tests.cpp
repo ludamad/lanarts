@@ -4,7 +4,7 @@
  */
 
 #include <lcommon/unittest.h>
-#include <lcommon/mathutil.h>
+#include <lcommon/math_util.h>
 
 #include "DrawableMock.h"
 

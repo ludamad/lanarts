@@ -3,7 +3,7 @@
  *  Defines a colour structure
  */
 
-#include <lcommon/mathutil.h>
+#include <lcommon/math_util.h>
 
 #include "Colour.h"
 

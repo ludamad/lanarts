@@ -8,7 +8,7 @@
 #include <lua.hpp>
 
 #include <lcommon/Timer.h>
-#include <lcommon/mathutil.h>
+#include <lcommon/math_util.h>
 
 #include <luawrap/luawrap.h>
 #include <luawrap/functions.h>
@@ -16,7 +16,7 @@
 
 #include "lua_newapi.h"
 
-#include "util/math_util.h"
+#include <lcommon/math_util.h>
 
 static int lapi_values_aux(lua_State* L) {
 	long idx = (long)lua_touserdata(L, lua_upvalueindex(2));

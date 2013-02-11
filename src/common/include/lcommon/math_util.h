@@ -3,8 +3,8 @@
  *  Math utility functions for lcommon
  */
 
-#ifndef LCOMMON_MATH_H_
-#define LCOMMON_MATH_H_
+#ifndef LCOMMON_MATH_UTIL_H_
+#define LCOMMON_MATH_UTIL_H_
 
 #include <cmath>
 
@@ -48,4 +48,7 @@ float distance_between(const Pos& a, const Pos& b);
 float magnitude(float x, float y);
 void normalize(float& x, float& y, float mag = 1);
 
-#endif /* LCOMMON_MATH_H_ */
+/* Integer division, but rounding up instead of down */
+int round_up_divide(int value, int divisor);
+
+#endif /* LCOMMON_MATH_UTIL_H_ */
