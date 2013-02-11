@@ -309,32 +309,6 @@ void FloodFillPaths::point_to_random_further(MTwist& mt, int sx, int sy) {
 //	}
 }
 
-void FloodFillPaths::fix_distances(int sx, int sy) {
-	FloodFillNode* fixed_node = get(sx, sy);
-
-	int minx = squish(sx - 1, 0, _size.w), miny = squish(sy - 1, 0, _size.h);
-	int maxx = squish(sx + 1, 0, _size.w), maxy = squish(sy + 1, 0, _size.h);
-
-	int min_distance = fixed_node->distance;
-	if (fixed_node->marked)
-		return;
-
-	for (int yy = miny; yy <= maxy; yy++) {
-		for (int xx = minx; xx <= maxx; xx++) {
-			if (sx == xx && sy == yy)
-				continue;
-			FloodFillNode* p = get(xx, yy);
-			if (p->solid)
-				continue;
-			int dist = p->distance + (abs(xx - sx) == abs(yy - sy) ? 140 : 100);
-			if (dist < min_distance) {
-				min_distance = dist;
-			}
-		}
-	}
-	fixed_node->distance = min_distance;
-}
-
 void FloodFillPaths::debug_draw(GameState* gs) {
 	GameView& view = gs->view();
 	int min_tilex, min_tiley;

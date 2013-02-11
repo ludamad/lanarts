@@ -85,7 +85,6 @@ public:
 private:
 	void point_to_local_min(int sx, int sy);
 	void point_to_random_further(MTwist& mt, int sx, int sy);
-	void fix_distances(int sx, int sy);
 	bool can_head(int sx, int sy, int ex, int ey, int speed, int dx, int dy);
 
 	/* Shared with game tile structure! */
