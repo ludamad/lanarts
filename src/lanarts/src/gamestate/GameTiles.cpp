@@ -26,7 +26,7 @@
 #include "GameTiles.h"
 
 GameTiles::GameTiles(const Size& size) :
-		tiles(size) {
+		_tiles(size) {
 
 	_solidity = new Grid<bool>(size, true);
 }
@@ -35,56 +35,56 @@ GameTiles::~GameTiles() {
 }
 
 int GameTiles::tile_width() {
-	return tiles.size().w;
+	return _tiles.size().w;
 }
 
 int GameTiles::tile_height() {
-	return tiles.size().h;
+	return _tiles.size().h;
 }
 
 Size GameTiles::size() const {
-	return tiles.size();
+	return _tiles.size();
 }
 
-Tile& GameTiles::get(int x, int y) {
-	return tiles[Pos(x,y)].tile;
+Tile& GameTiles::get(const Pos& xy) {
+	return _tiles[xy].tile;
 }
 
-bool GameTiles::is_seen(int x, int y) {
-	return tiles[Pos(x,y)].seen;
+bool GameTiles::is_seen(const Pos& xy) {
+	return _tiles[xy].seen;
 }
 
-void GameTiles::set_seethrough(int x, int y, bool seethrough) {
-	tiles[Pos(x,y)].seethrough = seethrough;
+void GameTiles::set_seethrough(const Pos& xy, bool seethrough) {
+	_tiles[xy].seethrough = seethrough;
 }
 
-void GameTiles::set_solid(int x, int y, bool solid) {
-	(*_solidity)[Pos(x,y)] = solid;
+void GameTiles::set_solid(const Pos& xy, bool solid) {
+	(*_solidity)[xy] = solid;
 }
 
-bool GameTiles::is_solid(int x, int y) {
-	return (*_solidity)[Pos(x,y)];
+bool GameTiles::is_solid(const Pos& xy) {
+	return (*_solidity)[xy];
 }
 
-bool GameTiles::is_seethrough(int x, int y) {
-	return tiles[Pos(x,y)].seethrough;
+bool GameTiles::is_seethrough(const Pos& xy) {
+	return _tiles[xy].seethrough;
 }
 
 void GameTiles::clear() {
-	memset(tiles.begin(), 0, sizeof(TileState) * size().area());
+	memset(_tiles.begin(), 0, sizeof(TileState) * size().area());
 	_solidity->fill(false);
 }
 
 void GameTiles::mark_all_seen() {
-	TileState* end = tiles.end();
-	for (TileState* iter = tiles.begin(); iter != end; iter++) {
+	TileState* end = _tiles.end();
+	for (TileState* iter = _tiles.begin(); iter != end; iter++) {
 		iter->seen = true;
 	}
 }
 
 void GameTiles::copy_to(GameTiles & t) const {
 	t._solidity = _solidity;
-	t.tiles = tiles;
+	t._tiles = _tiles;
 }
 
 void GameTiles::pre_draw(GameState* gs) {
@@ -106,9 +106,9 @@ void GameTiles::pre_draw(GameState* gs) {
 //	bool reveal_enabled = gs->key_down_state(SDLK_BACKQUOTE);
 	for (int y = min_tiley; y <= max_tiley; y++) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
-			Tile& tile = get(x, y);
+			Tile& tile = get(Pos(x, y));
 			const ldraw::Image& img = res::tile(tile.tile).img(tile.subtile);
-			if (/*reveal_enabled ||*/is_seen(x, y)) {
+			if (/*reveal_enabled ||*/is_seen(Pos(x, y))) {
 				img.draw(on_screen(gs, Pos(x * TILE_SIZE, y * TILE_SIZE)));
 			}
 		}
@@ -137,7 +137,7 @@ void GameTiles::step(GameState* gs) {
 				f.matches(x, y, matches);
 				for (int i = 0; i < sub_sqrs * sub_sqrs; i++) {
 					if (matches[i])
-						tiles[Pos(x,y)].seen = 1;
+						_tiles[Pos(x,y)].seen = 1;
 				}
 			}
 		}
@@ -170,7 +170,7 @@ void GameTiles::post_draw(GameState* gs) {
 		for (int x = min_tilex; x <= max_tilex; x++) {
 			bool has_match = false, has_free = false;
 			bool is_other_match = false;
-			Tile& tile = get(x, y);
+			Tile& tile = get(Pos(x, y));
 
 			std::vector<PlayerInst*> players = gs->players_in_level();
 
@@ -195,7 +195,7 @@ void GameTiles::post_draw(GameState* gs) {
 						Pos(x * TILE_SIZE - view.x, y * TILE_SIZE - view.y),
 						res::tile(tile.tile).size());
 				if (!is_other_match) {
-					if (!is_seen(x, y)) {
+					if (!is_seen(Pos(x, y))) {
 						ldraw::draw_rectangle(Colour(0, 0, 0), tilebox);
 					} else {
 						// Previously seen
@@ -212,7 +212,7 @@ void GameTiles::post_draw(GameState* gs) {
 
 void GameTiles::serialize(SerializeBuffer& serializer) {
 	serializer.write(size());
-	serializer.write_container(tiles._internal_vector());
+	serializer.write_container(_tiles._internal_vector());
 	serializer.write_container(_solidity->_internal_vector());
 }
 
@@ -237,12 +237,14 @@ static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
 	return rt < (radsqr);
 }
 
-bool GameTiles::radius_test(int x, int y, int rad, bool issolid, int ttype,
+bool GameTiles::radius_test(const Pos& xy, int rad, bool issolid, int ttype,
 		Pos* hitloc) {
 	int distsqr = (TILE_SIZE / 2 + rad), radsqr = rad * rad;
 	distsqr *= distsqr; //sqr it
 
 	Size size = this->size();
+
+	int x = xy.x, y = xy.y;
 
 	int mingrid_x = (x - rad) / TILE_SIZE, mingrid_y = (y - rad) / TILE_SIZE;
 	int maxgrid_x = (x + rad) / TILE_SIZE, maxgrid_y = (y + rad) / TILE_SIZE;
@@ -253,7 +255,7 @@ bool GameTiles::radius_test(int x, int y, int rad, bool issolid, int ttype,
 		for (int xx = minx; xx <= maxx; xx++) {
 			int idx = yy * size.w + xx;
 
-			TileState& tilestate = tiles.raw_get(idx);
+			TileState& tilestate = _tiles.raw_get(idx);
 			Tile& tile = tilestate.tile;
 
 			bool istype = (tile.tile == ttype || ttype == -1);
@@ -287,9 +289,9 @@ bool GameTiles::radius_test(int x, int y, int rad, bool issolid, int ttype,
 void GameTiles::deserialize(SerializeBuffer& serializer) {
 	Size newsize;
 	serializer.read(newsize);
-	tiles.resize(newsize);
+	_tiles.resize(newsize);
 	_solidity->resize(newsize);
-	serializer.read_container(tiles._internal_vector());
+	serializer.read_container(_tiles._internal_vector());
 	serializer.read_container(_solidity->_internal_vector());
 }
 

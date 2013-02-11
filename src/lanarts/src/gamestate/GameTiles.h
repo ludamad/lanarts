@@ -36,18 +36,18 @@ public:
 	int tile_height();
 
 	Size size() const;
-	Tile& get(int x, int y);
+	Tile& get(const Pos& xy);
 
-	void set_solid(int x, int y, bool solid);
-	void set_seethrough(int x, int y, bool seethrough);
+	void set_solid(const Pos& xy, bool solid);
+	void set_seethrough(const Pos& xy, bool seethrough);
 
-	bool is_seethrough(int x, int y);
-	bool is_seen(int x, int y);
-	bool is_solid(int x, int y);
+	bool is_seethrough(const Pos& xy);
+	bool is_seen(const Pos& xy);
+	bool is_solid(const Pos& xy);
 
 	void mark_all_seen();
 
-	bool radius_test(int x, int y, int rad, bool issolid = true, int ttype = -1,
+	bool radius_test(const Pos& xy, int rad, bool issolid = true, int ttype = -1,
 			Pos* hitloc = NULL);
 	void clear();
 	void copy_to(GameTiles& t) const;
@@ -68,7 +68,7 @@ private:
 
 	/* Stores information about tiles, such as if they have
 	 * been seen yet, and if they are see-through */
-	Grid<TileState> tiles;
+	Grid<TileState> _tiles;
 };
 
 #endif /* GAMETILES_H_ */

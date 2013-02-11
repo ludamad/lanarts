@@ -10,6 +10,10 @@
 
 #include <lcommon/mtwist.h>
 
+#include "util/Grid.h"
+
+#include "SolidityGridRef.h"
+
 class GameState;
 
 struct FloodFillCoord {

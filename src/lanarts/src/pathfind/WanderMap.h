@@ -37,8 +37,7 @@
 const int STEPS_BEFORE_RECALCULATE = 100;
 
 enum WanderDirection {
-	WANDER_AWAY,
-	WANDER_TOWARDS
+	WANDER_AWAY, WANDER_TOWARDS
 };
 
 struct WanderMapSource {
@@ -56,11 +55,13 @@ struct WanderMapSquare {
 
 class WanderMap {
 public:
-	WanderMap(const Size& size, const Size& division_size = Size(10, 10));
+	WanderMap(SolidityGridRef solidity, const Size& size,
+			const Size& division_size = Size(10, 10));
 	~WanderMap();
 
 	// Returns a reference from the Cache
-	const std::vector<Pos>& candidates(const Pos& xy, WanderDirection direction);
+	const std::vector<Pos>& candidates(const Pos& xy,
+			WanderDirection direction);
 
 	/* Step a frame */
 	void step();
@@ -68,7 +69,7 @@ public:
 private:
 	WanderMapSquare& get(const Pos& xy);
 
-
+	void generate_wander_map_section(const Pos& source_xy);
 	void ensure_square_valid(const Pos& xy);
 
 	struct Cache { // Data that can be freed if needed, not serialized
@@ -76,14 +77,18 @@ private:
 		std::vector<Pos> candidates;
 	};
 
+	/* Data */
+
 	Cache _cache;
 
 	int _frame; // Used to invalidate previous entries
 
 	Size _division_size;
 
-	Grid<WanderMapSquare> _squares;
+	/* Shared with game tile structure */
+	SolidityGridRef _solidity;
 
+	Grid<WanderMapSquare> _squares;
 	// There is one source for each 'division_size' squares
 	Grid<WanderMapSource> _sources;
 };

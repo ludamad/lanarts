@@ -85,7 +85,7 @@ static Pos seen_square_in_area(MTwist& mt, GameTiles& tiles) {
 	do {
 		p.x = mt.rand(tiles.tile_width());
 		p.y = mt.rand(tiles.tile_height());
-	} while (!tiles.is_seen(p.x, p.y) || tiles.is_solid(p.x, p.y));
+	} while (!tiles.is_seen(p) || tiles.is_solid(p));
 	return centered_multiple(p, TILE_SIZE);
 }
 static void spawn_in_lower_level(GameState* gs, PlayerInst* player) {

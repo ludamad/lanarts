@@ -392,7 +392,7 @@ GameInst* GameState::get_instance(obj_id id) {
 
 bool GameState::tile_radius_test(int x, int y, int rad, bool issolid, int ttype,
 		Pos* hitloc) {
-	return tiles().radius_test(x, y, rad, issolid, ttype, hitloc);
+	return tiles().radius_test(Pos(x, y), rad, issolid, ttype, hitloc);
 }
 
 //int GameState::object_square_test(GameInst** objs, int obj_cap,

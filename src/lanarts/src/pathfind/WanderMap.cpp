@@ -30,7 +30,9 @@ static void fill_with_surrounding_squares(std::vector<Pos>& squares,
 	}
 }
 
-WanderMap::WanderMap(const Size& size, const Size& division_size) {
+WanderMap::WanderMap(SolidityGridRef solidity, const Size& size,
+		const Size& division_size) {
+
 	int source_w = round_up_divide(size.w, division_size.w);
 	int source_h = round_up_divide(size.h, division_size.h);
 
@@ -47,20 +49,24 @@ WanderMapSquare& WanderMap::get(const Pos& xy) {
 	return _squares[xy];
 }
 
-
 void WanderMap::step() {
 	_frame++;
+}
+
+void WanderMap::generate_wander_map_section(const Pos& source_xy) {
+
 }
 
 void WanderMap::ensure_square_valid(const Pos& xy) {
 	Pos source_xy = Pos(xy.x / _division_size.w, xy.y / _division_size.h);
 	WanderMapSource& source = _sources[source_xy];
 	if (source.expiry_frame >= _frame) {
-
+		generate_wander_map_section(source_xy);
 	}
 }
 
-const std::vector<Pos>& WanderMap::candidates(const Pos& xy, WanderDirection direction) {
+const std::vector<Pos>& WanderMap::candidates(const Pos& xy,
+		WanderDirection direction) {
 	std::vector<Pos>& candidates = _cache.candidates;
 
 	fill_with_surrounding_squares(candidates, _squares.size(), xy);

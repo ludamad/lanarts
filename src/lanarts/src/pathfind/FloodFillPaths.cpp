@@ -101,7 +101,7 @@ void FloodFillPaths::calculate_path(GameState* gs, int ox, int oy, int radius) {
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
 			FloodFillNode* node = get(x, y);
-			node->solid = tile.is_solid(x + min_tilex, y + min_tiley);
+			node->solid = tile.is_solid(Pos(x + min_tilex, y + min_tiley));
 			node->open = true;
 			node->dx = 0;
 			node->dy = 0;

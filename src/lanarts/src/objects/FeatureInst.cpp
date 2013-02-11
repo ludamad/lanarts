@@ -50,16 +50,19 @@ void FeatureInst::step(GameState* gs) {
 		}
 		last_seen_spr = spr;
 	}
+
+	Pos tile_xy(x / TILE_SIZE, y / TILE_SIZE);
+
 	if (gs->object_radius_test(x, y, TILE_SIZE)) {
 		if (feature == DOOR_CLOSED) {
-			gs->tiles().set_solid(x / TILE_SIZE, y / TILE_SIZE, false);
-			gs->tiles().set_seethrough(x / TILE_SIZE, y / TILE_SIZE, true);
+			gs->tiles().set_solid(tile_xy, false);
+			gs->tiles().set_seethrough(tile_xy, true);
 			feature = DOOR_OPEN;
 		}
 	} else if (!gs->object_radius_test(x, y, TILE_SIZE)) {
 		if (feature == DOOR_OPEN) {
-			gs->tiles().set_solid(x / TILE_SIZE, y / TILE_SIZE, true);
-			gs->tiles().set_seethrough(x / TILE_SIZE, y / TILE_SIZE, false);
+			gs->tiles().set_solid(tile_xy, true);
+			gs->tiles().set_seethrough(tile_xy, false);
 			feature = DOOR_CLOSED;
 		}
 	}
@@ -67,18 +70,20 @@ void FeatureInst::step(GameState* gs) {
 
 void FeatureInst::init(GameState* gs) {
 	if (feature == DOOR_CLOSED || solid) {
-		gs->tiles().set_solid(x / TILE_SIZE, y / TILE_SIZE, true);
+		Pos tile_xy(x / TILE_SIZE, y / TILE_SIZE);
+		gs->tiles().set_solid(tile_xy, true);
 		if (feature == DOOR_CLOSED) {
-			gs->tiles().set_seethrough(x / TILE_SIZE, y / TILE_SIZE, false);
+			gs->tiles().set_seethrough(tile_xy, false);
 		}
 	}
 }
 
 void FeatureInst::deinit(GameState *gs) {
 	if (feature == DOOR_CLOSED || solid) {
-		gs->tiles().set_solid(x / TILE_SIZE, y / TILE_SIZE, false);
+		Pos tile_xy(x / TILE_SIZE, y / TILE_SIZE);
+		gs->tiles().set_solid(tile_xy, false);
 		if (feature == DOOR_CLOSED) {
-			gs->tiles().set_seethrough(x / TILE_SIZE, y / TILE_SIZE, true);
+			gs->tiles().set_seethrough(tile_xy, true);
 		}
 	}
 }

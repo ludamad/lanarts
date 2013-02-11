@@ -54,12 +54,13 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 	for (int y = 0; y < h; y++) {
 		char* iter = buff + y * ptw * 4;
 		for (int x = 0; x < w; x++) {
-			int tile = tiles.get(x, y).tile;
-			int seen = tiles.is_seen(x, y) || minimap_reveal;
+			Pos xy(x, y);
+			int tile = tiles.get(xy).tile;
+			int seen = tiles.is_seen(xy) || minimap_reveal;
 			if (seen) {
 				if (tile == stairs_down || tile == stairs_up) {
 					iter[0] = 255, iter[1] = 0, iter[2] = 0, iter[3] = 255;
-				} else if (!tiles.is_solid(x, y)) {/*floor*/
+				} else if (!tiles.is_solid(xy)) {/*floor*/
 					iter[0] = 255, iter[1] = 255, iter[2] = 255, iter[3] = 255;
 				} else { //if (tile == 1){/*wall*/
 					iter[0] = 100, iter[1] = 100, iter[2] = 100, iter[3] = 255;
@@ -76,7 +77,7 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 			int ex = enemy->x / TILE_SIZE;
 			int ey = enemy->y / TILE_SIZE;
 			int loc = ey * ptw + ex;
-			if (!minimap_reveal && !tiles.is_seen(ex, ey))
+			if (!minimap_reveal && !tiles.is_seen(Pos(ex, ey)))
 				continue;
 			if (!minimap_reveal && !gs->object_visible_test(enemy))
 				continue;

@@ -161,28 +161,31 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 
 	for (int y = 0; y < th; y++) {
 		for (int x = 0; x < tw; x++) {
+			Pos xy(x, y);
+
 			if (y < start_y || y >= end_y || x < start_x || x >= end_x) {
-				tiles.set_solid(x, y, true);
-				tiles.set_seethrough(x, y, false);
-				tiles.get(x, y) = rltile(mt, tileset.wall);
+				tiles.set_solid(xy, true);
+				tiles.set_seethrough(xy, false);
+				tiles.get(xy) = rltile(mt, tileset.wall);
 				continue;
 			}
+
 			Sqr& s = level.at(x - start_x, y - start_y);
-			tiles.set_solid(x, y, !s.passable);
-			tiles.set_seethrough(x, y, s.passable);
+			tiles.set_solid(xy, !s.passable);
+			tiles.set_seethrough(xy, s.passable);
 			if (s.passable) {
-				tiles.get(x, y) = rltile(mt, tileset.floor);
+				tiles.get(xy) = rltile(mt, tileset.floor);
 				if (s.roomID) {
 //					if (s.marking)
 // 					tiles[ind] = TILE_MESH_0+s.marking;
 				} else if (s.feature == SMALL_CORRIDOR) {
-					tiles.get(x, y) = rltile(mt, tileset.corridor);
+					tiles.get(xy) = rltile(mt, tileset.corridor);
 				}
 			} else {
-				tiles.get(x, y) = rltile(mt, tileset.wall);
+				tiles.get(xy) = rltile(mt, tileset.wall);
 				if (s.feature == SMALL_CORRIDOR) {
 					if (mt.rand(4) == 0) {
-						tiles.get(x, y) = rltile(mt, tileset.altwall);
+						tiles.get(xy) = rltile(mt, tileset.altwall);
 					}
 				}
 			}
@@ -209,7 +212,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 			for (int x = rx; x < rx + rw; x++) {
 				Sqr& s = level.at(x, y);
 				if (s.passable && s.roomID && s.feature != SMALL_CORRIDOR)
-					tiles.get(x + start_x, y + start_y) = rltile(mt,
+					tiles.get(Pos(x + start_x, y + start_y)) = rltile(mt,
 							tileset.altfloor);
 			}
 		}
@@ -222,7 +225,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		p.x += start_x;
 		p.y += start_y;
 
-		tiles.get(p.x, p.y) = rltile(mt, res::tileid("stairs_down"));
+		tiles.get(p) = rltile(mt, res::tileid("stairs_down"));
 
 		gs->get_level()->entrances.push_back(GameLevelPortal(p, Pos(0, 0)));
 	}
@@ -245,7 +248,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		p.x += start_x;
 		p.y += start_y;
 
-		tiles.get(p.x, p.y) = rltile(mt, res::tileid("stairs_up"));
+		tiles.get(p) = rltile(mt, res::tileid("stairs_up"));
 		gs->get_level()->exits.push_back(GameLevelPortal(p, Pos(0, 0)));
 	}
 
