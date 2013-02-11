@@ -64,6 +64,7 @@ public:
 	//Away from object
 	void random_further_direction(MTwist& mt, int x, int y, int w, int h,
 			float speed, float& vx, float& vy);
+
 	FloodFillNode* get(int x, int y) {
 		LANARTS_ASSERT( x >= 0 && x < _size.w );
 		LANARTS_ASSERT( y >= 0 && y < _size.h );
@@ -71,7 +72,7 @@ public:
 	}
 
 	BBox location() {
-		return BBox(start_x, start_y, start_x + _size.w, start_y + _size.h);
+		return BBox(_source.x, _source.y, _source.x + _size.w, _source.y + _size.h);
 	}
 
 	int width() const {
@@ -87,12 +88,13 @@ private:
 	void point_to_random_further(MTwist& mt, int sx, int sy);
 	bool can_head(int sx, int sy, int ex, int ey, int speed, int dx, int dy);
 
+
 	/* Shared with game tile structure! */
 	BoolGridRef _solidity;
 
 	Grid<FloodFillNode> path;
-	int start_x, start_y;
-	int path_x, path_y;
+	/* The source point of the flood fill */
+	Pos _source;
 	/* Grid has own internal size, this is size actually used */
 	Size _size;
 };

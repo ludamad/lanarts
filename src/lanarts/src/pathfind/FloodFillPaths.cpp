@@ -65,8 +65,6 @@ static void floodfill(Grid<FloodFillNode>& path, Size size, int sx, int sy) {
 
 FloodFillPaths::FloodFillPaths(BoolGridRef solidity) :
 		_solidity(solidity) {
-	path_x = 0, path_y = 0;
-	start_x = 0, start_y = 0;
 }
 
 FloodFillPaths::~FloodFillPaths() {
@@ -86,7 +84,7 @@ void FloodFillPaths::calculate_path(GameState* gs, int ox, int oy, int radius) {
 	view.min_tile_within(min_tilex, min_tiley);
 	view.max_tile_within(max_tilex, max_tiley);
 
-	start_x = min_tilex, start_y = min_tiley;
+	_source = Pos(min_tilex, min_tiley);
 
 	_size = Size(max_tilex - min_tilex, max_tiley - min_tiley);
 
@@ -111,7 +109,6 @@ void FloodFillPaths::calculate_path(GameState* gs, int ox, int oy, int radius) {
 
 	int tx = ox / TILE_SIZE - min_tilex, ty = oy / TILE_SIZE - min_tiley;
 	floodfill(path, _size, tx, ty);
-	path_x = tx, path_y = ty;
 	perf_timer_end(FUNCNAME);
 }
 
@@ -130,19 +127,19 @@ bool FloodFillPaths::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
 		for (int x = sx; x <= ex + TILE_SIZE; x += TILE_SIZE) {
 			xx = squish(x, sx, ex + 1);
 			yy = squish(y, sy, ey + 1);
-			int gx = (xx + dx * speed) / TILE_SIZE - start_x;
-			int gy = (yy + dy * speed) / TILE_SIZE - start_y;
+			int gx = (xx + dx * speed) / TILE_SIZE - _source.x;
+			int gy = (yy + dy * speed) / TILE_SIZE - _source.y;
 			if (is_solid_or_out_of_bounds(*this, gx, gy)) {
 				return false;
 			}
 			if (is_diag) {
-				if (is_solid_or_out_of_bounds(*this, xx / TILE_SIZE - start_x,
-						(yy + dy * speed) / TILE_SIZE - start_y)) {
+				if (is_solid_or_out_of_bounds(*this, xx / TILE_SIZE - _source.x,
+						(yy + dy * speed) / TILE_SIZE - _source.y)) {
 					return false;
 				}
 				if (is_solid_or_out_of_bounds(*this,
-						(xx + dx * speed) / TILE_SIZE - start_x,
-						yy / TILE_SIZE - start_y)) {
+						(xx + dx * speed) / TILE_SIZE - _source.x,
+						yy / TILE_SIZE - _source.y)) {
 					return false;
 				}
 			}
@@ -165,16 +162,16 @@ void FloodFillPaths::random_further_direction(MTwist& mt, int x, int y, int w,
 	int mingrid_x = x / TILE_SIZE, mingrid_y = y / TILE_SIZE;
 	int maxgrid_x = mx / TILE_SIZE, maxgrid_y = my / TILE_SIZE;
 	//Make sure coordinates do not go out of bounds
-	int minx = squish(mingrid_x, start_x, start_x + width());
-	int miny = squish(mingrid_y, start_y, start_y + height());
-	int maxx = squish(maxgrid_x, start_x, start_x + width());
-	int maxy = squish(maxgrid_y, start_y, start_y + height());
+	int minx = squish(mingrid_x, _source.x, _source.x + width());
+	int miny = squish(mingrid_y, _source.y, _source.y + height());
+	int maxx = squish(maxgrid_x, _source.x, _source.x + width());
+	int maxy = squish(maxgrid_y, _source.y, _source.y + height());
 	//Set up accumulators for x and y (later normalized)
 	int acc_x = 0, acc_y = 0;
 
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			int px = xx - start_x, py = yy - start_y;
+			int px = xx - _source.x, py = yy - _source.y;
 			FloodFillNode* p = get(px, py);
 			if (!p->solid) {
 				point_to_random_further(mt, px, py);
@@ -199,10 +196,10 @@ void FloodFillPaths::interpolated_direction(int x, int y, int w, int h,
 	int mingrid_x = x / TILE_SIZE, mingrid_y = y / TILE_SIZE;
 	int maxgrid_x = mx / TILE_SIZE, maxgrid_y = my / TILE_SIZE;
 	//Make sure coordinates do not go out of bounds
-	int minx = squish(mingrid_x, start_x, start_x + width());
-	int miny = squish(mingrid_y, start_y, start_y + height());
-	int maxx = squish(maxgrid_x, start_x, start_x + width());
-	int maxy = squish(maxgrid_y, start_y, start_y + height());
+	int minx = squish(mingrid_x, _source.x, _source.x + width());
+	int miny = squish(mingrid_y, _source.y, _source.y + height());
+	int maxx = squish(maxgrid_x, _source.x, _source.x + width());
+	int maxy = squish(maxgrid_y, _source.y, _source.y + height());
 	//Set up accumulators for x and y (later normalized)
 	int acc_x = 0, acc_y = 0;
 
@@ -211,7 +208,7 @@ void FloodFillPaths::interpolated_direction(int x, int y, int w, int h,
 			int sx = max(xx * TILE_SIZE, x), sy = max(yy * TILE_SIZE, y);
 			int ex = min((xx + 1) * TILE_SIZE, mx), ey = min(
 					(yy + 1) * TILE_SIZE, my);
-			int px = xx - start_x, py = yy - start_y;
+			int px = xx - _source.x, py = yy - _source.y;
 			FloodFillNode* p = get(px, py);
 			if (!p->solid) {
 				int sub_area = (ex - sx) * (ey - sy) + 1;
@@ -322,13 +319,13 @@ void FloodFillPaths::debug_draw(GameState* gs) {
 			FloodFillNode* node = get(x, y);
 			if (false && !node->solid)
 				gs->font().drawf(COL_WHITE,
-						Pos((x + start_x) * TILE_SIZE - view.x,
-								(y + start_y) * TILE_SIZE - view.y), "%d,%d",
+						Pos((x + _source.x) * TILE_SIZE - view.x,
+								(y + _source.y) * TILE_SIZE - view.y), "%d,%d",
 						node->dx, node->dy);
 			if (!node->solid) {
 				gs->font().drawf(COL_WHITE,
-						Pos((x + start_x) * TILE_SIZE - view.x,
-								(y + start_y) * TILE_SIZE - view.y), "%d",
+						Pos((x + _source.x) * TILE_SIZE - view.x,
+								(y + _source.y) * TILE_SIZE - view.y), "%d",
 						node->distance);
 			}
 		}
