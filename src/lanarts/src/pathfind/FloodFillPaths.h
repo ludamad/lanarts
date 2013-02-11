@@ -12,7 +12,7 @@
 
 #include "util/Grid.h"
 
-#include "SolidityGridRef.h"
+#include "BoolGridRef.h"
 
 class GameState;
 

@@ -15,7 +15,7 @@
 
 #include "util/Grid.h"
 
-#include "pathfind/SolidityGridRef.h"
+#include "pathfind/BoolGridRef.h"
 
 class GameState;
 class SerializeBuffer;
@@ -54,21 +54,19 @@ public:
 
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
-private:
-	struct TileState {
-		bool seen, seethrough;
-		Tile tile;
-		TileState() :
-				seen(false), seethrough(true) {
-		}
-	};
 
-	/* Stores whether a given tile is solid */
-	SolidityGridRef _solidity;
+	BoolGridRef solidity_map() const;
+	BoolGridRef previously_seen_map() const;
+	BoolGridRef seethrough_map() const;
+private:
+
+	/* Store mutable tile properties in share-able bitmaps.
+	 * GameTiles is considered the 'owner' for serialization purposes. */
+	BoolGridRef _solidity, _seen, _seethrough;
 
 	/* Stores information about tiles, such as if they have
 	 * been seen yet, and if they are see-through */
-	Grid<TileState> _tiles;
+	Grid<Tile> _tiles;
 };
 
 #endif /* GAMETILES_H_ */

@@ -30,7 +30,7 @@ static void fill_with_surrounding_squares(std::vector<Pos>& squares,
 	}
 }
 
-WanderMap::WanderMap(SolidityGridRef solidity, const Size& size,
+WanderMap::WanderMap(BoolGridRef solidity, const Size& size,
 		const Size& division_size) {
 
 	int source_w = round_up_divide(size.w, division_size.w);

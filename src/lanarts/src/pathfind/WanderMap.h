@@ -31,7 +31,7 @@
 
 #include "util/Grid.h"
 
-#include "SolidityGridRef.h"
+#include "BoolGridRef.h"
 #include "FloodFillPaths.h"
 
 const int STEPS_BEFORE_RECALCULATE = 100;
@@ -55,7 +55,7 @@ struct WanderMapSquare {
 
 class WanderMap {
 public:
-	WanderMap(SolidityGridRef solidity, const Size& size,
+	WanderMap(BoolGridRef solidity, const Size& size,
 			const Size& division_size = Size(10, 10));
 	~WanderMap();
 
@@ -86,7 +86,7 @@ private:
 	Size _division_size;
 
 	/* Shared with game tile structure */
-	SolidityGridRef _solidity;
+	BoolGridRef _solidity;
 
 	Grid<WanderMapSquare> _squares;
 	// There is one source for each 'division_size' squares
