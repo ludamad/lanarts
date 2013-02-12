@@ -63,6 +63,7 @@ int fov::isBlocked(short destX, short destY) {
 
 	return !tiles.is_seethrough(Pos(px, py));
 }
+
 bool fov::within_fov(const BBox& bbox) {
 	if (!has_been_calculated) {
 		return false;

@@ -65,7 +65,22 @@ local function main_loop(steponly)
 	return true
 end
 
+local fps_timer = timer_create()
+local fps_count = 1
+local fps = 60
+
 function postdraw()
+	fps_count = fps_count + 1
+
+	local w,h = unpack( display.window_size ) 
+	fonts.large:draw( {origin=CENTER}, {w/2, h/2}, "FPS: " .. fps )
+
+	local ms = fps_timer:get_milliseconds()
+	if ms > 100 then
+		fps = fps_count / ms * 100
+		fps_timer:start()
+		fps_count = 0
+	end
 end
 
 local music = music_optional_load("res/sound/lanarts1.ogg")
