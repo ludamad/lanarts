@@ -250,8 +250,10 @@ public:
 	 */
 
 	X* get() const {
+#ifndef NDEBUG
 		if (rawPtr == 0)
 			throw new NullPointerException;
+#endif
 		return rawPtr;
 	}
 
