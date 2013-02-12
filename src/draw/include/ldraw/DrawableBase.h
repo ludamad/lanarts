@@ -18,7 +18,7 @@ public:
 	virtual ~DrawableBase() {
 	}
 
-	virtual void draw(const DrawOptions& options, const Posf& pos) const = 0;
+	virtual void draw(const DrawOptions& options, const PosF& pos) const = 0;
 
 	/* Duration of an animation, 0 means not animated */
 	virtual float animation_duration() const {
@@ -29,7 +29,7 @@ public:
 		return animation_duration() != 0;
 	}
 
-	void draw(const Posf& pos) const {
+	void draw(const PosF& pos) const {
 		draw(DrawOptions(), pos);
 	}
 

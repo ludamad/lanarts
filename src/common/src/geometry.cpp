@@ -8,20 +8,20 @@
 #include "lcommon_assert.h"
 #include "geometry.h"
 
-void Posf::rotate(float angle) {
+void PosF::rotate(float angle) {
 	*this = rotated(angle);
 }
 
-Posf Posf::rotated(float angle) const {
+PosF PosF::rotated(float angle) const {
 	float cosa = cos(angle), sina = sin(angle);
-	return Posf(x * sina + y * cosa, -x * cosa + y * sina);
+	return PosF(x * sina + y * cosa, -x * cosa + y * sina);
 }
 
 QuadF::QuadF(const BBoxF& bbox, float angle) {
-	pos[0] = Posf(bbox.x1, bbox.y1);
-	pos[1] = Posf(bbox.x2, bbox.y1);
-	pos[2] = Posf(bbox.x2, bbox.y2);
-	pos[3] = Posf(bbox.x1, bbox.y2);
+	pos[0] = PosF(bbox.x1, bbox.y1);
+	pos[1] = PosF(bbox.x2, bbox.y1);
+	pos[2] = PosF(bbox.x2, bbox.y2);
+	pos[3] = PosF(bbox.x1, bbox.y2);
 	rotate(angle);
 }
 void QuadF::rotate(float angle) {
@@ -39,14 +39,14 @@ QuadF QuadF::rotated(float angle) const {
 	return cpy;
 }
 
-void QuadF::translate(const Posf& p) {
+void QuadF::translate(const PosF& p) {
 	for (int i = 0; i < 4; i++) {
 		pos[i].x += p.x;
 		pos[i].y += p.y;
 	}
 }
 
-QuadF QuadF::translated(const Posf& p) const {
+QuadF QuadF::translated(const PosF& p) const {
 	QuadF cpy(*this);
 	cpy.translate(p);
 	return cpy;
@@ -84,19 +84,19 @@ Size operator -(const Size& p1, const Size& p2) {
 }
 
 // Floating point versions of the above
-Posf operator +(const Posf& p1, const Posf& p2) {
-	return Posf(p1.x + p2.x, p1.y + p2.y);
+PosF operator +(const PosF& p1, const PosF& p2) {
+	return PosF(p1.x + p2.x, p1.y + p2.y);
 }
 
-void operator +=(Posf& p1, const Posf& p2) {
+void operator +=(PosF& p1, const PosF& p2) {
 	p1 = p1 + p2;
 }
 
-Posf operator -(const Posf& p1, const Posf& p2) {
-	return Posf(p1.x - p2.x, p1.y - p2.y);
+PosF operator -(const PosF& p1, const PosF& p2) {
+	return PosF(p1.x - p2.x, p1.y - p2.y);
 }
 
-void operator -=(Posf& p1, const Posf& p2) {
+void operator -=(PosF& p1, const PosF& p2) {
 	p1 = p1 - p2;
 }
 
@@ -146,6 +146,9 @@ bool Pos::operator ==(const Pos& o) const {
 
 bool Pos::operator !=(const Pos& o) const {
 	return !(*this == o);
+}
+
+Pos Pos::divided(int divisor) const {
 }
 
 Pos::Pos(int x, int y) :
@@ -249,27 +252,30 @@ float SizeF::area() const {
 	return w * h;
 }
 
-Posf::Posf() :
+PosF::PosF() :
 		x(0.0f), y(0.0f) {
 }
 
-Posf::Posf(float x, float y) :
+PosF::PosF(float x, float y) :
 		x(x), y(y) {
 }
 
-Posf::Posf(const SizeF& size) :
+PosF::PosF(const SizeF& size) :
 		x(size.w), y(size.h) {
 }
 
-Posf::Posf(const Pos& pos) :
+PosF::PosF(const Pos& pos) :
 		x(pos.x), y(pos.y) {
 }
 
-bool Posf::operator ==(const Posf& o) const {
+bool PosF::operator ==(const PosF& o) const {
 	return o.x == x && o.y == y;
 }
 
-bool Posf::operator !=(const Posf& o) const {
+PosF PosF::divided(float divisor) const {
+}
+
+bool PosF::operator !=(const PosF& o) const {
 	return !(*this == o);
 }
 
@@ -282,7 +288,7 @@ BBoxF::BBoxF(float x1, float y1, float x2, float y2) :
 	LCOMMON_ASSERT(x1 <= x2 && y1 <= y2);
 }
 
-BBoxF::BBoxF(const Posf& pos, const SizeF& size) :
+BBoxF::BBoxF(const PosF& pos, const SizeF& size) :
 		x1(pos.x), y1(pos.y), x2(pos.x + size.w), y2(pos.y + size.h) {
 	LCOMMON_ASSERT(x1 <= x2 && y1 <= y2);
 }
@@ -304,7 +310,7 @@ bool BBoxF::contains(float x, float y) const {
 	return x >= x1 && x < x2 && y >= y1 && y < y2;
 }
 
-bool BBoxF::contains(const Posf& p) const {
+bool BBoxF::contains(const PosF& p) const {
 	return contains(p.x, p.y);
 }
 
@@ -334,12 +340,12 @@ BBoxF BBoxF::scaled(const SizeF& scale) const {
 	return scaled(scale.w, scale.h);
 }
 
-Posf BBoxF::left_top() const {
-	return Posf(x1, y1);
+PosF BBoxF::left_top() const {
+	return PosF(x1, y1);
 }
 
-Posf BBoxF::center() const {
-	return Posf((x1 + x2) / 2, (y1 + y2) / 2);
+PosF BBoxF::center() const {
+	return PosF((x1 + x2) / 2, (y1 + y2) / 2);
 }
 
 float BBoxF::center_x() const {
@@ -363,7 +369,7 @@ BBoxF BBoxF::translated(float x, float y) const {
 	return BBoxF(x1 + x, y1 + y, x2 + x, y2 + y);
 }
 
-BBoxF BBoxF::translated(const Posf& pos) const {
+BBoxF BBoxF::translated(const PosF& pos) const {
 	return BBoxF(x1 + pos.x, y1 + pos.y, x2 + pos.x, y2 + pos.y);
 }
 

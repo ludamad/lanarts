@@ -23,12 +23,12 @@ static Font font_load(const char* filename, int height) {
 }
 
 static int font_draw(const Font& f, const DrawOptions& options,
-		const Posf& position, const char* str) {
+		const PosF& position, const char* str) {
 	return f.draw(options, position, str);
 }
 
 static void font_draw_wrapped(const Font& f, const DrawOptions& options,
-		const Posf& position, int maxwidth, const char* str) {
+		const PosF& position, int maxwidth, const char* str) {
 	f.draw_wrapped(options, position, maxwidth, str);
 }
 

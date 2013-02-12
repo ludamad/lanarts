@@ -19,7 +19,7 @@ public:
 		RADIUS = 10, VISION_SUBSQRS = 1, DEPTH = -100
 	};
 	AnimatedInst(const Pos& pos, sprite_id sprite, int animatetime = -1,
-			const Posf& speed = Posf(), const Posf& orientation = Posf(),
+			const PosF& speed = PosF(), const PosF& orientation = PosF(),
 			int depth = DEPTH, const std::string& text = std::string(),
 			Colour textcol = Colour(255, 0, 0)) :
 			GameInst(pos.x, pos.y, RADIUS, false, depth), textcol(textcol), rx(
@@ -50,7 +50,7 @@ private:
 
 inline AnimatedInst* animated_inst(const Pos& pos, const std::string& text,
 		const Colour& textcol, int animatetime = -1) {
-	return new AnimatedInst(pos, -1, -1, Posf(), Posf(), AnimatedInst::DEPTH,
+	return new AnimatedInst(pos, -1, -1, PosF(), PosF(), AnimatedInst::DEPTH,
 			text, textcol);
 }
 

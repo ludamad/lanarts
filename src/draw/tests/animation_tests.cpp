@@ -34,16 +34,16 @@ static void ldraw_animation_draw_test() {
 	anim.add(Drawable(new DrawableMock("1", &called_string)));
 	anim.add(Drawable(new DrawableMock("2", &called_string)));
 
-	anim.draw(DrawOptions().frame(0), Posf());
+	anim.draw(DrawOptions().frame(0), PosF());
 	UNIT_TEST_ASSERT(called_string == "0");
 
-	anim.draw(DrawOptions().frame(1), Posf());
+	anim.draw(DrawOptions().frame(1), PosF());
 	UNIT_TEST_ASSERT(called_string == "1");
 
-	anim.draw(DrawOptions().frame(2), Posf());
+	anim.draw(DrawOptions().frame(2), PosF());
 	UNIT_TEST_ASSERT(called_string == "2");
 
-	anim.draw(DrawOptions().frame(3), Posf());
+	anim.draw(DrawOptions().frame(3), PosF());
 	UNIT_TEST_ASSERT(called_string == "0");
 }
 

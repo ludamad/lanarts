@@ -30,16 +30,20 @@ static void fill_with_surrounding_squares(std::vector<Pos>& squares,
 	}
 }
 
-WanderMap::WanderMap(BoolGridRef solidity, const Size& size,
+WanderMap::WanderMap(const BoolGridRef& solidity, const Size& size,
 		const Size& division_size) {
+
+	_frame = 0;
+	_solidity = solidity;
+	_division_size = division_size;
 
 	int source_w = round_up_divide(size.w, division_size.w);
 	int source_h = round_up_divide(size.h, division_size.h);
 
-	_frame = 0;
 	_squares.resize(size);
 	_sources.resize(Size(source_w, source_h));
-	_division_size = division_size;
+
+	_cache.paths_from_source.initialize(_solidity);
 }
 
 WanderMap::~WanderMap() {
@@ -54,6 +58,7 @@ void WanderMap::step() {
 }
 
 void WanderMap::generate_wander_map_section(const Pos& source_xy) {
+	_cache.paths_from_source.initialize(_solidity);
 
 }
 

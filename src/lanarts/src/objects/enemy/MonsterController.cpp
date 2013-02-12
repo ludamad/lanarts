@@ -203,7 +203,7 @@ void MonsterController::update_velocity(GameState* gs, EnemyInst* e) {
 void MonsterController::update_position(GameState* gs, EnemyInst* e) {
 	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
 	simul_id simid = e->collision_simulation_id();
-	Posf pos = coll_avoid.get_position(simid);
+	PosF pos = coll_avoid.get_position(simid);
 
 	e->attempt_move_to_position(gs, pos.x, pos.y);
 	coll_avoid.set_position(simid, pos.x, pos.y);

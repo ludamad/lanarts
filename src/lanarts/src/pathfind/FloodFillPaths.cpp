@@ -63,42 +63,33 @@ static void floodfill(Grid<FloodFillNode>& path, Size size, int sx, int sy) {
 	delete[] heap;
 }
 
-FloodFillPaths::FloodFillPaths(BoolGridRef solidity) :
-		_solidity(solidity) {
+FloodFillPaths::FloodFillPaths(const BoolGridRef& solidity) {
+	initialize(solidity);
+}
+
+void FloodFillPaths::initialize(const BoolGridRef& solidity) {
+	_solidity = solidity;
 }
 
 FloodFillPaths::~FloodFillPaths() {
 }
 
-void FloodFillPaths::calculate_path(GameState* gs, int ox, int oy, int radius) {
-	perf_timer_begin(FUNCNAME);
-	int min_tilex, min_tiley;
-	int max_tilex, max_tiley;
 
-	GameTiles& tile = gs->tiles();
+void FloodFillPaths::fill_paths_tile_region(const Pos& tile_xy, const BBox& area, bool clear_previous) {
+	_source = area.left_top();
+	_size = area.size();
 
-	//Use a temporary 'GameView' object to make use of its helper methods
-	GameView view(0, 0, radius * 2, radius * 2, gs->width(), gs->height());
-	view.sharp_center_on(ox, oy);
-
-	view.min_tile_within(min_tilex, min_tiley);
-	view.max_tile_within(max_tilex, max_tiley);
-
-	_source = Pos(min_tilex, min_tiley);
-
-	_size = Size(max_tilex - min_tilex, max_tiley - min_tiley);
-
-	if (path.empty() || _size.w < path.width() || _size.h < path.height()) {
-		int alloc_w = max(path.width(), power_of_two_round(_size.w));
-		int alloc_h = max(path.height(), power_of_two_round(_size.h));
-		path.resize(Size(alloc_w, alloc_h));
-		memset(path.begin(), 0, alloc_w * alloc_h * sizeof(FloodFillNode));
+	if (_path.empty() || _size.w < _path.width() || _size.h < _path.height()) {
+		int alloc_w = max(_path.width(), power_of_two_round(_size.w));
+		int alloc_h = max(_path.height(), power_of_two_round(_size.h));
+		_path.resize(Size(alloc_w, alloc_h));
+		memset(_path.begin(), 0, alloc_w * alloc_h * sizeof(FloodFillNode));
 	}
 
 	for (int y = 0; y < _size.h; y++) {
 		for (int x = 0; x < _size.w; x++) {
 			FloodFillNode* node = get(x, y);
-			node->solid = tile.is_solid(Pos(x + min_tilex, y + min_tiley));
+			node->solid = (*_solidity)[Pos(x + area.x1, y + area.y1)];
 			node->open = true;
 			node->dx = 0;
 			node->dy = 0;
@@ -107,14 +98,29 @@ void FloodFillPaths::calculate_path(GameState* gs, int ox, int oy, int radius) {
 		}
 	}
 
-	int tx = ox / TILE_SIZE - min_tilex, ty = oy / TILE_SIZE - min_tiley;
-	floodfill(path, _size, tx, ty);
+	floodfill(_path, _size, tile_xy.x, tile_xy.y);
+}
+
+void FloodFillPaths::fill_paths_in_radius(const Pos& source_xy, int radius) {
+	perf_timer_begin(FUNCNAME);
+
+	//Use a temporary 'GameView' object to make use of its helper methods
+	GameView view(0, 0, radius * 2, radius * 2, _solidity->width() * TILE_SIZE, _solidity->height() * TILE_SIZE);
+	view.sharp_center_on(source_xy);
+
+	BBox tiles_covered = view.tile_region_covered();
+
+	Pos tile_xy = source_xy.divided(TILE_SIZE) - tiles_covered.left_top();
+	fill_paths_tile_region(tile_xy, tiles_covered);
+
 	perf_timer_end(FUNCNAME);
 }
 
 static bool is_solid_or_out_of_bounds(FloodFillPaths& path, int x, int y) {
-	if (x < 0 || x >= path.width() || y < 0 || y >= path.height())
+	if (x < 0 || x >= path.width() || y < 0 || y >= path.height()) {
 		return true;
+	}
+
 	return path.get(x, y)->solid;
 }
 
@@ -152,20 +158,23 @@ bool FloodFillPaths::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
 void FloodFillPaths::random_further_direction(MTwist& mt, int x, int y, int w,
 		int h, float speed, float& vx, float& vy) {
 
-	if (path.empty()) {
+	if (_path.empty()) {
 		vx = 0, vy = 0;
 		return;
 	}
 
 	int mx = x + w, my = y + h;
+
 	//Set up coordinate min and max
 	int mingrid_x = x / TILE_SIZE, mingrid_y = y / TILE_SIZE;
 	int maxgrid_x = mx / TILE_SIZE, maxgrid_y = my / TILE_SIZE;
+
 	//Make sure coordinates do not go out of bounds
 	int minx = squish(mingrid_x, _source.x, _source.x + width());
 	int miny = squish(mingrid_y, _source.y, _source.y + height());
 	int maxx = squish(maxgrid_x, _source.x, _source.x + width());
 	int maxy = squish(maxgrid_y, _source.y, _source.y + height());
+
 	//Set up accumulators for x and y (later normalized)
 	int acc_x = 0, acc_y = 0;
 
@@ -184,7 +193,7 @@ void FloodFillPaths::random_further_direction(MTwist& mt, int x, int y, int w,
 void FloodFillPaths::interpolated_direction(int x, int y, int w, int h,
 		float speed, float& vx, float& vy, bool lenient) {
 
-	if (path.empty()) {
+	if (_path.empty()) {
 		vx = 0, vy = 0;
 		return;
 	}
@@ -308,11 +317,6 @@ void FloodFillPaths::point_to_random_further(MTwist& mt, int sx, int sy) {
 
 void FloodFillPaths::debug_draw(GameState* gs) {
 	GameView& view = gs->view();
-	int min_tilex, min_tiley;
-	int max_tilex, max_tiley;
-
-	view.min_tile_within(min_tilex, min_tiley);
-	view.max_tile_within(max_tilex, max_tiley);
 
 	for (int y = 0; y < _size.h; y++) {
 		for (int x = 0; x < _size.w; x++) {

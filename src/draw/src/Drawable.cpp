@@ -19,11 +19,11 @@ Drawable::Drawable(const smartptr<DrawableBase>& drawable) :
 Drawable::~Drawable() {
 }
 
-void Drawable::draw(const DrawOptions & options, const Posf & pos) const {
+void Drawable::draw(const DrawOptions & options, const PosF & pos) const {
 	return ref->draw(options, pos);
 }
 
-void Drawable::draw(const Posf & pos) const {
+void Drawable::draw(const PosF & pos) const {
 	ref->draw(pos);
 }
 

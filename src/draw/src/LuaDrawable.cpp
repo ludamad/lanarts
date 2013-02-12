@@ -35,7 +35,7 @@ void LuaDrawable::_push_closure() const {
 	_draw_closure.get(L).push();
 }
 
-void LuaDrawable::draw(const DrawOptions & options, const Posf & pos) const {
+void LuaDrawable::draw(const DrawOptions & options, const PosF & pos) const {
 	_push_closure();
 	luawrap::call<void>(L, options, pos);
 }

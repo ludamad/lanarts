@@ -35,7 +35,7 @@ public:
 
 	virtual ~DirectionalDrawable();
 
-	virtual void draw(const DrawOptions& options, const Posf& pos) const;
+	virtual void draw(const DrawOptions& options, const PosF& pos) const;
 
 	void add(const Drawable& direction);
 

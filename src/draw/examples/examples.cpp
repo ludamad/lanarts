@@ -71,7 +71,7 @@ static void draw_loop(DrawFunc draw_func) {
 		draw_func();
 		double seconds = timer.get_microseconds() / 1000.0 / 1000.0;
 		fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::RIGHT_BOTTOM),
-				Posf(400, 400), "%d", int(frames / seconds));
+				PosF(400, 400), "%d", int(frames / seconds));
 		ldraw::display_draw_finish();
 		SDL_Delay(5);
 	}
@@ -79,7 +79,7 @@ static void draw_loop(DrawFunc draw_func) {
 
 static void draw_shapes() {
 	ldraw::draw_rectangle(COL_LIGHT_RED, BBoxF(100, 100, 300, 300));
-	ldraw::draw_circle(COL_LIGHT_BLUE, Posf(200, 200), 100);
+	ldraw::draw_circle(COL_LIGHT_BLUE, PosF(200, 200), 100);
 }
 
 ldraw::Image image;
@@ -87,7 +87,7 @@ ldraw::Image image;
 static void draw_images() {
 	BBox box(0, 0, 10, 10);
 	FOR_EACH_BBOX(box, x, y) {
-		image.draw(Posf(x * 40, y * 40));
+		image.draw(PosF(x * 40, y * 40));
 	}
 }
 
@@ -110,10 +110,10 @@ ldraw::Drawable arrow;
 static void draw_directional() {
 	using namespace ldraw;
 	draw_rectangle(COL_BABY_BLUE, BBoxF(0, 0, 400, 400));
-	Posf center(200, 200);
+	PosF center(200, 200);
 	BBox box(0, 0, 10, 10);
 	FOR_EACH_BBOX(box, x, y) {
-		Posf pos(x * 40 + 20, y * 40 + 20);
+		PosF pos(x * 40 + 20, y * 40 + 20);
 		float dir = compute_direction(pos, center);
 		arrow.draw(DrawOptions().angle(dir).origin(CENTER), pos);
 	}
@@ -124,7 +124,7 @@ float frame = 0.0f;
 
 static void draw_animation() {
 	using namespace ldraw;
-	Posf center(200, 200);
+	PosF center(200, 200);
 	frame += 1.0f;
 	animation.draw(DrawOptions().origin(CENTER).frame(frame), center);
 }
@@ -138,7 +138,7 @@ static void draw_script() {
 	luawrap::call<void>(L);
 
 	fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::LEFT_BOTTOM),
-			Posf(0, 400), "Lua");
+			PosF(0, 400), "Lua");
 }
 
 static void draw_script_from_drawable() {
@@ -148,10 +148,10 @@ static void draw_script_from_drawable() {
 	ldraw::Font fpsfont("sample.ttf", 40);
 	lua_getglobal(L, "drawable");
 	Drawable drawable = get<Drawable>(L, -1);
-	drawable.draw(Posf());
+	drawable.draw(PosF());
 
 	fpsfont.drawf(ldraw::DrawOptions(COL_GOLD).origin(ldraw::LEFT_BOTTOM),
-			Posf(0, 400), "LuaDrawable");
+			PosF(0, 400), "LuaDrawable");
 }
 
 static void setup_lua_state() {

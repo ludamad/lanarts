@@ -38,8 +38,8 @@ struct GLImage {
 			int type = GL_BGRA);
 	void image_from_bytes(const Size& size, char* data, int type = GL_BGRA);
 
-	void draw(const ldraw::DrawOptions& options, const Posf& pos);
-	void draw(const Posf& pos) {
+	void draw(const ldraw::DrawOptions& options, const PosF& pos);
+	void draw(const PosF& pos) {
 		draw(ldraw::DrawOptions(), pos);
 	}
 

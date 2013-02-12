@@ -43,18 +43,10 @@ struct GameView {
 		move_towards(x + dx, y + dy);
 	}
 
-	void min_tile_within(int& px, int& py) const;
-	void max_tile_within(int& px, int& py) const;
+	BBox tile_region_covered() const;
 
 	/*Are we outside of the centre of the view enough to warrant snapping the view ?*/
 	bool out_of_view_center(int px, int py);
-
-	BBox tiles_covered() {
-		BBox ret;
-		min_tile_within(ret.x1, ret.y1);
-		max_tile_within(ret.x2, ret.y2);
-		return ret;
-	}
 
 	Size size() {
 		return Size(width, height);
@@ -67,7 +59,7 @@ class GameState;
 
 Pos on_screen(GameState* gs, const Pos& p);
 BBox on_screen(GameState* gs, const BBox& p);
-Posf on_screen(GameState* gs, const Posf& p);
+PosF on_screen(GameState* gs, const PosF& p);
 BBoxF on_screen(GameState* gs, const BBoxF& p);
 
 #endif /* GAMEVIEW_H_ */

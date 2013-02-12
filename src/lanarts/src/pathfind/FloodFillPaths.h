@@ -48,11 +48,14 @@ struct FloodFillNode {
 
 class FloodFillPaths {
 public:
-	FloodFillPaths(BoolGridRef solidity = BoolGridRef());
+	FloodFillPaths(const BoolGridRef& solidity = BoolGridRef());
 	~FloodFillPaths();
+	void initialize(const BoolGridRef& solidity);
 
-//Floodfill based API
-	void calculate_path(GameState* gs, int ox, int oy, int radius);
+	void fill_paths_in_radius(const Pos& source_xy, int radius);
+
+	void fill_paths_tile_region(const Pos& tile_xy, const BBox& area, bool clear_previous = true);
+
 	//Towards object
 	void interpolated_direction(int x, int y, int w, int h, float speed,
 			float& vx, float& vy, bool lenient = false);
@@ -68,7 +71,7 @@ public:
 	FloodFillNode* get(int x, int y) {
 		LANARTS_ASSERT( x >= 0 && x < _size.w );
 		LANARTS_ASSERT( y >= 0 && y < _size.h );
-		return &path[Pos(x, y)];
+		return &_path[Pos(x, y)];
 	}
 
 	BBox location() {
@@ -88,11 +91,10 @@ private:
 	void point_to_random_further(MTwist& mt, int sx, int sy);
 	bool can_head(int sx, int sy, int ex, int ey, int speed, int dx, int dy);
 
-
 	/* Shared with game tile structure! */
 	BoolGridRef _solidity;
 
-	Grid<FloodFillNode> path;
+	Grid<FloodFillNode> _path;
 	/* The source point of the flood fill */
 	Pos _source;
 	/* Grid has own internal size, this is size actually used */

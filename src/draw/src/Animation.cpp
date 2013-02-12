@@ -24,7 +24,7 @@ Animation::Animation(float animation_speed) :
 Animation::~Animation() {
 }
 
-void Animation::draw(const DrawOptions& options, const Posf& pos) const {
+void Animation::draw(const DrawOptions& options, const PosF& pos) const {
 	if (frames.empty()) {
 		return;
 	}

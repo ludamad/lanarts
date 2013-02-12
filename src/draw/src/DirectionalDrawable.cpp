@@ -35,7 +35,7 @@ DirectionalDrawable::~DirectionalDrawable() {
 }
 
 void DirectionalDrawable::draw(const DrawOptions& options,
-		const Posf& pos) const {
+		const PosF& pos) const {
 	if (directions.empty()) {
 		return;
 	}

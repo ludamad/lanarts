@@ -52,7 +52,7 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
 	char dmgstr[32];
 	snprintf(dmgstr, 32, "%d", dmg);
 	gs->add_instance(
-			new AnimatedInst(Pos(), -1, 25, Posf(), Posf(), AnimatedInst::DEPTH,
+			new AnimatedInst(Pos(), -1, 25, PosF(), PosF(), AnimatedInst::DEPTH,
 					dmgstr, Colour(255, 148, 120)));
 
 	return damage(gs, dmg);
@@ -146,7 +146,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 	direction_towards(Pos(x, y), Pos(inst->x, inst->y), rx, ry, 0.5);
 	gs->add_instance(
 			new AnimatedInst(Pos(inst->x - 5 + rx * 5, inst->y + ry * 5), -1,
-					25, Posf(rx, ry), Posf(), AnimatedInst::DEPTH, dmgstr,
+					25, PosF(rx, ry), PosF(), AnimatedInst::DEPTH, dmgstr,
 					Colour(255, 148, 120)));
 
 	if (!ignore_cooldowns) {

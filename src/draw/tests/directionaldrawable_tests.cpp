@@ -38,13 +38,13 @@ static void ldraw_directionaldrawable_draw_test() {
 
 	float ONE_THIRD = FLOAT_PI*2/3;
 
-	dd.draw(DrawOptions().angle(0*ONE_THIRD), Posf());
+	dd.draw(DrawOptions().angle(0*ONE_THIRD), PosF());
 	UNIT_TEST_ASSERT(called_string == "0");
-	dd.draw(DrawOptions().angle(1*ONE_THIRD), Posf());
+	dd.draw(DrawOptions().angle(1*ONE_THIRD), PosF());
 	UNIT_TEST_ASSERT(called_string == "1");
-	dd.draw(DrawOptions().angle(2*ONE_THIRD), Posf());
+	dd.draw(DrawOptions().angle(2*ONE_THIRD), PosF());
 	UNIT_TEST_ASSERT(called_string == "2");
-	dd.draw(DrawOptions().angle(3*ONE_THIRD), Posf());
+	dd.draw(DrawOptions().angle(3*ONE_THIRD), PosF());
 	UNIT_TEST_ASSERT(called_string == "0");
 }
 

@@ -9,7 +9,7 @@
 #include <lcommon/smartptr.h>
 #include <lcommon/geometry.h>
 
-struct Posf;
+struct PosF;
 struct lua_State;
 
 namespace ldraw {
@@ -24,8 +24,8 @@ public:
 	Drawable();
 	~Drawable();
 
-	void draw(const DrawOptions& options, const Posf& pos) const;
-	void draw(const Posf& pos) const;
+	void draw(const DrawOptions& options, const PosF& pos) const;
+	void draw(const PosF& pos) const;
 
 	/* Duration of an animation, 0 means not animated */
 	float animation_duration() const;

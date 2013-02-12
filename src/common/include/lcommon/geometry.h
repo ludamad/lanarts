@@ -22,6 +22,9 @@ struct Pos {
 	explicit Pos(const Size& size);
 	bool operator==(const Pos& o) const;
 	bool operator!=(const Pos& o) const;
+
+	Pos divided(int divisor) const;
+
 	Pos(int x, int y);
 };
 
@@ -69,29 +72,31 @@ struct SizeF {
 };
 
 /*Represents a float x,y pair position*/
-struct Posf {
+struct PosF {
 	float x, y;
-	Posf();
-	Posf(float x, float y);
-	explicit Posf(const SizeF& size);
-	Posf(const Pos& pos);
+	PosF();
+	PosF(float x, float y);
+	explicit PosF(const SizeF& size);
+	PosF(const Pos& pos);
 	void rotate(float angle);
-	Posf rotated(float angle) const;
+	PosF rotated(float angle) const;
 
-	bool operator==(const Posf& o) const;
-	bool operator!=(const Posf& o) const;
+	PosF divided(float divisor) const;
+
+	bool operator==(const PosF& o) const;
+	bool operator!=(const PosF& o) const;
 };
 /*Represents a rectangular region in terms of its start and end x & y values, with floats*/
 struct BBoxF {
 	float x1, y1, x2, y2;
 	BBoxF();
 	BBoxF(float x1, float y1, float x2, float y2);
-	BBoxF(const Posf& pos, const SizeF& size);
+	BBoxF(const PosF& pos, const SizeF& size);
 	BBoxF(const BBox& bbox);
 	bool operator==(const BBoxF& bbox) const;
 	bool operator!=(const BBoxF& o) const;
 	bool contains(float x, float y) const;
-	bool contains(const Posf& p) const;
+	bool contains(const PosF& p) const;
 
 	BBoxF subregion(const BBoxF& bboxf) const;
 
@@ -101,20 +106,20 @@ struct BBoxF {
 	BBoxF scaled(float w, float h) const;
 
 	BBoxF scaled(const SizeF& scale) const;
-	Posf left_top() const;
+	PosF left_top() const;
 
-	Posf center() const;
+	PosF center() const;
 	float center_x() const;
 	float center_y() const;
 	void translate(float x, float y);
 	bool empty() const;
 	BBoxF translated(float x, float y) const;
 
-	BBoxF translated(const Posf& pos) const;
+	BBoxF translated(const PosF& pos) const;
 };
 
 struct QuadF {
-	Posf pos[4];
+	PosF pos[4];
 
 	QuadF() {
 	}
@@ -122,8 +127,8 @@ struct QuadF {
 
 	void rotate(float angle);
 	QuadF rotated(float angle) const;
-	void translate(const Posf& p);
-	QuadF translated(const Posf& p) const;
+	void translate(const PosF& p);
+	QuadF translated(const PosF& p) const;
 };
 
 /* Convenience operators for working with positions */
@@ -140,11 +145,11 @@ Size operator-(const Size& p1, const Size& p2);
 void operator-=(Size& p1, const Size& p2);
 
 /* Floating point versions of the above */
-Posf operator+(const Posf& p1, const Posf& p2);
-void operator+=(Posf& p1, const Posf& p2);
+PosF operator+(const PosF& p1, const PosF& p2);
+void operator+=(PosF& p1, const PosF& p2);
 
-Posf operator-(const Posf& p1, const Posf& p2);
-void operator-=(Posf& p1, const Posf& p2);
+PosF operator-(const PosF& p1, const PosF& p2);
+void operator-=(PosF& p1, const PosF& p2);
 
 SizeF operator+(const SizeF& p1, const SizeF& p2);
 void operator+=(SizeF& p1, const SizeF& p2);

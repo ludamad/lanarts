@@ -25,7 +25,7 @@ public:
 			float _animation_duration = 0);
 	~LuaDrawable();
 
-	void draw(const DrawOptions& options, const Posf& pos) const;
+	void draw(const DrawOptions& options, const PosF& pos) const;
 
 	float animation_duration() const {
 		return _animation_duration;

@@ -81,9 +81,9 @@ void CollisionAvoidance::step() {
 	perf_timer_end(FUNCNAME);
 }
 
-Posf CollisionAvoidance::get_position(simul_id id) {
+PosF CollisionAvoidance::get_position(simul_id id) {
 	RVO::Vector2 pos = simulator->getAgentPosition(id);
-	return Posf(pos.x(), pos.y());
+	return PosF(pos.x(), pos.y());
 }
 
 void CollisionAvoidance::clear() {

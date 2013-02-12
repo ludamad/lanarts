@@ -54,7 +54,7 @@ void Image::initialize(const Size& size, const BBoxF& draw_region,
 	_rotates = rotates;
 }
 
-void Image::draw(const DrawOptions& options, const Posf& pos) const {
+void Image::draw(const DrawOptions& options, const PosF& pos) const {
 	DrawOptions adjusted_options(options);
 	BBoxF region(options.draw_region);
 	if (region == BBoxF()) {

@@ -55,7 +55,7 @@ struct WanderMapSquare {
 
 class WanderMap {
 public:
-	WanderMap(BoolGridRef solidity, const Size& size,
+	WanderMap(const BoolGridRef& solidity, const Size& size,
 			const Size& division_size = Size(10, 10));
 	~WanderMap();
 

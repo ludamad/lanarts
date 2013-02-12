@@ -21,7 +21,7 @@ static void lua_geo_pushget_test() {
 	TestLuaState L;
 	lua_register_geometry(L, luawrap::globals(L));
 
-	lua_generic_pushget_test(L, Posf(0.5, 1.5));
+	lua_generic_pushget_test(L, PosF(0.5, 1.5));
 	lua_generic_pushget_test(L, Pos(1, 2));
 
 	lua_generic_pushget_test(L, SizeF(0.5, 1.5));
@@ -51,11 +51,11 @@ static void lua_pos_bind_test() {
 	lua_assert_valid_dostring(L, code);
 }
 
-static void posf_func1(Posf p) {
-	UNIT_TEST_ASSERT(p == Posf(.5,1.5));
+static void posf_func1(PosF p) {
+	UNIT_TEST_ASSERT(p == PosF(.5,1.5));
 }
-static void posf_func2(const Posf& p) {
-	UNIT_TEST_ASSERT(p == Posf(.5,1.5));
+static void posf_func2(const PosF& p) {
+	UNIT_TEST_ASSERT(p == PosF(.5,1.5));
 }
 
 static void lua_posf_bind_test() {

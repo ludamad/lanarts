@@ -23,7 +23,7 @@ int power_of_two_round(int input) {
 	return value;
 }
 
-float compute_direction(const Posf & p1, const Posf & p2) {
+float compute_direction(const PosF & p1, const PosF & p2) {
 	return atan2(p2.y - p1.y, p2.x - p1.x);
 }
 

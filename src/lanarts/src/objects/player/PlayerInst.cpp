@@ -52,7 +52,8 @@ void PlayerInst::init(GameState* gs) {
 	int previous_level = current_level;
 	CombatGameInst::init(gs);
 	teamid = gs->teams().default_player_team();
-	_path_to_player.calculate_path(gs, x, y, PLAYER_PATHING_RADIUS);
+	_path_to_player.initialize(gs->tiles().solidity_map());
+	_path_to_player.fill_paths_in_radius(pos(), PLAYER_PATHING_RADIUS);
 	collision_simulation_id() = gs->collision_avoidance().add_player_object(
 			this);
 }
@@ -153,7 +154,7 @@ void PlayerInst::shift_autotarget(GameState* gs) {
 
 void PlayerInst::step(GameState* gs) {
 	perf_timer_begin(FUNCNAME);
-	_path_to_player.calculate_path(gs, x, y, PLAYER_PATHING_RADIUS);
+	_path_to_player.fill_paths_in_radius(pos(), PLAYER_PATHING_RADIUS);
 
 	GameInst* target_inst = gs->get_instance(current_target);
 	bool visible = target_inst != NULL
@@ -230,7 +231,7 @@ void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read(last_chosen_weaponclass);
 //	serializer.read_container(queued_actions);
 	queued_actions.clear();
-	_path_to_player.calculate_path(gs, x, y, PLAYER_PATHING_RADIUS);
+	_path_to_player.fill_paths_in_radius(pos(), PLAYER_PATHING_RADIUS);
 	update_field_of_view(gs);
 	DESERIALIZE_POD_REGION(serializer, this, local, spellselect);
 

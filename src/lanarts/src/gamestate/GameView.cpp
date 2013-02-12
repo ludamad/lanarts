@@ -18,40 +18,43 @@ bool GameView::out_of_view_center(int px, int py) {
 void GameView::move_towards(int px, int py) {
 	int dx = px - x, dy = py - y;
 	if (abs(dx) > VIEW_SUBW / 2) {
-		if (px > x)
+		if (px > x) {
 			x = std::min(px - VIEW_SUBW / 2, x + VIEW_SPEED);
-		else
+		} else {
 			x = std::max(px + VIEW_SUBW / 2, x - VIEW_SPEED);
+		}
 		x = std::max(0, std::min(world_width - width, x));
 	}
 	if (abs(dy) > VIEW_SUBH / 2) {
-		if (py > y)
+		if (py > y) {
 			y = std::min(py - VIEW_SUBH / 2, y + VIEW_SPEED);
-		else
+		} else {
 			y = std::max(py + VIEW_SUBH / 2, y - VIEW_SPEED);
+		}
 		y = std::max(0, std::min(world_height - height, y));
 	}
 }
 
-void GameView::min_tile_within(int& px, int& py) const {
-	px = std::max(0, x / TILE_SIZE);
-	py = std::max(0, y / TILE_SIZE);
-}
+BBox GameView::tile_region_covered() const {
+	int min_x = std::max(0, x / TILE_SIZE);
+	int min_y = std::max(0, y / TILE_SIZE);
+	int max_x = (std::min(world_width, x + width)) / TILE_SIZE;
+	int max_y = (std::min(world_height, y + height)) / TILE_SIZE;
 
-void GameView::max_tile_within(int& px, int& py) const {
-	px = (std::min(world_width, x + width)) / TILE_SIZE;
-	py = (std::min(world_height, y + height)) / TILE_SIZE;
+	return BBox(min_x, min_y, max_x, max_y);
 }
 
 void GameView::sharp_center_on(int px, int py) {
-	if (px < width / 2)
+	if (px < width / 2) {
 		px = width / 2;
-	else if (px > world_width - width / 2)
+	} else if (px > world_width - width / 2) {
 		px = world_width - width / 2;
-	if (py < height / 2)
+	}
+	if (py < height / 2) {
 		py = height / 2;
-	else if (py > world_height - height / 2)
+	} else if (py > world_height - height / 2) {
 		py = world_height - height / 2;
+	}
 
 	x = px - width / 2;
 	y = py - height / 2;
@@ -70,9 +73,9 @@ BBox on_screen(GameState* gs, const BBox& b) {
 	return b.translated(-view.x, -view.y);
 
 }
-Posf on_screen(GameState* gs, const Posf& p) {
+PosF on_screen(GameState* gs, const PosF& p) {
 	GameView& view = gs->view();
-	return Posf(p.x - view.x, p.y - view.y);
+	return PosF(p.x - view.x, p.y - view.y);
 
 }
 BBoxF on_screen(GameState* gs, const BBoxF& b) {

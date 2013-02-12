@@ -32,7 +32,7 @@ const extern DrawOrigin
 
 //Assumes left-top origin bbox
 BBoxF adjusted_for_origin(const BBoxF& bbox, DrawOrigin origin);
-Posf adjusted_for_origin(const Posf& pos, const SizeF& size, DrawOrigin origin);
+PosF adjusted_for_origin(const PosF& pos, const SizeF& size, DrawOrigin origin);
 
 struct DrawOptions {
 	DrawOptions(const Colour& draw_colour) :

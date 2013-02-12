@@ -163,7 +163,7 @@ void init_font(font_data* fd, const char* fname, unsigned int h) {
  *  Text display routines & helper functions                      *
  ******************************************************************/
 
-static void gl_draw_glyph(const font_data& font, char glyph, const Posf& pos,
+static void gl_draw_glyph(const font_data& font, char glyph, const PosF& pos,
 		const SizeF& scale) {
 	const GLImage& img = font.font_img;
 	const char_data& data = font.data[glyph];
@@ -221,7 +221,7 @@ static int process_string(const font_data& font, const char* text,
 //
 /* General gl_print function for others to delegate to */
 static SizeF gl_print_impl(const DrawOptions& options, const font_data& font,
-		Posf p, int maxwidth, bool actually_print, const char* text) {
+		PosF p, int maxwidth, bool actually_print, const char* text) {
 	perf_timer_begin(FUNCNAME);
 
 	LDRAW_ASSERT(options.draw_region == BBoxF());
@@ -281,32 +281,32 @@ void Font::initialize(const char* filename, int height) {
 	init_font(_font.get(), filename, height);
 }
 
-void Font::draw_wrapped(const DrawOptions& options, const Posf& position,
+void Font::draw_wrapped(const DrawOptions& options, const PosF& position,
 		int maxwidth, const char* str) const {
 	gl_print_impl(options, *_font, position, maxwidth, true, str);
 }
 
-void Font::drawf_wrapped(const DrawOptions& options, const Posf& position,
+void Font::drawf_wrapped(const DrawOptions& options, const PosF& position,
 		int maxwidth, const char* fmt, ...) const {
 	VARARG_STR_FORMAT(_print_buffer, fmt);
 	draw_wrapped(options, position, maxwidth, _print_buffer);
 }
 
-int Font::draw(const DrawOptions& options, const Posf& position,
+int Font::draw(const DrawOptions& options, const PosF& position,
 		const char* str) const {
 	Colour c = options.draw_colour;
 	SizeF size = gl_print_impl(options, *_font, position, -1, true, str);
 	return size.w;
 }
 
-int Font::drawf(const DrawOptions& options, const Posf& position,
+int Font::drawf(const DrawOptions& options, const PosF& position,
 		const char* fmt, ...) const {
 	VARARG_STR_FORMAT(_print_buffer, fmt);
 	return draw(options, position, _print_buffer);
 }
 
 SizeF Font::get_draw_size(const char* str, int maxwidth) const {
-	return gl_print_impl(DrawOptions(), *_font, Posf(), maxwidth, false, str);
+	return gl_print_impl(DrawOptions(), *_font, PosF(), maxwidth, false, str);
 }
 
 SizeF Font::get_draw_size(const std::string& str, int maxwidth) const {

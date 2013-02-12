@@ -27,11 +27,10 @@ static void fill_buff2d(char* buff, int w, int h, int x, int y,
 		}
 }
 
-static void draw_rect2d(char* buff, int w, int h, int x, int y, int mx, int my,
-		const Colour& col) {
-	for (int yy = y; yy < my; yy++)
-		for (int xx = x; xx < mx; xx++) {
-			if (xx == x || yy == y || xx == mx - 1 || yy == my - 1) {
+static void draw_rect2d(char* buff, int w, int h, BBox bbox, const Colour& col) {
+	for (int yy = bbox.y1; yy < bbox.y2; yy++)
+		for (int xx = bbox.x1; xx < bbox.x2; xx++) {
+			if (xx == bbox.x1 || yy == bbox.y1 || xx == bbox.x2 - 1 || yy == bbox.y2 - 1) {
 				int loc = yy * w + xx;
 				buff[loc * 4] = col.b;
 				buff[loc * 4 + 1] = col.g;
@@ -69,31 +68,29 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 			iter += 4;
 		}
 	}
-	const std::vector<obj_id>& enemy_ids =
-			gs->monster_controller().monster_ids();
+	const std::vector<obj_id>& enemy_ids = gs->monster_controller().monster_ids();
+
 	for (int i = 0; i < enemy_ids.size(); i++) {
 		GameInst* enemy = gs->get_instance(enemy_ids[i]);
 		if (enemy) {
 			int ex = enemy->x / TILE_SIZE;
 			int ey = enemy->y / TILE_SIZE;
-			int loc = ey * ptw + ex;
-			if (!minimap_reveal && !tiles.is_seen(Pos(ex, ey)))
-				continue;
-			if (!minimap_reveal && !gs->object_visible_test(enemy))
-				continue;
 
+			if (!minimap_reveal && !tiles.is_seen(Pos(ex, ey))) {
+				continue;
+			}
+
+			if (!minimap_reveal && !gs->object_visible_test(enemy)) {
+				continue;
+			}
+
+			int loc = ey * ptw + ex;
 			buff[loc * 4] = 0;
 			buff[loc * 4 + 1] = 0;
 			buff[loc * 4 + 2] = 255;
 			buff[loc * 4 + 3] = 255;
 		}
 	}
-//
-//	int min_tilex, min_tiley;
-//	int max_tilex, max_tiley;
-//
-//	view.min_tile_within(min_tilex, min_tiley);
-//	view.max_tile_within(max_tilex, max_tiley);
 }
 
 const int MINIMAP_SIZEMAX = 128;
@@ -124,17 +121,14 @@ static void init_minimap_buff(char* minimap_arr, int ptw, int pth) {
 	}
 }
 
+// Draws a minimap from the contents of gs->tile_grid()
 void Minimap::draw(GameState* gs, float scale) {
-	//Draw a mini version of the contents of gs->tile_grid()
+
 	GameTiles& tiles = gs->tiles();
 	GameView& view = gs->view();
 	BBox bbox = minimap_bounds(gs);
 
-	int min_tilex, min_tiley;
-	int max_tilex, max_tiley;
-
-	view.min_tile_within(min_tilex, min_tiley);
-	view.max_tile_within(max_tilex, max_tiley);
+	BBox view_region = view.tile_region_covered();
 
 	int ptw = power_of_two_round(MINIMAP_SIZEMAX), pth = power_of_two_round(
 			MINIMAP_SIZEMAX);
@@ -152,11 +146,9 @@ void Minimap::draw(GameState* gs, float scale) {
 		int arr_x = (player->x / TILE_SIZE), arr_y = (player->y / TILE_SIZE);
 		fill_buff2d(minimap_arr, ptw, pth, arr_x - arr_x % 2, arr_y - arr_y % 2,
 				Colour(255, 180, 99), 2, 2);
-		draw_rect2d(minimap_arr, ptw, pth, min_tilex, min_tiley, max_tilex,
-				max_tiley, Colour(255, 180, 99)); //
+		draw_rect2d(minimap_arr, ptw, pth, view_region, Colour(255, 180, 99)); //
 	}
 	minimap_buff.from_bytes(Size(ptw, pth), minimap_arr);
 
 	minimap_buff.draw(bbox.left_top());
 }
-

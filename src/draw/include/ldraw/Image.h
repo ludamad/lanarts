@@ -67,7 +67,7 @@ public:
 		return _rotates;
 	}
 
-	void draw(const DrawOptions& options, const Posf& pos) const;
+	void draw(const DrawOptions& options, const PosF& pos) const;
 	void initialize(const std::string& filename, const BBoxF& draw_region =
 			BBoxF(), bool rotates = false);
 	void initialize(const Size& size, const BBoxF& draw_region = BBoxF(),

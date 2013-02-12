@@ -17,17 +17,17 @@ static void install_numeric_tuple() {
 	luawrap::install_type<T, ImplClass::push, ImplClass::get, ImplClass::check>();
 }
 
-static bool bbox_contains(const BBoxF& bbox, const Posf& pos) {
+static bool bbox_contains(const BBoxF& bbox, const PosF& pos) {
 	return bbox.contains(pos);
 }
-static BBoxF bbox_create(const Posf& pos, const SizeF& size) {
+static BBoxF bbox_create(const PosF& pos, const SizeF& size) {
 	return BBoxF(pos, size);
 }
 
 // lua state & module is not currently used but passed for future-proofing
 void lua_register_geometry(lua_State* L, const LuaValue& module) {
 	install_numeric_tuple<Pos, int>();
-	install_numeric_tuple<Posf, float>();
+	install_numeric_tuple<PosF, float>();
 	install_numeric_tuple<Size, int>();
 	install_numeric_tuple<SizeF, float>();
 	install_numeric_tuple<BBox, int>();

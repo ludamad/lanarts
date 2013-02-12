@@ -5,7 +5,7 @@
 #include <lcommon/smartptr.h>
 
 struct Colour;
-struct Posf;
+struct PosF;
 struct SizeF;
 
 namespace ldraw {
@@ -31,25 +31,25 @@ public:
 	}
 
 	// Standard font draw functions
-	int draw(const DrawOptions& options, const Posf& position,
+	int draw(const DrawOptions& options, const PosF& position,
 			const char* str) const;
-	int draw(const DrawOptions& options, const Posf& position,
+	int draw(const DrawOptions& options, const PosF& position,
 			const std::string& str) const {
 		return draw(options, position, str.c_str());
 	}
 
 	// Wrap over a maxwidth:
-	void draw_wrapped(const DrawOptions& options, const Posf& position,
+	void draw_wrapped(const DrawOptions& options, const PosF& position,
 			int maxwidth, const char* str) const;
-	void draw_wrapped(const DrawOptions& options, const Posf& position,
+	void draw_wrapped(const DrawOptions& options, const PosF& position,
 			int maxwidth, const std::string& str) const {
 		draw_wrapped(options, position, maxwidth, str.c_str());
 	}
 
 	//These operate similar to printf:
-	int drawf(const DrawOptions& options, const Posf& position,
+	int drawf(const DrawOptions& options, const PosF& position,
 			const char* fmt, ...) const;
-	void drawf_wrapped(const DrawOptions& options, const Posf& position,
+	void drawf_wrapped(const DrawOptions& options, const PosF& position,
 			int maxwidth, const char* fmt, ...) const;
 
 	// Return the size that would be drawn

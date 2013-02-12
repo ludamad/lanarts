@@ -18,10 +18,10 @@ public:
 	using DrawableBase::draw;
 
 	DrawableMock(const std::string& value, std::string* str,
-			DrawOptions* options = NULL, Posf* posf= NULL) :
+			DrawOptions* options = NULL, PosF* posf= NULL) :
 			value(value), _str(str), _options(options), _posf(posf) {
 	}
-	virtual void draw(const DrawOptions& options, const Posf& pos) const {
+	virtual void draw(const DrawOptions& options, const PosF& pos) const {
 		if (_str) {
 			*_str = value;
 		}
@@ -36,7 +36,7 @@ private:
 	std::string value;
 	std::string* _str;
 	DrawOptions* _options;
-	Posf* _posf;
+	PosF* _posf;
 };
 
 }

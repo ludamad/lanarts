@@ -639,7 +639,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 				snprintf(buffstr, 32, "%d XP", amnt);
 				gs->add_instance(
 						new AnimatedInst(Pos(e->x - 5, e->y - 5), -1, 25,
-								Posf(), Posf(), AnimatedInst::DEPTH, buffstr,
+								PosF(), PosF(), AnimatedInst::DEPTH, buffstr,
 								Colour(255, 215, 11)));
 			}
 		}

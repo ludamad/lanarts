@@ -15,13 +15,13 @@ const DrawOrigin
 
 BBoxF adjusted_for_origin(const BBoxF & bbox, DrawOrigin origin) {
 	SizeF size = bbox.size();
-	Posf new_lefttop = adjusted_for_origin(bbox.left_top(), size, origin);
+	PosF new_lefttop = adjusted_for_origin(bbox.left_top(), size, origin);
 	return BBoxF(new_lefttop, size);
 }
 
-Posf adjusted_for_origin(const Posf & pos, const SizeF & size,
+PosF adjusted_for_origin(const PosF & pos, const SizeF & size,
 		DrawOrigin origin) {
-	return Posf(pos.x - origin.placement_x * size.w,
+	return PosF(pos.x - origin.placement_x * size.w,
 				pos.y - origin.placement_y * size.h);
 }
 

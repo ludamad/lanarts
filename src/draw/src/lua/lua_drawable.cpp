@@ -68,11 +68,11 @@ void lua_pushdrawable(lua_State* L, const Drawable& drawable) {
 		}
 		const Drawable& drawable = lua_getdrawable(L, 1);
 		if (nargs == 2) {
-			Posf p = get < Posf > (L, 2);
+			PosF p = get < PosF > (L, 2);
 			drawable.draw(p);
 		} else if (nargs == 3) {
 			DrawOptions options = luawrap::get < DrawOptions > (L, 2);
-			Posf p = get < Posf > (L, 3);
+			PosF p = get < PosF > (L, 3);
 			drawable.draw(options, p);
 		} else {
 			luaL_error(L, LERR_MSG);

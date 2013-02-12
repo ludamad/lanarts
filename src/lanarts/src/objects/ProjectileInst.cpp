@@ -153,7 +153,7 @@ void ProjectileInst::step(GameState* gs) {
 			gs->add_instance(
 					new AnimatedInst(
 							Pos(victim->x - 5 + rx * 5, victim->y + ry * 5), -1,
-							25, Posf(rx, ry), Posf(), AnimatedInst::DEPTH,
+							25, PosF(rx, ry), PosF(), AnimatedInst::DEPTH,
 							buffstr));
 
 			if (victim->damage(gs, damage)) {
@@ -167,7 +167,7 @@ void ProjectileInst::step(GameState* gs) {
 
 				snprintf(buffstr, 32, "%d XP", amnt);
 				gs->add_instance(
-						new AnimatedInst(victim->pos(), -1, 25, Posf(), Posf(),
+						new AnimatedInst(victim->pos(), -1, 25, PosF(), PosF(),
 								AnimatedInst::DEPTH, buffstr, COL_GOLD));
 			}
 		}
@@ -195,7 +195,7 @@ void ProjectileInst::step(GameState* gs) {
 			gs->add_instance(
 					new AnimatedInst(
 							Pos(colobj->x - 5 + rx * 5, colobj->y + ry * 5), -1,
-							25, Posf(rx, ry), Posf(), AnimatedInst::DEPTH,
+							25, PosF(rx, ry), PosF(), AnimatedInst::DEPTH,
 							dmgstr));
 		}
 	}
@@ -227,8 +227,8 @@ void ProjectileInst::step(GameState* gs) {
 		}
 		if (hits == 0 || sole_target == 0) {
 			gs->add_instance(
-					new AnimatedInst(pos(), sprite(), 15, Posf(),
-							Posf(vx, vy)));
+					new AnimatedInst(pos(), sprite(), 15, PosF(),
+							PosF(vx, vy)));
 			gs->remove_instance(this);
 		}
 	}

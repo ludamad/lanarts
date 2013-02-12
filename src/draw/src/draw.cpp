@@ -42,7 +42,7 @@ void ldraw::draw_rectangle_outline(const Colour& clr, const BBoxF& bbox,
 const float PI = 3.141592f;
 const float DEG2RAD = PI / 180.0f;
 
-static void gl_draw_circle(const Colour& clr, const Posf& pos, float radius,
+static void gl_draw_circle(const Colour& clr, const PosF& pos, float radius,
 		bool outline) {
 	if (radius < .5)
 		return;
@@ -61,11 +61,11 @@ static void gl_draw_circle(const Colour& clr, const Posf& pos, float radius,
 	glEnd();
 }
 
-void ldraw::draw_circle(const Colour& clr, const Posf& pos, float radius) {
+void ldraw::draw_circle(const Colour& clr, const PosF& pos, float radius) {
 	gl_draw_circle(clr, pos, radius, false);
 }
 
-void ldraw::draw_circle_outline(const Colour& clr, const Posf& pos,
+void ldraw::draw_circle_outline(const Colour& clr, const PosF& pos,
 		float radius, int linewidth) {
 	if (linewidth != 1)
 		glLineWidth(linewidth);
@@ -74,7 +74,7 @@ void ldraw::draw_circle_outline(const Colour& clr, const Posf& pos,
 		glLineWidth(1);
 }
 
-void ldraw::draw_line(const Colour& clr, const Posf& p1, const Posf& p2,
+void ldraw::draw_line(const Colour& clr, const PosF& p1, const PosF& p2,
 		int linewidth) {
 
 	if (linewidth != 1)

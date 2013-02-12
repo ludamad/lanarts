@@ -168,7 +168,7 @@ static void gl_image_from_bytes(GLImage& img, const Size& size, char* data,
 	glDisable(GL_TEXTURE_2D);
 }
 
-static void glVertex(const Posf& pos) {
+static void glVertex(const PosF& pos) {
 	glVertex2i(pos.x, pos.y);
 }
 
@@ -205,7 +205,7 @@ void GLImage::image_from_bytes(const Size& size, char* data, int type) {
 	gl_image_from_bytes(*this, size, data, type);
 }
 
-void GLImage::draw(const ldraw::DrawOptions& options, const Posf& pos) {
+void GLImage::draw(const ldraw::DrawOptions& options, const PosF& pos) {
 	BBoxF draw_region(0, 0, width, height);
 
 	//Assert so unused settings don't pass through silently
@@ -223,7 +223,7 @@ void GLImage::draw(const ldraw::DrawOptions& options, const Posf& pos) {
 		return;
 	}
 
-	BBoxF adjusted = adjusted_for_origin(BBoxF(Posf(), draw_region.size()),
+	BBoxF adjusted = adjusted_for_origin(BBoxF(PosF(), draw_region.size()),
 			options.draw_origin).scaled(options.draw_scale);
 
 	QuadF quad(adjusted, options.draw_angle);

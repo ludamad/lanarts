@@ -11,7 +11,7 @@
 #include "geometry.h"
 
 int power_of_two_round(int input);
-float compute_direction(const Posf& p1, const Posf& p2);
+float compute_direction(const PosF& p1, const PosF& p2);
 
 const float FLOAT_PI = 3.14159265358979323846f;
 

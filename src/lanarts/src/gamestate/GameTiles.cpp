@@ -94,19 +94,18 @@ void GameTiles::pre_draw(GameState* gs) {
 	Size size = this->size();
 	GameView& view = gs->view();
 
-	int min_tilex, min_tiley;
-	int max_tilex, max_tiley;
+	BBox region = view.tile_region_covered();
 
-	view.min_tile_within(min_tilex, min_tiley);
-	view.max_tile_within(max_tilex, max_tiley);
+	if (region.x2 >= size.w) {
+		region.x2 = size.w - 1;
+	}
+	if (region.y2 >= size.h) {
+		region.y2 = size.h - 1;
+	}
 
-	if (max_tilex >= size.w)
-		max_tilex = size.w - 1;
-	if (max_tiley >= size.h)
-		max_tiley = size.h - 1;
 //	bool reveal_enabled = gs->key_down_state(SDLK_BACKQUOTE);
-	for (int y = min_tiley; y <= max_tiley; y++) {
-		for (int x = min_tilex; x <= max_tilex; x++) {
+	for (int y = region.y1; y <= region.y2; y++) {
+		for (int x = region.x1; x <= region.x2; x++) {
 			Tile& tile = get(Pos(x, y));
 			const ldraw::Image& img = res::tile(tile.tile).img(tile.subtile);
 			if (/*reveal_enabled ||*/is_seen(Pos(x, y))) {
@@ -149,16 +148,16 @@ void GameTiles::post_draw(GameState* gs) {
 
 	Size size = this->size();
 	GameView& view = gs->view();
-	int min_tilex, min_tiley;
-	int max_tilex, max_tiley;
 
-	view.min_tile_within(min_tilex, min_tiley);
-	view.max_tile_within(max_tilex, max_tiley);
+	BBox region = view.tile_region_covered();
 
-	if (max_tilex >= size.w)
-		max_tilex = size.w - 1;
-	if (max_tiley >= size.h)
-		max_tiley = size.h - 1;
+	if (region.x2 >= size.w) {
+		region.x2 = size.w - 1;
+	}
+	if (region.y2 >= size.h) {
+		region.y2 = size.h - 1;
+	}
+
 	const int sub_sqrs = VISION_SUBSQRS;
 
 	if (/*gs->key_down_state(SDLK_BACKQUOTE) ||*/!gs->level_has_player()) {
@@ -168,8 +167,8 @@ void GameTiles::post_draw(GameState* gs) {
 
 	fov& mainfov = gs->local_player()->field_of_view();
 	char matches[sub_sqrs * sub_sqrs];
-	for (int y = min_tiley; y <= max_tiley; y++) {
-		for (int x = min_tilex; x <= max_tilex; x++) {
+	for (int y = region.y1; y <= region.y2; y++) {
+		for (int x = region.x1; x <= region.x2; x++) {
 			bool has_match = false, has_free = false;
 			bool is_other_match = false;
 			Tile& tile = get(Pos(x, y));
