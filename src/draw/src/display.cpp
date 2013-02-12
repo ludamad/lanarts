@@ -9,6 +9,7 @@
 #include <GL/glu.h>
 
 #include <lcommon/geometry.h>
+#include <lcommon/perf_timer.h>
 
 #include "display.h"
 
@@ -132,7 +133,9 @@ void ldraw::display_draw_start() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 void ldraw::display_draw_finish() {
+	perf_timer_begin("SDL_GL_SwapBuffers");
 	SDL_GL_SwapBuffers();
+	perf_timer_end("SDL_GL_SwapBuffers");
 }
 
 Size ldraw::display_size() {

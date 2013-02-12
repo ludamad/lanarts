@@ -93,6 +93,7 @@ int main(int argc, char** argv) {
 		bool did_exit = !luawrap::call<bool>(L);
 		if (did_exit) goto label_Quit; /* User has quit! */
 	}
+	perf_timer_clear();
 
 	if (gs->start_game()) {
 		lua_getglobal(L, "main");
