@@ -149,6 +149,7 @@ bool Pos::operator !=(const Pos& o) const {
 }
 
 Pos Pos::divided(int divisor) const {
+	return Pos(x / divisor, y / divisor);
 }
 
 Pos::Pos(int x, int y) :
@@ -273,6 +274,7 @@ bool PosF::operator ==(const PosF& o) const {
 }
 
 PosF PosF::divided(float divisor) const {
+	return PosF(x / divisor, y / divisor);
 }
 
 bool PosF::operator !=(const PosF& o) const {
