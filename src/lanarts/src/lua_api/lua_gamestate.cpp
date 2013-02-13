@@ -60,8 +60,8 @@ static int game_input_capture(lua_State* L) {
 }
 
 static int game_input_handle(lua_State* L) {
-	bool quit = lua_api::gamestate(L)->pre_step();
-	lua_pushboolean(L, quit);
+	bool status = lua_api::gamestate(L)->pre_step();
+	lua_pushboolean(L, status); // should quit on false
 	return 1;
 }
 

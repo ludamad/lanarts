@@ -8,6 +8,7 @@
 #include <lua.hpp>
 
 #include <luawrap/luawrap.h>
+#include <luawrap/calls.h>
 
 #include <lcommon/lua_lcommon.h>
 
@@ -189,8 +190,20 @@ LuaValue lua_sprites, lua_armours, lua_enemies, lua_effects, lua_weapons,
 
 LuaValue lua_settings;
 
+static void update_loading_screen(lua_State* L, int percent) {
+	lua_api::require(L, "start_menu/loading.lua"); // for system.loading_draw
+	luawrap::globals(L)["system"].push();
+
+	lua_getfield(L, -1, "loading_draw");
+	if (!lua_isnil(L, -1)) {
+		luawrap::call<void>(L, percent);
+	}
+
+	lua_pop(L, 1); /* pop system table */
+}
+
 void init_game_data(GameSettings& settings, lua_State* L) {
-	LuaValue globals = luawrap::globals(L);
+	LuaSpecialValue globals = luawrap::globals(L);
 
 	DataFiles dfiles = load_datafilenames("res/datafiles.yaml");
 
@@ -202,25 +215,36 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 	lua_sprites.clear();
 	load_tileset_data(dfiles.tileset_files);
 
+	update_loading_screen(L, 0);
 	// --- ITEM DATA ---
 	lua_items = load_item_data(L, dfiles.item_files); //new
+	update_loading_screen(L, 10);
 
 	lua_projectiles = load_projectile_data(L, dfiles.projectile_files,
 			lua_items);
+	update_loading_screen(L, 20);
 
 	lua_spells = load_spell_data(L, dfiles.spell_files);
+	update_loading_screen(L, 30);
 
 	load_weapon_data(L, dfiles.weapon_files, &lua_items);
+	update_loading_screen(L, 40);
 
 	load_equipment_data(L, dfiles.equipment_files, &lua_items);
+	update_loading_screen(L, 10);
 	// --- ITEM DATA ---
 
 	lua_effects = load_effect_data(L, dfiles.effect_files);
+	update_loading_screen(L, 10);
 	lua_enemies = load_enemy_data(L, dfiles.enemy_files);
+	update_loading_screen(L, 10);
 
 	load_itemgenlist_data(L, dfiles.itemgenlist_files);
+	update_loading_screen(L, 10);
 	load_area_template_data(dfiles.level_template_files);
+	update_loading_screen(L, 10);
 	lua_dungeon = load_dungeon_data(L, dfiles.level_files);
+	update_loading_screen(L, 10);
 	lua_dungeon.clear();
 	lua_classes = load_class_data(L, dfiles.class_files);
 }

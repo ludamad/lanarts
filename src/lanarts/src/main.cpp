@@ -73,6 +73,7 @@ static GameState* init_gamestate() {
 
 /* Must take (int, char**) to play nice with SDL */
 int main(int argc, char** argv) {
+label_StartOver:
 
 	GameState* gs = init_gamestate();
 	lua_State* L = gs->luastate();
@@ -93,16 +94,23 @@ int main(int argc, char** argv) {
 		bool did_exit = !luawrap::call<bool>(L);
 		if (did_exit) goto label_Quit; /* User has quit! */
 	}
+
 	perf_timer_clear();
 
 	if (gs->start_game()) {
 		lua_getglobal(L, "main");
 		luawrap::call<void>(L);
+
+		if (!gs->io_controller().user_has_exit()) {
+			delete gs;
+			goto label_StartOver;
+		}
 	}
 
 	save_settings_data(gs->game_settings(), "saved_settings.yaml"); // Save full in-game results
 
-	label_Quit:
+label_Quit:
+
 	lanarts_quit();
 
 	delete gs;

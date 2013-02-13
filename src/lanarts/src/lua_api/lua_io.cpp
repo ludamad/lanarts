@@ -206,6 +206,7 @@ namespace lua_api {
 		LuaValue keys = globals["keys"].ensure_table();
 
 		keys["ENTER"] = (int)SDLK_RETURN;
+		keys["TAB"] = (int)SDLK_TAB;
 		keys["ESCAPE"] = (int)SDLK_ESCAPE;
 		keys["SPACE"] = (int)SDLK_SPACE;
 		keys["DELETE"] = (int)SDLK_DELETE;

@@ -51,17 +51,6 @@ local PLAYER_COLOURS = {
     COL_PALE_GREEN, COL_PALE_BLUE, COL_LIGHT_GRAY 
 }
 
-local test_values = { 
-    { name = "ludamad", class_name = "Mage" }, 
-    { name = "putterson", class_name = "Archer" }, 
-    { name = "azsc", class_name = "Fighter" },
-    { name = "thetest", class_name = "Mage" },
-    { name = "is", class_name = "Archer" },
-    { name = "ON!", class_name = "Fighter" },
-    { name = "is", class_name = "Archer" },
-    { name = "ON!", class_name = "Fighter" }
-}
-
 local function lobby_joined_players_list_create()
     local font = font_cached_load(settings.menu_font, 20)
     local group = InstanceGroup.create()

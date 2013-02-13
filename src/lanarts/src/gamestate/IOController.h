@@ -134,6 +134,8 @@ public:
 	bool query_event(const IOEvent& event, bool* triggered_already = NULL);
 	bool query_event(IOEvent::event_t event, bool* triggered_already = NULL);
 
+	bool user_has_exit() const;
+
 private:
 	void __trigger_events(IOEventTrigger::trigger_t trigger, SDLKey trigger_key,
 			SDLMod mod, bool holding_key);

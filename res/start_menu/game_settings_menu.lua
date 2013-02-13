@@ -272,6 +272,17 @@ local function class_choice_buttons_create()
     local button_size = { 96, 96 + y_padding + font.height }
     local button_row = InstanceLine.create( { dx = button_size[1] + x_padding } )
 
+    function button_row:step(xy)
+        InstanceLine.step(self, xy)
+
+        -- Allow choosing a class by using left/right arrows or tab
+        if key_pressed(keys.LEFT) then
+            settings.class_type = ( settings.class_type - 1 ) % #buttons
+        elseif key_pressed(keys.RIGHT) or key_pressed(keys.TAB) then
+            settings.class_type = ( settings.class_type + 1 ) % #buttons
+        end
+    end
+
     for i = 1, #buttons do
         local button = buttons[i]
 

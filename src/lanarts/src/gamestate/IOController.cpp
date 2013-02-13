@@ -278,7 +278,7 @@ int IOController::handle_event(SDL_Event* event) {
 		break;
 	}
 	case SDL_QUIT:
-		done = 1;
+		done = 2;
 		break;
 	}
 
@@ -291,6 +291,15 @@ void IOController::update_iostate(bool resetprev) {
 }
 std::vector<SDL_Event>& IOController::get_events() {
 	return iostate.sdl_events;
+}
+
+bool IOController::user_has_exit() const {
+	for (int i = 0; i < iostate.sdl_events.size(); i++) {
+		if (iostate.sdl_events[i].type == SDL_QUIT) {
+			return true;
+		}
+	}
+	return false;
 }
 
 void IOController::__trigger_events(IOEventTrigger::trigger_t trigger,
