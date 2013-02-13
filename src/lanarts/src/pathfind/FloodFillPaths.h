@@ -54,28 +54,25 @@ public:
 
 	void fill_paths_in_radius(const Pos& source_xy, int radius);
 
-	void fill_paths_tile_region(const Pos& tile_xy, const BBox& area, bool clear_previous = true);
+	void fill_paths_tile_region(const Pos& tile_xy, const BBox& area,
+			bool clear_previous = true);
 
 	//Towards object
-	void interpolated_direction(int x, int y, int w, int h, float speed,
-			float& vx, float& vy, bool lenient = false);
-	void interpolated_direction(const BBox& bbox, float speed, float& vx,
-			float& vy) {
-		interpolated_direction(bbox.x1, bbox.y1, bbox.width(), bbox.height(),
-				speed, vx, vy);
-	}
+	PosF interpolated_direction(const BBox& bbox, float speed, bool lenient = false);
+
 	//Away from object
-	void random_further_direction(MTwist& mt, int x, int y, int w, int h,
-			float speed, float& vx, float& vy);
+	PosF random_further_direction(MTwist& mt, int x, int y, int w, int h,
+			float speed);
 
 	FloodFillNode* get(int x, int y) {
-		LANARTS_ASSERT( x >= 0 && x < _size.w );
-		LANARTS_ASSERT( y >= 0 && y < _size.h );
+		LANARTS_ASSERT( x >= 0 && x < _size.w);
+		LANARTS_ASSERT( y >= 0 && y < _size.h);
 		return &_path[Pos(x, y)];
 	}
 
 	BBox location() {
-		return BBox(_source.x, _source.y, _source.x + _size.w, _source.y + _size.h);
+		return BBox(_source.x, _source.y, _source.x + _size.w,
+				_source.y + _size.h);
 	}
 
 	int width() const {
@@ -89,7 +86,7 @@ public:
 private:
 	void point_to_local_min(int sx, int sy);
 	void point_to_random_further(MTwist& mt, int sx, int sy);
-	bool can_head(int sx, int sy, int ex, int ey, int speed, int dx, int dy);
+	bool can_head(const BBox& bbox, int speed, int dx, int dy);
 
 	/* Shared with game tile structure! */
 	BoolGridRef _solidity;

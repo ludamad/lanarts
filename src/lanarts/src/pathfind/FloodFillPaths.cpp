@@ -74,8 +74,8 @@ void FloodFillPaths::initialize(const BoolGridRef& solidity) {
 FloodFillPaths::~FloodFillPaths() {
 }
 
-
-void FloodFillPaths::fill_paths_tile_region(const Pos& tile_xy, const BBox& area, bool clear_previous) {
+void FloodFillPaths::fill_paths_tile_region(const Pos& tile_xy,
+		const BBox& area, bool clear_previous) {
 	_source = area.left_top();
 	_size = area.size();
 
@@ -105,7 +105,8 @@ void FloodFillPaths::fill_paths_in_radius(const Pos& source_xy, int radius) {
 	perf_timer_begin(FUNCNAME);
 
 	//Use a temporary 'GameView' object to make use of its helper methods
-	GameView view(0, 0, radius * 2, radius * 2, _solidity->width() * TILE_SIZE, _solidity->height() * TILE_SIZE);
+	GameView view(0, 0, radius * 2, radius * 2, _solidity->width() * TILE_SIZE,
+			_solidity->height() * TILE_SIZE);
 	view.sharp_center_on(source_xy);
 
 	BBox tiles_covered = view.tile_region_covered();
@@ -124,15 +125,16 @@ static bool is_solid_or_out_of_bounds(FloodFillPaths& path, int x, int y) {
 	return path.get(x, y)->solid;
 }
 
-bool FloodFillPaths::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
+bool FloodFillPaths::can_head(const BBox& bbox, int speed, int dx,
 		int dy) {
 	bool is_diag = (abs(dx) == abs(dy));
 
 	int xx, yy;
-	for (int y = sy; y <= ey + TILE_SIZE; y += TILE_SIZE) {
-		for (int x = sx; x <= ex + TILE_SIZE; x += TILE_SIZE) {
-			xx = squish(x, sx, ex + 1);
-			yy = squish(y, sy, ey + 1);
+	for (int y = bbox.y1; y <= bbox.y2 + TILE_SIZE; y += TILE_SIZE) {
+		for (int x = bbox.x1; x <= bbox.x2 + TILE_SIZE; x += TILE_SIZE) {
+			xx = squish(x, bbox.x1, bbox.x2 + 1);
+			yy = squish(y, bbox.y1, bbox.y2 + 1);
+
 			int gx = (xx + dx * speed) / TILE_SIZE - _source.x;
 			int gy = (yy + dy * speed) / TILE_SIZE - _source.y;
 			if (is_solid_or_out_of_bounds(*this, gx, gy)) {
@@ -155,12 +157,11 @@ bool FloodFillPaths::can_head(int sx, int sy, int ex, int ey, int speed, int dx,
 }
 
 //Away from object
-void FloodFillPaths::random_further_direction(MTwist& mt, int x, int y, int w,
-		int h, float speed, float& vx, float& vy) {
+PosF FloodFillPaths::random_further_direction(MTwist& mt, int x, int y, int w,
+		int h, float speed) {
 
 	if (_path.empty()) {
-		vx = 0, vy = 0;
-		return;
+		return PosF();
 	}
 
 	int mx = x + w, my = y + h;
@@ -187,23 +188,23 @@ void FloodFillPaths::random_further_direction(MTwist& mt, int x, int y, int w,
 			}
 		}
 	}
-	interpolated_direction(x, y, w, h, speed, vx, vy);
+
+	return interpolated_direction( BBox(x, y, x + w, y + h), speed);
 }
 
-void FloodFillPaths::interpolated_direction(int x, int y, int w, int h,
-		float speed, float& vx, float& vy, bool lenient) {
+PosF FloodFillPaths::interpolated_direction(const BBox& bbox, float speed,
+		bool lenient) {
 
 	if (_path.empty()) {
-		vx = 0, vy = 0;
-		return;
+		return PosF();
 	}
 
-	int ispeed = (int)ceil(speed);
-	int area = w * h;
-	int mx = x + w, my = y + h;
+	int ispeed = (int) ceil(speed);
+	int area = bbox.size().area();
+
 	//Set up coordinate min and max
-	int mingrid_x = x / TILE_SIZE, mingrid_y = y / TILE_SIZE;
-	int maxgrid_x = mx / TILE_SIZE, maxgrid_y = my / TILE_SIZE;
+	int mingrid_x = bbox.x1 / TILE_SIZE, mingrid_y = bbox.y1 / TILE_SIZE;
+	int maxgrid_x = bbox.x2 / TILE_SIZE, maxgrid_y = bbox.y2 / TILE_SIZE;
 	//Make sure coordinates do not go out of bounds
 	int minx = squish(mingrid_x, _source.x, _source.x + width());
 	int miny = squish(mingrid_y, _source.y, _source.y + height());
@@ -214,15 +215,15 @@ void FloodFillPaths::interpolated_direction(int x, int y, int w, int h,
 
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			int sx = max(xx * TILE_SIZE, x), sy = max(yy * TILE_SIZE, y);
-			int ex = min((xx + 1) * TILE_SIZE, mx), ey = min(
-					(yy + 1) * TILE_SIZE, my);
+			int sx = max(xx * TILE_SIZE, bbox.x1), sy = max(yy * TILE_SIZE, bbox.y1);
+			int ex = min((xx + 1) * TILE_SIZE, bbox.x2), ey = min(
+					(yy + 1) * TILE_SIZE, bbox.y2);
 			int px = xx - _source.x, py = yy - _source.y;
 			FloodFillNode* p = get(px, py);
 			if (!p->solid) {
 				int sub_area = (ex - sx) * (ey - sy) + 1;
 				/*Make sure all interpolated directions are possible*/
-				if (lenient || can_head(x, y, mx, my, ispeed, p->dx, p->dy)) {
+				if (lenient || can_head(bbox, ispeed, p->dx, p->dy)) {
 					acc_x += p->dx * sub_area;
 					acc_y += p->dy * sub_area;
 				}
@@ -232,14 +233,14 @@ void FloodFillPaths::interpolated_direction(int x, int y, int w, int h,
 	float mag = sqrt(float(acc_x * acc_x + acc_y * acc_y));
 	if (mag == 0) {
 		if (!lenient) {
-			interpolated_direction(x, y, w, h, speed, vx, vy, true);
+			return interpolated_direction(bbox, speed, true);
 		} else {
-			vx = 0;
-			vy = 0;
+			return PosF();
 		}
 	} else {
-		vx = speed * float(acc_x) / mag;
-		vy = speed * float(acc_y) / mag;
+		float vx = speed * float(acc_x) / mag;
+		float vy = speed * float(acc_y) / mag;
+		return PosF(vx, vy);
 	}
 }
 

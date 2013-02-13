@@ -46,16 +46,6 @@ void MonsterController::register_enemy(GameInst* enemy) {
 	EnemyBehaviour& eb = e->behaviour();
 }
 
-void towards_highest(FloodFillPaths& path, Pos& p) {
-	int highest;
-	for (int y = -1; y <= +1; y++) {
-		for (int x = -1; x <= +1; x++) {
-			path.get(p.x + x, p.y + y);
-		}
-	}
-
-}
-
 void MonsterController::partial_copy_to(MonsterController & mc) const {
 	mc.mids = this->mids;
 //	mc.coll_avoid.clear();
