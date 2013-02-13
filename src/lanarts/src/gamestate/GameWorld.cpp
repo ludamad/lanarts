@@ -28,7 +28,10 @@ GameWorld::GameWorld(GameState* gs) :
 }
 
 GameWorld::~GameWorld() {
-	reset();
+	for (int i = 0; i < level_states.size(); i++) {
+		delete level_states[i];
+	}
+	level_states.clear();
 }
 
 void GameWorld::generate_room(GameLevelState* level) {
