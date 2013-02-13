@@ -1,4 +1,6 @@
 /*
+ Modified mtwist class, original license follows.
+
  A C-program for MT19937, with initialization improved 2002/1/26.
  Coded by Takuji Nishimura and Makoto Matsumoto.
 
@@ -41,17 +43,67 @@
  email: m-mat @ math.sci.hiroshima-u.ac.jp (remove space)
  */
 
-#ifndef MTWIST_H_
-#define MTWIST_H_
+#ifndef LCOMMON_MTWIST_H_
+#define LCOMMON_MTWIST_H_
 
 #include "Range.h"
 
 class MTwist {
+public:
+
+	void init_genrand(unsigned int s);
+	void init_by_array(unsigned int init_key[], int key_length);
+
+	MTwist() :
+			mti(N + 1) {
+		_amount_generated = 0;
+	}
+
+	MTwist(unsigned int s) :
+			mti(N + 1) {
+		_amount_generated = 0;
+		init_genrand(s);
+	}
+	MTwist(unsigned int init_key[], int key_length) :
+			mti(N + 1) {
+		_amount_generated = 0;
+		init_by_array(init_key, key_length);
+	}
+
+	int rand() {
+		_amount_generated++;
+		return genrand_int32();
+	}
+	int rand(int max) {
+		if (max == 1)
+			return 0;
+		_amount_generated++;
+		return genrand_int32() % max;
+	}
+	int rand(int min, int max) {
+		return rand(max - min) + min;
+	}
+
+	int rand(const Range& r) {
+		return rand(r.min, r.max + 1);
+	}
+	float rand(const RangeF& r) {
+		_amount_generated++;
+		return (r.max - r.min) * genrand_real1() + r.min;
+	}
+
+	int amount_generated() const {
+		return _amount_generated;
+	}
+
+private:
 	enum {
 		N = 624
 	};
 	unsigned int mt[N];
 	int mti;
+
+	int _amount_generated;
 
 	/* generates a random number on [0,0xffffffff]-interval */
 	unsigned int genrand_int32(void);
@@ -70,60 +122,6 @@ class MTwist {
 
 	/* generates a random number on [0,1) with 53-bit resolution*/
 	double genrand_res53(void);
-
-public:
-#ifndef NOMTWISTDEBUG
-	int DEBUG_INFO_amnt_generated;
-#endif
-
-	void init_genrand(unsigned int s);
-	void init_by_array(unsigned int init_key[], int key_length);
-
-	MTwist() :
-			mti(N + 1) {
-#ifndef NOMTWISTDEBUG
-		DEBUG_INFO_amnt_generated = 0;
-#endif
-	}
-	MTwist(unsigned int s) :
-			mti(N + 1) {
-#ifndef NOMTWISTDEBUG
-		DEBUG_INFO_amnt_generated = 0;
-#endif
-		init_genrand(s);
-	}
-	MTwist(unsigned int init_key[], int key_length) :
-			mti(N + 1) {
-#ifndef NOMTWISTDEBUG
-		DEBUG_INFO_amnt_generated = 0;
-#endif
-		init_by_array(init_key, key_length);
-	}
-
-	int rand() {
-#ifndef NOMTWISTDEBUG
-		DEBUG_INFO_amnt_generated++;
-#endif
-		return genrand_int32();
-	}
-	int rand(int max) {
-		if (max == 1)
-			return 0;
-#ifndef NOMTWISTDEBUG
-		DEBUG_INFO_amnt_generated++;
-#endif
-		return genrand_int32() % max;
-	}
-	int rand(int min, int max) {
-		return rand(max - min) + min;
-	}
-
-	int rand(const Range& r) {
-		return rand(r.min, r.max + 1);
-	}
-	float rand(const RangeF& r) {
-		return (r.max - r.min) * genrand_real1() + r.min;
-	}
 };
 
-#endif /* MTWIST_H_ */
+#endif /* LCOMMON_MTWIST_H_ */

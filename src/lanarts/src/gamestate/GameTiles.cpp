@@ -28,9 +28,9 @@
 GameTiles::GameTiles(const Size& size) :
 		_tiles(size) {
 
-	_solidity = new Grid<bool>(size, true);
-	_seen = new Grid<bool>(size, false);
-	_seethrough = new Grid<bool>(size, true);
+	_solidity.set( new Grid<bool>(size, true) );
+	_seen.set( new Grid<bool>(size, false) );
+	_seethrough.set( new Grid<bool>(size, true) );
 }
 
 GameTiles::~GameTiles() {

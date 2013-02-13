@@ -15,8 +15,12 @@ namespace lsound {
 	Sound::~Sound() {
 	}
 
-	Sound::Sound(const smartptr<SoundBase>& _sound) :
-			_sound(_sound) {
+	Sound::Sound(const smartptr<SoundBase>& sound) :
+			_sound(sound) {
+	}
+
+	Sound::Sound(SoundBase* sound) :
+			_sound(sound) {
 	}
 
 	bool Sound::empty() const {

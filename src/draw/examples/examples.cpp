@@ -184,11 +184,11 @@ int main(int argc, char** argv) {
 
 	std::vector<Image> arr_images = image_split(Image("arrows.png"),
 			SizeF(32, 32));
-	arrow = new DirectionalDrawable(arr_images, FLOAT_PI / 2);
+	arrow = Drawable(new DirectionalDrawable(arr_images, FLOAT_PI / 2));
 
 	std::vector<Image> anim_images = image_split(Image("animation.png"),
 			SizeF(480.0f / 6, 120));
-	animation = new Animation(anim_images, 0.1f);
+	animation = Drawable(new Animation(anim_images, 0.1f));
 
 	draw_loop(draw_shapes);
 	draw_loop(draw_images);

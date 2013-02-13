@@ -277,7 +277,7 @@ static SizeF gl_print_impl(const DrawOptions& options, const font_data& font,
  ******************************************************************/
 
 void Font::initialize(const char* filename, int height) {
-	_font = new font_data;
+	_font.set(new font_data);
 	init_font(_font.get(), filename, height);
 }
 

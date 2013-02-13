@@ -26,7 +26,7 @@ Image::Image() :
 
 void Image::initialize(const std::string& filename, const BBoxF& draw_region,
 		bool rotates) {
-	_image = new GLImage(filename);
+	_image.set(new GLImage(filename));
 	if (draw_region.empty()) {
 		_draw_region = BBoxF(0, 0, _image->width, _image->height);
 	} else {
@@ -45,7 +45,7 @@ Image::Image(const Image & image, const BBoxF & draw_region) :
 
 void Image::initialize(const Size& size, const BBoxF& draw_region,
 		bool rotates) {
-	_image = new GLImage(size);
+	_image.set(new GLImage(size));
 	if (draw_region.empty()) {
 		_draw_region = fullimagebounds(_image);
 	} else {

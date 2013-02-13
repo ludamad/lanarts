@@ -8,6 +8,8 @@
 
 #include <cstdio>
 
+#include <lcommon/mtwist.h>
+
 #include "gamestate/GameState.h"
 
 #include "objects/player/PlayerInst.h"
@@ -134,7 +136,7 @@ GameLevelState* generate_level(int roomid, MTwist& mt, GeneratedLevel& level,
 
 	level.initialize(w, h, get_level_offset(gs, w, h), layout.solid_fill);
 
-	printf("level.init at %d RNG calls\n", mt.DEBUG_INFO_amnt_generated);
+	printf("level.init at %d RNG calls\n", mt.amount_generated());
 	for (int i = 0; i < ls.area_templates.size(); i++) {
 		AreaTemplate& area_template = get_area_template(ls.area_templates[i]);
 		generate_area(level, area_template, Pos(2, 2), mt.rand(2), mt.rand(2));
@@ -142,15 +144,15 @@ GameLevelState* generate_level(int roomid, MTwist& mt, GeneratedLevel& level,
 	for (int i = 0; i < roomsettings.size(); i++) {
 		generate_rooms(L, roomsettings[i], mt, level);
 	}
-	printf("ROOMS state at %d RNG calls\n", mt.DEBUG_INFO_amnt_generated);
+	printf("ROOMS state at %d RNG calls\n", mt.amount_generated());
 	generate_tunnels(layout.tunnels, mt, level);
-	printf("TUNNELS state at %d RNG calls\n", mt.DEBUG_INFO_amnt_generated);
+	printf("TUNNELS state at %d RNG calls\n", mt.amount_generated());
 	generate_features(content.features, mt, level, gs);
-	printf("FEATURES state at %d RNG calls\n", mt.DEBUG_INFO_amnt_generated);
+	printf("FEATURES state at %d RNG calls\n", mt.amount_generated());
 	generate_enemies(content.enemies, mt, level, gs);
-	printf("ENEMIES state at %d RNG calls\n", mt.DEBUG_INFO_amnt_generated);
+	printf("ENEMIES state at %d RNG calls\n", mt.amount_generated());
 	generate_items(content.items, mt, level, gs);
-	printf("ITEMS state at %d RNG calls\n", mt.DEBUG_INFO_amnt_generated);
+	printf("ITEMS state at %d RNG calls\n", mt.amount_generated());
 	newlvl->rooms = level.rooms();
 
 	for (int i = 0; i < level.instances().size(); i++) {

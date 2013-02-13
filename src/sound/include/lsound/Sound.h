@@ -18,6 +18,7 @@ namespace lsound {
 		Sound();
 		~Sound();
 		Sound(const smartptr<SoundBase>& _sound);
+		explicit Sound(SoundBase* _sound);
 
 		bool empty() const;
 		void play() const;

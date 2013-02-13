@@ -16,6 +16,11 @@ Drawable::Drawable(const smartptr<DrawableBase>& drawable) :
 		ref(drawable) {
 }
 
+Drawable::Drawable(DrawableBase* drawable) :
+		ref(drawable) {
+}
+
+
 Drawable::~Drawable() {
 }
 

@@ -20,6 +20,7 @@ class DrawableBase;
 class Drawable {
 public:
 	Drawable(const smartptr<DrawableBase>& drawable);
+	explicit Drawable(DrawableBase* drawable);
 	Drawable& operator=(const smartptr<DrawableBase>& drawable);
 	Drawable();
 	~Drawable();

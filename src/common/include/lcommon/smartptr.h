@@ -33,28 +33,60 @@
  * Alex Rubinsteyn (alex.rubinsteyn {at-nospam} gmail {dot} com)
  */
 
-#ifndef yasper_ptr_h
-#define yasper_ptr_h
+#ifndef LCOMMON_SMARTPTR_H_
+#define LCOMMON_SMARTPTR_H_
 
-#include <exception>
-
-struct NullPointerException: public std::exception {
-	NullPointerException() throw () {
-	}
-	~NullPointerException() throw () {
-	}
-
-	const char* what() const throw () {
-		return "Attempted to dereference null smartptr";
-	}
-};
+#include <cstdlib>
+#include "lcommon_assert.h"
 
 typedef void (*delete_function_ptr)(void* ptr);
 
-/* A smart pointer adapted from yasper that allows for definition on incomplete types */
-template<typename X>
-class smartptr {
-private:
+namespace _lcommon_private {
+
+class smartptr_impl {
+public:
+	/*
+	 Conversion/casting operators
+	 */
+
+	operator bool() const {
+		return !empty();
+	}
+
+	/*
+	 Is there only one reference on the counter?
+	 */
+	bool is_unique() const {
+		if (refhandler && refhandler->count == 1)
+			return true;
+		return false;
+	}
+
+	bool empty() const {
+		return !rawPtr;
+	}
+
+	void clear() {
+		release();
+		rawPtr = NULL;
+		refhandler = NULL;
+	}
+
+	unsigned ref_count() const {
+		if (refhandler)
+			return refhandler->count;
+		return 0;
+	}
+
+	/*
+	 Destructor
+	 */
+	~smartptr_impl() {
+		release();
+	}
+
+protected:
+
 	// Keep function around for deletion purposes so that we can work on incomplete types
 	template<typename T>
 	static void delete_function(void* ptr) {
@@ -70,77 +102,89 @@ private:
 
 	};
 
+	void* rawPtr;
+	RefHandler* refhandler;
+
+	smartptr_impl(void* raw, RefHandler* c) :
+			rawPtr(raw), refhandler(c) {
+		if (c) {
+			LCOMMON_ASSERT(raw != NULL);
+			c->count++;
+		}
+
+	}
+
+
+	void init(void* raw, delete_function_ptr deleter) {
+		rawPtr = raw;
+		if (raw) {
+			refhandler = new RefHandler(deleter);
+		} else {
+			refhandler = NULL;
+		}
+	}
+
+	smartptr_impl(void* raw, delete_function_ptr deleter) {
+		init(raw, deleter);
+	}
+
+	// increment the count
+	void acquire(RefHandler* c) {
+		refhandler = c;
+		if (c) {
+			(c->count)++;
+		}
+	}
+
+	// decrement the count, delete if it is 0
+	void release() {
+		LCOMMON_ASSERT(!refhandler || refhandler->count > 0);
+		if (refhandler && --refhandler->count == 0) {
+			refhandler->deleter(rawPtr);
+			delete refhandler;
+		}
+	}
+};
+
+}
+
+/* A smart pointer adapted from yasper that allows for definition on incomplete types */
+template<typename X>
+class smartptr : public _lcommon_private::smartptr_impl{
 public:
 	typedef X element_type;
 
-	/*
-	 ptr needs to be its own friend so ptr< X > and ptr< Y > can access
-	 each other's private data members
-	 */
-	template<class Y> friend class smartptr;
-	/*
-	 default constructor
-	 - don't create Counter
-	 */
 	smartptr() :
-			rawPtr(0), refhandler(0) {
+		smartptr_impl(NULL, (RefHandler*)NULL) {
 	}
 
 	/*
 	 Construct from a raw pointer
 	 */
-	smartptr(X* raw, RefHandler* c = 0) :
-			rawPtr(0), refhandler(0) {
-		if (raw) {
-			rawPtr = raw;
-			if (c)
-				acquire(c);
-			else
-				refhandler = new RefHandler(delete_function<X>);
-		}
+	smartptr(X* raw, RefHandler* c) :
+		smartptr_impl((void*)raw, c) {
 	}
 
 	template<typename Y>
-	explicit smartptr(Y* raw, RefHandler* c = 0) :
-			rawPtr(0), refhandler(0) {
-		if (raw) {
-			rawPtr = static_cast<X*>(raw);
-			if (c)
-				acquire(c);
-			else
-				refhandler = new RefHandler(delete_function<X>);
-		}
+	explicit smartptr(Y* raw) :
+		smartptr_impl(raw, delete_function<X>) {
 	}
 
 	template<typename Y>
-	explicit smartptr(Y* raw, delete_function_ptr destructor) :
-			rawPtr(0), refhandler(0) {
-		if (raw) {
-			rawPtr = static_cast<X*>(raw);
-			refhandler = new RefHandler(destructor);
-		}
+	explicit smartptr(Y* raw, delete_function_ptr deleter) :
+		smartptr_impl(raw, deleter) {
 	}
 
 	/*
 	 Copy constructor
 	 */
-	smartptr(const smartptr<X>& otherPtr) {
-		acquire(otherPtr.refhandler);
-		rawPtr = otherPtr.rawPtr;
+	smartptr(const smartptr<X>& otherPtr) :
+		smartptr_impl(otherPtr.rawPtr, otherPtr.refhandler) {
 	}
 
 	template<typename Y>
 	explicit smartptr(const smartptr<Y>& otherPtr) :
-			rawPtr(0), refhandler(0) {
-		acquire(otherPtr.counter);
-		rawPtr = static_cast<X*>(otherPtr.get());
-	}
-
-	/*
-	 Destructor
-	 */
-	~smartptr() {
-		release();
+		smartptr_impl(otherPtr.rawPtr, otherPtr.refhandler) {
 	}
 
 	/*
@@ -161,58 +205,8 @@ public:
 		if (this != (smartptr<X>*)&otherPtr) {
 			release();
 			acquire(otherPtr.counter);
-			rawPtr = static_cast<X*>(otherPtr.get());
+			rawPtr = otherPtr.get();
 		}
-		return *this;
-	}
-
-	/*
-	 Assignment to raw pointers is really dangerous business.
-	 If the raw pointer is also being used elsewhere,
-	 we might prematurely delete it, causing much pain.
-	 Use sparingly/with caution.
-	 */
-
-	smartptr& operator=(X* raw) {
-
-		if (raw) {
-			release();
-			refhandler = new RefHandler(delete_function<X>);
-			rawPtr = raw;
-		}
-		return *this;
-	}
-
-	template<typename Y>
-	smartptr& operator=(Y* raw) {
-		if (raw) {
-			release();
-			refhandler = new RefHandler(delete_function<X>);
-			rawPtr = static_cast<X*>(raw);
-		}
-		return *this;
-	}
-
-	/*
-	 assignment to long to allow ptr< X > = NULL,
-	 also allows raw pointer assignment by conversion.
-	 Raw pointer assignment is really dangerous!
-	 If the raw pointer is being used elsewhere,
-	 it will get deleted prematurely.
-	 */
-	smartptr& operator=(long num) {
-		if (num == 0) //pointer set to null
-				{
-			release();
-		}
-
-		else //assign raw pointer by conversion
-		{
-			release();
-			refhandler = new RefHandler(delete_function<X>);
-			rawPtr = reinterpret_cast<X*>(num);
-		}
-
 		return *this;
 	}
 
@@ -220,23 +214,21 @@ public:
 	 Member Access
 	 */
 	X* operator->() const {
-		return get();
+		LCOMMON_ASSERT(rawPtr != NULL);
+		return (X*)rawPtr;
 	}
 
 	/*
 	 Dereference the pointer
 	 */
 	X& operator*() const {
-		return *get();
+		LCOMMON_ASSERT(rawPtr != NULL);
+		return *(X*)rawPtr;
 	}
 
 	/*
 	 Conversion/casting operators
 	 */
-
-	operator bool() const {
-		return !empty();
-	}
 
 	template<typename Y>
 	operator smartptr<Y>() {
@@ -245,63 +237,19 @@ public:
 		return smartptr<Y>(rawPtr, refhandler);
 	}
 
-	/*
-	 Provide access to the raw pointer
-	 */
-
+	/* Access the raw pointer */
 	X* get() const {
-#ifndef NDEBUG
-		if (rawPtr == 0)
-			throw new NullPointerException;
-#endif
-		return rawPtr;
+		LCOMMON_ASSERT(rawPtr != NULL);
+		return (X*)rawPtr;
 	}
 
-	/*
-	 Is there only one reference on the counter?
-	 */
-	bool is_unique() const {
-		if (refhandler && refhandler->count == 1)
-			return true;
-		return false;
+	/* Obtain a new raw pointer*/
+	template<typename Y>
+	void set(Y* ptr) {
+		release();
+		init(ptr, delete_function<Y>);
 	}
 
-	bool empty() const {
-		return !rawPtr;
-	}
-
-	unsigned get_count() const {
-		if (refhandler)
-			return refhandler->count;
-		return 0;
-	}
-
-private:
-	X* rawPtr;
-	RefHandler* refhandler;
-
-	// increment the count
-	void acquire(RefHandler* c) {
-		refhandler = c;
-		if (c) {
-			(c->count)++;
-		}
-	}
-
-	// decrement the count, delete if it is 0
-	void release() {
-		if (refhandler) {
-			(refhandler->count)--;
-
-			if (refhandler->count == 0) {
-				refhandler->deleter(rawPtr);
-				delete refhandler;
-			}
-		}
-		refhandler = 0;
-		rawPtr = 0;
-
-	}
 };
 
 template<typename X, typename Y>
@@ -314,20 +262,6 @@ bool operator==(const smartptr<X>& lptr, Y* raw) {
 	return lptr.get() == raw;
 }
 
-template<typename X>
-bool operator==(const smartptr<X>& lptr, long num) {
-	if (num == 0 && !lptr.IsValid()) //both pointer and address are null
-			{
-		return true;
-	}
-
-	else //convert num to a pointer, compare addresses
-	{
-		return lptr == reinterpret_cast<X*>(num);
-	}
-
-}
-
 template<typename X, typename Y>
 bool operator!=(const smartptr<X>& lptr, const smartptr<Y>& rptr) {
 	return (!operator==(lptr, rptr));
@@ -338,61 +272,4 @@ bool operator!=(const smartptr<X>& lptr, Y* raw) {
 	return (!operator==(lptr, raw));
 }
 
-template<typename X>
-bool operator!=(const smartptr<X>& lptr, long num) {
-	return (!operator==(lptr, num));
-}
-
-template<typename X, typename Y>
-bool operator&&(const smartptr<X>& lptr, const smartptr<Y>& rptr) {
-	return lptr.IsValid() && rptr.IsValid();
-}
-
-template<typename X>
-bool operator&&(const smartptr<X>& lptr, bool rval) {
-	return lptr.IsValid() && rval;
-}
-
-template<typename X>
-bool operator&&(bool lval, const smartptr<X>& rptr) {
-	return lval && rptr.IsValid();
-}
-
-template<typename X, typename Y>
-bool operator||(const smartptr<X>& lptr, const smartptr<Y>& rptr) {
-	return lptr.IsValid() || rptr.IsValid();
-}
-
-template<typename X>
-bool operator||(const smartptr<X>& lptr, bool rval) {
-	return lptr.IsValid() || rval;
-}
-
-template<typename X>
-bool operator||(bool lval, const smartptr<X>& rptr) {
-	return lval || rptr.IsValid();
-}
-
-template<typename X>
-bool operator!(const smartptr<X>& p) {
-	return (!p.IsValid());
-}
-
-/* less than comparisons for storage in containers */
-template<typename X, typename Y>
-bool operator<(const smartptr<X>& lptr, const smartptr<Y>& rptr) {
-	return lptr.get() < rptr.get();
-}
-
-template<typename X, typename Y>
-bool operator<(const smartptr<X>& lptr, Y* raw) {
-	return lptr.get() < raw;
-}
-
-template<typename X, typename Y>
-bool operator<(X* raw, const smartptr<Y>& rptr) {
-	return raw < rptr.get();
-}
-
-#endif
-
+#endif /* LCOMMON_SMARTPTR_H_ */
