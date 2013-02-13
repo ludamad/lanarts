@@ -142,34 +142,36 @@ local setup_lobby_menu -- forward declare
 
 function exit_menu()
     menu_state.menu = nil -- Signals event loop that menu is finished
+    menu_state.continue = nil
 end
 
 function setup_start_menu()
     menu_state.menu = InstanceBox.create( { size = display.window_size } )
+    menu_state.continue = setup_settings_menu
     menu_state.menu:add_instance(
-        start_menu_create( --[[New Game Button]] setup_settings_menu ),
+        start_menu_create( --[[New Game Button]] menu_state.continue ),
         CENTER
     )
 end
 
 function setup_settings_menu()
     menu_state.menu = InstanceBox.create( { size = display.window_size } )
+    function menu_state.continue() 
+        if settings.class_type ~= -1 then
+            exit_menu()
+        end
+    end
     menu_state.menu:add_instance(
-        game_settings_menu_create( --[[Back Button]] setup_start_menu,
-                 --[[Start Game Button]] function()
-                if settings.class_type ~= -1 then
-                    exit_menu()
-                end
-            end
-        ), 
+        game_settings_menu_create( --[[Back Button]] setup_start_menu, --[[Start Game Button]] menu_state.continue), 
         CENTER
     )
 end
 
 function setup_lobby_menu()
     menu_state.menu = InstanceBox.create( { size = display.window_size } )
+    menu_state.continue = exit_menu
     menu_state.menu:add_instance(
-        lobby_menu_create( --[[New Game Button]] exit_menu ),
+        lobby_menu_create( --[[Start Game Button]] menu_state.continue ),
         CENTER
     )
 end
@@ -186,11 +188,16 @@ local function menu_loop(should_poll)
             net.connections_poll()
         end
 
+
         menu_state.menu:step( {0, 0} )
 
-		if not menu_state.menu then -- because we have moved on 
-			return true
-		end
+        if key_pressed(keys.ENTER) and menu_state.continue then
+            menu_state:continue()
+        end
+
+        if not menu_state.menu then -- because we have moved on 
+            return true
+        end
 
         display.draw_start()
         menu_state.menu:draw( {0, 0} )
