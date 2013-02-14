@@ -8,99 +8,108 @@
 
 #include "SerializeBuffer.h"
 
-static lua_State* L;
+SUITE(lua_serialize_tests) {
+	TEST(lua_serialize_number) {
+		TestLuaState L;
 
-static void lua_serialize_number() {
-	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
-	const double testnumber = 1.1;
+		SerializeBuffer serializer = SerializeBuffer::plain_buffer();
+		const double testnumber = 1.1;
 
-	LuaValue value(L), result(L);
-	lua_pushnumber(L, testnumber);
-
-	value.pop();
-	lua_serialize(serializer, L, value);
-
-	lua_deserialize(serializer, L, result);
-	result.push();
-
-	UNIT_TEST_ASSERT(lua_isnumber(L, -1));
-	UNIT_TEST_ASSERT(lua_tonumber(L, -1) == testnumber);
-
-	lua_pop(L, 1);
-}
-
-static void lua_serialize_table() {
-	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
-	const double testnumber = 1.1;
-	const char* fieldname = "myfield";
-
-	// Push {myfield = 1.1}
-	lua_newtable(L);
-	lua_pushnumber(L, testnumber);
-	lua_setfield(L, -2, fieldname);
-
-	{
-		//serialize it
 		LuaValue value(L), result(L);
+		lua_pushnumber(L, testnumber);
+
 		value.pop();
 		lua_serialize(serializer, L, value);
-		//deserialize it
+
 		lua_deserialize(serializer, L, result);
 		result.push();
+
+		UNIT_TEST_ASSERT(lua_isnumber(L, -1));
+		UNIT_TEST_ASSERT(lua_tonumber(L, -1) == testnumber);
+
+		lua_pop(L, 1);
+
+		L.finish_check();
 	}
 
-	UNIT_TEST_ASSERT(lua_istable(L, -1));
-	lua_getfield(L, -1, fieldname);
-	double tablevalue = lua_tonumber(L, -1);
-	UNIT_TEST_ASSERT(lua_tonumber(L, -1) == testnumber);
+	TEST(lua_serialize_table) {
+		TestLuaState L;
 
-	lua_pop(L, 2);
-}
-static void lua_serialize_novalue() {
-	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
-	LuaValue value(L), result(L);
-	lua_serialize(serializer, L, value);
-	lua_deserialize(serializer, L, result);
-	result.push();
-	UNIT_TEST_ASSERT(lua_isnil(L, -1));
+		SerializeBuffer serializer = SerializeBuffer::plain_buffer();
+		const double testnumber = 1.1;
+		const char* fieldname = "myfield";
 
-}
-static void lua_serialize_nested_table() {
-	SerializeBuffer serializer = SerializeBuffer::plain_buffer();
-	const double testnumber = 1.1;
-	const char* fieldname = "myfield";
+		// Push {myfield = 1.1}
+		lua_newtable(L);
+		lua_pushnumber(L, testnumber);
+		lua_setfield(L, -2, fieldname);
 
-	// Push {{myfield = 1.1}}
-	lua_newtable(L);
-	lua_newtable(L);
-	lua_pushnumber(L, testnumber);
-	lua_setfield(L, -2, fieldname);
-	lua_setfield(L, -2, fieldname);
+		{
+			//serialize it
+			LuaValue value(L), result(L);
+			value.pop();
+			lua_serialize(serializer, L, value);
+			//deserialize it
+			lua_deserialize(serializer, L, result);
+			result.push();
+		}
 
-	{
-		//serialize it
+		UNIT_TEST_ASSERT(lua_istable(L, -1));
+		lua_getfield(L, -1, fieldname);
+		double tablevalue = lua_tonumber(L, -1);
+		UNIT_TEST_ASSERT(lua_tonumber(L, -1) == testnumber);
+
+		lua_pop(L, 2);
+		L.finish_check();
+	}
+
+	TEST(lua_serialize_novalue) {
+		TestLuaState L;
+
+		SerializeBuffer serializer = SerializeBuffer::plain_buffer();
 		LuaValue value(L), result(L);
-		value.pop();
 		lua_serialize(serializer, L, value);
 		lua_deserialize(serializer, L, result);
 		result.push();
+		UNIT_TEST_ASSERT(lua_isnil(L, -1));
+
+		lua_pop(L, 1);
+
+		L.finish_check();
 	}
 
-	UNIT_TEST_ASSERT(lua_istable(L, -1));
-	lua_getfield(L, -1, fieldname);
-	UNIT_TEST_ASSERT(lua_istable(L, -1));
-	lua_getfield(L, -1, fieldname);
-	double tablevalue = lua_tonumber(L, -1);
-	UNIT_TEST_ASSERT(lua_tonumber(L, -1) == testnumber);
+	TEST(lua_serialize_nested_table) {
+		TestLuaState L;
 
-	lua_pop(L, 3);
-}
+		SerializeBuffer serializer = SerializeBuffer::plain_buffer();
+		const double testnumber = 1.1;
+		const char* fieldname = "myfield";
 
-void lua_serialize_tests() {
-	L = lua_open();
-	UNIT_TEST(lua_serialize_novalue);
-	UNIT_TEST(lua_serialize_number);
-	UNIT_TEST(lua_serialize_table);
-	UNIT_TEST(lua_serialize_nested_table);
-	lua_close(L);
+		// Push {{myfield = 1.1}}
+		lua_newtable(L);
+		lua_newtable(L);
+		lua_pushnumber(L, testnumber);
+		lua_setfield(L, -2, fieldname);
+		lua_setfield(L, -2, fieldname);
+
+		{
+			//serialize it
+			LuaValue value(L), result(L);
+			value.pop();
+			lua_serialize(serializer, L, value);
+			lua_deserialize(serializer, L, result);
+			result.push();
+		}
+
+		UNIT_TEST_ASSERT(lua_istable(L, -1));
+		lua_getfield(L, -1, fieldname);
+		UNIT_TEST_ASSERT(lua_istable(L, -1));
+		lua_getfield(L, -1, fieldname);
+		double tablevalue = lua_tonumber(L, -1);
+		UNIT_TEST_ASSERT(lua_tonumber(L, -1) == testnumber);
+
+		lua_pop(L, 3);
+
+		L.finish_check();
+	}
 }

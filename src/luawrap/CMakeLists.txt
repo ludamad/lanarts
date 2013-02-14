@@ -8,7 +8,7 @@ set(CMAKE_BUILD_TYPE Debug)
 set( LIBS ../../libs)
 
 include_directories(
-    "include/"
+	"include/"
 	${LIBS}/lua 
 	${LIBS}/UnitTest++ 
 )

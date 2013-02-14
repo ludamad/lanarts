@@ -6,7 +6,7 @@ FIND_PACKAGE(SDL REQUIRED)
 set( SRC "..")
 set( LIBS ../../libs)
 include_directories(${SDL_INCLUDE_DIR}
-    include/lcommon/
+	include/lcommon/
 	${LIBS}/UnitTest++ 
 	${LIBS}/lua 
 	${SRC}/luawrap/include

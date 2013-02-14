@@ -572,6 +572,7 @@ void lua_serialize(SerializeBuffer& serializer, lua_State* L,
 	if (!value.empty()) {
 		value.push();
 		lua_serialize(serializer, L, -1);
+		lua_pop(L, 1);
 	}
 }
 

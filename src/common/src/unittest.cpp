@@ -111,7 +111,7 @@ public:
 	virtual void ReportTestFinish(const TestDetails& details,
 			float secondsElapsed) {
 		if (did_finish_correctly) {
-			printf("Passed: %s of %s\n", details.suiteName, details.testName);
+			printf("Passed: %s of %s\n", details.testName, details.suiteName);
 		}
 	}
 

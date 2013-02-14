@@ -5,6 +5,9 @@
 #ifndef UNITTEST_H_
 #define UNITTEST_H_
 
+#include <UnitTest++.h>
+#include "luawrap/testutils.h"
+
 #include <string>
 
 #define STRINGIZE_DETAIL(x) #x
