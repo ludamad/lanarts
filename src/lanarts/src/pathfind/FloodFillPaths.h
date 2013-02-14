@@ -58,21 +58,20 @@ public:
 			bool clear_previous = true);
 
 	//Towards object
-	PosF interpolated_direction(const BBox& bbox, float speed, bool lenient = false);
+	PosF interpolated_direction(const BBox& bbox, float speed, bool lenient =
+			false);
 
 	//Away from object
 	PosF random_further_direction(MTwist& mt, int x, int y, int w, int h,
 			float speed);
 
-	FloodFillNode* get(int x, int y) {
-		LANARTS_ASSERT( x >= 0 && x < _size.w);
-		LANARTS_ASSERT( y >= 0 && y < _size.h);
-		return &_path[Pos(x, y)];
+	BBox location() {
+		return BBox(_topleft_xy.x, _topleft_xy.y, _topleft_xy.x + _size.w,
+				_topleft_xy.y + _size.h);
 	}
 
-	BBox location() {
-		return BBox(_source.x, _source.y, _source.x + _size.w,
-				_source.y + _size.h);
+	FloodFillNode* node_at(const Pos& tile_xy) {
+		return get(tile_xy.x - _topleft_xy.x, tile_xy.y - _topleft_xy.y);
 	}
 
 	int width() const {
@@ -83,7 +82,14 @@ public:
 	}
 
 	void debug_draw(GameState* gs);
+
 private:
+	FloodFillNode* get(int x, int y) {
+		LANARTS_ASSERT( x >= 0 && x < _size.w);
+		LANARTS_ASSERT( y >= 0 && y < _size.h);
+		return &_path[Pos(x, y)];
+	}
+	bool is_solid_or_out_of_bounds(int x, int y);
 	void point_to_local_min(int sx, int sy);
 	void point_to_random_further(MTwist& mt, int sx, int sy);
 	bool can_head(const BBox& bbox, int speed, int dx, int dy);
@@ -92,8 +98,8 @@ private:
 	BoolGridRef _solidity;
 
 	Grid<FloodFillNode> _path;
-	/* The source point of the flood fill */
-	Pos _source;
+	/* The top left point covered by the flood fill */
+	Pos _topleft_xy;
 	/* Grid has own internal size, this is size actually used */
 	Size _size;
 };

@@ -5,11 +5,11 @@
  *   - Each monster is either WANDER_AWAY'ing from, or WANDER_TOWARDS'ing, a certain square
  *   - Monster at x,y wants to wander, checks the WanderMap
  *   - For each surrounding square ...
- *   	... If there is data associated with this x,y and it is not too outdated ..
+ *   	... If there is data associated with this x,y
  *   		... we grab this information:
  *				- source (x,y)
  *				- distance to source, only taking valid paths
- *		... Otherwise (data doesn't exist or is 'out-dated' [1] ) ...
+ *		... Otherwise (data doesn't exist ) ...
  *			... starting from x,y as the source, fill each square with the distance to source
  *			... set this location as the location to WANDER_AWAY from
  *		- Toss away any squares that would require crossing a solid square to reach
@@ -18,8 +18,6 @@
  *		- If we are WANDER_TOWARDS, take all the squares - call them SQUARE_SET - with ...
  *			the same source AND a smaller distance from the current square
  *		Pick a random square from SQUARE_SET, move towards that square.
- *
- *	[1] -- Out-dated means here that it if the source was generated STEPS_BEFORE_RECALCULATE steps ago, we create it again
  */
 
 #ifndef WANDERMAP_H_
@@ -40,33 +38,29 @@ enum WanderDirection {
 	WANDER_AWAY, WANDER_TOWARDS
 };
 
-struct WanderMapSource {
-	Pos xy;
-	int expiry_frame; // When to regenerate this source
-	WanderMapSource() {
-		expiry_frame = 0;
-	}
-};
-
 struct WanderMapSquare {
-	short source_index; // index for WanderMapSource
 	short distance_to_source;
 };
 
 class WanderMap {
 public:
-	WanderMap(const BoolGridRef& solidity, const Size& size,
-			const Size& division_size = Size(10, 10));
+	WanderMap(const BoolGridRef& solidity = BoolGridRef(), const Size& size =
+			Size(), const Size& division_size = Size(10, 10));
 	~WanderMap();
 
-	// Returns a reference from the Cache
-	const std::vector<Pos>& candidates(const Pos& xy,
+	void initialize(const BoolGridRef& solidity, const Size& size,
+			const Size& division_size = Size(10, 10));
+
+			// Returns a reference from the Cache
+			const std::vector<Pos>& candidates(const Pos& xy,
 			WanderDirection direction);
 
-	/* Step a frame */
-	void step();
+	void ensure_filled();
 
+	void debug_draw();
 private:
+	bool HACK_FOR_NOW_filled;
+
 	WanderMapSquare& get(const Pos& xy);
 
 	void generate_wander_map_section(const Pos& source_xy);
@@ -81,16 +75,12 @@ private:
 
 	Cache _cache;
 
-	int _frame; // Used to invalidate previous entries
-
 	Size _division_size;
 
 	/* Shared with game tile structure */
 	BoolGridRef _solidity;
 
 	Grid<WanderMapSquare> _squares;
-	// There is one source for each 'division_size' squares
-	Grid<WanderMapSource> _sources;
 };
 
 #endif /* WANDERMAP_H_ */

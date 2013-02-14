@@ -172,18 +172,20 @@ static void lapi_wait(LuaStackValue wait_time) {
 	lua_State* L = wait_time.luastate();
 	long wait_micro = wait_time.as<double>() * 1000;
 
-	Timer timer;
-
 	GameSettings& settings = lua_api::gamestate(wait_time)->game_settings();
 	if (settings.free_memory_while_idle) {
+		Timer timer;
+
 		while (timer.get_microseconds() < wait_micro) {
 			if (lua_gc(L, LUA_GCSTEP, 0)) {
 				break;
 			}
 		}
+
+		wait_micro -= (long)timer.get_microseconds();
 	}
 
-	long remaining_wait_ms = (wait_micro - (long)timer.get_microseconds()) / 1000;
+	long remaining_wait_ms = wait_micro / 1000;
 
 	if (remaining_wait_ms > 0) {
 		SDL_Delay(remaining_wait_ms);

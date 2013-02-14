@@ -76,7 +76,7 @@ FloodFillPaths::~FloodFillPaths() {
 
 void FloodFillPaths::fill_paths_tile_region(const Pos& tile_xy,
 		const BBox& area, bool clear_previous) {
-	_source = area.left_top();
+	_topleft_xy = area.left_top();
 	_size = area.size();
 
 	if (_path.empty() || _size.w < _path.width() || _size.h < _path.height()) {
@@ -86,15 +86,17 @@ void FloodFillPaths::fill_paths_tile_region(const Pos& tile_xy,
 		memset(_path.begin(), 0, alloc_w * alloc_h * sizeof(FloodFillNode));
 	}
 
-	for (int y = 0; y < _size.h; y++) {
-		for (int x = 0; x < _size.w; x++) {
-			FloodFillNode* node = get(x, y);
-			node->solid = (*_solidity)[Pos(x + area.x1, y + area.y1)];
-			node->open = true;
-			node->dx = 0;
-			node->dy = 0;
-			node->marked = false;
-			node->distance = 0;
+	if (clear_previous) {
+		for (int y = 0; y < _size.h; y++) {
+			for (int x = 0; x < _size.w; x++) {
+				FloodFillNode* node = get(x, y);
+				node->solid = (*_solidity)[Pos(x + area.x1, y + area.y1)];
+				node->open = true;
+				node->dx = 0;
+				node->dy = 0;
+				node->marked = false;
+				node->distance = 0;
+			}
 		}
 	}
 
@@ -117,16 +119,15 @@ void FloodFillPaths::fill_paths_in_radius(const Pos& source_xy, int radius) {
 	perf_timer_end(FUNCNAME);
 }
 
-static bool is_solid_or_out_of_bounds(FloodFillPaths& path, int x, int y) {
-	if (x < 0 || x >= path.width() || y < 0 || y >= path.height()) {
+bool FloodFillPaths::is_solid_or_out_of_bounds(int x, int y) {
+	if (x < 0 || x >= width() || y < 0 || y >= height()) {
 		return true;
 	}
 
-	return path.get(x, y)->solid;
+	return get(x, y)->solid;
 }
 
-bool FloodFillPaths::can_head(const BBox& bbox, int speed, int dx,
-		int dy) {
+bool FloodFillPaths::can_head(const BBox& bbox, int speed, int dx, int dy) {
 	bool is_diag = (abs(dx) == abs(dy));
 
 	int xx, yy;
@@ -135,19 +136,19 @@ bool FloodFillPaths::can_head(const BBox& bbox, int speed, int dx,
 			xx = squish(x, bbox.x1, bbox.x2 + 1);
 			yy = squish(y, bbox.y1, bbox.y2 + 1);
 
-			int gx = (xx + dx * speed) / TILE_SIZE - _source.x;
-			int gy = (yy + dy * speed) / TILE_SIZE - _source.y;
-			if (is_solid_or_out_of_bounds(*this, gx, gy)) {
+			int gx = (xx + dx * speed) / TILE_SIZE - _topleft_xy.x;
+			int gy = (yy + dy * speed) / TILE_SIZE - _topleft_xy.y;
+			if (is_solid_or_out_of_bounds(gx, gy)) {
 				return false;
 			}
 			if (is_diag) {
-				if (is_solid_or_out_of_bounds(*this, xx / TILE_SIZE - _source.x,
-						(yy + dy * speed) / TILE_SIZE - _source.y)) {
+				if (is_solid_or_out_of_bounds(xx / TILE_SIZE - _topleft_xy.x,
+						(yy + dy * speed) / TILE_SIZE - _topleft_xy.y)) {
 					return false;
 				}
-				if (is_solid_or_out_of_bounds(*this,
-						(xx + dx * speed) / TILE_SIZE - _source.x,
-						yy / TILE_SIZE - _source.y)) {
+				if (is_solid_or_out_of_bounds(
+						(xx + dx * speed) / TILE_SIZE - _topleft_xy.x,
+						yy / TILE_SIZE - _topleft_xy.y)) {
 					return false;
 				}
 			}
@@ -171,17 +172,17 @@ PosF FloodFillPaths::random_further_direction(MTwist& mt, int x, int y, int w,
 	int maxgrid_x = mx / TILE_SIZE, maxgrid_y = my / TILE_SIZE;
 
 	//Make sure coordinates do not go out of bounds
-	int minx = squish(mingrid_x, _source.x, _source.x + width());
-	int miny = squish(mingrid_y, _source.y, _source.y + height());
-	int maxx = squish(maxgrid_x, _source.x, _source.x + width());
-	int maxy = squish(maxgrid_y, _source.y, _source.y + height());
+	int minx = squish(mingrid_x, _topleft_xy.x, _topleft_xy.x + width());
+	int miny = squish(mingrid_y, _topleft_xy.y, _topleft_xy.y + height());
+	int maxx = squish(maxgrid_x, _topleft_xy.x, _topleft_xy.x + width());
+	int maxy = squish(maxgrid_y, _topleft_xy.y, _topleft_xy.y + height());
 
 	//Set up accumulators for x and y (later normalized)
 	int acc_x = 0, acc_y = 0;
 
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			int px = xx - _source.x, py = yy - _source.y;
+			int px = xx - _topleft_xy.x, py = yy - _topleft_xy.y;
 			FloodFillNode* p = get(px, py);
 			if (!p->solid) {
 				point_to_random_further(mt, px, py);
@@ -189,7 +190,7 @@ PosF FloodFillPaths::random_further_direction(MTwist& mt, int x, int y, int w,
 		}
 	}
 
-	return interpolated_direction( BBox(x, y, x + w, y + h), speed);
+	return interpolated_direction(BBox(x, y, x + w, y + h), speed);
 }
 
 PosF FloodFillPaths::interpolated_direction(const BBox& bbox, float speed,
@@ -206,19 +207,20 @@ PosF FloodFillPaths::interpolated_direction(const BBox& bbox, float speed,
 	int mingrid_x = bbox.x1 / TILE_SIZE, mingrid_y = bbox.y1 / TILE_SIZE;
 	int maxgrid_x = bbox.x2 / TILE_SIZE, maxgrid_y = bbox.y2 / TILE_SIZE;
 	//Make sure coordinates do not go out of bounds
-	int minx = squish(mingrid_x, _source.x, _source.x + width());
-	int miny = squish(mingrid_y, _source.y, _source.y + height());
-	int maxx = squish(maxgrid_x, _source.x, _source.x + width());
-	int maxy = squish(maxgrid_y, _source.y, _source.y + height());
+	int minx = squish(mingrid_x, _topleft_xy.x, _topleft_xy.x + width());
+	int miny = squish(mingrid_y, _topleft_xy.y, _topleft_xy.y + height());
+	int maxx = squish(maxgrid_x, _topleft_xy.x, _topleft_xy.x + width());
+	int maxy = squish(maxgrid_y, _topleft_xy.y, _topleft_xy.y + height());
 	//Set up accumulators for x and y (later normalized)
 	int acc_x = 0, acc_y = 0;
 
 	for (int yy = miny; yy <= maxy; yy++) {
 		for (int xx = minx; xx <= maxx; xx++) {
-			int sx = max(xx * TILE_SIZE, bbox.x1), sy = max(yy * TILE_SIZE, bbox.y1);
+			int sx = max(xx * TILE_SIZE, bbox.x1), sy = max(yy * TILE_SIZE,
+					bbox.y1);
 			int ex = min((xx + 1) * TILE_SIZE, bbox.x2), ey = min(
 					(yy + 1) * TILE_SIZE, bbox.y2);
-			int px = xx - _source.x, py = yy - _source.y;
+			int px = xx - _topleft_xy.x, py = yy - _topleft_xy.y;
 			FloodFillNode* p = get(px, py);
 			if (!p->solid) {
 				int sub_area = (ex - sx) * (ey - sy) + 1;
@@ -324,13 +326,13 @@ void FloodFillPaths::debug_draw(GameState* gs) {
 			FloodFillNode* node = get(x, y);
 			if (false && !node->solid)
 				gs->font().drawf(COL_WHITE,
-						Pos((x + _source.x) * TILE_SIZE - view.x,
-								(y + _source.y) * TILE_SIZE - view.y), "%d,%d",
+						Pos((x + _topleft_xy.x) * TILE_SIZE - view.x,
+								(y + _topleft_xy.y) * TILE_SIZE - view.y), "%d,%d",
 						node->dx, node->dy);
 			if (!node->solid) {
 				gs->font().drawf(COL_WHITE,
-						Pos((x + _source.x) * TILE_SIZE - view.x,
-								(y + _source.y) * TILE_SIZE - view.y), "%d",
+						Pos((x + _topleft_xy.x) * TILE_SIZE - view.x,
+								(y + _topleft_xy.y) * TILE_SIZE - view.y), "%d",
 						node->distance);
 			}
 		}

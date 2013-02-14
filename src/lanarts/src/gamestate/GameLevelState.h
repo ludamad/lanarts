@@ -5,6 +5,7 @@
 
 #ifndef GAMELEVELSTATE_H_
 #define GAMELEVELSTATE_H_
+
 #include <vector>
 
 #include <lcommon/geometry.h>
@@ -12,6 +13,7 @@
 #include "collision_avoidance/CollisionAvoidance.h"
 #include "levelgen/GeneratedLevel.h"
 #include "objects/enemy/MonsterController.h"
+#include "pathfind/WanderMap.h"
 
 #include "GameInstSet.h"
 
@@ -40,12 +42,13 @@ public:
 	void copy_to(GameLevelState & level) const;
 	GameLevelState* clone() const;
 
-	int width() {
-		return _width;
+	int width() const {
+		return _size.w;
 	}
-	int height() {
-		return _height;
+	int height() const {
+		return _size.h;
 	}
+
 	GameTiles& tiles() {
 		return _tiles;
 	}
@@ -53,14 +56,14 @@ public:
 	GameInstSet& game_inst_set() {
 		return _inst_set;
 	}
-	int tile_width() {
-		return _width / TILE_SIZE;
+	int tile_width() const {
+		return _size.w / TILE_SIZE;
 	}
-	int tile_height() {
-		return _height / TILE_SIZE;
+	int tile_height() const{
+		return _size.h / TILE_SIZE;
 	}
 
-	level_id id() {
+	level_id id() const {
 		return _levelid;
 	}
 
@@ -70,6 +73,10 @@ public:
 
 	CollisionAvoidance& collision_avoidance() {
 		return _collision_avoidance;
+	}
+
+	WanderMap& wander_map() {
+		return _wander_map;
 	}
 
 	void serialize(GameState* gs, SerializeBuffer& serializer);
@@ -84,11 +91,12 @@ private:
 
 	level_id _levelid;
 	int _steps_left;
-	int _width, _height;
+	Size _size;
 	GameTiles _tiles;
 	GameInstSet _inst_set;
 	MonsterController _monster_controller;
 	CollisionAvoidance _collision_avoidance;
+	WanderMap _wander_map;
 
 	bool _is_simulation;
 };

@@ -95,8 +95,6 @@ label_StartOver:
 		if (did_exit) goto label_Quit; /* User has quit! */
 	}
 
-	perf_timer_clear();
-
 	if (gs->start_game()) {
 		lua_getglobal(L, "main");
 		luawrap::call<void>(L);

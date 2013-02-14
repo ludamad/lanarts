@@ -57,7 +57,7 @@ local function main_loop(steponly)
 	local surplus = settings.time_per_step - timer:get_milliseconds()
 
 	perf.timing_begin("**Surplus**")
-	game.wait(surplus) 
+	game.wait(surplus)
 	perf.timing_end("**Surplus**")
 
 	perf.timing_end("**Game Frame**")
@@ -67,17 +67,19 @@ end
 
 local fps_timer = timer_create()
 local fps_count = 1
-local fps = 60
+local fps = nil
 
 function postdraw()
 	fps_count = fps_count + 1
 
-	local w,h = unpack( display.window_size ) 
-	fonts.large:draw( {origin=CENTER}, {w/2, h/2}, "FPS: " .. fps )
+	if fps then
+		local w,h = unpack( display.window_size ) 
+		fonts.small:draw( {origin=RIGHT_BOTTOM}, {w, h}, "FPS: " .. math.floor(fps) )
+	end
 
 	local ms = fps_timer:get_milliseconds()
-	if ms > 100 then
-		fps = fps_count / ms * 100
+	if ms > 1000 then
+		fps = fps_count / ms * 1000
 		fps_timer:start()
 		fps_count = 0
 	end

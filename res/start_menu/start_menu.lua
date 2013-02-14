@@ -38,7 +38,9 @@ local function start_menu_create(on_start_click)
 
     menu:add_instance(
         text_button_create("Start a New Game", on_start_click),
-        CENTER
+        CENTER,
+        --[[Down 100 pixels]]
+        {0, 100}
     )
 
     return menu

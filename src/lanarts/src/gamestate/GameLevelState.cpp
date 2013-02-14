@@ -15,12 +15,12 @@ GameLevelState::GameLevelState(int levelid, const Size& size,
 		bool wandering_flag, bool is_simulation) :
 		_levelid(levelid),
 		_steps_left(0),
-		_width(size.w),
-		_height(size.h),
+		_size(size),
 		_tiles(Size(size.w / TILE_SIZE, size.h / TILE_SIZE)),
 		_inst_set(size.w, size.h),
 		_monster_controller(wandering_flag),
-		_is_simulation(is_simulation) {
+		_is_simulation(is_simulation),
+		_wander_map() {
 }
 
 GameLevelState::~GameLevelState() {
@@ -53,8 +53,7 @@ int GameLevelState::room_within(const Pos& p) {
 }
 
 GameLevelState* GameLevelState::clone() const {
-	GameLevelState* state = new GameLevelState(_levelid, Size(_width, _height),
-			_is_simulation);
+	GameLevelState* state = new GameLevelState(_levelid, _size, _is_simulation);
 	copy_to(*state);
 	return state;
 }
@@ -72,8 +71,7 @@ void GameLevelState::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write_container(rooms);
 	serializer.write(_levelid);
 	serializer.write(_steps_left);
-	serializer.write(_width);
-	serializer.write(_height);
+	serializer.write(_size);
 	serializer.write(_is_simulation);
 
 	tiles().serialize(serializer);
@@ -87,8 +85,7 @@ void GameLevelState::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read_container(rooms);
 	serializer.read(_levelid);
 	serializer.read(_steps_left);
-	serializer.read(_width);
-	serializer.read(_height);
+	serializer.read(_size);
 	serializer.read(_is_simulation);
 
 	tiles().deserialize(serializer);
