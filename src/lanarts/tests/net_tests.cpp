@@ -56,7 +56,7 @@ SUITE(net_unit_tests) {
 		UNIT_TEST_ASSERT(callback_calls == 2);
 	}
 
-	static void test_multiple_clients() {
+	TEST(test_multiple_clients) {
 		const char* msgsrv = "Server Message";
 		const char* msgclient = "Client Message";
 		callback_calls = 0;
