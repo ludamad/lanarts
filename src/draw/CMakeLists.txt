@@ -11,9 +11,11 @@ set( SRC ../)
 set( LIBS ../../libs)
 
 include_directories(
-    include/ldraw/
+	include/ldraw/
+	${SRC}/common/include
 	${SRC}/common/include
 	${SRC}/luawrap/include
+	${LIBS}/UnitTest++
 	${LIBS}/lua
 	${SDL_INCLUDE_DIR} 
 	${SDLIMAGE_INCLUDE_DIR} 

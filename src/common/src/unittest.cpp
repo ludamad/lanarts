@@ -78,7 +78,6 @@ bool unit_test_suite(unit_test_function func, const char* fname) {
 	return true;
 }
 
-
 #include <UnitTest++.h>
 
 using namespace UnitTest;
@@ -102,8 +101,8 @@ public:
 	virtual void ReportFailure(const TestDetails& details,
 			char const* failure) {
 
-		printf("FAILED: %s line %d (%s)\n", details.testName,
-				details.lineNumber, failure);
+		printf("[%s]\n\t**FAILED: %s line %d (%s) \t[%s]\n", details.suiteName,
+				details.testName, details.lineNumber, failure);
 
 		did_finish_correctly = false;
 	}
@@ -111,7 +110,7 @@ public:
 	virtual void ReportTestFinish(const TestDetails& details,
 			float secondsElapsed) {
 		if (did_finish_correctly) {
-			printf("Passed: %s of %s\n", details.testName, details.suiteName);
+			printf("[%s]\n\t%s passed \n", details.suiteName, details.testName);
 		}
 	}
 

@@ -11,8 +11,6 @@ include(FindFreetype)
 set( SRC ..)
 set( LIBS ../../libs)
 
-
-
 include_directories(
 	${SDL_INCLUDE_DIR} 
 	${SDLIMAGE_INCLUDE_DIR}
@@ -24,6 +22,7 @@ include_directories(
 	${SRC}#/net
 	${SRC}/luawrap/include
 	${SRC}/sound/include
+	${LIBS}/UnitTest++ 
 	${LIBS}/yaml-cpp/include 
 	${LIBS}/lua 
 	${LIBS}#/rvo2 
@@ -82,11 +81,6 @@ file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 file(GLOB lanarts_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
        tests/*
-
-       tests/net/*
-
-       tests/stats/*
-       tests/lua_api/*
 )
 
 file(GLOB lanarts_examples RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
@@ -112,7 +106,7 @@ add_executable( lanarts_examples
 
 
 set (libraries 
-    lanartslib
+	lanartslib
 	ldraw
 	lcommon
 	lsound
