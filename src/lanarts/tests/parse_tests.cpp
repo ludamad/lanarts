@@ -12,7 +12,7 @@ SUITE(parse_unit_tests) {
 			FilenameList testfiles, expectedfiles;
 			filenames_from_pattern(testfiles, "test");
 			expectedfiles.push_back("test");
-			UNIT_TEST_ASSERT(testfiles == expectedfiles);
+			CHECK(testfiles == expectedfiles);
 		}
 		{
 			FilenameList testfiles, expectedfiles;
@@ -20,7 +20,7 @@ SUITE(parse_unit_tests) {
 			expectedfiles.push_back("test0");
 			expectedfiles.push_back("test1");
 			expectedfiles.push_back("test2");
-			UNIT_TEST_ASSERT(testfiles == expectedfiles);
+			CHECK(testfiles == expectedfiles);
 		}
 		{
 			FilenameList testfiles, expectedfiles;
@@ -28,14 +28,14 @@ SUITE(parse_unit_tests) {
 			expectedfiles.push_back("test0.png");
 			expectedfiles.push_back("test1.png");
 			expectedfiles.push_back("test2.png");
-			UNIT_TEST_ASSERT(testfiles == expectedfiles);
+			CHECK(testfiles == expectedfiles);
 		}
 
 		{
 			FilenameList testfiles, expectedfiles;
 			filenames_from_pattern(testfiles, "test(2-2)");
 			expectedfiles.push_back("test2");
-			UNIT_TEST_ASSERT(testfiles == expectedfiles);
+			CHECK(testfiles == expectedfiles);
 		}
 
 		{

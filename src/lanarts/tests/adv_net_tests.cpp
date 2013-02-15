@@ -37,19 +37,19 @@ SUITE(adv_net_unit_tests) {
 			const char* clientname2) {
 		std::vector<PlayerDataEntry>& pdes = netstate.pd.all_players();
 
-		UNIT_TEST_ASSERT(pdes.size() == 3);
+		CHECK(pdes.size() == 3);
 		for (int i = 0; i < pdes.size(); i++) {
-			UNIT_TEST_ASSERT(pdes[i].player_inst.get() == NULL);
-			UNIT_TEST_ASSERT(pdes[i].net_id == i);
+			CHECK(pdes[i].player_inst.get() == NULL);
+			CHECK(pdes[i].net_id == i);
 		}
 		/* test expected names */
-		UNIT_TEST_ASSERT(pdes[0].player_name == servername);
-		UNIT_TEST_ASSERT(pdes[1].player_name == clientname1);
-		UNIT_TEST_ASSERT(pdes[2].player_name == clientname2);
+		CHECK(pdes[0].player_name == servername);
+		CHECK(pdes[1].player_name == clientname1);
+		CHECK(pdes[2].player_name == clientname2);
 	}
 	static void test_initstate_helper(GameStateInitData& init, int seed) {
-		UNIT_TEST_ASSERT(init.seed == seed);
-		UNIT_TEST_ASSERT(init.seed_set_by_network_message);
+		CHECK(init.seed == seed);
+		CHECK(init.seed_set_by_network_message);
 	}
 
 	static void init_connections(NetUpdatedState& serverstate,
@@ -93,10 +93,10 @@ SUITE(adv_net_unit_tests) {
 
 	static void assert_game_actions_equals(GameAction& action1,
 			GameAction& action2) {
-		UNIT_TEST_ASSERT(action1.origin == action2.origin);
-		UNIT_TEST_ASSERT(action1.act == action2.act);
-		UNIT_TEST_ASSERT(action1.frame == action2.frame);
-		UNIT_TEST_ASSERT(action1.level == action2.level);
+		CHECK(action1.origin == action2.origin);
+		CHECK(action1.act == action2.act);
+		CHECK(action1.frame == action2.frame);
+		CHECK(action1.level == action2.level);
 	}
 
 	static void send_action(GameAction& action, int frame, int player,
@@ -112,7 +112,7 @@ SUITE(adv_net_unit_tests) {
 			GameAction& act, int frame) {
 		ActionQueue action;
 		pde.action_queue.extract_actions_for_frame(action, frame);
-		UNIT_TEST_ASSERT(action.size() == 1);
+		CHECK(action.size() == 1);
 		assert_game_actions_equals(action.at(0), act);
 	}
 	static void test_net_action_assert(NetUpdatedState& state, GameAction& a1,

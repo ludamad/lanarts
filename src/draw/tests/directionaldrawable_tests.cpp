@@ -22,8 +22,8 @@ SUITE(ldraw_directionaldrawable_tests) {
 		}
 
 		DirectionalDrawable dd(images);
-		UNIT_TEST_ASSERT(dd.animation_duration() == 0);
-		UNIT_TEST_ASSERT(!dd.is_animated());
+		CHECK(dd.animation_duration() == 0);
+		CHECK(!dd.is_animated());
 	}
 
 	//Test that it calls the correct mock
@@ -41,13 +41,13 @@ SUITE(ldraw_directionaldrawable_tests) {
 		float ONE_THIRD = FLOAT_PI * 2 / 3;
 
 		dd.draw(DrawOptions().angle(0 * ONE_THIRD), PosF());
-		UNIT_TEST_ASSERT(called_string == "0");
+		CHECK(called_string == "0");
 		dd.draw(DrawOptions().angle(1 * ONE_THIRD), PosF());
-		UNIT_TEST_ASSERT(called_string == "1");
+		CHECK(called_string == "1");
 		dd.draw(DrawOptions().angle(2 * ONE_THIRD), PosF());
-		UNIT_TEST_ASSERT(called_string == "2");
+		CHECK(called_string == "2");
 		dd.draw(DrawOptions().angle(3 * ONE_THIRD), PosF());
-		UNIT_TEST_ASSERT(called_string == "0");
+		CHECK(called_string == "0");
 	}
 
 }

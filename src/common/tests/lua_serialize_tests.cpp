@@ -24,8 +24,8 @@ SUITE(lua_serialize_tests) {
 		lua_deserialize(serializer, L, result);
 		result.push();
 
-		UNIT_TEST_ASSERT(lua_isnumber(L, -1));
-		UNIT_TEST_ASSERT(lua_tonumber(L, -1) == testnumber);
+		CHECK(lua_isnumber(L, -1));
+		CHECK(lua_tonumber(L, -1) == testnumber);
 
 		lua_pop(L, 1);
 
@@ -54,10 +54,10 @@ SUITE(lua_serialize_tests) {
 			result.push();
 		}
 
-		UNIT_TEST_ASSERT(lua_istable(L, -1));
+		CHECK(lua_istable(L, -1));
 		lua_getfield(L, -1, fieldname);
 		double tablevalue = lua_tonumber(L, -1);
-		UNIT_TEST_ASSERT(lua_tonumber(L, -1) == testnumber);
+		CHECK(lua_tonumber(L, -1) == testnumber);
 
 		lua_pop(L, 2);
 		L.finish_check();
@@ -71,7 +71,7 @@ SUITE(lua_serialize_tests) {
 		lua_serialize(serializer, L, value);
 		lua_deserialize(serializer, L, result);
 		result.push();
-		UNIT_TEST_ASSERT(lua_isnil(L, -1));
+		CHECK(lua_isnil(L, -1));
 
 		lua_pop(L, 1);
 
@@ -101,12 +101,12 @@ SUITE(lua_serialize_tests) {
 			result.push();
 		}
 
-		UNIT_TEST_ASSERT(lua_istable(L, -1));
+		CHECK(lua_istable(L, -1));
 		lua_getfield(L, -1, fieldname);
-		UNIT_TEST_ASSERT(lua_istable(L, -1));
+		CHECK(lua_istable(L, -1));
 		lua_getfield(L, -1, fieldname);
 		double tablevalue = lua_tonumber(L, -1);
-		UNIT_TEST_ASSERT(lua_tonumber(L, -1) == testnumber);
+		CHECK(lua_tonumber(L, -1) == testnumber);
 
 		lua_pop(L, 3);
 

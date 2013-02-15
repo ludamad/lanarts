@@ -27,20 +27,20 @@ SUITE(luavalue_tests) {
 			int input = 1337;
 			value["hello"] = input;
 			int output = value["hello"];
-			UNIT_TEST_ASSERT(input == output);
+			CHECK(input == output);
 		}
 
 		{
 			Pos inpos(1, 2);
 			value["hello"] = inpos;
 			Pos outpos = value["hello"];
-			UNIT_TEST_ASSERT(inpos == outpos);
+			CHECK(inpos == outpos);
 		}
 
 		globals.clear();
 		value.clear();
 
-		UNIT_TEST_ASSERT(lua_gettop(L) == 0);
+		CHECK(lua_gettop(L) == 0);
 	}
 
 	TEST(luavalue_test_value_equality) {
@@ -50,7 +50,7 @@ SUITE(luavalue_tests) {
 		LuaValue v1(L, -1), v2(L, -1);
 		v1.push();
 		v2.push();
-		UNIT_TEST_ASSERT(lua_equal(L, -1, -2));
+		CHECK(lua_equal(L, -1, -2));
 		lua_pop(L, 3);
 	}
 

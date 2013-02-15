@@ -19,16 +19,16 @@
 SUITE(stat_serialize_tests) {
 
 	static void assert_equal(Inventory& i1, Inventory& i2) {
-		UNIT_TEST_ASSERT(i1.max_size() == i2.max_size());
+		CHECK(i1.max_size() == i2.max_size());
 		for (int i = 0; i < i1.max_size(); i++) {
-			UNIT_TEST_ASSERT(i1.get(i) == i2.get(i));
+			CHECK(i1.get(i) == i2.get(i));
 		}
 	}
 
 	static void assert_equal(EquipmentStats& e1, EquipmentStats& e2) {
-		UNIT_TEST_ASSERT(e1.weapon() == e2.weapon());
-		UNIT_TEST_ASSERT(e1.armour() == e2.armour());
-		UNIT_TEST_ASSERT(e1.projectile() == e2.projectile());
+		CHECK(e1.weapon() == e2.weapon());
+		CHECK(e1.armour() == e2.armour());
+		CHECK(e1.projectile() == e2.projectile());
 		assert_equal(e1.inventory, e2.inventory);
 	}
 

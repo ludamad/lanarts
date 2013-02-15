@@ -7,11 +7,11 @@
 #include "unittest.h"
 
 static void range_func(const Range& range) {
-	UNIT_TEST_ASSERT(range == Range(1,2));
+	CHECK(range == Range(1,2));
 }
 
 static void rangef_func(const RangeF& rangef) {
-	UNIT_TEST_ASSERT(rangef == RangeF(.5,1.5));
+	CHECK(rangef == RangeF(.5,1.5));
 }
 
 SUITE(lua_range_tests) {

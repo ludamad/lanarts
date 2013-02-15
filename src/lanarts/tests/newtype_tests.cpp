@@ -14,13 +14,13 @@ SUITE(lua_api_tests) {
 		lua_api::register_general_api(L);
 
 		LuaValue newtype = luawrap::globals(L)["newtype"];
-		UNIT_TEST_ASSERT(!newtype.isnil());
+		CHECK(!newtype.isnil());
 
 		const char code[] = "bar = newtype().create()";
 		lua_assert_valid_dostring(L, code);
 
 		LuaValue bar = luawrap::globals(L)["bar"];
-		UNIT_TEST_ASSERT(!bar.isnil());
+		CHECK(!bar.isnil());
 
 		L.finish_check();
 	}
@@ -35,12 +35,12 @@ SUITE(lua_api_tests) {
 		lua_assert_valid_dostring(L, code);
 
 		LuaValue bar = luawrap::globals(L)["bar"];
-		UNIT_TEST_ASSERT(!bar.isnil());
+		CHECK(!bar.isnil());
 
 		LuaValue member = bar["member"];
 
-		UNIT_TEST_ASSERT(!member.isnil());
-		UNIT_TEST_ASSERT(member.as<std::string>() == "test");
+		CHECK(!member.isnil());
+		CHECK(member.as<std::string>() == "test");
 
 		L.finish_check();
 	}
@@ -58,8 +58,8 @@ SUITE(lua_api_tests) {
 
 		LuaValue got = luawrap::globals(L)["got"];
 
-		UNIT_TEST_ASSERT(!got.isnil());
-		UNIT_TEST_ASSERT(got.as<std::string>() == "test");
+		CHECK(!got.isnil());
+		CHECK(got.as<std::string>() == "test");
 
 		L.finish_check();
 	}
@@ -78,8 +78,8 @@ SUITE(lua_api_tests) {
 
 		LuaValue set = luawrap::globals(L)["set"];
 
-		UNIT_TEST_ASSERT(!set.isnil());
-		UNIT_TEST_ASSERT(set.as<std::string>() == "test");
+		CHECK(!set.isnil());
+		CHECK(set.as<std::string>() == "test");
 
 		L.finish_check();
 	}

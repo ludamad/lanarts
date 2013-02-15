@@ -1,12 +1,14 @@
-#include "unittest.h"
 #include <cstdio>
 #include <stdexcept>
 #include <cassert>
 
-struct Failure {
-	std::string msg;
+#include "unittest.h"
+
+using namespace UnitTest;
+
+struct Failure: public std::runtime_error {
 	Failure(const std::string& msg) :
-			msg(msg) {
+			runtime_error(msg) {
 	}
 };
 
@@ -19,68 +21,6 @@ void unit_test_assert(const std::string& msg, bool condition) {
 		unit_test_fail(msg);
 	}
 }
-
-static int unit_test_runs = 0, unit_test_failures = 0;
-static int unit_test_suite_runs = 0, unit_test_suite_failures = 0;
-
-bool unit_test(unit_test_function func, const char* fname) {
-	unit_test_runs++;
-	unit_test_suite_runs++;
-	try {
-		func();
-		printf("** Passed: %s\n", fname);
-		fflush(stdout);
-		return true;
-	} catch (const Failure& f) {
-		fprintf(stderr, "Failure in test %s:\n%s\n", fname, f.msg.c_str());
-		printf("** FAILED: %s\n", fname);
-	} catch (const std::exception& e) {
-		printf("** FAILED: %s\n", fname);
-		fprintf(stderr, "Exception in test %s:\n%s\n", fname, e.what());
-	} catch (...) {
-		printf("** FAILED: %s\n", fname);
-		fprintf(stderr, "Exception in test %s:\nUnknown exception type\n",
-				fname);
-	}
-	fflush(stdout);
-	fflush(stderr);
-
-	unit_test_failures++;
-	unit_test_suite_failures++;
-	return false;
-}
-
-void unit_test_reset_counts() {
-	unit_test_runs = 0;
-	unit_test_failures = 0;
-}
-
-void unit_test_print_count() {
-	fprintf(stdout, "Ran %d tests with %d passes and %d failures\n",
-			unit_test_runs, unit_test_runs - unit_test_failures,
-			unit_test_failures);
-	fflush(stdout);
-}
-
-bool unit_test_suite(unit_test_function func, const char* fname) {
-	unit_test_suite_runs = 0;
-	unit_test_suite_failures = 0;
-	fprintf(stdout, "running %s\n", fname);
-	func();
-	if (unit_test_suite_failures > 0) {
-		fprintf(stdout, "FAILED %s tests with %d tests failing out of %d\n",
-				fname, unit_test_suite_failures, unit_test_suite_runs);
-	} else {
-		fprintf(stdout, "%s passed all %d tests\n\n", fname,
-				unit_test_suite_runs, unit_test_suite_runs);
-	}
-	fflush(stdout);
-	return true;
-}
-
-#include <UnitTest++.h>
-
-using namespace UnitTest;
 
 class _UnitTestReporter: public TestReporter {
 public:
@@ -129,10 +69,6 @@ public:
 private:
 	bool did_finish_correctly;
 };
-
-bool unit_test_has_failure() {
-	return unit_test_failures > 0;
-}
 
 int run_unittests() {
 	_UnitTestReporter reporter;

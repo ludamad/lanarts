@@ -31,7 +31,7 @@ SUITE(net_unit_tests) {
 			const char* msg, size_t len) {
 		const char* tester = (char*) teststr;
 		callback_calls++;
-		UNIT_TEST_ASSERT(strncmp(tester, msg, len) == 0);
+		CHECK(strncmp(tester, msg, len) == 0);
 	}
 
 	TEST(test_simple_client_server_msg) {
@@ -53,7 +53,7 @@ SUITE(net_unit_tests) {
 		server->poll(assert_equal_msg, (void*) msg);
 		client->poll(assert_equal_msg, (void*) msg);
 
-		UNIT_TEST_ASSERT(callback_calls == 2);
+		CHECK(callback_calls == 2);
 	}
 
 	TEST(test_multiple_clients) {
@@ -82,7 +82,7 @@ SUITE(net_unit_tests) {
 		client1->poll(assert_equal_msg, (void*) msgsrv);
 		client2->poll(assert_equal_msg, (void*) msgsrv);
 
-		UNIT_TEST_ASSERT(callback_calls == 3);
+		CHECK(callback_calls == 3);
 	}
 
 	static void append_to_string_vector(receiver_t sender, void* strvec,
@@ -122,12 +122,12 @@ SUITE(net_unit_tests) {
 		server->poll(append_to_string_vector, (void*) &servermsglist);
 		client->poll(append_to_string_vector, (void*) &clientmsglist);
 
-		UNIT_TEST_ASSERT(servermsglist.size() == msg_n);
-		UNIT_TEST_ASSERT(clientmsglist.size() == msg_n);
+		CHECK(servermsglist.size() == msg_n);
+		CHECK(clientmsglist.size() == msg_n);
 
 		for (int i = 0; i < msg_n; i++) {
-			UNIT_TEST_ASSERT(servermsglist.at(i) == msgs[i]);
-			UNIT_TEST_ASSERT(clientmsglist.at(i) == msgs[i]);
+			CHECK(servermsglist.at(i) == msgs[i]);
+			CHECK(clientmsglist.at(i) == msgs[i]);
 		}
 	}
 

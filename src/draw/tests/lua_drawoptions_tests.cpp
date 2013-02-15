@@ -18,30 +18,30 @@ SUITE(lua_drawoptions_tests) {
 
 	static void drawoptions_func_defaults(const ldraw::DrawOptions& options) {
 		ldraw::DrawOptions defaults;
-		UNIT_TEST_ASSERT(options.draw_colour == defaults.draw_colour);
-		UNIT_TEST_ASSERT(options.draw_origin == defaults.draw_origin);
-		UNIT_TEST_ASSERT(options.draw_region == defaults.draw_region);
-		UNIT_TEST_ASSERT(options.draw_scale == defaults.draw_scale);
-		UNIT_TEST_ASSERT(options.draw_angle == defaults.draw_angle);
-		UNIT_TEST_ASSERT(options.draw_frame == defaults.draw_frame);
+		CHECK(options.draw_colour == defaults.draw_colour);
+		CHECK(options.draw_origin == defaults.draw_origin);
+		CHECK(options.draw_region == defaults.draw_region);
+		CHECK(options.draw_scale == defaults.draw_scale);
+		CHECK(options.draw_angle == defaults.draw_angle);
+		CHECK(options.draw_frame == defaults.draw_frame);
 	}
 	static void drawoptions_func_difforigin(const ldraw::DrawOptions& options) {
 		ldraw::DrawOptions defaults;
-		UNIT_TEST_ASSERT(options.draw_colour == defaults.draw_colour);
-		UNIT_TEST_ASSERT(options.draw_origin == ldraw::CENTER);
-		UNIT_TEST_ASSERT(options.draw_region == defaults.draw_region);
-		UNIT_TEST_ASSERT(options.draw_scale == defaults.draw_scale);
-		UNIT_TEST_ASSERT(options.draw_angle == defaults.draw_angle);
-		UNIT_TEST_ASSERT(options.draw_frame == defaults.draw_frame);
+		CHECK(options.draw_colour == defaults.draw_colour);
+		CHECK(options.draw_origin == ldraw::CENTER);
+		CHECK(options.draw_region == defaults.draw_region);
+		CHECK(options.draw_scale == defaults.draw_scale);
+		CHECK(options.draw_angle == defaults.draw_angle);
+		CHECK(options.draw_frame == defaults.draw_frame);
 	}
 
 	static void drawoptions_func_diffall(const ldraw::DrawOptions& options) {
-		UNIT_TEST_ASSERT(options.draw_colour == Colour(1,2,3,4));
-		UNIT_TEST_ASSERT(options.draw_origin == ldraw::CENTER);
-		UNIT_TEST_ASSERT(options.draw_region == BBoxF(1,2,3,4));
-		UNIT_TEST_ASSERT(options.draw_scale == SizeF(1,2));
-		UNIT_TEST_ASSERT(options.draw_angle == 1.0f);
-		UNIT_TEST_ASSERT(options.draw_frame == 1.0f);
+		CHECK(options.draw_colour == Colour(1,2,3,4));
+		CHECK(options.draw_origin == ldraw::CENTER);
+		CHECK(options.draw_region == BBoxF(1,2,3,4));
+		CHECK(options.draw_scale == SizeF(1,2));
+		CHECK(options.draw_angle == 1.0f);
+		CHECK(options.draw_frame == 1.0f);
 	}
 
 	TEST(lua_drawoptions_bind_test) {

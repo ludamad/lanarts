@@ -94,7 +94,6 @@ void FloodFillPaths::fill_paths_tile_region(const Pos& tile_xy,
 				node->open = true;
 				node->dx = 0;
 				node->dy = 0;
-				node->marked = false;
 				node->distance = 0;
 			}
 		}
@@ -257,7 +256,7 @@ void FloodFillPaths::point_to_local_min(int sx, int sy) {
 	int dx = 0, dy = 0;
 	int min_distance = HUGE_DISTANCE;
 
-	if (!fixed_node->marked) {
+	if (!fixed_node->open) {
 		for (int yy = miny; yy <= maxy; yy++) {
 			for (int xx = minx; xx <= maxx; xx++) {
 				if (sx == xx && sy == yy)
@@ -293,7 +292,7 @@ void FloodFillPaths::point_to_random_further(MTwist& mt, int sx, int sy) {
 	int compare_distance = fixed_node->distance;
 	bool set = false;
 
-	if (!fixed_node->marked) {
+	if (!fixed_node->open) {
 		for (int yy = miny; yy <= maxy; yy++) {
 			for (int xx = minx; xx <= maxx; xx++) {
 				if (sx == xx && sy == yy)

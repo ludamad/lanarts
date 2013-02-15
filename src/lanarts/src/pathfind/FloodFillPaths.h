@@ -36,12 +36,12 @@ struct FloodFillCoord {
 };
 
 struct FloodFillNode {
-	bool solid, open, marked;
+	bool solid, open;
 	int dx, dy, distance;
 	FloodFillNode() {
 	}
 	FloodFillNode(bool solid, bool open, int dx, int dy, int dist) :
-			solid(solid), open(open), marked(false), dx(dx), dy(dy), distance(
+			solid(solid), open(open), dx(dx), dy(dy), distance(
 					dist) {
 	}
 };
@@ -74,9 +74,14 @@ public:
 		return get(tile_xy.x - _topleft_xy.x, tile_xy.y - _topleft_xy.y);
 	}
 
+	Size size() const {
+		return _size;
+	}
+
 	int width() const {
 		return _size.w;
 	}
+
 	int height() const {
 		return _size.h;
 	}

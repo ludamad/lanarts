@@ -12,8 +12,8 @@ SUITE(ldraw_image_tests) {
 		using namespace ldraw;
 		Image img;
 		img.draw_region() = BBoxF(0, 0, 100, 100);
-		UNIT_TEST_ASSERT(img.draw_region() == BBoxF(0,0,100,100));
-		UNIT_TEST_ASSERT(img.animation_duration() == 0);
-		UNIT_TEST_ASSERT(!img.is_animated());
+		CHECK(img.draw_region() == BBoxF(0,0,100,100));
+		CHECK(img.animation_duration() == 0);
+		CHECK(!img.is_animated());
 	}
 }

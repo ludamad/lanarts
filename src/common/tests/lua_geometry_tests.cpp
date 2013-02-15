@@ -34,10 +34,10 @@ SUITE (lua_geometry_tests) {
 	}
 
 	static void pos_func1(Pos p) {
-		UNIT_TEST_ASSERT(p == Pos(1,2));
+		CHECK(p == Pos(1,2));
 	}
 	static void pos_func2(const Pos& p) {
-		UNIT_TEST_ASSERT(p == Pos(1,2));
+		CHECK(p == Pos(1,2));
 	}
 
 	TEST(lua_pos_bind_test) {
@@ -54,10 +54,10 @@ SUITE (lua_geometry_tests) {
 	}
 
 	static void posf_func1(PosF p) {
-		UNIT_TEST_ASSERT(p == PosF(.5,1.5));
+		CHECK(p == PosF(.5,1.5));
 	}
 	static void posf_func2(const PosF& p) {
-		UNIT_TEST_ASSERT(p == PosF(.5,1.5));
+		CHECK(p == PosF(.5,1.5));
 	}
 
 	TEST(lua_posf_bind_test) {
@@ -74,7 +74,7 @@ SUITE (lua_geometry_tests) {
 	}
 
 	static void bbox_func(const BBox& bbox) {
-		UNIT_TEST_ASSERT(bbox == BBox(1,2,3,4));
+		CHECK(bbox == BBox(1,2,3,4));
 	}
 
 	TEST(lua_bbox_bind_test) {
@@ -90,7 +90,7 @@ SUITE (lua_geometry_tests) {
 	}
 
 	static void bboxf_func(const BBoxF& bbox) {
-		UNIT_TEST_ASSERT(bbox == BBoxF(.5,1.5,2.5,3.5));
+		CHECK(bbox == BBoxF(.5,1.5,2.5,3.5));
 	}
 
 	TEST(lua_bboxf_bind_test) {
@@ -107,7 +107,7 @@ SUITE (lua_geometry_tests) {
 	}
 
 	static void size_func(const Size& size) {
-		UNIT_TEST_ASSERT(size == Size(1,2));
+		CHECK(size == Size(1,2));
 	}
 
 	TEST(lua_size_bind_test) {
@@ -124,7 +124,7 @@ SUITE (lua_geometry_tests) {
 	}
 
 	static void sizef_func(const SizeF& size) {
-		UNIT_TEST_ASSERT(size == SizeF(.5,1.5));
+		CHECK(size == SizeF(.5,1.5));
 	}
 	TEST(lua_sizef_bind_test) {
 		TestLuaState L;

@@ -20,8 +20,8 @@ SUITE(ldraw_animation_tests) {
 		}
 		Animation anim(images);
 
-		UNIT_TEST_ASSERT(anim.animation_duration() == 3);
-		UNIT_TEST_ASSERT(anim.is_animated());
+		CHECK(anim.animation_duration() == 3);
+		CHECK(anim.is_animated());
 	}
 
 	//Test that it calls the correct mock
@@ -37,16 +37,16 @@ SUITE(ldraw_animation_tests) {
 		anim.add(Drawable(new DrawableMock("2", &called_string)));
 
 		anim.draw(DrawOptions().frame(0), PosF());
-		UNIT_TEST_ASSERT(called_string == "0");
+		CHECK(called_string == "0");
 
 		anim.draw(DrawOptions().frame(1), PosF());
-		UNIT_TEST_ASSERT(called_string == "1");
+		CHECK(called_string == "1");
 
 		anim.draw(DrawOptions().frame(2), PosF());
-		UNIT_TEST_ASSERT(called_string == "2");
+		CHECK(called_string == "2");
 
 		anim.draw(DrawOptions().frame(3), PosF());
-		UNIT_TEST_ASSERT(called_string == "0");
+		CHECK(called_string == "0");
 	}
 }
 

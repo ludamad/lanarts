@@ -72,7 +72,7 @@ void WanderMap::generate_wander_map_section(const Pos& source_xy) {
 	for (; tile_xy.y < region.y2; tile_xy.y++) {
 		for (; tile_xy.x < region.x2; tile_xy.x++) {
 			FloodFillNode* node = paths.node_at(tile_xy);
-			if (!(*_solidity)[tile_xy] || !node->marked) {
+			if (!(*_solidity)[tile_xy] || node->open) {
 				paths.fill_paths_tile_region(tile_xy, region, false /* Incrementally fill */);
 			}
 			_squares[tile_xy].distance_to_source = node->distance;
@@ -90,7 +90,7 @@ void WanderMap::generate_wander_map_section(const Pos& source_xy) {
 			}
 
 			FloodFillNode* node = paths.node_at(tile_xy);
-			if (!(*_solidity)[tile_xy] && !node->marked) {
+			if (!(*_solidity)[tile_xy] && node->open) {
 				paths.fill_paths_tile_region(tile_xy, region, false /* Incrementally fill */);
 			}
 			_squares[tile_xy].distance_to_source = node->distance;

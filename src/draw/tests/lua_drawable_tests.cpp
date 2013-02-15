@@ -68,15 +68,15 @@ SUITE(lua_drawable_tests) {
 		lua_assert_valid_dostring(L, code);
 
 		lua_getglobal(L, "drawfunc");
-		UNIT_TEST_ASSERT(lua_checkluadrawable(L, -1));
-		UNIT_TEST_ASSERT(lua_checkdrawable(L, -1));
+		CHECK(lua_checkluadrawable(L, -1));
+		CHECK(lua_checkdrawable(L, -1));
 
 		LuaDrawable ldrawable1(L, LuaValue(L, -1));
 		LuaDrawable ldrawable2 = luawrap::get<LuaDrawable>(L, -1);
 		Drawable drawable = luawrap::get<Drawable>(L, -1);
 		LuaDrawable ldrawable3 = *dynamic_cast<LuaDrawable*>(drawable.ptr());
-		UNIT_TEST_ASSERT(ldrawable1 == ldrawable2);
-		UNIT_TEST_ASSERT(ldrawable1 == ldrawable3);
+		CHECK(ldrawable1 == ldrawable2);
+		CHECK(ldrawable1 == ldrawable3);
 		lua_pop(L, 1);
 
 		L.finish_check();

@@ -26,7 +26,7 @@ SUITE(lua_font_tests) {
 		lua_register_font(L, globals);
 
 		luawrap::push<Font>(L, f);
-		UNIT_TEST_ASSERT(lua_isuserdata(L, -1));
+		CHECK(lua_isuserdata(L, -1));
 		lua_pop(L, 1);
 
 		globals["assert"] = luawrap::function(L, unit_test_assert);

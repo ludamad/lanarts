@@ -53,7 +53,7 @@ SUITE(lua_image_tests) {
 
 			luawrap::push_function(L, img_identity_function);
 			BBoxF returned = luawrap::call<Image>(L, image).draw_region();
-			UNIT_TEST_ASSERT(image.draw_region() == returned);
+			CHECK(image.draw_region() == returned);
 		}
 
 		L.finish_check();
@@ -116,7 +116,7 @@ SUITE(lua_image_tests) {
 
 		}
 
-		UNIT_TEST_ASSERT(lua_gettop(L) == 0);
+		CHECK(lua_gettop(L) == 0);
 		lua_close(L);
 	}
 

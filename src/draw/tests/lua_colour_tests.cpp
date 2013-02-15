@@ -17,7 +17,7 @@
 
 SUITE(lua_colour_tests) {
 	static void colour_func(const Colour& range) {
-		UNIT_TEST_ASSERT(range == Colour(1,2,3,255));
+		CHECK(range == Colour(1,2,3,255));
 	}
 
 	TEST(lua_colour_bind_test) {
