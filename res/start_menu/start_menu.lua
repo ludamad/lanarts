@@ -164,7 +164,7 @@ function setup_start_menu()
     end
 
     menu_state.menu:add_instance(
-        start_menu_create( --[[New Game Button]] menu_state.continue, --[[Load Game Button]] on_load_click),
+        start_menu_create( --[[New Game Button]] setup_settings_menu, --[[Load Game Button]] on_load_click),
         CENTER
     )
 end
