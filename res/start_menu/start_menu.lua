@@ -52,6 +52,13 @@ local function start_menu_create(on_start_click, on_load_click)
         )
     end
 
+    function menu:step(xy) -- Makeshift inheritance
+       InstanceBox.step(self, xy)
+       if key_pressed('N') then
+            on_start_click()
+       end 
+    end
+
     return menu
 end
 

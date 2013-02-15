@@ -211,9 +211,8 @@ areas:
             generated:
               - default: *medium_animals
           
-#small levels with easyish enemies
       #Level 4
-      - layout: [*small_layout1]
+      - layout: *medium_layouts
         content:
           features: { tileset: [crystal_tiles, crystal_tiles_with_marble, crypt_tiles]}
           items:    { amount: 7,  itemgenlist: Enchanted Items   }
@@ -243,7 +242,7 @@ areas:
               - {enemy: Red Dragon, guaranteed_spawns: 1}
           
       #Level 7
-      - layout: *medium_layouts
+      - layout: [*small_layout1]
         content:
           features: { tileset: *all_tilesets}
           items:    { amount: 8,  itemgenlist: Enchanted Items   }
