@@ -55,7 +55,7 @@ public:
 	void update_position();
 	virtual void update_position(float newx, float newy);
 
-	bool damage(GameState* gs, int dmg);
+	virtual bool damage(GameState* gs, int dmg);
 	bool damage(GameState* gs, const EffectiveAttackStats& attack);
 	bool melee_attack(GameState* gs, CombatGameInst* inst,
 			const Weapon& weapon, bool ignore_cooldowns = false);
@@ -66,8 +66,7 @@ public:
 
 	virtual void signal_attacked_successfully() {
 	}
-	virtual void signal_was_damaged() {
-	}
+
 	virtual void signal_killed_enemy() {
 		kills++;
 	}

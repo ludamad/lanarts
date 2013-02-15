@@ -32,7 +32,6 @@ bool CombatGameInst::damage(GameState* gs, int dmg) {
 		die(gs);
 		return true;
 	}
-	signal_was_damaged();
 	cooldowns().reset_hurt_cooldown(HURT_COOLDOWN);
 	return false;
 }
@@ -64,8 +63,9 @@ void CombatGameInst::update_field_of_view(GameState* gs) {
 void CombatGameInst::step(GameState* gs) {
 	estats = stats().effective_stats(gs, this);
 	stats().step(gs, this, estats);
+
 	// XXX: If we do not sync the new mp & hp values
-	// we can get drawing artifacts
+	// we can get health/mp bars that look more than full
 	estats.core.hp = stats().core.hp;
 	estats.core.mp = stats().core.mp;
 }

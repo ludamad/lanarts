@@ -27,8 +27,9 @@ public:
 	virtual void copy_to(GameInst* inst) const;
 	virtual EnemyInst* clone() const;
 
+	virtual bool damage(GameState* gs, int dmg);
+
 	virtual void signal_attacked_successfully();
-	virtual void signal_was_damaged();
 
 	virtual unsigned int integrity_hash();
 
@@ -42,10 +43,12 @@ public:
 	int xpworth(){
 		return xpgain;
 	}
-protected:
+
+private:
 	bool seen;
 	int enemytype;
 	EnemyBehaviour eb;
+	int enemy_regen_cooloff;
 //	EnemyAIState ai_state;
 	int xpgain;
 };

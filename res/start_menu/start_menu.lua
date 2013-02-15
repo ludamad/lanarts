@@ -205,7 +205,6 @@ local function menu_loop(should_poll)
             net.connections_poll()
         end
 
-
         menu_state.menu:step( {0, 0} )
 
         if key_pressed(keys.ENTER) and menu_state.continue then

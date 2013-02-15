@@ -51,17 +51,21 @@ float monster_difficulty_multiplier(GameState* gs, EnemyEntry& etype) {
 	if (size > 6) {
 		size = 6; // A group larger than 6 will probably be split up considerably
 	}
-	float mult = log(size);//NB: natural log, base e ~ 2.718...
+	float mult = log(size); //NB: natural log, base e ~ 2.718...
 	if (etype.unique) {
-		return 1+mult / 8; // Can reasonably expect all players to be part of a boss fight
+		return 1 + mult / 8; // Can reasonably expect all players to be part of a boss fight
 	}
-	return 1+mult / 16;
+	return 1 + mult / 16;
 }
 
 EnemyInst::EnemyInst(int enemytype, int x, int y, int teamid, int mobid) :
-		CombatGameInst(__E(enemytype).basestats, __E(enemytype).enemy_sprite,
-				teamid, mobid, x, y, __E(enemytype).radius, true, DEPTH), seen(
-				false), enemytype(enemytype), xpgain(__E(enemytype).xpaward) {
+				CombatGameInst(__E(enemytype).basestats,
+						__E(enemytype).enemy_sprite, teamid, mobid, x, y,
+						__E(enemytype).radius, true, DEPTH) {
+	this->seen = false;
+	this->xpgain = __E(enemytype).xpaward;
+	this->enemytype = enemytype;
+	this->enemy_regen_cooloff = 0;
 }
 
 EnemyInst::~EnemyInst() {
@@ -78,10 +82,6 @@ static void combine_hash(unsigned int& hash, unsigned int val1, unsigned val2) {
 
 void EnemyInst::signal_attacked_successfully() {
 	eb.randomization.successful_hit_timer = 0;
-}
-
-void EnemyInst::signal_was_damaged() {
-	eb.randomization.damage_taken_timer = 0;
 }
 
 unsigned int EnemyInst::integrity_hash() {
@@ -102,7 +102,6 @@ void EnemyInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 //	ai_state.serialize(gs, serializer);
 }
 
-
 void EnemyInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	CombatGameInst::deserialize(gs, serializer);
 	serializer.read(seen);
@@ -114,6 +113,14 @@ void EnemyInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 			target_radius, effective_stats().movespeed);
 //	ai_state.deserialize(gs, serializer);
 }
+
+bool EnemyInst::damage(GameState* gs, int dmg) {
+	eb.damage_was_taken();
+	enemy_regen_cooloff += dmg;
+
+	return CombatGameInst::damage(gs, dmg);
+}
+
 EnemyEntry& EnemyInst::etype() {
 	return game_enemy_data.at(enemytype);
 }
@@ -159,7 +166,19 @@ static void show_defeat_message(GameChat& chat, EnemyEntry& e) {
 
 void EnemyInst::step(GameState* gs) {
 	//Much of the monster implementation resides in MonsterController
+
+// XXX: Make the monster health absorbing way less hackish and more general
+	int hp_before = stats().core.hp;
+
 	CombatGameInst::step(gs);
+
+	// Absorb health regen if recently damaged
+	int hp_gain = stats().core.hp - hp_before;
+	int hp_cooloff = std::min(enemy_regen_cooloff, hp_gain);
+	enemy_regen_cooloff -= hp_cooloff;
+	stats().core.hp -= hp_cooloff;
+	effective_stats().core.hp = stats().core.hp;
+
 	update_position();
 
 	if (!seen && gs->object_visible_test(this, gs->local_player())) {
@@ -175,17 +194,15 @@ void EnemyInst::draw(GameState* gs) {
 
 	if (gs->game_settings().draw_diagnostics) {
 		char statbuff[255];
-		snprintf(
-				statbuff,
-				255,
+		snprintf(statbuff, 255,
 				"simid=%d nvx=%f vy=%f\n chasetime=%d \n mdef=%d pdef=%d", // \n act=%d, path_steps = %d\npath_cooldown = %d\n",
 				simulation_id, vx, vy, eb.chase_timeout,
-				(int)effective_stats().magic.resistance,
-				(int)effective_stats().physical.resistance);
+				(int) effective_stats().magic.resistance,
+				(int) effective_stats().physical.resistance);
 		//eb.current_action,
 		//eb.path_steps, eb.path_cooldown);
-		gs->font().draw(COL_WHITE,
-				Pos(x - radius - view.x, y - 70 - view.y), statbuff);
+		gs->font().draw(COL_WHITE, Pos(x - radius - view.x, y - 70 - view.y),
+				statbuff);
 	}
 
 	int w = spr.size().w, h = spr.size().h;
@@ -196,23 +213,18 @@ void EnemyInst::draw(GameState* gs) {
 	if (!gs->object_visible_test(this))
 		return;
 
-// TODO: fix enemy mouseover descriptions ?
-//	BBox ebox(xx, yy, xx + w, yy + h);
-//	if (ebox.contains(gs->mouse_x() + view.x, gs->mouse_y() + view.y)) {
-//		draw_console_enemy_description(gs, etype());
-//	}
-
 	if (etype().draw_event.empty()) {
 		float frame = gs->frame();
 		if (etype().name == "Hydra") {
-			frame = floor( core_stats().hp / float(core_stats().max_hp) * 4);
-			if (frame >= 4) frame = 4;
+			frame = floor(core_stats().hp / float(core_stats().max_hp) * 4);
+			if (frame >= 4)
+				frame = 4;
 		}
 		CombatGameInst::draw(gs, frame);
 	} else {
 		lua_State* L = gs->luastate();
 		etype().draw_event.get(L).push();
-		luawrap::call<void>(L, (GameInst*)this);
+		luawrap::call<void>(L, (GameInst*) this);
 	}
 }
 
@@ -247,5 +259,5 @@ void EnemyInst::die(GameState *gs) {
 
 void EnemyInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(EnemyInst*)inst = *this;
+	*(EnemyInst*) inst = *this;
 }

@@ -1,0 +1,2 @@
+- Refactor the sidebar into Lua, starting with the inventory
+- Refactor CombatGameInst so the differences between enemies and players is merely a matter of 'status effects'

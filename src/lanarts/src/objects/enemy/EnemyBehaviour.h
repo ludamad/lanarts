@@ -83,6 +83,10 @@ struct EnemyBehaviour {
 		randomization.step();
 	}
 
+	void damage_was_taken() {
+		randomization.damage_taken_timer = 0;
+	}
+
 	void serialize(GameState* gs, SerializeBuffer& serializer);
 	void deserialize(GameState* gs, SerializeBuffer& serializer);
 };
