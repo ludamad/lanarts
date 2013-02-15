@@ -67,7 +67,6 @@ static GameState* init_gamestate() {
 	GameState* gs = new GameState(settings, L);
 	lua_api::register_api(gs, L);
 
-
 	return gs;
 }
 
@@ -96,6 +95,7 @@ label_StartOver:
 	}
 
 	if (gs->start_game()) {
+		lua_api::require(L, "main"); // loads main.lua
 		lua_getglobal(L, "main");
 		luawrap::call<void>(L);
 

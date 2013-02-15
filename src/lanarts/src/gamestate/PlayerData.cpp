@@ -128,6 +128,7 @@ void PlayerData::deserialize(GameState* gs, SerializeBuffer & serializer) {
 	for (int i = 0; i < psize; i++) {
 		PlayerDataEntry& pde = _players.at(i);
 		read_inst_ref(pde.player_inst, gs, serializer);
+		pde.classtype = pde.player()->class_stats().classid;
 		pde.action_queue.clear();
 	}
 

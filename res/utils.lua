@@ -2,6 +2,12 @@
 local assert = assert 
 local unpack = unpack
 
+function file_exists(name)
+	local f = io.open(name,"r")
+	if f ~= nil then io.close(f) end
+	return f ~= nil
+end
+
 function with_alpha(col, alpha) -- Don't mutate, we might be passed a colour constant!
     local copy = { unpack(col) } 
     -- Assume we have at least 3 components, but may have 4

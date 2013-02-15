@@ -230,6 +230,7 @@ void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read(last_chosen_weaponclass);
 //	serializer.read_container(queued_actions);
 	queued_actions.clear();
+	_path_to_player.initialize(gs->tiles().solidity_map());
 	_path_to_player.fill_paths_in_radius(pos(), PLAYER_PATHING_RADIUS);
 	update_field_of_view(gs);
 	DESERIALIZE_POD_REGION(serializer, this, local, spellselect);

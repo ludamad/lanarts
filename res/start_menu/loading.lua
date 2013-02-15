@@ -25,9 +25,9 @@ end
 
 local function center_screen_setup()
 	local center_box = InstanceBox.create( { size = {640, 480} } )
-	local percentage_label = TextLabel.create( fonts.small, {origin=CENTER_TOP}, "")
 	local task_label = TextLabel.create( fonts.small, {color=COL_MUTED_GREEN, origin=CENTER_TOP}, "")
 	local loading_label = TextLabel.create( fonts.large, { color=COL_LIGHT_GRAY, origin=CENTER_TOP }, "" )
+	local dragon_sprite = Sprite.image_create("res/enemies/bosses/sprites/reddragon.png")
 
 	center_box:add_instance( 
 		loading_label,
@@ -36,16 +36,15 @@ local function center_screen_setup()
 		{0, -100}
 	)
 	center_box:add_instance( 
-		Sprite.image_create("res/enemies/bosses/sprites/reddragon.png"), -- dragon
+		dragon_sprite,
 		CENTER
 	)
-	center_box:add_instance( percentage_label, CENTER )
 	center_box:add_instance( task_label, CENTER, --[[Down 50 pixels]] {0, 50} )
 
 	function setup_callback(percentage, task) 
---		percentage_label.text = percentage .. "% Done: "
 		task_label.text = task
 		loading_label.text = loading_string(percentage)
+		dragon_sprite.options.color = with_alpha( COL_WHITE, percentage/100 )
 	end
 
 	return center_box

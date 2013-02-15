@@ -1,11 +1,4 @@
-local function file_exists(name)
-	local f=io.open(name,"r")
-	if f~=nil then 
-		io.close(f) 
-		return true
-	end
-	return false 
-end
+require "utils"
 
 local function optional_load(file, loader) 
 	if not file_exists(file) then

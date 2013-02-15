@@ -203,6 +203,12 @@ static void update_loading_screen(lua_State* L, int percent, const char* task) {
 	/* pop system table */
 }
 
+template<class T>
+static void __lua_init(lua_State* L, T& t) {
+	for (int i = 0; i < t.size(); i++)
+		t[i].init(L);
+}
+
 void init_game_data(GameSettings& settings, lua_State* L) {
 	LuaSpecialValue globals = luawrap::globals(L);
 
@@ -249,37 +255,18 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 	lua_dungeon.clear();
 	lua_classes = load_class_data(L, dfiles.class_files);
 	update_loading_screen(L, 100, "Complete!");
-}
 
-static void register_as_global(lua_State* L, LuaValue& value,
-		const char* name) {
-	if (!value.empty()) {
-		value.push();
-		lua_setglobal(L, name);
-	}
-}
+	// TODO clean this up
 
-template<class T>
-static void __lua_init(lua_State* L, T& t) {
-	for (int i = 0; i < t.size(); i++)
-		t[i].init(L);
-}
+	lua_api::require(L, "main");
 
-void init_lua_data(GameState* gs, lua_State* L) {
-	//Lua configuration
-	lua_lanarts_api(gs, L);
+	globals["enemies"] = lua_enemies;
+	globals["effects"] = lua_effects;
+	globals["items"] = lua_items;
+	globals["projectiles"] = lua_projectiles;
+	globals["spells"] = lua_spells;
+	globals["classes"] = lua_classes;
 
-	register_as_global(L, lua_enemies, "enemies");
-	register_as_global(L, lua_effects, "effects");
-//	register_as_global(L, weapons, "weapons");
-	register_as_global(L, lua_items, "items");
-	register_as_global(L, lua_projectiles, "projectiles");
-	register_as_global(L, lua_spells, "spells");
-//	register_as_global(L, sprites, "sprites");
-//	register_as_global(L, dungeon, "dungeon");
-	register_as_global(L, lua_classes, "classes");
-
-	lua_safe_dofile(L, "res/main.lua");
 	__lua_init(L, game_enemy_data);
 	__lua_init(L, game_effect_data);
 	__lua_init(L, game_spell_data);
@@ -287,7 +274,6 @@ void init_lua_data(GameState* gs, lua_State* L) {
 	for (int i = 0; i < game_item_data.size(); i++) {
 		game_item_data[i]->init(L);
 	}
-
 }
 
 static void luayaml_push(LuaValue& value, lua_State* L, const char* name) {

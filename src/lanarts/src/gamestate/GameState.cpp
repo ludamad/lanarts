@@ -129,7 +129,6 @@ bool GameState::start_game() {
 		save_init(this, init_data.seed, settings.class_type);
 	}
 
-	init_lua_data(this, L);
 	if (settings.conntype == GameSettings::CLIENT) {
 		while (!init_data.seed_set_by_network_message) {
 			if (!connection.poll_messages(1 /* milliseconds */)) {
@@ -142,10 +141,13 @@ bool GameState::start_game() {
 
 	mtwist.init_genrand(init_data.seed);
 
-	set_level(world.get_level(0, true));
+	/* If class was not set, we may be loading a game -- don't init level */
+	if (settings.class_type != -1) {
+		set_level(world.get_level(0, true));
 
-	PlayerInst* p = local_player();
-	view().sharp_center_on(p->x, p->y);
+		PlayerInst* p = local_player();
+		view().sharp_center_on(p->x, p->y);
+	}
 
 	return true;
 }
@@ -195,6 +197,8 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	world.set_current_level(local_player()->current_level);
 
 	_view.sharp_center_on(local_player()->pos());
+
+	settings.class_type = local_player()->class_stats().classid;
 }
 
 obj_id GameState::add_instance(level_id level, GameInst* inst) {

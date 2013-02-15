@@ -88,6 +88,8 @@ end
 local music = music_optional_load("res/sound/lanarts1.ogg")
 
 function main()
+    config.startup_function()
+
 	game.input_capture()
 	music:loop()
 
@@ -106,23 +108,18 @@ function main()
 			paused = not paused
 		end
 
-		if key_pressed(keys.F6) and single_player then
-			game.load("savefile.save")
-			game.input_capture(true) -- reset input
-		end
-
 		if key_pressed(keys.ESCAPE) then 
-			show_message("Press Shift + Esc to exit, any unsaved progress will be lost!")
+			show_message("Press Shift + Esc to exit, your progress will be saved.")
 		end
 
 		if not main_loop(false) then
+			game.save("savefile.save")
 			break
 		end
 
 		if key_pressed(keys.F5) then
 			game.input_capture(true) -- reset input
 			net.sync_message_send()
-			game.save("savefile.save")
 		end
 	end
 

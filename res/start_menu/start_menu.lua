@@ -4,13 +4,14 @@ require "InstanceBox"
 require "Sprite"
 require "TextLabel"
 require "utils"
+require "config"
 
 -- START SCREEN -- 
 
 local function text_button_create(text, on_click)
-	local font = font_cached_load(settings.menu_font, 20)
-	local label = TextLabel.create(font, { color=COL_WHITE }, text)
-	local padding = 5
+    local font = font_cached_load(settings.menu_font, 20)
+    local label = TextLabel.create(font, { color=COL_WHITE }, text)
+    local padding = 5
 
     function label:step(xy) -- Makeshift inheritance
         TextLabel.step(self, xy)
@@ -26,7 +27,7 @@ local function text_button_create(text, on_click)
     return label
 end
 
-local function start_menu_create(on_start_click)
+local function start_menu_create(on_start_click, on_load_click)
     local menu = InstanceBox.create( { size = display.window_size } )
 
     menu:add_instance(
@@ -42,6 +43,14 @@ local function start_menu_create(on_start_click)
         --[[Down 100 pixels]]
         {0, 100}
     )
+    if file_exists("savefile.save") then
+        menu:add_instance(
+            text_button_create("Continue Game", on_load_click),
+            CENTER,
+            --[[Down 150 pixels]]
+            {0, 150}
+        )
+    end
 
     return menu
 end
@@ -138,20 +147,37 @@ end
 
 function setup_start_menu()
     menu_state.menu = InstanceBox.create( { size = display.window_size } )
-    menu_state.continue = setup_settings_menu
+    
+    local function on_load_click()
+        config.startup_function = function()
+            if file_exists("savefile.save") then
+                game.load("savefile.save")
+            end
+        end
+        exit_menu()
+    end
+
+    if file_exists("savefile.save") then
+        menu_state.continue = on_load_click
+    else 
+        menu_state.continue = setup_settings_menu
+    end
+
     menu_state.menu:add_instance(
-        start_menu_create( --[[New Game Button]] menu_state.continue ),
+        start_menu_create( --[[New Game Button]] menu_state.continue, --[[Load Game Button]] on_load_click),
         CENTER
     )
 end
 
 function setup_settings_menu()
     menu_state.menu = InstanceBox.create( { size = display.window_size } )
+
     function menu_state.continue() 
         if settings.class_type ~= -1 then
             exit_menu()
         end
     end
+
     menu_state.menu:add_instance(
         game_settings_menu_create( --[[Back Button]] setup_start_menu, --[[Start Game Button]] menu_state.continue), 
         CENTER
