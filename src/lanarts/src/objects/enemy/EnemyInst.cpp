@@ -99,6 +99,7 @@ void EnemyInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write_int(enemytype);
 	eb.serialize(gs, serializer);
 	serializer.write_int(xpgain);
+	serializer.write_int(enemy_regen_cooloff);
 //	ai_state.serialize(gs, serializer);
 }
 
@@ -108,6 +109,7 @@ void EnemyInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read_int(enemytype);
 	eb.deserialize(gs, serializer);
 	serializer.read_int(xpgain);
+	serializer.read_int(enemy_regen_cooloff);
 	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
 	collision_simulation_id() = coll_avoid.add_active_object(pos(),
 			target_radius, effective_stats().movespeed);

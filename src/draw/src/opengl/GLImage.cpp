@@ -228,7 +228,7 @@ void GLImage::draw(const ldraw::DrawOptions& options, const PosF& pos) {
 
 	QuadF quad(adjusted, options.draw_angle);
 
-	gl_draw_image(texture, options.draw_colour,
+	gl_draw_image(texture, options.draw_colour.clamp(),
 			draw_region.scaled(texw / width, texh / height),
 			quad.translated(pos));
 }

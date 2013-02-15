@@ -14,7 +14,7 @@ enemies:
     stats:
         attacks: [ { weapon: Basic Melee}, { projectile: Longer Range Blue Blast} ]
         movespeed: 3.5
-        hp: 250
+        hp: 400
         hpregen: 0.15
         strength: 25
         magic: 30
@@ -32,7 +32,7 @@ enemies:
     unique: yes
     stats:
         attacks: [ {weapon: Basic Melee}, { projectile: Large Fire Ball} ]
-        hp: 150
+        hp: 220
         hpregen: 0.1
         movespeed: 2.5
         strength: 25
@@ -47,7 +47,7 @@ enemies:
     unique: yes
     stats:
         attacks: [ {weapon: Basic Melee}, { projectile: Large Fire Ball} ]
-        hp: 150
+        hp: 250
         hpregen: 0.1
         movespeed: 2.5
         strength: 25
