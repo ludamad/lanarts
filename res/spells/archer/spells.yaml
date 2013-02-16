@@ -14,3 +14,13 @@ spells:
     resist_modifier: 0.5
     spr_spell: magic arrow
     projectile: Magic Arrow
+
+#TODO implement properly
+  - name: Poison Arrow
+    description:
+     Embues an arrow with poison.
+    mp_cost: 25
+    cooldown: 60
+    spr_spell: poison
+    projectile: Poison Cloud
+    

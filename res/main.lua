@@ -84,6 +84,7 @@ function postdraw()
 		fps_timer:start()
 		fps_count = 0
 	end
+	help_overlay_draw()
 end
 
 local music = music_optional_load("res/sound/lanarts1.ogg")
