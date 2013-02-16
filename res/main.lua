@@ -25,6 +25,7 @@ dofile "res/spells/spell_effects.lua"
 dofile "res/spells/spells.lua"
 dofile "res/levels/levels.lua"
 
+require "help_overlay"
 require "start_menu"
 
 local paused = false
