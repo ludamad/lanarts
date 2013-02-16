@@ -28,7 +28,7 @@ local function help_overlay_create()
     return overlay
 end
 
-local help_overlay = help_overlay_create()
+--local help_overlay = help_overlay_create()
 
 function help_overlay_toggle() 
     if help_overlay then
