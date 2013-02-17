@@ -46,7 +46,12 @@ static void write_or_assert_hash(SerializeBuffer& sb, unsigned int hash,
 	if (is_writing) {
 		sb.write_int(hash);
 	} else {
-		LANARTS_ASSERT(serializer_equals_read(sb, hash));
+		unsigned int val;
+		sb.read(val);
+		if (val != hash) {
+			printf("Values 0x%X and 0x%X do not match!\n", val, hash);
+			LANARTS_ASSERT(false);
+		}
 	}
 }
 

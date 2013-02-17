@@ -506,6 +506,7 @@ void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
 	}
 }
 void PlayerInst::use_move(GameState* gs, const GameAction& action) {
+	printf("id: %d using move for turn %d\n", id, gs->frame());
 	int dx = action.action_x;
 	int dy = action.action_y;
 
