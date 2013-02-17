@@ -50,6 +50,7 @@ static void write_or_assert_hash(SerializeBuffer& sb, unsigned int hash,
 		sb.read(val);
 		if (val != hash) {
 			printf("Values 0x%X and 0x%X do not match!\n", val, hash);
+			LANARTS_ASSERT(false);
 		}
 	}
 }
@@ -298,6 +299,7 @@ static bool extract_message_type(QueuedMessage& qm,
 		std::vector<QueuedMessage>& delayed_messages, int type) {
 	int location = find_message_type(qm, delayed_messages, type);
 	if (location != -1) {
+		qm.message->move_read_position(sizeof(int));
 		delayed_messages.erase(delayed_messages.begin() + location);
 		return true;
 	}
@@ -459,6 +461,7 @@ std::vector<QueuedMessage> GameNetConnection::sync_on_message(message_t msg) {
 				break;
 			}
 			received[qm.sender] = true;
+			qm.message->move_read_position(sizeof(int));
 			responses.push_back(qm);
 			_delayed_messages.erase(_delayed_messages.begin() + idx);
 		}
