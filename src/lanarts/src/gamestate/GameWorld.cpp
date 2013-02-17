@@ -152,49 +152,6 @@ GameLevelState* GameWorld::get_level(int roomid, bool spawnplayer,
 	return level_states[roomid];
 }
 
-static bool check_level_is_in_sync(GameState* gs, GameLevelState* level) {
-	if (level->id() == -1 || !gs->player_data().level_has_player(level->id())
-			|| !gs->net_connection().connection()) {
-		return true;
-	}
-
-	int hash_value = level->game_inst_set().hash();
-
-//	printf("NETWORK: Checking integrity hash=0x%X\n", prehashvalue);
-//	fflush(stdout);
-
-	//TODO: net redo
-//	if (!gs->net_connection().check_integrity(gs, hash_value)) {
-//		std::vector<GameInst*> instances = level->inst_set.to_vector();
-//		for (int i = 0; i < instances.size(); i++) {
-//			if (!gs->net_connection().check_integrity(gs,
-//					instances[i]->integrity_hash())) {
-//				GameInst* inst = instances[i];
-//				if (!dynamic_cast<AnimatedInst*>(inst)) {
-//					const char* type = typeid(*inst).name();
-//					printf("Hashes don't match for instance id=%d, type=%s!\n",
-//							inst->id, type);
-//					std::vector<Pos> theirs;
-//					gs->net_connection().send_and_sync(Pos(inst->x, inst->y),
-//							theirs);
-//					Pos* theirinst = &theirs[0];
-//					EnemyInst* e;
-//					if ((e = dynamic_cast<EnemyInst*>(inst))) {
-//						Pos vpos(e->vx * 1000, e->vy * 1000);
-//						std::vector<Pos> theirs;
-//						gs->net_connection().send_and_sync(vpos, theirs);
-//						Pos vpos2 = theirs[0];
-//					}
-//				}
-//
-//			}
-//		}
-//		printf("Hashes don't match before step, frame %d, level %d\n",
-//				gs->frame(), level->levelid);
-//		return false;
-//	}
-	return true;
-}
 bool GameWorld::pre_step() {
 	if (!gs->update_iostate())
 		return false;
@@ -202,13 +159,6 @@ bool GameWorld::pre_step() {
 	GameLevelState* current_level = gs->get_level();
 
 	midstep = true;
-
-	/* Check level sync states */
-	if (gs->game_settings().network_debug_mode) {
-		for (int i = 0; i < level_states.size(); i++) {
-			check_level_is_in_sync(gs, level_states[i]);
-		}
-	}
 
 	/* Queue actions for local player */
 	/* This will result in a network send of the player's actions */
@@ -219,6 +169,7 @@ bool GameWorld::pre_step() {
 	midstep = false;
 	return true;
 }
+
 bool GameWorld::step() {
 	redofirststep: //I used a goto dont kill mes
 

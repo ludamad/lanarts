@@ -3,8 +3,8 @@ username: User
 
 #Window settings
 fullscreen: no
-view_width: 800
-view_height: 600
+view_width: 640
+view_height: 480
 
 #Gameplay preferences
 autouse_health_potions: yes # can toggle in game as well
@@ -25,7 +25,7 @@ frame_action_repeat: 1 #Default = 0. Ignored in single player, improves multipla
 free_memory_while_idle: no # Gameplay is smoother, but CPU usage is increased. Keep off mainly if trying to stretch battery life of laptop.
 
 #Debug settings
-network_debug_mode: no
+network_debug_mode: yes
 invincible: no #Feel like exploring ? -> yes
 draw_diagnostics: no
 verbose_output: no
