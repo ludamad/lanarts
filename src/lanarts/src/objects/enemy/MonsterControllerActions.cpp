@@ -223,8 +223,8 @@ void MonsterController::set_monster_headings(GameState* gs,
 		}
 
 		eb.movement_decided = true;
-		e->vx = floor(e->vx * 4096.0f) / 4096.0f;
-		e->vy = floor(e->vy * 4096.0f) / 4096.0f;
+		e->vx = round(e->vx * 4096.0f) / 4096.0f;
+		e->vy = round(e->vy * 4096.0f) / 4096.0f;
 	}
 
 	perf_timer_end(FUNCNAME);
@@ -247,6 +247,9 @@ static bool move_towards(EnemyInst* e, const Pos& p) {
 	eb.path_steps++;
 	e->vx = dx / mag * speed / 2;
 	e->vy = dy / mag * speed / 2;
+	// Ensure floating point differences do not occur
+	e->vx = round(e->vx * 4096.0f) / 4096.0f;
+	e->vy = round(e->vy * 4096.0f) / 4096.0f;
 
 	return false;
 }
