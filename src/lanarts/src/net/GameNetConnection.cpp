@@ -50,7 +50,6 @@ static void write_or_assert_hash(SerializeBuffer& sb, unsigned int hash,
 		sb.read(val);
 		if (val != hash) {
 			printf("Values 0x%X and 0x%X do not match!\n", val, hash);
-			LANARTS_ASSERT(false);
 		}
 	}
 }
@@ -90,6 +89,8 @@ bool GameNetConnection::check_integrity(GameState* gs) {
 
 	std::vector<QueuedMessage> qms = sync_on_message(
 			PACKET_CHECK_SYNC_INTEGRITY);
+
+	printf("Got %d responses\n", qms.size());
 	for (int i = 0; i < qms.size(); i++) {
 		// Compare hashes
 		process_game_hash(gs, *qms[i].message, false);
@@ -278,18 +279,27 @@ void net_send_sync_ack(GameNetConnection& net) {
 	net.send_packet(sb);
 }
 
-static bool extract_message(QueuedMessage& qm,
+static int find_message_type(QueuedMessage& qm,
 		std::vector<QueuedMessage>& delayed_messages, int type) {
 	for (int i = 0; i < delayed_messages.size(); i++) {
 		qm = delayed_messages[i];
 		SerializeBuffer* msg = qm.message;
 		int msg_type;
 		msg->read_int(msg_type);
-		if (type == msg_type) {
-			delayed_messages.erase(delayed_messages.begin() + i);
-			return true;
-		}
 		msg->move_read_position(-(int)sizeof(int));
+		if (type == msg_type) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+static bool extract_message_type(QueuedMessage& qm,
+		std::vector<QueuedMessage>& delayed_messages, int type) {
+	int location = find_message_type(qm, delayed_messages, type);
+	if (location != -1) {
+		delayed_messages.erase(delayed_messages.begin() + location);
+		return true;
 	}
 	return false;
 }
@@ -311,7 +321,7 @@ static bool has_message(std::vector<QueuedMessage>& delayed_messages,
 bool GameNetConnection::consume_sync_messages(GameState* gs) {
 //	printf("Delayed Messages: %d\n", _delayed_messages.size());
 	QueuedMessage qm;
-	if (!extract_message(qm, _delayed_messages, PACKET_FORCE_SYNC)) {
+	if (!extract_message_type(qm, _delayed_messages, PACKET_FORCE_SYNC)) {
 		return false;
 	}
 	// Make sure we don't receive any stray actions after sync.
@@ -443,9 +453,14 @@ std::vector<QueuedMessage> GameNetConnection::sync_on_message(message_t msg) {
 		_connection->poll(gamenetconnection_queue_message, (void*)this,
 				timeout);
 
-		while (extract_message(qm, _delayed_messages, msg)) {
+		int idx;
+		while ( (idx = find_message_type(qm, _delayed_messages, msg)) != -1 ){
+			if (received[qm.sender]) {
+				break;
+			}
 			received[qm.sender] = true;
 			responses.push_back(qm);
+			_delayed_messages.erase(_delayed_messages.begin() + idx);
 		}
 
 		all_ack = true;
