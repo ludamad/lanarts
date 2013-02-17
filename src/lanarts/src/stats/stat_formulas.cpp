@@ -101,8 +101,8 @@ static void derive_secondary_stats(MTwist& mt, EffectiveStats& effective) {
 	CoreStats& core = effective.core;
 	effective.physical.resistance += core.defence / 2.5f;
 	effective.magic.resistance += core.willpower / 2.5f;
-	effective.physical.reduction += core.defence / 2.0;
-	effective.magic.reduction += core.willpower / 2.0;
+	effective.physical.reduction += core.defence / 2.0f;
+	effective.magic.reduction += core.willpower / 2.0f;
 }
 
 EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst,

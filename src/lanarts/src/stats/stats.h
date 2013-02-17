@@ -26,6 +26,8 @@ struct CoreStats {
 	int mp, max_mp;
 	int strength, defence, magic, willpower;
 	float hpregen, mpregen;
+	// Values < 0
+	float hp_regened, mp_regened;
 
 	CoreStats() :
 			hp(0), max_hp(0), mp(0), max_mp(0), strength(0), defence(0), magic(
@@ -40,8 +42,6 @@ struct CoreStats {
 	void heal_hp(float hpgain, int maxhp);
 	void heal_mp(float mpgain, int maxmp);
 	void apply_as_bonus(const CoreStats& bonus_stats);
-private:
-	float hp_regened, mp_regened;
 };
 
 /* Stat multiplier, weighted sum*/
