@@ -195,6 +195,9 @@ void MonsterController::update_position(GameState* gs, EnemyInst* e) {
 	simul_id simid = e->collision_simulation_id();
 	PosF pos = coll_avoid.get_position(simid);
 
+	pos.x = round(pos.x * 256.0f) / 256.0f;
+	pos.y = round(pos.y * 256.0f) / 256.0f;
+
 	e->attempt_move_to_position(gs, pos.x, pos.y);
 	coll_avoid.set_position(simid, pos.x, pos.y);
 	coll_avoid.set_maxspeed(simid, e->effective_stats().movespeed);
