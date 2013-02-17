@@ -223,6 +223,8 @@ void MonsterController::set_monster_headings(GameState* gs,
 		}
 
 		eb.movement_decided = true;
+		e->vx = floor(e->vx * 4096.0f) / 4096.0f;
+		e->vy = floor(e->vy * 4096.0f) / 4096.0f;
 	}
 
 	perf_timer_end(FUNCNAME);
