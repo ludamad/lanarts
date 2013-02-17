@@ -19,14 +19,14 @@
 #include <lcommon/math_util.h>
 
 static int lapi_values_aux(lua_State* L) {
-	long idx = (long)lua_touserdata(L, lua_upvalueindex(2));
-	long len = (long)lua_touserdata(L, lua_upvalueindex(3));
+	long idx = (long) lua_touserdata(L, lua_upvalueindex(2));
+	long len = (long) lua_touserdata(L, lua_upvalueindex(3));
 
 	if (idx > len) {
 		return 0;
 	}
 
-	lua_pushlightuserdata(L, (void*)(1 + idx));
+	lua_pushlightuserdata(L, (void*) (1 + idx));
 	lua_replace(L, lua_upvalueindex(2));
 
 	lua_rawgeti(L, lua_upvalueindex(1), idx);
@@ -226,12 +226,54 @@ static int lapi_toaddress(lua_State *L) {
 	return 1; /* return the table */
 }
 
+// buffer T
+// input A
+// start: consume al spaces
+
+static std::string string_pack(std::string s) {
+	int slen = s.size();
+	int new_i = 0, i = 0;
+
+	do {
+		/* First consume spaces at start */
+		while (i < slen) {
+			if (!isspace(s[i])) {
+				break;
+			}
+			i++;
+		}
+
+		/* Copy middle */
+		while (i < slen ) {
+			if (s[i] == '\n') {
+				break;
+			}
+			s[new_i++] = s[i++];
+		}
+
+		/* Trim spaces at end */
+		while (new_i >= 0) {
+			if (!isspace(s[new_i])) {
+				break;
+			}
+			new_i--;
+		}
+
+		/* Ensure one space between lines */
+		if (i < slen) {
+			s[new_i++] = ' ';
+		}
+	} while (i < slen);
+
+	return s; /* return the table */
+}
+
 namespace lua_api {
 
 	int l_itervalues(lua_State* L) {
 		lua_pushvalue(L, 1);
-		lua_pushlightuserdata(L, (void*)((1)));
-		lua_pushlightuserdata(L, (void*)((lua_objlen(L, 1))));
+		lua_pushlightuserdata(L, (void*) ((1)));
+		lua_pushlightuserdata(L, (void*) ((lua_objlen(L, 1))));
 		lua_pushcclosure(L, lapi_values_aux, 3);
 		return 1;
 	}
@@ -247,5 +289,7 @@ namespace lua_api {
 		globals["toaddress"].bind_function(lapi_toaddress);
 
 		globals["system"].ensure_table();
+		LuaValue string_table = globals["string"];
+		string_table["pack"].bind_function(string_pack);
 	}
 }
