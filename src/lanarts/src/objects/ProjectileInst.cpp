@@ -97,12 +97,6 @@ void ProjectileInst::step(GameState* gs) {
 
 	Pos tile_hit;
 
-	vx = round(vx * 256.0) / 256.0;
-	vy = round(vy * 256.0) / 256.0;
-
-	rx = round(rx * 256.0) / 256.0;
-	ry = round(ry * 256.0) / 256.0;
-
 	int newx = (int)round(rx + vx); //update based on rounding of true float
 	int newy = (int)round(ry + vy);
 	bool collides = gs->tile_radius_test(newx, newy, radius, true, -1,
@@ -239,6 +233,12 @@ void ProjectileInst::step(GameState* gs) {
 			gs->remove_instance(this);
 		}
 	}
+
+	vx = round(vx * 256.0) / 256.0;
+	vy = round(vy * 256.0) / 256.0;
+
+	rx = round(rx * 256.0) / 256.0;
+	ry = round(ry * 256.0) / 256.0;
 	event_log("ProjectileInst id=%d has rx=%f, ry=%f, vx=%f,vy=%f\n", id, rx, ry, vx, vy);
 }
 
