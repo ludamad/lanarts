@@ -29,5 +29,5 @@ network_debug_mode: yes
 invincible: no #Feel like exploring ? -> yes
 draw_diagnostics: no
 verbose_output: no
-keep_event_log: no
+keep_event_log: yes
 #comparison_event_log: logs/game_event_log #Uncomment for verbose logs
