@@ -6,6 +6,7 @@
 #ifndef ANIMATEDINST_H_
 #define ANIMATEDINST_H_
 #include <string>
+#include <cmath>
 
 #include "draw/draw_sprite.h"
 
@@ -27,6 +28,8 @@ public:
 					orientation.x), orienty(orientation.y), sprite(sprite), timeleft(
 					animatetime), animatetime(animatetime), text(text) {
 		animateframe = -1;
+		vx = round(vx * 256.0f) / 256.0f;
+		vy = round(vy * 256.0f) / 256.0f;
 		LANARTS_ASSERT(animatetime!= 0);
 	}
 	virtual ~AnimatedInst();

@@ -198,6 +198,8 @@ void PlayerInst::step(GameState* gs) {
 
 	is_resting = false;
 	perform_queued_actions(gs);
+	vx = round(vx * 256.0f) / 256.0f;
+	vy = round(vy * 256.0f) / 256.0f;
 
 	if (!gs->key_down_state(SDLK_x) && is_local_player())
 		view.center_on(last_x, last_y);
