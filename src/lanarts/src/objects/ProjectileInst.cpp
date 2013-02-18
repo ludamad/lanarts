@@ -136,6 +136,7 @@ void ProjectileInst::step(GameState* gs) {
 
 		if (colobj) {
 			EnemyInst* victim = (EnemyInst*)colobj;
+			event_log("ProjectileInst::step id=%d from player id=%d hit enemy id=%d\n", id, origin->id, colobj->id);
 			if (origin) {
 				origin->signal_attacked_successfully();
 			}
@@ -176,6 +177,7 @@ void ProjectileInst::step(GameState* gs) {
 		gs->object_radius_test(this, &colobj, 1, &player_colfilter);
 		if (colobj) {
 			CombatGameInst* victim = (CombatGameInst*)colobj;
+			event_log("ProjectileInst::step id=%d from enemy id=%d hit player id=%d\n", id, origin->id, colobj->id);
 			if (origin) {
 				origin->signal_attacked_successfully();
 			}
@@ -234,11 +236,13 @@ void ProjectileInst::step(GameState* gs) {
 		}
 	}
 
+	// Trying to get floating point stability
 	vx = round(vx * 256.0) / 256.0;
 	vy = round(vy * 256.0) / 256.0;
 
 	rx = round(rx * 256.0) / 256.0;
 	ry = round(ry * 256.0) / 256.0;
+	speed = round(speed * 256.0) / 256.0;
 	event_log("ProjectileInst id=%d has rx=%f, ry=%f, vx=%f,vy=%f\n", id, rx, ry, vx, vy);
 }
 

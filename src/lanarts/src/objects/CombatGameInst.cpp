@@ -149,6 +149,8 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 	snprintf(dmgstr, 32, "%d", damage);
 	float rx, ry;
 	direction_towards(Pos(x, y), Pos(inst->x, inst->y), rx, ry, 0.5);
+	rx = round(rx * 256.0f) / 256.0f;
+	ry = round(ry * 256.0f) / 256.0f;
 	gs->add_instance(
 			new AnimatedInst(Pos(inst->x - 5 + rx * 5, inst->y + ry * 5), -1,
 					25, PosF(rx, ry), PosF(), AnimatedInst::DEPTH, dmgstr,
