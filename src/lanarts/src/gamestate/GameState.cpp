@@ -275,6 +275,7 @@ bool GameState::step() {
 	}
 
 	if (!connection.poll_messages()) {
+
 		return false;
 	}
 	hud.step(this);

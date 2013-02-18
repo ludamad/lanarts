@@ -29,9 +29,7 @@
 const int HURT_COOLDOWN = 30;
 bool CombatGameInst::damage(GameState* gs, int dmg) {
 
-	printf("id %d took %d dmg\n",id,  dmg);
-
-	event_log("CombatGameInst::damage: id %d took %d dmg\n", id,  dmg);
+	event_log("CombatGameInst::damage: id %d took %d dmg\n", id, dmg);
 
 	if (core_stats().hurt(dmg)) {
 		die(gs);
@@ -52,6 +50,11 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
 		gs->game_chat().add_message(buff);
 
 	}
+
+	event_log(
+			"CombatGameInst::damage id=%d, attack: [dmg %d pow %d mag %d%%] -> Damage: %d",
+			id, attack.damage, attack.power, int(attack.magic_percentage * 100),
+			dmg);
 
 	char dmgstr[32];
 	snprintf(dmgstr, 32, "%d", dmg);
@@ -112,7 +115,8 @@ void CombatGameInst::draw(GameState *gs, float frame) {
 	effects().draw_effect_sprites(gs, Pos(sx, sy));
 
 	if (is_resting) {
-		res::sprite("resting").draw(ldraw::DrawOptions(ldraw::CENTER), on_screen(gs, pos()));
+		res::sprite("resting").draw(ldraw::DrawOptions(ldraw::CENTER),
+				on_screen(gs, pos()));
 	}
 	CoreStats& ecore = effective_stats().core;
 
@@ -198,6 +202,10 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 		p.y = inst->y;
 	}
 
+	event_log(
+			"CombatGameInst::projectile_attack id=%d created projectile at %d, %d\n",
+			id, p.x, p.y);
+
 	GameInst* bullet = new ProjectileInst(projectile, atkstats, id, Pos(x, y),
 			p, pentry.speed, pentry.range());
 	gs->add_instance(bullet);
@@ -223,14 +231,16 @@ void CombatGameInst::init(GameState* gs) {
 	estats = stats().effective_stats(gs, this);
 }
 
-
 const float ROUNDING_MULTIPLE = 256.0f;
 
 void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 		float& newy) {
 
+	event_log("CombatGameInst::attempt_move_to_position id=%d, %f, %f\n", id,
+			newx, newy);
 	float dx = newx - rx, dy = newy - ry;
 	float dist = sqrt(dx * dx + dy * dy);
+	dist = round(dist * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
 
 	bool collided = gs->tile_radius_test(round(newx), round(newy), 20);
 
@@ -267,8 +277,8 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 }
 
 void CombatGameInst::update_position() {
-	x = (int)round(rx); //update based on rounding of true float
-	y = (int)round(ry);
+	x = (int) round(rx); //update based on rounding of true float
+	y = (int) round(ry);
 	event_log("Instance id %d integer positions set to (%d,%d)\n", id, x, y);
 }
 
@@ -300,7 +310,8 @@ static void combine_stat_hash(unsigned int& hash, CombatStats& stats) {
 	combine_hash(hash, core.strength, core.defence);
 	combine_hash(hash, core.magic, core.willpower);
 	combine_hash(hash, core.hpregen, core.mpregen);
-	combine_hash(hash, (unsigned int&)core.hp_regened, (unsigned int&)core.mp_regened);
+	combine_hash(hash, (unsigned int&) core.hp_regened,
+			(unsigned int&) core.mp_regened);
 
 	combine_hash(hash, cstats.xp, cstats.classid);
 	for (int i = 0; i < inventory.max_size(); i++) {
@@ -312,7 +323,7 @@ static void combine_stat_hash(unsigned int& hash, CombatStats& stats) {
 }
 unsigned int CombatGameInst::integrity_hash() {
 	unsigned int hash = GameInst::integrity_hash();
-	combine_hash(hash, (unsigned int&)vx, (unsigned int&)vy);
+	combine_hash(hash, (unsigned int&) vx, (unsigned int&) vy);
 	combine_stat_hash(hash, stats());
 	return hash;
 }
