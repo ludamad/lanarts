@@ -7,6 +7,7 @@
 
 #include <lcommon/mtwist.h>
 
+#include "gamestate/GameLogger.h"
 #include "items/WeaponEntry.h"
 
 #include "class_data.h"
@@ -17,6 +18,7 @@
 
 bool CoreStats::hurt(int dmg) {
 	hp -= dmg;
+	event_log("CoreStats::hurt dmg=%d, hp=%d of %d\n", dmg, hp, max_hp);
 
 	if (hp < 0) {
 		hp = 0;
@@ -38,6 +40,9 @@ void CoreStats::heal_hp(float hpgain, int maxhp) {
 	}
 	if (hp > maxhp)
 		hp = maxhp;
+
+	event_log("CoreStats::heal hpgain=%f, hp_regened=%f, hp=%d of %d\n", hpgain, hp_regened, hp, max_hp);
+
 }
 
 void CoreStats::step(const CoreStats& effective_stats, float hp_regen_mod, float mp_regen_mod) {
@@ -54,6 +59,8 @@ void CoreStats::heal_mp(float mpgain, int maxmp) {
 
 	if (mp > maxmp)
 		mp = maxmp;
+
+	event_log("CoreStats::healmp mpgain=%f, mp_regened=%f, mp=%d of %d\n", mpgain, mp_regened, mp, max_mp);
 }
 
 void CoreStats::apply_as_bonus(const CoreStats& bonus_stats) {

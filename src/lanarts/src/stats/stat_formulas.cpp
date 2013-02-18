@@ -117,6 +117,8 @@ EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst,
 	factor_in_equipment_stats(gs->rng(), ret, stats.equipment);
 	derive_secondary_stats(gs->rng(), ret);
 	ret.cooldown_modifiers.apply(ret.cooldown_mult);
+	event_log("EffectiveAttackStats: hp=%d, mp=%d, hpregen=%f, mpregen=%f\n",
+			ret.core.hp, ret.core.mp, ret.core.hpregen, ret.core.mpregen);
 	return ret;
 }
 
