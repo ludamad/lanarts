@@ -6,6 +6,7 @@
 #include <cmath>
 
 #include "gamestate/GameState.h"
+#include "gamestate/GameLogger.h"
 
 #include "items/EquipmentEntry.h"
 #include "items/WeaponEntry.h"
@@ -54,6 +55,7 @@ int damage_formula(const EffectiveAttackStats& attacker,
 		const EffectiveStats& defender) {
 	float mdmg = magic_damage_formula(attacker, defender);
 	float pdmg = physical_damage_formula(attacker, defender);
+	event_log("damage_formula: mdmg=%f, pdmg=%f\n");
 
 	return mdmg * attacker.magic_percentage
 			+ pdmg * attacker.physical_percentage();

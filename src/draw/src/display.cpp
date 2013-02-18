@@ -53,13 +53,7 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
 	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 0);
 
-	int bpp;
-	/*detect the display depth */
-	if (SDL_GetVideoInfo()->vfmt->BitsPerPixel <= 8) {
-		bpp = 8;
-	} else {
-		bpp = 16; /* More doesn't seem to work */
-	}
+	int bpp = SDL_GetVideoInfo()->vfmt->BitsPerPixel;
 
 	/* Set the flags we want to use for setting the video mode */
 	Uint32 video_flags = SDL_OPENGL | SDL_DOUBLEBUF;

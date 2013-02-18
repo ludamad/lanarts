@@ -28,6 +28,11 @@
 
 const int HURT_COOLDOWN = 30;
 bool CombatGameInst::damage(GameState* gs, int dmg) {
+
+	printf("id %d took %d dmg\n",id,  dmg);
+
+	event_log("CombatGameInst::damage: id %d took %d dmg\n", id,  dmg);
+
 	if (core_stats().hurt(dmg)) {
 		die(gs);
 		return true;
