@@ -50,7 +50,7 @@ public:
 
 	virtual unsigned int integrity_hash();
 
-	void attempt_move_to_position(GameState* gs, float& newx, float& newy);
+	PosF attempt_move_to_position(GameState* gs, const PosF& new_xy);
 	//update based on rounding of true float
 	void update_position();
 	virtual void update_position(float newx, float newy);

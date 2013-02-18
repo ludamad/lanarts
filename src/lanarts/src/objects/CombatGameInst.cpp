@@ -233,19 +233,18 @@ void CombatGameInst::init(GameState* gs) {
 
 const float ROUNDING_MULTIPLE = 256.0f;
 
-void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
-		float& newy) {
+PosF CombatGameInst::attempt_move_to_position(GameState* gs, const PosF& newxy) {
 
 	event_log("CombatGameInst::attempt_move_to_position id=%d, %f, %f\n", id,
-			newx, newy);
-	float dx = newx - rx, dy = newy - ry;
+			newxy.x, newxy.y);
+	float dx = newxy.x - rx, dy = newxy.y - ry;
 	float dist = sqrt(dx * dx + dy * dy);
 	dist = round(dist * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
 
-	bool collided = gs->tile_radius_test(round(newx), round(newy), 20);
+	bool collided = gs->tile_radius_test(round(newxy.x), round(newxy.y), 20);
 
 	if (!collided) {
-		rx = newx, ry = newy;
+		rx = newxy.x, ry = newxy.y;
 	} else {
 		float nx = round(rx + vx), ny = round(ry + vy);
 		bool collided = gs->tile_radius_test(nx, ny, radius);
@@ -256,6 +255,7 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 				if (hitsx) {
 					vx = 0;
 				}
+
 				if (hitsy) {
 					vy = 0;
 				}
@@ -271,9 +271,10 @@ void CombatGameInst::attempt_move_to_position(GameState* gs, float& newx,
 		rx += vx;
 		ry += vy;
 	}
-	newx = rx, newy = ry;
 
 	update_position();
+
+	return Pos(rx, ry);
 }
 
 void CombatGameInst::update_position() {
