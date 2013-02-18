@@ -7,6 +7,13 @@ static void vararg_str_format_macro_test_helper(std::string& str,
 }
 
 SUITE(strformat_tests) {
+	TEST(str_pack_test) {
+		CHECK("test" == str_pack(" test "));
+		CHECK("te st" == str_pack("te st"));
+		CHECK("test test" == str_pack(" test \n test"));
+		CHECK("A B C" == str_pack(" A     \n     B       \n     C    "));
+	}
+
 	TEST(strformat_test) {
 		{
 			std::string teststr = format("%d%s%d", 1, "Hey", 1);

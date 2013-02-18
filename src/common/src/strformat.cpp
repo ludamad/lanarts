@@ -11,6 +11,45 @@
 
 #include "strformat.h"
 
+std::string str_pack(std::string str) {
+	int slen = str.size();
+	int new_i = 0, i = 0;
+
+	do {
+		/* First consume spaces at start */
+		while (i < slen) {
+			if (!isspace(str[i])) {
+				break;
+			}
+			i++;
+		}
+
+		/* Copy middle */
+		while (i < slen ) {
+			if (str[i] == '\n') {
+				break;
+			}
+			str[new_i++] = str[i++];
+		}
+
+		/* Trim spaces at end */
+		while (new_i >= 0) {
+			if (!isspace(str[new_i-1])) {
+				break;
+			}
+			new_i--;
+		}
+
+		/* Ensure one space between lines */
+		if (i < slen) {
+			str[new_i++] = ' ';
+		}
+	} while (i < slen);
+
+	str.resize(new_i);
+	return str; /* return the table */
+}
+
 // Note that because va_copy is not portable, this must be able to fail.
 // It is thus 'part' of the solution. The resulting string should not be used if it fails.
 // Correct usage:

@@ -110,7 +110,7 @@ private:
 	Pos value_draw_pos;
 };
 
-static void draw_base_entry_overlay(GameState* gs, BaseDataEntry& entry) {
+static void draw_base_entry_overlay(GameState* gs, ResourceEntryBase& entry) {
 	GameTextConsole& console = gs->game_console();
 	BBox bbox(console.bounding_box());
 	int descriptxoff = TILE_SIZE * 1.25;
@@ -142,7 +142,7 @@ static void draw_base_entry_overlay(GameState* gs, BaseDataEntry& entry) {
 			entry.description);
 }
 
-int draw_icon_and_name(GameState* gs, BaseDataEntry& entry, Colour col, int x,
+int draw_icon_and_name(GameState* gs, ResourceEntryBase& entry, Colour col, int x,
 		int y, int xoffset, int yoffset) {
 	draw_sprite(entry.get_sprite(), x, y);
 	ldraw::draw_rectangle_outline(COL_PALE_YELLOW.alpha(50),

@@ -12,7 +12,7 @@
 #include <string>
 
 #include "lanarts_defines.h"
-#include "data/BaseDataEntry.h"
+#include "data/ResourceEntryBase.h"
 
 #include "../LuaAction.h"
 
@@ -22,7 +22,7 @@ namespace ldraw {
 class Drawable;
 }
 
-class ItemEntry: public BaseDataEntry {
+class ItemEntry: public ResourceEntryBase {
 public:
 	ItemEntry() :
 			item_sprite(-1), stackable(true) {

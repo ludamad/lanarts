@@ -13,13 +13,13 @@
 
 #include <lcommon/LuaLazyValue.h>
 
-#include "data/BaseDataEntry.h"
+#include "data/ResourceEntryBase.h"
 
 #include "stats/combat_stats.h"
 
 #include "lanarts_defines.h"
 
-struct EnemyEntry: public BaseDataEntry {
+struct EnemyEntry: public ResourceEntryBase {
 	std::string appear_msg, defeat_msg;
 	int radius, xpaward;
 	sprite_id enemy_sprite, death_sprite;

@@ -41,7 +41,7 @@ public:
 	virtual void ReportFailure(const TestDetails& details,
 			char const* failure) {
 
-		printf("[%s]\n\t**FAILED: %s line %d (%s) \t[%s]\n", details.suiteName,
+		printf("[%s]\n\t**FAILED: %s line %d (%s)\n", details.suiteName,
 				details.testName, details.lineNumber, failure);
 
 		did_finish_correctly = false;

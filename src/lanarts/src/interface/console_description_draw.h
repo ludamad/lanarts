@@ -13,7 +13,7 @@ class ItemEntry;
 class EnemyEntry;
 class SpellEntry;
 class GameState;
-class BaseDataEntry;
+class ResourceEntryBase;
 
 const char* projectile_speed_description(int speed);
 const char* monster_speed_description(int speed);
@@ -21,7 +21,7 @@ const char* monster_speed_description(int speed);
 void draw_spell_icon_and_name(GameState* gs, SpellEntry& spl_entry, Colour col,
 		int x, int y);
 
-int draw_icon_and_name(GameState* gs, BaseDataEntry& entry, Colour col, int x,
+int draw_icon_and_name(GameState* gs, ResourceEntryBase& entry, Colour col, int x,
 		int y, int xoffset = TILE_SIZE * 1.25, int yoffset = TILE_SIZE / 2);
 
 void draw_console_spell_description(GameState* gs, SpellEntry& spl_entry);

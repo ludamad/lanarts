@@ -11,6 +11,8 @@ include(FindFreetype)
 set( SRC ..)
 set( LIBS ../../libs)
 
+
+
 include_directories(
 	${SDL_INCLUDE_DIR} 
 	${SDLIMAGE_INCLUDE_DIR}

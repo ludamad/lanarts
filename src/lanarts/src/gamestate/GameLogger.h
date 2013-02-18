@@ -31,9 +31,4 @@ void event_log(const char* fmt, ...);
 void event_log_initialize(GameState* gs, const char* input_file,
 		const char* output_file);
 
-#ifdef NDEBUG
-#define event_log(...)
-#endif
-
-
 #endif /* GAMELOGGER_H_ */

@@ -10,6 +10,9 @@
 #include <cstdarg>
 #include <string>
 
+
+std::string str_pack(std::string str);
+
 std::string format(const char* fmt, ...);
 void format(std::string& str, const char* fmt, ...);
 

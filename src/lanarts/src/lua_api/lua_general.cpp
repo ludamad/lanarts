@@ -9,6 +9,7 @@
 
 #include <lcommon/Timer.h>
 #include <lcommon/math_util.h>
+#include <lcommon/strformat.h>
 
 #include <luawrap/luawrap.h>
 #include <luawrap/functions.h>
@@ -230,44 +231,6 @@ static int lapi_toaddress(lua_State *L) {
 // input A
 // start: consume al spaces
 
-static std::string string_pack(std::string s) {
-	int slen = s.size();
-	int new_i = 0, i = 0;
-
-	do {
-		/* First consume spaces at start */
-		while (i < slen) {
-			if (!isspace(s[i])) {
-				break;
-			}
-			i++;
-		}
-
-		/* Copy middle */
-		while (i < slen ) {
-			if (s[i] == '\n') {
-				break;
-			}
-			s[new_i++] = s[i++];
-		}
-
-		/* Trim spaces at end */
-		while (new_i >= 0) {
-			if (!isspace(s[new_i])) {
-				break;
-			}
-			new_i--;
-		}
-
-		/* Ensure one space between lines */
-		if (i < slen) {
-			s[new_i++] = ' ';
-		}
-	} while (i < slen);
-
-	return s; /* return the table */
-}
-
 namespace lua_api {
 
 	int l_itervalues(lua_State* L) {
@@ -289,7 +252,8 @@ namespace lua_api {
 		globals["toaddress"].bind_function(lapi_toaddress);
 
 		globals["system"].ensure_table();
+		globals["string"].ensure_table();
 		LuaValue string_table = globals["string"];
-		string_table["pack"].bind_function(string_pack);
+		string_table["pack"].bind_function(str_pack);
 	}
 }

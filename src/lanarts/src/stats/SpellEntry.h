@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#include "data/BaseDataEntry.h"
+#include "data/ResourceEntryBase.h"
 
 #include <lcommon/LuaLazyValue.h>
 
@@ -17,7 +17,7 @@
 
 #include "items/items.h"
 
-struct SpellEntry: public BaseDataEntry {
+struct SpellEntry: public ResourceEntryBase {
 	sprite_id sprite;
 	int mp_cost, cooldown;
 	LuaLazyValue action_func; //Immediate action

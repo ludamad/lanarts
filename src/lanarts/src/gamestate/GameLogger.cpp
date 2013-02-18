@@ -42,8 +42,6 @@ GameLogger::~GameLogger() {
 	}
 }
 
-#undef event_log
-
 void GameLogger::event_log(const char *fmt, va_list ap) {
 	static std::string logline;
 
