@@ -21,7 +21,7 @@
 #include "stats/items/ProjectileEntry.h"
 #include "stats/items/WeaponEntry.h"
 
-#include "stats/class_data.h"
+#include "stats/ClassEntry.h"
 #include "stats/effect_data.h"
 #include "stats/items/ItemEntry.h"
 #include "stats/itemgen_data.h"

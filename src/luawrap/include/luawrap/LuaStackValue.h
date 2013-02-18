@@ -41,9 +41,15 @@ namespace _luawrap_private {
 		template<typename T>
 		operator T();
 
+		template<typename T>
+		T as();
+
 		// get if not nil
 		template<typename T>
 		void optionalget(T& value);
+
+		template<typename T>
+		T defaulted(const T& value);
 
 		template<typename T>
 		void operator=(const T& value);
@@ -54,6 +60,8 @@ namespace _luawrap_private {
 		void operator=(lua_CFunction func);
 		void operator=(const _LuaField& field);
 		void operator=(const _LuaStackField& field);
+
+		bool isnil() const;
 
 		LuaValue ensure_table() const;
 
@@ -105,6 +113,9 @@ public:
 	_luawrap_private::_LuaStackField operator[](std::string& key) const {
 		return operator[](key.c_str());
 	}
+
+	int objlen() const;
+	LuaValue operator[](int idx) const;
 
 private:
 	lua_State* L;

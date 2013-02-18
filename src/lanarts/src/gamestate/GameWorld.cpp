@@ -14,7 +14,7 @@
 #include "objects/player/PlayerInst.h"
 #include "objects/AnimatedInst.h"
 #include "objects/GameInstRef.h"
-#include "stats/class_data.h"
+#include "stats/ClassEntry.h"
 
 #include "GameLevelState.h"
 #include "GameState.h"
@@ -112,7 +112,7 @@ void GameWorld::spawn_players(GeneratedLevel& genlevel, void** player_instances,
 		for (int i = 0; i < gs->player_data().all_players().size(); i++) {
 			PlayerDataEntry& pde = gs->player_data().all_players()[i];
 			bool islocal = &pde == &gs->player_data().local_player_data();
-			ClassType& c = game_class_data.at(pde.classtype);
+			ClassEntry& c = game_class_data.at(pde.classtype);
 			int spriteidx = gs->rng().rand(c.sprites.size());
 
 			if (pde.player_inst.empty()) {

@@ -50,7 +50,7 @@ void load_area_template_data(const FilenameList& filenames);
 
 /* Definition of game data */
 
-std::vector<ClassType> game_class_data;
+std::vector<ClassEntry> game_class_data;
 std::vector<EffectEntry> game_effect_data;
 std::vector<EnemyEntry> game_enemy_data;
 std::vector<ItemGenList> game_itemgenlist_data;

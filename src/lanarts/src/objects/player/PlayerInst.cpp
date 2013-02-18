@@ -15,7 +15,7 @@
 
 #include "stats/items/WeaponEntry.h"
 
-#include "stats/class_data.h"
+#include "stats/ClassEntry.h"
 #include "stats/items/ItemEntry.h"
 
 #include <lcommon/math_util.h>

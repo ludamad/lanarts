@@ -13,7 +13,7 @@
 
 #include "lua_api/lua_yaml.h"
 
-#include "../class_data.h"
+#include "../ClassEntry.h"
 #include "../stats.h"
 
 #include "load_stats.h"
@@ -40,14 +40,14 @@ ClassSpellProgression parse_class_spell_progression(const YAML::Node& n) {
 	return progression;
 }
 
-ClassType parse_class(const YAML::Node& n) {
+ClassEntry parse_class(const YAML::Node& n) {
 
 //	std::string name;
 //	Stats starting_stats;
 //	int hp_perlevel, mp_perlevel;
 //	int str_perlevel, def_perlevel, mag_perlevel;
 //	float mpregen_perlevel, hpregen_perlevel;
-	ClassType classtype;
+	ClassEntry classtype;
 
 	const YAML::Node& level = n["gain_per_level"];
 
@@ -76,7 +76,7 @@ ClassType parse_class(const YAML::Node& n) {
 
 void load_class_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
-	ClassType entry = parse_class(node);
+	ClassEntry entry = parse_class(node);
 	(*value)[entry.name] = node;
 	game_class_data.push_back(entry);
 }

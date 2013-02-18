@@ -10,7 +10,7 @@
 #include "gamestate/GameLogger.h"
 #include "items/WeaponEntry.h"
 
-#include "class_data.h"
+#include "ClassEntry.h"
 
 #include "combat_stats.h"
 
@@ -140,7 +140,7 @@ void CooldownStats::reset_hurt_cooldown(int cooldown) {
 	hurt_cooldown = std::max(cooldown, hurt_cooldown);
 }
 
-ClassType& ClassStats::class_type() const {
+ClassEntry& ClassStats::class_type() const {
 	return game_class_data.at(classid);
 }
 

@@ -147,15 +147,39 @@ namespace _luawrap_private {
 	}
 
 	template<typename T>
+	T _LuaStackField::as() {
+		push();
+		return luawrap::pop<T>(value.luastate());
+	}
+	template<typename T>
+	T _LuaField::as() {
+		push();
+		return luawrap::pop<T>(value.luastate());
+	}
+
+	template<typename T>
 	inline void _LuaField::optionalget(T& val) {
 		lua_State* L = value.luastate();
 		value.push();
 		luawrap::getoptfield(L, -1, key, val);
 		lua_pop(L, 1);
 	}
+
+	template<typename T>
+	inline T _LuaField::defaulted(const T& value) {
+		T ret(value);
+		optionalget(ret);
+		return ret;
+	}
 	template<typename T>
 	inline void _LuaStackField::optionalget(T& val) {
 		luawrap::getoptfield(value.luastate(), value.index(), key, val);
+	}
+	template<typename T>
+	inline T _LuaStackField::defaulted(const T& value) {
+		T ret(value);
+		optionalget(ret);
+		return ret;
 	}
 }
 

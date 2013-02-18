@@ -58,6 +58,13 @@ namespace _luawrap_private {
 		pop();
 	}
 
+	bool _LuaStackField::isnil() const {
+		push();
+		bool nil = lua_isnil(value.luastate(), -1);
+		lua_pop(L, 1);
+		return nil;
+	}
+
 	void _LuaStackField::bind_function(lua_CFunction func) {
 		lua_pushcfunction(value.luastate(), func);
 		pop();
@@ -106,3 +113,17 @@ LuaSpecialValue luawrap::registry(lua_State* L) {
 	return LuaSpecialValue(L, LUA_REGISTRYINDEX);
 }
 
+int LuaStackValue::objlen() const {
+	push();
+	int len = lua_objlen(L, -1);
+	lua_pop(L, 1);
+	return len;
+}
+
+LuaValue LuaStackValue::operator [](int idx) const {
+	push();
+	lua_rawgeti(L, -1, idx);
+	LuaValue ret = LuaValue::pop_value(L);
+	lua_pop(L, 1);
+	return ret;
+}

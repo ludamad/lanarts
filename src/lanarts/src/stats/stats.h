@@ -17,7 +17,7 @@
 #include "AllowedActions.h"
 
 struct AttackStats;
-struct ClassType;
+struct ClassEntry;
 class MTwist;
 
 /* Core combat stats*/
@@ -187,7 +187,7 @@ struct ClassStats {
 	bool has_class() {
 		return classid >= 0;
 	}
-	ClassType& class_type() const;
+	ClassEntry& class_type() const;
 };
 
 #endif /* STATS_H_ */
