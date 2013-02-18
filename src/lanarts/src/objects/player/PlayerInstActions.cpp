@@ -506,7 +506,6 @@ void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
 	}
 }
 void PlayerInst::use_move(GameState* gs, const GameAction& action) {
-	printf("id: %d using move for turn %d\n", id, gs->frame());
 	int dx = action.action_x;
 	int dy = action.action_y;
 
@@ -560,6 +559,8 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 		}
 
 	}
+
+	event_log("Player id: %d using move for turn %d, vx=%f, vy=%f", id, gs->frame(), vx, vy);
 }
 
 static int scan_entrance(const std::vector<GameLevelPortal>& portals,

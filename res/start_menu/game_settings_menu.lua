@@ -46,7 +46,7 @@ end
 local function name_field_create()
     return text_field_create(
             "Enter your name:",
-            "User",
+            settings.username,
             { -- Field validating & updating 
                 update = function(field) -- Update username based on contents
                     settings.username = field.text

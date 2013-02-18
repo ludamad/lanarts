@@ -6,6 +6,7 @@
 #include <ldraw/DrawOptions.h>
 
 #include <lcommon/SerializeBuffer.h>
+#include <lcommon/strformat.h>
 
 #include "draw/draw_statbar.h"
 
@@ -39,6 +40,11 @@ bool CombatGameInst::damage(GameState* gs, int dmg) {
 	return false;
 }
 bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
+	event_log("CombatGameInst::damage: id %d getting hit by {cooldown = %d, "
+			"damage=%d, power=%d, magic_percentage=%f, resist_modifier=%f, physical_percentage=%f}",
+			id, attack.cooldown, attack.damage, attack.power,
+			attack.magic_percentage, attack.resist_modifier,
+			attack.physical_percentage());
 
 	int dmg = damage_formula(attack, effective_stats());
 
@@ -56,11 +62,9 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
 			id, attack.damage, attack.power, int(attack.magic_percentage * 100),
 			dmg);
 
-	char dmgstr[32];
-	snprintf(dmgstr, 32, "%d", dmg);
 	gs->add_instance(
 			new AnimatedInst(Pos(), -1, 25, PosF(), PosF(), AnimatedInst::DEPTH,
-					dmgstr, Colour(255, 148, 120)));
+					format("%d", dmg), Colour(255, 148, 120)));
 
 	return damage(gs, dmg);
 }
@@ -133,6 +137,8 @@ void CombatGameInst::draw(GameState *gs, float frame) {
 
 bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 		const Item& weapon, bool ignore_cooldowns) {
+	event_log("CombatGameInst::melee_attack: id %d hitting id %d, weapon = id %d", weapon.id);
+
 	bool isdead = false;
 	if (!ignore_cooldowns && !cooldowns().can_doaction())
 		return false;
@@ -179,6 +185,8 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 
 bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 		const Item& weapon, const Item& projectile) {
+
+	event_log("CombatGameInst::melee_attack: id %d hitting id %d, weapon = id %d", weapon.id);
 	if (!cooldowns().can_doaction())
 		return false;
 	MTwist& mt = gs->rng();
@@ -233,7 +241,8 @@ void CombatGameInst::init(GameState* gs) {
 
 const float ROUNDING_MULTIPLE = 256.0f;
 
-PosF CombatGameInst::attempt_move_to_position(GameState* gs, const PosF& newxy) {
+PosF CombatGameInst::attempt_move_to_position(GameState* gs,
+		const PosF& newxy) {
 
 	event_log("CombatGameInst::attempt_move_to_position id=%d, %f, %f\n", id,
 			newxy.x, newxy.y);

@@ -55,6 +55,11 @@ int damage_formula(const EffectiveAttackStats& attacker,
 		const EffectiveStats& defender) {
 	float mdmg = magic_damage_formula(attacker, defender);
 	float pdmg = physical_damage_formula(attacker, defender);
+
+	event_log("damage_formula attacker damage=%d power=%d cooldown=%d magic_percentage=%f resist_modifier=%f\n",
+			attacker.damage, attacker.power, attacker.cooldown, attacker.magic_percentage, attacker.resist_modifier);
+	event_log("damage_formula attacker damage=%d power=%d \n",
+			defender.physical.damage, defender.physical.power);
 	event_log("damage_formula: mdmg=%f, pdmg=%f\n", mdmg, pdmg);
 
 	return mdmg * attacker.magic_percentage
