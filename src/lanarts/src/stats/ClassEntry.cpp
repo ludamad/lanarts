@@ -4,7 +4,10 @@
  */
 
 #include <lua.hpp>
+#include <luawrap/luawrap.h>
 
+#include "data/game_data.h"
+#include "stats/stat_formulas.h"
 #include "ClassEntry.h"
 
 sprite_id ClassEntry::get_sprite() {
@@ -65,11 +68,9 @@ static CoreStats parse_core_stats(const LuaValue& value) {
 }
 
 static AttackStats parse_attack_stats(const LuaValue& value) {
-	std::string name;
 	AttackStats ret;
 
 	if (!value["weapon"].isnil()) {
-		name = value["weapon"];
 		ret.weapon = Weapon(
 				get_weapon_by_name(value["weapon"].as<const char*>()));
 	}
@@ -95,13 +96,13 @@ static CombatStats parse_combat_stats(const LuaValue& value) {
 	ret.class_stats.xplevel = value["xplevel"].defaulted(1);
 
 	if (!value["attacks"].isnil()) {
-		ret.attacks = parse_attack_stats(value);
+		ret.attacks.push_back(parse_attack_stats(value));
 	}
 
 	return ret;
 }
 
-static ClassSpell parse_class_spell(const LuaStackValue& value) {
+static ClassSpell parse_class_spell(const LuaValue& value) {
 	ClassSpell spell;
 
 	spell.spell = get_spell_by_name(value["spell"].as<const char*>());
@@ -111,48 +112,35 @@ static ClassSpell parse_class_spell(const LuaStackValue& value) {
 }
 
 static ClassSpellProgression parse_class_spell_progression(
-		const LuaStackValue& value) {
+		const LuaValue& value) {
 	lua_State* L = value.luastate();
 	ClassSpellProgression progression;
 
-	int valuelen = lua_objlen(value.luastate(), value.index());
+	int valuelen = value.objlen();
 	for (int i = 1; i <= valuelen; i++) {
-		lua_rawgeti(L, value.index(), i);
 		progression.available_spells.push_back(
-				parse_class_spell(LuaStackValue(L, -1)));
+				parse_class_spell(value[i]));
 	}
 
 	return progression;
 }
 
 void ClassEntry::convert_lua() {
-	LuaValue& val = lua_table();
+	LuaValue val = lua_table();
 	lua_State* L = val.luastate();
 
-	int ltop = lua_gettop(L);
-
 	// Use stack value instead of LuaValue, for performance
-	val["start_stats"].push();
-	val["sprites"].push();
-	val["available_spells"].push();
-
-	// Reference stack values
-	LuaStackValue start_stats(L, ltop + 1);
-	LuaStackValue sprites(L, ltop + 2);
-	LuaStackValue available_spells(L, ltop + 3);
+	LuaValue start_stats = val["start_stats"];
+	LuaValue sprites = val["sprites"];
+	LuaValue available_spells = val["available_spells"];
 
 	on_level_gain = val["on_level_gain"];
 
 	spell_progression = parse_class_spell_progression(available_spells);
 	starting_stats = parse_combat_stats(start_stats);
 
-	int sprite_len = lua_objlen(L, ltop + 2);
+	int sprite_len = sprites.objlen();
 	for (int i = 1; i <= sprite_len; i++) {
-		lua_rawgeti(L, ltop + 2, i);
-		this->sprites.push_back(res::spriteid(lua_tostring(L, -1)));
-		lua_pop(L, 1);
+		this->sprites.push_back(res::spriteid(sprites[i].as<const char*>()));
 	}
-
-	// Clean up stack values
-	lua_pop(L, 3);
 }

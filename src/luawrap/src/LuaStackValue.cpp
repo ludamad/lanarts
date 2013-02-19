@@ -61,7 +61,7 @@ namespace _luawrap_private {
 	bool _LuaStackField::isnil() const {
 		push();
 		bool nil = lua_isnil(value.luastate(), -1);
-		lua_pop(L, 1);
+		lua_pop(value.luastate(), 1);
 		return nil;
 	}
 

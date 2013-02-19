@@ -227,7 +227,7 @@ namespace _luawrap_private {
 	bool _LuaField::isnil() const {
 		push();
 		bool nil = lua_isnil(value.luastate(), -1);
-		lua_pop(L, 1);
+		lua_pop(value.luastate(), 1);
 		return nil;
 	}
 
@@ -315,16 +315,16 @@ lua_State* LuaValue::luastate() const {
 
 int LuaValue::objlen() const {
 	push();
-	int len = lua_objlen(L, -1);
-	lua_pop(L, 1);
+	int len = lua_objlen(luastate(), -1);
+	lua_pop(luastate(), 1);
 	return len;
 }
 
 LuaValue LuaValue::operator [](int idx) const {
 	push();
-	lua_rawgeti(L, -1, idx);
-	LuaValue ret = LuaValue::pop_value(L);
-	lua_pop(L, 1);
+	lua_rawgeti(luastate(), -1, idx);
+	LuaValue ret = LuaValue::pop_value(luastate());
+	lua_pop(luastate(), 1);
 	return ret;
 }
 
