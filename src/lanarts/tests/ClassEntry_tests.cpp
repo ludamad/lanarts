@@ -8,14 +8,13 @@
 #include "stats/ClassEntry.h"
 
 SUITE(ClassEntry_tests) {
-	static int merge_upvalue(lua_State* L) {
+	static int merge_tables(lua_State* L) {
 		lua_pushnil(L);
 
-		while (lua_next(L, -2)) {
-
+		while (lua_next(L, 2)) {
 			lua_pushvalue(L, -2); // key
 			lua_pushvalue(L, -2); // value
-			lua_settable(L, lua_upvalueindex(1));
+			lua_settable(L, 1);
 
 			lua_pop( L, 1);
 			// pop value
@@ -24,31 +23,31 @@ SUITE(ClassEntry_tests) {
 		return 0;
 	}
 
-	static int merge_closure(lua_State* L) {
-		lua_pushvalue(L, 1); // push obj
-		lua_pushcclosure(L, merge_upvalue, 1);
-		return 1;
+	static void set_classdefine_metatable(lua_State* L, int idx) {
+		lua_pushvalue(L, idx);
+
+		lua_newtable(L);
+		lua_pushcfunction(L, merge_tables);
+		lua_setfield(L, -2, "__call");
+
+		/* Set metatable of table at 'idx' */
+		lua_setmetatable(L, -2);
+
+		lua_pop(L, 1);
 	}
 
-	static LuaValue classdefine_metatable(lua_State* L) {
-		LuaValue classdefine = luameta_new(L, "ClassDefine");
-		LuaValue getters = luameta_getters(classdefine);
-		getters["__call"].bind_function(merge_closure);
-
-		return classdefine;
-	}
 	static int class_define(lua_State* L) {
 		LuaValue globals = luawrap::globals(L);
-		LuaValue defined = globals["defined"].ensure_table();
-		defined[lua_tostring(L, 1)] = true;
-		LuaValue metatable = classdefine_metatable(L);
-		lua_newtable(L);
-		metatable.push();
-		lua_setmetatable(L, -2);
+		LuaValue defined = globals["definitions"].ensure_table();
+		LuaValue newclass = defined[lua_tostring(L, 1)].ensure_table();
+
+		newclass.push();
+		set_classdefine_metatable(L, -1);
+
 		return 1;
 	}
 
-	TEST(class_define) {
+	TEST(proof_of_concept) {
 
 		std::string program = "res.class_define \"Mage\" {\n"
 				"    sprites = { \"wizard\", \"wizard2\" },\n"
@@ -82,11 +81,20 @@ SUITE(ClassEntry_tests) {
 		TestLuaState L;
 
 		LuaValue globals = luawrap::globals(L);
+		LuaValue defines = globals["definitions"].ensure_table();
 		LuaValue res = globals["res"].ensure_table();
 
 		res["class_define"].bind_function(class_define);
 
 		lua_safe_dostring(L, program.c_str());
+		CHECK(!defines["Mage"].isnil());
+
+		LuaValue mage = defines["Mage"];
+
+		CHECK(!mage["sprites"].isnil());
+		CHECK(!mage["available_spells"].isnil());
+		CHECK(!mage["start_stats"].isnil());
+		CHECK(!mage["on_level_gain"].isnil());
 
 		L.finish_check();
 	}
