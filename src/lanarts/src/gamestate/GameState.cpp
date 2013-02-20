@@ -70,6 +70,8 @@ GameState::GameState(const GameSettings& settings, lua_State* L) :
 
 	dragging_view = false;
 
+	_game_start_timestamp = 0;
+
 	init_data.seed = generate_seed();
 }
 
@@ -141,6 +143,10 @@ bool GameState::start_game() {
 
 	mtwist.init_genrand(init_data.seed);
 
+	time_t systime;
+	time(&systime);
+	_game_start_timestamp = systime;
+
 	/* If class was not set, we may be loading a game -- don't init level */
 	if (settings.class_type != -1) {
 		set_level(world.get_level(0, true));
@@ -180,6 +186,7 @@ bool GameState::level_has_player() {
 
 void GameState::serialize(SerializeBuffer& serializer) {
 	serializer.write(mtwist); // Save RNG state
+	serializer.write_int(_game_start_timestamp);
 
 	serializer.write_int(this->frame_n);
 	world.serialize(serializer);
@@ -190,6 +197,7 @@ void GameState::serialize(SerializeBuffer& serializer) {
 
 void GameState::deserialize(SerializeBuffer& serializer) {
 	serializer.read(mtwist); // Load RNG state
+	serializer.read_int(_game_start_timestamp);
 
 	serializer.read_int(this->frame_n);
 	world.deserialize(serializer);
@@ -227,6 +235,10 @@ const ldraw::Font& GameState::font() {
 
 const ldraw::Font& GameState::menu_font() {
 	return res::font_menu();
+}
+
+long GameState::game_start_timestamp() {
+	return _game_start_timestamp;
 }
 
 int GameState::handle_event(SDL_Event* event) {

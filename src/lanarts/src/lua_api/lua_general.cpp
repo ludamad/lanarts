@@ -19,6 +19,21 @@
 
 #include <lcommon/math_util.h>
 
+static int lapi_table_merge(lua_State* L) {
+	lua_pushnil(L);
+
+	while (lua_next(L, 2)) {
+		lua_pushvalue(L, -2); // key
+		lua_pushvalue(L, -2); // value
+		lua_settable(L, 1);
+
+		lua_pop( L, 1);
+		// pop value
+	}
+	lua_pop( L, 1);
+	return 0;
+}
+
 static int lapi_values_aux(lua_State* L) {
 	long idx = (long) lua_touserdata(L, lua_upvalueindex(2));
 	long len = (long) lua_touserdata(L, lua_upvalueindex(3));
@@ -227,10 +242,6 @@ static int lapi_toaddress(lua_State *L) {
 	return 1; /* return the table */
 }
 
-// buffer T
-// input A
-// start: consume al spaces
-
 namespace lua_api {
 
 	int l_itervalues(lua_State* L) {
@@ -250,6 +261,9 @@ namespace lua_api {
 		globals["string_split"].bind_function(lapi_string_split);
 		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);
+
+		LuaValue table = globals["table"];
+		table["merge"].bind_function(lapi_table_merge);
 
 		globals["system"].ensure_table();
 		globals["string"].ensure_table();

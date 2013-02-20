@@ -31,8 +31,7 @@ PlayerInst::PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y,
 		bool local) :
 		CombatGameInst(stats, sprite, NONE, -1, x, y, RADIUS, true, DEPTH), actions_set_for_turn(
 				false), fieldofview(LINEOFSIGHT), local(local), moving(0), autouse_mana_potion_try_count(
-				0), lives(0), deaths(0), previous_spellselect(0), spellselect(
-				-1) {
+				0), previous_spellselect(0), spellselect(-1) {
 	last_chosen_weaponclass = "unarmed";
 }
 
@@ -48,10 +47,12 @@ std::string player_name(GameState* gs, PlayerInst* p) {
 }
 
 void PlayerInst::init(GameState* gs) {
-	//XXX: this seems to be set wrong, fix this
-	int previous_level = current_level;
 	CombatGameInst::init(gs);
+
 	teamid = gs->teams().default_player_team();
+
+	_score_stats.deepest_floor = std::max(_score_stats.deepest_floor, current_level);
+
 	_path_to_player.initialize(gs->tiles().solidity_map());
 	_path_to_player.fill_paths_in_radius(pos(), PLAYER_PATHING_RADIUS);
 	collision_simulation_id() = gs->collision_avoidance().add_player_object(
@@ -140,7 +141,7 @@ void PlayerInst::shift_autotarget(GameState* gs) {
 			// Exit when we wrap around if we have a target
 			return;
 		}
-		EnemyInst* e = (EnemyInst*)gs->get_instance(mids[j]);
+		EnemyInst* e = (EnemyInst*) gs->get_instance(mids[j]);
 		bool isvisible = e != NULL && gs->object_visible_test(e, this, false);
 		if (isvisible) {
 			current_target = e->id;
@@ -182,7 +183,7 @@ void PlayerInst::step(GameState* gs) {
 		reset_rest_cooldown();
 
 	if (stats().has_died()) {
-		deaths++;
+		_score_stats.deaths++;
 //		if (is_local_focus())
 		queued_actions.clear();
 		actions_set_for_turn = false;
@@ -214,11 +215,12 @@ void PlayerInst::draw(GameState* gs) {
 
 void PlayerInst::copy_to(GameInst *inst) const {
 	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
-	*(PlayerInst*)inst = *this;
+	*(PlayerInst*) inst = *this;
 }
 
 void PlayerInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	CombatGameInst::serialize(gs, serializer);
+	serializer.write(_score_stats);
 	serializer.write(actions_set_for_turn);
 	serializer.write(last_chosen_weaponclass);
 //	serializer.write_container(queued_actions);
@@ -228,6 +230,7 @@ void PlayerInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 
 void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	CombatGameInst::deserialize(gs, serializer);
+	serializer.read(_score_stats);
 	serializer.read(actions_set_for_turn);
 	serializer.read(last_chosen_weaponclass);
 //	serializer.read_container(queued_actions);

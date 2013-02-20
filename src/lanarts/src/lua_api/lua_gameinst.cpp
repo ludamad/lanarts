@@ -186,7 +186,6 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_NUM_MEMB_LOOKUP("id", inst->id)
 	else IFLUA_NUM_MEMB_LOOKUP("radius", inst->radius)
 	else IFLUA_NUM_MEMB_LOOKUP("target_radius", inst->target_radius)
-	else IFLUA_NUM_MEMB_LOOKUP("kills", state->get_combat_inst()->number_of_kills())
 	else IFLUA_STATS_MEMB_LOOKUP("stats", inst)
 	else if (strcmp(cstr, "name") == 0) {
 		push_inst_name(L, inst);

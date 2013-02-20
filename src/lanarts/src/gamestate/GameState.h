@@ -236,9 +236,13 @@ public:
 		return world.teams();
 	}
 
+	long game_start_timestamp();
+
 	CollisionAvoidance& collision_avoidance();
 private:
 	int handle_event(SDL_Event* event);
+
+	int _game_start_timestamp;
 
 	/* Members */
 	GameSettings settings;

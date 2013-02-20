@@ -72,14 +72,13 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 	Pos p1(x, y), p2(x + x_interval, y);
 
 	gs->font().drawf(COL_WHITE, Pos(x, y), "Kills %d",
-			player_inst->number_of_kills());
+			player_inst->score_stats().kills);
 
 	if (gs->game_settings().regen_on_death) {
 		gs->font().drawf(COL_PALE_RED, Pos(x + x_interval, y), "Deaths %d",
-				player_inst->number_of_deaths());
+				player_inst->score_stats().deaths);
 	} else {
-		gs->font().drawf(COL_PALE_BLUE, Pos(x + x_interval, y), "Hardcore",
-				player_inst->number_of_deaths());
+		gs->font().draw(COL_PALE_BLUE, Pos(x + x_interval, y), "Hardcore");
 	}
 
 	p1.y += y_interval;

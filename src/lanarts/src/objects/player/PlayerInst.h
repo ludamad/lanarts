@@ -26,6 +26,17 @@
 const int REST_COOLDOWN = 200;
 const int PLAYER_PATHING_RADIUS = 500;
 
+/* Statistics that do not affect gameplay but are kept for scoring */
+struct PlayerScoreStats {
+	PlayerScoreStats() {
+		deaths = 0;
+		kills = 0;
+		deepest_floor = 0;
+	}
+	int deaths, kills, deepest_floor;
+};
+
+/* The player object, one exists globally per player */
 class PlayerInst: public CombatGameInst {
 public:
 	enum {
@@ -61,6 +72,10 @@ public:
 	virtual void update_field_of_view(GameState* gs);
 	virtual bool within_field_of_view(const Pos& pos);
 
+	virtual void signal_killed_enemy() {
+		_score_stats.kills++;
+	}
+
 	int spell_selected() {
 		return spellselect;
 	}
@@ -77,8 +92,8 @@ public:
 		return equipment().money;
 	}
 
-	int number_of_deaths() {
-		return deaths;
+	const PlayerScoreStats& score_stats() const {
+		return _score_stats;
 	}
 
 	Weapon weapon() {
@@ -131,6 +146,8 @@ private:
 	void reposition_item(GameState* gs, const GameAction& action);
 	void purchase_from_store(GameState* gs, const GameAction& action);
 
+	PlayerScoreStats _score_stats;
+
 	bool actions_set_for_turn;
 	ActionQueue queued_actions;
 	FloodFillPaths _path_to_player;
@@ -144,7 +161,6 @@ private:
 	// NB: local to spell select is assumed to be a POD region by serialize/deserialize
 	bool local, moving;
 	int autouse_mana_potion_try_count;
-	int lives, deaths;
 	int previous_spellselect, spellselect;
 };
 
