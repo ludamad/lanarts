@@ -11,5 +11,6 @@ CMakeLists.txt.orig
 *.wav
 *.exe
 *.zip
+*.score
 stdout.txt
 stderr.txt
