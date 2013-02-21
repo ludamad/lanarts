@@ -19,6 +19,7 @@
 #include "GameLevelState.h"
 #include "GameState.h"
 #include "GameWorld.h"
+#include "ScoreBoard.h"
 
 GameWorld::GameWorld(GameState* gs) :
 		gs(gs),
@@ -282,6 +283,9 @@ void GameWorld::reset(int keep) {
 	if (midstep) {
 		next_room_id = -2;
 	} else {
+		if (gs->local_player()->current_level >= 3) {
+			score_board_store(gs);
+		}
 		for (int i = keep; i < level_states.size(); i++) {
 			delete_list.push_back(level_states[i]);
 		}
@@ -290,6 +294,7 @@ void GameWorld::reset(int keep) {
 		gs->game_hud().override_sidebar_contents(NULL);
 		gs->set_level(get_level(keep, true /*spawn player*/));
 		gs->game_chat().clear();
+		gs->renew_game_timestamp();
 	}
 	for (int i = 0; i < delete_list.size(); i++) {
 		delete delete_list[i];

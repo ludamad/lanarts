@@ -70,7 +70,7 @@ GameState::GameState(const GameSettings& settings, lua_State* L) :
 
 	dragging_view = false;
 
-	_game_start_timestamp = 0;
+	_game_timestamp = 0;
 
 	init_data.seed = generate_seed();
 }
@@ -108,9 +108,7 @@ static void _event_log_initialize(GameState* gs, GameSettings& settings) {
 	}
 
 	if (settings.keep_event_log) {
-		time_t t;
-		time(&t);
-		format(input_log_name_buffer, "logs/game_event_log%d", (int)t);
+		format(input_log_name_buffer, "logs/game_event_log%d", gs->game_timestamp());
 		output_log = input_log_name_buffer.c_str();
 	}
 
@@ -118,6 +116,7 @@ static void _event_log_initialize(GameState* gs, GameSettings& settings) {
 }
 
 bool GameState::start_game() {
+	renew_game_timestamp();
 	_event_log_initialize(this, settings);
 
 	if (settings.conntype == GameSettings::SERVER) {
@@ -142,10 +141,6 @@ bool GameState::start_game() {
 	printf("Seed used for RNG = 0x%X\n", init_data.seed);
 
 	mtwist.init_genrand(init_data.seed);
-
-	time_t systime;
-	time(&systime);
-	_game_start_timestamp = systime;
 
 	/* If class was not set, we may be loading a game -- don't init level */
 	if (settings.class_type != -1) {
@@ -186,18 +181,20 @@ bool GameState::level_has_player() {
 
 void GameState::serialize(SerializeBuffer& serializer) {
 	serializer.write(mtwist); // Save RNG state
-	serializer.write_int(_game_start_timestamp);
+	serializer.write_int(_game_timestamp);
 
 	serializer.write_int(this->frame_n);
 	world.serialize(serializer);
 
 	player_data().serialize(this, serializer);
 	serializer.flush();
+
+	// Save score
 }
 
 void GameState::deserialize(SerializeBuffer& serializer) {
 	serializer.read(mtwist); // Load RNG state
-	serializer.read_int(_game_start_timestamp);
+	serializer.read_int(_game_timestamp);
 
 	serializer.read_int(this->frame_n);
 	world.deserialize(serializer);
@@ -237,8 +234,14 @@ const ldraw::Font& GameState::menu_font() {
 	return res::font_menu();
 }
 
-long GameState::game_start_timestamp() {
-	return _game_start_timestamp;
+int GameState::game_timestamp() {
+	return _game_timestamp;
+}
+
+void GameState::renew_game_timestamp() {
+	time_t systime;
+	time(&systime);
+	_game_timestamp = systime;
 }
 
 int GameState::handle_event(SDL_Event* event) {

@@ -184,10 +184,10 @@ void PlayerInst::step(GameState* gs) {
 
 	if (stats().has_died()) {
 		_score_stats.deaths++;
-//		if (is_local_focus())
 		queued_actions.clear();
 		actions_set_for_turn = false;
 		if (gs->game_settings().regen_on_death) {
+			stats().effects.clear();
 			stats().core.heal_fully();
 			spawn_in_lower_level(gs, this);
 		} else {

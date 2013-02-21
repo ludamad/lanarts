@@ -137,7 +137,7 @@ void CombatGameInst::draw(GameState *gs, float frame) {
 
 bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 		const Item& weapon, bool ignore_cooldowns) {
-	event_log("CombatGameInst::melee_attack: id %d hitting id %d, weapon = id %d", id, inst->id, weapon.id);
+	event_log("CombatGameInst::melee_attack: id %d hitting id %d, weapon = id %d", id, inst->id, 	weapon.id);
 
 	bool isdead = false;
 	if (!ignore_cooldowns && !cooldowns().can_doaction())

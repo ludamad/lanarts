@@ -97,3 +97,43 @@ function DEBUG_BOX_DRAW(self, xy)
         draw_rectangle_outline(with_alpha(color, alpha), bbox_create(xy, self.size), line_width )
     end
 end
+
+function pretty_tostring(val, tabs)
+    tabs = tabs or 0
+
+    local tabstr = ""
+
+    for i = 1, tabs do
+        tabstr = tabstr .. "  "
+    end
+
+    if type(val) ~= "table" then
+        return tabstr .. tostring(val)
+    end
+
+    local parts = {tabstr .. "{", --[[sentinel for remove below]]""}
+
+    for k,v in pairs(val) do
+        table.insert(parts, "\n")
+
+        if type(k) == "number" then
+            table.insert(parts, pretty_tostring(v, tabs+1))
+        else 
+            table.insert(parts, pretty_tostring(k, tabs+1))
+            table.insert(parts, " = ")
+            table.insert(parts, pretty_tostring(v))
+        end
+
+        table.insert(parts, ",")
+    end
+
+    parts[#parts] = nil -- remove comma
+
+    table.insert(parts, "\n" .. tabstr .. "}");
+
+    return table.concat(parts)
+end
+
+function pretty_print(val)
+    print(pretty_tostring(val))
+end

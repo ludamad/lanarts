@@ -218,3 +218,9 @@ void EffectStats::deserialize(GameState* gs, SerializeBuffer& serializer) {
 		serializer.read_int(effects[i].t_remaining);
 	}
 }
+
+void EffectStats::clear() {
+	for (int i = 0; i < EFFECTS_MAX; i++) {
+		effects[i].t_remaining = 0;
+	}
+}

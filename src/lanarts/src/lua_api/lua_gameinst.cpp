@@ -186,8 +186,12 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_NUM_MEMB_LOOKUP("id", inst->id)
 	else IFLUA_NUM_MEMB_LOOKUP("radius", inst->radius)
 	else IFLUA_NUM_MEMB_LOOKUP("target_radius", inst->target_radius)
+	else IFLUA_NUM_MEMB_LOOKUP("floor", inst->current_level)
 	else IFLUA_STATS_MEMB_LOOKUP("stats", inst)
-	else if (strcmp(cstr, "name") == 0) {
+	else if (strcmp(cstr, "kills") == 0) {
+		PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
+		lua_pushnumber(L, p ? p->score_stats().kills : 0);
+	} else if (strcmp(cstr, "name") == 0) {
 		push_inst_name(L, inst);
 	} else if (strcmp(cstr, "unique") == 0 && enemyinst != NULL){
 		lua_pushboolean(L, enemyinst->etype().unique);

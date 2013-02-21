@@ -21,7 +21,7 @@
 // Keep all documentation in doc/level.luadoc
 
 // game world functions
-static int world_player_local(lua_State* L) {
+static int world_local_player(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	luawrap::push(L, (GameInst*)gs->local_player());
 	return 1;
@@ -125,7 +125,7 @@ namespace lua_api {
 
 		LuaValue world = globals["world"].ensure_table();
 
-		world["player_local"].bind_function(world_player_local);
+		world["local_player"].bind_function(world_local_player);
 
 		LuaValue level = globals["level"].ensure_table();
 

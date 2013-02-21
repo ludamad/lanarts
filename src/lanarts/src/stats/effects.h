@@ -47,6 +47,8 @@ struct EffectStats {
 	void process(GameState* gs, CombatGameInst* inst,
 			EffectiveStats& effective) const;
 
+	void clear();
+
 	Effect effects[EFFECTS_MAX];
 };
 

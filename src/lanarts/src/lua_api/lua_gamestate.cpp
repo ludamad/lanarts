@@ -15,6 +15,7 @@
 
 #include "data/game_data.h"
 #include "gamestate/GameState.h"
+#include "gamestate/ScoreBoard.h"
 
 #include "lua_newapi.h"
 
@@ -24,6 +25,11 @@ static void game_save(LuaStackValue filename) {
 	lua_api::gamestate(filename)->serialize(sb);
 	sb.flush();
 	fclose(file);
+}
+
+static int game_score_board_store(lua_State* L) {
+	score_board_store(lua_api::gamestate(L));
+	return 0;
 }
 
 static void game_load(LuaStackValue filename) {
@@ -191,6 +197,19 @@ static void lapi_wait(LuaStackValue wait_time) {
 	}
 }
 
+void ScoreBoardEntry_lua_push(lua_State* L, const ScoreBoardEntry& entry) {
+	lua_newtable(L); // Push table
+
+	LuaStackValue score_table(L, -1); // Reference the new table
+	score_table["name"] = entry.name;
+	score_table["deaths"] = entry.score_stats.deaths;
+	score_table["deepest_floor"] = entry.score_stats.deepest_floor;
+	score_table["kills"] = entry.score_stats.kills;
+	score_table["character_level"] = entry.character_level;
+	score_table["timestamp"] = entry.timestamp;
+	score_table["hardcore"] = entry.hardcore;
+}
+
 namespace lua_api {
 
 	static void register_game_getters(lua_State* L, LuaValue& game) {
@@ -210,6 +229,9 @@ namespace lua_api {
 		luawrap::install_userdata_type<PlayerDataProxy,
 				PlayerDataProxy::metatable>();
 
+		// Install ScoreBoardEntry so we can bind fetch_scores directly
+		luawrap::install_type<ScoreBoardEntry, ScoreBoardEntry_lua_push>();
+
 		register_gamesettings(L);
 
 		LuaValue globals = luawrap::globals(L);
@@ -226,6 +248,9 @@ namespace lua_api {
 
 		game["input_capture"].bind_function(game_input_capture);
 		game["input_handle"].bind_function(game_input_handle);
+
+		game["score_board_fetch"].bind_function(score_board_fetch);
+		game["score_board_store"].bind_function(game_score_board_store);
 
 		register_game_getters(L, game);
 	}
