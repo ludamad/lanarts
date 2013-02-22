@@ -15,6 +15,7 @@
 #include <ldraw/DrawOptions.h>
 
 #include "lua_api/lua_gameinst.h"
+#include "lua_api/lua_newapi.h"
 
 #include "draw/colour_constants.h"
 #include "draw/draw_sprite.h"
@@ -240,6 +241,8 @@ bool EnemyInst::within_field_of_view(const Pos & pos) {
 
 void EnemyInst::die(GameState *gs) {
 	if (!destroyed) {
+		lua_api::event_monster_death(gs->luastate(), this);
+
 		AnimatedInst* anim = new AnimatedInst(pos(), etype().enemy_sprite, 20);
 		anim->frame(0);
 		gs->add_instance(anim);

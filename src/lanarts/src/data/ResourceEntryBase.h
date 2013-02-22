@@ -25,7 +25,7 @@ public:
 
 	virtual sprite_id get_sprite() = 0;
 	virtual const char* entry_type() = 0;
-	virtual void convert_lua();
+	virtual void convert_lua(); // This is a major work-in-progress
 
 	virtual void init( lua_State* L, int id, const std::string& name );
 

@@ -191,6 +191,9 @@ static int lua_member_lookup(lua_State* L) {
 	else if (strcmp(cstr, "kills") == 0) {
 		PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
 		lua_pushnumber(L, p ? p->score_stats().kills : 0);
+	} else if (strcmp(cstr, "deepest_floor") == 0) {
+		PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
+		lua_pushnumber(L, p ? p->score_stats().deepest_floor : 0);
 	} else if (strcmp(cstr, "name") == 0) {
 		push_inst_name(L, inst);
 	} else if (strcmp(cstr, "unique") == 0 && enemyinst != NULL){

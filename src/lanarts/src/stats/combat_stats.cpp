@@ -54,7 +54,7 @@ static void learn_class_spells(SpellsKnown& spells,
 }
 
 void CombatStats::gain_level() {
-	ClassEntry& ct = class_stats.class_type();
+	ClassEntry& ct = class_stats.class_entry();
 
 	core.hp += ct.hp_perlevel;
 	core.max_hp += ct.hp_perlevel;
@@ -77,7 +77,7 @@ void CombatStats::gain_level() {
 
 void CombatStats::init() {
 	if (class_stats.has_class()) {
-		const ClassEntry& ct = class_stats.class_type();
+		const ClassEntry& ct = class_stats.class_entry();
 		learn_class_spells(spells, ct.spell_progression, class_stats.xplevel);
 	}
 }

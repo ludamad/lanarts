@@ -187,7 +187,7 @@ struct ClassStats {
 	bool has_class() {
 		return classid >= 0;
 	}
-	ClassEntry& class_type() const;
+	ClassEntry& class_entry() const;
 };
 
 #endif /* STATS_H_ */

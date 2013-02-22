@@ -243,7 +243,6 @@ static int lapi_toaddress(lua_State *L) {
 }
 
 namespace lua_api {
-
 	int l_itervalues(lua_State* L) {
 		lua_pushvalue(L, 1);
 		lua_pushlightuserdata(L, (void*) ((1)));
@@ -265,9 +264,7 @@ namespace lua_api {
 		LuaValue table = globals["table"];
 		table["merge"].bind_function(lapi_table_merge);
 
-		globals["system"].ensure_table();
-		globals["string"].ensure_table();
-		LuaValue string_table = globals["string"];
+		LuaValue string_table = globals["string"].ensure_table();
 		string_table["pack"].bind_function(str_pack);
 	}
 }

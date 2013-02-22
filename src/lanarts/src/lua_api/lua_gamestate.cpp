@@ -197,19 +197,6 @@ static void lapi_wait(LuaStackValue wait_time) {
 	}
 }
 
-void ScoreBoardEntry_lua_push(lua_State* L, const ScoreBoardEntry& entry) {
-	lua_newtable(L); // Push table
-
-	LuaStackValue score_table(L, -1); // Reference the new table
-	score_table["name"] = entry.name;
-	score_table["deaths"] = entry.score_stats.deaths;
-	score_table["deepest_floor"] = entry.score_stats.deepest_floor;
-	score_table["kills"] = entry.score_stats.kills;
-	score_table["character_level"] = entry.character_level;
-	score_table["timestamp"] = entry.timestamp;
-	score_table["hardcore"] = entry.hardcore;
-}
-
 namespace lua_api {
 
 	static void register_game_getters(lua_State* L, LuaValue& game) {
@@ -230,7 +217,7 @@ namespace lua_api {
 				PlayerDataProxy::metatable>();
 
 		// Install ScoreBoardEntry so we can bind fetch_scores directly
-		luawrap::install_type<ScoreBoardEntry, ScoreBoardEntry_lua_push>();
+		luawrap::install_type<ScoreBoardEntry, ScoreBoardEntry::lua_push>();
 
 		register_gamesettings(L);
 

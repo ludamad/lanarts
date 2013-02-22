@@ -35,7 +35,7 @@ static GameState* init_gamestate() {
 
 	lua_State* L = lua_api::create_luastate();
 	lua_api::add_search_path(L, "res/?.lua");
-	lua_api::add_search_path(L, "res/start_menu/?.lua");
+	lua_api::add_search_path(L, "res/menus/?.lua");
 
 	GameSettings settings; // Initialized with defaults
 	// Load the manual settings
@@ -77,26 +77,30 @@ label_StartOver:
 	GameState* gs = init_gamestate();
 	lua_State* L = gs->luastate();
 
-	lua_api::require(L, "start_menu"); // loads start_menu.lua
+	lua_api::require(L, "main"); // loads engine hooks
 
-	lua_getglobal(L, "start_menu_show");
+	LuaValue engine = luawrap::globals(L)["engine"];
+
+	engine["menu_start"].push();
 	bool did_exit = !luawrap::call<bool>(L);
 	if (did_exit) goto label_Quit; /* User has quit! */
 
 	save_settings_data(gs->game_settings(), "saved_settings.yaml"); // Save partial settings in case of failure
 
 	gs->start_connection();
+
+	engine["resources_load"].push();
+	luawrap::call<void>(L);
 	init_game_data(gs->game_settings(), L);
 
 	if (gs->game_settings().conntype == GameSettings::SERVER) {
-		lua_getglobal(L, "lobby_menu_show");
+		engine["lobby_menu_start"].push();
 		bool did_exit = !luawrap::call<bool>(L);
 		if (did_exit) goto label_Quit; /* User has quit! */
 	}
 
 	if (gs->start_game()) {
-		lua_api::require(L, "main"); // loads main.lua
-		lua_getglobal(L, "main");
+		engine["game_start"].push();
 		luawrap::call<void>(L);
 
 		if (!gs->io_controller().user_has_exit()) {

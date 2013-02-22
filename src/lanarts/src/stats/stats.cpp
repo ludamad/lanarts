@@ -140,7 +140,7 @@ void CooldownStats::reset_hurt_cooldown(int cooldown) {
 	hurt_cooldown = std::max(cooldown, hurt_cooldown);
 }
 
-ClassEntry& ClassStats::class_type() const {
+ClassEntry& ClassStats::class_entry() const {
 	return game_class_data.at(classid);
 }
 

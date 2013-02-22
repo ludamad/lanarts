@@ -86,6 +86,10 @@ public:
 	Inventory& inventory();
 	EquipmentStats& equipment();
 
+	sprite_id get_sprite() const {
+		return sprite;
+	}
+
 	int& combat_mob_id() {
 		return mobid;
 	}

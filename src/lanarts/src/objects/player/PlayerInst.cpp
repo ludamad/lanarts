@@ -183,6 +183,8 @@ void PlayerInst::step(GameState* gs) {
 		reset_rest_cooldown();
 
 	if (stats().has_died()) {
+		lua_api::event_player_death(gs->luastate(), this);
+
 		_score_stats.deaths++;
 		queued_actions.clear();
 		actions_set_for_turn = false;

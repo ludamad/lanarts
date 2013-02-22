@@ -578,7 +578,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 		cooldown = std::max(wentry.cooldown(), pentry.cooldown());
 
 		//XXX: Horrible Archer hack REMOVE THIS LATER
-		if (class_stats().class_type().name == "Archer"
+		if (class_stats().class_entry().name == "Archer"
 				&& pentry.weapon_class == "bows") {
 			int xplevel = class_stats().xplevel;
 			float movebonus = (class_stats().xplevel - 1) / 4.0f;

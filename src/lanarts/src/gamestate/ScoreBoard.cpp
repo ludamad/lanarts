@@ -1,5 +1,8 @@
 #include "ScoreBoard.h"
 
+#include <luawrap/luawrap.h>
+#include "stats/ClassEntry.h"
+
 #include "GameState.h"
 
 #include <lcommon/SerializeBuffer.h>
@@ -8,10 +11,30 @@ ScoreBoardEntry::ScoreBoardEntry() :
 		character_level(0), timestamp(0), hardcore(0) {
 }
 
+void ScoreBoardEntry::lua_push(lua_State* L, const ScoreBoardEntry& entry) {
+	// Push table
+	lua_newtable(L);
+
+	LuaStackValue score_table(L, -1); // Reference the new table
+	score_table["name"] = entry.name;
+	score_table["class_name"] = entry.class_name;
+	// sprite_name not necessarily useful ATM
+	score_table["sprite_name"] = entry.sprite_name;
+	score_table["deaths"] = entry.score_stats.deaths;
+	score_table["deepest_floor"] = entry.score_stats.deepest_floor;
+	score_table["kills"] = entry.score_stats.kills;
+	score_table["character_level"] = entry.character_level;
+	score_table["timestamp"] = entry.timestamp;
+	score_table["hardcore"] = entry.hardcore;
+}
+
 ScoreBoardEntry::ScoreBoardEntry(const std::string& name,
+		const std::string& sprite_name, const std::string& class_name,
 		const PlayerScoreStats& score_stats, int character_level, int timestamp,
 		bool hardcore) :
 				name(name),
+				sprite_name(sprite_name),
+				class_name(class_name),
 				score_stats(score_stats),
 				character_level(character_level),
 				timestamp(timestamp),
@@ -72,6 +95,8 @@ void ScoreBoard::read_entries(std::vector<ScoreBoardEntry>& entries) const {
 	for (int i = 0; i < entry_amount; i++) {
 		ScoreBoardEntry entry;
 		reader.read(entry.name);
+		reader.read(entry.sprite_name);
+		reader.read(entry.class_name);
 		reader.read(entry.score_stats);
 		reader.read(entry.character_level);
 		reader.read(entry.timestamp);
@@ -105,6 +130,8 @@ void ScoreBoard::write_entries(const std::vector<ScoreBoardEntry>& entries) {
 	for (int i = 0; i < entries.size(); i++) {
 		const ScoreBoardEntry& entry = entries[i];
 		writer.write(entry.name);
+		writer.write(entry.sprite_name);
+		writer.write(entry.class_name);
 		writer.write(entry.score_stats);
 		writer.write(entry.character_level);
 		writer.write(entry.timestamp);
@@ -118,8 +145,13 @@ void ScoreBoard::write_entries(const std::vector<ScoreBoardEntry>& entries) {
 
 void score_board_store(GameState* gs) {
 	PlayerInst* player = gs->local_player();
+
+	std::string name = player_name(gs, player);
+	std::string sprite_name = res::sprite_name(player->get_sprite());
+	std::string class_name = player->class_stats().class_entry().name;
+
 	bool hardcore = !gs->game_settings().regen_on_death;
-	ScoreBoardEntry entry(player_name(gs, player), player->score_stats(),
+	ScoreBoardEntry entry(name, sprite_name, class_name, player->score_stats(),
 			player->class_stats().xplevel, gs->game_timestamp(), hardcore);
 
 	ScoreBoard::get_instance().store_entry(entry);

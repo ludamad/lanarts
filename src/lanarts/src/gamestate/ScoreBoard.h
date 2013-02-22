@@ -11,13 +11,21 @@ const char SCOREBOARD_FILE[] = "res/score_board.score";
 
 struct ScoreBoardEntry {
 	std::string name;
+	std::string sprite_name;
+	std::string class_name;
+
 	PlayerScoreStats score_stats;
+
 	int character_level;
 	int timestamp; // When the game started, used to uniquely identify a character
 	bool hardcore; // Playing on hardcore mode ?
 
+	static void lua_push(lua_State* L, const ScoreBoardEntry& entry);
+
 	ScoreBoardEntry();
 	ScoreBoardEntry(const std::string& name,
+			const std::string& sprite_name,
+			const std::string& class_name,
 			const PlayerScoreStats& score_stats, int character_level,
 			int timestamp, bool hardcore);
 };

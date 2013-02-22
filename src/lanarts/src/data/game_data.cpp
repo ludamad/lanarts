@@ -123,8 +123,8 @@ const char* equip_type_description(const ItemEntry& ientry) {
 class_id get_class_by_name(const char* name) {
 	return get_X_by_name(game_class_data, name);
 }
-sprite_id get_sprite_by_name(const char* name) {
-	return get_X_by_name(game_sprite_data, name);
+sprite_id get_sprite_by_name(const char* name, bool error_if_not_found) {
+	return get_X_by_name(game_sprite_data, name, error_if_not_found);
 }
 spell_id get_spell_by_name(const char* name) {
 	return get_X_by_name(game_spell_data, name);
@@ -191,16 +191,15 @@ LuaValue lua_sprites, lua_armours, lua_enemies, lua_effects, lua_weapons,
 LuaValue lua_settings;
 
 static void update_loading_screen(lua_State* L, int percent, const char* task) {
-	lua_api::require(L, "loading"); // for system.loading_draw
-	luawrap::globals(L)["system"].push();
+	luawrap::globals(L)["engine"].push();
 
-	lua_getfield(L, -1, "loading_draw");
+	lua_getfield(L, -1, "loading_screen_draw");
 	if (!lua_isnil(L, -1)) {
 		luawrap::call<void>(L, percent, task);
 	}
 
+	/* pop engine table */
 	lua_pop(L, 1);
-	/* pop system table */
 }
 
 template<class T>

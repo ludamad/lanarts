@@ -7,6 +7,9 @@
 #define LUA_NEWAPI_H_
 
 class GameState;
+class GameInst;
+class PlayerInst;
+class EnemyInst;
 struct lua_State;
 class LuaStackValue;
 class LuaValue;
@@ -60,6 +63,9 @@ namespace lua_api {
 	void luacall_postdraw(lua_State* L);
 	bool luacall_handle_event(lua_State* L, SDL_Event* e);
 	void luacall_hitsound(lua_State* L);
+
+	void event_player_death(lua_State* L, PlayerInst* player);
+	void event_monster_death(lua_State* L, EnemyInst* player);
 
 	// Lua utilities:
 	int l_itervalues(lua_State* L);

@@ -66,7 +66,7 @@ local function loading_screen_setup(...)
 end
 
 -- Loading callback
-function system.loading_draw(...)
+function loading_screen_draw(...)
 	perf.timing_begin("system.loading_draw")
     display.draw_start()
 
