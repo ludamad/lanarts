@@ -89,19 +89,26 @@ void ScoreBoard::read_entries(std::vector<ScoreBoardEntry>& entries) const {
 
 	SerializeBuffer reader = SerializeBuffer::file_reader(entry_file);
 
-	int entry_amount;
-	reader.read_int(entry_amount);
+	try {
+		int entry_amount;
+		reader.read_int(entry_amount);
 
-	for (int i = 0; i < entry_amount; i++) {
-		ScoreBoardEntry entry;
-		reader.read(entry.name);
-		reader.read(entry.sprite_name);
-		reader.read(entry.class_name);
-		reader.read(entry.score_stats);
-		reader.read(entry.character_level);
-		reader.read(entry.timestamp);
-		reader.read(entry.hardcore);
-		entries.push_back(entry);
+		for (int i = 0; i < entry_amount; i++) {
+			ScoreBoardEntry entry;
+			reader.read(entry.name);
+			reader.read(entry.sprite_name);
+			reader.read(entry.class_name);
+			reader.read(entry.score_stats);
+			reader.read(entry.character_level);
+			reader.read(entry.timestamp);
+			reader.read(entry.hardcore);
+			entries.push_back(entry);
+		}
+	} catch (const SerializeBufferError& sbe) {
+		// TODO: Be more graceful
+		printf("WARNING: Incompatible high score list was detected. The list may be overridden.\n");
+		printf("Internal error: '%'s'\n", sbe.what());
+		entries.clear(); // Don't show corrupted entries
 	}
 
 	reader.flush();

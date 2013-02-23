@@ -1,6 +1,5 @@
-function event_occurred(type, --[[Misc data]]...)
+function event_occurred(type, --[[Misc data]] ...)
     if type == 'PlayerDeath' then
-        local player = ...
-        print("You died!")
+        game.score_board_store()
     end
 end

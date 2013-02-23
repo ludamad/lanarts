@@ -69,7 +69,7 @@ end
 
 DEBUG_LAYOUTS = false
 
-local menu_state = { }
+local menu_state = { exit_game = false }
 
 local exit_menu -- forward declare
 local setup_start_menu -- forward declare
@@ -77,14 +77,21 @@ local setup_settings_menu -- forward declare
 local setup_lobby_menu -- forward declare
 local setup_scores_menu -- forward declare
 
-function exit_menu()
-    menu_state.menu = nil -- Signals event loop that menu is finished
+function exit_menu(exit_game)
+    -- Signals event loop that menu is finished
+    menu_state.menu = nil
+    menu_state.back = nil
     menu_state.continue = nil
+    menu_state.exit_game = exit_game
 end
 
 function setup_start_menu()
     menu_state.menu = InstanceBox.create( { size = display.window_size } )
-    
+
+    menu_state.back = function() 
+        exit_menu(--[[Quit game]] true) 
+    end    
+
     local function on_load_click()
         config.startup_function = function()
             if file_exists("savefile.save") then
@@ -108,7 +115,8 @@ end
 
 function setup_settings_menu()
     menu_state.menu = InstanceBox.create( { size = display.window_size } )
-
+    
+    menu_state.back = setup_start_menu
     menu_state.continue = function ()
         if settings.class_type ~= -1 then
             exit_menu()
@@ -116,13 +124,17 @@ function setup_settings_menu()
     end
 
     menu_state.menu:add_instance(
-        game_settings_menu_create( --[[Back Button]] setup_start_menu, --[[Start Game Button]] menu_state.continue), 
+        game_settings_menu_create( --[[Back Button]] menu_state.back, --[[Start Game Button]] menu_state.continue), 
         CENTER
     )
 end
 
 function setup_lobby_menu()
     menu_state.menu = InstanceBox.create( { size = display.window_size } )
+
+    menu_state.back =  function() 
+        exit_menu(--[[Quit game]] true) 
+    end
     menu_state.continue = exit_menu
     menu_state.menu:add_instance(
         lobby_menu_create( --[[Start Game Button]] menu_state.continue ),
@@ -132,15 +144,16 @@ end
 
 function setup_scores_menu()
     menu_state.menu = InstanceBox.create( { size = display.window_size } )
-    menu_state.continue = setup_start_menu
+    menu_state.back = setup_start_menu
+    menu_state.continue = nil
     menu_state.menu:add_instance(
-        scores_menu_create( --[[Back Button]] setup_start_menu ),
+        scores_menu_create( --[[Back Button]] menu_state.back ),
         CENTER
     )
 end
 
 local function menu_loop(should_poll)
-    while game.input_capture() and not key_pressed(keys.ESCAPE) do
+    while game.input_capture() do
         if key_pressed(keys.F9) then
             -- note, globals are usually protected against being changed
             -- but a bypass is allowed for cases where it must be done
@@ -153,12 +166,14 @@ local function menu_loop(should_poll)
 
         menu_state.menu:step( {0, 0} )
 
-        if key_pressed(keys.ENTER) and menu_state.continue then
-            menu_state:continue()
+        if key_pressed(keys.ESCAPE) and menu_state.back then
+            menu_state.back()
+        elseif key_pressed(keys.ENTER) and menu_state.continue then
+            menu_state.continue()
         end
 
         if not menu_state.menu then -- because we have moved on 
-            return true
+            return not menu_state.exit_game
         end
 
         display.draw_start()

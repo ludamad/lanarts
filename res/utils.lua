@@ -43,6 +43,22 @@ function vector_multiply(v1, v2)
     return ret
 end
 
+function vector_interpolate(v1, v2, percentage --[[0 results in v1, 1 results in v2, anything else is inbetween]])
+    local length = # v1
+    percentage = math.max( math.min(percentage, 1.0), 0.0)
+
+    assert(length == #v2, "vector_interpolate(): Vector lengths do not match!")
+
+    local ret = {}
+    for i = 1,length do 
+        local diff = v2[i] - v1[i]
+        ret[i] = v1[i] + diff * percentage
+    end
+
+    return ret
+end
+
+
 function vector_divide(v1, v2)
     local length = # v1
 

@@ -35,7 +35,7 @@ function engine.resources_load(...)
     dofile "res/enemies/enemies.lua"
 
     dofile "res/items/items.lua"
-    dofile "res/items/weapons/weapons.lua"
+    dofile "res/items/weapons/weapons.lua" 
 
     dofile "res/effects/effects.lua"
 
@@ -48,7 +48,7 @@ end
 function engine.game_start(...)
     require "game_loop"
 
-    return main(...)
+    return game_loop(...)
 end
 
 function engine.event_occurred(...)

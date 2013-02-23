@@ -106,6 +106,10 @@ namespace luawrap {
 	inline void getoptfield(lua_State* L, int idx, const char* key, T& val) {
 		lua_getfield(L, idx, key);
 		if (!lua_isnil(L, -1)) {
+			if (!check<T>(L, -1)) {
+				std::string err = "Field '" + std::string(key) + "' was not the expected type!\n";
+				luawrap::error(err.c_str());
+			}
 			val = pop<T>(L);
 		} else {
 			lua_pop(L, 1);

@@ -2,7 +2,7 @@ require "help_overlay"
 
 local paused = false
 
-local function main_loop(steponly)
+local function game_loop_body(steponly)
     perf.timing_begin("**Game Frame**")
 
     perf.timing_begin("**Sync Message**")
@@ -61,7 +61,7 @@ end
 
 local music = music_optional_load("res/sound/lanarts1.ogg")
 
-function main()
+function game_loop()
     config.startup_function()
 
     game.input_capture()
@@ -86,13 +86,10 @@ function main()
             show_message("Press Shift + Esc to exit, your progress will be saved.")
         end
 
-        if not main_loop(false) then
+        if not game_loop_body(false) then
             if single_player then
                 local player = world.local_player()
-                -- Have some threshold for saving characters in scoreboard
-                if player.floor >= 3 then
-                    game.score_board_store()
-                end
+                game.score_board_store()
                 game.save("savefile.save")
             end
             break

@@ -283,9 +283,6 @@ void GameWorld::reset(int keep) {
 	if (midstep) {
 		next_room_id = -2;
 	} else {
-		if (gs->local_player()->current_level >= 3) {
-			score_board_store(gs);
-		}
 		for (int i = keep; i < level_states.size(); i++) {
 			delete_list.push_back(level_states[i]);
 		}

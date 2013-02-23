@@ -217,8 +217,8 @@ namespace lua_api {
 		keys["INSERT"] = (int)SDLK_INSERT;
 		keys["HOME"] = (int)SDLK_HOME;
 		keys["END"] = (int)SDLK_END;
-		keys["PAGEUP"] = (int)SDLK_PAGEUP;
-		keys["PAGEDOWN"] = (int)SDLK_PAGEDOWN;
+		keys["PAGE_UP"] = (int)SDLK_PAGEUP;
+		keys["PAGE_DOWN"] = (int)SDLK_PAGEDOWN;
 		keys["F1"] = (int)SDLK_F1;
 		keys["F2"] = (int)SDLK_F2;
 		keys["F3"] = (int)SDLK_F3;
