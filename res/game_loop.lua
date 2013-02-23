@@ -2,6 +2,11 @@ require "help_overlay"
 
 local paused = false
 
+game_loop_control = {
+    game_is_over = false,
+    startup_function = do_nothing
+}
+
 local function game_loop_body(steponly)
     perf.timing_begin("**Game Frame**")
 
@@ -59,13 +64,10 @@ function postdraw()
     help_overlay_draw()
 end
 
-local music = music_optional_load("res/sound/lanarts1.ogg")
-
 function game_loop()
-    config.startup_function()
+    game_loop_control.startup_function()
 
     game.input_capture()
-    music:loop()
 
     while true do 
         local single_player = (settings.connection_type == net.NONE)
@@ -92,6 +94,10 @@ function game_loop()
                 game.score_board_store()
                 game.save("savefile.save")
             end
+            break
+        end
+
+        if game_loop_control.game_is_over then
             break
         end
 

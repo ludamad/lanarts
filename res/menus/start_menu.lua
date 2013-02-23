@@ -5,7 +5,7 @@ require "InstanceBox"
 require "Sprite"
 require "TextLabel"
 require "utils"
-require "config"
+require "game_loop"
 require "menu_utils"
 
 -- START SCREEN -- 
@@ -93,7 +93,7 @@ function setup_start_menu()
     end    
 
     local function on_load_click()
-        config.startup_function = function()
+        game_loop_control.startup_function = function()
             if file_exists("savefile.save") then
                 game.load("savefile.save")
             end
@@ -180,7 +180,6 @@ local function menu_loop(should_poll)
         menu_state.menu:draw( {0, 0} )
         display.draw_finish()
 
-        io.flush()
         game.wait(10)
     end
 

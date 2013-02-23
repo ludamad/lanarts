@@ -18,6 +18,14 @@ static char GAMESTATE_KEY[] = "";
 
 namespace lua_api {
 
+	void luacall_game_won(lua_State* L) {
+		luawrap::globals(L)["engine"].push();
+		lua_getfield(L, -1, "game_won");
+		luawrap::call<void>(L);
+		// pop engine table
+		lua_pop(L, 1);
+	}
+
 	void event_player_death(lua_State* L, PlayerInst* player) {
 		luawrap::globals(L)["engine"].push();
 		lua_getfield(L, -1, "event_occurred");

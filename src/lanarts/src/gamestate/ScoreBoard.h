@@ -18,16 +18,16 @@ struct ScoreBoardEntry {
 
 	int character_level;
 	int timestamp; // When the game started, used to uniquely identify a character
+	bool won_the_game; // Well, did we win ?
 	bool hardcore; // Playing on hardcore mode ?
 
 	static void lua_push(lua_State* L, const ScoreBoardEntry& entry);
 
 	ScoreBoardEntry();
-	ScoreBoardEntry(const std::string& name,
-			const std::string& sprite_name,
-			const std::string& class_name,
-			const PlayerScoreStats& score_stats, int character_level,
-			int timestamp, bool hardcore);
+	ScoreBoardEntry(const std::string& name, const std::string& sprite_name,
+			const std::string& class_name, const PlayerScoreStats& score_stats,
+			int character_level, int timestamp, bool won_the_game,
+			bool hardcore);
 };
 
 // Pseudo-singleton, is backed by a single file
@@ -53,7 +53,7 @@ private:
 };
 
 /* Utility methods */
-void score_board_store(GameState* gs);
+void score_board_store(GameState* gs, bool won_the_game = false);
 std::vector<ScoreBoardEntry> score_board_fetch();
 
 #endif /* SCOREBOARD_H_ */

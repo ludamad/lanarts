@@ -2,12 +2,12 @@ require "utils" -- import utils for 'do_nothing'
 
 TextLabel = newtype( )
 
-function TextLabel:init(font, arg1, arg2)
+function TextLabel:init(font, options_or_text, text)
     self.font = font
-    if arg2 then
-        self.options, self.text = arg1, arg2
+    if text then
+        self.options, self.text = options_or_text, text
     else 
-        self.options, self.text = {}, arg1
+        self.options, self.text = {}, options_or_text
     end
 end
 

@@ -93,7 +93,7 @@ public:
 	void read_container(T& t) {
 		int size;
 		read(size);
-		LSERIALIZE_CHECK(size*sizeof(T) < MAX_ALLOC_SIZE);
+		LSERIALIZE_CHECK(size_t(size * sizeof(T)) < MAX_ALLOC_SIZE);
 		t.resize(size);
 		for (typename T::iterator it = t.begin(); it != t.end(); ++it) {
 			read(*it);
@@ -112,7 +112,7 @@ public:
 
 		int size;
 		read(size);
-		LSERIALIZE_CHECK(size < MAX_ALLOC_SIZE);
+		LSERIALIZE_CHECK(size_t(size) < MAX_ALLOC_SIZE);
 		str.resize(size);
 		if (size > 0) {
 			read_raw(&str[0], size);

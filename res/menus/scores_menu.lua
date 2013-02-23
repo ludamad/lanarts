@@ -4,7 +4,8 @@ require "InstanceBox"
 require "Sprite"
 require "TextLabel"
 require "utils"
-require "config"
+
+local score_menu_font = "res/fonts/MateSC-Regular.ttf"
 
 -- Draw parts of text colored differently
 local function draw_colored_parts(font, origin, xy, ...)
@@ -30,6 +31,8 @@ local function draw_colored_parts(font, origin, xy, ...)
         local position = {adjusted_x + x_coords[idx],  xy[2]} 
         font:draw( { color = color, origin = adjusted_origin }, position, text)
     end
+
+    return rx -- return final width for further chaining
 end
 
 -- This is a hack.
@@ -56,14 +59,12 @@ local function sorted_scores_fetch()
     local scores = game.score_board_fetch()
 
     local function entry_compare(a, b)
-        if a.hardcore == b.hardcore then
-            if a.deepest_floor == b.deepest_floor then
-                if a.deaths == b.deaths then return a.kills > b.kills end
-                return a.deaths < b.deaths
-            end
-            return a.deepest_floor > b.deepest_floor
-        end
-        return a.hardcore
+        if a.won_the_game ~= b.won_the_game     then return a.won_the_game end
+        if a.hardcore ~= b.hardcore             then return a.hardcore end
+        if a.deepest_floor ~= b.deepest_floor   then return a.deepest_floor > b.deepest_floor end
+        if a.deaths ~= b.deaths                 then return a.deaths < b.deaths end
+        -- else
+        return a.kills > b.kills
     end
 
     table.sort(scores, entry_compare)
@@ -96,22 +97,28 @@ local function score_entry_draw(entry, ranking, ex, ey, ew, eh)
 
     -- Draw timestamp
     draw_colored_parts(font, RIGHT_TOP, {ex + ew - 4, ey + 2},
-        {COL_LIGHT_GRAY, 
+        {COL_LIGHT_GRAY,
          os.date("%Y %b %I:%M%p", entry.timestamp)}
     )
 
-    -- Draw deepest floor
+    -- Draw either 'Has Won!' or deepest floor
+    local progress_entry
+    if entry.won_the_game then 
+        progress_entry = {COL_PALE_BLUE, "Victorious!"}
+    else
+        progress_entry = {COL_BABY_BLUE, "Reached Floor " .. entry.deepest_floor .. " "}
+    end
     draw_colored_parts(font, LEFT_BOTTOM, {ex + 2, ey+eh - 4},
-        {COL_BABY_BLUE, "Reached Floor " .. entry.deepest_floor .. " "}
+        progress_entry
     )
 
     -- Draw how many monsters killed
-    draw_colored_parts(font, CENTER_BOTTOM, {ex + ew/2, ey+eh - 4},
+    draw_colored_parts(font, LEFT_BOTTOM, {ex + ew/2 - 50, ey+eh - 4},
         {COL_MUTED_YELLOW, "Killed " .. 
          entry.kills .. (( entry.kills == 1) and " Enemy" or " Enemies")}
     )
 
-    -- Create either 'Hardcore' text or death count
+    -- Draw either 'Hardcore' text or death count
     local death_entry
     if entry.hardcore then 
         death_entry = {COL_PALE_BLUE, "Hardcore"}
@@ -124,7 +131,11 @@ local function score_entry_draw(entry, ranking, ex, ey, ew, eh)
     )
 
     -- Draw a box around the entry
-    draw_rectangle_outline( COL_DARK_GRAY, bbox_create( {ex - 32, ey}, {ew + 32, eh} ), 1)
+    draw_rectangle_outline( 
+        entry.won_the_game and COL_LIGHT_GRAY or COL_DARK_GRAY, 
+        bbox_create( {ex - 32, ey}, {ew + 32, eh} ), 
+        1
+    )
 end
 
 local function score_entry_drawer_create()
@@ -170,7 +181,7 @@ local function scores_menu_body_create()
     -- Title text
     group:add_instance( 
         TextLabel.create(
-            font_cached_load("res/fonts/MateSC-Regular.ttf", 20), 
+            font_cached_load(score_menu_font, 20), 
             {color=COL_WHITE, origin = CENTER_TOP}, 
             "In Memoriam"
         ), 
@@ -214,7 +225,7 @@ function scores_menu_create(on_back_click)
     -- Back button
     menu:add_instance(
         text_button_create("Back", on_back_click, {
-            font = font_cached_load(settings.menu_font, 20),
+            font = font_cached_load(score_menu_font, 20),
             color = COL_WHITE,
             hover_color = COL_RED,
             click_box_padding = 5

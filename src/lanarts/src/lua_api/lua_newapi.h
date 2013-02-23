@@ -67,6 +67,8 @@ namespace lua_api {
 	void event_player_death(lua_State* L, PlayerInst* player);
 	void event_monster_death(lua_State* L, EnemyInst* player);
 
+	void luacall_game_won(lua_State* L);
+
 	// Lua utilities:
 	int l_itervalues(lua_State* L);
 }

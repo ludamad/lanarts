@@ -8,7 +8,7 @@
 #include <lcommon/SerializeBuffer.h>
 
 ScoreBoardEntry::ScoreBoardEntry() :
-		character_level(0), timestamp(0), hardcore(0) {
+		character_level(0), timestamp(0), won_the_game(0), hardcore(0) {
 }
 
 void ScoreBoardEntry::lua_push(lua_State* L, const ScoreBoardEntry& entry) {
@@ -26,18 +26,20 @@ void ScoreBoardEntry::lua_push(lua_State* L, const ScoreBoardEntry& entry) {
 	score_table["character_level"] = entry.character_level;
 	score_table["timestamp"] = entry.timestamp;
 	score_table["hardcore"] = entry.hardcore;
+	score_table["won_the_game"] = entry.won_the_game;
 }
 
 ScoreBoardEntry::ScoreBoardEntry(const std::string& name,
 		const std::string& sprite_name, const std::string& class_name,
 		const PlayerScoreStats& score_stats, int character_level, int timestamp,
-		bool hardcore) :
+		bool won_the_game, bool hardcore) :
 				name(name),
 				sprite_name(sprite_name),
 				class_name(class_name),
 				score_stats(score_stats),
 				character_level(character_level),
 				timestamp(timestamp),
+				won_the_game(won_the_game),
 				hardcore(hardcore) {
 }
 
@@ -101,12 +103,14 @@ void ScoreBoard::read_entries(std::vector<ScoreBoardEntry>& entries) const {
 			reader.read(entry.score_stats);
 			reader.read(entry.character_level);
 			reader.read(entry.timestamp);
+			reader.read(entry.won_the_game);
 			reader.read(entry.hardcore);
 			entries.push_back(entry);
 		}
 	} catch (const SerializeBufferError& sbe) {
 		// TODO: Be more graceful
-		printf("WARNING: Incompatible high score list was detected. The list may be overridden.\n");
+		printf(
+				"WARNING: Incompatible high score list was detected. The list may be overridden.\n");
 		printf("Internal error: '%'s'\n", sbe.what());
 		entries.clear(); // Don't show corrupted entries
 	}
@@ -142,6 +146,7 @@ void ScoreBoard::write_entries(const std::vector<ScoreBoardEntry>& entries) {
 		writer.write(entry.score_stats);
 		writer.write(entry.character_level);
 		writer.write(entry.timestamp);
+		writer.write(entry.won_the_game);
 		writer.write(entry.hardcore);
 	}
 
@@ -150,7 +155,7 @@ void ScoreBoard::write_entries(const std::vector<ScoreBoardEntry>& entries) {
 	fclose(entry_file);
 }
 
-void score_board_store(GameState* gs) {
+void score_board_store(GameState* gs, bool won_the_game) {
 	PlayerInst* player = gs->local_player();
 
 	std::string name = player_name(gs, player);
@@ -159,7 +164,8 @@ void score_board_store(GameState* gs) {
 
 	bool hardcore = !gs->game_settings().regen_on_death;
 	ScoreBoardEntry entry(name, sprite_name, class_name, player->score_stats(),
-			player->class_stats().xplevel, gs->game_timestamp(), hardcore);
+			player->class_stats().xplevel, gs->game_timestamp(), won_the_game,
+			hardcore);
 
 	ScoreBoard::get_instance().store_entry(entry);
 }

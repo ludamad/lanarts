@@ -51,6 +51,12 @@ function engine.game_start(...)
     return game_loop(...)
 end
 
+function engine.game_won(...)
+    require "event_occurred"
+
+    return player_has_won(...)
+end
+
 function engine.event_occurred(...)
     require "event_occurred"
 

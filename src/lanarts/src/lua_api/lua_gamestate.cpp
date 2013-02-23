@@ -28,7 +28,8 @@ static void game_save(LuaStackValue filename) {
 }
 
 static int game_score_board_store(lua_State* L) {
-	score_board_store(lua_api::gamestate(L));
+	score_board_store(lua_api::gamestate(L),
+			lua_gettop(L) >= 1 ? lua_toboolean(L, 1) : false);
 	return 0;
 }
 
@@ -134,7 +135,8 @@ struct PlayerDataProxy {
 
 	static PlayerDataEntry& _entry(const LuaStackValue& proxy) {
 		PlayerDataProxy* pdp = proxy.as<PlayerDataProxy*>();
-		std::vector<PlayerDataEntry>& players = lua_api::gamestate(proxy)->player_data().all_players();
+		std::vector<PlayerDataEntry>& players =
+				lua_api::gamestate(proxy)->player_data().all_players();
 		return players.at(pdp->index);
 	}
 
@@ -147,7 +149,7 @@ struct PlayerDataProxy {
 	}
 
 	static GameInst* instance(const LuaStackValue& proxy) {
-		return (GameInst*)_entry(proxy).player();
+		return (GameInst*) _entry(proxy).player();
 	}
 
 	static LuaValue metatable(lua_State* L) {
@@ -187,7 +189,7 @@ static void lapi_wait(LuaStackValue wait_time) {
 			}
 		}
 
-		wait_micro -= (long)timer.get_microseconds();
+		wait_micro -= (long) timer.get_microseconds();
 	}
 
 	long remaining_wait_ms = wait_micro / 1000;
@@ -200,14 +202,14 @@ static void lapi_wait(LuaStackValue wait_time) {
 namespace lua_api {
 
 	static void register_game_getters(lua_State* L, LuaValue& game) {
-		LuaValue meta = luameta_new(L, "__game");
-		LuaValue getters = luameta_getters(meta);
+		LuaValue metatable = luameta_new(L, "__game");
+		LuaValue getters = luameta_getters(metatable);
 
 		getters["frame"].bind_function(game_frame);
 		getters["players"].bind_function(game_players);
 
 		game.push();
-		meta.push();
+		metatable.push();
 		lua_setmetatable(L, -2);
 		lua_pop(L, 1);
 	}

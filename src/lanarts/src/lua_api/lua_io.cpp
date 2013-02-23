@@ -187,13 +187,13 @@ namespace lua_api {
 		register_textfield(L);
 
 		LuaValue globals = luawrap::globals(L);
-		LuaValue globalgetters = lua_api::global_getters(L);
+		LuaValue global_getters = lua_api::global_getters(L);
 
-		globalgetters["mouse_xy"].bind_function(mouse_xy);
-		globalgetters["mouse_left_held"].bind_function(mouse_left_held);
-		globalgetters["mouse_left_pressed"].bind_function(mouse_left_pressed);
-		globalgetters["mouse_right_held"].bind_function(mouse_right_held);
-		globalgetters["mouse_right_pressed"].bind_function(mouse_right_pressed);
+		global_getters["mouse_xy"].bind_function(mouse_xy);
+		global_getters["mouse_left_held"].bind_function(mouse_left_held);
+		global_getters["mouse_left_pressed"].bind_function(mouse_left_pressed);
+		global_getters["mouse_right_held"].bind_function(mouse_right_held);
+		global_getters["mouse_right_pressed"].bind_function(mouse_right_pressed);
 
 		globals["key_pressed"].bind_function(key_pressed);
 		globals["key_held"].bind_function(key_held);
