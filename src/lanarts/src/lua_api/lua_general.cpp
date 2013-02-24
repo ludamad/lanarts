@@ -243,6 +243,7 @@ static int lapi_toaddress(lua_State *L) {
 }
 
 namespace lua_api {
+
 	int l_itervalues(lua_State* L) {
 		lua_pushvalue(L, 1);
 		lua_pushlightuserdata(L, (void*) ((1)));

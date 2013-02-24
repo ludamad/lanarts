@@ -34,6 +34,12 @@ namespace lua_api {
 		lua_pop(L, 1);
 	}
 
+	void event_projectile_hit(lua_State* L, ProjectileInst* projectile, EnemyInst* enemy) {
+		luawrap::globals(L)["engine"].push();
+		lua_getfield(L, -1, "event_occurred");
+		luawrap::call<void>(L, "ProjectileHit", (GameInst*) projectile, (GameInst*) enemy);
+
+	}
 	void event_monster_death(lua_State* L, EnemyInst* enemy) {
 		luawrap::globals(L)["engine"].push();
 		lua_getfield(L, -1, "event_occurred");
