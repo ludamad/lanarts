@@ -188,7 +188,10 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_NUM_MEMB_LOOKUP("target_radius", inst->target_radius)
 	else IFLUA_NUM_MEMB_LOOKUP("floor", inst->current_level)
 	else IFLUA_STATS_MEMB_LOOKUP("stats", inst)
-	else if (strcmp(cstr, "kills") == 0) {
+	else if (strcmp(cstr, "spells") == 0) {
+		PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
+		luawrap::push(L, p->stats().spells.spell_id_list());
+	} else if (strcmp(cstr, "kills") == 0) {
 		PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
 		lua_pushnumber(L, p ? p->score_stats().kills : 0);
 	} else if (strcmp(cstr, "deepest_floor") == 0) {
@@ -285,7 +288,11 @@ void lua_gameinst_bindings(GameState* gs, lua_State* L) {
 }
 
 void lua_push_gameinst(lua_State* L, GameInst* inst) {
-	lunar_t::push(L, new bind_t(inst), true);
+	if (inst == NULL) {
+		lua_pushnil(L);
+	} else {
+		lunar_t::push(L, new bind_t(inst), true);
+	}
 }
 
 void lua_gameinst_callback(lua_State* L, LuaValue& value, GameInst* inst) {

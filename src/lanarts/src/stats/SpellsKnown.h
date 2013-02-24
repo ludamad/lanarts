@@ -24,6 +24,10 @@ public:
 		return spells.size();
 	}
 
+	const std::vector<spell_id>& spell_id_list() {
+		return spells;
+	}
+
 	void add_spell(spell_id slot);
 	void remove_spell(spell_id slot);
 	bool has_spell(spell_id slot);

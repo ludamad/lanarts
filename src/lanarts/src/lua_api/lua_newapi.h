@@ -9,6 +9,7 @@
 class GameState;
 class GameInst;
 class PlayerInst;
+class ProjectileInst;
 class EnemyInst;
 struct lua_State;
 class LuaStackValue;

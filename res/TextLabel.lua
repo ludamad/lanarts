@@ -20,7 +20,9 @@ function TextLabel:__tostring()
 end
 
 function TextLabel.get:size()
-    return self.font:draw_size(self.text)
+    return  self.wrapped and 
+                self.font:draw_size(self.text, self.max_width) 
+                 or self.font:draw_size(self.text)
 end
 
 function TextLabel:mouse_over(xy)
