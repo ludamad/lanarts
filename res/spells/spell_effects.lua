@@ -19,7 +19,7 @@ end
 
 local function berserk_extension(effect) 
 	if effect.extensions < 1 then
-		return 40
+		return 30
 	elseif effect.extensions < 5 then
 		return 20
 	end

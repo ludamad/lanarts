@@ -15,11 +15,19 @@ local function winning_screen_create()
         CENTER
     )
 
-    box:add_instance(
-         TextLabel.create( font_cached_load(winning_screen_font, 20), {color=COL_PALE_GREEN}, "You Have Won!"),
-         CENTER,
-         {0, (-20 - sprite.size[2]/2) }
-    )
+    if settings.regen_on_death then
+        box:add_instance(
+             TextLabel.create( font_cached_load(winning_screen_font, 20), {color=COL_PALE_GREEN}, "You Have Won!"),
+             CENTER,
+             {0, (-20 - sprite.size[2]/2) }
+        )
+    else
+        box:add_instance(
+             TextLabel.create( font_cached_load(winning_screen_font, 20), {color=COL_PALE_RED}, "You Have Won On Hardcore!!"),
+             CENTER,
+             {0, (-20 - sprite.size[2]/2) }
+        )
+    end
 
     box:add_instance(
          TextLabel.create( font_cached_load(winning_screen_font, 20), {color=COL_LIGHT_GRAY}, "Thanks for playing."),

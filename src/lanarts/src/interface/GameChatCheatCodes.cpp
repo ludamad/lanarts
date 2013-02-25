@@ -108,30 +108,11 @@ static bool handle_create_item(GameState* gs, const std::string& command) {
 }
 
 static bool handle_dolua(GameState* gs, const std::string& command) {
-	ChatMessage printed;
 	const char* content;
-	PlayerInst* p = gs->local_player();
 	lua_State* L = gs->luastate();
-
-	static LuaValue script_globals;
-	if (script_globals.empty())
-		script_globals.init(L);
-
-	lua_newtable(L);
-	lua_pushvalue(L, -1);
-	lua_setmetatable(L, -2);
-	script_globals.pop();
-	script_globals["__index"] = luawrap::globals(L);
-
-	lua_push_gameinst(L, p);
-	script_globals["player"].pop();
-	lua_push_combatstats(L, p);
-	script_globals["stats"].pop();
 
 	//Run lua command
 	if (starts_with(command, "!lua ", &content)) {
-//		std::string luafunc = std::string(content);
-
 		int prior_top = lua_gettop(L);
 
 		luaL_loadstring(L, content);
@@ -141,10 +122,6 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 			Colour(120, 120, 255));
 			return true;
 		}
-
-		int lfunc = lua_gettop(L);
-		script_globals.push();
-		lua_setfenv(L, lfunc);
 
 		bool iserr = (lua_pcall(L, 0, LUA_MULTRET, 0) != 0);
 
@@ -173,10 +150,6 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 			return true;
 		}
 
-		int lfunc = lua_gettop(L);
-		script_globals.push();
-		lua_setfenv(L, lfunc);
-
 		bool err_call = (lua_pcall(L, 0, 0, 0) != 0);
 		if (err_call) {
 			const char* val = lua_tostring(L, -1);
@@ -185,7 +158,15 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 		}
 		return true;
 	}
+
 	return false;
+}
+
+static bool handle_dolua_allow_globals(GameState* gs, const std::string& command) {
+	lua_api::globals_set_mutability(L, true);
+	bool result = handle_dolua(gs, command);
+	lua_api::globals_set_mutability(L, false);
+	return result;
 }
 
 bool GameChat::handle_special_commands(GameState* gs,
@@ -210,7 +191,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 	//Gain XP
 	if (starts_with(command, "!gainxp ", &content)) {
 		int xp = atoi(content);
-		if (xp > 0 && xp < 999999) {
+		if (xp > 0 && xp <= 9999999) {
 			printed.message = std::string("You have gained ") + content
 					+ " experience.";
 			printed.message_colour = Colour(50, 255, 50);
@@ -240,7 +221,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 		return true;
 	}
 
-	if (handle_dolua(gs, command)) {
+	if (handle_dolua_allow_globals(gs, command)) {
 		return true;
 	}
 	if (handle_create_item(gs, command)) {

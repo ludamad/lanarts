@@ -12,7 +12,7 @@ effects:
     step_func: poison_step
 
   - name: Berserk
-    exhausted_duration: 250
+    exhausted_duration: 275
     stat_func: berserk_effect.stat
     init_func: berserk_effect.init
     step_func: berserk_effect.step

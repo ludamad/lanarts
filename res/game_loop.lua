@@ -1,9 +1,12 @@
-require "help_overlay"
+--[[
+    Implements the game loop, which calls the step & draw events of all objects.
+]]
 
-local paused = false
+require "help_overlay"
 
 game_loop_control = {
     game_is_over = false,
+    game_is_paused = false,
     startup_function = do_nothing
 }
 
@@ -23,7 +26,7 @@ local function game_loop_body(steponly)
     end
 
     perf.timing_begin("**Step**")
-    if not game.step() then 
+    if not game_loop_control.game_is_paused and not game.step() then 
         return false 
     end
     perf.timing_end("**Step**")
@@ -81,7 +84,7 @@ function game_loop()
         end
     
         if key_pressed(keys.F4) then 
-            paused = not paused
+            game_loop_control.game_is_paused = not game_loop_control.game_is_paused
         end
 
         if key_pressed(keys.ESCAPE) then 
