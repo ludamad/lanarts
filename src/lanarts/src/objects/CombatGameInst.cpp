@@ -137,7 +137,7 @@ void CombatGameInst::draw(GameState *gs, float frame) {
 
 bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 		const Item& weapon, bool ignore_cooldowns) {
-	event_log("CombatGameInst::melee_attack: id %d hitting id %d, weapon = id %d", id, inst->id, 	weapon.id);
+	event_log("CombatGameInst::melee_attack: id %d hitting id %d, weapon = id %d\n", id, inst->id, 	weapon.id);
 
 	bool isdead = false;
 	if (!ignore_cooldowns && !cooldowns().can_doaction())
@@ -186,9 +186,10 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 		const Item& weapon, const Item& projectile) {
 
-	event_log("CombatGameInst::melee_attack: id %d hitting id %d, weapon = id %d", weapon.id);
 	if (!cooldowns().can_doaction())
 		return false;
+
+	event_log("CombatGameInst::projectile_attack: id %d hitting id %d, weapon = id %d\n", id, inst->id, weapon.id);
 	MTwist& mt = gs->rng();
 
 	WeaponEntry& wentry = weapon.weapon_entry();

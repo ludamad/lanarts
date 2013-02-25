@@ -560,7 +560,7 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 
 	}
 
-	event_log("Player id: %d using move for turn %d, vx=%f, vy=%f", id, gs->frame(), vx, vy);
+	event_log("Player id: %d using move for turn %d, vx=%f, vy=%f\n", id, gs->frame(), vx, vy);
 }
 
 static int scan_entrance(const std::vector<GameLevelPortal>& portals,

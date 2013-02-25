@@ -49,9 +49,8 @@ void GameLogger::event_log(const char *fmt, va_list ap) {
 		va_end(ap);
 		return;
 	}
-	format(logline, "Frame %d Level %d Hash %X: ",
-			gs->frame(), gs->get_level()->id(),
-			gs->get_level()->game_inst_set().hash());
+	format(logline, "Frame %d Level %d: ",
+			gs->frame(), gs->get_level()->id());
 	char text[512];
 	vsnprintf(text, sizeof(text), fmt, ap);
 	va_end(ap);
