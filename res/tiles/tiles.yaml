@@ -8,7 +8,7 @@ tiles:
     files: res/tiles/dngn_wall/stone_dark/stone_dark(0-3).png
 
   - name: brick
-    files: res/tiles/dngn_wall/brickdark/brick_dark(0-6).png
+    files: res/tiles/dngn_wall/brickdark/brick_dark.png%32x32
 
   - name: crypt_wall
     files: res/tiles/dngn_wall/crypt/crypt(0-14).png
@@ -52,7 +52,7 @@ tiles:
     files: res/tiles/dngn_floor/demonic_red/demonic_red(0-8).png
     
   - name: hive
-    files: res/tiles/dngn_floor/hive/hive(0-3).png
+    files: res/tiles/dngn_floor/hive/hive.png%32x32
     
   - name: mesh
     files: res/tiles/dngn_floor/mesh/mesh(0-3).png
