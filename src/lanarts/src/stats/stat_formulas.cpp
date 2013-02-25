@@ -36,6 +36,8 @@ static int basic_damage_formula(const EffectiveAttackStats& attacker,
 	float mult = damage_multiplier(attacker.power, defender.resistance);
 	float base = attacker.damage
 			- defender.reduction * attacker.resist_modifier;
+	event_log("basic_damage_formula: mult=%f, base=%f result=%f rounded=%d\n",
+			mult, base, mult * base, int(round(mult * base)));
 	if (base < 0)
 		return 0;
 	return round(mult * base);
@@ -57,7 +59,8 @@ int damage_formula(const EffectiveAttackStats& attacker,
 	float pdmg = physical_damage_formula(attacker, defender);
 
 	event_log("damage_formula attacker damage=%d power=%d cooldown=%d magic_percentage=%f resist_modifier=%f\n",
-			attacker.damage, attacker.power, attacker.cooldown, attacker.magic_percentage, attacker.resist_modifier);
+			attacker.damage, attacker.power, attacker.cooldown,
+			attacker.magic_percentage, attacker.resist_modifier);
 	event_log("damage_formula defender physical.resistance=%f physical.reduction=%d magic.resistance=%f magic.reduction=%d \n",
 			defender.physical.resistance, defender.physical.reduction,
 			defender.magic.resistance, defender.magic.reduction);
