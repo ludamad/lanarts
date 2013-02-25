@@ -5,6 +5,13 @@ require "TextLabel"
 require "utils"
 require "menu_utils"
 
+local text_button_params = {
+    font = font_cached_load(settings.menu_font, 20),
+    color = COL_WHITE,
+    hover_color = COL_RED,
+    click_box_padding = 5
+}
+
 local PLAYER_COLOURS = { 
     COL_BABY_BLUE, COL_PALE_YELLOW, COL_PALE_RED,
     COL_PALE_GREEN, COL_PALE_BLUE, COL_LIGHT_GRAY 
@@ -49,7 +56,7 @@ local function lobby_joined_players_list_create()
     return group
 end
 
-local function lobby_menu_create(on_start_click)
+function lobby_menu_create(on_start_click)
     local menu = InstanceBox.create( { size = display.window_size } )
     local logo = Sprite.image_create("res/interface/sprites/lanarts_logo.png")
 

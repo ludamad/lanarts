@@ -7,6 +7,7 @@ require "TextLabel"
 require "utils"
 require "game_loop"
 require "menu_utils"
+require "lobby_menu"
 
 -- START SCREEN -- 
 
