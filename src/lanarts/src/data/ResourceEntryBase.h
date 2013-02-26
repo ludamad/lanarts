@@ -25,13 +25,11 @@ public:
 
 	virtual sprite_id get_sprite() = 0;
 	virtual const char* entry_type() = 0;
-	virtual void convert_lua(); // This is a major work-in-progress
 
-	virtual void init( lua_State* L, int id, const std::string& name );
+	/* initialize a resource, with a table representation of the resource */
+	void init(int id, const LuaValue& table );
 
-	LuaValue lua_table() const;
-private:
-	LuaValue _luatable;
+	virtual void parse_lua_table( const LuaValue& table );
 };
 
 #endif /* RESOURCEENTRYBASE_H_ */

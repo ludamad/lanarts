@@ -42,15 +42,9 @@ struct ClassEntry: public ResourceEntryBase {
 	CombatStats starting_stats;
 	std::vector<sprite_id> sprites;
 
-	LuaValue on_level_gain;
 	int hp_perlevel, mp_perlevel;
 	int str_perlevel, def_perlevel, mag_perlevel, will_perlevel;
 	float mpregen_perlevel, hpregen_perlevel;
-
-	virtual sprite_id get_sprite();
-	virtual const char* entry_type();
-
-	virtual void convert_lua();
 
 	ClassEntry() :
 					class_id(-1),
@@ -63,6 +57,11 @@ struct ClassEntry: public ResourceEntryBase {
 					mpregen_perlevel(0),
 					hpregen_perlevel(0) {
 	}
+
+	virtual sprite_id get_sprite();
+	virtual const char* entry_type();
+
+	virtual void parse_lua_table(const LuaValue& table);
 };
 
 extern std::vector<ClassEntry> game_class_data;

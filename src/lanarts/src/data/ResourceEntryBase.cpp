@@ -3,6 +3,8 @@
  *  The base of various data entries, allows for operations common to all describable entries
  */
 
+#include <luawrap/luawrap.h>
+
 #include "ResourceEntryBase.h"
 
 ResourceEntryBase::ResourceEntryBase() {
@@ -12,17 +14,11 @@ ResourceEntryBase::ResourceEntryBase() {
 ResourceEntryBase::~ResourceEntryBase() {
 }
 
-void ResourceEntryBase::convert_lua() {
-}
-
-void ResourceEntryBase::init( lua_State* L, int id, const std::string& name ) {
+void ResourceEntryBase::init(int id, const LuaValue& table) {
 	this->id = id;
-	this->name = name;
-
-	_luatable.init(L);
+	parse_lua_table(table);
 }
 
-
-LuaValue ResourceEntryBase::lua_table() const {
-	return _luatable;
+void ResourceEntryBase::parse_lua_table( const LuaValue& table ) {
+	this->name = table["name"].as<std::string>();
 }

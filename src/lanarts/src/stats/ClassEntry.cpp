@@ -54,7 +54,7 @@ static CoreStats parse_core_stats(const LuaValue& value) {
 	core.max_hp = value["hp"].defaulted(0);
 
 	core.hp = core.max_hp;
-	core.mp = core.max_hp;
+	core.mp = core.max_mp;
 
 	core.hpregen = value["mpregen"].defaulted(0.0f);
 	core.mpregen = value["hpregen"].defaulted(0.0f);
@@ -113,32 +113,39 @@ static ClassSpell parse_class_spell(const LuaValue& value) {
 
 static ClassSpellProgression parse_class_spell_progression(
 		const LuaValue& value) {
-	lua_State* L = value.luastate();
 	ClassSpellProgression progression;
 
 	int valuelen = value.objlen();
 	for (int i = 1; i <= valuelen; i++) {
-		progression.available_spells.push_back(
-				parse_class_spell(value[i]));
+		progression.available_spells.push_back(parse_class_spell(value[i]));
 	}
 
 	return progression;
 }
 
-void ClassEntry::convert_lua() {
-	LuaValue val = lua_table();
-	lua_State* L = val.luastate();
+static void parse_gain_per_level(ClassEntry& entry,
+		const LuaValue& value) {
+	entry.hp_perlevel = value["hp"].defaulted(0);
+	entry.mp_perlevel = value["mp"].defaulted(0);
 
-	// Use stack value instead of LuaValue, for performance
-	LuaValue start_stats = val["start_stats"];
-	LuaValue sprites = val["sprites"];
-	LuaValue available_spells = val["available_spells"];
+	entry.str_perlevel = value["strength"].defaulted(0);
+	entry.def_perlevel = value["defence"].defaulted(0);
+	entry.mag_perlevel = value["magic"].defaulted(0);
+	entry.will_perlevel = value["willpower"].defaulted(0);
 
-	on_level_gain = val["on_level_gain"];
+	entry.mpregen_perlevel = value["mpregen"].defaulted(0.0f);
+	entry.hpregen_perlevel = value["hpregen"].defaulted(0.0f);
+}
 
-	spell_progression = parse_class_spell_progression(available_spells);
-	starting_stats = parse_combat_stats(start_stats);
+void ClassEntry::parse_lua_table(const LuaValue& table) {
+	ResourceEntryBase::parse_lua_table(table);
 
+	parse_gain_per_level(*this, table["on_level_gain"]);
+
+	spell_progression = parse_class_spell_progression(table["available_spells"]);
+	starting_stats = parse_combat_stats(table["start_stats"]);
+
+	LuaValue sprites = table["sprites"];
 	int sprite_len = sprites.objlen();
 	for (int i = 1; i <= sprite_len; i++) {
 		this->sprites.push_back(res::spriteid(sprites[i].as<const char*>()));

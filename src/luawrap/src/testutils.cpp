@@ -16,6 +16,9 @@ TestLuaState::TestLuaState() {
 }
 TestLuaState::~TestLuaState() {
 	lua_close(L);
+	if (!std::uncaught_exception()) {
+		finish_check();
+	}
 }
 
 void lua_assert_valid_dostring(lua_State* L, const char* code) {

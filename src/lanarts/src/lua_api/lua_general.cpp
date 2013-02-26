@@ -265,7 +265,7 @@ namespace lua_api {
 		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);
 
-		LuaValue table = globals["table"];
+		LuaValue table = globals["table"].ensure_table();
 		table["merge"].bind_function(lapi_table_merge);
 
 		LuaValue string_table = globals["string"].ensure_table();
