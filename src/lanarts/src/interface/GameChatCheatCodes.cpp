@@ -163,6 +163,7 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 }
 
 static bool handle_dolua_allow_globals(GameState* gs, const std::string& command) {
+	lua_State* L = gs->luastate();
 	lua_api::globals_set_mutability(L, true);
 	bool result = handle_dolua(gs, command);
 	lua_api::globals_set_mutability(L, false);

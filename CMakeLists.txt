@@ -5,7 +5,7 @@ set(CMAKE_BUILD_TYPE DEBUG)
 
 ## Compiler flags
 if(CMAKE_COMPILER_IS_GNUCXX)
-    add_definitions("-mfpmath=sse -msse2")
+    add_definitions("-mfpmath=sse -msse2 -ffp-contract=on")
 endif()
 
 option(MSVC_SHARED_RT "MSVC: Build with shared runtime libs (/MD)" ON)
