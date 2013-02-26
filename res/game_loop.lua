@@ -46,11 +46,20 @@ local function game_loop_body(steponly)
     return true
 end
 
+
+function game_post_draw()
+    for pdata in values(world.players) do
+        local p = pdata.instance
+        if not p:is_local_player() then
+            fonts.small:draw({color=COL_WHITE, origin=CENTER}, screen_coords{p.x, p.y-18}, pdata.name)
+        end
+    end
+end
+
 local fps_timer = timer_create()
 local fps_count = 1
 local fps = nil
-
-function postdraw()
+function game_overlay_draw()
     fps_count = fps_count + 1
 
     if fps then
@@ -66,6 +75,7 @@ function postdraw()
     end
     help_overlay_draw()
 end
+
 
 function game_loop()
     game_loop_control.startup_function()
@@ -93,7 +103,6 @@ function game_loop()
 
         if not game_loop_body(false) then
             if single_player then
-                local player = world.local_player()
                 game.score_board_store()
                 game.save("savefile.save")
             end

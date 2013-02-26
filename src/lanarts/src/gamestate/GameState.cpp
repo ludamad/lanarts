@@ -368,13 +368,15 @@ void GameState::draw(bool drawhud) {
 		safe_copy[i]->draw(this);
 	}
 
+	lua_api::luacall_post_draw(L);
+
 	monster_controller().post_draw(this);
 	get_level()->tiles().post_draw(this);
 	if (drawhud) {
 		hud.draw(this);
 	}
 
-	lua_api::luacall_postdraw(L); // Used for debug purposes
+	lua_api::luacall_overlay_draw(L); // Used for debug purposes
 
 	ldraw::display_draw_finish();
 

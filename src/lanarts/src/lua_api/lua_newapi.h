@@ -61,13 +61,14 @@ namespace lua_api {
 	void register_api(GameState* gs, lua_State* L);
 
 	// Callbacks into the lua VM:
-	void luacall_postdraw(lua_State* L);
 	bool luacall_handle_event(lua_State* L, SDL_Event* e);
+	void luacall_overlay_draw(lua_State* L);
+	void luacall_post_draw(lua_State* L);
 	void luacall_hitsound(lua_State* L);
 
 	void event_player_death(lua_State* L, PlayerInst* player);
 	void event_monster_death(lua_State* L, EnemyInst* player);
-	void event_projectile_hit(lua_State* L, ProjectileInst* projectile, EnemyInst* enemy);
+	void event_projectile_hit(lua_State* L, ProjectileInst* projectile, GameInst* target);
 
 	void luacall_game_won(lua_State* L);
 

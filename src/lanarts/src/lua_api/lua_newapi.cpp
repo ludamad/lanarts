@@ -178,14 +178,26 @@ namespace lua_api {
 		register_display_api(L);
 	}
 
-	void luacall_postdraw(lua_State* L) {
-		luawrap::globals(L)["postdraw"].push();
+	void luacall_post_draw(lua_State* L) {
+		luawrap::globals(L)["engine"].push();
+		lua_getfield(L, -1, "post_draw");
 		if (lua_isnil(L, -1)) {
 			lua_pop(L, 1);
 		} else {
 			luawrap::call<void>(L);
 		}
 	}
+
+	void luacall_overlay_draw(lua_State* L) {
+		luawrap::globals(L)["engine"].push();
+		lua_getfield(L, -1, "overlay_draw");
+		if (lua_isnil(L, -1)) {
+			lua_pop(L, 1);
+		} else {
+			luawrap::call<void>(L);
+		}
+	}
+
 
 	bool luacall_handle_event(lua_State* L, SDL_Event* e) {
 		bool handled = false;

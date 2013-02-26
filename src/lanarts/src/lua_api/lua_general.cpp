@@ -243,6 +243,9 @@ static int lapi_toaddress(lua_State *L) {
 }
 
 namespace lua_api {
+	void event_projectile_hit(lua_State* L, ProjectileInst* projectile,
+			GameInst* target) {
+	}
 
 	int l_itervalues(lua_State* L) {
 		lua_pushvalue(L, 1);

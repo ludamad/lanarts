@@ -33,7 +33,7 @@ local function lobby_joined_players_list_create()
         local font = font_cached_load(settings.font, 10)
         local x, y = unpack(xy)
     
-        for idx, player in ipairs(game.players) do
+        for idx, player in ipairs(world.players) do
             local color_idx = ( (idx -1) % #PLAYER_COLOURS ) + 1
             local color = PLAYER_COLOURS[ color_idx ]
 

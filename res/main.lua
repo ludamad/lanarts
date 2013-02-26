@@ -51,6 +51,18 @@ function engine.game_start(...)
     return game_loop(...)
 end
 
+function engine.post_draw(...)
+    require "game_loop"
+
+    return game_post_draw(...)
+end
+
+function engine.overlay_draw(...)
+    require "game_loop"
+
+    return game_overlay_draw(...)
+end
+
 function engine.game_won(...)
     require "event_occurred"
 

@@ -14,16 +14,67 @@
 #include "gamestate/GameLevelState.h"
 #include "gamestate/GameSettings.h"
 
+#include "stats/ClassEntry.h"
+
 #include "lua_newapi.h"
 
 #include "lua_api/lua_api.h"
 
 // Keep all documentation in doc/level.luadoc
 
+// A bit of a hack, but its OK and at least self-contained:
+struct PlayerDataProxy {
+
+	int index;
+	PlayerDataProxy(int index = 0) :
+			index(index) {
+	}
+
+	static PlayerDataEntry& _entry(const LuaStackValue& proxy) {
+		PlayerDataProxy* pdp = proxy.as<PlayerDataProxy*>();
+		std::vector<PlayerDataEntry>& players =
+				lua_api::gamestate(proxy)->player_data().all_players();
+		return players.at(pdp->index);
+	}
+
+	static const char* name(const LuaStackValue& proxy) {
+		return _entry(proxy).player_name.c_str();
+	}
+
+	static const char* class_name(const LuaStackValue& proxy) {
+		return game_class_data.at(_entry(proxy).classtype).name.c_str();
+	}
+
+	static GameInst* instance(const LuaStackValue& proxy) {
+		return (GameInst*) _entry(proxy).player();
+	}
+
+	static LuaValue metatable(lua_State* L) {
+		LuaValue meta = luameta_new(L, "PlayerData");
+		LuaValue getters = luameta_getters(meta);
+
+		getters["name"].bind_function(PlayerDataProxy::name);
+		getters["instance"].bind_function(PlayerDataProxy::instance);
+		getters["class_name"].bind_function(PlayerDataProxy::class_name);
+
+		return meta;
+	}
+};
+
+static int world_players(lua_State* L) {
+	int nplayers = lua_api::gamestate(L)->player_data().all_players().size();
+	lua_newtable(L);
+	for (int i = 0; i < nplayers; i++) {
+		luawrap::push<PlayerDataProxy>(L, PlayerDataProxy(i));
+		lua_rawseti(L, -2, i + 1);
+	}
+	return 1;
+}
+
 // game world functions
 static int world_local_player(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
-	luawrap::push(L, (GameInst*)gs->local_player());
+	luawrap::push(L, (GameInst*) gs->local_player());
 	return 1;
 }
 
@@ -61,7 +112,7 @@ static int level_monsters_list(lua_State* L) {
 	lua_newtable(L);
 	for (int i = 0; i < mons.size(); i++) {
 		luawrap::push(L, gs->get_instance(mons[i]));
-		lua_rawseti(L, -2, i+1);
+		lua_rawseti(L, -2, i + 1);
 	}
 	return 1;
 }
@@ -106,7 +157,8 @@ static bool level_place_free(const LuaStackValue& pos) {
 	return !gs->solid_test(NULL, p.x, p.y, 1);
 }
 
-static bool level_radius_place_free(const LuaStackValue& radius, const LuaStackValue& pos) {
+static bool level_radius_place_free(const LuaStackValue& radius,
+		const LuaStackValue& pos) {
 	GameState* gs = lua_api::gamestate(radius);
 	Pos p = pos.as<Pos>();
 	return !gs->solid_test(NULL, p.x, p.y, radius.as<int>());
@@ -119,13 +171,29 @@ bool temporary_isgameinst(lua_State* L, int idx) {
 //TODO Figure out how other levels should be queried
 
 namespace lua_api {
+	static void register_gameworld_getters(lua_State* L,
+			const LuaValue& world) {
+		luawrap::install_userdata_type<PlayerDataProxy,
+				PlayerDataProxy::metatable>();
+
+		LuaValue metatable = luameta_new(L, "world table");
+		LuaValue getters = luameta_getters(metatable);
+
+		getters["players"].bind_function(world_players);
+		getters["local_player"].bind_function(world_local_player);
+
+		world.push();
+		metatable.push();
+		lua_setmetatable(L, -2);
+		lua_pop(L, 1);
+	}
+
 	void register_gameworld_api(lua_State* L) {
 		LuaValue globals = luawrap::globals(L);
-		luawrap::install_type<GameInst*, lua_push_gameinst, lua_gameinst_arg, temporary_isgameinst>();
+		luawrap::install_type<GameInst*, lua_push_gameinst, lua_gameinst_arg,
+				temporary_isgameinst>();
 
-		LuaValue world = globals["world"].ensure_table();
-
-		world["local_player"].bind_function(world_local_player);
+		register_gameworld_getters(L, globals["world"].ensure_table());
 
 		LuaValue level = globals["level"].ensure_table();
 

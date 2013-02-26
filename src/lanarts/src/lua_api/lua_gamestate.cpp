@@ -125,55 +125,6 @@ static int game_frame(lua_State* L) {
 	return 1;
 }
 
-// A bit of a hack, but its OK and at least self-contained:
-struct PlayerDataProxy {
-
-	int index;
-	PlayerDataProxy(int index = 0) :
-			index(index) {
-	}
-
-	static PlayerDataEntry& _entry(const LuaStackValue& proxy) {
-		PlayerDataProxy* pdp = proxy.as<PlayerDataProxy*>();
-		std::vector<PlayerDataEntry>& players =
-				lua_api::gamestate(proxy)->player_data().all_players();
-		return players.at(pdp->index);
-	}
-
-	static const char* name(const LuaStackValue& proxy) {
-		return _entry(proxy).player_name.c_str();
-	}
-
-	static const char* class_name(const LuaStackValue& proxy) {
-		return game_class_data.at(_entry(proxy).classtype).name.c_str();
-	}
-
-	static GameInst* instance(const LuaStackValue& proxy) {
-		return (GameInst*) _entry(proxy).player();
-	}
-
-	static LuaValue metatable(lua_State* L) {
-		LuaValue meta = luameta_new(L, "PlayerData");
-		LuaValue getters = luameta_getters(meta);
-
-		getters["name"].bind_function(PlayerDataProxy::name);
-		getters["instance"].bind_function(PlayerDataProxy::instance);
-		getters["class_name"].bind_function(PlayerDataProxy::class_name);
-
-		return meta;
-	}
-};
-
-static int game_players(lua_State* L) {
-	int nplayers = lua_api::gamestate(L)->player_data().all_players().size();
-	lua_newtable(L);
-	for (int i = 0; i < nplayers; i++) {
-		luawrap::push<PlayerDataProxy>(L, PlayerDataProxy(i));
-		lua_rawseti(L, -2, i + 1);
-	}
-	return 1;
-}
-
 static void lapi_wait(LuaStackValue wait_time) {
 
 	lua_State* L = wait_time.luastate();
@@ -202,11 +153,10 @@ static void lapi_wait(LuaStackValue wait_time) {
 namespace lua_api {
 
 	static void register_game_getters(lua_State* L, LuaValue& game) {
-		LuaValue metatable = luameta_new(L, "__game");
+		LuaValue metatable = luameta_new(L, "game table");
 		LuaValue getters = luameta_getters(metatable);
 
 		getters["frame"].bind_function(game_frame);
-		getters["players"].bind_function(game_players);
 
 		game.push();
 		metatable.push();
@@ -215,9 +165,6 @@ namespace lua_api {
 	}
 
 	void register_gamestate_api(lua_State* L) {
-		luawrap::install_userdata_type<PlayerDataProxy,
-				PlayerDataProxy::metatable>();
-
 		// Install ScoreBoardEntry so we can bind fetch_scores directly
 		luawrap::install_type<ScoreBoardEntry, ScoreBoardEntry::lua_push>();
 
