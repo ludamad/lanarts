@@ -47,6 +47,8 @@ namespace luawrap {
 }
 
 namespace luawrap {
+	void dostring(const char* filename);
+	void dofile(const char* filename);
 
 	template<typename T>
 	inline void push(lua_State* L, const T& val) {
@@ -207,5 +209,9 @@ inline T LuaValue::as() const {
 }
 
 #include "../../src/predefined_helper.h"
+
+#include <luawrap/calls.h>
+#include <luawrap/functions.h>
+#include <luawrap/members.h>
 
 #endif /* LUAWRAP_LUAWRAP_H_ */
