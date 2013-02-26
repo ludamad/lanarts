@@ -6,6 +6,13 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
+#include "lua_api/lua_newapi.h"
+
+#include <luawrap/luawrap.h>
+#include <luawrap/functions.h>
+
+#include <lcommon/lua_lcommon.h>
+
 #include "data/game_data.h"
 #include "data/parse.h"
 
@@ -81,7 +88,19 @@ void load_class_callbackf(const YAML::Node& node, lua_State* L,
 	game_class_data.push_back(entry);
 }
 
+static void lapi_data_create_class(const LuaStackValue& table) {
+	ClassEntry entry;
+	entry.init(entry.class_id, table);
+	entry.class_id = game_class_data.size();
+	game_class_data.push_back(entry);
+}
+
+
 LuaValue load_class_data(lua_State* L, const FilenameList& filenames) {
+//	LuaValue data = luawrap::globals(L)["data"].ensure_table();
+//	data["class_create"].bind_function(lapi_data_create_class);
+//	lua_safe_dofile(L, "res/classes/classes.lua");
+
 	LuaValue ret(L);
 	ret.newtable();
 
