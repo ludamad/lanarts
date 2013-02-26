@@ -9,7 +9,6 @@
 #include "lua_api/lua_newapi.h"
 
 #include <luawrap/luawrap.h>
-#include <luawrap/functions.h>
 
 #include <lcommon/lua_lcommon.h>
 
@@ -97,16 +96,12 @@ static void lapi_data_create_class(const LuaStackValue& table) {
 
 
 LuaValue load_class_data(lua_State* L, const FilenameList& filenames) {
-//	LuaValue data = luawrap::globals(L)["data"].ensure_table();
-//	data["class_create"].bind_function(lapi_data_create_class);
-//	lua_safe_dofile(L, "res/classes/classes.lua");
+	LuaValue data = luawrap::globals(L)["data"].ensure_table();
+	data["class_create"].bind_function(lapi_data_create_class);
+	luawrap::dofile(L, "res/classes/classes.lua");
 
 	LuaValue ret(L);
 	ret.newtable();
-
-	game_class_data.clear();
-	load_data_impl_template(filenames, "classes", load_class_callbackf, L,
-			&ret);
 
 	for (int i = 0; i < game_class_data.size(); i++) {
 		CombatStats& cstats = game_class_data[i].starting_stats;

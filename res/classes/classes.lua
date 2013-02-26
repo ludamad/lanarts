@@ -1,7 +1,15 @@
 data.class_create {
     name = "Mage",
     sprites = {"wizard", "wizard2"},
-    spells = {
+    available_spells = {
+      { spell = "Fire Bolt",
+        level_needed = 1 }, 
+      { spell = "Blink",
+        level_needed = 2 }, 
+      { spell = "Poison Cloud",
+        level_needed = 3 }, 
+      { spell = "Magic Blast",
+        level_needed = 4 }
     },
     start_stats = {
         movespeed = 4,
@@ -14,7 +22,9 @@ data.class_create {
         willpower = 5,
         magic = 5,
         equipment = {
-          inventory = { item = "Mana Potion" }
+          inventory = {
+             {item = "Mana Potion"} 
+          }
         }
     },
     gain_per_level = {
@@ -31,52 +41,63 @@ data.class_create {
 
 data.class_create {
     name = "Fighter",
-    sprites = {"wizard", "wizard2"},
-    spells = {
+    sprites = {"fighter", "fighter2"},
+    available_spells = {
+      { spell = "Berserk",
+        level_needed = 1 }
     },
     start_stats = {
         movespeed = 4,
-        hp = 85,
-        mp = 100,
-        hpregen = 0.033,
-        mpregen = 0.066,
-        strength = 3,
-        defence = 3,
-        willpower = 5,
-        magic = 5,
+        hp = 110,
+        mp = 40,
+        hpregen = 0.055,
+        mpregen = 0.044,
+        strength = 6,
+        defence = 6,
+        willpower = 3,
+        magic = 2,
         equipment = {
-          inventory = { item = "Mana Potion" }
+          weapon = "Dagger",
+          inventory = {
+             {item = "Stone", amount = 10} 
+          }
         }
     },
     gain_per_level = {
-        hp = 15,
-        mp = 20,
+        hp = 25,
+        mp = 10,
         hpregen = 0.010,
         mpregen = 0.007,
-        magic = 2,
-        strength = 1,
-        defence = 1,
-        willpower = 2
+        magic = 1,
+        strength = 2,
+        defence = 2,
+        willpower = 1
     }
 }
 
 data.class_create {
     name = "Archer",
-    sprites = {"wizard", "wizard2"},
-    spells = {
+    sprites = {"archer"},
+    available_spells = {
+      { spell = "Magic Arrow",
+        level_needed = 2 }
     },
     start_stats = {
         movespeed = 4,
         hp = 85,
-        mp = 100,
-        hpregen = 0.033,
-        mpregen = 0.066,
-        strength = 3,
-        defence = 3,
-        willpower = 5,
-        magic = 5,
+        mp = 70,
+        hpregen = 0.05,
+        mpregen = 0.05,
+        strength = 4,
+        defence = 4,
+        willpower = 4,
+        magic = 4,
         equipment = {
-          inventory = { item = "Mana Potion" }
+          weapon = "Short Bow",
+          projectile = { item = "Arrow", amount = 40 },
+          inventory = {
+             {item = "Dagger"} 
+          }
         }
     },
     gain_per_level = {

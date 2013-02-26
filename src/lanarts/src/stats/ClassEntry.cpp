@@ -19,7 +19,7 @@ const char* ClassEntry::entry_type() {
 }
 
 static Item parse_as_item(const LuaValue& value, const char* key = "item") {
-	return Item(get_item_by_name(value.as<const char*>()),
+	return Item(get_item_by_name(value[key].as<const char*>()),
 			value["amount"].defaulted(1));
 }
 
@@ -34,7 +34,9 @@ static Inventory parse_inventory(const LuaValue& value) {
 
 static EquipmentStats parse_equipment(const LuaValue& value) {
 	EquipmentStats ret;
-	ret.inventory = parse_inventory(value["inventory"]);
+	if (!value["inventory"].isnil()) {
+		ret.inventory = parse_inventory(value["inventory"]);
+	}
 
 	if (!value["weapon"].isnil()) {
 		Item item = parse_as_item(value, "weapon");
@@ -85,7 +87,7 @@ static CombatStats parse_combat_stats(const LuaValue& value) {
 	CombatStats ret;
 
 	ret.movespeed = value["movespeed"];
-	if (value["equipment"].isnil()) {
+	if (!value["equipment"].isnil()) {
 		ret.equipment = parse_equipment(value["equipment"]);
 	}
 
@@ -140,7 +142,7 @@ static void parse_gain_per_level(ClassEntry& entry,
 void ClassEntry::parse_lua_table(const LuaValue& table) {
 	ResourceEntryBase::parse_lua_table(table);
 
-	parse_gain_per_level(*this, table["on_level_gain"]);
+	parse_gain_per_level(*this, table["gain_per_level"]);
 
 	spell_progression = parse_class_spell_progression(table["available_spells"]);
 	starting_stats = parse_combat_stats(table["start_stats"]);
