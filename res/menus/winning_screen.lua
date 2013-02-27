@@ -27,6 +27,7 @@ local function winning_screen_create()
              CENTER,
              {0, (-20 - sprite.size[2]/2) }
         )
+        sprite.options.color = COL_RED
     end
 
     box:add_instance(
