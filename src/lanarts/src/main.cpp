@@ -83,9 +83,8 @@ label_StartOver:
 
 	engine["menu_start"].push();
 	bool did_exit = !luawrap::call<bool>(L);
-	if (did_exit) goto label_Quit; /* User has quit! */
-
 	save_settings_data(gs->game_settings(), "saved_settings.yaml"); // Save settings from menu
+	if (did_exit) goto label_Quit; /* User has quit! */
 
 	gs->start_connection();
 
