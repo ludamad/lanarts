@@ -99,6 +99,7 @@ function setup_start_menu()
                 game.load("savefile.save")
             end
         end
+	settings.connection_type = net.NONE
         exit_menu()
     end
 

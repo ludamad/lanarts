@@ -1,8 +1,15 @@
+/*
+ * Contains configuration for lanarts
+ * All data relevant to chosen game mode, class, configuration options etc is stored here.
+ */
+
 #ifndef GAMESETTINGS_H_
 #define GAMESETTINGS_H_
 #include <string>
 
 #include "lanarts_defines.h"
+
+class SerializeBuffer;
 
 struct GameSettings {
 	enum connection_type {
@@ -71,6 +78,9 @@ struct GameSettings {
 
 		keep_event_log = false;
 	}
+
+	void serialize_gameplay_settings(SerializeBuffer& serializer) const;
+	void deserialize_gameplay_settings(SerializeBuffer& serializer);
 
 	bool saving_to_action_file() {
 		return !savereplay_file.empty();

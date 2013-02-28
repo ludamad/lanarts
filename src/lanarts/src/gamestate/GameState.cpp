@@ -188,6 +188,8 @@ bool GameState::level_has_player() {
 }
 
 void GameState::serialize(SerializeBuffer& serializer) {
+	settings.serialize_gameplay_settings(serializer);
+
 	serializer.write(mtwist); // Save RNG state
 	serializer.write_int(_game_timestamp);
 
@@ -196,11 +198,11 @@ void GameState::serialize(SerializeBuffer& serializer) {
 
 	player_data().serialize(this, serializer);
 	serializer.flush();
-
-	// Save score
 }
 
 void GameState::deserialize(SerializeBuffer& serializer) {
+	settings.deserialize_gameplay_settings(serializer);
+
 	serializer.read(mtwist); // Load RNG state
 	serializer.read_int(_game_timestamp);
 
