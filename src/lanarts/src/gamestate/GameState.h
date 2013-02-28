@@ -43,10 +43,18 @@ class MonsterController;
 class Serializer;
 
 struct GameStateInitData {
-	int seed;
-	bool seed_set_by_network_message;
-	GameStateInitData(int seed = 0, bool seed_set_by_network_message = false) :
-			seed(seed), seed_set_by_network_message(seed_set_by_network_message) {
+	// Other than seed, other settings are not used in single-player.
+	// They are used in multi-player to sync the server's settings.
+	int seed, frame_action_repeat;
+	bool regen_on_death, network_debug_mode, received_init_data;
+	float time_per_step;
+	GameStateInitData() :
+					seed(0),
+					frame_action_repeat(0),
+					regen_on_death(false),
+					network_debug_mode(false),
+					received_init_data(false),
+					time_per_step(0.0f) {
 	}
 };
 

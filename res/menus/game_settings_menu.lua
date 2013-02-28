@@ -189,6 +189,43 @@ local function respawn_toggle_create()
     return toggle
 end
 
+local function frame_action_repeat_toggle_create()
+    local toggle = { 
+        size = SETTINGS_BOX_SIZE,
+        large_font = BIG_SETTINGS_FONT,
+        font = SETTINGS_FONT,
+    }
+
+    function toggle:step(xy)
+        -- Toggle the connection type
+        local mouseover = mouse_over(xy, self.size)
+        if mouse_left_pressed and mouseover then
+            settings.frame_action_repeat = (settings.frame_action_repeat + 1) % 5
+        elseif mouse_right_pressed and mouseover then
+            settings.frame_action_repeat = (settings.frame_action_repeat - 1) % 5
+        end
+    end
+
+    function toggle:draw(xy)
+
+        local x,y = unpack(xy)
+        local w, h = unpack(self.size)
+
+        self.font:draw( {color=COL_GREEN, origin = LEFT_CENTER}, { x + 8, y + h / 2 }, 
+            (settings.frame_action_repeat+1) .. 'x'
+        )
+        self.font:draw( {color = COL_PALE_GREEN, origin = LEFT_CENTER}, { x + 40, y + h / 2 }, 
+            "Network Skip Rate"
+        )
+    
+        local box_color = mouse_over(xy, self.size) and COL_GOLD or COL_PALE_GREEN
+        draw_rectangle_outline(box_color, bbox_create(xy, self.size), 1)
+    end
+
+    return toggle
+    
+end
+
 local function speed_toggle_create()
     local toggle = { 
         size = SETTINGS_BOX_SIZE,
@@ -315,6 +352,7 @@ local function center_setting_fields_create()
     local fields = InstanceLine.create( {force_size = {500, 162}, dx = 320, dy = 64, per_row = 2} )
     local current_setting 
 
+    -- Adds different options depending on the connection type
     local function add_fields()
         current_setting = settings.connection_type
 
@@ -326,9 +364,15 @@ local function center_setting_fields_create()
             fields:add_instance( respawn_toggle_create() )
         end
 
-        fields:add_instance( speed_toggle_create() )
+        if current_setting ~= net.CLIENT then
+            fields:add_instance( speed_toggle_create() )
+        end
+
         fields:add_instance( name_field_create() )
-        
+        if current_setting == net.SERVER then
+           fields:add_instance( frame_action_repeat_toggle_create() )
+        end
+
         if current_setting == net.CLIENT then
             fields:add_instance( host_IP_field_create() )
         end

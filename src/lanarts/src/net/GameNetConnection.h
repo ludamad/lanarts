@@ -95,7 +95,7 @@ void net_send_sync_ack(GameNetConnection& net);
 void net_send_state_and_sync(GameNetConnection& net, GameState* gs);
 void net_send_connection_affirm(GameNetConnection& net, const std::string& name,
 		class_id classtype);
-void net_send_game_init_data(GameNetConnection& net, PlayerData& pd, int seed);
+void net_send_game_init_data(GameNetConnection& net, PlayerData& pd, GameStateInitData& init_data);
 void net_send_player_actions(GameNetConnection& net, int frame,
 		int player_number, const ActionQueue& actions);
 void net_send_chatmessage(GameNetConnection& net, ChatMessage& message);

@@ -51,7 +51,7 @@ void PlayerInst::init(GameState* gs) {
 
 	teamid = gs->teams().default_player_team();
 
-	_score_stats.deepest_floor = std::max(_score_stats.deepest_floor, current_level);
+	_score_stats.deepest_floor = std::max(_score_stats.deepest_floor, current_floor);
 
 	_path_to_player.initialize(gs->tiles().solidity_map());
 	_path_to_player.fill_paths_in_radius(pos(), PLAYER_PATHING_RADIUS);

@@ -186,7 +186,7 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_NUM_MEMB_LOOKUP("id", inst->id)
 	else IFLUA_NUM_MEMB_LOOKUP("radius", inst->radius)
 	else IFLUA_NUM_MEMB_LOOKUP("target_radius", inst->target_radius)
-	else IFLUA_NUM_MEMB_LOOKUP("floor", inst->current_level)
+	else IFLUA_NUM_MEMB_LOOKUP("floor", inst->current_floor)
 	else IFLUA_STATS_MEMB_LOOKUP("stats", inst)
 	else if (strcmp(cstr, "spells") == 0) {
 		PlayerInst* p = dynamic_cast<PlayerInst*>(inst);

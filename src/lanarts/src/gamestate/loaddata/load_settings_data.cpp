@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "data/game_data.h"
+#include "stats/ClassEntry.h"
 #include <yaml-cpp/yaml.h>
 #include "data/yaml_util.h"
 
@@ -26,6 +27,11 @@ void save_settings_data(GameSettings& settings, const char* filename) {
 		save_yaml_attr(file, "username", settings.username);
 		save_yaml_attr(file, "steps_per_draw", settings.steps_per_draw);
 		save_yaml_attr(file, "time_per_step", settings.time_per_step);
+		save_yaml_attr(file, "frame_action_repeat", settings.frame_action_repeat);
+
+		if (settings.class_type != -1 && settings.class_type < game_class_data.size()) {
+			save_yaml_attr(file, "class", res::class_entry(settings.class_type).name);
+		}
 
 		save_yaml_attr(file, "port", settings.port);
 		save_yaml_attr(file, "regen_level_on_death",

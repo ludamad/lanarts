@@ -55,6 +55,7 @@ itemgen_lists:
     - { item: Platemail,          chance: 1                      }
     - { item: Magician's Robe,    chance: 2                      }
     - { item: Runed Robe,         chance: 1                      }
+    - { item: Robe of Mana,         chance: 1                      }
     #Helmets
     - { item: Runed Helmet,       chance: 1                      }
     - { item: Crown of Mars,      chance: 1                      }

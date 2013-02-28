@@ -125,8 +125,7 @@ static ClassSpellProgression parse_class_spell_progression(
 	return progression;
 }
 
-static void parse_gain_per_level(ClassEntry& entry,
-		const LuaValue& value) {
+static void parse_gain_per_level(ClassEntry& entry, const LuaValue& value) {
 	entry.hp_perlevel = value["hp"].defaulted(0);
 	entry.mp_perlevel = value["mp"].defaulted(0);
 
@@ -144,12 +143,34 @@ void ClassEntry::parse_lua_table(const LuaValue& table) {
 
 	parse_gain_per_level(*this, table["gain_per_level"]);
 
-	spell_progression = parse_class_spell_progression(table["available_spells"]);
+	spell_progression = parse_class_spell_progression(
+			table["available_spells"]);
 	starting_stats = parse_combat_stats(table["start_stats"]);
 
 	LuaValue sprites = table["sprites"];
 	int sprite_len = sprites.objlen();
 	for (int i = 1; i <= sprite_len; i++) {
 		this->sprites.push_back(res::spriteid(sprites[i].as<const char*>()));
+	}
+}
+namespace res {
+	class_id classid(const char* name) {
+		return get_class_by_name(name);
+	}
+
+	class_id classid(const std::string& name) {
+		return get_class_by_name(name.c_str());
+	}
+
+	ClassEntry class_entry(const char* name) {
+		return game_class_data.at(classid(name));
+	}
+
+	ClassEntry class_entry(const std::string& name) {
+		return game_class_data.at(classid(name));
+	}
+
+	ClassEntry class_entry(class_id id) {
+		return game_class_data.at(id);
 	}
 }

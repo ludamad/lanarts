@@ -23,12 +23,13 @@ SUITE(lua_drawable_tests) {
 		using namespace ldraw;
 
 		TestLuaState L;
+		LuaValue globals = luawrap::globals(L);
+		ldraw::lua_register_ldraw(L, globals);
 
 		Image image;
 		image.draw_region() = BBoxF(0, 0, 10, 10);
 		Drawable drawable(new Image(image));
 
-		LuaValue globals = luawrap::globals(L);
 
 		globals["assert"] = luawrap::function(L, unit_test_assert);
 
@@ -59,8 +60,8 @@ SUITE(lua_drawable_tests) {
 		using namespace ldraw;
 
 		TestLuaState L;
-
 		LuaValue globals = luawrap::globals(L);
+		ldraw::lua_register_ldraw(L, globals);
 
 		globals["assert"] = luawrap::function(L, unit_test_assert);
 

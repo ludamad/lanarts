@@ -85,7 +85,7 @@ label_StartOver:
 	bool did_exit = !luawrap::call<bool>(L);
 	if (did_exit) goto label_Quit; /* User has quit! */
 
-	save_settings_data(gs->game_settings(), "saved_settings.yaml"); // Save partial settings in case of failure
+	save_settings_data(gs->game_settings(), "saved_settings.yaml"); // Save settings from menu
 
 	gs->start_connection();
 
@@ -109,13 +109,17 @@ label_StartOver:
 		}
 	}
 
-	save_settings_data(gs->game_settings(), "saved_settings.yaml"); // Save full in-game results
+	if (gs->game_settings().conntype != GameSettings::CLIENT) {
+		save_settings_data(gs->game_settings(), "saved_settings.yaml"); // Save settings from in-game
+	}
 
 label_Quit:
 
 	lanarts_quit();
 
 	delete gs;
+
+	printf("Lanarts shut down cleanly\n");
 
 //	lua_close(L); // TODO: To exit cleanly we must clear all resource vectors explicitly
 

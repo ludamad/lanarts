@@ -17,6 +17,9 @@ sprites:
   - name: platemail
     file: res/items/armour/sprites/plate2.png
 
+  - name: robe of mana
+    file: res/items/armour/sprites/robe_of_mana.png
+
 #Headgear
   - name: iron helmet
     file: res/items/armour/sprites/iron_helmet.png

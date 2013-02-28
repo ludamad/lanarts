@@ -27,12 +27,12 @@ void GameInst::draw(GameState* gs) {
 }
 
 void GameInst::init(GameState* gs) {
-	current_level = gs->game_world().get_current_level_id();
+	current_floor = gs->game_world().get_current_level_id();
 }
 
 void GameInst::deinit(GameState* gs) {
 	id = 0;
-	current_level = -1;
+	current_floor = -1;
 }
 
 unsigned int GameInst::integrity_hash() {
@@ -53,14 +53,14 @@ void GameInst::update_position(float newx, float newy) {
 void GameInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	//Write the plain-old-data region
 	//Dont save reference count or id
-	SERIALIZE_POD_REGION(serializer, this, last_x, current_level);
+	SERIALIZE_POD_REGION(serializer, this, last_x, current_floor);
 	lua_serialize(serializer, gs->luastate(), lua_variables);
 }
 
 void GameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	//Read the plain-old-data region
 	//Dont load reference count or id
-	DESERIALIZE_POD_REGION(serializer, this, last_x, current_level);
+	DESERIALIZE_POD_REGION(serializer, this, last_x, current_floor);
 	lua_deserialize(serializer, gs->luastate(), lua_variables);
 }
 

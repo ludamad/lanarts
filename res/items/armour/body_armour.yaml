@@ -61,8 +61,18 @@ equipment:
     equipment_type: armour
     armour_type: body armour
     resistance: { base: 2 }
-    reduction:  { base: 2 }
+    reduction:  { base: 1 }
     stat_bonuses: 
       magic: 1
+      defence: 1
     magic_resistance: { base: 2 }
     magic_reduction: { base: 2 }
+
+  - name: Robe of Mana
+    description: A robe of great magical capacity. 
+    shop_cost: [95, 105]
+    spr_item: robe of mana
+    equipment_type: armour
+    armour_type: body armour
+    stat_bonuses: 
+      mp: 35

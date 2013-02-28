@@ -133,3 +133,6 @@ target_link_libraries( lanarts_tests
 target_link_libraries( lanarts_examples
     ${libraries}
 )
+
+enable_testing()
+add_test(NAME lanarts_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/lanarts_tests )

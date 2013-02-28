@@ -120,7 +120,11 @@ bool GameState::start_game() {
 	_event_log_initialize(this, settings);
 
 	if (settings.conntype == GameSettings::SERVER) {
-		net_send_game_init_data(connection, player_data(), init_data.seed);
+		init_data.frame_action_repeat = settings.frame_action_repeat;
+		init_data.network_debug_mode = settings.network_debug_mode;
+		init_data.regen_on_death = settings.regen_on_death;
+		init_data.time_per_step = settings.time_per_step;
+		net_send_game_init_data(connection, player_data(), init_data);
 		connection.set_accepting_connections(false);
 	}
 	if (!settings.loadreplay_file.empty()) {
@@ -131,11 +135,15 @@ bool GameState::start_game() {
 	}
 
 	if (settings.conntype == GameSettings::CLIENT) {
-		while (!init_data.seed_set_by_network_message) {
+		while (!init_data.received_init_data) {
 			if (!connection.poll_messages(1 /* milliseconds */)) {
 				return false;
 			}
 		}
+		settings.frame_action_repeat = init_data.frame_action_repeat;
+		settings.network_debug_mode = init_data.network_debug_mode;
+		settings.regen_on_death = init_data.regen_on_death;
+		settings.time_per_step = init_data.time_per_step;
 	}
 
 	printf("Seed used for RNG = 0x%X\n", init_data.seed);
@@ -199,7 +207,7 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	serializer.read_int(this->frame_n);
 	world.deserialize(serializer);
 	player_data().deserialize(this, serializer);
-	world.set_current_level(local_player()->current_level);
+	world.set_current_level(local_player()->current_floor);
 
 	_view.sharp_center_on(local_player()->pos());
 
@@ -449,7 +457,7 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 	 }*/
 
 	if (player) {
-		if (player->current_level != game_world().get_current_level_id()) {
+		if (player->current_floor != game_world().get_current_level_id()) {
 			return false;
 		}
 
@@ -461,7 +469,7 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 	std::vector<PlayerDataEntry>& pdes = pc.all_players();
 	for (int i = 0; i < pdes.size(); i++) {
 		PlayerInst* p = (PlayerInst*)pdes[i].player_inst.get();
-		if (p && p->current_level == game_world().get_current_level_id()) {
+		if (p && p->current_floor == game_world().get_current_level_id()) {
 			has_player = true;
 			if (player_radius_visible_test(p, BBox(minx, miny, maxx, maxy))) {
 				return true;

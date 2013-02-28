@@ -47,9 +47,12 @@ SUITE(adv_net_unit_tests) {
 		CHECK(pdes[1].player_name == clientname1);
 		CHECK(pdes[2].player_name == clientname2);
 	}
-	static void test_initstate_helper(GameStateInitData& init, int seed) {
-		CHECK(init.seed == seed);
-		CHECK(init.seed_set_by_network_message);
+	static void test_initstate_helper(GameStateInitData& client_init, GameStateInitData& server_init) {
+		CHECK(client_init.received_init_data);
+		CHECK(client_init.seed == server_init.seed);
+		CHECK(client_init.network_debug_mode == server_init.network_debug_mode);
+		CHECK(client_init.regen_on_death == server_init.regen_on_death);
+		CHECK(client_init.time_per_step == server_init.time_per_step);
 	}
 
 	static void init_connections(NetUpdatedState& serverstate,
@@ -71,8 +74,13 @@ SUITE(adv_net_unit_tests) {
 
 		serverstate.conn.poll_messages();
 
-		const int seed = 0x533D;
-		net_send_game_init_data(serverstate.conn, serverstate.pd, seed);
+		GameStateInitData server_init;
+		server_init.seed = 0x1;
+		server_init.network_debug_mode = true;
+		server_init.regen_on_death = true;
+		server_init.time_per_step = 1.1f;
+
+		net_send_game_init_data(serverstate.conn, serverstate.pd, server_init);
 
 		client1state.conn.poll_messages();
 		client2state.conn.poll_messages();
@@ -80,10 +88,10 @@ SUITE(adv_net_unit_tests) {
 		test_state_helper(serverstate, servername, clientname1, clientname2);
 
 		test_state_helper(client1state, servername, clientname1, clientname2);
-		test_initstate_helper(client1state.init, seed);
+		test_initstate_helper(client1state.init, server_init);
 
 		test_state_helper(client2state, servername, clientname1, clientname2);
-		test_initstate_helper(client2state.init, seed);
+		test_initstate_helper(client2state.init, server_init);
 
 	}
 	TEST(test_net_connect_affirm) {

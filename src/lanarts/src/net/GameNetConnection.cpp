@@ -18,7 +18,10 @@
 
 GameNetConnection::GameNetConnection(GameChat& chat, PlayerData& pd,
 		GameStateInitData& init_data) :
-		chat(chat), pd(pd), init_data(init_data), _connection(NULL) {
+				chat(chat),
+				pd(pd),
+				init_data(init_data),
+				_connection(NULL) {
 	_message_buffer = new SerializeBuffer(SerializeBuffer::plain_buffer());
 }
 
@@ -64,7 +67,7 @@ static void process_level_hash(GameState* gs, GameLevelState* level,
 	for (int i = 0; i < instances.size(); i++) {
 		GameInst* inst = instances[i];
 		if (!dynamic_cast<AnimatedInst*>(inst)) {
- 			write_or_assert_hash(sb, inst->integrity_hash(), isw);
+			write_or_assert_hash(sb, inst->integrity_hash(), isw);
 		}
 	}
 	//compare magic number marker
@@ -148,7 +151,7 @@ void net_recv_connection_affirm(SerializeBuffer& sb, int sender,
 	sb.read_int(classtype);
 	printf("connection affirm read\n");
 	pd.register_player(name, NULL, classtype, sender);
-	printf("now there are %d players\n", (int)pd.all_players().size());
+	printf("now there are %d players\n", (int) pd.all_players().size());
 	pd.set_local_player_idx(0);
 }
 
@@ -165,8 +168,8 @@ void net_send_connection_affirm(GameNetConnection& net, const std::string& name,
 void net_recv_game_init_data(SerializeBuffer& sb, int sender,
 		GameStateInitData& init_data, PlayerData& pd) {
 	//Write seed
-	sb.read_int(init_data.seed);
-	init_data.seed_set_by_network_message = true;
+	sb.read(init_data);
+	init_data.received_init_data = true;
 
 	//Read player data
 	int localidx;
@@ -184,10 +187,16 @@ void net_recv_game_init_data(SerializeBuffer& sb, int sender,
 		sb.read_int(net_id);
 		pd.register_player(name, NULL, classtype, net_id);
 	}
-	printf("Received init packet: seed = 0x%X, localid = %d, nplayers = %d\n",
-			init_data.seed, localidx, playern);
+
+	printf(
+			"Received init packet: seed = 0x%X, localid = %d, nplayers = %d, "
+					"frame_action_repeat = %d, regen_level_on_death = %d, network_debug_mode = %d, time_per_step = %f\n",
+			init_data.seed, localidx, playern, init_data.frame_action_repeat,
+			(int) init_data.regen_on_death,
+			(int) init_data.network_debug_mode, init_data.time_per_step);
 }
-void net_send_game_init_data(GameNetConnection& net, PlayerData& pd, int seed) {
+void net_send_game_init_data(GameNetConnection& net, PlayerData& pd,
+		GameStateInitData& init_data) {
 	for (int n = 0; n < pd.all_players().size(); n++) {
 		int net_id = pd.all_players()[n].net_id;
 
@@ -201,7 +210,7 @@ void net_send_game_init_data(GameNetConnection& net, PlayerData& pd, int seed) {
 		SerializeBuffer& sb = net.grab_buffer(
 				GameNetConnection::PACKET_SERV2CLIENT_INITIALPLAYERDATA);
 
-		sb.write_int(seed);
+		sb.write(init_data);
 		// Send which index is local player to recipient:
 		sb.write_int(n);
 		std::vector<PlayerDataEntry>& plist = pd.all_players();
@@ -272,7 +281,7 @@ void net_recv_sync_data(SerializeBuffer& sb, GameState* gs) {
 		pdes[i].player()->set_local_player(false);
 	}
 	gs->player_data().set_local_player_idx(nplayer);
-	gs->game_world().set_current_level(gs->local_player()->current_level);
+	gs->game_world().set_current_level(gs->local_player()->current_floor);
 }
 
 void net_send_sync_ack(GameNetConnection& net) {
@@ -287,7 +296,7 @@ static int find_message_type(QueuedMessage& qm,
 		SerializeBuffer* msg = qm.message;
 		int msg_type;
 		msg->read_int(msg_type);
-		msg->move_read_position(-(int)sizeof(int));
+		msg->move_read_position(-(int) sizeof(int));
 		if (type == msg_type) {
 			return i;
 		}
@@ -312,7 +321,7 @@ static bool has_message(std::vector<QueuedMessage>& delayed_messages,
 		SerializeBuffer* msg = delayed_messages[i].message;
 		int msg_type;
 		msg->read_int(msg_type);
-		msg->move_read_position(-(int)sizeof(int));
+		msg->move_read_position(-(int) sizeof(int));
 		if (type == msg_type) {
 			return true;
 		}
@@ -389,7 +398,7 @@ bool GameNetConnection::_handle_message(int sender,
 		break;
 	}
 	default:
-		serializer.move_read_position(-(int)sizeof(int));
+		serializer.move_read_position(-(int) sizeof(int));
 		return false;
 	}
 	return true;
@@ -414,7 +423,7 @@ void GameNetConnection::_message_callback(int sender, const char* msg,
 
 static void gamenetconnection_consume_message(receiver_t sender, void* context,
 		const char* msg, size_t len) {
-	((GameNetConnection*)context)->_message_callback(sender, msg, len, false);
+	((GameNetConnection*) context)->_message_callback(sender, msg, len, false);
 }
 
 bool GameNetConnection::poll_messages(int timeout) {
@@ -427,7 +436,7 @@ bool GameNetConnection::poll_messages(int timeout) {
 				i--;
 			}
 		}
-		if (!_connection->poll(gamenetconnection_consume_message, (void*)this,
+		if (!_connection->poll(gamenetconnection_consume_message, (void*) this,
 				timeout)) {
 			return false;
 		}
@@ -437,7 +446,7 @@ bool GameNetConnection::poll_messages(int timeout) {
 
 static void gamenetconnection_queue_message(receiver_t sender, void* context,
 		const char* msg, size_t len) {
-	((GameNetConnection*)context)->_message_callback(sender, msg, len, true);
+	((GameNetConnection*) context)->_message_callback(sender, msg, len, true);
 }
 
 std::vector<QueuedMessage> GameNetConnection::sync_on_message(message_t msg) {
@@ -452,11 +461,11 @@ std::vector<QueuedMessage> GameNetConnection::sync_on_message(message_t msg) {
 
 	bool all_ack = false;
 	while (!all_ack) {
-		_connection->poll(gamenetconnection_queue_message, (void*)this,
+		_connection->poll(gamenetconnection_queue_message, (void*) this,
 				timeout);
 
 		int idx;
-		while ( (idx = find_message_type(qm, _delayed_messages, msg)) != -1 ){
+		while ((idx = find_message_type(qm, _delayed_messages, msg)) != -1) {
 			if (received[qm.sender]) {
 				break;
 			}

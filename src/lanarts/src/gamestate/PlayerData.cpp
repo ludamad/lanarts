@@ -32,7 +32,7 @@ void PlayerData::remove_all_players(GameState* gs) {
 		_players[i].action_queue.clear_actions();
 		if (p) {
 			int oldlevel = gs->game_world().get_current_level_id();
-			gs->game_world().set_current_level(p->current_level);
+			gs->game_world().set_current_level(p->current_floor);
 			gs->remove_instance(p);
 			gs->game_world().set_current_level(oldlevel);
 		}
@@ -60,7 +60,7 @@ std::vector<PlayerInst*> PlayerData::players_in_level(level_id level) {
 	std::vector<PlayerInst*> ret;
 	for (int i = 0; i < _players.size(); i++) {
 		GameInst* player = _players[i].player_inst.get();
-		if (player && player->current_level == level) {
+		if (player && player->current_floor == level) {
 			LANARTS_ASSERT(!player || dynamic_cast<PlayerInst*>(player));
 			ret.push_back((PlayerInst*) player);
 		}
@@ -71,7 +71,7 @@ std::vector<PlayerInst*> PlayerData::players_in_level(level_id level) {
 bool PlayerData::level_has_player(level_id level) {
 	for (int i = 0; i < _players.size(); i++) {
 		GameInstRef& p = _players[i].player_inst;
-		if (p.get() && p->current_level == level) {
+		if (p.get() && p->current_floor == level) {
 			return true;
 		}
 	}
@@ -87,7 +87,7 @@ void PlayerData::copy_to(PlayerData& pc) const {
 static void write_inst_ref(GameInstRef& ref, GameState* gs,
 		SerializeBuffer& serializer) {
 	serializer.write_int(ref->id);
-	serializer.write_int(ref->current_level);
+	serializer.write_int(ref->current_floor);
 }
 static void read_inst_ref(GameInstRef& ref, GameState* gs,
 		SerializeBuffer& serializer) {

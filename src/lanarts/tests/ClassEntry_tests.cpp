@@ -28,7 +28,7 @@ SUITE(ClassEntry_tests) {
 				"        equipment = {\n"
 				"        }\n"
 				"    },\n"
-				"    on_level_gain = {}\n"
+				"    gain_per_level = {}\n"
 				"}";
 
 		TestLuaState L;

@@ -48,9 +48,10 @@ end
 
 
 function game_post_draw()
+    local player = world.local_player
     for pdata in values(world.players) do
         local p = pdata.instance
-        if not p:is_local_player() then
+        if not p:is_local_player() and p.floor == player.floor then
             fonts.small:draw({color=COL_WHITE, origin=CENTER}, screen_coords{p.x, p.y-18}, pdata.name)
         end
     end
