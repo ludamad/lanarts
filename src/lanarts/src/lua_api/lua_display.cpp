@@ -13,7 +13,7 @@
 #include <SDL.h>
 
 #include "gamestate/GameState.h"
-#include "gamestate/GameLevelState.h"
+#include "gamestate/GameRoomState.h"
 #include "gamestate/GameSettings.h"
 
 #include "lua_newapi.h"

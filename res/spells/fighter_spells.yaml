@@ -37,7 +37,7 @@ spells:
     fallback_to_melee: no
     prereq_func: 
       function(caster, _, _) 
-        for mon in level.monsters() do
+        for mon in room.monsters() do
           if distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 40 then
             return true
           end

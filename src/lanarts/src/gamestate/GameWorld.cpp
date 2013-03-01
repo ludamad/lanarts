@@ -16,7 +16,7 @@
 #include "objects/GameInstRef.h"
 #include "stats/ClassEntry.h"
 
-#include "GameLevelState.h"
+#include "GameRoomState.h"
 #include "GameState.h"
 #include "GameWorld.h"
 #include "ScoreBoard.h"
@@ -43,7 +43,7 @@ level_id GameWorld::get_current_level_id() {
 	return gs->get_level()->id();
 }
 
-void GameWorld::place_inst(GeneratedLevel& genlevel, GameInst* inst) {
+void GameWorld::place_inst(GeneratedRoom& genlevel, GameInst* inst) {
 	GameTiles& tiles = gs->tiles();
 	Pos epos;
 	do {
@@ -102,7 +102,7 @@ void GameWorld::deserialize(SerializeBuffer& serializer) {
 	midstep = false;
 }
 
-void GameWorld::spawn_players(GeneratedLevel& genlevel, void** player_instances,
+void GameWorld::spawn_players(GeneratedRoom& genlevel, void** player_instances,
 		size_t nplayers) {
 	if (!player_instances) {
 		bool flocal = (gs->game_settings().conntype == GameSettings::CLIENT);
@@ -138,7 +138,7 @@ GameRoomState* GameWorld::get_level(int roomid, bool spawnplayer,
 		level_states.resize(roomid + 1, NULL);
 	}
 	if (!level_states[roomid]) {
-		GeneratedLevel genlevel;
+		GeneratedRoom genlevel;
 		GameRoomState* newlvl = generate_level(roomid, gs->rng(), genlevel,
 				gs);
 		level_states[roomid] = newlvl;

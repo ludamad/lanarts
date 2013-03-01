@@ -11,7 +11,7 @@
 #include <SDL.h>
 
 #include "gamestate/GameState.h"
-#include "gamestate/GameLevelState.h"
+#include "gamestate/GameRoomState.h"
 #include "gamestate/GameSettings.h"
 
 #include "stats/ClassEntry.h"

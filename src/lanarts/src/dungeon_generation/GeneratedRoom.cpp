@@ -1,32 +1,32 @@
 /*
- * GeneratedLevel.cpp:
+ * GeneratedRoom.cpp:
  * 	Utility class for room generation functions, stores generated room state & where the rooms are located
  */
 
 #include <lcommon/math_util.h>
-#include "GeneratedLevel.h"
+#include "GeneratedRoom.h"
 
-Sqr& GeneratedLevel::at(const Pos & p) {
+Sqr& GeneratedRoom::at(const Pos & p) {
 	return at(p.x, p.y);
 }
 
-Sqr& GeneratedLevel::at(int x, int y) {
+Sqr& GeneratedRoom::at(int x, int y) {
 	LANARTS_ASSERT(x >= 0 && x < size.w && y >= 0 && y < size.h);
 	return s[y * size.w + x];
 }
 
-void GeneratedLevel::set_region_corners(const Region & r) {
+void GeneratedRoom::set_region_corners(const Region & r) {
 	at(r.x, r.y).is_corner = true;
 	at(r.x, r.y + r.h - 1).is_corner = true;
 	at(r.x + r.w - 1, r.y).is_corner = true;
 	at(r.x + r.w - 1, r.y + r.h - 1).is_corner = true;
 }
 
-Pos GeneratedLevel::get_world_coordinate(const Pos& p) {
+Pos GeneratedRoom::get_world_coordinate(const Pos& p) const {
 	return centered_multiple(p + world_offset, TILE_SIZE);
 }
 
-bool GeneratedLevel::verify(const Region & r, bool check_init) {
+bool GeneratedRoom::verify(const Region & r, bool check_init) {
 	if (r.x + r.w > size.w)
 		return false;
 
@@ -48,7 +48,7 @@ bool GeneratedLevel::verify(const Region & r, bool check_init) {
 	return true;
 }
 
-void GeneratedLevel::set_region(const Region & r, const Sqr & val) {
+void GeneratedRoom::set_region(const Region & r, const Sqr & val) {
 	Sqr *sqrs = s + r.y * size.w;
 	for (int y = r.y; y < r.y + r.h; y++) {
 		for (int x = r.x; x < r.x + r.w; x++) {
@@ -59,7 +59,7 @@ void GeneratedLevel::set_region(const Region & r, const Sqr & val) {
 
 }
 
-int GeneratedLevel::region_groupID(const Region & r, Pos & p) {
+int GeneratedRoom::region_groupID(const Region & r, Pos & p) {
 	Sqr *sqrs = s + r.y * size.w;
 	for (int y = r.y; y < r.y + r.h; y++) {
 		for (int x = r.x; x < r.x + r.w; x++) {
@@ -74,7 +74,7 @@ int GeneratedLevel::region_groupID(const Region & r, Pos & p) {
 	return 0;
 }
 
-void GeneratedLevel::set_circle_with_perimeter(const Region & r,
+void GeneratedRoom::set_circle_with_perimeter(const Region & r,
 		const Sqr & val, int padding) {
 	Sqr *sqrs = s + r.y * size.w;
 	Sqr val2 = Sqr(0, 1, 0, UNSET, 0, val.roomID);
@@ -92,7 +92,7 @@ void GeneratedLevel::set_circle_with_perimeter(const Region & r,
 	}
 }
 
-void GeneratedLevel::set_region_with_perimeter(const Region & r,
+void GeneratedRoom::set_region_with_perimeter(const Region & r,
 		const Sqr & val, int padding) {
 	Sqr *sqrs = s + r.y * size.w;
 	Sqr val2 = Sqr(0, 1, 0, UNSET, 0, val.roomID);
@@ -130,12 +130,12 @@ void GeneratedLevel::set_region_with_perimeter(const Region & r,
 	set_region_corners(rr);
 }
 
-Pos generate_location(MTwist& mt, GeneratedLevel& level) {
+Pos generate_location(MTwist& mt, GeneratedRoom& level) {
 	return generate_location_in_region(mt, level,
 			Region(0, 0, level.width(), level.height()));
 }
 
-Pos generate_location_in_region(MTwist& mt, GeneratedLevel& level,
+Pos generate_location_in_region(MTwist& mt, GeneratedRoom& level,
 		const Region& r) {
 	Pos p;
 	Sqr* s;
@@ -153,8 +153,8 @@ Pos generate_location_in_region(MTwist& mt, GeneratedLevel& level,
 	return p;
 }
 
-Pos generate_location_byroom(MTwist& mt, GeneratedLevel& level) {
+Pos generate_location_byroom(MTwist& mt, GeneratedRoom& level) {
 	int roomn = mt.rand(level.rooms().size());
-	Room& room = level.rooms()[roomn];
-	return generate_location_in_region(mt, level, room.room_region);
+	RoomRegion& room = level.rooms()[roomn];
+	return generate_location_in_region(mt, level, room.region);
 }

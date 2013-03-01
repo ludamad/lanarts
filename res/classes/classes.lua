@@ -44,7 +44,9 @@ data.class_create {
     sprites = {"fighter", "fighter2"},
     available_spells = {
       { spell = "Berserk",
-        level_needed = 1 }
+        level_needed = 1 },
+      { spell = "Power Strike",
+        level_needed = 3 }
     },
     start_stats = {
         movespeed = 4,

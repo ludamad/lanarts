@@ -18,7 +18,7 @@
 #include "lanarts_defines.h"
 #include "stats/items/items.h"
 
-class GeneratedLevel;
+class GeneratedRoom;
 
 struct MonsterGenCoord {
 	Pos pos;
@@ -66,7 +66,7 @@ private:
 	std::vector<MonsterGenCoord> _monsters;
 };
 
-void generate_area(GeneratedLevel& level, AreaTemplate& area_template,
+void generate_area(GeneratedRoom& level, AreaTemplate& area_template,
 		const Pos& offset, bool flipX = false, bool flipY = false);
 
 areatemplate_id get_area_template_by_name(const char* name);

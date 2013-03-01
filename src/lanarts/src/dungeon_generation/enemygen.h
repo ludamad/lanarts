@@ -11,7 +11,7 @@
 #include <lcommon/mtwist.h>
 
 #include "lanarts_defines.h"
-#include "GeneratedLevel.h"
+#include "GeneratedRoom.h"
 
 #include "dungeon_data.h"
 
@@ -21,10 +21,10 @@ class GameState;
 void generate_enemy_after_level_creation(GameState* gs, enemy_id etype,
 		int amount = 1);
 
-int generate_enemy(GameState* gs, GeneratedLevel& level, MTwist& mt, enemy_id etype,
+int generate_enemy(GameState* gs, GeneratedRoom& level, MTwist& mt, enemy_id etype,
 		const Region& r, team_id teamid, int amount);
 //Generates enemy monsters during level generation
 void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
-		GeneratedLevel& level, GameState* gs);
+		GeneratedRoom& level, GameState* gs);
 
 #endif /* ENEMYGEN_H_ */

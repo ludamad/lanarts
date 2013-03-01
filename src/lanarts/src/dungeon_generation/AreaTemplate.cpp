@@ -8,7 +8,7 @@
 #include <cstdio>
 
 #include "AreaTemplate.h"
-#include "GeneratedLevel.h"
+#include "GeneratedRoom.h"
 
 AreaTemplate::AreaTemplate(const std::string& name, const char* data, int data_width, int width,
 		int height, const std::vector<Glyph>& glyphs) :
@@ -45,13 +45,13 @@ AreaTemplate::AreaTemplate(const std::string& name, const char* data, int data_w
 AreaTemplate::~AreaTemplate() {
 }
 
-void generate_area(GeneratedLevel& level, AreaTemplate& area_template,
+void generate_area(GeneratedRoom& level, AreaTemplate& area_template,
 		const Pos& offset, bool flipX, bool flipY) {
 	char* data = area_template.data();
 	int w = area_template.width(), h = area_template.height();
 
 	int roomid = level.rooms().size();
-	Room room(Region(offset.x, offset.y, w, h), roomid);
+	RoomRegion room(Region(offset.x, offset.y, w, h), roomid);
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
 			int ind = w * y + x;

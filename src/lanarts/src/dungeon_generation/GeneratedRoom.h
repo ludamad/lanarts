@@ -1,10 +1,10 @@
 /*
- * GeneratedLevel.h
+ * GeneratedRoom.h
  * 	Utility class for room generation functions, stores generated room state & where the rooms are located
  */
 
-#ifndef GENERATEDLEVEL_H_
-#define GENERATEDLEVEL_H_
+#ifndef GENERATEDROOM_H_
+#define GENERATEDROOM_H_
 #include <cstring>
 #include <vector>
 
@@ -16,34 +16,34 @@
 
 #include "generated_tile.h"
 
-struct Room {
+struct RoomRegion {
 	enum shape_t {
 		RECT = 0, OVAL = 1
 	};
 
-	Region room_region;
+	Region region;
 	int groupID;
 	int enemies_in_room;
-	Room() :
+	RoomRegion() :
 			groupID(0), enemies_in_room(0) {
 	}
-	Room(const Region& r, int groupID) :
-			room_region(r), groupID(groupID), enemies_in_room(0) {
+	RoomRegion(const Region& r, int groupID) :
+			region(r), groupID(groupID), enemies_in_room(0) {
 	}
-	void operator=(const Room& r) {
-		memcpy(this, &r, sizeof(Room));
+	void operator=(const RoomRegion& r) {
+		memcpy(this, &r, sizeof(RoomRegion));
 	}
 };
 
-class GeneratedLevel {
+class GeneratedRoom {
 public:
-	int width() {
+	int width() const {
 		return size.w;
 	}
-	int height() {
+	int height() const {
 		return size.h;
 	}
-	std::vector<Room>& rooms() {
+	std::vector<RoomRegion>& rooms() {
 		return room_list;
 	}
 	std::vector<GameInstRef>& instances() {
@@ -52,16 +52,16 @@ public:
 	void add_instance(GameInst* inst) {
 		return instance_list.push_back(inst);
 	}
-	Room& get_room(int i) {
+	RoomRegion& get_room(int i) {
 		return room_list.at(i);
 	}
 
-	GeneratedLevel() {
+	GeneratedRoom() {
 		s = NULL;
 		number_of_mobs = 0;
 	}
 
-	Pos get_world_coordinate(const Pos& p);
+	Pos get_world_coordinate(const Pos& p) const;
 
 	void initialize(int w, int h, const Pos& offset, bool solid = true) {
 		number_of_mobs = 0;
@@ -80,12 +80,12 @@ public:
 			}
 		}
 	}
-	GeneratedLevel(int w, int h, const Pos& offset) {
+	GeneratedRoom(int w, int h, const Pos& offset) {
 		s = NULL;
 		number_of_mobs = 0;
 		initialize(w, h, offset);
 	}
-	~GeneratedLevel() {
+	~GeneratedRoom() {
 		delete[] s;
 	}
 
@@ -107,18 +107,18 @@ public:
 	}
 
 private:
-	GeneratedLevel(const GeneratedLevel&); //DO-NOT-USE
+	GeneratedRoom(const GeneratedRoom&); //DO-NOT-USE
 	Sqr* s;
 	Size size;
 	Pos world_offset;
-	std::vector<Room> room_list;
+	std::vector<RoomRegion> room_list;
 	std::vector<GameInstRef> instance_list;
 	int number_of_mobs;
 };
 
-Pos generate_location(MTwist& mt, GeneratedLevel& level);
-Pos generate_location_byroom(MTwist& mt, GeneratedLevel& level);
-Pos generate_location_in_region(MTwist& mt, GeneratedLevel& level,
+Pos generate_location(MTwist& mt, GeneratedRoom& level);
+Pos generate_location_byroom(MTwist& mt, GeneratedRoom& level);
+Pos generate_location_in_region(MTwist& mt, GeneratedRoom& level,
 		const Region& r);
 
 #endif /* GENERATEDROOM_H_ */

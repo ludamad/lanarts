@@ -17,7 +17,7 @@
 
 #include "gamestate/GameAction.h"
 
-#include "gamestate/GameLevelState.h"
+#include "gamestate/GameRoomState.h"
 #include "pathfind/FloodFillPaths.h"
 
 #include "lua_api/lua_newapi.h"

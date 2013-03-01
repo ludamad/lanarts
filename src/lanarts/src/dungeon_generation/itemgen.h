@@ -9,7 +9,7 @@
 #include <vector>
 
 #include <lcommon/mtwist.h>
-#include "GeneratedLevel.h"
+#include "GeneratedRoom.h"
 #include "dungeon_data.h"
 
 class GameState;
@@ -18,6 +18,6 @@ const ItemGenChance& generate_item_choice(MTwist& mt,
 		itemgenlist_id itemgenlist);
 
 void generate_items(const ItemGenSettings& is, MTwist& mt,
-		GeneratedLevel& level, GameState* gs);
+		GeneratedRoom& level, GameState* gs);
 
 #endif /* ITEMGEN_H_ */

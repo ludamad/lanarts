@@ -91,7 +91,7 @@ function game_loop()
         end
 
         if key_pressed(keys.F3) and single_player then 
-            level.regenerate()
+            room.regenerate()
         end
     
         if key_pressed(keys.F4) then 

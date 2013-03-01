@@ -22,7 +22,7 @@ public:
 	enum {
 		NO_TURN = 0, TURN_PERIMETER = 1, TURN_START = 2
 	};
-	TunnelGenImpl(GeneratedLevel& s, MTwist& mt, int start_room, int padding,
+	TunnelGenImpl(GeneratedRoom& s, MTwist& mt, int start_room, int padding,
 			int width, int depth, int change_odds, bool ate = false) :
 			s(s), mt(mt), start_room(start_room), end_room(0), padding(padding), accept_tunnel_entry(
 					ate), avoid_groupid(0), width(width), maxdepth(depth), change_odds(
@@ -52,7 +52,7 @@ private:
 	bool validate_slice(Sqr* prev_content, TunnelSliceContext* cntxt, int dep);
 
 private:
-	GeneratedLevel& s;
+	GeneratedRoom& s;
 	MTwist& mt;
 	int start_room;
 	int end_room;
@@ -66,7 +66,7 @@ private:
 
 /*Sole visible function*/
 void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
-		GeneratedLevel& level) {
+		GeneratedRoom& level) {
 
 	Pos p;
 	bool axis, positive;
@@ -103,7 +103,7 @@ void generate_tunnels(const TunnelGenSettings& tgs, MTwist& mt,
 							tgs.padding > 0
 									&& (genpaths[i] > 0 || nogen_tries > 100));
 
-					generate_entrance(level.rooms()[i].room_region, mt,
+					generate_entrance(level.rooms()[i].region, mt,
 							std::min(genwidth, 2), p, axis, positive);
 
 					int val = positive ? +1 : -1;

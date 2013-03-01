@@ -21,7 +21,7 @@
 
 class GameState;
 class GameRoomState;
-class GeneratedLevel;
+class GeneratedRoom;
 class PlayerInst;
 
 class GameWorld {
@@ -38,7 +38,7 @@ public:
 	void set_current_level_lazy(int roomid);
 	void reset(int keep = 0);
 	void regen_level(int roomid);
-	void place_inst(GeneratedLevel& genlevel, GameInst* inst);
+	void place_inst(GeneratedRoom& genlevel, GameInst* inst);
 	GameRoomState* get_current_level() {
 		return lvl;
 	}
@@ -62,7 +62,7 @@ public:
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
 private:
-	void spawn_players(GeneratedLevel& genlevel, void** player_instances,
+	void spawn_players(GeneratedRoom& genlevel, void** player_instances,
 			size_t nplayers);
 	bool midstep;
 	int next_room_id;

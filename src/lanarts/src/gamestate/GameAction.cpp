@@ -6,7 +6,7 @@
 
 #include "objects/GameInst.h"
 #include "GameAction.h"
-#include "GameLevelState.h"
+#include "GameRoomState.h"
 
 #include "GameState.h"
 

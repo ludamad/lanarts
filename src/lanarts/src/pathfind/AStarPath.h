@@ -6,7 +6,7 @@
 #ifndef ASTAR_PATHFIND_H_
 #define ASTAR_PATHFIND_H_
 
-#include "dungeon_generation/GeneratedLevel.h"
+#include "dungeon_generation/GeneratedRoom.h"
 #include "objects/GameInst.h"
 #include <vector>
 

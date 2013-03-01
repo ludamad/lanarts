@@ -22,7 +22,7 @@ function powerstrike_spell.action(caster, _, _)
     caster:add_effect("Charge", 8).callback = 
       function (effect, caster)
       	local num = 0
-        for mon in level.monsters() do
+        for mon in room.monsters() do
           if distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 35 then
             num = num + 1
             caster:melee(mon)

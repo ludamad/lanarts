@@ -31,17 +31,17 @@ void generate_enemy_after_level_creation(GameState* gs, enemy_id etype,
 	}
 }
 
-static Region& enemy_region_candidate(MTwist& mt, GeneratedLevel& level) {
-	std::vector<Room>& rooms = level.rooms();
+static Region& enemy_region_candidate(MTwist& mt, GeneratedRoom& level) {
+	std::vector<RoomRegion>& rooms = level.rooms();
 	int ind1 = mt.rand(rooms.size()), ind2 = mt.rand(rooms.size());
-	Room& r1 = rooms[ind1], &r2 = rooms[ind2];
+	RoomRegion& r1 = rooms[ind1], &r2 = rooms[ind2];
 	if (r1.enemies_in_room < r2.enemies_in_room) {
-		return r1.room_region;
+		return r1.region;
 	} else {
-		return r2.room_region;
+		return r2.region;
 	}
 }
-static Pos enemy_position_candidate(MTwist& mt, GeneratedLevel& level,
+static Pos enemy_position_candidate(MTwist& mt, GeneratedRoom& level,
 		const Region& region_suggestion) {
 	Pos epos;
 	int tries = 0;
@@ -55,7 +55,7 @@ static Pos enemy_position_candidate(MTwist& mt, GeneratedLevel& level,
 	return epos;
 }
 
-int generate_enemy(GameState* gs, GeneratedLevel& level, MTwist& mt,
+int generate_enemy(GameState* gs, GeneratedRoom& level, MTwist& mt,
 		enemy_id etype, const Region& r, team_id teamid, int amount) {
 
 	int mobid = amount > 1 ? -1 : level.get_next_mob_id();
@@ -87,7 +87,7 @@ static int get_total_chance(const EnemyGenSettings& rs) {
 
 //Generates enemy monsters
 void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
-		GeneratedLevel& level, GameState* gs) {
+		GeneratedRoom& level, GameState* gs) {
 	int nplayers = gs->player_data().all_players().size();
 
 	int nmons = round(mt.rand(rs.num_monsters) * (1 + log(nplayers) / 4));

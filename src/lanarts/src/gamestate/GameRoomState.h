@@ -11,7 +11,7 @@
 #include <lcommon/geometry.h>
 
 #include "collision_avoidance/CollisionAvoidance.h"
-#include "dungeon_generation/GeneratedLevel.h"
+#include "dungeon_generation/GeneratedRoom.h"
 #include "objects/enemy/MonsterController.h"
 #include "pathfind/WanderMap.h"
 
@@ -87,7 +87,7 @@ public:
 
 public:
 	std::vector<GameRoomPortal> exits, entrances;
-	std::vector<Room> rooms;
+	std::vector<RoomRegion> rooms;
 private:
 
 	level_id _levelid;

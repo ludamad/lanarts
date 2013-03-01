@@ -10,7 +10,7 @@
 #include <lcommon/mtwist.h>
 
 #include "lanarts_defines.h"
-#include "GeneratedLevel.h"
+#include "GeneratedRoom.h"
 
 #include "dungeon_data.h"
 
@@ -18,6 +18,6 @@ class GameState;
 
 //Generates tiles
 void generate_features(const FeatureGenSettings& rs, MTwist& mt,
-		GeneratedLevel& level, GameState* gs);
+		GeneratedRoom& level, GameState* gs);
 
 #endif /* FEATUREGEN_H_ */

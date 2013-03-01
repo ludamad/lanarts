@@ -7,7 +7,7 @@
 #include <lcommon/strformat.h>
 
 #include "GameState.h"
-#include "GameLevelState.h"
+#include "GameRoomState.h"
 #include "GameLogger.h"
 
 GameLogger::GameLogger() :

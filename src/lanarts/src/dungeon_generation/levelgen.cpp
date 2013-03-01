@@ -14,7 +14,7 @@
 
 #include "objects/player/PlayerInst.h"
 
-#include "GeneratedLevel.h"
+#include "GeneratedRoom.h"
 
 #include "dungeon_data.h"
 #include "levelgen.h"
@@ -22,7 +22,7 @@
 const int TOO_MANY_FAILURES = 100;
 
 //return false on failure
-bool generate_room_at(MTwist& mt, GeneratedLevel& level, const Region& r,
+bool generate_room_at(MTwist& mt, GeneratedRoom& level, const Region& r,
 		int padding, int mark) {
 	if (!level.verify(r))
 		return false;
@@ -30,7 +30,7 @@ bool generate_room_at(MTwist& mt, GeneratedLevel& level, const Region& r,
 			level.rooms().size() + 1);
 	level.set_region_with_perimeter(r, val, padding);
 
-	Room room(
+	RoomRegion room(
 			Region(r.x + padding, r.y + padding, r.w - padding * 2,
 					r.h - padding * 2), 0);
 	level.rooms().push_back(room);
@@ -38,7 +38,7 @@ bool generate_room_at(MTwist& mt, GeneratedLevel& level, const Region& r,
 	return true;
 }
 
-bool generate_room(MTwist& mt, GeneratedLevel& level, int rw, int rh,
+bool generate_room(MTwist& mt, GeneratedRoom& level, int rw, int rh,
 		int padding, int mark, int max_attempts) {
 
 	int levelw = level.width(), levelh = level.height();
@@ -56,7 +56,7 @@ bool generate_room(MTwist& mt, GeneratedLevel& level, int rw, int rh,
 }
 
 void generate_rooms(lua_State* L, const RoomGenSettings& rs, MTwist& mt,
-		GeneratedLevel& level) {
+		GeneratedRoom& level) {
 	int pad = rs.room_padding;
 	int nrooms = mt.rand(rs.amount_of_rooms);
 	Range sizerange(rs.size.min + pad * 2, rs.size.max + pad * 2);
@@ -82,11 +82,11 @@ void generate_rooms(lua_State* L, const RoomGenSettings& rs, MTwist& mt,
 	}
 	NoMoreRooms: // Come from above
 
-	std::vector<Room>& room_list = level.rooms();
+	std::vector<RoomRegion>& room_list = level.rooms();
 	/*Room erosion/dilation*/
 	int remove_corners_chance = 20;
 	for (int i = 0; i < room_list.size(); i++) {
-		Region r = room_list[i].room_region;
+		Region r = room_list[i].region;
 		bool remove_corners = mt.rand(100) <= remove_corners_chance;
 		for (int y = r.y - 1; y < r.y + r.h + 1; y++)
 			for (int x = r.x - 1; x < r.x + r.w + 1; x++) {
@@ -109,7 +109,7 @@ Pos get_level_offset(GameState* gs, int lw, int lh) {
 
 	return Pos((tw - lw) / 2, (th - lh) / 2);
 }
-GameRoomState* generate_level(int roomid, MTwist& mt, GeneratedLevel& level,
+GameRoomState* generate_level(int roomid, MTwist& mt, GeneratedRoom& level,
 		GameState* gs) {
 	DungeonBranch& branch = game_dungeon_data[DNGN_MAIN_BRANCH];
 

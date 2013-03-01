@@ -8,7 +8,7 @@
 
 #include "draw/SpriteEntry.h"
 #include "draw/TileEntry.h"
-#include "gamestate/GameLevelState.h"
+#include "gamestate/GameRoomState.h"
 
 #include "gamestate/GameState.h"
 #include "gamestate/GameTiles.h"
@@ -38,7 +38,7 @@ static tileset_id randtileset(MTwist& mt,
 	return tilesets[mt.rand(tilesets.size())];
 }
 
-static void create_door(GameState* gs, GeneratedLevel& l, int x, int y) {
+static void create_door(GameState* gs, GeneratedRoom& l, int x, int y) {
 	GameTiles& tiles = gs->tiles();
 	int tw = tiles.tile_width(), th = tiles.tile_height();
 	int lw = l.width(), lh = l.height();
@@ -54,7 +54,7 @@ static void create_door(GameState* gs, GeneratedLevel& l, int x, int y) {
 		gs->add_instance(new FeatureInst(fpos, FeatureInst::DOOR_CLOSED));
 	}
 }
-static void remove_wall(GameState* gs, GeneratedLevel& l, int x, int y) {
+static void remove_wall(GameState* gs, GeneratedRoom& l, int x, int y) {
 	GameTiles& tiles = gs->tiles();
 	int tw = tiles.tile_width(), th = tiles.tile_height();
 	int lw = l.width(), lh = l.height();
@@ -67,7 +67,7 @@ static void remove_wall(GameState* gs, GeneratedLevel& l, int x, int y) {
 		s.passable = true;
 	}
 }
-static void create_doors_all_around(GameState* gs, GeneratedLevel& l,
+static void create_doors_all_around(GameState* gs, GeneratedRoom& l,
 		const BBox& region) {
 	for (int x = region.x1; x < region.x2; x++) {
 		create_door(gs, l, x, region.y1);
@@ -78,7 +78,7 @@ static void create_doors_all_around(GameState* gs, GeneratedLevel& l,
 		create_door(gs, l, region.x2 - 1, y);
 	}
 }
-static void remove_all_around(GameState* gs, GeneratedLevel& l,
+static void remove_all_around(GameState* gs, GeneratedRoom& l,
 		const BBox& region) {
 	for (int x = region.x1 + 1; x < region.x2 - 1; x++) {
 		remove_wall(gs, l, x, region.y1);
@@ -104,7 +104,7 @@ static StoreInventory generate_shop_inventory(MTwist& mt, int itemn) {
 	}
 	return inv;
 }
-static void generate_shop(GameState* gs, GeneratedLevel& level, MTwist& mt,
+static void generate_shop(GameState* gs, GeneratedRoom& level, MTwist& mt,
 		const Pos& p) {
 	Pos worldpos = level.get_world_coordinate(p);
 	level.at(p).has_instance = true;
@@ -115,7 +115,7 @@ static void generate_shop(GameState* gs, GeneratedLevel& level, MTwist& mt,
 					generate_shop_inventory(mt, itemn)));
 
 }
-static void generate_statue(GameState* gs, GeneratedLevel& level, MTwist& mt,
+static void generate_statue(GameState* gs, GeneratedRoom& level, MTwist& mt,
 		const Pos& p) {
 	Pos worldpos = level.get_world_coordinate(p);
 	level.at(p).has_instance = true;
@@ -133,13 +133,13 @@ static void generate_statue(GameState* gs, GeneratedLevel& level, MTwist& mt,
 }
 
 void generate_features(const FeatureGenSettings& fs, MTwist& mt,
-		GeneratedLevel& level, GameState* gs) {
+		GeneratedRoom& level, GameState* gs) {
 
-	std::vector<Room>& rooms = level.rooms();
+	std::vector<RoomRegion>& rooms = level.rooms();
 	const int nrooms = rooms.size();
 
 	for (int i = 0; i < nrooms; i++) {
-		Region& r = rooms[i].room_region;
+		Region& r = rooms[i].region;
 		if (gs->rng().rand(100) == 0) {
 			remove_all_around(gs, level,
 					BBox(r.x - 1, r.y - 1, r.x + r.w + 1, r.y + r.h + 1));
@@ -195,7 +195,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 	for (int i = 0; i < level.rooms().size(); i++) {
 		if (gs->rng().rand(3) != 0)
 			continue;
-		Region r = level.rooms()[i].room_region;
+		Region r = level.rooms()[i].region;
 		/*
 
 		 int rx = r.x + gs->rng().rand(1, r.w-1);
@@ -253,7 +253,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 	}
 
 	for (int i = 0; i < nrooms; i++) {
-		Region& r = rooms[i].room_region;
+		Region& r = rooms[i].region;
 		if (mt.rand(100) == 0) {
 			create_doors_all_around(gs, level,
 					BBox(r.x - 1, r.y - 1, r.x + r.w + 1, r.y + r.h + 1));
@@ -263,8 +263,8 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 	int amount_statues = mt.rand(10);
 	for (int attempts = 0; attempts < amount_statues; attempts++) {
 		int ind = mt.rand(rooms.size());
-		Room& r1 = rooms[ind];
-		Region inner = r1.room_region.remove_perimeter();
+		RoomRegion& r1 = rooms[ind];
+		Region inner = r1.region.remove_perimeter();
 		if (inner.w < 2 || inner.h < 2) {
 			continue;
 		}

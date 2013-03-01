@@ -104,7 +104,7 @@ function thrown_effect.step(effect, obj)
 		local x = math.floor( obj.x + math.cos(effect.angle) * increment )
 		local y = math.floor( obj.y + math.sin(effect.angle) * increment )
 	
-		if level.object_place_free(obj, {x,y}) then 
+		if room.object_place_free(obj, {x,y}) then 
 			obj.x = x
 			obj.y = y
 		end

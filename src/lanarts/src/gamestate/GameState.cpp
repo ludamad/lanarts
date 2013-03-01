@@ -44,7 +44,7 @@
 #include "util/game_replays.h"
 #include <lcommon/math_util.h>
 
-#include "GameLevelState.h"
+#include "GameRoomState.h"
 #include "GameState.h"
 
 static int generate_seed() {
