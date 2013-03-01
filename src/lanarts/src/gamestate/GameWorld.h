@@ -20,7 +20,7 @@
 #include "PlayerData.h"
 
 class GameState;
-class GameLevelState;
+class GameRoomState;
 class GeneratedLevel;
 class PlayerInst;
 
@@ -28,8 +28,8 @@ class GameWorld {
 public:
 	GameWorld(GameState* gs);
 	~GameWorld();
-	void generate_room(GameLevelState* level);
-	GameLevelState* get_level(int roomid, bool spawnplayer = false,
+	void generate_room(GameRoomState* level);
+	GameRoomState* get_level(int roomid, bool spawnplayer = false,
 			void** player_instances = NULL, size_t nplayers = 0);
 	bool pre_step();
 	bool step();
@@ -39,10 +39,10 @@ public:
 	void reset(int keep = 0);
 	void regen_level(int roomid);
 	void place_inst(GeneratedLevel& genlevel, GameInst* inst);
-	GameLevelState* get_current_level() {
+	GameRoomState* get_current_level() {
 		return lvl;
 	}
-	void set_current_level(GameLevelState* level) {
+	void set_current_level(GameRoomState* level) {
 		lvl = level;
 	}
 	PlayerData& player_data() {
@@ -71,9 +71,9 @@ private:
 	PlayerData _player_data;
 	TeamRelations _teams;
 
-	GameLevelState* lvl;
+	GameRoomState* lvl;
 	GameState* gs;
-	std::vector<GameLevelState*> level_states;
+	std::vector<GameRoomState*> level_states;
 };
 
 #endif /* GAMEWORLD_H_ */

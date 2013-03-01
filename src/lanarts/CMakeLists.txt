@@ -11,7 +11,6 @@ include(FindFreetype)
 set( SRC ..)
 set( LIBS ../../libs)
 
-
 include_directories(
 	${SDL_INCLUDE_DIR} 
 	${SDLIMAGE_INCLUDE_DIR}
@@ -51,8 +50,8 @@ file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     src/interface/*
     src/interface/sidebar/*
  
-    src/levelgen/*
-    src/levelgen/loaddata/*
+    src/dungeon_generation/*
+    src/dungeon_generation/loaddata/*
  
     src/lua/*
     src/lua_api/*

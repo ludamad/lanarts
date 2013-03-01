@@ -563,7 +563,7 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 	event_log("Player id: %d using move for turn %d, vx=%f, vy=%f\n", id, gs->frame(), vx, vy);
 }
 
-static int scan_entrance(const std::vector<GameLevelPortal>& portals,
+static int scan_entrance(const std::vector<GameRoomPortal>& portals,
 		const Pos& tilepos) {
 	for (int i = 0; i < portals.size(); i++) {
 		if (portals[i].entrancesqr == tilepos) {
@@ -592,7 +592,7 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->get_level()->exits.size());
 	gs->ensure_level_connectivity(gs->get_level()->id() - 1,
 			gs->get_level()->id());
-	GameLevelPortal* portal = &gs->get_level()->exits[entr_n];
+	GameRoomPortal* portal = &gs->get_level()->exits[entr_n];
 
 	int px = centered_multiple(portal->exitsqr.x, TILE_SIZE);
 	int py = centered_multiple(portal->exitsqr.y, TILE_SIZE);
@@ -633,7 +633,7 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->get_level()->entrances.size());
 	gs->ensure_level_connectivity(gs->get_level()->id(),
 			gs->get_level()->id() + 1);
-	GameLevelPortal* portal = &gs->get_level()->entrances[entr_n];
+	GameRoomPortal* portal = &gs->get_level()->entrances[entr_n];
 
 	int px = centered_multiple(portal->exitsqr.x, TILE_SIZE);
 	int py = centered_multiple(portal->exitsqr.y, TILE_SIZE);

@@ -11,7 +11,7 @@
 
 #include "GameState.h"
 
-GameLevelState::GameLevelState(int levelid, const Size& size,
+GameRoomState::GameRoomState(int levelid, const Size& size,
 		bool wandering_flag, bool is_simulation) :
 		_levelid(levelid),
 		_steps_left(0),
@@ -23,10 +23,10 @@ GameLevelState::GameLevelState(int levelid, const Size& size,
 		_wander_map() {
 }
 
-GameLevelState::~GameLevelState() {
+GameRoomState::~GameRoomState() {
 }
 
-void GameLevelState::copy_to(GameLevelState & level) const {
+void GameRoomState::copy_to(GameRoomState & level) const {
 	level.entrances = this->entrances; //Copy exits&entrances just in case
 	level.exits = this->exits; //However we will typically copy_to just to synch
 //	this->inst_set.copy_to(level.inst_set);
@@ -38,7 +38,7 @@ void GameLevelState::copy_to(GameLevelState & level) const {
 //	level.steps_left = this->steps_left;
 }
 
-int GameLevelState::room_within(const Pos& p) {
+int GameRoomState::room_within(const Pos& p) {
 	for (int i = 0; i < rooms.size(); i++) {
 		int px = p.x / TILE_SIZE, py = p.y / TILE_SIZE;
 		const Region & r = rooms[i].room_region;
@@ -52,8 +52,8 @@ int GameLevelState::room_within(const Pos& p) {
 	return -1;
 }
 
-GameLevelState* GameLevelState::clone() const {
-	GameLevelState* state = new GameLevelState(_levelid, _size, _is_simulation);
+GameRoomState* GameRoomState::clone() const {
+	GameRoomState* state = new GameRoomState(_levelid, _size, _is_simulation);
 	copy_to(*state);
 	return state;
 }
@@ -65,7 +65,7 @@ static void update_player_fields_of_view(GameState* gs) {
 	}
 }
 
-void GameLevelState::serialize(GameState* gs, SerializeBuffer& serializer) {
+void GameRoomState::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write_container(exits);
 	serializer.write_container(entrances);
 	serializer.write_container(rooms);
@@ -79,7 +79,7 @@ void GameLevelState::serialize(GameState* gs, SerializeBuffer& serializer) {
 	monster_controller().serialize(serializer);
 }
 
-void GameLevelState::deserialize(GameState* gs, SerializeBuffer& serializer) {
+void GameRoomState::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read_container(exits);
 	serializer.read_container(entrances);
 	serializer.read_container(rooms);
@@ -95,7 +95,7 @@ void GameLevelState::deserialize(GameState* gs, SerializeBuffer& serializer) {
 
 }
 
-void GameLevelState::step(GameState* gs) {
+void GameRoomState::step(GameState* gs) {
 	const int STEPS_TO_SIMULATE = 1000;
 
 	bool has_player_in_level = gs->player_data().level_has_player(id());
@@ -108,7 +108,7 @@ void GameLevelState::step(GameState* gs) {
 	}
 	perf_timer_begin(FUNCNAME);
 
-	GameLevelState* previous_level = gs->get_level();
+	GameRoomState* previous_level = gs->get_level();
 	gs->set_level(this);
 
 	update_player_fields_of_view(gs);

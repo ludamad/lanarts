@@ -14,7 +14,7 @@
 
 #include "gamestate/GameSettings.h"
 #include "gamestate/tileset_data.h"
-#include "levelgen/dungeon_data.h"
+#include "dungeon_generation/dungeon_data.h"
 #include "objects/enemy/EnemyEntry.h"
 
 #include "stats/items/EquipmentEntry.h"

@@ -11,7 +11,7 @@
 
 #include "stats/items/ItemEntry.h"
 
-#include "levelgen/enemygen.h"
+#include "dungeon_generation/enemygen.h"
 
 #include "objects/player/PlayerInst.h"
 

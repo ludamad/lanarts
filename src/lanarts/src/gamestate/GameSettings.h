@@ -51,6 +51,8 @@ struct GameSettings {
 
 	GameSettings() {
 		//sets defaults
+		username = "User";
+
 		fullscreen = false;
 		regen_on_death = true;
 

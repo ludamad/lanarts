@@ -93,7 +93,7 @@ static Pos seen_square_in_area(MTwist& mt, GameTiles& tiles) {
 static void spawn_in_lower_level(GameState* gs, PlayerInst* player) {
 	int levelid1 = gs->game_world().get_current_level_id();
 	int levelid2 = (levelid1 > 0) ? levelid1 - 1 : 0;
-	GameLevelState* level2 = gs->game_world().get_level(levelid2);
+	GameRoomState* level2 = gs->game_world().get_level(levelid2);
 	Pos sqr = seen_square_in_area(gs->rng(), level2->tiles());
 
 	for (int i = 0; i < gs->player_data().all_players().size(); i++) {

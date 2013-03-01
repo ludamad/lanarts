@@ -26,8 +26,8 @@ enemy_files:
   - enemies/misc/misc.yaml
   - enemies/undead/undead.yaml
   
-level_template_files:
-  - levels/templates/templates.yaml
+room_template_files:
+  - rooms/templates/templates.yaml
 
 item_files: 
   - items/misc/misc.yaml
@@ -36,8 +36,8 @@ item_files:
 itemgenlist_files:
   - items/itemgenlists.yaml
   
-level_files: 
-  - levels/levels.yaml
+room_files: 
+  - rooms/rooms.yaml
 
 projectile_files: 
   - items/projectiles.yaml

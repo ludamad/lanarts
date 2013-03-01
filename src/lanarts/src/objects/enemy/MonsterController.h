@@ -34,7 +34,7 @@ namespace RVO {
 struct RVOSimulator;
 }
 
-class GameLevelState;
+class GameRoomState;
 class PlayerInst;
 
 class MonsterController {
@@ -59,7 +59,7 @@ public:
 	//Copy everything but RVO::Simulator
 	void partial_copy_to(MonsterController& mc) const;
 	//Fill out RVO::Simulator
-	void finish_copy(GameLevelState* level);
+	void finish_copy(GameRoomState* level);
 
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);

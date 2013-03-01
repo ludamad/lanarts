@@ -58,7 +58,7 @@ static void write_or_assert_hash(SerializeBuffer& sb, unsigned int hash,
 	}
 }
 
-static void process_level_hash(GameState* gs, GameLevelState* level,
+static void process_level_hash(GameState* gs, GameRoomState* level,
 		SerializeBuffer& sb, bool isw) {
 	if (level->id() == -1)
 		return;

@@ -80,7 +80,7 @@ static int world_local_player(lua_State* L) {
 
 // level functions
 
-static int level_regenerate(lua_State* L) {
+static int room_regenerate(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	int levelid = gs->get_level()->id();
 
@@ -92,21 +92,21 @@ static int level_regenerate(lua_State* L) {
 	return 0;
 }
 
-static int level_objects_list(lua_State* L) {
+static int room_objects_list(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	GameInstSet& insts = gs->get_level()->game_inst_set();
 	luawrap::push(L, insts.to_vector());
 	return 1;
 }
 
-static int level_objects(lua_State* L) {
+static int room_objects(lua_State* L) {
 	lua_pushcfunction(L, lua_api::l_itervalues);
-	level_objects_list(L);
+	room_objects_list(L);
 	lua_call(L, 1, 1);
 	return 1;
 }
 
-static int level_monsters_list(lua_State* L) {
+static int room_monsters_list(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	const std::vector<obj_id>& mons = gs->monster_controller().monster_ids();
 	lua_newtable(L);
@@ -117,27 +117,48 @@ static int level_monsters_list(lua_State* L) {
 	return 1;
 }
 
-static int level_monsters(lua_State* L) {
+static int room_monsters_seen(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	int narg = lua_gettop(L);
+	PlayerInst* p = narg >= 1 ? (PlayerInst*) lua_gameinst_arg(L, 1) : NULL;
+	const std::vector<obj_id>& monsters =
+			gs->monster_controller().monster_ids();
+	lua_newtable(L);
+	int tableidx = lua_gettop(L);
+
+	int valid = 1;
+	for (int i = 0; i < monsters.size(); i++) {
+		GameInst* e = gs->get_instance(monsters[i]);
+		if (e && gs->object_visible_test(e, p, false)) {
+			lua_push_gameinst(L, e);
+			lua_rawseti(L, tableidx, valid++);
+		}
+	}
+
+	return 1;
+}
+
+static int room_monsters(lua_State* L) {
 	lua_pushcfunction(L, lua_api::l_itervalues);
-	level_monsters_list(L);
+	room_monsters_list(L);
 	lua_call(L, 1, 1);
 	return 1;
 }
 
 // Look up a specific instance given an id
-static int level_instance(lua_State* L) {
+static int room_instance(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	luawrap::push(L, gs->get_instance(luaL_checkinteger(L, 1)));
 	return 1;
 }
 
 // TODO add test for specific player
-static bool level_object_visible(const LuaStackValue& obj) {
+static bool room_object_visible(const LuaStackValue& obj) {
 	GameState* gs = lua_api::gamestate(obj);
 	return gs->object_visible_test(obj.as<GameInst*>());
 }
 
-static int level_object_place_free(lua_State* L) {
+static int room_object_place_free(lua_State* L) {
 	int nargs = lua_gettop(L);
 	GameState* gs = lua_api::gamestate(L);
 	GameInst* inst = luawrap::get<GameInst*>(L, 1);
@@ -151,13 +172,13 @@ static int level_object_place_free(lua_State* L) {
 	return 1;
 }
 
-static bool level_place_free(const LuaStackValue& pos) {
+static bool room_place_free(const LuaStackValue& pos) {
 	GameState* gs = lua_api::gamestate(pos);
 	Pos p = pos.as<Pos>();
 	return !gs->solid_test(NULL, p.x, p.y, 1);
 }
 
-static bool level_radius_place_free(const LuaStackValue& radius,
+static bool room_radius_place_free(const LuaStackValue& radius,
 		const LuaStackValue& pos) {
 	GameState* gs = lua_api::gamestate(radius);
 	Pos p = pos.as<Pos>();
@@ -168,7 +189,9 @@ bool temporary_isgameinst(lua_State* L, int idx) {
 	return lua_isuserdata(L, idx);
 }
 
-//TODO Figure out how other levels should be queried
+// TODO Figure out how other rooms should be queried
+// Probably by world.rooms[roomid].instance() etc
+// They can hold closures.
 
 namespace lua_api {
 	static void register_gameworld_getters(lua_State* L,
@@ -195,23 +218,23 @@ namespace lua_api {
 
 		register_gameworld_getters(L, globals["world"].ensure_table());
 
-		LuaValue level = globals["level"].ensure_table();
+		LuaValue room = globals["room"].ensure_table();
 
 		// Debug/special-case-only functions:
-		level["regenerate"].bind_function(level_regenerate);
+		room["regenerate"].bind_function(room_regenerate);
 
 		// Query functions:
-		level["objects_list"].bind_function(level_objects_list);
-		level["objects"].bind_function(level_objects);
+		room["objects_list"].bind_function(room_objects_list);
+		room["objects"].bind_function(room_objects);
 
-		level["instance"].bind_function(level_instance);
+		room["instance"].bind_function(room_instance);
 
-		level["monsters_list"].bind_function(level_monsters_list);
-		level["monsters"].bind_function(level_monsters);
+		room["monsters_list"].bind_function(room_monsters_list);
+		room["monsters"].bind_function(room_monsters);
 
-		level["object_visible"].bind_function(level_object_visible);
-		level["object_place_free"].bind_function(level_object_place_free);
-		level["place_free"].bind_function(level_place_free);
-		level["radius_place_free"].bind_function(level_radius_place_free);
+		room["object_visible"].bind_function(room_object_visible);
+		room["object_place_free"].bind_function(room_object_place_free);
+		room["place_free"].bind_function(room_place_free);
+		room["radius_place_free"].bind_function(room_radius_place_free);
 	}
 }

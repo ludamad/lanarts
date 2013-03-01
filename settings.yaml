@@ -6,23 +6,12 @@ fullscreen: no
 view_width: 1200
 view_height: 800
 
-#Gameplay preferences
-autouse_health_potions: yes # can toggle in game as well
-autouse_mana_potions: yes # can toggle in game as well
-
 #Font settings
 font: res/fonts/Gudea-Regular.ttf
 menu_font: res/fonts/Gudea-Regular.ttf
 
-#Network settings
-ip: localhost
-port: 6112
-
 #Performance settings
 steps_per_draw: 1 #More is almost guaranteed to make the game faster, 1 is ideal
-time_per_step: 14
-frame_action_repeat: 3 #Default = 0. Ignored in single player, improves multiplayer latency in exchange for controlability
-free_memory_while_idle: no # Gameplay is smoother, but CPU usage is increased. Keep off mainly if trying to stretch battery life of laptop.
 
 #Debug settings
 network_debug_mode: no
@@ -30,4 +19,3 @@ invincible: no #Feel like exploring ? -> yes
 draw_diagnostics: no
 verbose_output: no
 keep_event_log: no
-#comparison_event_log: logs/game_event_log #Uncomment for verbose logs

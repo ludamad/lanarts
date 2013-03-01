@@ -46,6 +46,9 @@ sprites:
   - name: iron boots
     file: res/items/armour/sprites/boots_iron.png
 
+  - name: troll boots
+    file: res/items/armour/sprites/boots4_green.png
+
 #Gloves
   - name: leather gloves
     file: res/items/armour/sprites/leather_gloves.png

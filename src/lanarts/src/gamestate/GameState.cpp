@@ -24,7 +24,7 @@
 #include "draw/draw_sprite.h"
 #include "draw/TileEntry.h"
 
-#include "levelgen/dungeon_data.h"
+#include "dungeon_generation/dungeon_data.h"
 
 #include "lua_api/lua_api.h"
 #include "lua_api/lua_newapi.h"
@@ -161,7 +161,7 @@ bool GameState::start_game() {
 	return true;
 }
 
-void GameState::set_level(GameLevelState* lvl) {
+void GameState::set_level(GameRoomState* lvl) {
 	world.set_current_level(lvl);
 	if (lvl != NULL) {
 		_view.world_width = lvl->width();
@@ -259,7 +259,7 @@ int GameState::handle_event(SDL_Event* event) {
 		return false;
 	}
 
-	GameLevelState* level = get_level();
+	GameRoomState* level = get_level();
 
 	if (level && level->id() != -1) {
 		if (hud.handle_event(this, event)) {

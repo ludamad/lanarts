@@ -15,3 +15,13 @@ equipment:
     equipment_type: boots
     resistance: { base: 2 }
     reduction: { base: 1 }
+
+  - name: Troll Boots
+    description: Heavy boots suitable for war.
+    shop_cost: [35, 45]
+    spr_item: troll boots
+    equipment_type: boots
+    stat_bonuses: 
+      movespeed: -2.0
+    resistance: { base: 2 }
+    reduction: { base: 1 }

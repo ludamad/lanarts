@@ -41,8 +41,6 @@ function engine.resources_load(...)
 
     dofile "res/spells/spell_effects.lua"
     dofile "res/spells/spells.lua"
-
-    dofile "res/levels/levels.lua"
 end
 
 function engine.game_start(...)

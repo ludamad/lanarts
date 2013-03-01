@@ -76,7 +76,7 @@ static int lua_member_lookup(lua_State* L) {
 	else IFLUA_NUM_MEMB_LOOKUP("willpower", stats->core.willpower)
 	else IFLUA_NUM_MEMB_LOOKUP("speed", stats->movespeed)
 	else IFLUA_NUM_MEMB_LOOKUP("xp", stats->class_stats.xp)
-	else IFLUA_NUM_MEMB_LOOKUP("xpneeded", stats->class_stats.xpneeded)
+	else IFLUA_NUM_MEMB_LOOKUP("xp_needed", stats->class_stats.xpneeded)
 	else IFLUA_NUM_MEMB_LOOKUP("level", stats->class_stats.xplevel)
 	else IFLUA_NUM_MEMB_LOOKUP("attack_cooldown", stats->cooldowns.action_cooldown)
 	else IFLUA_STR_MEMB_LOOKUP("weapon_type", stats->equipment.weapon().weapon_entry().weapon_class)

@@ -55,7 +55,7 @@ static int monsters_in_level(lua_State* L) {
 static int monsters_seen(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	int narg = lua_gettop(L);
-	PlayerInst* p = narg >= 1 ? (PlayerInst*)lua_gameinst_arg(L, 1) : NULL;
+	PlayerInst* p = narg >= 1 ? (PlayerInst*) lua_gameinst_arg(L, 1) : NULL;
 	const std::vector<obj_id>& monsters =
 			gs->monster_controller().monster_ids();
 	lua_newtable(L);
@@ -82,7 +82,7 @@ static int reveal_map(lua_State* L) {
 static int obj_to_exit(lua_State* L) {
 
 	GameState* gs = lua_api::gamestate(L);
-	GameLevelState* level = gs->get_level();
+	GameRoomState* level = gs->get_level();
 	GameInst* user = lua_gameinst_arg(L, 1);
 	MTwist& mt = gs->rng();
 	int nexits = level->exits.size();
@@ -98,7 +98,9 @@ static int obj_to_exit(lua_State* L) {
 	gs->game_chat().add_message("You are yanked to the exit!", COL_PALE_GREEN);
 
 	PlayerInst* player = dynamic_cast<PlayerInst*>(user);
-	gs->view().sharp_center_on(player->pos());
+	if (player && player->is_local_player()) {
+		gs->view().sharp_center_on(user->pos());
+	}
 
 	return 0;
 }
