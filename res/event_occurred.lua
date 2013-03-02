@@ -1,6 +1,9 @@
+require "sounds"
+
 local events = {}
 
-function events.PlayerDeath()
+function events.PlayerDeath(player)
+    
     game.score_board_store()
 end
 
