@@ -191,7 +191,10 @@ static int lua_member_lookup(lua_State* L) {
 	else if (strcmp(cstr, "spells") == 0) {
 		PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
 		luawrap::push(L, p->stats().spells.spell_id_list());
-	} else if (strcmp(cstr, "kills") == 0) {
+	} else if (strcmp(cstr, "class_name") == 0) {
+		PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
+		luawrap::push(L, p->class_stats().class_entry().name);
+	}else if (strcmp(cstr, "kills") == 0) {
 		PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
 		lua_pushnumber(L, p ? p->score_stats().kills : 0);
 	} else if (strcmp(cstr, "deepest_floor") == 0) {

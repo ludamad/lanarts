@@ -61,7 +61,13 @@ bool gl_set_vsync(bool state) {
 
 #else // not windows
 
-#ifdef __linux__
+#ifdef __arm__
+// Fallback, just fail!
+bool gl_set_vsync(bool state) {
+	return false;
+}
+
+#elif __linux__
 
 #include <GL/glx.h>
 
