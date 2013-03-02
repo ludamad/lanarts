@@ -104,7 +104,7 @@ SUITE(adv_net_unit_tests) {
 		CHECK(action1.origin == action2.origin);
 		CHECK(action1.act == action2.act);
 		CHECK(action1.frame == action2.frame);
-		CHECK(action1.level == action2.level);
+		CHECK(action1.room == action2.room);
 	}
 
 	static void send_action(GameAction& action, int frame, int player,

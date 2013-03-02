@@ -55,10 +55,10 @@ bool generate_room(MTwist& mt, GeneratedRoom& level, int rw, int rh,
 	return false;
 }
 
-void generate_rooms(lua_State* L, const RoomGenSettings& rs, MTwist& mt,
+void generate_rooms(lua_State* L, const RegionGenSettings& rs, MTwist& mt,
 		GeneratedRoom& level) {
-	int pad = rs.room_padding;
-	int nrooms = mt.rand(rs.amount_of_rooms);
+	int pad = rs.region_padding;
+	int nrooms = mt.rand(rs.amount_of_regions);
 	Range sizerange(rs.size.min + pad * 2, rs.size.max + pad * 2);
 
 	int failures = 0;
@@ -69,7 +69,7 @@ void generate_rooms(lua_State* L, const RoomGenSettings& rs, MTwist& mt,
 
 			int rw = mt.rand(sizerange), rh = mt.rand(sizerange);
 
-			if (generate_room(mt, level, rw, rh, rs.room_padding, mark, 20)) {
+			if (generate_room(mt, level, rw, rh, rs.region_padding, mark, 20)) {
 				break;
 			}
 //			if (generate_room_lua(L, level, rw, rh, rs.room_padding, 20)) {
@@ -98,7 +98,7 @@ void generate_rooms(lua_State* L, const RoomGenSettings& rs, MTwist& mt,
 }
 
 static const LayoutGenSettings& choose_random_layout(MTwist& mt,
-		const LevelGenSettings& ls) {
+		const RoomGenSettings& ls) {
 	int layout_index = mt.rand(ls.layouts.size());
 	return ls.layouts[layout_index];
 }
@@ -113,11 +113,11 @@ GameRoomState* generate_level(int roomid, MTwist& mt, GeneratedRoom& level,
 		GameState* gs) {
 	DungeonBranch& branch = game_dungeon_data[DNGN_MAIN_BRANCH];
 
-	const LevelGenSettings& ls = branch.level_data[roomid];
+	const RoomGenSettings& ls = branch.level_data[roomid];
 	const ContentGenSettings& content = ls.content;
 	const LayoutGenSettings& layout = choose_random_layout(mt, ls);
 
-	const std::vector<RoomGenSettings>& roomsettings = layout.rooms;
+	const std::vector<RegionGenSettings>& roomsettings = layout.rooms;
 
 	int w = mt.rand(layout.width), h = mt.rand(layout.height);
 	bool wandering = content.enemies.wandering;

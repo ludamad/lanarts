@@ -26,9 +26,9 @@ GameRoomState::GameRoomState(int levelid, const Size& size,
 GameRoomState::~GameRoomState() {
 }
 
-void GameRoomState::copy_to(GameRoomState & level) const {
-	level.entrances = this->entrances; //Copy exits&entrances just in case
-	level.exits = this->exits; //However we will typically copy_to just to synch
+void GameRoomState::copy_to(GameRoomState & room) const {
+	room.entrances = this->entrances; //Copy exits&entrances just in case
+	room.exits = this->exits; //However we will typically copy_to just to synch
 //	this->inst_set.copy_to(level.inst_set);
 //	level.is_simulation = this->is_simulation;
 //	tiles.copy_to(level.tiles);

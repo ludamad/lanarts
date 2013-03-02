@@ -28,10 +28,10 @@ ItemGenSettings parse_item_gen(const YAML::Node& n) {
 	}
 	return igs;
 }
-RoomGenSettings parse_room_gen(const YAML::Node& n) {
-	RoomGenSettings rgs;
-	rgs.amount_of_rooms = parse_range(n["amount"]);
-	rgs.room_padding = parse_defaulted(n, "padding", 1);
+RegionGenSettings parse_room_gen(const YAML::Node& n) {
+	RegionGenSettings rgs;
+	rgs.amount_of_regions = parse_range(n["amount"]);
+	rgs.region_padding = parse_defaulted(n, "padding", 1);
 	rgs.size = parse_range(n["size"]);
 	return rgs;
 }
@@ -120,8 +120,8 @@ LayoutGenSettings parse_layout_gen(const YAML::Node& n) {
 	return lgs;
 }
 
-LevelGenSettings parse_level_gen(lua_State* L, const YAML::Node& n) {
-	LevelGenSettings level;
+RoomGenSettings parse_level_gen(lua_State* L, const YAML::Node& n) {
+	RoomGenSettings level;
 	level.content = parse_content_gen(n["content"]);
 
 	const YAML::Node& layouts = n["layout"];
@@ -145,7 +145,7 @@ LevelGenSettings parse_level_gen(lua_State* L, const YAML::Node& n) {
 
 }
 void parse_dungeon_branch(lua_State* L, const YAML::Node& n,
-		std::vector<LevelGenSettings>& rooms) {
+		std::vector<RoomGenSettings>& rooms) {
 	const YAML::Node& lnodes = n["rooms"];
 	for (int i = 0; i < lnodes.size(); i++) {
 		//printf("Loading level\n");

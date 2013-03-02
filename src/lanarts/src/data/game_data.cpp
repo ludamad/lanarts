@@ -58,7 +58,7 @@ std::vector<TileEntry> game_tile_data;
 std::vector<TilesetEntry> game_tileset_data;
 std::vector<SpellEntry> game_spell_data;
 std::vector<SpriteEntry> game_sprite_data;
-std::vector<LevelGenSettings> game_dungeon_yaml;
+std::vector<RoomGenSettings> game_dungeon_yaml;
 
 DungeonBranch game_dungeon_data[1] = { };
 

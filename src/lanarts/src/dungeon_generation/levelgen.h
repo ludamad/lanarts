@@ -25,7 +25,7 @@ bool generate_room_at(MTwist& mt, GeneratedRoom& level, const Region& r,
 bool generate_room(MTwist& mt, GeneratedRoom& level, int rw, int rh,
 		int padding, int mark, int max_attempts);
 
-void generate_rooms(lua_State* L, const RoomGenSettings& rs, MTwist& mt,
+void generate_rooms(lua_State* L, const RegionGenSettings& rs, MTwist& mt,
 		GeneratedRoom& level);
 GameRoomState* generate_level(int roomid, MTwist& mt, GeneratedRoom& level,
 		GameState* gs);

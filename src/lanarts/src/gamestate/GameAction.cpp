@@ -12,7 +12,7 @@
 
 GameAction::GameAction(obj_id origin, action_t act, int frame, int level,
 		int use_id, int action_x, int action_y, int use_id2) :
-		origin(origin), act(act), frame(frame), level(level), use_id(use_id), use_id2(
+		origin(origin), act(act), frame(frame), room(level), use_id(use_id), use_id2(
 				use_id2), action_x(action_x), action_y(action_y) {
 
 }

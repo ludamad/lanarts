@@ -32,12 +32,12 @@ struct TunnelGenSettings {
 	}
 };
 
-struct RoomGenSettings {
-	int room_padding;
-	Range amount_of_rooms;
+struct RegionGenSettings {
+	int region_padding;
+	Range amount_of_regions;
 	Range size;
-	RoomGenSettings() :
-			room_padding(1), amount_of_rooms(0, 0), size(0, 0) {
+	RegionGenSettings() :
+			region_padding(1), amount_of_regions(0, 0), size(0, 0) {
 
 	}
 };
@@ -45,7 +45,7 @@ struct RoomGenSettings {
 struct LayoutGenSettings {
 	Range width, height;
 	TunnelGenSettings tunnels;
-	std::vector<RoomGenSettings> rooms;
+	std::vector<RegionGenSettings> rooms;
 	bool solid_fill;
 	LayoutGenSettings() :
 			solid_fill(true) {
@@ -84,7 +84,7 @@ struct ContentGenSettings {
 };
 
 
-struct LevelGenSettings {
+struct RoomGenSettings {
 	std::vector<areatemplate_id> area_templates;
 	std::vector<LayoutGenSettings> layouts;
 	ContentGenSettings content;
@@ -92,18 +92,18 @@ struct LevelGenSettings {
 };
 
 struct DungeonBranch {
-	LevelGenSettings* level_data;
+	RoomGenSettings* level_data;
 	int nlevels;
 	DungeonBranch() {
 		level_data = NULL;
 	}
-	DungeonBranch(LevelGenSettings* level_data, int nlevels) :
+	DungeonBranch(RoomGenSettings* level_data, int nlevels) :
 			level_data(level_data), nlevels(nlevels) {
 	}
 };
 
 extern DungeonBranch game_dungeon_data[];
-extern std::vector<LevelGenSettings> game_dungeon_yaml;
+extern std::vector<RoomGenSettings> game_dungeon_yaml;
 extern size_t game_dungeon_n;
 
 #endif /* DUNGEON_DATA_H_ */
