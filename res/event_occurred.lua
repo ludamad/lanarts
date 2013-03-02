@@ -1,9 +1,10 @@
-require "sounds"
+require "sound"
 
 local events = {}
 
 function events.PlayerDeath(player)
-    
+    local classtable = {Mage=sounds.death_mage, Fighter=sounds.death_fighter, Archer=sounds.death_archer}
+    classtable[player.class_name]:play()
     game.score_board_store()
 end
 
