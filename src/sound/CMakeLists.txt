@@ -22,6 +22,7 @@ aux_source_directory("src/lua" lua_lsound_src) #Find source files
 aux_source_directory("include/lsound" lsound_inc) #Find source files
 
 add_library( lsound
+             STATIC
              ${lsound_src} 
              ${lua_lsound_src}
              ${lsound_inc} )

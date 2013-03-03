@@ -38,6 +38,7 @@ file(GLOB ldraw_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_library( ldraw
+		STATIC
              ${ldraw_src} )
 
 set(LINKEDLIBS

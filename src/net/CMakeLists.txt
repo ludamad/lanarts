@@ -29,6 +29,7 @@ set( lanarts_net_include
 )
 
 add_library( lanarts_net
+             STATIC
              ${lanarts_net_src})
 
 

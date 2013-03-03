@@ -57,5 +57,5 @@ set( lua_src
 	print.c
 )
 
-add_library( lua
+add_library( lua STATIC
              ${lua_src} )

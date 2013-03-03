@@ -88,6 +88,7 @@ file(GLOB lanarts_examples RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 
 add_library( lanartslib
+		STATIC
              ${lanarts_src}
             )
 
