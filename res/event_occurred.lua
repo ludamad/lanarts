@@ -9,6 +9,18 @@ function events.PlayerDeath(player)
 end
 
 function events.MonsterDeath(monster)
+    local monstersounds = { ["Giant Rat"]=sounds.death_rat ,
+                            ["Giant Bat"]=sounds.death_bat ,
+                            ["Giant Spider"]=sounds.death_spider ,
+                            ["Hound"]=sounds.death_hound ,
+                            ["Sheep"]=sounds.death_sheep ,
+                            ["Giant Frog"]=sounds.death_frog ,
+                            ["Green Slime"]=sounds.death_slime ,
+                            ["Red Slime"]=sounds.death_slime                           
+                        }
+    if monstersounds[monster.name] ~= nil then
+        monstersounds[monster.name]:play()
+    end
     if monster.name == "Zin" then
         engine.game_won()
     end
