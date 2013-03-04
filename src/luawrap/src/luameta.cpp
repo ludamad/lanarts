@@ -36,7 +36,8 @@ static int luameta_get_member(lua_State* L) {
 	}
 
 	// Fallback to default getter (if one exists)
-	const int fallback_upvalue = lua_upvalueindex(LUAMETA_GETTER_FALLBACK_UPVALUE);
+	const int fallback_upvalue =
+			lua_upvalueindex(LUAMETA_GETTER_FALLBACK_UPVALUE);
 	if (!lua_isnil(L, fallback_upvalue)) {
 
 		// If it is table, set directly, otherwise call as function (below)
@@ -57,7 +58,8 @@ static int luameta_get_member(lua_State* L) {
 
 	LuaStackValue tbl(L, lua_upvalueindex(1));
 	tbl["__typename"].push();
-	return luaL_error(L, "Type '%s': Cannot read '%s', member does not exist!\n",
+	return luaL_error(L,
+			"Type '%s': Cannot read '%s', member does not exist!\n",
 			lua_tostring(L, -1), lua_tostring(L, 2));
 
 }
@@ -169,12 +171,12 @@ LuaValue luameta_constants(const LuaValue& metatable) {
  * Pushes cached metatable if exists, or initializes cache and then pushes.
  */
 void luameta_push(lua_State* L, luameta_initializer initfunc) {
-	lua_pushlightuserdata(L, (void*)initfunc);
+	lua_pushlightuserdata(L, (void*) initfunc);
 	lua_gettable(L, LUA_REGISTRYINDEX);
 	if (lua_isnil(L, -1)) {
 		lua_pop(L, 1);
 		LuaValue metatable = initfunc(L);
-		lua_pushlightuserdata(L, (void*)initfunc);
+		lua_pushlightuserdata(L, (void*) initfunc);
 		metatable.push();
 		lua_settable(L, LUA_REGISTRYINDEX);
 
@@ -225,4 +227,22 @@ void luameta_defaultgetter(const LuaValue& metatable, const LuaValue& getter) {
  */
 void luameta_gc(const LuaValue& metatable, lua_CFunction func) {
 	metatable["__gc"].bind_function(func);
+}
+
+LuaModule::LuaModule(lua_State* L, const char* module_name) :
+				proxy(L) {
+	metatable = luameta_new(L, module_name);
+
+	// Create proxy table
+	lua_newtable(L);
+	metatable.push();
+	lua_setmetatable(L, -2);
+	proxy.pop();
+
+	values = luameta_constants(metatable);
+	setters = luameta_setters(metatable);
+	getters = luameta_getters(metatable);
+}
+
+LuaModule::LuaModule() {
 }

@@ -50,6 +50,21 @@ namespace lua_api {
 		return luameta_getters(globalsmeta);
 	}
 
+	LuaModule global_module(lua_State* L) {
+		LuaModule module;
+		luawrap::globals(L).push();
+		lua_getmetatable(L, -1);
+		module.metatable = LuaValue::pop_value(L);
+
+		module.proxy = luawrap::globals(L);
+		module.setters = luameta_setters(module.metatable);
+		module.getters = luameta_getters(module.metatable);
+		module.values = luameta_constants(module.metatable);
+
+		return module;
+	}
+
+
 	LuaValue global_setters(lua_State* L) {
 		luawrap::globals(L).push();
 		lua_getmetatable(L, -1);
@@ -78,6 +93,19 @@ namespace lua_api {
 		package["path"] = "./?.lua";
 	}
 
+	static int wrapped_with_globals_mutable(lua_State* L) {
+		bool was_mutable = globals_get_mutability(L);
+		globals_set_mutability(L, true);
+
+		int nargs = lua_gettop(L);
+		lua_pushvalue(L, lua_upvalueindex(1));
+		lua_insert(L, 1);
+		lua_call(L, nargs, LUA_MULTRET);
+
+		globals_set_mutability(L, was_mutable);
+		return lua_gettop(L);
+	}
+
 	/* Creates a lua state with a custom global metatable.
 	 * All further registration assumes the lua state was created with this function. */
 	lua_State* create_luastate() {
@@ -94,6 +122,9 @@ namespace lua_api {
 		luaL_openlibs(L);
 
 		configure_lua_packages(L);
+
+		luawrap::globals(L)["require"].push();
+		lua_pushcclosure(L, wrapped_with_globals_mutable, 1);
 
 		luameta_defaultsetter(globalsmeta, contents);
 		luameta_defaultgetter(globalsmeta, contents);

@@ -30,7 +30,7 @@ function engine.resources_load(...)
     function is_armour(item)         return item.type == "armour" end
     function is_projectile(item)     return item.type == "projectile" end
 
-    dofile "res/sound.lua"
+    require "sound"
 
     dofile "res/enemies/enemies.lua"
 

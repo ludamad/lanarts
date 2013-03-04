@@ -232,10 +232,6 @@ CollisionAvoidance & GameState::collision_avoidance() {
 	return get_level()->collision_avoidance();
 }
 
-bool GameState::in_menu_screen() {
-	return get_level()->id() == -1;
-}
-
 const ldraw::Font& GameState::font() {
 	return res::font_primary();
 }
@@ -323,25 +319,19 @@ void GameState::adjust_view_to_dragging() {
 	/*Adjust the view if the player is far from view center,
 	 *if we are following the cursor, or if the minimap is clicked */
 	bool is_dragged = false;
-	if (key_down_state(SDLK_x) && !in_menu_screen()) {
-		int nx = mouse_x() + _view.x, ny = mouse_y() + _view.y;
-		for (int i = 0; i < 2; i++)
-			_view.center_on(nx, ny);
-		is_dragged = true;
-	} else {
-		if (mouse_right_down()) {
-			BBox minimap_bbox = hud.minimap_bbox(this);
-			int mx = mouse_x() - minimap_bbox.x1, my = mouse_y()
-					- minimap_bbox.y1;
-			int mw = minimap_bbox.width(), mh = minimap_bbox.height();
 
-			bool outofx = (mx < 0 || mx >= mw);
-			bool outofy = (my < 0 || my >= mh);
+	if (mouse_right_down()) {
+		BBox minimap_bbox = hud.minimap_bbox(this);
+		int mx = mouse_x() - minimap_bbox.x1, my = mouse_y()
+				- minimap_bbox.y1;
+		int mw = minimap_bbox.width(), mh = minimap_bbox.height();
 
-			if (dragging_view || (!outofx && !outofy)) {
-				_view.sharp_center_on(mx * width() / mw, my * height() / mh);
-				is_dragged = true;
-			}
+		bool outofx = (mx < 0 || mx >= mw);
+		bool outofy = (my < 0 || my >= mh);
+
+		if (dragging_view || (!outofx && !outofy)) {
+			_view.sharp_center_on(mx * width() / mw, my * height() / mh);
+			is_dragged = true;
 		}
 	}
 

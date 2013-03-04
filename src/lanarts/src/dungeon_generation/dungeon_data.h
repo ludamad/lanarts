@@ -32,6 +32,7 @@ struct TunnelGenSettings {
 	}
 };
 
+// A room region is a section of a room, often connected by tunnels & doors
 struct RegionGenSettings {
 	int region_padding;
 	Range amount_of_regions;

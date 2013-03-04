@@ -3,6 +3,8 @@
  *  Bindings for the lsound component
  */
 
+#include <SDL/SDL_mixer.h>
+
 #include <luawrap/luameta.h>
 #include <luawrap/types.h>
 #include <luawrap/functions.h>
@@ -36,9 +38,19 @@ LuaValue lua_soundmetatable(lua_State* L) {
 	return meta;
 }
 
-void lua_register_lsound(lua_State* L) {
+static void set_volume(LuaStackValue table, LuaStackValue key, double volume) {
+	Mix_Volume(-1, volume / double(MIX_MAX_VOLUME));
+}
+
+static double get_volume(LuaStackValue table, LuaStackValue key) {
+	return Mix_Volume(-1, -1) / double(MIX_MAX_VOLUME);
+}
+
+void lua_register_lsound(lua_State* L, const LuaModule& module) {
 	luawrap::install_userdata_type<Sound, lua_soundmetatable>();
-	LuaSpecialValue globals = luawrap::globals(L);
-	globals["music_load"].bind_function(load_music);
-	globals["sound_load"].bind_function(load_sound);
+
+	module.values["music_load"].bind_function(load_music);
+	module.values["sound_load"].bind_function(load_sound);
+	module.setters["sound_volume"].bind_function(set_volume);
+	module.getters["sound_volume"].bind_function(get_volume);
 }

@@ -14,6 +14,7 @@ class EnemyInst;
 struct lua_State;
 class LuaStackValue;
 class LuaValue;
+struct LuaModule;
 union SDL_Event;
 
 namespace lua_api {
@@ -24,6 +25,7 @@ namespace lua_api {
 	GameState* gamestate(const LuaStackValue& val);
 
 	LuaValue global_getters(lua_State* L);
+	LuaModule global_module(lua_State* L);
 	LuaValue global_setters(lua_State* L);
 	void globals_set_mutability(lua_State* L, bool mutability);
 	bool globals_get_mutability(lua_State* L);

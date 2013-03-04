@@ -77,4 +77,29 @@ inline void luameta_gc(const LuaValue& metatable) {
 	luameta_gc(metatable, __luameta_destroy<T>);
 }
 
+/* A LuaModule follows a metatable scheme where there is a proxy table that
+ * either points to getters&setters, or direct values. */
+struct LuaModule {
+	LuaValue proxy;
+
+	/* Does not need to be queried directly. */
+	LuaValue metatable;
+
+	/* Modify the following to add to the module. */
+	LuaValue values;
+	LuaValue getters;
+	LuaValue setters;
+
+	LuaModule(lua_State* L, const char* module_name);
+	LuaModule();
+
+	bool empty() const {
+		return proxy.empty();
+	}
+
+	operator LuaValue() const {
+		return proxy;
+	}
+};
+
 #endif /* LUAWRAP_LUAMETA_H_ */

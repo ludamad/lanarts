@@ -181,7 +181,7 @@ namespace lua_api {
 	void register_io_api(lua_State* L) {
 		luawrap::install_plaindata_type<SDL_Event>();
 
-		lua_register_lsound(L);
+		lua_register_lsound(L, lua_api::global_module(L));
 		register_input_table(L);
 
 		register_textfield(L);
