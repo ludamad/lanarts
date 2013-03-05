@@ -33,7 +33,7 @@ SUITE(luavalue_tests) {
 		{
 			Pos inpos(1, 2);
 			value["hello"] = inpos;
-			Pos outpos = value["hello"];
+			Pos outpos = value["hello"].as<Pos>();
 			CHECK(inpos == outpos);
 		}
 
@@ -106,13 +106,13 @@ SUITE(luavalue_tests) {
 		for (int i = 0; i < 10000; i++) {
 			Pos inpos(1, 2);
 			value["hello"] = inpos;
-			Pos outpos = value["hello"];
+			Pos outpos = value["hello"].as<Pos>();
 		}
 		perf_timer_end("lua_get_set_pos");
 
 		perf_timer_begin("lua_get_pos");
 		for (int i = 0; i < 10000; i++) {
-			Pos outpos = value["hello"];
+			Pos outpos = value["hello"].as<Pos>();
 		}
 		perf_timer_end("lua_get_pos");
 

@@ -20,6 +20,8 @@
 #include <luawrap/LuaStackValue.h>
 #include <luawrap/LuaValue.h>
 
+#include <luawrap/luawrap.h>
+
 using namespace _luawrap_private;
 
 namespace _luawrap_private {
@@ -63,6 +65,27 @@ namespace _luawrap_private {
 		bool nil = lua_isnil(value.luastate(), -1);
 		lua_pop(value.luastate(), 1);
 		return nil;
+	}
+
+	_LuaStackField::operator LuaValue() {
+		push();
+		return LuaValue::pop_value(value.luastate());
+	}
+
+	_LuaStackField::operator int() {
+		return as<int>();
+	}
+
+	_LuaStackField::operator double() {
+		return as<double>();
+	}
+
+	_LuaStackField::operator const char*() {
+		return as<const char*>();
+	}
+
+	_LuaStackField::operator std::string() {
+		return as<std::string>();
 	}
 
 	void _LuaStackField::bind_function(lua_CFunction func) {

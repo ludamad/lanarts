@@ -39,10 +39,13 @@ namespace _luawrap_private {
 		void pop() const;
 
 		template<typename T>
-		operator T();
-
-		template<typename T>
 		T as();
+
+		operator LuaValue();
+		operator int();
+		operator double();
+		operator const char*();
+		operator std::string();
 
 		// get if not nil
 		template<typename T>

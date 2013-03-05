@@ -55,7 +55,10 @@ namespace _luawrap_private {
 		T as();
 
 		operator LuaValue();
-		template<typename T> operator T();
+		operator int();
+		operator double();
+		operator const char*();
+		operator std::string();
 
 		// get if not nil
 		template<typename T>

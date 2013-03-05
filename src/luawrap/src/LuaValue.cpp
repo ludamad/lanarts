@@ -6,25 +6,11 @@
 
 #include <luawrap/LuaValue.h>
 #include <luawrap/luawraperror.h>
+#include <luawrap/luawrap.h>
 
 #include "luawrapassert.h"
 
 using namespace _luawrap_private;
-
-namespace luawrap {
-	namespace _private {
-		//Use RAII to pop the lua stack after return:
-		struct PopHack {
-			lua_State* L;
-			PopHack(lua_State* L) :
-					L(L) {
-			}
-			~PopHack() {
-				lua_pop(L, 1);
-			}
-		};
-	}
-}
 
 namespace _luawrap_private {
 
@@ -229,6 +215,22 @@ namespace _luawrap_private {
 		bool nil = lua_isnil(value.luastate(), -1);
 		lua_pop(value.luastate(), 1);
 		return nil;
+	}
+
+	_LuaField::operator int() {
+		return as<int>();
+	}
+
+	_LuaField::operator double() {
+		return as<double>();
+	}
+
+	_LuaField::operator const char*() {
+		return as<const char*>();
+	}
+
+	_LuaField::operator std::string() {
+		return as<std::string>();
 	}
 
 	void _LuaField::bind_function(lua_CFunction func) {
