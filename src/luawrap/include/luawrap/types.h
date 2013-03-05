@@ -7,6 +7,8 @@
 #ifndef LUAWRAP_TYPES_H_
 #define LUAWRAP_TYPES_H_
 
+#include <string>
+
 #include <typeinfo>
 #include <lua.hpp>
 
@@ -17,6 +19,13 @@
 #include <luawrap/luameta.h>
 
 struct lua_State;
+
+namespace luawrap {
+	namespace _private {
+		/* Attempt to make the output of typeinfo readable for nicer errors, if possible. */
+		std::string demangle_typename(const char* name);
+	}
+}
 
 namespace luawrap {
 	namespace _private {

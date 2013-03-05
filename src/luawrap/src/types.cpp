@@ -49,7 +49,7 @@ namespace luawrap {
 		bool check_is_luametatype(lua_State* L, int idx,
 				luameta_initializer meta) {
 			lua_getmetatable(L, idx);
-			lua_pushlightuserdata(L, (void*)meta);
+			lua_pushlightuserdata(L, (void*) meta);
 			lua_gettable(L, LUA_REGISTRYINDEX);
 			bool eq = lua_rawequal(L, -2, -1);
 			lua_pop(L, 2);
@@ -58,3 +58,25 @@ namespace luawrap {
 
 	}
 }
+
+#ifdef __GNUC__
+#include <cxxabi.h>
+
+/* Attempt to make the output of typeinfo readable for nicer errors, if possible. */
+std::string luawrap::_private::demangle_typename(const char* name) {
+	int status;
+	const char* demangled = abi::__cxa_demangle(name, 0, 0, &status);
+	if (status != 0) {
+		return name;
+	}
+	std::string newname(demangled);
+	return newname;
+}
+
+#else
+
+/* Attempt to make the output of typeinfo readable for nicer errors, if possible. */
+std::string luawrap::_private::demangle_typename(const char* name) {
+	return name;
+}
+#endif
