@@ -59,9 +59,12 @@ end
 
 local fps_timer = timer_create()
 local fps_count = 1
+local fps_lastframe = 0
 local fps = nil
 function game_overlay_draw()
-    fps_count = fps_count + 1
+    local frame_increase = math.max(0, game.frame - fps_lastframe)
+    fps_lastframe = game.frame
+    fps_count = fps_count + frame_increase
 
     if fps then
         local w,h = unpack( display.window_size ) 
@@ -102,10 +105,11 @@ function game_loop()
             show_message("Press Shift + Esc to exit, your progress will be saved.")
         end
 
-        if not game_loop_body(false) then
+	local steponly = (game.frame % settings.steps_per_draw ~= 0)
+        if not game_loop_body(steponly) then
             if single_player then
                 game.score_board_store()
-                game.save("savefile.save")
+                game.save("res/savefile.save")
             end
             break
         end

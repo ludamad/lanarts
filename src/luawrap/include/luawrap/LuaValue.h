@@ -54,8 +54,8 @@ namespace _luawrap_private {
 		template<typename T>
 		T as();
 
-		template<typename T> operator T();
 		operator LuaValue();
+		template<typename T> operator T();
 
 		// get if not nil
 		template<typename T>
@@ -96,6 +96,7 @@ public:
 	LuaValue(lua_State* L, const char* global);
 	LuaValue(lua_State* L, int pos);
 	LuaValue(const LuaStackValue& svalue);
+	LuaValue(const _luawrap_private::_LuaField& field);
 	LuaValue(lua_State* L);
 
 	LuaValue(const LuaValue& value);

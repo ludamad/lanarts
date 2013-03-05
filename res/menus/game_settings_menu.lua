@@ -360,7 +360,7 @@ local function center_setting_fields_create()
 
         fields:add_instance( connection_toggle_create() )
 
-        if current_setting == net.NONE then
+        if current_setting ~= net.CLIENT then
             fields:add_instance( respawn_toggle_create() )
         end
 
@@ -368,14 +368,15 @@ local function center_setting_fields_create()
             fields:add_instance( speed_toggle_create() )
         end
 
-        fields:add_instance( name_field_create() )
+        if current_setting == net.CLIENT then
+            fields:add_instance( host_IP_field_create() )
+        end
+
         if current_setting == net.SERVER then
            fields:add_instance( frame_action_repeat_toggle_create() )
         end
 
-        if current_setting == net.CLIENT then
-            fields:add_instance( host_IP_field_create() )
-        end
+        fields:add_instance( name_field_create() )
 
         if current_setting ~= net.NONE then
             fields:add_instance( connection_port_field_create() )

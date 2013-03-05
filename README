@@ -6,8 +6,7 @@ Inventory - 1 through 9 for item slots
 Mouse use - click to use last weapon/spell, note mouse use is currently unwieldy and not recommended
 Using stairs, picking up items - Simply stop on top of them
 
-F5 - Save / Force sync in online play
-F6 - Load
+To change the games resolution/toggle fullscrene and other settings, check out settings.yaml.
 
 DEVELOPMENT:
 

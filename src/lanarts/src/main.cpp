@@ -43,7 +43,7 @@ static GameState* init_gamestate() {
 		fatal_error("Fatal error: settings.yaml not found, the game is probably being loaded from the wrong place.\n");
 	}
 
-	load_settings_data(settings, "saved_settings.yaml"); // Override with remembered settings
+	load_settings_data(settings, "res/saved_settings.yaml"); // Override with remembered settings
 
 	if (SDL_Init(0) < 0) {
 		exit(0);
@@ -83,7 +83,7 @@ label_StartOver:
 
 	engine["menu_start"].push();
 	bool did_exit = !luawrap::call<bool>(L);
-	save_settings_data(gs->game_settings(), "saved_settings.yaml"); // Save settings from menu
+	save_settings_data(gs->game_settings(), "res/saved_settings.yaml"); // Save settings from menu
 	if (did_exit) goto label_Quit; /* User has quit! */
 
 	gs->start_connection();
@@ -103,13 +103,16 @@ label_StartOver:
 		luawrap::call<void>(L);
 
 		if (!gs->io_controller().user_has_exit()) {
+			if (gs->game_settings().conntype != GameSettings::CLIENT) {
+				save_settings_data(gs->game_settings(), "res/saved_settings.yaml"); // Save settings from in-game
+			}
 			delete gs;
 			goto label_StartOver;
 		}
 	}
 
 	if (gs->game_settings().conntype != GameSettings::CLIENT) {
-		save_settings_data(gs->game_settings(), "saved_settings.yaml"); // Save settings from in-game
+		save_settings_data(gs->game_settings(), "res/saved_settings.yaml"); // Save settings from in-game
 	}
 
 label_Quit:

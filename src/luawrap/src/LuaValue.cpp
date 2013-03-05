@@ -328,6 +328,12 @@ LuaValue LuaValue::operator [](int idx) const {
 	return ret;
 }
 
+LuaValue::LuaValue(const _luawrap_private::_LuaField& field) {
+	impl = new _LuaValueImpl(field.value.luastate());
+	field.push();
+	pop();
+}
+
 LuaValue LuaValue::pop_value(lua_State* L) {
 	luawrap::_private::PopHack delayedpop(L);
 	return LuaValue(L, -1);

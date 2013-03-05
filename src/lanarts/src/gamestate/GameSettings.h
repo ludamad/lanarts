@@ -60,7 +60,7 @@ struct GameSettings {
 		view_width = 960;
 		view_height = 720;
 		steps_per_draw = 1;
-		time_per_step = 12;
+		time_per_step = 14;
 		frame_action_repeat = 0;
 		free_memory_while_idle = false;
 
@@ -70,7 +70,8 @@ struct GameSettings {
 		invincible = false;
 		draw_diagnostics = false;
 
-		port = 0;
+		ip = "localhost";
+		port = 6112;
 		conntype = NONE;
 		network_debug_mode = false;
 		verbose_output = false;

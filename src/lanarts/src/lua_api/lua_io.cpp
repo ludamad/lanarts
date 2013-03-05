@@ -124,6 +124,18 @@ static int lua_newtextinput(lua_State* L) {
 	return 1;
 }
 
+static std::string textfield_get_text(const LuaStackValue& obj, const LuaStackValue& key) {
+	return obj.as<TextField>().text();
+}
+
+static void textfield_set_text(const LuaStackValue& obj, const LuaStackValue& key, const std::string& val) {
+	obj.as<TextField>().set_text(val);
+}
+
+static int textfield_get_max_length(const LuaStackValue& obj, const LuaStackValue& key) {
+	return obj.as<TextField>().max_length();
+}
+
 LuaValue lua_textfieldmetatable(lua_State* L) {
 	LuaValue meta = luameta_new(L, "TextInput");
 
@@ -131,13 +143,10 @@ LuaValue lua_textfieldmetatable(lua_State* L) {
 	LuaValue getters = luameta_getters(meta);
 	LuaValue setters = luameta_setters(meta);
 
-	getters["text"] = &luawrap::getter<TextField, const std::string&,
-			&TextField::text>;
-	getters["max_length"] = &luawrap::getter<TextField, int,
-			&TextField::max_length>;
-	setters["text"] = &luawrap::setter<TextField, const std::string&,
-			&TextField::set_text>;
 
+	getters["text"].bind_function(textfield_get_text);
+	setters["text"].bind_function(textfield_set_text);
+	getters["max_length"].bind_function(textfield_get_max_length);
 	methods["step"].bind_function(textfield_step);
 	methods["event_handle"].bind_function(textfield_handle_event);
 	methods["clear"].bind_function(textfield_clear);

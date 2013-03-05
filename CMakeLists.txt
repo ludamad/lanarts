@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 2.6)
 
 set(CMAKE_BUILD_TYPE DEBUG)
-# add_definitions(-DNDEBUG)
+add_definitions(-DNDEBUG)
 
 ## Compiler flags
 if(CMAKE_COMPILER_IS_GNUCXX)
-    add_definitions("-mfpmath=sse -msse2 -ffp-contract=on")
+    add_definitions("-mfpmath=sse -msse2 -ffp-contract=on -std=c++98")
 endif()
 
 option(MSVC_SHARED_RT "MSVC: Build with shared runtime libs (/MD)" ON)
