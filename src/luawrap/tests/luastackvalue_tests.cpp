@@ -1,8 +1,3 @@
-/*
- * luavalue_tests.cpp:
- *  Tests for LuaValue
- */
-
 #include <lua.hpp>
 
 #include <luawrap/luawrap.h>
@@ -28,8 +23,5 @@ SUITE (LuaStackValue) {
 		CHECK_EQUAL(1, abc);
 
 		L.finish_check();
-	}
-
-	TEST(luavalue_test_value_equality) {
 	}
 }

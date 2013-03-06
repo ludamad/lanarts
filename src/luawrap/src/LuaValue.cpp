@@ -298,7 +298,7 @@ namespace luawrap {
 			failmsg += "\n... an error occurred in lua's runtime:\n";
 			failmsg += lua_tostring(L, -1);
 
-			luawrap::error(failmsg.c_str());
+			luawrap::error(failmsg);
 		}
 
 		LUAWRAP_ASSERT(lua_gettop(L) - ntop == 1);

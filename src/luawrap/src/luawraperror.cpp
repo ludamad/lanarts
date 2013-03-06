@@ -27,9 +27,9 @@ namespace luawrap {
 		return 1;
 	}
 
-	std::string conversion_error_string(const std::string& type,
+	std::string value_error_string(const std::string& type,
 			const std::string& object_path, const std::string& object_repr) {
-		return "Cannot convert " + object_path + ", expected " + type
-				+ " convertible but was " + object_repr;
+		return "Invalid value at <object>" + object_path + ", expected a " + type
+				+ " type but got " + object_repr;
 	}
 }
