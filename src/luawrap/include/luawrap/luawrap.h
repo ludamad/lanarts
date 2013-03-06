@@ -21,6 +21,7 @@
 #include <luawrap/config.h>
 
 #include <luawrap/LuaValue.h>
+#include <luawrap/LuaField.h>
 #include <luawrap/LuaStackValue.h>
 #include <luawrap/luawraperror.h>
 
@@ -117,6 +118,14 @@ namespace luawrap {
 			lua_pop(L, 1);
 		}
 	}
+}
+
+// LuaField implementations
+
+template<typename T>
+inline void LuaField::operator =(const T& value) {
+	luawrap::push<T>(L, value);
+	pop();
 }
 
 // LuaValue related

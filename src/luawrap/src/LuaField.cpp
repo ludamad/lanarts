@@ -16,8 +16,11 @@
 #include <cstring>
 
 #include <luawrap/LuaField.h>
-
 #include <luawrap/luawraperror.h>
+#include <luawrap/LuaValue.h>
+#include <luawrap/LuaStackValue.h>
+
+#include "luawrapassert.h"
 
 /*****************************************************************************
  *                          Constructors                                     *
@@ -46,7 +49,7 @@ LuaField::LuaField(lua_State* L, void* parent, int index) {
 	init(L, INTEGER_INDEX, REGISTRY_PARENT, ind, par);
 }
 
-LuaField::LuaField(LuaField* parent, const char* index) {
+LuaField::LuaField(const LuaField* parent, const char* index) {
 	Index ind;
 	Parent par;
 	par.field = parent;
@@ -54,7 +57,7 @@ LuaField::LuaField(LuaField* parent, const char* index) {
 	init(parent->L, STRING_INDEX, FIELD_PARENT, ind, par);
 }
 
-LuaField::LuaField(LuaField* parent, int index) {
+LuaField::LuaField(const LuaField* parent, int index) {
 	Index ind;
 	Parent par;
 	par.field = parent;
@@ -107,17 +110,18 @@ std::string LuaField::index_path() const {
 }
 
 void LuaField::index_path(std::string& str) const {
-	if (!_parent_type) {
+	if (_parent_type == FIELD_PARENT) {
 		_parent.field->index_path(str);
-		if (_index_type == STRING_INDEX) {
-			str += "[\"";
-			str += _index.string;
-			str += "\"]";
-		} else {
-			char buff[32];
-			sprintf(buff, "[%d]", _index.integer);
-			str += buff;
-		}
+	}
+
+	if (_index_type == STRING_INDEX) {
+		str += "[\"";
+		str += _index.string;
+		str += "\"]";
+	} else {
+		char buff[32];
+		sprintf(buff, "[%d]", _index.integer);
+		str += buff;
 	}
 }
 
@@ -128,13 +132,12 @@ void LuaField::index_path(std::string& str) const {
 void LuaField::push() const {
 	push_parent();
 	if (_index_type == STRING_INDEX) {
-		/* String index */
 		lua_getfield(L, -1, _index.string);
 	} else {
 		lua_pushinteger(L, _index.integer);
 		lua_gettable(L, -2);
 	}
-
+	lua_replace(L, -2);
 }
 
 void LuaField::handle_nil_parent() const {
@@ -155,10 +158,12 @@ void LuaField::push_parent() const {
 			lua_pushvalue(L, _parent.stack_index);
 		}
 	} else {
+		LUAWRAP_ASSERT(_parent.field->luastate() == L);
 		_parent.field->push();
 	}
 
 	if (lua_isnil(L, -1)) {
+		lua_pop(L, 1);
 		handle_nil_parent();
 	}
 }
@@ -175,8 +180,33 @@ void LuaField::pop() const {
 	/* Value to pop */
 	lua_pushvalue(L, -3);
 	/* Parent */
-	lua_gettable(L, -3);
+	lua_settable(L, -3);
 	/* Pop parent and value to pop*/
 	lua_pop(L, 2);
 }
 
+/*****************************************************************************
+ *                         Container methods                                 *
+ *****************************************************************************/
+
+LuaField LuaField::operator [](const char* key) const {
+	return LuaField(this, key);
+}
+
+LuaField LuaField::operator [](int index) const {
+	return LuaField(this, index);
+}
+
+void LuaField::operator =(const LuaField& field) {
+	LUAWRAP_ASSERT(field.luastate() == L);
+
+	field.push();
+	pop();
+}
+
+void LuaField::operator =(const LuaValue& value) {
+	LUAWRAP_ASSERT(value.luastate() == L);
+
+	value.push();
+	pop();
+}
