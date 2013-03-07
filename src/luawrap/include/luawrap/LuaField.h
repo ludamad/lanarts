@@ -65,8 +65,17 @@ public:
 	operator LuaValue() const;
 
 	template <typename T>
-	void as();
+	T as();
+
+	/** Lua api convenience methods **/
+	bool isnil() const;
+	int objlen() const;
+	void* to_userdata() const;
+	double to_num() const;
+	int to_int() const;
+	const char* to_str() const;
 private:
+	void error_and_pop(const std::string& expected_type) const;
 	void handle_nil_parent() const;
 	void push_parent() const;
 

@@ -210,3 +210,80 @@ void LuaField::operator =(const LuaValue& value) {
 	value.push();
 	pop();
 }
+
+LuaField::operator LuaValue() const {
+	push();
+	return LuaValue::pop_value(L);
+}
+
+
+/*****************************************************************************
+ *                         Lua API convenience methods                       *
+ *****************************************************************************/
+
+void LuaField::error_and_pop(const std::string& expected_type) const {
+	std::string obj_repr= lua_tostring(L, -1);
+	std::string type = lua_typename(L, -1);
+	lua_pop(L, 1);
+	luawrap::value_error_string(type, index_path(), obj_repr);
+}
+
+bool LuaField::isnil() const {
+	push();
+	bool nil = lua_isnil(L, -1);
+	lua_pop(L, 1);
+	return nil;
+}
+
+void* LuaField::to_userdata() const {
+	push();
+	void* userdata = lua_touserdata(L, -1);
+	if (!userdata) {
+		error_and_pop("userdata");
+	}
+	lua_pop(L, 1);
+	return userdata;
+}
+
+double LuaField::to_num() const {
+	push();
+	if (!lua_isnumber(L, -1)) {
+		error_and_pop("double");
+	}
+	double num = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+	return num;
+}
+
+int LuaField::to_int() const {
+	push();
+
+	//TODO: Evaluate whether full integer checking is necessary
+	double num = lua_tonumber(L, -1);
+	int integer = (int)num;
+	if (!lua_isnumber(L, -1) || num != integer) {
+		error_and_pop("integer");
+	}
+	lua_pop(L, 1);
+	return integer;
+}
+
+const char* LuaField::to_str() const {
+	push();
+	if (!lua_isstring(L, -1)) {
+		error_and_pop("string");
+	}
+	const char* str = lua_tostring(L, -1);
+	lua_pop(L, 1);
+	return str;
+}
+
+int LuaField::objlen() const {
+	push();
+	if (!lua_isstring(L, -1)) {
+		error_and_pop("table");
+	}
+	int len = lua_objlen(L, -1);
+	lua_pop(L, 1);
+	return len;
+}

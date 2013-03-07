@@ -128,6 +128,12 @@ inline void LuaField::operator =(const T& value) {
 	pop();
 }
 
+template<typename T>
+inline T LuaField::as() {
+	push();
+	return luawrap::pop<T>(L);
+}
+
 // LuaValue related
 namespace _luawrap_private {
 
