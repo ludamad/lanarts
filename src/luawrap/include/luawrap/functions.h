@@ -363,8 +363,8 @@ namespace luawrap {
 
 template<typename Function>
 inline void LuaField::bind_function(const Function& function) const {
-	char buffer[32];
-	const char* key;
+	char buffer[32]; /* int to string buffer */
+	const char* key; /* points to index (either string or converted number) */
 	if (_index_type == 1) {
 		key = _index.string;
 	} else {
@@ -373,19 +373,6 @@ inline void LuaField::bind_function(const Function& function) const {
 	}
 	luawrap::push_function(L, key, function);
 	pop();
-}
-
-namespace _luawrap_private {
-	template<typename Function>
-	inline void _LuaField::bind_function(Function func) {
-		luawrap::push_function(value.luastate(), key, func);
-		pop();
-	}
-	template<typename Function>
-	inline void _LuaStackField::bind_function(Function func) {
-		luawrap::push_function(value.luastate(), key, func);
-		pop();
-	}
 }
 
 #endif /* LUAWRAP_FUNCTIONS_H_ */

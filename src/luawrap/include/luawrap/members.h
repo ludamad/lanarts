@@ -85,40 +85,4 @@ namespace luawrap {
 	}
 }
 
-template<typename T, typename V>
-inline void _luawrap_private::_LuaField::bind_getter(V T::*member) {
-	void* userdata = lua_newuserdata(value.luastate(), sizeof(member));
-	*((V T::**) userdata) = member;
-
-	lua_pushcclosure(value.luastate(), luawrap::_private::getter<T, V>, 1);
-	pop();
-}
-
-template<typename T, typename V>
-inline void _luawrap_private::_LuaField::bind_setter(V T::*member) {
-	void* userdata = lua_newuserdata(value.luastate(), sizeof(member));
-	*((V T::**) userdata) = member;
-
-	lua_pushcclosure(value.luastate(), luawrap::_private::setter<T, V>, 1);
-	pop();
-}
-
-template<typename T, typename V>
-inline void _luawrap_private::_LuaStackField::bind_getter(V T::*member) {
-	void* userdata = lua_newuserdata(value.luastate(), sizeof(member));
-	*((V T::**) userdata) = member;
-
-	lua_pushcclosure(value.luastate(), luawrap::_private::getter<T, V>, 1);
-	pop();
-}
-
-template<typename T, typename V>
-inline void _luawrap_private::_LuaStackField::bind_setter(V T::*member) {
-	void* userdata = lua_newuserdata(value.luastate(), sizeof(member));
-	*((V T::**) userdata) = member;
-
-	lua_pushcclosure(value.luastate(), luawrap::_private::setter<T, V>, 1);
-	pop();
-}
-
 #endif /* LUAWRAP_MEMBERS_H_ */

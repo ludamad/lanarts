@@ -167,90 +167,6 @@ void luafield_push(lua_State* L, const LuaValue& value, const char* key) {
 	lua_replace(L, tableind);
 }
 
-namespace _luawrap_private {
-
-	void _LuaField::push() const {
-		luafield_push(value.luastate(), value, key);
-	}
-
-	void _LuaField::pop() const {
-		luafield_pop(value.luastate(), value, key);
-	}
-
-	void _LuaField::operator =(const LuaValue & value) {
-		value.push();
-		pop();
-	}
-
-	void _LuaField::operator =(lua_CFunction func) {
-		lua_pushcfunction(value.luastate(), func);
-		pop();
-	}
-
-	void _LuaField::operator =(const char* str) {
-		lua_pushstring(value.luastate(), str);
-		pop();
-	}
-
-	LuaValue _LuaField::ensure_table() const {
-		lua_State* L = value.luastate();
-		push();
-
-		if (!lua_istable(L, -1)) {
-			lua_pop(L, 1);
-			lua_newtable(L);
-			lua_pushvalue(L, -1);
-			pop();
-		}
-
-		return LuaValue::pop_value(L);
-	}
-
-	void _LuaField::operator =(const LuaStackValue& value) {
-		value.push();
-		pop();
-	}
-
-	bool _LuaField::isnil() const {
-		push();
-		bool nil = lua_isnil(value.luastate(), -1);
-		lua_pop(value.luastate(), 1);
-		return nil;
-	}
-
-	_LuaField::operator int() {
-		return as<int>();
-	}
-
-	_LuaField::operator double() {
-		return as<double>();
-	}
-
-	_LuaField::operator const char*() {
-		return as<const char*>();
-	}
-
-	_LuaField::operator std::string() {
-		return as<std::string>();
-	}
-
-	void _LuaField::bind_function(lua_CFunction func) {
-		lua_pushcfunction(value.luastate(), func);
-		pop();
-	}
-
-}
-
-_luawrap_private::_LuaField::operator LuaValue() {
-	push();
-	return LuaValue::pop_value(value.luastate());
-}
-
-void _LuaField::operator =(const _LuaField & field) {
-	field.push();
-	pop();
-}
-
 bool LuaValue::operator ==(const LuaValue & o) const {
 	return impl == o.impl;
 }
@@ -321,12 +237,6 @@ int LuaValue::objlen() const {
 	int len = lua_objlen(luastate(), -1);
 	lua_pop(luastate(), 1);
 	return len;
-}
-
-LuaValue::LuaValue(const _luawrap_private::_LuaField& field) {
-	impl = new _LuaValueImpl(field.value.luastate());
-	field.push();
-	pop();
 }
 
 LuaField LuaValue::operator [](std::string& key) const {

@@ -36,61 +36,7 @@ inline void luafield_push(lua_State* L, const LuaValue& value,
 }
 
 namespace _luawrap_private {
-
 	struct _LuaValueImpl;
-
-	struct _LuaField {
-		_LuaField(const LuaValue& value, const char* key) :
-				value(value), key(key) {
-		}
-		void push() const;
-
-		void pop() const;
-
-		const LuaValue& value;
-		const char* key;
-
-		template<typename T>
-		T as();
-
-		operator LuaValue();
-		operator int();
-		operator double();
-		operator const char*();
-		operator std::string();
-
-		// get if not nil
-		template<typename T>
-		void optionalget(T& value);
-
-		template<typename T>
-		T defaulted(const T& value);
-
-		template<typename T> void operator =(const T& value);
-		void operator =(const LuaValue& value);
-		void operator =(const LuaStackValue& value);
-		void operator =(const char* str);
-		void operator =(lua_CFunction func);
-		void operator =(const _LuaField& field);
-
-		bool isnil() const;
-
-		LuaValue ensure_table() const;
-
-		// Registers a CPP function
-		template<typename Function> void bind_function(Function func);
-		void bind_function(lua_CFunction func);
-
-		template<typename T, typename V> void bind_getter(V T::*member);
-		template<typename T, typename V> void bind_setter(V T::*member);
-
-	private:
-		friend class ::LuaValue;
-		_LuaField(const _LuaField& field) :
-			value(field.value), key(field.key) {
-		}
-	};
-
 }
 
 class LuaValue {
@@ -98,7 +44,6 @@ public:
 	LuaValue(lua_State* L, const char* global);
 	LuaValue(lua_State* L, int pos);
 	LuaValue(const LuaStackValue& svalue);
-	LuaValue(const _luawrap_private::_LuaField& field);
 	LuaValue(lua_State* L);
 
 	LuaValue(const LuaValue& value);
