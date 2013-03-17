@@ -20,14 +20,14 @@ SUITE (LuaValue) {
 		{
 			int input = 1337;
 			value["hello"] = input;
-			int output = value["hello"];
+			int output = value["hello"].as<int>();
 			CHECK_EQUAL(input, output);
 		}
 
 		{
 			std::string input = "test";
 			value["hello"] = input;
-			std::string output = value["hello"];
+			std::string output = value["hello"].to_str();
 			CHECK(input == output);
 		}
 

@@ -36,7 +36,7 @@ static int net_connections_poll(lua_State* L) {
 
 namespace lua_api {
 	void register_net_api(lua_State* L) {
-		LuaValue module = luawrap::globals(L)["net"].ensure_table();
+		LuaValue module = luawrap::ensure_table(luawrap::globals(L)["net"]);
 
 		module["NONE"] = (int)GameSettings::NONE;
 		module["SERVER"] = (int)GameSettings::SERVER;

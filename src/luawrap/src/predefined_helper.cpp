@@ -36,6 +36,18 @@ namespace luawrap {
 			return true;
 		}
 
+		void TypeImpl<lua_CFunction>::push(lua_State* L, lua_CFunction val) {
+			lua_pushcfunction(L, val);
+		}
+
+		lua_CFunction TypeImpl<lua_CFunction>::get(lua_State* L, int idx) {
+			return lua_tocfunction(L, idx);
+		}
+
+		bool TypeImpl<lua_CFunction>::check(lua_State* L, int idx) {
+			return lua_iscfunction(L, idx);
+		}
+
 		void TypeImpl<bool>::push(lua_State* L, bool val) {
 			lua_pushboolean(L, val);
 		}

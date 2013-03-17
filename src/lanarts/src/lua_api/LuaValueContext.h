@@ -47,7 +47,7 @@ public:
 	}
 	template <typename T>
 	T defaulted(const char* string_idx, const T& default_value) const {
-		return _child[string_idx].defaulted(default_value);
+		return _child.defaulted(string_idx, default_value);
 	}
 	LuaValueContext operator[](const char* string_idx) const;
 	LuaValueContext operator[](int integer_idx) const;

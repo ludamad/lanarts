@@ -76,8 +76,9 @@ LuaValue luaapi_settings_proxy(lua_State* L) {
 	LuaValue getters = luameta_getters(meta);
 	LuaValue setters = luameta_setters(meta);
 
-#define BIND(x) getters[#x].bind_getter(&GameSettings::x); \
-	setters[#x].bind_setter(&GameSettings::x)
+#define BIND(x) \
+	luawrap::bind_getter( getters[#x], &GameSettings::x); \
+	luawrap::bind_setter( setters[#x], &GameSettings::x)
 
 	BIND(font);
 	BIND(menu_font);
@@ -108,8 +109,8 @@ LuaValue luaapi_settings_proxy(lua_State* L) {
 	// We must ensure that the enum type is looked up properly
 	// This is not ideal but better than accidentally not casting to int or writing more boilerplate
 	luawrap::install_casted_type<GameSettings::connection_type, int>();
-	getters["connection_type"].bind_getter(&GameSettings::conntype);
-	setters["connection_type"].bind_setter(&GameSettings::conntype);
+	luawrap::bind_getter(getters["connection_type"], &GameSettings::conntype);
+	luawrap::bind_setter(setters["connection_type"], &GameSettings::conntype);
 
 	return meta;
 }
@@ -171,7 +172,7 @@ namespace lua_api {
 		register_gamesettings(L);
 
 		LuaValue globals = luawrap::globals(L);
-		LuaValue game = globals["game"].ensure_table();
+		LuaValue game = luawrap::ensure_table(globals["game"]);
 
 		game["resources_load"].bind_function(game_resources_load);
 

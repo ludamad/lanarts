@@ -46,7 +46,7 @@ void lua_register_timer(lua_State *L, const LuaValue& module) {
 
 	module["timer_create"].bind_function(newtimer);
 
-	LuaValue perf_timer = module["perf"].ensure_table();
+	LuaValue perf_timer = luawrap::ensure_table(module["perf"]);
 
 	perf_timer["timing_begin"].bind_function(perf_timer_begin);
 	perf_timer["timing_end"].bind_function(perf_timer_end);

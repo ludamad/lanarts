@@ -136,7 +136,7 @@ void EffectStats::step(GameState* gs, CombatGameInst* inst) {
 
 			e.state["time_left"] = e.t_remaining;
 			lua_effect_func_callback(L, eentry.step_func.get(L), e, inst);
-			e.t_remaining = e.state["time_left"];
+			e.t_remaining = e.state["time_left"].to_int();
 
 			if (e.t_remaining == 0) {
 				lua_effect_func_callback(L, eentry.finish_func.get(L), e, inst);

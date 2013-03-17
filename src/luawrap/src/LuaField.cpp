@@ -217,9 +217,15 @@ LuaField::operator LuaValue() const {
 }
 
 
+
 /*****************************************************************************
  *                         Lua API convenience methods                       *
  *****************************************************************************/
+
+void LuaField::bind_function(lua_CFunction luafunc) const {
+	lua_pushcfunction(L, luafunc);
+	pop();
+}
 
 void LuaField::error_and_pop(const std::string& expected_type) const {
 	std::string obj_repr= lua_tostring(L, -1);
@@ -298,11 +304,12 @@ int LuaField::objlen() const {
 	return len;
 }
 
-const LuaField& ensure_table(const LuaField& field) {
+const LuaField& luawrap::ensure_table(const LuaField& field) {
 	field.push();
-	if (!lua_istable(L, -1)){
+	if (!lua_istable(field.luastate(), -1)){
 		field.newtable();
 	}
-	lua_pop(L, 1);
+	lua_pop(field.luastate(), 1);
 	return field;
 }
+

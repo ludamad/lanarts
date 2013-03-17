@@ -14,6 +14,8 @@
 #ifndef LUAFIELD_H_
 #define LUAFIELD_H_
 
+#include <cstdio>
+#include <lua.hpp>
 #include <string>
 
 struct lua_State;
@@ -59,13 +61,22 @@ public:
 	void operator=(const LuaField& field);
 	void operator=(const LuaValue& value);
 
-	template <typename T>
+	/** Luawrap convenience methods **/
+	template<typename T>
 	void operator=(const T& value);
 
 	operator LuaValue() const;
 
-	template <typename T>
+	template<typename T>
 	T as();
+
+	template<typename T>
+	T defaulted(const char* key, const T& value) const;
+
+
+	void bind_function(lua_CFunction luafunc) const;
+	template<typename Function>
+	void bind_function(const Function& function) const;
 
 	/** Lua api convenience methods **/
 	void newtable() const;
@@ -92,7 +103,8 @@ private:
 		int stack_index;
 	};
 
-	void init(lua_State* L, char index_type, char parent_type, Index index, Parent parent);
+	void init(lua_State* L, char index_type, char parent_type, Index index,
+			Parent parent);
 
 	/* members */
 	lua_State* L;
@@ -103,6 +115,8 @@ private:
 	Parent _parent;
 };
 
-const LuaField& ensure_table(const LuaField& field);
+namespace luawrap {
+	const LuaField& ensure_table(const LuaField& field);
+}
 
 #endif /* LUAFIELD_H_ */

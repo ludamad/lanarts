@@ -46,11 +46,11 @@ ldraw::DrawOptions lua_get_drawoptions(lua_State *L, int idx) {
 		options.draw_origin = luawrap::pop<ldraw::DrawOrigin>(L);
 	}
 
-	table["color"].optionalget(options.draw_colour);
-	table["region"].optionalget(options.draw_region);
-	table["scale"].optionalget(options.draw_scale);
-	table["angle"].optionalget(options.draw_angle);
-	table["frame"].optionalget(options.draw_frame);
+	options.draw_colour = table.defaulted("color", options.draw_colour);
+	options.draw_region = table.defaulted("region", options.draw_region);
+	options.draw_scale = table.defaulted("scale", options.draw_scale);
+	options.draw_angle = table.defaulted("angle", options.draw_angle);
+	options.draw_frame = table.defaulted("frame", options.draw_frame);
 
 	return options;
 }

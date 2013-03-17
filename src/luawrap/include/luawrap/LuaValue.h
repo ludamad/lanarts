@@ -14,13 +14,12 @@
 
 #include <string>
 
+#include <lua.hpp>
 #include <luawrap/config.h>
 #include <luawrap/LuaStackValue.h>
+#include <luawrap/LuaField.h>
 
-struct lua_State;
 class LuaValue;
-
-typedef int (*lua_CFunction)(lua_State *L);
 
 void luafield_pop(lua_State* L, const LuaValue& value, const char* key);
 
@@ -115,6 +114,7 @@ public:
 
 	void pop();
 	void set(int pos);
+	void clear();
 
 	void push() const;
 	bool empty() const;
@@ -123,21 +123,19 @@ public:
 	// Convert to any type
 	template<typename T>
 	T as() const;
+	template<typename T>
+	T defaulted(const char* key, const T& value) const;
 
 	// Mainly for low-level routines, do not depend on too heavily
 	lua_State* luastate() const;
 
-	_luawrap_private::_LuaField operator[](const char* key) const {
-		return _luawrap_private::_LuaField(*this, key);
-	}
-	//NB: it is unsafe to have 'std::string& key' be const here!
-	//This would result potentially in a char* ptr being used outside of its scope
-	_luawrap_private::_LuaField operator[](std::string& key) const {
-		return operator[](key.c_str());
-	}
+	/* NB: it is unsafe to have 'std::string& key' be const here!
+	 * This would result potentially in a char* ptr being used outside of its scope */
+	LuaField operator[](std::string& key) const;
+	LuaField operator[](const char* key) const;
+	LuaField operator[](int index) const;
 
 	int objlen() const;
-	LuaValue operator[](int idx) const;
 
 	bool operator==(const LuaValue& o) const;
 	bool operator!=(const LuaValue& o) const;

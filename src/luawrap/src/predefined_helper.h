@@ -70,6 +70,15 @@ namespace luawrap {
 			static bool check(lua_State *L, int idx);
 		};
 
+		/* Standard lua C function */
+		template<>
+		class TypeImpl<lua_CFunction> {
+		public:
+			static void push(lua_State* L, lua_CFunction val);
+			static lua_CFunction get(lua_State* L, int idx);
+			static bool check(lua_State *L, int idx);
+		};
+
 		/* Boolean */
 		template<>
 		class TypeImpl<bool> {
@@ -206,6 +215,5 @@ namespace luawrap {
 
 	}
 }
-
 
 #endif /* LUAWRAP_PREDEFINED_HELPER_H_ */

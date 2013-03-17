@@ -39,12 +39,11 @@ static FilenameList parse_imgfilelist(const YAML::Node& node) {
 	return filenames;
 }
 
-
 void load_tile_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	TileEntry entry;
 	entry.name = parse_str(node["name"]);
-	entry.images =parse_image_list(node["files"]);
+	entry.images = parse_image_list(node["files"]);
 
 	game_tile_data.push_back(entry);
 }
@@ -72,13 +71,12 @@ void load_sprite_callbackf(const YAML::Node& node, lua_State* L,
 	(*value)[entry.name] = entry.sprite;
 }
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames) {
-	LuaValue lsprites = luawrap::globals(L)["sprites"].ensure_table();
+	LuaValue lsprites = luawrap::ensure_table(luawrap::globals(L)["sprites"]);
 
 	game_sprite_data.clear();
 
 	load_data_impl_template(filenames, "sprites", load_sprite_callbackf, L,
 			&lsprites);
-
 
 	return lsprites;
 }

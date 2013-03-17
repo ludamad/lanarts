@@ -134,6 +134,18 @@ inline T LuaField::as() {
 	return luawrap::pop<T>(L);
 }
 
+template<typename T>
+inline T LuaField::defaulted(const char* key, const T& value) const {
+	luawrap::_private::PopHack delayedpop(L);
+	push();
+	lua_getfield(L, -1, key);
+	if (lua_isnil(L, -1)) {
+		return value;
+	}
+	return luawrap::get<T>(L, -1);
+}
+
+
 // LuaValue related
 namespace _luawrap_private {
 
@@ -197,6 +209,19 @@ inline T LuaStackValue::as() const {
 }
 
 template<typename T>
+inline T LuaStackValue::defaulted(const char* key, const T& value) const {
+	lua_State* L = luastate();
+	luawrap::_private::PopHack delayedpop(L);
+	push();
+	lua_getfield(L, -1, key);
+	if (lua_isnil(L, -1)) {
+		return value;
+	}
+	return luawrap::get<T>(L, -1);
+
+}
+
+template<typename T>
 inline T LuaValue::as() const {
 	push();
 
@@ -205,6 +230,18 @@ inline T LuaValue::as() const {
 	}
 
 	return luawrap::pop<T>(luastate());
+}
+
+template<typename T>
+inline T LuaValue::defaulted(const char* key, const T& value) const {
+	lua_State* L = luastate();
+	luawrap::_private::PopHack delayedpop(L);
+	push();
+	lua_getfield(L, -1, key);
+	if (lua_isnil(L, -1)) {
+		return value;
+	}
+	return luawrap::get<T>(L, -1);
 }
 
 #include "../../src/predefined_helper.h"

@@ -361,6 +361,20 @@ namespace luawrap {
 	}
 }
 
+template<typename Function>
+inline void LuaField::bind_function(const Function& function) const {
+	char buffer[32];
+	const char* key;
+	if (_index_type == 1) {
+		key = _index.string;
+	} else {
+		sprintf(buffer, "%d", _index.integer);
+		key = buffer;
+	}
+	luawrap::push_function(L, key, function);
+	pop();
+}
+
 namespace _luawrap_private {
 	template<typename Function>
 	inline void _LuaField::bind_function(Function func) {

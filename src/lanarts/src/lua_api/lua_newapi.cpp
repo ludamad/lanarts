@@ -195,9 +195,9 @@ namespace lua_api {
 		lua_lanarts_api(gs, L); // TODO: Deprecated
 
 		LuaValue globals = luawrap::globals(L);
-		LuaValue gamestate = globals["game"].ensure_table();
+		LuaValue gamestate = luawrap::ensure_table(globals["game"]);
 		// Holds engine hooks
-		LuaValue engine = globals["engine"].ensure_table();
+		LuaValue engine = luawrap::ensure_table(globals["engine"]);
 
 		register_gamestate(gs, L);
 		register_general_api(L);

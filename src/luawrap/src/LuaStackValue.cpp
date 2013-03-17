@@ -136,17 +136,21 @@ LuaSpecialValue luawrap::registry(lua_State* L) {
 	return LuaSpecialValue(L, LUA_REGISTRYINDEX);
 }
 
+LuaField LuaStackValue::operator [](std::string& key) const {
+	return LuaField(L, idx, key.c_str());
+}
+
+LuaField LuaStackValue::operator [](const char* key) const {
+	return LuaField(L, idx, key);
+}
+
+LuaField LuaStackValue::operator [](int index) const {
+	return LuaField(L, idx, index);
+}
+
 int LuaStackValue::objlen() const {
 	push();
 	int len = lua_objlen(L, -1);
 	lua_pop(L, 1);
 	return len;
-}
-
-LuaValue LuaStackValue::operator [](int idx) const {
-	push();
-	lua_rawgeti(L, -1, idx);
-	LuaValue ret = LuaValue::pop_value(L);
-	lua_pop(L, 1);
-	return ret;
 }

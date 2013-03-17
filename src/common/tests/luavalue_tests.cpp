@@ -26,7 +26,7 @@ SUITE(luavalue_tests) {
 		{
 			int input = 1337;
 			value["hello"] = input;
-			int output = value["hello"];
+			int output = value["hello"].to_int();
 			CHECK(input == output);
 		}
 

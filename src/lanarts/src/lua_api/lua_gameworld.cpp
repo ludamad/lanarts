@@ -216,9 +216,9 @@ namespace lua_api {
 		luawrap::install_type<GameInst*, lua_push_gameinst, lua_gameinst_arg,
 				temporary_isgameinst>();
 
-		register_gameworld_getters(L, globals["world"].ensure_table());
+		register_gameworld_getters(L, luawrap::ensure_table(globals["world"]));
 
-		LuaValue room = globals["room"].ensure_table();
+		LuaValue room = luawrap::ensure_table(globals["room"]);
 
 		// Debug/special-case-only functions:
 		room["regenerate"].bind_function(room_regenerate);

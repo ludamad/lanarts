@@ -4,6 +4,7 @@
 
 #include <lua.hpp>
 
+#include <luawrap/LuaField.h>
 #include <luawrap/LuaValue.h>
 #include <luawrap/luawraperror.h>
 #include <luawrap/luawrap.h>
@@ -322,18 +323,22 @@ int LuaValue::objlen() const {
 	return len;
 }
 
-LuaValue LuaValue::operator [](int idx) const {
-	push();
-	lua_rawgeti(luastate(), -1, idx);
-	LuaValue ret = LuaValue::pop_value(luastate());
-	lua_pop(luastate(), 1);
-	return ret;
-}
-
 LuaValue::LuaValue(const _luawrap_private::_LuaField& field) {
 	impl = new _LuaValueImpl(field.value.luastate());
 	field.push();
 	pop();
+}
+
+LuaField LuaValue::operator [](std::string& key) const {
+	return LuaField(impl->L, (void*)impl, key.c_str());
+}
+
+LuaField LuaValue::operator [](const char* key) const {
+	return LuaField(impl->L, (void*)impl, key);
+}
+
+LuaField LuaValue::operator [](int index) const {
+	return LuaField(impl->L, (void*)impl, index);
 }
 
 LuaValue LuaValue::pop_value(lua_State* L) {

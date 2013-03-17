@@ -42,13 +42,13 @@ LuaValue foo_newmetatable(lua_State* L) {
 	LuaValue getters = luameta_getters(metatable);
 	LuaValue setters = luameta_setters(metatable);
 
-	getters["bar"].bind_getter(&Foo::bar);
-	setters["bar"].bind_setter(&Foo::bar);
+	luawrap::bind_getter( getters["bar"], &Foo::bar);
+	luawrap::bind_setter( setters["bar"], &Foo::bar);
 
 	getters["bar2"] = &luawrap::getter<Foo, int, &Foo::get_bar>;
 	setters["bar2"] = &luawrap::setter<Foo, int, &Foo::get_bar>;
 
-	getters["bar3"].bind_getter(&Foo::bar);
+	luawrap::bind_getter( getters["bar3"], &Foo::bar);
 	setters["bar3"] = &luawrap::setter<Foo, int, &Foo::set_bar>;
 
 	methods["mymethod"].bind_function(mymethod);

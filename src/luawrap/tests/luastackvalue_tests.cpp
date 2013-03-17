@@ -19,7 +19,7 @@ SUITE (LuaStackValue) {
 
 		CHECK_EQUAL(1, abc);
 
-		abc = globals["abc"];
+		abc = globals["abc"].to_int();
 		CHECK_EQUAL(1, abc);
 
 		L.finish_check();

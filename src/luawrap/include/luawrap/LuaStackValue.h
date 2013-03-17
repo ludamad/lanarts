@@ -20,7 +20,9 @@
 
 #include <string>
 
-struct lua_State;
+#include <lua.hpp>
+#include <luawrap/LuaField.h>
+
 class LuaValue;
 class LuaStackValue;
 
@@ -107,18 +109,16 @@ public:
 	template<typename T>
 	T as() const;
 
-	_luawrap_private::_LuaStackField operator[](const char* key) const {
-		return _luawrap_private::_LuaStackField(*this, key);
-	}
+	template<typename T>
+	T defaulted(const char* key, const T& value) const;
 
-	//NB: it is unsafe to have 'std::string& key' be const here!
-	//This would result potentially in a char* ptr being used outside of its scope
-	_luawrap_private::_LuaStackField operator[](std::string& key) const {
-		return operator[](key.c_str());
-	}
+	/* NB: it is unsafe to have 'std::string& key' be const here!
+	 * This would result potentially in a char* ptr being used outside of its scope */
+	LuaField operator[](std::string& key) const;
+	LuaField operator[](const char* key) const;
+	LuaField operator[](int index) const;
 
 	int objlen() const;
-	LuaValue operator[](int idx) const;
 
 private:
 	lua_State* L;

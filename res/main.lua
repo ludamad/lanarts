@@ -72,3 +72,5 @@ function engine.event_occurred(...)
 
     return event_occurred(...)
 end
+
+sound_volume = 0

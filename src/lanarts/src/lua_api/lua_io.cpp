@@ -158,7 +158,7 @@ LuaValue lua_textfieldmetatable(lua_State* L) {
 }
 
 static void register_textfield(lua_State* L) {
-	LuaValue textfield = luawrap::globals(L)["TextInput"].ensure_table();
+	LuaValue textfield = luawrap::ensure_table(luawrap::globals(L)["TextInput"]);
 	textfield["create"].bind_function(lua_newtextinput);
 	luawrap::install_userdata_type<TextField, &lua_textfieldmetatable>();
 }
@@ -173,7 +173,7 @@ static int get_events(lua_State* L) {
 }
 
 static void register_input_table(lua_State* L) {
-	LuaValue input = luawrap::globals(L)["input"].ensure_table();
+	LuaValue input = luawrap::ensure_table(luawrap::globals(L)["input"]);
 
 	LuaValue meta = luameta_new(L, "<InputTable>");
 	LuaValue getters = luameta_getters(meta);
@@ -212,7 +212,7 @@ namespace lua_api {
 		globals["screen_coords"].bind_function(screen_coords);
 		globals["world_coords"].bind_function(world_coords);
 
-		LuaValue keys = globals["keys"].ensure_table();
+		LuaValue keys = luawrap::ensure_table(globals["keys"]);
 
 		keys["ENTER"] = (int)SDLK_RETURN;
 		keys["TAB"] = (int)SDLK_TAB;

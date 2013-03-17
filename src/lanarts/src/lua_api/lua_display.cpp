@@ -21,7 +21,7 @@
 namespace lua_api {
 
 	static void register_display_table(lua_State* L) {
-		LuaValue display = luawrap::globals(L)["display"].ensure_table();
+		LuaValue display = luawrap::ensure_table(luawrap::globals(L)["display"]);
 
 		display["initialize"].bind_function(ldraw::display_initialize);
 		display["draw_start"].bind_function(ldraw::display_draw_start);
@@ -44,7 +44,7 @@ namespace lua_api {
 		LuaValue globals = luawrap::globals(L);
 		GameState* gs = lua_api::gamestate(L);
 
-		LuaValue fonts = globals["fonts"].ensure_table();
+		LuaValue fonts = luawrap::ensure_table(globals["fonts"]);
 
 		fonts["small"] = gs->font();
 		fonts["large"] = gs->menu_font();

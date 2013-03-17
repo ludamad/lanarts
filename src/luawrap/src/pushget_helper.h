@@ -12,6 +12,8 @@
 #ifndef LUAWRAP_PUSHGET_HELPER_H_
 #define LUAWRAP_PUSHGET_HELPER_H_
 
+#include <lua.hpp>
+
 namespace luawrap {
 	namespace _private {
 

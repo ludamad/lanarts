@@ -159,8 +159,8 @@ static int lapi_newtype(lua_State* L) {
 	lua_pushcclosure(L, lapi_newtype_create, 1);
 	newtype["create"].pop();
 
-	newtype["set"].ensure_table();
-	newtype["get"].ensure_table();
+	luawrap::ensure_table(newtype["set"]);
+	luawrap::ensure_table(newtype["get"]);
 
 	if (!lua_isnil(L, 1)) {
 		LuaStackValue parameters(L, 1);
@@ -265,10 +265,10 @@ namespace lua_api {
 		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);
 
-		LuaValue table = globals["table"].ensure_table();
+		LuaValue table = luawrap::ensure_table(globals["table"]);
 		table["merge"].bind_function(lapi_table_merge);
 
-		LuaValue string_table = globals["string"].ensure_table();
+		LuaValue string_table = luawrap::ensure_table(globals["string"]);
 		string_table["pack"].bind_function(str_pack);
 	}
 }
