@@ -113,7 +113,6 @@ public:
 
 	void operator=(const LuaValue& value);
 
-	void clear();
 	void pop();
 	void set(int pos);
 

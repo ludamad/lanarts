@@ -68,6 +68,8 @@ public:
 	T as();
 
 	/** Lua api convenience methods **/
+	void newtable() const;
+	void set_nil() const;
 	bool isnil() const;
 	int objlen() const;
 	void* to_userdata() const;
@@ -100,5 +102,7 @@ private:
 	Index _index;
 	Parent _parent;
 };
+
+const LuaField& ensure_table(const LuaField& field);
 
 #endif /* LUAFIELD_H_ */

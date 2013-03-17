@@ -235,6 +235,16 @@ bool LuaField::isnil() const {
 	return nil;
 }
 
+void LuaField::newtable() const {
+	lua_newtable(L);
+	pop();
+}
+
+void LuaField::set_nil() const {
+	lua_pushnil(L);
+	pop();
+}
+
 void* LuaField::to_userdata() const {
 	push();
 	void* userdata = lua_touserdata(L, -1);
@@ -286,4 +296,13 @@ int LuaField::objlen() const {
 	int len = lua_objlen(L, -1);
 	lua_pop(L, 1);
 	return len;
+}
+
+const LuaField& ensure_table(const LuaField& field) {
+	field.push();
+	if (!lua_istable(L, -1)){
+		field.newtable();
+	}
+	lua_pop(L, 1);
+	return field;
 }
