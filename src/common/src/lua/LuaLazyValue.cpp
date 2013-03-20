@@ -11,6 +11,7 @@ LuaLazyValue::LuaLazyValue(const std::string& expr) :
 
 LuaLazyValue::LuaLazyValue(const LuaValue& value) :
 		_value(value) {
+	LCOMMON_ASSERT(!_value.empty());
 }
 
 LuaLazyValue::LuaLazyValue() {

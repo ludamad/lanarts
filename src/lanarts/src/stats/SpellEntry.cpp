@@ -42,14 +42,24 @@ void SpellEntry::parse_lua_table(const LuaValue& table) {
 	mp_cost = table["mp_cost"].to_num();
 
 	if (!table["projectile"].isnil()) {
-		projectile = Projectile(get_projectile_by_name(table["projectile"].to_str()));
+		projectile = Projectile(
+				get_projectile_by_name(table["projectile"].to_str()));
 	}
 
-	action_func = LuaLazyValue(table["action_func"].assert_not_nil());
-	autotarget_func = LuaLazyValue(table["autotarget_func"].assert_not_nil());
-	prereq_func = LuaLazyValue(table["prereq_func"].assert_not_nil());
+	if (table["autotarget_func"].isnil()) {
+		table["autotarget_func"] =
+				luawrap::globals(table.luastate())["spell_choose_target"];
+	}
+	autotarget_func = LuaLazyValue(table["autotarget_func"]);
+	LANARTS_ASSERT(!autotarget_func.get(table.luastate()).isnil());
+	if (!table["action_func"].isnil()) {
+		action_func = LuaLazyValue(table["action_func"]);
+	}
+	if (!table["prereq_func"].isnil()) {
+		prereq_func = LuaLazyValue(table["prereq_func"]);
+	}
 
-	can_cast_with_cooldown = set_if_nil(table, "can_cast_with_cooldown", true);
+	can_cast_with_cooldown = set_if_nil(table, "can_cast_with_cooldown", false);
 	can_cast_with_held_key = set_if_nil(table, "can_cast_with_held_key", true);
 	fallback_to_melee = set_if_nil(table, "fallback_to_melee", true);
 }

@@ -8,6 +8,8 @@
 
 #include <luawrap/LuaValue.h>
 
+#include "lcommon_assert.h"
+
 class LuaLazyValue {
 public:
 	explicit LuaLazyValue(const std::string& expr);

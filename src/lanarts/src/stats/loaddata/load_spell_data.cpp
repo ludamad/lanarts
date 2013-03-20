@@ -55,13 +55,25 @@ void load_spell_callbackf(const YAML::Node& node, lua_State* L,
 
 	(*value)[entry.name] = node;
 }
-LuaValue load_spell_data(lua_State* L, const FilenameList& filenames) {
-	LuaValue ret(L);
-	ret.newtable();
 
+static LuaValue spell_table;
+static void lapi_data_create_spell(const LuaStackValue& table) {
+	SpellEntry entry;
+	int idx = game_spell_data.size();
+	entry.init(idx, table);
+	spell_table[idx+1] = table;
+	game_spell_data.push_back(entry);
+}
+
+LuaValue load_spell_data(lua_State* L, const FilenameList& filenames) {
 	game_spell_data.clear();
 
-	load_data_impl_template(filenames, "spells", load_spell_callbackf, L, &ret);
+	spell_table = LuaValue(L);
+	spell_table.newtable();
 
-	return ret;
+	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["data"]);
+	data["spell_create"].bind_function(lapi_data_create_spell);
+	luawrap::dofile(L, "res/spells/spells.lua");
+
+	return spell_table;
 }

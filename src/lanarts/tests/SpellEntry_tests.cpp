@@ -6,14 +6,22 @@
 #include <luawrap/functions.h>
 
 #include "draw/SpriteEntry.h"
+#include "stats/items/ProjectileEntry.h"
 #include "stats/SpellEntry.h"
 
 extern std::vector<SpriteEntry> game_sprite_data;
+extern std::vector<ItemEntry*> game_item_data;
 
-static void setup_mock_sprite() {
+static void setup_mock_data() {
 	game_sprite_data.clear();
-	SpriteEntry entry("sprite", ldraw::Drawable());
-	game_sprite_data.push_back(entry);
+	game_sprite_data.push_back(SpriteEntry("sprite", ldraw::Drawable()));
+	for (int i = 0; i < game_item_data.size(); i++) {
+		delete game_item_data[i];
+	}
+	game_item_data.clear();
+	ProjectileEntry projectile;
+	projectile.name = "projectile";
+	game_item_data.push_back(new ProjectileEntry(projectile));
 }
 
 SUITE(SpellEntry_tests) {
@@ -24,6 +32,7 @@ SUITE(SpellEntry_tests) {
 						"    name = 'spell', "
 						"    spr_spell = 'sprite', "
 						"    description = 'description', "
+						"    projectile = 'projectile', "
 						"    mp_cost = 1, "
 						"    cooldown = 2, "
 						"    autotarget_func = 3, "
@@ -33,13 +42,14 @@ SUITE(SpellEntry_tests) {
 						"}";
 
 		TestLuaState L;
-		setup_mock_sprite();
+		setup_mock_data();
 		lua_safe_dostring(L, program.c_str());
 
 		SpellEntry spell;
 		spell.init(0, luawrap::globals(L)["table"]);
 		CHECK("spell" == spell.name);
 		CHECK("sprite" == res::sprite_name(spell.sprite));
+		CHECK("projectile" == spell.projectile.projectile_entry().name);
 		CHECK("description" == spell.description);
 		CHECK(1 == spell.mp_cost);
 		CHECK(2 == spell.cooldown);

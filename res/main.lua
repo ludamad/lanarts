@@ -40,7 +40,6 @@ function engine.resources_load(...)
     dofile "res/effects/effects.lua"
 
     dofile "res/spells/spell_effects.lua"
-    dofile "res/spells/spells.lua"
 end
 
 function engine.game_start(...)

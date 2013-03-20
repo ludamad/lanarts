@@ -97,7 +97,7 @@ const LuaField& LuaField::assert_not_nil() const {
 	if (!lua_isnil(L, -1)) {
 		lua_pop(L, 1);
 	} else {
-		error_and_pop("nil");
+		error_and_pop("non-nil");
 	}
 	return *this;
 }
@@ -249,10 +249,9 @@ void LuaField::bind_function(lua_CFunction luafunc) const {
 
 void LuaField::error_and_pop(const std::string& expected_type) const {
 	const char* repr = lua_tostring(L, -1);
-	std::string obj_repr = repr ? repr : "nil";
-	std::string type = lua_typename(L, -1);
+	std::string obj_repr = repr ? repr : lua_typename(L, -1);
 	lua_pop(L, 1);
-	luawrap::value_error_string(type, index_path(), obj_repr);
+	luawrap::conversion_error(expected_type, index_path(), obj_repr);
 }
 
 bool LuaField::isnil() const {

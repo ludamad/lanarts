@@ -86,9 +86,10 @@ int main(int argc, char** argv) {
 	engine["menu_start"].push();
 	bool did_exit = !luawrap::call<bool>(L);
 	save_settings_data(gs->game_settings(), "res/saved_settings.yaml"); // Save settings from menu
-	if (did_exit)
+	if (did_exit) {
+		/* User has quit! */
 		goto label_Quit;
-	/* User has quit! */
+	}
 
 	gs->start_connection();
 
