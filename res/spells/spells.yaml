@@ -48,3 +48,4 @@ spells:
     action_func: function(caster, x, y) caster:move_to(x,y) end
     #NB: if the autotarget_func returns nil, the spell is not performed
     autotarget_func: spell_choose_safest_square
+ 

@@ -20,11 +20,12 @@
 struct SpellEntry: public ResourceEntryBase {
 	sprite_id sprite;
 	int mp_cost, cooldown;
-	LuaLazyValue action_func; //Immediate action
-	LuaLazyValue autotarget_func; //Auto-target func
-	LuaLazyValue prereq_func; //Pre-req to casting
-	Projectile projectile; //Projectile used, if any
+	LuaLazyValue action_func; // Immediate action
+	LuaLazyValue autotarget_func; // Auto-target func
+	LuaLazyValue prereq_func; // Pre-req to casting
+	Projectile projectile; // Projectile used, if any
 	bool can_cast_with_cooldown, can_cast_with_held_key, fallback_to_melee;
+
 	SpellEntry() :
 			sprite(-1), mp_cost(0), cooldown(0), can_cast_with_cooldown(false), can_cast_with_held_key(
 					false), fallback_to_melee(false) {
@@ -36,7 +37,7 @@ struct SpellEntry: public ResourceEntryBase {
 		return sprite;
 	}
 
-	void init(lua_State* L) {
+	void initialize(lua_State* L) {
 		action_func.initialize(L);
 		autotarget_func.initialize(L);
 		prereq_func.initialize(L);
@@ -44,9 +45,15 @@ struct SpellEntry: public ResourceEntryBase {
 	bool uses_projectile() {
 		return projectile.id != NO_ITEM;
 	}
+
+	virtual void parse_lua_table(const LuaValue& table);
 };
 
-extern std::vector<SpellEntry> game_spell_data;
-
-spell_id get_spell_by_name(const char* name);
+namespace res {
+	::spell_id spell_id(const char* name);
+	::spell_id spell_id(const std::string& name);
+	SpellEntry& spell(const char* name);
+	SpellEntry& spell(const std::string& name);
+	SpellEntry& spell(::spell_id id);
+}
 #endif /* SPELLENTRY_H_ */

@@ -665,7 +665,7 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
 	EffectiveStats& estats = effective_stats();
 
 	spell_id spell = spells_known().get(action.use_id);
-	SpellEntry& spl_entry = game_spell_data.at(spell);
+	SpellEntry& spl_entry = res::spell(spell);
 
 	if (spl_entry.mp_cost > core_stats().mp
 			|| (!spl_entry.can_cast_with_cooldown && !cooldowns().can_doaction())) {

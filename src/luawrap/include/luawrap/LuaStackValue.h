@@ -29,6 +29,7 @@ public:
 	LuaStackValue();
 
 	void push() const;
+	void pop() const;
 
 	bool empty() const;
 
@@ -53,7 +54,18 @@ public:
 	LuaField operator[](const char* key) const;
 	LuaField operator[](int index) const;
 
+	/* Lua API convenience methods */
+	bool has(const char* key) const;
+	void newtable() const;
+	void set_nil() const;
+	bool isnil() const;
+	void* to_userdata() const;
+	double to_num() const;
+	bool to_bool() const;
+	int to_int() const;
+	const char* to_str() const;
 	int objlen() const;
+	LuaValue metatable() const;
 
 private:
 	lua_State* L;

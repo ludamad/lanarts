@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <stdexcept>
 #include <ctime>
 
 #include <lcommon/fatal_error.h>
@@ -40,7 +41,8 @@ static GameState* init_gamestate() {
 	GameSettings settings; // Initialized with defaults
 	// Load the manual settings
 	if (!load_settings_data(settings, "settings.yaml")) {
-		fatal_error("Fatal error: settings.yaml not found, the game is probably being loaded from the wrong place.\n");
+		fatal_error(
+				"Fatal error: settings.yaml not found, the game is probably being loaded from the wrong place.\n");
 	}
 
 	load_settings_data(settings, "res/saved_settings.yaml"); // Override with remembered settings
@@ -72,7 +74,7 @@ static GameState* init_gamestate() {
 
 /* Must take (int, char**) to play nice with SDL */
 int main(int argc, char** argv) {
-label_StartOver:
+	label_StartOver:
 
 	GameState* gs = init_gamestate();
 	lua_State* L = gs->luastate();
@@ -84,18 +86,30 @@ label_StartOver:
 	engine["menu_start"].push();
 	bool did_exit = !luawrap::call<bool>(L);
 	save_settings_data(gs->game_settings(), "res/saved_settings.yaml"); // Save settings from menu
-	if (did_exit) goto label_Quit; /* User has quit! */
+	if (did_exit)
+		goto label_Quit;
+	/* User has quit! */
 
 	gs->start_connection();
 
 	engine["resources_load"].push();
 	luawrap::call<void>(L);
-	init_game_data(gs->game_settings(), L);
+
+	try {
+		init_game_data(gs->game_settings(), L);
+	} catch (const std::exception& err) {
+		fprintf(stderr, "%s\n", err.what());
+		fflush(stderr);
+		goto label_Quit;
+	}
 
 	if (gs->game_settings().conntype == GameSettings::SERVER) {
 		engine["lobby_menu_start"].push();
 		bool did_exit = !luawrap::call<bool>(L);
-		if (did_exit) goto label_Quit; /* User has quit! */
+
+		if (did_exit) { /* User has quit! */
+			goto label_Quit;
+		}
 	}
 
 	if (gs->start_game()) {
@@ -104,7 +118,8 @@ label_StartOver:
 
 		if (!gs->io_controller().user_has_exit()) {
 			if (gs->game_settings().conntype != GameSettings::CLIENT) {
-				save_settings_data(gs->game_settings(), "res/saved_settings.yaml"); // Save settings from in-game
+				save_settings_data(gs->game_settings(),
+						"res/saved_settings.yaml"); // Save settings from in-game
 			}
 			delete gs;
 			goto label_StartOver;
@@ -115,7 +130,7 @@ label_StartOver:
 		save_settings_data(gs->game_settings(), "res/saved_settings.yaml"); // Save settings from in-game
 	}
 
-label_Quit:
+	label_Quit:
 
 	lanarts_quit();
 

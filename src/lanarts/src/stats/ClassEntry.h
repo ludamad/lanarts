@@ -68,11 +68,11 @@ extern std::vector<ClassEntry> game_class_data;
 class_id get_class_by_name(const char* name);
 
 namespace res {
-	class_id classid(const char* name);
-	class_id classid(const std::string& name);
+	::class_id class_id(const char* name);
+	::class_id class_id(const std::string& name);
 	ClassEntry class_entry(const char* name);
 	ClassEntry class_entry(const std::string& name);
-	ClassEntry class_entry(class_id id);
+	ClassEntry class_entry(::class_id id);
 }
 
 #endif /* CLASSENTRY_H_ */

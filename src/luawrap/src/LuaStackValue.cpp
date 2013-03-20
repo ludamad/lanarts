@@ -62,8 +62,104 @@ LuaField LuaStackValue::operator [](int index) const {
 	return LuaField(L, idx, index);
 }
 
+bool LuaStackValue::has(const char* key) const {
+	return !(*this)[key].isnil();
+}
+
+void LuaStackValue::newtable() const {
+}
+
+bool LuaStackValue::isnil() const {
+	return lua_isnil(L, idx);
+}
+
+void LuaStackValue::pop() const {
+	lua_replace(L, idx);
+}
+
+LuaValue LuaStackValue::metatable() const {
+	push();
+	lua_getmetatable(L, -1);
+	LuaValue table(L, -1);
+	lua_pop(L, 2);
+	return table;
+}
+
+
+void LuaStackValue::set_nil() const {
+	lua_pushnil(L);
+	pop();
+}
+
+static void error_and_pop(lua_State* L, const std::string& expected_type) {
+	const char* repr = lua_tostring(L, -1);
+	std::string obj_repr = repr ? repr : "nil";
+	std::string type = lua_typename(L, -1);
+	lua_pop(L, 1);
+	luawrap::value_error_string(type, "", obj_repr);
+}
+
+
+void* LuaStackValue::to_userdata() const {
+	lua_State* L = luastate();
+	push();
+	void* userdata = lua_touserdata(L, -1);
+	if (!userdata) {
+		error_and_pop(L, "userdata");
+	}
+	lua_pop(L, 1);
+	return userdata;
+}
+
+double LuaStackValue::to_num() const {
+	push();
+	if (!lua_isnumber(L, -1)) {
+		error_and_pop(L, "double");
+	}
+	double num = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+	return num;
+}
+
+
+int LuaStackValue::to_int() const {
+	push();
+
+	//TODO: Evaluate whether full integer checking is necessary
+	double num = lua_tonumber(L, -1);
+	int integer = (int) num;
+	if (!lua_isnumber(L, -1) || num != integer) {
+		error_and_pop(L, "integer");
+	}
+	lua_pop(L, 1);
+	return integer;
+}
+
+bool LuaStackValue::to_bool() const {
+	push();
+	if (!lua_isboolean(L, -1)) {
+		error_and_pop(L, "boolean");
+	}
+	bool boolean = lua_toboolean(L, -1);
+	lua_pop(L, 1);
+	return boolean;
+}
+
+const char* LuaStackValue::to_str() const {
+	push();
+	if (!lua_isstring(L, -1)) {
+		error_and_pop(L, "string");
+	}
+	const char* str = lua_tostring(L, -1);
+	lua_pop(L, 1);
+	return str;
+}
+
 int LuaStackValue::objlen() const {
 	push();
+	if (!lua_istable(L, -1)) {
+		error_and_pop(L, "table");
+	}
 	int len = lua_objlen(L, -1);
 	lua_pop(L, 1);
 	return len;

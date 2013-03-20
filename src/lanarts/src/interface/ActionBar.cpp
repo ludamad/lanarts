@@ -197,7 +197,7 @@ static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 
 	for (int i = 0; i < spell_n; i++) {
 		spell_id spell = spells.get(i);
-		SpellEntry& spl_entry = game_spell_data.at(spell);
+		SpellEntry& spl_entry = res::spell(spell);
 		SpriteEntry& spr_entry = game_sprite_data.at(spl_entry.sprite);
 		res::sprite(spl_entry.sprite).draw(Pos(sx + i * TILE_SIZE, sy));
 	}
@@ -209,7 +209,7 @@ static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 
 		if (spellidx < spell_n) {
 			spell_id spell = spells.get(spellidx);
-			SpellEntry& spl_entry = game_spell_data.at(spell);
+			SpellEntry& spl_entry = res::spell(spell);
 
 			outline_col =
 					is_selected ? COL_SELECTED_OUTLINE : COL_FILLED_OUTLINE;

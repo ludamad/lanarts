@@ -31,7 +31,7 @@ public:
 		int nargs = lua_gettop(L);
 		GameInst* origin_obj = lua_gameinst_arg(L, 1);
 
-		sprite_id sprite = res::spriteid(lua_tostring(L, lua_gettop(L)));
+		sprite_id sprite = res::sprite_id(lua_tostring(L, lua_gettop(L)));
 		lua_pop(L, 1);
 
 		bool bounce = nargs < 8 ? false : lua_toboolean(L, 8);

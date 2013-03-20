@@ -67,7 +67,7 @@ LuaField::LuaField(const LuaField* parent, int index) {
 
 static void adjust_stack_index(lua_State* L, int& stackidx) {
 	if (stackidx > LUA_REGISTRYINDEX + 100 && stackidx < 1) {
-		stackidx+= lua_gettop(L) + 1; // Convert relative negative position to 'absolute' stack position
+		stackidx += lua_gettop(L) + 1; // Convert relative negative position to 'absolute' stack position
 	}
 }
 LuaField::LuaField(lua_State* L, int stackidx, const char* index) {
@@ -86,6 +86,28 @@ LuaField::LuaField(lua_State* L, int stackidx, int index) {
 	par.stack_index = stackidx;
 	ind.integer = index;
 	init(L, INTEGER_INDEX, STACK_PARENT, ind, par);
+}
+
+bool LuaField::has(const char* key) const {
+	return !(*this)[key].isnil();
+}
+
+const LuaField& LuaField::assert_not_nil() const {
+	push();
+	if (!lua_isnil(L, -1)) {
+		lua_pop(L, 1);
+	} else {
+		error_and_pop("nil");
+	}
+	return *this;
+}
+
+LuaValue LuaField::metatable() const {
+	push();
+	lua_getmetatable(L, -1);
+	LuaValue table(L, -1);
+	lua_pop(L, 2);
+	return table;
 }
 
 void LuaField::init(lua_State* L, char index_type, char parent_type,
@@ -216,8 +238,6 @@ LuaField::operator LuaValue() const {
 	return LuaValue::pop_value(L);
 }
 
-
-
 /*****************************************************************************
  *                         Lua API convenience methods                       *
  *****************************************************************************/
@@ -228,7 +248,8 @@ void LuaField::bind_function(lua_CFunction luafunc) const {
 }
 
 void LuaField::error_and_pop(const std::string& expected_type) const {
-	std::string obj_repr= lua_tostring(L, -1);
+	const char* repr = lua_tostring(L, -1);
+	std::string obj_repr = repr ? repr : "nil";
 	std::string type = lua_typename(L, -1);
 	lua_pop(L, 1);
 	luawrap::value_error_string(type, index_path(), obj_repr);
@@ -276,12 +297,22 @@ int LuaField::to_int() const {
 
 	//TODO: Evaluate whether full integer checking is necessary
 	double num = lua_tonumber(L, -1);
-	int integer = (int)num;
+	int integer = (int) num;
 	if (!lua_isnumber(L, -1) || num != integer) {
 		error_and_pop("integer");
 	}
 	lua_pop(L, 1);
 	return integer;
+}
+
+bool LuaField::to_bool() const {
+	push();
+	if (!lua_isboolean(L, -1)) {
+		error_and_pop("boolean");
+	}
+	bool boolean = lua_toboolean(L, -1);
+	lua_pop(L, 1);
+	return boolean;
 }
 
 const char* LuaField::to_str() const {
@@ -296,7 +327,7 @@ const char* LuaField::to_str() const {
 
 int LuaField::objlen() const {
 	push();
-	if (!lua_isstring(L, -1)) {
+	if (!lua_istable(L, -1)) {
 		error_and_pop("table");
 	}
 	int len = lua_objlen(L, -1);
@@ -306,7 +337,7 @@ int LuaField::objlen() const {
 
 const LuaField& luawrap::ensure_table(const LuaField& field) {
 	field.push();
-	if (!lua_istable(field.luastate(), -1)){
+	if (!lua_istable(field.luastate(), -1)) {
 		field.newtable();
 	}
 	lua_pop(field.luastate(), 1);

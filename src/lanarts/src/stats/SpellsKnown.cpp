@@ -23,7 +23,7 @@ void SpellsKnown::remove_spell(spell_id slot) {
 }
 
 SpellEntry& SpellsKnown::get_entry(int ind) {
-	return game_spell_data.at(get(ind));
+	return res::spell(get(ind));
 }
 
 bool SpellsKnown::has_spell(spell_id slot) {

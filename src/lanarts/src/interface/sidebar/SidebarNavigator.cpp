@@ -40,7 +40,7 @@ void SidebarNavigator::NavigationOption::draw_icon(GameState* gs,
 	} else if (icon_bbox.contains(gs->mouse_x(), gs->mouse_y())) {
 		col = COL_HOVER_VIEWICON;
 	}
-	draw_sprite(res::spriteid(iconsprite.c_str()), icon_bbox.x1, icon_bbox.y1, col);
+	draw_sprite(res::sprite_id(iconsprite.c_str()), icon_bbox.x1, icon_bbox.y1, col);
 }
 
 static BBox icon_bounds(const BBox& main_content_bounds, int icon_n,

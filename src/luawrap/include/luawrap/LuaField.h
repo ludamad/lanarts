@@ -68,25 +68,34 @@ public:
 	operator LuaValue() const;
 
 	template<typename T>
-	T as();
+	T as() const;
+
+	template<typename T>
+	bool is() const;
+
+	const LuaField& assert_not_nil() const;
 
 	template<typename T>
 	T defaulted(const char* key, const T& value) const;
-
 
 	void bind_function(lua_CFunction luafunc) const;
 	template<typename Function>
 	void bind_function(const Function& function) const;
 
 	/** Lua api convenience methods **/
+	bool has(const char* key) const;
 	void newtable() const;
 	void set_nil() const;
 	bool isnil() const;
 	int objlen() const;
 	void* to_userdata() const;
 	double to_num() const;
+	bool to_bool() const;
 	int to_int() const;
 	const char* to_str() const;
+
+	LuaValue metatable() const;
+
 private:
 	void error_and_pop(const std::string& expected_type) const;
 	void handle_nil_parent() const;
@@ -117,6 +126,24 @@ private:
 
 namespace luawrap {
 	const LuaField& ensure_table(const LuaField& field);
+	template <typename LuaWrapper, typename T>
+	T set_if_nil(const LuaWrapper& wrapper, const T& value) {
+		if (wrapper.isnil()) {
+			wrapper = value;
+			return value;
+		}
+
+		return wrapper.template as<T>();
+	}
+	template <typename LuaWrapper, typename T>
+	T set_if_nil(const LuaWrapper& wrapper, const char* key, const T& value) {
+		LuaField field = wrapper[key];
+		if (field.isnil()) {
+			field = value;
+			return value;
+		}
+		return field.as<T>();
+	}
 }
 
 #endif /* LUAFIELD_H_ */

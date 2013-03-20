@@ -42,15 +42,15 @@ struct SpriteEntry {
 extern std::vector<SpriteEntry> game_sprite_data;
 
 namespace res {
-	const std::string& sprite_name(sprite_id idx);
+	const std::string& sprite_name(::sprite_id idx);
 	bool sprite_exists(const std::string& name);
-	ldraw::Drawable& sprite(sprite_id idx);
+	ldraw::Drawable& sprite(::sprite_id idx);
 
 	ldraw::Drawable& sprite(const char* name);
 	ldraw::Drawable& sprite(const std::string& name);
 
-	sprite_id spriteid(const char* name);
-	sprite_id spriteid(const std::string& name);
+	::sprite_id sprite_id(const char* name);
+	::sprite_id sprite_id(const std::string& name);
 }
 
 #endif /* SPRITEENTRY_H_ */

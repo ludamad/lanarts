@@ -268,10 +268,13 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 
 	__lua_init(L, game_enemy_data);
 	__lua_init(L, game_effect_data);
-	__lua_init(L, game_spell_data);
 
 	for (int i = 0; i < game_item_data.size(); i++) {
 		game_item_data[i]->init(L);
+	}
+
+	for (int i = 0; i < game_spell_data.size(); i++) {
+		game_spell_data[i].initialize(L);
 	}
 }
 

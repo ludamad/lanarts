@@ -53,6 +53,6 @@ void draw_speed_box(GameState* gs, const BBox& bbox) {
 	int diff = settings.time_per_step - 10;
 	draw_setting_box(gs, bbox,
 			bbox.contains(gs->mouse_pos()) ? COL_GOLD : COL_WHITE,
-			res::spriteid("speed setting icon"),
+			res::sprite_id("speed setting icon"),
 			COL_WHITE.alpha(255 - diff * 30), text, COL_WHITE);
 }

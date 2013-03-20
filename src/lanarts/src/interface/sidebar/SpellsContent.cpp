@@ -36,7 +36,7 @@ static void draw_spells_known(GameState* gs, const BBox& bbox,
 			break;
 
 		spell_id spell = spells.get(spellidx);
-		SpellEntry& spl_entry = game_spell_data.at(spell);
+		SpellEntry& spl_entry = res::spell(spell);
 		draw_spell_icon_and_name(gs, spl_entry, Colour(), x, y);
 
 		BBox entry_box(x, y, ex, y + TILE_SIZE);

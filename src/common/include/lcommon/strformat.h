@@ -12,6 +12,7 @@
 
 
 std::string str_pack(std::string str);
+std::string str_tolower(std::string str);
 
 std::string format(const char* fmt, ...);
 void format(std::string& str, const char* fmt, ...);

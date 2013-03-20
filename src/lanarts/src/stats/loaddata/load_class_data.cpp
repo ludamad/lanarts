@@ -11,6 +11,7 @@
 #include <luawrap/luawrap.h>
 
 #include <lcommon/lua_lcommon.h>
+#include <lcommon/strformat.h>
 
 #include "data/game_data.h"
 #include "data/parse.h"
@@ -30,7 +31,7 @@ ClassSpell parse_class_spell(const YAML::Node& n) {
 	ClassSpell spell;
 
 	std::string spellname = parse_str(n["spell"]);
-	spell.spell = get_spell_by_name(spellname.c_str());
+	spell.spell = res::spell_id(spellname.c_str());
 	spell.xplevel_required = parse_int(n["level_needed"]);
 
 	return spell;
@@ -93,7 +94,6 @@ static void lapi_data_create_class(const LuaStackValue& table) {
 	entry.class_id = game_class_data.size();
 	game_class_data.push_back(entry);
 }
-
 
 LuaValue load_class_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["data"]);

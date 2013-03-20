@@ -21,10 +21,10 @@ void ConfigContent::draw(GameState* gs) const {
 
 	BBox entry_box(bbox.x1, bbox.y1, bbox.x2, bbox.y1 + TILE_SIZE);
 	draw_option_box(gs, entry_box, settings.autouse_mana_potions,
-			res::spriteid("mana_potion"), "Auto-Use Mana Potions");
+			res::sprite_id("mana_potion"), "Auto-Use Mana Potions");
 	entry_box = entry_box.translated(0, TILE_SIZE);
 	draw_option_box(gs, entry_box, settings.autouse_health_potions,
-			res::spriteid("health_potion"), "Auto-Use Health Potions");
+			res::sprite_id("health_potion"), "Auto-Use Health Potions");
 	entry_box = entry_box.translated(0, TILE_SIZE);
 	draw_speed_box(gs, entry_box);
 }

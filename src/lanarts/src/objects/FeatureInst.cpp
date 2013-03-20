@@ -44,9 +44,9 @@ void FeatureInst::step(GameState* gs) {
 	if (gs->object_visible_test(this)) {
 		sprite_id spr = spriteid;
 		if (feature == DOOR_CLOSED) {
-			spr = res::spriteid("closed door");
+			spr = res::sprite_id("closed door");
 		} else if (feature == DOOR_OPEN) {
-			spr = res::spriteid("open door");
+			spr = res::sprite_id("open door");
 		}
 		last_seen_spr = spr;
 	}

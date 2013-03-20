@@ -4,14 +4,15 @@
  */
 
 #include <lua.hpp>
-#include <luawrap/luawrap.h>
 
-#include "lua_api/LuaValueContext.h"
+#include <luawrap/luawrap.h>
 
 #include <lcommon/strformat.h>
 
 #include "data/game_data.h"
 #include "stats/stat_formulas.h"
+
+#include "SpellEntry.h"
 #include "ClassEntry.h"
 
 sprite_id ClassEntry::get_sprite() {
@@ -19,25 +20,25 @@ sprite_id ClassEntry::get_sprite() {
 }
 
 const char* ClassEntry::entry_type() {
-	return "ClassEntry";
+	return "Class";
 }
 
-static Item parse_as_item(const LuaValueContext& value,
+static Item parse_as_item(const LuaField& value,
 		const char* key = "item") {
-	return Item(get_item_by_name(value[key]->as<const char*>()),
+	return Item(get_item_by_name(value[key].to_str()),
 			value.defaulted("amount", 1));
 }
 
-static Inventory parse_inventory(const LuaValueContext& value) {
+static Inventory parse_inventory(const LuaField& value) {
 	Inventory ret;
-	int len = value->objlen();
+	int len = value.objlen();
 	for (int i = 1; i <= len; i++) {
 		ret.add(parse_as_item(value[i]));
 	}
 	return ret;
 }
 
-static EquipmentStats parse_equipment(const LuaValueContext& value) {
+static EquipmentStats parse_equipment(const LuaField& value) {
 	EquipmentStats ret;
 	if (value.has("inventory")) {
 		ret.inventory = parse_inventory(value["inventory"]);
@@ -55,7 +56,7 @@ static EquipmentStats parse_equipment(const LuaValueContext& value) {
 	return ret;
 }
 
-static CoreStats parse_core_stats(const LuaValueContext& value) {
+static CoreStats parse_core_stats(const LuaField& value) {
 	CoreStats core;
 	core.max_mp = value.defaulted("mp", 0);
 	core.max_hp = value.defaulted("hp", 0);
@@ -74,24 +75,24 @@ static CoreStats parse_core_stats(const LuaValueContext& value) {
 	return core;
 }
 
-static AttackStats parse_attack_stats(const LuaValueContext& value) {
+static AttackStats parse_attack_stats(const LuaField& value) {
 	AttackStats ret;
 
 	if (value.has("weapon")) {
 		ret.weapon = Weapon(
-				get_weapon_by_name(value["weapon"]->as<const char*>()));
+				get_weapon_by_name(value["weapon"].to_str()));
 	}
 	if (value.has("projectile")) {
 		ret.projectile = Projectile(
-				get_projectile_by_name(value["projectile"]->as<const char*>()));
+				get_projectile_by_name(value["projectile"].to_str()));
 	}
 	return ret;
 }
 
-static CombatStats parse_combat_stats(const LuaValueContext& value) {
+static CombatStats parse_combat_stats(const LuaField& value) {
 	CombatStats ret;
 
-	ret.movespeed = value["movespeed"]->as<float>();
+	ret.movespeed = value["movespeed"].to_num();
 	if (value.has("equipment")) {
 		ret.equipment = parse_equipment(value["equipment"]);
 	}
@@ -109,20 +110,20 @@ static CombatStats parse_combat_stats(const LuaValueContext& value) {
 	return ret;
 }
 
-static ClassSpell parse_class_spell(const LuaValueContext& value) {
+static ClassSpell parse_class_spell(const LuaField& value) {
 	ClassSpell spell;
 
-	spell.spell = get_spell_by_name(value["spell"]->as<const char*>());
-	spell.xplevel_required = value["level_needed"]->as<int>();
+	spell.spell = res::spell_id(value["spell"].to_str());
+	spell.xplevel_required = value["level_needed"].to_int();
 
 	return spell;
 }
 
 static ClassSpellProgression parse_class_spell_progression(
-		const LuaValueContext& value) {
+		const LuaField& value) {
 	ClassSpellProgression progression;
 
-	int valuelen = value->objlen();
+	int valuelen = value.objlen();
 	for (int i = 1; i <= valuelen; i++) {
 		progression.available_spells.push_back(parse_class_spell(value[i]));
 	}
@@ -131,7 +132,7 @@ static ClassSpellProgression parse_class_spell_progression(
 }
 
 static void parse_gain_per_level(ClassEntry& entry,
-		const LuaValueContext& value) {
+		const LuaField& value) {
 	entry.hp_perlevel = value.defaulted("hp", 0);
 	entry.mp_perlevel = value.defaulted("mp", 0);
 
@@ -145,42 +146,36 @@ static void parse_gain_per_level(ClassEntry& entry,
 }
 
 void ClassEntry::parse_lua_table(const LuaValue& table) {
-	ResourceEntryBase::parse_lua_table(table);
-
-	std::string fmt = format("Error while creating ClassEntry: "
-			"expected %s%%s field, but did not exist!\n", name.c_str());
-	LuaValueContext value(table, fmt.c_str());
-
-	parse_gain_per_level(*this, value["gain_per_level"]);
+	parse_gain_per_level(*this, table["gain_per_level"]);
 
 	spell_progression = parse_class_spell_progression(
-			value["available_spells"]);
-	starting_stats = parse_combat_stats(value["start_stats"]);
+			table["available_spells"]);
+	starting_stats = parse_combat_stats(table["start_stats"]);
 
-	LuaValueContext sprites = value["sprites"];
-	int sprite_len = sprites->objlen();
+	LuaField sprites = table["sprites"];
+	int sprite_len = sprites.objlen();
 	for (int i = 1; i <= sprite_len; i++) {
-		this->sprites.push_back(res::spriteid(sprites[i]->as<const char*>()));
+		this->sprites.push_back(res::sprite_id(sprites[i].to_str()));
 	}
 }
 namespace res {
-	class_id classid(const char* name) {
+	::class_id class_id(const char* name) {
 		return get_class_by_name(name);
 	}
 
-	class_id classid(const std::string& name) {
+	::class_id class_id(const std::string& name) {
 		return get_class_by_name(name.c_str());
 	}
 
 	ClassEntry class_entry(const char* name) {
-		return game_class_data.at(classid(name));
+		return game_class_data.at(class_id(name));
 	}
 
 	ClassEntry class_entry(const std::string& name) {
-		return game_class_data.at(classid(name));
+		return game_class_data.at(class_id(name));
 	}
 
-	ClassEntry class_entry(class_id id) {
+	ClassEntry class_entry(::class_id id) {
 		return game_class_data.at(id);
 	}
 }

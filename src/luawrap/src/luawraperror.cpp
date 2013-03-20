@@ -29,7 +29,7 @@ namespace luawrap {
 
 	std::string value_error_string(const std::string& type,
 			const std::string& object_path, const std::string& object_repr) {
-		return "Invalid value at <object>" + object_path + ", expected a " + type
+		return "Invalid value at " + object_path + ", expected a " + type
 				+ " type but got " + object_repr;
 	}
 }

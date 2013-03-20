@@ -111,7 +111,7 @@ static void generate_shop(GameState* gs, GeneratedRoom& level, MTwist& mt,
 
 	int itemn = mt.rand(Range(2, 14));
 	gs->add_instance(
-			new StoreInst(worldpos, false, res::spriteid("store"),
+			new StoreInst(worldpos, false, res::sprite_id("store"),
 					generate_shop_inventory(mt, itemn)));
 
 }
@@ -121,7 +121,7 @@ static void generate_statue(GameState* gs, GeneratedRoom& level, MTwist& mt,
 	level.at(p).has_instance = true;
 
 	int itemn = mt.rand(Range(2, 10));
-	sprite_id spriteid = res::spriteid("statue");
+	sprite_id spriteid = res::sprite_id("statue");
 	SpriteEntry& statue_sprite = game_sprite_data.at(spriteid);
 	ldraw::Drawable& sprite = res::sprite(spriteid);
 	int nimages = (int)sprite.animation_duration();

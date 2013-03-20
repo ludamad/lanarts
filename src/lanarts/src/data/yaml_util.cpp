@@ -33,7 +33,7 @@ std::vector<const YAML::Node*> flatten_seq_mappings(const YAML::Node & n) {
 int parse_sprite_number(const YAML::Node & n) {
 	std::string s;
 	n >> s;
-	return res::spriteid(s.c_str());
+	return res::sprite_id(s.c_str());
 }
 
 int parse_sprite_number(const YAML::Node & n, const char *key) {
@@ -42,7 +42,7 @@ int parse_sprite_number(const YAML::Node & n, const char *key) {
 
 	std::string s;
 	n[key] >> s;
-	return res::spriteid(s.c_str());
+	return res::sprite_id(s.c_str());
 }
 
 int parse_enemy_number(const YAML::Node& n, const char *key) {
@@ -165,8 +165,8 @@ void load_data_impl_template(const FilenameList& filenames,
 				fflush(stdout);
 			}
 		} else {
-			printf("file '%s' could not be loaded!\n", it->c_str());
-			fflush(stdout);
+			fprintf(stderr, "Resource file %s does not exist!\n", it->c_str());
+			fflush(stderr);
 		}
 	}
 

@@ -129,14 +129,21 @@ inline void LuaField::operator =(const T& value) {
 }
 
 template<typename T>
-inline T LuaField::as() {
+inline T LuaField::as() const {
 	push();
 	return luawrap::pop<T>(L);
 }
 
 template<typename T>
-inline T LuaField::defaulted(const char* key, const T& value) const {
+inline bool LuaField::is() const {
 	luawrap::_private::PopHack delayedpop(L);
+	push();
+	return luawrap::check<T>(L, -1);
+}
+
+template<typename T>
+inline T LuaField::defaulted(const char* key, const T& value) const {
+	luawrap::_private::PopHack delayedpop1(L), delayedpop2(L);
 	push();
 	lua_getfield(L, -1, key);
 	if (lua_isnil(L, -1)) {
@@ -156,7 +163,7 @@ inline T LuaStackValue::as() const {
 template<typename T>
 inline T LuaStackValue::defaulted(const char* key, const T& value) const {
 	lua_State* L = luastate();
-	luawrap::_private::PopHack delayedpop(L);
+	luawrap::_private::PopHack delayedpop1(L), delayedpop2(L);
 	push();
 	lua_getfield(L, -1, key);
 	if (lua_isnil(L, -1)) {

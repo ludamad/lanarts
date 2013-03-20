@@ -50,6 +50,13 @@ std::string str_pack(std::string str) {
 	return str; /* return the table */
 }
 
+std::string str_tolower(std::string str) {
+	for (int i = 0; i < str.size(); i++) {
+		str[i] = tolower(str[i]);
+	}
+	return str;
+}
+
 // Note that because va_copy is not portable, this must be able to fail.
 // It is thus 'part' of the solution. The resulting string should not be used if it fails.
 // Correct usage:

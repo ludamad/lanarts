@@ -35,7 +35,7 @@ SUITE(ClassEntry_tests) {
 		lua_safe_dostring(L, program.c_str());
 
 		ClassEntry mage;
-		mage.parse_lua_table(luawrap::globals(L)["table"]);
+		mage.init(0, luawrap::globals(L)["table"]);
 		CHECK("Mage" ==  mage.name);
 		CHECK(1 ==  mage.starting_stats.movespeed);
 		CHECK(2 ==  mage.starting_stats.core.hp);

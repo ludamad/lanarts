@@ -53,17 +53,13 @@ public:
 
 	void init(lua_State* L);
 
-	void newtable() const;
-
 	void operator=(const LuaValue& value);
 
-	void pop();
-	void set(int pos);
+	void pop() const;
 	void clear();
 
 	void push() const;
 	bool empty() const;
-	bool isnil() const;
 
 	// Convert to any type
 	template<typename T>
@@ -80,7 +76,19 @@ public:
 	LuaField operator[](const char* key) const;
 	LuaField operator[](int index) const;
 
+	/* Lua api convenience methods*/
+	void set(int pos);
+	bool has(const char* key) const;
+	void newtable() const;
+	void set_nil() const;
+	bool isnil() const;
+	void* to_userdata() const;
+	double to_num() const;
+	bool to_bool() const;
+	int to_int() const;
+	const char* to_str() const;
 	int objlen() const;
+	LuaValue metatable() const;
 
 	bool operator==(const LuaValue& o) const;
 	bool operator!=(const LuaValue& o) const;

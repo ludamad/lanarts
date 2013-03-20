@@ -16,6 +16,8 @@
 
 using namespace std;
 
+extern std::vector<SpellEntry> game_spell_data;
+
 Projectile parse_projectile_name(const YAML::Node& n) {
 	std::string projectile_name = parse_str(n);
 	projectile_id id = get_projectile_by_name(projectile_name.c_str());

@@ -49,8 +49,10 @@ void lua_assert_invalid_dostring(lua_State* L, const char* code) {
 
 void TestLuaState::finish_check() const {
 	if (lua_gettop(L) != 0) {
+		char entry_buff[32];
+		sprintf(entry_buff, "%d", lua_gettop(L));
 		throw std::runtime_error(
-				"Failed assertion after test, lua_gettop(L) == 0");
+				std::string("Failed assertion after test, lua_gettop(L) == 0, was ") + entry_buff);
 	}
 }
 

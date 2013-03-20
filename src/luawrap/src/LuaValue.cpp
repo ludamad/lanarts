@@ -45,9 +45,9 @@ namespace _luawrap_private {
 			lua_gettable(L, LUA_REGISTRYINDEX);
 		}
 
-		void pop() {
+		void pop() const {
 			int valueidx = lua_gettop(L);
-			lua_pushlightuserdata(L, this); /* push address as key */
+			lua_pushlightuserdata(L, (void*)this); /* push address as key */
 			lua_pushvalue(L, valueidx); /*Clone value*/
 			lua_settable(L, LUA_REGISTRYINDEX);
 
@@ -119,7 +119,7 @@ void LuaValue::set(int pos) {
 	impl->set(pos);
 }
 
-void LuaValue::pop() {
+void LuaValue::pop() const {
 	impl->pop();
 }
 
@@ -140,6 +140,10 @@ void LuaValue::operator =(const LuaValue & value) {
 
 bool LuaValue::empty() const {
 	return impl == NULL || impl->L == NULL;
+}
+
+bool LuaValue::has(const char* key) const {
+	return !(*this)[key].isnil();
 }
 
 bool LuaValue::isnil() const {
@@ -232,13 +236,6 @@ lua_State* LuaValue::luastate() const {
 	return impl->L;
 }
 
-int LuaValue::objlen() const {
-	push();
-	int len = lua_objlen(luastate(), -1);
-	lua_pop(luastate(), 1);
-	return len;
-}
-
 LuaField LuaValue::operator [](std::string& key) const {
 	return LuaField(impl->L, (void*)impl, key.c_str());
 }
@@ -249,6 +246,97 @@ LuaField LuaValue::operator [](const char* key) const {
 
 LuaField LuaValue::operator [](int index) const {
 	return LuaField(impl->L, (void*)impl, index);
+}
+
+LuaValue LuaValue::metatable() const {
+	push();
+	lua_getmetatable(impl->L, -1);
+	LuaValue table(impl->L, -1);
+	lua_pop(impl->L, 2);
+	return table;
+}
+
+void LuaValue::set_nil() const {
+	lua_pushnil(luastate());
+	pop();
+}
+
+static void error_and_pop(lua_State* L, const std::string& expected_type) {
+	const char* repr = lua_tostring(L, -1);
+	std::string obj_repr = repr ? repr : "nil";
+	std::string type = lua_typename(L, -1);
+	lua_pop(L, 1);
+	luawrap::value_error_string(type, "", obj_repr);
+}
+
+void* LuaValue::to_userdata() const {
+	lua_State* L = luastate();
+	push();
+	void* userdata = lua_touserdata(L, -1);
+	if (!userdata) {
+		error_and_pop(L, "userdata");
+	}
+	lua_pop(L, 1);
+	return userdata;
+}
+
+double LuaValue::to_num() const {
+	lua_State* L = luastate();
+	push();
+	if (!lua_isnumber(L, -1)) {
+		error_and_pop(L, "double");
+	}
+	double num = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+	return num;
+}
+
+
+int LuaValue::to_int() const {
+	lua_State* L = luastate();
+	push();
+
+	//TODO: Evaluate whether full integer checking is necessary
+	double num = lua_tonumber(L, -1);
+	int integer = (int) num;
+	if (!lua_isnumber(L, -1) || num != integer) {
+		error_and_pop(L, "integer");
+	}
+	lua_pop(L, 1);
+	return integer;
+}
+
+bool LuaValue::to_bool() const {
+	lua_State* L = luastate();
+	push();
+	if (!lua_isboolean(L, -1)) {
+		error_and_pop(L, "boolean");
+	}
+	bool boolean = lua_toboolean(L, -1);
+	lua_pop(L, 1);
+	return boolean;
+}
+
+const char* LuaValue::to_str() const {
+	lua_State* L = luastate();
+	push();
+	if (!lua_isstring(L, -1)) {
+		error_and_pop(L, "string");
+	}
+	const char* str = lua_tostring(L, -1);
+	lua_pop(L, 1);
+	return str;
+}
+
+int LuaValue::objlen() const {
+	lua_State* L = luastate();
+	push();
+	if (!lua_istable(L, -1)) {
+		error_and_pop(L, "table");
+	}
+	int len = lua_objlen(L, -1);
+	lua_pop(L, 1);
+	return len;
 }
 
 LuaValue LuaValue::pop_value(lua_State* L) {

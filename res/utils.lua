@@ -114,8 +114,9 @@ function DEBUG_BOX_DRAW(self, xy)
     end
 end
 
-function pretty_tostring(val, tabs)
+function pretty_tostring(val, tabs, --[[Optional]] quote_strings)
     tabs = tabs or 0
+    quote_strings = (quote_strings == nil) or quote_strings
 
     local tabstr = ""
 
@@ -123,11 +124,15 @@ function pretty_tostring(val, tabs)
         tabstr = tabstr .. "  "
     end
 
+    if type(val) == "string" and quote_strings then
+        return tabstr .. "\"" .. val .. "\""
+    end
+
     if type(val) ~= "table" then
         return tabstr .. tostring(val)
     end
 
-    local parts = {tabstr .. "{", --[[sentinel for remove below]]""}
+    local parts = {"{", --[[sentinel for remove below]]""}
 
     for k,v in pairs(val) do
         table.insert(parts, "\n")
@@ -135,9 +140,9 @@ function pretty_tostring(val, tabs)
         if type(k) == "number" then
             table.insert(parts, pretty_tostring(v, tabs+1))
         else 
-            table.insert(parts, pretty_tostring(k, tabs+1))
+            table.insert(parts, pretty_tostring(k, tabs+1, false))
             table.insert(parts, " = ")
-            table.insert(parts, pretty_tostring(v))
+            table.insert(parts, pretty_tostring(v, type(v) == "table" and tabs+1 or 0))
         end
 
         table.insert(parts, ",")
