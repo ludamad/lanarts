@@ -56,7 +56,7 @@ local function class_image_for_name_hack(name)
 end
 
 local function sorted_scores_fetch()
-    local scores = game.score_board_fetch()
+    local scores = Game.score_board_fetch()
 
     local function entry_compare(a, b)
         if a.won_the_game ~= b.won_the_game     then return a.won_the_game end

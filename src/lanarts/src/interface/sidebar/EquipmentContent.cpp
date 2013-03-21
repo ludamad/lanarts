@@ -72,11 +72,11 @@ struct SlotAndDefault {
 	}
 };
 
-const SlotAndDefault slot_data[] = { SlotAndDefault(EquipmentEntry::PROJECTILE,
+const SlotAndDefault slot_data[] = { SlotAndDefault(EquipmentEntry::AMMO,
 		"No Projectile"), SlotAndDefault(EquipmentEntry::BODY_ARMOUR,
 		"No Armour"), SlotAndDefault(EquipmentEntry::BOOTS, "No Boots"),
 		SlotAndDefault(EquipmentEntry::GLOVES, "No Gloves"), SlotAndDefault(
-				EquipmentEntry::HELMET, "No Helmet"), };
+				EquipmentEntry::HEADGEAR, "No Headgear"), };
 
 const size_t slot_data_n = sizeof(slot_data) / sizeof(SlotAndDefault);
 

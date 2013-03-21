@@ -25,8 +25,8 @@ end
 
 local function center_screen_setup()
 	local center_box = InstanceBox.create( { size = {640, 480} } )
-	local task_label = TextLabel.create( fonts.small, {color=COL_MUTED_GREEN, origin=CENTER_TOP}, "")
-	local loading_label = TextLabel.create( fonts.large, { color=COL_LIGHT_GRAY, origin=CENTER_TOP }, "" )
+	local task_label = TextLabel.create( Fonts.small, {color=COL_MUTED_GREEN, origin=CENTER_TOP}, "")
+	local loading_label = TextLabel.create( Fonts.large, { color=COL_LIGHT_GRAY, origin=CENTER_TOP }, "" )
 	local dragon_sprite = Sprite.image_create("res/enemies/bosses/sprites/reddragon.png")
 
 	center_box:add_instance( 

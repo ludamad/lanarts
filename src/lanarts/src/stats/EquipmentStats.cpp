@@ -21,7 +21,7 @@ bool EquipmentStats::valid_to_use(const Item& item) {
 		return true;
 	}
 	switch (item.equipment_entry().type) {
-	case EquipmentEntry::PROJECTILE:
+	case EquipmentEntry::AMMO:
 		return projectile_valid_to_equip(inventory, item);
 	}
 	return true;
@@ -60,7 +60,7 @@ bool EquipmentStats::has_armour() {
 }
 
 bool EquipmentStats::has_projectile() {
-	return inventory.get_equipped(EquipmentEntry::PROJECTILE) != -1;
+	return inventory.get_equipped(EquipmentEntry::AMMO) != -1;
 }
 
 ItemSlot& EquipmentStats::weapon_slot() {
@@ -69,7 +69,7 @@ ItemSlot& EquipmentStats::weapon_slot() {
 }
 
 ItemSlot& EquipmentStats::projectile_slot() {
-	itemslot_t slot = inventory.get_equipped(EquipmentEntry::PROJECTILE);
+	itemslot_t slot = inventory.get_equipped(EquipmentEntry::AMMO);
 	return inventory.get(slot);
 }
 

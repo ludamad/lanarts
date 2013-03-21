@@ -32,15 +32,15 @@ const char* EquipmentEntry::entry_type() {
 		return "Armour";
 	case EquipmentEntry::BOOTS:
 		return "Boots";
-	case EquipmentEntry::HELMET:
-		return "Helmet";
+	case EquipmentEntry::HEADGEAR:
+		return "Headgear";
 	case EquipmentEntry::GLOVES:
 		return "Gloves";
 	case EquipmentEntry::RING:
 		return "Ring";
 	case EquipmentEntry::WEAPON:
 		return "Weapon";
-	case EquipmentEntry::PROJECTILE: {
+	case EquipmentEntry::AMMO: {
 		ProjectileEntry* pentry = dynamic_cast<ProjectileEntry*>(this);
 		if (pentry->is_standalone()) {
 			return "Throwing Weapon";

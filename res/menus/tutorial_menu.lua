@@ -56,7 +56,7 @@ function tutorial_menu_show(...)
     function go_back()    update_screen(screen_idx - 1) end
     function go_forward() update_screen(screen_idx + 1) end
 
-    while game.input_capture() and not key_pressed(keys.ESCAPE) and screen  do
+    while Game.input_capture() and not key_pressed(keys.ESCAPE) and screen  do
         display.draw_start()
         screen:step( {0,0} )
 
@@ -70,7 +70,7 @@ function tutorial_menu_show(...)
 
         screen:draw( {0,0} )
         display.draw_finish()
-        game.wait(100)
+        Game.wait(100)
     end
 
     return false

@@ -155,7 +155,7 @@ function setup_scores_menu()
 end
 
 local function menu_loop(should_poll)
-    while game.input_capture() do
+    while Game.input_capture() do
         if key_pressed(keys.F9) then
             -- note, globals are usually protected against being changed
             -- but a bypass is allowed for cases where it must be done
@@ -182,7 +182,7 @@ local function menu_loop(should_poll)
         menu_state.menu:draw( {0, 0} )
         display.draw_finish()
 
-        game.wait(10)
+        Game.wait(10)
     end
 
     return false -- User has quit the game

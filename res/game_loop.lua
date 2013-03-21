@@ -21,24 +21,24 @@ local function game_loop_body(steponly)
 
     if not steponly then
         perf.timing_begin("**Draw**")
-        game.draw()
+        Game.draw()
         perf.timing_end("**Draw**")
     end
 
     perf.timing_begin("**Step**")
-    if not game_loop_control.game_is_paused and not game.step() then 
+    if not game_loop_control.game_is_paused and not Game.step() then 
         return false 
     end
     perf.timing_end("**Step**")
 
-    if not game.input_handle() then 
+    if not Game.input_handle() then 
         return false 
     end
 
     local surplus = settings.time_per_step - timer:get_milliseconds()
 
     perf.timing_begin("**Surplus**")
-    game.wait(surplus)
+    Game.wait(surplus)
     perf.timing_end("**Surplus**")
 
     perf.timing_end("**Game Frame**")
@@ -52,7 +52,7 @@ function game_post_draw()
     for pdata in values(world.players) do
         local p = pdata.instance
         if not p:is_local_player() and p.floor == player.floor then
-            fonts.small:draw({color=COL_WHITE, origin=CENTER}, screen_coords{p.x, p.y-18}, pdata.name)
+            Fonts.small:draw({color=COL_WHITE, origin=CENTER}, screen_coords{p.x, p.y-18}, pdata.name)
         end
     end
 end
@@ -62,13 +62,13 @@ local fps_count = 1
 local fps_lastframe = 0
 local fps = nil
 function game_overlay_draw()
-    local frame_increase = math.max(0, game.frame - fps_lastframe)
-    fps_lastframe = game.frame
+    local frame_increase = math.max(0, Game.frame - fps_lastframe)
+    fps_lastframe = Game.frame
     fps_count = fps_count + frame_increase
 
     if fps then
         local w,h = unpack( display.window_size ) 
-        fonts.small:draw( {origin=RIGHT_BOTTOM}, {w, h}, "FPS: " .. math.floor(fps) )
+        Fonts.small:draw( {origin=RIGHT_BOTTOM}, {w, h}, "FPS: " .. math.floor(fps) )
     end
 
     local ms = fps_timer:get_milliseconds()
@@ -84,13 +84,13 @@ end
 function game_loop()
     game_loop_control.startup_function()
 
-    game.input_capture()
+    Game.input_capture()
 
     while true do 
         local single_player = (settings.connection_type == net.NONE)
     
         if key_pressed(keys.F2) and single_player then 
-            game.resources_load()
+            Game.resources_load()
         end
 
         if key_pressed(keys.F3) and single_player then 
@@ -105,11 +105,11 @@ function game_loop()
             show_message("Press Shift + Esc to exit, your progress will be saved.")
         end
 
-	local steponly = (game.frame % settings.steps_per_draw ~= 0)
+	local steponly = (Game.frame % settings.steps_per_draw ~= 0)
         if not game_loop_body(steponly) then
             if single_player then
-                game.score_board_store()
-                game.save("res/savefile.save")
+                Game.score_board_store()
+                Game.save("res/savefile.save")
             end
             break
         end
@@ -119,7 +119,7 @@ function game_loop()
         end
 
         if key_pressed(keys.F5) then
-            game.input_capture(true) -- reset input
+            Game.input_capture(true) -- reset input
             net.sync_message_send()
         end
     end

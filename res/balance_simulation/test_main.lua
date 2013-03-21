@@ -62,7 +62,7 @@ end
 local function menu_loop()
     local draw_function = draw_function_create()
 
-    while game.input_capture() and not key_pressed(keys.ESCAPE) do
+    while Game.input_capture() and not key_pressed(keys.ESCAPE) do
         if key_pressed(keys.F9) then
             -- note, globals are usually protected against being changed
             -- but a bypass is allowed for cases where it must be done
@@ -74,7 +74,7 @@ local function menu_loop()
         display.draw_finish()
 
         io.flush()
-        game.wait(10)
+        Game.wait(10)
     end
 
     return false -- User has quit the game

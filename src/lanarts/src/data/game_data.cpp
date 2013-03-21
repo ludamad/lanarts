@@ -105,7 +105,7 @@ const char* equip_type_description(const ItemEntry& ientry) {
 		return "Armour";
 	case EquipmentEntry::WEAPON:
 		return "Weapon";
-	case EquipmentEntry::PROJECTILE: {
+	case EquipmentEntry::AMMO: {
 		const ProjectileEntry* pentry =
 				dynamic_cast<const ProjectileEntry*>(eentry);
 		if (pentry->is_standalone()) {
@@ -191,7 +191,7 @@ LuaValue lua_sprites, lua_armours, lua_enemies, lua_effects, lua_weapons,
 LuaValue lua_settings;
 
 static void update_loading_screen(lua_State* L, int percent, const char* task) {
-	luawrap::globals(L)["engine"].push();
+	luawrap::globals(L)["Engine"].push();
 
 	lua_getfield(L, -1, "loading_screen_draw");
 	if (!lua_isnil(L, -1)) {

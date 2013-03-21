@@ -44,7 +44,7 @@ namespace lua_api {
 		LuaValue globals = luawrap::globals(L);
 		GameState* gs = lua_api::gamestate(L);
 
-		LuaValue fonts = luawrap::ensure_table(globals["fonts"]);
+		LuaValue fonts = luawrap::ensure_table(globals["Fonts"]);
 
 		fonts["small"] = gs->font();
 		fonts["large"] = gs->menu_font();

@@ -452,7 +452,7 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 					if (!p.empty()) {
 						if (!p.projectile_entry().is_standalone()) {
 							inventory().deequip_type(
-									EquipmentEntry::PROJECTILE);
+									EquipmentEntry::AMMO);
 						}
 					}
 					equipment().equip(slot);

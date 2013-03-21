@@ -76,7 +76,7 @@ static bool handle_equip_slot_io(GameState* gs, PlayerInst* p, const BBox& bbox,
 		if (!p->projectile().empty()) {
 			queued_actions.push_back(
 					game_action(gs, p, GameAction::DEEQUIP_ITEM,
-							EquipmentEntry::PROJECTILE));
+							EquipmentEntry::AMMO));
 			return true;
 		}
 	}
@@ -92,6 +92,7 @@ static bool handle_equip_slot_io(GameState* gs, PlayerInst* p, const BBox& bbox,
 	}
 	return false;
 }
+
 
 static bool handle_spell_slot_io(GameState* gs, PlayerInst* p, const BBox& bbox,
 		ActionQueue& queued_actions) {

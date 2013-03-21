@@ -5,7 +5,7 @@ local events = {}
 function events.PlayerDeath(player)
     local classtable = {Mage=sounds.death_mage, Fighter=sounds.death_fighter, Archer=sounds.death_archer}
     classtable[player.class_name]:play()
-    game.score_board_store()
+    Game.score_board_store()
 end
 
 function events.MonsterDeath(monster)
@@ -22,15 +22,15 @@ function events.MonsterDeath(monster)
         monstersounds[monster.name]:play()
     end
     if monster.name == "Zin" then
-        engine.game_won()
+        Engine.Game_won()
     end
 end
 
 function events.PlayerEnterLevel()
     local single_player = (settings.connection_type == net.NONE)
     if single_player then
-        game.score_board_store()
-        game.save("res/savefile.save")
+        Game.score_board_store()
+        Game.save("res/savefile.save")
     end
 end
 
@@ -46,8 +46,8 @@ function player_has_won()
     require "winning_screen"
     require "game_loop"
 
-    game.wait(400)
+    Game.wait(400)
     game_loop_control.game_is_over = true
-    game.score_board_store(--[[Store winning entry]] true)
+    Game.score_board_store(--[[Store winning entry]] true)
     winning_screen_show()
 end

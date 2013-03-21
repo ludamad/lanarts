@@ -19,7 +19,7 @@ static char GAMESTATE_KEY[] = "";
 namespace lua_api {
 
 	void luacall_game_won(lua_State* L) {
-		luawrap::globals(L)["engine"].push();
+		luawrap::globals(L)["Engine"].push();
 		lua_getfield(L, -1, "game_won");
 		luawrap::call<void>(L);
 		// pop engine table
@@ -28,7 +28,7 @@ namespace lua_api {
 
 
 	void event_player_death(lua_State* L, PlayerInst* player) {
-		luawrap::globals(L)["engine"].push();
+		luawrap::globals(L)["Engine"].push();
 		lua_getfield(L, -1, "event_occurred");
 		luawrap::call<void>(L, "PlayerDeath", (GameInst*) player);
 		// pop engine table
@@ -36,7 +36,7 @@ namespace lua_api {
 	}
 
 	void event_monster_death(lua_State* L, EnemyInst* enemy) {
-		luawrap::globals(L)["engine"].push();
+		luawrap::globals(L)["Engine"].push();
 		lua_getfield(L, -1, "event_occurred");
 		luawrap::call<void>(L, "MonsterDeath", (GameInst*) enemy);
 		// pop engine table
@@ -195,9 +195,9 @@ namespace lua_api {
 		lua_lanarts_api(gs, L); // TODO: Deprecated
 
 		LuaValue globals = luawrap::globals(L);
-		LuaValue gamestate = luawrap::ensure_table(globals["game"]);
+		LuaValue gamestate = luawrap::ensure_table(globals["Game"]);
 		// Holds engine hooks
-		LuaValue engine = luawrap::ensure_table(globals["engine"]);
+		LuaValue engine = luawrap::ensure_table(globals["Engine"]);
 
 		register_gamestate(gs, L);
 		register_general_api(L);
@@ -210,7 +210,7 @@ namespace lua_api {
 	}
 
 	void luacall_post_draw(lua_State* L) {
-		luawrap::globals(L)["engine"].push();
+		luawrap::globals(L)["Engine"].push();
 		lua_getfield(L, -1, "post_draw");
 		if (lua_isnil(L, -1)) {
 			lua_pop(L, 1);
@@ -220,7 +220,7 @@ namespace lua_api {
 	}
 
 	void luacall_overlay_draw(lua_State* L) {
-		luawrap::globals(L)["engine"].push();
+		luawrap::globals(L)["Engine"].push();
 		lua_getfield(L, -1, "overlay_draw");
 		if (lua_isnil(L, -1)) {
 			lua_pop(L, 1);
@@ -233,7 +233,7 @@ namespace lua_api {
 	bool luacall_handle_event(lua_State* L, SDL_Event* e) {
 		bool handled = false;
 
-		luawrap::globals(L)["engine"].push();
+		luawrap::globals(L)["Engine"].push();
 		LuaStackValue(L, -1)["io_event_occurred"].push();
 
 		if (!lua_isnil(L, -1)) {

@@ -15,7 +15,7 @@ local function action_bar_hints_create()
         local x, y = unpack(xy)
         for i, text in ipairs(hint_text) do
             options.color = with_alpha(COL_PALE_YELLOW, i-2 <= #spells and 1.0 or 0.2)
-            fonts.small:draw( options, {x + (i-0.5) * 32, y}, text )
+            Fonts.small:draw( options, {x + (i-0.5) * 32, y}, text )
         end
     end
 

@@ -5,25 +5,25 @@
     in additional files.
 ]]
 
-function engine.menu_start(...)
+function Engine.menu_start(...)
     require "start_menu"
 
     return start_menu_show(...)
 end
 
-function engine.lobby_menu_start(...)
+function Engine.lobby_menu_start(...)
     require "lobby_menu"
 
     return lobby_menu_show(...)
 end
 
-function engine.loading_screen_draw(...)
+function Engine.loading_screen_draw(...)
     require "loading_screen"
 
     return loading_screen_draw(...)
 end
 
-function engine.resources_load(...)
+function Engine.resources_load(...)
     --TODO: Find a better place for these helper functions
     function is_consumable(item)     return item.type == "consumable" end
     function is_weapon(item)         return item.type == "weapon" end
@@ -42,31 +42,31 @@ function engine.resources_load(...)
     dofile "res/spells/spell_effects.lua"
 end
 
-function engine.game_start(...)
+function Engine.game_start(...)
     require "game_loop"
 
     return game_loop(...)
 end
 
-function engine.post_draw(...)
+function Engine.post_draw(...)
     require "game_loop"
 
     return game_post_draw(...)
 end
 
-function engine.overlay_draw(...)
+function Engine.overlay_draw(...)
     require "game_loop"
 
     return game_overlay_draw(...)
 end
 
-function engine.game_won(...)
+function Engine.game_won(...)
     require "event_occurred"
 
     return player_has_won(...)
 end
 
-function engine.event_occurred(...)
+function Engine.event_occurred(...)
     require "event_occurred"
 
     return event_occurred(...)

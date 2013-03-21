@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
 
 	lua_api::require(L, "main"); // loads engine hooks
 
-	LuaValue engine = luawrap::globals(L)["engine"];
+	LuaValue engine = luawrap::globals(L)["Engine"];
 
 	engine["menu_start"].push();
 	bool did_exit = !luawrap::call<bool>(L);

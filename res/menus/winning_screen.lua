@@ -58,12 +58,12 @@ end
 function winning_screen_show(...)
     local screen = winning_screen_create()
 
-    while game.input_capture() and not key_pressed(keys.ESCAPE)  do
+    while Game.input_capture() and not key_pressed(keys.ESCAPE)  do
         display.draw_start()
         screen:step( {0,0} )
         screen:draw( {0,0} )
         display.draw_finish()
-        game.wait(100)
+        Game.wait(100)
     end
 
     return false

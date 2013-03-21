@@ -172,7 +172,7 @@ namespace lua_api {
 		register_gamesettings(L);
 
 		LuaValue globals = luawrap::globals(L);
-		LuaValue game = luawrap::ensure_table(globals["game"]);
+		LuaValue game = luawrap::ensure_table(globals["Game"]);
 
 		game["resources_load"].bind_function(game_resources_load);
 

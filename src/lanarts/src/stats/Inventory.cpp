@@ -82,7 +82,7 @@ void Inventory::deserialize(SerializeBuffer& serializer) {
 }
 
 void Inventory::__dequip_projectile_if_invalid() {
-	itemslot_t slot = get_equipped(EquipmentEntry::PROJECTILE);
+	itemslot_t slot = get_equipped(EquipmentEntry::AMMO);
 	if (slot != -1) {
 		ItemSlot& itemslot = get(slot);
 		if (!projectile_valid_to_equip(*this, itemslot.item)) {
@@ -169,7 +169,7 @@ Weapon equipped_weapon(const Inventory & inventory) {
 }
 
 Projectile equipped_projectile(const Inventory & inventory) {
-	itemslot_t slot = inventory.get_equipped(EquipmentEntry::PROJECTILE);
+	itemslot_t slot = inventory.get_equipped(EquipmentEntry::AMMO);
 	if (slot != -1) {
 		return inventory.get(slot).item;
 	} else {
@@ -195,7 +195,7 @@ itemslot_t projectile_compatible_weapon(const Inventory& inventory,
 
 bool projectile_smart_equip(Inventory& inventory, itemslot_t itemslot) {
 	const Projectile& proj = inventory.get(itemslot).item;
-	itemslot_t slot = inventory.get_equipped(EquipmentEntry::PROJECTILE);
+	itemslot_t slot = inventory.get_equipped(EquipmentEntry::AMMO);
 
 	if (projectile_valid_to_equip(inventory, proj)) {
 		inventory.equip(itemslot);
@@ -266,7 +266,7 @@ void weapon_smart_equip(Inventory& inventory) {
 	}
 	// Next just go unarmed
 	inventory.deequip_type(EquipmentEntry::WEAPON);
-	inventory.deequip_type(EquipmentEntry::PROJECTILE);
+	inventory.deequip_type(EquipmentEntry::AMMO);
 }
 
 Equipment equipped_armour(const Inventory & inventory) {
