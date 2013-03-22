@@ -48,8 +48,8 @@ end
 
 
 function game_post_draw()
-    local player = world.local_player
-    for pdata in values(world.players) do
+    local player = World.local_player
+    for pdata in values(World.players) do
         local p = pdata.instance
         if not p:is_local_player() and p.floor == player.floor then
             Fonts.small:draw({color=COL_WHITE, origin=CENTER}, screen_coords{p.x, p.y-18}, pdata.name)
@@ -94,7 +94,7 @@ function game_loop()
         end
 
         if key_pressed(keys.F3) and single_player then 
-            room.regenerate()
+            Room.regenerate()
         end
     
         if key_pressed(keys.F4) then 

@@ -11,7 +11,7 @@
 -- 2. Easily extend the default capabilites of objects
 -- 3. CPP objects & lua objects should blend seemlessly
 
--- 'room.instance_radius_test'
+-- 'Room.instance_radius_test'
 -- we need to be a hybrid gameinst & lua object
 
 local instances = {
@@ -29,8 +29,8 @@ local function init_base(self, ...)
 end
 
 -- Cannot be directly instantiated ?
--- Although I don't see why not... maybe room.create(ProjectileInstance, ...) is cleaner
--- eg room.create(instances.PlayerInstance, ...)
+-- Although I don't see why not... maybe Room.create(ProjectileInstance, ...) is cleaner
+-- eg Room.create(instances.PlayerInstance, ...)
 
 -- Well. We need to encapsulate a given room.
 
@@ -57,6 +57,6 @@ end
 -- Then again -- we wont often have many room locals, and they still *can* be done
 -- OK, so room. 
 
-world.run_on_level(world.rooms[2])
+World.run_on_level(World.rooms[2])
 
-room.instance(1)
+Room.instance(1)

@@ -11,7 +11,7 @@ local function action_bar_hints_create()
     local hints = { size = {32 * #hint_text, 32}, step = do_nothing }
 
     function hints:draw(xy) 
-        local spells = world.local_player.spells
+        local spells = World.local_player.spells
         local x, y = unpack(xy)
         for i, text in ipairs(hint_text) do
             options.color = with_alpha(COL_PALE_YELLOW, i-2 <= #spells and 1.0 or 0.2)

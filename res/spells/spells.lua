@@ -130,7 +130,7 @@ local PowerStrike = {
 
 local function ChargeCallback(effect, caster)
     local num = 0
-    for mon in room.monsters() do
+    for mon in Room.monsters() do
         if distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 35 then
             num = num + 1
             caster:melee(mon)
@@ -155,7 +155,7 @@ function PowerStrike.action_func(caster)
 end
 
 function PowerStrike.prereq_func(caster)
-    for mon in room.monsters() do
+    for mon in Room.monsters() do
         if distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 40 then
             return true
         end
