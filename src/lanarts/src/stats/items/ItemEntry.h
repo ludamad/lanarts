@@ -33,7 +33,7 @@ public:
 	}
 	virtual ~ItemEntry() {
 	}
-	virtual void init(lua_State* L) {
+	virtual void initialize(lua_State* L) {
 		use_action.init(L);
 	}
 
@@ -59,6 +59,8 @@ public:
 	const std::string& inventory_use_fail_message() {
 		return use_action.failure_message;
 	}
+
+	virtual void parse_lua_table(const LuaValue& table);
 
 	// Cost when appearing in shops, if (0,0) will not appear in shops.
 	Range shop_cost;

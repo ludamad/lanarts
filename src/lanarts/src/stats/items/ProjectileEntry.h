@@ -19,8 +19,8 @@ public:
 	virtual ~ProjectileEntry() {
 	}
 
-	virtual void init(lua_State* L) {
-		EquipmentEntry::init(L);
+	virtual void initialize(lua_State* L) {
+		EquipmentEntry::initialize(L);
 		attack.init(L);
 	}
 

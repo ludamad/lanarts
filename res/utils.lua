@@ -114,14 +114,16 @@ function DEBUG_BOX_DRAW(self, xy)
     end
 end
 
-function pretty_tostring(val, tabs, --[[Optional]] quote_strings)
+function pretty_tostring(val, --[[Optional]] tabs, --[[Optional]] packed, --[[Optional]] quote_strings)
     tabs = tabs or 0
     quote_strings = (quote_strings == nil) or quote_strings
 
     local tabstr = ""
 
-    for i = 1, tabs do
-        tabstr = tabstr .. "  "
+    if not packed then
+        for i = 1, tabs do
+            tabstr = tabstr .. "  "
+        end
     end
 
     if type(val) == "string" and quote_strings then
@@ -132,15 +134,15 @@ function pretty_tostring(val, tabs, --[[Optional]] quote_strings)
         return tabstr .. tostring(val)
     end
 
-    local parts = {"{", --[[sentinel for remove below]]""}
+    local parts = {"{", --[[sentinel for remove below]] ""}
 
     for k,v in pairs(val) do
-        table.insert(parts, "\n")
+        table.insert(parts, packed and " " or "\n") 
 
         if type(k) == "number" then
-            table.insert(parts, pretty_tostring(v, tabs+1))
+            table.insert(parts, pretty_tostring(v, tabs+1, packed))
         else 
-            table.insert(parts, pretty_tostring(k, tabs+1, false))
+            table.insert(parts, pretty_tostring(k, tabs+1, packed, false))
             table.insert(parts, " = ")
             table.insert(parts, pretty_tostring(v, type(v) == "table" and tabs+1 or 0))
         end
@@ -148,15 +150,15 @@ function pretty_tostring(val, tabs, --[[Optional]] quote_strings)
         table.insert(parts, ",")
     end
 
-    parts[#parts] = nil -- remove comma
+    parts[#parts] = nil -- remove comma or sentinel
 
-    table.insert(parts, "\n" .. tabstr .. "}");
+    table.insert(parts, (packed and " " or "\n") .. tabstr .. "}");
 
     return table.concat(parts)
 end
 
-function pretty_print(val)
-    print(pretty_tostring(val))
+function pretty_print(val, --[[Optional]] tabs, --[[Optional]] packed)
+    print(pretty_tostring(val, tabs, packed))
 end
 
 function optional_load(file, loader) 

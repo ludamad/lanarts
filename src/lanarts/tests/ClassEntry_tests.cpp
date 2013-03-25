@@ -7,7 +7,7 @@
 
 #include "stats/ClassEntry.h"
 
-SUITE(ClassEntry_tests) {
+SUITE(ClassEntry) {
 	TEST(parse_lua_table) {
 
 		std::string program = "table = {\n"

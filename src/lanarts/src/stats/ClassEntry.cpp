@@ -26,7 +26,7 @@ const char* ClassEntry::entry_type() {
 static Item parse_as_item(const LuaField& value,
 		const char* key = "item") {
 	return Item(get_item_by_name(value[key].to_str()),
-			value.defaulted("amount", 1));
+			luawrap::defaulted(value, "amount", 1));
 }
 
 static Inventory parse_inventory(const LuaField& value) {
@@ -57,21 +57,23 @@ static EquipmentStats parse_equipment(const LuaField& value) {
 }
 
 static CoreStats parse_core_stats(const LuaField& value) {
+	using namespace luawrap;
+
 	CoreStats core;
-	core.max_mp = value.defaulted("mp", 0);
-	core.max_hp = value.defaulted("hp", 0);
+	core.max_mp = defaulted(value, "mp", 0);
+	core.max_hp = defaulted(value, "hp", 0);
 
 	core.hp = core.max_hp;
 	core.mp = core.max_mp;
 
-	core.hpregen = value.defaulted("mpregen", 0.0f);
-	core.mpregen = value.defaulted("hpregen", 0.0f);
+	core.hpregen = defaulted(value, "mpregen", 0.0f);
+	core.mpregen = defaulted(value, "hpregen", 0.0f);
 
-	core.strength = value.defaulted("strength", 0);
-	core.defence = value.defaulted("defence", 0);
+	core.strength = defaulted(value, "strength", 0);
+	core.defence = defaulted(value, "defence", 0);
 
-	core.magic = value.defaulted("magic", 0);
-	core.willpower = value.defaulted("willpower", 0);
+	core.magic = defaulted(value, "magic", 0);
+	core.willpower = defaulted(value, "willpower", 0);
 	return core;
 }
 
@@ -90,6 +92,7 @@ static AttackStats parse_attack_stats(const LuaField& value) {
 }
 
 static CombatStats parse_combat_stats(const LuaField& value) {
+	using namespace luawrap;
 	CombatStats ret;
 
 	ret.movespeed = value["movespeed"].to_num();
@@ -99,9 +102,9 @@ static CombatStats parse_combat_stats(const LuaField& value) {
 
 	ret.core = parse_core_stats(value);
 
-	ret.class_stats.xpneeded = value.defaulted("xpneeded",
+	ret.class_stats.xpneeded = defaulted(value, "xpneeded",
 			experience_needed_formula(1));
-	ret.class_stats.xplevel = value.defaulted("xplevel", 1);
+	ret.class_stats.xplevel = defaulted(value, "xplevel", 1);
 
 	if (value.has("attacks")) {
 		ret.attacks.push_back(parse_attack_stats(value));
@@ -133,16 +136,17 @@ static ClassSpellProgression parse_class_spell_progression(
 
 static void parse_gain_per_level(ClassEntry& entry,
 		const LuaField& value) {
-	entry.hp_perlevel = value.defaulted("hp", 0);
-	entry.mp_perlevel = value.defaulted("mp", 0);
+	using namespace luawrap;
+	entry.hp_perlevel = defaulted(value, "hp", 0);
+	entry.mp_perlevel = defaulted(value, "mp", 0);
 
-	entry.str_perlevel = value.defaulted("strength", 0);
-	entry.def_perlevel = value.defaulted("defence", 0);
-	entry.mag_perlevel = value.defaulted("magic", 0);
-	entry.will_perlevel = value.defaulted("willpower", 0);
+	entry.str_perlevel = defaulted(value, "strength", 0);
+	entry.def_perlevel = defaulted(value, "defence", 0);
+	entry.mag_perlevel = defaulted(value, "magic", 0);
+	entry.will_perlevel = defaulted(value, "willpower", 0);
 
-	entry.mpregen_perlevel = value.defaulted("mpregen", 0.0f);
-	entry.hpregen_perlevel = value.defaulted("hpregen", 0.0f);
+	entry.mpregen_perlevel = defaulted(value, "mpregen", 0.0f);
+	entry.hpregen_perlevel = defaulted(value, "hpregen", 0.0f);
 }
 
 void ClassEntry::parse_lua_table(const LuaValue& table) {

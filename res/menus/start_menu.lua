@@ -96,7 +96,7 @@ function setup_start_menu()
     local function on_load_click()
         game_loop_control.startup_function = function()
             if file_exists("res/savefile.save") then
-                game.load("res/savefile.save")
+                Game.load("res/savefile.save")
             end
         end
 	settings.connection_type = net.NONE

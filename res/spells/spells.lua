@@ -1,6 +1,6 @@
 -- FIRE BOLT
 
-data.spell_create {
+Data.spell_create {
     name = "Fire Bolt",
     spr_spell = "fire bolt",
     description = "A fast bolt of fire, hits a single target. The bolt can bounce off walls safely.",
@@ -11,7 +11,7 @@ data.spell_create {
 
 -- POISON CLOUD
 
-data.spell_create {
+Data.spell_create {
     name = "Poison Cloud",
     spr_spell = "poison",
     description = "A poisonous cloud that causes damage over time.",
@@ -49,11 +49,11 @@ function Berserk.action_func(caster, x, y)
     end
 end
 
-data.spell_create(Berserk)
+Data.spell_create(Berserk)
 
 -- POISON ARROW
 
-data.spell_create {
+Data.spell_create {
     name = "Poison Arrow",
     spr_spell = "poison",
     description = "Embues an arrow with poison.",
@@ -84,7 +84,7 @@ function Blink.action_func(caster, x, y)
     caster:move_to(x,y)
 end
 
-data.spell_create(Blink)
+Data.spell_create(Blink)
 
 -- MAGIC ARROW
 
@@ -102,11 +102,11 @@ function MagicArrow.prereq_func(caster)
     return caster.stats.weapon_type == "bows"
 end
 
-data.spell_create(MagicArrow)
+Data.spell_create(MagicArrow)
 
 -- MAGIC BLAST
 
-data.spell_create {
+Data.spell_create {
     name = "Magic Blast",
     description = "A slow, powerful magic blast of energy. The blast can bounce off an enemy twice before dissipating.",
     spr_spell = "magic blast",
@@ -167,4 +167,4 @@ function PowerStrike.autotarget_func(caster)
     return caster.x, caster.y
 end
 
-data.spell_create(PowerStrike)
+Data.spell_create(PowerStrike)

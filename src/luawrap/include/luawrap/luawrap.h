@@ -142,35 +142,11 @@ inline bool LuaField::is() const {
 }
 
 template<typename T>
-inline T LuaField::defaulted(const char* key, const T& value) const {
-	luawrap::_private::PopHack delayedpop1(L), delayedpop2(L);
-	push();
-	lua_getfield(L, -1, key);
-	if (lua_isnil(L, -1)) {
-		return value;
-	}
-	return luawrap::get<T>(L, -1);
-}
-
-template<typename T>
 inline T LuaStackValue::as() const {
 	if (!luawrap::check<T>(L, idx)) {
 		luawrap::error("Error converting type!");
 	}
 	return luawrap::get<T>(L, idx);
-}
-
-template<typename T>
-inline T LuaStackValue::defaulted(const char* key, const T& value) const {
-	lua_State* L = luastate();
-	luawrap::_private::PopHack delayedpop1(L), delayedpop2(L);
-	push();
-	lua_getfield(L, -1, key);
-	if (lua_isnil(L, -1)) {
-		return value;
-	}
-	return luawrap::get<T>(L, -1);
-
 }
 
 template<typename T>
@@ -182,18 +158,6 @@ inline T LuaValue::as() const {
 	}
 
 	return luawrap::pop<T>(luastate());
-}
-
-template<typename T>
-inline T LuaValue::defaulted(const char* key, const T& value) const {
-	lua_State* L = luastate();
-	luawrap::_private::PopHack delayedpop(L);
-	push();
-	lua_getfield(L, -1, key);
-	if (lua_isnil(L, -1)) {
-		return value;
-	}
-	return luawrap::get<T>(L, -1);
 }
 
 #include "../../src/predefined_helper.h"

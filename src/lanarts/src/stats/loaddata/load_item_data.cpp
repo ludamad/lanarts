@@ -45,13 +45,32 @@ static void load_item_callbackf(const YAML::Node& node, lua_State* L,
 	(*value)[entry->name] = node;
 }
 
+static LuaValue* item_table;
+static void lapi_data_create_item(const LuaStackValue& table) {
+
+	ItemEntry* entry = new ItemEntry;
+	game_item_data.push_back(entry);
+
+	(*item_table)[entry->name] = table;
+
+	int idx = game_item_data.size();
+	entry->init(idx, table);
+	printf("Loaded %s successfully!\n", entry->name.c_str());
+	game_item_data.push_back(entry);
+}
+
 LuaValue load_item_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret(L);
 	ret.newtable();
+	item_table = &ret;
 
 	clear_item_data(game_item_data);
 
-	load_data_impl_template(filenames, "items", load_item_callbackf, L, &ret);
+//	load_data_impl_template(filenames, "items", load_item_callbackf, L, &ret);
+
+	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["Data"]);
+	data["item_create"].bind_function(lapi_data_create_item);
+	luawrap::dofile(L, "res/items/items2.lua");
 
 	return ret;
 }

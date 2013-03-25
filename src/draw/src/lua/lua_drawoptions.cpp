@@ -28,6 +28,8 @@ void lua_push_drawoptions(lua_State *L, const ldraw::DrawOptions & options) {
 }
 
 ldraw::DrawOptions lua_get_drawoptions(lua_State *L, int idx) {
+	using namespace luawrap;
+
 	lua_rawgeti(L, idx, 1);
 	if (lua_isnil(L, -1)) {
 		lua_pop(L, 1);
@@ -46,11 +48,11 @@ ldraw::DrawOptions lua_get_drawoptions(lua_State *L, int idx) {
 		options.draw_origin = luawrap::pop<ldraw::DrawOrigin>(L);
 	}
 
-	options.draw_colour = table.defaulted("color", options.draw_colour);
-	options.draw_region = table.defaulted("region", options.draw_region);
-	options.draw_scale = table.defaulted("scale", options.draw_scale);
-	options.draw_angle = table.defaulted("angle", options.draw_angle);
-	options.draw_frame = table.defaulted("frame", options.draw_frame);
+	options.draw_colour = defaulted(table, "color", options.draw_colour);
+	options.draw_region = defaulted(table, "region", options.draw_region);
+	options.draw_scale = defaulted(table, "scale", options.draw_scale);
+	options.draw_angle = defaulted(table, "angle", options.draw_angle);
+	options.draw_frame = defaulted(table, "frame", options.draw_frame);
 
 	return options;
 }

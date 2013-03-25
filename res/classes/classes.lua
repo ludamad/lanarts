@@ -1,4 +1,4 @@
-data.class_create {
+Data.class_create {
     name = "Mage",
     sprites = {"wizard", "wizard2"},
     available_spells = {
@@ -39,7 +39,7 @@ data.class_create {
     }
 }
 
-data.class_create {
+Data.class_create {
     name = "Fighter",
     sprites = {"fighter", "fighter2"},
     available_spells = {
@@ -77,7 +77,7 @@ data.class_create {
     }
 }
 
-data.class_create {
+Data.class_create {
     name = "Archer",
     sprites = {"archer"},
     available_spells = {

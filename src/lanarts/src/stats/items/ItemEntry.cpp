@@ -1,12 +1,14 @@
 /*
- * ItemEntry.cpp:
- *  Describes an item entry.
+ * Itemcpp:
+ *  Describes an item
  *  This class can represent equipment or consumables such as scrolls etc
  *  It is the base class for various kinds of equipment. Consumables use it directly.
  */
 
 #include <cstdio>
 #include <typeinfo>
+
+#include <luawrap/luawrap.h>
 
 #include "draw/SpriteEntry.h"
 
@@ -61,4 +63,26 @@ bool is_item_weapon(ItemEntry & ientry) {
 
 bool is_item_equipment(ItemEntry & ientry) {
 	return dynamic_cast<EquipmentEntry*>(&ientry) != NULL;
+}
+
+void ItemEntry::parse_lua_table(const LuaValue& table) {
+	using namespace luawrap;
+
+	shop_cost = defaulted(table, "shop_cost", Range());
+
+	use_action.success_message = set_if_nil(table, "use_message",
+			std::string());
+	use_action.failure_message = set_if_nil(table, "cant_use_message",
+			std::string());
+
+	if (!table["action_func"].isnil()) {
+		use_action.action_func = LuaLazyValue(table["action_func"]);
+	}
+	if (!table["prereq_func"].isnil()) {
+		use_action.prereq_func = LuaLazyValue(table["prereq_func"]);
+	}
+	item_sprite = res::sprite_id(table["spr_item"].to_str());
+
+	stackable = set_if_nil(table, "stackable", true);
+
 }

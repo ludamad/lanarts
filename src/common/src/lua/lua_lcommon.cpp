@@ -11,6 +11,7 @@
 
 #include "lua_timer.h"
 #include "lua_geometry.h"
+#include "lua_range.h"
 
 void lua_safe_dostring(lua_State* L, const char* code) {
 	if (luaL_dostring(L, code)) {
@@ -53,5 +54,6 @@ void lua_register_lcommon(lua_State* L, const LuaValue& module) {
 	lua_setglobal(L, "dofile");
 
 	lua_register_geometry(L, module);
+	lua_register_range(L, module);
 }
 

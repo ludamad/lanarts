@@ -64,8 +64,6 @@ public:
 	// Convert to any type
 	template<typename T>
 	T as() const;
-	template<typename T>
-	T defaulted(const char* key, const T& value) const;
 
 	// Mainly for low-level routines, do not depend on too heavily
 	lua_State* luastate() const;
@@ -100,6 +98,44 @@ private:
 };
 
 namespace luawrap {
+
+	const LuaField& ensure_table(const LuaField& field);
+	template<typename LuaWrapper, typename T>
+	T set_if_nil(const LuaWrapper& wrapper, const T& value) {
+		if (wrapper.isnil()) {
+			wrapper = value;
+			return value;
+		}
+
+		return wrapper.template as<T>();
+	}
+	template<typename LuaWrapper, typename T>
+	T set_if_nil(const LuaWrapper& wrapper, const char* key, const T& value) {
+		LuaField field = wrapper[key];
+		if (field.isnil()) {
+			field = value;
+			return value;
+		}
+		return field.as<T>();
+	}
+
+	template<typename LuaWrapper, typename T>
+	inline T defaulted(const LuaWrapper& wrapper, const T& value) {
+		if (wrapper.isnil()) {
+			return value;
+		}
+		return wrapper.template as<T>();
+	}
+
+	template<typename LuaWrapper, typename T>
+	inline T defaulted(const LuaWrapper& wrapper, const char* key, const T& value) {
+		LuaField field = wrapper[key];
+		if (field.isnil()) {
+			return value;
+		}
+		return field.as<T>();
+	}
+
 	LuaValue eval(lua_State* L, const std::string& code);
 }
 

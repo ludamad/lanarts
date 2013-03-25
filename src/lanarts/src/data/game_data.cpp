@@ -28,7 +28,6 @@ void load_tile_data(const FilenameList& filenames);
 void load_tileset_data(const FilenameList& filenames);
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames);
 
-/// NEW EQUIPMENT CODE
 LuaValue load_item_data(lua_State* L, const FilenameList& filenames);
 void load_equipment_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemtable);
@@ -36,7 +35,6 @@ LuaValue load_projectile_data(lua_State* L, const FilenameList& filenames,
 		LuaValue& itemstable);
 void load_weapon_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemstable = NULL);
-/// NEW EQUIPMENT CODE
 
 LuaValue load_spell_data(lua_State* L, const FilenameList& filenames);
 
@@ -263,6 +261,38 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 	globals["effects"] = lua_effects;
 	globals["items"] = lua_items;
 	globals["projectiles"] = lua_projectiles;
+	LuaValue weapons = luawrap::ensure_table(globals["weapons"]);
+	int ind = 0;
+	for (int i = 0; i < game_item_data.size(); i++) {
+		ItemEntry& ientry = get_item_entry(i);
+		if (dynamic_cast<WeaponEntry*>(&ientry)) {
+			WeaponEntry& entry = get_weapon_entry(i);
+
+			weapons[++ind] = lua_items[entry.name];
+		}
+	}
+	LuaValue armour = luawrap::ensure_table(globals["armour"]);
+	ind = 0;
+	for (int i = 0; i < game_item_data.size(); i++) {
+		ItemEntry& ientry = get_item_entry(i);
+		if (dynamic_cast<EquipmentEntry*>(&ientry)) {
+			if (dynamic_cast<WeaponEntry*>(&ientry) || dynamic_cast<ProjectileEntry*>(&ientry)) {
+				continue;
+			}
+			ItemEntry& entry = get_item_entry(i);
+
+			armour[++ind] = lua_items[entry.name];
+		}
+	}
+	LuaValue consumables = luawrap::ensure_table(globals["consumable"]);
+	for (int i = 0; i < game_item_data.size(); i++) {
+		ItemEntry& ientry = get_item_entry(i);
+		if (!dynamic_cast<EquipmentEntry*>(&ientry)) {
+			ItemEntry& entry = get_item_entry(i);
+
+			consumables[entry.name] = lua_items[entry.name];
+		}
+	}
 	globals["spells"] = lua_spells;
 	globals["classes"] = lua_classes;
 
@@ -270,7 +300,7 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 	__lua_init(L, game_effect_data);
 
 	for (int i = 0; i < game_item_data.size(); i++) {
-		game_item_data[i]->init(L);
+		game_item_data[i]->initialize(L);
 	}
 
 	for (int i = 0; i < game_spell_data.size(); i++) {

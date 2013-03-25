@@ -42,8 +42,11 @@ static void game_load(LuaStackValue filename) {
 
 static int game_resources_load(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
+	bool was_mutable = lua_api::globals_get_mutability(L);
+	lua_api::globals_set_mutability(L, true);
 	ldraw::lua_register_ldraw(L, luawrap::globals(L));
 	init_game_data(gs->game_settings(), gs->luastate());
+	lua_api::globals_set_mutability(L, was_mutable);
 	return 0;
 }
 

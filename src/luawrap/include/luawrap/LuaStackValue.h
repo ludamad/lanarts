@@ -45,9 +45,6 @@ public:
 	template<typename T>
 	T as() const;
 
-	template<typename T>
-	T defaulted(const char* key, const T& value) const;
-
 	/* NB: it is unsafe to have 'std::string& key' be const here!
 	 * This would result potentially in a char* ptr being used outside of its scope */
 	LuaField operator[](std::string& key) const;

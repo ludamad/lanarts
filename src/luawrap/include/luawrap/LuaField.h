@@ -75,9 +75,6 @@ public:
 
 	const LuaField& assert_not_nil() const;
 
-	template<typename T>
-	T defaulted(const char* key, const T& value) const;
-
 	void bind_function(lua_CFunction luafunc) const;
 	template<typename Function>
 	void bind_function(const Function& function) const;
@@ -123,27 +120,5 @@ private:
 	Index _index;
 	Parent _parent;
 };
-
-namespace luawrap {
-	const LuaField& ensure_table(const LuaField& field);
-	template <typename LuaWrapper, typename T>
-	T set_if_nil(const LuaWrapper& wrapper, const T& value) {
-		if (wrapper.isnil()) {
-			wrapper = value;
-			return value;
-		}
-
-		return wrapper.template as<T>();
-	}
-	template <typename LuaWrapper, typename T>
-	T set_if_nil(const LuaWrapper& wrapper, const char* key, const T& value) {
-		LuaField field = wrapper[key];
-		if (field.isnil()) {
-			field = value;
-			return value;
-		}
-		return field.as<T>();
-	}
-}
 
 #endif /* LUAFIELD_H_ */

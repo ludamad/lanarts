@@ -24,7 +24,7 @@ static void setup_mock_data() {
 	game_item_data.push_back(new ProjectileEntry(projectile));
 }
 
-SUITE(SpellEntry_tests) {
+SUITE(SpellEntry) {
 	TEST(parse_lua_table) {
 
 		std::string program =

@@ -35,7 +35,7 @@ static void lapi_data_create_class(const LuaStackValue& table) {
 }
 
 LuaValue load_class_data(lua_State* L, const FilenameList& filenames) {
-	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["data"]);
+	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["Data"]);
 	data["class_create"].bind_function(lapi_data_create_class);
 	luawrap::dofile(L, "res/classes/classes.lua");
 
