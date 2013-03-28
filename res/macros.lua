@@ -33,14 +33,13 @@ local function pkv(key, nocomma)
     return true
 end
 
-for v in values(armour) do
-    if v.equipment_type == "gloves" then
-        obj = v
+function dump_armour(v)
+      obj = v
         printed = {}
-        print( "Data.equipment_create {")
+        print( "Data.armour_create {")
         pkv("name")
         pkv("description")
-        pkv("type")
+        pkv("damage_type")
         print("")
         if pkv("shop_cost") then
             print("")
@@ -62,6 +61,59 @@ for v in values(armour) do
         if pkv("magic_resistance") then
             print("")
         end
+	
+        pkv("stat_bonuses", true)
+        print("}\n")
+        print_unused_keys(obj, printed)
+end
+
+for v in values(weapons) do
+    if true then --v.equipment_type == "weapon" then
+        obj = v
+        printed = {}
+        print( "Data.weapon_create {")
+        pkv("name")
+        pkv("description")
+        pkv("weapon_class")
+        print("")
+        if pkv("shop_cost") then
+            print("")
+        end
+        if pkv("spr_item") then
+            print("")
+        end
+
+        pkv("damage_type")
+        pkv("uses_projectile")
+	pkv("resist_modifier")
+	print("")
+	pkv("damage")
+	pkv("power")
+        print("")
+
+        if pkv("cooldown") then
+            print("")
+        end
+
+        if pkv("range") then
+            print("")
+        end
+
+        if pkv("spell_cooldown_multiplier") then 
+            print("")
+        end
+        if pkv("ranged_cooldown_multiplier") then
+            print("")
+        end
+        pkv("reduction")
+        if pkv("magic_reduction") then
+            print("")
+        end
+        pkv("resistance")
+        if pkv("magic_resistance") then
+            print("")
+        end
+	
         pkv("stat_bonuses", true)
         print("}\n")
         print_unused_keys(obj, printed)

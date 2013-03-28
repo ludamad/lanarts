@@ -49,8 +49,30 @@ void load_weapon_callbackf(const YAML::Node& node, lua_State* L,
 	}
 }
 
+//void load_weapon_data(lua_State* L, const FilenameList& filenames,
+//		LuaValue* itemtable) {
+//	load_data_impl_template(filenames, "weapons", load_weapon_callbackf, L,
+//			itemtable);
+//}
+
+static LuaValue* weapon_table;
+static void lapi_data_create_weapon(const LuaStackValue& table) {
+	WeaponEntry* entry = new WeaponEntry;
+	game_item_data.push_back(entry);
+
+	(*weapon_table)[entry->name] = table;
+
+	int idx = game_item_data.size();
+	entry->init(idx, table);
+	printf("Loaded %s successfully!\n", entry->name.c_str());
+	game_item_data.push_back(entry);
+}
+
 void load_weapon_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemtable) {
-	load_data_impl_template(filenames, "weapons", load_weapon_callbackf, L,
-			itemtable);
+	weapon_table = itemtable;
+
+	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["Data"]);
+	data["weapon_create"].bind_function(lapi_data_create_weapon);
+	luawrap::dofile(L, "res/items/weapons/weapons2.lua");
 }

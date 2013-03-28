@@ -9,6 +9,8 @@
 
 #include <luawrap/luawrap.h>
 
+#include "util/lua_parse_util.h"
+
 #include "gamestate/GameLogger.h"
 #include "items/WeaponEntry.h"
 
@@ -170,16 +172,6 @@ CoreStats parse_core_stats(const LuaField& value, bool required) {
 	return core;
 }
 
-static Range parse_defaulted_range(const LuaField& value, const Range& r) {
-	using namespace luawrap;
-
-	if (value.is<int>()) {
-		int i = value.to_int();
-		return Range(i, i);
-	}
-	return defaulted(value, "base", Range(0, 0));
-}
-
 /* Accepts nil */
 CoreStatMultiplier parse_core_stat_multiplier(const LuaField& value) {
 	using namespace luawrap;
@@ -188,7 +180,7 @@ CoreStatMultiplier parse_core_stat_multiplier(const LuaField& value) {
 	if (value.isnil()) {
 		return sm;
 	}
-	sm.base = parse_defaulted_range(value["base"], Range(0,0));
+	sm.base = defaulted(lua_util::make_pair_if_num(value["base"]), Range(0,0));
 	sm.strength = defaulted(value, "strength", 0.0f);
 	sm.magic = defaulted(value, "magic", 0.0f);
 	sm.defence = defaulted(value, "defence", 0.0f);

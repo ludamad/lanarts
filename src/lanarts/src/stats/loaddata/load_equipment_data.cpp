@@ -67,8 +67,6 @@ static void lapi_data_create_equipment(const LuaStackValue& table) {
 void load_equipment_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemtable) {
 	equipment_table = itemtable;
-	load_data_impl_template(filenames, "equipment", load_equipment_callbackf, L,
-			itemtable);
 
 	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["Data"]);
 	data["equipment_create"].bind_function(lapi_data_create_equipment);

@@ -59,6 +59,8 @@ public:
 		return attack.attack_action.action_func;
 	}
 
+	virtual void parse_lua_table(const LuaValue& table);
+
 	std::string weapon_class;
 	bool uses_projectile;
 	Attack attack;

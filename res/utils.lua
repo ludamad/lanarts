@@ -137,22 +137,22 @@ function pretty_tostring(val, --[[Optional]] tabs, --[[Optional]] packed, --[[Op
     local parts = {"{", --[[sentinel for remove below]] ""}
 
     for k,v in pairs(val) do
-        table.insert(parts, packed and " " or "\n") 
+        table.insert(parts, packed and "" or "\n") 
 
         if type(k) == "number" then
             table.insert(parts, pretty_tostring(v, tabs+1, packed))
         else 
             table.insert(parts, pretty_tostring(k, tabs+1, packed, false))
             table.insert(parts, " = ")
-            table.insert(parts, pretty_tostring(v, type(v) == "table" and tabs+1 or 0))
+            table.insert(parts, pretty_tostring(v, type(v) == "table" and tabs+1 or 0, packed))
         end
 
-        table.insert(parts, ",")
+        table.insert(parts, ", ")
     end
 
     parts[#parts] = nil -- remove comma or sentinel
 
-    table.insert(parts, (packed and " " or "\n") .. tabstr .. "}");
+    table.insert(parts, (packed and "" or "\n") .. tabstr .. "}");
 
     return table.concat(parts)
 end

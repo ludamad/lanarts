@@ -28,7 +28,6 @@ include_directories(
 	${LIBS}#/rvo2 
 	)
 
-
 file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
     src/include/* 
  

@@ -66,11 +66,9 @@ LuaValue load_item_data(lua_State* L, const FilenameList& filenames) {
 
 	clear_item_data(game_item_data);
 
-//	load_data_impl_template(filenames, "items", load_item_callbackf, L, &ret);
-
 	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["Data"]);
 	data["item_create"].bind_function(lapi_data_create_item);
-	luawrap::dofile(L, "res/items/items2.lua");
+	luawrap::dofile(L, "res/items/items.lua");
 
 	return ret;
 }

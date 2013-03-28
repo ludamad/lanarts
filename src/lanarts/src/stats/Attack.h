@@ -9,6 +9,8 @@
 #include "stat_modifiers.h"
 #include "LuaAction.h"
 
+class LuaField;
+
 class Attack {
 public:
 	Attack() :
@@ -44,5 +46,7 @@ public:
 	sprite_id attack_sprite;
 	LuaAction attack_action;
 };
+
+Attack parse_attack(const LuaField& field);
 
 #endif /* ATTACK_H_ */

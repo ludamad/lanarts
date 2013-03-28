@@ -26,7 +26,6 @@ namespace lua_api {
 		lua_pop(L, 1);
 	}
 
-
 	void event_player_death(lua_State* L, PlayerInst* player) {
 		luawrap::globals(L)["Engine"].push();
 		lua_getfield(L, -1, "event_occurred");
@@ -125,6 +124,7 @@ namespace lua_api {
 
 		luawrap::globals(L)["require"].push();
 		lua_pushcclosure(L, wrapped_with_globals_mutable, 1);
+		luawrap::globals(L)["require"].pop();
 
 		luameta_defaultsetter(globalsmeta, contents);
 		luameta_defaultgetter(globalsmeta, contents);
