@@ -51,8 +51,30 @@ void load_equipment_callbackf(const YAML::Node& node, lua_State* L,
 
 }
 
+static LuaValue* equipment_table;
+static void lapi_data_create_equipment(const LuaStackValue& table) {
+	EquipmentEntry* entry = new EquipmentEntry;
+	game_item_data.push_back(entry);
+
+	(*equipment_table)[entry->name] = table;
+
+	int idx = game_item_data.size();
+	entry->init(idx, table);
+	printf("Loaded %s successfully!\n", entry->name.c_str());
+	game_item_data.push_back(entry);
+}
+
 void load_equipment_data(lua_State* L, const FilenameList& filenames,
 		LuaValue* itemtable) {
+	equipment_table = itemtable;
 	load_data_impl_template(filenames, "equipment", load_equipment_callbackf, L,
 			itemtable);
+
+	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["Data"]);
+	data["equipment_create"].bind_function(lapi_data_create_equipment);
+	luawrap::dofile(L, "res/items/armour/body_armour.lua");
+	luawrap::dofile(L, "res/items/armour/boots.lua");
+	luawrap::dofile(L, "res/items/armour/gloves.lua");
+	luawrap::dofile(L, "res/items/armour/helmets.lua");
+	luawrap::dofile(L, "res/items/rings/rings.lua");
 }

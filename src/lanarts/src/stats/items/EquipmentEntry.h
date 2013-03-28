@@ -57,6 +57,8 @@ public:
 		return 1;
 	}
 
+	virtual void parse_lua_table(const LuaValue& table);
+
 	equip_type type;
 	// Stat modifiers while wearing this equipment
 	StatModifiers stat_modifiers;

@@ -12,6 +12,8 @@
 
 #include "stats.h"
 
+class LuaField;
+
 struct DamageStats {
 	CoreStatMultiplier power_stats, damage_stats;
 	float magic_percentage, physical_percentage;
@@ -36,6 +38,10 @@ struct StatModifiers {
 	StatModifiers() {
 	}
 };
+
+DamageStats parse_damage_modifiers(const LuaField& value);
+ArmourStats parse_defence_modifiers(const LuaField& value);
+StatModifiers parse_stat_modifiers(const LuaField& value);
 
 struct StatusEffectModifiers {
 	std::vector<effect_id> status_effects;

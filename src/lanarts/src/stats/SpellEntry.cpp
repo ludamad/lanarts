@@ -15,24 +15,6 @@ extern std::vector<SpellEntry> game_spell_data;
 
 spell_id get_spell_by_name(const char* name);
 
-//entry.name = parse_str(n["name"]);
-//entry.description = parse_defaulted(n, "description", std::string());
-//entry.sprite = parse_sprite_number(n, "spr_spell");
-//entry.mp_cost = parse_int(n["mp_cost"]);
-//entry.cooldown = parse_int(n["cooldown"]);
-//if (yaml_has_node(n, "projectile")) {
-//	entry.projectile = parse_projectile_name(n["projectile"]);
-//}
-//entry.action_func = parse_luaexpr(L, n, "action_func");
-//entry.autotarget_func = parse_luaexpr(L, n, "autotarget_func", default_autotarget_func);
-//entry.prereq_func = parse_luaexpr(L, n, "prereq_func");
-//entry.can_cast_with_cooldown = parse_defaulted(n, "can_cast_with_cooldown",
-//		false);
-//entry.can_cast_with_held_key = parse_defaulted(n, "can_cast_with_held_key",
-//			true);
-//entry.fallback_to_melee = parse_defaulted(n, "fallback_to_melee",
-//			true);
-
 void SpellEntry::parse_lua_table(const LuaValue& table) {
 	using namespace luawrap;
 

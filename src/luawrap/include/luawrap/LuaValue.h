@@ -19,22 +19,6 @@
 #include <luawrap/LuaStackValue.h>
 #include <luawrap/LuaField.h>
 
-class LuaValue;
-
-void luafield_pop(lua_State* L, const LuaValue& value, const char* key);
-
-inline void luafield_pop(lua_State* L, const LuaValue& value,
-		const std::string& key) {
-	luafield_pop(L, value, key.c_str());
-}
-
-void luafield_push(lua_State* L, const LuaValue& value, const char* key);
-
-inline void luafield_push(lua_State* L, const LuaValue& value,
-		const std::string& key) {
-	luafield_push(L, value, key.c_str());
-}
-
 namespace _luawrap_private {
 	struct _LuaValueImpl;
 }
@@ -64,6 +48,9 @@ public:
 	// Convert to any type
 	template<typename T>
 	T as() const;
+
+	// We can convert to a forwarding LuaField for API convenience
+	operator LuaField() const ;
 
 	// Mainly for low-level routines, do not depend on too heavily
 	lua_State* luastate() const;

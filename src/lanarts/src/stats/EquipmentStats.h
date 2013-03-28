@@ -51,4 +51,7 @@ public:
 	money_t money;
 };
 
+EquipmentStats parse_equipment(const LuaField& value);
+
+
 #endif /* EQUIPMENTSTATS_H_ */

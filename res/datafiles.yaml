@@ -3,12 +3,12 @@
 #Locations of markup files
 #relative to res/
 
-equipment_files:
-  - items/armour/body_armour.yaml
-  - items/armour/helmets.yaml
-  - items/armour/boots.yaml
-  - items/armour/gloves.yaml
-  - items/rings/rings.yaml
+equipment_files: []
+#  - items/armour/body_armour.yaml
+#  - items/armour/helmets.yaml
+#  - items/armour/boots.yaml
+#  - items/armour/gloves.yaml
+#  - items/rings/rings.yaml
 
 class_files: 
   - classes/classes.yaml

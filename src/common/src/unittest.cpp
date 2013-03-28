@@ -22,6 +22,14 @@ void unit_test_assert(const std::string& msg, bool condition) {
 	}
 }
 
+static std::string suite_str(const TestDetails& details) {
+	std::string suite = details.suiteName;
+	if (suite != "DefaultSuite") {
+		return "[" + suite + "]\n";
+	}
+	return "[top-level functions]\n";
+}
+
 class _UnitTestReporter: public TestReporter {
 public:
 
@@ -41,7 +49,7 @@ public:
 	virtual void ReportFailure(const TestDetails& details,
 			char const* failure) {
 
-		printf("[%s]\n\t**FAILED: %s line %d (%s)\n", details.suiteName,
+		printf("%s\t**FAILED: %s line %d (%s)\n", suite_str(details).c_str(),
 				details.testName, details.lineNumber, failure);
 
 		did_finish_correctly = false;
@@ -50,7 +58,7 @@ public:
 	virtual void ReportTestFinish(const TestDetails& details,
 			float secondsElapsed) {
 		if (did_finish_correctly) {
-			printf("[%s]\n\t%s passed \n", details.suiteName, details.testName);
+			printf("%s\t%s passed \n", suite_str(details).c_str(), details.testName);
 		}
 	}
 

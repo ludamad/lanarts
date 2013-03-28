@@ -3,6 +3,8 @@
  *  Represents all the possessions and equipped items of a player
  */
 
+#include <luawrap/luawrap.h>
+
 #include <lcommon/SerializeBuffer.h>
 
 #include "items/ItemEntry.h"
@@ -37,17 +39,11 @@ bool EquipmentStats::use_ammo(int amnt) {
 
 void EquipmentStats::serialize(SerializeBuffer& serializer) {
 	inventory.serialize(serializer);
-//	_weapon.serialize(serializer);
-//	_projectile.serialize(serializer);
-//	_armour.serialize(serializer);
 	serializer.write_int(money);
 }
 
 void EquipmentStats::deserialize(SerializeBuffer& serializer) {
 	inventory.deserialize(serializer);
-//	_weapon.deserialize(serializer);
-//	_projectile.deserialize(serializer);
-//	_armour.deserialize(serializer);
 	serializer.read_int(money);
 }
 
@@ -90,3 +86,35 @@ Equipment EquipmentStats::armour() const {
 	return equipped_armour(inventory);
 }
 
+static Item parse_as_item(const LuaField& value,
+		const char* key = "item") {
+	return Item(get_item_by_name(value[key].to_str()),
+			luawrap::defaulted(value, "amount", 1));
+}
+
+static Inventory parse_inventory(const LuaField& value) {
+	Inventory ret;
+	int len = value.objlen();
+	for (int i = 1; i <= len; i++) {
+		ret.add(parse_as_item(value[i]));
+	}
+	return ret;
+}
+
+EquipmentStats parse_equipment(const LuaField& value) {
+	EquipmentStats ret;
+	if (value.has("inventory")) {
+		ret.inventory = parse_inventory(value["inventory"]);
+	}
+
+	if (value.has("weapon")) {
+		Item item = parse_as_item(value, "weapon");
+		ret.inventory.add(item, true);
+	}
+
+	if (value.has("projectile")) {
+		Item item = parse_as_item(value["projectile"]);
+		ret.inventory.add(item, true);
+	}
+	return ret;
+}

@@ -19,6 +19,7 @@
 struct AttackStats;
 struct ClassEntry;
 class MTwist;
+class LuaField;
 
 /* Core combat stats*/
 struct CoreStats {
@@ -44,6 +45,8 @@ struct CoreStats {
 	void apply_as_bonus(const CoreStats& bonus_stats);
 };
 
+CoreStats parse_core_stats(const LuaField& value, bool required = false);
+
 /* Stat multiplier, weighted sum*/
 struct CoreStatMultiplier {
 	Range base;
@@ -60,6 +63,9 @@ struct CoreStatMultiplier {
 	Range calculate_range(const CoreStats& stats) const;
 	float calculate(MTwist& mt, const CoreStats& stats) const;
 };
+
+/* Accepts nil */
+CoreStatMultiplier parse_core_stat_multiplier(const LuaField& value);
 
 /* Derived combat stats, power & damage represent properties
  * They are not fully determined until EffectiveAttackStats is created */
@@ -123,6 +129,9 @@ struct CooldownModifiers {
 				cooldown_modifiers.ranged_cooldown_multiplier;
 	}
 };
+
+CooldownModifiers parse_cooldown_modifiers(const LuaField& value);
+
 /* Core & derived stats after stat & item properties */
 struct EffectiveStats {
 	CoreStats core;

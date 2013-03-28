@@ -28,10 +28,10 @@ class LuaValue;
 class LuaField {
 public:
 	/** Constructors **/
-
 	/* Looks up an object in the registry */
 	LuaField(lua_State* L, void* parent, const char* index);
 	LuaField(lua_State* L, void* parent, int index);
+	LuaField(lua_State* L, void* parent);
 
 	/* Looks up another LuaField */
 	LuaField(const LuaField* parent, const char* index);

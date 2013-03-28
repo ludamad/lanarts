@@ -27,7 +27,8 @@ void ResourceEntryBase::init(int id, const LuaValue& table) {
 		table["id"] = this->id;
 
 		this->name = table["name"].as<std::string>();
-		this->description = luawrap::set_if_nil(table, "description", std::string());
+		this->description = luawrap::set_if_nil(table, "description",
+				std::string());
 
 		this->lua_representation = table;
 
@@ -38,14 +39,21 @@ void ResourceEntryBase::init(int id, const LuaValue& table) {
 			resource_name = table["name"].to_str();
 		}
 
+		std::string location;
 		lua_Debug debug;
-		lua_getstack(table.luastate(), 1, &debug);
-		lua_getinfo(table.luastate(), "nSl", &debug);
+		if (lua_getstack(table.luastate(), 1, &debug)) {
+			lua_getinfo(table.luastate(), "nSl", &debug);
+			location = format("%s line %d", debug.source, debug.currentline);
+		} else {
+			debug.source = "Unknown";
+			debug.currentline = 0;
+			location = "Called from C++ code:";
+		}
 
-		std::string err_msg = format("%s line %d\n"
-				"Resource error while loading %s '%s':\n%s", debug.source,
-				debug.currentline, str_tolower(entry_type()).c_str(),
-				resource_name.c_str(), error.what());
+		std::string err_msg = format("%s\n"
+				"Resource error while loading %s '%s':\n%s", location.c_str(),
+				str_tolower(entry_type()).c_str(), resource_name.c_str(),
+				error.what());
 
 		/* Restore at least the lua stack size, even if filled with wrong values */
 		lua_settop(L, lua_stack_size);

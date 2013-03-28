@@ -26,7 +26,7 @@
  *                          Constructors                                     *
  *****************************************************************************/
 enum {
-	STRING_INDEX = 0, INTEGER_INDEX = 1
+	STRING_INDEX = 0, INTEGER_INDEX = 1, NO_INDEX = 2
 };
 
 enum {
@@ -48,6 +48,14 @@ LuaField::LuaField(lua_State* L, void* parent, int index) {
 	ind.integer = index;
 	init(L, INTEGER_INDEX, REGISTRY_PARENT, ind, par);
 }
+
+LuaField::LuaField(lua_State* L, void* parent) {
+	Index ind;
+	Parent par;
+	par.registry = parent;
+	init(L, NO_INDEX, REGISTRY_PARENT, ind, par);
+}
+
 
 LuaField::LuaField(const LuaField* parent, const char* index) {
 	Index ind;
@@ -140,7 +148,7 @@ void LuaField::index_path(std::string& str) const {
 		str += "[\"";
 		str += _index.string;
 		str += "\"]";
-	} else {
+	} else if (_index_type == INTEGER_INDEX){
 		char buff[32];
 		sprintf(buff, "[%d]", _index.integer);
 		str += buff;
@@ -155,11 +163,14 @@ void LuaField::push() const {
 	push_parent();
 	if (_index_type == STRING_INDEX) {
 		lua_getfield(L, -1, _index.string);
-	} else {
+		lua_replace(L, -2);
+	} else if (_index_type == INTEGER_INDEX){
 		lua_pushinteger(L, _index.integer);
 		lua_gettable(L, -2);
+		lua_replace(L, -2);
+	} else {// == NO_INDEX
+		/* Nothing, return parent */
 	}
-	lua_replace(L, -2);
 }
 
 void LuaField::handle_nil_parent() const {
@@ -184,13 +195,16 @@ void LuaField::push_parent() const {
 		_parent.field->push();
 	}
 
-	if (lua_isnil(L, -1)) {
+	if (lua_isnil(L, -1) && _index_type != NO_INDEX) {
 		lua_pop(L, 1);
 		handle_nil_parent();
 	}
 }
 
 void LuaField::pop() const {
+	if (_index_type == NO_INDEX) {
+		luawrap::error("Cannot mutate LuaField that has no index!");
+	}
 	push_parent();
 
 	if (_index_type == STRING_INDEX) {

@@ -7,6 +7,8 @@
 
 #include <lcommon/mtwist.h>
 
+#include <luawrap/luawrap.h>
+
 #include "gamestate/GameLogger.h"
 #include "items/WeaponEntry.h"
 
@@ -144,3 +146,67 @@ ClassEntry& ClassStats::class_entry() const {
 	return game_class_data.at(classid);
 }
 
+CoreStats parse_core_stats(const LuaField& value, bool required) {
+	using namespace luawrap;
+
+	CoreStats core;
+	if (!required && value.isnil()) {
+		return core;
+	}
+	core.max_mp = defaulted(value, "mp", 0);
+	core.max_hp = defaulted(value, "hp", 0);
+
+	core.hp = core.max_hp;
+	core.mp = core.max_mp;
+
+	core.hpregen = defaulted(value, "mpregen", 0.0f);
+	core.mpregen = defaulted(value, "hpregen", 0.0f);
+
+	core.strength = defaulted(value, "strength", 0);
+	core.defence = defaulted(value, "defence", 0);
+
+	core.magic = defaulted(value, "magic", 0);
+	core.willpower = defaulted(value, "willpower", 0);
+	return core;
+}
+
+static Range parse_defaulted_range(const LuaField& value, const Range& r) {
+	using namespace luawrap;
+
+	if (value.is<int>()) {
+		int i = value.to_int();
+		return Range(i, i);
+	}
+	return defaulted(value, "base", Range(0, 0));
+}
+
+/* Accepts nil */
+CoreStatMultiplier parse_core_stat_multiplier(const LuaField& value) {
+	using namespace luawrap;
+
+	CoreStatMultiplier sm;
+	if (value.isnil()) {
+		return sm;
+	}
+	sm.base = parse_defaulted_range(value["base"], Range(0,0));
+	sm.strength = defaulted(value, "strength", 0.0f);
+	sm.magic = defaulted(value, "magic", 0.0f);
+	sm.defence = defaulted(value, "defence", 0.0f);
+	sm.willpower = defaulted(value, "willpower", 0.0f);
+	return sm;
+}
+
+CooldownModifiers parse_cooldown_modifiers(const LuaField& value) {
+	using namespace luawrap;
+
+	CooldownModifiers cm;
+	cm.melee_cooldown_multiplier = defaulted(value, "melee_cooldown_multiplier",
+			1.0f);
+	cm.ranged_cooldown_multiplier = defaulted(value,
+			"ranged_cooldown_multiplier", 1.0f);
+	cm.rest_cooldown_multiplier = defaulted(value, "rest_cooldown_multiplier",
+			1.0f);
+	cm.spell_cooldown_multiplier = defaulted(value, "spell_cooldown_multiplier",
+			1.0f);
+	return cm;
+}

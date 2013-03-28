@@ -42,6 +42,8 @@ struct AttackStats {
 	Projectile projectile;
 };
 
+AttackStats parse_attack_stats(const LuaField& value);
+
 /* Represents all the stats used by a combat entity */
 struct CombatStats {
 	CombatStats(const ClassStats& class_stats = ClassStats(),
@@ -77,5 +79,7 @@ struct CombatStats {
 
 	float movespeed;
 };
+
+CombatStats parse_combat_stats(const LuaField& value);
 
 #endif /* COMBAT_STATS_H_ */

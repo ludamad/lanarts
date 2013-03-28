@@ -153,24 +153,6 @@ bool LuaValue::isnil() const {
 	return nilval;
 }
 
-void luafield_pop(lua_State* L, const LuaValue& value, const char* key) {
-	value.push();
-	LUAWRAP_ASSERT(!lua_isnil(L, -1));
-
-	lua_pushvalue(L, -2);
-	lua_setfield(L, -2, key);
-	/*Pop table and value*/
-	lua_pop(L, 2);
-}
-void luafield_push(lua_State* L, const LuaValue& value, const char* key) {
-	value.push(); /*Get the associatedb lua table*/
-	LUAWRAP_ASSERT(!lua_isnil(L, -1));
-
-	int tableind = lua_gettop(L);
-	lua_getfield(L, tableind, key);
-	lua_replace(L, tableind);
-}
-
 bool LuaValue::operator ==(const LuaValue & o) const {
 	return impl == o.impl;
 }
@@ -337,6 +319,10 @@ int LuaValue::objlen() const {
 	int len = lua_objlen(L, -1);
 	lua_pop(L, 1);
 	return len;
+}
+
+LuaValue::operator LuaField() const {
+	return LuaField(impl->L, (void*)impl);
 }
 
 LuaValue LuaValue::pop_value(lua_State* L) {

@@ -6,6 +6,8 @@
 
 #include <lcommon/SerializeBuffer.h>
 
+#include <luawrap/luawrap.h>
+
 #include "items/ProjectileEntry.h"
 #include "items/WeaponEntry.h"
 
@@ -232,3 +234,38 @@ void CombatStats::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read(movespeed);
 }
 
+AttackStats parse_attack_stats(const LuaField& value) {
+	AttackStats ret;
+
+	if (value.has("weapon")) {
+		ret.weapon = Weapon(
+				get_weapon_by_name(value["weapon"].to_str()));
+	}
+	if (value.has("projectile")) {
+		ret.projectile = Projectile(
+				get_projectile_by_name(value["projectile"].to_str()));
+	}
+	return ret;
+}
+
+CombatStats parse_combat_stats(const LuaField& value) {
+	using namespace luawrap;
+	CombatStats ret;
+
+	ret.movespeed = value["movespeed"].to_num();
+	if (value.has("equipment")) {
+		ret.equipment = parse_equipment(value["equipment"]);
+	}
+
+	ret.core = parse_core_stats(value, true /*required*/);
+
+	ret.class_stats.xpneeded = defaulted(value, "xpneeded",
+			experience_needed_formula(1));
+	ret.class_stats.xplevel = defaulted(value, "xplevel", 1);
+
+	if (value.has("attacks")) {
+		ret.attacks.push_back(parse_attack_stats(value));
+	}
+
+	return ret;
+}

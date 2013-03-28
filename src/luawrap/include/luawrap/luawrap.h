@@ -25,6 +25,8 @@
 #include <luawrap/LuaStackValue.h>
 #include <luawrap/luawraperror.h>
 
+#include <typeinfo>
+
 // Include internal header
 #include "../../src/pushget_helper.h"
 
@@ -63,6 +65,12 @@ namespace luawrap {
 	}
 
 	template<typename T>
+	inline typename _private::PushGetCheckWrap<T>::RetType get_unchecked(lua_State* L,
+			int idx) {
+		return _private::PushGetCheckWrap<T>::get(L, idx);
+	}
+
+	template<typename T>
 	inline bool check(lua_State* L, int idx) {
 		return _private::PushGetCheckWrap<T>::check(L, idx);
 	}
@@ -86,38 +94,6 @@ namespace luawrap {
 		lval.pop();
 		return lval;
 	}
-
-	template<typename T>
-	inline void setfield(lua_State* L, int idx, const char* key, const T& val) {
-		push<T>(L, val);
-		lua_setfield(L, idx, key);
-	}
-
-	template<typename T>
-	inline T getfield(lua_State* L, int idx, const char* key) {
-		lua_getfield(L, idx, key);
-		return pop<T>(L);
-	}
-
-	template<typename T>
-	inline void getfield(lua_State* L, int idx, const char* key, T& val) {
-		val = getfield<T>(L, idx, key);
-	}
-
-	// Get field if value is not nil
-	template<typename T>
-	inline void getoptfield(lua_State* L, int idx, const char* key, T& val) {
-		lua_getfield(L, idx, key);
-		if (!lua_isnil(L, -1)) {
-			if (!check<T>(L, -1)) {
-				std::string err = "Field '" + std::string(key) + "' was not the expected type!\n";
-				luawrap::error(err.c_str());
-			}
-			val = pop<T>(L);
-		} else {
-			lua_pop(L, 1);
-		}
-	}
 }
 
 // LuaField implementations
@@ -131,6 +107,11 @@ inline void LuaField::operator =(const T& value) {
 template<typename T>
 inline T LuaField::as() const {
 	push();
+	if (!luawrap::check<T>(L, -1)) {
+		const char* repr = lua_tostring(L, -1);
+		std::string obj_repr = repr ? repr : lua_typename(L, -1);
+		luawrap::conversion_error(typeid(T).name(), index_path(), obj_repr);
+	}
 	return luawrap::pop<T>(L);
 }
 

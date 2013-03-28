@@ -1,19 +1,3 @@
---    name = "Magician's Robe",
---    description = "An enchanted robe of protection and magical power.",
---    equipment_type = "armour",
---
---    shop_cost = {45, 60},
---
---    spr_item = "enchanted robe",
---
---    magic_reduction = { base = 2 },
---    reduction = { base = 1 },
---
---    resistance = { base = 1 },
---    magic_resistance = { base = 1 },
---
---    stat_bonuses = { magic = 1 }
-
 print "Running macros.lua"
 
 local function print_unused_keys(obj, keys) 
@@ -50,7 +34,7 @@ local function pkv(key, nocomma)
 end
 
 for v in values(armour) do
-    if v.equipment_type == "ring" then
+    if v.equipment_type == "gloves" then
         obj = v
         printed = {}
         print( "Data.equipment_create {")
@@ -83,5 +67,6 @@ for v in values(armour) do
         print_unused_keys(obj, printed)
     end
 end
+
 print "Finished running macros.lua"
 io.flush()
