@@ -61,7 +61,6 @@ static void lapi_data_create_equipment(const LuaStackValue& table) {
 	int idx = game_item_data.size();
 	entry->init(idx, table);
 	printf("Loaded %s successfully!\n", entry->name.c_str());
-	game_item_data.push_back(entry);
 }
 
 void load_equipment_data(lua_State* L, const FilenameList& filenames,

@@ -256,5 +256,4 @@ namespace lua_api {
 			luawrap::call<void>(L);
 		}
 	}
-
 }

@@ -56,7 +56,6 @@ static void lapi_data_create_item(const LuaStackValue& table) {
 	int idx = game_item_data.size();
 	entry->init(idx, table);
 	printf("Loaded %s successfully!\n", entry->name.c_str());
-	game_item_data.push_back(entry);
 }
 
 LuaValue load_item_data(lua_State* L, const FilenameList& filenames) {
