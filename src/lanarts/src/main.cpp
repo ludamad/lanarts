@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
 	}
 
 	if (gs->game_settings().conntype == GameSettings::SERVER) {
-		engine["lobby_menu_start"].push();
+		engine["pregame_menu_start"].push();
 		bool did_exit = !luawrap::call<bool>(L);
 
 		if (did_exit) { /* User has quit! */

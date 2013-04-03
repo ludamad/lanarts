@@ -42,10 +42,10 @@ local function graph_line(func, range, color, draw_area)
 end
 
 local function draw_function_create()
-   local w,h = unpack(display.window_size)
+   local w,h = unpack(Display.window_size)
    
    local function draw_function()
-        draw_rectangle(COL_WHITE, {0,0, unpack(display.window_size)} )
+        draw_rectangle(COL_WHITE, {0,0, unpack(Display.window_size)} )
         for F in values(functions_to_plot) do
             graph_line( 
                 F[1],
@@ -69,9 +69,9 @@ local function menu_loop()
             setglobal("DEBUG_LAYOUTS", not DEBUG_LAYOUTS) -- flip on/off
         end
 
-        display.draw_start()
+        Display.draw_start()
         draw_function()
-        display.draw_finish()
+        Display.draw_finish()
 
         io.flush()
         Game.wait(10)
@@ -84,6 +84,6 @@ end
 function main() 
     local WINDOW_SIZE = { 800, 800 }
 
-    display.initialize("Lanarts Example", WINDOW_SIZE, false)
+    Display.initialize("Lanarts Example", WINDOW_SIZE, false)
     menu_loop()
 end

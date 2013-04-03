@@ -29,9 +29,9 @@ function main()
             setglobal("DEBUG_LAYOUTS", not DEBUG_LAYOUTS) -- flip on/off
         end
 
-        display.draw_start()
+        Display.draw_start()
         inv:draw( {100, 100} )
-        display.draw_finish()
+        Display.draw_finish()
 
         io.flush()
         Game.wait(10)

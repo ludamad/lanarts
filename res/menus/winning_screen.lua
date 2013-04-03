@@ -7,7 +7,7 @@ require "utils"
 local winning_screen_font = "res/fonts/MateSC-Regular.ttf"
 
 local function winning_screen_create()
-    local box = InstanceBox.create( { size = display.window_size} )
+    local box = InstanceBox.create( { size = Display.window_size} )
     local sprite = Sprite.image_create("res/menus/winning_screen.png")
 
     box:add_instance(
@@ -48,7 +48,7 @@ local function winning_screen_create()
         black_box_alpha = math.max(0, black_box_alpha - 0.05)
         draw_rectangle(
             with_alpha(COL_BLACK, black_box_alpha), 
-            bbox_create( {0,0}, display.window_size )
+            bbox_create( {0,0}, Display.window_size )
         ) 
     end
 
@@ -59,10 +59,10 @@ function winning_screen_show(...)
     local screen = winning_screen_create()
 
     while Game.input_capture() and not key_pressed(keys.ESCAPE)  do
-        display.draw_start()
+        Display.draw_start()
         screen:step( {0,0} )
         screen:draw( {0,0} )
-        display.draw_finish()
+        Display.draw_finish()
         Game.wait(100)
     end
 

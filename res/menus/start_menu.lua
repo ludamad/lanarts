@@ -7,7 +7,7 @@ require "TextLabel"
 require "utils"
 require "game_loop"
 require "menu_utils"
-require "lobby_menu"
+require "pregame_menu"
 
 -- START SCREEN -- 
 
@@ -19,7 +19,7 @@ local text_button_params = {
 }
 
 local function start_menu_create(on_start_click, on_load_click, on_score_click)
-    local menu = InstanceBox.create( { size = display.window_size } )
+    local menu = InstanceBox.create( { size = Display.window_size } )
 
     menu:add_instance(
         Sprite.image_create("res/interface/sprites/lanarts_logo.png"),
@@ -75,7 +75,7 @@ local menu_state = { exit_game = false }
 local exit_menu -- forward declare
 local setup_start_menu -- forward declare
 local setup_settings_menu -- forward declare
-local setup_lobby_menu -- forward declare
+local setup_pregame_menu -- forward declare
 local setup_scores_menu -- forward declare
 
 function exit_menu(exit_game)
@@ -87,7 +87,7 @@ function exit_menu(exit_game)
 end
 
 function setup_start_menu()
-    menu_state.menu = InstanceBox.create( { size = display.window_size } )
+    menu_state.menu = InstanceBox.create( { size = Display.window_size } )
 
     menu_state.back = function() 
         exit_menu(--[[Quit game]] true) 
@@ -116,7 +116,7 @@ function setup_start_menu()
 end
 
 function setup_settings_menu()
-    menu_state.menu = InstanceBox.create( { size = display.window_size } )
+    menu_state.menu = InstanceBox.create( { size = Display.window_size } )
     
     menu_state.back = setup_start_menu
     menu_state.continue = function ()
@@ -131,21 +131,21 @@ function setup_settings_menu()
     )
 end
 
-function setup_lobby_menu()
-    menu_state.menu = InstanceBox.create( { size = display.window_size } )
+function setup_pregame_menu()
+    menu_state.menu = InstanceBox.create( { size = Display.window_size } )
 
     menu_state.back =  function() 
         exit_menu(--[[Quit game]] true) 
     end
     menu_state.continue = exit_menu
     menu_state.menu:add_instance(
-        lobby_menu_create( --[[Start Game Button]] menu_state.continue ),
+        pregame_menu_create( --[[Start Game Button]] menu_state.continue ),
         CENTER
     )
 end
 
 function setup_scores_menu()
-    menu_state.menu = InstanceBox.create( { size = display.window_size } )
+    menu_state.menu = InstanceBox.create( { size = Display.window_size } )
     menu_state.back = setup_start_menu
     menu_state.continue = nil
     menu_state.menu:add_instance(
@@ -178,9 +178,9 @@ local function menu_loop(should_poll)
             return not menu_state.exit_game
         end
 
-        display.draw_start()
+        Display.draw_start()
         menu_state.menu:draw( {0, 0} )
-        display.draw_finish()
+        Display.draw_finish()
 
         Game.wait(10)
     end
@@ -195,8 +195,8 @@ function start_menu_show()
 end
 
 
-function lobby_menu_show()
-    setup_lobby_menu()
+function pregame_menu_show()
+    setup_pregame_menu()
 
     return menu_loop(--[[Poll connections]] true)
 end

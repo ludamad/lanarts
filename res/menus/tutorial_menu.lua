@@ -29,7 +29,7 @@ local function lanarts_explain_screen_create(click_back, click_forward)
          CENTER
     )
 
-    local window = InstanceBox.create( { size = display.window_size} )
+    local window = InstanceBox.create( { size = Display.window_size} )
     window:add_instance(
          contents,
          CENTER
@@ -57,7 +57,7 @@ function tutorial_menu_show(...)
     function go_forward() update_screen(screen_idx + 1) end
 
     while Game.input_capture() and not key_pressed(keys.ESCAPE) and screen  do
-        display.draw_start()
+        Display.draw_start()
         screen:step( {0,0} )
 
         if key_pressed(keys.ESCAPE) then
@@ -69,7 +69,7 @@ function tutorial_menu_show(...)
         end
 
         screen:draw( {0,0} )
-        display.draw_finish()
+        Display.draw_finish()
         Game.wait(100)
     end
 

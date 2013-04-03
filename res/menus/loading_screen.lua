@@ -55,7 +55,7 @@ local function loading_screen_setup(...)
 		return cached_setup(...)
 	end
 
-	local screen_box = InstanceBox.create( { size = display.window_size } )
+	local screen_box = InstanceBox.create( { size = Display.window_size } )
 
 	screen_box:add_instance( center_screen_setup(), CENTER )
 
@@ -68,11 +68,11 @@ end
 -- Loading callback
 function loading_screen_draw(...)
 	perf.timing_begin("system.loading_draw")
-    display.draw_start()
+    Display.draw_start()
 
     local screen = loading_screen_setup(...)
     screen:draw( {0,0} )
 
-    display.draw_finish()
+    Display.draw_finish()
 	perf.timing_end("system.loading_draw")
 end

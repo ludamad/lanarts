@@ -7,34 +7,6 @@ require "utils"
 
 local score_menu_font = "res/fonts/MateSC-Regular.ttf"
 
--- Draw parts of text colored differently
-local function draw_colored_parts(font, origin, xy, ...)
-    local rx, ry = 0, 0
-
-    local parts = {...}
-    local x_coords = {}
-
-    -- First calculate relative positions
-    for idx, part in ipairs(parts) do
-        local color, text = unpack(part)
-        local w, h = unpack( font:draw_size(text) )
-        x_coords[idx] = rx
-        rx = rx + w
-    end
-
-    local adjusted_origin = {0, origin[2]}
-    local adjusted_x = xy[1] - rx * origin[1]
-
-    -- Next draw according to origin
-    for idx, part in ipairs(parts) do
-        local color, text = unpack(part)
-        local position = {adjusted_x + x_coords[idx],  xy[2]} 
-        font:draw( { color = color, origin = adjusted_origin }, position, text)
-    end
-
-    return rx -- return final width for further chaining
-end
-
 -- This is a hack.
 -- Currently we cannot rely on the sprites being loaded, so we duplicate information from class_sprites.yaml here
 -- This will be fixed in the coming move from YAML to Lua (allowing us to simply require 'class_sprite_data.lua')
@@ -198,7 +170,7 @@ local function scores_menu_body_create()
 end
 
 function scores_menu_create(on_back_click)
-    local menu = InstanceBox.create( { size = display.window_size } )
+    local menu = InstanceBox.create( { size = Display.window_size } )
     local logo_displacement = 0
 
     -- Display the logo if we are >= 800x600 res

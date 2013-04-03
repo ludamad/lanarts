@@ -180,3 +180,31 @@ end
 function sound_optional_load(file) 
 	return optional_load(file, sound_load)
 end
+
+-- Draw parts of text colored differently
+function draw_colored_parts(font, origin, xy, ...)
+    local rx, ry = 0, 0
+
+    local parts = {...}
+    local x_coords = {}
+
+    -- First calculate relative positions
+    for idx, part in ipairs(parts) do
+        local color, text = unpack(part)
+        local w, h = unpack( font:draw_size(text) )
+        x_coords[idx] = rx
+        rx = rx + w
+    end
+
+    local adjusted_origin = {0, origin[2]}
+    local adjusted_x = xy[1] - rx * origin[1]
+
+    -- Next draw according to origin
+    for idx, part in ipairs(parts) do
+        local color, text = unpack(part)
+        local position = {adjusted_x + x_coords[idx],  xy[2]} 
+        font:draw( { color = color, origin = adjusted_origin }, position, text)
+    end
+
+    return rx -- return final width for further chaining
+end

@@ -11,10 +11,10 @@ function Engine.menu_start(...)
     return start_menu_show(...)
 end
 
-function Engine.lobby_menu_start(...)
-    require "lobby_menu"
+function Engine.pregame_menu_start(...)
+    require "pregame_menu"
 
-    return lobby_menu_show(...)
+    return pregame_menu_show(...)
 end
 
 function Engine.loading_screen_draw(...)

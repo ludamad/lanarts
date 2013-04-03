@@ -21,7 +21,7 @@
 namespace lua_api {
 
 	static void register_display_table(lua_State* L) {
-		LuaValue display = luawrap::ensure_table(luawrap::globals(L)["display"]);
+		LuaValue display = luawrap::ensure_table(luawrap::globals(L)["Display"]);
 
 		display["initialize"].bind_function(ldraw::display_initialize);
 		display["draw_start"].bind_function(ldraw::display_draw_start);
