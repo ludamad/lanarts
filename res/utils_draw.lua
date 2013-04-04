@@ -1,6 +1,7 @@
 require "utils_general" -- for 'memoized'
 
--- Draw parts of text colored differently
+--- Draw parts of text colored differently
+-- @usage draw_colored_parts(font, LEFT_TOP, {0,0}. {COL_RED, "hi "}, {COL_BLUE, "there"} )
 function draw_colored_parts(font, origin, xy, ...)
     local rx, ry = 0, 0
 
@@ -28,12 +29,14 @@ function draw_colored_parts(font, origin, xy, ...)
     return rx -- return final width for further chaining
 end
 
+--- Load a font, first checking if it exists in a cache
 font_cached_load = memoized(font_load)
+--- Load an image, first checking if it exists in a cache
 image_cached_load = memoized(image_load)
 
-local DEBUG_FONT = font_cached_load(settings.menu_font, 10)
-
+-- Used for debug information overlay
 function DEBUG_BOX_DRAW(self, xy)
+    debug_font = font_cached_load(settings.menu_font, 10)
     if DEBUG_LAYOUTS then
         local mouse_is_over = mouse_over(xy, self.size)
         local color = mouse_is_over and COL_PALE_BLUE or COL_YELLOW
@@ -41,13 +44,16 @@ function DEBUG_BOX_DRAW(self, xy)
         local alpha = mouse_is_over and 0.5 or 0.25
 
         if mouse_is_over then
-            DEBUG_FONT:draw( { color = COL_WHITE, origin = LEFT_BOTTOM }, xy, tostring(self) )
+            debug_font:draw( { color = COL_WHITE, origin = LEFT_BOTTOM }, xy, tostring(self) )
         end
 
         draw_rectangle_outline(with_alpha(color, alpha), bbox_create(xy, self.size), line_width )
     end
 end
 
+--- Takes a color, and returns a color with a transparency of 'alpha'
+-- Colors that already have an alpha will be made more transparent.
+-- @usage with_alpha(COL_WHITE, 0.5)
 function with_alpha(col, alpha) -- Don't mutate, we might be passed a colour constant!
     local copy = { unpack(col) } 
     -- Assume we have at least 3 components, but may have 4

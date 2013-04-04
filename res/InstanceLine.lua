@@ -2,8 +2,17 @@
 
 require "InstanceGroup"
 
-InstanceLine = newtype( )
+--- A layout consisting of objects placed on one or multiple lines.
+-- Each object can be placed with an optional offset.
+-- Objects that are stored should have 'step' and 'draw' methods that take a position, as well as a 'size' member.
+-- @usage For example, InstanceLine.create( {dx = 32} ) or InstanceLine.create( {dx = 32, per_row = 3, dy = 32} )
+InstanceLine = newtype()
 
+--- Initializes a new InstanceLine. Takes an argument table.
+-- params.force_size overrides the size the layout is considered. Otherwise it is dynamic.
+-- params.dx is manditory, specifying spacing of elements on the line.
+-- params.per_row & params.dy must be passed together or not at all, and specify how to arrange elements into a grid.
+-- @usage For example, InstanceLine.create( {dx = 32} ) or InstanceLine.create( {dx = 32, per_row = 3, dy = 32} )
 function InstanceLine:init(params)
     assert( params.dx,
         "InstanceLine.create expects a 'dx' member to indicate spacing of elements.")
@@ -23,6 +32,12 @@ function InstanceLine:init(params)
     self.per_row = --[[Optional]] params.per_row or false
 end
 
+--- Removes the contained object 'obj'
+function InstanceLine:remove(obj)
+    self._instances:remove(obj)
+end
+
+--- Removes all contained objects.
 function InstanceLine:clear()
     self._instances:clear()
     self.position = {0, 0}
@@ -32,20 +47,18 @@ function InstanceLine:clear()
     end
 end
 
-function InstanceLine:remove(obj)
-    self._instances:remove(obj)
-end
-
+--- Calls step on all contained objects.
 function InstanceLine:step(xy) 
     self._instances:step(xy)
 end
 
+--- Calls draw on all contained objects.
 function InstanceLine:draw(xy)
     self._instances:draw(xy)
     DEBUG_BOX_DRAW(self, xy)
 end
 
--- Moves the next location
+--- Moves to the next location, as if an instance were added.
 function InstanceLine:skip_location()
     local nx, ny = unpack(self.position)
 
@@ -59,10 +72,15 @@ function InstanceLine:skip_location()
     end
 end
 
+--- Return an iterable that iterates over all objects and their positions.
+-- @param xy <i>optional, default {0,0}</i>
+-- @usage for obj, xy in instance_line:instances({100,100}) do ... end
 function InstanceLine:instances(xy)
     return self._instances:instances(xy)
 end
 
+--- Add an object to the current line, starting a new one if per_row was passed and has been exceeded.
+-- @param offset <i>optional, default {0,0}</i> a position offset for the object.
 function InstanceLine:add_instance(obj, --[[Optional]] offset)
 
     local x, y = unpack(offset or {0,0})
@@ -79,10 +97,12 @@ function InstanceLine:add_instance(obj, --[[Optional]] offset)
     self:skip_location()
 end
 
+--- Whether the mouse is within the InstanceLine.
 function InstanceLine:mouse_over(xy)
     return mouse_over(xy, self.size)
 end
 
+--- A simple string representation for debugging purposes.
 function InstanceLine:__tostring()
     return "[InstanceLine " .. toaddress(self) .. "]"
 end
