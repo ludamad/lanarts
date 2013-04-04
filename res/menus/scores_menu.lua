@@ -80,9 +80,7 @@ local function score_entry_draw(entry, ranking, ex, ey, ew, eh)
     else
         progress_entry = {COL_BABY_BLUE, "Reached Floor " .. entry.deepest_floor .. " "}
     end
-    draw_colored_parts(font, LEFT_BOTTOM, {ex + 2, ey+eh - 4},
-        progress_entry
-    )
+    draw_colored_parts(font, LEFT_BOTTOM, {ex + 2, ey+eh - 4}, progress_entry)
 
     -- Draw how many monsters killed
     draw_colored_parts(font, LEFT_BOTTOM, {ex + ew/2 - 50, ey+eh - 4},
@@ -106,7 +104,7 @@ local function score_entry_draw(entry, ranking, ex, ey, ew, eh)
     draw_rectangle_outline( 
         entry.won_the_game and COL_LIGHT_GRAY or COL_DARK_GRAY, 
         bbox_create( {ex - 32, ey}, {ew + 32, eh} ), 
-        1
+        1  -- outline width
     )
 end
 
