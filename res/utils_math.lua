@@ -44,6 +44,19 @@ function vector_divide(v1, v2)
     return ret
 end
 
+--- Returns the position of an object of size 'size' aligned to a bounding box origin (eg, RIGHT_BOTTOM)
+-- @param bbox the surrounding bounding box
+-- @param origin the origin within the bounding box
+-- @param obj_size <i>optional, default {0,0}</i> the size of the object
+-- @param offset <i>optional, default {0,0}</i> a location offset to apply
+function origin_aligned(bbox, origin, --[[Optional]] obj_size, --[[Optional]] offset)
+    obj_size = obj_size or {0,0}
+    offset = offset or {0,0}
+    local bbox_w, bbox_h = bbox[3] - bbox[1], bbox[4] - bbox[2]
+    return { ( bbox_w - obj_size[1] ) * origin[1] + bbox[1] + offset[1],
+             ( bbox_h - obj_size[2] ) * origin[2] + bbox[2] + offset[2] }
+end
+
 --- Returns whether 'origin' represents a valid origin. 
 -- A valid origin is a pair of numbers between 0 and 1, representing placement on a rectangle, eg LEFT_TOP is {0,0}.
 function origin_valid(origin)
