@@ -36,13 +36,11 @@ static GameState* init_gamestate() {
 
 	lua_State* L = lua_api::create_luastate();
 	lua_api::add_search_path(L, "res/?.lua");
-	lua_api::add_search_path(L, "res/menus/?.lua");
 
 	GameSettings settings; // Initialized with defaults
 	// Load the manual settings
 	if (!load_settings_data(settings, "settings.yaml")) {
-		fatal_error(
-				"Fatal error: settings.yaml not found, the game is probably being loaded from the wrong place.\n");
+		fatal_error("Fatal error: settings.yaml not found, the game is probably being loaded from the wrong place.\n");
 	}
 
 	load_settings_data(settings, "res/saved_settings.yaml"); // Override with remembered settings

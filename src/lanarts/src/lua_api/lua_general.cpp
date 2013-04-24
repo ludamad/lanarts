@@ -242,6 +242,10 @@ static int lapi_toaddress(lua_State *L) {
 	return 1; /* return the table */
 }
 
+static void lapi_add_search_path(LuaStackValue path) {
+	lua_api::add_search_path(path.luastate(), path.to_str());
+}
+
 namespace lua_api {
 	void event_projectile_hit(lua_State* L, ProjectileInst* projectile,
 			GameInst* target) {
@@ -249,8 +253,8 @@ namespace lua_api {
 
 	int l_itervalues(lua_State* L) {
 		lua_pushvalue(L, 1);
-		lua_pushlightuserdata(L, (void*) ((1)));
-		lua_pushlightuserdata(L, (void*) ((lua_objlen(L, 1))));
+		lua_pushlightuserdata(L, (void*) (1)); // Lua array iteration starts at 1
+		lua_pushlightuserdata(L, (void*) (lua_objlen(L, 1))); // End at the object length
 		lua_pushcclosure(L, lapi_values_aux, 3);
 		return 1;
 	}
@@ -264,6 +268,8 @@ namespace lua_api {
 		globals["string_split"].bind_function(lapi_string_split);
 		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);
+
+		globals["require_path_add"].bind_function(lapi_add_search_path);
 
 		LuaValue table = luawrap::ensure_table(globals["table"]);
 		table["merge"].bind_function(lapi_table_merge);

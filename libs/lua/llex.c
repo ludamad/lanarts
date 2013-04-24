@@ -442,7 +442,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       }
     }
   }
-  return -1;//Does-not-occur
+  return -1; /* Does-not-occur */
 }
 
 

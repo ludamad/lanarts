@@ -323,7 +323,7 @@ static const char *min_expand (MatchState *ms, const char *s,
       s++;  /* try with one more repetition */
     else return NULL;
   }
-  return NULL;//does-not-occur;
+  return NULL; /* does-not-occur */
 }
 
 

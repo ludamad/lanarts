@@ -5,6 +5,11 @@
     in additional files.
 ]]
 
+require_path_add("res/menus/?.lua")
+require_path_add("res/library_files/?.lua")
+
+sound_volume = 0 -- Mute the game
+
 function Engine.menu_start(...)
     require "start_menu"
 
@@ -70,5 +75,3 @@ function Engine.event_occurred(...)
 
     return event_occurred(...)
 end
-
-sound_volume = 0

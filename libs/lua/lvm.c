@@ -219,7 +219,7 @@ static int l_strcmp (const TString *ls, const TString *rs) {
       l += len; ll -= len; r += len; lr -= len;
     }
   }
-  return -1; // Suppress warning
+  return -1; /* Suppress warning */
 }
 
 

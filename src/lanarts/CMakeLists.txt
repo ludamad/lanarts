@@ -19,13 +19,13 @@ include_directories(
 	src/
 	${SRC}/common/include
 	${SRC}/draw/include
-	${SRC}#/net
+	${SRC} # for net
 	${SRC}/luawrap/include
 	${SRC}/sound/include
 	${LIBS}/UnitTest++ 
-	${LIBS}/yaml-cpp/include 
+	${LIBS}/yaml-cpp/include
 	${LIBS}/lua 
-	${LIBS}#/rvo2 
+	${LIBS} # for rvo2 & luasocket
 	)
 
 file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
@@ -87,8 +87,7 @@ file(GLOB lanarts_examples RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 
-add_library( lanartslib
-		STATIC
+add_library( lanartslib STATIC
              ${lanarts_src}
             )
 
@@ -111,6 +110,7 @@ set (libraries
 	lcommon
 	lsound
 	lua
+	luasocket
 	luawrap
 	lanarts_net
 	yaml-cpp
