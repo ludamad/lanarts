@@ -20,7 +20,6 @@ void lua_effectivestats_bindings(GameState* gs, lua_State* L);
 void lua_collision_check_bindings(lua_State* L);
 void lua_spelltarget_bindings(lua_State* L);
 void lua_object_func_bindings(lua_State* L);
-void lua_display_func_bindings(lua_State* L);
 
 int rand_range(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
@@ -58,7 +57,6 @@ void lua_lanarts_api(GameState* state, lua_State* L) {
 	lua_gamestate_bindings(state, L);
 	lua_gameinst_bindings(state, L);
 	lua_combatstats_bindings(state, L);
-	lua_display_func_bindings(L);
 	lua_effectivestats_bindings(state, L);
 	lua_collision_check_bindings(L);
 	lua_spelltarget_bindings(L);
@@ -107,10 +105,4 @@ Colour lua_tocolour(lua_State* L, int idx) {
 	Colour c;
 	lua_tonarray(L, idx, (int*)&c, sizeof(Colour) / sizeof(int));
 	return c;
-}
-
-std::string lua_tocppstring(lua_State* L, int idx) {
-	size_t size;
-	const char* cstr = lua_tolstring(L, idx, &size);
-	return std::string(cstr, size);
 }

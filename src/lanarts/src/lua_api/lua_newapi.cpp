@@ -206,6 +206,7 @@ namespace lua_api {
 		register_net_api(L);
 		register_gamestate_api(L);
 		register_gameworld_api(L);
+		register_event_log_api(L);
 		register_display_api(L);
 	}
 

@@ -43,9 +43,9 @@ end
 function Berserk.action_func(caster, x, y)
     caster:add_effect("Berserk", 150 + caster.stats.level * 20)
     if caster:is_local_player() then
-        show_message("You enter a powerful rage!", {200,200,255})
+        EventLog.add("You enter a powerful rage!", {200,200,255})
     elseif caster.name == "Your ally" then
-        show_message(caster.name .. " enters a powerful rage!", {200,200,255})
+        EventLog.add(caster.name .. " enters a powerful rage!", {200,200,255})
     end
 end
 
@@ -138,7 +138,7 @@ local function ChargeCallback(effect, caster)
             if rand_range(0, 100) < chance then -- decreasing chance of knockback
                 mon:add_effect("Thrown", 45 + 2 * caster.stats.level).angle = direction({caster.x, caster.y}, {mon.x, mon.y})
                 if caster:is_local_player() then
-                    show_message("The " .. mon.name .." is thrown back!", {200,200,255})
+                    EventLog.add("The " .. mon.name .." is thrown back!", {200,200,255})
                 end
             end
         end
@@ -147,9 +147,9 @@ end
 
 function PowerStrike.action_func(caster)
     if caster:is_local_player() then
-        show_message("You strike wildly in all directions!", {200,200,255})
+        EventLog.add("You strike wildly in all directions!", {200,200,255})
     elseif caster.name == "Your ally" then
-        show_message(caster.name .. " strikes wildly in all directions!", {200,200,255})
+        EventLog.add(caster.name .. " strikes wildly in all directions!", {200,200,255})
     end
     caster:add_effect("Charge", 8).callback = ChargeCallback
 end

@@ -37,10 +37,10 @@ function berserk_effect.step(effect, obj)
 	while killdiff > 0 do
 		effect.time_left = effect.time_left + berserk_extension(effect)
 		if obj:is_local_player() then
-			show_message("Your rage grows ...", {200,200,255})
+			EventLog.add("Your rage grows ...", {200,200,255})
 		end
 		if settings.verbose_output then
-			show_message("Killed Enemy, berserk time_left = " .. effect.time_left)
+			EventLog.add("Killed Enemy, berserk time_left = " .. effect.time_left)
 		end
 		killdiff = killdiff -1
 		effect.extensions = effect.extensions + 1

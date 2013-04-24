@@ -102,7 +102,7 @@ function game_loop()
         end
 
         if key_pressed(keys.ESCAPE) then 
-            show_message("Press Shift + Esc to exit, your progress will be saved.")
+            EventLog.add("Press Shift + Esc to exit, your progress will be saved.")
         end
 
 	local steponly = (Game.frame % settings.steps_per_draw ~= 0)

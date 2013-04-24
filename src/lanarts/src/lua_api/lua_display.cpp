@@ -18,10 +18,19 @@
 
 #include "lua_newapi.h"
 
+static int event_log_add(lua_State* L) {
+	int nargs = lua_gettop(L);
+	GameState* gs = lua_api::gamestate(L);
+	Colour col = nargs >= 2 ? LuaStackValue(L, 2).as<Colour>() : Colour();
+	gs->game_chat().add_message(LuaStackValue(L, 1).to_str(), col);
+	return 0;
+}
+
 namespace lua_api {
 
 	static void register_display_table(lua_State* L) {
-		LuaValue display = luawrap::ensure_table(luawrap::globals(L)["Display"]);
+		LuaSpecialValue globals = luawrap::globals(L);
+		LuaValue display = luawrap::ensure_table(globals["Display"]);
 
 		display["initialize"].bind_function(ldraw::display_initialize);
 		display["draw_start"].bind_function(ldraw::display_draw_start);
@@ -50,5 +59,11 @@ namespace lua_api {
 		fonts["large"] = gs->menu_font();
 
 		register_display_table(L);
+	}
+
+	void register_event_log_api(lua_State* L) {
+		LuaSpecialValue globals = luawrap::globals(L);
+		LuaValue event_log = luawrap::ensure_table(globals["EventLog"]);
+		event_log["add"].bind_function(event_log_add);
 	}
 }

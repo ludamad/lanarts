@@ -38,6 +38,8 @@ bool create_directory(const char* path) {
 #endif
 
 bool ensure_directory(const char* path) {
-	create_directory(path);
+	if (create_directory(path)) {
+		return true;
+	}
 	return is_directory(path);
 }

@@ -51,8 +51,6 @@
 #define UPPER_MASK 0x80000000UL /* most significant w-r bits */
 #define LOWER_MASK 0x7fffffffUL /* least significant r bits */
 
-MTwist twist_state;
-
 /* initializes mt[N] with a seed */
 void MTwist::init_genrand(unsigned int s)
 {
