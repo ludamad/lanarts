@@ -10,6 +10,8 @@
 
 #include <lua.hpp>
 
+#include <lcommon/directory.h>
+
 #include <net/lanarts_net.h>
 #include <lsound/lsound.h>
 
@@ -43,7 +45,11 @@ static GameState* init_gamestate() {
 		fatal_error("Fatal error: settings.yaml not found, the game is probably being loaded from the wrong place.\n");
 	}
 
-	load_settings_data(settings, "res/saved_settings.yaml"); // Override with remembered settings
+	bool can_create_saves = ensure_directory("saves");
+	if (!can_create_saves) {
+		printf("Problem creating save directory, will not be able to create save files!\n");
+	}
+	load_settings_data(settings, "saves/saved_settings.yaml"); // Override with remembered settings
 
 	if (SDL_Init(0) < 0) {
 		exit(0);
@@ -83,7 +89,7 @@ int main(int argc, char** argv) {
 
 	engine["menu_start"].push();
 	bool did_exit = !luawrap::call<bool>(L);
-	save_settings_data(gs->game_settings(), "res/saved_settings.yaml"); // Save settings from menu
+	save_settings_data(gs->game_settings(), "saves/saved_settings.yaml"); // Save settings from menu
 	if (did_exit) {
 		/* User has quit! */
 		goto label_Quit;
@@ -118,7 +124,7 @@ int main(int argc, char** argv) {
 		if (!gs->io_controller().user_has_exit()) {
 			if (gs->game_settings().conntype != GameSettings::CLIENT) {
 				save_settings_data(gs->game_settings(),
-						"res/saved_settings.yaml"); // Save settings from in-game
+						"saves/saved_settings.yaml"); // Save settings from in-game
 			}
 			delete gs;
 			goto label_StartOver;
@@ -126,7 +132,7 @@ int main(int argc, char** argv) {
 	}
 
 	if (gs->game_settings().conntype != GameSettings::CLIENT) {
-		save_settings_data(gs->game_settings(), "res/saved_settings.yaml"); // Save settings from in-game
+		save_settings_data(gs->game_settings(), "saves/saved_settings.yaml"); // Save settings from in-game
 	}
 
 	label_Quit:

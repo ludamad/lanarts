@@ -36,7 +36,7 @@ local function start_menu_create(on_start_click, on_load_click, on_score_click)
     )
     y_position = y_position + 50
 
-    if file_exists("res/savefile.save") then
+    if file_exists("saves/savefile.save") then
         menu:add_instance(
             text_button_create("Continue Game", on_load_click, text_button_params),
             CENTER,
@@ -95,15 +95,15 @@ function setup_start_menu()
 
     local function on_load_click()
         game_loop_control.startup_function = function()
-            if file_exists("res/savefile.save") then
-                Game.load("res/savefile.save")
+            if file_exists("saves/savefile.save") then
+                Game.load("saves/savefile.save")
             end
         end
 	settings.connection_type = net.NONE
         exit_menu()
     end
 
-    if file_exists("res/savefile.save") then
+    if file_exists("saves/savefile.save") then
         menu_state.continue = on_load_click
     else 
         menu_state.continue = setup_settings_menu

@@ -1,7 +1,7 @@
 /*
  * directory.cpp:
  *  Simple function to create a directory.
- *  Supports Windows and Posix platforms
+ *  Supports Windows and Posix platforms.
  */
 
 #include "directory.h"
@@ -25,7 +25,6 @@ bool create_directory(const char* path) {
 #else
 
 #include <sys/stat.h>
-#include <cerrno>
 
 bool is_directory(const char* path) {
 	struct stat st;
@@ -37,3 +36,8 @@ bool create_directory(const char* path) {
 }
 
 #endif
+
+bool ensure_directory(const char* path) {
+	create_directory(path);
+	return is_directory(path);
+}

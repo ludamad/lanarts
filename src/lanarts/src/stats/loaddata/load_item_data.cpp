@@ -36,15 +36,6 @@ void parse_item_entry(lua_State* L, const YAML::Node& n, ItemEntry& entry) {
 	parse_optional(n, "shop_cost", Range());
 }
 
-static void load_item_callbackf(const YAML::Node& node, lua_State* L,
-		LuaValue* value) {
-	ItemEntry* entry = new ItemEntry;
-	parse_item_entry(L, node, *entry);
-	game_item_data.push_back(entry);
-
-	(*value)[entry->name] = node;
-}
-
 static LuaValue* item_table;
 static void lapi_data_create_item(const LuaStackValue& table) {
 
@@ -55,7 +46,6 @@ static void lapi_data_create_item(const LuaStackValue& table) {
 
 	int idx = game_item_data.size();
 	entry->init(idx, table);
-	printf("Loaded %s successfully!\n", entry->name.c_str());
 }
 
 LuaValue load_item_data(lua_State* L, const FilenameList& filenames) {

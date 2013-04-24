@@ -109,7 +109,7 @@ function game_loop()
         if not game_loop_body(steponly) then
             if single_player then
                 Game.score_board_store()
-                Game.save("res/savefile.save")
+                Game.save("saves/savefile.save")
             end
             break
         end

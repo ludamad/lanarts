@@ -7,7 +7,7 @@
 
 class GameState;
 
-const char SCOREBOARD_FILE[] = "res/score_board.score";
+const char SCOREBOARD_FILE[] = "saves/score_board.score";
 
 struct ScoreBoardEntry {
 	std::string name;

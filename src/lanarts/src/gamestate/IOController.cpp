@@ -88,7 +88,6 @@ static void bind_key_events(std::vector<IOEventTrigger>& bindings,
 IOController::IOController() {
 	//XXX: For now we hardcode the specific actions
 	SDLMod item_mod = SDLMod(KMOD_LSHIFT | KMOD_RSHIFT);
-	char action_key = 'j';
 
 	// Spell choice
 	bind_key_events(event_bindings, "yuiop", IOEvent::ACTIVATE_SPELL_N,
@@ -145,12 +144,9 @@ IOController::IOController() {
 	/*Do autotarget action */
 	{
 		IOEvent event(IOEvent::AUTOTARGET_CURRENT_ACTION);
-		IOEventTrigger trigger1(event, IOEventTrigger::NONE, SDLKey(action_key),
+		IOEventTrigger trigger(event, IOEventTrigger::NONE, SDLK_SPACE,
 				KMOD_NONE, KMOD_NONE, true);
-		IOEventTrigger trigger2(event, IOEventTrigger::NONE, SDLK_SPACE,
-				KMOD_NONE, KMOD_NONE, true);
-		event_bindings.push_back(trigger1);
-		event_bindings.push_back(trigger2);
+		event_bindings.push_back(trigger);
 	}
 
 	/*Do targetted action */{

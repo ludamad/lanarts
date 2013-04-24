@@ -30,7 +30,7 @@ function events.PlayerEnterLevel()
     local single_player = (settings.connection_type == net.NONE)
     if single_player then
         Game.score_board_store()
-        Game.save("res/savefile.save")
+        Game.save("saves/savefile.save")
     end
 end
 

@@ -39,8 +39,6 @@ function Engine.resources_load(...)
 
     dofile "res/enemies/enemies.lua"
 
-    dofile "res/items/weapons/weapons.lua" 
-
     dofile "res/effects/effects.lua"
 
     dofile "res/spells/spell_effects.lua"
