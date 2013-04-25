@@ -82,8 +82,8 @@ file(GLOB lanarts_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
        tests/*
 )
 
-file(GLOB lanarts_examples RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
-       examples/*
+file(GLOB lanarts_runner RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+       standalone/*
 )
 
 
@@ -99,8 +99,8 @@ add_executable( lanarts_tests
              ${lanarts_tests} 
 	        )
 
-add_executable( lanarts_examples
-             ${lanarts_examples} 
+add_executable( lanarts_runner
+             ${lanarts_runner} 
 	        )
 
 
@@ -132,7 +132,7 @@ target_link_libraries( lanarts_tests
     ${libraries}
 	UnitTest++
 )
-target_link_libraries( lanarts_examples
+target_link_libraries( lanarts_runner
     ${libraries}
 )
 

@@ -48,11 +48,4 @@ void luayaml_push_levelinfo(lua_State* L, const char* name);
 void lua_push_narray(lua_State* L, const int* nums, int n);
 void lua_tonarray(lua_State* L, int idx, int* nums, int n);
 
-void lua_push_region(lua_State* L, const Region& r);
-Region lua_toregion(lua_State* L, int idx);
-
-void lua_push_colour(lua_State* L, const Colour& r);
-Colour lua_tocolour(lua_State* L, int idx);
-std::string lua_tocppstring(lua_State* L, int idx);
-
 #endif /* LUA_API_H_ */

@@ -4,6 +4,4 @@ if ! ./make.sh; then
 fi
 
 # Run lanarts
-
-cd ../lanarts
 ../lanarts_build/src/lanarts/lanarts

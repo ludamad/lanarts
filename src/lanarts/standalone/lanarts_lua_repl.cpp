@@ -1,15 +1,17 @@
 /*
- * lua_repl.cpp:
+ * lanarts_lua_repl.cpp:
  *  Functions for interactive standard input.
  *  Can be placed in event-loop.
  *  Adapted from lua.c.
  *  See Copyright Notice in <lua/lua.h>
  */
 
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
+#include <string>
 
 #define lua_c
 
@@ -24,7 +26,6 @@ extern "C" {
 static lua_State *globalL = NULL;
 
 const char program_name[] = "LanartsEngine";
-
 
 static void lstop (lua_State *L, lua_Debug *ar) {
   (void)ar;  /* unused arg. */
@@ -91,7 +92,7 @@ static int docall (lua_State *L, int narg, int clear) {
 }
 
 static const char *get_prompt (lua_State *L, int firstline) {
-  return (firstline ? ">" : ">>");
+  return (firstline ? "> " : "  ");
 }
 
 
@@ -127,13 +128,32 @@ static int pushline (lua_State *L, int firstline) {
   return 1;
 }
 
+static int try_print(lua_State* L, const char* line, int len) {
+	std::string buffstr;
+	buffstr.reserve(len + sizeof("print()"));
+	buffstr += "print(";
+	buffstr += line;
+	buffstr += ')';
+    return luaL_loadbuffer(L, buffstr.c_str(), buffstr.size(), "=stdin");
+}
+
 static int loadline (lua_State *L) {
-  int status;
+  int status, print_status;
   lua_settop(L, 0);
   if (!pushline(L, 1))
     return -1;  /* no input */
   for (;;) {  /* repeat until gets a complete line */
     status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), "=stdin");
+    if (status == LUA_ERRSYNTAX) {
+        lua_pop(L, 1);
+    	print_status = try_print(L,lua_tostring(L, 1), lua_strlen(L, 1));
+    	if (print_status == LUA_ERRSYNTAX) {
+		  lua_pop(L, 1);
+    	} else {
+    		status = print_status;
+    		break;
+    	}
+    }
     if (!incomplete(L, status)) break;  /* cannot try to add lines? */
     if (!pushline(L, 0))  /* no more input? */
       return -1;

@@ -7,6 +7,7 @@
 -----------------------------------------------------------------------------
 -- Declare module and import dependencies
 -----------------------------------------------------------------------------
+print "I am here like a pioneer"
 local base = _G
 local string = require("string")
 local math = require("math")

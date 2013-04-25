@@ -11,6 +11,10 @@
 #include "lua_api/lua_yaml.h"
 #include "lua_api/lua_api.h"
 
+extern "C" {
+#include "luasocket/luasocket.h"
+}
+
 #include "lua_newapi.h"
 
 // NB: the -address- of this key is used, not the actual string.
@@ -190,18 +194,27 @@ namespace lua_api {
 		return !fallback.isnil();
 	}
 
+	void register_lua_libraries(lua_State* L) {
+		LuaField loaded = luawrap::registry(L)["_LOADED"];
+		luaopen_socket_core(L);
+		loaded["socket.core"].pop();
+		lua_api::add_search_path(L, "res/library_files/luasocket/?.lua");
+		luawrap::dofile(L, "res/library_files/luasocket/socket.lua");
+	}
+
 	// Register all the lanarts API functions and types
 	void register_api(GameState* gs, lua_State* L) {
 		lua_lanarts_api(gs, L); // TODO: Deprecated
 
 		LuaValue globals = luawrap::globals(L);
-		LuaValue gamestate = luawrap::ensure_table(globals["Game"]);
+		LuaValue game = luawrap::ensure_table(globals["Game"]);
 		// Holds engine hooks
 		LuaValue engine = luawrap::ensure_table(globals["Engine"]);
 
 		register_gamestate(gs, L);
 		register_general_api(L);
 
+		register_lua_libraries(L);
 		register_io_api(L);
 		register_net_api(L);
 		register_gamestate_api(L);

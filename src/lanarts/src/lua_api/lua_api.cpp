@@ -86,23 +86,3 @@ void lua_tonarray(lua_State* L, int idx, int* nums, int n) {
 		lua_pop(L, 1);
 	}
 }
-
-void lua_push_region(lua_State* L, const Region& r) {
-	lua_push_narray(L, (const int*)&r, sizeof(Region) / sizeof(int));
-}
-
-Region lua_toregion(lua_State* L, int idx) {
-	Region r;
-	lua_tonarray(L, idx, (int*)&r, sizeof(Region) / sizeof(int));
-	return r;
-}
-
-void lua_push_colour(lua_State* L, const Colour& c) {
-	lua_push_narray(L, (const int*)&c, sizeof(Colour) / sizeof(int));
-}
-
-Colour lua_tocolour(lua_State* L, int idx) {
-	Colour c;
-	lua_tonarray(L, idx, (int*)&c, sizeof(Colour) / sizeof(int));
-	return c;
-}
