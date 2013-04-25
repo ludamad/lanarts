@@ -4,6 +4,7 @@
 
 require "help_overlay"
 
+--- Externally visible control structure for the main loop
 game_loop_control = {
     game_is_over = false,
     game_is_paused = false,
@@ -58,9 +59,8 @@ function game_post_draw()
 end
 
 local fps_timer = timer_create()
-local fps_count = 1
-local fps_lastframe = 0
-local fps = nil
+local fps_count, fps_lastframe, fps = 1, 0, nil
+
 function game_overlay_draw()
     local frame_increase = math.max(0, Game.frame - fps_lastframe)
     fps_lastframe = Game.frame
