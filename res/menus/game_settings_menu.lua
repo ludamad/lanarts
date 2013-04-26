@@ -58,7 +58,7 @@ end
 local function is_valid_ip_string(text)
     if text == "localhost" then return true end
 
-    local parts = string_split(text, ".")
+    local parts = text:split(".")
 
     -- Valid IP string has 4 components, eg 1.2.3.4
     if #parts ~= 4 then return false end
