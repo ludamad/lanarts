@@ -45,7 +45,4 @@ void luayaml_push_sprites(lua_State* L, const char* name);
 void luayaml_push_enemies(lua_State* L, const char* name);
 void luayaml_push_levelinfo(lua_State* L, const char* name);
 
-void lua_push_narray(lua_State* L, const int* nums, int n);
-void lua_tonarray(lua_State* L, int idx, int* nums, int n);
-
 #endif /* LUA_API_H_ */

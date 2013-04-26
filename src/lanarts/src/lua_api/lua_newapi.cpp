@@ -13,6 +13,7 @@
 
 extern "C" {
 #include "luasocket/luasocket.h"
+#include "luasocket/mime.h"
 }
 
 #include "lua_newapi.h"
@@ -109,6 +110,11 @@ namespace lua_api {
 		return lua_gettop(L);
 	}
 
+	static int safe_dofile(LuaStackValue filename) {
+		luawrap::dofile(filename.luastate(), filename.to_str());
+		return 0;
+	}
+
 	/* Creates a lua state with a custom global metatable.
 	 * All further registration assumes the lua state was created with this function. */
 	lua_State* create_luastate() {
@@ -129,6 +135,8 @@ namespace lua_api {
 		luawrap::globals(L)["require"].push();
 		lua_pushcclosure(L, wrapped_with_globals_mutable, 1);
 		luawrap::globals(L)["require"].pop();
+
+		luawrap::globals(L)["dofile"].bind_function(safe_dofile);
 
 		luameta_defaultsetter(globalsmeta, contents);
 		luameta_defaultgetter(globalsmeta, contents);
@@ -195,11 +203,11 @@ namespace lua_api {
 	}
 
 	void register_lua_libraries(lua_State* L) {
-		LuaField loaded = luawrap::registry(L)["_LOADED"];
-		luaopen_socket_core(L);
-		loaded["socket.core"].pop();
-		lua_api::add_search_path(L, "res/library_files/luasocket/?.lua");
-		luawrap::dofile(L, "res/library_files/luasocket/socket.lua");
+		LuaField preload = luawrap::globals(L)["package"]["preload"];
+		preload["socket.core"].bind_function(luaopen_socket_core);
+		preload["mime.core"].bind_function(luaopen_mime_core);
+
+		lua_api::add_search_path(L, "res/library_files/?.lua");
 	}
 
 	// Register all the lanarts API functions and types

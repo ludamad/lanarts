@@ -41,17 +41,8 @@ void lua_safe_dofile(lua_State* L, const char* fname) {
 
 }
 
-// Partially copied from Lua source
-static int lua_safe_dofile(lua_State *L) {
-	const char *fname = luaL_optstring(L, 1, NULL);
-	lua_safe_dofile(L, fname);
-	return 0;
-}
-
 void lua_register_lcommon(lua_State* L, const LuaValue& module) {
 	lua_register_timer(L, module);
-	lua_pushcfunction(L, lua_safe_dofile);
-	lua_setglobal(L, "dofile");
 
 	lua_register_geometry(L, module);
 	lua_register_range(L, module);

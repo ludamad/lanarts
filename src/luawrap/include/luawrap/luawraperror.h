@@ -58,6 +58,10 @@ namespace luawrap {
 		std::string _type, _object_path, _object_repr;
 	};
 
+	inline void error(const char* msg) {
+		throw Error(msg ? msg : "<No error message>");
+	}
+
 	inline void error(const std::string& msg) {
 		throw Error(msg);
 	}

@@ -5,12 +5,25 @@
 
 #include <lua.hpp>
 
+#include <luawrap/luawrap.h>
+
 #include <luawrap/luawraperror.h>
 
 namespace luawrap {
 	int errorfunc(lua_State *L) {
-		if (!lua_isstring(L, 1)) /* 'message' not a string? */
-			return 1; /* keep it intact */
+		LuaSpecialValue globals = luawrap::globals(L);
+
+		if (!lua_isstring(L, 1)) {
+			/* 'message' not a string? */
+			if (globals["tostring"].isnil()) {
+				lua_pushstring(L, "<Could not convert error to string>");
+			} else {
+				luawrap::globals(L)["tostring"].push();
+				lua_pushvalue(L, 1);
+				lua_call(L, 1, 1);
+			}
+			lua_replace(L, 1);
+		}
 		lua_getfield(L, LUA_GLOBALSINDEX, "debug");
 		if (!lua_istable(L, -1)) {
 			lua_pop(L, 1);

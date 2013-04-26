@@ -20,7 +20,8 @@ namespace luawrap {
 			lua_pushcfunction(L, luawrap::errorfunc);
 			lua_insert(L, -2 - nargs); // swap places with pushed function
 			if (lua_pcall(L, nargs, 1, -2 - nargs) != 0) {
-				error(lua_tostring(L, -1));
+				const char* errstr = lua_tostring(L, -1);
+				error(errstr ? errstr : "<Invalid error string>");
 			}
 			lua_replace(L, -2);
 		}

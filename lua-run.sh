@@ -8,4 +8,4 @@ if ! ./make.sh; then
 fi
 
 # Run lanarts
-../lanarts_build/src/lanarts/lanarts_runner $@
+gdb --tui --args ../lanarts_build/src/lanarts/lanarts_runner $@

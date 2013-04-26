@@ -19,6 +19,7 @@ namespace luawrap {
 					code, lua_tostring(L, -1));
 			error(lua_tostring(L, -1));
 			lua_pop(L, 1);
+			return;
 		}
 
 		// Push error function before lua function
@@ -38,6 +39,7 @@ namespace luawrap {
 					filename, lua_tostring(L, -1));
 			error(lua_tostring(L, -1));
 			lua_pop(L, 1);
+			return;
 		}
 
 		// Push error function before lua function

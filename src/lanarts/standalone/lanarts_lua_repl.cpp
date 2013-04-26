@@ -147,9 +147,7 @@ static int loadline (lua_State *L) {
     if (status == LUA_ERRSYNTAX) {
         lua_pop(L, 1);
     	print_status = try_print(L,lua_tostring(L, 1), lua_strlen(L, 1));
-    	if (print_status == LUA_ERRSYNTAX) {
-		  lua_pop(L, 1);
-    	} else {
+    	if (print_status != LUA_ERRSYNTAX) {
     		status = print_status;
     		break;
     	}

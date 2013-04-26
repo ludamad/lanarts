@@ -1,6 +1,6 @@
 /*
- * lanarts_examples.cpp:
- *  Exercises some of the hard-to-unit test code
+ * lanarts_lua_runner.cpp:
+ *  Lanarts engine lua script runner.
  */
 
 #include <cstdio>
@@ -18,17 +18,9 @@
 
 #include "lua_api/lua_newapi.h"
 
+/* From lanarts_lua_repl.cpp
+ * Blocks until a lua expression is received from standard input */
 int read_eval_print(lua_State *L);
-
-static void perform_luascript(lua_State* L, const char* file) {
-	luawrap::dofile(L, file);
-	lua_api::globals_set_mutability(L, false);
-
-	luawrap::globals(L)["main"].push();
-	if (!lua_isnil(L, -1)) {
-		luawrap::call<void>(L);
-	}
-}
 
 static lua_State* setup_lua_state() {
 	using namespace ldraw;
@@ -39,6 +31,16 @@ static lua_State* setup_lua_state() {
 	lua_api::register_api(new GameState(GameSettings(), L), L);
 
 	return L;
+}
+
+static void perform_luascript(lua_State* L, const char* file) {
+	luawrap::dofile(L, file);
+	lua_api::globals_set_mutability(L, false);
+
+	luawrap::globals(L)["main"].push();
+	if (!lua_isnil(L, -1)) {
+		luawrap::call<void>(L);
+	}
 }
 
 // Must be char** argv to play nice with SDL on windows!

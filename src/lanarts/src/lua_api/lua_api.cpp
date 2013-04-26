@@ -68,21 +68,3 @@ void lua_lanarts_api(GameState* state, lua_State* L) {
 	lua_setfield(L, LUA_GLOBALSINDEX, #f);
 	LUA_FUNC_REGISTER(rand_range);
 }
-
-void lua_push_narray(lua_State* L, const int* nums, int n) {
-	lua_newtable(L);
-	int idx = lua_gettop(L);
-	for (int i = 0; i < n; i++) {
-		lua_pushnumber(L, nums[i]);
-		lua_rawseti(L, idx, i + 1);
-	}
-}
-void lua_tonarray(lua_State* L, int idx, int* nums, int n) {
-	for (int i = 0; i < n; i++) {
-		lua_rawgeti(L, idx, i + 1);
-		if (!lua_isnil(L, -1)) {
-			nums[i] = lua_tointeger(L, -1);
-		}
-		lua_pop(L, 1);
-	}
-}

@@ -265,7 +265,7 @@ namespace lua_api {
 		globals["direction"].bind_function(compute_direction);
 		globals["distance"].bind_function(distance_between);
 		globals["newtype"].bind_function(lapi_newtype);
-		globals["string_split"].bind_function(lapi_string_split);
+		globals["string"]["split"].bind_function(lapi_string_split);
 		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);
 
