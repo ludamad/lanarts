@@ -265,7 +265,6 @@ namespace lua_api {
 		globals["direction"].bind_function(compute_direction);
 		globals["distance"].bind_function(distance_between);
 		globals["newtype"].bind_function(lapi_newtype);
-		globals["string"]["split"].bind_function(lapi_string_split);
 		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);
 
@@ -275,6 +274,7 @@ namespace lua_api {
 		table["merge"].bind_function(lapi_table_merge);
 
 		LuaValue string_table = luawrap::ensure_table(globals["string"]);
+		string_table["split"].bind_function(lapi_string_split);
 		string_table["pack"].bind_function(str_pack);
 	}
 }

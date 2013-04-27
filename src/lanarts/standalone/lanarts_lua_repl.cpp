@@ -95,7 +95,6 @@ static const char *get_prompt (lua_State *L, int firstline) {
   return (firstline ? "> " : "  ");
 }
 
-
 static int incomplete (lua_State *L, int status) {
   if (status == LUA_ERRSYNTAX) {
     size_t lmsg;
@@ -108,7 +107,6 @@ static int incomplete (lua_State *L, int status) {
   }
   return 0;  /* else... */
 }
-
 
 static int pushline (lua_State *L, int firstline) {
   char buffer[LUA_MAXINPUT];

@@ -32,7 +32,7 @@ SUITE(ClassEntry) {
 				"}";
 
 		TestLuaState L;
-		lua_safe_dostring(L, program.c_str());
+		luawrap::dostring(L, program.c_str());
 
 		ClassEntry mage;
 		mage.init(0, luawrap::globals(L)["table"]);

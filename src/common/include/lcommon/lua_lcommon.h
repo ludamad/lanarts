@@ -10,10 +10,6 @@
 #include "lua_timer.h"
 #include "lua_geometry.h"
 
-// Exits on error:
-void lua_safe_dostring(lua_State* L, const char* code);
-void lua_safe_dofile(lua_State* L, const char* fname);
-
 class LuaValue;
 void lua_register_lcommon(lua_State* L, const LuaValue& module);
 

@@ -168,7 +168,7 @@ static void setup_lua_state() {
 }
 
 static void draw_luascript(lua_State* L, const char* file) {
-	lua_safe_dofile(L, file);
+	luawrap::dofile(L, file);
 	draw_loop(draw_script);
 	if (lua_tostring(L,-1)) {
 		printf("%s\n", lua_tostring(L,-1));

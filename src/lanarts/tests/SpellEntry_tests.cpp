@@ -43,7 +43,7 @@ SUITE(SpellEntry) {
 
 		TestLuaState L;
 		setup_mock_data();
-		lua_safe_dostring(L, program.c_str());
+		luawrap::dostring(L, program.c_str());
 
 		SpellEntry spell;
 		spell.init(0, luawrap::globals(L)["table"]);

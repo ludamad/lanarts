@@ -16,7 +16,6 @@ static void setup_mock_data() {
 	game_sprite_data.push_back(SpriteEntry("sprite", ldraw::Drawable()));
 }
 
-
 SUITE(ItemEntry) {
 	TEST(parse_lua_table) {
 
@@ -35,7 +34,7 @@ SUITE(ItemEntry) {
 		TestLuaState L;
 		lua_register_lcommon(L, luawrap::globals(L));
 		setup_mock_data();
-		lua_safe_dostring(L, program.c_str());
+		luawrap::dostring(L, program.c_str());
 
 		ItemEntry item;
 		item.init(0, luawrap::globals(L)["table"]);
