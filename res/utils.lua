@@ -7,6 +7,16 @@ require "utils_draw"
 
 -- More ad hoc utilities without a home, yet
 
+--- Return whether the mouse has been right clicked within a bounding box.
+function bbox_right_clicked(bbox, origin)
+    return mouse_right_pressed and bbox_mouse_over(bbox, origin)
+end
+
+--- Return whether the mouse has been left clicked within a bounding box.
+function bbox_left_clicked(bbox, origin)
+    return mouse_left_pressed and bbox_mouse_over(bbox, origin)
+end
+
 --- Return whether the mouse is within a bounding box.
 function bbox_mouse_over(bbox, origin)
     return bbox_contains( shift_origin(bbox, origin or LEFT_TOP), mouse_xy )

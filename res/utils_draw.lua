@@ -33,10 +33,10 @@ end
 font_cached_load = memoized(font_load)
 --- Load an image, first checking if it exists in a cache
 image_cached_load = memoized(image_load)
-
+DEBUG_LAYOUTS = false
 -- Used for debug information overlay
 function DEBUG_BOX_DRAW(self, xy)
-    debug_font = font_cached_load(settings.menu_font, 10)
+    local debug_font = font_cached_load(settings.menu_font, 10)
     if DEBUG_LAYOUTS then
         local mouse_is_over = mouse_over(xy, self.size)
         local color = mouse_is_over and COL_PALE_BLUE or COL_YELLOW

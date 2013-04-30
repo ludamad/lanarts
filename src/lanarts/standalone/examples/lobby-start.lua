@@ -1,4 +1,5 @@
 require "utils"
+require "InstanceLine"
 require "Sprite"
 
 local game_entry_draw
@@ -7,6 +8,8 @@ local small_font = font_cached_load(settings.font, 10)
 local medium_font = font_cached_load("res/fonts/MateSC-Regular.ttf", 14)
 local large_font = font_cached_load("res/fonts/MateSC-Regular.ttf", 14)
 
+local ENTRY_SIZE = {200, 40}
+local ENTRY_SPACING = 45
 
 local sample_lobby_entry = { 
     host = "ludamad",
@@ -22,16 +25,35 @@ local sample_player_entry = {
     -- In the future stats will go here. However it is too early to try to work with them.
 }
 
-local function lobby_menu(state)
-    local menu = {}
-    menu.entries = { sample_player_entry, sample_player_entry }
-    return { TODO
-        step = do_nothing,
-        draw = function ()
-            logo:draw({10,10})
-            game_entry_draw(1, sample_player_entry, {20, 200, 220, 240})
+
+local function game_entry_create(entry_number, entry_data)
+    local obj = {}
+    obj.entry_data = entry_data
+    obj.size = ENTRY_SIZE
+
+    function obj:step(xy)
+        local bbox = bbox_create(xy, self.size)
+        if bbox_left_clicked(bbox) then
+            print("Event entry clicked, event_data = ")
+            pretty_print(self.entry_data)
         end
-    }
+    end
+
+    function obj:draw(xy)
+        local bbox = bbox_create(xy, self.size)
+        game_entry_draw(entry_number, self.entry_data, bbox)
+    end
+    return obj
+end
+
+-- Recreated every time the game set changes
+local function game_entry_list_create()
+    local obj = InstanceLine.create( {dx = 0, dy = ENTRY_SPACING, per_row = 1} )
+    local entries = { sample_player_entry, sample_player_entry } -- TODO real data
+    for i=1,#entries do
+        obj:add_instance(game_entry_create(i, entries[i]))
+    end
+    return obj
 end
 
 local function draw_in_box(font, bbox, origin, offset, ...)
@@ -50,13 +72,14 @@ end
 function main()
     Display.initialize("Lanarts Example", {800, 600}, false)
     local state = {}
-    state.menu = lobby_menu(state)
+    state.menu = game_entry_list_create()
 
     while Game.input_capture() do
-        state.menu.step()
+        state.menu:step({20,200})
 
         Display.draw_start()
-        state.menu.draw()
+        logo:draw( {10,10} )
+        state.menu:draw( {20,200} )
         Display.draw_finish()
 
         Game.wait(5)
