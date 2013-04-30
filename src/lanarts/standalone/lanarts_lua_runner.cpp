@@ -45,6 +45,10 @@ static void perform_luascript(lua_State* L, const char* file) {
 
 // Must be char** argv to play nice with SDL on windows!
 int main(int argc, char** argv) {
+	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+		exit(0);
+	}
+
 	try {
 		using namespace ldraw;
 

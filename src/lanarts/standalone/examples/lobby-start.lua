@@ -2,7 +2,7 @@ require "utils"
 require "Sprite"
 
 local game_entry_draw
-local logo = image_cached_load("lanarts_logo.png")
+local logo = image_cached_load("res/interface/sprites/lanarts_logo_no_sub.png")
 local small_font = font_cached_load(settings.font, 10)
 local medium_font = font_cached_load("res/fonts/MateSC-Regular.ttf", 14)
 local large_font = font_cached_load("res/fonts/MateSC-Regular.ttf", 14)
@@ -27,7 +27,6 @@ local function lobby_menu(state)
         step = do_nothing,
         draw = function ()
             logo:draw({10,10})
-            
             game_entry_draw(1, sample_player_entry, {20, 200, 220, 240})
         end
     }
