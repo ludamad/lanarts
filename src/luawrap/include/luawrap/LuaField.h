@@ -7,8 +7,7 @@
  *  There is some trade-off of usability and performance here, but generally it is very fast.
  *
  *  It should NOT be used as a class member. It primarily exists as a proxy convenience class.
- *
- *  You have been warned.
+ *  You should only use it on the stack. You have been warned.
  */
 
 #ifndef LUAFIELD_H_
