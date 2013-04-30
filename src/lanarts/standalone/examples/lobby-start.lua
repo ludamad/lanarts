@@ -23,7 +23,9 @@ local sample_player_entry = {
 }
 
 local function lobby_menu(state)
-    return {
+    local menu = {}
+    menu.entries = { sample_player_entry, sample_player_entry }
+    return { TODO
         step = do_nothing,
         draw = function ()
             logo:draw({10,10})
