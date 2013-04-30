@@ -11,6 +11,8 @@
 
 #include <luawrap/luawrap.h>
 
+#include <ldraw/display.h>
+
 #include <lcommon/lua_lcommon.h>
 #include <lcommon/fatal_error.h>
 
@@ -53,6 +55,8 @@ int main(int argc, char** argv) {
 		using namespace ldraw;
 
 		lua_State* L = setup_lua_state();
+
+		ldraw::display_initialize("Lanarts Example Runner", Size(1, 0));
 
 		if (argc < 2) {
 			printf("Welcome to LanartsEngine, please type some Lua\n");
