@@ -43,9 +43,8 @@ static int lua_tokeycode(const LuaStackValue& value) {
 		return tolower(str[0]);
 	}
 
-	luaL_error(L,
-			"Expected key number or one-character string for keycode, but got %s.",
-			lua_typename(L, idx));
+	luaL_error(L, "Expected key number or one-character string for keycode, but got %s.",
+			luaL_typename(L, idx));
 	return 0;
 }
 

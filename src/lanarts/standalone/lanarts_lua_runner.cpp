@@ -20,7 +20,7 @@
 
 #include "lua_api/lua_newapi.h"
 
-/* From lanarts_lua_repl.cpp
+/* Defined in lanarts_lua_repl.cpp
  * Blocks until a lua expression is received from standard input */
 int read_eval_print(lua_State *L);
 
@@ -51,13 +51,8 @@ int main(int argc, char** argv) {
 		exit(0);
 	}
 
+	lua_State* L = setup_lua_state();
 	try {
-		using namespace ldraw;
-
-		lua_State* L = setup_lua_state();
-
-		ldraw::display_initialize("Lanarts Example Runner", Size(1, 0));
-
 		if (argc < 2) {
 			printf("Welcome to LanartsEngine, please type some Lua\n");
 			while (true) {
@@ -65,10 +60,14 @@ int main(int argc, char** argv) {
 				luawrap::call<void>(L);
 			}
 		} else {
+			ldraw::display_initialize("Lanarts Example Runner", Size(1, 1));
 			perform_luascript(L, argv[1]);
 		}
 
 		lua_close(L);
+	} catch (const luawrap::Error& lwrap_err) {
+		std::string err = lwrap_err.what();
+		luawrap::print_stacktrace(L, err);
 	} catch (const __FatalError& err) {
 		printf("Fatal error occurred in lanarts runner, exiting ... \n");
 	}

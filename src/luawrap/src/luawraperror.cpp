@@ -10,6 +10,13 @@
 #include <luawrap/luawraperror.h>
 
 namespace luawrap {
+	void print_stacktrace(lua_State* L, const std::string& error_message) {
+		lua_pushcfunction(L, errorfunc);
+		lua_pushlstring(L, error_message.c_str(), error_message.size());
+		lua_call(L, 1, 1);
+		printf("%s\n", lua_tostring(L, -1));
+		lua_pop(L, 1);
+	}
 	int errorfunc(lua_State *L) {
 		LuaSpecialValue globals = luawrap::globals(L);
 
@@ -42,7 +49,10 @@ namespace luawrap {
 
 	std::string value_error_string(const std::string& type,
 			const std::string& object_path, const std::string& object_repr) {
-		return "Invalid value at " + object_path + ", expected a " + type
-				+ " type but got " + object_repr;
+		std::string error_msg = "Invalid value";
+		if (!object_path.empty()) {
+			error_msg += " at " + object_path;
+		}
+		return error_msg + ", expected a " + type + " but got " + object_repr;
 	}
 }

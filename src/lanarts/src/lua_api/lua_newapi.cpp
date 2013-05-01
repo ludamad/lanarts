@@ -143,7 +143,7 @@ namespace lua_api {
 
 		lua_newtable(L);
 
-//		/* push global table */
+		/* push global meta table */
 		globalsmeta.push();
 		lua_setmetatable(L, -2); /* set global meta-table*/
 

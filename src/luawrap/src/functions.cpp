@@ -4,6 +4,7 @@
  */
 
 #include <luawrap/functions.h>
+#include <luawrap/types.h>
 
 #include <lua.hpp>
 
@@ -17,16 +18,16 @@ namespace luawrap {
 	}
 
 	namespace _private {
-		bool argcheck(lua_State* L, const char* funcname, int idx,
-				bool arg_ok) {
-			if (arg_ok) {
-				return true;
-			}
 
+		/* Assumes function name is at upvalue 2 */
+		bool __argfail(lua_State* L, int idx, const char* expected_type) {
+			const char* funcname = lua_tostring(L, lua_upvalueindex(2));
+			std::string demangled = demangle_typename(expected_type);
 			LuaValue lstring = argstring(L, idx);
 
-			luaL_error(L, "Wrong type for argument %d call to '%s' (was '%s')!", idx,
-					funcname, lstring.as<const char*>());
+			luaL_error(L, "Wrong type for argument %d in call to '%s', expected a %s but got the %s '%s'!",
+					idx, funcname, demangled.c_str(), luaL_typename(L, idx),
+					lstring.as<const char*>());
 			return false;
 		}
 	}

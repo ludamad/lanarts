@@ -188,7 +188,7 @@ static int lapi_newtype(lua_State* L) {
 	return 1; // return new type metatable
 }
 
-static int lapi_string_split(lua_State *L) {
+static int lapi_string_split(lua_State* L) {
 	size_t str_size;
 	const char* tail = luaL_checklstring(L, 1, &str_size);
 	const char* end = tail + str_size;
@@ -225,7 +225,32 @@ static int lapi_string_split(lua_State *L) {
 	return 1; /* return the table */
 }
 
-static int lapi_setglobal(lua_State *L) {
+/*
+ * Joins array elements with a given string, eg (" "):join( {"hello", "world"} ) => "hello world"
+ */
+static std::string lapi_string_join(const char* joiner, LuaStackValue table) {
+	lua_State* L = table.luastate();
+
+	std::string return_string;
+
+	int joiner_len = strlen(joiner), table_len = table.objlen();
+	for (int i = 1; i <= table_len; i++) {
+		// Append element
+		table[i].push();
+		size_t elem_size;
+		const char* elem = lua_tolstring(L, -1, &elem_size);
+		return_string.append(elem, elem_size);
+		lua_pop(L, 1);
+
+		// Append joiner, unless at end
+		if (i != table_len) {
+			return_string.append(joiner, joiner_len);
+		}
+	}
+	return return_string;
+}
+
+static int lapi_setglobal(lua_State* L) {
 	bool prev = lua_api::globals_get_mutability(L);
 
 	lua_api::globals_set_mutability(L, true);
@@ -235,7 +260,7 @@ static int lapi_setglobal(lua_State *L) {
 	return 1; /* return the table */
 }
 
-static int lapi_toaddress(lua_State *L) {
+static int lapi_toaddress(lua_State* L) {
 	char address[64];
 	snprintf(address, 64, "0x%X", lua_topointer(L, 1));
 	lua_pushstring(L, address);
@@ -275,6 +300,7 @@ namespace lua_api {
 
 		LuaValue string_table = luawrap::ensure_table(globals["string"]);
 		string_table["split"].bind_function(lapi_string_split);
+		string_table["join"].bind_function(lapi_string_join);
 		string_table["pack"].bind_function(str_pack);
 	}
 }

@@ -14,9 +14,12 @@
 
 namespace luawrap {
 	namespace _private {
+		/* Attempt to make the output of typeinfo readable for nicer errors, if possible.
+		 * Defined in types.cpp */
+		std::string demangle_typename(const char* name);
 
-		bool argcheck(lua_State* L, const char* funcname, int argn,
-				bool arg_ok);
+		/* Assumes function name is at upvalue 2 */
+		bool __argfail(lua_State* L, int argn, const char* expected_type);
 
 		template<typename T>
 		struct FuncWrap {
@@ -31,7 +34,7 @@ namespace luawrap {
 		struct FuncWrap<void (*)()> {
 			static int cppfunction(lua_State* L) {
 
-				((void (*)())lua_touserdata(L, lua_upvalueindex(1)))();
+				((void (*)()) lua_touserdata(L, lua_upvalueindex(1)))();
 				return 0;
 			}
 		};
@@ -40,7 +43,8 @@ namespace luawrap {
 		struct FuncWrap<R (*)()> {
 			static int cppfunction(lua_State* L) {
 
-				push<R>(L, ((R (*)())lua_touserdata(L, lua_upvalueindex(1)))());
+				push<R>(L,
+						((R (*)()) lua_touserdata(L, lua_upvalueindex(1)))());
 				return 1;
 			}
 		};
@@ -48,11 +52,10 @@ namespace luawrap {
 		template<typename A1>
 		struct FuncWrap<void (*)(A1)> {
 			static int cppfunction(lua_State* L) {
-				if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1,
-						check<A1>(L, 1))) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))) {
 					return 0;
 				}
-				((void (*)(A1))lua_touserdata(L, lua_upvalueindex(1)))(
+				((void (*)(A1)) lua_touserdata(L, lua_upvalueindex(1)))(
 						get<A1>(L, 1));
 				return 0;
 			}
@@ -61,12 +64,11 @@ namespace luawrap {
 		template<typename R, typename A1>
 		struct FuncWrap<R (*)(A1)> {
 			static int cppfunction(lua_State* L) {
-				if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1,
-						check<A1>(L, 1))) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))) {
 					return 0;
 				}
 				push<R>(L,
-						((R (*)(A1))lua_touserdata(L, lua_upvalueindex(1)))(
+						((R (*)(A1)) lua_touserdata(L, lua_upvalueindex(1)))(
 								get<A1>(L, 1)));
 				return 1;
 			}
@@ -75,13 +77,12 @@ namespace luawrap {
 		template<typename A1, typename A2>
 		struct FuncWrap<void (*)(A1, A2)> {
 			static int cppfunction(lua_State* L) {
-				if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1,
-						check<A1>(L, 1))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2,
-								check<A2>(L, 2))) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))) {
 					return 0;
 				}
-				((void (*)(A1, A2))lua_touserdata(L, lua_upvalueindex(1)))(
+				((void (*)(A1, A2)) lua_touserdata(L, lua_upvalueindex(1)))(
 						get<A1>(L, 1), get<A2>(L, 2));
 				return 0;
 			}
@@ -90,14 +91,13 @@ namespace luawrap {
 		template<typename R, typename A1, typename A2>
 		struct FuncWrap<R (*)(A1, A2)> {
 			static int cppfunction(lua_State* L) {
-				if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1,
-						check<A1>(L, 1))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2,
-								check<A2>(L, 2))) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))) {
 					return 0;
 				}
 				push<R>(L,
-						((R (*)(A1, A2))lua_touserdata(L, lua_upvalueindex(1)))(
+						((R (*)(A1, A2)) lua_touserdata(L, lua_upvalueindex(1)))(
 								get<A1>(L, 1), get<A2>(L, 2)));
 				return 1;
 			}
@@ -106,15 +106,14 @@ namespace luawrap {
 		template<typename A1, typename A2, typename A3>
 		struct FuncWrap<void (*)(A1, A2, A3)> {
 			static int cppfunction(lua_State* L) {
-				if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1,
-						check<A1>(L, 1))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2,
-								check<A2>(L, 2))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 3,
-								check<A3>(L, 3))) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))
+						|| !(check<A3>(L, 3)
+								|| __argfail(L, 3, typeid(A3).name()))) {
 					return 0;
 				}
-				((void (*)(A1, A2, A3))lua_touserdata(L, lua_upvalueindex(1)))(
+				((void (*)(A1, A2, A3)) lua_touserdata(L, lua_upvalueindex(1)))(
 						get<A1>(L, 1), get<A2>(L, 2), get<A3>(L, 3));
 				return 0;
 			}
@@ -123,16 +122,15 @@ namespace luawrap {
 		template<typename R, typename A1, typename A2, typename A3>
 		struct FuncWrap<R (*)(A1, A2, A3)> {
 			static int cppfunction(lua_State* L) {
-				if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1,
-						check<A1>(L, 1))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2,
-								check<A2>(L, 2))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 3,
-								check<A3>(L, 3))) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))
+						|| !(check<A3>(L, 3)
+								|| __argfail(L, 3, typeid(A3).name()))) {
 					return 0;
 				}
 				push<R>(L,
-						((R (*)(A1, A2, A3))lua_touserdata(L,
+						((R (*)(A1, A2, A3)) lua_touserdata(L,
 								lua_upvalueindex(1)))(get<A1>(L, 1),
 								get<A2>(L, 2), get<A3>(L, 3)));
 				return 1;
@@ -142,17 +140,16 @@ namespace luawrap {
 		template<typename A1, typename A2, typename A3, typename A4>
 		struct FuncWrap<void (*)(A1, A2, A3, A4)> {
 			static int cppfunction(lua_State* L) {
-				if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1,
-						check<A1>(L, 1))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2,
-								check<A2>(L, 2))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 3,
-								check<A3>(L, 3))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 4,
-								check<A4>(L, 4))) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))
+						|| !(check<A3>(L, 3)
+								|| __argfail(L, 3, typeid(A3).name()))
+						|| !(check<A4>(L, 4)
+								|| __argfail(L, 4, typeid(A4).name()))) {
 					return 0;
 				}
-				((void (*)(A1, A2, A3, A4))lua_touserdata(L,
+				((void (*)(A1, A2, A3, A4)) lua_touserdata(L,
 						lua_upvalueindex(1)))(get<A1>(L, 1), get<A2>(L, 2),
 						get<A3>(L, 3), get<A4>(L, 4));
 				return 0;
@@ -162,18 +159,17 @@ namespace luawrap {
 		template<typename R, typename A1, typename A2, typename A3, typename A4>
 		struct FuncWrap<R (*)(A1, A2, A3, A4)> {
 			static int cppfunction(lua_State* L) {
-				if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1,
-						check<A1>(L, 1))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2,
-								check<A2>(L, 2))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 3,
-								check<A3>(L, 3))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 4,
-								check<A4>(L, 4))) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))
+						|| !(check<A3>(L, 3)
+								|| __argfail(L, 3, typeid(A3).name()))
+						|| !(check<A4>(L, 4)
+								|| __argfail(L, 4, typeid(A4).name()))) {
 					return 0;
 				}
 				push<R>(L,
-						((R (*)(A1, A2, A3, A4))lua_touserdata(L,
+						((R (*)(A1, A2, A3, A4)) lua_touserdata(L,
 								lua_upvalueindex(1)))(get<A1>(L, 1),
 								get<A2>(L, 2), get<A3>(L, 3), get<A4>(L, 4)));
 				return 1;
@@ -183,19 +179,18 @@ namespace luawrap {
 		template<typename A1, typename A2, typename A3, typename A4, typename A5>
 		struct FuncWrap<void (*)(A1, A2, A3, A4, A5)> {
 			static int cppfunction(lua_State* L) {
-				if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1,
-						check<A1>(L, 1))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2,
-								check<A2>(L, 2))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 3,
-								check<A3>(L, 3))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 4,
-								check<A4>(L, 4))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 5,
-								check<A5>(L, 5))) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))
+						|| !(check<A3>(L, 3)
+								|| __argfail(L, 3, typeid(A3).name()))
+						|| !(check<A4>(L, 4)
+								|| __argfail(L, 4, typeid(A4).name()))
+						|| !(check<A5>(L, 5)
+								|| __argfail(L, 5, typeid(A5).name()))) {
 					return 0;
 				}
-				((void (*)(A1, A2, A3, A4, A5))lua_touserdata(L,
+				((void (*)(A1, A2, A3, A4, A5)) lua_touserdata(L,
 						lua_upvalueindex(1)))(get<A1>(L, 1), get<A2>(L, 2),
 						get<A3>(L, 3), get<A4>(L, 4), get<A5>(L, 5));
 				return 0;
@@ -206,20 +201,19 @@ namespace luawrap {
 				typename A5>
 		struct FuncWrap<R (*)(A1, A2, A3, A4, A5)> {
 			static int cppfunction(lua_State* L) {
-				if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1,
-						check<A1>(L, 1))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2,
-								check<A2>(L, 2))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 3,
-								check<A3>(L, 3))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 4,
-								check<A4>(L, 4))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 5,
-								check<A5>(L, 5))) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))
+						|| !(check<A3>(L, 3)
+								|| __argfail(L, 3, typeid(A3).name()))
+						|| !(check<A4>(L, 4)
+								|| __argfail(L, 4, typeid(A4).name()))
+						|| !(check<A5>(L, 5)
+								|| __argfail(L, 5, typeid(A5).name()))) {
 					return 0;
 				}
 				push<R>(L,
-						((R (*)(A1, A2, A3, A4, A5))lua_touserdata(L,
+						((R (*)(A1, A2, A3, A4, A5)) lua_touserdata(L,
 								lua_upvalueindex(1)))(get<A1>(L, 1),
 								get<A2>(L, 2), get<A3>(L, 3), get<A4>(L, 4),
 								get<A5>(L, 5)));
@@ -231,21 +225,20 @@ namespace luawrap {
 				typename A5, typename A6>
 		struct FuncWrap<void (*)(A1, A2, A3, A4, A5, A6)> {
 			static int cppfunction(lua_State* L) {
-				if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1,
-						check<A1>(L, 1))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2,
-								check<A2>(L, 2))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 3,
-								check<A3>(L, 3))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 4,
-								check<A4>(L, 4))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 5,
-								check<A5>(L, 5))
-						|| !argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 6,
-								check<A6>(L, 6))) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))
+						|| !(check<A3>(L, 3)
+								|| __argfail(L, 3, typeid(A3).name()))
+						|| !(check<A4>(L, 4)
+								|| __argfail(L, 4, typeid(A4).name()))
+						|| !(check<A5>(L, 5)
+								|| __argfail(L, 5, typeid(A5).name()))
+						|| !(check<A6>(L, 6)
+								|| __argfail(L, 6, typeid(A6).name()))) {
 					return 0;
 				}
-				((void (*)(A1, A2, A3, A4, A5, A6))lua_touserdata(L,
+				((void (*)(A1, A2, A3, A4, A5, A6)) lua_touserdata(L,
 						lua_upvalueindex(1)))(get<A1>(L, 1), get<A2>(L, 2),
 						get<A3>(L, 3), get<A4>(L, 4), get<A5>(L, 5),
 						get<A6>(L, 6));
@@ -253,69 +246,212 @@ namespace luawrap {
 			}
 		};
 
+		template<typename R, typename A1, typename A2, typename A3, typename A4,
+				typename A5, typename A6>
+		struct FuncWrap<R (*)(A1, A2, A3, A4, A5, A6)> {
+			static int cppfunction(lua_State* L) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))
+						|| !(check<A3>(L, 3)
+								|| __argfail(L, 3, typeid(A3).name()))
+						|| !(check<A4>(L, 4)
+								|| __argfail(L, 4, typeid(A4).name()))
+						|| !(check<A5>(L, 5)
+								|| __argfail(L, 5, typeid(A5).name()))
+						|| !(check<A6>(L, 6)
+								|| __argfail(L, 6, typeid(A6).name()))) {
+					return 0;
+				}
+				push<R>(L,
+						((R (*)(A1, A2, A3, A4, A5, A6)) lua_touserdata(L,
+								lua_upvalueindex(1)))(get<A1>(L, 1),
+								get<A2>(L, 2), get<A3>(L, 3), get<A4>(L, 4),
+								get<A5>(L, 5), get<A6>(L, 6)));
+				return 1;
+			}
+		};
+
 #ifdef LUAWRAP_LONG_FUNCTIONS
-	template<typename R, typename A1,typename A2,typename A3,typename A4,typename A5,typename A6>
-	struct FuncWrap<R (*)(A1,A2,A3,A4,A5,A6)> {
-		static int cppfunction(lua_State* L) {
-			if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1, check<A1>(L, 1))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2, check<A2>(L, 2))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 3, check<A3>(L, 3))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 4, check<A4>(L, 4))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 5, check<A5>(L, 5))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 6, check<A6>(L, 6))) {return 0;}
-			push<R>(L, ((R (*)(A1,A2,A3,A4,A5,A6))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5),get<A6>(L, 6)));
-			return 1;
-		}
-	};
+		template<typename A1, typename A2, typename A3, typename A4,
+				typename A5, typename A6, typename A7>
+		struct FuncWrap<void (*)(A1, A2, A3, A4, A5, A6, A7)> {
+			static int cppfunction(lua_State* L) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))
+						|| !(check<A3>(L, 3)
+								|| __argfail(L, 3, typeid(A3).name()))
+						|| !(check<A4>(L, 4)
+								|| __argfail(L, 4, typeid(A4).name()))
+						|| !(check<A5>(L, 5)
+								|| __argfail(L, 5, typeid(A5).name()))
+						|| !(check<A6>(L, 6)
+								|| __argfail(L, 6, typeid(A6).name()))
+						|| !(check<A7>(L, 7)
+								|| __argfail(L, 7, typeid(A7).name()))) {
+					return 0;
+				}
+				((void (*)(A1, A2, A3, A4, A5, A6, A7)) lua_touserdata(L,
+						lua_upvalueindex(1)))(get<A1>(L, 1), get<A2>(L, 2),
+						get<A3>(L, 3), get<A4>(L, 4), get<A5>(L, 5),
+						get<A6>(L, 6), get<A7>(L, 7));
+				return 0;
+			}
+		};
 
-	template<typename A1,typename A2,typename A3,typename A4,typename A5,typename A6,typename A7>
-	struct FuncWrap<void (*)(A1,A2,A3,A4,A5,A6,A7)> {
-		static int cppfunction(lua_State* L) {
-			if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1, check<A1>(L, 1))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2, check<A2>(L, 2))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 3, check<A3>(L, 3))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 4, check<A4>(L, 4))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 5, check<A5>(L, 5))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 6, check<A6>(L, 6))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 7, check<A7>(L, 7))) {return 0;}
-			((void (*)(A1,A2,A3,A4,A5,A6,A7))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5),get<A6>(L, 6),get<A7>(L, 7));
-			return 0;
-		}
-	};
+		template<typename R, typename A1, typename A2, typename A3, typename A4,
+				typename A5, typename A6, typename A7>
+		struct FuncWrap<R (*)(A1, A2, A3, A4, A5, A6, A7)> {
+			static int cppfunction(lua_State* L) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))
+						|| !(check<A3>(L, 3)
+								|| __argfail(L, 3, typeid(A3).name()))
+						|| !(check<A4>(L, 4)
+								|| __argfail(L, 4, typeid(A4).name()))
+						|| !(check<A5>(L, 5)
+								|| __argfail(L, 5, typeid(A5).name()))
+						|| !(check<A6>(L, 6)
+								|| __argfail(L, 6, typeid(A6).name()))
+						|| !(check<A7>(L, 7)
+								|| __argfail(L, 7, typeid(A7).name()))) {
+					return 0;
+				}
+				push<R>(L,
+						((R (*)(A1, A2, A3, A4, A5, A6, A7)) lua_touserdata(L,
+								lua_upvalueindex(1)))(get<A1>(L, 1),
+								get<A2>(L, 2), get<A3>(L, 3), get<A4>(L, 4),
+								get<A5>(L, 5), get<A6>(L, 6), get<A7>(L, 7)));
+				return 1;
+			}
+		};
 
-	template<typename R, typename A1,typename A2,typename A3,typename A4,typename A5,typename A6,typename A7>
-	struct FuncWrap<R (*)(A1,A2,A3,A4,A5,A6,A7)> {
-		static int cppfunction(lua_State* L) {
-			if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1, check<A1>(L, 1))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2, check<A2>(L, 2))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 3, check<A3>(L, 3))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 4, check<A4>(L, 4))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 5, check<A5>(L, 5))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 6, check<A6>(L, 6))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 7, check<A7>(L, 7))) {return 0;}
-			push<R>(L, ((R (*)(A1,A2,A3,A4,A5,A6,A7))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5),get<A6>(L, 6),get<A7>(L, 7)));
-			return 1;
-		}
-	};
+		template<typename A1, typename A2, typename A3, typename A4,
+				typename A5, typename A6, typename A7, typename A8>
+		struct FuncWrap<void (*)(A1, A2, A3, A4, A5, A6, A7, A8)> {
+			static int cppfunction(lua_State* L) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))
+						|| !(check<A3>(L, 3)
+								|| __argfail(L, 3, typeid(A3).name()))
+						|| !(check<A4>(L, 4)
+								|| __argfail(L, 4, typeid(A4).name()))
+						|| !(check<A5>(L, 5)
+								|| __argfail(L, 5, typeid(A5).name()))
+						|| !(check<A6>(L, 6)
+								|| __argfail(L, 6, typeid(A6).name()))
+						|| !(check<A7>(L, 7)
+								|| __argfail(L, 7, typeid(A7).name()))
+						|| !(check<A8>(L, 8)
+								|| __argfail(L, 8, typeid(A8).name()))) {
+					return 0;
+				}
+				((void (*)(A1, A2, A3, A4, A5, A6, A7, A8)) lua_touserdata(L,
+						lua_upvalueindex(1)))(get<A1>(L, 1), get<A2>(L, 2),
+						get<A3>(L, 3), get<A4>(L, 4), get<A5>(L, 5),
+						get<A6>(L, 6), get<A7>(L, 7), get<A8>(L, 8));
+				return 0;
+			}
+		};
 
-	template<typename A1,typename A2,typename A3,typename A4,typename A5,typename A6,typename A7,typename A8>
-	struct FuncWrap<void (*)(A1,A2,A3,A4,A5,A6,A7,A8)> {
-		static int cppfunction(lua_State* L) {
-			if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1, check<A1>(L, 1))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2, check<A2>(L, 2))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 3, check<A3>(L, 3))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 4, check<A4>(L, 4))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 5, check<A5>(L, 5))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 6, check<A6>(L, 6))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 7, check<A7>(L, 7))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 8, check<A8>(L, 8))) {return 0;}
-			((void (*)(A1,A2,A3,A4,A5,A6,A7,A8))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5),get<A6>(L, 6),get<A7>(L, 7),get<A8>(L, 8));
-			return 0;
-		}
-	};
+		template<typename R, typename A1, typename A2, typename A3, typename A4,
+				typename A5, typename A6, typename A7, typename A8>
+		struct FuncWrap<R (*)(A1, A2, A3, A4, A5, A6, A7, A8)> {
+			static int cppfunction(lua_State* L) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))
+						|| !(check<A3>(L, 3)
+								|| __argfail(L, 3, typeid(A3).name()))
+						|| !(check<A4>(L, 4)
+								|| __argfail(L, 4, typeid(A4).name()))
+						|| !(check<A5>(L, 5)
+								|| __argfail(L, 5, typeid(A5).name()))
+						|| !(check<A6>(L, 6)
+								|| __argfail(L, 6, typeid(A6).name()))
+						|| !(check<A7>(L, 7)
+								|| __argfail(L, 7, typeid(A7).name()))
+						|| !(check<A8>(L, 8)
+								|| __argfail(L, 8, typeid(A8).name()))) {
+					return 0;
+				}
+				push<R>(L,
+						((R (*)(A1, A2, A3, A4, A5, A6, A7, A8)) lua_touserdata(
+								L, lua_upvalueindex(1)))(get<A1>(L, 1),
+								get<A2>(L, 2), get<A3>(L, 3), get<A4>(L, 4),
+								get<A5>(L, 5), get<A6>(L, 6), get<A7>(L, 7),
+								get<A8>(L, 8)));
+				return 1;
+			}
+		};
 
-	template<typename R, typename A1,typename A2,typename A3,typename A4,typename A5,typename A6,typename A7,typename A8>
-	struct FuncWrap<R (*)(A1,A2,A3,A4,A5,A6,A7,A8)> {
-		static int cppfunction(lua_State* L) {
-			if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1, check<A1>(L, 1))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2, check<A2>(L, 2))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 3, check<A3>(L, 3))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 4, check<A4>(L, 4))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 5, check<A5>(L, 5))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 6, check<A6>(L, 6))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 7, check<A7>(L, 7))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 8, check<A8>(L, 8))) {return 0;}
-			push<R>(L, ((R (*)(A1,A2,A3,A4,A5,A6,A7,A8))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5),get<A6>(L, 6),get<A7>(L, 7),get<A8>(L, 8)));
-			return 1;
-		}
-	};
+		template<typename A1, typename A2, typename A3, typename A4,
+				typename A5, typename A6, typename A7, typename A8, typename A9>
+		struct FuncWrap<void (*)(A1, A2, A3, A4, A5, A6, A7, A8, A9)> {
+			static int cppfunction(lua_State* L) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))
+						|| !(check<A3>(L, 3)
+								|| __argfail(L, 3, typeid(A3).name()))
+						|| !(check<A4>(L, 4)
+								|| __argfail(L, 4, typeid(A4).name()))
+						|| !(check<A5>(L, 5)
+								|| __argfail(L, 5, typeid(A5).name()))
+						|| !(check<A6>(L, 6)
+								|| __argfail(L, 6, typeid(A6).name()))
+						|| !(check<A7>(L, 7)
+								|| __argfail(L, 7, typeid(A7).name()))
+						|| !(check<A8>(L, 8)
+								|| __argfail(L, 8, typeid(A8).name()))
+						|| !(check<A9>(L, 9)
+								|| __argfail(L, 9, typeid(A9).name()))) {
+					return 0;
+				}
+				((void (*)(A1, A2, A3, A4, A5, A6, A7, A8, A9)) lua_touserdata(
+						L, lua_upvalueindex(1)))(get<A1>(L, 1), get<A2>(L, 2),
+						get<A3>(L, 3), get<A4>(L, 4), get<A5>(L, 5),
+						get<A6>(L, 6), get<A7>(L, 7), get<A8>(L, 8),
+						get<A9>(L, 9));
+				return 0;
+			}
+		};
 
-	template<typename A1,typename A2,typename A3,typename A4,typename A5,typename A6,typename A7,typename A8,typename A9>
-	struct FuncWrap<void (*)(A1,A2,A3,A4,A5,A6,A7,A8,A9)> {
-		static int cppfunction(lua_State* L) {
-			if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1, check<A1>(L, 1))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2, check<A2>(L, 2))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 3, check<A3>(L, 3))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 4, check<A4>(L, 4))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 5, check<A5>(L, 5))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 6, check<A6>(L, 6))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 7, check<A7>(L, 7))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 8, check<A8>(L, 8))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 9, check<A9>(L, 9))) {return 0;}
-			((void (*)(A1,A2,A3,A4,A5,A6,A7,A8,A9))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5),get<A6>(L, 6),get<A7>(L, 7),get<A8>(L, 8),get<A9>(L, 9));
-			return 0;
-		}
-	};
-
-	template<typename R, typename A1,typename A2,typename A3,typename A4,typename A5,typename A6,typename A7,typename A8,typename A9>
-	struct FuncWrap<R (*)(A1,A2,A3,A4,A5,A6,A7,A8,A9)> {
-		static int cppfunction(lua_State* L) {
-			if (!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 1, check<A1>(L, 1))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 2, check<A2>(L, 2))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 3, check<A3>(L, 3))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 4, check<A4>(L, 4))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 5, check<A5>(L, 5))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 6, check<A6>(L, 6))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 7, check<A7>(L, 7))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 8, check<A8>(L, 8))||!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), 9, check<A9>(L, 9))) {return 0;}
-			push<R>(L, ((R (*)(A1,A2,A3,A4,A5,A6,A7,A8,A9))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5),get<A6>(L, 6),get<A7>(L, 7),get<A8>(L, 8),get<A9>(L, 9)));
-			return 1;
-		}
-	};
+		template<typename R, typename A1, typename A2, typename A3, typename A4,
+				typename A5, typename A6, typename A7, typename A8, typename A9>
+		struct FuncWrap<R (*)(A1, A2, A3, A4, A5, A6, A7, A8, A9)> {
+			static int cppfunction(lua_State* L) {
+				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
+						|| !(check<A2>(L, 2)
+								|| __argfail(L, 2, typeid(A2).name()))
+						|| !(check<A3>(L, 3)
+								|| __argfail(L, 3, typeid(A3).name()))
+						|| !(check<A4>(L, 4)
+								|| __argfail(L, 4, typeid(A4).name()))
+						|| !(check<A5>(L, 5)
+								|| __argfail(L, 5, typeid(A5).name()))
+						|| !(check<A6>(L, 6)
+								|| __argfail(L, 6, typeid(A6).name()))
+						|| !(check<A7>(L, 7)
+								|| __argfail(L, 7, typeid(A7).name()))
+						|| !(check<A8>(L, 8)
+								|| __argfail(L, 8, typeid(A8).name()))
+						|| !(check<A9>(L, 9)
+								|| __argfail(L, 9, typeid(A9).name()))) {
+					return 0;
+				}
+				push<R>(L,
+						((R (*)(A1, A2, A3, A4, A5, A6, A7, A8, A9)) lua_touserdata(
+								L, lua_upvalueindex(1)))(get<A1>(L, 1),
+								get<A2>(L, 2), get<A3>(L, 3), get<A4>(L, 4),
+								get<A5>(L, 5), get<A6>(L, 6), get<A7>(L, 7),
+								get<A8>(L, 8), get<A9>(L, 9)));
+				return 1;
+			}
+		};
 #endif
 
 	/******************************************************************************
@@ -333,12 +469,12 @@ namespace luawrap {
 
 	template<typename Function>
 	inline void push_function(lua_State* L, const char* fname, Function func) {
-		lua_pushlightuserdata(L, (void*)func);
+		lua_pushlightuserdata(L, (void*) func);
 		if (fname) {
 			lua_pushstring(L, fname);
 		} else {
-			lua_pushfstring(L, "[function %s at 0x%p]", typeid(Function).name(),
-					(void*)func);
+			std::string fname = _private::demangle_typename(typeid(Function).name());
+			lua_pushfstring(L, "[function of signature %s at 0x%p]", fname.c_str(), (void*) func);
 		}
 		lua_pushcclosure(L, _private::FuncWrap<Function>::cppfunction, 2);
 	}
@@ -363,13 +499,9 @@ namespace luawrap {
 
 template<typename Function>
 inline void LuaField::bind_function(const Function& function) const {
-	char buffer[32]; /* int to string buffer */
-	const char* key; /* points to index (either string or converted number) */
-	if (_index_type == 1) {
+	const char* key = NULL; /* points to key, if string-indexed */
+	if (_index_type == 0) {
 		key = _index.string;
-	} else {
-		sprintf(buffer, "%d", _index.integer);
-		key = buffer;
 	}
 	luawrap::push_function(L, key, function);
 	pop();

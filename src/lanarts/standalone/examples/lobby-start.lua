@@ -15,7 +15,10 @@ local sample_lobby_entry = {
     host = "ludamad",
     max_players = 4, 
     players = {
-        "ciribot"
+        "ciribot",
+        "ludamad",
+        "gallanthor",
+        "Jesbus"
     }
 }
 
@@ -25,7 +28,6 @@ local sample_player_entry = {
     -- In the future stats will go here. However it is too early to try to work with them.
 }
 
-
 local function game_entry_create(entry_number, entry_data)
     local obj = {}
     obj.entry_data = entry_data
@@ -34,8 +36,7 @@ local function game_entry_create(entry_number, entry_data)
     function obj:step(xy)
         local bbox = bbox_create(xy, self.size)
         if bbox_left_clicked(bbox) then
-            print("Event entry clicked, event_data = ")
-            pretty_print(self.entry_data)
+            print("Entry " .. entry_number .. " was clicked.")
         end
     end
 
@@ -49,7 +50,7 @@ end
 -- Recreated every time the game set changes
 local function game_entry_list_create()
     local obj = InstanceLine.create( {dx = 0, dy = ENTRY_SPACING, per_row = 1} )
-    local entries = { sample_player_entry, sample_player_entry } -- TODO real data
+    local entries = { sample_lobby_entry, sample_lobby_entry } -- TODO real data
     for i=1,#entries do
         obj:add_instance(game_entry_create(i, entries[i]))
     end
@@ -63,8 +64,8 @@ end
 function game_entry_draw(number, entry, bbox)
     local game_number_color = vector_interpolate(COL_YELLOW, COL_DARK_GRAY, (number-1) / 10)
     draw_in_box(medium_font, bbox, LEFT_CENTER, {-14,0}, {game_number_color, number})
-    draw_in_box(small_font, bbox, LEFT_TOP, {0,3}, {COL_WHITE, "Players: "}, {COL_MUTED_GREEN, entry.name})
-    draw_in_box(small_font, bbox, LEFT_TOP, {0,18}, {COL_WHITE, "Host: "}, {COL_PALE_RED, entry.name})
+    draw_in_box(small_font, bbox, LEFT_TOP, {0,3}, {COL_WHITE, "Players: "}, {COL_MUTED_GREEN, (", "):join(entry.players)})
+    draw_in_box(small_font, bbox, LEFT_TOP, {0,18}, {COL_WHITE, "Host: "}, {COL_PALE_RED, entry.host})
 
     draw_rectangle_outline( bbox_mouse_over(bbox) and COL_WHITE or COL_GRAY, bbox, 1 )
 end
@@ -79,6 +80,7 @@ function main()
 
         Display.draw_start()
         logo:draw( {10,10} )
+        small_font:draw( {origin = LEFT_TOP}, {20, 180}, {} )
         state.menu:draw( {20,200} )
         Display.draw_finish()
 

@@ -263,7 +263,7 @@ void LuaField::bind_function(lua_CFunction luafunc) const {
 
 void LuaField::error_and_pop(const std::string& expected_type) const {
 	const char* repr = lua_tostring(L, -1);
-	std::string obj_repr = repr ? repr : lua_typename(L, -1);
+	std::string obj_repr = repr ? repr : luaL_typename(L, -1);
 	lua_pop(L, 1);
 	luawrap::conversion_error(expected_type, index_path(), obj_repr);
 }

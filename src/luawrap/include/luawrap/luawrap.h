@@ -109,7 +109,7 @@ inline T LuaField::as() const {
 	push();
 	if (!luawrap::check<T>(L, -1)) {
 		const char* repr = lua_tostring(L, -1);
-		std::string obj_repr = repr ? repr : lua_typename(L, -1);
+		std::string obj_repr = repr ? repr : luaL_typename(L, -1);
 		luawrap::conversion_error(typeid(T).name(), index_path(), obj_repr);
 	}
 	return luawrap::pop<T>(L);

@@ -26,7 +26,7 @@ overloads = []
 
 
 def make_argcheck(i):
-    CONDITIONAL = '''!argcheck(L, lua_tostring(L, lua_upvalueindex(2)), {N}, check<A{N}>(L, {N}))'''
+    CONDITIONAL = '''!(check<A{N}>(L, {N}) || __argfail(L, {N}, typeid(A{N}).name()))'''
     ARGCHECK = '''if (GENERATED_CONDITIONALS) { return 0; }'''
     if i == 0: return ""
     conditional = "||".join(CONDITIONAL.format(N=n) for n in range(1, i + 1))

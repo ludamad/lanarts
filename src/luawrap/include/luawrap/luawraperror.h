@@ -10,6 +10,7 @@
 #include <luawrap/config.h>
 
 namespace luawrap {
+	void print_stacktrace(lua_State* L, const std::string& error_message);
 	int errorfunc(lua_State *L);
 	std::string value_error_string(const std::string& type,
 			const std::string& object_path, const std::string& object_repr);

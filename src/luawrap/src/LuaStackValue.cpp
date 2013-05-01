@@ -94,9 +94,8 @@ void LuaStackValue::set_nil() const {
 static void error_and_pop(lua_State* L, const std::string& expected_type) {
 	const char* repr = lua_tostring(L, -1);
 	std::string obj_repr = repr ? repr : "nil";
-	std::string type = lua_typename(L, -1);
 	lua_pop(L, 1);
-	luawrap::conversion_error(type, "", obj_repr);
+	luawrap::conversion_error(expected_type, "", obj_repr);
 }
 
 

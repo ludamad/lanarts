@@ -246,7 +246,7 @@ void LuaValue::set_nil() const {
 static void error_and_pop(lua_State* L, const std::string& expected_type) {
 	const char* repr = lua_tostring(L, -1);
 	std::string obj_repr = repr ? repr : "nil";
-	std::string type = lua_typename(L, -1);
+	std::string type = luaL_typename(L, -1);
 	lua_pop(L, 1);
 	luawrap::conversion_error(type, "", obj_repr);
 }
