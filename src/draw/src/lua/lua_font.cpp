@@ -74,7 +74,7 @@ void lua_register_font(lua_State* L, const LuaValue& module) {
 	using namespace ldraw;
 	luawrap::install_userdata_type<Font, lua_fontmetatable>();
 
-	module["font_load"] = luawrap::function(L, font_load);
+	module["font_load"].bind_function(font_load);
 }
 
 }

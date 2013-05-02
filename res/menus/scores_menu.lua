@@ -70,7 +70,7 @@ local function score_entry_draw(entry, ranking, ex, ey, ew, eh)
     -- Draw timestamp
     draw_colored_parts(font, RIGHT_TOP, {ex + ew - 4, ey + 2},
         {COL_LIGHT_GRAY,
-         os.date("%Y %b %I:%M%p", entry.timestamp)}
+         os.date("%Y %b %d %I:%M%p", entry.timestamp)}
     )
 
     -- Draw either 'Has Won!' or deepest floor

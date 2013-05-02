@@ -244,16 +244,8 @@ local function speed_toggle_create()
     end
 
     function toggle:draw(xy)
-        local text = "Speed: Slow"
-    
-        if settings.time_per_step <= 10 then 
-            text = "Speed: Very Fast"
-        elseif settings.time_per_step <= 12 then
-            text = "Speed: Fast"
-        elseif settings.time_per_step <= 14 then
-            text = "Speed: Normal"
-        end
-    
+        local text = "Speed: " .. speed_description(settings.time_per_step)
+   
         local alpha = 255 - (settings.time_per_step - 10) * 30
 
         local x,y = unpack(xy)
