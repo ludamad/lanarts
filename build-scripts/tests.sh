@@ -1,4 +1,6 @@
-if ! ./make.sh; then
+if [ $(basename $(pwd)) == 'build-scripts' ] ; then cd .. ; fi
+
+if ! ./build-scripts/make.sh; then
         echo "Build failed, aborting lanarts run."
         exit $?
 fi

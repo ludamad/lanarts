@@ -4,7 +4,7 @@ PROJECT(project_lcommon)
 FIND_PACKAGE(SDL REQUIRED)
 
 set( SRC "..")
-set( LIBS ../../libs)
+set( LIBS ../../dependencies)
 include_directories(${SDL_INCLUDE_DIR}
 	include/lcommon/
 	${LIBS}/UnitTest++ 

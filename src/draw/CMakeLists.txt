@@ -8,7 +8,7 @@ FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
 set( SRC ../)
-set( LIBS ../../libs)
+set( LIBS ../../dependencies)
 
 include_directories(
 	include/ldraw/

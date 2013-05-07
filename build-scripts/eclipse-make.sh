@@ -1,3 +1,5 @@
+if [ $(basename $(pwd)) == 'build-scripts' ] ; then cd .. ; fi
+
 mkdir -p ../lanarts-eclipse
 cd ../lanarts-eclipse
 

@@ -1,0 +1,64 @@
+layer + draw()
+
+How should this be designed ?
+Should 'effect' be a lua object ? -> Yes. Should it have arbitrary state -> Yes.
+
+
+Recommentation: always pass 'self' as first argument
+Default layer == same layer as user
+
+function PreBlink:queue_drawables()
+end
+
+function PreBlink:draw_modify(user, options)
+	return options
+end
+
+function PreBlink:draw()
+	
+end
+
+local PreBlinkDrawHooks = {}
+-- Call it draw_events ??
+-- It should be shared between items etc etc 
+function PreBlinkDrawHooks:draw()
+
+end
+
+Maybe call it a Hooks object ? 
+
+data.item_create {
+	name = "Potion of Dragon Slaying",
+	type = items.potion,
+	on_use = function(user)
+		user:add_modifier{ state=dragon_slaying_buff, duration=200 }
+	end,
+	on_equip = function()
+	end
+	equipped_hooks = {
+	}
+}
+
+-- Each wielded object has a state hook
+	-- What about passive objects ? There needs to be some, even less than ideal, way.
+
+-- Thusly, all items etc etc are collections of hooks. 
+	- Maybe they all have the chance to push hooks ? - Give each item a step event! Entity design would be useful here. (Not happening, though.)
+	- This is somewhat awkward for naturally wielded items. A wielded_hooks semantic sugar should be done.
+		- This will be no different than the state hook format for 'status effects' (Call them status hooks, even?).
+		- Each collection of hooks is a lua table. Each combat object has an associated hook list.
+-- Designing this right from the beginning (This is THE most important future feature of lanarts):
+	- Hooks need an associated priority. By default, hooks should be run-order independent.
+	- Draw hooks have an associated draw layer.
+		^ Separate draw hooks from stat hooks! So obvious!
+		^ So each object needs a clusterfuck of hook tables ?
+			^ This isn't as bad as it sounds. 
+			  First of all, this can & should be entirely in Lua (down to the combat calculations & hook types). There is *no way* combat number calculations would *ever* be a bottleneck.
+
+Web Mar 20 5:00pm
+OK. Lets do this right. 
+
+
+
+
+

@@ -5,7 +5,7 @@ PROJECT(project_luawrap)
 set(CMAKE_BUILD_TYPE Debug)
 #add_definitions(-DNDEBUG)
 
-set( LIBS ../../libs)
+set( LIBS ../../dependencies)
 
 include_directories(
 	"include/"

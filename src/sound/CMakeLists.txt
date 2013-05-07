@@ -4,7 +4,7 @@ PROJECT(project_lsound)
 FIND_PACKAGE(SDL REQUIRED)
 FIND_PACKAGE(SDL_mixer REQUIRED)
 
-set( LIBS ../../libs)
+set( LIBS ../../dependencies)
 set( SRC ..)
 
 include_directories(

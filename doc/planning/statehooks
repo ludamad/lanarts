@@ -1,0 +1,224 @@
+Rough thoughts -- way rougher than the working draft. Ramblings, even.
+
+statehooks:
+	- State hooks are not one thing, they are a generic mechanism
+	- A state hook plays closely with event handling
+
+-- Should just dive in and make items in lua.
+
+local dragon_slaying_buff = {
+	-- We should not damage a user directly in this function
+	on_attack = function(user, target, attack)
+		attack.weapon
+	end
+}
+
+data.item_create {
+	name = "Potion of Dragon Slaying",
+	type = items.potion,
+	on_use = function(user)
+		user:add_modifier{ state=dragon_slaying_buff, duration=200 }
+	end
+}
+
+phase 1: Error meaningfully on lua parsing problems -- DONE
+phase 2: convert parts of yaml to lua
+
+-- current task, convert effects
+-- We should convert them, but also expand them
+What are status effects ?
+ - They are stat modifiers that typically expire after time -- but not necessarily the case
+ - Caveat: Representing stat modifications as functions makes introspection harder
+ 
+ 
+on_step -- Give the effect a chance to remove itself ? And other very general things
+on_draw -- Somehow draw the player differently ?
+	Options: Alter the DrawOptions used to draw the player -- primarily colour though
+	Draw behind/on-top-of player
+	^^^^^^^^^^^^^^ -- it would make sense to be able to schedule drawing in layers ...
+Alternatives:
+So status effects should be able to do complex things, such as have things spin around you / shoot particles, etc.
+- If we do schedule drawing, we should process all draw() events at once and then have them all queue
+- The alternative is to have all the GameObject draw() events queue by default
+	- How big of an issue is drawing order ? It isn't until it is.
+
+function on_draw(user)
+	display.draw_at( user.layer-1, function ()  { } )
+end
+
+Web Mar 20 5:00pm
+OK. Lets do this right. 
+
+layer + draw()
+
+How should this be designed ?
+Should 'effect' be a lua object ? -> Yes. Should it have arbitrary state -> Yes.
+
+
+Recommentation: always pass 'self' as first argument
+Default layer == same layer as user
+
+function PreBlink:queue_drawables()
+end
+
+function PreBlink:draw_modify(user, options)
+	return options
+end
+
+function PreBlink:draw()
+	
+end
+
+local PreBlinkDrawHooks = {}
+-- Call it draw_events ??
+-- It should be shared between items etc etc 
+function PreBlinkDrawHooks:draw()
+
+end
+
+Maybe call it a Hooks object ? 
+
+data.item_create {
+	name = "Potion of Dragon Slaying",
+	type = items.potion,
+	on_use = function(user)
+		user:add_modifier{ state=dragon_slaying_buff, duration=200 }
+	end,
+	on_equip = function()
+	end
+	equipped_hooks = {
+	}
+}
+
+-- Each wielded object has a state hook
+	-- What about passive objects ? There needs to be some, even less than ideal, way.
+
+-- Thusly, all items etc etc are collections of hooks. 
+	- Maybe they all have the chance to push hooks ? - Give each item a step event! Entity design would be useful here. (Not happening, though.)
+	- This is somewhat awkward for naturally wielded items. A wielded_hooks semantic sugar should be done.
+		- This will be no different than the state hook format for 'status effects' (Call them status hooks, even?).
+		- Each collection of hooks is a lua table. Each combat object has an associated hook list.
+-- Designing this right from the beginning (This is THE most important future feature of lanarts):
+	- Hooks need an associated priority. By default, hooks should be run-order independent.
+	- Draw hooks have an associated draw layer.
+		^ Separate draw hooks from stat hooks! So obvious!
+		^ So each object needs a clusterfuck of hook tables ?
+			^ This isn't as bad as it sounds. 
+			  First of all, this can & should be entirely in Lua (down to the combat calculations & hook types). There is *no way* combat number calculations would *ever* be a bottleneck.
+
+Hook tables are thus even more generic, as there are multiple types of hooks. Each object is the 'sum of its parts', going from basic stats to secondary stats.
+-- Resist redoing the stat system for now. This is more important.
+-- Each hook table has a priority. Each hook table operates with a piece of data passed as the first parameter.
+	- Fundamental question: Item identification is not yet implemented. To lua it goes ?
+	- Thus items *will* have a state, and indeed an identity. Each item that exists in the game will have a lua table behind it.
+	- Technically, even the item slots should be in lua & not hard-coded (enemies should *fake* these.)
+		- This is contentious (to me at least). There is a big danger here in going nuts trying to support too much genericness.
+		- What instead then ?
+			- It is better to have features with default support from the engine that can be ignored in mods if they so choose
+			- Mods should be stackable - every feature of flexibility should keep in mind that some things can only be implemented once.
+				- Total game mods are decidedly a lower priority, can be done with engine patches anyway.
+	- OK. Built-in engine support for item identification. If this is ever a problem, it will justify the gain from not doing it now.
+		- Expressiveness in the mod data files is *very important*. Builtin content that is not used is not evil.
+
+- Should convert spell's effects first / existing items that cause effects.
+	- There should be constraints with eg poison resistance
+		- This is more of a stat thing -- monsters should have various resistance attributes to the various damage types
+			- Could follow Dungeon Crawl and have 4 levels of resistance
+				- Maybe a percentage is better ? 
+					-- but resistance should reflect unnatural resistance, not that gained from being tough
+				- This percentage affects the chance for the spell to even work
+					-- Damage always works, the damage amount based off of a random formula
+					-- status effect spells should have random chances of not working
+- Need a complete picture of a usable poison spell:
+	- 10 MP weak poison spell - there is a level of 'poisonedness'
+		- What is similar ? Useful to stack healing customly etc
+
+	- How to reconcile different poison sources of different durations from potentially eg cursed items (evil!) ?
+		- They can all be modelled independentally - solves the different durations/sources
+			- But they should be summarized when printed in interface / actual effect occurring
+			- They can specify a type, which specifies a handler that takes the data and summarizes it
+				- Most promising idea yet -- structured effect categories
+				- What about movement effects ? These should be independent, mostly. But how to reconcile paralysis + stun?
+					Paralysis should have lower priority, status.POST_MULTIPLIER or somesuch.
+	- Status handlers make it easy to post effect types, same way a wrapper could be provided for movement effects
+
+status.poison = {
+	draw_events = {}, #Interface, etc
+	stat_events = {}
+	step = function() 
+	end
+} -- Provide easy nullification of all poison, etc
+-- Should status types have unique IDs ?
+	-- Necessary to serialize well in C side, can store more efficient status structure this way
+	-- It is strongly identity based, so I think so
+-- What does step event fall under ? -- Probably it's own thing ? -- Return true if finished
+
+data.spells_create {
+    name = "Poison Cloud",
+    spr_spell = "poison",
+    description = "A poisonous cloud that causes damage over time.",
+    action_func = function(caster, x, y)
+	obj = room.object_at({x,y})
+	obj:status_add {
+		type = Statuses.POISON, -- Use capitals for namespaces, otherwise we risk clashing ? True for room! Capitals otherwise used for types, so it makes sense.
+		duration = 40,
+		poison_strength = Statuses.poison.WEAK, 
+		draw_events = {},
+		status_events = {}
+		
+		# Complain about this: draw_events = {},
+		# Complain about this: stat_events = {}
+		
+	}
+    end,
+    mp_cost = 25,
+    cooldown = 60
+}
+
+
+-- Sharing poison functionality between a weapon and a spell:
+-- Probably the only -good- way to do this is to add a status
+-- How else ? Well, we'd have to let the weapon be of 'poison' type. It's not as clean.
+effective_stats:status_add(...) -- But it shall not take a duration. This is OK, duration is optional -- by default things are permanent.
+-- Should duration be part of the passed table ? I think this is strongly a dynamic property.
+
+
+data.item_create {
+	name = "Poisoned Dagger",
+	type = Items.WEAPON,
+	damage = {4, 10},
+	if_in_inventory = { # the most general
+	}, # Should be able to check 'not wielded and not equipped' etc. Though wielded is undefined if not in stat_modifier or on_attack
+	# For cleanliness, on_attack should not provide the chance to alter the stat modifiers. wielded weapon always has its if_wielded ran last, so it can take advantage of more information.
+	if_equipped = { # convenient specialization
+		on_step = function() end,
+		draw_modifier = function() end,
+		stat_modifier = {
+			statuses = {
+				Statuses.WEAK_POISON
+			}
+		}
+	}
+	if_wielded = { # convenient specialization
+		stat_modifier = {
+			statuses = {
+				
+			}
+		}
+	}
+}
+
+# So the idea becomes one of progressive filtering, with the ability to dynamically add more things to process async
+
+data.item_create
+
+# An event table: 
+# - has the form if_XXX
+# - Can be a table or a forwarding function
+# Actual events have the form on_XXX, XXX_modifier, with the exception of 'step'
+
+# The drawing problem:
+draw_modifier can queue parts to draw ? But this would require calling all the draw_modifiers in the pre-draw phase.
+3 separate hooks: draw, draw_modifier, draw_queue
+draw_queue <- can be list of drawables with their associated layer OR dynamic function. <-- Nice thing is it is not critical to implement this now, only plan for it.
+draw <- drawn same 

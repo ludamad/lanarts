@@ -1,0 +1,44 @@
+Designing items to be used in Lanarts is, like all Lanarts scripting, a matter of writing Lua code.
+
+For now we will focus on creating a one-time use item. The basic call we have to use is 'data.item_create'.
+
+Lets start with a minimal working example.
+
+Create a file in the Lanarts res/ folder called my_items.lua (or whatever you want to name it)
+
+Inside place this:
+
+    data.item_create  {
+        type = items.CONSUMABLE,
+        name = "The Item",
+        sprite = data.sprite "my_item.png", 
+        on_use = function(self, user)
+            show_message("We used it!")
+        end
+    }
+
+'on_use' defines the behaviour of the item when it is used. Since this is a consumable item, it provides a single use, and then dissapears.
+'self' in this function refers to the item, and can be used to look-up the item's properties. 'user' in this function refers to the enemy or player using this item.
+Note though that enemy's will not know how to use items right off the bat.
+For ways simple item behaviour can be implemented, see other items as examples, as well as the general Lanarts API.
+Items that cause temporary effects are a bit harder, and will be discussed in part 2, state hooks.
+
+Now, in the game, we need to make sure it is loaded. Go into res/main.lua:
+
+In the function engine.resources_load, add the following line:
+
+    dofile "res/my_items.lua"
+
+Now, start up a game. When your game has started (ie, you have picked your character and are actually playing), press enter, and type the following:
+
+    !item The Item
+
+You should get the message:
+
+    We used it!
+
+Valid item types currently include:
+    items.CONSUMABLE, items.POTION, items.SCROLL, items.WEAPON, items.BODY_ARMOUR, items.BOOTS, items.GLOVES, items.HEADGEAR
+
+Samples for wieldable items are given in part 2.
+

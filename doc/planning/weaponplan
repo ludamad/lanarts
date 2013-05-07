@@ -1,0 +1,40 @@
+weapon migration plan:
+ - for now, keep 
+    damage: {base: [2,5], strength: 0.75} 
+   format. Delay ALL changes to stat overhaul. Focus on more event functionality with exact refactoring -- anything else is a mess waiting to happen.
+		-- Plus delaying stat changes allows for a new release without much risk of breakage
+
+  - name: Magic Sword
+    shop_cost: [75,95]
+    weapon_class: short blades
+    description: An enchanted sword that saps your mana reserves, but does greater damage.
+    damage: {base: [4,8], strength: 1.1, magic: 0.2}
+    resist_modifier: 1.1
+    power: {base: 1, strength: 0.2}
+    range: 7
+    on_hit_func: use_magic_sword
+    cooldown: 42
+    spr_item: magic sword
+
+
+data.weapon_create vs data.item_create
+To the layperson, they aren't necessarily the same thing
+Clean separation is better, the consistency is false.
+It is possible (and recommended) that custom reosurces types be added to the 'data' namespace.
+Should it be Data? -- Action item, change all major lua namespaces to capitals
+
+Data.weapon_create {
+	name = "Magic Sword",
+	description = "An enchanted sword that saps your mana reserves, but does greater damage.",
+	weapon_class = "short blades", -- eventually change this to 'type' ? but this is OK
+	shop_cost = [75, 95],
+    	damage = { base = {4,8}, strength = 1.1, magic = 0.2},
+    	resist_modifier = 1.1,
+    	power = {base = 1, strength = 0.2},
+   	range = 7
+}
+
+drawing stats -> can be done automatically if table provided, but otherwise ??
+Can be hard to draw all the details, maybe provide a 'more...' button with full stat listing.
+-> This will pause the game in single-player, draw in the middle of the screen w/ transparency.
+OK.

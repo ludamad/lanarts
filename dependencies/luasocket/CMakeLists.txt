@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_luasocket)
 
-set( LIBS ../../libs)
+set( LIBS ../../dependencies)
 
 include_directories(
 	${LIBS}/lua
