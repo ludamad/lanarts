@@ -19,7 +19,7 @@ local text_button_params = {
 }
 
 local function start_menu_create(on_start_click, on_load_click, on_score_click)
-    local menu = InstanceBox.create( { size = Display.window_size } )
+    local menu = InstanceBox.create( { size = Display.display_size } )
 
     menu:add_instance(
         Sprite.image_create("res/interface/sprites/lanarts_logo.png"),
@@ -87,7 +87,7 @@ function exit_menu(exit_game)
 end
 
 function setup_start_menu()
-    menu_state.menu = InstanceBox.create( { size = Display.window_size } )
+    menu_state.menu = InstanceBox.create( { size = Display.display_size } )
 
     menu_state.back = function() 
         exit_menu(--[[Quit game]] true) 
@@ -116,7 +116,7 @@ function setup_start_menu()
 end
 
 function setup_settings_menu()
-    menu_state.menu = InstanceBox.create( { size = Display.window_size } )
+    menu_state.menu = InstanceBox.create( { size = Display.display_size } )
     
     menu_state.back = setup_start_menu
     menu_state.continue = function ()
@@ -132,7 +132,7 @@ function setup_settings_menu()
 end
 
 function setup_pregame_menu()
-    menu_state.menu = InstanceBox.create( { size = Display.window_size } )
+    menu_state.menu = InstanceBox.create( { size = Display.display_size } )
 
     menu_state.back =  function() 
         exit_menu(--[[Quit game]] true) 
@@ -145,7 +145,7 @@ function setup_pregame_menu()
 end
 
 function setup_scores_menu()
-    menu_state.menu = InstanceBox.create( { size = Display.window_size } )
+    menu_state.menu = InstanceBox.create( { size = Display.display_size } )
     menu_state.back = setup_start_menu
     menu_state.continue = nil
     menu_state.menu:add_instance(

@@ -67,7 +67,7 @@ function game_overlay_draw()
     fps_count = fps_count + frame_increase
 
     if fps then
-        local w,h = unpack( Display.window_size ) 
+        local w,h = unpack( Display.display_size ) 
         Fonts.small:draw( {origin=RIGHT_BOTTOM}, {w, h}, "FPS: " .. math.floor(fps) )
     end
 

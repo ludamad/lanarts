@@ -42,10 +42,10 @@ local function graph_line(func, range, color, draw_area)
 end
 
 local function draw_function_create()
-   local w,h = unpack(Display.window_size)
+   local w,h = unpack(Display.display_size)
    
    local function draw_function()
-        draw_rectangle(COL_WHITE, {0,0, unpack(Display.window_size)} )
+        draw_rectangle(COL_WHITE, {0,0, unpack(Display.display_size)} )
         for F in values(functions_to_plot) do
             graph_line( 
                 F[1],

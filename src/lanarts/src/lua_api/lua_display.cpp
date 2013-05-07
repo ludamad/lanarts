@@ -39,7 +39,7 @@ namespace lua_api {
 		LuaValue meta = luameta_new(L, "<DisplayTable>");
 		LuaValue getters = luameta_getters(meta);
 
-		getters["window_size"].bind_function(ldraw::display_size);
+		getters["display_size"].bind_function(ldraw::display_size);
 
 		display.push();
 		meta.push();

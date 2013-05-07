@@ -57,7 +57,7 @@ local function pregame_joined_players_list_create()
 end
 
 function pregame_menu_create(on_start_click)
-    local menu = InstanceBox.create( { size = Display.window_size } )
+    local menu = InstanceBox.create( { size = Display.display_size } )
     local logo = Sprite.image_create("res/interface/sprites/lanarts_logo.png")
 
     menu:add_instance(

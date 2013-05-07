@@ -168,7 +168,7 @@ local function scores_menu_body_create()
 end
 
 function scores_menu_create(on_back_click)
-    local menu = InstanceBox.create( { size = Display.window_size } )
+    local menu = InstanceBox.create( { size = Display.display_size } )
     local logo_displacement = 0
 
     -- Display the logo if we are >= 800x600 res

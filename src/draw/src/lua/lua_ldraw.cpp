@@ -31,14 +31,11 @@ void lua_register_ldraw(lua_State* L, const LuaValue& module, bool register_lcom
 		lua_register_lcommon(L, module);
 	}
 
-#define BIND_FUNC(f)\
-	module[#f].bind_function(f)
-
-	BIND_FUNC(draw_rectangle);
-	BIND_FUNC(draw_circle);
-	BIND_FUNC(draw_circle_outline);
-	BIND_FUNC(draw_rectangle_outline);
-	BIND_FUNC(draw_line);
+	module["draw_rectangle"].bind_function(draw_rectangle);
+	module["draw_circle"].bind_function(draw_circle);
+	module["draw_circle_outline"].bind_function(draw_circle_outline);
+	module["draw_rectangle_outline"].bind_function(draw_rectangle_outline);
+	module["draw_line"].bind_function(draw_line);
 
 	lua_register_font(L, module);
 	lua_register_image(L, module);

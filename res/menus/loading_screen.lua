@@ -55,7 +55,7 @@ local function loading_screen_setup(...)
 		return cached_setup(...)
 	end
 
-	local screen_box = InstanceBox.create( { size = Display.window_size } )
+	local screen_box = InstanceBox.create( { size = Display.display_size } )
 
 	screen_box:add_instance( center_screen_setup(), CENTER )
 

@@ -1,6 +1,8 @@
 require "utils"
+require "InstanceBox"
 require "InstanceLine"
 require "Sprite"
+require "TextLabel"
 
 local game_entry_draw
 local logo = image_cached_load("res/interface/sprites/lanarts_logo_no_sub.png")
@@ -89,8 +91,27 @@ function game_entry_draw(number, entry, bbox)
     draw_rectangle_outline( bbox_mouse_over(bbox) and COL_WHITE or COL_GRAY, bbox, 1 )
 end
 
+function game_lobby_menu_create(on_back_click) 
+    local menu = InstanceBox.create{ size = Display.display_size }
+    state.menu = game_entry_list_create()
+
+    while Game.input_capture() do
+        state.menu:step({20,200})
+
+        Display.draw_start()
+        logo:draw( {10,10} )
+        large_font:draw( {origin = LEFT_TOP}, {20, 180}, "Open Games" )
+        state.menu:draw( {20,220} )
+        Display.draw_finish()
+
+        Game.wait(5)
+    end
+   
+
+end
+
 function main()
-    Display.initialize("Lanarts Example", {800, 600}, false)
+    Display.initialize("Lanarts Example", {640, 480}, false)
     local state = {}
     state.menu = game_entry_list_create()
 

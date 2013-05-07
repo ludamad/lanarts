@@ -29,7 +29,7 @@ local function lanarts_explain_screen_create(click_back, click_forward)
          CENTER
     )
 
-    local window = InstanceBox.create( { size = Display.window_size} )
+    local window = InstanceBox.create( { size = Display.display_size} )
     window:add_instance(
          contents,
          CENTER

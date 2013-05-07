@@ -23,7 +23,7 @@ local function action_bar_hints_create()
 end
 
 local function help_overlay_create()
-    local overlay = InstanceBox.create( {size = Display.window_size} )
+    local overlay = InstanceBox.create( {size = Display.display_size} )
     local action_bar = action_bar_hints_create()
     overlay:add_instance( action_bar, LEFT_BOTTOM, --[[Up 16 pixels]] {0, -16})
 
