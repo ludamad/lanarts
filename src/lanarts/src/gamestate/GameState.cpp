@@ -14,6 +14,7 @@
 #include <vector>
 
 #include <lcommon/SerializeBuffer.h>
+#include <lcommon/directory.h>
 #include <lcommon/strformat.h>
 
 #include <ldraw/display.h>
@@ -108,6 +109,8 @@ static void _event_log_initialize(GameState* gs, GameSettings& settings) {
 	}
 
 	if (settings.keep_event_log) {
+		/* We will fail to write logs unless we have a log directory */
+		ensure_directory("logs");
 		format(input_log_name_buffer, "logs/game_event_log%d", gs->game_timestamp());
 		output_log = input_log_name_buffer.c_str();
 	}
