@@ -11,8 +11,15 @@ endif()
 option(MSVC_SHARED_RT "MSVC: Build with shared runtime libs (/MD)" ON)
 option(MSVC_STHREADED_RT "MSVC: Build with single-threaded static runtime libs (/ML until VS .NET 2003)" OFF)
 
-add_subdirectory( src ) 
-add_subdirectory( dependencies ) 
-
 # Enable tests
 enable_testing()
+
+add_subdirectory( dependencies ) 
+
+add_subdirectory( luawrap )
+add_subdirectory( lanarts )
+add_subdirectory( common-utils )
+add_subdirectory( draw )
+add_subdirectory( net )
+add_subdirectory( sound )
+
