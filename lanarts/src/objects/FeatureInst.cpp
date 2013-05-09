@@ -1,0 +1,123 @@
+/*
+ * FeatureInst.cpp:
+ *  Represents a feature on the floor
+ */
+
+#include <typeinfo>
+
+#include <ldraw/DrawOptions.h>
+
+#include "draw/colour_constants.h"
+#include "draw/SpriteEntry.h"
+
+#include "gamestate/GameState.h"
+#include "gamestate/GameTiles.h"
+#include "stats/items/ItemEntry.h"
+
+#include <lcommon/math_util.h>
+#include "FeatureInst.h"
+
+#include "collision_filters.h"
+
+FeatureInst::FeatureInst(const Pos& pos, feature_t feature, bool solid,
+		sprite_id spriteid, int depth, int sprite_frame) :
+		GameInst(pos.x, pos.y, RADIUS, solid, depth), feature(feature), last_seen_spr(
+				-1), spriteid(spriteid), sprite_frame(sprite_frame) {
+
+}
+
+FeatureInst::~FeatureInst() {
+}
+
+void FeatureInst::draw(GameState* gs) {
+	Colour drawcolour = COL_WHITE;
+	if (last_seen_spr > -1) {
+		SpriteEntry& spr_entry = game_sprite_data.at(last_seen_spr);
+		res::sprite(last_seen_spr).draw(
+				ldraw::DrawOptions().origin(ldraw::CENTER).frame(sprite_frame).colour(
+						drawcolour), on_screen(gs, pos()));
+	}
+}
+
+void FeatureInst::step(GameState* gs) {
+
+	if (gs->object_visible_test(this)) {
+		sprite_id spr = spriteid;
+		if (feature == DOOR_CLOSED) {
+			spr = res::sprite_id("closed door");
+		} else if (feature == DOOR_OPEN) {
+			spr = res::sprite_id("open door");
+		}
+		last_seen_spr = spr;
+	}
+
+	Pos tile_xy(x / TILE_SIZE, y / TILE_SIZE);
+
+	if (gs->object_radius_test(x, y, TILE_SIZE)) {
+		if (feature == DOOR_CLOSED) {
+			gs->tiles().set_solid(tile_xy, false);
+			gs->tiles().set_seethrough(tile_xy, true);
+			feature = DOOR_OPEN;
+		}
+	} else if (!gs->object_radius_test(x, y, TILE_SIZE)) {
+		if (feature == DOOR_OPEN) {
+			gs->tiles().set_solid(tile_xy, true);
+			gs->tiles().set_seethrough(tile_xy, false);
+			feature = DOOR_CLOSED;
+		}
+	}
+}
+
+void FeatureInst::init(GameState* gs) {
+	if (feature == DOOR_CLOSED || solid) {
+		Pos tile_xy(x / TILE_SIZE, y / TILE_SIZE);
+		gs->tiles().set_solid(tile_xy, true);
+		if (feature == DOOR_CLOSED) {
+			gs->tiles().set_seethrough(tile_xy, false);
+		}
+	}
+}
+
+void FeatureInst::deinit(GameState *gs) {
+	if (feature == DOOR_CLOSED || solid) {
+		Pos tile_xy(x / TILE_SIZE, y / TILE_SIZE);
+		gs->tiles().set_solid(tile_xy, false);
+		if (feature == DOOR_CLOSED) {
+			gs->tiles().set_seethrough(tile_xy, true);
+		}
+	}
+}
+
+void FeatureInst::player_interact(GameState* gs) {
+}
+
+void FeatureInst::copy_to(GameInst* inst) const {
+	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
+	*(FeatureInst*)inst = *this;
+}
+
+FeatureInst* FeatureInst::clone() const {
+	return new FeatureInst(*this);
+}
+
+bool feature_exists_near(GameState* gs, const Pos& p) {
+	Pos midx = round_to_multiple(p, TILE_SIZE, true);
+	return gs->object_radius_test(midx.x, midx.y, 4);
+}
+
+void FeatureInst::serialize(GameState* gs, SerializeBuffer& serializer) {
+	GameInst::serialize(gs, serializer);
+	serializer.write_int(feature);
+	serializer.write_int(last_seen_spr);
+	serializer.write_int(spriteid);
+	serializer.write_int(sprite_frame);
+}
+
+void FeatureInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	GameInst::deserialize(gs, serializer);
+	serializer.read_int(feature);
+	serializer.read_int(last_seen_spr);
+	serializer.read_int(spriteid);
+	serializer.read_int(sprite_frame);
+}
+

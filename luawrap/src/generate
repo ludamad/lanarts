@@ -1,0 +1,190 @@
+
+template<>
+struct FuncWrap<void (*)()> {
+    static int cppfunction(lua_State* L) {
+        
+        ((void (*)())lua_touserdata(L, lua_upvalueindex(1)))();
+        return 0;
+    }
+};
+
+template<typename R>
+struct FuncWrap<R (*)()>  {
+    static int cppfunction(lua_State* L) {
+        
+        push<R>(L, ((R (*)())lua_touserdata(L, lua_upvalueindex(1)))());
+        return 1;
+    }
+};
+
+
+template<typename A1>
+struct FuncWrap<void (*)(A1)> {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))) { return 0; }
+        ((void (*)(A1))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1));
+        return 0;
+    }
+};
+
+template<typename R, typename A1>
+struct FuncWrap<R (*)(A1)>  {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))) { return 0; }
+        push<R>(L, ((R (*)(A1))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1)));
+        return 1;
+    }
+};
+
+
+template<typename A1,typename A2>
+struct FuncWrap<void (*)(A1,A2)> {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))) { return 0; }
+        ((void (*)(A1,A2))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2));
+        return 0;
+    }
+};
+
+template<typename R, typename A1,typename A2>
+struct FuncWrap<R (*)(A1,A2)>  {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))) { return 0; }
+        push<R>(L, ((R (*)(A1,A2))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2)));
+        return 1;
+    }
+};
+
+
+template<typename A1,typename A2,typename A3>
+struct FuncWrap<void (*)(A1,A2,A3)> {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))||!(check<A3>(L, 3) || __argfail(L, 3, typeid(A3).name()))) { return 0; }
+        ((void (*)(A1,A2,A3))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3));
+        return 0;
+    }
+};
+
+template<typename R, typename A1,typename A2,typename A3>
+struct FuncWrap<R (*)(A1,A2,A3)>  {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))||!(check<A3>(L, 3) || __argfail(L, 3, typeid(A3).name()))) { return 0; }
+        push<R>(L, ((R (*)(A1,A2,A3))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3)));
+        return 1;
+    }
+};
+
+
+template<typename A1,typename A2,typename A3,typename A4>
+struct FuncWrap<void (*)(A1,A2,A3,A4)> {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))||!(check<A3>(L, 3) || __argfail(L, 3, typeid(A3).name()))||!(check<A4>(L, 4) || __argfail(L, 4, typeid(A4).name()))) { return 0; }
+        ((void (*)(A1,A2,A3,A4))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4));
+        return 0;
+    }
+};
+
+template<typename R, typename A1,typename A2,typename A3,typename A4>
+struct FuncWrap<R (*)(A1,A2,A3,A4)>  {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))||!(check<A3>(L, 3) || __argfail(L, 3, typeid(A3).name()))||!(check<A4>(L, 4) || __argfail(L, 4, typeid(A4).name()))) { return 0; }
+        push<R>(L, ((R (*)(A1,A2,A3,A4))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4)));
+        return 1;
+    }
+};
+
+
+template<typename A1,typename A2,typename A3,typename A4,typename A5>
+struct FuncWrap<void (*)(A1,A2,A3,A4,A5)> {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))||!(check<A3>(L, 3) || __argfail(L, 3, typeid(A3).name()))||!(check<A4>(L, 4) || __argfail(L, 4, typeid(A4).name()))||!(check<A5>(L, 5) || __argfail(L, 5, typeid(A5).name()))) { return 0; }
+        ((void (*)(A1,A2,A3,A4,A5))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5));
+        return 0;
+    }
+};
+
+template<typename R, typename A1,typename A2,typename A3,typename A4,typename A5>
+struct FuncWrap<R (*)(A1,A2,A3,A4,A5)>  {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))||!(check<A3>(L, 3) || __argfail(L, 3, typeid(A3).name()))||!(check<A4>(L, 4) || __argfail(L, 4, typeid(A4).name()))||!(check<A5>(L, 5) || __argfail(L, 5, typeid(A5).name()))) { return 0; }
+        push<R>(L, ((R (*)(A1,A2,A3,A4,A5))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5)));
+        return 1;
+    }
+};
+
+
+template<typename A1,typename A2,typename A3,typename A4,typename A5,typename A6>
+struct FuncWrap<void (*)(A1,A2,A3,A4,A5,A6)> {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))||!(check<A3>(L, 3) || __argfail(L, 3, typeid(A3).name()))||!(check<A4>(L, 4) || __argfail(L, 4, typeid(A4).name()))||!(check<A5>(L, 5) || __argfail(L, 5, typeid(A5).name()))||!(check<A6>(L, 6) || __argfail(L, 6, typeid(A6).name()))) { return 0; }
+        ((void (*)(A1,A2,A3,A4,A5,A6))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5),get<A6>(L, 6));
+        return 0;
+    }
+};
+
+template<typename R, typename A1,typename A2,typename A3,typename A4,typename A5,typename A6>
+struct FuncWrap<R (*)(A1,A2,A3,A4,A5,A6)>  {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))||!(check<A3>(L, 3) || __argfail(L, 3, typeid(A3).name()))||!(check<A4>(L, 4) || __argfail(L, 4, typeid(A4).name()))||!(check<A5>(L, 5) || __argfail(L, 5, typeid(A5).name()))||!(check<A6>(L, 6) || __argfail(L, 6, typeid(A6).name()))) { return 0; }
+        push<R>(L, ((R (*)(A1,A2,A3,A4,A5,A6))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5),get<A6>(L, 6)));
+        return 1;
+    }
+};
+
+
+template<typename A1,typename A2,typename A3,typename A4,typename A5,typename A6,typename A7>
+struct FuncWrap<void (*)(A1,A2,A3,A4,A5,A6,A7)> {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))||!(check<A3>(L, 3) || __argfail(L, 3, typeid(A3).name()))||!(check<A4>(L, 4) || __argfail(L, 4, typeid(A4).name()))||!(check<A5>(L, 5) || __argfail(L, 5, typeid(A5).name()))||!(check<A6>(L, 6) || __argfail(L, 6, typeid(A6).name()))||!(check<A7>(L, 7) || __argfail(L, 7, typeid(A7).name()))) { return 0; }
+        ((void (*)(A1,A2,A3,A4,A5,A6,A7))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5),get<A6>(L, 6),get<A7>(L, 7));
+        return 0;
+    }
+};
+
+template<typename R, typename A1,typename A2,typename A3,typename A4,typename A5,typename A6,typename A7>
+struct FuncWrap<R (*)(A1,A2,A3,A4,A5,A6,A7)>  {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))||!(check<A3>(L, 3) || __argfail(L, 3, typeid(A3).name()))||!(check<A4>(L, 4) || __argfail(L, 4, typeid(A4).name()))||!(check<A5>(L, 5) || __argfail(L, 5, typeid(A5).name()))||!(check<A6>(L, 6) || __argfail(L, 6, typeid(A6).name()))||!(check<A7>(L, 7) || __argfail(L, 7, typeid(A7).name()))) { return 0; }
+        push<R>(L, ((R (*)(A1,A2,A3,A4,A5,A6,A7))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5),get<A6>(L, 6),get<A7>(L, 7)));
+        return 1;
+    }
+};
+
+
+template<typename A1,typename A2,typename A3,typename A4,typename A5,typename A6,typename A7,typename A8>
+struct FuncWrap<void (*)(A1,A2,A3,A4,A5,A6,A7,A8)> {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))||!(check<A3>(L, 3) || __argfail(L, 3, typeid(A3).name()))||!(check<A4>(L, 4) || __argfail(L, 4, typeid(A4).name()))||!(check<A5>(L, 5) || __argfail(L, 5, typeid(A5).name()))||!(check<A6>(L, 6) || __argfail(L, 6, typeid(A6).name()))||!(check<A7>(L, 7) || __argfail(L, 7, typeid(A7).name()))||!(check<A8>(L, 8) || __argfail(L, 8, typeid(A8).name()))) { return 0; }
+        ((void (*)(A1,A2,A3,A4,A5,A6,A7,A8))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5),get<A6>(L, 6),get<A7>(L, 7),get<A8>(L, 8));
+        return 0;
+    }
+};
+
+template<typename R, typename A1,typename A2,typename A3,typename A4,typename A5,typename A6,typename A7,typename A8>
+struct FuncWrap<R (*)(A1,A2,A3,A4,A5,A6,A7,A8)>  {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))||!(check<A3>(L, 3) || __argfail(L, 3, typeid(A3).name()))||!(check<A4>(L, 4) || __argfail(L, 4, typeid(A4).name()))||!(check<A5>(L, 5) || __argfail(L, 5, typeid(A5).name()))||!(check<A6>(L, 6) || __argfail(L, 6, typeid(A6).name()))||!(check<A7>(L, 7) || __argfail(L, 7, typeid(A7).name()))||!(check<A8>(L, 8) || __argfail(L, 8, typeid(A8).name()))) { return 0; }
+        push<R>(L, ((R (*)(A1,A2,A3,A4,A5,A6,A7,A8))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5),get<A6>(L, 6),get<A7>(L, 7),get<A8>(L, 8)));
+        return 1;
+    }
+};
+
+
+template<typename A1,typename A2,typename A3,typename A4,typename A5,typename A6,typename A7,typename A8,typename A9>
+struct FuncWrap<void (*)(A1,A2,A3,A4,A5,A6,A7,A8,A9)> {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))||!(check<A3>(L, 3) || __argfail(L, 3, typeid(A3).name()))||!(check<A4>(L, 4) || __argfail(L, 4, typeid(A4).name()))||!(check<A5>(L, 5) || __argfail(L, 5, typeid(A5).name()))||!(check<A6>(L, 6) || __argfail(L, 6, typeid(A6).name()))||!(check<A7>(L, 7) || __argfail(L, 7, typeid(A7).name()))||!(check<A8>(L, 8) || __argfail(L, 8, typeid(A8).name()))||!(check<A9>(L, 9) || __argfail(L, 9, typeid(A9).name()))) { return 0; }
+        ((void (*)(A1,A2,A3,A4,A5,A6,A7,A8,A9))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5),get<A6>(L, 6),get<A7>(L, 7),get<A8>(L, 8),get<A9>(L, 9));
+        return 0;
+    }
+};
+
+template<typename R, typename A1,typename A2,typename A3,typename A4,typename A5,typename A6,typename A7,typename A8,typename A9>
+struct FuncWrap<R (*)(A1,A2,A3,A4,A5,A6,A7,A8,A9)>  {
+    static int cppfunction(lua_State* L) {
+        if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))||!(check<A2>(L, 2) || __argfail(L, 2, typeid(A2).name()))||!(check<A3>(L, 3) || __argfail(L, 3, typeid(A3).name()))||!(check<A4>(L, 4) || __argfail(L, 4, typeid(A4).name()))||!(check<A5>(L, 5) || __argfail(L, 5, typeid(A5).name()))||!(check<A6>(L, 6) || __argfail(L, 6, typeid(A6).name()))||!(check<A7>(L, 7) || __argfail(L, 7, typeid(A7).name()))||!(check<A8>(L, 8) || __argfail(L, 8, typeid(A8).name()))||!(check<A9>(L, 9) || __argfail(L, 9, typeid(A9).name()))) { return 0; }
+        push<R>(L, ((R (*)(A1,A2,A3,A4,A5,A6,A7,A8,A9))lua_touserdata(L, lua_upvalueindex(1)))(get<A1>(L, 1),get<A2>(L, 2),get<A3>(L, 3),get<A4>(L, 4),get<A5>(L, 5),get<A6>(L, 6),get<A7>(L, 7),get<A8>(L, 8),get<A9>(L, 9)));
+        return 1;
+    }
+};
+

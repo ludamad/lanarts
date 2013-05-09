@@ -1,0 +1,56 @@
+/*
+ * GameInstRef.h:
+ *  Retains a reference to a GameInst object.
+ *  This acts as a smart pointer to GameInst.
+ *  Generally, only store obj_id and do object lookups wherever appropriate.
+ *  This will help prevent any circular reference cases between objects.
+ */
+
+#include "gamestate/GameState.h"
+
+#include "GameInst.h"
+#include "GameInstRef.h"
+
+static void __retain_ref(GameInst* inst) {
+	if (inst) {
+		LANARTS_ASSERT(inst->reference_count >= 0);
+		GameInst::retain_reference(inst);
+	}
+}
+static void __free_ref(GameInst* inst) {
+	if (inst) {
+		GameInst::free_reference(inst);
+	}
+}
+
+GameInstRef::GameInstRef(GameInst* inst) :
+		inst(inst) {
+	__retain_ref(inst);
+}
+
+GameInstRef::GameInstRef(const GameInstRef& gref) :
+		inst(gref.inst) {
+	__retain_ref(inst);
+}
+
+GameInstRef::GameInstRef(GameState* gs, obj_id id) :
+		inst(gs->get_instance(id)) {
+	__retain_ref(inst);
+}
+
+GameInstRef::~GameInstRef() {
+	__free_ref(inst);
+}
+
+void GameInstRef::operator =(const GameInstRef& ref) {
+	__retain_ref(ref.inst);
+	__free_ref(inst);
+	inst = ref.inst;
+}
+
+void GameInstRef::operator =(GameInst* ref) {
+	__retain_ref(ref);
+	__free_ref(inst);
+	inst = ref;
+}
+
