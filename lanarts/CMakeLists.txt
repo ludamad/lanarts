@@ -20,10 +20,10 @@ include_directories(
 	${FREETYPE_INCLUDE_DIRS}
 	src/
 	${SRC}/common-utils/include
-	${SRC}/draw/include
+	"${SRC}/draw-lib/include"
 	${SRC} # for net
 	${SRC}/luawrap/include
-	${SRC}/sound/include
+	"${SRC}/sound-lib/include"
 	${DEPS}/UnitTest++ 
 	${DEPS}/yaml-cpp/include
 	${DEPS}/lua 

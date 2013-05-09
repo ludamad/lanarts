@@ -6,7 +6,7 @@
 
 #include <lcommon/unittest.h>
 
-#include <net/lanarts_net.h>
+#include <net-lib/lanarts_net.h>
 
 #include <lcommon/SerializeBuffer.h>
 

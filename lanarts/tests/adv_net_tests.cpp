@@ -11,7 +11,7 @@
 
 #include <lua.hpp>
 
-#include <net/lanarts_net.h>
+#include <net-lib/lanarts_net.h>
 
 #include <lcommon/unittest.h>
 

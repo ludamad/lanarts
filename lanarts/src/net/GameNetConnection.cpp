@@ -5,7 +5,7 @@
  * 	Provides useful behaviour on top of the src_net library.
  */
 
-#include <net/lanarts_net.h>
+#include <net-lib/lanarts_net.h>
 
 #include "gamestate/GameState.h"
 
