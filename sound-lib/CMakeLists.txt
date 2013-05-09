@@ -11,8 +11,8 @@ include_directories(
     "include/lsound"
     ${SDL_INCLUDE_DIR} 
     ${LIBS}/lua
-    ${SRC}/luawrap/include
-    ${SRC}/common-utils/include
+    "${SRC}/luawrap-lib/include"
+    "${SRC}/common-lib/include"
 )
 
 

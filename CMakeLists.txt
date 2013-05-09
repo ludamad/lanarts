@@ -16,10 +16,10 @@ enable_testing()
 
 add_subdirectory( dependencies ) 
 
-add_subdirectory( luawrap )
-add_subdirectory( lanarts )
-add_subdirectory( common-utils )
+add_subdirectory( luawrap-lib )
+add_subdirectory( common-lib )
 add_subdirectory( draw-lib )
 add_subdirectory( net-lib )
 add_subdirectory( sound-lib )
 
+add_subdirectory( lanarts )

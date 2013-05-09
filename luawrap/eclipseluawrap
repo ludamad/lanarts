@@ -1,5 +1,0 @@
-whereitwas=$(pwd)
-mkdir -p ~/eclipseluawrap
-cd ~/eclipseluawrap
-
-cmake -G"Eclipse CDT4 - Unix Makefiles" $whereitwas

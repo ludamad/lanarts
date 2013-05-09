@@ -14,8 +14,8 @@ add_definitions( -std=c++98 )
 
 include_directories(
 	include/ldraw/
-	${SRC}/common-utils/include
-	${SRC}/luawrap/include
+	"${SRC}/common-lib/include"
+	"${SRC}/luawrap-lib/include"
 	${DEPS}/UnitTest++
 	${DEPS}/lua
 	${SDL_INCLUDE_DIR} 

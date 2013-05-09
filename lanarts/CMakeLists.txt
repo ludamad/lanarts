@@ -19,13 +19,13 @@ include_directories(
 	${OpenGL_INCLUDE_DIRS} 		
 	${FREETYPE_INCLUDE_DIRS}
 	src/
-	${SRC}/common-utils/include
+	"${SRC}/common-lib/include"
 	"${SRC}/draw-lib/include"
 	${SRC} # for net
-	${SRC}/luawrap/include
+	"${SRC}/luawrap-lib/include"
 	"${SRC}/sound-lib/include"
 	${DEPS}/UnitTest++ 
-	${DEPS}/yaml-cpp/include
+	"${DEPS}/yaml-cpp/include"
 	${DEPS}/lua 
 	${DEPS} # for rvo2 & luasocket
 	)
