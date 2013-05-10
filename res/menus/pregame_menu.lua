@@ -3,7 +3,7 @@ require "InstanceBox"
 require "Sprite"
 require "TextLabel"
 require "utils"
-require "menu_utils"
+require "utils_text_component"
 
 local text_button_params = {
     font = font_cached_load(settings.menu_font, 20),

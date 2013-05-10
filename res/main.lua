@@ -5,25 +5,24 @@
     in additional files.
 ]]
 
-require_path_add("res/menus/?.lua")
 require_path_add("res/library_files/?.lua")
 
 sound_volume = 0 -- Mute the game
 
 function Engine.menu_start(...)
-    require "start_menu"
+    require "menus.start_menu"
 
     return start_menu_show(...)
 end
 
 function Engine.pregame_menu_start(...)
-    require "pregame_menu"
+    require "menus.pregame_menu"
 
     return pregame_menu_show(...)
 end
 
 function Engine.loading_screen_draw(...)
-    require "loading_screen"
+    require "menus.loading_screen"
 
     return loading_screen_draw(...)
 end

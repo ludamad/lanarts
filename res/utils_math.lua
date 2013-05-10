@@ -3,14 +3,26 @@
 --- Given two numeric arrays of the same length, returns a new array with each of the elements multiplied together
 function vector_multiply(v1, v2)
     local length = # v1
-
     assert(length == #v2, "vector_multiply(): Vector lengths do not match!")
 
     local ret = {}
     for i = 1,length do ret[i] = v1[i] * v2[i] end
-
     return ret
 end
+
+function vector_apply(f) 
+    return function (v1, v2)
+        local length = # v1
+        assert(length == #v2, "vector_apply(): Vector lengths do not match!")
+
+        local ret = {}
+        for i = 1,length do ret[i] = f(v1[i], v2[i]) end
+        return ret
+    end
+end
+
+vector_max = vector_apply(math.max)
+vector_min = vector_apply(math.min)
 
 --- Given two numeric arrays of the same length, returns a new array with the elements interpolated.
 -- The resulting values are in between the original values.

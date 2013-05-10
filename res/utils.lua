@@ -5,6 +5,7 @@ require "utils_general"
 require "utils_math"
 require "utils_draw"
 require "utils_description"
+require "utils_text_component"
 
 -- More ad hoc utilities without a home, yet
 

@@ -1,13 +1,14 @@
-require "game_settings_menu"
-require "scores_menu"
-
 require "InstanceBox"
 require "Sprite"
 require "TextLabel"
 require "utils"
 require "game_loop"
-require "menu_utils"
-require "pregame_menu"
+
+require "utils_text_component"
+
+require "menus.game_settings_menu"
+require "menus.pregame_menu"
+require "menus.scores_menu"
 
 -- START SCREEN -- 
 

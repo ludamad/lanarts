@@ -5,7 +5,9 @@ require "TextInputBox"
 require "TextLabel"
 require "Sprite"
 
-local SETTINGS_BOX_MAXCHARS = 18
+require "utils_text_component"
+
+local SETTINGS_BOX_MAX_CHARS = 18
 local SETTINGS_BOX_SIZE = {180, 34}
 
 local CONFIG_MENU_SIZE = {640, 480}
@@ -13,46 +15,13 @@ local CONFIG_MENU_SIZE = {640, 480}
 local SETTINGS_FONT = font_cached_load(settings.font, 10)
 local BIG_SETTINGS_FONT = font_cached_load(settings.menu_font, 20)
 
-local function text_field_create(label_text, default_text, callbacks)
-
-    local field = InstanceGroup.create()
-
-    -- Add text label
-    field:add_instance(
-        TextLabel.create(
-            SETTINGS_FONT, -- TextLabel font
-            {color = COL_YELLOW }, 
-            label_text
-        ),
-        {0, -20} -- position
-    )
-
-    -- Add text input box
-    field:add_instance(
-        TextInputBox.create( 
-            SETTINGS_FONT, -- TextInputBox font
-            SETTINGS_BOX_SIZE, -- Text input box size
-            {SETTINGS_BOX_MAXCHARS, default_text}, -- input box parameters
-            callbacks
-        ),
-       {0, 0} -- position
-    )
-
-    field.size = SETTINGS_BOX_SIZE
-
-    return field
-end
-
-local function name_field_create()
-    return text_field_create(
-            "Enter your name:",
-            settings.username,
-            { -- Field validating & updating 
-                update = function(field) -- Update username based on contents
-                    settings.username = field.text
-                end
-            }
-    )
+-- Adds common settings for text field functions that take size, font & max_chars
+local function settings_text_field_params(params)
+    params = params or {}
+    params.size = params.size or SETTINGS_BOX_SIZE
+    params.font = params.font or SETTINGS_FONT
+    params.max_chars = params.max_chars or SETTINGS_BOX_MAX_CHARS
+    return params
 end
 
 local function is_valid_ip_string(text)
@@ -74,29 +43,31 @@ local function is_valid_ip_string(text)
 end
 
 local function host_IP_field_create()
-    return text_field_create(
-            "Host IP:",
-            settings.ip,
-            { -- Field validating & updating 
-                update = function(field) -- Update host IP based on contents
-                    settings.ip = field.text
-                end,
-                valid_string = is_valid_ip_string
-            }
-    )
+    local params = settings_text_field_params {
+        label_text = "Host IP:",
+        default_text = settings.ip,
+        input_callbacks = { -- Field validating & updating 
+            update = function(field) -- Update host IP based on contents
+                settings.ip = field.text
+            end,
+            valid_string = is_valid_ip_string
+        }
+    }
+    return text_field_create(params)
 end
 
 local function connection_port_field_create()
-    return text_field_create(
-            "Connection Port:",
-            settings.port,
-            { -- Field validating & updating 
-                update = function(field) -- Update connection port based on contents
-                    settings.port = tonumber(field.text)
-                end,
-                valid_string = tonumber
-            }
-    )
+    local params = settings_text_field_params {
+        label_text = "Connection Port:",
+        default_text = settings.port,
+        input_callbacks = { -- Field validating & updating 
+            update = function(field) -- Update connection port based on contents
+                settings.port = tonumber(field.text)
+            end,
+            valid_string = tonumber
+        }
+    }
+    return text_field_create(params)
 end
 
 local function connection_toggle_create()
@@ -368,7 +339,8 @@ local function center_setting_fields_create()
            fields:add_instance( frame_action_repeat_toggle_create() )
         end
 
-        fields:add_instance( name_field_create() )
+        local name_field = name_field_create( settings_text_field_params() )
+        fields:add_instance(name_field)
 
         if current_setting ~= net.NONE then
             fields:add_instance( connection_port_field_create() )

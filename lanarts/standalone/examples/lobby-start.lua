@@ -4,11 +4,16 @@ require "InstanceLine"
 require "Sprite"
 require "TextLabel"
 
+require "utils_text_component"
+
 local game_entry_draw
-local logo = image_cached_load("res/interface/sprites/lanarts_logo_no_sub.png")
+local logo_path = "res/interface/sprites/lanarts_logo_no_sub.png"
 local small_font = font_cached_load(settings.font, 10)
-local medium_font = font_cached_load("res/fonts/MateSC-Regular.ttf", 14)
-local large_font = font_cached_load("res/fonts/MateSC-Regular.ttf", 14)
+local large_font = font_cached_load(settings.font, 20)
+local alt_font = font_cached_load("res/fonts/MateSC-Regular.ttf", 14)
+
+local SETTINGS_BOX_MAX_CHARS = 18
+local SETTINGS_BOX_SIZE = {180, 34}
 
 local ENTRY_SIZE = {350, 40}
 local ENTRY_SPACING = 45
@@ -83,7 +88,7 @@ end
 
 function game_entry_draw(number, entry, bbox)
     local game_number_color = vector_interpolate(COL_YELLOW, COL_DARK_GRAY, (number-1) / 10)
-    draw_in_box(medium_font, bbox, LEFT_CENTER, {-14,0}, {game_number_color, number})
+    draw_in_box(alt_font, bbox, LEFT_CENTER, {-14,0}, {game_number_color, number})
     draw_in_box(small_font, bbox, LEFT_TOP, {0,18}, {COL_WHITE, "Host: "}, {COL_PALE_RED, entry.host})
     draw_in_box(small_font, bbox, LEFT_TOP, {0,3}, {COL_WHITE, "Players: "}, {COL_MUTED_GREEN, player_list_string(entry.players, PLAYER_LIST_MAX_CHARS)} )
     draw_in_box(small_font, bbox, RIGHT_TOP, {-5,20},  {COL_LIGHT_GRAY, os.date("%I:%M%p", entry.creationTime)} )
@@ -91,37 +96,43 @@ function game_entry_draw(number, entry, bbox)
     draw_rectangle_outline( bbox_mouse_over(bbox) and COL_WHITE or COL_GRAY, bbox, 1 )
 end
 
-function game_lobby_menu_create(on_back_click) 
-    local menu = InstanceBox.create{ size = Display.display_size }
-    state.menu = game_entry_list_create()
+function lobby_menu_create(on_back_click) 
+    local menu = InstanceBox.create{ size = vector_min(Display.display_size, {800, 600}) }
+    menu:add_instance(game_entry_list_create(), LEFT_CENTER, {20, 80})
+    menu:add_instance(Sprite.image_create(logo_path), LEFT_TOP, {10,10})
+    menu:add_instance(TextLabel.create(alt_font, "Open Games"), LEFT_CENTER, {20,-52})
 
-    while Game.input_capture() do
-        state.menu:step({20,200})
+    local w, h = unpack(menu.size)
+    local right_side = InstanceBox.create{ size = {w/2, h} }
+    right_side:add_instance(
+        name_field_create { 
+            label_text = "Your name: ",
+            size = SETTINGS_BOX_SIZE, font = small_font, max_chars = SETTINGS_BOX_MAX_CHARS
+        }, CENTER, {0, -13}
+    )
+    right_side:add_instance(
+        text_button_create( "Back", on_back_click, {font = large_font} ), 
+        CENTER, {0, 100}
+    )
 
-        Display.draw_start()
-        logo:draw( {10,10} )
-        large_font:draw( {origin = LEFT_TOP}, {20, 180}, "Open Games" )
-        state.menu:draw( {20,220} )
-        Display.draw_finish()
+    menu:add_instance(right_side, RIGHT_CENTER)
 
-        Game.wait(5)
-    end
-   
-
+    return menu
 end
 
 function main()
     Display.initialize("Lanarts Example", {640, 480}, false)
-    local state = {}
-    state.menu = game_entry_list_create()
+--    Display.initialize("Lanarts Example", {1200, 900}, false)
+    local menu_frame = InstanceBox.create { size = Display.display_size }
+    menu_frame:add_instance(lobby_menu_create(), CENTER)
+
+    local state = {menu = menu_frame}
 
     while Game.input_capture() do
-        state.menu:step({20,200})
+        state.menu:step({0,0})
 
         Display.draw_start()
-        logo:draw( {10,10} )
-        large_font:draw( {origin = LEFT_TOP}, {20, 180}, "Open Games" )
-        state.menu:draw( {20,220} )
+        state.menu:draw({0,0})
         Display.draw_finish()
 
         Game.wait(5)

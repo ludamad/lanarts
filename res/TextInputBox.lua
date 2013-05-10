@@ -3,8 +3,17 @@ require "utils"
 local BLINK_TIME_MS = 600
 local BLINK_HELD_MS = 600
 
+--- An interactive text field, a convenient drawable object wrapper 
+-- over the native (aka C++-implemented) TextInput object. 
 TextInputBox = newtype()
 
+--- Create an interactive text field
+-- font: the font to draw with
+-- size: the size of the box to draw around the text
+-- fieldargs: {max characters, default_text} 
+-- callbacks: {optional 'update' callback, 
+--              optional 'select' callback, 
+--              optional 'deselect' callback}
 function TextInputBox:init(font, size, fieldargs, callbacks)
     self.text_input = TextInput.create( unpack(fieldargs))
 

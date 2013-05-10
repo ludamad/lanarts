@@ -1,5 +1,3 @@
-require "game_settings_menu"
-
 require "InstanceBox"
 require "Sprite"
 require "TextLabel"
