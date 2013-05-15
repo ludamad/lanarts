@@ -56,6 +56,7 @@ function game_post_draw()
             Fonts.small:draw({color=COL_WHITE, origin=CENTER}, screen_coords{p.x, p.y-18}, pdata.name)
         end
     end
+
 end
 
 local fps_timer = timer_create()
@@ -105,7 +106,7 @@ function game_loop()
             EventLog.add("Press Shift + Esc to exit, your progress will be saved.")
         end
 
-	local steponly = (Game.frame % settings.steps_per_draw ~= 0)
+        local steponly = (Game.frame % settings.steps_per_draw ~= 0)
         if not game_loop_body(steponly) then
             if single_player then
                 Game.score_board_store()
