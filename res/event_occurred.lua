@@ -22,7 +22,7 @@ function events.MonsterDeath(monster)
         monstersounds[monster.name]:play()
     end
     if monster.name == "Zin" then
-        Engine.Game_won()
+        Engine.game_won()
     end
 end
 
