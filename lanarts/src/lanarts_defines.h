@@ -68,6 +68,6 @@ inline void cooldown_step(int& cooldown) {
 
 // This is required to ensure we do proper cleanup without hanging on exit
 // This does NOT abort
-void lanarts_system_quitem_quit();
+void lanarts_system_quit();
 
 #endif
