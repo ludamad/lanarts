@@ -208,7 +208,7 @@ void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
 //		if (gs->game_settings().network_debug_mode) {
 		bool seq = serializer_equals_read(serializer, inst->integrity_hash());
 		if (!seq) {
-			lanarts_quit();
+			lanarts_system_quit();
 			abort();
 		}
 //		}

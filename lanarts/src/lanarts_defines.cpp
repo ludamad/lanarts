@@ -6,7 +6,7 @@
 
 #include "lanarts_defines.h"
 
-void lanarts_quit() {
+void lanarts_system_quit() {
 	lanarts_net_quit();
 	SDL_QuitSubSystem(SDL_INIT_EVERYTHING ^ SDL_INIT_AUDIO);
 

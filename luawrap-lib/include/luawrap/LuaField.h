@@ -2,8 +2,11 @@
  * LuaField.h:
  *	PLEASE READ BEFORE USING.
  *
- *  Represents a value inside another lua object.
- *  This is represented by an index chain of sorts and *MUST* be stored on the stack.
+ *  Represents a value inside another lua object -OR- a plain LuaStackValue or LuaValue.
+ *  If you want a parameter that takes any lua object, use this.
+ *
+ *  This is represented by an index chain of possible 0 length.
+ *  Generally this *MUST* be stored on the stack.
  *  There is some trade-off of usability and performance here, but generally it is very fast.
  *
  *  It should NOT be used as a class member. It primarily exists as a proxy convenience class.

@@ -137,7 +137,7 @@ int main(int argc, char** argv) {
 
 	label_Quit:
 
-	lanarts_quit();
+	lanarts_system_quit();
 
 	delete gs;
 
