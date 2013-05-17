@@ -17,7 +17,7 @@
 class WeaponEntry: public EquipmentEntry {
 public:
 	WeaponEntry() :
-			EquipmentEntry(), uses_projectile(false) {
+			EquipmentEntry(WEAPON), uses_projectile(false) {
 
 	}
 	virtual ~WeaponEntry() {

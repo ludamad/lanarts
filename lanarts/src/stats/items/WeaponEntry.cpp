@@ -32,7 +32,6 @@ WeaponEntry& get_weapon_entry(weapon_id id) {
 
 void WeaponEntry::parse_lua_table(const LuaValue& table) {
 	EquipmentEntry::parse_lua_table(table);
-	type = EquipmentEntry::WEAPON;
 	weapon_class = table["type"].to_str();
 
 	attack = parse_attack(table);

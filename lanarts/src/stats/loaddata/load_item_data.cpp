@@ -38,14 +38,12 @@ void parse_item_entry(lua_State* L, const YAML::Node& n, ItemEntry& entry) {
 
 static LuaValue* item_table;
 static void lapi_data_create_item(const LuaStackValue& table) {
-
 	ItemEntry* entry = new ItemEntry;
+	entry->init(game_item_data.size(), table);
+
 	game_item_data.push_back(entry);
 
 	(*item_table)[entry->name] = table;
-
-	int idx = game_item_data.size();
-	entry->init(idx, table);
 }
 
 LuaValue load_item_data(lua_State* L, const FilenameList& filenames) {

@@ -73,8 +73,9 @@ static EquipmentEntry::equip_type name2type(const char* name) {
 
 void EquipmentEntry::parse_lua_table(const LuaValue& table) {
 	ItemEntry::parse_lua_table(table);
-
-	type = name2type(table["type"].to_str());
+	if (type == EquipmentEntry::NONE) {
+		type = name2type(table["type"].to_str());
+	}
 	stackable = false;
 	use_action = LuaAction(LuaValue());
 	stat_modifiers = parse_stat_modifiers(table);
