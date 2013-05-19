@@ -58,7 +58,6 @@ static int lapi_combatgameinst_add_effect(lua_State* L) {
 	return 1;
 }
 
-
 static void lapi_playerinst_reset_rest_cooldown(PlayerInst* inst) {
 	inst->cooldowns().reset_rest_cooldown(REST_COOLDOWN);
 }
