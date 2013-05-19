@@ -53,7 +53,6 @@ void lua_lanarts_api(GameState* state, lua_State* L) {
 
 	lua_atpanic(L, lua_lanarts_panic);
 
-	lua_gameinst_bindings(state, L);
 	lua_combatstats_bindings(state, L);
 	lua_effectivestats_bindings(state, L);
 	lua_collision_check_bindings(L);

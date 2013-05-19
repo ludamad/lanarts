@@ -99,7 +99,7 @@ void EffectStats::process(GameState* gs, CombatGameInst* inst,
 			game_effect_data.at(effects[i].effectid).stat_func.get(L).push();
 			if (!effects[i].state.empty()) {
 				effects[i].state.push();
-				lua_push_gameinst(L, inst);
+				luawrap::push(L, inst);
 
 				lua_pushvalue(L, baseind);
 				lua_pushvalue(L, affind);
@@ -121,7 +121,7 @@ static void lua_effect_func_callback(lua_State* L, LuaValue& value,
 
 	value.push();
 	effect.state.push();
-	lua_push_gameinst(L, inst);
+	luawrap::push(L, inst);
 	lua_call(L, 2, 0);
 }
 

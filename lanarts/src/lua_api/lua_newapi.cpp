@@ -10,6 +10,7 @@
 
 #include "lua_api/lua_yaml.h"
 #include "lua_api/lua_api.h"
+#include "lua_api/lua_gameinst.h"
 
 extern "C" {
 #include "luasocket/luasocket.h"

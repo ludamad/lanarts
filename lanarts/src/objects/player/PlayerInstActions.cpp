@@ -6,6 +6,8 @@
 
 #include <lua.hpp>
 
+#include <luawrap/luawrap.h>
+
 #include <lcommon/strformat.h>
 
 #include "draw/draw_sprite.h"
@@ -408,7 +410,7 @@ static bool item_check_lua_prereq(lua_State* L, ItemEntry& type,
 
 	prereq.push();
 	luayaml_push_item(L, type.name.c_str());
-	lua_push_gameinst(L, user);
+	luawrap::push(L, user);
 	lua_call(L, 2, 1);
 
 	bool ret = lua_toboolean(L, lua_gettop(L));
@@ -421,7 +423,7 @@ static void item_do_lua_action(lua_State* L, ItemEntry& type, GameInst* user,
 	LuaValue& usefunc = type.inventory_use_func().get(L);
 	usefunc.push();
 	luayaml_push_item(L, type.name.c_str());
-	lua_push_gameinst(L, user);
+	luawrap::push(L, user);
 	lua_pushnumber(L, p.x);
 	lua_pushnumber(L, p.y);
 	lua_pushnumber(L, amnt);

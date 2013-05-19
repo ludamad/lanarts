@@ -8,6 +8,8 @@
 
 #include <lua.hpp>
 
+#include <luawrap/luawrap.h>
+
 #include "draw/colour_constants.h"
 #include "draw/SpriteEntry.h"
 #include "gamestate/GameState.h"
@@ -94,8 +96,8 @@ static void lua_hit_callback(lua_State* L, LuaValue& callback,
 		GameInst* target) {
 	if (!callback.empty()) {
 		callback.push();
-		lua_push_gameinst(L, projectile);
-		lua_push_gameinst(L, target);
+		luawrap::push(L, projectile);
+		luawrap::push(L, target);
 		lua_push_effectiveattackstats(L, atkstats);
 		lua_call(L, 3, 0);
 	}

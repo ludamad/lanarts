@@ -15,6 +15,7 @@
 #include "objects/enemy/MonsterController.h"
 #include "pathfind/WanderMap.h"
 
+#include "LuaDrawableQueue.h"
 #include "GameInstSet.h"
 
 #include "GameTiles.h"
@@ -76,6 +77,10 @@ public:
 		return _collision_avoidance;
 	}
 
+	LuaDrawableQueue& drawable_queue() {
+		return _drawable_queue;
+	}
+
 	WanderMap& wander_map() {
 		return _wander_map;
 	}
@@ -98,6 +103,8 @@ private:
 	MonsterController _monster_controller;
 	CollisionAvoidance _collision_avoidance;
 	WanderMap _wander_map;
+	/* Used to store dynamic drawable information */
+	LuaDrawableQueue _drawable_queue;
 
 	bool _is_simulation;
 };

@@ -1,309 +1,348 @@
-#include <cstring>
+/*
+ * lua_gameinst.cpp:
+ *  Representation of a GameInst in Lua.
+ */
 
+#include <lua.hpp>
+
+#include <lua_api/lua_newapi.h>
 #include <luawrap/luawrap.h>
+#include <luawrap/members.h>
 
 #include "data/lua_game_data.h"
-#include "gamestate/GameState.h"
-#include "objects/enemy/EnemyInst.h"
 
-#include "objects/player/PlayerInst.h"
+#include "gamestate/GameState.h"
 
 #include "objects/GameInst.h"
-#include "stats/effect_data.h"
-#include "stats/items/ItemEntry.h"
-#include "stats/stats.h"
+#include "objects/enemy/EnemyInst.h"
+#include "objects/player/PlayerInst.h"
+#include "objects/CombatGameInst.h"
 
 #include "lua_api.h"
-#include "lunar.h"
+#include "lua_gameinst.h"
 
-class GameInstLuaBinding {
-public:
-	static const char className[];
-	static Lunar<GameInstLuaBinding>::RegType methods[];
-
-	GameInstLuaBinding(GameInst* inst) :
-			inst(inst) {
-	}
-
-	GameInst* get_inst() {
-		return inst.get();
-	}
-
-	CombatGameInst* get_combat_inst() {
-		CombatGameInst* combat_inst = dynamic_cast<CombatGameInst*>(get_inst());
-		return combat_inst;
-	}
-	CombatStats* get_stats() {
-		CombatGameInst* combat_inst = get_combat_inst();
-		if (combat_inst != NULL) {
-			return &combat_inst->stats();
-		} else {
-			return NULL;
-		}
-	}
-	int heal_fully(lua_State* L) {
-		get_stats()->core.heal_fully();
-		return 0;
-	}
-	int direct_damage(lua_State* L) {
-		get_combat_inst()->damage(lua_api::gamestate(L), lua_tonumber(L, 1));
-		return 0;
-	}
-	int damage(lua_State* L) {
-		GameState* gs = lua_api::gamestate(L);
-		EffectiveAttackStats attack;
-		int nargs = lua_gettop(L);
-		attack.damage = round(lua_tointeger(L, 1));
-		attack.power = round(lua_tointeger(L, 2));
-		attack.magic_percentage = nargs >= 3 ? lua_tonumber(L, 3) : 1.0f;
-		attack.resist_modifier = nargs >= 4 ? lua_tonumber(L, 4) : 1.0f;
-
-		get_combat_inst()->damage(lua_api::gamestate(L), attack);
-		return 0;
-	}
-	int melee(lua_State* L) {
-		CombatGameInst* attacker_inst = get_combat_inst();
-		CombatGameInst* attacked_inst = dynamic_cast<CombatGameInst*>(luawrap::get<GameInst*>(L, 1));
-		Weapon w = attacker_inst->equipment().weapon();
-		bool dead = attacker_inst->melee_attack(lua_api::gamestate(L), attacked_inst, w, true);
-		lua_pushboolean(L, dead);
-		return 1;
-	}
-	int add_effect(lua_State* L) {
-		CombatGameInst* combatinst;
-		if ((combatinst = dynamic_cast<CombatGameInst*>(get_inst()))) {
-			LuaValue effect = combatinst->effects().add(lua_api::gamestate(L),
-					combatinst, effect_from_lua(L, 1), lua_tointeger(L, 2));
-			effect.push();
-		} else {
-			lua_pushnil(L);
-		}
-
-		return 1;
-	}
-	int reset_rest_cooldown(lua_State* L) {
-		PlayerInst* p = dynamic_cast<PlayerInst*>(inst.get());
-		if (p) {
-			p->cooldowns().reset_rest_cooldown(REST_COOLDOWN);
-		}
-		return 0;
-	}
-	int is_local_player(lua_State* L) {
-		PlayerInst* p = dynamic_cast<PlayerInst*>(inst.get());
-		if (p) {
-			lua_pushboolean(L, p->is_local_player());
-		} else {
-			lua_pushboolean(L, false);
-		}
-		return 1;
-	}
-
-	int has_effect(lua_State* L) {
-		CombatGameInst* combatinst;
-		if ((combatinst = dynamic_cast<CombatGameInst*>(get_inst()))) {
-			lua_pushboolean(L,
-					combatinst->effects().get(effect_from_lua(L, 1)) != NULL);
-		} else {
-			lua_pushnil(L);
-		}
-
-		return 1;
-	}
-	int move_to(lua_State* L) {
-		inst->update_position(lua_tonumber(L, 1), lua_tonumber(L, 2));
-		return 0;
-	}
-	int heal_hp(lua_State* L) {
-		CombatGameInst* cinst = get_combat_inst();
-		CoreStats& core = cinst->core_stats();
-		CoreStats& ecore = cinst->effective_stats().core;
-		core.heal_hp(lua_tointeger(L, 1), ecore.max_hp);
-		ecore.hp = core.hp;
-		return 0;
-	}
-	int heal_mp(lua_State* L) {
-		CombatGameInst* cinst = get_combat_inst();
-		CoreStats& core = cinst->core_stats();
-		CoreStats& ecore = cinst->effective_stats().core;
-		core.heal_mp(lua_tointeger(L, 1), ecore.max_mp);
-		ecore.mp = core.mp;
-		return 0;
-	}
-private:
-	GameInstRef inst;
-};
-
-typedef GameInstLuaBinding bind_t;
-typedef Lunar<GameInstLuaBinding> lunar_t;
-typedef lunar_t::RegType meth_t;
-#define LUA_DEF(m) meth_t(#m, &bind_t:: m)
-
-GameInst* lua_gameinst_arg(lua_State* L, int narg) {
-	bind_t* bind = lunar_t::check(L, narg);
-	return bind->get_inst();
+/* Methods */
+static void lapi_combatgameinst_heal_fully(CombatGameInst* inst) {
+	inst->stats().core.heal_fully();
 }
 
-#define IFLUA_NUM_MEMB_LOOKUP(n, m) \
-	if (strncmp(cstr, n, sizeof(n))==0){\
-	lua_pushnumber(L, m );\
-}
-#define IFLUA_STATS_MEMB_LOOKUP(n, m) \
-	if (strncmp(cstr, n, sizeof(n))==0){\
-	lua_push_combatstats(L, m );\
+static void lapi_combatgameinst_direct_damage(LuaStackValue inst, double amount) {
+	inst.as<CombatGameInst*>()->damage(lua_api::gamestate(inst), amount);
 }
 
-static void push_inst_name(lua_State* L, GameInst* inst) {
+static int lapi_combatgameinst_damage(lua_State* L) {
+	using namespace luawrap;
 	GameState* gs = lua_api::gamestate(L);
-	PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
-	if (p) {
-		std::vector<PlayerDataEntry>& players = gs->player_data().all_players();
-		for (int i = 0; i < players.size(); i++) {
-			if (players[i].player_inst.get() == p) {
-				const std::string& name = players[i].player_name;
-				lua_pushlstring(L, name.c_str(), name.size());
-			}
-		}
-	} else {
-		EnemyInst* e = dynamic_cast<EnemyInst*>(inst);
-		if (e) {
-			std::string& name = e->etype().name;
-			lua_pushlstring(L, name.c_str(), name.size());
-		} else {
-			lua_pushnil(L);
-		}
-	}
+	EffectiveAttackStats attack;
+	int nargs = lua_gettop(L);
+	attack.damage = round(lua_tointeger(L, 2));
+	attack.power = round(lua_tointeger(L, 3));
+	attack.magic_percentage = nargs >= 4 ? lua_tonumber(L, 4) : 1.0f;
+	attack.resist_modifier = nargs >= 5 ? lua_tonumber(L, 5) : 1.0f;
+
+	get<CombatGameInst*>(L, 1)->damage(lua_api::gamestate(L), attack);
+	return 0;
 }
 
-static int lua_member_lookup(lua_State* L) {
-	bind_t* state = lunar_t::check(L, 1);
-	const char* cstr = lua_tostring(L, 2);
-
-	GameInst* inst = state->get_inst();
-	EnemyInst* enemyinst = dynamic_cast<EnemyInst*>(inst);
-
-	IFLUA_NUM_MEMB_LOOKUP("x", inst->x)
-	else IFLUA_NUM_MEMB_LOOKUP("y", inst->y)
-	else IFLUA_NUM_MEMB_LOOKUP("id", inst->id)
-	else IFLUA_NUM_MEMB_LOOKUP("radius", inst->radius)
-	else IFLUA_NUM_MEMB_LOOKUP("target_radius", inst->target_radius)
-	else IFLUA_NUM_MEMB_LOOKUP("floor", inst->current_floor)
-	else IFLUA_STATS_MEMB_LOOKUP("stats", inst)
-	else if (strcmp(cstr, "spells") == 0) {
-		PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
-		luawrap::push(L, p->stats().spells.spell_id_list());
-	} else if (strcmp(cstr, "class_name") == 0) {
-		PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
-		luawrap::push(L, p->class_stats().class_entry().name);
-	}else if (strcmp(cstr, "kills") == 0) {
-		PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
-		lua_pushnumber(L, p ? p->score_stats().kills : 0);
-	} else if (strcmp(cstr, "deepest_floor") == 0) {
-		PlayerInst* p = dynamic_cast<PlayerInst*>(inst);
-		lua_pushnumber(L, p ? p->score_stats().deepest_floor : 0);
-	} else if (strcmp(cstr, "name") == 0) {
-		push_inst_name(L, inst);
-	} else if (strcmp(cstr, "unique") == 0 && enemyinst != NULL){
-		lua_pushboolean(L, enemyinst->etype().unique);
-	} else {
-		lua_getglobal(L, bind_t::className);
-		int tableind = lua_gettop(L);
-		lua_pushvalue(L, 2);
-		lua_gettable(L, tableind);
-		lua_replace(L, tableind);
-		if (lua_isnil(L, -1)) {
-			lua_pop(L, 1);
-
-			if (!inst->lua_variables.empty()) {
-				inst->lua_variables.push();
-				tableind = lua_gettop(L);
-				lua_pushvalue(L, 2);
-				lua_gettable(L, tableind);
-				lua_replace(L, tableind);
-			}
-		}
-	}
-	return 1;
+static bool lapi_combatgameinst_melee(LuaStackValue attacker, CombatGameInst* victim) {
+	Weapon w = attacker.as<CombatGameInst*>()->equipment().weapon();
+	return attacker.as<CombatGameInst*>()->melee_attack(lua_api::gamestate(attacker), victim, w, true);
 }
-static int lua_member_update(lua_State* L) {
-#define IFLUA_NUM_MEMB_UPDATE(n, m) \
-		if (strncmp(cstr, n, sizeof(n))==0){\
-			m = lua_tonumber(L, 3 );\
-	}
 
-	bind_t* state = lunar_t::check(L, 1);
-	GameInst* inst = state->get_inst();
-	CombatGameInst* combatinst = state->get_combat_inst();
-	const char* cstr = lua_tostring(L, 2);
+static int lapi_combatgameinst_add_effect(lua_State* L) {
+	CombatGameInst* combatinst = luawrap::get<CombatGameInst*>(L, 1);
+	LuaValue effect = combatinst->effects().add(lua_api::gamestate(L),
+			combatinst, effect_from_lua(L, 2), lua_tointeger(L, 3));
+	effect.push();
 
-	bool had_member = true;
-	if (strcmp(cstr, "x") == 0) {
-		inst->x = lua_tonumber(L, 3 );
-		if (combatinst) {
-			combatinst->update_position(lua_tonumber(L, 3 ), combatinst->ry);
-		}
-	} else if (strcmp(cstr, "y") == 0) {
-		inst->y = lua_tonumber(L, 3 );
-		if (combatinst) {
-			combatinst->update_position(combatinst->rx, lua_tonumber(L, 3 ));
-		}
-	} else if (combatinst) {
-		IFLUA_NUM_MEMB_UPDATE("vx", combatinst->vx)
-		else IFLUA_NUM_MEMB_UPDATE("vy", combatinst->vy)
-		else
-			had_member = false;
-	}
-	if (!had_member) {
-		LuaValue& vars = inst->lua_variables;
-		if (vars.empty()) {
-			vars.init(L);
-			vars.newtable();
-		}
-		vars.push();
-		int tableind = lua_gettop(L);
-		lua_pushvalue(L, 2);
-		lua_pushvalue(L, 3);
-		lua_settable(L, tableind);
-		lua_replace(L, tableind);
-	}
 	return 1;
 }
 
-meth_t bind_t::methods[] = { LUA_DEF(heal_fully), LUA_DEF(move_to),
-		LUA_DEF(heal_hp), LUA_DEF(heal_mp), LUA_DEF(direct_damage),
-		LUA_DEF(damage), LUA_DEF(add_effect), LUA_DEF(has_effect),
-		LUA_DEF(is_local_player), LUA_DEF(melee),
-		LUA_DEF(reset_rest_cooldown), meth_t(0, 0) };
 
-void lua_gameinst_bindings(GameState* gs, lua_State* L) {
-	lunar_t::Register(L);
-
-	luaL_getmetatable(L, bind_t::className);
-//
-	int tableind = lua_gettop(L);
-
-	lua_pushstring(L, "__index");
-	lua_pushcfunction(L, lua_member_lookup);
-	lua_settable(L, tableind);
-
-	lua_pushstring(L, "__newindex");
-	lua_pushcfunction(L, lua_member_update);
-	lua_settable(L, tableind);
+static void lapi_playerinst_reset_rest_cooldown(PlayerInst* inst) {
+	inst->cooldowns().reset_rest_cooldown(REST_COOLDOWN);
 }
 
-void lua_push_gameinst(lua_State* L, GameInst* inst) {
-	if (inst == NULL) {
+static bool lapi_playerinst_is_local_player(PlayerInst* inst) {
+	return inst->is_local_player();
+}
+
+static int lapi_combatgameinst_has_effect(lua_State* L) {
+	CombatGameInst* combatinst = (CombatGameInst*)luawrap::get<GameInst*>(L, 1);
+	lua_pushboolean(L, combatinst->effects().get(effect_from_lua(L, 2)) != NULL);
+
+	return 1;
+}
+
+static void lapi_combatgameinst_heal_hp(CombatGameInst* inst, int hp) {
+	CoreStats& core = inst->core_stats();
+	CoreStats& ecore = inst->effective_stats().core;
+	core.heal_hp(hp, ecore.max_hp);
+	ecore.hp = core.hp;
+}
+
+static void lapi_combatgameinst_heal_mp(CombatGameInst* inst, int mp) {
+	CoreStats& core = inst->core_stats();
+	CoreStats& ecore = inst->effective_stats().core;
+	core.heal_mp(mp, ecore.max_mp);
+	ecore.mp = core.mp;
+}
+
+/* Getters/setters*/
+static void lapi_gameinst_set_x(GameInst* inst, LuaStackValue field,  double x) {
+	inst->update_position(x, inst->y);
+}
+static void lapi_gameinst_set_y(GameInst* inst, LuaStackValue field, double y) {
+	inst->update_position(inst->x, y);
+}
+
+static void lapi_gameinst_set_xy(GameInst* inst, LuaStackValue field, const PosF& position) {
+	inst->update_position(position.x, position.y);
+}
+static void lapi_gameinst_step(LuaStackValue inst) {
+	inst.as<GameInst*>()->step(lua_api::gamestate(inst));
+}
+static void lapi_gameinst_draw(LuaStackValue inst) {
+	inst.as<GameInst*>()->draw(lua_api::gamestate(inst));
+}
+static Pos lapi_gameinst_xy(LuaStackValue inst) {
+	return inst.as<GameInst*>()->pos();
+}
+
+static int lapi_gameinst_stats(lua_State* L) {
+	lua_push_combatstats(L, luawrap::get<GameInst*>(L, 1));
+	return 1;
+}
+
+static std::string lapi_playerinst_name(LuaStackValue inst) {
+	std::vector<PlayerDataEntry>& players = lua_api::gamestate(inst)->player_data().all_players();
+	for (int i = 0; i < players.size(); i++) {
+		if (players[i].player_inst.get() == inst.as<PlayerInst*>()) {
+			return players[i].player_name;
+		}
+	}
+	return std::string(); // Failed
+}
+
+static std::string lapi_playerinst_class_name(PlayerInst* inst) {
+	return inst->class_stats().class_entry().name;
+}
+
+static std::vector<spell_id> lapi_playerinst_spells(PlayerInst* inst) {
+	return inst->stats().spells.spell_id_list();
+}
+
+static int lapi_playerinst_kills(LuaStackValue inst) {
+	return inst.as<PlayerInst*>()->score_stats().kills;
+}
+
+static int lapi_playerinst_deepest_floor(PlayerInst* inst) {
+	return inst->score_stats().deepest_floor;
+}
+
+static int lapi_playerinst_deaths(PlayerInst* inst) {
+	return inst->score_stats().deaths;
+}
+
+static std::string lapi_enemyinst_name(EnemyInst* inst) {
+	return inst->etype().name;
+}
+
+static bool lapi_enemyinst_unique(EnemyInst* inst) {
+	return inst->etype().unique;
+}
+
+static int lapi_gameinst_getter_fallback(lua_State* L) {
+	LuaValue& variables = luawrap::get<GameInst*>(L, 1)->lua_variables;
+	printf("Getting '%s'\n", lua_tostring(L, 2));
+	if (variables.empty()) {
 		lua_pushnil(L);
 	} else {
-		lunar_t::push(L, new bind_t(inst), true);
+		variables.push();
+		lua_pushvalue(L, 2);
+		lua_gettable(L, -2);
+	}
+	return 1;
+}
+
+static int lapi_gameinst_setter_fallback(lua_State* L) {
+	LuaValue& variables = luawrap::get<GameInst*>(L, 1)->lua_variables;
+	if (variables.empty()) {
+		variables.init(L);
+		variables.newtable();
+	}
+	variables.push();
+	lua_pushvalue(L, 2);
+	lua_pushvalue(L, 3);
+	lua_settable(L, -3);
+	return 1;
+}
+
+static LuaValue lua_gameinst_base_metatable(lua_State* L) {
+	using namespace luawrap;
+
+	LuaValue meta = luameta_new(L, "Font");
+	meta["__isgameinst"] = true;
+	LuaValue methods = luameta_constants(meta), getters = luameta_getters(meta), setters = luameta_setters(meta);
+
+	lua_pushcfunction(L, &lapi_gameinst_getter_fallback);
+	luameta_defaultgetter(meta, LuaStackValue(L, -1));
+	lua_pop(L, 1);
+
+	lua_pushcfunction(L, &lapi_gameinst_setter_fallback);
+	luameta_defaultsetter(meta, LuaStackValue(L, -1));
+	lua_pop(L, 1);
+
+	bind_getter(getters["x"], &GameInst::x);
+	bind_getter(getters["y"], &GameInst::y);
+	bind_getter(getters["id"], &GameInst::y);
+	bind_getter(getters["depth"], &GameInst::depth);
+	bind_getter(getters["radius"], &GameInst::radius);
+	bind_getter(getters["target_radius"], &GameInst::target_radius);
+	bind_getter(getters["floor"], &GameInst::current_floor);
+
+	getters["xy"].bind_function(lapi_gameinst_xy);
+	getters["stats"].bind_function(lapi_gameinst_stats);
+
+	setters["x"].bind_function(lapi_gameinst_set_x);
+	setters["y"].bind_function(lapi_gameinst_set_y);
+	setters["xy"].bind_function(lapi_gameinst_set_xy);
+
+	methods["step"].bind_function(lapi_gameinst_step);
+	methods["draw"].bind_function(lapi_gameinst_draw);
+
+	return meta;
+}
+
+static LuaValue lua_combatgameinst_metatable(lua_State* L) {
+	LuaValue meta = lua_gameinst_base_metatable(L);
+	LuaValue methods = luameta_constants(meta), getters = luameta_getters(meta), setters = luameta_setters(meta);
+
+	luawrap::bind_getter(getters["vx"], &CombatGameInst::vx);
+	luawrap::bind_getter(getters["vy"], &CombatGameInst::vy);
+
+	methods["heal_fully"].bind_function(lapi_combatgameinst_heal_fully);
+	methods["damage"].bind_function(lapi_combatgameinst_damage);
+	methods["direct_damage"].bind_function(lapi_combatgameinst_direct_damage);
+	methods["melee"].bind_function(lapi_combatgameinst_melee);
+	methods["heal_hp"].bind_function(lapi_combatgameinst_heal_hp);
+	methods["heal_mp"].bind_function(lapi_combatgameinst_heal_mp);
+
+	methods["add_effect"].bind_function(lapi_combatgameinst_add_effect);
+	methods["has_effect"].bind_function(lapi_combatgameinst_has_effect);
+
+	return meta;
+}
+
+static LuaValue lua_enemyinst_metatable(lua_State* L) {
+	LuaValue meta = lua_combatgameinst_metatable(L);
+	LuaValue methods = luameta_constants(meta), getters = luameta_getters(meta), setters = luameta_setters(meta);
+
+	getters["name"].bind_function(lapi_enemyinst_name);
+	getters["unique"].bind_function(lapi_enemyinst_unique);
+
+	return meta;
+}
+
+static LuaValue lua_playerinst_metatable(lua_State* L) {
+	LuaValue meta = lua_combatgameinst_metatable(L);
+	LuaValue methods = luameta_constants(meta), getters = luameta_getters(meta), setters = luameta_setters(meta);
+
+	getters["name"].bind_function(lapi_playerinst_name);
+	getters["class_name"].bind_function(lapi_playerinst_class_name);
+	getters["kills"].bind_function(lapi_playerinst_kills);
+	getters["deepest_floor"].bind_function(lapi_playerinst_deepest_floor);
+	getters["deaths"].bind_function(lapi_playerinst_deaths);
+	getters["spells"].bind_function(lapi_playerinst_spells);
+
+	methods["is_local_player"].bind_function(lapi_playerinst_is_local_player);
+	methods["reset_rest_cooldown"].bind_function(lapi_playerinst_reset_rest_cooldown);
+	return meta;
+}
+
+static void lua_gameinst_push_metatable(lua_State* L, GameInst* inst) {
+	if (dynamic_cast<PlayerInst*>(inst)) {
+		luameta_push(L, &lua_playerinst_metatable);
+	} else if (dynamic_cast<EnemyInst*>(inst)) {
+		luameta_push(L, &lua_enemyinst_metatable);
+	} else if (dynamic_cast<CombatGameInst*>(inst)) {
+		luameta_push(L, &lua_combatgameinst_metatable);
+	} else {
+		luameta_push(L, &lua_gameinst_base_metatable);
 	}
 }
 
+/* Functions required by luawrap */
+
+/* For GameInst* */
+void lua_pushgameinst(lua_State* L, GameInst* inst) {
+	GameInst** lua_inst = (GameInst**) lua_newuserdata(L, sizeof(GameInst*));
+	*lua_inst = inst;
+	lua_gameinst_push_metatable(L, inst);
+	lua_setmetatable(L, -2);
+}
+
+GameInst* lua_getgameinst(lua_State* L, int idx) {
+	return *(GameInst**) lua_touserdata(L, idx);
+}
+
+bool lua_checkgameinst(lua_State* L, int idx) {
+	if (!lua_isuserdata(L, idx)) {
+		return false;
+	}
+	lua_getmetatable(L, idx);
+	if (lua_isnil(L, -1)) {
+		return false;
+	}
+	lua_getfield(L, -1, "__isgameinst");
+	bool isgameinst = !lua_isnil(L, -1);
+	lua_pop(L, 2);
+	return isgameinst;
+}
+
+/* For CombatGameInst* */
+void lua_pushcombatgameinst(lua_State* L, CombatGameInst* inst) {
+	lua_pushgameinst(L, inst);
+}
+
+CombatGameInst* lua_getcombatgameinst(lua_State* L, int idx) {
+	return *(CombatGameInst**) lua_touserdata(L, idx);
+}
+
+/* For EnemyInst* */
+void lua_pushenemyinst(lua_State* L, EnemyInst* inst) {
+	lua_pushgameinst(L, inst);
+}
+
+EnemyInst* lua_getenemyinst(lua_State* L, int idx) {
+	return *(EnemyInst**) lua_touserdata(L, idx);
+}
+
+/* For PlayerInst* */
+void lua_pushplayerinst(lua_State* L, PlayerInst* inst) {
+	lua_pushgameinst(L, inst);
+}
+
+PlayerInst* lua_getplayerinst(lua_State* L, int idx) {
+	return *(PlayerInst**) lua_touserdata(L, idx);
+}
+
+/* TODO: Deprecated */
 void lua_gameinst_callback(lua_State* L, LuaValue& value, GameInst* inst) {
 	if (value.empty())
 		return;
 	value.push();
-	lua_push_gameinst(L, inst);
+	luawrap::push(L, inst);
 	lua_call(L, 1, 0);
 }
 
-const char GameInstLuaBinding::className[] = "GameInst";
+void lua_register_gameinst(lua_State* L) {
+	luawrap::install_type<GameInst*, lua_pushgameinst, lua_getgameinst,
+			lua_checkgameinst>();
+	luawrap::install_type<CombatGameInst*, lua_pushcombatgameinst, lua_getcombatgameinst,
+			lua_checkgameinst>();
+	luawrap::install_type<PlayerInst*, lua_pushplayerinst, lua_getplayerinst,
+			lua_checkgameinst>();
+	luawrap::install_type<EnemyInst*, lua_pushenemyinst, lua_getenemyinst,
+			lua_checkgameinst>();
+}

@@ -3,12 +3,12 @@
  *  Query the state of the game world.
  */
 
+#include <SDL.h>
+
 #include <lua.hpp>
 #include <luawrap/luawrap.h>
 #include <luawrap/functions.h>
 #include <luawrap/types.h>
-
-#include <SDL.h>
 
 #include "gamestate/GameState.h"
 #include "gamestate/GameRoomState.h"
@@ -19,6 +19,7 @@
 #include "lua_newapi.h"
 
 #include "lua_api/lua_api.h"
+#include "lua_api/lua_gameinst.h"
 
 // Keep all documentation in doc/level.luadoc
 
@@ -120,7 +121,7 @@ static int room_monsters_list(lua_State* L) {
 static int room_monsters_seen(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	int narg = lua_gettop(L);
-	PlayerInst* p = narg >= 1 ? (PlayerInst*) lua_gameinst_arg(L, 1) : NULL;
+	PlayerInst* p = narg >= 1 ? luawrap::get<PlayerInst*>(L, 1) : NULL;
 	const std::vector<obj_id>& monsters =
 			gs->monster_controller().monster_ids();
 	lua_newtable(L);
@@ -130,7 +131,7 @@ static int room_monsters_seen(lua_State* L) {
 	for (int i = 0; i < monsters.size(); i++) {
 		GameInst* e = gs->get_instance(monsters[i]);
 		if (e && gs->object_visible_test(e, p, false)) {
-			lua_push_gameinst(L, e);
+			luawrap::push(L, e);
 			lua_rawseti(L, tableidx, valid++);
 		}
 	}
@@ -213,8 +214,7 @@ namespace lua_api {
 
 	void register_gameworld_api(lua_State* L) {
 		LuaValue globals = luawrap::globals(L);
-		luawrap::install_type<GameInst*, lua_push_gameinst, lua_gameinst_arg,
-				temporary_isgameinst>();
+		lua_register_gameinst(L);
 
 		register_gameworld_getters(L, luawrap::ensure_table(globals["World"]));
 

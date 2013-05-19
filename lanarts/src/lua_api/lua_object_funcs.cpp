@@ -6,6 +6,8 @@
 
 #include <lua.hpp>
 
+#include <luawrap/luawrap.h>
+
 #include "data/lua_game_data.h"
 
 #include "draw/colour_constants.h"
@@ -25,7 +27,7 @@ static int players_in_level(lua_State* L) {
 	lua_createtable(L, 0, 0);
 	int table = lua_gettop(L);
 	for (int i = 0; i < players.size(); i++) {
-		lua_push_gameinst(L, players[i]);
+		luawrap::push(L, players[i]);
 		//  lua_pushnumber(L, 2);
 		lua_rawseti(L, table, i + 1);
 	}
@@ -43,7 +45,7 @@ static int monsters_in_level(lua_State* L) {
 	for (int i = 0; i < monsters.size(); i++) {
 		GameInst* e = gs->get_instance(monsters[i]);
 		if (e) {
-			lua_push_gameinst(L, e);
+			luawrap::push(L, e);
 			lua_rawseti(L, tableidx, valid++);
 		}
 	}
@@ -55,7 +57,7 @@ static int monsters_in_level(lua_State* L) {
 static int monsters_seen(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	int narg = lua_gettop(L);
-	PlayerInst* p = narg >= 1 ? (PlayerInst*) lua_gameinst_arg(L, 1) : NULL;
+	PlayerInst* p = narg >= 1 ? luawrap::get<PlayerInst*>(L, 1) : NULL;
 	const std::vector<obj_id>& monsters =
 			gs->monster_controller().monster_ids();
 	lua_newtable(L);
@@ -65,7 +67,7 @@ static int monsters_seen(lua_State* L) {
 	for (int i = 0; i < monsters.size(); i++) {
 		GameInst* e = gs->get_instance(monsters[i]);
 		if (e && gs->object_visible_test(e, p, false)) {
-			lua_push_gameinst(L, e);
+			luawrap::push(L, e);
 			lua_rawseti(L, tableidx, valid++);
 		}
 	}
@@ -83,7 +85,7 @@ static int obj_to_exit(lua_State* L) {
 
 	GameState* gs = lua_api::gamestate(L);
 	GameRoomState* level = gs->get_level();
-	GameInst* user = lua_gameinst_arg(L, 1);
+	GameInst* user = luawrap::get<GameInst*>(L, 1);
 	MTwist& mt = gs->rng();
 	int nexits = level->exits.size();
 	if (nexits == 0) {

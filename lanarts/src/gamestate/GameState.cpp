@@ -347,6 +347,20 @@ void GameState::adjust_view_to_dragging() {
 	}
 	dragging_view = is_dragged;
 }
+
+static void lua_drawables_draw_below_depth(LuaDrawableQueue::Iterator iter, int depth) {
+	for (; !iter.is_done() && iter.get_current_depth() < depth; iter.fetch_next()) {
+		iter.draw_current();
+	}
+}
+
+static void lua_drawables_draw_rest(LuaDrawableQueue::Iterator iter) {
+	for (; !iter.is_done(); iter.fetch_next()) {
+		iter.draw_current();
+	}
+}
+
+
 void GameState::draw(bool drawhud) {
 	perf_timer_begin(FUNCNAME);
 
@@ -367,9 +381,13 @@ void GameState::draw(bool drawhud) {
 	get_level()->tiles().pre_draw(this);
 
 	std::vector<GameInst*> safe_copy = get_level()->game_inst_set().to_vector();
+	LuaDrawableQueue::Iterator lua_drawables = get_level()->drawable_queue();
+
 	for (size_t i = 0; i < safe_copy.size(); i++) {
+		lua_drawables_draw_below_depth(lua_drawables, safe_copy[i]->depth);
 		safe_copy[i]->draw(this);
 	}
+	lua_drawables_draw_rest(lua_drawables);
 
 	lua_api::luacall_post_draw(L);
 

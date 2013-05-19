@@ -146,4 +146,5 @@ void lua_push_combatstats(lua_State* L, const CombatStats& stats) {
 CombatStats& lua_get_combatstats(lua_State* L, int idx) {
 	return *lunar_t::check(L, idx)->get_stats(L);
 }
+
 const char CombatStatsLuaBinding::className[] = "CombatStats";

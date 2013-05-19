@@ -81,7 +81,7 @@ function Blink.prereq_func(caster, x, y)
 end
 
 function Blink.action_func(caster, x, y)
-    caster:move_to(x,y)
+    caster.xy = {x,y}
 end
 
 Data.spell_create(Blink)

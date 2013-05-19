@@ -5,6 +5,8 @@
 
 #include <lua.hpp>
 
+#include <luawrap/luawrap.h>
+
 #include "data/lua_game_data.h"
 
 #include "gamestate/GameState.h"
@@ -19,7 +21,7 @@
 // Take arguments: caster, target; returns x, y
 static int spell_choose_safest_square(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
-	PlayerInst* inst = dynamic_cast<PlayerInst*>(lua_gameinst_arg(L, 1));
+	PlayerInst* inst = luawrap::get<PlayerInst*>(L, 1);
 	//CombatGameInst* target = dynamic_cast<CombatGameInst*>(lua_gameinst_arg(L, 2));
 	Pos p;
 	if (!lua_isnil(L, 2) && find_safest_square(inst, gs, p)) {
@@ -37,8 +39,7 @@ static int spell_choose_target(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	//PlayerInst* inst = dynamic_cast<PlayerInst*>(lua_gameinst_arg(L, 1));
 	if (!lua_isnil(L, 2)) {
-		CombatGameInst* target = dynamic_cast<CombatGameInst*>(lua_gameinst_arg(
-				L, 2));
+		CombatGameInst* target = dynamic_cast<CombatGameInst*>(luawrap::get<GameInst*>(L, 2));
 		if (target) {
 			lua_pushnumber(L, target->x);
 			lua_pushnumber(L, target->y);

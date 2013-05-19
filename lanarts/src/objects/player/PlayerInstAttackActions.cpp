@@ -5,6 +5,8 @@
 
 #include <lua.hpp>
 
+#include <luawrap/luawrap.h>
+
 #include "data/game_data.h"
 #include "draw/colour_constants.h"
 #include "draw/draw_sprite.h"
@@ -187,11 +189,11 @@ static bool lua_spell_get_target(GameState* gs, PlayerInst* p, LuaValue& action,
 
 	int beforecall_idx = lua_gettop(L);
 	action.push();
-	lua_push_gameinst(L, p);
+	luawrap::push(L, p);
 	if (!target) {
 		lua_pushnil(L);
 	} else {
-		lua_push_gameinst(L, target);
+		luawrap::push(L, target);
 	}
 
 	// Allow for multiple return values
@@ -215,7 +217,7 @@ static void player_use_luacallback_spell(GameState* gs, PlayerInst* p,
 		SpellEntry& spl_entry, LuaValue& action, const Pos& target) {
 	lua_State* L = gs->luastate();
 	action.push();
-	lua_push_gameinst(L, p);
+	luawrap::push(L, p);
 	lua_pushnumber(L, target.x);
 	lua_pushnumber(L, target.y);
 	lua_call(L, 3, 0);
@@ -228,7 +230,7 @@ static bool lua_spell_check_prereq(GameState* gs, PlayerInst* p,
 
 	if (!action.empty()) {
 		action.push();
-		lua_push_gameinst(L, p);
+		luawrap::push(L, p);
 		lua_pushnumber(L, target.x);
 		lua_pushnumber(L, target.y);
 		lua_call(L, 3, 1);
@@ -520,8 +522,8 @@ static void lua_hit_callback(lua_State* L, LuaValue& callback, GameInst* user,
 		GameInst* target) {
 	if (!callback.empty()) {
 		callback.push();
-		lua_push_gameinst(L, user);
-		lua_push_gameinst(L, target);
+		luawrap::push(L, user);
+		luawrap::push(L, target);
 		lua_call(L, 2, 0);
 	}
 }

@@ -50,7 +50,6 @@ public:
 
 	void initialize(const BoolGridRef& solidity, const Size& size,
 			const Size& division_size = Size(10, 10));
-
 			// Returns a reference from the Cache
 			const std::vector<Pos>& candidates(const Pos& xy,
 			WanderDirection direction);
