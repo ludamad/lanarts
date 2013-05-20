@@ -1,3 +1,6 @@
+#ifndef SERVERCONNECTION_H_
+#define SERVERCONNECTION_H_
+
 #include <udt/udt.h>
 #include <udt/epoll.h>
 
@@ -33,3 +36,5 @@ private:
 
 	SYSSOCKET _poller;
 };
+
+#endif

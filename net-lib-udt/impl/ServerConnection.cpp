@@ -33,20 +33,27 @@ void ServerConnection::initialize_connection() {
 	if (!udt_initialize_connection(_server_socket, _port)) {
 		return; //TODO return boolean
 	}
+
+	UDT::epoll_add_usock(_poller, _server_socket);
 }
 
 bool ServerConnection::_accept_connection() {
-	//			printf("ServerConnect::poll: new client connection\n");
 	sockaddr_storage clientaddr;
 	int addrlen = sizeof(clientaddr);
+
+	/* Make sure we accept in non-blocking mode */
 	bool block = false;
-	UDT::setsockopt(_server_socket, 0, UDT_SNDSYN, &block, sizeof(bool));
+	UDT::setsockopt(_server_socket, 0, UDT_RCVSYN, &block, sizeof(bool));
 	UDTSOCKET client_socket = UDT::accept(_server_socket,
 			(sockaddr*) &clientaddr, &addrlen);
 	block = true;
-	UDT::setsockopt(_server_socket, 0, UDT_SNDSYN, &block, sizeof(bool));
+	UDT::setsockopt(_server_socket, 0, UDT_RCVSYN, &block, sizeof(bool));
 
 	if (client_socket == UDT::INVALID_SOCK) {
+		if (UDT::getlasterror().getErrorCode() != CUDTException::EASYNCRCV) {
+			fprintf(stderr, "Accepting socket got error %s\n",
+					UDT::getlasterror().getErrorMessage());
+		}
 		// No sockets to connect to
 		return false;
 	}
@@ -59,6 +66,7 @@ bool ServerConnection::_accept_connection() {
 		UDT::epoll_add_usock(_poller, client_socket);
 		_socket_list.push_back(client_socket);
 	}
+	printf("Got a connection in accept_connection\n");
 	return true;
 }
 
@@ -76,19 +84,27 @@ bool ServerConnection::poll(packet_recv_callback message_handler, void* context,
 		int nready = UDT::epoll_wait(_poller, &sockets_to_read, NULL, timeout);
 		timeout = 0; // Don't wait again on repeated checks
 
-		if (nready < 0) {
-			fprintf(stderr, "Error: UDT::epoll_wait reported error code %d\n",
-					-nready);
-			return false;
+		if (nready == UDT::ERROR) {
+			if (UDT::getlasterror().getErrorCode()
+					!= CUDTException::EASYNCRCV) {
+				fprintf(stderr, "Error: UDT::epoll_wait reported error %s\n",
+						UDT::getlasterror().getErrorMessage());
+			}
+			break;
 		} else if (nready == 0) {
 			break;
 		}
 
 		for (std::set<UDTSOCKET>::iterator sock_iter = sockets_to_read.begin();
 				sock_iter != sockets_to_read.end(); ++sock_iter) {
+
+			if (*sock_iter == _server_socket) {
+				continue;
+			}
+
 			std::vector<UDTSOCKET>::iterator it = std::find(
 					_socket_list.begin(), _socket_list.end(), *sock_iter);
-			LNET_ASSERT(it == _socket_list.end());
+			LNET_ASSERT(it != _socket_list.end());
 
 			size_t i = it - _socket_list.begin();
 
@@ -115,10 +131,7 @@ bool ServerConnection::poll(packet_recv_callback message_handler, void* context,
 				}
 			}
 		}
-
-		while (_accept_connection()) {
-			/* Accept connections until there are none left to accept */
-		}
+		_accept_connection();
 	}
 
 	return true;
@@ -151,8 +164,7 @@ void ServerConnection::_send_message(PacketBuffer& packet, receiver_t receiver,
 void ServerConnection::send_message(const char* msg, int len,
 		receiver_t receiver) {
 	if (_server_socket == -1) {
-		fprintf(
-				stderr,
+		fprintf(stderr,
 				"ServerConnection::send_message: Connection not initialized!\n");
 		fflush(stderr);
 		return;

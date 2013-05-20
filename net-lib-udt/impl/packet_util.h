@@ -59,6 +59,7 @@ inline bool read_n_bytes(UDTSOCKET socket, PacketBuffer& packet, int nbytes) {
 
 inline bool receive_packet(UDTSOCKET socket, PacketBuffer& packet,
 		receiver_t& receiver, receiver_t& sender) {
+	printf("Receiving packet\n");
 	packet.resize(HEADER_SIZE);
 
 	if (!read_n_bytes(socket, packet, HEADER_SIZE)) {

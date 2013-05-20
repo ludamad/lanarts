@@ -9,9 +9,11 @@
 #include <vector>
 #include <string>
 
+#include <SDL/SDL_thread.h>
+
 #include <lua.hpp>
 
-#include <net-lib/lanarts_net.h>
+#include <net-lib-udt/lanarts_net.h>
 
 #include <lcommon/unittest.h>
 
@@ -19,6 +21,16 @@
 
 #include "gamestate/PlayerData.h"
 #include "net/GameNetConnection.h"
+
+struct LanartsNetInitHelper {
+	LanartsNetInitHelper() {
+		lanarts_net_init(true);
+	}
+	~LanartsNetInitHelper() {
+		lanarts_net_quit();
+	}
+
+};
 
 SUITE(adv_net_unit_tests) {
 
@@ -28,7 +40,7 @@ SUITE(adv_net_unit_tests) {
 		GameStateInitData init;
 		PlayerData pd;
 		NetUpdatedState() :
-				conn(chat, pd, init) {
+						conn(chat, pd, init) {
 		}
 	};
 
@@ -47,7 +59,8 @@ SUITE(adv_net_unit_tests) {
 		CHECK(pdes[1].player_name == clientname1);
 		CHECK(pdes[2].player_name == clientname2);
 	}
-	static void test_initstate_helper(GameStateInitData& client_init, GameStateInitData& server_init) {
+	static void test_initstate_helper(GameStateInitData& client_init,
+			GameStateInitData& server_init) {
 		CHECK(client_init.received_init_data);
 		CHECK(client_init.seed == server_init.seed);
 		CHECK(client_init.network_debug_mode == server_init.network_debug_mode);
@@ -57,6 +70,7 @@ SUITE(adv_net_unit_tests) {
 
 	static void init_connections(NetUpdatedState& serverstate,
 			NetUpdatedState& client1state, NetUpdatedState& client2state) {
+
 		const int TEST_PORT = 6112;
 
 		const char* servername = "server";
@@ -95,6 +109,8 @@ SUITE(adv_net_unit_tests) {
 
 	}
 	TEST(test_net_connect_affirm) {
+		LanartsNetInitHelper lanarts_net_init_helper;
+
 		NetUpdatedState serverstate, client1state, client2state;
 		init_connections(serverstate, client1state, client2state);
 	}
@@ -130,6 +146,8 @@ SUITE(adv_net_unit_tests) {
 		test_net_actionqueue_assert(state.pd.all_players().at(2), a3, frame);
 	}
 	TEST(test_net_action_sending1) {
+		LanartsNetInitHelper lanarts_net_init_helper;
+
 		NetUpdatedState serverstate, client1state, client2state;
 		init_connections(serverstate, client1state, client2state);
 
@@ -156,6 +174,8 @@ SUITE(adv_net_unit_tests) {
 	}
 
 	TEST(test_net_action_sending2) {
+		LanartsNetInitHelper lanarts_net_init_helper;
+
 		NetUpdatedState serverstate, client1state, client2state;
 		init_connections(serverstate, client1state, client2state);
 

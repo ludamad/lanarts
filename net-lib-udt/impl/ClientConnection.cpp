@@ -39,10 +39,13 @@ bool ClientConnection::poll(packet_recv_callback message_handler, void* context,
 	while (true) {
 		int nready = UDT::epoll_wait(_poller, NULL, NULL, timeout);
 		timeout = 0; // Don't wait again on repeated checks
-		if (nready < 0) {
-			fprintf(stderr, "Error: UDT::epoll_wait reported error code %d\n",
-					-nready);
-			return false;
+
+		if (nready == UDT::ERROR) {
+			if (UDT::getlasterror().getErrorCode() != CUDTException::EASYNCRCV) {
+				fprintf(stderr, "Error: UDT::epoll_wait reported error %s\n",
+						UDT::getlasterror().getErrorMessage());
+			}
+			break;
 		} else if (nready == 0) {
 			break;
 		}

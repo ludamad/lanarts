@@ -114,8 +114,9 @@ set (libraries
 	lua
 	luasocket
 	luawrap
-	lanarts_net
+	lanarts_net_udt
 	yaml-cpp
+        udt
 	RVO
 	${OPENGL_gl_LIBRARY}
 	${SDLMIXER_LIBRARY}
