@@ -2,9 +2,9 @@
 username: User
 
 #Window settings
-fullscreen: no
-view_width: 640
-view_height: 480
+fullscreen: yes
+view_width: 1920
+view_height: 1080
 
 #Font settings
 font: res/fonts/Gudea-Regular.ttf

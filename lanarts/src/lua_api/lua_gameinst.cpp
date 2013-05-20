@@ -213,6 +213,11 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	return meta;
 }
 
+static int lapi_do_nothing(lua_State *L) {
+    (void) L;
+    return 0;
+}
+
 static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LuaValue meta = lua_gameinst_base_metatable(L);
 	LuaValue methods = luameta_constants(meta), getters = luameta_getters(meta), setters = luameta_setters(meta);
@@ -229,6 +234,8 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 
 	methods["add_effect"].bind_function(lapi_combatgameinst_add_effect);
 	methods["has_effect"].bind_function(lapi_combatgameinst_has_effect);
+
+	methods["reset_rest_cooldown"].bind_function(lapi_do_nothing);
 
 	return meta;
 }
