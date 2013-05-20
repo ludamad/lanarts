@@ -1,12 +1,5 @@
-/*
- * ServerConnection.h:
- *  Represents a connection made by a server to multiple clients
- */
-
-#ifndef SERVERCONNECTION_H_
-#define SERVERCONNECTION_H_
-
-#include <vector>
+#include <udt/udt.h>
+#include <udt/epoll.h>
 
 #include "../NetConnection.h"
 
@@ -26,19 +19,17 @@ public:
 			ALL_RECEIVERS);
 
 private:
+	bool _accept_connection();
 	void _send_message(PacketBuffer& packet, receiver_t receiver,
 			int originator);
+
 	int _port;
-	// Buffer for sending & receiving messages
-	PacketBuffer _packet_buffer;
-	// Maximum accepted connections
 	int _maximum_sockets;
 	// Whether we are currently accepting connections
 	bool _accepting_connections;
-	TCPsocket _server_socket;
-	// List of client sockets
-	std::vector<TCPsocket> _socket_list;
-	SDLNet_SocketSet _socket_set;
-};
+	PacketBuffer _packet_buffer;
+	UDTSOCKET _server_socket;
+	std::vector<UDTSOCKET> _socket_list;
 
-#endif /* SERVERCONNECTION_H_ */
+	SYSSOCKET _poller;
+};
