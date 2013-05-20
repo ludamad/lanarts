@@ -222,6 +222,7 @@ void net_send_game_init_data(GameNetConnection& net, PlayerData& pd,
 			sb.write_int(pde.classtype);
 			sb.write_int(pde.net_id);
 		}
+		printf("Sending to player %d\n", n);
 		net.send_packet(sb, net_id);
 	}
 }
@@ -437,10 +438,14 @@ bool GameNetConnection::poll_messages(int timeout) {
 				i--;
 			}
 		}
+		perf_timer_begin("*** NETWORK POLLING ***");
 		if (!_connection->poll(gamenetconnection_consume_message, (void*) this,
-				timeout)) {
+				50)) {
+
+			perf_timer_end("*** NETWORK POLLING ***");
 			return false;
 		}
+		perf_timer_end("*** NETWORK POLLING ***");
 	}
 	return true;
 }

@@ -712,10 +712,10 @@ int main()
    Test_Srv[3] = Test_4_Srv;
    Test_Cli[3] = Test_4_Cli;
 
+      UDT::startup();
    for (int i = 0; i < test_case; ++ i)
    {
       cout << "Start Test # " << i + 1 << endl;
-      UDT::startup();
 
 #ifndef WIN32
       pthread_t srv, cli;
@@ -731,9 +731,9 @@ int main()
       WaitForSingleObject(cli, INFINITE);
 #endif
 
-      UDT::cleanup();
       cout << "Test # " << i + 1 << " completed." << endl;
    }
 
+      UDT::cleanup();
    return 0;
 }

@@ -24,9 +24,20 @@ ServerConnection::ServerConnection(int port, int maximum_sockets) :
 	_server_socket = -1;
 	_poller = UDT::epoll_create();
 }
+static void complaining_close(UDTSOCKET socket) {
+	if (UDT::close(socket) == UDT::ERROR) {
+		fprintf(stderr, "Closing socket %d got error %s\n",
+				socket, UDT::getlasterror().getErrorMessage());
+	}
+}
 
 ServerConnection::~ServerConnection() {
-	UDT::close(_server_socket);
+	for (int i = 0; i < _socket_list.size(); i++) {
+		complaining_close(_socket_list[i]);
+		UDT::epoll_remove_usock(_poller, _socket_list[i]);
+	}
+	complaining_close(_server_socket);
+	UDT::epoll_release(_poller);
 }
 
 void ServerConnection::initialize_connection() {
@@ -66,7 +77,7 @@ bool ServerConnection::_accept_connection() {
 		UDT::epoll_add_usock(_poller, client_socket);
 		_socket_list.push_back(client_socket);
 	}
-	printf("Got a connection in accept_connection\n");
+	printf("Accepted a connection\n");
 	return true;
 }
 
@@ -85,10 +96,10 @@ bool ServerConnection::poll(packet_recv_callback message_handler, void* context,
 		timeout = 0; // Don't wait again on repeated checks
 
 		if (nready == UDT::ERROR) {
-			if (UDT::getlasterror().getErrorCode()
-					!= CUDTException::EASYNCRCV) {
-				fprintf(stderr, "Error: UDT::epoll_wait reported error %s\n",
-						UDT::getlasterror().getErrorMessage());
+			if (UDT::getlasterror().getErrorCode() != CUDTException::ETIMEOUT) {
+				fprintf(stderr, "Error: UDT::epoll_wait reported error %s %d\n",
+						UDT::getlasterror().getErrorMessage(),
+						UDT::getlasterror().getErrorCode());
 			}
 			break;
 		} else if (nready == 0) {
@@ -115,11 +126,6 @@ bool ServerConnection::poll(packet_recv_callback message_handler, void* context,
 			}
 
 			if (!_packet_buffer.empty()) {
-				// Rebroadcast to clients
-				// <TEMP>
-				printf("Rebroadcasting message to %d from %d\n", receiver,
-						i + 1);
-				// </TEMP>
 				_send_message(_packet_buffer, receiver, receiver_t(i + 1));
 
 				if (receiver == ALL_RECEIVERS || receiver == SERVER_RECEIVER) {
@@ -145,12 +151,6 @@ void ServerConnection::_send_message(PacketBuffer& packet, receiver_t receiver,
 		int originator) {
 	set_packet_sender(packet, originator);
 	if (receiver == ALL_RECEIVERS) {
-		// <TEMP>
-		std::string msg(&packet.at(12), packet.size() - 12);
-		printf("ServerConnection::_send_message: Sending msg '%s'\n",
-				msg.c_str());
-
-		// </TEMP>
 		for (int i = 0; i < _socket_list.size(); i++) {
 			if (i + 1 != originator) {
 				send_packet(_socket_list[i], _packet_buffer);

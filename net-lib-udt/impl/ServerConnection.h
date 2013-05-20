@@ -21,6 +21,9 @@ public:
 	virtual void send_message(const char* msg, int len, receiver_t receiver =
 			ALL_RECEIVERS);
 
+	const std::vector<UDTSOCKET>& get_socket_list() {
+		return _socket_list;
+	}
 private:
 	bool _accept_connection();
 	void _send_message(PacketBuffer& packet, receiver_t receiver,

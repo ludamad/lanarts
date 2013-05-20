@@ -6,6 +6,8 @@
 #ifndef PACKET_UTIL_H_
 #define PACKET_UTIL_H_
 
+#include <udt/udt.h>
+
 #include <cstdio>
 #include <cstring>
 #include <vector>
@@ -27,7 +29,6 @@ inline void prepare_packet(PacketBuffer& packet, const char* msg, int len,
 			((char*) &sender) + sizeof(int));
 	packet.insert(packet.end(), (char*) &len, ((char*) &len) + sizeof(int));
 	packet.insert(packet.end(), msg, msg + len);
-//	printf("prepping with %d %d %d\n", receiver, sender, len);
 }
 
 inline void set_packet_sender(PacketBuffer& packet, int sender = 0) {
@@ -59,7 +60,6 @@ inline bool read_n_bytes(UDTSOCKET socket, PacketBuffer& packet, int nbytes) {
 
 inline bool receive_packet(UDTSOCKET socket, PacketBuffer& packet,
 		receiver_t& receiver, receiver_t& sender) {
-	printf("Receiving packet\n");
 	packet.resize(HEADER_SIZE);
 
 	if (!read_n_bytes(socket, packet, HEADER_SIZE)) {

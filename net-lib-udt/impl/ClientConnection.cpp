@@ -37,11 +37,12 @@ bool ClientConnection::poll(packet_recv_callback message_handler, void* context,
 	}
 
 	while (true) {
-		int nready = UDT::epoll_wait(_poller, NULL, NULL, timeout);
+		std::set<UDTSOCKET> sockets_to_read;
+		int nready = UDT::epoll_wait(_poller, &sockets_to_read, NULL, timeout);
 		timeout = 0; // Don't wait again on repeated checks
 
 		if (nready == UDT::ERROR) {
-			if (UDT::getlasterror().getErrorCode() != CUDTException::EASYNCRCV) {
+			if (UDT::getlasterror().getErrorCode() != CUDTException::ETIMEOUT) {
 				fprintf(stderr, "Error: UDT::epoll_wait reported error %s\n",
 						UDT::getlasterror().getErrorMessage());
 			}
