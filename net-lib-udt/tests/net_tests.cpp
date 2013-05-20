@@ -5,6 +5,7 @@
 #include <string>
 
 #include <lcommon/unittest.h>
+#include <lcommon/Timer.h>
 
 #include "../NetConnection.h"
 #include "../impl/ClientConnection.h"
@@ -30,7 +31,7 @@ static bool message_was_received = false;
 
 static void message_received(receiver_t sender, void* context,
 		const char* msg, size_t len) {
-	printf("Message '%s' was received\n", std::string(msg,len).c_str());
+//	printf("Message '%s' was received\n", std::string(msg,len).c_str());
 	message_was_received = true;
 }
 
@@ -99,6 +100,26 @@ SUITE(net_tests) {
 		delete server;
 		delete client;
 		CHECK(message_was_received);
+	}
+
+	/* Test local host latency */
+	TEST(profile_server_send) {
+		LanartsNetInitHelper __init_helper;
+
+		NetConnection* server = NULL;
+		NetConnection* client = NULL;
+		create_server_and_clients(&server, &client);
+
+		double total_time = 0;
+		for (int i = 0; i < 25; i++) {
+			Timer timer;
+			server->send_message("Hello World", sizeof "Hello World", NetConnection::ALL_RECEIVERS);
+			client->poll(message_received, NULL, TEST_TIMEOUT);
+			total_time += timer.get_microseconds() / 1000.0;
+		}
+		printf("In profile_server_send, got average=%.2f milliseconds", float(total_time/25));
+		delete server;
+		delete client;
 	}
 
 	TEST(two_clients) {

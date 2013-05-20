@@ -1,3 +1,5 @@
+#include <cstdio>
+
 #include <lcommon/unittest.h>
 #include <lcommon/Timer.h>
 

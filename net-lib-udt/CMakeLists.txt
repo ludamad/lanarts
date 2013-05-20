@@ -3,7 +3,7 @@ PROJECT(project_lanarts_net_udt)
 
 set( DEPS ../dependencies)
 
-add_definitions( -std=c++98 -DLINUX )
+add_definitions( -std=c++98 -DLINUX  )
 
 include_directories(
 	${DEPS}/ # For UDT 

@@ -3,6 +3,7 @@
  *  Provides timing information on a per-method basis
  */
 
+#include <cstdio>
 #include <cmath>
 #include <algorithm>
 #include "PerfTimer.h"
