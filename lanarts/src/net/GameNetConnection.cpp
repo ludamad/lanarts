@@ -440,7 +440,7 @@ bool GameNetConnection::poll_messages(int timeout) {
 		}
 		perf_timer_begin("*** NETWORK POLLING ***");
 		if (!_connection->poll(gamenetconnection_consume_message, (void*) this,
-				50)) {
+				1)) {
 
 			perf_timer_end("*** NETWORK POLLING ***");
 			return false;
