@@ -111,13 +111,13 @@ SUITE(net_tests) {
 		create_server_and_clients(&server, &client);
 
 		double total_time = 0;
-		for (int i = 0; i < 25; i++) {
+		for (int i = 0; i < 1500; i++) {
 			Timer timer;
 			server->send_message("Hello World", sizeof "Hello World", NetConnection::ALL_RECEIVERS);
 			client->poll(message_received, NULL, TEST_TIMEOUT);
 			total_time += timer.get_microseconds() / 1000.0;
 		}
-		printf("In profile_server_send, got average=%.2f milliseconds", float(total_time/25));
+		printf("In profile_server_send, got average=%.2f milliseconds", float(total_time/1500));
 		delete server;
 		delete client;
 	}

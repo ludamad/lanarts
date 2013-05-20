@@ -34,8 +34,9 @@ struct LanartsCCC: public CCC {
 class CUDPBlast: public CCC {
 public:
 	CUDPBlast() {
-		m_dPktSndPeriod = 1000;
-		m_dCWndSize = 83333.0;
+		m_dPktSndPeriod = 0;
+		m_dCWndSize = 8000000.0;
+		setRTO(50000);
 		setACKInterval(1);
 		setACKTimer(0);
 	}
