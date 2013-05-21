@@ -35,14 +35,14 @@ static void message_received(receiver_t sender, void* context,
 	message_was_received = true;
 }
 
-static NetConnection* create_server() {
+NetConnection* create_server() {
 	NetConnection* server = create_server_connection(TEST_PORT);
 	CHECK(dynamic_cast<ServerConnection*>(server));
 	server->initialize_connection();
 	return server;
 }
 
-static NetConnection* create_client() {
+NetConnection* create_client(const char* host) {
 	NetConnection* client = create_client_connection("localhost", TEST_PORT);
 	CHECK(dynamic_cast<ClientConnection*>(client));
 	client->initialize_connection();
@@ -52,7 +52,7 @@ static NetConnection* create_client() {
 static void create_server_and_clients(NetConnection** server, NetConnection** client, int argc = 1) {
 	*server = create_server();
 	for (int i = 0; i < argc; i++) {
-		client[i] = create_client();
+		client[i] = create_client("localhost");
 	}
 
 	(*server)->poll(message_received, NULL, TEST_TIMEOUT);
@@ -104,6 +104,7 @@ SUITE(net_tests) {
 
 	/* Test local host latency */
 	TEST(profile_server_send) {
+		const int TEST_RUNS = 25;
 		LanartsNetInitHelper __init_helper;
 
 		NetConnection* server = NULL;
@@ -111,13 +112,12 @@ SUITE(net_tests) {
 		create_server_and_clients(&server, &client);
 
 		double total_time = 0;
-		for (int i = 0; i < 1500; i++) {
-			Timer timer;
+		Timer timer;
+		for (int i = 0; i < TEST_RUNS; i++) {
 			server->send_message("Hello World", sizeof "Hello World", NetConnection::ALL_RECEIVERS);
 			client->poll(message_received, NULL, TEST_TIMEOUT);
-			total_time += timer.get_microseconds() / 1000.0;
 		}
-		printf("In profile_server_send, got average=%.2f milliseconds", float(total_time/1500));
+		printf("In profile_server_send, got average=%.2f milliseconds", float(timer.get_microseconds()/1000.0/TEST_RUNS));
 		delete server;
 		delete client;
 	}
