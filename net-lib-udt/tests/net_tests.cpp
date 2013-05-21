@@ -43,7 +43,7 @@ NetConnection* create_server() {
 }
 
 NetConnection* create_client(const char* host) {
-	NetConnection* client = create_client_connection("localhost", TEST_PORT);
+	NetConnection* client = create_client_connection(host, TEST_PORT);
 	CHECK(dynamic_cast<ClientConnection*>(client));
 	client->initialize_connection();
 	return client;
