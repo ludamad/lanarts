@@ -13,6 +13,7 @@
 #include <lcommon/directory.h>
 
 #include <net-lib-udt/lanarts_net.h>
+
 #include <lsound/lsound.h>
 
 #include <ldraw/display.h>
@@ -118,8 +119,13 @@ int main(int argc, char** argv) {
 	}
 
 	if (gs->start_game()) {
-		engine["game_start"].push();
-		luawrap::call<void>(L);
+		try {
+			engine["game_start"].push();
+			luawrap::call<void>(L);
+		} catch (const LNetConnectionError& err) {
+			fprintf(stderr, "The game must end due to a connection termination:%s\n",
+					err.what());
+		}
 
 		if (!gs->io_controller().user_has_exit()) {
 			if (gs->game_settings().conntype != GameSettings::CLIENT) {

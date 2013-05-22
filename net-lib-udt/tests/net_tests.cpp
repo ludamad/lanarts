@@ -6,6 +6,7 @@
 
 #include <lcommon/unittest.h>
 #include <lcommon/Timer.h>
+#include <lcommon/perf_timer.h>
 
 #include "../NetConnection.h"
 #include "../impl/ClientConnection.h"
@@ -104,7 +105,7 @@ SUITE(net_tests) {
 
 	/* Test local host latency */
 	TEST(profile_server_send) {
-		const int TEST_RUNS = 25;
+		const int TEST_RUNS = 100;
 		LanartsNetInitHelper __init_helper;
 
 		NetConnection* server = NULL;
@@ -112,12 +113,21 @@ SUITE(net_tests) {
 		create_server_and_clients(&server, &client);
 
 		double total_time = 0;
-		Timer timer;
-		for (int i = 0; i < TEST_RUNS; i++) {
+		/*warm-up*/
+		for (int i = 0; i < 10; i++) {
 			server->send_message("Hello World", sizeof "Hello World", NetConnection::ALL_RECEIVERS);
 			client->poll(message_received, NULL, TEST_TIMEOUT);
 		}
-		printf("In profile_server_send, got average=%.2f milliseconds", float(timer.get_microseconds()/1000.0/TEST_RUNS));
+		for (int i = 0; i < TEST_RUNS; i++) {
+			perf_timer_begin("TEST");
+			server->send_message("Hello World", sizeof "Hello World", NetConnection::ALL_RECEIVERS);
+			client->poll(message_received, NULL, TEST_TIMEOUT);
+			client->send_message("Hello World", sizeof "Hello World", NetConnection::ALL_RECEIVERS);
+			server->poll(message_received, NULL, TEST_TIMEOUT);
+			perf_timer_end("TEST");
+		}
+		perf_print_results();
+//		printf("In profile_server_send, got average=%.2f milliseconds", float(timer.get_microseconds()/1000.0/TEST_RUNS));
 		delete server;
 		delete client;
 	}

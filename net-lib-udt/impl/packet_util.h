@@ -8,10 +8,14 @@
 
 #include <udt/udt.h>
 
+#include <lcommon/strformat.h>
+
 #include <cstdio>
 #include <cstring>
 #include <vector>
 #include <cassert>
+
+#include "../lanarts_net.h"
 
 #define LNET_ASSERT(x) assert(x)
 
@@ -36,8 +40,13 @@ inline void set_packet_sender(PacketBuffer& packet, int sender = 0) {
 
 }
 inline void send_packet(UDTSOCKET socket, PacketBuffer& packet) {
-	if (UDT::send(socket, &packet[0], packet.size(), 0) == UDT::ERROR) {
-		printf("Error sending packet!\n");
+//	if (UDT::send(socket, &packet[0], packet.size(), 0) == UDT::ERROR) {
+//		__lnet_throw_connection_error("send_packet got error message:\n\t%s\n",
+//				UDT::getlasterror().getErrorMessage());
+//	}
+	if (UDT::sendmsg(socket, &packet[0], packet.size()) == UDT::ERROR) {
+		__lnet_throw_connection_error("send_packet got error message:\n\t%s\n",
+				UDT::getlasterror().getErrorMessage());
 	}
 }
 
@@ -47,10 +56,9 @@ inline bool read_n_bytes(UDTSOCKET socket, PacketBuffer& packet, int nbytes) {
 	while (nread < nbytes) {
 		int recv = UDT::recv(socket, &packet[nread], nbytes, 0);
 		if (recv == UDT::ERROR) {
-			fprintf(stderr,
+			__lnet_throw_connection_error(
 					"Connection severed, read_n_bytes got error message:\n\t%s\n",
 					UDT::getlasterror().getErrorMessage());
-			fflush(stderr);
 			return false;
 		}
 		nread += recv;
@@ -58,7 +66,27 @@ inline bool read_n_bytes(UDTSOCKET socket, PacketBuffer& packet, int nbytes) {
 	return true;
 }
 
+const int MAX_PACKET_SIZE = 4192;
+
 inline bool receive_packet(UDTSOCKET socket, PacketBuffer& packet,
+		receiver_t& receiver, receiver_t& sender) {
+	char packet_buffer[MAX_PACKET_SIZE];
+	int nbody = UDT::recvmsg(socket, packet_buffer, MAX_PACKET_SIZE);
+	if (nbody == UDT::ERROR) {
+		__lnet_throw_connection_error(
+				"Connection severed, receive_packet got error message:\n\t%s\n",
+				UDT::getlasterror().getErrorMessage());
+		return false;
+	}
+	int size = *(int*) &packet_buffer[sizeof(int) * 2];
+	packet.assign(packet_buffer, packet_buffer + size);
+
+	receiver = *(int*) &packet[0];
+	sender = *(int*) &packet[sizeof(int)];
+	return true;
+}
+
+inline bool __receive_packet(UDTSOCKET socket, PacketBuffer& packet,
 		receiver_t& receiver, receiver_t& sender) {
 	packet.resize(HEADER_SIZE);
 
@@ -79,10 +107,9 @@ inline bool receive_packet(UDTSOCKET socket, PacketBuffer& packet,
 		int nbody = UDT::recv(socket, &packet[body_read + HEADER_SIZE], needed,
 				0);
 		if (nbody == UDT::ERROR) {
-			fprintf(stderr,
+			__lnet_throw_connection_error(
 					"Connection severed, receive_packet got error message:\n\t%s\n",
 					UDT::getlasterror().getErrorMessage());
-			fflush(stderr);
 			return false;
 		}
 		body_read += nbody;

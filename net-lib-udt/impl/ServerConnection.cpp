@@ -26,8 +26,8 @@ ServerConnection::ServerConnection(int port, int maximum_sockets) :
 }
 static void complaining_close(UDTSOCKET socket) {
 	if (UDT::close(socket) == UDT::ERROR) {
-		fprintf(stderr, "Closing socket %d got error %s\n",
-				socket, UDT::getlasterror().getErrorMessage());
+		fprintf(stderr, "Closing socket %d got error %s\n", socket,
+				UDT::getlasterror().getErrorMessage());
 	}
 }
 
@@ -62,7 +62,7 @@ bool ServerConnection::_accept_connection() {
 
 	if (client_socket == UDT::INVALID_SOCK) {
 		if (UDT::getlasterror().getErrorCode() != CUDTException::EASYNCRCV) {
-			fprintf(stderr, "Accepting socket got error %s\n",
+			__lnet_throw_connection_error("Accepting socket got error %s\n",
 					UDT::getlasterror().getErrorMessage());
 		}
 		// No sockets to connect to
@@ -84,7 +84,7 @@ bool ServerConnection::_accept_connection() {
 bool ServerConnection::poll(packet_recv_callback message_handler, void* context,
 		int timeout) {
 	if (_server_socket == -1) {
-		fprintf(stderr,
+		__lnet_throw_connection_error(
 				"ServerConnection::poll: Connection not initialized!\n");
 		return false;
 	}
@@ -97,9 +97,9 @@ bool ServerConnection::poll(packet_recv_callback message_handler, void* context,
 
 		if (nready == UDT::ERROR) {
 			if (UDT::getlasterror().getErrorCode() != CUDTException::ETIMEOUT) {
-				fprintf(stderr, "Error: UDT::epoll_wait reported error %s %d\n",
-						UDT::getlasterror().getErrorMessage(),
-						UDT::getlasterror().getErrorCode());
+				__lnet_throw_connection_error(
+						"Error: UDT::epoll_wait reported error %s %d\n",
+						UDT::getlasterror().getErrorMessage());
 			}
 			break;
 		} else if (nready == 0) {
@@ -164,10 +164,8 @@ void ServerConnection::_send_message(PacketBuffer& packet, receiver_t receiver,
 void ServerConnection::send_message(const char* msg, int len,
 		receiver_t receiver) {
 	if (_server_socket == -1) {
-		fprintf(stderr,
+		__lnet_throw_connection_error(
 				"ServerConnection::send_message: Connection not initialized!\n");
-		fflush(stderr);
-		return;
 	}
 
 	prepare_packet(_packet_buffer, msg, len, receiver);

@@ -3,6 +3,8 @@
  *  Fundamental routines for the lanarts_net library
  */
 
+#include <cstdlib>
+
 #include <udt/udt.h>
 
 #include "../lanarts_net.h"
@@ -33,4 +35,15 @@ NetConnection* create_server_connection(int port) {
  */
 NetConnection* create_client_connection(const char* host, int port) {
 	return new ClientConnection(host, port);
+}
+
+void __lnet_throw_connection_error(const char* fmt, ...) {
+	std::string err;
+	VARARG_STR_FORMAT(err, fmt);
+#ifndef LNET_NO_EXCEPTIONS
+	throw LNetConnectionError(err);
+#else
+	fputs(stderr, err.c_str());
+	abort();
+#endif
 }

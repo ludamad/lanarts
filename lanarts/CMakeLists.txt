@@ -116,7 +116,7 @@ set (libraries
 	luawrap
 	lanarts_net_udt
 	yaml-cpp
-        udt
+    udt
 	RVO
 	${OPENGL_gl_LIBRARY}
 	${SDLMIXER_LIBRARY}

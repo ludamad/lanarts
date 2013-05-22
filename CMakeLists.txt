@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
 set(CMAKE_BUILD_TYPE DEBUG)
+add_definitions(-DNDEBUG)
 
 ## Compiler flags
 if(CMAKE_COMPILER_IS_GNUCXX)
@@ -18,6 +19,7 @@ add_subdirectory( dependencies )
 add_subdirectory( luawrap-lib )
 add_subdirectory( common-lib )
 add_subdirectory( draw-lib )
+add_subdirectory( net-lib )
 add_subdirectory( net-lib-udt )
 add_subdirectory( sound-lib )
 

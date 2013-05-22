@@ -7,6 +7,7 @@
 #define LANARTS_NET_H_
 
 #include "NetConnection.h"
+#include <stdexcept>
 
 /**
  * Initialize the library
@@ -27,5 +28,14 @@ NetConnection* create_server_connection(int port);
  * Note that you must call initialize_connection().
  */
 NetConnection* create_client_connection(const char* host, int port);
+
+#ifndef LNET_NO_EXCEPTIONS
+class LNetConnectionError: public std::runtime_error {
+public:
+	LNetConnectionError(const std::string& err) :
+					runtime_error(err) {
+	}
+};
+#endif
 
 #endif /* LANARTS_NET_H_ */

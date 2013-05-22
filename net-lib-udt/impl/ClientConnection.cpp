@@ -7,10 +7,12 @@
 
 #include "udt-util.h"
 
+#include "../lanarts_net.h"
 #include "ClientConnection.h"
 
 ClientConnection::ClientConnection(const char* addr, int port) :
-		hostname(addr), _port(port) {
+				hostname(addr),
+				_port(port) {
 	_client_socket = -1;
 	_poller = UDT::epoll_create();
 }
@@ -22,7 +24,7 @@ ClientConnection::~ClientConnection() {
 
 void ClientConnection::initialize_connection() {
 	if (!udt_initialize_connection(_client_socket, _port, hostname.c_str())) {
-		return; //TODO return boolean
+		__lnet_throw_connection_error("Failed to initialize connection.");
 	}
 
 	UDT::epoll_add_usock(_poller, _client_socket);
@@ -31,7 +33,7 @@ void ClientConnection::initialize_connection() {
 bool ClientConnection::poll(packet_recv_callback message_handler, void* context,
 		int timeout) {
 	if (_client_socket == -1) {
-		fprintf(stderr,
+		__lnet_throw_connection_error(
 				"ClientConnection::poll: Connection not initialized!\n");
 		return false;
 	}
@@ -43,8 +45,11 @@ bool ClientConnection::poll(packet_recv_callback message_handler, void* context,
 
 		if (nready == UDT::ERROR) {
 			if (UDT::getlasterror().getErrorCode() != CUDTException::ETIMEOUT) {
-				fprintf(stderr, "Error: UDT::epoll_wait reported error %s\n",
+				__lnet_throw_connection_error(
+						"Error: UDT::epoll_wait reported error %s\n",
 						UDT::getlasterror().getErrorMessage());
+			} else if (!sockets_to_read.empty()) {
+				__lnet_throw_connection_error("Socket closed or broken\n");
 			}
 			break;
 		} else if (nready == 0) {
@@ -67,8 +72,7 @@ bool ClientConnection::poll(packet_recv_callback message_handler, void* context,
 void ClientConnection::send_message(const char* msg, int len,
 		receiver_t receiver) {
 	if (_client_socket == -1) {
-		fprintf(
-				stderr,
+		__lnet_throw_connection_error(
 				"ClientConnection::send_message: Connection not initialized!\n");
 		return;
 	}

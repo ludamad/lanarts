@@ -28,4 +28,18 @@ NetConnection* create_server_connection(int port);
  */
 NetConnection* create_client_connection(const char* host, int port);
 
+#ifndef LNET_NO_EXCEPTIONS
+
+#include <stdexcept>
+
+class LNetConnectionError: public std::runtime_error {
+public:
+	LNetConnectionError(const std::string& err) :
+					runtime_error(err) {
+	}
+};
+#endif
+
+void __lnet_throw_connection_error(const char* fmt, ...);
+
 #endif /* LANARTS_NET_H_ */

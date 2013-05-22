@@ -42,8 +42,8 @@ public:
       m_dPktSndPeriod = 0.0;
       m_dCWndSize = 2.0;
 
-      setACKInterval(2);
-      setRTO(1000000);
+      setACKInterval(1);
+      setRTO(5000);
    }
 
    virtual void onACK(const int& ack)
@@ -115,18 +115,23 @@ protected:
 class CUDPBlast: public CCC {
 public:
 	CUDPBlast() {
-		m_dPktSndPeriod = 0;
-		m_dCWndSize = 8000000.0;
-		setRTO(1000);
-		setACKInterval(1);
-		setACKTimer(0);
+//	      m_dPktSndPeriod = 1000000;
+	      m_dCWndSize = 83333.0;
+
+		m_dPktSndPeriod = 0;//(m_iMSS
+//		m_iRTT = 0;
+				//);//* 8.0) * 1;
+//		m_dPktSndPeriod = 0;
+//		m_dCWndSize = 2;
+//		setACKInterval(1);
+//		setACKTimer(0);
 	}
 
 public:
 	void setRate(double mbps) {
-//		m_dPktSndPeriod = (m_iMSS * 8.0) / mbps;
 	}
 };
+
 
 inline bool udt_initialize_connection(UDTSOCKET& socket, int port,
 		const char* connect_ip = NULL) {
@@ -137,7 +142,7 @@ inline bool udt_initialize_connection(UDTSOCKET& socket, int port,
 
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_socktype = SOCK_DGRAM;
 
 	std::string port_str = format("%d", port).c_str();
 
@@ -158,26 +163,26 @@ inline bool udt_initialize_connection(UDTSOCKET& socket, int port,
 	}
 
 	/* Use a low buffer size, the default is very large */
-	int udt_buffsize = 1600;
-	UDT::setsockopt(socket, 0, UDT_SNDBUF, &udt_buffsize, sizeof(int));
-	UDT::setsockopt(socket, 0, UDT_RCVBUF, &udt_buffsize, sizeof(int));
+//	int udt_buffsize = 16000;
+//	UDT::setsockopt(socket, 0, UDT_SNDBUF, &udt_buffsize, sizeof(int));
+//	UDT::setsockopt(socket, 0, UDT_RCVBUF, &udt_buffsize, sizeof(int));
 
 //	int udp_fc = 80;
 //	UDT::setsockopt(socket, 0, UDT_FC, &udp_fc, sizeof(int));
-//	int udp_mss = 400;
+//	int udp_mss = 9000;
 //	UDT::setsockopt(socket, 0, UDT_MSS, &udp_mss, sizeof(int));
 
 	UDT::setsockopt(socket, 0, UDT_CC, new CCCFactory<CUDPBlast>,
 			sizeof(CCCFactory<CUDPBlast> ));
-	int udp_buffsize = 800;
-	UDT::setsockopt(socket, 0, UDP_SNDBUF, &udp_buffsize, sizeof(int));
-	UDT::setsockopt(socket, 0, UDP_RCVBUF, &udp_buffsize, sizeof(int));
-
-	bool block = true;
-	UDT::setsockopt(socket, 0, UDT_SNDSYN, &block, sizeof(bool));
-	UDT::setsockopt(socket, 0, UDT_RCVSYN, &block, sizeof(bool));
-	bool reuse = true;
-	UDT::setsockopt(socket, 0, UDT_REUSEADDR, &reuse, sizeof(bool));
+//	int udp_buffsize = 8000;
+//	UDT::setsockopt(socket, 0, UDP_SNDBUF, &udp_buffsize, sizeof(int));
+//	UDT::setsockopt(socket, 0, UDP_RCVBUF, &udp_buffsize, sizeof(int));
+//
+//	bool block = true;
+//	UDT::setsockopt(socket, 0, UDT_SNDSYN, &block, sizeof(bool));
+//	UDT::setsockopt(socket, 0, UDT_RCVSYN, &block, sizeof(bool));
+//	bool reuse = true;
+//	UDT::setsockopt(socket, 0, UDT_REUSEADDR, &reuse, sizeof(bool));
 //	bool linger = false;
 //	UDT::setsockopt(socket, 0, UDT_LINGER, &linger, sizeof(bool));
 
