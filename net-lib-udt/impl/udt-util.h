@@ -123,7 +123,7 @@ public:
 				//);//* 8.0) * 1;
 //		m_dPktSndPeriod = 0;
 //		m_dCWndSize = 2;
-//		setACKInterval(1);
+		setACKInterval(1);
 //		setACKTimer(0);
 	}
 
@@ -142,7 +142,7 @@ inline bool udt_initialize_connection(UDTSOCKET& socket, int port,
 
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_socktype = SOCK_STREAM;
 
 	std::string port_str = format("%d", port).c_str();
 
@@ -172,8 +172,8 @@ inline bool udt_initialize_connection(UDTSOCKET& socket, int port,
 //	int udp_mss = 9000;
 //	UDT::setsockopt(socket, 0, UDT_MSS, &udp_mss, sizeof(int));
 
-	UDT::setsockopt(socket, 0, UDT_CC, new CCCFactory<CUDPBlast>,
-			sizeof(CCCFactory<CUDPBlast> ));
+//	UDT::setsockopt(socket, 0, UDT_CC, new CCCFactory<CUDPBlast>,
+//			sizeof(CCCFactory<CUDPBlast> ));
 //	int udp_buffsize = 8000;
 //	UDT::setsockopt(socket, 0, UDP_SNDBUF, &udp_buffsize, sizeof(int));
 //	UDT::setsockopt(socket, 0, UDP_RCVBUF, &udp_buffsize, sizeof(int));

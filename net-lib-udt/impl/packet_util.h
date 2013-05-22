@@ -40,14 +40,14 @@ inline void set_packet_sender(PacketBuffer& packet, int sender = 0) {
 
 }
 inline void send_packet(UDTSOCKET socket, PacketBuffer& packet) {
-//	if (UDT::send(socket, &packet[0], packet.size(), 0) == UDT::ERROR) {
-//		__lnet_throw_connection_error("send_packet got error message:\n\t%s\n",
-//				UDT::getlasterror().getErrorMessage());
-//	}
-	if (UDT::sendmsg(socket, &packet[0], packet.size()) == UDT::ERROR) {
+	if (UDT::send(socket, &packet[0], packet.size(), 0) == UDT::ERROR) {
 		__lnet_throw_connection_error("send_packet got error message:\n\t%s\n",
 				UDT::getlasterror().getErrorMessage());
 	}
+//	if (UDT::sendmsg(socket, &packet[0], packet.size()) == UDT::ERROR) {
+//		__lnet_throw_connection_error("send_packet got error message:\n\t%s\n",
+//				UDT::getlasterror().getErrorMessage());
+//	}
 }
 
 /* Ensure we can read the header even if we somehow get less than HEADER_SIZE bytes */
@@ -68,7 +68,7 @@ inline bool read_n_bytes(UDTSOCKET socket, PacketBuffer& packet, int nbytes) {
 
 const int MAX_PACKET_SIZE = 4192;
 
-inline bool receive_packet(UDTSOCKET socket, PacketBuffer& packet,
+inline bool __receive_packet(UDTSOCKET socket, PacketBuffer& packet,
 		receiver_t& receiver, receiver_t& sender) {
 	char packet_buffer[MAX_PACKET_SIZE];
 	int nbody = UDT::recvmsg(socket, packet_buffer, MAX_PACKET_SIZE);
@@ -86,7 +86,7 @@ inline bool receive_packet(UDTSOCKET socket, PacketBuffer& packet,
 	return true;
 }
 
-inline bool __receive_packet(UDTSOCKET socket, PacketBuffer& packet,
+inline bool receive_packet(UDTSOCKET socket, PacketBuffer& packet,
 		receiver_t& receiver, receiver_t& sender) {
 	packet.resize(HEADER_SIZE);
 

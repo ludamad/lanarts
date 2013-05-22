@@ -20,7 +20,7 @@ add_subdirectory( luawrap-lib )
 add_subdirectory( common-lib )
 add_subdirectory( draw-lib )
 add_subdirectory( net-lib )
-add_subdirectory( net-lib-udt )
+#add_subdirectory( net-lib-udt )
 add_subdirectory( sound-lib )
 
 add_subdirectory( lanarts )
