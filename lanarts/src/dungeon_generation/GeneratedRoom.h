@@ -91,6 +91,7 @@ public:
 
 	Sqr& at(int x, int y);
 	Sqr& at(const Pos & p);
+	bool within(const Pos& p);
 
 	void set_region(const Region& r, const Sqr& val);
 	void set_region_corners(const Region & r);

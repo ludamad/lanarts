@@ -51,9 +51,11 @@ static void push_tileset_node(std::vector<tileset_id>& tilesets,
 }
 
 FeatureGenSettings parse_feature_gen(const YAML::Node& n) {
+	/* The FeatureGenSettings constructor contains the 	default feature generation settings */
 	FeatureGenSettings fgs;
-	fgs.nstairs_up = parse_defaulted(n, "stairs_up", 3);
-	fgs.nstairs_down = parse_defaulted(n, "stairs_down", 3);
+	fgs.nstairs_up = parse_defaulted(n, "stairs_up", fgs.nstairs_up);
+	fgs.nstairs_down = parse_defaulted(n, "stairs_down", fgs.nstairs_down);
+	fgs.nstatues = parse_defaulted(n, "statues", fgs.nstatues);
 	if (yaml_has_node(n, "tileset")) {
 		const YAML::Node& tilenode = n["tileset"];
 		if (tilenode.Type() == YAML::NodeType::Scalar) {

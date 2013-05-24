@@ -55,9 +55,12 @@ struct LayoutGenSettings {
 
 struct FeatureGenSettings {
 	int nstairs_up, nstairs_down;
+	Range nstatues;
 	std::vector<tileset_id> tilesets;
 	FeatureGenSettings() :
-			nstairs_up(3), nstairs_down(3) {
+					nstairs_up(3),
+					nstairs_down(3),
+					nstatues(0, 10) {
 	}
 };
 

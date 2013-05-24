@@ -120,7 +120,6 @@ static void generate_statue(GameState* gs, GeneratedRoom& level, MTwist& mt,
 	Pos worldpos = level.get_world_coordinate(p);
 	level.at(p).has_instance = true;
 
-	int itemn = mt.rand(Range(2, 10));
 	sprite_id spriteid = res::sprite_id("statue");
 	SpriteEntry& statue_sprite = game_sprite_data.at(spriteid);
 	ldraw::Drawable& sprite = res::sprite(spriteid);
@@ -130,6 +129,20 @@ static void generate_statue(GameState* gs, GeneratedRoom& level, MTwist& mt,
 	gs->add_instance(
 			new FeatureInst(worldpos, FeatureInst::DECORATION, true, spriteid,
 					FeatureInst::DEPTH, imgid));
+}
+
+static bool is_near_wall(GeneratedRoom& level, const Pos& p) {
+	for (int dy = -1; dy <= +1; dy++) {
+		for (int dx = -1; dx <= +1; dx++) {
+			if (!level.within(Pos(p.x + dx, p.y + dy))) {
+				continue;
+			}
+			if (!level.at(Pos(p.x + dx, p.y + dy)).passable) {
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 void generate_features(const FeatureGenSettings& fs, MTwist& mt,
@@ -260,7 +273,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		}
 	}
 
-	int amount_statues = mt.rand(10);
+	int amount_statues = mt.rand(fs.nstatues);
 	for (int attempts = 0; attempts < amount_statues; attempts++) {
 		int ind = mt.rand(rooms.size());
 		RoomRegion& r1 = rooms[ind];
@@ -268,12 +281,17 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		if (inner.w < 2 || inner.h < 2) {
 			continue;
 		}
-		Pos pos = generate_location_in_region(mt, level, inner);
-		Sqr& sqr = level.at(pos);
-		if (!sqr.passable || sqr.has_instance) {
-			continue;
-		}
+		Pos pos;
+		do {
+			pos = generate_location_in_region(mt, level, inner);
+			Sqr& sqr = level.at(pos);
+			if (!sqr.passable || sqr.has_instance) {
+				/* We may not have many candidate locations, just skip this one in case */
+				goto GiveUpOnStatueGeneration;
+			}
+		} while (is_near_wall(level, pos));
 		generate_statue(gs, level, mt, pos);
+		GiveUpOnStatueGeneration:;
 	}
 
 	if (mt.rand(4) == 0) {

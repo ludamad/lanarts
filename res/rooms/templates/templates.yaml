@@ -1,36 +1,77 @@
 templates:
-  - name: dome2
+  - name: dome1
     rotatable: yes
     legend:
       - glyph: D
         enemy: Red Dragon
     data:
-      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      xx...xxxxxxxxxxxxxxxxxxxxxxxxx...xx
-      x.....xxxxxxxxxx...xxxxxxxxxx.....x
-      x..>..+.......+.....+.......+.....x
-      x.....xxxxxxxxx..D..xxxxxxxxx.....x
-      xx...xxxxx....+.....+....xxxxx...xx
-      xxxxxxx....xxxxx...xxxxx....xxxxxxx
-      xxxxxx..xxxxxxxxxxxxxxxxxxx..xxxxxx
-      xxxxx..xxxxxxxxxx.xxxxxxxxxx..xxxxx
-      xxxxx+xxxxxxxxxx...xxxxxxxxxx+xxxxx
-      xxx...xxxxxxxx.......xxxxxxxx...xxx
-      xx.....xxxxxx.........xxxxxx.....xx
-      xx.....+....+....<....+....+.....xx
-      xx.....xxxxxx.........xxxxxx.....xx
-      xxx...xxxxxxxx.......xxxxxxxx...xxx
-      xxx+x+xxxxxxxxxx...xxxxxxxxxx+x+xxx
-      xxx.x..xxxxxxxxxx-xxxxxxxxxx..x.xxx
-      xxx.xx..xxxxxxxxxxxxxxxxxxx..xx.xxx
-      xxx+xxx....xxxxx...xxxxx....xxx+xxx
-      xx...xxxxx....+.....+....xxxxx...xx
-      x.....xxxxxxxxx.....xxxxxxxxx.....x
-      x.....xxxxxxxxx.....xxxxxxxxx.....x
-      x.....xxxxxxxxxx...xxxxxxxxxx.....x
-      xx...xxxxxxxxxxxxxxxxxxxxxxxxx...xx
-      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  - name: dome
+      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      xx......xxxxxxxxxxxxxxxxxxxxxxxx......x...xx
+      x........xxxxxxxxxx...xxxxxxxxxx...........x
+      x..........................................x
+      x....................D.....................x
+      x.........................................xx
+      x..............xxxx...xxxxx...............xx
+      x...............xxxxxxxxxxxx..............xx
+      x..............xxxxxxxxxxxxx..............xx
+      xxx............xxxxxxxxxxxxx..............xx
+      xxx............xx.......xx................xx
+      xx........................................xx
+      xx........................................xx
+      xx........................................xx
+      xx........................................xx
+      xx........................................xx
+      xx........................................xx
+      xx........................................xx
+      xx........xxxxxx.........xxxxxx...........xx
+      xxxx......xxxxxxx.......xxxxxx...........xxx
+      xxxx......xxxxxxxx.....xxxxxxxx...........xx
+      xxx........xxxxxx.......xxxxxxx...........xx
+      xxx.........xxxxx.......xxxxxx............xx
+      xxx.......................................xx
+      xx........................................xx
+      xx........................................xx
+      xx........................................xx
+      x............xxx.......xxxx...............x
+      x..........xxxxxxx.....xxxxxxx.............x
+      x........xxxxxxxxxx...xxxxxxxxxx...........x
+      xx......xxxxxxxxxxxxxxxxxxxxxxxx......x...xx
+      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  - name: dome2
+    rotatable: yes
+    data:
+      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      xxxxxxxxxxxx.........................xxxxxxxxxxxx
+      xxxxxxxxxxxx.........................xxxxxxxxxxxx
+      xxxxxxxxxxxx.........................xxxxxxxxxxxx
+      xxxxxxxxxxxx.........................xxxxxxxxxxxx
+      xxxxxxxxxxxx.........................xxxxxxxxxxxx
+      x...............................................x
+      x...............................................x
+      x...............................................x
+      x..........xxxxxxxxxxx..........................x
+      x..........xxxxxxxxxxx..........................x
+      x..........xxxxxxxxxxx..........................x
+      x..........xxxxxxxxxxx..........................x
+      x..........xxxxxxxxxxx..........................x
+      x...............................................x
+      x...............................................x
+      x...............................................x
+      x...............................................x
+      x...............................................x
+      x...............................................x
+      x...............................................x
+      x...............................................x
+      x...............................................x
+      x...............................................x
+      x...............................................x
+      xxxxxxxxxxxx.........................xxxxxxxxxxxx
+      xxxxxxxxxxxx.........................xxxxxxxxxxxx
+      xxxxxxxxxxxx.........................xxxxxxxxxxxx
+      xxxxxxxxxxxx.........................xxxxxxxxxxxx
+      xxxxxxxxxxxx.........................xxxxxxxxxxxx
+      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  - name: dome3
     rotatable: yes
     legend:
       - glyph: D

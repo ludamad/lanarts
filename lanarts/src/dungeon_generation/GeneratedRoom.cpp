@@ -10,8 +10,12 @@ Sqr& GeneratedRoom::at(const Pos & p) {
 	return at(p.x, p.y);
 }
 
+bool GeneratedRoom::within(const Pos& p) {
+	return p.x >= 0 && p.x < size.w && p.y >= 0 && p.y < size.h;
+}
+
 Sqr& GeneratedRoom::at(int x, int y) {
-	LANARTS_ASSERT(x >= 0 && x < size.w && y >= 0 && y < size.h);
+	LANARTS_ASSERT(within(Pos(x,y)));
 	return s[y * size.w + x];
 }
 
