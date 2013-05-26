@@ -16,6 +16,7 @@ ClientConnection::ClientConnection(const char* addr, int port) {
 }
 
 ClientConnection::~ClientConnection() {
+	enet_peer_disconnect(_server_peer, 0);
 	enet_peer_reset(_server_peer);
 	enet_host_destroy(_client_socket);
 }
@@ -64,29 +65,33 @@ void ClientConnection::initialize_connection() {
 	printf("ClientSocket connected\n");
 }
 
-bool ClientConnection::poll(packet_recv_callback message_handler, void* context,
+int ClientConnection::poll(packet_recv_callback message_handler, void* context,
 		int timeout) {
 	ENetEvent event;
 
+	int polled = 0;
 	while (poll_adapter(_client_socket, &event, timeout) > 0) {
 		timeout = 0; // Don't wait for timeout a second time
 		switch (event.type) {
 		case ENET_EVENT_TYPE_RECEIVE: {
-			int sender_id = get_epacket_sender(event.packet);
+			ENetPacket* epacket = event.packet;
+			int sender_id = get_epacket_sender(epacket);
 			if (message_handler) {
+				polled++;
 				message_handler(sender_id, context,
-						&_packet_buffer[HEADER_SIZE],
-						_packet_buffer.size() - HEADER_SIZE);
+						HEADER_SIZE + (const char*)epacket->data,
+						epacket->dataLength - HEADER_SIZE);
 			}
-			enet_packet_destroy(event.packet);
+			enet_packet_destroy(epacket);
 			break;
 		}
 		case ENET_EVENT_TYPE_DISCONNECT:
 			printf("We have disconnected from the server.\n");
+			__lnet_throw_connection_error("Client connection dropped");
 			break;
 		}
 	}
-	return true;
+	return polled;
 }
 
 void ClientConnection::send_message(const char* msg, int len,
@@ -98,4 +103,5 @@ void ClientConnection::send_message(const char* msg, int len,
 
 	prepare_packet(_packet_buffer, msg, len, receiver);
 	send_packet(_server_peer, _packet_buffer);
+	enet_host_flush(_client_socket);
 }

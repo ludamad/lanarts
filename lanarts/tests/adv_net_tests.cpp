@@ -13,7 +13,7 @@
 
 #include <lua.hpp>
 
-#include <net-lib/lanarts_net.h>
+#include <net-lib-enet/lanarts_net.h>
 
 #include <lcommon/unittest.h>
 
@@ -29,10 +29,9 @@ struct LanartsNetInitHelper {
 	~LanartsNetInitHelper() {
 		lanarts_net_quit();
 	}
-
 };
 
-const int TEST_POLL_TIMEOUT = 100;
+const int TEST_POLL_TIMEOUT = 50;
 
 SUITE(adv_net_unit_tests) {
 
@@ -51,15 +50,15 @@ SUITE(adv_net_unit_tests) {
 			const char* clientname2) {
 		std::vector<PlayerDataEntry>& pdes = netstate.pd.all_players();
 
-		CHECK(pdes.size() == 3);
+		CHECK_EQUAL(3, pdes.size());
 		for (int i = 0; i < pdes.size(); i++) {
-			CHECK(pdes[i].player_inst.get() == NULL);
-			CHECK(pdes[i].net_id == i);
+			CHECK(pdes.at(i).player_inst.get() == NULL);
+			CHECK(pdes.at(i).net_id == i);
 		}
 		/* test expected names */
-		CHECK(pdes[0].player_name == servername);
-		CHECK(pdes[1].player_name == clientname1);
-		CHECK(pdes[2].player_name == clientname2);
+		CHECK(pdes.at(0).player_name == servername);
+		CHECK(pdes.at(1).player_name == clientname1);
+		CHECK(pdes.at(2).player_name == clientname2);
 	}
 	static void test_initstate_helper(GameStateInitData& client_init,
 			GameStateInitData& server_init) {
@@ -111,12 +110,6 @@ SUITE(adv_net_unit_tests) {
 
 		client1state.conn.poll_messages(TEST_POLL_TIMEOUT);
 		client2state.conn.poll_messages(TEST_POLL_TIMEOUT);
-		serverstate.conn.poll_messages(TEST_POLL_TIMEOUT);
-		client1state.conn.poll_messages(TEST_POLL_TIMEOUT);
-		client2state.conn.poll_messages(TEST_POLL_TIMEOUT);
-//
-//		client1state.conn.poll_messages(TEST_POLL_TIMEOUT);
-//		client2state.conn.poll_messages(TEST_POLL_TIMEOUT);
 
 		test_state_helper(serverstate, servername, clientname1, clientname2);
 
@@ -164,65 +157,78 @@ SUITE(adv_net_unit_tests) {
 		test_net_actionqueue_assert(state.pd.all_players().at(1), a2, frame);
 		test_net_actionqueue_assert(state.pd.all_players().at(2), a3, frame);
 	}
-//	TEST(test_net_action_sending1) {
-//		LanartsNetInitHelper lanarts_net_init_helper;
-//
-//		NetUpdatedState serverstate, client1state, client2state;
-//		init_connections(serverstate, client1state, client2state);
-//
-//		for (int frame = 0; frame < 3; frame++) {
-//			GameAction serv_action(0, GameAction::action_t(0), frame, 0);
-//			GameAction client1_action(1, GameAction::action_t(1), frame, 1);
-//			GameAction client2_action(2, GameAction::action_t(2), frame, 2);
-//
-//			send_action(serv_action, frame, 0, serverstate);
-//			send_action(client1_action, frame, 1, client1state);
-//			send_action(client2_action, frame, 2, client2state);
-//
-//			serverstate.conn.poll_messages(TEST_POLL_TIMEOUT);
-//			client1state.conn.poll_messages(TEST_POLL_TIMEOUT);
-//			client2state.conn.poll_messages(TEST_POLL_TIMEOUT);
-//
-//			test_net_action_assert(serverstate, serv_action, client1_action,
-//					client2_action, frame);
-//			test_net_action_assert(client1state, serv_action, client1_action,
-//					client2_action, frame);
-//			test_net_action_assert(client2state, serv_action, client1_action,
-//					client2_action, frame);
-//		}
-//	}
-//
-//	TEST(test_net_action_sending2) {
-//		LanartsNetInitHelper lanarts_net_init_helper;
-//
-//		NetUpdatedState serverstate, client1state, client2state;
-//		init_connections(serverstate, client1state, client2state);
-//
-//		for (int frame = 0; frame < 3; frame++) {
-//			GameAction serv_action(0, GameAction::action_t(0), frame, 0);
-//			GameAction client1_action(1, GameAction::action_t(1), frame, 1);
-//			GameAction client2_action(2, GameAction::action_t(2), frame, 2);
-//
-//			send_action(serv_action, frame, 0, serverstate);
-//			send_action(client1_action, frame, 1, client1state);
-//			send_action(client2_action, frame, 2, client2state);
-//		}
-//		serverstate.conn.poll_messages(TEST_POLL_TIMEOUT);
-//		client1state.conn.poll_messages(TEST_POLL_TIMEOUT);
-//		client2state.conn.poll_messages(TEST_POLL_TIMEOUT);
-//
-//		for (int frame = 0; frame < 3; frame++) {
-//			GameAction serv_action(0, GameAction::action_t(0), frame, 0);
-//			GameAction client1_action(1, GameAction::action_t(1), frame, 1);
-//			GameAction client2_action(2, GameAction::action_t(2), frame, 2);
-//
-//			test_net_action_assert(serverstate, serv_action, client1_action,
-//					client2_action, frame);
-//			test_net_action_assert(client1state, serv_action, client1_action,
-//					client2_action, frame);
-//			test_net_action_assert(client2state, serv_action, client1_action,
-//					client2_action, frame);
-//		}
-//	}
+
+	static void poll_n(GameNetConnection& connection, int times) {
+		int polled = 0;
+		while (polled < times) {
+			int got = connection.poll_messages(TEST_POLL_TIMEOUT);
+			if (got == 0) {
+				return; // Failure, but go on
+			}
+			polled += got;
+		}
+	}
+	TEST(test_net_action_sending1) {
+		LanartsNetInitHelper lanarts_net_init_helper;
+
+		NetUpdatedState serverstate, client1state, client2state;
+		init_connections(serverstate, client1state, client2state);
+
+		for (int frame = 0; frame < 3; frame++) {
+			GameAction serv_action(0, GameAction::action_t(0), frame, 0);
+			GameAction client1_action(1, GameAction::action_t(1), frame, 1);
+			GameAction client2_action(2, GameAction::action_t(2), frame, 2);
+
+			send_action(serv_action, frame, 0, serverstate);
+			send_action(client1_action, frame, 1, client1state);
+			send_action(client2_action, frame, 2, client2state);
+
+			/* We expect an action from each player */
+			poll_n(serverstate.conn, 2);
+			poll_n(client1state.conn, 2);
+			poll_n(client2state.conn, 2);
+
+			test_net_action_assert(serverstate, serv_action, client1_action,
+					client2_action, frame);
+			test_net_action_assert(client1state, serv_action, client1_action,
+					client2_action, frame);
+			test_net_action_assert(client2state, serv_action, client1_action,
+					client2_action, frame);
+		}
+	}
+
+	TEST(test_net_action_sending2) {
+		LanartsNetInitHelper lanarts_net_init_helper;
+
+		NetUpdatedState serverstate, client1state, client2state;
+		init_connections(serverstate, client1state, client2state);
+
+		for (int frame = 0; frame < 3; frame++) {
+			GameAction serv_action(0, GameAction::action_t(0), frame, 0);
+			GameAction client1_action(1, GameAction::action_t(1), frame, 1);
+			GameAction client2_action(2, GameAction::action_t(2), frame, 2);
+
+			send_action(serv_action, frame, 0, serverstate);
+			send_action(client1_action, frame, 1, client1state);
+			send_action(client2_action, frame, 2, client2state);
+		}
+		/* We expect an action from each player, 3 times, so 6 */
+		poll_n(serverstate.conn, 6);
+		poll_n(client1state.conn, 6);
+		poll_n(client2state.conn, 6);
+
+		for (int frame = 0; frame < 3; frame++) {
+			GameAction serv_action(0, GameAction::action_t(0), frame, 0);
+			GameAction client1_action(1, GameAction::action_t(1), frame, 1);
+			GameAction client2_action(2, GameAction::action_t(2), frame, 2);
+
+			test_net_action_assert(serverstate, serv_action, client1_action,
+					client2_action, frame);
+			test_net_action_assert(client1state, serv_action, client1_action,
+					client2_action, frame);
+			test_net_action_assert(client2state, serv_action, client1_action,
+					client2_action, frame);
+		}
+	}
 
 }

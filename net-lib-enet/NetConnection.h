@@ -26,9 +26,10 @@ public:
 	virtual void initialize_connection() = 0;
 
 	/*
-	 * Poll for new messages/connections
+	 * Poll for new messages/connections.
+	 * Returns amount of messages received.
 	 */
-	virtual bool poll(packet_recv_callback message_handler,
+	virtual int poll(packet_recv_callback message_handler,
 			void* context = NULL, int timeout = 0) = 0;
 
 	/*

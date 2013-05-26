@@ -25,13 +25,13 @@ inline void prepare_packet(PacketBuffer& packet, const char* msg, int len,
 	packet.insert(packet.end(), msg, msg + len);
 }
 
-inline void set_packet_sender(PacketBuffer& packet, int sender = 0) {
-	memcpy(&packet.at(sizeof(int)), &sender, sizeof(int));
-}
 inline int get_epacket_sender(ENetPacket* epacket) {
 	int sender;
 	memcpy(&sender, epacket->data + sizeof(int), sizeof(int));
 	return sender;
+}
+inline void set_epacket_sender(ENetPacket* epacket, int sender) {
+	memcpy(epacket->data + sizeof(int), &sender, sizeof(int));
 }
 
 inline ENetPacket* make_epacket(PacketBuffer& packet, bool reliable) {
@@ -46,15 +46,12 @@ inline void broadcast_packet(ENetHost* host, PacketBuffer& packet, bool reliable
 	enet_host_broadcast(host, 0, make_epacket(packet, reliable));
 }
 
-/* Note: destroys the enet packet! */
-inline void copy_and_release_packet(ENetPacket* epacket, PacketBuffer& packet,
+inline void copy_packet_to_buffer(ENetPacket* epacket, PacketBuffer& packet,
 		receiver_t& receiver, receiver_t& sender) {
 	packet.assign(epacket->data, epacket->data + epacket->dataLength);
 
 	receiver = *(int*) &packet[0];
 	sender = *(int*) &packet[sizeof(int)];
-
-	enet_packet_destroy(epacket);
 }
 
 

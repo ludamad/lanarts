@@ -7,7 +7,7 @@
 
 #include <lcommon/SerializeBuffer.h>
 
-#include <net-lib/lanarts_net.h>
+#include <net-lib-enet/lanarts_net.h>
 
 #include "gamestate/GameState.h"
 
@@ -146,6 +146,7 @@ void net_send_player_actions(GameNetConnection& net, int frame,
 // Only the server is concerned with this message
 void net_recv_connection_affirm(SerializeBuffer& sb, int sender,
 		PlayerData& pd) {
+	printf("Recv conn with size=%d\n", sb.size());
 	std::string name;
 	class_id classtype;
 	sb.read(name);
@@ -198,8 +199,10 @@ void net_recv_game_init_data(SerializeBuffer& sb, int sender,
 }
 void net_send_game_init_data(GameNetConnection& net, PlayerData& pd,
 		GameStateInitData& init_data) {
+	printf("net_send_game_init_data: Sending to %d players\n", pd.all_players().size());
 	for (int n = 0; n < pd.all_players().size(); n++) {
 		int net_id = pd.all_players()[n].net_id;
+		printf("net_send_game_init_data: Pre-sending to player %d with net-id %d\n", n, net_id);
 
 		if (net_id == 0) {
 			continue; // Don't send to self
@@ -222,7 +225,7 @@ void net_send_game_init_data(GameNetConnection& net, PlayerData& pd,
 			sb.write_int(pde.classtype);
 			sb.write_int(pde.net_id);
 		}
-		printf("Sending to player %d\n", n);
+		printf("net_send_game_init_data: Sending to player %d\n", n);
 		net.send_packet(sb, net_id);
 	}
 }
@@ -428,7 +431,7 @@ static void gamenetconnection_consume_message(receiver_t sender, void* context,
 	((GameNetConnection*) context)->_message_callback(sender, msg, len, false);
 }
 
-bool GameNetConnection::poll_messages(int timeout) {
+int GameNetConnection::poll_messages(int timeout) {
 	if (_connection) {
 		for (int i = 0; i < _delayed_messages.size(); i++) {
 			QueuedMessage& qm = _delayed_messages[i];
@@ -439,15 +442,12 @@ bool GameNetConnection::poll_messages(int timeout) {
 			}
 		}
 		perf_timer_begin("*** NETWORK POLLING ***");
-		if (!_connection->poll(gamenetconnection_consume_message, (void*) this,
-				1)) {
-
-			perf_timer_end("*** NETWORK POLLING ***");
-			return false;
-		}
+		int polln = _connection->poll(gamenetconnection_consume_message, (void*) this,
+				1);
 		perf_timer_end("*** NETWORK POLLING ***");
+		return polln;
 	}
-	return true;
+	return 0;
 }
 
 static void gamenetconnection_queue_message(receiver_t sender, void* context,

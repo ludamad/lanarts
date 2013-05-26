@@ -139,9 +139,7 @@ bool GameState::start_game() {
 
 	if (settings.conntype == GameSettings::CLIENT) {
 		while (!init_data.received_init_data) {
-			if (!connection.poll_messages(1 /* milliseconds */)) {
-				return false;
-			}
+			connection.poll_messages(1 /* milliseconds */);
 		}
 		settings.frame_action_repeat = init_data.frame_action_repeat;
 		settings.network_debug_mode = init_data.network_debug_mode;
@@ -298,10 +296,8 @@ bool GameState::step() {
 		connection.check_integrity(this);
 	}
 
-	if (!connection.poll_messages()) {
+	connection.poll_messages();
 
-		return false;
-	}
 	hud.step(this);
 	if (!world.step()) {
 		return false;

@@ -2,7 +2,7 @@
 
 #include <lsound/lsound.h>
 
-#include <net-lib/lanarts_net.h>
+#include <net-lib-enet/lanarts_net.h>
 
 #include "lanarts_defines.h"
 

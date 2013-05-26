@@ -3,6 +3,8 @@ PROJECT(project_lanarts_net_enet)
 
 set( DEPS ../dependencies)
 
+FIND_PACKAGE(SDL REQUIRED)
+
 add_definitions( -std=c++98 )
 
 include_directories(
@@ -11,6 +13,7 @@ include_directories(
 	../luawrap-lib/include
 	${DEPS}/UnitTest++ 
 )
+
 
 add_definitions( -std=c++98 )
 
@@ -30,6 +33,7 @@ target_link_libraries(
 	lanarts_net_enet
 	pthread
 	enet
+    ${SDL_LIBRARY}
 	lcommon
 	UnitTest++
 )

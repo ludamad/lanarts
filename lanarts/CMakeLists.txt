@@ -114,13 +114,14 @@ set (libraries
 	lua
 	luasocket
 	luawrap
-	lanarts_net
+	lanarts_net_enet
 	yaml-cpp
 	RVO
 	${OPENGL_gl_LIBRARY}
 	${SDLMIXER_LIBRARY}
 	${SDL_LIBRARY}
 	${SDLIMAGE_LIBRARY}
+        enet
 	${SDLNET_LIBRARY}
 	${SDLMAIN_LIBRARY}
 	${FREETYPE_LIBRARIES}

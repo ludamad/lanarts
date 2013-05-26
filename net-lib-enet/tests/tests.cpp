@@ -61,7 +61,7 @@ static int run_client_server_test(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
-	int exit_code = 0;//run_unittests();
-	run_client_server_test(argc, argv);
+	int exit_code = run_unittests();
+//	run_client_server_test(argc, argv);
 	return exit_code;
 }

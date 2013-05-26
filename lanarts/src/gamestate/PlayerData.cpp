@@ -168,9 +168,7 @@ static bool player_poll_for_actions(GameState* gs, PlayerDataEntry& pde) {
 			if (gs->game_settings().verbose_output) {
 				printf("Polling for player %d\n", pde.net_id);
 			}
-			if (!gs->net_connection().poll_messages(POLL_MS_TIMEOUT)) {
-				return false;
-			}
+			gs->net_connection().poll_messages(POLL_MS_TIMEOUT);
 		} else {
 
 			ActionQueue actions;

@@ -12,7 +12,7 @@
 
 #include <lcommon/directory.h>
 
-#include <net-lib/lanarts_net.h>
+#include <net-lib-enet/lanarts_net.h>
 
 #include <lsound/lsound.h>
 

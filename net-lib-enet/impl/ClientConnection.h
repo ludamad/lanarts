@@ -20,7 +20,7 @@ public:
 
 	virtual void initialize_connection();
 
-	virtual bool poll(packet_recv_callback message_handler, void* context = NULL, int timeout = 0);
+	virtual int poll(packet_recv_callback message_handler, void* context = NULL, int timeout = 0);
 	virtual void set_accepting_connections(bool accept) {
 		//no-op
 	}

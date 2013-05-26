@@ -8,6 +8,7 @@
 
 #include <cstdio>
 #include <enet/enet.h>
+#include "../lanarts_net.h"
 
 /*
  * Wait forever if we get a negative number
@@ -18,10 +19,12 @@ inline int poll_adapter(ENetHost* host, ENetEvent* event, int timeout) {
 		forever = true;
 		timeout = 1000000; // Arbitrary large number
 	}
-	printf("Polling with timeout %d\n", timeout);
 	int result;
 	do {
 		result = enet_host_service(host, event, timeout);
+		if (result < -1) {
+			__lnet_throw_connection_error("Client connection dropped");
+		}
 		if (result > 0) {
 			return result;
 		}
