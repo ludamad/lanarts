@@ -51,7 +51,7 @@ void GameWorld::place_inst(GeneratedRoom& genlevel, GameInst* inst) {
 	} while (!genlevel.at(epos).passable || genlevel.at(epos).has_instance);
 
 	genlevel.at(epos).has_instance = true;
-	Pos spawn_pos = genlevel.get_world_coordinate(epos);
+	Pos spawn_pos = genlevel.get_world_coordinate(gs, epos);
 
 	inst->last_x = spawn_pos.x;
 	inst->last_y = spawn_pos.y;

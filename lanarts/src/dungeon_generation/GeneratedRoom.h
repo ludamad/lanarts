@@ -61,14 +61,13 @@ public:
 		number_of_mobs = 0;
 	}
 
-	Pos get_world_coordinate(const Pos& p) const;
+	Pos get_world_coordinate(GameState* gs, const Pos& p) const;
 
-	void initialize(int w, int h, const Pos& offset, bool solid = true) {
+	void initialize(int w, int h, bool solid = true) {
 		number_of_mobs = 0;
 		delete[] s;
 		size = Size(w, h);
 		s = new Sqr[w * h];
-		world_offset = offset;
 		memset(s, 0, sizeof(Sqr) * w * h);
 		if (!solid) {
 			for (int i = 0; i < w * h; i++) {
@@ -80,10 +79,10 @@ public:
 			}
 		}
 	}
-	GeneratedRoom(int w, int h, const Pos& offset) {
+	GeneratedRoom(int w, int h) {
 		s = NULL;
 		number_of_mobs = 0;
-		initialize(w, h, offset);
+		initialize(w, h);
 	}
 	~GeneratedRoom() {
 		delete[] s;
@@ -111,7 +110,6 @@ private:
 	GeneratedRoom(const GeneratedRoom&); //DO-NOT-USE
 	Sqr* s;
 	Size size;
-	Pos world_offset;
 	std::vector<RoomRegion> room_list;
 	std::vector<GameInstRef> instance_list;
 	int number_of_mobs;

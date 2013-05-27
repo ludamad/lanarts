@@ -67,7 +67,7 @@ int generate_enemy(GameState* gs, GeneratedRoom& level, MTwist& mt,
 			level.get_room(sqr.roomID - 1).enemies_in_room++;
 		}
 
-		Pos world_pos = level.get_world_coordinate(epos);
+		Pos world_pos = level.get_world_coordinate(gs, epos);
 
 		event_log("Generating enemy %d at %d %d for team %d mob %d\n", etype,
 				world_pos.x, world_pos.y, teamid, mobid);

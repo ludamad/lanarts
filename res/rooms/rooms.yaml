@@ -160,29 +160,52 @@ areas:
         content:
           features: { tileset: [cobble, crypt_tiles, snake_tiles], statues: 0 }
           items:    { amount: 3,  itemgenlist: Basic Items   }
-          enemies: { wandering: no, amount: 5, generated: *easy_animals }
+          enemies:
+            wandering: no
+            amount: 5
+            generated:
+              - { enemy: Giant Rat,         chance: 100 }
+              - { enemy: Giant Bat,         chance: 100 }
       #Level 0
       - layout: [*tiny_layout1]
         content:
           features: { tileset: *lair_tilesets }
-          items:    { amount: 3,  itemgenlist: Basic Items   }
-          enemies: { wandering: no, amount: 5, generated: *easy_animals }
+          items:    { amount: 3,  itemgenlist: Basic Items   }         
+          enemies:
+            wandering: no
+            amount: 4
+            generated:
+              - { enemy: Giant Rat,         chance: 100  }
+              - { enemy: Giant Bat,         chance: 100 }
+              - { enemy: Cloud Elemental,   guaranteed_spawns: 1 }
      #Level 1
       - layout: *tiny_layouts
         content:
           features: { tileset: *lair_tilesets}
-          items:    { amount: 3,  itemgenlist: Basic Items   }
-          enemies: { wandering: no, amount: 8, generated: *easy_animals }
+          items:    { amount: 3,  itemgenlist: Basic Items   } 
+          enemies:
+            wandering: no
+            amount: 7
+            generated:
+              - { enemy: Giant Rat,         chance: 100  }
+              - { enemy: Giant Bat,         chance: 100 }
+              - { enemy: Hound,         chance: 100 }
+              - { enemy: Cloud Elemental,   guaranteed_spawns: 2 }
         
       #Level 2
       - layout: *tiny_layouts
         content:
           features: { tileset: *lair_tilesets}
-          items:    { amount: 4,  itemgenlist: Basic Items   }          
-          enemies: { 
-            wandering: no, amount: 12, 
-            generated: [ {default: *medium_animals}, {enemy: Cloud Elemental, chance: 25}] 
-          }
+          items:    { amount: 4,  itemgenlist: Basic Items   }  
+          enemies:
+            wandering: no
+            amount: 12
+            generated:
+              - { enemy: Giant Rat,         chance: 100  }
+              - { enemy: Giant Bat,         chance: 100 }
+              - { enemy: Hound,         chance: 100 }
+              - { enemy: Cloud Elemental,   chance: 50 }
+              - { enemy: Giant Spider,   chance: 50 }
       #Level 3
       - layout: *small_layouts
         content:

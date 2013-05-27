@@ -17,7 +17,7 @@ ClientConnection::ClientConnection(const char* addr, int port) {
 
 ClientConnection::~ClientConnection() {
 	enet_peer_disconnect(_server_peer, 0);
-	enet_peer_reset(_server_peer);
+//	enet_peer_reset(_server_peer);
 	enet_host_destroy(_client_socket);
 }
 

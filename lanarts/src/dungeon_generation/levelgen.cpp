@@ -103,12 +103,6 @@ static const LayoutGenSettings& choose_random_layout(MTwist& mt,
 	return ls.layouts[layout_index];
 }
 
-Pos get_level_offset(GameState* gs, int lw, int lh) {
-	GameTiles& tiles = gs->tiles();
-	int tw = tiles.tile_width(), th = tiles.tile_height();
-
-	return Pos((tw - lw) / 2, (th - lh) / 2);
-}
 GameRoomState* generate_level(int roomid, MTwist& mt, GeneratedRoom& level,
 		GameState* gs) {
 	DungeonBranch& branch = game_dungeon_data[DNGN_MAIN_BRANCH];
@@ -134,7 +128,7 @@ GameRoomState* generate_level(int roomid, MTwist& mt, GeneratedRoom& level,
 	GameRoomState* prevlvl = gs->get_level(); //Save level context
 	gs->set_level(newlvl); //Set level context to new level
 
-	level.initialize(w, h, get_level_offset(gs, w, h), layout.solid_fill);
+	level.initialize(w, h, layout.solid_fill);
 
 	printf("level.init at %d RNG calls\n", mt.amount_generated());
 	if (!ls.area_templates.empty()) {

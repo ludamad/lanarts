@@ -106,7 +106,7 @@ static StoreInventory generate_shop_inventory(MTwist& mt, int itemn) {
 }
 static void generate_shop(GameState* gs, GeneratedRoom& level, MTwist& mt,
 		const Pos& p) {
-	Pos worldpos = level.get_world_coordinate(p);
+	Pos worldpos = level.get_world_coordinate(gs, p);
 	level.at(p).has_instance = true;
 
 	int itemn = mt.rand(Range(2, 14));
@@ -117,7 +117,7 @@ static void generate_shop(GameState* gs, GeneratedRoom& level, MTwist& mt,
 }
 static void generate_statue(GameState* gs, GeneratedRoom& level, MTwist& mt,
 		const Pos& p) {
-	Pos worldpos = level.get_world_coordinate(p);
+	Pos worldpos = level.get_world_coordinate(gs, p);
 	level.at(p).has_instance = true;
 
 	sprite_id spriteid = res::sprite_id("statue");

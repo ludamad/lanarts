@@ -4,6 +4,8 @@
  */
 
 #include <lcommon/math_util.h>
+#include "gamestate/GameTiles.h"
+#include "gamestate/GameState.h"
 #include "GeneratedRoom.h"
 
 Sqr& GeneratedRoom::at(const Pos & p) {
@@ -26,8 +28,15 @@ void GeneratedRoom::set_region_corners(const Region & r) {
 	at(r.x + r.w - 1, r.y + r.h - 1).is_corner = true;
 }
 
-Pos GeneratedRoom::get_world_coordinate(const Pos& p) const {
-	return centered_multiple(p + world_offset, TILE_SIZE);
+static Pos get_level_offset(GameState* gs, int lw, int lh) {
+	GameTiles& tiles = gs->tiles();
+	int tw = tiles.tile_width(), th = tiles.tile_height();
+
+	return Pos((tw - lw) / 2, (th - lh) / 2);
+}
+
+Pos GeneratedRoom::get_world_coordinate(GameState* gs, const Pos& p) const {
+	return centered_multiple(p + get_level_offset(gs, size.w, size.h), TILE_SIZE);
 }
 
 bool GeneratedRoom::verify(const Region & r, bool check_init) {
