@@ -1,0 +1,8 @@
+Everyone where a table is accepted, a one argument function is also accepted (or a special lua table, etc)
+All applied in the context of a combat actor
+
+draw_queue --
+	list of drawables, or function to queue drawables
+	associated with a certain depth
+draw_modifier --
+	change the draw parameters to the object
