@@ -48,6 +48,13 @@ struct BBox {
 	Size size() const;
 	int center_x() const;
 	int center_y() const;
+
+	BBox grow(int amount) const;
+	BBox shrink(int amount) const {
+		return grow(-amount);
+	}
+	BBox resized_within(const BBox& o) const;
+
 	void translate(int x, int y);
 	bool empty() const;
 	BBox translated(int x, int y) const;

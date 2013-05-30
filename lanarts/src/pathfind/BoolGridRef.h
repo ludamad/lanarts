@@ -15,7 +15,7 @@
 #define BOOLGRIDREF_H_
 
 #include <lcommon/smartptr.h>
-#include "util/Grid.h"
+#include <lcommon/Grid.h>
 
 // Until any special implementation is needed, simply define as a typedef
 typedef smartptr< Grid<bool> > BoolGridRef;

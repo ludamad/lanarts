@@ -9,8 +9,9 @@
 #include <vector>
 
 #include <lcommon/mtwist.h>
+#include <lcommon/Grid.h>
 
-#include "util/Grid.h"
+#include "../lanarts_defines.h"
 
 #include "BoolGridRef.h"
 

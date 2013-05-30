@@ -26,8 +26,7 @@
 #include <vector>
 
 #include <lcommon/geometry.h>
-
-#include "util/Grid.h"
+#include <lcommon/Grid.h>
 
 #include "BoolGridRef.h"
 #include "FloodFillPaths.h"

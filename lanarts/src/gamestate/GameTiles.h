@@ -11,9 +11,10 @@
 #include <cstring>
 #include <vector>
 
+#include <lcommon/Grid.h>
+
 #include "lanarts_defines.h"
 
-#include "util/Grid.h"
 
 #include "pathfind/BoolGridRef.h"
 

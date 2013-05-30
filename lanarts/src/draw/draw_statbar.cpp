@@ -20,4 +20,3 @@ void draw_statbar(const BBoxF& bbox, float fill, const Colour& front,
 void draw_statbar(const BBoxF & bbox, float fill) {
 	draw_statbar(bbox, fill, Colour(0, 255, 0), Colour(255, 0, 0));
 }
-

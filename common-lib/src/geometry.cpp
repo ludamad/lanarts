@@ -3,6 +3,7 @@
  *  Simple geometric defines
  */
 
+#include <algorithm>
 #include <cmath>
 
 #include "lcommon_assert.h"
@@ -375,3 +376,10 @@ BBoxF BBoxF::translated(const PosF& pos) const {
 	return BBoxF(x1 + pos.x, y1 + pos.y, x2 + pos.x, y2 + pos.y);
 }
 
+BBox BBox::grow(int amount) const {
+	return BBox(x1 - amount, y1 - amount, x2 + amount, y2 + amount);
+}
+
+BBox BBox::resized_within(const BBox& o) const {
+	return BBox(std::max(x1, o.x1), std::max(y1, o.y1), std::min(x2, o.x2), std::min(y2, o.y2));
+}

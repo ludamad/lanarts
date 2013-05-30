@@ -7,9 +7,8 @@
 #define GRID_H_
 
 #include <vector>
-#include <lcommon/geometry.h>
-
-#include "lanarts_defines.h"
+#include "geometry.h"
+#include "lcommon_assert.h"
 
 template <typename V>
 class Grid {
@@ -29,8 +28,8 @@ public:
 	 * Get the element at 'xy'.
 	 */
 	Ref operator[](const Pos& xy) {
-		LANARTS_ASSERT(xy.x >= 0 && xy.x < _size.w);
-		LANARTS_ASSERT(xy.y >= 0 && xy.y < _size.h);
+		LCOMMON_ASSERT(xy.x >= 0 && xy.x < _size.w);
+		LCOMMON_ASSERT(xy.y >= 0 && xy.y < _size.h);
 		return _contents[xy.y * _size.w + xy.x];
 	}
 
@@ -38,8 +37,8 @@ public:
 	 * Get the element at 'xy' (but unmodifiable).
 	 */
 	ConstRef operator[](const Pos& xy) const {
-		LANARTS_ASSERT(xy.x >= 0 && xy.x < _size.w);
-		LANARTS_ASSERT(xy.y >= 0 && xy.y < _size.h);
+		LCOMMON_ASSERT(xy.x >= 0 && xy.x < _size.w);
+		LCOMMON_ASSERT(xy.y >= 0 && xy.y < _size.h);
 		return _contents[xy.y * _size.w + xy.x];
 	}
 

@@ -11,7 +11,9 @@
 /*Represents a range*/
 struct Range {
 	int min, max;
-	explicit Range(int min = 0, int max = 0) :
+	Range() : min(0), max(0) {
+	}
+	explicit Range(int min, int max) :
 			min(min), max(max) {
 		LCOMMON_ASSERT(min <= max);
 	}
@@ -29,7 +31,10 @@ struct Range {
 /*Represents a float range*/
 struct RangeF {
 	float min, max;
-	explicit RangeF(float min = 0, float max = 0) :
+
+	RangeF() : min(0.0f), max(0.0f) {
+	}
+	explicit RangeF(float min, float max) :
 			min(min), max(max) {
 		LCOMMON_ASSERT(min <= max);
 	}
