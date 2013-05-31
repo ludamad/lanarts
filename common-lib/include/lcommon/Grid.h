@@ -110,6 +110,9 @@ public:
 	std::vector<V>& _internal_vector() {
 		return _contents;
 	}
+	const std::vector<V>& _internal_vector() const {
+		return _contents;
+	}
 
 private:
 	Size _size;

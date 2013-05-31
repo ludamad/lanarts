@@ -13,11 +13,13 @@
 #include <lcommon/int_types.h>
 #include <lcommon/mtwist.h>
 
+class SerializeBuffer;
+
 namespace ldungeon_gen {
 
 	const uint16 FLAG_SOLID = 1 << 0;
 	const uint16 FLAG_PERIMETER = 1 << 1;
-	const uint16 FLAG_CORNER = 1 << 2;
+	const uint16 FLAG_TUNNEL = 1 << 2;
 	const uint16 FLAG_HAS_OBJECT = 1 << 3;
 	const uint16 FLAG_NEAR_PORTAL = 1 << 4;
 	/* For future use */
@@ -30,36 +32,22 @@ namespace ldungeon_gen {
 	struct Selector {
 		uint16 must_be_on_bits;
 		uint16 must_be_off_bits;
-		uint16 must_be_content, must_be_group;
-		bool use_must_be_value, use_must_be_group;
-
-		Selector(uint16 must_be_on_bits, uint16 must_be_off_bits,
-				uint16 must_be_content, uint16 must_be_group) :
-						must_be_on_bits(must_be_on_bits),
-						must_be_off_bits(must_be_off_bits),
-						must_be_content(must_be_content),
-						must_be_group(must_be_group),
-						use_must_be_value(true),
-						use_must_be_group(true) {
-		}
+		uint16 must_be_content;
+		bool use_must_be_value;
 
 		Selector(uint16 must_be_on_bits, uint16 must_be_off_bits,
 				uint16 must_be_content) :
 						must_be_on_bits(must_be_on_bits),
 						must_be_off_bits(must_be_off_bits),
 						must_be_content(must_be_content),
-						must_be_group(0),
-						use_must_be_value(true),
-						use_must_be_group(false) {
+						use_must_be_value(true) {
 		}
 
-		Selector(uint16 must_be_on_bits, uint16 must_be_off_bits) :
+		Selector(uint16 must_be_on_bits = 0, uint16 must_be_off_bits = 0) :
 						must_be_on_bits(must_be_on_bits),
 						must_be_off_bits(must_be_off_bits),
 						must_be_content(0),
-						must_be_group(0),
-						use_must_be_value(false),
-						use_must_be_group(false) {
+						use_must_be_value(false) {
 		}
 
 	};
@@ -71,19 +59,8 @@ namespace ldungeon_gen {
 		uint16 turn_on_bits;
 		uint16 turn_off_bits;
 		uint16 flip_bits;
-		uint16 content_value, group_value;
-		bool use_content_value, use_group_value;
-
-		Operator(uint16 turn_on_bits, uint16 turn_off_bits, uint16 flip_bits,
-				uint16 content_value, uint16 group_value) :
-						turn_on_bits(turn_on_bits),
-						turn_off_bits(turn_off_bits),
-						flip_bits(flip_bits),
-						content_value(content_value),
-						group_value(group_value),
-						use_content_value(true),
-						use_group_value(true) {
-		}
+		uint16 content_value;
+		bool use_content_value;
 
 		Operator(uint16 turn_on_bits, uint16 turn_off_bits, uint16 flip_bits,
 				uint16 content_value) :
@@ -91,19 +68,15 @@ namespace ldungeon_gen {
 						turn_off_bits(turn_off_bits),
 						flip_bits(flip_bits),
 						content_value(content_value),
-						group_value(0),
-						use_content_value(true),
-						use_group_value(false) {
+						use_content_value(true) {
 		}
 
-		Operator(uint16 turn_on_bits, uint16 turn_off_bits, uint16 flip_bits) :
+		Operator(uint16 turn_on_bits = 0, uint16 turn_off_bits = 0, uint16 flip_bits = 0) :
 						turn_on_bits(turn_on_bits),
 						turn_off_bits(turn_off_bits),
 						flip_bits(flip_bits),
 						content_value(0),
-						group_value(0),
-						use_content_value(false),
-						use_group_value(false) {
+						use_content_value(false) {
 		}
 	};
 
@@ -136,9 +109,7 @@ namespace ldungeon_gen {
 					&& ((selector.must_be_off_bits & ~flags)
 							== selector.must_be_off_bits)
 					&& (!selector.use_must_be_value
-							|| content == selector.must_be_content)
-					&& (!selector.use_must_be_group
-							|| group == selector.must_be_group);
+							|| content == selector.must_be_content);
 		}
 		inline void apply(Operator oper) {
 			flags &= ~oper.turn_off_bits;
@@ -146,9 +117,6 @@ namespace ldungeon_gen {
 			flags ^= oper.flip_bits;
 			if (oper.use_content_value) {
 				content = oper.content_value;
-			}
-			if (oper.use_group_value) {
-				group = oper.group_value;
 			}
 		}
 		inline void apply(ConditionalOperator oper) {
@@ -162,22 +130,40 @@ namespace ldungeon_gen {
 	};
 
 	struct Group {
+		/* Group ID relationship */
 		int group_id, parent_group_id;
+		std::vector<int> child_group_ids;
+		/* Bounding box of area */
 		BBox group_area;
+
 		Group(int group_id, int parent_group_id, const BBox& group_area) :
 						group_id(group_id),
 						parent_group_id(parent_group_id),
 						group_area(group_area) {
 		}
+
+		void serialize(SerializeBuffer& serializer) const;
+		void deserialize(SerializeBuffer& serializer);
 	};
 
 	const int ROOT_GROUP_ID = 0;
+	typedef int group_t;
+
 	/* Inheritance used for Grid methods */
 	class Map: public Grid<Square> {
 	public:
-		Map(const Size& size, const Square& fill_value = Square());
+		Map(const Size& size = Size(), const Square& fill_value = Square());
 		std::vector<Group> groups;
-		Group& make_group(const BBox& area, int parent_group);
+		group_t make_group(const BBox& area, int parent_group_id);
+
+		/* For testing purposes with serialization */
+		bool operator==(const Map& map) const;
+		bool operator!=(const Map& map) const {
+			return !(*this == map);
+		}
+
+		void serialize(SerializeBuffer& serializer) const;
+		void deserialize(SerializeBuffer& serializer);
 	};
 }
 

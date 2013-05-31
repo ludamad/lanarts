@@ -21,16 +21,21 @@ namespace ldungeon_gen {
 		enum {
 			NO_TURN = 0, TURN_PERIMETER = 1, TURN_START = 2
 		};
-		TunnelGenImpl(Map& map, MTwist& mt, ConditionalOperator fill_oper, ConditionalOperator perimeter_oper, int start_room, int padding,
-				int width, int depth, int change_odds, bool ate = false) :
+		TunnelGenImpl(Map& map, MTwist& mt, Selector is_invalid,
+				Selector is_finished, ConditionalOperator fill_oper,
+				ConditionalOperator perimeter_oper, int start_room, int padding,
+				int width, int depth, int change_odds,
+				bool accept_tunnel_entry = false) :
 						map(map),
 						mt(mt),
+						is_invalid(is_invalid),
+						is_finished(is_finished),
 						fill_oper(fill_oper),
 						perimeter_oper(perimeter_oper),
 						start_room(start_room),
 						end_room(0),
 						padding(padding),
-						accept_tunnel_entry(ate),
+						accept_tunnel_entry(accept_tunnel_entry),
 						avoid_groupid(-1),
 						width(width),
 						maxdepth(depth),
@@ -62,6 +67,7 @@ namespace ldungeon_gen {
 	private:
 		Map& map;
 		MTwist& mt;
+		Selector is_invalid, is_finished;
 		ConditionalOperator perimeter_oper, fill_oper;
 		int start_room;
 		int end_room;
@@ -73,61 +79,8 @@ namespace ldungeon_gen {
 		int change_odds;
 	};
 
-	/*Sole visible function*/
-	void generate_tunnels(Map& map, const TunnelGenSettings& tgs, MTwist& mt,
-			ConditionalOperator fill_oper, ConditionalOperator perimeter_oper) {
-
-		Pos p;
-		bool axis, positive;
-
-		std::vector<Square> btbuff;
-		std::vector<TunnelSliceContext> tsbuff;
-
-		std::vector<int> genpaths(map.groups.size(), 0);
-		std::vector<int> totalpaths(map.groups.size(), 0);
-		for (int i = 0; i < map.groups.size(); i++) {
-			totalpaths[i] = mt.rand(tgs.num_tunnels);
-		}
-		int nogen_tries = 0;
-		while (nogen_tries < 200) {
-			nogen_tries++;
-
-			for (int i = 0; i < map.groups.size(); i++) {
-				if (genpaths[i] >= totalpaths[i])
-					continue;
-				bool generated = false;
-				int genwidth = mt.rand(tgs.size);
-				for (; genwidth >= 1 && !generated; genwidth--) {
-					int path_len = 5;
-					for (int attempts = 0; attempts < 16 && !generated;
-							attempts++) {
-						TunnelGenImpl tg(map, mt, fill_oper, perimeter_oper, i + 1, tgs.padding,
-								genwidth, path_len, 20,
-								tgs.padding > 0
-										&& (genpaths[i] > 0 || nogen_tries > 100));
-
-						generate_entrance(map.groups[i].group_area, mt,
-								std::min(genwidth, 2), p, axis, positive);
-
-						int val = positive ? +1 : -1;
-						int dx = axis ? 0 : val, dy = axis ? val : 0;
-
-						if (tg.generate(p, dx, dy, btbuff, tsbuff)) {
-							genpaths[i]++;
-							nogen_tries = 0;
-							path_len = 5;
-							generated = true;
-						}
-						if (attempts >= 4) {
-							path_len += 5;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	static Square* backtrack_entry(Square* backtracking, int entry_size, int entryn) {
+	static Square* backtrack_entry(Square* backtracking, int entry_size,
+			int entryn) {
 		return &backtracking[entry_size * entryn];
 	}
 
@@ -141,9 +94,6 @@ namespace ldungeon_gen {
 		//calculated
 		bool tunneled;
 		Pos ip, newpos;
-
-		TunnelSliceContext() {
-		}
 	};
 
 	void TunnelGenImpl::initialize_slice(TunnelSliceContext* cntxt,
@@ -162,7 +112,8 @@ namespace ldungeon_gen {
 		for (int i = 0; i < width + padding * 2; i++) {
 			int xcomp = (dy == 0 ? 0 : i);
 			int ycomp = (dx == 0 ? 0 : i);
-			map[Pos(cntxt->ip.x + xcomp, cntxt->ip.y + ycomp)] = prev_content[i];
+			map[Pos(cntxt->ip.x + xcomp, cntxt->ip.y + ycomp)] =
+					prev_content[i];
 		}
 
 	}
@@ -185,9 +136,10 @@ namespace ldungeon_gen {
 			int xcomp = (dy == 0 ? 0 : i);
 			int ycomp = (dx == 0 ? 0 : i);
 			Square& sqr = map[Pos(cntxt->p.x + xcomp, cntxt->p.y + ycomp)];
+
 			/* Look for reasons we would not be done */
-			if (sqr.matches_flags(FLAG_SOLID) || sqr.group == 0//|| (!accept_tunnel_entry && sqr.group == 0)
-					|| sqr.matches_flags(FLAG_CORNER)) {
+//			if (sqr.matches_flags(FLAG_SOLID) || sqr.group == 0//|| (!accept_tunnel_entry && sqr.group == 0)
+			if (!sqr.matches(is_finished)) {
 				cntxt->tunneled = false;
 				break;
 			}
@@ -207,11 +159,14 @@ namespace ldungeon_gen {
 		for (int i = 0; i < width + padding * 2; i++) {
 			int xcomp = (dy == 0 ? 0 : i);
 			int ycomp = (dx == 0 ? 0 : i);
-			Square& sqr =  map[Pos(cntxt->ip.x + xcomp, cntxt->ip.y + ycomp)];
-			if (!sqr.matches_flags(FLAG_SOLID)
-					|| (!accept_tunnel_entry && cntxt->turn_state == NO_TURN
-							&& sqr.matches_flags(FLAG_PERIMETER) && sqr.group == 0))
+			Square& sqr = map[Pos(cntxt->ip.x + xcomp, cntxt->ip.y + ycomp)];
+//			if (!sqr.matches_flags(FLAG_SOLID)
+//					|| (!accept_tunnel_entry && cntxt->turn_state == NO_TURN
+//							&& sqr.matches_flags(FLAG_PERIMETER)
+//							&& sqr.group == 0))
+			if (sqr.matches(is_invalid)) {
 				return false;
+			}
 			memcpy(prev_content + i, &sqr, sizeof(Square));
 		}
 		return true;
@@ -277,7 +232,7 @@ namespace ldungeon_gen {
 			int xcomp = (dy == 0 ? 0 : i);
 			int ycomp = (dx == 0 ? 0 : i);
 
-			Square& sqr =  map[Pos(cntxt->p.x + xcomp, cntxt->p.y + ycomp)];
+			Square& sqr = map[Pos(cntxt->p.x + xcomp, cntxt->p.y + ycomp)];
 			sqr.apply(fill_oper);
 		}
 
@@ -313,8 +268,63 @@ namespace ldungeon_gen {
 		else if (t.size() < size)
 			t.resize(t.size() * 2);
 	}
+
+	bool TunnelGenOperator::apply(Map& map,
+			group_t parent_group_id, const BBox& rect) {
+
+		Pos p;
+		bool axis, positive;
+
+		std::vector<Square> btbuff;
+		std::vector<TunnelSliceContext> tsbuff;
+
+		std::vector<int> genpaths(map.groups.size(), 0);
+		std::vector<int> totalpaths(map.groups.size(), 0);
+		for (int i = 0; i < map.groups.size(); i++) {
+			totalpaths[i] = randomizer.rand(num_tunnels);
+		}
+		int nogen_tries = 0;
+		while (nogen_tries < 200) {
+			nogen_tries++;
+
+			for (int i = 0; i < map.groups.size(); i++) {
+				if (genpaths[i] >= totalpaths[i])
+					continue;
+				bool generated = false;
+				int genwidth = randomizer.rand(size);
+				for (; genwidth >= 1 && !generated; genwidth--) {
+					int path_len = 5;
+					for (int attempts = 0; attempts < 16 && !generated;
+							attempts++) {
+						TunnelGenImpl tg(map, randomizer, is_invalid,
+								is_finished, fill_oper, perimeter_oper, i + 1,
+								padding, genwidth, path_len, 20,
+								padding > 0
+										&& (genpaths[i] > 0 || nogen_tries > 100));
+
+						generate_entrance(map.groups[i].group_area, randomizer,
+								std::min(genwidth, 2), p, axis, positive);
+
+						int val = positive ? +1 : -1;
+						int dx = axis ? 0 : val, dy = axis ? val : 0;
+
+						if (tg.generate(p, dx, dy, btbuff, tsbuff)) {
+							genpaths[i]++;
+							nogen_tries = 0;
+							path_len = 5;
+							generated = true;
+						}
+						if (attempts >= 4) {
+							path_len += 5;
+						}
+					}
+				}
+			}
+		}
+	}
 	bool TunnelGenImpl::generate(Pos p, int dx, int dy,
-			std::vector<Square>& btbuff, std::vector<TunnelSliceContext>& tsbuff) {
+			std::vector<Square>& btbuff,
+			std::vector<TunnelSliceContext>& tsbuff) {
 
 		int entry_size = width + padding * 2;
 
@@ -330,7 +340,7 @@ namespace ldungeon_gen {
 		bool complete_tunnel = false;
 		int tunnel_depth = 0;
 
-		//By setting TURN_PERIMETER we avoid trying a turn on the first tunnel slice
+//By setting TURN_PERIMETER we avoid trying a turn on the first tunnel slice
 		initialize_slice(&tsc[tunnel_depth], TURN_PERIMETER, dx, dy, p);
 		while (true) {
 			prev_content = backtrack_entry(backtracking, entry_size,
