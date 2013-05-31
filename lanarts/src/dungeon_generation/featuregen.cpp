@@ -274,7 +274,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 	}
 
 	int amount_statues = mt.rand(fs.nstatues);
-	for (int attempts = 0; attempts < amount_statues; attempts++) {
+	for (int i = 0; i < amount_statues; i++) {
 		int ind = mt.rand(rooms.size());
 		RoomRegion& r1 = rooms[ind];
 		Region inner = r1.region.remove_perimeter();
@@ -282,7 +282,12 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 			continue;
 		}
 		Pos pos;
+		int attempts = 0;
+		const int MAX_STATUE_ATTEMPTS = 16;
 		do {
+			if (++attempts < MAX_STATUE_ATTEMPTS) {
+				goto GiveUpOnStatueGeneration;
+			}
 			pos = generate_location_in_region(mt, level, inner);
 			Sqr& sqr = level.at(pos);
 			if (!sqr.passable || sqr.has_instance) {

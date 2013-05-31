@@ -90,12 +90,17 @@ void generate_enemies(const EnemyGenSettings& rs, MTwist& mt,
 		GeneratedRoom& level, GameState* gs) {
 	int nplayers = gs->player_data().all_players().size();
 
-	int nmons = round(mt.rand(rs.num_monsters) * (1 + log(nplayers) / 4));
+	//TODO Evalute the formula of growth here
+	int nmons = round(mt.rand(RangeF(rs.num_monsters)) * (1.0f + nplayers * 0.2f));
 	int total_chance = get_total_chance(rs);
 
 	for (int i = 0; i < rs.enemy_chances.size(); i++) {
 		const EnemyGenChance& ec = rs.enemy_chances[i];
 		int amnt_spawns = mt.rand(ec.guaranteed_spawns);
+		//TODO: Make this hack less of a hack
+		if (nplayers >= 4) {
+			amnt_spawns++;
+		}
 		if (amnt_spawns > 0) {
 			generate_enemy(gs, level, mt, ec.enemytype,
 					enemy_region_candidate(mt, level),
