@@ -21,15 +21,14 @@ namespace ldungeon_gen {
 		enum {
 			NO_TURN = 0, TURN_PERIMETER = 1, TURN_START = 2
 		};
-		TunnelGenImpl(Map& map, MTwist& mt, Selector is_valid,
-				Selector is_finished, ConditionalOperator fill_oper,
+		TunnelGenImpl(Map& map, MTwist& mt, const TunnelSelector& selector,
+				ConditionalOperator fill_oper,
 				ConditionalOperator perimeter_oper, int start_room, int padding,
 				int width, int depth, int change_odds,
 				bool accept_tunnel_entry = false) :
 						map(map),
 						mt(mt),
-						is_valid(is_valid),
-						is_finished(is_finished),
+						selector(selector),
 						fill_oper(fill_oper),
 						perimeter_oper(perimeter_oper),
 						start_room(start_room),
@@ -67,7 +66,7 @@ namespace ldungeon_gen {
 	private:
 		Map& map;
 		MTwist& mt;
-		Selector is_valid, is_finished;
+		TunnelSelector selector;
 		ConditionalOperator perimeter_oper, fill_oper;
 		int start_room;
 		int end_room;
@@ -132,13 +131,16 @@ namespace ldungeon_gen {
 		/* Start with the assumption that we're done */
 		cntxt->tunneled = true;
 
-		for (int i = 0; i < width; i++) {
+		int last_square = width + padding * 2 - 1;
+		for (int i = 0; i <= last_square; i++) {
 			int xcomp = (dy == 0 ? 0 : i);
 			int ycomp = (dx == 0 ? 0 : i);
 			Square& sqr = map[Pos(cntxt->p.x + xcomp, cntxt->p.y + ycomp)];
 
 			/* Look for reasons we would not be done */
 //			if (sqr.matches_flags(FLAG_SOLID) || sqr.group == 0//|| (!accept_tunnel_entry && sqr.group == 0)
+			bool is_perimeter = (i == 0 || i == last_square);
+			Selector is_finished = is_perimeter ? selector.is_finished_perimeter : selector.is_finished_fill;
 			if (!sqr.matches(is_finished)) {
 				cntxt->tunneled = false;
 				break;
@@ -156,7 +158,7 @@ namespace ldungeon_gen {
 			return true;
 		}
 
-		for (int i = 0; i < width + padding * 2; i++) {
+		for (int i = 0; i <= last_square; i++) {
 			int xcomp = (dy == 0 ? 0 : i);
 			int ycomp = (dx == 0 ? 0 : i);
 			Square& sqr = map[Pos(cntxt->ip.x + xcomp, cntxt->ip.y + ycomp)];
@@ -164,6 +166,8 @@ namespace ldungeon_gen {
 //					|| (!accept_tunnel_entry && cntxt->turn_state == NO_TURN
 //							&& sqr.matches_flags(FLAG_PERIMETER)
 //							&& sqr.group == 0))
+			bool is_perimeter = (i == 0 || i == last_square);
+			Selector is_valid = is_perimeter ? selector.is_valid_perimeter : selector.is_valid_fill;
 			if (!sqr.matches(is_valid) && cntxt->turn_state == NO_TURN) {
 				return false;
 			}
@@ -269,8 +273,8 @@ namespace ldungeon_gen {
 			t.resize(t.size() * 2);
 	}
 
-	bool TunnelGenOperator::apply(Map& map,
-			group_t parent_group_id, const BBox& rect) {
+	bool TunnelGenOperator::apply(Map& map, group_t parent_group_id,
+			const BBox& rect) {
 
 		Pos p;
 		bool axis, positive;
@@ -296,9 +300,9 @@ namespace ldungeon_gen {
 					int path_len = 5;
 					for (int attempts = 0; attempts < 16 && !generated;
 							attempts++) {
-						TunnelGenImpl tg(map, randomizer, is_valid,
-								is_finished, fill_oper, perimeter_oper, i + 1,
-								padding, genwidth, path_len, 20,
+						TunnelGenImpl tg(map, randomizer, selector,
+								fill_oper, perimeter_oper, i + 1, padding,
+								genwidth, path_len, 20,
 								padding > 0
 										&& (genpaths[i] > 0 || nogen_tries > 100));
 
