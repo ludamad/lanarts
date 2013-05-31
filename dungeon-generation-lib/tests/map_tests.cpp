@@ -95,9 +95,9 @@ static const Size MAP_SIZE(80, 40);
 
 TEST(test_map_generation) {
 	MTwist randomizer;
+	/* 0, 1, 2 are used as map content values*/
 	Map map(MAP_SIZE);
 
-	/* 0, 1, 2 are used as map content values*/
 	/* Create rooms */{
 		ConditionalOperator fill_oper(SELECT_ALL,
 				Operator(0, FLAG_SOLID /* remove solid flag */, 0, 1));
@@ -105,18 +105,18 @@ TEST(test_map_generation) {
 				Operator(FLAG_PERIMETER /* add perimeter flag */, 0, 0, 2));
 		/* Operator to carve out each room */
 		RectangleApplyOperator rect_oper(fill_oper, 1, perimeter_oper);
-		BSPApplyOperator bsp_oper(randomizer, rect_oper, Size(8,8), true, 6);
+		BSPApplyOperator bsp_oper(randomizer, rect_oper, Size(8, 8), true, 7);
 		bsp_oper.apply(map, ROOT_GROUP_ID, BBox(Pos(0, 0), MAP_SIZE));
 	}
 
 	/* Create tunnels */{
 		ConditionalOperator fill_oper(SELECT_ALL,
 				Operator(FLAG_TUNNEL, FLAG_SOLID, 0, 3));
-		ConditionalOperator perimeter_oper(SELECT_ALL,
+		ConditionalOperator perimeter_oper(Selector(FLAG_SOLID),
 				Operator(FLAG_SOLID | FLAG_TUNNEL | FLAG_PERIMETER, 0, 0, 4));
-		Selector is_invalid(FLAG_TUNNEL, FLAG_SOLID);
-		Selector is_finished(0, FLAG_SOLID | FLAG_TUNNEL);
-		TunnelGenOperator tunnel_oper(randomizer, is_invalid, is_finished,
+		Selector is_valid(FLAG_SOLID, FLAG_TUNNEL);
+		Selector is_finished(0, FLAG_SOLID);
+		TunnelGenOperator tunnel_oper(randomizer, is_valid, is_finished,
 				fill_oper, perimeter_oper, 1, Range(1, 2), Range(1, 1));
 		tunnel_oper.apply(map, ROOT_GROUP_ID, BBox(Pos(0, 0), MAP_SIZE));
 	}
@@ -127,7 +127,15 @@ TEST(test_map_generation) {
 			int n = map[Pos(x, y)].content;
 			int g = map[Pos(x, y)].group;
 			bool solid = map[Pos(x, y)].matches_flags(FLAG_SOLID);
-			if (n == 0) {
+			bool perimeter = map[Pos(x, y)].matches_flags(FLAG_PERIMETER);
+			bool tunnel = map[Pos(x, y)].matches_flags(FLAG_TUNNEL);
+			if (solid && tunnel)
+				printf("T ");
+			else if (!solid && tunnel)
+				printf("- ");
+			else if (perimeter && solid) {
+				printf("O ");
+			} else if (n == 0) {
 				printf(solid ? "# " : "0 ");
 			} else if (n == 1) {
 //				printf("%c ", char('a' + (g % 24)));

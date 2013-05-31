@@ -33,21 +33,21 @@ namespace ldungeon_gen {
 		uint16 must_be_on_bits;
 		uint16 must_be_off_bits;
 		uint16 must_be_content;
-		bool use_must_be_value;
+		bool use_must_be_content;
 
 		Selector(uint16 must_be_on_bits, uint16 must_be_off_bits,
 				uint16 must_be_content) :
 						must_be_on_bits(must_be_on_bits),
 						must_be_off_bits(must_be_off_bits),
 						must_be_content(must_be_content),
-						use_must_be_value(true) {
+						use_must_be_content(true) {
 		}
 
 		Selector(uint16 must_be_on_bits = 0, uint16 must_be_off_bits = 0) :
 						must_be_on_bits(must_be_on_bits),
 						must_be_off_bits(must_be_off_bits),
 						must_be_content(0),
-						use_must_be_value(false) {
+						use_must_be_content(false) {
 		}
 
 	};
@@ -104,11 +104,11 @@ namespace ldungeon_gen {
 						group(group) {
 		}
 		inline bool matches(Selector selector) const {
-			return ((selector.must_be_on_bits & flags)
+			return ((flags & selector.must_be_on_bits)
 					== selector.must_be_on_bits)
-					&& ((selector.must_be_off_bits & ~flags)
-							== selector.must_be_off_bits)
-					&& (!selector.use_must_be_value
+					&& ((flags & ~selector.must_be_off_bits)
+							== flags)
+					&& (!selector.use_must_be_content
 							|| content == selector.must_be_content);
 		}
 		inline void apply(Operator oper) {

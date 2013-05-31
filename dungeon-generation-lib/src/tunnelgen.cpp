@@ -21,14 +21,14 @@ namespace ldungeon_gen {
 		enum {
 			NO_TURN = 0, TURN_PERIMETER = 1, TURN_START = 2
 		};
-		TunnelGenImpl(Map& map, MTwist& mt, Selector is_invalid,
+		TunnelGenImpl(Map& map, MTwist& mt, Selector is_valid,
 				Selector is_finished, ConditionalOperator fill_oper,
 				ConditionalOperator perimeter_oper, int start_room, int padding,
 				int width, int depth, int change_odds,
 				bool accept_tunnel_entry = false) :
 						map(map),
 						mt(mt),
-						is_invalid(is_invalid),
+						is_valid(is_valid),
 						is_finished(is_finished),
 						fill_oper(fill_oper),
 						perimeter_oper(perimeter_oper),
@@ -67,7 +67,7 @@ namespace ldungeon_gen {
 	private:
 		Map& map;
 		MTwist& mt;
-		Selector is_invalid, is_finished;
+		Selector is_valid, is_finished;
 		ConditionalOperator perimeter_oper, fill_oper;
 		int start_room;
 		int end_room;
@@ -164,7 +164,7 @@ namespace ldungeon_gen {
 //					|| (!accept_tunnel_entry && cntxt->turn_state == NO_TURN
 //							&& sqr.matches_flags(FLAG_PERIMETER)
 //							&& sqr.group == 0))
-			if (sqr.matches(is_invalid)) {
+			if (!sqr.matches(is_valid) && cntxt->turn_state == NO_TURN) {
 				return false;
 			}
 			memcpy(prev_content + i, &sqr, sizeof(Square));
@@ -296,7 +296,7 @@ namespace ldungeon_gen {
 					int path_len = 5;
 					for (int attempts = 0; attempts < 16 && !generated;
 							attempts++) {
-						TunnelGenImpl tg(map, randomizer, is_invalid,
+						TunnelGenImpl tg(map, randomizer, is_valid,
 								is_finished, fill_oper, perimeter_oper, i + 1,
 								padding, genwidth, path_len, 20,
 								padding > 0
@@ -321,6 +321,8 @@ namespace ldungeon_gen {
 				}
 			}
 		}
+
+		return true;
 	}
 	bool TunnelGenImpl::generate(Pos p, int dx, int dy,
 			std::vector<Square>& btbuff,

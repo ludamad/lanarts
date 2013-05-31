@@ -20,17 +20,17 @@ namespace ldungeon_gen {
 
 	struct TunnelGenOperator: public AreaOperatorBase {
 		MTwist randomizer;
-		Selector is_invalid, is_finished;
+		Selector is_valid, is_finished;
 		ConditionalOperator fill_oper, perimeter_oper;
 		int padding;
 		Range size, num_tunnels;
 
-		TunnelGenOperator(MTwist& randomizer, Selector is_invalid,
+		TunnelGenOperator(MTwist& randomizer, Selector is_valid,
 				Selector is_finished, ConditionalOperator fill_oper,
 				ConditionalOperator perimeter_oper, int padding, Range size,
 				Range num_tunnels) :
 						randomizer(randomizer),
-						is_invalid(is_invalid),
+						is_valid(is_valid),
 						is_finished(is_finished),
 						fill_oper(fill_oper),
 						perimeter_oper(perimeter_oper),
