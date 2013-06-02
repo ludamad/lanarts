@@ -153,7 +153,6 @@ static bool lapi_enemyinst_unique(EnemyInst* inst) {
 
 static int lapi_gameinst_getter_fallback(lua_State* L) {
 	LuaValue& variables = luawrap::get<GameInst*>(L, 1)->lua_variables;
-	printf("Getting '%s'\n", lua_tostring(L, 2));
 	if (variables.empty()) {
 		lua_pushnil(L);
 	} else {
@@ -214,8 +213,17 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 }
 
 static int lapi_do_nothing(lua_State *L) {
-    (void) L;
     return 0;
+}
+
+static int lapi_return_0(lua_State *L) {
+    lua_pushnumber(L, 0);
+    return 1;
+}
+
+static int lapi_return_false(lua_State *L) {
+    lua_pushboolean(L, false);
+    return 1;
 }
 
 static LuaValue lua_combatgameinst_metatable(lua_State* L) {
@@ -246,6 +254,8 @@ static LuaValue lua_enemyinst_metatable(lua_State* L) {
 
 	getters["name"].bind_function(lapi_enemyinst_name);
 	getters["unique"].bind_function(lapi_enemyinst_unique);
+	getters["kills"].bind_function(lapi_return_0);
+	methods["is_local_player"].bind_function(lapi_return_false);
 
 	return meta;
 }
