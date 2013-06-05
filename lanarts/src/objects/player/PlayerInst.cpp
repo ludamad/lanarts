@@ -35,15 +35,17 @@ PlayerInst::PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y,
 	last_chosen_weaponclass = "unarmed";
 }
 
-std::string player_name(GameState* gs, PlayerInst* p) {
+
+PlayerDataEntry& PlayerInst::player_entry(GameState* gs) const {
 	std::vector<PlayerDataEntry>& players = gs->player_data().all_players();
 	for (int i = 0; i < players.size(); i++) {
-		if (players[i].player_inst.get() == p) {
-			return players[i].player_name;
+		if (players[i].player_inst.get() == this) {
+			return players[i];
 		}
 	}
 	LANARTS_ASSERT(false);
-	return "";
+	/* Typematch to quell warning */
+	return players.at(-1);
 }
 
 void PlayerInst::init(GameState* gs) {

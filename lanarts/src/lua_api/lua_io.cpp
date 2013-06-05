@@ -142,7 +142,6 @@ LuaValue lua_textfieldmetatable(lua_State* L) {
 	LuaValue getters = luameta_getters(meta);
 	LuaValue setters = luameta_setters(meta);
 
-
 	getters["text"].bind_function(textfield_get_text);
 	setters["text"].bind_function(textfield_set_text);
 	getters["max_length"].bind_function(textfield_get_max_length);

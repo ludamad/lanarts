@@ -3,8 +3,8 @@ username: User
 
 #Window settings
 fullscreen: no
-view_width: 900
-view_height: 720
+view_width: 800
+view_height: 600
 
 #Font settings
 font: res/fonts/Gudea-Regular.ttf

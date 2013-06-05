@@ -38,6 +38,8 @@ struct PlayerScoreStats {
 	int deaths, kills, deepest_floor;
 };
 
+struct PlayerDataEntry;
+
 /* The player object, one exists globally per player */
 class PlayerInst: public CombatGameInst {
 public:
@@ -106,6 +108,8 @@ public:
 		return equipment().projectile();
 	}
 
+	PlayerDataEntry& player_entry(GameState* gs) const;
+
 	bool is_local_player() {
 		return local;
 	}
@@ -166,7 +170,6 @@ private:
 	int previous_spellselect, spellselect;
 };
 
-std::string player_name(GameState* gs, PlayerInst* p);
 bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position);
 
 #endif /* PLAYERINST_H_ */

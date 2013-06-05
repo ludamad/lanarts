@@ -158,7 +158,7 @@ void ScoreBoard::write_entries(const std::vector<ScoreBoardEntry>& entries) {
 void score_board_store(GameState* gs, bool won_the_game) {
 	PlayerInst* player = gs->local_player();
 
-	std::string name = player_name(gs, player);
+	std::string name = player->player_entry(gs).player_name;
 	std::string sprite_name = res::sprite_name(player->get_sprite());
 	std::string class_name = player->class_stats().class_entry().name;
 

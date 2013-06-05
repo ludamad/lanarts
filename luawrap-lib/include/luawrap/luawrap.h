@@ -75,7 +75,7 @@ namespace luawrap {
 		return _private::PushGetCheckWrap<T>::check(L, idx);
 	}
 
-	// Utility operators:
+//	// Utility operators:
 	template<typename T>
 	inline void get(lua_State* L, int idx, T& val) {
 		val = get<T>(L, idx);

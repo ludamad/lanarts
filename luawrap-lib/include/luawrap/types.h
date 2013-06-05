@@ -201,15 +201,34 @@ namespace luawrap {
 		}
 
 		template<typename To, typename From>
+		inline To get_dynamic_casted(lua_State* L, int idx) {
+			return dynamic_cast<To>(luawrap::get<From>(L, idx));
+		}
+
+		template<typename To, typename From>
 		inline void push_casted(lua_State* L, const To& val) {
 			luawrap::push<From>(L, (From)val);
 		}
+
+		template<typename To, typename From>
+		inline void push_dynamic_casted(lua_State* L, const To& val) {
+			luawrap::push<From>(L, dynamic_cast<From>(val));
+		}
 	}
+
 	template<typename To, typename From>
 	static inline void install_casted_type() {
 		using namespace _private;
 
 		install_type<To, &push_casted<To, From>, &get_casted<To, From>,
+				&luawrap::check<From> >();
+	}
+
+	template<typename To, typename From>
+	static inline void install_dynamic_casted_type() {
+		using namespace _private;
+
+		install_type<To, &push_dynamic_casted<To, From>, &get_dynamic_casted<To, From>,
 				&luawrap::check<From> >();
 	}
 }

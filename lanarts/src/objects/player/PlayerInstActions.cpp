@@ -602,7 +602,7 @@ void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 	int newlevel = gs->get_level()->id() - 1;
 	std::string verb = "You ascend";
 	if (!is_local_player()) {
-		verb = player_name(gs, this) + " ascends";
+		verb = player_entry(gs).player_name + " ascends";
 	}
 
 	if (newlevel == 0) {
@@ -644,7 +644,7 @@ void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
 
 	std::string verb = "You descend";
 	if (!is_local_player()) {
-		verb = player_name(gs, this) + " descends";
+		verb = player_entry(gs).player_name + " descends";
 	}
 
 	if (newlevel == 0) {

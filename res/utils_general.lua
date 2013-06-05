@@ -88,6 +88,31 @@ function pretty_tostring(val, --[[Optional]] tabs, --[[Optional]] packed, --[[Op
     return table.concat(parts)
 end
 
+function table.pop_first(t)
+    local len = #t
+    if len == 0 then 
+        return nil 
+    end
+    local val = t[len]
+    for i=1,len-1 do
+        t[i] = t[i+1]
+    end
+    t[len] = nil
+    return val
+end
+
+function table.pop_last(t)
+    local val = t[#t]
+    t[#t] = nil
+    return val    
+end
+
+function table.insert_all(t1, t2)
+    for v in values(t2) do
+        t1[#t1] = v
+    end
+end
+
 --- Get a  human-readable string from a lua value. The resulting value is generally valid lua.
 -- Note that the paramaters should typically not used directly, except for perhaps 'packed'.
 -- @param val the value to pretty-print
