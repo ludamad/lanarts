@@ -38,18 +38,22 @@ static tileset_id randtileset(MTwist& mt,
 	return tilesets[mt.rand(tilesets.size())];
 }
 
-static void create_door(GameState* gs, GeneratedRoom& l, int x, int y) {
+static void create_door(GameState* gs, GeneratedRoom& room, const Pos& xy) {
 	GameTiles& tiles = gs->tiles();
 	int tw = tiles.tile_width(), th = tiles.tile_height();
-	int lw = l.width(), lh = l.height();
+	int lw = room.width(), lh = room.height();
 
 	int start_x = (tw - lw) / 2;
 	int start_y = (th - lh) / 2;
 
-	Sqr& s = l.at(x, y);
+	if (!room.within(xy)) {
+		return;
+	}
+
+	Sqr& s = room.at(xy);
 	if (!s.has_instance && s.passable) {
 		s.has_instance = true;
-		Pos fpos(x + start_x, y + start_y);
+		Pos fpos = xy + Pos(start_x, start_y);
 		fpos = centered_multiple(fpos, TILE_SIZE);
 		gs->add_instance(new FeatureInst(fpos, FeatureInst::DOOR_CLOSED));
 	}
@@ -67,26 +71,26 @@ static void remove_wall(GameState* gs, GeneratedRoom& l, int x, int y) {
 		s.passable = true;
 	}
 }
-static void create_doors_all_around(GameState* gs, GeneratedRoom& l,
+static void create_doors_all_around(GameState* gs, GeneratedRoom& room,
 		const BBox& region) {
 	for (int x = region.x1; x < region.x2; x++) {
-		create_door(gs, l, x, region.y1);
-		create_door(gs, l, x, region.y2 - 1);
+		create_door(gs, room, Pos(x, region.y1));
+		create_door(gs, room, Pos(x, region.y2 - 1));
 	}
 	for (int y = region.y1; y < region.y2; y++) {
-		create_door(gs, l, region.x1, y);
-		create_door(gs, l, region.x2 - 1, y);
+		create_door(gs, room, Pos(region.x1, y));
+		create_door(gs, room, Pos(region.x2 - 1, y));
 	}
 }
-static void remove_all_around(GameState* gs, GeneratedRoom& l,
+static void remove_all_around(GameState* gs, GeneratedRoom& room,
 		const BBox& region) {
 	for (int x = region.x1 + 1; x < region.x2 - 1; x++) {
-		remove_wall(gs, l, x, region.y1);
-		remove_wall(gs, l, x, region.y2 - 1);
+		remove_wall(gs, room, x, region.y1);
+		remove_wall(gs, room, x, region.y2 - 1);
 	}
 	for (int y = region.y1 + 1; y < region.y2 - 1; y++) {
-		remove_wall(gs, l, region.x1, y);
-		remove_wall(gs, l, region.x2 - 1, y);
+		remove_wall(gs, room, region.x1, y);
+		remove_wall(gs, room, region.x2 - 1, y);
 	}
 }
 static StoreInventory generate_shop_inventory(MTwist& mt, int itemn) {
@@ -104,10 +108,10 @@ static StoreInventory generate_shop_inventory(MTwist& mt, int itemn) {
 	}
 	return inv;
 }
-static void generate_shop(GameState* gs, GeneratedRoom& level, MTwist& mt,
+static void generate_shop(GameState* gs, GeneratedRoom& room, MTwist& mt,
 		const Pos& p) {
-	Pos worldpos = level.get_world_coordinate(gs, p);
-	level.at(p).has_instance = true;
+	Pos worldpos = room.get_world_coordinate(gs, p);
+	room.at(p).has_instance = true;
 
 	int itemn = mt.rand(Range(2, 14));
 	gs->add_instance(
@@ -115,10 +119,10 @@ static void generate_shop(GameState* gs, GeneratedRoom& level, MTwist& mt,
 					generate_shop_inventory(mt, itemn)));
 
 }
-static void generate_statue(GameState* gs, GeneratedRoom& level, MTwist& mt,
+static void generate_statue(GameState* gs, GeneratedRoom& room, MTwist& mt,
 		const Pos& p) {
-	Pos worldpos = level.get_world_coordinate(gs, p);
-	level.at(p).has_instance = true;
+	Pos worldpos = room.get_world_coordinate(gs, p);
+	room.at(p).has_instance = true;
 
 	sprite_id spriteid = res::sprite_id("statue");
 	SpriteEntry& statue_sprite = game_sprite_data.at(spriteid);
@@ -131,13 +135,13 @@ static void generate_statue(GameState* gs, GeneratedRoom& level, MTwist& mt,
 					FeatureInst::DEPTH, imgid));
 }
 
-static bool is_near_wall(GeneratedRoom& level, const Pos& p) {
+static bool is_near_wall(GeneratedRoom& room, const Pos& p) {
 	for (int dy = -1; dy <= +1; dy++) {
 		for (int dx = -1; dx <= +1; dx++) {
-			if (!level.within(Pos(p.x + dx, p.y + dy))) {
+			if (!room.within(Pos(p.x + dx, p.y + dy))) {
 				continue;
 			}
-			if (!level.at(Pos(p.x + dx, p.y + dy)).passable) {
+			if (!room.at(Pos(p.x + dx, p.y + dy)).passable) {
 				return true;
 			}
 		}
@@ -146,15 +150,15 @@ static bool is_near_wall(GeneratedRoom& level, const Pos& p) {
 }
 
 void generate_features(const FeatureGenSettings& fs, MTwist& mt,
-		GeneratedRoom& level, GameState* gs) {
+		GeneratedRoom& room, GameState* gs) {
 
-	std::vector<RoomRegion>& rooms = level.rooms();
+	std::vector<RoomRegion>& rooms = room.rooms();
 	const int nrooms = rooms.size();
 
 	for (int i = 0; i < nrooms; i++) {
 		Region& r = rooms[i].region;
 		if (gs->rng().rand(100) == 0) {
-			remove_all_around(gs, level,
+			remove_all_around(gs, room,
 					BBox(r.x - 1, r.y - 1, r.x + r.w + 1, r.y + r.h + 1));
 		}
 	}
@@ -164,7 +168,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 	tiles.clear();
 
 	int tw = tiles.tile_width(), th = tiles.tile_height();
-	int lw = level.width(), lh = level.height();
+	int lw = room.width(), lh = room.height();
 
 	int start_x = (tw - lw) / 2;
 	int start_y = (th - lh) / 2;
@@ -183,7 +187,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 				continue;
 			}
 
-			Sqr& s = level.at(x - start_x, y - start_y);
+			Sqr& s = room.at(x - start_x, y - start_y);
 			tiles.set_solid(xy, !s.passable);
 			tiles.set_seethrough(xy, s.passable);
 			if (s.passable) {
@@ -205,10 +209,10 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 		}
 	}
 
-	for (int i = 0; i < level.rooms().size(); i++) {
+	for (int i = 0; i < room.rooms().size(); i++) {
 		if (gs->rng().rand(3) != 0)
 			continue;
-		Region r = level.rooms()[i].region;
+		Region r = room.rooms()[i].region;
 		/*
 
 		 int rx = r.x + gs->rng().rand(1, r.w-1);
@@ -223,7 +227,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 
 		for (int y = ry; y < ry + rh; y++) {
 			for (int x = rx; x < rx + rw; x++) {
-				Sqr& s = level.at(x, y);
+				Sqr& s = room.at(x, y);
 				if (s.passable && s.roomID && s.feature != SMALL_CORRIDOR)
 					tiles.get(Pos(x + start_x, y + start_y)) = rltile(mt,
 							tileset.altfloor);
@@ -232,8 +236,8 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 	}
 	gs->get_level()->entrances.clear();
 	for (int n = 0; n < fs.nstairs_down; n++) {
-		Pos p = generate_location(mt, level);
-		level.at(p).has_instance = true;
+		Pos p = generate_location(mt, room);
+		room.at(p).has_instance = true;
 
 		p.x += start_x;
 		p.y += start_y;
@@ -245,16 +249,16 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 
 	gs->get_level()->exits.clear();
 	for (int n = 0; n < fs.nstairs_up; n++) {
-		Pos p = generate_location(mt, level);
-		level.at(p).has_instance = true;
+		Pos p = generate_location(mt, room);
+		room.at(p).has_instance = true;
 
 		int x = p.x - 4, y = p.y - 4;
 		int ex = p.x + 5, ey = p.y + 5;
 		x = std::max(0, x), y = std::max(0, y);
-		ex = std::min(ex, level.width()), ey = std::min(ey, level.height());
+		ex = std::min(ex, room.width()), ey = std::min(ey, room.height());
 		for (int yy = y; yy < ey; yy++) {
 			for (int xx = x; xx < ex; xx++) {
-				level.at(xx, yy).near_entrance = true;
+				room.at(xx, yy).near_entrance = true;
 			}
 		}
 
@@ -268,7 +272,7 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 	for (int i = 0; i < nrooms; i++) {
 		Region& r = rooms[i].region;
 		if (mt.rand(100) == 0) {
-			create_doors_all_around(gs, level,
+			create_doors_all_around(gs, room,
 					BBox(r.x - 1, r.y - 1, r.x + r.w + 1, r.y + r.h + 1));
 		}
 	}
@@ -288,25 +292,25 @@ void generate_features(const FeatureGenSettings& fs, MTwist& mt,
 			if (++attempts < MAX_STATUE_ATTEMPTS) {
 				goto GiveUpOnStatueGeneration;
 			}
-			pos = generate_location_in_region(mt, level, inner);
-			Sqr& sqr = level.at(pos);
+			pos = generate_location_in_region(mt, room, inner);
+			Sqr& sqr = room.at(pos);
 			if (!sqr.passable || sqr.has_instance) {
 				/* We may not have many candidate locations, just skip this one in case */
 				goto GiveUpOnStatueGeneration;
 			}
-		} while (is_near_wall(level, pos));
-		generate_statue(gs, level, mt, pos);
+		} while (is_near_wall(room, pos));
+		generate_statue(gs, room, mt, pos);
 		GiveUpOnStatueGeneration:;
 	}
 
 	if (mt.rand(4) == 0) {
 		for (int attempts = 0; attempts < 200; attempts++) {
-			Pos pos = generate_location(mt, level);
-			Sqr& sqr = level.at(pos);
+			Pos pos = generate_location(mt, room);
+			Sqr& sqr = room.at(pos);
 			if (!sqr.passable || sqr.has_instance) {
 				continue;
 			}
-			generate_shop(gs, level, mt, pos);
+			generate_shop(gs, room, mt, pos);
 			break;
 		}
 	}

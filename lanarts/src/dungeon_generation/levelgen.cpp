@@ -131,7 +131,9 @@ GameRoomState* generate_level(int roomid, MTwist& mt, GeneratedRoom& level,
 	if (!ls.area_templates.empty()) {
 		int area_idx = mt.rand(ls.area_templates.size());
 		AreaTemplate& area_template = get_area_template(ls.area_templates[area_idx]);
-		generate_area(level, area_template, Pos(2, 2), mt.rand(2), mt.rand(2));
+		int offset_x = (w - area_template.width()) / 2;
+		int offset_y = (h - area_template.height()) / 2;
+		generate_area(level, area_template, Pos(offset_x, offset_y), mt.rand(2), mt.rand(2));
 	}
 	for (int i = 0; i < roomsettings.size(); i++) {
 		generate_rooms(L, roomsettings[i], mt, level);

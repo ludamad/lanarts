@@ -97,7 +97,6 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 }
 
 static int lapi_combatgameinst_damage(lua_State* L) {
-	using namespace luawrap;
 	GameState* gs = lua_api::gamestate(L);
 	EffectiveAttackStats attack;
 	int nargs = lua_gettop(L);
@@ -106,7 +105,7 @@ static int lapi_combatgameinst_damage(lua_State* L) {
 	attack.magic_percentage = nargs >= 4 ? lua_tonumber(L, 4) : 1.0f;
 	attack.resist_modifier = nargs >= 5 ? lua_tonumber(L, 5) : 1.0f;
 
-	get<CombatGameInst*>(L, 1)->damage(lua_api::gamestate(L), attack);
+	luawrap::get<CombatGameInst*>(L, 1)->damage(lua_api::gamestate(L), attack);
 	return 0;
 }
 
