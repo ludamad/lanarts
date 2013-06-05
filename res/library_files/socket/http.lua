@@ -267,7 +267,7 @@ local function shouldreceivebody(reqt, code)
 end
 
 -- forward declarations
-local trequest, tredirect
+local tredirect
 
 function tredirect(reqt, location)
     local result, code, headers, status = trequest {
@@ -287,6 +287,7 @@ function tredirect(reqt, location)
     return result, code, headers, status
 end
 
+--- XXX: Made global for Lanarts purposes
 function trequest(reqt)
     -- we loop until we get what we want, or
     -- until we are sure there is no way to get it
