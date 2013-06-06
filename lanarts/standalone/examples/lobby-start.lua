@@ -93,7 +93,7 @@ end
 function lobby_menu_create(on_back_click) 
     local menu = InstanceBox.create{ size = vector_min(Display.display_size, {800, 600}) }
     menu.entry_list = game_entry_list_create()
-    menu:add_instance(menu.entry_list, LEFT_CENTER, {20, 80})
+    menu:add_instance(menu.entry_list, LEFT_TOP, {20, 210})
     menu:add_instance(Sprite.image_create(logo_path), LEFT_TOP, {10,10})
     menu:add_instance(TextLabel.create(alt_font, "Open Games"), LEFT_CENTER, {20,-52})
 
