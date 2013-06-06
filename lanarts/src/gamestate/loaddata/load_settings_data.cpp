@@ -65,6 +65,7 @@ bool load_settings_data(GameSettings& settings, const char* filename) {
 			optional_set(root, "view_height", settings.view_height);
 			optional_set(root, "ip", settings.ip);
 			optional_set(root, "port", settings.port);
+			optional_set(root, "lobby_server_url", settings.lobby_server_url);
 			optional_set(root, "steps_per_draw", settings.steps_per_draw);
 			if (settings.steps_per_draw < 1)
 				settings.steps_per_draw = 1;

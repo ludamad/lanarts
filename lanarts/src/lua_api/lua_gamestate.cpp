@@ -91,6 +91,7 @@ LuaValue luaapi_settings_proxy(lua_State* L) {
 	BIND(view_height);
 	BIND(ip);
 	BIND(port);
+	BIND(lobby_server_url);
 	BIND(steps_per_draw);
 	BIND(frame_action_repeat);
 	BIND(free_memory_while_idle);

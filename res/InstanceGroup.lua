@@ -68,7 +68,6 @@ function InstanceGroup:remove(obj)
     for i = 1, #insts do
         if insts[i][1] == obj then
             table.remove(insts, i)
-            print("WE REMOVED IT")
             return true
         end
     end

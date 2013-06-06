@@ -38,15 +38,15 @@ local function loading_box_create(size)
 end
 
 -- For reference, this is how the received table looks
-local sample_lobby_entry = { 
-    host = "ludamad",
-    creationTime = 1010010,
-    id = "51b002b8e1382367f2000003",
-    players = {
-        "ciribot",
-        "ludamad",
-    }
-}
+--local sample_lobby_entry = { 
+--    host = "ludamad",
+--    creationTime = 1010010,
+--    id = "51b002b8e1382367f2000003",
+--    players = {
+--        "ciribot",
+--       "ludamad",
+--    }
+--}
 
 local configuration = {
     update_frequency = 5000 -- milliseconds

@@ -18,6 +18,7 @@ struct GameSettings {
 
 	/*Multiplayer settings*/
 	std::string ip, username;
+	std::string lobby_server_url;
 	int port;
 	connection_type conntype;
 	bool network_debug_mode;
@@ -71,6 +72,7 @@ struct GameSettings {
 		draw_diagnostics = false;
 
 		ip = "localhost";
+		lobby_server_url = "http://localhost:8080";
 		port = 6112;
 		conntype = NONE;
 		network_debug_mode = false;

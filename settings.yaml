@@ -1,5 +1,6 @@
 #Online settings
 username: User
+lobby_server_url: http://localhost:8080
 
 #Window settings
 fullscreen: no
