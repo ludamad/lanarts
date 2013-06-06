@@ -1,37 +1,19 @@
-require "utils" -- for pretty_print
-YieldingSocket = require "networking.YieldingSocket"
-
 local json = require "json"
 local socket = require "socket"
 local http = require "socket.http"
 local ltn12 = require "ltn12"
 
-local conf = {
-    url = "http://localhost:8080/",
-}
+require "utils" -- for pretty_print
+require "networking.http_request"
 
 local login_info = {
     username = nil,
     sessionId = nil
 }
 
-local function yielding_request(url, message)
-    local response_parts = {}
-    local reqt = {
-        url = url,
-        method = "POST",
-        create = YieldingSocket.create,
-        sink = ltn12.sink.table(response_parts),
-        source = ltn12.source.string(message),
-        headers = {
-            ["content-length"] = #message,
-            ["content-type"] = "application/x-www-form-urlencoded"
-        }
-    }
-    pretty_print(reqt)
-    local code, headers, status = socket.skip(1, http.trequest(reqt))
-    return table.concat(response_parts), code, headers, status
-end
+local conf = {
+    url = "http://localhost:8080"
+}
 
 local function send_request(r)
     local json_string = json.generate(r)
@@ -65,13 +47,10 @@ local function parse_request(line)
     return nil
 end
 
-local function handle_response(str)
-    local status, msg = json.parse(str)
-    if not status then 
-        error(msg) 
-    elseif msg.type == "LoginSuccessMessage" then
+local function handle_response(msg, status)
+    if msg.type == "LoginSuccessMessage" then
         login_info.sessionId = msg.sessionId    
-    end 
+    end
     pretty_print(msg)
 end
 
@@ -79,10 +58,19 @@ local function handle_next_request(line)
     local request = parse_request(line)
     if request ~= nil then
         local thread = coroutine.create(function()
-            local response = send_request(request) 
+            local response, status = json_request(conf.url, request) 
+            if status ~= 200 then 
+                error(response)
+            end
             handle_response(response)
         end)
-        while coroutine.resume(thread) == true do end
+        while true do
+            local status, err = coroutine.resume(thread)
+            if not status then
+                if err and err ~= 'cannot resume dead coroutine' then error(err) end
+                break
+            end
+        end
     else 
         print "Your request was invalidly formatted!"
     end
@@ -96,4 +84,3 @@ function main()
         io.flush()
     end
 end
-

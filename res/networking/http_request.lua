@@ -3,9 +3,12 @@
 -- Primarily for use with luasocket's socket.http & coroutines
 -- Reads in line by line
 
-require "utils" -- for table.pop_front & do_nothing
-
+local jsonlib = require "json"
 local socket = require "socket"
+local http = require "socket.http"
+local ltn12 = require "ltn12"
+
+require "utils" -- for table.pop_front & do_nothing
 
 local YieldingSocket = newtype()
 
@@ -66,4 +69,37 @@ function YieldingSocket:receive(pattern, ...)
     end
 end
 
-return YieldingSocket
+--- Calls yield instead of blocking
+function http_request(url, message)
+    local response_parts = {}
+    local reqt = {
+        url = url,
+        method = "GET",
+        create = YieldingSocket.create,
+        sink = ltn12.sink.table(response_parts)
+    }
+    if message then        
+        reqt.source = ltn12.source.string(message)
+        reqt.headers = {
+            ["content-length"] = #message,
+            ["content-type"] = "application/x-www-form-urlencoded"
+        }
+        reqt.method = "POST"
+    end
+    pretty_print(reqt)
+    local code, headers, status = socket.skip(1, http.trequest(reqt))
+    return table.concat(response_parts), code, headers, status
+end
+
+--- Calls yield instead of blocking
+function json_request(url, message)
+    -- nil if message is nil
+    print "JSON REQUEST"
+    local json_request = message and jsonlib.generate(message)
+    local json_response, code, headers, status = http_request(url, json_request)
+    print "JSON REQUEST"
+    local status, response_table = jsonlib.parse(json_response)
+    if not status then error(response_table) end
+
+    return response_table, code, headers, status
+end

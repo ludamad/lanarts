@@ -1,6 +1,7 @@
 CMakeFiles/*
 logs/*
 replays/*
+saves/
 CMakeCache.txt
 Makefile
 saved_settings.yaml
