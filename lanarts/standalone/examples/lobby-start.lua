@@ -4,6 +4,9 @@ require "InstanceLine"
 require "Sprite"
 require "TextLabel"
 
+require "networking.lobby"
+require "networking.tasks"
+
 require "utils_text_component"
 
 local game_entry_draw
@@ -19,30 +22,22 @@ local ENTRY_SIZE = {350, 40}
 local ENTRY_SPACING = 45
 local PLAYER_LIST_MAX_CHARS = 50
 
+-- For reference, this is how the received table looks
 local sample_lobby_entry = { 
     host = "ludamad",
-    max_players = 4, 
     creationTime = 1010010,
-    settings = {
-        hardcore = false,
-        gameSpeed = 10,
-        actionSkip = 0
-    },
+    id = "51b002b8e1382367f2000003",
     players = {
         "ciribot",
         "ludamad",
-        "ludamad",
-        "ludamad",
-        "gallanthor",
-        "Jesbus",
-        "Someone.Else<3"
     }
 }
 
-local sample_player_entry = {
-    name = "ciribot",
-    registered = true
-    -- In the future stats will go here. However it is too early to try to work with them.
+-- Filled with data from the server
+local entries = { }
+
+local configuration = {
+    update_frequency = 5000 -- milliseconds
 }
 
 local function game_entry_create(entry_number, entry_data)
@@ -67,7 +62,6 @@ end
 -- Recreated every time the game set changes
 local function game_entry_list_create()
     local obj = InstanceLine.create( {dx = 0, dy = ENTRY_SPACING, per_row = 1} )
-    local entries = { sample_lobby_entry, sample_lobby_entry, sample_lobby_entry, sample_lobby_entry, sample_lobby_entry } -- TODO real data
     for i=1,#entries do
         obj:add_instance(game_entry_create(i, entries[i]))
     end
@@ -98,7 +92,8 @@ end
 
 function lobby_menu_create(on_back_click) 
     local menu = InstanceBox.create{ size = vector_min(Display.display_size, {800, 600}) }
-    menu:add_instance(game_entry_list_create(), LEFT_CENTER, {20, 80})
+    menu.entry_list = game_entry_list_create()
+    menu:add_instance(menu.entry_list, LEFT_CENTER, {20, 80})
     menu:add_instance(Sprite.image_create(logo_path), LEFT_TOP, {10,10})
     menu:add_instance(TextLabel.create(alt_font, "Open Games"), LEFT_CENTER, {20,-52})
 
@@ -124,7 +119,27 @@ function main()
     Display.initialize("Lanarts Example", {640, 480}, false)
 --    Display.initialize("Lanarts Example", {1200, 900}, false)
     local menu_frame = InstanceBox.create { size = Display.display_size }
-    menu_frame:add_instance(lobby_menu_create(), CENTER)
+    local lobby_menu = lobby_menu_create()
+    menu_frame:add_instance(lobby_menu, CENTER)
+
+    local function query_game_list()
+        local first_time = true
+        while true do
+            local timer = timer_create()
+            while not first_time and timer:get_milliseconds() < configuration.update_frequency do
+                coroutine.yield()
+            end
+            local response = Lobby.query_game_list()
+            first_time = false
+            pretty_print(response)
+            lobby_menu.entry_list:clear()
+            for i=1,#response.gameList do
+                lobby_menu.entry_list:add_instance(game_entry_create(i, response.gameList[i]))
+            end
+        end
+    end
+
+    Task.create(query_game_list)
 
     local state = {menu = menu_frame}
 
@@ -134,6 +149,9 @@ function main()
         Display.draw_start()
         state.menu:draw({0,0})
         Display.draw_finish()
+
+        Task.run_all()
+        io.flush()
 
         Game.wait(5)
     end

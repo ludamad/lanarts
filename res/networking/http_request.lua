@@ -16,13 +16,13 @@ local YieldingSocket = newtype()
 local CONNECT_INTERVAL = 1000 -- 1000 ms
 
 function YieldingSocket:init(...)
-    print ("CALLED!")
+--    print ("CALLED!")
     self.socket = socket.tcp(...)
     self.socket:settimeout(0)
 end
 
 local function print_ret(fn, ...)
-    print(fn .. " returned : ", ...)
+--    print(fn .. " returned : ", ...)
     return ...
 end
 
@@ -55,10 +55,8 @@ function YieldingSocket:receive(pattern, ...)
     local line = ''
     while true do
         local result, err, part = print_ret("for receive", self.socket:receive(pattern, ...))
-        print (" Got pattern=", pattern, " rest = {", ..., "}, err=", err)
         if not result and err == "timeout" then 
             line = line .. part
-            print "YIELD"
             coroutine.yield()
         elseif err ~= nil then
             return nil, err
@@ -86,7 +84,6 @@ function http_request(url, message)
         }
         reqt.method = "POST"
     end
-    pretty_print(reqt)
     local code, headers, status = socket.skip(1, http.trequest(reqt))
     return table.concat(response_parts), code, headers, status
 end
