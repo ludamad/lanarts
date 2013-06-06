@@ -22,7 +22,10 @@ function Task.run_all()
     while i <= #task_list do
         local status, err = task_list[i]:resume()
         if not status then
-            if err and err ~= 'cannot resume dead coroutine' then error(err) end
+            if err and err ~= 'cannot resume dead coroutine' then 
+                if type(err) ~= "string" then err = pretty_tostring(err) end
+                error(err) 
+            end
             table.remove(task_list, i)
         else
             i = i + 1

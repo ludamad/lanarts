@@ -5,7 +5,7 @@ require "networking.http_request"
 
 
 Lobby = {
-    url = "http://putterson.homedns.org:8080"
+    url = "http://localhost:8080"
 }
 
 function Lobby.create_user(username, password)

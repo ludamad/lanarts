@@ -95,6 +95,12 @@ void lua_pushdrawable(lua_State* L, const Drawable& drawable) {
 			}
 		} else if (strcmp(member, "animated") == 0) {
 			lua_pushboolean(L, drawable.is_animated());
+		} else if (strcmp(member, "width") == 0) {
+			lua_pushnumber(L, drawable.size().h);
+		} else if (strcmp(member, "height") == 0) {
+			lua_pushnumber(L, drawable.size().w);
+		} else if (strcmp(member, "size") == 0) {
+			luawrap::push(L, drawable.size());
 		} else {
 			drawable_base_push_metatable(L);
 			lua_getfield(L, -1, member);

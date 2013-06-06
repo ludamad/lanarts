@@ -55,17 +55,9 @@ static int luaimage_index(lua_State *L) {
 	}
 	const Image & image = lua_getimage(L, 1);
 	const char* member = lua_tostring(L, 2);
-	if (strcmp(member, "width") == 0) {
-		lua_pushnumber(L, image.width());
-	} else if (strcmp(member, "height") == 0) {
-		lua_pushnumber(L, image.height());
-	} else if (strcmp(member, "size") == 0) {
-		luawrap::push(L, image.size());
-	} else {
-		return luadrawablebase_index(L, image, member);
-	}
 
-	return 1;
+	//TODO Evaluate if this is still needed, all it does is forward
+	return luadrawablebase_index(L, image, member);
 }
 
 void Image::push_metatable(lua_State *L) const {

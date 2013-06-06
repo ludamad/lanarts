@@ -12,9 +12,6 @@ require "utils" -- for table.pop_front & do_nothing
 
 local YieldingSocket = newtype()
 
--- Intervals to wait for connect before yielding
-local CONNECT_INTERVAL = 1000 -- 1000 ms
-
 function YieldingSocket:init(...)
 --    print ("CALLED!")
     self.socket = socket.tcp(...)
@@ -27,14 +24,20 @@ local function print_ret(fn, ...)
 end
 
 function YieldingSocket:connect(...)
+    local status, err = self.socket:connect(...)
+    if err and err ~= "timeout" then return status, err end
     while true do
-        self.socket:settimeout(CONNECT_INTERVAL)
-        local status, err = self.socket:connect(...)
-        if err == "timeout" then
-            coroutine.yield()
+        local _, writable, selecterr = socket.select({}, {self.socket}, 0) 
+        if selecterr and selecterr ~= "timeout" then error(selecterr) end
+        if # writable > 0 then
+            local status, err = self.socket:connect(...)
+            if err == nil or err == "already connected" then
+                return status, nil
+            elseif err ~= "timeout" then
+                return status, err
+            end
         else
-            self.socket:settimeout(0)
-            return status, err
+            coroutine.yield()
         end
     end
 end

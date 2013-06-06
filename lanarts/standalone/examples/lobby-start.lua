@@ -22,6 +22,21 @@ local ENTRY_SIZE = {350, 40}
 local ENTRY_SPACING = 45
 local PLAYER_LIST_MAX_CHARS = 50
 
+-- A component that starts by displaying a loading animation until 'replace' is called
+local function loading_box_create(size)
+    local obj = InstanceBox.create( {size=size} )
+    local loading_animation = animation_create( image_split(image_cached_load "res/menus/loading_64x64.png", {64, 64}), 0.1 )
+    local contents = Sprite.create(loading_animation, {color=with_alpha(COL_WHITE, 0.25)} )
+    obj:add_instance(contents, CENTER)
+    -- Called when component has loaded
+    function obj:replace(newcontents, origin)
+        if contents then self:remove(contents) end
+        contents = newcontents
+        self:add_instance(newcontents, origin)
+    end
+    return obj
+end
+
 -- For reference, this is how the received table looks
 local sample_lobby_entry = { 
     host = "ludamad",
@@ -32,9 +47,6 @@ local sample_lobby_entry = {
         "ludamad",
     }
 }
-
--- Filled with data from the server
-local entries = { }
 
 local configuration = {
     update_frequency = 5000 -- milliseconds
@@ -60,7 +72,7 @@ local function game_entry_create(entry_number, entry_data)
 end
 
 -- Recreated every time the game set changes
-local function game_entry_list_create()
+local function game_entry_list_create(entries)
     local obj = InstanceLine.create( {dx = 0, dy = ENTRY_SPACING, per_row = 1} )
     for i=1,#entries do
         obj:add_instance(game_entry_create(i, entries[i]))
@@ -92,8 +104,8 @@ end
 
 function lobby_menu_create(on_back_click) 
     local menu = InstanceBox.create{ size = vector_min(Display.display_size, {800, 600}) }
-    menu.entry_list = game_entry_list_create()
-    menu:add_instance(menu.entry_list, LEFT_TOP, {20, 210})
+    menu.entry_list = loading_box_create({400, 400})
+    menu:add_instance(menu.entry_list, LEFT_TOP, {20, 200})
     menu:add_instance(Sprite.image_create(logo_path), LEFT_TOP, {10,10})
     menu:add_instance(TextLabel.create(alt_font, "Open Games"), LEFT_CENTER, {20,-52})
 
@@ -131,11 +143,7 @@ function main()
             end
             local response = Lobby.query_game_list()
             first_time = false
-            pretty_print(response)
-            lobby_menu.entry_list:clear()
-            for i=1,#response.gameList do
-                lobby_menu.entry_list:add_instance(game_entry_create(i, response.gameList[i]))
-            end
+            lobby_menu.entry_list:replace( game_entry_list_create(response.gameList), LEFT_TOP, {0,0} )
         end
     end
 
