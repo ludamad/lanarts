@@ -94,10 +94,8 @@ end
 --- Calls yield instead of blocking
 function json_request(url, message)
     -- nil if message is nil
-    print "JSON REQUEST"
     local json_request = message and jsonlib.generate(message)
     local json_response, code, headers, status = http_request(url, json_request)
-    print "JSON REQUEST"
     local status, response_table = jsonlib.parse(json_response)
     if not status then error(response_table) end
 
