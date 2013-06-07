@@ -102,8 +102,31 @@ function game_entry_draw(number, entry, bbox)
     draw_rectangle_outline( bbox_mouse_over(bbox) and COL_WHITE or COL_GRAY, bbox, 1 )
 end
 
+local function game_query_task_create(menu)
+   local function query_game_list()
+        local first_time = true
+        while true do
+            local timer = timer_create()
+            while not first_time and timer:get_milliseconds() < configuration.update_frequency do
+                coroutine.yield()
+                -- Have we been signalled to finish ?
+                if not menu.alive then 
+                    return 
+                end
+            end
+            local response = Lobby.query_game_list()
+            first_time = false
+            menu.entry_list:replace( game_entry_list_create(response.gameList), LEFT_TOP, {0,0} )
+        end
+    end
+    Task.create(query_game_list)
+end
+
 function lobby_menu_create(on_back_click) 
     local menu = InstanceBox.create{ size = vector_min(Display.display_size, {800, 600}) }
+    -- The game query task will finish once menu.alive is false
+    menu.alive = true
+
     menu.entry_list = loading_box_create({400, 400})
     menu:add_instance(menu.entry_list, LEFT_TOP, {20, 200})
     menu:add_instance(Sprite.image_create(logo_path), LEFT_TOP, {10,10})
@@ -117,8 +140,15 @@ function lobby_menu_create(on_back_click)
             size = SETTINGS_BOX_SIZE, font = small_font, max_chars = SETTINGS_BOX_MAX_CHARS
         }, CENTER, {0, -13}
     )
+
+    game_query_task_create(menu)
     right_side:add_instance(
-        text_button_create( "Back", on_back_click, {font = large_font} ), 
+        text_button_create( "Back", 
+            function (...) 
+                menu.alive = false -- Signal the task to finish
+                return on_back_click(...) 
+            end, 
+            {font = large_font} ), 
         CENTER, {0, 100}
     )
 
@@ -133,22 +163,6 @@ function main()
     local menu_frame = InstanceBox.create { size = Display.display_size }
     local lobby_menu = lobby_menu_create()
     menu_frame:add_instance(lobby_menu, CENTER)
-
-    local function query_game_list()
-        local first_time = true
-        while true do
-            local timer = timer_create()
-            while not first_time and timer:get_milliseconds() < configuration.update_frequency do
-                coroutine.yield()
-            end
-            local response = Lobby.query_game_list()
-            first_time = false
-            lobby_menu.entry_list:replace( game_entry_list_create(response.gameList), LEFT_TOP, {0,0} )
-        end
-    end
-
-    Task.create(query_game_list)
-
     local state = {menu = menu_frame}
 
     while Game.input_capture() do

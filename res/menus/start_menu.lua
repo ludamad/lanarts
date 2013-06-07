@@ -7,8 +7,11 @@ require "game_loop"
 require "utils_text_component"
 
 require "menus.game_settings_menu"
+require "menus.lobby_menu"
 require "menus.pregame_menu"
 require "menus.scores_menu"
+
+require "networking.tasks"
 
 -- START SCREEN -- 
 
@@ -19,7 +22,7 @@ local text_button_params = {
     click_box_padding = 5
 }
 
-local function start_menu_create(on_start_click, on_load_click, on_score_click)
+local function start_menu_create(on_start_click, on_join_click, on_load_click, on_score_click)
     local menu = InstanceBox.create( { size = Display.display_size } )
 
     menu:add_instance(
@@ -29,9 +32,16 @@ local function start_menu_create(on_start_click, on_load_click, on_score_click)
         {0, 10}
     )
 
-    local y_position = 100 -- Start down 100 pixels
+    local y_position = 70 -- Start down 70 pixels
     menu:add_instance(
         text_button_create("Start a New Game", on_start_click, text_button_params),
+        CENTER,
+        {0, y_position}
+    )
+    y_position = y_position + 50
+
+    menu:add_instance(
+        text_button_create("Join an Existing Game", on_join_click, text_button_params),
         CENTER,
         {0, y_position}
     )
@@ -52,7 +62,6 @@ local function start_menu_create(on_start_click, on_load_click, on_score_click)
         {0, y_position}
     )
     y_position = y_position + 50
-
 
     function menu:step(xy) -- Makeshift inheritance
        InstanceBox.step(self, xy)
@@ -78,6 +87,7 @@ local setup_start_menu -- forward declare
 local setup_settings_menu -- forward declare
 local setup_pregame_menu -- forward declare
 local setup_scores_menu -- forward declare
+local setup_lobby_menu -- forward declare
 
 function exit_menu(exit_game)
     -- Signals event loop that menu is finished
@@ -111,7 +121,7 @@ function setup_start_menu()
     end
 
     menu_state.menu:add_instance(
-        start_menu_create( --[[New Game Button]] setup_settings_menu, --[[Load Game Button]] on_load_click, --[[Highscores Button]] setup_scores_menu),
+        start_menu_create( --[[New Game Button]] setup_settings_menu, --[[Join Game Button]] setup_lobby_menu, --[[Load Game Button]] on_load_click, --[[Highscores Button]] setup_scores_menu),
         CENTER
     )
 end
@@ -155,6 +165,16 @@ function setup_scores_menu()
     )
 end
 
+function setup_lobby_menu()
+    menu_state.menu = InstanceBox.create( { size = Display.display_size } )
+    menu_state.back = setup_start_menu
+    menu_state.continue = nil
+    menu_state.menu:add_instance(
+        lobby_menu_create( --[[Back Button]] menu_state.back ),
+        CENTER
+    )
+end
+
 local function menu_loop(should_poll)
     while Game.input_capture() do
         if key_pressed(keys.F9) then
@@ -183,6 +203,7 @@ local function menu_loop(should_poll)
         menu_state.menu:draw( {0, 0} )
         Display.draw_finish()
 
+        Task.run_all()
         Game.wait(10)
     end
 
@@ -192,7 +213,7 @@ end
 function start_menu_show()
     setup_start_menu()
 
-	return menu_loop(--[[Do not poll connections]] false)
+    return menu_loop(--[[Do not poll connections]] false)
 end
 
 

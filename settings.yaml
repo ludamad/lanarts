@@ -4,8 +4,8 @@ lobby_server_url: http://localhost:8080
 
 #Window settings
 fullscreen: no
-view_width: 800
-view_height: 600
+view_width: 640
+view_height: 480
 
 #Font settings
 font: res/fonts/Gudea-Regular.ttf
