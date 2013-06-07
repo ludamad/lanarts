@@ -22,6 +22,26 @@ local ENTRY_SIZE = {350, 40}
 local ENTRY_SPACING = 45
 local PLAYER_LIST_MAX_CHARS = 50
 
+local session_info = {
+    username = nil,
+    sessionId = nil
+}
+
+local function login_if_needed()
+     if session_info.username ~= settings.username then
+         local credentials = Lobby.guest_login(settings.username)
+         session_info.username = settings.username
+         session_info.sessionId = credentials.sessionId
+    end
+end
+
+local function join_game_task_create(entry_data)
+    Task.create(function()
+        login_if_needed()
+        pretty_print( Lobby.join_game(session_info.username, session_info.sessionId, entry_data.id) )
+    end)
+end
+
 -- A component that starts by displaying a loading animation until 'replace' is called
 local function loading_box_create(size)
     local obj = InstanceBox.create( {size=size} )
@@ -60,6 +80,7 @@ local function game_entry_create(entry_number, entry_data)
     function obj:step(xy)
         local bbox = bbox_create(xy, self.size)
         if bbox_left_clicked(bbox) then
+            join_game_task_create(obj.entry_data)
             print("Entry " .. entry_number .. " was clicked.")
         end
     end
@@ -134,6 +155,7 @@ function lobby_menu_create(on_back_click)
 
     local w, h = unpack(menu.size)
     local right_side = InstanceBox.create{ size = {w/2, h} }
+
     right_side:add_instance(
         name_field_create { 
             label_text = "Your name: ",

@@ -21,7 +21,7 @@ function Lobby.login(username, password)
     })
 end
 
-function Lobby.guest_login(username, password)
+function Lobby.guest_login(username)
     return json_request(settings.lobby_server_url, {
         type = "GuestLoginMessage", 
         username = username
@@ -42,6 +42,15 @@ function Lobby.create_game(username, sessionId)
         type = "CreateGameMessage", 
         username = username,
         sessionId = sessionId,
+    })
+end
+
+function Lobby.join_game(username, sessionId, gameId)
+    return json_request(settings.lobby_server_url, {
+        type = "JoinGameMessage", 
+        username = username,
+        sessionId = sessionId,
+        gameId = gameId
     })
 end
 
