@@ -4,8 +4,8 @@ lobby_server_url: http://putterson.homedns.org:8080
 
 #Window settings
 fullscreen: no
-view_width: 640
-view_height: 480
+view_width: 1000
+view_height: 900
 
 #Font settings
 font: res/fonts/Gudea-Regular.ttf

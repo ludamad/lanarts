@@ -27,7 +27,7 @@ local function loading_box_create(size)
     local obj = InstanceBox.create( {size=size} )
     local loading_animation = animation_create( image_split(image_cached_load "res/menus/loading_64x64.png", {64, 64}), 0.1 )
     local contents = Sprite.create(loading_animation, {color=with_alpha(COL_WHITE, 0.25)} )
-    obj:add_instance(contents, CENTER)
+    obj:add_instance(contents, CENTER_TOP, {0,50})
     -- Called when component has loaded
     function obj:replace(newcontents, origin)
         if contents then self:remove(contents) end
@@ -127,10 +127,10 @@ function lobby_menu_create(on_back_click)
     -- The game query task will finish once menu.alive is false
     menu.alive = true
 
-    menu.entry_list = loading_box_create({400, 400})
+    menu.entry_list = loading_box_create({350, 400})
     menu:add_instance(menu.entry_list, LEFT_TOP, {20, 200})
     menu:add_instance(Sprite.image_create(logo_path), LEFT_TOP, {10,10})
-    menu:add_instance(TextLabel.create(alt_font, "Open Games"), LEFT_CENTER, {20,-52})
+    menu:add_instance(TextLabel.create(alt_font, "Open Games"), LEFT_TOP, {20,175})
 
     local w, h = unpack(menu.size)
     local right_side = InstanceBox.create{ size = {w/2, h} }
@@ -157,6 +157,7 @@ function lobby_menu_create(on_back_click)
     return menu
 end
 
+-- For testing purposes
 function main()
     Display.initialize("Lanarts Example", {640, 480}, false)
 --    Display.initialize("Lanarts Example", {1200, 900}, false)
