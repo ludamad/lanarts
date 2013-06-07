@@ -8,12 +8,12 @@
 
 #include <cstdio>
 #include <cstring>
-#include <SDL_net.h>
+#include <enet/enet.h>
 #include <vector>
 
 typedef std::vector<char> PacketBuffer;
 
-static const int HEADER_SIZE = sizeof(int) * 3;
+static const int HEADER_SIZE = sizeof(int) * 2;
 
 inline void prepare_packet(PacketBuffer& packet, const char* msg, int len,
 		int receiver, int sender = 0) {
@@ -22,74 +22,37 @@ inline void prepare_packet(PacketBuffer& packet, const char* msg, int len,
 	packet.insert(packet.end(), (char*)&receiver,
 			((char*)&receiver) + sizeof(int));
 	packet.insert(packet.end(), (char*)&sender, ((char*)&sender) + sizeof(int));
-	packet.insert(packet.end(), (char*)&len, ((char*)&len) + sizeof(int));
 	packet.insert(packet.end(), msg, msg + len);
-//	printf("prepping with %d %d %d\n", receiver, sender, len);
 }
 
-inline void set_packet_sender(PacketBuffer& packet, int sender = 0) {
-	memcpy(&packet.at(sizeof(int)), &sender, sizeof(int));
-
+inline int get_epacket_sender(ENetPacket* epacket) {
+	int sender;
+	memcpy(&sender, epacket->data + sizeof(int), sizeof(int));
+	return sender;
 }
-inline void send_packet(TCPsocket socket, PacketBuffer& packet) {
-	SDLNet_TCP_Send(socket, &packet[0], packet.size());
-}
-
-/* Ensure we can read the header even if we somehow get less than HEADER_SIZE bytes */
-inline bool read_n_bytes(TCPsocket socket, PacketBuffer& packet, int nbytes) {
-	int nread = 0;
-	while (nread < nbytes) {
-		int recv = SDLNet_TCP_Recv(socket, &packet[nread], nbytes);
-		if (recv == 0) {
-			fprintf(stderr, "Connection closed!\n");
-			fflush(stderr);
-			return false;
-		} else if (recv < 0) {
-			fprintf(stderr,
-					"Connection severed, read_n_bytes got error message:\n\t%s\n",
-					SDLNet_GetError());
-			fflush(stderr);
-			return false;
-		}
-		nread += recv;
-	}
-	return true;
+inline void set_epacket_sender(ENetPacket* epacket, int sender) {
+	memcpy(epacket->data + sizeof(int), &sender, sizeof(int));
 }
 
-inline bool receive_packet(TCPsocket socket, PacketBuffer& packet,
+inline ENetPacket* make_epacket(PacketBuffer& packet, bool reliable) {
+	return enet_packet_create((void*)&packet[0], packet.size(), reliable ? ENET_PACKET_FLAG_RELIABLE : 0);
+}
+
+inline void send_packet(ENetPeer* peer, PacketBuffer& packet, bool reliable = true) {
+	enet_peer_send(peer, 0, make_epacket(packet, reliable));
+}
+
+inline void broadcast_packet(ENetHost* host, PacketBuffer& packet, bool reliable = true) {
+	enet_host_broadcast(host, 0, make_epacket(packet, reliable));
+}
+
+inline void copy_packet_to_buffer(ENetPacket* epacket, PacketBuffer& packet,
 		receiver_t& receiver, receiver_t& sender) {
-	packet.resize(HEADER_SIZE);
+	packet.assign(epacket->data, epacket->data + epacket->dataLength);
 
-	if (!read_n_bytes(socket, packet, HEADER_SIZE)) {
-		return false;
-	}
-
-	receiver = *(int*)&packet[0];
-	sender = *(int*)&packet[sizeof(int)];
-	int size = *(int*)&packet[sizeof(int) * 2];
-
-//		printf("recving with %d %d %d\n", receiver, sender, size);
-	int body_read = 0;
-	packet.resize(size + HEADER_SIZE);
-
-	while (size > body_read) {
-		int needed = size - body_read;
-		int nbody = SDLNet_TCP_Recv(socket, &packet[body_read + HEADER_SIZE],
-				needed);
-		if (nbody == 0) {
-			fprintf(stderr, "Connection closed!\n");
-			fflush(stderr);
-			return false;
-		} else if (nbody < 0) {
-			fprintf(stderr,
-					"Connection severed, receive_packet got error message:\n\t%s\n",
-					SDLNet_GetError());
-			fflush(stderr);
-			return false;
-		}
-		body_read += nbody;
-	}
-	return true;
+	receiver = *(int*) &packet[0];
+	sender = *(int*) &packet[sizeof(int)];
 }
+
 
 #endif /* PACKET_UTIL_H_ */

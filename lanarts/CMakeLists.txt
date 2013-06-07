@@ -3,7 +3,6 @@ PROJECT(project_lanarts)
 
 FIND_PACKAGE(SDL REQUIRED)
 FIND_PACKAGE(SDL_image REQUIRED)
-FIND_PACKAGE(SDL_net REQUIRED)
 FIND_PACKAGE(SDL_mixer REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
@@ -114,7 +113,7 @@ set (libraries
 	lua
 	luasocket
 	luawrap
-	lanarts_net_enet
+	lanarts_net
 	yaml-cpp
 	RVO
 	${OPENGL_gl_LIBRARY}
@@ -122,7 +121,6 @@ set (libraries
 	${SDL_LIBRARY}
 	${SDLIMAGE_LIBRARY}
         enet
-	${SDLNET_LIBRARY}
 	${SDLMAIN_LIBRARY}
 	${FREETYPE_LIBRARIES}
 )

@@ -1,38 +1,30 @@
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lanarts_net)
 
-FIND_PACKAGE(SDL REQUIRED)
-FIND_PACKAGE(SDL_net REQUIRED)
+set( DEPS ../dependencies)
 
-include_directories(${SDL_INCLUDE_DIR} ${SDLNET_INCLUDE_DIR} 
-	../common-lib/include
-	../luawrap-lib/include
-)
+FIND_PACKAGE(SDL REQUIRED)
 
 add_definitions( -std=c++98 )
 
-set( lanarts_net_src
-	impl/ServerConnection.cpp
-	impl/ClientConnection.cpp
-	impl/lanarts_net.cpp
+include_directories(
+	${DEPS}/enet/include
+	../common-lib/include
+	../luawrap-lib/include
+	${DEPS}/UnitTest++ 
 )
 
-set( lanarts_net_tests_src
-	test-tcp.cpp
-)
 
-set( lanarts_net_include
-	lanarts_net.h
-	NetConnection.h
-	impl/packet_util.h
-	impl/ServerConnection.h
-	impl/ClientConnection.h
-)
+add_definitions( -std=c++98 )
+
+aux_source_directory( "impl/" lanarts_net_src)
+aux_source_directory( "tests/" lanarts_net_tests_src)
 
 add_library( lanarts_net
              STATIC
              ${lanarts_net_src})
 
+	
 add_executable( lanarts_net_tests
              ${lanarts_net_tests_src})
 
@@ -40,8 +32,8 @@ target_link_libraries(
 	lanarts_net_tests
 	lanarts_net
 	pthread
+	enet
+    ${SDL_LIBRARY}
 	lcommon
 	UnitTest++
-	${SDL_LIBRARY}
-	${SDLNET_LIBRARY}
 )

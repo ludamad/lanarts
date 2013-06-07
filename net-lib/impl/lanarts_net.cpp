@@ -2,7 +2,10 @@
  * lanarts_net.h:
  *  Primary functions for lanarts_net library
  */
-#include <SDL_net.h>
+
+#include <enet/enet.h>
+
+#include <lcommon/strformat.h>
 
 #include "../lanarts_net.h"
 
@@ -13,11 +16,10 @@
  * Initialize the library
  * return true on success
  */
-bool lanarts_net_init(bool print_error) {
-	if (SDLNet_Init() < 0) {
-		if (print_error) {
-			fprintf(stderr, "Couldn't initialize SDL_net: %s\n",
-					SDL_GetError());
+bool lanarts_net_init(bool throw_on_error) {
+	if (enet_initialize() != 0) {
+		if (throw_on_error) {
+			__lnet_throw_connection_error("Couldn't initialize SDL_net: %s\n");
 		}
 		return false;
 	}
@@ -33,7 +35,7 @@ NetConnection* create_server_connection(int port) {
 }
 
 void lanarts_net_quit() {
-	SDLNet_Quit();
+	enet_deinitialize();
 }
 
 /**
@@ -44,3 +46,14 @@ NetConnection* create_client_connection(const char* host, int port) {
 	return new ClientConnection(host, port);
 }
 
+
+void __lnet_throw_connection_error(const char* fmt, ...) {
+	std::string err;
+	VARARG_STR_FORMAT(err, fmt);
+#ifndef LNET_NO_EXCEPTIONS
+	throw LNetConnectionError(err);
+#else
+	fputs(stderr, err.c_str());
+	abort();
+#endif
+}

@@ -1,80 +1,107 @@
 /*
- * ClientConnection.cpp:
+ * ClientConnection.h:
  *  Represents a client connected to a server
  */
 
 #include "ClientConnection.h"
 
-ClientConnection::ClientConnection(const char* addr, int port) :
-		hostname(addr), _port(port) {
+#include "enet_util.h"
+#include "../lanarts_net.h"
+
+ClientConnection::ClientConnection(const char* addr, int port) {
+	_hostname = addr;
+	_port = port;
 	_client_socket = NULL;
-	_socket_set = SDLNet_AllocSocketSet(1);
+	_server_peer = NULL;
 }
 
 ClientConnection::~ClientConnection() {
-	SDLNet_TCP_Close(_client_socket);
-	SDLNet_FreeSocketSet(_socket_set);
+	enet_peer_disconnect(_server_peer, 0);
+//	enet_peer_reset(_server_peer);
+	enet_host_destroy(_client_socket);
+}
+
+static void wait_for_connect(ENetHost* host) {
+	ENetEvent event;
+	while (true) {
+		if (enet_host_service(host, &event, 1000) > 0) {
+			switch (event.type) {
+			case ENET_EVENT_TYPE_RECEIVE:
+				printf("RECV\n"); break;
+			case ENET_EVENT_TYPE_DISCONNECT:
+				printf("DISC\n"); break;
+			case ENET_EVENT_TYPE_CONNECT:
+				printf("CONN\n"); break;
+			}
+			return;
+		}
+	}
 }
 
 void ClientConnection::initialize_connection() {
-	IPaddress ip;
-	if (SDLNet_ResolveHost(&ip, hostname.c_str(), _port) < 0) {
-		fprintf(stderr, "Error resolving host name '%s'\n", hostname.c_str());
-	} else {
-		_client_socket = SDLNet_TCP_Open(&ip);
-		if (!_client_socket) {
-			fprintf(stderr,
-					"Error resolving connecting to host '%s' with port %d\n",
-					hostname.c_str(), _port);
-		}
+	_client_socket = enet_host_create(NULL,
+			32 /* allow up to 32 clients and/or outgoing connections */,
+			1 /* one channel, channel 0 */,
+			0 /* assume any amount of incoming bandwidth */,
+			0 /* assume any amount of outgoing bandwidth */);
 
-		SDLNet_TCP_AddSocket(_socket_set, _client_socket);
+	if (_client_socket == NULL) {
+		__lnet_throw_connection_error(
+				"An error occurred while trying to create an ENet client host at port %d.\n", _port);
 	}
+
+	ENetAddress address;
+	enet_address_set_host(&address, _hostname.c_str());
+	address.port = _port;
+
+	_server_peer = enet_host_connect(_client_socket, &address, 2, 0);
+	if (_server_peer == NULL) {
+		__lnet_throw_connection_error(
+				"No available peers for initiating an ENet connection.\n");
+	}
+	printf("ClientSocket waiting for %s:%d\n", _hostname.c_str(), _port);
+
+	wait_for_connect(_client_socket);
+	printf("ClientSocket connected\n");
 }
 
-bool ClientConnection::poll(packet_recv_callback message_handler, void* context,
+int ClientConnection::poll(packet_recv_callback message_handler, void* context,
 		int timeout) {
-	if (_client_socket == NULL) {
-		fprintf(stderr,
-				"ClientConnection::poll: Connection not initialized!\n");
-		return false;
-	}
+	ENetEvent event;
 
-	while (true) {
-		int nready = SDLNet_CheckSockets(_socket_set, timeout);
-		timeout = 0; // Don't wait again on repeated checks
-		if (nready < 0) {
-			fprintf(stderr, "Error: SDLNet_CheckSockets reported %s\n",
-					SDLNet_GetError());
-			return false;
-		} else if (nready == 0) {
+	int polled = 0;
+	while (poll_adapter(_client_socket, &event, timeout) > 0) {
+		timeout = 0; // Don't wait for timeout a second time
+		switch (event.type) {
+		case ENET_EVENT_TYPE_RECEIVE: {
+			ENetPacket* epacket = event.packet;
+			int sender_id = get_epacket_sender(epacket);
+			if (message_handler) {
+				polled++;
+				message_handler(sender_id, context,
+						HEADER_SIZE + (const char*)epacket->data,
+						epacket->dataLength - HEADER_SIZE);
+			}
+			enet_packet_destroy(epacket);
 			break;
 		}
-		while (SDLNet_SocketReady(_client_socket)) {
-			receiver_t receiver, sender;
-
-			if (!receive_packet(_client_socket, _packet_buffer, receiver, sender)) {
-				return false;
-			}
-
-			if (message_handler && !_packet_buffer.empty()) {
-				message_handler(sender, context, &_packet_buffer[HEADER_SIZE],
-						_packet_buffer.size() - HEADER_SIZE);
-			}
+		case ENET_EVENT_TYPE_DISCONNECT:
+			printf("We have disconnected from the server.\n");
+			__lnet_throw_connection_error("Client connection dropped");
+			break;
 		}
 	}
-	return true;
+	return polled;
 }
 
 void ClientConnection::send_message(const char* msg, int len,
 		receiver_t receiver) {
 	if (_client_socket == NULL) {
-		fprintf(
-				stderr,
-				"ClientConnection::send_message: Connection not initialized!\n");
-		return;
+		__lnet_throw_connection_error(
+				"ServerConnection::send_message: Connection not initialized!\n");
 	}
 
 	prepare_packet(_packet_buffer, msg, len, receiver);
-	send_packet(_client_socket, _packet_buffer);
+	send_packet(_server_peer, _packet_buffer);
+	enet_host_flush(_client_socket);
 }

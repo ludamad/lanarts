@@ -7,7 +7,7 @@
 
 #include <lcommon/SerializeBuffer.h>
 
-#include <net-lib-enet/lanarts_net.h>
+#include <net-lib/lanarts_net.h>
 
 #include "gamestate/GameState.h"
 

@@ -7,13 +7,12 @@
 #define LANARTS_NET_H_
 
 #include "NetConnection.h"
-#include <stdexcept>
 
 /**
  * Initialize the library
  * return true on success
  */
-bool lanarts_net_init(bool print_error = true);
+bool lanarts_net_init(bool throw_on_error = true);
 // NB: does not abort
 void lanarts_net_quit();
 
@@ -30,6 +29,9 @@ NetConnection* create_server_connection(int port);
 NetConnection* create_client_connection(const char* host, int port);
 
 #ifndef LNET_NO_EXCEPTIONS
+
+#include <stdexcept>
+
 class LNetConnectionError: public std::runtime_error {
 public:
 	LNetConnectionError(const std::string& err) :
@@ -37,5 +39,7 @@ public:
 	}
 };
 #endif
+
+void __lnet_throw_connection_error(const char* fmt, ...);
 
 #endif /* LANARTS_NET_H_ */

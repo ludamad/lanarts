@@ -9,9 +9,8 @@
 #include <string>
 #include <vector>
 
-#include <SDL_net.h>
-
 #include "../NetConnection.h"
+
 #include "packet_util.h"
 
 class ClientConnection: public NetConnection {
@@ -21,19 +20,19 @@ public:
 
 	virtual void initialize_connection();
 
-	virtual bool poll(packet_recv_callback message_handler, void* context = NULL, int timeout = 0);
+	virtual int poll(packet_recv_callback message_handler, void* context = NULL, int timeout = 0);
 	virtual void set_accepting_connections(bool accept) {
 		//no-op
 	}
 	virtual void send_message(const char* msg, int len, receiver_t receiver =
 			ALL_RECEIVERS);
 private:
-	std::string hostname;
+	std::string _hostname;
 	int _port;
 	// Buffer for sending & receiving messages
 	PacketBuffer _packet_buffer;
-	TCPsocket _client_socket;
-	SDLNet_SocketSet _socket_set;
+	ENetHost* _client_socket;
+	ENetPeer* _server_peer;
 };
 
 #endif /* CLIENTCONNECTION_H_ */
