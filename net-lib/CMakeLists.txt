@@ -8,6 +8,7 @@ FIND_PACKAGE(SDL REQUIRED)
 add_definitions( -std=c++98 )
 
 include_directories(
+	${SDL_INCLUDE_DIR} 
 	${DEPS}/enet/include
 	../common-lib/include
 	../luawrap-lib/include
