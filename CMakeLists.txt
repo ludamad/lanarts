@@ -8,6 +8,10 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions("-mfpmath=sse -msse2 -ffp-contract=on")
 endif()
 
+if(WIN32)
+    add_definitions("-DWIN32")
+endif()
+
 option(MSVC_SHARED_RT "MSVC: Build with shared runtime libs (/MD)" ON)
 option(MSVC_STHREADED_RT "MSVC: Build with single-threaded static runtime libs (/ML until VS .NET 2003)" OFF)
 

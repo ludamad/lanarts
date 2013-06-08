@@ -23,6 +23,7 @@ add_library( lcommon
              STATIC
              ${lcommon_src} )
 
+
 AUX_SOURCE_DIRECTORY(tests lcommon_tests) 
 
 add_executable( lcommon_tests
