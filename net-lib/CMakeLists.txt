@@ -15,7 +15,6 @@ include_directories(
 	${DEPS}/UnitTest++ 
 )
 
-
 add_definitions( -std=c++98 )
 
 aux_source_directory( "impl/" lanarts_net_src)

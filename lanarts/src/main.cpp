@@ -80,7 +80,6 @@ static GameState* init_gamestate() {
 /* Must take (int, char**) to play nice with SDL */
 int main(int argc, char** argv) {
 	label_StartOver:
-	printf("E\n");
 
 	GameState* gs = init_gamestate();
 	lua_State* L = gs->luastate();

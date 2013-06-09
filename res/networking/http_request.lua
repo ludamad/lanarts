@@ -32,7 +32,7 @@ function YieldingSocket:connect(...)
         if # writable > 0 then
             local status, err = self.socket:connect(...)
             if err == nil or err == "already connected" then
-                return status, nil
+                return 1, nil
             elseif err ~= "timeout" then
                 return status, err
             end

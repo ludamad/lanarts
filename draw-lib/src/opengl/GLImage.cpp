@@ -98,6 +98,7 @@ void GLImage::initialize(const std::string& filename) {
 	image = IMG_Load(filename.c_str());
 	if (image == NULL) {
 		printf("Image '%s' could not be loaded\n", filename.c_str());
+		printf("SDL reported: '%s'\n", IMG_GetError());
 		fatal_error();
 	}
 

@@ -10,6 +10,7 @@ set( SRC ..)
 include_directories(
     "include/lsound"
     ${SDL_INCLUDE_DIR} 
+    ${SDLMIXER_INCLUDE_DIR} 
     ${LIBS}/lua
     "${SRC}/luawrap-lib/include"
     "${SRC}/common-lib/include"

@@ -1,12 +1,11 @@
 #Online settings
 username: User
-lobby_server_url: http://localhost:8080
-# http://putterson.homedns.org:8080
+lobby_server_url: http://putterson.homedns.org:8080
 
 #Window settings
 fullscreen: no
 view_width: 1000
-view_height: 900
+view_height: 600
 
 #Font settings
 font: res/fonts/Gudea-Regular.ttf

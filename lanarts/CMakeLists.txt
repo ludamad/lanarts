@@ -116,11 +116,11 @@ set (libraries
 	lanarts_net
 	yaml-cpp
 	RVO
+	${SDLIMAGE_LIBRARY}
 	${OPENGL_gl_LIBRARY}
 	${SDLMIXER_LIBRARY}
+    enet
 	${SDL_LIBRARY}
-	${SDLIMAGE_LIBRARY}
-        enet
 	${SDLMAIN_LIBRARY}
 	${FREETYPE_LIBRARIES}
 )
