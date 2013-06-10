@@ -121,7 +121,7 @@ function game_entry_draw(number, entry, bbox)
     -- XXX: Find out why this returns nil on windows
     local date = os.date("%I:%M%p", entry.creationTime)
     if date ~= nil then
-        draw_in_box(small_font, bbox, RIGHT_TOP, {-5,20},  {COL_LIGHT_GRAY, } )
+        draw_in_box(small_font, bbox, RIGHT_TOP, {-5,20},  {COL_LIGHT_GRAY, date } )
     end
 
     draw_rectangle_outline( bbox_mouse_over(bbox) and COL_WHITE or COL_GRAY, bbox, 1 )
