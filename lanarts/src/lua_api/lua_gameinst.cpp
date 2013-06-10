@@ -162,7 +162,7 @@ static LuaValue lua_enemyinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(getters, name, OBJ->etype().name);
 	LUAWRAP_GETTER(getters, unique, OBJ->etype().unique);
 	LUAWRAP_GETTER(getters, kills, 0);
-	LUAWRAP_GETTER(getters, is_local_player, false);
+	LUAWRAP_GETTER(methods, is_local_player, false);
 
 	return meta;
 }
