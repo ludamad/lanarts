@@ -4,7 +4,7 @@ lobby_server_url: http://putterson.homedns.org:8080
 
 #Window settings
 fullscreen: no
-view_width: 1000
+view_width: 800
 view_height: 600
 
 #Font settings
