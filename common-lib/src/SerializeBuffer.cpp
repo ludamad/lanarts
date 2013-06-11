@@ -15,7 +15,7 @@ static void file_buffer_fillf(void* context, std::vector<char>& buffer,
 	int end = buffer.size();
 	//Policy for file buffer reads: Use max buffer size
 	buffer.resize(maxsize);
-	int readn = fread(&buffer[end], 1, maxsize - end, file);
+	int readn = fread(end + &buffer[0], 1, maxsize - end, file);
 	buffer.resize(end + readn);
 }
 
