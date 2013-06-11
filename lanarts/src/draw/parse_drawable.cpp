@@ -65,7 +65,7 @@ DirectionalDrawable parse_directional(const YAML::Node& node) {
 
 static bool parse_image_split_pattern(const std::string& pattern, Size* size,
 		std::string* filename) {
-	int pos1 = pattern.find('%');
+	size_t pos1 = pattern.find('%');
 
 	if (pos1 == std::string::npos) {
 		return false;
