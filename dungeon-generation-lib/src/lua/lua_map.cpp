@@ -9,6 +9,7 @@
 
 #include "Map.h"
 #include "map_fill.h"
+#include "tunnelgen.h"
 #include "map_check.h"
 
 namespace ldungeon_gen {
@@ -233,13 +234,48 @@ namespace ldungeon_gen {
 				defaulted(args["create_subgroup"], true));
 
 		/* Create a closure which applies the function */
-		luawrap::push_function(L, "MapGen.rectangle_operator instance", oper_aux);
+		luawrap::push_function(L, "MapGen.bsp_operator instance", oper_aux);
 		luawrap::push(L, AreaOperatorPtr(new BSPApplyOperator(oper)));
 		lua_setupvalue(L, -2, OPER_UPVALUE);
 
 		return LuaStackValue(L, -1);
 	}
 
+	static LuaStackValue tunnel_operator(LuaStackValue args) {
+		using namespace luawrap;
+		lua_State* L = args.luastate();
+
+		//Get RNG setup for map generation
+		luawrap::registry(L)["MapGenRNG"].push();
+		MTwist* mtwist = (MTwist*)lua_touserdata(L, -1);
+		
+		LuaValue vs = args["validity_selector"];
+ 		Selector vfill_selector = vs.isnil() ? Selector() : selector_get(args["fill_selector"]);
+ 		Selector vperimeter_selector = vs.isnil() ? Selector() : selector_get(args["perimeter_selector"]);
+
+		LuaValue cs = args["completion_selector"];
+ 		Selector cfill_selector = cs.isnil() ? Selector() : selector_get(args["fill_selector"]);
+ 		Selector cperimeter_selector = cs.isnil() ? Selector() : selector_get(args["perimeter_selector"]);
+
+		ConditionalOperator fill_oper = conditional_operator_get(args["fill_operator"]);
+		ConditionalOperator perimeter_oper = conditional_operator_get(args["perimeter_operator"]);
+
+		int padding = defaulted(args["padding"], 1);
+		Range size_range = args["size_range"].as<Range>();
+		Range tunnels_per_room_range  = args["tunnels_per_room_range "].as<Range>();
+
+	        TunnelSelector tunnel_selector(vfill_selector, vperimeter_selector,
+                                  cfill_selector, cperimeter_selector);
+
+                TunnelGenOperator oper(*mtwist, tunnel_selector, fill_oper,
+                                perimeter_oper, padding, size_range, tunnels_per_room_range);	
+		/* Create a closure which applies the function */
+		luawrap::push_function(L, "MapGen.tunnel_operator instance", oper_aux);
+		luawrap::push(L, AreaOperatorPtr(new TunnelGenOperator(oper)));
+		lua_setupvalue(L, -2, OPER_UPVALUE);
+
+		return LuaStackValue(L, -1);
+	}
 	/*****************************************************************************
 	 *                          Register bindings                                *
 	 *****************************************************************************/
@@ -271,5 +307,6 @@ namespace ldungeon_gen {
 		module["map_create"].bind_function(map_create);
 		module["rectangle_operator"].bind_function(rectangle_operator);
 		module["bsp_operator"].bind_function(bsp_operator);
+		module["tunnel_operator"].bind_function(tunnel_operator);
 	}
 }

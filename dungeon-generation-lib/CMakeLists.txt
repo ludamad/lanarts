@@ -11,6 +11,7 @@ add_definitions( -std=c++98 )
 
 include_directories(
 	include/ldungeon_gen
+	../dependencies/lua
 	../common-lib/include
 	../draw-lib/include
 	../luawrap-lib/include

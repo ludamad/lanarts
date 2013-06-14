@@ -29,7 +29,7 @@ function tests.basic_api_check()
 end
 
 function tests.map_gen_test()
-    local solid_square = MapGen.square { flags = MapGen.flags_combine(MapGen.FLAG_SOLID) }
+    local solid_square = MapGen.square { flags = MapGen.FLAG_SOLID }
     local map = MapGen.map_create { size = {80,40}, fill = solid_square }
 
     print "bsp oper create"
@@ -46,6 +46,24 @@ function tests.map_gen_test()
     print "bsp oper apply"
     -- Apply the binary space partitioning (bsp)
     bsp_oper(map, MapGen.ROOT_GROUP, bbox_create({0,0}, map.size))
+
+    local tunnel_oper = MapGen.tunnel_operator {
+        validity_selector = { 
+            fill_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.flags_combine(MapGen.FLAG_PERIMETER, MapGen.FLAG_TUNNEL) },
+            perimeter_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.FLAG_TUNNEL }
+        },
+
+        completion_selector = {
+            fill_selector = { matches_none = { MapGen.FLAG_SOLID, MapGen.FLAG_PERIMETER, MapGen.FLAG_TUNNEL } },
+            perimeter_selector = { matches_none = MapGen.FLAG_SOLID } 
+        },
+
+        fill_operator = { add = MapGen.FLAG_TUNNEL, remove = MapGen.FLAG_SOLID },
+        perimeter_operator = { matches_all = MapGen.FLAGS_SOLID, add = MapGen.flags_combine(MapGen.FLAG_SOLID, MapGen.FLAG_TUNNEL, MapGen.FLAG_PERIMETER) },
+
+        size_range = {1,2},
+        tunnels_per_room_range = {1,1}
+    }
 
     local parts = {}
 
