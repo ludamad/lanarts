@@ -10,9 +10,10 @@
 
 #include <luawrap/luawrap.h>
 #include <luawrap/functions.h>
-//
+
+
 #define LUAWRAP_SET_TYPE(x) typedef x LuawrapMacroTypeToWrap;
-//
+
 //// Allows for one line method wrapping
 //// TODO: Argument typecheck
 #define LUAWRAP_METHOD(table, func_name, body) \
@@ -25,7 +26,7 @@
 		} \
 	}; \
 	table[ #func_name ].bind_function( MacroGeneratedMethod_##func_name :: func_name )
-//
+
 //// Allows for one line getter wrapping
 //// TODO: Argument typecheck
 #define LUAWRAP_GETTER(table, func_name, body) \
@@ -37,7 +38,7 @@
 		} \
 	}; \
 	table[ #func_name ].bind_function( MacroGeneratedGetter_##func_name :: func_name )
-//
+
 //// Allows for one line setter wrapping
 //// TODO: Argument typecheck
 #define LUAWRAP_SETTER(table, func_name, param_type, body) \

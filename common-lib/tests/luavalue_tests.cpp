@@ -18,7 +18,7 @@ SUITE(luavalue_tests) {
 		TestLuaState L;
 
 		LuaValue globals = luawrap::globals(L);
-		lua_register_lcommon(L, globals);
+		lua_register_lcommon(L);
 
 		LuaValue value(L);
 		value.newtable();
@@ -60,7 +60,7 @@ SUITE(luavalue_tests) {
 		perf_timer_begin("lua_binding");
 		for (int i = 0; i < 10000; i++) {
 			lua_State* L = lua_open();
-			lua_register_lcommon(L, LuaValue(L, LUA_GLOBALSINDEX));
+			lua_register_lcommon(L);
 
 			lua_close(L);
 		}

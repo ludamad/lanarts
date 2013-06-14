@@ -24,7 +24,7 @@ namespace ldungeon_gen {
 	group_t Map::make_group(const BBox& area, int parent_group_id) {
 		int group_id = groups.size();
 
-		groups[parent_group_id].child_group_ids.push_back(group_id);
+		groups.at(parent_group_id).child_group_ids.push_back(group_id);
 		groups.push_back(Group(group_id, parent_group_id, area));
 
 		/* Label the rectangular area as our group */

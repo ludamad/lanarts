@@ -163,7 +163,7 @@ static void setup_lua_state() {
 	LuaValue globals = luawrap::globals(L);
 
 	lua_register_ldraw(L, globals);
-	lua_register_lcommon(L, globals);
+	lua_register_lcommon(L);
 
 }
 

@@ -51,7 +51,7 @@ namespace ldungeon_gen {
 						num_tunnels(num_tunnels) {
 		}
 
-		virtual bool apply(Map& map, group_t parent_group_id, const BBox& rect);
+		virtual bool apply(MapPtr map, group_t parent_group_id, const BBox& rect);
 	};
 }
 

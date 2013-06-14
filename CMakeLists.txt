@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 2.6)
 
-set(CMAKE_BUILD_TYPE RELEASEZ)
+set(CMAKE_BUILD_TYPE DEBUG)
 #add_definitions(-DNDEBUG)
 
 ## Compiler flags
 if(CMAKE_COMPILER_IS_GNUCXX)
-    add_definitions("-mfpmath=sse -msse2 -ffp-contract=on")
+    add_definitions("-mfpmath=sse -msse2 -ffp-contract=on ")
 endif()
 
 if(WIN32)
@@ -14,6 +14,7 @@ if(WIN32)
         add_definitions("-mwindows")
     endif()
 endif()
+
 
 option(MSVC_SHARED_RT "MSVC: Build with shared runtime libs (/MD)" ON)
 option(MSVC_STHREADED_RT "MSVC: Build with single-threaded static runtime libs (/ML until VS .NET 2003)" OFF)

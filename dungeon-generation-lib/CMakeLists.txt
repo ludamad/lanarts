@@ -1,6 +1,8 @@
 cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lanarts_dungeon_gen)
 
+
+
 set( DEPS ../dependencies)
 
 FIND_PACKAGE(SDL REQUIRED)
@@ -16,6 +18,7 @@ include_directories(
 )
 
 aux_source_directory( "src/" lanarts_dungeon_gen_src)
+aux_source_directory( "src/lua" lanarts_dungeon_gen_src)
 aux_source_directory( "include/" lanarts_dungeon_gen_include)
 aux_source_directory( "tests/" lanarts_dungeon_gen_tests_src)
 
@@ -32,6 +35,8 @@ target_link_libraries(
 	lanarts_dungeon_gen_tests
 	lanarts_dungeon_gen
 	lcommon
+	luawrap
+	lua
 	ldraw
 	UnitTest++
 )

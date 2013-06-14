@@ -27,32 +27,34 @@ namespace ldungeon_gen {
 					create_subgroup(create_subgroup) {
 	}
 
-	bool RectangleApplyOperator::apply(Map& map, group_t parent_group_id, const BBox& rect) {
+	bool RectangleApplyOperator::apply(MapPtr map, group_t parent_group_id, const BBox& rect) {
 
-		const BBox map_bounds(Pos(0, 0), map.size());
+		const BBox map_bounds(Pos(0, 0), map->size());
 
 		BBox inner_rect = rect.shrink(perimeter);
 		if (create_subgroup) {
-			map.make_group(inner_rect, parent_group_id);
+			map->make_group(inner_rect, parent_group_id);
 		}
-		int rowstart = rect.y1 * map.width();
+		int rowstart = rect.y1 * map->width();
 		for (int y = rect.y1; y < rect.y2; y++) {
 
 			int idx = rowstart + rect.x1;
 			for (int x = rect.x1; x < rect.x2; x++) {
 				if (perimeter == 0 || inner_rect.contains(x, y)) {
 					/* Inside the box */
-					map.raw_get(idx).apply(fill_oper);
+					map->raw_get(idx).apply(fill_oper);
 				} else {
 					/* On the perimeter*/
-					map.raw_get(idx).apply(perimeter_oper);
+					map->raw_get(idx).apply(perimeter_oper);
 				}
 				idx++;
 			}
-			rowstart += map.width();
+			rowstart += map->width();
 		}
 		return true;
 	}
+
+
 
 	/* By placing in cpp file, ensures only created in one module */
 	AreaOperatorBase::~AreaOperatorBase() {
@@ -60,12 +62,10 @@ namespace ldungeon_gen {
 
 	class BSPRectOperator: public ITCODBspCallback {
 	public:
-		BSPRectOperator(Map& map, group_t parent_group_id, const BSPApplyOperator& bsp_settings,
-				AreaOperatorBase& node_oper) :
+		BSPRectOperator(MapPtr map, group_t parent_group_id, const BSPApplyOperator& bsp_settings):
 						map(map),
 						parent_group_id(parent_group_id),
-						bsp_settings(bsp_settings),
-						node_oper(node_oper) {
+						bsp_settings(bsp_settings) {
 		}
 
 		int get_int(int min, int max) {
@@ -86,22 +86,24 @@ namespace ldungeon_gen {
 					miny = get_int(miny, maxy - bsp_settings.minimum_room_size.h + 2);
 					maxx = get_int(minx + bsp_settings.minimum_room_size.w - 1, maxx + 1);
 					maxy = get_int(miny + bsp_settings.minimum_room_size.h - 1, maxy + 1);
+					if (minx > maxx || miny > maxy) {
+						minx = miny = maxx = maxy = 0;
+					}
 				}
-				node_oper.apply(map, parent_group_id, BBox(minx, miny, maxx, maxy));
+				bsp_settings.area_oper->apply(map, parent_group_id, BBox(minx, miny, maxx, maxy));
 			}
 			return true;
 		}
 
 	private:
-		Map& map;
+		MapPtr map;
 		group_t parent_group_id;
 		const BSPApplyOperator& bsp_settings;
-		AreaOperatorBase& node_oper;
 	};
 
-	bool BSPApplyOperator::apply(Map& map, group_t parent_group_id, const BBox& rect) {
+	bool BSPApplyOperator::apply(MapPtr map, group_t parent_group_id, const BBox& rect) {
 		if (create_subgroup) {
-			map.make_group(rect, parent_group_id);
+			map->make_group(rect, parent_group_id);
 		}
 
 		TCODBsp* bsp = new TCODBsp(rect.x1, rect.y1, rect.width(),
@@ -111,7 +113,7 @@ namespace ldungeon_gen {
 				minimum_room_size.h, 1.5f, 1.5f);
 
 		// create the dungeon from the bsp
-		BSPRectOperator bsp_node_oper(map, parent_group_id, *this, area_oper);
+		BSPRectOperator bsp_node_oper(map, parent_group_id, *this);
 		bsp->traverseInvertedLevelOrder(&bsp_node_oper, NULL);
 		delete bsp;
 

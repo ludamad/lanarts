@@ -29,7 +29,7 @@ SUITE(EquipmentEntry) {
 				"}";
 
 		TestLuaState L;
-		lua_register_lcommon(L, luawrap::globals(L));
+		lua_register_lcommon(L);
 		setup_mock_data();
 
 		EquipmentEntry item;

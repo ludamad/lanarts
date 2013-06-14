@@ -87,6 +87,7 @@ private:
 namespace luawrap {
 
 	const LuaField& ensure_table(const LuaField& field);
+
 	template<typename LuaWrapper, typename T>
 	T set_if_nil(const LuaWrapper& wrapper, const T& value) {
 		if (wrapper.isnil()) {

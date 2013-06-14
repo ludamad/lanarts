@@ -32,7 +32,7 @@ SUITE(ItemEntry) {
 						"}";
 
 		TestLuaState L;
-		lua_register_lcommon(L, luawrap::globals(L));
+		lua_register_lcommon(L);
 		setup_mock_data();
 		luawrap::dostring(L, program.c_str());
 

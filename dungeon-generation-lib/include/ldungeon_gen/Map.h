@@ -12,6 +12,7 @@
 #include <lcommon/Grid.h>
 #include <lcommon/int_types.h>
 #include <lcommon/mtwist.h>
+#include <lcommon/smartptr.h>
 
 class SerializeBuffer;
 
@@ -165,6 +166,8 @@ namespace ldungeon_gen {
 		void serialize(SerializeBuffer& serializer) const;
 		void deserialize(SerializeBuffer& serializer);
 	};
+
+	typedef smartptr<Map> MapPtr;
 }
 
 #endif /* MAP_H_ */

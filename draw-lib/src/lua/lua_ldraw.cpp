@@ -28,7 +28,7 @@ void lua_register_ldraw(lua_State* L, const LuaValue& module, bool register_lcom
 	using namespace ldraw;
 
 	if (register_lcommon) {
-		lua_register_lcommon(L, module);
+		lua_register_lcommon(L);
 	}
 
 	module["draw_rectangle"].bind_function(draw_rectangle);

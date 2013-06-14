@@ -273,7 +273,7 @@ namespace ldungeon_gen {
 			t.resize(t.size() * 2);
 	}
 
-	bool TunnelGenOperator::apply(Map& map, group_t parent_group_id,
+	bool TunnelGenOperator::apply(MapPtr map, group_t parent_group_id,
 			const BBox& rect) {
 
 		Pos p;
@@ -282,16 +282,16 @@ namespace ldungeon_gen {
 		std::vector<Square> btbuff;
 		std::vector<TunnelSliceContext> tsbuff;
 
-		std::vector<int> genpaths(map.groups.size(), 0);
-		std::vector<int> totalpaths(map.groups.size(), 0);
-		for (int i = 0; i < map.groups.size(); i++) {
+		std::vector<int> genpaths(map->groups.size(), 0);
+		std::vector<int> totalpaths(map->groups.size(), 0);
+		for (int i = 0; i < map->groups.size(); i++) {
 			totalpaths[i] = randomizer.rand(num_tunnels);
 		}
 		int nogen_tries = 0;
 		while (nogen_tries < 200) {
 			nogen_tries++;
 
-			for (int i = 0; i < map.groups.size(); i++) {
+			for (int i = 0; i < map->groups.size(); i++) {
 				if (genpaths[i] >= totalpaths[i])
 					continue;
 				bool generated = false;
@@ -300,13 +300,13 @@ namespace ldungeon_gen {
 					int path_len = 5;
 					for (int attempts = 0; attempts < 16 && !generated;
 							attempts++) {
-						TunnelGenImpl tg(map, randomizer, selector,
+						TunnelGenImpl tg(*map, randomizer, selector,
 								fill_oper, perimeter_oper, i + 1, padding,
 								genwidth, path_len, 20,
 								padding > 0
 										&& (genpaths[i] > 0 || nogen_tries > 100));
 
-						generate_entrance(map.groups[i].group_area, randomizer,
+						generate_entrance(map->groups[i].group_area, randomizer,
 								std::min(genwidth, 2), p, axis, positive);
 
 						int val = positive ? +1 : -1;

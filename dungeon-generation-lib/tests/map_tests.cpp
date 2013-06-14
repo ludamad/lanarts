@@ -1,3 +1,4 @@
+#include <set>
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
@@ -6,7 +7,11 @@
 #include <lcommon/mtwist.h>
 #include <lcommon/SerializeBuffer.h>
 
+#include <luawrap/luawrap.h>
+#include <luawrap/testutils.h>
+
 #include "Map.h"
+#include "lua_ldungeon.h"
 #include "map_fill.h"
 #include "tunnelgen.h"
 
@@ -64,20 +69,20 @@ TEST(square_selector_matches) {
 TEST(map_rectangle_fill) {
 	const uint16 TEST_CONTENT = 5;
 
-	Map map(Size(10, 10), Square(FLAG_SOLID));
+	MapPtr map(new Map(Size(10, 10), Square(FLAG_SOLID)));
 
 	Selector selector(FLAG_SOLID, 0);
 	Operator oper(FLAG_HAS_OBJECT /*turn on*/, FLAG_SOLID /*turn off*/, 0,
 			TEST_CONTENT);
 	RectangleApplyOperator rect_oper(ConditionalOperator(selector, oper));
 
-	const BBox bounds(Pos(0, 0), map.size());
+	const BBox bounds(Pos(0, 0), map->size());
 	rect_oper.apply(map, ROOT_GROUP_ID, bounds);
 
 	FOR_EACH_BBOX(bounds, x, y)
 	{
 		CHECK(
-				map[Pos(x, y)].matches(
+				(*map)[Pos(x, y)].matches(
 						Selector(FLAG_HAS_OBJECT, FLAG_SOLID, TEST_CONTENT)));
 	}
 }
@@ -96,7 +101,7 @@ static const Size MAP_SIZE(80, 40);
 TEST(test_map_generation) {
 	MTwist randomizer;
 	/* 0, 1, 2 are used as map content values*/
-	Map map(MAP_SIZE);
+	MapPtr map_ptr(new Map(MAP_SIZE));
 
 	/* Create rooms */{
 		ConditionalOperator fill_oper(SELECT_ALL,
@@ -104,9 +109,9 @@ TEST(test_map_generation) {
 		ConditionalOperator perimeter_oper(SELECT_ALL,
 				Operator(FLAG_PERIMETER /* add perimeter flag */, 0, 0, 2));
 		/* Operator to carve out each room */
-		RectangleApplyOperator rect_oper(fill_oper, 1, perimeter_oper);
+		AreaOperatorPtr rect_oper(new RectangleApplyOperator(fill_oper, 1, perimeter_oper));
 		BSPApplyOperator bsp_oper(randomizer, rect_oper, Size(8, 8), true, 7);
-		bsp_oper.apply(map, ROOT_GROUP_ID, BBox(Pos(0, 0), MAP_SIZE));
+		bsp_oper.apply(map_ptr, ROOT_GROUP_ID, BBox(Pos(0, 0), MAP_SIZE));
 	}
 
 	/* Create tunnels */{
@@ -123,11 +128,14 @@ TEST(test_map_generation) {
 		TunnelSelector tunnel_selector(is_valid_fill, is_valid_perimeter,
 				is_finished_fill, is_finished_perimeter);
 
+
 		TunnelGenOperator tunnel_oper(randomizer, tunnel_selector, fill_oper,
 				perimeter_oper, 1, Range(1, 2), Range(1, 1));
-		tunnel_oper.apply(map, ROOT_GROUP_ID, BBox(Pos(0, 0), MAP_SIZE));
+		tunnel_oper.apply(map_ptr, ROOT_GROUP_ID, BBox(Pos(0, 0), MAP_SIZE));
 	}
 
+
+	Map& map = *map_ptr; // convenience
 	// render the level
 	for (int y = 0; y < MAP_SIZE.h; y++) {
 		for (int x = 0; x < MAP_SIZE.w; x++) {
@@ -162,4 +170,33 @@ TEST(test_map_generation) {
 	}
 
 	CHECK(serialized_correctly(map));
+}
+
+TEST(test_lua_bindings) {
+	typedef std::set<std::string> StrSet;
+	typedef std::set<std::string>::iterator StrSetIter;
+
+	TestLuaState L;
+	MTwist mtwist;
+
+	luaL_openlibs(L);
+	LuaField map_gen = luawrap::globals(L)["MapGen"];
+	luawrap::ensure_table(map_gen);
+	lua_register_ldungeon(map_gen, &mtwist, true);
+
+	luawrap::dofile(L, "tests/map_api_tests.lua");
+	luawrap::globals(L)["tests"].push();
+
+	StrSet testnames;
+    lua_pushnil(L);  /* first key */
+    while (lua_next(L, -2) != 0) {
+    	testnames.insert(lua_tostring(L, -2));
+    	lua_pop(L, 1);
+    }
+    for (StrSetIter it = testnames.begin(); it != testnames.end(); ++it) {
+    	printf("Running test '%s'\n", it->c_str());
+    	lua_getfield(L, -1, it->c_str());
+    	luawrap::call<void>(L);
+    }
+    lua_pop(L, 1); /* pop test table */
 }

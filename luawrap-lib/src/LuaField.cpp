@@ -356,4 +356,3 @@ const LuaField& luawrap::ensure_table(const LuaField& field) {
 	lua_pop(field.luastate(), 1);
 	return field;
 }
-

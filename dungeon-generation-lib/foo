@@ -1,0 +1,1 @@
+lanarts_dungeon_gen_tests: /home/adomurad/lanarts-git/lanarts/dungeon-generation-lib/../common-lib/include/lcommon/Grid.h:49: Ref Grid<ldungeon_gen::Square>::raw_get(int) [V = ldungeon_gen::Square]: Assertion `idx > 0 && idx < _contents.size()' failed.
