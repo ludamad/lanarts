@@ -94,6 +94,10 @@ namespace ldungeon_gen {
 		return selector;
 	}
 
+	static Selector selector_optional_get(LuaField args) {
+		return args.isnil() ? Selector() : selector_get(args);
+	}
+
 	/* Parses an 'operators' from a table. All fields are optional. */
 	static Operator operator_get(LuaField args) {
 		bool has_content = args.has("content");
@@ -103,6 +107,10 @@ namespace ldungeon_gen {
 				luawrap::defaulted(args["content"], 0));
 		oper.use_content_value = has_content;
 		return oper;
+	}
+
+	static Operator operator_optional_get(LuaField args) {
+		return args.isnil() ? Operator() : operator_get(args);
 	}
 
 	static ConditionalOperator conditional_operator_get(LuaField args) {
@@ -162,13 +170,19 @@ namespace ldungeon_gen {
 	 *                   Area operator helpers                                   *
 	 *****************************************************************************/
 
-	const int OPER_UPVALUE = luawrap::UPVALUES_USED + 1;
+	const int OPER_UPVALUE = 1;
 
 	/* Helper for wrapping the object in a closure*/
-	static void oper_aux(LuaStackValue map, group_t parent_group_id, const BBox& rect) {
-		lua_State* L = map.luastate();
+	static int oper_aux(lua_State* L) {
+        using namespace luawrap;
+
+        MapPtr map = get<MapPtr>(L, 1);
+        group_t parent_group_id = get<int>(L, 2);
+        BBox rect = get<BBox>(L, 3);
+
 		AreaOperatorPtr oper = luawrap::get<AreaOperatorPtr>(L, lua_upvalueindex(OPER_UPVALUE));
-		oper->apply(map.as<MapPtr>(), parent_group_id, rect);
+		oper->apply(map, parent_group_id, rect);
+        return 1;
 	}
 
 	LuaValue lua_opermetatable(lua_State* L) {
@@ -189,9 +203,8 @@ namespace ldungeon_gen {
 				defaulted(args["create_subgroup"], true));
 
 		/* Create a closure which applies the function */
-		luawrap::push_function(L, "MapGen.rectangle_operator instance", oper_aux);
 		luawrap::push(L, AreaOperatorPtr(new RectangleApplyOperator(oper)));
-		lua_setupvalue(L, -2, OPER_UPVALUE);
+		lua_pushcclosure(L, oper_aux, 1);
 
 		return LuaStackValue(L, -1);
 	}
@@ -234,9 +247,8 @@ namespace ldungeon_gen {
 				defaulted(args["create_subgroup"], true));
 
 		/* Create a closure which applies the function */
-		luawrap::push_function(L, "MapGen.bsp_operator instance", oper_aux);
 		luawrap::push(L, AreaOperatorPtr(new BSPApplyOperator(oper)));
-		lua_setupvalue(L, -2, OPER_UPVALUE);
+		lua_pushcclosure(L, oper_aux, 1);
 
 		return LuaStackValue(L, -1);
 	}
@@ -250,29 +262,28 @@ namespace ldungeon_gen {
 		MTwist* mtwist = (MTwist*)lua_touserdata(L, -1);
 		
 		LuaValue vs = args["validity_selector"];
- 		Selector vfill_selector = vs.isnil() ? Selector() : selector_get(args["fill_selector"]);
- 		Selector vperimeter_selector = vs.isnil() ? Selector() : selector_get(args["perimeter_selector"]);
+ 		Selector vfill_selector = vs.isnil() ? Selector() : selector_optional_get(vs["fill_selector"]);
+ 		Selector vperimeter_selector = vs.isnil() ? Selector() : selector_optional_get(vs["perimeter_selector"]);
 
 		LuaValue cs = args["completion_selector"];
- 		Selector cfill_selector = cs.isnil() ? Selector() : selector_get(args["fill_selector"]);
- 		Selector cperimeter_selector = cs.isnil() ? Selector() : selector_get(args["perimeter_selector"]);
+ 		Selector cfill_selector = cs.isnil() ? Selector() : selector_optional_get(cs["fill_selector"]);
+ 		Selector cperimeter_selector = cs.isnil() ? Selector() : selector_optional_get(cs["perimeter_selector"]);
 
 		ConditionalOperator fill_oper = conditional_operator_get(args["fill_operator"]);
 		ConditionalOperator perimeter_oper = conditional_operator_get(args["perimeter_operator"]);
 
 		int padding = defaulted(args["padding"], 1);
 		Range size_range = args["size_range"].as<Range>();
-		Range tunnels_per_room_range  = args["tunnels_per_room_range "].as<Range>();
+		Range tunnels_per_room_range  = args["tunnels_per_room_range"].as<Range>();
 
-	        TunnelSelector tunnel_selector(vfill_selector, vperimeter_selector,
+	    TunnelSelector tunnel_selector(vfill_selector, vperimeter_selector,
                                   cfill_selector, cperimeter_selector);
 
-                TunnelGenOperator oper(*mtwist, tunnel_selector, fill_oper,
+        TunnelGenOperator oper(*mtwist, tunnel_selector, fill_oper,
                                 perimeter_oper, padding, size_range, tunnels_per_room_range);	
 		/* Create a closure which applies the function */
-		luawrap::push_function(L, "MapGen.tunnel_operator instance", oper_aux);
 		luawrap::push(L, AreaOperatorPtr(new TunnelGenOperator(oper)));
-		lua_setupvalue(L, -2, OPER_UPVALUE);
+		lua_pushcclosure(L, oper_aux, 1);
 
 		return LuaStackValue(L, -1);
 	}

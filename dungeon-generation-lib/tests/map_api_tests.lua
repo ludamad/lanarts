@@ -36,8 +36,8 @@ function tests.map_gen_test()
     local bsp_oper = MapGen.bsp_operator {
         child_operator = MapGen.rectangle_operator { 
             perimeter_width = 1,
-            fill_operator = { remove = {MapGen.FLAG_SOLID} },
-            perimeter_operator = { add = {MapGen.FLAG_PERIMETER} }
+            fill_operator = { remove = {MapGen.FLAG_SOLID}, content = 1 },
+            perimeter_operator = { add = {MapGen.FLAG_PERIMETER}, content = 2 },
         },
         split_depth = 7,
         minimum_node_size = {8,8}
@@ -49,7 +49,7 @@ function tests.map_gen_test()
 
     local tunnel_oper = MapGen.tunnel_operator {
         validity_selector = { 
-            fill_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.flags_combine(MapGen.FLAG_PERIMETER, MapGen.FLAG_TUNNEL) },
+            fill_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = {MapGen.FLAG_PERIMETER, MapGen.FLAG_TUNNEL} },
             perimeter_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.FLAG_TUNNEL }
         },
 
@@ -58,12 +58,14 @@ function tests.map_gen_test()
             perimeter_selector = { matches_none = MapGen.FLAG_SOLID } 
         },
 
-        fill_operator = { add = MapGen.FLAG_TUNNEL, remove = MapGen.FLAG_SOLID },
-        perimeter_operator = { matches_all = MapGen.FLAGS_SOLID, add = MapGen.flags_combine(MapGen.FLAG_SOLID, MapGen.FLAG_TUNNEL, MapGen.FLAG_PERIMETER) },
+        fill_operator = { add = MapGen.FLAG_TUNNEL, remove = MapGen.FLAG_SOLID, content = 3},
+        perimeter_operator = { matches_all = MapGen.FLAGS_SOLID, add = {MapGen.FLAG_SOLID, MapGen.FLAG_TUNNEL, MapGen.FLAG_PERIMETER}, content = 4 },
 
         size_range = {1,2},
-        tunnels_per_room_range = {1,1}
+        tunnels_per_room_range = {1,3}
     }
+
+    tunnel_oper(map, MapGen.ROOT_GROUP, bbox_create( {0,0}, map.size) )
 
     local parts = {}
 

@@ -54,8 +54,6 @@ namespace ldungeon_gen {
 		return true;
 	}
 
-
-
 	/* By placing in cpp file, ensures only created in one module */
 	AreaOperatorBase::~AreaOperatorBase() {
 	}
@@ -103,7 +101,7 @@ namespace ldungeon_gen {
 
 	bool BSPApplyOperator::apply(MapPtr map, group_t parent_group_id, const BBox& rect) {
 		if (create_subgroup) {
-			map->make_group(rect, parent_group_id);
+		    parent_group_id = map->make_group(rect, parent_group_id);
 		}
 
 		TCODBsp* bsp = new TCODBsp(rect.x1, rect.y1, rect.width(),
@@ -119,4 +117,44 @@ namespace ldungeon_gen {
 
 		return true;
 	}
+/*
+    bool RandomPlacementApplyOperator::place_random(MapPtr map, group_t parent_group_id, Size size) {
+        const int MAX_ATTEMPTS = 10;
+        for (int attempts = 0; attempts < MAX_ATTEMPTS; attempts++) {
+            int rx = mt.rand(1, map.width() - size.w - padding) | 1;
+            int ry = mt.rand(1, map.height() - size.h -  padding) | 1;
+            BBox room(rx, ry, rx + size.w, rh + size.h);
+            if (area_oper->apply(map, parent_group_id, room)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool RandomPlacementApplyOperator::apply(MapPtr map, group_t parent_group_id, const BBox& rect) {
+        const int TOO_MANY_FAILURES = 25;
+		if (create_subgroup) {
+			parent_group_id = map->make_group(rect, parent_group_id);
+		}
+
+        int nrooms = mt.rand(amount_of_regions);
+        Range sizerange(size.min + padding * 2, size.max + padding * 2);
+
+        int failures = 0;
+        for (int i = 0; i < nrooms; i++) {
+            for (;; failures++) {
+
+                int rw = mt.rand(sizerange), rh = mt.rand(sizerange);
+
+                if (place_random(map, parent_group_id, Size(rw, rh)) {
+                    break;
+                }
+                if (failures > TOO_MANY_FAILURES)
+                    goto NoMoreRooms;
+                // Goto below
+            }
+        }
+        NoMoreRooms:
+        return true;
+    } */
 }
