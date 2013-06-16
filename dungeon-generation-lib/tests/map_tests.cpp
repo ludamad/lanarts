@@ -74,7 +74,7 @@ TEST(map_rectangle_fill) {
 	Selector selector(FLAG_SOLID, 0);
 	Operator oper(FLAG_HAS_OBJECT /*turn on*/, FLAG_SOLID /*turn off*/, 0,
 			TEST_CONTENT);
-	RectangleApplyOperator rect_oper(ConditionalOperator(selector, oper));
+	RectangleApplyOperator rect_oper(AreaQueryPtr(), ConditionalOperator(selector, oper));
 
 	const BBox bounds(Pos(0, 0), map->size());
 	rect_oper.apply(map, ROOT_GROUP_ID, bounds);
@@ -109,7 +109,7 @@ TEST(test_map_generation) {
 		ConditionalOperator perimeter_oper(SELECT_ALL,
 				Operator(FLAG_PERIMETER /* add perimeter flag */, 0, 0, 2));
 		/* Operator to carve out each room */
-		AreaOperatorPtr rect_oper(new RectangleApplyOperator(fill_oper, 1, perimeter_oper));
+		AreaOperatorPtr rect_oper(new RectangleApplyOperator(AreaQueryPtr(), fill_oper, 1, perimeter_oper));
 		BSPApplyOperator bsp_oper(randomizer, rect_oper, Size(8, 8), true, 7);
 		bsp_oper.apply(map_ptr, ROOT_GROUP_ID, BBox(Pos(0, 0), MAP_SIZE));
 	}
@@ -194,7 +194,7 @@ TEST(test_lua_bindings) {
     	lua_pop(L, 1);
     }
     for (StrSetIter it = testnames.begin(); it != testnames.end(); ++it) {
-    	printf("Running test '%s'\n", it->c_str());
+    	printf("Running lua test '%s'\n", it->c_str());
     	lua_getfield(L, -1, it->c_str());
     	luawrap::call<void>(L);
     }

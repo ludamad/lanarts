@@ -13,6 +13,7 @@
 #include <lcommon/smartptr.h>
 
 #include "Map.h"
+#include "map_check.h"
 
 namespace ldungeon_gen {
 
@@ -28,15 +29,16 @@ namespace ldungeon_gen {
 
 	/* Applies an operator to a rectangle, can operate separately on the perimeter */
 	struct RectangleApplyOperator: public AreaOperatorBase {
+		AreaQueryPtr query;
 		ConditionalOperator fill_oper, perimeter_oper;
 		int perimeter;
 		bool create_subgroup;
 
 		/* Apply to rectangle without a perimeter */
-		RectangleApplyOperator(ConditionalOperator fill_oper, bool create_subgroup = true);
+		RectangleApplyOperator(AreaQueryPtr query, ConditionalOperator fill_oper, bool create_subgroup = true);
 
 		/* Apply to rectangle with a perimeter */
-		RectangleApplyOperator(ConditionalOperator fill_oper, int perimeter,
+		RectangleApplyOperator(AreaQueryPtr query, ConditionalOperator fill_oper, int perimeter,
 				ConditionalOperator perimeter_oper, bool create_subgroup = true);
 
 		virtual bool apply(MapPtr map, group_t parent_group_id, const BBox& rect);
@@ -67,17 +69,15 @@ namespace ldungeon_gen {
 
 	struct RandomPlacementApplyOperator : public AreaOperatorBase {
         MTwist& randomizer;
-		int region_padding;
 		Range amount_of_regions, size;
 		bool create_subgroup;
 
-		AreaOperatorBase& area_oper;
+		AreaOperatorPtr area_oper;
 
-		RandomPlacementApplyOperator(MTwist& randomizer, int region_padding,
+		RandomPlacementApplyOperator(MTwist& randomizer,
                 Range amount_of_regions, Range size,
-				AreaOperatorBase& area_oper, bool create_subgroup = true) :
+				AreaOperatorPtr area_oper, bool create_subgroup = true) :
                         randomizer(randomizer),
-						region_padding(region_padding),
 						amount_of_regions(amount_of_regions),
 						size(size),
 						area_oper(area_oper),
@@ -87,7 +87,7 @@ namespace ldungeon_gen {
 		virtual bool apply(MapPtr map, group_t parent_group_id, const BBox& rect);
 
     private:
-        bool place_random(MapPtr map, Size size);
+        bool place_random(MapPtr map, group_t parent_group_id, Size size);
 	};
 }
 

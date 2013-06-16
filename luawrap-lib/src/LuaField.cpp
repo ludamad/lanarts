@@ -96,6 +96,14 @@ LuaField::LuaField(lua_State* L, int stackidx, int index) {
 	init(L, INTEGER_INDEX, STACK_PARENT, ind, par);
 }
 
+LuaField::LuaField(lua_State* L, int stackidx) {
+	adjust_stack_index(L, stackidx);
+	Index ind;
+	Parent par;
+	par.stack_index = stackidx;
+	init(L, NO_INDEX, STACK_PARENT, ind, par);
+}
+
 bool LuaField::has(const char* key) const {
 	return !(*this)[key].isnil();
 }

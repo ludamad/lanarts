@@ -5,13 +5,17 @@
 
 #include <cstdlib>
 
+#include "ldungeon_assert.h"
+
 #include "map_fill.h"
 #include "bsp.hpp"
 
 namespace ldungeon_gen {
 
 	RectangleApplyOperator::RectangleApplyOperator(
+			AreaQueryPtr query,
 			ConditionalOperator fill_oper, bool create_subgroup) :
+					query(query),
 					fill_oper(fill_oper),
 					perimeter(0),
 					perimeter_oper(Selector(0, 0), Operator(0, 0, 0)),
@@ -19,8 +23,10 @@ namespace ldungeon_gen {
 	}
 
 	RectangleApplyOperator::RectangleApplyOperator(
+			AreaQueryPtr query,
 			ConditionalOperator fill_oper, int perimeter,
 			ConditionalOperator perimeter_oper, bool create_subgroup) :
+					query(query),
 					fill_oper(fill_oper),
 					perimeter(perimeter),
 					perimeter_oper(perimeter_oper),
@@ -30,6 +36,12 @@ namespace ldungeon_gen {
 	bool RectangleApplyOperator::apply(MapPtr map, group_t parent_group_id, const BBox& rect) {
 
 		const BBox map_bounds(Pos(0, 0), map->size());
+		LDUNGEON_ASSERT(rect.resized_within(map_bounds) == rect);
+
+		/* Do we match the query ? */
+		if (!query.empty() && !query->matches(map, parent_group_id, rect)) {
+			return false;
+		}
 
 		BBox inner_rect = rect.shrink(perimeter);
 		if (create_subgroup) {
@@ -117,13 +129,12 @@ namespace ldungeon_gen {
 
 		return true;
 	}
-/*
     bool RandomPlacementApplyOperator::place_random(MapPtr map, group_t parent_group_id, Size size) {
         const int MAX_ATTEMPTS = 10;
         for (int attempts = 0; attempts < MAX_ATTEMPTS; attempts++) {
-            int rx = mt.rand(1, map.width() - size.w - padding) | 1;
-            int ry = mt.rand(1, map.height() - size.h -  padding) | 1;
-            BBox room(rx, ry, rx + size.w, rh + size.h);
+            int rx = randomizer.rand(1, map->width() - size.w) | 1;
+            int ry = randomizer.rand(1, map->height() - size.h) | 1;
+            BBox room(rx, ry, rx + size.w, ry + size.h);
             if (area_oper->apply(map, parent_group_id, room)) {
                 return true;
             }
@@ -137,16 +148,16 @@ namespace ldungeon_gen {
 			parent_group_id = map->make_group(rect, parent_group_id);
 		}
 
-        int nrooms = mt.rand(amount_of_regions);
-        Range sizerange(size.min + padding * 2, size.max + padding * 2);
+        int nrooms = randomizer.rand(amount_of_regions);
+        Range sizerange(size.min, size.max);
 
         int failures = 0;
         for (int i = 0; i < nrooms; i++) {
             for (;; failures++) {
 
-                int rw = mt.rand(sizerange), rh = mt.rand(sizerange);
+                int rw = randomizer.rand(sizerange), rh = randomizer.rand(sizerange);
 
-                if (place_random(map, parent_group_id, Size(rw, rh)) {
+                if (place_random(map, parent_group_id, Size(rw, rh))) {
                     break;
                 }
                 if (failures > TOO_MANY_FAILURES)
@@ -156,5 +167,5 @@ namespace ldungeon_gen {
         }
         NoMoreRooms:
         return true;
-    } */
+    }
 }

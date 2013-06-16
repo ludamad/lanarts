@@ -85,22 +85,22 @@ namespace ldungeon_gen {
 
 	struct TunnelSliceContext {
 		//provided
-		Pos p;
+		Pos pos;
 		int dx, dy;
 		char turn_state;
 		int attempt_number;
 
 		//calculated
 		bool tunneled;
-		Pos ip, newpos;
+		Pos perim_pos, newpos;
 	};
 
 	void TunnelGenImpl::initialize_slice(TunnelSliceContext* cntxt,
 			int turn_state, int dx, int dy, const Pos& pos) {
 		cntxt->turn_state = turn_state;
 		cntxt->dx = dx, cntxt->dy = dy;
-		cntxt->p = pos;
-		cntxt->ip = Pos(pos.x - (dy != 0 ? 1 : 0), pos.y - (dx != 0 ? 1 : 0));
+		cntxt->pos = pos;
+		cntxt->perim_pos = Pos(pos.x - (dy != 0 ? padding : 0), pos.y - (dx != 0 ? padding : 0));
 		cntxt->attempt_number = 0;
 	}
 
@@ -111,7 +111,7 @@ namespace ldungeon_gen {
 		for (int i = 0; i < width + padding * 2; i++) {
 			int xcomp = (dy == 0 ? 0 : i);
 			int ycomp = (dx == 0 ? 0 : i);
-			map[Pos(cntxt->ip.x + xcomp, cntxt->ip.y + ycomp)] =
+			map[Pos(cntxt->perim_pos.x + xcomp, cntxt->perim_pos.y + ycomp)] =
 					prev_content[i];
 		}
 
@@ -119,12 +119,12 @@ namespace ldungeon_gen {
 	bool TunnelGenImpl::validate_slice(Square* prev_content,
 			TunnelSliceContext* cntxt, int dep) {
 		int dx = cntxt->dx, dy = cntxt->dy;
-		if (cntxt->p.x <= 2
-				|| cntxt->p.x
+		if (cntxt->pos.x <= 2
+				|| cntxt->pos.x
 						>= map.width() - width - (dy == 0 ? 0 : padding * 2))
 			return false;
-		if (cntxt->p.y <= 2
-				|| cntxt->p.y
+		if (cntxt->pos.y <= 2
+				|| cntxt->pos.y
 						>= map.height() - width - (dx == 0 ? 0 : padding * 2))
 			return false;
 
@@ -135,10 +135,9 @@ namespace ldungeon_gen {
 		for (int i = 0; i <= last_square; i++) {
 			int xcomp = (dy == 0 ? 0 : i);
 			int ycomp = (dx == 0 ? 0 : i);
-			Square& sqr = map[Pos(cntxt->p.x + xcomp, cntxt->p.y + ycomp)];
+			Square& sqr = map[Pos(cntxt->pos.x + xcomp, cntxt->pos.y + ycomp)];
 
 			/* Look for reasons we would not be done */
-//			if (sqr.matches_flags(FLAG_SOLID) || sqr.group == 0//|| (!accept_tunnel_entry && sqr.group == 0)
 			bool is_perimeter = (i == 0 || i == last_square);
 			Selector is_finished = is_perimeter ? selector.is_finished_perimeter : selector.is_finished_fill;
 			if (!sqr.matches(is_finished)) {
@@ -161,11 +160,7 @@ namespace ldungeon_gen {
 		for (int i = 0; i <= last_square; i++) {
 			int xcomp = (dy == 0 ? 0 : i);
 			int ycomp = (dx == 0 ? 0 : i);
-			Square& sqr = map[Pos(cntxt->ip.x + xcomp, cntxt->ip.y + ycomp)];
-//			if (!sqr.matches_flags(FLAG_SOLID)
-//					|| (!accept_tunnel_entry && cntxt->turn_state == NO_TURN
-//							&& sqr.matches_flags(FLAG_PERIMETER)
-//							&& sqr.group == 0))
+			Square& sqr = map[Pos(cntxt->perim_pos.x + xcomp, cntxt->perim_pos.y + ycomp)];
 			bool is_perimeter = (i == 0 || i == last_square);
 			Selector is_valid = is_perimeter ? selector.is_valid_perimeter : selector.is_valid_fill;
 			if (!sqr.matches(is_valid) && cntxt->turn_state == NO_TURN) {
@@ -184,24 +179,24 @@ namespace ldungeon_gen {
 
 		if (dx == 0) {
 			if (positive)
-				newpos.x = cntxt->p.x + width;
+				newpos.x = cntxt->pos.x + width;
 			else
-				newpos.x = cntxt->p.x - 1;
+				newpos.x = cntxt->pos.x - 1;
 			ndx = positive ? +1 : -1;
 		} else {
 			ndx = 0;
-			newpos.x = dx > 0 ? cntxt->p.x - width : cntxt->p.x + 1;
+			newpos.x = dx > 0 ? cntxt->pos.x - width : cntxt->pos.x + 1;
 		}
 
 		if (dy == 0) {
 			if (positive)
-				newpos.y = cntxt->p.y + width;
+				newpos.y = cntxt->pos.y + width;
 			else
-				newpos.y = cntxt->p.y - 1;
+				newpos.y = cntxt->pos.y - 1;
 			ndy = positive ? +1 : -1;
 		} else {
 			ndy = 0;
-			newpos.y = dy > 0 ? cntxt->p.y - width : cntxt->p.y + 1;
+			newpos.y = dy > 0 ? cntxt->pos.y - width : cntxt->pos.y + 1;
 		}
 		return newpos;
 	}
@@ -211,18 +206,18 @@ namespace ldungeon_gen {
 		int dx = cntxt->dx, dy = cntxt->dy;
 
 		if (dy == 0)
-			newpos.y = cntxt->p.y;
+			newpos.y = cntxt->pos.y;
 		else if (dy > 0)
-			newpos.y = cntxt->p.y + 1;
+			newpos.y = cntxt->pos.y + 1;
 		else
-			newpos.y = cntxt->p.y - 1;
+			newpos.y = cntxt->pos.y - 1;
 
 		if (dx == 0)
-			newpos.x = cntxt->p.x;
+			newpos.x = cntxt->pos.x;
 		else if (dx > 0)
-			newpos.x = cntxt->p.x + 1;
+			newpos.x = cntxt->pos.x + 1;
 		else
-			newpos.x = cntxt->p.x - 1;
+			newpos.x = cntxt->pos.x - 1;
 
 		return newpos;
 	}
@@ -231,17 +226,23 @@ namespace ldungeon_gen {
 			TunnelSliceContext* next) {
 		int dx = cntxt->dx, dy = cntxt->dy;
 
-		map[cntxt->ip].apply(perimeter_oper);
+		/* Make the first piece of perimeter */
+		for (int i = 0; i < padding; i++) {
+			int xcomp = (dy == 0 ? 0 : i);
+			int ycomp = (dx == 0 ? 0 : i);
+			map[Pos(cntxt->perim_pos.x+xcomp, cntxt->perim_pos.y+ycomp)].apply(perimeter_oper);
+		}
+		/* Make the inner fill */
 		for (int i = 0; i < width; i++) {
 			int xcomp = (dy == 0 ? 0 : i);
 			int ycomp = (dx == 0 ? 0 : i);
-
-			Square& sqr = map[Pos(cntxt->p.x + xcomp, cntxt->p.y + ycomp)];
-			sqr.apply(fill_oper);
+			map[Pos(cntxt->pos.x + xcomp, cntxt->pos.y + ycomp)].apply(fill_oper);
 		}
 
-		map[Pos(cntxt->ip.x + (dy == 0 ? 0 : width + 1),
-				cntxt->ip.y + (dx == 0 ? 0 : width + 1))].apply(perimeter_oper);
+		for (int i = 0; i < padding; i++) {
+			map[Pos(cntxt->perim_pos.x + (dy == 0 ? 0 : width + i+padding),
+					cntxt->perim_pos.y + (dx == 0 ? 0 : width + i+padding))].apply(perimeter_oper);
+		}
 
 		Pos newpos = next_tunnel_position(cntxt);
 
@@ -256,11 +257,13 @@ namespace ldungeon_gen {
 		int ndx, ndy;
 		Pos newpos = next_turn_position(cntxt, ndx, ndy);
 
-		for (int i = 0; i < width + padding * 2; i++) {
-			int xcomp = (dy == 0 ? 0 : i);
-			int ycomp = (dx == 0 ? 0 : i);
-			Square& sqr = map[Pos(cntxt->ip.x + xcomp, cntxt->ip.y + ycomp)];
-			sqr.apply(perimeter_oper);
+		if (padding > 0) { // TODO: Handle padding > 1 properly
+			for (int i = 0; i < width + padding * 2; i++) {
+				int xcomp = (dy == 0 ? 0 : i);
+				int ycomp = (dx == 0 ? 0 : i);
+				Square& sqr = map[Pos(cntxt->perim_pos.x + xcomp, cntxt->perim_pos.y + ycomp)];
+				sqr.apply(perimeter_oper);
+			}
 		}
 		initialize_slice(next, TURN_PERIMETER, ndx, ndy, newpos);
 	}

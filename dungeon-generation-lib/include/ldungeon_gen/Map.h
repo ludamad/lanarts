@@ -14,6 +14,8 @@
 #include <lcommon/mtwist.h>
 #include <lcommon/smartptr.h>
 
+#include <luawrap/LuaValue.h>
+
 class SerializeBuffer;
 
 namespace ldungeon_gen {
@@ -155,6 +157,8 @@ namespace ldungeon_gen {
 	public:
 		Map(const Size& size = Size(), const Square& fill_value = Square());
 		std::vector<Group> groups;
+		LuaValue luafields;
+
 		group_t make_group(const BBox& area, int parent_group_id);
 
 		/* For testing purposes with serialization */

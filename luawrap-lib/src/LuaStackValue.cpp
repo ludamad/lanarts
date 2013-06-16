@@ -77,6 +77,10 @@ void LuaStackValue::pop() const {
 	lua_replace(L, idx);
 }
 
+LuaStackValue::operator LuaField() const {
+	return LuaField(L, idx);
+}
+
 LuaValue LuaStackValue::metatable() const {
 	push();
 	lua_getmetatable(L, -1);

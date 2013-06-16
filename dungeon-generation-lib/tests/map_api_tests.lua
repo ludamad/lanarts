@@ -9,7 +9,7 @@ local function assert_exists2(str, str2)
     assert(_G[str], str .. "." .. str2)
 end
 
-function tests.basic_api_check()
+function tests.test1_api_check()
     assert_exists("MapGen")
     assert_exists2("MapGen", "ROOT_GROUP")
 
@@ -28,26 +28,25 @@ function tests.basic_api_check()
     assert_exists2("MapGen", "rectangle_operator")
 end
 
-function tests.map_gen_test()
-    local solid_square = MapGen.square { flags = MapGen.FLAG_SOLID }
-    local map = MapGen.map_create { size = {80,40}, fill = solid_square }
+local function make_rectangle_query()
+	return MapGen.rectangle_query { 
+		fill_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.FLAG_PERIMETER }, 
+		perimeter_width = 1, 
+		perimeter_selector = { matches_all = MapGen.FLAG_SOLID }
+	}
+end
 
-    print "bsp oper create"
-    local bsp_oper = MapGen.bsp_operator {
-        child_operator = MapGen.rectangle_operator { 
-            perimeter_width = 1,
-            fill_operator = { remove = {MapGen.FLAG_SOLID}, content = 1 },
-            perimeter_operator = { add = {MapGen.FLAG_PERIMETER}, content = 2 },
-        },
-        split_depth = 7,
-        minimum_node_size = {8,8}
+local function make_rectangle_oper(--[[Optional]] area_query)
+    return MapGen.rectangle_operator { 
+        area_query = area_query,
+        perimeter_width = 1,
+       fill_operator = { remove = {MapGen.FLAG_SOLID}, content = 1 },
+        perimeter_operator = { add = {MapGen.FLAG_PERIMETER}, content = 2 },
     }
+end
 
-    print "bsp oper apply"
-    -- Apply the binary space partitioning (bsp)
-    bsp_oper(map, MapGen.ROOT_GROUP, bbox_create({0,0}, map.size))
-
-    local tunnel_oper = MapGen.tunnel_operator {
+local function make_tunnel_oper() 
+	return MapGen.tunnel_operator {
         validity_selector = { 
             fill_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = {MapGen.FLAG_PERIMETER, MapGen.FLAG_TUNNEL} },
             perimeter_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.FLAG_TUNNEL }
@@ -61,28 +60,56 @@ function tests.map_gen_test()
         fill_operator = { add = MapGen.FLAG_TUNNEL, remove = MapGen.FLAG_SOLID, content = 3},
         perimeter_operator = { matches_all = MapGen.FLAGS_SOLID, add = {MapGen.FLAG_SOLID, MapGen.FLAG_TUNNEL, MapGen.FLAG_PERIMETER}, content = 4 },
 
+		perimeter_width = 1,
         size_range = {1,2},
-        tunnels_per_room_range = {1,3}
+        tunnels_per_room_range = {1,2}
     }
+end
 
-    tunnel_oper(map, MapGen.ROOT_GROUP, bbox_create( {0,0}, map.size) )
 
+local InstanceList = {
+	create = function () 
+		local obj = { instances = {} }
+		
+		function obj:add(content, xy)
+			assert(self:at(xy) == nil, "Overlapping instances! Some placement check failed.")
+			table.insert(self.instances, {content, xy}) 
+		end
+		
+		function obj:at(xy)
+			for _, inst in ipairs(self.instances) do
+				local content, cxy = unpack(inst)
+				if cxy[1] == xy[1] and cxy[2] == xy[2] then return content end
+			end
+			return nil
+		end
+
+		return obj
+	end
+}
+
+local function print_map(map, --[[Optional]] instances)
     local parts = {}
+    instances = instances or InstanceList.create()
 
     local function add_part(strpart) 
         table.insert(parts, strpart)
     end
 
-    print "bsp oper print"
+	print "At print_map"
     for y=0,map.size[2]-1 do
         for x=0,map.size[1]-1 do
+        	local inst = instances:at({x,y})
             local sqr = map:get({x, y})
-            local n = sqr.content
-            local g = sqr.group
+
+            local n, g = sqr.content, sqr.group
             local solid = MapGen.flags_match(sqr.flags, MapGen.FLAG_SOLID)
             local perimeter = MapGen.flags_match(sqr.flags, MapGen.FLAG_PERIMETER)
             local tunnel = MapGen.flags_match(sqr.flags, MapGen.FLAG_TUNNEL)
-            if solid and tunnel then
+
+        	if inst then 
+        		add_part(inst .. " ") 
+            elseif solid and tunnel then
                 add_part("T ")
             elseif not solid and tunnel then
                 add_part("- ")
@@ -104,4 +131,104 @@ function tests.map_gen_test()
     end
 
     print(table.concat(parts))
+end
+
+function tests.test2_bsp()
+    local solid_square = MapGen.square { flags = MapGen.FLAG_SOLID }
+    local map = MapGen.map_create { size = {80,40}, fill = solid_square }
+
+    print "bsp oper create"
+    local bsp_oper = MapGen.bsp_operator {
+        child_operator = make_rectangle_oper(),
+        split_depth = 7,
+        minimum_node_size = {8,8}
+    }
+
+    print "bsp oper apply"
+    -- Apply the binary space partitioning (bsp)
+    bsp_oper(map, MapGen.ROOT_GROUP, bbox_create({0,0}, map.size))
+
+    local tunnel_oper = make_tunnel_oper()
+
+    tunnel_oper(map, MapGen.ROOT_GROUP, bbox_create( {0,0}, map.size) )
+
+	print_map(map)
+end
+
+function tests.test3_random_placement()
+    local solid_square = MapGen.square { flags = MapGen.FLAG_SOLID }
+    local map = MapGen.map_create { size = {80,40}, fill = solid_square }
+
+    print "random placement oper create"
+    local random_placement_oper = MapGen.random_placement_operator {
+        child_operator = make_rectangle_oper(make_rectangle_query()),
+        size_range = {6,9},
+        amount_of_placements_range = {20, 20},
+        create_subgroup = true
+    }
+
+    print "random placement oper apply"
+    -- Apply the binary space partitioning (bsp)
+    random_placement_oper(map, MapGen.ROOT_GROUP, bbox_create({0,0}, map.size))
+
+    local tunnel_oper = make_tunnel_oper()
+
+    tunnel_oper(map, MapGen.ROOT_GROUP, bbox_create( {0,0}, map.size) )
+
+    print_map(map)
+end
+
+
+local function place_instance(map, area, type)		
+	local xy = MapGen.find_random_square { map = map, area = area, selector = {matches_none = {MapGen.FLAG_HAS_OBJECT, MapGen.FLAG_SOLID} } }
+	if xy ~= nil then
+		map.instances:add(type, xy)
+		map:square_apply(xy, {add = MapGen.FLAG_HAS_OBJECT})
+	end
+end
+
+local function place_instances(map, area)
+	for i=1,4 do
+		place_instance(map, area, '1')
+		place_instance(map, area, '2')
+		place_instance(map, area, '3')
+	end
+end
+
+-- Test with lua functions, just recreating map_random_placement_test
+function tests.test4_custom_operator()
+
+    local solid_square = MapGen.square { flags = MapGen.FLAG_SOLID }
+    -- Uses 'InstanceList' class defined above
+    local map = MapGen.map_create { size = {80,40}, fill = solid_square, instances = InstanceList.create() }
+
+    print "custom create"
+    local random_placement_oper = MapGen.random_placement_operator {
+        child_operator = function(map, subgroup, bounds)
+        	--Purposefully convoluted for test purposes
+        	local queryfn = function(...)
+        		local query = make_rectangle_query()
+        		return query(map, subgroup, bounds)
+        	end
+        	local oper = make_rectangle_oper(queryfn)
+        	if oper(map, subgroup, bounds) then
+				place_instances(map, bounds)
+				return true
+			end
+			return false
+		end,
+        size_range = {6,9},
+        amount_of_placements_range = {20, 20},
+        create_subgroup = true
+    }
+
+    print "custom apply"
+    -- Apply the binary space partitioning (bsp)
+    random_placement_oper(map, MapGen.ROOT_GROUP, bbox_create({0,0}, map.size))
+
+    local tunnel_oper = make_tunnel_oper()
+
+    tunnel_oper(map, MapGen.ROOT_GROUP, bbox_create( {0,0}, map.size) )
+
+    print_map(map, map.instances)
 end
