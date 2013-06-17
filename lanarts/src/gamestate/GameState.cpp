@@ -18,6 +18,7 @@
 #include <lcommon/strformat.h>
 
 #include <ldraw/display.h>
+#include <luawrap/luawrap.h>
 
 #include "draw/fonts.h"
 #include "data/game_data.h"
@@ -153,7 +154,9 @@ bool GameState::start_game() {
 
 	/* If class was not set, we may be loading a game -- don't init level */
 	if (settings.class_type != -1) {
-		set_level(world.get_level(0, true));
+		luawrap::globals(L)["Engine"]["first_map_create"].push();
+		int levelid = luawrap::call<int>(L);
+		set_level(game_world().get_level(levelid));
 
 		PlayerInst* p = local_player();
 		view().sharp_center_on(p->x, p->y);
@@ -218,10 +221,10 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 }
 
 obj_id GameState::add_instance(level_id level, GameInst* inst) {
-	level_id curr = game_world().get_current_level_id();
+	GameRoomState* map = game_world().get_current_level();
 	game_world().set_current_level(level);
 	obj_id id = add_instance(inst);
-	game_world().set_current_level(curr);
+	game_world().set_current_level(map);
 	return id;
 }
 

@@ -8,6 +8,10 @@
 #include <luawrap/luameta.h>
 #include <ldraw/lua_ldraw.h>
 
+#include <ldungeon_gen/lua_ldungeon.h>
+
+#include "gamestate/GameState.h"
+
 #include "lua_api/lua_yaml.h"
 #include "lua_api/lua_api.h"
 #include "lua_api/lua_gameinst.h"
@@ -223,6 +227,9 @@ namespace lua_api {
 		register_gamestate(gs, L);
 		register_general_api(L);
 
+		luawrap::ensure_table(globals["MapGen"]);
+
+		ldungeon_gen::lua_register_ldungeon(globals["MapGen"], &gs->rng(), false);
 		register_lua_libraries(L);
 		register_io_api(L);
 		register_net_api(L);

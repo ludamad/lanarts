@@ -103,6 +103,8 @@ int main(int argc, char** argv) {
 
 	try {
 		init_game_data(gs->game_settings(), L);
+		engine["resources_post_load"].push();
+		luawrap::call<void>(L);
 	} catch (const std::exception& err) {
 		fprintf(stderr, "%s\n", err.what());
 		fflush(stderr);

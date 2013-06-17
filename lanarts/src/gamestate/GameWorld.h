@@ -11,6 +11,8 @@
 #include <vector>
 #include <cstdlib>
 
+#include <ldungeon_gen/Map.h>
+
 #include "objects/TeamRelations.h"
 
 #include "stats/EnemiesSeen.h"
@@ -36,6 +38,9 @@ public:
 	void level_move(int id, int x, int y, int roomid1, int roomid2);
 	void set_current_level(int roomid);
 	void set_current_level_lazy(int roomid);
+
+	GameRoomState* map_create(const Size& size, bool wandering_enabled = true);
+
 	void reset(int keep = 0);
 	void regen_level(int roomid);
 	void place_inst(GeneratedRoom& genlevel, GameInst* inst);
@@ -61,7 +66,10 @@ public:
 	void connect_entrance_to_exit(int roomid1, int roomid2);
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
+
+	void spawn_players(GameRoomState* map);
 private:
+	void place_player(GameRoomState* map, GameInst* p);
 	void spawn_players(GeneratedRoom& genlevel, void** player_instances,
 			size_t nplayers);
 	bool midstep;

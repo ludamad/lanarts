@@ -16,6 +16,8 @@
 #include "objects/GameInstRef.h"
 #include "stats/ClassEntry.h"
 
+#include <lcommon/math_util.h>
+
 #include "GameRoomState.h"
 #include "GameState.h"
 #include "GameWorld.h"
@@ -100,6 +102,55 @@ void GameWorld::deserialize(SerializeBuffer& serializer) {
 
 	gs->set_level(original);
 	midstep = false;
+}
+
+GameRoomState* GameWorld::map_create(const Size& size, bool wandering_enabled) {
+	int levelid = level_states.size();
+	GameRoomState* map = new GameRoomState(levelid, Size(size.w * TILE_SIZE, size.h * TILE_SIZE), wandering_enabled);
+	level_states.push_back(map);
+	return map;
+}
+
+void GameWorld::place_player(GameRoomState* map, GameInst* p) {
+	GameRoomState* currlvl = gs->get_level(); // Save level context
+	set_current_level(map);
+	GameTiles& tiles = map->tiles();
+	Pos ppos;
+	do {
+		int rand_x = gs->rng().rand(tiles.tile_width());
+		int rand_y = gs->rng().rand(tiles.tile_height());
+		ppos = centered_multiple(Pos(rand_x, rand_y), TILE_SIZE);
+	} while (gs->solid_test(NULL, ppos.x, ppos.y, 15));
+
+	p->last_x = ppos.x;
+	p->last_y = ppos.y;
+	p->update_position(ppos.x, ppos.y);
+	gs->add_instance(map->id(), p);
+	set_current_level(currlvl);
+
+}
+
+void GameWorld::spawn_players(GameRoomState* map) {
+	bool flocal = (gs->game_settings().conntype == GameSettings::CLIENT);
+	GameSettings& settings = gs->game_settings();
+	GameNetConnection& netconn = gs->net_connection();
+	int myclassn = gs->game_settings().class_type;
+
+	for (int i = 0; i < gs->player_data().all_players().size(); i++) {
+		PlayerDataEntry& pde = gs->player_data().all_players()[i];
+		bool islocal = &pde == &gs->player_data().local_player_data();
+		ClassEntry& c = game_class_data.at(pde.classtype);
+		int spriteidx = gs->rng().rand(c.sprites.size());
+
+		if (pde.player_inst.empty()) {
+			pde.player_inst = new PlayerInst(c.starting_stats,
+					c.sprites[spriteidx], 0, 0, islocal);
+		}
+		printf("Spawning for player %d: %s\n", i,
+				islocal ? "local player" : "network player");
+
+		place_player(map, pde.player_inst.get());
+	}
 }
 
 void GameWorld::spawn_players(GeneratedRoom& genlevel, void** player_instances,

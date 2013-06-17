@@ -35,13 +35,16 @@ function Engine.resources_load(...)
     function is_projectile(item)     return item.type == "projectile" end
 
     require "sound"
-    require "tiles.tilesets"
 
     dofile "res/enemies/enemies.lua"
 
     dofile "res/effects/effects.lua"
 
     dofile "res/spells/spell_effects.lua"
+end
+
+function Engine.resources_post_load(...)
+    require "tiles.tilesets"
 end
 
 function Engine.game_start(...)

@@ -5,6 +5,8 @@
 
 #include <SDL.h>
 
+#include <ldungeon_gen/Map.h>
+
 #include <lua.hpp>
 #include <luawrap/luawrap.h>
 #include <luawrap/functions.h>
@@ -13,6 +15,8 @@
 #include "gamestate/GameState.h"
 #include "gamestate/GameRoomState.h"
 #include "gamestate/GameSettings.h"
+
+#include "draw/TileEntry.h"
 
 #include "stats/ClassEntry.h"
 
@@ -62,6 +66,40 @@ struct PlayerDataProxy {
 	}
 };
 
+static int world_map_create(LuaStackValue args) {
+	using namespace luawrap;
+	using namespace ldungeon_gen;
+
+	GameState* gs = lua_api::gamestate(args);
+	MapPtr map = args["map"].as<MapPtr>();
+	GameRoomState* game_map = gs->game_world().map_create(map->size(),
+			defaulted(args["wandering_enabled"], true));
+
+	GameTiles& tiles = game_map->tiles();
+	BBox bbox(Pos(), tiles.size());
+	FOR_EACH_BBOX(bbox, x, y) {
+		Tile& tile = tiles.get(Pos(x,y));
+		Square& square = (*map)[Pos(x,y)];
+		TileEntry& entry = res::tile(tile.tile);
+
+		int variations = entry.images.size();
+		tile.tile = square.content;
+		printf("Resulting tile = %d\n", tile.tile);
+		tile.subtile = gs->rng().rand(variations);
+		(*tiles.solidity_map())[Pos(x,y)] = ((square.flags & FLAG_SOLID) != 0);
+	}
+
+	if (!args["instances"].isnil()) {
+		typedef std::vector<GameInst*> InstanceList;
+		InstanceList instances = args["instances"].as<InstanceList>();
+		for (int i = 0; i < instances.size(); i++) {
+			gs->add_instance(game_map->id(), instances[i]);
+		}
+	}
+
+	return game_map->id();
+}
+
 static int world_players(lua_State* L) {
 	int nplayers = lua_api::gamestate(L)->player_data().all_players().size();
 	lua_newtable(L);
@@ -77,6 +115,12 @@ static int world_local_player(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	luawrap::push(L, (GameInst*) gs->local_player());
 	return 1;
+}
+
+static void world_players_spawn(LuaStackValue level_id) {
+	GameState* gs = lua_api::gamestate(level_id);
+	GameRoomState* map = gs->game_world().get_level(level_id.to_int());
+	gs->game_world().spawn_players(map);
 }
 
 // level functions
@@ -210,6 +254,10 @@ namespace lua_api {
 
 		LuaValue metatable = luameta_new(L, "world table");
 		LuaValue getters = luameta_getters(metatable);
+		LuaValue methods = luameta_constants(metatable);
+
+		methods["map_create"].bind_function(world_map_create);
+		methods["players_spawn"].bind_function(world_players_spawn);
 
 		getters["players"].bind_function(world_players);
 		getters["local_player"].bind_function(world_local_player);

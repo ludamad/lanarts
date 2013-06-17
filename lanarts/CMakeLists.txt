@@ -20,6 +20,7 @@ include_directories(
 	src/
 	"${SRC}/common-lib/include"
 	"${SRC}/draw-lib/include"
+	"${SRC}/dungeon-generation-lib/include"
 	${SRC} # for net
 	"${SRC}/luawrap-lib/include"
 	"${SRC}/sound-lib/include"
@@ -110,6 +111,7 @@ set (libraries
 	lanartslib
 	ldraw
 	lcommon
+	lanarts_dungeon_gen
 	lsound
 	lua
 	luasocket
