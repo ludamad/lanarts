@@ -35,6 +35,7 @@ function Engine.resources_load(...)
     function is_projectile(item)     return item.type == "projectile" end
 
     require "sound"
+    require "tiles.tilesets"
 
     dofile "res/enemies/enemies.lua"
 
@@ -71,4 +72,10 @@ function Engine.event_occurred(...)
     require "event_occurred"
 
     return event_occurred(...)
+end
+
+function Engine.first_map_create(...)
+	require "rooms.map_generation"
+
+	return first_map_create(...)
 end

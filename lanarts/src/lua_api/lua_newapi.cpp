@@ -230,6 +230,7 @@ namespace lua_api {
 		register_gameworld_api(L);
 		register_event_log_api(L);
 		register_display_api(L);
+		register_tiles_api(L);
 	}
 
 	void luacall_post_draw(lua_State* L) {

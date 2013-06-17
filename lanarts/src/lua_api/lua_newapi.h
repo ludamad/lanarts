@@ -52,6 +52,8 @@ namespace lua_api {
 	/* Functions for the event log, namely adding messages */
 	void register_event_log_api(lua_State* L);
 
+	void register_tiles_api(lua_State* L);
+
 	// Special-case functions such as save_game, load_game, regen_level.
 	// Some of these are for testing purposes only.
 	void register_gamestate_api(lua_State* L);

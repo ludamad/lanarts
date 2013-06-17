@@ -22,7 +22,8 @@
 #include "draw/TileEntry.h"
 
 static int tile_create(LuaStackValue imagelist) {
-	TileEntry entry("", imagelist.as<std::vector<ldraw::Image> >());
+	TileEntry entry;
+	entry.images = imagelist.as<std::vector<ldraw::Image> >();
 	game_tile_data.push_back(entry);
 	return game_tile_data.size() - 1;
 }
