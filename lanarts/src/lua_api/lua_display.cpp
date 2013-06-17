@@ -16,7 +16,7 @@
 #include "draw/parse_drawable.h"
 
 #include "gamestate/GameState.h"
-#include "gamestate/GameRoomState.h"
+#include "gamestate/GameMapState.h"
 #include "gamestate/GameSettings.h"
 
 #include "lua_newapi.h"

@@ -51,7 +51,7 @@ void MonsterController::partial_copy_to(MonsterController & mc) const {
 //	mc.coll_avoid.clear();
 }
 
-void MonsterController::finish_copy(GameRoomState* level) {
+void MonsterController::finish_copy(GameMapState* level) {
 	for (int i = 0; i < mids.size(); i++) {
 		EnemyInst* enemy = (EnemyInst*)level->game_inst_set().get_instance(
 				mids[i]);

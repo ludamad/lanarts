@@ -13,7 +13,7 @@
 #include <luawrap/types.h>
 
 #include "gamestate/GameState.h"
-#include "gamestate/GameRoomState.h"
+#include "gamestate/GameMapState.h"
 #include "gamestate/GameSettings.h"
 
 #include "draw/TileEntry.h"
@@ -72,7 +72,7 @@ static int world_map_create(LuaStackValue args) {
 
 	GameState* gs = lua_api::gamestate(args);
 	MapPtr map = args["map"].as<MapPtr>();
-	GameRoomState* game_map = gs->game_world().map_create(map->size(),
+	GameMapState* game_map = gs->game_world().map_create(map->size(),
 			defaulted(args["wandering_enabled"], true));
 
 	GameTiles& tiles = game_map->tiles();
@@ -119,7 +119,7 @@ static int world_local_player(lua_State* L) {
 
 static void world_players_spawn(LuaStackValue level_id) {
 	GameState* gs = lua_api::gamestate(level_id);
-	GameRoomState* map = gs->game_world().get_level(level_id.to_int());
+	GameMapState* map = gs->game_world().get_level(level_id.to_int());
 	gs->game_world().spawn_players(map);
 }
 

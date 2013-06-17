@@ -18,7 +18,7 @@
 
 #include <lcommon/math_util.h>
 
-#include "GameRoomState.h"
+#include "GameMapState.h"
 #include "GameState.h"
 #include "GameWorld.h"
 #include "ScoreBoard.h"
@@ -37,7 +37,7 @@ GameWorld::~GameWorld() {
 	level_states.clear();
 }
 
-void GameWorld::generate_room(GameRoomState* level) {
+void GameWorld::generate_room(GameMapState* level) {
 
 }
 
@@ -66,10 +66,10 @@ void GameWorld::serialize(SerializeBuffer& serializer) {
 	_enemies_seen.serialize(serializer);
 
 	serializer.write_int(level_states.size());
-	GameRoomState* original = gs->get_level();
+	GameMapState* original = gs->get_level();
 
 	for (int i = 0; i < level_states.size(); i++) {
-		GameRoomState* lvl = level_states[i];
+		GameMapState* lvl = level_states[i];
 		serializer.write( Size(lvl->width(), lvl->height()) );
 		gs->set_level(lvl);
 		lvl->serialize(gs, serializer);
@@ -88,13 +88,13 @@ void GameWorld::deserialize(SerializeBuffer& serializer) {
 	}
 	level_states.resize(nlevels, NULL);
 
-	GameRoomState* original = gs->get_level();
+	GameMapState* original = gs->get_level();
 
 	for (int i = 0; i < level_states.size(); i++) {
 		Size size;
 		serializer.read(size);
 		if (level_states[i] == NULL) {
-			level_states[i] = new GameRoomState(i, size, false, false);
+			level_states[i] = new GameMapState(i, size, false, false);
 		}
 		gs->set_level(level_states[i]);
 		level_states[i]->deserialize(gs, serializer);
@@ -104,15 +104,15 @@ void GameWorld::deserialize(SerializeBuffer& serializer) {
 	midstep = false;
 }
 
-GameRoomState* GameWorld::map_create(const Size& size, bool wandering_enabled) {
+GameMapState* GameWorld::map_create(const Size& size, bool wandering_enabled) {
 	int levelid = level_states.size();
-	GameRoomState* map = new GameRoomState(levelid, Size(size.w * TILE_SIZE, size.h * TILE_SIZE), wandering_enabled);
+	GameMapState* map = new GameMapState(levelid, Size(size.w * TILE_SIZE, size.h * TILE_SIZE), wandering_enabled);
 	level_states.push_back(map);
 	return map;
 }
 
-void GameWorld::place_player(GameRoomState* map, GameInst* p) {
-	GameRoomState* currlvl = gs->get_level(); // Save level context
+void GameWorld::place_player(GameMapState* map, GameInst* p) {
+	GameMapState* currlvl = gs->get_level(); // Save level context
 	set_current_level(map);
 	GameTiles& tiles = map->tiles();
 	Pos ppos;
@@ -130,7 +130,7 @@ void GameWorld::place_player(GameRoomState* map, GameInst* p) {
 
 }
 
-void GameWorld::spawn_players(GameRoomState* map) {
+void GameWorld::spawn_players(GameMapState* map) {
 	bool flocal = (gs->game_settings().conntype == GameSettings::CLIENT);
 	GameSettings& settings = gs->game_settings();
 	GameNetConnection& netconn = gs->net_connection();
@@ -181,16 +181,16 @@ void GameWorld::spawn_players(GeneratedRoom& genlevel, void** player_instances,
 		}
 	}
 }
-GameRoomState* GameWorld::get_level(int roomid, bool spawnplayer,
+GameMapState* GameWorld::get_level(int roomid, bool spawnplayer,
 		void** player_instances, size_t nplayers) {
-	GameRoomState* currlvl = gs->get_level(); // Save level context
+	GameMapState* currlvl = gs->get_level(); // Save level context
 
 	if (roomid >= level_states.size()) {
 		level_states.resize(roomid + 1, NULL);
 	}
 	if (!level_states[roomid]) {
 		GeneratedRoom genlevel;
-		GameRoomState* newlvl = generate_level(roomid, gs->rng(), genlevel,
+		GameMapState* newlvl = generate_level(roomid, gs->rng(), genlevel,
 				gs);
 		level_states[roomid] = newlvl;
 		gs->set_level(newlvl);
@@ -208,7 +208,7 @@ bool GameWorld::pre_step() {
 	if (!gs->update_iostate())
 		return false;
 
-	GameRoomState* current_level = gs->get_level();
+	GameMapState* current_level = gs->get_level();
 
 	midstep = true;
 
@@ -225,7 +225,7 @@ bool GameWorld::pre_step() {
 bool GameWorld::step() {
 	redofirststep: //I used a goto dont kill mes
 
-	GameRoomState* current_level = gs->get_level();
+	GameMapState* current_level = gs->get_level();
 
 	midstep = true;
 
@@ -237,7 +237,7 @@ bool GameWorld::step() {
 	}
 
 	for (int i = 0; i < level_states.size(); i++) {
-		GameRoomState* level = level_states[i];
+		GameMapState* level = level_states[i];
 		level->step(gs);
 	}
 
@@ -256,7 +256,7 @@ bool GameWorld::step() {
 }
 
 void GameWorld::regen_level(int roomid) {
-	GameRoomState* level = get_level(roomid);
+	GameMapState* level = get_level(roomid);
 	std::vector<PlayerInst*> players = player_data().players_in_level(roomid);
 
 	/* Take all players out of level*/
@@ -270,7 +270,7 @@ void GameWorld::regen_level(int roomid) {
 
 	level_states[roomid] = NULL;
 
-	GameRoomState* newlevel = get_level(roomid, true, (void**)&players[0],
+	GameMapState* newlevel = get_level(roomid, true, (void**)&players[0],
 			players.size());
 
 	if (gs->get_level() == level) {
@@ -286,8 +286,8 @@ void GameWorld::regen_level(int roomid) {
 
 void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {
 	//save the level context
-	GameRoomState* last = gs->get_level();
-	GameRoomState* state = get_level(roomid1);
+	GameMapState* last = gs->get_level();
+	GameMapState* state = get_level(roomid1);
 	//set the level context
 	gs->set_level(state);
 
@@ -330,7 +330,7 @@ void GameWorld::set_current_level_lazy(int roomid) {
 }
 
 void GameWorld::reset(int keep) {
-	std::vector<GameRoomState*> delete_list;
+	std::vector<GameMapState*> delete_list;
 	if (midstep) {
 		next_room_id = -2;
 	} else {
@@ -350,8 +350,8 @@ void GameWorld::reset(int keep) {
 }
 
 void GameWorld::connect_entrance_to_exit(int roomid1, int roomid2) {
-	GameRoomState* l1 = get_level(roomid1);
-	GameRoomState* l2 = get_level(roomid2);
+	GameMapState* l1 = get_level(roomid1);
+	GameMapState* l2 = get_level(roomid2);
 	LANARTS_ASSERT(l2->exits.size() == l1->entrances.size());
 	for (int i = 0; i < l2->exits.size(); i++) {
 		l2->exits[i].exitsqr = l1->entrances[i].entrancesqr;

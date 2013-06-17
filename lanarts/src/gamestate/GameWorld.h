@@ -22,20 +22,21 @@
 #include "PlayerData.h"
 
 class GameState;
-class GameRoomState;
+class GameMapState;
 class GeneratedRoom;
 class PlayerInst;
 
 class GameMaps {
-
+public:
+	std::vector<GameMapState*> maps;
 };
 
 class GameWorld {
 public:
 	GameWorld(GameState* gs);
 	~GameWorld();
-	void generate_room(GameRoomState* level);
-	GameRoomState* get_level(int roomid, bool spawnplayer = false,
+	void generate_room(GameMapState* level);
+	GameMapState* get_level(int roomid, bool spawnplayer = false,
 			void** player_instances = NULL, size_t nplayers = 0);
 	bool pre_step();
 	bool step();
@@ -43,15 +44,15 @@ public:
 	void set_current_level(int roomid);
 	void set_current_level_lazy(int roomid);
 
-	GameRoomState* map_create(const Size& size, bool wandering_enabled = true);
+	GameMapState* map_create(const Size& size, bool wandering_enabled = true);
 
 	void reset(int keep = 0);
 	void regen_level(int roomid);
 	void place_inst(GeneratedRoom& genlevel, GameInst* inst);
-	GameRoomState* get_current_level() {
+	GameMapState* get_current_level() {
 		return lvl;
 	}
-	void set_current_level(GameRoomState* level) {
+	void set_current_level(GameMapState* level) {
 		lvl = level;
 	}
 	PlayerData& player_data() {
@@ -71,9 +72,9 @@ public:
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
 
-	void spawn_players(GameRoomState* map);
+	void spawn_players(GameMapState* map);
 private:
-	void place_player(GameRoomState* map, GameInst* p);
+	void place_player(GameMapState* map, GameInst* p);
 	void spawn_players(GeneratedRoom& genlevel, void** player_instances,
 			size_t nplayers);
 	bool midstep;
@@ -83,9 +84,9 @@ private:
 	PlayerData _player_data;
 	TeamRelations _teams;
 
-	GameRoomState* lvl;
+	GameMapState* lvl;
 	GameState* gs;
-	std::vector<GameRoomState*> level_states;
+	std::vector<GameMapState*> level_states;
 };
 
 #endif /* GAMEWORLD_H_ */

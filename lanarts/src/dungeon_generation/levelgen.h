@@ -15,7 +15,7 @@
 #include "tunnelgen.h"
 
 class GameState;
-class GameRoomState;
+class GameMapState;
 struct GeneratedRoom;
 struct lua_State;
 
@@ -27,7 +27,7 @@ bool generate_room(MTwist& mt, GeneratedRoom& level, int rw, int rh,
 
 void generate_rooms(lua_State* L, const RegionGenSettings& rs, MTwist& mt,
 		GeneratedRoom& level);
-GameRoomState* generate_level(int roomid, MTwist& mt, GeneratedRoom& level,
+GameMapState* generate_level(int roomid, MTwist& mt, GeneratedRoom& level,
 		GameState* gs);
 
 #endif /* LEVELGEN_H_ */

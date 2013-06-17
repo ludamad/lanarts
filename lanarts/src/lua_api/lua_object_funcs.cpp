@@ -84,7 +84,7 @@ static int reveal_map(lua_State* L) {
 static int obj_to_exit(lua_State* L) {
 
 	GameState* gs = lua_api::gamestate(L);
-	GameRoomState* level = gs->get_level();
+	GameMapState* level = gs->get_level();
 	GameInst* user = luawrap::get<GameInst*>(L, 1);
 	MTwist& mt = gs->rng();
 	int nexits = level->exits.size();

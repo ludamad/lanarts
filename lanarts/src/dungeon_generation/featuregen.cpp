@@ -8,7 +8,7 @@
 
 #include "draw/SpriteEntry.h"
 #include "draw/TileEntry.h"
-#include "gamestate/GameRoomState.h"
+#include "gamestate/GameMapState.h"
 
 #include "gamestate/GameState.h"
 #include "gamestate/GameTiles.h"

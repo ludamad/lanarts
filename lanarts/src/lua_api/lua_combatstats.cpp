@@ -1,4 +1,4 @@
-#include "gamestate/GameRoomState.h"
+#include "gamestate/GameMapState.h"
 #include "gamestate/GameState.h"
 
 #include "objects/enemy/EnemyInst.h"

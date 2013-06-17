@@ -46,7 +46,7 @@
 #include "util/game_replays.h"
 #include <lcommon/math_util.h>
 
-#include "GameRoomState.h"
+#include "GameMapState.h"
 #include "GameState.h"
 
 static int generate_seed() {
@@ -165,7 +165,7 @@ bool GameState::start_game() {
 	return true;
 }
 
-void GameState::set_level(GameRoomState* lvl) {
+void GameState::set_level(GameMapState* lvl) {
 	world.set_current_level(lvl);
 	if (lvl != NULL) {
 		_view.world_width = lvl->width();
@@ -221,7 +221,7 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 }
 
 obj_id GameState::add_instance(level_id level, GameInst* inst) {
-	GameRoomState* map = game_world().get_current_level();
+	GameMapState* map = game_world().get_current_level();
 	game_world().set_current_level(level);
 	obj_id id = add_instance(inst);
 	game_world().set_current_level(map);
@@ -259,7 +259,7 @@ int GameState::handle_event(SDL_Event* event) {
 		return false;
 	}
 
-	GameRoomState* level = get_level();
+	GameMapState* level = get_level();
 
 	if (level && level->id() != -1) {
 		if (hud.handle_event(this, event)) {
