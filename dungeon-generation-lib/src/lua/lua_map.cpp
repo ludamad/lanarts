@@ -523,9 +523,10 @@ namespace ldungeon_gen {
 		module["FLAG_HAS_OBJECT"] = FLAG_HAS_OBJECT;
 		module["FLAG_NEAR_PORTAL"] = FLAG_NEAR_PORTAL;
 		module["FLAG_PERIMETER"] = FLAG_PERIMETER;
+		module["FLAG_SEETHROUGH"] = FLAG_SEETHROUGH;
 		for (int i = 1; i <= 8; i++) {
 			std::string str = format("FLAG_CUSTOM%d", i);
-			module[str] = FLAG_RESERVED3 << i;
+			module[str] = FLAG_RESERVED2 << i;
 		}
 
 		module["flags_list"].bind_function(flags_list);

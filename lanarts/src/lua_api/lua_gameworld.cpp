@@ -80,13 +80,13 @@ static int world_map_create(LuaStackValue args) {
 	FOR_EACH_BBOX(bbox, x, y) {
 		Tile& tile = tiles.get(Pos(x,y));
 		Square& square = (*map)[Pos(x,y)];
-		TileEntry& entry = res::tile(tile.tile);
+		TileEntry& entry = res::tile(square.content);
 
 		int variations = entry.images.size();
 		tile.tile = square.content;
-		printf("Resulting tile = %d\n", tile.tile);
 		tile.subtile = gs->rng().rand(variations);
 		(*tiles.solidity_map())[Pos(x,y)] = ((square.flags & FLAG_SOLID) != 0);
+		(*tiles.seethrough_map())[Pos(x,y)] = ((square.flags & FLAG_SEETHROUGH) != 0);
 	}
 
 	if (!args["instances"].isnil()) {

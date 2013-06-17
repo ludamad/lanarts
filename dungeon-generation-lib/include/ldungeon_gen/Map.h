@@ -25,10 +25,10 @@ namespace ldungeon_gen {
 	const uint16 FLAG_TUNNEL = 1 << 2;
 	const uint16 FLAG_HAS_OBJECT = 1 << 3;
 	const uint16 FLAG_NEAR_PORTAL = 1 << 4;
+	const uint16 FLAG_SEETHROUGH = 1 << 5;
 	/* For future use */
-	const uint16 FLAG_RESERVED1 = 1 << 5;
-	const uint16 FLAG_RESERVED2 = 1 << 6;
-	const uint16 FLAG_RESERVED3 = 1 << 7;
+	const uint16 FLAG_RESERVED1 = 1 << 6;
+	const uint16 FLAG_RESERVED2 = 1 << 7;
 
 	/* Identifies squares to act on based on their fields.
 	 */
