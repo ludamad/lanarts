@@ -62,6 +62,11 @@ static int lapi_gameinst_setter_fallback(lua_State* L) {
 	return 1;
 }
 
+static int lapi_gameinst_freeref(lua_State* L) {
+	GameInst::free_reference(luawrap::get<GameInst*>(L, 1));
+	return 0;
+}
+
 static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(GameInst*);
 
@@ -98,6 +103,8 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	lua_pushcfunction(L, &lapi_gameinst_setter_fallback);
 	luameta_defaultsetter(meta, LuaStackValue(L, -1));
 	lua_pop(L, 1);
+
+	luameta_gc(meta, lapi_gameinst_freeref);
 
 	return meta;
 }
@@ -228,6 +235,7 @@ namespace GameInstWrap {
 		*lua_inst = inst;
 		lua_gameinst_push_metatable(L, inst);
 		lua_setmetatable(L, -2);
+		GameInst::retain_reference(inst);
 	}
 }
 
@@ -253,9 +261,13 @@ static GameInst* lua_enemyinst_create(LuaStackValue args) {
 static GameInst* lua_featureinst_create(LuaStackValue args) {
 	using namespace luawrap;
 
-	return new FeatureInst(args["xy"].as<Pos>(), (FeatureInst::feature_t)args["type"].to_int(),
+	GameInst* inst = new FeatureInst(args["xy"].as<Pos>(), (FeatureInst::feature_t)args["type"].to_int(),
 			defaulted(args["solid"], false),
 			res::sprite_id(args["sprite"].to_str()));
+	if (!defaulted(args["delay_init"], false)) {
+		lua_api::gamestate(args)->add_instance(inst);
+	}
+	return inst;
 }
 
 

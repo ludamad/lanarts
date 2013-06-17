@@ -26,6 +26,10 @@ class GameRoomState;
 class GeneratedRoom;
 class PlayerInst;
 
+class GameMaps {
+
+};
+
 class GameWorld {
 public:
 	GameWorld(GameState* gs);
