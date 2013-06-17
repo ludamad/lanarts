@@ -3,8 +3,8 @@
  *  Tunnel generation algorithms
  */
 
-#ifndef TUNNELGEN_H_
-#define TUNNELGEN_H_
+#ifndef LDUNGEON_TUNNELGEN_H_
+#define LDUNGEON_TUNNELGEN_H_
 
 const int MAX_TUNNEL_WIDTH = 4;
 
@@ -55,4 +55,4 @@ namespace ldungeon_gen {
 	};
 }
 
-#endif /* TUNNELGEN_H_ */
+#endif /* LDUNGEON_TUNNELGEN_H_ */

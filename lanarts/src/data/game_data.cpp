@@ -12,6 +12,8 @@
 
 #include <lcommon/lua_lcommon.h>
 
+#include "data/FilenameList.h"
+
 #include "draw/fonts.h"
 
 #include "lua_api/lua_api.h"
@@ -19,6 +21,7 @@
 #include "stats/items/EquipmentEntry.h"
 #include "stats/items/ItemEntry.h"
 #include "stats/items/ProjectileEntry.h"
+#include "stats/items/WeaponEntry.h"
 #include "stats/items/WeaponEntry.h"
 
 #include "game_data.h"

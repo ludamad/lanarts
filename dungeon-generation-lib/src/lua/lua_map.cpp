@@ -3,6 +3,8 @@
  *  Exposes the dungeon generation map to Lua
  */
 
+#include <lcommon/strformat.h>
+
 #include <luawrap/luawrap.h>
 #include <luawrap/members.h>
 #include <luawrap/macros.h>
@@ -125,7 +127,7 @@ namespace ldungeon_gen {
 
 	static Square square_create(LuaStackValue args) {
 		using namespace luawrap;
-		return Square(defaulted(args["flags"], 0),
+		return Square(flags_get(args["flags"]),
 				defaulted(args["content"], 0),
 				defaulted(args["group"], ROOT_GROUP_ID));
 	}
@@ -202,7 +204,7 @@ namespace ldungeon_gen {
 		using namespace luawrap;
 		MapPtr ptr(
 				new Map(defaulted(args["size"], Size()),
-						defaulted(args["fill_value"], Square())));
+						defaulted(args["fill"], Square())));
 		ptr->luafields = args;
 		return ptr;
 	}
@@ -481,7 +483,7 @@ namespace ldungeon_gen {
 		//Get RNG setup for map generation
 		luawrap::registry(L)["MapGenRNG"].push();
 		MTwist* mtwist = (MTwist*) lua_touserdata(L, -1);
-		bool create_subgroup = args["create_subgroup"].to_bool();
+		bool create_subgroup = defaulted(args["create_subgroup"], true);
 
 		Range size_range = args["size_range"].as<Range>();
 		Range amount_of_placements_range =
@@ -521,6 +523,10 @@ namespace ldungeon_gen {
 		module["FLAG_HAS_OBJECT"] = FLAG_HAS_OBJECT;
 		module["FLAG_NEAR_PORTAL"] = FLAG_NEAR_PORTAL;
 		module["FLAG_PERIMETER"] = FLAG_PERIMETER;
+		for (int i = 1; i <= 8; i++) {
+			std::string str = format("FLAG_CUSTOM%d", i);
+			module[str] = FLAG_RESERVED3 << i;
+		}
 
 		module["flags_list"].bind_function(flags_list);
 		module["flags_match"].bind_function(flags_match);

@@ -101,7 +101,7 @@ namespace ldungeon_gen {
 		/* Group this square belongs to */
 		uint16 group;
 
-		Square(uint16 flags = FLAG_SOLID, uint16 content = 0, uint16 group = 0) :
+		Square(uint16 flags = 0, uint16 content = 0, uint16 group = 0) :
 						flags(flags),
 						content(content),
 						group(group) {

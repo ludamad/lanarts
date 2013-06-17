@@ -9,8 +9,11 @@
 #include <luawrap/functions.h>
 
 #include <ldraw/display.h>
+#include <ldraw/Image.h>
 
 #include <SDL.h>
+
+#include "draw/parse_drawable.h"
 
 #include "gamestate/GameState.h"
 #include "gamestate/GameRoomState.h"
@@ -26,12 +29,21 @@ static int event_log_add(lua_State* L) {
 	return 0;
 }
 
+static std::vector<ldraw::Image> images_load(const char* pattern) {
+	std::vector<ldraw::Image> ret;
+	if (!filepattern_to_image_list(ret,pattern)) {
+		luawrap::error("Invalid pattern!\n");
+	}
+	return ret;
+}
+
 namespace lua_api {
 
 	static void register_display_table(lua_State* L) {
 		LuaSpecialValue globals = luawrap::globals(L);
 		LuaValue display = luawrap::ensure_table(globals["Display"]);
 
+		globals["images_load"].bind_function(images_load);
 		display["initialize"].bind_function(ldraw::display_initialize);
 		display["draw_start"].bind_function(ldraw::display_draw_start);
 		display["draw_finish"].bind_function(ldraw::display_draw_finish);

@@ -22,6 +22,8 @@
 
 #include <luawrap/luawrap.h>
 
+#include "luawrapassert.h"
+
 LuaStackValue::LuaStackValue(lua_State* L, int idx) :
 		L(L), idx(idx) {
 	if (idx > LUA_REGISTRYINDEX + 100 && idx < 1) {
@@ -35,6 +37,7 @@ LuaStackValue::LuaStackValue() :
 }
 
 void LuaStackValue::push() const {
+	LUAWRAP_ASSERT(L);
 	lua_pushvalue(L, idx);
 }
 

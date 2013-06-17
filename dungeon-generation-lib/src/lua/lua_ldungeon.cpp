@@ -9,8 +9,8 @@
 
 namespace ldungeon_gen {
 
-	/* Defined in lua_map.cpp */
 	void lua_register_map(const LuaValue& module, MTwist* mtwist);
+	void lua_register_areatemplate(const LuaValue& module);
 
 	void lua_register_ldungeon(const LuaValue& module, MTwist* mtwist, bool register_lcommon = true) {
 		lua_State* L = module.luastate();
@@ -18,5 +18,6 @@ namespace ldungeon_gen {
 			lua_register_lcommon(L);
 		}
 		lua_register_map(module, mtwist);
+		lua_register_areatemplate(module);
 	}
 }

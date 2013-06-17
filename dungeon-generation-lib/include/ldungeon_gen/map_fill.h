@@ -6,8 +6,8 @@
  *  	- Random rectangle placement
  */
 
-#ifndef MAP_FILL_H_
-#define MAP_FILL_H_
+#ifndef LDUNGEON_MAP_FILL_H_
+#define LDUNGEON_MAP_FILL_H_
 
 #include <lcommon/Range.h>
 #include <lcommon/smartptr.h>
@@ -91,4 +91,4 @@ namespace ldungeon_gen {
 	};
 }
 
-#endif /* MAP_FILL_H_ */
+#endif /* LDUNGEON_MAP_FILL_H_ */

@@ -55,7 +55,7 @@ void ProjectileInst::deinit(GameState* gs) {
 	if (pentry.drop_chance > break_roll) {
 		int nx = round_to_multiple(x, TILE_SIZE, true), ny = round_to_multiple(
 				y, TILE_SIZE, true);
-		ItemInst* item = new ItemInst(projectile.with_amount(1), nx, ny,
+		ItemInst* item = new ItemInst(projectile.with_amount(1), Pos(nx, ny),
 				origin_id, true /*auto-pickup*/);
 		gs->add_instance(item);
 	}

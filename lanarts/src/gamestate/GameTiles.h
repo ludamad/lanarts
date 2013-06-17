@@ -23,6 +23,14 @@ class SerializeBuffer;
 
 struct Pos;
 
+/*Represents a single square tile*/
+struct Tile {
+	unsigned short tile, subtile;
+	Tile(int tile = 0, int subtile = 0) :
+			tile(tile), subtile(subtile) {
+	}
+};
+
 class GameTiles {
 public:
 	GameTiles(const Size& size);

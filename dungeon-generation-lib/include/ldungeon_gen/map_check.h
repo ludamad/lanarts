@@ -3,8 +3,8 @@
  *  Various algorithms for querying a map.
  */
 
-#ifndef MAP_CHECK_H_
-#define MAP_CHECK_H_
+#ifndef LDUNGEON_MAP_CHECK_H_
+#define LDUNGEON_MAP_CHECK_H_
 
 #include "Map.h"
 #include <lcommon/smartptr.h>
@@ -44,4 +44,4 @@ namespace ldungeon_gen {
 	bool find_random_square(MTwist& randomizer, MapPtr map, const BBox& bbox, Selector selector, Pos& xy, int max_attempts = RANDOM_MATCH_MAX_ATTEMPTS);
 }
 
-#endif /* MAP_CHECK_H_ */
+#endif /* LDUNGEON_MAP_CHECK_H_ */

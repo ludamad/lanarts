@@ -107,6 +107,14 @@ static int room_objects(lua_State* L) {
 	return 1;
 }
 
+static void room_add_instance(LuaStackValue gameinst) {
+	GameInst* inst = gameinst.as<GameInst*>();
+	if (inst->current_floor != -1) {
+		luawrap::error("Attempt to add game instance that was already added!");
+	}
+	lua_api::gamestate(gameinst)->add_instance(inst);
+}
+
 static int room_monsters_list(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	const std::vector<obj_id>& mons = gs->monster_controller().monster_ids();
@@ -227,6 +235,7 @@ namespace lua_api {
 		room["objects_list"].bind_function(room_objects_list);
 		room["objects"].bind_function(room_objects);
 
+		room["add_instance"].bind_function(room_add_instance);
 		room["instance"].bind_function(room_instance);
 
 		room["monsters_list"].bind_function(room_monsters_list);

@@ -153,16 +153,12 @@ TEST(test_map_generation) {
 			} else if (n == 0) {
 				printf(solid ? "# " : "0 ");
 			} else if (n == 1) {
-//				printf("%c ", char('a' + (g % 24)));
 				printf("  ");
 			} else if (n == 2) {
-//				printf(". ");
 				printf("# ");
 			} else if (n == 3) {
-//				printf("+ ");
 				printf("  ");
 			} else if (n == 4) {
-//				printf("= ");
 				printf("# ");
 			}
 		}
@@ -170,6 +166,24 @@ TEST(test_map_generation) {
 	}
 
 	CHECK(serialized_correctly(map));
+}
+static int lua_random(LuaStackValue max) {
+	lua_State* L = max.luastate();
+	//Get RNG setup for map generation
+	luawrap::registry(L)["MapGenRNG"].push();
+	MTwist* mtwist = (MTwist*) lua_touserdata(L, -1);
+	lua_pop(L, 1); /* pop RNG object */
+	return mtwist->rand(max.to_int());
+}
+
+static bool lua_chance(LuaStackValue chance) {
+	lua_State* L = chance.luastate();
+	//Get RNG setup for map generation
+	luawrap::registry(L)["MapGenRNG"].push();
+	MTwist* mtwist = (MTwist*) lua_touserdata(L, -1);
+	lua_pop(L, 1); /* pop RNG object */
+	float generated = mtwist->rand(RangeF(0,1));
+	return (generated < chance.to_num());
 }
 
 TEST(test_lua_bindings) {
@@ -180,6 +194,9 @@ TEST(test_lua_bindings) {
 	MTwist mtwist;
 
 	luaL_openlibs(L);
+	luawrap::globals(L)["random"].bind_function(lua_random);
+	luawrap::globals(L)["chance"].bind_function(lua_chance);
+
 	LuaField map_gen = luawrap::globals(L)["MapGen"];
 	luawrap::ensure_table(map_gen);
 	lua_register_ldungeon(map_gen, &mtwist, true);

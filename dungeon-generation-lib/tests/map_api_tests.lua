@@ -232,3 +232,69 @@ function tests.test4_custom_operator()
 
     print_map(map, map.instances)
 end
+
+function tests.test5_areatemplate()
+    local map = MapGen.map_create { size = {4,4}, instances = InstanceList.create() }
+	local area_template = MapGen.area_template_create {
+		data =
+[[++++
++--+
++--+
+++++]],
+		legend = {
+			["+"] = { fill = MapGen.square { flags = MapGen.FLAG_SOLID} },
+			["-"] = { fill = MapGen.square { flags = 0 }}
+		}
+	}
+	area_template:apply { 
+		map = map,
+		group = MapGen.ROOT_GROUP, 
+		top_left_xy = {0,0} 
+	}
+	print_map(map)
+end
+
+function tests.test6_areatemplate_complex()
+	local sqr = MapGen.square { flags = 0 }
+    local map = MapGen.map_create { size = {40,40}, fill = sqr, instances = InstanceList.create() }
+	local FLAG_APPLIED = MapGen.FLAG_CUSTOM1
+
+	local area_template = MapGen.area_template_create {
+		data =
+[[------------
+--+++++++---
+-++----+++--
+-+-----++++-
+-+--------+-
+-+--------+-
+-+--------+-
+-+--------+-
+-+--------+-
+-+++-----++-
+--++---+++--
+------------]],
+		legend = {
+			["+"] = { fill = MapGen.square { flags = {MapGen.FLAG_SOLID, FLAG_APPLIED}, } },
+			["-"] = { fill = MapGen.square { flags = FLAG_APPLIED }}
+		}
+	}
+
+    MapGen.random_placement_operator {
+        child_operator = function(map, group, rect)
+        	if not MapGen.rectangle_query {fill_selector = {matches_none = FLAG_APPLIED} } (map, group, rect) then
+        		return false
+        	end
+			area_template:apply { 
+				map = map,
+				group = group, 
+				top_left_xy = {rect[1],rect[2]} ,
+				flip_x = chance(0.5),
+				flip_y = chance(0.5)
+			}
+        end,
+        size_range = {12,12},
+        amount_of_placements_range = {5, 5},
+    }(map, MapGen.ROOT_GROUP, bbox_create({0,0}, map.size))
+
+	print_map(map)
+end
