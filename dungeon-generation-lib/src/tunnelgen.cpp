@@ -8,6 +8,8 @@
 #include <cstring>
 
 #include <lcommon/mtwist.h>
+
+#include "ldungeon_assert.h"
 #include "tunnelgen.h"
 
 namespace ldungeon_gen {
@@ -21,24 +23,12 @@ namespace ldungeon_gen {
 		enum {
 			NO_TURN = 0, TURN_PERIMETER = 1, TURN_START = 2
 		};
-		TunnelGenImpl(Map& map, MTwist& mt, const TunnelSelector& selector,
-				ConditionalOperator fill_oper,
-				ConditionalOperator perimeter_oper, int start_room, int padding,
-				int width, int depth, int change_odds,
-				bool accept_tunnel_entry = false) :
+		TunnelGenImpl(Map& map, MTwist& mt, const TunnelCheckSettings& selector,
+				const TunnelFillSettings& filler) :
 						map(map),
 						mt(mt),
 						selector(selector),
-						fill_oper(fill_oper),
-						perimeter_oper(perimeter_oper),
-						start_room(start_room),
-						end_room(0),
-						padding(padding),
-						accept_tunnel_entry(accept_tunnel_entry),
-						avoid_groupid(-1),
-						width(width),
-						maxdepth(depth),
-						change_odds(change_odds) {
+						filler(filler) {
 		}
 
 	public:
@@ -66,16 +56,8 @@ namespace ldungeon_gen {
 	private:
 		Map& map;
 		MTwist& mt;
-		TunnelSelector selector;
-		ConditionalOperator perimeter_oper, fill_oper;
-		int start_room;
-		int end_room;
-		int padding;
-		bool accept_tunnel_entry;
-		int avoid_groupid;
-		int width;
-		int maxdepth;
-		int change_odds;
+		TunnelCheckSettings selector;
+		TunnelFillSettings filler;
 	};
 
 	static Square* backtrack_entry(Square* backtracking, int entry_size,
@@ -100,7 +82,8 @@ namespace ldungeon_gen {
 		cntxt->turn_state = turn_state;
 		cntxt->dx = dx, cntxt->dy = dy;
 		cntxt->pos = pos;
-		cntxt->perim_pos = Pos(pos.x - (dy != 0 ? padding : 0), pos.y - (dx != 0 ? padding : 0));
+		cntxt->perim_pos = Pos(pos.x - (dy != 0 ? filler.padding : 0),
+				pos.y - (dx != 0 ? filler.padding : 0));
 		cntxt->attempt_number = 0;
 	}
 
@@ -108,7 +91,7 @@ namespace ldungeon_gen {
 			TunnelSliceContext* cntxt, int dep) {
 		int dx = cntxt->dx, dy = cntxt->dy;
 
-		for (int i = 0; i < width + padding * 2; i++) {
+		for (int i = 0; i < filler.width + filler.padding * 2; i++) {
 			int xcomp = (dy == 0 ? 0 : i);
 			int ycomp = (dx == 0 ? 0 : i);
 			map[Pos(cntxt->perim_pos.x + xcomp, cntxt->perim_pos.y + ycomp)] =
@@ -121,17 +104,17 @@ namespace ldungeon_gen {
 		int dx = cntxt->dx, dy = cntxt->dy;
 		if (cntxt->pos.x <= 2
 				|| cntxt->pos.x
-						>= map.width() - width - (dy == 0 ? 0 : padding * 2))
+						>= map.width() - filler.width - (dy == 0 ? 0 : filler.padding * 2))
 			return false;
 		if (cntxt->pos.y <= 2
 				|| cntxt->pos.y
-						>= map.height() - width - (dx == 0 ? 0 : padding * 2))
+						>= map.height() - filler.width - (dx == 0 ? 0 : filler.padding * 2))
 			return false;
 
 		/* Start with the assumption that we're done */
 		cntxt->tunneled = true;
 
-		int last_square = width + padding * 2 - 1;
+		int last_square = filler.width + filler.padding * 2 - 1;
 		for (int i = 0; i <= last_square; i++) {
 			int xcomp = (dy == 0 ? 0 : i);
 			int ycomp = (dx == 0 ? 0 : i);
@@ -144,10 +127,9 @@ namespace ldungeon_gen {
 				cntxt->tunneled = false;
 				break;
 			}
-			if (sqr.group == avoid_groupid)
-				return false;
-			if (sqr.group == start_room)
-				return false;
+			if (sqr.group == selector.avoid_group){
+//				return false;
+			}
 		}
 
 		if (cntxt->tunneled) {
@@ -179,24 +161,24 @@ namespace ldungeon_gen {
 
 		if (dx == 0) {
 			if (positive)
-				newpos.x = cntxt->pos.x + width;
+				newpos.x = cntxt->pos.x + filler.width;
 			else
 				newpos.x = cntxt->pos.x - 1;
 			ndx = positive ? +1 : -1;
 		} else {
 			ndx = 0;
-			newpos.x = dx > 0 ? cntxt->pos.x - width : cntxt->pos.x + 1;
+			newpos.x = dx > 0 ? cntxt->pos.x - filler.width : cntxt->pos.x + 1;
 		}
 
 		if (dy == 0) {
 			if (positive)
-				newpos.y = cntxt->pos.y + width;
+				newpos.y = cntxt->pos.y + filler.width;
 			else
 				newpos.y = cntxt->pos.y - 1;
 			ndy = positive ? +1 : -1;
 		} else {
 			ndy = 0;
-			newpos.y = dy > 0 ? cntxt->pos.y - width : cntxt->pos.y + 1;
+			newpos.y = dy > 0 ? cntxt->pos.y - filler.width : cntxt->pos.y + 1;
 		}
 		return newpos;
 	}
@@ -227,27 +209,28 @@ namespace ldungeon_gen {
 		int dx = cntxt->dx, dy = cntxt->dy;
 
 		/* Make the first piece of perimeter */
-		for (int i = 0; i < padding; i++) {
+		for (int i = 0; i < filler.padding; i++) {
 			int xcomp = (dy == 0 ? 0 : i);
 			int ycomp = (dx == 0 ? 0 : i);
-			map[Pos(cntxt->perim_pos.x+xcomp, cntxt->perim_pos.y+ycomp)].apply(perimeter_oper);
+			map[Pos(cntxt->perim_pos.x+xcomp, cntxt->perim_pos.y+ycomp)].apply(filler.perimeter_oper);
 		}
 		/* Make the inner fill */
-		for (int i = 0; i < width; i++) {
+		for (int i = 0; i < filler.width; i++) {
 			int xcomp = (dy == 0 ? 0 : i);
 			int ycomp = (dx == 0 ? 0 : i);
-			map[Pos(cntxt->pos.x + xcomp, cntxt->pos.y + ycomp)].apply(fill_oper);
+			map[Pos(cntxt->pos.x + xcomp, cntxt->pos.y + ycomp)].apply(filler.fill_oper);
 		}
 
-		for (int i = 0; i < padding; i++) {
-			map[Pos(cntxt->perim_pos.x + (dy == 0 ? 0 : width + i+padding),
-					cntxt->perim_pos.y + (dx == 0 ? 0 : width + i+padding))].apply(perimeter_oper);
+		for (int i = 0; i < filler.padding; i++) {
+			int x = cntxt->perim_pos.x + (dy == 0 ? 0 : filler.width + i+filler.padding);
+			int y = cntxt->perim_pos.y + (dx == 0 ? 0 : filler.width + i+filler.padding);
+			map[Pos(x,y)].apply(filler.perimeter_oper);
 		}
 
 		Pos newpos = next_tunnel_position(cntxt);
 
 		bool start_turn = cntxt->turn_state == NO_TURN
-				&& mt.rand(change_odds) == 0;
+				&& (mt.randf() < filler.turn_chance);
 		initialize_slice(next, start_turn ? TURN_START : NO_TURN, dx, dy,
 				newpos);
 	}
@@ -257,12 +240,12 @@ namespace ldungeon_gen {
 		int ndx, ndy;
 		Pos newpos = next_turn_position(cntxt, ndx, ndy);
 
-		if (padding > 0) { // TODO: Handle padding > 1 properly
-			for (int i = 0; i < width + padding * 2; i++) {
+		if (filler.padding > 0) { // TODO: Handle padding > 1 properly
+			for (int i = 0; i < filler.width + filler.padding * 2; i++) {
 				int xcomp = (dy == 0 ? 0 : i);
 				int ycomp = (dx == 0 ? 0 : i);
 				Square& sqr = map[Pos(cntxt->perim_pos.x + xcomp, cntxt->perim_pos.y + ycomp)];
-				sqr.apply(perimeter_oper);
+				sqr.apply(filler.perimeter_oper);
 			}
 		}
 		initialize_slice(next, TURN_PERIMETER, ndx, ndy, newpos);
@@ -300,14 +283,12 @@ namespace ldungeon_gen {
 				bool generated = false;
 				int genwidth = randomizer.rand(size);
 				for (; genwidth >= 1 && !generated; genwidth--) {
-					int path_len = 5;
+					int path_len = 2;
 					for (int attempts = 0; attempts < 16 && !generated;
 							attempts++) {
-						TunnelGenImpl tg(*map, randomizer, selector,
-								fill_oper, perimeter_oper, i + 1, padding,
-								genwidth, path_len, 20,
-								padding > 0
-										&& (genpaths[i] > 0 || nogen_tries > 100));
+						selector.avoid_group = i;
+						TunnelFillSettings filler(fill_oper, padding, perimeter_oper, genwidth, path_len, 0.05);
+						TunnelGenImpl tg(*map, randomizer, selector, filler);
 
 						generate_entrance(map->groups[i].group_area, randomizer,
 								std::min(genwidth, 2), p, axis, positive);
@@ -318,7 +299,7 @@ namespace ldungeon_gen {
 						if (tg.generate(p, dx, dy, btbuff, tsbuff)) {
 							genpaths[i]++;
 							nogen_tries = 0;
-							path_len = 5;
+							path_len = 2;
 							generated = true;
 						}
 						if (attempts >= 4) {
@@ -335,10 +316,10 @@ namespace ldungeon_gen {
 			std::vector<Square>& btbuff,
 			std::vector<TunnelSliceContext>& tsbuff) {
 
-		int entry_size = width + padding * 2;
+		int entry_size = filler.width + filler.padding * 2;
 
-		__resizebuff(btbuff, entry_size * maxdepth);
-		__resizebuff(tsbuff, maxdepth);
+		__resizebuff(btbuff, entry_size * filler.max_length);
+		__resizebuff(tsbuff, filler.max_length);
 
 		Square* backtracking = &btbuff[0];
 		TunnelSliceContext* tsc = &tsbuff[0];
@@ -358,14 +339,13 @@ namespace ldungeon_gen {
 
 			//We must leave room to initialize the next tunnel depth
 			bool valid =
-					tunnel_depth < maxdepth - 1
+					tunnel_depth < filler.max_length- 1
 							&& (tsc[tunnel_depth].attempt_number > 0
 									|| validate_slice(prev_content, cntxt,
 											tunnel_depth));
 			if (valid && cntxt->attempt_number <= 0) {
 
 				if (cntxt->tunneled) {
-					end_room = map[p].group;
 					complete_tunnel = true;
 					break;
 				}
@@ -375,7 +355,6 @@ namespace ldungeon_gen {
 				} else {
 					this->tunnel_straight_slice(cntxt, &tsc[tunnel_depth + 1]);
 				}
-
 				cntxt->attempt_number++;
 				tunnel_depth++;
 			} else {
@@ -417,5 +396,11 @@ namespace ldungeon_gen {
 			p.y = ind;
 		}
 	}
+//
+//	bool tunnel_generate(MapPtr map, MTwist& randomizer, const Pos& xy,
+//			const Pos& direction, const TunnelCheckSettings& selector,
+//			const TunnelFillSettings& filler) {
+//		LDUNGEON_ASSERT(filler.width > 0 && filler.width <= MAX_TUNNEL_WIDTH);
+//	}
 
 }

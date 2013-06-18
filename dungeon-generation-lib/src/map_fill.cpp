@@ -45,8 +45,10 @@ namespace ldungeon_gen {
 
 		BBox inner_rect = rect.shrink(perimeter);
 		if (create_subgroup) {
-			map->make_group(inner_rect, parent_group_id);
+			group_t grp = map->make_group(rect, parent_group_id);
+			map->groups.at(grp).group_area = inner_rect;
 		}
+
 		int rowstart = rect.y1 * map->width();
 		for (int y = rect.y1; y < rect.y2; y++) {
 

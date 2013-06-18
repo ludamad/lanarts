@@ -294,6 +294,21 @@ static int lapi_random(lua_State* L) {
 	return 1;
 }
 
+static BBox lapi_random_subregion(LuaStackValue lbox, Size size) {
+	BBox bbox = lbox.as<BBox>();
+	GameState* gs = lua_api::gamestate(lbox);
+
+    int x = gs->rng().rand(bbox.x1, bbox.x2 - size.w);
+    int y = gs->rng().rand(bbox.y1, bbox.y2 - size.h);
+
+    return BBox(Pos(x,y), size);
+}
+
+static bool lapi_chance(LuaStackValue val) {
+	GameState* gs = lua_api::gamestate(val);
+	return gs->rng().rand(RangeF(0,1)) < val.to_num();
+}
+
 namespace lua_api {
 	void event_projectile_hit(lua_State* L, ProjectileInst* projectile,
 			GameInst* target) {
@@ -316,6 +331,8 @@ namespace lua_api {
 		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);
 		globals["random"].bind_function(lapi_random);
+		globals["random_subregion"].bind_function(lapi_random_subregion);
+		globals["chance"].bind_function(lapi_chance);
 
 		globals["require_path_add"].bind_function(lapi_add_search_path);
 

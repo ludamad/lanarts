@@ -27,7 +27,7 @@ enemy_files:
   - enemies/undead/undead.yaml
   
 room_template_files:
-  - rooms/templates/templates.yaml
+  - maps/templates/templates.yaml
 
 item_files: 
   - items/misc/misc.yaml
@@ -36,8 +36,8 @@ item_files:
 itemgenlist_files:
   - items/itemgenlists.yaml
   
-room_files: 
-  - rooms/rooms.yaml
+map_files: 
+  - maps/maps.yaml
 
 projectile_files: 
   - items/projectiles.yaml

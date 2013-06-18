@@ -462,7 +462,7 @@ namespace ldungeon_gen {
 		Range tunnels_per_room_range =
 				args["tunnels_per_room_range"].as<Range>();
 
-		TunnelSelector tunnel_selector(vfill_selector, vperimeter_selector,
+		TunnelCheckSettings tunnel_selector(vfill_selector, vperimeter_selector,
 				cfill_selector, cperimeter_selector);
 
 		TunnelGenOperator oper(*mtwist, tunnel_selector, fill_oper,

@@ -78,7 +78,7 @@ function Engine.event_occurred(...)
 end
 
 function Engine.first_map_create(...)
-	require "rooms.map_generation"
+	require "maps.map_generation"
 
 	return first_map_create(...)
 end

@@ -125,7 +125,7 @@ TEST(test_map_generation) {
 
 		Selector is_finished_fill(0, FLAG_SOLID | FLAG_PERIMETER | FLAG_TUNNEL);
 		Selector is_finished_perimeter(0, FLAG_SOLID);
-		TunnelSelector tunnel_selector(is_valid_fill, is_valid_perimeter,
+		TunnelCheckSettings tunnel_selector(is_valid_fill, is_valid_perimeter,
 				is_finished_fill, is_finished_perimeter);
 
 

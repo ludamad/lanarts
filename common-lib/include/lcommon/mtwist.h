@@ -87,6 +87,10 @@ public:
 	int rand(const Range& r) {
 		return rand(r.min, r.max + 1);
 	}
+	double randf() {
+		_amount_generated++;
+		return genrand_real1();
+	}
 	float rand(const RangeF& r) {
 		_amount_generated++;
 		return (r.max - r.min) * genrand_real1() + r.min;
