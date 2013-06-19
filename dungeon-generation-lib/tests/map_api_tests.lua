@@ -6,7 +6,7 @@ local function assert_exists(str)
 end
 
 local function assert_exists2(str, str2)
-    assert(_G[str], str .. "." .. str2)
+    assert(_G[str][str2], str .. "." .. str2)
 end
 
 function tests.test1_api_check()
@@ -22,19 +22,17 @@ function tests.test1_api_check()
     assert_exists2("MapGen", "flags_list")
     assert_exists2("MapGen", "flags_combine")
 
-    assert_exists2("MapGen", "square_create")
-
     assert_exists2("MapGen", "map_create")
     assert_exists2("MapGen", "rectangle_operator")
     assert_exists2("MapGen", "tunnel_generate")
 end
 
 local function make_rectangle_query()
-	return MapGen.rectangle_query { 
-		fill_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.FLAG_PERIMETER }, 
-		perimeter_width = 1, 
-		perimeter_selector = { matches_all = MapGen.FLAG_SOLID }
-	}
+        return MapGen.rectangle_query { 
+                fill_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.FLAG_PERIMETER }, 
+                perimeter_width = 1, 
+                perimeter_selector = { matches_all = MapGen.FLAG_SOLID }
+        }
 end
 
 local function make_rectangle_oper(--[[Optional]] area_query)
@@ -47,7 +45,7 @@ local function make_rectangle_oper(--[[Optional]] area_query)
 end
 
 local function make_tunnel_oper() 
-	return MapGen.tunnel_operator {
+        return MapGen.tunnel_operator {
         validity_selector = { 
             fill_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.FLAG_TUNNEL },
             perimeter_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.FLAG_TUNNEL }
@@ -61,7 +59,7 @@ local function make_tunnel_oper()
         fill_operator = { add = MapGen.FLAG_TUNNEL, remove = MapGen.FLAG_SOLID, content = 3},
         perimeter_operator = { matches_all = MapGen.FLAG_SOLID, add = {MapGen.FLAG_SOLID, MapGen.FLAG_TUNNEL, MapGen.FLAG_PERIMETER}, content = 4 },
 
-		perimeter_width = 1,
+                perimeter_width = 1,
         size_range = {1,2},
         tunnels_per_room_range = {1,2}
     }
@@ -69,24 +67,24 @@ end
 
 
 local InstanceList = {
-	create = function () 
-		local obj = { instances = {} }
-		
-		function obj:add(content, xy)
-			assert(self:at(xy) == nil, "Overlapping instances! Some placement check failed.")
-			table.insert(self.instances, {content, xy}) 
-		end
-		
-		function obj:at(xy)
-			for _, inst in ipairs(self.instances) do
-				local content, cxy = unpack(inst)
-				if cxy[1] == xy[1] and cxy[2] == xy[2] then return content end
-			end
-			return nil
-		end
+        create = function () 
+                local obj = { instances = {} }
+                
+                function obj:add(content, xy)
+                        assert(self:at(xy) == nil, "Overlapping instances! Some placement check failed.")
+                        table.insert(self.instances, {content, xy}) 
+                end
+                
+                function obj:at(xy)
+                        for _, inst in ipairs(self.instances) do
+                                local content, cxy = unpack(inst)
+                                if cxy[1] == xy[1] and cxy[2] == xy[2] then return content end
+                        end
+                        return nil
+                end
 
-		return obj
-	end
+                return obj
+        end
 }
 
 local function print_map(map, --[[Optional]] instances)
@@ -97,10 +95,10 @@ local function print_map(map, --[[Optional]] instances)
         table.insert(parts, strpart)
     end
 
-	print "At print_map"
+        print "At print_map"
     for y=0,map.size[2]-1 do
         for x=0,map.size[1]-1 do
-        	local inst = instances:at({x,y})
+                local inst = instances:at({x,y})
             local sqr = map:get({x, y})
 
             local n, g = sqr.content, sqr.group
@@ -108,8 +106,8 @@ local function print_map(map, --[[Optional]] instances)
             local perimeter = MapGen.flags_match(sqr.flags, MapGen.FLAG_PERIMETER)
             local tunnel = MapGen.flags_match(sqr.flags, MapGen.FLAG_TUNNEL)
 
-        	if inst then 
-        		add_part(inst .. " ") 
+                if inst then 
+                        add_part(inst .. " ") 
             elseif solid and tunnel then
                 add_part("T ")
             elseif not solid and tunnel then
@@ -135,8 +133,7 @@ local function print_map(map, --[[Optional]] instances)
 end
 
 function tests.test2_bsp()
-    local solid_square = MapGen.square { flags = MapGen.FLAG_SOLID }
-    local map = MapGen.map_create { size = {80,40}, fill = solid_square }
+    local map = MapGen.map_create { size = {80,40}, flags = MapGen.FLAG_SOLID }
 
     print "bsp oper create"
     local bsp_oper = MapGen.bsp_operator {
@@ -153,12 +150,11 @@ function tests.test2_bsp()
 
     tunnel_oper(map, MapGen.ROOT_GROUP, bbox_create( {0,0}, map.size) )
 
-	print_map(map)
+        print_map(map)
 end
 
 function tests.test3_random_placement()
-    local solid_square = MapGen.square { flags = MapGen.FLAG_SOLID }
-    local map = MapGen.map_create { size = {80,40}, fill = solid_square }
+    local map = MapGen.map_create { size = {80,40}, flags = MapGen.FLAG_SOLID }
 
     print "random placement oper create"
     local random_placement_oper = MapGen.random_placement_operator {
@@ -180,44 +176,42 @@ function tests.test3_random_placement()
 end
 
 
-local function place_instance(map, area, type)		
-	local xy = MapGen.find_random_square { map = map, area = area, selector = {matches_none = {MapGen.FLAG_HAS_OBJECT, MapGen.FLAG_SOLID} } }
-	if xy ~= nil then
-		map.instances:add(type, xy)
-		map:square_apply(xy, {add = MapGen.FLAG_HAS_OBJECT})
-	end
+local function place_instance(map, area, type)          
+        local xy = MapGen.find_random_square { map = map, area = area, selector = {matches_none = {MapGen.FLAG_HAS_OBJECT, MapGen.FLAG_SOLID} } }
+        if xy ~= nil then
+                map.instances:add(type, xy)
+                map:square_apply(xy, {add = MapGen.FLAG_HAS_OBJECT})
+        end
 end
 
 local function place_instances(map, area)
-	for i=1,4 do
-		place_instance(map, area, '1')
-		place_instance(map, area, '2')
-		place_instance(map, area, '3')
-	end
+        for i=1,4 do
+                place_instance(map, area, '1')
+                place_instance(map, area, '2')
+                place_instance(map, area, '3')
+        end
 end
 
 -- Test with lua functions, just recreating map_random_placement_test
 function tests.test4_custom_operator()
-
-    local solid_square = MapGen.square { flags = MapGen.FLAG_SOLID }
     -- Uses 'InstanceList' class defined above
-    local map = MapGen.map_create { size = {80,40}, fill = solid_square, instances = InstanceList.create() }
+    local map = MapGen.map_create { size = {80,40}, flags = MapGen.FLAG_SOLID, instances = InstanceList.create() }
 
     print "custom create"
     local random_placement_oper = MapGen.random_placement_operator {
         child_operator = function(map, subgroup, bounds)
-        	--Purposefully convoluted for test purposes
-        	local queryfn = function(...)
-        		local query = make_rectangle_query()
-        		return query(map, subgroup, bounds)
-        	end
-        	local oper = make_rectangle_oper(queryfn)
-        	if oper(map, subgroup, bounds) then
-				place_instances(map, bounds)
-				return true
-			end
-			return false
-		end,
+                --Purposefully convoluted for test purposes
+                local queryfn = function(...)
+                        local query = make_rectangle_query()
+                        return query(map, subgroup, bounds)
+                end
+                local oper = make_rectangle_oper(queryfn)
+                if oper(map, subgroup, bounds) then
+                                place_instances(map, bounds)
+                                return true
+                        end
+                        return false
+                end,
         size_range = {6,9},
         amount_of_placements_range = {20, 20},
         create_subgroup = true
@@ -236,32 +230,31 @@ end
 
 function tests.test5_areatemplate()
     local map = MapGen.map_create { size = {4,4}, instances = InstanceList.create() }
-	local area_template = MapGen.area_template_create {
-		data =
+        local area_template = MapGen.area_template_create {
+                data =
 [[++++
 +--+
 +--+
 ++++]],
-		legend = {
-			["+"] = { fill = MapGen.square { flags = MapGen.FLAG_SOLID} },
-			["-"] = { fill = MapGen.square { flags = 0 }}
-		}
-	}
-	area_template:apply { 
-		map = map,
-		group = MapGen.ROOT_GROUP, 
-		top_left_xy = {0,0} 
-	}
-	print_map(map)
+                legend = {
+                        ["+"] = { flags = MapGen.FLAG_SOLID },
+                        ["-"] = { flags = 0 }
+                }
+        }
+        area_template:apply { 
+                map = map,
+                group = MapGen.ROOT_GROUP, 
+                top_left_xy = {0,0} 
+        }
+        print_map(map)
 end
 
 function tests.test6_areatemplate_complex()
-	local sqr = MapGen.square { flags = 0 }
-    local map = MapGen.map_create { size = {40,40}, fill = sqr, instances = InstanceList.create() }
-	local FLAG_APPLIED = MapGen.FLAG_CUSTOM1
+    local map = MapGen.map_create { size = {40,40}, flags = 0, instances = InstanceList.create() }
+        local FLAG_APPLIED = MapGen.FLAG_CUSTOM1
 
-	local area_template = MapGen.area_template_create {
-		data =
+        local area_template = MapGen.area_template_create {
+                data =
 [[------------
 --+++++++---
 -++----+++--
@@ -274,28 +267,96 @@ function tests.test6_areatemplate_complex()
 -+++-----++-
 --++---+++--
 ------------]],
-		legend = {
-			["+"] = { fill = MapGen.square { flags = {MapGen.FLAG_SOLID, FLAG_APPLIED}, } },
-			["-"] = { fill = MapGen.square { flags = FLAG_APPLIED }}
-		}
-	}
+                legend = {
+                        ["+"] = { flags = {MapGen.FLAG_SOLID, FLAG_APPLIED} },
+                        ["-"] = { flags = FLAG_APPLIED }
+                }
+        }
 
     MapGen.random_placement_operator {
         child_operator = function(map, group, rect)
-        	if not MapGen.rectangle_query {fill_selector = {matches_none = FLAG_APPLIED} } (map, group, rect) then
-        		return false
-        	end
-			area_template:apply { 
-				map = map,
-				group = group, 
-				top_left_xy = {rect[1],rect[2]} ,
-				flip_x = chance(0.5),
-				flip_y = chance(0.5)
-			}
+                if not MapGen.rectangle_query {fill_selector = {matches_none = FLAG_APPLIED} } (map, group, rect) then
+                        return false
+                end
+                area_template:apply { 
+                    map = map,
+                    group = group, 
+                    top_left_xy = {rect[1],rect[2]} ,
+                    flip_x = chance(0.5),
+                    flip_y = chance(0.5)
+                }
         end,
         size_range = {12,12},
         amount_of_placements_range = {5, 5},
     }(map, MapGen.ROOT_GROUP, bbox_create({0,0}, map.size))
+    print_map(map)
+end
 
-	print_map(map)
+
+function tests.test7_areatemplate_large()
+	local area_template = MapGen.area_template_create {
+		data = 
+[[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.............xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx............................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx......................................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...............................................xxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx................................................xxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx................................................xxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx................................................xxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...........................................xxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.......................................xxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx................................xxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...........................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.........................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...............xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx........................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.........................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..........................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...............................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxx........................................................xxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxx.................................................................xxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxx.....................................................................xxxxxxxxxxxxxxxxxx
+xxxxxxxxxxx........................................................................xxxxxxxxxxxxxxxxx
+xxxxxxxxx..........................................................................xxxxxxxxxxxxxxxxx
+xxxxxxxxx..........................................................xxx.............xxxxxxxxxxxxxxxxx
+xxxxxxxxx..........................................................................xxxxxxxxxxxxxxxxx
+xxxxxxxxx........................xxx...............................................xxxxxxxxxxxxxxxxx
+xxxxxxxxx.......................xxxxx................................................xxxxxxxxxxxxxxx
+xxxxxxxxx........................xx....................................................xxxxxxxxxxxxx
+xxxxxxxxx.....................................................................xxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxx..........................................................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxx......................................................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxx.....................................................................xxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxx..............................................xx............................xxxxxxxxxxxxxxx
+xxxxxxxxx.............................................xx..................................xxxxxxxxxx
+xxxxxxxxx.............................................x...................................xxxxxxxxxx
+xxxxxxxxx...........................x.................x...................................xxxxxxxxxx
+xxxxxxxxx..........................xxx...............xx...................................xxxxxxxxxx
+xxxxxxxxx............................x................xx..................................xxxxxxxxxx
+xxxxxxxxxxx............................................xx.................................xxxxxxxxxx
+xxxxxxxxxxxxxx..........................................xxx..............................xxxxxxxxxxx
+xxxxxxxxxxxxxxx...........................................xxxx...........................xxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..............................xxx........................xxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]], 
+		legend = {
+		        ["x"] = { flags = {MapGen.FLAG_SOLID, FLAG_APPLIED} },
+		        ["."] = { flags = 0 }
+		}
+	}
+
+    local map = MapGen.map_create { size = {100,100}, instances = InstanceList.create() }
+    area_template:apply { 
+            map = map,
+            group = MapGen.ROOT_GROUP, 
+            top_left_xy = {0,0} 
+    }
+    print_map(map)
 end

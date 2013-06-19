@@ -6,7 +6,7 @@ local function room_carve_operator(tileset)
         area_query = MapGen.rectangle_query { 
                         fill_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.FLAG_PERIMETER }, 
                         perimeter_width = 1, perimeter_selector = { matches_all = MapGen.FLAG_SOLID }
-                },
+        },
         perimeter_width = 1, perimeter_operator = { add = {MapGen.FLAG_SOLID, MapGen.FLAG_PERIMETER}, content = tileset.wall },
         fill_operator = { add = MapGen.FLAG_SEETHROUGH, remove = MapGen.FLAG_SOLID, content = tileset.floor }
     }
@@ -54,7 +54,7 @@ local function simple_tunnels(map, tileset)
 end
 
 function first_map_create() 
-    local tileset = TileSets.pebble
+    local tileset = TileSets.grass
     local solid_square = MapGen.square { flags = MapGen.FLAG_SOLID, content = tileset.wall}
     local map = MapGen.map_create { size = {80,80}, fill = solid_square, instances = {} }
 

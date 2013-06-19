@@ -26,8 +26,9 @@ namespace ldungeon_gen {
 		if (lua_isnumber(L, 1)) {
 			flags = lua_tonumber(L, 1);
 		} else {
-			Square sqr = luawrap::get<Square>(L, 1);
-			flags = sqr.flags;
+			lua_pushfstring(L, "Expected integer in 'flags_list', got '%s'!",
+					lua_typename(L, lua_type(L, 1)));
+			return lua_error(L);
 		}
 
 		/* Push flag list */
@@ -134,16 +135,12 @@ namespace ldungeon_gen {
 				defaulted(args["group"], ROOT_GROUP_ID));
 	}
 
-	LuaValue lua_squaremetatable(lua_State* L) {
-		LuaValue meta = luameta_new(L, "MapGen.Square");
-		LuaValue methods = luameta_constants(meta);
-
-		LuaValue getters = luameta_getters(meta);
-		luawrap::bind_getter(getters["flags"], &Square::flags);
-		luawrap::bind_getter(getters["content"], &Square::content);
-		luawrap::bind_getter(getters["group"], &Square::group);
-
-		return meta;
+	void lua_square_push(lua_State* L, Square square) {
+		lua_newtable(L);
+		LuaStackValue table(L, -1);
+		table["flags"] = square.flags;
+		table["content"] = square.content;
+		table["group"] = square.group;
 	}
 
 	/*****************************************************************************
@@ -194,9 +191,9 @@ namespace ldungeon_gen {
 		lua_pop(L, 1);
 
 		LUAWRAP_GETTER(getters, size, OBJ->size());
-		LUAWRAP_GETTER(methods, get, (*OBJ)[luawrap::get<Pos>(L, 2)]);
+		LUAWRAP_METHOD(methods, get, lua_square_push(L, (*OBJ)[luawrap::get<Pos>(L, 2)]));
 		LUAWRAP_METHOD(methods, set, (*OBJ)[luawrap::get<Pos>(L, 2)] =
-				luawrap::get<Square>(L, 3));
+				lua_square_get(LuaStackValue(L, 3)));
 		LUAWRAP_METHOD(methods, square_apply, (*OBJ)[luawrap::get<Pos>(L, 2)].apply(lua_operator_get(LuaStackValue(L, 3))));
 
 		return meta;
@@ -206,7 +203,7 @@ namespace ldungeon_gen {
 		using namespace luawrap;
 		MapPtr ptr(
 				new Map(defaulted(args["size"], Size()),
-						defaulted(args["fill"], Square())));
+						lua_square_get(args)));
 		ptr->luafields = args;
 		return ptr;
 	}
@@ -509,7 +506,6 @@ namespace ldungeon_gen {
 	void lua_register_map(const LuaValue& module, MTwist* mtwist) {
 		lua_State* L = module.luastate();
 
-		luawrap::install_userdata_type<Square, lua_squaremetatable>();
 		luawrap::install_userdata_type<MapPtr, lua_mapmetatable>();
 		luawrap::install_userdata_type<AreaOperatorPtr, lua_opermetatable>();
 		luawrap::install_userdata_type<AreaQueryPtr, lua_querymetatable>();
@@ -534,8 +530,6 @@ namespace ldungeon_gen {
 		module["flags_list"].bind_function(flags_list);
 		module["flags_match"].bind_function(flags_match);
 		module["flags_combine"].bind_function(flags_combine);
-
-		module["square"].bind_function(lua_square_get);
 
 		module["map_create"].bind_function(map_create);
 		module["rectangle_operator"].bind_function(rectangle_operator);

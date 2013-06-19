@@ -9,6 +9,8 @@
 
 #include "AreaTemplate.h"
 
+#include "lua_ldungeon_impl.h"
+
 #include "Map.h"
 #include "map_fill.h"
 #include "map_check.h"
@@ -46,7 +48,7 @@ namespace ldungeon_gen {
 
 	static Glyph glyph_get(LuaStackValue glyph) {
 		LuaValue on_placement = luawrap::defaulted(glyph["on_placement"], LuaValue());
-		return Glyph(glyph["fill"].as<Square>(), on_placement);
+		return Glyph(lua_square_get(glyph), on_placement);
 	}
 
 	static LuaStackValue area_template_create(LuaStackValue args) {

@@ -25,6 +25,7 @@ namespace ldungeon_gen {
 	Operator lua_operator_optional_get(LuaField args);
 
 	Square lua_square_get(LuaStackValue args);
+	void lua_square_push(lua_State* L, Square square);
 
 	ConditionalOperator lua_conditional_operator_get(LuaField args);
 	ConditionalOperator lua_conditional_operator_optional_get(LuaField args);
