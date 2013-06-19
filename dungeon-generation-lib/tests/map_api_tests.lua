@@ -26,6 +26,7 @@ function tests.test1_api_check()
 
     assert_exists2("MapGen", "map_create")
     assert_exists2("MapGen", "rectangle_operator")
+    assert_exists2("MapGen", "tunnel_generate")
 end
 
 local function make_rectangle_query()
@@ -48,17 +49,17 @@ end
 local function make_tunnel_oper() 
 	return MapGen.tunnel_operator {
         validity_selector = { 
-            fill_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = {MapGen.FLAG_PERIMETER, MapGen.FLAG_TUNNEL} },
+            fill_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.FLAG_TUNNEL },
             perimeter_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.FLAG_TUNNEL }
         },
 
         completion_selector = {
-            fill_selector = { matches_none = { MapGen.FLAG_SOLID, MapGen.FLAG_PERIMETER, MapGen.FLAG_TUNNEL } },
+            fill_selector = { matches_none = {MapGen.FLAG_SOLID, MapGen.FLAG_PERIMETER, MapGen.FLAG_TUNNEL} },
             perimeter_selector = { matches_none = MapGen.FLAG_SOLID } 
         },
 
         fill_operator = { add = MapGen.FLAG_TUNNEL, remove = MapGen.FLAG_SOLID, content = 3},
-        perimeter_operator = { matches_all = MapGen.FLAGS_SOLID, add = {MapGen.FLAG_SOLID, MapGen.FLAG_TUNNEL, MapGen.FLAG_PERIMETER}, content = 4 },
+        perimeter_operator = { matches_all = MapGen.FLAG_SOLID, add = {MapGen.FLAG_SOLID, MapGen.FLAG_TUNNEL, MapGen.FLAG_PERIMETER}, content = 4 },
 
 		perimeter_width = 1,
         size_range = {1,2},

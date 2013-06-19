@@ -16,7 +16,7 @@ local function simple_random_placement_operator(map, tileset)
     print "SIMPLE_RANDOM_PLACEMENT_OPERATOR"
     return MapGen.random_placement_operator {
         child_operator = room_carve_operator(tileset),
-        size_range = {12,20}, amount_of_placements_range = {3,4},
+        size_range = chance(.5) and {15,15} or {5,5}, amount_of_placements_range = {3,4},
         create_subgroup = false
     } 
 end
@@ -40,7 +40,7 @@ local function simple_tunnels(map, tileset)
 
         completion_selector = {
             fill_selector = { matches_none = { MapGen.FLAG_SOLID, MapGen.FLAG_PERIMETER, MapGen.FLAG_TUNNEL } },
-            perimeter_selector = { --[[ matches_none = MapGen.FLAG_SOLID]] } 
+            perimeter_selector = { matches_none = MapGen.FLAG_SOLID } 
         },
 
         fill_operator = { add = {MapGen.FLAG_TUNNEL, MapGen.FLAG_SEETHROUGH}, remove = MapGen.FLAG_SOLID, content = tileset.floor},

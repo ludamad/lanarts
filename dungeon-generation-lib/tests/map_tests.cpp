@@ -101,7 +101,7 @@ static const Size MAP_SIZE(80, 40);
 TEST(test_map_generation) {
 	MTwist randomizer;
 	/* 0, 1, 2 are used as map content values*/
-	MapPtr map_ptr(new Map(MAP_SIZE));
+	MapPtr map_ptr(new Map(MAP_SIZE, Square(FLAG_SOLID)));
 
 	/* Create rooms */{
 		ConditionalOperator fill_oper(SELECT_ALL,
@@ -118,16 +118,15 @@ TEST(test_map_generation) {
 		ConditionalOperator fill_oper(SELECT_ALL,
 				Operator(FLAG_TUNNEL, FLAG_SOLID, 0, 3));
 		ConditionalOperator perimeter_oper(Selector(FLAG_SOLID),
-				Operator(FLAG_SOLID | FLAG_TUNNEL | FLAG_PERIMETER, 0, 0, 4));
+				Operator(FLAG_SOLID, FLAG_TUNNEL, 0, 4));
 
-		Selector is_valid_fill(FLAG_SOLID, FLAG_TUNNEL | FLAG_PERIMETER);
+		Selector is_valid_fill(FLAG_SOLID, FLAG_TUNNEL);
 		Selector is_valid_perimeter(FLAG_SOLID, FLAG_TUNNEL);
 
 		Selector is_finished_fill(0, FLAG_SOLID | FLAG_PERIMETER | FLAG_TUNNEL);
 		Selector is_finished_perimeter(0, FLAG_SOLID);
 		TunnelCheckSettings tunnel_selector(is_valid_fill, is_valid_perimeter,
 				is_finished_fill, is_finished_perimeter);
-
 
 		TunnelGenOperator tunnel_oper(randomizer, tunnel_selector, fill_oper,
 				perimeter_oper, 1, Range(1, 2), Range(1, 1));

@@ -18,6 +18,7 @@ include_directories(
 	${DEPS}/UnitTest++ 
 )
 
+
 aux_source_directory( "src/" lanarts_dungeon_gen_src)
 aux_source_directory( "src/lua" lanarts_dungeon_gen_src)
 aux_source_directory( "include/" lanarts_dungeon_gen_include)

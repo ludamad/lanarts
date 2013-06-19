@@ -14,6 +14,8 @@
 #include "tunnelgen.h"
 #include "map_check.h"
 
+#include "lua_ldungeon_impl.h"
+
 namespace ldungeon_gen {
 
 	/*****************************************************************************
@@ -87,7 +89,7 @@ namespace ldungeon_gen {
 	}
 
 	/* Parses a 'selector' from a table. All fields are optional. */
-	static Selector selector_get(LuaField args) {
+	Selector lua_selector_get(LuaField args) {
 		bool has_content = args.has("matches_content");
 		Selector selector(flags_get(args["matches_all"]),
 				flags_get(args["matches_none"]),
@@ -96,12 +98,12 @@ namespace ldungeon_gen {
 		return selector;
 	}
 
-	static Selector selector_optional_get(LuaField args) {
-		return args.isnil() ? Selector() : selector_get(args);
+	Selector lua_selector_optional_get(LuaField args) {
+		return args.isnil() ? Selector() : lua_selector_get(args);
 	}
 
 	/* Parses an 'operators' from a table. All fields are optional. */
-	static Operator operator_get(LuaField args) {
+	Operator lua_operator_get(LuaField args) {
 		bool has_content = args.has("content");
 		Operator oper(flags_get(args["add"]), flags_get(args["remove"]),
 				flags_get(args["toggle"]),
@@ -110,22 +112,22 @@ namespace ldungeon_gen {
 		return oper;
 	}
 
-	static Operator operator_optional_get(LuaField args) {
-		return args.isnil() ? Operator() : operator_get(args);
+	Operator lua_operator_optional_get(LuaField args) {
+		return args.isnil() ? Operator() : lua_operator_get(args);
 	}
 
-	static ConditionalOperator conditional_operator_get(LuaField args) {
-		return ConditionalOperator(selector_get(args), operator_get(args));
+	ConditionalOperator lua_conditional_operator_get(LuaField args) {
+		return ConditionalOperator(lua_selector_get(args), lua_operator_get(args));
 	}
 
-	static ConditionalOperator conditional_operator_optional_get(
+	ConditionalOperator lua_conditional_operator_optional_get(
 			LuaField args) {
 		return args.isnil() ?
 				ConditionalOperator(Selector(), Operator()) :
-				conditional_operator_get(args);
+				lua_conditional_operator_get(args);
 	}
 
-	static Square square_create(LuaStackValue args) {
+	Square lua_square_get(LuaStackValue args) {
 		using namespace luawrap;
 		return Square(flags_get(args["flags"]),
 				defaulted(args["content"], 0),
@@ -195,7 +197,7 @@ namespace ldungeon_gen {
 		LUAWRAP_GETTER(methods, get, (*OBJ)[luawrap::get<Pos>(L, 2)]);
 		LUAWRAP_METHOD(methods, set, (*OBJ)[luawrap::get<Pos>(L, 2)] =
 				luawrap::get<Square>(L, 3));
-		LUAWRAP_METHOD(methods, square_apply, (*OBJ)[luawrap::get<Pos>(L, 2)].apply(operator_get(LuaStackValue(L, 3))));
+		LUAWRAP_METHOD(methods, square_apply, (*OBJ)[luawrap::get<Pos>(L, 2)].apply(lua_operator_get(LuaStackValue(L, 3))));
 
 		return meta;
 	}
@@ -240,9 +242,9 @@ namespace ldungeon_gen {
 		using namespace luawrap;
 		lua_State* L = args.luastate();
 
-		RectangleQuery query(selector_optional_get(args["fill_selector"]),
+		RectangleQuery query(lua_selector_optional_get(args["fill_selector"]),
 				defaulted(args["perimeter_width"], 0),
-				selector_optional_get(args["perimeter_selector"]));
+				lua_selector_optional_get(args["perimeter_selector"]));
 
 		/* Create a closure which applies the function */
 		luawrap::push(L, AreaQueryPtr(new RectangleQuery(query)));
@@ -302,7 +304,7 @@ namespace ldungeon_gen {
 
 		Pos xy;
 		bool found = find_random_square(*mtwist, args["map"].as<MapPtr>(),
-				args["area"].as<BBox>(), selector_get(args["selector"]), xy,
+				args["area"].as<BBox>(), lua_selector_get(args["selector"]), xy,
 				luawrap::defaulted(args["max_attempts"],
 						RANDOM_MATCH_MAX_ATTEMPTS));
 		if (found) {
@@ -345,9 +347,9 @@ namespace ldungeon_gen {
 
 		AreaQueryPtr query = area_query_optional_get(args["area_query"]);
 		RectangleApplyOperator oper(query,
-				conditional_operator_optional_get(args["fill_operator"]),
+				lua_conditional_operator_optional_get(args["fill_operator"]),
 				defaulted(args["perimeter_width"], 0),
-				conditional_operator_optional_get(args["perimeter_operator"]),
+				lua_conditional_operator_optional_get(args["perimeter_operator"]),
 				defaulted(args["create_subgroup"], true));
 
 		/* Create a closure which applies the function */
@@ -437,24 +439,24 @@ namespace ldungeon_gen {
 		LuaValue vs = args["validity_selector"];
 		Selector vfill_selector =
 				vs.isnil() ?
-						Selector() : selector_optional_get(vs["fill_selector"]);
+						Selector() : lua_selector_optional_get(vs["fill_selector"]);
 		Selector vperimeter_selector =
 				vs.isnil() ?
 						Selector() :
-						selector_optional_get(vs["perimeter_selector"]);
+						lua_selector_optional_get(vs["perimeter_selector"]);
 
 		LuaValue cs = args["completion_selector"];
 		Selector cfill_selector =
 				cs.isnil() ?
-						Selector() : selector_optional_get(cs["fill_selector"]);
+						Selector() : lua_selector_optional_get(cs["fill_selector"]);
 		Selector cperimeter_selector =
 				cs.isnil() ?
 						Selector() :
-						selector_optional_get(cs["perimeter_selector"]);
+						lua_selector_optional_get(cs["perimeter_selector"]);
 
-		ConditionalOperator fill_oper = conditional_operator_get(
+		ConditionalOperator fill_oper = lua_conditional_operator_get(
 				args["fill_operator"]);
-		ConditionalOperator perimeter_oper = conditional_operator_get(
+		ConditionalOperator perimeter_oper = lua_conditional_operator_get(
 				args["perimeter_operator"]);
 
 		int perimeter_width = defaulted(args["perimeter_width"], 0);
@@ -533,7 +535,7 @@ namespace ldungeon_gen {
 		module["flags_match"].bind_function(flags_match);
 		module["flags_combine"].bind_function(flags_combine);
 
-		module["square"].bind_function(square_create);
+		module["square"].bind_function(lua_square_get);
 
 		module["map_create"].bind_function(map_create);
 		module["rectangle_operator"].bind_function(rectangle_operator);

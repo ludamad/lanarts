@@ -11,7 +11,6 @@
 
 #include "Map.h"
 #include "map_fill.h"
-#include "tunnelgen.h"
 #include "map_check.h"
 
 namespace ldungeon_gen {

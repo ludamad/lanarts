@@ -50,17 +50,17 @@ namespace ldungeon_gen {
 
 	struct TunnelGenOperator: public AreaOperatorBase {
 		MTwist randomizer;
-		TunnelCheckSettings selector;
+		TunnelCheckSettings checker;
 		ConditionalOperator fill_oper, perimeter_oper;
 		int padding;
 		Range size, num_tunnels;
 
 		TunnelGenOperator(MTwist& randomizer,
-				const TunnelCheckSettings& selector,
+				const TunnelCheckSettings& checker,
 				ConditionalOperator fill_oper,
 				ConditionalOperator perimeter_oper, int padding, Range size,
 				Range num_tunnels) :
-				randomizer(randomizer), selector(selector), fill_oper(
+				randomizer(randomizer), checker(checker), fill_oper(
 						fill_oper), perimeter_oper(perimeter_oper), padding(
 						padding), size(size), num_tunnels(num_tunnels) {
 		}
@@ -72,7 +72,7 @@ namespace ldungeon_gen {
 	/* 'xy' determines where to start tunneling from.
 	 * 'direction' determines what direction to tunnel from there */
 	bool tunnel_generate(MapPtr map, MTwist& randomizer, const Pos& xy,
-			const Pos& direction, const TunnelCheckSettings& selector,
+			const Pos& direction, const TunnelCheckSettings& checker,
 			const TunnelFillSettings& filler);
 }
 #endif /* LDUNGEON_TUNNELGEN_H_ */

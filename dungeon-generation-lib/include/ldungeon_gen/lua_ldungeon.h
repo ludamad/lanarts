@@ -11,6 +11,7 @@ class LuaValue;
 class MTwist;
 
 namespace ldungeon_gen {
+	MTwist& ldungeon_get_rng(lua_State* L);
 	void lua_register_ldungeon(const LuaValue& module, MTwist* mtwist, bool register_lcommon);
 }
 

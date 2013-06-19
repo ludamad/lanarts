@@ -8,6 +8,7 @@
 #include <cstring>
 
 #include <lcommon/mtwist.h>
+#include <lcommon/math_util.h>
 
 #include "ldungeon_assert.h"
 #include "tunnelgen.h"
@@ -23,11 +24,11 @@ namespace ldungeon_gen {
 		enum {
 			NO_TURN = 0, TURN_PERIMETER = 1, TURN_START = 2
 		};
-		TunnelGenImpl(Map& map, MTwist& mt, const TunnelCheckSettings& selector,
+		TunnelGenImpl(Map& map, MTwist& mt, const TunnelCheckSettings& checker,
 				const TunnelFillSettings& filler) :
 						map(map),
 						mt(mt),
-						selector(selector),
+						checker(checker),
 						filler(filler) {
 		}
 
@@ -56,7 +57,7 @@ namespace ldungeon_gen {
 	private:
 		Map& map;
 		MTwist& mt;
-		TunnelCheckSettings selector;
+		TunnelCheckSettings checker;
 		TunnelFillSettings filler;
 	};
 
@@ -102,13 +103,13 @@ namespace ldungeon_gen {
 	bool TunnelGenImpl::validate_slice(Square* prev_content,
 			TunnelSliceContext* cntxt, int dep) {
 		int dx = cntxt->dx, dy = cntxt->dy;
-		if (cntxt->pos.x <= 2
+		if (cntxt->pos.x < 0
 				|| cntxt->pos.x
-						>= map.width() - filler.width - (dy == 0 ? 0 : filler.padding * 2))
+						>= map.width() - (dy == 0 ? 0 : filler.width + filler.padding * 2))
 			return false;
-		if (cntxt->pos.y <= 2
+		if (cntxt->pos.y < 0
 				|| cntxt->pos.y
-						>= map.height() - filler.width - (dx == 0 ? 0 : filler.padding * 2))
+						>= map.height() -(dx == 0 ? 0 :  filler.width + filler.padding * 2))
 			return false;
 
 		/* Start with the assumption that we're done */
@@ -122,13 +123,14 @@ namespace ldungeon_gen {
 
 			/* Look for reasons we would not be done */
 			bool is_perimeter = (i == 0 || i == last_square);
-			Selector is_finished = is_perimeter ? selector.is_finished_perimeter : selector.is_finished_fill;
+			Selector is_finished = is_perimeter ? checker.is_finished_perimeter : checker.is_finished_fill;
 			if (!sqr.matches(is_finished)) {
 				cntxt->tunneled = false;
 				break;
 			}
-			if (sqr.group == selector.avoid_group){
-//				return false;
+			if (sqr.group == checker.avoid_group || (checker.end_group >= 0 && sqr.group != checker.end_group)) {
+				cntxt->tunneled = false;
+				break;
 			}
 		}
 
@@ -144,8 +146,8 @@ namespace ldungeon_gen {
 			int ycomp = (dx == 0 ? 0 : i);
 			Square& sqr = map[Pos(cntxt->perim_pos.x + xcomp, cntxt->perim_pos.y + ycomp)];
 			bool is_perimeter = (i == 0 || i == last_square);
-			Selector is_valid = is_perimeter ? selector.is_valid_perimeter : selector.is_valid_fill;
-			if (!sqr.matches(is_valid) && cntxt->turn_state == NO_TURN) {
+			Selector is_valid = is_perimeter ? checker.is_valid_perimeter : checker.is_valid_fill;
+			if (cntxt->turn_state == NO_TURN && !sqr.matches(is_valid)) {
 				return false;
 			}
 			memcpy(prev_content + i, &sqr, sizeof(Square));
@@ -286,9 +288,9 @@ namespace ldungeon_gen {
 					int path_len = 2;
 					for (int attempts = 0; attempts < 16 && !generated;
 							attempts++) {
-						selector.avoid_group = i;
+						checker.avoid_group = i;
 						TunnelFillSettings filler(fill_oper, padding, perimeter_oper, genwidth, path_len, 0.05);
-						TunnelGenImpl tg(*map, randomizer, selector, filler);
+						TunnelGenImpl tg(*map, randomizer, checker, filler);
 
 						generate_entrance(map->groups[i].group_area, randomizer,
 								std::min(genwidth, 2), p, axis, positive);
@@ -330,7 +332,7 @@ namespace ldungeon_gen {
 		bool complete_tunnel = false;
 		int tunnel_depth = 0;
 
-//By setting TURN_PERIMETER we avoid trying a turn on the first tunnel slice
+		//By setting TURN_PERIMETER we avoid trying a turn on the first tunnel slice
 		initialize_slice(&tsc[tunnel_depth], TURN_PERIMETER, dx, dy, p);
 		while (true) {
 			prev_content = backtrack_entry(backtracking, entry_size,
@@ -339,7 +341,7 @@ namespace ldungeon_gen {
 
 			//We must leave room to initialize the next tunnel depth
 			bool valid =
-					tunnel_depth < filler.max_length- 1
+					tunnel_depth < filler.max_length - 1
 							&& (tsc[tunnel_depth].attempt_number > 0
 									|| validate_slice(prev_content, cntxt,
 											tunnel_depth));
@@ -396,11 +398,19 @@ namespace ldungeon_gen {
 			p.y = ind;
 		}
 	}
-//
-//	bool tunnel_generate(MapPtr map, MTwist& randomizer, const Pos& xy,
-//			const Pos& direction, const TunnelCheckSettings& selector,
-//			const TunnelFillSettings& filler) {
-//		LDUNGEON_ASSERT(filler.width > 0 && filler.width <= MAX_TUNNEL_WIDTH);
-//	}
 
+	bool tunnel_generate(MapPtr map, MTwist& randomizer, const Pos& xy,
+			const Pos& direction, const TunnelCheckSettings& checker,
+			const TunnelFillSettings& filler) {
+		/* Assert some (very) conservative range */
+		LDUNGEON_ASSERT(filler.width > 0 && filler.width <= 255);
+		LDUNGEON_ASSERT(direction != Pos());
+
+		/* TODO: Cache this. */
+		std::vector<Square> btbuff;
+		std::vector<TunnelSliceContext> tsbuff;
+
+		TunnelGenImpl tg(*map, randomizer, checker, filler);
+		return tg.generate(xy, signum(direction.x), signum(direction.y), btbuff, tsbuff);
+	}
 }
