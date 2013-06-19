@@ -29,8 +29,9 @@ namespace ldungeon_gen {
 	static int strlineheight(const std::string& data, int width) {
 		int chars_since_space = 0;
 		int height = 0;
-		for (int i = 0; i < data.size(); i++) {
-			if (isspace(data[i])) {
+		int null_term_len = data.size() + 1; // Size including null-terminator
+		for (int i = 0; i < null_term_len; i++) {
+			if (!data[i] || isspace(data[i])) {
 				if (chars_since_space != width) {
 					printf(" Got %d vs %d\n", chars_since_space, width);
 					luawrap::error("Non-uniform grid passed to area template");
@@ -38,7 +39,7 @@ namespace ldungeon_gen {
 				chars_since_space = 0;
 				do {
 					i++;
-				} while (isspace(data[i]));
+				} while (i < null_term_len && isspace(data[i]));
 				height++;
 			}
 			chars_since_space++;
