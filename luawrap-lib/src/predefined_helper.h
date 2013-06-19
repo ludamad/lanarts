@@ -70,6 +70,15 @@ namespace luawrap {
 			static bool check(lua_State *L, int idx);
 		};
 
+		/* Lua field value -> matches any value! */
+		template<>
+		class TypeImpl<LuaField> {
+		public:
+			static void push(lua_State* L, const LuaField& val);
+			static LuaField get(lua_State* L, int idx);
+			static bool check(lua_State *L, int idx);
+		};
+
 		/* Standard lua C function */
 		template<>
 		class TypeImpl<lua_CFunction> {

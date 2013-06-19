@@ -4,10 +4,13 @@
  */
 
 #include <lua.hpp>
+
 #include <luawrap/luawrap.h>
 #include <luawrap/functions.h>
 #include <luawrap/members.h>
 #include <luawrap/types.h>
+
+#include <lcommon/lua_utils.h>
 
 #include <lsound/lua_lsound.h>
 
@@ -41,6 +44,8 @@ static LuaValue tileset_create(LuaStackValue fields) {
 		lua_pop(L, 1); // Pop value
 	}
 	lua_pop(L, 1); // Pop table
+
+	lua_protect_table(tileset);
 	return tileset;
 }
 

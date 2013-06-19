@@ -36,6 +36,18 @@ namespace luawrap {
 			return true;
 		}
 
+		void TypeImpl<LuaField>::push(lua_State* L, const LuaField& val) {
+			val.push();
+		}
+
+		LuaField TypeImpl<LuaField>::get(lua_State* L, int idx) {
+			return LuaStackValue(L, idx);
+		}
+
+		bool TypeImpl<LuaField>::check(lua_State* L, int idx) {
+			return true;
+		}
+
 		void TypeImpl<lua_CFunction>::push(lua_State* L, lua_CFunction val) {
 			lua_pushcfunction(L, val);
 		}
