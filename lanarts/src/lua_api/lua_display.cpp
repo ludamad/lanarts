@@ -8,6 +8,8 @@
 #include <luawrap/luawrap.h>
 #include <luawrap/functions.h>
 
+#include <lcommon/lua_utils.h>
+
 #include <ldraw/display.h>
 #include <ldraw/Image.h>
 
@@ -41,7 +43,7 @@ namespace lua_api {
 
 	static void register_display_table(lua_State* L) {
 		LuaSpecialValue globals = luawrap::globals(L);
-		LuaValue display = luawrap::ensure_table(globals["Display"]);
+		LuaValue display = lua_ensure_protected_table(globals["Display"]);
 
 		globals["images_load"].bind_function(images_load);
 		display["initialize"].bind_function(ldraw::display_initialize);
@@ -65,7 +67,7 @@ namespace lua_api {
 		LuaValue globals = luawrap::globals(L);
 		GameState* gs = lua_api::gamestate(L);
 
-		LuaValue fonts = luawrap::ensure_table(globals["Fonts"]);
+		LuaValue fonts = lua_ensure_protected_table(globals["Fonts"]);
 
 		fonts["small"] = gs->font();
 		fonts["large"] = gs->menu_font();
@@ -75,7 +77,7 @@ namespace lua_api {
 
 	void register_event_log_api(lua_State* L) {
 		LuaSpecialValue globals = luawrap::globals(L);
-		LuaValue event_log = luawrap::ensure_table(globals["EventLog"]);
+		LuaValue event_log = lua_ensure_protected_table(globals["EventLog"]);
 		event_log["add"].bind_function(event_log_add);
 	}
 }

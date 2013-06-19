@@ -51,7 +51,7 @@ static LuaValue tileset_create(LuaStackValue fields) {
 
 namespace lua_api {
 	void register_tiles_api(lua_State* L) {
-		LuaValue data = luawrap::ensure_table(luawrap::globals(L)["Data"]);
+		LuaValue data = lua_ensure_protected_table(luawrap::globals(L)["Data"]);
 		data["tile_create"].bind_function(tile_create);
 		data["tileset_create"].bind_function(tileset_create);
 	}

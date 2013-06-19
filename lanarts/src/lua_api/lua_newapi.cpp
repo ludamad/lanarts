@@ -6,6 +6,9 @@
 #include <luawrap/luawrap.h>
 #include <luawrap/calls.h>
 #include <luawrap/luameta.h>
+
+#include <lcommon/lua_utils.h>
+
 #include <ldraw/lua_ldraw.h>
 
 #include <ldungeon_gen/lua_ldungeon.h>
@@ -220,7 +223,7 @@ namespace lua_api {
 		lua_lanarts_api(gs, L); // TODO: Deprecated
 
 		LuaValue globals = luawrap::globals(L);
-		LuaValue game = luawrap::ensure_table(globals["Game"]);
+		LuaValue game = lua_ensure_protected_table(globals["Game"]);
 		// Holds engine hooks
 		LuaValue engine = luawrap::ensure_table(globals["Engine"]);
 
