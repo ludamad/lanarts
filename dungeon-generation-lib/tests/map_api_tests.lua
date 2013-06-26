@@ -237,8 +237,8 @@ function tests.test5_areatemplate()
 +--+
 ++++]],
                 legend = {
-                        ["+"] = { flags = MapGen.FLAG_SOLID },
-                        ["-"] = { flags = 0 }
+                        ["+"] = { add = MapGen.FLAG_SOLID },
+                        ["-"] = { }
                 }
         }
         area_template:apply { 
@@ -268,8 +268,8 @@ function tests.test6_areatemplate_complex()
 --++---+++--
 ------------]],
                 legend = {
-                        ["+"] = { flags = {MapGen.FLAG_SOLID, FLAG_APPLIED} },
-                        ["-"] = { flags = FLAG_APPLIED }
+                        ["+"] = { add = {MapGen.FLAG_SOLID, FLAG_APPLIED} },
+                        ["-"] = { add = FLAG_APPLIED }
                 }
         }
 
@@ -293,62 +293,12 @@ function tests.test6_areatemplate_complex()
 end
 
 
-function tests.test7_areatemplate_large()
+function tests.test7_areatemplate_from_file()
 	local area_template = MapGen.area_template_create {
-		data = 
-[[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.............xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx............................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx......................................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...............................................xxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx................................................xxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx................................................xxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx................................................xxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...........................................xxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.......................................xxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx................................xxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...........................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.........................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...............xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx........................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.........................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..........................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...............................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxx........................................................xxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxx.................................................................xxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxx.....................................................................xxxxxxxxxxxxxxxxxx
-xxxxxxxxxxx........................................................................xxxxxxxxxxxxxxxxx
-xxxxxxxxx..........................................................................xxxxxxxxxxxxxxxxx
-xxxxxxxxx..........................................................xxx.............xxxxxxxxxxxxxxxxx
-xxxxxxxxx..........................................................................xxxxxxxxxxxxxxxxx
-xxxxxxxxx........................xxx...............................................xxxxxxxxxxxxxxxxx
-xxxxxxxxx.......................xxxxx................................................xxxxxxxxxxxxxxx
-xxxxxxxxx........................xx....................................................xxxxxxxxxxxxx
-xxxxxxxxx.....................................................................xxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxx..........................................................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxx......................................................xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxx.....................................................................xxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxx..............................................xx............................xxxxxxxxxxxxxxx
-xxxxxxxxx.............................................xx..................................xxxxxxxxxx
-xxxxxxxxx.............................................x...................................xxxxxxxxxx
-xxxxxxxxx...........................x.................x...................................xxxxxxxxxx
-xxxxxxxxx..........................xxx...............xx...................................xxxxxxxxxx
-xxxxxxxxx............................x................xx..................................xxxxxxxxxx
-xxxxxxxxxxx............................................xx.................................xxxxxxxxxx
-xxxxxxxxxxxxxx..........................................xxx..............................xxxxxxxxxxx
-xxxxxxxxxxxxxxx...........................................xxxx...........................xxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..............................xxx........................xxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]], 
+		data_file = "tests/test-template.txt", 
 		legend = {
-		        ["x"] = { flags = {MapGen.FLAG_SOLID, FLAG_APPLIED} },
-		        ["."] = { flags = 0 }
+		        ["x"] = { add = {MapGen.FLAG_SOLID, FLAG_APPLIED} },
+		        ["."] = { add = 0 }
 		}
 	}
 

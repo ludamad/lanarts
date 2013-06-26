@@ -522,6 +522,7 @@ namespace ldungeon_gen {
 		module["FLAG_NEAR_PORTAL"] = FLAG_NEAR_PORTAL;
 		module["FLAG_PERIMETER"] = FLAG_PERIMETER;
 		module["FLAG_SEETHROUGH"] = FLAG_SEETHROUGH;
+		module["FLAGS_ALL"] = (int)-1;
 		for (int i = 1; i <= 8; i++) {
 			std::string str = format("FLAG_CUSTOM%d", i);
 			module[str] = FLAG_RESERVED2 << i;

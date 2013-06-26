@@ -43,7 +43,7 @@ function event_occurred(type, --[[Misc data]] ...)
 end
 
 function player_has_won()
-    require "winning_screen"
+    require "menus.winning_screen"
     require "game_loop"
 
     Game.wait(400)

@@ -48,7 +48,7 @@ namespace ldungeon_gen {
 		return TunnelFillSettings(fill_oper,
 				defaulted(args["perimeter_width"], 0), perimeter_oper,
 				defaulted(args["width"], 1), defaulted(args["max_length"], 0),
-				defaulted(args["turn_chance"], 0.05f));
+				defaulted(args["turn_chance"], 0.00f));
 	}
 
 	static bool lua_tunnel_generate(LuaStackValue args) {
@@ -61,5 +61,9 @@ namespace ldungeon_gen {
 
 	void lua_register_tunnelgen(const LuaValue& module) {
 		module["tunnel_generate"].bind_function(lua_tunnel_generate);
+		module["LEFT"] = Pos(-1, 0);
+		module["RIGHT"] = Pos(+1, 0);
+		module["DOWN"] = Pos(0, +1);
+		module["UP"] = Pos(0, -1);
 	}
 }

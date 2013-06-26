@@ -14,10 +14,11 @@
 #include "AreaTemplate.h"
 
 namespace ldungeon_gen {
-	AreaTemplate::AreaTemplate(const char* data, int data_width,
-			Size size) {
+	AreaTemplate::AreaTemplate(const char* data, Size size) {
 		_grid.set(new Grid<char>(size));
-		LDUNGEON_ASSERT(size.w > 0 && size.h > 0 && data_width >= size.w);
+		LDUNGEON_ASSERT(size.w > 0 && size.h > 0);
+		/* Assume uniformly spaced block with newline at end of each line */
+		int data_width = size.w + 1; /* Account for newline character */
 
 		for (int y = 0; y < size.h; y++) {
 			for (int x = 0; x < size.w; x++) {
@@ -53,7 +54,7 @@ namespace ldungeon_gen {
 			char chr = (*_grid)[Pos(x,y)];
 			Glyph glyph = _legend[chr];
 
-			(*map)[Pos(sqrx, sqry)] = glyph.square;
+			(*map)[Pos(sqrx, sqry)].apply(glyph.oper);
 
 			/* Apply lua function */
 			if (!glyph.value.empty() && !glyph.value.isnil()) {

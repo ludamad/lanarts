@@ -86,6 +86,8 @@ namespace ldungeon_gen {
 	struct ConditionalOperator {
 		Selector selector;
 		Operator oper;
+		ConditionalOperator() {
+		}
 		ConditionalOperator(Selector selector, Operator oper) :
 						selector(selector),
 						oper(oper) {
@@ -115,6 +117,7 @@ namespace ldungeon_gen {
 							|| content == selector.must_be_content);
 		}
 		inline void apply(Operator oper) {
+			/* By turning off first, we can wipe all flags and set new ones */
 			flags &= ~oper.turn_off_bits;
 			flags |= oper.turn_on_bits;
 			flags ^= oper.flip_bits;

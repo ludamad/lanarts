@@ -53,10 +53,26 @@ local function simple_tunnels(map, tileset)
     oper(map, MapGen.ROOT_GROUP, bbox_create({0,0}, map.size))
 end
 
-function first_map_create() 
+local function area_temp_apply()
     local tileset = TileSets.grass
-    local solid_square = MapGen.square { flags = MapGen.FLAG_SOLID, content = tileset.wall}
-    local map = MapGen.map_create { size = {80,80}, fill = solid_square, instances = {} }
+    local area_temp = MapGen.area_template_create {
+        data_file = "res/maps/test-template.txt",
+        legend = { ['x'] = { add = {MapGen.FLAG_SEETHROUGH, MapGen.FLAG_SOLID}, content = tileset.wall }, 
+                   ['.'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor } }
+    }
+    local map = MapGen.map_create { size = area_temp.size, content = tileset.wall, instances = {} }
+    area_temp:apply { map = map }
+
+    local map_id = World.map_create { map = map, instances = map.instances }
+    World.players_spawn(map_id)
+    return map_id
+end
+
+first_map_create = area_temp_apply
+
+function sfirst_map_create() 
+    local tileset = TileSets.grass
+    local map = MapGen.map_create { size = {80,80}, flags = MapGen.FLAG_SOLID, content = tileset.wall, instances = {} }
 
     simple_bsp_operator(map, tileset)(map, MapGen.ROOT_GROUP, bbox_create({0,0}, map.size))
     simple_tunnels(map, tileset)

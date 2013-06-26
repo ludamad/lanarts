@@ -66,6 +66,26 @@ struct PlayerDataProxy {
 	}
 };
 
+
+static Tile resolve_tile(ldungeon_gen::Map& map, MTwist& mt, Pos& xy) {
+	using namespace ldungeon_gen;
+	int tileid, subtileid;
+
+	TileEntry& entry = res::tile(tileid);
+	TileLayoutRules& rules = entry.layout_rules;
+
+	/* Simple random tile */
+	if (rules.orientations.empty()) {
+		subtileid = mt.rand(rules.rest);
+	} else {
+		/* Oriented tile. */
+		// Check if the tiles in the surrounding area are the same as this one.
+		bool same_tile[3][3];
+
+	}
+	return Tile(tileid, subtileid);
+}
+
 static int world_map_create(LuaStackValue args) {
 	using namespace luawrap;
 	using namespace ldungeon_gen;

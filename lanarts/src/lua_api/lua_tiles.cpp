@@ -24,9 +24,29 @@
 
 #include "draw/TileEntry.h"
 
-static int tile_create(LuaStackValue imagelist) {
+
+static int tile_create(LuaStackValue args) {
+	lua_State* L = args.luastate();
 	TileEntry entry;
-	entry.images = imagelist.as<std::vector<ldraw::Image> >();
+	LuaField images = args["images"];
+	if (!images.isnil()) {
+		entry.images = images.as<ImageList>();
+		entry.layout_rules.rest = Range(0, entry.images.size());
+	} else {
+		LuaField img_orients= args["image_orientations"];
+		std::vector<ImageList> orients = img_orients["orientations"].as<std::vector<ImageList> >();
+		if (orients.size() != 9) {
+			lua_pushstring(L, "Expected 9 entries in image_orientations.orientations.");
+			return lua_error(L);
+		}
+		for (int i = 0; i < orients.size(); i++) {
+			ImageList& list = orients[i];
+			int start_ind = entry.images.size();
+			entry.images.insert(entry.images.end(), list.begin(), list.end());
+			entry.layout_rules.orientations.push_back(
+					Range(start_ind, start_ind + list.size()));
+		}
+	}
 	game_tile_data.push_back(entry);
 	return game_tile_data.size() - 1;
 }

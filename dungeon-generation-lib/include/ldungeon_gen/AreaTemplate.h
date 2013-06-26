@@ -23,22 +23,26 @@
 namespace ldungeon_gen {
 
 	struct Glyph {
-		Square square;
+		ConditionalOperator oper;
 		LuaValue value; /* event, passed map and xy */
-		Glyph(Square square = Square(), LuaValue value = LuaValue()) : square(square), value(value) {
+		Glyph(ConditionalOperator oper = ConditionalOperator(), LuaValue value = LuaValue()) :
+				oper(oper), value(value) {
 		}
 	};
 
 	/* Attempts to place a template in the given location */
 	class AreaTemplate {
 	public:
-		// TODO TEST
-		AreaTemplate(const char* data, int data_width, Size size);
+		AreaTemplate(const char* data, Size size);
 		~AreaTemplate();
 
 		void define_glyph(char key, Glyph glyph);
 		void apply(MapPtr map, group_t parent_group_id, const Pos& xy,
 				bool flipX = false, bool flipY = false, bool create_subgroup = true);
+
+		Size size() const {
+			return _grid->size();
+		}
 	private:
 		smartptr< Grid<char> > _grid;
 		std::map<char, Glyph> _legend;
