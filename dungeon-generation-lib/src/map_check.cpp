@@ -3,6 +3,7 @@
  *  Various algorithms for querying a map.
  */
 
+#include <cstdio>
 #include <cstdlib>
 
 #include "map_check.h"
@@ -42,5 +43,35 @@ namespace ldungeon_gen {
 
 		return true;
 	}
-}
+	AreaQueryBase::~AreaQueryBase() {
 
+	}
+
+	RectangleQuery::RectangleQuery(Selector fill_selector) :
+			fill_selector(fill_selector), perimeter(0) {
+	}
+
+	RectangleQuery::RectangleQuery(Selector fill_selector, int perimeter,
+			Selector perimeter_selector) :
+			fill_selector(fill_selector), perimeter(perimeter), perimeter_selector(
+					perimeter_selector) {
+	}
+
+	bool RectangleQuery::matches(MapPtr map, group_t parent_group_id,
+			const BBox& rect) {
+		return rectangle_matches(*map, rect, fill_selector, perimeter, perimeter_selector);
+	}
+
+	bool find_random_square(MTwist& randomizer, MapPtr map, const BBox& bbox,
+			Selector selector, Pos& xy, int max_attempts) {
+		for (int i = 0; i < max_attempts; i++) {
+			int w = bbox.width(), h = bbox.height();
+			int x = bbox.x1 + randomizer.rand(w), y = bbox.y1 + randomizer.rand(h);
+			if ((*map)[Pos(x,y)].matches(selector)) {
+				xy = Pos(x,y);
+				return true;
+			}
+		}
+		return false;
+	}
+}

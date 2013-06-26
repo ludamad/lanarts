@@ -15,6 +15,8 @@
 #include <luawrap/functions.h>
 #include <luawrap/calls.h>
 
+#include "gamestate/GameState.h"
+
 #include "lua_newapi.h"
 
 #include <lcommon/math_util.h>
@@ -271,6 +273,42 @@ static void lapi_add_search_path(LuaStackValue path) {
 	lua_api::add_search_path(path.luastate(), path.to_str());
 }
 
+static int lapi_random(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	int nargs = lua_gettop(L);
+	int min = 0, max = 0;
+	if (nargs == 1) {
+		// array[1]
+		lua_rawgeti(L, 1, 1);
+		min = lua_tointeger(L, -1);
+		// array[2]
+		lua_rawgeti(L, 1, 2);
+		max = lua_tointeger(L, -1);
+		lua_pop(L, 2);
+	} else if (nargs > 1) {
+		min = lua_tointeger(L, 1);
+		max = lua_tointeger(L, 2);
+	}
+
+	lua_pushnumber(L, gs->rng().rand(min, max + 1));
+	return 1;
+}
+
+static BBox lapi_random_subregion(LuaStackValue lbox, Size size) {
+	BBox bbox = lbox.as<BBox>();
+	GameState* gs = lua_api::gamestate(lbox);
+
+    int x = gs->rng().rand(bbox.x1, bbox.x2 - size.w);
+    int y = gs->rng().rand(bbox.y1, bbox.y2 - size.h);
+
+    return BBox(Pos(x,y), size);
+}
+
+static bool lapi_chance(LuaStackValue val) {
+	GameState* gs = lua_api::gamestate(val);
+	return gs->rng().rand(RangeF(0,1)) < val.to_num();
+}
+
 namespace lua_api {
 	void event_projectile_hit(lua_State* L, ProjectileInst* projectile,
 			GameInst* target) {
@@ -292,6 +330,9 @@ namespace lua_api {
 		globals["newtype"].bind_function(lapi_newtype);
 		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);
+		globals["random"].bind_function(lapi_random);
+		globals["random_subregion"].bind_function(lapi_random_subregion);
+		globals["chance"].bind_function(lapi_chance);
 
 		globals["require_path_add"].bind_function(lapi_add_search_path);
 

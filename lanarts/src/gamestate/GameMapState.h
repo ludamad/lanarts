@@ -1,10 +1,10 @@
 /*
- * GameRoomState.h:
- *  Contains game room data (room == dungeon level == dungeon floor)
+ * GameMapState.h:
+ *  Contains game map (level) data
  */
 
-#ifndef GAMEROOMSTATE_H_
-#define GAMEROOMSTATE_H_
+#ifndef GAMEMAPSTATE_H_
+#define GAMEMAPSTATE_H_
 
 #include <vector>
 
@@ -34,15 +34,15 @@ struct GameRoomPortal {
 	}
 };
 
-class GameRoomState {
+class GameMapState {
 public:
-	GameRoomState(level_id levelid, const Size& size,
+	GameMapState(level_id levelid, const Size& size,
 			bool wandering_flag = true, bool is_simulation = false);
-	~GameRoomState();
+	~GameMapState();
 
 	int room_within(const Pos& p);
-	void copy_to(GameRoomState & level) const;
-	GameRoomState* clone() const;
+	void copy_to(GameMapState & level) const;
+	GameMapState* clone() const;
 
 	int width() const {
 		return _size.w;
@@ -109,4 +109,4 @@ private:
 	bool _is_simulation;
 };
 
-#endif /* GAMEROOMSTATE_H_ */
+#endif /* GAMEMAPSTATE_H_ */

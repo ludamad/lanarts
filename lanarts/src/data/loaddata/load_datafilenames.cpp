@@ -37,7 +37,7 @@ DataFiles load_datafilenames(const char* filename) {
 			optional_set(root, "effect_files", dfiles.effect_files);
 			optional_set(root, "item_files", dfiles.item_files);
 			optional_set(root, "itemgenlist_files", dfiles.itemgenlist_files);
-			optional_set(root, "room_files", dfiles.room_files);
+			optional_set(root, "map_files", dfiles.map_files);
 			optional_set(root, "room_template_files", dfiles.room_template_files);
 			optional_set(root, "projectile_files", dfiles.projectile_files);
 			optional_set(root, "spell_files", dfiles.spell_files);

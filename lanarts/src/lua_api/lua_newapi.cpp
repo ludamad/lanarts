@@ -6,7 +6,14 @@
 #include <luawrap/luawrap.h>
 #include <luawrap/calls.h>
 #include <luawrap/luameta.h>
+
+#include <lcommon/lua_utils.h>
+
 #include <ldraw/lua_ldraw.h>
+
+#include <ldungeon_gen/lua_ldungeon.h>
+
+#include "gamestate/GameState.h"
 
 #include "lua_api/lua_yaml.h"
 #include "lua_api/lua_api.h"
@@ -216,13 +223,16 @@ namespace lua_api {
 		lua_lanarts_api(gs, L); // TODO: Deprecated
 
 		LuaValue globals = luawrap::globals(L);
-		LuaValue game = luawrap::ensure_table(globals["Game"]);
+		LuaValue game = lua_ensure_protected_table(globals["Game"]);
 		// Holds engine hooks
 		LuaValue engine = luawrap::ensure_table(globals["Engine"]);
 
 		register_gamestate(gs, L);
 		register_general_api(L);
 
+		luawrap::ensure_table(globals["MapGen"]);
+
+		ldungeon_gen::lua_register_ldungeon(globals["MapGen"], &gs->rng(), false);
 		register_lua_libraries(L);
 		register_io_api(L);
 		register_net_api(L);
@@ -230,6 +240,7 @@ namespace lua_api {
 		register_gameworld_api(L);
 		register_event_log_api(L);
 		register_display_api(L);
+		register_tiles_api(L);
 	}
 
 	void luacall_post_draw(lua_State* L) {

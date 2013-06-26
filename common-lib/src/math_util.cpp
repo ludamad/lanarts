@@ -73,6 +73,12 @@ void normalize(float& x, float& y, float mag) {
 	y *= mag / curr_mag;
 }
 
+int signum(int val) {
+	if (val > 0) return +1;
+	if (val < 0) return -1;
+	return 0;
+}
+
 /* Integer division, but rounding up instead of down */
 int round_up_divide(int value, int divisor) {
 	return (value + divisor - 1) / divisor;

@@ -48,7 +48,7 @@ static int lua_lanarts_panic(lua_State* L) {
 
 void lua_lanarts_api(GameState* state, lua_State* L) {
 	LuaValue globals(L, LUA_GLOBALSINDEX);
-	lua_register_lcommon(L, globals);
+	lua_register_lcommon(L);
 	ldraw::lua_register_ldraw(L, globals);
 
 	lua_atpanic(L, lua_lanarts_panic);

@@ -34,6 +34,9 @@ __inline long int round2int (float flt) {
 }
 #endif
 
+/* Returns -1, 0, or +1 depending on sign */
+int signum(int val);
+
 int squish(int a, int b, int c);
 
 Pos centered_multiple(const Pos& pos, int mult);

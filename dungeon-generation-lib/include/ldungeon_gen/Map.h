@@ -12,6 +12,9 @@
 #include <lcommon/Grid.h>
 #include <lcommon/int_types.h>
 #include <lcommon/mtwist.h>
+#include <lcommon/smartptr.h>
+
+#include <luawrap/LuaValue.h>
 
 class SerializeBuffer;
 
@@ -22,10 +25,10 @@ namespace ldungeon_gen {
 	const uint16 FLAG_TUNNEL = 1 << 2;
 	const uint16 FLAG_HAS_OBJECT = 1 << 3;
 	const uint16 FLAG_NEAR_PORTAL = 1 << 4;
+	const uint16 FLAG_SEETHROUGH = 1 << 5;
 	/* For future use */
-	const uint16 FLAG_RESERVED1 = 1 << 5;
-	const uint16 FLAG_RESERVED2 = 1 << 6;
-	const uint16 FLAG_RESERVED3 = 1 << 7;
+	const uint16 FLAG_RESERVED1 = 1 << 6;
+	const uint16 FLAG_RESERVED2 = 1 << 7;
 
 	/* Identifies squares to act on based on their fields.
 	 */
@@ -83,6 +86,8 @@ namespace ldungeon_gen {
 	struct ConditionalOperator {
 		Selector selector;
 		Operator oper;
+		ConditionalOperator() {
+		}
 		ConditionalOperator(Selector selector, Operator oper) :
 						selector(selector),
 						oper(oper) {
@@ -98,7 +103,7 @@ namespace ldungeon_gen {
 		/* Group this square belongs to */
 		uint16 group;
 
-		Square(uint16 flags = FLAG_SOLID, uint16 content = 0, uint16 group = 0) :
+		Square(uint16 flags = 0, uint16 content = 0, uint16 group = 0) :
 						flags(flags),
 						content(content),
 						group(group) {
@@ -112,6 +117,7 @@ namespace ldungeon_gen {
 							|| content == selector.must_be_content);
 		}
 		inline void apply(Operator oper) {
+			/* By turning off first, we can wipe all flags and set new ones */
 			flags &= ~oper.turn_off_bits;
 			flags |= oper.turn_on_bits;
 			flags ^= oper.flip_bits;
@@ -154,6 +160,8 @@ namespace ldungeon_gen {
 	public:
 		Map(const Size& size = Size(), const Square& fill_value = Square());
 		std::vector<Group> groups;
+		LuaValue luafields;
+
 		group_t make_group(const BBox& area, int parent_group_id);
 
 		/* For testing purposes with serialization */
@@ -165,6 +173,8 @@ namespace ldungeon_gen {
 		void serialize(SerializeBuffer& serializer) const;
 		void deserialize(SerializeBuffer& serializer);
 	};
+
+	typedef smartptr<Map> MapPtr;
 }
 
 #endif /* MAP_H_ */

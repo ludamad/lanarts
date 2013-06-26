@@ -15,6 +15,7 @@ CollisionAvoidance::CollisionAvoidance() {
 	simulator->setTimeStep(1.0f);
 }
 
+
 CollisionAvoidance::~CollisionAvoidance() {
 	delete simulator;
 }

@@ -6,12 +6,14 @@
  *  	- Random rectangle placement
  */
 
-#ifndef MAP_FILL_H_
-#define MAP_FILL_H_
+#ifndef LDUNGEON_MAP_FILL_H_
+#define LDUNGEON_MAP_FILL_H_
 
 #include <lcommon/Range.h>
+#include <lcommon/smartptr.h>
 
 #include "Map.h"
+#include "map_check.h"
 
 namespace ldungeon_gen {
 
@@ -20,23 +22,26 @@ namespace ldungeon_gen {
 	public:
 		virtual ~AreaOperatorBase();
 		/* Should only return false if _nothing_ was done! */
-		virtual bool apply(Map& map, group_t parent_group_id, const BBox& rect) = 0;
+		virtual bool apply(MapPtr map, group_t parent_group_id, const BBox& rect) = 0;
 	};
+
+	typedef smartptr<AreaOperatorBase> AreaOperatorPtr;
 
 	/* Applies an operator to a rectangle, can operate separately on the perimeter */
 	struct RectangleApplyOperator: public AreaOperatorBase {
+		AreaQueryPtr query;
 		ConditionalOperator fill_oper, perimeter_oper;
 		int perimeter;
 		bool create_subgroup;
 
 		/* Apply to rectangle without a perimeter */
-		RectangleApplyOperator(ConditionalOperator fill_oper, bool create_subgroup = true);
+		RectangleApplyOperator(AreaQueryPtr query, ConditionalOperator fill_oper, bool create_subgroup = true);
 
 		/* Apply to rectangle with a perimeter */
-		RectangleApplyOperator(ConditionalOperator fill_oper, int perimeter,
+		RectangleApplyOperator(AreaQueryPtr query, ConditionalOperator fill_oper, int perimeter,
 				ConditionalOperator perimeter_oper, bool create_subgroup = true);
 
-		virtual bool apply(Map& map, group_t parent_group_id, const BBox& rect);
+		virtual bool apply(MapPtr map, group_t parent_group_id, const BBox& rect);
 	};
 
 	struct BSPApplyOperator: public AreaOperatorBase {
@@ -46,9 +51,9 @@ namespace ldungeon_gen {
 		int split_depth;
 		bool create_subgroup;
 
-		AreaOperatorBase& area_oper;
+		AreaOperatorPtr area_oper;
 
-		BSPApplyOperator(MTwist& randomizer, AreaOperatorBase& area_oper,
+		BSPApplyOperator(MTwist& randomizer, AreaOperatorPtr area_oper,
 				Size minimum_room_size, bool randomize_size = true,
 				int split_depth = 8, bool create_subgroup = true) :
 						area_oper(area_oper),
@@ -59,25 +64,31 @@ namespace ldungeon_gen {
 						create_subgroup(create_subgroup) {
 		}
 
-		virtual bool apply(Map& map, group_t parent_group_id, const BBox& rect);
+		virtual bool apply(MapPtr map, group_t parent_group_id, const BBox& rect);
 	};
 
 	struct RandomPlacementApplyOperator : public AreaOperatorBase {
-		int region_padding;
+        MTwist& randomizer;
 		Range amount_of_regions, size;
 		bool create_subgroup;
 
-		AreaOperatorBase& area_oper;
+		AreaOperatorPtr area_oper;
 
-		RandomPlacementApplyOperator(int region_padding, Range amount_of_regions, Range size,
-				AreaOperatorBase& area_oper, bool create_subgroup = true) :
-						region_padding(region_padding),
+		RandomPlacementApplyOperator(MTwist& randomizer,
+                Range amount_of_regions, Range size,
+				AreaOperatorPtr area_oper, bool create_subgroup = true) :
+                        randomizer(randomizer),
 						amount_of_regions(amount_of_regions),
 						size(size),
 						area_oper(area_oper),
 						create_subgroup(create_subgroup) {
 		}
+
+		virtual bool apply(MapPtr map, group_t parent_group_id, const BBox& rect);
+
+    private:
+        bool place_random(MapPtr map, group_t parent_group_id, Size size);
 	};
 }
 
-#endif /* MAP_FILL_H_ */
+#endif /* LDUNGEON_MAP_FILL_H_ */

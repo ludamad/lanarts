@@ -19,15 +19,6 @@
 #define snprintf _snprintf
 #endif
 
-//TODO remove from lanarts_defines.h
-/*Represents a single square tile*/
-struct Tile {
-	unsigned short tile, subtile;
-	Tile(int tile = 0, int subtile = 0) :
-			tile(tile), subtile(subtile) {
-	}
-};
-
 static const int TILE_SIZE = 32;
 
 /*Used to identify objects. Safe to store and use later, can query if object still in play.*/

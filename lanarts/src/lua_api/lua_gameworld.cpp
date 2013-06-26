@@ -5,14 +5,18 @@
 
 #include <SDL.h>
 
+#include <ldungeon_gen/Map.h>
+
 #include <lua.hpp>
 #include <luawrap/luawrap.h>
 #include <luawrap/functions.h>
 #include <luawrap/types.h>
 
 #include "gamestate/GameState.h"
-#include "gamestate/GameRoomState.h"
+#include "gamestate/GameMapState.h"
 #include "gamestate/GameSettings.h"
+
+#include "draw/TileEntry.h"
 
 #include "stats/ClassEntry.h"
 
@@ -62,6 +66,60 @@ struct PlayerDataProxy {
 	}
 };
 
+
+static Tile resolve_tile(ldungeon_gen::Map& map, MTwist& mt, Pos& xy) {
+	using namespace ldungeon_gen;
+	int tileid, subtileid;
+
+	TileEntry& entry = res::tile(tileid);
+	TileLayoutRules& rules = entry.layout_rules;
+
+	/* Simple random tile */
+	if (rules.orientations.empty()) {
+		subtileid = mt.rand(rules.rest);
+	} else {
+		/* Oriented tile. */
+		// Check if the tiles in the surrounding area are the same as this one.
+		bool same_tile[3][3];
+
+	}
+	return Tile(tileid, subtileid);
+}
+
+static int world_map_create(LuaStackValue args) {
+	using namespace luawrap;
+	using namespace ldungeon_gen;
+
+	GameState* gs = lua_api::gamestate(args);
+	MapPtr map = args["map"].as<MapPtr>();
+	GameMapState* game_map = gs->game_world().map_create(map->size(),
+			defaulted(args["wandering_enabled"], true));
+
+	GameTiles& tiles = game_map->tiles();
+	BBox bbox(Pos(), tiles.size());
+	FOR_EACH_BBOX(bbox, x, y) {
+		Tile& tile = tiles.get(Pos(x,y));
+		Square& square = (*map)[Pos(x,y)];
+		TileEntry& entry = res::tile(square.content);
+
+		int variations = entry.images.size();
+		tile.tile = square.content;
+		tile.subtile = gs->rng().rand(variations);
+		(*tiles.solidity_map())[Pos(x,y)] = ((square.flags & FLAG_SOLID) != 0);
+		(*tiles.seethrough_map())[Pos(x,y)] = ((square.flags & FLAG_SEETHROUGH) != 0);
+	}
+
+	if (!args["instances"].isnil()) {
+		typedef std::vector<GameInst*> InstanceList;
+		InstanceList instances = args["instances"].as<InstanceList>();
+		for (int i = 0; i < instances.size(); i++) {
+			gs->add_instance(game_map->id(), instances[i]);
+		}
+	}
+
+	return game_map->id();
+}
+
 static int world_players(lua_State* L) {
 	int nplayers = lua_api::gamestate(L)->player_data().all_players().size();
 	lua_newtable(L);
@@ -77,6 +135,12 @@ static int world_local_player(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	luawrap::push(L, (GameInst*) gs->local_player());
 	return 1;
+}
+
+static void world_players_spawn(LuaStackValue level_id) {
+	GameState* gs = lua_api::gamestate(level_id);
+	GameMapState* map = gs->game_world().get_level(level_id.to_int());
+	gs->game_world().spawn_players(map);
 }
 
 // level functions
@@ -105,6 +169,14 @@ static int room_objects(lua_State* L) {
 	room_objects_list(L);
 	lua_call(L, 1, 1);
 	return 1;
+}
+
+static void room_add_instance(LuaStackValue gameinst) {
+	GameInst* inst = gameinst.as<GameInst*>();
+	if (inst->current_floor != -1) {
+		luawrap::error("Attempt to add game instance that was already added!");
+	}
+	lua_api::gamestate(gameinst)->add_instance(inst);
 }
 
 static int room_monsters_list(lua_State* L) {
@@ -202,6 +274,10 @@ namespace lua_api {
 
 		LuaValue metatable = luameta_new(L, "world table");
 		LuaValue getters = luameta_getters(metatable);
+		LuaValue methods = luameta_constants(metatable);
+
+		methods["map_create"].bind_function(world_map_create);
+		methods["players_spawn"].bind_function(world_players_spawn);
 
 		getters["players"].bind_function(world_players);
 		getters["local_player"].bind_function(world_local_player);
@@ -227,6 +303,7 @@ namespace lua_api {
 		room["objects_list"].bind_function(room_objects_list);
 		room["objects"].bind_function(room_objects);
 
+		room["add_instance"].bind_function(room_add_instance);
 		room["instance"].bind_function(room_instance);
 
 		room["monsters_list"].bind_function(room_monsters_list);

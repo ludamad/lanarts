@@ -20,6 +20,7 @@ include_directories(
 	src/
 	"${SRC}/common-lib/include"
 	"${SRC}/draw-lib/include"
+	"${SRC}/dungeon-generation-lib/include"
 	${SRC} # for net
 	"${SRC}/luawrap-lib/include"
 	"${SRC}/sound-lib/include"
@@ -28,6 +29,7 @@ include_directories(
 	${DEPS}/lua 
 	${DEPS} # for rvo2 & luasocket
 	)
+
 
 file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
     src/include/* 
@@ -109,6 +111,7 @@ set (libraries
 	lanartslib
 	ldraw
 	lcommon
+	lanarts_dungeon_gen
 	lsound
 	lua
 	luasocket

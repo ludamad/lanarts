@@ -377,7 +377,8 @@ BBoxF BBoxF::translated(const PosF& pos) const {
 }
 
 BBox BBox::grow(int amount) const {
-	return BBox(x1 - amount, y1 - amount, x2 + amount, y2 + amount);
+	return BBox(Pos(x1 - amount, y1 - amount),
+			Size(std::max(0, width() + amount*2), std::max(0, height() + amount*2)));
 }
 
 BBox BBox::resized_within(const BBox& o) const {

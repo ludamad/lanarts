@@ -31,10 +31,11 @@ void fov::calculate(GameState* gs, int ptx, int pty) {
 	this->ptx = ptx, this->pty = pty;
 	this->sx = ptx - radius, this->sy = pty - radius;
 
-	int radius_squared = radius * radius;
+	float radius_squared = (radius-.5) * (radius-.5);
 
 	for (int y = -radius; y <= radius; y++) {
 		for (int x = -radius; x <= radius; x++) {
+
 			if (x * x + y * y < radius_squared) {
 				m.set(x, y);
 			} else {

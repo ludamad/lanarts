@@ -13,10 +13,10 @@
 #include "lua_geometry.h"
 #include "lua_range.h"
 
-void lua_register_lcommon(lua_State* L, const LuaValue& module) {
-	lua_register_timer(L, module);
+void lua_register_lcommon(lua_State* L) {
+	LuaValue globals = luawrap::globals(L);
+	lua_register_timer(L, globals);
 
-	lua_register_geometry(L, module);
-	lua_register_range(L, module);
+	lua_register_geometry(L, globals);
+	lua_register_range(L, globals);
 }
-

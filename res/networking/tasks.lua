@@ -7,8 +7,9 @@ local task_list = {}
 
 Task = newtype()
 
-function Task:init(fn) 
+function Task:init(fn, err_handler) 
     self.task_coroutine = coroutine.create(fn)
+    self.err_handler = err_handler or false
     task_list[#task_list+1] = self
 end
 
@@ -23,8 +24,12 @@ function Task.run_all()
         local status, err = task_list[i]:resume()
         if not status then
             if err and err ~= 'cannot resume dead coroutine' then 
-                if type(err) ~= "string" then err = pretty_tostring(err) end
-                error(err) 
+            	if task_list[i].err_handler then
+            		task_list[i]:err_handler()
+            	else
+		            if type(err) ~= "string" then err = pretty_tostring(err) end
+		            print(err)
+                end 
             end
             table.remove(task_list, i)
         else

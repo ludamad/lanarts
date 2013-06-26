@@ -12,6 +12,8 @@
 
 #include <lcommon/lua_lcommon.h>
 
+#include "data/FilenameList.h"
+
 #include "draw/fonts.h"
 
 #include "lua_api/lua_api.h"
@@ -19,6 +21,7 @@
 #include "stats/items/EquipmentEntry.h"
 #include "stats/items/ItemEntry.h"
 #include "stats/items/ProjectileEntry.h"
+#include "stats/items/WeaponEntry.h"
 #include "stats/items/WeaponEntry.h"
 
 #include "game_data.h"
@@ -247,7 +250,7 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 	update_loading_screen(L, 70, "Loading Dungeon Areas");
 	load_area_template_data(dfiles.room_template_files);
 	update_loading_screen(L, 80, "Loading Dungeon Generation Templates");
-	lua_dungeon = load_dungeon_data(L, dfiles.room_files);
+	lua_dungeon = load_dungeon_data(L, dfiles.map_files);
 	update_loading_screen(L, 90, "Loading Classes");
 	lua_dungeon.clear();
 	lua_classes = load_class_data(L, dfiles.class_files);

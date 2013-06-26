@@ -43,6 +43,10 @@ function Engine.resources_load(...)
     dofile "res/spells/spell_effects.lua"
 end
 
+function Engine.resources_post_load(...)
+    require "tiles.tilesets"
+end
+
 function Engine.game_start(...)
     require "game_loop"
 
@@ -71,4 +75,10 @@ function Engine.event_occurred(...)
     require "event_occurred"
 
     return event_occurred(...)
+end
+
+function Engine.first_map_create(...)
+	require "maps.map_generation"
+
+	return first_map_create(...)
 end

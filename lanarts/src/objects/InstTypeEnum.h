@@ -22,7 +22,6 @@ enum InstType {
 	FEATURE_INST,
 	ITEM_INST,
 	PROJECTILE_INST,
-	SCRIPTED_INST,
 	INVALID_INST
 };
 
@@ -80,7 +79,7 @@ inline GameInst* from_inst_type(InstType type) {
 	case FEATURE_INST:
 		return new FeatureInst(Pos(), FeatureInst::feature_t(NONE), false);
 	case ITEM_INST:
-		return new ItemInst(Item(), NONE, NONE);
+		return new ItemInst(Item(), Pos());
 	case PROJECTILE_INST:
 		return new ProjectileInst(Projectile(), EffectiveAttackStats(), NONE,
 				Pos(), Pos(), NONE, NONE);

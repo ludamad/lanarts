@@ -42,6 +42,7 @@ public:
 	/* Looks up a lua stack value */
 	LuaField(lua_State* L, int stackidx, const char* index);
 	LuaField(lua_State* L, int stackidx, int index);
+	LuaField(lua_State* L, int stackidx);
 
 	/** Getters **/
 	lua_State* luastate() const {

@@ -15,9 +15,9 @@ public:
 	enum {
 		RADIUS = 15, DEPTH = 100
 	};
-	ItemInst(const Item& item, int x, int y, obj_id dropped_by = 0,
+	ItemInst(const Item& item, const Pos& xy, obj_id dropped_by = 0,
 			bool pickup_by_dropper = false) :
-			GameInst(x, y, RADIUS, false, DEPTH), item(item), dropped_by(
+			GameInst(xy.x, xy.y, RADIUS, false, DEPTH), item(item), dropped_by(
 					dropped_by), pickup_by_dropper(pickup_by_dropper), was_seen(false) {
 	}
 	virtual ~ItemInst();

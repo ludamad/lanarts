@@ -34,7 +34,7 @@ SUITE(WeaponEntry) {
 				"}";
 
 		TestLuaState L;
-		lua_register_lcommon(L, luawrap::globals(L));
+		lua_register_lcommon(L);
 		setup_mock_data();
 
 		WeaponEntry item;

@@ -46,6 +46,7 @@ public:
 	 * Access the underlying vector directly.
 	 */
 	Ref raw_get(int idx) {
+		LCOMMON_ASSERT(idx >= 0 && idx < _contents.size());
 		return _contents[idx];
 	}
 
@@ -53,6 +54,7 @@ public:
 	 * Access the underlying vector directly (but unmodifiable).
 	 */
 	ConstRef raw_get(int idx) const {
+		LCOMMON_ASSERT(idx >= 0 && idx < _contents.size());
 		return _contents[idx];
 	}
 

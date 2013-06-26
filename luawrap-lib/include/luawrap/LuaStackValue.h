@@ -41,6 +41,9 @@ public:
 		return idx;
 	}
 
+	// We can convert to a forwarding LuaField for API convenience
+	operator LuaField() const ;
+
 	// Convert to any type
 	template<typename T>
 	T as() const;

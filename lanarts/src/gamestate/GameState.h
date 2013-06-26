@@ -33,7 +33,7 @@
 #include "PlayerData.h"
 
 struct lua_State;
-class GameRoomState;
+class GameMapState;
 class GameTiles;
 
 class GameInst;
@@ -220,11 +220,11 @@ public:
 	int key_press_state(int keyval);
 
 	/* Level utility functions */
-	GameRoomState* get_level() {
+	GameMapState* get_level() {
 		return world.get_current_level();
 	}
 
-	void set_level(GameRoomState* lvl);
+	void set_level(GameMapState* lvl);
 	void level_move(int id, int x, int y, int roomid1, int roomid2);
 	/* Make sure rooms exist & portals point to valid locations in next room */
 	void ensure_level_connectivity(int roomid1, int roomid2);

@@ -335,7 +335,7 @@ void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 	bool already_item_here = gs->object_radius_test(dropx, dropy,
 			ItemInst::RADIUS, item_colfilter);
 	if (!already_item_here) {
-		gs->add_instance(new ItemInst(itemslot.item, dropx, dropy, id));
+		gs->add_instance(new ItemInst(itemslot.item, Pos(dropx, dropy), id));
 		itemslot.clear();
 	}
 	if (this->local) {

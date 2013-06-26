@@ -7,6 +7,7 @@
 #include "lua_geometry.h"
 #include "unittest.h"
 
+
 template<typename T>
 void lua_generic_pushget_test(lua_State* L, const T& value) {
 	luawrap::push<T>(L, value);

@@ -100,7 +100,7 @@ static const LayoutGenSettings& choose_random_layout(MTwist& mt,
 	return ls.layouts[layout_index];
 }
 
-GameRoomState* generate_level(int roomid, MTwist& mt, GeneratedRoom& level,
+GameMapState* generate_level(int roomid, MTwist& mt, GeneratedRoom& level,
 		GameState* gs) {
 	DungeonBranch& branch = game_dungeon_data[DNGN_MAIN_BRANCH];
 
@@ -120,9 +120,9 @@ GameRoomState* generate_level(int roomid, MTwist& mt, GeneratedRoom& level,
 			h + LEVEL_BORDER_PAD);
 	int pxw = lw * TILE_SIZE, pxh = lh * TILE_SIZE;
 
-	GameRoomState* newlvl = new GameRoomState(roomid, Size(pxw, pxh), wandering);
+	GameMapState* newlvl = new GameMapState(roomid, Size(pxw, pxh), wandering);
 
-	GameRoomState* prevlvl = gs->get_level(); //Save level context
+	GameMapState* prevlvl = gs->get_level(); //Save level context
 	gs->set_level(newlvl); //Set level context to new level
 
 	level.initialize(w, h, layout.solid_fill);

@@ -53,7 +53,7 @@ void generate_items(const ItemGenSettings& is, MTwist& mt,
 
 		const ItemGenChance& igc = generate_item_choice(mt, is.itemgenlist);
 		int quantity = mt.rand(igc.quantity);
-		gs->add_instance(new ItemInst(Item(igc.itemtype, quantity), ix, iy));
+		gs->add_instance(new ItemInst(Item(igc.itemtype, quantity), Pos(ix, iy)));
 		level.at(ipos).has_instance = true;
 	}
 }
