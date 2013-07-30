@@ -101,6 +101,15 @@ function table.pop_first(t)
     return val
 end
 
+function table.clear(t)
+    for i=#t,1 do
+        t[i] = nil
+    end
+    for k,v in pairs(t) do
+        t[k] = nil
+    end
+end
+
 function table.pop_last(t)
     local val = t[#t]
     t[#t] = nil
@@ -122,3 +131,19 @@ function pretty_print(val, --[[Optional]] tabs, --[[Optional]] packed)
     print(pretty_tostring(val, tabs, packed))
 end
 
+--- Iterate all iterators one after another
+function iter_combine(...)
+    local args = {...}
+    local arg_n = #args
+    local arg_i = 1
+    local iter = args[arg_i]
+    return function()
+        while true do
+            if not iter then return nil end
+            local val = iter()
+            if val ~= nil then return val end
+            arg_i = arg_i + 1
+            iter = args[arg_i]
+        end
+    end
+end

@@ -56,6 +56,14 @@ function vector_divide(v1, v2)
     return ret
 end
 
+function table.add(a,b)
+    for k,v in pairs(b) do
+        local bval = b[k]
+        if type(bval) == "table" then table.add(a[k], bval)
+        else a[k] = (a[k] or 0) + bval end
+    end
+end
+
 --- Returns the position of an object of size 'size' aligned to a bounding box origin (eg, RIGHT_BOTTOM)
 -- @param bbox the surrounding bounding box
 -- @param origin the origin within the bounding box

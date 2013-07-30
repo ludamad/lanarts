@@ -14,6 +14,7 @@
 #include <luawrap/luawrap.h>
 #include <luawrap/functions.h>
 #include <luawrap/calls.h>
+#include <lcommon/directory.h>
 
 #include "gamestate/GameState.h"
 
@@ -29,10 +30,101 @@ static int lapi_table_merge(lua_State* L) {
 		lua_pushvalue(L, -2); // value
 		lua_settable(L, 1);
 
-		lua_pop( L, 1);
+		lua_pop(L, 1);
 		// pop value
 	}
-	lua_pop( L, 1);
+	lua_pop(L, 1);
+	return 0;
+}
+// Delete different keys
+static int lapi_table_remove_nonexisting(lua_State* L) {
+	lua_pushnil(L);
+	while (lua_next(L, 2)) {
+		lua_pushvalue(L, -2); // key
+		lua_pushvalue(L, -1); // key
+		lua_rawget(L, 1);
+		if (lua_isnil(L, -1)) {
+			// Set entry to nil, not in other table.
+			lua_rawset(L, 2);
+		} else {
+			lua_pop(L, 2);
+		}
+		lua_pop(L, 1); // pop value
+	}
+	lua_pop(L, 1);
+	return 0;
+}
+
+static bool metacopy(lua_State* L) {
+	// Ensure same meta-table, call __copy metamethod if exists
+	if (lua_getmetatable(L, 1)) {
+		lua_setmetatable(L, 2);
+		lua_getmetatable(L, 1);
+
+		// Call __copy metamethod if not nil, skipping the rest of the copying.
+		lua_getfield(L, -1, "__copy");
+		if (!lua_isnil(L, -1)) {
+			lua_pushvalue(L, 1);
+			lua_pushvalue(L, 2);
+			lua_call(L, 2, 0);
+			return true;
+		}
+		lua_pop(L, 1);
+	}
+	return false;
+}
+
+static int lapi_table_copy(lua_State* L) {
+	if (metacopy(L)) {
+		return 0;
+	}
+
+	lua_pushnil(L);
+
+	while (lua_next(L, 2)) {
+		lua_pushvalue(L, -2); // key
+		lua_pushvalue(L, -2); // value
+		lua_settable(L, 1);
+
+		lua_pop(L, 1);
+		// pop value
+	}
+	lua_pop(L, 1);
+	return 0;
+}
+
+// Works with plain-data tables and not-too-special tables.
+static int lapi_table_deep_copy(lua_State* L) {
+	if (metacopy(L)) {
+		return 0;
+	}
+
+	// Deep copy over members
+	lua_pushnil(L);
+	while (lua_next(L, 1)) {
+		lua_pushvalue(L, -2); // key
+		LuaStackValue key(L, -1);
+		lua_pushvalue(L, -2); // value
+		LuaStackValue value(L, -1);
+
+		key.push();
+		lua_rawget(L, 2); // push current value
+		if (lua_istable(L, -1) && lua_istable(L, value.index())) {
+			// Recursively deep copy
+			lua_pushcfunction(L, lapi_table_deep_copy);
+			lua_pushvalue(L, -2); // push current value
+			value.push();
+			lua_call(L, 2, 0);
+			lua_pop(L, 1);
+		} else {
+			lua_pop(L, 1);
+			lua_rawset(L, 2);
+		}
+
+		lua_pop(L, 1); // pop value
+	}
+	// Note, calling this directly works only because the arguments are in the same order!
+	lapi_table_remove_nonexisting(L);
 	return 0;
 }
 
@@ -59,7 +151,6 @@ static int lapi_values_aux(lua_State* L) {
 // Try getters, then methods, then inherited __index
 static int lapi_newtype_index(lua_State* L) {
 	// Upvalue 1: Getters
-
 	lua_pushvalue(L, 2); // key
 	lua_gettable(L, lua_upvalueindex(1)); // Push getter
 
@@ -68,18 +159,14 @@ static int lapi_newtype_index(lua_State* L) {
 		lua_call(L, 1, 1); // Call getter with obj
 		return 1;
 	}
-
 	// Upvalue 2: Metatable
-
 	lua_pushvalue(L, 2); // key
 	lua_rawget(L, lua_upvalueindex(2)); // metatable table
 
 	if (!lua_isnil(L, -1)) {
 		return 1;
 	}
-
 	// Upvalue 3: Inherited metatable
-
 	if (!lua_isnil(L, lua_upvalueindex(3))) {
 		lua_getfield(L, lua_upvalueindex(3), "__index");
 		lua_pushvalue(L, 1); // obj
@@ -98,7 +185,6 @@ static int lapi_newtype_index(lua_State* L) {
 
 static int lapi_newtype_newindex(lua_State* L) {
 	// Upvalue 1: Setters
-
 	lua_pushvalue(L, 2); // key
 	lua_gettable(L, lua_upvalueindex(1)); // Push setter
 
@@ -108,9 +194,7 @@ static int lapi_newtype_newindex(lua_State* L) {
 		lua_call(L, 2, 0); // Call setter with obj, value
 		return 0;
 	}
-//
-//	// Upvalue 2: Inherited metatable
-
+	// Upvalue 2: Inherited metatable
 	if (!lua_isnil(L, lua_upvalueindex(2))) {
 		lua_getfield(L, lua_upvalueindex(2), "__newindex");
 		lua_pushvalue(L, 1); // obj
@@ -273,6 +357,92 @@ static void lapi_add_search_path(LuaStackValue path) {
 	lua_api::add_search_path(path.luastate(), path.to_str());
 }
 
+// Replace '/' or '\' by '.', placing it in 'dot-form'
+// Remove any pre-existing '.', as this would mess with the path handing algorithms.
+static void path2dotform(std::string& str) {
+	std::string dotform;
+	int i = 0;
+	// Remove any separators or dots at beginning
+	for (; i < str.size(); i++) {
+		if (str[i] != '\\' && str[i] != '/' && str[i] != '.') {
+			break;
+		}
+	}
+	// Replace separators, remove dots
+	for (; i < str.size(); i++) {
+		if (str[i] == '\\' || str[i] == '/') {
+			dotform += '.';
+		} else if (str[i] != '.') {
+			dotform += str[i];
+		}
+	}
+	str = dotform;
+}
+
+static void dotform_chop_until_dot(std::string& str) {
+	while (!str.empty() && str[str.size()-1] != '.') {
+		str.resize(str.size() - 1);
+	}
+}
+
+static void dotform_chop_trailing_dots(std::string& str) {
+	// Chop trailing dots from cwd
+	while (!str.empty() && str[str.size()-1] == '.') {
+		str.resize(str.size() - 1);
+	}
+}
+
+static void dotform_chop_component(std::string& str) {
+	dotform_chop_until_dot(str);
+	dotform_chop_trailing_dots(str);
+}
+
+// Delegates to 'require', readjusts a relative 'dot-form' path
+static int lapi_require_relative(lua_State* L) {
+	// Resolve backtracks, ie every occurrence of < goes up one directory
+	const char* req_arg = lua_tostring(L, 1);
+	int backtracks = 0;
+	while (*req_arg == '<') {
+		backtracks++, req_arg++;
+	}
+
+	// Lookup caller's source location
+	lua_Debug debug;
+	lua_getstack(L, 1, &debug);
+	lua_getinfo(L, "S", &debug);
+
+	// '@' indicates a relative path, remove this character if present
+	std::string src = (*debug.source == '@' ? debug.source + 1: debug.source);
+	std::string cwd = working_directory();
+
+	path2dotform(src), path2dotform(cwd);
+	// Chop filename from source, and resolve backtracks
+	for (int i = 0; i < backtracks + 1; i++) {
+		dotform_chop_component(src);
+	}
+	dotform_chop_trailing_dots(cwd);
+
+	// Try to make all paths relative to the modules directory.
+	cwd += 'modules';
+
+	const char* src_ptr = src.c_str(), *cwd_ptr = cwd.c_str();
+
+	// Find common substring
+	while (*cwd_ptr && *src_ptr == *cwd_ptr) {
+		src_ptr++, cwd_ptr++;
+	}
+
+	std::string require_string = src_ptr;
+	require_string += ".";
+	require_string += req_arg;
+
+	luawrap::globals(L)["require"].push();
+	lua_pushstring(L, require_string.c_str());
+	lua_call(L, 1, 1);
+
+	return 1; // Return module
+}
+
 static int lapi_random(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	int nargs = lua_gettop(L);
@@ -298,15 +468,15 @@ static BBox lapi_random_subregion(LuaStackValue lbox, Size size) {
 	BBox bbox = lbox.as<BBox>();
 	GameState* gs = lua_api::gamestate(lbox);
 
-    int x = gs->rng().rand(bbox.x1, bbox.x2 - size.w);
-    int y = gs->rng().rand(bbox.y1, bbox.y2 - size.h);
+	int x = gs->rng().rand(bbox.x1, bbox.x2 - size.w);
+	int y = gs->rng().rand(bbox.y1, bbox.y2 - size.h);
 
-    return BBox(Pos(x,y), size);
+	return BBox(Pos(x, y), size);
 }
 
 static bool lapi_chance(LuaStackValue val) {
 	GameState* gs = lua_api::gamestate(val);
-	return gs->rng().rand(RangeF(0,1)) < val.to_num();
+	return gs->rng().rand(RangeF(0, 1)) < val.to_num();
 }
 
 namespace lua_api {
@@ -334,10 +504,14 @@ namespace lua_api {
 		globals["random_subregion"].bind_function(lapi_random_subregion);
 		globals["chance"].bind_function(lapi_chance);
 
+		globals["require_relative"].bind_function(lapi_require_relative);
 		globals["require_path_add"].bind_function(lapi_add_search_path);
 
 		LuaValue table = luawrap::ensure_table(globals["table"]);
 		table["merge"].bind_function(lapi_table_merge);
+		table["copy"].bind_function(lapi_table_copy);
+		table["deep_copy"].bind_function(lapi_table_deep_copy);
+		table["remove_nonexisting"].bind_function(lapi_table_remove_nonexisting);
 
 		LuaValue string_table = luawrap::ensure_table(globals["string"]);
 		string_table["split"].bind_function(lapi_string_split);

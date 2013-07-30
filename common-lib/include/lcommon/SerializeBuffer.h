@@ -150,6 +150,9 @@ public:
 	size_t size() const {
 		return _buffer.size();
 	}
+	int read_position() const {
+		return _read_position;
+	}
 
 	void clear();
 	void flush();

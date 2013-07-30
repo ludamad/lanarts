@@ -12,6 +12,7 @@
 #include <cstring>
 
 #include <string>
+#include <lcommon/directory.h>
 
 #define lua_c
 
@@ -132,7 +133,7 @@ static int try_print(lua_State* L, const char* line, int len) {
 	buffstr += "print(";
 	buffstr += line;
 	buffstr += ')';
-    return luaL_loadbuffer(L, buffstr.c_str(), buffstr.size(), "=stdin");
+    return luaL_loadbuffer(L, buffstr.c_str(), buffstr.size(), working_directory().c_str());
 }
 
 static int loadline (lua_State *L) {
@@ -141,7 +142,7 @@ static int loadline (lua_State *L) {
   if (!pushline(L, 1))
     return -1;  /* no input */
   for (;;) {  /* repeat until gets a complete line */
-    status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), "=stdin");
+    status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), working_directory().c_str());
     if (status == LUA_ERRSYNTAX) {
         lua_pop(L, 1);
     	print_status = try_print(L,lua_tostring(L, 1), lua_strlen(L, 1));

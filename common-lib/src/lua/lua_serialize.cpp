@@ -63,11 +63,11 @@ typedef struct mar_Buffer {
 	char* data;
 } mar_Buffer;
 
-static int mar_encode_table(lua_State *L, mar_Buffer *buf, size_t *idx);
+static int mar_encode_table(lua_State *L, SerializeBuffer& buf, size_t *idx);
 static int mar_decode_table(lua_State *L, const char* buf, size_t len,
 		size_t *idx);
 
-static void buf_init(lua_State *L, mar_Buffer *buf) {
+static void buf_init(lua_State *L, mar_Buffer* buf) {
 	buf->size = 128;
 	buf->seek = 0;
 	buf->head = 0;
@@ -75,30 +75,34 @@ static void buf_init(lua_State *L, mar_Buffer *buf) {
 		luaL_error(L, "Out of memory!");
 }
 
-static void buf_done(lua_State* L, mar_Buffer *buf) {
+static void buf_done(lua_State* L, mar_Buffer* buf) {
 	free(buf->data);
 }
+//
+//static int buf_write(lua_State* L, void* str, size_t len, SerializeBuffer& buf) {
+//	if (len > UINT32_MAX)
+//		luaL_error(L, "buffer too long");
+//	if (buf->size - buf->head < len) {
+//		size_t new_size = buf->size << 1;
+//		size_t cur_head = buf->head;
+//		while (new_size - cur_head <= len) {
+//			new_size = new_size << 1;
+//		}
+//		if (!(buf->data = (char*)realloc(buf->data, new_size))) {
+//			luaL_error(L, "Out of memory!");
+//		}
+//		buf->size = new_size;
+//	}
+//	memcpy(&buf->data[buf->head], str, len);
+//	buf->head += len;
+//	return 0;
+//}
 
-static int buf_write(lua_State* L, void* str, size_t len, mar_Buffer *buf) {
-	if (len > UINT32_MAX)
-		luaL_error(L, "buffer too long");
-	if (buf->size - buf->head < len) {
-		size_t new_size = buf->size << 1;
-		size_t cur_head = buf->head;
-		while (new_size - cur_head <= len) {
-			new_size = new_size << 1;
-		}
-		if (!(buf->data = (char*)realloc(buf->data, new_size))) {
-			luaL_error(L, "Out of memory!");
-		}
-		buf->size = new_size;
-	}
-	memcpy(&buf->data[buf->head], str, len);
-	buf->head += len;
-	return 0;
+static int lua_serialize_buffer_writer(lua_State* L, const void* data, size_t len, void* buffer) {
+	((SerializeBuffer*)buffer)->write_raw((const char*) data, len);
 }
 
-static const char* buf_read(lua_State *L, mar_Buffer *buf, size_t *len) {
+static const char* buf_read(lua_State *L, mar_Buffer* buf, size_t *len) {
 	if (buf->seek < buf->head) {
 		buf->seek = buf->head;
 		*len = buf->seek;
@@ -108,45 +112,46 @@ static const char* buf_read(lua_State *L, mar_Buffer *buf, size_t *len) {
 	return NULL;
 }
 
-void mar_encode_value(lua_State *L, mar_Buffer *buf, int val, size_t *idx) {
-	size_t l;
+static inline bool buf_write_if_seen(lua_State* L, SerializeBuffer& buf, int table_idx) {
+	lua_rawget(L, table_idx);
+	bool was_seen = !lua_isnil(L, -1);
+	if (was_seen) {
+		buf.write_byte(MAR_TREF);
+		buf.write_int(lua_tointeger(L, -1));
+	}
+	lua_pop(L, 1);
+	return was_seen;
+}
+static inline void buf_append(SerializeBuffer& buf, SerializeBuffer& sub_buf) {
+	buf.write_int(sub_buf.size());
+	buf.write_raw(sub_buf.data(), sub_buf.size());
+}
+
+void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) {
 	int val_type = lua_type(L, val);
 	lua_pushvalue(L, val);
 
-	buf_write(L, (void*)&val_type, MAR_CHR, buf);
+	buf.write_byte(val_type);
 	switch (val_type) {
 	case LUA_TBOOLEAN: {
-		int int_val = lua_toboolean(L, -1);
-		buf_write(L, (void*)&int_val, MAR_CHR, buf);
+		buf.write_byte(lua_toboolean(L, -1));
 		break;
 	}
 	case LUA_TSTRING: {
-		const char *str_val = lua_tolstring(L, -1, &l);
-		buf_write(L, (void*)&l, MAR_I32, buf);
-		buf_write(L, (void*)str_val, l, buf);
+		size_t len;
+		const char* str_val = lua_tolstring(L, -1, &len);
+		buf.write_int(len);
+		buf.write_raw(str_val, len);
 		break;
 	}
 	case LUA_TNUMBER: {
-		lua_Number num_val = lua_tonumber(L, -1);
-		buf_write(L, (void*)&num_val, MAR_I64, buf);
+		buf.write(lua_tonumber(L, -1));
 		break;
 	}
 	case LUA_TTABLE: {
-		int tag, ref;
 		lua_pushvalue(L, -1);
-		lua_rawget(L, SEEN_IDX);
-		if (!lua_isnil(L, -1)) {
-			ref = lua_tointeger(L, -1);
-			tag = MAR_TREF;
-			buf_write(L, (void*)&tag, MAR_CHR, buf);
-			buf_write(L, (void*)&ref, MAR_I32, buf);
-			lua_pop(L, 1);
-		} else {
-			mar_Buffer rec_buf;
-			lua_pop(L, 1);
-			/* pop nil */
+		if (!buf_write_if_seen(L, buf, SEEN_IDX)) {
 			if (luaL_getmetafield(L, -1, "__persist")) {
-				tag = MAR_TUSR;
 
 				lua_pushvalue(L, -2); /* self */
 				lua_call(L, 1, 1);
@@ -160,69 +165,52 @@ void mar_encode_value(lua_State *L, mar_Buffer *buf, int val, size_t *idx) {
 				lua_pushvalue(L, -2); /* callback */
 				lua_rawseti(L, -2, 1);
 
-				buf_init(L, &rec_buf);
-				mar_encode_table(L, &rec_buf, idx);
+				SerializeBuffer rec_buf = SerializeBuffer::plain_buffer();
+				mar_encode_table(L, rec_buf, idx);
 
-				buf_write(L, (void*)&tag, MAR_CHR, buf);
-				buf_write(L, (void*)&rec_buf.head, MAR_I32, buf);
-				buf_write(L, rec_buf.data, rec_buf.head, buf);
-				buf_done(L, &rec_buf);
+				buf.write_byte(MAR_TUSR);
+				buf_append(buf, rec_buf);
 				lua_pop(L, 1);
 			} else {
-				tag = MAR_TVAL;
-
 				lua_pushvalue(L, -1);
 				lua_pushinteger(L, (*idx)++);
 				lua_rawset(L, SEEN_IDX);
 
 				lua_pushvalue(L, -1);
-				buf_init(L, &rec_buf);
-				mar_encode_table(L, &rec_buf, idx);
+
+				SerializeBuffer rec_buf = SerializeBuffer::plain_buffer();
+				mar_encode_table(L, rec_buf, idx);
 				lua_pop(L, 1);
 
-				buf_write(L, (void*)&tag, MAR_CHR, buf);
-				buf_write(L, (void*)&rec_buf.head, MAR_I32, buf);
-				buf_write(L, rec_buf.data, rec_buf.head, buf);
-				buf_done(L, &rec_buf);
+				buf.write_byte(MAR_TVAL);
+				buf_append(buf, rec_buf);
 			}
 		}
 		break;
 	}
 	case LUA_TFUNCTION: {
-		int tag, ref;
 		lua_pushvalue(L, -1);
-		lua_rawget(L, SEEN_IDX);
-		if (!lua_isnil(L, -1)) {
-			ref = lua_tointeger(L, -1);
-			tag = MAR_TREF;
-			buf_write(L, (void*)&tag, MAR_CHR, buf);
-			buf_write(L, (void*)&ref, MAR_I32, buf);
-			lua_pop(L, 1);
-		} else {
-			mar_Buffer rec_buf;
+		if (!buf_write_if_seen(L, buf, SEEN_IDX)) {
 			int i;
 			lua_Debug ar;
-			lua_pop(L, 1);
-			/* pop nil */
 
 			lua_pushvalue(L, -1);
 			lua_getinfo(L, ">nuS", &ar);
 			if (ar.what[0] != 'L') {
 				luaL_error(L, "attempt to persist a C function '%s'", ar.name);
 			}
-			tag = MAR_TVAL;
 			lua_pushvalue(L, -1);
 			lua_pushinteger(L, (*idx)++);
 			lua_rawset(L, SEEN_IDX);
 
 			lua_pushvalue(L, -1);
-			buf_init(L, &rec_buf);
-			lua_dump(L, (lua_Writer)buf_write, &rec_buf);
 
-			buf_write(L, (void*)&tag, MAR_CHR, buf);
-			buf_write(L, (void*)&rec_buf.head, MAR_I32, buf);
-			buf_write(L, rec_buf.data, rec_buf.head, buf);
-			buf_done(L, &rec_buf);
+			SerializeBuffer rec_buf = SerializeBuffer::plain_buffer();
+			lua_dump(L, lua_serialize_buffer_writer, &rec_buf);
+			buf.write_byte(MAR_TVAL);
+			buf.write_int(rec_buf.size());
+			buf.write_raw(rec_buf.data(), rec_buf.size());
+
 			lua_pop(L, 1);
 
 			lua_newtable(L);
@@ -231,12 +219,10 @@ void mar_encode_value(lua_State *L, mar_Buffer *buf, int val, size_t *idx) {
 				lua_rawseti(L, -2, i);
 			}
 
-			buf_init(L, &rec_buf);
-			mar_encode_table(L, &rec_buf, idx);
+			rec_buf.clear();
+			mar_encode_table(L, rec_buf, idx);
+			buf_append(buf, rec_buf);
 
-			buf_write(L, (void*)&rec_buf.head, MAR_I32, buf);
-			buf_write(L, rec_buf.data, rec_buf.head, buf);
-			buf_done(L, &rec_buf);
 			lua_pop(L, 1);
 		}
 
@@ -245,20 +231,8 @@ void mar_encode_value(lua_State *L, mar_Buffer *buf, int val, size_t *idx) {
 	case LUA_TUSERDATA: {
 		int tag, ref;
 		lua_pushvalue(L, -1);
-		lua_rawget(L, SEEN_IDX);
-		if (!lua_isnil(L, -1)) {
-			ref = lua_tointeger(L, -1);
-			tag = MAR_TREF;
-			buf_write(L, (void*)&tag, MAR_CHR, buf);
-			buf_write(L, (void*)&ref, MAR_I32, buf);
-			lua_pop(L, 1);
-		} else {
-			mar_Buffer rec_buf;
-			lua_pop(L, 1);
-			/* pop nil */
+		if (!buf_write_if_seen(L, buf, SEEN_IDX)) {
 			if (luaL_getmetafield(L, -1, "__persist")) {
-				tag = MAR_TUSR;
-
 				lua_pushvalue(L, -2);
 				lua_pushinteger(L, (*idx)++);
 				lua_rawset(L, SEEN_IDX);
@@ -273,13 +247,11 @@ void mar_encode_value(lua_State *L, mar_Buffer *buf, int val, size_t *idx) {
 				lua_rawseti(L, -2, 1);
 				lua_remove(L, -2);
 
-				buf_init(L, &rec_buf);
-				mar_encode_table(L, &rec_buf, idx);
+				SerializeBuffer rec_buf = SerializeBuffer::plain_buffer();
+				mar_encode_table(L, rec_buf, idx);
 
-				buf_write(L, (void*)&tag, MAR_CHR, buf);
-				buf_write(L, (void*)&rec_buf.head, MAR_I32, buf);
-				buf_write(L, rec_buf.data, rec_buf.head, buf);
-				buf_done(L, &rec_buf);
+				buf.write_byte(MAR_TUSR);
+				buf_append(buf, rec_buf);
 			} else {
 				luaL_error(L, "attempt to encode userdata (no __persist hook)");
 			}
@@ -296,7 +268,7 @@ void mar_encode_value(lua_State *L, mar_Buffer *buf, int val, size_t *idx) {
 	lua_pop(L, 1);
 }
 
-static int mar_encode_table(lua_State *L, mar_Buffer *buf, size_t *idx) {
+static int mar_encode_table(lua_State *L, SerializeBuffer& buf, size_t *idx) {
 	lua_pushnil(L);
 	while (lua_next(L, -2) != 0) {
 		mar_encode_value(L, buf, -2, idx);
@@ -440,20 +412,9 @@ static int mar_decode_table(lua_State *L, const char* buf, size_t len,
 	return 1;
 }
 
-static mar_Buffer global_mar_buffer;
-static bool global_buffer_initialized = false;
+static SerializeBuffer* __cheathack_global;
 
 int mar_encode(lua_State* L) {
-	size_t idx, len;
-
-	if (!global_buffer_initialized) {
-		buf_init(L, &global_mar_buffer);
-		global_buffer_initialized = true;
-	} else {
-		global_mar_buffer.seek = 0;
-		global_mar_buffer.head = 0;
-	}
-
 	if (lua_isnone(L, 1)) {
 		lua_pushnil(L);
 	}
@@ -463,7 +424,7 @@ int mar_encode(lua_State* L) {
 		luaL_error(L, "bad argument #2 to encode (expected table)");
 	}
 
-	len = lua_objlen(L, 2);
+	size_t len = lua_objlen(L, 2), idx;
 	lua_newtable(L);
 	for (idx = 1; idx <= len; idx++) {
 		lua_rawgeti(L, 2, idx);
@@ -472,7 +433,7 @@ int mar_encode(lua_State* L) {
 	}
 
 	lua_pushvalue(L, 1);
-	mar_encode_value(L, &global_mar_buffer, -1, &idx);
+	mar_encode_value(L, *__cheathack_global, -1, &idx);
 	//remove seen table and value copy
 	lua_pop(L, 2);
 
@@ -480,32 +441,26 @@ int mar_encode(lua_State* L) {
 }
 
 int mar_decode(lua_State* L) {
-	size_t l, idx, len;
-
-	if (!global_buffer_initialized) {
-		buf_init(L, &global_mar_buffer);
-		global_buffer_initialized = true;
-	}
-
-	const char *p;
-	const char *s = global_mar_buffer.data;
-
 	if (lua_isnoneornil(L, 1)) {
 		lua_newtable(L);
 	} else if (!lua_istable(L, 1)) {
 		luaL_error(L, "bad argument #1 to decode (expected table)");
 	}
 
-	len = lua_objlen(L, 1);
+	size_t len = lua_objlen(L, 1);
 	lua_newtable(L);
+	size_t idx;
 	for (idx = 1; idx <= len; idx++) {
 		lua_rawgeti(L, 1, idx);
 		lua_rawseti(L, SEEN_IDX, idx);
 	}
 
-	p = s;
-	mar_decode_value(L, global_mar_buffer.data, global_mar_buffer.head, &p,
-			&idx);
+	const char* buf_data = __cheathack_global->data() + __cheathack_global->read_position();
+	const char* data_iter = buf_data;
+	size_t buf_size = __cheathack_global->size() - __cheathack_global->read_position();
+	mar_decode_value(L, buf_data, buf_size, &data_iter, &idx);
+
+	__cheathack_global->move_read_position(data_iter - buf_data);
 	return 1;
 }
 
@@ -523,40 +478,17 @@ void lua_serialize(SerializeBuffer& serialize, lua_State* L, int idx) {
 		return;
 	}
 
+	__cheathack_global = &serialize;
+
 	lua_pushvalue(L, idx);
 	lua_pushcfunction(L, mar_encode);
 	lua_insert(L, -2);
 
 	lua_call(L, 1, 0);
-	int size = global_mar_buffer.head;
-	serialize.write(size);
-	serialize.write_raw(global_mar_buffer.data, size);
 }
 
 void lua_deserialize(SerializeBuffer& serialize, lua_State* L) {
-
-	if (!global_buffer_initialized) {
-		buf_init(L, &global_mar_buffer);
-		global_buffer_initialized = true;
-	}
-
-	int size;
-	serialize.read_int(size);
-
-	if (size == 0) {
-		lua_pushnil(L);
-		return;
-	}
-
-	global_mar_buffer.seek = 0;
-	global_mar_buffer.head = size;
-
-	if (size > global_mar_buffer.size) {
-		global_mar_buffer.size = size;
-		global_mar_buffer.data = (char*)malloc(size);
-	}
-
-	serialize.read_raw(global_mar_buffer.data, size);
+	__cheathack_global = &serialize;
 
 	lua_pushcfunction(L, mar_decode);
 

@@ -4,6 +4,8 @@
  *  Supports Windows and Posix platforms.
  */
 
+#include <string>
+#include <cstdlib>
 #include "directory.h"
 
 #ifdef WIN32
@@ -25,6 +27,7 @@ bool create_directory(const char* path) {
 #else
 
 #include <sys/stat.h>
+#include <unistd.h>
 
 bool is_directory(const char* path) {
 	struct stat st;
@@ -42,4 +45,25 @@ bool ensure_directory(const char* path) {
 		return true;
 	}
 	return is_directory(path);
+}
+
+std::string working_directory() {
+#ifdef WIN32
+	cwd = _getcwd(NULL, 0);
+#else
+	const int CWD_BUFFER_TRY = 1024;
+	char buffer[CWD_BUFFER_TRY];
+	if (getcwd(buffer, CWD_BUFFER_TRY)) {
+		return buffer;
+	}
+	size_t size = CWD_BUFFER_TRY * 2;
+	char* cwd = (char*)malloc(size);
+	while (!getcwd(cwd, size)) {
+		size *= 2;
+		cwd = (char*)realloc(cwd, size);
+	}
+#endif
+	std::string ret(cwd);
+	free(cwd);
+	return ret;
 }

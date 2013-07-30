@@ -17,4 +17,3 @@ void fatal_error(const char* msg) {
 	fflush(stderr);
 	throw __FatalError();
 }
-
