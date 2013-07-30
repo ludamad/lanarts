@@ -9,7 +9,6 @@ include(FindFreetype)
 
 set( SRC ..)
 set( DEPS ../dependencies)
-set( BUILTDEPS ${CMAKE_BINARY_DIR}/dependencies )
 
 add_definitions( -std=c++98 )
 
@@ -27,11 +26,10 @@ include_directories(
 	"${SRC}/sound-lib/include"
 	${DEPS}/UnitTest++ 
 	"${DEPS}/yaml-cpp/include"
-	${DEPS}/lua/src
-        ${BUILTDEPS}/lua
+	${DEPS}/lua 
 	${DEPS} # for rvo2 & luasocket
 	)
-    message( "IT WAS THIS " ${BUILTDEPS}/lua )
+
 
 file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
     src/include/* 

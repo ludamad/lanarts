@@ -17,7 +17,7 @@ include_directories(
 	"${SRC}/common-lib/include"
 	"${SRC}/luawrap-lib/include"
 	${DEPS}/UnitTest++
-	${DEPS}/lua/src
+	${DEPS}/lua
 	${SDL_INCLUDE_DIR} 
 	${SDLIMAGE_INCLUDE_DIR} 
 	${OpenGL_INCLUDE_DIRS} 		

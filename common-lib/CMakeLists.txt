@@ -8,7 +8,7 @@ set( DEPS ../dependencies)
 include_directories(${SDL_INCLUDE_DIR}
 	include/lcommon/
 	${DEPS}/UnitTest++ 
-	${DEPS}/lua/src
+	${DEPS}/lua 
 	"${SRC}/luawrap-lib/include"
 )
 add_definitions( -std=c++98 )

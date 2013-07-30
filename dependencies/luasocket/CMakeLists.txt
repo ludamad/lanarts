@@ -4,7 +4,7 @@ PROJECT(project_luasocket)
 set( LIBS ../../dependencies)
 
 include_directories(
-	${LIBS}/lua/src
+	${LIBS}/lua
 )
 
 set( luasocket_src
