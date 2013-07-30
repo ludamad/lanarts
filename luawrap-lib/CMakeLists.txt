@@ -11,7 +11,7 @@ add_definitions( -std=c++98 )
 
 include_directories(
 	"include/"
-	${DEPS}/lua 
+	${DEPS}/lua/src
 	${DEPS}/UnitTest++ 
 )
 
