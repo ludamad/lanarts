@@ -10,21 +10,21 @@ require_path_add("modules/lanarts/library_files/?.lua")
 sound_volume = 0 -- Mute the game
 
 function Engine.menu_start(...)
-    local StartMenu = import "lanarts.menus.StartMenu"
+    local menus = import "@menus"
 
-    return StartMenu.start_menu_show(...)
+    return menus.start_menu_show(...)
 end
 
 function Engine.pregame_menu_start(...)
-    local StartMenu = import "lanarts.menus.StartMenu"
+    local menus = import "@menus"
 
-    return StartMenu.pregame_menu_show(...)
+    return menus.pregame_menu_show(...)
 end
 
 function Engine.loading_screen_draw(...)
-    import "lanarts.menus.loading_screen"
+    local loading_screen = import "@menus.loading_screen"
 
-    return loading_screen_draw(...)
+    return loading_screen.draw(...)
 end
 
 function Engine.resources_load(...)
@@ -34,51 +34,49 @@ function Engine.resources_load(...)
     function is_armour(item)         return item.type == "armour" end
     function is_projectile(item)     return item.type == "projectile" end
 
-    import "lanarts.sounds"
+    import "@enemies.enemies"
 
-    dofile "modules/lanarts/enemies/enemies.lua"
+    import "@effects.effects"
 
-    dofile "modules/lanarts/effects/effects.lua"
-
-    dofile "modules/lanarts/spells/spell_effects.lua"
+    import "@spells.spell_effects"
 end
 
 function Engine.resources_post_load(...)
-    import "lanarts.tiles.tilesets"
+    import "@tiles.tilesets"
 end
 
 function Engine.game_start(...)
-    import "lanarts.game_loop"
+    local game_loop = import "@game_loop"
 
-    return game_loop(...)
+    return game_loop.run_loop(...)
 end
 
 function Engine.post_draw(...)
-    import "lanarts.game_loop"
+    local game_loop = import "@game_loop"
 
-    return game_post_draw(...)
+    return game_loop.post_draw(...)
 end
 
 function Engine.overlay_draw(...)
-    import "lanarts.game_loop"
+    local game_loop = import "@game_loop"
 
-    return game_overlay_draw(...)
+    return game_loop.overlay_draw(...)
 end
 
 function Engine.game_won(...)
-    import "lanarts.event_occurred"
+    local events = import "@events"
 
-    return player_has_won(...)
+    return events.player_has_won(...)
 end
 
 function Engine.event_occurred(...)
-    import "lanarts.event_occurred"
+    local events = import "@events"
 
-    return event_occurred(...)
+    return events.trigger_event(...)
 end
 
 function Engine.first_map_create(...)
-	import "core.maps.map_generation"
+    import "@maps.map_generation"
 
-	return first_map_create(...)
+    return first_map_create(...)
 end

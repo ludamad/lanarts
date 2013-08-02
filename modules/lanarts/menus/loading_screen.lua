@@ -66,7 +66,7 @@ local function loading_screen_setup(...)
 end
 
 -- Loading callback
-function loading_screen_draw(...)
+local function loading_screen_draw(...)
 	perf.timing_begin("system.loading_draw")
     Display.draw_start()
 
@@ -76,3 +76,8 @@ function loading_screen_draw(...)
     Display.draw_finish()
 	perf.timing_end("system.loading_draw")
 end
+
+-- Submodule
+return {
+    draw = loading_screen_draw
+}

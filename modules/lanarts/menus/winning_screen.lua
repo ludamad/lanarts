@@ -55,7 +55,7 @@ local function winning_screen_create()
     return box
 end
 
-function winning_screen_show(...)
+local function winning_screen_show(...)
     local screen = winning_screen_create()
 
     while Game.input_capture() and not key_pressed(keys.ESCAPE)  do
@@ -68,3 +68,8 @@ function winning_screen_show(...)
 
     return false
 end
+
+-- Submodule
+return {
+    show = winning_screen_show
+}

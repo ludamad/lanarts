@@ -2,10 +2,12 @@
     Implements the game loop, which calls the step & draw events of all objects.
 ]]
 
+local M = {} -- Submodule
+
 local help_overlay = import "lanarts.help_overlay"
 
 --- Externally visible control structure for the main loop
-game_loop_control = {
+M.loop_control = {
     game_is_over = false,
     game_is_paused = false,
     startup_function = do_nothing
@@ -27,7 +29,7 @@ local function game_loop_body(steponly)
     end
 
     perf.timing_begin("**Step**")
-    if not game_loop_control.game_is_paused and not Game.step() then 
+    if not M.loop_control.game_is_paused and not Game.step() then 
         return false 
     end
     perf.timing_end("**Step**")
@@ -48,7 +50,7 @@ local function game_loop_body(steponly)
 end
 
 
-function game_post_draw()
+function M.post_draw()
     local player = World.local_player
     for pdata in values(World.players) do
         local p = pdata.instance
@@ -62,7 +64,7 @@ end
 local fps_timer = timer_create()
 local fps_count, fps_lastframe, fps = 1, 0, nil
 
-function game_overlay_draw()
+function M.overlay_draw()
     local frame_increase = math.max(0, Game.frame - fps_lastframe)
     fps_lastframe = Game.frame
     fps_count = fps_count + frame_increase
@@ -82,8 +84,8 @@ function game_overlay_draw()
 end
 
 
-function game_loop()
-    game_loop_control.startup_function()
+function M.run_loop()
+    M.loop_control.startup_function()
 
     Game.input_capture()
 
@@ -99,7 +101,7 @@ function game_loop()
         end
     
         if key_pressed(keys.F4) then 
-            game_loop_control.game_is_paused = not game_loop_control.game_is_paused
+            M.loop_control.game_is_paused = not M.loop_control.game_is_paused
         end
 
         if key_pressed(keys.ESCAPE) then 
@@ -115,7 +117,7 @@ function game_loop()
             break
         end
 
-        if game_loop_control.game_is_over then
+        if M.loop_control.game_is_over then
             break
         end
 
@@ -130,3 +132,5 @@ function game_loop()
     print( "Step time: " .. string.format("%f", perf.get_timing("**Step**")) )
     print( "Draw time: " .. string.format("%f", perf.get_timing("**Draw**")) )
 end
+
+return M
