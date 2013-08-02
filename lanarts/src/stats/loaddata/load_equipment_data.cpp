@@ -3,6 +3,7 @@
 #include <lua.hpp>
 
 #include "lua_api/lua_yaml.h"
+#include "lua_api/lua_newapi.h"
 #include "data/game_data.h"
 #include "data/yaml_util.h"
 
@@ -68,9 +69,9 @@ void load_equipment_data(lua_State* L, const FilenameList& filenames,
 
 	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["Data"]);
 	data["equipment_create"].bind_function(lapi_data_create_equipment);
-	luawrap::dofile(L, "res/items/armour/body_armour.lua");
-	luawrap::dofile(L, "res/items/armour/boots.lua");
-	luawrap::dofile(L, "res/items/armour/gloves.lua");
-	luawrap::dofile(L, "res/items/armour/helmets.lua");
-	luawrap::dofile(L, "res/items/rings/rings.lua");
+	luawrap::dofile(L, "modules/lanarts/items/armour/body_armour.lua");
+	luawrap::dofile(L, "modules/lanarts/items/armour/boots.lua");
+	luawrap::dofile(L, "modules/lanarts/items/armour/gloves.lua");
+	luawrap::dofile(L, "modules/lanarts/items/armour/helmets.lua");
+	luawrap::dofile(L, "modules/lanarts/items/rings/rings.lua");
 }

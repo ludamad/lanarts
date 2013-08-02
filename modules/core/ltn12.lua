@@ -8,8 +8,6 @@
 -----------------------------------------------------------------------------
 -- Declare module
 -----------------------------------------------------------------------------
-local string = require("string")
-local table = require("table")
 local base = _G
 module("ltn12")
 
@@ -289,4 +287,3 @@ function pump.all(src, snk, step)
         end
     end
 end
-

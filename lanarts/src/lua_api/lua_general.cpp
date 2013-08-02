@@ -480,7 +480,13 @@ static LuaValue lapi_import_internal(LuaStackValue importstring) {
 	lua_State* L = importstring.luastate();
 	LuaValue module = luawrap::globals(L)["_INTERNAL_IMPORTED"][importstring.to_str()];
 	if (module.isnil()) {
-		return module;
+		LuaValue loader = luawrap::globals(L)["_INTERNAL_LOADERS"][importstring.to_str()];
+		if (loader.isnil()) {
+			return loader;
+		}
+		loader.push();
+		lua_call(L, 0, 1);
+		return LuaValue::pop_value(L);
 	}
 	LuaValue ret_table(L);
 	ret_table.newtable();
@@ -491,6 +497,24 @@ static LuaValue lapi_import_internal(LuaStackValue importstring) {
 namespace lua_api {
 	void event_projectile_hit(lua_State* L, ProjectileInst* projectile,
 			GameInst* target) {
+	}
+
+	void register_lua_submodule(lua_State* L, const char* vpath,
+			LuaValue module) {
+		LuaValue imported = luawrap::ensure_table(luawrap::globals(L)["_INTERNAL_IMPORTED"]);
+		imported[vpath] = module;
+	}
+
+	void register_lua_submodule_loader(lua_State* L, const char* vpath, LuaValue loader) {
+		LuaValue loaders = luawrap::ensure_table(luawrap::globals(L)["_INTERNAL_LOADERS"]);
+		loaders[vpath] = loader;
+	}
+
+	LuaValue import(lua_State* L, const char* filename) {
+		luawrap::globals(L)["import"].push();
+		lua_pushstring(L, filename);
+		lua_call(L, 1, 1);
+		return LuaValue::pop_value(L);
 	}
 
 	int l_itervalues(lua_State* L) {
@@ -505,6 +529,7 @@ namespace lua_api {
 		LuaValue globals = luawrap::globals(L);
 		LuaValue registry = luawrap::registry(L);
 		luawrap::ensure_table(luawrap::globals(L)["_INTERNAL_IMPORTED"]);
+		luawrap::ensure_table(luawrap::globals(L)["_INTERNAL_LOADERS"]);
 		globals["values"].bind_function(l_itervalues);
 		globals["_LOADED"] = luawrap::ensure_table(registry["_LOADED"]);
 		globals["direction"].bind_function(compute_direction);

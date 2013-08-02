@@ -1,7 +1,7 @@
-local InstanceBox = import "core.InstanceBox"
-local InstanceLine = import "core.InstanceLine"
-local TextLabel = import "core.TextLabel"
-local Sprite = import "core.Sprite"
+local InstanceBox = import "core.ui.InstanceBox"
+local InstanceLine = import "core.ui.InstanceLine"
+local TextLabel = import "core.ui.TextLabel"
+local Sprite = import "core.ui.Sprite"
 local utils = import "core.utils"
 
 local cached_screen
@@ -27,7 +27,7 @@ local function center_screen_setup()
 	local center_box = InstanceBox.create( { size = {640, 480} } )
 	local task_label = TextLabel.create( Fonts.small, {color=COL_MUTED_GREEN, origin=CENTER_TOP}, "")
 	local loading_label = TextLabel.create( Fonts.large, { color=COL_LIGHT_GRAY, origin=CENTER_TOP }, "" )
-	local dragon_sprite = Sprite.image_create("res/enemies/bosses/sprites/reddragon.png")
+	local dragon_sprite = Sprite.image_create("modules/lanarts/enemies/bosses/sprites/reddragon.png")
 
 	center_box:add_instance( 
 		loading_label,

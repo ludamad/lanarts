@@ -2,10 +2,10 @@
 sprites:
 
   - name: zin
-    file: res/enemies/bosses/sprites/zin.png 
+    file: modules/lanarts/enemies/bosses/sprites/zin.png 
    
   - name: red dragon
-    file: res/enemies/bosses/sprites/reddragon.png
+    file: modules/lanarts/enemies/bosses/sprites/reddragon.png
 
   - name: pisilohe
-    file: res/enemies/bosses/sprites/pisilohe8_0.png
+    file: modules/lanarts/enemies/bosses/sprites/pisilohe8_0.png

@@ -38,7 +38,7 @@ using namespace std;
 static GameState* init_gamestate() {
 
 	lua_State* L = lua_api::create_luastate();
-	lua_api::add_search_path(L, "res/?.lua");
+	lua_api::add_search_path(L, "modules/lanarts/?.lua");
 
 	GameSettings settings; // Initialized with defaults
 	// Load the manual settings
@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
 	GameState* gs = init_gamestate();
 	lua_State* L = gs->luastate();
 
-	lua_api::require(L, "main"); // loads engine hooks
+	luawrap::dofile(L, "modules/main.lua"); // loads module bootstrap
 
 	LuaValue engine = luawrap::globals(L)["Engine"];
 

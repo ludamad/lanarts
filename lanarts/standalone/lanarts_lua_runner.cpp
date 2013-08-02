@@ -29,7 +29,7 @@ static lua_State* setup_lua_state() {
 
 	lua_State* L = lua_api::create_luastate();
 
-	lua_api::add_search_path(L, "res/?.lua");
+	lua_api::add_search_path(L, "modules/?.lua");
 	lua_api::register_api(new GameState(GameSettings(), L), L);
 
 	return L;

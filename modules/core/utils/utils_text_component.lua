@@ -42,7 +42,7 @@ end
 --      'input_callbacks': Controls the TextInputBox, see TextInputBox.lua
 -- }
 function text_field_create(params)
-    imported_text_input_box = imported_text_input_box or (import "@TextInputBox") or true
+    imported_text_input_box = imported_text_input_box or (import "@ui.TextInputBox") or true
 
     local font, size = params.font, params.size
     local max_chars, label_text = params.max_chars, params.label_text

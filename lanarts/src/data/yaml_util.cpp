@@ -137,12 +137,12 @@ void load_data_impl_template(const FilenameList& filenames,
 
 	FilenameList::const_iterator it = filenames.begin();
 	for (; it != filenames.end(); ++it) {
-		std::string fname = "res/" + *it;
+		std::string fname = "modules/lanarts/" + *it;
 		fstream file(fname.c_str(), fstream::in | fstream::binary);
 
 		if (!file) {
 			fprintf(stderr,
-					"Fatal error: File %s not found, ensure you are running from the directory with res/ folder.\n",
+					"Fatal error: File %s not found, ensure you are running from the directory with modules/ folder.\n",
 					fname.c_str());
 			fatal_error();
 		}

@@ -8,10 +8,10 @@
 -----------------------------------------------------------------------------
 -- Declare module
 -----------------------------------------------------------------------------
-local string = require("string")
 local base = _G
-local table = require("table")
-module("socket.url")
+local string = base.string
+local table = base.table
+module("core.socket.url")
 
 -----------------------------------------------------------------------------
 -- Module version

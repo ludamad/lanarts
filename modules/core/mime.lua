@@ -9,10 +9,9 @@
 -- Declare module and import dependencies
 -----------------------------------------------------------------------------
 local base = _G
-local ltn12 = require("ltn12")
-local mime = require("mime.core")
-local io = require("io")
-local string = require("string")
+local ltn12 = import("@ltn12")
+local mime = import("@mime.core")
+
 module("mime")
 
 -- encode, decode and wrap algorithm tables

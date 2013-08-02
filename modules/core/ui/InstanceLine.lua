@@ -1,6 +1,6 @@
 -- Organizes instances into rows & columns
 
-local InstanceGroup = import "core.InstanceGroup"
+local InstanceGroup = import "core.ui.InstanceGroup"
 
 --- A layout consisting of objects placed on one or multiple lines.
 -- Each object can be placed with an optional offset.
@@ -106,3 +106,5 @@ end
 function InstanceLine:__tostring()
     return "[InstanceLine " .. toaddress(self) .. "]"
 end
+
+return InstanceLine

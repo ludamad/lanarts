@@ -196,6 +196,7 @@ namespace lua_api {
 		register_textfield(L);
 
 		LuaValue globals = luawrap::globals(L);
+		globals.push();
 		LuaValue global_getters = lua_api::global_getters(L);
 
 		global_getters["mouse_xy"].bind_function(mouse_xy);

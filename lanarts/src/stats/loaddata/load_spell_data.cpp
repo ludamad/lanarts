@@ -35,7 +35,7 @@ LuaValue load_spell_data(lua_State* L, const FilenameList& filenames) {
 
 	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["Data"]);
 	data["spell_create"].bind_function(lapi_data_create_spell);
-	luawrap::dofile(L, "res/spells/spells.lua");
+	luawrap::dofile(L, "modules/lanarts/spells/spells.lua");
 
 	return spell_table;
 }

@@ -98,3 +98,4 @@ end
 function InstanceGroup:__tostring()
     return "[InstanceGroup " .. toaddress(self) .. "]"
 end
+return InstanceGroup

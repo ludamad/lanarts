@@ -1,7 +1,7 @@
 --- 
 
 #Locations of markup files
-#relative to res/
+#relative to modules/lanarts/
 
 equipment_files: []
 #  - items/armour/body_armour.yaml

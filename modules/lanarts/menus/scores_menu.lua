@@ -1,20 +1,20 @@
-local InstanceBox = import "core.InstanceBox"
-local Sprite = import "core.Sprite"
-local TextLabel = import "core.TextLabel"
+local InstanceBox = import "core.ui.InstanceBox"
+local Sprite = import "core.ui.Sprite"
+local TextLabel = import "core.ui.TextLabel"
 local utils = import "core.utils"
 
-local score_menu_font = "res/fonts/MateSC-Regular.ttf"
+local score_menu_font = "modules/core/fonts/MateSC-Regular.ttf"
 
 -- This is a hack.
 -- Currently we cannot rely on the sprites being loaded, so we duplicate information from class_sprites.yaml here
 -- This will be fixed in the coming move from YAML to Lua (allowing us to simply require 'class_sprite_data.lua')
 local function class_image_for_name_hack(name)
     local path_table = {
-        fighter = "res/classes/sprites/fighter.png",
-        fighter2 = "res/classes/sprites/fighter2.png", 
-        wizard = "res/classes/sprites/wizard.png", 
-        wizard2 = "res/classes/sprites/wizard2.png",
-        archer = "res/classes/sprites/archer.png"
+        fighter = "modules/lanarts/classes/sprites/fighter.png",
+        fighter2 = "modules/lanarts/classes/sprites/fighter2.png", 
+        wizard = "modules/lanarts/classes/sprites/wizard.png", 
+        wizard2 = "modules/lanarts/classes/sprites/wizard2.png",
+        archer = "modules/lanarts/classes/sprites/archer.png"
     }
 
     local path = path_table[name]
@@ -43,7 +43,7 @@ end
 
 local function score_entry_draw(entry, ranking, ex, ey, ew, eh)
     -- Draw ranking
-    local ranking_font = font_cached_load("res/fonts/MateSC-Regular.ttf", 14)
+    local ranking_font = font_cached_load("modules/core/fonts/MateSC-Regular.ttf", 14)
     local ranking_color = vector_interpolate(COL_YELLOW, COL_DARK_GRAY, (ranking-1) / 10)
     ranking_font:draw( 
         {color = ranking_color, origin = RIGHT_CENTER}, 
@@ -171,7 +171,7 @@ function scores_menu_create(on_back_click)
 
     -- Display the logo if we are >= 800x600 res
     if menu.size[2] >= 600 then
-        local logo = Sprite.image_create("res/interface/sprites/lanarts_logo.png")
+        local logo = Sprite.image_create("modules/lanarts/interface/sprites/lanarts_logo.png")
     
         menu:add_instance(
             logo, 

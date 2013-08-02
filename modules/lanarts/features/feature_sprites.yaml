@@ -1,13 +1,13 @@
 sprites:    
   - name: open door
-    file: res/features/sprites/open_door.png
+    file: modules/lanarts/features/sprites/open_door.png
 
   - name: closed door
-    file: res/features/sprites/closed_door.png
+    file: modules/lanarts/features/sprites/closed_door.png
 
   - name: store
-    file: res/features/sprites/shop.png
+    file: modules/lanarts/features/sprites/shop.png
 
   - name: statue
     type: animation
-    frames: res/features/sprites/statues/statue(0-17).png    
+    frames: modules/lanarts/features/sprites/statues/statue(0-17).png

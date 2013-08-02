@@ -43,6 +43,9 @@ namespace lua_api {
 
 	void register_io_api(lua_State* L);
 
+	void register_lua_submodule(lua_State* L, const char* vpath, LuaValue module);
+	void register_lua_submodule_loader(lua_State* L, const char* vpath, LuaValue loader);
+
 	/* Register general utility functions */
 	void register_general_api(lua_State* L) ;
 
@@ -66,6 +69,8 @@ namespace lua_api {
 
 	// Register all the lanarts API functions and types
 	void register_api(GameState* gs, lua_State* L);
+
+	LuaValue import(lua_State* L, const char* filename);
 
 	// Callbacks into the lua VM:
 	bool luacall_handle_event(lua_State* L, SDL_Event* e);

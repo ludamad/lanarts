@@ -34,9 +34,11 @@ local function import_file(vpath)
     local rpath = vpath:gsub("%.", "/") .. ".lua"
     local loaded, err = loadfile(ROOT_FOLDER .. '/' .. rpath)
     if loaded then
-        return { loaded(vpath) }
+        -- If no return from module, return its 'fenv'.
+        local entries = { loaded(vpath) }
+        return (#entries > 0) and entries or { getfenv(loaded) }
     else
-        print("'import_file' error loading path \"" .. rpath .. "\": " .. err)
+        error("'import file': error loading path \"" .. rpath .. "\": " .. err)
         return nil
     end
 end
@@ -58,7 +60,7 @@ function import(vpath, --[[Optional]] mname)
         else vpath = path_root .. '.' .. vpath_rest end
     end
 
-    local module = _IMPORTED[vpath]
+    local module = _IMPORTED[vpath] or _LOADED[vpath]
     if module == _ILLEGAL_RECURSION_SENTINEL then
         error("import detected import recursion from '" .. vpath .. "' being loaded from '" .. mname .. "'")
     elseif module then 
@@ -87,7 +89,7 @@ require_path_add("modules/?.lua")
 local main = import "core.main"
 
 -- Hardcoded for now!
-local modules = {"lanarts", "test"}
+local modules = {"lanarts"} --, "test"}
 
 for m in values(modules) do
     import(m .. ".main")

@@ -1,7 +1,7 @@
 -- Places instances on a certain origin, an optional offset can also be specified
 
 local utils = import "core.utils"
-local InstanceGroup = import "core.InstanceGroup"
+local InstanceGroup = import "core.ui.InstanceGroup"
 
 --- A layout consisting of objects placed on a grid. 
 -- Each object can be placed with an origin, as well as an optional offset.
@@ -70,3 +70,5 @@ end
 function InstanceBox:__tostring()
     return "[InstanceBox " .. toaddress(self) .. "]"
 end
+
+return InstanceBox

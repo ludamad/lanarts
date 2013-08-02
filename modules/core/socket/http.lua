@@ -8,14 +8,13 @@
 -----------------------------------------------------------------------------
 -- Declare module and import dependencies
 -------------------------------------------------------------------------------
-local socket = require("socket")
-local url = require("socket.url")
-local ltn12 = require("ltn12")
-local mime = require("mime")
-local string = require("string")
+import "@socket"
+local url = import "@socket.url"
+local ltn12 = import "@ltn12"
+local mime = import "@mime"
 local base = _G
-local table = require("table")
-module("socket.http")
+
+module("socket.http", package.seeall)
 
 -----------------------------------------------------------------------------
 -- Program constants

@@ -8,9 +8,9 @@
 -- Declare module and import dependencies
 -----------------------------------------------------------------------------
 local base = _G
-local string = require("string")
-local math = require("math")
-local socket = require("socket.core")
+
+import("core.socket.core")
+
 module("socket")
 
 -----------------------------------------------------------------------------

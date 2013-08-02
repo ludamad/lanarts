@@ -51,3 +51,5 @@ end
 function Sprite:__tostring()
     return "[Sprite " .. toaddress(self) .. "]" 
 end
+
+return Sprite

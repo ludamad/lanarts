@@ -1,15 +1,15 @@
-local InstanceBox = import "core.InstanceBox"
-local Sprite = import "core.Sprite"
-local TextLabel = import "core.TextLabel"
+local InstanceBox = import "core.ui.InstanceBox"
+local Sprite = import "core.ui.Sprite"
+local TextLabel = import "core.ui.TextLabel"
 local utils = import "core.utils"
-local game_loop = import "core.game_loop"
+local game_loop = import "lanarts.game_loop"
 
-local utils_text_component = import "core.utils_text_component"
+local utils_text_component = import "core.utils.utils_text_component"
 
-import "core.menus.game_settings_menu"
-import "core.menus.lobby_menu"
-import "core.menus.pregame_menu"
-import "core.menus.scores_menu"
+import "lanarts.menus.game_settings_menu"
+import "lanarts.menus.lobby_menu"
+import "lanarts.menus.pregame_menu"
+import "lanarts.menus.scores_menu"
 
 import "core.networking.tasks"
 
@@ -26,7 +26,7 @@ local function start_menu_create(on_start_click, on_join_click, on_load_click, o
     local menu = InstanceBox.create( { size = Display.display_size } )
 
     menu:add_instance(
-        Sprite.image_create("res/interface/sprites/lanarts_logo.png"),
+        Sprite.image_create("modules/lanarts/interface/sprites/lanarts_logo.png"),
         CENTER_TOP,
         --[[Down 10 pixels]]
         {0, 10}

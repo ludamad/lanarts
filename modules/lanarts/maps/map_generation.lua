@@ -56,7 +56,7 @@ end
 local function area_temp_apply()
     local tileset = TileSets.grass
     local area_temp = MapGen.area_template_create {
-        data_file = "res/maps/test-template.txt",
+        data_file = "modules/lanarts/maps/test-template.txt",
         legend = { ['x'] = { add = {MapGen.FLAG_SEETHROUGH, MapGen.FLAG_SOLID}, content = tileset.wall }, 
                    ['.'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor } }
     }

@@ -1,9 +1,9 @@
-local InstanceGroup = import "core.InstanceGroup"
-local InstanceBox = import "core.InstanceBox"
-local Sprite = import "core.Sprite"
-local TextLabel = import "core.TextLabel"
+local InstanceGroup = import "core.ui.InstanceGroup"
+local InstanceBox = import "core.ui.InstanceBox"
+local Sprite = import "core.ui.Sprite"
+local TextLabel = import "core.ui.TextLabel"
 local utils = import "core.utils"
-local utils_text_component = import "core.utils_text_component"
+local utils_text_component = import "core.utils.utils_text_component"
 
 local text_button_params = {
     font = font_cached_load(settings.menu_font, 20),
@@ -58,7 +58,7 @@ end
 
 function pregame_menu_create(on_start_click)
     local menu = InstanceBox.create( { size = Display.display_size } )
-    local logo = Sprite.image_create("res/interface/sprites/lanarts_logo.png")
+    local logo = Sprite.image_create("modules/lanarts/interface/sprites/lanarts_logo.png")
 
     menu:add_instance(
         logo, 

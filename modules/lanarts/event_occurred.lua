@@ -1,4 +1,4 @@
-local sounds = import "core.sound"
+local sounds = import "lanarts.sounds"
 
 local events = {}
 
@@ -43,8 +43,8 @@ function event_occurred(type, --[[Misc data]] ...)
 end
 
 function player_has_won()
-    import "core.menus.winning_screen"
-    import "core.game_loop"
+    import "lanarts.menus.winning_screen"
+    import "lanarts.game_loop"
 
     Game.wait(400)
     game_loop_control.game_is_over = true

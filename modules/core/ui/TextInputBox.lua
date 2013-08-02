@@ -117,3 +117,5 @@ end
 function TextInputBox:__tostring()
     return "[TextInputBox " .. toaddress(self) .. "]" 
 end
+
+return TextInputBox

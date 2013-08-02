@@ -1,19 +1,19 @@
 local utils = import "core.utils"
-local InstanceBox = import "core.InstanceBox"
-local InstanceLine = import "core.InstanceLine"
-local Sprite = import "core.Sprite"
-local TextLabel = import "core.TextLabel"
+local InstanceBox = import "core.ui.InstanceBox"
+local InstanceLine = import "core.ui.InstanceLine"
+local Sprite = import "core.ui.Sprite"
+local TextLabel = import "core.ui.TextLabel"
 
 import "core.networking.lobby"
 import "core.networking.tasks"
 
-local utils_text_component = import "core.utils_text_component"
+local utils_text_component = import "core.utils.utils_text_component"
 
 local game_entry_draw
-local logo_path = "res/interface/sprites/lanarts_logo_no_sub.png"
+local logo_path = "modules/lanarts/interface/sprites/lanarts_logo_no_sub.png"
 local small_font = font_cached_load(settings.font, 10)
 local large_font = font_cached_load(settings.font, 20)
-local alt_font = font_cached_load("res/fonts/MateSC-Regular.ttf", 14)
+local alt_font = font_cached_load("modules/core/fonts/MateSC-Regular.ttf", 14)
 
 local SETTINGS_BOX_MAX_CHARS = 18
 local SETTINGS_BOX_SIZE = {180, 34}
@@ -45,7 +45,7 @@ end
 -- A component that starts by displaying a loading animation until 'replace' is called
 local function loading_box_create(size)
     local obj = InstanceBox.create( {size=size} )
-    local loading_animation = animation_create( image_split(image_cached_load "res/menus/loading_64x64.png", {64, 64}), 0.1 )
+    local loading_animation = animation_create( image_split(image_cached_load "modules/lanarts/menus/loading_64x64.png", {64, 64}), 0.1 )
     local contents = Sprite.create(loading_animation, {color=with_alpha(COL_WHITE, 0.25)} )
     obj:add_instance(contents, CENTER_TOP, {0,50})
     -- Called when component has loaded

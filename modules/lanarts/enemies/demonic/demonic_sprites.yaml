@@ -2,10 +2,10 @@
 sprites:
 
   - name: imp
-    file: res/enemies/demonic/sprites/cute_imp.png
+    file: modules/lanarts/enemies/demonic/sprites/cute_imp.png
     
   - name: hell hog
-    file: res/enemies/demonic/sprites/hell_hog.png
+    file: modules/lanarts/enemies/demonic/sprites/hell_hog.png
 
   - name: unseen horror
-    file: res/enemies/demonic/sprites/unseen_horror.png
+    file: modules/lanarts/enemies/demonic/sprites/unseen_horror.png

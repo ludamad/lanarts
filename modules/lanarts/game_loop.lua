@@ -2,7 +2,7 @@
     Implements the game loop, which calls the step & draw events of all objects.
 ]]
 
-local help_overlay = import "core.help_overlay"
+local help_overlay = import "lanarts.help_overlay"
 
 --- Externally visible control structure for the main loop
 game_loop_control = {

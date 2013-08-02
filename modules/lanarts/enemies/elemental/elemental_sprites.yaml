@@ -2,16 +2,16 @@
 sprites: 
 
   - name: storm elemental
-    file: res/enemies/elemental/sprites/storm_elemental.png
+    file: modules/lanarts/enemies/elemental/sprites/storm_elemental.png
 
   - name: hell storm
-    file: res/enemies/elemental/sprites/hell_storm.png
+    file: modules/lanarts/enemies/elemental/sprites/hell_storm.png
 
   - name: cloud elemental
-    file: res/enemies/elemental/sprites/cloud_elemental.png
+    file: modules/lanarts/enemies/elemental/sprites/cloud_elemental.png
 
   - name: water elemental
-    file: res/enemies/elemental/sprites/waterelemental.png
+    file: modules/lanarts/enemies/elemental/sprites/waterelemental.png
 
   - name: hell forged
-    file: res/enemies/elemental/sprites/hellforged.png
+    file: modules/lanarts/enemies/elemental/sprites/hellforged.png

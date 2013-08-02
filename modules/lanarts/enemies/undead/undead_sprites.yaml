@@ -2,13 +2,13 @@
 sprites:
 
   - name: exec
-    file: res/enemies/undead/sprites/exec.png
+    file: modules/lanarts/enemies/undead/sprites/exec.png
 
   - name: skeleton
-    file: res/enemies/undead/sprites/skeleton.png
+    file: modules/lanarts/enemies/undead/sprites/skeleton.png
     
   - name: skeleton fighter
-    file: res/enemies/undead/sprites/skelefighter.png
+    file: modules/lanarts/enemies/undead/sprites/skelefighter.png
     
   - name: zombie
-    file: res/enemies/undead/sprites/zombie.png
+    file: modules/lanarts/enemies/undead/sprites/zombie.png

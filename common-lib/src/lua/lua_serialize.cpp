@@ -414,11 +414,19 @@ int mar_encode(lua_State* L) {
 }
 
 int mar_decode(lua_State* L) {
-	if (!lua_isnoneornil(L, 1) && !lua_istable(L, 1)) {
-		luaL_error(L, "bad argument #1 to decode (expected table)");
+	if (lua_isnone(L, 1)) {
+		lua_pushnil(L);
 	}
 	while (lua_gettop(L) < 3) {
 		lua_newtable(L);
+	}
+	for (int i = 2; i <= 3; i++) {
+		if (lua_isnil(L, i)) {
+			lua_newtable(L);
+			lua_replace(L, i);
+		} else if (!lua_istable(L, i)) {
+			luaL_error(L, "bad argument #%d to decode (expected table)", i);
+		}
 	}
 
 	size_t len = lua_objlen(L, 1);

@@ -1,53 +1,53 @@
 sprites: 
   - name: dagger
-    file: res/items/weapons/sprites/dagger.png
+    file: modules/lanarts/items/weapons/sprites/dagger.png
 
   - name: short sword
-    file: res/items/weapons/sprites/shortsword.png
+    file: modules/lanarts/items/weapons/sprites/shortsword.png
     
   - name: samurai sabre
-    file: res/items/weapons/sprites/samuri_sabre.png
+    file: modules/lanarts/items/weapons/sprites/samuri_sabre.png
     
   - name: iron broadsword
-    file: res/items/weapons/sprites/iron_broadsword.png
+    file: modules/lanarts/items/weapons/sprites/iron_broadsword.png
     
   - name: magic sword
-    file: res/items/weapons/sprites/magic_sword.png
+    file: modules/lanarts/items/weapons/sprites/magic_sword.png
 
   - name: battle axe
-    file: res/items/weapons/sprites/battle_axe.png
+    file: modules/lanarts/items/weapons/sprites/battle_axe.png
   
   - name: orc axe
-    file: res/items/weapons/sprites/orc_axe.png
+    file: modules/lanarts/items/weapons/sprites/orc_axe.png
 
   - name: mace
-    file: res/items/weapons/sprites/mace.png
+    file: modules/lanarts/items/weapons/sprites/mace.png
 
   - name: bow1
-    file: res/items/weapons/sprites/ranged/bow1.png
+    file: modules/lanarts/items/weapons/sprites/ranged/bow1.png
   
   - name: iron scimitar
-    file: res/items/weapons/sprites/scimitar.png
+    file: modules/lanarts/items/weapons/sprites/scimitar.png
 
   - name: long bow
-    file: res/items/weapons/sprites/ranged/longbow.png
+    file: modules/lanarts/items/weapons/sprites/ranged/longbow.png
 
   - name: big stone
-    file: res/effects/sprites/big_stone.png
+    file: modules/lanarts/effects/sprites/big_stone.png
 
   - name: hand
-    file: res/items/weapons/sprites/hand.png
+    file: modules/lanarts/items/weapons/sprites/hand.png
 
   - name: arrow_projectile
     type: directional
-    frames: res/items/weapons/sprites/projectiles/arrow(0-7).png
+    frames: modules/lanarts/items/weapons/sprites/projectiles/arrow(0-7).png
 
   - name: stone_arrow_projectile
     type: directional
-    frames: res/items/weapons/sprites/projectiles/bolt(0-7).png
+    frames: modules/lanarts/items/weapons/sprites/projectiles/bolt(0-7).png
 
   - name: arrow_item
-    file: res/items/weapons/sprites/arrow.png
+    file: modules/lanarts/items/weapons/sprites/arrow.png
 
   - name: stone_arrow_item
-    file: res/items/weapons/sprites/silver_arrow.png
+    file: modules/lanarts/items/weapons/sprites/silver_arrow.png

@@ -1,11 +1,11 @@
 local utils = import "core.utils"
-local InstanceGroup = import "core.InstanceGroup"
-local InstanceLine = import "core.InstanceLine"
-local TextInputBox = import "core.TextInputBox"
-local TextLabel = import "core.TextLabel"
-local Sprite = import "core.Sprite"
+local InstanceGroup = import "core.ui.InstanceGroup"
+local InstanceLine = import "core.ui.InstanceLine"
+local TextInputBox = import "core.ui.TextInputBox"
+local TextLabel = import "core.ui.TextLabel"
+local Sprite = import "core.ui.Sprite"
 
-local utils_text_component = import "core.utils_text_component"
+local utils_text_component = import "core.utils.utils_text_component"
 
 local SETTINGS_BOX_MAX_CHARS = 18
 local SETTINGS_BOX_SIZE = {180, 34}
@@ -72,9 +72,9 @@ end
 
 local function connection_toggle_create()
 
-    local client_option_image = image_cached_load("res/interface/sprites/config/client_icon.png")
-    local server_option_image = image_cached_load("res/interface/sprites/config/server_icon.png")
-    local single_player_option_image = image_cached_load("res/interface/sprites/config/single_player_icon.png")
+    local client_option_image = image_cached_load("modules/lanarts/interface/sprites/config/client_icon.png")
+    local server_option_image = image_cached_load("modules/lanarts/interface/sprites/config/server_icon.png")
+    local single_player_option_image = image_cached_load("modules/lanarts/interface/sprites/config/single_player_icon.png")
 
     local toggle = { 
         size = SETTINGS_BOX_SIZE,
@@ -126,8 +126,8 @@ local function respawn_toggle_create()
         font = SETTINGS_FONT,
     }
 
-    local respawn = image_cached_load("res/interface/sprites/config/respawn_setting.png")
-    local hardcore = image_cached_load("res/interface/sprites/config/hardcore_setting.png")
+    local respawn = image_cached_load("modules/lanarts/interface/sprites/config/respawn_setting.png")
+    local hardcore = image_cached_load("modules/lanarts/interface/sprites/config/hardcore_setting.png")
 
     function toggle:step(xy)
         -- Toggle the connection type
@@ -201,7 +201,7 @@ local function speed_toggle_create()
     local toggle = { 
         size = SETTINGS_BOX_SIZE,
         font = SETTINGS_FONT,
-        sprite = image_cached_load("res/interface/sprites/config/speed_setting.png")
+        sprite = image_cached_load("modules/lanarts/interface/sprites/config/speed_setting.png")
     }
 
     function toggle:step(xy)
@@ -259,7 +259,7 @@ local function label_button_create(params, color_formula, on_click)
 end
 
 local function class_choice_buttons_create()
-    local sprite_base = "res/interface/sprites/class_icons/"
+    local sprite_base = "modules/lanarts/interface/sprites/class_icons/"
     local x_padding, y_padding = 32, 16
     local font = BIG_SETTINGS_FONT
 

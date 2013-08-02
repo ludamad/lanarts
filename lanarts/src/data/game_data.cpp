@@ -212,7 +212,7 @@ static void __lua_init(lua_State* L, T& t) {
 void init_game_data(GameSettings& settings, lua_State* L) {
 	LuaSpecialValue globals = luawrap::globals(L);
 
-	DataFiles dfiles = load_datafilenames("res/datafiles.yaml");
+	DataFiles dfiles = load_datafilenames("modules/lanarts/datafiles.yaml");
 
 //NB: Do not re-order the way resources are loaded unless you know what you're doing!
 //For example, all item data types must be loaded before room generation data

@@ -9,14 +9,12 @@
 -- Declare module and import dependencies
 -----------------------------------------------------------------------------
 local base = _G
-local table = require("table")
-local string = require("string")
-local math = require("math")
-local socket = require("socket")
-local url = require("socket.url")
-local tp = require("socket.tp")
-local ltn12 = require("ltn12")
-module("socket.ftp")
+local string = import("core.string")
+local socket = import("core.socket")
+local url = import("core.socket.url")
+local tp = import("core.socket.tp")
+local ltn12 = import("core.ltn12")
+module("core.socket.ftp")
 
 -----------------------------------------------------------------------------
 -- Program constants

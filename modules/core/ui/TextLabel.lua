@@ -49,3 +49,5 @@ function TextLabel:draw(xy)
         self.font:draw( self.options, xy, self.text )
     end
 end
+
+return TextLabel

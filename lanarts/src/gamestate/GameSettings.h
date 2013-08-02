@@ -65,8 +65,8 @@ struct GameSettings {
 		frame_action_repeat = 0;
 		free_memory_while_idle = false;
 
-		font = "res/fonts/Gudea-Regular.ttf";
-		menu_font = "res/fonts/Gudea-Regular.ttf";
+		font = "modules/core/fonts/Gudea-Regular.ttf";
+		menu_font = "modules/core/fonts/Gudea-Regular.ttf";
 
 		invincible = false;
 		draw_diagnostics = false;

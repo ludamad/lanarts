@@ -9,15 +9,15 @@
 -- Declare module and import dependencies
 -----------------------------------------------------------------------------
 local base = _G
-local coroutine = require("coroutine")
-local string = require("string")
-local math = require("math")
-local os = require("os")
-local socket = require("socket")
-local tp = require("socket.tp")
-local ltn12 = require("ltn12")
-local mime = require("mime")
-module("socket.smtp")
+local coroutine = import("coroutine")
+local string = import("string")
+local math = import("math")
+local os = import("os")
+local socket = import("core.socket")
+local tp = import("core.socket.tp")
+local ltn12 = import("core.ltn12")
+local mime = import("mime")
+module("core.socket.smtp")
 
 -----------------------------------------------------------------------------
 -- Program constants

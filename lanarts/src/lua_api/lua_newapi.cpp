@@ -106,6 +106,7 @@ namespace lua_api {
 	}
 
 	static int wrapped_with_globals_mutable(lua_State* L) {
+		printf("wrapped_with_globals_mutable got %d\n", lua_gettop(L));
 		bool was_mutable = globals_get_mutability(L);
 		globals_set_mutability(L, true);
 
@@ -121,6 +122,25 @@ namespace lua_api {
 	static int safe_dofile(LuaStackValue filename) {
 		luawrap::dofile(filename.luastate(), filename.to_str());
 		return 0;
+	}
+
+	// Necessary for interacting with 'module' & luaL_openlib
+	static int wrap_call_permissive(lua_State* L) {
+		int nargs = lua_gettop(L);
+		LuaValue globals = luawrap::globals(L);
+
+		if (lua_getmetatable(L, LUA_GLOBALSINDEX)) {
+			lua_getfield(L, -1, "__constants");
+			if (!lua_isnil(L, -1)) {
+				lua_replace(L, LUA_GLOBALSINDEX);
+			} else {
+				lua_pop(L, 1);
+			}
+			lua_pop(L, 1);
+		}
+
+		lua_CFunction cfunc = lua_tocfunction(L, lua_upvalueindex(1));
+		return cfunc(L);
 	}
 
 	/* Creates a lua state with a custom global metatable.
@@ -140,6 +160,9 @@ namespace lua_api {
 
 		configure_lua_packages(L);
 
+		luawrap::globals(L)["module"].push();
+		lua_pushcclosure(L, wrap_call_permissive, 1);
+		luawrap::globals(L)["module"].pop();
 		luawrap::globals(L)["require"].push();
 		lua_pushcclosure(L, wrapped_with_globals_mutable, 1);
 		luawrap::globals(L)["require"].pop();
@@ -184,13 +207,16 @@ namespace lua_api {
 		return gs;
 	}
 
+
 	// Convenience function that performs above on captured lua state
 	GameState* gamestate(const LuaStackValue& val) {
 		return gamestate(val.luastate());
 	}
 
 	void globals_set_mutability(lua_State* L, bool mutability) {
-		lua_getmetatable(L, LUA_GLOBALSINDEX); /* set global meta-table*/
+		if (!lua_getmetatable(L, LUA_GLOBALSINDEX)) {
+			return;
+		}
 		LuaValue globalsmeta = LuaValue::pop_value(L);
 
 		LuaValue fallback = luameta_constants(globalsmeta);
@@ -204,7 +230,9 @@ namespace lua_api {
 	}
 
 	bool globals_get_mutability(lua_State* L) {
-		lua_getmetatable(L, LUA_GLOBALSINDEX); /* set global meta-table*/
+		if (!lua_getmetatable(L, LUA_GLOBALSINDEX)) {
+			return true;
+		}
 		LuaValue globalsmeta = LuaValue::pop_value(L);
 		LuaValue fallback = luameta_constants(globalsmeta);
 		return !fallback.isnil();
@@ -212,10 +240,12 @@ namespace lua_api {
 
 	void register_lua_libraries(lua_State* L) {
 		LuaField preload = luawrap::globals(L)["package"]["preload"];
+		lua_pushcfunction(L, luaopen_socket_core);
+		lua_api::register_lua_submodule_loader(L, "core.socket.core", LuaValue::pop_value(L));
+		lua_pushcfunction(L, luaopen_mime_core);
+		lua_api::register_lua_submodule_loader(L, "core.mime.core", LuaValue::pop_value(L));
 		preload["socket.core"].bind_function(luaopen_socket_core);
 		preload["mime.core"].bind_function(luaopen_mime_core);
-
-		lua_api::add_search_path(L, "res/library_files/?.lua");
 	}
 
 	// Register all the lanarts API functions and types

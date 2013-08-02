@@ -9,10 +9,10 @@
 -- Declare module and import dependencies
 -----------------------------------------------------------------------------
 local base = _G
-local string = require("string")
-local socket = require("socket")
-local ltn12 = require("ltn12")
-module("socket.tp")
+local string = import("string")
+local socket = import("core.socket")
+local ltn12 = import("core.ltn12")
+module("core.socket.tp")
 
 -----------------------------------------------------------------------------
 -- Program constants

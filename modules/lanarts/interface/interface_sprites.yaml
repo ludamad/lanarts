@@ -1,58 +1,58 @@
 sprites:
   - name: logo
-    file: res/interface/sprites/lanarts_logo.png
+    file: modules/lanarts/interface/sprites/lanarts_logo.png
     
   - name: inventory_icon
-    file: res/interface/sprites/items.png
+    file: modules/lanarts/interface/sprites/items.png
     
   - name: equipment_icon
-    file: res/interface/sprites/equipment.png
+    file: modules/lanarts/interface/sprites/equipment.png
     
   - name: spells_icon
-    file: res/interface/sprites/magic.png
+    file: modules/lanarts/interface/sprites/magic.png
     
   - name: config_icon
-    file: res/interface/sprites/config.png
+    file: modules/lanarts/interface/sprites/config.png
     
   - name: enemies_icon
-    file: res/interface/sprites/enemies.png
+    file: modules/lanarts/interface/sprites/enemies.png
     
   - name: stats_icon
-    file: res/interface/sprites/stats.png
+    file: modules/lanarts/interface/sprites/stats.png
     
   - name: left_arrow
-    file: res/interface/sprites/left_arrow.png
+    file: modules/lanarts/interface/sprites/left_arrow.png
     
   - name: right_arrow
-    file: res/interface/sprites/right_arrow.png
+    file: modules/lanarts/interface/sprites/right_arrow.png
         
   - name: archer_icon
-    file: res/interface/sprites/class_icons/archer.png
+    file: modules/lanarts/interface/sprites/class_icons/archer.png
     
   - name: druid_icon
-    file: res/interface/sprites/class_icons/druid.png
+    file: modules/lanarts/interface/sprites/class_icons/druid.png
     
   - name: fighter_icon
-    file: res/interface/sprites/class_icons/fighter.png
+    file: modules/lanarts/interface/sprites/class_icons/fighter.png
     
   - name: wizard_icon
-    file: res/interface/sprites/class_icons/wizard.png
+    file: modules/lanarts/interface/sprites/class_icons/wizard.png
     
   - name: speed setting icon
-    file: res/interface/sprites/config/speed_setting.png
+    file: modules/lanarts/interface/sprites/config/speed_setting.png
     
   - name: hardcore setting icon
-    file: res/interface/sprites/config/hardcore_setting.png
+    file: modules/lanarts/interface/sprites/config/hardcore_setting.png
     
   - name: respawn setting icon
-    file: res/interface/sprites/config/respawn_setting.png
+    file: modules/lanarts/interface/sprites/config/respawn_setting.png
     
     #network settings
   - name: client setting icon
-    file: res/interface/sprites/config/client_icon.png
+    file: modules/lanarts/interface/sprites/config/client_icon.png
     
   - name: server setting icon
-    file: res/interface/sprites/config/server_icon.png
+    file: modules/lanarts/interface/sprites/config/server_icon.png
     
   - name: single player setting icon
-    file: res/interface/sprites/config/single_player_icon.png
+    file: modules/lanarts/interface/sprites/config/single_player_icon.png

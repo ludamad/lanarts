@@ -1,7 +1,7 @@
-local InstanceBox = import "core.InstanceBox"
-local InstanceLine = import "core.InstanceLine"
-local TextLabel = import "core.TextLabel"
-local Sprite = import "core.Sprite"
+local InstanceBox = import "core.ui.InstanceBox"
+local InstanceLine = import "core.ui.InstanceLine"
+local TextLabel = import "core.ui.TextLabel"
+local Sprite = import "core.ui.Sprite"
 local utils = import "core.utils"
 
 local function action_bar_hints_create()
