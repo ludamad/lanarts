@@ -12,6 +12,8 @@ local utils = import "core.utils" -- for table.pop_front & do_nothing
 
 local YieldingSocket = newtype()
 
+local M = {} --submodule
+
 function YieldingSocket:init(...)
 --    print ("CALLED!")
     self.socket = socket.tcp(...)
@@ -71,7 +73,7 @@ function YieldingSocket:receive(pattern, ...)
 end
 
 --- Calls yield instead of blocking
-function http_request(url, message)
+function M.http_request(url, message)
     local response_parts = {}
     local reqt = {
         url = url,
@@ -92,12 +94,14 @@ function http_request(url, message)
 end
 
 --- Calls yield instead of blocking
-function json_request(url, message)
+function M.json_request(url, message)
     -- nil if message is nil
     local json_request = message and jsonlib.generate(message)
-    local json_response, code, headers, status = http_request(url, json_request)
+    local json_response, code, headers, status = M.http_request(url, json_request)
     local status, response_table = jsonlib.parse(json_response)
     if not status then error(response_table) end
 
     return response_table, code, headers, status
 end
+
+return M

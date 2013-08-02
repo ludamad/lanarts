@@ -6,7 +6,7 @@ local InstanceGroup = import "core.ui.InstanceGroup"
 -- Each object can be placed with an optional offset.
 -- Objects that are stored should have 'step' and 'draw' methods that take a position, as well as a 'size' member.
 -- @usage For example, InstanceLine.create( {dx = 32} ) or InstanceLine.create( {dx = 32, per_row = 3, dy = 32} )
-InstanceLine = newtype()
+local InstanceLine = newtype()
 
 --- Initializes a new InstanceLine. Takes an argument table.
 -- params.force_size overrides the size the layout is considered. Otherwise it is dynamic.

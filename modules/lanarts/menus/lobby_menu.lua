@@ -4,8 +4,8 @@ local InstanceLine = import "core.ui.InstanceLine"
 local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
 
-import "core.networking.lobby"
-import "core.networking.tasks"
+local lobby = import "core.networking.lobby"
+local tasks = import "core.networking.tasks"
 
 local utils_text_component = import "core.utils.utils_text_component"
 
@@ -29,16 +29,16 @@ local session_info = {
 
 local function login_if_needed()
      if session_info.username ~= settings.username then
-         local credentials = Lobby.guest_login(settings.username)
+         local credentials = lobby.guest_login(settings.username)
          session_info.username = settings.username
          session_info.sessionId = credentials.sessionId
     end
 end
 
 local function join_game_task_create(entry_data)
-    Task.create(function()
+    tasks.create(function()
         login_if_needed()
-        pretty_print( Lobby.join_game(session_info.username, session_info.sessionId, entry_data.id) )
+        pretty_print( lobby.join_game(session_info.username, session_info.sessionId, entry_data.id) )
     end)
 end
 
@@ -139,12 +139,12 @@ local function game_query_task_create(menu)
                     return 
                 end
             end
-            local response = Lobby.query_game_list()
+            local response = lobby.query_game_list()
             first_time = false
             menu.entry_list:replace( game_entry_list_create(response.gameList), LEFT_TOP, {0,0} )
         end
     end
-    Task.create(query_game_list)
+    tasks.create(query_game_list)
 end
 
 function lobby_menu_create(on_back_click) 
@@ -199,7 +199,7 @@ function main()
         state.menu:draw({0,0})
         Display.draw_finish()
 
-        Task.run_all()
+        tasks.run_all()
         io.flush()
 
         Game.wait(5)

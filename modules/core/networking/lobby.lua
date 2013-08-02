@@ -1,35 +1,35 @@
-import "core.networking.http_request"
+local httprequest = import "core.networking.http_request"
 
 --- Lobby HTTP requests. They are all nonblocking. Instead, they call yield.
 -- Valid only within coroutines.
 
-Lobby = {}
+local M = {} --submodule
 
-function Lobby.create_user(username, password)
-    return json_request(settings.lobby_server_url, {
+function M.create_user(username, password)
+    return httprequest.json_request(settings.lobby_server_url, {
         type = "CreateUserMessage", 
         username = username, 
         password = password 
     })
 end
 
-function Lobby.login(username, password)
-    return json_request(settings.lobby_server_url, {
+function M.login(username, password)
+    return httprequest.json_request(settings.lobby_server_url, {
         type = "LoginMessage", 
         username = username, 
         password = password 
     })
 end
 
-function Lobby.guest_login(username)
-    return json_request(settings.lobby_server_url, {
+function M.guest_login(username)
+    return httprequest.json_request(settings.lobby_server_url, {
         type = "GuestLoginMessage", 
         username = username
     })
 end
 
-function Lobby.chat_message(username, sessionId, message)
-    return json_request(settings.lobby_server_url, {
+function M.chat_message(username, sessionId, message)
+    return httprequest.json_request(settings.lobby_server_url, {
         type = "ChatMessage", 
         username = username,
         sessionId = sessionId,
@@ -37,16 +37,16 @@ function Lobby.chat_message(username, sessionId, message)
     })
 end
 
-function Lobby.create_game(username, sessionId)
-    return json_request(settings.lobby_server_url, {
+function M.create_game(username, sessionId)
+    return httprequest.json_request(settings.lobby_server_url, {
         type = "CreateGameMessage", 
         username = username,
         sessionId = sessionId,
     })
 end
 
-function Lobby.join_game(username, sessionId, gameId)
-    return json_request(settings.lobby_server_url, {
+function M.join_game(username, sessionId, gameId)
+    return httprequest.json_request(settings.lobby_server_url, {
         type = "JoinGameMessage", 
         username = username,
         sessionId = sessionId,
@@ -54,15 +54,17 @@ function Lobby.join_game(username, sessionId, gameId)
     })
 end
 
-function Lobby.query_game(gameId)
-    return json_request(settings.lobby_server_url, {
+function M.query_game(gameId)
+    return httprequest.json_request(settings.lobby_server_url, {
         type = "GameStatusRequestMessage", 
         gameId = gameId
     })
 end
 
-function Lobby.query_game_list()
-    return json_request(settings.lobby_server_url, {
+function M.query_game_list()
+    return httprequest.json_request(settings.lobby_server_url, {
         type = "GameListRequestMessage" 
     })
 end
+
+return M

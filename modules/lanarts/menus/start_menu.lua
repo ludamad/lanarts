@@ -11,7 +11,7 @@ import "lanarts.menus.lobby_menu"
 import "lanarts.menus.pregame_menu"
 import "lanarts.menus.scores_menu"
 
-import "core.networking.tasks"
+local tasks = import "core.networking.tasks"
 
 -- START SCREEN -- 
 
@@ -203,7 +203,7 @@ local function menu_loop(should_poll)
         menu_state.menu:draw( {0, 0} )
         Display.draw_finish()
 
-        Task.run_all()
+        tasks.run_all()
         Game.wait(10)
     end
 

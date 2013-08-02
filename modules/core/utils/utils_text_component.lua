@@ -1,5 +1,12 @@
--- Solves circular dependencies:
-local imported_text_input_box = false
+local InstanceGroup, TextLabel, InstanceBox, TextInputBox
+
+-- Solve circular dependence by late-loading
+local function ensure_loaded_dependencies()
+    InstanceGroup = InstanceGroup or import "@ui.InstanceGroup"
+    TextLabel = TextLabel or import "@ui.TextLabel"
+    InstanceBox = InstanceBox or import "@ui.InstanceBox"
+    TextInputBox = TextInputBox or import "@ui.TextInputBox"
+end
 
 --- Create a clickable piece of text
 -- Displays the text 'text'
@@ -11,11 +18,14 @@ local imported_text_input_box = false
 --      'padding' controls how much bigger the click area is than the text, default 5
 -- }
 function text_button_create(text, on_click, params)
+    ensure_loaded_dependencies()
+
     local no_hover_color = params.color or COL_WHITE
     local hover_color = params.hover_color or no_hover_color
     local padding = params.click_box_padding or 5
     local font = params.font
 
+    -- Solves circular dependencies:
     local label = TextLabel.create(font, { color=no_hover_color }, text)
 
     function label:step(xy) -- Makeshift inheritance
@@ -32,7 +42,6 @@ function text_button_create(text, on_click, params)
     return label
 end
 
-
 --- Takes a parameter table with the following parameters: {
 --      'font': The font to use when drawing the input box
 --      'size': The size of the input box
@@ -42,7 +51,7 @@ end
 --      'input_callbacks': Controls the TextInputBox, see TextInputBox.lua
 -- }
 function text_field_create(params)
-    imported_text_input_box = imported_text_input_box or (import "@ui.TextInputBox") or true
+    ensure_loaded_dependencies()
 
     local font, size = params.font, params.size
     local max_chars, label_text = params.max_chars, params.label_text

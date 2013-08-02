@@ -6,7 +6,7 @@
 -- Each object can be placed with an origin, as well as an optional offset.
 -- Objects that are stored should have 'step' and 'draw' methods that take a position.
 -- @usage InstanceGroup.create()
-InstanceGroup = newtype()
+local InstanceGroup = newtype()
 
 --- Initializes a new instance group. 
 -- @usage InstanceGroup.create()

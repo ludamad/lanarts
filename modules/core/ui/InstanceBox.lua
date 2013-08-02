@@ -7,7 +7,7 @@ local InstanceGroup = import "core.ui.InstanceGroup"
 -- Each object can be placed with an origin, as well as an optional offset.
 -- Objects that are stored should have 'step' and 'draw' methods that take a position, as well as a 'size' member.
 -- @usage InstanceBox.create({ size = {640,480} })
-InstanceBox = newtype()
+local InstanceBox = newtype()
 
 --- Initializes a new InstanceBox.
 -- @usage InstanceBox.create({ size = {640,480} })

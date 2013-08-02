@@ -5,7 +5,8 @@ local utils = import "core.utils"
 
 local task_list = {}
 
-Task = newtype()
+local M = {} --submodule
+local Task = newtype()
 
 function Task:init(fn, err_handler) 
     self.task_coroutine = coroutine.create(fn)
@@ -13,12 +14,15 @@ function Task:init(fn, err_handler)
     task_list[#task_list+1] = self
 end
 
+-- Expose create function
+M.create = Task.create
+
 function Task:resume()
     return coroutine.resume(self.task_coroutine)
 end
 
 -- Runs all tasks, removing any completed tasks from list
-function Task.run_all() 
+function M.run_all() 
     local i = 1
     while i <= #task_list do
         local status, err = task_list[i]:resume()
@@ -37,3 +41,5 @@ function Task.run_all()
         end
     end
 end
+
+return M

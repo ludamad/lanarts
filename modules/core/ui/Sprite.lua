@@ -3,7 +3,7 @@ local utils = import "core.utils" -- import utils for 'do_nothing'
 --- Stores state associated with a drawable object.
 -- This state can be mutated by accessing the object's
 -- 'options' object.
-Sprite = newtype()
+local Sprite = newtype()
 
 ---  Create and load an image from a filename and an options table
 -- The options table specifies the frame and the origin, as well as
