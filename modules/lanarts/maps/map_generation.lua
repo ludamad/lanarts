@@ -1,5 +1,8 @@
 local utils = import "core.utils"
-import "core.tiles.tilesets"
+import "@tiles.tilesets"
+local MapGen = import "core.map_generation"
+
+local M = {} -- Submodule
 
 local function room_carve_operator(tileset)
     return MapGen.rectangle_operator { 
@@ -56,7 +59,7 @@ end
 local function area_temp_apply()
     local tileset = TileSets.grass
     local area_temp = MapGen.area_template_create {
-        data_file = "modules/lanarts/maps/test-template.txt",
+        data_file = path_resolve "test-template.txt",
         legend = { ['x'] = { add = {MapGen.FLAG_SEETHROUGH, MapGen.FLAG_SOLID}, content = tileset.wall }, 
                    ['.'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor } }
     }
@@ -68,9 +71,9 @@ local function area_temp_apply()
     return map_id
 end
 
-first_map_create = area_temp_apply
+M.first_map_create = area_temp_apply
 
-function sfirst_map_create() 
+local function sfirst_map_create() 
     local tileset = TileSets.grass
     local map = MapGen.map_create { size = {80,80}, flags = MapGen.FLAG_SOLID, content = tileset.wall, instances = {} }
 
@@ -81,3 +84,5 @@ function sfirst_map_create()
     World.players_spawn(map_id)
     return map_id
 end
+
+return M

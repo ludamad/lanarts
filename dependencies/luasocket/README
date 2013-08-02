@@ -1,2 +1,2 @@
 The library is a hybrid C/Lua library. 
-The lua portion is in res/library_files.
+The lua portion is in modules/core

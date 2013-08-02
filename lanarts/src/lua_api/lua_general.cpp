@@ -397,6 +397,33 @@ static void dotform_chop_component(std::string& str) {
 	dotform_chop_trailing_dots(str);
 }
 
+static const char* get_source(lua_State* L) {
+	lua_Debug ar;
+	lua_getstack(L, 1, &ar);
+	lua_getinfo(L, "S", &ar);
+	return ar.source;
+}
+
+static int lapi_path_resolve(lua_State* L) {
+	std::string current = get_source(L);
+	// Find character index where root dir ends
+	int i = current.size() - 1;
+	while (i >= 0 && (current[i] == '/' || current[i] == '\\')) {
+		i--;
+	}
+	// Find root dir
+	while (i >= 0 && (current[i] != '/' && current[i] != '\\')) {
+		i--;
+	}
+	i--; // Remove separator
+	current.resize(std::max(0, i + 1));
+
+	const char* cptr = current.c_str();
+	// '@' indicates a file path when used in debug info, remove this character if present
+	lua_pushfstring(L, "%s/%s", *cptr == '@' ? cptr + 1 : cptr, lua_tostring(L, 1));
+	return 1;
+}
+
 // Delegates to 'require', readjusts a relative 'dot-form' path
 static int lapi_virtual_path_create_relative(lua_State* L) {
 	// Resolve backtracks, ie every occurrence of < goes up one directory
@@ -406,7 +433,6 @@ static int lapi_virtual_path_create_relative(lua_State* L) {
 	while (*sub_path == '<') {
 		backtracks++, sub_path++;
 	}
-
 
 	// '@' indicates a file path when used in debug info, remove this character if present
 	std::string src = (*sub_path== '@' ? sub_path + 1: sub_path);
@@ -544,6 +570,7 @@ namespace lua_api {
 		globals["import_internal"].bind_function(lapi_import_internal);
 		globals["virtual_path_create_relative"].bind_function(lapi_virtual_path_create_relative);
 		globals["require_path_add"].bind_function(lapi_add_search_path);
+		globals["path_resolve"].bind_function(lapi_path_resolve);
 
 		LuaValue table = luawrap::ensure_table(globals["table"]);
 		table["merge"].bind_function(lapi_table_merge);
