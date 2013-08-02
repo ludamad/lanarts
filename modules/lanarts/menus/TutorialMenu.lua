@@ -40,7 +40,7 @@ end
 
 local tutorial_screens = {lanarts_explain_screen_create}
 
-function tutorial_menu_show(...)
+local function tutorial_menu_show(...)
     local screen
 
     local screen_idx = 1
@@ -75,3 +75,9 @@ function tutorial_menu_show(...)
 
     return false
 end
+
+-- submodule
+return {
+    show = tutorial_menu_show
+}
+

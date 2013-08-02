@@ -166,7 +166,7 @@ local function scores_menu_body_create()
     return group
 end
 
-function scores_menu_create(on_back_click)
+local function scores_menu_create(on_back_click)
     local menu = InstanceBox.create( { size = Display.display_size } )
     local logo_displacement = 0
 
@@ -206,3 +206,8 @@ function scores_menu_create(on_back_click)
 
     return menu
 end
+
+-- submodule
+return {
+    create = scores_menu_create
+}

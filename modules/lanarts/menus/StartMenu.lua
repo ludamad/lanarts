@@ -2,14 +2,14 @@ local InstanceBox = import "core.ui.InstanceBox"
 local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
 local utils = import "core.utils"
-local game_loop = import "lanarts.game_loop"
+local game_loop = import "@game_loop"
 
 local utils_text_component = import "core.utils.utils_text_component"
 
-import "lanarts.menus.game_settings_menu"
-import "lanarts.menus.lobby_menu"
-import "lanarts.menus.pregame_menu"
-import "lanarts.menus.scores_menu"
+local GameSettingsMenu = import "@menus.GameSettingsMenu"
+local LobbyMenu = import "@menus.LobbyMenu"
+local PregameMenu = import "@menus.PregameMenu"
+local ScoresMenu = import "@menus.ScoresMenu"
 
 local tasks = import "core.networking.tasks"
 
@@ -121,7 +121,8 @@ function setup_start_menu()
     end
 
     menu_state.menu:add_instance(
-        start_menu_create( --[[New Game Button]] setup_settings_menu, --[[Join Game Button]] setup_lobby_menu, --[[Load Game Button]] on_load_click, --[[Highscores Button]] setup_scores_menu),
+        start_menu_create( --[[New Game Button]] setup_settings_menu, --[[Join Game Button]] setup_lobby_menu, 
+            --[[Load Game Button]] on_load_click, --[[Highscores Button]] setup_scores_menu),
         CENTER
     )
 end
@@ -137,7 +138,7 @@ function setup_settings_menu()
     end
 
     menu_state.menu:add_instance(
-        game_settings_menu_create( --[[Back Button]] menu_state.back, --[[Start Game Button]] menu_state.continue), 
+        GameSettingsMenu.create( --[[Back Button]] menu_state.back, --[[Start Game Button]] menu_state.continue), 
         CENTER
     )
 end
@@ -150,7 +151,7 @@ function setup_pregame_menu()
     end
     menu_state.continue = exit_menu
     menu_state.menu:add_instance(
-        pregame_menu_create( --[[Start Game Button]] menu_state.continue ),
+        PreGameMenu.create( --[[Start Game Button]] menu_state.continue ),
         CENTER
     )
 end
@@ -160,7 +161,7 @@ function setup_scores_menu()
     menu_state.back = setup_start_menu
     menu_state.continue = nil
     menu_state.menu:add_instance(
-        scores_menu_create( --[[Back Button]] menu_state.back ),
+        ScoresMenu.create( --[[Back Button]] menu_state.back ),
         CENTER
     )
 end
@@ -170,7 +171,7 @@ function setup_lobby_menu()
     menu_state.back = setup_start_menu
     menu_state.continue = nil
     menu_state.menu:add_instance(
-        lobby_menu_create( --[[Back Button]] menu_state.back ),
+        LobbyMenu.create( --[[Back Button]] menu_state.back ),
         CENTER
     )
 end
@@ -210,15 +211,16 @@ local function menu_loop(should_poll)
     return false -- User has quit the game
 end
 
-function start_menu_show()
-    setup_start_menu()
+-- Submodule
+return {
+    start_menu_show = function()
+        setup_start_menu()
 
-    return menu_loop(--[[Do not poll connections]] false)
-end
+        return menu_loop(--[[Do not poll connections]] false)
+    end
+    , pregame_menu_show = function()
+        setup_pregame_menu()
 
-
-function pregame_menu_show()
-    setup_pregame_menu()
-
-    return menu_loop(--[[Poll connections]] true)
-end
+        return menu_loop(--[[Poll connections]] true)
+    end
+}

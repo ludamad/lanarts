@@ -10,15 +10,15 @@ require_path_add("modules/lanarts/library_files/?.lua")
 sound_volume = 0 -- Mute the game
 
 function Engine.menu_start(...)
-    import "lanarts.menus.start_menu"
+    local StartMenu = import "lanarts.menus.StartMenu"
 
-    return start_menu_show(...)
+    return StartMenu.start_menu_show(...)
 end
 
 function Engine.pregame_menu_start(...)
-    import "lanarts.menus.pregame_menu"
+    local StartMenu = import "lanarts.menus.StartMenu"
 
-    return pregame_menu_show(...)
+    return StartMenu.pregame_menu_show(...)
 end
 
 function Engine.loading_screen_draw(...)

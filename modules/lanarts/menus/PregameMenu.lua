@@ -56,7 +56,7 @@ local function pregame_joined_players_list_create()
     return group
 end
 
-function pregame_menu_create(on_start_click)
+local function pregame_menu_create(on_start_click)
     local menu = InstanceBox.create( { size = Display.display_size } )
     local logo = Sprite.image_create("modules/lanarts/interface/sprites/lanarts_logo.png")
 
@@ -82,3 +82,8 @@ function pregame_menu_create(on_start_click)
 
     return menu
 end
+
+-- Submodule
+return {
+    create = pregame_menu_create
+}

@@ -408,7 +408,7 @@ local function back_and_continue_options_create(on_back_click, on_start_click)
     return options
 end
 
-function game_settings_menu_create(on_back_click, on_start_click)
+local function game_settings_menu_create(on_back_click, on_start_click)
     local fields = InstanceBox.create( {size = { 640, 480 } } )
 
     fields:add_instance( 
@@ -429,3 +429,9 @@ function game_settings_menu_create(on_back_click, on_start_click)
 
     return fields
 end
+
+-- submodule
+return {
+    create = game_settings_menu_create
+}
+

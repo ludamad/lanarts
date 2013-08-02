@@ -147,7 +147,7 @@ local function game_query_task_create(menu)
     tasks.create(query_game_list)
 end
 
-function lobby_menu_create(on_back_click) 
+local function lobby_menu_create(on_back_click) 
     local menu = InstanceBox.create{ size = vector_min(Display.display_size, {800, 600}) }
     -- The game query task will finish once menu.alive is false
     menu.alive = true
@@ -183,26 +183,7 @@ function lobby_menu_create(on_back_click)
     return menu
 end
 
--- For testing purposes
-function main()
-    Display.initialize("Lanarts Example", {640, 480}, false)
---    Display.initialize("Lanarts Example", {1200, 900}, false)
-    local menu_frame = InstanceBox.create { size = Display.display_size }
-    local lobby_menu = lobby_menu_create()
-    menu_frame:add_instance(lobby_menu, CENTER)
-    local state = {menu = menu_frame}
-
-    while Game.input_capture() do
-        state.menu:step({0,0})
-
-        Display.draw_start()
-        state.menu:draw({0,0})
-        Display.draw_finish()
-
-        tasks.run_all()
-        io.flush()
-
-        Game.wait(5)
-    end
-end
-
+-- submodule
+return {
+    create = lobby_menu_create
+}
