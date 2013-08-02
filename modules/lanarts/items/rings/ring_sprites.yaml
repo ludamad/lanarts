@@ -1,0 +1,21 @@
+sprites: 
+  - name: magicians ring
+    file: res/items/rings/sprites/magicians_ring.png
+
+  - name: ring of spells
+    file: res/items/rings/sprites/ring_of_spells.png
+
+  - name: ring of stone
+    file: res/items/rings/sprites/ring_of_stone.png
+
+  - name: ogres ring
+    file: res/items/rings/sprites/ogres_ring.png
+ 
+  - name: hydra ring
+    file: res/items/rings/sprites/hydra_ring.png
+
+  - name: moonstone ring
+    file: res/items/rings/sprites/moonstone_ring.png
+
+  - name: ring of vitality
+    file: res/items/rings/sprites/ring_of_vitality.png

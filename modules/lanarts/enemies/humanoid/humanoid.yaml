@@ -1,0 +1,56 @@
+---
+#Enemy Markup
+enemies:
+
+#  - name: Orc Priest
+#    sprite: orc priest
+#   
+#  - name: Orc Sorceror
+#    sprite: orc sorceror
+#    
+#  - name: Orc Warlord
+#    sprite: orc warlord
+#    
+#  - name: Orc High Priest
+#    sprite: orc high priest
+    
+  - name: Orc Warrior
+    sprite: orc knight
+    death_sprite: blood
+    radius: 12
+    xpaward: 50
+    appear_message: You see an orc warrior!
+    defeat_message: The orc warrior dies.
+    init_func: enemy_berserker_init 
+    step_func: enemy_berserker_step
+    stats:
+        attacks: [ {weapon: Fast Melee} ]
+        hp: 100
+        hpregen: 0.02
+        movespeed: 4
+        strength: 35
+        defence: 12
+        willpower: 6
+
+  - name: Dark Centaur
+    sprite: nessos
+    death_sprite: blood
+    radius: 12
+    xpaward: 30
+    appear_message: A dark centaur readies his bow.
+    defeat_message: The dark centaur has been defeated.
+    stats:
+        attacks: [ {projectile: Dark Arrows} ]
+        hp: 80
+        hpregen: 0.01
+        movespeed: 4
+        strength: 20
+        defence: 8
+        willpower: 3
+
+#    
+#  - name: Orc Knight
+#    sprite: orc knight
+#    
+#  - name: Orc Wizard
+#    sprite: orc wizard

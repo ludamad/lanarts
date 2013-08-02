@@ -1,0 +1,83 @@
+--- 
+itemgen_lists:
+  - name: Basic Items    
+    items: &BasicItems
+    - { item: Gold,               chance: 125, quantity: [5,15]  }
+    #Projectiles
+    - { item: Arrow,              chance: 15,  quantity: [5,20]  }
+    - { item: Stone,              chance: 15,  quantity: [3,15]  }
+    #Ranged Weapons
+    - { item: Short Bow,          chance: 10                     }
+    #Melee Weapons
+    - { item: Dagger,             chance: 10                     }
+    - { item: Short Sword,        chance: 10                     }
+    - { item: Mace,               chance: 5                      }
+    #Scrolls
+    - { item: Haste Scroll,       chance: 3                      }
+    - { item: Strength Scroll,    chance: 2                      }
+    - { item: Scroll of Escape,   chance: 3                      }
+    - { item: Magic Scroll,       chance: 2                      }
+    - { item: Defence Scroll,     chance: 2                      }
+    - { item: Will Scroll,        chance: 2                      }
+    #Potions
+    - { item: Health Potion,      chance: 10                     }
+    - { item: Mana Potion,        chance: 10                     }
+    #Body Armour
+    - { item: Leather Armour,     chance: 4                      }
+    - { item: Robe,               chance: 4                      }
+    #Helmets
+    - { item: Iron Helmet,        chance: 4                      }
+    - { item: Wizard's Hat,       chance: 4                      }
+    #Rings
+    - { item: Ring of Spells,     chance: 3                      }
+    - { item: Ring of Vitality,   chance: 3                      }
+    - { item: Ring of Stone,      chance: 3                      }
+    #Boots
+    - { item: Leather Boots,      chance: 5                      }
+    #Gloves
+    - { item: Leather Gloves,     chance: 5                      }
+
+  - name: Enchanted Items
+    items: &EnchantedItems
+    - default: *BasicItems
+    #Projectiles
+    - { item: Silver Arrow,       chance: 10,  quantity: [2,6]   }
+    #Ranged Weapons
+    - { item: Long Bow,           chance: 2                      }
+    #Melee Weapons
+    - { item: Samurai Sabre,      chance: 1                      }
+    - { item: Magic Sword,        chance: 2                      }
+    #Potions
+    - { item: Health Potion,      chance: 10                     }
+    - { item: Mana Potion,        chance: 10                     }
+    #Body Armour
+    - { item: Chainmail,          chance: 2                      }
+    - { item: Platemail,          chance: 1                      }
+    - { item: Magician's Robe,    chance: 2                      }
+    - { item: Runed Robe,         chance: 1                      }
+    - { item: Robe of Mana,         chance: 1                      }
+    #Helmets
+    - { item: Runed Helmet,       chance: 1                      }
+    - { item: Crown of Mars,      chance: 1                      }
+    - { item: Crown of Orcus,     chance: 1                      }
+    - { item: Diana's Diadem,     chance: 1                      }
+    #Rings
+    - { item: Magician's Ring,    chance: 1                      }
+    - { item: Moonstone Ring,     chance: 1                      }
+    - { item: Ogre's Ring,        chance: 1                      }
+    - { item: Hydra Ring,         chance: 1                      }
+    #Boots
+    - { item: Iron Boots,         chance: 1                      }
+    #Gloves
+    - { item: Steel Gloves,       chance: 1                      }
+    - { item: Runed Gloves,       chance: 1                      }
+  - name: Store Items
+    items:
+    - default: *EnchantedItems
+    - { item: Arrow,              chance: 25,  quantity: [5,20]  }
+#    - { item: Iron Scimitar,      chance: 2                      }
+#    - { item: Battle Axe,         chance: 2                      }
+#    - { item: Orc Axe,            chance: 1                      }
+ #   - { item: Iron Broadsword,    chance: 2                      }
+ 
+ 

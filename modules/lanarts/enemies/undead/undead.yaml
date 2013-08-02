@@ -1,0 +1,86 @@
+---
+#Enemy Markup
+enemies:
+  - name: Skeleton
+    sprite: skeleton
+    radius: 11
+    xpaward: 20
+    appear_message: A re-animated skeleton appears!
+    defeat_message: The skeleton is broken unto a pile of bones.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 50
+        hpregen: 0.03
+        movespeed: 2
+        #base stats:
+        strength: 10
+        defence: 2
+        willpower: 2  
+        
+  - name: Skeleton Fighter
+    sprite: skeleton fighter
+    radius: 14
+    xpaward: 10
+    appear_message: A re-animated skeleton appears!
+    defeat_message: The skeleton is broken unto a pile of bones.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 50
+        hpregen: 0.03
+        movespeed: 2
+        #base stats:
+        strength: 10
+        defence: 2
+        willpower: 2
+        
+  - name: Zombie
+    sprite: zombie
+    death_sprite: green blood
+    appear_message: A re-animated zombie appears!
+    defeat_message: The zombie is beaten into a mess of flesh.
+    radius: 14
+    xpaward: 25
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 40
+        hpregen: 0.05
+        movespeed: 2
+        strength: 20
+        defence: 8  
+        willpower: 8
+      
+  - name: Krell
+    sprite: franken
+    death_sprite: green blood
+    description: A creature of unholy will to live.
+    appear_message: A horrible krell enters the scene.
+    defeat_message: The krell dies at last.
+    radius: 14
+    xpaward: 30
+    stats:
+        attacks: [ {weapon: Slow Melee} ]
+        hp: 35
+        hpregen: 0.25
+        movespeed: 2
+        strength: 30
+        defence: 10
+        willpower: 10
+
+#  - name: Executioner
+#    sprite: exec
+#    description: An undead creature equipped with terrifying blades.
+#    appear_message: The terrifying executioner appears.
+#    defeat_message: The executioner is vanquished.
+#    init_func: enemy_berserker_init 
+#    step_func: enemy_berserker_step
+#    radius: 12
+#    xpaward: 50
+#    stats:
+#        attacks: [ {weapon: Fast Melee} ]
+#        movespeed: 4.0
+#        hp: 50
+#        hpregen: 0.25
+#        strength: 20
+#        magic: 20
+#        defence: 10  
+#        willpower: 10
