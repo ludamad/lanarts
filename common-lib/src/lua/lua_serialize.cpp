@@ -429,10 +429,10 @@ int mar_decode(lua_State* L) {
 		}
 	}
 
-	size_t len = lua_objlen(L, 1);
+	size_t len = lua_objlen(L, 2);
 	size_t idx;
 	for (idx = 1; idx <= len; idx++) {
-		lua_rawgeti(L, 1, idx);
+		lua_rawgeti(L, 2, idx);
 		lua_rawseti(L, SEEN_IDX, idx);
 	}
 
