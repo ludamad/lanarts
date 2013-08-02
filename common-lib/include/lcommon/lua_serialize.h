@@ -36,10 +36,14 @@ class SerializeBuffer;
 struct lua_State;
 class LuaValue;
 
-void lua_serialize(SerializeBuffer& serializer, lua_State* L, int idx);
-void lua_deserialize(SerializeBuffer& serializer, lua_State* L);
+void lua_serialize(SerializeBuffer& serializer, lua_State* L, int nargs);
+void lua_deserialize(SerializeBuffer& serializer, lua_State* L, int nargs);
 
 void lua_serialize(SerializeBuffer& serializer, lua_State* L, const LuaValue& value);
 void lua_deserialize(SerializeBuffer& serializer, lua_State* L, LuaValue& value);
+
+// Metatable-based class wrapped for SerializeBuffer in Lua.
+// Makes it possible to push SerializeBuffer's with luawrap.
+LuaValue lua_serializebuffer_type(lua_State *L);
 
 #endif /* LCOMMON_LUA_SERIALIZE_H_ */

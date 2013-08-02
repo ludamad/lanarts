@@ -23,7 +23,7 @@ GameNetConnection::GameNetConnection(GameChat& chat, PlayerData& pd,
 				pd(pd),
 				init_data(init_data),
 				_connection(NULL) {
-	_message_buffer = new SerializeBuffer(SerializeBuffer::plain_buffer());
+	_message_buffer = new SerializeBuffer();
 }
 
 GameNetConnection::~GameNetConnection() {
@@ -422,7 +422,7 @@ void GameNetConnection::_message_callback(int sender, const char* msg,
 
 	if (queue_messages || !_handle_message(sender, *_message_buffer)) {
 		_delayed_messages.push_back(QueuedMessage(_message_buffer, sender));
-		_message_buffer = new SerializeBuffer(SerializeBuffer::plain_buffer());
+		_message_buffer = new SerializeBuffer();
 	}
 }
 

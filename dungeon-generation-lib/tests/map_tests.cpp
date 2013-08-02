@@ -88,7 +88,7 @@ TEST(map_rectangle_fill) {
 }
 
 static bool serialized_correctly(const Map& map) {
-	SerializeBuffer buffer = SerializeBuffer::plain_buffer();
+	SerializeBuffer buffer;
 	map.serialize(buffer);
 	Map newmap;
 	newmap.deserialize(buffer);

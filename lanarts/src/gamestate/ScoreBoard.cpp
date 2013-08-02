@@ -89,7 +89,7 @@ void ScoreBoard::read_entries(std::vector<ScoreBoardEntry>& entries) const {
 		return; // Interpret non-existent as empty
 	}
 
-	SerializeBuffer reader = SerializeBuffer::file_reader(entry_file);
+	SerializeBuffer reader(entry_file, SerializeBuffer::INPUT);
 
 	try {
 		int entry_amount;
@@ -134,7 +134,7 @@ void ScoreBoard::write_entries(const std::vector<ScoreBoardEntry>& entries) {
 		return;
 	}
 
-	SerializeBuffer writer = SerializeBuffer::file_writer(entry_file);
+	SerializeBuffer writer(entry_file, SerializeBuffer::OUTPUT);
 
 	writer.write_int(entries.size());
 

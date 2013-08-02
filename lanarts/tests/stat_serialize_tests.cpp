@@ -38,7 +38,7 @@ SUITE(stat_serialize_tests) {
 		//mock up some item data
 		game_item_data.resize(TEST_N, &mock_item);
 
-		SerializeBuffer serializer = SerializeBuffer::plain_buffer();
+		SerializeBuffer serializer;
 		Inventory inv1, inv2;
 		for (int i = 0; i < TEST_N; i++) {
 			inv1.add(Item(i));
@@ -58,7 +58,7 @@ SUITE(stat_serialize_tests) {
 		//mock up some item data
 		game_item_data.resize(TEST_N, &mock_item);
 
-		SerializeBuffer serializer = SerializeBuffer::plain_buffer();
+		SerializeBuffer serializer;
 		EquipmentStats e1, e2;
 		e1.inventory.add(Item(1));
 		e1.serialize(serializer);

@@ -52,6 +52,10 @@ int main(int argc, char** argv) {
 	}
 
 	lua_State* L = setup_lua_state();
+	LuaValue args = luawrap::ensure_table(luawrap::globals(L)["_cmdargs"]);
+	for (int i = 2; i < argc; i++) {
+		args[i-1] = argv[i];
+	}
 	try {
 		if (argc < 2) {
 			printf("Welcome to LanartsEngine, please type some Lua\n");

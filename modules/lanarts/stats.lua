@@ -1,6 +1,4 @@
-require "utils" -- For table.add
-
-local HookSet = require_relative "HookSet"
+local HookSet = import "@HookSet"
 
 local M = {} -- submodule
 

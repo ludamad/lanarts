@@ -398,21 +398,18 @@ static void dotform_chop_component(std::string& str) {
 }
 
 // Delegates to 'require', readjusts a relative 'dot-form' path
-static int lapi_require_relative(lua_State* L) {
+static int lapi_virtual_path_create_relative(lua_State* L) {
 	// Resolve backtracks, ie every occurrence of < goes up one directory
-	const char* req_arg = lua_tostring(L, 1);
+	const char* sub_path = lua_tostring(L, 1);
+	const char* base_path = lua_tostring(L, 2);
 	int backtracks = 0;
-	while (*req_arg == '<') {
-		backtracks++, req_arg++;
+	while (*sub_path == '<') {
+		backtracks++, sub_path++;
 	}
 
-	// Lookup caller's source location
-	lua_Debug debug;
-	lua_getstack(L, 1, &debug);
-	lua_getinfo(L, "S", &debug);
 
-	// '@' indicates a relative path, remove this character if present
-	std::string src = (*debug.source == '@' ? debug.source + 1: debug.source);
+	// '@' indicates a file path when used in debug info, remove this character if present
+	std::string src = (*sub_path== '@' ? sub_path + 1: sub_path);
 	std::string cwd = working_directory();
 
 	path2dotform(src), path2dotform(cwd);
@@ -422,8 +419,14 @@ static int lapi_require_relative(lua_State* L) {
 	}
 	dotform_chop_trailing_dots(cwd);
 
-	// Try to make all paths relative to the modules directory.
-	cwd += 'modules';
+	// Make source relative to cwd
+	src = cwd + "." + src;
+	// Make into cwd by relative path base_path.
+	if (*base_path) {
+		cwd += ".";
+		cwd += base_path;
+	}
+	cwd += ".";
 
 	const char* src_ptr = src.c_str(), *cwd_ptr = cwd.c_str();
 
@@ -432,15 +435,8 @@ static int lapi_require_relative(lua_State* L) {
 		src_ptr++, cwd_ptr++;
 	}
 
-	std::string require_string = src_ptr;
-	require_string += ".";
-	require_string += req_arg;
-
-	luawrap::globals(L)["require"].push();
-	lua_pushstring(L, require_string.c_str());
-	lua_call(L, 1, 1);
-
-	return 1; // Return module
+	lua_pushstring(L, src_ptr);
+	return 1; // Return relative virtual path
 }
 
 static int lapi_random(lua_State* L) {
@@ -479,6 +475,19 @@ static bool lapi_chance(LuaStackValue val) {
 	return gs->rng().rand(RangeF(0, 1)) < val.to_num();
 }
 
+// TODO: Lazy loading
+static LuaValue lapi_import_internal(LuaStackValue importstring) {
+	lua_State* L = importstring.luastate();
+	LuaValue module = luawrap::globals(L)["_INTERNAL_IMPORTED"][importstring.to_str()];
+	if (module.isnil()) {
+		return module;
+	}
+	LuaValue ret_table(L);
+	ret_table.newtable();
+	ret_table[1] = module;
+	return ret_table;
+}
+
 namespace lua_api {
 	void event_projectile_hit(lua_State* L, ProjectileInst* projectile,
 			GameInst* target) {
@@ -494,7 +503,10 @@ namespace lua_api {
 
 	void register_general_api(lua_State* L) {
 		LuaValue globals = luawrap::globals(L);
+		LuaValue registry = luawrap::registry(L);
+		luawrap::ensure_table(luawrap::globals(L)["_INTERNAL_IMPORTED"]);
 		globals["values"].bind_function(l_itervalues);
+		globals["_LOADED"] = luawrap::ensure_table(registry["_LOADED"]);
 		globals["direction"].bind_function(compute_direction);
 		globals["distance"].bind_function(distance_between);
 		globals["newtype"].bind_function(lapi_newtype);
@@ -504,7 +516,8 @@ namespace lua_api {
 		globals["random_subregion"].bind_function(lapi_random_subregion);
 		globals["chance"].bind_function(lapi_chance);
 
-		globals["require_relative"].bind_function(lapi_require_relative);
+		globals["import_internal"].bind_function(lapi_import_internal);
+		globals["virtual_path_create_relative"].bind_function(lapi_virtual_path_create_relative);
 		globals["require_path_add"].bind_function(lapi_add_search_path);
 
 		LuaValue table = luawrap::ensure_table(globals["table"]);

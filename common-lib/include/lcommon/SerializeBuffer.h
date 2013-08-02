@@ -21,6 +21,7 @@ const int MAX_BUFFER_SIZE = 128 * 1024; //128kb
 typedef void (*buffer_flushf)(void* context, const char* data, size_t size);
 typedef void (*buffer_fillf)(void* context, std::vector<char>& buffer,
 		size_t maxsize);
+typedef void (*buffer_closef)(void* context);
 
 class SerializeBufferError : public std::runtime_error {
 public:
@@ -46,11 +47,17 @@ inline void serialize_buffer_error(const std::string& msg) {
 #define LSERIALIZE_CHECK(check) \
 	if (!(check)) { serialize_buffer_error( format( "SerializeBuffer line %d: %s", __LINE__, #check) ); }
 
+
 class SerializeBuffer {
 public:
-	static SerializeBuffer file_writer(FILE* file);
-	static SerializeBuffer file_reader(FILE* file);
-	static SerializeBuffer plain_buffer();
+	enum IOType {
+		INPUT,
+		OUTPUT
+	};
+
+	SerializeBuffer(void* context, buffer_flushf flushf, buffer_fillf fillf, buffer_closef closef);
+	SerializeBuffer();
+	SerializeBuffer(FILE* file, IOType type, bool close_file = false);
 
 	template<class T>
 	void write_container(const T& t) {
@@ -132,15 +139,17 @@ public:
 		read(i);
 		t = (T)i;
 	}
+
+	int read_int() {
+		int integer;
+		read_int(integer);
+		return integer;
+	}
+
 	template<class T>
 	void read(T& t) {
 		read_raw((char*)&t, sizeof(T));
 	}
-//	template<class T>
-//	void peek(T& t) {
-//		read(t);
-//		_read_position -= sizeof(T);
-//	}
 
 	~SerializeBuffer();
 
@@ -154,6 +163,7 @@ public:
 		return _read_position;
 	}
 
+	void close();
 	void clear();
 	void flush();
 	void fill();
@@ -164,14 +174,14 @@ public:
 	bool empty() const {
 		return _buffer.empty();
 	}
-private:
-	SerializeBuffer(void* context, buffer_flushf flushf, buffer_fillf fillf);
 
+private:
 	std::vector<char> _buffer;
 	int _read_position;
 	void* _context;
 	buffer_flushf _flushf;
 	buffer_fillf _fillf;
+	buffer_closef _closef;
 };
 
 // The following functions are hacks for quick and dirty serialization of known POD regions

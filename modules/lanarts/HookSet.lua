@@ -1,5 +1,3 @@
-require "utils" -- For table.clear
-
 local HookSet = newtype()
 
 function HookSet:init()

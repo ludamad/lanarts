@@ -74,6 +74,7 @@ public:
 	const char* to_str() const;
 	int objlen() const;
 	LuaValue metatable() const;
+	void set_metatable(const LuaField& metatable) const;
 
 	bool operator==(const LuaValue& o) const;
 	bool operator!=(const LuaValue& o) const;

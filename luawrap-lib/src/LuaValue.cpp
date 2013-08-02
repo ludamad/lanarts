@@ -325,6 +325,13 @@ LuaValue::operator LuaField() const {
 	return LuaField(impl->L, (void*)impl);
 }
 
+void LuaValue::set_metatable(const LuaField& metatable) const {
+	push();
+	metatable.push();
+	lua_setmetatable(impl->L, -2);
+	lua_pop(impl->L, 1);
+}
+
 LuaValue LuaValue::pop_value(lua_State* L) {
 	luawrap::_private::PopHack delayedpop(L);
 	return LuaValue(L, -1);

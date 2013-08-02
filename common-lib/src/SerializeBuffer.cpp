@@ -19,15 +19,8 @@ static void file_buffer_fillf(void* context, std::vector<char>& buffer,
 	buffer.resize(end + readn);
 }
 
-SerializeBuffer SerializeBuffer::file_writer(FILE* file) {
-	return SerializeBuffer(file, file_buffer_flushf, NULL);
-}
-
-SerializeBuffer SerializeBuffer::file_reader(FILE *file) {
-	return SerializeBuffer(file, NULL, file_buffer_fillf);
-}
-SerializeBuffer SerializeBuffer::plain_buffer() {
-	return SerializeBuffer(NULL, NULL, NULL);
+static void file_buffer_closef(void* context) {
+	fclose((FILE*)context);
 }
 
 void SerializeBuffer::clear() {
@@ -36,18 +29,40 @@ void SerializeBuffer::clear() {
 }
 
 SerializeBuffer::SerializeBuffer(void* context, buffer_flushf flushf,
-		buffer_fillf fillf) :
-		_read_position(0), _context(context), _flushf(flushf), _fillf(fillf) {
+		buffer_fillf fillf, buffer_closef closef) :
+		_read_position(0), _context(context), _flushf(flushf), _fillf(fillf), _closef(closef) {
+}
+
+SerializeBuffer::SerializeBuffer() :
+		_read_position(0), _context(NULL), _flushf(NULL), _fillf(NULL), _closef(NULL) {
+}
+
+SerializeBuffer::SerializeBuffer(FILE* file, SerializeBuffer::IOType type, bool close_file) :
+		_read_position(0), _context(file) {
+	_flushf = type == OUTPUT ? file_buffer_flushf : NULL;
+	_fillf = type == INPUT ? file_buffer_fillf : NULL;
+	_closef = close_file ? file_buffer_closef : NULL;
 }
 
 SerializeBuffer::~SerializeBuffer() {
-	flush();
+	close();
 }
 
 void SerializeBuffer::flush() {
 	if (!_buffer.empty() && _flushf != NULL) {
 		_flushf(_context, &_buffer[0], _buffer.size());
 		_buffer.clear();
+	}
+}
+
+void SerializeBuffer::close() {
+	if (_context != NULL) {
+		flush();
+		if (_closef) {
+			_closef(_context);
+		}
+		_context = NULL, _flushf = NULL;
+		_fillf = NULL, _closef = NULL;
 	}
 }
 

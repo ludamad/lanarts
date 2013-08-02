@@ -5,8 +5,6 @@
 -- This allows for succint definitions of traits that modify multiple values.
 -- TODO: Test resource persisting
 
-require "utils"
-
 local M = {} -- submodule
 
 --- Create functions which share 'global' tables

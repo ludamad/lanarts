@@ -10,6 +10,7 @@ endif()
 
 if(WIN32)
     add_definitions("-DWIN32")
+
     if(CMAKE_COMPILER_IS_GNUCXX)
         add_definitions("-mwindows")
     endif()

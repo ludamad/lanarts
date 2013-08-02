@@ -95,6 +95,7 @@ public:
 	const char* to_str() const;
 
 	LuaValue metatable() const;
+	void set_metatable(const LuaField& metatable) const;
 
 private:
 	void error_and_pop(const std::string& expected_type) const;

@@ -70,6 +70,8 @@ bool LuaStackValue::has(const char* key) const {
 }
 
 void LuaStackValue::newtable() const {
+	lua_newtable(L);
+	pop();
 }
 
 bool LuaStackValue::isnil() const {
@@ -169,4 +171,11 @@ int LuaStackValue::objlen() const {
 	int len = lua_objlen(L, -1);
 	lua_pop(L, 1);
 	return len;
+}
+
+void LuaStackValue::set_metatable(const LuaField& metatable) const {
+	push();
+	metatable.push();
+	lua_setmetatable(L, -2);
+	lua_pop(L, 1);
 }

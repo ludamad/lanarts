@@ -120,10 +120,20 @@ const LuaField& LuaField::assert_not_nil() const {
 
 LuaValue LuaField::metatable() const {
 	push();
-	lua_getmetatable(L, -1);
+	if (!lua_getmetatable(L, -1)) {
+		lua_pushnil(L);
+	}
 	LuaValue table(L, -1);
 	lua_pop(L, 2);
 	return table;
+}
+
+void LuaField::set_metatable(const LuaField& metatable) const {
+	lua_State* L = luastate();
+	push();
+	metatable.push();
+	lua_setmetatable(L, -2);
+	lua_pop(L, 1);
 }
 
 void LuaField::init(lua_State* L, char index_type, char parent_type,

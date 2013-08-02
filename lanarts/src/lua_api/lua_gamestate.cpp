@@ -21,7 +21,7 @@
 
 static void game_save(LuaStackValue filename) {
 	FILE* file = fopen(filename.as<const char*>(), "wb");
-	SerializeBuffer sb = SerializeBuffer::file_writer(file);
+	SerializeBuffer sb(file, SerializeBuffer::OUTPUT);
 	lua_api::gamestate(filename)->serialize(sb);
 	sb.flush();
 	fclose(file);
@@ -35,7 +35,7 @@ static int game_score_board_store(lua_State* L) {
 
 static void game_load(LuaStackValue filename) {
 	FILE* file = fopen(filename.as<const char*>(), "rb");
-	SerializeBuffer sb = SerializeBuffer::file_reader(file);
+	SerializeBuffer sb(file, SerializeBuffer::INPUT);
 	lua_api::gamestate(filename)->deserialize(sb);
 	fclose(file);
 }

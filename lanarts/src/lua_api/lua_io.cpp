@@ -9,6 +9,8 @@
 #include <luawrap/members.h>
 #include <luawrap/types.h>
 
+#include <lcommon/lua_serialize.h>
+
 #include <lsound/lua_lsound.h>
 
 #include <SDL.h>
@@ -241,5 +243,8 @@ namespace lua_api {
 		keys["F13"] = (int)SDLK_F13;
 		keys["F14"] = (int)SDLK_F14;
 		keys["F15"] = (int)SDLK_F15;
+
+		LuaValue imported = luawrap::ensure_table(globals["_INTERNAL_IMPORTED"]);
+		imported["core.io.SerializeBuffer"] = lua_serializebuffer_type(L);
 	}
 }
