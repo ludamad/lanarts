@@ -5,6 +5,8 @@
 
 #include <typeinfo>
 
+#include <luawrap/luawrap.h>
+
 #include <ldraw/DrawOptions.h>
 
 #include "draw/colour_constants.h"
@@ -76,6 +78,7 @@ void FeatureInst::init(GameState* gs) {
 			gs->tiles().set_seethrough(tile_xy, false);
 		}
 	}
+	lua_variables.init(gs->luastate());
 }
 
 void FeatureInst::deinit(GameState *gs) {

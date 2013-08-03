@@ -14,6 +14,7 @@ if(WIN32)
     if(CMAKE_COMPILER_IS_GNUCXX)
         add_definitions("-mwindows")
     endif()
+    
 endif()
 
 option(MSVC_SHARED_RT "MSVC: Build with shared runtime libs (/MD)" ON)

@@ -18,38 +18,38 @@
 //// TODO: Argument typecheck
 #define LUAWRAP_METHOD(table, func_name, body) \
 	struct MacroGeneratedMethod_##func_name { \
-		static int func_name (lua_State* L) { \
+		static int FUNC##func_name (lua_State* L) { \
 			int nargs = lua_gettop(L); \
 			LuawrapMacroTypeToWrap OBJ = luawrap::get<LuawrapMacroTypeToWrap>(L, 1); \
 			body ; \
 			return lua_gettop(L) - nargs; \
 		} \
 	}; \
-	table[ #func_name ].bind_function( MacroGeneratedMethod_##func_name :: func_name )
+	table[ #func_name ].bind_function( MacroGeneratedMethod_##func_name :: FUNC##func_name )
 
 //// Allows for one line getter wrapping
 //// TODO: Argument typecheck
 #define LUAWRAP_GETTER(table, func_name, body) \
 	struct MacroGeneratedGetter_##func_name { \
-		static int func_name (lua_State* L) { \
+		static int FUNC##func_name  (lua_State* L) { \
 			LuawrapMacroTypeToWrap OBJ = luawrap::get<LuawrapMacroTypeToWrap>(L, 1); \
 			luawrap::push(L, body ); \
 			return 1; \
 		} \
 	}; \
-	table[ #func_name ].bind_function( MacroGeneratedGetter_##func_name :: func_name )
+	table[ #func_name ].bind_function( MacroGeneratedGetter_##func_name :: FUNC##func_name  )
 
 //// Allows for one line setter wrapping
 //// TODO: Argument typecheck
 #define LUAWRAP_SETTER(table, func_name, param_type, body) \
 	struct MacroGeneratedSetter_##func_name { \
-		static int func_name (lua_State* L) { \
+		static int FUNC##func_name  (lua_State* L) { \
 			LuawrapMacroTypeToWrap OBJ = luawrap::get<LuawrapMacroTypeToWrap>(L, 1); \
 			param_type VAL = luawrap::get<param_type>(L, 3); \
 			body ; \
 			return 0; \
 		} \
 	}; \
-	table[ #func_name ].bind_function( MacroGeneratedSetter_##func_name :: func_name )
+	table[ #func_name ].bind_function( MacroGeneratedSetter_##func_name :: FUNC##func_name  )
 
 #endif /* LUAWRAP_MACROS_H_ */

@@ -16,6 +16,8 @@
 #include <luawrap/calls.h>
 #include <lcommon/directory.h>
 
+#include <lcommon/lua_utils.h>
+
 #include "gamestate/GameState.h"
 
 #include "lua_newapi.h"
@@ -543,6 +545,14 @@ namespace lua_api {
 		return LuaValue::pop_value(L);
 	}
 
+	LuaValue register_lua_submodule(lua_State* L, const char* vpath) {
+		LuaValue submodule(L);
+		submodule.newtable();
+		lua_protect_table(submodule); // Ensure that nil access is an error
+		register_lua_submodule(L, vpath, submodule);
+		return submodule;
+	}
+
 	int l_itervalues(lua_State* L) {
 		lua_pushvalue(L, 1);
 		lua_pushlightuserdata(L, (void*) (1)); // Lua array iteration starts at 1
@@ -566,6 +576,7 @@ namespace lua_api {
 		globals["random"].bind_function(lapi_random);
 		globals["random_subregion"].bind_function(lapi_random_subregion);
 		globals["chance"].bind_function(lapi_chance);
+		globals["nilprotect"].bind_function(lua_protect_table);
 
 		globals["import_internal"].bind_function(lapi_import_internal);
 		globals["virtual_path_create_relative"].bind_function(lapi_virtual_path_create_relative);

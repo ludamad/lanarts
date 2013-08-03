@@ -89,6 +89,8 @@ namespace ldungeon_gen {
     private:
         bool place_random(MapPtr map, group_t parent_group_id, Size size);
 	};
+
+	BBox random_place(Map& map, MTwist& randomizer, Size size);
 }
 
 #endif /* LDUNGEON_MAP_FILL_H_ */

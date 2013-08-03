@@ -131,12 +131,17 @@ namespace ldungeon_gen {
 
 		return true;
 	}
+
+	BBox random_place(Map& map, MTwist& randomizer, Size size) {
+		int rx = randomizer.rand(0, map.width() - size.w);
+		int ry = randomizer.rand(0, map.height() - size.h);
+		return BBox(rx, ry, rx + size.w, ry + size.h);
+	}
+
     bool RandomPlacementApplyOperator::place_random(MapPtr map, group_t parent_group_id, Size size) {
         const int MAX_ATTEMPTS = 10;
         for (int attempts = 0; attempts < MAX_ATTEMPTS; attempts++) {
-            int rx = randomizer.rand(1, map->width() - size.w) | 1;
-            int ry = randomizer.rand(1, map->height() - size.h) | 1;
-            BBox room(rx, ry, rx + size.w, ry + size.h);
+        	BBox room = random_place(*map, randomizer, size);
             if (area_oper->apply(map, parent_group_id, room)) {
                 return true;
             }

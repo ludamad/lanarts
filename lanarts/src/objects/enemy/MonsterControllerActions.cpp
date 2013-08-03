@@ -306,8 +306,8 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 		int tries_left = 35; // arbitrary number
 		do {
 			if (!is_fullpath) {
-				target.x = ex + mt.rand(-3, 4);
-				target.y = ey + mt.rand(-3, 4);
+				target.x = squish(ex + mt.rand(-3, 4), 0, tile.tile_width() - 1);
+				target.y = squish(ey + mt.rand(-3, 4), 0, tile.tile_height() - 1);
 			} else {
 				target.x = mt.rand(tile.tile_width());
 				target.y = mt.rand(tile.tile_height());

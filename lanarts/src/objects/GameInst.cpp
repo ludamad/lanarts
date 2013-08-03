@@ -8,6 +8,8 @@
  * 		->GameInst::init(GameState) called from add_instance, does further initialization
  */
 
+#include <luawrap/luawrap.h>
+
 #include <lcommon/SerializeBuffer.h>
 #include <lcommon/lua_serialize.h>
 
@@ -19,14 +21,30 @@
 
 GameInst::~GameInst() {
 }
+static void try_callback(GameInst* inst, const char* callback) {
+	if (inst->lua_variables.empty()) {
+		return;
+	}
+	lua_State* L = inst->lua_variables.luastate();
+	inst->lua_variables[callback].push();
+	if (!lua_isnil(L, -1)) {
+		luawrap::push(L, inst);
+		lua_call(L, 1, 0);
+	} else {
+		lua_pop(L, 1);
+	}
+}
 
 void GameInst::step(GameState* gs) {
+	try_callback(this, "on_step");
 }
 
 void GameInst::draw(GameState* gs) {
+	try_callback(this, "on_draw");
 }
 
 void GameInst::init(GameState* gs) {
+	try_callback(this, "on_init");
 	current_floor = gs->game_world().get_current_level_id();
 }
 

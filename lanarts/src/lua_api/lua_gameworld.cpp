@@ -86,40 +86,6 @@ static Tile resolve_tile(ldungeon_gen::Map& map, MTwist& mt, Pos& xy) {
 	return Tile(tileid, subtileid);
 }
 
-static int world_map_create(LuaStackValue args) {
-	using namespace luawrap;
-	using namespace ldungeon_gen;
-
-	GameState* gs = lua_api::gamestate(args);
-	MapPtr map = args["map"].as<MapPtr>();
-	GameMapState* game_map = gs->game_world().map_create(map->size(),
-			defaulted(args["wandering_enabled"], true));
-
-	GameTiles& tiles = game_map->tiles();
-	BBox bbox(Pos(), tiles.size());
-	FOR_EACH_BBOX(bbox, x, y) {
-		Tile& tile = tiles.get(Pos(x,y));
-		Square& square = (*map)[Pos(x,y)];
-		TileEntry& entry = res::tile(square.content);
-
-		int variations = entry.images.size();
-		tile.tile = square.content;
-		tile.subtile = gs->rng().rand(variations);
-		(*tiles.solidity_map())[Pos(x,y)] = ((square.flags & FLAG_SOLID) != 0);
-		(*tiles.seethrough_map())[Pos(x,y)] = ((square.flags & FLAG_SEETHROUGH) != 0);
-	}
-
-	if (!args["instances"].isnil()) {
-		typedef std::vector<GameInst*> InstanceList;
-		InstanceList instances = args["instances"].as<InstanceList>();
-		for (int i = 0; i < instances.size(); i++) {
-			gs->add_instance(game_map->id(), instances[i]);
-		}
-	}
-
-	return game_map->id();
-}
-
 static int world_players(lua_State* L) {
 	int nplayers = lua_api::gamestate(L)->player_data().all_players().size();
 	lua_newtable(L);
@@ -276,7 +242,6 @@ namespace lua_api {
 		LuaValue getters = luameta_getters(metatable);
 		LuaValue methods = luameta_constants(metatable);
 
-		methods["map_create"].bind_function(world_map_create);
 		methods["players_spawn"].bind_function(world_players_spawn);
 
 		getters["players"].bind_function(world_players);

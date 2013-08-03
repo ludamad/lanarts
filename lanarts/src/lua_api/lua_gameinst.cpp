@@ -76,6 +76,11 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	LuaValue methods = luameta_constants(meta);
 	LUAWRAP_METHOD(methods, step, OBJ->step(lua_api::gamestate(L)));
 	LUAWRAP_METHOD(methods, draw, OBJ->draw(lua_api::gamestate(L)));
+	LUAWRAP_METHOD(methods, init,
+			GameState* gs = lua_api::gamestate(L);
+			level_id map = lua_gettop(L) <= 0 ? gs->game_world().get_current_level_id() : lua_tointeger(L, 1);
+			gs->add_instance(map, OBJ);
+	);
 
 	LuaValue getters = luameta_getters(meta);
 	LUAWRAP_GETTER(getters, xy, OBJ->pos());
@@ -248,26 +253,33 @@ void lua_gameinst_callback(lua_State* L, LuaValue& value, GameInst* inst) {
 	lua_call(L, 1, 0);
 }
 
-static GameInst* lua_enemyinst_create(LuaStackValue args) {
-	using namespace luawrap;
-	GameState* gs = lua_api::gamestate(args);
-	int teamid = defaulted(args["team_id"], gs->teams().default_enemy_team());
-	const char* enemy_name = args["enemy"].to_str();
-
-	Pos xy = args["xy"].as<Pos>();
-	return new EnemyInst(get_enemy_by_name(enemy_name),xy.x, xy.y, teamid);
-}
-
-static GameInst* lua_featureinst_create(LuaStackValue args) {
-	using namespace luawrap;
-
-	GameInst* inst = new FeatureInst(args["xy"].as<Pos>(), (FeatureInst::feature_t)args["type"].to_int(),
-			defaulted(args["solid"], false),
-			res::sprite_id(args["sprite"].to_str()));
-	if (!defaulted(args["delay_init"], false)) {
-		lua_api::gamestate(args)->add_instance(inst);
+static GameInst* do_instance_init(GameState* gs, GameInst* inst, LuaStackValue args) {
+	if (args["do_init"].isnil() || args["do_init"].to_bool()) {
+		level_id id = gs->game_world().get_current_level_id();
+		if (args["map"].isnil()) {
+			id = args["map"].to_int();
+		}
+		gs->add_instance(id, inst);
 	}
 	return inst;
+}
+
+static GameInst* enemy_create(LuaStackValue args) {
+	GameState* gs = lua_api::gamestate(args);
+	int etype = get_enemy_by_name(args["type"].to_str());
+	Pos xy = args["xy"].as<Pos>();
+	EnemyInst* inst = new EnemyInst(etype, xy.x, xy.y, gs->teams().default_enemy_team());
+	return do_instance_init(gs, inst, args);
+}
+
+static GameInst* feature_create(LuaStackValue args) {
+	using namespace luawrap;
+	GameState* gs = lua_api::gamestate(args);
+
+	FeatureInst* inst = new FeatureInst(args["xy"].as<Pos>(), (FeatureInst::feature_t)args["type"].to_int(),
+			defaulted(args["solid"], false),
+			res::sprite_id(args["sprite"].to_str()));
+	return do_instance_init(gs, inst, args);
 }
 
 
@@ -276,9 +288,11 @@ static Item lua_item_get(LuaStackValue item) {
 	int amount = luawrap::defaulted(item["amount"], 1);
 	return Item(type, amount);
 }
-static GameInst* lua_iteminst_create(LuaStackValue args) {
+
+static GameInst* item_create(LuaStackValue args) {
 	using namespace luawrap;
-	return new ItemInst(lua_item_get(args), args["xy"].as<Pos>());
+	GameState* gs = lua_api::gamestate(args);
+	return do_instance_init(gs, new ItemInst(lua_item_get(args), args["xy"].as<Pos>()), args);
 }
 
 void lua_register_gameinst(lua_State* L) {
@@ -289,12 +303,12 @@ void lua_register_gameinst(lua_State* L) {
 	luawrap::install_dynamic_casted_type<FeatureInst*, GameInst*>();
 
 	LuaValue globals = luawrap::globals(L);
-	LuaValue game_object_table = luawrap::ensure_table(globals["GameObject"]);
-	game_object_table["enemy_create"].bind_function(lua_enemyinst_create);
-	game_object_table["feature_create"].bind_function(lua_featureinst_create);
-	game_object_table["item_create"].bind_function(lua_iteminst_create);
+	LuaValue submodule = lua_api::register_lua_submodule(L, "core.GameObject");
+	submodule["enemy_create"].bind_function(enemy_create);
+	submodule["feature_create"].bind_function(feature_create);
+	submodule["item_create"].bind_function(item_create);
 
-	game_object_table["DOOR_OPEN"] = (int)FeatureInst::DOOR_OPEN;
-	game_object_table["DOOR_CLOSED"] = (int)FeatureInst::DOOR_CLOSED;
-	game_object_table["DECORATION"] = (int)FeatureInst::DECORATION;
+	submodule["DOOR_OPEN"] = (int)FeatureInst::DOOR_OPEN;
+	submodule["DOOR_CLOSED"] = (int)FeatureInst::DOOR_CLOSED;
+	submodule["OTHER"] = (int)FeatureInst::OTHER;
 }

@@ -131,7 +131,7 @@ static void generate_statue(GameState* gs, GeneratedRoom& room, MTwist& mt,
 	if (nimages <= 0) nimages = 1;
 	int imgid = mt.rand(nimages);
 	gs->add_instance(
-			new FeatureInst(worldpos, FeatureInst::DECORATION, true, spriteid,
+			new FeatureInst(worldpos, FeatureInst::OTHER, true, spriteid,
 					FeatureInst::DEPTH, imgid));
 }
 

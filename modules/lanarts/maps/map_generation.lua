@@ -1,12 +1,14 @@
 local utils = import "core.utils"
 import "@tiles.tilesets"
 local MapGen = import "core.map_generation"
+local Maps = import "core.maps"
+local GameObject = import "core.GameObject"
 
 local M = {} -- Submodule
 
 local function room_carve_operator(tileset)
     return MapGen.rectangle_operator { 
-        area_query = MapGen.rectangle_query { 
+        area_query = MapGen.rectangle_criteria { 
                         fill_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.FLAG_PERIMETER }, 
                         perimeter_width = 1, perimeter_selector = { matches_all = MapGen.FLAG_SOLID }
         },
@@ -56,6 +58,19 @@ local function simple_tunnels(map, tileset)
     oper(map, MapGen.ROOT_GROUP, bbox_create({0,0}, map.size))
 end
 
+local function random_enemy(map, type) 
+    local sqr = MapGen.find_random_square { 
+        map = map, 
+        selector = { matches_none = {MapGen.FLAG_SOLID, MapGen.FLAG_HAS_OBJECT} },
+        operator = { add = MapGen.FLAG_HAS_OBJECT } 
+    }
+    table.insert(map.instances, GameObject.enemy_create {
+        do_init = false,
+        xy = {sqr[1]*32+16, sqr[2]*32+16},
+        type = type
+    })
+end
+
 local function area_temp_apply()
     local tileset = TileSets.grass
     local area_temp = MapGen.area_template_create {
@@ -65,8 +80,9 @@ local function area_temp_apply()
     }
     local map = MapGen.map_create { size = area_temp.size, content = tileset.wall, instances = {} }
     area_temp:apply { map = map }
-
-    local map_id = World.map_create { map = map, instances = map.instances }
+    for i=1,10 do random_enemy(map, "Giant Bat") end
+    for i=1,10 do random_enemy(map, "Giant Rat") end
+    local map_id = Maps.create { map = map, instances = map.instances }
     World.players_spawn(map_id)
     return map_id
 end

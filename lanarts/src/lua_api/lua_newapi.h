@@ -44,6 +44,7 @@ namespace lua_api {
 	void register_io_api(lua_State* L);
 
 	void register_lua_submodule(lua_State* L, const char* vpath, LuaValue module);
+	LuaValue register_lua_submodule(lua_State* L, const char* vpath);
 	void register_lua_submodule_loader(lua_State* L, const char* vpath, LuaValue loader);
 
 	/* Register general utility functions */

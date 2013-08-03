@@ -1,3 +1,5 @@
+local EventLog = import "core.ui.EventLog"
+
 function poison_statmod(effect, obj, old, new)
 	new.defence = math.max(0, new.defence - 3)
 	new.willpower = math.max(0, new.willpower - 3)

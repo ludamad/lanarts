@@ -61,7 +61,6 @@ namespace lua_api {
 		lua_pop(L, 1);
 	}
 
-
 	/* Functions for visual results in the lanarts world, eg drawing text */
 	void register_display_api(lua_State* L) {
 		LuaValue globals = luawrap::globals(L);
@@ -76,8 +75,11 @@ namespace lua_api {
 	}
 
 	void register_event_log_api(lua_State* L) {
-		LuaSpecialValue globals = luawrap::globals(L);
-		LuaValue event_log = lua_ensure_protected_table(globals["EventLog"]);
+		LuaValue event_log(L);
+		event_log.newtable();
+		event_log = lua_ensure_protected_table(event_log);
 		event_log["add"].bind_function(event_log_add);
+
+		register_lua_submodule(L, "core.ui.EventLog", event_log);
 	}
 }

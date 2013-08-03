@@ -14,7 +14,7 @@
 class FeatureInst: public GameInst {
 public:
 	enum feature_t {
-		DOOR_OPEN, DOOR_CLOSED, DECORATION
+		DOOR_OPEN, DOOR_CLOSED, OTHER
 	};
 	enum {
 		RADIUS = 15, DEPTH = 100

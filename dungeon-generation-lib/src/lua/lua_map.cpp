@@ -250,6 +250,7 @@ namespace ldungeon_gen {
 		return LuaStackValue(L, -1);
 	}
 
+
 	struct LuaAreaQuery : public AreaQueryBase {
 		LuaValue query;
 
@@ -290,21 +291,33 @@ namespace ldungeon_gen {
 		return val.isnil() ? AreaQueryPtr() : area_query_get(val);
 	}
 
+	// TODO: Rename this 'rectangle query
+	static bool rectangle_query_apply(LuaStackValue args) {
+		using namespace luawrap;
+		LuaStackValue oper = rectangle_query(args);
+		bool applied = area_query_get(oper)->matches(
+				args["map"].as<MapPtr>(),
+				defaulted(args["parent_group_id"], ROOT_GROUP_ID),
+				args["area"].as<BBox>()
+		);
+		return applied;
+	}
+
 	/* Returns nil if none found, position otherwise */
 	static int lfind_random_square(lua_State* L) {
 		LuaStackValue args(L, 1);
 
-		//Get RNG setup for map generation
-		luawrap::registry(L)["MapGenRNG"].push();
-		MTwist* mtwist = (MTwist*) lua_touserdata(L, -1);
-		lua_pop(L, 1); /* pop RNG object */
-
+		MapPtr map = args["map"].as<MapPtr>();
+		BBox area = luawrap::defaulted(args["area"], BBox(Pos(0,0), map->size()));
 		Pos xy;
-		bool found = find_random_square(*mtwist, args["map"].as<MapPtr>(),
-				args["area"].as<BBox>(), lua_selector_get(args["selector"]), xy,
+		bool found = find_random_square(ldungeon_get_rng(L), map,
+				area, lua_selector_get(args["selector"]), xy,
 				luawrap::defaulted(args["max_attempts"],
 						RANDOM_MATCH_MAX_ATTEMPTS));
 		if (found) {
+			if (!args["operator"].isnil()) {
+				(*map)[xy].apply(lua_operator_get(args["operator"]));
+			}
 			luawrap::push(L, xy);
 		} else {
 			lua_pushnil(L);
@@ -318,7 +331,7 @@ namespace ldungeon_gen {
 	static const int OPER_UPVALUE = 1;
 
 	/* Helper for wrapping the object in a closure*/
-	static int oper_aux(lua_State* L) {
+	int oper_aux(lua_State* L) {
 		using namespace luawrap;
 
 		MapPtr map = get<MapPtr>(L, 1);
@@ -356,6 +369,17 @@ namespace ldungeon_gen {
 		return LuaStackValue(L, -1);
 	}
 
+	static bool rectangle_apply(LuaStackValue args) {
+		using namespace luawrap;
+		LuaStackValue oper = rectangle_operator(args);
+		bool applied = area_operator_get(oper)->apply(
+				args["map"].as<MapPtr>(),
+				defaulted(args["parent_group_id"], ROOT_GROUP_ID),
+				args["area"].as<BBox>()
+		);
+		return applied;
+	}
+
 	struct LuaAreaOperator : public AreaOperatorBase {
 		LuaValue oper;
 
@@ -382,7 +406,7 @@ namespace ldungeon_gen {
 		}
 	};
 
-	static AreaOperatorPtr area_operator_get(LuaField val) {
+	AreaOperatorPtr area_operator_get(LuaField val) {
 		lua_State* L = val.luastate();
 
 		val.push();
@@ -400,29 +424,6 @@ namespace ldungeon_gen {
 		AreaOperatorPtr area_oper = *(AreaOperatorPtr*) upvalue.to_userdata();
 		lua_pop(L, 2); /* pop closure and oper value */
 		return area_oper;
-	}
-
-	static LuaStackValue bsp_operator(LuaStackValue args) {
-		using namespace luawrap;
-		lua_State* L = args.luastate();
-
-		//Get RNG setup for map generation
-		luawrap::registry(L)["MapGenRNG"].push();
-		MTwist* mtwist = (MTwist*) lua_touserdata(L, -1);
-		lua_pop(L, 1); /* pop RNG object */
-
-		BSPApplyOperator oper(*mtwist,
-				area_operator_get(args["child_operator"]),
-				defaulted(args["minimum_node_size"], Size()),
-				defaulted(args["randomize_size"], true),
-				defaulted(args["split_depth"], 8),
-				defaulted(args["create_subgroup"], true));
-
-		/* Create a closure which applies the function */
-		luawrap::push(L, AreaOperatorPtr(new BSPApplyOperator(oper)));
-		lua_pushcclosure(L, oper_aux, 1);
-
-		return LuaStackValue(L, -1);
 	}
 
 	static LuaStackValue tunnel_operator(LuaStackValue args) {
@@ -474,6 +475,17 @@ namespace ldungeon_gen {
 		return LuaStackValue(L, -1);
 	}
 
+	static bool tunnel_apply(LuaStackValue args) {
+		using namespace luawrap;
+		LuaStackValue oper = tunnel_operator(args);
+		bool applied = area_operator_get(oper)->apply(
+				args["map"].as<MapPtr>(),
+				defaulted(args["parent_group_id"], ROOT_GROUP_ID),
+				args["area"].as<BBox>()
+		);
+		return applied;
+	}
+
 	/* Binding that simply provides random placement in an area, leaves overlap check to child area operator. */
 	static LuaStackValue random_placement_operator(LuaStackValue args) {
 		using namespace luawrap;
@@ -503,8 +515,29 @@ namespace ldungeon_gen {
 	/*****************************************************************************
 	 *                          Register bindings                                *
 	 *****************************************************************************/
-	void lua_register_map(const LuaValue& module, MTwist* mtwist) {
-		lua_State* L = module.luastate();
+
+	static void lua_register_placement_functions(const LuaValue& submodule) {
+		submodule["map_create"].bind_function(map_create);
+		submodule["rectangle_operator"].bind_function(rectangle_operator);
+		submodule["tunnel_operator"].bind_function(tunnel_operator);
+		submodule["rectangle_apply"].bind_function(rectangle_apply);
+		submodule["tunnel_apply"].bind_function(tunnel_apply);
+
+		submodule["random_placement_operator"].bind_function(
+				random_placement_operator);
+
+		submodule["rectangle_query"].bind_function(rectangle_query_apply);
+		submodule["rectangle_criteria"].bind_function(rectangle_query);
+		submodule["find_random_square"].bind_function(lfind_random_square);
+
+		LUAWRAP_SET_TYPE(LuaStackValue);
+		LUAWRAP_GETTER(submodule, random_place,
+				random_place(*OBJ["map"].as<MapPtr>(), ldungeon_get_rng(L), luawrap::defaulted(OBJ["size"], Size())));
+
+	}
+
+	void lua_register_map(const LuaValue& submodule, MTwist* mtwist) {
+		lua_State* L = submodule.luastate();
 
 		luawrap::install_userdata_type<MapPtr, lua_mapmetatable>();
 		luawrap::install_userdata_type<AreaOperatorPtr, lua_opermetatable>();
@@ -514,32 +547,25 @@ namespace ldungeon_gen {
 		lua_pushlightuserdata(L, (void*) mtwist);
 		luawrap::registry(L)["MapGenRNG"].pop();
 
-		module["ROOT_GROUP"] = ROOT_GROUP_ID;
+		lua_register_bsp(submodule);
+		lua_register_placement_functions(submodule);
 
-		module["FLAG_SOLID"] = FLAG_SOLID;
-		module["FLAG_TUNNEL"] = FLAG_TUNNEL;
-		module["FLAG_HAS_OBJECT"] = FLAG_HAS_OBJECT;
-		module["FLAG_NEAR_PORTAL"] = FLAG_NEAR_PORTAL;
-		module["FLAG_PERIMETER"] = FLAG_PERIMETER;
-		module["FLAG_SEETHROUGH"] = FLAG_SEETHROUGH;
-		module["FLAGS_ALL"] = (int)-1;
+		submodule["ROOT_GROUP"] = ROOT_GROUP_ID;
+
+		submodule["FLAG_SOLID"] = FLAG_SOLID;
+		submodule["FLAG_TUNNEL"] = FLAG_TUNNEL;
+		submodule["FLAG_HAS_OBJECT"] = FLAG_HAS_OBJECT;
+		submodule["FLAG_NEAR_PORTAL"] = FLAG_NEAR_PORTAL;
+		submodule["FLAG_PERIMETER"] = FLAG_PERIMETER;
+		submodule["FLAG_SEETHROUGH"] = FLAG_SEETHROUGH;
+		submodule["FLAGS_ALL"] = (int)-1;
 		for (int i = 1; i <= 8; i++) {
 			std::string str = format("FLAG_CUSTOM%d", i);
-			module[str] = FLAG_RESERVED2 << i;
+			submodule[str] = FLAG_RESERVED2 << i;
 		}
 
-		module["flags_list"].bind_function(flags_list);
-		module["flags_match"].bind_function(flags_match);
-		module["flags_combine"].bind_function(flags_combine);
-
-		module["map_create"].bind_function(map_create);
-		module["rectangle_operator"].bind_function(rectangle_operator);
-		module["bsp_operator"].bind_function(bsp_operator);
-		module["tunnel_operator"].bind_function(tunnel_operator);
-		module["random_placement_operator"].bind_function(
-				random_placement_operator);
-
-		module["rectangle_query"].bind_function(rectangle_query);
-		module["find_random_square"].bind_function(lfind_random_square);
+		submodule["flags_list"].bind_function(flags_list);
+		submodule["flags_match"].bind_function(flags_match);
+		submodule["flags_combine"].bind_function(flags_combine);
 	}
 }

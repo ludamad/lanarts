@@ -222,11 +222,7 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 }
 
 obj_id GameState::add_instance(level_id level, GameInst* inst) {
-	GameMapState* map = game_world().get_current_level();
-	game_world().set_current_level(level);
-	obj_id id = add_instance(inst);
-	game_world().set_current_level(map);
-	return id;
+	return game_world().get_level(level)->add_instance(this, inst);
 }
 
 GameInst* GameState::get_instance(level_id level, obj_id id) {
@@ -406,11 +402,7 @@ void GameState::draw(bool drawhud) {
 }
 
 obj_id GameState::add_instance(GameInst* inst) {
-	obj_id id = get_level()->game_inst_set().add_instance(inst);
-	inst->init(this);
-	event_log("Adding instance id: %d x: %d y: %d target_radius: %d depth %d\n",
-			inst->id, inst->x, inst->y, inst->target_radius, inst->depth);
-	return id;
+	return get_level()->add_instance(this, inst);
 }
 
 void GameState::remove_instance(GameInst* inst) {

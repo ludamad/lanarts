@@ -2,9 +2,11 @@
     Implements the game loop, which calls the step & draw events of all objects.
 ]]
 
+local EventLog = import "core.ui.EventLog"
+
 local M = {} -- Submodule
 
-local help_overlay = import "lanarts.help_overlay"
+local help_overlay = import "@help_overlay"
 
 --- Externally visible control structure for the main loop
 M.loop_control = {

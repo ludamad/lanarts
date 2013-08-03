@@ -1,14 +1,13 @@
 /*
- * lua_ldungeon_impl.h
- *
- *  Created on: Jun 18, 2013
- *      Author: adomurad
+ * lua_ldungeon_impl.h:
+ *  Internally shared binding functions
  */
 
 #ifndef LUA_LDUNGEON_IMPL_H_
 #define LUA_LDUNGEON_IMPL_H_
 
 #include "Map.h"
+#include "map_fill.h"
 
 struct lua_State;
 class LuaValue;
@@ -29,6 +28,10 @@ namespace ldungeon_gen {
 
 	ConditionalOperator lua_conditional_operator_get(LuaField args);
 	ConditionalOperator lua_conditional_operator_optional_get(LuaField args);
+	void lua_register_bsp(const LuaValue& submodule);
+
+	int oper_aux(lua_State* L);
+	AreaOperatorPtr area_operator_get(LuaField val);
 }
 
 #endif /* LUA_LDUNGEON_IMPL_H_ */

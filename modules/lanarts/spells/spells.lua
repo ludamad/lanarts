@@ -1,3 +1,5 @@
+local EventLog = import "core.ui.EventLog"
+
 -- FIRE BOLT
 
 Data.spell_create {

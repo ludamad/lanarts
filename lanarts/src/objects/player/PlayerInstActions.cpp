@@ -576,6 +576,18 @@ static int scan_entrance(const std::vector<GameRoomPortal>& portals,
 	return -1;
 }
 
+
+void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
+	if (!effective_stats().allowed_actions.can_use_stairs) {
+		if (is_local_player()) {
+			gs->game_chat().add_message(
+					"You cannot use the stairs in this state!");
+		}
+		return;
+	}
+
+}
+
 void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
 	if (!effective_stats().allowed_actions.can_use_stairs) {
 		if (is_local_player()) {

@@ -106,7 +106,6 @@ namespace lua_api {
 	}
 
 	static int wrapped_with_globals_mutable(lua_State* L) {
-		printf("wrapped_with_globals_mutable got %d\n", lua_gettop(L));
 		bool was_mutable = globals_get_mutability(L);
 		globals_set_mutability(L, true);
 
@@ -248,6 +247,8 @@ namespace lua_api {
 		preload["mime.core"].bind_function(luaopen_mime_core);
 	}
 
+	void register_lua_core_maps(lua_State* L);
+
 	// Register all the lanarts API functions and types
 	void register_api(GameState* gs, lua_State* L) {
 		lua_lanarts_api(gs, L); // TODO: Deprecated
@@ -273,6 +274,8 @@ namespace lua_api {
 		register_event_log_api(L);
 		register_display_api(L);
 		register_tiles_api(L);
+
+		register_lua_core_maps(L);
 	}
 
 	void luacall_post_draw(lua_State* L) {

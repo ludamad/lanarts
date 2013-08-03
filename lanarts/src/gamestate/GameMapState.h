@@ -85,6 +85,8 @@ public:
 		return _wander_map;
 	}
 
+	obj_id add_instance(GameState* gs, GameInst* inst);
+
 	void serialize(GameState* gs, SerializeBuffer& serializer);
 	void deserialize(GameState* gs, SerializeBuffer& serializer);
 

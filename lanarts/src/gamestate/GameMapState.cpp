@@ -10,6 +10,7 @@
 #include "GameMapState.h"
 
 #include "GameState.h"
+#include "GameLogger.h"
 
 GameMapState::GameMapState(int levelid, const Size& size,
 		bool wandering_flag, bool is_simulation) :
@@ -93,6 +94,22 @@ void GameMapState::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	game_inst_set().deserialize(gs, serializer);
 	monster_controller().deserialize(serializer);
 
+}
+
+// Does an add_instance in this map
+obj_id GameMapState::add_instance(GameState* gs, GameInst* inst) {
+	GameMapState* current_level = gs->game_world().get_current_level();
+
+	// 'Awake' this map
+	gs->game_world().set_current_level(this);
+	obj_id id = game_inst_set().add_instance(inst);
+	inst->init(gs);
+	gs->game_world().set_current_level(current_level);
+
+	event_log("Adding instance id: %d x: %d y: %d target_radius: %d depth %d\n",
+			inst->id, inst->x, inst->y, inst->target_radius, inst->depth);
+
+	return id;
 }
 
 void GameMapState::step(GameState* gs) {
