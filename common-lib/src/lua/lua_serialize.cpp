@@ -102,7 +102,6 @@ static inline bool buf_write_if_seen(lua_State* L, SerializeBuffer& buf, int tab
 			buf.write_byte(MAR_TREF_STR);
 			buf.write_int(str_len);
 			buf.write_raw(str, str_len);
-			printf("SAVED with string %s\n", str);
 		}
 	}
 	lua_pop(L, 1);
@@ -289,7 +288,6 @@ static void store_object(LuaField key, LuaField value, LuaField str2obj_table, L
 	str2obj_table.push();
 	key.push();// Push string
 	value.push();// Push value
-	printf("Serializing %s as %s\n", lua_tostring(L, -2), lua_typename(L, lua_type(L,-1)));
 	lua_rawset(L, -3);
 	lua_pop(L, 1);
 
@@ -345,7 +343,6 @@ void lua_store_submodule_refs(LuaField submodule, const char* name, LuaField str
 		if (lua_type(L, -2) == LUA_TSTRING) {
 			int val_idx = lua_gettop(L);
 			lua_pushfstring(L, "%s;%s", name, lua_tostring(L, -2));
-//			printf("Serializing %s\n", lua_tostring(L, -1));
 			int type = lua_type(L, val_idx);
 			if (type != LUA_TSTRING && type != LUA_TNUMBER && type != LUA_TBOOLEAN && type != LUA_TBOOLEAN) {
 				store_object(LuaStackValue(L, -1), LuaStackValue(L, val_idx), str2obj_table, obj2str_table, recurse);
@@ -399,7 +396,6 @@ static bool decode_ref(lua_State* L, const char *buf, size_t len, const char **p
 				throw std::runtime_error(format("Could not find matching value for key '%s' in deserialization.", lua_tostring(L, -1)));
 			}
 		}
-		printf("LOADED with string %s\n", lua_tostring(L, -2));
 		lua_replace(L, -2);
 
 		return true;
@@ -442,7 +438,6 @@ void mar_decode_value(lua_State* L, const char *buf, size_t len, const char **p,
 			mar_incr_ptr(l);
 			if (tag == MAR_TVAL_WITH_META) {
 				// Rearrange with meta-table (decoded above)
-				printf("Deserializing value with metatable!\n");
 				lua_insert(L, -2);
 				lua_setmetatable(L, -2);
 			}
@@ -538,8 +533,6 @@ int mar_encode(lua_State* L) {
 			luaL_error(L, "bad argument #%d to encode (expected table)", i);
 		}
 	}
-	printf("Encoding with mar_encode: ");
-	pretty_print(LuaStackValue(L, 1));
 
 	size_t len = lua_objlen(L, 2), start_len = lua_objlen(L, 3), idx;
 	for (idx = start_len + 1; idx <= len; idx++) {

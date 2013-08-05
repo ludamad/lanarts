@@ -43,22 +43,23 @@ function M.spawn_decoration(map, sprite, sqr)
     return object
 end
 
-function M.spawn_portal(map, sqr, sprite, callback)
+function M.spawn_portal(map, sqr, sprite, callback, --[[Optional]] frame)
     local object = GameObject.feature_create {
         do_init = false,
         xy = {sqr[1]*32+16, sqr[2]*32+16},
         type = GameObject.PORTAL,
         sprite = sprite,
-        on_player_interact = callback
+        on_player_interact = callback,
+        frame = frame
     }
     table.insert(map.instances, object)
     return object
 end
 
-function M.random_portal(map, area, sprite, callback) 
+function M.random_portal(map, area, sprite, callback, --[[Optional]] frame) 
     local sqr = M.random_square(map, area)
     if not sqr then return nil end
-    return M.spawn_portal(map, sqr, sprite, callback)
+    return M.spawn_portal(map, sqr, sprite, callback, frame)
 end
 --
 --function M.random_portal_connect(map, area, sprite, portals, direction, portal_key, next_map)

@@ -78,10 +78,14 @@ local function find_player_positions(map)
     return positions
 end
 
+local function stair_kinds_index(x, y)
+    return y*6+x -- stair_kinds.png has rows of 6
+end
+
 local function generate_store(map, xy)
     local items = {}
     for i=1,random(5,10) do
-        table.insert(items, item_utils.item_generate(item_groups.basic_items, true))
+        table.insert(items, item_utils.item_generate(chance(.5) and item_groups.basic_items or item_groups.enchanted_items, true))
     end
     table.insert(map.instances, GameObject.store_create {
         xy = {(xy[1]+.5)*Maps.TILE_SIZE, (xy[2]+.5)*Maps.TILE_SIZE},

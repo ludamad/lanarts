@@ -38,4 +38,37 @@ M.basic_items = {
     , { item = "Leather Gloves",     chance = 5                      }
 }
 
+M.enchanted_items = {
+    { item = "Silver Arrow",       chance = 10,  amount = {2,6}   }
+    -- Ranged Weapons
+    , { item = "Long Bow",           chance = 2                      }
+    -- Melee Weapons
+    , { item = "Samurai Sabre",      chance = 1                      }
+    , { item = "Magic Sword",        chance = 2                      }
+    -- Potions
+    , { item = "Health Potion",      chance = 10                     }
+    , { item = "Mana Potion",        chance = 10                     }
+    -- Body Armour
+    , { item = "Chainmail",          chance = 2                      }
+    , { item = "Platemail",          chance = 1                      }
+    , { item = "Magician's Robe",    chance = 2                      }
+    , { item = "Runed Robe",         chance = 1                      }
+    , { item = "Robe of Mana",         chance = 1                      }
+    -- Helmets
+    , { item = "Runed Helmet",       chance = 1                      }
+    , { item = "Crown of Mars",      chance = 1                      }
+    , { item = "Crown of Orcus",     chance = 1                      }
+    , { item = "Diana's Diadem",     chance = 1                      }
+    -- Rings
+    , { item = "Magician's Ring",    chance = 1                      }
+    , { item = "Moonstone Ring",     chance = 1                      }
+    , { item = "Ogre's Ring",        chance = 1                      }
+    , { item = "Hydra Ring",         chance = 1                      }
+    -- Boots
+    , { item = "Iron Boots",         chance = 1                      }
+    -- Gloves
+    , { item = "Steel Gloves",       chance = 1                      }
+    , { item = "Runed Gloves",       chance = 1                      }
+}
+
 return M
