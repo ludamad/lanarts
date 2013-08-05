@@ -74,8 +74,8 @@ function pretty_tostring(val, --[[Optional]] tabs, --[[Optional]] packed, --[[Op
             table.insert(parts, pretty_tostring(v, tabs+1, packed))
         else 
             table.insert(parts, pretty_tostring(k, tabs+1, packed, false))
-            table.insert(parts, " = ")
-            table.insert(parts, pretty_tostring(v, type(v) == "table" and tabs+1 or 0, packed))
+--            table.insert(parts, " = ")
+--            table.insert(parts, pretty_tostring(v, type(v) == "table" and tabs+1 or 0, packed))
         end
 
         table.insert(parts, ", ")

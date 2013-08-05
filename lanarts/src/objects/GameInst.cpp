@@ -21,14 +21,23 @@
 
 GameInst::~GameInst() {
 }
-static void try_callback(GameInst* inst, const char* callback) {
-	if (inst->lua_variables.empty()) {
+
+void GameInst::lua_lookup(lua_State* L, const char* key) {
+	if (lua_variables.empty() || lua_variables.isnil()) {
+		lua_pushnil(L);
 		return;
 	}
-	lua_State* L = inst->lua_variables.luastate();
-	inst->lua_variables[callback].push();
+	lua_variables[key].push();
+}
+
+void GameInst::try_callback(const char* callback) {
+	if (lua_variables.empty() || lua_variables.isnil()) {
+		return;
+	}
+	lua_State* L = lua_variables.luastate();
+	lua_variables[callback].push();
 	if (!lua_isnil(L, -1)) {
-		luawrap::push(L, inst);
+		luawrap::push(L, this);
 		lua_call(L, 1, 0);
 	} else {
 		lua_pop(L, 1);
@@ -36,19 +45,20 @@ static void try_callback(GameInst* inst, const char* callback) {
 }
 
 void GameInst::step(GameState* gs) {
-	try_callback(this, "on_step");
+	try_callback("on_step");
 }
 
 void GameInst::draw(GameState* gs) {
-	try_callback(this, "on_draw");
+	try_callback("on_draw");
 }
 
 void GameInst::init(GameState* gs) {
-	try_callback(this, "on_init");
+	try_callback("on_init");
 	current_floor = gs->game_world().get_current_level_id();
 }
 
 void GameInst::deinit(GameState* gs) {
+	try_callback("on_deinit");
 	id = 0;
 	current_floor = -1;
 }
@@ -103,4 +113,3 @@ void GameInst::free_reference(GameInst* inst) {
 //	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
 //	*inst = *this;
 //}
-

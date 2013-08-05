@@ -34,11 +34,43 @@
 #include "../store/StoreInst.h"
 
 #include "../AnimatedInst.h"
+#include "../FeatureInst.h"
 #include "../ItemInst.h"
 #include "../ProjectileInst.h"
 #include "../collision_filters.h"
 
 #include "PlayerInst.h"
+
+static FeatureInst* find_usable_portal(GameState* gs, GameInst* player) {
+	std::vector<GameInst*> instances = gs->get_level()->game_inst_set().to_vector();
+	for (int i = 0; i < instances.size(); i++) {
+		FeatureInst* inst = dynamic_cast<FeatureInst*>(instances[i]);
+		if (inst == NULL) {
+			continue;
+		}
+		if (inst->feature_type() == FeatureInst::PORTAL) {
+			Pos sqr = Pos(inst->x / TILE_SIZE, inst->y /TILE_SIZE);
+			BBox portal_box(Pos(sqr.x*TILE_SIZE, sqr.y*TILE_SIZE), Size(TILE_SIZE, TILE_SIZE));
+			bool hit_test = circle_rectangle_test(player->pos(), player->target_radius, portal_box);
+			if (hit_test) {
+				return inst;
+			}
+		}
+	}
+	return NULL;
+}
+
+static bool queue_portal_use(GameState* gs, PlayerInst* player, ActionQueue& queue) {
+	FeatureInst* portal = find_usable_portal(gs, player);
+	if (portal != NULL) {
+		queue.push_back(
+				game_action(gs, player, GameAction::USE_PORTAL));
+		player->cooldowns().reset_stopaction_timeout(50);
+		return true;
+	}
+	return false;
+}
+
 
 // Determines if a projectile should be wielded from the ground
 static bool projectile_should_autowield(EquipmentStats& equipment,
@@ -232,6 +264,7 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 			queued_actions.push_back(
 					game_action(gs, this, GameAction::USE_ENTRANCE));
 			cooldowns().reset_stopaction_timeout(50);
+		} else if (queue_portal_use(gs, this, queued_actions)) {
 		}
 	}
 
@@ -376,6 +409,8 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 		return use_spell(gs, action);
 	case GameAction::USE_REST:
 		return use_rest(gs, action);
+	case GameAction::USE_PORTAL:
+		return use_dngn_portal(gs, action);
 	case GameAction::USE_ENTRANCE:
 		return use_dngn_entrance(gs, action);
 	case GameAction::USE_EXIT:
@@ -576,7 +611,6 @@ static int scan_entrance(const std::vector<GameRoomPortal>& portals,
 	return -1;
 }
 
-
 void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
 	if (!effective_stats().allowed_actions.can_use_stairs) {
 		if (is_local_player()) {
@@ -585,7 +619,8 @@ void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
 		}
 		return;
 	}
-
+	FeatureInst* portal = find_usable_portal(gs, this);
+	portal->player_interact(gs, this);
 }
 
 void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {

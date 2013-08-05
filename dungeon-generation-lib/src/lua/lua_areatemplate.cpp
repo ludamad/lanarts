@@ -156,9 +156,21 @@ namespace ldungeon_gen {
 		return meta;
 	}
 
+	static bool lua_area_template_apply(LuaStackValue args) {
+		using namespace luawrap;
+		LuaStackValue oper = area_template_create(args);
+		bool applied = area_operator_get(oper)->apply(
+				args["map"].as<MapPtr>(),
+				defaulted(args["parent_group_id"], ROOT_GROUP_ID),
+				args["area"].as<BBox>()
+		);
+		return applied;
+	}
+
 	void lua_register_areatemplate(const LuaValue& module) {
 		luawrap::install_userdata_type<AreaTemplatePtr,
 				lua_areatemplatemetatable>();
+		module["area_template_apply"].bind_function(lua_area_template_apply);
 		module["area_template_create"].bind_function(area_template_create);
 	}
 }

@@ -95,6 +95,11 @@ static int world_players(lua_State* L) {
 	}
 	return 1;
 }
+static int world_player_amount(lua_State* L) {
+	int nplayers = lua_api::gamestate(L)->player_data().all_players().size();
+	lua_pushinteger(L, nplayers);
+	return 1;
+}
 
 // game world functions
 static int world_local_player(lua_State* L) {
@@ -103,10 +108,10 @@ static int world_local_player(lua_State* L) {
 	return 1;
 }
 
-static void world_players_spawn(LuaStackValue level_id) {
+static void world_players_spawn(LuaStackValue level_id, const std::vector<Pos>& positions) {
 	GameState* gs = lua_api::gamestate(level_id);
 	GameMapState* map = gs->game_world().get_level(level_id.to_int());
-	gs->game_world().spawn_players(map);
+	gs->game_world().spawn_players(map, positions);
 }
 
 // level functions
@@ -233,18 +238,19 @@ bool temporary_isgameinst(lua_State* L, int idx) {
 // They can hold closures.
 
 namespace lua_api {
-	static void register_gameworld_getters(lua_State* L,
+	static void register_gameworld_submodule(lua_State* L,
 			const LuaValue& world) {
 		luawrap::install_userdata_type<PlayerDataProxy,
 				PlayerDataProxy::metatable>();
 
-		LuaValue metatable = luameta_new(L, "world table");
+		LuaValue metatable = luameta_new(L, "GameWorld");
 		LuaValue getters = luameta_getters(metatable);
-		LuaValue methods = luameta_constants(metatable);
+		LuaValue functions = luameta_constants(metatable);
 
-		methods["players_spawn"].bind_function(world_players_spawn);
+		functions["players_spawn"].bind_function(world_players_spawn);
 
 		getters["players"].bind_function(world_players);
+		getters["player_amount"].bind_function(world_player_amount);
 		getters["local_player"].bind_function(world_local_player);
 
 		world.push();
@@ -257,7 +263,8 @@ namespace lua_api {
 		LuaValue globals = luawrap::globals(L);
 		lua_register_gameinst(L);
 
-		register_gameworld_getters(L, luawrap::ensure_table(globals["World"]));
+		LuaValue world = register_lua_submodule(L, "core.GameWorld");
+		register_gameworld_submodule(L, world);
 
 		LuaValue room = luawrap::ensure_table(globals["Room"]);
 

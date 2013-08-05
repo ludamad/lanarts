@@ -4,6 +4,7 @@ local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
 local utils = import "core.utils"
 local utils_text_component = import "core.utils.utils_text_component"
+local World = import "core.GameWorld"
 
 local text_button_params = {
     font = font_cached_load(settings.menu_font, 20),

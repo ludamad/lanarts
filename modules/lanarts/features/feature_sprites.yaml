@@ -8,6 +8,19 @@ sprites:
   - name: store
     file: modules/lanarts/features/sprites/shop.png
 
+  - name: stairs_up
+    file: modules/lanarts/tiles/features/stairs_up.png
+
+  - name: stairs_down
+    file: modules/lanarts/tiles/features/stairs_down.png
+
   - name: statue
     type: animation
     frames: modules/lanarts/features/sprites/statues/statue(0-17).png
+
+  - name: shrub
+    file: modules/lanarts/features/sprites/shrub.png
+
+  - name: anvil
+    file: modules/lanarts/features/sprites/anvil.png
+    

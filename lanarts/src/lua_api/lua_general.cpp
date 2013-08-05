@@ -538,6 +538,13 @@ namespace lua_api {
 		loaders[vpath] = loader;
 	}
 
+	void pretty_print(LuaField field) {
+		lua_State* L = field.luastate();
+		luawrap::globals(L)["pretty_print"].push();
+		field.push();
+		lua_call(L, 1, 0);
+	}
+
 	LuaValue import(lua_State* L, const char* filename) {
 		luawrap::globals(L)["import"].push();
 		lua_pushstring(L, filename);

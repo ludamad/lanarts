@@ -348,3 +348,5 @@ request = socket.protect(function(reqt, body)
     if base.type(reqt) == "string" then return srequest(reqt, body)
     else return trequest(reqt) end
 end)
+
+return base.getfenv()

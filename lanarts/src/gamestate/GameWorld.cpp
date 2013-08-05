@@ -130,13 +130,14 @@ void GameWorld::place_player(GameMapState* map, GameInst* p) {
 
 }
 
-void GameWorld::spawn_players(GameMapState* map) {
+void GameWorld::spawn_players(GameMapState* map, const std::vector<Pos>& positions) {
 	bool flocal = (gs->game_settings().conntype == GameSettings::CLIENT);
 	GameSettings& settings = gs->game_settings();
 	GameNetConnection& netconn = gs->net_connection();
 	int myclassn = gs->game_settings().class_type;
 
 	for (int i = 0; i < gs->player_data().all_players().size(); i++) {
+		Pos position = positions.at(i);
 		PlayerDataEntry& pde = gs->player_data().all_players()[i];
 		bool islocal = &pde == &gs->player_data().local_player_data();
 		ClassEntry& c = game_class_data.at(pde.classtype);
@@ -144,12 +145,11 @@ void GameWorld::spawn_players(GameMapState* map) {
 
 		if (pde.player_inst.empty()) {
 			pde.player_inst = new PlayerInst(c.starting_stats,
-					c.sprites[spriteidx], 0, 0, islocal);
+					c.sprites[spriteidx], position.x, position.y, islocal);
 		}
 		printf("Spawning for player %d: %s\n", i,
 				islocal ? "local player" : "network player");
-
-		place_player(map, pde.player_inst.get());
+		map->add_instance(gs, pde.player_inst.get());
 	}
 }
 

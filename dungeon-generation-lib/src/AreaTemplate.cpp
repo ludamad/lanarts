@@ -58,16 +58,16 @@ namespace ldungeon_gen {
 
 			/* Apply lua function */
 			if (!glyph.value.empty() && !glyph.value.isnil()) {
+				printf("APPLYING GLYPH FUNCTION\n");
 				LDUNGEON_ASSERT(L == NULL || glyph.value.luastate() == L);
 				if (L == NULL) {
 					L = glyph.value.luastate();
 					luawrap::push(L, map);
-					luawrap::push(L, Pos());
 				}
-				LuaStackValue mapval(L, -2), posval(L, -1);
+				LuaStackValue mapval(L, -1);
 				glyph.value.push();
 				mapval.push();
-				posval.push();
+				luawrap::push(L, Pos(sqrx, sqry));
 				lua_call(L, 2, 0);
 			}
 		}

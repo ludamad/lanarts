@@ -14,6 +14,7 @@ class EnemyInst;
 struct lua_State;
 class LuaStackValue;
 class LuaValue;
+class LuaField;
 struct LuaModule;
 union SDL_Event;
 
@@ -71,6 +72,7 @@ namespace lua_api {
 	// Register all the lanarts API functions and types
 	void register_api(GameState* gs, lua_State* L);
 
+	void pretty_print(LuaField field);
 	LuaValue import(lua_State* L, const char* filename);
 
 	// Callbacks into the lua VM:

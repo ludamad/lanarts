@@ -55,6 +55,9 @@ public:
 	virtual unsigned int integrity_hash();
 	virtual void update_position(float newx, float newy);
 
+	void try_callback(const char* callback);
+	void lua_lookup(lua_State* L, const char* key);
+
 	BBox bbox() {
 		return BBox(x - radius, y - radius, x + radius, y + radius);
 	}

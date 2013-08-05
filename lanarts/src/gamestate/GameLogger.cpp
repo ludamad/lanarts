@@ -45,7 +45,7 @@ GameLogger::~GameLogger() {
 void GameLogger::event_log(const char *fmt, va_list ap) {
 	static std::string logline;
 
-	if (!gs || !output_log_file || gs->get_level()->id() == -1) {
+	if (!gs || !output_log_file || gs->get_level() == NULL || gs->get_level()->id() < 0) {
 		va_end(ap);
 		return;
 	}

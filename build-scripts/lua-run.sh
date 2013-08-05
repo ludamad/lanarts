@@ -4,7 +4,7 @@
 
 if [ $(basename $(pwd)) == 'build-scripts' ] ; then cd .. ; fi
 
-if ! ./build-scripts/ninja.sh > /dev/null ; then
+if ! ./build-scripts/make.sh > /dev/null ; then
 	echo "Build failed, aborting lanarts-lua run."
 	exit $?
 fi

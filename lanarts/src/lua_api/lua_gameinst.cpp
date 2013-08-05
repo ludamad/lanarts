@@ -253,7 +253,31 @@ void lua_gameinst_callback(lua_State* L, LuaValue& value, GameInst* inst) {
 	lua_call(L, 1, 0);
 }
 
+static void set_gameinst_member(GameInst* inst, LuaStackValue args, const char* member) {
+	lua_State* L = args.luastate();
+	args[member].push();
+	if (!lua_isnil(L, -1)) {
+		LuaValue& v = inst->lua_variables;
+		if (v.empty()) {
+			v.init(L);
+			v.newtable();
+		}
+		v[member].pop();
+	} else {
+		lua_pop(L, 1);
+	}
+}
+
 static GameInst* do_instance_init(GameState* gs, GameInst* inst, LuaStackValue args) {
+	set_gameinst_member(inst, args, "on_init");
+	set_gameinst_member(inst, args, "on_deinit");
+	set_gameinst_member(inst, args, "on_step");
+	set_gameinst_member(inst, args, "on_draw");
+	set_gameinst_member(inst, args, "on_player_interact");
+	if (!args["radius"].isnil()) {
+		inst->target_radius = args["radius"].to_int();
+		inst->radius = std::min(15, inst->target_radius);
+	}
 	if (args["do_init"].isnil() || args["do_init"].to_bool()) {
 		level_id id = gs->game_world().get_current_level_id();
 		if (args["map"].isnil()) {
@@ -278,10 +302,10 @@ static GameInst* feature_create(LuaStackValue args) {
 
 	FeatureInst* inst = new FeatureInst(args["xy"].as<Pos>(), (FeatureInst::feature_t)args["type"].to_int(),
 			defaulted(args["solid"], false),
-			res::sprite_id(args["sprite"].to_str()));
+			res::sprite_id(args["sprite"].to_str()),
+			defaulted(args["depth"], (int)FeatureInst::DEPTH));
 	return do_instance_init(gs, inst, args);
 }
-
 
 static Item lua_item_get(LuaStackValue item) {
 	item_id type = get_item_by_name(item["type"].to_str());
@@ -310,5 +334,6 @@ void lua_register_gameinst(lua_State* L) {
 
 	submodule["DOOR_OPEN"] = (int)FeatureInst::DOOR_OPEN;
 	submodule["DOOR_CLOSED"] = (int)FeatureInst::DOOR_CLOSED;
+	submodule["PORTAL"] = (int)FeatureInst::PORTAL;
 	submodule["OTHER"] = (int)FeatureInst::OTHER;
 }

@@ -39,8 +39,12 @@ class LuaValue;
 void lua_serialize(SerializeBuffer& serializer, lua_State* L, int nargs);
 void lua_deserialize(SerializeBuffer& serializer, lua_State* L, int nargs);
 
+void lua_register_for_serialization(const char* key, LuaField object);
 void lua_serialize(SerializeBuffer& serializer, lua_State* L, const LuaValue& value);
 void lua_deserialize(SerializeBuffer& serializer, lua_State* L, LuaValue& value);
+
+
+void lua_store_submodule_refs(LuaField dictionary, LuaField submodule);
 
 // Metatable-based class wrapped for SerializeBuffer in Lua.
 // Makes it possible to push SerializeBuffer's with luawrap.

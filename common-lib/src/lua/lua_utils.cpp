@@ -7,6 +7,8 @@
 
 #include <lua.hpp>
 
+#include "lua_serialize.h"
+
 #include "strformat.h"
 
 #include <luawrap/luawrap.h>
@@ -22,6 +24,7 @@ static LuaValue create_protection_table(lua_State* L) {
 	LuaValue val(L);
 	val.newtable();
 	val["__index"].bind_function(error_fallback);
+	lua_register_for_serialization("C;lua_utils;__index", val["__index"]);
 	return val;
 }
 

@@ -72,5 +72,6 @@ namespace lua_api {
 		LuaValue submodule = register_lua_submodule(L, "core.maps");
 		submodule["create"].bind_function(maps_create);
 		submodule["transfer"].bind_function(maps_transfer);
+		submodule["TILE_SIZE"] = TILE_SIZE;
 	}
 }

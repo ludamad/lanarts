@@ -72,7 +72,7 @@ public:
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
 
-	void spawn_players(GameMapState* map);
+	void spawn_players(GameMapState* map, const std::vector<Pos>& positions);
 private:
 	void place_player(GameMapState* map, GameInst* p);
 	void spawn_players(GeneratedRoom& genlevel, void** player_instances,

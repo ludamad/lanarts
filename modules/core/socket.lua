@@ -131,3 +131,4 @@ sourcet["default"] = sourcet["until-closed"]
 
 source = choose(sourcet)
 
+return base.getfenv()

@@ -78,7 +78,6 @@ void FeatureInst::init(GameState* gs) {
 			gs->tiles().set_seethrough(tile_xy, false);
 		}
 	}
-	lua_variables.init(gs->luastate());
 }
 
 void FeatureInst::deinit(GameState *gs) {
@@ -91,7 +90,16 @@ void FeatureInst::deinit(GameState *gs) {
 	}
 }
 
-void FeatureInst::player_interact(GameState* gs) {
+void FeatureInst::player_interact(GameState* gs, GameInst* inst) {
+	lua_State* L = gs->luastate();
+	lua_lookup(L, "on_player_interact");
+	if (lua_isnil(L, -1)) {
+		lua_pop(L, 1);
+		return;
+	}
+	luawrap::push(L, (GameInst*)this);
+	luawrap::push(L, inst);
+	lua_call(L, 2, 0);
 }
 
 void FeatureInst::copy_to(GameInst* inst) const {

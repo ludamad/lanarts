@@ -59,7 +59,7 @@ static LuaValue tileset_create(LuaStackValue fields) {
 
 	fields.push();
 	lua_pushnil(L); // Initial key
-	while (lua_next(L, -2)) {
+	while (lua_next(L, -2) != 0) {
 		tileset[lua_tostring(L, -2)] = tile_create(LuaStackValue(L, -1));
 		lua_pop(L, 1); // Pop value
 	}

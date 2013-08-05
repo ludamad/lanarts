@@ -295,10 +295,11 @@ namespace ldungeon_gen {
 	static bool rectangle_query_apply(LuaStackValue args) {
 		using namespace luawrap;
 		LuaStackValue oper = rectangle_query(args);
+		MapPtr map = args["map"].as<MapPtr>();
 		bool applied = area_query_get(oper)->matches(
-				args["map"].as<MapPtr>(),
+				map,
 				defaulted(args["parent_group_id"], ROOT_GROUP_ID),
-				args["area"].as<BBox>()
+				defaulted(args["area"], BBox(Pos(), map->size()))
 		);
 		return applied;
 	}
@@ -372,10 +373,11 @@ namespace ldungeon_gen {
 	static bool rectangle_apply(LuaStackValue args) {
 		using namespace luawrap;
 		LuaStackValue oper = rectangle_operator(args);
+		MapPtr map = args["map"].as<MapPtr>();
 		bool applied = area_operator_get(oper)->apply(
-				args["map"].as<MapPtr>(),
+				map,
 				defaulted(args["parent_group_id"], ROOT_GROUP_ID),
-				args["area"].as<BBox>()
+				defaulted(args["area"], BBox(Pos(), map->size()))
 		);
 		return applied;
 	}
@@ -512,6 +514,18 @@ namespace ldungeon_gen {
 		return LuaStackValue(L, -1);
 	}
 
+	static bool random_placement_apply(LuaStackValue args) {
+		using namespace luawrap;
+		LuaStackValue oper = random_placement_operator(args);
+		MapPtr map =  args["map"].as<MapPtr>();
+		bool applied = area_operator_get(oper)->apply(
+				map,
+				defaulted(args["parent_group_id"], ROOT_GROUP_ID),
+				defaulted(args["area"], BBox(Pos(), map->size()))
+		);
+		return applied;
+	}
+
 	/*****************************************************************************
 	 *                          Register bindings                                *
 	 *****************************************************************************/
@@ -525,6 +539,9 @@ namespace ldungeon_gen {
 
 		submodule["random_placement_operator"].bind_function(
 				random_placement_operator);
+
+		submodule["random_placement_apply"].bind_function(
+				random_placement_apply);
 
 		submodule["rectangle_query"].bind_function(rectangle_query_apply);
 		submodule["rectangle_criteria"].bind_function(rectangle_query);

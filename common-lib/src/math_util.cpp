@@ -83,3 +83,29 @@ int signum(int val) {
 int round_up_divide(int value, int divisor) {
 	return (value + divisor - 1) / divisor;
 }
+
+bool circle_line_test(Pos circle_xy, int circle_rad, Pos line_start_xy,
+		Pos line_end_xy) {
+	Pos linedelta = line_end_xy - line_start_xy;
+	Pos circledelta = line_start_xy - circle_xy;
+	int ddist = linedelta.x * linedelta.x + linedelta.y * linedelta.y;
+	int t = -(circledelta.x * linedelta.x + circledelta.y * linedelta.y);
+
+	/* Restrict t to within the limits of the line segment */
+	if (t < 0)
+		t = 0;
+	else if (t > ddist)
+		t = ddist;
+
+	int dx = (line_start_xy.x + t * linedelta.x / ddist) - circle_xy.x;
+	int dy = (line_start_xy.y + t * linedelta.y / ddist) - circle_xy.y;
+	int rt = (dx * dx) + (dy * dy);
+	return rt < (circle_rad * circle_rad);
+}
+
+bool circle_rectangle_test(Pos circle_xy, int circle_rad, BBox rect) {
+	return circle_line_test(circle_xy, circle_rad, Pos(rect.x1, rect.y1), Pos(rect.x2, rect.y1)) ||
+		circle_line_test(circle_xy, circle_rad, Pos(rect.x1, rect.y1), Pos(rect.x1, rect.y2)) ||
+		circle_line_test(circle_xy, circle_rad, Pos(rect.x1, rect.y2), Pos(rect.x2, rect.y2)) ||
+		circle_line_test(circle_xy, circle_rad, Pos(rect.x2, rect.y1), Pos(rect.x2, rect.y2));
+}

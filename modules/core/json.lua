@@ -431,3 +431,4 @@ function test()
     end
 end
 
+return getfenv()

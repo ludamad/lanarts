@@ -219,25 +219,25 @@ void GameTiles::serialize(SerializeBuffer& serializer) {
 	serializer.write_container(_seethrough->_internal_vector());
 }
 
-static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
-		float radsqr) {
-	int dx, dy, t, rt, ddist;
-	dx = qx - px;
-	dy = qy - py;
-	ddist = dx * dx + dy * dy;
-	t = -((px - cx) * dx + (py - cy) * dy);
-
-	/* Restrict t to within the limits of the line segment */
-	if (t < 0)
-		t = 0;
-	else if (t > ddist)
-		t = ddist;
-
-	dx = (px + t * (qx - px) / ddist) - cx;
-	dy = (py + t * (qy - py) / ddist) - cy;
-	rt = (dx * dx) + (dy * dy);
-	return rt < (radsqr);
-}
+//static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
+//		float radsqr) {
+//	int dx, dy, t, rt, ddist;
+//	dx = qx - px;
+//	dy = qy - py;
+//	ddist = dx * dx + dy * dy;
+//	t = -((px - cx) * dx + (py - cy) * dy);
+//
+//	/* Restrict t to within the limits of the line segment */
+//	if (t < 0)
+//		t = 0;
+//	else if (t > ddist)
+//		t = ddist;
+//
+//	dx = (px + t * (qx - px) / ddist) - cx;
+//	dy = (py + t * (qy - py) / ddist) - cy;
+//	rt = (dx * dx) + (dy * dy);
+//	return rt < (radsqr);
+//}
 
 bool GameTiles::radius_test(const Pos& xy, int rad, bool issolid, int ttype,
 		Pos* hitloc) {
@@ -263,21 +263,10 @@ bool GameTiles::radius_test(const Pos& xy, int rad, bool issolid, int ttype,
 			bool solidity_match = _solidity->raw_get(idx) == issolid;
 
 			if (solidity_match && istype) {
-				int offset = TILE_SIZE / 2; //To and from center
-				int cx = int(xx * TILE_SIZE) + offset;
-				int cy = int(yy * TILE_SIZE) + offset;
-				int ydist = cy - y;
-				int xdist = cx - x;
-				double ddist = ydist * ydist + xdist * xdist;
-				if (ddist < distsqr
-						|| circle_line_test(cx - offset, cy - offset,
-								cx + offset, cy - offset, x, y, radsqr)
-						|| circle_line_test(cx - offset, cy - offset,
-								cx - offset, cy + offset, x, y, radsqr)
-						|| circle_line_test(cx - offset, cy + offset,
-								cx + offset, cy + offset, x, y, radsqr)
-						|| circle_line_test(cx + offset, cy - offset,
-								cx + offset, cy + offset, x, y, radsqr)) {
+				BBox tilebox(Pos(xx * TILE_SIZE, yy * TILE_SIZE), Size(TILE_SIZE, TILE_SIZE));
+				Pos dist = tilebox.center() - xy;
+				double ddist = dist.x * dist.x + dist.y * dist.y;
+				if (ddist < distsqr || circle_rectangle_test(xy, rad, tilebox)) {
 					if (hitloc)
 						*hitloc = Pos(xx, yy);
 					return true;

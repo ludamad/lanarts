@@ -14,7 +14,7 @@
 class FeatureInst: public GameInst {
 public:
 	enum feature_t {
-		DOOR_OPEN, DOOR_CLOSED, OTHER
+		DOOR_OPEN, DOOR_CLOSED, PORTAL, OTHER
 	};
 	enum {
 		RADIUS = 15, DEPTH = 100
@@ -26,13 +26,16 @@ public:
 	virtual void deinit(GameState *gs);
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
-	void player_interact(GameState* gs);
+	void player_interact(GameState* gs, GameInst* inst);
 	virtual void copy_to(GameInst* inst) const;
 	virtual FeatureInst* clone() const;
 
 	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
 	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
 
+	feature_t feature_type() const {
+		return feature;
+	}
 private:
 	feature_t feature;
 	sprite_id last_seen_spr;

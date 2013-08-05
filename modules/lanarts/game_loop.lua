@@ -6,6 +6,7 @@ local EventLog = import "core.ui.EventLog"
 
 local M = {} -- Submodule
 
+local World = import "core.GameWorld"
 local help_overlay = import "@help_overlay"
 
 --- Externally visible control structure for the main loop

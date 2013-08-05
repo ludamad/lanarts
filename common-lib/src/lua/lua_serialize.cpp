@@ -36,6 +36,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <exception>
 #include <lua.hpp>
 #include <luawrap/luawrap.h>
 
@@ -43,11 +44,12 @@
 #include "SerializeBuffer.h"
 
 static const unsigned int MAR_TREF = 1;
+static const unsigned int MAR_TREF_STR = 2;
 // Table without a meta-table
-static const unsigned int MAR_TVAL = 2;
+static const unsigned int MAR_TVAL = 3;
 // Table with a meta-table
-static const unsigned int MAR_TVAL_WITH_META = 3;
-static const unsigned int MAR_TUSR = 4;
+static const unsigned int MAR_TVAL_WITH_META = 4;
+static const unsigned int MAR_TUSR = 5;
 
 static const unsigned int MAR_CHR = 1;
 static const unsigned int MAR_I64 = 8;
@@ -91,8 +93,17 @@ static inline bool buf_write_if_seen(lua_State* L, SerializeBuffer& buf, int tab
 	lua_rawget(L, table_idx);
 	bool was_seen = !lua_isnil(L, -1);
 	if (was_seen) {
-		buf.write_byte(MAR_TREF);
-		buf.write_int(lua_tointeger(L, -1));
+		if (lua_isnumber(L, -1)) {
+			buf.write_byte(MAR_TREF);
+			buf.write_int(lua_tointeger(L, -1));
+		} else {
+			size_t str_len;
+			const char* str = lua_tolstring(L, -1, &str_len);
+			buf.write_byte(MAR_TREF_STR);
+			buf.write_int(str_len);
+			buf.write_raw(str, str_len);
+			printf("SAVED with string %s\n", str);
+		}
 	}
 	lua_pop(L, 1);
 	return was_seen;
@@ -121,6 +132,14 @@ static inline bool buf_try_persist_hook(lua_State *L, SerializeBuffer& buf, size
 		lua_settop(L, stacksize);
 	}
 	return false;
+}
+
+
+static void pretty_print(LuaField field) {
+	lua_State* L = field.luastate();
+	luawrap::globals(L)["pretty_print"].push();
+	field.push();
+	lua_call(L, 1, 0);
 }
 
 void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) {
@@ -180,6 +199,7 @@ void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) 
 			lua_pushvalue(L, -1);
 			lua_getinfo(L, ">nuS", &ar);
 			if (ar.what[0] != 'L') {
+				lua_CFunction cfunction = lua_tocfunction(L, -1);
 				luaL_error(L, "attempt to persist a C function '%s'", ar.name);
 			}
 			lua_pushvalue(L, -1);
@@ -259,6 +279,134 @@ static void mar_handle_persist_closure(lua_State* L, const char *buf, size_t len
 	lua_rawseti(L, SEEN_IDX, (*idx)++);
 }
 
+void lua_store_submodule_refs(LuaField submodule, const char* name, LuaField str2obj_table, LuaField obj2str_table, bool recurse = true);
+
+static void store_object(LuaField key, LuaField value, LuaField str2obj_table, LuaField obj2str_table, bool recurse = true) {
+	lua_State* L = key.luastate();
+	int ntop = lua_gettop(L);
+
+	// Store the string->object pair
+	str2obj_table.push();
+	key.push();// Push string
+	value.push();// Push value
+	printf("Serializing %s as %s\n", lua_tostring(L, -2), lua_typename(L, lua_type(L,-1)));
+	lua_rawset(L, -3);
+	lua_pop(L, 1);
+
+	// Check if the object->string pair already has the object,
+	// We should avoid over-writing it
+	obj2str_table.push();
+	value.push();// Push value
+	lua_rawget(L, -2);
+
+	// The object has already been stored
+	if (!lua_isnil(L, -1)) {
+		lua_settop(L, ntop);
+		return;
+	}
+	lua_pop(L, 2); // pop table & result
+
+	obj2str_table.push();
+	value.push();// Push value
+	key.push();// Push string
+	lua_rawset(L, -3);
+	lua_pop(L, 1);
+
+	value.push();
+	if (lua_istable(L, -1) && recurse) {
+		lua_store_submodule_refs(value, key.to_str(), str2obj_table, obj2str_table);
+	}
+
+	lua_settop(L, ntop);
+}
+
+void lua_register_for_serialization(const char* key, LuaField object) {
+	lua_State* L = object.luastate();
+	LuaField table = luawrap::ensure_table(luawrap::registry(L)["serialize_registered"]);
+	table[key] = object;
+}
+
+// TODO: Less hackish
+void lua_store_submodule_refs(LuaField submodule, const char* name, LuaField str2obj_table, LuaField obj2str_table, bool recurse) {
+	lua_State* L = submodule.luastate();
+
+	// Iterate the submodule
+	submodule.push();
+	if (lua_getmetatable(L, -1)) {
+		int type = lua_type(L, -1);
+		lua_pushfstring(L, "%s;;<meta>", name);
+		if (type != LUA_TSTRING && type != LUA_TNUMBER && type != LUA_TBOOLEAN && type != LUA_TBOOLEAN) {
+			store_object(LuaStackValue(L, -1), LuaStackValue(L, -2), str2obj_table, obj2str_table, recurse);
+		}
+		lua_pop(L, 2);
+	}
+	lua_pushnil(L);
+	while (lua_next(L, -2) != 0) {
+		if (lua_type(L, -2) == LUA_TSTRING) {
+			int val_idx = lua_gettop(L);
+			lua_pushfstring(L, "%s;%s", name, lua_tostring(L, -2));
+//			printf("Serializing %s\n", lua_tostring(L, -1));
+			int type = lua_type(L, val_idx);
+			if (type != LUA_TSTRING && type != LUA_TNUMBER && type != LUA_TBOOLEAN && type != LUA_TBOOLEAN) {
+				store_object(LuaStackValue(L, -1), LuaStackValue(L, val_idx), str2obj_table, obj2str_table, recurse);
+			}
+			lua_pop(L, 2);
+		} else {
+			lua_pop(L, 1);
+		}
+	}
+	lua_pop(L, 1);
+}
+
+// TODO: Less hackish
+static void decode_ref_miss(lua_State* L, const char* ref_str, size_t len) {
+	int i;
+	for (i = 0; i < len; i++) {
+		if (ref_str[i] == ';') {
+			break;
+		}
+	}
+	lua_pushlstring(L, ref_str, i);
+	printf("Got ref miss with '%s', importing '%s'\n", ref_str, lua_tostring(L, -1));
+	luawrap::globals(L)["import"].push();
+	lua_pushvalue(L, -2);
+	lua_call(L, 1, 1);
+	store_object(LuaStackValue(L, -2), LuaStackValue(L, -1),  luawrap::registry(L)["serialize_key2obj"], luawrap::registry(L)["serialize_obj2key"]);
+	lua_pop(L, 2);
+}
+
+static bool decode_ref(lua_State* L, const char *buf, size_t len, const char **p, int tag) {
+	if (tag == MAR_TREF) {
+		int ref;
+		mar_next_len(ref, int);
+		lua_rawgeti(L, SEEN_IDX, ref);
+		return true;
+	} else if (tag == MAR_TREF_STR) {
+		size_t l;
+		mar_next_len(l, uint32_t);
+		lua_pushlstring(L, *p, l);
+		mar_incr_ptr(l);
+
+		lua_pushvalue(L, -1); // duplicate string
+		lua_rawget(L, SEEN_IDX);
+		if (lua_isnil(L, -1)) {
+			lua_pop(L, 1);
+			decode_ref_miss(L, lua_tostring(L, -1), l);
+			lua_pushvalue(L, -1); // duplicate string
+
+			lua_rawget(L, SEEN_IDX);
+			if (lua_isnil(L, -1)) {
+				throw std::runtime_error(format("Could not find matching value for key '%s' in deserialization.", lua_tostring(L, -1)));
+			}
+		}
+		printf("LOADED with string %s\n", lua_tostring(L, -2));
+		lua_replace(L, -2);
+
+		return true;
+	}
+	return false;
+}
+
 void mar_decode_value(lua_State* L, const char *buf, size_t len, const char **p,
 		size_t *idx) {
 	size_t l;
@@ -281,10 +429,7 @@ void mar_decode_value(lua_State* L, const char *buf, size_t len, const char **p,
 	case LUA_TTABLE: {
 		char tag = *(char*)*p;
 		mar_incr_ptr(MAR_CHR);
-		if (tag == MAR_TREF) {
-			int ref;
-			mar_next_len(ref, int);
-			lua_rawgeti(L, SEEN_IDX, ref);
+		if (decode_ref(L, buf, len, p, tag)) {
 		} else if (tag == MAR_TVAL_WITH_META || tag == MAR_TVAL) {
 			if (tag == MAR_TVAL_WITH_META) {
 				mar_decode_value(L, buf, len, p, idx);
@@ -297,6 +442,7 @@ void mar_decode_value(lua_State* L, const char *buf, size_t len, const char **p,
 			mar_incr_ptr(l);
 			if (tag == MAR_TVAL_WITH_META) {
 				// Rearrange with meta-table (decoded above)
+				printf("Deserializing value with metatable!\n");
 				lua_insert(L, -2);
 				lua_setmetatable(L, -2);
 			}
@@ -313,10 +459,8 @@ void mar_decode_value(lua_State* L, const char *buf, size_t len, const char **p,
 		mar_Buffer dec_buf;
 		char tag = *(char*)*p;
 		mar_incr_ptr(1);
-		if (tag == MAR_TREF) {
-			int ref;
-			mar_next_len(ref, int);
-			lua_rawgeti(L, SEEN_IDX, ref);
+		if (decode_ref(L, buf, len, p, tag)) {
+					// done
 		} else {
 			mar_next_len(l, uint32_t);
 			dec_buf.data = (char*)*p;
@@ -345,10 +489,8 @@ void mar_decode_value(lua_State* L, const char *buf, size_t len, const char **p,
 	case LUA_TUSERDATA: {
 		char tag = *(char*)*p;
 		mar_incr_ptr(MAR_CHR);
-		if (tag == MAR_TREF) {
-			int ref;
-			mar_next_len(ref, int);
-			lua_rawgeti(L, SEEN_IDX, ref);
+		if (decode_ref(L, buf, len, p, tag)) {
+			// done
 		} else if (tag == MAR_TUSR) {
 			mar_handle_persist_closure(L, buf, len, p, idx);
 		} else { /* tag == MAR_TVAL */
@@ -396,10 +538,11 @@ int mar_encode(lua_State* L) {
 			luaL_error(L, "bad argument #%d to encode (expected table)", i);
 		}
 	}
+	printf("Encoding with mar_encode: ");
+	pretty_print(LuaStackValue(L, 1));
 
-	size_t len = lua_objlen(L, 2), idx;
-	lua_newtable(L);
-	for (idx = 1; idx <= len; idx++) {
+	size_t len = lua_objlen(L, 2), start_len = lua_objlen(L, 3), idx;
+	for (idx = start_len + 1; idx <= len; idx++) {
 		lua_rawgeti(L, 2, idx);
 		lua_pushinteger(L, idx);
 		lua_rawset(L, SEEN_IDX);
@@ -429,9 +572,9 @@ int mar_decode(lua_State* L) {
 		}
 	}
 
-	size_t len = lua_objlen(L, 2);
+	size_t len = lua_objlen(L, 2), start_len = lua_objlen(L, 3);
 	size_t idx;
-	for (idx = 1; idx <= len; idx++) {
+	for (idx = start_len + 1; idx <= len; idx++) {
 		lua_rawgeti(L, 2, idx);
 		lua_rawseti(L, SEEN_IDX, idx);
 	}
@@ -452,9 +595,52 @@ int mar_clone(lua_State* L) {
 	return 1;
 }
 
+static void ensure_serialization_state(lua_State* L) {
+	if (!luawrap::registry(L)["serialize_key2obj"].isnil()) {
+		return;
+	}
+	luawrap::registry(L)["serialize_key2obj"].newtable();
+	luawrap::registry(L)["serialize_obj2key"].newtable();
+
+	// Serialize globals
+	lua_pushstring(L, "_G");
+	store_object(LuaStackValue(L, -1), luawrap::globals(L),
+			luawrap::registry(L)["serialize_key2obj"],
+			luawrap::registry(L)["serialize_obj2key"], false);
+	lua_pop(L, 1); // pop "_G"
+
+	luawrap::globals(L)["_IMPORTED"].push();
+	lua_pushnil(L);
+	while (lua_next(L, -2) != 0) {
+		LuaStackValue(L, -1)[1].push(); // unbox
+		if (!lua_isnil(L, -1)) {
+			store_object(LuaStackValue(L, -3), LuaStackValue(L, -1),
+					luawrap::registry(L)["serialize_key2obj"],
+					luawrap::registry(L)["serialize_obj2key"]);
+		}
+		lua_pop(L, 2);
+	}
+	lua_pop(L, 1);
+
+	luawrap::registry(L)["serialize_registered"].push();
+	if (lua_isnil(L, -1)) {
+		lua_pop(L, 1);
+		return;
+	}
+	lua_pushnil(L);
+	while (lua_next(L, -2) != 0) {
+		store_object(LuaStackValue(L, -2), LuaStackValue(L, -1),
+				luawrap::registry(L)["serialize_key2obj"],
+				luawrap::registry(L)["serialize_obj2key"]);
+		lua_pop(L, 1);
+	}
+	lua_pop(L, 1);
+}
+
 /* lcommon adapter code starts here */
 void lua_serialize(SerializeBuffer& serialize, lua_State* L, int nargs) {
 	__cheathack_global = &serialize;
+
 	lua_pushcfunction(L, mar_encode);
 	lua_insert(L, -nargs-1);
 	lua_call(L, nargs, 0);
@@ -462,6 +648,7 @@ void lua_serialize(SerializeBuffer& serialize, lua_State* L, int nargs) {
 
 void lua_deserialize(SerializeBuffer& serialize, lua_State* L, int nargs) {
 	__cheathack_global = &serialize;
+
 	lua_pushcfunction(L, mar_decode);
 	lua_insert(L, -nargs-1);
 	lua_call(L, nargs, 1);
@@ -471,22 +658,33 @@ void lua_deserialize(SerializeBuffer& serialize, lua_State* L, int nargs) {
 
 void lua_serialize(SerializeBuffer& serializer, lua_State* L,
 		const LuaValue& value) {
+	ensure_serialization_state(L);
+
 	serializer.write_byte(value.empty());
 
 	if (!value.empty()) {
 		value.push();
-		lua_serialize(serializer, L, 1);
+		lua_newtable(L);
+		luawrap::registry(L)["serialize_obj2key"].push();
+
+		lua_serialize(serializer, L, 3);
 	}
 }
 
 void lua_deserialize(SerializeBuffer& serializer, lua_State* L,
 		LuaValue& value) {
+	ensure_serialization_state(L);
+
 	bool isnull;
 	serializer.read_byte(isnull);
 
 	if (!isnull) {
+		lua_pushnil(L);
+		lua_newtable(L);
+		luawrap::registry(L)["serialize_key2obj"].push();
+		lua_deserialize(serializer, L, 3);
+
 		value.init(L);
-		lua_deserialize(serializer, L, 1);
 		value.pop();
 	} else {
 		value.clear();

@@ -34,9 +34,8 @@ local function import_file(vpath)
     local rpath = vpath:gsub("%.", "/") .. ".lua"
     local loaded, err = loadfile(ROOT_FOLDER .. '/' .. rpath)
     if loaded then
-        -- If no return from module, return its 'fenv'.
         local entries = { loaded(vpath) }
-        return (#entries > 0) and entries or { getfenv(loaded) }
+        return entries
     else
         error("'import file': error loading path \"" .. rpath .. "\": " .. err)
         return nil

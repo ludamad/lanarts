@@ -18,6 +18,7 @@ struct GameAction {
 		MOVE,
 		USE_SPELL,
 		USE_REST,
+		USE_PORTAL,
 		USE_ENTRANCE,
 		USE_EXIT,
 		USE_ITEM,
