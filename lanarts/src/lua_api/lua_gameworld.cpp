@@ -268,9 +268,6 @@ namespace lua_api {
 
 		LuaValue room = luawrap::ensure_table(globals["Room"]);
 
-		// Debug/special-case-only functions:
-		room["regenerate"].bind_function(room_regenerate);
-
 		// Query functions:
 		room["objects_list"].bind_function(room_objects_list);
 		room["objects"].bind_function(room_objects);
@@ -285,5 +282,8 @@ namespace lua_api {
 		room["object_place_free"].bind_function(room_object_place_free);
 		room["place_free"].bind_function(room_place_free);
 		room["radius_place_free"].bind_function(room_radius_place_free);
+
+		// Debug/special-case-only functions:
+		room["regenerate"].bind_function(room_regenerate);
 	}
 }

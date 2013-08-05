@@ -244,6 +244,7 @@ public:
 
 	int game_timestamp();
 	void renew_game_timestamp();
+	void restart();
 
 	CollisionAvoidance& collision_avoidance();
 private:

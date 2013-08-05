@@ -4,6 +4,7 @@
  */
 
 #include <lua.hpp>
+#include <stdexcept>
 
 #include <lua_api/lua_newapi.h>
 
@@ -21,6 +22,7 @@
 #include "objects/GameInst.h"
 #include "objects/enemy/EnemyInst.h"
 #include "objects/FeatureInst.h"
+#include "objects/store/StoreInst.h"
 #include "objects/ItemInst.h"
 #include "objects/player/PlayerInst.h"
 #include "objects/CombatGameInst.h"
@@ -279,8 +281,13 @@ static GameInst* do_instance_init(GameState* gs, GameInst* inst, LuaStackValue a
 		inst->radius = std::min(15, inst->target_radius);
 	}
 	if (args["do_init"].isnil() || args["do_init"].to_bool()) {
-		level_id id = gs->game_world().get_current_level_id();
+		level_id id;
 		if (args["map"].isnil()) {
+			if (!gs->get_level()) {
+				throw std::runtime_error("Attempt to initialize object with no active levels! Try using with do_init = false");
+			}
+			id = gs->game_world().get_current_level_id();
+		} else {
 			id = args["map"].to_int();
 		}
 		gs->add_instance(id, inst);
@@ -303,7 +310,8 @@ static GameInst* feature_create(LuaStackValue args) {
 	FeatureInst* inst = new FeatureInst(args["xy"].as<Pos>(), (FeatureInst::feature_t)args["type"].to_int(),
 			defaulted(args["solid"], false),
 			res::sprite_id(args["sprite"].to_str()),
-			defaulted(args["depth"], (int)FeatureInst::DEPTH));
+			defaulted(args["depth"], (int)FeatureInst::DEPTH),
+			defaulted(args["frame"], 0));
 	return do_instance_init(gs, inst, args);
 }
 
@@ -311,6 +319,32 @@ static Item lua_item_get(LuaStackValue item) {
 	item_id type = get_item_by_name(item["type"].to_str());
 	int amount = luawrap::defaulted(item["amount"], 1);
 	return Item(type, amount);
+}
+
+static GameInst* store_create(LuaStackValue args) {
+	using namespace luawrap;
+	lua_State* L = args.luastate();
+	GameState* gs = lua_api::gamestate(args);
+
+	// Determine inventory
+	StoreInventory inventory;
+	LuaField items = args["items"];
+	int size = items.objlen();
+	for (int i = 1; i <= size; i++) {
+		items[i].push();
+		LuaStackValue item(L, -1);
+		item_id type = get_item_by_name(item["type"].to_str());
+		ItemEntry& entry = get_item_entry(type);
+		int amount = luawrap::defaulted(item["amount"], 1);
+		int cost = gs->rng().rand(entry.shop_cost.multiply(amount));
+		inventory.add(Item(type, amount), cost);
+	}
+
+	StoreInst* inst = new StoreInst(args["xy"].as<Pos>(),
+			defaulted(args["solid"], false),
+			res::sprite_id(args["sprite"].to_str()),
+			inventory);
+	return do_instance_init(gs, inst, args);
 }
 
 static GameInst* item_create(LuaStackValue args) {
@@ -331,6 +365,7 @@ void lua_register_gameinst(lua_State* L) {
 	submodule["enemy_create"].bind_function(enemy_create);
 	submodule["feature_create"].bind_function(feature_create);
 	submodule["item_create"].bind_function(item_create);
+	submodule["store_create"].bind_function(store_create);
 
 	submodule["DOOR_OPEN"] = (int)FeatureInst::DOOR_OPEN;
 	submodule["DOOR_CLOSED"] = (int)FeatureInst::DOOR_CLOSED;

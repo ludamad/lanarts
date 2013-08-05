@@ -40,7 +40,7 @@ namespace ldungeon_gen {
 		virtual bool matches(MapPtr map, group_t parent_group_id, const BBox& rect);
 	};
 
-	const int RANDOM_MATCH_MAX_ATTEMPTS = 50;
+	const int RANDOM_MATCH_MAX_ATTEMPTS = 10000;
 	bool find_random_square(MTwist& randomizer, MapPtr map, const BBox& bbox, Selector selector, Pos& xy, int max_attempts = RANDOM_MATCH_MAX_ATTEMPTS);
 }
 

@@ -57,10 +57,10 @@ static void lapi_data_create_equipment(const LuaStackValue& table) {
 	EquipmentEntry* entry = new EquipmentEntry;
 	game_item_data.push_back(entry);
 
-	(*equipment_table)[entry->name] = table;
-
 	int idx = game_item_data.size();
 	entry->init(idx, table);
+
+	(*equipment_table)[entry->name] = table;
 }
 
 void load_equipment_data(lua_State* L, const FilenameList& filenames,

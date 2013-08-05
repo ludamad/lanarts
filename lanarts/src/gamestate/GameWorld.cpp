@@ -143,10 +143,10 @@ void GameWorld::spawn_players(GameMapState* map, const std::vector<Pos>& positio
 		ClassEntry& c = game_class_data.at(pde.classtype);
 		int spriteidx = gs->rng().rand(c.sprites.size());
 
-		if (pde.player_inst.empty()) {
+//		if (pde.player_inst.empty()) {
 			pde.player_inst = new PlayerInst(c.starting_stats,
 					c.sprites[spriteidx], position.x, position.y, islocal);
-		}
+//		}
 		printf("Spawning for player %d: %s\n", i,
 				islocal ? "local player" : "network player");
 		map->add_instance(gs, pde.player_inst.get());
@@ -243,7 +243,7 @@ bool GameWorld::step() {
 
 	midstep = false;
 	if (next_room_id == -2) {
-		reset(0);
+		gs->restart();
 		next_room_id = 0;
 	}
 	if (next_room_id != -1) {
@@ -340,7 +340,7 @@ void GameWorld::reset(int keep) {
 		player_data().remove_all_players(gs);
 		level_states.resize(keep);
 		gs->game_hud().override_sidebar_contents(NULL);
-		gs->set_level(get_level(keep, true /*spawn player*/));
+//		gs->set_level(get_level(keep, true /*spawn player*/));
 		gs->game_chat().clear();
 		gs->renew_game_timestamp();
 	}

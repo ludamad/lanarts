@@ -154,13 +154,7 @@ bool GameState::start_game() {
 
 	/* If class was not set, we may be loading a game -- don't init level */
 	if (settings.class_type != -1) {
-		luawrap::globals(L)["Engine"]["first_map_create"].push();
-		int levelid = luawrap::call<int>(L);
-		set_level(game_world().get_level(levelid));
-//		set_level(game_world().get_level(0, true));
-
-		PlayerInst* p = local_player();
-		view().sharp_center_on(p->x, p->y);
+		restart();
 	}
 
 	return true;
@@ -249,6 +243,19 @@ void GameState::renew_game_timestamp() {
 	time_t systime;
 	time(&systime);
 	_game_timestamp = systime;
+}
+
+void GameState::restart() {
+	if (game_world().number_of_levels() > 0) {
+		game_world().reset(0);
+	}
+	luawrap::globals(L)["Engine"]["first_map_create"].push();
+	int levelid = luawrap::call<int>(L);
+	set_level(game_world().get_level(levelid));
+//		set_level(game_world().get_level(0, true));
+
+	PlayerInst* p = local_player();
+	view().sharp_center_on(p->x, p->y);
 }
 
 int GameState::handle_event(SDL_Event* event) {

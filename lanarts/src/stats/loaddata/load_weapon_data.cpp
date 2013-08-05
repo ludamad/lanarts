@@ -18,10 +18,10 @@ static void lapi_data_create_weapon(const LuaStackValue& table) {
 	WeaponEntry* entry = new WeaponEntry;
 	game_item_data.push_back(entry);
 
-	(*weapon_table)[entry->name] = table;
-
 	int idx = game_item_data.size();
 	entry->init(idx, table);
+
+	(*weapon_table)[entry->name] = table;
 }
 
 void load_weapon_data(lua_State* L, const FilenameList& filenames,

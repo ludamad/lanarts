@@ -11,6 +11,9 @@ local dungeons = import ".dungeons"
 local PortalSet = import ".PortalSet"
 local MapSequence = import ".MapSequence"
 
+local item_utils = import ".item_utils"
+local item_groups = import ".item_groups"
+
 local M = {} -- Submodule
 
 -- End of cruft
@@ -68,11 +71,24 @@ local function find_player_positions(map)
     local positions = {}
     local map_area = bbox_create({0,0},map.size)
     for i=1,World.player_amount do
-        local sqr = map_utils.random_square(map, map_area, --[[Selector]] { matches_none = {MapGen.FLAG_SOLID, MapGen.FLAG_HAS_OBJECT} })
+        local sqr = map_utils.random_square(map, map_area, --[[Selector]] { matches_all = {FLAG_PLAYERSPAWN}, matches_none = {MapGen.FLAG_SOLID, MapGen.FLAG_HAS_OBJECT} })
         if not sqr then error("Could not find player spawn position for player " .. i .. "!") end
         positions[i] = {(sqr[1]+.5) * Maps.TILE_SIZE, (sqr[2]+.5) * Maps.TILE_SIZE}
     end
     return positions
+end
+
+local function generate_store(map, xy)
+    local items = {}
+    for i=1,random(5,10) do
+        table.insert(items, item_utils.item_generate(item_groups.basic_items, true))
+    end
+    table.insert(map.instances, GameObject.store_create {
+        xy = {(xy[1]+.5)*Maps.TILE_SIZE, (xy[2]+.5)*Maps.TILE_SIZE},
+        items = items,
+        do_init = false,
+        sprite = "store"
+    })
 end
 
 function M.overworld_create()	
@@ -91,7 +107,8 @@ function M.overworld_create()
                     local portal = map_utils.spawn_portal(map, xy, "stairs_down")
                     O2T:forward_portal_add(1, portal, portal_number, function() return temple_level_create(1) end)
                     portal_number = portal_number + 1
-               end} 
+               end},
+           ['S'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor, on_placement = generate_store } 
 	})
 
 	for i=1,2 do map_utils.random_enemy(map, "Giant Bat") end

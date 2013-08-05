@@ -60,23 +60,23 @@ function M.random_portal(map, area, sprite, callback)
     if not sqr then return nil end
     return M.spawn_portal(map, sqr, sprite, callback)
 end
-
-function M.random_portal_connect(map, area, sprite, portals, direction, portal_key, next_map)
-    local portal = M.random_portal(map, sprite, function(self, user)
-            if not self.connected_map then
-                if type(next_map) == "function" then
-                    self.connected_map = next_map(self, user)
-                else 
-                    self.connected_map = next_map
-                end
-            end
-            local methodname = direction == "start" and "get_end" or "get_start" -- Go to opposite end
-            Maps.transfer(user, self.connected_map, portals[methodname](portals, portal_key))
-    end)
-    local methodname = direction == "start" and "set_start" or "set_end"
-    portals[methodname](portals, portal_key, portal.xy)
-    return portal
-end
+--
+--function M.random_portal_connect(map, area, sprite, portals, direction, portal_key, next_map)
+--    local portal = M.random_portal(map, sprite, function(self, user)
+--            if not self.connected_map then
+--                if type(next_map) == "function" then
+--                    self.connected_map = next_map(self, user)
+--                else 
+--                    self.connected_map = next_map
+--                end
+--            end
+--            local methodname = direction == "start" and "get_end" or "get_start" -- Go to opposite end
+--            Maps.transfer(user, self.connected_map, portals[methodname](portals, portal_key))
+--    end)
+--    local methodname = direction == "start" and "set_start" or "set_end"
+--    portals[methodname](portals, portal_key, portal.xy)
+--    return portal
+--end
 
 function M.map_create(size, content, --[[Optional]] flags)
     return MapGen.map_create { size = size, flags = flags or MapGen.FLAG_SOLID, content = content, instances = {} }
