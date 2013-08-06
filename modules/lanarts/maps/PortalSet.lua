@@ -5,7 +5,7 @@ function PortalSet:init()
 end
 
 local function ensure_key(self, key)
-	self.entrances[key] = self.entrances[key] or {"", ""}
+	self.entrances[key] = self.entrances[key] or {}
 end
 
 function PortalSet:set_end(key, val)

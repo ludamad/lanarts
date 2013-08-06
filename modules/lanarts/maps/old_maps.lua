@@ -366,12 +366,22 @@ end
 local function generate_statues(map)
     local areas = leaf_group_areas(map)
     local amount = random(5,10)
-    for i=1,amount do
+    local i = 0
+    while i < amount do
         local area = random_choice(areas)
         local sqr = map_utils.random_square(map, area)
         if not sqr then return end
-        map:square_apply(sqr, {remove = MapGen.FLAG_SEETHROUGH})
-        map_utils.spawn_decoration(map, "statue", sqr, random(0,17))
+        local query = MapGen.rectangle_query {
+            map = map,
+            -- nearby 3x3 box
+            area = bbox_create( {sqr[1]-1, sqr[2]-1}, {3, 3}),
+            fill_selector = {matches_none = MapGen.FLAG_SOLID}
+        } 
+        if query then
+            map:square_apply(sqr, {remove = MapGen.FLAG_SEETHROUGH})
+            map_utils.spawn_decoration(map, "statue", sqr, random(0,17))
+            i = i + 1
+        end
     end
 --    for (int i = 0; i < amount_statues; i++) {
 --        int ind = mt.rand(rooms.size());

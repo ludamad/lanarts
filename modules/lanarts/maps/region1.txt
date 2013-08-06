@@ -8,10 +8,10 @@ Sxx...........xxxxxzzz,<S,,z..1111111................xxxxxxxxxx
 xxxx..........xxxxzz,,,<,,,z.11111111..................xxxxxxxx
 xxxx..........xxxzz,S,,,,,,z.11111111...................xxxxxxx
 xxxxx..........xxzz,,,S,,,,,.1111111......................xxxxx
-xxxxxxx........xxzzz,,,,,,,,.1111111........................xxx
-xxxxxxxx.......zzzzzzzzzzzzz.......................T........xxx
-xxxxxxxxx......z,,zzzxxxxxxxx............D..................xxx
-xxxxxxxxx......z,S<,zzzzxxxxxxxxxxxxxxx.....................xxx
+xxxxxxx........xxzzz,,,,,,,,.1111111...............t........xxx
+xxxxxxxx.......zzzzzzzzzzzzz.............p........tTt.......xxx
+xxxxxxxxx......z,,zzzxxxxxxxx...........pDp........t........xxx
+xxxxxxxxx......z,S<,zzzzxxxxxxxxxxxxxxx..p..................xxx
 xxxxxxxxxx.....z,,,,S,,zzxxxxxxxxxxxxxxx....................xxx
 xxxxxxxxxx.....zz,,<,,,,zxxxxxxxxxxxxxxxxx................xxxxx
 xxxxxxxxxx.....zz,,zzzzzz.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

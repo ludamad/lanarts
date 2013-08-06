@@ -90,6 +90,7 @@ static const char* buf_read(lua_State *L, mar_Buffer* buf, size_t *len) {
 }
 
 static inline bool buf_write_if_seen(lua_State* L, SerializeBuffer& buf, int table_idx) {
+	lua_pushvalue(L, -1);
 	lua_rawget(L, table_idx);
 	bool was_seen = !lua_isnil(L, -1);
 	if (was_seen) {
@@ -103,6 +104,7 @@ static inline bool buf_write_if_seen(lua_State* L, SerializeBuffer& buf, int tab
 			buf.write_int(str_len);
 			buf.write_raw(str, str_len);
 		}
+		lua_pop(L, 1); // pop fully if was seen
 	}
 	lua_pop(L, 1);
 	return was_seen;
@@ -119,7 +121,7 @@ static inline bool buf_try_persist_hook(lua_State *L, SerializeBuffer& buf, size
 
 		lua_pushvalue(L, -2); /* self */
 		lua_call(L, 1, LUA_MULTRET);
-		if (!lua_isfunction(L, -1)) {
+		if (!lua_isfunction(L, stacksize+1)) {
 			luaL_error(L, "__persist must return a function");
 		}
 		// Save the amount of returned values
@@ -128,7 +130,8 @@ static inline bool buf_try_persist_hook(lua_State *L, SerializeBuffer& buf, size
 		for (int i = stacksize + 1; i <= lua_gettop(L); i++) {
 			mar_encode_value(L, buf, i, idx);
 		}
-		lua_settop(L, stacksize);
+		// pop if persisted
+		lua_settop(L, stacksize - 1);
 	}
 	return false;
 }
@@ -166,7 +169,7 @@ void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) 
 		lua_pushvalue(L, -1);
 		if (!buf_write_if_seen(L, buf, SEEN_IDX)
 				&& !buf_try_persist_hook(L, buf, idx)) {
-			lua_pushvalue(L, -1);
+			printf("Type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
 			lua_pushinteger(L, (*idx)++);
 			lua_rawset(L, SEEN_IDX);
 
@@ -195,13 +198,13 @@ void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) 
 			int i;
 			lua_Debug ar;
 
-			lua_pushvalue(L, -1);
 			lua_getinfo(L, ">nuS", &ar);
 			if (ar.what[0] != 'L') {
 				lua_CFunction cfunction = lua_tocfunction(L, -1);
 				luaL_error(L, "attempt to persist a C function '%s'", ar.name);
 			}
 			lua_pushvalue(L, -1);
+			printf("Type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
 			lua_pushinteger(L, (*idx)++);
 			lua_rawset(L, SEEN_IDX);
 
@@ -275,6 +278,7 @@ static void mar_handle_persist_closure(lua_State* L, const char *buf, size_t len
 	// First argument is function, so persistargs-1 arguments are passed
 	lua_call(L, persistargs - 1, 1);
 	lua_pushvalue(L, -1);
+	printf("Type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
 	lua_rawseti(L, SEEN_IDX, (*idx)++);
 }
 
@@ -427,18 +431,20 @@ void mar_decode_value(lua_State* L, const char *buf, size_t len, const char **p,
 		mar_incr_ptr(MAR_CHR);
 		if (decode_ref(L, buf, len, p, tag)) {
 		} else if (tag == MAR_TVAL_WITH_META || tag == MAR_TVAL) {
-			if (tag == MAR_TVAL_WITH_META) {
-				mar_decode_value(L, buf, len, p, idx);
-			}
-			mar_next_len(l, uint32_t);
 			lua_newtable(L);
 			lua_pushvalue(L, -1);
+			printf("Type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
 			lua_rawseti(L, SEEN_IDX, (*idx)++);
+			if (tag == MAR_TVAL_WITH_META) {
+				mar_decode_value(L, buf, len, p, idx);
+				lua_pushvalue(L, -2); // Push for decoding
+			}
+			mar_next_len(l, uint32_t);
 			mar_decode_table(L, *p, l, idx);
 			mar_incr_ptr(l);
+			pretty_print(LuaStackValue(L, -1));
 			if (tag == MAR_TVAL_WITH_META) {
-				// Rearrange with meta-table (decoded above)
-				lua_insert(L, -2);
+				lua_pop(L, 1);
 				lua_setmetatable(L, -2);
 			}
 		} else if (tag == MAR_TUSR) {
@@ -467,6 +473,7 @@ void mar_decode_value(lua_State* L, const char *buf, size_t len, const char **p,
 
 			lua_pushvalue(L, -1);
 			lua_rawseti(L, SEEN_IDX, (*idx)++);
+			printf("Type %d = %s\n", *idx -1, lua_typename(L, lua_type(L, -1)));
 
 			mar_next_len(l, uint32_t);
 			lua_newtable(L);
@@ -534,8 +541,10 @@ int mar_encode(lua_State* L) {
 		}
 	}
 
-	size_t len = lua_objlen(L, 2), start_len = lua_objlen(L, 3), idx;
-	for (idx = start_len + 1; idx <= len; idx++) {
+	static size_t idx = 1;
+	size_t len = lua_objlen(L, 2);
+	size_t goal = idx + len - 1;
+	for (; idx <= goal; idx++) {
 		lua_rawgeti(L, 2, idx);
 		lua_pushinteger(L, idx);
 		lua_rawset(L, SEEN_IDX);
@@ -567,7 +576,7 @@ int mar_decode(lua_State* L) {
 
 	size_t len = lua_objlen(L, 2), start_len = lua_objlen(L, 3);
 	size_t idx;
-	for (idx = start_len + 1; idx <= len; idx++) {
+	for (idx = start_len + 1; idx <= start_len + len; idx++) {
 		lua_rawgeti(L, 2, idx);
 		lua_rawseti(L, SEEN_IDX, idx);
 	}
@@ -683,4 +692,3 @@ void lua_deserialize(SerializeBuffer& serializer, lua_State* L,
 		value.clear();
 	}
 }
-

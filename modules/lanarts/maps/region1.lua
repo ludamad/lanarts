@@ -107,19 +107,23 @@ end
 
 --Test
 local function connect_map(args)
-    pretty_print(args)
     local map = args.map
     local seq_idx = args.sequence_index
     local MapSeq = args.map_sequence
     local map_area = bbox_create({0,0}, map.size)
     for i=1,MapSeq:number_of_backward_portals(seq_idx) do
-        local portal
---        if seq_idx == 2 then
---            portal = map_utils.random_portal(map, map_area, args.sprite_out or args.sprite_up, nil, args.sprite_out_index or args.sprite_up_index)
---        else
-            portal = map_utils.random_portal(map, map_area, args.sprite_up, nil, args.sprite_up_index)
---        end
-        MapSeq:backward_portal_resolve(seq_idx, portal, i)
+        -- Always have 3 going 'out'
+        local iterations = 1
+        if seq_idx == 2 then iterations = 3 end
+        for i=1,iterations do
+            local portal
+            if seq_idx == 2 then
+                portal = map_utils.random_portal(map, map_area, args.sprite_out or args.sprite_up, nil, args.sprite_out_index or args.sprite_up_index)
+            else
+                portal = map_utils.random_portal(map, map_area, args.sprite_up, nil, args.sprite_up_index)
+            end
+            MapSeq:backward_portal_resolve(seq_idx, portal, i)
+        end
     end
     for i=1,args.forward_portals do
         print("Generating forward portal!")
@@ -135,7 +139,9 @@ local function old_map_generate(MapSeq, tileset, floor)
     connect_map {
         map = map, 
         map_sequence = MapSeq, sequence_index = seq_idx,
-        sprite_up = "stairs_up", sprite_down = "stairs_down",
+        sprite_up =  "stair_kinds", sprite_up_index = stair_kinds_index(5, 2),
+        sprite_out =  "stair_kinds", sprite_out_index = 0,
+        sprite_down = "stair_kinds", sprite_down_index = stair_kinds_index(4, 2),
         forward_portals = last_floor and 0 or 3,
         next_floor_callback = function() 
             return old_map_generate(MapSeq, tileset, floor + 1)
@@ -172,14 +178,16 @@ function M.overworld_create()
                on_placement = function(map, xy)
                     map_utils.spawn_decoration(map, "anvil", xy)
                end},
+           ['p'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor }, 
+           ['t'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.temple.floor }, 
            ['T'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.temple.floor,
                on_placement = function(map, xy)
                     local portal = map_utils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 11))
-                    O2T:forward_portal_add(1, portal, portal_number, function() return temple_level_create(1, random_tileset()) end)
+                    O2T:forward_portal_add(1, portal, portal_number, function() return temple_level_create(1, TileSets.temple) end)
                     portal_number = portal_number + 1
                end},           
            ['D'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.temple.floor,
-               on_placement = old_dungeon_placement_function(OldMapSeq, random_tileset()) },
+               on_placement = old_dungeon_placement_function(OldMapSeq, TileSets.pebble) },
            ['S'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor, on_placement = generate_store } 
     })
 

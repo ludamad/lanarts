@@ -7,6 +7,7 @@ local MapSequence = newtype()
 function MapSequence:init(--[[Optional]] args)
     self.maps = {}
     self.next_slot = 1
+    self:_slots_ensure(10)
     args = args or {}
     if args.preallocate then
         for i=1,args.preallocate do
