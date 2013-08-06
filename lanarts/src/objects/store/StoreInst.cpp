@@ -42,7 +42,7 @@ void StoreInst::draw(GameState* gs) {
 	}
 	if (last_seen_spr > -1) {
 		draw_sprite(gs->view(), last_seen_spr, x - TILE_SIZE / 2,
-				y - TILE_SIZE / 2, drawcolour);
+				y - TILE_SIZE / 2, 0,0, spr_frame, drawcolour);
 	}
 }
 
@@ -64,6 +64,7 @@ void StoreInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	inv.serialize(serializer);
 	serializer.write(last_seen_spr);
 	serializer.write(spriteid);
+	serializer.write(spr_frame);
 }
 
 void StoreInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
@@ -72,5 +73,6 @@ void StoreInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	inv.deserialize(serializer);
 	serializer.read(last_seen_spr);
 	serializer.read(spriteid);
+	serializer.read(spr_frame);
 }
 

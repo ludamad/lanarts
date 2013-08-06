@@ -10,18 +10,18 @@ local PortalSet = import ".PortalSet"
 
 local M = {} -- Submodule
 
-function M.room_carve_operator(wall_tile, floor_tile)
+function M.room_carve_operator(wall_tile, floor_tile, --[[Optional]] padding)
     return MapGen.rectangle_operator { 
         area_query = MapGen.rectangle_criteria { 
                         fill_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.FLAG_PERIMETER }, 
-                        perimeter_width = 1, perimeter_selector = { matches_all = MapGen.FLAG_SOLID }
+                        perimeter_width = padding or 1, perimeter_selector = { matches_all = MapGen.FLAG_SOLID }
         },
-        perimeter_width = 1, perimeter_operator = { add = {MapGen.FLAG_SOLID, MapGen.FLAG_PERIMETER}, content = wall_tile },
+        perimeter_width = padding or 1, perimeter_operator = { add = {MapGen.FLAG_SOLID, MapGen.FLAG_PERIMETER}, content = wall_tile },
         fill_operator = { add = MapGen.FLAG_SEETHROUGH, remove = MapGen.FLAG_SOLID, content = floor_tile }
     }
 end
 
-function M.simple_tunnels(map, width, tunnels_per_room, wall_tile, floor_tile, area) 
+function M.simple_tunnels(map, width_range, tunnels_per_room, wall_tile, floor_tile, --[[Optional]] area, --[[Optional]] padding) 
     area = area or bbox_create({0,0}, map.size)
     local oper = MapGen.tunnel_operator {
         validity_selector = { 
@@ -37,8 +37,8 @@ function M.simple_tunnels(map, width, tunnels_per_room, wall_tile, floor_tile, a
         fill_operator = { add = {MapGen.FLAG_TUNNEL, MapGen.FLAG_SEETHROUGH}, remove = MapGen.FLAG_SOLID, content = floor_tile},
         perimeter_operator = { matches_all = MapGen.FLAGS_SOLID, add = {MapGen.FLAG_SOLID, MapGen.FLAG_TUNNEL, MapGen.FLAG_PERIMETER}, content = wall_tile},
 
-        perimeter_width = 1,
-        size_range = {width, width},
+        perimeter_width = padding or 1,
+        size_range = width_range,
         tunnels_per_room_range = tunnels_per_room
     }
     oper(map, MapGen.ROOT_GROUP, area)

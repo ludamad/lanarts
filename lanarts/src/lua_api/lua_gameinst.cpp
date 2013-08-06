@@ -72,7 +72,7 @@ static int lapi_gameinst_freeref(lua_State* L) {
 static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(GameInst*);
 
-	LuaValue meta = luameta_new(L, "Font");
+	LuaValue meta = luameta_new(L, "GameObject");
 	meta["__isgameinst"] = true;
 
 	LuaValue methods = luameta_constants(meta);
@@ -339,11 +339,12 @@ static GameInst* store_create(LuaStackValue args) {
 		int cost = gs->rng().rand(entry.shop_cost.multiply(amount));
 		inventory.add(Item(type, amount), cost);
 	}
+	sprite_id spr_id = res::sprite_id(args["sprite"].to_str());
 
 	StoreInst* inst = new StoreInst(args["xy"].as<Pos>(),
 			defaulted(args["solid"], false),
-			res::sprite_id(args["sprite"].to_str()),
-			inventory);
+			spr_id, inventory,
+			defaulted(args["frame"], 0));
 	return do_instance_init(gs, inst, args);
 }
 

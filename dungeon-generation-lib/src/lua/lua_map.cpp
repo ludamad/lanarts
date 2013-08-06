@@ -174,6 +174,24 @@ namespace ldungeon_gen {
 		return 1;
 	}
 
+	static int lua_map_group_list(lua_State* L) {
+		MapPtr map = luawrap::get<MapPtr>(L, 1);
+		lua_newtable(L);
+		LuaStackValue table(L, -1);
+		// NOTE: creates 0-indexed group table
+		for (int i = 0; i < map->groups.size(); i++) {
+			table[i].newtable();
+			table[i].push();
+			LuaStackValue group(L, -1);
+			group["id"] = map->groups[i].group_id;
+			group["parent_id"] = map->groups[i].parent_group_id;
+			group["children"] = map->groups[i].child_group_ids;
+			group["area"] = map->groups[i].group_area;
+			lua_pop(L, 1);
+		}
+		return 1;
+	}
+
 	LuaValue lua_mapmetatable(lua_State* L) {
 		LUAWRAP_SET_TYPE(MapPtr&);
 
@@ -189,6 +207,8 @@ namespace ldungeon_gen {
 		lua_pushcfunction(L, &lua_map_setter_fallback);
 		luameta_defaultsetter(meta, LuaStackValue(L, -1));
 		lua_pop(L, 1);
+
+		getters["groups"].bind_function(lua_map_group_list);
 
 		LUAWRAP_GETTER(getters, size, OBJ->size());
 		LUAWRAP_METHOD(methods, get, lua_square_push(L, (*OBJ)[luawrap::get<Pos>(L, 2)]));

@@ -4,7 +4,9 @@ local M = {} -- Submodule
 
 M.grass = Data.tileset_create {
 	floor = { images = images_load (path_resolve "outside_floor/grass/grass(0-11).png") },
-	wall = { images = { image_load (path_resolve "outside_wall/tree/tree.png") }}
+    wall = { images = { image_load (path_resolve "outside_wall/tree/tree.png") }},
+    dirt = { images = images_load (path_resolve "floor_overworld_dirt.png%32x32")},
+    wall_alt = { images = images_load (path_resolve "wall_overworld_wall.png%32x32") }
 }
 
 M.pebble = Data.tileset_create {

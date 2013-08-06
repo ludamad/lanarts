@@ -74,8 +74,8 @@ function pretty_tostring(val, --[[Optional]] tabs, --[[Optional]] packed, --[[Op
             table.insert(parts, pretty_tostring(v, tabs+1, packed))
         else 
             table.insert(parts, pretty_tostring(k, tabs+1, packed, false))
---            table.insert(parts, " = ")
---            table.insert(parts, pretty_tostring(v, type(v) == "table" and tabs+1 or 0, packed))
+            table.insert(parts, " = ")
+            table.insert(parts, pretty_tostring(v, type(v) == "table" and tabs+1 or 0, packed))
         end
 
         table.insert(parts, ", ")
@@ -146,4 +146,19 @@ function iter_combine(...)
             iter = args[arg_i]
         end
     end
+end
+
+--- Like a functional map of a function onto a list
+function map_call(f, list)
+    local ret = {}
+    for v in values(list) do 
+        ret[#ret + 1] = f(v)
+    end
+    return ret
+end
+
+--- Return a random element from a list
+function random_choice(choices)
+    local idx = random(1, #choices)
+    return choices[idx]
 end

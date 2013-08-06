@@ -6,7 +6,8 @@ sprites:
     file: modules/lanarts/features/sprites/closed_door.png
 
   - name: store
-    file: modules/lanarts/features/sprites/shop.png
+    type: animation
+    frames: modules/lanarts/features/sprites/shops.png%32x32
 
   - name: stairs_up
     file: modules/lanarts/tiles/features/stairs_up.png
@@ -27,4 +28,3 @@ sprites:
   - name: stair_kinds
     type: animation
     frames: modules/lanarts/features/sprites/stair_kinds.png%32x32
-    

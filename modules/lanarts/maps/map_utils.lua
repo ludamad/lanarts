@@ -18,11 +18,29 @@ function M.spawn_enemy(map, type, tile_xy)
         do_init = false,
         xy = {tile_xy[1]*32+16, tile_xy[2]*32+16},
         type = type,
-        area = area
     }
     table.insert(map.instances, object)
     return object
 
+end
+
+function M.spawn_item(map, type, amount, tile_xy)
+    local object = GameObject.item_create {
+        do_init = false,
+        xy = {tile_xy[1]*32+16, tile_xy[2]*32+16},
+        type = type,
+        amount = amount,
+        type = type,
+    }
+    table.insert(map.instances, object)
+    return object
+
+end
+
+function M.random_item(map, type, amount, area) 
+    local sqr = M.random_square(map, area)
+    if not sqr then return nil end
+    return M.spawn_item(map, type, amount, sqr)
 end
 
 function M.random_enemy(map, type, area) 
@@ -31,19 +49,21 @@ function M.random_enemy(map, type, area)
     return M.spawn_enemy(map, type, sqr)
 end
 
-function M.spawn_decoration(map, sprite, sqr) 
+function M.spawn_decoration(map, sprite, sqr, frame) 
     local object = GameObject.feature_create {
         do_init = false,
         solid = true,
         xy = {sqr[1]*32+16, sqr[2]*32+16},
         type = GameObject.OTHER,
         sprite = sprite,
+        frame = frame
     }
     table.insert(map.instances, object)
     return object
 end
 
-function M.spawn_portal(map, sqr, sprite, callback, --[[Optional]] frame)
+function M.spawn_portal(map, sqr, sprite, --[[Optional]] callback, --[[Optional]] frame)
+    print ("Spawning portal at " .. pretty_tostring(sqr))
     local object = GameObject.feature_create {
         do_init = false,
         xy = {sqr[1]*32+16, sqr[2]*32+16},
@@ -97,7 +117,7 @@ function M.area_template_to_map(filename, legend)
 	local area_temp = MapGen.area_template_create {data_file = filename, legend = legend}
 
 	local map = M.map_create(area_temp.size, 0)
-	area_temp:apply{ map = map }
+	area_temp:apply{ map = map, flip_x = chance(.5), flip_y = chance(.5) }
 	return map
 end
 

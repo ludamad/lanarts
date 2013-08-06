@@ -18,9 +18,9 @@ public:
 		RADIUS = 15, DEPTH = 100
 	};
 	StoreInst(const Pos& pos, bool solid, sprite_id spriteid,
-			const StoreInventory& inv) :
+			const StoreInventory& inv, int spr_frame = 0) :
 			GameInst(pos.x, pos.y, RADIUS, solid, DEPTH), last_seen_spr(-1), spriteid(
-					spriteid), inv(inv) {
+					spriteid), inv(inv), spr_frame(spr_frame) {
 	}
 	StoreInventory& inventory() {
 		return inv;
@@ -38,6 +38,7 @@ private:
 	StoreInventory inv;
 	sprite_id last_seen_spr;
 	sprite_id spriteid;
+	int spr_frame;
 };
 
 #endif /* STOREINST_H_ */
