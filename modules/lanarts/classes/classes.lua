@@ -22,6 +22,7 @@ Data.class_create {
         willpower = 5,
         magic = 5,
         equipment = {
+          gold = 100,
           inventory = {
              {item = "Mana Potion"} 
           }
@@ -60,6 +61,7 @@ Data.class_create {
         magic = 2,
         equipment = {
           weapon = "Dagger",
+          gold = 100,
           inventory = {
              {item = "Stone", amount = 10} 
           }
@@ -96,6 +98,7 @@ Data.class_create {
         magic = 4,
         equipment = {
           weapon = "Short Bow",
+          gold = 100,
           projectile = { item = "Arrow", amount = 40 },
           inventory = {
              {item = "Dagger"} 
