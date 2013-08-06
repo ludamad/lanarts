@@ -25,6 +25,9 @@ sprites:
   - name: anvil
     file: modules/lanarts/features/sprites/anvil.png
 
+  - name: warning_skull
+    file: modules/lanarts/features/sprites/warning.png
+
   - name: stair_kinds
     type: animation
     frames: modules/lanarts/features/sprites/stair_kinds.png%32x32

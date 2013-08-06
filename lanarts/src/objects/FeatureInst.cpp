@@ -14,6 +14,7 @@
 
 #include "gamestate/GameState.h"
 #include "gamestate/GameTiles.h"
+
 #include "stats/items/ItemEntry.h"
 
 #include <lcommon/math_util.h>

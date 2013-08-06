@@ -195,7 +195,7 @@ void PlayerInst::step(GameState* gs) {
 			stats().core.heal_fully();
 			spawn_in_lower_level(gs, this);
 		} else {
-			gs->restart();
+			gs->game_world().reset(0);
 		}
 		perf_timer_end(FUNCNAME);
 		return;

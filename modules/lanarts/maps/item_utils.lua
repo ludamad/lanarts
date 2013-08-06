@@ -1,5 +1,7 @@
 -- Routines for generating items 
 
+local map_utils = import ".map_utils"
+
 local M = {} -- Submodule
 
 local function resolve_range(r)
@@ -33,6 +35,11 @@ function M.item_generate(group, only_with_shop_cost)
         end
     end
     return nil
+end
+
+function M.item_object_generate(map, group)
+    local item = M.item_generate(group)
+    map_utils.random_item(map, item.type, item.amount)
 end
 
 return M

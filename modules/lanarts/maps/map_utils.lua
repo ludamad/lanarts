@@ -49,10 +49,22 @@ function M.random_enemy(map, type, area)
     return M.spawn_enemy(map, type, sqr)
 end
 
-function M.spawn_decoration(map, sprite, sqr, frame) 
+function M.spawn_door(map, sqr)
     local object = GameObject.feature_create {
         do_init = false,
-        solid = true,
+        xy = {sqr[1]*32+16, sqr[2]*32+16},
+        type = GameObject.DOOR_CLOSED,
+        sprite = "closed door",
+    }
+    table.insert(map.instances, object)
+    return object
+end
+
+function M.spawn_decoration(map, sprite, sqr, frame, solid)
+    if solid == nil then solid = true end 
+    local object = GameObject.feature_create {
+        do_init = false,
+        solid = solid,
         xy = {sqr[1]*32+16, sqr[2]*32+16},
         type = GameObject.OTHER,
         sprite = sprite,

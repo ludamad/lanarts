@@ -215,6 +215,7 @@ namespace ldungeon_gen {
 		LUAWRAP_METHOD(methods, set, (*OBJ)[luawrap::get<Pos>(L, 2)] =
 				lua_square_get(LuaStackValue(L, 3)));
 		LUAWRAP_METHOD(methods, square_apply, (*OBJ)[luawrap::get<Pos>(L, 2)].apply(lua_operator_get(LuaStackValue(L, 3))));
+		LUAWRAP_GETTER(methods, square_query, (*OBJ)[luawrap::get<Pos>(L, 2)].matches(lua_selector_get(LuaStackValue(L, 3))));
 
 		return meta;
 	}

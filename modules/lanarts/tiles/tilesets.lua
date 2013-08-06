@@ -17,12 +17,33 @@ M.pebble = Data.tileset_create {
 	wall = { images = images_load (path_resolve "dngn_wall/brickdark/brick_dark.png%32x32")}
 }
 
-
 M.temple = Data.tileset_create {
     floor = { images = images_load (path_resolve "dngn_floor/crystal/crystal_floor(0-5).png") },
     floor_alt = { images = images_load (path_resolve "dngn_floor/mesh/mesh(0-3).png") },
     wall = { images = images_load (path_resolve "dngn_wall/marble_wall/marble_wall(0-11).png")}
 }
+
+M.crystal = {
+    floor = M.temple.floor,
+    floor_alt = M.temple.floor_alt,
+    wall = Data.tile_create { images = images_load(path_resolve "dngn_wall/crystal/crystal_wall(0-13).png") }
+}
+
+M.snake = Data.tileset_create {
+    floor = { images = images_load (path_resolve "dngn_floor/snake/snake-d(0-3).png") },
+    floor_alt = { images = images_load (path_resolve "dngn_floor/snake/snake-a(0-3).png") },
+    floor_tunnel = { images = images_load (path_resolve "dngn_floor/snake/snake-c(0-3).png") },
+    wall = { images = images_load (path_resolve "dngn_wall/snake/snake(0-9).png") }
+}
+
+for k,tileset in pairs(M) do
+    if not rawget(tileset, "floor_altl") then
+        tileset.floor_alt = tileset.floor
+    end
+    if not rawget(tileset, "floor_tunnel") then
+        tileset.floor_tunnel = tileset.floor_alt
+    end
+end
 
 -----
 --
