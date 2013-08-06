@@ -151,7 +151,7 @@ function setup_pregame_menu()
     end
     menu_state.continue = exit_menu
     menu_state.menu:add_instance(
-        PreGameMenu.create( --[[Start Game Button]] menu_state.continue ),
+        PregameMenu.create( --[[Start Game Button]] menu_state.continue ),
         CENTER
     )
 end

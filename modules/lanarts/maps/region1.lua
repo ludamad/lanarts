@@ -112,10 +112,10 @@ local function connect_map(args)
     local MapSeq = args.map_sequence
     local map_area = bbox_create({0,0}, map.size)
     for i=1,MapSeq:number_of_backward_portals(seq_idx) do
-        -- Always have 3 going 'out'
-        local iterations = 1
-        if seq_idx == 2 then iterations = 3 end
-        for i=1,iterations do
+--         Always have 3 going 'out'
+--        local iterations = 1
+--        if seq_idx == 2 then iterations = 3 end
+--        for i=1,iterations do
             local portal
             if seq_idx == 2 then
                 portal = map_utils.random_portal(map, map_area, args.sprite_out or args.sprite_up, nil, args.sprite_out_index or args.sprite_up_index)
@@ -123,7 +123,7 @@ local function connect_map(args)
                 portal = map_utils.random_portal(map, map_area, args.sprite_up, nil, args.sprite_up_index)
             end
             MapSeq:backward_portal_resolve(seq_idx, portal, i)
-        end
+--        end
     end
     for i=1,args.forward_portals do
         print("Generating forward portal!")
