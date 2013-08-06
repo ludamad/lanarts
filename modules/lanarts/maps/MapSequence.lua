@@ -7,7 +7,6 @@ local MapSequence = newtype()
 function MapSequence:init(--[[Optional]] args)
     self.maps = {}
     self.next_slot = 1
-    self:_slots_ensure(10)
     args = args or {}
     if args.preallocate then
         for i=1,args.preallocate do
@@ -70,6 +69,10 @@ function MapSequence:slot_resolve(idx, map_id)
     print("Got slot resolve ", idx, " for map ", map_id)
     self.maps[idx].map_id = map_id
     return map_id
+end
+
+function MapSequence.get:size()
+    return #self.maps
 end
 
 return MapSequence

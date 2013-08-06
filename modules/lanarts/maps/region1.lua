@@ -25,57 +25,78 @@ local function stair_kinds_index(x, y)
     return y*6+x -- stair_kinds.png has rows of 6
 end
 
+-- Helps with connecting the overworld to the dungeons
+local function connect_map(args)
+    local map = args.map
+    local seq_idx = args.sequence_index
+    local MapSeq = args.map_sequence
+    local map_area = bbox_create({0,0}, map.size)
+    for i=1,MapSeq:number_of_backward_portals(seq_idx) do
+        local iterations = args.backward_portal_multiple or 1
+        for iter=1,iterations do
+            local portal
+            if seq_idx == 2 then
+                portal = map_utils.random_portal(map, map_area, args.sprite_out or args.sprite_up, nil, args.sprite_out_index or args.sprite_up_index)
+            else
+                portal = map_utils.random_portal(map, map_area, args.sprite_up, nil, args.sprite_up_index)
+            end
+            MapSeq:backward_portal_resolve(seq_idx, portal, i)
+        end
+    end
+    for i=1,args.forward_portals do
+        print("Generating forward portal!")
+        local portal = map_utils.random_portal(map, map_area, args.sprite_down, nil, args.sprite_down_index)
+        MapSeq:forward_portal_add(seq_idx, portal, i, args.next_floor_callback)
+    end
+end
+
 -- Overworld to template map sequence (from overworld to deeper in the temple)
 local TEMPLE_DEPTH = 2
-local O2T = MapSequence.create {preallocate = TEMPLE_DEPTH + 1}
--- Overworld to template map sequence (from deeper in the temple to the overworld)
-local T2O = MapSequence.create {preallocate = TEMPLE_DEPTH + 1}
---local temple_to_overworld = MapSequence.create {preallocate = 2}
 
-local function temple_level_base_apply(map, --[[Optional]] area)
-    local tileset = TileSets.temple
+local function temple_level_base_apply(map, tileset, area)
     MapGen.random_placement_apply { map = map, area = area,
         child_operator = dungeons.room_carve_operator(tileset.wall, tileset.floor),
         size_range = {12,15}, amount_of_placements_range = {10,15},
         create_subgroup = false
     }
-    dungeons.simple_tunnels(map, {2,2}, {1,1}, tileset.wall, tileset.floor)
-    dungeons.simple_tunnels(map, {1,1}, {0,1}, tileset.wall, tileset.floor_alt)
+    dungeons.simple_tunnels(map, {2,2}, {1,1}, tileset.wall, tileset.floor, area)
+    dungeons.simple_tunnels(map, {1,1}, {0,1}, tileset.wall, tileset.floor_alt, area)
 end
 
-local function temple_level_create(floor, tileset)
-    local map
-   -- if floor == 1 then
-        map = map_utils.map_create({40, 40}, tileset.wall)
-        temple_level_base_apply(map)
-   -- end
+local function temple_level_create(floor, sequences, tileset)
+    local map = map_utils.map_create({40, 40}, tileset.wall)
+    temple_level_base_apply(map, tileset, {8, 8, 38, 38})
 
     local map_area = bbox_create({0,0}, map.size)
 
-    local seq_idx = floor+1 -- Add one to account for overworld
-    -- Resolve connections
-    for i=1,3 do
-        local portal, portal_num = nil, i
-        if floor == 1 then
-            portal = map_utils.random_portal(map, map_area, "stair_kinds", nil, stair_kinds_index(0,0))
-            portal_num = 1
-        else 
-            portal = map_utils.random_portal(map, map_area, "stair_kinds", nil, stair_kinds_index(5,7))
-        end
-        local portal_num = i
-        -- There is only one cave entrance
-        if floor == 1 then portal_num = 1 end
-        O2T:backward_portal_resolve(seq_idx, portal, portal_num)
-         if floor < TEMPLE_DEPTH then
-            local portal = map_utils.random_portal(map, map_area, "stair_kinds", nil, stair_kinds_index(4,7))
-            O2T:forward_portal_add(seq_idx, portal, i, function() return temple_level_create(floor+1, tileset) end)
-        end
+    local done_once = false
+    local sequence_ids = {}
+    for MapSeq in values(sequences) do
+        local seq_idx = MapSeq:slot_create()
+        table.insert(sequence_ids, seq_idx)
+        local no_forward = (floor >= TEMPLE_DEPTH or (done_once and floor == 1))
+        connect_map {
+            map = map, 
+            map_sequence = MapSeq, sequence_index = seq_idx,
+            sprite_up =  "stair_kinds", sprite_up_index = stair_kinds_index(5, 7),
+            sprite_out =  "stair_kinds", sprite_out_index = done_once and stair_kinds_index(0, 9) or 0,
+            sprite_down = "stair_kinds", sprite_down_index = stair_kinds_index(4, 7),
+            forward_portals = no_forward and 0 or 1,
+            next_floor_callback = function() 
+                return temple_level_create(floor +1, sequences, tileset)
+            end
+        }
+        done_once = true
     end
 
     for i=1,2 do map_utils.random_enemy(map, "Giant Bat") end
     for i=1,2 do map_utils.random_enemy(map, "Giant Rat") end
 
-    return O2T:slot_resolve(seq_idx, map_utils.game_map_create(map))
+    local map_id = map_utils.game_map_create(map)
+    for i=1,#sequences do
+        sequences[i]:slot_resolve(sequence_ids[i], map_id)
+    end
+    return map_id
 end
 
 local FLAG_PLAYERSPAWN = MapGen.FLAG_CUSTOM1
@@ -105,43 +126,17 @@ local function generate_store(map, xy)
     })
 end
 
---Test
-local function connect_map(args)
-    local map = args.map
-    local seq_idx = args.sequence_index
-    local MapSeq = args.map_sequence
-    local map_area = bbox_create({0,0}, map.size)
-    for i=1,MapSeq:number_of_backward_portals(seq_idx) do
---         Always have 3 going 'out'
---        local iterations = 1
---        if seq_idx == 2 then iterations = 3 end
---        for i=1,iterations do
-            local portal
-            if seq_idx == 2 then
-                portal = map_utils.random_portal(map, map_area, args.sprite_out or args.sprite_up, nil, args.sprite_out_index or args.sprite_up_index)
-            else
-                portal = map_utils.random_portal(map, map_area, args.sprite_up, nil, args.sprite_up_index)
-            end
-            MapSeq:backward_portal_resolve(seq_idx, portal, i)
---        end
-    end
-    for i=1,args.forward_portals do
-        print("Generating forward portal!")
-        local portal = map_utils.random_portal(map, map_area, args.sprite_down, nil, args.sprite_down_index)
-        MapSeq:forward_portal_add(seq_idx, portal, i, args.next_floor_callback)
-    end
-end
-
 local function old_map_generate(MapSeq, tileset, floor)
     local map = old_maps.create_map(floor, tileset)
     local last_floor = (floor >= old_maps.last_floor)
     local seq_idx = MapSeq:slot_create()
     connect_map {
         map = map, 
+        backward_portal_multiple = (floor == 1) and 3 or 1,
         map_sequence = MapSeq, sequence_index = seq_idx,
-        sprite_up =  "stair_kinds", sprite_up_index = stair_kinds_index(5, 2),
+        sprite_up =  "stair_kinds", sprite_up_index = stair_kinds_index(5, 9),
         sprite_out =  "stair_kinds", sprite_out_index = 0,
-        sprite_down = "stair_kinds", sprite_down_index = stair_kinds_index(4, 2),
+        sprite_down = "stair_kinds", sprite_down_index = stair_kinds_index(4, 9),
         forward_portals = last_floor and 0 or 3,
         next_floor_callback = function() 
             return old_map_generate(MapSeq, tileset, floor + 1)
@@ -151,24 +146,20 @@ local function old_map_generate(MapSeq, tileset, floor)
 end
 
 local function old_dungeon_placement_function(MapSeq, tileset)
-    local seq_idx = MapSeq:slot_create()
     return function(map, xy)
         local portal = map_utils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 12))
-        MapSeq:forward_portal_add(seq_idx, portal, 1, function() 
+        MapSeq:forward_portal_add(1, portal, 1, function() 
             return old_map_generate(MapSeq, tileset, 1) 
         end)
     end
 end
 
-local function random_tileset() 
-    return random_choice{TileSets.pebble, TileSets.temple};
-end
-
 function M.overworld_create()   
     local tileset = TileSets.grass
-    local portal_number = 1
-    local OldMapSeq = MapSequence.create()
-    local map = map_utils.area_template_to_map(path_resolve "region1.txt", { 
+    local OldMapSeq = MapSequence.create {preallocate = 1}
+    local temple_sequences = {}
+    local dirthole_sequences = {}
+    local map = map_utils.area_template_to_map(path_resolve "region1.txt", --[[padding]] 4, { 
            ['x'] = { add = {MapGen.FLAG_SEETHROUGH, MapGen.FLAG_SOLID}, content = tileset.wall }, 
            ['z'] = { add = MapGen.FLAG_SOLID, content = tileset.wall_alt }, 
            ['.'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor },
@@ -183,16 +174,37 @@ function M.overworld_create()
            ['T'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.temple.floor,
                on_placement = function(map, xy)
                     local portal = map_utils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 11))
-                    O2T:forward_portal_add(1, portal, portal_number, function() return temple_level_create(1, TileSets.temple) end)
-                    portal_number = portal_number + 1
+                    local seq_len = #temple_sequences
+                    temple_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
+                    temple_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
+                        function() 
+                            return temple_level_create(1, temple_sequences, TileSets.temple)
+                    end)
                end},           
            ['D'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.temple.floor,
                on_placement = old_dungeon_placement_function(OldMapSeq, TileSets.pebble) },
-           ['S'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor, on_placement = generate_store } 
+           ['S'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor, on_placement = generate_store },
+           ['G'] =  { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor,
+               on_placement = function(map, xy)
+                    local portal = map_utils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(0, 2))
+                    local seq_len = #dirthole_sequences
+                    dirthole_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
+                    dirthole_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
+                        function() 
+                            return temple_level_create(1, dirthole_sequences, TileSets.pebble)
+                    end)
+               end}
     })
 
-    local map_id = O2T:slot_resolve(1, map_utils.game_map_create(map))
+    local map_id = map_utils.game_map_create(map)
     OldMapSeq:slot_resolve(1, map_id)
+    for MapSeq in values(temple_sequences) do
+        MapSeq:slot_resolve(1, map_id)
+    end
+    for MapSeq in values(dirthole_sequences) do
+        MapSeq:slot_resolve(1, map_id)
+    end
+    
     World.players_spawn(map_id, find_player_positions(map, FLAG_PLAYERSPAWN))
     return map_id
 end

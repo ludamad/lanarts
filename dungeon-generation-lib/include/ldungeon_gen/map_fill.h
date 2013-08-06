@@ -87,10 +87,10 @@ namespace ldungeon_gen {
 		virtual bool apply(MapPtr map, group_t parent_group_id, const BBox& rect);
 
     private:
-        bool place_random(MapPtr map, group_t parent_group_id, Size size);
+        bool place_random(MapPtr map, group_t parent_group_id, const BBox& rect, Size size);
 	};
 
-	BBox random_place(Map& map, MTwist& randomizer, Size size);
+	BBox random_place(BBox area, MTwist& randomizer, Size size);
 }
 
 #endif /* LDUNGEON_MAP_FILL_H_ */

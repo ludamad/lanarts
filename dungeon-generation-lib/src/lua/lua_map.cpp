@@ -569,7 +569,7 @@ namespace ldungeon_gen {
 
 		LUAWRAP_SET_TYPE(LuaStackValue);
 		LUAWRAP_GETTER(submodule, random_place,
-				random_place(*OBJ["map"].as<MapPtr>(), ldungeon_get_rng(L), luawrap::defaulted(OBJ["size"], Size())));
+				random_place(OBJ["area"].as<BBox>(), ldungeon_get_rng(L), luawrap::defaulted(OBJ["size"], Size())));
 
 	}
 

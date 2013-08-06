@@ -155,19 +155,19 @@ local large_layouts = {
 
 local map_layouts = {
 -- tiny rooms with animals
---      { layout = {size = {50,50}, rooms = {}, tunnels =  { width = 0, per_room = 0} },
---        templates = {dome1, dome2, dome3},
---        content = {
---          features = { tileset = {cobble, crypt_tiles, snake_tiles}, statues = 0 },
---          items =    { amount = 3,  group = Basic Items   },
---          enemies = {
---            wandering = false,
---            amount = 5,
---            generated = {
---              {enemy = "Giant Rat",         chance = 100 },
---              {enemy = "Giant Bat",         chance = 100 }
---            }
---      }
+      { templates = {path_resolve "dungeon1room1a.txt", path_resolve "dungeon1room1b.txt", path_resolve "dungeon1room1c.txt"},
+        content = {
+          items = { amount = 3,  group = item_groups.basic_items   },
+          enemies = {
+            wandering = false,
+            amount = 5,
+            generated = {
+              {enemy = "Giant Rat",         chance = 100 },
+              {enemy = "Giant Bat",         chance = 100 }
+            }
+          }
+        }
+      },
       -- Level 0
       { layout = {tiny_layout1},
         content = {
@@ -383,30 +383,12 @@ local function generate_statues(map)
             i = i + 1
         end
     end
---    for (int i = 0; i < amount_statues; i++) {
---        int ind = mt.rand(rooms.size());
---        RoomRegion& r1 = rooms[ind];
---        Region inner = r1.region.remove_perimeter();
---        if (inner.w < 2 || inner.h < 2) {
---            continue;
---        }
---        Pos pos;
---        int attempts = 0;
---        const int MAX_STATUE_ATTEMPTS = 16;
---        do {
---            if (++attempts < MAX_STATUE_ATTEMPTS) {
---                goto GiveUpOnStatueGeneration;
---            }
---            pos = generate_location_in_region(mt, room, inner);
---            Sqr& sqr = room.at(pos);
---            if (!sqr.passable || sqr.has_instance) {
---                /* We may not have many candidate locations, just skip this one in case */
---                goto GiveUpOnStatueGeneration;
---            }
---        } while (is_near_wall(room, pos));
---        generate_statue(gs, room, mt, pos);
---        GiveUpOnStatueGeneration:;
---    }
+end
+
+local PADDING = 4
+local function get_inner_area(map)
+    local w,h = unpack(map.size)
+    return bbox_create({PADDING, PADDING}, {w - PADDING*2, h - PADDING * 2})
 end
 
 local function generate_content(map, content, tileset)
@@ -417,11 +399,11 @@ end
 
 local function generate_tunnels(map, tunnels, tileset)
     local per_room_range = type(tunnels.per_room) == "table" and tunnels.per_room or {tunnels.per_room, tunnels.per_room}
-    dungeons.simple_tunnels(map, tunnels.width, per_room_range, tileset.wall, tileset.floor)
+    dungeons.simple_tunnels(map, tunnels.width, per_room_range, tileset.wall, tileset.floor_alt, get_inner_area(map))
 end
 
 local function map_gen_apply(map, placements, wall, floor, size, padding)
-    MapGen.random_placement_apply { map = map, 
+    MapGen.random_placement_apply { map = map, area = get_inner_area(map),
         child_operator = dungeons.room_carve_operator(wall, floor, padding or 1),
         size_range = size, amount_of_placements_range = placements,
         create_subgroup = false
@@ -442,13 +424,26 @@ local function generate_layout(map, layout, tileset)
     generate_tunnels(map, layout.tunnels, tileset)
 end
 
+local function generate_from_template(template, tileset)
+    return map_utils.area_template_to_map(template, --[[padding]] 4, { 
+           ['x'] = { add = MapGen.FLAG_SOLID, content = tileset.wall }, 
+           ['.'] = { add = MapGen.FLAG_SEETHROUGH, content = chance(.5) and tileset.floor_alt or tileset.floor }
+    })
+end
+
 local function create_map(floor, tileset)
     local entry = map_layouts[floor]
     -- Resolve room width & height ranges by applying range_resolve
-    local layout = random_choice(entry.layout)
-    local size = map_call(range_resolve, layout.size)
-    local map = map_utils.map_create(size, tileset.wall)
-    generate_layout(map, layout, tileset)
+    local map
+    if entry.layout then
+        local layout = random_choice(entry.layout)
+        local size = map_call(range_resolve, layout.size)
+        map = map_utils.map_create(size, tileset.wall)
+        generate_layout(map, layout, tileset)
+    else 
+        local template = random_choice(entry.templates)
+        map = generate_from_template(template, tileset)
+    end
     generate_content(map, entry.content, tileset)
     return map
 end

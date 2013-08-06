@@ -88,6 +88,11 @@ function pretty_tostring(val, --[[Optional]] tabs, --[[Optional]] packed, --[[Op
     return table.concat(parts)
 end
 
+function table.clone(t)
+    local newt = {}
+    table.copy(newt, t)
+    return newt
+end
 function table.pop_first(t)
     local len = #t
     if len == 0 then 

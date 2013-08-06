@@ -10,6 +10,16 @@ function vector_multiply(v1, v2)
     return ret
 end
 
+function vector_add(v1, v2)
+    local length = # v1
+    assert(length == #v2, "vector_multiply(): Vector lengths do not match!")
+
+    local ret = {}
+    for i = 1,length do ret[i] = v1[i] + v2[i] end
+    return ret
+end
+
+
 function vector_apply(f) 
     return function (v1, v2)
         local length = # v1

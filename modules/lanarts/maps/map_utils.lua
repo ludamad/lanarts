@@ -113,11 +113,11 @@ function M.area_template_apply(map, area, filename, legend)
     area_temp:apply{ map = map, area = area }
 end
 
-function M.area_template_to_map(filename, legend)
+function M.area_template_to_map(filename, padding, legend)
 	local area_temp = MapGen.area_template_create {data_file = filename, legend = legend}
 
-	local map = M.map_create(area_temp.size, 0)
-	area_temp:apply{ map = map, flip_x = chance(.5), flip_y = chance(.5) }
+	local map = M.map_create(vector_add(area_temp.size, {padding*2,padding*2}), legend['x'].content)
+	area_temp:apply{ map = map, top_left_xy = {padding,padding}, flip_x = chance(.5), flip_y = chance(.5) }
 	return map
 end
 

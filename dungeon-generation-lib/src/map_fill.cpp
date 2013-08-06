@@ -132,16 +132,16 @@ namespace ldungeon_gen {
 		return true;
 	}
 
-	BBox random_place(Map& map, MTwist& randomizer, Size size) {
-		int rx = randomizer.rand(0, map.width() - size.w);
-		int ry = randomizer.rand(0, map.height() - size.h);
-		return BBox(rx, ry, rx + size.w, ry + size.h);
-	}
+    BBox random_place(BBox area, MTwist& randomizer, Size size) {
+            int rx = randomizer.rand(area.x1, area.x2 - size.w);
+            int ry = randomizer.rand(area.y1, area.y2 - size.h);
+            return BBox(rx, ry, rx + size.w, ry + size.h);
+    }
 
-    bool RandomPlacementApplyOperator::place_random(MapPtr map, group_t parent_group_id, Size size) {
+    bool RandomPlacementApplyOperator::place_random(MapPtr map, group_t parent_group_id, const BBox& rect, Size size) {
         const int MAX_ATTEMPTS = 10;
         for (int attempts = 0; attempts < MAX_ATTEMPTS; attempts++) {
-        	BBox room = random_place(*map, randomizer, size);
+        	BBox room = random_place(rect, randomizer, size);
             if (area_oper->apply(map, parent_group_id, room)) {
                 return true;
             }
@@ -164,7 +164,7 @@ namespace ldungeon_gen {
 
                 int rw = randomizer.rand(sizerange), rh = randomizer.rand(sizerange);
 
-                if (place_random(map, parent_group_id, Size(rw, rh))) {
+                if (place_random(map, parent_group_id, rect, Size(rw, rh))) {
                     break;
                 }
                 if (failures > TOO_MANY_FAILURES)
