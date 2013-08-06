@@ -37,7 +37,7 @@ M.snake = Data.tileset_create {
 }
 
 for k,tileset in pairs(M) do
-    if not rawget(tileset, "floor_altl") then
+    if not rawget(tileset, "floor_alt") then
         tileset.floor_alt = tileset.floor
     end
     if not rawget(tileset, "floor_tunnel") then
