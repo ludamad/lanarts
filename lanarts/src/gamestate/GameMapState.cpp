@@ -20,8 +20,7 @@ GameMapState::GameMapState(int levelid, const Size& size,
 		_tiles(Size(size.w / TILE_SIZE, size.h / TILE_SIZE)),
 		_inst_set(size.w, size.h),
 		_monster_controller(wandering_flag),
-		_is_simulation(is_simulation),
-		_wander_map() {
+		_is_simulation(is_simulation) {
 }
 
 GameMapState::~GameMapState() {
@@ -48,7 +47,6 @@ int GameMapState::room_within(const Pos& p) {
 				return i;
 			}
 		}
-
 	}
 	return -1;
 }

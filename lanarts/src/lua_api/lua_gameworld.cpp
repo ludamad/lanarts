@@ -116,7 +116,7 @@ static void world_players_spawn(LuaStackValue level_id, const std::vector<Pos>& 
 
 // level functions
 
-static int room_regenerate(lua_State* L) {
+static int gmap_regenerate(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	int levelid = gs->get_level()->id();
 
@@ -128,21 +128,21 @@ static int room_regenerate(lua_State* L) {
 	return 0;
 }
 
-static int room_objects_list(lua_State* L) {
+static int gmap_objects_list(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	GameInstSet& insts = gs->get_level()->game_inst_set();
 	luawrap::push(L, insts.to_vector());
 	return 1;
 }
 
-static int room_objects(lua_State* L) {
+static int gmap_objects(lua_State* L) {
 	lua_pushcfunction(L, lua_api::l_itervalues);
-	room_objects_list(L);
+	gmap_objects_list(L);
 	lua_call(L, 1, 1);
 	return 1;
 }
 
-static void room_add_instance(LuaStackValue gameinst) {
+static void gmap_add_instance(LuaStackValue gameinst) {
 	GameInst* inst = gameinst.as<GameInst*>();
 	if (inst->current_floor != -1) {
 		luawrap::error("Attempt to add game instance that was already added!");
@@ -150,7 +150,7 @@ static void room_add_instance(LuaStackValue gameinst) {
 	lua_api::gamestate(gameinst)->add_instance(inst);
 }
 
-static int room_monsters_list(lua_State* L) {
+static int gmap_monsters_list(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	const std::vector<obj_id>& mons = gs->monster_controller().monster_ids();
 	lua_newtable(L);
@@ -161,7 +161,7 @@ static int room_monsters_list(lua_State* L) {
 	return 1;
 }
 
-static int room_monsters_seen(lua_State* L) {
+static int gmap_monsters_seen(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	int narg = lua_gettop(L);
 	PlayerInst* p = narg >= 1 ? luawrap::get<PlayerInst*>(L, 1) : NULL;
@@ -182,27 +182,27 @@ static int room_monsters_seen(lua_State* L) {
 	return 1;
 }
 
-static int room_monsters(lua_State* L) {
+static int gmap_monsters(lua_State* L) {
 	lua_pushcfunction(L, lua_api::l_itervalues);
-	room_monsters_list(L);
+	gmap_monsters_list(L);
 	lua_call(L, 1, 1);
 	return 1;
 }
 
 // Look up a specific instance given an id
-static int room_instance(lua_State* L) {
+static int gmap_instance(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	luawrap::push(L, gs->get_instance(luaL_checkinteger(L, 1)));
 	return 1;
 }
 
 // TODO add test for specific player
-static bool room_object_visible(const LuaStackValue& obj) {
+static bool gmap_object_visible(const LuaStackValue& obj) {
 	GameState* gs = lua_api::gamestate(obj);
 	return gs->object_visible_test(obj.as<GameInst*>());
 }
 
-static int room_object_place_free(lua_State* L) {
+static int gmap_object_place_free(lua_State* L) {
 	int nargs = lua_gettop(L);
 	GameState* gs = lua_api::gamestate(L);
 	GameInst* inst = luawrap::get<GameInst*>(L, 1);
@@ -216,13 +216,29 @@ static int room_object_place_free(lua_State* L) {
 	return 1;
 }
 
-static bool room_place_free(const LuaStackValue& pos) {
+const int MAX_RET = 16;
+
+static int gmap_object_collisions(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	GameInst* inst = luawrap::get<GameInst*>(L, 1);
+	GameInst* objects[MAX_RET];
+
+	int nret = gs->object_radius_test(inst, objects, MAX_RET);
+	lua_newtable(L);
+	for (int i = 0; i < nret; i++){
+		luawrap::push(L, objects[i]);
+		lua_rawset(L, i+1);
+	}
+	return 1;
+}
+
+static bool gmap_place_free(const LuaStackValue& pos) {
 	GameState* gs = lua_api::gamestate(pos);
 	Pos p = pos.as<Pos>();
 	return !gs->solid_test(NULL, p.x, p.y, 1);
 }
 
-static bool room_radius_place_free(const LuaStackValue& radius,
+static bool gmap_radius_place_free(const LuaStackValue& radius,
 		const LuaStackValue& pos) {
 	GameState* gs = lua_api::gamestate(radius);
 	Pos p = pos.as<Pos>();
@@ -266,24 +282,25 @@ namespace lua_api {
 		LuaValue world = register_lua_submodule(L, "core.GameWorld");
 		register_gameworld_submodule(L, world);
 
-		LuaValue room = luawrap::ensure_table(globals["Room"]);
+		LuaValue gmap = register_lua_submodule(L, "core.GameMap");
 
 		// Query functions:
-		room["objects_list"].bind_function(room_objects_list);
-		room["objects"].bind_function(room_objects);
+		gmap["objects_list"].bind_function(gmap_objects_list);
+		gmap["objects"].bind_function(gmap_objects);
 
-		room["add_instance"].bind_function(room_add_instance);
-		room["instance"].bind_function(room_instance);
+		gmap["add_instance"].bind_function(gmap_add_instance);
+		gmap["instance"].bind_function(gmap_instance);
 
-		room["monsters_list"].bind_function(room_monsters_list);
-		room["monsters"].bind_function(room_monsters);
+		gmap["monsters_list"].bind_function(gmap_monsters_list);
+		gmap["monsters"].bind_function(gmap_monsters);
 
-		room["object_visible"].bind_function(room_object_visible);
-		room["object_place_free"].bind_function(room_object_place_free);
-		room["place_free"].bind_function(room_place_free);
-		room["radius_place_free"].bind_function(room_radius_place_free);
+		gmap["object_visible"].bind_function(gmap_object_visible);
+		gmap["object_collisions"].bind_function(gmap_object_collisions);
+		gmap["object_place_free"].bind_function(gmap_object_place_free);
+		gmap["place_free"].bind_function(gmap_place_free);
+		gmap["radius_place_free"].bind_function(gmap_radius_place_free);
 
 		// Debug/special-case-only functions:
-		room["regenerate"].bind_function(room_regenerate);
+		gmap["regenerate"].bind_function(gmap_regenerate);
 	}
 }

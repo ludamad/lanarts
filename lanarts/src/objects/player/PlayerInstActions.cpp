@@ -621,6 +621,7 @@ void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
 	}
 	FeatureInst* portal = find_usable_portal(gs, this);
 	portal->player_interact(gs, this);
+	reset_rest_cooldown();
 }
 
 void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {

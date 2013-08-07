@@ -448,25 +448,25 @@ local function generate_layout(map, layout, tileset)
     generate_tunnels(map, layout.tunnels, tileset)
 end
 
-local function generate_from_template(template, tileset)
-    return map_utils.area_template_to_map(template, --[[padding]] 4, { 
+local function generate_from_template(label, template, tileset)
+    return map_utils.area_template_to_map(label, template, --[[padding]] 4, { 
            ['x'] = { add = MapGen.FLAG_SOLID, content = tileset.wall }, 
            ['.'] = { add = MapGen.FLAG_SEETHROUGH, content = chance(.5) and tileset.floor_alt or tileset.floor }
     })
 end
 
-local function create_map(floor, tileset)
+local function create_map(label, floor, tileset)
     local entry = map_layouts[floor]
     -- Resolve room width & height ranges by applying range_resolve
     local map
     if entry.layout then
         local layout = random_choice(entry.layout)
         local size = map_call(range_resolve, layout.size)
-        map = map_utils.map_create(size, tileset.wall)
+        map = map_utils.map_create(label, size, tileset.wall)
         generate_layout(map, layout, tileset)
     else 
         local template = random_choice(entry.templates)
-        map = generate_from_template(template, tileset)
+        map = generate_from_template(label, template, tileset)
     end
     generate_content(map, entry.content, tileset)
     return map

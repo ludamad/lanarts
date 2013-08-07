@@ -111,13 +111,19 @@ end
 --    return portal
 --end
 
-function M.map_create(size, content, --[[Optional]] flags)
-    return MapGen.map_create { size = size, flags = flags or MapGen.FLAG_SOLID, content = content, instances = {} }
+function M.map_create(label, size, content, --[[Optional]] flags)
+    return MapGen.map_create { 
+    	label = label, 
+    	size = size, 
+    	flags = flags or MapGen.FLAG_SOLID, 
+    	content = content, 
+    	instances = {} 
+    }
 end
 
 function M.game_map_create(map, wandering_enabled) 
     if wandering_enabled == nil then wandering_enabled = false end
-    return Maps.create { map = map, instances = map.instances, wandering_enabled = wandering_enabled }
+    return Maps.create { map = map, label = map.label, instances = map.instances, wandering_enabled = wandering_enabled }
 end
 
 function M.area_template_apply(map, area, filename, legend)
@@ -125,10 +131,10 @@ function M.area_template_apply(map, area, filename, legend)
     area_temp:apply{ map = map, area = area }
 end
 
-function M.area_template_to_map(filename, padding, legend)
+function M.area_template_to_map(label, filename, padding, legend)
 	local area_temp = MapGen.area_template_create {data_file = filename, legend = legend}
 
-	local map = M.map_create(vector_add(area_temp.size, {padding*2,padding*2}), legend['x'].content)
+	local map = M.map_create(label, vector_add(area_temp.size, {padding*2,padding*2}), legend['x'].content)
 	area_temp:apply{ map = map, top_left_xy = {padding,padding}, flip_x = chance(.5), flip_y = chance(.5) }
 	return map
 end

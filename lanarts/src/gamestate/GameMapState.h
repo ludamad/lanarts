@@ -61,6 +61,7 @@ public:
 	int tile_width() const {
 		return _size.w / TILE_SIZE;
 	}
+
 	int tile_height() const {
 		return _size.h / TILE_SIZE;
 	}
@@ -81,10 +82,6 @@ public:
 		return _drawable_queue;
 	}
 
-	WanderMap& wander_map() {
-		return _wander_map;
-	}
-
 	obj_id add_instance(GameState* gs, GameInst* inst);
 
 	void serialize(GameState* gs, SerializeBuffer& serializer);
@@ -92,11 +89,14 @@ public:
 
 	void step(GameState* gs);
 
+	std::string& label() {
+		return _label;
+	}
 public:
 	std::vector<GameRoomPortal> exits, entrances;
 	std::vector<RoomRegion> rooms;
 private:
-
+	std::string _label;
 	level_id _levelid;
 	int _steps_left;
 	Size _size;
@@ -104,7 +104,6 @@ private:
 	GameInstSet _inst_set;
 	MonsterController _monster_controller;
 	CollisionAvoidance _collision_avoidance;
-	WanderMap _wander_map;
 	/* Used to store dynamic drawable information */
 	LuaDrawableQueue _drawable_queue;
 

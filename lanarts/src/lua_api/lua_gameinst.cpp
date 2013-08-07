@@ -303,6 +303,16 @@ static GameInst* enemy_create(LuaStackValue args) {
 	return do_instance_init(gs, inst, args);
 }
 
+static GameInst* object_create(LuaStackValue args) {
+	using namespace luawrap;
+	Pos xy = args["xy"].as<Pos>();
+	bool solid = defaulted(args["solid"], false);
+	int radius = defaulted(args["radius"], 15);
+	int depth = defaulted(args["depth"], 0);
+	GameInst* inst = new GameInst(xy.x, xy.y, radius, solid, depth);
+	return do_instance_init(lua_api::gamestate(args), inst, args);
+}
+
 static GameInst* feature_create(LuaStackValue args) {
 	using namespace luawrap;
 	GameState* gs = lua_api::gamestate(args);
@@ -364,6 +374,7 @@ void lua_register_gameinst(lua_State* L) {
 	LuaValue globals = luawrap::globals(L);
 	LuaValue submodule = lua_api::register_lua_submodule(L, "core.GameObject");
 	submodule["enemy_create"].bind_function(enemy_create);
+	submodule["object_create"].bind_function(object_create);
 	submodule["feature_create"].bind_function(feature_create);
 	submodule["item_create"].bind_function(item_create);
 	submodule["store_create"].bind_function(store_create);

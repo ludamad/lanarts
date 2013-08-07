@@ -64,7 +64,7 @@ local function temple_level_base_apply(map, tileset, area)
 end
 
 local function temple_level_create(floor, sequences, tileset)
-    local map = map_utils.map_create({40+floor*5, 40+floor*5}, tileset.wall)
+    local map = map_utils.map_create( "Temple " .. floor, {40+floor*5, 40+floor*5}, tileset.wall)
     temple_level_base_apply(map, tileset, bbox_create({4,4}, vector_add(map.size, {-8,-8})))
 
     local map_area = bbox_create({0,0}, map.size)
@@ -133,7 +133,7 @@ end
 
 local function old_map_generate(MapSeq, tileset, offset, max_floor, floor)
     floor = floor or 1
-    local map = old_maps.create_map(floor + offset, tileset)
+    local map = old_maps.create_map("Dungeon "..floor, floor + offset, tileset)
     local last_floor = (floor >= max_floor)
     local seq_idx = MapSeq:slot_create()
     connect_map {
@@ -166,12 +166,14 @@ function M.overworld_create()
     local OldMapSeq2 = MapSequence.create {preallocate = 1}
     local temple_sequences = {}
     local dirthole_sequences = {}
-    local map = map_utils.area_template_to_map(path_resolve "region1.txt", --[[padding]] 4, { 
+    local map = map_utils.area_template_to_map("Overworld", 
+    		--[[file path]] path_resolve "region1.txt", 
+    		--[[padding]] 4, {
            ['x'] = { add = {MapGen.FLAG_SEETHROUGH, MapGen.FLAG_SOLID}, content = tileset.wall }, 
            ['z'] = { add = MapGen.FLAG_SOLID, content = tileset.wall_alt }, 
            ['.'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor },
            [','] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.dirt },
-           ['1'] = { add = {MapGen.FLAG_SEETHROUGH, FLAG_PLAYERSPAWN}, content = tileset.floor } ,
+           [':'] = { add = {MapGen.FLAG_SEETHROUGH, FLAG_PLAYERSPAWN}, content = tileset.floor } ,
            ['<'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.dirt, 
                on_placement = function(map, xy)
                     map_utils.spawn_decoration(map, "anvil", xy)
@@ -185,7 +187,7 @@ function M.overworld_create()
                     temple_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
                     temple_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
                         function() 
-                            return temple_level_create(1, temple_sequences, TileSets.snake)
+                            return temple_level_create(1, temple_sequences, TileSets.temple)
                     end)
                end},           
            ['D'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor,

@@ -36,6 +36,8 @@ static int maps_create(LuaStackValue args) {
 	GameMapState* game_map = gs->game_world().map_create(map->size(),
 			defaulted(args["wandering_enabled"], true));
 
+	game_map->label() = defaulted(args["label"], std::string("Somewhere"));
+
 	GameTiles& tiles = game_map->tiles();
 	BBox bbox(Pos(), tiles.size());
 	FOR_EACH_BBOX(bbox, x, y) {
