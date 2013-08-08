@@ -11,6 +11,7 @@
 #ifdef WIN32
 
 #include <windows.h>
+#include <direct.h>
 
 bool is_directory(const char* path) {
 	DWORD attribs = GetFileAttributesA(path);
@@ -49,7 +50,7 @@ bool ensure_directory(const char* path) {
 
 std::string working_directory() {
 #ifdef WIN32
-	cwd = _getcwd(NULL, 0);
+	char* cwd = _getcwd(NULL, 0);
 #else
 	const int CWD_BUFFER_TRY = 1024;
 	char buffer[CWD_BUFFER_TRY];

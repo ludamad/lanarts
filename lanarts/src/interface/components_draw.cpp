@@ -45,14 +45,14 @@ void draw_speed_box(GameState* gs, const BBox& bbox) {
 	const char* text = "Speed: Slow ";
 	if (settings.time_per_step <= 10) {
 		text = "Speed: Very Fast";
-	} else if (settings.time_per_step <= 12) {
+	} else if (settings.time_per_step <= 13) {
 		text = "Speed: Fast";
-	} else if (settings.time_per_step <= 14) {
+	} else if (settings.time_per_step <= 16) {
 		text = "Speed: Normal";
 	}
 	int diff = settings.time_per_step - 10;
 	draw_setting_box(gs, bbox,
 			bbox.contains(gs->mouse_pos()) ? COL_GOLD : COL_WHITE,
 			res::sprite_id("speed setting icon"),
-			COL_WHITE.alpha(255 - diff * 30), text, COL_WHITE);
+			COL_WHITE.alpha(255 - diff * 20), text, COL_WHITE);
 }

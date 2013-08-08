@@ -44,9 +44,9 @@ bool ConfigContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 	}
 	entry_box = entry_box.translated(0, TILE_SIZE);
 	if (leftclick && entry_box.contains(mpos)) {
-		settings.time_per_step -= 2;
+		settings.time_per_step -= 3;
 		if (settings.time_per_step < 10) {
-			settings.time_per_step = 16;
+			settings.time_per_step = 19;
 		}
 	}
 

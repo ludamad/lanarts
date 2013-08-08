@@ -208,9 +208,9 @@ local function speed_toggle_create()
     function toggle:step(xy)
         -- Toggle the connection type
         if mouse_left_pressed and mouse_over(xy, self.size) then
-            settings.time_per_step = settings.time_per_step - 2
+            settings.time_per_step = settings.time_per_step - 3
             if settings.time_per_step < 10 then
-                settings.time_per_step = 16
+                settings.time_per_step = 19
             end
         end
     end
@@ -218,7 +218,7 @@ local function speed_toggle_create()
     function toggle:draw(xy)
         local text = "Speed: " .. speed_description(settings.time_per_step)
    
-        local alpha = 255 - (settings.time_per_step - 10) * 30
+        local alpha = 255 - (settings.time_per_step - 10) * 20
 
         local x,y = unpack(xy)
         local w, h = unpack(self.size)

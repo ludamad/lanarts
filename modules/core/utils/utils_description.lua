@@ -3,9 +3,9 @@ function speed_description(time_per_step)
 
     if time_per_step <= 10 then
         text = "Very Fast"
-    elseif time_per_step <= 12 then
+    elseif time_per_step <= 13 then
         text = "Fast"
-    elseif time_per_step <= 14 then
+    elseif time_per_step <= 16 then
         text = "Normal"
     end
     return text

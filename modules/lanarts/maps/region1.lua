@@ -63,8 +63,8 @@ local function temple_level_base_apply(map, tileset, area)
     dungeons.simple_tunnels(map, {1,1}, {0,1}, tileset.wall, tileset.floor_tunnel, area)
 end
 
-local function temple_level_create(floor, sequences, tileset)
-    local map = map_utils.map_create( "Temple " .. floor, {40+floor*5, 40+floor*5}, tileset.wall)
+local function temple_level_create(label, floor, sequences, tileset)
+    local map = map_utils.map_create( label .. ' ' .. floor, {40+floor*5, 40+floor*5}, tileset.wall)
     temple_level_base_apply(map, tileset, bbox_create({4,4}, vector_add(map.size, {-8,-8})))
 
     local map_area = bbox_create({0,0}, map.size)
@@ -83,7 +83,7 @@ local function temple_level_create(floor, sequences, tileset)
             sprite_down = "stair_kinds", sprite_down_index = stair_kinds_index(4, 7),
             forward_portals = no_forward and 0 or 1,
             next_floor_callback = function() 
-                return temple_level_create(floor +1, sequences, tileset)
+                return temple_level_create(label, floor +1, sequences, tileset)
             end
         }
         done_once = true
@@ -187,7 +187,7 @@ function M.overworld_create()
                     temple_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
                     temple_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
                         function() 
-                            return temple_level_create(1, temple_sequences, TileSets.temple)
+                            return temple_level_create("Temple", 1, temple_sequences, TileSets.temple)
                     end)
                end},           
            ['D'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor,
@@ -225,7 +225,7 @@ function M.overworld_create()
                     dirthole_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
                     dirthole_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
                         function()
-                            return temple_level_create(1, dirthole_sequences, TileSets.pebble)
+                            return temple_level_create("Mines", 1, dirthole_sequences, TileSets.pebble)
                     end)
                end}
     })

@@ -61,7 +61,7 @@ struct GameSettings {
 		view_width = 960;
 		view_height = 720;
 		steps_per_draw = 1;
-		time_per_step = 14;
+		time_per_step = 16;
 		frame_action_repeat = 0;
 		free_memory_while_idle = false;
 
