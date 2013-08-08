@@ -141,7 +141,7 @@ static BBox content_area_box(const BBox& sidebar_box) {
 }
 
 static BBox minimap_bounds(const BBox& sidebar_bounds) {
-	int minimap_relposx = 20, minimap_relposy = 64 + 45;
+	int minimap_relposx = 10, minimap_relposy = 64 + 25;
 	int minimap_w = 128, minimap_h = 128;
 	int sx = sidebar_bounds.x1 + minimap_relposx;
 	int sy = sidebar_bounds.y1 + minimap_relposy;

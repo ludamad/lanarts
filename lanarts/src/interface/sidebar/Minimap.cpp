@@ -167,8 +167,6 @@ void Minimap::draw(GameState* gs) {
 	BBox draw_region(view_region.center() - Pos(size.w / 2, size.h / 2), size);
 	draw_region = draw_region.resized_within(BBox(Pos(0,0), Size(128,128)));
 
-//	SizeF scales(128.0f / draw_region.width(), 128.0f / draw_region.height());
-
 	// Prevent blurriness when scaling
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	minimap_buff.draw(ldraw::DrawOptions(draw_region).scale(SizeF(scale,scale)), bbox.left_top());
