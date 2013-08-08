@@ -133,14 +133,12 @@ namespace ldungeon_gen {
 	/* Map is only manditory component */
 	static void area_template_apply(AreaTemplatePtr temp, LuaStackValue args) {
 		using namespace luawrap;
-		bool flipX = defaulted(args["flip_x"], false), flipY = defaulted(
-				args["flip_y"], false);
+		Orientation orientation = (Orientation)defaulted(args["orientation"], (int)ORIENT_DEFAULT);
 		bool create_subgroup = defaulted(args["create_subgroup"], true);
 		int group = defaulted(args["group"], ROOT_GROUP_ID);
 		Pos top_left_xy = defaulted(args["top_left_xy"], Pos());
 
-		temp->apply(args["map"].as<MapPtr>(), group, top_left_xy, flipX, flipY,
-				create_subgroup);
+		temp->apply(args["map"].as<MapPtr>(), group, top_left_xy, orientation, create_subgroup);
 	}
 
 	LuaValue lua_areatemplatemetatable(lua_State* L) {
@@ -170,6 +168,12 @@ namespace ldungeon_gen {
 	void lua_register_areatemplate(const LuaValue& module) {
 		luawrap::install_userdata_type<AreaTemplatePtr,
 				lua_areatemplatemetatable>();
+		module["ORIENT_DEFAULT"] = (int)ORIENT_DEFAULT;
+		module["ORIENT_FLIP_X"] = (int)ORIENT_FLIP_X;
+		module["ORIENT_FLIP_Y"] = (int)ORIENT_FLIP_Y;
+		module["ORIENT_TURN_90"] = (int)ORIENT_TURN_90;
+		module["ORIENT_TURN_180"] = (int)ORIENT_TURN_180;
+		module["ORIENT_TURN_270"] = (int)ORIENT_TURN_270;
 		module["area_template_apply"].bind_function(lua_area_template_apply);
 		module["area_template_create"].bind_function(area_template_create);
 	}

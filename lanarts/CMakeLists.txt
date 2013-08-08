@@ -12,6 +12,7 @@ set( DEPS ../dependencies)
 
 add_definitions( -std=c++98 )
 
+
 include_directories(
 	${SDL_INCLUDE_DIR} 
 	${SDLIMAGE_INCLUDE_DIR}

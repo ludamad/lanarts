@@ -35,8 +35,29 @@ namespace ldungeon_gen {
 		_legend[key] = glyph;
 	}
 
+	inline static Pos reorient(Pos xy, Size size, Orientation orientation) {
+		int negx = size.w - xy.x - 1, negy = size.h - xy.y - 1;
+		switch (orientation) {
+		case ORIENT_DEFAULT:
+			return xy;
+		case ORIENT_FLIP_X:
+			return Pos(negx, xy.y);
+		case ORIENT_FLIP_Y:
+			return Pos(xy.x, negy);
+		case ORIENT_TURN_90:
+			return Pos(xy.y, negx);
+		case ORIENT_TURN_180:
+			return Pos(negx, negy);
+		case ORIENT_TURN_270:
+			return Pos(negy, xy.x);
+		default:
+			LDUNGEON_ASSERT(false);
+			return xy; // Shutup compiler
+		}
+	}
+
 	void AreaTemplate::apply(MapPtr map, group_t parent_group_id,
-			const Pos& xy, bool flipX, bool flipY, bool create_subgroup) {
+			const Pos& xy, Orientation orientation, bool create_subgroup) {
 		int w = _grid->width(), h = _grid->height();
 
 		/* Push arguments only once, the moment we find our lua_State */
@@ -49,16 +70,14 @@ namespace ldungeon_gen {
 		}
 		BBox grid_rect(Pos(), _grid->size());
 		FOR_EACH_BBOX(grid_rect, x, y) {
-			int sqrx = xy.x + (flipX ? w - x - 1 : x);
-			int sqry = xy.y + (flipY ? h - y - 1 : y);
+			Pos sqr = reorient(Pos(x,y), Size(w,h), orientation);
 			char chr = (*_grid)[Pos(x,y)];
 			Glyph glyph = _legend[chr];
 
-			(*map)[Pos(sqrx, sqry)].apply(glyph.oper);
+			(*map)[sqr].apply(glyph.oper);
 
 			/* Apply lua function */
 			if (!glyph.value.empty() && !glyph.value.isnil()) {
-				printf("APPLYING GLYPH FUNCTION\n");
 				LDUNGEON_ASSERT(L == NULL || glyph.value.luastate() == L);
 				if (L == NULL) {
 					L = glyph.value.luastate();
@@ -67,7 +86,7 @@ namespace ldungeon_gen {
 				LuaStackValue mapval(L, -1);
 				glyph.value.push();
 				mapval.push();
-				luawrap::push(L, Pos(sqrx, sqry));
+				luawrap::push(L, sqr);
 				lua_call(L, 2, 0);
 			}
 		}

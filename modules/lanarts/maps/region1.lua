@@ -191,7 +191,7 @@ function M.overworld_create()
                     end)
                end},           
            ['D'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor,
-               on_placement = old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {1,5}) },
+               on_placement = old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {5,5}) },
            ['X'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.floor,
                on_placement = old_dungeon_placement_function(OldMapSeq2, TileSets.snake, {6,10}) },
            ['s'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.floor},

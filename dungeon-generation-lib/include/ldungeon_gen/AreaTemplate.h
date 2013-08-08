@@ -22,6 +22,15 @@
 
 namespace ldungeon_gen {
 
+	enum Orientation {
+		ORIENT_DEFAULT,
+		ORIENT_FLIP_X,
+		ORIENT_FLIP_Y,
+		ORIENT_TURN_90,
+		ORIENT_TURN_180,
+		ORIENT_TURN_270
+	};
+
 	struct Glyph {
 		ConditionalOperator oper;
 		LuaValue value; /* event, passed map and xy */
@@ -38,7 +47,7 @@ namespace ldungeon_gen {
 
 		void define_glyph(char key, Glyph glyph);
 		void apply(MapPtr map, group_t parent_group_id, const Pos& xy,
-				bool flipX = false, bool flipY = false, bool create_subgroup = true);
+				Orientation orientation, bool create_subgroup = true);
 
 		Size size() const {
 			return _grid->size();
@@ -50,5 +59,4 @@ namespace ldungeon_gen {
 
 	typedef smartptr<AreaTemplate> AreaTemplatePtr;
 }
-
 #endif /* LDUNGEON_AREATEMPLATE_H_ */

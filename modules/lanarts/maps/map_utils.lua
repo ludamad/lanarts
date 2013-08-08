@@ -134,8 +134,17 @@ end
 function M.area_template_to_map(label, filename, padding, legend)
 	local area_temp = MapGen.area_template_create {data_file = filename, legend = legend}
 
+    local orient = random_choice {
+        MapGen.ORIENT_DEFAULT, MapGen.ORIENT_FLIP_X, MapGen.ORIENT_FLIP_Y,
+        MapGen.ORIENT_TURN_90, MapGen.ORIENT_TURN_180, MapGen.ORIENT_TURN_270
+    }
+    local size = vector_add(area_temp.size, {padding*2,padding*2})
+    if orient == MapGen.ORIENT_TURN_90 or MapGen.ORIENT_TURN_270 then
+        size[1], size[2] = size[2], size[1]
+    end
+
 	local map = M.map_create(label, vector_add(area_temp.size, {padding*2,padding*2}), legend['x'].content)
-	area_temp:apply{ map = map, top_left_xy = {padding,padding}, flip_x = chance(.5), flip_y = chance(.5) }
+	area_temp:apply{ map = map, top_left_xy = {padding,padding}, orientation = orient }
 	return map
 end
 
