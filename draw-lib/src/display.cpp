@@ -44,7 +44,6 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
 		fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
 		return;
 	}
-
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);

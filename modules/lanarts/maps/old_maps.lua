@@ -78,7 +78,7 @@ local tiny_layout3 = {
 local small_layout1 = {
         size = {40, 40},
         rooms =    { padding = 0, amount = 40, size = {4,4} },
-        tunnels =  { padding = 0, width = {1,2},   per_room = 5 }
+        tunnels =  { padding = 1, width = {1,2},   per_room = 5 }
 }
 
 local small_layout2 = {
@@ -162,21 +162,21 @@ end
 
 local map_layouts = {
   -- Level 1
-  { templates = {path_resolve "dungeon1room1a.txt", path_resolve "dungeon1room1b.txt", path_resolve "dungeon1room1c.txt"},
-    content = {
-      items = { amount = 3,  group = item_groups.basic_items   },
-      enemies = {
-        wandering = false,
-        amount = 5,
-        generated = {
-          {enemy = "Giant Rat",         chance = 100 },
-          {enemy = "Giant Bat",         chance = 100 }
-        }
-      }
-    }
-  },
+--  { templates = {path_resolve "dungeon1room1a.txt", path_resolve "dungeon1room1b.txt", path_resolve "dungeon1room1c.txt"},
+--    content = {
+--      items = { amount = 3,  group = item_groups.basic_items   },
+--      enemies = {
+--        wandering = false,
+--        amount = 5,
+--        generated = {
+--          {enemy = "Giant Rat",         chance = 100 },
+--          {enemy = "Giant Bat",         chance = 100 }
+--        }
+--      }
+--    }
+--  },
   -- Level 2
-  { layout = {tiny_layout1},
+  { layout = {small_layout1},
     content = {
       items =    { amount = 3,  group = item_groups.basic_items   },
       enemies = {
@@ -420,7 +420,7 @@ end
 
 local function generate_tunnels(map, tunnels, tileset)
     local per_room_range = type(tunnels.per_room) == "table" and tunnels.per_room or {tunnels.per_room, tunnels.per_room}
-    dungeons.simple_tunnels(map, tunnels.width, per_room_range, tileset.wall, tileset.floor_tunnel or tileset.floor_alt, get_inner_area(map))
+    dungeons.simple_tunnels(map, tunnels.width, per_room_range, tileset.wall, tileset.floor_tunnel or tileset.floor_alt, get_inner_area(map), tunnels.padding)
 end
 
 local function map_gen_apply(map, placements, wall, floor, size, padding)
@@ -439,8 +439,10 @@ local function generate_rooms(map, rooms, tileset)
     local amounts = range_resolve(rooms.amount)
     local alt_amount = math.random(math.floor(amounts*0.10), math.ceil(amounts*0.50))
     amounts = amounts - alt_amount
-    map_gen_apply(map, {alt_amount, alt_amount}, tileset.wall, tileset.floor_alt, rooms.size, rooms.padding)
-    map_gen_apply(map, {amounts, amounts}, tileset.wall, tileset.floor , rooms.size, rooms.padding)
+    -- Compensate for padding
+    local size = {rooms.size[1] + rooms.padding*2, rooms.size[2] + rooms.padding*2}
+    map_gen_apply(map, {alt_amount, alt_amount}, tileset.wall, tileset.floor_alt, size, rooms.padding)
+    map_gen_apply(map, {amounts, amounts}, tileset.wall, tileset.floor , size, rooms.padding)
 end
 
 local function generate_layout(map, layout, tileset)
@@ -474,6 +476,8 @@ end
 
 -- Submodule
 return {
+    medium_animals = medium_animals,
     create_map = create_map,
-    last_floor = #map_layouts
+    last_floor = #map_layouts,
+    generate_from_enemy_entries = generate_from_enemy_entries
 }

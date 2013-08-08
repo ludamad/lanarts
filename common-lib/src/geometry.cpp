@@ -384,3 +384,7 @@ BBox BBox::grow(int amount) const {
 BBox BBox::resized_within(const BBox& o) const {
 	return BBox(std::max(x1, o.x1), std::max(y1, o.y1), std::min(x2, o.x2), std::min(y2, o.y2));
 }
+
+BBoxF BBoxF::resized_within(const BBoxF& o) const {
+	return BBoxF(std::max(x1, o.x1), std::max(y1, o.y1), std::min(x2, o.x2), std::min(y2, o.y2));
+}

@@ -123,6 +123,7 @@ struct BBoxF {
 	BBoxF translated(float x, float y) const;
 
 	BBoxF translated(const PosF& pos) const;
+	BBoxF resized_within(const BBoxF& o) const;
 };
 
 struct QuadF {

@@ -213,11 +213,13 @@ function M.overworld_create()
                     local seq_len = #dirthole_sequences
                     dirthole_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
                     dirthole_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
-                        function() 
+                        function()
                             return temple_level_create(1, dirthole_sequences, TileSets.pebble)
                     end)
                end}
     })
+
+    old_maps.generate_from_enemy_entries(map, old_maps.medium_animals, 20)
 
     local map_id = map_utils.game_map_create(map)
     OldMapSeq1:slot_resolve(1, map_id)
@@ -228,7 +230,7 @@ function M.overworld_create()
     for MapSeq in values(dirthole_sequences) do
         MapSeq:slot_resolve(1, map_id)
     end
-    
+
     World.players_spawn(map_id, find_player_positions(map, FLAG_PLAYERSPAWN))
     return map_id
 end

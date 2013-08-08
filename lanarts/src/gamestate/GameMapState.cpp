@@ -68,6 +68,7 @@ void GameMapState::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write_container(exits);
 	serializer.write_container(entrances);
 	serializer.write_container(rooms);
+	serializer.write(_label);
 	serializer.write(_levelid);
 	serializer.write(_steps_left);
 	serializer.write(_size);
@@ -82,6 +83,7 @@ void GameMapState::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read_container(exits);
 	serializer.read_container(entrances);
 	serializer.read_container(rooms);
+	serializer.read(_label);
 	serializer.read(_levelid);
 	serializer.read(_steps_left);
 	serializer.read(_size);

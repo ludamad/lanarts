@@ -159,7 +159,7 @@ void Sidebar::draw(GameState* gs) {
 
 	PlayerInst* p = gs->local_player();
 
-	minimap.draw(gs, 1.0f);
+	minimap.draw(gs);
 	draw_player_base_stats(gs, p, sidebar_bounds.x1 + 10,
 			sidebar_bounds.y1 + 237, sidebar_bounds.width());
 	draw_player_statbars(gs, p, sidebar_bounds.x1 + STATBAR_OFFSET_X,

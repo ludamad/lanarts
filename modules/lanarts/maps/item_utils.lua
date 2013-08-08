@@ -19,13 +19,13 @@ end
 function M.item_generate(group, only_with_shop_cost)
     local total_chance = 0
     for entry in values(group) do
-        if shop_cost(entry) then
+        if not only_with_shop_cost or shop_cost(entry) then
             total_chance = total_chance + entry.chance
         end
     end
     local num = random(1, total_chance)
     for entry in values(group) do
-        if shop_cost(entry) then
+        if not only_with_shop_cost or shop_cost(entry) then
             num = num - entry.chance
             if num <= 0 then
                 local amount = resolve_range(entry.amount)
