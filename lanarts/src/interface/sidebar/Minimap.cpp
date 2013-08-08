@@ -115,6 +115,7 @@ BBox Minimap::minimap_bounds(GameState* gs) {
 	int level_w = gs->get_level()->tile_width();
 	int level_h = gs->get_level()->tile_height();
 
+
 	int max_w = minimap_max_bounds.width(), max_h = minimap_max_bounds.height();
 
 	int draw_x = minimap_max_bounds.x1 + (max_w - level_w) / 2;

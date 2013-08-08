@@ -97,7 +97,7 @@ local function temple_level_create(floor, sequences, tileset)
         end
     end
 
-    local map_id = map_utils.game_map_create(map)
+    local map_id = map_utils.game_map_create(map, true)
     for i=1,#sequences do
         sequences[i]:slot_resolve(sequence_ids[i], map_id)
     end
@@ -148,7 +148,7 @@ local function old_map_generate(MapSeq, tileset, offset, max_floor, floor)
             return old_map_generate(MapSeq, tileset, floor + 1, max_floor, offset)
         end
     }
-    return MapSeq:slot_resolve(seq_idx, map_utils.game_map_create(map))
+    return MapSeq:slot_resolve(seq_idx, map_utils.game_map_create(map, true))
 end
 
 local function old_dungeon_placement_function(MapSeq, tileset, levels)
@@ -170,7 +170,7 @@ function M.overworld_create()
     		--[[file path]] path_resolve "region1.txt", 
     		--[[padding]] 4, {
            ['x'] = { add = {MapGen.FLAG_SEETHROUGH, MapGen.FLAG_SOLID}, content = tileset.wall }, 
-           ['z'] = { add = MapGen.FLAG_SOLID, content = tileset.wall_alt }, 
+           ['W'] = { add = MapGen.FLAG_SOLID, content = tileset.wall_alt }, 
            ['.'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor },
            [','] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.dirt },
            [':'] = { add = {MapGen.FLAG_SEETHROUGH, FLAG_PLAYERSPAWN}, content = tileset.floor } ,
@@ -191,9 +191,9 @@ function M.overworld_create()
                     end)
                end},           
            ['D'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor,
-               on_placement = old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {1,8}) },
+               on_placement = old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {1,5}) },
            ['X'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.floor,
-               on_placement = old_dungeon_placement_function(OldMapSeq2, TileSets.snake, {9,13}) },
+               on_placement = old_dungeon_placement_function(OldMapSeq2, TileSets.snake, {6,10}) },
            ['s'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.floor},
            ['w'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.floor,
                on_placement = function(map, xy)
@@ -207,6 +207,17 @@ function M.overworld_create()
            					map:set(xy, map:get({xy[1] - 1, xy[2]}))
            				end
            			end },
+           ['i'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor, 
+                    on_placement = function(map, xy)
+                        local item = item_utils.item_generate(item_groups.enchanted_items)
+                        map:set(xy, map:get({xy[1] - 1, xy[2]}))
+                        map_utils.spawn_item(map, item.type, item.amount, xy)
+                    end },           
+           ['e'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor, 
+                    on_placement = function(map, xy)
+                        local enemy = old_maps.enemy_generate(old_maps.harder_enemies)
+                        map_utils.spawn_enemy(map, enemy, xy)
+                    end },
            ['G'] =  { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor,
                on_placement = function(map, xy)
                     local portal = map_utils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(0, 2))

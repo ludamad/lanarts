@@ -40,6 +40,27 @@ enemies:
         defence: 15
         willpower: 15
 
+  - name: Hell Warrior
+    appear_message: 
+        A Hell Warrior commands you to die!
+    defeat_message: 
+        You have rebuked the Hell Warrior!
+    sprite: hell warrior
+    radius: 16
+    xpaward: 150
+    unique: yes
+    init_func: enemy_berserker_init 
+    step_func: enemy_berserker_step
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 200
+        hpregen: 0.125
+        movespeed: 5
+        strength: 25
+        magic: 10
+        defence: 12
+        willpower: 8
+
   - name: Pisilohe
     sprite: pisilohe
     radius: 30

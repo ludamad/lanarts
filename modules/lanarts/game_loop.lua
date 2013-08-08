@@ -7,6 +7,7 @@ local EventLog = import "core.ui.EventLog"
 local M = {} -- Submodule
 
 local World = import "core.GameWorld"
+local Map = import "core.GameMap"
 local help_overlay = import "@help_overlay"
 
 --- Externally visible control structure for the main loop
@@ -100,7 +101,7 @@ function M.run_loop()
         end
 
         if key_pressed(keys.F3) and single_player then 
-            Room.regenerate()
+            Map.regenerate()
         end
     
         if key_pressed(keys.F4) then 

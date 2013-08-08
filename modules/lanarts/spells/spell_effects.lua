@@ -1,4 +1,5 @@
 local EventLog = import "core.ui.EventLog"
+local Map = import "core.GameMap"
 
 function poison_statmod(effect, obj, old, new)
 	new.defence = math.max(0, new.defence - 3)
@@ -106,7 +107,7 @@ function thrown_effect.step(effect, obj)
 		local x = math.floor( obj.x + math.cos(effect.angle) * increment )
 		local y = math.floor( obj.y + math.sin(effect.angle) * increment )
 	
-		if Room.object_place_free(obj, {x,y}) then 
+		if Map.object_place_free(obj, {x,y}) then 
 			obj.x = x
 			obj.y = y
 		end

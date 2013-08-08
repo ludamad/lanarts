@@ -116,7 +116,7 @@ function M.map_create(label, size, content, --[[Optional]] flags)
     	label = label, 
     	size = size, 
     	flags = flags or MapGen.FLAG_SOLID, 
-    	content = content, 
+    	content = content,
     	instances = {} 
     }
 end

@@ -103,11 +103,11 @@ namespace ldungeon_gen {
 	bool TunnelGenImpl::validate_slice(Square* prev_content,
 			TunnelSliceContext* cntxt, int dep) {
 		int dx = cntxt->dx, dy = cntxt->dy;
-		if (cntxt->pos.x < 0
+		if (cntxt->perim_pos.x < 0
 				|| cntxt->pos.x
 						>= map.width() - (dy == 0 ? 0 : filler.width + filler.padding * 2))
 			return false;
-		if (cntxt->pos.y < 0
+		if (cntxt->perim_pos.y < 0
 				|| cntxt->pos.y
 						>= map.height() -(dx == 0 ? 0 :  filler.width + filler.padding * 2))
 			return false;

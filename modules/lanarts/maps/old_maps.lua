@@ -3,6 +3,7 @@ local item_utils = import ".item_utils"
 local dungeons = import ".dungeons"
 local map_utils = import ".map_utils"
 local MapGen = import "core.map_generation"
+local World = import "core.GameWorld"
 
 local easy_animals = {
   {enemy = "Giant Rat",         chance = 100,  group_chance = 33, group_size = 2          },
@@ -162,35 +163,6 @@ end
 
 local map_layouts = {
   -- Level 1
---  { templates = {path_resolve "dungeon1room1a.txt", path_resolve "dungeon1room1b.txt", path_resolve "dungeon1room1c.txt"},
---    content = {
---      items = { amount = 3,  group = item_groups.basic_items   },
---      enemies = {
---        wandering = false,
---        amount = 5,
---        generated = {
---          {enemy = "Giant Rat",         chance = 100 },
---          {enemy = "Giant Bat",         chance = 100 }
---        }
---      }
---    }
---  },
-  -- Level 2
-  { layout = {small_layout1},
-    content = {
-      items =    { amount = 3,  group = item_groups.basic_items   },
-      enemies = {
-        wandering = false,
-        amount = 4,
-        generated = {
-          {enemy = "Giant Rat",         chance = 100  },
-          {enemy = "Giant Bat",         chance = 100 },
-          {enemy = "Cloud Elemental",   guaranteed_spawns = 1 }
-        }
-      }
-    }
-  },
-  -- Level 3
   { layout = tiny_layouts,
     content = {
       items = { amount = 3,  group = item_groups.basic_items   },
@@ -206,7 +178,7 @@ local map_layouts = {
       }
     }
   },
-  -- Level 4
+  -- Level 2
   { layout = tiny_layouts,
     content = {
       items = { amount = 4,  group = item_groups.basic_items },
@@ -223,70 +195,60 @@ local map_layouts = {
       }  
     }
   },
-  -- Level 5
+  -- Level 3
   { layout = small_layouts,
     content = {
-      items = { amount = 5,  group = item_groups.enchanted_items   },
+      items = { amount = 5,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
       enemies = {
         amount = {10,14},
         generated = medium_animals 
       }
     }
   },
-  -- Level 6
-  { layout = medium_layouts,
-    content = {
-      items = { amount = 7,  group = item_groups.enchanted_items   },
-      enemies = {
-        amount = {12,15},
-        generated = easy_enemies
-      }
-    }
-  },
-  -- Level 7
+  -- Level 4
   { layout = small_layouts,
     content = {
-      items = { amount = 8,  group = item_groups.enchanted_items   },
+      items = { amount = 8,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
       enemies = {
         amount = {12,15},
         generated = medium_enemies
       }
     }
   },
-  -- Level 8
-  { layout = small_layouts,
+  -- Level 5
+  { templates = {path_resolve "dungeon1room1a.txt", path_resolve "dungeon1room1b.txt", path_resolve "dungeon1room1c.txt"},
     content = {
-      items = { amount = 8,  group = item_groups.enchanted_items   },
+      items = { amount = 4,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
       enemies = {
-        amount = 15,
-        generated = tconcat(medium_enemies, {{enemy = "Red Dragon", guaranteed_spawns = 1}})
+        amount = 6,
+        generated = tconcat(medium_enemies, {{enemy = "Hell Warrior", guaranteed_spawns = 1}})
       }
     }
   },
-  -- Level 9
+  -- Level 6
   { layout = {small_layout1},
     content = {
-      items = { amount = 8,  group = item_groups.enchanted_items   },
+      items = { amount = 8, group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
       enemies = {
         amount = {14,16},
         generated = tconcat(medium_enemies, {{enemy = "Orc Warrior", guaranteed_spawns = {0,1}}})
       }
     }
   },
-  -- Level 10
+  -- Level 7
   { layout = medium_layouts,
     content = {
-      items = { amount = 8,  group = item_groups.enchanted_items   },
+      items = { amount = 8, group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
       enemies = {
         amount = {18,22},
         generated = tconcat(hard_enemies, {{enemy = "Orc Warrior", guaranteed_spawns = {0,1}}})
       }
     }
   },
-  -- Level 11
+  -- Level 8
   { layout = large_layouts,
     content = {
-      items = { amount = 10,  group = item_groups.enchanted_items   },
+      items = { amount = 10, group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
       enemies = {
         amount = 22,
         generated = hard_enemies
@@ -294,20 +256,20 @@ local map_layouts = {
     }
   
   },
-  -- Level 12
+  -- Level 9
   { layout = large_layouts,
     content = {
-      items = { amount = 12,  group = item_groups.enchanted_items   },
+      items = { amount = 7,  group = item_groups.enchanted_items   },
       enemies = {
         amount = 25,
         generated = harder_enemies
       }
     }
   },
-  -- Level 13
+  -- Level 10
   { layout = large_layouts,
     content = {
-      items = { amount = 13,  group = item_groups.enchanted_items   },
+      items = { amount = 7,  group = item_groups.enchanted_items   },
       enemies = {
         amount = 30,
         generated = tconcat(harder_enemies, {{enemy = "Zin", guaranteed_spawns = 1}})
@@ -324,6 +286,20 @@ end
 local function generate_items(map, items)
     for i=1,range_resolve(items.amount) do
         item_utils.item_object_generate(map, items.group)
+    end
+end
+
+local function enemy_generate(chances)
+    local total_chance = 0
+    for entry in values(chances) do
+        total_chance = total_chance + (entry.chance or 0)
+    end
+    local rand = random(1, total_chance)
+    for entry in values(chances) do
+        rand = rand - (entry.chance or 0)
+        if rand <= 0 then
+            return entry.enemy
+        end
     end
 end
 
@@ -349,7 +325,15 @@ local function generate_from_enemy_entries(map, chances, amount)
 end
 
 local function generate_enemies(map, enemies)
-    generate_from_enemy_entries(map, enemies.generated, range_resolve(enemies.amount))
+    local min, max
+    if type(enemies.amount) == 'table' then 
+        min, max = unpack(enemies.amount)
+    else
+        min, max = enemies.amount, enemies.amount
+    end
+    local amounts = {min * (0.8 + World.player_amount * 0.2), max * (0.8 + World.player_amount * 0.2)}
+    local amount = math.round(randomf(amounts))
+    generate_from_enemy_entries(map, enemies.generated, amount)
 end
 
 local function leaf_group_areas(map)
@@ -477,6 +461,8 @@ end
 -- Submodule
 return {
     medium_animals = medium_animals,
+    enemy_generate = enemy_generate,
+    harder_enemies = harder_enemies,
     create_map = create_map,
     last_floor = #map_layouts,
     generate_from_enemy_entries = generate_from_enemy_entries

@@ -2,7 +2,7 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 xx......xxxxxxxxxxxxxxxxxxxxxxxx......x...xx
 x........xxxxxxxxxx...xxxxxxxxxx...........x
 x..........................................x
-x....................D.....................x
+x..........................................x
 x.........................................xx
 x..............xxxx...xxxxx...............xx
 x...............xxxxxxxxxxxx..............xx

@@ -9,3 +9,6 @@ sprites:
 
   - name: pisilohe
     file: modules/lanarts/enemies/bosses/sprites/pisilohe8_0.png
+
+  - name: hell warrior
+    file: modules/lanarts/enemies/bosses/sprites/trog.png

@@ -488,6 +488,27 @@ static int lapi_random(lua_State* L) {
 	return 1;
 }
 
+static int lapi_randomf(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	int nargs = lua_gettop(L);
+	double min = 0, max = 0;
+	if (nargs == 1) {
+		// array[1]
+		lua_rawgeti(L, 1, 1);
+		min = lua_tonumber(L, -1);
+		// array[2]
+		lua_rawgeti(L, 1, 2);
+		max = lua_tonumber(L, -1);
+		lua_pop(L, 2);
+	} else if (nargs > 1) {
+		min = lua_tonumber(L, 1);
+		max = lua_tonumber(L, 2);
+	}
+
+	lua_pushnumber(L, gs->rng().rand(RangeF(min, max)));
+	return 1;
+}
+
 static BBox lapi_random_subregion(LuaStackValue lbox, Size size) {
 	BBox bbox = lbox.as<BBox>();
 	GameState* gs = lua_api::gamestate(lbox);
@@ -581,6 +602,8 @@ namespace lua_api {
 		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);
 		globals["random"].bind_function(lapi_random);
+		globals["math"]["round"].bind_function(round);
+		globals["randomf"].bind_function(lapi_randomf);
 		globals["random_subregion"].bind_function(lapi_random_subregion);
 		globals["chance"].bind_function(lapi_chance);
 		globals["nilprotect"].bind_function(lua_protect_table);
