@@ -36,6 +36,9 @@ public:
 	feature_t feature_type() const {
 		return feature;
 	}
+        bool has_been_seen() const {
+            return (last_seen_spr > -1);
+        }
 private:
 	feature_t feature;
 	sprite_id last_seen_spr;

@@ -86,13 +86,16 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 			int ex = instance->x / TILE_SIZE;
 			int ey = instance->y / TILE_SIZE;
 
-			if (!minimap_reveal && !tiles.is_seen(Pos(ex, ey))) {
-				continue;
-			}
-
-			if (!minimap_reveal && !gs->object_visible_test(instance)) {
-				continue;
-			}
+                        bool seen = tiles.is_seen(Pos(ex, ey));
+                        if (is_enemy) {
+			    seen = seen && gs->object_visible_test(instance);
+                        } else if (is_feature) {
+                            bool was_seen = dynamic_cast<FeatureInst*>(instance)->has_been_seen();
+                            seen = seen && was_seen;
+                        }
+                        if (!seen && !minimap_reveal) {
+                            continue;
+                        }
 
 			if (is_enemy) {
 				set_colour(buff, ex, ey, ptw, Colour(255,0,0));

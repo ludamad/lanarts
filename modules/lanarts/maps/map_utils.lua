@@ -48,7 +48,7 @@ function M.spawn_item(map, type, amount, tile_xy)
 end
 
 function M.random_store(map, items, area) 
-    local sqr = M.random_store(map, area)
+    local sqr = M.random_square(map, area)
     if not sqr then return nil end
     return M.spawn_store(map, items, sqr)
 end
