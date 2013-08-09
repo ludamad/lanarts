@@ -232,7 +232,9 @@ LuaField LuaValue::operator [](int index) const {
 
 LuaValue LuaValue::metatable() const {
 	push();
-	lua_getmetatable(impl->L, -1);
+	if (!lua_getmetatable(impl->L, -1)) {
+		lua_pushnil(impl->L);
+	}
 	LuaValue table(impl->L, -1);
 	lua_pop(impl->L, 2);
 	return table;

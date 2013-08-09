@@ -24,6 +24,17 @@ function M.spawn_enemy(map, type, tile_xy)
 
 end
 
+function M.spawn_store(map, items, tile_xy)
+    local object = GameObject.store_create {
+        xy = {tile_xy[1]*32+16, tile_xy[2]*32+16},
+        items = items,
+        do_init = false,
+        sprite = "store",
+        frame = random(0,4)
+    }
+    table.insert(map.instances, object)
+end
+
 function M.spawn_item(map, type, amount, tile_xy)
     local object = GameObject.item_create {
         do_init = false,
@@ -34,7 +45,12 @@ function M.spawn_item(map, type, amount, tile_xy)
     }
     table.insert(map.instances, object)
     return object
+end
 
+function M.random_store(map, items, area) 
+    local sqr = M.random_store(map, area)
+    if not sqr then return nil end
+    return M.spawn_store(map, items, sqr)
 end
 
 function M.random_item(map, type, amount, area) 
@@ -75,7 +91,6 @@ function M.spawn_decoration(map, sprite, sqr, frame, solid)
 end
 
 function M.spawn_portal(map, sqr, sprite, --[[Optional]] callback, --[[Optional]] frame)
-    print ("Spawning portal at " .. pretty_tostring(sqr))
     local object = GameObject.feature_create {
         do_init = false,
         xy = {sqr[1]*32+16, sqr[2]*32+16},
@@ -93,23 +108,6 @@ function M.random_portal(map, area, sprite, callback, --[[Optional]] frame)
     if not sqr then return nil end
     return M.spawn_portal(map, sqr, sprite, callback, frame)
 end
---
---function M.random_portal_connect(map, area, sprite, portals, direction, portal_key, next_map)
---    local portal = M.random_portal(map, sprite, function(self, user)
---            if not self.connected_map then
---                if type(next_map) == "function" then
---                    self.connected_map = next_map(self, user)
---                else 
---                    self.connected_map = next_map
---                end
---            end
---            local methodname = direction == "start" and "get_end" or "get_start" -- Go to opposite end
---            Maps.transfer(user, self.connected_map, portals[methodname](portals, portal_key))
---    end)
---    local methodname = direction == "start" and "set_start" or "set_end"
---    portals[methodname](portals, portal_key, portal.xy)
---    return portal
---end
 
 function M.map_create(label, size, content, --[[Optional]] flags)
     return MapGen.map_create { 
@@ -139,13 +137,13 @@ function M.area_template_to_map(label, filename, padding, legend)
         MapGen.ORIENT_TURN_90, MapGen.ORIENT_TURN_180, MapGen.ORIENT_TURN_270
     }
     local size = vector_add(area_temp.size, {padding*2,padding*2})
-    if orient == MapGen.ORIENT_TURN_90 or MapGen.ORIENT_TURN_270 then
+    if orient == MapGen.ORIENT_TURN_90 or orient == MapGen.ORIENT_TURN_270 then
         size[1], size[2] = size[2], size[1]
     end
 
-	local map = M.map_create(label, vector_add(area_temp.size, {padding*2,padding*2}), legend['x'].content)
-	area_temp:apply{ map = map, top_left_xy = {padding,padding}, orientation = orient }
-	return map
+    local map = M.map_create(label, size, legend['x'].content)
+    area_temp:apply{ map = map, top_left_xy = {padding,padding}, orientation = orient }
+    return map
 end
 
 return M

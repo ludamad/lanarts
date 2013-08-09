@@ -128,8 +128,16 @@ SUITE(lua_serialize_tests) {
 		tablepair[1] = value1;
 		tablepair[2] = value2;
 
+		// Sanity check
+		tablepair[1].metatable().push();
+		tablepair[2].metatable().push();
+		CHECK(lua_equal(L, -2, -1));
+		lua_pop(L, 2);
+
 		lua_serialize(serializer, L, tablepair);
 		lua_deserialize(serializer, L, tablepair);
+
+		CHECK(tablepair.metatable().isnil());
 
 		CHECK(!tablepair[1].metatable().isnil());
 		CHECK(!tablepair[2].metatable().isnil());

@@ -592,6 +592,7 @@ namespace lua_api {
 	void register_general_api(lua_State* L) {
 		LuaValue globals = luawrap::globals(L);
 		LuaValue registry = luawrap::registry(L);
+
 		luawrap::ensure_table(luawrap::globals(L)["_INTERNAL_IMPORTED"]);
 		luawrap::ensure_table(luawrap::globals(L)["_INTERNAL_LOADERS"]);
 		globals["values"].bind_function(l_itervalues);
@@ -602,7 +603,6 @@ namespace lua_api {
 		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);
 		globals["random"].bind_function(lapi_random);
-		globals["math"]["round"].bind_function(round);
 		globals["randomf"].bind_function(lapi_randomf);
 		globals["random_subregion"].bind_function(lapi_random_subregion);
 		globals["chance"].bind_function(lapi_chance);
@@ -623,5 +623,8 @@ namespace lua_api {
 		string_table["split"].bind_function(lapi_string_split);
 		string_table["join"].bind_function(lapi_string_join);
 		string_table["pack"].bind_function(str_pack);
+
+		LuaValue math = luawrap::ensure_table(globals["math"]);
+		math["round"].bind_function(round);
 	}
 }

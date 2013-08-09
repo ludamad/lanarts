@@ -97,6 +97,7 @@ static inline bool buf_write_if_seen(lua_State* L, SerializeBuffer& buf, int tab
 		if (lua_isnumber(L, -1)) {
 			buf.write_byte(MAR_TREF);
 			buf.write_int(lua_tointeger(L, -1));
+			printf("Writing object with integer ID\n");
 		} else {
 			size_t str_len;
 			const char* str = lua_tolstring(L, -1, &str_len);
@@ -136,14 +137,6 @@ static inline bool buf_try_persist_hook(lua_State *L, SerializeBuffer& buf, size
 	return false;
 }
 
-
-static void pretty_print(LuaField field) {
-	lua_State* L = field.luastate();
-	luawrap::globals(L)["pretty_print"].push();
-	field.push();
-	lua_call(L, 1, 0);
-}
-
 void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) {
 	int val_type = lua_type(L, val);
 	lua_pushvalue(L, val);
@@ -169,11 +162,12 @@ void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) 
 		lua_pushvalue(L, -1);
 		if (!buf_write_if_seen(L, buf, SEEN_IDX)
 				&& !buf_try_persist_hook(L, buf, idx)) {
-			printf("Type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
+			printf("Serializing type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
 			lua_pushinteger(L, (*idx)++);
 			lua_rawset(L, SEEN_IDX);
 
 			if (lua_getmetatable(L, -1)) {
+				printf("Object has metatable %lX\n", lua_topointer(L, -1));
 				// Table with a meta-table
 				buf.write_byte(MAR_TVAL_WITH_META);
 				mar_encode_value(L, buf, -1, idx);
@@ -204,7 +198,7 @@ void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) 
 				luaL_error(L, "attempt to persist a C function '%s'", ar.name);
 			}
 			lua_pushvalue(L, -1);
-			printf("Type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
+			printf("Serializing type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
 			lua_pushinteger(L, (*idx)++);
 			lua_rawset(L, SEEN_IDX);
 
@@ -433,16 +427,17 @@ void mar_decode_value(lua_State* L, const char *buf, size_t len, const char **p,
 		} else if (tag == MAR_TVAL_WITH_META || tag == MAR_TVAL) {
 			lua_newtable(L);
 			lua_pushvalue(L, -1);
-			printf("Type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
+			printf("Decoding type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
 			lua_rawseti(L, SEEN_IDX, (*idx)++);
 			if (tag == MAR_TVAL_WITH_META) {
 				mar_decode_value(L, buf, len, p, idx);
+				printf("Object has metatable %lX\n", lua_topointer(L, -1));
+				printf("Pushed metatable, type=%s\n", lua_typename(L, lua_type(L, -1)));
 				lua_pushvalue(L, -2); // Push for decoding
 			}
 			mar_next_len(l, uint32_t);
 			mar_decode_table(L, *p, l, idx);
 			mar_incr_ptr(l);
-			pretty_print(LuaStackValue(L, -1));
 			if (tag == MAR_TVAL_WITH_META) {
 				lua_pop(L, 1);
 				lua_setmetatable(L, -2);
@@ -473,7 +468,7 @@ void mar_decode_value(lua_State* L, const char *buf, size_t len, const char **p,
 
 			lua_pushvalue(L, -1);
 			lua_rawseti(L, SEEN_IDX, (*idx)++);
-			printf("Type %d = %s\n", *idx -1, lua_typename(L, lua_type(L, -1)));
+			printf("Decoding type %d = %s\n", *idx -1, lua_typename(L, lua_type(L, -1)));
 
 			mar_next_len(l, uint32_t);
 			lua_newtable(L);
@@ -541,7 +536,7 @@ int mar_encode(lua_State* L) {
 		}
 	}
 
-	static size_t idx = 1;
+	size_t idx = luawrap::defaulted(luawrap::registry(L)["serialize_idx"], 1);
 	size_t len = lua_objlen(L, 2);
 	size_t goal = idx + len - 1;
 	for (; idx <= goal; idx++) {
@@ -554,6 +549,7 @@ int mar_encode(lua_State* L) {
 	mar_encode_value(L, *__cheathack_global, -1, &idx);
 	//remove seen table and value copy
 	lua_pop(L, 2);
+	luawrap::registry(L)["serialize_idx"] = idx;
 
 	return 0;
 }
@@ -611,7 +607,7 @@ static void ensure_serialization_state(lua_State* L) {
 			luawrap::registry(L)["serialize_obj2key"], false);
 	lua_pop(L, 1); // pop "_G"
 
-	luawrap::globals(L)["_IMPORTED"].push();
+	luawrap::ensure_table(luawrap::globals(L)["_IMPORTED"]).push();
 	lua_pushnil(L);
 	while (lua_next(L, -2) != 0) {
 		LuaStackValue(L, -1)[1].push(); // unbox
@@ -671,6 +667,15 @@ void lua_serialize(SerializeBuffer& serializer, lua_State* L,
 
 		lua_serialize(serializer, L, 3);
 	}
+}
+
+void lua_clear_serialization_state(lua_State* L) {
+	lua_pushnil(L);
+	luawrap::registry(L)["serialize_obj2key"].pop();
+	lua_pushnil(L);
+	luawrap::registry(L)["serialize_key2obj"].pop();
+	lua_pushnil(L);
+	luawrap::registry(L)["serialize_idx"].pop();
 }
 
 void lua_deserialize(SerializeBuffer& serializer, lua_State* L,

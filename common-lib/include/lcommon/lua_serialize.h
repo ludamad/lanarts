@@ -32,6 +32,9 @@
 #ifndef LCOMMON_LUA_SERIALIZE_H_
 #define LCOMMON_LUA_SERIALIZE_H_
 
+// TODO: Its amazing that the global object naming even works but
+// there is some mess to clean after my vicious hacking
+
 class SerializeBuffer;
 struct lua_State;
 class LuaValue;
@@ -43,6 +46,7 @@ void lua_register_for_serialization(const char* key, LuaField object);
 void lua_serialize(SerializeBuffer& serializer, lua_State* L, const LuaValue& value);
 void lua_deserialize(SerializeBuffer& serializer, lua_State* L, LuaValue& value);
 
+void lua_clear_serialization_state(lua_State* L);
 
 void lua_store_submodule_refs(LuaField dictionary, LuaField submodule);
 

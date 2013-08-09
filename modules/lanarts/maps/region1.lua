@@ -44,7 +44,6 @@ local function connect_map(args)
         end
     end
     for i=1,args.forward_portals do
-        print("Generating forward portal!")
         local portal = map_utils.random_portal(map, map_area, args.sprite_down, nil, args.sprite_down_index)
         MapSeq:forward_portal_add(seq_idx, portal, i, args.next_floor_callback)
     end
@@ -122,13 +121,7 @@ local function generate_store(map, xy)
     for i=1,random(5,10) do
         table.insert(items, item_utils.item_generate(chance(.5) and item_groups.basic_items or item_groups.enchanted_items, true))
     end
-    table.insert(map.instances, GameObject.store_create {
-        xy = {(xy[1]+.5)*Maps.TILE_SIZE, (xy[2]+.5)*Maps.TILE_SIZE},
-        items = items,
-        do_init = false,
-        sprite = "store",
-        frame = random(0,4)
-    })
+    map_utils.spawn_store(map, items, xy)
 end
 
 local function old_map_generate(MapSeq, tileset, offset, max_floor, floor)
@@ -191,7 +184,7 @@ function M.overworld_create()
                     end)
                end},           
            ['D'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor,
-               on_placement = old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {5,5}) },
+               on_placement = old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {1,5}) },
            ['X'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.floor,
                on_placement = old_dungeon_placement_function(OldMapSeq2, TileSets.snake, {6,10}) },
            ['s'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.floor},

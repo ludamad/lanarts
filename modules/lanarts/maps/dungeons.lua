@@ -40,7 +40,7 @@ function M.simple_tunnels(map, width_range, tunnels_per_room, wall_tile, floor_t
 
         fill_operator = { add = {MapGen.FLAG_TUNNEL, MapGen.FLAG_SEETHROUGH}, remove = MapGen.FLAG_SOLID, content = floor_tile},
         perimeter_operator = { 
-            matches_all = MapGen.FLAGS_SOLID, remove = MapGen.FLAG_SEETHROUGH, 
+            matches_all = MapGen.FLAG_SOLID, remove = MapGen.FLAG_SEETHROUGH, 
             add = {MapGen.FLAG_SOLID, MapGen.FLAG_TUNNEL, MapGen.FLAG_PERIMETER}, content = wall_tile},
 
         perimeter_width = padding or 1,

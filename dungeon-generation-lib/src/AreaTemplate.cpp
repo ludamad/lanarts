@@ -65,12 +65,13 @@ namespace ldungeon_gen {
 
 		/* Area of map to apply to: */
 		if (create_subgroup) {
-			BBox rect(xy, _grid->size());
+			Size adjustedsize = (orientation == ORIENT_TURN_90 || orientation == ORIENT_TURN_270) ? Size(h,w) : Size(w,h);
+			BBox rect(xy, adjustedsize);
 			map->make_group(rect, parent_group_id);
 		}
 		BBox grid_rect(Pos(), _grid->size());
 		FOR_EACH_BBOX(grid_rect, x, y) {
-			Pos sqr = reorient(Pos(x,y), Size(w,h), orientation);
+			Pos sqr = xy + reorient(Pos(x,y), Size(w,h), orientation);
 			char chr = (*_grid)[Pos(x,y)];
 			Glyph glyph = _legend[chr];
 

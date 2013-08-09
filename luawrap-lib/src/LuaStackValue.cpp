@@ -88,7 +88,9 @@ LuaStackValue::operator LuaField() const {
 
 LuaValue LuaStackValue::metatable() const {
 	push();
-	lua_getmetatable(L, -1);
+	if (!lua_getmetatable(L, -1)) {
+		lua_pushnil(L);
+	}
 	LuaValue table(L, -1);
 	lua_pop(L, 2);
 	return table;
