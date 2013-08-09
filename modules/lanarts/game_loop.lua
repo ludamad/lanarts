@@ -9,6 +9,7 @@ local M = {} -- Submodule
 local World = import "core.GameWorld"
 local Map = import "core.GameMap"
 local help_overlay = import "@help_overlay"
+local keys = import "core.keyboard"
 
 --- Externally visible control structure for the main loop
 M.loop_control = {

@@ -3,12 +3,13 @@ local InstanceLine = import "core.ui.InstanceLine"
 local TextLabel = import "core.ui.TextLabel"
 local Sprite = import "core.ui.Sprite"
 local utils = import "core.utils"
+local keys = import "core.keyboard"
 
 local winning_screen_font = "modules/core/fonts/MateSC-Regular.ttf"
 
 local function winning_screen_create()
     local box = InstanceBox.create( { size = Display.display_size} )
-    local sprite = Sprite.image_create("modules/lanarts/menus/winning_screen.png")
+    local sprite = Sprite.image_create(path_resolve "winning_screen.png")
 
     box:add_instance(
         sprite,
@@ -65,8 +66,6 @@ local function winning_screen_show(...)
         Display.draw_finish()
         Game.wait(100)
     end
-
-    return false
 end
 
 -- Submodule

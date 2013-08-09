@@ -92,11 +92,13 @@ static Pos seen_square_in_area(MTwist& mt, GameTiles& tiles) {
 	} while (!tiles.is_seen(p) || tiles.is_solid(p));
 	return centered_multiple(p, TILE_SIZE);
 }
-static void spawn_in_lower_level(GameState* gs, PlayerInst* player) {
-	int levelid1 = gs->game_world().get_current_level_id();
-	int levelid2 = (levelid1 > 0) ? levelid1 - 1 : 0;
-	GameMapState* level2 = gs->game_world().get_level(levelid2);
-	Pos sqr = seen_square_in_area(gs->rng(), level2->tiles());
+
+// Assumes overworld == map ID 0
+static void spawn_in_overworld(GameState* gs, PlayerInst* player) {
+	int current_map = gs->game_world().get_current_level_id();
+	int overworld_map = (current_map > 0) ? current_map - 1 : 0;
+	GameMapState* overworld = gs->game_world().get_level(overworld_map);
+	Pos sqr = seen_square_in_area(gs->rng(), overworld->tiles());
 
 	for (int i = 0; i < gs->player_data().all_players().size(); i++) {
 		PlayerDataEntry& pde = gs->player_data().all_players()[i];
@@ -109,11 +111,12 @@ static void spawn_in_lower_level(GameState* gs, PlayerInst* player) {
 			player->is_local_player() ?
 					"You have respawned!" : "Your ally has respawned!",
 			Colour(100, 150, 150));
-	if (levelid1 != levelid2) {
-		gs->game_world().level_move(player->id, sqr.x, sqr.y, levelid1,
-				levelid2);
+	if (current_map != overworld_map) {
+		gs->game_world().level_move(player->id, sqr.x, sqr.y, current_map,
+				overworld_map);
 	} else {
 		player->update_position(sqr.x, sqr.y);
+		gs->view().sharp_center_on(player->pos());
 	}
 }
 
@@ -193,7 +196,7 @@ void PlayerInst::step(GameState* gs) {
 		if (gs->game_settings().regen_on_death) {
 			stats().effects.clear();
 			stats().core.heal_fully();
-			spawn_in_lower_level(gs, this);
+			spawn_in_overworld(gs, this);
 		} else {
 			gs->game_world().reset(0);
 		}

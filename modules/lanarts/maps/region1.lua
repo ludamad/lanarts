@@ -50,7 +50,7 @@ local function connect_map(args)
 end
 
 -- Overworld to template map sequence (from overworld to deeper in the temple)
-local TEMPLE_DEPTH = 3
+local TEMPLE_DEPTH = 4
 
 local function temple_level_base_apply(map, tileset, area)
     MapGen.random_placement_apply { map = map, area = area,
@@ -63,7 +63,7 @@ local function temple_level_base_apply(map, tileset, area)
 end
 
 local function temple_level_create(label, floor, sequences, tileset)
-    local map = map_utils.map_create( label .. ' ' .. floor, {40+floor*5, 40+floor*5}, tileset.wall)
+    local map = map_utils.map_create( label .. ' ' .. floor, {40+floor*10, 40+floor*10}, tileset.wall)
     temple_level_base_apply(map, tileset, bbox_create({4,4}, vector_add(map.size, {-8,-8})))
 
     local map_area = bbox_create({0,0}, map.size)

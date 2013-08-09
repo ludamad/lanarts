@@ -78,7 +78,7 @@ public:
 
 	/* Return false if game should exit*/
 	bool step();
-	bool update_iostate(bool resetprev = true);
+	bool update_iostate(bool resetprev = true, bool trigger_event_handling = true);
 
 	void adjust_view_to_dragging();
 
@@ -248,7 +248,7 @@ public:
 
 	CollisionAvoidance& collision_avoidance();
 private:
-	int handle_event(SDL_Event* event);
+	int handle_event(SDL_Event* event, bool trigger_event_handling = true);
 
 	int _game_timestamp;
 

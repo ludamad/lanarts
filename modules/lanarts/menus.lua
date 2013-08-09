@@ -12,6 +12,7 @@ local PregameMenu = import "@menus.PregameMenu"
 local ScoresMenu = import "@menus.ScoresMenu"
 
 local tasks = import "core.networking.tasks"
+local keys = import "core.keyboard"
 
 -- START SCREEN -- 
 

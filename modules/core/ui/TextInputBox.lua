@@ -1,11 +1,12 @@
 local utils = import "core.utils"
+local keys = import "core.keyboard"
 
 local BLINK_TIME_MS = 600
 local BLINK_HELD_MS = 600
 
 --- An interactive text field, a convenient drawable object wrapper 
 -- over the native (aka C++-implemented) TextInput object. 
-TextInputBox = newtype()
+local TextInputBox = newtype()
 
 --- Create an interactive text field
 -- font: the font to draw with

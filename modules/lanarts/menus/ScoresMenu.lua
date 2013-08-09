@@ -3,6 +3,7 @@ local InstanceGroup = import "core.ui.InstanceGroup"
 local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
 local utils = import "core.utils"
+local keys = import "core.keyboard"
 
 local score_menu_font = "modules/core/fonts/MateSC-Regular.ttf"
 

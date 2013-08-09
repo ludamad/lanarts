@@ -1,4 +1,5 @@
-local sounds = import "lanarts.sounds"
+local sounds = import "@sounds"
+local DeathScreen = import "@menus.DeathScreen"
 
 local M = {} -- Submodule
 
@@ -7,6 +8,7 @@ local events = {}
 function events.PlayerDeath(player)
     local classtable = {Mage=sounds.death_mage, Fighter=sounds.death_fighter, Archer=sounds.death_archer}
     classtable[player.class_name]:play()
+    DeathScreen.show()
     Game.score_board_store()
 end
 
@@ -45,13 +47,13 @@ function M.trigger_event(type, --[[Misc data]] ...)
 end
 
 function M.player_has_won()
-    local winning_screen = import "lanarts.menus.winning_screen"
+    local WinningScreen = import "lanarts.menus.WinningScreen"
     local game_loop_control = (import "lanarts.game_loop").loop_control
 
     Game.wait(400)
     game_loop_control.game_is_over = true
     Game.score_board_store(--[[Store winning entry]] true)
-    winning_screen.show()
+    WinningScreen.show()
 end
 
 return M

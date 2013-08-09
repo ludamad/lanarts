@@ -258,14 +258,14 @@ void GameState::restart() {
 	view().sharp_center_on(p->x, p->y);
 }
 
-int GameState::handle_event(SDL_Event* event) {
+int GameState::handle_event(SDL_Event* event, bool trigger_event_handling) {
 	if (lua_api::luacall_handle_event(luastate(), event)) {
 		return false;
 	}
 
 	GameMapState* level = get_level();
 
-	if (level && level->id() != -1) {
+	if (trigger_event_handling && level && level->id() != -1) {
 		if (hud.handle_event(this, event)) {
 			return false;
 		}
@@ -273,7 +273,7 @@ int GameState::handle_event(SDL_Event* event) {
 
 	return iocontroller.handle_event(event);
 }
-bool GameState::update_iostate(bool resetprev) {
+bool GameState::update_iostate(bool resetprev, bool trigger_event_handling) {
 	/* If 'resetprev', clear the io state for held keys
 	 * and then poll what's currently pressed */
 	if (repeat_actions_counter <= 0) {
@@ -281,7 +281,7 @@ bool GameState::update_iostate(bool resetprev) {
 
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
-			if (handle_event(&event)) {
+			if (handle_event(&event, trigger_event_handling)) {
 				return false;
 			}
 		}
