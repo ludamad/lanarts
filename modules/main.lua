@@ -105,7 +105,7 @@ end
 require_path_add("modules/?.lua")
 
 -- Hardcoded for now!
-local modules = {"core", "lanarts", "tests"}
+local modules = {"core", "lanarts"}--, "tests"}
 
 -- Begin loading all the modules
 for m in values(modules) do
