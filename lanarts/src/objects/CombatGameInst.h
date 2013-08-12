@@ -26,10 +26,10 @@ struct CollisionAvoidanceParameters {
 class CombatGameInst: public GameInst {
 public:
 	CombatGameInst(const CombatStats& base_stats, sprite_id sprite,
-			team_id teamid, int mobid, int x, int y, int radius, bool solid =
+			int x, int y, int radius, bool solid =
 					true, int depth = 0) :
 			GameInst(x, y, radius, solid, depth), rx(x), ry(y), vx(0), vy(0), is_resting(
-					false), teamid(teamid), mobid(mobid), sprite(sprite), simulation_id(
+					false), sprite(sprite), simulation_id(
 					-1), current_target(NONE), base_stats(base_stats) {
 	}
 	CombatGameInst() :
@@ -61,7 +61,6 @@ public:
 			const Weapon& weapon, bool ignore_cooldowns = false);
 	bool projectile_attack(GameState* gs, CombatGameInst* inst,
 			const Weapon& weapon, const Projectile& projectile);
-	//bool spell_attack ...
 	bool attack(GameState* gs, CombatGameInst* inst, const AttackStats& attack);
 
 	virtual void signal_attacked_successfully() {
@@ -90,11 +89,6 @@ public:
 		return sprite;
 	}
 
-	int& combat_mob_id() {
-		return mobid;
-	}
-
-	team_id& team();
 	simul_id& collision_simulation_id();
 
 	obj_id& target() {
@@ -106,8 +100,6 @@ public:
 	float rx, ry;
 protected:
 	bool is_resting;
-	team_id teamid;
-	int mobid;
 	sprite_id sprite;
 	simul_id simulation_id;
 	obj_id current_target;

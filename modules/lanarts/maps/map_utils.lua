@@ -1,6 +1,6 @@
 local GameObject = import "core.GameObject"
 local MapGen = import "core.map_generation"
-local Maps = import "core.maps"
+local GameMap = import "core.GameMap"
 
 local M = {} -- Submodule
 
@@ -121,7 +121,7 @@ end
 
 function M.game_map_create(map, wandering_enabled) 
     if wandering_enabled == nil then wandering_enabled = false end
-    return Maps.create { map = map, label = map.label, instances = map.instances, wandering_enabled = wandering_enabled }
+    return GameMap.create { map = map, label = map.label, instances = map.instances, wandering_enabled = wandering_enabled }
 end
 
 function M.area_template_apply(map, area, filename, legend)

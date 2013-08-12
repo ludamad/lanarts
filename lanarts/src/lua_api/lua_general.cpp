@@ -15,6 +15,7 @@
 #include <luawrap/functions.h>
 #include <luawrap/calls.h>
 #include <lcommon/directory.h>
+#include <lcommon/lua_serialize.h>
 
 #include <lcommon/lua_utils.h>
 
@@ -431,7 +432,9 @@ static int lapi_virtual_path_create_relative(lua_State* L) {
 	// Resolve backtracks, ie every occurrence of < goes up one directory
 	const char* sub_path = lua_tostring(L, 1);
 	const char* base_path = lua_tostring(L, 2);
-	int backtracks = 0;
+	bool drop_filename = (lua_gettop(L) >= 3 && lua_toboolean(L, 3));
+
+	int backtracks = drop_filename ? 1 : 0;
 	while (*sub_path == '<') {
 		backtracks++, sub_path++;
 	}
@@ -440,9 +443,14 @@ static int lapi_virtual_path_create_relative(lua_State* L) {
 	std::string src = (*sub_path== '@' ? sub_path + 1: sub_path);
 	std::string cwd = working_directory();
 
+	// Ensure file extension has been removed
+	if (src.size() >= 4 && strncmp(&src[src.size()-4], ".lua", 4) == 0) {
+		src.resize(src.size()-4);
+	}
+
 	path2dotform(src), path2dotform(cwd);
 	// Chop filename from source, and resolve backtracks
-	for (int i = 0; i < backtracks + 1; i++) {
+	for (int i = 0; i < backtracks; i++) {
 		dotform_chop_component(src);
 	}
 	dotform_chop_trailing_dots(cwd);
@@ -524,7 +532,6 @@ static bool lapi_chance(LuaStackValue val) {
 	return gs->rng().rand(RangeF(0, 1)) < val.to_num();
 }
 
-// TODO: Lazy loading
 static LuaValue lapi_import_internal(LuaStackValue importstring) {
 	lua_State* L = importstring.luastate();
 	LuaValue module = luawrap::globals(L)["_INTERNAL_IMPORTED"][importstring.to_str()];
@@ -541,6 +548,11 @@ static LuaValue lapi_import_internal(LuaStackValue importstring) {
 	ret_table.newtable();
 	ret_table[1] = module;
 	return ret_table;
+}
+
+static LuaStackValue lapi_always_serialize(LuaStackValue value) {
+	lua_register_serialization_mutable(value);
+	return value;
 }
 
 namespace lua_api {
@@ -566,9 +578,9 @@ namespace lua_api {
 		lua_call(L, 1, 0);
 	}
 
-	LuaValue import(lua_State* L, const char* filename) {
+	LuaValue import(lua_State* L, const char* virtual_path) {
 		luawrap::globals(L)["import"].push();
-		lua_pushstring(L, filename);
+		lua_pushstring(L, virtual_path);
 		lua_call(L, 1, 1);
 		return LuaValue::pop_value(L);
 	}
@@ -626,5 +638,14 @@ namespace lua_api {
 
 		LuaValue math = luawrap::ensure_table(globals["math"]);
 		math["round"].bind_function(round);
+
+		// Represents global, mutable data. Only module that is not serialized 'as a constant'.
+		LuaValue global_data(L);
+		global_data.newtable();
+		lua_api::register_lua_submodule(L, "core.GlobalData", global_data);
+		lua_register_serialization_mutable(global_data);
+
+		LuaValue serialization = lua_api::register_lua_submodule(L, "core.serialization");
+		serialization["always_serialize"].bind_function(lapi_always_serialize);
 	}
 }

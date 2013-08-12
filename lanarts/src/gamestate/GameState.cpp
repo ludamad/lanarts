@@ -26,8 +26,6 @@
 #include "draw/draw_sprite.h"
 #include "draw/TileEntry.h"
 
-#include "dungeon_generation/dungeon_data.h"
-
 #include "lua_api/lua_api.h"
 #include "lua_api/lua_newapi.h"
 

@@ -24,18 +24,21 @@ static LuaValue create_protection_table(lua_State* L) {
 	LuaValue val(L);
 	val.newtable();
 	val["__index"].bind_function(error_fallback);
-	lua_register_for_serialization("C;lua_utils;__index", val["__index"]);
+	lua_register_serialization_constant("C;lua_utils;__index", val["__index"]);
 	return val;
 }
 
 /* Protect a lua table from returning nil. */
-void lua_protect_table(const LuaField& field) {
+LuaField lua_protect_table(const LuaField& field) {
 	lua_State* L = field.luastate();
 
 	field.push();
 	luameta_push(L, create_protection_table);
 	lua_setmetatable(L, -2);
 	lua_pop(L, 1); /* Pop field */
+
+	// return table itself for convenience
+	return field;
 }
 
 /* Ensures a table exists here, and create a protected table if not */

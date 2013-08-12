@@ -22,3 +22,6 @@ sprites:
 
   - name: haste effected
     file: modules/lanarts/effects/sprites/i-speed.png
+
+  - name: fire cloud
+    file: modules/lanarts/effects/sprites/fire-cloud.png

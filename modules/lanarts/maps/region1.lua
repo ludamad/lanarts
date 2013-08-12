@@ -1,20 +1,20 @@
-local utils = import "core.utils"
+local Utils = import "core.utils"
 local MapGen = import "core.map_generation"
-local Maps = import "core.maps"
+local GameMap = import "core.GameMap"
 local GameObject = import "core.GameObject"
 local World = import "core.GameWorld"
 
 local TileSets = import "@tiles.tilesets"
 
-local map_utils = import ".map_utils"
+local MapUtils = import ".map_utils"
 local dungeons = import ".dungeons"
 local PortalSet = import ".PortalSet"
 local MapSequence = import ".MapSequence"
 
-local item_utils = import ".item_utils"
-local item_groups = import ".item_groups"
+local ItemUtils = import ".item_utils"
+local ItemGroups = import ".item_groups"
 
-local old_maps = import ".old_maps"
+local OldMaps = import ".old_maps"
 
 local M = {} -- Submodule
 
@@ -36,15 +36,15 @@ local function connect_map(args)
         for iter=1,iterations do
             local portal
             if seq_idx == 2 then
-                portal = map_utils.random_portal(map, map_area, args.sprite_out or args.sprite_up, nil, args.sprite_out_index or args.sprite_up_index)
+                portal = MapUtils.random_portal(map, map_area, args.sprite_out or args.sprite_up, nil, args.sprite_out_index or args.sprite_up_index)
             else
-                portal = map_utils.random_portal(map, map_area, args.sprite_up, nil, args.sprite_up_index)
+                portal = MapUtils.random_portal(map, map_area, args.sprite_up, nil, args.sprite_up_index)
             end
             MapSeq:backward_portal_resolve(seq_idx, portal, i)
         end
     end
     for i=1,args.forward_portals do
-        local portal = map_utils.random_portal(map, map_area, args.sprite_down, nil, args.sprite_down_index)
+        local portal = MapUtils.random_portal(map, map_area, args.sprite_down, nil, args.sprite_down_index)
         MapSeq:forward_portal_add(seq_idx, portal, i, args.next_floor_callback)
     end
 end
@@ -63,7 +63,7 @@ local function temple_level_base_apply(map, tileset, area)
 end
 
 local function temple_level_create(label, floor, sequences, tileset)
-    local map = map_utils.map_create( label .. ' ' .. floor, {40+floor*10, 40+floor*10}, tileset.wall)
+    local map = MapUtils.map_create( label .. ' ' .. floor, {40+floor*10, 40+floor*10}, tileset.wall)
     temple_level_base_apply(map, tileset, bbox_create({4,4}, vector_add(map.size, {-8,-8})))
 
     local map_area = bbox_create({0,0}, map.size)
@@ -88,15 +88,15 @@ local function temple_level_create(label, floor, sequences, tileset)
         done_once = true
     end
 
-    for i=1,floor do map_utils.random_enemy(map, "Skeleton") end
-    for i=1,floor do map_utils.random_enemy(map, "Dark Centaur") end
+    for i=1,floor do MapUtils.random_enemy(map, "Skeleton") end
+    for i=1,floor do MapUtils.random_enemy(map, "Dark Centaur") end
     if floor == TEMPLE_DEPTH then
         for i=1,20 do
-            item_utils.item_object_generate(map, item_groups.basic_items)
+            ItemUtils.item_object_generate(map, ItemGroups.basic_items)
         end
     end
 
-    local map_id = map_utils.game_map_create(map, true)
+    local map_id = MapUtils.game_map_create(map, true)
     for i=1,#sequences do
         sequences[i]:slot_resolve(sequence_ids[i], map_id)
     end
@@ -109,9 +109,9 @@ local function find_player_positions(map, --[[Optional]] flags)
     local positions = {}
     local map_area = bbox_create({0,0},map.size)
     for i=1,World.player_amount do
-        local sqr = map_utils.random_square(map, map_area, --[[Selector]] { matches_all = flags, matches_none = {MapGen.FLAG_SOLID, MapGen.FLAG_HAS_OBJECT} })
+        local sqr = MapUtils.random_square(map, map_area, --[[Selector]] { matches_all = flags, matches_none = {MapGen.FLAG_SOLID, MapGen.FLAG_HAS_OBJECT} })
         if not sqr then error("Could not find player spawn position for player " .. i .. "!") end
-        positions[i] = {(sqr[1]+.5) * Maps.TILE_SIZE, (sqr[2]+.5) * Maps.TILE_SIZE}
+        positions[i] = {(sqr[1]+.5) * GameMap.TILE_SIZE, (sqr[2]+.5) * GameMap.TILE_SIZE}
     end
     return positions
 end
@@ -119,14 +119,14 @@ end
 local function generate_store(map, xy)
     local items = {}
     for i=1,random(5,10) do
-        table.insert(items, item_utils.item_generate(chance(.5) and item_groups.basic_items or item_groups.enchanted_items, true))
+        table.insert(items, ItemUtils.item_generate(chance(.5) and ItemGroups.basic_items or ItemGroups.enchanted_items, true))
     end
-    map_utils.spawn_store(map, items, xy)
+    MapUtils.spawn_store(map, items, xy)
 end
 
 local function old_map_generate(MapSeq, tileset, offset, max_floor, floor)
     floor = floor or 1
-    local map = old_maps.create_map("Dungeon "..floor, floor + offset, tileset)
+    local map = OldMaps.create_map("Dungeon "..floor, floor + offset, tileset)
     local last_floor = (floor >= max_floor)
     local seq_idx = MapSeq:slot_create()
     connect_map {
@@ -141,12 +141,12 @@ local function old_map_generate(MapSeq, tileset, offset, max_floor, floor)
             return old_map_generate(MapSeq, tileset, floor + 1, max_floor, offset)
         end
     }
-    return MapSeq:slot_resolve(seq_idx, map_utils.game_map_create(map, true))
+    return MapSeq:slot_resolve(seq_idx, MapUtils.game_map_create(map, true))
 end
 
 local function old_dungeon_placement_function(MapSeq, tileset, levels)
     return function(map, xy)
-        local portal = map_utils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 12))
+        local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 12))
         MapSeq:forward_portal_add(1, portal, 1, function() 
             return old_map_generate(MapSeq, tileset, levels[1]-1, levels[2]-levels[1]+1) 
         end)
@@ -159,7 +159,11 @@ function M.overworld_create()
     local OldMapSeq2 = MapSequence.create {preallocate = 1}
     local temple_sequences = {}
     local dirthole_sequences = {}
-    local map = map_utils.area_template_to_map("Overworld", 
+
+    -- These squares take the form of a square next to them, after the initial map generation is done
+    local undecided_squares = {}
+
+    local map = MapUtils.area_template_to_map("Overworld", 
     		--[[file path]] path_resolve "region1.txt", 
     		--[[padding]] 4, {
            ['x'] = { add = {MapGen.FLAG_SEETHROUGH, MapGen.FLAG_SOLID}, content = tileset.wall }, 
@@ -169,13 +173,13 @@ function M.overworld_create()
            [':'] = { add = {MapGen.FLAG_SEETHROUGH, FLAG_PLAYERSPAWN}, content = tileset.floor } ,
            ['<'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.dirt, 
                on_placement = function(map, xy)
-                    map_utils.spawn_decoration(map, "anvil", xy)
+                    MapUtils.spawn_decoration(map, "anvil", xy)
                end},
            ['p'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor }, 
            ['t'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.temple.floor }, 
            ['T'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.temple.floor,
                on_placement = function(map, xy)
-                    local portal = map_utils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 11))
+                    local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 11))
                     local seq_len = #temple_sequences
                     temple_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
                     temple_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
@@ -190,30 +194,30 @@ function M.overworld_create()
            ['s'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.floor},
            ['w'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.floor,
                on_placement = function(map, xy)
-                    map_utils.spawn_decoration(map, "warning_skull", xy, 0, false)
+                    MapUtils.spawn_decoration(map, "warning_skull", xy, 0, false)
                end},
            ['S'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor, 
            			on_placement = function(map, xy) 
            				if chance(.4) then 
            					generate_store(map, xy)
            				else
-           					map:set(xy, map:get({xy[1] - 1, xy[2]}))
+                            table.insert(undecided_squares, xy)
            				end
            			end },
            ['i'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor, 
                     on_placement = function(map, xy)
-                        local item = item_utils.item_generate(item_groups.enchanted_items)
-                        map:set(xy, map:get({xy[1] - 1, xy[2]}))
-                        map_utils.spawn_item(map, item.type, item.amount, xy)
+                        local item = ItemUtils.item_generate(ItemGroups.enchanted_items)
+                        table.insert(undecided_squares, xy)
+                        MapUtils.spawn_item(map, item.type, item.amount, xy)
                     end },           
            ['e'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor, 
                     on_placement = function(map, xy)
-                        local enemy = old_maps.enemy_generate(old_maps.harder_enemies)
-                        map_utils.spawn_enemy(map, enemy, xy)
+                        local enemy = OldMaps.enemy_generate(OldMaps.harder_enemies)
+                        MapUtils.spawn_enemy(map, enemy, xy)
                     end },
            ['G'] =  { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor,
                on_placement = function(map, xy)
-                    local portal = map_utils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(0, 2))
+                    local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(0, 2))
                     local seq_len = #dirthole_sequences
                     dirthole_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
                     dirthole_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
@@ -223,9 +227,14 @@ function M.overworld_create()
                end}
     })
 
-    old_maps.generate_from_enemy_entries(map, old_maps.medium_animals, 20)
+    -- For all undecided squares, copy over the square from the left
+    for xy in values(undecided_squares) do
+        map:set(xy, map:get({xy[1] - 1, xy[2]})) 
+    end
 
-    local map_id = map_utils.game_map_create(map)
+    OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 20)
+
+    local map_id = MapUtils.game_map_create(map)
     OldMapSeq1:slot_resolve(1, map_id)
     OldMapSeq2:slot_resolve(1, map_id)
     for MapSeq in values(temple_sequences) do

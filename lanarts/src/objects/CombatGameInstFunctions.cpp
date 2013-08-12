@@ -51,6 +51,7 @@ float estimate_inst_path_distance(CombatGameInst* inst1,
 static bool player_inst_can_see(PlayerInst* player, CombatGameInst* inst2) {
 	return player->within_field_of_view(inst2->pos());
 }
+
 bool inst_can_see(CombatGameInst *inst1, CombatGameInst *inst2) {
 	PlayerInst* p;
 	if ((p = dynamic_cast<PlayerInst*>(inst1))) {
@@ -68,7 +69,6 @@ CombatGameInst* find_closest_hostile(GameState* gs, CombatGameInst* inst,
 	GameView view(0, 0, PATHING_RADIUS * 2, PATHING_RADIUS * 2, gs->width(),
 			gs->height());
 
-	TeamRelations& teams = gs->teams();
 	float min_dist = HUGE_DISTANCE;
 	CombatGameInst* closest_inst = NULL;
 
@@ -80,20 +80,24 @@ CombatGameInst* find_closest_hostile(GameState* gs, CombatGameInst* inst,
 			if (view.within_view(inst->bbox())) {
 				keep_chasing = true;
 			}
-
 		}
 
 		if (!keep_chasing && !inst_can_see(inst, candidates[i])) {
 			continue;
 		}
-		if (!insts_are_hostile(teams, inst, candidates[i])) {
+
+		float dist = inst_distance(inst, candidates[i]);
+		if (dist >= min_dist) {
 			continue;
 		}
-		float dist = inst_distance(inst, candidates[i]);
-		if (dist < min_dist) {
-			min_dist = dist;
-			closest_inst = candidates[i];
+
+		if (!teamrelations_is_hostile(inst, candidates[i])) {
+			continue;
 		}
+
+		// If we are here, this is a better candidate than any previous
+		min_dist = dist;
+		closest_inst = candidates[i];
 	}
 	return closest_inst;
 }

@@ -353,10 +353,6 @@ void CombatGameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read(estats);
 }
 
-team_id& CombatGameInst::team() {
-	return teamid;
-}
-
 ClassStats& CombatGameInst::class_stats() {
 	return stats().class_stats;
 }

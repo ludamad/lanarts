@@ -38,19 +38,6 @@ void GameMapState::copy_to(GameMapState & room) const {
 //	level.steps_left = this->steps_left;
 }
 
-int GameMapState::room_within(const Pos& p) {
-	for (int i = 0; i < rooms.size(); i++) {
-		int px = p.x / TILE_SIZE, py = p.y / TILE_SIZE;
-		const Region & r = rooms[i].region;
-		if (r.x <= px && r.x + r.w >= px) {
-			if (r.y <= py && r.y + r.h >= py) {
-				return i;
-			}
-		}
-	}
-	return -1;
-}
-
 GameMapState* GameMapState::clone() const {
 	GameMapState* state = new GameMapState(_levelid, _size, _is_simulation);
 	copy_to(*state);
@@ -67,7 +54,6 @@ static void update_player_fields_of_view(GameState* gs) {
 void GameMapState::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write_container(exits);
 	serializer.write_container(entrances);
-	serializer.write_container(rooms);
 	serializer.write(_label);
 	serializer.write(_levelid);
 	serializer.write(_steps_left);
@@ -82,7 +68,6 @@ void GameMapState::serialize(GameState* gs, SerializeBuffer& serializer) {
 void GameMapState::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read_container(exits);
 	serializer.read_container(entrances);
-	serializer.read_container(rooms);
 	serializer.read(_label);
 	serializer.read(_levelid);
 	serializer.read(_steps_left);

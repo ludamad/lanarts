@@ -14,8 +14,6 @@
 
 #include "draw/TileEntry.h"
 
-#include "dungeon_generation/levelgen.h"
-
 #include "objects/player/PlayerInst.h"
 
 #include <lcommon/SerializeBuffer.h>

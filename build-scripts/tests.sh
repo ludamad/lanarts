@@ -26,5 +26,5 @@ function highlight {
 # Run lanarts tests
 
 cd ../lanarts
-../lanarts_build/src/lanarts/lanarts_tests | highlight
+../lanarts_build/lanarts/lanarts_tests | highlight
 

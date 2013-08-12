@@ -1,7 +1,7 @@
 --- Represents a linear group of maps, such as a deepening dungeon
 
 local PortalSet = import ".PortalSet"
-local Maps = import "core.maps"
+local GameMap = import "core.GameMap"
 local MapSequence = newtype()
 
 function MapSequence:init(--[[Optional]] args)
@@ -43,7 +43,7 @@ function MapSequence:forward_portal_add(idx, portal, key, create_map_function)
         self:slot_resolve(idx + 1, self:_get_map_id(idx+1) or create_map_function(portal, user))
         create_map_function = nil -- Serialization optimization
         print ("Transferring using portal '" .. (idx + 1) .. "', square = " .. pretty_tostring(forward_portals:get_end(key)))
-        Maps.transfer(user, self:_get_map_id(idx+1), forward_portals:get_end(key))
+        GameMap.transfer(user, self:_get_map_id(idx+1), forward_portals:get_end(key))
     end
 end
 
@@ -55,7 +55,7 @@ function MapSequence:backward_portal_resolve(idx, portal, key)
     local back_portals = self.maps[idx].back_portals
     back_portals:set_end(key, portal.xy)
     portal.on_player_interact = function(portal, user)
-        Maps.transfer(user, self:_get_map_id(idx - 1), back_portals:get_start(key))
+        GameMap.transfer(user, self:_get_map_id(idx - 1), back_portals:get_start(key))
     end
 end
 

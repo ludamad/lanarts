@@ -88,8 +88,18 @@ int main(int argc, char** argv) {
 
 	LuaValue engine = luawrap::globals(L)["Engine"];
 
+	bool did_exit, should_continue;
+
+	engine["main"].push();
+	should_continue = luawrap::call<bool>(L,
+			std::vector<std::string>(argv + 1, argv + argc));
+	if (!should_continue) {
+		/* User has quit! */
+		goto label_Quit;
+	}
+
 	engine["menu_start"].push();
-	bool did_exit = !luawrap::call<bool>(L);
+	did_exit = !luawrap::call<bool>(L);
 	save_settings_data(gs->game_settings(), "saves/saved_settings.yaml"); // Save settings from menu
 	if (did_exit) {
 		/* User has quit! */

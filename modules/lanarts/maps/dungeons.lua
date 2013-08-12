@@ -1,6 +1,5 @@
 local utils = import "core.utils"
 local MapGen = import "core.map_generation"
-local Maps = import "core.maps"
 local GameObject = import "core.GameObject"
 
 local TileSets = import "@tiles.tilesets"

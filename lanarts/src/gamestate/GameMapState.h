@@ -11,7 +11,6 @@
 #include <lcommon/geometry.h>
 
 #include "collision_avoidance/CollisionAvoidance.h"
-#include "dungeon_generation/GeneratedRoom.h"
 #include "objects/enemy/MonsterController.h"
 #include "pathfind/WanderMap.h"
 
@@ -40,7 +39,6 @@ public:
 			bool wandering_flag = true, bool is_simulation = false);
 	~GameMapState();
 
-	int room_within(const Pos& p);
 	void copy_to(GameMapState & level) const;
 	GameMapState* clone() const;
 
@@ -94,7 +92,6 @@ public:
 	}
 public:
 	std::vector<GameRoomPortal> exits, entrances;
-	std::vector<RoomRegion> rooms;
 private:
 	std::string _label;
 	level_id _levelid;

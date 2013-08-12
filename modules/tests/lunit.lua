@@ -597,13 +597,6 @@ local function in_patternmap(map, name)
   return false
 end
 
-
-
-
-
-
-
-
 -- Called from 'lunit' shell script.
 
 function main(argv)
@@ -617,12 +610,10 @@ function main(argv)
     end
   end
 
-  local function loadtestcase(filename)
-    if not is_string(filename) then
+  local function loadtestcase(vpath)
+    if not is_string(vpath) then
       return error("lunit.main: invalid argument")
     end
-    filename = filename:split('.lua')[1] .. '/dummy.lua'
-    local vpath = virtual_path_create_relative(filename, "modules") 
     local ok, runner = pcall( import, vpath)
     if not ok then
       return error("Cannot load test-case '" .. vpath .. "'" .. tostring(runner))
@@ -658,7 +649,7 @@ function main(argv)
     end
   end
 
-  loadrunner(runner or "test.lunit-console")
+  loadrunner(runner or "tests.lunit-console")
 
   if doloadonly then
     return loadonly()

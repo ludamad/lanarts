@@ -32,27 +32,28 @@ static char GAMESTATE_KEY[] = "";
 namespace lua_api {
 
 	void luacall_game_won(lua_State* L) {
-		luawrap::globals(L)["Engine"].push();
-		lua_getfield(L, -1, "game_won");
+		luawrap::globals(L)["Engine"]["game_won"].push();
 		luawrap::call<void>(L);
-		// pop engine table
-		lua_pop(L, 1);
 	}
 
 	void event_player_death(lua_State* L, PlayerInst* player) {
-		luawrap::globals(L)["Engine"].push();
-		lua_getfield(L, -1, "event_occurred");
+		luawrap::globals(L)["Engine"]["event_occurred"].push();
 		luawrap::call<void>(L, "PlayerDeath", (GameInst*) player);
-		// pop engine table
-		lua_pop(L, 1);
+	}
+
+	void event_player_init(lua_State* L, PlayerInst* player) {
+		luawrap::globals(L)["Engine"]["event_occurred"].push();
+		luawrap::call<void>(L, "PlayerInit", (GameInst*) player);
+	}
+
+	void event_monster_init(lua_State* L, EnemyInst* enemy) {
+		luawrap::globals(L)["Engine"]["event_occurred"].push();
+		luawrap::call<void>(L, "MonsterInit", (GameInst*) enemy);
 	}
 
 	void event_monster_death(lua_State* L, EnemyInst* enemy) {
-		luawrap::globals(L)["Engine"].push();
-		lua_getfield(L, -1, "event_occurred");
+		luawrap::globals(L)["Engine"]["event_occurred"].push();
 		luawrap::call<void>(L, "MonsterDeath", (GameInst*) enemy);
-		// pop engine table
-		lua_pop(L, 1);
 	}
 
 	LuaValue global_getters(lua_State* L) {

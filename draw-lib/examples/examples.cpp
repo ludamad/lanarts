@@ -129,7 +129,7 @@ static void draw_animation() {
 	animation.draw(DrawOptions().origin(CENTER).frame(frame), center);
 }
 
-lua_State* L;
+static lua_State* L;
 
 static void draw_script() {
 	ldraw::Font fpsfont("sample.ttf", 40);

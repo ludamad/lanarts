@@ -7,6 +7,7 @@ FIND_PACKAGE(SDL_mixer REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
+
 set( SRC ..)
 set( DEPS ../dependencies)
 

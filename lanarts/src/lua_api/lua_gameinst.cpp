@@ -299,7 +299,7 @@ static GameInst* enemy_create(LuaStackValue args) {
 	GameState* gs = lua_api::gamestate(args);
 	int etype = get_enemy_by_name(args["type"].to_str());
 	Pos xy = args["xy"].as<Pos>();
-	EnemyInst* inst = new EnemyInst(etype, xy.x, xy.y, gs->teams().default_enemy_team());
+	EnemyInst* inst = new EnemyInst(etype, xy.x, xy.y);
 	return do_instance_init(gs, inst, args);
 }
 

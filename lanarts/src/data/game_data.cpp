@@ -41,27 +41,19 @@ void load_weapon_data(lua_State* L, const FilenameList& filenames,
 
 LuaValue load_spell_data(lua_State* L, const FilenameList& filenames);
 
-LuaValue load_itemgenlist_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_enemy_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_effect_data(lua_State* L, const FilenameList& filenames);
-LuaValue load_dungeon_data(lua_State* L, const FilenameList& filenames);
 LuaValue load_class_data(lua_State* L, const FilenameList& filenames);
-
-void load_area_template_data(const FilenameList& filenames);
 
 /* Definition of game data */
 
 std::vector<ClassEntry> game_class_data;
 std::vector<EffectEntry> game_effect_data;
 std::vector<EnemyEntry> game_enemy_data;
-std::vector<ItemGenList> game_itemgenlist_data;
 std::vector<TileEntry> game_tile_data;
 std::vector<TilesetEntry> game_tileset_data;
 std::vector<SpellEntry> game_spell_data;
 std::vector<SpriteEntry> game_sprite_data;
-std::vector<RoomGenSettings> game_dungeon_yaml;
-
-DungeonBranch game_dungeon_data[1] = { };
 
 template<typename T>
 static int get_X_by_name(const T& t, const char* name, bool error_if_not_found =
@@ -145,11 +137,6 @@ enemy_id get_enemy_by_name(const char* name, bool error_if_not_found) {
 	return get_X_by_name(game_enemy_data, name, error_if_not_found);
 }
 
-itemgenlist_id get_itemgenlist_by_name(const char* name,
-		bool error_if_not_found) {
-	return get_X_by_name(game_itemgenlist_data, name, error_if_not_found);
-}
-
 tileset_id get_tileset_by_name(const char* name) {
 	return get_X_by_name(game_tileset_data, name);
 }
@@ -187,7 +174,7 @@ tileset_id tileset_from_lua(lua_State* L, int idx) {
 }
 
 LuaValue lua_sprites, lua_armours, lua_enemies, lua_effects, lua_weapons,
-		lua_projectiles, lua_items, lua_dungeon, lua_classes, lua_spells;
+		lua_projectiles, lua_items, lua_classes, lua_spells;
 
 LuaValue lua_settings;
 
@@ -245,14 +232,7 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 	lua_enemies = load_enemy_data(L, dfiles.enemy_files);
 	update_loading_screen(L, 60, "Loading Item Generation Templates");
 
-	load_itemgenlist_data(L, dfiles.itemgenlist_files);
-
-	update_loading_screen(L, 70, "Loading Dungeon Areas");
-	load_area_template_data(dfiles.room_template_files);
-	update_loading_screen(L, 80, "Loading Dungeon Generation Templates");
-	lua_dungeon = load_dungeon_data(L, dfiles.map_files);
 	update_loading_screen(L, 90, "Loading Classes");
-	lua_dungeon.clear();
 	lua_classes = load_class_data(L, dfiles.class_files);
 	update_loading_screen(L, 100, "Complete!");
 
@@ -327,10 +307,5 @@ void luayaml_push_sprites(lua_State* L, const char* name) {
 }
 void luayaml_push_enemies(lua_State* L, const char* name) {
 	luayaml_push(lua_enemies, L, name);
-	LANARTS_ASSERT(!lua_isnil(L, -1));
-}
-
-void luayaml_push_levelinfo(lua_State* L, const char* name) {
-	luayaml_push(lua_dungeon, L, name);
 	LANARTS_ASSERT(!lua_isnil(L, -1));
 }

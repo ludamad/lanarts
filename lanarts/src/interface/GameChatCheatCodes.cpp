@@ -11,8 +11,6 @@
 
 #include "stats/items/ItemEntry.h"
 
-#include "dungeon_generation/enemygen.h"
-
 #include "objects/player/PlayerInst.h"
 
 #include "lua_api/lua_api.h"
@@ -36,6 +34,25 @@ static bool starts_with(const std::string& str, const char* prefix,
 	return false;
 }
 
+//Used for !spawn command
+static void generate_enemies(GameState* gs, enemy_id etype,
+                int amount) {
+        MTwist& mt = gs->rng();
+        GameTiles& tiles = gs->tiles();
+
+        for (int i = 0; i < amount; i++) {
+                Pos epos;
+                int tries = 0;
+                do {
+                        int rand_x = mt.rand(tiles.tile_width());
+                        int rand_y = mt.rand(tiles.tile_height());
+                        epos = centered_multiple(Pos(rand_x, rand_y), TILE_SIZE);
+                } while (gs->solid_test(NULL, epos.x, epos.y, 15));
+                gs->add_instance(new EnemyInst(etype, epos.x, epos.y));
+        }
+}
+
+
 static bool handle_spawn_enemies(GameState* gs, const std::string& command) {
 	ChatMessage printed;
 	const char* content;
@@ -53,7 +70,7 @@ static bool handle_spawn_enemies(GameState* gs, const std::string& command) {
 			printed.message_colour = Colour(255, 50, 50);
 		} else {
 			printed.message = std::string(rest) + " has spawned !";
-			generate_enemy_after_level_creation(gs, enemy, amnt);
+			generate_enemies(gs, enemy, amnt);
 			printed.message_colour = Colour(50, 255, 50);
 		}
 		gs->game_chat().add_message(printed);

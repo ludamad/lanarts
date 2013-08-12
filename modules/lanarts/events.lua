@@ -1,26 +1,34 @@
-local sounds = import "@sounds"
+local Sounds = import "@sounds"
 local DeathScreen = import "@menus.DeathScreen"
+local PlayerFunctions = import "@players"
+local Relations = import "@objects.relations"
 
 local M = {} -- Submodule
 
 local events = {}
 
+events.PlayerInit = PlayerFunctions.player_init
+
 function events.PlayerDeath(player)
-    local classtable = {Mage=sounds.death_mage, Fighter=sounds.death_fighter, Archer=sounds.death_archer}
+    local classtable = {Mage=Sounds.death_mage, Fighter=Sounds.death_fighter, Archer=Sounds.death_archer}
     classtable[player.class_name]:play()
     DeathScreen.show()
     Game.score_board_store()
 end
 
+function events.MonsterInit(monster)
+    monster.team = Relations.TEAM_MONSTER_ROOT
+end
+
 function events.MonsterDeath(monster)
-    local monstersounds = { ["Giant Rat"]=sounds.death_rat ,
-                            ["Giant Bat"]=sounds.death_bat ,
-                            ["Giant Spider"]=sounds.death_spider ,
-                            ["Hound"]=sounds.death_hound ,
-                            ["Sheep"]=sounds.death_sheep ,
-                            ["Giant Frog"]=sounds.death_frog ,
-                            ["Green Slime"]=sounds.death_slime ,
-                            ["Red Slime"]=sounds.death_slime                           
+    local monstersounds = { ["Giant Rat"]=Sounds.death_rat ,
+                            ["Giant Bat"]=Sounds.death_bat ,
+                            ["Giant Spider"]=Sounds.death_spider ,
+                            ["Hound"]=Sounds.death_hound ,
+                            ["Sheep"]=Sounds.death_sheep ,
+                            ["Giant Frog"]=Sounds.death_frog ,
+                            ["Green Slime"]=Sounds.death_slime ,
+                            ["Red Slime"]=Sounds.death_slime                           
                         }
     if monstersounds[monster.name] ~= nil then
         monstersounds[monster.name]:play()

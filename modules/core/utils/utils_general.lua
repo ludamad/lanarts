@@ -93,6 +93,7 @@ function table.clone(t)
     table.copy(newt, t)
     return newt
 end
+
 function table.pop_first(t)
     local len = #t
     if len == 0 then 
@@ -121,9 +122,34 @@ function table.pop_last(t)
     return val    
 end
 
+function table.contains(t, val)
+    for i=1,#t do 
+        if t[i] == val then 
+            return true
+        end
+    end
+    return false
+end
+
+--- NOTE: Operates on array portion of table
+-- Removes all occurences of 'val' from the table, compacting it
+function table.remove_occurences(t, val)
+    local new_len = 1
+    -- Compact array
+    for i = 1, #t do
+        if t[i] ~= val then
+            t[new_len] = t[i]
+            new_len = new_len + 1
+        end
+    end
+    for i = new_len+1, #t do
+        t[i] = nil -- delete values at end
+    end
+end
+
 function table.insert_all(t1, t2)
     for v in values(t2) do
-        t1[#t1] = v
+        t1[#t1 + 1] = v
     end
 end
 

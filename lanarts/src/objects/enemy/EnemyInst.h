@@ -9,7 +9,6 @@
 #include "stats/stats.h"
 #include "../CombatGameInst.h"
 #include "../GameInst.h"
-#include "EnemyAIState.h"
 
 #include "EnemyBehaviour.h"
 
@@ -17,7 +16,7 @@
 
 class EnemyInst : public CombatGameInst {
 public:
-	EnemyInst(int enemytype, int x, int y, int teamid, int mobid = -1);
+	EnemyInst(int enemytype, int x, int y);
 	virtual ~EnemyInst();
 
 	virtual void init(GameState* gs);
@@ -49,7 +48,6 @@ private:
 	int enemytype;
 	EnemyBehaviour eb;
 	int enemy_regen_cooloff;
-//	EnemyAIState ai_state;
 	int xpgain;
 };
 

@@ -48,7 +48,6 @@ public:
 
 	void reset(int keep = 0);
 	void regen_level(int roomid);
-	void place_inst(GeneratedRoom& genlevel, GameInst* inst);
 	GameMapState* get_current_level() {
 		return lvl;
 	}
@@ -61,9 +60,7 @@ public:
 	EnemiesSeen& enemies_seen() {
 		return _enemies_seen;
 	}
-	TeamRelations& teams() {
-		return _teams;
-	}
+
 	int number_of_levels() {
 		return level_states.size();
 	}
@@ -82,7 +79,6 @@ private:
 
 	EnemiesSeen _enemies_seen;
 	PlayerData _player_data;
-	TeamRelations _teams;
 
 	GameMapState* lvl;
 	GameState* gs;

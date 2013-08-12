@@ -85,7 +85,7 @@ function begin()
     end
   end
 
-  printformat("Loaded testsuite with %d tests in %d testcases.\n\n", total_tests, total_tc)
+  printformat("Loaded testsuite with %d tests in %d testcases.\n", total_tests, total_tc)
 end
 
 
@@ -120,8 +120,7 @@ end
 
 
 function done()
-  printformat("\n\n%d Assertions checked.\n", lunit.stats.assertions )
-  print()
+  printformat("\n%d Assertions checked.\n", lunit.stats.assertions )
 
   for i, msg in ipairs(msgs) do
     printformat( "%3d) %s\n", i, msg )
@@ -130,9 +129,5 @@ function done()
   printformat("Testsuite finished (%d passed, %d failed, %d errors).\n",
       lunit.stats.passed, lunit.stats.failed, lunit.stats.errors )
 end
-
-
-
-
 
 return _G["lunit-console"]

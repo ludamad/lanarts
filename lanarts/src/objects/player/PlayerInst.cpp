@@ -20,6 +20,8 @@
 
 #include <lcommon/math_util.h>
 
+#include "lua_api/lua_newapi.h"
+
 #include "../enemy/EnemyInst.h"
 
 #include "../AnimatedInst.h"
@@ -29,7 +31,7 @@
 
 PlayerInst::PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y,
 		bool local) :
-		CombatGameInst(stats, sprite, NONE, -1, x, y, RADIUS, true, DEPTH), actions_set_for_turn(
+		CombatGameInst(stats, sprite, x, y, RADIUS, true, DEPTH), actions_set_for_turn(
 				false), fieldofview(LINEOFSIGHT), local(local), moving(0), autouse_mana_potion_try_count(
 				0), previous_spellselect(0), spellselect(-1) {
 	last_chosen_weaponclass = "unarmed";
@@ -51,14 +53,14 @@ PlayerDataEntry& PlayerInst::player_entry(GameState* gs) const {
 void PlayerInst::init(GameState* gs) {
 	CombatGameInst::init(gs);
 
-	teamid = gs->teams().default_player_team();
-
 	_score_stats.deepest_floor = std::max(_score_stats.deepest_floor, current_floor);
 
 	_path_to_player.initialize(gs->tiles().solidity_map());
 	_path_to_player.fill_paths_in_radius(pos(), PLAYER_PATHING_RADIUS);
 	collision_simulation_id() = gs->collision_avoidance().add_player_object(
 			this);
+
+	lua_api::event_player_init(gs->luastate(), this);
 }
 
 PlayerInst::~PlayerInst() {

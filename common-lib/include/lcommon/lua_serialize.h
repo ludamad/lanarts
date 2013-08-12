@@ -42,13 +42,15 @@ class LuaValue;
 void lua_serialize(SerializeBuffer& serializer, lua_State* L, int nargs);
 void lua_deserialize(SerializeBuffer& serializer, lua_State* L, int nargs);
 
-void lua_register_for_serialization(const char* key, LuaField object);
+void lua_register_serialization_constant(const char* key, LuaField object);
+// Often not required, however it is necessary for mutable submodules and the like
+// As well, it is safer to be explicit
+void lua_register_serialization_mutable(LuaField object);
+
 void lua_serialize(SerializeBuffer& serializer, lua_State* L, const LuaValue& value);
 void lua_deserialize(SerializeBuffer& serializer, lua_State* L, LuaValue& value);
 
 void lua_clear_serialization_state(lua_State* L);
-
-void lua_store_submodule_refs(LuaField dictionary, LuaField submodule);
 
 // Metatable-based class wrapped for SerializeBuffer in Lua.
 // Makes it possible to push SerializeBuffer's with luawrap.

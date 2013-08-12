@@ -278,9 +278,24 @@ static void mar_handle_persist_closure(lua_State* L, const char *buf, size_t len
 
 void lua_store_submodule_refs(LuaField submodule, const char* name, LuaField str2obj_table, LuaField obj2str_table, bool recurse = true);
 
+static bool object_was_marked_mutable(LuaField value) {
+	lua_State* L = value.luastate();
+	luawrap::registry(L)["serialize_always"].push();
+	value.push();
+	lua_rawget(L, -2);
+	bool wasnil = lua_isnil(L, -1);
+	lua_pop(L, 2); // table & value
+	return !wasnil;
+}
+
 static void store_object(LuaField key, LuaField value, LuaField str2obj_table, LuaField obj2str_table, bool recurse = true) {
 	lua_State* L = key.luastate();
 	int ntop = lua_gettop(L);
+
+	if (object_was_marked_mutable(value)) {
+		printf("Object %s was marked mutable and will not be treated as a constant.\n", key.to_str());
+		return;
+	}
 
 	// Store the string->object pair
 	str2obj_table.push();
@@ -316,10 +331,20 @@ static void store_object(LuaField key, LuaField value, LuaField str2obj_table, L
 	lua_settop(L, ntop);
 }
 
-void lua_register_for_serialization(const char* key, LuaField object) {
+void lua_register_serialization_constant(const char* key, LuaField object) {
 	lua_State* L = object.luastate();
-	LuaField table = luawrap::ensure_table(luawrap::registry(L)["serialize_registered"]);
+	LuaField table = luawrap::ensure_table(luawrap::registry(L)["serialize_never"]);
 	table[key] = object;
+}
+
+void lua_register_serialization_mutable(LuaField object) {
+	lua_State* L = object.luastate();
+	LuaField table = luawrap::ensure_table(luawrap::registry(L)["serialize_always"]);
+	table.push();
+	object.push();
+	lua_pushboolean(L, true); // Arbitrary non-nil value
+	lua_rawset(L, -3);
+	lua_pop(L, 1); // Table
 }
 
 // TODO: Less hackish
@@ -597,6 +622,9 @@ static void ensure_serialization_state(lua_State* L) {
 	if (!luawrap::registry(L)["serialize_key2obj"].isnil()) {
 		return;
 	}
+	luawrap::ensure_table(luawrap::registry(L)["serialize_never"]);
+	luawrap::ensure_table(luawrap::registry(L)["serialize_always"]);
+
 	luawrap::registry(L)["serialize_key2obj"].newtable();
 	luawrap::registry(L)["serialize_obj2key"].newtable();
 
@@ -620,7 +648,7 @@ static void ensure_serialization_state(lua_State* L) {
 	}
 	lua_pop(L, 1);
 
-	luawrap::registry(L)["serialize_registered"].push();
+	luawrap::registry(L)["serialize_never"].push();
 	if (lua_isnil(L, -1)) {
 		lua_pop(L, 1);
 		return;

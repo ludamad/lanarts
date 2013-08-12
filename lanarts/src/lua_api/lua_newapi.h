@@ -73,7 +73,7 @@ namespace lua_api {
 	void register_api(GameState* gs, lua_State* L);
 
 	void pretty_print(LuaField field);
-	LuaValue import(lua_State* L, const char* filename);
+	LuaValue import(lua_State* L, const char* virtual_path);
 
 	// Callbacks into the lua VM:
 	bool luacall_handle_event(lua_State* L, SDL_Event* e);
@@ -81,8 +81,10 @@ namespace lua_api {
 	void luacall_post_draw(lua_State* L);
 	void luacall_hitsound(lua_State* L);
 
+	void event_player_init(lua_State* L, PlayerInst* player);
 	void event_player_death(lua_State* L, PlayerInst* player);
-	void event_monster_death(lua_State* L, EnemyInst* player);
+	void event_monster_init(lua_State* L, EnemyInst* enemy);
+	void event_monster_death(lua_State* L, EnemyInst* enemy);
 	void event_projectile_hit(lua_State* L, ProjectileInst* projectile, GameInst* target);
 
 	void luacall_game_won(lua_State* L);
@@ -90,6 +92,5 @@ namespace lua_api {
 	// Lua utilities:
 	int l_itervalues(lua_State* L);
 }
-
 
 #endif /* LUA_NEWAPI_H_ */

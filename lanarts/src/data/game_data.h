@@ -14,7 +14,6 @@
 
 #include "gamestate/GameSettings.h"
 #include "gamestate/tileset_data.h"
-#include "dungeon_generation/dungeon_data.h"
 #include "objects/enemy/EnemyEntry.h"
 
 #include "stats/items/EquipmentEntry.h"
@@ -24,7 +23,6 @@
 #include "stats/ClassEntry.h"
 #include "stats/effect_data.h"
 #include "stats/items/ItemEntry.h"
-#include "stats/itemgen_data.h"
 #include "stats/SpellEntry.h"
 
 #include "datafilenames.h"

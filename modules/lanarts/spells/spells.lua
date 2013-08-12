@@ -171,3 +171,6 @@ function PowerStrike.autotarget_func(caster)
 end
 
 Data.spell_create(PowerStrike)
+
+-- FIRE CLOUD
+

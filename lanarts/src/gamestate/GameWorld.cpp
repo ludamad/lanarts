@@ -7,7 +7,6 @@
 #include <typeinfo>
 
 #include "draw/TileEntry.h"
-#include "dungeon_generation/levelgen.h"
 
 #include "objects/enemy/EnemyInst.h"
 
@@ -43,23 +42,6 @@ void GameWorld::generate_room(GameMapState* level) {
 
 level_id GameWorld::get_current_level_id() {
 	return gs->get_level()->id();
-}
-
-void GameWorld::place_inst(GeneratedRoom& genlevel, GameInst* inst) {
-	GameTiles& tiles = gs->tiles();
-	Pos epos;
-	do {
-		epos = generate_location(gs->rng(), genlevel);
-	} while (!genlevel.at(epos).passable || genlevel.at(epos).has_instance);
-
-	genlevel.at(epos).has_instance = true;
-	Pos spawn_pos = genlevel.get_world_coordinate(gs, epos);
-
-	inst->last_x = spawn_pos.x;
-	inst->last_y = spawn_pos.y;
-	inst->update_position(spawn_pos.x, spawn_pos.y);
-
-	gs->add_instance(inst);
 }
 
 void GameWorld::serialize(SerializeBuffer& serializer) {
@@ -153,55 +135,9 @@ void GameWorld::spawn_players(GameMapState* map, const std::vector<Pos>& positio
 	}
 }
 
-void GameWorld::spawn_players(GeneratedRoom& genlevel, void** player_instances,
-		size_t nplayers) {
-	if (!player_instances) {
-		bool flocal = (gs->game_settings().conntype == GameSettings::CLIENT);
-		GameSettings& settings = gs->game_settings();
-		GameNetConnection& netconn = gs->net_connection();
-		int myclassn = gs->game_settings().class_type;
-
-		for (int i = 0; i < gs->player_data().all_players().size(); i++) {
-			PlayerDataEntry& pde = gs->player_data().all_players()[i];
-			bool islocal = &pde == &gs->player_data().local_player_data();
-			ClassEntry& c = game_class_data.at(pde.classtype);
-			int spriteidx = gs->rng().rand(c.sprites.size());
-
-			if (pde.player_inst.empty()) {
-				pde.player_inst = new PlayerInst(c.starting_stats,
-						c.sprites[spriteidx], 0, 0, islocal);
-			}
-			printf("Spawning for player %d: %s\n", i,
-					islocal ? "local player" : "network player");
-			place_inst(genlevel, pde.player_inst.get());
-		}
-	} else {
-		for (int i = 0; i < nplayers; i++) {
-			place_inst(genlevel, (GameInst*)player_instances[i]);
-		}
-	}
-}
 GameMapState* GameWorld::get_level(int roomid, bool spawnplayer,
 		void** player_instances, size_t nplayers) {
-	GameMapState* currlvl = gs->get_level(); // Save level context
-
-	if (roomid >= level_states.size()) {
-		level_states.resize(roomid + 1, NULL);
-	}
-	if (!level_states[roomid]) {
-		GeneratedRoom genlevel;
-		GameMapState* newlvl = generate_level(roomid, gs->rng(), genlevel,
-				gs);
-		level_states[roomid] = newlvl;
-		gs->set_level(newlvl);
-
-		if (spawnplayer) {
-			spawn_players(genlevel, player_instances, nplayers);
-		}
-	}
-
-	gs->set_level(currlvl); // Restore level context
-	return level_states[roomid];
+	return level_states.at(roomid);
 }
 
 bool GameWorld::pre_step() {

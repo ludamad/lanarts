@@ -31,8 +31,6 @@ typedef int item_id;
 const item_id NO_ITEM = -1;
 
 typedef int area_id;
-typedef int areatemplate_id;
-typedef int itemgenlist_id;
 typedef int armour_id;
 typedef int effect_id;
 typedef int equipment_id;
@@ -44,8 +42,6 @@ typedef int tile_id;
 typedef int tileset_id;
 typedef int enemy_id;
 typedef int weapon_id;
-/*Determines what team something belongs to*/
-typedef int team_id;
 typedef int level_id;
 
 /*Type used to store monetary values*/

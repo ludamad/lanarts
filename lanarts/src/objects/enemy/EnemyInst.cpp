@@ -59,9 +59,9 @@ float monster_difficulty_multiplier(GameState* gs, EnemyEntry& etype) {
 	return 1 + mult / 16;
 }
 
-EnemyInst::EnemyInst(int enemytype, int x, int y, int teamid, int mobid) :
+EnemyInst::EnemyInst(int enemytype, int x, int y) :
 				CombatGameInst(__E(enemytype).basestats,
-						__E(enemytype).enemy_sprite, teamid, mobid, x, y,
+						__E(enemytype).enemy_sprite, x, y,
 						__E(enemytype).radius, true, DEPTH) {
 	this->seen = false;
 	this->xpgain = __E(enemytype).xpaward;
@@ -145,6 +145,7 @@ void EnemyInst::init(GameState* gs) {
 	core_stats().max_hp *= diffmult;
 
 	lua_gameinst_callback(L, etype().init_event.get(L), this);
+	lua_api::event_monster_init(L, this);
 }
 static bool starts_with_vowel(const std::string& name) {
 	char c = tolower(name[0]);

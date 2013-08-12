@@ -238,10 +238,6 @@ public:
 		this->repeat_actions_counter = repeat_actions_counter;
 	}
 
-	TeamRelations& teams() {
-		return world.teams();
-	}
-
 	int game_timestamp();
 	void renew_game_timestamp();
 	void restart();

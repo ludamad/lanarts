@@ -66,7 +66,7 @@ public:
 		return Pos(x, y);
 	}
 	//Used for keeping object from being deleted arbitrarily
-	//Important for lua code
+	//Important for the GameInst lua binding
 	int reference_count;
 
 	/*Should probably keep these public, many functions operate on these*/

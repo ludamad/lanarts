@@ -38,8 +38,6 @@ private:
 	static bool bullet_target_hit2(GameInst* self, GameInst* other);
 
 	float rx, ry, vx, vy, speed;
-	/* Team alignment, to determine if friendly-firing */
-	team_id team;
 	/* Origin object, and optional exclusive target*/
 	obj_id origin_id, sole_target;
 
