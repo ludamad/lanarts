@@ -2,6 +2,7 @@ local Sounds = import "@sounds"
 local DeathScreen = import "@menus.DeathScreen"
 local PlayerFunctions = import "@players"
 local Relations = import "@objects.relations"
+local World = import "core.GameWorld"
 
 local M = {} -- Submodule
 
@@ -12,7 +13,9 @@ events.PlayerInit = PlayerFunctions.player_init
 function events.PlayerDeath(player)
     local classtable = {Mage=Sounds.death_mage, Fighter=Sounds.death_fighter, Archer=Sounds.death_archer}
     classtable[player.class_name]:play()
-    DeathScreen.show()
+    if #World.players == 1 then
+        DeathScreen.show()
+    end
     Game.score_board_store()
 end
 
