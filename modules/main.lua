@@ -95,17 +95,17 @@ end
 --- Lanarts Entry point
 -- @param args the arguments passed on the command-line.
 function Engine.main(args)
-    if table.contains(args, "--tests-only") then
+--    if table.contains(args, "--tests-only") then
         return false
-    end
-    return true -- Continue graphical startup
+--    end
+--    return true -- Continue graphical startup
 end
 
 -- Require is used when interacting with 'vanilla' lua modules
 require_path_add("modules/?.lua")
 
 -- Hardcoded for now!
-local modules = {"core", "lanarts"}--, "tests"}
+local modules = {"core", "lanarts", "tests"}
 
 -- Begin loading all the modules
 for m in values(modules) do

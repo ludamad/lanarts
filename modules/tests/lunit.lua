@@ -391,7 +391,7 @@ do
   end
 
   function reporterrobj(context, tcname, testname, errobj)
-    local fullname = tcname .. "." .. testname
+    local fullname = testname .. " (in " .. testname .. ')'
     if context == "setup" then
       fullname = fullname .. ":" .. setupname(tcname, testname)
     elseif context == "teardown" then
@@ -429,15 +429,7 @@ do
 
     -- Register the module as a testcase
     _testcases[m._NAME] = m
-
-    -- Import lunit, fail, assert* and is_* function to the module/testcase
-    m.lunit = lunit
-    m.fail = lunit.fail
-    for funcname, func in pairs(lunit) do
-      if "assert" == string_sub(funcname, 1, 6) or "is_" == string_sub(funcname, 1, 3) then
-        m[funcname] = func
-      end
-    end
+    -- Ludamad: simplification, do not import test names
   end
 
   -- Iterator (testcasename) over all Testcases
@@ -481,11 +473,9 @@ do
   function lunit.tests(tcname)
     local testnames = {}
     for key, value in pairs(testcase(tcname)) do
-      if is_string(key) and is_function(value) then
-        local lfn = string.lower(key)
-        if string.sub(lfn, 1, 4) == "test" or string.sub(lfn, -4) == "test" then
-          testnames[key] = true
-        end
+      -- Ludamad: Simplified, removed test filtering
+      if is_function(value) then
+         testnames[key] = true
       end
     end
     return key_iter, testnames, nil

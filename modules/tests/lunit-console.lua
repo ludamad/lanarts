@@ -61,10 +61,10 @@ local function writestatus(char)
   if columns_printed == 0 then
     io.write("    ")
   end
-  if columns_printed == 60 then
-    io.write("\n    ")
-    columns_printed = 0
-  end
+--  if columns_printed == 60 then
+--    io.write("\n    ")
+--    columns_printed = 0
+--  end
   io.write(char)
   io.flush()
   columns_printed = columns_printed + 1
@@ -95,14 +95,12 @@ end
 
 
 function err(fullname, message, traceback)
-  writestatus("E")
-  msgs[#msgs+1] = "Error! ("..fullname.."):\n"..message.."\n\t"..table.concat(traceback, "\n\t") .. "\n"
+  msgs[#msgs+1] = "ERROR for "..fullname.."\n"..message.."\n\t"..table.concat(traceback, "\n\t") .. "\n"
 end
 
 
 function fail(fullname, where, message, usermessage)
-  writestatus("F")
-  local text =  "Failure ("..fullname.."):\n"..
+  local text =  "FAILURE for "..fullname.."\n"..
                 where..": "..message.."\n"
 
   if usermessage then
@@ -114,7 +112,7 @@ end
 
 
 function pass(testcasename, testname)
-  writestatus(".")
+  msgs[#msgs+1] = "Pass for " .. testname .. " (in " ..testcasename..")"
 end
 
 

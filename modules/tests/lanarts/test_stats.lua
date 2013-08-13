@@ -1,7 +1,5 @@
 local stats = import "unstable.stats"
 
-module( ..., lunit.testcase, package.seeall )
-
-function test()
+function TestCases.stats_create()
     lunit.assert(stats.stats_create())
 end
