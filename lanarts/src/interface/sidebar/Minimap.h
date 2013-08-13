@@ -13,16 +13,16 @@ class GameState;
 
 class Minimap {
 public:
-	Minimap(const BBox& minimap_max_bounds);
+	Minimap(const Pos& minimap_center);
 
 	void draw(GameState* gs);
-	BBox minimap_bounds(GameState* gs);
+	BBox minimap_bounds(GameState* gs, Size size);
 
 private:
 	char* minimap_arr;
 	int scale;
 	ldraw::Image minimap_buff;
-	BBox minimap_max_bounds;
+	Pos minimap_center;
 };
 
 #endif /* MINIMAP_H_ */

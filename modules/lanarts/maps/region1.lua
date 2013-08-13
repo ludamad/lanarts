@@ -153,6 +153,36 @@ local function old_dungeon_placement_function(MapSeq, tileset, levels)
     end
 end
 
+local NOT_SOLID_QUERY = {matches_none = MapGen.FLAG_SOLID}
+local function try_copy_unsolid(map, xy1, xy2) 
+    if map:square_query(xy2, NOT_SOLID_QUERY) then
+        map:set(xy1, map:get(xy2))
+        return true
+    end
+    return false
+end
+
+local function copy_close_unsolid_tile(map, xy)
+    for dx=-1,1,2 do
+        if try_copy_unsolid(map, xy, {xy[1]+dx, xy[2]}) then
+            return
+        end
+    end
+    for dy=-1,1,2 do
+        if try_copy_unsolid(map, xy, {xy[1], xy[2]+dy}) then
+            return
+        end
+    end
+    for dy=-1,1,2 do
+        for dx=-1,1,2 do
+            if dx ~= 0 and dy ~= 0 and try_copy_unsolid(map, xy, {xy[1]+dx, xy[2]+dy}) then
+                return
+            end
+        end
+    end
+end
+
+
 function M.overworld_create()   
     local tileset = TileSets.grass
     local OldMapSeq1 = MapSequence.create {preallocate = 1}
@@ -163,21 +193,26 @@ function M.overworld_create()
     -- These squares take the form of a square next to them, after the initial map generation is done
     local undecided_squares = {}
 
+    local UNDECIDED_FLAG, UNDECIDED_TILE = MapGen.FLAG_SOLID, tileset.wall
     local map = MapUtils.area_template_to_map("Overworld", 
     		--[[file path]] path_resolve "region1.txt", 
     		--[[padding]] 4, {
+    	   --Player spawn candidate square
+           [':'] = { add = {MapGen.FLAG_SEETHROUGH, FLAG_PLAYERSPAWN}, content = tileset.floor } ,
+    	   --Walls
            ['x'] = { add = {MapGen.FLAG_SEETHROUGH, MapGen.FLAG_SOLID}, content = tileset.wall }, 
            ['W'] = { add = MapGen.FLAG_SOLID, content = tileset.wall_alt }, 
+           ['P'] = { add = MapGen.FLAG_SOLID, content = TileSets.pebble.wall }, 
+           --Floors
+           ['s'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.floor},
            ['.'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor },
-           [','] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.dirt },
-           [':'] = { add = {MapGen.FLAG_SEETHROUGH, FLAG_PLAYERSPAWN}, content = tileset.floor } ,
-           ['<'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.dirt, 
-               on_placement = function(map, xy)
-                    MapUtils.spawn_decoration(map, "anvil", xy)
-               end},
+           ['b'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.dirt },
+           [','] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor_alt1 },
+           ['`'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor_alt2 },
            ['p'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor }, 
+           ['h'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor_alt }, 
            ['t'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.temple.floor }, 
-           ['T'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.temple.floor,
+           ['T'] = { add = UNDECIDED_FLAG, content = UNDECIDED_TILE,
                on_placement = function(map, xy)
                     local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 11))
                     local seq_len = #temple_sequences
@@ -186,35 +221,70 @@ function M.overworld_create()
                         function() 
                             return temple_level_create("Temple", 1, temple_sequences, TileSets.temple)
                     end)
-               end},           
+                    table.insert(undecided_squares, xy)
+               end},
+
+           --Entrance to Dungeon 1: easier monsters
            ['D'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor,
                on_placement = old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {1,5}) },
+
+           --Entrance to Dungeon 2: harder monsters
            ['X'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.floor,
                on_placement = old_dungeon_placement_function(OldMapSeq2, TileSets.snake, {6,10}) },
-           ['s'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.floor},
-           ['w'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.floor,
+           -- Overworld features
+           -- Anvil
+           ['<'] = { add = UNDECIDED_FLAG, content = UNDECIDED_TILE, 
+               on_placement = function(map, xy)
+                    MapUtils.spawn_decoration(map, "anvil", xy)
+                    table.insert(undecided_squares, xy)
+               end},
+           --Warning skull
+           ['w'] = { add = UNDECIDED_FLAG, content = UNDECIDED_TILE,
                on_placement = function(map, xy)
                     MapUtils.spawn_decoration(map, "warning_skull", xy, 0, false)
+                    table.insert(undecided_squares, xy)
                end},
-           ['S'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor, 
+           --Store candidate square
+           ['S'] = { add = UNDECIDED_FLAG, content = UNDECIDED_TILE, 
            			on_placement = function(map, xy) 
            				if chance(.4) then 
            					generate_store(map, xy)
-           				else
-                            table.insert(undecided_squares, xy)
            				end
+                        table.insert(undecided_squares, xy)
            			end },
+           --Item candidate square
            ['i'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor, 
                     on_placement = function(map, xy)
-                        local item = ItemUtils.item_generate(ItemGroups.enchanted_items)
+                        if chance(.4) then 
+                            local item = ItemUtils.item_generate(ItemGroups.enchanted_items)
+                            MapUtils.spawn_item(map, item.type, item.amount, xy)
+                        end
                         table.insert(undecided_squares, xy)
-                        MapUtils.spawn_item(map, item.type, item.amount, xy)
                     end },           
-           ['e'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor, 
+           --Door
+           ['d'] = { add = UNDECIDED_FLAG, content = UNDECIDED_TILE, 
+                   on_placement = function (map, xy) 
+                        MapUtils.spawn_door(map,xy)
+                        table.insert(undecided_squares, xy)
+                   end },               
+           --Gold candidate square
+           ['*'] = { add = UNDECIDED_FLAG, content = UNDECIDED_TILE, 
+                   on_placement = function (map, xy) 
+                        if chance(.4) then 
+                            MapUtils.spawn_item(map, "Gold", random(2,10), xy)
+                        end
+                        table.insert(undecided_squares, xy)
+                   end },           
+           --Enemy candidate square
+           ['e'] = { add = UNDECIDED_FLAG, content = UNDECIDED_TILE, 
                     on_placement = function(map, xy)
-                        local enemy = OldMaps.enemy_generate(OldMaps.harder_enemies)
-                        MapUtils.spawn_enemy(map, enemy, xy)
+                        if chance(.8) then 
+                            local enemy = OldMaps.enemy_generate(OldMaps.harder_enemies)
+                            MapUtils.spawn_enemy(map, enemy, xy)
+                        end
+                        table.insert(undecided_squares, xy)
                     end },
+           --Entrance to 'Mines': a connecting mini-dungeon
            ['G'] =  { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor,
                on_placement = function(map, xy)
                     local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(0, 2))
@@ -229,10 +299,10 @@ function M.overworld_create()
 
     -- For all undecided squares, copy over the square from the left
     for xy in values(undecided_squares) do
-        map:set(xy, map:get({xy[1] - 1, xy[2]})) 
+        copy_close_unsolid_tile(map, xy)
     end
 
-    OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 20)
+    OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 40)
 
     local map_id = MapUtils.game_map_create(map)
     OldMapSeq1:slot_resolve(1, map_id)

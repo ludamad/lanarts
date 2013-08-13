@@ -140,16 +140,12 @@ static BBox content_area_box(const BBox& sidebar_box) {
 	return BBox(sx, sy, ex, ey);
 }
 
-static BBox minimap_bounds(const BBox& sidebar_bounds) {
-	int minimap_relposx = 10, minimap_relposy = 64 + 25;
-	int minimap_w = 128, minimap_h = 128;
-	int sx = sidebar_bounds.x1 + minimap_relposx;
-	int sy = sidebar_bounds.y1 + minimap_relposy;
-	return BBox(sx, sy, sx + minimap_w, sy + minimap_h);
+static Pos minimap_center(const BBox& sidebar_bounds) {
+	return sidebar_bounds.left_top() + Pos(74, 158);
 }
 
 Sidebar::Sidebar(const BBox& sidebar_bounds) :
-		sidebar_bounds(sidebar_bounds), minimap(minimap_bounds(sidebar_bounds)), navigator(
+		sidebar_bounds(sidebar_bounds), minimap(minimap_center(sidebar_bounds)), navigator(
 				sidebar_bounds, content_area_box(sidebar_bounds)) {
 }
 

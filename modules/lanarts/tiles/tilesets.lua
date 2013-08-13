@@ -3,7 +3,9 @@ local utils = import "core.utils"
 local M = {} -- Submodule
 
 M.grass = Data.tileset_create {
-    floor = { images = images_load (path_resolve "floor_overworld_grass.png%32x32") },
+    floor = { images = images_load (path_resolve "floor_overworld_grass1.png%32x32") },
+    floor_alt1 = { images = images_load (path_resolve "floor_overworld_grass2.png%32x32") },
+    floor_alt2 = { images = images_load (path_resolve "floor_overworld_grass3.png%32x32") },
     wall = { images = images_load (path_resolve "wall_overworld_trees.png%32x32")},
     dirt = { images = images_load (path_resolve "outside_floor/sandrockfloor/floor_sand_rock(0-3).png")},
 --    dirt = { images = images_load (path_resolve "floor_overworld_dirt.png%32x32")},

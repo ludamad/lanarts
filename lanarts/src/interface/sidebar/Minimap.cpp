@@ -57,6 +57,7 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 
 	int stairs_down = res::tileid("stairs_down");
 	int stairs_up = res::tileid("stairs_up");
+	fov& fov = gs->local_player()->field_of_view();
 	for (int y = 0; y < shown.height(); y++) {
 		char* iter = buff + y * ptw * 4;
 		for (int x = 0; x < shown.width(); x++) {
@@ -67,10 +68,13 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 				if (tile == stairs_down || tile == stairs_up) {
 					iter[0] = 255, iter[1] = 0, iter[2] = 0, iter[3] = 255;
 				} else if (!tiles.is_solid(xy)) {/*floor*/
-					iter[0] = 100, iter[1] = 100, iter[2] = 100, iter[3] = 255;
+					iter[0] = 50, iter[1] = 50, iter[2] = 50, iter[3] = 255;
 				} else { //if (tile == 1){/*wall*/
-					iter[0] = 255, iter[1] = 255, iter[2] = 255, iter[3] = 255;
+					iter[0] = 200, iter[1] = 225, iter[2] = 200, iter[3] = 255;
 				}
+			}
+			if (!fov.within_fov(xy.x, xy.y)) {
+				iter[0] /=2 , iter[1] /= 2, iter[2] /= 2;
 			}
 			iter += 4;
 		}
@@ -112,22 +116,16 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 static const int MINIMAP_DIM_MAX = 128;
 static const Size MINIMAP_SIZE_MAX(MINIMAP_DIM_MAX, MINIMAP_DIM_MAX);
 
-Minimap::Minimap(const BBox& minimap_max_bounds) :
-		minimap_max_bounds(minimap_max_bounds), minimap_arr(NULL) {
+Minimap::Minimap(const Pos& minimap_center) :
+		minimap_center(minimap_center), minimap_arr(NULL) {
 	scale = 2;
 }
 
-BBox Minimap::minimap_bounds(GameState* gs) {
-	int level_w = gs->get_level()->tile_width();
-	int level_h = gs->get_level()->tile_height();
+BBox Minimap::minimap_bounds(GameState* gs, Size size) {
+	int draw_x = minimap_center.x - size.w / 2;
+	int draw_y = minimap_center.y - size.h / 2;
 
-
-	int max_w = minimap_max_bounds.width(), max_h = minimap_max_bounds.height();
-
-	int draw_x = minimap_max_bounds.x1 + (max_w - level_w) / 2;
-	int draw_y = minimap_max_bounds.y1 + (max_h - level_h) / 2;
-
-	return BBox(draw_x, draw_y, draw_x + level_w, draw_y + level_h);
+	return BBox(draw_x, draw_y, draw_x + size.w, draw_y + size.h);
 }
 
 static void init_minimap_buff(char* minimap_arr, int ptw, int pth) {
@@ -153,12 +151,10 @@ void Minimap::draw(GameState* gs) {
 
 	GameTiles& tiles = gs->tiles();
 	GameView& view = gs->view();
-	BBox bbox = minimap_bounds(gs);
 
 	BBox view_region = view.tile_region_covered();
 	// Portion of world displayed on minimap
 	BBox world_portion = find_portion(view_region.center(), MINIMAP_SIZE_MAX, tiles.size());
-	printf("WORLD PORTION (%d %d) to (%d %d) size = (%d %d)\n", world_portion.x1, world_portion.y1, world_portion.x2, world_portion.y2, world_portion.width(), world_portion.height());
 
 	int ptw = power_of_two_round(MINIMAP_DIM_MAX), pth = power_of_two_round(
 			MINIMAP_DIM_MAX);
@@ -168,7 +164,7 @@ void Minimap::draw(GameState* gs) {
 
 	init_minimap_buff(minimap_arr, ptw, pth);
 
-	world2minimapbuffer(gs, minimap_arr, world_portion, bbox.width(), bbox.height(), ptw, pth);
+	world2minimapbuffer(gs, minimap_arr, world_portion, world_portion.width(), world_portion.height(), ptw, pth);
 
 	BBox adjusted_view_region = view_region.translated(-world_portion.x1, -world_portion.y1);
 	PlayerInst* player = gs->local_player();
@@ -176,28 +172,23 @@ void Minimap::draw(GameState* gs) {
 		int arr_x = (player->x / TILE_SIZE) - world_portion.x1, arr_y = (player->y / TILE_SIZE) - world_portion.y1;
 //		fill_buff2d(minimap_arr, ptw, pth, arr_x - arr_x % 2, arr_y - arr_y % 2,
 //				Colour(255, 180, 99), 2, 2);
-		fill_buff2d(minimap_arr, ptw, pth, arr_x, arr_y, Colour(255, 180, 99), 1, 1);
-		draw_rect2d(minimap_arr, ptw, pth, adjusted_view_region, Colour(255, 180, 99));
+		fill_buff2d(minimap_arr, ptw, pth, arr_x, arr_y, COL_YELLOW, 1, 1);
+//		draw_rect2d(minimap_arr, ptw, pth, adjusted_view_region, Colour(255, 180, 99));
 	}
 	minimap_buff.from_bytes(Size(ptw, pth), minimap_arr);
 
 	Size size(MINIMAP_DIM_MAX / scale, MINIMAP_DIM_MAX / scale);
-	BBox draw_region(adjusted_view_region.center() - Pos(size.w / 2, size.h / 2), size);
-	draw_region = find_portion(adjusted_view_region.center(), size, world_portion.size());
+	BBox draw_region = find_portion(adjusted_view_region.center(), size, world_portion.size());
 
 	// Prevent blurriness when scaling
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	minimap_buff.draw(ldraw::DrawOptions(draw_region).scale(SizeF(scale,scale)), bbox.left_top() + Pos(25,25));
+	BBox bbox = minimap_bounds(gs, Size(draw_region.width() * scale, draw_region.height() * scale));
+	minimap_buff.draw(ldraw::DrawOptions(draw_region).scale(SizeF(scale,scale)), bbox.left_top());
 	if (bbox.contains(gs->mouse_pos())) {
 		if (gs->mouse_left_click()) {
 			scale *= 2;
 			if (scale > 8) {
 				scale = 1;
-			}
-		} else if (gs->mouse_right_click()) {
-			scale /= 2;
-			if (scale < 1) {
-				scale = 8;
 			}
 		}
 	}
