@@ -27,6 +27,8 @@ local function class_image_for_name_hack(name)
     end
 end
 
+local TEXT_COLOR = {255, 250, 240}
+
 local function sorted_scores_fetch()
     local scores = Game.score_board_fetch()
 
@@ -63,8 +65,8 @@ local function score_entry_draw(entry, ranking, ex, ey, ew, eh)
     -- Draw character name & level
     draw_colored_parts(font, LEFT_TOP, {ex + 2, ey + 2},
         {COL_MUTED_GREEN, entry.name .. "  "},
-        {COL_WHITE, "Level " .. entry.character_level .. " "},
-        {COL_WHITE, entry.class_name}
+        {TEXT_COLOR, "Level " .. entry.character_level .. " "},
+        {TEXT_COLOR, entry.class_name}
     )
 
     -- Draw timestamp
@@ -152,7 +154,7 @@ local function scores_menu_body_create()
     group:add_instance( 
         TextLabel.create(
             font_cached_load(score_menu_font, 20), 
-            {color=COL_WHITE, origin = CENTER_TOP}, 
+            {color=TEXT_COLOR, origin = CENTER_TOP}, 
             "In Memoriam"
         ), 
         {100, 30}
@@ -173,7 +175,7 @@ local function scores_menu_create(on_back_click)
 
     -- Display the logo if we are >= 800x600 res
     if menu.size[2] >= 600 then
-        local logo = Sprite.image_create("modules/lanarts/interface/sprites/lanarts_logo.png")
+        local logo = Sprite.image_create("modules/lanarts/LANARTS.png")
     
         menu:add_instance(
             logo, 
@@ -196,7 +198,7 @@ local function scores_menu_create(on_back_click)
     menu:add_instance(
         text_button_create("Back", on_back_click, {
             font = font_cached_load(score_menu_font, 20),
-            color = COL_WHITE,
+            color = TEXT_COLOR,
             hover_color = COL_RED,
             click_box_padding = 5
         }),

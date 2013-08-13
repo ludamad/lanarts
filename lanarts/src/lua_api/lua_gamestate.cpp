@@ -131,22 +131,56 @@ static int game_frame(lua_State* L) {
 	return 1;
 }
 
-static void lapi_wait(LuaStackValue wait_time) {
+static long garbage_collect_while_waiting(lua_State* L, long wait_micro) {
+	// How many times do we step garbage collection before checking time ?
+	static const int ITERS_PER_CHECK = 2;
 
+	// Try to do 4ms of garbage collection for every 6 frames
+	static const int MICROS_PER_FRAME_GROUP = 4000 /*4 ms*/;
+	static const int FRAME_PER_GROUP = 6;
+
+	static int n_frames = 0;
+	static long time_spent_micro = 0;
+
+	Timer timer;
+
+	n_frames++;
+
+	if (time_spent_micro >= MICROS_PER_FRAME_GROUP) {
+		if (n_frames > FRAME_PER_GROUP) {
+			time_spent_micro = 0;
+			n_frames = 0;
+		} else {
+			return 0;
+		}
+	}
+
+	wait_micro = std::min(wait_micro, MICROS_PER_FRAME_GROUP - time_spent_micro);
+
+	int initial_memusage = lua_gc(L, LUA_GCCOUNT,0);
+	while (timer.get_microseconds() < wait_micro) {
+		for (int i = 0; i < ITERS_PER_CHECK; i++){
+			if (lua_gc(L, LUA_GCSTEP, 0)) {
+				goto label_AfterLoop;
+			}
+		}
+	}
+
+label_AfterLoop:
+	time_spent_micro += timer.get_microseconds();
+	int mem_drop = (initial_memusage - lua_gc(L, LUA_GCCOUNT,0));
+
+	return timer.get_microseconds();
+}
+
+static void lapi_wait(LuaStackValue wait_time) {
 	lua_State* L = wait_time.luastate();
 	long wait_micro = wait_time.as<double>() * 1000;
 
-	GameSettings& settings = lua_api::gamestate(wait_time)->game_settings();
+	GameState* gs = lua_api::gamestate(wait_time);
+	GameSettings& settings = gs->game_settings();
 	if (settings.free_memory_while_idle) {
-		Timer timer;
-
-		while (timer.get_microseconds() < wait_micro) {
-			if (lua_gc(L, LUA_GCSTEP, 0)) {
-				break;
-			}
-		}
-
-		wait_micro -= (long) timer.get_microseconds();
+		wait_micro -= garbage_collect_while_waiting(L, wait_micro);
 	}
 
 	long remaining_wait_ms = wait_micro / 1000;

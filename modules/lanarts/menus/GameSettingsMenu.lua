@@ -12,6 +12,7 @@ local utils_text_component = import "core.utils.utils_text_component"
 local SETTINGS_BOX_MAX_CHARS = 18
 local SETTINGS_BOX_SIZE = {180, 34}
 
+local TEXT_COLOR = {255, 250, 240}
 local CONFIG_MENU_SIZE = {640, 480}
 
 local SETTINGS_FONT = font_cached_load(settings.font, 10)
@@ -145,8 +146,8 @@ local function respawn_toggle_create()
         local w, h = unpack(self.size)
 
         local text = settings.regen_on_death and "Respawn on Death" or "Hardcore (No respawn!)"
-        local text_color = settings.regen_on_death and COL_WHITE or COL_LIGHT_RED
-        local sprite_color = settings.regen_on_death and COL_WHITE or COL_LIGHT_RED
+        local text_color = settings.regen_on_death and TEXT_COLOR or COL_LIGHT_RED
+        local sprite_color = settings.regen_on_death and TEXT_COLOR or COL_LIGHT_RED
         local box_color = sprite_color
 
         if mouse_over(xy, self.size) then 
@@ -154,7 +155,7 @@ local function respawn_toggle_create()
         end
 
         sprite:draw( {origin = LEFT_CENTER, color = sprite_color}, { x, y + h / 2 } )
-        self.font:draw( {origin = LEFT_CENTER, color = text_color}, { x + 8 + sprite.size[2], y + h / 2 }, text )
+        self.font:draw( {color = TEXT_COLOR, origin = LEFT_CENTER, color = text_color}, { x + 8 + sprite.size[2], y + h / 2 }, text )
     
         draw_rectangle_outline(box_color, bbox_create(xy, self.size), 1)
     end
@@ -225,7 +226,7 @@ local function speed_toggle_create()
         local w, h = unpack(self.size)
 
         self.sprite:draw( { color = {255, 255, 255, alpha}, origin = LEFT_CENTER }, { x, y + h / 2 } )
-        self.font:draw( {origin = LEFT_CENTER}, { x + 8 + self.sprite.size[2], y + h / 2 }, text )
+        self.font:draw( {color = TEXT_COLOR, origin = LEFT_CENTER}, { x + 8 + self.sprite.size[2], y + h / 2 }, text )
     
         local box_color = mouse_over(xy, self.size) and COL_GOLD or COL_WHITE
         draw_rectangle_outline(box_color, bbox_create(xy, self.size), 1)
@@ -254,7 +255,7 @@ local function label_button_create(params, color_formula, on_click)
 
         local color = color_formula(self, xy)
         sprite.options.color = color
-        label.options.color = color
+        label.options.color = color == COL_WHITE and TEXT_COLOR or color
     end
 
     return label_button
@@ -400,7 +401,7 @@ local function back_and_continue_options_create(on_back_click, on_start_click)
             local click_handler = components[obj]
 
             local mouse_is_over = obj:mouse_over(obj_xy)
-            obj.options.color = mouse_is_over and COL_GOLD or COL_WHITE
+            obj.options.color = mouse_is_over and COL_GOLD or TEXT_COLOR
 
             if mouse_is_over and mouse_left_pressed then click_handler() end
         end

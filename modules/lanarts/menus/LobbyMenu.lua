@@ -10,7 +10,7 @@ local tasks = import "core.networking.tasks"
 local utils_text_component = import "core.utils.utils_text_component"
 
 local game_entry_draw
-local logo_path = "modules/lanarts/interface/sprites/lanarts_logo_no_sub.png"
+local logo_path = "modules/lanarts/LANARTS.png"
 local small_font = font_cached_load(settings.font, 10)
 local large_font = font_cached_load(settings.font, 20)
 local alt_font = font_cached_load("modules/core/fonts/MateSC-Regular.ttf", 14)

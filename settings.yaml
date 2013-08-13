@@ -4,19 +4,20 @@ lobby_server_url: http://putterson.homedns.org:8080
 
 #Window settings
 fullscreen: no
-view_width: 1000
-view_height: 800
+view_width: 900
+view_height: 600
 
 #Font settings
 font: modules/core/fonts/Gudea-Regular.ttf
-menu_font: modules/core/fonts/Gudea-Regular.ttf
+menu_font: modules/core/fonts/MateSC-Regular.ttf
 
 #Performance settings
 steps_per_draw: 1 #More is almost guaranteed to make the game faster, 1 is ideal
+free_memory_while_idle: yes
 
 #Debug settings
 network_debug_mode: no
 invincible: no #Feel like exploring ? -> yes
 draw_diagnostics: no
 verbose_output: no
-keep_event_log: yes
+keep_event_log: no

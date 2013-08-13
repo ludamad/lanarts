@@ -15,22 +15,24 @@ local tasks = import "core.networking.tasks"
 local keys = import "core.keyboard"
 
 -- START SCREEN -- 
-
 local text_button_params = {
     font = font_cached_load(settings.menu_font, 20),
-    color = COL_WHITE,
+    color = {255, 250, 240},
     hover_color = COL_RED,
     click_box_padding = 5
 }
 
 local function start_menu_create(on_start_click, on_join_click, on_load_click, on_score_click)
     local menu = InstanceBox.create( { size = Display.display_size } )
+    local transparent_sprite =  Sprite.image_create(path_resolve "LANARTS-transparent.png")
+    transparent_sprite.options.color= {255, 255, 255, 50}
+    menu:add_instance(transparent_sprite, CENTER_TOP, {-15, 45})
 
     menu:add_instance(
-        Sprite.image_create("modules/lanarts/interface/sprites/lanarts_logo.png"),
+        Sprite.image_create(path_resolve "LANARTS.png"),
         CENTER_TOP,
         --[[Down 10 pixels]]
-        {0, 10}
+        {0, 30}
     )
 
     local y_position = 70 -- Start down 70 pixels
