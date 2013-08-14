@@ -65,7 +65,6 @@ static bool queue_portal_use(GameState* gs, PlayerInst* player, ActionQueue& que
 	if (portal != NULL) {
 		queue.push_back(
 				game_action(gs, player, GameAction::USE_PORTAL));
-		player->cooldowns().reset_stopaction_timeout(50);
 		return true;
 	}
 	return false;
@@ -216,6 +215,8 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 
 	if (pde.action_queue.has_actions_for_frame(gs->frame())) {
 		pde.action_queue.extract_actions_for_frame(queued_actions, gs->frame());
+		event_log("Player %d has %d actions", player_entry(gs).net_id,
+				(int) queued_actions.size());
 		return;
 	}
 	if (!single_player) {
@@ -231,12 +232,12 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 
 	if (!settings.loadreplay_file.empty()) {
 		load_actions(gs, queued_actions);
-	} else if (is_local_player()) {
-		enqueue_io_movement_actions(gs, dx, dy);
+	}
 
-		if (was_moving && !moving && cooldowns().can_do_stopaction()) {
-			do_stopaction = true;
-		}
+	enqueue_io_movement_actions(gs, dx, dy);
+
+	if (was_moving && !moving && cooldowns().can_do_stopaction()) {
+		do_stopaction = true;
 	}
 //Shifting target
 	if (gs->key_press_state(SDLK_k)) {
@@ -258,25 +259,7 @@ void PlayerInst::enqueue_io_actions(GameState* gs) {
 			|| io.query_event(IOEvent::MOUSETARGET_CURRENT_ACTION);
 	if ((do_stopaction && !action_usage) || gs->key_down_state(SDLK_PERIOD)
 			|| gs->mouse_downwheel()) {
-		Pos hitsqr;
-		if (gs->tile_radius_test(x, y, RADIUS, false,
-				res::tileid("stairs_down"), &hitsqr)) {
-			queued_actions.push_back(
-					game_action(gs, this, GameAction::USE_ENTRANCE));
-			cooldowns().reset_stopaction_timeout(50);
-		} else if (queue_portal_use(gs, this, queued_actions)) {
-		}
-	}
-
-	if ((do_stopaction && !action_usage) || gs->key_down_state(SDLK_COMMA)
-			|| gs->mouse_upwheel()) {
-		Pos hitsqr;
-		if (gs->tile_radius_test(x, y, RADIUS, false,
-				res::tileid("stairs_up"), &hitsqr)) {
-			queued_actions.push_back(
-					game_action(gs, this, GameAction::USE_EXIT));
-			cooldowns().reset_stopaction_timeout(50);
-		}
+		queue_portal_use(gs, this, queued_actions);
 	}
 
 // If we haven't done anything, rest
@@ -400,6 +383,11 @@ void PlayerInst::reposition_item(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
+	event_log("Player id=%d performing act=%d, xy=(%d,%d), frame=%d, origin=%d, room=%d, use_id=%d, use_id2=%d\n",
+			this->player_entry(gs).net_id,
+			action.act, action.action_x,
+			action.action_y, action.frame, action.origin, action.room,
+			action.use_id, action.use_id2);
 	switch (action.act) {
 	case GameAction::MOVE:
 		return use_move(gs, action);
@@ -411,10 +399,6 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 		return use_rest(gs, action);
 	case GameAction::USE_PORTAL:
 		return use_dngn_portal(gs, action);
-	case GameAction::USE_ENTRANCE:
-		return use_dngn_entrance(gs, action);
-	case GameAction::USE_EXIT:
-		return use_dngn_exit(gs, action);
 	case GameAction::USE_ITEM:
 		return use_item(gs, action);
 	case GameAction::PICKUP_ITEM:
@@ -615,96 +599,36 @@ void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
 	if (!effective_stats().allowed_actions.can_use_stairs) {
 		if (is_local_player()) {
 			gs->game_chat().add_message(
-					"You cannot use the stairs in this state!");
+					"You cannot use the exit in this state!");
 		}
 		return;
 	}
+
+	cooldowns().reset_stopaction_timeout(50);
 	FeatureInst* portal = find_usable_portal(gs, this);
 	portal->player_interact(gs, this);
 	reset_rest_cooldown();
-}
 
-void PlayerInst::use_dngn_exit(GameState* gs, const GameAction& action) {
-	if (!effective_stats().allowed_actions.can_use_stairs) {
-		if (is_local_player()) {
-			gs->game_chat().add_message(
-					"You cannot use the stairs in this state!");
-		}
-		return;
-	}
-	Pos hitpos;
-	bool didhit = gs->tile_radius_test(x, y, radius, false,
-			res::tileid("stairs_up"), &hitpos);
-	int entr_n = scan_entrance(gs->get_level()->exits, hitpos);
-	if (!didhit || entr_n == -1)
-		return;
-
-	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->get_level()->exits.size());
-	gs->ensure_level_connectivity(gs->get_level()->id() - 1,
-			gs->get_level()->id());
-	GameRoomPortal* portal = &gs->get_level()->exits[entr_n];
-
-	int px = centered_multiple(portal->exitsqr.x, TILE_SIZE);
-	int py = centered_multiple(portal->exitsqr.y, TILE_SIZE);
-
-	int newlevel = gs->get_level()->id() - 1;
-	std::string verb = "You ascend";
+	std::string subject_and_verb = "You travel";
 	if (!is_local_player()) {
-		verb = player_entry(gs).player_name + " ascends";
+		subject_and_verb = player_entry(gs).player_name + " travels";
 	}
 
-	if (newlevel == 0) {
-		verb += " to the top floor";
-	} else {
-		verb = format("%s to the floor %d", verb.c_str(), newlevel);
-	}
-	gs->game_chat().add_message(verb, COL_PALE_BLUE);
+	const std::string& map_label =
+			gs->game_world().get_level(current_floor)->label();
 
-
-	gs->level_move(id, px, py, gs->get_level()->id(), newlevel);
-
-	reset_rest_cooldown();
-}
-void PlayerInst::use_dngn_entrance(GameState* gs, const GameAction& action) {
-	if (!effective_stats().allowed_actions.can_use_stairs) {
-		if (is_local_player()) {
-			gs->game_chat().add_message(
-					"You cannot use the stairs in this state!");
+	bool label_has_digit = false; // Does it have a number in the label?
+	for (int i = 0; i < map_label.size(); i++) {
+		if (isdigit(map_label[i])) {
+			label_has_digit = true;
+			break;
 		}
-		return;
-	}
-	Pos hitpos;
-	bool didhit = gs->tile_radius_test(x, y, radius, false,
-			res::tileid("stairs_down"), &hitpos);
-	int entr_n = scan_entrance(gs->get_level()->entrances, hitpos);
-	if (!didhit || entr_n == -1)
-		return;
-
-	LANARTS_ASSERT( entr_n >= 0 && entr_n < gs->get_level()->entrances.size());
-	gs->ensure_level_connectivity(gs->get_level()->id(),
-			gs->get_level()->id() + 1);
-	GameRoomPortal* portal = &gs->get_level()->entrances[entr_n];
-
-	int px = centered_multiple(portal->exitsqr.x, TILE_SIZE);
-	int py = centered_multiple(portal->exitsqr.y, TILE_SIZE);
-
-	int newlevel = gs->get_level()->id() + 1;
-
-	std::string verb = "You descend";
-	if (!is_local_player()) {
-		verb = player_entry(gs).player_name + " descends";
 	}
 
-	if (newlevel == 0) {
-		verb += " to the top floor";
-	} else {
-		verb = format("%s to the floor %d", verb.c_str(), newlevel);
-	}
-	gs->game_chat().add_message(verb, COL_PALE_BLUE);
-
-	gs->level_move(id, px, py, gs->get_level()->id(), newlevel);
-
-	reset_rest_cooldown();
+	gs->game_chat().add_message(
+			format("%s to %s%s", subject_and_verb.c_str(),
+					label_has_digit ? "" : "the ", map_label.c_str()),
+			is_local_player() ? COL_WHITE : COL_YELLOW);
 }
 
 void PlayerInst::gain_xp(GameState* gs, int xp) {

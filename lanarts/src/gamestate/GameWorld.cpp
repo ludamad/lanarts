@@ -159,8 +159,6 @@ bool GameWorld::pre_step() {
 }
 
 bool GameWorld::step() {
-	redofirststep: //I used a goto dont kill mes
-
 	GameMapState* current_level = gs->get_level();
 
 	midstep = true;
@@ -276,7 +274,6 @@ void GameWorld::reset(int keep) {
 		player_data().remove_all_players(gs);
 		level_states.resize(keep);
 		gs->game_hud().override_sidebar_contents(NULL);
-//		gs->set_level(get_level(keep, true /*spawn player*/));
 		gs->game_chat().clear();
 		gs->renew_game_timestamp();
 	}

@@ -10,6 +10,11 @@
 
 #include "GameState.h"
 
+GameAction::GameAction() :
+		origin(0), act((action_t)0), frame(0), room(0), use_id(0), use_id2(0), action_x(
+				0), action_y(0) {
+}
+
 GameAction::GameAction(obj_id origin, action_t act, int frame, int level,
 		int use_id, int action_x, int action_y, int use_id2) :
 		origin(origin), act(act), frame(frame), room(level), use_id(use_id), use_id2(
