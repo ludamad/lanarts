@@ -98,7 +98,7 @@ static Pos seen_square_in_area(MTwist& mt, GameTiles& tiles) {
 // Assumes overworld == map ID 0
 static void spawn_in_overworld(GameState* gs, PlayerInst* player) {
 	int current_map = gs->game_world().get_current_level_id();
-	int overworld_map = (current_map > 0) ? current_map - 1 : 0;
+	int overworld_map = 0;
 	GameMapState* overworld = gs->game_world().get_level(overworld_map);
 	Pos sqr = seen_square_in_area(gs->rng(), overworld->tiles());
 

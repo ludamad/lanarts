@@ -138,7 +138,7 @@ local function old_map_generate(MapSeq, tileset, offset, max_floor, floor)
         sprite_down = "stair_kinds", sprite_down_index = stair_kinds_index(4, 9),
         forward_portals = last_floor and 0 or 3,
         next_floor_callback = function() 
-            return old_map_generate(MapSeq, tileset, floor + 1, max_floor, offset)
+            return old_map_generate(MapSeq, tileset, offset, max_floor, floor + 1)
         end
     }
     return MapSeq:slot_resolve(seq_idx, MapUtils.game_map_create(map, true))

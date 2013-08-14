@@ -78,7 +78,6 @@ void GameMapState::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	collision_avoidance().clear();
 	game_inst_set().deserialize(gs, serializer);
 	monster_controller().deserialize(serializer);
-
 }
 
 // Does an add_instance in this map
