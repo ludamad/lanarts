@@ -16,7 +16,7 @@
 
 #include "PlayerData.h"
 
-PlayerInst* PlayerDataEntry::player() {
+PlayerInst* PlayerDataEntry::player() const {
 	GameInst* local = player_inst.get();
 	LANARTS_ASSERT(!local || dynamic_cast<PlayerInst*>(local));
 	return (PlayerInst*) local;

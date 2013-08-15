@@ -26,7 +26,7 @@ struct PlayerDataEntry {
 	class_id classtype;
 	int net_id;
 
-	PlayerInst* player();
+	PlayerInst* player() const;
 
 	PlayerDataEntry(const std::string& player_name, GameInst* player_inst,
 			class_id classtype, int net_id) :

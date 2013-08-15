@@ -330,6 +330,7 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 }
 
 void PlayerInst::perform_queued_actions(GameState* gs) {
+	perf_timer_begin(FUNCNAME);
 	GameSettings& settings = gs->game_settings();
 
 	if (settings.saving_to_action_file()) {
@@ -341,6 +342,7 @@ void PlayerInst::perform_queued_actions(GameState* gs) {
 	}
 	queued_actions.clear();
 	actions_set_for_turn = false;
+	perf_timer_end(FUNCNAME);
 }
 
 void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
@@ -527,6 +529,7 @@ void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
 	}
 }
 void PlayerInst::use_move(GameState* gs, const GameAction& action) {
+	perf_timer_begin(FUNCNAME);
 	int dx = action.action_x;
 	int dy = action.action_y;
 
@@ -582,17 +585,7 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 	}
 
 	event_log("Player id: %d using move for turn %d, vx=%f, vy=%f\n", id, gs->frame(), vx, vy);
-}
-
-static int scan_entrance(const std::vector<GameRoomPortal>& portals,
-		const Pos& tilepos) {
-	for (int i = 0; i < portals.size(); i++) {
-		if (portals[i].entrancesqr == tilepos) {
-			return i;
-		}
-	}
-
-	return -1;
+	perf_timer_end(FUNCNAME);
 }
 
 void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {

@@ -165,7 +165,6 @@ static void show_defeat_message(GameChat& chat, EnemyEntry& e) {
 	if (!e.defeat_msg.empty()) {
 		chat.add_message(e.defeat_msg, COL_MUTED_GREEN);
 	}
-
 }
 
 void EnemyInst::step(GameState* gs) {

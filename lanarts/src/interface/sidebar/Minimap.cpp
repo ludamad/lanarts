@@ -12,6 +12,7 @@
 #include "objects/FeatureInst.h"
 
 #include <lcommon/math_util.h>
+#include <lcommon/perf_timer.h>
 
 #include <SDL_opengl.h>
 #include "Minimap.h"
@@ -55,9 +56,7 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 
 	bool minimap_reveal = gs->key_down_state(SDLK_z);
 
-	int stairs_down = res::tileid("stairs_down");
-	int stairs_up = res::tileid("stairs_up");
-	fov& fov = gs->local_player()->field_of_view();
+	std::vector<PlayerInst*> players = gs->player_data().players_in_level(gs->get_level()->id());
 	for (int y = 0; y < shown.height(); y++) {
 		char* iter = buff + y * ptw * 4;
 		for (int x = 0; x < shown.width(); x++) {
@@ -65,15 +64,23 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 			int tile = tiles.get(xy).tile;
 			int seen = tiles.is_seen(xy) || minimap_reveal;
 			if (seen) {
-				if (tile == stairs_down || tile == stairs_up) {
-					iter[0] = 255, iter[1] = 0, iter[2] = 0, iter[3] = 255;
-				} else if (!tiles.is_solid(xy)) {/*floor*/
+				if (!tiles.is_solid(xy)) {/*floor*/
 					iter[0] = 50, iter[1] = 50, iter[2] = 50, iter[3] = 255;
 				} else { //if (tile == 1){/*wall*/
 					iter[0] = 200, iter[1] = 225, iter[2] = 200, iter[3] = 255;
 				}
 			}
-			if (!fov.within_fov(xy.x, xy.y)) {
+
+			// Check if visible by a player on this level
+			bool within_fovs = false;
+			for (int i = 0; i < players.size(); i++) {
+				fov& fov = players[i]->field_of_view();
+				if (fov.within_fov(xy.x, xy.y)) {
+					within_fovs = true;
+					break;
+				}
+			}
+			if (!within_fovs) {
 				iter[0] /=2 , iter[1] /= 2, iter[2] /= 2;
 			}
 			iter += 4;
@@ -148,6 +155,7 @@ static BBox find_portion(Pos center, Size desired_size, Size world_size) {
 
 // Draws a minimap from the contents of gs->tile_grid()
 void Minimap::draw(GameState* gs) {
+	perf_timer_begin(FUNCNAME);
 
 	GameTiles& tiles = gs->tiles();
 	GameView& view = gs->view();
@@ -167,12 +175,14 @@ void Minimap::draw(GameState* gs) {
 	world2minimapbuffer(gs, minimap_arr, world_portion, world_portion.width(), world_portion.height(), ptw, pth);
 
 	BBox adjusted_view_region = view_region.translated(-world_portion.x1, -world_portion.y1);
-	PlayerInst* player = gs->local_player();
-	if (player) {
+
+	std::vector<PlayerInst*> players_in_level = gs->player_data().players_in_level(gs->get_level()->id());
+	for (int i = 0; i < players_in_level.size(); i++) {
+		PlayerInst* player = players_in_level[i];
 		int arr_x = (player->x / TILE_SIZE) - world_portion.x1, arr_y = (player->y / TILE_SIZE) - world_portion.y1;
 //		fill_buff2d(minimap_arr, ptw, pth, arr_x - arr_x % 2, arr_y - arr_y % 2,
 //				Colour(255, 180, 99), 2, 2);
-		fill_buff2d(minimap_arr, ptw, pth, arr_x, arr_y, COL_YELLOW, 1, 1);
+		fill_buff2d(minimap_arr, ptw, pth, arr_x, arr_y, player->is_local_player() ? COL_YELLOW : COL_BABY_BLUE, 1, 1);
 //		draw_rect2d(minimap_arr, ptw, pth, adjusted_view_region, Colour(255, 180, 99));
 	}
 	minimap_buff.from_bytes(Size(ptw, pth), minimap_arr);
@@ -192,4 +202,5 @@ void Minimap::draw(GameState* gs) {
 			}
 		}
 	}
+	perf_timer_end(FUNCNAME);
 }
