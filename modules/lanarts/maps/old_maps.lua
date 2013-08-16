@@ -350,6 +350,7 @@ local function generate_statues(map)
     local areas = leaf_group_areas(map)
     local amount = random(5,10)
     local i = 0
+    local tries, MAX_TRIES = 1, 10
     while i < amount do
         local area = random_choice(areas)
         local sqr = map_utils.random_square(map, area)
@@ -364,7 +365,12 @@ local function generate_statues(map)
             map:square_apply(sqr, {remove = MapGen.FLAG_SEETHROUGH})
             map_utils.spawn_decoration(map, "statue", sqr, random(0,17))
             i = i + 1
+            tries = 0
         end
+        tries = tries + 1
+        if tries >= MAX_TRIES then
+            return
+        end 
     end
 end
 

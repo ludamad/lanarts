@@ -233,6 +233,27 @@ Data.weapon_create {
 }
 
 Data.weapon_create {
+    name = "Wand of Minor Missile",
+    description = "A powerful long-bow.",
+    type = "wands",
+
+    shop_cost = {75, 85},
+
+    spr_item = "missle wand",
+
+    uses_projectile = true,
+
+    damage = {base = {5, 9}, strength = 1.2},
+    power = {base = 5, strength = 0.25},
+
+    cooldown = 55,
+
+    range = 300
+}
+
+-- BEGIN MONSTER ATTACK TYPES ---
+
+Data.weapon_create {
     name = "Slow Melee",
     type = "unarmed",
 
@@ -248,7 +269,6 @@ Data.weapon_create {
     range = 7
 }
 
--- BEGIN MONSTER ATTACK TYPES ---
 
 Data.weapon_create {
     name = "Basic Melee",

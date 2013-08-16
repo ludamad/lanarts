@@ -37,18 +37,18 @@ local function start_menu_create(on_start_click, on_join_click, on_load_click, o
 
     local y_position = 70 -- Start down 70 pixels
     menu:add_instance(
-        text_button_create("Start a New Game", on_start_click, text_button_params),
+        text_button_create("Start or Join a Game", on_start_click, text_button_params),
         CENTER,
         {0, y_position}
     )
     y_position = y_position + 50
 
-    menu:add_instance(
-        text_button_create("Join an Existing Game", on_join_click, text_button_params),
-        CENTER,
-        {0, y_position}
-    )
-    y_position = y_position + 50
+--    menu:add_instance(
+--        text_button_create("Browse Hosted Games", on_join_click, text_button_params),
+--        CENTER,
+--        {0, y_position}
+--    )
+--    y_position = y_position + 50
 
     if file_exists("saves/savefile.save") then
         menu:add_instance(

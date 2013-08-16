@@ -10,7 +10,10 @@ sprites:
     
   - name: iron broadsword
     file: modules/lanarts/items/weapons/sprites/iron_broadsword.png
-    
+
+  - name: missle wand
+    file: modules/lanarts/items/weapons/missle-wand.png
+
   - name: magic sword
     file: modules/lanarts/items/weapons/sprites/magic_sword.png
 
