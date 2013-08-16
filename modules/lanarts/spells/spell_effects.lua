@@ -124,3 +124,11 @@ function thrown_effect.stat(effect, obj, old, new)
 		obj.stats.attack_cooldown = 2
 	end
 end
+
+-- expedited
+
+expedited_effect = {}
+
+function expedited_effect.stat(effect, obj, old, new)
+	new.speed = new.speed + 2
+end

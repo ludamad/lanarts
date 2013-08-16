@@ -37,6 +37,10 @@ sprites:
         
   - name: large fire
     file: modules/lanarts/effects/sprites/cloud_fire2.png
+
+  - name: minor missile
+    type: directional
+    frames: modules/lanarts/spells/sprites/minor_missile.png%32x32
     
   - name: berserk
     file: modules/lanarts/spells/sprites/berserk.png
@@ -46,7 +50,7 @@ sprites:
         
   - name: berserk_effected
     file: modules/lanarts/effects/sprites/berserk.png       
-
+        
   - name: exhausted_effected
     file: modules/lanarts/effects/sprites/i-slowing.png
 
@@ -55,3 +59,6 @@ sprites:
 
   - name: thrown_effected
     file: modules/lanarts/spells/sprites/fleeing.png
+
+  - name: expedite
+    file: modules/lanarts/spells/sprites/swiftness.png

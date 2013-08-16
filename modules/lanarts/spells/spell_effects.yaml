@@ -44,6 +44,19 @@ effects:
     effected_colour: [120,120,120] #RGB
     effected_sprite: exhausted_effected
 
+  - name: Expedited
+    stat_func: expedited_effect.stat
+    can_use_rest: no
+    finish_func: 
+      function (effect, obj) 
+        local EventLog = import "core.ui.EventLog";
+        if obj:is_local_player() then 
+          EventLog.add("You are no longer expedited.", {255,200,200}) 
+        end
+      end
+    effected_colour: [220,220,255] #RGB
+    effected_sprite: haste effected
+
   - name: Charge
     can_use_spells: no
     init_func: charge_effect.init

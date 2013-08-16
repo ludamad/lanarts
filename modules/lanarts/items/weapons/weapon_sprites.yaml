@@ -11,8 +11,8 @@ sprites:
   - name: iron broadsword
     file: modules/lanarts/items/weapons/sprites/iron_broadsword.png
 
-  - name: missle wand
-    file: modules/lanarts/items/weapons/missle-wand.png
+  - name: missile wand
+    file: modules/lanarts/items/weapons/missile-wand.png
 
   - name: magic sword
     file: modules/lanarts/items/weapons/sprites/magic_sword.png
@@ -34,6 +34,9 @@ sprites:
 
   - name: long bow
     file: modules/lanarts/items/weapons/sprites/ranged/longbow.png
+
+  - name: mars bow
+    file: modules/lanarts/items/weapons/sprites/ranged/mars_bow.png
 
   - name: big stone
     file: modules/lanarts/effects/sprites/big_stone.png

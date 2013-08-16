@@ -233,18 +233,18 @@ Data.weapon_create {
 }
 
 Data.weapon_create {
-    name = "Wand of Minor Missile",
-    description = "A powerful long-bow.",
-    type = "wands",
+    name = "Mars Bow",
+    description = "A bow begotten of Mars blessing.",
+    type = "bows",
 
-    shop_cost = {75, 85},
+    shop_cost = {105, 145},
 
-    spr_item = "missle wand",
+    spr_item = "mars bow",
 
     uses_projectile = true,
 
-    damage = {base = {5, 9}, strength = 1.2},
-    power = {base = 5, strength = 0.25},
+    damage = {base = {6, 10}, strength = 1.2},
+    power = {base = 6, strength = 0.25},
 
     cooldown = 55,
 

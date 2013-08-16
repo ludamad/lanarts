@@ -3,18 +3,17 @@ projectiles:
   - name: Fire Bolt
     weapon_class: magic
     damage_type: {magic: 1.0}
-    damage: { base: [2,6], magic: 1.05 }
+    damage: { base: [2,4], magic: 1.05 }
     power: { base: 1, magic: 0.2 }
     range: 300
     speed: 7
     spr_item: none
     spr_attack: fire bolt
-    can_wall_bounce: yes
-    
+
   - name: Magic Blast
     weapon_class: magic
     damage_type: { magic: 1.0}
-    damage: { base: [3,14], magic: 2.1 }
+    damage: { base: [3,16], magic: 2.1 }
     power: { base: 2, magic: 0.2 }
     range: 300
     speed: 4
@@ -22,7 +21,19 @@ projectiles:
     resist_modifier: 2.0
     spr_item: none
     spr_attack: magic blast
-    
+
+  - name: Minor Missile
+    weapon_class: magic
+    damage_type: { magic: 1.0}
+    damage: { base: [0,5], magic: .65 }
+    power: { base: 0, magic: 0.2 }
+    range: 300
+    speed: 8
+    resist_modifier: 0.65
+    spr_item: none
+    spr_attack: minor missile
+    can_wall_bounce: yes
+ 
   - name: Poison Cloud
     weapon_class: magic
     damage_type: { magic: 1.0}

@@ -50,7 +50,7 @@ local function connect_map(args)
 end
 
 -- Overworld to template map sequence (from overworld to deeper in the temple)
-local TEMPLE_DEPTH = 4
+local TEMPLE_DEPTH = 2
 
 local function temple_level_base_apply(map, tileset, area)
     MapGen.random_placement_apply { map = map, area = area,
@@ -62,7 +62,7 @@ local function temple_level_base_apply(map, tileset, area)
     dungeons.simple_tunnels(map, {1,1}, {0,1}, tileset.wall, tileset.floor_tunnel, area)
 end
 
-local function temple_level_create(label, floor, sequences, tileset)
+local function temple_level_create(label, floor, sequences, tileset, enemy_candidates)
     local map = MapUtils.map_create( label .. ' ' .. floor, {40+floor*10, 40+floor*10}, tileset.wall)
     temple_level_base_apply(map, tileset, bbox_create({4,4}, vector_add(map.size, {-8,-8})))
 
@@ -82,14 +82,13 @@ local function temple_level_create(label, floor, sequences, tileset)
             sprite_down = "stair_kinds", sprite_down_index = stair_kinds_index(4, 7),
             forward_portals = no_forward and 0 or 1,
             next_floor_callback = function() 
-                return temple_level_create(label, floor +1, sequences, tileset)
+                return temple_level_create(label, floor +1, sequences, tileset, enemy_candidates)
             end
         }
         done_once = true
     end
 
-    for i=1,floor do MapUtils.random_enemy(map, "Skeleton") end
-    for i=1,floor do MapUtils.random_enemy(map, "Dark Centaur") end
+    for i=1,10 do MapUtils.random_enemy(map, random_choice(enemy_candidates)) end
     if floor == TEMPLE_DEPTH then
         for i=1,20 do
             ItemUtils.item_object_generate(map, ItemGroups.basic_items)
@@ -109,7 +108,11 @@ local function find_player_positions(map, --[[Optional]] flags)
     local positions = {}
     local map_area = bbox_create({0,0},map.size)
     for i=1,World.player_amount do
-        local sqr = MapUtils.random_square(map, map_area, --[[Selector]] { matches_all = flags, matches_none = {MapGen.FLAG_SOLID, MapGen.FLAG_HAS_OBJECT} })
+        local sqr = MapUtils.random_square(map, map_area, 
+            --[[Selector]] { matches_all = flags, matches_none = {MapGen.FLAG_SOLID, MapGen.FLAG_HAS_OBJECT} },
+            --[[Operator]] nil, 
+            --[[Max attempts]] 10000
+        )
         if not sqr then error("Could not find player spawn position for player " .. i .. "!") end
         positions[i] = {(sqr[1]+.5) * GameMap.TILE_SIZE, (sqr[2]+.5) * GameMap.TILE_SIZE}
     end
@@ -219,7 +222,7 @@ function M.overworld_create()
                     temple_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
                     temple_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
                         function() 
-                            return temple_level_create("Temple", 1, temple_sequences, TileSets.temple)
+                            return temple_level_create("Temple", 1, temple_sequences, TileSets.temple, {"Skeleton", "Dark Centaur"})
                     end)
                     table.insert(undecided_squares, xy)
                end},
@@ -278,10 +281,14 @@ function M.overworld_create()
            --Enemy candidate square
            ['e'] = { add = UNDECIDED_FLAG, content = UNDECIDED_TILE, 
                     on_placement = function(map, xy)
-                        if chance(.8) then 
-                            local enemy = OldMaps.enemy_generate(OldMaps.harder_enemies)
-                            MapUtils.spawn_enemy(map, enemy, xy)
-                        end
+                        local enemy = OldMaps.enemy_generate(OldMaps.harder_enemies)
+                        MapUtils.spawn_enemy(map, enemy, xy)
+                        table.insert(undecided_squares, xy)
+                    end },          
+           --Red dragon square
+           ['E'] = { add = UNDECIDED_FLAG, content = UNDECIDED_TILE, 
+                    on_placement = function(map, xy)
+                        MapUtils.spawn_enemy(map, "Red Dragon", xy)
                         table.insert(undecided_squares, xy)
                     end },
            --Entrance to 'Mines': a connecting mini-dungeon
@@ -292,7 +299,7 @@ function M.overworld_create()
                     dirthole_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
                     dirthole_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
                         function()
-                            return temple_level_create("Mines", 1, dirthole_sequences, TileSets.pebble)
+                            return temple_level_create("Mines", 1, dirthole_sequences, TileSets.pebble, {"Golem", "Zombie"})
                     end)
                end}
     })

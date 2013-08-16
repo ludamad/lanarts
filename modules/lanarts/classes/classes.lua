@@ -4,12 +4,14 @@ Data.class_create {
     available_spells = {
       { spell = "Fire Bolt",
         level_needed = 1 }, 
+      { spell = "Minor Missile",
+    	level_needed = 1 },
       { spell = "Blink",
         level_needed = 2 }, 
       { spell = "Poison Cloud",
-        level_needed = 3 }, 
+        level_needed = 2 }, 
       { spell = "Magic Blast",
-        level_needed = 4 }
+        level_needed = 3 }
     },
     start_stats = {
         movespeed = 4,
@@ -83,6 +85,8 @@ Data.class_create {
     name = "Archer",
     sprites = {"archer"},
     available_spells = {
+      { spell = "Expedite",
+        level_needed = 1 },
       { spell = "Magic Arrow",
         level_needed = 2 }
     },

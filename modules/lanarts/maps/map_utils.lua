@@ -4,12 +4,12 @@ local GameMap = import "core.GameMap"
 
 local M = {} -- Submodule
 
-function M.random_square(map, area, --[[Optional]] selector, --[[Optional]] operator) 
+function M.random_square(map, area, --[[Optional]] selector, --[[Optional]] operator, --[[Optional]] max_attempts) 
     return MapGen.find_random_square { 
-        map = map, 
+        map = map, area = area, 
         selector = selector or { matches_none = {MapGen.FLAG_SOLID, MapGen.FLAG_HAS_OBJECT} },
         operator = operator or { add = MapGen.FLAG_HAS_OBJECT },
-        area = area
+        max_attempts = max_attempts
     }
 end
 

@@ -1,12 +1,23 @@
 local EventLog = import "core.ui.EventLog"
 local Map = import "core.GameMap"
 
+-- MINOR MISSILE
+
+Data.spell_create {
+    name = "Minor Missile",
+    spr_spell = "minor missile",
+    description = "A low cost, fast bolt of energy. Hits a single target. The bolt can bounce off walls safely.",
+    projectile = "Minor Missile",
+    mp_cost = 4,
+    cooldown = 35
+}
+
 -- FIRE BOLT
 
 Data.spell_create {
     name = "Fire Bolt",
     spr_spell = "fire bolt",
-    description = "A fast bolt of fire, hits a single target. The bolt can bounce off walls safely.",
+    description = "A fast bolt of fire. Hits a single target.",
     projectile = "Fire Bolt",
     mp_cost = 10,
     cooldown = 35
@@ -44,7 +55,7 @@ function Berserk.autotarget_func(caster)
 end
 
 function Berserk.action_func(caster, x, y)
-    caster:add_effect("Berserk", 150 + caster.stats.level * 20)
+    caster:add_effect("Berserk", 150 + math.min(4, caster.stats.level)  * 20)
     if caster:is_local_player() then
         EventLog.add("You enter a powerful rage!", {200,200,255})
     elseif caster.name == "Your ally" then
@@ -53,17 +64,6 @@ function Berserk.action_func(caster, x, y)
 end
 
 Data.spell_create(Berserk)
-
--- POISON ARROW
-
-Data.spell_create {
-    name = "Poison Arrow",
-    spr_spell = "poison",
-    description = "Embues an arrow with poison.",
-    projectile = "Poison Cloud",
-    mp_cost = 25,
-    cooldown = 60
-}
 
 -- BLINK
 
@@ -172,5 +172,34 @@ end
 
 Data.spell_create(PowerStrike)
 
--- FIRE CLOUD
+-- EXPEDITE --
 
+local Expedite = {
+    name = "Expedite",
+    description = "Run faster for a short duration.",
+    can_cast_with_held_key = false,
+    spr_spell = "expedite",
+    can_cast_with_cooldown = true,
+    mp_cost = 30,
+    cooldown = 30,
+    fallback_to_melee = false,
+}
+
+function Expedite.prereq_func(caster)
+    return not caster:has_effect("Expedited")
+end
+
+function Expedite.autotarget_func(caster)
+    return caster.x, caster.y
+end
+
+function Expedite.action_func(caster, x, y)
+    caster:add_effect("Expedited", 200 + math.min(7, caster.stats.level) * 20)
+    if caster:is_local_player() then
+        EventLog.add("You feel expedient!", {200,200,255})
+    elseif caster.name == "Your ally" then
+        EventLog.add(caster.name .. " seems expedient.", {200,200,255})
+    end
+end
+
+Data.spell_create(Expedite)
