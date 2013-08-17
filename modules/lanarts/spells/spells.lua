@@ -194,7 +194,7 @@ function Expedite.autotarget_func(caster)
 end
 
 function Expedite.action_func(caster, x, y)
-    caster:add_effect("Expedited", 250)
+    caster:add_effect("Expedited", 150)
     if caster:is_local_player() then
         EventLog.add("You feel expedient!", {200,200,255})
     elseif caster.name == "Your ally" then
