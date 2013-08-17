@@ -57,23 +57,23 @@ local harder_enemies = {
 local test_layout = {
         size = {70,70},
         rooms =    { padding = 1, amount = 1,  size = {60,60}},
-        tunnels =  { padding = 2, width = {1,2}, per_room = 0}
+        tunnels =  { padding = 1, width = {1,2}, per_room = 0}
 }
 local tiny_layout1 = {
         size = {{55,75},{55,76}}, -- {width} by {height},
         rooms =    { padding = 1, amount = 3,  size = {10,12}},
-        tunnels =  { padding = 2, width = {2,4}, per_room = 2}
+        tunnels =  { padding = 1, width = {1,4}, per_room = 2}
 }        
 local tiny_layout2 = {
         size = {{55,75},{45,76}}, -- {width} by {height},
         rooms =    { padding = 1, amount = 6,  size = {5,12} },
-        tunnels =  { padding = 2, width = {2,4}, per_room = 2}
+        tunnels =  { padding = 1, width = {1,4}, per_room = 2}
 }
 
 local tiny_layout3 = {
         size = {40,80},
         rooms =    { padding = 1, amount = {5,10}, size = {4,10} },
-        tunnels =  { padding = 1, width = {2,4},  per_room = {2,3} }
+        tunnels =  { padding = 1, width = {1,4},  per_room = {2,3} }
 }
 
 local small_layout1 = {

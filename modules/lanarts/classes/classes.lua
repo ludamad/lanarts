@@ -6,10 +6,6 @@ Data.class_create {
         level_needed = 1 }, 
       { spell = "Minor Missile",
     	level_needed = 1 },
-      { spell = "Blink",
-        level_needed = 2 }, 
-      { spell = "Poison Cloud",
-        level_needed = 2 }, 
       { spell = "Magic Blast",
         level_needed = 3 }
     },
@@ -88,7 +84,9 @@ Data.class_create {
       { spell = "Expedite",
         level_needed = 1 },
       { spell = "Magic Arrow",
-        level_needed = 2 }
+        level_needed = 2 },
+      { spell = "Poison Cloud",
+        level_needed = 3 } 
     },
     start_stats = {
         movespeed = 4,
@@ -96,7 +94,7 @@ Data.class_create {
         mp = 70,
         hpregen = 0.05,
         mpregen = 0.05,
-        strength = 4,
+        strength = 5,
         defence = 4,
         willpower = 4,
         magic = 4,

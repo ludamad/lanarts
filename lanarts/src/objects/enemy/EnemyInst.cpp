@@ -54,9 +54,9 @@ float monster_difficulty_multiplier(GameState* gs, EnemyEntry& etype) {
 	}
 	float mult = log(size); //NB: natural log, base e ~ 2.718...
 	if (etype.unique) {
-		return 1 + mult / 8; // Can reasonably expect all players to be part of a boss fight
+		return 1 + mult / 2; // Can reasonably expect all players to be part of a boss fight
 	}
-	return 1 + mult / 16;
+	return 1 + mult / 3;
 }
 
 EnemyInst::EnemyInst(int enemytype, int x, int y) :
@@ -141,8 +141,8 @@ void EnemyInst::init(GameState* gs) {
 	lua_State* L = gs->luastate();
 
 	float diffmult = monster_difficulty_multiplier(gs, etype());
-	core_stats().hp *= diffmult;
-	core_stats().max_hp *= diffmult;
+	core_stats().hp = ceil(core_stats().hp  * diffmult);
+	core_stats().max_hp = ceil(core_stats().max_hp  * diffmult);
 
 	lua_gameinst_callback(L, etype().init_event.get(L), this);
 	lua_api::event_monster_init(L, this);

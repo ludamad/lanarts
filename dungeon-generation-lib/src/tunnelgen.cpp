@@ -276,7 +276,7 @@ namespace ldungeon_gen {
 			totalpaths[i] = randomizer.rand(num_tunnels);
 		}
 		int nogen_tries = 0;
-		while (nogen_tries < 200) {
+		while (nogen_tries < 2000) {
 			nogen_tries++;
 
 			for (int i = 0; i < map->groups.size(); i++) {

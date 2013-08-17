@@ -16,7 +16,6 @@ M.basic_items = {
     -- Scrolls
     , { item = "Haste Scroll",       chance = 7                      }
     , { item = "Strength Scroll",    chance = 2                      }
-    , { item = "Scroll of Escape",   chance = 3                      }
     , { item = "Magic Scroll",       chance = 2                      }
     , { item = "Defence Scroll",     chance = 2                      }
     , { item = "Will Scroll",        chance = 2                      }

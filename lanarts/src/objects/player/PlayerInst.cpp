@@ -118,7 +118,9 @@ static void spawn_in_overworld(GameState* gs, PlayerInst* player) {
 				overworld_map);
 	} else {
 		player->update_position(sqr.x, sqr.y);
-		gs->view().sharp_center_on(player->pos());
+		if (player->is_local_player()) {
+			gs->view().sharp_center_on(player->pos());
+		}
 	}
 }
 

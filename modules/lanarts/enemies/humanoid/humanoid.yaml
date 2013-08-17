@@ -46,7 +46,7 @@ enemies:
         movespeed: 4
         strength: 20
         defence: 8
-        willpower: 3
+        willpower: 8
 
 #    
 #  - name: Orc Knight

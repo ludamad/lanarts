@@ -180,7 +180,7 @@ local Expedite = {
     can_cast_with_held_key = false,
     spr_spell = "expedite",
     can_cast_with_cooldown = true,
-    mp_cost = 30,
+    mp_cost = 25,
     cooldown = 30,
     fallback_to_melee = false,
 }
@@ -194,7 +194,7 @@ function Expedite.autotarget_func(caster)
 end
 
 function Expedite.action_func(caster, x, y)
-    caster:add_effect("Expedited", 200 + math.min(7, caster.stats.level) * 20)
+    caster:add_effect("Expedited", 250)
     if caster:is_local_player() then
         EventLog.add("You feel expedient!", {200,200,255})
     elseif caster.name == "Your ally" then

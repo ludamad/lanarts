@@ -13,8 +13,8 @@ projectiles:
   - name: Magic Blast
     weapon_class: magic
     damage_type: { magic: 1.0}
-    damage: { base: [3,16], magic: 2.1 }
-    power: { base: 2, magic: 0.2 }
+    damage: { base: [3,14], magic: 2.1 }
+    power: { base: 1, magic: 0.2 }
     range: 300
     speed: 4
     number_of_target_bounces: 3
@@ -28,7 +28,7 @@ projectiles:
     damage: { base: [0,5], magic: .65 }
     power: { base: 0, magic: 0.2 }
     range: 300
-    speed: 8
+    speed: 7.25
     resist_modifier: 0.65
     spr_item: none
     spr_attack: minor missile

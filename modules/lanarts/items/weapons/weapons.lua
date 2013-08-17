@@ -218,7 +218,7 @@ Data.weapon_create {
     description = "A powerful long-bow.",
     type = "bows",
 
-    shop_cost = {75, 85},
+    shop_cost = {95, 125},
 
     spr_item = "long bow",
 
@@ -237,7 +237,7 @@ Data.weapon_create {
     description = "A bow begotten of Mars blessing.",
     type = "bows",
 
-    shop_cost = {105, 145},
+    shop_cost = {205, 245},
 
     spr_item = "mars bow",
 
