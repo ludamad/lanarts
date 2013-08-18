@@ -301,31 +301,32 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	}
 	int ex = e->x / TILE_SIZE, ey = e->y / TILE_SIZE;
 
+	Pos target;
+	int tries_left = 35; // arbitrary number
 	do {
-		Pos target;
-		int tries_left = 35; // arbitrary number
-		do {
-			if (!is_fullpath) {
-				target.x = squish(ex + mt.rand(-3, 4), 0, tile.tile_width() - 1);
-				target.y = squish(ey + mt.rand(-3, 4), 0, tile.tile_height() - 1);
-			} else {
-				target.x = mt.rand(tile.tile_width());
-				target.y = mt.rand(tile.tile_height());
-			}
-			tries_left--;
-		} while (tries_left > 0 && tile.is_solid(target));
-
-		if (tries_left == 0) {
-			return; // Avoid pathological cases
+		if (!is_fullpath) {
+			target.x = squish(ex + mt.rand(-3, 4), 0, tile.tile_width() - 1);
+			target.y = squish(ey + mt.rand(-3, 4), 0, tile.tile_height() - 1);
+		} else {
+			target.x = mt.rand(tile.tile_width());
+			target.y = mt.rand(tile.tile_height());
 		}
+		tries_left--;
+	} while (tries_left > 0 && tile.is_solid(target));
 
-		eb.current_node = 0;
-		eb.path = astarcontext.calculate_AStar_path(gs, ex, ey, target.x, target.y);
-		if (is_fullpath) {
-			eb.path_cooldown = EnemyBehaviour::RANDOM_WALK_COOLDOWN/2 + mt.rand(EnemyBehaviour::RANDOM_WALK_COOLDOWN);
-		}
-		eb.current_action = EnemyBehaviour::FOLLOWING_PATH;
-	} while (eb.path.size() <= 1);
+	if (tries_left == 0) {
+		return; // Avoid pathological cases
+	}
+
+	eb.path = astarcontext.calculate_AStar_path(gs, ex, ey, target.x, target.y);
+	if (eb.path.size() <= 1) {
+		return;
+	}
+	eb.current_node = 0;
+	if (is_fullpath) {
+		eb.path_cooldown = EnemyBehaviour::RANDOM_WALK_COOLDOWN/2 + mt.rand(EnemyBehaviour::RANDOM_WALK_COOLDOWN);
+	}
+	eb.current_action = EnemyBehaviour::FOLLOWING_PATH;
 
 	eb.path_steps = 0;
 	eb.path_start = Pos(e->x, e->y);

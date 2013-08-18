@@ -75,4 +75,3 @@ bool EnemiesSeenContent::handle_io(GameState *gs,
 
 EnemiesSeenContent::~EnemiesSeenContent() {
 }
-
