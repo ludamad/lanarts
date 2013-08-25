@@ -26,7 +26,7 @@ M.game_object_stat_context_create = GameObjectStatContext.create
 
 --- Sync derived stats with base stats
 function M.copy_base_to_derived(context)
-    table.deep_copy(context.derived, context.base)
+    table.deep_copy(context.base, context.derived)
 end
 
 --- Change HP & reflect it in both derived and base stat-sets

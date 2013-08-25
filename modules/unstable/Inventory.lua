@@ -6,5 +6,5 @@ end
 
 function Inventory:__copy(other)
     -- Ensure a shallow copy when used with table.deep_copy
-    table.copy(other, self)
+    table.copy(self, other)
 end

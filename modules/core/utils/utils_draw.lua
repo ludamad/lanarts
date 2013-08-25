@@ -55,7 +55,7 @@ end
 -- Colors that already have an alpha will be made more transparent.
 -- @usage with_alpha(COL_WHITE, 0.5)
 function with_alpha(col, alpha) -- Don't mutate, we might be passed a colour constant!
-    local copy = { unpack(col) } 
+    local copy = { unpack(col) }
     -- Assume we have at least 3 components, but may have 4
     copy[4] = (copy[4] and copy[4] or 255 ) * alpha
     return copy    

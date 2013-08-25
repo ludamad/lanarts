@@ -90,7 +90,7 @@ end
 
 function table.clone(t)
     local newt = {}
-    table.copy(newt, t)
+    table.copy(t, newt)
     return newt
 end
 

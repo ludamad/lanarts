@@ -84,49 +84,16 @@ static int lapi_table_copy(lua_State* L) {
 
 	lua_pushnil(L);
 
-	while (lua_next(L, 2)) {
+	while (lua_next(L, 1)) {
 		lua_pushvalue(L, -2); // key
 		lua_pushvalue(L, -2); // value
-		lua_settable(L, 1);
+		lua_settable(L, 2);
 
 		lua_pop(L, 1);
 		// pop value
 	}
 	lua_pop(L, 1);
 	return 0;
-}
-
-// Works with plain-data tables and not-too-special tables.
-static int lapi_table_deep_clone(lua_State* L) {
-	if (lua_gettop(L) != 1) {
-		luaL_error(L, "table.deep_copy takes 1 argument, got %d", lua_gettop(L));
-	}
-
-	lua_newtable(L); // Push new table as argument 2, making it compatible with 'metacopy'
-	// Copy metatable and check for __copy
-	if (metacopy(L)) {
-		return 1; // Return, if we have a __copy metamethod
-	}
-
-	// Deep copy over members
-	lua_pushnil(L);
-	while (lua_next(L, 1)) {
-		lua_pushvalue(L, -2); // key
-		lua_pushvalue(L, -2); // value
-
-		if (lua_istable(L, -1)) {
-			// Create clone of value
-			lua_pushcfunction(L, lapi_table_deep_clone);
-			lua_pushvalue(L, -2);
-			lua_call(L, 1, 1);
-			lua_replace(L, -2); // Replace old value
-		}
-		lua_rawset(L, 2);
-
-		lua_pop(L, 1); // pop value
-	}
-
-	return 1;
 }
 
 // Works with plain-data tables and not-too-special tables.

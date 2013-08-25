@@ -4,7 +4,7 @@ local M = ResourceTypes.type_create() -- Submodule
 function M.skills_create(--[[Optional]] params)
     local skills = {}
     if params ~= nil then
-        table.deep_copy(skills, params)
+        table.deep_copy(params, skills)
     end
     return skills
 end
