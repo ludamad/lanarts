@@ -6,7 +6,7 @@
 
 #include <lua.hpp>
 #include <luawrap/luawrap.h>
-#include <luawrap/functions.h>
+#include <luawrap/macros.h>
 
 #include <lcommon/lua_utils.h>
 
@@ -66,10 +66,14 @@ namespace lua_api {
 		LuaValue globals = luawrap::globals(L);
 		GameState* gs = lua_api::gamestate(L);
 
-		LuaValue fonts = lua_ensure_protected_table(globals["Fonts"]);
+		LuaValue fonts = luawrap::ensure_table(globals["Fonts"]);
+		LuaValue fonts_meta = luameta_new(L, "Fonts");
+		LuaValue fonts_getters = luameta_getters(fonts_meta);
+		fonts.set_metatable(fonts_meta);
 
-		fonts["small"] = gs->font();
-		fonts["large"] = gs->menu_font();
+		LUAWRAP_SET_TYPE(LuaValue);
+		LUAWRAP_GETTER(fonts_getters, small, lua_api::gamestate(L)->font());
+		LUAWRAP_GETTER(fonts_getters, large, lua_api::gamestate(L)->menu_font());
 
 		register_display_table(L);
 	}

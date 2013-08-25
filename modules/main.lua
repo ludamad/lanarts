@@ -92,9 +92,15 @@ function data_load(key, default, --[[Optional]] vpath)
     return val
 end
 
+-- Require is used when interacting with 'vanilla' lua modules
+require_path_add("modules/?.lua")
+
 --- Lanarts Entry point
 -- @param args the arguments passed on the command-line.
+-- @return whether we are performing a full game initialization, or performing some testing task
 function Engine.main(args)
+    import "core.main"
+
     if table.contains(args, "--tests-only") then
         import "tests.main"
         return false
@@ -102,18 +108,15 @@ function Engine.main(args)
         import "unstable.simulation"
         return false
     end
-    return true -- Continue graphical startup
-end
 
--- Require is used when interacting with 'vanilla' lua modules
-require_path_add("modules/?.lua")
+    Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
+    -- TODO: Remove any notion of 'internal graphics'. All graphics loading should be prompted by Lua.
+    __initialize_internal_graphics()
+    
+    -- Hardcoded for now!
+    import "lanarts.main"
 
--- Hardcoded for now!
-local modules = {"core", "lanarts"}
-
--- Begin loading all the modules
-for m in values(modules) do
-    import(m .. ".main")
+    return true -- Continue lanarts initialization
 end
 
 print "End of 'modules/main.lua'."

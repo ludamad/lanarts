@@ -260,10 +260,12 @@ void GameInstSet::step(GameState* gs) {
 	for (int i = 0; i < unit_capacity; i++) {
 		GameInst* inst = unit_set[i].inst;
 		if (valid_inst(inst)) {
+			perf_timer_begin(typeid(*inst).name());
 			inst->destroyed = false;
 			event_log("Step-event for id %d\n", inst->id);
 			inst->step(gs);
 			update_instance_for_step(&unit_set[i], inst);
+			perf_timer_end(typeid(*inst).name());
 		}
 	}
 	perf_timer_end(FUNCNAME);
@@ -439,6 +441,7 @@ void GameInstSet::__update_collision_position(InstanceState* state,
 
 void GameInstSet::update_instance_for_step(InstanceState* state,
 		GameInst* inst) {
+	perf_timer_begin(FUNCNAME);
 	if (inst->destroyed)
 		return;
 	if (true || inst->solid) {
@@ -448,6 +451,7 @@ void GameInstSet::update_instance_for_step(InstanceState* state,
 		__update_collision_position(state, last_pos, new_pos);
 	}
 	inst->last_x = inst->x, inst->last_y = inst->y;
+	perf_timer_end(FUNCNAME);
 }
 
 void GameInstSet::add_to_depthlist(InstanceState* inst,

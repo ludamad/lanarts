@@ -13,7 +13,7 @@ local text_button_params = {
     click_box_padding = 5
 }
 
-local PLAYER_COLOURS = { 
+local PLAYER_COLORS = { 
     COL_BABY_BLUE, COL_PALE_YELLOW, COL_PALE_RED,
     COL_PALE_GREEN, COL_PALE_BLUE, COL_LIGHT_GRAY 
 }
@@ -35,8 +35,8 @@ local function pregame_joined_players_list_create()
         local x, y = unpack(xy)
     
         for idx, player in ipairs(World.players) do
-            local color_idx = ( (idx -1) % #PLAYER_COLOURS ) + 1
-            local color = PLAYER_COLOURS[ color_idx ]
+            local color_idx = ( (idx -1) % #PLAYER_COLORS ) + 1
+            local color = PLAYER_COLORS[ color_idx ]
 
             local text = "Player " .. idx .. ": "
             if idx == 1 then -- Slot 1 always local player

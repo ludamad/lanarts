@@ -453,6 +453,8 @@ static bool player_radius_visible_test(PlayerInst* player, const BBox& bbox) {
 
 bool GameState::radius_visible_test(int x, int y, int radius,
 		PlayerInst* player, bool canreveal) {
+	perf_timer_begin(FUNCNAME);
+
 	const int sub_sqrs = VISION_SUBSQRS;
 	const int subsize = TILE_SIZE / sub_sqrs;
 
@@ -461,17 +463,15 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 	int maxgrid_x = (x + radius) / subsize, maxgrid_y = (y + radius) / subsize;
 	int minx = squish(mingrid_x, 0, w), miny = squish(mingrid_y, 0, h);
 	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
-	/*
-	 if (canreveal && key_down_state(SDLK_BACKQUOTE)) {
-	 return true;
-	 }*/
 
 	if (player) {
-		if (player->current_floor != game_world().get_current_level_id()) {
-			return false;
+		bool visible = false;
+		if (player->current_floor == game_world().get_current_level_id()) {
+			visible = player_radius_visible_test(player, BBox(minx, miny, maxx, maxy));
 		}
 
-		return player_radius_visible_test(player, BBox(minx, miny, maxx, maxy));
+		perf_timer_end(FUNCNAME);
+		return visible;
 	}
 
 	bool has_player = false;
@@ -486,6 +486,8 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 			}
 		}
 	}
+
+	perf_timer_end(FUNCNAME);
 	return (!has_player);
 }
 bool GameState::object_visible_test(GameInst* obj, PlayerInst* player,

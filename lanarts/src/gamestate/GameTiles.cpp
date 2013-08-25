@@ -116,6 +116,7 @@ void GameTiles::pre_draw(GameState* gs) {
 }
 
 void GameTiles::step(GameState* gs) {
+	perf_timer_begin(FUNCNAME);
 	const int sub_sqrs = VISION_SUBSQRS;
 
 	char matches[sub_sqrs * sub_sqrs];
@@ -141,6 +142,7 @@ void GameTiles::step(GameState* gs) {
 			}
 		}
 	}
+	perf_timer_end(FUNCNAME);
 }
 void GameTiles::post_draw(GameState* gs) {
 

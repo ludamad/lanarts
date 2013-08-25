@@ -20,7 +20,6 @@
 #include <ldraw/lua_ldraw.h>
 
 #include <luawrap/luawrap.h>
-#include <luawrap/calls.h>
 
 #include "data/game_data.h"
 
@@ -33,7 +32,14 @@
 #include "lua_api/lua_yaml.h"
 #include "lua_api/lua_newapi.h"
 
-using namespace std;
+// This is a stop-gap measure to allow Lua all-or-nothing control over internal graphic initialization.
+// Long-term we must move eg fonts completely to Lua.
+static int __initialize_internal_graphics(lua_State* L) {
+	GameSettings& settings = lua_api::gamestate(L)->game_settings();
+	res::font_primary().initialize(settings.font, 10);
+	res::font_menu().initialize(settings.menu_font, 20);
+	return 0;
+}
 
 static GameState* init_gamestate() {
 
@@ -56,23 +62,15 @@ static GameState* init_gamestate() {
 		exit(0);
 	}
 
-	Size window_size(settings.view_width, settings.view_height);
-	ldraw::display_initialize("Lanarts", window_size, settings.fullscreen);
-
-	res::font_primary().initialize(settings.font, 10);
-	res::font_menu().initialize(settings.menu_font, 20);
-
 	lanarts_net_init(true);
 	lua_api::preinit_state(L);
 	lsound::init();
 
 	//GameState claims ownership of the passed lua_State*
-	const int HUD_WIDTH = 160;
-	int windoww = settings.view_width, windowh = settings.view_height;
-	int vieww = windoww - HUD_WIDTH, viewh = windowh;
-
 	GameState* gs = new GameState(settings, L);
 	lua_api::register_api(gs, L);
+
+	luawrap::globals(L)["__initialize_internal_graphics"].bind_function(__initialize_internal_graphics);
 
 	return gs;
 }
@@ -84,7 +82,10 @@ int main(int argc, char** argv) {
 	GameState* gs = init_gamestate();
 	lua_State* L = gs->luastate();
 
-	luawrap::dofile(L, "modules/main.lua"); // loads module bootstrap
+	/* Load low-level Lua bootstrapping code.
+	 * Implements the module system used by the rest of the engine.
+	 */
+	luawrap::dofile(L, "modules/main.lua");
 
 	LuaValue engine = luawrap::globals(L)["Engine"];
 

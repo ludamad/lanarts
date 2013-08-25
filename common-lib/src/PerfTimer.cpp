@@ -3,6 +3,7 @@
  *  Provides timing information on a per-method basis
  */
 
+#include <string>
 #include <cstdio>
 #include <cmath>
 #include <algorithm>
@@ -36,9 +37,15 @@ void PerfTimer::end(const char* method) {
 
 void PerfTimer::print_results() {
 	printf("**** START PERFORMANCE STATS ****\n");
-	MethodPerfProfileMap::iterator it = perf_map.begin();
-	for (; it != perf_map.end(); ++it) {
-		MethodPerfProfile& mpp = it->second;
+	std::map<std::string, MethodPerfProfile> sorted_perf_map;
+	MethodPerfProfileMap::iterator prof_iter = perf_map.begin();
+	for (; prof_iter != perf_map.end(); ++prof_iter) {
+		sorted_perf_map[prof_iter->first] = prof_iter->second;
+	}
+
+	std::map<std::string, MethodPerfProfile>::iterator sorted_iter = sorted_perf_map.begin();
+	for (; sorted_iter != sorted_perf_map.end(); ++sorted_iter) {
+		MethodPerfProfile& mpp = sorted_iter->second;
 		float total = mpp.total_microseconds / 1000.0f;
 		float max = mpp.max_microseconds / 1000.0f;
 		float avg = total / mpp.total_calls;
@@ -49,7 +56,7 @@ void PerfTimer::print_results() {
 				"\tCALLS\t %d"
 				"\n\tSTDDEV +-%.4fms, +-%.2f%%"
 				"\tMAX %.4fms\n",
-				it->first, avg,
+				sorted_iter->first.c_str(), avg,
 				total,
 				mpp.total_calls,
 				stddev, stddev_percentage,

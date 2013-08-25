@@ -78,9 +78,11 @@ void GameLogger::event_log(const char *fmt, ...) {
 static GameLogger __logger;
 
 void event_log(const char *fmt, ...) {
+	perf_timer_begin(FUNCNAME);
 	va_list ap;
 	va_start(ap, fmt);
 	__logger.event_log(fmt, ap);
+	perf_timer_end(FUNCNAME);
 }
 void event_log_initialize(GameState* gs, const char* input_file,
 		const char* output_file) {
