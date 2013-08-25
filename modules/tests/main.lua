@@ -2,9 +2,13 @@ import 'core.utils'
 import '@lunit'
 
 local tests = {
-    "tests.lanarts.test_stats",
-    "tests.lanarts.test_object_relations",
-    "tests.core.test_SerializeBuffer"
+    "tests.unstable.TestStats",
+    "tests.unstable.TestResourceTypes",
+    "tests.unstable.TestSkillsContent",
+    "tests.unstable.TestSpellsContent",
+    "tests.unstable.TestSchemas",
+    "tests.lanarts.TestObjectRelations",
+    "tests.core.TestSerializeBuffer"
 }
 
 local testcases = {}
@@ -25,5 +29,7 @@ TestCases = setmetatable({}, {
         get_lunit_testcase(virtual_path(2))[key] = val
     end
 })
+
+assert = lunit.assert
 
 lunit.main{'--', unpack(tests)}

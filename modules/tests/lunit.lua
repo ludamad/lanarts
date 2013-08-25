@@ -606,7 +606,7 @@ function main(argv)
     end
     local ok, runner = pcall( import, vpath)
     if not ok then
-      return error("Cannot load test-case '" .. vpath .. "'" .. tostring(runner))
+      return error("Cannot load test-case '" .. vpath .. "'\n\t\t" .. tostring(runner))
     end
   end
 

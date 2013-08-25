@@ -4,14 +4,15 @@
 
 local EventLog = import "core.ui.EventLog"
 
-local M = {} -- Submodule
-
 local World = import "core.GameWorld"
 local Map = import "core.GameMap"
 local help_overlay = import "@help_overlay"
 local keys = import "core.keyboard"
 
+local M = {} -- Submodule
+
 --- Externally visible control structure for the main loop
+-- Global mutable state, but no serialization guards, as storing it is not needed.
 M.loop_control = {
     game_is_over = false,
     game_is_paused = false,

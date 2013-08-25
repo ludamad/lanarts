@@ -1,5 +1,6 @@
-function TestCases.SerializeBuffer_bindings()
-    local SB = import "core.io.SerializeBuffer"
+local SB = import "core.io.SerializeBuffer"
+
+function TestCases.bindings_check()
     lunit.assert(SB)
     lunit.assert(SB.create)
     local sb = SB.create()

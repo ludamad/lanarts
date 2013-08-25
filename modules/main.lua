@@ -81,9 +81,9 @@ end
 local GlobalData = import "core.GlobalData"
 
 -- Data is defined on a per-submodule basis
-function data_load(key, default)
+function data_load(key, default, --[[Optional]] vpath)
     -- Make a safe & (almost) guaranteed unique key 
-    local global_key = virtual_path(2) .. ':' .. key
+    local global_key = (vpath or virtual_path(2)) .. ':' .. key
     local val = GlobalData[global_key]
     if not val then 
         GlobalData[global_key] = default
@@ -96,6 +96,10 @@ end
 -- @param args the arguments passed on the command-line.
 function Engine.main(args)
     if table.contains(args, "--tests-only") then
+        import "tests.main"
+        return false
+    elseif table.contains(args, "--simulation") then
+        import "unstable.simulation"
         return false
     end
     return true -- Continue graphical startup
@@ -105,7 +109,7 @@ end
 require_path_add("modules/?.lua")
 
 -- Hardcoded for now!
-local modules = {"core", "lanarts"}--, "tests"}
+local modules = {"core", "lanarts"}
 
 -- Begin loading all the modules
 for m in values(modules) do

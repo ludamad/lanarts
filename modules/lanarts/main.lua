@@ -1,11 +1,5 @@
---[[
-    This is the only Lua file explicitly loaded by the lanarts engine.
-
-    This sets up all the engine hooks that control program flow, and pull
-    in additional files.
-]]
-
-require_path_add("modules/lanarts/library_files/?.lua")
+--- This is the main loading point of the game, after the bootstrap 'main'.
+-- This sets up all the engine hooks that define the Lanarts game.
 
 sound_volume = 0 -- Mute the game
 

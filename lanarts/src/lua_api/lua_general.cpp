@@ -61,8 +61,8 @@ static int lapi_table_remove_nonexisting(lua_State* L) {
 static bool metacopy(lua_State* L) {
 	// Ensure same meta-table, call __copy metamethod if exists
 	if (lua_getmetatable(L, 1)) {
+		lua_pushvalue(L, -1);
 		lua_setmetatable(L, 2);
-		lua_getmetatable(L, 1);
 
 		// Call __copy metamethod if not nil, skipping the rest of the copying.
 		lua_getfield(L, -1, "__copy");
@@ -72,7 +72,7 @@ static bool metacopy(lua_State* L) {
 			lua_call(L, 2, 0);
 			return true;
 		}
-		lua_pop(L, 1);
+		lua_pop(L, 2);
 	}
 	return false;
 }
@@ -97,9 +97,47 @@ static int lapi_table_copy(lua_State* L) {
 }
 
 // Works with plain-data tables and not-too-special tables.
-static int lapi_table_deep_copy(lua_State* L) {
+static int lapi_table_deep_clone(lua_State* L) {
+	if (lua_gettop(L) != 1) {
+		luaL_error(L, "table.deep_copy takes 1 argument, got %d", lua_gettop(L));
+	}
+
+	lua_newtable(L); // Push new table as argument 2, making it compatible with 'metacopy'
+	// Copy metatable and check for __copy
 	if (metacopy(L)) {
-		return 0;
+		return 1; // Return, if we have a __copy metamethod
+	}
+
+	// Deep copy over members
+	lua_pushnil(L);
+	while (lua_next(L, 1)) {
+		lua_pushvalue(L, -2); // key
+		lua_pushvalue(L, -2); // value
+
+		if (lua_istable(L, -1)) {
+			// Create clone of value
+			lua_pushcfunction(L, lapi_table_deep_clone);
+			lua_pushvalue(L, -2);
+			lua_call(L, 1, 1);
+			lua_replace(L, -2); // Replace old value
+		}
+		lua_rawset(L, 2);
+
+		lua_pop(L, 1); // pop value
+	}
+
+	return 1;
+}
+
+// Works with plain-data tables and not-too-special tables.
+static int lapi_table_deep_copy(lua_State* L) {
+	if (lua_gettop(L) != 2) {
+		luaL_error(L, "table.deep_copy takes 2 arguments, got %d", lua_gettop(L));
+	}
+
+	// Copy metatable and check for __copy
+	if (metacopy(L)) {
+		return 0; // Return, if we have a __copy metamethod
 	}
 
 	// Deep copy over members
@@ -111,18 +149,27 @@ static int lapi_table_deep_copy(lua_State* L) {
 		LuaStackValue value(L, -1);
 
 		key.push();
-		lua_rawget(L, 2); // push current value
-		if (lua_istable(L, -1) && lua_istable(L, value.index())) {
-			// Recursively deep copy
+		// Figure out new value
+		if (lua_istable(L, value.index())) {
+			// Recursive deep copy case
+			/* Resolve value to copy to */ {
+				key.push();
+				lua_rawget(L, 2); // push current value
+				// Copy into if table, else make new table
+				if (!lua_istable(L, -1)) {
+					lua_pop(L, 1);
+					lua_newtable(L);
+				}
+			}
 			lua_pushcfunction(L, lapi_table_deep_copy);
-			lua_pushvalue(L, -2); // push current value
 			value.push();
+			lua_pushvalue(L, -3); // Push value to copy to
 			lua_call(L, 2, 0);
-			lua_pop(L, 1);
 		} else {
-			lua_pop(L, 1);
-			lua_rawset(L, 2);
+			// Shallow copy case
+			value.push();
 		}
+		lua_rawset(L, 2);
 
 		lua_pop(L, 1); // pop value
 	}
@@ -629,6 +676,7 @@ namespace lua_api {
 		table["merge"].bind_function(lapi_table_merge);
 		table["copy"].bind_function(lapi_table_copy);
 		table["deep_copy"].bind_function(lapi_table_deep_copy);
+//		table["deep_clone"].bind_function(lapi_table_deep_clone);
 		table["remove_nonexisting"].bind_function(lapi_table_remove_nonexisting);
 
 		LuaValue string_table = luawrap::ensure_table(globals["string"]);

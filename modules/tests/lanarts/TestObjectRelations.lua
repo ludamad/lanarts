@@ -3,7 +3,7 @@ local MapGen = import "core.map_generation"
 local GameMap = import "core.GameMap"
 local GameObject = import "core.GameObject"
 
--- Test game map, dead simple but valid 1x1 game map. All objects stacked on square 0.
+-- Dead simple, but valid, 1x1 test game-map. All objects are stacked on square {0,0}.
 local gmap = GameMap.create { 
     map = MapGen.map_create { 
         label = "TestLevel", 

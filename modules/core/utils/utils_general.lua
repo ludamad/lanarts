@@ -94,6 +94,12 @@ function table.clone(t)
     return newt
 end
 
+function table.deep_clone(t)
+    local newt = {}
+    table.deep_copy(t, newt)
+    return newt
+end
+
 function table.pop_first(t)
     local len = #t
     if len == 0 then 
@@ -150,6 +156,30 @@ end
 function table.insert_all(t1, t2)
     for v in values(t2) do
         t1[#t1 + 1] = v
+    end
+end
+
+--- Adds values from src to dest, copying them if initially nil
+function table.defaulted_addition(src, dest)
+    for k,v in pairs(src) do
+        local val = dest[k]
+        if dest[k] == nil then
+            dest[k] = src[k]
+        else
+            dest[k] = val + src[k]
+        end
+    end
+end
+
+--- Subtracts values from src to dest, copying them if initially nil
+function table.defaulted_subtraction(src, dest)
+    for k,v in pairs(src) do
+        local val = dest[k]
+        if dest[k] == nil then
+            dest[k] = src[k]
+        else
+            dest[k] = val - src[k]
+        end
     end
 end
 
