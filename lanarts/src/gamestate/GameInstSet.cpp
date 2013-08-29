@@ -191,7 +191,6 @@ void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
 		int id;
 		serializer.read_int(type);
 		serializer.read_int(id);
-		printf("Deserializing id=%d\n", id);
 		GameInst* inst = get_instance(id);
 		bool has_inst = inst != NULL;
 		if (!has_inst) {

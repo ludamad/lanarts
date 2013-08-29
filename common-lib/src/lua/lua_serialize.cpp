@@ -97,7 +97,7 @@ static inline bool buf_write_if_seen(lua_State* L, SerializeBuffer& buf, int tab
 		if (lua_isnumber(L, -1)) {
 			buf.write_byte(MAR_TREF);
 			buf.write_int(lua_tointeger(L, -1));
-			printf("Writing object with integer ID\n");
+//			printf("Writing object with integer ID\n");
 		} else {
 			size_t str_len;
 			const char* str = lua_tolstring(L, -1, &str_len);
@@ -162,12 +162,12 @@ void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) 
 		lua_pushvalue(L, -1);
 		if (!buf_write_if_seen(L, buf, SEEN_IDX)
 				&& !buf_try_persist_hook(L, buf, idx)) {
-			printf("Serializing type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
+//			printf("Serializing type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
 			lua_pushinteger(L, (*idx)++);
 			lua_rawset(L, SEEN_IDX);
 
 			if (lua_getmetatable(L, -1)) {
-				printf("Object has metatable %lX\n", lua_topointer(L, -1));
+//				printf("Object has metatable %lX\n", lua_topointer(L, -1));
 				// Table with a meta-table
 				buf.write_byte(MAR_TVAL_WITH_META);
 				mar_encode_value(L, buf, -1, idx);
@@ -198,7 +198,7 @@ void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) 
 				luaL_error(L, "attempt to persist a C function '%s'", ar.name);
 			}
 			lua_pushvalue(L, -1);
-			printf("Serializing type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
+//			printf("Serializing type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
 			lua_pushinteger(L, (*idx)++);
 			lua_rawset(L, SEEN_IDX);
 
@@ -272,7 +272,7 @@ static void mar_handle_persist_closure(lua_State* L, const char *buf, size_t len
 	// First argument is function, so persistargs-1 arguments are passed
 	lua_call(L, persistargs - 1, 1);
 	lua_pushvalue(L, -1);
-	printf("Type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
+//	printf("Type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
 	lua_rawseti(L, SEEN_IDX, (*idx)++);
 }
 
@@ -293,7 +293,7 @@ static void store_object(LuaField key, LuaField value, LuaField str2obj_table, L
 	int ntop = lua_gettop(L);
 
 	if (object_was_marked_mutable(value)) {
-		printf("Object %s was marked mutable and will not be treated as a constant.\n", key.to_str());
+//		printf("Object %s was marked mutable and will not be treated as a constant.\n", key.to_str());
 		return;
 	}
 
@@ -387,7 +387,7 @@ static void decode_ref_miss(lua_State* L, const char* ref_str, size_t len) {
 		}
 	}
 	lua_pushlstring(L, ref_str, i);
-	printf("Got ref miss with '%s', importing '%s'\n", ref_str, lua_tostring(L, -1));
+//	printf("Got ref miss with '%s', importing '%s'\n", ref_str, lua_tostring(L, -1));
 	luawrap::globals(L)["import"].push();
 	lua_pushvalue(L, -2);
 	lua_call(L, 1, 1);
@@ -452,12 +452,12 @@ void mar_decode_value(lua_State* L, const char *buf, size_t len, const char **p,
 		} else if (tag == MAR_TVAL_WITH_META || tag == MAR_TVAL) {
 			lua_newtable(L);
 			lua_pushvalue(L, -1);
-			printf("Decoding type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
+//			printf("Decoding type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
 			lua_rawseti(L, SEEN_IDX, (*idx)++);
 			if (tag == MAR_TVAL_WITH_META) {
 				mar_decode_value(L, buf, len, p, idx);
-				printf("Object has metatable %lX\n", lua_topointer(L, -1));
-				printf("Pushed metatable, type=%s\n", lua_typename(L, lua_type(L, -1)));
+//				printf("Object has metatable %lX\n", lua_topointer(L, -1));
+//				printf("Pushed metatable, type=%s\n", lua_typename(L, lua_type(L, -1)));
 				lua_pushvalue(L, -2); // Push for decoding
 			}
 			mar_next_len(l, uint32_t);
@@ -493,7 +493,7 @@ void mar_decode_value(lua_State* L, const char *buf, size_t len, const char **p,
 
 			lua_pushvalue(L, -1);
 			lua_rawseti(L, SEEN_IDX, (*idx)++);
-			printf("Decoding type %d = %s\n", *idx -1, lua_typename(L, lua_type(L, -1)));
+//			printf("Decoding type %d = %s\n", *idx -1, lua_typename(L, lua_type(L, -1)));
 
 			mar_next_len(l, uint32_t);
 			lua_newtable(L);

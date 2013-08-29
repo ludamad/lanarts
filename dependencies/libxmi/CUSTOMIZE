@@ -1,0 +1,44 @@
+This file describes possible customizations of the libxmi library.  Please
+read the file README first; it describes what libxmi does.
+
+1. If desired, modify the default definition of `miPixel' in ./xmi.h by
+   defining the MI_PIXEL_TYPE preprocessor symbol at compile time.  Each
+   point in a miPaintedSet is painted with a miPixel, but what a miPixel
+   is, is up to you.  By default it is an `unsigned int', but it could be
+   another integer type, a floating point type, a structure, a union...
+   That would be arranged by defining MI_PIXEL_TYPE.  If MI_PIXEL_TYPE is a
+   structure or a union, the macro MI_SAME_PIXEL(), which tests two
+   miPixels for equality, should be redefined too.
+
+2. If desired, define the macro MI_DEFAULT_MERGE2_PIXEL() also.  As
+   explained in ./xmi.h, by default, miCopyPaintedSetToCanvas() uses the
+   Painter's Algorithm (a source pixel replaces a destination pixel).  That
+   may be altered programatically by invoking miSetPixelMerge2().  But at
+   installation time, the default behavior may be altered too, by defining
+   the macro MI_DEFAULT_MERGE2_PIXEL(new, source, dest).  For example, if
+   the miPixel datatype is defined to include an alpha component as well as
+   color components, a change would be called for.
+
+3. The same, for the macro MI_DEFAULT_MERGE3_PIXEL().  This macro is used
+   when a "texture" pixel is available as part of a miCanvas, and must be
+   taken into account, besides the source pixel and the destination pixel
+   already on the miCanvas.
+
+4. If desired, customize the definition of the `drawable' contained within
+   an miCanvas by defining the symbol MI_CANVAS_DRAWABLE_TYPE.  If this is
+   not defined, the drawable will be an miPixmap.  If you define
+   MI_CANVAS_DRAWABLE_TYPE, you will also need to define the accessor
+   macros MI_GET_CANVAS_DRAWABLE_PIXEL(pCanvas, x, y, pixel) and
+   MI_SET_CANVAS_DRAWABLE_PIXEL(pCanvas, x, y, pixel).  The macro
+   MI_GET_CANVAS_DRAWABLE_BOUNDS(pCanvas, xleft, ytop, xright, ybottom)
+   should be defined too.  See ./xmi.h.
+
+
+Actually, if you are interested only in the first stage of the graphics
+pipeline, i.e., the painting of pixels in a miPaintedSet by the eight
+drawing functions in the core API, only modification #1 above is relevant.
+A miPaintedSet is an opaque object, but by looking at the function
+miCopyPaintedSetToCanvas() in the file mi_canvas.c, you should be able to
+see how it is laid out.  It would be trivial to write your own function
+that copies pixels out of a miPaintedSet, i.e., to rewrite the second stage
+of the graphics pipeline from scratch in a completely customized way.
