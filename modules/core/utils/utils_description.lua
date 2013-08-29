@@ -1,3 +1,4 @@
+-- TODO: This is obviously weird
 function speed_description(time_per_step)
     local text = "Slow"
 

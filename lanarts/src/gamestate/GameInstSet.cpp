@@ -410,6 +410,37 @@ int GameInstSet::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 	return obj_n;
 }
 
+std::vector<GameInst*> GameInstSet::object_rectangle_test(BBox rect, GameInst* tester, col_filterf f) {
+	int mingrid_x = rect.x1 / REGION_SIZE, mingrid_y = rect.y1 / REGION_SIZE;
+	int maxgrid_x = rect.x2 / REGION_SIZE, maxgrid_y = rect.y2 / REGION_SIZE;
+	int minx = squish(mingrid_x, 0, grid_w), miny = squish(mingrid_y, 0,
+		grid_h);
+	int maxx = squish(maxgrid_x, 0, grid_w), maxy = squish(maxgrid_y, 0,
+		grid_h);
+
+	std::vector<GameInst*> instances;
+	for (int yy = miny; yy <= maxy; yy++) {
+		int index = yy * grid_w + minx;
+		for (int xx = minx; xx <= maxx; xx++) {
+			InstanceLinkedList& unit_list = unit_grid[index++];
+			InstanceState* ptr = unit_list.start_of_list;
+			if (!ptr)
+				continue;
+
+			while (ptr) {
+				GameInst* inst = ptr->inst;
+				if (tester != inst) {
+					if (circle_rectangle_test(inst->pos(), inst->target_radius, rect)) {
+						instances.push_back(inst);
+					}
+				}
+				ptr = ptr->next_in_grid;
+			}
+		}
+	}
+	return instances;
+}
+
 void GameInstSet::clear() {
 	for (int i = 0; i < unit_capacity; i++) {
 		GameInst* inst = unit_set[i].inst;

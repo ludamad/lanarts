@@ -13,7 +13,6 @@
 
 #include "lua_api.h"
 
-void lua_gameinst_bindings(GameState* gs, lua_State* L);
 void lua_combatstats_bindings(GameState* gs, lua_State* L);
 void lua_effectivestats_bindings(GameState* gs, lua_State* L);
 void lua_collision_check_bindings(lua_State* L);

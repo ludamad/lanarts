@@ -1,3 +1,5 @@
+local Display = import "core.Display"
+
 local InstanceGroup = import "core.ui.InstanceGroup"
 local InstanceBox = import "core.ui.InstanceBox"
 local Sprite = import "core.ui.Sprite"

@@ -12,13 +12,33 @@ end
 
 function vector_add(v1, v2)
     local length = # v1
-    assert(length == #v2, "vector_multiply(): Vector lengths do not match!")
+    assert(length == #v2, "vector_add(): Vector lengths do not match!")
 
     local ret = {}
     for i = 1,length do ret[i] = v1[i] + v2[i] end
     return ret
 end
 
+function vector_subtract(v1, v2)
+    local length = # v1
+    assert(length == #v2, "vector_subtract(): Vector lengths do not match!")
+
+    local ret = {}
+    for i = 1,length do ret[i] = v1[i] - v2[i] end
+    return ret
+end
+
+function vector_scale(v1, scale, --[[Optional]] floor_result)
+    local ret = {}
+    for i = 1,#v1 do 
+        local result = v1[i] * scale
+        if floor_result then
+            result = math.floor(result)
+        end
+        ret[i] = result
+    end
+    return ret
+end
 
 function vector_apply(f) 
     return function (v1, v2)
@@ -29,6 +49,18 @@ function vector_apply(f)
         for i = 1,length do ret[i] = f(v1[i], v2[i]) end
         return ret
     end
+end
+
+--- Calculates the sum t1[k] * t2[k] for every key 'k' that exists in t1 and t2  
+function table.dot_product(t1, t2)
+    local sum = 0
+    for k,v1 in pairs(t1) do
+        local v2 = t2[k]
+        if v2 ~= nil then
+            sum = sum + (v1 * v2)
+        end
+    end
+    return sum
 end
 
 vector_max = vector_apply(math.max)

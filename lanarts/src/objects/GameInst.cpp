@@ -34,14 +34,33 @@ void GameInst::try_callback(const char* callback) {
 	if (lua_variables.empty() || lua_variables.isnil()) {
 		return;
 	}
+
 	lua_State* L = lua_variables.luastate();
-	lua_variables[callback].push();
+	lua_pushstring(L, callback);
+	int string_idx = lua_gettop(L);
+
+	lua_variables.push();
+	lua_pushvalue(L, string_idx); // Duplicate string
+	lua_gettable(L, -2);
+
+	// Not available ? Try the type table.
+	if (lua_isnil(L, -1)) {
+		lua_pop(L, 1);
+		// Push type table
+		lua_pushliteral(L, "type");
+		lua_rawget(L, string_idx + 1); // Get from lua_variables
+		if (!lua_isnil(L, -1)) {
+			int type_table_idx = lua_gettop(L);
+			lua_pushvalue(L, string_idx); // Duplicate string
+			lua_gettable(L, type_table_idx);
+		}
+	}
+
 	if (!lua_isnil(L, -1)) {
 		luawrap::push(L, this);
 		lua_call(L, 1, 0);
-	} else {
-		lua_pop(L, 1);
 	}
+	lua_settop(L, string_idx - 1);
 }
 
 void GameInst::step(GameState* gs) {
@@ -53,8 +72,8 @@ void GameInst::draw(GameState* gs) {
 }
 
 void GameInst::init(GameState* gs) {
-	try_callback("on_init");
 	current_floor = gs->game_world().get_current_level_id();
+	try_callback("on_init");
 }
 
 void GameInst::deinit(GameState* gs) {

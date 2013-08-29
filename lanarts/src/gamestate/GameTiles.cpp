@@ -50,7 +50,7 @@ Tile& GameTiles::get(const Pos& xy) {
 	return _tiles[xy];
 }
 
-bool GameTiles::is_seen(const Pos& xy) {
+bool GameTiles::was_seen(const Pos& xy) {
 	return (*_seen)[xy];
 }
 
@@ -106,7 +106,7 @@ void GameTiles::pre_draw(GameState* gs) {
 		for (int x = region.x1; x <= region.x2; x++) {
 			Tile& tile = get(Pos(x, y));
 			const ldraw::Image& img = res::tile(tile.tile).img(tile.subtile);
-			if (/*reveal_enabled ||*/is_seen(Pos(x, y))) {
+			if (/*reveal_enabled ||*/was_seen(Pos(x, y))) {
 				img.draw(on_screen(gs, Pos(x * TILE_SIZE, y * TILE_SIZE)));
 			}
 		}
@@ -196,7 +196,7 @@ void GameTiles::post_draw(GameState* gs) {
 						Pos(x * TILE_SIZE - view.x, y * TILE_SIZE - view.y),
 						res::tile(tile.tile).size());
 				if (!is_other_match) {
-					if (!is_seen(Pos(x, y))) {
+					if (!was_seen(Pos(x, y))) {
 						ldraw::draw_rectangle(Colour(0, 0, 0), tilebox);
 					} else {
 						// Previously seen

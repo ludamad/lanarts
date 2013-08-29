@@ -2,12 +2,13 @@
     Implements the game loop, which calls the step & draw events of all objects.
 ]]
 
+local Display = import "core.Display"
 local EventLog = import "core.ui.EventLog"
 
 local World = import "core.GameWorld"
 local Map = import "core.GameMap"
 local help_overlay = import "@help_overlay"
-local keys = import "core.keyboard"
+local Keys = import "core.keyboard"
 
 local M = {} -- Submodule
 
@@ -60,7 +61,7 @@ function M.post_draw()
     local player = World.local_player
     for pdata in values(World.players) do
         local p = pdata.instance
-        if not p:is_local_player() and p.floor == player.floor then
+        if not p:is_local_player() and p.map == player.map then
             Fonts.small:draw({color=COL_WHITE, origin=CENTER}, screen_coords{p.x, p.y-18}, pdata.name)
         end
     end
@@ -98,19 +99,15 @@ function M.run_loop()
     while true do 
         local single_player = (settings.connection_type == net.NONE)
     
-        if key_pressed(keys.F2) and single_player then 
+        if key_pressed(Keys.F2) and single_player then 
             Game.resources_load()
         end
-
-        if key_pressed(keys.F3) and single_player then 
-            Map.regenerate()
-        end
     
-        if key_pressed(keys.F4) then 
+        if key_pressed(Keys.F4) then 
             M.loop_control.game_is_paused = not M.loop_control.game_is_paused
         end
 
-        if key_pressed(keys.ESCAPE) then 
+        if key_pressed(Keys.ESCAPE) then 
             EventLog.add("Press Shift + Esc to exit, your progress will be saved.")
         end
 
@@ -127,7 +124,7 @@ function M.run_loop()
             break
         end
 
-        if key_pressed(keys.F5) then
+        if key_pressed(Keys.F5) then
             Game.input_capture(true) -- reset input
             net.sync_message_send()
         end

@@ -5,12 +5,14 @@ local map_utils = import ".map_utils"
 local MapGen = import "core.map_generation"
 local World = import "core.GameWorld"
 
+local M = nilprotect {} -- Submodule
+
 local easy_animals = {
   {enemy = "Giant Rat",         chance = 100,  group_chance = 33, group_size = 2          },
   {enemy = "Giant Bat",         chance = 100                                            }
 }
 
-local medium_animals = {
+M.medium_animals = {
   {enemy = "Giant Rat",         chance = 100, group_chance = 33, group_size = 3           },
   {enemy = "Giant Bat",         chance = 100, group_chance = 33, group_size = 3           },
   {enemy = "Giant Spider",      chance = 100,                                           },
@@ -43,7 +45,7 @@ local hard_enemies = {
  {enemy = "Unseen Horror",     chance = 10,   group_chance = 33, group_size = 2           }
 }
 
-local harder_enemies = {
+M.harder_enemies = {
   {enemy = "Super Chicken",     chance = 50,  group_chance = 33, group_size = {2,4}       },
   {enemy = "Ciribot",           chance = 100                                            },
   {enemy = "Storm Elemental",   chance = 5,   group_chance = 100, group_size = 4          },
@@ -201,7 +203,7 @@ local map_layouts = {
       items = { amount = 5,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
       enemies = {
         amount = {10,14},
-        generated = medium_animals 
+        generated = M.medium_animals 
       }
     }
   },
@@ -262,7 +264,7 @@ local map_layouts = {
       items = { amount = 7,  group = item_groups.enchanted_items   },
       enemies = {
         amount = 25,
-        generated = harder_enemies
+        generated = M.harder_enemies
       }
     }
   },
@@ -272,7 +274,7 @@ local map_layouts = {
       items = { amount = 7,  group = item_groups.enchanted_items   },
       enemies = {
         amount = 30,
-        generated = tconcat(harder_enemies, {{enemy = "Zin", guaranteed_spawns = 1}})
+        generated = tconcat(M.harder_enemies, {{enemy = "Zin", guaranteed_spawns = 1}})
       }
     }
   }
@@ -289,7 +291,7 @@ local function generate_items(map, items)
     end
 end
 
-local function enemy_generate(chances)
+function M.enemy_generate(chances)
     local total_chance = 0
     for entry in values(chances) do
         total_chance = total_chance + (entry.chance or 0)
@@ -303,7 +305,7 @@ local function enemy_generate(chances)
     end
 end
 
-local function generate_from_enemy_entries(map, chances, amount)
+function M.generate_from_enemy_entries(map, chances, amount)
     local total_chance = 0
     for entry in values(chances) do
         total_chance = total_chance + (entry.chance or 0)
@@ -333,7 +335,7 @@ local function generate_enemies(map, enemies)
     end
     local amounts = {min * (0.8 + World.player_amount * 0.2), max * (0.8 + World.player_amount * 0.2)}
     local amount = math.round(randomf(amounts))
-    generate_from_enemy_entries(map, enemies.generated, amount)
+    M.generate_from_enemy_entries(map, enemies.generated, amount)
 end
 
 local function leaf_group_areas(map)
@@ -345,6 +347,8 @@ local function leaf_group_areas(map)
     end
     return ret
 end
+
+M.statue = animation_create(images_load "modules/lanarts/features/sprites/statues/statue(0-17).png", 1.0)
 
 local function generate_statues(map)
     local areas = leaf_group_areas(map)
@@ -363,7 +367,7 @@ local function generate_statues(map)
         } 
         if query then
             map:square_apply(sqr, {remove = MapGen.FLAG_SEETHROUGH})
-            map_utils.spawn_decoration(map, "statue", sqr, random(0,17))
+            map_utils.spawn_decoration(map, M.statue, sqr, random(0,17))
             i = i + 1
             tries = 0
         end
@@ -458,7 +462,7 @@ local function generate_from_template(label, template, tileset)
     })
 end
 
-local function create_map(label, floor, tileset)
+function M.create_map(label, floor, tileset)
     local entry = map_layouts[floor]
     -- Resolve room width & height ranges by applying range_resolve
     local map
@@ -475,12 +479,7 @@ local function create_map(label, floor, tileset)
     return map
 end
 
+M.last_floor = #map_layouts
+
 -- Submodule
-return {
-    medium_animals = medium_animals,
-    enemy_generate = enemy_generate,
-    harder_enemies = harder_enemies,
-    create_map = create_map,
-    last_floor = #map_layouts,
-    generate_from_enemy_entries = generate_from_enemy_entries
-}
+return M

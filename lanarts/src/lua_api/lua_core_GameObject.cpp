@@ -1,5 +1,5 @@
 /*
- * lua_gameinst.cpp:
+ * lua_core_GameObject.cpp:
  *  Representation of a GameInst in Lua.
  */
 
@@ -20,6 +20,7 @@
 #include "data/game_data.h"
 
 #include "objects/GameInst.h"
+#include "objects/AnimatedInst.h"
 #include "objects/enemy/EnemyInst.h"
 #include "objects/FeatureInst.h"
 #include "objects/store/StoreInst.h"
@@ -88,11 +89,13 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	LUAWRAP_GETTER(getters, xy, OBJ->pos());
 	luawrap::bind_getter(getters["x"], &GameInst::x);
 	luawrap::bind_getter(getters["y"], &GameInst::y);
-	luawrap::bind_getter(getters["id"], &GameInst::y);
+	luawrap::bind_getter(getters["destroyed"], &GameInst::destroyed);
+	luawrap::bind_getter(getters["id"], &GameInst::id);
 	luawrap::bind_getter(getters["depth"], &GameInst::depth);
 	luawrap::bind_getter(getters["radius"], &GameInst::radius);
 	luawrap::bind_getter(getters["target_radius"], &GameInst::target_radius);
-	luawrap::bind_getter(getters["floor"], &GameInst::current_floor);
+	luawrap::bind_getter(getters["map"], &GameInst::current_floor);
+	LUAWRAP_GETTER(meta, __tostring, typeid(*OBJ).name());
 
 	getters["stats"].bind_function(lapi_gameinst_stats);
 
@@ -147,6 +150,11 @@ static int lapi_do_nothing(lua_State *L) {
     return 0;
 }
 
+static int lapi_combatgameinst_derived_stats(lua_State* L) {
+	lua_push_effectivestats(L, luawrap::get<GameInst*>(L, 1));
+	return 1;
+}
+
 static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(CombatGameInst*);
 
@@ -164,6 +172,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	methods["damage"].bind_function(lapi_combatgameinst_damage);
 	methods["heal_hp"].bind_function(lapi_combatgameinst_heal_hp);
 	methods["heal_mp"].bind_function(lapi_combatgameinst_heal_mp);
+	methods["derived_stats"].bind_function(lapi_combatgameinst_derived_stats);
 
 	LUAWRAP_METHOD(methods, add_effect, OBJ->effects().add(lua_api::gamestate(L), OBJ, effect_from_lua(L, 2), lua_tointeger(L, 3)).push() );
 	LUAWRAP_GETTER(methods, has_effect, OBJ->effects().get(effect_from_lua(L, 2)) != NULL);
@@ -182,7 +191,6 @@ static LuaValue lua_enemyinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(getters, name, OBJ->etype().name);
 	LUAWRAP_GETTER(getters, unique, OBJ->etype().unique);
 	LUAWRAP_GETTER(getters, kills, 0);
-	LUAWRAP_GETTER(methods, is_local_player, false);
 
 	return meta;
 }
@@ -218,6 +226,26 @@ static void lua_gameinst_push_metatable(lua_State* L, GameInst* inst) {
 	}
 }
 
+static void create_and_push_gameinst_cache(lua_State* L) {
+	// Create the cache table
+	lua_newtable(L);
+	int cache_idx = lua_gettop(L);
+
+	lua_pushvalue(L, LUA_REGISTRYINDEX);
+	int reg_idx = lua_gettop(L);
+	lua_pushlightuserdata(L, (void*)&create_and_push_gameinst_cache);
+	lua_pushvalue(L, cache_idx);
+	lua_rawset(L, reg_idx);
+
+	// Set up as weak table
+	lua_newtable(L);
+	lua_pushstring(L, "v");
+	lua_setfield(L, -2, "__mode");
+	lua_setmetatable(L, cache_idx);
+
+	lua_pop(L, 1); // Pop registry
+}
+
 // Functions required for luawrap
 namespace GameInstWrap {
 	GameInst* get(lua_State* L, int idx) {
@@ -238,11 +266,42 @@ namespace GameInstWrap {
 		return isgameinst;
 	}
 	void push(lua_State* L, GameInst* inst) {
-		GameInst** lua_inst = (GameInst**) lua_newuserdata(L, sizeof(GameInst*));
-		*lua_inst = inst;
-		lua_gameinst_push_metatable(L, inst);
-		lua_setmetatable(L, -2);
-		GameInst::retain_reference(inst);
+		if (inst == NULL) {
+			lua_pushnil(L);
+			return;
+		}
+
+		int prev_top = lua_gettop(L);
+		lua_pushvalue(L, LUA_REGISTRYINDEX);
+		int reg_idx = lua_gettop(L);
+		lua_pushlightuserdata(L, (void*)&create_and_push_gameinst_cache);
+		lua_rawget(L, reg_idx);
+		if (lua_isnil(L, -1)) {
+			lua_pop(L, 1);
+			create_and_push_gameinst_cache(L);
+		}
+		int cache_idx = lua_gettop(L);
+
+		lua_pushlightuserdata(L, inst);
+		lua_rawget(L, cache_idx);
+		if (lua_isnil(L, -1)) {
+			lua_pop(L, 1);
+			GameInst** lua_inst = (GameInst**) lua_newuserdata(L, sizeof(GameInst*));
+
+			// Cache the object
+			lua_pushlightuserdata(L, inst);
+			lua_pushvalue(L, -2);
+			lua_rawset(L, cache_idx);
+			*lua_inst = inst;
+
+			// Set up its metatable
+			lua_gameinst_push_metatable(L, inst);
+			lua_setmetatable(L, -2);
+			GameInst::retain_reference(inst);
+		}
+
+		lua_replace(L, prev_top + 1);
+		lua_settop(L, prev_top + 1);
 	}
 }
 
@@ -325,6 +384,27 @@ static GameInst* feature_create(LuaStackValue args) {
 	return do_instance_init(gs, inst, args);
 }
 
+static GameInst* animation_create(LuaStackValue args) {
+	using namespace luawrap;
+	GameState* gs = lua_api::gamestate(args);
+
+	sprite_id spr_id = -1;
+	if (!args["sprite"].isnil()) {
+		spr_id = res::sprite_id(args["sprite"].to_str());
+	}
+
+	AnimatedInst* inst = new AnimatedInst(
+			args["xy"].as<Pos>(),
+			spr_id,
+			defaulted(args["duration"], -1),
+			defaulted(args["velocity"], PosF()),
+			defaulted(args["orientation"], PosF()),
+			defaulted(args["depth"], (int)AnimatedInst::DEPTH),
+			defaulted(args["text"], std::string()),
+			defaulted(args["text_color"], Colour()));
+	return do_instance_init(gs, inst, args);
+}
+
 static Item lua_item_get(LuaStackValue item) {
 	item_id type = get_item_by_name(item["type"].to_str());
 	int amount = luawrap::defaulted(item["amount"], 1);
@@ -364,6 +444,10 @@ static GameInst* item_create(LuaStackValue args) {
 	return do_instance_init(gs, new ItemInst(lua_item_get(args), args["xy"].as<Pos>()), args);
 }
 
+static void object_destroy(LuaStackValue inst) {
+	lua_api::gamestate(inst)->remove_instance(inst.as<GameInst*>());
+}
+
 void lua_register_gameinst(lua_State* L) {
 	luawrap::install_type<GameInst*, GameInstWrap::push, GameInstWrap::get, GameInstWrap::check>();
 	luawrap::install_dynamic_casted_type<CombatGameInst*, GameInst*>();
@@ -377,7 +461,9 @@ void lua_register_gameinst(lua_State* L) {
 	submodule["object_create"].bind_function(object_create);
 	submodule["feature_create"].bind_function(feature_create);
 	submodule["item_create"].bind_function(item_create);
+	submodule["animation_create"].bind_function(animation_create);
 	submodule["store_create"].bind_function(store_create);
+	submodule["destroy"].bind_function(object_destroy);
 
 	submodule["DOOR_OPEN"] = (int)FeatureInst::DOOR_OPEN;
 	submodule["DOOR_CLOSED"] = (int)FeatureInst::DOOR_CLOSED;

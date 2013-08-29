@@ -16,9 +16,9 @@ function Engine.pregame_menu_start(...)
 end
 
 function Engine.loading_screen_draw(...)
-    local loading_screen = import "@menus.loading_screen"
+    local LoadingScreen = import "@menus.LoadingScreen"
 
-    return loading_screen.draw(...)
+    return LoadingScreen.draw(...)
 end
 
 function Engine.resources_load(...)

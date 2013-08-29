@@ -51,7 +51,7 @@ public:
 	void set_seethrough(const Pos& xy, bool seethrough);
 
 	bool is_seethrough(const Pos& xy);
-	bool is_seen(const Pos& xy);
+	bool was_seen(const Pos& xy);
 	bool is_solid(const Pos& xy);
 
 	void mark_all_seen();

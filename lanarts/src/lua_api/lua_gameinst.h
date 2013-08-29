@@ -10,6 +10,7 @@ struct lua_State;
 class LuaValue;
 class GameInst;
 
+// Defined in lua_core_GameObject
 void lua_gameinst_callback(lua_State* L, LuaValue& value, GameInst* inst);
 
 void lua_register_gameinst(lua_State* L);

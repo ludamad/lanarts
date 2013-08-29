@@ -2,10 +2,13 @@
 local Schemas = import "@Schemas"
 local ResourceTypes = import "@ResourceTypes"
 
-local ITEM_TYPE_SCHEMA = {
-    name = Schemas.STRING,
-    traits = Schemas.TABLE,
-    on_prerequisite = Schemas.FUNCTION_OR_NIL
-}
+local ItemType = ResourceTypes.type_create(
+    Schemas.checker_create {
+        name = Schemas.STRING,
+        description = Schemas.STRING,
+        traits = Schemas.TABLE,
+        on_prerequisite = Schemas.FUNCTION_OR_NIL
+    }
+)
 
-return ResourceTypes.type_create(Schemas.checker_create(ITEM_TYPE_SCHEMA))
+return ItemType

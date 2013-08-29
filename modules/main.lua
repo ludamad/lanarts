@@ -109,6 +109,7 @@ function Engine.main(args)
         return false
     end
 
+    local Display = import "core.Display"
     Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
     -- TODO: Remove any notion of 'internal graphics'. All graphics loading should be prompted by Lua.
     __initialize_internal_graphics()
@@ -118,5 +119,3 @@ function Engine.main(args)
 
     return true -- Continue lanarts initialization
 end
-
-print "End of 'modules/main.lua'."

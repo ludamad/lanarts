@@ -15,6 +15,7 @@
 #include "ProjectileInst.h"
 
 enum InstType {
+	PLAIN_INST,
 	ENEMY_INST,
 	PLAYER_INST,
 	STORE_INST,
@@ -40,6 +41,8 @@ inline InstType get_inst_type(GameInst* inst) {
 		return ITEM_INST;
 	} else if (dynamic_cast<ProjectileInst*>(inst)) {
 		return PROJECTILE_INST;
+	} else if (typeid(*inst) == typeid(GameInst&)) {
+		return PLAIN_INST;
 	}
 	LANARTS_ASSERT(false);
 	return INVALID_INST;
@@ -61,6 +64,8 @@ inline bool is_inst_type(GameInst* inst, InstType type) {
 		return dynamic_cast<ItemInst*>(inst) != NULL;
 	case PROJECTILE_INST:
 		return dynamic_cast<ProjectileInst*>(inst) != NULL;
+	case PLAIN_INST:
+		return typeid(*inst) == typeid(GameInst&);
 	}
 	LANARTS_ASSERT(false);
 	return false;
@@ -83,6 +88,8 @@ inline GameInst* from_inst_type(InstType type) {
 	case PROJECTILE_INST:
 		return new ProjectileInst(Projectile(), EffectiveAttackStats(), NONE,
 				Pos(), Pos(), NONE, NONE);
+	case PLAIN_INST:
+		return new GameInst(0, 0, 0);
 	}
 	LANARTS_ASSERT(false);
 	return NULL;

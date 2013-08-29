@@ -27,6 +27,7 @@ struct EffectiveAttackStats;
 
 void lua_push_combatstats(lua_State* L, GameInst* inst);
 void lua_push_combatstats(lua_State* L, const CombatStats& stats);
+void lua_push_effectivestats(lua_State* L, GameInst* inst);
 void lua_push_effectivestats(lua_State* L, const EffectiveStats& stats);
 void lua_push_effectiveattackstats(lua_State* L,
 		const EffectiveAttackStats& stats);

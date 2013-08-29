@@ -1,6 +1,7 @@
 /*
- * lua_core_maps.cpp:
- *  Implements a lua submodule for lanarts.
+ * lua_core_GameMap.cpp:
+ *	core.GameMap submodule: Handles level query functions.
+ *	TODO: Phase out implicit 'this level'
  */
 
 #include <SDL.h>
@@ -65,16 +66,10 @@ static int gmap_create(LuaStackValue args) {
 
 // level functions
 
-static int gmap_regenerate(lua_State* L) {
-	GameState* gs = lua_api::gamestate(L);
-	int levelid = gs->get_level()->id();
-
-	if (lua_gettop(L) > 0) {
-		levelid = luaL_checknumber(L, 1);
-	}
-
-	gs->game_world().regen_level(levelid);
-	return 0;
+static GameInst* gmap_lookup(LuaStackValue current_map, obj_id object) {
+	GameState* gs = lua_api::gamestate(current_map);
+	GameMapState* map = gs->game_world().get_level(current_map.to_int());
+	return map->game_inst_set().get_instance(object);
 }
 
 static int gmap_objects_list(lua_State* L) {
@@ -89,6 +84,36 @@ static int gmap_objects(lua_State* L) {
 	gmap_objects_list(L);
 	lua_call(L, 1, 1);
 	return 1;
+}
+
+static bool gmap_tile_is_solid(LuaStackValue current_map, Pos xy) {
+	GameState* gs = lua_api::gamestate(current_map);
+	GameMapState* map = gs->game_world().get_level(current_map.to_int());
+	return map->tiles().is_solid(xy);
+}
+
+static bool gmap_tile_is_seethrough(LuaStackValue current_map, Pos xy) {
+	GameState* gs = lua_api::gamestate(current_map);
+	GameMapState* map = gs->game_world().get_level(current_map.to_int());
+	return map->tiles().is_seethrough(xy);
+}
+
+static void gmap_tile_set_solid(LuaStackValue current_map, Pos xy, bool solidity) {
+	GameState* gs = lua_api::gamestate(current_map);
+	GameMapState* map = gs->game_world().get_level(current_map.to_int());
+	map->tiles().set_solid(xy, solidity);
+}
+
+static void gmap_tile_set_seethrough(LuaStackValue current_map, Pos xy, bool solidity) {
+	GameState* gs = lua_api::gamestate(current_map);
+	GameMapState* map = gs->game_world().get_level(current_map.to_int());
+	map->tiles().set_seethrough(xy, solidity);
+}
+
+static bool gmap_tile_was_seen(LuaStackValue current_map, Pos xy) {
+	GameState* gs = lua_api::gamestate(current_map);
+	GameMapState* map = gs->game_world().get_level(current_map.to_int());
+	return map->tiles().was_seen(xy);
 }
 
 static void gmap_add_instance(LuaStackValue gameinst) {
@@ -138,6 +163,27 @@ static int gmap_monsters(lua_State* L) {
 	return 1;
 }
 
+static int gmap_distance_to_player(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	int map_id = lua_tointeger(L, 1);
+	Pos xy = luawrap::get<Pos>(L, 2);
+	std::vector<PlayerDataEntry>& entries = gs->player_data().all_players();
+	int max_dist = -1;
+	for (int i = 0; i < entries.size(); i++) {
+		GameInst* player = entries[i].player_inst.get();
+		Pos dpos = xy - player->pos();
+		max_dist = std::max(max_dist, abs(dpos.x));
+		max_dist = std::max(max_dist, abs(dpos.y));
+	}
+
+	if (max_dist == -1) {
+		lua_pushnil(L);
+	} else {
+		lua_pushinteger(L, max_dist);
+	}
+	return 1;
+}
+
 // Look up a specific instance given an id
 static int gmap_instance(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
@@ -167,16 +213,45 @@ static int gmap_object_place_free(lua_State* L) {
 
 const int MAX_RET = 16;
 
-static int gmap_object_collisions(lua_State* L) {
+static int gmap_object_collision_check(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	GameInst* inst = luawrap::get<GameInst*>(L, 1);
+	Pos pos = inst->pos();
+	if (lua_gettop(L) >= 2) {
+		pos = luawrap::get<Pos>(L, 2);
+	}
 	GameInst* objects[MAX_RET];
 
-	int nret = gs->object_radius_test(inst, objects, MAX_RET);
+	int nret = gs->object_radius_test(inst, objects, MAX_RET, NULL, pos.x, pos.y);
 	lua_newtable(L);
 	for (int i = 0; i < nret; i++){
 		luawrap::push(L, objects[i]);
-		lua_rawset(L, i+1);
+		lua_rawseti(L, -2, i+1);
+	}
+	return 1;
+}
+
+static std::vector<GameInst*> gmap_rectangle_collision_check(LuaStackValue current_map, BBox area, LuaStackValue tester /* Can be empty */) {
+	GameState* gs = lua_api::gamestate(current_map);
+	GameMapState* map = gs->game_world().get_level(current_map.to_int());
+
+	return map->game_inst_set().object_rectangle_test(area, tester.isnil() ? NULL : tester.as<GameInst*>());
+}
+
+static int gmap_object_tile_check(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	GameInst* inst = luawrap::get<GameInst*>(L, 1);
+	Pos pos = inst->pos();
+	if (lua_gettop(L) >= 2) {
+		pos = luawrap::get<Pos>(L, 2);
+	}
+
+	Pos hit_pos;
+	bool collided = gs->tile_radius_test(pos.x, pos.y, inst->radius, true, -1, &hit_pos);
+	if (!collided) {
+		lua_pushnil(L);
+	} else {
+		luawrap::push(L, hit_pos);
 	}
 	return 1;
 }
@@ -209,8 +284,16 @@ namespace lua_api {
 		gmap["TILE_SIZE"] = TILE_SIZE;
 
 		// Query functions:
+		gmap["lookup"].bind_function(gmap_lookup);
+
 		gmap["objects_list"].bind_function(gmap_objects_list);
 		gmap["objects"].bind_function(gmap_objects);
+
+		gmap["tile_is_solid"].bind_function(gmap_tile_is_solid);
+		gmap["tile_is_seethrough"].bind_function(gmap_tile_is_seethrough);
+		gmap["tile_set_solid"].bind_function(gmap_tile_set_solid);
+		gmap["tile_set_seethrough"].bind_function(gmap_tile_set_seethrough);
+		gmap["tile_was_seen"].bind_function(gmap_tile_was_seen);
 
 		gmap["add_instance"].bind_function(gmap_add_instance);
 		gmap["instance"].bind_function(gmap_instance);
@@ -218,13 +301,15 @@ namespace lua_api {
 		gmap["monsters_list"].bind_function(gmap_monsters_list);
 		gmap["monsters"].bind_function(gmap_monsters);
 
+		gmap["distance_to_player"].bind_function(gmap_distance_to_player);
+
 		gmap["object_visible"].bind_function(gmap_object_visible);
-		gmap["object_collisions"].bind_function(gmap_object_collisions);
+		gmap["object_collision_check"].bind_function(gmap_object_collision_check);
+		gmap["object_tile_check"].bind_function(gmap_object_tile_check);
 		gmap["object_place_free"].bind_function(gmap_object_place_free);
+		gmap["rectangle_collision_check"].bind_function(gmap_rectangle_collision_check);
+
 		gmap["place_free"].bind_function(gmap_place_free);
 		gmap["radius_place_free"].bind_function(gmap_radius_place_free);
-
-		// Debug/special-case-only functions:
-		gmap["regenerate"].bind_function(gmap_regenerate);
 	}
 }

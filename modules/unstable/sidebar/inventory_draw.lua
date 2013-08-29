@@ -1,10 +1,11 @@
-local utils = import "core.utils"
+local Display = import "core.Display"
+
 local InstanceBox = import "core.ui.InstanceBox"
 local InstanceLine = import "core.ui.InstanceLine"
 local TextInputBox = import "core.ui.TextInputBox"
 local TextLabel = import "core.ui.TextLabel"
 local Sprite = import "core.ui.Sprite"
-local keys = import "core.keyboard"
+local Keys = import "core.keyboard"
 
 DEBUG_LAYOUTS = false
 
@@ -23,8 +24,8 @@ function main()
     local size = {160, 300}
     local inv = inventory_view_create(size)
 
-    while Game.input_capture() and not key_pressed(keys.ESCAPE) do
-        if key_pressed(keys.F9) then
+    while Game.input_capture() and not key_pressed(Keys.ESCAPE) do
+        if key_pressed(Keys.F9) then
             -- note, globals are usually protected against being changed
             -- but a bypass is allowed for cases where it must be done
             setglobal("DEBUG_LAYOUTS", not DEBUG_LAYOUTS) -- flip on/off

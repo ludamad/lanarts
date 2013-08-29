@@ -1,7 +1,7 @@
 local Sounds = import "@sounds"
 local DeathScreen = import "@menus.DeathScreen"
 local PlayerFunctions = import "@players"
-local Relations = import "@objects.relations"
+local Relations = import "@objects.Relations"
 local World = import "core.GameWorld"
 
 local M = {} -- Submodule

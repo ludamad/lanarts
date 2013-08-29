@@ -1,10 +1,10 @@
+local Display = import "core.Display"
+
 local InstanceBox = import "core.ui.InstanceBox"
 local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
 local utils = import "core.utils"
 local game_loop = import "@game_loop"
-
-local utils_text_component = import "core.utils.utils_text_component"
 
 local GameSettingsMenu = import "@menus.GameSettingsMenu"
 local LobbyMenu = import "@menus.LobbyMenu"

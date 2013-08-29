@@ -9,6 +9,7 @@
 #include <luawrap/macros.h>
 
 #include <lcommon/lua_utils.h>
+#include <lcommon/math_util.h>
 
 #include <ldraw/display.h>
 #include <ldraw/Image.h>
@@ -39,26 +40,45 @@ static std::vector<ldraw::Image> images_load(const char* pattern) {
 	return ret;
 }
 
+static int display_xy(lua_State* L) {
+	GameView& view = lua_api::gamestate(L)->view();
+	luawrap::push<Pos>(L, Pos(view.x, view.y));
+	return 1;
+}
+
+static int to_screen_xy(lua_State* L) {
+	GameView& view = lua_api::gamestate(L)->view();
+	luawrap::push<Pos>(L, luawrap::get<Pos>(L, 1) - Pos(view.x, view.y));
+	return 1;
+}
+
+static int object_within_view(lua_State* L) {
+	GameView& view = lua_api::gamestate(L)->view();
+	GameInst* inst = luawrap::get<GameInst*>(L, 1);
+	lua_pushboolean(L, circle_rectangle_test(inst->pos(), inst->target_radius, view.region_covered()));
+	return 1;
+}
+
 namespace lua_api {
 
 	static void register_display_table(lua_State* L) {
 		LuaSpecialValue globals = luawrap::globals(L);
-		LuaValue display = lua_ensure_protected_table(globals["Display"]);
+		LuaValue display = register_lua_submodule(L, "core.Display");
 
 		globals["images_load"].bind_function(images_load);
 		display["initialize"].bind_function(ldraw::display_initialize);
 		display["draw_start"].bind_function(ldraw::display_draw_start);
 		display["draw_finish"].bind_function(ldraw::display_draw_finish);
+		display["object_within_view"].bind_function(object_within_view);
+		display["to_screen_xy"].bind_function(to_screen_xy);
 
 		LuaValue meta = luameta_new(L, "<DisplayTable>");
 		LuaValue getters = luameta_getters(meta);
 
 		getters["display_size"].bind_function(ldraw::display_size);
+		getters["display_xy"].bind_function(display_xy);
 
-		display.push();
-		meta.push();
-		lua_setmetatable(L, -2);
-		lua_pop(L, 1);
+		display.set_metatable(meta);
 	}
 
 	/* Functions for visual results in the lanarts world, eg drawing text */
@@ -79,11 +99,7 @@ namespace lua_api {
 	}
 
 	void register_event_log_api(lua_State* L) {
-		LuaValue event_log(L);
-		event_log.newtable();
-		event_log = lua_ensure_protected_table(event_log);
+		LuaValue event_log = register_lua_submodule(L, "core.ui.EventLog");
 		event_log["add"].bind_function(event_log_add);
-
-		register_lua_submodule(L, "core.ui.EventLog", event_log);
 	}
 }

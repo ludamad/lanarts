@@ -73,6 +73,7 @@ void CombatGameInst::update_field_of_view(GameState* gs) {
 }
 
 void CombatGameInst::step(GameState* gs) {
+	GameInst::step(gs);
 	estats = stats().effective_stats(gs, this);
 	stats().step(gs, this, estats);
 

@@ -11,6 +11,7 @@
 static const int VIEW_SUBW = 100, VIEW_SUBH = 100;
 static const int VIEW_SPEED = 8;
 
+
 bool GameView::out_of_view_center(int px, int py) {
 	int dx = px - x, dy = py - y;
 	return (abs(dx) > width / 2 || abs(dy) > height / 2);
@@ -33,6 +34,10 @@ void GameView::move_towards(int px, int py) {
 		}
 		y = std::max(0, std::min(world_height - height, y));
 	}
+}
+
+BBox GameView::region_covered() const {
+	return BBox(Pos(x,y), size());
 }
 
 BBox GameView::tile_region_covered() const {

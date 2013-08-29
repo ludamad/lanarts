@@ -43,12 +43,13 @@ struct GameView {
 		move_towards(x + dx, y + dy);
 	}
 
+	BBox region_covered() const;
 	BBox tile_region_covered() const;
 
 	/*Are we outside of the centre of the view enough to warrant snapping the view ?*/
 	bool out_of_view_center(int px, int py);
 
-	Size size() {
+	Size size() const {
 		return Size(width, height);
 	}
 };

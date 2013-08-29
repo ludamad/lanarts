@@ -8,7 +8,8 @@ local tests = {
     "tests.unstable.TestSpellsContent",
     "tests.unstable.TestSchemas",
     "tests.lanarts.TestObjectRelations",
-    "tests.core.TestSerializeBuffer"
+    "tests.core.TestSerializeBuffer",
+    "tests.core.TestGameMap"
 }
 
 local testcases = {}

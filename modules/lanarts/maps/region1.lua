@@ -185,6 +185,8 @@ local function copy_close_unsolid_tile(map, xy)
     end
 end
 
+M._warning_skull = image_load "modules/lanarts/features/sprites/warning.png"
+M._anvil = image_load "modules/lanarts/features/sprites/anvil.png"
 
 function M.overworld_create()   
     local tileset = TileSets.grass
@@ -238,13 +240,13 @@ function M.overworld_create()
            -- Anvil
            ['<'] = { add = UNDECIDED_FLAG, content = UNDECIDED_TILE, 
                on_placement = function(map, xy)
-                    MapUtils.spawn_decoration(map, "anvil", xy)
+                    MapUtils.spawn_decoration(map, M._anvil, xy)
                     table.insert(undecided_squares, xy)
                end},
            --Warning skull
            ['w'] = { add = UNDECIDED_FLAG, content = UNDECIDED_TILE,
                on_placement = function(map, xy)
-                    MapUtils.spawn_decoration(map, "warning_skull", xy, 0, false)
+                    MapUtils.spawn_decoration(map, M._warning_skull, xy, 0, false)
                     table.insert(undecided_squares, xy)
                end},
            --Store candidate square

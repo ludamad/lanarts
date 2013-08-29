@@ -1,4 +1,4 @@
-local Relations = import "lanarts.objects.relations"
+local Relations = import "lanarts.objects.Relations"
 local MapGen = import "core.map_generation"
 local GameMap = import "core.GameMap"
 local GameObject = import "core.GameObject"

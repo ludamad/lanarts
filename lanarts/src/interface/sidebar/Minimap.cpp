@@ -62,7 +62,7 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 		for (int x = 0; x < shown.width(); x++) {
 			Pos xy(x + shown.x1, y + shown.y1);
 			int tile = tiles.get(xy).tile;
-			int seen = tiles.is_seen(xy) || minimap_reveal;
+			int seen = tiles.was_seen(xy) || minimap_reveal;
 			if (seen) {
 				if (!tiles.is_solid(xy)) {/*floor*/
 					iter[0] = 50, iter[1] = 50, iter[2] = 50, iter[3] = 255;
@@ -99,7 +99,7 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 				continue;
 			}
 
-			bool seen = tiles.is_seen(Pos(ex, ey));
+			bool seen = tiles.was_seen(Pos(ex, ey));
 			if (is_enemy) {
 				seen = seen && gs->object_visible_test(instance);
 			} else if (is_feature) {

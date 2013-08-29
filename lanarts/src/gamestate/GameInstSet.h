@@ -58,6 +58,7 @@ public:
 
 	void copy_to(GameInstSet& inst_set) const;
 
+	std::vector<GameInst*> object_rectangle_test(BBox rect, GameInst* tester = NULL, col_filterf f = NULL);
 	void clear();
 
 	void serialize(GameState* gs, SerializeBuffer& serializer);

@@ -126,6 +126,7 @@ namespace luawrap {
 		template<typename R, typename A1, typename A2, typename A3>
 		struct FuncWrap<R (*)(A1, A2, A3)> {
 			static int cppfunction(lua_State* L) {
+
 				if (!(check<A1>(L, 1) || __argfail(L, 1, typeid(A1).name()))
 						|| !(check<A2>(L, 2)
 								|| __argfail(L, 2, typeid(A2).name()))

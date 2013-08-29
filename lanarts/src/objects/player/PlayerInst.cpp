@@ -91,7 +91,7 @@ static Pos seen_square_in_area(MTwist& mt, GameTiles& tiles) {
 	do {
 		p.x = mt.rand(tiles.tile_width());
 		p.y = mt.rand(tiles.tile_height());
-	} while (!tiles.is_seen(p) || tiles.is_solid(p));
+	} while (!tiles.was_seen(p) || tiles.is_solid(p));
 	return centered_multiple(p, TILE_SIZE);
 }
 

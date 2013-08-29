@@ -17,7 +17,7 @@ const int DONT_DRAW_SPRITE = -1;
 class AnimatedInst: public GameInst {
 public:
 	enum {
-		RADIUS = 10, VISION_SUBSQRS = 1, DEPTH = -100
+		RADIUS = 10, DEPTH = -100
 	};
 	AnimatedInst(const Pos& pos, sprite_id sprite, int animatetime = -1,
 			const PosF& speed = PosF(), const PosF& orientation = PosF(),

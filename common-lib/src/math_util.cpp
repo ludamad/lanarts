@@ -104,6 +104,10 @@ bool circle_line_test(Pos circle_xy, int circle_rad, Pos line_start_xy,
 }
 
 bool circle_rectangle_test(Pos circle_xy, int circle_rad, BBox rect) {
+	Pos rad_duped = Pos(circle_rad, circle_rad);
+	if (rect.contains(circle_xy + rad_duped) || rect.contains(circle_xy - rad_duped)) {
+		return true;
+	}
 	return circle_line_test(circle_xy, circle_rad, Pos(rect.x1, rect.y1), Pos(rect.x2, rect.y1)) ||
 		circle_line_test(circle_xy, circle_rad, Pos(rect.x1, rect.y1), Pos(rect.x1, rect.y2)) ||
 		circle_line_test(circle_xy, circle_rad, Pos(rect.x1, rect.y2), Pos(rect.x2, rect.y2)) ||
