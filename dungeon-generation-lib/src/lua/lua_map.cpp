@@ -312,7 +312,6 @@ namespace ldungeon_gen {
 		return val.isnil() ? AreaQueryPtr() : area_query_get(val);
 	}
 
-	// TODO: Rename this 'rectangle query
 	static bool rectangle_query_apply(LuaStackValue args) {
 		using namespace luawrap;
 		LuaStackValue oper = rectangle_query(args);

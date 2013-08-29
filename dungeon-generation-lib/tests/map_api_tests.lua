@@ -27,8 +27,8 @@ function tests.test1_api_check()
     assert_exists2("MapGen", "tunnel_generate")
 end
 
-local function make_rectangle_query()
-        return MapGen.rectangle_query { 
+local function make_rectangle_criteria()
+        return MapGen.rectangle_criteria { 
                 fill_selector = { matches_all = MapGen.FLAG_SOLID, matches_none = MapGen.FLAG_PERIMETER }, 
                 perimeter_width = 1, 
                 perimeter_selector = { matches_all = MapGen.FLAG_SOLID }
@@ -158,7 +158,7 @@ function tests.test3_random_placement()
 
     print "random placement oper create"
     local random_placement_oper = MapGen.random_placement_operator {
-        child_operator = make_rectangle_oper(make_rectangle_query()),
+        child_operator = make_rectangle_oper(make_rectangle_criteria()),
         size_range = {6,9},
         amount_of_placements_range = {20, 20},
         create_subgroup = true
@@ -202,7 +202,7 @@ function tests.test4_custom_operator()
         child_operator = function(map, subgroup, bounds)
                 --Purposefully convoluted for test purposes
                 local queryfn = function(...)
-                        local query = make_rectangle_query()
+                        local query = make_rectangle_criteria()
                         return query(map, subgroup, bounds)
                 end
                 local oper = make_rectangle_oper(queryfn)
@@ -275,7 +275,7 @@ function tests.test6_areatemplate_complex()
 
     MapGen.random_placement_operator {
         child_operator = function(map, group, rect)
-                if not MapGen.rectangle_query {fill_selector = {matches_none = FLAG_APPLIED} } (map, group, rect) then
+                if not MapGen.rectangle_criteria {fill_selector = {matches_none = FLAG_APPLIED} } (map, group, rect) then
                         return false
                 end
                 area_template:apply { 

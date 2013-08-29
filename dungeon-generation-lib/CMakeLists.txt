@@ -43,3 +43,7 @@ target_link_libraries(
 	ldraw
 	UnitTest++
 )
+
+enable_testing()
+add_test(NAME lanarts_dungeon_gen_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/lanarts_dungeon_gen_tests )
+
