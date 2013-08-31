@@ -120,6 +120,7 @@ set (libraries
 	lanarts_net
 	yaml-cpp
 	RVO
+        libxmi
 	${SDLIMAGE_LIBRARY}
 	${OPENGL_gl_LIBRARY}
 	${SDLMIXER_LIBRARY}

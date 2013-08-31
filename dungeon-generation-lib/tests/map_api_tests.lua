@@ -249,9 +249,10 @@ function tests.test5_areatemplate()
         print_map(map)
 end
 
+local FLAG_APPLIED = MapGen.FLAG_CUSTOM1
+
 function tests.test6_areatemplate_complex()
     local map = MapGen.map_create { size = {40,40}, flags = 0, instances = InstanceList.create() }
-        local FLAG_APPLIED = MapGen.FLAG_CUSTOM1
 
         local area_template = MapGen.area_template_create {
                 data =
@@ -308,5 +309,14 @@ function tests.test7_areatemplate_from_file()
             group = MapGen.ROOT_GROUP, 
             top_left_xy = {0,0} 
     }
+    print_map(map)
+end
+
+function tests.tests8_polygon_apply()
+    local map = MapGen.map_create { size = {50,50} }
+    MapGen.polygon_apply(map, 
+    	{ add = {MapGen.FLAG_SOLID, FLAG_APPLIED}}, 
+    	{ {0,25}, {15,0}, {35,0}, {50, 25}, {35, 50}, {15, 50} }
+   	)
     print_map(map)
 end

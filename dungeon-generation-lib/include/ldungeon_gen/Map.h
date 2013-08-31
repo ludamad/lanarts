@@ -53,6 +53,12 @@ namespace ldungeon_gen {
 						use_must_be_content(false) {
 		}
 
+		bool operator==(const Selector& o) {
+			return must_be_on_bits == o.must_be_on_bits
+					&& must_be_off_bits == o.must_be_off_bits
+					&& must_be_content == o.must_be_content
+					&& use_must_be_content == o.use_must_be_content;
+		}
 	};
 
 	/* Operates on the labels and content of a square.
@@ -81,6 +87,13 @@ namespace ldungeon_gen {
 						content_value(0),
 						use_content_value(false) {
 		}
+		bool operator==(const Operator& o) {
+			return turn_on_bits == o.turn_on_bits
+					&& turn_off_bits == o.turn_off_bits
+					&& flip_bits == o.flip_bits
+					&& content_value == o.content_value
+					&& use_content_value == o.use_content_value;
+		}
 	};
 
 	struct ConditionalOperator {
@@ -91,6 +104,9 @@ namespace ldungeon_gen {
 		ConditionalOperator(Selector selector, Operator oper) :
 						selector(selector),
 						oper(oper) {
+		}
+		bool operator==(const ConditionalOperator& o) {
+			return selector == o.selector && oper == o.oper;
 		}
 	};
 

@@ -32,6 +32,8 @@ namespace ldungeon_gen {
 
 	int oper_aux(lua_State* L);
 	AreaOperatorPtr area_operator_get(LuaField val);
+
+	void register_libxmi_bindings(LuaValue submodule);
 }
 
 #endif /* LUA_LDUNGEON_IMPL_H_ */
