@@ -366,7 +366,7 @@ local function generate_statues(map)
             fill_selector = {matches_none = MapGen.FLAG_SOLID}
         } 
         if query then
-            map:square_apply(sqr, {remove = MapGen.FLAG_SEETHROUGH})
+            map:square_apply(sqr, {add = MapGen.FLAG_SOLID, remove = MapGen.FLAG_SEETHROUGH})
             map_utils.spawn_decoration(map, M.statue, sqr, random(0,17))
             i = i + 1
             tries = 0

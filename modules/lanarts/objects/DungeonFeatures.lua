@@ -23,7 +23,7 @@ end
 
 function Base:on_draw()
     if self.sprite and Display.object_within_view(self) then
-        ObjectUtils.screen_draw(self.sprite, self.xy)
+        ObjectUtils.screen_draw(self.sprite, self.xy, self.alpha, self.frame)
     end
 end
 

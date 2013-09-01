@@ -176,26 +176,65 @@ namespace ldungeon_gen {
 		return PaintedSetWrapperPtr(new PaintedSetWrapper());
 	}
 
-	static void polygon_render(PaintedSetWrapperPtr ps, const Polygon& points, LuaStackValue identifier) {
-		ps->set_pixel_fill(ps->index(identifier));
-		miFillPolygon(ps->set, ps->gc, MI_SHAPE_GENERAL, MI_COORD_MODE_ORIGIN, points.size(), (miPoint*)&points[0]);
+	typedef void applyf(LuaStackValue args, PaintedSetWrapper& ps);
+
+	static void polygonf(LuaStackValue args, PaintedSetWrapper& ps) {
+		const Polygon& points = args["points"].as<Polygon>();
+		miFillPolygon(ps.set, ps.gc, MI_SHAPE_GENERAL, MI_COORD_MODE_ORIGIN, points.size(), (miPoint*)&points[0]);
 	}
 
-	static int polygon_apply(lua_State* L) {
-		MapPtr map = luawrap::get<MapPtr>(L, 1);
-		ConditionalOperator oper = lua_conditional_operator_get(LuaStackValue(L, 2));
-		const Polygon& points = luawrap::get<Polygon>(L, 3);
-		Pos offset = lua_gettop(L) >= 4 ? luawrap::get<Pos>(L, 4) : Pos();
-		BBox area = lua_gettop(L) >= 5 ? luawrap::get<BBox>(L, 5) : BBox(Pos(), map->size());
+	static void linef(LuaStackValue args, PaintedSetWrapper& ps) {
+		Pos start = args["from_xy"].as<Pos>();
+		Pos end = args["to_xy"].as<Pos>();
+		miPoint arr[] = { { start.x, start.y }, { end.x, end.y } };
+
+		miDrawLines(ps.set, ps.gc, MI_COORD_MODE_ORIGIN, sizeof(arr)/sizeof(miPoint), arr);
+	}
+
+	static void configure(LuaStackValue args, PaintedSetWrapper& ps) {
+		int line_width = luawrap::defaulted(args["line_width"], 1);
+		miSetGCAttrib(ps.gc, MI_GC_LINE_WIDTH, line_width);
+	}
+
+	static void generic_apply(LuaStackValue args, applyf func) {
+		lua_State* L = args.luastate();
+		MapPtr map = args["map"].as<MapPtr>();
 
 		PaintedSetWrapper ps;
+		ps.set_pixel_fill(1);
+
+		configure(args, ps);
+		func(args, ps);
+
+		ConditionalOperator oper = lua_conditional_operator_get(args["operator"]);
 		OperatorTable operators(1);
 		operators[0] = oper;
-
-		ps.set_pixel_fill(1);
-		miFillPolygon(ps.set, ps.gc, MI_SHAPE_GENERAL, MI_COORD_MODE_ORIGIN, points.size(), (miPoint*)&points[0]);
+		Pos offset = luawrap::defaulted(args["xy"], Pos());
+		BBox area = luawrap::defaulted(args["area"], BBox(Pos(), map->size()));
 		apply_operators_to_painted_set(ps.set, *map, operators, area, offset);
-		return 0;
+	}
+
+	static void generic_render(LuaStackValue args, applyf func) {
+		lua_State* L = args.luastate();
+		PaintedSetWrapperPtr ps  = args["shape_set"].as<PaintedSetWrapperPtr>();
+		ps->set_pixel_fill(1);
+		func(args, *ps);
+	}
+
+	static void polygon_apply(LuaStackValue args) {
+		generic_apply(args, polygonf);
+	}
+
+	static void line_apply(LuaStackValue args) {
+		generic_apply(args, linef);
+	}
+
+	static void polygon_render(LuaStackValue args) {
+		generic_render(args, polygonf);
+	}
+
+	static void line_render(LuaStackValue args) {
+		generic_render(args, linef);
 	}
 
 	static void shape_set_apply(LuaStackValue args) {
@@ -233,7 +272,10 @@ namespace ldungeon_gen {
 		luawrap::install_userdata_type<PaintedSetWrapperPtr, paintedset_metatable>();
 		submodule["shape_set_create"].bind_function(shape_set_create);
 		submodule["shape_set_apply"].bind_function(shape_set_apply);
-		submodule["polygon_render"].bind_function(polygon_render);
+
 		submodule["polygon_apply"].bind_function(polygon_apply);
+		submodule["polygon_render"].bind_function(polygon_render);
+		submodule["line_apply"].bind_function(line_apply);
+		submodule["line_render"].bind_function(line_render);
 	}
 }

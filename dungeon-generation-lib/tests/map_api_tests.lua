@@ -314,9 +314,26 @@ end
 
 function tests.tests8_polygon_apply()
     local map = MapGen.map_create { size = {50,50} }
-    MapGen.polygon_apply(map, 
-    	{ add = {MapGen.FLAG_SOLID, FLAG_APPLIED}}, 
-    	{ {0,25}, {15,0}, {35,0}, {50, 25}, {35, 50}, {15, 50} }
-   	)
+    MapGen.polygon_apply {
+        map = map, 
+    	operator = { add = {MapGen.FLAG_SOLID, FLAG_APPLIED} }, 
+    	points = { {0,25}, {15,0}, {35,0}, {50, 25}, {35, 50}, {15, 50} }
+   	}
+    print_map(map)
+end
+
+function tests.tests9_line_apply()
+    local map = MapGen.map_create { size = {50,50} }
+    MapGen.line_apply {
+        map = map, 
+    	operator = { add = {MapGen.FLAG_SOLID, FLAG_APPLIED} }, 
+    	from_xy = {10,10}, to_xy = {40,40}
+   	}
+    MapGen.line_apply {
+        map = map, 
+        line_width = 4,
+    	operator = { add = {MapGen.FLAG_SOLID, FLAG_APPLIED} }, 
+    	from_xy = {5,5}, to_xy = {40,5}
+   	}
     print_map(map)
 end
