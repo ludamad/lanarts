@@ -40,7 +40,7 @@ namespace ldungeon_gen {
 	}
 
 	struct LuaTreeReconstructor : public ITCODBspCallback {
-		LuaTreeReconstructor(LuaStackValue cache) {
+		LuaTreeReconstructor(LuaStackValue cache) : cache(cache) {
 			this->L = cache.luastate();
 		}
 
@@ -88,7 +88,7 @@ namespace ldungeon_gen {
 		MapPtr map = args["map"].as<MapPtr>();
 		BBox rect = defaulted(args["area"], BBox(Pos(), map->size()));
 		Size node_size = defaulted(args["minimum_node_size"], Size());
-		int split_depth = defaulted(args["split_depth"], 8);
+		int split_depth = defaulted(args["split_depth"], 1);
 		float max_hratio = defaulted(args["max_width_ratio"], 1.5f);
 		float max_vratio = defaulted(args["max_height_ratio"], 1.5f);
 

@@ -345,12 +345,12 @@ function M.overworld_create()
     local line_positions = {}
 
     local keep_position = random_choice{true, false}
-    for i=1,random(20,30) do
+    for i=1,random(20,50) do
         local xy = random_pos(area)
         MapGen.polygon_apply {
             map = map, area = bounds,
             operator = { remove = MapGen.FLAG_SOLID, add = MapGen.FLAG_SEETHROUGH, content = tileset.floor },
-            points = ShapeUtils.random_polygon(area, xy, {4, random(5,15)}, random(5,12)) 
+            points = ShapeUtils.random_polygon(area, xy, {4, random(5,20)}, random(5,12)) 
         }
         table.insert(line_positions, xy)
 
@@ -358,7 +358,7 @@ function M.overworld_create()
         xy = keep_position and xy or random_pos(area)
         MapGen.polygon_apply {
             map = map, area = bounds,
-            operator = { matches_all = MapGen.FLAG_SOLID, remove = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.wall },
+            operator = { matches_all = MapGen.FLAG_SOLID, remove = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.wall },
             points = ShapeUtils.random_polygon(area, xy, {4, random(5,15)}, random(5,12)) 
         }
         xy = keep_position and xy or random_pos(area)
