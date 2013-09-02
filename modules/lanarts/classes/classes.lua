@@ -2,6 +2,8 @@ Data.class_create {
     name = "Mage",
     sprites = {"wizard", "wizard2"},
     available_spells = {
+      { spell = "TestMissile",
+        level_needed = 1 },
       { spell = "Fire Bolt",
         level_needed = 1 }, 
       { spell = "Minor Missile",

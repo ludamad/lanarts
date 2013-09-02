@@ -47,7 +47,7 @@ end
 -- LINEAR PROJECTILE
 
 local LinearBase = ObjectUtils.type_create(Base)
-M.LinearProjectileBase = Base
+M.LinearProjectileBase = LinearBase
 
 LinearBase.on_draw = ObjectUtils.draw_sprite_member_if_seen
 LinearBase.on_tile_collide = GameObject.destroy
@@ -75,32 +75,6 @@ function LinearBase.create(args)
     args.range_left = args.range_left or 250
 
     return LinearBase.base.create(args)
-end
-
--- TEST PROJECTILE
-
-local Test = ObjectUtils.type_create(LinearBase)
-M.TestProjectile = Test
-
-M._example_sprite = image_cached_load "modules/lanarts/spells/sprites/orb_of_destruction.png"
-function Test.on_object_collide(self, other)
-    local Relations = import "@objects.Relations"
-    if self.user_id ~= other.id then
-        local user = GameMap.lookup(self.map, self.user_id)
-        if Relations.is_hostile(user, other) then
-            other:damage(10, 10, 0)
-        end
-        GameObject.destroy(self)
-    end
-end
-
-function Test.create(user, xy)
-    return Test.base.create {
-        type = Test,
-        xy = xy, velocity = {2,2},
-        sprite = M._example_sprite,
-        user_id = user.id
-    }
 end
 
 -- HELPER FUNCTIONS

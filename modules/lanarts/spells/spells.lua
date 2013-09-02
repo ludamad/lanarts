@@ -1,5 +1,11 @@
 local EventLog = import "core.ui.EventLog"
+local GameObject = import "core.GameObject"
 local Map = import "core.GameMap"
+local Projectiles = import "@objects.Projectiles"
+local ObjectUtils = import "@objects.object_utils"
+
+
+local M = nilprotect {} -- Submodule
 
 -- MINOR MISSILE
 
@@ -203,3 +209,131 @@ function Expedite.action_func(caster, x, y)
 end
 
 Data.spell_create(Expedite)
+
+-- NewMagicBlast
+
+local Test = ObjectUtils.type_create(Projectiles.LinearProjectileBase)
+
+M._example_sprite = image_cached_load "modules/lanarts/spells/sprites/orb_of_destruction.png"
+function Test:on_object_collide(other)
+    local Relations = import "@objects.Relations"
+    if self.user_id ~= other.id then
+        local user = Map.lookup(self.map, self.user_id)
+        if Relations.is_hostile(user, other) then
+            other:damage(10, 10, 0)
+        end
+        GameObject.destroy(self)
+    end
+end
+
+function Test:on_tile_collide(tile_xy)
+end
+
+function Test:on_step()
+	local new_xy = vector_add(self.xy, self.velocity)
+	local hitsx = Map.object_tile_check(self, {new_xy[1], self.y})
+	local hitsy = Map.object_tile_check(self, {self.x, new_xy[2]})
+	if hitsy or hitsx or Map.object_tile_check(self) then
+		if hitsx then
+			self.velocity[1] = -self.velocity[1]
+		end
+		if hitsy then
+			self.velocity[2] = -self.velocity[2]
+		end
+		if not hitsx and not hitsy then
+			self.velocity = vector_scale(self.velocity,-1)
+		end
+	end
+	Projectiles.LinearProjectileBase.on_step(self)
+end
+
+function Test.create(user, xy, velocity)
+    return Test.base.create {
+        type = Test,
+        xy = xy, velocity = velocity,
+        sprite = M._example_sprite,
+        user_id = user.id
+    }
+end
+
+local NewMagicBlast = {
+    name = "NewMagicBlast",
+    description = "Test Lua code.",
+    spr_spell = "magic blast",
+    mp_cost = 25,
+    cooldown = 65,
+    fallback_to_melee = false,
+}
+
+function NewMagicBlast.action_func(caster, x, y)
+	local dir = vector_subtract({x, y},caster.xy)
+	dir = vector_normalize(dir, 2)
+	Test.create(caster, caster.xy, dir)
+end
+
+Data.spell_create(NewMagicBlast)
+
+-- NewMinorMissile
+
+local Test = ObjectUtils.type_create(Projectiles.LinearProjectileBase)
+
+M._example_sprite = image_cached_load "modules/lanarts/spells/sprites/orb_of_destruction.png"
+function Test:on_object_collide(other)
+    local Relations = import "@objects.Relations"
+    if self.user_id ~= other.id then
+        local user = Map.lookup(self.map, self.user_id)
+        if Relations.is_hostile(user, other) then
+            other:damage(10, 10, 0)
+        end
+        GameObject.destroy(self)
+    end
+end
+
+function Test:on_tile_collide(tile_xy)
+end
+
+function Test:on_step()
+	local new_xy = vector_add(self.xy, self.velocity)
+	local hitsx = Map.object_tile_check(self, {new_xy[1], self.y})
+	local hitsy = Map.object_tile_check(self, {self.x, new_xy[2]})
+	if hitsy or hitsx or Map.object_tile_check(self) then
+		if hitsx then
+			self.velocity[1] = -self.velocity[1]
+		end
+		if hitsy then
+			self.velocity[2] = -self.velocity[2]
+		end
+		if not hitsx and not hitsy then
+			self.velocity = vector_scale(self.velocity,-1)
+		end
+	end
+	Projectiles.LinearProjectileBase.on_step(self)
+end
+
+function Test.create(user, xy, velocity)
+    return Test.base.create {
+        type = Test,
+        xy = xy, velocity = velocity,
+        sprite = M._example_sprite,
+        user_id = user.id
+    }
+end
+
+local NewMinorMissile = {
+    name = "New Minor Missile",
+    description = "Test Lua code.",
+    spr_spell = "magic blast",
+    mp_cost = 25,
+    cooldown = 65,
+    fallback_to_melee = false,
+}
+
+function NewMinorMissile.action_func(caster, x, y)
+	local dir = vector_subtract({x, y},caster.xy)
+	dir = vector_normalize(dir, 2)
+	Test.create(caster, caster.xy, dir)
+end
+
+Data.spell_create(NewMinorMissile)
+
+return M

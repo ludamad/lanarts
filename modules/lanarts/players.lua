@@ -5,9 +5,6 @@ local DungeonFeatures = import "@objects.DungeonFeatures"
 
 local function player_on_step(self)
     local single_player = (settings.connection_type == net.NONE)
-    if single_player and key_pressed('L') then
-       Projectiles.TestProjectile.create(self, self.xy)
-    end
 end
 
 -- Return submodule

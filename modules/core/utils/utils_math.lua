@@ -40,6 +40,19 @@ function vector_scale(v1, scale, --[[Optional]] floor_result)
     return ret
 end
 
+function vector_magnitude(v)
+	local sum = 0
+	for i = 1,#v do
+		sum = sum + v[i]^2
+	end
+	return math.sqrt(sum)
+end
+
+function vector_normalize(v, --[[Optional]] magnitude)
+	magnitude = magnitude or 1
+	return vector_scale(v, magnitude/vector_magnitude(v))
+end
+
 function vector_apply(f) 
     return function (v1, v2)
         local length = # v1
