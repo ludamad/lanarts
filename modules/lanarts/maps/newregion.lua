@@ -7,6 +7,7 @@ local TileSets = import "@tiles.tilesets"
 
 local MapUtils = import ".map_utils"
 local ShapeUtils = import ".shape_utils"
+local Layouts  = import ".layouts"
 local dungeons = import ".dungeons"
 local PortalSet = import ".PortalSet"
 local MapSequence = import ".MapSequence"
@@ -335,12 +336,10 @@ local function sort_positions_by_relative_distance(ps)
     end
 end
 
-function M.overworld_create()   
+local function generate_area(map, area)
     local tileset = TileSets.grass
 
-    local w,h = random(150,250), random(150,250)
-    local map = MapUtils.map_create("Overworld", {w,h}, tileset.wall, {MapGen.FLAG_SOLID, MapGen.FLAG_SEETHROUGH})
-    local area = {50,50, w-50,h-50}
+    local w,h = unpack(map.size)
     local bounds = {1,1,w-1,h-1}
     local line_positions = {}
 
@@ -354,13 +353,13 @@ function M.overworld_create()
         }
         table.insert(line_positions, xy)
 
-
         xy = keep_position and xy or random_pos(area)
         MapGen.polygon_apply {
             map = map, area = bounds,
             operator = { matches_all = MapGen.FLAG_SOLID, remove = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.wall },
             points = ShapeUtils.random_polygon(area, xy, {4, random(5,15)}, random(5,12)) 
         }
+
         xy = keep_position and xy or random_pos(area)
         MapGen.polygon_apply {
             map = map, area = bounds,
@@ -421,10 +420,32 @@ function M.overworld_create()
             }
         end
     end
+end
+
+function M.overworld_create()
+    local tileset = TileSets.grass
+
+    local w,h = 200,200
+    local map = MapUtils.map_create("Overworld", {w,h}, tileset.wall, {MapGen.FLAG_SOLID, MapGen.FLAG_SEETHROUGH})
+    local bsp = MapGen.bsp_split { map = map, minimum_node_size = {100, 100} }
+    for area in values{bsp.left.area, bsp.right.area} do
+        area = {area[1] + 25, area[2] + 25, area[3] - 25, area[4] - 25}
+        generate_area(map, area)
+    end
+
+    Layouts.brute_tunnel(map, bsp.left.area, bsp.right.area, {
+            operator = {
+                matches_all=MapGen.FLAG_SOLID,
+                add=MapGen.FLAG_SEETHROUGH, 
+                remove=MapGen.FLAG_SOLID, 
+                content=random_choice{tileset.floor, tileset.floor_alt1, tileset.floor_alt2}
+            }
+        }
+    )
+
 --   OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 40)
 
     local map_id = place_content(map)
-
     World.players_spawn(map_id, find_player_positions(map))
     return map_id
 end

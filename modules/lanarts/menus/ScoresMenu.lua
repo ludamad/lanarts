@@ -7,7 +7,7 @@ local TextLabel = import "core.ui.TextLabel"
 local utils = import "core.utils"
 local keys = import "core.keyboard"
 
-local score_menu_font = "modules/core/fonts/MateSC-Regular.ttf"
+local score_menu_font = "modules/core/fonts/alagard_by_pix3m-d6awiwp.ttf"
 
 -- This is a hack.
 -- Currently we cannot rely on the sprites being loaded, so we duplicate information from class_sprites.yaml here
