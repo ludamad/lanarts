@@ -425,9 +425,9 @@ end
 function M.overworld_create()
     local tileset = TileSets.grass
 
-    local w,h = 200,200
+    local w,h = 600,600
     local map = MapUtils.map_create("Overworld", {w,h}, tileset.wall, {MapGen.FLAG_SOLID, MapGen.FLAG_SEETHROUGH})
-    local bsp = MapGen.bsp_split { map = map, minimum_node_size = {100, 100} }
+    local bsp = MapGen.bsp_split { map = map, minimum_node_size = {w/3, h/3} }
     for area in values{bsp.left.area, bsp.right.area} do
         area = {area[1] + 25, area[2] + 25, area[3] - 25, area[4] - 25}
         generate_area(map, area)
