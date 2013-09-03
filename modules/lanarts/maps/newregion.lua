@@ -422,26 +422,41 @@ local function generate_area(map, area)
     end
 end
 
+local function get_leafs(node, --[[Optional]] table)
+    table = table or {}
+    if node.left then
+       get_leafs(node.left, table) 
+    end
+    if node.right then
+       get_leafs(node.right, table) 
+    end
+    if not node.left and not node.right then
+        table[#table + 1] = node
+    end
+    return table
+end
+
 function M.overworld_create()
     local tileset = TileSets.grass
 
-    local w,h = 600,600
+    local w,h = 800,800
     local map = MapUtils.map_create("Overworld", {w,h}, tileset.wall, {MapGen.FLAG_SOLID, MapGen.FLAG_SEETHROUGH})
-    local bsp = MapGen.bsp_split { map = map, minimum_node_size = {w/3, h/3} }
-    for area in values{bsp.left.area, bsp.right.area} do
-        area = {area[1] + 25, area[2] + 25, area[3] - 25, area[4] - 25}
-        generate_area(map, area)
+    local nodes = get_leafs(MapGen.bsp_split { split_depth = 4, map = map, minimum_node_size = {w/6, h/6}, area = {100,100,700,700} })
+    for i=1,#nodes do
+        generate_area(map, nodes[i].area)
     end
+--    for i=1,#nodes do
+--        Layouts.brute_tunnel(map, nodes[i].area, nodes[i%#nodes+1].area, {
+--                operator = {
+--                    matches_all=MapGen.FLAG_SOLID,
+--                    add=MapGen.FLAG_SEETHROUGH, 
+--                    remove=MapGen.FLAG_SOLID, 
+--                    content=random_choice{tileset.floor, tileset.floor_alt1, tileset.floor_alt2}
+--                }
+--            }
+--        )
+--    end
 
-    Layouts.brute_tunnel(map, bsp.left.area, bsp.right.area, {
-            operator = {
-                matches_all=MapGen.FLAG_SOLID,
-                add=MapGen.FLAG_SEETHROUGH, 
-                remove=MapGen.FLAG_SOLID, 
-                content=random_choice{tileset.floor, tileset.floor_alt1, tileset.floor_alt2}
-            }
-        }
-    )
 
 --   OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 40)
 
