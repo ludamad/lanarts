@@ -4,8 +4,8 @@ local InstanceBox = import "core.ui.InstanceBox"
 local InstanceGroup = import "core.ui.InstanceGroup"
 local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
-local utils = import "core.utils"
-local keys = import "core.keyboard"
+local utils = import "core.Utils"
+local keys = import "core.Keyboard"
 
 local score_menu_font = "modules/core/fonts/alagard_by_pix3m-d6awiwp.ttf"
 

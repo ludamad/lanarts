@@ -1,4 +1,4 @@
-local utils = import "core.utils" -- import utils for 'do_nothing'
+local utils = import "core.Utils" -- import utils for 'do_nothing'
 
 --- A static, drawable text instance. Implements everything 
 -- needed to be added to an InstanceGroup, InstanceBox or InstanceLine.

@@ -3,12 +3,12 @@ local GameMap = import "core.GameMap"
 local GameObject = import "core.GameObject"
 local World = import "core.GameWorld"
 
-local TileSets = import "@tiles.tilesets"
+local TileSets = import "@tiles.Tilesets"
 
 local MapUtils = import ".map_utils"
 local ShapeUtils = import ".shape_utils"
-local Layouts  = import ".layouts"
-local dungeons = import ".dungeons"
+local Layouts  = import ".Layouts"
+local dungeons = import ".Dungeons"
 local PortalSet = import ".PortalSet"
 local MapSequence = import ".MapSequence"
 

@@ -5,8 +5,8 @@ local InstanceLine = import "core.ui.InstanceLine"
 local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
 
-local lobby = import "core.networking.lobby"
-local tasks = import "core.networking.tasks"
+local lobby = import "core.networking.Lobby"
+local tasks = import "core.networking.Tasks"
 
 local game_entry_draw
 local logo_path = "modules/lanarts/LANARTS.png"

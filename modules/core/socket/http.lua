@@ -8,10 +8,10 @@
 -----------------------------------------------------------------------------
 -- Declare module and import dependencies
 -------------------------------------------------------------------------------
-import "@socket"
-local url = import "@socket.url"
+import "@Socket"
+local url = import "@socket.Url"
 local ltn12 = import "@ltn12"
-local mime = import "@mime"
+local mime = import "@Mime"
 local base = _G
 
 module("socket.http", package.seeall)

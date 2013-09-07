@@ -3,12 +3,12 @@
 -- Primarily for use with luasocket's socket.http & coroutines
 -- Reads in line by line
 
-local jsonlib = import "core.json"
-local socket = import "core.socket"
-local http = import "core.socket.http"
+local jsonlib = import "core.Json"
+local socket = import "core.Socket"
+local http = import "core.socket.Http"
 local ltn12 = import "core.ltn12"
 
-local utils = import "core.utils" -- for table.pop_front & do_nothing
+local utils = import "core.Utils" -- for table.pop_front & do_nothing
 
 local YieldingSocket = newtype()
 

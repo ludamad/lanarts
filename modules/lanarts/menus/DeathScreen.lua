@@ -4,9 +4,9 @@ local InstanceBox = import "core.ui.InstanceBox"
 local InstanceLine = import "core.ui.InstanceLine"
 local TextLabel = import "core.ui.TextLabel"
 local Sprite = import "core.ui.Sprite"
-local utils = import "core.utils"
+local utils = import "core.Utils"
 
-local keys = import "core.keyboard"
+local keys = import "core.Keyboard"
 
 local death_screen_font = "modules/core/fonts/MateSC-Regular.ttf"
 

@@ -1,8 +1,8 @@
-local utils = import "core.utils"
+local utils = import "core.Utils"
 local MapGen = import "core.map_generation"
 local GameObject = import "core.GameObject"
 
-local TileSets = import "@tiles.tilesets"
+local TileSets = import "@tiles.Tilesets"
 
 local map_utils = import ".map_utils"
 local PortalSet = import ".PortalSet"

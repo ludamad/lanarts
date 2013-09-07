@@ -4,7 +4,7 @@ local InstanceBox = import "core.ui.InstanceBox"
 local InstanceLine = import "core.ui.InstanceLine"
 local TextLabel = import "core.ui.TextLabel"
 local Sprite = import "core.ui.Sprite"
-local utils = import "core.utils"
+local utils = import "core.Utils"
 local World = import "core.GameWorld"
 
 local function action_bar_hints_create()

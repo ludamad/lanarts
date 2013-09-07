@@ -1,6 +1,6 @@
 -- Places instances on a certain origin, an optional offset can also be specified
 
-local utils = import "core.utils"
+local utils = import "core.Utils"
 local InstanceGroup = import "core.ui.InstanceGroup"
 
 --- A layout consisting of objects placed on a grid. 

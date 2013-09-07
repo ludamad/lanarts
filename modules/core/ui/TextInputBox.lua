@@ -1,5 +1,5 @@
-local utils = import "core.utils"
-local keys = import "core.keyboard"
+local utils = import "core.Utils"
+local keys = import "core.Keyboard"
 
 local BLINK_TIME_MS = 600
 local BLINK_HELD_MS = 600

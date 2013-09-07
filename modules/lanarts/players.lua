@@ -1,5 +1,5 @@
 local Relations = import "@objects.Relations"
-local Keys = import "core.keyboard"
+local Keys = import "core.Keyboard"
 local Projectiles = import "@objects.Projectiles"
 local DungeonFeatures = import "@objects.DungeonFeatures"
 

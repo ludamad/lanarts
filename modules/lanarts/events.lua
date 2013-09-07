@@ -1,6 +1,6 @@
-local Sounds = import "@sounds"
+local Sounds = import "@Sounds"
 local DeathScreen = import "@menus.DeathScreen"
-local PlayerFunctions = import "@players"
+local PlayerFunctions = import "@Players"
 local Relations = import "@objects.Relations"
 local World = import "core.GameWorld"
 

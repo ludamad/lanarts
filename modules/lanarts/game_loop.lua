@@ -8,7 +8,7 @@ local EventLog = import "core.ui.EventLog"
 local World = import "core.GameWorld"
 local Map = import "core.GameMap"
 local help_overlay = import "@help_overlay"
-local Keys = import "core.keyboard"
+local Keys = import "core.Keyboard"
 
 local M = {} -- Submodule
 

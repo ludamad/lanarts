@@ -99,10 +99,10 @@ require_path_add("modules/?.lua")
 -- @param args the arguments passed on the command-line.
 -- @return whether we are performing a full game initialization, or performing some testing task
 function Engine.main(args)
-    import "core.main"
+    import "core.Main"
 
     if table.contains(args, "--tests-only") then
-        import "tests.main"
+        import "tests.Main"
         return false
     elseif table.contains(args, "--simulation") then
         import "unstable.Simulation"
@@ -115,7 +115,7 @@ function Engine.main(args)
     __initialize_internal_graphics()
     
     -- Hardcoded for now!
-    import "lanarts.main"
+    import "lanarts.Main"
 
     return true -- Continue lanarts initialization
 end

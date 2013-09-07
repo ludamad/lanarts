@@ -1,4 +1,4 @@
-local utils = import "core.utils"
+local utils = import "core.Utils"
 
 local M = {} -- Submodule
 

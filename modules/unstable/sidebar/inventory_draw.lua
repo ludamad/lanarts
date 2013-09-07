@@ -5,7 +5,7 @@ local InstanceLine = import "core.ui.InstanceLine"
 local TextInputBox = import "core.ui.TextInputBox"
 local TextLabel = import "core.ui.TextLabel"
 local Sprite = import "core.ui.Sprite"
-local Keys = import "core.keyboard"
+local Keys = import "core.Keyboard"
 
 DEBUG_LAYOUTS = false
 

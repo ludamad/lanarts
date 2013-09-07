@@ -3,7 +3,7 @@ local Display = import "core.Display"
 local InstanceBox = import "core.ui.InstanceBox"
 local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
-local utils = import "core.utils"
+local utils = import "core.Utils"
 local game_loop = import "@game_loop"
 
 local GameSettingsMenu = import "@menus.GameSettingsMenu"
@@ -11,8 +11,8 @@ local LobbyMenu = import "@menus.LobbyMenu"
 local PregameMenu = import "@menus.PregameMenu"
 local ScoresMenu = import "@menus.ScoresMenu"
 
-local tasks = import "core.networking.tasks"
-local keys = import "core.keyboard"
+local tasks = import "core.networking.Tasks"
+local keys = import "core.Keyboard"
 
 -- START SCREEN -- 
 local text_button_params = {

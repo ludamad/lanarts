@@ -1,11 +1,11 @@
-local utils = import "core.utils"
+local utils = import "core.Utils"
 local InstanceGroup = import "core.ui.InstanceGroup"
 local InstanceLine = import "core.ui.InstanceLine"
 local InstanceBox = import "core.ui.InstanceBox"
 local TextInputBox = import "core.ui.TextInputBox"
 local TextLabel = import "core.ui.TextLabel"
 local Sprite = import "core.ui.Sprite"
-local keys = import "core.keyboard"
+local keys = import "core.Keyboard"
 
 local utils_text_component = import "core.utils.utils_text_component"
 

@@ -4,7 +4,7 @@ local InstanceGroup = import "core.ui.InstanceGroup"
 local InstanceBox = import "core.ui.InstanceBox"
 local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
-local utils = import "core.utils"
+local utils = import "core.Utils"
 local utils_text_component = import "core.utils.utils_text_component"
 local World = import "core.GameWorld"
 

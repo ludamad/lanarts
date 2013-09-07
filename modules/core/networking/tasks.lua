@@ -1,7 +1,7 @@
 --- Create a tracked coroutine.
 -- Provides a function to run all tasks, removing completed ones.
 
-local utils = import "core.utils"
+local utils = import "core.Utils"
 
 local task_list = {}
 

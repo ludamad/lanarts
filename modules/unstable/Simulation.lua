@@ -97,7 +97,7 @@ local function step(context)
 end
 
 local function battle(player, enemy)
-    local spells = import "@content.spells"
+    local spells = import "@content.Spells"
 
     StatContext.add_item(player, ItemType.lookup("Health Potion"))
     StatContext.add_spell(player, Spells.lookup("Berserk"))
@@ -129,10 +129,10 @@ local function replace_event_log_with_print()
 end
 
 local function main()
-    local animals = import "@content.monsters.animals"
+    local animals = import "@content.monsters.Animals"
     -- Load content
     import "@items.items_consumables"
-    import "@content.races"
+    import "@content.Races"
 
     replace_event_log_with_print()
 
