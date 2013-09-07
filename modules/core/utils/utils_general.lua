@@ -166,7 +166,11 @@ function table.defaulted_addition(src, dest)
         if dest[k] == nil then
             dest[k] = src[k]
         else
-            dest[k] = val + src[k]
+            if type(val) == 'table' then
+                table.defaulted_addition(src[k], val)
+            else
+                dest[k] = val + src[k]
+            end
         end
     end
 end
@@ -178,9 +182,21 @@ function table.defaulted_subtraction(src, dest)
         if dest[k] == nil then
             dest[k] = src[k]
         else
-            dest[k] = val - src[k]
+            if type(val) == 'table' then
+                table.defaulted_subtraction(src[k], val)
+            else
+                dest[k] = val - src[k]
+            end
         end
     end
+end
+
+function table.scaled(t, scale)
+    local ret = {}
+    for k,v in pairs(t) do
+        ret[k] = v*scale
+    end
+    return ret
 end
 
 --- Get a  human-readable string from a lua value. The resulting value is generally valid lua.
@@ -216,6 +232,15 @@ function map_call(f, list)
         ret[#ret + 1] = f(v)
     end
     return ret
+end
+
+local _cached_dup_table = {}
+function dup(val, times)
+    table.clear(_cached_dup_table)
+    for i=1,times do
+        _cached_dup_table[i] = val
+    end
+    return unpack(_cached_dup_table)
 end
 
 --- Return a random element from a list

@@ -2,11 +2,11 @@ import 'core.utils'
 import '@lunit'
 
 local tests = {
+    "tests.unstable.TestAttackResolution",
     "tests.unstable.TestStats",
     "tests.unstable.TestResourceTypes",
-    "tests.unstable.TestSkillsContent",
-    "tests.unstable.TestSpellsContent",
     "tests.unstable.TestSchemas",
+    "tests.unstable.TestContent",
     "tests.lanarts.TestObjectRelations",
     "tests.core.TestSerializeBuffer",
     "tests.core.TestGameMap"

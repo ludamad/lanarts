@@ -1,4 +1,8 @@
+local M = nilprotect {} -- Submodule
+
 local HookSet = newtype()
+
+M.MIN_PRIORITY = -math.huge
 
 function HookSet:init()
     -- List of hooks, sorted by priority
@@ -7,14 +11,22 @@ function HookSet:init()
     self.new_hooks = {}
 end
 
-function HookSet:hook_add(hook)
+function HookSet:__copy(other)
+    -- Ensure a shallow copy when used with table.deep_copy
+    other.hooks = rawget(other, "hooks") or {}
+    other.new_hooks = rawget(other, "new_hooks") or {}
+    table.copy(self.hooks, other.hooks)
+    table.copy(self.new_hooks, other.new_hooks)
+end
+
+function HookSet:add_hook(hook)
     table.insert(self.new_hooks, hook)
 end
 
 -- Place recently added hooks into the sorted list
-local function merge_new_hooks(self)
+function HookSet:merge_new_hooks()
     for hook in values(self.new_hooks) do
-        if hook.priority == nil then
+        if hook.priority <= M.MIN_PRIORITY then
             table.insert(self.hooks, hook)
         else 
             local i = #self.hooks
@@ -32,17 +44,16 @@ local function merge_new_hooks(self)
 end
 
 function HookSet:on_step(...)
-    merge_new_hooks(self)
+    self:merge_new_hooks()
     -- Perform the hook step event, filtering finished hooks.
     local new_len, i = 0, 1
     for i=1,#self.hooks do
         local hook = self.hooks[i]
-        if hook.on_step then
-            if hook:on_step(...) ~= false then
-               -- Perform compacting
-               new_len = new_len + 1
-               self.hooks[new_len] = hook
-            end
+        if hook.on_step and hook:on_step(...) then
+           -- Perform compacting
+           self.hooks[new_len] = hook
+        else
+           new_len = new_len + 1
         end
     end
     -- Perform clean-up
@@ -52,11 +63,12 @@ function HookSet:on_step(...)
 end
 
 function HookSet:perform(method_name, ...)
-    merge_new_hooks(self)
+    self:merge_new_hooks()
     for hook in values(self.hooks) do
         local method = hook[method_name]
         if method then method(hook, ...) end
     end
 end
 
-return HookSet
+M.create = HookSet.create
+return M

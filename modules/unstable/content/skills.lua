@@ -4,30 +4,30 @@ local AptitudeTypes = import ".aptitude_types"
 
 local M = {} -- Submodule
 
-Skills.define {
+M.melee = Skills.define {
     name = "Melee",
     description = "Increases efficacy in physical combat.",
 
     on_calculate = function(level, user)
-        StatContext.effectiveness_add(user, AptitudeTypes.melee, level)
+        StatContext.add_effectiveness(user, AptitudeTypes.melee, level)
     end
 }
 
-Skills.define {
+M.magic = Skills.define {
     name = "Magic",
     description = "Increases efficacy in the magic arts.",
 
     on_calculate = function(level, user)
-        StatContext.effectiveness_add(user, AptitudeTypes.magic, level)
+        StatContext.add_effectiveness(user, AptitudeTypes.magic, level)
     end
 }
 
-Skills.define {
+M.ranged = Skills.define {
     name = "Ranged",
     description = "Increases efficacy in ranged weaponry.",
 
     on_calculate = function(level, user)
-        StatContext.effectiveness_add(user, AptitudeTypes.ranged, level)
+        StatContext.add_effectiveness(user, AptitudeTypes.ranged, level)
     end
 }
 

@@ -18,19 +18,20 @@ function M.type_create(--[[Optional]] resource_creation_function, --[[Optional]]
 
     local R = nilprotect {} -- Resource table
     local next_id = 1
-    R.resource_list = {}
-    R.resource_name_table = provide_name_lookup and {} or nil
+    R.list = {}
+    R.table = provide_name_lookup and {} or nil
 
     function R.define(table)
+    	table = table or {}
     	if should_preprocess then
     		M.resolve_preprocess_functions(table)
     	end
     	-- Call the resource creation function, if one was provided.
         local entry = resource_creation_function and resource_creation_function(table) or table
-        entry.id = #R.resource_list + 1
-        R.resource_list[entry.id] = entry
+        entry.id = #R.list + 1
+        R.list[entry.id] = entry
         if provide_name_lookup then
-            R.resource_name_table[entry.name] = entry
+            R.table[entry.name] = entry
         end
         return entry
     end
@@ -38,10 +39,10 @@ function M.type_create(--[[Optional]] resource_creation_function, --[[Optional]]
     function R.lookup(key)
         local t = type(key)
         if t == "string" then
-            if provide_name_lookup then return R.resource_name_table[key] end
+            if provide_name_lookup then return R.table[key] end
             error("Attempt to lookup entry with name '" .. key .. "' for resource type that does not have a name.")
         elseif t == "number" then
-            return R.resource_list[key]
+            return R.list[key]
         else
             error("Attempt to lookup entry with unsupported key type '" .. t .. "'. Key was " .. pretty_tostring(key))
         end

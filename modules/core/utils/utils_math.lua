@@ -40,6 +40,25 @@ function vector_scale(v1, scale, --[[Optional]] floor_result)
     return ret
 end
 
+function vector_distance(v1,v2)
+    local length = # v1
+    assert(length == #v2, "vector_distance(): Vector lengths do not match!")
+
+    local sum = 0
+    for i = 1,length do 
+        sum = sum + v1[i]*v1[i] + v2[i]*v2[i] 
+    end
+    return math.sqrt(sum)
+end
+
+function vector_sum(v)
+    local sum = 0
+	for i = 1,#v do
+		sum = sum + v[i]
+	end
+	return sum
+end
+
 function vector_magnitude(v)
 	local sum = 0
 	for i = 1,#v do

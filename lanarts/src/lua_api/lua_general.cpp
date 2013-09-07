@@ -414,15 +414,16 @@ static void dotform_chop_component(std::string& str) {
 	dotform_chop_trailing_dots(str);
 }
 
-static const char* get_source(lua_State* L) {
+static const char* get_source(lua_State* L, int idx) {
 	lua_Debug ar;
-	lua_getstack(L, 1, &ar);
+	lua_getstack(L, idx, &ar);
 	lua_getinfo(L, "S", &ar);
 	return ar.source;
 }
 
 static int lapi_path_resolve(lua_State* L) {
-	std::string current = get_source(L);
+	int stack_idx = lua_gettop(L) < 2 ? 1 : lua_tointeger(L, 2);
+	std::string current = get_source(L, stack_idx);
 	// Find character index where root dir ends
 	int i = current.size() - 1;
 	while (i >= 0 && (current[i] == '/' || current[i] == '\\')) {
@@ -624,7 +625,6 @@ namespace lua_api {
 		globals["values"].bind_function(l_itervalues);
 		globals["_LOADED"] = luawrap::ensure_table(registry["_LOADED"]);
 		globals["direction"].bind_function(compute_direction);
-		globals["distance"].bind_function(distance_between);
 		globals["newtype"].bind_function(lapi_newtype);
 		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);

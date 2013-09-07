@@ -10,7 +10,7 @@ local function passes_schema(schema, t)
         end
     end
 
-    Schemas.check(schema, t)
+    Schemas.enforce(schema, t)
 
     assert = real_assert
     return passes
