@@ -32,7 +32,7 @@ function Engine.resources_load(...)
 
     import "@effects.Effects"
 
-    import "@spells.spell_effects"
+    import "@spells.SpellEffects"
 end
 
 function Engine.resources_post_load(...)
@@ -40,19 +40,19 @@ function Engine.resources_post_load(...)
 end
 
 function Engine.game_start(...)
-    local game_loop = import "@game_loop"
+    local game_loop = import "@GameLoop"
 
     return game_loop.run_loop(...)
 end
 
 function Engine.post_draw(...)
-    local game_loop = import "@game_loop"
+    local game_loop = import "@GameLoop"
 
     return game_loop.post_draw(...)
 end
 
 function Engine.overlay_draw(...)
-    local game_loop = import "@game_loop"
+    local game_loop = import "@GameLoop"
 
     return game_loop.overlay_draw(...)
 end

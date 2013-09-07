@@ -2,10 +2,10 @@ local StatusType = import "@StatusType"
 local StatContext = import "@StatContext"
 local Cooldowns = import "@Cooldowns"
 
-local CooldownTypes = import ".cooldown_types"
-local AptitudeTypes = import ".aptitude_types"
-local StatUtils = import ".stat_utils"
-local LogUtils = import "lanarts.log_utils"
+local CooldownTypes = import ".CooldownTypes"
+local AptitudeTypes = import ".AptitudeTypes"
+local StatUtils = import ".StatUtils"
+local LogUtils = import "lanarts.LogUtils"
 local EventLog = import "core.ui.EventLog"
 
 local M = nilprotect {} -- Submodule

@@ -1,8 +1,8 @@
-local item_groups = import ".item_groups"
-local item_utils = import ".item_utils"
+local item_groups = import ".ItemGroups"
+local item_utils = import ".ItemUtils"
 local dungeons = import ".Dungeons"
-local map_utils = import ".map_utils"
-local MapGen = import "core.map_generation"
+local map_utils = import ".MapUtils"
+local MapGen = import "core.MapGeneration"
 local World = import "core.GameWorld"
 
 local M = nilprotect {} -- Submodule

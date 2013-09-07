@@ -1,6 +1,6 @@
 local GameMap = import "core.GameMap"
 local GameObject = import "core.GameObject"
-local MapGen = import "core.map_generation"
+local MapGen = import "core.MapGeneration"
 
 local gmap = GameMap.create { 
     map = MapGen.map_create { 

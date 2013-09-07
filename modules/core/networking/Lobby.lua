@@ -1,4 +1,4 @@
-local httprequest = import "core.networking.http_request"
+local httprequest = import "core.networking.HttpRequest"
 
 --- Lobby HTTP requests. They are all nonblocking. Instead, they call yield.
 -- Valid only within coroutines.

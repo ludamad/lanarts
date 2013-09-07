@@ -1,6 +1,6 @@
 local ItemType = import "@ItemType"
-local ItemTraits = import ".item_traits"
-local LogUtils = import "lanarts.log_utils"
+local ItemTraits = import ".ItemTraits"
+local LogUtils = import "lanarts.LogUtils"
 local StatContext = import "@StatContext"
 
 local HEALTH_POTION_HEAL_AMOUNT = 50

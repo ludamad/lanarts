@@ -1,6 +1,6 @@
 local Skills = import "@Skills"
 local StatContext = import "@StatContext"
-local AptitudeTypes = import ".aptitude_types"
+local AptitudeTypes = import ".AptitudeTypes"
 
 local M = {} -- Submodule
 

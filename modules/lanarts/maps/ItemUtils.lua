@@ -1,6 +1,6 @@
 -- Routines for generating items 
 
-local map_utils = import ".map_utils"
+local map_utils = import ".MapUtils"
 
 local M = {} -- Submodule
 

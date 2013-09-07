@@ -5,10 +5,10 @@ local MonsterType = import "@MonsterType"
 local Stats = import "@Stats"
 
 local Relations = import "lanarts.objects.Relations"
-local AptitudeTypes = import "@content.aptitude_types"
+local AptitudeTypes = import "@content.AptitudeTypes"
 
-local Traits = import ".monster_traits"
-local Utils = import ".monster_utils"
+local Traits = import ".MonsterTraits"
+local Utils = import ".MonsterUtils"
 
 
 local M = nilprotect {} -- Submodule

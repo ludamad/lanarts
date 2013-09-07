@@ -1,5 +1,5 @@
 local StatContext = import "@StatContext"
-local AptitudeTypes = import "@content.aptitude_types"
+local AptitudeTypes = import "@content.AptitudeTypes"
 
 local M = nilprotect {} -- Submodule
 

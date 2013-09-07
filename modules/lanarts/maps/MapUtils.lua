@@ -1,7 +1,7 @@
 local DungeonFeatures = import "@objects.DungeonFeatures"
 
 local GameObject = import "core.GameObject"
-local MapGen = import "core.map_generation"
+local MapGen = import "core.MapGeneration"
 local GameMap = import "core.GameMap"
 
 local M = {} -- Submodule

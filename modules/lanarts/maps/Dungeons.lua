@@ -1,10 +1,10 @@
 local utils = import "core.Utils"
-local MapGen = import "core.map_generation"
+local MapGen = import "core.MapGeneration"
 local GameObject = import "core.GameObject"
 
 local TileSets = import "@tiles.Tilesets"
 
-local map_utils = import ".map_utils"
+local map_utils = import ".MapUtils"
 local PortalSet = import ".PortalSet"
 
 local M = {} -- Submodule

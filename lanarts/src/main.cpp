@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
 	/* Load low-level Lua bootstrapping code.
 	 * Implements the module system used by the rest of the engine.
 	 */
-	luawrap::dofile(L, "modules/main.lua");
+	luawrap::dofile(L, "modules/Main.lua");
 
 	LuaValue engine = luawrap::globals(L)["Engine"];
 

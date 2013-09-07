@@ -3,10 +3,10 @@ local M = nilprotect {} -- Submodule
 local Spells = import "@Spells"
 local Stats = import "@Stats"
 local Races = import "@Races"
-local SpellTraits = import ".spell_traits"
-local AptitudeTypes = import ".aptitude_types"
+local SpellTraits = import ".SpellTraits"
+local AptitudeTypes = import ".AptitudeTypes"
 local StatContext = import "@StatContext"
-local LogUtils = import "lanarts.log_utils"
+local LogUtils = import "lanarts.LogUtils"
 
 local UNDEAD_HEAL_AMOUNT = 30
 

@@ -1,10 +1,10 @@
 -- Use this include when you want util_* functions.
 -- As well as including those, it defines some additional ad-hoc utility functions.
 
-import "@utils.utils_general"
-import "@utils.utils_math"
-import "@utils.utils_draw"
-import "@utils.utils_description"
+import "@utils.UtilsGeneral"
+import "@utils.UtilsMath"
+import "@utils.UtilsDraw"
+import "@utils.UtilsDescription"
 import "@utils.utils_text_component"
 
 -- More ad hoc utilities without a home, yet

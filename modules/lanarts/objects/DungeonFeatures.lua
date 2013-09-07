@@ -2,7 +2,7 @@ local GameObject = import "core.GameObject"
 local GameMap = import "core.GameMap"
 local Display = import "core.Display"
 
-local ObjectUtils = import ".object_utils"
+local ObjectUtils = import ".ObjectUtils"
 
 local M = nilprotect {} -- Submodule
 

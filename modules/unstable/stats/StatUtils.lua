@@ -1,6 +1,6 @@
 local StatContext = import "@StatContext"
 
-local CooldownTypes = import ".cooldown_types"
+local CooldownTypes = import ".CooldownTypes"
 
 local M = nilprotect {} -- Submodule
 

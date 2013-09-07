@@ -1,4 +1,4 @@
-import ".utils_general" -- for 'memoized'
+import ".UtilsGeneral" -- for 'memoized'
 
 --- Draw parts of text colored differently
 -- @usage draw_colored_parts(font, LEFT_TOP, {0,0}. {COL_RED, "hi "}, {COL_BLUE, "there"} )

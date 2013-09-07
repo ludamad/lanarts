@@ -3,12 +3,14 @@ function update_file() {
 }
 
 for i in $(find . -name '*.lua') ; do
-    package='(@?\.?(?:\w+\.)*)'
+    package='(\@?\.?(?:\w+\.)*)'
     word='([a-z])([a-z]*)'
     IMP='import "'
-    replace=$IMP'$1\u$2$3\u$4$5'
-    perl -p -i -e "s/$IMP$package$word_$word\"/$replace\"/g" $i
-#    echo $res > $i
+    replace1=$IMP'$1\u$2$3'
+    replace2=$IMP'$1\u$2$3\u$4$5'
+    perl -p -i -e "s/$IMP$package$word\"/$replace1\"/g" $i
+    perl -p -i -e "s/$IMP$package$word\\_$word\"/$replace2\"/g" $i
+  #  echo 'import "test.test_balls"' | perl -pe "s/$IMP$package$word\\_$word\"/$replace\"/g"
 done
 
 for i in $(find . -name '*.lua') ; do
@@ -20,8 +22,5 @@ for i in $(find . -name '*.lua') ; do
     fname=$(echo $fname | sed 's/_//g')
     fname=$(echo $fname | sed 's/Lua/lua/g')
     echo "New filename $fname"
-    mv $i "$dname/$fname"
-#    echo $res > $i
+    mv -f $i "$dname/$fname"
 done
-
-# perl -pe 's/import "(\.?(?:\w+\.)*)([a-z])([a-z]*)_([a-z])([a-z]*)"/ and"import \"$1\u$2$3\u$4$5\"\int'

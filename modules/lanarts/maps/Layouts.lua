@@ -1,5 +1,5 @@
-local MapGen = import "core.map_generation"
-local MapUtils = import ".map_utils"
+local MapGen = import "core.MapGeneration"
+local MapUtils = import ".MapUtils"
 
 local M = nilprotect {} -- Submodule
 

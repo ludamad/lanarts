@@ -59,7 +59,7 @@ end
 
 function M.player_has_won()
     local WinningScreen = import "lanarts.menus.WinningScreen"
-    local game_loop_control = (import "lanarts.game_loop").loop_control
+    local game_loop_control = (import "lanarts.GameLoop").loop_control
 
     Game.wait(400)
     game_loop_control.game_is_over = true

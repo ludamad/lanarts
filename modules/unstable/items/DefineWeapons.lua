@@ -1,5 +1,5 @@
-local EquipmentTypes = import ".equipment_types"
-local AptitudeTypes = import "@content.aptitude_types"
+local EquipmentTypes = import ".EquipmentTypes"
+local AptitudeTypes = import "@content.AptitudeTypes"
 local Attacks = import "@Attacks"
 
 local M = nilprotect {} -- Submodule

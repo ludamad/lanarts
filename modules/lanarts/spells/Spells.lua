@@ -2,7 +2,7 @@ local EventLog = import "core.ui.EventLog"
 local GameObject = import "core.GameObject"
 local Map = import "core.GameMap"
 local Projectiles = import "@objects.Projectiles"
-local ObjectUtils = import "@objects.object_utils"
+local ObjectUtils = import "@objects.ObjectUtils"
 
 
 local M = nilprotect {} -- Submodule

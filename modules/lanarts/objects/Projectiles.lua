@@ -2,7 +2,7 @@ local GameObject = import "core.GameObject"
 local GameMap = import "core.GameMap"
 
 local Animations = import ".Animations"
-local ObjectUtils = import ".object_utils"
+local ObjectUtils = import ".ObjectUtils"
 
 local M = {} -- Submodule
 

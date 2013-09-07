@@ -2,14 +2,14 @@ local StatContext = import "@StatContext"
 local AttackResolution = import "@AttackResolution"
 local Attacks = import "@Attacks"
 local Stats = import "@Stats"
-local AnsiCol = import "core.terminal.ansi_colors"
+local AnsiCol = import "core.terminal.AnsiColors"
 local Races = import "@Races"
 local ItemType = import "@ItemType"
 local Spells = import "@Spells"
 
 local Relations = import "lanarts.objects.Relations"
-local AptitudeTypes = import "@content.aptitude_types"
-local LogUtils = import "lanarts.log_utils"
+local AptitudeTypes = import "@content.AptitudeTypes"
+local LogUtils = import "lanarts.LogUtils"
 
 local function choose_option(...)
     local options = {...}
@@ -131,7 +131,7 @@ end
 local function main()
     local animals = import "@content.monsters.Animals"
     -- Load content
-    import "@items.items_consumables"
+    import "@items.ItemsConsumables"
     import "@content.Races"
 
     replace_event_log_with_print()

@@ -1,6 +1,6 @@
 -- Test the horribly complicated damage-defence resolution function
 
-local AR = import "unstable.attack_resolution"
+local AR = import "unstable.AttackResolution"
 
 function TestCases.test_simple_resolution()
     local dmg = AR.resolve_damage(

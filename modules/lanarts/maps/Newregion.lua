@@ -1,21 +1,21 @@
-local MapGen = import "core.map_generation"
+local MapGen = import "core.MapGeneration"
 local GameMap = import "core.GameMap"
 local GameObject = import "core.GameObject"
 local World = import "core.GameWorld"
 
 local TileSets = import "@tiles.Tilesets"
 
-local MapUtils = import ".map_utils"
-local ShapeUtils = import ".shape_utils"
+local MapUtils = import ".MapUtils"
+local ShapeUtils = import ".ShapeUtils"
 local Layouts  = import ".Layouts"
 local dungeons = import ".Dungeons"
 local PortalSet = import ".PortalSet"
 local MapSequence = import ".MapSequence"
 
-local ItemUtils = import ".item_utils"
-local ItemGroups = import ".item_groups"
+local ItemUtils = import ".ItemUtils"
+local ItemGroups = import ".ItemGroups"
 
-local OldMaps = import ".old_maps"
+local OldMaps = import ".OldMaps"
 
 local M = {} -- Submodule
 

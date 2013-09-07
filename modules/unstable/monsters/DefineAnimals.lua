@@ -1,10 +1,10 @@
 local MonsterType = import "@MonsterType"
 local Stats = import "@Stats"
 
-local AptitudeTypes = import "@content.aptitude_types"
+local AptitudeTypes = import "@content.AptitudeTypes"
 
-local Utils = import ".monster_utils"
-local Traits = import ".monster_traits"
+local Utils = import ".MonsterUtils"
+local Traits = import ".MonsterTraits"
 local Attacks = import "@Attacks"
 
 local M = nilprotect {} -- Submodule
