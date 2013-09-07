@@ -22,7 +22,7 @@ function SpellsKnown:can_use_spell(stats, spell_slot)
        c:has_cooldown(C.SPELL_ACTIONS) or c:has_cooldown(spell_slot.type) then
         return false
     end
-    return spell_slot.type.on_prerequisite(spell_slot.modifiers, stats)
+    return spell_slot.type.on_prerequisite(spell_slot, stats)
 end
 
 function SpellsKnown:use_spell(stats, spell_slot)
@@ -33,7 +33,7 @@ function SpellsKnown:use_spell(stats, spell_slot)
         c:add_cooldown(C.OFFENSIVE_ACTIONS, spell.cooldown_offensive)
         c:add_cooldown(C.SPELL_ACTIONS, spell.cooldown_offensive)
         c:add_cooldown(C.ALL_ACTIONS, spell.cooldown_global)
-        spell_slot.type.on_use(spell_slot.modifiers, stats)
+        spell_slot.type.on_use(spell_slot, stats)
         return true
     end
     return false

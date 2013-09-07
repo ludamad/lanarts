@@ -78,6 +78,10 @@ static bool metacopy(lua_State* L) {
 }
 
 static int lapi_table_copy(lua_State* L) {
+	if (lua_gettop(L) != 2) {
+		luaL_error(L, "table.deep_copy takes 2 arguments, got %d", lua_gettop(L));
+	}
+
 	if (metacopy(L)) {
 		return 0;
 	}
@@ -92,7 +96,9 @@ static int lapi_table_copy(lua_State* L) {
 		lua_pop(L, 1);
 		// pop value
 	}
-	lua_pop(L, 1);
+
+	// Note, calling this directly works only because the arguments are in the same order!
+	lapi_table_remove_nonexisting(L);
 	return 0;
 }
 

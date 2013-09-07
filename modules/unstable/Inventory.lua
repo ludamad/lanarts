@@ -1,3 +1,5 @@
+local StatContext = import "@StatContext"
+
 local Inventory = newtype()
 
 local INVENTORY_CAPACITY = 25
@@ -55,6 +57,22 @@ function Inventory:use_item(user, type, --[[Optional]] modifiers)
     assert(item, "Inventory did not contain 1 of " .. type.name)
 end
 
+function Inventory:get_equipped_items(user, equipment_type)
+    local items = {}
+    for item in self:values() do
+        if item.equipped and table.contains(item.type.traits, equipment_type) then
+            table.insert(items, item)
+        end
+    end
+    return items
+end
+
+function Inventory:get_equipped_item(...)
+    local items = self:get_equipped_items(...)
+    assert(#items <= 1)
+    return items[1]
+end
+
 function Inventory:remove_item(type, --[[Optional]] amount, --[[Optional]] modifiers)
     local item, idx = self:find_item(type, modifiers)
     if item then
@@ -65,6 +83,32 @@ end
 
 function Inventory:values()
     return values(self.items)
+end
+
+function Inventory:on_step(stats)
+    for item in self:values() do
+        if item.equipped then
+            local on_step = item.type.on_step
+            if on_step then
+                on_step(item, stats)
+            end
+        end
+    end
+end
+
+function Inventory:on_calculate(stats)
+    for item in self:values() do
+        if item.equipped then
+            local bonuses = item.type.equipment_bonuses 
+            if bonuses then
+                StatContext.temporary_add(stats, item.type.equipment_bonuses)
+            end
+            local on_calc = item.type.on_calculate
+            if on_calc then
+                on_calc(item, stats)
+            end
+        end
+    end
 end
 
 function Inventory.item_create(type, --[[Optional]] amount, --[[Optional]] modifiers)

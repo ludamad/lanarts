@@ -8,7 +8,8 @@ local ItemType = ResourceTypes.type_create(
         description = Schemas.STRING,
         traits = Schemas.TABLE,
         on_prerequisite = Schemas.FUNCTION_OR_NIL,
-        on_use = Schemas.FUNCTION
+        on_use = Schemas.FUNCTION,
+        equip_bonuses = Schemas.TABLE_OR_NIL
     }
 )
 
