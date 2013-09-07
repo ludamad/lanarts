@@ -1,13 +1,15 @@
 local StatContext = import "@StatContext"
-local AttackResolution = import "@attack_resolution"
+local AttackResolution = import "@AttackResolution"
 local Attacks = import "@Attacks"
 local Stats = import "@Stats"
 local AnsiCol = import "core.terminal.ansi_colors"
 local Races = import "@Races"
+local ItemType = import "@ItemType"
+local Spells = import "@Spells"
+
 local Relations = import "lanarts.objects.Relations"
-local Items = import "@content.items"
 local AptitudeTypes = import "@content.aptitude_types"
-local LogUtils = import "@content.log_utils"
+local LogUtils = import "lanarts.log_utils"
 
 local function choose_option(...)
     local options = {...}
@@ -63,7 +65,7 @@ local function use_item(player)
     local item = choice2item[choose_option(unpack(choices))]
     if not item then return false end
 
-    inventory:use_item(player, item.type)
+    inventory:use_item(player, item)
     return true
 end
 
@@ -97,8 +99,8 @@ end
 local function battle(player, enemy)
     local spells = import "@content.spells"
 
-    StatContext.add_item(player, Items.health_potion)
-    StatContext.add_spell(player, spells.berserk)
+    StatContext.add_item(player, ItemType.lookup("Health Potion"))
+    StatContext.add_spell(player, Spells.lookup("Berserk"))
 
     step(player)
     while enemy.base.hp > 0 do
@@ -121,14 +123,15 @@ end
 
 local function replace_event_log_with_print()
     local EventLog = import "core.ui.EventLog"
-    EventLog.add = function(msg) 
-        print(msg)
+    EventLog.add = function(msg, color)
+        AnsiCol.println(msg, AnsiCol.from_rgb(color or COL_WHITE))
     end
 end
 
 local function main()
     local animals = import "@content.monsters.animals"
-
+    -- Load content
+    import "@items.items_consumables"
     import "@content.races"
 
     replace_event_log_with_print()
@@ -148,7 +151,7 @@ local function main()
         base_stats = stats,
         traits = {"player"},
         derived_stats = table.deep_clone(stats),
-        attacks = {Attacks.attack_create(0, 5, dup(AptitudeTypes.melee, 4))},
+        attacks = {Attacks.attack_create(0, 5, AptitudeTypes.melee)},
         name = "TesterMan"
     }
 

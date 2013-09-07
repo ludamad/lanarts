@@ -1,16 +1,30 @@
 -- Usage: 'ItemType.define { ... attributes ... }', 'ItemType.lookup(<name or ID>)'
-local Schemas = import "@Schemas"
+local S = import "@Schemas"
 local ResourceTypes = import "@ResourceTypes"
 
 local ItemType = ResourceTypes.type_create(
-    Schemas.enforce_function_create {
-        name = Schemas.STRING,
-        description = Schemas.STRING,
-        traits = Schemas.TABLE,
-        on_prerequisite = Schemas.FUNCTION_OR_NIL,
-        on_use = Schemas.FUNCTION,
-        equip_bonuses = Schemas.TABLE_OR_NIL
+    S.enforce_function_create {
+        name = S.STRING,
+        description = S.STRING,
+        sprite = S.TABLE, -- Really any 'drawable' type, eg has :draw(xy) method
+        traits = S.TABLE, -- Determines if it is equipment, etc
+        gold_worth = S.defaulted(S.NUMBER, 0), -- Determines shop cost and placement weight 
+
+        on_prerequisite = S.FUNCTION_OR_NIL,
+        on_use = S.FUNCTION,
+
+        equip_bonuses = S.TABLE_OR_NIL,
+        -- Takes an approximate character-level appropriateness
+        on_variation = S.FUNCTION_OR_NIL,
+
+        -- For equipment (all require item to be equippable and already equippeds
+        on_step = S.FUNCTION_OR_NIL,
+        on_evoke = S.FUNCTION_OR_NIL,
+        on_wield = S.FUNCTION_OR_NIL,
+        on_calculate = S.FUNCTION_OR_NIL
     }
 )
+
+ItemType.EQUIPMENT_TRAIT = "equipment_trait"
 
 return ItemType

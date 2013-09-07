@@ -91,18 +91,22 @@ end
 -- Ensures that 0 <= hp <= max_hp
 function M.add_hp(context, hp)
 	local B, D = context.base, context.derived
+    local orig_hp = D.hp
 	-- NOTE: We can have as much hp as the -derived max hp-
 	B.hp = math.min(math.max(0, B.hp + hp), D.max_hp)
 	D.hp = math.min(math.max(0, D.hp + hp), D.max_hp)
+	return D.hp - orig_hp
 end
 
 --- Change MP & reflect it in both derived and base stat-sets
 -- Ensures that 0 <= mp <= max_mp
 function M.add_mp(context, mp)
     local B, D = context.base, context.derived
+    local orig_mp = D.mp
 	-- NOTE: We can have as much mp as the -derived max mp-
     B.mp = math.min(math.max(0, B.mp + mp), D.max_mp)
     D.mp = math.min(math.max(0, D.mp + mp), D.max_mp)
+    return D.mp - orig_mp
 end
 
 --- Add a cooldown of a certain cooldown type (permanently)

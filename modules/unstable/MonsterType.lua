@@ -9,7 +9,7 @@ local MonsterType = ResourceTypes.type_create(
         description = S.STRING,
         xp_award = S.NUMBER,
         stats = S.TABLE,
-        attacks = S.TABLE,
+        unarmed_attack = S.TABLE,
 
         -- Object controlling functions
         radius = S.defaulted(S.NUMBER, 14),

@@ -6,6 +6,7 @@ local Races = import "@Races"
 local SpellTraits = import ".spell_traits"
 local AptitudeTypes = import ".aptitude_types"
 local StatContext = import "@StatContext"
+local LogUtils = import "lanarts.log_utils"
 
 local UNDEAD_HEAL_AMOUNT = 30
 
@@ -20,7 +21,8 @@ local undead_heal = Spells.define {
         return caster.base.hp < caster.derived.max_hp
     end,
     on_use = function (self, caster)
-        StatContext.add_hp(caster, UNDEAD_HEAL_AMOUNT)
+        local actual = StatContext.add_hp(caster, UNDEAD_HEAL_AMOUNT)
+        LogUtils.resolved_log(caster.obj, "<The >$You invoke the curse to gain{s} " .. actual .. "HP!", COL_GREEN)
     end
 }
 

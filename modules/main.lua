@@ -105,7 +105,7 @@ function Engine.main(args)
         import "tests.main"
         return false
     elseif table.contains(args, "--simulation") then
-        import "unstable.simulation"
+        import "unstable.Simulation"
         return false
     end
 

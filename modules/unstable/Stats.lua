@@ -2,6 +2,7 @@ local HookSet = import "@HookSet"
 local Cooldowns = import "@Cooldowns"
 local Inventory = import "@Inventory"
 local SpellsKnown = import "@SpellsKnown"
+local Attacks = import "@Attacks"
 
 local M = {} -- Submodule
 
@@ -49,6 +50,7 @@ function M.stats_create(--[[Optional]] params)
 
         spells = params.spells or SpellsKnown.create(),
         abilities = params.abilities or {},
+        unarmed_attack = params.unarmed_attack or Attacks.ZERO_DAMAGE_ATTACK,
 
         -- Simple dictionary of all 'infinite resistances'. Applies whenever resistance applies.
         immunities = params.immunities or {},

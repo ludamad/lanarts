@@ -30,31 +30,28 @@ function Inventory:add_item(type, --[[Optional]] amount, --[[Optional]] modifier
     local item = self:find_item(type, modifiers)
     if item then
         item.amount = item.amount + (amount or 1)
-        return true
+        return item
     end
 
     if #self.items < self.capacity then
-        table.insert(self.items, Inventory.item_create(type, amount, modifiers))
-        return true
+        local item = Inventory.item_create(type, amount, modifiers)
+        table.insert(self.items, item)
+        return item
     end
 
-    return false
+    return nil
 end
 
-local function remove_from_slot(inventory, item, idx, --[[Optional]] amount)
-    item.amount = item.amount - (amount or 1)
-    if item.amount <= 0 then 
-        table.remove(inventory.items, idx) 
+local function remove_from_slot(inventory, item_slot, --[[Optional]] amount)
+    item_slot.amount = item_slot.amount - (amount or 1)
+    if item_slot.amount <= 0 then 
+        table.remove_occurences(inventory.items, item_slot) 
     end
 end
 
-function Inventory:use_item(user, type, --[[Optional]] modifiers)
-    local item, idx = self:find_item(type, modifiers)
-    if item then
-        item.type.on_use(item, user)
-        remove_from_slot(self, item, idx)
-    end
-    assert(item, "Inventory did not contain 1 of " .. type.name)
+function Inventory:use_item(user, item_slot)
+    item_slot.type.on_use(item_slot, user)
+    remove_from_slot(self, item_slot)
 end
 
 function Inventory:get_equipped_items(user, equipment_type)
@@ -73,12 +70,8 @@ function Inventory:get_equipped_item(...)
     return items[1]
 end
 
-function Inventory:remove_item(type, --[[Optional]] amount, --[[Optional]] modifiers)
-    local item, idx = self:find_item(type, modifiers)
-    if item then
-        remove_from_slot(self, item, idx, amount)
-    end
-    assert(item, "Inventory did not contain " .. amount .. " of " .. type.name)
+function Inventory:remove_item(item_slot, --[[Optional]] amount)
+    remove_from_slot(self, item_slot, amount)
 end
 
 function Inventory:values()
@@ -101,7 +94,10 @@ function Inventory:on_calculate(stats)
         if item.equipped then
             local bonuses = item.type.equipment_bonuses 
             if bonuses then
-                StatContext.temporary_add(stats, item.type.equipment_bonuses)
+                StatContext.temporary_add(stats, bonuses)
+            end
+            if item.modifiers and item.modifiers.equipment_bonuses then
+                StatContext.temporary_add(stats, item.modifiers.equipment_bonuses)
             end
             local on_calc = item.type.on_calculate
             if on_calc then

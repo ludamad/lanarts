@@ -1,5 +1,5 @@
 local EventLog = import "core.ui.EventLog"
-local Players = import "lanarts.players"
+local Players = import "@players"
 
 local M = nilprotect {} -- Submodule
 

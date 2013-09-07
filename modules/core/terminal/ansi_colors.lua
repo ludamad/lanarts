@@ -72,6 +72,29 @@ M.UNDERLINE = ";4"
 M.CROSSED_OUT = ";9"
 M.DEFAULT = ""
 
+local function rgb_to_xterm(rgb)
+    local incs = {0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff}
+    local res = {}
+    for col in values(rgb) do
+        for i= 1, #incs - 1 do
+            local s, b = incs[i], incs[i+1] -- smaller, bigger
+            if s <= col and col <= b then
+                local s1 = math.abs(s - col)
+                local b1 = math.abs(b - col)
+                table.insert(res, s1 < b1 and s or b)
+                break
+            end
+        end
+    end
+    local ColorLookupTable = import ".color_lookup_table"
+    local equiv = ColorLookupTable.table[string.format("%.2x%.2x%.2x", unpack(res))]
+    return equiv
+end
+
+function M.from_rgb(color) 
+   return AnsiColor.create("38;5;" .. rgb_to_xterm(color))
+end
+
 function M.print(text, col, --[[Optional]] sgr_params)
     io.write(col(text, sgr_params))
     io.flush(io.stdout)

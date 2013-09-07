@@ -5,7 +5,7 @@ local Cooldowns = import "@Cooldowns"
 local CooldownTypes = import ".cooldown_types"
 local AptitudeTypes = import ".aptitude_types"
 local StatUtils = import ".stat_utils"
-local LogUtils = import ".log_utils"
+local LogUtils = import "lanarts.log_utils"
 local EventLog = import "core.ui.EventLog"
 
 local M = nilprotect {} -- Submodule

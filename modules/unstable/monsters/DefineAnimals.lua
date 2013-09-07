@@ -3,13 +3,13 @@ local Stats = import "@Stats"
 
 local AptitudeTypes = import "@content.aptitude_types"
 
-local DefineUtils = import ".monster_define_utils"
+local Utils = import ".monster_utils"
 local Traits = import ".monster_traits"
 local Attacks = import "@Attacks"
 
 local M = nilprotect {} -- Submodule
 
-M.rat = DefineUtils.define {
+M.rat = Utils.monster_define {
     name = "Giant Rat",
     description = "A giant, aggressive vermin.",
     traits = {Traits.ANIMAL},
@@ -24,7 +24,7 @@ M.rat = DefineUtils.define {
         movement_speed = 2
     },
 
-    attacks = {Attacks.attack_create(0, 5, dup(AptitudeTypes.melee, 4))},
+    unarmed_attack = Attacks.attacks_create(--[[Effectiveness]] 0, --[[Damage]] 5, AptitudeTypes.melee),
 
     appear_message = "A hostile large rat approaches!",
     defeat_message = "Blood splatters as the large rat is destroyed."
