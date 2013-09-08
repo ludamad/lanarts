@@ -1,13 +1,13 @@
 local StatContext = import "@StatContext"
-local AptitudeTypes = import "@content.AptitudeTypes"
+local Apts = import "@stats.AptitudeTypes"
 
 local M = nilprotect {} -- Submodule
 
 M.stat_mod_functions = {
     ANIMAL = function(stats)
         local context = StatContext.stat_context_create(stats)
-        StatContext.add_resistance(context, AptitudeTypes.slashing, -2, --[[Permanent]] true)
-        StatContext.add_defence(context, AptitudeTypes.slashing, -2, --[[Permanent]] true)
+        StatContext.add_resistance(context, Apts.SLASHING, -2, --[[Permanent]] true)
+        StatContext.add_defence(context, Apts.SLASHING, -2, --[[Permanent]] true)
     end,
     HUMANOID = do_nothing,
 }

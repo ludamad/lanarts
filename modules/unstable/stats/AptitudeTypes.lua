@@ -2,39 +2,45 @@ local M = nilprotect {} -- Submodule
 
 -- TRAINABLE APTITUDES
 
+local aptitudes = {
 -- Main combat proficiencies
-M.MELEE = "MELEE"
-M.RANGED = "RANGED"
-M.MAGIC = "MAGIC"
+    "MELEE",
+    "RANGED",
+    "MAGIC",
 
 -- Weapon types
-M.PIERCING = "PIERCING"
-M.SLASHING = "SLASHING"
-M.BLUNT = "BLUNT"
+    "PIERCING",
+    "SLASHING",
+    "BLUNT",
 
 -- Spell types
-M.ENCHANTMENTS = "ENCHANTMENTS"
-M.CURSES = "CURSES"
-M.FORCE = "FORCE"
+    "ENCHANTMENTS",
+    "CURSES",
+    "FORCE",
 
 -- Misc proficiencies
-M.ARMOUR = "ARMOUR" -- Ability to use armour
-M.WILLPOWER = "WILLPOWER" -- Ability to resist spell effects
-M.FORTITUDE = "FORTITUDE" -- Ability to resist physical abilities (stun, sleep etc)
-M.SELF_MASTERY = "SELF_MASTERY" -- Ability to perform maneuvers
-M.MAGIC_DEVICES = "MAGIC_DEVICES" -- Ability to use magic devices
+    "ARMOUR", -- Ability to use armour
+    "WILLPOWER", -- Ability to resist spell effects
+    "FORTITUDE", -- Ability to resist physical abilities (stun, sleep etc)
+    "SELF_MASTERY", -- Ability to perform maneuvers
+    "MAGIC_DEVICES", -- Ability to use magic devices
 
 -- Major 'elements'
-M.DARK = "DARK"
-M.LIGHT = "LIGHT"
-M.FIRE = "FIRE"
-M.WATER = "WATER"
+    "DARK",
+    "LIGHT",
+    "FIRE",
+    "WATER",
 
 -- Minor elements
-M.EARTH = "EARTH"
-M.AIR = "AIR"
+    "EARTH",
+    "AIR",
 
 -- NON-TRAINABLE APTITUDES
-M.POISON = "POISON"
+    "POISON"
+}
+
+for type in values(aptitudes) do
+    M[type] = type
+end
 
 return M

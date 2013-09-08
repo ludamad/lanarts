@@ -12,7 +12,9 @@ end
 function Inventory:__copy(other)
     -- Ensure a shallow copy when used with table.deep_copy
     other.items = rawget(other, "items") or {}
-    table.copy(self.items, other.items)
+    for i=1,#self.items do
+        other.items[i] = table.clone(self.items[i])
+    end
     other.capacity = self.capacity
 end
 
@@ -45,7 +47,7 @@ end
 local function remove_from_slot(inventory, item_slot, --[[Optional]] amount)
     item_slot.amount = item_slot.amount - (amount or 1)
     if item_slot.amount <= 0 then 
-        table.remove_occurences(inventory.items, item_slot) 
+        table.remove_occurences(inventory.items, item_slot)
     end
 end
 

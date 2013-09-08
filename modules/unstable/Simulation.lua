@@ -8,7 +8,7 @@ local ItemType = import "@ItemType"
 local Spells = import "@Spells"
 
 local Relations = import "lanarts.objects.Relations"
-local AptitudeTypes = import "@content.AptitudeTypes"
+local Apts = import "@stats.AptitudeTypes"
 local LogUtils = import "lanarts.LogUtils"
 
 local function choose_option(...)
@@ -70,7 +70,7 @@ local function use_item(player)
 end
 
 local function damage(attacker, target)
-    local dmg = AttackResolution.damage_calc(attacker.obj.attacks[1], attacker, target)
+    local dmg = AttackResolution.damage_calc(attacker.obj.attack, attacker, target)
 
     AnsiCol.println(
         LogUtils.resolve_conditional_message(attacker.obj, "{The }$You deal{s} " ..dmg .. " damage!"),
@@ -97,7 +97,7 @@ local function step(context)
 end
 
 local function battle(player, enemy)
-    local spells = import "@content.Spells"
+    local spells = import "@stats.Spells"
 
     StatContext.add_item(player, ItemType.lookup("Health Potion"))
     StatContext.add_spell(player, Spells.lookup("Berserk"))
@@ -129,10 +129,10 @@ local function replace_event_log_with_print()
 end
 
 local function main()
-    local animals = import "@content.monsters.Animals"
-    -- Load content
-    import "@items.ItemsConsumables"
-    import "@content.Races"
+    local animals = import "@monsters.DefineAnimals"
+    -- Load stats
+    import "@items.DefineConsumables"
+    import "@races.DefineRaces"
 
     replace_event_log_with_print()
 
@@ -151,7 +151,7 @@ local function main()
         base_stats = stats,
         traits = {"player"},
         derived_stats = table.deep_clone(stats),
-        attacks = {Attacks.attack_create(0, 5, AptitudeTypes.melee)},
+        attack = Attacks.attack_create(0, 5, Apts.MELEE),
         name = "TesterMan"
     }
 
@@ -162,7 +162,7 @@ local function main()
         base_stats = monster_stats,
         derived_stats = table.deep_clone(monster_stats),
         name = animals.rat.name,
-        attacks = animals.rat.attacks
+        attack = animals.rat.unarmed_attack
     }
 
     local scmake = StatContext.game_object_stat_context_create

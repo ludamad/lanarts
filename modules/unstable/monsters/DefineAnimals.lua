@@ -1,11 +1,6 @@
-local MonsterType = import "@MonsterType"
-local Stats = import "@Stats"
+local Apts = import "@stats.AptitudeTypes"
 
-local AptitudeTypes = import "@content.AptitudeTypes"
-
-local Utils = import ".MonsterUtils"
-local Traits = import ".MonsterTraits"
-local Attacks = import "@Attacks"
+local Utils,Traits = import ".MonsterUtils", import ".MonsterTraits"
 
 local M = nilprotect {} -- Submodule
 
@@ -24,7 +19,7 @@ M.rat = Utils.monster_define {
         movement_speed = 2
     },
 
-    unarmed_attack = Attacks.attacks_create(--[[Effectiveness]] 0, --[[Damage]] 5, AptitudeTypes.melee),
+    unarmed_attack = {--[[Effectiveness]] 0, --[[Damage]] 5, Apts.MELEE},
 
     appear_message = "A hostile large rat approaches!",
     defeat_message = "Blood splatters as the large rat is destroyed."

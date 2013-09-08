@@ -3,28 +3,28 @@ local EventLog = import "core.ui.EventLog"
 local StatContext = import "@StatContext"
 local MonsterType = import "@MonsterType"
 local Stats = import "@Stats"
+local Attacks = import "@Attacks"
 
 local Relations = import "lanarts.objects.Relations"
-local AptitudeTypes = import "@content.AptitudeTypes"
+local AptitudeTypes = import "@stats.AptitudeTypes"
+local ContentUtils = import "@stats.ContentUtils"
 
 local Traits = import ".MonsterTraits"
-local Utils = import ".MonsterUtils"
-
 
 local M = nilprotect {} -- Submodule
 
-function M.appear_message(msg)
+function M.appear_message(msg, --[[Optional]] color)
     return function(t)
         t.on_first_appear = function()
-            EventLog.add(msg, {255,255,255})
+            EventLog.add(msg, color or {255,255,255})
         end
     end
 end
 
-function M.defeat_message(msg)
+function M.defeat_message(msg, --[[Optional]] color)
     return function(t)
         t.on_die = function()
-            EventLog.add(msg, {255,255,255})
+            EventLog.add(msg, color or {255,255,255})
         end
     end
 end
@@ -37,21 +37,19 @@ function M.monster_define(t)
     t.stats.team = t.stats.team or Relations.TEAM_MONSTER_ROOT
     local stats = Stats.stats_create(t.stats)
     local context = StatContext.stat_context_create(stats)
-    local sprite_name = t.name:gsub(' ', '_'):lower() .. ".png"
-    local sprite = ContentUtils.derive_sprite(name, --[[Callers stack index]] 2)
+    local sprite = ContentUtils.derive_sprite(t.name, --[[Callers stack index]] 2)
 
     for type,v in pairs(t.aptitudes or {}) do
-        local eff,dam,res,def = unpack(v)
-        StatContext.add_effectiveness(context, type, eff or 0, --[[Permanent]] true)
-        StatContext.add_damage(context, type, dam or 0, --[[Permanent]] true)
-        StatContext.add_resistance(context, type, res or 0, --[[Permanent]] true)
-        StatContext.add_defence(context, type, def or 0, --[[Permanent]] true)
+        StatContext.add_all_aptitudes(context, type, v, true)
     end
 
     for trait in values(t.traits or {}) do
         Traits.stat_mod_functions[trait](stats)
     end
 
+    if t.unarmed_attack and #t.unarmed_attack > 0 then
+        t.unarmed_attack = Attacks.attack_create(unpack(t.unarmed_attack))
+    end 
     return MonsterType.define {
         M.appear_message(t.appear_message),
         M.defeat_message(t.defeat_message),
@@ -63,7 +61,7 @@ function M.monster_define(t)
         radius = t.radius,
         sprite = sprite,
         on_draw = on_draw_sprite,
-        attacks = t.attacks
+        unarmed_attack = t.unarmed_attack
     }
 end
 

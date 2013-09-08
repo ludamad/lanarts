@@ -178,9 +178,16 @@ function M.add_offensive_aptitudes(context, type, amount, --[[Optional, default 
 end
 
 --- Change all aptitude of a certain type, defaults to temporary. 
-function M.add_all_aptitudes(context, type, amount, --[[Optional, default false]] permanent)
-    M.add_defensive_aptitudes(context, type, amount, permanent)
-    M.add_offensive_aptitudes(context, type, amount, permanent)
+function M.add_all_aptitudes(context, type, amounts, --[[Optional, default false]] permanent)
+    if _G.type(amounts) == "number" then
+        -- Resolve if number
+        amounts = {dup(amounts,4)}
+    end
+    local eff,dam,res,def = unpack(amounts)
+    M.add_effectiveness(context, type, eff or 0, permanent)
+    M.add_damage(context, type, dam or 0, permanent)
+    M.add_resistance(context, type, res or 0, permanent)
+    M.add_defence(context, type, def or 0, permanent)
 end
 
 function M.multiply_cooldown_multiplier(context, type, multiplier, --[[Optional, default false]] permanent)

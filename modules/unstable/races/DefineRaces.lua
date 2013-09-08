@@ -3,9 +3,9 @@ local M = nilprotect {} -- Submodule
 local Spells = import "@Spells"
 local Stats = import "@Stats"
 local Races = import "@Races"
-local SpellTraits = import ".SpellTraits"
-local AptitudeTypes = import ".AptitudeTypes"
 local StatContext = import "@StatContext"
+local SpellTraits = import "@stats.SpellTraits"
+local Apts = import "@stats.AptitudeTypes"
 local LogUtils = import "lanarts.LogUtils"
 
 local UNDEAD_HEAL_AMOUNT = 30
@@ -37,12 +37,12 @@ M.undead = Races.define {
         local stats = Stats.stats_create {
             hp = 80, mp = 80,
             name = name, team = team,
-            immunities = {poison = true}, 
+            immunities = {POISON = true}, 
         }
 
         -- All the convenient methods are defined over a stat context, so create one
         local context = StatContext.stat_context_create(stats)
-        StatContext.add_all_aptitudes(context, AptitudeTypes.dark, 2, --[[Permanent]] true)
+        StatContext.add_all_aptitudes(context, Apts.DARK, 2, --[[Permanent]] true)
         StatContext.add_spell(context, undead_heal)
 
         return stats
@@ -63,8 +63,8 @@ M.human = Races.define {
 
         -- All the convenient methods are defined over a stat context, so create one
         local context = StatContext.stat_context_create(stats)
-        StatContext.add_effectiveness(context, AptitudeTypes.self_mastery, 2, --[[Permanent]] true)
-        StatContext.add_effectiveness(context, AptitudeTypes.magic_devices, 2, --[[Permanent]] true)
+        StatContext.add_effectiveness(context, Apts.SELF_MASTERY, 2, --[[Permanent]] true)
+        StatContext.add_effectiveness(context, Apts.MAGIC_DEVICES, 2, --[[Permanent]] true)
 
         return stats
     end

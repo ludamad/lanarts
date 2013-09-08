@@ -1,14 +1,8 @@
-local EquipmentTypes = import ".EquipmentTypes"
-local AptitudeTypes = import "@content.AptitudeTypes"
-local Attacks = import "@Attacks"
+local Apts = import "@stats.AptitudeTypes"
+local Traits,Utils = import ".ItemTraits", import ".ItemUtils"
 
-local M = nilprotect {} -- Submodule
-
-EquipmentTypes.weapon_define {
+Utils.weapon_define {
     name = "Dagger",
-    weapon = "A small but sharp blade, adept at stabbing purposes.",
-    attack = Attacks.attack_create(--[[Effectiveness]] 0, --[[Damage]] 5, {AptitudeTypes.melee, AptitudeTypes.piercing}),
-    
+    description = "A small but sharp blade, adept at stabbing purposes.",
+    attack = {--[[Effectiveness]] 0, --[[Damage]] 5, {Apts.MELEE, Apts.PIERCING}}
 }
-
-return M

@@ -9,9 +9,9 @@
 -- Declare module and import dependencies
 -----------------------------------------------------------------------------
 local base = _G
-local string = import("string")
-local socket = import("core.socket")
-local ltn12 = import("core.ltn12")
+local string = _G.string
+local socket = import("core.Socket")
+local ltn12 = import("core.Ltn12")
 module("core.socket.tp")
 
 -----------------------------------------------------------------------------

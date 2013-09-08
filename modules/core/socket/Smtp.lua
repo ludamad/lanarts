@@ -9,14 +9,14 @@
 -- Declare module and import dependencies
 -----------------------------------------------------------------------------
 local base = _G
-local coroutine = import("coroutine")
-local string = import("string")
-local math = import("math")
-local os = import("os")
-local socket = import("core.socket")
-local tp = import("core.socket.tp")
-local ltn12 = import("core.ltn12")
-local mime = import("mime")
+local coroutine = _G.coroutine
+local string = _G.string
+local math = _G.math
+local os = _G.os
+local socket = import("core.Socket")
+local tp = import("core.socket.Tp")
+local ltn12 = import("core.Ltn12")
+local mime = import("core.Mime")
 module("core.socket.smtp")
 
 -----------------------------------------------------------------------------

@@ -6,7 +6,7 @@ local ItemType = ResourceTypes.type_create(
     S.enforce_function_create {
         name = S.STRING,
         description = S.STRING,
-        sprite = S.TABLE, -- Really any 'drawable' type, eg has :draw(xy) method
+        sprite = S.NOT_NIL, -- Any 'drawable' type, eg has :draw(xy) method
         traits = S.TABLE, -- Determines if it is equipment, etc
         gold_worth = S.defaulted(S.NUMBER, 0), -- Determines shop cost and placement weight 
 

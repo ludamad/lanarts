@@ -4,9 +4,10 @@
 -- Reads in line by line
 
 local jsonlib = import "core.Json"
+local string = _G.string
 local socket = import "core.Socket"
 local http = import "core.socket.Http"
-local ltn12 = import "core.ltn12"
+local ltn12 = import "core.Ltn12"
 
 local utils = import "core.Utils" -- for table.pop_front & do_nothing
 

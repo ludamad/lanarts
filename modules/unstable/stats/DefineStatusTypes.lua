@@ -3,7 +3,7 @@ local StatContext = import "@StatContext"
 local Cooldowns = import "@Cooldowns"
 
 local CooldownTypes = import ".CooldownTypes"
-local AptitudeTypes = import ".AptitudeTypes"
+local Apts = import ".AptitudeTypes"
 local StatUtils = import ".StatUtils"
 local LogUtils = import "lanarts.LogUtils"
 local EventLog = import "core.ui.EventLog"
@@ -52,8 +52,8 @@ M.Exhausted = StatusType.define {
     on_calculate = function(self, stats)
         local D = stats.derived
         StatContext.multiply_cooldown_rate(stats, Cooldowns.ALL_ACTIONS, 0.8)
-        StatContext.add_damage(stats, AptitudeTypes.melee, -2)
-        StatContext.add_defence(stats, AptitudeTypes.melee, -3)
+        StatContext.add_damage(stats, Apts.MELEE, -2)
+        StatContext.add_defence(stats, Apts.MELEE, -3)
         D.movement_speed = D.movement_speed / 2
     end,
     on_deregister = function(self, stats)
@@ -83,8 +83,8 @@ M.Berserk = StatusType.define {
         local D = stats.derived
 
         -- Stat bonuses
-        StatContext.add_damage(stats, AptitudeTypes.melee, 2)
-        StatContext.add_defence(stats, AptitudeTypes.melee, 4 + D.level)
+        StatContext.add_damage(stats, Apts.MELEE, 2)
+        StatContext.add_defence(stats, Apts.MELEE, 4 + D.level)
 
         -- Speed bonsues
         D.movement_speed = D.movement_speed + 1

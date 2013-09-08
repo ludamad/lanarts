@@ -86,7 +86,7 @@ local function rgb_to_xterm(rgb)
             end
         end
     end
-    local ColorLookupTable = import ".color_lookup_table"
+    local ColorLookupTable = import ".ColorLookupTable"
     local equiv = ColorLookupTable.table[string.format("%.2x%.2x%.2x", unpack(res))]
     return equiv
 end

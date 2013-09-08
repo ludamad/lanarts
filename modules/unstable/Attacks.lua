@@ -50,15 +50,16 @@ function M.attack_create(
     -- Weapon speed and related damage multiplier 
      --[[Optional]] speed, --[[Optional]] defence_modifier)
     speed = speed or 1
+    multipliers = resolve_multiplier_table(multipliers)
     return {
         sub_attacks = {{
             base_effectiveness = base_effectiveness, 
             base_damage = base_damage,
 
-            effectiveness_multipliers = resolve_arg(multipliers[1]), 
-            damage_multipliers = resolve_arg(multipliers[2]),
-            resistance_multipliers = resolve_arg(multipliers[3]), 
-            defence_multipliers = resolve_arg(multipliers[4])
+            effectiveness_multipliers = multipliers[1],
+            damage_multipliers = multipliers[2],
+            resistance_multipliers = multipliers[3], 
+            defence_multipliers = multipliers[4]
         }},
 
         cooldown = BASE_ATTACK_RATE * speed,

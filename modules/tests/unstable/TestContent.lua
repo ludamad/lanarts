@@ -1,18 +1,19 @@
 local content_files = {
     "unstable.items.DefineConsumables",
-    "unstable.items.DefineWeapons",
-    "unstable.content.aptitude_types",
-    "unstable.content.cooldown_types",
-    "unstable.content.item_traits",
-    "unstable.content.races",
-    "unstable.content.skills",
-    "unstable.content.spells",
-    "unstable.content.stat_utils",
-    "unstable.content.monsters.animals",
-    "unstable.content.status_types",
+    "unstable.items.DefineWeapons"
+--[[    "unstable.content.AptitudeTypes",
+    "unstable.content.CooldownTypes",
+    "unstable.content.ItemTraits",
+    "unstable.content.Races",
+    "unstable.content.Skills",
+    "unstable.content.Spells",
+    "unstable.content.StatUtils",
+    "unstable.content.Monsters.Animals",
+    "unstable.content.StatusTypes",
 
-    "unstable.items.equipment_types",
-    "unstable.items.items_consumables"
+    "unstable.items.EquipmentTypes",
+    "unstable.items.ItemsConsumables"
+]]
 }
 
 for file in values(content_files) do

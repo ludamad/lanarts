@@ -1,4 +1,4 @@
-import 'core.utils'
+import "core.Utils"
 import '@lunit'
 
 local tests = {

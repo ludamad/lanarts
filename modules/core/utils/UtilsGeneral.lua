@@ -148,7 +148,7 @@ function table.remove_occurences(t, val)
             new_len = new_len + 1
         end
     end
-    for i = new_len+1, #t do
+    for i = new_len, #t do
         t[i] = nil -- delete values at end
     end
 end

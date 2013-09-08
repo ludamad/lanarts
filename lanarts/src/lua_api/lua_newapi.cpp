@@ -262,7 +262,7 @@ namespace lua_api {
 		register_gamestate(gs, L);
 		register_general_api(L);
 
-		LuaValue map_gen = register_lua_submodule(L, "core.map_generation");
+		LuaValue map_gen = register_lua_submodule(L, "core.MapGeneration");
 		ldungeon_gen::lua_register_ldungeon(map_gen, &gs->rng(), false);
 
 		register_lua_libraries(L);

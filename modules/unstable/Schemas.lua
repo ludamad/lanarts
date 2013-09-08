@@ -70,7 +70,7 @@ local function enforce_value(k, v, t)
     elseif v == M.NIL then
         assert(t[k] == nil, "Failed nil constraint")
     elseif v == M.TABLE then
-        assert(type(t[k]) == "table", "Failed table constraint")
+        assert(type(t[k]) == "table", "Failed table constraint "..k)
     elseif v == M.BOOL then
         assert(type(t[k]) == "boolean", "Failed boolean constraint")
     elseif v == M.NUMBER then

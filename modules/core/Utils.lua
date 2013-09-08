@@ -5,7 +5,7 @@ import "@utils.UtilsGeneral"
 import "@utils.UtilsMath"
 import "@utils.UtilsDraw"
 import "@utils.UtilsDescription"
-import "@utils.utils_text_component"
+import "@utils.UtilsTextComponent"
 
 -- More ad hoc utilities without a home, yet
 

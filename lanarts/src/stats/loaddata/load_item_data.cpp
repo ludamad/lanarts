@@ -55,7 +55,7 @@ LuaValue load_item_data(lua_State* L, const FilenameList& filenames) {
 
 	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["Data"]);
 	data["item_create"].bind_function(lapi_data_create_item);
-	luawrap::dofile(L, "modules/lanarts/items/items.lua");
+	luawrap::dofile(L, "modules/lanarts/items/Items.lua");
 
 	return ret;
 }

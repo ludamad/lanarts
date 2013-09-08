@@ -2,7 +2,7 @@ local Spells = import "@Spells"
 local StatusType = import "@StatusType"
 
 local SpellTraits = import ".SpellTraits"
-local status_types = import ".StatusTypes"
+local status_types = import ".DefineStatusTypes"
 
 local M = nilprotect {} -- Submodule
 

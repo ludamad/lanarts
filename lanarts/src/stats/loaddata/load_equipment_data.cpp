@@ -69,9 +69,9 @@ void load_equipment_data(lua_State* L, const FilenameList& filenames,
 
 	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["Data"]);
 	data["equipment_create"].bind_function(lapi_data_create_equipment);
-	luawrap::dofile(L, "modules/lanarts/items/armour/body_armour.lua");
-	luawrap::dofile(L, "modules/lanarts/items/armour/boots.lua");
-	luawrap::dofile(L, "modules/lanarts/items/armour/gloves.lua");
-	luawrap::dofile(L, "modules/lanarts/items/armour/helmets.lua");
-	luawrap::dofile(L, "modules/lanarts/items/rings/rings.lua");
+	luawrap::dofile(L, "modules/lanarts/items/armour/BodyArmour.lua");
+	luawrap::dofile(L, "modules/lanarts/items/armour/Boots.lua");
+	luawrap::dofile(L, "modules/lanarts/items/armour/Gloves.lua");
+	luawrap::dofile(L, "modules/lanarts/items/armour/Helmets.lua");
+	luawrap::dofile(L, "modules/lanarts/items/rings/Rings.lua");
 }

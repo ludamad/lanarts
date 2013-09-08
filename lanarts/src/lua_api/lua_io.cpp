@@ -213,7 +213,7 @@ namespace lua_api {
 		globals["screen_coords"].bind_function(screen_coords);
 		globals["world_coords"].bind_function(world_coords);
 
-		LuaValue keys = lua_api::register_lua_submodule(L, "core.keyboard");
+		LuaValue keys = lua_api::register_lua_submodule(L, "core.Keyboard");
 
 		keys["ENTER"] = (int)SDLK_RETURN;
 		keys["TAB"] = (int)SDLK_TAB;

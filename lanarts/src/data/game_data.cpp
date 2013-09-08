@@ -238,8 +238,6 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 
 	// TODO clean this up
 
-	lua_api::require(L, "main");
-
 	globals["enemies"] = lua_enemies;
 	globals["effects"] = lua_effects;
 	globals["items"] = lua_items;
