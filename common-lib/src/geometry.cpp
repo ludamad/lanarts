@@ -153,6 +153,10 @@ Pos Pos::divided(int divisor) const {
 	return Pos(x / divisor, y / divisor);
 }
 
+Pos Pos::scaled(int scale) const {
+	return Pos(x * scale, y * scale);
+}
+
 Pos::Pos(int x, int y) :
 		x(x), y(y) {
 }
@@ -276,6 +280,10 @@ bool PosF::operator ==(const PosF& o) const {
 
 PosF PosF::divided(float divisor) const {
 	return PosF(x / divisor, y / divisor);
+}
+
+PosF PosF::scaled(float scale) const {
+	return PosF(x * scale, y * scale);
 }
 
 bool PosF::operator !=(const PosF& o) const {

@@ -24,6 +24,7 @@ struct Pos {
 	bool operator!=(const Pos& o) const;
 
 	Pos divided(int divisor) const;
+	Pos scaled(int scale) const;
 
 	Pos(int x, int y);
 };
@@ -87,6 +88,7 @@ struct PosF {
 	PosF(const Pos& pos);
 	void rotate(float angle);
 	PosF rotated(float angle) const;
+	PosF scaled(float scale) const;
 
 	PosF divided(float divisor) const;
 

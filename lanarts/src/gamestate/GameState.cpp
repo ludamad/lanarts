@@ -68,7 +68,7 @@ GameState::GameState(const GameSettings& settings, lua_State* L) :
 		world(this),
 		repeat_actions_counter(0) {
 
-	dragging_view = false;
+	is_dragging_view = false;
 
 	_game_timestamp = 0;
 
@@ -320,33 +320,31 @@ int GameState::key_press_state(int keyval) {
 }
 
 void GameState::adjust_view_to_dragging() {
+	if (!is_dragging_view) {
+		previous_view = _view;
+	}
 	/*Adjust the view if the player is far from view center,
 	 *if we are following the cursor, or if the minimap is clicked */
 	bool is_dragged = false;
 
 	if (mouse_right_down()) {
-		BBox minimap_bbox = hud.minimap_bbox(this);
-		int mx = mouse_x() - minimap_bbox.x1, my = mouse_y()
-				- minimap_bbox.y1;
-		int mw = minimap_bbox.width(), mh = minimap_bbox.height();
-
-		bool outofx = (mx < 0 || mx >= mw);
-		bool outofy = (my < 0 || my >= mh);
-
-		if (dragging_view || (!outofx && !outofy)) {
-			_view.sharp_center_on(mx * width() / mw, my * height() / mh);
+		BBox minimap_bbox = hud.minimap().minimap_bounds(this);
+		if (is_dragging_view || minimap_bbox.contains(mouse_pos())) {
+			Pos minimap_xy = mouse_pos() - minimap_bbox.left_top();
+			Pos world_xy = hud.minimap().minimap_xy_to_world_xy(this, previous_view, minimap_xy);
+			_view.sharp_center_on(world_xy);
 			is_dragged = true;
 		}
 	}
 
 	/*If we were previously dragging, now snap back to the player position*/
-	if (!is_dragged && dragging_view) {
+	if (!is_dragged && is_dragging_view) {
 		PlayerInst* p = local_player();
 		if (p) {
 			_view.sharp_center_on(p->x, p->y);
 		}
 	}
-	dragging_view = is_dragged;
+	is_dragging_view = is_dragged;
 }
 
 static void lua_drawables_draw_below_depth(LuaDrawableQueue::Iterator iter, int depth) {

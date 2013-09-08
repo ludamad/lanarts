@@ -11,7 +11,7 @@
 struct GameView {
 	int x, y, width, height, world_width, world_height;
 
-	GameView(int x, int y, int width, int height, int world_width = 0,
+	GameView(int x = 0, int y = 0, int width = 0, int height = 0, int world_width = 0,
 			int world_height = 0) :
 			x(x), y(y), width(width), height(height), world_width(world_width), world_height(
 					world_height) {

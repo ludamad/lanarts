@@ -101,12 +101,11 @@ void GameTiles::pre_draw(GameState* gs) {
 		region.y2 = size.h - 1;
 	}
 
-//	bool reveal_enabled = gs->key_down_state(SDLK_BACKQUOTE);
 	for (int y = region.y1; y <= region.y2; y++) {
 		for (int x = region.x1; x <= region.x2; x++) {
 			Tile& tile = get(Pos(x, y));
 			const ldraw::Image& img = res::tile(tile.tile).img(tile.subtile);
-			if (/*reveal_enabled ||*/was_seen(Pos(x, y))) {
+			if (was_seen(Pos(x, y))) {
 				img.draw(on_screen(gs, Pos(x * TILE_SIZE, y * TILE_SIZE)));
 			}
 		}

@@ -43,6 +43,10 @@ BBox GameHud::minimap_bbox(GameState* gs) {
 			minimap_y + minimap_h);
 }
 
+Minimap& GameHud::minimap() {
+	return sidebar.minimap;
+}
+
 void GameHud::step(GameState *gs) {
 	console.step(gs);
 	action_bar.step(gs);
@@ -110,4 +114,3 @@ GameHud::GameHud(const BBox& sidebar_box, const BBox& view_box) :
 void GameHud::reset_slot_selected() {
 	sidebar.reset_slot_selected();
 }
-

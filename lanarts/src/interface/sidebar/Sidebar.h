@@ -35,7 +35,6 @@ public:
 		navigator.override_sidebar_contents(overlay);
 	}
 
-private:
 	BBox sidebar_bounds;
 	Minimap minimap;
 	SidebarNavigator navigator;

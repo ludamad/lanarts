@@ -260,7 +260,9 @@ private:
 	GameWorld world;
 
 	MTwist mtwist;
-	bool dragging_view;
+	// For dragging purposes:
+	GameView previous_view;
+	bool is_dragging_view;
 	IOController iocontroller;
 
 	//XXX: This repeats the last action N times, a more elegant solution is needed

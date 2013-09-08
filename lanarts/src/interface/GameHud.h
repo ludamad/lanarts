@@ -41,6 +41,7 @@ public:
 
 	/*Location of the minimap on the screen*/
 	BBox minimap_bbox(GameState* gs);
+	Minimap& minimap();
 
 	GameHud(const BBox& sidebar_box, const BBox& view_box);
 
