@@ -52,11 +52,11 @@ local function remove_from_slot(inventory, item_slot, --[[Optional]] amount)
 end
 
 function Inventory:use_item(user, item_slot)
-    item_slot.type.on_use(item_slot, user)
-    remove_from_slot(self, item_slot)
+    local to_remove = item_slot.type.on_use(item_slot, user)
+    remove_from_slot(self, item_slot, to_remove or 1)
 end
 
-function Inventory:get_equipped_items(user, equipment_type)
+function Inventory:get_equipped_items(equipment_type)
     local items = {}
     for item in self:values() do
         if item.equipped and table.contains(item.type.traits, equipment_type) then
@@ -74,6 +74,10 @@ end
 
 function Inventory:remove_item(item_slot, --[[Optional]] amount)
     remove_from_slot(self, item_slot, amount)
+end
+
+function Inventory:equip_item(item_slot)
+    item_slot.equipped = true
 end
 
 function Inventory:values()

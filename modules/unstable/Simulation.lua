@@ -9,6 +9,7 @@ local Spells = import "@Spells"
 
 local Relations = import "lanarts.objects.Relations"
 local Apts = import "@stats.AptitudeTypes"
+local ItemTraits = import "@items.ItemTraits"
 local LogUtils = import "lanarts.LogUtils"
 
 local function choose_option(...)
@@ -70,7 +71,10 @@ local function use_item(player)
 end
 
 local function damage(attacker, target)
-    local dmg = AttackResolution.damage_calc(attacker.obj.attack, attacker, target)
+    local weapon = StatContext.get_equipped_item(attacker, ItemTraits.WEAPON)
+    local attack = (weapon ~= nil) and weapon.type.attack or attacker.obj.unarmed_attack
+
+    local dmg = AttackResolution.damage_calc(attack, attacker, target)
 
     AnsiCol.println(
         LogUtils.resolve_conditional_message(attacker.obj, "{The }$You deal{s} " ..dmg .. " damage!"),
@@ -99,7 +103,9 @@ end
 local function battle(player, enemy)
     local spells = import "@stats.Spells"
 
-    StatContext.add_item(player, ItemType.lookup("Health Potion"))
+    for item_name in values{"Health Potion", "Dagger"} do
+        StatContext.add_item(player, ItemType.lookup(item_name))
+    end
     StatContext.add_spell(player, Spells.lookup("Berserk"))
 
     step(player)
@@ -132,6 +138,7 @@ local function main()
     local animals = import "@monsters.DefineAnimals"
     -- Load stats
     import "@items.DefineConsumables"
+    import "@items.DefineWeapons"
     import "@races.DefineRaces"
 
     replace_event_log_with_print()
@@ -151,7 +158,7 @@ local function main()
         base_stats = stats,
         traits = {"player"},
         derived_stats = table.deep_clone(stats),
-        attack = Attacks.attack_create(0, 5, Apts.MELEE),
+        unarmed_attack = Attacks.attack_create(0, 5, Apts.MELEE),
         name = "TesterMan"
     }
 
@@ -162,7 +169,7 @@ local function main()
         base_stats = monster_stats,
         derived_stats = table.deep_clone(monster_stats),
         name = animals.rat.name,
-        attack = animals.rat.unarmed_attack
+        unarmed_attack = animals.rat.unarmed_attack
     }
 
     local scmake = StatContext.game_object_stat_context_create

@@ -1,14 +1,16 @@
 -- The item sprite is 'auto-calculated' from the sprite name.
 
 local ItemType = import "@ItemType"
+local StatContext = import "@StatContext"
 local Attacks = import "@Attacks"
 local ItemTraits = import ".ItemTraits"
 local ContentUtils = import "@stats.ContentUtils"
 
 local M = nilprotect {} -- Submodule
 
-local function on_use_equipment()
-    print "TODO" --TODO
+local function on_use_equipment(item_slot, stats)
+    StatContext.equip_item(stats, item_slot)
+    return 0 -- Use 0 copies
 end
 
 local function type_define(args, type, --[[Optional]] not_equipment)

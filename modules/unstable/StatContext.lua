@@ -51,11 +51,23 @@ function M.use_spell(stats, spell_slot)
 end
 
 function M.add_item(stats, ...)
-    stats.base.inventory:add_item(...)
+    return stats.base.inventory:add_item(...)
 end
 
 function M.use_item(stats, ...)
-    stats.base.inventory:use_item(...)
+    return stats.base.inventory:use_item(...)
+end
+
+function M.get_equipped_item(stats, ...)
+    return stats.base.inventory:get_equipped_item(...)
+end
+
+function M.get_equipped_items(stats, ...)
+    return stats.base.inventory:get_equipped_items(...)
+end
+
+function M.equip_item(stats, ...)
+    return stats.base.inventory:equip_item(...)
 end
 
 function M.on_step(context)
