@@ -19,7 +19,7 @@ local function resolve_multiplier(arg)
     if #arg > 0 then
         local ret = {}
         for trait in values(arg) do
-            ret[arg] = 1
+            ret[trait] = 1
         end
         return ret
     end

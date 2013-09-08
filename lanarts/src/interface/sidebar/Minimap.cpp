@@ -32,12 +32,16 @@ static void fill_buff2d(char* buff, int w, int h, int x, int y,
 }
 
 
+inline static void set_colour(char* buff, Colour col) {
+	buff[0] = col.b;
+	buff[1] = col.g;
+	buff[2] = col.r;
+	buff[3] = col.a;
+}
+
 inline static void set_colour(char* buff, int x, int y, int ptw, Colour col) {
 	int loc = y * ptw + x;
-	buff[loc * 4] = col.b;
-	buff[loc * 4 + 1] = col.g;
-	buff[loc * 4 + 2] = col.r;
-	buff[loc * 4 + 3] = col.a;
+	set_colour(buff + loc * 4, col);
 }
 
 static void draw_rect2d(char* buff, int w, int h, BBox bbox, const Colour& col) {
@@ -67,7 +71,7 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 				if (!tiles.is_solid(xy)) {/*floor*/
 					iter[0] = 50, iter[1] = 50, iter[2] = 50, iter[3] = 255;
 				} else { //if (tile == 1){/*wall*/
-					iter[0] = 200, iter[1] = 225, iter[2] = 200, iter[3] = 255;
+					set_colour(iter, Colour(200,225,200));
 				}
 			}
 

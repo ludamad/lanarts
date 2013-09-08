@@ -94,6 +94,14 @@ function table.clone(t)
     return newt
 end
 
+function table.key_list(t)
+    local ret = {}
+    for k,v in pairs(t) do
+        table.insert(ret,k)
+    end
+    return ret
+end
+
 function table.deep_clone(t)
     local newt = {}
     table.deep_copy(t, newt)

@@ -114,7 +114,13 @@ function Inventory:on_calculate(stats)
 end
 
 function Inventory.item_create(type, --[[Optional]] amount, --[[Optional]] modifiers)
+    -- Resolve the name, for convenience.
+    local name = type.name
+    if modifiers and modifiers.name then
+        name = modifiers.name
+    end
     return {
+        name = name,
         type = type,
         amount = amount or 1,
         modifiers = modifiers,

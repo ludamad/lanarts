@@ -122,12 +122,11 @@ function M.damage_calc(attack, attacker, target)
 
     for s in values(attack.sub_attacks) do
         local damage, percentage = resolve_subattack(s, attack.defence_modifier, AApt, TApt)
+        print("Attack hits for " .. damage .. " with "  .. math.floor(percentage*100) .. "% effectiveness.")
         table.insert(A, damage * percentage)
         table.insert(DM, table.scaled(s.defence_multipliers, percentage))
     end
 
---    local final_damage = (damage - defence) * (1.0 + (effectiveness - resistance) / RESISTANCE_MULTIPLE_INTERVAL)
---    return math.max(0, final_damage)
     return M.resolve_damage(A, DM, TApt.defence)
 end
 

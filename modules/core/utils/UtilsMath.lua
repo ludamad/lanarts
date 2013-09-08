@@ -130,6 +130,15 @@ function vector_divide(v1, v2)
     return ret
 end
 
+function random_round(num)
+    local f = math.floor(num)
+    if randomf(0,1) < (num-f) then
+        return f + 1
+    else
+        return f
+    end
+end
+
 function table.add(a,b)
     for k,v in pairs(b) do
         local bval = b[k]
