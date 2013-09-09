@@ -96,11 +96,11 @@ function M.attack_to_string(attack, --[[Optional]] use_color)
     end
     assert(#attack.sub_attacks == 1) -- For now
     local sub = attack.sub_attacks[1]
-    local ret = ("%s%s%s%s "):format(
-        if_color(C.RED, "{", C.BOLD),
-        if_color(C.RED, '+'..sub.base_effectiveness, C.BOLD) .. if_color(C.GREEN),
-        if_color(C.RED, ",", C.BOLD),
-        if_color(C.RED, '+'..sub.base_damage, C.BOLD)
+    local ret = if_color(C.RED,
+        ("{%s,%s "):format(
+            sub.base_effectiveness > 0 and '+'..sub.base_effectiveness or sub.base_effectiveness, 
+            '+'..sub.base_damage), 
+        C.BOLD
     )
 
     local traits = {}

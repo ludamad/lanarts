@@ -10,7 +10,7 @@ local SkillType = ResourceTypes.type_create(
         on_step = S.FUNCTION_OR_NIL,
         on_attack = S.FUNCTION_OR_NIL,
         on_calculate = S.FUNCTION_OR_NIL,
-        experience_cost_multiplier = S.defaulted(S.NUMBER, 1)
+        cost_multiplier = S.defaulted(S.NUMBER, 1)
     }
 )
 

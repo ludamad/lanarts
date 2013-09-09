@@ -59,8 +59,11 @@ end
 
 local function choose_skills(player, xp_to_spend)
     while xp_to_spend > 0 do
+        StatContext.on_step(player)
+        StatContext.on_calculate(player)
+        print(StatUtils.stats_to_string(player.derived, --[[Color]] true, --[[New lines]] true, player.base.name .. ", the Adventurer"))
         -- Pick skill
-        AnsiCol.println("You have "..xp_to_spend.."XP to spend.", AnsiCol.GREEN, AnsiCol.BOLD)
+        AnsiCol.println("You have "..xp_to_spend.."SP to spend.", AnsiCol.GREEN, AnsiCol.BOLD)
         local choices = {}
         local choice2skill = {}
         for skill in values(SkillType.list) do
@@ -74,7 +77,11 @@ local function choose_skills(player, xp_to_spend)
 
         -- Pick experience gain
         while true do
-            AnsiCol.println("You have "..xp_to_spend.."XP to spend.", AnsiCol.GREEN, AnsiCol.BOLD)
+            StatContext.on_step(player)
+            StatContext.on_calculate(player)
+            print(StatUtils.stats_to_string(player.derived, --[[Color]] true, --[[New lines]] true, player.base.name .. ", the Adventurer"))
+    
+            AnsiCol.println("You have "..xp_to_spend.."SP to spend.", AnsiCol.GREEN, AnsiCol.BOLD)
             AnsiCol.println(
                 ("Spend how much on %s%s"):format(
                     AnsiCol.WHITE(skill.name, AnsiCol.BOLD), 
@@ -84,27 +91,32 @@ local function choose_skills(player, xp_to_spend)
             local skill_slot = Stats.get_skill(player.base, skill)
     
             local function xp2level(xp)
-                return ExperienceCalculation.skill_level_from_experience(skill.experience_cost_multiplier, xp)
+                return ExperienceCalculation.skill_level_from_cost(skill.cost_multiplier, xp)
             end
             local function level2xp(xp_level)
-                return ExperienceCalculation.experience_from_skill_level(skill.experience_cost_multiplier, xp_level)
+                return ExperienceCalculation.cost_from_skill_level(skill.cost_multiplier, xp_level)
             end
             local function needed(gain)
                 return level2xp(skill_slot.level + gain) - skill_slot.experience 
             end
     
+            local need5, need1, need0_1 = needed(5.0), needed(1.0), needed(0.1)
+
+            local choices, amounts = {"Back"}, {}
+            local function reg(k,xp) table.insert(choices, k) ; amounts[k] = xp end
+
+            if need0_1 <= xp_to_spend then
+                reg(("+0.1 (Spend %s to become %s)"):format(need0_1, skill_slot.level+0.1), need0_1)
+            end
+            if need1 <= xp_to_spend then
+                reg(("+1 (Spend %s to become %s)"):format(need1, skill_slot.level+1), need1)
+            end
+            if need5 <= xp_to_spend then
+                reg(("+5 (Spend %s to become %s)"):format(need5, skill_slot.level+5), need5)
+            end
             local max = xp2level(skill_slot.experience + xp_to_spend)
-            local amounts = {
-                ["Max (Spend ".. xp_to_spend .. " to become "..max..")"] = xp_to_spend
-            }
-            if needed(1.0) <= xp_to_spend then
-                amounts[("+1 (Spend %s to become %s)"):format(needed(1.0), skill_slot.level+1)] = needed(1.0)
-            end
-            if needed(0.1) <= xp_to_spend then
-                amounts[("+0.1 (Spend %s to become %s)"):format(needed(0.1), skill_slot.level+0.1)] = needed(0.1)
-            end
-            local choices = {"Back"}
-            for k,v in pairs(amounts) do table.insert(choices, k) end
+            reg("Max (Spend ".. xp_to_spend .. " to become "..max..")", xp_to_spend)
+
             local amount = amounts[choose_option(unpack(choices))]
             if not amount then break end
 
@@ -182,11 +194,16 @@ end
 local function battle(player, enemy)
     local spells = import "@stats.Spells"
 
-    for item_name in values{"Health Potion", "Dagger"} do
-        StatContext.add_item(player, ItemType.lookup(item_name))
+    for item in values(ItemType.list) do
+        StatContext.add_item(player, item)
     end
+--    local sp=1000
+--    for i=1,20 do
+--        sp = sp + ExperienceCalculation.skill_points_at_level_up(i)
+--        print(("Level %d has %dSP"):format(i, sp))
+--    end
     StatContext.add_spell(player, Spells.lookup("Berserk"))
-    choose_skills(player, 1000)
+    choose_skills(player, 24000)
     step(player)
     while enemy.base.hp > 0 do
         print(StatUtils.stats_to_string(player.derived, --[[Color]] true, --[[New lines]] true, player.base.name .. ", the Adventurer"))
