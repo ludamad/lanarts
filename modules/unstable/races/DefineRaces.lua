@@ -64,7 +64,7 @@ M.human = Races.define {
         -- All the convenient methods are defined over a stat context, so create one
         local context = StatContext.stat_context_create(stats)
         StatContext.add_effectiveness(context, Apts.SELF_MASTERY, 2, --[[Permanent]] true)
-        StatContext.add_effectiveness(context, Apts.MAGIC_DEVICES, 2, --[[Permanent]] true)
+        StatContext.add_effectiveness(context, Apts.MAGIC_ITEMS, 2, --[[Permanent]] true)
 
         return stats
     end

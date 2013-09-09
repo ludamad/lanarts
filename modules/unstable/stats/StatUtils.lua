@@ -54,10 +54,12 @@ function M.stats_to_string(s, --[[Optional]] use_color, --[[Optional]] use_new_l
     local trait_strings = {""}
     for trait in values(trait_list) do
         local apts = s.aptitudes
+        local not_all_0 = false
         local function apt(cat) -- Helper function
             local s = apts[cat][trait]
             local pre = to_camelcase(cat:sub(1,3)) .. ' '
-            if s then 
+            if s and s ~= 0 then
+                not_all_0  = true 
                 if s > 0 then 
                     return if_color(C.CYAN, pre.. '+' .. s, C.BOLD)
                 else 
@@ -72,7 +74,9 @@ function M.stats_to_string(s, --[[Optional]] use_color, --[[Optional]] use_new_l
             apt("effectiveness"), apt("damage"), apt("resistance"), apt("defence"),
             if_color(C.WHITE, ')')
         )
-        table.insert(trait_strings, str)
+        if not_all_0 then
+            table.insert(trait_strings, str)
+        end
     end
     ret = ret .. (use_new_lines and "\n" or " "):join(trait_strings)
     return ret

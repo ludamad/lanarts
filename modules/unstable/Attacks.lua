@@ -47,9 +47,9 @@ function M.attack_create(
     base_effectiveness, base_damage,
     -- Aptitude modifiers
     multipliers, 
-    -- Weapon speed and related damage multiplier 
-     --[[Optional]] speed, --[[Optional]] defence_modifier)
-    speed = speed or 1
+    -- Weapon delay and related damage multiplier 
+     --[[Optional]] delay, --[[Optional]] defence_modifier)
+    delay = delay or 1
     multipliers = resolve_multiplier_table(multipliers)
     return {
         sub_attacks = {{
@@ -62,8 +62,8 @@ function M.attack_create(
             defence_multipliers = multipliers[4]
         }},
 
-        cooldown = BASE_ATTACK_RATE * speed,
-        defence_modifier = defence_modifier or speed
+        cooldown = BASE_ATTACK_RATE * delay,
+        defence_modifier = defence_modifier or delay
     }
 end
 

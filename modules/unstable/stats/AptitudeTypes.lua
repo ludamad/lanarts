@@ -1,8 +1,7 @@
 local M = nilprotect {} -- Submodule
 
--- TRAINABLE APTITUDES
-
 local aptitudes = {
+-- TRAINABLE APTITUDES
 -- Main combat proficiencies
     "MELEE",
     "RANGED",
@@ -23,7 +22,7 @@ local aptitudes = {
     "WILLPOWER", -- Ability to resist spell effects
     "FORTITUDE", -- Ability to resist physical abilities (stun, sleep etc)
     "SELF_MASTERY", -- Ability to perform maneuvers
-    "MAGIC_DEVICES", -- Ability to use magic devices
+    "MAGIC_ITEMS", -- Ability to use magic items
 
 -- Major 'elements'
     "DARK",
@@ -36,7 +35,13 @@ local aptitudes = {
     "AIR",
 
 -- NON-TRAINABLE APTITUDES
-    "POISON"
+    "POISON",
+-- ALTERNATE WEAPON CLASSES
+    "BLADE",
+    "AXE",
+    "MACE",
+    "POLEARM",
+    "STAFF",
 }
 
 for type in values(aptitudes) do

@@ -80,6 +80,10 @@ function Inventory:equip_item(item_slot)
     item_slot.equipped = true
 end
 
+function Inventory:deequip_item(item_slot)
+    item_slot.equipped = false
+end
+
 function Inventory:values()
     return values(self.items)
 end

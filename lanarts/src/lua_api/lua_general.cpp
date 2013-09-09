@@ -58,7 +58,7 @@ static int lapi_table_remove_nonexisting(lua_State* L) {
 	return 0;
 }
 
-static bool metacopy(lua_State* L) {
+static bool metacopy(lua_State* L, bool use_meta) {
 	// Ensure same meta-table, call __copy metamethod if exists
 	if (lua_getmetatable(L, 1)) {
 		lua_pushvalue(L, -1);
@@ -66,7 +66,7 @@ static bool metacopy(lua_State* L) {
 
 		// Call __copy metamethod if not nil, skipping the rest of the copying.
 		lua_getfield(L, -1, "__copy");
-		if (!lua_isnil(L, -1)) {
+		if (use_meta && !lua_isnil(L, -1)) {
 			lua_pushvalue(L, 1);
 			lua_pushvalue(L, 2);
 			lua_call(L, 2, 0);
@@ -78,11 +78,13 @@ static bool metacopy(lua_State* L) {
 }
 
 static int lapi_table_copy(lua_State* L) {
-	if (lua_gettop(L) != 2) {
+	if (lua_gettop(L) < 2) {
 		luaL_error(L, "table.deep_copy takes 2 arguments, got %d", lua_gettop(L));
 	}
 
-	if (metacopy(L)) {
+	// Copy metatable and check for __copy
+	bool use_meta = (lua_gettop(L) < 3 || lua_toboolean(L, 3));
+	if (metacopy(L, use_meta)) {
 		return 0;
 	}
 
@@ -104,12 +106,13 @@ static int lapi_table_copy(lua_State* L) {
 
 // Works with plain-data tables and not-too-special tables.
 static int lapi_table_deep_copy(lua_State* L) {
-	if (lua_gettop(L) != 2) {
+	if (lua_gettop(L) < 2) {
 		luaL_error(L, "table.deep_copy takes 2 arguments, got %d", lua_gettop(L));
 	}
 
 	// Copy metatable and check for __copy
-	if (metacopy(L)) {
+	bool use_meta = (lua_gettop(L) < 3 || lua_toboolean(L, 3));
+	if (metacopy(L, use_meta)) {
 		return 0; // Return, if we have a __copy metamethod
 	}
 

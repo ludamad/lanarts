@@ -61,4 +61,13 @@ function M.stats_create(--[[Optional]] params)
     }
 end
 
+function M.get_skill(stats, skill_type)
+    for skill_slot in values(stats.skills) do
+        if skill_slot.type == skill_type then
+            return skill_slot
+        end
+    end
+    assert(false)
+end
+
 return M
