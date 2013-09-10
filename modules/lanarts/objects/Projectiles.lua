@@ -6,7 +6,7 @@ local ObjectUtils = import ".ObjectUtils"
 
 local M = {} -- Submodule
 
-M.PROJECTILE_TRAIT = "Projectile"
+M.PROJECTILE_TRAIT = "PROJECTILE_TRAIT"
 
 -- PROJECTILE BASE CLASS
 
@@ -33,7 +33,8 @@ end
 -- xy, radius, on_step, on_draw, on_tile_collide, on_object_collide, do_init
 -- Everything else is extra.
 function Base._create(real_type, base_create, args)
-    args.traits = {M.PROJECTILE_TRAIT}
+    args.traits = args.traits or {}
+    table.insert(args.traits, M.PROJECTILE_TRAIT)
 
     local object = base_create(real_type, args)
     -- Wrap supplied on_step

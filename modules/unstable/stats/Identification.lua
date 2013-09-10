@@ -68,7 +68,7 @@ function M.name_and_description(stats, item_slot)
     if M.is_identified(stats, item_slot) then
         return item_slot.name, item_slot.description                
     else
-        return item_slot.unidentified_name, item_slot.unidentified_description
+        return item_slot.unidentified_name or item_slot.name, item_slot.unidentified_description or item_slot.description
     end
 end
 

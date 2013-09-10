@@ -24,15 +24,21 @@ local function on_use_equipment(type)
     end
 end
 
+-- Filters melee, magic, ranged. Useful for determining identify skills, which should not be affected by these aptitudes.
+function M.filter_main_aptitudes(apts)
+    local new_apts = {}
+    for value in values(apts) do
+        if value ~= Apts.MELEE and value ~= Apts.MAGIC and value ~= Apts.RANGED then
+            table.insert(new_apts, value)
+        end
+    end
+    return new_apts
+end
+
 local function add_default_types(t, args, difficulty, --[[Optional]] types)
     if not types then
         local default_types = args.types or {Apts.MAGIC_ITEMS}
-        types = {}
-        for value in values(default_types) do
-            if value ~= Apts.MELEE and value ~= Apts.MAGIC then
-                table.insert(types, value)
-            end
-        end
+        types = M.filter_main_aptitudes(default_types)
     end
     local P = Proficiency
     table.insert(t,P.proficiency_requirement_create(P.proficiency_type_create(types), args.difficulty))
@@ -70,7 +76,7 @@ local function type_define(args, type, --[[Optional]] not_equipment)
 end
 
 function M.weapon_define(args)
-    -- Unwound weapon in convenient manner
+    -- Define weapon attack in convenient manner
     assert(args.types and args.difficulty and args.gold_worth)
     args.traits = args.traits or {}
     for type in values(args.types) do 

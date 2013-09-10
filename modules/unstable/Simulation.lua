@@ -16,6 +16,21 @@ local StatUtils = import "@stats.StatUtils"
 local ItemTraits = import "@items.ItemTraits"
 local Identification = import "@stats.Identification"
 
+local GameMap = import "core.GameMap"
+local GameObject = import "core.GameObject"
+
+local gmap = GameMap.create { 
+    map = MapGen.map_create { 
+        label = "TestLevel", 
+        size = {256,256},            
+        content = Data.tile_create { 
+            images = {
+                image_load (path_resolve "test_tile.png")
+            }
+        }
+    }
+}
+
 local Proficiency = import "@Proficiency"
 local LogUtils = import "lanarts.LogUtils"
 
@@ -261,6 +276,26 @@ local function create_player_stats(race, name, --[[Optional]] team)
     return stats
 end
 
+local function choose_race()
+    local C = AnsiCol
+    local idx = 1
+    while true do
+        local race = Races.list[idx]
+        print(C.YELLOW("Race ".. idx .. ") ", C.BOLD).. C.WHITE(race.name))
+        print(C.YELLOW(race.description))
+        local stats = create_player_stats(race, "Level 1 " .. race.name)
+        local context = StatContext.stat_context_create(stats)
+        StatContext.on_step(context)
+        StatContext.on_calculate(context)
+        print(StatUtils.stats_to_string(context.derived, --[[Color]] true, --[[New lines]] true, stats.name))
+        print(C.BLUE("Do you wish to play as a " .. race.name .. " Adventurer?", C.BOLD))
+        if choose_option("No", "Yes") == "Yes" then
+            return race
+        end
+        idx = (idx % #Races.list) + 1 
+    end
+end
+
 local function main()
     local animals = import "@monsters.DefineAnimals"
     -- Load stats
@@ -272,13 +307,7 @@ local function main()
 
     replace_event_log_with_print()
 
-    -- Choose race
-    local options = {}
-    for race in values(Races.list) do
-        table.insert(options, race.name)
-    end
-
-    local race = Races.lookup( choose_option(unpack(options)) )
+    local race = choose_race()
     local stats = create_player_stats(race, "Tester")
 
     -- Create pseudo-objects

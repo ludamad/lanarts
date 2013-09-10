@@ -18,7 +18,8 @@ ring_define {
     on_init = function(self)
         local P = Proficiency
         assert(self.bonus)
-        self.identify_requirements = {P.proficiency_requirement_create({Apts.MAGIC_ITEMS}, self.bonus + 1)}
+        local difficulty = self.bonus + random(-1,2)
+        self.identify_requirements = {P.proficiency_requirement_create({Apts.MAGIC_ITEMS}, difficulty)}
         self.name = '+' .. self.bonus .. ' ' .. self.lookup_key
 
         self.unidentified_name = ItemRandomDescriptions.random_ring_name()

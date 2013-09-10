@@ -3,7 +3,8 @@ local Cooldowns = import "@Cooldowns"
 
 --- Provides implementations of stat contexts.
 -- Conceptually, a stat context is any object which has the fields (or getters) 'base' and 'derived'
--- Optionally, 'obj' should be provided for operations that alter 
+-- Optionally, 'obj' should be provided for operations that alter
+-- 'obj' is to safe to leave out if doing stat modifications, however methods like on_step and on_calculate may cause problems. 
 
 local M = nilprotect {} -- Submodule
 
@@ -11,26 +12,12 @@ local M = nilprotect {} -- Submodule
 -- Context creation                 --
 --------------------------------------
 
---- Simply forwards the 'base' and 'derived' parts of the game object
-local GameObjectStatContext = newtype()
-function GameObjectStatContext:init(obj)     
-	self.obj = obj
-end
-
-function GameObjectStatContext.get:base()
-	return self.obj.base_stats
-end
-
-function GameObjectStatContext.get:derived() 
-    return self.obj.derived_stats
-end
-
-M.game_object_stat_context_create = GameObjectStatContext.create 
-
-function M.stat_context_create(stats)
+-- Create a stat context, optionally taking an object.
+function M.stat_context_create(stats, --[[Optional]] obj)
     return {
         base = stats,
-        derived = table.deep_clone(stats)
+        derived = table.deep_clone(stats),
+        obj = obj
     }
 end
 
@@ -79,6 +66,10 @@ function M.calculate_proficiency_modifier(stats, ...)
 end
 
 function M.on_step(context)
+    if context.base.hp > 0 then
+        M.add_hp(context, context.derived.hp_regen)
+    end
+    M.add_mp(context, context.derived.mp_regen)
     context.base.hooks:merge_new_hooks()
     M.copy_base_to_derived(context)
     context.base.cooldowns:on_step()
@@ -190,15 +181,17 @@ function M.add_defence(context, type, amount, --[[Optional, default false]] perm
 end
 
 --- Change resistance & defence aptitude of a certain type, defaults to temporary. 
-function M.add_defensive_aptitudes(context, type, amount, --[[Optional, default false]] permanent)
-    M.add_resistance(context, type, amount, permanent)
-    M.add_defence(context, type, amount, permanent)
+function M.add_defensive_aptitudes(context, type, amounts, --[[Optional, default false]] permanent)
+    if _G.type(amounts) == "number" then amounts = {dup(amounts,2)} end
+    M.add_resistance(context, type, amounts[1], permanent)
+    M.add_defence(context, type, amounts[2], permanent)
 end
 
 --- Change effectiveness & damage aptitude of a certain type, defaults to temporary. 
-function M.add_offensive_aptitudes(context, type, amount, --[[Optional, default false]] permanent)
-    M.add_effectiveness(context, type, amount, permanent)
-    M.add_damage(context, type, amount, permanent)
+function M.add_offensive_aptitudes(context, type, amounts, --[[Optional, default false]] permanent)
+    if _G.type(amounts) == "number" then amounts = {dup(amounts,2)} end
+    M.add_effectiveness(context, type, amounts[1], permanent)
+    M.add_damage(context, type, amounts[2], permanent)
 end
 
 --- Change all aptitude of a certain type, defaults to temporary. 

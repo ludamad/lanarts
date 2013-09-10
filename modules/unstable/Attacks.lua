@@ -31,6 +31,18 @@ function M.attack_create(
     }
 end
 
+function M.attack_add_effectiveness(attack, amount)
+    for sub_attack in values(attack.sub_attacks) do
+        sub_attack.base_effectiveness = sub_attack.base_effectiveness + amount
+    end
+end
+
+function M.attack_add_damage(attack, amount)
+    for sub_attack in values(attack.sub_attacks) do
+        sub_attack.base_damage = sub_attack.base_damage + amount
+    end
+end
+
 function M.attack_context_create(obj, base, derived, attack)
     return {
         obj = obj,
