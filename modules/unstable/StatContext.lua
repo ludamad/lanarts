@@ -74,6 +74,10 @@ function M.deequip_item(stats, ...)
     return stats.base.inventory:deequip_item(...)
 end
 
+function M.calculate_proficiency_modifier(stats, ...)
+    return stats.base.inventory:calculate_proficiency_modifier(stats, ...) 
+end
+
 function M.on_step(context)
     context.base.hooks:merge_new_hooks()
     M.copy_base_to_derived(context)
@@ -85,6 +89,7 @@ function M.on_calculate(context)
     for skill_slot in values(context.derived.skills) do
         skill_slot.type.on_calculate(skill_slot, context)
     end
+    context.derived.inventory:on_calculate(context)
     context.derived.hooks:perform("on_calculate", context)
 end
 

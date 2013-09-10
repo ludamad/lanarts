@@ -1,3 +1,6 @@
+-- Ensure undefined global variable access results in an error
+nilprotect(_G)
+
 -- Define essential global variables, and module engine interaction here.
 -- Global variables & functions will be locked after the 'main.lua' file of each module has ran
 
@@ -62,8 +65,8 @@ function import(vpath, --[[Optional]] mname)
     end
 
     -- Protect against import circles
-    _IMPORTED[vpath] = ILLEGAL_RECURSION_SENTINEL
-    _LOADED[vpath] = ILLEGAL_RECURSION_SENTINEL
+    _IMPORTED[vpath] = _ILLEGAL_RECURSION_SENTINEL
+    _LOADED[vpath] = _ILLEGAL_RECURSION_SENTINEL
 
     -- Step from most recently added import resolver to least
     for i=#_import_resolvers,1,-1 do

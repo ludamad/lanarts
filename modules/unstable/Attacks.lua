@@ -1,45 +1,9 @@
 local ResourceTypes = import "@ResourceTypes"
+local StatMultiplierUtils = import "@StatMultiplierUtils"
 
 local M = nilprotect {} -- Submodule
 
 local BASE_ATTACK_RATE = 45 -- frames, everything is compared to this rate
-
-function M.to_mult_table(...)
-    local ret = {}
-    for i=1,select("#", ...),2 do
-    	local trait = select(i, ...)
-    	local value = select(i+1, ...)
-    	ret[trait] = value
-    end
-    return ret
-end
-
-local function resolve_multiplier(arg)
-    if type(arg) == "string" then return {[arg] = 1} end
-    if #arg > 0 then
-        local ret = {}
-        for trait in values(arg) do
-            ret[trait] = 1
-        end
-        return ret
-    end
-
-    return arg
-end
-
-local function resolve_multiplier_table(args)
-    -- This is already a multiplier-table
-    if type(arg) == "table" and type(arg[1]) == "table" then
-        assert(#arg == 4, "'attack_create' expects a set of 4 attack multipliers")
-        local copy = {}
-        for val in values(args) do
-            table.insert(copy, resolve_multiplier(val))
-        end
-        return copy
-    end
-    -- Else
-    return {dup(resolve_multiplier(args), 4)}
-end
 
 -- Create an attack with a single sub-attack
 function M.attack_create(
@@ -48,9 +12,9 @@ function M.attack_create(
     -- Aptitude modifiers
     multipliers, 
     -- Weapon delay and related damage multiplier 
-     --[[Optional]] delay, --[[Optional]] defence_modifier)
+     --[[Optional]] delay, --[[Optional]] damage_multiplier)
     delay = delay or 1
-    multipliers = resolve_multiplier_table(multipliers)
+    multipliers = StatMultiplierUtils.resolve_multiplier_set(multipliers)
     return {
         sub_attacks = {{
             base_effectiveness = base_effectiveness, 
@@ -63,7 +27,7 @@ function M.attack_create(
         }},
 
         cooldown = BASE_ATTACK_RATE * delay,
-        defence_modifier = defence_modifier or delay
+        damage_multiplier = damage_multiplier or delay
     }
 end
 

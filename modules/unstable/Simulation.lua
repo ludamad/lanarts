@@ -8,12 +8,15 @@ local ItemType = import "@ItemType"
 local SkillType = import "@SkillType"
 local Spells = import "@Spells"
 local ExperienceCalculation = import "@stats.ExperienceCalculation"
+local ProficiencyPenalties = import "@stats.ProficiencyPenalties"
 
 local Relations = import "lanarts.objects.Relations"
 local Apts = import "@stats.AptitudeTypes"
 local StatUtils = import "@stats.StatUtils"
 local ItemTraits = import "@items.ItemTraits"
-local ItemProficiency = import "@items.ItemProficiency"
+local Identification = import "@stats.Identification"
+
+local Proficiency = import "@Proficiency"
 local LogUtils = import "lanarts.LogUtils"
 
 local function choose_option(...)
@@ -76,7 +79,7 @@ local function choose_skills(player, xp_to_spend)
         if not skill then break end
 
         -- Pick experience gain
-        while true do
+        while xp_to_spend > 0 do
             StatContext.on_step(player)
             StatContext.on_calculate(player)
             print(StatUtils.stats_to_string(player.derived, --[[Color]] true, --[[New lines]] true, player.base.name .. ", the Adventurer"))
@@ -135,7 +138,22 @@ local function use_item(player)
     local choices = {"Back"}
     local choice2item = {}
     for item in inventory:values() do
-        local entry = item.name .. (item.equipped and equip_msg or "")
+        local name = Identification.name_and_description(player, item)
+        local modifier = StatContext.calculate_proficiency_modifier(player, item)
+        local entry
+        if not Identification.is_identified(player, item) then
+            entry = AnsiCol.WHITE(name .. ' [Unidentified]', AnsiCol.FAINT)
+        else
+            entry = modifier > 0 and AnsiCol.WHITE(name) or name
+            if modifier > 0 then
+                if modifier <= 0.05 then entry = entry .. AnsiCol.MAGENTA(" [Easy]", AnsiCol.BOLD)
+                elseif modifier <= 0.10 then entry = entry .. AnsiCol.MAGENTA(" [Tricky]", AnsiCol.BOLD)
+                elseif modifier <= 0.15 then entry = entry .. AnsiCol.MAGENTA(" [Hard]", AnsiCol.BOLD)
+                elseif modifier <= 0.75 then entry = entry .. AnsiCol.MAGENTA(" [Very Hard]", AnsiCol.BOLD) 
+                else entry = AnsiCol.MAGENTA(name) .. AnsiCol.RED(" [Untrained]", AnsiCol.BOLD) end
+            end
+        end
+        entry = entry .. AnsiCol.YELLOW(item.equipped and equip_msg or "")
         table.insert(choices, entry)
         choice2item[entry] = item
     end
@@ -150,10 +168,10 @@ end
 local function get_attack(attacker)
     local weapon = StatContext.get_equipped_item(attacker, ItemTraits.WEAPON)
     if weapon then
-        local proficiency = ItemProficiency.calculate_proficiency(weapon.type.proficiency_requirements[1], attacker)
-        print("Proficiency", proficiency) 
+        local modifier = StatContext.calculate_proficiency_modifier(attacker, weapon)
+        return ProficiencyPenalties.apply_attack_modifier(weapon.type.attack, modifier)
     end
-    return (weapon ~= nil) and weapon.type.attack or attacker.obj.unarmed_attack
+    return attacker.obj.unarmed_attack -- Default
 end
 
 local function damage(attacker, target)
@@ -195,14 +213,12 @@ local function battle(player, enemy)
     local spells = import "@stats.Spells"
 
     for item in values(ItemType.list) do
-        StatContext.add_item(player, item)
+        if item.name then
+            StatContext.add_item(player, item)
+        end
     end
---    local sp=1000
---    for i=1,20 do
---        sp = sp + ExperienceCalculation.skill_points_at_level_up(i)
---        print(("Level %d has %dSP"):format(i, sp))
---    end
-    StatContext.add_spell(player, Spells.lookup("Berserk"))
+    StatContext.add_item(player, {type = "Ring of Slashing", bonus = 2})
+    StatContext.add_spell(player, "Berserk")
     choose_skills(player, 24000)
     step(player)
     while enemy.base.hp > 0 do
@@ -251,6 +267,7 @@ local function main()
     import "@items.DefineConsumables"
     import "@items.DefineWeapons"
     import "@races.DefineRaces"
+    import "@items.DefineRings"
     import "@stats.DefineSkills"
 
     replace_event_log_with_print()

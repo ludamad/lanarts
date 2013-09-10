@@ -1,4 +1,7 @@
 local StatContext = import "@StatContext"
+local Proficiency = import "@Proficiency"
+local SlotUtils = import "@SlotUtils"
+local ItemType = import "@ItemType"
 
 local Inventory = newtype()
 
@@ -18,9 +21,9 @@ function Inventory:__copy(other)
     other.capacity = self.capacity
 end
 
-function Inventory:find_item(type, --[[Optional]] modifiers)
+function Inventory:find_item(item_type)
     for idx,item in ipairs(self.items) do
-        if item.type == type and item.modifiers == modifiers then
+        if item_type == item.type then
             return item,idx
         end
     end
@@ -28,19 +31,24 @@ function Inventory:find_item(type, --[[Optional]] modifiers)
 end
 
 -- Returns whether there was room to add the item
-function Inventory:add_item(type, --[[Optional]] amount, --[[Optional]] modifiers)
-    local item = self:find_item(type, modifiers)
-    if item then
-        item.amount = item.amount + (amount or 1)
-        return item
+function Inventory:add_item(item_slot)
+    -- Resolve item slot
+    if type(item_slot) == "string" or not getmetatable(item_slot) then 
+        if not item_slot.type then item_slot = {type = item_slot} end
+        item_slot = Inventory.item_slot_create(item_slot) 
+    end
+    if item_slot.stackable then
+        local item = self:find_item(item_slot.type)
+        if item then
+            item.amount = item.amount + (item_slot.amount or 1)
+            return item
+        end
     end
 
     if #self.items < self.capacity then
-        local item = Inventory.item_create(type, amount, modifiers)
-        table.insert(self.items, item)
-        return item
+        table.insert(self.items, item_slot)
+        return item_slot
     end
-
     return nil
 end
 
@@ -52,14 +60,14 @@ local function remove_from_slot(inventory, item_slot, --[[Optional]] amount)
 end
 
 function Inventory:use_item(user, item_slot)
-    local to_remove = item_slot.type.on_use(item_slot, user)
+    local to_remove = item_slot.on_use(item_slot, user)
     remove_from_slot(self, item_slot, to_remove or 1)
 end
 
 function Inventory:get_equipped_items(equipment_type)
     local items = {}
     for item in self:values() do
-        if item.equipped and table.contains(item.type.traits, equipment_type) then
+        if item.equipped and table.contains(item.traits, equipment_type) then
             table.insert(items, item)
         end
     end
@@ -102,34 +110,31 @@ end
 function Inventory:on_calculate(stats)
     for item in self:values() do
         if item.equipped then
-            local bonuses = item.type.equipment_bonuses 
-            if bonuses then
-                StatContext.temporary_add(stats, bonuses)
-            end
-            if item.modifiers and item.modifiers.equipment_bonuses then
-                StatContext.temporary_add(stats, item.modifiers.equipment_bonuses)
-            end
-            local on_calc = item.type.on_calculate
-            if on_calc then
-                on_calc(item, stats)
-            end
+            item:on_calculate(stats)
         end
     end
 end
 
-function Inventory.item_create(type, --[[Optional]] amount, --[[Optional]] modifiers)
-    -- Resolve the name, for convenience.
-    local name = type.name
-    if modifiers and modifiers.name then
-        name = modifiers.name
+function Inventory:calculate_proficiency_modifier(stats, item_slot)
+    local fail, total = Proficiency.resolve_proficiency_requirements(item_slot.type.proficiency_requirements, stats)
+    if total == 0 then return 0.0 end
+    return fail/total
+end
+
+function Inventory.item_slot_create(args)
+    if _G.type(args.type) == "string" then 
+        args.type = ItemType.lookup(args.type)
     end
-    return {
-        name = name,
-        type = type,
-        amount = amount or 1,
-        modifiers = modifiers,
-        equipped = false
-    }
+    local type = args.type
+    assert(type)
+    args.amount = args.amount or 1
+    args.equipped = args.equipped or false
+    setmetatable(args, SlotUtils.METATABLE)
+
+    if type.on_init then
+       type.on_init(args)
+    end
+    return args
 end
 
 return Inventory

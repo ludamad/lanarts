@@ -101,14 +101,15 @@ end
 
 local RESISTANCE_MULTIPLE_INTERVAL = 20
 
-local function resolve_subattack(s, defence_modifier, AApt, TApt)
+local function resolve_subattack(s, damage_multiplier, AApt, TApt)
     local resistance = table.dot_product(s.resistance_multipliers, TApt.resistance)
-    local defence = defence_modifier * table.dot_product(s.defence_multipliers, TApt.defence)
+    local defence = damage_multiplier * table.dot_product(s.defence_multipliers, TApt.defence)
     local effectiveness = s.base_effectiveness + table.dot_product(s.effectiveness_multipliers, AApt.effectiveness)
     local damage = s.base_damage + table.dot_product(s.damage_multipliers, AApt.damage)
+    damage = math.max(0, (damage - defence) * damage_multiplier)
 
     local percentage = math.max(0, 1.0 + (effectiveness - resistance) / RESISTANCE_MULTIPLE_INTERVAL)
-    return math.max(0, damage - defence), percentage
+    return damage, percentage
 end
 
 --- Determine the damage done by an attack
@@ -121,7 +122,7 @@ function M.damage_calc(attack, attacker, target)
     local A,DM = {}, {}
 
     for s in values(attack.sub_attacks) do
-        local damage, percentage = resolve_subattack(s, attack.defence_modifier, AApt, TApt)
+        local damage, percentage = resolve_subattack(s, attack.damage_multiplier, AApt, TApt)
 --        print("Attack hits for " .. damage .. " with "  .. math.floor(percentage*100) .. "% effectiveness.")
         table.insert(A, damage * percentage)
         table.insert(DM, table.scaled(s.defence_multipliers, percentage))

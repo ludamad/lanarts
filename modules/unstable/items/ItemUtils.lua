@@ -5,7 +5,7 @@ local Apts = import "@stats.AptitudeTypes"
 local StatContext = import "@StatContext"
 local Attacks = import "@Attacks"
 local ItemTraits = import ".ItemTraits"
-local ItemProficiency = import ".ItemProficiency"
+local Proficiency = import "@Proficiency"
 local ContentUtils = import "@stats.ContentUtils"
 
 local M = nilprotect {} -- Submodule
@@ -24,31 +24,47 @@ local function on_use_equipment(type)
     end
 end
 
+local function add_default_types(t, args, difficulty, --[[Optional]] types)
+    if not types then
+        local default_types = args.types or {Apts.MAGIC_ITEMS}
+        types = {}
+        for value in values(default_types) do
+            if value ~= Apts.MELEE and value ~= Apts.MAGIC then
+                table.insert(types, value)
+            end
+        end
+    end
+    local P = Proficiency
+    table.insert(t,P.proficiency_requirement_create(P.proficiency_type_create(types), args.difficulty))
+end
+
 local function type_define(args, type, --[[Optional]] not_equipment)
     args.traits = args.traits or {}
     table.insert(args.traits, type)
     if not not_equipment then
         table.insert(args.traits, ItemType.EQUIPMENT_TRAIT)
     end
+
+    -- Proficiency and identification
     if not args.proficiency_requirements then
         args.proficiency_requirements = {}
-        local types = args.proficiency_types
-        if not types then
-            local default_types = args.types or {Apts.MAGIC_ITEMS}
-            types = {}
-            for value in values(default_types) do
-                if value ~= Apts.MELEE and value ~= Apts.MAGIC then
-                    table.insert(types, value)
-                end
-            end
+        if args.difficulty then
+            add_default_types(args.proficiency_requirements, args, args.dfficulty, args.proficiency_types)
         end
-        local IP = ItemProficiency
-        table.insert(args.proficiency_requirements, 
-            IP.item_proficiency_requirement_create { IP.item_proficiency_type_create(types), args.difficulty }
-        )
     end
-    args.sprite = ContentUtils.derive_sprite(args.name)
+    args.needs_identification = args.needs_identification  or (args.unidentified_name ~= nil)
+
+    if args.identify_difficulty then
+        if not args.identify_requirements then
+            args.identify_requirements = {}
+        end
+        add_default_types(args.identify_requirements, args, args.identify_dfficulty, args.identify_types)
+    end
+
+    args.sprite = args.sprite or ContentUtils.derive_sprite(args.lookup_key or args.name)
     args.on_use = args.on_use or on_use_equipment(type)
+    args.stackable = args.stackable or (ItemTraits.equipment_slot_capacities[type] == nil)
+
     assert(_G.type(args.proficiency_requirements) == 'table')
     return ItemType.define(args)
 end
@@ -64,7 +80,7 @@ function M.weapon_define(args)
         args.attack = Attacks.attack_create(unpack(args.attack))
     end
     if not args.attack then
-        args.attack = Attacks.attack_create(args.effectiveness or 0,args.damage or 0, args.multipliers or args.types, --[[Optional]] args.delay, --[[Optional]] args.defence_modifier)
+        args.attack = Attacks.attack_create(args.effectiveness or 0,args.damage or 0, args.multipliers or args.types, --[[Optional]] args.delay, --[[Optional]] args.damage_multiplier)
     end
     return type_define(args, ItemTraits.WEAPON)
 end

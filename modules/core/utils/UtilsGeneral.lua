@@ -39,6 +39,10 @@ function file_exists(name)
     return f ~= nil
 end
 
+function string:interpolate(table)
+    return (self:gsub('($%b{})', function(w) return table[w:sub(3, -2)] or w end))
+end
+
 --- Get a  human-readable string from a lua value. The resulting value is generally valid lua.
 -- Note that the paramaters should typically not used directly, except for perhaps 'packed'.
 -- @param val the value to pretty-print

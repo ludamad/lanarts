@@ -11,10 +11,11 @@ local M = nilprotect {} -- submodule
 -- @param provide_name_lookup Optional, whether to allow for lookup by name. True by default.
 -- @param should_preprocess whether to run the array portion as functions operating on the table. True by default.
 -- TODO Eventually sort out conflicting names via virtual paths.
-function M.type_create(--[[Optional]] resource_creation_function, --[[Optional]] provide_name_lookup, --[[Optional]] should_preprocess)
+function M.type_create(--[[Optional]] resource_creation_function, --[[Optional]] provide_name_lookup, --[[Optional]] should_preprocess, --[[Optional]] lookup_key)
     -- Convert nil -> true for provide_name_lookup & should_preprocess.
     provide_name_lookup = (provide_name_lookup == nil) or provide_name_lookup
     should_preprocess = (should_preprocess == nil) or should_preprocess
+    lookup_key = lookup_key or "name"
 
     local R = nilprotect {} -- Resource table
     local next_id = 1
@@ -31,7 +32,7 @@ function M.type_create(--[[Optional]] resource_creation_function, --[[Optional]]
         entry.id = #R.list + 1
         R.list[entry.id] = entry
         if provide_name_lookup then
-            R.table[entry.name] = entry
+            R.table[entry[lookup_key]] = entry
         end
         return entry
     end
