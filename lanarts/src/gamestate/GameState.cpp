@@ -359,7 +359,6 @@ static void lua_drawables_draw_rest(LuaDrawableQueue::Iterator iter) {
 	}
 }
 
-
 void GameState::draw(bool drawhud) {
 	perf_timer_begin(FUNCNAME);
 

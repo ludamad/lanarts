@@ -2,7 +2,9 @@
 local S = import "@Schemas"
 local ResourceTypes = import "@ResourceTypes"
 
-local monster_schema = {
+local M = nilprotect {} -- Submodule
+
+local class_schema = {
     name = S.STRING,
     traits = S.TABLE,
     description = S.STRING,
@@ -19,9 +21,8 @@ local monster_schema = {
     on_first_appear = S.FUNCTION_OR_NIL
 }
 
-local function define_monster(args)
-    return S.enforce(monster_schema, args)
+function M.class_define()
+
 end
 
-local MonsterType = ResourceTypes.type_create(define_monster)
-return MonsterType
+return M

@@ -7,10 +7,7 @@ local AttackableObject = ObjectUtils.type_create()
 AttackableObject.ATTACKABLE_TRAIT = "ATTACKABLE_TRAIT"
 
 function AttackableObject.create(args)
-    assert(args.sprite and args.base_stats and (args.can_attack ~= nil))
-    if args.can_attack then 
-        assert(args.unarmed_attack)
-    end
+    assert(args.base_stats and (args.can_attack ~= nil))
 
     -- Set up type signature
     args.type = args.type or AttackableObject
@@ -42,8 +39,6 @@ end
 function AttackableObject:on_step()
     StatContext.on_step(self._context)
 end
-
-AttackableObject.on_draw = ObjectUtils.draw_sprite_member_if_seen
 
 function AttackableObject:melee_attack()
     if not self.can_attack then return nil end

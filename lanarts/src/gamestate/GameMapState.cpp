@@ -123,14 +123,21 @@ void GameMapState::step(GameState* gs) {
 	perf_timer_end(FUNCNAME);
 }
 
+// Only for Lua use at the moment!
 void GameMapState::draw(GameState* gs) {
-	bool has_player_in_level = gs->player_data().level_has_player(id());
-
 	perf_timer_begin(FUNCNAME);
 
+	// Become current level
 	GameMapState* previous_level = gs->get_level();
 	gs->set_level(this);
-	gs->draw(gs);
+
+	std::vector<GameInst*> safe_copy = game_inst_set().to_vector();
+	for (size_t i = 0; i < safe_copy.size(); i++) {
+		safe_copy[i]->draw(gs);
+	}
+
+	monster_controller().post_draw(gs);
+	tiles().post_draw(gs);
 
 	gs->set_level(previous_level);
 

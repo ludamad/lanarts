@@ -57,7 +57,7 @@ function M.monster_define(t, --[[Optional]] derive_idx)
         xp_award = t.xp_award,
         radius = t.radius,
 
-        stats = stats,
+        base_stats = stats,
         unarmed_attack = t.unarmed_attack,
 
     }

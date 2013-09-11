@@ -297,6 +297,10 @@ local function choose_race()
 end
 
 local function main()
+    -- OpenGL must be initialized before content loading!
+    local Display = import "core.Display"
+    Display.initialize("Lanarts", {640, 480}, false)
+
     -- Load game content
     import "@items.DefineConsumables"
     import "@items.DefineWeapons"
@@ -315,8 +319,6 @@ local function main()
         AnsiCol.println(msg, AnsiCol.from_rgb(color or COL_WHITE))
     end
 
-    local Display = import "core.Display"
-    Display.initialize("Lanarts", {640, 480}, false)
     -- TODO: Remove any notion of 'internal graphics'. All graphics loading should be prompted by Lua.
     __initialize_internal_graphics()
 
@@ -324,7 +326,9 @@ local function main()
     local player = SM:add_player("Tester", choose_race(), {25,25})
     local monster = SM:add_monster("Giant Rat", {75,75})
 
+    Display.draw_start()
     SM:draw()
+    Display.draw_finish()
 
     battle(StatContext.stat_context_create(player.base_stats, player.derived_stats, player), StatContext.stat_context_create(monster.base_stats, monster.derived_stats, monster))
 end
