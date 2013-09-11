@@ -8,6 +8,11 @@ function SpellsKnown:init()
     self.spells = {}
 end
 
+function SpellsKnown:__copy(other)
+    -- Ensure a shallow copy when used with table.deep_copy
+    table.copy(self, other, --[[No metacall]] false)
+end
+
 function SpellsKnown:add_spell(spell_slot)
     -- Resolve item slot
     if type(spell_slot) == "string" or not getmetatable(spell_slot) then

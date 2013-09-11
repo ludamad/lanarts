@@ -6,10 +6,10 @@ local StatContext
 local function default_on_calculate(self, user)
     StatContext = StatContext or import "@StatContext" -- Lazy import
     if self.equip_bonuses then
-        StatContext.temporary_add(self.equip_bonuses or {})
+        StatContext.temporary_add(user, self.equip_bonuses or {})
     end
     if self.base_equip_bonuses then
-        StatContext.temporary_add(self.base_equip_bonuses)
+        StatContext.temporary_add(user, self.base_equip_bonuses)
     end
 end
 

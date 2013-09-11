@@ -31,16 +31,16 @@ function M.attack_create(
     }
 end
 
-function M.attack_add_effectiveness(attack, amount)
+function M.attack_add_effectiveness_and_damage(attack, eff, dam)
     for sub_attack in values(attack.sub_attacks) do
-        sub_attack.base_effectiveness = sub_attack.base_effectiveness + amount
+        sub_attack.base_effectiveness = sub_attack.base_effectiveness + eff
+        sub_attack.base_damage = sub_attack.base_damage + dam
     end
+    return attack
 end
 
-function M.attack_add_damage(attack, amount)
-    for sub_attack in values(attack.sub_attacks) do
-        sub_attack.base_damage = sub_attack.base_damage + amount
-    end
+function M.attack_copy_and_add(attack, eff, dam)
+    return M.attack_add_effectiveness_and_damage(table.deep_clone(attack), eff, dam)
 end
 
 function M.attack_context_create(obj, base, derived, attack)

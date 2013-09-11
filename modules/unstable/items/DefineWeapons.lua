@@ -1,37 +1,5 @@
 local Apts = import "@stats.AptitudeTypes"
-local Attacks = import "@Attacks"
-local Traits = import ".ItemTraits"
-local Utils = import ".ItemUtils"
-local Proficiency = import "@Proficiency"
-
-local function bonus_str(val)
-    if not val then return "+0" end
-    if val >= 0 then return '+'..val end
-    return val
-end
-
-local function base_weapon_init(self)
-    local P = Proficiency
-    local eff_bonus, dam_bonus = self.effectiveness_bonus or random(-2,3), self.damage_bonus or random(-2,10)
-    self.effectiveness_bonus, self.damage_bonus = eff_bonus, dam_bonus
-    local difficulty = random_round((math.abs(eff_bonus) * math.abs(dam_bonus)) ^ .85) + random(-1,3) + (self.difficulty or 0)
-
-    local types = Utils.filter_main_aptitudes(self.types)
-    table.insert(types, Apts.WEAPON_IDENTIFICATION)
-    self.identify_requirements = {P.proficiency_requirement_create(types, difficulty)}
-    self.unidentified_name = self.name
-    self.name = ("%s,%s %s"):format(bonus_str(self.effectiveness_bonus), bonus_str(self.damage_bonus), self.unidentified_name)
-
-    self.attack = table.deep_clone(self.attack)
-    Attacks.attack_add_effectiveness(self.attack, eff_bonus)
-    Attacks.attack_add_damage(self.attack, dam_bonus)
-end
-
-local function weapon_define(args)
-    args.needs_identification = true
-    args.on_init = base_weapon_init
-    return Utils.weapon_define(args)
-end
+local weapon_define = (import ".ItemDefineUtils").weapon_define
 
 weapon_define {
     name = "Dagger",

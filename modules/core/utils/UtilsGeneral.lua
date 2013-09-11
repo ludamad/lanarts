@@ -211,6 +211,11 @@ function table.scaled(t, scale)
     return ret
 end
 
+-- Resolves a number, or a random range
+function random_resolve(v)
+    return type(v) == "table" and random(unpack(v)) or v
+end
+
 --- Get a  human-readable string from a lua value. The resulting value is generally valid lua.
 -- Note that the paramaters should typically not used directly, except for perhaps 'packed'.
 -- @param val the value to pretty-print

@@ -1,5 +1,9 @@
 local GameMap = import "core.GameMap"
+local MonsterType = import "@MonsterType"
 local MapGen = import "core.MapGeneration"
+
+local PlayerObject = import "@objects.PlayerObject"
+local MonsterObject = import "@objects.MonsterObject"
 
 local SimulationMap = newtype()
 
@@ -13,13 +17,36 @@ function SimulationMap:init()
                     image_cached_load (path_resolve "test_content/test_tile.png")
                 }
             }
+        }
     }
-    self.enemies = {}
+    self.monsters = {}
     self.players = {}
 end
 
-function SimulationMap:add_enemy(enemy, xy)
-    
+function SimulationMap:add_player(name, race, xy)
+    local player_object = PlayerObject.create {
+        name = name,
+        race = race,
+        sprite = {}, -- TODO
+        xy = xy,
+        is_local_player = function() return true end,
+        do_init = true,
+        map = self.gmap
+    }
+    table.insert(self.players, player_object)
+    return player_object
+end
+
+function SimulationMap:add_monster(monster, xy)
+    local monster_object = MonsterObject.create {
+        monster_type = monster,
+        sprite = {}, -- TODO
+        xy = xy,
+        do_init = true,
+        map = self.gmap
+    }
+    table.insert(self.monsters, monster_object)
+    return monster_object
 end
 
 return SimulationMap

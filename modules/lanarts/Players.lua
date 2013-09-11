@@ -3,7 +3,7 @@ local Keys = import "core.Keyboard"
 local Projectiles = import "@objects.Projectiles"
 local DungeonFeatures = import "@objects.DungeonFeatures"
 
-local PLAYER_TRAIT = "player"
+local PLAYER_TRAIT = "PLAYER_TRAIT"
 
 local function player_on_step(self)
     local single_player = (settings.connection_type == net.NONE)

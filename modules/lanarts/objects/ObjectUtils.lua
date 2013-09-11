@@ -48,12 +48,16 @@ function M.type_create(--[[Optional]] base_type)
     if base_type then table.copy(base_type, type) end
     type.base = base_type
 
-    function type._base_create(real_type, ...)
+    function type._base_create(real_type, args)
         if base_type then 
-            return base_type._create(real_type, base_type.on_base_create, ...)
+            if base_type._create then
+                return base_type._create(real_type, base_type.on_base_create, args)
+            end
+            args.type = args.type or real_type
+            return base_type.create(args)
         else
-            local object = M.object_create(...)
-            object.type = object.type or real_type
+            args.type = args.type or real_type
+            local object = M.object_create(args)
             return object
         end
     end

@@ -7,7 +7,7 @@ local AttackableObject = ObjectUtils.type_create()
 AttackableObject.ATTACKABLE_TRAIT = "ATTACKABLE_TRAIT"
 
 function AttackableObject.create(args)
-    args(args.sprite and args.base_stats and (args.can_attack ~= nil))
+    assert(args.sprite and args.base_stats and (args.can_attack ~= nil))
     if args.can_attack then 
         assert(args.unarmed_attack)
     end
@@ -15,12 +15,12 @@ function AttackableObject.create(args)
     -- Set up type signature
     args.type = args.type or AttackableObject
     args.base_stats = args.base_stats -- Retains provided stats object
-    args.derived_stats = table.deep_copy(args.stats)
+    args.derived_stats = table.deep_clone(args.base_stats)
 
     args.traits = args.traits or {}
     table.insert(args.traits, AttackableObject.ATTACKABLE_TRAIT)
 
-    return AttackableObject.base.create(args)
+    return AttackableObject._base_create(AttackableObject, args)
 end
 
 function AttackableObject:on_init()
@@ -31,7 +31,7 @@ end
 
 -- Only way to get a StatContext.
 -- This provides some guarantee of correctness.
-function AttackableObject:stats()
+function AttackableObject:stat_context()
     if self._stats_need_calculate then
         StatContext.on_calculate(self._context)
         self._stats_need_calculate = false

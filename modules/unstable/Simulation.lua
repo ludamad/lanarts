@@ -18,19 +18,10 @@ local Identification = import "@stats.Identification"
 
 local GameMap = import "core.GameMap"
 local GameObject = import "core.GameObject"
+local PlayerObject = import "@objects.PlayerObject"
+local MonsterObject = import "@objects.MonsterObject"
 
-local gmap = GameMap.create { 
-    map = MapGen.map_create { 
-        label = "TestLevel", 
-        size = {256,256},            
-        content = Data.tile_create { 
-            images = {
-                image_load (path_resolve "test_tile.png")
-            }
-        }
-    }
-}
-
+local SimulationMap = import "@SimulationMap"
 local Proficiency = import "@Proficiency"
 local LogUtils = import "lanarts.LogUtils"
 
@@ -55,7 +46,7 @@ local function choose_option(...)
 end
 
 -- Returns whether performed the spell
-local function perform_spell(player, enemy)
+local function perform_spell(player, monster)
     local spells = player.base.spells
     local choices = {"Back"}
     local choice2spell = {}
@@ -157,9 +148,9 @@ local function use_item(player)
         local modifier = StatContext.calculate_proficiency_modifier(player, item)
         local entry
         if not Identification.is_identified(player, item) then
-            entry = AnsiCol.WHITE(name .. ' [Unidentified]', AnsiCol.FAINT)
+            entry = AnsiCol.YELLOW(name) .. AnsiCol.WHITE(' [Unidentified]', AnsiCol.FAINT)
         else
-            entry = modifier > 0 and AnsiCol.WHITE(name) or name
+            entry = modifier > 0 and AnsiCol.WHITE(name) or AnsiCol.WHITE(name, AnsiCol.BOLD)
             if modifier > 0 then
                 if modifier <= 0.05 then entry = entry .. AnsiCol.MAGENTA(" [Easy]", AnsiCol.BOLD)
                 elseif modifier <= 0.10 then entry = entry .. AnsiCol.MAGENTA(" [Tricky]", AnsiCol.BOLD)
@@ -201,12 +192,28 @@ local function damage(attacker, target)
     StatContext.add_hp(target, -random_round(dmg))
 
     AnsiCol.println(
-        LogUtils.resolve_conditional_message(target.obj, "{The }$You [have]{has} " .. target.base.hp .. "HP left"), 
+        LogUtils.resolve_conditional_message(target.obj, "{The }$You [have]{has} " .. math.ceil(target.base.hp) .. "HP left"), 
         AnsiCol.BLUE, AnsiCol.ITALIC .. AnsiCol.BOLD
     )
 
 end
 
+local function track_identification(stats)
+    stats.base.identifications = stats.base.identifications or {}
+    table.clear(stats.base.identifications)
+    for item in stats.base.inventory:values() do
+        stats.base.identifications[item] = Identification.is_identified(stats, item)
+    end
+end
+
+local function report_new_identifications(stats)
+    stats.base.identifications = stats.base.identifications or {}
+    for item in stats.base.inventory:values() do
+        if (stats.base.identifications[item] == false) and Identification.is_identified(stats, item) then
+            AnsiCol.println("You identify the ".. item.name .. "(Was "..item.unidentified_name..")", AnsiCol.WHITE,AnsiCol.BOLD)
+        end
+    end
+end
 local frame = 1
 
 local function step(context)
@@ -214,6 +221,9 @@ local function step(context)
         StatContext.on_step(context)
         StatContext.on_calculate(context)
         frame = frame + 1
+        
+        report_new_identifications(context)
+        track_identification(context)
     end
 end
 
@@ -224,56 +234,43 @@ local function dump_stats(player, monster)
     print("Monster After\t", StatUtils.stats_to_string(monster.derived, --[[Color]] true))
 end
 
-local function battle(player, enemy)
+local function battle(player, monster)
     local spells = import "@stats.Spells"
 
     for item in values(ItemType.list) do
-        if item.name then
-            StatContext.add_item(player, item)
+        local IT = ItemTraits
+        local function is(trait) return table.contains(item.traits, trait) end
+ 
+        if table.contains(item.traits, ItemTraits.WEAPON) then
+            StatContext.add_item(player, {type = item, effectiveness_bonus = random(-2,4), damage_bonus = random(-2,4)})
+        elseif is(IT.BODY_ARMOUR) or is(IT.BRACERS) or is(IT.BOOTS) or is(IT.HEADGEAR) or is(IT.GLOVES) then
+            StatContext.add_item(player, {type = item, bonus = random(1,3)})
+        else 
+            StatContext.add_item(player, {type = item, bonus = random(1,5)})
         end
     end
-    StatContext.add_item(player, {type = "Ring of Slashing", bonus = 2})
     StatContext.add_spell(player, "Berserk")
     choose_skills(player, 24000)
     step(player)
-    while enemy.base.hp > 0 do
+    track_identification(player)
+    while monster.base.hp > 0 do
         print(StatUtils.stats_to_string(player.derived, --[[Color]] true, --[[New lines]] true, player.base.name .. ", the Adventurer"))
         print(StatUtils.attack_to_string(get_attack(player), --[[Color]] true))    
         local action = choose_option("Attack", "Spell", "Item")
         local moved = true
         if action == "Attack" then
-            damage(player, enemy) 
+            damage(player, monster) 
         elseif action == "Spell" then
-            moved = perform_spell(player, enemy)
+            moved = perform_spell(player, monster)
         elseif action == "Item" then
             moved = use_item(player)
         end
         if moved then
-            step(enemy)
-            damage(enemy, player)
             step(player)
+            damage(monster, player)
+            step(monster)
         end
     end
-end
-
-local function replace_event_log_with_print()
-    local EventLog = import "core.ui.EventLog"
-    EventLog.add = function(msg, color)
-        AnsiCol.println(msg, AnsiCol.from_rgb(color or COL_WHITE))
-    end
-end
-
-local function create_player_stats(race, name, --[[Optional]] team)
-    local meta = {__copy = function(t1,t2) 
-        table.copy(t1,t2, --[[Do not invoke meta]] false)
-    end}
-
-    local stats = race.on_create(name, team or Relations.TEAM_PLAYER_DEFAULT)
-    for skill in values(SkillType.list) do
-        local slot = {type = skill, level = 0, experience = 0}
-        table.insert(stats.skills, setmetatable(slot, meta))
-    end
-    return stats
 end
 
 local function choose_race()
@@ -283,7 +280,7 @@ local function choose_race()
         local race = Races.list[idx]
         print(C.YELLOW("Race ".. idx .. ") ", C.BOLD).. C.WHITE(race.name))
         print(C.YELLOW(race.description))
-        local stats = create_player_stats(race, "Level 1 " .. race.name)
+        local stats = PlayerObject.create_player_stats(race, "Level 1 " .. race.name)
         local context = StatContext.stat_context_create(stats)
         StatContext.on_step(context)
         StatContext.on_calculate(context)
@@ -297,41 +294,29 @@ local function choose_race()
 end
 
 local function main()
-    local animals = import "@monsters.DefineAnimals"
-    -- Load stats
+    -- Load game content
     import "@items.DefineConsumables"
     import "@items.DefineWeapons"
-    import "@races.DefineRaces"
     import "@items.DefineRings"
+    import "@items.DefineArmour"
+
+    import "@races.DefineRaces"
+
     import "@stats.DefineSkills"
 
-    replace_event_log_with_print()
+    import "@monsters.DefineAnimals"
 
-    local race = choose_race()
-    local stats = create_player_stats(race, "Tester")
+    -- Make sure EventLog.add prints to console instead
+    local EventLog = import "core.ui.EventLog"
+    EventLog.add = function(msg, color)
+        AnsiCol.println(msg, AnsiCol.from_rgb(color or COL_WHITE))
+    end
 
-    -- Create pseudo-objects
-    local player = {
-        is_local_player = function() return true end,
-        base_stats = stats,
-        traits = {"player"},
-        derived_stats = table.deep_clone(stats),
-        unarmed_attack = Attacks.attack_create(0, 5, Apts.MELEE),
-        name = "TesterMan"
-    }
+    local SM = SimulationMap.create()
+    local player = SM:add_player("Tester", choose_race(), {25,25})
+    local monster = SM:add_monster("Giant Rat", {75,75})
 
-    local monster_stats = table.deep_clone(animals.rat.stats)
-    local monster = {
-        traits = {"monster"},
-        is_local_player = function() return false end,
-        base_stats = monster_stats,
-        derived_stats = table.deep_clone(monster_stats),
-        name = animals.rat.name,
-        unarmed_attack = animals.rat.unarmed_attack
-    }
-
-    local scmake = StatContext.game_object_stat_context_create
-    battle(scmake(player), scmake(monster))
+    battle(StatContext.stat_context_create(player.base_stats, player.derived_stats, player), StatContext.stat_context_create(monster.base_stats, monster.derived_stats, monster))
 end
 
 main()

@@ -4,6 +4,7 @@ local M = nilprotect {} -- Submodule
 M._IDENTIFIED = {}
 
 local ID_POINTS_PER_APT_POINT = 100
+local ITEM_EQUIP_ID_POINT_BONUS = 300
 
 function M.set_identification_points(stats, item_slot, val)
     local B = stats.base
@@ -40,6 +41,9 @@ function M.is_identified(stats, item_slot)
     ensure_identify_table(stats, item_slot)
     local id_points = get_id_points(stats,item_slot)
     if id_points == M._IDENTIFIED then return true end
+    if item_slot.equipped then
+        id_points = id_points + ITEM_EQUIP_ID_POINT_BONUS 
+    end
     local fail, total = Proficiency.resolve_proficiency_requirements(item_slot.identify_requirements, stats)
     if id_points >= fail * ID_POINTS_PER_APT_POINT then
         if item_slot.on_identify then 

@@ -1,4 +1,4 @@
-local Utils,Traits = import ".ItemUtils", import ".ItemTraits"
+local Utils,Traits = import ".ItemDefineUtils", import ".ItemTraits"
 local LogUtils = import "lanarts.LogUtils"
 local StatContext = import "@StatContext"
 

@@ -43,7 +43,8 @@ local aptitudes = {
     "POLEARM",
     "STAFF",
 -- Misc proficiencies
-    "WEAPON_IDENTIFICATION"
+    "WEAPON_IDENTIFICATION",
+    "WEAPON_PROFICIENCY",
 }
 
 for type in values(aptitudes) do

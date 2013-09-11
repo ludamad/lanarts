@@ -81,6 +81,11 @@ static int lapi_table_copy(lua_State* L) {
 	if (lua_gettop(L) < 2) {
 		luaL_error(L, "table.deep_copy takes 2 arguments, got %d", lua_gettop(L));
 	}
+	for (int i = 1; i <= 2; i++) {
+		if (!lua_istable(L, 1)) {
+			luaL_error(L, "table.deep_copy argument %d not a table", i);
+		}
+	}
 
 	// Copy metatable and check for __copy
 	bool use_meta = (lua_gettop(L) < 3 || lua_toboolean(L, 3));
@@ -108,6 +113,11 @@ static int lapi_table_copy(lua_State* L) {
 static int lapi_table_deep_copy(lua_State* L) {
 	if (lua_gettop(L) < 2) {
 		luaL_error(L, "table.deep_copy takes 2 arguments, got %d", lua_gettop(L));
+	}
+	for (int i = 1; i <= 2; i++) {
+		if (!lua_istable(L, 1)) {
+			luaL_error(L, "table.deep_copy argument %d not a table", i);
+		}
 	}
 
 	// Copy metatable and check for __copy

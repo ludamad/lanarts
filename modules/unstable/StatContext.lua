@@ -13,10 +13,10 @@ local M = nilprotect {} -- Submodule
 --------------------------------------
 
 -- Create a stat context, optionally taking an object.
-function M.stat_context_create(stats, --[[Optional]] obj)
+function M.stat_context_create(base, --[[Optional]] derived, --[[Optional]] obj)
     return {
-        base = stats,
-        derived = table.deep_clone(stats),
+        base = base,
+        derived = derived or table.deep_clone(base),
         obj = obj
     }
 end

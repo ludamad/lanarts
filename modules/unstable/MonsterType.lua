@@ -22,6 +22,7 @@ local monster_schema = {
 local function define_monster(args)
     S.enforce(monster_schema, args)
     args.stats.name = args.stats.name or args.name
+    return args
 end
 
 local MonsterType = ResourceTypes.type_create(define_monster)

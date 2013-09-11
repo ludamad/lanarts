@@ -1,3 +1,4 @@
+local Apts = import "@stats.AptitudeTypes"
 local M = nilprotect {} -- Submodule
 
 M.equipment_slot_capacities = {
@@ -22,5 +23,17 @@ end
 for type in values(consumable_types) do
     M[type] = type
 end
+
+M.default_equipment_slot_types = {
+    [M.WEAPON] = Apts.WEAPON_IDENTIFICATION,
+    [M.AMMUNITION] = Apts.WEAPON_IDENTIFICATION,
+    [M.RING] = Apts.MAGIC_ITEMS,
+    [M.AMULET] = Apts.MAGIC_ITEMS,
+    [M.HEADGEAR] = Apts.ARMOUR,
+    [M.BODY_ARMOUR] = Apts.ARMOUR,
+    [M.GLOVES] = Apts.ARMOUR,
+    [M.BOOTS] = Apts.ARMOUR,
+    [M.BRACERS] = Apts.ARMOUR
+}
 
 return M

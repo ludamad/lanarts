@@ -16,7 +16,7 @@ end
 function M.resolve_conditional_message(user, msg)
     local is_player = Players.is_player(user) 
     local is_local_player = Players.is_local_player(user)
-    local name = is_local_player and 'You' or user.name
+    local name = is_local_player and 'You' or user.base_stats.name
     -- Resolve name references
     msg = msg:gsub("$You", name)
     msg = msg:gsub("$you", name:lower())

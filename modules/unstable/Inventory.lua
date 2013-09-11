@@ -5,7 +5,7 @@ local ItemType = import "@ItemType"
 
 local Inventory = newtype()
 
-local INVENTORY_CAPACITY = 25
+local INVENTORY_CAPACITY = 2500
 
 function Inventory:init(--[[Optional]] capacity)
     self.items = {}
@@ -14,11 +14,7 @@ end
 
 function Inventory:__copy(other)
     -- Ensure a shallow copy when used with table.deep_copy
-    other.items = rawget(other, "items") or {}
-    for i=1,#self.items do
-        other.items[i] = table.clone(self.items[i])
-    end
-    other.capacity = self.capacity
+    table.copy(self, other, --[[No metacall]] false)
 end
 
 function Inventory:find_item(item_type)
