@@ -1,53 +1,63 @@
 local M = nilprotect {} -- Submodule
 
-local aptitudes = {
+local function make_allowable(eff,dam,res,def)
+    return {effectiveness=eff, damage=dam, resistance=res, defence=def}
+end
+
+local ALL = make_allowable(dup(true,4))
+local EFFECTIVENESS = make_allowable(true, dup(false,3))
+local RESISTANCE_AND_EFFECTIVENESS = make_allowable(true, false, true, false)
+
+M.allowed_aptitudes = {
 -- TRAINABLE APTITUDES
 -- Main combat proficiencies
-    "MELEE",
-    "RANGED",
-    "MAGIC",
+    MELEE = ALL,
+    RANGED = ALL,
+    MAGIC = ALL,
 
 -- Weapon types
-    "PIERCING",
-    "SLASHING",
-    "BLUNT",
+    PIERCING = ALL,
+    SLASHING = ALL,
+    BLUNT = ALL,
 
 -- Spell types
-    "ENCHANTMENTS",
-    "CURSES",
-    "FORCE",
+    ENCHANTMENTS = ALL,
+    CURSES = ALL,
+    FORCE = ALL,
 
 -- Misc proficiencies
-    "ARMOUR", -- Ability to use armour
-    "WILLPOWER", -- Ability to resist spell effects
-    "FORTITUDE", -- Ability to resist physical abilities (stun, sleep etc)
-    "SELF_MASTERY", -- Ability to perform maneuvers
-    "MAGIC_ITEMS", -- Ability to use magic items
+    ARMOUR = EFFECTIVENESS, -- Ability to use armour
+    WILLPOWER = EFFECTIVENESS, -- Ability to resist spell effects
+    FORTITUDE = EFFECTIVENESS, -- Ability to resist physical abilities (stun, sleep etc)
+    SELF_MASTERY = EFFECTIVENESS, -- Ability to perform maneuvers
+    MAGIC_ITEMS = EFFECTIVENESS, -- Ability to use magic items
 
 -- Major 'elements'
-    "DARK",
-    "LIGHT",
-    "FIRE",
-    "WATER",
+    DARK = ALL,
+    LIGHT = ALL,
+    FIRE = ALL,
+    WATER = ALL,
 
 -- Minor elements
-    "EARTH",
-    "AIR",
+    EARTH = ALL,
+    AIR = ALL,
 
 -- NON-TRAINABLE APTITUDES
-    "POISON",
--- ALTERNATE WEAPON CLASSES
-    "BLADE",
-    "AXE",
-    "MACE",
-    "POLEARM",
-    "STAFF",
+    POISON = RESISTANCE_AND_EFFECTIVENESS,
+-- Alternate weapon categories
+    BLADE = ALL,
+    AXE = ALL,
+    MACE = ALL,
+    POLEARM = ALL,
+    STAFF = ALL,
 -- Misc proficiencies
-    "WEAPON_IDENTIFICATION",
-    "WEAPON_PROFICIENCY",
+    WEAPON_IDENTIFICATION = EFFECTIVENESS,
+    WEAPON_PROFICIENCY = EFFECTIVENESS,
+    CASTING_TIME = EFFECTIVENESS,
+    ATTACK_TIME = EFFECTIVENESS
 }
 
-for type in values(aptitudes) do
+for type, allowable in pairs(M.allowed_aptitudes) do
     M[type] = type
 end
 
