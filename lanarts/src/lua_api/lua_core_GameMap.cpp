@@ -276,6 +276,18 @@ static void gmap_transfer(LuaStackValue inst, level_id map, Pos xy) {
 	gs->game_world().level_move(inst.as<GameInst*>()->id, xy.x, xy.y, current_id, map);
 }
 
+static void gmap_map_step(LuaStackValue table) {
+	GameState* gs = lua_api::gamestate(table);
+	level_id map_id = table["map"].to_int();
+	gs->game_world().get_level(map_id)->step(gs);
+}
+
+static void gmap_map_draw(LuaStackValue table) {
+	GameState* gs = lua_api::gamestate(table);
+	level_id map_id = table["map"].to_int();
+	gs->game_world().get_level(map_id)->draw(gs);
+}
+
 namespace lua_api {
 	void register_lua_core_maps(lua_State* L) {
 		LuaValue gmap = register_lua_submodule(L, "core.GameMap");
@@ -300,6 +312,9 @@ namespace lua_api {
 
 		gmap["monsters_list"].bind_function(gmap_monsters_list);
 		gmap["monsters"].bind_function(gmap_monsters);
+
+		gmap["map_step"].bind_function(gmap_map_step);
+		gmap["map_draw"].bind_function(gmap_map_draw);
 
 		gmap["distance_to_player"].bind_function(gmap_distance_to_player);
 

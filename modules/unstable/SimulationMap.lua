@@ -40,13 +40,21 @@ end
 function SimulationMap:add_monster(monster, xy)
     local monster_object = MonsterObject.create {
         monster_type = monster,
-        sprite = {}, -- TODO
         xy = xy,
         do_init = true,
         map = self.gmap
     }
+    pretty_print(monster_object.type)
     table.insert(self.monsters, monster_object)
     return monster_object
+end
+
+function SimulationMap:step()
+    GameMap.map_step({map = self.gmap})
+end
+
+function SimulationMap:draw()
+    GameMap.map_draw({map = self.gmap})
 end
 
 return SimulationMap

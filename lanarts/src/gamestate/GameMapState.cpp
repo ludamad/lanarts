@@ -122,3 +122,17 @@ void GameMapState::step(GameState* gs) {
 
 	perf_timer_end(FUNCNAME);
 }
+
+void GameMapState::draw(GameState* gs) {
+	bool has_player_in_level = gs->player_data().level_has_player(id());
+
+	perf_timer_begin(FUNCNAME);
+
+	GameMapState* previous_level = gs->get_level();
+	gs->set_level(this);
+	gs->draw(gs);
+
+	gs->set_level(previous_level);
+
+	perf_timer_end(FUNCNAME);
+}

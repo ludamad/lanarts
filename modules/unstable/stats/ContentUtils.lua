@@ -1,4 +1,8 @@
 local Apts = import "@stats.AptitudeTypes"
+local SpellsKnown = import "@SpellsKnown"
+local StatContext = import "@StatContext"
+local Spells = import "@Spells"
+local Stats = import "@Stats"
 
 local M = nilprotect {} -- Submodule
 
@@ -12,6 +16,7 @@ end
 -- Resolves bonuses of the form [Apts.FOOBAR] = {0,1,1,0}
 -- or [Apts.FOOBAR] = 2, equivalent to {2,2,2,2}
 -- Expects a mutable 'table' that is being used to define a resource type
+-- It will remove the 'convenience variables' used to define the aptitudes.
 function M.resolve_aptitude_bonuses(table, --[[Optional]] result)
     result = result or {effectiveness={},damage={},resistance={},defence={}}
     for key,val in pairs(table) do
@@ -34,6 +39,24 @@ function M.resolve_aptitude_bonuses(table, --[[Optional]] result)
         end
     end
     return result
+end
+
+-- Expects a mutable 'table' that is being used to define a resource type
+-- It will remove the 'convenience variables' used to define the aptitudes.
+function M.resolve_embedded_stats(table)
+    local aptitudes = M.resolve_aptitude_bonuses
+    local spells = table.spells
+    if not getmetatable(table.spells) == SpellsKnown then
+        spells = SpellsKnown.create()
+        for spell in values(table.spells) do
+            if type(spell) == "table" and not spell.id then
+                spell = Spells.define(spell)
+            end 
+            spells:add_spell(spell)
+        end
+    end
+    table.spells = spells
+    return Stats.stats_create(table)
 end
 
 return M

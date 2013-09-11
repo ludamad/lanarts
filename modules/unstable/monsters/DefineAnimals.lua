@@ -1,28 +1,18 @@
 local Apts = import "@stats.AptitudeTypes"
+local animal_define = (import ".MonsterDefineUtils").animal_define 
 
-local Utils,Traits = import ".MonsterUtils", import ".MonsterTraits"
-
-local M = nilprotect {} -- Submodule
-
-M.rat = Utils.monster_define {
+animal_define {
     name = "Giant Rat",
     description = "A giant, aggressive vermin.",
-    traits = {Traits.ANIMAL},
+    appear_message = "A hostile large rat approaches!",
+    defeat_message = "Blood splatters as the large rat is destroyed.",
 
     xp_award = 5,
     radius = 14,
 
-    stats = {
-        level = 1,
-        hp = 150, 
-        hp_regen = 0.03, 
-        movement_speed = 2
-    },
+    level = 1, movement_speed = 2,
+    hp = 150, hp_regen = 0.03, 
 
-    unarmed_attack = {--[[Effectiveness]] 0, --[[Damage]] 5, Apts.MELEE},
-
-    appear_message = "A hostile large rat approaches!",
-    defeat_message = "Blood splatters as the large rat is destroyed."
+    effectiveness = 1, damage = 10, 
+    delay = 1.4
 }
-
-return M

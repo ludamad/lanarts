@@ -206,11 +206,14 @@ local function track_identification(stats)
     end
 end
 
+local function WHITE_BOLD(s) return AnsiCol.WHITE(s, AnsiCol.BOLD) end
+local function WHITE_FAINT(s) return AnsiCol.WHITE(s, AnsiCol.FAINT) end
+
 local function report_new_identifications(stats)
     stats.base.identifications = stats.base.identifications or {}
     for item in stats.base.inventory:values() do
         if (stats.base.identifications[item] == false) and Identification.is_identified(stats, item) then
-            AnsiCol.println("You identify the ".. item.name .. "(Was "..item.unidentified_name..")", AnsiCol.WHITE,AnsiCol.BOLD)
+            print(WHITE_BOLD("You identify the ".. item.name .. " (Was ") .. WHITE_FAINT(item.unidentified_name) .. WHITE_BOLD(")"))
         end
     end
 end
@@ -312,9 +315,16 @@ local function main()
         AnsiCol.println(msg, AnsiCol.from_rgb(color or COL_WHITE))
     end
 
+    local Display = import "core.Display"
+    Display.initialize("Lanarts", {640, 480}, false)
+    -- TODO: Remove any notion of 'internal graphics'. All graphics loading should be prompted by Lua.
+    __initialize_internal_graphics()
+
     local SM = SimulationMap.create()
     local player = SM:add_player("Tester", choose_race(), {25,25})
     local monster = SM:add_monster("Giant Rat", {75,75})
+
+    SM:draw()
 
     battle(StatContext.stat_context_create(player.base_stats, player.derived_stats, player), StatContext.stat_context_create(monster.base_stats, monster.derived_stats, monster))
 end

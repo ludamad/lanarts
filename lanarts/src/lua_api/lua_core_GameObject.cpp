@@ -45,8 +45,24 @@ static int lapi_gameinst_getter_fallback(lua_State* L) {
 		lua_pushnil(L);
 	} else {
 		variables.push();
-		lua_pushvalue(L, 2);
+		lua_pushvalue(L, 2); // On stack: [object table, key]
 		lua_gettable(L, -2);
+	}
+	/* Still nil ? Try to access in 'self.type'. */
+	if (lua_isnil(L, -1)) {
+		/* Get type table */
+		lua_pop(L, 1); // Pop nil
+		variables.push();
+		lua_pushliteral(L, "type");
+		lua_rawget(L, -2);
+		lua_replace(L, -2); // On stack: [type table]
+
+		LuaStackValue table(L, -1);
+		if (!table.isnil()) {
+			lua_pushvalue(L, 2); // On stack: [type table, key]
+			lua_gettable(L, table.index());
+			lua_replace(L, -2); // On stack [type table's value]
+		}
 	}
 	return 1;
 }

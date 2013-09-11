@@ -86,6 +86,7 @@ public:
 	void deserialize(GameState* gs, SerializeBuffer& serializer);
 
 	void step(GameState* gs);
+	void draw(GameState* gs);
 
 	std::string& label() {
 		return _label;
