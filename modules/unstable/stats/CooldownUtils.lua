@@ -23,6 +23,8 @@ end
 -- Augment an attack with a cooldown requirement and 
 function M.derive_attack_with_cooldown(args)
     local attack = args.unarmed_attack or args.attack
+    local types = args.multipliers or args.types
+    assert(types)
 
     -- First resolve 
     if attack and #attack > 0 then -- Resolve argument table
@@ -30,8 +32,7 @@ function M.derive_attack_with_cooldown(args)
     end
     if not args.attack then
         attack = Attacks.attack_create(
-            args.effectiveness or 0, args.damage or 0, 
-            args.multipliers or args.types, 
+            args.effectiveness or 0, args.damage or 0, types, 
             --[[Optional]] args.delay, --[[Optional]] args.damage_multiplier
         )
     end

@@ -37,6 +37,8 @@ function M.monster_define(t, --[[Optional]] derive_idx)
         Traits.stat_mod_functions[trait](stats)
     end
 
+    t.types = t.types or {Apts.MELEE}
+
     return MonsterType.define {
         name = t.name,
         description = t.description:pack(),

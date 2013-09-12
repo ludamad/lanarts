@@ -75,8 +75,7 @@ static GameState* init_gamestate() {
 	return gs;
 }
 
-/* Must take (int, char**) to play nice with SDL */
-int main(int argc, char** argv) {
+static int run_engine(int argc, char** argv) {
 	label_StartOver:
 
 	GameState* gs = init_gamestate();
@@ -165,4 +164,14 @@ int main(int argc, char** argv) {
 //	lua_close(L); // TODO: To exit cleanly we must clear all resource vectors explicitly
 
 	return 0;
+}
+
+/* Must take (int, char**) to play nice with SDL */
+int main(int argc, char** argv) {
+	try {
+		run_engine(argc, argv);
+	} catch (const std::exception& err) {
+		fprintf(stderr, "%s\n", err.what());
+		fflush(stderr);
+	}
 }
