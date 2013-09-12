@@ -1,15 +1,27 @@
 local ResourceTypes = import "@ResourceTypes"
 local StatMultiplierUtils = import "@StatMultiplierUtils"
 local CooldownTypes = import "@stats.CooldownTypes"
+local AttackResolution = import "@AttackResolution"
+local LogUtils = import "lanarts.LogUtils"
+local StatContext = import "@StatContext"
 
 local M = nilprotect {} -- Submodule
 
+local function attack_on_use(self, attacker, target)
+    local dmg = AttackResolution.damage_calc(self, attacker, target)
+
+    LogUtils.log_resolved(attacker.obj, "{The }$You deal{s} " ..dmg .. " damage!", COL_GREEN)
+
+    StatContext.add_hp(target, -random_round(dmg))
+end
+
+-- Attacks follow the 'action' interface (on_use, optional on_prerequisite)
 -- Create an attack with a single sub-attack
 function M.attack_create(
     -- Base stats
     base_effectiveness, base_damage,
     -- Aptitude modifiers
-    aptitude_multipliers, action_cooldown,
+    aptitude_multipliers,
     -- Weapon delay and related damage multiplier 
      --[[Optional]] delay, --[[Optional]] damage_multiplier)
     delay = delay or 1
@@ -23,8 +35,8 @@ function M.attack_create(
             resistance_multipliers = m[3], defence_multipliers = m[4]
         }},
 
-        action_cooldown = action_cooldown,
-        damage_multiplier = damage_multiplier or delay
+        damage_multiplier = damage_multiplier or delay,
+        on_use = attack_on_use
     }
 end
 

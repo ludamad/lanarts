@@ -1,5 +1,5 @@
 local Apts = import "@stats.AptitudeTypes"
-local SpellTypeKnown = import "@SpellTypeKnown"
+local SpellsKnown = import "@SpellsKnown"
 local StatContext = import "@StatContext"
 local SpellType = import "@SpellType"
 local Stats = import "@Stats"
@@ -46,8 +46,8 @@ end
 function M.resolve_embedded_stats(table)
     local aptitudes = M.resolve_aptitude_bonuses
     local spells = table.spells
-    if not getmetatable(table.spells) == SpellTypeKnown then
-        spells = SpellTypeKnown.create()
+    if not getmetatable(table.spells) == SpellsKnown then
+        spells = SpellsKnown.create()
         for spell in values(table.spells) do
             if type(spell) == "table" and not spell.id then
                 spell = SpellType.define(spell)

@@ -1,7 +1,7 @@
 local HookSet = import "@HookSet"
 local CooldownSet = import "@CooldownSet"
 local Inventory = import "@Inventory"
-local SpellTypeKnown = import "@SpellTypeKnown"
+local SpellsKnown = import "@SpellsKnown"
 local Attacks = import "@Attacks"
 
 local M = {} -- Submodule
@@ -48,7 +48,7 @@ function M.stats_create(--[[Optional]] params)
         skills = M.skills_create(params.skills),
         hooks = params.hooks or HookSet.create(),
 
-        spells = params.spells or SpellTypeKnown.create(),
+        spells = params.spells or SpellsKnown.create(),
         abilities = params.abilities or {},
         unarmed_attack = params.unarmed_attack or Attacks.ZERO_DAMAGE_ATTACK,
 

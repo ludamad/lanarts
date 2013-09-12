@@ -11,7 +11,6 @@ local CooldownSet = newtype()
 function CooldownSet:init()
 	self.cooldowns = {}
 	self.cooldown_rates = {}
-	self.cooldown_multipliers = {}
 end
 
 function CooldownSet:on_step()
@@ -27,21 +26,9 @@ end
 
 local MIN_DIVISOR = 0.25 -- No more than 4x needed cooldown 
 
-local function resolve_action_cooldown(self, s, c, should_add)
-    local divisor = 1.0 + Proficiency.calculate_proficiency(s, c.multipliers)
-    local mult = 1.0/math.max(MIN_DIVISOR, divisor)
-    for type, amount in pairs(c.base_cooldowns) do
-        local val = should_add and self.cooldowns[type] or 0
-        self.cooldowns[type] = val + amount * mult
-    end
-end
-
-function CooldownSet:add_action_cooldown(stats, action_cooldown)
-    resolve_action_cooldown(self, stats, action_cooldown, true)
-end
-
-function CooldownSet:set_action_cooldown(stats, action_cooldown)
-    resolve_action_cooldown(self, stats, action_cooldown, false)
+function CooldownSet:cooldown_apply(stats, type, cooldown, --[[Optional]] f)
+    f = f or math.max
+    self.cooldowns[type] = f(self.cooldowns[type] or 0, cooldown) 
 end
 
 function CooldownSet:has_cooldown(type)
@@ -53,28 +40,10 @@ function CooldownSet:get_cooldown(type)
     return self.cooldowns[type] or 0
 end
 
-local function table_multiply_defaulted(table, key, multiplier)
-    table[key] = (table[key] or 1) * multiplier
-end
-
-function CooldownSet:multiply_cooldown_multiplier(type, amount)
-    table_multiply_defaulted(self.cooldown_multipliers, type, amount)
-end
-
-function CooldownSet:multiply_cooldown_rate(type, amount)
-    table_multiply_defaulted(self.cooldown_rates, type, amount)
-
+function CooldownSet:multiply_cooldown_rate(type, v)
+    self.cooldown_rates[type] = (self.cooldown_rates[type] or 1) * v
 end
 
 M.create = CooldownSet.create
-
-function M.cooldown_create
-
-function M.action_cooldown_create(base_cooldowns, multipliers)
-    if #multipliers > 0 then 
-        multipliers = Proficiency.proficiency_type_create(multipliers)
-    end
-    return {base_cooldowns = base_cooldowns, multipliers = multipliers}
-end
 
 return M

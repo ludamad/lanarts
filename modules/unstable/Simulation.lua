@@ -238,8 +238,6 @@ local function dump_stats(player, monster)
 end
 
 local function battle(player, monster)
-    local spells = import "@stats.SpellType"
-
     for item in values(ItemType.list) do
         local IT = ItemTraits
         local function is(trait) return table.contains(item.traits, trait) end

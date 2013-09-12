@@ -9,6 +9,7 @@ local Attacks = import "@Attacks"
 local Relations = import "lanarts.objects.Relations"
 local AptitudeTypes = import "@stats.AptitudeTypes"
 local ContentUtils = import "@stats.ContentUtils"
+local CooldownUtils = import "@stats.CooldownUtils"
 
 local Traits = import ".MonsterTraits"
 
@@ -36,14 +37,6 @@ function M.monster_define(t, --[[Optional]] derive_idx)
         Traits.stat_mod_functions[trait](stats)
     end
 
-    if t.unarmed_attack and #t.unarmed_attack > 0 then
-        t.unarmed_attack = Attacks.attack_create(unpack(t.unarmed_attack))
-    end
-    if not t.unarmed_attack then
-        local attack_types = t.multipliers or t.types or Apts.MELEE
-        t.unarmed_attack = Attacks.attack_create(t.effectiveness or 0,t.damage or 0, attack_types, --[[Optional]] t.delay, --[[Optional]] t.damage_multiplier)
-
-    end
     return MonsterType.define {
         name = t.name,
         description = t.description:pack(),
@@ -58,7 +51,7 @@ function M.monster_define(t, --[[Optional]] derive_idx)
         radius = t.radius,
 
         base_stats = stats,
-        unarmed_attack = t.unarmed_attack,
+        unarmed_attack = CooldownUtils.derive_attack_with_cooldown(t),
 
     }
 end

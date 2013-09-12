@@ -251,6 +251,41 @@ function map_call(f, list)
     return ret
 end
 
+-- Functional composition
+function func_apply_and(f1,f2, --[[Optional]] s2)
+    return function(s1,...) 
+        local v = {f1(s1,...)}
+        if not v[1] then return unpack(v)
+        else 
+            if s2 then return f2(s2, ...)
+            else return f2(s1,...) end
+        end
+    end
+end
+
+function func_apply_not(f)
+    return function(...) return not f(...) end
+end
+
+function func_apply_or(f1,f2, --[[Optional]] s2)
+    return function(s1,...) 
+        local v = {f1(s1,...)}
+        if v[1] then return unpack(v)
+        else 
+            if s2 then return f2(s2, ...)
+            else return f2(s1,...) end
+        end
+    end
+end
+
+function func_apply_sequence(f1,f2,--[[Optional]] s2)
+    return function(s1,...) 
+        f1(s1,...)
+        if s2 then f2(s2, ...) 
+        else f1(s1,...) end 
+    end
+end
+
 local _cached_dup_table = {}
 function dup(val, times)
     table.clear(_cached_dup_table)

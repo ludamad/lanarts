@@ -19,9 +19,6 @@ local schema = {
     gold_worth = S.defaulted(S.NOT_NIL, 0), -- Determines shop cost and placement weight
     stackable = S.NOT_NIL, -- Is it stackable ?
 
-    on_cooldown_prerequisite = S.FUNCTION,
-    on_cooldown_apply = S.FUNCTION,
-    prerequisite_cooldowns = S.TABLE, -- Which cooldowns must be 0?
     on_prerequisite = S.FUNCTION_OR_NIL,
     on_use = S.FUNCTION,
 
