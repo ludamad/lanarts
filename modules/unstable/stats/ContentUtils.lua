@@ -1,7 +1,7 @@
 local Apts = import "@stats.AptitudeTypes"
-local SpellsKnown = import "@SpellsKnown"
+local SpellTypeKnown = import "@SpellTypeKnown"
 local StatContext = import "@StatContext"
-local Spells = import "@Spells"
+local SpellType = import "@SpellType"
 local Stats = import "@Stats"
 
 local M = nilprotect {} -- Submodule
@@ -46,11 +46,11 @@ end
 function M.resolve_embedded_stats(table)
     local aptitudes = M.resolve_aptitude_bonuses
     local spells = table.spells
-    if not getmetatable(table.spells) == SpellsKnown then
-        spells = SpellsKnown.create()
+    if not getmetatable(table.spells) == SpellTypeKnown then
+        spells = SpellTypeKnown.create()
         for spell in values(table.spells) do
             if type(spell) == "table" and not spell.id then
-                spell = Spells.define(spell)
+                spell = SpellType.define(spell)
             end 
             spells:add_spell(spell)
         end

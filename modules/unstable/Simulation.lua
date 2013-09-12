@@ -6,7 +6,7 @@ local AnsiCol = import "core.terminal.AnsiColors"
 local Races = import "@Races"
 local ItemType = import "@ItemType"
 local SkillType = import "@SkillType"
-local Spells = import "@Spells"
+local SpellType = import "@SpellType"
 local ExperienceCalculation = import "@stats.ExperienceCalculation"
 local ProficiencyPenalties = import "@stats.ProficiencyPenalties"
 
@@ -238,7 +238,7 @@ local function dump_stats(player, monster)
 end
 
 local function battle(player, monster)
-    local spells = import "@stats.Spells"
+    local spells = import "@stats.SpellType"
 
     for item in values(ItemType.list) do
         local IT = ItemTraits

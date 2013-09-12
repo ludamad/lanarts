@@ -1,4 +1,4 @@
--- Usage: 'Spells.define { ... attributes ... }', 'Spells.lookup(<name or ID>)'
+-- Usage: 'SpellType.define { ... attributes ... }', 'SpellType.lookup(<name or ID>)'
 local S = import "@Schemas"
 local ResourceTypes = import "@ResourceTypes"
 
@@ -22,7 +22,7 @@ local TARGET_TYPES = {
 local DEFAULT_GLOBAL_COOLDOWN = 40
 local DEFAULT_RANGE = 300
 
-local Spells = ResourceTypes.type_create(
+local SpellType = ResourceTypes.type_create(
     S.enforce_function_create {
         name = S.STRING,
         description = S.STRING,
@@ -42,6 +42,8 @@ local Spells = ResourceTypes.type_create(
 		recommended_stats = S.TABLE_OR_NIL,
 
         on_use = S.FUNCTION,
+        on_cooldown_prerequisite = S.FUNCTION,
+        on_cooldown_apply = S.FUNCTION,
         on_prerequisite = S.FUNCTION_OR_NIL,
         on_autotarget = S.FUNCTION_OR_NIL,
 
@@ -49,7 +51,7 @@ local Spells = ResourceTypes.type_create(
     }
 )
 
-M.define = Spells.define
-M.lookup = Spells.lookup
+M.define = SpellType.define
+M.lookup = SpellType.lookup
 
 return M

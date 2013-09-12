@@ -1,4 +1,4 @@
-local Spells = import "@Spells"
+local SpellType = import "@SpellType"
 local SpellTraits = import "@stats.SpellTraits"
 local Apts = import "@stats.AptitudeTypes"
 
@@ -28,7 +28,7 @@ races_define {
         traits = {SpellTraits.BUFF_SPELL},
         mp_cost = 30,
         cooldown_offensive = 35,
-        target_type = Spells.TARGET_NONE,
+        target_type = SpellType.TARGET_NONE,
 
         heal_amount = 30,
 

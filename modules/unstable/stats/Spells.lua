@@ -1,4 +1,4 @@
-local Spells = import "@Spells"
+local SpellType = import "@SpellType"
 local StatusType = import "@StatusType"
 
 local SpellTraits = import ".SpellTraits"
@@ -6,7 +6,7 @@ local status_types = import ".DefineStatusTypes"
 
 local M = nilprotect {} -- Submodule
 
-M.berserk = Spells.define {
+M.berserk = SpellType.define {
 	name = "Berserk",
 	description = "Allows you to strike powerful blows for a limited duration, afterwards you are slower and vulnerable.",
 	mp_cost = 40,

@@ -1,5 +1,5 @@
 local EventLog = import "core.ui.EventLog"
-local Cooldowns = import "@Cooldowns"
+local CooldownSet = import "@CooldownSet"
 
 --- Provides implementations of stat contexts.
 -- Conceptually, a stat context is any object which has the fields (or getters) 'base' and 'derived'

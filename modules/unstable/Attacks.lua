@@ -1,32 +1,29 @@
 local ResourceTypes = import "@ResourceTypes"
 local StatMultiplierUtils = import "@StatMultiplierUtils"
+local CooldownTypes = import "@stats.CooldownTypes"
 
 local M = nilprotect {} -- Submodule
-
-local BASE_ATTACK_RATE = 45 -- frames, everything is compared to this rate
 
 -- Create an attack with a single sub-attack
 function M.attack_create(
     -- Base stats
     base_effectiveness, base_damage,
     -- Aptitude modifiers
-    multipliers, 
+    aptitude_multipliers, action_cooldown,
     -- Weapon delay and related damage multiplier 
      --[[Optional]] delay, --[[Optional]] damage_multiplier)
     delay = delay or 1
-    multipliers = StatMultiplierUtils.resolve_multiplier_set(multipliers)
+    local m = StatMultiplierUtils.resolve_multiplier_set(aptitude_multipliers)
     return {
         sub_attacks = {{
             base_effectiveness = base_effectiveness, 
             base_damage = base_damage,
 
-            effectiveness_multipliers = multipliers[1],
-            damage_multipliers = multipliers[2],
-            resistance_multipliers = multipliers[3], 
-            defence_multipliers = multipliers[4]
+            effectiveness_multipliers = m[1], damage_multipliers = m[2],
+            resistance_multipliers = m[3], defence_multipliers = m[4]
         }},
 
-        cooldown = BASE_ATTACK_RATE * delay,
+        action_cooldown = action_cooldown,
         damage_multiplier = damage_multiplier or delay
     }
 end

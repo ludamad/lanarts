@@ -1,9 +1,26 @@
 local M = nilprotect {} -- Submodule
 
--- Core cooldown types are stored in Cooldowns.lua
+-- Default cooldown amounts
+M.default_cooldown_table = {
+    ALL_ACTIONS = 45,
+    OFFENSIVE_ACTIONS = 45,
+    MELEE_ACTIONS = 45,
+    SPELL_ACTIONS = 45,
+    REST_ACTION = 20
+}
 
-M.REST_ACTION = "rest_action_cooldown"
+-- Cooldown types
+for type,amount in pairs(M.default_cooldown_table) do
+    M[type] = type
+end
 
-M.REST_COOLDOWN_AMOUNT = 20
+function M.cooldown_table(types, --[[Optional]] scale)
+    scale = scale or 1
+    local ret = {}
+    for type in values(types) do
+        ret[type] = M.default_cooldown_table[type] * scale
+    end
+    return ret
+end
 
 return M
