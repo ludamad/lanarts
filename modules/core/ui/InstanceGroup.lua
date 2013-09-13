@@ -15,7 +15,7 @@ function InstanceGroup:init()
 end
 
 --- Add an object to this container.
--- @param xy the origin to align against, eg LEFT_TOP, RIGHT_BOTTOM.
+-- @param xy the origin to align against, eg Display.LEFT_TOP, Display.RIGHT_BOTTOM.
 function InstanceGroup:add_instance(obj, xy )
     self._instances[#self._instances + 1] = { obj, xy }
 end

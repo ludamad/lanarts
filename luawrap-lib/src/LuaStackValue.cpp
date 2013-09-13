@@ -175,6 +175,11 @@ int LuaStackValue::objlen() const {
 	return len;
 }
 
+void LuaStackValue::set(int pos) {
+	lua_pushvalue(L, pos);
+	pop();
+}
+
 void LuaStackValue::set_metatable(const LuaField& metatable) const {
 	push();
 	metatable.push();

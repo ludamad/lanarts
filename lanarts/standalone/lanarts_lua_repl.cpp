@@ -164,10 +164,6 @@ static int loadline (lua_State *L) {
 }
 
 int read_eval_print(lua_State *L) {
-	bool previous_mutability = lua_api::globals_get_mutability(L);
-
-	lua_api::globals_set_mutability(L, true);
-
 	int status = loadline(L);
 	if (status != -1) {
 		if (status == 0)
@@ -183,7 +179,5 @@ int read_eval_print(lua_State *L) {
 								lua_tostring(L, -1)));
 		}
 	}
-
-	lua_api::globals_set_mutability(L, previous_mutability);
 	return 0;
 }

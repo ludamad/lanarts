@@ -185,8 +185,8 @@ local function copy_close_unsolid_tile(map, xy)
     end
 end
 
-M._warning_skull = image_load "modules/lanarts/features/sprites/warning.png"
-M._anvil = image_load "modules/lanarts/features/sprites/anvil.png"
+M._warning_skull = Display.image_load "modules/lanarts/features/sprites/warning.png"
+M._anvil = Display.image_load "modules/lanarts/features/sprites/anvil.png"
 
 function M.overworld_create()   
     local tileset = TileSets.grass

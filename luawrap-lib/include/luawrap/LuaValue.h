@@ -63,9 +63,9 @@ public:
 
 	/* Lua api convenience methods*/
 	void set(int pos);
+	void set_nil() const;
 	bool has(const char* key) const;
 	void newtable() const;
-	void set_nil() const;
 	bool isnil() const;
 	void* to_userdata() const;
 	double to_num() const;

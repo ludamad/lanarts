@@ -2,6 +2,7 @@ local MapGen = import "core.MapGeneration"
 local GameMap = import "core.GameMap"
 local GameObject = import "core.GameObject"
 local World = import "core.GameWorld"
+local Display = import "core.Display"
 
 local TileSets = import "@tiles.Tilesets"
 
@@ -186,8 +187,8 @@ local function copy_close_unsolid_tile(map, xy)
     end
 end
 
-M._warning_skull = image_load "modules/lanarts/features/sprites/warning.png"
-M._anvil = image_load "modules/lanarts/features/sprites/anvil.png"
+M._warning_skull = Display.image_load "modules/lanarts/features/sprites/warning.png"
+M._anvil = Display.image_load "modules/lanarts/features/sprites/anvil.png"
 
 local function random_pos(bbox)
     return {random(bbox[1], bbox[3]), random(bbox[2], bbox[4])}

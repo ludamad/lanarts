@@ -2,8 +2,7 @@
 
 #include <lcommon/lua_lcommon.h>
 #include <lcommon/strformat.h>
-
-#include <ldraw/lua_ldraw.h>
+#include <luawrap/luawrap.h>
 
 #include "gamestate/GameState.h"
 
@@ -41,6 +40,7 @@ int rand_range(lua_State* L) {
 }
 
 static int lua_lanarts_panic(lua_State* L) {
+	luawrap::errorfunc(L);
 	throw std::runtime_error(format("LUA PANIC: %s", lua_tostring(L, -1)));
 	return 0;
 }
@@ -48,7 +48,6 @@ static int lua_lanarts_panic(lua_State* L) {
 void lua_lanarts_api(GameState* state, lua_State* L) {
 	LuaValue globals(L, LUA_GLOBALSINDEX);
 	lua_register_lcommon(L);
-	ldraw::lua_register_ldraw(L, globals);
 
 	lua_atpanic(L, lua_lanarts_panic);
 

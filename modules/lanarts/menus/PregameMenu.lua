@@ -24,7 +24,7 @@ local function pregame_joined_players_list_create()
     group.size = {200, 400} -- For placement algorithms
 
     group:add_instance( 
-        TextLabel.create(font, {color=COL_WHITE, origin = CENTER_TOP}, "Players In Game:"), 
+        TextLabel.create(font, {color=COL_WHITE, origin = Display.CENTER_TOP}, "Players In Game:"), 
         {100, 30}
     )
 
@@ -45,7 +45,7 @@ local function pregame_joined_players_list_create()
             text = text .. player.name .. " the " .. player.class_name
 
             font:draw( 
-                { color = color, origin = CENTER_TOP }, 
+                { color = color, origin = Display.CENTER_TOP }, 
                 { x, y + (idx - 1) * 20 }, 
                 text
             )
@@ -63,20 +63,20 @@ local function pregame_menu_create(on_start_click)
 
     menu:add_instance(
         logo, 
-        CENTER_TOP,
+        Display.CENTER_TOP,
         --[[Down 10 pixels]]
         {0, 10}
     )
 
     menu:add_instance(
         pregame_joined_players_list_create(), 
-        CENTER_TOP,
+        Display.CENTER_TOP,
         {0, 10 + logo.size[2]}
     )
 
     menu:add_instance(
         text_button_create("Start the Game!", on_start_click, text_button_params),
-        CENTER_BOTTOM,
+        Display.CENTER_BOTTOM,
         --[[Up 40 pixels]]
         {0, -40}
     )

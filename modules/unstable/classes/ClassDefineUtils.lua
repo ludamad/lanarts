@@ -38,7 +38,7 @@ end
 
 local APT_FOR_SKILL = {
     ["Slashing"] = Apts.SLASHING,
-    ["Piercing"] = Apts.SLASHING,
+    ["Piercing"] = Apts.PIERCING,
     ["Blunt"] = Apts.BLUNT,
     ["Ranged"] = Apts.RANGED
 }

@@ -13,6 +13,7 @@
 
 #include <ldraw/display.h>
 #include <ldraw/Image.h>
+#include <ldraw/lua_ldraw.h>
 
 #include <SDL.h>
 
@@ -59,26 +60,38 @@ static int object_within_view(lua_State* L) {
 	return 1;
 }
 
+static Pos screen_coords(const LuaStackValue& value) {
+	GameState* gs = lua_api::gamestate(value);
+	return on_screen(gs, value.as<Pos>());
+}
+
+static Pos world_coords(const LuaStackValue& value) {
+	GameState* gs = lua_api::gamestate(value);
+	Pos p = value.as<Pos>();
+	p.x += gs->view().x;
+	p.y += gs->view().y;
+	return p;
+}
+
 namespace lua_api {
 
-	static void register_display_table(lua_State* L) {
+	static void register_display_submodule(lua_State* L) {
 		LuaSpecialValue globals = luawrap::globals(L);
-		LuaValue display = register_lua_submodule(L, "core.Display");
+		LuaModule display = register_lua_submodule_as_luamodule(L, "core.Display");
+		LuaValue vals = display.values;
+		ldraw::lua_register_ldraw(L, vals);
 
-		globals["images_load"].bind_function(images_load);
-		display["initialize"].bind_function(ldraw::display_initialize);
-		display["draw_start"].bind_function(ldraw::display_draw_start);
-		display["draw_finish"].bind_function(ldraw::display_draw_finish);
-		display["object_within_view"].bind_function(object_within_view);
-		display["to_screen_xy"].bind_function(to_screen_xy);
+		display.getters["screen_coords"].bind_function(screen_coords);
+		display.getters["world_coords"].bind_function(world_coords);
+		display.getters["display_size"].bind_function(ldraw::display_size);
+		display.getters["display_xy"].bind_function(display_xy);
 
-		LuaValue meta = luameta_new(L, "<DisplayTable>");
-		LuaValue getters = luameta_getters(meta);
-
-		getters["display_size"].bind_function(ldraw::display_size);
-		getters["display_xy"].bind_function(display_xy);
-
-		display.set_metatable(meta);
+		vals["images_load"].bind_function(images_load);
+		vals["initialize"].bind_function(ldraw::display_initialize);
+		vals["draw_start"].bind_function(ldraw::display_draw_start);
+		vals["draw_finish"].bind_function(ldraw::display_draw_finish);
+		vals["object_within_view"].bind_function(object_within_view);
+		vals["to_screen_xy"].bind_function(to_screen_xy);
 	}
 
 	/* Functions for visual results in the lanarts world, eg drawing text */
@@ -95,7 +108,7 @@ namespace lua_api {
 		LUAWRAP_GETTER(fonts_getters, small, lua_api::gamestate(L)->font());
 		LUAWRAP_GETTER(fonts_getters, large, lua_api::gamestate(L)->menu_font());
 
-		register_display_table(L);
+		register_display_submodule(L);
 	}
 
 	void register_event_log_api(lua_State* L) {

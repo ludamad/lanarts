@@ -9,7 +9,7 @@ local World = import "core.GameWorld"
 
 local function action_bar_hints_create()
     local hint_text = {'H', ' ', 'Y', 'U', 'I', 'O', 'P'}
-    local options = {origin = CENTER_TOP}
+    local options = {origin = Display.CENTER_TOP}
 
     local hints = { size = {32 * #hint_text, 32}, step = do_nothing }
 
@@ -28,7 +28,7 @@ end
 local function help_overlay_create()
     local overlay = InstanceBox.create( {size = Display.display_size} )
     local action_bar = action_bar_hints_create()
-    overlay:add_instance( action_bar, LEFT_BOTTOM, --[[Up 16 pixels]] {0, -16})
+    overlay:add_instance( action_bar, Display.LEFT_BOTTOM, --[[Up 16 pixels]] {0, -16})
 
     return overlay
 end

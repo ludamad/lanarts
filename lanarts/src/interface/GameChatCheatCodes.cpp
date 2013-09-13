@@ -179,14 +179,6 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 	return false;
 }
 
-static bool handle_dolua_allow_globals(GameState* gs, const std::string& command) {
-	lua_State* L = gs->luastate();
-	lua_api::globals_set_mutability(L, true);
-	bool result = handle_dolua(gs, command);
-	lua_api::globals_set_mutability(L, false);
-	return result;
-}
-
 bool GameChat::handle_special_commands(GameState* gs,
 		const std::string& command) {
 	// These codes will cause problems in multiplayer
@@ -239,7 +231,7 @@ bool GameChat::handle_special_commands(GameState* gs,
 		return true;
 	}
 
-	if (handle_dolua_allow_globals(gs, command)) {
+	if (handle_dolua(gs, command)) {
 		return true;
 	}
 	if (handle_create_item(gs, command)) {

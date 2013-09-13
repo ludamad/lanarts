@@ -5,7 +5,7 @@ local InstanceGroup = import "core.ui.InstanceGroup"
 local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
 local utils = import "core.Utils"
-local keys = import "core.Keyboard"
+local Keys = import "core.Keyboard"
 
 local score_menu_font = "modules/core/fonts/alagard_by_pix3m-d6awiwp.ttf"
 
@@ -65,7 +65,7 @@ local function score_entry_draw(entry, ranking, ex, ey, ew, eh)
     end
 
     -- Draw character name & level
-    draw_colored_parts(font, LEFT_TOP, {ex + 2, ey + 2},
+    draw_colored_parts(font, Display.LEFT_TOP, {ex + 2, ey + 2},
         {COL_MUTED_GREEN, entry.name .. "  "},
         {TEXT_COLOR, "Level " .. entry.character_level .. " "},
         {TEXT_COLOR, entry.class_name}
@@ -84,10 +84,10 @@ local function score_entry_draw(entry, ranking, ex, ey, ew, eh)
     else
         progress_entry = {COL_BABY_BLUE, "Reached Floor " .. entry.deepest_floor .. " "}
     end
-    draw_colored_parts(font, LEFT_BOTTOM, {ex + 2, ey+eh - 4}, progress_entry)
+    draw_colored_parts(font, Display.LEFT_BOTTOM, {ex + 2, ey+eh - 4}, progress_entry)
 
     -- Draw how many monsters killed
-    draw_colored_parts(font, LEFT_BOTTOM, {ex + ew/2 - 50, ey+eh - 4},
+    draw_colored_parts(font, Display.LEFT_BOTTOM, {ex + ew/2 - 50, ey+eh - 4},
         {COL_MUTED_YELLOW, "Killed " .. 
          entry.kills .. (( entry.kills == 1) and " Enemy" or " Enemies")}
     )
@@ -100,12 +100,12 @@ local function score_entry_draw(entry, ranking, ex, ey, ew, eh)
         death_entry = { COL_PALE_RED, entry.deaths .. ((entry.deaths == 1) and " Death" or " Deaths") }
     end
 
-    draw_colored_parts(font, RIGHT_BOTTOM, {ex + ew - 2, ey+eh - 4},
+    draw_colored_parts(font, Display.RIGHT_BOTTOM, {ex + ew - 2, ey+eh - 4},
         death_entry
     )
 
     -- Draw a box around the entry
-    draw_rectangle_outline( 
+    Display.draw_rectangle_outline( 
         entry.won_the_game and COL_LIGHT_GRAY or COL_DARK_GRAY, 
         bbox_create( {ex - 32, ey}, {ew + 32, eh} ), 
         1  -- outline width
@@ -130,10 +130,10 @@ local function score_entry_drawer_create()
     end
 
     function scores_drawer:step(xy)
-        if key_pressed(keys.UP) then self:scroll_list(-1) end
-        if key_pressed(keys.PAGE_UP) then self:scroll_list(-10) end
-        if key_pressed(keys.DOWN) then self:scroll_list(1) end
-        if key_pressed(keys.PAGE_DOWN) then self:scroll_list(10) end
+        if Keys.key_pressed(Keys.UP) then self:scroll_list(-1) end
+        if Keys.key_pressed(Keys.PAGE_UP) then self:scroll_list(-10) end
+        if Keys.key_pressed(Keys.DOWN) then self:scroll_list(1) end
+        if Keys.key_pressed(Keys.PAGE_DOWN) then self:scroll_list(10) end
     end
 
     function scores_drawer:draw(xy)
@@ -156,7 +156,7 @@ local function scores_menu_body_create()
     group:add_instance( 
         TextLabel.create(
             font_cached_load(score_menu_font, 20), 
-            {color=TEXT_COLOR, origin = CENTER_TOP}, 
+            {color=TEXT_COLOR, origin = Display.CENTER_TOP}, 
             "In Memoriam"
         ), 
         {100, 30}
@@ -181,7 +181,7 @@ local function scores_menu_create(on_back_click)
     
         menu:add_instance(
             logo, 
-            CENTER_TOP,
+            Display.CENTER_TOP,
             --[[Down 10 pixels]]
             {0, 10}
         )
@@ -192,7 +192,7 @@ local function scores_menu_create(on_back_click)
     -- Score title + drawer object
     menu:add_instance(
         scores_menu_body_create(), 
-        CENTER_TOP,
+        Display.CENTER_TOP,
         {0, 10 + logo_displacement}
     )
 
@@ -204,7 +204,7 @@ local function scores_menu_create(on_back_click)
             hover_color = COL_RED,
             click_box_padding = 5
         }),
-        CENTER_BOTTOM,
+        Display.CENTER_BOTTOM,
         --[[Up 25 pixels]]
         {0, -25}
     )

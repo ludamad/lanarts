@@ -4,7 +4,9 @@ local InstanceBox = import "core.ui.InstanceBox"
 local TextInputBox = import "core.ui.TextInputBox"
 local TextLabel = import "core.ui.TextLabel"
 local Sprite = import "core.ui.Sprite"
-local keys = import "core.Keyboard"
+local Keys = import "core.Keyboard"
+local Mouse = import "core.Mouse"
+local Display = import "core.Display"
 
 local SETTINGS_BOX_MAX_CHARS = 18
 local SETTINGS_BOX_SIZE = {180, 34}
@@ -83,7 +85,7 @@ local function connection_toggle_create()
 
     function toggle:step(xy)
         -- Toggle the connection type
-        if mouse_left_pressed and mouse_over(xy, self.size) then
+        if Mouse.mouse_left_pressed and mouse_over(xy, self.size) then
             settings.connection_type = (settings.connection_type + 1) % 3
         end
     end
@@ -110,11 +112,11 @@ local function connection_toggle_create()
         local x,y = unpack(xy)
         local w, h = unpack(self.size)
 
-        sprite:draw( { color = color, origin = LEFT_CENTER }, { x, y + h / 2 } )
-        self.font:draw( { color = color, origin = LEFT_CENTER }, { x + 8 + sprite.size[2], y + h / 2 }, text )
+        sprite:draw( { color = color, origin = Display.LEFT_CENTER }, { x, y + h / 2 } )
+        self.font:draw( { color = color, origin = Display.LEFT_CENTER }, { x + 8 + sprite.size[2], y + h / 2 }, text )
 
         local box_color = mouse_over(xy, self.size) and COL_GOLD or color
-        draw_rectangle_outline(box_color, bbox_create(xy, self.size), 1)
+        Display.draw_rectangle_outline(box_color, bbox_create(xy, self.size), 1)
     end
 
     return toggle
@@ -131,7 +133,7 @@ local function respawn_toggle_create()
 
     function toggle:step(xy)
         -- Toggle the connection type
-        if mouse_left_pressed and mouse_over(xy, self.size) then
+        if Mouse.mouse_left_pressed and mouse_over(xy, self.size) then
             settings.regen_on_death = not settings.regen_on_death
         end
     end
@@ -151,10 +153,10 @@ local function respawn_toggle_create()
             box_color = COL_GOLD 
         end
 
-        sprite:draw( {origin = LEFT_CENTER, color = sprite_color}, { x, y + h / 2 } )
-        self.font:draw( {color = TEXT_COLOR, origin = LEFT_CENTER, color = text_color}, { x + 8 + sprite.size[2], y + h / 2 }, text )
+        sprite:draw( {origin = Display.LEFT_CENTER, color = sprite_color}, { x, y + h / 2 } )
+        self.font:draw( {color = TEXT_COLOR, origin = Display.LEFT_CENTER, color = text_color}, { x + 8 + sprite.size[2], y + h / 2 }, text )
     
-        draw_rectangle_outline(box_color, bbox_create(xy, self.size), 1)
+        Display.draw_rectangle_outline(box_color, bbox_create(xy, self.size), 1)
     end
 
     return toggle
@@ -170,9 +172,9 @@ local function frame_action_repeat_toggle_create()
     function toggle:step(xy)
         -- Toggle the connection type
         local mouseover = mouse_over(xy, self.size)
-        if mouse_left_pressed and mouseover then
+        if Mouse.mouse_left_pressed and mouseover then
             settings.frame_action_repeat = (settings.frame_action_repeat + 1) % 5
-        elseif mouse_right_pressed and mouseover then
+        elseif Mouse.mouse_right_pressed and mouseover then
             settings.frame_action_repeat = (settings.frame_action_repeat - 1) % 5
         end
     end
@@ -182,15 +184,15 @@ local function frame_action_repeat_toggle_create()
         local x,y = unpack(xy)
         local w, h = unpack(self.size)
 
-        self.font:draw( {color=COL_GREEN, origin = LEFT_CENTER}, { x + 8, y + h / 2 }, 
+        self.font:draw( {color=COL_GREEN, origin = Display.LEFT_CENTER}, { x + 8, y + h / 2 }, 
             (settings.frame_action_repeat+1) .. 'x'
         )
-        self.font:draw( {color = COL_PALE_GREEN, origin = LEFT_CENTER}, { x + 40, y + h / 2 }, 
+        self.font:draw( {color = COL_PALE_GREEN, origin = Display.LEFT_CENTER}, { x + 40, y + h / 2 }, 
             "Network Skip Rate"
         )
     
         local box_color = mouse_over(xy, self.size) and COL_GOLD or COL_PALE_GREEN
-        draw_rectangle_outline(box_color, bbox_create(xy, self.size), 1)
+        Display.draw_rectangle_outline(box_color, bbox_create(xy, self.size), 1)
     end
 
     return toggle
@@ -206,7 +208,7 @@ local function speed_toggle_create()
 
     function toggle:step(xy)
         -- Toggle the connection type
-        if mouse_left_pressed and mouse_over(xy, self.size) then
+        if Mouse.mouse_left_pressed and mouse_over(xy, self.size) then
             settings.time_per_step = settings.time_per_step - 3
             if settings.time_per_step < 10 then
                 settings.time_per_step = 19
@@ -222,11 +224,11 @@ local function speed_toggle_create()
         local x,y = unpack(xy)
         local w, h = unpack(self.size)
 
-        self.sprite:draw( { color = {255, 255, 255, alpha}, origin = LEFT_CENTER }, { x, y + h / 2 } )
-        self.font:draw( {color = TEXT_COLOR, origin = LEFT_CENTER}, { x + 8 + self.sprite.size[2], y + h / 2 }, text )
+        self.sprite:draw( { color = {255, 255, 255, alpha}, origin = Display.LEFT_CENTER }, { x, y + h / 2 } )
+        self.font:draw( {color = TEXT_COLOR, origin = Display.LEFT_CENTER}, { x + 8 + self.sprite.size[2], y + h / 2 }, text )
     
         local box_color = mouse_over(xy, self.size) and COL_GOLD or COL_WHITE
-        draw_rectangle_outline(box_color, bbox_create(xy, self.size), 1)
+        Display.draw_rectangle_outline(box_color, bbox_create(xy, self.size), 1)
     end
 
     return toggle
@@ -240,13 +242,13 @@ local function label_button_create(params, color_formula, on_click)
 
     local label_button = InstanceBox.create( params )
 
-    label_button:add_instance( sprite, CENTER_TOP )
-    label_button:add_instance( label, CENTER_BOTTOM )
+    label_button:add_instance( sprite, Display.CENTER_TOP )
+    label_button:add_instance( label, Display.CENTER_BOTTOM )
     
     function label_button:step(xy) -- Makeshift inheritance
         InstanceBox.step(self, xy)
 
-        if self:mouse_over(xy) and mouse_left_pressed then 
+        if self:mouse_over(xy) and Mouse.mouse_left_pressed then 
             on_click(self, xy)
         end
 
@@ -276,9 +278,9 @@ local function class_choice_buttons_create()
         InstanceLine.step(self, xy)
 
         -- Allow choosing a class by using left/right arrows or tab
-        if key_pressed(keys.LEFT) then
+        if Keys.key_pressed(Keys.LEFT) then
             settings.class_type = ( settings.class_type - 1 ) % #buttons
-        elseif key_pressed(keys.RIGHT) or key_pressed(keys.TAB) then
+        elseif Keys.key_pressed(Keys.RIGHT) or Keys.key_pressed(Keys.TAB) then
             settings.class_type = ( settings.class_type + 1 ) % #buttons
         end
     end
@@ -400,7 +402,7 @@ local function back_and_continue_options_create(on_back_click, on_start_click)
             local mouse_is_over = obj:mouse_over(obj_xy)
             obj.options.color = mouse_is_over and COL_GOLD or TEXT_COLOR
 
-            if mouse_is_over and mouse_left_pressed then click_handler() end
+            if mouse_is_over and Mouse.mouse_left_pressed then click_handler() end
         end
     end
 
@@ -412,7 +414,7 @@ local function game_settings_menu_create(on_back_click, on_start_click)
 
     fields:add_instance( 
         class_choice_buttons_create(), 
-        CENTER_TOP, --[[Down 50 pixels]] { 0, 50 } )
+        Display.CENTER_TOP, --[[Down 50 pixels]] { 0, 50 } )
 
     fields:add_instance( 
         center_setting_fields_create(), 
@@ -420,11 +422,11 @@ local function game_settings_menu_create(on_back_click, on_start_click)
 
     fields:add_instance( 
         back_and_continue_options_create(on_back_click, on_start_click), 
-        CENTER_BOTTOM, --[[Up 20 pixels]] { 0, -20 } )
+        Display.CENTER_BOTTOM, --[[Up 20 pixels]] { 0, -20 } )
 
     fields:add_instance( 
         choose_class_message_create(), 
-        CENTER_BOTTOM, --[[Up 50 pixels]] { 0, -50 }  )
+        Display.CENTER_BOTTOM, --[[Up 50 pixels]] { 0, -50 }  )
 
     return fields
 end

@@ -1,4 +1,5 @@
 local item_groups = import ".ItemGroups"
+local Display = import "core.Display"
 local item_utils = import ".ItemUtils"
 local dungeons = import ".Dungeons"
 local map_utils = import ".MapUtils"
@@ -348,7 +349,7 @@ local function leaf_group_areas(map)
     return ret
 end
 
-M.statue = animation_create(images_load "modules/lanarts/features/sprites/statues/statue(0-17).png", 1.0)
+M.statue = Display.animation_create(Display.images_load "modules/lanarts/features/sprites/statues/statue(0-17).png", 1.0)
 
 local function generate_statues(map)
     local areas = leaf_group_areas(map)

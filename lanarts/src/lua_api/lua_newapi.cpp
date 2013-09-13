@@ -56,35 +56,6 @@ namespace lua_api {
 		luawrap::call<void>(L, "MonsterDeath", (GameInst*) enemy);
 	}
 
-	LuaValue global_getters(lua_State* L) {
-		luawrap::globals(L).push();
-		lua_getmetatable(L, -1);
-		LuaValue globalsmeta = LuaValue::pop_value(L);
-		return luameta_getters(globalsmeta);
-	}
-
-	LuaModule global_module(lua_State* L) {
-		LuaModule module;
-		luawrap::globals(L).push();
-		lua_getmetatable(L, -1);
-		module.metatable = LuaValue::pop_value(L);
-
-		module.proxy = luawrap::globals(L);
-		module.setters = luameta_setters(module.metatable);
-		module.getters = luameta_getters(module.metatable);
-		module.values = luameta_constants(module.metatable);
-
-		return module;
-	}
-
-
-	LuaValue global_setters(lua_State* L) {
-		luawrap::globals(L).push();
-		lua_getmetatable(L, -1);
-		LuaValue globalsmeta = LuaValue::pop_value(L);
-		return luameta_setters(globalsmeta);
-	}
-
 	void add_search_path(lua_State* L, const char* path) {
 		LuaValue package = luawrap::globals(L)["package"];
 		package["path"].push();
@@ -99,95 +70,29 @@ namespace lua_api {
 		lua_call(L, 1, 0);
 	}
 
-	static void configure_lua_packages(lua_State* L) {
-		LuaValue package = luawrap::globals(L)["package"];
-		lua_pushnil(L);
-		package["loadlib"].pop(); // Remove for now
-		package["path"] = "./?.lua";
-	}
-
-	static int wrapped_with_globals_mutable(lua_State* L) {
-		bool was_mutable = globals_get_mutability(L);
-		globals_set_mutability(L, true);
-
-		int nargs = lua_gettop(L);
-		lua_pushvalue(L, lua_upvalueindex(1));
-		lua_insert(L, 1);
-		lua_call(L, nargs, LUA_MULTRET);
-
-		globals_set_mutability(L, was_mutable);
-		return lua_gettop(L);
-	}
 
 	static int safe_dofile(LuaStackValue filename) {
 		luawrap::dofile(filename.luastate(), filename.to_str());
 		return 0;
 	}
 
-	// Necessary for interacting with 'module' & luaL_openlib
-	static int wrap_call_permissive(lua_State* L) {
-		int nargs = lua_gettop(L);
-		LuaValue globals = luawrap::globals(L);
+	/* Simple lua configuration.
+	 * Lanarts assumed the lua state was created with this function. */
+	lua_State* create_configured_luastate() {
+		// TODO: Remove all implicit yaml<->lua
+		luawrap::install_type<YAML::Node, lua_pushyaml>();
 
-		if (lua_getmetatable(L, LUA_GLOBALSINDEX)) {
-			lua_getfield(L, -1, "__constants");
-			if (!lua_isnil(L, -1)) {
-				lua_replace(L, LUA_GLOBALSINDEX);
-			} else {
-				lua_pop(L, 1);
-			}
-			lua_pop(L, 1);
-		}
-
-		lua_CFunction cfunc = lua_tocfunction(L, lua_upvalueindex(1));
-		return cfunc(L);
-	}
-
-	/* Creates a lua state with a custom global metatable.
-	 * All further registration assumes the lua state was created with this function. */
-	lua_State* create_luastate() {
 		lua_State* L = lua_open();
-
-		LuaValue globalsmeta = luameta_new(L, "<GlobalVariables>");
-		LuaValue contents = luameta_constants(globalsmeta);
-
-		// Set contents as global table temporarily
-		contents.push();
-		lua_replace(L, LUA_GLOBALSINDEX);
-
-		// Do openlibs before making globals table a proxy
 		luaL_openlibs(L);
 
-		configure_lua_packages(L);
+		// configure_lua_packages:
+		LuaValue package = luawrap::globals(L)["package"];
+		package["loadlib"].set_nil(); // Remove until library loading plan is made
+		package["path"] = "./?.lua";
 
-		luawrap::globals(L)["module"].push();
-		lua_pushcclosure(L, wrap_call_permissive, 1);
-		luawrap::globals(L)["module"].pop();
-		luawrap::globals(L)["require"].push();
-		lua_pushcclosure(L, wrapped_with_globals_mutable, 1);
-		luawrap::globals(L)["require"].pop();
-
-		luawrap::globals(L)["dofile"].bind_function(safe_dofile);
-
-		luameta_defaultsetter(globalsmeta, contents);
-		luameta_defaultgetter(globalsmeta, contents);
-
-		lua_newtable(L);
-
-		/* push global meta table */
-		globalsmeta.push();
-		lua_setmetatable(L, -2); /* set global meta-table*/
-
-		lua_replace(L, LUA_GLOBALSINDEX);
-
+		LuaSpecialValue globals = luawrap::globals(L);
+		globals["dofile"].bind_function(safe_dofile);
 		return L;
-	}
-
-	// Install types for use with luawrap
-	void preinit_state(lua_State* L) {
-		luawrap::install_type<YAML::Node, lua_pushyaml>();
-		// NB: ldraw registers lcommon by default
-		ldraw::lua_register_ldraw(L, luawrap::globals(L));
 	}
 
 	// Register all the lanarts API functions and types
@@ -211,31 +116,6 @@ namespace lua_api {
 	// Convenience function that performs above on captured lua state
 	GameState* gamestate(const LuaStackValue& val) {
 		return gamestate(val.luastate());
-	}
-
-	void globals_set_mutability(lua_State* L, bool mutability) {
-		if (!lua_getmetatable(L, LUA_GLOBALSINDEX)) {
-			return;
-		}
-		LuaValue globalsmeta = LuaValue::pop_value(L);
-
-		LuaValue fallback = luameta_constants(globalsmeta);
-
-		if (!mutability) {
-			fallback.init(L); // set to 'nil'
-		}
-
-		luameta_defaultsetter(globalsmeta, fallback);
-		luameta_defaultgetter(globalsmeta, fallback);
-	}
-
-	bool globals_get_mutability(lua_State* L) {
-		if (!lua_getmetatable(L, LUA_GLOBALSINDEX)) {
-			return true;
-		}
-		LuaValue globalsmeta = LuaValue::pop_value(L);
-		LuaValue fallback = luameta_constants(globalsmeta);
-		return !fallback.isnil();
 	}
 
 	void register_lua_libraries(lua_State* L) {

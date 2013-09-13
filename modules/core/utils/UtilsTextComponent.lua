@@ -1,3 +1,4 @@
+local Mouse = import "core.Mouse"
 local InstanceGroup, TextLabel, InstanceBox, TextInputBox
 
 -- Solve circular dependence by late-loading
@@ -34,7 +35,7 @@ function text_button_create(text, on_click, params)
         local bbox = bbox_padded( xy, self.size, padding )
         self.options.color = bbox_mouse_over( bbox ) and hover_color or no_hover_color
 
-        if mouse_left_pressed and bbox_mouse_over( bbox ) then
+        if Mouse.mouse_left_pressed and bbox_mouse_over( bbox ) then
             on_click()
         end
     end

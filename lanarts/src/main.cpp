@@ -43,7 +43,7 @@ static int __initialize_internal_graphics(lua_State* L) {
 
 static GameState* init_gamestate() {
 
-	lua_State* L = lua_api::create_luastate();
+	lua_State* L = lua_api::create_configured_luastate();
 	lua_api::add_search_path(L, "modules/lanarts/?.lua");
 
 	GameSettings settings; // Initialized with defaults
@@ -63,7 +63,6 @@ static GameState* init_gamestate() {
 	}
 
 	lanarts_net_init(true);
-	lua_api::preinit_state(L);
 	lsound::init();
 
 	//GameState claims ownership of the passed lua_State*

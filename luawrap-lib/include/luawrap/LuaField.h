@@ -55,7 +55,9 @@ public:
 
 	/** Stack methods **/
 	void push() const;
+	void raw_push() const;
 	void pop() const;
+	void raw_pop() const;
 
 	/** Container methods **/
 	LuaField operator[](const char* key) const;
@@ -83,6 +85,7 @@ public:
 	void bind_function(const Function& function) const;
 
 	/** Lua api convenience methods **/
+	void set(int pos);
 	bool has(const char* key) const;
 	void newtable() const;
 	void set_nil() const;

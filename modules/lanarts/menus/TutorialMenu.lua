@@ -17,7 +17,7 @@ local function lanarts_explain_screen_create(click_back, click_forward)
 
     contents:add_instance(
          TextLabel.create( title_font, {color=COL_WHITE}, "Lanarts"),
-         LEFT_TOP,
+         Display.LEFT_TOP,
          {50, 50 }
     )
 
@@ -29,13 +29,13 @@ local function lanarts_explain_screen_create(click_back, click_forward)
                 Press YUIOP to use spell slots 1-5. test test test test test test test test test test test test test test test test test test test test 
             ]]
          ),
-         CENTER
+         Display.CENTER
     )
 
     local window = InstanceBox.create( { size = Display.display_size} )
     window:add_instance(
          contents,
-         CENTER
+         Display.CENTER
     )
     
     return window
@@ -59,15 +59,15 @@ local function tutorial_menu_show(...)
     function go_back()    update_screen(screen_idx - 1) end
     function go_forward() update_screen(screen_idx + 1) end
 
-    while Game.input_capture() and not key_pressed(keys.ESCAPE) and screen  do
+    while Game.input_capture() and not Keys.key_pressed(keys.ESCAPE) and screen  do
         Display.draw_start()
         screen:step( {0,0} )
 
-        if key_pressed(keys.ESCAPE) then
+        if Keys.key_pressed(keys.ESCAPE) then
             screen = nil -- exit
-        elseif key_pressed(keys.ENTER) or key_pressed(keys.RIGHT) then 
+        elseif Keys.key_pressed(keys.ENTER) or Keys.key_pressed(keys.RIGHT) then 
             go_forward()
-        elseif key_pressed(keys.LEFT) then 
+        elseif Keys.key_pressed(keys.LEFT) then 
             go_back()
         end
 

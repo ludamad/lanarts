@@ -45,7 +45,7 @@ function InstanceBox:instances( --[[Optional]] xy)
 end
 
 --- Add an object to this container.
--- @param origin the origin to align against, eg LEFT_TOP, RIGHT_BOTTOM.
+-- @param origin the origin to align against, eg Display.LEFT_TOP, Display.RIGHT_BOTTOM.
 -- @param offset <i>optional, default {0,0}</i> a position offset for the object.
 function InstanceBox:add_instance(obj, origin, --[[Optional]] offset)
     assert( origin_valid(origin), "InstanceBox: Expected origin coordinates between [0,0] and [1,1]") 

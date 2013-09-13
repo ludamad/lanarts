@@ -15,7 +15,7 @@ function inventory_view_create(size)
     local box = InstanceBox.create( { size = size } )
     function box:draw(xy) -- makeshift inheritance
         local bbox = bbox_create(xy, self.size)
-        draw_rectangle_outline(COL_WHITE, bbox, 1)
+        Display.draw_rectangle_outline(COL_WHITE, bbox, 1)
     end 
     return box
 end
@@ -24,8 +24,8 @@ function main()
     local size = {160, 300}
     local inv = inventory_view_create(size)
 
-    while Game.input_capture() and not key_pressed(Keys.ESCAPE) do
-        if key_pressed(Keys.F9) then
+    while Game.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
+        if Keys.key_pressed(Keys.F9) then
             -- note, globals are usually protected against being changed
             -- but a bypass is allowed for cases where it must be done
             setglobal("DEBUG_LAYOUTS", not DEBUG_LAYOUTS) -- flip on/off

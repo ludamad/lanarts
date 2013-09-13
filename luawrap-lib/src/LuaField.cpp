@@ -136,6 +136,11 @@ void LuaField::set_metatable(const LuaField& metatable) const {
 	lua_pop(L, 1);
 }
 
+void LuaField::set(int pos) {
+	lua_pushvalue(L, pos);
+	pop();
+}
+
 void LuaField::init(lua_State* L, char index_type, char parent_type,
 		Index index, Parent parent) {
 	this->L = L;
@@ -191,6 +196,20 @@ void LuaField::push() const {
 	}
 }
 
+void LuaField::raw_push() const {
+	push_parent();
+	if (_index_type == STRING_INDEX) {
+		lua_pushstring(L, _index.string);
+	} else if (_index_type == INTEGER_INDEX){
+		lua_pushinteger(L, _index.integer);
+	} else {// == NO_INDEX
+		/* Nothing, return parent */
+		return;
+	}
+	lua_rawget(L, -2);
+	lua_replace(L, -2);
+}
+
 void LuaField::handle_nil_parent() const {
 	std::string idxpath = "";
 	if (_parent_type == FIELD_PARENT) {
@@ -235,6 +254,26 @@ void LuaField::pop() const {
 	lua_pushvalue(L, -3);
 	/* Parent */
 	lua_settable(L, -3);
+	/* Pop parent and value to pop*/
+	lua_pop(L, 2);
+}
+
+void LuaField::raw_pop() const {
+	if (_index_type == NO_INDEX) {
+		luawrap::error("Cannot mutate LuaField that has no index!");
+	}
+	push_parent();
+
+	if (_index_type == STRING_INDEX) {
+		lua_pushstring(L, _index.string);
+	} else {
+		lua_pushinteger(L, _index.integer);
+	}
+
+	/* Value to pop */
+	lua_pushvalue(L, -3);
+	/* Parent */
+	lua_rawset(L, -3);
 	/* Pop parent and value to pop*/
 	lua_pop(L, 2);
 }
@@ -367,10 +406,12 @@ int LuaField::objlen() const {
 }
 
 const LuaField& luawrap::ensure_table(const LuaField& field) {
-	field.push();
-	if (!lua_istable(field.luastate(), -1)) {
-		field.newtable();
+	lua_State* L = field.luastate();
+	field.raw_push();
+	if (!lua_istable(L, -1)) {
+		lua_newtable(L);
+		field.raw_pop();
 	}
-	lua_pop(field.luastate(), 1);
+	lua_pop(L, 1); // Field
 	return field;
 }

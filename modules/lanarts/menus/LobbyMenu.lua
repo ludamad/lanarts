@@ -46,7 +46,7 @@ local function loading_box_create(size)
     local obj = InstanceBox.create( {size=size} )
     local loading_animation = animation_create( image_split(image_cached_load "modules/lanarts/menus/loading_64x64.png", {64, 64}), 0.1 )
     local contents = Sprite.create(loading_animation, {color=with_alpha(COL_WHITE, 0.25)} )
-    obj:add_instance(contents, CENTER_TOP, {0,50})
+    obj:add_instance(contents, Display.CENTER_TOP, {0,50})
     -- Called when component has loaded
     function obj:replace(newcontents, origin)
         if contents then self:remove(contents) end
@@ -114,16 +114,16 @@ end
 
 function game_entry_draw(number, entry, bbox)
     local game_number_color = vector_interpolate(COL_YELLOW, COL_DARK_GRAY, (number-1) / 10)
-    draw_in_box(alt_font, bbox, LEFT_CENTER, {-14,0}, {game_number_color, number})
-    draw_in_box(small_font, bbox, LEFT_TOP, {0,18}, {COL_WHITE, "Host: "}, {COL_PALE_RED, entry.host})
-    draw_in_box(small_font, bbox, LEFT_TOP, {0,3}, {COL_WHITE, "Players: "}, {COL_MUTED_GREEN, player_list_string(entry.players, PLAYER_LIST_MAX_CHARS)} )    
+    draw_in_box(alt_font, bbox, Display.LEFT_CENTER, {-14,0}, {game_number_color, number})
+    draw_in_box(small_font, bbox, Display.LEFT_TOP, {0,18}, {COL_WHITE, "Host: "}, {COL_PALE_RED, entry.host})
+    draw_in_box(small_font, bbox, Display.LEFT_TOP, {0,3}, {COL_WHITE, "Players: "}, {COL_MUTED_GREEN, player_list_string(entry.players, PLAYER_LIST_MAX_CHARS)} )    
     -- XXX: Find out why this returns nil on windows
     local date = os.date("%I:%M%p", entry.creationTime)
     if date ~= nil then
         draw_in_box(small_font, bbox, RIGHT_TOP, {-5,20},  {COL_LIGHT_GRAY, date } )
     end
 
-    draw_rectangle_outline( bbox_mouse_over(bbox) and COL_WHITE or COL_GRAY, bbox, 1 )
+    Display.draw_rectangle_outline( bbox_mouse_over(bbox) and COL_WHITE or COL_GRAY, bbox, 1 )
 end
 
 local function game_query_task_create(menu)
@@ -140,7 +140,7 @@ local function game_query_task_create(menu)
             end
             local response = lobby.query_game_list()
             first_time = false
-            menu.entry_list:replace( game_entry_list_create(response.gameList), LEFT_TOP, {0,0} )
+            menu.entry_list:replace( game_entry_list_create(response.gameList), Display.LEFT_TOP, {0,0} )
         end
     end
     tasks.create(query_game_list)
@@ -152,9 +152,9 @@ local function lobby_menu_create(on_back_click)
     menu.alive = true
 
     menu.entry_list = loading_box_create({350, 400})
-    menu:add_instance(menu.entry_list, LEFT_TOP, {20, 200})
-    menu:add_instance(Sprite.image_create(logo_path), LEFT_TOP, {10,10})
-    menu:add_instance(TextLabel.create(alt_font, "Open Games"), LEFT_TOP, {20,175})
+    menu:add_instance(menu.entry_list, Display.LEFT_TOP, {20, 200})
+    menu:add_instance(Sprite.image_create(logo_path), Display.LEFT_TOP, {10,10})
+    menu:add_instance(TextLabel.create(alt_font, "Open Games"), Display.LEFT_TOP, {20,175})
 
     local w, h = unpack(menu.size)
     local right_side = InstanceBox.create{ size = {w/2, h} }
@@ -163,7 +163,7 @@ local function lobby_menu_create(on_back_click)
         name_field_create { 
             label_text = "Your name: ",
             size = SETTINGS_BOX_SIZE, font = small_font, max_chars = SETTINGS_BOX_MAX_CHARS
-        }, CENTER, {0, -13}
+        }, Display.CENTER, {0, -13}
     )
 
     game_query_task_create(menu)
@@ -174,7 +174,7 @@ local function lobby_menu_create(on_back_click)
                 return on_back_click(...) 
             end, 
             {font = large_font} ), 
-        CENTER, {0, 100}
+        Display.CENTER, {0, 100}
     )
 
     menu:add_instance(right_side, RIGHT_CENTER)

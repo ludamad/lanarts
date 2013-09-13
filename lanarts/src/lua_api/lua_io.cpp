@@ -88,19 +88,6 @@ static int mouse_right_pressed(lua_State* L) {
 	return 1;
 }
 
-static Pos screen_coords(const LuaStackValue& value) {
-	GameState* gs = lua_api::gamestate(value);
-	return on_screen(gs, value.as<Pos>());
-}
-
-static Pos world_coords(const LuaStackValue& value) {
-	GameState* gs = lua_api::gamestate(value);
-	Pos p = value.as<Pos>();
-	p.x += gs->view().x;
-	p.y += gs->view().y;
-	return p;
-}
-
 /* START of TextField bindings */
 
 static void textfield_step(TextField& textfield) {
@@ -190,30 +177,24 @@ namespace lua_api {
 	void register_io_api(lua_State* L) {
 		luawrap::install_plaindata_type<SDL_Event>();
 
-		lua_register_lsound(L, lua_api::global_module(L));
+		register_lua_submodule(L, "core.io.SerializeBuffer", lua_serializebuffer_type(L));
+		lua_register_lsound(L, register_lua_submodule_as_luamodule(L, "core.Sound"));
 		register_input_table(L);
 
 		register_textfield(L);
 
-		LuaValue globals = luawrap::globals(L);
-		globals.push();
-		LuaValue global_getters = lua_api::global_getters(L);
+		// Mouse API
+		LuaModule mouse = lua_api::register_lua_submodule_as_luamodule(L, "core.Mouse");
+		mouse.getters["mouse_xy"].bind_function(mouse_xy);
+		mouse.getters["mouse_left_held"].bind_function(mouse_left_held);
+		mouse.getters["mouse_left_pressed"].bind_function(mouse_left_pressed);
+		mouse.getters["mouse_right_held"].bind_function(mouse_right_held);
+		mouse.getters["mouse_right_pressed"].bind_function(mouse_right_pressed);
 
-		global_getters["mouse_xy"].bind_function(mouse_xy);
-		global_getters["mouse_left_held"].bind_function(mouse_left_held);
-		global_getters["mouse_left_pressed"].bind_function(mouse_left_pressed);
-		global_getters["mouse_right_held"].bind_function(mouse_right_held);
-		global_getters["mouse_right_pressed"].bind_function(mouse_right_pressed);
-
-		globals["key_pressed"].bind_function(key_pressed);
-		globals["key_held"].bind_function(key_held);
-
-		globals["key_held"].bind_function(key_held);
-
-		globals["screen_coords"].bind_function(screen_coords);
-		globals["world_coords"].bind_function(world_coords);
-
+		// Keyboard API
 		LuaValue keys = lua_api::register_lua_submodule(L, "core.Keyboard");
+		keys["key_pressed"].bind_function(key_pressed);
+		keys["key_held"].bind_function(key_held);
 
 		keys["ENTER"] = (int)SDLK_RETURN;
 		keys["TAB"] = (int)SDLK_TAB;
@@ -244,8 +225,5 @@ namespace lua_api {
 		keys["F13"] = (int)SDLK_F13;
 		keys["F14"] = (int)SDLK_F14;
 		keys["F15"] = (int)SDLK_F15;
-
-		LuaValue imported = luawrap::ensure_table(globals["_INTERNAL_IMPORTED"]);
-		imported["core.io.SerializeBuffer"] = lua_serializebuffer_type(L);
 	}
 }

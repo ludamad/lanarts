@@ -27,21 +27,21 @@ end
 
 local function center_screen_setup()
 	local center_box = InstanceBox.create( { size = {640, 480} } )
-	local task_label = TextLabel.create( Fonts.small, {color=COL_MUTED_GREEN, origin=CENTER_TOP}, "")
-	local loading_label = TextLabel.create( Fonts.large, { color=COL_LIGHT_GRAY, origin=CENTER_TOP }, "" )
+	local task_label = TextLabel.create( Fonts.small, {color=COL_MUTED_GREEN, origin=Display.CENTER_TOP}, "")
+	local loading_label = TextLabel.create( Fonts.large, { color=COL_LIGHT_GRAY, origin=Display.CENTER_TOP }, "" )
 	local dragon_sprite = Sprite.image_create("modules/lanarts/enemies/bosses/sprites/reddragon.png")
 
 	center_box:add_instance( 
 		loading_label,
-		CENTER,
+		Display.CENTER,
 		-- Up 100 pixels
 		{0, -100}
 	)
 	center_box:add_instance( 
 		dragon_sprite,
-		CENTER
+		Display.CENTER
 	)
-	center_box:add_instance( task_label, CENTER, --[[Down 50 pixels]] {0, 50} )
+	center_box:add_instance( task_label, Display.CENTER, --[[Down 50 pixels]] {0, 50} )
 
 	function setup_callback(percentage, task) 
 		task_label.text = task
@@ -59,7 +59,7 @@ local function loading_screen_setup(...)
 
 	local screen_box = InstanceBox.create( { size = Display.display_size } )
 
-    screen_box:add_instance( center_screen_setup(), CENTER )
+    screen_box:add_instance( center_screen_setup(), Display.CENTER )
 
 	-- set up cache
 	cached_screen = screen_box

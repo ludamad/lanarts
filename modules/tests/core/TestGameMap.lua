@@ -1,6 +1,7 @@
 local GameMap = import "core.GameMap"
 local GameObject = import "core.GameObject"
 local MapGen = import "core.MapGeneration"
+local Display = import "core.Display"
 
 local gmap = GameMap.create { 
     map = MapGen.map_create { 
@@ -8,7 +9,7 @@ local gmap = GameMap.create {
         size = {256,256},            
         content = Data.tile_create { 
             images = {
-                image_load (path_resolve "test_tile.png")
+                Display.images_load (path_resolve "test_tile.png")
             }
         }
     }

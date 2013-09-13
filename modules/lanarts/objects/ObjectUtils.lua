@@ -38,7 +38,7 @@ end
 function M.screen_draw(sprite, xy, --[[Optional]] alpha, --[[Optional]] frame)
     local color = alpha and with_alpha(COL_WHITE, alpha) or COL_WHITE
     sprite:draw(
-        {origin=CENTER, color=color, frame=frame},
+        {origin=Display.CENTER, color=color, frame=frame},
         Display.to_screen_xy(xy)
     )
 end

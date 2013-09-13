@@ -12,8 +12,6 @@
 #include <lcommon/strformat.h>
 
 #include <luawrap/luawrap.h>
-#include <luawrap/functions.h>
-#include <luawrap/calls.h>
 #include <lcommon/directory.h>
 #include <lcommon/lua_serialize.h>
 
@@ -373,12 +371,7 @@ static std::string lapi_string_join(const char* joiner, LuaStackValue table) {
 }
 
 static int lapi_setglobal(lua_State* L) {
-	bool prev = lua_api::globals_get_mutability(L);
-
-	lua_api::globals_set_mutability(L, true);
 	lua_settable(L, LUA_GLOBALSINDEX); // use params 1 & 2
-	lua_api::globals_set_mutability(L, prev);
-
 	return 1; /* return the table */
 }
 
@@ -624,6 +617,12 @@ namespace lua_api {
 		submodule.newtable();
 		lua_protect_table(submodule); // Ensure that nil access is an error
 		register_lua_submodule(L, vpath, submodule);
+		return submodule;
+	}
+
+	LuaModule register_lua_submodule_as_luamodule(lua_State* L, const char* vpath) {
+		LuaModule submodule(L, vpath);
+		register_lua_submodule(L, vpath, submodule.proxy);
 		return submodule;
 	}
 

@@ -1,5 +1,7 @@
 local utils = import "core.Utils"
-local keys = import "core.Keyboard"
+local Keys = import "core.Keyboard"
+local Mouse = import "core.Mouse"
+local Display = import "core.Display"
 
 local BLINK_TIME_MS = 600
 local BLINK_HELD_MS = 600
@@ -10,7 +12,7 @@ local TextInputBox = newtype()
 
 --- Create an interactive text field
 -- font: the font to draw with
--- size: the size of the box to draw around the text
+-- size: the size of the box to draw around the texth
 -- fieldargs: {max characters, default_text} 
 -- callbacks: {optional 'update' callback, 
 --              optional 'select' callback, 
@@ -55,9 +57,9 @@ function TextInputBox:step(xy)
         self:update()
     end
 
-    local clicked = mouse_left_pressed and self:mouse_over(xy)
+    local clicked = Mouse.mouse_left_pressed and self:mouse_over(xy)
 
-    if (key_pressed(keys.ENTER) or mouse_left_pressed) and self.selected then
+    if (Keys.key_pressed(Keys.ENTER) or Mouse.mouse_left_pressed) and self.selected then
         self.selected = false
         self:deselect()
     elseif clicked and not self.selected then
@@ -85,7 +87,7 @@ end
 function TextInputBox:draw(xy)
     local bbox = bbox_create(xy, self.size)
 
-    draw_rectangle(COL_DARKER_GRAY, bbox)
+    Display.draw_rectangle(COL_DARKER_GRAY, bbox)
 
     local textcolor = self.valid_string(self.text) and COL_MUTED_GREEN or COL_LIGHT_RED
 
@@ -98,7 +100,7 @@ function TextInputBox:draw(xy)
     end
 
     self.font:draw(
-        {color = textcolor, origin = LEFT_CENTER}, 
+        {color = textcolor, origin = Display.LEFT_CENTER}, 
         {x + 5, y + h / 2}, 
         text
     )
@@ -111,7 +113,7 @@ function TextInputBox:draw(xy)
         boxcolor = COL_MID_GRAY
     end
 
-    draw_rectangle_outline(boxcolor, bbox_create(xy, self.size), 1)
+    Display.draw_rectangle_outline(boxcolor, bbox_create(xy, self.size), 1)
     DEBUG_BOX_DRAW(self, xy)
 end
 

@@ -62,7 +62,7 @@ function M.post_draw()
     for pdata in values(World.players) do
         local p = pdata.instance
         if not p:is_local_player() and p.map == player.map then
-            Fonts.small:draw({color=COL_WHITE, origin=CENTER}, screen_coords{p.x, p.y-18}, pdata.name)
+            Fonts.small:draw({color=COL_WHITE, origin=Display.CENTER}, screen_coords{p.x, p.y-18}, pdata.name)
         end
     end
 
@@ -78,7 +78,7 @@ function M.overlay_draw()
 
     if fps then
         local w,h = unpack( Display.display_size ) 
-        Fonts.small:draw( {origin=RIGHT_BOTTOM}, {w, h}, "FPS: " .. math.floor(fps) )
+        Fonts.small:draw( {origin=Display.RIGHT_BOTTOM}, {w, h}, "FPS: " .. math.floor(fps) )
     end
 
     local ms = fps_timer:get_milliseconds()
@@ -99,15 +99,15 @@ function M.run_loop()
     while true do 
         local single_player = (settings.connection_type == net.NONE)
     
-        if key_pressed(Keys.F2) and single_player then 
+        if Keys.key_pressed(Keys.F2) and single_player then 
             Game.resources_load()
         end
     
-        if key_pressed(Keys.F4) then 
+        if Keys.key_pressed(Keys.F4) then 
             M.loop_control.game_is_paused = not M.loop_control.game_is_paused
         end
 
-        if key_pressed(Keys.ESCAPE) then 
+        if Keys.key_pressed(Keys.ESCAPE) then 
             EventLog.add("Press Shift + Esc to exit, your progress will be saved.")
         end
 
@@ -124,7 +124,7 @@ function M.run_loop()
             break
         end
 
-        if key_pressed(Keys.F5) then
+        if Keys.key_pressed(Keys.F5) then
             Game.input_capture(true) -- reset input
             net.sync_message_send()
         end

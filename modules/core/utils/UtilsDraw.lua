@@ -1,7 +1,8 @@
 import ".UtilsGeneral" -- for 'memoized'
+local Display = import "core.Display"
 
 --- Draw parts of text colored differently
--- @usage draw_colored_parts(font, LEFT_TOP, {0,0}. {COL_RED, "hi "}, {COL_BLUE, "there"} )
+-- @usage draw_colored_parts(font, Display.LEFT_TOP, {0,0}. {COL_RED, "hi "}, {COL_BLUE, "there"} )
 function draw_colored_parts(font, origin, xy, ...)
     local rx, ry = 0, 0
 
@@ -30,9 +31,9 @@ function draw_colored_parts(font, origin, xy, ...)
 end
 
 --- Load a font, first checking if it exists in a cache
-font_cached_load = memoized(font_load)
+font_cached_load = memoized(Display.font_load)
 --- Load an image, first checking if it exists in a cache
-image_cached_load = memoized(image_load)
+image_cached_load = memoized(Display.image_load)
 DEBUG_LAYOUTS = false
 -- Used for debug information overlay
 function DEBUG_BOX_DRAW(self, xy)
@@ -44,10 +45,10 @@ function DEBUG_BOX_DRAW(self, xy)
         local alpha = mouse_is_over and 0.5 or 0.25
 
         if mouse_is_over then
-            debug_font:draw( { color = COL_WHITE, origin = LEFT_BOTTOM }, xy, tostring(self) )
+            debug_font:draw( { color = COL_WHITE, origin = Display.LEFT_BOTTOM }, xy, tostring(self) )
         end
 
-        draw_rectangle_outline(with_alpha(color, alpha), bbox_create(xy, self.size), line_width )
+        Display.draw_rectangle_outline(with_alpha(color, alpha), bbox_create(xy, self.size), line_width )
     end
 end
 

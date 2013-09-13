@@ -16,35 +16,35 @@ local function death_screen_create()
 
     box:add_instance(
         sprite,
-        CENTER
+        Display.CENTER
     )
 
     box:add_instance(
          TextLabel.create( font_cached_load(death_screen_font, 20), {color=COL_PALE_RED}, "You Have Died!"),
-         CENTER,
+         Display.CENTER,
          {0, (-40 - sprite.size[2]/2) }
     )
 
     if settings.regen_on_death then
         box:add_instance(
              TextLabel.create( font_cached_load(death_screen_font, 20), {color=COL_LIGHT_GRAY}, "Press enter to respawn."),
-             CENTER,
+             Display.CENTER,
              {0, (20 + sprite.size[2]/2) }
         )
     else
         box:add_instance(
              TextLabel.create( font_cached_load(death_screen_font, 12), {color=COL_RED}, "Hardcore death is permanent!"),
-             CENTER,
+             Display.CENTER,
              {0, (-20 - sprite.size[2]/2) }
         )
         box:add_instance(
              TextLabel.create( font_cached_load(death_screen_font, 20), {color=COL_LIGHT_GRAY}, "Thanks for playing."),
-             CENTER,
+             Display.CENTER,
              {0, (20 + sprite.size[2]/2) }
         )
         box:add_instance(
              TextLabel.create( font_cached_load(settings.menu_font, 12), {color=COL_PALE_YELLOW}, "-ludamad"),
-             CENTER,
+             Display.CENTER,
              {100, (45 + sprite.size[2]/2) }
         )
     end
@@ -53,7 +53,7 @@ local function death_screen_create()
     function box:draw(xy) --Makeshift inheritance
         InstanceBox.draw(self, xy)
         black_box_alpha = math.max(0, black_box_alpha - 0.05)
-        draw_rectangle(
+        Display.draw_rectangle(
             with_alpha(COL_BLACK, black_box_alpha), 
             bbox_create( {0,0}, Display.display_size )
         ) 
@@ -65,7 +65,7 @@ end
 local function death_screen_show(...)
     local screen = death_screen_create(...)
 
-    while Game.input_capture(true, false) and not key_pressed(keys.ESCAPE) and not key_pressed(keys.ENTER) and not key_pressed(keys.SPACE) do
+    while Game.input_capture(true, false) and not Keys.key_pressed(keys.ESCAPE) and not Keys.key_pressed(keys.ENTER) and not Keys.key_pressed(keys.SPACE) do
         Display.draw_start()
         screen:step( {0,0} )
         screen:draw( {0,0} )

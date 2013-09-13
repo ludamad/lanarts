@@ -25,12 +25,6 @@ namespace lua_api {
 	// Convenience function that performs above on captured lua state
 	GameState* gamestate(const LuaStackValue& val);
 
-	LuaValue global_getters(lua_State* L);
-	LuaModule global_module(lua_State* L);
-	LuaValue global_setters(lua_State* L);
-	void globals_set_mutability(lua_State* L, bool mutability);
-	bool globals_get_mutability(lua_State* L);
-
 	/* Add a path for searching with the 'require' function. */
 	void add_search_path(lua_State* L, const char* path);
 	/* Use serach path to load a module if it has not yet been loaded. */
@@ -38,7 +32,7 @@ namespace lua_api {
 
 	/* Creates a lua state with a custom global metatable.
 	 * All further registration assumes the lua state was created with this function. */
-	lua_State* create_luastate();
+	lua_State* create_configured_luastate();
 
 	void preinit_state(lua_State* L); // TODO: This should be removed some time
 
@@ -46,6 +40,7 @@ namespace lua_api {
 
 	void register_lua_submodule(lua_State* L, const char* vpath, LuaValue module);
 	LuaValue register_lua_submodule(lua_State* L, const char* vpath);
+	LuaModule register_lua_submodule_as_luamodule(lua_State* L, const char* vpath);
 	void register_lua_submodule_loader(lua_State* L, const char* vpath, LuaValue loader);
 
 	/* Register general utility functions */

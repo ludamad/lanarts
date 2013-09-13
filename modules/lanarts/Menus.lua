@@ -11,9 +11,9 @@ local LobbyMenu = import "@menus.LobbyMenu"
 local PregameMenu = import "@menus.PregameMenu"
 local ScoresMenu = import "@menus.ScoresMenu"
 
-local tasks = import "core.networking.Tasks"
-local keys = import "core.Keyboard"
-
+local Tasks = import "core.networking.Tasks"
+local Keys = import "core.Keyboard"
+    
 -- START SCREEN -- 
 local text_button_params = {
     font = font_cached_load(settings.menu_font, 20),
@@ -26,11 +26,11 @@ local function start_menu_create(on_start_click, on_join_click, on_load_click, o
     local menu = InstanceBox.create( { size = Display.display_size } )
     local transparent_sprite =  Sprite.image_create(path_resolve "LANARTS-transparent.png")
     transparent_sprite.options.color= {255, 255, 255, 50}
-    menu:add_instance(transparent_sprite, CENTER_TOP, {-15, 45})
+    menu:add_instance(transparent_sprite, Display.CENTER_TOP, {-15, 45})
 
     menu:add_instance(
         Sprite.image_create(path_resolve "LANARTS.png"),
-        CENTER_TOP,
+        Display.CENTER_TOP,
         --[[Down 10 pixels]]
         {0, 30}
     )
@@ -38,14 +38,14 @@ local function start_menu_create(on_start_click, on_join_click, on_load_click, o
     local y_position = 70 -- Start down 70 pixels
     menu:add_instance(
         text_button_create("Start or Join a Game", on_start_click, text_button_params),
-        CENTER,
+        Display.CENTER,
         {0, y_position}
     )
     y_position = y_position + 50
 
 --    menu:add_instance(
 --        text_button_create("Browse Hosted Games", on_join_click, text_button_params),
---        CENTER,
+--        Display.CENTER,
 --        {0, y_position}
 --    )
 --    y_position = y_position + 50
@@ -53,7 +53,7 @@ local function start_menu_create(on_start_click, on_join_click, on_load_click, o
     if file_exists("saves/savefile.save") then
         menu:add_instance(
             text_button_create("Continue Game", on_load_click, text_button_params),
-            CENTER,
+            Display.CENTER,
             {0, y_position}
         )
         y_position = y_position + 50
@@ -61,16 +61,16 @@ local function start_menu_create(on_start_click, on_join_click, on_load_click, o
 
     menu:add_instance(
         text_button_create("Highscores", on_score_click, text_button_params),
-        CENTER,
+        Display.CENTER,
         {0, y_position}
     )
     y_position = y_position + 50
 
     function menu:step(xy) -- Makeshift inheritance
        InstanceBox.step(self, xy)
-       if key_pressed('N') then
+       if Keys.key_pressed('N') then
             on_start_click()
-       elseif key_pressed('S') then
+       elseif Keys.key_pressed('S') then
             on_score_click()
        end 
     end
@@ -126,7 +126,7 @@ function setup_start_menu()
     menu_state.menu:add_instance(
         start_menu_create( --[[New Game Button]] setup_settings_menu, --[[Join Game Button]] setup_lobby_menu, 
             --[[Load Game Button]] on_load_click, --[[Highscores Button]] setup_scores_menu),
-        CENTER
+        Display.CENTER
     )
 end
 
@@ -142,7 +142,7 @@ function setup_settings_menu()
 
     menu_state.menu:add_instance(
         GameSettingsMenu.create( --[[Back Button]] menu_state.back, --[[Start Game Button]] menu_state.continue), 
-        CENTER
+        Display.CENTER
     )
 end
 
@@ -155,7 +155,7 @@ function setup_pregame_menu()
     menu_state.continue = exit_menu
     menu_state.menu:add_instance(
         PregameMenu.create( --[[Start Game Button]] menu_state.continue ),
-        CENTER
+        Display.CENTER
     )
 end
 
@@ -165,7 +165,7 @@ function setup_scores_menu()
     menu_state.continue = nil
     menu_state.menu:add_instance(
         ScoresMenu.create( --[[Back Button]] menu_state.back ),
-        CENTER
+        Display.CENTER
     )
 end
 
@@ -175,13 +175,13 @@ function setup_lobby_menu()
     menu_state.continue = nil
     menu_state.menu:add_instance(
         LobbyMenu.create( --[[Back Button]] menu_state.back ),
-        CENTER
+        Display.CENTER
     )
 end
 
 local function menu_loop(should_poll)
     while Game.input_capture() do
-        if key_pressed(keys.F9) then
+        if Keys.key_pressed(Keys.F9) then
             -- note, globals are usually protected against being changed
             -- but a bypass is allowed for cases where it must be done
             setglobal("DEBUG_LAYOUTS", not DEBUG_LAYOUTS) -- flip on/off
@@ -193,9 +193,9 @@ local function menu_loop(should_poll)
 
         menu_state.menu:step( {0, 0} )
 
-        if key_pressed(keys.ESCAPE) and menu_state.back then
+        if Keys.key_pressed(Keys.ESCAPE) and menu_state.back then
             menu_state.back()
-        elseif key_pressed(keys.ENTER) and menu_state.continue then
+        elseif Keys.key_pressed(Keys.ENTER) and menu_state.continue then
             menu_state.continue()
         end
 
@@ -207,7 +207,7 @@ local function menu_loop(should_poll)
         menu_state.menu:draw( {0, 0} )
         Display.draw_finish()
 
-        tasks.run_all()
+        Tasks.run_all()
         Game.wait(10)
     end
 

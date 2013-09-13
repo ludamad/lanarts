@@ -27,7 +27,7 @@ int read_eval_print(lua_State *L);
 static lua_State* setup_lua_state() {
 	using namespace ldraw;
 
-	lua_State* L = lua_api::create_luastate();
+	lua_State* L = lua_api::create_configured_luastate();
 
 	lua_api::add_search_path(L, "modules/?.lua");
 	lua_api::register_api(new GameState(GameSettings(), L), L);
@@ -37,8 +37,6 @@ static lua_State* setup_lua_state() {
 
 static void perform_luascript(lua_State* L, const char* file) {
 	luawrap::dofile(L, file);
-	lua_api::globals_set_mutability(L, false);
-
 	luawrap::globals(L)["main"].push();
 	if (!lua_isnil(L, -1)) {
 		luawrap::call<void>(L);

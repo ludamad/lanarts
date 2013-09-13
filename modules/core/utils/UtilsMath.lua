@@ -147,7 +147,7 @@ function table.add(a,b)
     end
 end
 
---- Returns the position of an object of size 'size' aligned to a bounding box origin (eg, RIGHT_BOTTOM)
+--- Returns the position of an object of size 'size' aligned to a bounding box origin (eg, Display.RIGHT_BOTTOM)
 -- @param bbox the surrounding bounding box
 -- @param origin the origin within the bounding box
 -- @param obj_size <i>optional, default {0,0}</i> the size of the object
@@ -161,7 +161,7 @@ function origin_aligned(bbox, origin, --[[Optional]] obj_size, --[[Optional]] of
 end
 
 --- Returns whether 'origin' represents a valid origin. 
--- A valid origin is a pair of numbers between 0 and 1, representing placement on a rectangle, eg LEFT_TOP is {0,0}.
+-- A valid origin is a pair of numbers between 0 and 1, representing placement on a rectangle, eg Display.LEFT_TOP is {0,0}.
 function origin_valid(origin)
     local rx, ry = unpack(origin)
     return rx >= 0 and rx <= 1 and ry >= 0 and ry <= 1

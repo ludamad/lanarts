@@ -55,6 +55,7 @@ public:
 	LuaField operator[](int index) const;
 
 	/* Lua API convenience methods */
+	void set(int pos);
 	bool has(const char* key) const;
 	void newtable() const;
 	void set_nil() const;
