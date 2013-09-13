@@ -300,16 +300,7 @@ local function main()
     Display.initialize("Lanarts", {640, 480}, false)
 
     -- Load game content
-    import "@items.DefineConsumables"
-    import "@items.DefineWeapons"
-    import "@items.DefineRings"
-    import "@items.DefineArmour"
-
-    import "@races.DefineRaces"
-
-    import "@stats.DefineSkills"
-
-    import "@monsters.DefineAnimals"
+    import "@DefineAll"
 
     -- Make sure EventLog.add prints to console instead
     local EventLog = import "core.ui.EventLog"

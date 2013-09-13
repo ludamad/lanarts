@@ -20,7 +20,7 @@ end
 function M.resolve_aptitude_bonuses(table, --[[Optional]] result)
     result = result or {effectiveness={},damage={},resistance={},defence={}}
     for key,val in pairs(table) do
-        if rawget(Apts, key) then
+        if Apts.allowed_aptitudes[key] then
             local eff,dam,res,def
             if type(val) == 'number' then
                 eff,dam,res,def = val,val,val,val

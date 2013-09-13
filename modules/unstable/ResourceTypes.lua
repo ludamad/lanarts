@@ -49,6 +49,10 @@ function M.type_create(--[[Optional]] resource_creation_function, --[[Optional]]
         end
     end
 
+    function R.values()
+        return values(R.list)
+    end
+
     return R
 end
 

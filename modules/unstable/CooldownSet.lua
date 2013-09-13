@@ -26,9 +26,13 @@ end
 
 local MIN_DIVISOR = 0.25 -- No more than 4x needed cooldown 
 
-function CooldownSet:cooldown_apply(stats, type, cooldown, --[[Optional]] f)
+function CooldownSet:apply_cooldown(type, cooldown, --[[Optional]] f)
     f = f or math.max
     self.cooldowns[type] = f(self.cooldowns[type] or 0, cooldown) 
+end
+
+function CooldownSet:add_cooldown(type, cooldown)
+    self.cooldowns[type] = self.cooldowns[type] or 0 + cooldown 
 end
 
 function CooldownSet:has_cooldown(type)

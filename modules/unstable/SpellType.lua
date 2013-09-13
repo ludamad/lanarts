@@ -42,8 +42,6 @@ local SpellType = ResourceTypes.type_create(
 		recommended_stats = S.TABLE_OR_NIL,
 
         on_use = S.FUNCTION,
-        on_cooldown_prerequisite = S.FUNCTION,
-        on_cooldown_apply = S.FUNCTION,
         on_prerequisite = S.FUNCTION_OR_NIL,
         on_autotarget = S.FUNCTION_OR_NIL,
 

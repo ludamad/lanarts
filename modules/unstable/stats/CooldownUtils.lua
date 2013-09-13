@@ -1,6 +1,7 @@
 local Attacks = import "@Attacks"
 local Types = import ".CooldownTypes"
 local Apts = import "@stats.AptitudeTypes"
+local StatContext = import "@StatContext"
 
 local M = nilprotect {} -- Submodule
 
@@ -38,6 +39,18 @@ function M.derive_attack_with_cooldown(args)
     end
 
     return M.resolve_action_cooldown(attack)
+end
+
+-- Function for applying to all cooldowns
+function M.multiply_all_cooldown_rates(stats, rate, --[[Optional]] permanent)
+    for type,_cooldown in pairs(Types.default_cooldown_table) do
+        StatContext.multiply_cooldown_rate(stats, type, rate, permanent)
+    end
+end
+
+function M.reset_rest_cooldown(stats)
+    local cooldown = Types.default_cooldown_table[Types.REST_ACTION]
+    StatContext.apply_cooldown(stats, Types.REST_ACTION, cooldown)
 end
 
 --------------------------------------------------------------------------------

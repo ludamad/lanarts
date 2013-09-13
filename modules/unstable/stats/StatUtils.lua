@@ -5,10 +5,6 @@ local C = import "core.terminal.AnsiColors"
 
 local M = nilprotect {} -- Submodule
 
-function M.reset_rest_cooldown(stats)
-    StatContext.set_cooldown(stats, CooldownTypes.REST_ACTION, CooldownTypes.REST_COOLDOWN_AMOUNT)
-end
-
 function M.round_for_print(num)
     assert(num >= 0)
     if num < 1 then return 1 end

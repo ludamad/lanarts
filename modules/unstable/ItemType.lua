@@ -32,6 +32,7 @@ local schema = {
     on_step = S.FUNCTION_OR_NIL,
     on_evoke = S.FUNCTION_OR_NIL,
     on_wield = S.FUNCTION_OR_NIL,
+    on_wield_prerequisite = S.FUNCTION_OR_NIL,
     on_calculate = S.defaulted(S.FUNCTION, default_on_calculate)
 }
 

@@ -1,6 +1,7 @@
 local SkillType = import "@SkillType"
 local StatContext = import "@StatContext"
-local Apts = import ".AptitudeTypes"
+local Apts = import "@stats.AptitudeTypes"
+local ExperienceCalculation = import "@stats.ExperienceCalculation"
 
 local M = {} -- Submodule
 
@@ -29,9 +30,19 @@ local function on_calculate(skill_slot, user)
     end
 end
 
+local function xp2level(skill_slot, xp)
+    return ExperienceCalculation.skill_level_from_cost(skill_slot.type.cost_multiplier, xp)
+end
+
+local function on_spend_experience(skill_slot, xp)
+    skill_slot.experience = skill_slot.experience + xp
+    skill_slot.level = xp2level(skill_slot, skill_slot.experience)
+end
+
 local function skill_define(args)
     args.aptitudes = resolve_aptitude_bonuses(args.aptitudes)
     args.on_calculate = on_calculate
+    args.on_spend_experience = on_spend_experience
     return SkillType.define(args)
 end
 

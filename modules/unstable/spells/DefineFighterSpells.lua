@@ -1,12 +1,9 @@
-local SpellType = import "@SpellType"
+local spell_define = (import "@SpellType").define
 local StatusType = import "@StatusType"
 
 local SpellTraits = import ".SpellTraits"
-local status_types = import ".DefineStatusTypes"
 
-local M = nilprotect {} -- Submodule
-
-M.berserk = SpellType.define {
+spell_define {
 	name = "Berserk",
 	description = "Allows you to strike powerful blows for a limited duration, afterwards you are slower and vulnerable.",
 	mp_cost = 40,
@@ -17,19 +14,17 @@ M.berserk = SpellType.define {
     on_prerequisite = function(self, caster)
         local D = caster.derived
 
-        local not_exhausted = not StatusType.get_hook(D.hooks, status_types.Exhausted)
-        local not_berserk = not StatusType.get_hook(D.hooks, status_types.Berserk)
+        local not_exhausted = not StatusType.get_hook(D.hooks, "Exhausted")
+        local not_berserk = not StatusType.get_hook(D.hooks, "Berserk")
  
         return not_exhausted and not_berserk
     end,
 
     on_use = function(self, caster)
         local B = caster.base
-        StatusType.update_hook(B.hooks, status_types.Berserk, caster, 150 + math.min(4, B.level)  * 20)
+        StatusType.update_hook(B.hooks, "Berserk", caster, 150 + math.min(4, B.level)  * 20)
     end,
 
     cooldown_self = 1000,
     cooldown_offensive = 50
 }
-
-return M

@@ -1,5 +1,5 @@
 local SpellType = import "@SpellType"
-local SpellTraits = import "@stats.SpellTraits"
+local SpellTraits = import "@spells.SpellTraits"
 local Apts = import "@stats.AptitudeTypes"
 
 local races_define = (import ".RaceDefineUtils").races_define

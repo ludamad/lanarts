@@ -2,9 +2,10 @@ local StatusType = import "@StatusType"
 local StatContext = import "@StatContext"
 local CooldownSet = import "@CooldownSet"
 
-local CooldownTypes = import ".CooldownTypes"
-local Apts = import ".AptitudeTypes"
-local StatUtils = import ".StatUtils"
+local CooldownTypes = import "@stats.CooldownTypes"
+local CooldownUtils = import "@stats.CooldownUtils"
+local Apts = import "@stats.AptitudeTypes"
+local StatUtils = import "@stats.StatUtils"
 local LogUtils = import "lanarts.LogUtils"
 local EventLog = import "core.ui.EventLog"
 
@@ -45,13 +46,14 @@ local EXHAUSTION_MOVEMENT_MULTIPLIER = 0.75
 local EXHAUSTION_ATTACK_COOLDOWN_MULTIPLIER = 0.75
 M.Exhausted = StatusType.define {
     TIME_LIMITED,
+    name = "Exhausted",
     init = function(self, stats, ...)
         self.base.init(self, stats, ...)
         LogUtils.log_if_player(stats.obj, "$You {is}[are] now exhausted.", {255,200,200})
     end,
     on_calculate = function(self, stats)
         local D = stats.derived
-        StatContext.multiply_cooldown_rate(stats, CooldownSet.ALL_ACTIONS, 0.8)
+        CooldownUtils.multiply_all_cooldown_rates(stats, 0.8)
         StatContext.add_damage(stats, Apts.MELEE, -2)
         StatContext.add_defence(stats, Apts.MELEE, -3)
         D.movement_speed = D.movement_speed / 2
@@ -75,6 +77,7 @@ local BERSERK_EXHAUSTION_DURATION = 275
 
 M.Berserk = StatusType.define {
     TIME_LIMITED,
+    name = "Berserk",
     init = function(self, stats, ...)
        self.base.init(self, stats, ...)
        LogUtils.log_if_player(stats.obj, "$You enter{s} a powerful rage!", {200,200,255})
@@ -88,9 +91,9 @@ M.Berserk = StatusType.define {
 
         -- Speed bonsues
         D.movement_speed = D.movement_speed + 1
-        StatContext.multiply_cooldown_rate(stats, CooldownSet.MELEE_ACTIONS, 1.35)
+        StatContext.add_effectiveness(stats, Apts.MELEE_SPEED, 7)
 
-        StatUtils.reset_rest_cooldown(stats)
+        CooldownUtils.reset_rest_cooldown(stats)
     end,
     on_kill = function(self, stats)
         LogUtils.log_resolved(stats.obj, "<The >{$You's}[Your] rage grows ...", {200,200,255})

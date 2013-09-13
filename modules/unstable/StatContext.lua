@@ -207,18 +207,21 @@ function M.add_all_aptitudes(context, type, amounts, --[[Optional, default false
     M.add_defence(context, type, def or 0, permanent)
 end
 
-function M.multiply_cooldown_multiplier(context, type, multiplier, --[[Optional, default false]] permanent)
-    context.derived.cooldowns:multiply_cooldown_multiplier(type, multiplier)
+function M.multiply_cooldown_rate(context, type, multiplier, --[[Optional, default false]] permanent)
+    context.derived.cooldowns:multiply_cooldown_rate(type, multiplier)
     if permanent then
-        context.base.cooldowns:multiply_cooldown_multiplier(type, multiplier)
+        context.base.cooldowns:multiply_cooldown_rate(type, multiplier)
     end
 end
 
-function M.multiply_cooldown_rate(context, type, multiplier, --[[Optional, default false]] permanent)
-    context.derived.cooldowns:multiply_cooldown_multiplier(type, multiplier)
-    if permanent then
-        context.base.cooldowns:multiply_cooldown_multiplier(type, multiplier)
-    end
+function M.add_cooldown(context, type, amount)
+    context.base.cooldowns:add_cooldown(type, amount)
+    context.derived.cooldowns:add_cooldown(type, amount)
+end
+
+function M.apply_cooldown(context, type, amount, --[[Optional]] f)
+    context.base.cooldowns:apply_cooldown(type, amount, f)
+    context.derived.cooldowns:apply_cooldown(type, amount, f)
 end
 
 return M

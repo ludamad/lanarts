@@ -7,6 +7,7 @@ local Attacks = import "@Attacks"
 local ItemTraits = import ".ItemTraits"
 local Proficiency = import "@Proficiency"
 local ContentUtils = import "@stats.ContentUtils"
+local CooldownUtils = import "@stats.CooldownUtils"
 local ItemRandomDescriptions = import ".ItemRandomDescriptions"
 
 local M = nilprotect {} -- Submodule
@@ -122,6 +123,14 @@ function M.resolve_weapon_bonuses(self)
     self.attack = Attacks.attack_copy_and_add(self.type.attack, b1, b2)
 end
 
+local function on_wield_weapon_prerequisite(self, target)
+    return self.attack.on_prerequisite(self.attack, target)
+end
+
+local function on_wield_weapon(self, target)
+    return self.attack.on_use(self.attack, target)
+end
+
 function M.weapon_define(args)
     -- Define weapon attack in convenient manner
     assert(args.types and args.difficulty and args.gold_worth)
@@ -130,14 +139,9 @@ function M.weapon_define(args)
         table.insert_all(args.proficiency_types, args.types)
         table.insert(args.proficiency_types, Apts.WEAPON_PROFICIENCY)
     end
-    if args.attack and #args.attack > 0 then
-        args.attack = Attacks.attack_create(unpack(args.attack))
-    end
-    if not args.attack then
-        args.attack = Attacks.attack_create(args.effectiveness or 0,args.damage or 0, args.multipliers or args.types, --[[Optional]] args.delay, --[[Optional]] args.damage_multiplier)
-    end
-    -- Clean-up convenience variables
-    args.effectiveness, args.damage, args.multipliers, args.delay = nil
+    args.attack = CooldownUtils.derive_attack_with_cooldown(args)
+    args.on_wield = args.on_wield or on_wield_weapon
+    args.on_wield_prerequisite = args.on_wield_prerequisite or on_wield_weapon_prerequisite
     return type_define(args, ItemTraits.WEAPON, M.resolve_weapon_bonuses)
 end
 
