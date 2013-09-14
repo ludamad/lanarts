@@ -10,6 +10,7 @@
 #include <luawrap/types.h>
 
 #include <lcommon/lua_serialize.h>
+#include <lcommon/directory.h>
 
 #include <lsound/lua_lsound.h>
 
@@ -173,6 +174,30 @@ static void register_input_table(lua_State* L) {
 	lua_pop(L, 1);
 }
 
+// Directory bindings
+
+static FilenameList io_directory_subfiles(const char* path) {
+	FilenameList list;
+	DirListing listing = list_directory(path);
+	for (int i = 0; i < listing.size(); i++) {
+		if (!listing[i].is_directory) {
+			list.push_back(listing[i].name);
+		}
+	}
+	return list;
+}
+
+static FilenameList io_directory_subdirectories(const char* path) {
+	FilenameList list;
+	DirListing listing = list_directory(path);
+	for (int i = 0; i < listing.size(); i++) {
+		if (listing[i].is_directory) {
+			list.push_back(listing[i].name);
+		}
+	}
+	return list;
+}
+
 namespace lua_api {
 	void register_io_api(lua_State* L) {
 		luawrap::install_plaindata_type<SDL_Event>();
@@ -182,6 +207,12 @@ namespace lua_api {
 		register_input_table(L);
 
 		register_textfield(L);
+
+		// Files API
+		LuaValue io = luawrap::ensure_table(luawrap::globals(L)["io"]);
+		io["directory_subfiles"].bind_function(io_directory_subfiles);
+		io["directory_subdirectories"].bind_function(io_directory_subdirectories);
+		io["directory_search"].bind_function(search_directory);
 
 		// Mouse API
 		LuaModule mouse = lua_api::register_lua_submodule_as_luamodule(L, "core.Mouse");

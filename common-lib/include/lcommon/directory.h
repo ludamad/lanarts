@@ -12,10 +12,18 @@
 
 typedef std::vector<std::string> FilenameList;
 
-struct DirListing {
-	FilenameList files;
-	FilenameList directories;
+struct DirEntry {
+	bool is_directory;
+	std::string name, path;
+	DirEntry(bool is_directory, const std::string& name,
+			const std::string& path) {
+		this->is_directory = is_directory;
+		this->name = name;
+		this->path = path;
+	}
 };
+
+typedef std::vector<DirEntry> DirListing;
 
 /* Returns false if invalid path or not a directory */
 bool is_directory(const char* path);
@@ -28,7 +36,7 @@ bool create_directory(const char* path);
 bool ensure_directory(const char* path);
 
 DirListing list_directory(const char* path);
-FilenameList search_directory(const char* path, const char* name /*Can be NULL*/, const char* ext, bool recursive);
+FilenameList search_directory(const char* path, const char* name_pattern, bool recursive = false);
 
 /* Grab current working directory. Robust & portable but slightly inefficient. */
 std::string working_directory();

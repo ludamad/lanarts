@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.6 )
+cmake_minimum_required( VERSION 2.8 )
 PROJECT(project_lanarts_dungeon_gen)
 
 set( DEPS ../dependencies)
@@ -45,5 +45,7 @@ target_link_libraries(
 )
 
 enable_testing()
-add_test(NAME lanarts_dungeon_gen_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/lanarts_dungeon_gen_tests )
+add_test(NAME lanarts_dungeon_gen_tests COMMAND
+    cd ${CMAKE_CURRENT_SOURCE_DIR} ;
+    ${EXECUTABLE_OUTPUT_PATH}/lanarts_dungeon_gen_tests )
 

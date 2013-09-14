@@ -1,14 +1,10 @@
--- Load game content
-import "@items.DefineConsumables"
-import "@items.DefineWeapons"
-import "@items.DefineRings"
-import "@items.DefineArmour"
+-- Import all content definition submodules.
+local CONTENT_PATTERN = "Define*"
+local content = find_submodules("unstable", --[[Recursive]] true, CONTENT_PATTERN)
 
-import "@races.DefineRaces"
-
-import "@stats.DefineSkills"
-
-import "@spells.DefineFighterSpells"
-import "@spells.DefineStatusTypes"
-
-import "@monsters.DefineAnimals"
+for c in values(content) do
+    if c ~= "unstable.DefineAll" then
+        -- Don't recursively import!
+        import(c)
+    end
+end

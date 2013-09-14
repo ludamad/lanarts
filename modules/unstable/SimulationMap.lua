@@ -23,10 +23,11 @@ function SimulationMap:init()
     self.players = {}
 end
 
-function SimulationMap:add_player(name, race, xy)
+function SimulationMap:add_player(name, race, class, xy)
     local player_object = PlayerObject.create {
         name = name,
         race = race,
+        class = class,
         sprite = {}, -- TODO
         xy = xy,
         is_local_player = function() return true end,
@@ -44,7 +45,6 @@ function SimulationMap:add_monster(monster, xy)
         do_init = true,
         map = self.gmap
     }
-    pretty_print(monster_object.type)
     table.insert(self.monsters, monster_object)
     return monster_object
 end

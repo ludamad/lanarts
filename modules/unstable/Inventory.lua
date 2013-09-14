@@ -14,7 +14,8 @@ end
 
 function Inventory:__copy(other)
     -- Ensure a shallow copy when used with table.deep_copy
-    table.copy(self, other, --[[No metacall]] false)
+    other.capacity = self.capacity
+    other.items = table.clone(self.items)
 end
 
 function Inventory:find_item(item_type)

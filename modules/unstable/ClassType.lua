@@ -7,7 +7,7 @@ local class_schema = {
     traits = S.TABLE_OR_NIL,
     on_spend_skill_points = S.FUNCTION, -- Takes (self, skill_points_to_spend)
     on_create = S.FUNCTION, -- Takes (configuration)
-    on_init = S.FUNCTION, -- Takes (self, stats
+    on_init = S.FUNCTION, -- Takes (self, stats)
 }
 
 local function define_class(args)

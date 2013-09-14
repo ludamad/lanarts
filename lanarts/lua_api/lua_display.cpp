@@ -10,6 +10,7 @@
 
 #include <lcommon/lua_utils.h>
 #include <lcommon/math_util.h>
+#include <lcommon/strformat.h>
 
 #include <ldraw/display.h>
 #include <ldraw/Image.h>
@@ -36,7 +37,7 @@ static int event_log_add(lua_State* L) {
 static std::vector<ldraw::Image> images_load(const char* pattern) {
 	std::vector<ldraw::Image> ret;
 	if (!filepattern_to_image_list(ret,pattern)) {
-		luawrap::error("Invalid pattern!\n");
+		luawrap::error(format("Invalid pattern '%s'!\n", pattern));
 	}
 	return ret;
 }

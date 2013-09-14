@@ -78,7 +78,7 @@ end
 
 function M.on_calculate(context)
     for skill_slot in values(context.derived.skills) do
-        skill_slot.type.on_calculate(skill_slot, context)
+        skill_slot:on_calculate(context)
     end
     context.derived.inventory:on_calculate(context)
     context.derived.hooks:perform("on_calculate", context)

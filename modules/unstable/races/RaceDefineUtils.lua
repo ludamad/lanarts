@@ -1,4 +1,4 @@
-local Races = import "@Races"
+local RaceType = import "@RaceType"
 
 local Stats = import "@Stats"
 local StatContext = import "@StatContext"
@@ -10,7 +10,7 @@ local M = nilprotect {} -- Submodule
 function M.races_define(args)
     args.description = args.description:pack()
     if args.on_create then -- Full custom
-        return Races.define(args)
+        return RaceType.define(args)
     end
 
     -- Create based off embedded stats, aptitudes & spells
@@ -23,7 +23,7 @@ function M.races_define(args)
         return stats
     end
 
-    return Races.define(args)
+    return RaceType.define(args)
 end
 
 return M

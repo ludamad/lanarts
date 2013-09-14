@@ -7,18 +7,17 @@ FIND_PACKAGE(SDL_mixer REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
-
 set( SRC ..)
 set( DEPS ../dependencies)
 
 add_definitions( -std=c++98 )
 
 include_directories(
+	"."
 	${SDL_INCLUDE_DIR} 
 	${SDLIMAGE_INCLUDE_DIR}
 	${OpenGL_INCLUDE_DIRS} 		
 	${FREETYPE_INCLUDE_DIRS}
-	src/
 	"${SRC}/common-lib/include"
 	"${SRC}/draw-lib/include"
 	"${SRC}/dungeon-generation-lib/include"
@@ -33,83 +32,64 @@ include_directories(
 
 
 file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
-    src/include/* 
+    include/* 
  
-    src/collision_avoidance/*
+    collision_avoidance/*
  
-    src/data/*
-    src/data/loaddata/*
+    data/*
+    data/loaddata/*
  
-    src/display/*
-    src/display/loaddata/*
+    display/*
+    display/loaddata/*
  
-    src/draw/*
-    src/draw/loaddata/*
+    draw/*
+    draw/loaddata/*
  
-    src/fov/*
-    src/fov/impl/*
+    fov/*
+    fov/impl/*
  
-    src/gamestate/*
-    src/gamestate/loaddata/*
+    gamestate/*
+    gamestate/loaddata/*
  
-    src/interface/*
-    src/interface/sidebar/*
+    interface/*
+    interface/sidebar/*
  
-    src/dungeon_generation/*
-    src/dungeon_generation/loaddata/*
+    dungeon_generation/*
+    dungeon_generation/loaddata/*
  
-    src/lua/*
-    src/lua_api/*
+    lua/*
+    lua_api/*
  
-    src/menu/*
+    menu/*
  
-    src/net/*
+    net/*
 
-    src/objects/*
-    src/objects/enemy/*
-    src/objects/loaddata/*
-    src/objects/player/*
-    src/objects/store/*
+    objects/*
+    objects/enemy/*
+    objects/loaddata/*
+    objects/player/*
+    objects/store/*
 
-    src/pathfind/*
+    pathfind/*
 
-    src/stats/*
-    src/stats/items/*
-    src/stats/loaddata/*
+    stats/*
+    stats/items/*
+    stats/loaddata/*
 
-    src/util/*
+    util/*
 
-    src/lanarts_defines.cpp
+    lanarts_defines.cpp
+
+	main.cpp
 )
 
 file(GLOB lanarts_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
        tests/*
 )
 
-file(GLOB lanarts_runner RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
-       standalone/*
-)
-
-
-add_library( lanartslib STATIC
-             ${lanarts_src}
-            )
-
-add_executable( lanarts
-	        src/main.cpp
-	        )
-	        
-add_executable( lanarts_tests
-             ${lanarts_tests} 
-	        )
-
-add_executable( lanarts_runner
-             ${lanarts_runner} 
-	        )
-
+add_executable( lanarts ${lanarts_src} )
 
 set (libraries 
-	lanartslib
 	ldraw
 	lcommon
 	lanarts_dungeon_gen
@@ -120,7 +100,7 @@ set (libraries
 	lanarts_net
 	yaml-cpp
 	RVO
-        libxmi
+    libxmi
 	${SDLIMAGE_LIBRARY}
 	${OPENGL_gl_LIBRARY}
 	${SDLMIXER_LIBRARY}
@@ -128,19 +108,14 @@ set (libraries
 	${SDL_LIBRARY}
 	${SDLMAIN_LIBRARY}
 	${FREETYPE_LIBRARIES}
+        UnitTest++
 )
 
 target_link_libraries( lanarts 
     ${libraries}
 )
 
-target_link_libraries( lanarts_tests
-    ${libraries}
-	UnitTest++
-)
-target_link_libraries( lanarts_runner
-    ${libraries}
-)
-
 enable_testing()
-add_test(NAME lanarts_tests COMMAND ${EXECUTABLE_OUTPUT_PATH}/lanarts_tests )
+add_test(NAME lanarts_tests COMMAND 
+    cd ${CMAKE_SOURCE_DIR} ;
+    ${EXECUTABLE_OUTPUT_PATH}/lanarts --tests )

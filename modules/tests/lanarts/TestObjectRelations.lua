@@ -11,7 +11,7 @@ local gmap = GameMap.create {
         size = {1,1},            
         content = Data.tile_create { 
             images = {
-                Display.images_load (path_resolve "test_tile.png")
+                Display.image_load (path_resolve "test_tile.png")
             }
         }
     }

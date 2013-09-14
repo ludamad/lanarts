@@ -4,27 +4,29 @@ local Attacks = import "@Attacks"
 local Apts = import "@stats.AptitudeTypes"
 local Relations = import "lanarts.objects.Relations"
 local SkillType = import "@SkillType"
+local StatContext = import "@StatContext"
 
 local PlayerObject = ObjectUtils.type_create(AttackableObject) 
 PlayerObject.PLAYER_TRAIT = "PLAYER_TRAIT"
 
-function PlayerObject.create_player_stats(race, name, --[[Optional]] team)
-    local meta = {__copy = function(t1,t2) 
-        table.copy(t1,t2, --[[Do not invoke meta]] false)
-    end}
-
+function PlayerObject.create_player_stats(race, --[[Can-be-nil]] class, name, --[[Optional]] team)
     local stats = race.on_create(name, team or Relations.TEAM_PLAYER_DEFAULT)
     for skill in values(SkillType.list) do
-        local slot = {type = skill, level = 0, experience = 0}
-        table.insert(stats.skills, setmetatable(slot, meta))
+        table.insert(stats.skills, skill:on_create())
     end
+
+    if class then
+        local context = StatContext.stat_context_create(stats)
+        class:on_init(context)
+    end
+
     return stats
 end
 
 local DEFAULT_UNARMED_ATTACK = Attacks.attack_create(0, 5, Apts.MELEE)
 
 function PlayerObject.create(args)
-    assert(args.sprite and args.race and args.name)
+    assert(args.sprite and args.race and args.class and args.name)
 
     -- Set up type signature
     args.type = args.type or PlayerObject
@@ -33,7 +35,7 @@ function PlayerObject.create(args)
 
     -- AttackableObject configuration
     args.can_attack = true
-    args.base_stats = PlayerObject.create_player_stats(args.race, args.name)
+    args.base_stats = PlayerObject.create_player_stats(args.race, args.class, args.name)
 
     -- Create pseudo-objects
     args.unarmed_attack = args.unarmed_attack or args.race.unarmed_attack or DEFAULT_UNARMED_ATTACK

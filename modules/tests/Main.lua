@@ -1,15 +1,10 @@
 import "core.Utils"
 import '@lunit'
 
-local tests = {
-    "tests.unstable.TestAttackResolution",
-    "tests.unstable.TestStats",
-    "tests.unstable.TestResourceTypes",
-    "tests.unstable.TestSchemas",
-    "tests.unstable.TestContent",
-    "tests.lanarts.TestObjectRelations",
-    "tests.core.TestSerializeBuffer",
-    "tests.core.TestGameMap"
+local EXEMPT = {
+    "tests.lunit-console",
+    "tests.lunit",
+    "tests.Main"
 }
 
 local testcases = {}
@@ -33,4 +28,13 @@ TestCases = setmetatable({}, {
 
 assert = lunit.assert
 
-lunit.main{'--', unpack(tests)}
+local tests = {}
+for test in values(find_submodules("tests", true)) do
+    if not table.contains(EXEMPT, test) then
+        table.insert(tests, test)
+    end
+end
+
+local stats = lunit.main{'--', unpack(tests)}
+
+return (stats.failed == 0 and stats.errors == 0)

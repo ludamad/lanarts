@@ -3,10 +3,11 @@ local AttackResolution = import "@AttackResolution"
 local Attacks = import "@Attacks"
 local Stats = import "@Stats"
 local AnsiCol = import "core.terminal.AnsiColors"
-local Races = import "@Races"
+local RaceType = import "@RaceType"
 local ItemType = import "@ItemType"
 local SkillType = import "@SkillType"
 local SpellType = import "@SpellType"
+local ClassType = import "@ClassType"
 local ExperienceCalculation = import "@stats.ExperienceCalculation"
 local ProficiencyPenalties = import "@stats.ProficiencyPenalties"
 
@@ -66,13 +67,13 @@ local function perform_spell(player, monster)
     return used
 end
 
-local function choose_skills(player, xp_to_spend)
-    while xp_to_spend > 0 do
+local function choose_skills(player, SP)
+    while SP > 0 do
         StatContext.on_step(player)
         StatContext.on_calculate(player)
         print(StatUtils.stats_to_string(player.derived, --[[Color]] true, --[[New lines]] true, player.base.name .. ", the Adventurer"))
         -- Pick skill
-        AnsiCol.println("You have "..xp_to_spend.."SP to spend.", AnsiCol.GREEN, AnsiCol.BOLD)
+        AnsiCol.println("You have "..SP.."SP to spend.", AnsiCol.GREEN, AnsiCol.BOLD)
         local choices = {}
         local choice2skill = {}
         for skill in values(SkillType.list) do
@@ -84,13 +85,13 @@ local function choose_skills(player, xp_to_spend)
         local skill = choice2skill[choose_option(unpack(choices))]
         if not skill then break end
 
-        -- Pick experience gain
-        while xp_to_spend > 0 do
+        -- Pick skill points gain
+        while SP > 0 do
             StatContext.on_step(player)
             StatContext.on_calculate(player)
             print(StatUtils.stats_to_string(player.derived, --[[Color]] true, --[[New lines]] true, player.base.name .. ", the Adventurer"))
     
-            AnsiCol.println("You have "..xp_to_spend.."SP to spend.", AnsiCol.GREEN, AnsiCol.BOLD)
+            AnsiCol.println("You have "..SP.."SP to spend.", AnsiCol.GREEN, AnsiCol.BOLD)
             AnsiCol.println(
                 ("Spend how much on %s%s"):format(
                     AnsiCol.WHITE(skill.name, AnsiCol.BOLD), 
@@ -100,13 +101,13 @@ local function choose_skills(player, xp_to_spend)
             local skill_slot = Stats.get_skill(player.base, skill)
     
             local function xp2level(xp)
-                return ExperienceCalculation.skill_level_from_cost(skill.cost_multiplier, xp)
+                return ExperienceCalculation.skill_level_from_cost(skill_slot.cost_multiplier, xp)
             end
             local function level2xp(xp_level)
-                return ExperienceCalculation.cost_from_skill_level(skill.cost_multiplier, xp_level)
+                return ExperienceCalculation.cost_from_skill_level(skill_slot.cost_multiplier, xp_level)
             end
             local function needed(gain)
-                return level2xp(skill_slot.level + gain) - skill_slot.experience 
+                return math.ceil(level2xp(skill_slot.level + gain) - skill_slot.skill_points) 
             end
     
             local need5, need1, need0_1 = needed(5.0), needed(1.0), needed(0.1)
@@ -114,24 +115,23 @@ local function choose_skills(player, xp_to_spend)
             local choices, amounts = {"Back"}, {}
             local function reg(k,xp) table.insert(choices, k) ; amounts[k] = xp end
 
-            if need0_1 <= xp_to_spend then
+            if need0_1 <= SP then
                 reg(("+0.1 (Spend %s to become %s)"):format(need0_1, skill_slot.level+0.1), need0_1)
             end
-            if need1 <= xp_to_spend then
+            if need1 <= SP then
                 reg(("+1 (Spend %s to become %s)"):format(need1, skill_slot.level+1), need1)
             end
-            if need5 <= xp_to_spend then
+            if need5 <= SP then
                 reg(("+5 (Spend %s to become %s)"):format(need5, skill_slot.level+5), need5)
             end
-            local max = xp2level(skill_slot.experience + xp_to_spend)
-            reg("Max (Spend ".. xp_to_spend .. " to become "..max..")", xp_to_spend)
+            local max = xp2level(skill_slot.skill_points + SP)
+            reg("Max (Spend ".. SP .. " to become "..max..")", SP)
 
             local amount = amounts[choose_option(unpack(choices))]
             if not amount then break end
 
-            xp_to_spend = xp_to_spend - amount
-            skill_slot.experience = skill_slot.experience + amount
-            skill_slot.level = xp2level(skill_slot.experience)
+            SP = SP - amount
+            skill_slot:on_spend_skill_points(amount)
         end
     end
 end
@@ -237,7 +237,7 @@ local function dump_stats(player, monster)
     print("Monster After\t", StatUtils.stats_to_string(monster.derived, --[[Color]] true))
 end
 
-local function battle(player, monster)
+local function give_all_items()
     for item in values(ItemType.list) do
         local IT = ItemTraits
         local function is(trait) return table.contains(item.traits, trait) end
@@ -250,8 +250,10 @@ local function battle(player, monster)
             StatContext.add_item(player, {type = item, bonus = random(1,5)})
         end
     end
+end
+local function battle(player, monster)
     StatContext.add_spell(player, "Berserk")
-    choose_skills(player, 24000)
+--    choose_skills(player, 24000)
     step(player)
     track_identification(player)
     while monster.base.hp > 0 do
@@ -274,30 +276,60 @@ local function battle(player, monster)
     end
 end
 
+local function print_sample_stats(race, --[[Optional]] class)
+    local stats = PlayerObject.create_player_stats(race, class, "Level 1 " .. race.name)
+    local context = StatContext.stat_context_create(stats)
+    StatContext.on_step(context)
+    StatContext.on_calculate(context)
+    print(StatUtils.stats_to_string(context.derived, --[[Color]] true, --[[New lines]] true, stats.name))
+    return stats
+end
+
 local function choose_race()
     local C = AnsiCol
     local idx = 1
     while true do
-        local race = Races.list[idx]
+        local race = RaceType.list[idx]
         print(C.YELLOW("Race ".. idx .. ") ", C.BOLD).. C.WHITE(race.name))
         print(C.YELLOW(race.description))
-        local stats = PlayerObject.create_player_stats(race, "Level 1 " .. race.name)
-        local context = StatContext.stat_context_create(stats)
-        StatContext.on_step(context)
-        StatContext.on_calculate(context)
-        print(StatUtils.stats_to_string(context.derived, --[[Color]] true, --[[New lines]] true, stats.name))
-        print(C.BLUE("Do you wish to play as a " .. race.name .. " Adventurer?", C.BOLD))
+        print_sample_stats(race)
+        print(C.BLUE("Do you wish to play as a " .. race.name .. "?", C.BOLD))
         if choose_option("No", "Yes") == "Yes" then
             return race
         end
-        idx = (idx % #Races.list) + 1 
+        idx = (idx % #RaceType.list) + 1 
     end
+end
+
+local function choose_class(race)
+    local class_types = {}
+    table.insert(class_types, ClassType.lookup("Knight"))
+--    for v in values{"Fire", "Water", "Light", "Dark"} do
+--        table.insert(classes, ClassType.lookup("Mage"):on_create {magic_skill = v, weapon_skill = "Slashing Weapons"})
+--    end
+
+    local C = AnsiCol
+    local idx = 1
+    while true do
+        local class = class_types[idx]
+        print(C.YELLOW("Class ".. idx .. ") ", C.BOLD).. C.WHITE(class.name))
+        print(C.YELLOW(class.description))
+        print_sample_stats(race, class:on_create{weapon_skill="Slashing Weapons"})
+        print(C.BLUE("Do you wish to play as a " .. race.name .. " " .. class.name .. "?", C.BOLD))
+        if choose_option("No", "Yes") == "Yes" then
+            print("Which specialization?")
+            local skill = choose_option("Piercing Weapons", "Slashing Weapons", "Blunt Weapons")
+            return class:on_create{weapon_skill=skill}
+        end
+        idx = (idx % #class_types) + 1 
+    end
+    return class
 end
 
 local function main()
     -- OpenGL must be initialized before content loading!
     local Display = import "core.Display"
-    Display.initialize("Lanarts", {640, 480}, false)
+--    Display.initialize("Lanarts", {640, 480}, false)
 
     -- Load game content
     import "@DefineAll"
@@ -309,15 +341,17 @@ local function main()
     end
 
     -- TODO: Remove any notion of 'internal graphics'. All graphics loading should be prompted by Lua.
-    __initialize_internal_graphics()
+--    __initialize_internal_graphics()
 
     local SM = SimulationMap.create()
-    local player = SM:add_player("Tester", choose_race(), {25,25})
+    local race = choose_race()
+    local class = choose_class(race)
+    local player = SM:add_player("Tester", race, class, {25,25})
     local monster = SM:add_monster("Giant Rat", {75,75})
 
-    Display.draw_start()
-    SM:draw()
-    Display.draw_finish()
+--    Display.draw_start()
+--    SM:draw()
+--    Display.draw_finish()
 
     battle(StatContext.stat_context_create(player.base_stats, player.derived_stats, player), StatContext.stat_context_create(monster.base_stats, monster.derived_stats, monster))
 end

@@ -4,6 +4,7 @@
 #include <ctime>
 
 #include <lcommon/fatal_error.h>
+#include <lcommon/unittest.h>
 
 #include <SDL.h>
 #include <SDL_opengl.h>
@@ -70,6 +71,7 @@ static GameState* init_gamestate() {
 	lua_api::register_api(gs, L);
 
 	luawrap::globals(L)["__initialize_internal_graphics"].bind_function(__initialize_internal_graphics);
+	luawrap::globals(L)["_lanarts_unit_tests"].bind_function(run_unittests);
 
 	return gs;
 }

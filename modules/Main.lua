@@ -4,7 +4,7 @@ nilprotect(_G)
 -- Define essential global variables, and module engine interaction here.
 -- Global variables & functions will be locked after the 'main.lua' file of each module has ran
 
-local ROOT_FOLDER = "modules"
+_ROOT_FOLDER = "modules"
 
 -- Name caches
 local mname_table = {}
@@ -12,7 +12,7 @@ local mname_table = {}
 function virtual_path(idx, --[[Optional]] drop_filename)
     idx = (idx or 1) + 1
     local src = debug.getinfo(idx, "S").source
-    return virtual_path_create_relative(src, ROOT_FOLDER, drop_filename)
+    return virtual_path_create_relative(src, _ROOT_FOLDER, drop_filename)
 end
 
 function module_name(idx)
@@ -28,14 +28,19 @@ function module_name(idx)
     return mname
 end
 
+function virtual_path_to_real(vpath)
+    local rpath = vpath:gsub("%.", "/")
+    return _ROOT_FOLDER .. '/' .. rpath
+end
+
 local function import_file(vpath)
-    local rpath = vpath:gsub("%.", "/") .. ".lua"
-    local loaded, err = loadfile(ROOT_FOLDER .. '/' .. rpath)
+    local rpath = virtual_path_to_real(vpath) .. '.lua'
+    local loaded, err = loadfile(rpath)
     if loaded then
         local entries = { loaded(vpath) }
         return entries
     else
-        error("'import file': error loading path \"" .. rpath .. "\": " .. err)
+        error("Error while importing " .. rpath .. ":\n\t" .. err)
         return nil
     end
 end
@@ -59,7 +64,7 @@ function import(vpath, --[[Optional]] mname)
 
     local module = _IMPORTED[vpath] or _LOADED[vpath]
     if module == _ILLEGAL_RECURSION_SENTINEL then
-        error("import detected import recursion from '" .. vpath .. "' being loaded from '" .. mname .. "'")
+        error("import detected import recursion from '" .. vpath .. "' being loaded from '" .. (mname or '') .. "'")
     elseif module then 
         return unpack(module)
     end
@@ -95,6 +100,15 @@ function data_load(key, default, --[[Optional]] vpath)
     return val
 end
 
+-- Utility for finding submodules of a given vpath
+function find_submodules(vpath, --[[Optional]] recursive, --[[Optional]] pattern)
+    local ret, root = {}, virtual_path_to_real(vpath) 
+    for file in values(io.directory_search(root, (pattern or "*") .. ".lua", recursive or false)) do
+        table.insert(ret, virtual_path_create_relative(file, _ROOT_FOLDER))
+    end
+    return ret
+end
+
 -- Require is used when interacting with 'vanilla' lua modules
 require_path_add("modules/?.lua")
 
@@ -104,11 +118,17 @@ require_path_add("modules/?.lua")
 function Engine.main(args)
     import "core.Main"
 
-    if table.contains(args, "--tests-only") then
-        import "tests.Main"
+    if table.contains(args, "--tests") then
+        local failures = _lanarts_unit_tests()
+        local passed = import "tests.Main"
+        -- Return exit code so ctest will notice the failure
+        if failures or not passed then os.exit(2) end
         return false
     elseif table.contains(args, "--simulation") then
         import "unstable.Simulation"
+        return false
+    elseif args[1] == "--example" then
+        import ("examples." .. args[2])
         return false
     end
 

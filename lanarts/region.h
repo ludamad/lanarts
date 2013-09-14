@@ -8,7 +8,6 @@
 
 #include <lcommon/geometry.h>
 
-
 //TODO replace region with BBox everywhere
 /*Represents a rectangular region in terms of its start x,y values as well as its dimensions*/
 struct Region {
@@ -24,6 +23,5 @@ struct Region {
 	}
 
 };
-
 
 #endif /* REGION_H_ */

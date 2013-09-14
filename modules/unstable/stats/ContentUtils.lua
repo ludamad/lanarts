@@ -35,7 +35,7 @@ function M.resolve_aptitude_bonuses(table, --[[Optional]] result)
             result.effectiveness[key], result.damage[key] = curr_eff + eff, curr_dam + dam 
             result.resistance[key], result.defence[key] = curr_res + res, curr_def + def
  
-            table[key] = val -- Cleanup the aptitude convenience variable
+            table[key] = nil -- Cleanup the aptitude convenience variable
         end
     end
     return result
@@ -44,7 +44,7 @@ end
 -- Expects a mutable 'table' that is being used to define a resource type
 -- It will remove the 'convenience variables' used to define the aptitudes.
 function M.resolve_embedded_stats(table)
-    local aptitudes = M.resolve_aptitude_bonuses
+    table.aptitudes = M.resolve_aptitude_bonuses(table)
     local spells = table.spells
     if not getmetatable(table.spells) == SpellsKnown then
         spells = SpellsKnown.create()

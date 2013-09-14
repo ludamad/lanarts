@@ -30,19 +30,32 @@ local function on_calculate(skill_slot, user)
     end
 end
 
-local function xp2level(skill_slot, xp)
-    return ExperienceCalculation.skill_level_from_cost(skill_slot.type.cost_multiplier, xp)
+local SKILL_META = {
+    __index = function (t,k) return assert(rawget(t, "type"))[k] end,
+    __copy = function(t1,t2) table.copy(t1,t2, --[[Do not invoke meta]] false) end
+}
+
+local function on_create(skill)
+    assert(skill)
+    local slot = {type = skill, level = 0, skill_points = 0, cost_multiplier = 1.0}
+    setmetatable(slot, SKILL_META)
+    return slot
 end
 
-local function on_spend_experience(skill_slot, xp)
-    skill_slot.experience = skill_slot.experience + xp
-    skill_slot.level = xp2level(skill_slot, skill_slot.experience)
+local function xp2level(skill_slot, xp)
+    return ExperienceCalculation.skill_level_from_cost(skill_slot.cost_multiplier, xp)
+end
+
+local function on_spend_skill_points(skill_slot, sp)
+    skill_slot.skill_points = skill_slot.skill_points + sp
+    skill_slot.level = xp2level(skill_slot, skill_slot.skill_points)
 end
 
 local function skill_define(args)
     args.aptitudes = resolve_aptitude_bonuses(args.aptitudes)
-    args.on_calculate = on_calculate
-    args.on_spend_experience = on_spend_experience
+    args.on_calculate = args.on_calculate or on_calculate
+    args.on_spend_skill_points = args.on_spend_skill_points or on_spend_skill_points
+    args.on_create = args.on_create or on_create
     return SkillType.define(args)
 end
 
@@ -72,7 +85,7 @@ skill_define {
 }
 
 skill_define {
-    name = "Ranged",
+    name = "Ranged Fighting",
     description = "Increases effectiveness and damage with ranged weaponry.",
     aptitudes = {Apts.RANGED, {1.0,0.5,0,0}}
 }

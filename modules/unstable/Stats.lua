@@ -25,8 +25,13 @@ function M.aptitudes_create(--[[Optional]] params)
     }
 end
 
+local function clone_if_exists(v)
+    return v and table.deep_clone(v) or nil
+end
+
 -- Create stats with defaults, or copy over from other stats
 function M.stats_create(--[[Optional]] params)
+    local C = clone_if_exists
     params = params or {}
     return {
         name = params.name,
@@ -43,19 +48,19 @@ function M.stats_create(--[[Optional]] params)
         max_mp = params.max_mp or params.mp or 0,
         mp_regen = params.mp_regen or 0,
 
-        inventory = params.inventory or Inventory.create(),
+        inventory = C(params.inventory) or Inventory.create(),
         aptitudes = M.aptitudes_create(params.aptitudes),
         skills = M.skills_create(params.skills),
-        hooks = params.hooks or HookSet.create(),
+        hooks = C(params.hooks) or HookSet.create(),
 
-        spells = params.spells or SpellsKnown.create(),
-        abilities = params.abilities or {},
+        spells = C(params.spells) or SpellsKnown.create(),
+        abilities = C(params.abilities) or {},
         unarmed_attack = params.unarmed_attack or Attacks.ZERO_DAMAGE_ATTACK,
 
         -- Simple dictionary of all 'infinite resistances'. Applies whenever resistance applies.
-        immunities = params.immunities or {},
+        immunities = C(params.immunities) or {},
 
-        cooldowns = params.cooldowns or CooldownSet.create(),
+        cooldowns = C(params.cooldowns) or CooldownSet.create(),
 
         movement_speed = params.movement_speed or 2
     }

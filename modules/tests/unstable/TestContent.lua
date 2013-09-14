@@ -1,22 +1,9 @@
-local content_files = {
-    "unstable.items.DefineConsumables",
-    "unstable.items.DefineWeapons"
---[[    "unstable.content.AptitudeTypes",
-    "unstable.content.CooldownTypes",
-    "unstable.content.ItemTraits",
-    "unstable.content.Races",
-    "unstable.content.Skills",
-    "unstable.content.Spells",
-    "unstable.content.StatUtils",
-    "unstable.content.Monsters.Animals",
-    "unstable.content.StatusTypes",
+for vpath in values(find_submodules("unstable.stats", true, "Define*")) do
+    import(vpath)
+end
 
-    "unstable.items.EquipmentTypes",
-    "unstable.items.ItemsConsumables"
-]]
-}
-
-for file in values(content_files) do
+-- Iterate over all unstable/../DefineXX.lua files and add them as separate tests
+for file in values(find_submodules("unstable", true, "Define*")) do
     TestCases["(import \"" .. file .. "\")"] = function()
         import(file)
     end
