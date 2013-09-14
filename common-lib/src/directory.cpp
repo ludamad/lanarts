@@ -7,9 +7,11 @@
 #include <string>
 #include <cstdlib>
 #include "directory.h"
+#include "tinydir.h"
 
 #ifdef WIN32
 
+#include "dirent_windows.h"
 #include <windows.h>
 #include <direct.h>
 
@@ -67,4 +69,13 @@ std::string working_directory() {
 	std::string ret(cwd);
 	free(cwd);
 	return ret;
+}
+
+DirListing list_directory(const char* path) {
+	DirListing listing;
+	return listing;
+}
+
+FilenameList search_directory(const char* path, const char* name,
+		const char* ext, bool recursive) {
 }
