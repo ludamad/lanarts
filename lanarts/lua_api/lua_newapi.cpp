@@ -128,7 +128,8 @@ namespace lua_api {
 		preload["mime.core"].bind_function(luaopen_mime_core);
 	}
 
-	void register_lua_core_maps(lua_State* L);
+	void register_lua_core_GameMap(lua_State* L);
+	void register_lua_core_CollisionAvoidance(lua_State* L);
 
 	// Register all the lanarts API functions and types
 	void register_api(GameState* gs, lua_State* L) {
@@ -154,7 +155,8 @@ namespace lua_api {
 		register_display_api(L);
 		register_tiles_api(L);
 
-		register_lua_core_maps(L);
+		register_lua_core_GameMap(L);
+		register_lua_core_CollisionAvoidance(L);
 	}
 
 	void luacall_post_draw(lua_State* L) {

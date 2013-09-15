@@ -256,6 +256,21 @@ static int gmap_object_tile_check(lua_State* L) {
 	return 1;
 }
 
+static int gmap_radius_tile_check(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	Pos pos = luawrap::get<Pos>(L, 1);
+	int radius = lua_tointeger(L, 2);
+
+	Pos hit_pos;
+	bool collided = gs->tile_radius_test(pos.x, pos.y, radius, true, -1, &hit_pos);
+	if (!collided) {
+		lua_pushnil(L);
+	} else {
+		luawrap::push(L, hit_pos);
+	}
+	return 1;
+}
+
 static bool gmap_place_free(const LuaStackValue& pos) {
 	GameState* gs = lua_api::gamestate(pos);
 	Pos p = pos.as<Pos>();
@@ -289,7 +304,7 @@ static void gmap_map_draw(LuaStackValue table) {
 }
 
 namespace lua_api {
-	void register_lua_core_maps(lua_State* L) {
+	void register_lua_core_GameMap(lua_State* L) {
 		LuaValue gmap = register_lua_submodule(L, "core.GameMap");
 		gmap["create"].bind_function(gmap_create);
 		gmap["transfer"].bind_function(gmap_transfer);
@@ -322,6 +337,7 @@ namespace lua_api {
 		gmap["object_collision_check"].bind_function(gmap_object_collision_check);
 		gmap["object_tile_check"].bind_function(gmap_object_tile_check);
 		gmap["object_place_free"].bind_function(gmap_object_place_free);
+		gmap["radius_tile_check"].bind_function(gmap_radius_tile_check);
 		gmap["rectangle_collision_check"].bind_function(gmap_rectangle_collision_check);
 
 		gmap["place_free"].bind_function(gmap_place_free);

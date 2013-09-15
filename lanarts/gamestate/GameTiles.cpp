@@ -100,12 +100,13 @@ void GameTiles::pre_draw(GameState* gs) {
 	if (region.y2 >= size.h) {
 		region.y2 = size.h - 1;
 	}
+	bool has_players = !gs->player_data().all_players().empty();
 
 	for (int y = region.y1; y <= region.y2; y++) {
 		for (int x = region.x1; x <= region.x2; x++) {
 			Tile& tile = get(Pos(x, y));
 			const ldraw::Image& img = res::tile(tile.tile).img(tile.subtile);
-			if (was_seen(Pos(x, y))) {
+			if (!has_players || was_seen(Pos(x, y))) {
 				img.draw(on_screen(gs, Pos(x * TILE_SIZE, y * TILE_SIZE)));
 			}
 		}

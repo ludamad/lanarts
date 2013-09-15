@@ -99,7 +99,8 @@ obj_id GameMapState::add_instance(GameState* gs, GameInst* inst) {
 void GameMapState::step(GameState* gs) {
 	const int STEPS_TO_SIMULATE = 1000;
 
-	bool has_player_in_level = gs->player_data().level_has_player(id());
+	bool game_has_players = !gs->player_data().all_players().empty();
+	bool has_player_in_level = gs->player_data().level_has_player(id()) || !game_has_players;
 
 	if (has_player_in_level) {
 		_steps_left = STEPS_TO_SIMULATE;
@@ -127,6 +128,7 @@ void GameMapState::step(GameState* gs) {
 void GameMapState::draw(GameState* gs) {
 	perf_timer_begin(FUNCNAME);
 
+	tiles().pre_draw(gs);
 	// Become current level
 	GameMapState* previous_level = gs->get_level();
 	gs->set_level(this);
