@@ -62,7 +62,7 @@ void AStarPath::initialize(GameState* gs) {
 }
 
 bool AStarPath::can_cross(const Pos& s, const Pos& e) {
-	return !at(s.x, e.y)->solid && !at(e.x, s.y)->solid;
+	return !at(Pos(s.x, e.y))->solid && !at(Pos(e.x, s.y))->solid;
 }
 
 static std::vector<AStarNode*>::iterator find_heap_position(
@@ -77,18 +77,19 @@ static std::vector<AStarNode*>::iterator find_heap_position(
 }
 
 /*Used to make sure all interpolated directions are possible*/
-std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, int sx,
-		int sy, int ex, int ey) {
+std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, Pos s, Pos e, bool clear_results) {
 	perf_timer_begin(FUNCNAME);
-	initialize(gs);
+	if (clear_results) {
+		initialize(gs);
+	}
 
 	AStarOrderNodes orderfunc;
 	std::vector<AStarNode*> heap;
 
-	AStarNode* start = at(sx, sy);
+	AStarNode* start = at(s);
 
 	start->g_score = 0;
-	start->h_score = heurestic_distance(Pos(sx, sy), Pos(ex, ey));
+	start->h_score = heurestic_distance(s, e);
 	start->f_score = start->h_score;
 	start->openset = true;
 	start->previous = NULL;
@@ -116,7 +117,7 @@ std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, int sx,
 				if (xx < 0 || xx >= w)
 					continue;
 
-				AStarNode* neighbour = at(xx, yy);
+				AStarNode* neighbour = at(Pos(xx, yy));
 				if (neighbour->closedset)
 					continue;
 				if (!can_cross(Pos(x, y), Pos(xx, yy)))
@@ -127,8 +128,7 @@ std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, int sx,
 				if (!neighbour->solid && !neighbour->openset) {
 					neighbour->openset = true;
 					neighbour->previous = node;
-					neighbour->h_score = heurestic_distance(Pos(xx, yy),
-							Pos(ex, ey));
+					neighbour->h_score = heurestic_distance(Pos(xx, yy), e);
 					neighbour->g_score = g_score;
 					neighbour->f_score = neighbour->g_score
 							+ neighbour->h_score;
@@ -149,7 +149,7 @@ std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, int sx,
 		}
 	}
 	std::vector<Pos> positions;
-	AStarNode* traverse = at(ex, ey);
+	AStarNode* traverse = at(e);
 	while (traverse) {
 		int x = (traverse - nodes) % w;
 		int y = (traverse - nodes) / w;

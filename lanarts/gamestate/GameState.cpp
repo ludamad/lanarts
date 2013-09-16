@@ -436,6 +436,12 @@ bool GameState::tile_radius_test(int x, int y, int rad, bool issolid, int ttype,
 	return tiles().radius_test(Pos(x, y), rad, issolid, ttype, hitloc);
 }
 
+bool GameState::tile_line_test(const Pos& from_xy, const Pos& to_xy,
+		bool issolid, int ttype, Pos* hitloc) {
+	return tiles().line_test(from_xy, to_xy, issolid, ttype, hitloc);
+}
+
+
 //int GameState::object_square_test(GameInst** objs, int obj_cap,
 //		col_filterf f, const Pos& pos) {
 //	return get_level()->game_inst_set().object_square_test(objs, obj_cap, f, pos);

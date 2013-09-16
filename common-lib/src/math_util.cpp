@@ -103,6 +103,34 @@ bool circle_line_test(Pos circle_xy, int circle_rad, Pos line_start_xy,
 	return rt < (circle_rad * circle_rad);
 }
 
+// TODO: Clean once works...
+bool rectangle_line_test(BBox rect, Pos from_xy, Pos to_xy) {
+	int temp1, temp2, RHS;
+	Pos dd = to_xy - from_xy;
+	float distance = sqrt(dd.x*dd.x + dd.y*dd.y);
+	Pos diff = (from_xy+to_xy).divided(2) - rect.center();
+
+	temp1 = abs(signum(dd.x) * rect.x1 + signum(dd.y) * rect.y1);
+	temp2 = abs(diff.x * rect.x1 + diff.y * rect.y1);
+	RHS = rect.width() + distance * temp1;
+    if (temp2 > RHS) {
+        return false;
+    }
+
+	temp1 = abs(signum(dd.x) * rect.x2 + signum(dd.y) * rect.y2);
+	temp2 = abs(diff.x * rect.x2 + diff.y * rect.y2);
+	RHS = rect.height() + distance * temp1;
+    if (temp2 > RHS) {
+        return false;
+    }
+
+    int LHS = abs(diff.x * signum(dd.y) - diff.y * signum(dd.x));
+    temp1 = abs(rect.x1 * signum(dd.y) - rect.y1 * signum(dd.x));
+    temp2 = abs(rect.x2 * signum(dd.y) - rect.y2 * signum(dd.x));
+    RHS = rect.width() * temp1 + rect.height() * temp2;
+    return LHS <= RHS;
+}
+
 bool circle_rectangle_test(Pos circle_xy, int circle_rad, BBox rect) {
 	Pos rad_duped = Pos(circle_rad, circle_rad);
 	if (rect.contains(circle_xy + rad_duped) || rect.contains(circle_xy - rad_duped)) {

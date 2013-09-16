@@ -308,10 +308,6 @@ local function place_content(map)
     return map_id
 end
 
---local function generate_inline_room(args)
---    MapGen.rectangle_query {map = args.map}
---end
-
 local function sort_positions_by_angle(positions, centre)
     table.sort(positions, function(a,b)
         local angle1 = math.atan2(unpack(vector_subtract(a,centre)))

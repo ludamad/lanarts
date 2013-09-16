@@ -58,6 +58,8 @@ public:
 
 	bool radius_test(const Pos& xy, int rad, bool issolid = true, int ttype = -1,
 			Pos* hitloc = NULL);
+	bool line_test(const Pos& from_xy, const Pos& to_xy, bool issolid = true, int ttype = -1,
+			Pos* hitloc = NULL);
 	void clear();
 	void copy_to(GameTiles& t) const;
 

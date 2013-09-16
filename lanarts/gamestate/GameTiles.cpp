@@ -19,6 +19,9 @@
 #include <lcommon/SerializeBuffer.h>
 
 #include <lcommon/math_util.h>
+
+#include "util/bresenham.h"
+
 #include "GameState.h"
 
 #include "GameTiles.h"
@@ -238,6 +241,37 @@ void GameTiles::serialize(SerializeBuffer& serializer) {
 //	rt = (dx * dx) + (dy * dy);
 //	return rt < (radsqr);
 //}
+
+bool GameTiles::line_test(const Pos& from_xy, const Pos& to_xy, bool issolid, int ttype,
+		Pos* hitloc) {
+	Size size = this->size();
+
+	TCOD_bresenham_data_t line_data;
+	Pos tile_from = from_xy.divided(TILE_SIZE), tile_to = to_xy.divided(TILE_SIZE);
+	TCOD_line_init_mt(tile_from.x, tile_from.y, tile_to.x, tile_to.y, &line_data);
+
+	// Iterate for each (x,y) in the line
+	int x,y;
+	while (!TCOD_line_step_mt(&x, &y, &line_data)) {
+		int idx = y * size.w + x;
+
+		Tile& tile = _tiles.raw_get(idx);
+
+		bool istype = (tile.tile == ttype || ttype == -1);
+		bool solidity_match = _solidity->raw_get(idx) == issolid;
+
+		if (solidity_match && istype) {
+			BBox tilebox(Pos(x * TILE_SIZE, y * TILE_SIZE), Size(TILE_SIZE, TILE_SIZE));
+			if (rectangle_line_test(tilebox, from_xy, to_xy)) {
+				if (hitloc)
+					*hitloc = Pos(x, y);
+				return true;
+			}
+		}
+
+	}
+	return false;
+}
 
 bool GameTiles::radius_test(const Pos& xy, int rad, bool issolid, int ttype,
 		Pos* hitloc) {

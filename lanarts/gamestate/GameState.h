@@ -101,7 +101,8 @@ public:
 	/* Collision test functions */
 	bool tile_radius_test(int x, int y, int rad, bool issolid = true,
 			int ttype = -1, Pos* hitloc = NULL);
-	bool tile_line_test(int x, int y, int w, int h);
+	bool tile_line_test(const Pos& from_xy, const Pos& to_xy,
+			bool issolid = true, int ttype = -1, Pos* hitloc = NULL);
 	int object_radius_test(GameInst* obj, GameInst** objs = NULL, int obj_cap =
 			0, col_filterf f = NULL, int x = -1, int y = -1, int radius = -1);
 	int object_radius_test(int x, int y, int radius, col_filterf f = NULL,

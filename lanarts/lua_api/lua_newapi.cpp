@@ -130,6 +130,7 @@ namespace lua_api {
 
 	void register_lua_core_GameMap(lua_State* L);
 	void register_lua_core_CollisionAvoidance(lua_State* L);
+	void register_lua_core_PathFinding(lua_State* L);
 
 	// Register all the lanarts API functions and types
 	void register_api(GameState* gs, lua_State* L) {
@@ -157,6 +158,7 @@ namespace lua_api {
 
 		register_lua_core_GameMap(L);
 		register_lua_core_CollisionAvoidance(L);
+		register_lua_core_PathFinding(L);
 	}
 
 	void luacall_post_draw(lua_State* L) {

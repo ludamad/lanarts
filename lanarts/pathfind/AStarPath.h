@@ -28,12 +28,12 @@ public:
 		delete[] nodes;
 	}
 	//outputs in real-world waypoints
-	std::vector<Pos> calculate_AStar_path(GameState *gs, int sx, int sy, int ex, int ey);
+	std::vector<Pos> calculate_AStar_path(GameState* gs, Pos s, Pos e, bool clear_results = true);
 
 private:
 	void initialize(GameState* gs);
-	AStarNode* at(int x, int y){
-		return &nodes[y*w+x];
+	AStarNode* at(Pos xy){
+		return &nodes[xy.y*w+xy.x];
 	}
 	AStarNode* nodes;
 	bool can_cross(const Pos& s, const Pos& e);

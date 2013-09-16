@@ -87,7 +87,7 @@ file(GLOB lanarts_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
        tests/*
 )
 
-add_executable( lanarts ${lanarts_src} )
+add_executable( lanarts ${lanarts_src} ${lanarts_tests})
 
 set (libraries 
 	ldraw
