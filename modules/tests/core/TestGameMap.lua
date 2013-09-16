@@ -3,22 +3,33 @@ local GameObject = import "core.GameObject"
 local MapGen = import "core.MapGeneration"
 local Display = import "core.Display"
 
-local gmap = GameMap.create { 
-    map = MapGen.map_create { 
-        label = "TestLevel", 
-        size = {256,256},            
-        content = Data.tile_create { 
-            images = {
-                Display.image_load (path_resolve "test_tile.png")
+local function gmap_create(--[[Optional]] solid_tiles)
+    solid_tiles = solid_tiles or {} -- TODO
+    GameMap.create { 
+        map = MapGen.map_create { 
+            label = "TestLevel", 
+            size = {256,256},            
+            content = Data.tile_create { 
+                images = {
+                    Display.image_load (path_resolve "test_tile.png")
+                }
             }
         }
     }
-}
+end
 
 function TestCases.rectangle_collision_check()
+    local gmap = gmap_create()
     local object_in = GameObject.object_create{ map = gmap, xy = {75,75}, radius = 10 }
     local object_out = GameObject.object_create{ map = gmap, xy = {25,25}, radius = 10 }
     local instances = GameMap.rectangle_collision_check(gmap, {50,50,150,150}, nil)
+    assert(#instances == 1)
+    assert(instances[1].id == object_in.id)
+end
+
+function TestCases.rectangle_collision_check()
+    local gmap = gmap_create()
+    local instances = GameMap.line_tile_check(gmap, {50,50,150,150}, nil)
     assert(#instances == 1)
     assert(instances[1].id == object_in.id)
 end
