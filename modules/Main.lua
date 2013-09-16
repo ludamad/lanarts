@@ -118,19 +118,20 @@ require_path_add("modules/?.lua")
 function Engine.main(args)
     import "core.Main"
 
-    if table.contains(args, "--tests") then
-        local failures = _lanarts_unit_tests()
-        local passed = import "tests.Main"
+    local all_tests, cpp_tests, lua_tests = (args[1] == "--tests"), (args[1] == "--cpp-tests"), (args[1] == "--lua-tests")
+    if all_tests or cpp_tests or lua_tests then
+        local failures = (cpp_tests or all_tests) and _lanarts_unit_tests() or 0
+        local passed = (lua_tests or all_tests) and import "tests.Main" or true
         -- Return exit code so ctest will notice the failure
-        if failures or not passed then os.exit(2) end
+        if failures > 0 or not passed then os.exit(2) end
         return false
-    elseif table.contains(args, "--simulation") then
+    elseif args[1] == "--simulation" then
         import "unstable.Simulation"
         return false
     elseif args[1] == "--example" then
         import ("examples." .. args[2])
         return false
-    elseif table.contains(args, "--repl") then
+    elseif args[1] "--repl" then
         local finished = false
         function _G.start_lanarts() finished = true end
         while not finished do 
