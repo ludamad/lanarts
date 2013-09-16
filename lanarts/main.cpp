@@ -29,9 +29,9 @@
 
 #include "gamestate/GameState.h"
 
-#include "lua_api/lua_newapi.h"
+#include "lua_api/lua_api.h"
 #include "lua_api/lua_yaml.h"
-#include "lua_api/lua_newapi.h"
+#include "lua_api/lua_api.h"
 
 // This is a stop-gap measure to allow Lua all-or-nothing control over internal graphic initialization.
 // Long-term we must move eg fonts completely to Lua.

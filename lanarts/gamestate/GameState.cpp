@@ -26,8 +26,8 @@
 #include "draw/draw_sprite.h"
 #include "draw/TileEntry.h"
 
-#include "lua_api/lua_newapi.h"
-#include "lua_api/lua_newapi.h"
+#include "lua_api/lua_api.h"
+#include "lua_api/lua_api.h"
 
 #include "net/GameNetConnection.h"
 

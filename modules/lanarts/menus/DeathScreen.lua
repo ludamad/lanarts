@@ -1,4 +1,5 @@
 local Display = import "core.Display"
+local GameState = import "core.GameState"
 
 local InstanceBox = import "core.ui.InstanceBox"
 local InstanceLine = import "core.ui.InstanceLine"
@@ -65,12 +66,12 @@ end
 local function death_screen_show(...)
     local screen = death_screen_create(...)
 
-    while Game.input_capture(true, false) and not Keys.key_pressed(keys.ESCAPE) and not Keys.key_pressed(keys.ENTER) and not Keys.key_pressed(keys.SPACE) do
+    while GameState.input_capture(true, false) and not Keys.key_pressed(keys.ESCAPE) and not Keys.key_pressed(keys.ENTER) and not Keys.key_pressed(keys.SPACE) do
         Display.draw_start()
         screen:step( {0,0} )
         screen:draw( {0,0} )
         Display.draw_finish()
-        Game.wait(100)
+        GameState.wait(100)
     end
 end
 

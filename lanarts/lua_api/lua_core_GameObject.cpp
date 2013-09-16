@@ -6,7 +6,7 @@
 #include <lua.hpp>
 #include <stdexcept>
 
-#include <lua_api/lua_newapi.h>
+#include <lua_api/lua_api.h>
 
 #include <luawrap/luawrap.h>
 #include <luawrap/members.h>
@@ -28,8 +28,7 @@
 #include "objects/player/PlayerInst.h"
 #include "objects/CombatGameInst.h"
 
-#include "lua_newapi.h"
-#include "lua_gameinst.h"
+#include "lua_api.h"
 
 #include "draw/SpriteEntry.h"
 
@@ -464,25 +463,27 @@ static void object_destroy(LuaStackValue inst) {
 	lua_api::gamestate(inst)->remove_instance(inst.as<GameInst*>());
 }
 
-void lua_register_gameinst(lua_State* L) {
-	luawrap::install_type<GameInst*, GameInstWrap::push, GameInstWrap::get, GameInstWrap::check>();
-	luawrap::install_dynamic_casted_type<CombatGameInst*, GameInst*>();
-	luawrap::install_dynamic_casted_type<PlayerInst*, GameInst*>();
-	luawrap::install_dynamic_casted_type<EnemyInst*, GameInst*>();
-	luawrap::install_dynamic_casted_type<FeatureInst*, GameInst*>();
+namespace lua_api {
+	void register_lua_core_GameObject(lua_State* L) {
+		luawrap::install_type<GameInst*, GameInstWrap::push, GameInstWrap::get, GameInstWrap::check>();
+		luawrap::install_dynamic_casted_type<CombatGameInst*, GameInst*>();
+		luawrap::install_dynamic_casted_type<PlayerInst*, GameInst*>();
+		luawrap::install_dynamic_casted_type<EnemyInst*, GameInst*>();
+		luawrap::install_dynamic_casted_type<FeatureInst*, GameInst*>();
 
-	LuaValue globals = luawrap::globals(L);
-	LuaValue submodule = lua_api::register_lua_submodule(L, "core.GameObject");
-	submodule["enemy_create"].bind_function(enemy_create);
-	submodule["object_create"].bind_function(object_create);
-	submodule["feature_create"].bind_function(feature_create);
-	submodule["item_create"].bind_function(item_create);
-	submodule["animation_create"].bind_function(animation_create);
-	submodule["store_create"].bind_function(store_create);
-	submodule["destroy"].bind_function(object_destroy);
+		LuaValue globals = luawrap::globals(L);
+		LuaValue submodule = lua_api::register_lua_submodule(L, "core.GameObject");
+		submodule["enemy_create"].bind_function(enemy_create);
+		submodule["object_create"].bind_function(object_create);
+		submodule["feature_create"].bind_function(feature_create);
+		submodule["item_create"].bind_function(item_create);
+		submodule["animation_create"].bind_function(animation_create);
+		submodule["store_create"].bind_function(store_create);
+		submodule["destroy"].bind_function(object_destroy);
 
-	submodule["DOOR_OPEN"] = (int)FeatureInst::DOOR_OPEN;
-	submodule["DOOR_CLOSED"] = (int)FeatureInst::DOOR_CLOSED;
-	submodule["PORTAL"] = (int)FeatureInst::PORTAL;
-	submodule["OTHER"] = (int)FeatureInst::OTHER;
+		submodule["DOOR_OPEN"] = (int)FeatureInst::DOOR_OPEN;
+		submodule["DOOR_CLOSED"] = (int)FeatureInst::DOOR_CLOSED;
+		submodule["PORTAL"] = (int)FeatureInst::PORTAL;
+		submodule["OTHER"] = (int)FeatureInst::OTHER;
+	}
 }

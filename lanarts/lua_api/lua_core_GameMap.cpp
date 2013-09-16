@@ -23,10 +23,9 @@
 
 #include "stats/ClassEntry.h"
 
-#include "lua_newapi.h"
+#include "lua_api.h"
 
-#include "lua_api/lua_newapi.h"
-#include "lua_api/lua_gameinst.h"
+#include "lua_api/lua_api.h"
 
 static int gmap_create(LuaStackValue args) {
 	using namespace luawrap;

@@ -20,7 +20,7 @@
 
 #include <lcommon/math_util.h>
 
-#include "lua_api/lua_newapi.h"
+#include "lua_api/lua_api.h"
 
 #include "../enemy/EnemyInst.h"
 

@@ -10,9 +10,9 @@
 #include <lua.hpp>
 #include <luawrap/luawrap.h>
 
-#include "lua_newapi.h"
+#include "lua_api.h"
 
-#include "lua_api/lua_newapi.h"
+#include "lua_api/lua_api.h"
 #include "fov/fov.h"
 
 #include <lcommon/math_util.h>

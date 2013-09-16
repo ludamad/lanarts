@@ -24,7 +24,7 @@
 #include "gamestate/GameMapState.h"
 #include "gamestate/GameSettings.h"
 
-#include "lua_newapi.h"
+#include "lua_api.h"
 
 static int event_log_add(lua_State* L) {
 	int nargs = lua_gettop(L);
@@ -82,8 +82,8 @@ namespace lua_api {
 		LuaValue vals = display.values;
 		ldraw::lua_register_ldraw(L, vals);
 
-		display.getters["screen_coords"].bind_function(screen_coords);
-		display.getters["world_coords"].bind_function(world_coords);
+		vals["screen_coords"].bind_function(screen_coords);
+		vals["world_coords"].bind_function(world_coords);
 		display.getters["display_size"].bind_function(ldraw::display_size);
 		display.getters["display_xy"].bind_function(display_xy);
 
@@ -96,7 +96,7 @@ namespace lua_api {
 	}
 
 	/* Functions for visual results in the lanarts world, eg drawing text */
-	void register_display_api(lua_State* L) {
+	void register_lua_core_Display(lua_State* L) {
 		LuaValue globals = luawrap::globals(L);
 		GameState* gs = lua_api::gamestate(L);
 

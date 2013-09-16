@@ -17,7 +17,7 @@
 #include "gamestate/GameState.h"
 #include "gamestate/ScoreBoard.h"
 
-#include "lua_newapi.h"
+#include "lua_api.h"
 
 static void game_save(LuaStackValue filename) {
 	FILE* file = fopen(filename.as<const char*>(), "wb");
@@ -200,14 +200,14 @@ namespace lua_api {
 		lua_pop(L, 1);
 	}
 
-	void register_gamestate_api(lua_State* L) {
+	void register_lua_core_GameState(lua_State* L) {
 		// Install ScoreBoardEntry so we can bind fetch_scores directly
 		luawrap::install_type<ScoreBoardEntry, ScoreBoardEntry::lua_push>();
 
 		register_gamesettings(L);
 
 		LuaValue globals = luawrap::globals(L);
-		LuaValue game = luawrap::ensure_table(globals["Game"]);
+		LuaValue game = register_lua_submodule(L, "core.GameState");
 
 		game["resources_load"].bind_function(game_resources_load);
 

@@ -22,7 +22,7 @@ extern "C" {
 
 #include <lua.hpp>
 
-#include <lua_api/lua_newapi.h>
+#include <lua_api/lua_api.h>
 
 static lua_State *globalL = NULL;
 

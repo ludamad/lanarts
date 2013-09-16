@@ -130,6 +130,12 @@ function Engine.main(args)
     elseif args[1] == "--example" then
         import ("examples." .. args[2])
         return false
+    elseif table.contains(args, "--repl") then
+        local finished = false
+        function _G.start_lanarts() finished = true end
+        while not finished do 
+            __read_eval_print()
+        end
     end
 
     local Display = import "core.Display"

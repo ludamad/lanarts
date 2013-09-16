@@ -5,9 +5,11 @@
 local Display = import "core.Display"
 local EventLog = import "core.ui.EventLog"
 
+local GameState = import "core.GameState"
 local World = import "core.GameWorld"
 local Map = import "core.GameMap"
 local help_overlay = import "@HelpOverlay"
+local Network = import "core.Network"
 local Keys = import "core.Keyboard"
 
 local M = {} -- Submodule
@@ -24,31 +26,31 @@ local function game_loop_body(steponly)
     perf.timing_begin("**Game Frame**")
 
     perf.timing_begin("**Sync Message**")
-    net.sync_message_consume()
+    Network.sync_message_consume()
     perf.timing_end("**Sync Message**")
 
     local timer = timer_create()
 
     if not steponly then
         perf.timing_begin("**Draw**")
-        Game.draw()
+        GameState.draw()
         perf.timing_end("**Draw**")
     end
 
     perf.timing_begin("**Step**")
-    if not M.loop_control.game_is_paused and not Game.step() then 
+    if not M.loop_control.game_is_paused and not GameState.step() then 
         return false 
     end
     perf.timing_end("**Step**")
 
-    if not Game.input_handle() then 
+    if not GameState.input_handle() then 
         return false 
     end
 
     local surplus = settings.time_per_step - timer:get_milliseconds()
 
     perf.timing_begin("**Surplus**")
-    Game.wait(surplus)
+    GameState.wait(surplus)
     perf.timing_end("**Surplus**")
 
     perf.timing_end("**Game Frame**")
@@ -62,18 +64,17 @@ function M.post_draw()
     for pdata in values(World.players) do
         local p = pdata.instance
         if not p:is_local_player() and p.map == player.map then
-            Fonts.small:draw({color=COL_WHITE, origin=Display.CENTER}, screen_coords{p.x, p.y-18}, pdata.name)
+            Fonts.small:draw({color=COL_WHITE, origin=Display.CENTER}, Display.screen_coords{p.x, p.y-18}, pdata.name)
         end
     end
-
 end
 
 local fps_timer = timer_create()
 local fps_count, fps_lastframe, fps = 1, 0, nil
 
 function M.overlay_draw()
-    local frame_increase = math.max(0, Game.frame - fps_lastframe)
-    fps_lastframe = Game.frame
+    local frame_increase = math.max(0, GameState.frame - fps_lastframe)
+    fps_lastframe = GameState.frame
     fps_count = fps_count + frame_increase
 
     if fps then
@@ -94,13 +95,13 @@ end
 function M.run_loop()
     M.loop_control.startup_function()
 
-    Game.input_capture()
+    GameState.input_capture()
 
     while true do 
-        local single_player = (settings.connection_type == net.NONE)
+        local single_player = (settings.connection_type == Network.NONE)
     
         if Keys.key_pressed(Keys.F2) and single_player then 
-            Game.resources_load()
+            GameState.resources_load()
         end
     
         if Keys.key_pressed(Keys.F4) then 
@@ -111,11 +112,11 @@ function M.run_loop()
             EventLog.add("Press Shift + Esc to exit, your progress will be saved.")
         end
 
-        local steponly = (Game.frame % settings.steps_per_draw ~= 0)
+        local steponly = (GameState.frame % settings.steps_per_draw ~= 0)
         if not game_loop_body(steponly) then
             if single_player then
-                Game.score_board_store()
-                Game.save("saves/savefile.save")
+                GameState.score_board_store()
+                GameState.save("saves/savefile.save")
             end
             break
         end
@@ -125,8 +126,8 @@ function M.run_loop()
         end
 
         if Keys.key_pressed(Keys.F5) then
-            Game.input_capture(true) -- reset input
-            net.sync_message_send()
+            GameState.input_capture(true) -- reset input
+            Network.sync_message_send()
         end
     end
 

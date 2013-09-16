@@ -1,4 +1,5 @@
 local Display = import "core.Display"
+local GameState = import "core.GameState"
 
 local InstanceBox = import "core.ui.InstanceBox"
 local InstanceLine = import "core.ui.InstanceLine"
@@ -59,7 +60,7 @@ local function tutorial_menu_show(...)
     function go_back()    update_screen(screen_idx - 1) end
     function go_forward() update_screen(screen_idx + 1) end
 
-    while Game.input_capture() and not Keys.key_pressed(keys.ESCAPE) and screen  do
+    while GameState.input_capture() and not Keys.key_pressed(keys.ESCAPE) and screen  do
         Display.draw_start()
         screen:step( {0,0} )
 
@@ -73,7 +74,7 @@ local function tutorial_menu_show(...)
 
         screen:draw( {0,0} )
         Display.draw_finish()
-        Game.wait(100)
+        GameState.wait(100)
     end
 
     return false

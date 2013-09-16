@@ -14,8 +14,8 @@
 #include "draw/TileEntry.h"
 #include "gamestate/GameState.h"
 
-#include "lua_api/lua_newapi.h"
-#include "lua_api/lua_newapi.h"
+#include "lua_api/lua_api.h"
+#include "lua_api/lua_api.h"
 
 #include "stats/items/ItemEntry.h"
 

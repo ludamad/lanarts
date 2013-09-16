@@ -1,7 +1,9 @@
 local Sounds = import "@Sounds"
+local GameState = import "core.GameState"
 local DeathScreen = import "@menus.DeathScreen"
 local PlayerFunctions = import "@Players"
 local Relations = import "@objects.Relations"
+local Network = import "core.Network"
 local World = import "core.GameWorld"
 
 local M = {} -- Submodule
@@ -16,7 +18,7 @@ function events.PlayerDeath(player)
     if #World.players == 1 then
         DeathScreen.show()
     end
-    Game.score_board_store()
+    GameState.score_board_store()
 end
 
 function events.MonsterInit(monster)
@@ -42,10 +44,10 @@ function events.MonsterDeath(monster)
 end
 
 function events.PlayerEnterLevel()
-    local single_player = (settings.connection_type == net.NONE)
+    local single_player = (settings.connection_type == Network.NONE)
     if single_player then
-        Game.score_board_store()
-        Game.save("saves/savefile.save")
+        GameState.score_board_store()
+        GameState.save("saves/savefile.save")
     end
 end
 
@@ -61,9 +63,9 @@ function M.player_has_won()
     local WinningScreen = import "lanarts.menus.WinningScreen"
     local game_loop_control = (import "lanarts.GameLoop").loop_control
 
-    Game.wait(400)
+    GameState.wait(400)
     game_loop_control.game_is_over = true
-    Game.score_board_store(--[[Store winning entry]] true)
+    GameState.score_board_store(--[[Store winning entry]] true)
     WinningScreen.show()
 end
 

@@ -20,7 +20,7 @@
 #include "gamestate/GameMapState.h"
 #include "pathfind/FloodFillPaths.h"
 
-#include "lua_api/lua_newapi.h"
+#include "lua_api/lua_api.h"
 
 #include "../CombatGameInst.h"
 #include "../GameInst.h"

@@ -1,5 +1,6 @@
 local Display = import "core.Display"
 local Keys = import "core.Keyboard"
+local GameState = import "core.GameState"
 
 local GameObject = newtype()
 
@@ -29,9 +30,9 @@ local WINDOW_SIZE = { 640, 480 }
 Display.initialize("Lanarts Example", WINDOW_SIZE, --[[Not fullscreen]] false)
 local obj = GameObject.create({320, 240}, 8, 32)
 
-while Game.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do obj:step()
+while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do obj:step()
     Display.draw_start()
     obj:draw()
     Display.draw_finish()
-    Game.wait(10)
+    GameState.wait(10)
 end

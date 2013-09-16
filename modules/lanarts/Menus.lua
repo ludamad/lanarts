@@ -5,7 +5,9 @@ local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
 local utils = import "core.Utils"
 local game_loop = import "@GameLoop"
+local GameState = import "core.GameState"
 
+local Network = import "core.Network"
 local GameSettingsMenu = import "@menus.GameSettingsMenu"
 local LobbyMenu = import "@menus.LobbyMenu"
 local PregameMenu = import "@menus.PregameMenu"
@@ -110,10 +112,10 @@ function setup_start_menu()
     local function on_load_click()
         game_loop.loop_control.startup_function = function()
             if file_exists("saves/savefile.save") then
-                Game.load("saves/savefile.save")
+                GameState.load("saves/savefile.save")
             end
         end
-	settings.connection_type = net.NONE
+	settings.connection_type = Network.NONE
         exit_menu()
     end
 
@@ -180,7 +182,7 @@ function setup_lobby_menu()
 end
 
 local function menu_loop(should_poll)
-    while Game.input_capture() do
+    while GameState.input_capture() do
         if Keys.key_pressed(Keys.F9) then
             -- note, globals are usually protected against being changed
             -- but a bypass is allowed for cases where it must be done
@@ -188,7 +190,7 @@ local function menu_loop(should_poll)
         end
 
         if should_poll then
-            net.connections_poll()
+            Network.connections_poll()
         end
 
         menu_state.menu:step( {0, 0} )
@@ -208,7 +210,7 @@ local function menu_loop(should_poll)
         Display.draw_finish()
 
         Tasks.run_all()
-        Game.wait(10)
+        GameState.wait(10)
     end
 
     return false -- User has quit the game

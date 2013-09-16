@@ -1,4 +1,5 @@
 local Display = import "core.Display"
+local GameState = import "core.GameState"
 
 local InstanceBox = import "core.ui.InstanceBox"
 local InstanceGroup = import "core.ui.InstanceGroup"
@@ -32,7 +33,7 @@ end
 local TEXT_COLOR = {255, 250, 240}
 
 local function sorted_scores_fetch()
-    local scores = Game.score_board_fetch()
+    local scores = GameState.score_board_fetch()
 
     local function entry_compare(a, b)
         if a.won_the_game ~= b.won_the_game     then return a.won_the_game end

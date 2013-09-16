@@ -2,11 +2,12 @@ local Relations = import "@objects.Relations"
 local Keys = import "core.Keyboard"
 local Projectiles = import "@objects.Projectiles"
 local DungeonFeatures = import "@objects.DungeonFeatures"
+local Network = import "core.Network"
 
 local PLAYER_TRAIT = "PLAYER_TRAIT"
 
 local function player_on_step(self)
-    local single_player = (settings.connection_type == net.NONE)
+    local single_player = (settings.connection_type == Network.NONE)
 end
 
 -- Return submodule

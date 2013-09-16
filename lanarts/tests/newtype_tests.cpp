@@ -5,7 +5,7 @@
 #include <luawrap/LuaValue.h>
 #include <luawrap/luawrap.h>
 #include <luawrap/testutils.h>
-#include <lua_api/lua_newapi.h>
+#include <lua_api/lua_api.h>
 
 SUITE(lua_api_tests) {
 

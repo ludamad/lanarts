@@ -5,7 +5,7 @@
  */
 
 #include <luawrap/luawrap.h>
-#include "lua_api/lua_newapi.h"
+#include "lua_api/lua_api.h"
 
 #include "objects/CombatGameInst.h"
 

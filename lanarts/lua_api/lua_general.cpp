@@ -19,7 +19,7 @@
 
 #include "gamestate/GameState.h"
 
-#include "lua_newapi.h"
+#include "lua_api.h"
 
 #include <lcommon/math_util.h>
 
@@ -656,6 +656,8 @@ namespace lua_api {
 		return 1;
 	}
 
+	int read_eval_print(lua_State *L);
+
 	void register_general_api(lua_State* L) {
 		LuaValue globals = luawrap::globals(L);
 		LuaValue registry = luawrap::registry(L);
@@ -675,6 +677,8 @@ namespace lua_api {
 		globals["chance"].bind_function(lapi_chance);
 		globals["nilprotect"].bind_function(lua_protect_table);
 
+		globals["__read_eval_print"].bind_function(read_eval_print);
+
 		globals["import_internal"].bind_function(lapi_import_internal);
 		globals["virtual_path_create_relative"].bind_function(lapi_virtual_path_create_relative);
 		globals["require_path_add"].bind_function(lapi_add_search_path);
@@ -684,7 +688,6 @@ namespace lua_api {
 		table["merge"].bind_function(lapi_table_merge);
 		table["copy"].bind_function(lapi_table_copy);
 		table["deep_copy"].bind_function(lapi_table_deep_copy);
-//		table["deep_clone"].bind_function(lapi_table_deep_clone);
 		table["remove_nonexisting"].bind_function(lapi_table_remove_nonexisting);
 
 		LuaValue string_table = luawrap::ensure_table(globals["string"]);

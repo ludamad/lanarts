@@ -20,7 +20,7 @@
 
 #include "interface/TextField.h"
 
-#include "lua_newapi.h"
+#include "lua_api.h"
 
 #include "draw/TileEntry.h"
 
@@ -31,7 +31,6 @@ static int tile_create(LuaStackValue args) {
 	LuaField images = args["images"];
 	if (!images.isnil()) {
 		entry.images = images.as<ImageList>();
-		entry.layout_rules.rest = Range(0, entry.images.size());
 	} else {
 		LuaField img_orients= args["image_orientations"];
 		std::vector<ImageList> orients = img_orients["orientations"].as<std::vector<ImageList> >();
@@ -43,8 +42,6 @@ static int tile_create(LuaStackValue args) {
 			ImageList& list = orients[i];
 			int start_ind = entry.images.size();
 			entry.images.insert(entry.images.end(), list.begin(), list.end());
-			entry.layout_rules.orientations.push_back(
-					Range(start_ind, start_ind + list.size()));
 		}
 	}
 	game_tile_data.push_back(entry);

@@ -1,10 +1,10 @@
 /*
- * lua_newapi.h:
- *  New API, rename to lua_api once completed
+ * lua_api.h:
+ *  C++-side of the Lua API. Defines most of the 'core' module.
  */
 
-#ifndef LUA_NEWAPI_H_
-#define LUA_NEWAPI_H_
+#ifndef LUA_API_H_
+#define LUA_API_H_
 
 class GameState;
 class GameInst;
@@ -46,9 +46,6 @@ namespace lua_api {
 
 	/* Register general utility functions */
 	void register_general_api(lua_State* L) ;
-
-	/* Functions for visual results in the lanarts world, eg drawing text */
-	void register_display_api(lua_State* L);
 
 	/* Functions for the event log, namely adding messages */
 	void register_event_log_api(lua_State* L);
@@ -96,6 +93,9 @@ class CombatStats;
 class EffectiveStats;
 class EffectiveAttackStats;
 
+// Defined in lua_core_GameObject
+void lua_gameinst_callback(lua_State* L, LuaValue& value, GameInst* inst);
+
 void lua_push_effectivestats(lua_State* L, GameInst* inst);
 void lua_push_effectivestats(lua_State* L, const EffectiveStats& stats);
 void lua_push_effectiveattackstats(lua_State* L, const EffectiveAttackStats& stats);
@@ -110,4 +110,4 @@ void lua_push_combatstats(lua_State* L, const CombatStats& stats);
 
 void luayaml_push_item(lua_State* L, const char* name);
 
-#endif /* LUA_NEWAPI_H_ */
+#endif /* LUA_API_H_ */

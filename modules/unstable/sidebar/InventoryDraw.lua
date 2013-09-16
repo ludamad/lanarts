@@ -6,6 +6,7 @@ local TextInputBox = import "core.ui.TextInputBox"
 local TextLabel = import "core.ui.TextLabel"
 local Sprite = import "core.ui.Sprite"
 local Keys = import "core.Keyboard"
+local GameState = import "core.GameState"
 
 DEBUG_LAYOUTS = false
 
@@ -24,7 +25,7 @@ function main()
     local size = {160, 300}
     local inv = inventory_view_create(size)
 
-    while Game.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
+    while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
         if Keys.key_pressed(Keys.F9) then
             -- note, globals are usually protected against being changed
             -- but a bypass is allowed for cases where it must be done
@@ -36,7 +37,7 @@ function main()
         Display.draw_finish()
 
         io.flush()
-        Game.wait(10)
+        GameState.wait(10)
     end
 
     return false -- User has quit the game

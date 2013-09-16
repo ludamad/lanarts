@@ -6,7 +6,7 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
-#include "lua_api/lua_newapi.h"
+#include "lua_api/lua_api.h"
 
 #include <luawrap/luawrap.h>
 

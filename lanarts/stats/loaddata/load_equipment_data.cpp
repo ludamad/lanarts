@@ -3,7 +3,7 @@
 #include <lua.hpp>
 
 #include "lua_api/lua_yaml.h"
-#include "lua_api/lua_newapi.h"
+#include "lua_api/lua_api.h"
 #include "data/game_data.h"
 #include "data/yaml_util.h"
 

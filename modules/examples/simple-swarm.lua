@@ -1,4 +1,5 @@
 local Display = import "core.Display"
+local GameState = import "core.GameState"
 
 -- Necessary to load images:
 Display.initialize("Lanarts Example", {640,640}, --[[Not fullscreen]] false)
@@ -136,11 +137,11 @@ for i=1,10 do
     obj.sim_id = cgroup:add_object(obj)
 end
 
-while Game.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
+while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
     GameMap.map_step {map=gmap}
     cgroup:step()
     Display.draw_start()
     GameMap.map_draw {map=gmap}
     Display.draw_finish()
-    Game.wait(10)
+    GameState.wait(10)
 end

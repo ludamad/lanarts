@@ -1,5 +1,5 @@
 /*
- * lua_newapi.cpp:
+ * lua_api.cpp:
  *  New API, rename to lua_api once completed
  */
 
@@ -17,15 +17,14 @@
 #include "gamestate/GameState.h"
 
 #include "lua_api/lua_yaml.h"
-#include "lua_api/lua_newapi.h"
-#include "lua_api/lua_gameinst.h"
+#include "lua_api/lua_api.h"
 
 extern "C" {
 #include "luasocket/luasocket.h"
 #include "luasocket/mime.h"
 }
 
-#include "lua_newapi.h"
+#include "lua_api.h"
 
 // NB: the -address- of this key is used, not the actual string.
 static char GAMESTATE_KEY[] = "";
@@ -131,9 +130,15 @@ namespace lua_api {
 		preload["mime.core"].bind_function(luaopen_mime_core);
 	}
 
+	void register_lua_core_Display(lua_State* L);
+	void register_lua_core_GameObject(lua_State* L);
 	void register_lua_core_GameMap(lua_State* L);
+	void register_lua_core_GameState(lua_State* L);
+	void register_lua_core_GameWorld(lua_State* L);
 	void register_lua_core_CollisionAvoidance(lua_State* L);
 	void register_lua_core_PathFinding(lua_State* L);
+	void register_lua_core_Keyboard(lua_State* L);
+	void register_lua_core_Mouse(lua_State* L);
 
 	static int lua_lanarts_panic(lua_State* L) {
 		luawrap::errorfunc(L);
@@ -162,10 +167,7 @@ namespace lua_api {
 		// Old-style API
 		register_io_api(L);
 		register_net_api(L);
-		register_gamestate_api(L);
-		register_gameworld_api(L);
 		register_event_log_api(L);
-		register_display_api(L);
 		register_tiles_api(L);
 
 		lua_spelltarget_bindings(L);
@@ -173,9 +175,15 @@ namespace lua_api {
 		lua_combatstats_bindings(gs, L);
 
 		// New-style API
+		register_lua_core_Display(L);
+		register_lua_core_GameObject(L);
 		register_lua_core_GameMap(L);
+		register_lua_core_GameState(L);
+		register_lua_core_GameWorld(L);
 		register_lua_core_CollisionAvoidance(L);
 		register_lua_core_PathFinding(L);
+		register_lua_core_Keyboard(L);
+		register_lua_core_Mouse(L);
 	}
 
 	void luacall_post_draw(lua_State* L) {

@@ -14,8 +14,7 @@
 #include <ldraw/Font.h>
 #include <ldraw/DrawOptions.h>
 
-#include "lua_api/lua_gameinst.h"
-#include "lua_api/lua_newapi.h"
+#include "lua_api/lua_api.h"
 
 #include "draw/colour_constants.h"
 #include "draw/draw_sprite.h"

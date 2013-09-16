@@ -13,7 +13,7 @@
 #include "gamestate/GameState.h"
 #include "gamestate/GameSettings.h"
 
-#include "lua_newapi.h"
+#include "lua_api.h"
 
 static int net_sync_message_consume(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
@@ -36,7 +36,7 @@ static int net_connections_poll(lua_State* L) {
 
 namespace lua_api {
 	void register_net_api(lua_State* L) {
-		LuaValue module = luawrap::ensure_table(luawrap::globals(L)["net"]);
+		LuaValue module = lua_api::register_lua_submodule(L, "core.Network");
 
 		module["NONE"] = (int)GameSettings::NONE;
 		module["SERVER"] = (int)GameSettings::SERVER;

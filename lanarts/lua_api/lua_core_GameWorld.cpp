@@ -20,12 +20,7 @@
 
 #include "stats/ClassEntry.h"
 
-#include "lua_newapi.h"
-
-#include "lua_api/lua_newapi.h"
-#include "lua_api/lua_gameinst.h"
-
-// Keep all documentation in doc/level.luadoc
+#include "lua_api.h"
 
 // A bit of a hack, but its OK and at least self-contained:
 struct PlayerDataProxy {
@@ -66,26 +61,6 @@ struct PlayerDataProxy {
 	}
 };
 
-
-static Tile resolve_tile(ldungeon_gen::Map& map, MTwist& mt, Pos& xy) {
-	using namespace ldungeon_gen;
-	int tileid, subtileid;
-
-	TileEntry& entry = res::tile(tileid);
-	TileLayoutRules& rules = entry.layout_rules;
-
-	/* Simple random tile */
-	if (rules.orientations.empty()) {
-		subtileid = mt.rand(rules.rest);
-	} else {
-		/* Oriented tile. */
-		// Check if the tiles in the surrounding area are the same as this one.
-		bool same_tile[3][3];
-
-	}
-	return Tile(tileid, subtileid);
-}
-
 static int world_players(lua_State* L) {
 	int nplayers = lua_api::gamestate(L)->player_data().all_players().size();
 	lua_newtable(L);
@@ -115,8 +90,8 @@ static void world_players_spawn(LuaStackValue level_id, const std::vector<Pos>& 
 }
 
 namespace lua_api {
-	static void register_gameworld_submodule(lua_State* L,
-			const LuaValue& world) {
+	void register_lua_core_GameWorld(lua_State* L) {
+		LuaValue world = register_lua_submodule(L, "core.GameWorld");
 		luawrap::install_userdata_type<PlayerDataProxy,
 				PlayerDataProxy::metatable>();
 
@@ -134,13 +109,5 @@ namespace lua_api {
 		metatable.push();
 		lua_setmetatable(L, -2);
 		lua_pop(L, 1);
-	}
-
-	void register_gameworld_api(lua_State* L) {
-		LuaValue globals = luawrap::globals(L);
-		lua_register_gameinst(L);
-
-		LuaValue world = register_lua_submodule(L, "core.GameWorld");
-		register_gameworld_submodule(L, world);
 	}
 }

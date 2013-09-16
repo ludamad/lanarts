@@ -11,7 +11,7 @@
 #include "stats/combat_stats.h"
 #include "stats/stats.h"
 
-#include "lua_newapi.h"
+#include "lua_api.h"
 #include "lunar.h"
 
 class CombatStatsLuaBinding {

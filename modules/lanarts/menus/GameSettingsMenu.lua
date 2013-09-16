@@ -4,6 +4,8 @@ local InstanceBox = import "core.ui.InstanceBox"
 local TextInputBox = import "core.ui.TextInputBox"
 local TextLabel = import "core.ui.TextLabel"
 local Sprite = import "core.ui.Sprite"
+
+local Network = import "core.Network"
 local Keys = import "core.Keyboard"
 local Mouse = import "core.Mouse"
 local Display = import "core.Display"
@@ -95,15 +97,15 @@ local function connection_toggle_create()
 
         local text, color, box_color, sprite
 
-        if settings.connection_type == net.CLIENT then
+        if settings.connection_type == Network.CLIENT then
             text = "Connect to a game"
             color = COL_MUTED_GREEN
             sprite = client_option_image
-        elseif settings.connection_type == net.SERVER then
+        elseif settings.connection_type == Network.SERVER then
             text = "Host a game"
             color = COL_PALE_RED
             sprite = server_option_image
-        else -- settings.connection_type == net.NONE
+        else -- settings.connection_type == Network.NONE
             text = "Single-player"
             color = COL_BABY_BLUE
             sprite = single_player_option_image
@@ -325,26 +327,26 @@ local function center_setting_fields_create()
 
         fields:add_instance( connection_toggle_create() )
 
-        if current_setting ~= net.CLIENT then
+        if current_setting ~= Network.CLIENT then
             fields:add_instance( respawn_toggle_create() )
         end
 
-        if current_setting ~= net.CLIENT then
+        if current_setting ~= Network.CLIENT then
             fields:add_instance( speed_toggle_create() )
         end
 
-        if current_setting == net.CLIENT then
+        if current_setting == Network.CLIENT then
             fields:add_instance( host_IP_field_create() )
         end
 
-        if current_setting == net.SERVER then
+        if current_setting == Network.SERVER then
            fields:add_instance( frame_action_repeat_toggle_create() )
         end
 
         local name_field = name_field_create( settings_text_field_params() )
         fields:add_instance(name_field)
 
-        if current_setting ~= net.NONE then
+        if current_setting ~= Network.NONE then
             fields:add_instance( connection_port_field_create() )
         end
 

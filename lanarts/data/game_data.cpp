@@ -16,7 +16,7 @@
 
 #include "draw/fonts.h"
 
-#include "lua_api/lua_newapi.h"
+#include "lua_api/lua_api.h"
 
 #include "stats/items/EquipmentEntry.h"
 #include "stats/items/ItemEntry.h"

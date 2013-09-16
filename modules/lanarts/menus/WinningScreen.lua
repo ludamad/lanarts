@@ -1,4 +1,5 @@
 local Display = import "core.Display"
+local GameState = import "core.GameState"
 
 local InstanceBox = import "core.ui.InstanceBox"
 local InstanceLine = import "core.ui.InstanceLine"
@@ -61,12 +62,12 @@ end
 local function winning_screen_show(...)
     local screen = winning_screen_create()
 
-    while Game.input_capture() and not Keys.key_pressed(keys.ESCAPE)  do
+    while GameState.input_capture() and not Keys.key_pressed(keys.ESCAPE)  do
         Display.draw_start()
         screen:step( {0,0} )
         screen:draw( {0,0} )
         Display.draw_finish()
-        Game.wait(100)
+        GameState.wait(100)
     end
 end
 

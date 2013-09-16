@@ -14,28 +14,9 @@
 
 typedef std::vector<ldraw::Image> ImageList;
 
-struct TileLayout {
-	Range image_range;
-	/* Does this tile explicitly state if it is solid ? */
-	bool use_tile_solidity, solidity;
-	TileLayout() {
-		use_tile_solidity = false;
-		solidity = false;
-	}
-};
-
-struct TileLayoutRules {
-	// 9 orientations depending on surrounding tiles
-	// Empty if a simple tile (only 'rest' is used)
-	std::vector<Range> orientations;
-	// Used when simple tile, or when there are no surrounding tiles
-	Range rest;
-};
-
 struct TileEntry {
 	std::string name;
 	ImageList images;
-	TileLayoutRules layout_rules;
 
 	const ldraw::Image& img(int ind = 0) const {
 		return images.at(ind);
