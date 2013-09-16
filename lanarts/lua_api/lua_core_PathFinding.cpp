@@ -1,8 +1,6 @@
 /*
- * lua_core_PathFinding.cpp
- *
- *  Created on: Sep 15, 2013
- *      Author: adomurad
+ * lua_core_PathFinding.cpp:
+ *  Pathfinding submodule
  */
 
 #include <SDL.h>
@@ -14,7 +12,7 @@
 
 #include "lua_newapi.h"
 
-#include "lua_api/lua_api.h"
+#include "lua_api/lua_newapi.h"
 #include "pathfind/AStarPath.h"
 
 #include "gamestate/GameState.h"
@@ -42,7 +40,7 @@ LuaValue lua_astarmetatable(lua_State* L) {
 	LuaValue methods = luameta_constants(meta);
 	methods["calculate_path"].bind_function(astar_calculate_path);
 
-	luameta_gc<AStarPath>(meta);
+	luameta_gc<AStarPathPtr>(meta);
 
 	return meta;
 }

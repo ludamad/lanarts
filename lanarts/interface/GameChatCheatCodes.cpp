@@ -13,7 +13,7 @@
 
 #include "objects/player/PlayerInst.h"
 
-#include "lua_api/lua_api.h"
+#include "lua_api/lua_newapi.h"
 
 #include "GameChat.h"
 

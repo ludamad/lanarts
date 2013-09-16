@@ -16,7 +16,7 @@
 
 #include "draw/fonts.h"
 
-#include "lua_api/lua_api.h"
+#include "lua_api/lua_newapi.h"
 
 #include "stats/items/EquipmentEntry.h"
 #include "stats/items/ItemEntry.h"
@@ -211,7 +211,8 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 
 	update_loading_screen(L, 0, "Loading Items");
 	// --- ITEM DATA ---
-	lua_items = load_item_data(L, dfiles.item_files); //new
+	// TODO: Go to new system
+	lua_items = load_item_data(L, FilenameList());
 	update_loading_screen(L, 10, "Loading Projectiles");
 
 	lua_projectiles = load_projectile_data(L, dfiles.projectile_files,
@@ -233,7 +234,7 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 	update_loading_screen(L, 60, "Loading Item Generation Templates");
 
 	update_loading_screen(L, 90, "Loading Classes");
-	lua_classes = load_class_data(L, dfiles.class_files);
+	lua_classes = load_class_data(L, FilenameList());
 	update_loading_screen(L, 100, "Complete!");
 
 	// TODO clean this up

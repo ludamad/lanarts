@@ -107,7 +107,7 @@ function thrown_effect.step(effect, obj)
 		local x = math.floor( obj.x + math.cos(effect.angle) * increment )
 		local y = math.floor( obj.y + math.sin(effect.angle) * increment )
 	
-		if Map.object_place_free(obj, {x,y}) then 
+		if Map.object_solid_check(obj, {x,y}) then 
 			obj.x = x
 			obj.y = y
 		end

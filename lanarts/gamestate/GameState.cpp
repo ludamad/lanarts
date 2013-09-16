@@ -26,7 +26,7 @@
 #include "draw/draw_sprite.h"
 #include "draw/TileEntry.h"
 
-#include "lua_api/lua_api.h"
+#include "lua_api/lua_newapi.h"
 #include "lua_api/lua_newapi.h"
 
 #include "net/GameNetConnection.h"
@@ -462,12 +462,9 @@ bool GameState::radius_visible_test(int x, int y, int radius,
 		PlayerInst* player, bool canreveal) {
 	perf_timer_begin(FUNCNAME);
 
-	const int sub_sqrs = VISION_SUBSQRS;
-	const int subsize = TILE_SIZE / sub_sqrs;
-
-	int w = width() / subsize, h = height() / subsize;
-	int mingrid_x = (x - radius) / subsize, mingrid_y = (y - radius) / subsize;
-	int maxgrid_x = (x + radius) / subsize, maxgrid_y = (y + radius) / subsize;
+	int w = width() / TILE_SIZE, h = height() / TILE_SIZE;
+	int mingrid_x = (x - radius) / TILE_SIZE, mingrid_y = (y - radius) / TILE_SIZE;
+	int maxgrid_x = (x + radius) / TILE_SIZE, maxgrid_y = (y + radius) / TILE_SIZE;
 	int minx = squish(mingrid_x, 0, w), miny = squish(mingrid_y, 0, h);
 	int maxx = squish(maxgrid_x, 0, w), maxy = squish(maxgrid_y, 0, h);
 

@@ -22,7 +22,7 @@
 
 #include "lua_newapi.h"
 
-#include "lua_api/lua_api.h"
+#include "lua_api/lua_newapi.h"
 #include "lua_api/lua_gameinst.h"
 
 // Keep all documentation in doc/level.luadoc

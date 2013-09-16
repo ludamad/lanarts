@@ -16,7 +16,7 @@
 #include "objects/GameInst.h"
 
 #include <lcommon/math_util.h>
-#include "lua_api.h"
+#include "lua_newapi.h"
 
 // Take arguments: caster, target; returns x, y
 static int spell_choose_safest_square(lua_State* L) {

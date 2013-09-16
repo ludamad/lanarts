@@ -32,12 +32,9 @@ DataFiles load_datafilenames(const char* filename) {
 			parser.GetNextDocument(root);
 
 			optional_set(root, "equipment_files", dfiles.equipment_files);
-			optional_set(root, "class_files", dfiles.class_files);
 			optional_set(root, "enemy_files", dfiles.enemy_files);
 			optional_set(root, "effect_files", dfiles.effect_files);
-			optional_set(root, "item_files", dfiles.item_files);
 			optional_set(root, "itemgenlist_files", dfiles.itemgenlist_files);
-			optional_set(root, "map_files", dfiles.map_files);
 			optional_set(root, "room_template_files", dfiles.room_template_files);
 			optional_set(root, "projectile_files", dfiles.projectile_files);
 			optional_set(root, "spell_files", dfiles.spell_files);

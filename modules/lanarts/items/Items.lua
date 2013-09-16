@@ -108,17 +108,3 @@ Data.item_create {
         user.stats.magic = user.stats.magic + 1
     end
 }
-
-Data.item_create  {
-    name = "Scroll of Escape",
-    description = "Brings you to a nearby exit.",
-    use_message = "You feel closer to escaping!",
-
-    shop_cost = {80,85},
- 
-    spr_item = "scroll escape",
-
-    action_func = function (item, obj) 
-        obj_to_exit(obj) 
-    end
-}

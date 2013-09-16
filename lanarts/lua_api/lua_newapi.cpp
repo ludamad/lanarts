@@ -8,6 +8,7 @@
 #include <luawrap/luameta.h>
 
 #include <lcommon/lua_utils.h>
+#include <lcommon/lua_lcommon.h>
 
 #include <ldraw/lua_ldraw.h>
 
@@ -16,7 +17,7 @@
 #include "gamestate/GameState.h"
 
 #include "lua_api/lua_yaml.h"
-#include "lua_api/lua_api.h"
+#include "lua_api/lua_newapi.h"
 #include "lua_api/lua_gameinst.h"
 
 extern "C" {
@@ -124,6 +125,8 @@ namespace lua_api {
 		lua_api::register_lua_submodule_loader(L, "core.socket.core", LuaValue::pop_value(L));
 		lua_pushcfunction(L, luaopen_mime_core);
 		lua_api::register_lua_submodule_loader(L, "core.mime.core", LuaValue::pop_value(L));
+
+		lua_register_lcommon(L);
 		preload["socket.core"].bind_function(luaopen_socket_core);
 		preload["mime.core"].bind_function(luaopen_mime_core);
 	}
@@ -132,9 +135,16 @@ namespace lua_api {
 	void register_lua_core_CollisionAvoidance(lua_State* L);
 	void register_lua_core_PathFinding(lua_State* L);
 
+	static int lua_lanarts_panic(lua_State* L) {
+		luawrap::errorfunc(L);
+		throw std::runtime_error(format("LUA PANIC: %s", lua_tostring(L, -1)));
+		return 0;
+	}
+
 	// Register all the lanarts API functions and types
 	void register_api(GameState* gs, lua_State* L) {
-		lua_lanarts_api(gs, L); // TODO: Deprecated
+		// May be required by loading that follows:
+		register_lua_libraries(L);
 
 		LuaValue globals = luawrap::globals(L);
 		LuaValue game = lua_ensure_protected_table(globals["Game"]);
@@ -147,7 +157,9 @@ namespace lua_api {
 		LuaValue map_gen = register_lua_submodule(L, "core.MapGeneration");
 		ldungeon_gen::lua_register_ldungeon(map_gen, &gs->rng(), false);
 
-		register_lua_libraries(L);
+		lua_atpanic(L, lua_lanarts_panic);
+
+		// Old-style API
 		register_io_api(L);
 		register_net_api(L);
 		register_gamestate_api(L);
@@ -156,6 +168,11 @@ namespace lua_api {
 		register_display_api(L);
 		register_tiles_api(L);
 
+		lua_spelltarget_bindings(L);
+		lua_effectivestats_bindings(gs, L);
+		lua_combatstats_bindings(gs, L);
+
+		// New-style API
 		register_lua_core_GameMap(L);
 		register_lua_core_CollisionAvoidance(L);
 		register_lua_core_PathFinding(L);

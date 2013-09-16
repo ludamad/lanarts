@@ -28,7 +28,7 @@
 #include "objects/player/PlayerInst.h"
 #include "objects/CombatGameInst.h"
 
-#include "lua_api.h"
+#include "lua_newapi.h"
 #include "lua_gameinst.h"
 
 #include "draw/SpriteEntry.h"

@@ -163,21 +163,23 @@ static int loadline (lua_State *L) {
   return status;
 }
 
-int read_eval_print(lua_State *L) {
-	int status = loadline(L);
-	if (status != -1) {
-		if (status == 0)
-			status = docall(L, 0, 0);
-		report(L, status);
-		if (status == 0 && lua_gettop(L) > 0) { /* any result to print? */
-			lua_getglobal(L, "print");
-			lua_insert(L, 1);
-			if (lua_pcall(L, lua_gettop(L) - 1, 0, 0) != 0)
-				l_message(program_name,
-						lua_pushfstring(L,
-								"error calling " LUA_QL("print") " (%s)",
-								lua_tostring(L, -1)));
+namespace lua_api {
+	int read_eval_print(lua_State *L) {
+		int status = loadline(L);
+		if (status != -1) {
+			if (status == 0)
+				status = docall(L, 0, 0);
+			report(L, status);
+			if (status == 0 && lua_gettop(L) > 0) { /* any result to print? */
+				lua_getglobal(L, "print");
+				lua_insert(L, 1);
+				if (lua_pcall(L, lua_gettop(L) - 1, 0, 0) != 0)
+					l_message(program_name,
+							lua_pushfstring(L,
+									"error calling " LUA_QL("print") " (%s)",
+									lua_tostring(L, -1)));
+			}
 		}
+		return 0;
 	}
-	return 0;
 }

@@ -11,6 +11,7 @@ class GameInst;
 class PlayerInst;
 class ProjectileInst;
 class EnemyInst;
+
 struct lua_State;
 class LuaStackValue;
 class LuaValue;
@@ -87,5 +88,26 @@ namespace lua_api {
 	// Lua utilities:
 	int l_itervalues(lua_State* L);
 }
+
+// OLD API BRIDGE:
+// TODO: Remove (almost) obsolete methods
+
+class CombatStats;
+class EffectiveStats;
+class EffectiveAttackStats;
+
+void lua_push_effectivestats(lua_State* L, GameInst* inst);
+void lua_push_effectivestats(lua_State* L, const EffectiveStats& stats);
+void lua_push_effectiveattackstats(lua_State* L, const EffectiveAttackStats& stats);
+EffectiveStats& lua_get_effectivestats(lua_State* L, int idx);
+
+void lua_spelltarget_bindings(lua_State* L);
+void lua_effectivestats_bindings(GameState* gs, lua_State* L);
+void lua_combatstats_bindings(GameState* gs, lua_State* L);
+
+void lua_push_combatstats(lua_State* L, GameInst* inst);
+void lua_push_combatstats(lua_State* L, const CombatStats& stats);
+
+void luayaml_push_item(lua_State* L, const char* name);
 
 #endif /* LUA_NEWAPI_H_ */

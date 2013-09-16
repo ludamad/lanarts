@@ -7,7 +7,7 @@
 #include <lcommon/geometry.h>
 #include <lcommon/smartptr.h>
 
-#include "lua_api.h"
+#include "lua_newapi.h"
 #include "collision_avoidance/CollisionAvoidance.h"
 
 typedef smartptr<CollisionAvoidance> CollisionAvoidancePtr;

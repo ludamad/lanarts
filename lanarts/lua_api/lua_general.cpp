@@ -502,6 +502,28 @@ static int lapi_virtual_path_create_relative(lua_State* L) {
 	return 1; // Return relative virtual path
 }
 
+
+static int lapi_rand_range(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	int nargs = lua_gettop(L);
+	int min = 0, max = 0;
+	if (nargs == 1) {
+		// array[1]
+		lua_rawgeti(L, 1, 1);
+		min = lua_tointeger(L, -1);
+		// array[2]
+		lua_rawgeti(L, 1, 2);
+		max = lua_tointeger(L, -1);
+		lua_pop(L, 2);
+	} else if (nargs > 1) {
+		min = lua_tointeger(L, 1);
+		max = lua_tointeger(L, 2);
+	}
+
+	lua_pushnumber(L, gs->rng().rand(min, max + 1));
+	return 1;
+}
+
 static int lapi_random(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	int nargs = lua_gettop(L);
@@ -646,6 +668,7 @@ namespace lua_api {
 		globals["newtype"].bind_function(lapi_newtype);
 		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);
+		globals["rand_range"].bind_function(lapi_rand_range);
 		globals["random"].bind_function(lapi_random);
 		globals["randomf"].bind_function(lapi_randomf);
 		globals["random_subregion"].bind_function(lapi_random_subregion);

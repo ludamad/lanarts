@@ -25,7 +25,7 @@
 
 #include "lua_newapi.h"
 
-#include "lua_api/lua_api.h"
+#include "lua_api/lua_newapi.h"
 #include "lua_api/lua_gameinst.h"
 
 static int gmap_create(LuaStackValue args) {
@@ -63,6 +63,7 @@ static int gmap_create(LuaStackValue args) {
 
 	return game_map->id();
 }
+
 
 // level functions
 
@@ -191,21 +192,34 @@ static int gmap_instance(lua_State* L) {
 	return 1;
 }
 
-// TODO add test for specific player
-static bool gmap_object_visible(const LuaStackValue& obj) {
-	GameState* gs = lua_api::gamestate(obj);
-	return gs->object_visible_test(obj.as<GameInst*>());
+template <typename T>
+static T stack_defaulted(lua_State* L, int narg, const T& default_value) {
+	return lua_gettop(L) >= narg ? luawrap::get<T>(L, narg) : default_value;
 }
 
-static int gmap_object_place_free(lua_State* L) {
+static int gmap_object_visible(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	GameInst* inst = luawrap::get<GameInst*>(L, 1);
+	Pos xy = stack_defaulted(L, 2, inst->pos());
+	PlayerInst* player = stack_defaulted(L, 3, (PlayerInst*)NULL);
+	lua_pushboolean(L, gs->radius_visible_test(xy.x, xy.y, inst->radius, player));
+	return 1;
+}
+
+static int gmap_radius_visible(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	Pos xy = luawrap::get<Pos>(L, 1);
+	double radius = lua_tonumber(L, 2);
+	PlayerInst* player = stack_defaulted(L, 3, (PlayerInst*)NULL);
+	lua_pushboolean(L, gs->radius_visible_test(xy.x, xy.y, radius, player));
+	return 1;
+}
+
+static int gmap_object_solid_check(lua_State* L) {
 	int nargs = lua_gettop(L);
 	GameState* gs = lua_api::gamestate(L);
 	GameInst* inst = luawrap::get<GameInst*>(L, 1);
-	Pos p = inst->pos();
-
-	if (nargs > 1) {
-		p = luawrap::get<Pos>(L, 2);
-	}
+	Pos p = stack_defaulted(L, 2, inst->pos());
 
 	lua_pushboolean(L, !gs->solid_test(inst, p.x, p.y));
 	return 1;
@@ -216,13 +230,10 @@ const int MAX_RET = 16;
 static int gmap_object_collision_check(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	GameInst* inst = luawrap::get<GameInst*>(L, 1);
-	Pos pos = inst->pos();
-	if (lua_gettop(L) >= 2) {
-		pos = luawrap::get<Pos>(L, 2);
-	}
+	Pos xy = stack_defaulted(L, 2, inst->pos());
 	GameInst* objects[MAX_RET];
 
-	int nret = gs->object_radius_test(inst, objects, MAX_RET, NULL, pos.x, pos.y);
+	int nret = gs->object_radius_test(inst, objects, MAX_RET, NULL, xy.x, xy.y);
 	lua_newtable(L);
 	for (int i = 0; i < nret; i++){
 		luawrap::push(L, objects[i]);
@@ -342,6 +353,7 @@ namespace lua_api {
 		gmap["instance"].bind_function(gmap_instance);
 
 		gmap["monsters_list"].bind_function(gmap_monsters_list);
+		gmap["monsters_seen"].bind_function(gmap_monsters_seen);
 		gmap["monsters"].bind_function(gmap_monsters);
 
 		gmap["map_step"].bind_function(gmap_map_step);
@@ -350,12 +362,15 @@ namespace lua_api {
 		gmap["distance_to_player"].bind_function(gmap_distance_to_player);
 
 		gmap["object_visible"].bind_function(gmap_object_visible);
+		gmap["radius_visible"].bind_function(gmap_radius_visible);
+
 		gmap["object_collision_check"].bind_function(gmap_object_collision_check);
 		gmap["object_tile_check"].bind_function(gmap_object_tile_check);
-		gmap["object_place_free"].bind_function(gmap_object_place_free);
 		gmap["radius_tile_check"].bind_function(gmap_radius_tile_check);
 		gmap["rectangle_collision_check"].bind_function(gmap_rectangle_collision_check);
 		gmap["line_tile_check"].bind_function(gmap_line_tile_check);
+
+		gmap["object_solid_check"].bind_function(gmap_object_solid_check);
 
 		gmap["place_free"].bind_function(gmap_place_free);
 		gmap["radius_place_free"].bind_function(gmap_radius_place_free);

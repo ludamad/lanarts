@@ -86,7 +86,8 @@ local Blink = {
 }
 
 function Blink.prereq_func(caster, x, y)
-    return radius_visible_check(x, y, caster.radius) and not obj_solid_check(caster, x, y, caster.radius)
+    local xy = {x,y}
+    return Map.radius_visible(xy, caster.radius) and not Map.object_collision_check(caster, xy)
 end
 
 function Blink.action_func(caster, x, y)
