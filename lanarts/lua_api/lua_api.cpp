@@ -43,16 +43,25 @@ namespace lua_api {
 
 	void event_player_init(lua_State* L, PlayerInst* player) {
 		luawrap::globals(L)["Engine"]["event_occurred"].push();
+		if (lua_isnil(L, -1)) {
+			return lua_pop(L, 1);
+		}
 		luawrap::call<void>(L, "PlayerInit", (GameInst*) player);
 	}
 
 	void event_monster_init(lua_State* L, EnemyInst* enemy) {
 		luawrap::globals(L)["Engine"]["event_occurred"].push();
+		if (lua_isnil(L, -1)) {
+			return lua_pop(L, 1);
+		}
 		luawrap::call<void>(L, "MonsterInit", (GameInst*) enemy);
 	}
 
 	void event_monster_death(lua_State* L, EnemyInst* enemy) {
 		luawrap::globals(L)["Engine"]["event_occurred"].push();
+		if (lua_isnil(L, -1)) {
+			return lua_pop(L, 1);
+		}
 		luawrap::call<void>(L, "MonsterDeath", (GameInst*) enemy);
 	}
 

@@ -71,9 +71,9 @@ function M.on_step(context)
     end
     M.add_mp(context, context.derived.mp_regen)
     context.base.hooks:merge_new_hooks()
-    M.copy_base_to_derived(context)
-    context.base.cooldowns:on_step()
+    context.base.cooldowns:on_step(context.derived.cooldowns.cooldown_rates)
     context.base.hooks:on_step(context)
+    M.copy_base_to_derived(context)
 end
 
 function M.on_calculate(context)
@@ -215,8 +215,12 @@ function M.multiply_cooldown_rate(context, type, multiplier, --[[Optional, defau
 end
 
 function M.add_cooldown(context, type, amount)
-    context.base.cooldowns:add_cooldown(type, amount)
     context.derived.cooldowns:add_cooldown(type, amount)
+    context.base.cooldowns:add_cooldown(type, amount)
+end
+
+function M.has_cooldown(context, type, amount)
+    return context.derived.cooldowns:has_cooldown(type)
 end
 
 function M.apply_cooldown(context, type, amount, --[[Optional]] f)

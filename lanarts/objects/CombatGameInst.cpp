@@ -105,6 +105,10 @@ static float hurt_alpha_value(int hurt_cooldown) {
 }
 
 void CombatGameInst::draw(GameState *gs, float frame) {
+	GameInst::draw(gs);
+	if (sprite == -1) {
+		return;
+	}
 	GameView& view = gs->view();
 	SpriteEntry& spr = game_sprite_data[sprite];
 	Colour draw_colour = effects().effected_colour();

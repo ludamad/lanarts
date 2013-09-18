@@ -30,7 +30,7 @@ function M.fadeout_create(args)
         ObjectUtils.draw_if_seen(self, self.sprite, alpha)
     end
 
-    return ObjectUtils.object_create(args)
+    return GameObject.object_create(args)
 end
 
 function M.is_animation(obj)

@@ -165,11 +165,6 @@ static int lapi_do_nothing(lua_State *L) {
     return 0;
 }
 
-static int lapi_combatgameinst_derived_stats(lua_State* L) {
-	lua_push_effectivestats(L, luawrap::get<GameInst*>(L, 1));
-	return 1;
-}
-
 static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(CombatGameInst*);
 
@@ -187,7 +182,6 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	methods["damage"].bind_function(lapi_combatgameinst_damage);
 	methods["heal_hp"].bind_function(lapi_combatgameinst_heal_hp);
 	methods["heal_mp"].bind_function(lapi_combatgameinst_heal_mp);
-	methods["derived_stats"].bind_function(lapi_combatgameinst_derived_stats);
 
 	LUAWRAP_METHOD(methods, add_effect, OBJ->effects().add(lua_api::gamestate(L), OBJ, effect_from_lua(L, 2), lua_tointeger(L, 3)).push() );
 	LUAWRAP_GETTER(methods, has_effect, OBJ->effects().get(effect_from_lua(L, 2)) != NULL);
@@ -329,27 +323,57 @@ void lua_gameinst_callback(lua_State* L, LuaValue& value, GameInst* inst) {
 	lua_call(L, 1, 0);
 }
 
-static void set_gameinst_member(GameInst* inst, LuaStackValue args, const char* member) {
-	lua_State* L = args.luastate();
-	args[member].push();
+typedef LuaValue (*exclusionf)(lua_State* L);
+
+static void push_exclusion_set(lua_State* L, exclusionf func) {
+	luawrap::registry(L).push();
+	lua_pushlightuserdata(L, (void*) func);
+	lua_rawget(L, -2);
 	if (!lua_isnil(L, -1)) {
-		LuaValue& v = inst->lua_variables;
-		if (v.empty()) {
-			v.init(L);
-			v.newtable();
-		}
-		v[member].pop();
-	} else {
-		lua_pop(L, 1);
+		lua_replace(L, -2);
+		return; // Return cached set
 	}
+	lua_pop(L, 1); // pop nil
+	LuaValue exclusions = func(L);
+	lua_pushlightuserdata(L, (void*) func);
+	exclusions.push();
+	lua_rawset(L, -3); // set cache
+	exclusions.push(); // push value
 }
 
-static GameInst* do_instance_init(GameState* gs, GameInst* inst, LuaStackValue args) {
-	set_gameinst_member(inst, args, "on_init");
-	set_gameinst_member(inst, args, "on_deinit");
-	set_gameinst_member(inst, args, "on_step");
-	set_gameinst_member(inst, args, "on_draw");
-	set_gameinst_member(inst, args, "on_player_interact");
+static GameInst* copy_over_arguments(GameInst* inst, LuaStackValue args, exclusionf exclusions) {
+	lua_State* L = args.luastate();
+	int pre_top = lua_gettop(L);
+	push_exclusion_set(L, exclusions);
+	int ex_idx = lua_gettop(L);
+
+	inst->lua_variables.init(L);
+	inst->lua_variables.newtable();
+	inst->lua_variables.push();
+	int lv_idx = lua_gettop(L);
+	lua_pushnil(L);
+	while (lua_next(L, args.index())) {
+		// Check exclusion set
+		lua_pushvalue(L, -2); // Push key
+		lua_rawget(L, ex_idx);
+		if (!lua_isnil(L, -1)) {
+			lua_pop(L, 2); // Pop '1' and value
+			continue; // Excluded!
+		}
+		lua_pop(L, 1); // pop nil
+		// Set value
+		lua_pushvalue(L, -2); // Push key
+		lua_pushvalue(L, -2); // Push value
+		lua_rawset(L, lv_idx);
+		lua_pop(L, 1); // pop value
+	}
+	lua_settop(L, pre_top);
+	return inst;
+}
+
+static GameInst* initialize_object(GameState* gs, GameInst* inst, LuaStackValue args, exclusionf exclusions) {
+	copy_over_arguments(inst, args, exclusions);
+
 	if (!args["radius"].isnil()) {
 		inst->target_radius = args["radius"].to_int();
 		inst->radius = std::min(15, inst->target_radius);
@@ -368,13 +392,25 @@ static GameInst* do_instance_init(GameState* gs, GameInst* inst, LuaStackValue a
 	}
 	return inst;
 }
+static LuaValue base_object_exclusions(lua_State* L) {
+	LuaValue X = LuaValue::newtable(L);
+	X["xy"] = 1, X["radius"] = 1, X["do_init"] = 1;
+	X["solid"] = 1, X["depth"] = 1, X["map"] = 1;
+	return X;
+}
+
+static LuaValue misc_exclusions(lua_State* L) {
+	LuaValue X = base_object_exclusions(L);
+	X["sprite"] = 1, X["frame"] = 1, X["type"] = 1;
+	return X;
+}
 
 static GameInst* enemy_create(LuaStackValue args) {
 	GameState* gs = lua_api::gamestate(args);
 	int etype = get_enemy_by_name(args["type"].to_str());
 	Pos xy = args["xy"].as<Pos>();
 	EnemyInst* inst = new EnemyInst(etype, xy.x, xy.y);
-	return do_instance_init(gs, inst, args);
+	return initialize_object(gs, inst, args, &misc_exclusions);
 }
 
 static GameInst* object_create(LuaStackValue args) {
@@ -384,7 +420,16 @@ static GameInst* object_create(LuaStackValue args) {
 	int radius = defaulted(args["radius"], 15);
 	int depth = defaulted(args["depth"], 0);
 	GameInst* inst = new GameInst(xy.x, xy.y, radius, solid, depth);
-	return do_instance_init(lua_api::gamestate(args), inst, args);
+	return initialize_object(lua_api::gamestate(args), inst, args, &base_object_exclusions);
+}
+
+static GameInst* player_create(LuaStackValue args) {
+	using namespace luawrap;
+	GameState* gs = lua_api::gamestate(args);
+	Pos xy = args["xy"].as<Pos>();
+	GameInst* inst = new PlayerInst(CombatStats(), -1, xy.x, xy.y);
+	gs->player_data().register_player(args["name"].to_str(), (PlayerInst*)inst, -1, -1);
+	return initialize_object(gs, inst, args, &base_object_exclusions);
 }
 
 static GameInst* feature_create(LuaStackValue args) {
@@ -396,7 +441,7 @@ static GameInst* feature_create(LuaStackValue args) {
 			res::sprite_id(args["sprite"].to_str()),
 			defaulted(args["depth"], (int)FeatureInst::DEPTH),
 			defaulted(args["frame"], 0));
-	return do_instance_init(gs, inst, args);
+	return initialize_object(gs, inst, args, &misc_exclusions);
 }
 
 static GameInst* animation_create(LuaStackValue args) {
@@ -417,7 +462,7 @@ static GameInst* animation_create(LuaStackValue args) {
 			defaulted(args["depth"], (int)AnimatedInst::DEPTH),
 			defaulted(args["text"], std::string()),
 			defaulted(args["text_color"], Colour()));
-	return do_instance_init(gs, inst, args);
+	return initialize_object(gs, inst, args, &base_object_exclusions);
 }
 
 static Item lua_item_get(LuaStackValue item) {
@@ -450,13 +495,13 @@ static GameInst* store_create(LuaStackValue args) {
 			defaulted(args["solid"], false),
 			spr_id, inventory,
 			defaulted(args["frame"], 0));
-	return do_instance_init(gs, inst, args);
+	return initialize_object(gs, inst, args, &base_object_exclusions);
 }
 
 static GameInst* item_create(LuaStackValue args) {
-	using namespace luawrap;
-	GameState* gs = lua_api::gamestate(args);
-	return do_instance_init(gs, new ItemInst(lua_item_get(args), args["xy"].as<Pos>()), args);
+	return initialize_object(lua_api::gamestate(args),
+			new ItemInst(lua_item_get(args), args["xy"].as<Pos>()), args,
+			&base_object_exclusions);
 }
 
 static void object_destroy(LuaStackValue inst) {
@@ -479,6 +524,7 @@ namespace lua_api {
 		submodule["item_create"].bind_function(item_create);
 		submodule["animation_create"].bind_function(animation_create);
 		submodule["store_create"].bind_function(store_create);
+		submodule["player_create"].bind_function(player_create);
 		submodule["destroy"].bind_function(object_destroy);
 
 		submodule["DOOR_OPEN"] = (int)FeatureInst::DOOR_OPEN;

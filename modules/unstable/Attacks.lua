@@ -10,10 +10,19 @@ local M = nilprotect {} -- Submodule
 local function attack_on_use(self, attacker, target)
     local dmg = AttackResolution.damage_calc(self, attacker, target)
 
-    LogUtils.log_resolved(attacker.obj, "{The }$You deal{s} " ..dmg .. " damage!", COL_GREEN)
-
     StatContext.add_hp(target, -random_round(dmg))
+    return dmg
 end
+
+local function attack_on_prereq(self, attacker, target)
+    local reach = self.range + attacker.obj.radius + target.obj.radius
+    if reach < vector_distance(attacker.obj.xy, target.obj.xy) then
+        return false, "You cannot reach!"
+    end
+    return true
+end
+
+local DEFAULT_MELEE_RANGE = 10
 
 -- Attacks follow the 'action' interface (on_use, optional on_prerequisite)
 -- Create an attack with a single sub-attack
@@ -23,7 +32,8 @@ function M.attack_create(
     -- Aptitude modifiers
     aptitude_multipliers,
     -- Weapon delay and related damage multiplier 
-     --[[Optional]] delay, --[[Optional]] damage_multiplier)
+     --[[Optional]] delay, --[[Optional]] damage_multiplier,
+     --[[Optional]] range)
     delay = delay or 1
     local m = StatMultiplierUtils.resolve_multiplier_set(aptitude_multipliers)
     return {
@@ -36,7 +46,9 @@ function M.attack_create(
         }},
 
         damage_multiplier = damage_multiplier or delay,
-        on_use = attack_on_use
+        on_use = attack_on_use,
+        on_prerequisite = attack_on_prereq,
+        range = range or DEFAULT_MELEE_RANGE
     }
 end
 

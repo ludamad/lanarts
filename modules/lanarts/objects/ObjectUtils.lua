@@ -5,25 +5,6 @@ local GameMap = import "core.GameMap"
 
 local M = nilprotect {} -- Submodule
 
--- TODO: Make each GameObject take a metatable that operates like a class
--- Per-object diversification can still be provided via alternate per-object hooks.
--- on_step is fairly 'low-level' which is why it never worked well for enemy customization
-
-local AVOID_SETTING = {xy=1, on_draw=1, on_step=1, radius=1, solid=1, do_init=1}
-
--- Create an object, copying over any unneeded arguments
--- TODO: Merge this functionality with GameObject.object_create so that it is no longer necessary
-function M.object_create(args)
-    local object = GameObject.object_create(args)
-    for k,v in pairs(args) do
-        -- Avoid setting anything we already used
-        if not AVOID_SETTING[k] then
-            object[k] = v
-        end
-    end
-    return object
-end
-
 function M.draw_if_seen(obj, sprite, --[[Optional]] alpha)
     if GameMap.object_visible(obj) then 
         M.screen_draw(sprite, obj.xy, alpha)
@@ -57,7 +38,7 @@ function M.type_create(--[[Optional]] base_type)
             return base_type.create(args)
         else
             args.type = args.type or real_type
-            local object = M.object_create(args)
+            local object = GameObject.object_create(args)
             return object
         end
     end

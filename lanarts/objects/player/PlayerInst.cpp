@@ -177,7 +177,7 @@ void PlayerInst::step(GameState* gs) {
 	}
 
 	if (!actions_set_for_turn) {
-		printf("No actions for turn player id %d\n", id);
+		GameInst::step(gs); // For callback
 		perf_timer_end(FUNCNAME);
 		return;
 	}

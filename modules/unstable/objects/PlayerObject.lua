@@ -1,10 +1,11 @@
-local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local AttackableObject = import ".AttackableObject"
 local Attacks = import "@Attacks"
 local Apts = import "@stats.AptitudeTypes"
 local Relations = import "lanarts.objects.Relations"
+local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local SkillType = import "@SkillType"
 local StatContext = import "@StatContext"
+local GameObject = import "core.GameObject"
 
 local PlayerObject = ObjectUtils.type_create(AttackableObject) 
 PlayerObject.PLAYER_TRAIT = "PLAYER_TRAIT"
@@ -14,10 +15,11 @@ function PlayerObject.create_player_stats(race, --[[Can-be-nil]] class, name, --
     for skill in values(SkillType.list) do
         table.insert(stats.skills, skill:on_create())
     end
-
+    
     if class then
         local context = StatContext.stat_context_create(stats)
         class:on_init(context)
+        StatContext.add_spell(context, "Berserk")
     end
 
     return stats
@@ -25,8 +27,15 @@ end
 
 local DEFAULT_UNARMED_ATTACK = Attacks.attack_create(0, 5, Apts.MELEE)
 
+local function resolve_sprite(race)
+    local dir = path_resolve("sprites/"..race.name:lower())
+    local results = io.directory_search(dir, "*.png", true)
+    return image_cached_load(random_choice(results))
+end
+
 function PlayerObject.create(args)
-    assert(args.sprite and args.race and args.class and args.name)
+    args.sprite = resolve_sprite(args.race)
+    assert(args.race and args.class and args.name)
 
     -- Set up type signature
     args.type = args.type or PlayerObject
@@ -39,8 +48,13 @@ function PlayerObject.create(args)
 
     -- Create pseudo-objects
     args.unarmed_attack = args.unarmed_attack or args.race.unarmed_attack or DEFAULT_UNARMED_ATTACK
+    args.base_create = GameObject.player_create
 
     return PlayerObject._base_create(PlayerObject, args)
+end
+
+function PlayerObject:on_draw()
+    self.sprite:draw(self.xy)
 end
 
 function PlayerObject.is_player(obj)

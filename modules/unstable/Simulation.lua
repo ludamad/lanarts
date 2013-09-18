@@ -1,3 +1,7 @@
+-- OpenGL must be initialized before content loading!
+local Display = import "core.Display"
+Display.initialize("Lanarts", {640, 640}, false)
+
 local StatContext = import "@StatContext"
 local AttackResolution = import "@AttackResolution"
 local Attacks = import "@Attacks"
@@ -19,12 +23,14 @@ local Identification = import "@stats.Identification"
 
 local GameMap = import "core.GameMap"
 local GameObject = import "core.GameObject"
+local GameState = import "core.GameState"
 local PlayerObject = import "@objects.PlayerObject"
 local MonsterObject = import "@objects.MonsterObject"
 
 local SimulationMap = import "@SimulationMap"
 local Proficiency = import "@Proficiency"
 local LogUtils = import "lanarts.LogUtils"
+local Keys = import "core.Keyboard"
 
 local function choose_option(...)
     local options = {...}
@@ -37,6 +43,7 @@ local function choose_option(...)
     local choice
     while not choice do
         local input = io.read("*line")
+        if not input or input:lower() == 'exit' or input:lower() == 'quit' then os.exit(0) end
         choice = options[tonumber(input)]
         if not choice then
             AnsiCol.println("Sorry, that is not a valid choice.", AnsiCol.RED, AnsiCol.BOLD)
@@ -171,33 +178,6 @@ local function use_item(player)
     return true
 end
 
-local function get_attack(attacker)
-    local weapon = StatContext.get_equipped_item(attacker, ItemTraits.WEAPON)
-    if weapon then
-        local modifier = StatContext.calculate_proficiency_modifier(attacker, weapon)
-        return ProficiencyPenalties.apply_attack_modifier(weapon.type.attack, modifier)
-    end
-    return attacker.obj.unarmed_attack -- Default
-end
-
-local function damage(attacker, target)
-
-    local dmg = AttackResolution.damage_calc(get_attack(attacker), attacker, target)
-
-    AnsiCol.println(
-        LogUtils.resolve_conditional_message(attacker.obj, "{The }$You deal{s} " ..dmg .. " damage!"),
-        AnsiCol.GREEN, AnsiCol.BOLD
-    )
-
-    StatContext.add_hp(target, -random_round(dmg))
-
-    AnsiCol.println(
-        LogUtils.resolve_conditional_message(target.obj, "{The }$You [have]{has} " .. math.ceil(target.base.hp) .. "HP left"), 
-        AnsiCol.BLUE, AnsiCol.ITALIC .. AnsiCol.BOLD
-    )
-
-end
-
 local function track_identification(stats)
     stats.base.identifications = stats.base.identifications or {}
     table.clear(stats.base.identifications)
@@ -219,17 +199,6 @@ local function report_new_identifications(stats)
 end
 local frame = 1
 
-local function step(context)
-    for i=1,50 do
-        StatContext.on_step(context)
-        StatContext.on_calculate(context)
-        frame = frame + 1
-        
-        report_new_identifications(context)
-        track_identification(context)
-    end
-end
-
 local function dump_stats(player, monster)
     print("Player Before\t", StatUtils.stats_to_string(player.base, --[[Color]] true))
     print("Player After\t", StatUtils.stats_to_string(player.derived, --[[Color]] true))
@@ -237,7 +206,7 @@ local function dump_stats(player, monster)
     print("Monster After\t", StatUtils.stats_to_string(monster.derived, --[[Color]] true))
 end
 
-local function give_all_items()
+local function give_all_items(player)
     for item in values(ItemType.list) do
         local IT = ItemTraits
         local function is(trait) return table.contains(item.traits, trait) end
@@ -251,27 +220,26 @@ local function give_all_items()
         end
     end
 end
-local function battle(player, monster)
-    StatContext.add_spell(player, "Berserk")
---    choose_skills(player, 24000)
-    step(player)
-    track_identification(player)
-    while monster.base.hp > 0 do
+
+local frame = 0
+
+local function query_player(player, monster)
+    frame = frame + 1
+    local attack = player.obj:melee_attack()
+    if not attack:on_prerequisite(player, monster) then return end
+    local moved = false
+    while not moved do
+        AnsiCol.println("Frame: " .. frame, AnsiCol.YELLOW, AnsiCol.BOLD)
         print(StatUtils.stats_to_string(player.derived, --[[Color]] true, --[[New lines]] true, player.base.name .. ", the Adventurer"))
-        print(StatUtils.attack_to_string(get_attack(player), --[[Color]] true))    
+        print(StatUtils.attack_to_string(attack, --[[Color]] true))    
         local action = choose_option("Attack", "Spell", "Item")
-        local moved = true
         if action == "Attack" then
-            damage(player, monster) 
+            player.obj:apply_attack(attack, monster.obj)
+            moved = true
         elseif action == "Spell" then
             moved = perform_spell(player, monster)
         elseif action == "Item" then
             moved = use_item(player)
-        end
-        if moved then
-            step(player)
-            damage(monster, player)
-            step(monster)
         end
     end
 end
@@ -323,14 +291,9 @@ local function choose_class(race)
         end
         idx = (idx % #class_types) + 1 
     end
-    return class
 end
 
 local function main()
-    -- OpenGL must be initialized before content loading!
-    local Display = import "core.Display"
---    Display.initialize("Lanarts", {640, 480}, false)
-
     -- Load game content
     import "@DefineAll"
 
@@ -341,19 +304,24 @@ local function main()
     end
 
     -- TODO: Remove any notion of 'internal graphics'. All graphics loading should be prompted by Lua.
---    __initialize_internal_graphics()
+    __initialize_internal_graphics()
 
     local SM = SimulationMap.create()
     local race = choose_race()
     local class = choose_class(race)
-    local player = SM:add_player("Tester", race, class, {25,25})
-    local monster = SM:add_monster("Giant Rat", {75,75})
+    local player = SM:add_player("Tester", race, class)
+    local monster = SM:add_monster("Giant Rat")
 
---    Display.draw_start()
---    SM:draw()
---    Display.draw_finish()
-
-    battle(StatContext.stat_context_create(player.base_stats, player.derived_stats, player), StatContext.stat_context_create(monster.base_stats, monster.derived_stats, monster))
+    while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
+        SM:step()
+        report_new_identifications(player:stat_context())
+        track_identification(player:stat_context())
+        query_player(player:stat_context(), monster:stat_context())
+        Display.draw_start()
+        SM:draw()
+        Display.draw_finish()
+        GameState.wait(5)
+    end
 end
 
 main()

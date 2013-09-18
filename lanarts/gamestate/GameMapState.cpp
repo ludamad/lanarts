@@ -90,7 +90,9 @@ obj_id GameMapState::add_instance(GameState* gs, GameInst* inst) {
 	inst->init(gs);
 	gs->game_world().set_current_level(current_level);
 
-	event_log("Adding instance id: %d x: %d y: %d target_radius: %d depth %d\n",
+//	event_log("Adding instance id: %d x: %d y: %d target_radius: %d depth %d\n",
+//			inst->id, inst->x, inst->y, inst->target_radius, inst->depth);
+	printf("Adding instance id: %d x: %d y: %d target_radius: %d depth %d\n",
 			inst->id, inst->x, inst->y, inst->target_radius, inst->depth);
 
 	return id;
@@ -125,10 +127,10 @@ void GameMapState::step(GameState* gs) {
 }
 
 // Only for Lua use at the moment!
-void GameMapState::draw(GameState* gs) {
+void GameMapState::draw(GameState* gs, bool reveal_all) {
 	perf_timer_begin(FUNCNAME);
 
-	tiles().pre_draw(gs);
+	tiles().pre_draw(gs, reveal_all);
 	// Become current level
 	GameMapState* previous_level = gs->get_level();
 	gs->set_level(this);
@@ -139,7 +141,9 @@ void GameMapState::draw(GameState* gs) {
 	}
 
 	monster_controller().post_draw(gs);
-	tiles().post_draw(gs);
+	if (!reveal_all) {
+		tiles().post_draw(gs);
+	}
 
 	gs->set_level(previous_level);
 

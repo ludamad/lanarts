@@ -31,7 +31,7 @@ M.hook = {
 --        CooldownUtils.reset_rest_cooldown(stats)
 --    end,
 --    on_kill = function(self, stats)
---        LogUtils.log_resolved(stats.obj, "<The >{$You's}[Your] rage grows ...", {200,200,255})
+--        LogUtils.resolved_log(stats.obj, "<The >{$You's}[Your] rage grows ...", {200,200,255})
 --    end,
 --    on_deregister = function(self, stats)
 --       local B = stats.base

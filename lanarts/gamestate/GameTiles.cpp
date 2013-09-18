@@ -89,7 +89,7 @@ void GameTiles::copy_to(GameTiles & t) const {
 	t._tiles = _tiles;
 }
 
-void GameTiles::pre_draw(GameState* gs) {
+void GameTiles::pre_draw(GameState* gs, bool reveal_all) {
 	perf_timer_begin(FUNCNAME);
 
 	Size size = this->size();
@@ -103,13 +103,14 @@ void GameTiles::pre_draw(GameState* gs) {
 	if (region.y2 >= size.h) {
 		region.y2 = size.h - 1;
 	}
-	bool has_players = !gs->player_data().all_players().empty();
+	// Reveal all if no players present:
+	reveal_all |= gs->player_data().all_players().empty();
 
 	for (int y = region.y1; y <= region.y2; y++) {
 		for (int x = region.x1; x <= region.x2; x++) {
 			Tile& tile = get(Pos(x, y));
 			const ldraw::Image& img = res::tile(tile.tile).img(tile.subtile);
-			if (!has_players || was_seen(Pos(x, y))) {
+			if (reveal_all || was_seen(Pos(x, y))) {
 				img.draw(on_screen(gs, Pos(x * TILE_SIZE, y * TILE_SIZE)));
 			}
 		}

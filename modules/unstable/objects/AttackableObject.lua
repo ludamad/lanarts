@@ -2,6 +2,8 @@ local StatContext = import "@StatContext"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local ItemTraits = import "@items.ItemTraits"
 local ProficiencyPenalties = import "@stats.ProficiencyPenalties"
+local AttackResolution = import "@AttackResolution"
+local LogUtils = import "lanarts.LogUtils"
 
 local AttackableObject = ObjectUtils.type_create()
 AttackableObject.ATTACKABLE_TRAIT = "ATTACKABLE_TRAIT"
@@ -11,13 +13,14 @@ function AttackableObject.create(args)
 
     -- Set up type signature
     args.type = args.type or AttackableObject
-    args.base_stats = args.base_stats -- Retains provided stats object
     args.derived_stats = table.deep_clone(args.base_stats)
 
     args.traits = args.traits or {}
     table.insert(args.traits, AttackableObject.ATTACKABLE_TRAIT)
 
-    return AttackableObject._base_create(AttackableObject, args)
+    local ret = args.base_create and args.base_create(args) or AttackableObject._base_create(AttackableObject, args)
+    assert(ret.derived_stats == args.derived_stats)
+    return ret
 end
 
 function AttackableObject:on_init()
@@ -53,6 +56,15 @@ end
 
 function AttackableObject.is_attackable(obj)
     return table.contains(obj.traits, AttackableObject.ATTACKABLE_TRAIT)
+end
+
+-- NOTE: Bypassing on_prerequisite
+function AttackableObject:apply_attack(attack, target_obj)
+    local attacker, target = self:stat_context(), target_obj:stat_context()
+
+    local dmg = attack:on_use(attacker, target)
+    LogUtils.resolved_log(attacker.obj, "{The }$You deal{s} " ..dmg .. " damage!", COL_GREEN)
+    LogUtils.resolved_log(target.obj, "{The }$You [have]{has} " .. math.ceil(target.base.hp) .. "HP left.", COL_PALE_BLUE)
 end
 
 return AttackableObject

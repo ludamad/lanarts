@@ -80,6 +80,7 @@ public:
 	bool operator!=(const LuaValue& o) const;
 
 	static LuaValue pop_value(lua_State* L);
+	static LuaValue newtable(lua_State* L);
 
 private:
 	_luawrap_private::_LuaValueImpl* impl;

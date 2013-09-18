@@ -38,7 +38,7 @@ public:
 
 	void step(GameState* gs);
 
-	void pre_draw(GameState* gs);
+	void pre_draw(GameState* gs, bool reveal_all = false);
 	void post_draw(GameState* gs);
 
 	int tile_width();

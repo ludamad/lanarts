@@ -13,9 +13,10 @@ function CooldownSet:init()
 	self.cooldown_rates = {}
 end
 
-function CooldownSet:on_step()
+function CooldownSet:on_step(--[[Optional]] rates)
+    rates = rates or self.cooldown_rates
     for k,v in pairs(self.cooldowns) do
-        local rate = (self.cooldown_rates[k] or 1)
+        local rate = (rates[k] or 1)
         local val = v - rate
         if val <= 0 then
             val = nil -- Delete
@@ -32,7 +33,9 @@ function CooldownSet:apply_cooldown(type, cooldown, --[[Optional]] f)
 end
 
 function CooldownSet:add_cooldown(type, cooldown)
-    self.cooldowns[type] = self.cooldowns[type] or 0 + cooldown 
+    local amount = cooldown * (self.cooldown_rates[type] or 1)
+    self.cooldowns[type] = (self.cooldowns[type] or 0) + amount
+    return amount 
 end
 
 function CooldownSet:has_cooldown(type)

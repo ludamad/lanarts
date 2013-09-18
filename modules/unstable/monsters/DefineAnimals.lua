@@ -11,7 +11,7 @@ animal_define {
     radius = 14,
 
     level = 1, movement_speed = 2,
-    hp = 150, hp_regen = 0.03, 
+    hp = 7, hp_regen = 0.03, 
 
     effectiveness = 1, damage = 10, 
     delay = 1.4

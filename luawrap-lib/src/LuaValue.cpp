@@ -339,3 +339,8 @@ LuaValue LuaValue::pop_value(lua_State* L) {
 	return LuaValue(L, -1);
 }
 
+LuaValue LuaValue::newtable(lua_State* L) {
+	LuaValue val(L);
+	val.newtable();
+	return val;
+}

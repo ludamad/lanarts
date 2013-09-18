@@ -15,7 +15,7 @@ local function gmap_create(size, --[[Optional]] solid_tiles)
         }
     }
     for xy in values(solid_tiles or {}) do
-        gmap:tile_set_solid(xy, true)
+        GameMap.tile_set_solid(gmap, xy, true)
     end
     return gmap
 end
@@ -30,7 +30,11 @@ function TestCases.rectangle_collision_check()
 end
 
 function TestCases.line_tile_check()
-    local gmap = gmap_create({96,96}, {1,1})
+    local gmap = gmap_create({256,256}, {{1,1}})
     local hit_xy = GameMap.line_tile_check(gmap, {-12,48},{96+12,48})
+    assert(hit_xy and hit_xy[1] == 1 and hit_xy[2] == 1)
+    assert(not GameMap.line_tile_check(gmap, {-12,16},{96+12,16}))
+    assert(not GameMap.line_tile_check(gmap, {-12,90},{96+12,90}))
+    hit_xy = GameMap.line_tile_check(gmap, {-12,48},{48,48})
     assert(hit_xy and hit_xy[1] == 1 and hit_xy[2] == 1)
 end

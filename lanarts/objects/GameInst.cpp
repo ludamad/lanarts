@@ -19,6 +19,8 @@
 
 #include "GameInst.h"
 
+#include "lua_api/lua_api.h"
+
 GameInst::~GameInst() {
 }
 
@@ -30,18 +32,19 @@ void GameInst::lua_lookup(lua_State* L, const char* key) {
 	lua_variables[key].push();
 }
 
-void GameInst::try_callback(const char* callback) {
+bool GameInst::try_callback(const char* callback) {
 	if (lua_variables.empty() || lua_variables.isnil()) {
-		return;
+		printf("WHAT?\n");
+		return false;
 	}
 
 	lua_State* L = lua_variables.luastate();
 	lua_pushstring(L, callback);
-	int string_idx = lua_gettop(L);
 
+	int string_idx = lua_gettop(L);
 	lua_variables.push();
 	lua_pushvalue(L, string_idx); // Duplicate string
-	lua_gettable(L, -2);
+	lua_gettable(L,  string_idx + 1); // Get from lua_variables
 
 	// Not available ? Try the type table.
 	if (lua_isnil(L, -1)) {
@@ -56,11 +59,14 @@ void GameInst::try_callback(const char* callback) {
 		}
 	}
 
+	bool called = false;
 	if (!lua_isnil(L, -1)) {
 		luawrap::push(L, this);
 		lua_call(L, 1, 0);
+		called = true;
 	}
 	lua_settop(L, string_idx - 1);
+	return called;
 }
 
 void GameInst::step(GameState* gs) {

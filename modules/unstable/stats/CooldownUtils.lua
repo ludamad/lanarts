@@ -21,7 +21,7 @@ function M.resolve_action_cooldown(action, --[[Optional]] args)
     return resolve_action(action, args.on_prerequisite, args.on_use)
 end
 
--- Augment an attack with a cooldown requirement and 
+-- Augment an attack with a cooldown requirement and application
 function M.derive_attack_with_cooldown(args)
     local attack = args.unarmed_attack or args.attack
     local types = args.multipliers or args.types
@@ -37,6 +37,14 @@ function M.derive_attack_with_cooldown(args)
             --[[Optional]] args.delay, --[[Optional]] args.damage_multiplier
         )
     end
+
+    -- Copy over all cooldown* members
+    for k,v in pairs(args) do
+        if k:find("cooldown") == 1 then
+            attack[k] = attack[k] or args[k]
+        end
+    end
+    attack.cooldown = attack.cooldown or Types.default_cooldown_table[Types.OFFENSIVE_ACTIONS] * (attack.delay or 1) 
 
     return M.resolve_action_cooldown(attack)
 end
@@ -77,17 +85,16 @@ M.SPELL_ACTION = make_action(Types.ALL_ACTIONS, Apts.MAGIC_SPEED)
 M.ITEM_ACTION = make_action(Types.ITEM_ACTIONS)
 M.ABILITY_ACTION = make_action(Types.ABILITY_ACTIONS)
 
-local function has_cooldowns(action, stats)
+local function meets_cooldown_prereqs(action, stats)
     local c = action.cooldown_type or M.GENERIC_ACTION
 
-    local C, has = stats.cooldowns, stats.cooldowns.has_cooldown 
-    if not has(C, --[[Self cooldown]] action) then
+    if StatContext.has_cooldown(stats, --[[Self cooldown]] action) then
         return false, FAIL_SELF_MESSAGE
     end 
 
     -- Check all the implied cooldown types ('parents')
     for type in values(c.required_cooldowns) do
-        if not has(C, type) then return false, FAIL_MESSAGE end
+        if StatContext.has_cooldown(stats, type) then return false, FAIL_MESSAGE end
     end
 
     return true
@@ -96,39 +103,33 @@ end
 local function apply_cooldowns(action, stats)
     local c = action.cooldown_type or M.GENERIC_ACTION
 
-    local C, add = stats.cooldowns, stats.cooldowns.add_cooldown 
-
     local mult = 1.0
     if c.aptitude then 
-        mult = mult + APT_WORTH * stats.aptitudes.effectiveness[c.aptitude]
+        mult = mult + APT_WORTH * stats.derived.aptitudes.effectiveness[c.aptitude]
     end
     local self_mult = action.fixed_self_cooldown and 1.0 or mult
-    add(C, action, (action.cooldown_self or action.cooldown) * self_mult)
+    StatContext.add_cooldown(stats, action, (action.cooldown_self or action.cooldown) * self_mult)
 
     -- Check all the implied cooldown types ('parents')
     for type in values(c.required_cooldowns) do
         local field_name = Types.cooldown_field_map[type]
-        add(C, type, (action[field_name] or action.cooldown) * mult)
+        StatContext.add_cooldown(stats, type, (action[field_name] or action.cooldown) * mult)
     end
-    return true
 end
 
 -- Note: Forward declared above
 function resolve_action(action, on_preq, on_use)
-    function action:on_prerequisite(stats)
+    function action:on_prerequisite(...)
         local success, err = true
-        if on_preq then success,err = on_preq() end
+        if on_preq then success,err = on_preq(self, ...) end
         if not success then return success,err end
 
-        return has_cooldowns(self, stats)
+        return meets_cooldown_prereqs(self, ...)
     end
 
-    function action:on_use(stats)
-        local success, err = true
-        if on_preq then success,err = on_preq() end
-        if not success then return success,err end
-
-        return has_cooldowns(self, stats)
+    function action:on_use(...)
+        local val = on_use and (on_use(self, ...))
+        return apply_cooldowns(self, ...) or val
     end
 
     return action

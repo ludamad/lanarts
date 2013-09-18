@@ -132,9 +132,9 @@ for i=1,10 do
     local obj = GameObject.object_create {
         map=gmap, xy = {tile_xy[1]*32+16, tile_xy[2]*32+16},
         radius = 11, on_step = Obj.step, on_draw = Obj.draw
+        speed = 4,
+        sim_id = cgroup:add_object(obj)
     }
-    obj.speed = 4
-    obj.sim_id = cgroup:add_object(obj)
 end
 
 while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do

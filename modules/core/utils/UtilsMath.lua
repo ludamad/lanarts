@@ -46,7 +46,7 @@ function vector_distance(v1,v2)
 
     local sum = 0
     for i = 1,length do 
-        sum = sum + v1[i]*v1[i] + v2[i]*v2[i] 
+        sum = sum + (v2[i] - v1[i]) ^ 2 
     end
     return math.sqrt(sum)
 end
@@ -173,4 +173,11 @@ function bbox_padded(xy, size, pad)
              xy[2] - pad, 
              xy[1] + size[1] + pad, 
              xy[2] + size[2] + pad }
+end
+
+
+function math.sign_of(v)
+    if v > 0 then return 1 end
+    if v == 0 then return 0 end
+    return -1
 end

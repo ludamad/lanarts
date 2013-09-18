@@ -284,7 +284,8 @@ static int gmap_radius_tile_check(lua_State* L) {
 static LuaStackValue gmap_line_tile_check(LuaStackValue current_map, Pos from_xy, Pos to_xy) {
 	lua_State* L = current_map.luastate();
 	GameState* gs = lua_api::gamestate(L);
-	GameMapState* map = gs->game_world().get_level(current_map.to_int());
+	GameMapState* prev_map = gs->game_world().get_current_level();
+	gs->set_level(gs->game_world().get_level(current_map.to_int()));
 
 	Pos hit_pos;
 	bool collided = gs->tile_line_test(from_xy, to_xy, true, -1, &hit_pos);
@@ -293,6 +294,7 @@ static LuaStackValue gmap_line_tile_check(LuaStackValue current_map, Pos from_xy
 	} else {
 		luawrap::push(L, hit_pos);
 	}
+	gs->set_level(prev_map);
 
 	return LuaStackValue(L, -1);
 }
@@ -326,7 +328,8 @@ static void gmap_map_step(LuaStackValue table) {
 static void gmap_map_draw(LuaStackValue table) {
 	GameState* gs = lua_api::gamestate(table);
 	level_id map_id = table["map"].to_int();
-	gs->game_world().get_level(map_id)->draw(gs);
+	bool reveal_all = luawrap::defaulted(table["reveal_all"], false);
+	gs->game_world().get_level(map_id)->draw(gs, reveal_all);
 }
 
 namespace lua_api {
