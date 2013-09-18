@@ -12,10 +12,6 @@ PlayerObject.PLAYER_TRAIT = "PLAYER_TRAIT"
 
 function PlayerObject.create_player_stats(race, --[[Can-be-nil]] class, name, --[[Optional]] team)
     local stats = race.on_create(name, team or Relations.TEAM_PLAYER_DEFAULT)
-    for skill in values(SkillType.list) do
-        table.insert(stats.skills, skill:on_create())
-    end
-    
     if class then
         local context = StatContext.stat_context_create(stats)
         class:on_init(context)

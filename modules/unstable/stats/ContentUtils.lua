@@ -3,6 +3,7 @@ local SpellsKnown = import "@SpellsKnown"
 local StatContext = import "@StatContext"
 local SpellType = import "@SpellType"
 local Stats = import "@Stats"
+local SkillType = import "@SkillType"
 
 local M = nilprotect {} -- Submodule
 
@@ -41,10 +42,26 @@ function M.resolve_aptitude_bonuses(table, --[[Optional]] result)
     return result
 end
 
+function M.resolve_skills(table)
+    local C = table.skill_costs or {}
+    local skills = {}
+    for k,v in pairs(C) do
+        local type = assert(SkillType.lookup(k), k .. " is not a skill!")
+        local skill = type:on_create()
+        skill.cost_multiplier = skill.cost_multiplier * v
+        _G.table.insert(skills, skill) 
+    end
+    table.skill_costs = nil
+    return skills
+end
+
 -- Expects a mutable 'table' that is being used to define a resource type
 -- It will remove the 'convenience variables' used to define the aptitudes.
-function M.resolve_embedded_stats(table)
+function M.resolve_embedded_stats(table, --[[Optional]] resolve_skills)
     table.aptitudes = M.resolve_aptitude_bonuses(table)
+    if resolve_skills then
+        table.skills = M.resolve_skills(table)
+    end
     local spells = table.spells
     if not getmetatable(table.spells) == SpellsKnown then
         spells = SpellsKnown.create()

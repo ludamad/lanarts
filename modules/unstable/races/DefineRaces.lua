@@ -15,7 +15,7 @@ races_define {
     hp = 80,  hp_regen = 0, -- None!
     mp = 100, mp_regen = 0.012,
 
-    [Apts.DARK] = 2, 
+    [Apts.DARK] = {2,1,2,1}, 
     [Apts.CURSES] = {2,0,0,0}, 
     [Apts.ENCHANTMENTS] = {2,0,0,0}, 
     [Apts.POISON] = {0,0,20,0},
@@ -64,19 +64,24 @@ races_define {
     name = "Orc",
     description = [[
     A brutish race. Orcish magic and combat focuses on dealing heavy blows. 
-    Additionally, they possess great aptitude at using magic devices and performing physical maneuvers. 
+    Additionally, they possess great aptitude at using magic devices and performing physical maneuvers.
+    They train Armour & Force skills 15% faster. 
 ]],
 
     hp = 100, hp_regen = 0.010,
     mp = 80,  mp_regen = 0.008,
 
-    [Apts.MELEE] = {-4,2,0,0},
-    [Apts.MAGIC] = {-4,2,0,0},
+    [Apts.MELEE] = {-2,1,0,0},
+    [Apts.MAGIC] = {-2,1,0,0},
 
     [Apts.FORTITUDE] = {2,0,0,0},
     [Apts.WILLPOWER] = {2,0,0,0},
-    [Apts.ARMOUR] = {2,0,0,0},
     [Apts.EARTH] = {2,0,0,0},
 
-    [Apts.AIR] = {-2,0,0,0}
+    [Apts.AIR] = {-2,0,0,0},
+
+    skill_costs = {
+        ["Armour"] = 0.85, 
+        ["Force"] = 0.85
+    }
 }

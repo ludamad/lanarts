@@ -15,12 +15,12 @@ function M.races_define(args)
         return RaceType.define(args)
     end
 
-    args.types = args.types or {Apts.BLUNT, Apts.MELEE}
+    args.types = args.types or {Apts.BLUNT, Apts.MELEE} -- For CooldownUtils.derive_attack_with_cooldown
     args.attack = CooldownUtils.derive_attack_with_cooldown(args)
     -- Create based off embedded stats, aptitudes & spells
-    local stat_template = ContentUtils.resolve_embedded_stats(args)
+    local stat_template = ContentUtils.resolve_embedded_stats(args, --[[Resolve skill costs]] true)
     function args.on_create(name, team)
-        local stats = Stats.stats_create(stat_template)
+        local stats = Stats.stats_create(stat_template, --[[Add skills]] true)
         stats.name = name
         stats.team = team
         stats.race = args

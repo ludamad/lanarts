@@ -93,15 +93,6 @@ function M.copy_base_to_derived(context)
     table.deep_copy(context.base, context.derived)
 end
 
---- Add an immunity, possibly permanently.
-function M.add_immunity(context, type, --[[Optional]] permanent)
-    local B, D = context.base, context.derived
-    D.immunities[type] = true
-    if permanent then
-        B.immunities[type] = true
-    end
-end
-
 --- Change HP & reflect it in both derived and base stat-sets
 -- Ensures that 0 <= hp <= max_hp
 function M.add_hp(context, hp)
