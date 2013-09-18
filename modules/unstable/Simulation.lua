@@ -227,6 +227,7 @@ local function query_player(player, monster)
     frame = frame + 1
     local attack = player.obj:melee_attack()
     if not attack:on_prerequisite(player, monster) then return end
+    if not Attacks.obj_in_range(attack, player, monster) then return end
     local moved = false
     while not moved do
         AnsiCol.println("Frame: " .. frame, AnsiCol.YELLOW, AnsiCol.BOLD)
@@ -314,13 +315,13 @@ local function main()
 
     while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
         SM:step()
-        report_new_identifications(player:stat_context())
-        track_identification(player:stat_context())
-        query_player(player:stat_context(), monster:stat_context())
         Display.draw_start()
         SM:draw()
         Display.draw_finish()
         GameState.wait(5)
+        report_new_identifications(player:stat_context())
+        track_identification(player:stat_context())
+        query_player(player:stat_context(), monster:stat_context())
     end
 end
 

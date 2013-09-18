@@ -39,6 +39,12 @@ function AttackableObject:stat_context()
     return self._context
 end
 
+-- Shortcut for providing a StatContext copy, needed by eg projectile objects
+function AttackableObject:stat_context_copy()
+    local context = self:stat_context()
+    return { obj = self, base = table.deep_clone(context.base), derived = table.deep_clone(context.derived) }
+end
+
 function AttackableObject:on_step()
     StatContext.on_step(self._context)
 end

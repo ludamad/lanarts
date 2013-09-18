@@ -3,7 +3,7 @@ local Apts = import "@stats.AptitudeTypes"
 local ContentUtils = import "@stats.ContentUtils"
 local StatusType = import "@StatusType"
 local SpellType = import "@SpellType"
-local Projectiles = import "lanarts.objects.Projectiles"
+local AttackProjectileObject = import "@objects.AttackProjectileObject"
 
 local M = nilprotect {} -- Submodule
 
@@ -29,13 +29,17 @@ local function missile_spell_prereq(self, caster, xy)
 end
 
 local function missile_spell_on_use(self, caster, xy)
-    return self.attack:on_prerequisite(caster)
+    local dir = vector_subtract(xy, caster.xy)
+    dir = vector_normalize(dir, self.speed)
+    AttackProjectileObject.create {
+    }
 end
 
 function M.missile_spell_define(args)
-    if args.on_prerequisite then
-        args.on_prerequisite = func_apply_and(args.on_prerequisite or missile_spell_prereq)
-    end
+    assert(args.speed)
+
+    args.on_prerequisite = --[[If]] args.on_prerequisite and --[[Then]] func_apply_and(args.on_prerequisite or missile_spell_prereq) or --[[Else]] missile_spell_prereq
+    args.on_use = --[[If]] args.on_use and --[[Then]] func_apply_sequence(args.on_use or missile_spell_on_use) or --[[Else]] missile_spell_on_use
 
     args.target_type = args.target_type or SpellType.TARGET_HOSTILE
     args.traits = args.traits or {Traits.FORCE_SPELL}

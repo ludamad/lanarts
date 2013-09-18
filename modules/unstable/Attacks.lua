@@ -17,12 +17,16 @@ end
 M.CANNOT_REACH_MESSAGE = "You cannot reach!"
 
 -- Not part of on_prereq to allow flexibly specifying target position
-function M.attack_in_range(attack, attacker, target_radius, target_xy)
+function M.xy_in_range(attack, attacker, target_radius, target_xy)
     local reach = attack.range + attacker.obj.radius + target_radius
     if reach < vector_distance(attacker.obj.xy, target_xy) then
         return false, M.CANNOT_REACH_MESSAGE
     end
     return true
+end
+
+function M.obj_in_range(attack, attacker, target)
+    return M.xy_in_range(attack, attacker, target.obj.radius, target.obj.xy)
 end
 
 local DEFAULT_MELEE_RANGE = 10

@@ -10,7 +10,11 @@ local M = {} -- Submodule
 -- Create a skill table with the given values. Defaults are used for anything not provided.
 function M.skills_create(--[[Optional]] params, --[[Optional]] add_skills)
     local ret = {}
-    if params then table.copy(params, ret) end
+    if params then 
+        for skill_slot in values(params) do
+            table.insert(ret, table.clone(skill_slot)) 
+        end
+    end
     if add_skills then
         for skill in values(SkillType.list) do
             local has_already = false

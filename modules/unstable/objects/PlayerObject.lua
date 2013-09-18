@@ -15,13 +15,10 @@ function PlayerObject.create_player_stats(race, --[[Can-be-nil]] class, name, --
     if class then
         local context = StatContext.stat_context_create(stats)
         class:on_init(context)
-        StatContext.add_spell(context, "Berserk")
     end
 
     return stats
 end
-
-local DEFAULT_UNARMED_ATTACK = Attacks.attack_create(0, 5, Apts.MELEE)
 
 local function resolve_sprite(race)
     local dir = path_resolve("sprites/"..race.name:lower())
@@ -43,7 +40,7 @@ function PlayerObject.create(args)
     args.base_stats = PlayerObject.create_player_stats(args.race, args.class, args.name)
 
     -- Create pseudo-objects
-    args.unarmed_attack = args.unarmed_attack or args.race.unarmed_attack or DEFAULT_UNARMED_ATTACK
+    args.unarmed_attack = args.unarmed_attack or args.race.attack 
     args.base_create = GameObject.player_create
 
     return PlayerObject.base_create(args)

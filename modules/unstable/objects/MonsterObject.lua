@@ -1,6 +1,7 @@
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local GameObject = import "core.GameObject"
 local Animations = import "lanarts.objects.Animations"
+local Attacks = import "@Attacks"
 local AttackableObject = import ".AttackableObject"
 local MonsterType = import "@MonsterType"
 local GameMap = import "core.GameMap"
@@ -46,7 +47,10 @@ local function monster_step(self)
         return 
     end
 
-    if self.unarmed_attack:on_prerequisite(self:stat_context(), player:stat_context()) then
+
+    local S,P = self:stat_context(), player:stat_context()
+    local in_range = Attacks.obj_in_range(self.unarmed_attack, S, P)
+    if self.unarmed_attack:on_prerequisite(S,P) and in_range then
         self:apply_attack(self.unarmed_attack, player)
     end
 

@@ -245,7 +245,7 @@ function Test:on_step()
 			self.velocity = vector_scale(self.velocity,-1)
 		end
 	end
-	Projectiles.LinearProjectileBase.on_step(self)
+	self.base.on_step(self)
 end
 
 function Test.create(user, xy, velocity)

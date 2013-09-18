@@ -59,8 +59,7 @@ function LinearBase:on_step()
 end
 
 function LinearBase.create(args)
-    assert(args.velocity)
-    args.radius = args.radius or args.sprite.width / 2
+    assert(args.velocity and args.radius)
     args.range_left = args.range_left or 250
     return LinearBase.base_create(args)
 end

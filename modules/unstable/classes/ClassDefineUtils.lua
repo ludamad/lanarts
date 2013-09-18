@@ -80,7 +80,7 @@ function M.class_define(class_type)
     assert(class_type.lookup_key)
     class_type.on_spend_skill_points = class_type.on_spend_skill_points or M.default_spend_skill_points
     class_type.on_create = class_type.on_create or default_class_create_closure(class_type)
-    class_type.on_init = class_type.on_init or M.default_class_on_init(class_type)
+    class_type.on_init = class_type.on_init or M.default_class_on_init
     for k,v in pairs(class_type.skills) do 
         assert(SkillType.lookup(k), k .. " is not a skill!") 
     end
