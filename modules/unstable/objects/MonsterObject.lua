@@ -92,7 +92,7 @@ function M.create(args)
     -- AttackableObject configuration
     args.can_attack = true
 
-    return obj_type._base_create(obj_type, args)
+    return obj_type.base_create(args)
 end
 
 function M.is_attackable(obj)

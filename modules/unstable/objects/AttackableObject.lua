@@ -18,7 +18,7 @@ function AttackableObject.create(args)
     args.traits = args.traits or {}
     table.insert(args.traits, AttackableObject.ATTACKABLE_TRAIT)
 
-    local ret = args.base_create and args.base_create(args) or AttackableObject._base_create(AttackableObject, args)
+    local ret = args.base_create and args.base_create(args) or AttackableObject.base_create( args)
     assert(ret.derived_stats == args.derived_stats)
     return ret
 end

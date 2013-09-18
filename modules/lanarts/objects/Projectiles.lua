@@ -1,7 +1,5 @@
 local GameObject = import "core.GameObject"
 local GameMap = import "core.GameMap"
-
-local Animations = import ".Animations"
 local ObjectUtils = import ".ObjectUtils"
 
 local M = {} -- Submodule
@@ -32,17 +30,15 @@ end
 -- Manditory arguments:
 -- xy, radius, on_step, on_draw, on_tile_collide, on_object_collide, do_init
 -- Everything else is extra.
-function Base._create(real_type, base_create, args)
+function Base.create(args)
     args.traits = args.traits or {}
     table.insert(args.traits, M.PROJECTILE_TRAIT)
-
-    local object = base_create(real_type, args)
     -- Wrap supplied on_step
-    object._on_step = object.on_step or object.type.on_step
+    args._on_step = args.on_step or args.type.on_step
     -- Make sure our on_step is called
-    object.on_step = projectile_wrapper_on_step
+    args.on_step = projectile_wrapper_on_step
 
-    return object
+    return Base.base_create(args)
 end
 
 -- LINEAR PROJECTILE
@@ -50,7 +46,6 @@ end
 local LinearBase = ObjectUtils.type_create(Base)
 M.LinearProjectileBase = LinearBase
 
-LinearBase.on_draw = ObjectUtils.draw_sprite_member_if_seen
 LinearBase.on_tile_collide = GameObject.destroy
 
 function LinearBase:on_step()
@@ -63,19 +58,11 @@ function LinearBase:on_step()
     self.range_left = self.range_left - math.sqrt(vx*vx+vy*vy)
 end
 
-function LinearBase:on_deinit()
-    local ANIMATION_FADEOUT_DURATION = 25
-    Animations.fadeout_create { sprite = self.sprite, duration = ANIMATION_FADEOUT_DURATION, xy = self.xy }
-end
-
 function LinearBase.create(args)
-    assert(args.velocity and args.sprite)
-
-    args.type = args.type or LinearBase
+    assert(args.velocity)
     args.radius = args.radius or args.sprite.width / 2
     args.range_left = args.range_left or 250
-
-    return LinearBase.base.create(args)
+    return LinearBase.base_create(args)
 end
 
 -- HELPER FUNCTIONS

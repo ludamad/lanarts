@@ -16,9 +16,9 @@ local DEACTIVATION_DISTANCE = 768
 local Base = ObjectUtils.type_create()
 M.FeatureBase = Base
 
-function Base._create(realtype, base_create, args)
-    args.traits = {M.FEATURE_TRAIT}
-    return base_create(realtype, args)
+function Base.create(args)
+    args.traits = args.trait or {M.FEATURE_TRAIT}
+    return args.base_create(args)
 end 
 
 function Base:on_draw()
@@ -30,7 +30,6 @@ end
 -- Decoration
 local Decoration = ObjectUtils.type_create(Base)
 M.Decoration = Decoration
-
 
 function Decoration:on_step()
     if self.sprite or GameMap.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then

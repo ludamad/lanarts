@@ -46,7 +46,7 @@ function PlayerObject.create(args)
     args.unarmed_attack = args.unarmed_attack or args.race.unarmed_attack or DEFAULT_UNARMED_ATTACK
     args.base_create = GameObject.player_create
 
-    return PlayerObject._base_create(PlayerObject, args)
+    return PlayerObject.base_create(args)
 end
 
 function PlayerObject:on_draw()

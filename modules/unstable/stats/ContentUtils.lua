@@ -4,6 +4,7 @@ local StatContext = import "@StatContext"
 local SpellType = import "@SpellType"
 local Stats = import "@Stats"
 local SkillType = import "@SkillType"
+local Attacks = import "@Attacks"
 
 local M = nilprotect {} -- Submodule
 
@@ -74,6 +75,25 @@ function M.resolve_embedded_stats(table, --[[Optional]] resolve_skills)
     end
     table.spells = spells
     return Stats.stats_create(table)
+end
+
+function M.derive_attack(args)
+    local attack = args.unarmed_attack or args.attack
+    local types = args.multipliers or args.types
+    assert(types)
+
+    -- First resolve 
+    if attack and #attack > 0 then -- Resolve argument table
+        attack = Attacks.attack_create(attack)
+    end
+    if not args.attack then
+        attack = Attacks.attack_create(
+            args.effectiveness or 0, args.damage or 0, types, 
+            --[[Optional]] args.delay, --[[Optional]] args.damage_multiplier, 
+            --[[Optional]] args.range
+        )
+    end
+    return attack
 end
 
 return M

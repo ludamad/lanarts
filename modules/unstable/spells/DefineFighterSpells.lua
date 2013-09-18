@@ -1,4 +1,4 @@
-local spell_define = (import "@SpellType").define
+local spell_define = (import ".SpellDefineUtils").spell_define
 local StatusType = import "@StatusType"
 
 local SpellTraits = import ".SpellTraits"

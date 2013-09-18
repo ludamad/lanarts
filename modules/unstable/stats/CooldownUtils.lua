@@ -1,5 +1,6 @@
 local Attacks = import "@Attacks"
 local Types = import ".CooldownTypes"
+local ContentUtils = import ".ContentUtils"
 local Apts = import "@stats.AptitudeTypes"
 local StatContext = import "@StatContext"
 
@@ -23,21 +24,7 @@ end
 
 -- Augment an attack with a cooldown requirement and application
 function M.derive_attack_with_cooldown(args)
-    local attack = args.unarmed_attack or args.attack
-    local types = args.multipliers or args.types
-    assert(types)
-
-    -- First resolve 
-    if attack and #attack > 0 then -- Resolve argument table
-        attack = Attacks.attack_create(attack)
-    end
-    if not args.attack then
-        attack = Attacks.attack_create(
-            args.effectiveness or 0, args.damage or 0, types, 
-            --[[Optional]] args.delay, --[[Optional]] args.damage_multiplier
-        )
-    end
-
+    local attack = ContentUtils.derive_attack(args)
     -- Copy over all cooldown* members
     for k,v in pairs(args) do
         if k:find("cooldown") == 1 then

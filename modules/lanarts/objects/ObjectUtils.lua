@@ -29,23 +29,13 @@ function M.type_create(--[[Optional]] base_type)
     if base_type then table.copy(base_type, type) end
     type.base = base_type
 
-    function type._base_create(real_type, args)
-        if base_type then 
-            if base_type._create then
-                return base_type._create(real_type, base_type.on_base_create, args)
-            end
-            args.type = args.type or real_type
-            return base_type.create(args)
-        else
-            args.type = args.type or real_type
-            local object = GameObject.object_create(args)
-            return object
-        end
+    function type.base_create(args)
+        args.type = args.type or type
+        if base_type then return base_type.create(args)
+        else return GameObject.object_create(args) end
     end
-
-    function type.create(...)
-        return type._create(type, type._base_create, ...)
-    end
+    -- Default create
+    type.create = type.base_crate
 
     return type
 end

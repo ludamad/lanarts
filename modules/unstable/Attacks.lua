@@ -14,10 +14,13 @@ local function attack_on_use(self, attacker, target)
     return dmg
 end
 
-local function attack_on_prereq(self, attacker, target)
-    local reach = self.range + attacker.obj.radius + target.obj.radius
-    if reach < vector_distance(attacker.obj.xy, target.obj.xy) then
-        return false, "You cannot reach!"
+M.CANNOT_REACH_MESSAGE = "You cannot reach!"
+
+-- Not part of on_prereq to allow flexibly specifying target position
+function M.attack_in_range(attack, attacker, target_radius, target_xy)
+    local reach = attack.range + attacker.obj.radius + target_radius
+    if reach < vector_distance(attacker.obj.xy, target_xy) then
+        return false, M.CANNOT_REACH_MESSAGE
     end
     return true
 end
@@ -47,7 +50,6 @@ function M.attack_create(
 
         damage_multiplier = damage_multiplier or delay,
         on_use = attack_on_use,
-        on_prerequisite = attack_on_prereq,
         range = range or DEFAULT_MELEE_RANGE
     }
 end
