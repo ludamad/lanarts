@@ -20,6 +20,8 @@ function AttackableObject.create(args)
 
     local ret = args.base_create and args.base_create(args) or AttackableObject.base_create( args)
     assert(ret.derived_stats == args.derived_stats)
+    StatContext.on_step(ret._context)
+    StatContext.on_calculate(ret._context)
     return ret
 end
 
@@ -47,6 +49,7 @@ end
 
 function AttackableObject:on_step()
     StatContext.on_step(self._context)
+    self._stats_need_calculate = true
 end
 
 function AttackableObject:melee_attack()

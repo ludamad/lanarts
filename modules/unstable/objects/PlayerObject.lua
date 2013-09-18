@@ -16,6 +16,11 @@ function PlayerObject.create_player_stats(race, --[[Can-be-nil]] class, name, --
         local context = StatContext.stat_context_create(stats)
         class:on_init(context)
     end
+    for skill in values(stats.skills) do
+        if skill.level ~= 0 then
+        io.write('[',skill.name, '=>',skill.level,']\n')
+        end
+    end
 
     return stats
 end

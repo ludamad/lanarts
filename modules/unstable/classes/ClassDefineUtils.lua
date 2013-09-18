@@ -16,8 +16,9 @@ function M.default_spend_skill_points(self, stats, SP)
     end
     local mult = 1/total
     for k,v in pairs(self.skills) do
-        local slot = SkillType.get_skill_slot(stats.base.skills, k)
-        slot:on_spend_skill_points(v * mult * SP)
+        local new_v = v * mult * SP
+        SkillType.get_skill_slot(stats.base.skills, k):on_spend_skill_points(new_v)
+        SkillType.get_skill_slot(stats.derived.skills, k):on_spend_skill_points(new_v)
     end
 end
 
