@@ -31,12 +31,12 @@ end
 
 -- Returns message on failure
 function SpellsKnown:can_use_spell(stats, spell_slot)
-    return spell_slot.type.on_prerequisite(spell_slot, stats)
+    return spell_slot:on_prerequisite(stats)
 end
 
 function SpellsKnown:use_spell(stats, spell_slot)
     if self:can_use_spell(stats, spell_slot) then
-        spell_slot.type.on_use(spell_slot, stats)
+        spell_slot:on_use(stats)
         return true
     end
     return false

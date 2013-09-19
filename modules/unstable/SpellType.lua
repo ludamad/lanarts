@@ -30,11 +30,9 @@ local schema = {
     range = S.defaulted(S.NUMBER, DEFAULT_RANGE),
     mp_cost = S.defaulted(S.NUMBER, 0),
 
-    requires_cooldown_offensive = S.defaulted(S.BOOL, true),
-    requires_cooldown_global = S.defaulted(S.BOOL, true),
-
 	cooldown_self = S.defaulted(S.NUMBER, 0),
 	cooldown_offensive = S.NUMBER,
+	cooldown = S.NUMBER,
 	cooldown_global = S.defaulted(S.NUMBER, DEFAULT_GLOBAL_COOLDOWN),
 
 	recommended_stats = S.TABLE_OR_NIL,

@@ -63,6 +63,11 @@ function M.default_class_on_init(self, stats)
             StatContext.add_item(stats, item)
         end
     end
+    if self.spells then
+        for spell in values(self.spells) do 
+            StatContext.add_spell(stats, spell)
+        end
+    end
     local wep = self.weapon
     if not wep then 
         wep = find_least_worth_weapon(APT_FOR_SKILL[self.weapon_skill])

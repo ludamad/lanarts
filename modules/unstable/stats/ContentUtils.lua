@@ -96,4 +96,12 @@ function M.derive_attack(args)
     return attack
 end
 
+function M.combine_on_prereq(p1, p2)
+    return  --[[If]] p2 and --[[Then]] func_apply_and(p1, p2) or --[[Else]] p1
+end
+
+function M.combine_on_use(p1, p2)
+    return  --[[If]] p2 and --[[Then]] func_apply_sequence(p1, p2) or --[[Else]] p1
+end 
+
 return M

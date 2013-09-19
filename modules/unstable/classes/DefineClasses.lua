@@ -66,6 +66,8 @@ class_define {
         -- TODO more items
     end,
 
+    spells = {"Minor Missile"},
+
     skills = {
         ["Melee"] = SPECIALITY,
         ["Melee Resistance"] = MODERATE,

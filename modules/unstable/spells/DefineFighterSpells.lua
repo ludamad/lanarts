@@ -26,5 +26,5 @@ spell_define {
     end,
 
     cooldown_self = 1000,
-    cooldown_offensive = 50
+    cooldown = 50
 }
