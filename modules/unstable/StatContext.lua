@@ -29,12 +29,12 @@ function M.add_spell(stats, ...)
     stats.base.spells:add_spell(...)
 end
 
-function M.can_use_spell(stats, spell_slot)
-    return stats.base.spells:can_use_spell(stats, spell_slot)
+function M.can_use_spell(stats, ...)
+    return stats.base.spells:can_use_spell(stats, ...)
 end
 
-function M.use_spell(stats, spell_slot)
-    return stats.base.spells:use_spell(stats, spell_slot)
+function M.use_spell(stats, ...)
+    return stats.base.spells:use_spell(stats, ...)
 end
 
 function M.add_item(stats, ...)

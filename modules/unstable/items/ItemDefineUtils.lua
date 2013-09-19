@@ -85,7 +85,7 @@ local function type_define(args, type, --[[Optional]] on_init, --[[Optional]] no
         add_default_types(args.identify_requirements, args, args.identify_dfficulty, args.identify_types)
     end
 
-    args.sprite = args.sprite or ContentUtils.derive_sprite(args.lookup_key or args.name)
+    args.sprite = ContentUtils.resolve_sprite(args)
     args.on_use = args.on_use or on_use_equipment(type)
     args.stackable = args.stackable or (ItemTraits.equipment_slot_capacities[type] == nil)
     args.on_init = args.on_init or on_init

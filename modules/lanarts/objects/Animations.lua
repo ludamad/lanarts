@@ -12,7 +12,6 @@ function M.fadeout_create(args)
     assert(args.duration and args.sprite)
     args.velocity = args.velocity or {0,0}
     args.time_elapsed = 0
-    args.radius = args.radius or args.sprite.width / 2
 
     args.depth = args.depth or ANIMATION_DEPTH
     args.traits = {ANIMATION_TRAIT}

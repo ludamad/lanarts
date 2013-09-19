@@ -1,3 +1,5 @@
+local Display = import "core.Display"
+
 local Apts = import "@stats.AptitudeTypes"
 local SpellsKnown = import "@SpellsKnown"
 local StatContext = import "@StatContext"
@@ -10,9 +12,20 @@ local M = nilprotect {} -- Submodule
 
 -- Derive sprite from name
 function M.derive_sprite(name, --[[Optional]] stack_idx)
-    stack_idx = (stack_idx or 1) + 1
-    local path = path_resolve("sprites/" .. name:gsub(' ', '_'):lower() .. ".png", stack_idx)
+    local path = path_resolve("sprites/" .. name:gsub(' ', '_'):lower() .. ".png", (stack_idx or 1) + 1)
     return image_cached_load(path)
+end
+
+function M.resolve_sprite(args, --[[Optional]] stack_idx)
+    local sprite = args.sprite or M.derive_sprite(args.lookup_key or args.name, (stack_idx or 1) + 1)
+    if type(sprite) == "string" then
+        if sprite:find("(") or sprite:find("%") then
+            return Display.animation_create(Display.images_load(sprite), 1.0)
+        else
+            return Display.image_load(sprite)
+        end
+    end
+    return sprite
 end
 
 -- Resolves bonuses of the form [Apts.FOOBAR] = {0,1,1,0}

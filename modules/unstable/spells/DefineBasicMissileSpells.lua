@@ -15,10 +15,11 @@ end
 missile_spell_define {
     lookup_key = "Minor Missile",
     description = "A minor missile attack.",
-    sprite = {},
-    speed = 7,
-    cooldown = 25,
-    mp_cost = 5,
+    sprite = "sprites/minor_missile.png%32x32",
+
+    mp_cost = 5, cooldown = 25,
+    speed = 7, radius = 4,
+
     on_create = function(type, args)
         local self = SpellDefineUtils.base_spell_on_create(type, args)
         resolve_bonuses(self)

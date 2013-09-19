@@ -66,7 +66,7 @@ local function perform_spell(player, monster)
     local spell = choice2spell[choose_option(unpack(choices))]
     if not spell then return false end
 
-    local used = StatContext.use_spell(player, spell)
+    local used = StatContext.use_spell(player, spell, monster.obj.xy)
     if not used then
         print("You must wait before using this.")
     end

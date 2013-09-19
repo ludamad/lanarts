@@ -282,7 +282,7 @@ function func_apply_sequence(f1,f2,--[[Optional]] s2)
     return function(s1,...)
         local v = f1(s1,...)
         if s2 then v = f2(s2, ...) or v 
-        else v = f1(s1,...) or v end
+        else v = f2(s1,...) or v end
         return v 
     end
 end
