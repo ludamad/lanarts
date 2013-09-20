@@ -8,13 +8,17 @@ local GameObject = import "core.GameObject"
 local AttackProjectileObject = ObjectUtils.type_create(Projectiles.LinearProjectileBase)
 
 function AttackProjectileObject:on_object_collide(other)
-    local user = self.stats.obj
-    if user ~= other then
+    local user = assert(self.stats.obj)
+    print "HIT1"
+    if other ~= user then
+        print "HIT2"
         if Relations.is_hostile(user, other) then
+        print "HIT3"
             -- No prereq for attack projectile!
             self:apply_attack(other)
             GameObject.destroy(self)
         elseif other.solid then
+        print "HIT4"
             GameObject.destroy(self)
         end
     end

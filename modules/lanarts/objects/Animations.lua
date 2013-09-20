@@ -25,8 +25,10 @@ function M.fadeout_create(args)
     end
 
     function args:on_draw()
-        local alpha = (self.duration - self.time_elapsed) / self.duration
-        ObjectUtils.draw_if_seen(self, self.sprite, alpha)
+        self.sprite:draw(self.xy)
+--    
+--        local alpha = (self.duration - self.time_elapsed) / self.duration
+--        ObjectUtils.draw_if_seen(self, self.sprite, alpha)
     end
 
     return GameObject.object_create(args)

@@ -68,7 +68,7 @@ function M.missile_spell_define(args)
 
     args.on_use = ContentUtils.combine_on_use(M.create_missile, args.on_use)
 
-    args.sprite = args.sprite or ContentUtils.derive_sprite(args.lookup_key or args.name)
+    args.sprite = ContentUtils.resolve_sprite(args)
     args.target_type = args.target_type or SpellType.TARGET_HOSTILE
     args.traits = args.traits or {Traits.FORCE_SPELL}
 

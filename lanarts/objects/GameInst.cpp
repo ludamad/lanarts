@@ -34,7 +34,6 @@ void GameInst::lua_lookup(lua_State* L, const char* key) {
 
 bool GameInst::try_callback(const char* callback) {
 	if (lua_variables.empty() || lua_variables.isnil()) {
-		printf("WHAT?\n");
 		return false;
 	}
 

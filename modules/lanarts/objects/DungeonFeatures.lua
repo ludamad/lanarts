@@ -18,7 +18,7 @@ M.FeatureBase = Base
 
 function Base.create(args)
     args.traits = args.trait or {M.FEATURE_TRAIT}
-    return args.base_create(args)
+    return Base.base_create(args)
 end 
 
 function Base:on_draw()
@@ -46,7 +46,7 @@ function Decoration.create(args)
     args.sprite = nil
     args.depth = args.depth or M.FEATURE_DEPTH
     args.frame = args.frame or 0
-    return Decoration.base.create(args)
+    return Decoration.base_create(args)
 end
 
 -- Door

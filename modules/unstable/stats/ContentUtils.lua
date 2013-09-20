@@ -19,7 +19,8 @@ end
 function M.resolve_sprite(args, --[[Optional]] stack_idx)
     local sprite = args.sprite or M.derive_sprite(args.lookup_key or args.name, (stack_idx or 1) + 1)
     if type(sprite) == "string" then
-        if sprite:find("(") or sprite:find("%") then
+        if sprite:find("%(") or sprite:find("%%") then
+            sprite = path_resolve(sprite, (stack_idx or 1) + 1)
             return Display.animation_create(Display.images_load(sprite), 1.0)
         else
             return Display.image_load(sprite)

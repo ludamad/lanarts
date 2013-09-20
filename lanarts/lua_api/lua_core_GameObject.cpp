@@ -112,8 +112,6 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	luawrap::bind_getter(getters["map"], &GameInst::current_floor);
 	LUAWRAP_GETTER(meta, __tostring, typeid(*OBJ).name());
 
-	getters["stats"].bind_function(lapi_gameinst_stats);
-
 	// Use table as fallback for getting values
 	lua_pushcfunction(L, &lapi_gameinst_getter_fallback);
 	luameta_defaultgetter(meta, LuaStackValue(L, -1));
@@ -173,6 +171,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LuaValue getters = luameta_getters(meta);
 	luawrap::bind_getter(getters["vx"], &CombatGameInst::vx);
 	luawrap::bind_getter(getters["vy"], &CombatGameInst::vy);
+	getters["stats"].bind_function(lapi_gameinst_stats);
 
 	LuaValue methods = luameta_constants(meta);
 	LUAWRAP_METHOD(methods, heal_fully, OBJ->stats().core.heal_fully());

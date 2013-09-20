@@ -10,6 +10,7 @@ AttackableObject.ATTACKABLE_TRAIT = "ATTACKABLE_TRAIT"
 
 function AttackableObject.create(args)
     assert(args.base_stats and (args.can_attack ~= nil))
+    args.solid = true
 
     -- Set up type signature
     args.type = args.type or AttackableObject
