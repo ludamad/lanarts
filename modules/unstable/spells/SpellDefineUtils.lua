@@ -23,7 +23,6 @@ local function mana_use(self, caster)
     StatContext.add_mp(caster, -self.mp_cost)
 end
 
-
 local SPELL_META = {
     __index = function (t,k) return assert(rawget(t, "type"))[k] end,
     __copy = function(t1,t2) table.copy(t1,t2, --[[Do not invoke meta]] false) end

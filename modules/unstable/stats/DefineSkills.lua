@@ -1,5 +1,6 @@
 local SkillType = import "@SkillType"
 local StatContext = import "@StatContext"
+local ContentUtils = import ".ContentUtils"
 local Apts = import "@stats.AptitudeTypes"
 local ExperienceCalculation = import "@stats.ExperienceCalculation"
 
@@ -30,15 +31,10 @@ local function on_calculate(skill_slot, user)
     end
 end
 
-local SKILL_META = {
-    __index = function (t,k) return assert(rawget(t, "type"))[k] end,
-    __copy = function(t1,t2) table.copy(t1,t2, --[[Do not invoke meta]] false) end
-}
-
 local function on_create(skill)
     assert(skill)
     local slot = {type = skill, level = 0, skill_points = 0, cost_multiplier = 1.0}
-    setmetatable(slot, SKILL_META)
+    setmetatable(slot, ContentUtils.RESOURCE_METATABLE)
     return slot
 end
 

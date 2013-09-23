@@ -16,6 +16,28 @@ for type,amount in pairs(M.default_cooldown_table) do
     M[type] = type
 end
 
+function M.cooldown_needed_message(type)
+    if type == M.ITEM_ACTIONS then
+        return "You cannot use an item yet."
+    elseif type == M.MELEE_ACTIONS or type == M.OFFENSIVE_ACTIONS or type == M.SPELL_ACTIONS then
+        return "You cannot use an attack yet."
+    end
+end
+
+-- Canonical order for resolving cooldowns. 
+-- This is important for consistent iteration, for eg predictable error reporting.
+-- Also useful for only iterating the members that are correct cooldowns.
+function M.cooldown_pairs(t)
+    local keys = pairs(M.default_cooldown_table)
+    return function()
+        while true do
+            local k = keys()
+            if not k then return nil end
+            if t[k] then return t[k] end
+        end
+    end
+end
+
 M.parent_cooldown_types = {
     [M.ALL_ACTIONS] = {},
     [M.OFFENSIVE_ACTIONS] = {M.ALL_ACTIONS},
@@ -34,7 +56,6 @@ M.cooldown_field_map = {
     [M.ITEM_ACTIONS] = "cooldown_item",
     [M.ABILITY_ACTIONS] = "cooldown_ability",
 }
-
 
 function M.cooldown_table(types, --[[Optional]] scale)
     scale = scale or 1

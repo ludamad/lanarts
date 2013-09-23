@@ -10,6 +10,11 @@ local Attacks = import "@Attacks"
 
 local M = nilprotect {} -- Submodule
 
+M.RESOURCE_METATABLE = {
+    __index = function (t,k) return assert(rawget(t, "type"))[k] end,
+    __copy = function(t1,t2) table.copy(t1,t2, --[[Do not invoke meta]] false) end
+}
+
 -- Derive sprite from name
 function M.derive_sprite(name, --[[Optional]] stack_idx)
     local path = path_resolve("sprites/" .. name:gsub(' ', '_'):lower() .. ".png", (stack_idx or 1) + 1)

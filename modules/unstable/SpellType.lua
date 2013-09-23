@@ -21,14 +21,8 @@ local schema = {
 	cooldown = S.NUMBER,
 	cooldown_global = S.defaulted(S.NUMBER, DEFAULT_GLOBAL_COOLDOWN),
 
-	recommended_stats = S.TABLE_OR_NIL,
-
-    on_create = S.FUNCTION,
-    on_use = S.FUNCTION,
-    on_prerequisite = S.FUNCTION_OR_NIL,
-    on_autotarget = S.FUNCTION_OR_NIL,
-
-    ai_score_hint = S.FUNCTION_OR_NIL
+    use_action = S.TABLE,
+    on_create = S.FUNCTION
 }
 
 local function create(t)
