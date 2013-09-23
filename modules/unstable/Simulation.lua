@@ -332,11 +332,6 @@ local function main()
         player:stat_context_copy(), player:melee_attack(), monster:stat_context_copy()
     )
     print("To kill the giant rat, you need " .. kill_time .. " steps with melee.")
-    kill_time = TimeToKillCalculation.calculate_time_to_kill(
-        player:stat_context_copy(), player:melee_attack(), monster:stat_context_copy()
-    )
-    print("To kill the giant rat, you need " .. kill_time .. " steps with magic.")
-
     assert((import "lanarts.objects.Relations").is_hostile(player, monster))
 
     while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
