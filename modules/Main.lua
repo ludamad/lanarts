@@ -123,7 +123,7 @@ function Engine.main(args)
 
         local Display = import "core.Display"
         Display.initialize("Tests", {settings.view_width, settings.view_height}, settings.fullscreen)
-        
+
         local failures = (cpp_tests or all_tests) and _lanarts_unit_tests() or 0
         local passed = (lua_tests or all_tests) and import "tests.Main" or true
         -- Return exit code so ctest will notice the failure
@@ -137,7 +137,10 @@ function Engine.main(args)
         return false
     elseif args[1] == "--repl" then
         local finished = false
-        function _G.start_lanarts() finished = true end
+        function _G.start_lanarts()
+            -- Continue lanarts initialization 
+            finished = true
+        end
         while not finished do 
             __read_eval_print()
         end

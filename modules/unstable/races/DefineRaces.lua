@@ -1,6 +1,7 @@
 local SpellType = import "@SpellType"
 local SpellTraits = import "@spells.SpellTraits"
 local Apts = import "@stats.AptitudeTypes"
+local Actions = import "@Actions"
 
 local races_define = (import ".RaceDefineUtils").races_define
 
@@ -28,7 +29,7 @@ races_define {
         traits = {SpellTraits.BUFF_SPELL},
         mp_cost = 30,
         cooldown_offensive = 35,
-        target_type = SpellType.TARGET_NONE,
+        target_type = Actions.TARGET_NONE,
 
         heal_amount = 30,
 
@@ -40,7 +41,7 @@ races_define {
             local StatContext = import "@StatContext"
             local LogUtils = import "lanarts.LogUtils"
             local actual = StatContext.add_hp(caster, self.heal_amount)
-            LogUtils.resolved_log(caster.obj, "<The >$You invoke [the]{its} curse to gain{s} " .. actual .. "HP!", COL_GREEN)
+            LogUtils.event_log_resolved(caster.obj, "<The >$You invoke [the]{its} curse to gain{s} " .. actual .. "HP!", COL_GREEN)
         end
     }}
 }

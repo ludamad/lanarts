@@ -1,3 +1,4 @@
+local Apts = import "@stats.AptitudeTypes"
 local SpellDefineUtils = import ".SpellDefineUtils"
 local missile_spell_define = SpellDefineUtils.missile_spell_define
 local StatusType = import "@StatusType"
@@ -19,6 +20,9 @@ missile_spell_define {
 
     mp_cost = 5, cooldown = 25,
     speed = 7, radius = 4,
+
+    types = {Apts.MAGIC, Apts.FORCE},
+    damage = 5, effectiveness = 2,
 
     on_create = function(type, args)
         local self = SpellDefineUtils.base_spell_on_create(type, args)

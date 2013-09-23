@@ -192,7 +192,7 @@ function table.defaulted_subtraction(src, dest)
     for k,v in pairs(src) do
         local val = dest[k]
         if dest[k] == nil then
-            dest[k] = src[k]
+            dest[k] = -src[k]
         else
             if type(val) == 'table' then
                 table.defaulted_subtraction(src[k], val)

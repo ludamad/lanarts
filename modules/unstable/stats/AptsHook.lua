@@ -6,7 +6,7 @@ local M = nilprotect {} -- Submodule
 M.hook = {
 --    init = function(self, stats, ...)
 --       self.base.init(self, stats, ...)
---       LogUtils.log_if_player(stats.obj, "$You enter{s} a powerful rage!", {200,200,255})
+--       LogUtils.event_log_player(stats.obj, "$You enter{s} a powerful rage!", {200,200,255})
 --    end,
 --    on_step = function(self, stats, ...)
 --    
@@ -31,7 +31,7 @@ M.hook = {
 --        CooldownUtils.reset_rest_cooldown(stats)
 --    end,
 --    on_kill = function(self, stats)
---        LogUtils.resolved_log(stats.obj, "<The >{$You's}[Your] rage grows ...", {200,200,255})
+--        LogUtils.event_log_resolved(stats.obj, "<The >{$You's}[Your] rage grows ...", {200,200,255})
 --    end,
 --    on_deregister = function(self, stats)
 --       local B = stats.base

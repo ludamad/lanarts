@@ -27,6 +27,8 @@ local GameState = import "core.GameState"
 local PlayerObject = import "@objects.PlayerObject"
 local MonsterObject = import "@objects.MonsterObject"
 
+local CooldownTypes = import "@stats.CooldownTypes"
+
 local SimulationMap = import "@SimulationMap"
 local Proficiency = import "@Proficiency"
 local LogUtils = import "lanarts.LogUtils"
@@ -221,32 +223,44 @@ local function give_all_items(player)
     end
 end
 
-local frame = 0
+local frame, WAIT_UNTIL = 0, 0
+
+local function can_continue(player)
+    if frame < WAIT_UNTIL then return false end
+    return not StatContext.has_cooldown(player, CooldownTypes.ALL_ACTIONS)
+end
 
 local function query_player(player, monster)
     frame = frame + 1
     local attack = player.obj:melee_attack()
-    if not attack:on_prerequisite(player, monster) then return end
-    if not Attacks.obj_in_range(attack, player, monster) then return end
+    if not can_continue(player) then return end
     local moved = false
     while not moved do
         AnsiCol.println("Frame: " .. frame, AnsiCol.YELLOW, AnsiCol.BOLD)
         print(StatUtils.stats_to_string(player.derived, --[[Color]] true, --[[New lines]] true, player.base.name .. ", the Adventurer"))
         print(StatUtils.attack_to_string(attack, --[[Color]] true))    
-        local action = choose_option("Attack", "Spell", "Item")
+        local action = choose_option("Attack", "Spell", "Item", "Wait")
         if action == "Attack" then
-            player.obj:apply_attack(attack, monster.obj)
-            moved = true
+            local able, problem = player.obj:can_attack(attack, monster.obj)
+            if able then
+                player.obj:apply_attack(attack, monster.obj)
+                moved = true
+            else
+                print(problem)
+            end
         elseif action == "Spell" then
             moved = perform_spell(player, monster)
         elseif action == "Item" then
             moved = use_item(player)
+        elseif action == "Wait" then
+            WAIT_UNTIL = frame + 10
+            moved = true
         end
     end
 end
 
 local function print_sample_stats(race, --[[Optional]] class)
-    local stats = PlayerObject.create_player_stats(race, class, "Level 1 " .. race.name)
+    local stats = PlayerObject.player_stats_create(race, class, "Level 1 " .. race.name)
     local context = StatContext.stat_context_create(stats)
     StatContext.on_step(context)
     StatContext.on_calculate(context)
@@ -273,9 +287,9 @@ end
 local function choose_class(race)
     local class_types = {}
     table.insert(class_types, ClassType.lookup("Knight"))
---    for v in values{"Fire", "Water", "Light", "Dark"} do
---        table.insert(classes, ClassType.lookup("Mage"):on_create {magic_skill = v, weapon_skill = "Slashing Weapons"})
---    end
+    for v in values{"Force"} do
+        table.insert(class_types, ClassType.lookup("Mage"):on_create {magic_skill = v, weapon_skill = "Slashing Weapons"})
+    end
 
     local C = AnsiCol
     local idx = 1
@@ -288,7 +302,7 @@ local function choose_class(race)
         if choose_option("No", "Yes") == "Yes" then
             print("Which specialization?")
             local skill = choose_option("Piercing Weapons", "Slashing Weapons", "Blunt Weapons")
-            return class:on_create{weapon_skill=skill}
+            return class:on_create{magic_skill = class.magic_skill, weapon_skill=skill}
         end
         idx = (idx % #class_types) + 1 
     end
@@ -312,6 +326,18 @@ local function main()
     local class = choose_class(race)
     local player = SM:add_player("Tester", race, class)
     local monster = SM:add_monster("Giant Rat")
+
+    local TimeToKillCalculation = import "@simulation.TimeToKillCalculation"
+    local kill_time = TimeToKillCalculation.calculate_time_to_kill(
+        player:stat_context_copy(), player:melee_attack(), monster:stat_context_copy()
+    )
+    print("To kill the giant rat, you need " .. kill_time .. " steps with melee.")
+    kill_time = TimeToKillCalculation.calculate_time_to_kill(
+        player:stat_context_copy(), player:melee_attack(), monster:stat_context_copy()
+    )
+    print("To kill the giant rat, you need " .. kill_time .. " steps with magic.")
+
+    assert((import "lanarts.objects.Relations").is_hostile(player, monster))
 
     while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
         SM:step()

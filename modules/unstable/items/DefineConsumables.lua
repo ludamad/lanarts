@@ -13,7 +13,7 @@ Utils.potion_define {
 
     on_use = function(self, user)
         local actual = StatContext.add_hp(user, HEALTH_POTION_HEAL_AMOUNT)
-        LogUtils.resolved_log(user.obj, "<The >$You gain{s} " .. actual .. "HP!")
+        LogUtils.event_log_resolved(user.obj, "<The >$You gain{s} " .. actual .. "HP!")
     end
 }
 
@@ -28,6 +28,6 @@ Utils.potion_define {
 
     on_use = function(self, user)
         local actual = StatContext.add_mp(user, MANA_POTION_MP_GAIN_AMOUNT)
-        LogUtils.resolved_log(user.obj, "<The >$You gain{s} " .. actual .. "MP!", COL_WHITE)
+        LogUtils.event_log_resolved(user.obj, "<The >$You gain{s} " .. actual .. "MP!", COL_WHITE)
     end
 }

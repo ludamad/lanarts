@@ -1,23 +1,9 @@
 -- Usage: 'SpellType.define { ... attributes ... }', 'SpellType.lookup(<name or ID>)'
 local S = import "@Schemas"
 local ResourceTypes = import "@ResourceTypes"
+local Actions = import "@Actions"
 
 local M = nilprotect {} -- Submodule
-
--- Useful for monster AI and auto-targetting.
--- The on_autotarget method provides better functionality.
-M.TARGET_NONE = "target_none"
-
-M.TARGET_HOSTILE_POSITION = "target_hostile_position"
-M.TARGET_FRIENDLY_POSITION = "target_friendly_position"
-
-M.TARGET_HOSTILE = "target_hostile"
-M.TARGET_FRIENDLY = "target_friendly"
-
-local TARGET_TYPES = {
-    M.TARGET_NONE, M.TARGET_HOSTILE_POSITION, M.TARGET_FRIENDLY_POSITION,
-    M.TARGET_HOSTILE, M.TARGET_FRIENDLY
-}
 
 local DEFAULT_GLOBAL_COOLDOWN = 40
 local DEFAULT_RANGE = 300
@@ -26,7 +12,7 @@ local schema = {
     lookup_key = S.STRING,
     traits = S.TABLE,
 
-    target_type = S.one_of(TARGET_TYPES, --[[default]] M.TARGET_HOSTILE_POSITION),
+    target_type = S.one_of(Actions.TARGET_TYPES, --[[default]] Actions.TARGET_HOSTILE_POSITION),
     range = S.defaulted(S.NUMBER, DEFAULT_RANGE),
     mp_cost = S.defaulted(S.NUMBER, 0),
 

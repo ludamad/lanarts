@@ -18,4 +18,3 @@ void lanarts_system_quit() {
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 #endif
 }
-

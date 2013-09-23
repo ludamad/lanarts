@@ -9,31 +9,25 @@ local AttackProjectileObject = ObjectUtils.type_create(Projectiles.LinearProject
 
 function AttackProjectileObject:on_object_collide(other)
     local user = assert(self.stats.obj)
-    print "HIT1"
     if other ~= user then
-        print "HIT2"
         if Relations.is_hostile(user, other) then
-        print "HIT3"
             -- No prereq for attack projectile!
             self:apply_attack(other)
             GameObject.destroy(self)
         elseif other.solid then
-        print "HIT4"
             GameObject.destroy(self)
         end
     end
 end
 
-function AttackProjectileObject:on_draw()
-    self.sprite:draw(self.xy)
-end
+AttackProjectileObject.on_draw = ObjectUtils.draw_sprite_member_if_seen
 
 function AttackProjectileObject:apply_attack(target_obj)
     local target = target_obj:stat_context()
 
     local dmg = self.attack:on_use(self.stats, target)
-    LogUtils.resolved_log(target.obj, "{The }$You takes{s} " ..dmg .. " damage!", COL_GREEN)
-    LogUtils.resolved_log(target.obj, "{The }$You [have]{has} " .. math.ceil(target.base.hp) .. "HP left.", COL_PALE_BLUE)
+    LogUtils.event_log_resolved(target.obj, "{The }$You take{s} " ..dmg .. " damage!", COL_GREEN)
+    LogUtils.event_log_resolved(target.obj, "{The }$You [have]{has} " .. math.ceil(target.base.hp) .. "HP left.", COL_PALE_BLUE)
 end
 
 function AttackProjectileObject:on_deinit()

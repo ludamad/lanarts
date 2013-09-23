@@ -3,6 +3,7 @@ local ItemType = import "@ItemType"
 local Apts = import "@stats.AptitudeTypes"
 local SkillType = import "@SkillType"
 local StatContext = import "@StatContext"
+local ExperienceCalculation = import "@stats.ExperienceCalculation"
 
 local M = nilprotect {} -- Submodule
 
@@ -57,7 +58,7 @@ local function find_least_worth_weapon(trait)
 end
 
 function M.default_class_on_init(self, stats)
-    self:on_spend_skill_points(stats, 5000)
+    self:on_spend_skill_points(stats, ExperienceCalculation.SKILL_POINT_START_AMOUNT)
     if self.items then
         for item in values(self.items) do 
             StatContext.add_item(stats, item)

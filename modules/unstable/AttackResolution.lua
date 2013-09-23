@@ -1,3 +1,5 @@
+local LogUtils = import "lanarts.LogUtils"
+
 local M = nilprotect {} -- Submodule
 
 -- Helper for finding highest defence multiplier of a certain type
@@ -103,13 +105,17 @@ local RESISTANCE_MULTIPLE_INTERVAL = 20
 
 local function resolve_subattack(s, damage_multiplier, AApt, TApt)
     local resistance = table.dot_product(s.resistance_multipliers, TApt.resistance)
-    local defence = damage_multiplier * table.dot_product(s.defence_multipliers, TApt.defence)
+    local defence = table.dot_product(s.defence_multipliers, TApt.defence)
     local effectiveness = s.base_effectiveness + table.dot_product(s.effectiveness_multipliers, AApt.effectiveness)
-    local damage = s.base_damage + table.dot_product(s.damage_multipliers, AApt.damage)
-    damage = math.max(0, (damage - defence) * damage_multiplier)
+    local damage = table.dot_product(s.damage_multipliers, AApt.damage)
 
     local percentage = math.max(0, 1.0 + (effectiveness - resistance) / RESISTANCE_MULTIPLE_INTERVAL)
-    return damage, percentage
+    local resolved_damage = math.max(0, s.base_damage + (damage - defence) * damage_multiplier)
+
+    LogUtils.debug_log("Damage: ",s.base_damage, " Base Dam + (", damage," Dam vs ", defence, " Def) * ", damage_multiplier*100, "% multiplier => ", resolved_damage, " damage.")
+    LogUtils.debug_log("Effectiveness: 100% + (", effectiveness," Eff vs ", resistance, " Res) / ",RESISTANCE_MULTIPLE_INTERVAL," => ", math.ceil(percentage*1000)/10, "%.")
+
+    return resolved_damage, percentage
 end
 
 --- Determine the damage done by an attack
@@ -123,13 +129,12 @@ function M.damage_calc(attack, attacker, target)
 
     for s in values(attack.sub_attacks) do
         local damage, percentage = resolve_subattack(s, attack.damage_multiplier, AApt, TApt)
---        print("Attack hits for " .. damage .. " with "  .. math.floor(percentage*100) .. "% effectiveness.")
+        LogUtils.debug_log("Attack hits for ", damage, " with ", math.ceil(percentage*1000)/10 .. "% effectiveness.")
         table.insert(A, damage * percentage)
         table.insert(DM, table.scaled(s.defence_multipliers, percentage))
     end
 
     return M.resolve_damage(A, DM, TApt.defence)
 end
-
 
 return M

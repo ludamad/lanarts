@@ -23,10 +23,6 @@ local function default_on_die_message(self)
     EventLog.add(self.type.defeat_message, self.defeat_color or {255,255,255})
 end
 
-local function on_draw_sprite(self)
-    self.sprite:draw(self.xy)
-end
-
 function M.monster_define(t, --[[Optional]] derive_idx)
     t.team = t.team or Relations.TEAM_MONSTER_ROOT
     local stats = ContentUtils.resolve_embedded_stats(t)
@@ -46,7 +42,7 @@ function M.monster_define(t, --[[Optional]] derive_idx)
         on_die = t.on_die or default_on_die_message,
 
         sprite = sprite,
-        on_draw = t.on_draw or on_draw_sprite,
+        on_draw = t.on_draw,
         traits = t.traits,
 
         xp_award = t.xp_award,
@@ -54,7 +50,6 @@ function M.monster_define(t, --[[Optional]] derive_idx)
 
         base_stats = stats,
         unarmed_attack = CooldownUtils.derive_attack_with_cooldown(t),
-
     }
 end
 

@@ -49,7 +49,7 @@ M.Exhausted = StatusType.define {
     name = "Exhausted",
     init = function(self, stats, ...)
         self.base.init(self, stats, ...)
-        LogUtils.log_if_player(stats.obj, "$You {is}[are] now exhausted.", {255,200,200})
+        LogUtils.event_log_player(stats.obj, "$You {is}[are] now exhausted.", {255,200,200})
     end,
     on_calculate = function(self, stats)
         local D = stats.derived
@@ -59,7 +59,7 @@ M.Exhausted = StatusType.define {
         D.movement_speed = D.movement_speed / 2
     end,
     on_deregister = function(self, stats)
-       LogUtils.log_if_player(stats.obj, "$You {is}[are] no longer exhausted.", {200,200,255})
+       LogUtils.event_log_player(stats.obj, "$You {is}[are] no longer exhausted.", {200,200,255})
     end
 }
 
@@ -80,7 +80,7 @@ M.Berserk = StatusType.define {
     name = "Berserk",
     init = function(self, stats, ...)
        self.base.init(self, stats, ...)
-       LogUtils.log_if_player(stats.obj, "$You enter{s} a powerful rage!", {200,200,255})
+       LogUtils.event_log_player(stats.obj, "$You enter{s} a powerful rage!", {200,200,255})
     end,
     on_calculate = function(self, stats)
         local D = stats.derived
@@ -96,7 +96,7 @@ M.Berserk = StatusType.define {
         CooldownUtils.reset_rest_cooldown(stats)
     end,
     on_kill = function(self, stats)
-        LogUtils.resolved_log(stats.obj, "<The >{$You's}[Your] rage grows ...", {200,200,255})
+        LogUtils.event_log_resolved(stats.obj, "<The >{$You's}[Your] rage grows ...", {200,200,255})
     end,
     on_deregister = function(self, stats)
        local B = stats.base

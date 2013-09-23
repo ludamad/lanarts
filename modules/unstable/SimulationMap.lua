@@ -14,7 +14,7 @@ local SimulationMap = newtype()
 function SimulationMap:init()
     self.map = MapUtils.area_template_to_map("LanartsExampleLevel", path_resolve "test_content/test-map.txt", 0, {
         ['.'] =  { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor },
-        ['x'] =  { add = {MapGen.FLAG_SEETHROUGH,MapGen.FLAG_SOLID}, content = TileSets.pebble.wall }
+        ['x'] =  { add = MapGen.FLAG_SOLID, content = TileSets.pebble.wall }
     })
 	self.gmap = GameMap.create { map = self.map }
     self.monsters = {}
@@ -27,7 +27,7 @@ function SimulationMap:add_player(name, race, class)
         name = name,
         race = race,
         class = class,
-        xy = vector_scale(tile_xy, 32),
+        xy = MapUtils.from_tile_xy(tile_xy),
         is_local_player = function() return true end,
         do_init = true,
         map = self.gmap
@@ -40,7 +40,7 @@ function SimulationMap:add_monster(monster)
     local tile_xy = MapUtils.random_square(self.map)
     local monster_object = MonsterObject.create {
         monster_type = monster,
-        xy = vector_scale(tile_xy, 32),
+        xy = MapUtils.from_tile_xy(tile_xy),
         do_init = true,
         map = self.gmap
     }
@@ -53,7 +53,7 @@ function SimulationMap:step()
 end
 
 function SimulationMap:draw()
-    GameMap.map_draw({map = self.gmap, reveal_all = true})
+    GameMap.map_draw({map = self.gmap})
 end
 
 return SimulationMap

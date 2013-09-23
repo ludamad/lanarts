@@ -1,5 +1,6 @@
 local Type, Traits = import "@SpellType", import ".SpellTraits"
 local Apts = import "@stats.AptitudeTypes"
+local Actions = import "@Actions"
 local ContentUtils = import "@stats.ContentUtils"
 local CooldownUtils = import "@stats.CooldownUtils"
 local StatusType = import "@StatusType"
@@ -49,7 +50,7 @@ function M.spell_define(args)
     return SpellType.define(args)
 end
 
-function M.create_missile(self, caster, xy)
+function M.missile_create(self, caster, xy)
     local dir = vector_subtract(xy, caster.obj.xy)
     dir = vector_normalize(dir, self.speed)
     return AttackProjectileObject.create {
@@ -66,10 +67,10 @@ end
 function M.missile_spell_define(args)
     assert(args.speed)
 
-    args.on_use = ContentUtils.combine_on_use(M.create_missile, args.on_use)
+    args.on_use = ContentUtils.combine_on_use(M.missile_create, args.on_use)
 
     args.sprite = ContentUtils.resolve_sprite(args)
-    args.target_type = args.target_type or SpellType.TARGET_HOSTILE
+    args.target_type = args.target_type or Actions.TARGET_HOSTILE
     args.traits = args.traits or {Traits.FORCE_SPELL}
 
     args.types = args.types or {Apts.FORCE} -- For 'derive_attack'

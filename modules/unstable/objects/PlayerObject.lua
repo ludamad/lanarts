@@ -10,7 +10,7 @@ local GameObject = import "core.GameObject"
 local PlayerObject = ObjectUtils.type_create(AttackableObject) 
 PlayerObject.PLAYER_TRAIT = "PLAYER_TRAIT"
 
-function PlayerObject.create_player_stats(race, --[[Can-be-nil]] class, name, --[[Optional]] team)
+function PlayerObject.player_stats_create(race, --[[Can-be-nil]] class, name, --[[Optional]] team)
     local stats = race.on_create(name, team or Relations.TEAM_PLAYER_DEFAULT)
     if class then
         local context = StatContext.stat_context_create(stats)
@@ -41,18 +41,14 @@ function PlayerObject.create(args)
     table.insert(args.traits, PlayerObject.PLAYER_TRAIT)
 
     -- AttackableObject configuration
-    args.can_attack = true
-    args.base_stats = PlayerObject.create_player_stats(args.race, args.class, args.name)
+    args.has_attack = true
+    args.base_stats = PlayerObject.player_stats_create(args.race, args.class, args.name)
 
     -- Create pseudo-objects
     args.unarmed_attack = args.unarmed_attack or args.race.attack 
     args.base_create = GameObject.player_create
 
     return PlayerObject.base_create(args)
-end
-
-function PlayerObject:on_draw()
-    self.sprite:draw(self.xy)
 end
 
 function PlayerObject.is_player(obj)

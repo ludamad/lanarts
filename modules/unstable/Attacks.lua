@@ -54,6 +54,7 @@ function M.attack_create(
 
         damage_multiplier = damage_multiplier or delay,
         on_use = attack_on_use,
+        apply = attack_on_use, -- TODO deprecate on_use for attacks
         range = range or DEFAULT_MELEE_RANGE
     }
 end

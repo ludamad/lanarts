@@ -6,6 +6,10 @@ local GameMap = import "core.GameMap"
 
 local M = {} -- Submodule
 
+function M.from_tile_xy(xy)
+    return {xy[1]*32+16, xy[2]*32+16}
+end
+
 function M.random_square(map, area, --[[Optional]] selector, --[[Optional]] operator, --[[Optional]] max_attempts) 
     return MapGen.find_random_square { 
         map = map, area = area, 
@@ -18,7 +22,7 @@ end
 function M.spawn_enemy(map, type, tile_xy)
     local object = GameObject.enemy_create {
         do_init = false,
-        xy = {tile_xy[1]*32+16, tile_xy[2]*32+16},
+        xy = M.from_tile_xy(tile_xy),
         type = type,
     }
     table.insert(map.instances, object)
@@ -28,7 +32,7 @@ end
 
 function M.spawn_store(map, items, tile_xy)
     local object = GameObject.store_create {
-        xy = {tile_xy[1]*32+16, tile_xy[2]*32+16},
+        xy = M.from_tile_xy(tile_xy),
         items = items,
         do_init = false,
         sprite = "store",
@@ -40,7 +44,7 @@ end
 function M.spawn_item(map, type, amount, tile_xy)
     local object = GameObject.item_create {
         do_init = false,
-        xy = {tile_xy[1]*32+16, tile_xy[2]*32+16},
+        xy = M.from_tile_xy(tile_xy),
         type = type,
         amount = amount,
         type = type,
@@ -68,7 +72,7 @@ function M.random_enemy(map, type, area)
 end
 
 function M.spawn_door(map, sqr)
-    local object = DungeonFeatures.Door.create { do_init = false, xy = {sqr[1]*32+16, sqr[2]*32+16} }
+    local object = DungeonFeatures.Door.create { do_init = false, xy = M.from_tile_xy(sqr) }
     table.insert(map.instances, object)
     return object
 end
@@ -77,7 +81,7 @@ function M.spawn_decoration(map, sprite, sqr, frame, solid)
     if solid == nil then solid = true end 
     local object = DungeonFeatures.Decoration.create {
         do_init = false,
-        xy = {sqr[1]*32+16, sqr[2]*32+16},
+        xy = M.from_tile_xy(sqr),
         type = DungeonFeatures.Decoration,
         sprite = sprite,
         frame = frame
@@ -89,7 +93,7 @@ end
 function M.spawn_portal(map, sqr, sprite, --[[Optional]] callback, --[[Optional]] frame)
     local object = GameObject.feature_create {
         do_init = false,
-        xy = {sqr[1]*32+16, sqr[2]*32+16},
+        xy = M.from_tile_xy(sqr),
         type = GameObject.PORTAL,
         sprite = sprite,
         on_player_interact = callback,

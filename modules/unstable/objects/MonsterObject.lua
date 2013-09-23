@@ -13,10 +13,6 @@ M.MONSTER_TRAIT = "MONSTER_TRAIT"
 
 -- Monster object methods:
 
-local function monster_draw(self)
-    self.sprite:draw(self.xy)
-end
-
 local function monster_die(self)
     if self.destroyed then return end
 
@@ -73,7 +69,6 @@ local function monster_object_type(type)
     -- Merge data from monster type
     for k,v in pairs(type) do object_type[k] = v end
 
-    object_type.on_draw = monster_draw
     object_type.on_step = monster_step
 
     MONSTER_OBJECT_TYPE_CACHE[type] = object_type
@@ -94,7 +89,7 @@ function M.create(args)
     table.insert(args.traits, M.MONSTER_TRAIT)
 
     -- AttackableObject configuration
-    args.can_attack = true
+    args.has_attack = true
 
     return obj_type.base_create(args)
 end

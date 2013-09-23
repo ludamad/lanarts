@@ -9,8 +9,6 @@ local Attacks = import "@Attacks"
 
 local M = nilprotect {} -- Submodule
 
---local DEFAULT_UNARMED_ATTACK = Attacks.attack_create(0, 5, Apts.MELEE)
-
 -- A more convenient race_define
 function M.races_define(args)
     args.description = args.description:pack()

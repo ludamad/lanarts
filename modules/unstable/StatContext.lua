@@ -140,6 +140,17 @@ function M.permanent_add(context, values)
     M.temporary_add(context, values)
 end
 
+--- Change a stat temporarily. Subtracts from derived context only.
+function M.temporary_subtract(context, values)
+    table.defaulted_subtraction(values, context.derived)
+end
+
+--- Change a stat permanently. Subtracts from both derived and base contexts.
+function M.permanent_subtract(context, values)
+    table.defaulted_subtraction(values, context.base)
+    M.temporary_subtract(context, values)
+end
+
 --- Change an aptitude temporarily.
 local function add_aptitude(context, category, type, amount, --[[Optional, default false]] permanent )
     (permanent and M.permanent_add or M.temporary_add)(context, {
@@ -210,7 +221,7 @@ function M.add_cooldown(context, type, amount)
     context.base.cooldowns:add_cooldown(type, amount)
 end
 
-function M.has_cooldown(context, type, amount)
+function M.has_cooldown(context, type)
     return context.derived.cooldowns:has_cooldown(type)
 end
 

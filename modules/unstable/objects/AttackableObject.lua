@@ -4,12 +4,13 @@ local ItemTraits = import "@items.ItemTraits"
 local ProficiencyPenalties = import "@stats.ProficiencyPenalties"
 local AttackResolution = import "@AttackResolution"
 local LogUtils = import "lanarts.LogUtils"
+local Attacks = import "@Attacks"
 
 local AttackableObject = ObjectUtils.type_create()
 AttackableObject.ATTACKABLE_TRAIT = "ATTACKABLE_TRAIT"
 
 function AttackableObject.create(args)
-    assert(args.base_stats and (args.can_attack ~= nil))
+    assert(args.base_stats and (args.has_attack ~= nil))
     args.solid = true
 
     -- Set up type signature
@@ -30,6 +31,7 @@ function AttackableObject:on_init()
     -- Internal only property. Provides a stat context of unknown validity.
     self._context = StatContext.stat_context_create(self.base_stats, self.derived_stats, self)
     self._stats_need_calculate = false -- Mark as valid stat context
+    self.team = self.base_stats.team
 end
 
 -- Only way to get a StatContext.
@@ -53,8 +55,10 @@ function AttackableObject:on_step()
     self._stats_need_calculate = true
 end
 
+AttackableObject.on_draw = ObjectUtils.draw_sprite_member_if_seen
+
 function AttackableObject:melee_attack()
-    if not self.can_attack then return nil end
+    if not self.has_attack then return nil end
 
     local weapon = StatContext.get_equipped_item(self._context, ItemTraits.WEAPON)
     if weapon then
@@ -63,7 +67,7 @@ function AttackableObject:melee_attack()
     end
     return self.unarmed_attack -- Default
 end
-
+ 
 function AttackableObject.is_attackable(obj)
     return table.contains(obj.traits, AttackableObject.ATTACKABLE_TRAIT)
 end
@@ -73,8 +77,15 @@ function AttackableObject:apply_attack(attack, target_obj)
     local attacker, target = self:stat_context(), target_obj:stat_context()
 
     local dmg = attack:on_use(attacker, target)
-    LogUtils.resolved_log(attacker.obj, "{The }$You deal{s} " ..dmg .. " damage!", COL_GREEN)
-    LogUtils.resolved_log(target.obj, "{The }$You [have]{has} " .. math.ceil(target.base.hp) .. "HP left.", COL_PALE_BLUE)
+    LogUtils.event_log_resolved(attacker.obj, "{The }$You deal{s} " ..dmg .. " damage!", COL_GREEN)
+    LogUtils.event_log_resolved(target.obj, "{The }$You [have]{has} " .. math.ceil(target.base.hp) .. "HP left.", COL_PALE_BLUE)
+end
+
+function AttackableObject:can_attack(attack, target_obj)
+    local attacker, target = self:stat_context(), target_obj:stat_context()
+    local ok, problem = Attacks.obj_in_range(attack, attacker, target)
+    if not ok then return false, problem end
+    return attack:on_prerequisite(attacker, target)
 end
 
 return AttackableObject

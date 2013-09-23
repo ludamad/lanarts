@@ -1,7 +1,15 @@
 local EventLog = import "core.ui.EventLog"
 local Players = import "@Players"
+local AnsiColors = import "core.terminal.AnsiColors"
 
 local M = nilprotect {} -- Submodule
+
+-- TODO: Turn on/off logging per module in some efficient manner
+-- Initializing a logger is possible... However, a special version of LogUtils for each module may be better.
+__LANARTS_DEBUG_MODE = true
+local DEBUG_MESSAGE_PREFIX = "DEBUG: "
+-- TODO Colorize logging from different sections
+local DEBUG_COLOR = AnsiColors.YELLOW
 
 -- Remove start and end character
 local function unwrap(str)
@@ -11,6 +19,14 @@ end
 -- Ignore string
 local function toss(str)
     return ""
+end
+
+function M.set_debug_mode(debug_mode)
+    rawset(_G, "__LANARTS_DEBUG_MODE", debug_mode)
+end
+
+function M.get_debug_mode(debug_mode)
+    return __LANARTS_DEBUG_MODE
 end
 
 function M.resolve_conditional_message(user, msg)
@@ -31,22 +47,33 @@ function M.resolve_conditional_message(user, msg)
     return msg
 end
 
-function M.resolved_log(user, msg, ...)
+function M.event_log_resolved(user, msg, ...)
     EventLog.add(M.resolve_conditional_message(user, msg), ...)
 end
 
+function M.debug_log(msg, ...)
+    if not __LANARTS_DEBUG_MODE then return end
+    AnsiColors.print(DEBUG_MESSAGE_PREFIX, AnsiColors.WHITE, AnsiColors.BOLD .. AnsiColors.UNDERLINE)
+    AnsiColors.println(msg .. table.concat{...}, DEBUG_COLOR, AnsiColors.UNDERLINE)
+end
+
+function M.debug_log_resolved(user, msg, ...)
+    if not __LANARTS_DEBUG_MODE then return end
+    M.debug_log(M.resolve_conditional_message(user, msg .. table.concat{...}))
+end
+
 -- Logs if it is the current player
-function M.log_if_local(user, ...)
+function M.event_log_local(user, ...)
     if Players.is_local_player(user) then
-        M.resolved_log(user, ...)
+        M.event_log_resolved(user, ...)
         return true
     end
     return false
 end
 
-function M.log_if_player(user, ...)
+function M.event_log_player(user, ...)
     if Players.is_player(user) then
-        M.resolved_log(user, ...)
+        M.event_log_resolved(user, ...)
         return true
     end
     return false

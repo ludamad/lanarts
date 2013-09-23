@@ -13,7 +13,7 @@ local MAGE_NAMES_FOR_SKILL = {
     ["Light"] = "Lifemage",
     ["Curses"] = "Hexcrafter",
     ["Enchantments"] = "Enchanter",
-    ["Force"] = "Warbender",
+    ["Force"] = "Warmage",
     ["Earth"] = "Druid",
     ["Air"] = "Windsmage"
 }
@@ -37,7 +37,10 @@ class_define {
         -- TODO more items
     end,
 
+    spells = {"Minor Missile"},
+
     skills = {
+        ["Magic"] = SPECIALITY,
         ["Magic Resistance"] = MODERATE,
         ["Magic Items"] = MODERATE,
         ["Willpower"] = MODERATE,
@@ -65,8 +68,6 @@ class_define {
         Utils.default_class_on_init(self, stats)
         -- TODO more items
     end,
-
-    spells = {"Minor Missile"},
 
     skills = {
         ["Melee"] = SPECIALITY,
