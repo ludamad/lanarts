@@ -8,17 +8,7 @@ spell_define {
 	description = "Allows you to strike powerful blows for a limited duration, afterwards you are slower and vulnerable.",
 	mp_cost = 40,
 
-	-- Used for AI and interface decisions
-	traits = {SpellTraits.ABILITY_SPELL, SpellTraits.BUFF_SPELL},
-
-    on_prerequisite = function(self, caster)
-        local D = caster.derived
-
-        local not_exhausted = not StatusType.get_hook(D.hooks, "Exhausted")
-        local not_berserk = not StatusType.get_hook(D.hooks, "Berserk")
- 
-        return not_exhausted and not_berserk
-    end,
+    
 
     on_use = function(self, caster)
         local B = caster.base

@@ -40,13 +40,14 @@ end
 
 local StatusType = ResourceTypes.type_create(create)
 
-local function resolve(status_type)
-    if type(status_type) ~= "string" then return status_type end
+-- Like 'lookup', but returns tables as they are.
+function StatusType.resolve(status_type)
+    if type(status_type) == "table" then return status_type end
     return StatusType.lookup(status_type)
 end
 
 function StatusType.get_hook(hooks, status_type)
-    status_type = resolve(status_type)
+    status_type = StatusType.resolve(status_type)
     for hook in values(hooks) do
         if getmetatable(hook) == status_type then
             return hook
@@ -56,7 +57,7 @@ function StatusType.get_hook(hooks, status_type)
 end
 
 function StatusType.update_hook(hooks, status_type, ...)
-    status_type = resolve(status_type)
+    status_type = StatusType.resolve(status_type)
     local hook = StatusType.get_hook(hooks, status_type)
     if not hook then
         hook = status_type.create(...)

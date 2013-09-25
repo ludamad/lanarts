@@ -34,6 +34,7 @@ M.parent_cooldown_types = {
     [M.REST_ACTION] = {M.ALL_ACTIONS}
 }
 
+-- The following make cooldowns easier to define:
 M.cooldown_to_field_map = {
     [M.ALL_ACTIONS] = "cooldown",
     [M.OFFENSIVE_ACTIONS] = "cooldown_offensive",

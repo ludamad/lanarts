@@ -5,6 +5,7 @@ local ProjectileEffect = import ".ProjectileEffect"
 local ContentUtils = import ".ContentUtils"
 local Actions = import "@Actions"
 local Attacks = import "@Attacks"
+local StatusType = import "@StatusType"
 
 local M = nilprotect {} -- Submodule
 
@@ -54,7 +55,7 @@ local function find_cooldowns(t)
     local arr=CooldownTypes.cooldown_fields
     local idx,len = 1,#arr
     return function()
-        while idx < len do
+        while idx <= len do
             local field = arr[idx]
             idx = idx + 1
             if t[field] then
@@ -73,12 +74,10 @@ function M.derive_cooldowns(args, --[[Optional, default false]] cleanup_members)
     local C = {} -- Requirements
     local found_any = false
     for field, k,v in find_cooldowns(args) do
-        print("FOUND ", field,k,v)
         found_any = true
         if cleanup_members then args[field] = nil end
         C[k] = v
         for parent in values(CooldownTypes.parent_cooldown_types[k]) do
-            print("IMPLIED ", k.." => "..parent, v)
             C[parent] = C[parent] or v
         end
     end
@@ -122,6 +121,14 @@ function M.derive_distance_prereq(args, --[[Optional, default false]] cleanup_me
     return nil
 end
 
+local function derive_status_prereqs(args)
+    StatusType.resolve
+end
+
+local function derive_status_effects(actions, args)
+
+end
+
 local function add_if_not_nil(action, prerequisite, effect)
     if prerequisite then table.insert(action.prerequisites, prerequisite) end
     if effect then table.insert(action.effects, effect) end
@@ -161,5 +168,6 @@ function M.derive_action(args, --[[Optional, default false]] cleanup_members)
 
     return action
 end
+
 
 return M

@@ -1,14 +1,7 @@
-local Type, Traits = import "@SpellType", import ".SpellTraits"
-local Apts = import "@stats.AptitudeTypes"
-local ActionUtils = import "@stats.ActionUtils"
 local Actions = import "@Actions"
 local ContentUtils = import "@stats.ContentUtils"
-local CooldownUtils = import "@stats.CooldownUtils"
 local ActionUtils = import "@stats.ActionUtils"
-local StatusType = import "@StatusType"
-local StatContext = import "@StatContext"
 local SpellType = import "@SpellType"
-local AttackProjectileObject = import "@objects.AttackProjectileObject"
 
 local M = nilprotect {} -- Submodule
 
