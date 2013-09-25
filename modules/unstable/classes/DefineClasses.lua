@@ -56,7 +56,7 @@ class_define {
     name = "Knight",
     description = "A disciplined, heavily armoured warrior.",
     items = {"Health Potion"},
-    spells = {"Minor Missile"},
+    spells = {"Minor Missile", "Berserk"},
 
     -- Takes 'weapon_skill'
     on_create = function(class, args)

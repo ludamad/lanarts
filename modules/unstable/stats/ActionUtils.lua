@@ -122,11 +122,18 @@ function M.derive_distance_prereq(args, --[[Optional, default false]] cleanup_me
 end
 
 local function derive_status_prereqs(args)
-    StatusType.resolve
+    if not args.user_statuses_cant_have and not args.user_statuses_must_have then
+        return nil
+    end
+    return StatPrereqs.UserStatusPrereq.create(args.user_statuses_cant_have, args.user_statuses_must_have)
 end
-
 local function derive_status_effects(actions, args)
-
+    for s in values(args.user_statuses_added) do
+        table.insert(actions, StatEffects.UserStatusEffect.create(unpack(s)))
+    end
+    for s in values(args.target_statuses_added) do
+        table.insert(actions, StatEffects.TargetStatusEffect.create(unpack(s)))
+    end
 end
 
 local function add_if_not_nil(action, prerequisite, effect)
@@ -155,6 +162,8 @@ function M.derive_action(args, --[[Optional, default false]] cleanup_members)
     add_if_not_nil(action, M.derive_distance_prereq(args, cleanup_members), --[[No associated effect]] nil)
     -- Damaging attack effect
     add_if_not_nil(action, --[[No associated prereq]] nil, ContentUtils.derive_attack(args.attack or args, cleanup_members))
+    add_if_not_nil(action, derive_status_prereqs(args), --[[No associated effect]] nil)
+    derive_status_effects(action.effects, args)
     -- Projectile effect
     local P = args.created_projectile
     if P then

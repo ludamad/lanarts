@@ -27,15 +27,13 @@ function M.CooldownCostEffect:apply(user)
         mult = mult + self.apt_worth * user.derived.aptitudes.effectiveness[self.rate_aptitude]
     end
     for k,v in pairs(self.cooldown_costs) do
-        print("Adding: ", k, v)
         StatContext.add_cooldown(user, k, v)
     end
-    pretty_print(user.base.cooldowns)
     return true
 end
 
 ------ STATUS EFFECT CAUSATION ----------------------------------------
-local function resolved_args(self)
+local function resolved_args(self, user, target)
     local resolved_args = {}
     for arg in values(self.args) do
         local is_function = (type(arg) == "function")
@@ -50,7 +48,7 @@ function M.UserStatusEffect:init(status_type, ...)
     self.args = {...}
 end
 function M.UserStatusEffect:apply(user, target)
-    StatContext.update_status(user, self.status_type, unpack(resolved_args(self)))
+    StatContext.update_status(user, self.status_type, resolved_args(self, user, target))
 end
 --- To target of action:
 M.TargetStatusEffect = newtype()
@@ -59,7 +57,7 @@ function M.TargetStatusEffect:init(status_type, ...)
     self.args = {...}
 end
 function M.TargetStatusEffect:apply(user, target)
-    StatContext.update_status(target, self.status_type, unpack(resolved_args(self)))
+    StatContext.update_status(target, self.status_type, resolved_args(self, user, target))
 end
 
 return M

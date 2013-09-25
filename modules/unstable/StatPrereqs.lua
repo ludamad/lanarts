@@ -3,6 +3,7 @@
 -- Prerequisites consist of a check() method, which returns true/false as well as the reason for failure (string).
 
 local StatContext = import "@StatContext"
+local StatusType = import "@StatusType"
 
 local M = nilprotect {} -- Submodule
 
@@ -82,17 +83,22 @@ function M.DistancePrereq:check(user, target)
 end
 
 ------ STATUS EFFECT REQUIREMENT ----------------------------------
-M.StatusPrereq = newtype()
-function M.StatusPrereq:init(forbidden, required)
+M.UserStatusPrereq = newtype()
+function M.UserStatusPrereq:init(forbidden, required)
+    -- Resolve statuses referred to by name
+    forbidden = forbidden and table.clone(forbidden) or {}
+    required = required and table.clone(required) or {}
+    for i=1,#forbidden do forbidden[i] = StatusType.resolve(forbidden[i]) end
+    for i=1,#required do required[i] = StatusType.resolve(required[i]) end
     self.forbidden, self.required = forbidden, required
 end
 
-function M.StatusPrereq:check(user)
+function M.UserStatusPrereq:check(user)
     for f in values(self.forbidden) do
-        if StatContext.has_status(user, f) then return false end
+        if StatContext.get_status(user, f) then return false end
     end
     for r in values(self.required) do
-        if not StatContext.has_status(user, r) then return false end
+        if not StatContext.get_status(user, r) then return false end
     end
     return true
 end

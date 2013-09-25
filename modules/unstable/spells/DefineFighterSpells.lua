@@ -8,12 +8,8 @@ spell_define {
 	description = "Allows you to strike powerful blows for a limited duration, afterwards you are slower and vulnerable.",
 	mp_cost = 40,
 
-    
-
-    on_use = function(self, caster)
-        local B = caster.base
-        StatusType.update_hook(B.hooks, "Berserk", caster, 150 + math.min(4, B.level)  * 20)
-    end,
+    user_statuses_cant_have = {"Exhausted", "Berserk"},
+    user_statuses_added = {{"Berserk", function(caster) return 150 + math.min(4, caster.base.level) * 20 end}},
 
     cooldown_self = 1000,
     cooldown = 50
