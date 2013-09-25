@@ -1,3 +1,4 @@
+-- DEPRECATED delete once ActionProjectileObject replaces it
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local Projectiles = import "lanarts.objects.Projectiles"
 local Animations = import "lanarts.objects.Animations"

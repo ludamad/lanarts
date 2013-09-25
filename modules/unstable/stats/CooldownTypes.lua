@@ -24,20 +24,6 @@ function M.cooldown_needed_message(type)
     end
 end
 
--- Canonical order for resolving cooldowns. 
--- This is important for consistent iteration, for eg predictable error reporting.
--- Also useful for only iterating the members that are correct cooldowns.
-function M.cooldown_pairs(t)
-    local keys = pairs(M.default_cooldown_table)
-    return function()
-        while true do
-            local k = keys()
-            if not k then return nil end
-            if t[k] then return t[k] end
-        end
-    end
-end
-
 M.parent_cooldown_types = {
     [M.ALL_ACTIONS] = {},
     [M.OFFENSIVE_ACTIONS] = {M.ALL_ACTIONS},
@@ -56,6 +42,22 @@ M.cooldown_field_map = {
     [M.ITEM_ACTIONS] = "cooldown_item",
     [M.ABILITY_ACTIONS] = "cooldown_ability",
 }
+
+local fields = table.value_list(M.cooldown_field_map)
+table.sort(fields)
+
+-- Iterate all cooldown fields. 
+function M.cooldown_field_values(t)
+    local values_state = {values, M.default_cooldown_table}
+    return function()
+        while true do
+            table.assign(values_state, iterator_step(values_state))
+            local k = values_state[1]
+            if not k then return nil end
+            if t[k] then return t[k] end
+        end
+    end
+end
 
 function M.cooldown_table(types, --[[Optional]] scale)
     scale = scale or 1

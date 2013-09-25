@@ -37,21 +37,38 @@ function M.use_action(user, action, target)
     return true
 end
 
--- Selectors are functions that uniquely determine effects.
--- Same-selector effects should be merged to guarantee uniqueness
-
-function M.get_effect(action, selector)
+-- Lookup all effects of a certain type.
+function M.get_all_effects(action, type)
+    local effects = {}
     for v in values(action.effects) do
-        if selector(v) then return v end
+        if getmetatable(v) == type then table.insert(effects,v) end
     end
-    return nil
+    return effects
 end
 
-function M.get_prerequisite(action, selector)
-    for v in values(action.prerequisites) do
-        if selector(v) then return v end
+-- Lookup all prerequisites of a certain type.
+function M.get_all_prerequisites(action, type)
+    local prereqs = {}
+    for v in values(action.effects) do
+        if getmetatable(v) == type then table.insert(prereqs,v) end
     end
-    return nil
+    return prereqs
+end
+
+-- Lookup the unique effect of a given type.
+-- Errors if multiple matching effects exist!
+function M.get_effect(action, type)
+    local effects = M.get_all_effects(action, type)
+    assert(#effects <= 1)
+    return effects[1]
+end
+
+-- Lookup the unique prerequisite of a given type.
+-- Errors if multiple matching prerequisites exist!
+function M.get_prerequisite(action, type)
+    local prereqs = M.get_all_prerequisites(action, type)
+    assert(#prereqs <= 1)
+    return prereqs[1]
 end
 
 return M

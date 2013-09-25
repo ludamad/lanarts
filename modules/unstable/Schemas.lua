@@ -43,6 +43,10 @@ local function is_special_member(k)
 end
 
 local function enforce_value(k, v, t)
+    if type(v) == "function" then
+        v(t, k)
+        return
+    end
 	local meta = getmetatable(v)
 	-- Handle 'one of X' constraints
 	if meta == ONE_OF_METATABLE then

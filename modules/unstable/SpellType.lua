@@ -8,20 +8,21 @@ local M = nilprotect {} -- Submodule
 local DEFAULT_GLOBAL_COOLDOWN = 40
 local DEFAULT_RANGE = 300
 
+local function sprite_assert(s) 
+    if not s.draw then
+        assert(s.draw, "Schema expected sprite (ie, has draw() member) but got:\n " .. pretty_tostring(s,nil,true))
+    end
+end
+
 local schema = {
     lookup_key = S.STRING,
-    traits = S.TABLE,
+--    sprite = sprite_assert,
 
     target_type = S.one_of(Actions.TARGET_TYPES, --[[default]] Actions.TARGET_HOSTILE_POSITION),
     range = S.defaulted(S.NUMBER, DEFAULT_RANGE),
     mp_cost = S.defaulted(S.NUMBER, 0),
 
-	cooldown_self = S.defaulted(S.NUMBER, 0),
-	cooldown_offensive = S.NUMBER,
-	cooldown = S.NUMBER,
-	cooldown_global = S.defaulted(S.NUMBER, DEFAULT_GLOBAL_COOLDOWN),
-
-    use_action = S.TABLE,
+--    use_action = S.TABLE,
     on_create = S.FUNCTION
 }
 

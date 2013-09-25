@@ -7,14 +7,18 @@ local StatContext = import "@StatContext"
 local M = nilprotect {} -- Submodule
 
 ------ GENERIC STAT PREREQ (>= stat prereq) ------------------------
-local StatPrereq = newtype()
+M.StatPrereq = newtype()
 local function resolve_stat_prereq(prereqs, derived_stats)
-    for k,v in prereqs do
+    for k,v in pairs(prereqs) do
         if type(v) == "table" then
             local is_ok, problem = resolve_stat_prereq(v, derived_stats[k])
             if not is_ok then
                 return false, problem
             end
+        end
+        -- Special case for HP! Note this assumes 'hp' isn't used anywhere other than main stat table.
+        if k == "hp" and derived_stats[k] < v + 1 then
+            return false, "That would kill you!"
         end
         if derived_stats[k] < v then
             return false, "You do not have enough " .. k .. "." -- TODO Fix for awkward cases
@@ -22,25 +26,21 @@ local function resolve_stat_prereq(prereqs, derived_stats)
     end
     return true
 end
-function StatPrereq:init(stat_prereqs) 
+function M.StatPrereq:init(stat_prereqs) 
     -- Takes mapping stat -> prereq. Can take nested tables.
     self.stat_prereqs = stat_prereqs
 end
-function StatPrereq:check(user) 
+function M.StatPrereq:check(user) 
     return resolve_stat_prereq(self.stat_prereqs, user.derived)
 end
-function M.is_stat_prereq(prereq) -- API
-    return getmetatable(prereq) == StatPrereq 
-end
-M.stat_prereq_create = StatPrereq.create -- API
 
 ------ GENERIC COOLDOWN REQUIREMENT (<= 0) ------------------------
-local CooldownPrereq = newtype()
-function CooldownPrereq:init(cooldown_prereq_list) 
+M.CooldownPrereq = newtype()
+function M.CooldownPrereq:init(cooldown_prereq_list) 
     -- Takes list of required cooldowns
     self.cooldown_prereq_list = cooldown_prereq_list
 end
-function CooldownPrereq:check(user)
+function M.CooldownPrereq:check(user)
     for c in values(self.cooldown_prereq_list) do
         if StatContext.has_cooldown(user, c) then
             return false, "You must wait before doing that!"
@@ -48,25 +48,18 @@ function CooldownPrereq:check(user)
     end
     return true
 end
-function M.is_cooldown_prereq(prereq) -- API
-    return getmetatable(prereq) == CooldownPrereq 
-end
-M.cooldown_prereq_create = CooldownPrereq.create -- API
 
------- RANGE REQUIREMENT -------------------------
+------ DISTANCE REQUIREMENT ---------------------------------------
 -- Note: Able to take both xy and obj targets!
-local RangePrereq = newtype()
-function RangePrereq:init(min_range, --[[Optional]] max_range)
-    assert(type(max_range) == 'number') 
+M.DistancePrereq = newtype()
+function M.DistancePrereq:init(max_dist, --[[Optional]] min_dist)
+    assert(type(max_dist) == 'number') 
     -- Takes list of required cooldowns
-    self.min_range = min_range
-    self.max_range = max_range or math.huge
+    self.max_dist = max_dist or math.huge
+    self.min_dist = min_dist or 0
 end
--- TODO: Evaluate if this should be placed in util. If enough time passes without need just remove this comment.
-local function is_position(xy_candidate)
-    return type(xy_candidate) == "table" and not getmetatable(xy_candidate) and #xy_candidate == 2
-end
-function RangePrereq:check(user, target)
+
+function M.DistancePrereq:check(user, target)
     local target_xy, target_radius 
     -- Assumption: Target is either a position or a StatContext
     if is_position(target) then 
@@ -78,18 +71,30 @@ function RangePrereq:check(user, target)
     -- Compare only at the tip of the object(s)
     local reach = user.obj.radius + target_radius
     local distance = vector_distance(user.obj.xy, target_xy) - reach
-    if distance > self.max_range then
+    if distance < self.min_dist then
         return false, "You are too close!"
-    end 
-    if distance < self.min_range then
-        return false, "You cannot reach!"
     end
+    if distance > self.max_dist then
+        return false, "You cannot reach!"
+    end 
 
     return true
 end
-function M.is_range_prereq(prereq) -- API
-    return getmetatable(prereq) == RangePrereq 
+
+------ STATUS EFFECT REQUIREMENT ----------------------------------
+M.StatusPrereq = newtype()
+function M.StatusPrereq:init(forbidden, required)
+    self.forbidden, self.required = forbidden, required
 end
-M.range_prereq_create = RangePrereq.create -- API
+
+function M.StatusPrereq:check(user)
+    for f in values(self.forbidden) do
+        if StatContext.has_status(user, f) then return false end
+    end
+    for r in values(self.required) do
+        if not StatContext.has_status(user, r) then return false end
+    end
+    return true
+end
 
 return M

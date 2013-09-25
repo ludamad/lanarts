@@ -92,6 +92,13 @@ function pretty_tostring(val, --[[Optional]] tabs, --[[Optional]] packed, --[[Op
     return table.concat(parts)
 end
 
+function table.assign(t, ...)
+    table.clear(t)
+    for index=1,select("#", ...) do
+        t[index] = select(index, ...)
+    end
+end
+
 function table.clone(t)
     local newt = {}
     table.copy(t, newt)
@@ -100,8 +107,16 @@ end
 
 function table.key_list(t)
     local ret = {}
-    for k,v in pairs(t) do
+    for k,_ in pairs(t) do
         table.insert(ret,k)
+    end
+    return ret
+end
+
+function table.value_list(t)
+    local ret = {}
+    for _,v in pairs(t) do
+        table.insert(ret,v)
     end
     return ret
 end
@@ -300,4 +315,13 @@ end
 function random_choice(choices)
     local idx = random(1, #choices)
     return choices[idx]
+end
+
+local function iterator_helper(f,...)
+    return f(...)
+end
+function iterator_step(state)
+    local oldf = state[1] -- Used in hack to determine termination
+    table.assign(state, iterator_helper(unpack(state)))
+    if state[1] ~= oldf then table.clear(state) end
 end

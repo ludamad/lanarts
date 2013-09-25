@@ -37,7 +37,7 @@ class_define {
         -- TODO more items
     end,
 
-    spells = {"Minor Missile"},
+    spells = {"Minor Missile", "Minor Missile2"},
 
     skills = {
         ["Magic"] = SPECIALITY,

@@ -175,6 +175,9 @@ function bbox_padded(xy, size, pad)
              xy[2] + size[2] + pad }
 end
 
+function is_position(xy_candidate)
+    return type(xy_candidate) == "table" and not getmetatable(xy_candidate) and #xy_candidate == 2
+end
 
 function math.sign_of(v)
     if v > 0 then return 1 end

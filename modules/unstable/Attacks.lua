@@ -8,6 +8,7 @@ local StatContext = import "@StatContext"
 local M = nilprotect {} -- Submodule
 
 local function attack_on_use(self, attacker, target)
+    assert(target.base and target.derived, "Stat context expected as target parameter (probably wrong target type)")
     local dmg = AttackResolution.damage_calc(self, attacker, target)
 
     StatContext.add_hp(target, -random_round(dmg))
@@ -31,33 +32,39 @@ end
 
 local DEFAULT_MELEE_RANGE = 10
 
+M.AttackEffect = {__index = {apply = attack_on_use}} -- TODO migrate to newtype
+
 -- Attacks follow the 'action' interface (on_use, optional on_prerequisite)
 -- Create an attack with a single sub-attack
-function M.attack_create(
-    -- Base stats
-    base_effectiveness, base_damage,
-    -- Aptitude modifiers
-    aptitude_multipliers,
-    -- Weapon delay and related damage multiplier 
-     --[[Optional]] delay, --[[Optional]] damage_multiplier,
-     --[[Optional]] range)
+function M.AttackEffect.__index:init(
+        -- Base stats
+        base_effectiveness, base_damage,
+        -- Aptitude modifiers
+        aptitude_multipliers,
+        -- Weapon delay and related damage multiplier 
+         --[[Optional]] delay, --[[Optional]] damage_multiplier,
+         --[[Optional]] range
+    )
     delay = delay or 1
     local m = StatMultiplierUtils.resolve_multiplier_set(aptitude_multipliers)
-    return {
-        sub_attacks = {{
-            base_effectiveness = base_effectiveness, 
-            base_damage = base_damage,
+    self.sub_attacks = {{
+        base_effectiveness = base_effectiveness, 
+        base_damage = base_damage,
 
-            effectiveness_multipliers = m[1], damage_multipliers = m[2],
-            resistance_multipliers = m[3], defence_multipliers = m[4]
-        }},
+        effectiveness_multipliers = m[1], damage_multipliers = m[2],
+        resistance_multipliers = m[3], defence_multipliers = m[4]
+    }}
 
-        damage_multiplier = damage_multiplier or delay,
-        on_use = attack_on_use,
-        apply = attack_on_use, -- TODO deprecate on_use for attacks
-        range = range or DEFAULT_MELEE_RANGE
-    }
+    self.damage_multiplier = damage_multiplier or delay
+    self.on_use = attack_on_use -- TODO deprecate on_use for attacks
+    self.range = range or DEFAULT_MELEE_RANGE
 end
+
+M.attack_create = function(...) 
+   local ret = setmetatable({}, M.AttackEffect)
+   ret:init(...)
+   return ret
+end --M.AttackEffect.create
 
 function M.attack_add_effectiveness_and_damage(attack, eff, dam)
     for sub_attack in values(attack.sub_attacks) do

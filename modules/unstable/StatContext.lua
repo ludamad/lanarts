@@ -1,5 +1,6 @@
 local EventLog = import "core.ui.EventLog"
 local CooldownSet = import "@CooldownSet"
+local StatusType = import "@StatusType"
 
 --- Provides implementations of stat contexts.
 -- Conceptually, a stat context is any object which has the fields (or getters) 'base' and 'derived'
@@ -228,6 +229,14 @@ end
 function M.apply_cooldown(context, type, amount, --[[Optional]] f)
     context.base.cooldowns:apply_cooldown(type, amount, f)
     context.derived.cooldowns:apply_cooldown(type, amount, f)
+end
+
+function M.update_status(context, status_type, ...)
+    return StatusType.update_hook(context.base.hooks, status_type, ...)
+end
+
+function M.get_status(context, status_type)
+    return StatusType.get_hook(context.base.hooks, status_type)
 end
 
 return M

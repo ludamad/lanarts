@@ -96,21 +96,27 @@ function M.resolve_embedded_stats(table, --[[Optional]] resolve_skills)
     return Stats.stats_create(table)
 end
 
-function M.derive_attack(args)
+-- Returns an attack effect TODO: Rename to derive_attack_effect
+function M.derive_attack(args, --[[Optional, default false]] cleanup_member)
     local attack = args.unarmed_attack or args.attack
-    local types = args.multipliers or args.types
-    assert(types)
+    local types = args.aptitude_types or args.multipliers or args.types -- TODO Only allow 'aptitude_types'!!
+    if not types then return nil end
 
     -- First resolve 
     if attack and #attack > 0 then -- Resolve argument table
         attack = Attacks.attack_create(attack)
     end
-    if not args.attack then
+    if not attack then
         attack = Attacks.attack_create(
             args.effectiveness or 0, args.damage or 0, types, 
-            --[[Optional]] args.delay, --[[Optional]] args.damage_multiplier, 
+            --[[Optional]] args.delay, --[[Optional]] args.damage_multiplier, -- TODO only use apt types 
             --[[Optional]] args.range
         )
+    end
+    if cleanup_member then
+        args.effectiveness, args.damage = nil
+        args.attack, args.unarmed_attack, args.multipliers, args.type = nil
+        args.delay, args.damage_multiplier, args.range = nil
     end
     return attack
 end
