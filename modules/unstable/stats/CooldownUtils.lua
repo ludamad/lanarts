@@ -99,7 +99,7 @@ local function apply_cooldowns(action, stats)
 
     -- Check all the implied cooldown types ('parents')
     for type in values(c.required_cooldowns) do
-        local field_name = Types.cooldown_field_map[type]
+        local field_name = Types.cooldown_to_field_map[type]
         StatContext.add_cooldown(stats, type, (action[field_name] or action.cooldown) * mult)
     end
 end

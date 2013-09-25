@@ -92,6 +92,10 @@ function pretty_tostring(val, --[[Optional]] tabs, --[[Optional]] packed, --[[Op
     return table.concat(parts)
 end
 
+function pretty_tostring_compact(v)
+    return pretty_tostring(v, nil, true)
+end
+
 function table.assign(t, ...)
     table.clear(t)
     for index=1,select("#", ...) do
@@ -117,6 +121,14 @@ function table.value_list(t)
     local ret = {}
     for _,v in pairs(t) do
         table.insert(ret,v)
+    end
+    return ret
+end
+
+function table.value_key_invert(t)
+    local ret = {}
+    for k,v in pairs(t) do
+        ret[v] = k
     end
     return ret
 end
@@ -238,6 +250,12 @@ end
 -- @param packed <i>optional, default false</i>, if true, minimal spacing is used
 function pretty_print(val, --[[Optional]] tabs, --[[Optional]] packed)
     print(pretty_tostring(val, tabs, packed))
+end
+
+function pretty_print_all(...)
+    local args = {...}
+    for i=1,#args do args[i] = pretty_tostring_compact(args[i]) end
+    print(unpack(args))
 end
 
 --- Iterate all iterators one after another

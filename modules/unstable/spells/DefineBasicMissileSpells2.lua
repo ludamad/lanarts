@@ -17,7 +17,8 @@ spell_define {
     description = "A minor missile attack.",
     sprite = "sprites/minor_missile.png%32x32",
 
-    mp_cost = 5, cooldown = 25,
+    mp_cost = 500,
+    cooldown_offensive = 25,
 
     created_projectile = {
         speed = 7, radius = 4,

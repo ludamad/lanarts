@@ -43,7 +43,7 @@ end
 function M.CooldownPrereq:check(user)
     for c in values(self.cooldown_prereq_list) do
         if StatContext.has_cooldown(user, c) then
-            return false, "You must wait before doing that!"
+            return false, "You must wait before doing that! ["..c.."]"
         end
     end
     return true

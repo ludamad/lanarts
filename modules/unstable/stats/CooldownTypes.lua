@@ -34,7 +34,7 @@ M.parent_cooldown_types = {
     [M.REST_ACTION] = {M.ALL_ACTIONS}
 }
 
-M.cooldown_field_map = {
+M.cooldown_to_field_map = {
     [M.ALL_ACTIONS] = "cooldown",
     [M.OFFENSIVE_ACTIONS] = "cooldown_offensive",
     [M.MELEE_ACTIONS] = "cooldown_melee",
@@ -43,21 +43,10 @@ M.cooldown_field_map = {
     [M.ABILITY_ACTIONS] = "cooldown_ability",
 }
 
-local fields = table.value_list(M.cooldown_field_map)
-table.sort(fields)
+M.field_to_cooldown_map = table.value_key_invert(M.cooldown_to_field_map)
 
--- Iterate all cooldown fields. 
-function M.cooldown_field_values(t)
-    local values_state = {values, M.default_cooldown_table}
-    return function()
-        while true do
-            table.assign(values_state, iterator_step(values_state))
-            local k = values_state[1]
-            if not k then return nil end
-            if t[k] then return t[k] end
-        end
-    end
-end
+M.cooldown_fields = table.key_list(M.field_to_cooldown_map)
+table.sort(M.cooldown_fields)
 
 function M.cooldown_table(types, --[[Optional]] scale)
     scale = scale or 1

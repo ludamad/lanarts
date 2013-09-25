@@ -40,8 +40,4 @@ function M.spell_define(args)
     return SpellType.define(args)
 end
 
-local function missile_apply(self, user, target_xy) 
-    return M.missile_create(self, user, target_xy) 
-end
-
 return M

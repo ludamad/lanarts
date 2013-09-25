@@ -227,7 +227,7 @@ local frame, WAIT_UNTIL = 0, 0
 
 local function can_continue(player)
     if frame < WAIT_UNTIL then return false end
-    return not StatContext.has_cooldown(player, CooldownTypes.ALL_ACTIONS)
+    return true--not StatContext.has_cooldown(player, CooldownTypes.ALL_ACTIONS)
 end
 
 local function query_player(player, monster)
@@ -327,11 +327,11 @@ local function main()
     local player = SM:add_player("Tester", race, class)
     local monster = SM:add_monster("Giant Rat")
 
-    local TimeToKillCalculation = import "@simulation.TimeToKillCalculation"
-    local kill_time = TimeToKillCalculation.calculate_time_to_kill(
-        player:stat_context_copy(), player:melee_attack(), monster:stat_context_copy()
-    )
-    print("To kill the giant rat, you need " .. kill_time .. " steps with melee.")
+--    local TimeToKillCalculation = import "@simulation.TimeToKillCalculation"
+--    local kill_time = TimeToKillCalculation.calculate_time_to_kill(
+--        player:stat_context_copy(), player:melee_attack(), monster:stat_context_copy()
+--    )
+--    print("To kill the giant rat, you need " .. kill_time .. " steps with melee.")
     assert((import "lanarts.objects.Relations").is_hostile(player, monster))
 
     while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do

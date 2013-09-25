@@ -49,6 +49,21 @@ function M.desirable_user_aptitudes(action)
     return apt_list
 end
 
+-- Locate cooldown field indicators, and return their associated cooldown types and values
+local function find_cooldowns(t)
+    local arr=CooldownTypes.cooldown_fields
+    local idx,len = 1,#arr
+    return function()
+        while idx < len do
+            local field = arr[idx]
+            idx = idx + 1
+            if t[field] then
+                return field, CooldownTypes.field_to_cooldown_map[field], t[field]
+            end
+        end
+    end
+end
+
 -- Returns prerequisite+effect for the cooldowns found in a table, derived 
 -- from eg cooldown_self = 40. Any 'parent cooldowns' 
 -- will also have the value added to their cooldown timer. (See CooldownTypes)
@@ -57,10 +72,9 @@ end
 function M.derive_cooldowns(args, --[[Optional, default false]] cleanup_members)
     local C = {} -- Requirements
     local found_any = false
-    for field,v in CooldownTypes.cooldown_field_values(args) do
-        local k = CooldownTypes.cooldown_field_map[field]
+    for field, k,v in find_cooldowns(args) do
         found_any = true
-        if cleanup_members then args[k] = nil end
+        if cleanup_members then args[field] = nil end
         C[k] = v
         for parent in values(CooldownTypes.parent_cooldown_types[k]) do
             C[parent] = C[parent] or v
@@ -80,15 +94,15 @@ function M.derive_cooldowns(args, --[[Optional, default false]] cleanup_members)
     return prereq, effect
 end
 
-
 -- Returns prerequisite+effect for the stats that are required, and permanently lowered by the action.
 -- These are derived from the 'costs' table. Additionally, there are two shortcuts for mp & hp: 'mp_cost' & 'hp_cost'
 -- Returns nil if no cooldowns were detected.
 function M.derive_stat_costs(args, --[[Optional, default false]] cleanup_members)
     if args.mp_cost or args.hp_cost then
         args.costs = args.costs or {}
-        assert(not args.mp_cost or not args.costs.mp_cost, "Duplicate definition of MP cost in action!")
-        assert(not args.hp_cost or not args.costs.hp_cost, "Duplicate definition of HP cost in action!")
+        assert(not args.mp_cost or not args.costs.mp, "Duplicate definition of MP cost in action!")
+        assert(not args.hp_cost or not args.costs.hp, "Duplicate definition of HP cost in action!")
+        args.costs.mp, args.costs.hp = args.mp_cost, args.hp_cost
     end
     if not args.costs then return nil end
     local prereq = StatPrereqs.StatPrereq.create(args.costs)
@@ -142,6 +156,8 @@ function M.derive_action(args, --[[Optional, default false]] cleanup_members)
     if cleanup_members then
         args.target_type, args.prerequisites, args.effects = nil
     end
+
+    pretty_print(action.effects)
 
     return action
 end
