@@ -9,44 +9,12 @@ local StatUtils = import "@stats.StatUtils"
 local LogUtils = import "lanarts.LogUtils"
 local EventLog = import "core.ui.EventLog"
 
-local M = nilprotect {} -- Submodule
-
--- Base for time-limited statuses
-
-local TimeLimitedBase = {
-    init = function(self, stats, time_left)
-        self.time_left = time_left
-    end,
-    on_update = function(self, stats, time_left)
-        self.time_left = math.max(self.time_left, time_left)
-    end,
-    on_step = function(self, stats)
-        self.time_left = self.time_left - 1
-        if self.time_left <= 0 then
-            if self.on_deregister then
-                self:on_deregister(stats)
-            end
-            return true -- Deregister
-        end
-    end
-}
-
-local function TIME_LIMITED(status_type)
-    status_type.base = TimeLimitedBase
-    for k,v in pairs(TimeLimitedBase) do
-        if not status_type[k] then
-            status_type[k] = v
-        end
-    end
-    return status_type
-end
-
 -- EXHAUSTION
 local EXHAUSTION_MOVEMENT_MULTIPLIER = 0.75
 local EXHAUSTION_ATTACK_COOLDOWN_MULTIPLIER = 0.75
-M.Exhausted = StatusType.define {
-    TIME_LIMITED,
+local Exhausted = StatusType.define {
     name = "Exhausted",
+    time_limited = true,
     init = function(self, stats, ...)
         self.base.init(self, stats, ...)
         LogUtils.event_log_player(stats.obj, "$You {is}[are] now exhausted.", {255,200,200})
@@ -75,9 +43,9 @@ end
 
 local BERSERK_EXHAUSTION_DURATION = 275
 
-M.Berserk = StatusType.define {
-    TIME_LIMITED,
+StatusType.define {
     name = "Berserk",
+    time_limited = true,
     init = function(self, stats, ...)
        self.base.init(self, stats, ...)
        LogUtils.event_log_player(stats.obj, "$You enter{s} a powerful rage!", {200,200,255})
@@ -100,8 +68,6 @@ M.Berserk = StatusType.define {
     end,
     on_deregister = function(self, stats)
        local B = stats.base
-       StatusType.update_hook(B.hooks, M.Exhausted, stats, BERSERK_EXHAUSTION_DURATION)
+       StatusType.update_hook(B.hooks, Exhausted, stats, BERSERK_EXHAUSTION_DURATION)
     end
 }
-
-return M

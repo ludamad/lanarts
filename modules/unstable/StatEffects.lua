@@ -22,7 +22,6 @@ function M.CooldownCostEffect:init(cooldown_costs, --[[Optional]] rate_aptitude,
     self.apt_worth = apt_worth or 0.05 -- 5% per aptitude point
 end
 function M.CooldownCostEffect:apply(user)
-    print("OCCURRINGIZZLE")
     local mult = 1.0
     if self.rate_aptitude then
         mult = mult + self.apt_worth * user.derived.aptitudes.effectiveness[self.rate_aptitude]

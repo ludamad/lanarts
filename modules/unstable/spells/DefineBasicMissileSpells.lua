@@ -1,6 +1,5 @@
 local Apts = import "@stats.AptitudeTypes"
-local SpellDefineUtils = import ".SpellDefineUtils"
-local missile_spell_define = SpellDefineUtils.missile_spell_define
+local spell_define = (import ".SpellDefineUtils").spell_define
 local StatusType = import "@StatusType"
 
 local SpellTraits = import ".SpellTraits"
@@ -13,19 +12,22 @@ local function resolve_bonuses(self)
     self.name = bonus_str2(eff,dam) .. ' ' .. self.lookup_key
 end
 
-missile_spell_define {
+spell_define {
     lookup_key = "Minor Missile",
     description = "A minor missile attack.",
     sprite = "sprites/minor_missile.png%32x32",
 
-    mp_cost = 5, cooldown = 25,
-    speed = 7, radius = 4,
+    mp_cost = 5,
+    cooldown_spell = 25,
 
-    types = {Apts.MAGIC, Apts.FORCE},
-    damage = 5, effectiveness = 2,
+    created_projectile = {
+        speed = 7, radius = 4,
+        aptitude_types = {Apts.MAGIC, Apts.FORCE},
+        damage = 5, effectiveness = 2
+    },
 
     on_create = function(type, args)
-        local self = SpellDefineUtils.base_spell_on_create(type, args)
+        local self = type:base_on_create(args)
         resolve_bonuses(self)
         return self
     end

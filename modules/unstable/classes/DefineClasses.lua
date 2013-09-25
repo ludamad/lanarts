@@ -37,7 +37,7 @@ class_define {
         -- TODO more items
     end,
 
-    spells = {"Minor Missile", "Minor Missile2"},
+    spells = {"Minor Missile"},
 
     skills = {
         ["Magic"] = SPECIALITY,
@@ -56,6 +56,7 @@ class_define {
     name = "Knight",
     description = "A disciplined, heavily armoured warrior.",
     items = {"Health Potion"},
+    spells = {"Minor Missile"},
 
     -- Takes 'weapon_skill'
     on_create = function(class, args)

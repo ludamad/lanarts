@@ -73,10 +73,12 @@ function M.derive_cooldowns(args, --[[Optional, default false]] cleanup_members)
     local C = {} -- Requirements
     local found_any = false
     for field, k,v in find_cooldowns(args) do
+        print("FOUND ", field,k,v)
         found_any = true
         if cleanup_members then args[field] = nil end
         C[k] = v
         for parent in values(CooldownTypes.parent_cooldown_types[k]) do
+            print("IMPLIED ", k.." => "..parent, v)
             C[parent] = C[parent] or v
         end
     end
@@ -156,8 +158,6 @@ function M.derive_action(args, --[[Optional, default false]] cleanup_members)
     if cleanup_members then
         args.target_type, args.prerequisites, args.effects = nil
     end
-
-    pretty_print(action.effects)
 
     return action
 end
