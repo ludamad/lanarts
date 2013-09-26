@@ -31,9 +31,6 @@ function SpellsKnown:can_use_spell(stats, spell_slot, target)
 end
 
 function SpellsKnown:use_spell(stats, spell_slot, target)
-    for i,effect in ipairs(spell_slot.action_use.effects) do
-        print(i,pretty_tostring_compact(effect))
-    end
     assert(self:can_use_spell(stats, spell_slot, target))
     Actions.use_action(stats, spell_slot.action_use, target, spell_slot)
 end

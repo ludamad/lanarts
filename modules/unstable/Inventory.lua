@@ -62,7 +62,7 @@ function Inventory:use_item(user, item_slot, --[[Optional]] target)
     remove_from_slot(self, item_slot, to_remove or 1)
 end
 
-function Inventory:use_item(user, item_slot, --[[Optional]] target)
+function Inventory:can_use_item(user, item_slot, --[[Optional]] target)
     return Actions.can_use_action(user, item_slot.action_use, target, item_slot)
 end
 

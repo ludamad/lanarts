@@ -56,7 +56,7 @@ end
 -- Lookup all prerequisites of a certain type.
 function M.get_all_prerequisites(action, type)
     local prereqs = {}
-    for v in values(action.effects) do
+    for v in values(action.prerequisites) do
         if getmetatable(v) == type then table.insert(prereqs,v) end
     end
     return prereqs

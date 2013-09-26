@@ -8,7 +8,7 @@ Utils.potion_define {
     description = "A blessed potion of healing infusions, it restores "..HEALTH_POTION_HEAL_AMOUNT.." HP to the user.",
 
     on_prerequisite = function(self, stats)
-        return stats.derived.hp < stats.derived.max_hp
+        return stats.derived.hp < stats.derived.max_hp, "That would be a waste!"
     end,
 
     on_use = function(self, user)
@@ -23,7 +23,7 @@ Utils.potion_define {
     description = "A prized concoction, it produces a spike of magical energy, worth "..MANA_POTION_MP_GAIN_AMOUNT.." MP.",
 
     on_prerequisite = function(self, stats)
-        return stats.derived.hp < stats.derived.max_hp
+        return stats.derived.hp < stats.derived.max_hp, "That would be a waste!"
     end,
 
     on_use = function(self, user)
