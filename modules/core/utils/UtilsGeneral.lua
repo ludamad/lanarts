@@ -178,7 +178,7 @@ end
 
 --- NOTE: Operates on array portion of table
 -- Removes all occurences of 'val' from the table, compacting it
-function table.remove_occurences(t, val)
+function table.remove_occurrences(t, val)
     local new_len = 1
     -- Compact array
     for i = 1, #t do

@@ -4,13 +4,14 @@ local ItemTraits = import "@items.ItemTraits"
 local ProficiencyPenalties = import "@stats.ProficiencyPenalties"
 local AttackResolution = import "@AttackResolution"
 local LogUtils = import "lanarts.LogUtils"
+local Actions = import "@Actions"
 local Attacks = import "@Attacks"
 
 local AttackableObject = ObjectUtils.type_create()
 AttackableObject.ATTACKABLE_TRAIT = "ATTACKABLE_TRAIT"
 
 function AttackableObject.create(args)
-    assert(args.base_stats and (args.has_attack ~= nil))
+    assert(args.base_stats and (args.performs_actions ~= nil))
     args.solid = true
 
     -- Set up type signature
@@ -57,15 +58,15 @@ end
 
 AttackableObject.on_draw = ObjectUtils.draw_sprite_member_if_seen
 
-function AttackableObject:melee_attack()
-    if not self.has_attack then return nil end
+function AttackableObject:weapon_action()
+    if not self.performs_actions then return nil end
 
     local weapon = StatContext.get_equipped_item(self._context, ItemTraits.WEAPON)
     if weapon then
         local modifier = StatContext.calculate_proficiency_modifier(self._context, weapon)
-        return ProficiencyPenalties.apply_attack_modifier(weapon.type.attack, modifier)
+        return ProficiencyPenalties.apply_attack_modifier(weapon.action_wield, modifier), weapon
     end
-    return self.unarmed_attack -- Default
+    return self.unarmed_action, self.race or self -- Default
 end
  
 function AttackableObject.is_attackable(obj)
@@ -73,19 +74,16 @@ function AttackableObject.is_attackable(obj)
 end
 
 -- NOTE: Bypassing on_prerequisite
-function AttackableObject:apply_attack(attack, target_obj)
-    local attacker, target = self:stat_context(), target_obj:stat_context()
-
-    local dmg = attack:on_use(attacker, target)
-    LogUtils.event_log_resolved(attacker.obj, "{The }$You deal{s} " ..dmg .. " damage!", COL_GREEN)
-    LogUtils.event_log_resolved(target.obj, "{The }$You [have]{has} " .. math.ceil(target.base.hp) .. "HP left.", COL_PALE_BLUE)
+function AttackableObject:use_action(action, target, source)
+    assert(target)
+    assert(source)
+    Actions.use_action(self:stat_context(), action, target, source)
 end
 
-function AttackableObject:can_attack(attack, target_obj)
-    local attacker, target = self:stat_context(), target_obj:stat_context()
-    local ok, problem = Attacks.obj_in_range(attack, attacker, target)
-    if not ok then return false, problem end
-    return attack:on_prerequisite(attacker, target)
+function AttackableObject:can_use_action(action, target, source)
+    assert(target)
+    assert(source)
+    return Actions.can_use_action(self:stat_context(), action, target, source)
 end
 
 return AttackableObject

@@ -9,6 +9,7 @@ local Attacks = import "@Attacks"
 local Relations = import "lanarts.objects.Relations"
 local AptitudeTypes = import "@stats.AptitudeTypes"
 local ContentUtils = import "@stats.ContentUtils"
+local ActionUtils = import "@stats.ActionUtils"
 local CooldownUtils = import "@stats.CooldownUtils"
 
 local Traits = import ".MonsterTraits"
@@ -23,6 +24,7 @@ local function default_on_die_message(self)
     EventLog.add(self.type.defeat_message, self.defeat_color or {255,255,255})
 end
 
+local DEFAULT_MELEE_RANGE = 10
 function M.monster_define(t, --[[Optional]] derive_idx)
     t.team = t.team or Relations.TEAM_MONSTER_ROOT
     local stats = ContentUtils.resolve_embedded_stats(t)
@@ -34,6 +36,8 @@ function M.monster_define(t, --[[Optional]] derive_idx)
     end
 
     t.types = t.types or {Apts.MELEE}
+    local action = t.unarmed_action or t
+    action.range = action.range or DEFAULT_MELEE_RANGE
 
     return MonsterType.define {
         name = t.name,
@@ -49,7 +53,7 @@ function M.monster_define(t, --[[Optional]] derive_idx)
         radius = t.radius,
 
         base_stats = stats,
-        unarmed_attack = CooldownUtils.derive_attack_with_cooldown(t),
+        unarmed_action = ActionUtils.derive_action(action)
     }
 end
 

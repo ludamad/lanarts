@@ -7,36 +7,20 @@ local StatContext = import "@StatContext"
 
 local M = nilprotect {} -- Submodule
 
-local function attack_on_use(self, attacker, target)
+M.AttackEffect = newtype()
+
+function M.AttackEffect:apply(attacker, target)
     assert(target.base and target.derived, "Stat context expected as target parameter (probably wrong target type)")
     local dmg = AttackResolution.damage_calc(self, attacker, target)
-
     StatContext.add_hp(target, -random_round(dmg))
+    LogUtils.event_log_resolved(attacker.obj, "{The }$You deal{s} " ..dmg .. " damage!", COL_GREEN)
+    LogUtils.event_log_resolved(target.obj, "{The }$You [have]{has} " .. math.ceil(target.base.hp) .. "HP left.", COL_PALE_BLUE)
     return dmg
 end
 
-M.CANNOT_REACH_MESSAGE = "You cannot reach!"
-
--- Not part of on_prereq to allow flexibly specifying target position
-function M.xy_in_range(attack, attacker, target_radius, target_xy)
-    local reach = attack.range + attacker.obj.radius + target_radius
-    if reach < vector_distance(attacker.obj.xy, target_xy) then
-        return false, M.CANNOT_REACH_MESSAGE
-    end
-    return true
-end
-
-function M.obj_in_range(attack, attacker, target)
-    return M.xy_in_range(attack, attacker, target.obj.radius, target.obj.xy)
-end
-
-local DEFAULT_MELEE_RANGE = 10
-
-M.AttackEffect = {__index = {apply = attack_on_use}} -- TODO migrate to newtype
-
 -- Attacks follow the 'action' interface (on_use, optional on_prerequisite)
 -- Create an attack with a single sub-attack
-function M.AttackEffect.__index:init(
+function M.AttackEffect:init(
         -- Base stats
         base_effectiveness, base_damage,
         -- Aptitude modifiers
@@ -56,15 +40,9 @@ function M.AttackEffect.__index:init(
     }}
 
     self.damage_multiplier = damage_multiplier or delay
-    self.on_use = attack_on_use -- TODO deprecate on_use for attacks
-    self.range = range or DEFAULT_MELEE_RANGE
 end
 
-M.attack_create = function(...) 
-   local ret = setmetatable({}, M.AttackEffect)
-   ret:init(...)
-   return ret
-end --M.AttackEffect.create
+M.attack_create = M.AttackEffect.create
 
 function M.attack_add_effectiveness_and_damage(attack, eff, dam)
     for sub_attack in values(attack.sub_attacks) do
@@ -72,10 +50,6 @@ function M.attack_add_effectiveness_and_damage(attack, eff, dam)
         sub_attack.base_damage = sub_attack.base_damage + dam
     end
     return attack
-end
-
-function M.attack_copy_and_add(attack, eff, dam)
-    return M.attack_add_effectiveness_and_damage(table.deep_clone(attack), eff, dam)
 end
 
 function M.attack_context_create(obj, base, derived, attack)

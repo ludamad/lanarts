@@ -153,27 +153,37 @@ function M.CustomEffect:apply(user, target)
     self.on_use()
 end
 
+local DEFAULT_MELEE_RANGE = 10
+local DEFAULT_MELEE_COOLDOWN = 45
+
 -- Derive different action components. This is used for items, spells, and miscellaneous abilities.
 -- Components recognized by this routine:
 -- cooldowns and stat costs (see derive_cooldowns and derive_stat_costs)
 -- distance requirements (see derive_distance_prereq),
 -- attacks (see ContentUtils.derive_attack)
 -- projectiles (see ProjectileEffect.derive_projectile)
-function M.derive_action(args, --[[Optional, default false]] cleanup_members)
+function M.derive_action(args, --[[Optional, default false]] cleanup_members,  --[[Optional, default true]] derive_prereqs)
+    derive_prereqs = (derive_prereqs == nil or derive_prereqs)
     local action = { 
         target_type = args.target_type or Actions.TARGET_HOSTILE,
         prerequisites = args.prerequisites or {}, effects = args.effects or {},
         -- Optional arguments
-        name = args.name or nil, sprite = args.sprite or nil 
+        name = args.name or nil, sprite = args.sprite or nil,
+        -- on_prerequisite and on_use are special in that they take a context object when used, allowing more dynamic action content. 
+        on_prerequisite = args.on_prerequisite or nil, 
+        on_use = args.on_use or nil
     }
-
+    -- Damaging attack effect
+    add_if_not_nil(action, --[[No associated prereq]] nil, ContentUtils.derive_attack(args.attack or args, cleanup_members))
+    if derive_prereqs and Actions.get_effect(action, Attacks.AttackEffect) then
+        args.range = args.range or DEFAULT_MELEE_RANGE
+        args.cooldown_offensive = args.cooldown_offensive or (DEFAULT_MELEE_COOLDOWN * (args.delay or 1))
+    end
     -- Stat costs and cooldowns
     add_if_not_nil(action, M.derive_stat_costs(args, cleanup_members))
     add_if_not_nil(action, M.derive_cooldowns(args, cleanup_members))
     -- Min & max distance requirement
     add_if_not_nil(action, M.derive_distance_prereq(args, cleanup_members), --[[No associated effect]] nil)
-    -- Damaging attack effect
-    add_if_not_nil(action, --[[No associated prereq]] nil, ContentUtils.derive_attack(args.attack or args, cleanup_members))
     add_if_not_nil(action, derive_status_prereqs(args), --[[No associated effect]] nil)
     derive_status_effects(action.effects, args)
     -- Projectile effect
@@ -181,6 +191,7 @@ function M.derive_action(args, --[[Optional, default false]] cleanup_members)
     if P then
         P.sprite = P.sprite or args.sprite -- Inherit sprite from outer action
         local effect = ProjectileEffect.derive_projectile_effect(P, cleanup_members)
+        assert(effect)
         add_if_not_nil(action, --[[No associated prereq]] nil, effect)
     end
     if cleanup_members then

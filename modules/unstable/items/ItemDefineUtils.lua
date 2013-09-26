@@ -3,6 +3,8 @@
 local ItemType = import "@ItemType"
 local Apts = import "@stats.AptitudeTypes"
 local StatContext = import "@StatContext"
+local Actions = import "@Actions"
+local ActionUtils = import "@stats.ActionUtils"
 local Attacks = import "@Attacks"
 local ItemTraits = import ".ItemTraits"
 local Proficiency = import "@Proficiency"
@@ -12,25 +14,29 @@ local ItemRandomDescriptions = import ".ItemRandomDescriptions"
 
 local M = nilprotect {} -- Submodule
 
-local function on_use_equipment(type)
+local function equipment_action_use(type)
     local capacity = ItemTraits.equipment_slot_capacities[type]
     assert(capacity) 
-    return function(item_slot, stats)
-        -- De-equip if equipped
-        if item_slot.equipped then
-            item_slot.equipped = false
+    return {
+        prerequisites = {},
+        effects = {},
+        on_use = function(item_slot, stats)
+            -- De-equip if equipped
+            if item_slot.equipped then
+                item_slot.equipped = false
+                return 0 -- Use 0 copies
+            end
+    
+            -- Equip if not equipped
+            local equipped_items = StatContext.get_equipped_items(stats, type)
+            if #equipped_items == capacity then
+                assert(#equipped_items > 0)
+                StatContext.deequip_item(stats, equipped_items[1])
+            end
+            StatContext.equip_item(stats, item_slot)
             return 0 -- Use 0 copies
         end
-
-        -- Equip if not equipped
-        local equipped_items = StatContext.get_equipped_items(stats, type)
-        if #equipped_items == capacity then
-            assert(#equipped_items > 0)
-            StatContext.deequip_item(stats, equipped_items[1])
-        end
-        StatContext.equip_item(stats, item_slot)
-        return 0 -- Use 0 copies
-    end
+    }
 end
 
 -- Filters melee, magic, ranged. Useful for determining identify skills, which should not be affected by these aptitudes.
@@ -86,7 +92,13 @@ local function type_define(args, type, --[[Optional]] on_init, --[[Optional]] no
     end
 
     args.sprite = ContentUtils.resolve_sprite(args)
-    args.on_use = args.on_use or on_use_equipment(type)
+    -- Derive item-use action. Defaulted to equipping for equipment types. 
+    if not_equipment or args.action_use then
+        args.action_use = ActionUtils.derive_action(args.action_use or args, --[[Cleanup]] true)
+    else
+        args.action_use = equipment_action_use(type)
+    end
+    assert(args.action_use)
     args.stackable = args.stackable or (ItemTraits.equipment_slot_capacities[type] == nil)
     args.on_init = args.on_init or on_init
 
@@ -119,18 +131,12 @@ function M.resolve_weapon_bonuses(self)
 
     local difficulty = ((b1*b1+b2*b2) ^ 0.75) + random(-1,3) + (self.difficulty or 0)
     init_identify_requirements(self, {Apts.WEAPON_IDENTIFICATION}, random_round(difficulty))
-
-    self.attack = Attacks.attack_copy_and_add(self.type.attack, b1, b2)
+    self.action_wield = table.deep_clone(self.action_wield)
+    local attack = assert(Actions.get_effect(self.action_wield, Attacks.AttackEffect))
+    Attacks.attack_add_effectiveness_and_damage(attack, b1, b2)
 end
 
-local function on_wield_weapon_prerequisite(self, target)
-    return self.attack.on_prerequisite(self.attack, target)
-end
-
-local function on_wield_weapon(self, target)
-    return self.attack.on_use(self.attack, target)
-end
-
+local DEFAULT_MELEE_RANGE = 10
 function M.weapon_define(args)
     -- Define weapon attack in convenient manner
     assert(args.types and args.difficulty and args.gold_worth)
@@ -139,9 +145,8 @@ function M.weapon_define(args)
         table.insert_all(args.proficiency_types, args.types)
         table.insert(args.proficiency_types, Apts.WEAPON_PROFICIENCY)
     end
-    args.attack = CooldownUtils.derive_attack_with_cooldown(args)
-    args.on_wield = args.on_wield or on_wield_weapon
-    args.on_wield_prerequisite = args.on_wield_prerequisite or on_wield_weapon_prerequisite
+    args.range = args.range or DEFAULT_MELEE_RANGE
+    args.action_wield = ActionUtils.derive_action(args, --[[Cleanup]] true)
     return type_define(args, ItemTraits.WEAPON, M.resolve_weapon_bonuses)
 end
 

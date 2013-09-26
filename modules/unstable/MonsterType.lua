@@ -8,7 +8,7 @@ local monster_schema = {
     description = S.STRING,
     xp_award = S.NUMBER,
     base_stats = S.TABLE,
-    unarmed_attack = S.TABLE,
+    unarmed_action = S.TABLE,
   
     -- Object controlling functions
     radius = S.defaulted(S.NUMBER, 14),

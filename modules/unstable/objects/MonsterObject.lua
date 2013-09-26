@@ -43,11 +43,10 @@ local function monster_step(self)
         return 
     end
 
-
     local S,P = self:stat_context(), player:stat_context()
-    local in_range = Attacks.obj_in_range(self.unarmed_attack, S, P)
-    if self.unarmed_attack:on_prerequisite(S,P) and in_range then
-        self:apply_attack(self.unarmed_attack, player)
+    local weapon_action, source = self:weapon_action()
+    if self:can_use_action(weapon_action, P, source) then 
+        self:use_action(weapon_action, P, source) 
     end
 
     local dx,dy = unpack(vector_subtract(player.xy, self.xy))
@@ -89,7 +88,7 @@ function M.create(args)
     table.insert(args.traits, M.MONSTER_TRAIT)
 
     -- AttackableObject configuration
-    args.has_attack = true
+    args.performs_actions = true
 
     return obj_type.base_create(args)
 end

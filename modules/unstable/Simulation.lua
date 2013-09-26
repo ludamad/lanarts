@@ -5,6 +5,7 @@ Display.initialize("Lanarts", {640, 640}, false)
 local StatContext = import "@StatContext"
 local AttackResolution = import "@AttackResolution"
 local Attacks = import "@Attacks"
+local Actions = import "@Actions"
 local Stats = import "@Stats"
 local AnsiCol = import "core.terminal.AnsiColors"
 local RaceType = import "@RaceType"
@@ -67,13 +68,13 @@ local function perform_spell(player, monster)
 
     local spell = choice2spell[choose_option(unpack(choices))]
     if not spell then return false end
-
-    local used = StatContext.use_spell(player, spell, monster.obj.xy)
-    if not used then
-        print("You must wait before using this.")
-    end
-
-    return used
+    local ok, problem = StatContext.can_use_spell(player, spell, monster.obj.xy)
+    if not ok then 
+        print(problem)
+        return false
+    end    
+    StatContext.use_spell(player, spell, monster.obj.xy)
+    return true
 end
 
 local function choose_skills(player, SP)
@@ -176,7 +177,9 @@ local function use_item(player)
     local item = choice2item[choose_option(unpack(choices))]
     if not item then return false end
 
-    inventory:use_item(player, item)
+    local ok, problem = StatContext.can_use_item(player, item)
+    if not ok then print(problem) return false end
+    StatContext.use_item(player, item)
     return true
 end
 
@@ -232,18 +235,18 @@ end
 
 local function query_player(player, monster)
     frame = frame + 1
-    local attack = player.obj:melee_attack()
+    local weapon_action, source = player.obj:weapon_action()
     if not can_continue(player) then return end
     local moved = false
     while not moved do
         AnsiCol.println("Frame: " .. frame, AnsiCol.YELLOW, AnsiCol.BOLD)
         print(StatUtils.stats_to_string(player.derived, --[[Color]] true, --[[New lines]] true, player.base.name .. ", the Adventurer"))
-        print(StatUtils.attack_to_string(attack, --[[Color]] true))    
+        print(StatUtils.attack_to_string(Actions.get_effect(weapon_action, Attacks.AttackEffect), --[[Color]] true))    
         local action = choose_option("Attack", "Spell", "Item", "Wait")
         if action == "Attack" then
-            local able, problem = player.obj:can_attack(attack, monster.obj)
-            if able then
-                player.obj:apply_attack(attack, monster.obj)
+            local ok, problem = player.obj:can_use_action(weapon_action, monster, source) 
+            if ok then
+                player.obj:use_action(weapon_action, monster, source) 
                 moved = true
             else
                 print(problem)

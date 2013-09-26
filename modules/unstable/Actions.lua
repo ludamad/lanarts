@@ -20,29 +20,28 @@ for v in values(M.TARGET_TYPES) do
 end
 
 function M.can_use_action(user, action, target, --[[Optional]] action_source)
-    if action_source and action_source.on_prerequisite then
-        local ok, problem = action_source:on_prerequisite(user, target)
+    if action.on_prerequisite then
+        local ok, problem = action.on_prerequisite(action_source, user, target)
         if not ok then return false, problem end 
     end
     for prereq in values(action.prerequisites) do
-        if not prereq:check(user, target) then
-            return false, action 
-        end
+        local ok, problem = prereq:check(user, target)
+        if not ok then return false, problem end 
     end
     return true
 end
 
 function M.use_action(user, action, target, --[[Optional]] action_source)
     assert(M.can_use_action(user, action, target, action_source))
-
-    if action_source and action_source.on_use then
-        action_source:on_use(user, target) 
+    local ret
+    if action.on_use then
+        ret = action.on_use(action_source, user, target) and ret 
     end
 
     for effect in values(action.effects) do
-        effect:apply(user, target)
+        ret = effect:apply(user, target) and ret
     end
-    return true
+    return ret
 end
 
 -- Lookup all effects of a certain type.
@@ -69,6 +68,17 @@ function M.get_effect(action, type)
     local effects = M.get_all_effects(action, type)
     assert(#effects <= 1)
     return effects[1]
+end
+
+-- Replace the unique effect of a given type.
+-- Errors if multiple matching effects exist!
+function M.set_effect(action, type, new_effect)
+    local effects = M.get_all_effects(action, type)
+    assert(#effects <= 1)
+    for effect in values(effects) do 
+        table.remove_occurrences(action.effects, effect)
+    end
+    table.insert(action.effects, new_effect)
 end
 
 -- Lookup the unique prerequisite of a given type.

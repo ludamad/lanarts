@@ -1,6 +1,7 @@
 local StatContext = import "@StatContext"
 local Proficiency = import "@Proficiency"
 local SlotUtils = import "@SlotUtils"
+local Actions = import "@Actions"
 local ItemType = import "@ItemType"
 
 local Inventory = newtype()
@@ -52,13 +53,17 @@ end
 local function remove_from_slot(inventory, item_slot, --[[Optional]] amount)
     item_slot.amount = item_slot.amount - (amount or 1)
     if item_slot.amount <= 0 then 
-        table.remove_occurences(inventory.items, item_slot)
+        table.remove_occurrences(inventory.items, item_slot)
     end
 end
 
-function Inventory:use_item(user, item_slot)
-    local to_remove = item_slot.on_use(item_slot, user)
+function Inventory:use_item(user, item_slot, --[[Optional]] target)
+    local to_remove = Actions.use_action(user, item_slot.action_use, target, item_slot)
     remove_from_slot(self, item_slot, to_remove or 1)
+end
+
+function Inventory:use_item(user, item_slot, --[[Optional]] target)
+    return Actions.can_use_action(user, item_slot.action_use, target, item_slot)
 end
 
 function Inventory:get_equipped_items(equipment_type)

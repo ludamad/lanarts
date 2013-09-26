@@ -41,7 +41,7 @@ function PlayerObject.create(args)
     table.insert(args.traits, PlayerObject.PLAYER_TRAIT)
 
     -- AttackableObject configuration
-    args.has_attack = true
+    args.performs_actions = true
     args.base_stats = PlayerObject.player_stats_create(args.race, args.class, args.name)
 
     -- Create pseudo-objects

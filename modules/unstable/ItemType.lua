@@ -19,9 +19,6 @@ local schema = {
     gold_worth = S.defaulted(S.NOT_NIL, 0), -- Determines shop cost and placement weight
     stackable = S.NOT_NIL, -- Is it stackable ?
 
-    on_prerequisite = S.FUNCTION_OR_NIL,
-    on_use = S.FUNCTION,
-
     base_equip_bonuses = S.TABLE_OR_NIL,
     equip_bonuses = S.NIL, -- Dont accidentally set
     -- Takes an approximate character-level appropriateness
@@ -31,8 +28,8 @@ local schema = {
     -- For equipment (all require item to be equippable and already equipped)
     on_step = S.FUNCTION_OR_NIL,
     on_evoke = S.FUNCTION_OR_NIL,
-    on_wield = S.FUNCTION_OR_NIL,
-    on_wield_prerequisite = S.FUNCTION_OR_NIL,
+    action_use = S.TABLE,
+    action_wield = S.TABLE_OR_NIL,
     on_calculate = S.defaulted(S.FUNCTION, default_on_calculate)
 }
 

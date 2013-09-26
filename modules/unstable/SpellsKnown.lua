@@ -31,11 +31,11 @@ function SpellsKnown:can_use_spell(stats, spell_slot, target)
 end
 
 function SpellsKnown:use_spell(stats, spell_slot, target)
-    if self:can_use_spell(stats, spell_slot, target) then
-        Actions.use_action(stats, spell_slot.action_use, target, spell_slot)
-        return true
+    for i,effect in ipairs(spell_slot.action_use.effects) do
+        print(i,pretty_tostring_compact(effect))
     end
-    return false
+    assert(self:can_use_spell(stats, spell_slot, target))
+    Actions.use_action(stats, spell_slot.action_use, target, spell_slot)
 end
 
 return SpellsKnown

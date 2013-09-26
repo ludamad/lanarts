@@ -43,7 +43,11 @@ function M.add_item(stats, ...)
 end
 
 function M.use_item(stats, ...)
-    return stats.base.inventory:use_item(...)
+    return stats.base.inventory:use_item(stats, ...)
+end
+
+function M.can_use_item(stats, ...)
+    return stats.base.inventory:can_use_item(stats, ...)
 end
 
 function M.get_equipped_item(stats, ...)

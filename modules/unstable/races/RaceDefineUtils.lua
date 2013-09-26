@@ -4,6 +4,7 @@ local Apts = import "@stats.AptitudeTypes"
 local Stats = import "@Stats"
 local StatContext = import "@StatContext"
 local ContentUtils = import "@stats.ContentUtils"
+local ActionUtils = import "@stats.ActionUtils"
 local CooldownUtils = import "@stats.CooldownUtils"
 local Attacks = import "@Attacks"
 
@@ -18,8 +19,8 @@ function M.races_define(args)
 
     args.types = args.types or {Apts.BLUNT, Apts.MELEE} -- For CooldownUtils.derive_attack_with_cooldown
     args.damage = args.damage or 5
-    args.attack = CooldownUtils.derive_attack_with_cooldown(args)
-    assert(args.attack.on_prerequisite and args.attack.on_use)
+    local action = args.unarmed_action or args
+    args.unarmed_action = ActionUtils.derive_action(action, --[[Cleanup]] true)
     -- Create based off embedded stats, aptitudes & spells
     local stat_template = ContentUtils.resolve_embedded_stats(args, --[[Resolve skill costs]] true)
     function args.on_create(name, team)
