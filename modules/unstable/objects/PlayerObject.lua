@@ -1,13 +1,14 @@
-local AttackableObject = import ".AttackableObject"
+local CombatObject = import ".CombatObject"
 local Attacks = import "@Attacks"
 local Apts = import "@stats.AptitudeTypes"
 local Relations = import "lanarts.objects.Relations"
+local PlayerIOActions = import ".PlayerIOActions"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local SkillType = import "@SkillType"
 local StatContext = import "@StatContext"
 local GameObject = import "core.GameObject"
 
-local PlayerObject = ObjectUtils.type_create(AttackableObject) 
+local PlayerObject = ObjectUtils.type_create(CombatObject)
 PlayerObject.PLAYER_TRAIT = "PLAYER_TRAIT"
 
 function PlayerObject.player_stats_create(race, --[[Can-be-nil]] class, name, --[[Optional]] team)
@@ -38,24 +39,25 @@ function PlayerObject:on_step()
         os.exit(0)
     end
     self.base.on_step(self)
-    table.clear(self.queued_actions)
-    self:io_handler(self.queued_actions)
-    for action in values(self.queued_actions) do
+    table.clear(self.queued_io_actions)
+    self:io_action_handler(self.queued_io_actions)
+    for io_action in values(self.queued_io_actions) do
+        PlayerIOActions.use_io_action(self, unpack(io_action))
     end
 end
 
 function PlayerObject.create(args)
     args.sprite = resolve_sprite(args.race)
-    args.queued_actions = {}
-    assert(args.race and args.class and args.name and args.io_handler)
+    args.queued_io_actions = {}
+    args.io_action_handler = args.io_action_handler or do_nothing
+    assert(args.race and args.class and args.name and args.io_action_handler)
 
     -- Set up type signature
     args.type = args.type or PlayerObject
     args.traits = args.traits or {}
     table.insert(args.traits, PlayerObject.PLAYER_TRAIT)
 
-    -- AttackableObject configuration
-    args.performs_actions = true
+    -- CombatObject configuration
     args.base_stats = PlayerObject.player_stats_create(args.race, args.class, args.name)
 
     -- Create pseudo-objects

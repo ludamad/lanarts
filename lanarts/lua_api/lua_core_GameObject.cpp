@@ -58,9 +58,18 @@ static int lapi_gameinst_getter_fallback(lua_State* L) {
 
 		LuaStackValue table(L, -1);
 		if (!table.isnil()) {
-			lua_pushvalue(L, 2); // On stack: [type table, key]
-			lua_gettable(L, table.index());
-			lua_replace(L, -2); // On stack [type table's value]
+			// First, try the __index method.
+			lua_getfield(L, table.index(), "__index");
+			if (!lua_isnil(L, -1)) {
+				lua_pushvalue(L, 1);
+				lua_pushvalue(L, 2);
+				lua_call(L, 2, 1); // On stack [type table, value]
+			}
+			if (lua_isnil(L, -1)) {
+				lua_pop(L, 1); // pop nil
+				lua_pushvalue(L, 2); // On stack: [type table, key]
+				lua_gettable(L, table.index()); // On stack [type table, value]
+			}
 		}
 	}
 	return 1;
