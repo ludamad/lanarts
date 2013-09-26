@@ -227,7 +227,7 @@ local frame, WAIT_UNTIL = 0, 0
 
 local function can_continue(player)
     if frame < WAIT_UNTIL then return false end
-    return true--not StatContext.has_cooldown(player, CooldownTypes.ALL_ACTIONS)
+    return not StatContext.has_cooldown(player, CooldownTypes.ALL_ACTIONS)
 end
 
 local function query_player(player, monster)

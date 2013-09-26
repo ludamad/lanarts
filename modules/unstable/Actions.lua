@@ -19,7 +19,11 @@ for v in values(M.TARGET_TYPES) do
     M[v] = v
 end
 
-function M.can_use_action(user, action, target)
+function M.can_use_action(user, action, target, --[[Optional]] action_source)
+    if action_source and action_source.on_prerequisite then
+        local ok, problem = action_source:on_prerequisite(user, target)
+        if not ok then return false, problem end 
+    end
     for prereq in values(action.prerequisites) do
         if not prereq:check(user, target) then
             return false, action 
@@ -28,8 +32,12 @@ function M.can_use_action(user, action, target)
     return true
 end
 
-function M.use_action(user, action, target)
-    assert(M.can_use_action(user, action, target))
+function M.use_action(user, action, target, --[[Optional]] action_source)
+    assert(M.can_use_action(user, action, target, action_source))
+
+    if action_source and action_source.on_use then
+        action_source:on_use(user, target) 
+    end
 
     for effect in values(action.effects) do
         effect:apply(user, target)

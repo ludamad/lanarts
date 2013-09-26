@@ -23,7 +23,7 @@ races_define {
 
     [Apts.LIGHT] = -2,
 
-    starting_spells = {{
+    spells = {{
         name = "Benevolent Curse",
         description = "You gain control of the curse that brought you to unlife, manipulating it to heal yourself.",
         traits = {SpellTraits.BUFF_SPELL},

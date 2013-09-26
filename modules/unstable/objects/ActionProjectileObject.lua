@@ -24,7 +24,7 @@ end
 ActionProjectileObject.on_draw = ObjectUtils.draw_sprite_member_if_seen
 
 function ActionProjectileObject:apply_action(target_obj)
-    Actions.use_action(self.stats, self.action, target_obj:stat_context())
+    Actions.use_action(self.stats, self.action, target_obj:stat_context(), self.action_source)
 end
 
 function ActionProjectileObject:on_deinit()

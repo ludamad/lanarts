@@ -12,5 +12,5 @@ spell_define {
     user_statuses_added = {{"Berserk", function(caster) return 150 + math.min(4, caster.base.level) * 20 end}},
 
     cooldown_self = 1000,
-    cooldown = 50
+    cooldown_ability = 50
 }

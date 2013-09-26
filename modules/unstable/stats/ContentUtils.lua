@@ -83,11 +83,12 @@ function M.resolve_embedded_stats(table, --[[Optional]] resolve_skills)
         table.skills = M.resolve_skills(table)
     end
     local spells = table.spells
-    if not getmetatable(table.spells) == SpellsKnown then
+    if getmetatable(spells) ~= SpellsKnown then
         spells = SpellsKnown.create()
         for spell in values(table.spells) do
             if type(spell) == "table" and not spell.id then
-                spell = SpellType.define(spell)
+                local SpellDefineUtils = import "@spells.SpellDefineUtils"
+                spell = SpellDefineUtils.spell_define(spell)
             end 
             spells:add_spell(spell)
         end

@@ -18,6 +18,9 @@ local TimeLimitedBase = {
             end
             return true -- Deregister
         end
+    end,
+    add_time_left = function(self, amount)
+        self.time_left = self.time_left + amount
     end
 }
 

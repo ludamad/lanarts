@@ -17,18 +17,12 @@ function M.base_spell_on_create(spell, args)
 end
 
 function M.spell_define(args)
-    args.on_create = args.on_create or M.base_spell_on_create
+    args.base_on_create = args.base_on_create or M.base_spell_on_create
+    args.on_create = args.on_create or args.base_on_create
     args.sprite = ContentUtils.resolve_sprite(args)
     local action_args = args.action_use or args
     args.action_use = ActionUtils.derive_action(action_args, --[[Cleanup members]] true)
-    args.on_use = function(self, caster, target)
-        return Actions.use_action(caster, self.action_use, target)
-    end
-    args.on_prerequisite = function(self, caster, target)
-        return Actions.can_use_action(caster, self.action_use, target)
-    end
     args.aptitude_types = ActionUtils.desirable_user_aptitudes(args.action_use)
-    args.base_on_create = M.base_spell_on_create
 
     return SpellType.define(args)
 end

@@ -232,7 +232,8 @@ function M.apply_cooldown(context, type, amount, --[[Optional]] f)
 end
 
 function M.update_status(context, status_type, ...)
-    return StatusType.update_hook(context.base.hooks, status_type, ...)
+    assert(context)
+    return StatusType.update_hook(context.base.hooks, status_type, context, ...)
 end
 
 function M.get_status(context, status_type)

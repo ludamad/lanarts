@@ -1,6 +1,7 @@
 local CooldownSet = import "@CooldownSet"
 local SlotUtils = import "@SlotUtils"
 local SpellType = import "@SpellType"
+local Actions = import "@Actions"
 
 local SpellsKnown = newtype()
 
@@ -25,13 +26,13 @@ function SpellsKnown:values()
 end
 
 -- Returns message on failure
-function SpellsKnown:can_use_spell(stats, spell_slot, ...)
-    return spell_slot:on_prerequisite(stats, ...)
+function SpellsKnown:can_use_spell(stats, spell_slot, target)
+    return Actions.can_use_action(stats, spell_slot.action_use, target, spell_slot)
 end
 
-function SpellsKnown:use_spell(stats, spell_slot, ...)
-    if self:can_use_spell(stats, spell_slot, ...) then
-        spell_slot:on_use(stats, ...)
+function SpellsKnown:use_spell(stats, spell_slot, target)
+    if self:can_use_spell(stats, spell_slot, target) then
+        Actions.use_action(stats, spell_slot.action_use, target, spell_slot)
         return true
     end
     return false

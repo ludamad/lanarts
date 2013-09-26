@@ -34,6 +34,7 @@ end
 
 ------ STATUS EFFECT CAUSATION ----------------------------------------
 local function resolved_args(self, user, target)
+    assert(self and user and target)
     local resolved_args = {}
     for arg in values(self.args) do
         local is_function = (type(arg) == "function")
@@ -41,6 +42,7 @@ local function resolved_args(self, user, target)
     end
     return unpack(resolved_args)    
 end
+
 --- To user of action:
 M.UserStatusEffect = newtype()
 function M.UserStatusEffect:init(status_type, ...)

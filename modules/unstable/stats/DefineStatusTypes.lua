@@ -32,15 +32,6 @@ local Exhausted = StatusType.define {
 }
 
 -- BERSERKING
-local function berserk_extension(effect)
-    if effect.extensions < 1 then
-        return 30
-    elseif effect.extensions < 5 then
-        return 20
-    end
-    return 5
-end
-
 local BERSERK_EXHAUSTION_DURATION = 275
 
 StatusType.define {
@@ -48,6 +39,7 @@ StatusType.define {
     time_limited = true,
     init = function(self, stats, ...)
        self.base.init(self, stats, ...)
+       self.extensions = 0
        LogUtils.event_log_player(stats.obj, "$You enter{s} a powerful rage!", {200,200,255})
     end,
     on_calculate = function(self, stats)
@@ -64,6 +56,12 @@ StatusType.define {
         CooldownUtils.reset_rest_cooldown(stats)
     end,
     on_kill = function(self, stats)
+        -- Extend the berserking
+        local time_bonus = self.extensions < 5 and 20 or 5
+        if self.extensions == 0 then time_bonus = 30 end
+        self:add_duration(time_bonus)
+        self.extensions = self.extensions + 1
+        LogUtils.debug_log(stats.obj.name," berserking time extends by ", time_bonus)
         LogUtils.event_log_resolved(stats.obj, "<The >{$You's}[Your] rage grows ...", {200,200,255})
     end,
     on_deregister = function(self, stats)

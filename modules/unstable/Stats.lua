@@ -44,8 +44,14 @@ function M.aptitudes_create(--[[Optional]] params)
     }
 end
 
-local function clone_if_exists(v)
-    return v and table.deep_clone(v) or nil
+local function clone_if_exists(v, assert_metatable)
+    if v then 
+        local clone = table.deep_clone(v)
+        assert(getmetatable(v) == getmetatable(clone))
+        assert(not assert_metatable or getmetatable(v))
+        return clone
+    end
+    return nil
 end
 
 -- Create stats with defaults, or copy over from other stats
@@ -67,16 +73,16 @@ function M.stats_create(--[[Optional]] params, --[[Optional]] add_skills)
         max_mp = params.max_mp or params.mp or 0,
         mp_regen = params.mp_regen or 0,
 
-        inventory = C(params.inventory) or Inventory.create(),
+        inventory = C(params.inventory, true) or Inventory.create(),
         aptitudes = M.aptitudes_create(params.aptitudes),
         skills = M.skills_create(params.skills, add_skills),
-        hooks = C(params.hooks) or HookSet.create(),
+        hooks = C(params.hooks, true) or HookSet.create(),
 
-        spells = C(params.spells) or SpellsKnown.create(),
+        spells = C(params.spells, true) or SpellsKnown.create(),
         abilities = C(params.abilities) or {},
         unarmed_attack = params.unarmed_attack or Attacks.ZERO_DAMAGE_ATTACK,
 
-        cooldowns = C(params.cooldowns) or CooldownSet.create(),
+        cooldowns = C(params.cooldowns, true) or CooldownSet.create(),
 
         movement_speed = params.movement_speed or 2
     }

@@ -141,6 +141,18 @@ local function add_if_not_nil(action, prerequisite, effect)
     if effect then table.insert(action.effects, effect) end
 end
 
+M.CustomEffect = newtype()
+
+function M.CustomEffect:init(resource, prereq, on_use)
+    self.prereq = prereq
+    self.on_use = on_use
+    self.context_resource = resource
+end
+
+function M.CustomEffect:apply(user, target)
+    self.on_use()
+end
+
 -- Derive different action components. This is used for items, spells, and miscellaneous abilities.
 -- Components recognized by this routine:
 -- cooldowns and stat costs (see derive_cooldowns and derive_stat_costs)
@@ -177,6 +189,5 @@ function M.derive_action(args, --[[Optional, default false]] cleanup_members)
 
     return action
 end
-
 
 return M

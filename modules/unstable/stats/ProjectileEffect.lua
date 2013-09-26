@@ -10,6 +10,7 @@ function ProjectileEffect:init(args)
     self.sprite = assert(args.sprite)
     self.radius = assert(args.radius)
     self.speed = assert(args.speed)
+    self.action_source = args.action_source
     self.action = args.action
 end
 
@@ -42,7 +43,8 @@ function ProjectileEffect.derive_projectile_effect(args, --[[Optional, default f
     local effect = ProjectileEffect.create { 
         sprite = args.sprite, 
         radius = args.radius or (args.sprite.width / 2), 
-        speed = args.speed
+        speed = args.speed,
+        action_source = args.action_soruce
     }
 
     effect.action = ActionUtils.derive_action(args.action or args, cleanup_members)
