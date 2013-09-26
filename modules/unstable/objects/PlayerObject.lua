@@ -31,9 +31,23 @@ local function resolve_sprite(race)
     return image_cached_load(random_choice(results))
 end
 
+function PlayerObject:on_step()
+    -- Death event:
+    if self.base_stats.hp <= 0 then
+        print("YOU DIED")
+        os.exit(0)
+    end
+    self.base.on_step(self)
+    table.clear(self.queued_actions)
+    self:io_handler(self.queued_actions)
+    for action in values(self.queued_actions) do
+    end
+end
+
 function PlayerObject.create(args)
     args.sprite = resolve_sprite(args.race)
-    assert(args.race and args.class and args.name)
+    args.queued_actions = {}
+    assert(args.race and args.class and args.name and args.io_handler)
 
     -- Set up type signature
     args.type = args.type or PlayerObject
