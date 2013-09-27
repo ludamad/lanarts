@@ -61,7 +61,7 @@ function PlayerObject.create(args)
     args.base_stats = PlayerObject.player_stats_create(args.race, args.class, args.name)
 
     -- Create pseudo-objects
-    args.unarmed_attack = args.unarmed_attack or args.race.attack 
+    args.unarmed_action = args.unarmed_action or args.race.unarmed_action 
     args.base_create = GameObject.player_create
 
     return PlayerObject.base_create(args)
