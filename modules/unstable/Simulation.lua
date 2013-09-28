@@ -1,7 +1,4 @@
 -- OpenGL must be initialized before content loading!
-local Display = import "core.Display"
-Display.initialize("Lanarts", {640, 640}, false)
-
 local StatContext = import "@StatContext"
 local AttackResolution = import "@AttackResolution"
 local Attacks = import "@Attacks"
@@ -35,7 +32,9 @@ local Proficiency = import "@Proficiency"
 local LogUtils = import "lanarts.LogUtils"
 local Keys = import "core.Keyboard"
 
-local function choose_option(...)
+local M = nilprotect {} -- Submodule
+
+function M.choose_option(...)
     local options = {...}
     local prompt = {}
     for idx, option in ipairs(options) do
@@ -66,7 +65,7 @@ local function perform_spell(player, monster)
         choice2spell[spell.name] = spell
     end
 
-    local spell = choice2spell[choose_option(unpack(choices))]
+    local spell = choice2spell[M.choose_option(unpack(choices))]
     if not spell then return false end
     local ok, problem = StatContext.can_use_spell(player, spell, monster.obj.xy)
     if not ok then 
@@ -92,7 +91,7 @@ local function choose_skills(player, SP)
         end
         table.insert(choices, "Finish")
     
-        local skill = choice2skill[choose_option(unpack(choices))]
+        local skill = choice2skill[M.choose_option(unpack(choices))]
         if not skill then break end
 
         -- Pick skill points gain
@@ -137,7 +136,7 @@ local function choose_skills(player, SP)
             local max = xp2level(skill_slot.skill_points + SP)
             reg("Max (Spend ".. SP .. " to become "..max..")", SP)
 
-            local amount = amounts[choose_option(unpack(choices))]
+            local amount = amounts[M.choose_option(unpack(choices))]
             if not amount then break end
 
             SP = SP - amount
@@ -174,7 +173,7 @@ local function use_item(player)
         choice2item[entry] = item
     end
 
-    local item = choice2item[choose_option(unpack(choices))]
+    local item = choice2item[M.choose_option(unpack(choices))]
     if not item then return false end
 
     local ok, problem = StatContext.can_use_item(player, item)
@@ -242,7 +241,7 @@ local function query_player(player, monster)
         AnsiCol.println("Frame: " .. frame, AnsiCol.YELLOW, AnsiCol.BOLD)
         print(StatUtils.stats_to_string(player.derived, --[[Color]] true, --[[New lines]] true, player.base.name .. ", the Adventurer"))
         print(StatUtils.attack_to_string(Actions.get_effect(weapon_action, Attacks.AttackEffect), --[[Color]] true))    
-        local action = choose_option("Attack", "Spell", "Item", "Wait")
+        local action = M.choose_option("Attack", "Spell", "Item", "Wait")
         if action == "Attack" then
             local ok, problem = player.obj:can_use_action(weapon_action, monster, source) 
             if ok then
@@ -280,7 +279,7 @@ local function choose_race()
         print(C.YELLOW(race.description))
         print_sample_stats(race)
         print(C.BLUE("Do you wish to play as a " .. race.name .. "?", C.BOLD))
-        if choose_option("No", "Yes") == "Yes" then
+        if M.choose_option("No", "Yes") == "Yes" then
             return race
         end
         idx = (idx % #RaceType.list) + 1 
@@ -302,16 +301,22 @@ local function choose_class(race)
         print(C.YELLOW(class.description))
         print_sample_stats(race, class:on_create{weapon_skill="Slashing Weapons"})
         print(C.BLUE("Do you wish to play as a " .. race.name .. " " .. class.name .. "?", C.BOLD))
-        if choose_option("No", "Yes") == "Yes" then
+        if M.choose_option("No", "Yes") == "Yes" then
             print("Which specialization?")
-            local skill = choose_option("Piercing Weapons", "Slashing Weapons", "Blunt Weapons")
+            local skill = M.choose_option("Piercing Weapons", "Slashing Weapons", "Blunt Weapons")
             return class:on_create{magic_skill = class.magic_skill, weapon_skill=skill}
         end
         idx = (idx % #class_types) + 1 
     end
 end
 
-local function main()
+function M.choose_player_stats()
+    local race = choose_race()
+    local class = choose_class(race)
+    return race, class
+end
+
+function M.main()
     -- Load game content
     import "@DefineAll"
 
@@ -324,18 +329,21 @@ local function main()
     -- TODO: Remove any notion of 'internal graphics'. All graphics loading should be prompted by Lua.
     __initialize_internal_graphics()
 
-    local SM = SimulationMap.create()
-    local race = choose_race()
-    local class = choose_class(race)
-    local player = SM:add_player("Tester", race, class)
-    local monster = SM:add_monster("Giant Rat")
+    local Display = import "core.Display"
+    local MapGen = import "core.MapGeneration"
+    local MapUtils = import "lanarts.maps.MapUtils"
+    local TileSets = import "lanarts.tiles.Tilesets"
 
---    local TimeToKillCalculation = import "@simulation.TimeToKillCalculation"
---    local kill_time = TimeToKillCalculation.calculate_time_to_kill(
---        player:stat_context_copy(), player:melee_attack(), monster:stat_context_copy()
---    )
---    print("To kill the giant rat, you need " .. kill_time .. " steps with melee.")
-    assert((import "lanarts.objects.Relations").is_hostile(player, monster))
+    local map = MapUtils.area_template_to_map("LanartsExampleLevel", path_resolve "test_content/test-map.txt", 0, {
+        ['.'] =  { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor },
+        ['x'] =  { add = MapGen.FLAG_SOLID, content = TileSets.pebble.wall }
+    })
+    local gmap = GameMap.create { map = map }
+    local SM = SimulationMap.create(map, gmap)
+    local race, class = M.choose_player_stats()
+    local player = SM:add_player("Tester", race, class)
+    player.io_action_handler = do_nothing
+    local monster = SM:add_monster("Giant Rat")
 
     while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
         SM:step()
@@ -349,4 +357,4 @@ local function main()
     end
 end
 
-main()
+return M

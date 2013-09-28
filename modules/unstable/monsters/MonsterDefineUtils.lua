@@ -10,7 +10,6 @@ local Relations = import "lanarts.objects.Relations"
 local AptitudeTypes = import "@stats.AptitudeTypes"
 local ContentUtils = import "@stats.ContentUtils"
 local ActionUtils = import "@stats.ActionUtils"
-local CooldownUtils = import "@stats.CooldownUtils"
 
 local Traits = import ".MonsterTraits"
 

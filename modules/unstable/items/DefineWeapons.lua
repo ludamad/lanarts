@@ -6,7 +6,7 @@ weapon_define {
     description = "A small but sharp blade, adept at stabbing purposes.",
 
     gold_worth = 15, difficulty = 0,
-    types = {Apts.MELEE, Apts.PIERCING, Apts.BLADE},
+    aptitude_types = {Apts.MELEE, Apts.PIERCING, Apts.BLADE},
     effectiveness = 6, damage = 4, delay = 1.0
 }
 
@@ -15,7 +15,7 @@ weapon_define {
     description = "A small, light sword.",
 
     gold_worth = 35, difficulty = 1,
-    types = {Apts.MELEE, Apts.PIERCING, Apts.BLADE},
+    aptitude_types = {Apts.MELEE, Apts.PIERCING, Apts.BLADE},
     effectiveness = 4, damage = 6, delay = 1.1
 }
 
@@ -24,7 +24,7 @@ weapon_define {
     description = "A large trusty sword.",
 
     gold_worth = 80, difficulty = 3,
-    types = {Apts.MELEE, Apts.SLASHING, Apts.BLADE},
+    aptitude_types = {Apts.MELEE, Apts.SLASHING, Apts.BLADE},
     effectiveness = 1, damage = 10, delay = 1.4
 }
 
@@ -33,7 +33,7 @@ weapon_define {
     description = "An oversized brutish sword.",
 
     gold_worth = 120, difficulty = 5,
-    types = {Apts.MELEE, Apts.SLASHING, Apts.BLADE},
+    aptitude_types = {Apts.MELEE, Apts.SLASHING, Apts.BLADE},
     effectiveness = -3, damage = 16, delay = 1.6
 }
 
@@ -42,6 +42,6 @@ weapon_define {
     description = "A light, small and sturdy axe.",
 
     gold_worth = 20, difficulty = 0,
-    types = {Apts.MELEE, Apts.SLASHING, Apts.AXE},
+    aptitude_types = {Apts.MELEE, Apts.SLASHING, Apts.AXE},
     effectiveness = 3, damage = 7, delay = 1.3
 }

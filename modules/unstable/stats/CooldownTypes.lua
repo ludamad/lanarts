@@ -1,3 +1,5 @@
+local StatContext = import "@StatContext"
+
 local M = nilprotect {} -- Submodule
 
 -- Default cooldown amounts
@@ -56,6 +58,18 @@ function M.cooldown_table(types, --[[Optional]] scale)
         ret[type] = M.default_cooldown_table[type] * scale
     end
     return ret
+end
+
+-- Function for applying to all cooldowns
+function M.multiply_all_cooldown_rates(stats, rate, --[[Optional]] permanent)
+    for type,_cooldown in pairs(M.default_cooldown_table) do
+        StatContext.multiply_cooldown_rate(stats, type, rate, permanent)
+    end
+end
+
+function M.reset_rest_cooldown(stats)
+    local cooldown = M.default_cooldown_table[M.REST_ACTION]
+    StatContext.apply_cooldown(stats, M.REST_ACTION, cooldown)
 end
 
 return M

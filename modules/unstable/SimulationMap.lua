@@ -1,4 +1,5 @@
 local GameMap = import "core.GameMap"
+local GameState = import "core.GameState"
 local MonsterType = import "@MonsterType"
 local MapGen = import "core.MapGeneration"
 local Display = import "core.Display"
@@ -11,12 +12,9 @@ local TileSets = import "lanarts.tiles.Tilesets"
 
 local SimulationMap = newtype()
 
-function SimulationMap:init()
-    self.map = MapUtils.area_template_to_map("LanartsExampleLevel", path_resolve "test_content/test-map.txt", 0, {
-        ['.'] =  { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor },
-        ['x'] =  { add = MapGen.FLAG_SOLID, content = TileSets.pebble.wall }
-    })
-	self.gmap = GameMap.create { map = self.map }
+function SimulationMap:init(map, gmap)
+    self.map = map
+    self.gmap = gmap
     self.monsters = {}
     self.players = {}
 end
@@ -49,6 +47,7 @@ function SimulationMap:add_monster(monster)
 end
 
 function SimulationMap:step()
+    Display.view_follow(self.players[1].xy)
     GameMap.map_step({map = self.gmap})
 end
 

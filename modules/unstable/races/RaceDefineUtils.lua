@@ -5,7 +5,6 @@ local Stats = import "@Stats"
 local StatContext = import "@StatContext"
 local ContentUtils = import "@stats.ContentUtils"
 local ActionUtils = import "@stats.ActionUtils"
-local CooldownUtils = import "@stats.CooldownUtils"
 local Attacks = import "@Attacks"
 
 local M = nilprotect {} -- Submodule
@@ -17,7 +16,7 @@ function M.races_define(args)
         return RaceType.define(args)
     end
 
-    args.types = args.types or {Apts.BLUNT, Apts.MELEE} -- For CooldownUtils.derive_attack_with_cooldown
+    args.aptitude_types = args.aptitude_types or {Apts.BLUNT, Apts.MELEE} -- For ActionUtils.derive_action
     args.damage = args.damage or 5
     local action = args.unarmed_action or args
     args.unarmed_action = ActionUtils.derive_action(action, --[[Cleanup]] true)

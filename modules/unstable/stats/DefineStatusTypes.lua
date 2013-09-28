@@ -3,7 +3,6 @@ local StatContext = import "@StatContext"
 local CooldownSet = import "@CooldownSet"
 
 local CooldownTypes = import "@stats.CooldownTypes"
-local CooldownUtils = import "@stats.CooldownUtils"
 local Apts = import "@stats.AptitudeTypes"
 local StatUtils = import "@stats.StatUtils"
 local LogUtils = import "lanarts.LogUtils"
@@ -21,7 +20,7 @@ local Exhausted = StatusType.define {
     end,
     on_calculate = function(self, stats)
         local D = stats.derived
-        CooldownUtils.multiply_all_cooldown_rates(stats, 0.8)
+        CooldownTypes.multiply_all_cooldown_rates(stats, 0.8)
         StatContext.add_damage(stats, Apts.MELEE, -2)
         StatContext.add_defence(stats, Apts.MELEE, -3)
         D.movement_speed = D.movement_speed / 2
@@ -53,7 +52,7 @@ StatusType.define {
         D.movement_speed = D.movement_speed + 1
         StatContext.add_effectiveness(stats, Apts.MELEE_SPEED, 7)
 
-        CooldownUtils.reset_rest_cooldown(stats)
+        CooldownTypes.reset_rest_cooldown(stats)
     end,
     on_kill = function(self, stats)
         -- Extend the berserking

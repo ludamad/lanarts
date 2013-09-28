@@ -100,7 +100,7 @@ end
 -- Returns an attack effect TODO: Rename to derive_attack_effect
 function M.derive_attack(args, --[[Optional, default false]] cleanup_member)
     local attack = args.unarmed_attack or args.attack
-    local types = args.aptitude_types or args.multipliers or args.types -- TODO Only allow 'aptitude_types'!!
+    local types = args.aptitude_types or args.types -- TODO Only allow 'aptitude_types'!!
     if not types then return nil end
 
     -- First resolve 

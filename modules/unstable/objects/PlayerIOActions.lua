@@ -7,17 +7,7 @@ local M = nilprotect {} -- Submodule
 M.MoveIOAction = {
     _types = {SUtils.XY},
     check = function(player, xy)
-        return not GameMap.object_solid_check(player)
-    end,
-    apply = function(player, xy)
-        player.xy = xy
-    end
-}
-
-M.AutotargetObjectIOAction = {
-    _types = {SUtils.NUM},
-    check = function(player, target_id)
-        return not GameMap.object_solid_check(player)
+        return not GameMap.object_solid_check(player, xy)
     end,
     apply = function(player, xy)
         player.xy = xy
@@ -33,11 +23,11 @@ for i,action in ipairs(M.action_types) do
 end
 
 function M.can_use_io_action(player, action, ...)
-    action:check(player, ...)
+    return action.check(player, ...)
 end
 
 function M.use_io_action(player, action, ...)
-    action:apply(player, ...)
+    action.apply(player, ...)
 end
 
 return M

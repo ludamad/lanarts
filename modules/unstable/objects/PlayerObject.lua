@@ -3,6 +3,7 @@ local Attacks = import "@Attacks"
 local Apts = import "@stats.AptitudeTypes"
 local Relations = import "lanarts.objects.Relations"
 local PlayerIOActions = import ".PlayerIOActions"
+local PlayerIOResolution = import ".PlayerIOResolution"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local SkillType = import "@SkillType"
 local StatContext = import "@StatContext"
@@ -16,11 +17,6 @@ function PlayerObject.player_stats_create(race, --[[Can-be-nil]] class, name, --
     if class then
         local context = StatContext.stat_context_create(stats)
         class:on_init(context)
-    end
-    for skill in values(stats.skills) do
-        if skill.level ~= 0 then
-        io.write('[',skill.name, '=>',skill.level,']\n')
-        end
     end
 
     return stats
@@ -49,7 +45,7 @@ end
 function PlayerObject.create(args)
     args.sprite = resolve_sprite(args.race)
     args.queued_io_actions = {}
-    args.io_action_handler = args.io_action_handler or do_nothing
+    args.io_action_handler = args.io_action_handler or PlayerIOResolution.default_io_action_resolver
     assert(args.race and args.class and args.name and args.io_action_handler)
 
     -- Set up type signature

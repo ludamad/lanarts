@@ -15,7 +15,6 @@ CombatObject.COMBAT_TRAIT = "COMBAT_TRAIT"
 
 function CombatObject.create(args)
     assert(args.base_stats)
-    args.solid = true
 
     -- Set up type signature
     args.type = args.type or CombatObject

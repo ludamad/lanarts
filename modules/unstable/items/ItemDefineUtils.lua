@@ -9,7 +9,6 @@ local Attacks = import "@Attacks"
 local ItemTraits = import ".ItemTraits"
 local Proficiency = import "@Proficiency"
 local ContentUtils = import "@stats.ContentUtils"
-local CooldownUtils = import "@stats.CooldownUtils"
 local ItemRandomDescriptions = import ".ItemRandomDescriptions"
 
 local M = nilprotect {} -- Submodule
@@ -139,7 +138,7 @@ end
 local DEFAULT_MELEE_RANGE = 10
 function M.weapon_define(args)
     -- Define weapon attack in convenient manner
-    assert(args.types and args.difficulty and args.gold_worth)
+    assert(args.aptitude_types and args.difficulty and args.gold_worth)
     if not args.proficiency_types then
         args.proficiency_types = {}
         table.insert_all(args.proficiency_types, args.types)

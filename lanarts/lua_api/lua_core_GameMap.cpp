@@ -220,7 +220,7 @@ static int gmap_object_solid_check(lua_State* L) {
 	GameInst* inst = luawrap::get<GameInst*>(L, 1);
 	Pos p = stack_defaulted(L, 2, inst->pos());
 
-	lua_pushboolean(L, !gs->solid_test(inst, p.x, p.y));
+	lua_pushboolean(L, gs->solid_test(inst, p.x, p.y));
 	return 1;
 }
 

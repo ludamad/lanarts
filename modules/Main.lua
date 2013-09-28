@@ -130,7 +130,7 @@ function Engine.main(args)
         if failures > 0 or not passed then os.exit(2) end
         return false
     elseif args[1] == "--simulation" then
-        import "unstable.Simulation"
+        import "unstable.TestMap"
         return false
     elseif args[1] == "--example" then
         import ("examples." .. args[2])

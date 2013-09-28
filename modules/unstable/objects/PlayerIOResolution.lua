@@ -5,7 +5,7 @@ local PlayerIOActions = import ".PlayerIOActions"
 local M = nilprotect {} -- Submodule
 
 local function add_if_valid(player, actions, action, candidate)
-    if PlayerIOActions.can_use_action(player, action, candidate) then
+    if PlayerIOActions.can_use_io_action(player, action, candidate) then
         table.insert(actions, {action, candidate})
         return true
     end
@@ -20,16 +20,21 @@ local function add_first_valid_candidate(player, actions, action, candidates)
     return false
 end
 
+function M.resolve_autoattacks(player, actions)
+    if Keys.key_held('h') then 
+    end
+end
+
 function M.resolve_movement(player, actions)
     local stats = player:stat_context()
     local move_speed = stats.derived.movement_speed
 
     local dx,dy=0,0
 
-    if Keys.key_pressed('w') then dy=-1 end
-    if Keys.key_pressed('s') then dy=1 end
-    if Keys.key_pressed('a') then dx=-1 end
-    if Keys.key_pressed('d') then dx=1 end
+    if Keys.key_held('w') then dy=-1 end
+    if Keys.key_held('s') then dy=1 end
+    if Keys.key_held('a') then dx=-1 end
+    if Keys.key_held('d') then dx=1 end
 
     -- Return if no movement
     if dx == 0 and dy == 0 then return end

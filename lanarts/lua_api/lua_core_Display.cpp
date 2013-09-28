@@ -74,6 +74,14 @@ static Pos world_coords(const LuaStackValue& value) {
 	return p;
 }
 
+static void view_snap(LuaStackValue xy) {
+    lua_api::gamestate(xy)->view().sharp_center_on(xy.as<Pos>());
+}
+
+static void view_follow(LuaStackValue xy) {
+    lua_api::gamestate(xy)->view().center_on(xy.as<Pos>());
+}
+
 namespace lua_api {
 
 	static void register_display_submodule(lua_State* L) {
@@ -87,6 +95,8 @@ namespace lua_api {
 		display.getters["display_size"].bind_function(ldraw::display_size);
 		display.getters["display_xy"].bind_function(display_xy);
 
+		vals["view_snap"].bind_function(view_snap);
+		vals["view_follow"].bind_function(view_follow);
 		vals["images_load"].bind_function(images_load);
 		vals["initialize"].bind_function(ldraw::display_initialize);
 		vals["draw_start"].bind_function(ldraw::display_draw_start);

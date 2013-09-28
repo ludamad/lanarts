@@ -39,8 +39,8 @@ function MonsterObject:on_step()
     end
     self.base.on_step(self)
     local player
-    for obj in GameMap.objects() do 
-        if PlayerObject.is_player(obj) then 
+    for obj in GameMap.objects() do
+        if obj.traits and PlayerObject.is_player(obj) then 
             player = obj 
             break
         end

@@ -275,24 +275,24 @@ local function place_content(map)
         map:square_apply(xy, {add = MapGen.FLAG_SOLID})
         MapUtils.spawn_decoration(map, M._anvil, xy)
     end
-    for i=1,15 do
-        if chance(.4) then 
-            generate_store(map, find_clear_patch(map, area))
-        end
-    end
-    for i=1,30 do
-        if chance(.4) then 
-            local item = ItemUtils.item_generate(ItemGroups.basic_items)
-            MapUtils.spawn_item(map, item.type, item.amount, MapUtils.random_square(map, area))
-        end
-        if chance(.4) then 
-            MapUtils.spawn_item(map, "Gold", random(2,10), MapUtils.random_square(map, area))
-        end
-    end
-    for i=1,20 do
-        local enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
-        MapUtils.spawn_enemy(map, enemy, find_clear_patch(map, area))
-    end
+--    for i=1,15 do
+--        if chance(.4) then 
+--            generate_store(map, find_clear_patch(map, area))
+--        end
+--    end
+--    for i=1,30 do
+--        if chance(.4) then 
+--            local item = ItemUtils.item_generate(ItemGroups.basic_items)
+--            MapUtils.spawn_item(map, item.type, item.amount, MapUtils.random_square(map, area))
+--        end
+--        if chance(.4) then 
+--            MapUtils.spawn_item(map, "Gold", random(2,10), MapUtils.random_square(map, area))
+--        end
+--    end
+--    for i=1,20 do
+--        local enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
+--        MapUtils.spawn_enemy(map, enemy, find_clear_patch(map, area))
+--    end
 --    MapUtils.spawn_enemy(map, "Red Dragon", MapUtils.random_square(map, area))
 
     local map_id = MapUtils.game_map_create(map)
@@ -433,7 +433,7 @@ local function get_leafs(node, --[[Optional]] table)
     return table
 end
 
-function M.overworld_create()
+function M.overworld_create_helper()
     local tileset = TileSets.grass
 
     local w,h = 200,200
@@ -459,6 +459,11 @@ function M.overworld_create()
 --   OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 40)
 
     local map_id = place_content(map)
+    return map, map_id
+end
+
+function M.overworld_create()
+    local map, map_id = M.overworld_create_helper()
     World.players_spawn(map_id, find_player_positions(map))
     return map_id
 end
