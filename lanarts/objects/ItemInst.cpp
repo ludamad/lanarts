@@ -60,7 +60,7 @@ void ItemInst::draw(GameState* gs) {
 
 	was_seen = true;
 
-	Pos p = round_to_multiple(pos(), TILE_SIZE);
+	Pos p = round_to_multiple(ipos(), TILE_SIZE);
 
 	ldraw::draw_rectangle_outline(COL_WHITE.alpha(45),
 			on_screen(gs, BBox(p.x + 1, p.y + 1, p.x + TILE_SIZE, p.y + TILE_SIZE)));

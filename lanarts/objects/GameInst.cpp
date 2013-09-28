@@ -88,9 +88,10 @@ void GameInst::deinit(GameState* gs) {
 }
 
 unsigned int GameInst::integrity_hash() {
+	Pos xy = ipos();
 	unsigned int hash = 0x9a3e;
-	hash ^= (x << 16) + y;
-	hash ^= this->radius * hash;
+	hash ^= (xy.x << 16) + xy.y;
+	hash ^= int(this->radius) * hash;
 	return hash;
 }
 
@@ -99,7 +100,7 @@ void GameInst::retain_reference(GameInst* inst) {
 }
 
 void GameInst::update_position(float newx, float newy) {
-	this->x = round(newx), this->y = round(newy);
+	this->x = newx, this->y = newy;
 }
 
 void GameInst::serialize(GameState* gs, SerializeBuffer& serializer) {

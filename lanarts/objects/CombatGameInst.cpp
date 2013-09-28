@@ -125,7 +125,7 @@ void CombatGameInst::draw(GameState *gs, float frame) {
 
 	if (is_resting) {
 		res::sprite("resting").draw(ldraw::DrawOptions(ldraw::CENTER),
-				on_screen(gs, pos()));
+				on_screen(gs, ipos()));
 	}
 	CoreStats& ecore = effective_stats().core;
 
@@ -180,7 +180,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 	WeaponEntry& wentry = weapon.weapon_entry();
 	if (wentry.name != "none") {
 		gs->add_instance(
-				new AnimatedInst(inst->pos(), wentry.attack_sprite(), 25));
+				new AnimatedInst(inst->ipos(), wentry.attack_sprite(), 25));
 	}
 
 	signal_attacked_successfully();
@@ -293,8 +293,8 @@ PosF CombatGameInst::attempt_move_to_position(GameState* gs,
 }
 
 void CombatGameInst::update_position() {
-	x = (int) round(rx); //update based on rounding of true float
-	y = (int) round(ry);
+	x = iround(rx); //update based on rounding of true float
+	y = iround(ry);
 	event_log("Instance id %d integer positions set to (%d,%d)\n", id, x, y);
 }
 

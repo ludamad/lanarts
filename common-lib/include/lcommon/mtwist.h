@@ -93,7 +93,7 @@ public:
 	}
 	float rand(const RangeF& r) {
 		_amount_generated++;
-		return (r.max - r.min) * genrand_real1() + r.min;
+		return float((r.max - r.min) * genrand_real1() + r.min);
 	}
 
 	int amount_generated() const {

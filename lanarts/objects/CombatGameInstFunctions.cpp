@@ -24,7 +24,7 @@ const int PATHING_RADIUS = 500;
 
 /* Provides geometric distance between objects */
 float inst_distance(CombatGameInst* inst1, CombatGameInst* inst2) {
-	return distance_between(inst1->pos(), inst2->pos());
+	return distance_between(inst1->ipos(), inst2->ipos());
 }
 
 /* Provides the exact path cost to the player */
@@ -49,7 +49,7 @@ float estimate_inst_path_distance(CombatGameInst* inst1,
 }
 
 static bool player_inst_can_see(PlayerInst* player, CombatGameInst* inst2) {
-	return player->within_field_of_view(inst2->pos());
+	return player->within_field_of_view(inst2->ipos());
 }
 
 bool inst_can_see(CombatGameInst *inst1, CombatGameInst *inst2) {

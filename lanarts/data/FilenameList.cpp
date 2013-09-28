@@ -31,7 +31,7 @@ bool filenames_from_pattern(FilenameList & filenames, const std::string& str) {
 	}
 
 	std::string prestring(str.begin(), str.begin() + pos1);
-	int post_pos = pos2 + pos1 + 1; // adjust pos2 for whole string
+	size_t post_pos = pos2 + pos1 + 1; // adjust pos2 for whole string
 
 	for (int n = min; n <= max; n++) {
 		filenames.push_back(

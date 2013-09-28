@@ -208,7 +208,7 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	player_data().deserialize(this, serializer);
 	world.set_current_level(local_player()->current_floor);
 
-	_view.sharp_center_on(local_player()->pos());
+	_view.sharp_center_on(local_player()->ipos());
 
 	settings.class_type = local_player()->class_stats().classid;
 }

@@ -429,7 +429,7 @@ std::vector<GameInst*> GameInstSet::object_rectangle_test(BBox rect, GameInst* t
 			while (ptr) {
 				GameInst* inst = ptr->inst;
 				if (tester != inst) {
-					if (circle_rectangle_test(inst->pos(), inst->target_radius, rect)) {
+					if (circle_rectangle_test(inst->ipos(), inst->target_radius, rect)) {
 						instances.push_back(inst);
 					}
 				}

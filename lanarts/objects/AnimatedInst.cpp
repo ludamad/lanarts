@@ -59,7 +59,7 @@ void AnimatedInst::draw(GameState* gs) {
 					textcol.b + fade * wd.b / 100, 255 - fade);
 		}
 
-		gs->font().draw(alphacol, on_screen(gs, pos()), text);
+		gs->font().draw(alphacol, on_screen(gs, ipos()), text);
 	}
 }
 

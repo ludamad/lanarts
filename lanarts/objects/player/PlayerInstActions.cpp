@@ -51,7 +51,7 @@ static FeatureInst* find_usable_portal(GameState* gs, GameInst* player) {
 		if (inst->feature_type() == FeatureInst::PORTAL) {
 			Pos sqr = Pos(inst->x / TILE_SIZE, inst->y /TILE_SIZE);
 			BBox portal_box(Pos(sqr.x*TILE_SIZE, sqr.y*TILE_SIZE), Size(TILE_SIZE, TILE_SIZE));
-			bool hit_test = circle_rectangle_test(player->pos(), player->target_radius, portal_box);
+			bool hit_test = circle_rectangle_test(player->ipos(), player->target_radius, portal_box);
 			if (hit_test) {
 				return inst;
 			}

@@ -22,8 +22,8 @@ void draw_sprite(const GameView& view, sprite_id sprite, int x, int y,
 		float dx, float dy, float frame, const Colour& c) {
 	using namespace ldraw;
 
-	float PI = 3.1415921;
-	float direction = PI * 2.5 + atan2(dy, dx);
+	float PI = 3.1415921f;
+	float direction = PI * 2.5f + atan2f(dy, dx);
 
 	SpriteEntry& entry = game_sprite_data.at(sprite);
 	entry.sprite.draw(DrawOptions().colour(c).angle(direction).frame(frame), Pos(x-view.x,y-view.y));

@@ -47,11 +47,11 @@ struct RangeF {
 	}
 
 	explicit RangeF(const Range& r) :
-			min(r.min), max(r.max) {
+			min((float)r.min), max((float)r.max) {
 		LCOMMON_ASSERT(min <= max);
 	}
-	Range multiply(float n) const {
-		return Range(min * n, max * n);
+	RangeF multiply(float n) const {
+		return RangeF(min * n, max * n);
 	}
 };
 

@@ -182,7 +182,7 @@ bool GameWorld::step() {
 	}
 	if (next_room_id != -1) {
 		set_current_level(next_room_id);
-		gs->view().sharp_center_on(gs->local_player()->pos());
+		gs->view().sharp_center_on(gs->local_player()->ipos());
 		next_room_id = -1;
 	}
 

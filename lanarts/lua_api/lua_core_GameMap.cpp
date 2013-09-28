@@ -171,7 +171,7 @@ static int gmap_distance_to_player(lua_State* L) {
 	int max_dist = -1;
 	for (int i = 0; i < entries.size(); i++) {
 		GameInst* player = entries[i].player_inst.get();
-		Pos dpos = xy - player->pos();
+		Pos dpos = xy - player->ipos();
 		max_dist = std::max(max_dist, abs(dpos.x));
 		max_dist = std::max(max_dist, abs(dpos.y));
 	}
@@ -199,7 +199,7 @@ static T stack_defaulted(lua_State* L, int narg, const T& default_value) {
 static int gmap_object_visible(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	GameInst* inst = luawrap::get<GameInst*>(L, 1);
-	Pos xy = stack_defaulted(L, 2, inst->pos());
+	Pos xy = stack_defaulted(L, 2, inst->ipos());
 	PlayerInst* player = stack_defaulted(L, 3, (PlayerInst*)NULL);
 	lua_pushboolean(L, gs->radius_visible_test(xy.x, xy.y, inst->radius, player));
 	return 1;
@@ -218,7 +218,7 @@ static int gmap_object_solid_check(lua_State* L) {
 	int nargs = lua_gettop(L);
 	GameState* gs = lua_api::gamestate(L);
 	GameInst* inst = luawrap::get<GameInst*>(L, 1);
-	Pos p = stack_defaulted(L, 2, inst->pos());
+	Pos p = stack_defaulted(L, 2, inst->ipos());
 
 	lua_pushboolean(L, gs->solid_test(inst, p.x, p.y));
 	return 1;
@@ -229,7 +229,7 @@ const int MAX_RET = 16;
 static int gmap_object_collision_check(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	GameInst* inst = luawrap::get<GameInst*>(L, 1);
-	Pos xy = stack_defaulted(L, 2, inst->pos());
+	Pos xy = stack_defaulted(L, 2, inst->ipos());
 	GameInst* objects[MAX_RET];
 
 	int nret = gs->object_radius_test(inst, objects, MAX_RET, NULL, xy.x, xy.y);
@@ -251,7 +251,7 @@ static std::vector<GameInst*> gmap_rectangle_collision_check(LuaStackValue curre
 static int gmap_object_tile_check(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	GameInst* inst = luawrap::get<GameInst*>(L, 1);
-	Pos pos = inst->pos();
+	Pos pos = inst->ipos();
 	if (lua_gettop(L) >= 2) {
 		pos = luawrap::get<Pos>(L, 2);
 	}

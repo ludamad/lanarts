@@ -56,7 +56,7 @@ void PlayerInst::init(GameState* gs) {
 	_score_stats.deepest_floor = std::max(_score_stats.deepest_floor, current_floor);
 
 	_path_to_player.initialize(gs->tiles().solidity_map());
-	_path_to_player.fill_paths_in_radius(pos(), PLAYER_PATHING_RADIUS);
+	_path_to_player.fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
 	collision_simulation_id() = gs->collision_avoidance().add_player_object(
 			this);
 
@@ -119,7 +119,7 @@ static void spawn_in_overworld(GameState* gs, PlayerInst* player) {
 	} else {
 		player->update_position(sqr.x, sqr.y);
 		if (player->is_local_player()) {
-			gs->view().sharp_center_on(player->pos());
+			gs->view().sharp_center_on(player->ipos());
 		}
 	}
 }
@@ -164,7 +164,7 @@ void PlayerInst::shift_autotarget(GameState* gs) {
 
 void PlayerInst::step(GameState* gs) {
 	perf_timer_begin(FUNCNAME);
-	_path_to_player.fill_paths_in_radius(pos(), PLAYER_PATHING_RADIUS);
+	_path_to_player.fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
 
 	GameInst* target_inst = gs->get_instance(current_target);
 	bool visible = target_inst != NULL
@@ -247,7 +247,7 @@ void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 //	serializer.read_container(queued_actions);
 	queued_actions.clear();
 	_path_to_player.initialize(gs->tiles().solidity_map());
-	_path_to_player.fill_paths_in_radius(pos(), PLAYER_PATHING_RADIUS);
+	_path_to_player.fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
 	update_field_of_view(gs);
 	DESERIALIZE_POD_REGION(serializer, this, local, spellselect);
 

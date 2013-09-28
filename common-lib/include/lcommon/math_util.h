@@ -16,15 +16,11 @@ float compute_direction(const PosF& p1, const PosF& p2);
 const float FLOAT_PI = 3.14159265358979323846f;
 
 #ifdef __GNUC__
-//inline long int round2int(float f) {
-//	return lrintf(f);
-//}
-//for now:
-inline long int round2int(float flt) {
-	return (long int)round(flt);
+inline int iround(float f) {
+	return (int)lrintf(f);
 }
 #elif (defined (WIN32) || defined (_WIN32))
-__inline long int round2int (float flt) {
+__inline int iround (float flt) {
 	int intgr;
 	_asm
 	{	fld flt

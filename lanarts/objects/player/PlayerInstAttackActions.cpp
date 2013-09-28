@@ -75,7 +75,7 @@ static GameInst* get_closest_monster(GameState* gs, PlayerInst* p) {
 	std::vector<GameInst*> visible_monsters;
 	get_visible_monsters(gs, visible_monsters, p);
 
-	return find_closest_from_list(gs, visible_monsters, p->pos());
+	return find_closest_from_list(gs, visible_monsters, p->ipos());
 }
 static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
 		GameInst* targ, float dx, float dy) {
@@ -483,7 +483,7 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
 			if (mousetarget) {
 				targ_pos = Pos(rmx, rmy);
 			} else if (autotarget && curr_target) {
-				targ_pos = curr_target->pos();
+				targ_pos = curr_target->ipos();
 			}
 		} else {
 			if (mousetarget) {
@@ -500,7 +500,7 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
 				GameInst* closest = get_closest_monster(gs, this);
 
 				if (closest
-						&& decide_attack_movement(pos(), closest->pos(),
+						&& decide_attack_movement(ipos(), closest->ipos(),
 								TILE_SIZE / 4, vx, vy)) {
 					queued_actions.push_back(
 							game_action(gs, this, GameAction::MOVE, spellselect,

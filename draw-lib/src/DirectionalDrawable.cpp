@@ -43,7 +43,7 @@ void DirectionalDrawable::draw(const DrawOptions& options,
 	float fidx = (options.draw_angle + _angle_offset) / FLOAT_PI / 2;
 	int nframes = directions.size();
 
-	int idx = round2int(fidx * nframes) % nframes;
+	int idx = iround(fidx * nframes) % nframes;
 
 	if (idx < 0) { // % can leave negative values
 		idx += nframes;

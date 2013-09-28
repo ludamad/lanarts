@@ -57,7 +57,7 @@ static int to_screen_xy(lua_State* L) {
 static int object_within_view(lua_State* L) {
 	GameView& view = lua_api::gamestate(L)->view();
 	GameInst* inst = luawrap::get<GameInst*>(L, 1);
-	lua_pushboolean(L, circle_rectangle_test(inst->pos(), inst->target_radius, view.region_covered()));
+	lua_pushboolean(L, circle_rectangle_test(inst->ipos(), inst->target_radius, view.region_covered()));
 	return 1;
 }
 

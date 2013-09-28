@@ -181,7 +181,7 @@ void ProjectileInst::step(GameState* gs) {
 
 				snprintf(buffstr, 32, "%d XP", amnt);
 				gs->add_instance(
-						new AnimatedInst(victim->pos(), -1, 25, PosF(), PosF(),
+						new AnimatedInst(victim->ipos(), -1, 25, PosF(), PosF(),
 								AnimatedInst::DEPTH, buffstr, COL_GOLD));
 			}
 		}
@@ -244,7 +244,7 @@ void ProjectileInst::step(GameState* gs) {
 		}
 		if (hits == 0 || sole_target == 0) {
 			gs->add_instance(
-					new AnimatedInst(pos(), sprite(), 15, PosF(),
+					new AnimatedInst(ipos(), sprite(), 15, PosF(),
 							PosF(vx, vy)));
 			gs->remove_instance(this);
 		}

@@ -384,7 +384,7 @@ static GameInst* initialize_object(GameState* gs, GameInst* inst, LuaStackValue 
 
 	if (!args["radius"].isnil()) {
 		inst->target_radius = args["radius"].to_int();
-		inst->radius = std::min(15, inst->target_radius);
+		inst->radius = std::min(15.0f, inst->target_radius);
 	}
 	if (args["do_init"].isnil() || args["do_init"].to_bool()) {
 		level_id id;

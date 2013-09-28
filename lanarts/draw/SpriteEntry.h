@@ -30,7 +30,7 @@ struct SpriteEntry {
 
 	Size size() const {
 		SizeF sz = sprite.size();
-		return Size(sz.w, sz.h);
+		return Size(int(sz.w), int(sz.h));
 	}
 
 	SpriteEntry(const std::string& name, const ldraw::Drawable& sprite,

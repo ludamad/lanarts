@@ -72,7 +72,7 @@ CoreStatMultiplier parse_core_stat_multiplier(const LuaField& value);
 struct DerivedStats {
 	float power, resistance;
 	int damage, reduction;
-	DerivedStats(int power = 0, int resistance = 0, int damage = 0,
+	DerivedStats(float power = 0, float resistance = 0, int damage = 0,
 			int reduction = 0) :
 			power(power), resistance(resistance), damage(damage), reduction(
 					reduction) {

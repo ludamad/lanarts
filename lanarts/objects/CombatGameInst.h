@@ -26,7 +26,7 @@ struct CollisionAvoidanceParameters {
 class CombatGameInst: public GameInst {
 public:
 	CombatGameInst(const CombatStats& base_stats, sprite_id sprite,
-			int x, int y, int radius, bool solid =
+			float x, float y, float radius, bool solid =
 					true, int depth = 0) :
 			GameInst(x, y, radius, solid, depth), rx(x), ry(y), vx(0), vy(0), is_resting(
 					false), sprite(sprite), simulation_id(

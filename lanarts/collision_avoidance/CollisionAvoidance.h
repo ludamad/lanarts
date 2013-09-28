@@ -24,8 +24,8 @@ public:
 	CollisionAvoidance();
 	~CollisionAvoidance();
 
-	simul_id add_active_object(const Pos& pos, int radius, float movespeed);
-	simul_id add_passive_object(const Pos& pos, int radius);
+	simul_id add_active_object(const PosF& pos, float radius, float movespeed);
+	simul_id add_passive_object(const PosF& pos, float radius);
 	simul_id add_object(CombatGameInst* inst);
 	simul_id add_player_object(CombatGameInst* inst);
 
@@ -41,8 +41,5 @@ public:
 private:
 	RVO::RVOSimulator* simulator;
 };
-
-void avoid_object_collisions(CollisionAvoidance& colavoid,
-		const std::vector<CombatGameInst*>& objects);
 
 #endif /* COLLISIONAVOIDANCE_H_ */

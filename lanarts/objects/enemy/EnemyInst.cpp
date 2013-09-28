@@ -111,7 +111,7 @@ void EnemyInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read_int(xpgain);
 	serializer.read_int(enemy_regen_cooloff);
 	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
-	collision_simulation_id() = coll_avoid.add_active_object(pos(),
+	collision_simulation_id() = coll_avoid.add_active_object(ipos(),
 			target_radius, effective_stats().movespeed);
 //	ai_state.deserialize(gs, serializer);
 }
@@ -134,7 +134,7 @@ void EnemyInst::init(GameState* gs) {
 	mc.register_enemy(this);
 
 	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
-	collision_simulation_id() = coll_avoid.add_active_object(pos(),
+	collision_simulation_id() = coll_avoid.add_active_object(ipos(),
 			target_radius, effective_stats().movespeed);
 
 	lua_State* L = gs->luastate();
@@ -242,7 +242,7 @@ void EnemyInst::die(GameState *gs) {
 	if (!destroyed) {
 		lua_api::event_monster_death(gs->luastate(), this);
 
-		AnimatedInst* anim = new AnimatedInst(pos(), etype().enemy_sprite, 20);
+		AnimatedInst* anim = new AnimatedInst(ipos(), etype().enemy_sprite, 20);
 		anim->frame(0);
 		gs->add_instance(anim);
 		gs->remove_instance(this);
@@ -254,7 +254,7 @@ void EnemyInst::die(GameState *gs) {
 		if (etype().death_sprite > -1) {
 			const int DEATH_SPRITE_TIMEOUT = 1600;
 			gs->add_instance(
-					new AnimatedInst(pos(), etype().death_sprite,
+					new AnimatedInst(ipos(), etype().death_sprite,
 							DEATH_SPRITE_TIMEOUT, PosF(), PosF(),
 							ItemInst::DEPTH));
 		}

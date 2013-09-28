@@ -16,6 +16,7 @@
 
 #include <luawrap/LuaValue.h>
 #include <lcommon/geometry.h>
+#include <lcommon/math_util.h>
 
 #include "lanarts_defines.h"
 
@@ -30,8 +31,8 @@ public:
 	static void retain_reference(GameInst* inst);
 	static void free_reference(GameInst* inst);
 
-	GameInst(int x, int y, int radius, bool solid = true, int depth = 0) :
-			reference_count(0), id(0), last_x(x), last_y(y), x(x), y(y), radius(
+	GameInst(float x, float y, float radius, bool solid = true, int depth = 0) :
+			reference_count(0), id(0), last_x(iround(x)), last_y(iround(y)), x(x), y(y), radius(
 					radius), target_radius(radius), depth(depth), solid(solid), destroyed(
 					false), current_floor(-1) {
 		if (this->radius > 14)
@@ -59,11 +60,15 @@ public:
 	void lua_lookup(lua_State* L, const char* key);
 
 	BBox bbox() {
-		return BBox(x - radius, y - radius, x + radius, y + radius);
+		return BBox(iround(x - radius), iround(y - radius), iround(x + radius),
+				iround(y + radius));
 	}
 
-	Pos pos() {
-		return Pos(x, y);
+	PosF pos() {
+		return PosF(x, y);
+	}
+	Pos ipos() {
+		return Pos(iround(x), iround(y));
 	}
 	//Used for keeping object from being deleted arbitrarily
 	//Important for the GameInst lua binding
@@ -72,7 +77,7 @@ public:
 	/*Should probably keep these public, many functions operate on these*/
 	obj_id id;
 	int last_x, last_y;
-	int x, y, radius, target_radius;
+	float x, y, radius, target_radius;
 	int depth;
 	bool solid, destroyed;
 	level_id current_floor;

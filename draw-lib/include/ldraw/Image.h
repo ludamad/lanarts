@@ -48,11 +48,11 @@ public:
 	}
 
 	int width() const {
-		return _draw_region.width();
+		return (int)_draw_region.width();
 	}
 
 	int height() const {
-		return _draw_region.height();
+		return (int)_draw_region.height();
 	}
 
 	BBoxF& draw_region() {
