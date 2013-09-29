@@ -1,6 +1,4 @@
 local Display = import "core.Display"
-Display.initialize("Lanarts", {640, 640}, false)
-
 local AnsiCol = import "core.terminal.AnsiColors"
 local GameState = import "core.GameState"
 local Keys = import "core.Keyboard"

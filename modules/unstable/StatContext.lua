@@ -42,6 +42,10 @@ function M.add_item(stats, ...)
     return stats.base.inventory:add_item(...)
 end
 
+function M.remove_item(stats, ...)
+    return stats.base.inventory:remove_item(...)
+end
+
 function M.use_item(stats, ...)
     return stats.base.inventory:use_item(stats, ...)
 end

@@ -32,11 +32,6 @@ class_define {
         return self 
     end,
 
-    on_init = function(self, stats)
-        Utils.default_class_on_init(self, stats)
-        -- TODO more items
-    end,
-
     spells = {"Minor Missile"},
 
     skills = {
@@ -55,8 +50,8 @@ class_define {
 class_define {
     name = "Knight",
     description = "A disciplined, heavily armoured warrior.",
-    items = {"Health Potion"},
-    spells = {"Minor Missile", "Berserk"},
+    items = {"Health Potion", "Hand Axe"},
+    spells = {"Berserk"},
 
     -- Takes 'weapon_skill'
     on_create = function(class, args)
@@ -65,13 +60,28 @@ class_define {
         return self 
     end,
 
-    on_init = function(self, stats)
-        Utils.default_class_on_init(self, stats)
-        -- TODO more items
-    end,
+    skills = {
+        ["Melee"] = SPECIALITY,
+        ["Melee Resistance"] = MODERATE,
+        ["Armour"] = MODERATE,
+        ["Fortitude"] = MODERATE,
+
+        ["Magic"] = MINOR,
+        ["Magic Resistance"] = MINOR,
+        ["Willpower"] = MINOR,
+        ["Magic Items"] = MINOR
+    }
+}
+
+class_define {
+    name = "Archer",
+    description = "A master of ranged combat. Fires swiftly from afar.",
+    items = {"Short Bow", {type="Arrow", amount=40}},
+    spells = {"Magic Arrow"},
 
     skills = {
         ["Melee"] = SPECIALITY,
+        ["Ranged Fighting"] = SPECIALITY,
         ["Melee Resistance"] = MODERATE,
         ["Armour"] = MODERATE,
         ["Fortitude"] = MODERATE,

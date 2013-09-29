@@ -48,6 +48,7 @@ M.allowed_aptitudes = {
     BLADE = ALL,
     AXE = ALL,
     MACE = ALL,
+    BOWS = ALL,
     POLEARM = ALL,
     STAFF = ALL,
 -- Misc proficiencies

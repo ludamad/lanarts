@@ -116,6 +116,8 @@ require_path_add("modules/?.lua")
 -- @param args the arguments passed on the command-line.
 -- @return whether we are performing a full game initialization, or performing some testing task
 function Engine.main(args)
+    local Display = import "core.Display"
+
     import "core.Main"
 
     local all_tests, cpp_tests, lua_tests = (args[1] == "--tests"), (args[1] == "--cpp-tests"), (args[1] == "--lua-tests")
@@ -130,6 +132,12 @@ function Engine.main(args)
         if failures > 0 or not passed then os.exit(2) end
         return false
     elseif args[1] == "--simulation" then
+        Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
+        local S = import "unstable.Simulation"
+        S.main()
+        return false   
+    elseif args[1] == "--testmap" then
+        Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
         import "unstable.TestMap"
         return false
     elseif args[1] == "--example" then
@@ -146,7 +154,6 @@ function Engine.main(args)
         end
     end
 
-    local Display = import "core.Display"
     Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
     -- TODO: Remove any notion of 'internal graphics'. All graphics loading should be prompted by Lua.
     __initialize_internal_graphics()

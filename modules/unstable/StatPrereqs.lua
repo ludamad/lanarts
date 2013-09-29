@@ -4,6 +4,7 @@
 
 local StatContext = import "@StatContext"
 local StatusType = import "@StatusType"
+local ItemType = import "@ItemType"
 
 local M = nilprotect {} -- Submodule
 
@@ -57,7 +58,7 @@ function M.DistancePrereq:init(max_dist, --[[Optional]] min_dist)
     assert(type(max_dist) == 'number') 
     -- Takes list of required cooldowns
     self.max_dist = max_dist or math.huge
-    self.min_dist = min_dist or 0
+    self.min_dist = min_dist or -math.huge
 end
 
 function M.DistancePrereq:check(user, target)
@@ -99,6 +100,29 @@ function M.UserStatusPrereq:check(user)
     end
     for r in values(self.required) do
         if not StatContext.get_status(user, r) then return false end
+    end
+    return true
+end
+
+------ EQUIPMENT WORN REQUIREMENT ----------------------------------
+M.EquipmentPrereq = newtype()
+function M.EquipmentPrereq:init(slot, categorical_name, --[[Optional]] type, --[[Optional]] trait, --[[Optional]] amount)
+    self.slot = slot
+    self.categorical_name = categorical_name
+    self.type = type and ItemType.resolve(type) or false
+    self.trait = trait or false
+    self.amount = amount or 1
+end
+
+function M.EquipmentPrereq:check(user)
+    local item = StatContext.get_equipped_item(user, self.slot)
+    local notrait = self.trait and item and not table.contains(item.traits, self.trait)  
+    local notype = self.type and item and not item.type == self.type  
+    if not item or notrait or notype then
+        return false, "You need to have " .. self.categorical_name .. " equipped!"
+    end
+    if item.amount < self.amount then
+        return false, "You do not have enough " .. self.categorical_name .. " equipped!"
     end
     return true
 end

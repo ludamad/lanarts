@@ -35,11 +35,13 @@ function M.use_action(user, action, target, --[[Optional]] action_source)
     assert(M.can_use_action(user, action, target, action_source))
     local ret
     if action.on_use then
-        ret = action.on_use(action_source, user, target) and ret 
+        local res = action.on_use(action_source, user, target)
+        ret = ret or res
     end
 
     for effect in values(action.effects) do
-        ret = effect:apply(user, target) and ret
+        local res = effect:apply(user, target)
+        ret = ret or res
     end
     return ret
 end

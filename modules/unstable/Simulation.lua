@@ -16,6 +16,7 @@ local ProficiencyPenalties = import "@stats.ProficiencyPenalties"
 local Relations = import "lanarts.objects.Relations"
 local Apts = import "@stats.AptitudeTypes"
 local StatUtils = import "@stats.StatUtils"
+local ActionUtils = import "@stats.ActionUtils"
 local ItemTraits = import "@items.ItemTraits"
 local Identification = import "@stats.Identification"
 
@@ -240,7 +241,7 @@ local function query_player(player, monster)
     while not moved do
         AnsiCol.println("Frame: " .. frame, AnsiCol.YELLOW, AnsiCol.BOLD)
         print(StatUtils.stats_to_string(player.derived, --[[Color]] true, --[[New lines]] true, player.base.name .. ", the Adventurer"))
-        print(StatUtils.attack_to_string(Actions.get_effect(weapon_action, Attacks.AttackEffect), --[[Color]] true))    
+        print(StatUtils.attack_to_string(ActionUtils.find_attack(weapon_action, true), --[[Color]] true))    
         local action = M.choose_option("Attack", "Spell", "Item", "Wait")
         if action == "Attack" then
             local ok, problem = player.obj:can_use_action(weapon_action, monster, source) 
@@ -288,6 +289,7 @@ end
 
 local function choose_class(race)
     local class_types = {}
+    table.insert(class_types, ClassType.lookup("Archer"))
     table.insert(class_types, ClassType.lookup("Knight"))
     for v in values{"Force"} do
         table.insert(class_types, ClassType.lookup("Mage"):on_create {magic_skill = v, weapon_skill = "Slashing Weapons"})
@@ -302,8 +304,11 @@ local function choose_class(race)
         print_sample_stats(race, class:on_create{weapon_skill="Slashing Weapons"})
         print(C.BLUE("Do you wish to play as a " .. race.name .. " " .. class.name .. "?", C.BOLD))
         if M.choose_option("No", "Yes") == "Yes" then
-            print("Which specialization?")
-            local skill = M.choose_option("Piercing Weapons", "Slashing Weapons", "Blunt Weapons")
+            local skill
+            if class.name ~= "Archer" then
+                print("Which specialization?")
+                M.choose_option("Piercing Weapons", "Slashing Weapons", "Blunt Weapons")
+            end
             return class:on_create{magic_skill = class.magic_skill, weapon_skill=skill}
         end
         idx = (idx % #class_types) + 1 

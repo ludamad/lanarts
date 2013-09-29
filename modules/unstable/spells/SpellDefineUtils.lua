@@ -20,7 +20,7 @@ function M.spell_define(args)
     args.base_on_create = args.base_on_create or M.base_spell_on_create
     args.on_create = args.on_create or args.base_on_create
     args.sprite = ContentUtils.resolve_sprite(args)
-    args.action_use = ActionUtils.derive_action(args.action_use or args, --[[Cleanup members]] true)
+    args.action_use = ActionUtils.derive_action(args.action_use or args, ActionUtils.ALL_ACTION_COMPONENTS, --[[Cleanup members]] true)
     args.aptitude_types = ActionUtils.desirable_user_aptitudes(args.action_use)
 
     return SpellType.define(args)

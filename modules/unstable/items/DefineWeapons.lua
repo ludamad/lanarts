@@ -1,6 +1,9 @@
 local Apts = import "@stats.AptitudeTypes"
+local Traits = import ".ItemTraits"
 local weapon_define = (import ".ItemDefineUtils").weapon_define
+local ranged_weapon_define = (import ".ItemDefineUtils").ranged_weapon_define
 
+-- PIERCING
 weapon_define {
     name = "Dagger",
     description = "A small but sharp blade, adept at stabbing purposes.",
@@ -19,6 +22,7 @@ weapon_define {
     effectiveness = 4, damage = 6, delay = 1.1
 }
 
+-- SLASHING
 weapon_define {
     name = "Long Sword",
     description = "A large trusty sword.",
@@ -43,5 +47,17 @@ weapon_define {
 
     gold_worth = 20, difficulty = 0,
     aptitude_types = {Apts.MELEE, Apts.SLASHING, Apts.AXE},
+    effectiveness = 3, damage = 7, delay = 1.3
+}
+
+-- RANGED
+
+ranged_weapon_define {
+    name = "Short Bow",
+    description = "A small bow.",
+
+    ammunition_trait = Traits.ARROW,
+    gold_worth = 20, difficulty = 0,
+    aptitude_types = {[Apts.BOWS] = 1, [Apts.RANGED] = 1.0, [Apts.MELEE] = 0.5},
     effectiveness = 3, damage = 7, delay = 1.3
 }

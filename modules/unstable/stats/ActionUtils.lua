@@ -6,26 +6,33 @@ local ContentUtils = import ".ContentUtils"
 local Actions = import "@Actions"
 local Attacks = import "@Attacks"
 local StatusType = import "@StatusType"
+local RangedWeaponActions = import "@items.RangedWeaponActions"
 
 local M = nilprotect {} -- Submodule
+
+function M.find_attack(action, --[[Optional]] recursive)
+    if recursive then 
+        local attacks = M.get_nested_attacks(action)
+        assert(#attacks == 1)
+        return attacks[1]
+    end
+    return Actions.get_effect(action, Attacks.AttackEffect)
+end
 
 -- Grabs all the attacks from the action, including those nested in projectile effects
 function M.get_nested_attacks(action)
     local attacks = {}
 
     local function add_attack(action)
-        local attack = Actions.get_effect(action, Attacks.AttackEffect)
+        local attack = M.find_attack(action)
         if attack then table.insert(attacks, attack) end
     end
 
-    -- Lookup direct attack
-    add_attack(action)
-
-    -- Lookup projectile attack
-    local projectile = Actions.get_effect(action, ProjectileEffect)
-    if projectile then
-        add_attack(projectile.action)
-    end
+    add_attack(action)  -- Lookup direct attack
+    local projectile = Actions.get_effect(action, ProjectileEffect) -- Lookup projectile attack
+    if projectile then add_attack(projectile.action) end
+    local ammo_fire = Actions.get_effect(action, RangedWeaponActions.AmmoFireEffect) -- Lookup ammo fire effect
+    if ammo_fire then add_attack(ammo_fire.action) end
 
     return attacks
 end
@@ -127,19 +134,6 @@ local function derive_status_prereqs(args)
     end
     return StatPrereqs.UserStatusPrereq.create(args.user_statuses_cant_have, args.user_statuses_must_have)
 end
-local function derive_status_effects(actions, args)
-    for s in values(args.user_statuses_added) do
-        table.insert(actions, StatEffects.UserStatusEffect.create(unpack(s)))
-    end
-    for s in values(args.target_statuses_added) do
-        table.insert(actions, StatEffects.TargetStatusEffect.create(unpack(s)))
-    end
-end
-
-local function add_if_not_nil(action, prerequisite, effect)
-    if prerequisite then table.insert(action.prerequisites, prerequisite) end
-    if effect then table.insert(action.effects, effect) end
-end
 
 M.CustomEffect = newtype()
 
@@ -156,14 +150,42 @@ end
 local DEFAULT_MELEE_RANGE = 10
 local DEFAULT_MELEE_COOLDOWN = 45
 
+local function add_prereq(action, prerequisite)
+    if prerequisite then table.insert(action.prerequisites, prerequisite) end
+end
+local function add_effect(action, effect)
+    if effect then table.insert(action.effects, effect) end
+end
+
+local function add_prereq_and_effect(action, prereq, effect)
+    add_prereq(action, prereq)
+    add_effect(action, effect)
+end
+
+M.USER_ACTION_COMPONENTS = { -- Ideal for eg the action_wield of a ranged weapon / action_use of ranged spell.
+    derive_range = true,
+    derive_cooldown = true,
+    derive_equipment_prereq = true,
+    derive_stat_cost = true,
+    derive_user_status_prereq = true, derive_user_status_add = true,
+    derive_projectile_create = true
+}
+M.TARGET_ACTION_COMPONENTS = { -- Ideal for melee/touch attacks
+    derive_attack = true, 
+    derive_target_status_add = true
+}
+M.ALL_ACTION_COMPONENTS = {} -- Ideal for melee/touch attacks
+table.merge(M.ALL_ACTION_COMPONENTS, M.USER_ACTION_COMPONENTS)
+table.merge(M.ALL_ACTION_COMPONENTS, M.TARGET_ACTION_COMPONENTS)
+
 -- Derive different action components. This is used for items, spells, and miscellaneous abilities.
 -- Components recognized by this routine:
 -- cooldowns and stat costs (see derive_cooldowns and derive_stat_costs)
 -- distance requirements (see derive_distance_prereq),
--- attacks (see ContentUtils.derive_attack)
+-- attacks (see ContentUtils.derive_attack_effect)
 -- projectiles (see ProjectileEffect.derive_projectile)
-function M.derive_action(args, --[[Optional, default false]] cleanup_members,  --[[Optional, default true]] derive_prereqs)
-    derive_prereqs = (derive_prereqs == nil or derive_prereqs)
+function M.derive_action(args, --[[Optional]] options, --[[Optional, default false]] cleanup_members)
+    options = options or M.ALL_ACTION_COMPONENTS
     local action = { 
         target_type = args.target_type or Actions.TARGET_HOSTILE,
         prerequisites = args.prerequisites or {}, effects = args.effects or {},
@@ -173,27 +195,53 @@ function M.derive_action(args, --[[Optional, default false]] cleanup_members,  -
         on_prerequisite = args.on_prerequisite or nil, 
         on_use = args.on_use or nil
     }
+    if options.derive_equipment_prereq and args.equipment_prereq then
+        local E = args.equipment_prereq
+        local slot, type, name = E.slot, E.type, E.name
+        if not name and type then name = type.name end
+        if not slot and type then slot = type.slot end
+        assert(name and slot)
+        local equip_prereq = StatPrereqs.EquipmentPrereq.create(slot, name, type, E.trait, E.amount or 1)
+        add_prereq(action, equip_prereq)
+    end
     -- Damaging attack effect
-    add_if_not_nil(action, --[[No associated prereq]] nil, ContentUtils.derive_attack(args.attack or args, cleanup_members))
-    if derive_prereqs and Actions.get_effect(action, Attacks.AttackEffect) then
+    if options.derive_attack then
+        add_effect(action, ContentUtils.derive_attack_effect(args.attack or args, cleanup_members))
+    end
+    if options.derive_range then
         args.range = args.range or DEFAULT_MELEE_RANGE
+        -- Min & max distance requirement
+        add_prereq(action, M.derive_distance_prereq(args, cleanup_members))
+    end
+    if options.derive_cooldown then
         args.cooldown_offensive = args.cooldown_offensive or (DEFAULT_MELEE_COOLDOWN * (args.delay or 1))
+        add_prereq_and_effect(action, M.derive_cooldowns(args, cleanup_members))
     end
     -- Stat costs and cooldowns
-    add_if_not_nil(action, M.derive_stat_costs(args, cleanup_members))
-    add_if_not_nil(action, M.derive_cooldowns(args, cleanup_members))
-    -- Min & max distance requirement
-    add_if_not_nil(action, M.derive_distance_prereq(args, cleanup_members), --[[No associated effect]] nil)
-    add_if_not_nil(action, derive_status_prereqs(args), --[[No associated effect]] nil)
-    derive_status_effects(action.effects, args)
-    -- Projectile effect
-    local P = args.created_projectile
-    if P then
+    if options.derive_stat_cost then
+        add_prereq_and_effect(action, M.derive_stat_costs(args, cleanup_members))
+    end
+    if options.derive_user_status_prereq then
+        add_prereq(action, derive_status_prereqs(args))
+    end
+    if options.derive_user_status_add then
+        for s in values(args.user_statuses_added) do
+            table.insert(action.effects, StatEffects.UserStatusEffect.create(unpack(s)))
+        end
+    end
+    if options.derive_target_status_add then
+        for s in values(args.target_statuses_added) do
+            table.insert(action.effects, StatEffects.TargetStatusEffect.create(unpack(s)))
+        end
+    end
+    if options.derive_projectile_create and args.created_projectile then
+        -- Projectile effect
+        local P = args.created_projectile
         P.sprite = P.sprite or args.sprite -- Inherit sprite from outer action
         local effect = ProjectileEffect.derive_projectile_effect(P, cleanup_members)
-        assert(effect)
-        add_if_not_nil(action, --[[No associated prereq]] nil, effect)
+        add_effect(action, assert(effect))
     end
+
     if cleanup_members then
         args.target_type, args.prerequisites, args.effects = nil
     end

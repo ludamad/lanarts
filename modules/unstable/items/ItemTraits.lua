@@ -15,14 +15,17 @@ M.equipment_slot_capacities = {
 
 local consumable_types = {
     "POTION", 
-    "SCROLL"
+    "SCROLL",
 }
-for type,cap in pairs(M.equipment_slot_capacities) do
-    M[type] = type
-end
-for type in values(consumable_types) do
-    M[type] = type
-end
+
+M.ammunition_types = {
+    ARROW = "arrows", -- For bows
+    STONE = "stones" -- For unarmed use
+}
+
+for type,cap in pairs(M.equipment_slot_capacities) do M[type] = type end
+for type,cap in pairs(M.ammunition_types) do M[type] = type end
+for type in values(consumable_types) do M[type] = type end
 
 M.default_equipment_slot_types = {
     [M.WEAPON] = Apts.WEAPON_IDENTIFICATION,

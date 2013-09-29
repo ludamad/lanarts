@@ -45,7 +45,7 @@ function ProjectileEffect.derive_projectile_effect(args, --[[Optional, default f
         speed = args.speed
     }
 
-    effect.action = ActionUtils.derive_action(args.action or args, cleanup_members, --[[Do not derive prereqs]] false)
+    effect.action = ActionUtils.derive_action(args.action or args, ActionUtils.TARGET_ACTION_COMPONENTS, cleanup_members)
     assert(#effect.action.prerequisites == 0, "Projectile actions cannot have prerequisites.")
 
     if cleanup_members then

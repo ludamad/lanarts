@@ -31,7 +31,6 @@ function M.CooldownCostEffect:apply(user)
     end
     return true
 end
-
 ------ STATUS EFFECT CAUSATION ----------------------------------------
 local function resolved_args(self, user, target)
     assert(self and user and target)

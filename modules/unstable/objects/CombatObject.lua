@@ -15,7 +15,7 @@ CombatObject.COMBAT_TRAIT = "COMBAT_TRAIT"
 
 function CombatObject.create(args)
     assert(args.base_stats)
-
+    args.solid = args.solid or true
     -- Set up type signature
     args.type = args.type or CombatObject
     args.derived_stats = table.deep_clone(args.base_stats)

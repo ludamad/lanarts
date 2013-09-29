@@ -9,7 +9,9 @@ local Attacks = import "@Attacks"
 local ItemTraits = import ".ItemTraits"
 local Proficiency = import "@Proficiency"
 local ContentUtils = import "@stats.ContentUtils"
+local ProjectileEffect = import "@stats.ProjectileEffect"
 local ItemRandomDescriptions = import ".ItemRandomDescriptions"
+local RangedWeaponActions = import ".RangedWeaponActions"
 
 local M = nilprotect {} -- Submodule
 
@@ -64,6 +66,8 @@ local function type_define(args, type, --[[Optional]] on_init, --[[Optional]] no
 
     args.traits = args.traits or {}
     table.insert(args.traits, type)
+    table.insert_all(args.traits, args.aptitude_types or {})
+    table.insert_all(args.traits, table.key_list(args.aptitude_types or {}))
     table.insert_all(args.traits, args.types or {})
 
     if not not_equipment then
@@ -93,7 +97,7 @@ local function type_define(args, type, --[[Optional]] on_init, --[[Optional]] no
     args.sprite = ContentUtils.resolve_sprite(args)
     -- Derive item-use action. Defaulted to equipping for equipment types. 
     if not_equipment or args.action_use then
-        args.action_use = ActionUtils.derive_action(args.action_use or args, --[[Cleanup]] true)
+        args.action_use = ActionUtils.derive_action(args.action_use or args, ActionUtils.ALL_ACTION_COMPONENTS, --[[Cleanup]] true)
     else
         args.action_use = equipment_action_use(type)
     end
@@ -123,30 +127,65 @@ local function init_identify_requirements(self, id_types, difficulty)
     table.insert_all(types, id_types)
     self.identify_requirements = {P.proficiency_requirement_create(types, difficulty)}
 end
-function M.resolve_weapon_bonuses(self)
+
+function M.resolve_weapon_name(self)
     local b1, b2 = self.effectiveness_bonus or 0, self.damage_bonus or 0
     self.unidentified_name = self.unidentified_name or self.type.name
     self.name =  bonus_str2(b1,b2) .. ' ' .. self.type.name
+end
 
+function M.resolve_weapon_bonuses(self)
+    M.resolve_weapon_name(self)
+    local b1, b2 = self.effectiveness_bonus or 0, self.damage_bonus or 0
     local difficulty = ((b1*b1+b2*b2) ^ 0.75) + random(-1,3) + (self.difficulty or 0)
     init_identify_requirements(self, {Apts.WEAPON_IDENTIFICATION}, random_round(difficulty))
     self.action_wield = table.deep_clone(self.action_wield)
-    local attack = assert(Actions.get_effect(self.action_wield, Attacks.AttackEffect))
-    Attacks.attack_add_effectiveness_and_damage(attack, b1, b2)
+    local attack = Actions.get_effect(self.action_wield, Attacks.AttackEffect)
+    if not attack then
+        local proj = Actions.get_effect(self.action_wield, ProjectileEffect)
+        if proj then
+            attack = Actions.get_effect(proj.action, Attacks.AttackEffect)
+        end
+    end
+    if attack then
+        Attacks.attack_add_effectiveness_and_damage(attack, b1, b2)
+    end
+end
+
+local function resolve_action(args, action_key, action_opts)
+    if args[action_key] then
+        args[action_key] = ActionUtils.derive_action(args[action_key])
+    else
+        args[action_key] = ActionUtils.derive_action(args, action_opts, --[[Cleanup]] true)
+    end
+end
+
+local function weapon_base(args, default_range, action_key, action_opts)
+    assert(args.aptitude_types and args.difficulty and args.gold_worth)
+    if not args.proficiency_types then
+        args.proficiency_types = {}
+        table.insert_all(args.proficiency_types, args.aptitude_types)
+        table.insert(args.proficiency_types, Apts.WEAPON_PROFICIENCY)
+    end
+    args.range = args.range or default_range
+    resolve_action(args, action_key, action_opts)
+    -- Define weapon attack in convenient manner:
+    return type_define(args, ItemTraits.WEAPON, M.resolve_weapon_bonuses)
 end
 
 local DEFAULT_MELEE_RANGE = 10
 function M.weapon_define(args)
-    -- Define weapon attack in convenient manner
-    assert(args.aptitude_types and args.difficulty and args.gold_worth)
-    if not args.proficiency_types then
-        args.proficiency_types = {}
-        table.insert_all(args.proficiency_types, args.types)
-        table.insert(args.proficiency_types, Apts.WEAPON_PROFICIENCY)
-    end
-    args.range = args.range or DEFAULT_MELEE_RANGE
-    args.action_wield = ActionUtils.derive_action(args, --[[Cleanup]] true)
-    return type_define(args, ItemTraits.WEAPON, M.resolve_weapon_bonuses)
+    return weapon_base(args, DEFAULT_MELEE_RANGE, "action_wield", ActionUtils.ALL_ACTION_COMPONENTS)
+end
+
+local DEFAULT_RANGED_RANGE = 300
+function M.ranged_weapon_define(args)
+    args.range = args.range or DEFAULT_RANGED_RANGE
+    resolve_action(args, "action_wield", ActionUtils.USER_ACTION_COMPONENTS)
+    args.on_use = args.on_projectile_hit -- Set up for deriving action_projectile_hit
+    local weapon = weapon_base(args, DEFAULT_RANGED_RANGE, "action_projectile_hit", ActionUtils.TARGET_ACTION_COMPONENTS)
+    RangedWeaponActions.add_ranged_weapon_effect_and_prereq(args.action_wield, args.action_projectile_hit, args.ammunition_trait, args.ammunition_cost or 1)
+    return weapon
 end
 
 function M.resolve_armour_bonuses(self)
@@ -188,8 +227,11 @@ function M.boots_define(args)
     return type_define(args, ItemTraits.BOOTS, M.resolve_armour_bonuses)
 end
 
+local DEFAULT_PROJECTILE_RADIUS = 8
 function M.ammunition_define(args)
-    return type_define(args, ItemTraits.AMMUNTION)
+    args.radius = args.radius or DEFAULT_PROJECTILE_RADIUS
+    args.on_fire = args.on_fire or RangedWeaponActions.default_ammunition_on_fire
+    return type_define(args, ItemTraits.AMMUNITION, M.resolve_weapon_name)
 end
 
 function M.potion_define(args)
