@@ -14,6 +14,7 @@ local ExperienceCalculation = import "@stats.ExperienceCalculation"
 local ProficiencyPenalties = import "@stats.ProficiencyPenalties"
 
 local Relations = import "lanarts.objects.Relations"
+local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local Apts = import "@stats.AptitudeTypes"
 local StatUtils = import "@stats.StatUtils"
 local ActionUtils = import "@stats.ActionUtils"
@@ -233,8 +234,11 @@ local function can_continue(player)
     return not StatContext.has_cooldown(player, CooldownTypes.ALL_ACTIONS)
 end
 
-local function query_player(player, monster)
+local function query_player(player)
     frame = frame + 1
+    local monster_obj = ObjectUtils.find_closest_hostile(player.obj)
+    if not monster_obj then os.exit() end
+    local monster = monster_obj:stat_context()
     local weapon_action, source = player.obj:weapon_action()
     if not can_continue(player) then return end
     local moved = false
@@ -307,7 +311,7 @@ local function choose_class(race)
             local skill
             if class.name ~= "Archer" then
                 print("Which specialization?")
-                M.choose_option("Piercing Weapons", "Slashing Weapons", "Blunt Weapons")
+                skill = M.choose_option("Piercing Weapons", "Slashing Weapons", "Blunt Weapons")
             end
             return class:on_create{magic_skill = class.magic_skill, weapon_skill=skill}
         end
@@ -348,7 +352,9 @@ function M.main()
     local race, class = M.choose_player_stats()
     local player = SM:add_player("Tester", race, class)
     player.io_action_handler = do_nothing
-    local monster = SM:add_monster("Giant Rat")
+    for i=1,2 do
+        SM:add_monster("Giant Rat")
+    end
 
     while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
         SM:step()
@@ -358,7 +364,7 @@ function M.main()
         GameState.wait(5)
         report_new_identifications(player:stat_context())
         track_identification(player:stat_context())
-        query_player(player:stat_context(), monster:stat_context())
+        query_player(player:stat_context())
     end
 end
 

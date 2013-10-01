@@ -1,6 +1,7 @@
 local StatPrereqs = import "@StatPrereqs"
 local StatEffects = import "@StatEffects"
 local CooldownTypes = import ".CooldownTypes"
+local Sounds = import "@sounds.Sounds"
 local ProjectileEffect = import ".ProjectileEffect"
 local ContentUtils = import ".ContentUtils"
 local Actions = import "@Actions"
@@ -137,14 +138,9 @@ end
 
 M.CustomEffect = newtype()
 
-function M.CustomEffect:init(resource, prereq, on_use)
-    self.prereq = prereq
-    self.on_use = on_use
-    self.context_resource = resource
-end
-
-function M.CustomEffect:apply(user, target)
-    self.on_use()
+function M.CustomEffect:init(args)
+    for k,v in pairs(args) do self[k] = v end
+    assert(self.apply)
 end
 
 local DEFAULT_MELEE_RANGE = 10
@@ -168,7 +164,8 @@ M.USER_ACTION_COMPONENTS = { -- Ideal for eg the action_wield of a ranged weapon
     derive_equipment_prereq = true,
     derive_stat_cost = true,
     derive_user_status_prereq = true, derive_user_status_add = true,
-    derive_projectile_create = true
+    derive_projectile_create = true,
+    derive_sound_play = true
 }
 M.TARGET_ACTION_COMPONENTS = { -- Ideal for melee/touch attacks
     derive_attack = true, 
@@ -208,14 +205,28 @@ function M.derive_action(args, --[[Optional]] options, --[[Optional, default fal
     if options.derive_attack then
         add_effect(action, ContentUtils.derive_attack_effect(args.attack or args, cleanup_members))
     end
+
     if options.derive_range then
-        args.range = args.range or DEFAULT_MELEE_RANGE
         -- Min & max distance requirement
         add_prereq(action, M.derive_distance_prereq(args, cleanup_members))
     end
     if options.derive_cooldown then
         args.cooldown_offensive = args.cooldown_offensive or (DEFAULT_MELEE_COOLDOWN * (args.delay or 1))
         add_prereq_and_effect(action, M.derive_cooldowns(args, cleanup_members))
+    end
+    if options.derive_sound_play and args.sound then
+        if type(args.sound) == "string" then
+            args.sound = {Sounds.lookup(args.sound)}
+        end
+        for i,sound in ipairs(args.sound) do
+            if type(sound) == "string" then
+                args.sound[i] = Sounds.lookup(sound)
+            end
+        end
+        add_effect(action, M.CustomEffect.create {
+            sound = args.sound,
+            apply = function(self) random_choice(self.sound):play() end
+        })
     end
     -- Stat costs and cooldowns
     if options.derive_stat_cost then

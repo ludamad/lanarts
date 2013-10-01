@@ -203,10 +203,12 @@ static int lapi_newtype_index(lua_State* L) {
 	// Upvalue 3: Inherited metatable
 	if (!lua_isnil(L, lua_upvalueindex(3))) {
 		lua_getfield(L, lua_upvalueindex(3), "__index");
-		lua_pushvalue(L, 1); // obj
-		lua_pushvalue(L, 2); // key
-		lua_call(L, 2, 1);
-		return 1;
+		if (!lua_isnil(L, -1)) {
+			lua_pushvalue(L, 1); // obj
+			lua_pushvalue(L, 2); // key
+			lua_call(L, 2, 1);
+			return 1;
+		}
 	}
 
 	luawrap::globals(L)["tostring"].push();
@@ -231,11 +233,13 @@ static int lapi_newtype_newindex(lua_State* L) {
 	// Upvalue 2: Inherited metatable
 	if (!lua_isnil(L, lua_upvalueindex(2))) {
 		lua_getfield(L, lua_upvalueindex(2), "__newindex");
-		lua_pushvalue(L, 1); // obj
-		lua_pushvalue(L, 2); // key
-		lua_pushvalue(L, 3); // value
-		lua_call(L, 3, 0);
-		return 0;
+		if (!lua_isnil(L, -1)) {
+			lua_pushvalue(L, 1); // obj
+			lua_pushvalue(L, 2); // key
+			lua_pushvalue(L, 3); // value
+			lua_call(L, 3, 0);
+			return 0;
+		}
 	}
 
 	// Try object itself:

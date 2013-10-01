@@ -1,6 +1,8 @@
 -- Represents an object that takes actions and 
 
+local GameMap = import "core.GameMap"
 local StatContext = import "@StatContext"
+local ExperienceCalculation = import "@stats.ExperienceCalculation"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local ItemTraits = import "@items.ItemTraits"
 local ProficiencyPenalties = import "@stats.ProficiencyPenalties"
@@ -34,7 +36,10 @@ function CombatObject:on_init()
     -- Internal only property. Provides a stat context of unknown validity.
     self._context = StatContext.stat_context_create(self.base_stats, self.derived_stats, self)
     self._stats_need_calculate = false -- Mark as valid stat context
-    self.team = self.base_stats.team
+end
+
+function CombatObject:gain_xp(xp)
+    ExperienceCalculation.gain_xp(self:stat_context(), xp)
 end
 
 -- Only way to get a StatContext.
@@ -58,7 +63,20 @@ function CombatObject:on_step()
     self._stats_need_calculate = true
 end
 
-CombatObject.on_draw = ObjectUtils.draw_sprite_member_if_seen
+-- Paramater for on_draw
+local function drawf(O)
+    ObjectUtils.screen_draw(O.sprite, O.xy, O.alpha, O.frame, O.direction, O.color)
+end
+
+function CombatObject:on_draw()
+    if GameMap.object_visible(self) then 
+        local options = {
+            sprite = self.sprite, xy = self.xy, direction = self.direction or 0,
+            alpha = self.alpha or 1, frame = self.frame or 0, color = self.color or COL_WHITE
+        }
+        StatContext.on_draw(self:stat_context(), drawf, options)
+    end
+end
 
 function CombatObject:weapon_action()
     local weapon = StatContext.get_equipped_item(self._context, ItemTraits.WEAPON)

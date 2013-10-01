@@ -6,6 +6,8 @@ local CombatObject = import ".CombatObject"
 local MonsterType = import "@MonsterType"
 local GameMap = import "core.GameMap"
 local PlayerObject = import ".PlayerObject"
+local ExperienceCalculation = import "@stats.ExperienceCalculation"
+local LogUtils = import "lanarts.LogUtils"
 
 local MonsterObject = ObjectUtils.type_create(CombatObject)
 -- Ensure that the monster's type is looked up in resolution
@@ -19,10 +21,12 @@ MonsterObject.MONSTER_TRAIT = "MONSTER_TRAIT"
 
 -- Monster object methods:
 
-function MonsterObject:death(self)
+function MonsterObject:on_death(attacker_obj)
+    local xp = ExperienceCalculation.challenge_rating_to_xp_gain(attacker_obj.base_stats.level, self.challenge_rating)
+    xp = random_round(xp)
+    attacker_obj:gain_xp(xp)
     if self.destroyed then return end
 
-    GameObject.destroy(self)
     Animations.fadeout_create {
         map = self.map, xy = self.xy,
         sprite = self.sprite,
@@ -30,35 +34,24 @@ function MonsterObject:death(self)
     }
 
     if self.on_die then self:on_die() end
+    GameObject.destroy(self)
 end
 
 function MonsterObject:on_step()
-    -- Death event:
-    if self.base_stats.hp <= 0 then 
-        return self:death() 
-    end
     self.base.on_step(self)
-    local player
-    for obj in GameMap.objects() do
-        if obj.traits and PlayerObject.is_player(obj) then 
-            player = obj 
-            break
-        end
-    end
-    if not player then 
-        return 
-    end
+    local hostile = ObjectUtils.find_closest_hostile(self)
+    if not hostile then return end -- No target
 
-    local S,P = self:stat_context(), player:stat_context()
+    local S,P = self:stat_context(), hostile:stat_context()
     local weapon_action, source = self:weapon_action()
-    if self:can_use_action(weapon_action, P, source) then 
+    if self:can_use_action(weapon_action, P, source) then
         self:use_action(weapon_action, P, source) 
     end
 
-    local dx,dy = unpack(vector_subtract(player.xy, self.xy))
+    local dx,dy = unpack(vector_subtract(hostile.xy, self.xy))
     local move_speed = self:stat_context().derived.movement_speed
     local xspeed, yspeed= math.min(move_speed, math.abs(dx)), math.min(move_speed, math.abs(dy))
-    if vector_distance(player.xy, self.xy) > player.radius + self.radius then
+    if vector_distance(hostile.xy, self.xy) > hostile.radius + self.radius then
         self.xy = vector_add(self.xy, {math.sign_of(dx) * xspeed, math.sign_of(dy) * yspeed})
     end
 end

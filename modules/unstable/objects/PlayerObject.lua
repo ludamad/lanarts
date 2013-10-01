@@ -8,12 +8,19 @@ local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local SkillType = import "@SkillType"
 local StatContext = import "@StatContext"
 local GameObject = import "core.GameObject"
+local LogUtils = import "lanarts.LogUtils"
 
 local PlayerObject = ObjectUtils.type_create(CombatObject)
 PlayerObject.PLAYER_TRAIT = "PLAYER_TRAIT"
 
-function PlayerObject.player_stats_create(race, --[[Can-be-nil]] class, name, --[[Optional]] team)
-    local stats = race.on_create(name, team or Relations.TEAM_PLAYER_DEFAULT)
+local function player_preferences(args)
+    return nilprotect {
+        manual_skill_point_spending = args.manual_skill_point_spending or false 
+    }
+end
+
+function PlayerObject.player_stats_create(race, --[[Can-be-nil]] class, name)
+    local stats = race.on_create(name)
     if class then
         local context = StatContext.stat_context_create(stats)
         class:on_init(context)
@@ -28,12 +35,33 @@ local function resolve_sprite(race)
     return image_cached_load(random_choice(results))
 end
 
-function PlayerObject:on_step()
-    -- Death event:
-    if self.base_stats.hp <= 0 then
-        print("YOU DIED")
-        os.exit(0)
+function PlayerObject:on_death()
+    print("YOU DIED")
+    os.exit()
+end
+
+function PlayerObject:_autospend_skill_points()
+    local B = self.base_stats
+    if B.skill_points > 0 then
+        self.class:on_spend_skill_points(self:stat_context(), B.skill_points, --[[Log]] true)
+        B.skill_points = 0
     end
+end
+
+function PlayerObject:on_init()
+    self.base.on_init(self)
+    self:gain_xp(1000)
+end
+
+function PlayerObject:gain_xp(xp)
+    LogUtils.event_log_resolved(self, ("<The >$You gain{s} %dXP!"):format(xp), COL_YELLOW)
+    self.base.gain_xp(self, xp)
+    local P = self.preferences 
+    if not P.manual_skill_point_spending then
+        self:_autospend_skill_points()
+    end
+end
+function PlayerObject:on_step()
     self.base.on_step(self)
     table.clear(self.queued_io_actions)
     self:io_action_handler(self.queued_io_actions)
@@ -45,9 +73,10 @@ end
 function PlayerObject.create(args)
     args.sprite = resolve_sprite(args.race)
     args.queued_io_actions = {}
+    args.preferences = player_preferences(args.preferences or {})
     args.io_action_handler = args.io_action_handler or PlayerIOResolution.default_io_action_resolver
     assert(args.race and args.class and args.name and args.io_action_handler)
-
+    args.team = args.team or Relations.TEAM_PLAYER_DEFAULT
     -- Set up type signature
     args.type = args.type or PlayerObject
     args.traits = args.traits or {}

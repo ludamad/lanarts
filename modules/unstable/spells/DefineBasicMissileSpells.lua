@@ -21,6 +21,7 @@ spell_define {
     mp_cost = 5,
     cooldown_spell = 25,
 
+    sound = "Blip",
     created_projectile = {
         speed = 7, radius = 4,
         aptitude_types = {Apts.MAGIC, Apts.FORCE},

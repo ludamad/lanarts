@@ -63,6 +63,8 @@ function M.stats_create(--[[Optional]] params, --[[Optional]] add_skills)
         team = params.team,
 
         level = params.level or 1,
+        xp = params.xp or 0, -- Note, XP needed is a function of level
+        skill_points = params.skill_points or 0,
 
     	-- The 'core stats', hp & mp. The rest of the stats are defined in terms of aptitudes.
         hp = params.hp or params.max_hp,
@@ -84,7 +86,7 @@ function M.stats_create(--[[Optional]] params, --[[Optional]] add_skills)
 
         cooldowns = C(params.cooldowns, true) or CooldownSet.create(),
 
-        movement_speed = params.movement_speed or 2
+        movement_speed = params.movement_speed or 4
     }
 end
 

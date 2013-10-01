@@ -175,6 +175,10 @@ end
 
 local DEFAULT_MELEE_RANGE = 10
 function M.weapon_define(args)
+    if not args.sound then
+        args.sound = {}
+        for i=1,5 do args.sound[i] = "SwordUnsheathe"..i end
+    end
     return weapon_base(args, DEFAULT_MELEE_RANGE, "action_wield", ActionUtils.ALL_ACTION_COMPONENTS)
 end
 

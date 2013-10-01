@@ -224,6 +224,10 @@ public:
 	GameMapState* get_level() {
 		return world.get_current_level();
 	}
+	level_id get_level_id();
+	GameMapState* get_level(level_id id) {
+		return world.get_level(id);
+	}
 
 	void set_level(GameMapState* lvl);
 	void level_move(int id, int x, int y, int roomid1, int roomid2);

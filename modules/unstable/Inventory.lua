@@ -117,6 +117,15 @@ function Inventory:on_calculate(stats)
     end
 end
 
+function Inventory:on_draw(stats, drawf, args)
+    for item in self:values() do
+        if item.equipped and item.on_draw then
+            drawf, args = item:on_draw(stats, drawf, args)
+        end
+    end
+    return drawf, args
+end
+
 function Inventory:calculate_proficiency_modifier(stats, item_slot)
     local fail, total = Proficiency.resolve_proficiency_requirements(item_slot.type.proficiency_requirements, stats)
     if total == 0 then return 0.0 end

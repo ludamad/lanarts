@@ -135,9 +135,8 @@ void GameWorld::spawn_players(GameMapState* map, const std::vector<Pos>& positio
 	}
 }
 
-GameMapState* GameWorld::get_level(int roomid, bool spawnplayer,
-		void** player_instances, size_t nplayers) {
-	return level_states.at(roomid);
+GameMapState* GameWorld::get_level(level_id id) {
+	return level_states.at(id);
 }
 
 bool GameWorld::pre_step() {
@@ -187,35 +186,6 @@ bool GameWorld::step() {
 	}
 
 	return true;
-}
-
-void GameWorld::regen_level(int roomid) {
-	GameMapState* level = get_level(roomid);
-	std::vector<PlayerInst*> players = player_data().players_in_level(roomid);
-
-	/* Take all players out of level*/
-	for (int i = 0; i < players.size(); i++) {
-		// Get and retain player
-		players[i]->core_stats().heal_fully();
-
-		// Remove from current level
-		gs->remove_instance(players[i]);
-	}
-
-	level_states[roomid] = NULL;
-
-	GameMapState* newlevel = get_level(roomid, true, (void**)&players[0],
-			players.size());
-
-	if (gs->get_level() == level) {
-		gs->game_hud().override_sidebar_contents(NULL);
-		gs->set_level(newlevel);
-		GameInst* p = gs->local_player();
-		gs->view().sharp_center_on(p->x, p->y);
-	}
-
-	//Delete existing level
-	delete level;
 }
 
 void GameWorld::level_move(int id, int x, int y, int roomid1, int roomid2) {

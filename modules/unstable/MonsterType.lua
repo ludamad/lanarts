@@ -6,7 +6,7 @@ local monster_schema = {
     name = S.STRING,
     traits = S.TABLE,
     description = S.STRING,
-    xp_award = S.NUMBER,
+    challenge_rating = S.NUMBER,
     base_stats = S.TABLE,
     unarmed_action = S.TABLE,
   

@@ -4,10 +4,11 @@ local Apts = import "@stats.AptitudeTypes"
 local SkillType = import "@SkillType"
 local StatContext = import "@StatContext"
 local ExperienceCalculation = import "@stats.ExperienceCalculation"
+local LogUtils = import "lanarts.LogUtils"
 
 local M = nilprotect {} -- Submodule
 
-function M.default_spend_skill_points(self, stats, SP)
+function M.default_spend_skill_points(self, stats, skill_points, --[[Optional]] log_increases)
     local total = 0
     for k,v in pairs(self.skills) do 
        total = total + v
@@ -17,9 +18,8 @@ function M.default_spend_skill_points(self, stats, SP)
     end
     local mult = 1/total
     for k,v in pairs(self.skills) do
-        local new_v = v * mult * SP
-        SkillType.get_skill_slot(stats.base.skills, k):on_spend_skill_points(new_v)
-        SkillType.get_skill_slot(stats.derived.skills, k):on_spend_skill_points(new_v)
+        local new_v = v * mult * skill_points
+        SkillType.get_skill_slot(stats.base.skills, k):on_spend_skill_points(stats, new_v, log_increases)
     end
 end
 
@@ -57,6 +57,11 @@ local function find_least_worth_weapon(trait)
     return wep
 end
 
+function M.default_class_on_level_gain(self, stats)
+    local HP_GAIN, MP_GAIN = 15, 15
+    StatContext.permanent_add(stats, {hp=HP_GAIN, max_hp=HP_GAIN, mp=MP_GAIN, max_mp=MP_GAIN})
+end
+
 function M.default_class_on_init(self, stats)
     self:on_spend_skill_points(stats, ExperienceCalculation.SKILL_POINT_START_AMOUNT)
     if self.items then
@@ -87,6 +92,7 @@ function M.class_define(class_type)
     assert(class_type.lookup_key)
     class_type.on_spend_skill_points = class_type.on_spend_skill_points or M.default_spend_skill_points
     class_type.on_create = class_type.on_create or default_class_create_closure(class_type)
+    class_type.on_level_gain = class_type.on_level_gain or M.default_class_on_level_gain 
     class_type.on_init = class_type.on_init or M.default_class_on_init
     for k,v in pairs(class_type.skills) do 
         assert(SkillType.lookup(k), k .. " is not a skill!") 

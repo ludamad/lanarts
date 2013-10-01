@@ -85,12 +85,23 @@ function M.on_step(context)
     M.copy_base_to_derived(context)
 end
 
+function M.on_draw(context, drawf, options)
+    drawf, options = context.derived.inventory:on_draw(context, drawf, options)
+    drawf, options = context.derived.hooks:on_draw(context, drawf, options)
+    drawf(options)
+end
+
 function M.on_calculate(context)
     for skill_slot in values(context.derived.skills) do
         skill_slot:on_calculate(context)
     end
     context.derived.inventory:on_calculate(context)
     context.derived.hooks:perform("on_calculate", context)
+end
+
+function M.on_death(context, attacker)
+    context.derived.hooks:perform("on_death", context, attacker)
+    context.obj:on_death(attacker.obj)
 end
 
 --------------------------------------

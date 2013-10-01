@@ -72,9 +72,15 @@ static GameInst* gmap_lookup(LuaStackValue current_map, obj_id object) {
 	return map->game_inst_set().get_instance(object);
 }
 
+template <typename T>
+static T stack_defaulted(lua_State* L, int narg, const T& default_value) {
+	return lua_gettop(L) >= narg ? luawrap::get<T>(L, narg) : default_value;
+}
+
 static int gmap_objects_list(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
-	GameInstSet& insts = gs->get_level()->game_inst_set();
+	int map_id = stack_defaulted(L, 1, gs->get_level_id());
+	GameInstSet& insts = gs->get_level(map_id)->game_inst_set();
 	luawrap::push(L, insts.to_vector());
 	return 1;
 }
@@ -189,11 +195,6 @@ static int gmap_instance(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	luawrap::push(L, gs->get_instance(luaL_checkinteger(L, 1)));
 	return 1;
-}
-
-template <typename T>
-static T stack_defaulted(lua_State* L, int narg, const T& default_value) {
-	return lua_gettop(L) >= narg ? luawrap::get<T>(L, narg) : default_value;
 }
 
 static int gmap_object_visible(lua_State* L) {

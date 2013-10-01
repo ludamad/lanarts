@@ -34,7 +34,7 @@ races_define {
         heal_amount = 30,
 
         on_prerequisite = function (self, caster)
-            return caster.base.hp < caster.derived.max_hp
+            return caster.base.hp < caster.derived.max_hp, "That would be a waste!"
         end,
 
         on_use = function (self, caster)

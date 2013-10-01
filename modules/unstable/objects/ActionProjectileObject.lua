@@ -29,7 +29,7 @@ end
 
 function ActionProjectileObject:on_deinit()
     local ANIMATION_FADEOUT_DURATION = 25
-    Animations.fadeout_create { sprite = self.sprite, duration = ANIMATION_FADEOUT_DURATION, xy = self.xy }
+    Animations.fadeout_create { sprite = self.sprite, duration = ANIMATION_FADEOUT_DURATION, direction = self.direction, xy = self.xy }
 end
 
 function ActionProjectileObject.create(args)

@@ -9,6 +9,7 @@ local Attacks = import "@Attacks"
 local Relations = import "lanarts.objects.Relations"
 local AptitudeTypes = import "@stats.AptitudeTypes"
 local ContentUtils = import "@stats.ContentUtils"
+local ExperienceCalculation = import "@stats.ExperienceCalculation"
 local ActionUtils = import "@stats.ActionUtils"
 
 local Traits = import ".MonsterTraits"
@@ -34,12 +35,13 @@ function M.monster_define(t, --[[Optional]] derive_idx)
         Traits.stat_mod_functions[trait](stats)
     end
 
-    t.types = t.types or {Apts.MELEE}
+    t.aptitude_types = t.aptitude_types or {Apts.MELEE}
     local action = t.unarmed_action or t
     action.range = action.range or DEFAULT_MELEE_RANGE
 
     return MonsterType.define {
         name = t.name,
+        team = t.team,
         description = t.description:pack(),
         on_first_appear = t.on_first_appear or default_on_appear_message,
         on_die = t.on_die or default_on_die_message,
@@ -48,7 +50,7 @@ function M.monster_define(t, --[[Optional]] derive_idx)
         on_draw = t.on_draw,
         traits = t.traits,
 
-        xp_award = t.xp_award,
+        challenge_rating = t.challenge_rating,
         radius = t.radius,
 
         base_stats = stats,

@@ -43,6 +43,16 @@ function HookSet:merge_new_hooks()
     table.clear(self.new_hooks)
 end
 
+function HookSet:on_draw(stats, drawf, options)
+    self:merge_new_hooks()
+    for hook in values(self.hooks) do
+        if hook.on_draw then
+            drawf, options = hook:on_draw(stats, drawf, options)
+        end
+    end
+    return drawf, options
+end
+
 function HookSet:on_step(...)
     self:merge_new_hooks()
     -- Perform the hook step event, filtering finished hooks.

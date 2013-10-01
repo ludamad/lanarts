@@ -24,8 +24,9 @@ local TimeLimitedBase = {
     end
 }
 
+local LENIENT_NEWTYPE_PARENT = {__index = do_nothing} -- Do not fail on unresolved access
 local function create(args)
-    local type = newtype()
+    local type = newtype{parent = LENIENT_NEWTYPE_PARENT}
     type.priority = HookSet.MIN_PRIORITY
     for k,v in pairs(args) do
         type[k] = v

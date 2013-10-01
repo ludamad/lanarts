@@ -26,7 +26,7 @@ function M.resolve_sprite(args, --[[Optional]] stack_idx)
     if type(sprite) == "string" then
         if sprite:find("%(") or sprite:find("%%") then
             sprite = path_resolve(sprite, (stack_idx or 1) + 1)
-            return Display.animation_create(Display.images_load(sprite), 1.0)
+            return Display.directional_create(Display.images_load(sprite), 1.0)
         else
             return Display.image_load(sprite)
         end
@@ -101,7 +101,11 @@ end
 function M.derive_attack_effect(args, --[[Optional, default false]] cleanup_member)
     local attack = args.unarmed_attack or args.attack
     local types = args.aptitude_types
-    if not types then return nil end
+    if not types and not attack then
+        assert(not args.damage and not args.effectiveness, 
+            "Incomplete attack specified, missing aptitude_types.") 
+        return nil
+    end
 
     -- First resolve 
     if attack and #attack > 0 then -- Resolve argument table
@@ -110,14 +114,13 @@ function M.derive_attack_effect(args, --[[Optional, default false]] cleanup_memb
     if not attack then
         attack = Attacks.attack_create(
             args.effectiveness or 0, args.damage or 0, types, 
-            --[[Optional]] args.delay, --[[Optional]] args.damage_multiplier, 
-            --[[Optional]] args.range
+            --[[Optional]] args.delay, --[[Optional]] args.damage_multiplier
         )
     end
     if cleanup_member then
         args.effectiveness, args.damage = nil
         args.attack, args.unarmed_attack, args.multipliers, args.type = nil
-        args.delay, args.damage_multiplier, args.range = nil
+        args.delay, args.damage_multiplier = nil
     end
     return attack
 end

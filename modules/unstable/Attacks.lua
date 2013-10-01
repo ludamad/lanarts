@@ -26,8 +26,7 @@ function M.AttackEffect:init(
         -- Aptitude modifiers
         aptitude_multipliers,
         -- Weapon delay and related damage multiplier 
-         --[[Optional]] delay, --[[Optional]] damage_multiplier,
-         --[[Optional]] range
+         --[[Optional]] delay, --[[Optional]] damage_multiplier
     )
     delay = delay or 1
     local m = StatMultiplierUtils.resolve_multiplier_set(aptitude_multipliers)

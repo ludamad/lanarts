@@ -549,3 +549,10 @@ MonsterController& GameState::monster_controller() {
 void GameState::skip_next_instance_id() {
 	get_level()->game_inst_set().skip_next_id();
 }
+
+level_id GameState::get_level_id() {
+	if (get_level() == NULL) {
+		return -1;
+	}
+	return get_level()->id();
+}

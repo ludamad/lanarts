@@ -1,11 +1,12 @@
 local StatusType = import "@StatusType"
 local StatContext = import "@StatContext"
 local CooldownSet = import "@CooldownSet"
-
+local Display = import "core.Display"
 local CooldownTypes = import "@stats.CooldownTypes"
 local Apts = import "@stats.AptitudeTypes"
 local StatUtils = import "@stats.StatUtils"
 local LogUtils = import "lanarts.LogUtils"
+local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local EventLog = import "core.ui.EventLog"
 
 -- EXHAUSTION
@@ -14,6 +15,15 @@ local EXHAUSTION_ATTACK_COOLDOWN_MULTIPLIER = 0.75
 local Exhausted = StatusType.define {
     name = "Exhausted",
     time_limited = true,
+    sprite = Display.image_load(path_resolve "sprites/exhausted.png"),
+    on_draw = function(self, stats, drawf, options)
+        options.color = COL_PALE_BLUE
+        local function new_drawf(options)
+            drawf(options)
+            ObjectUtils.screen_draw(self.sprite, options.xy)
+        end
+        return new_drawf, options
+    end,
     init = function(self, stats, ...)
         self.base.init(self, stats, ...)
         LogUtils.event_log_player(stats.obj, "$You {is}[are] now exhausted.", {255,200,200})
@@ -40,6 +50,15 @@ StatusType.define {
        self.base.init(self, stats, ...)
        self.extensions = 0
        LogUtils.event_log_player(stats.obj, "$You enter{s} a powerful rage!", {200,200,255})
+    end,
+    sprite = Display.image_load(path_resolve "sprites/berserk.png"),
+    on_draw = function(self, stats, drawf, options)
+        options.color = COL_PALE_RED
+        local function new_drawf(options)
+            drawf(options)
+            ObjectUtils.screen_draw(self.sprite, options.xy)
+        end
+        return new_drawf, options
     end,
     on_calculate = function(self, stats)
         local D = stats.derived

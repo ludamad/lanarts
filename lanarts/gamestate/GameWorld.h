@@ -26,18 +26,12 @@ class GameMapState;
 class GeneratedRoom;
 class PlayerInst;
 
-class GameMaps {
-public:
-	std::vector<GameMapState*> maps;
-};
-
 class GameWorld {
 public:
 	GameWorld(GameState* gs);
 	~GameWorld();
 	void generate_room(GameMapState* level);
-	GameMapState* get_level(int roomid, bool spawnplayer = false,
-			void** player_instances = NULL, size_t nplayers = 0);
+	GameMapState* get_level(level_id id);
 	bool pre_step();
 	bool step();
 	void level_move(int id, int x, int y, int roomid1, int roomid2);
@@ -47,7 +41,6 @@ public:
 	GameMapState* map_create(const Size& size, bool wandering_enabled = true);
 
 	void reset(int keep = 0);
-	void regen_level(int roomid);
 	GameMapState* get_current_level() {
 		return lvl;
 	}

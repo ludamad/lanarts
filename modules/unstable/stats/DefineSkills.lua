@@ -3,6 +3,7 @@ local StatContext = import "@StatContext"
 local ContentUtils = import ".ContentUtils"
 local Apts = import "@stats.AptitudeTypes"
 local ExperienceCalculation = import "@stats.ExperienceCalculation"
+local LogUtils = import "lanarts.LogUtils"
 
 local M = {} -- Submodule
 
@@ -42,9 +43,17 @@ local function xp2level(skill_slot, xp)
     return ExperienceCalculation.skill_level_from_cost(skill_slot.cost_multiplier, xp)
 end
 
-local function on_spend_skill_points(skill_slot, sp)
+local function on_spend_skill_points(skill_slot, stats, sp, --[[Optional]] print)
+    local old_level = skill_slot.level
     skill_slot.skill_points = skill_slot.skill_points + sp
     skill_slot.level = xp2level(skill_slot, skill_slot.skill_points)
+
+    if print and skill_slot.level > old_level then
+        local msg = ("{$You's}[Your] %s skill rises from %.1f to %.1f!"):format(
+            skill_slot.name, old_level, skill_slot.level
+        )
+        LogUtils.event_log_player(stats.obj, msg, COL_PALE_GREEN)
+    end
 end
 
 local function skill_define(args)
@@ -140,6 +149,12 @@ skill_define {
 }
 
 -- Spell types
+skill_define {
+    name = "Summoning",
+    description = "Increases power of and control over summoned creatures.",
+    aptitudes = {Apts.SUMMONING, {1.0, dup(0,3)}}
+}
+
 skill_define {
     name = "Enchantments",
     description = "Increases efficacy in enchanting magics.",

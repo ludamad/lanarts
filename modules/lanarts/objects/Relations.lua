@@ -43,6 +43,8 @@ end
 -- Query for explicit relationship settings in any parent teams
 local function query_chain(team, root)
     while root do
+        -- Same-team is friendly
+        if team == root then return M.FRIENDLY end
         local relation = team.relation_table[root]
         if relation ~= nil then 
             return relation 
@@ -53,6 +55,9 @@ local function query_chain(team, root)
 end 
 
 function M.team_get_relationship(team1, team2)
+    -- Same-team is friendly
+    if team1 == team2 then return M.FRIENDLY end
+
     local default1, default2 = team1.default_relationship, team2.default_relationship
     while team1 and team2 do
          local result = query_chain(team1, team2)
@@ -85,11 +90,8 @@ end
 -- Argument order does not matter
 
 function M.get_relationship(obj1, obj2)
-    -- All combat objects have a team, the following handles non-combat objects:
-    if not (obj1.team and obj2.team) then
-        return nil
-    end
-    return M.team_get_relationship(obj1.team, obj2.team) 
+    assert(obj1.team and obj2.team) -- All combat objects have a team
+    return M.team_get_relationship(obj1.team, obj2.team)
 end
 
 function M.is_hostile(obj1, obj2)

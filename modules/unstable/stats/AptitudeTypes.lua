@@ -24,6 +24,7 @@ M.allowed_aptitudes = {
     ENCHANTMENTS = ALL,
     CURSES = ALL,
     FORCE = ALL,
+    SUMMONING = EFFECTIVENESS,
 
 -- Misc proficiencies
     ARMOUR = EFFECTIVENESS, -- Ability to use armour

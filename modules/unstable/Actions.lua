@@ -1,6 +1,8 @@
 -- Actions consist of a 'target_type', 'prerequisites' list, and 'effects' list.
 -- They are the main building blocks of spells, items, etc
 
+local StatContext = import "@StatContext"
+
 local M = nilprotect {} -- Submodule
 
 M.TARGET_TYPES = {
@@ -43,6 +45,13 @@ function M.use_action(user, action, target, --[[Optional]] action_source)
         local res = effect:apply(user, target)
         ret = ret or res
     end
+
+    if type(target) == "table" and target.obj then
+        if target.base.hp <= 0 then
+           StatContext.on_death(target, user)
+        end
+    end
+
     return ret
 end
 
