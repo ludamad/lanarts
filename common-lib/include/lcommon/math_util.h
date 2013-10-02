@@ -52,6 +52,6 @@ int round_up_divide(int value, int divisor);
 
 bool circle_line_test(Pos circle_xy, int circle_rad, Pos line_start_xy, Pos line_end_xy);
 bool circle_rectangle_test(Pos circle_xy, int circle_rad, BBox rect);
-bool rectangle_line_test(BBox rect, Pos from_xy, Pos to_xy);
+bool rectangle_line_test(BBoxF rect, PosF from_xy, PosF to_xy);
 
 #endif /* LCOMMON_MATH_UTIL_H_ */

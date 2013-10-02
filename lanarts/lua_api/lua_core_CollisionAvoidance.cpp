@@ -14,8 +14,8 @@ typedef smartptr<CollisionAvoidance> CollisionAvoidancePtr;
 
 static simul_id colavoid_add_object(CollisionAvoidancePtr colavoid, LuaStackValue args) {
 	using namespace luawrap;
-	return colavoid->add_active_object(args["xy"].as<Pos>(),
-			args["radius"].to_int(), defaulted(args["speed"], 0.0));
+	return colavoid->add_active_object(args["xy"].as<PosF>(),
+			args["radius"].to_num(), defaulted(args["speed"], 0.0f));
 }
 
 static void colavoid_step(CollisionAvoidancePtr colavoid) {
@@ -28,7 +28,7 @@ static void colavoid_update_object(CollisionAvoidancePtr colavoid, simul_id id, 
 		colavoid->set_maxspeed(id, args["speed"].to_int());
 	}
 	if (!args["xy"].isnil()) {
-		Pos xy = args["xy"].as<Pos>();
+		PosF xy = args["xy"].as<PosF>();
 		colavoid->set_position(id, xy.x, xy.y);
 	}
 	if (!args["preferred_velocity"].isnil()) {

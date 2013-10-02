@@ -223,26 +223,6 @@ void GameTiles::serialize(SerializeBuffer& serializer) {
 	serializer.write_container(_seethrough->_internal_vector());
 }
 
-//static bool circle_line_test(int px, int py, int qx, int qy, int cx, int cy,
-//		float radsqr) {
-//	int dx, dy, t, rt, ddist;
-//	dx = qx - px;
-//	dy = qy - py;
-//	ddist = dx * dx + dy * dy;
-//	t = -((px - cx) * dx + (py - cy) * dy);
-//
-//	/* Restrict t to within the limits of the line segment */
-//	if (t < 0)
-//		t = 0;
-//	else if (t > ddist)
-//		t = ddist;
-//
-//	dx = (px + t * (qx - px) / ddist) - cx;
-//	dy = (py + t * (qy - py) / ddist) - cy;
-//	rt = (dx * dx) + (dy * dy);
-//	return rt < (radsqr);
-//}
-
 bool GameTiles::line_test(const Pos& from_xy, const Pos& to_xy, bool issolid, int ttype,
 		Pos* hitloc) {
 	Size size = this->size();

@@ -103,32 +103,38 @@ bool circle_line_test(Pos circle_xy, int circle_rad, Pos line_start_xy,
 	return rt < (circle_rad * circle_rad);
 }
 
-// TODO: Clean once works...
-bool rectangle_line_test(BBox rect, Pos from_xy, Pos to_xy) {
-	int temp1, temp2, RHS;
-	Pos dd = to_xy - from_xy;
-	float distance = sqrt(dd.x*dd.x + dd.y*dd.y);
-	Pos diff = (from_xy+to_xy).divided(2) - rect.center();
+bool rectangle_line_test(BBoxF rect, PosF from_xy, PosF to_xy) {
+	if (rect.contains(from_xy) || rect.contains(to_xy)) {
+		return true;
+	}
+	// Find min and max X for the segment intersected with the rectangle's x-projections
+	float minX = std::min(from_xy.x, std::min(to_xy.x, rect.x1));
+	float maxX = std::max(from_xy.x, std::max(to_xy.x, rect.x2));
 
-	temp1 = abs(signum(dd.x) * rect.x1 + signum(dd.y) * rect.y1);
-	temp2 = abs(diff.x * rect.x1 + diff.y * rect.y1);
-	RHS = rect.width() + distance * temp1;
-    if (temp2 > RHS) {
-        return false;
-    }
+	if (minX > maxX) { // If their projections do not intersect return false
+		return false;
+	}
 
-	temp1 = abs(signum(dd.x) * rect.x2 + signum(dd.y) * rect.y2);
-	temp2 = abs(diff.x * rect.x2 + diff.y * rect.y2);
-	RHS = rect.height() + distance * temp1;
-    if (temp2 > RHS) {
-        return false;
-    }
+	// Find corresponding min and max Y for min and max X we found before
+	float minY = from_xy.y, maxY = to_xy.y, dx = (to_xy.x - from_xy.x);
+	if (fabs(dx) > 0.0000001) {
+		double sign = dx > 0 ? +1 : -1;
+		double offset = from_xy.y - sign * from_xy.x;
+		minY = sign * minX + offset;
+		maxY = sign * maxX + offset;
+	}
 
-    int LHS = abs(diff.x * signum(dd.y) - diff.y * signum(dd.x));
-    temp1 = abs(rect.x1 * signum(dd.y) - rect.y1 * signum(dd.x));
-    temp2 = abs(rect.x2 * signum(dd.y) - rect.y2 * signum(dd.x));
-    RHS = rect.width() * temp1 + rect.height() * temp2;
-    return LHS <= RHS;
+	if (minY > maxY) {
+		std::swap(minY, maxY);
+	}
+
+	// Find the intersection of the segment's and rectangle's y-projections
+	minY= std::max(minY, rect.y1), maxY = std::max(maxY, rect.y2);
+	if (minY > maxY) { // Y-projections do not intersect
+		return false;
+	}
+
+	return true;
 }
 
 bool circle_rectangle_test(Pos circle_xy, int circle_rad, BBox rect) {

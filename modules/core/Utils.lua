@@ -13,6 +13,13 @@ local Sound = import "core.Sound"
 
 -- More ad hoc utilities without a home, yet
 
+function to_tilexy(xy)
+    return {math.floor(xy[1]/32), math.floor(xy[2]/32)}
+end
+function to_worldxy(xy)
+    return {xy[1]*32+16, xy[2]*32+16}
+end
+
 --- Return whether the mouse has been right clicked within a bounding box.
 function bbox_right_clicked(bbox, origin)
     return Mouse.mouse_right_pressed and bbox_mouse_over(bbox, origin)

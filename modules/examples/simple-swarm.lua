@@ -55,11 +55,12 @@ local function fat_line_check(radius, from_xy, to_xy)
     if GameMap.radius_tile_check(to_xy, radius) then return true end
 
     -- Two lines from either sides of the 'end circles'
-    if GameMap.line_tile_check(gmap, vsub(from_xy,reach), vsub(to_xy,reach)) then
-        return true
-    end
-    if GameMap.line_tile_check(gmap, vadd(from_xy,reach), vadd(to_xy,reach)) then
-        return true
+    for reach in values{{radius,0}, {0, radius}} do
+        if GameMap.line_tile_check(gmap, vsub(from_xy,reach), vsub(to_xy,reach)) then
+            return true
+        elseif GameMap.line_tile_check(gmap, vadd(from_xy,reach), vadd(to_xy,reach)) then
+            return true
+        end
     end
     -- Refuted
     return false
@@ -71,6 +72,10 @@ local function follow_path(self)
     while self.path do
         local idx = self.path_idx
         local node, is_final_node = self.path[idx], (idx == #self.path)
+        if not node then 
+            self.path = nil
+            break
+        end
         local dx,dy=node[1]-x,node[2]-y
         local xspeed, yspeed= math.min(self.speed, math.abs(dx)), math.min(self.speed, math.abs(dy))
         local dist, dist_needed = math.sqrt(dx*dx+dy*dy), (is_final_node and 0 or 16)
@@ -78,6 +83,8 @@ local function follow_path(self)
         local straight_line_to_next_node = false
         if not is_final_node and not fat_line_check(self.radius, self.xy, self.path[idx+1]) then
             straight_line_to_next_node = true
+        elseif dist >= 32 and fat_line_check(self.radius, self.xy, self.path[idx]) then
+            self.path_idx = math.max(0,self.path_idx - 1)
         end
 
         if straight_line_to_next_node or dist < dist_needed then
@@ -91,6 +98,8 @@ local function follow_path(self)
     end
 end
 
+local last_click
+
 local Obj = {}
 function Obj:step()
     local close_to_wall = (GameMap.radius_tile_check(self.xy, self.radius + 10))
@@ -100,6 +109,7 @@ function Obj:step()
     end
 
     if Mouse.mouse_left_pressed then
+        last_click = Mouse.mouse_xy
         self.path = path_create(self.xy)
         self.path_idx = 1
     end
@@ -125,13 +135,16 @@ end
 
 function Obj:draw()
     Display.draw_circle(COL_WHITE, self.xy, self.radius)
+    if self.path and self.path[self.path_idx] then
+        Display.draw_line(COL_YELLOW, self.xy, self.path[self.path_idx], 1)
+    end
 end
 
 for i=1,10 do
     local tile_xy = MapUtils.random_square(map)
     local obj = GameObject.object_create {
         map=gmap, xy = {tile_xy[1]*32+16, tile_xy[2]*32+16},
-        radius = 11, on_step = Obj.step, on_draw = Obj.draw, speed = 4,
+        radius = 11, on_step = Obj.step, on_draw = Obj.draw, speed = 3,
     }
     obj.sim_id = cgroup:add_object(obj)
 end
@@ -141,6 +154,10 @@ while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
     cgroup:step()
     Display.draw_start()
     GameMap.map_draw {map=gmap}
+    if last_click then
+        local xy = {math.floor(last_click[1]/32)*32+16, math.floor(last_click[2]/32)*32+16}
+        Display.draw_circle(with_alpha(COL_RED, .5), xy, 8)
+    end
     Display.draw_finish()
     GameState.wait(10)
 end

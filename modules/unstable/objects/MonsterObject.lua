@@ -37,6 +37,13 @@ function MonsterObject:on_death(attacker_obj)
     GameObject.destroy(self)
 end
 
+function MonsterObject:on_draw()
+    local hostile = ObjectUtils.find_closest_hostile(self)
+    local check = GameMap.line_tile_check(self.map, self.xy, hostile.xy)
+    ObjectUtils.screen_draw(self.sprite, self.xy)
+    Fonts.small:draw({color=COL_WHITE}, self.xy, check and "NOT SEEN" or "SEEN")
+end
+
 function MonsterObject:on_step()
     self.base.on_step(self)
     local hostile = ObjectUtils.find_closest_hostile(self)
@@ -61,6 +68,8 @@ function MonsterObject.create(args)
     if type(args.monster_type) == "string" then
         args.monster_type = MonsterType.lookup(args.monster_type)
     end
+    -- The AI state module holds the 
+    args.ai_state = {}
     args.base_stats = table.deep_clone(args.monster_type.base_stats)
 
     -- Set up type signature
