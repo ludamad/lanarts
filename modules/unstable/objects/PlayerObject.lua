@@ -6,6 +6,7 @@ local PlayerIOActions = import ".PlayerIOActions"
 local PlayerIOResolution = import ".PlayerIOResolution"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local SkillType = import "@SkillType"
+local RaceType = import "@RaceType"
 local StatContext = import "@StatContext"
 local GameObject = import "core.GameObject"
 local LogUtils = import "lanarts.LogUtils"
@@ -20,7 +21,7 @@ local function player_preferences(args)
 end
 
 function PlayerObject.player_stats_create(race, --[[Can-be-nil]] class, name)
-    local stats = race.on_create(name)
+    local stats = RaceType.resolve(race).on_create(name)
     if class then
         local context = StatContext.stat_context_create(stats)
         class:on_init(context)
