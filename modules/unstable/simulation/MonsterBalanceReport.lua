@@ -2,6 +2,7 @@ local MonsterType = import "@MonsterType"
 local ClassType = import "@ClassType"
 local PlayerObject = import "@objects.PlayerObject"
 local RaceType = import "@RaceType"
+local StatContext = import "@StatContext"
 
 local M = nilprotect {} -- Submodule
 
@@ -27,7 +28,7 @@ end
 
 local function generate_entry(stats)
     for m in values(MonsterType.list) do
-        
+--        StatContext.
     end
 end
 

@@ -269,11 +269,13 @@ static int gmap_object_tile_check(lua_State* L) {
 
 static int gmap_radius_tile_check(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
-	Pos pos = luawrap::get<Pos>(L, 1);
-	int radius = lua_tointeger(L, 2);
+	int map_id = stack_defaulted(L, 1, gs->get_level_id());
+	GameTiles& tiles = gs->get_level(map_id)->tiles();
+	Pos pos = luawrap::get<Pos>(L, 2);
+	int radius = lua_tointeger(L, 3);
 
 	Pos hit_pos;
-	bool collided = gs->tile_radius_test(pos.x, pos.y, radius, true, -1, &hit_pos);
+	bool collided = tiles.radius_test(pos, radius, true, -1, &hit_pos);
 	if (!collided) {
 		lua_pushnil(L);
 	} else {

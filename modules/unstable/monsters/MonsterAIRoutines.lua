@@ -21,7 +21,7 @@ end
 
 -- Search two lines at two lines of a circle, combined with two circle checks.
 -- Emulates a check of eg a missile's trajectory.
-local function fat_line_check(radius, from_xy, to_xy)
+local function fat_line_check(gmap, radius, from_xy, to_xy)
     local vadd,vsub = vector_add, vector_subtract
     local reach = {radius, 0}
 
@@ -41,36 +41,36 @@ local function fat_line_check(radius, from_xy, to_xy)
     return false
 end
 
-local function follow_path(self)
-    self.preferred_velocity = {0,0}
-    local x, y = unpack(self.xy)
-    while self.path do
-        local idx = self.path_idx
-        local node, is_final_node = self.path[idx], (idx == #self.path)
+local function follow_path(mon, path, idx)
+    mon.preferred_velocity = {0,0}
+    local x, y = unpack(mon.xy)
+    while path do
+        local node, is_final_node = path[idx], (idx == #path)
         if not node then 
-            self.path = nil
+            path = nil
             break
         end
         local dx,dy=node[1]-x,node[2]-y
-        local xspeed, yspeed= math.min(self.speed, math.abs(dx)), math.min(self.speed, math.abs(dy))
+        local xspeed, yspeed= math.min(mon.speed, math.abs(dx)), math.min(mon.speed, math.abs(dy))
         local dist, dist_needed = math.sqrt(dx*dx+dy*dy), (is_final_node and 0 or 16)
 
         local straight_line_to_next_node = false
-        if not is_final_node and not fat_line_check(self.radius, self.xy, self.path[idx+1]) then
+        if not is_final_node and not fat_line_check(mon.map, mon.radius, mon.xy, path[idx+1]) then
             straight_line_to_next_node = true
-        elseif dist >= 32 and fat_line_check(self.radius, self.xy, self.path[idx]) then
-            self.path_idx = math.max(0,self.path_idx - 1)
+        elseif dist >= 32 and fat_line_check(mon.map, mon.radius, mon.xy, path[idx]) then
+            idx = math.max(0,idx - 1)
         end
 
         if straight_line_to_next_node or dist < dist_needed then
-            self.path_idx = self.path_idx + 1
-            if self.path_idx > #self.path then self.path = nil end
+            idx = idx + 1
+            if idx > #path then path = nil end
             -- Continue onto next node
         else
-            self.preferred_velocity = {signof(dx)*xspeed, signof(dy)*yspeed}
+            mon.preferred_velocity = {signof(dx)*xspeed, signof(dy)*yspeed}
             break -- Done
         end
     end
+    return path, path and idx or nil
 end
 
 M.ActionTask = newtype()
@@ -79,6 +79,8 @@ end
 
 M.GoToTask = newtype()
 function M.GoToTask:init(xy)
+    self.destination_xy = xy
+    self.path = path_create(self.destination_xy)
 end
 
 M.FollowRoutine = newtype()
