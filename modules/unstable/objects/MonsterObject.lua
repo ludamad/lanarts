@@ -44,27 +44,40 @@ function MonsterObject:on_draw()
     Fonts.small:draw({color=COL_WHITE}, self.xy, check and "NOT SEEN" or "SEEN")
 end
 
-function MonsterObject:on_step()
-    self.base.on_step(self)
-    local hostile = ObjectUtils.find_closest_hostile(self)
-    if not hostile then return end -- No target
+local Resolver = newtype()
 
-    local S,P = self:stat_context(), hostile:stat_context()
-    local weapon_action, source = self:weapon_action()
-    if self:can_use_action(weapon_action, P, source) then
-        self:use_action(weapon_action, P, source) 
+function Resolver:on_prestep(obj)
+    local A = {}
+    self.preferred_velocity = {0,0}
+
+    local hostile = ObjectUtils.find_closest_hostile(obj)
+    if not hostile then return nil end -- No target
+    
+    local S,P = obj:stat_context(), hostile:stat_context()
+    local weapon_action, source = obj:weapon_action()
+    if obj:can_use_action(weapon_action, P, source) then
+        A.action = weapon_action
+        A.target = P
+        A.source = source 
     end
 
-    local dx,dy = unpack(vector_subtract(hostile.xy, self.xy))
-    local move_speed = self:stat_context().derived.movement_speed
+    local dx,dy = unpack(vector_subtract(hostile.xy, obj.xy))
+    local move_speed = obj:stat_context().derived.movement_speed
     local xspeed, yspeed= math.min(move_speed, math.abs(dx)), math.min(move_speed, math.abs(dy))
-    if vector_distance(hostile.xy, self.xy) > hostile.radius + self.radius then
-        self.xy = vector_add(self.xy, {math.sign_of(dx) * xspeed, math.sign_of(dy) * yspeed})
+    if vector_distance(hostile.xy, obj.xy) > hostile.radius + obj.radius then
+        self.preferred_velocity[1] = math.sign_of(dx) * xspeed
+        self.preferred_velocity[2] = math.sign_of(dy) * yspeed
     end
+
+    return A
+end
+
+function Resolver:resolve(obj)
 end
 
 function MonsterObject.create(args)
     assert(args.monster_type and not args.type)
+    args.action_resolver = Resolver.create()
     if type(args.monster_type) == "string" then
         args.monster_type = MonsterType.lookup(args.monster_type)
     end

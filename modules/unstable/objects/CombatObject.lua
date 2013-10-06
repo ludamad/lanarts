@@ -16,7 +16,7 @@ local CombatObject = ObjectUtils.type_create()
 CombatObject.COMBAT_TRAIT = "COMBAT_TRAIT"
 
 function CombatObject.create(args)
-    assert(args.base_stats)
+    assert(args.base_stats and args.action_resolver)
     args.solid = args.solid or true
     -- Set up type signature
     args.type = args.type or CombatObject
@@ -36,6 +36,11 @@ function CombatObject:on_init()
     -- Internal only property. Provides a stat context of unknown validity.
     self._context = StatContext.stat_context_create(self.base_stats, self.derived_stats, self)
     self._stats_need_calculate = false -- Mark as valid stat context
+    self.action_resolver:on_object_init(self)
+end
+
+function CombatObject:on_deinit()
+    self.action_resolver:on_object_deinit(self)
 end
 
 function CombatObject:gain_xp(xp)
@@ -58,9 +63,53 @@ function CombatObject:stat_context_copy()
     return { obj = self, base = table.deep_clone(context.base), derived = table.deep_clone(context.derived) }
 end
 
+function CombatObject:on_prestep()
+    self.action_resolver:on_prestep(self)
+end
+
+function CombatObject:use_resolved_action()
+    self.action_resolver:use_resolved_action(self)
+    if not R then return end
+
+    local new_xy = {self.x + (R.vx or 0), self.y + (R.vy or 0)}
+    if not GameMap.object_solid_check(self, new_xy) then
+        self.xy = new_xy
+    end
+    if R.action then
+        self:use_action(R.action, R.target, R.source)
+    end
+
+    return R
+end
+
 function CombatObject:on_step()
+    local cgroup = self.collision_avoidance_group
     StatContext.on_step(self._context)
     self._stats_need_calculate = true
+
+    local close_to_wall = GameMap.radius_tile_check(self.xy, self.radius + 10)
+    local prev_xy = self.xy
+    if not close_to_wall then
+        cgroup:object_copy_xy(self.sim_id, self)
+    end
+
+    if close_to_wall then
+        local dx,dy = unpack(self.preferred_velocity)
+        local new_xy = {self.x+dx,self.y+dy}
+        if not GameMap.radius_tile_check(new_xy, self.radius) then
+            self.xy = new_xy
+        else
+            new_xy[1], new_xy[2] = self.x+dx, self.y
+            if not GameMap.radius_tile_check(new_xy, self.radius) then self.xy = new_xy
+            else
+                new_xy[1], new_xy[2] = self.x, self.y+dy
+                if not GameMap.radius_tile_check(new_xy, self.radius) then self.xy = new_xy end
+            end
+        end
+    end
+
+    local R = self.action_resolver:resolve(self)
+    self:on_resolve_action(R)
 end
 
 -- Paramater for on_draw

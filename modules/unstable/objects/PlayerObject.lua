@@ -63,7 +63,10 @@ function PlayerObject:gain_xp(xp)
     end
 end
 function PlayerObject:on_step()
-    self.base.on_step(self)
+--    self.base.on_step(self)
+    StatContext.on_step(self._context) -- TEMP
+    self._stats_need_calculate = true -- TEMP2
+
     table.clear(self.queued_io_actions)
     self:io_action_handler(self.queued_io_actions)
     for io_action in values(self.queued_io_actions) do
@@ -73,6 +76,7 @@ end
 
 function PlayerObject.create(args)
     args.sprite = resolve_sprite(args.race)
+    args.action_resolver = {} -- TODO
     args.queued_io_actions = {}
     args.preferences = player_preferences(args.preferences or {})
     args.io_action_handler = args.io_action_handler or PlayerIOResolution.default_io_action_resolver

@@ -41,6 +41,10 @@ static PosF colavoid_object_xy(CollisionAvoidancePtr colavoid, simul_id id) {
 	return colavoid->get_position(id);
 }
 
+static void colavoid_remove_object(CollisionAvoidancePtr colavoid, simul_id id) {
+	colavoid->remove_object(id);
+}
+
 static void colavoid_object_copy_xy(CollisionAvoidancePtr colavoid, simul_id id, LuaStackValue args) {
 	args["xy"] = colavoid->get_position(id);
 }
@@ -49,6 +53,7 @@ LuaValue lua_colavoidmetatable(lua_State* L) {
 	LuaValue meta = luameta_new(L, "CollisionAvoidance");
 	LuaValue methods = luameta_constants(meta);
 	methods["add_object"].bind_function(colavoid_add_object);
+	methods["remove_object"].bind_function(colavoid_remove_object);
 	methods["update_object"].bind_function(colavoid_update_object);
 	methods["object_xy"].bind_function(colavoid_object_xy);
 	methods["object_copy_xy"].bind_function(colavoid_object_copy_xy);

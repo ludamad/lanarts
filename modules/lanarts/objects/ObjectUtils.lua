@@ -69,4 +69,20 @@ function M.tile_xy(self)
     return vector_scale(self.xy, 1/32.0, true)
 end
 
+function M.find_free_position(self, dir)
+    local dx,dy = unpack(dir)
+    local check, new_xy, R = GameMap.radius_tile_check, {}, self.radius
+
+    new_xy[1], new_xy[2] = self.x+dx, self.y+dy
+    if not check(new_xy, R) then return new_xy end
+
+    new_xy[1], new_xy[2] = self.x+dx, self.y
+    if not check(new_xy, R) then return new_xy end
+
+    new_xy[1], new_xy[2] = self.x, self.y+dy
+    if not check(new_xy, R) then return new_xy end
+
+    return nil
+end
+
 return M
