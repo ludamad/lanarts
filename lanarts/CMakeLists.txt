@@ -9,8 +9,17 @@ include(FindFreetype)
 
 set( SRC ..)
 set( DEPS ../dependencies)
+set( BUILTDEPS ${CMAKE_BINARY_DIR}/dependencies )
 
 add_definitions( -std=c++98 )
+
+if (${USE_LUAJIT})
+    set( lua_includes ${DEPS}/luajit/src ${DEPS}/lua )
+        set( lua_libraries luajit )
+else()
+        set( lua_includes ${DEPS}/lua  )
+        set( lua_libraries lua )
+endif()
 
 include_directories(
 	"."
@@ -26,7 +35,7 @@ include_directories(
 	"${SRC}/sound-lib/include"
 	${DEPS}/UnitTest++ 
 	"${DEPS}/yaml-cpp/include"
-	${DEPS}/lua 
+	${lua_includes} 
 	${DEPS} # for rvo2 & luasocket
 	)
 
@@ -93,7 +102,7 @@ set (libraries
 	lcommon
 	lanarts_dungeon_gen
 	lsound
-	lua
+	${lua_libraries}
 	luasocket
 	luawrap
 	lanarts_net

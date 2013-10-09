@@ -69,47 +69,14 @@ end
 
 function CombatObject:use_resolved_action()
     self.action_resolver:use_resolved_action(self)
-    if not R then return end
-
-    local new_xy = {self.x + (R.vx or 0), self.y + (R.vy or 0)}
-    if not GameMap.object_solid_check(self, new_xy) then
-        self.xy = new_xy
-    end
-    if R.action then
-        self:use_action(R.action, R.target, R.source)
-    end
-
-    return R
 end
 
 function CombatObject:on_step()
-    local cgroup = self.collision_avoidance_group
+    local cgroup = self.collision_group
     StatContext.on_step(self._context)
     self._stats_need_calculate = true
 
-    local close_to_wall = GameMap.radius_tile_check(self.xy, self.radius + 10)
-    local prev_xy = self.xy
-    if not close_to_wall then
-        cgroup:object_copy_xy(self.sim_id, self)
-    end
-
-    if close_to_wall then
-        local dx,dy = unpack(self.preferred_velocity)
-        local new_xy = {self.x+dx,self.y+dy}
-        if not GameMap.radius_tile_check(new_xy, self.radius) then
-            self.xy = new_xy
-        else
-            new_xy[1], new_xy[2] = self.x+dx, self.y
-            if not GameMap.radius_tile_check(new_xy, self.radius) then self.xy = new_xy
-            else
-                new_xy[1], new_xy[2] = self.x, self.y+dy
-                if not GameMap.radius_tile_check(new_xy, self.radius) then self.xy = new_xy end
-            end
-        end
-    end
-
-    local R = self.action_resolver:resolve(self)
-    self:on_resolve_action(R)
+    self:use_resolved_action()
 end
 
 -- Paramater for on_draw

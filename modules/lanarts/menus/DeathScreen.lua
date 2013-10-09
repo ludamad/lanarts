@@ -5,9 +5,8 @@ local InstanceBox = import "core.ui.InstanceBox"
 local InstanceLine = import "core.ui.InstanceLine"
 local TextLabel = import "core.ui.TextLabel"
 local Sprite = import "core.ui.Sprite"
-local utils = import "core.Utils"
 
-local keys = import "core.Keyboard"
+local Keys = import "core.Keyboard"
 
 local death_screen_font = "modules/core/fonts/MateSC-Regular.ttf"
 
@@ -66,7 +65,7 @@ end
 local function death_screen_show(...)
     local screen = death_screen_create(...)
 
-    while GameState.input_capture(true, false) and not Keys.key_pressed(keys.ESCAPE) and not Keys.key_pressed(keys.ENTER) and not Keys.key_pressed(keys.SPACE) do
+    while GameState.input_capture(true, false) and not Keys.key_pressed(Keys.ESCAPE) and not Keys.key_pressed(Keys.ENTER) and not Keys.key_pressed(Keys.SPACE) do
         Display.draw_start()
         screen:step( {0,0} )
         screen:draw( {0,0} )

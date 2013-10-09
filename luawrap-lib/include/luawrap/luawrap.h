@@ -59,8 +59,20 @@ namespace luawrap {
 	}
 
 	template<typename T>
+	inline bool check(lua_State* L, int idx) {
+		return _private::PushGetCheckWrap<T>::check(L, idx);
+	}
+
+	template<typename T>
 	inline typename _private::PushGetCheckWrap<T>::RetType get(lua_State* L,
 			int idx) {
+		if (!check<T>(L, idx)) {
+			const char* repr = lua_tostring(L, idx);
+			std::string obj_repr = repr ? repr : luaL_typename(L, idx);
+			char buff[50];
+			sprintf(buff, "%d", idx);
+			luawrap::conversion_error(typeid(T).name(), buff, obj_repr);
+		}
 		return _private::PushGetCheckWrap<T>::get(L, idx);
 	}
 
@@ -68,11 +80,6 @@ namespace luawrap {
 	inline typename _private::PushGetCheckWrap<T>::RetType get_unchecked(lua_State* L,
 			int idx) {
 		return _private::PushGetCheckWrap<T>::get(L, idx);
-	}
-
-	template<typename T>
-	inline bool check(lua_State* L, int idx) {
-		return _private::PushGetCheckWrap<T>::check(L, idx);
 	}
 
 //	// Utility operators:

@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 2.6)
 
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/luajit)
+    add_definitions(-DUSE_LUAJIT)
+    set(USE_LUAJIT 1)
+endif ()
+
 set(CMAKE_BUILD_TYPE DEBUG)
 #add_definitions(-DNDEBUG)
 

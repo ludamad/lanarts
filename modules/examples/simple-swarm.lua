@@ -51,8 +51,8 @@ local function fat_line_check(radius, from_xy, to_xy)
     local reach = {radius, 0}
 
     -- Circle checks at the ends of the line
-    if GameMap.radius_tile_check(from_xy, radius) then return true end
-    if GameMap.radius_tile_check(to_xy, radius) then return true end
+    if GameMap.radius_tile_check(gmap, from_xy, radius) then return true end
+    if GameMap.radius_tile_check(gmap, to_xy, radius) then return true end
 
     -- Two lines from either sides of the 'end circles'
     for reach in values{{radius,0}, {0, radius}} do
@@ -102,7 +102,7 @@ local last_click
 
 local Obj = {}
 function Obj:step()
-    local close_to_wall = (GameMap.radius_tile_check(self.xy, self.radius + 10))
+    local close_to_wall = (GameMap.radius_tile_check(gmap, self.xy, self.radius + 10))
     local prev_xy = self.xy
     if not close_to_wall then
         cgroup:object_copy_xy(self.sim_id, self)
@@ -119,14 +119,14 @@ function Obj:step()
     if close_to_wall then
         local dx,dy = unpack(self.preferred_velocity)
         local new_xy = {self.x+dx,self.y+dy}
-        if not GameMap.radius_tile_check(new_xy, self.radius) then
+        if not GameMap.radius_tile_check(gmap, new_xy, self.radius) then
             self.xy = new_xy
         else
             new_xy[1], new_xy[2] = self.x+dx, self.y
-            if not GameMap.radius_tile_check(new_xy, self.radius) then self.xy = new_xy
+            if not GameMap.radius_tile_check(gmap, new_xy, self.radius) then self.xy = new_xy
             else
                 new_xy[1], new_xy[2] = self.x, self.y+dy
-                if not GameMap.radius_tile_check(new_xy, self.radius) then self.xy = new_xy end
+                if not GameMap.radius_tile_check(gmap, new_xy, self.radius) then self.xy = new_xy end
             end
         end
     end

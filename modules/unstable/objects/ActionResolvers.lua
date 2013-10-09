@@ -1,5 +1,6 @@
 local GameMap = import "core.GameMap"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
+local PathUtils = import ".PathUtils"
 
 local M = nilprotect {} -- Submodule
 
@@ -8,6 +9,7 @@ M.ActionResolverBase = Base
 
 function Base:init(cgroup)
 	self.cgroup = cgroup -- Collision avoidance group
+--    assert(self.resolve_action)
 	self:_reset()
 end
 
@@ -16,6 +18,10 @@ function Base:_reset()
 	-- Use false as a 'safe' nil-value
 	self.action, self.target, self.source = false, false, false
 	self.close_to_wall = false
+end
+
+function Base:_set_action(action, target, source)
+    self.action, self.target, self.source = (action or false), (target or false), (source or false)
 end
 
 -- CollisionAvoidance expects 'radius, speed, xy, preferred_velocity' members.
@@ -30,7 +36,7 @@ function Base:_copy_from_colavoid(obj)
 end
 
 function Base:_copy_to_colavoid(obj)
-    self.cgroup:object_update(self.sim_id, self)
+    self.cgroup:update_object(self.sim_id, self)
 end
 
 function Base:on_object_init(obj)
@@ -44,11 +50,11 @@ end
 
 -- Assumes a cgroup:step() between on_prestep and use_resolved_action 
 function Base:use_resolved_action(obj)
-    local close_to_wall = GameMap.radius_tile_check(obj.xy, obj.radius + 10)
+    local close_to_wall = GameMap.radius_tile_check(obj.map, obj.xy, obj.radius + 10)
     if close_to_wall then
         local new_xy = ObjectUtils.find_free_position(obj, self.preferred_velocity)
         self.xy = new_xy or self.xy
-    else 
+    else
         self:_copy_from_colavoid(obj)
     end
     if self.action then
@@ -58,25 +64,39 @@ end
 
 function Base:on_prestep(obj)
     self:_reset()
+    if getmetatable(self).resolve_action then self:resolve_action(obj) end
+    self:_copy_to_colavoid(obj)
 end
 
 local AI = newtype {parent = Base}
 M.AIActionResolver = AI
 
-function AI:init(cgroup, action_chooser)
+function AI:init(cgroup)
     Base.init(self, cgroup)
-    assert(self.resolve_movement)
-    self.action_chooser = action_chooser
+    self.path = false
 end
 
-function AI:on_prestep(obj)
-    Base.on_prestep(obj)
+function AI:resolve_action(obj)
+    self:_reset()
 
-    local action, target, source = self:action_chooser(obj)
-    self.action, self.target = action or false, target or false
-    self.source = source or false
+    local hostile = ObjectUtils.find_closest_hostile(obj)
+    if not hostile then return nil end -- No target
+    
+    local S,H = obj:stat_context(), hostile:stat_context()
+    local weapon_action, source = obj:weapon_action()
+    if obj:can_use_action(weapon_action, H, source) then
+        self.action = weapon_action
+        self.target = H
+        self.source = source 
+    end
 
-    self:_copy_to_colavoid(obj)
+    local dx,dy = unpack(vector_subtract(hostile.xy, obj.xy))
+    local move_speed = obj:stat_context().derived.movement_speed
+    local xspeed, yspeed= math.min(move_speed, math.abs(dx)), math.min(move_speed, math.abs(dy))
+    if vector_distance(hostile.xy, obj.xy) > hostile.radius + obj.radius then
+        self.preferred_velocity[1] = math.sign_of(dx) * xspeed
+        self.preferred_velocity[2] = math.sign_of(dy) * yspeed
+    end
 end
 
 return M

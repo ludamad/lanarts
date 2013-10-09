@@ -36,15 +36,50 @@
 // This is a stop-gap measure to allow Lua all-or-nothing control over internal graphic initialization.
 // Long-term we must move eg fonts completely to Lua.
 static int __initialize_internal_graphics(lua_State* L) {
+	static bool called = false;
+	if (called) {
+		return 0;
+	}
+	called = true;
 	GameSettings& settings = lua_api::gamestate(L)->game_settings();
 	res::font_primary().initialize(settings.font, 10);
 	res::font_menu().initialize(settings.menu_font, 20);
 	return 0;
 }
 
+#ifdef USE_LUAJIT
+
+extern "C" {
+#include <luajit.h>
+}
+
+// LuaJIT only: Catch C++ exceptions and convert them to Lua error messages.
+static int luajit_wrap_exceptions(lua_State *L, lua_CFunction f) {
+	try {
+		return f(L);  // Call wrapped function and return result.
+	} catch (const char *s) {  // Catch and convert exceptions.
+		lua_pushstring(L, s);
+	} catch (std::exception& e) {
+		lua_pushstring(L, e.what());
+	} catch (...) {
+		lua_pushliteral(L, "caught (...)");
+	}
+	return lua_error(L);  // Rethrow as a Lua error.
+}
+
+static void luajit_configure(lua_State* L) {
+	lua_pushlightuserdata(L, (void *)luajit_wrap_exceptions);
+	luaJIT_setmode(L, -1, LUAJIT_MODE_WRAPCFUNC|LUAJIT_MODE_ON);
+	lua_pop(L, 1);
+}
+#endif
+
 static GameState* init_gamestate() {
 
 	lua_State* L = lua_api::create_configured_luastate();
+#ifdef USE_LUAJIT
+	luajit_configure(L);
+#endif
 	lua_api::add_search_path(L, "modules/lanarts/?.lua");
 
 	GameSettings settings; // Initialized with defaults
@@ -76,7 +111,7 @@ static GameState* init_gamestate() {
 	return gs;
 }
 
-static int run_engine(int argc, char** argv) {
+static void run_engine(int argc, char** argv) {
 	label_StartOver:
 
 	GameState* gs = init_gamestate();
@@ -161,10 +196,6 @@ static int run_engine(int argc, char** argv) {
 	delete gs;
 
 	printf("Lanarts shut down cleanly\n");
-
-//	lua_close(L); // TODO: To exit cleanly we must clear all resource vectors explicitly
-
-	return 0;
 }
 
 /* Must take (int, char**) to play nice with SDL */
@@ -175,4 +206,6 @@ int main(int argc, char** argv) {
 		fprintf(stderr, "%s\n", err.what());
 		fflush(stderr);
 	}
+
+	return 0;
 }

@@ -15,17 +15,32 @@ M.RESOURCE_METATABLE = {
     __copy = function(t1,t2) table.copy(t1,t2, --[[Do not invoke meta]] false) end
 }
 
+-- Scan and call 'path_resolve' with call frame that begins with 'Define' prefix
+function M.path_resolve_for_definition(path)
+    for idx=1,math.huge do
+        local info = debug.getinfo(idx)
+        if not info then 
+            return nil
+        end
+        local src = info.source
+        local idx = src:find("/Define")
+        if idx then 
+            return src:sub(2,idx) .. path
+        end
+    end
+end
+
 -- Derive sprite from name
-function M.derive_sprite(name, --[[Optional]] stack_idx)
-    local path = path_resolve("sprites/" .. name:gsub(' ', '_'):lower() .. ".png", (stack_idx or 1) + 1)
+function M.derive_sprite(name)
+    local path = M.path_resolve_for_definition('sprites/')  .. name:gsub(' ', '_'):lower() .. ".png"
     return image_cached_load(path)
 end
 
-function M.resolve_sprite(args, --[[Optional]] stack_idx)
-    local sprite = args.sprite or M.derive_sprite(args.lookup_key or args.name, (stack_idx or 1) + 1)
+function M.resolve_sprite(args)
+    local sprite = args.sprite or M.derive_sprite(args.lookup_key or args.name)
     if type(sprite) == "string" then
         if sprite:find("%(") or sprite:find("%%") then
-            sprite = path_resolve(sprite, (stack_idx or 1) + 1)
+            sprite = M.path_resolve_for_definition(sprite)
             return Display.directional_create(Display.images_load(sprite), 1.0)
         else
             return Display.image_load(sprite)

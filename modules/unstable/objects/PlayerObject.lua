@@ -10,6 +10,7 @@ local RaceType = import "@RaceType"
 local StatContext = import "@StatContext"
 local GameObject = import "core.GameObject"
 local LogUtils = import "lanarts.LogUtils"
+local ActionResolvers = import ".ActionResolvers"
 
 local PlayerObject = ObjectUtils.type_create(CombatObject)
 PlayerObject.PLAYER_TRAIT = "PLAYER_TRAIT"
@@ -76,7 +77,7 @@ end
 
 function PlayerObject.create(args)
     args.sprite = resolve_sprite(args.race)
-    args.action_resolver = {} -- TODO
+    args.action_resolver = ActionResolvers.ActionResolverBase.create(args.collision_group)
     args.queued_io_actions = {}
     args.preferences = player_preferences(args.preferences or {})
     args.io_action_handler = args.io_action_handler or PlayerIOResolution.default_io_action_resolver

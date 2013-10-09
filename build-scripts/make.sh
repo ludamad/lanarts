@@ -10,7 +10,8 @@ T="$(date +%s%N)"
 
 ##MAKE
 failed=0
-if ! make -j4 ; then
+cores=$(grep -c ^processor /proc/cpuinfo)
+if ! make -j$((cores+1)) ; then
 	failed=1
 fi
 

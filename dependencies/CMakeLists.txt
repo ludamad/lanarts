@@ -1,9 +1,13 @@
 cmake_minimum_required(VERSION 2.6)
 
-add_subdirectory( lua )
+if (${USE_LUAJIT})
+    add_subdirectory( luajit )
+else()
+    add_subdirectory( lua )
+endif ()
+
 add_subdirectory( luasocket )
 add_subdirectory( rvo2 )
 add_subdirectory( enet )
-add_subdirectory( libxmi )
 add_subdirectory( yaml-cpp )
 add_subdirectory( UnitTest++ )

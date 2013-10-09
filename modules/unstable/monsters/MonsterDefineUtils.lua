@@ -29,7 +29,7 @@ function M.monster_define(t, --[[Optional]] derive_idx)
     t.team = t.team or Relations.TEAM_MONSTER_ROOT
     local stats = ContentUtils.resolve_embedded_stats(t)
     local context = StatContext.stat_context_create(stats)
-    local sprite = t.sprite or ContentUtils.derive_sprite(t.name, --[[Callers stack index]] (derive_idx or 1) + 1)
+    local sprite = t.sprite or ContentUtils.derive_sprite(t.name)
 
     for trait in values(t.traits or {}) do
         Traits.stat_mod_functions[trait](stats)
