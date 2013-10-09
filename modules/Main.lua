@@ -3,7 +3,6 @@ nilprotect(_G)
 
 -- Define essential global variables, and module engine interaction here.
 -- Global variables & functions will be locked after the 'main.lua' file of each module has ran
-
 _ROOT_FOLDER = "modules"
 
 -- Name caches

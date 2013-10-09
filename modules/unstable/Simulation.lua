@@ -230,6 +230,7 @@ end
 local frame, WAIT_UNTIL = 0, 0
 
 local function can_continue(player)
+print("FRAME",frame)
     if frame < WAIT_UNTIL then return false end
     return not StatContext.has_cooldown(player, CooldownTypes.ALL_ACTIONS)
 end
@@ -240,7 +241,7 @@ local function query_player(player)
     if not monster_obj then os.exit() end
     local monster = monster_obj:stat_context()
     local weapon_action, source = player.obj:weapon_action()
-    if not can_continue(player) then return end
+    if not can_continue(player) then return false end
     local moved = false
     while not moved do
         AnsiCol.println("Frame: " .. frame, AnsiCol.YELLOW, AnsiCol.BOLD)
@@ -264,6 +265,7 @@ local function query_player(player)
             moved = true
         end
     end
+    return moved
 end
 
 local function print_sample_stats(race, --[[Optional]] class)
@@ -352,19 +354,20 @@ function M.main()
     local race, class = M.choose_player_stats()
     local player = SM:add_player("Tester", race, class)
     player.io_action_handler = do_nothing
-    for i=1,2 do
+    for i=1,20 do
         SM:add_monster("Giant Rat")
     end
 
     while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
         SM:step()
-        Display.draw_start()
-        SM:draw()
-        Display.draw_finish()
-        GameState.wait(5)
         report_new_identifications(player:stat_context())
         track_identification(player:stat_context())
-        query_player(player:stat_context())
+        if query_player(player:stat_context()) then
+            Display.draw_start()
+            SM:draw()
+            Display.draw_finish()
+            GameState.wait(5)
+        end
     end
 end
 

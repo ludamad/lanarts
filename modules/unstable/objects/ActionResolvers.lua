@@ -77,8 +77,6 @@ function AI:init(cgroup)
 end
 
 function AI:resolve_action(obj)
-    self:_reset()
-
     local hostile = ObjectUtils.find_closest_hostile(obj)
     if not hostile then return nil end -- No target
     
