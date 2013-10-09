@@ -9,6 +9,8 @@
 -- Declare module
 -----------------------------------------------------------------------------
 local base = _G
+local table = table
+local string = string
 module("ltn12")
 
 filter = {}
@@ -36,6 +38,7 @@ end
 -- chains a bunch of filters together
 -- (thanks to Wim Couwenberg)
 function filter.chain(...)
+    local arg = {...}
     local n = table.getn(arg)
     local top, index = 1, 1
     local retry = ""
@@ -288,4 +291,9 @@ function pump.all(src, snk, step)
     end
 end
 
-return base.getfenv()
+return {
+    filter = filter,
+    source = source,
+    sink = sink,
+    pump = pump
+}

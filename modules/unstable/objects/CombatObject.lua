@@ -72,7 +72,6 @@ function CombatObject:use_resolved_action()
 end
 
 function CombatObject:on_step()
-    local cgroup = self.collision_group
     StatContext.on_step(self._context)
     self._stats_need_calculate = true
 

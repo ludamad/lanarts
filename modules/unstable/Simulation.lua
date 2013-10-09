@@ -230,7 +230,6 @@ end
 local frame, WAIT_UNTIL = 0, 0
 
 local function can_continue(player)
-print("FRAME",frame)
     if frame < WAIT_UNTIL then return false end
     return not StatContext.has_cooldown(player, CooldownTypes.ALL_ACTIONS)
 end
@@ -358,11 +357,12 @@ function M.main()
         SM:add_monster("Giant Rat")
     end
 
+    local DRAW_ALL_FRAMES = true
     while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
         SM:step()
         report_new_identifications(player:stat_context())
         track_identification(player:stat_context())
-        if query_player(player:stat_context()) then
+        if query_player(player:stat_context()) or DRAW_ALL_FRAMES then
             Display.draw_start()
             SM:draw()
             Display.draw_finish()

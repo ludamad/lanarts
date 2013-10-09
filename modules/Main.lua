@@ -1,9 +1,3 @@
-if os.getenv('DEBUG_MODE') then 
-    require_path_add("/usr/share/lua/5.1/?.lua")
-    local dbg = loadfile("/home/adomurad/scripts/debugger.lua")
-    dbg()()
-end
-
 -- Ensure undefined global variable access results in an error
 nilprotect(_G)
 
@@ -117,6 +111,17 @@ end
 -- Require is used when interacting with 'vanilla' lua modules
 require_path_add("modules/?.lua")
 
+local function attach_debugger()
+    local DBG_PATH, DBG_MODULE = "/usr/share/lua/5.1/", "debugger"
+    local DBG_FILE = DBG_PATH .. DBG_MODULE .. ".lua"
+    if not file_exists(DBG_FILE) then
+        error("Debugging requires " .. DBG_FILE .. " to exist!")
+    end
+    require_path_add(DBG_PATH .. "?.lua")
+    require(DBG_MODULE)()
+    attach_debugger = do_nothing
+end
+
 --- Lanarts Entry point
 -- @param args the arguments passed on the command-line.
 -- @return whether we are performing a full game initialization, or performing some testing task
@@ -125,9 +130,13 @@ function Engine.main(args)
 
     import "core.Main"
 
-    local all_tests, cpp_tests, lua_tests = (args[1] == "--tests"), (args[1] == "--cpp-tests"), (args[1] == "--lua-tests")
-    if all_tests or cpp_tests or lua_tests then
+    if table.contains(args, "--debug") then
+        attach_debugger()
+    end
 
+    local all_tests, cpp_tests, lua_tests = (args[1] == "--tests"), (args[1] == "--cpp-tests"), (args[1] == "--lua-tests")
+
+    if all_tests or cpp_tests or lua_tests then
         local Display = import "core.Display"
         Display.initialize("Tests", {settings.view_width, settings.view_height}, settings.fullscreen)
 

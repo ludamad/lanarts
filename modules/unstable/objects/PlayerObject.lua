@@ -52,7 +52,6 @@ end
 
 function PlayerObject:on_init()
     self.base.on_init(self)
-    self:gain_xp(1000)
 end
 
 function PlayerObject:gain_xp(xp)

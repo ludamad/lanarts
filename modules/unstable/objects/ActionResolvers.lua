@@ -32,10 +32,11 @@ function Base:_copy_from_object(obj)
 end
 
 function Base:_copy_from_colavoid(obj)
-    self.cgroup:object_copy_xy(self.sim_id, self)
+    self.cgroup:object_copy_xy(self.sim_id, obj)
 end
 
 function Base:_copy_to_colavoid(obj)
+    self:_copy_from_object(obj)
     self.cgroup:update_object(self.sim_id, self)
 end
 
@@ -53,13 +54,14 @@ function Base:use_resolved_action(obj)
     local close_to_wall = GameMap.radius_tile_check(obj.map, obj.xy, obj.radius + 10)
     if close_to_wall then
         local new_xy = ObjectUtils.find_free_position(obj, self.preferred_velocity)
-        self.xy = new_xy or self.xy
+        obj.xy = new_xy or obj.xy
     else
         self:_copy_from_colavoid(obj)
     end
     if self.action then
         obj:use_action(self.action, self.target or nil, self.source or nil)
     end
+
 end
 
 function Base:on_prestep(obj)
