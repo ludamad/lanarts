@@ -59,5 +59,5 @@ ranged_weapon_define {
     ammunition_trait = Traits.ARROW,
     gold_worth = 20, difficulty = 0,
     aptitude_types = {[Apts.BOWS] = 1, [Apts.RANGED] = 1.0, [Apts.MELEE] = 0.5},
-    effectiveness = 3, damage = 7, delay = 1.3
+    effectiveness = 6, damage = 4, delay = 1.0
 }

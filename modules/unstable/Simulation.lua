@@ -237,7 +237,8 @@ end
 local function query_player(player)
     frame = frame + 1
     local monster_obj = ObjectUtils.find_closest_hostile(player.obj)
-    if not monster_obj then os.exit() end
+    if not monster_obj then return false end
+    if not GameMap.object_visible(monster_obj) then return false end
     local monster = monster_obj:stat_context()
     local weapon_action, source = player.obj:weapon_action()
     if not can_continue(player) then return false end
@@ -326,6 +327,35 @@ function M.choose_player_stats()
     return race, class
 end
 
+local fights,fight_idx = {}, 1
+local function add_fight(name, amount, times)
+    table.insert_all(fights, {dup({[name] = amount}, times)})
+end
+
+add_fight("Giant Rat", 1, 5)
+add_fight("Giant Rat", 2, 5)
+
+local function fight_spawn_if_over(SM)
+    for obj in GameMap.objects(SM.gmap) do
+        if MonsterObject.is_monster(obj) then
+            return -- Fight in progress
+        end
+    end
+    local fight = fights[fight_idx]
+    fight_idx = fight_idx + 1
+    if not fight then 
+        print(AnsiCol.YELLOW("You have won."))
+        os.exit()
+    end
+
+    for monster,amount in pairs(fight) do
+        print(AnsiCol.YELLOW(amount .. " " .. monster .. " spawns."))
+        for i=1,amount do
+            SM:add_monster(monster)
+        end
+    end
+end
+
 function M.main()
     -- Load game content
     import "@DefineAll"
@@ -353,21 +383,17 @@ function M.main()
     local race, class = M.choose_player_stats()
     local player = SM:add_player("Tester", race, class)
     player.io_action_handler = do_nothing
-    for i=1,20 do
-        SM:add_monster("Giant Rat")
-    end
 
-    local DRAW_ALL_FRAMES = true
     while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
+        fight_spawn_if_over(SM)
+        Display.view_snap(player.xy)
+        Display.draw_start()
+        SM:draw()
+        Display.draw_finish()
         SM:step()
         report_new_identifications(player:stat_context())
         track_identification(player:stat_context())
-        if query_player(player:stat_context()) or DRAW_ALL_FRAMES then
-            Display.draw_start()
-            SM:draw()
-            Display.draw_finish()
-            GameState.wait(5)
-        end
+        query_player(player:stat_context())
     end
 end
 

@@ -12,7 +12,6 @@ local base = _G
 local ltn12 = import("@Ltn12")
 local mime = import("@mime.core")
 
-pretty_print(ltn12.filter)
 module("mime")
 
 -- encode, decode and wrap algorithm tables

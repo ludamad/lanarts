@@ -33,11 +33,12 @@ function M.stats_to_string(s, --[[Optional]] use_color, --[[Optional]] use_new_l
         return (...) or ""
     end
 
-    local ret = ("%s %s %s %s"):format(
+    local ret = ("%s %s %s %s %s"):format(
         if_color(C.WHITE, alternate_name or s.name), 
         if_color(C.GREEN, ("HP %d/%d"):format(R(s.hp), s.max_hp)), 
         if_color(C.BLUE, ("MP %d/%d"):format(R(s.mp), s.max_mp)),
-        if_color(C.YELLOW, ("XP %d/%d"):format(s.xp, ExperienceCalculation.level_experience_needed(s.level)))
+        if_color(C.YELLOW, ("XP %d/%d"):format(s.xp, ExperienceCalculation.level_experience_needed(s.level))),
+        if_color(C.YELLOW, ("(%d%%)"):format(math.floor(ExperienceCalculation.level_progress(s.xp, s.level)*100)))
     )
 
     local traits = {}

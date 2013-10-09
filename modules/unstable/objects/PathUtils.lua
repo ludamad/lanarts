@@ -29,7 +29,7 @@ local Path = newtype()
 
 function Path:init(path) 
 	self.path = path
-	self.node_index = 0
+	self.node_index = 1
 end
 
 M.path_create = Path.create

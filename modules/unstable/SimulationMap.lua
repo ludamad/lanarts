@@ -23,16 +23,20 @@ function SimulationMap:init(map, gmap)
 end
 
 function SimulationMap:add_player(name, race, class)
-    local tile_xy = MapUtils.random_square(self.map)
+    local xy = MapUtils.random_square(self.map)
     local player_object = PlayerObject.create {
         name = name,
         race = race,
         class = class,
         collision_group = self.collision_group,
-        xy = MapUtils.from_tile_xy(tile_xy),
+        xy = MapUtils.from_tile_xy(xy),
         is_local_player = function() return true end,
         do_init = true,
         map = self.gmap
+    }
+    MapGen.rectangle_apply {
+        map=self.map, area = {xy[1]-6,xy[2]-6,xy[1]+6,xy[2]+6}, 
+        fill_operator = {add = MapGen.FLAG_HAS_OBJECT}
     }
     table.insert(self.players, player_object)
     return player_object

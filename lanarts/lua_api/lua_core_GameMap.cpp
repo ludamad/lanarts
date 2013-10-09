@@ -202,7 +202,12 @@ static int gmap_object_visible(lua_State* L) {
 	GameInst* inst = luawrap::get<GameInst*>(L, 1);
 	Pos xy = stack_defaulted(L, 2, inst->ipos());
 	PlayerInst* player = stack_defaulted(L, 3, (PlayerInst*)NULL);
+
+	GameMapState* prev_map = gs->get_level();
+	gs->set_level(gs->game_world().get_level(inst->current_floor));
+
 	lua_pushboolean(L, gs->radius_visible_test(xy.x, xy.y, inst->radius, player));
+	gs->set_level(prev_map);
 	return 1;
 }
 
@@ -244,7 +249,7 @@ static int gmap_object_collision_check(lua_State* L) {
 
 static std::vector<GameInst*> gmap_rectangle_collision_check(LuaStackValue current_map, BBox area, LuaStackValue tester /* Can be empty */) {
 	GameState* gs = lua_api::gamestate(current_map);
-	GameMapState* map = gs->game_world().get_level(current_map.to_int());
+	GameMapState* map = gs->get_level();
 
 	return map->game_inst_set().object_rectangle_test(area, tester.isnil() ? NULL : tester.as<GameInst*>());
 }
@@ -287,7 +292,7 @@ static int gmap_radius_tile_check(lua_State* L) {
 static LuaStackValue gmap_line_tile_check(LuaStackValue current_map, Pos from_xy, Pos to_xy) {
 	lua_State* L = current_map.luastate();
 	GameState* gs = lua_api::gamestate(L);
-	GameMapState* prev_map = gs->game_world().get_current_level();
+	GameMapState* prev_map = gs->get_level();
 	gs->set_level(gs->game_world().get_level(current_map.to_int()));
 
 	Pos hit_pos;
