@@ -64,7 +64,7 @@ function M.level_progress(xp, level)
         pre_xp_cost = M.level_experience_needed(level - 1)
     end
     local xp_cost = M.level_experience_needed(level)
-    return (xp - pre_xp_cost) / xp_cost
+    return (xp - pre_xp_cost) / (xp_cost - pre_xp_cost)
 end
 
 -- Gain skill points in 'SKILL_POINT_INTERVALS' intervals
@@ -95,11 +95,12 @@ function M.gain_xp(context, xp)
             B.skill_points = B.skill_points + M.skill_points_at_level_up(B.level) / SKILL_POINT_INTERVALS 
         end
 
-        local xp_spent = math.min(xp, amount_needed(old_xp, B.level))
+        local needed = math.max(0, amount_needed(old_xp, B.level))
+        local xp_spent = math.min(xp, needed)
         xp = xp - xp_spent
         B.xp = B.xp + xp_spent
  
-        if intervals_new == SKILL_POINT_INTERVALS then
+        if needed <= 0 then
             -- Levelup!
             B.level = B.level + 1
         end

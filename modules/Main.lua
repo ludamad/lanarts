@@ -1,3 +1,9 @@
+if os.getenv('DEBUG_MODE') then 
+    require_path_add("/usr/share/lua/5.1/?.lua")
+    local dbg = loadfile("/home/adomurad/scripts/debugger.lua")
+    dbg()()
+end
+
 -- Ensure undefined global variable access results in an error
 nilprotect(_G)
 

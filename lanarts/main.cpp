@@ -61,8 +61,6 @@ static int luajit_wrap_exceptions(lua_State *L, lua_CFunction f) {
 		lua_pushstring(L, s);
 	} catch (const std::exception& e) {
 		lua_pushstring(L, e.what());
-	} catch (...) {
-		lua_pushliteral(L, "caught (...)");
 	}
 	return lua_error(L);  // Rethrow as a Lua error.
 }
