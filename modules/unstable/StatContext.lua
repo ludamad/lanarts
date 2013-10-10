@@ -99,11 +99,6 @@ function M.on_calculate(context, ...)
     context.derived.hooks:perform("on_calculate", context, ...)
 end
 
-function M.on_action(context, ...)
-    context.derived.inventory:perform("on_action", context, ...)
-    context.derived.hooks:perform("on_action", context, ...)
-end
-
 function M.on_death(context, attacker)
     context.derived.hooks:perform("on_death", context, attacker)
     context.obj:on_death(attacker.obj)

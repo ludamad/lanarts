@@ -388,13 +388,14 @@ function M.main()
     while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
         fight_spawn_if_over(SM)
         Display.view_snap(player.xy)
-        Display.draw_start()
-        SM:draw()
-        Display.draw_finish()
         SM:step()
         report_new_identifications(player:stat_context())
         track_identification(player:stat_context())
-        query_player(player:stat_context())
+        if query_player(player:stat_context()) then
+            Display.draw_start()
+            SM:draw()
+            Display.draw_finish()
+        end
     end
 end
 

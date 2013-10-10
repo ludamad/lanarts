@@ -9,6 +9,7 @@ local ProficiencyPenalties = import "@stats.ProficiencyPenalties"
 local AttackResolution = import "@AttackResolution"
 local LogUtils = import "lanarts.LogUtils"
 local Actions = import "@Actions"
+local ActionContext = import "@ActionContext"
 local Attacks = import "@Attacks"
 
 local CombatObject = ObjectUtils.type_create()
