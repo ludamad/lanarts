@@ -76,7 +76,7 @@ class_define {
 class_define {
     name = "Archer",
     description = "A master of ranged combat. Fires swiftly from afar.",
-    items = {{type="Short Bow", equipped=true}, {type="Arrow", amount=40, equipped = true}},
+    items = {{type="Short Bow", equipped=true}, {type="Arrow", amount=400, equipped = true}},
     spells = {"Magic Arrow", "Berserk", "Minor Missile"},
 
     skills = {

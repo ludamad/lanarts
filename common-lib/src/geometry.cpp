@@ -390,9 +390,15 @@ BBox BBox::grow(int amount) const {
 }
 
 BBox BBox::resized_within(const BBox& o) const {
-	return BBox(std::max(x1, o.x1), std::max(y1, o.y1), std::min(x2, o.x2), std::min(y2, o.y2));
+	int nx2 = std::min(x2, o.x2), ny2 = std::min(y2, o.y2);
+	int nx1 = std::min(nx2, std::max(x1, o.x1));
+	int ny1 = std::min(ny2, std::max(y1, o.y1));
+	return BBox(nx1, ny1, nx2, ny2);
 }
 
 BBoxF BBoxF::resized_within(const BBoxF& o) const {
-	return BBoxF(std::max(x1, o.x1), std::max(y1, o.y1), std::min(x2, o.x2), std::min(y2, o.y2));
+	float nx2 = std::min(x2, o.x2), ny2 = std::min(y2, o.y2);
+	float nx1 = std::min(nx2, std::max(x1, o.x1));
+	float ny1 = std::min(ny2, std::max(y1, o.y1));
+	return BBox(nx1, ny1, nx2, ny2);
 }

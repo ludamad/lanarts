@@ -58,8 +58,8 @@ local function remove_from_slot(inventory, item_slot, --[[Optional]] amount)
 end
 
 function Inventory:use_item(user, item_slot, --[[Optional]] target)
-    local to_remove = Actions.use_action(user, item_slot.action_use, target, item_slot)
-    remove_from_slot(self, item_slot, to_remove or 1)
+    Actions.use_action(user, item_slot.action_use, target, item_slot)
+    remove_from_slot(self, item_slot, 1)
 end
 
 function Inventory:can_use_item(user, item_slot, --[[Optional]] target)

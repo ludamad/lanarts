@@ -35,7 +35,7 @@ function SimulationMap:add_player(name, race, class)
         map = self.gmap
     }
     MapGen.rectangle_apply {
-        map=self.map, area = {xy[1]-6,xy[2]-6,xy[1]+6,xy[2]+6}, 
+        map=self.map, area = {xy[1]-3,xy[2]-3,xy[1]+3,xy[2]+3},
         fill_operator = {add = MapGen.FLAG_HAS_OBJECT}
     }
     table.insert(self.players, player_object)

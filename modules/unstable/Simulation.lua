@@ -334,6 +334,7 @@ end
 
 add_fight("Giant Rat", 1, 5)
 add_fight("Giant Rat", 2, 5)
+add_fight("Giant Rat", 3, 10)
 
 local function fight_spawn_if_over(SM)
     for obj in GameMap.objects(SM.gmap) do
