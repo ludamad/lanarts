@@ -1,8 +1,10 @@
 local Apts = import "@stats.AptitudeTypes"
-local animal_define = (import ".MonsterDefineUtils").animal_define 
+local Mons = import ".MonsterDefineUtils" 
+local monster_define = Mons.monster_define 
 
-animal_define {
+monster_define {
     name = "Giant Rat",
+    monster_kind = Mons.ANIMAL,
     description = "A giant, aggressive vermin.",
     appear_message = "A hostile large rat approaches!",
     defeat_message = "Blood splatters as the large rat is destroyed.",

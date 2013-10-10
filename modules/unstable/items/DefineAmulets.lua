@@ -5,16 +5,16 @@ local StatContext = import "@StatContext"
 local Proficiency = import "@Proficiency"
 local ItemRandomDescriptions = import ".ItemRandomDescriptions"
 
-local random_ring_names = data_load("random_ring_names", {})
+local random_amulet_names = data_load("random_amulet_names", {})
 
 local function aptitude_bonus_ring_define(args)
     args.needs_identification = true
 
-    function args.on_calculate(self, stats)
-        StatContext.add_all_aptitudes(stats, args.aptitude, self.real_bonus or self.bonus) -- real_bonus can be a full 4-vector, while bonus must be a number
+    function args:on_action(user, action, target, source)
+        
     end
 
-    function args.on_init(self)
+    function args:on_init()
         local P = Proficiency
         assert(self.bonus)
         for k in values{"identify_requirements", "proficiency_requirements"} do
@@ -31,8 +31,8 @@ local function aptitude_bonus_ring_define(args)
         end
         self.name = '+' .. self.bonus .. ' ' .. self.lookup_key
 
-        self.unidentified_name = random_ring_names[args] or ItemRandomDescriptions.random_ring_name()
-        random_ring_names[args] = self.unidentified_name
+        self.unidentified_name = random_amulet_names[args] or ItemRandomDescriptions.random_ring_name()
+        random_amulet_names[args] = self.unidentified_name
 
         self.unidentified_description = "You're not sure what it does, if anything."
     end
@@ -41,14 +41,11 @@ local function aptitude_bonus_ring_define(args)
 end
 
 local APTS = {
-    {Apts.RANGED,   "Archer's Ring",    {4,8}, "A ring that provides the user with cunning during Ranged combat."},
-    {Apts.SLASHING, "Ring of Slashing", {3,6}, "A ring that provides the user with skill in Slashing weaponry and combat."},
-    {Apts.PIERCING, "Ring of Piercing", {3,6}, "A ring that provides the user with skill in Piercing weaponry and combat."},
-    {Apts.BLUNT,    "Ring of Blunting", {3,6}, "A ring that provides the user with skill in Blunt weaponry and combat."}
+    {Apts.FIRE,   "Talisman of Incineration",    {4,8}, "An amulet that causes fire damage on every melee attack."},
 }
 
 for apt in values(APTS) do
-    local APTITUDE, NAME, DIFFICULTY, DESCRIPTION = unpack(apt) 
+    local APTITUDE, NAME, DIFFICULTY, DESCRIPTION = unpack(apt)
     aptitude_bonus_ring_define {
         lookup_key = NAME,
         aptitude = APTITUDE,
@@ -60,7 +57,3 @@ for apt in values(APTS) do
         end
     }
 end
-
-local APTS = {
-    {Apts.RANGED,   "Archer's Ring",    {4,8}, "A ring that provides the user with cunning during Ranged combat."}
-}

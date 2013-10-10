@@ -1,5 +1,6 @@
 local ActionProjectileObject = import "@objects.ActionProjectileObject"
 local Actions = import "@Actions"
+local ContentUtils = import "@stats.ContentUtils"
 
 -- Creates a missile as part of an action.
 -- Allows for either StatContext's or positions as targets.
@@ -38,10 +39,11 @@ local ActionUtils
 -- Derive a projectile effect
 function ProjectileEffect.derive_projectile_effect(args, --[[Optional, default false]] cleanup_members)
     ActionUtils = ActionUtils or import ".ActionUtils" -- Lazy import to avoid circular dependency
-
+    assert(args.sprite) -- Can be filepath, resolved below
+    local sprite = ContentUtils.resolve_sprite(args)
     local effect = ProjectileEffect.create { 
-        sprite = args.sprite, 
-        radius = args.radius or (args.sprite.width / 2), 
+        sprite = sprite,
+        radius = args.radius or (sprite.width / 2),
         speed = args.speed
     }
 

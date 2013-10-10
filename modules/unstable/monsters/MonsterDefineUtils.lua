@@ -12,9 +12,36 @@ local ContentUtils = import "@stats.ContentUtils"
 local ExperienceCalculation = import "@stats.ExperienceCalculation"
 local ActionUtils = import "@stats.ActionUtils"
 
-local Traits = import ".MonsterTraits"
-
 local M = nilprotect {} -- Submodule
+
+M.stat_mod_functions = {
+    ANIMAL = function(stats)
+        local context = StatContext.stat_context_create(stats)
+        StatContext.add_defensive_aptitudes(context, Apts.SLASHING, -2, --[[Permanent]] true)
+    end,
+    WATER_ELEMENTAL = function(stats)
+        local context = StatContext.stat_context_create(stats)
+        StatContext.add_defensive_aptitudes(context, Apts.FIRE, -3, --[[Permanent]] true)
+    end,
+    AIR_ELEMENTAL = function(stats)
+        local context = StatContext.stat_context_create(stats)
+        StatContext.add_defensive_aptitudes(context, Apts.EARTH, -3, --[[Permanent]] true)
+    end,
+    EARTH_ELEMENTAL = function(stats)
+        local context = StatContext.stat_context_create(stats)
+        StatContext.add_defensive_aptitudes(context, Apts.AIR, -3, --[[Permanent]] true)
+    end,
+    FIRE_ELEMENTAL = function(stats)
+        local context = StatContext.stat_context_create(stats)
+        StatContext.add_defensive_aptitudes(context, Apts.WATER, -3, --[[Permanent]] true)
+    end,
+    HUMANOID = do_nothing,
+}
+
+-- Export keys as traits
+for k,v in pairs(M.stat_mod_functions) do
+    M[k] = k
+end
 
 local function default_on_appear_message(self)
     EventLog.add(self.appear_message, self.appear_color or {255,255,255})
@@ -25,17 +52,19 @@ local function default_on_die_message(self)
 end
 
 local DEFAULT_MELEE_RANGE = 10
-function M.monster_define(t, --[[Optional]] derive_idx)
-    t.team = t.team or Relations.TEAM_MONSTER_ROOT
+function M.monster_define(t)
     local stats = ContentUtils.resolve_embedded_stats(t)
     local context = StatContext.stat_context_create(stats)
-    local sprite = t.sprite or ContentUtils.derive_sprite(t.name)
 
-    for trait in values(t.traits or {}) do
-        Traits.stat_mod_functions[trait](stats)
+    t.team = t.team or Relations.TEAM_MONSTER_ROOT
+    t.sprite = t.sprite or ContentUtils.derive_sprite(t.name)
+    t.traits = t.traits or {}
+    t.aptitude_types = t.aptitude_types or {Apts.MELEE}
+    if t.monster_kind then
+        table.insert(t.traits, t.monster_kind)
+        M.stat_mod_functions[t.monster_kind](stats)
     end
 
-    t.aptitude_types = t.aptitude_types or {Apts.MELEE}
     local action = t.unarmed_action or t
     action.range = action.range or DEFAULT_MELEE_RANGE
 
@@ -46,7 +75,7 @@ function M.monster_define(t, --[[Optional]] derive_idx)
         on_first_appear = t.on_first_appear or default_on_appear_message,
         on_die = t.on_die or default_on_die_message,
 
-        sprite = sprite,
+        sprite = t.sprite,
         on_draw = t.on_draw,
         traits = t.traits,
 
@@ -56,12 +85,6 @@ function M.monster_define(t, --[[Optional]] derive_idx)
         base_stats = stats,
         unarmed_action = ActionUtils.derive_action(action)
     }
-end
-
-function M.animal_define(t, --[[Optional]] derive_idx)
-    t.traits = t.traits or {}
-    table.insert(t.traits, Traits.ANIMAL)
-    return M.monster_define(t, (derive_idx or 1) + 1)
 end
 
 return M

@@ -109,10 +109,11 @@ function Inventory:on_step(stats)
     end
 end
 
-function Inventory:on_calculate(stats)
+function Inventory:perform(method_name, ...)
     for item in self:values() do
         if item.equipped then
-            item:on_calculate(stats)
+            local method = item[method_name]
+            if method then method(item, ...) end
         end
     end
 end

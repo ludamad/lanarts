@@ -1,4 +1,3 @@
--- OpenGL must be initialized before content loading!
 local StatContext = import "@StatContext"
 local AttackResolution = import "@AttackResolution"
 local Attacks = import "@Attacks"
@@ -332,6 +331,7 @@ local function add_fight(name, amount, times)
     table.insert_all(fights, {dup({[name] = amount}, times)})
 end
 
+add_fight("Cloud Elemental", 1, 1)
 add_fight("Giant Rat", 1, 5)
 add_fight("Giant Rat", 2, 5)
 add_fight("Giant Rat", 3, 10)
@@ -392,6 +392,7 @@ function M.main()
         SM:draw()
         Display.draw_finish()
         SM:step()
+        GameState.wait(5)
         report_new_identifications(player:stat_context())
         track_identification(player:stat_context())
         query_player(player:stat_context())

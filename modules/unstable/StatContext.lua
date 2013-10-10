@@ -91,12 +91,17 @@ function M.on_draw(context, drawf, options)
     drawf(options)
 end
 
-function M.on_calculate(context)
+function M.on_calculate(context, ...)
     for skill_slot in values(context.derived.skills) do
-        skill_slot:on_calculate(context)
+        skill_slot:on_calculate(context, ...)
     end
-    context.derived.inventory:on_calculate(context)
-    context.derived.hooks:perform("on_calculate", context)
+    context.derived.inventory:perform("on_calculate", context, ...)
+    context.derived.hooks:perform("on_calculate", context, ...)
+end
+
+function M.on_action(context, ...)
+    context.derived.inventory:perform("on_action", context, ...)
+    context.derived.hooks:perform("on_action", context, ...)
 end
 
 function M.on_death(context, attacker)
