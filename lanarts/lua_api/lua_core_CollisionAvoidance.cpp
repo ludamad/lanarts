@@ -25,7 +25,7 @@ static void colavoid_step(CollisionAvoidancePtr colavoid) {
 static void colavoid_update_object(CollisionAvoidancePtr colavoid, simul_id id, LuaStackValue args) {
 	using namespace luawrap;
 	if (!args["speed"].isnil()) {
-		colavoid->set_maxspeed(id, args["speed"].to_int());
+		colavoid->set_maxspeed(id, args["speed"].to_num());
 	}
 	if (!args["xy"].isnil()) {
 		PosF xy = args["xy"].as<PosF>();

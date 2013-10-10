@@ -65,19 +65,22 @@ static int luajit_wrap_exceptions(lua_State *L, lua_CFunction f) {
 	return lua_error(L);  // Rethrow as a Lua error.
 }
 
-static void luajit_configure(lua_State* L) {
+static void lua_vm_configure(lua_State* L) {
 	lua_pushlightuserdata(L, (void *)luajit_wrap_exceptions);
 	luaJIT_setmode(L, -1, LUAJIT_MODE_WRAPCFUNC|LUAJIT_MODE_ON);
 	lua_pop(L, 1);
+	luawrap::globals(L)["__LUAJIT"] = true;
+}
+#else
+static void lua_vm_configure(lua_State* L) {
+	luawrap::globals(L)["__LUAJIT"] = false;
 }
 #endif
 
 static GameState* init_gamestate() {
 
 	lua_State* L = lua_api::create_configured_luastate();
-#ifdef USE_LUAJIT
-	luajit_configure(L);
-#endif
+	lua_vm_configure(L);
 	lua_api::add_search_path(L, "modules/lanarts/?.lua");
 
 	GameSettings settings; // Initialized with defaults

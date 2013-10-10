@@ -46,7 +46,7 @@ local StatusType = ResourceTypes.type_create(create)
 
 function StatusType.get_hook(hooks, status_type)
     status_type = StatusType.resolve(status_type)
-    for hook in values(hooks) do
+    for hook in hooks:values() do
         if getmetatable(hook) == status_type then
             return hook
         end

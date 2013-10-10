@@ -123,7 +123,7 @@ end
 local function init_identify_requirements(self, id_types, difficulty)
     local P = Proficiency
 
-    local types = M.filter_main_aptitudes(self.types)
+    local types = M.filter_main_aptitudes(self.aptitude_types)
     table.insert_all(types, id_types)
     self.identify_requirements = {P.proficiency_requirement_create(types, difficulty)}
 end

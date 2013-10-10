@@ -44,7 +44,7 @@ function M.is_identified(stats, item_slot)
     if item_slot.equipped then
         id_points = id_points + ITEM_EQUIP_ID_POINT_BONUS 
     end
-    local fail, total = Proficiency.resolve_proficiency_requirements(item_slot.identify_requirements, stats)
+    local fail, total = Proficiency.resolve_proficiency_requirements(item_slot.identify_requirements or {}, stats)
     if id_points >= fail * ID_POINTS_PER_APT_POINT then
         if item_slot.on_identify then 
             item_slot:on_identify(stats) 

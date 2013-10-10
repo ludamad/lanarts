@@ -253,10 +253,14 @@ function pretty_print(val, --[[Optional]] tabs, --[[Optional]] packed)
 end
 
 function pretty_print_all(...)
-    local args = {...}
-    for i=1,#args do args[i] = pretty_tostring_compact(args[i]) end
+    local args = {}
+    for i=1,select("#", ...) do
+    	args[i] = pretty_tostring_compact(select(i, ...)) 
+	end
     print(unpack(args))
 end
+-- Convenience print-like function:
+pretty = pretty_print_all
 
 --- Iterate all iterators one after another
 function iter_combine(...)

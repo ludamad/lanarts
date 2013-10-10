@@ -96,10 +96,14 @@ end
 
 function M.UserStatusPrereq:check(user)
     for f in values(self.forbidden) do
-        if StatContext.get_status(user, f) then return false end
+        if StatContext.get_status(user, f) then 
+            return false, "You cannot do this in a " .. f.name:lower() .. " state!" 
+        end
     end
     for r in values(self.required) do
-        if not StatContext.get_status(user, r) then return false end
+        if not StatContext.get_status(user, r) then 
+            return false, "You must do this in a " .. r.name:lower() .. " state!"
+        end
     end
     return true
 end

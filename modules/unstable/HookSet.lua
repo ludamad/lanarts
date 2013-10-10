@@ -53,6 +53,10 @@ function HookSet:on_draw(stats, drawf, options)
     return drawf, options
 end
 
+function HookSet:values()
+    return values(self.hooks)
+end
+
 function HookSet:on_step(...)
     self:merge_new_hooks()
     -- Perform the hook step event, filtering finished hooks.

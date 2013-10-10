@@ -44,7 +44,7 @@ function M.desirable_user_aptitudes(action)
     local attacks = M.get_nested_attacks(action)
     local apt_table = {}
     for attack in values(attacks) do
-        for sub_attack in values(action.sub_attacks) do
+        for sub_attack in values(action.sub_attacks or {}) do
             for k,v in pairs (sub_attack.effectiveness_multipliers) do
                 if v > 0 then apt_table[k] = true end
             end
@@ -236,12 +236,12 @@ function M.derive_action(args, --[[Optional]] options, --[[Optional, default fal
         add_prereq(action, derive_status_prereqs(args))
     end
     if options.derive_user_status_add then
-        for s in values(args.user_statuses_added) do
+        for s in values(args.user_statuses_added or {}) do
             table.insert(action.effects, StatEffects.UserStatusEffect.create(unpack(s)))
         end
     end
     if options.derive_target_status_add then
-        for s in values(args.target_statuses_added) do
+        for s in values(args.target_statuses_added or {}) do
             table.insert(action.effects, StatEffects.TargetStatusEffect.create(unpack(s)))
         end
     end
