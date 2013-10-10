@@ -84,8 +84,7 @@ function AI:resolve_action(obj)
     
     local S,H = obj:stat_context(), hostile:stat_context()
     local weapon_action, source = obj:weapon_action()
-    
-    print(obj.name, obj:can_use_action(weapon_action, H, source))
+
     if obj:can_use_action(weapon_action, H, source) then
         self.action = weapon_action
         self.target = H
