@@ -148,7 +148,7 @@ function Engine.main(args)
     elseif args[1] == "--simulation" then
         Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
         local S = import "unstable.Simulation"
-        S.main()
+        S.main(args)
         return false   
     elseif args[1] == "--testmap" then
         Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)

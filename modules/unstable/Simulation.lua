@@ -357,7 +357,7 @@ local function fight_spawn_if_over(SM)
     end
 end
 
-function M.main()
+function M.main(cmd_args)
     -- Load game content
     import "@DefineAll"
 
@@ -381,7 +381,7 @@ function M.main()
     })
     local gmap = GameMap.create { map = map }
     local SM = SimulationMap.create(map, gmap)
-    local race, class = M.choose_player_stats()
+    local race, class = M.choose_player_stats(cmd_args)
     local player = SM:add_player("Tester", race, class)
     player.io_action_handler = do_nothing
 

@@ -8,6 +8,7 @@ M.DIRECT_ACTION = "DIRECT_ACTION"
 M.PROJECTILE_ACTION = "PROJECTILE_ACTION"
 
 function M.action_context_create(user, action, --[[Optional]] source, --[[Optional]] type)
+    pretty(user, action, source, type)
     return { 
         user = user, 
         base = action, derived = table.deep_clone(action), 
