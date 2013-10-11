@@ -34,6 +34,7 @@ static LJ_AINLINE uint32_t hashrot(uint32_t lo, uint32_t hi)
 #define hsize2hbits(s)	((s) ? ((s)==1 ? 1 : 1+lj_fls((uint32_t)((s)-1))) : 0)
 
 LJ_FUNCA GCtab *lj_tab_new(lua_State *L, uint32_t asize, uint32_t hbits);
+LJ_FUNC GCtab *lj_tab_new_ah(lua_State *L, int32_t a, int32_t h);
 #if LJ_HASJIT
 LJ_FUNC GCtab * LJ_FASTCALL lj_tab_new1(lua_State *L, uint32_t ahsize);
 #endif
@@ -50,7 +51,7 @@ LJ_FUNCA cTValue *lj_tab_get(lua_State *L, GCtab *t, cTValue *key);
 /* Caveat: all setters require a write barrier for the stored value. */
 
 LJ_FUNCA TValue *lj_tab_newkey(lua_State *L, GCtab *t, cTValue *key);
-LJ_FUNC TValue *lj_tab_setinth(lua_State *L, GCtab *t, int32_t key);
+LJ_FUNCA TValue *lj_tab_setinth(lua_State *L, GCtab *t, int32_t key);
 LJ_FUNC TValue *lj_tab_setstr(lua_State *L, GCtab *t, GCstr *key);
 LJ_FUNC TValue *lj_tab_set(lua_State *L, GCtab *t, cTValue *key);
 

@@ -17,7 +17,8 @@
 #define lua_c
 
 extern "C" {
-#include <luaconf.h>
+    // Explicitly use the vanilla Lua header. We want features not provided by LuaJIT.
+    #include "../dependencies/lua/luaconf.h" 
 }
 
 #include <lua.hpp>

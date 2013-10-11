@@ -14,11 +14,11 @@ set( BUILTDEPS ${CMAKE_BINARY_DIR}/dependencies )
 add_definitions( -std=c++98 )
 
 if (${USE_LUAJIT})
-    set( lua_includes ${DEPS}/luajit/src ${DEPS}/lua )
-        set( lua_libraries luajit )
+    set( lua_includes ${DEPS}/luajit/src )
+    set( lua_libraries luajit )
 else()
-        set( lua_includes ${DEPS}/lua  )
-        set( lua_libraries lua )
+    set( lua_includes ${DEPS}/lua  )
+    set( lua_libraries lua )
 endif()
 
 include_directories(

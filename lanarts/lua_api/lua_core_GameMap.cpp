@@ -249,7 +249,7 @@ static int gmap_object_collision_check(lua_State* L) {
 
 static std::vector<GameInst*> gmap_rectangle_collision_check(LuaStackValue current_map, BBox area, LuaStackValue tester /* Can be empty */) {
 	GameState* gs = lua_api::gamestate(current_map);
-	GameMapState* map = gs->get_level();
+	GameMapState* map = gs->get_level(current_map.to_int());
 
 	return map->game_inst_set().object_rectangle_test(area, tester.isnil() ? NULL : tester.as<GameInst*>());
 }

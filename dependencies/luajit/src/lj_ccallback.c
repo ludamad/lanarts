@@ -408,6 +408,7 @@ static void callback_conv_args(CTState *cts, lua_State *L)
   intptr_t *stack = cts->cb.stack;
   MSize slot = cts->cb.slot;
   CTypeID id = 0, rid, fid;
+  int gcsteps = 0;
   CType *ct;
   GCfunc *fn;
   MSize ngpr = 0, nsp = 0, maxgpr = CCALL_NARG_GPR;
@@ -475,7 +476,7 @@ static void callback_conv_args(CTState *cts, lua_State *L)
     done:
       if (LJ_BE && cta->size < CTSIZE_PTR)
 	sp = (void *)((uint8_t *)sp + CTSIZE_PTR-cta->size);
-      lj_cconv_tv_ct(cts, cta, 0, o++, sp);
+      gcsteps += lj_cconv_tv_ct(cts, cta, 0, o++, sp);
     }
     fid = ctf->sib;
   }
@@ -485,6 +486,8 @@ static void callback_conv_args(CTState *cts, lua_State *L)
   if (ctype_cconv(ct->info) != CTCC_CDECL)
     (L->base-2)->u32.hi |= (nsp << (16+2));
 #endif
+  while (gcsteps-- > 0)
+    lj_gc_check(L);
 }
 
 /* Convert Lua object to callback result. */
@@ -526,7 +529,7 @@ lua_State * LJ_FASTCALL lj_ccallback_enter(CTState *cts, void *cf)
   lua_State *L = cts->L;
   global_State *g = cts->g;
   lua_assert(L != NULL);
-  if (gcref(g->jit_L)) {
+  if (tvref(g->jit_base)) {
     setstrV(L, L->top++, lj_err_str(L, LJ_ERR_FFI_BADCBACK));
     if (g->panic) g->panic(L);
     exit(EXIT_FAILURE);
@@ -559,9 +562,9 @@ void LJ_FASTCALL lj_ccallback_leave(CTState *cts, TValue *o)
   }
   callback_conv_result(cts, L, o);
   /* Finally drop C frame and continuation frame. */
-  L->cframe = cframe_prev(L->cframe);
   L->top -= 2;
   L->base = obase;
+  L->cframe = cframe_prev(L->cframe);
   cts->cb.slot = 0;  /* Blacklist C function that called the callback. */
 }
 
