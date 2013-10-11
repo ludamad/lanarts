@@ -25,8 +25,8 @@ function M.can_use_action(action_context, target)
     return Actions.can_use_action(action_context.user, action_context.derived, target, action_context.source)
 end
 
-function M.use_action(action_context, target)
-    return Actions.use_action(action_context.user, action_context.derived, target, action_context.source)
+function M.use_action(action_context, target, --[[Optional]] ignore_death)
+    return Actions.use_action(action_context.user, action_context.derived, target, action_context.source, ignore_death)
 end
 
 -- Lookup all effects of a certain type.
@@ -39,8 +39,11 @@ end
 function M.get_effect(action_context, type) 
     return Actions.get_effect(action_context.derived, type) 
 end
-function M.set_effect(action_context, type, new_effect) 
-    return Actions.set_effect(action_context.derived, type, new_effect)
+function M.reset_effect(action_context, type, --[[Optional]] new_effect) 
+    return Actions.reset_effect(action_context.derived, type, new_effect)
+end
+function M.reset_prerequisite(action_context, type, --[[Optional]] new_prereq) 
+    return Actions.reset_prerequisite(action_context.derived, type, new_prereq)
 end
 function M.get_prerequisite(action_context, type)
     return Actions.get_prerequisite(action_context.derived, type) 

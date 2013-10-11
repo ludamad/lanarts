@@ -353,11 +353,10 @@ local function fight_spawn_if_over(SM)
         print(AnsiCol.YELLOW(amount .. " " .. monster .. " spawns."))
         for i=1,amount do
             local mon = SM:add_monster(monster)
---            local ttk = import "@simulation.TimeToKillCalculation"
---            local moncopy = table.deep_clone(mon:stat_context())
---            local player = SM.players[1]:stat_context()
---            local action, source = player.obj:weapon_action()
---            local steps = ttk.calculate_time_to_kill(player, action, moncopy, source)
+            local TTK = import "@simulation.TimeToKillCalculation"
+            local action_context = SM.players[1]:weapon_action_context()
+            local steps = TTK.calculate_time_to_kill(action_context, mon:stat_context())
+            print("Death took ", steps, " steps!")
         end
     end
 end

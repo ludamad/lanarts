@@ -83,13 +83,30 @@ end
 
 -- Replace the unique effect of a given type.
 -- Errors if multiple matching effects exist!
-function M.set_effect(action, type, new_effect)
+-- Removes the type if new_effect is nil.
+function M.reset_effect(action, type, --[[Optional]] new_effect)
     local effects = M.get_all_effects(action, type)
     assert(#effects <= 1)
     for effect in values(effects) do 
         table.remove_occurrences(action.effects, effect)
     end
-    table.insert(action.effects, new_effect)
+    if new_effect then
+        table.insert(action.effects, new_effect)
+    end
+end
+
+-- Replace the unique effect of a given type.
+-- Errors if multiple matching effects exist!
+-- Removes the type if new_effect is nil.
+function M.reset_prerequisite(action, type, --[[Optional]] new_prereq)
+    local prereqs = M.get_all_prerequisites(action, type)
+    assert(#prereqs <= 1)
+    for prereq in values(prereqs) do 
+        table.remove_occurrences(action.prerequisites, prereq)
+    end
+    if new_prereq then
+        table.insert(action.prerequisites, new_prereq)
+    end
 end
 
 -- Lookup the unique prerequisite of a given type.

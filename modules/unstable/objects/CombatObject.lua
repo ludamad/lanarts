@@ -102,6 +102,11 @@ function CombatObject:weapon_action()
     end
     return self.unarmed_action, self.race or self -- Default
 end
+
+function CombatObject:weapon_action_context()
+    local action, source = self:weapon_action()
+    return ActionContext.action_context_create(action, self:stat_context(), source)
+end
  
 function CombatObject.is_combat_object(obj)
     return table.contains(obj.traits, CombatObject.COMBAT_TRAIT)
