@@ -33,7 +33,7 @@ function M.can_use_action(user, action, target, --[[Optional]] action_source)
     return true
 end
 
-function M.use_action(user, action, target, --[[Optional]] action_source)
+function M.use_action(user, action, target, --[[Optional]] action_source, --[[Optional]] ignore_death)
     assert(M.can_use_action(user, action, target, action_source))
     local ret
     if action.on_use then
@@ -46,7 +46,7 @@ function M.use_action(user, action, target, --[[Optional]] action_source)
         ret = ret or res
     end
 
-    if type(target) == "table" and target.obj then
+    if not ignore_death and type(target) == "table" and target.obj then
         if target.base.hp <= 0 then
            StatContext.on_death(target, user)
         end

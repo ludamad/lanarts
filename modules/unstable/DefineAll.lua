@@ -1,3 +1,5 @@
+local timer = timer_create()
+
 -- Import all content definition submodules.
 local CONTENT_PATTERN = "Define*"
 
@@ -14,3 +16,5 @@ end
 -- Import stats folder first, has fundamental components:
 import_all("unstable.stats")
 import_all("unstable")
+
+print("** Loading elapsed time: " .. timer:get_milliseconds() .. "ms")
