@@ -377,7 +377,7 @@ local function fight_spawn_if_over(SM)
 
             local steps
             local timer = timer_create()
-            for i=1,10 do
+            for i=1,100 do
                 steps = TTK.calculate_time_to_kill(action_context, mon:stat_context())
             end
             print("Fighting the " .. mon.name .. " took " .. steps .. " steps! Calculation took " .. timer:get_milliseconds() .. "ms.")

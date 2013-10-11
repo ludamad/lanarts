@@ -62,12 +62,15 @@ local function simulate(action_context, target, max_time)
     target = mock_stat_context(target)
 
     for steps=1,max_time do
-        perf.timing_begin("**Stat context stepping**")
-        for v in values{action_context.user, target} do
-            StatContext.on_step(v)
-            StatContext.on_calculate(v)
-        end
-        perf.timing_end("**Stat context stepping**")
+        perf.timing_begin("**Stat context stepping player **")
+        StatContext.on_step(action_context.user)
+        StatContext.on_calculate(action_context.user)
+        perf.timing_end("**Stat context stepping player **")
+
+        perf.timing_begin("**Stat context stepping monster **")
+        StatContext.on_step(target)
+        StatContext.on_calculate(target)
+        perf.timing_end("**Stat context stepping monster **")
 
         perf.timing_begin("**Action use**")
         if ActionContext.can_use_action(action_context, target) then

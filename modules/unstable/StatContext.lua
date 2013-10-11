@@ -171,15 +171,23 @@ function M.permanent_subtract(context, values)
     M.temporary_subtract(context, values)
 end
 
+local function add_aptitude_stats(stats, category, type, amount)
+    local apts = stats.aptitudes
+    local cat = apts[category]
+    if not cat then 
+        cat = {}
+        apts[category] = cat
+    end
+    local prev_amount = cat[type] or 0
+    cat[type] = prev_amount + amount
+end
+
 --- Change an aptitude temporarily.
 local function add_aptitude(context, category, type, amount, --[[Optional, default false]] permanent )
-    (permanent and M.permanent_add or M.temporary_add)(context, {
-        aptitudes = {
-            [category] = {
-                [type] = amount
-            } 
-        }
-    })
+    if permanent then
+        add_aptitude_stats(context.base, category, type, amount)
+    end 
+    add_aptitude_stats(context.derived, category, type, amount)
 end
 
 --- Change an effectiveness aptitude, defaults to temporary. 
