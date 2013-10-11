@@ -36,7 +36,7 @@ namespace ldungeon_gen {
 	bool RectangleApplyOperator::apply(MapPtr map, group_t parent_group_id, const BBox& rect_arg) {
 
 		const BBox map_bounds(Pos(0, 0), map->size());
-		BBox rect = rect.resized_within(map_bounds);
+		BBox rect = rect_arg.resized_within(map_bounds);
 
 		/* Do we match the query ? */
 		if (!query.empty() && !query->matches(map, parent_group_id, rect)) {

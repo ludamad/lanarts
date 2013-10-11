@@ -275,25 +275,25 @@ local function place_content(map)
         map:square_apply(xy, {add = MapGen.FLAG_SOLID})
         MapUtils.spawn_decoration(map, M._anvil, xy)
     end
---    for i=1,15 do
---        if chance(.4) then 
---            generate_store(map, find_clear_patch(map, area))
---        end
---    end
---    for i=1,30 do
---        if chance(.4) then 
---            local item = ItemUtils.item_generate(ItemGroups.basic_items)
---            MapUtils.spawn_item(map, item.type, item.amount, MapUtils.random_square(map, area))
---        end
---        if chance(.4) then 
---            MapUtils.spawn_item(map, "Gold", random(2,10), MapUtils.random_square(map, area))
---        end
---    end
---    for i=1,20 do
---        local enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
---        MapUtils.spawn_enemy(map, enemy, find_clear_patch(map, area))
---    end
---    MapUtils.spawn_enemy(map, "Red Dragon", MapUtils.random_square(map, area))
+    for i=1,15 do
+        if chance(.4) then 
+            generate_store(map, find_clear_patch(map, area))
+        end
+    end
+    for i=1,30 do
+        if chance(.4) then 
+            local item = ItemUtils.item_generate(ItemGroups.basic_items)
+            MapUtils.spawn_item(map, item.type, item.amount, MapUtils.random_square(map, area))
+        end
+        if chance(.4) then 
+            MapUtils.spawn_item(map, "Gold", random(2,10), MapUtils.random_square(map, area))
+        end
+    end
+    for i=1,20 do
+        local enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
+        MapUtils.spawn_enemy(map, enemy, find_clear_patch(map, area))
+    end
+    MapUtils.spawn_enemy(map, "Red Dragon", MapUtils.random_square(map, area))
 
     local map_id = MapUtils.game_map_create(map)
     OldMapSeq1:slot_resolve(1, map_id)
