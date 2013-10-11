@@ -7,11 +7,10 @@ local M = nilprotect {} -- Submodule
 M.DIRECT_ACTION = "DIRECT_ACTION"
 M.PROJECTILE_ACTION = "PROJECTILE_ACTION"
 
-function M.action_context_create(user, action, --[[Optional]] source, --[[Optional]] type)
-    pretty(user, action, source, type)
+function M.action_context_create(action, --[[Optional]] user, --[[Optional]] source, --[[Optional]] type)
     return { 
-        user = user, 
         base = action, derived = table.deep_clone(action), 
+        user = user, 
         source = source, -- The item, race etc that defined this action.
         type = type or M.DIRECT_ACTION -- While we store 'source', it is not enough to infer eg if the action was caused by a projectile hit
     }
