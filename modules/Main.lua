@@ -1,3 +1,5 @@
+dofile "modules/core/VMConfiguration.lua" -- Configure based on the VM we are using.
+
 -- Ensure undefined global variable access results in an error
 nilprotect(_G)
 

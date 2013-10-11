@@ -13,11 +13,11 @@ function Inventory:init(--[[Optional]] capacity)
     self.capacity = capacity or INVENTORY_CAPACITY
 end
 
-function Inventory:__copy(other)
-    -- Ensure a shallow copy when used with table.deep_copy
-    other.capacity = self.capacity
-    other.items = table.clone(self.items)
-end
+--function Inventory:__copy(other)
+--    -- Ensure a shallow copy when used with table.deep_copy
+--    other.capacity = self.capacity
+--    other.items = table.clone(self.items)
+--end
 
 function Inventory:find_item(item_type)
     for idx,item in ipairs(self.items) do

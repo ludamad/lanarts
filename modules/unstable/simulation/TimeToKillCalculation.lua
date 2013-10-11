@@ -6,56 +6,23 @@ local LogUtils = import "lanarts.LogUtils"
 local Actions = import "@Actions"
 local ActionContext = import "@ActionContext"
 local ActionUtils = import "@stats.ActionUtils"
+local ProjectileEffect = import "@stats.ProjectileEffect"
+local RangedWeaponActions = import "@items.RangedWeaponActions"
 local StatContext = import "@StatContext"
 local StatPrereqs = import "@StatPrereqs"
+local EventLog = import "core.ui.EventLog"
 
 local M = nilprotect {} -- Submodule
-
-local MAX_TIME = 5000
-function M.calculate_time_to_kill_old(attacker, action, target, source)
-    local was_debug = LogUtils.get_debug_mode()
-    attacker = {
-        base = attacker.base,
-        derived = attacker.derived,
-        obj = {xy = {0,0}, radius = attacker.obj.radius, traits = {}},
-    }
-    target = {
-        base = target.base,
-        derived = target.derived,
-        obj = {xy = {1,1}, radius = target.obj.radius, traits = {}},
-        traits = {}
-    }
-    LogUtils.set_debug_mode(false)
-    for steps=1,MAX_TIME do
-        for v in values{attacker, target} do
-            StatContext.on_step(v)
-            StatContext.on_calculate(v)
-        end
-        if Actions.can_use_action(attacker, action, target, source) then
-            local attack = ActionUtils.find_attack(action, true)
-            attack:apply(attacker, target)
-        end
-        if target.base.hp <= 0 then
-            LogUtils.set_debug_mode(was_debug)
-            return steps
-        end
-    end
-    LogUtils.set_debug_mode(was_debug)
-    return math.huge
-end
 
 local function mock_object(stat_context)
     local obj = {
         xy = {0,0},
+        base_stats = stat_context.base,
         radius = stat_context.obj.radius,
         traits = {}
     }
     setmetatable(obj, {__index = function() return do_nothing end})
-    return {
-        base = stat_context.base,
-        derived = stat_context.derived,
-        obj = obj
-    }
+    return obj
 end
 
 local function mock_stat_context(SC)
@@ -67,16 +34,17 @@ local function action_remove_distance_prereq(A)
     Actions.reset_prerequisite(A, StatPrereqs.DistancePrereq)
 end
 
-local function action_collapse_projectile(A)
-    if A.created_projectile then
-        table.insert_all(A.effects, A.created_projectile.effects)
-        A.created_projectile = nil
+local function action_collapse_nested(A, effect_type)
+    local effect = Actions.reset_effect(A, effect_type) -- Grab and remove
+    if effect then
+        table.insert_all(A.effects, effect.action.effects)
     end
 end
 
 local function mock_action(A)
     local copy = table.deep_clone(A)
-    action_collapse_projectile(copy)
+    action_collapse_nested(copy, ProjectileEffect)
+    action_collapse_nested(copy, RangedWeaponActions.AmmoFireEffect)
     action_remove_distance_prereq(copy)
     return copy
 end
@@ -84,30 +52,55 @@ end
 local function mock_action_context(AC)
     local copy = table.clone(AC)
     copy.user = mock_stat_context(AC.user)
+    copy.base = mock_action(AC.base)
     copy.derived = mock_action(AC.derived)
     return copy
 end
 
-function M.calculate_time_to_kill(action_context, target)
+local function simulate(action_context, target, max_time)
     action_context = mock_action_context(action_context)
     target = mock_stat_context(target)
-    local was_debug = LogUtils.get_debug_mode()
-    LogUtils.set_debug_mode(false)
-    for steps=1,MAX_TIME do
+
+    for steps=1,max_time do
+        perf.timing_begin("**Stat context stepping**")
         for v in values{action_context.user, target} do
             StatContext.on_step(v)
             StatContext.on_calculate(v)
         end
+        perf.timing_end("**Stat context stepping**")
+
+        perf.timing_begin("**Action use**")
         if ActionContext.can_use_action(action_context, target) then
             ActionContext.use_action(action_context, target)
         end
-        if target.base.hp <= 0 then
-            LogUtils.set_debug_mode(was_debug)
+        perf.timing_end("**Action use**")
+        if target.base.hp <= 0 then 
             return steps
         end
     end
-    LogUtils.set_debug_mode(was_debug)
+
+    pretty(action_context.derived)
+    pretty(target.base)
+    assert(false)
     return math.huge
+end
+
+local MAX_TIME = 5000
+function M.calculate_time_to_kill(action_context, target, --[[Optional]] max_time)
+    -- Silence the system
+    local was_debug = LogUtils.get_debug_mode()
+    local log_add_prev = EventLog.add
+
+    LogUtils.set_debug_mode(false)
+    EventLog.add = do_nothing
+
+    local steps = simulate(action_context, target, max_time or MAX_TIME)
+
+    -- Louden the system
+    LogUtils.set_debug_mode(was_debug)
+    EventLog.add = log_add_prev
+
+    return steps
 end
 
 return M

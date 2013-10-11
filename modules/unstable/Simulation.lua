@@ -276,9 +276,16 @@ local function print_sample_stats(race, --[[Optional]] class)
     return stats
 end
 
-local function choose_race()
+local function choose_race(cmd_args)
     local C = AnsiCol
     local idx = 1
+
+    for race in values(RaceType.list) do
+        if table.contains(cmd_args, "--race:" .. race.name) then
+            return race
+        end
+    end
+
     while true do
         local race = RaceType.list[idx]
         print(C.YELLOW("Race ".. idx .. ") ", C.BOLD).. C.WHITE(race.name))
@@ -292,7 +299,9 @@ local function choose_race()
     end
 end
 
-local function choose_class(race)
+local function choose_class(race, cmd_args)
+    local C = AnsiCol
+
     local class_types = {}
     table.insert(class_types, ClassType.lookup("Archer"))
     table.insert(class_types, ClassType.lookup("Knight"))
@@ -300,9 +309,17 @@ local function choose_class(race)
         table.insert(class_types, ClassType.lookup("Mage"):on_create {magic_skill = v, weapon_skill = "Slashing Weapons"})
     end
 
-    local C = AnsiCol
+    local skill, picked_class = "Slashing Weapons", nil
+
+    for c in values(class_types) do
+        if table.contains(cmd_args, "--class:" .. c.name) then
+            picked_class = c
+            break
+        end
+    end
+
     local idx = 1
-    while true do
+    while not picked_class do
         local class = class_types[idx]
         print(C.YELLOW("Class ".. idx .. ") ", C.BOLD).. C.WHITE(class.name))
         print(C.YELLOW(class.description))
@@ -314,15 +331,17 @@ local function choose_class(race)
                 print("Which specialization?")
                 skill = M.choose_option("Piercing Weapons", "Slashing Weapons", "Blunt Weapons")
             end
-            return class:on_create{magic_skill = class.magic_skill, weapon_skill=skill}
+            picked_class = class
         end
         idx = (idx % #class_types) + 1 
     end
+
+    return picked_class:on_create{magic_skill = picked_class.magic_skill, weapon_skill=skill}
 end
 
-function M.choose_player_stats()
-    local race = choose_race()
-    local class = choose_class(race)
+function M.choose_player_stats(cmd_args)
+    local race = choose_race(cmd_args)
+    local class = choose_class(race, cmd_args)
     return race, class
 end
 
@@ -355,8 +374,15 @@ local function fight_spawn_if_over(SM)
             local mon = SM:add_monster(monster)
             local TTK = import "@simulation.TimeToKillCalculation"
             local action_context = SM.players[1]:weapon_action_context()
-            local steps = TTK.calculate_time_to_kill(action_context, mon:stat_context())
-            print("Death took ", steps, " steps!")
+
+            local steps
+            for i=1,100 do
+                local timer = timer_create()
+                steps = TTK.calculate_time_to_kill(action_context, mon:stat_context())
+                print("Fighting the took " .. steps .. " steps! Calculation took " .. timer:get_milliseconds() .. "ms.")
+            end
+            perf.timing_print()
+            os.exit()
         end
     end
 end

@@ -93,6 +93,7 @@ function M.reset_effect(action, type, --[[Optional]] new_effect)
     if new_effect then
         table.insert(action.effects, new_effect)
     end
+    return effects[1]
 end
 
 -- Replace the unique effect of a given type.
@@ -107,6 +108,7 @@ function M.reset_prerequisite(action, type, --[[Optional]] new_prereq)
     if new_prereq then
         table.insert(action.prerequisites, new_prereq)
     end
+    return prereqs[1]
 end
 
 -- Lookup the unique prerequisite of a given type.
