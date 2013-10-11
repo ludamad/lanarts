@@ -128,7 +128,7 @@ namespace lua_api {
 	}
 
 	void register_lua_libraries(lua_State* L) {
-		LuaField preload = luawrap::globals(L)["package"]["preload"];
+		LuaValue preload = luawrap::globals(L)["package"]["preload"];
 		lua_pushcfunction(L, luaopen_socket_core);
 		lua_api::register_lua_submodule_loader(L, "core.socket.core", LuaValue::pop_value(L));
 		lua_pushcfunction(L, luaopen_mime_core);
