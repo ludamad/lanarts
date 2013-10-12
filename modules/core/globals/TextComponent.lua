@@ -104,4 +104,3 @@ function name_field_create(params)
         }
     }
 end
-

@@ -3,6 +3,17 @@ if not __LUAJIT then
     return
 end
 
+function profile(f, ...)
+  local profile = require("jit.profile")
+  local pr = {}
+  profile.start("f", function(th, samples, vmmode)
+    local d = profile.dumpstack(th, "l\t", 3)
+    pr[d] = (pr[d] or 0) + samples
+  end)
+  local ret = {f(...)}
+  
+end
+
 function values(table)
     local idx = 1
     return function()

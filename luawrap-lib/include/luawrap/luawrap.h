@@ -51,7 +51,7 @@ namespace luawrap {
 
 namespace luawrap {
 	void dostring(lua_State* L, const char* code);
-	void dofile(lua_State* L, const char* filename);
+	LuaValue dofile(lua_State* L, const char* filename);
 
 	template<typename T>
 	inline void push(lua_State* L, const T& val) {

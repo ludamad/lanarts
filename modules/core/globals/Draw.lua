@@ -1,4 +1,5 @@
-import ".UtilsGeneral" -- for 'memoized'
+import ".General" -- for 'memoized'
+
 local Display = import "core.Display"
 
 --- Draw parts of text colored differently

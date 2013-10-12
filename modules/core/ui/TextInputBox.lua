@@ -1,4 +1,3 @@
-local utils = import "core.Utils"
 local Keys = import "core.Keyboard"
 local Mouse = import "core.Mouse"
 local Display = import "core.Display"

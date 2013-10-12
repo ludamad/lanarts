@@ -121,13 +121,13 @@ static void run_engine(int argc, char** argv) {
 	/* Load low-level Lua bootstrapping code.
 	 * Implements the module system used by the rest of the engine.
 	 */
-	luawrap::dofile(L, "modules/Main.lua");
+	LuaValue entry_point = luawrap::dofile(L, "modules/Main.lua");
 
 	LuaValue engine = luawrap::globals(L)["Engine"];
 
 	bool did_exit, should_continue;
 
-	engine["main"].push();
+	entry_point.push();
 	should_continue = luawrap::call<bool>(L,
 			std::vector<std::string>(argv + 1, argv + argc));
 	if (!should_continue) {

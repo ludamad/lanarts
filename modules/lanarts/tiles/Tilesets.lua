@@ -1,4 +1,3 @@
-local utils = import "core.Utils"
 local Display = import "core.Display"
 
 local M = {} -- Submodule

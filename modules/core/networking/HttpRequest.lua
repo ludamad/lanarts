@@ -9,8 +9,6 @@ local socket = import "core.Socket"
 local http = import "core.socket.Http"
 local ltn12 = import "core.Ltn12"
 
-local utils = import "core.Utils" -- for table.pop_front & do_nothing
-
 local YieldingSocket = newtype()
 
 local M = {} --submodule

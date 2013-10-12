@@ -1,5 +1,3 @@
-local utils = import "core.Utils"
-
 return {
     death_mage = sound_optional_load "modules/lanarts/sound/death_player.wav" 
     , death_fighter = sound_optional_load "modules/lanarts/sound/death_player.wav" 

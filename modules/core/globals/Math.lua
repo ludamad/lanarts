@@ -53,23 +53,23 @@ end
 
 function vector_sum(v)
     local sum = 0
-	for i = 1,#v do
-		sum = sum + v[i]
-	end
-	return sum
+    for i = 1,#v do
+        sum = sum + v[i]
+    end
+    return sum
 end
 
 function vector_magnitude(v)
-	local sum = 0
-	for i = 1,#v do
-		sum = sum + v[i]^2
-	end
-	return math.sqrt(sum)
+    local sum = 0
+    for i = 1,#v do
+        sum = sum + v[i]^2
+    end
+    return math.sqrt(sum)
 end
 
 function vector_normalize(v, --[[Optional]] magnitude)
-	magnitude = magnitude or 1
-	return vector_scale(v, magnitude/vector_magnitude(v))
+    magnitude = magnitude or 1
+    return vector_scale(v, magnitude/vector_magnitude(v))
 end
 
 function vector_apply(f) 
@@ -136,14 +136,6 @@ function random_round(num)
         return f + 1
     else
         return f
-    end
-end
-
-function table.add(a,b)
-    for k,v in pairs(b) do
-        local bval = b[k]
-        if type(bval) == "table" then table.add(a[k], bval)
-        else a[k] = (a[k] or 0) + bval end
     end
 end
 

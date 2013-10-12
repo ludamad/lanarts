@@ -374,13 +374,12 @@ local function fight_spawn_if_over(SM)
             local mon = SM:add_monster(monster)
             local TTK = import "@simulation.TimeToKillCalculation"
             local action_context = SM.players[1]:weapon_action_context()
-
             local steps
             local timer = timer_create()
-            for i=1,10 do
+            for i=1,100 do
                 steps = TTK.calculate_time_to_kill(action_context, mon:stat_context())
             end
-            print("Fighting the " .. mon.name .. " took " .. steps .. " steps! Calculation took " .. timer:get_milliseconds() .. "ms.")
+            print("Killing the " .. mon.name .. " took " .. steps .. " steps. Calculation took " .. timer:get_milliseconds() .. "ms.")
             perf.timing_print()
             os.exit()
         end

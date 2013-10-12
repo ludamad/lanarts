@@ -1,4 +1,3 @@
-local utils = import "core.Utils"
 local MapGen = import "core.MapGeneration"
 local GameObject = import "core.GameObject"
 

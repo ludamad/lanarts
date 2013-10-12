@@ -1,11 +1,9 @@
 --- Create a tracked coroutine.
 -- Provides a function to run all tasks, removing completed ones.
 
-local utils = import "core.Utils"
-
 local task_list = {}
 
-local M = {} --submodule
+local M = nilprotect {} -- Submodule
 local Task = newtype()
 
 function Task:init(fn, err_handler) 

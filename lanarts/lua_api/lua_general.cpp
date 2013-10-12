@@ -374,11 +374,6 @@ static std::string lapi_string_join(const char* joiner, LuaStackValue table) {
 	return return_string;
 }
 
-static int lapi_setglobal(lua_State* L) {
-	lua_settable(L, LUA_GLOBALSINDEX); // use params 1 & 2
-	return 1; /* return the table */
-}
-
 static int lapi_toaddress(lua_State* L) {
 	char address[64];
 	snprintf(address, 64, "0x%X", lua_topointer(L, 1));
@@ -386,7 +381,7 @@ static int lapi_toaddress(lua_State* L) {
 	return 1; /* return the table */
 }
 
-static void lapi_add_search_path(LuaStackValue path) {
+static void lapi_require_path_add(LuaStackValue path) {
 	lua_api::add_search_path(path.luastate(), path.to_str());
 }
 
@@ -672,20 +667,18 @@ namespace lua_api {
 		globals["_LOADED"] = luawrap::ensure_table(registry["_LOADED"]);
 		globals["direction"].bind_function(compute_direction);
 		globals["newtype"].bind_function(lapi_newtype);
-		globals["setglobal"].bind_function(lapi_setglobal);
 		globals["toaddress"].bind_function(lapi_toaddress);
 		globals["rand_range"].bind_function(lapi_rand_range);
 		globals["random"].bind_function(lapi_random);
 		globals["randomf"].bind_function(lapi_randomf);
 		globals["random_subregion"].bind_function(lapi_random_subregion);
 		globals["chance"].bind_function(lapi_chance);
-		globals["nilprotect"].bind_function(lua_protect_table);
 
 		globals["__read_eval_print"].bind_function(read_eval_print);
 
 		globals["import_internal"].bind_function(lapi_import_internal);
 		globals["virtual_path_create_relative"].bind_function(lapi_virtual_path_create_relative);
-		globals["require_path_add"].bind_function(lapi_add_search_path);
+		globals["require_path_add"].bind_function(lapi_require_path_add);
 		globals["path_resolve"].bind_function(lapi_path_resolve);
 
 		LuaValue table = luawrap::ensure_table(globals["table"]);

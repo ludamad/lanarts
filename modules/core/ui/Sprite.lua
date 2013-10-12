@@ -1,5 +1,3 @@
-local utils = import "core.Utils" -- import utils for 'do_nothing'
-
 --- Stores state associated with a drawable object.
 -- This state can be mutated by accessing the object's
 -- 'options' object.

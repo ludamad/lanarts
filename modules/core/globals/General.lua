@@ -1,5 +1,20 @@
 -- Utility code that can apply to lua programming in general.
 
+-- Global data is a special submodule, its members are always serialized
+local GlobalData = import "core.GlobalData"
+
+-- Data is defined on a per-submodule basis
+function data_load(key, default, --[[Optional]] vpath)
+    -- Make a safe & (almost) guaranteed unique key 
+    local global_key = (vpath or virtual_path(2)) .. ':' .. key
+    local val = GlobalData[global_key]
+    if not val then 
+        GlobalData[global_key] = default
+        return default
+    end
+    return val
+end
+
 --- Does nothing. 
 --@usage dummy_object = { step = do_nothing, draw = do_nothing }
 function do_nothing() end
@@ -29,18 +44,6 @@ function memoized(func, --[[Optional]] separator)
 
         return cache[key]
     end
-end
-
---- Return whether a file with the specified name exists.
--- More precisely, returns whether the given file can be opened for reading.
-function file_exists(name)
-    local f = io.open(name,"r")
-    if f ~= nil then io.close(f) end
-    return f ~= nil
-end
-
-function string:interpolate(table)
-    return (self:gsub('($%b{})', function(w) return table[w:sub(3, -2)] or w end))
 end
 
 --- Get a  human-readable string from a lua value. The resulting value is generally valid lua.
@@ -96,148 +99,6 @@ function pretty_tostring_compact(v)
     return pretty_tostring(v, nil, true)
 end
 
-function table.assign(t, ...)
-    table.clear(t)
-    for index=1,select("#", ...) do
-        t[index] = select(index, ...)
-    end
-end
-
-function table.clone(t)
-    local newt = {}
-    table.copy(t, newt)
-    return newt
-end
-
-function table.key_list(t)
-    local ret = {}
-    for k,_ in pairs(t) do
-        table.insert(ret,k)
-    end
-    return ret
-end
-
-function table.value_list(t)
-    local ret = {}
-    for _,v in pairs(t) do
-        table.insert(ret,v)
-    end
-    return ret
-end
-
-function table.value_key_invert(t)
-    local ret = {}
-    for k,v in pairs(t) do
-        ret[v] = k
-    end
-    return ret
-end
-
-function table.deep_clone(t)
-    local newt = {}
-    table.deep_copy(t, newt)
-    return newt
-end
-
-function table.pop_first(t)
-    local len = #t
-    if len == 0 then 
-        return nil 
-    end
-    local val = t[len]
-    for i=1,len-1 do
-        t[i] = t[i+1]
-    end
-    t[len] = nil
-    return val
-end
-
-function table.clear(t)
-    for i=#t,1 do
-        t[i] = nil
-    end
-    for k,v in pairs(t) do
-        t[k] = nil
-    end
-end
-
-function table.pop_last(t)
-    local val = t[#t]
-    t[#t] = nil
-    return val    
-end
-
-function table.contains(t, val)
-    for i=1,#t do 
-        if t[i] == val then 
-            return true
-        end
-    end
-    return false
-end
-
---- NOTE: Operates on array portion of table
--- Removes all occurences of 'val' from the table, compacting it
-function table.remove_occurrences(t, val)
-    local new_len = 1
-    -- Compact array
-    for i = 1, #t do
-        if t[i] ~= val then
-            t[new_len] = t[i]
-            new_len = new_len + 1
-        end
-    end
-    for i = new_len, #t do
-        t[i] = nil -- delete values at end
-    end
-end
-
-function table.insert_all(t1, t2)
-    for v in values(t2) do
-        t1[#t1 + 1] = v
-    end
-end
-
---- Adds values from src to dest, copying them if initially nil
-function table.defaulted_addition(src, dest)
-    for k,v in pairs(src) do
-        local val = dest[k]
-        if dest[k] == nil then
-            dest[k] = src[k]
-        else
-            if type(val) == 'table' then
-                table.defaulted_addition(src[k], val)
-            else
-                dest[k] = val + src[k]
-            end
-        end
-    end
-end
-
---- Subtracts values from src to dest, copying them if initially nil
-function table.defaulted_subtraction(src, dest)
-    for k,v in pairs(src) do
-        local val = dest[k]
-        if dest[k] == nil then
-            dest[k] = -src[k]
-        else
-            if type(val) == 'table' then
-                table.defaulted_subtraction(src[k], val)
-            else
-                dest[k] = val - src[k]
-            end
-        end
-    end
-end
-
-function table.scaled(t, scale)
-    local ret = {}
-    for k,v in pairs(t) do
-        ret[k] = v*scale
-    end
-    return ret
-end
-
 -- Resolves a number, or a random range
 function random_resolve(v)
     return type(v) == "table" and random(unpack(v)) or v
@@ -252,15 +113,14 @@ function pretty_print(val, --[[Optional]] tabs, --[[Optional]] packed)
     print(pretty_tostring(val, tabs, packed))
 end
 
-function pretty_print_all(...)
+-- Convenience print-like function:
+function pretty(...)
     local args = {}
     for i=1,select("#", ...) do
     	args[i] = pretty_tostring_compact(select(i, ...)) 
 	end
     print(unpack(args))
 end
--- Convenience print-like function:
-pretty = pretty_print_all
 
 --- Iterate all iterators one after another
 function iter_combine(...)
