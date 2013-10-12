@@ -27,8 +27,14 @@ local function resolve_aptitude_bonuses(a)
 end
 
 local function on_calculate(skill_slot, user)
+    local apts = user.derived.aptitudes
+    local level = user.base.level
     for type, apt in pairs(skill_slot.type.aptitudes) do
-        StatContext.add_all_aptitudes(user, type, vector_scale(apt, skill_slot.level))
+        local eff,dam,res,def = apt[1],apt[2],apt[3],apt[4]
+        apts.effectiveness[type] = (apts.effectiveness[type] or 0) + eff * level   
+        apts.damage[type] = (apts.damage[type] or 0) + dam * level   
+        apts.resistance[type] = (apts.resistance[type] or 0) + res * level   
+        apts.defence[type] = (apts.defence[type] or 0) + def * level   
     end
 end
 
