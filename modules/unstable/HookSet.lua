@@ -25,7 +25,9 @@ end
 
 -- Place recently added hooks into the sorted list
 function HookSet:merge_new_hooks()
-    for hook in values(self.new_hooks) do
+    if #self.new_hooks == 0 then return end
+
+    for _, hook in ipairs(self.new_hooks) do
         if hook.priority <= M.MIN_PRIORITY then
             table.insert(self.hooks, hook)
         else 
@@ -45,7 +47,7 @@ end
 
 function HookSet:on_draw(stats, drawf, options)
     self:merge_new_hooks()
-    for hook in values(self.hooks) do
+    for _, hook in ipairs(self.hooks) do
         if hook.on_draw then
             drawf, options = hook:on_draw(stats, drawf, options)
         end
@@ -78,9 +80,18 @@ end
 
 function HookSet:perform(method_name, ...)
     self:merge_new_hooks()
-    for hook in values(self.hooks) do
+    for _, hook in ipairs(self.hooks) do
         local method = hook[method_name]
         if method then method(hook, ...) end
+    end
+end
+
+function HookSet:on_calculate(user)
+    self:merge_new_hooks()
+    for _, hook in ipairs(self.hooks) do
+        if hook.on_calculate then
+            hook:on_calculate(user) 
+        end
     end
 end
 

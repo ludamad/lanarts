@@ -43,7 +43,7 @@ function M.CooldownPrereq:init(cooldown_prereq_list)
     self.cooldown_prereq_list = cooldown_prereq_list
 end
 function M.CooldownPrereq:check(user)
-    for c in values(self.cooldown_prereq_list) do
+    for _, c in ipairs(self.cooldown_prereq_list) do
         if StatContext.has_cooldown(user, c) then
             return false, "You must wait before doing that! ["..c.."]"
         end
@@ -95,12 +95,12 @@ function M.UserStatusPrereq:init(forbidden, required)
 end
 
 function M.UserStatusPrereq:check(user)
-    for f in values(self.forbidden) do
+    for _, f in ipairs(self.forbidden) do
         if StatContext.get_status(user, f) then 
             return false, "You cannot do this in a " .. f.name:lower() .. " state!" 
         end
     end
-    for r in values(self.required) do
+    for _, r in ipairs(self.required) do
         if not StatContext.get_status(user, r) then 
             return false, "You must do this in a " .. r.name:lower() .. " state!"
         end

@@ -79,10 +79,7 @@ function M.stats_create(--[[Optional]] params, --[[Optional]] add_skills)
         aptitudes = M.aptitudes_create(params.aptitudes),
         skills = M.skills_create(params.skills, add_skills),
         hooks = C(params.hooks, true) or HookSet.create(),
-
         spells = C(params.spells, true) or SpellsKnown.create(),
-        abilities = C(params.abilities) or {},
-        unarmed_attack = params.unarmed_attack or Attacks.ZERO_DAMAGE_ATTACK,
 
         cooldowns = C(params.cooldowns, true) or CooldownSet.create(),
 

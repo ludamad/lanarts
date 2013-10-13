@@ -1,5 +1,8 @@
 local StatContext = import "@StatContext"
-
+local Apts = import "@stats.AptitudeTypes"
+local Stats = import "@Stats"
+local StatContext = import "@StatContext"
+local CodeGeneration = import "core.CodeGeneration"
 local CooldownTypes = import ".CooldownTypes"
 local ExperienceCalculation = import ".ExperienceCalculation"
 local C = import "core.terminal.AnsiColors"
@@ -131,6 +134,54 @@ function M.attack_to_string(attack, --[[Optional]] use_color)
     end
 
     return ret .. (" "):join(apt_list) .. if_color(C.RED, "}", C.BOLD)
+end
+
+local apt_func_signature = "copy_apts(a,b)"
+M.stat_copy = CodeGeneration.copy_function_compile {
+    prelude = ("local function %s\n%send\n"):format(
+        apt_func_signature,
+        CodeGeneration.copy_block_create {
+            simple = table.sorted_key_list(Apts.allowed_aptitudes)
+        }
+    ),
+    simple = {
+        "name", "team", "level", "skill_points", "xp", 
+        "hp", "max_hp", "hp_regen",
+        "mp", "max_mp", "mp_regen",
+        "movement_speed", "skills", "inventory", "hooks"
+    },
+    meta = {
+        "cooldowns"
+    },
+    complex = {
+        aptitudes = {
+            complex = {
+                defence = apt_func_signature, damage = apt_func_signature,
+                resistance = apt_func_signature, effectiveness = apt_func_signature
+            }
+        }
+    }
+}
+
+function M.stat_context_on_step(context)
+    return StatContext.on_step(context, M.stat_copy)
+end
+
+function M.stat_clone(stats)
+    local new_stats = Stats.stats_create()
+    M.stat_copy(stats, new_stats)
+    return new_stats    
+end
+
+function M.stat_full_clone(stats)
+    local new_stats = M.stat_clone(stats)
+    new_stats.skills = {}
+    new_stats.spells = {}
+    for k in values{"inventory", "skills", "spells"} do
+        new_stats[k] = {}
+        table.deep_copy(stats[k], new_stats[k], --[[Do not invoke meta]] false)
+    end
+    return new_stats
 end
 
 return M

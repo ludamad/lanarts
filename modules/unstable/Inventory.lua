@@ -13,12 +13,6 @@ function Inventory:init(--[[Optional]] capacity)
     self.capacity = capacity or INVENTORY_CAPACITY
 end
 
---function Inventory:__copy(other)
---    -- Ensure a shallow copy when used with table.deep_copy
---    other.capacity = self.capacity
---    other.items = table.clone(self.items)
---end
-
 function Inventory:find_item(item_type)
     for idx,item in ipairs(self.items) do
         if item_type == item.type then
@@ -68,7 +62,7 @@ end
 
 function Inventory:get_equipped_items(equipment_type)
     local items = {}
-    for item in self:values() do
+    for _, item in ipairs(self.items)  do
         if item.equipped and table.contains(item.traits, equipment_type) then
             table.insert(items, item)
         end
@@ -99,7 +93,7 @@ function Inventory:values()
 end
 
 function Inventory:on_step(stats)
-    for item in self:values() do
+    for _, item in ipairs(self.items)  do
         if item.equipped then
             local on_step = item.type.on_step
             if on_step then
@@ -110,7 +104,7 @@ function Inventory:on_step(stats)
 end
 
 function Inventory:perform(method_name, ...)
-    for item in self:values() do
+    for _, item in ipairs(self.items)  do
         if item.equipped then
             local method = item[method_name]
             if method then method(item, ...) end
@@ -118,8 +112,16 @@ function Inventory:perform(method_name, ...)
     end
 end
 
+function Inventory:on_calculate(user)
+    for _, item in ipairs(self.items)  do
+        if item.equipped and item.on_calculate then
+            item:on_calculate(user)
+        end
+    end
+end
+
 function Inventory:on_draw(stats, drawf, args)
-    for item in self:values() do
+    for _, item in ipairs(self.items)  do
         if item.equipped and item.on_draw then
             drawf, args = item:on_draw(stats, drawf, args)
         end

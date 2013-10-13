@@ -1,6 +1,5 @@
 local CombatObject = import ".CombatObject"
 local Attacks = import "@Attacks"
-local Apts = import "@stats.AptitudeTypes"
 local Relations = import "lanarts.objects.Relations"
 local PlayerIOActions = import ".PlayerIOActions"
 local PlayerIOResolution = import ".PlayerIOResolution"
@@ -21,20 +20,8 @@ local function player_preferences(args)
     }
 end
 
--- Minor optimization, ensure aptitude table is filled with 0s
-local function ensure_apts_exist(stats)
-    local apts = stats.aptitudes
-    local apt_types = {apts.effectiveness, apts.resistance, apts.damage, apts.defence}
-    for k,v in pairs(Apts.allowed_aptitudes) do
-        for t in values(apt_types) do
-            t[k] = t[k] or 0
-        end
-    end
-end
-
 function PlayerObject.player_stats_create(race, --[[Can-be-nil]] class, name)
     local stats = RaceType.resolve(race).on_create(name)
-    ensure_apts_exist(stats)
     if class then
         local context = StatContext.stat_context_create(stats)
         class:on_init(context)

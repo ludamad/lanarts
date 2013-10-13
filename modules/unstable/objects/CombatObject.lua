@@ -11,6 +11,7 @@ local LogUtils = import "lanarts.LogUtils"
 local Actions = import "@Actions"
 local ActionContext = import "@ActionContext"
 local Attacks = import "@Attacks"
+local StatUtils = import "@stats.StatUtils"
 
 local CombatObject = ObjectUtils.type_create()
 
@@ -28,7 +29,7 @@ function CombatObject.create(args)
 
     local ret = args.base_create and args.base_create(args) or CombatObject.base_create( args)
     assert(ret.derived_stats == args.derived_stats)
-    StatContext.on_step(ret._context)
+    StatUtils.stat_context_on_step(ret._context)
     StatContext.on_calculate(ret._context)
     return ret
 end
@@ -73,7 +74,7 @@ function CombatObject:use_resolved_action()
 end
 
 function CombatObject:on_step()
-    StatContext.on_step(self._context)
+    StatUtils.stat_context_on_step(self._context)
     self._stats_need_calculate = true
 
     self:use_resolved_action()

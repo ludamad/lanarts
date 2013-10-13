@@ -11,6 +11,7 @@ local RangedWeaponActions = import "@items.RangedWeaponActions"
 local StatContext = import "@StatContext"
 local StatPrereqs = import "@StatPrereqs"
 local EventLog = import "core.ui.EventLog"
+local StatUtils = import "@stats.StatUtils"
 
 local M = nilprotect {} -- Submodule
 
@@ -63,14 +64,18 @@ local function simulate(action_context, target, max_time)
 
     for steps=1,max_time do
         perf.timing_begin("**Stat context stepping player **")
-        StatContext.on_step(action_context.user)
-        StatContext.on_calculate(action_context.user)
+        StatUtils.stat_context_on_step(action_context.user)
         perf.timing_end("**Stat context stepping player **")
+        perf.timing_begin("**Stat context calculate player **")
+        StatContext.on_calculate(action_context.user)
+        perf.timing_end("**Stat context calculate player **")
 
         perf.timing_begin("**Stat context stepping monster **")
-        StatContext.on_step(target)
-        StatContext.on_calculate(target)
+        StatUtils.stat_context_on_step(target)
         perf.timing_end("**Stat context stepping monster **")
+        perf.timing_begin("**Stat context calculate monster **")
+        StatContext.on_calculate(target)
+        perf.timing_end("**Stat context calculate monster **")
 
         perf.timing_begin("**Action use**")
         if ActionContext.can_use_action(action_context, target) then

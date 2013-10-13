@@ -26,7 +26,7 @@ function M.can_use_action(user, action, target, --[[Optional]] action_source)
         local ok, problem = action.on_prerequisite(action_source, user, target)
         if not ok then return false, problem end 
     end
-    for prereq in values(action.prerequisites) do
+    for _, prereq in ipairs(action.prerequisites) do
         local ok, problem = prereq:check(user, target)
         if not ok then return false, problem end 
     end
@@ -41,7 +41,7 @@ function M.use_action(user, action, target, --[[Optional]] action_source, --[[Op
         ret = ret or res
     end
 
-    for effect in values(action.effects) do
+    for _, effect in ipairs(action.effects) do
         local res = effect:apply(user, target)
         ret = ret or res
     end
@@ -58,7 +58,7 @@ end
 -- Lookup all effects of a certain type.
 function M.get_all_effects(action, type)
     local effects = {}
-    for v in values(action.effects) do
+    for _, v in ipairs(action.effects) do
         if getmetatable(v) == type then table.insert(effects,v) end
     end
     return effects
@@ -67,7 +67,7 @@ end
 -- Lookup all prerequisites of a certain type.
 function M.get_all_prerequisites(action, type)
     local prereqs = {}
-    for v in values(action.prerequisites) do
+    for _, v in ipairs(action.prerequisites) do
         if getmetatable(v) == type then table.insert(prereqs,v) end
     end
     return prereqs
@@ -87,7 +87,7 @@ end
 function M.reset_effect(action, type, --[[Optional]] new_effect)
     local effects = M.get_all_effects(action, type)
     assert(#effects <= 1)
-    for effect in values(effects) do 
+    for _, effect in ipairs(effects) do 
         table.remove_occurrences(action.effects, effect)
     end
     if new_effect then
@@ -102,7 +102,7 @@ end
 function M.reset_prerequisite(action, type, --[[Optional]] new_prereq)
     local prereqs = M.get_all_prerequisites(action, type)
     assert(#prereqs <= 1)
-    for prereq in values(prereqs) do 
+    for _, prereq in ipairs(prereqs) do 
         table.remove_occurrences(action.prerequisites, prereq)
     end
     if new_prereq then

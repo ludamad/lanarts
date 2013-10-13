@@ -1,17 +1,15 @@
--- Define replacement for common operations that should be in C for normal Lua, but in C++ for LuaJIT:
+-- Define replacement for common operations that should be in C++ for normal Lua, but in Lua for LuaJIT:
+pretty("__LUAJIT", __LUAJIT)
 if not __LUAJIT then
+    function profile(f, ...) return f(...) end
     return
 end
 
-function profile(f, ...)
-  local profile = require("jit.profile")
-  local pr = {}
-  profile.start("f", function(th, samples, vmmode)
-    local d = profile.dumpstack(th, "l\t", 3)
-    pr[d] = (pr[d] or 0) + samples
-  end)
-  local ret = {f(...)}
-  
+function profile(f)
+    require("jit.p").start("vF9")
+    local ret = {f()}
+    require("jit.p").stop()
+    return unpack(ret)
 end
 
 function values(table)

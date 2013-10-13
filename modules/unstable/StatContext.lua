@@ -74,7 +74,7 @@ function M.calculate_proficiency_modifier(stats, ...)
     return stats.base.inventory:calculate_proficiency_modifier(stats, ...) 
 end
 
-function M.on_step(context)
+function M.on_step(context, --[[Optional]] copy_func)
     if context.base.hp > 0 then
         M.add_hp(context, context.derived.hp_regen)
     end
@@ -82,7 +82,7 @@ function M.on_step(context)
     context.base.hooks:merge_new_hooks()
     context.base.cooldowns:on_step(context.derived.cooldowns.cooldown_rates)
     context.base.hooks:on_step(context)
-    M.copy_base_to_derived(context)
+    M.copy_base_to_derived(context, --[[Optional]] copy_func)
 end
 
 function M.on_draw(context, drawf, options)
@@ -91,12 +91,12 @@ function M.on_draw(context, drawf, options)
     drawf(options)
 end
 
-function M.on_calculate(context, ...)
-    for skill_slot in values(context.derived.skills) do
-        skill_slot:on_calculate(context, ...)
+function M.on_calculate(context)
+    for _, skill_slot in ipairs(context.derived.skills) do
+        skill_slot:on_calculate(context)
     end
-    context.derived.inventory:perform("on_calculate", context, ...)
-    context.derived.hooks:perform("on_calculate", context, ...)
+    context.derived.inventory:on_calculate(context)
+    context.derived.hooks:on_calculate(context)
 end
 
 function M.on_death(context, attacker)
@@ -109,8 +109,8 @@ end
 --------------------------------------
 
 --- Sync derived stats with base stats
-function M.copy_base_to_derived(context)
-    table.deep_copy(context.base, context.derived)
+function M.copy_base_to_derived(context, --[[Optional]] copy_func)
+    (copy_func or table.deep_copy)(context.base, context.derived)
 end
 
 --- Change HP & reflect it in both derived and base stat-sets

@@ -1,3 +1,5 @@
+local CodeGeneration = import "core.CodeGeneration"
+
 local SkillType = import "@SkillType"
 local StatContext = import "@StatContext"
 local ContentUtils = import ".ContentUtils"
@@ -38,6 +40,19 @@ local function on_calculate(skill_slot, user)
     end
 end
 
+-- Optimization: Shaved 9% off with this method (LuaJIT)
+local function specialized_on_calculate(type, apt)
+    local eff_val,dam_val,res_val,def_val = apt[1],apt[2],apt[3],apt[4]
+    return function(_, user)
+        local apts, level = user.derived.aptitudes, user.base.level
+        local eff, dam, res, def = apts.effectiveness, apts.damage, apts.resistance, apts.defence
+        eff[type] = (eff[type] or 0) + eff_val * level
+        dam[type] = (dam[type] or 0) + dam_val * level
+        res[type] = (res[type] or 0) + res_val * level
+        def[type] = (def[type] or 0) + def_val * level
+    end
+end
+
 local function on_create(skill)
     assert(skill)
     local slot = {type = skill, level = 0, skill_points = 0, cost_multiplier = 1.0}
@@ -64,7 +79,13 @@ end
 
 local function skill_define(args)
     args.aptitudes = resolve_aptitude_bonuses(args.aptitudes)
-    args.on_calculate = args.on_calculate or on_calculate
+    local keys = table.key_list(args.aptitudes)
+    if #keys == 1 then 
+        local k = keys[1]
+        args.on_calculate = args.on_calculate or specialized_on_calculate(k, args.aptitudes[k])
+    else
+        args.on_calculate = args.on_calculate or on_calculate
+    end
     args.on_spend_skill_points = args.on_spend_skill_points or on_spend_skill_points
     args.on_create = args.on_create or on_create
     return SkillType.define(args)

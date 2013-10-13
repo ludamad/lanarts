@@ -32,6 +32,7 @@ local SimulationMap = import "@SimulationMap"
 local Proficiency = import "@Proficiency"
 local LogUtils = import "lanarts.LogUtils"
 local Keys = import "core.Keyboard"
+local StatUtils = import "@stats.StatUtils"
 
 local M = nilprotect {} -- Submodule
 
@@ -79,7 +80,7 @@ end
 
 local function choose_skills(player, SP)
     while SP > 0 do
-        StatContext.on_step(player)
+        StatUtils.stat_context_on_step(player)
         StatContext.on_calculate(player)
         print(StatUtils.stats_to_string(player.derived, --[[Color]] true, --[[New lines]] true, player.base.name .. ", the Adventurer"))
         -- Pick skill
@@ -97,7 +98,7 @@ local function choose_skills(player, SP)
 
         -- Pick skill points gain
         while SP > 0 do
-            StatContext.on_step(player)
+            StatUtils.stat_context_on_step(player)
             StatContext.on_calculate(player)
             print(StatUtils.stats_to_string(player.derived, --[[Color]] true, --[[New lines]] true, player.base.name .. ", the Adventurer"))
     
@@ -270,7 +271,7 @@ end
 local function print_sample_stats(race, --[[Optional]] class)
     local stats = PlayerObject.player_stats_create(race, class, "Level 1 " .. race.name)
     local context = StatContext.stat_context_create(stats)
-    StatContext.on_step(context)
+    StatUtils.stat_context_on_step(context)
     StatContext.on_calculate(context)
     print(StatUtils.stats_to_string(context.derived, --[[Color]] true, --[[New lines]] true, stats.name))
     return stats
@@ -376,9 +377,12 @@ local function fight_spawn_if_over(SM)
             local action_context = SM.players[1]:weapon_action_context()
             local steps
             local timer = timer_create()
-            for i=1,100 do
-                steps = TTK.calculate_time_to_kill(action_context, mon:stat_context())
+            local function calc_steps() 
+                for i=1,100 do
+                    steps = TTK.calculate_time_to_kill(action_context, mon:stat_context())
+                end
             end
+            profile(calc_steps)
             print("Killing the " .. mon.name .. " took " .. steps .. " steps. Calculation took " .. timer:get_milliseconds() .. "ms.")
             perf.timing_print()
             os.exit()

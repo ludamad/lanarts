@@ -142,8 +142,8 @@ end
 --- Like a functional map of a function onto a list
 function map_call(f, list)
     local ret = {}
-    for v in values(list) do 
-        ret[#ret + 1] = f(v)
+    for i=1,#list do 
+        ret[i] = f(list[i])
     end
     return ret
 end

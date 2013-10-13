@@ -4,6 +4,13 @@ local M = nilprotect {} -- Submodule
 -- Shared by spells and items
 M.METATABLE = {}
 
+function M.METATABLE:__copy(obj)
+    local type = self.type
+    self.type = nil
+    table.deep_copy(self, obj, --[[Do not invoke meta]] false)
+    self.type, obj.type = type, type
+end
+
 function M.METATABLE:__index(k)
     -- Look in slot type
     local v = rawget(self, 'type')[k]

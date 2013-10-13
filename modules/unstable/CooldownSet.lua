@@ -18,11 +18,26 @@ function CooldownSet:on_step(--[[Optional]] rates)
     for k,v in pairs(self.cooldowns) do
         local rate = (rates[k] or 1)
         local val = v - rate
-        if val <= 0 then
-            val = nil -- Delete
-        end
+        if val <= 0 then val = 0 end
         self.cooldowns[k] = val
     end
+end
+
+function CooldownSet:__copy(b)
+    if not rawget(b, "cooldowns") then
+        table.clear(b) 
+        setmetatable(b, CooldownSet)
+        CooldownSet.init(b)
+    else
+        for c, v in pairs(b.cooldowns) do
+            if not self.cooldowns[c] then b.cooldowns[c] = 0 end
+        end
+        for c, v in pairs(b.cooldown_rates) do
+            if not self.cooldown_rates[c] then b.cooldowns[c] = 1 end
+        end
+    end
+    for c, v in pairs(self.cooldowns) do b.cooldowns[c] = v end
+    for c, v in pairs(self.cooldown_rates) do b.cooldown_rates[c] = v end
 end
 
 local MIN_DIVISOR = 0.25 -- No more than 4x needed cooldown 

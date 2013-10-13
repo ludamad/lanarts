@@ -6,13 +6,15 @@ function nilprotect(t)
     return setmetatable(t, nilprotect_meta)
 end
 
+require_path_add(_ROOT_FOLDER .. '/?.lua')
+
 -- Ensure undefined global variable access results in an error
 nilprotect(_G)
 
 local globals_subpackage = "core.globals"
 local modules_submodule = globals_subpackage .. ".Modules"
 -- Note: 'import' is not defined until Modules.lua is ran.
-dofile(_ROOT_FOLDER .. "/" .. modules_submodule:gsub("%.", "/") .. ".lua")
+require(modules_submodule)
 import_all(globals_subpackage, "*", true, function(name) 
     return name ~= modules_submodule
 end)

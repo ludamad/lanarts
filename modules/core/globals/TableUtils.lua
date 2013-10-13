@@ -1,10 +1,20 @@
 function table.clone(t)
+    local meta = getmetatable(t)
+    if meta then
+        local clone = meta.__clone
+        if clone then return clone(t) end
+    end
     local newt = {}
     table.copy(t, newt)
     return newt
 end
 
 function table.deep_clone(t)
+    local meta = getmetatable(t)
+    if meta then
+        local clone = meta.__clone
+        if clone then return clone(t) end
+    end
     local newt = {}
     table.deep_copy(t, newt)
     return newt
@@ -22,6 +32,12 @@ function table.key_list(t)
     for k,_ in pairs(t) do
         table.insert(ret,k)
     end
+    return ret
+end
+
+function table.sorted_key_list(t, ...)
+    local ret = table.key_list(t)
+    table.sort(ret, ...)
     return ret
 end
 
