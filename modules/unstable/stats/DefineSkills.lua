@@ -9,23 +9,23 @@ local LogUtils = import "lanarts.LogUtils"
 
 local M = {} -- Submodule
 
-local function resolve_aptitude_bonuses(a)
-    if type(a) == "string" then
-        return {[a] = {dup(1,4)}}
+local function resolve_aptitude_bonuses(apts)
+    if type(apts) == "string" then
+        return {[apts] = {dup(1,4)}}
     end
-    if #a > 0 then
+    if #apts > 0 then
         local temp = {}
-        for i=1,#a,2 do
-            temp[a[i]] = a[i+1]
+        for i=1,#apts,2 do
+            temp[apts[i]] = apts[i+1]
         end
-        a = temp
+        apts = temp
     end
-    for k,v in pairs(a) do
+    for k,v in pairs(apts) do
         if type(v) == "number" then
-            a[k] = {dup(v,4)}
+            apts[k] = {dup(v,4)}
         end
     end
-    return a
+    return apts
 end
 
 local function on_calculate(skill_slot, user)

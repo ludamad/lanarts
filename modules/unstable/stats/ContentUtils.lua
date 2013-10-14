@@ -1,5 +1,6 @@
 local Display = import "core.Display"
 
+local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local Apts = import "@stats.AptitudeTypes"
 local SpellsKnown = import "@SpellsKnown"
 local StatContext = import "@StatContext"
@@ -27,6 +28,25 @@ function M.path_resolve_for_definition(path)
         if idx then 
             return src:sub(2,idx) .. path
         end
+    end
+end
+
+function M.derive_on_draw(args)
+    if type(args) == "function" then return args end
+    if type(args) == "string" then args = M.derive_sprite(args) end
+    if getmetatable(args) then -- Is it a plain table?
+        args = { sprite = args }
+    end
+
+    return function(self, stats, drawf, options)
+        if args.new_color then
+            options.color = args.new_color
+        end
+        local function new_drawf(options)
+            drawf(options)
+            ObjectUtils.screen_draw(self.sprite, options.xy, args.alpha, args.frame, args.direction, args.color)
+        end
+        return new_drawf, options
     end
 end
 

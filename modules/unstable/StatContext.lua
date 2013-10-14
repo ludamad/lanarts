@@ -85,10 +85,20 @@ function M.on_step(context, --[[Optional]] copy_func)
     M.copy_base_to_derived(context, --[[Optional]] copy_func)
 end
 
+function M.on_draw_call_collapse(context, drawf, options, obj, method, ...)
+    if not obj then
+        assert(not method)
+        drawf(options)
+    else
+        method(obj, context, drawf, options, ...)
+    end
+end
+
 function M.on_draw(context, drawf, options)
-    drawf, options = context.derived.inventory:on_draw(context, drawf, options)
-    drawf, options = context.derived.hooks:on_draw(context, drawf, options)
-    drawf(options)
+    local funcs = {}
+    context.derived.inventory:get_on_draw_methods(funcs)
+    context.derived.hooks:get_on_draw_methods(funcs)
+    M.on_draw_call_collapse(context, drawf, options, unpack(funcs))
 end
 
 function M.on_calculate(context)
@@ -110,7 +120,8 @@ end
 
 --- Sync derived stats with base stats
 function M.copy_base_to_derived(context, --[[Optional]] copy_func)
-    (copy_func or table.deep_copy)(context.base, context.derived)
+    if copy_func then return copy_func(context.base, context.derived) end
+    table.deep_copy(context.base, context.derived)
 end
 
 --- Change HP & reflect it in both derived and base stat-sets

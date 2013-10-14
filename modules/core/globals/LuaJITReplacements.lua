@@ -1,5 +1,4 @@
 -- Define replacement for common operations that should be in C++ for normal Lua, but in Lua for LuaJIT:
-pretty("__LUAJIT", __LUAJIT)
 if not __LUAJIT then
     function profile(f, ...) return f(...) end
     return

@@ -114,8 +114,7 @@ function M.attack_to_string(attack, --[[Optional]] use_color)
         end
     end
 
-    local trait_list = table.key_list(traits)
-    table.sort(trait_list)
+    local trait_list = table.sorted_key_list(traits)
 
     local apt_list = {}
     for trait in values(trait_list) do
@@ -148,7 +147,10 @@ M.stat_copy = CodeGeneration.copy_function_compile {
         "name", "team", "level", "skill_points", "xp", 
         "hp", "max_hp", "hp_regen",
         "mp", "max_mp", "mp_regen",
-        "movement_speed", "skills", "inventory", "hooks"
+        "movement_speed", "inventory", "hooks"
+    },
+    deep = {
+        "skills"
     },
     meta = {
         "cooldowns"

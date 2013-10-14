@@ -52,13 +52,10 @@ StatusType.define {
        LogUtils.event_log_player(stats.obj, "$You enter{s} a powerful rage!", {200,200,255})
     end,
     sprite = Display.image_load(path_resolve "sprites/berserk.png"),
-    on_draw = function(self, stats, drawf, options)
+    on_draw = function(self, stats, drawf, options, ...)
         options.color = COL_PALE_RED
-        local function new_drawf(options)
-            drawf(options)
-            ObjectUtils.screen_draw(self.sprite, options.xy)
-        end
-        return new_drawf, options
+        StatContext.on_draw_call_collapse(stats, drawf, options, ...)
+        ObjectUtils.screen_draw(self.sprite, options.xy)
     end,
     on_calculate = function(self, stats)
         local D = stats.derived

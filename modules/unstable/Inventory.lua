@@ -120,13 +120,13 @@ function Inventory:on_calculate(user)
     end
 end
 
-function Inventory:on_draw(stats, drawf, args)
+function Inventory:get_on_draw_methods(func_list)
     for _, item in ipairs(self.items)  do
         if item.equipped and item.on_draw then
-            drawf, args = item:on_draw(stats, drawf, args)
+            table.insert(func_list, item)
+            table.insert(func_list, item.on_draw)
         end
     end
-    return drawf, args
 end
 
 function Inventory:calculate_proficiency_modifier(stats, item_slot)

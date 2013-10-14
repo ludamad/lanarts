@@ -45,14 +45,14 @@ function HookSet:merge_new_hooks()
     table.clear(self.new_hooks)
 end
 
-function HookSet:on_draw(stats, drawf, options)
+function HookSet:get_on_draw_methods(func_list)
     self:merge_new_hooks()
     for _, hook in ipairs(self.hooks) do
         if hook.on_draw then
-            drawf, options = hook:on_draw(stats, drawf, options)
+            table.insert(func_list, hook)
+            table.insert(func_list, hook.on_draw)
         end
     end
-    return drawf, options
 end
 
 function HookSet:values()

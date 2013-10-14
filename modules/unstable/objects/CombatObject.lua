@@ -62,7 +62,8 @@ end
 -- Shortcut for providing a StatContext copy, needed by eg projectile objects
 function CombatObject:stat_context_copy()
     local context = self:stat_context()
-    return { obj = self, base = table.deep_clone(context.base), derived = table.deep_clone(context.derived) }
+    local new_base = StatUtils.stat_full_clone(context.base)
+    return { obj = self, base = new_base, derived = StatUtils.stat_clone(new_base) }
 end
 
 function CombatObject:on_prestep()
