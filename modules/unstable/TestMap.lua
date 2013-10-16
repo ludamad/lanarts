@@ -29,8 +29,8 @@ function M.main(cmd_args)
 
     Display.view_snap(player.xy)
     while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
+        Display.view_snap(player.xy)
         SM:step()
-
         Display.draw_start()
         SM:draw()
         Display.draw_finish()
