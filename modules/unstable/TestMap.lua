@@ -6,7 +6,9 @@ local Simulation = import ".Simulation"
 local SimulationMap = import ".SimulationMap"
 local Newregion = import "lanarts.maps.Newregion"
 
-local function main()
+local M = nilprotect {} -- Submodule
+
+function M.main(cmd_args)
     -- Load game content
     import "@DefineAll"
 
@@ -19,9 +21,9 @@ local function main()
     -- TODO: Remove any notion of 'internal graphics'. All graphics loading should be prompted by Lua.
     __initialize_internal_graphics()
 
-    local map, gmap = Newregion.overworld_create_helper()
+    local map, gmap = Newregion.overworld_create_helper(--[[Empty]] true)
     local SM = SimulationMap.create(map, gmap)
-    local race, class = Simulation.choose_player_stats()
+    local race, class = Simulation.choose_player_stats(cmd_args)
     local player = SM:add_player("Tester", race, class)
     local monster = SM:add_monster("Giant Rat")
 
@@ -36,4 +38,4 @@ local function main()
     end
 end
 
-main()
+return M

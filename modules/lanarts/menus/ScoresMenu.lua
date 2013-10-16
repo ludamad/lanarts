@@ -52,7 +52,7 @@ local function score_entry_draw(entry, ranking, ex, ey, ew, eh)
     local ranking_font = font_cached_load("modules/core/fonts/MateSC-Regular.ttf", 14)
     local ranking_color = vector_interpolate(COL_YELLOW, COL_DARK_GRAY, (ranking-1) / 10)
     ranking_font:draw( 
-        {color = ranking_color, origin = RIGHT_CENTER}, 
+        {color = ranking_color, origin = Display.RIGHT_CENTER}, 
         {ex - 40, ey + eh/2}, 
         ranking
     )
@@ -61,7 +61,7 @@ local function score_entry_draw(entry, ranking, ex, ey, ew, eh)
     -- Draw class sprite
     local class_sprite = class_image_for_name_hack(entry.sprite_name)
     if class_sprite then
-        class_sprite:draw( {origin=RIGHT_CENTER}, {ex - 2, ey + eh/2} )
+        class_sprite:draw( {origin=Display.RIGHT_CENTER}, {ex - 2, ey + eh/2} )
     end
 
     -- Draw character name & level

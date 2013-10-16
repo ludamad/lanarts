@@ -1,0 +1,24 @@
+-- Sure we can make a monster creator -- but we can also make an _anything_ creator.
+-- Spawning rules, clumps, etc. Useful for item groups too.
+	- Same structure can parse rules for multiple content types, defining them in one go is convenient for vaults.
+        - Trees trees trees!
+Root configuration (very powerful) ->
+         -> Interpretations, etc
+
+Each node type represents an embeddable configuration. The configuration is essentially an object oriented construct, resolved at each node with respect to the entire configuration context. A strong desire exists to control the game content via a single high-level configuration as much as possible. Thus, the tree is resolved from the bottom to the top, if you think of the original node as being the bottom of the configuration stack.
+
+
+	Interesting configurations:
+		- Flavour: An entire game can be flavoured. The flavours include
+
+The configuration returns a value, and a transformation function.
+The transformation function takes two values and returns a new value.
+
+function MyConfiguration:flavour(configs)
+    return "Melee-heavy"
+end
+^ If nothing is returned, the default transformation is to simply discard the initial flavour (unless the new configuration is silent).
+
+The global configuration should provide a default for _everything_ since this will guarantee proper resolution. This default may end up never being used, in fact, however an assert should be placed such that the global configuration always has it.
+
+-- Last release of Prelanarts.

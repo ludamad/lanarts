@@ -212,7 +212,7 @@ local function find_clear_patch(map, area)
     end
 end
 
-local function place_content(map)
+local function place_content(map, --[[Optional]] dont_spawn_content)
     local OldMapSeq1 = MapSequence.create {preallocate = 1}
     local OldMapSeq2 = MapSequence.create {preallocate = 1}
     local temple_sequences = {}
@@ -220,89 +220,91 @@ local function place_content(map)
 
     local area = bbox_create({0,0}, map.size)
 
-    -- Generate temple & mines
-    for i=1,2 do
-        local xy = find_clear_patch(map, area)
-        local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 11))
-        local seq_len = #temple_sequences
-        temple_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
-        temple_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
-            function() 
-                return temple_level_create("Temple", 1, temple_sequences, TileSets.temple, {"Skeleton", "Dark Centaur"})
-        end)
+    if not dont_spawn_content then  
+        -- Generate temple & mines
+        for i=1,2 do
+            local xy = find_clear_patch(map, area)
+            local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 11))
+            local seq_len = #temple_sequences
+            temple_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
+            temple_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
+                function() 
+                    return temple_level_create("Temple", 1, temple_sequences, TileSets.temple, {"Skeleton", "Dark Centaur"})
+            end)
 
-        MapGen.rectangle_apply {
-            map=map, area = {xy[1]-1,xy[2]-1,xy[1]+2,xy[2]+2}, 
-            fill_operator = {matches_none = MapGen.FLAG_SOLID, content=TileSets.temple.floor}
-        }
+            MapGen.rectangle_apply {
+                map=map, area = {xy[1]-1,xy[2]-1,xy[1]+2,xy[2]+2}, 
+                fill_operator = {matches_none = MapGen.FLAG_SOLID, content=TileSets.temple.floor}
+            }
 
-        xy = MapUtils.random_square(map, area)
-        portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(0, 2))
-        seq_len = #dirthole_sequences
-        dirthole_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
-        dirthole_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
-            function()
-                return temple_level_create("Mines", 1, dirthole_sequences, TileSets.pebble, {"Golem", "Zombie"})
-        end)
+            xy = MapUtils.random_square(map, area)
+            portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(0, 2))
+            seq_len = #dirthole_sequences
+            dirthole_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
+            dirthole_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
+                function()
+                    return temple_level_create("Mines", 1, dirthole_sequences, TileSets.pebble, {"Golem", "Zombie"})
+            end)
 
+            MapGen.rectangle_apply {
+                map=map, area = {xy[1]-1,xy[2]-1,xy[1]+2,xy[2]+2}, 
+                fill_operator = {matches_none = MapGen.FLAG_SOLID, content=TileSets.pebble.floor}
+            }
+        end
+
+        local xy = MapUtils.random_square(map, area)
         MapGen.rectangle_apply {
             map=map, area = {xy[1]-1,xy[2]-1,xy[1]+2,xy[2]+2}, 
             fill_operator = {matches_none = MapGen.FLAG_SOLID, content=TileSets.pebble.floor}
         }
-    end
-
-    local xy = MapUtils.random_square(map, area)
-    MapGen.rectangle_apply {
-        map=map, area = {xy[1]-1,xy[2]-1,xy[1]+2,xy[2]+2}, 
-        fill_operator = {matches_none = MapGen.FLAG_SOLID, content=TileSets.pebble.floor}
-    }
-    old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {1,5})(map, xy)
-    xy = MapUtils.random_square(map, area)
-    old_dungeon_placement_function(OldMapSeq2, TileSets.snake, {6,10})(map, xy)
-    for dxy in values{{1,0}, {-1,0}, {0,1}, {0,-1}} do
-        local nxy = vector_add(xy, dxy)
-        if map:square_query(nxy, {matches_none = MapGen.FLAG_SOLID}) then
-            MapUtils.spawn_decoration(map, M._warning_skull, nxy)
+        old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {1,5})(map, xy)
+        xy = MapUtils.random_square(map, area)
+        old_dungeon_placement_function(OldMapSeq2, TileSets.snake, {6,10})(map, xy)
+        for dxy in values{{1,0}, {-1,0}, {0,1}, {0,-1}} do
+            local nxy = vector_add(xy, dxy)
+            if map:square_query(nxy, {matches_none = MapGen.FLAG_SOLID}) then
+                MapUtils.spawn_decoration(map, M._warning_skull, nxy)
+            end
         end
+        MapGen.rectangle_apply {
+            map=map, area = {xy[1]-1,xy[2]-1,xy[1]+2,xy[2]+2}, 
+            fill_operator = {matches_none = MapGen.FLAG_SOLID, content=TileSets.snake.floor}
+        }
+        for i=1,15 do
+            if chance(.4) then 
+                generate_store(map, find_clear_patch(map, area))
+            end
+        end
+        for i=1,30 do
+            if chance(.4) then 
+                local item = ItemUtils.item_generate(ItemGroups.basic_items)
+                MapUtils.spawn_item(map, item.type, item.amount, MapUtils.random_square(map, area))
+            end
+            if chance(.4) then 
+                MapUtils.spawn_item(map, "Gold", random(2,10), MapUtils.random_square(map, area))
+            end
+        end
+        for i=1,20 do
+            local enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
+            MapUtils.spawn_enemy(map, enemy, find_clear_patch(map, area))
+        end
+        MapUtils.spawn_enemy(map, "Red Dragon", MapUtils.random_square(map, area))
     end
-    MapGen.rectangle_apply {
-        map=map, area = {xy[1]-1,xy[2]-1,xy[1]+2,xy[2]+2}, 
-        fill_operator = {matches_none = MapGen.FLAG_SOLID, content=TileSets.snake.floor}
-    }
-
     for i=1,10 do
         local xy = find_clear_patch(map, area)
         map:square_apply(xy, {add = MapGen.FLAG_SOLID})
         MapUtils.spawn_decoration(map, M._anvil, xy)
     end
-    for i=1,15 do
-        if chance(.4) then 
-            generate_store(map, find_clear_patch(map, area))
-        end
-    end
-    for i=1,30 do
-        if chance(.4) then 
-            local item = ItemUtils.item_generate(ItemGroups.basic_items)
-            MapUtils.spawn_item(map, item.type, item.amount, MapUtils.random_square(map, area))
-        end
-        if chance(.4) then 
-            MapUtils.spawn_item(map, "Gold", random(2,10), MapUtils.random_square(map, area))
-        end
-    end
-    for i=1,20 do
-        local enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
-        MapUtils.spawn_enemy(map, enemy, find_clear_patch(map, area))
-    end
-    MapUtils.spawn_enemy(map, "Red Dragon", MapUtils.random_square(map, area))
-
     local map_id = MapUtils.game_map_create(map)
-    OldMapSeq1:slot_resolve(1, map_id)
-    OldMapSeq2:slot_resolve(1, map_id)
-    for MapSeq in values(temple_sequences) do
-        MapSeq:slot_resolve(1, map_id)
-    end
-    for MapSeq in values(dirthole_sequences) do
-        MapSeq:slot_resolve(1, map_id)
+    if not dont_spawn_content then
+        OldMapSeq1:slot_resolve(1, map_id)
+        OldMapSeq2:slot_resolve(1, map_id)
+        for MapSeq in values(temple_sequences) do
+            MapSeq:slot_resolve(1, map_id)
+        end
+        for MapSeq in values(dirthole_sequences) do
+            MapSeq:slot_resolve(1, map_id)
+        end
     end
 
     return map_id
@@ -433,7 +435,7 @@ local function get_leafs(node, --[[Optional]] table)
     return table
 end
 
-function M.overworld_create_helper()
+function M.overworld_create_helper(--[[Optional]] dont_spawn_content)
     local tileset = TileSets.grass
 
     local w,h = 200,200
@@ -458,12 +460,12 @@ function M.overworld_create_helper()
 
 --   OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 40)
 
-    local map_id = place_content(map)
+    local map_id = place_content(map, dont_spawn_content)
     return map, map_id
 end
 
-function M.overworld_create()
-    local map, map_id = M.overworld_create_helper()
+function M.overworld_create(--[[Optional]] dont_spawn_content)
+    local map, map_id = M.overworld_create_helper(dont_spawn_content)
     World.players_spawn(map_id, find_player_positions(map))
     return map_id
 end

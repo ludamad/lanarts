@@ -1,17 +1,9 @@
 local Display = import "core.Display"
-
 local InstanceBox = import "core.ui.InstanceBox"
 local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
-local game_loop = import "@GameLoop"
 local GameState = import "core.GameState"
-
 local Network = import "core.Network"
-local GameSettingsMenu = import "@menus.GameSettingsMenu"
-local LobbyMenu = import "@menus.LobbyMenu"
-local PregameMenu = import "@menus.PregameMenu"
-local ScoresMenu = import "@menus.ScoresMenu"
-
 local Tasks = import "core.networking.Tasks"
 local Keys = import "core.Keyboard"
     
@@ -25,12 +17,12 @@ local text_button_params = {
 
 local function start_menu_create(on_start_click, on_join_click, on_load_click, on_score_click)
     local menu = InstanceBox.create( { size = Display.display_size } )
-    local transparent_sprite =  Sprite.image_create(path_resolve "LANARTS-transparent.png")
+    local transparent_sprite =  Sprite.image_create(path_resolve "sprites/LANARTS-transparent.png")
     transparent_sprite.options.color= {255, 255, 255, 50}
     menu:add_instance(transparent_sprite, Display.CENTER_TOP, {-15, 45})
 
     menu:add_instance(
-        Sprite.image_create(path_resolve "LANARTS.png"),
+        Sprite.image_create(path_resolve "sprites/LANARTS.png"),
         Display.CENTER_TOP,
         --[[Down 10 pixels]]
         {0, 30}
@@ -79,11 +71,7 @@ local function start_menu_create(on_start_click, on_join_click, on_load_click, o
     return menu
 end
 
-
 -- MAIN --
-
-DEBUG_LAYOUTS = false
-
 local menu_state = { exit_game = false }
 
 local exit_menu -- forward declare
@@ -109,12 +97,12 @@ function setup_start_menu()
     end    
 
     local function on_load_click()
-        game_loop.loop_control.startup_function = function()
-            if file_exists("saves/savefile.save") then
-                GameState.load("saves/savefile.save")
-            end
-        end
-	settings.connection_type = Network.NONE
+--        game_loop.loop_control.startup_function = function()
+--            if file_exists("saves/savefile.save") then
+--                GameState.load("saves/savefile.save")
+--            end
+--        end
+    settings.connection_type = Network.NONE
         exit_menu()
     end
 
@@ -132,60 +120,58 @@ function setup_start_menu()
 end
 
 function setup_settings_menu()
-    menu_state.menu = InstanceBox.create( { size = Display.display_size } )
-    
-    menu_state.back = setup_start_menu
-    menu_state.continue = function ()
-        if settings.class_type ~= -1 then
-            exit_menu()
-        end
-    end
-
-    menu_state.menu:add_instance(
-        GameSettingsMenu.create( --[[Back Button]] menu_state.back, --[[Start Game Button]] menu_state.continue), 
-        Display.CENTER
-    )
+--    menu_state.menu = InstanceBox.create( { size = Display.display_size } )
+--    
+--    menu_state.back = setup_start_menu
+--    menu_state.continue = function ()
+--        if settings.class_type ~= -1 then
+--            exit_menu()
+--        end
+--    end
+--
+--    menu_state.menu:add_instance(
+--        GameSettingsMenu.create( --[[Back Button]] menu_state.back, --[[Start Game Button]] menu_state.continue), 
+--        Display.CENTER
+--    )
 end
 
 function setup_pregame_menu()
-    menu_state.menu = InstanceBox.create( { size = Display.display_size } )
-
-    menu_state.back =  function() 
-        exit_menu(--[[Quit game]] true) 
-    end
-    menu_state.continue = exit_menu
-    menu_state.menu:add_instance(
-        PregameMenu.create( --[[Start Game Button]] menu_state.continue ),
-        Display.CENTER
-    )
+--    menu_state.menu = InstanceBox.create( { size = Display.display_size } )
+--
+--    menu_state.back =  function() 
+--        exit_menu(--[[Quit game]] true) 
+--    end
+--    menu_state.continue = exit_menu
+--    menu_state.menu:add_instance(
+--        PregameMenu.create( --[[Start Game Button]] menu_state.continue ),
+--        Display.CENTER
+--    )
 end
 
 function setup_scores_menu()
-    menu_state.menu = InstanceBox.create( { size = Display.display_size } )
-    menu_state.back = setup_start_menu
-    menu_state.continue = nil
-    menu_state.menu:add_instance(
-        ScoresMenu.create( --[[Back Button]] menu_state.back ),
-        Display.CENTER
-    )
+--    menu_state.menu = InstanceBox.create( { size = Display.display_size } )
+--    menu_state.back = setup_start_menu
+--    menu_state.continue = nil
+--    menu_state.menu:add_instance(
+--        ScoresMenu.create( --[[Back Button]] menu_state.back ),
+--        Display.CENTER
+--    )
 end
 
 function setup_lobby_menu()
-    menu_state.menu = InstanceBox.create( { size = Display.display_size } )
-    menu_state.back = setup_start_menu
-    menu_state.continue = nil
-    menu_state.menu:add_instance(
-        LobbyMenu.create( --[[Back Button]] menu_state.back ),
-        Display.CENTER
-    )
+--    menu_state.menu = InstanceBox.create( { size = Display.display_size } )
+--    menu_state.back = setup_start_menu
+--    menu_state.continue = nil
+--    menu_state.menu:add_instance(
+--        LobbyMenu.create( --[[Back Button]] menu_state.back ),
+--        Display.CENTER
+--    )
 end
 
 local function menu_loop(should_poll)
     while GameState.input_capture() do
         if Keys.key_pressed(Keys.F9) then
-            -- note, globals are usually protected against being changed
-            -- but a bypass is allowed for cases where it must be done
-            setglobal("DEBUG_LAYOUTS", not DEBUG_LAYOUTS) -- flip on/off
+            _G.DEBUG_LAYOUTS = not _G.DEBUG_LAYOUTS -- flip on/off
         end
 
         if should_poll then

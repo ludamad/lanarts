@@ -44,9 +44,15 @@ local function main(args)
         local S = import "unstable.Simulation"
         S.main(args)
         return false   
+    elseif args[1] == "--menu" then
+        Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
+        local M = import "unstable.menus.Menus"
+        M.start_menu_show()
+        return false   
     elseif args[1] == "--testmap" then
         Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
-        import "unstable.TestMap"
+        local TM = import "unstable.TestMap"
+        TM.main(args)
         return false
     elseif args[1] == "--example" then
         import ("examples." .. args[2])
