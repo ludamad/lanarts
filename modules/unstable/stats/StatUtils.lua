@@ -147,13 +147,16 @@ M.stat_copy = CodeGeneration.copy_function_compile {
         "name", "team", "level", "skill_points", "xp", 
         "hp", "max_hp", "hp_regen",
         "mp", "max_mp", "mp_regen",
-        "movement_speed", "inventory", "hooks"
+        "movement_speed", "inventory"
     },
     deep = {
         "skills"
     },
     meta = {
         "cooldowns"
+    },
+    method = {
+        hooks = "shallow_copy"
     },
     complex = {
         aptitudes = {

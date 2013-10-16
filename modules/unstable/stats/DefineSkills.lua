@@ -7,8 +7,6 @@ local Apts = import "@stats.AptitudeTypes"
 local ExperienceCalculation = import "@stats.ExperienceCalculation"
 local LogUtils = import "lanarts.LogUtils"
 
-local M = {} -- Submodule
-
 local function resolve_aptitude_bonuses(apts)
     if type(apts) == "string" then
         return {[apts] = {dup(1,4)}}
@@ -28,7 +26,7 @@ local function resolve_aptitude_bonuses(apts)
     return apts
 end
 
-local function on_calculate(skill_slot, user)
+local function default_on_calculate(skill_slot, user)
     local apts = user.derived.aptitudes
     local level = user.base.level
     for type, apt in pairs(skill_slot.type.aptitudes) do
@@ -40,7 +38,6 @@ local function on_calculate(skill_slot, user)
     end
 end
 
--- Optimization: Shaved 9% off with this method (LuaJIT)
 local function specialized_on_calculate(type, apt)
     local eff_val,dam_val,res_val,def_val = apt[1],apt[2],apt[3],apt[4]
     return function(_, user)
@@ -82,7 +79,7 @@ local function skill_define(args)
     local keys = table.key_list(args.aptitudes)
     if #keys == 1 then 
         local k = keys[1]
-        args.on_calculate = args.on_calculate or specialized_on_calculate(k, args.aptitudes[k])
+        args.on_calculate = args.default_on_calculate or specialized_on_calculate(k, args.aptitudes[k])
     else
         args.on_calculate = args.on_calculate or on_calculate
     end
@@ -151,14 +148,22 @@ skill_define {
 
 skill_define {
     name = "Willpower",
-    description = "Increases ability to resist the effects of magics.",
-    aptitudes = {Apts.WILLPOWER, {1.0, dup(0,3)}}
+    description = "Increases MP & the ability to resist the effects of magics.",
+    aptitudes = {Apts.WILLPOWER, {1.0, dup(0,3)}},
+    on_calculate = function(self, user)
+        default_on_calculate(self, user)
+        user.derived.max_hp = user.derived.max_mp + self.level * 20
+    end
 }
 
 skill_define {
     name = "Fortitude",
-    description = "Increases ability to resist undesirable status changes.",
-    aptitudes = {Apts.FORTITUDE, {1.0, dup(0,3)}}
+    description = "Increases HP & the ability to resist undesirable status changes.",
+    aptitudes = {Apts.FORTITUDE, {1.0, dup(0,3)}},
+    on_calculate = function(self, user)
+        default_on_calculate(self, user)
+        user.derived.max_hp = user.derived.max_hp + self.level * 20
+    end
 }
 
 skill_define {
@@ -237,5 +242,3 @@ skill_define {
     description = "Increases control over the air.",
     aptitudes = {Apts.AIR, {1.0, 0.5, 1.0, 0.5}}
 }
-
-return M

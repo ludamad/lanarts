@@ -14,10 +14,13 @@ function M.default_spend_skill_points(self, stats, skill_points, --[[Optional]] 
        total = total + v
     end
     if total == 0 then 
-        return 
+        return
     end
     local mult = 1/total
+    local remainder = 0
     for k,v in pairs(self.skills) do
+        local amount = math.floor(mult * skill_points)
+        remainder = remainder + (mult * skill_points - amount)
         local new_v = v * mult * skill_points
         SkillType.get_skill_slot(stats.base.skills, k):on_spend_skill_points(stats, new_v, log_increases)
     end

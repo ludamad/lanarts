@@ -13,7 +13,6 @@
 
 #ifdef WIN32
 
-#include "dirent_windows.h"
 #include <windows.h>
 #include <direct.h>
 

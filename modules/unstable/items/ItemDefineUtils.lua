@@ -60,6 +60,26 @@ local function add_default_types(t, args, difficulty, --[[Optional]] types)
     table.insert(t,P.proficiency_requirement_create(P.proficiency_type_create(types), args.difficulty))
 end
 
+local function derive_on_draw(name)
+    return ContentUtils.derive_on_draw(_ROOT_FOLDER .. "/unstable/items/sprites/held_sprites/" .. name, --[[Absolute paths]] true)
+end
+
+-- Draw functions for held weapons:
+local default_on_draw = {
+    [Apts.BOWS] = derive_on_draw("bow.png"),
+    [Apts.BLADE] = derive_on_draw("short_sword.png"),
+    [Apts.AXE] = derive_on_draw("hand_axe.png"),
+    [Apts.MACE] = derive_on_draw("mace.png"),
+    [Apts.POLEARM] = derive_on_draw("polearm.png"),
+    [Apts.STAFF] = derive_on_draw("staff.png")
+}
+
+local function find_default_on_draw(apts)
+    for _, apt in ipairs(apts) do
+        if default_on_draw[apt] then return default_on_draw[apt] end
+    end
+end
+
 local function type_define(args, type, --[[Optional]] on_init, --[[Optional]] not_equipment)
     args.base_equip_bonuses = args.base_equip_bonuses or {}
     args.base_equip_bonuses.aptitudes = ContentUtils.resolve_aptitude_bonuses(args, args.base_equip_bonuses.aptitudes)
@@ -72,6 +92,12 @@ local function type_define(args, type, --[[Optional]] on_init, --[[Optional]] no
 
     if not not_equipment then
         table.insert(args.traits, ItemType.EQUIPMENT_TRAIT)
+    end
+
+    if args.on_draw then
+        args.on_draw = ContentUtils.derive_on_draw(args.on_draw)
+    elseif args.aptitude_types then
+        args.on_draw = find_default_on_draw(args.aptitude_types) or nil
     end
 
     -- Proficiency and identification

@@ -59,7 +59,9 @@ function M.monster_define(t)
     t.team = t.team or Relations.TEAM_MONSTER_ROOT
     t.sprite = t.sprite or ContentUtils.derive_sprite(t.name)
     t.traits = t.traits or {}
-    t.aptitude_types = t.aptitude_types or {Apts.MELEE}
+    if t.damage then
+        t.aptitude_types = t.aptitude_types or {Apts.MELEE}
+    end
     if t.monster_kind then
         table.insert(t.traits, t.monster_kind)
         M.stat_mod_functions[t.monster_kind](stats)

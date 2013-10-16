@@ -17,6 +17,8 @@ weapon_define {
     name = "Short Sword",
     description = "A small, light sword.",
 
+    on_draw = "sprites/held_sprites/short_sword.png",
+
     gold_worth = 35, difficulty = 1,
     aptitude_types = {Apts.MELEE, Apts.PIERCING, Apts.BLADE},
     effectiveness = 4, damage = 6, delay = 1.1
@@ -44,6 +46,8 @@ weapon_define {
 weapon_define {
     name = "Hand Axe",
     description = "A light, small and sturdy axe.",
+
+    on_draw = "sprites/held_sprites/hand_axe.png",
 
     gold_worth = 20, difficulty = 0,
     aptitude_types = {Apts.MELEE, Apts.SLASHING, Apts.AXE},

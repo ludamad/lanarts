@@ -8,22 +8,22 @@ local StatUtils = import "@stats.StatUtils"
 local LogUtils = import "lanarts.LogUtils"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local EventLog = import "core.ui.EventLog"
+local ContentUtils = import "@stats.ContentUtils"
+
+local function status_type_define(args)
+    if args.on_draw then
+        args.on_draw = ContentUtils.derive_on_draw(args)
+    end
+    return StatusType.define(args)
+end
 
 -- EXHAUSTION
 local EXHAUSTION_MOVEMENT_MULTIPLIER = 0.75
 local EXHAUSTION_ATTACK_COOLDOWN_MULTIPLIER = 0.75
-local Exhausted = StatusType.define {
+local Exhausted = status_type_define {
     name = "Exhausted",
     time_limited = true,
-    sprite = Display.image_load(path_resolve "sprites/exhausted.png"),
-    on_draw = function(self, stats, drawf, options)
-        options.color = COL_PALE_BLUE
-        local function new_drawf(options)
-            drawf(options)
-            ObjectUtils.screen_draw(self.sprite, options.xy)
-        end
-        return new_drawf, options
-    end,
+    on_draw = { sprite = "exhausted.png", new_color = COL_PALE_BLUE },
     init = function(self, stats, ...)
         self.base.init(self, stats, ...)
         LogUtils.event_log_player(stats.obj, "$You {is}[are] now exhausted.", {255,200,200})
@@ -43,7 +43,7 @@ local Exhausted = StatusType.define {
 -- BERSERKING
 local BERSERK_EXHAUSTION_DURATION = 275
 
-StatusType.define {
+status_type_define {
     name = "Berserk",
     time_limited = true,
     init = function(self, stats, ...)
@@ -52,11 +52,7 @@ StatusType.define {
        LogUtils.event_log_player(stats.obj, "$You enter{s} a powerful rage!", {200,200,255})
     end,
     sprite = Display.image_load(path_resolve "sprites/berserk.png"),
-    on_draw = function(self, stats, drawf, options, ...)
-        options.color = COL_PALE_RED
-        StatContext.on_draw_call_collapse(stats, drawf, options, ...)
-        ObjectUtils.screen_draw(self.sprite, options.xy)
-    end,
+    on_draw = { sprite = "berserk.png", new_color = COL_PALE_RED },
     on_calculate = function(self, stats)
         local D = stats.derived
 

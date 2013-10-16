@@ -117,9 +117,6 @@ extern __C_LINKAGE char *strerror ____P((int errnum));
 #ifdef HAVE_LIMITS_H
 #include <limits.h>		/* for INT_MAX */
 #endif
-#ifdef HAVE_VALUES_H
-#include <values.h>		/* for MAXDOUBLE, MAXFLOAT, MAXINT (backups) */
-#endif
 
 /* Bounds on integer datatypes (should be in limits.h, but may not be). */
 

@@ -11,8 +11,7 @@ function HookSet:init()
     self.new_hooks = {}
 end
 
-function HookSet:__copy(other)
-    -- Ensure a shallow copy when used with table.deep_copy
+function HookSet:shallow_copy(other)
     other.hooks = rawget(other, "hooks") or {}
     other.new_hooks = rawget(other, "new_hooks") or {}
     table.copy(self.hooks, other.hooks)

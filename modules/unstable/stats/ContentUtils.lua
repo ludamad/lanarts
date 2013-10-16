@@ -31,22 +31,19 @@ function M.path_resolve_for_definition(path)
     end
 end
 
-function M.derive_on_draw(args)
+function M.derive_on_draw(args, --[[Optional]] absolute_paths)
     if type(args) == "function" then return args end
-    if type(args) == "string" then args = M.derive_sprite(args) end
-    if getmetatable(args) then -- Is it a plain table?
+    if type(args) == "string" or getmetatable(args) then -- Is it not a plain table?
         args = { sprite = args }
     end
+    if type(args.sprite) == "string" then 
+        args.sprite = M.resolve_sprite(args, absolute_paths)
+    end
 
-    return function(self, stats, drawf, options)
-        if args.new_color then
-            options.color = args.new_color
-        end
-        local function new_drawf(options)
-            drawf(options)
-            ObjectUtils.screen_draw(self.sprite, options.xy, args.alpha, args.frame, args.direction, args.color)
-        end
-        return new_drawf, options
+    return function(self, stats, drawf, options, ...)
+        if args.new_color then options.color = args.new_color end
+        StatContext.on_draw_call_collapse(stats, drawf, options, ...)
+        ObjectUtils.screen_draw(args.sprite, options.xy, args.alpha, args.frame, args.direction, args.color)
     end
 end
 
@@ -56,11 +53,13 @@ function M.derive_sprite(name)
     return image_cached_load(path)
 end
 
-function M.resolve_sprite(args)
+function M.resolve_sprite(args, --[[Optional]] absolute_paths)
     local sprite = args.sprite or M.derive_sprite(args.lookup_key or args.name)
     if type(sprite) == "string" then
-        if sprite:find("%(") or sprite:find("%%") then
+        if not absolute_paths then
             sprite = M.path_resolve_for_definition(sprite)
+        end
+        if sprite:find("%(") or sprite:find("%%") then
             return Display.directional_create(Display.images_load(sprite), 1.0)
         else
             return Display.image_load(sprite)

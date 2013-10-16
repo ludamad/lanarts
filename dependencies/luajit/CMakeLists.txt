@@ -314,10 +314,3 @@ set_target_properties ( luajit PROPERTIES OUTPUT_NAME luajit CLEAN_DIRECT_OUTPUT
 ## LuaJIT Executable
 add_executable ( luajitrepl src/luajit.c )
 target_link_libraries ( luajitrepl luajit )
-
-# On Windows build a no-console variant also
-if ( LUA_BUILD_WLUA )
-  add_executable ( wluajit WIN32 src/wmain.c src/luajit.c )
-  target_link_libraries ( wluajit lualit )
-  install_executable ( wluajit )
-endif ()
