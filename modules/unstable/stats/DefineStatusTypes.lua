@@ -1,21 +1,10 @@
 local StatusType = import "@StatusType"
 local StatContext = import "@StatContext"
-local CooldownSet = import "@CooldownSet"
 local Display = import "core.Display"
 local CooldownTypes = import "@stats.CooldownTypes"
 local Apts = import "@stats.AptitudeTypes"
-local StatUtils = import "@stats.StatUtils"
 local LogUtils = import "lanarts.LogUtils"
-local ObjectUtils = import "lanarts.objects.ObjectUtils"
-local EventLog = import "core.ui.EventLog"
-local ContentUtils = import "@stats.ContentUtils"
-
-local function status_type_define(args)
-    if args.on_draw then
-        args.on_draw = ContentUtils.derive_on_draw(args)
-    end
-    return StatusType.define(args)
-end
+local status_type_define = (import ".StatusTypeUtils").status_type_define
 
 -- EXHAUSTION
 local EXHAUSTION_MOVEMENT_MULTIPLIER = 0.75

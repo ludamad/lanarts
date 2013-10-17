@@ -129,4 +129,11 @@ function CombatObject:can_use_action(action, target, source)
     return Actions.can_use_action(self:stat_context(), action, target, source)
 end
 
+function CombatObject:on_hostile_action(enemy, action, source)
+    local atk = Actions.get_effect(action, Attacks.AttackEffect)
+    if atk then
+        
+    end
+end
+
 return CombatObject
