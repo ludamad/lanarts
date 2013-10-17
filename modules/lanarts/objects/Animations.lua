@@ -1,5 +1,5 @@
 local GameObject = import "core.GameObject"
-local GameMap = import "core.Map"
+local Map = import "core.Map"
 
 local ObjectUtils = import ".ObjectUtils"
 

@@ -22,6 +22,7 @@
 
 struct lua_State;
 class GameState;
+class GameMapState;
 class SerializeBuffer;
 //Base class for game instances
 
@@ -58,6 +59,7 @@ public:
 
 	bool try_callback(const char* callback);
 	void lua_lookup(lua_State* L, const char* key);
+	GameMapState* get_map(GameState* gs);
 
 	BBox bbox() {
 		return BBox(iround(x - radius), iround(y - radius), iround(x + radius),

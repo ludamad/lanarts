@@ -1,4 +1,4 @@
-local GameMap = import "core.Map"
+local Map = import "core.Map"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local PathUtils = import ".PathUtils"
 
@@ -51,7 +51,7 @@ end
 
 -- Assumes a cgroup:step() between on_prestep and use_resolved_action 
 function Base:use_resolved_action(obj)
-    local close_to_wall = GameMap.radius_tile_check(obj.map, obj.xy, obj.radius + 10)
+    local close_to_wall = Map.radius_tile_check(obj.map, obj.xy, obj.radius + 10)
     if close_to_wall then
         local new_xy = ObjectUtils.find_free_position(obj, self.preferred_velocity)
         obj.xy = new_xy or obj.xy

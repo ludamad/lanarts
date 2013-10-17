@@ -20,7 +20,7 @@ local ActionUtils = import "@stats.ActionUtils"
 local ItemTraits = import "@items.ItemTraits"
 local Identification = import "@stats.Identification"
 
-local GameMap = import "core.Map"
+local Map = import "core.Map"
 local GameObject = import "core.GameObject"
 local GameState = import "core.GameState"
 local PlayerObject = import "@objects.PlayerObject"
@@ -28,7 +28,7 @@ local MonsterObject = import "@objects.MonsterObject"
 
 local CooldownTypes = import "@stats.CooldownTypes"
 
-local SimulationMap = import "@SimulationMap"
+local GameMap = import "@maps.GameMap"
 local Proficiency = import "@Proficiency"
 local LogUtils = import "lanarts.LogUtils"
 local Keys = import "core.Keyboard"
@@ -238,7 +238,7 @@ local function query_player(player)
     frame = frame + 1
     local monster_obj = ObjectUtils.find_closest_hostile(player.obj)
     if not monster_obj then return false end
-    if not GameMap.object_visible(monster_obj) then return false end
+    if not Map.object_visible(monster_obj) then return false end
     local monster = monster_obj:stat_context()
     local weapon_action, source = player.obj:weapon_action()
     if not can_continue(player) then return false end
@@ -357,8 +357,8 @@ add_fight("Giant Rat", 1, 5)
 add_fight("Giant Rat", 2, 5)
 add_fight("Giant Rat", 3, 10)
 
-local function fight_spawn_if_over(SM)
-    for obj in GameMap.objects(SM.gmap) do
+local function fight_spawn_if_over(GM)
+    for obj in Map.objects(GM.map) do
         if MonsterObject.is_monster(obj) then
             return -- Fight in progress
         end
@@ -373,9 +373,9 @@ local function fight_spawn_if_over(SM)
     for monster,amount in pairs(fight) do
         print(AnsiCol.YELLOW(amount .. " " .. monster .. " spawns."))
         for i=1,amount do
-            local mon = SM:add_monster(monster)
+            local mon = GM:add_monster(monster)
             local TTK = import "@simulation.TimeToKillCalculation"
-            local action_context = SM.players[1]:weapon_action_context()
+            local action_context = GM.players[1]:weapon_action_context()
             local timer = timer_create()
             local steps = TTK.calculate_time_to_kill(action_context, mon:stat_context())
             print("Killing the " .. mon.name .. " took " .. steps .. " steps. Calculation took " .. timer:get_milliseconds() .. "ms.")
@@ -397,28 +397,28 @@ function M.main(cmd_args)
     __initialize_internal_graphics()
 
     local Display = import "core.Display"
-    local MapGen = import "core.SourceMap"
+    local SourceMap = import "core.SourceMap"
     local MapUtils = import "lanarts.maps.MapUtils"
     local TileSets = import "lanarts.tiles.Tilesets"
 
-    local map = MapUtils.area_template_to_map("LanartsExampleLevel", path_resolve "test_content/test-map.txt", 0, {
-        ['.'] =  { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor },
-        ['x'] =  { add = MapGen.FLAG_SOLID, content = TileSets.pebble.wall }
+    local source_map = MapUtils.area_template_to_map("LanartsExampleLevel", path_resolve "test_content/test-map.txt", 0, {
+        ['.'] =  { add = SourceMap.FLAG_SEETHROUGH, content = TileSets.pebble.floor },
+        ['x'] =  { add = SourceMap.FLAG_SOLID, content = TileSets.pebble.wall }
     })
-    local gmap = GameMap.create { map = map }
-    local SM = SimulationMap.create(map, gmap)
+    local map = Map.create { map = source_map }
+    local GM = GameMap.create(map, map)
     local race, class = M.choose_player_stats(cmd_args)
-    local player = SM:add_player("Tester", race, class)
+    local player = GM:add_player("Tester", race, class)
     player.io_action_handler = do_nothing
 
     while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
         Display.draw_start()
-        SM:draw()
+        GM:draw()
         Display.draw_finish()
         GameState.wait(2)
-        fight_spawn_if_over(SM)
+        fight_spawn_if_over(GM)
         Display.view_snap(player.xy)
-        SM:step()
+        GM:step()
         report_new_identifications(player:stat_context())
         track_identification(player:stat_context())
         query_player(player:stat_context())

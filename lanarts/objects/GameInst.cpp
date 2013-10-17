@@ -138,3 +138,7 @@ void GameInst::free_reference(GameInst* inst) {
 //	LANARTS_ASSERT(typeid(*this) == typeid(*inst));
 //	*inst = *this;
 //}
+
+GameMapState* GameInst::get_map(GameState* gs) {
+	return gs->get_level(current_floor);
+}

@@ -91,6 +91,30 @@ public:
 	std::string& label() {
 		return _label;
 	}
+
+	// TODO: De-duplicate this (same logic in GameState, for now)
+
+	bool tile_radius_test(int x, int y, int rad, bool issolid = true,
+			int ttype = -1, Pos* hitloc = NULL) {
+		return tiles().radius_test(Pos(x, y), rad, issolid, ttype, hitloc);
+	}
+
+	int object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
+			col_filterf f, int x, int y, int radius) {
+		return game_inst_set().object_radius_test(obj, objs, obj_cap, f, x, y, radius);
+	}
+
+	bool solid_test(GameInst* obj, int x, int y, int radius = -1) {
+		return solid_test(obj, NULL, 0, NULL, x, y, radius);
+	}
+
+	bool solid_test(GameInst* obj, GameInst** objs = NULL, int obj_cap = 0,
+			col_filterf f = NULL, int x = -1, int y = -1, int radius = -1) {
+		int lx = (x == -1 ? obj->x : x), ly = (y == -1 ? obj->y : y);
+		return tile_radius_test(lx, ly, radius == -1 ? obj->radius : radius)
+				|| object_radius_test(obj, objs, obj_cap, f, x, y, radius);
+	}
+
 public:
 	std::vector<GameRoomPortal> exits, entrances;
 private:

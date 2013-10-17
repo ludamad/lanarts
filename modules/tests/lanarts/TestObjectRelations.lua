@@ -1,12 +1,12 @@
 local Relations = import "lanarts.objects.Relations"
-local MapGen = import "core.SourceMap"
-local GameMap = import "core.Map"
+local SourceMap = import "core.SourceMap"
+local Map = import "core.Map"
 local GameObject = import "core.GameObject"
 local Display = import "core.Display"
 
 -- Dead simple, but valid, 1x1 test game-map. All objects are stacked on square {0,0}.
-local gmap = GameMap.create { 
-    map = MapGen.map_create { 
+local gmap = Map.create { 
+    map = SourceMap.map_create { 
         label = "TestLevel", 
         size = {1,1},            
         content = Data.tile_create { 

@@ -7,8 +7,8 @@ Display.initialize("Lanarts Example", {640,640}, --[[Not fullscreen]] false)
 local Keys = import "core.Keyboard"
 local Mouse = import "core.Mouse"
 local GameObject = import "core.GameObject"
-local GameMap = import "core.Map"
-local MapGen = import "core.SourceMap"
+local Map = import "core.Map"
+local SourceMap = import "core.SourceMap"
 local ColAvoid = import "core.CollisionAvoidance"
 local PathFinding = import "core.PathFinding"
 
@@ -33,11 +33,11 @@ local function to_worldxy(xy)
 end
 
 local map = MapUtils.area_template_to_map("LanartsExampleLevel", path_resolve "simple-swarm-map.txt", 0, {
-    ['.'] =  { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor },
-    ['x'] =  { add = {MapGen.FLAG_SEETHROUGH,MapGen.FLAG_SOLID}, content = TileSets.pebble.wall }
+    ['.'] =  { add = SourceMap.FLAG_SEETHROUGH, content = TileSets.pebble.floor },
+    ['x'] =  { add = {SourceMap.FLAG_SEETHROUGH,SourceMap.FLAG_SOLID}, content = TileSets.pebble.wall }
 })
 
-local gmap = GameMap.create { map = map }
+local gmap = Map.create { map = map }
 
 local function path_create(xy)
     local mxy = to_tilexy(Mouse.mouse_xy)
@@ -51,14 +51,14 @@ local function fat_line_check(radius, from_xy, to_xy)
     local reach = {radius, 0}
 
     -- Circle checks at the ends of the line
-    if GameMap.radius_tile_check(gmap, from_xy, radius) then return true end
-    if GameMap.radius_tile_check(gmap, to_xy, radius) then return true end
+    if Map.radius_tile_check(gmap, from_xy, radius) then return true end
+    if Map.radius_tile_check(gmap, to_xy, radius) then return true end
 
     -- Two lines from either sides of the 'end circles'
     for reach in values{{radius,0}, {0, radius}} do
-        if GameMap.line_tile_check(gmap, vsub(from_xy,reach), vsub(to_xy,reach)) then
+        if Map.line_tile_check(gmap, vsub(from_xy,reach), vsub(to_xy,reach)) then
             return true
-        elseif GameMap.line_tile_check(gmap, vadd(from_xy,reach), vadd(to_xy,reach)) then
+        elseif Map.line_tile_check(gmap, vadd(from_xy,reach), vadd(to_xy,reach)) then
             return true
         end
     end
@@ -102,7 +102,7 @@ local last_click
 
 local Obj = {}
 function Obj:step()
-    local close_to_wall = (GameMap.radius_tile_check(gmap, self.xy, self.radius + 10))
+    local close_to_wall = (Map.radius_tile_check(gmap, self.xy, self.radius + 10))
     local prev_xy = self.xy
     if not close_to_wall then
         cgroup:object_copy_xy(self.sim_id, self)
@@ -119,14 +119,14 @@ function Obj:step()
     if close_to_wall then
         local dx,dy = unpack(self.preferred_velocity)
         local new_xy = {self.x+dx,self.y+dy}
-        if not GameMap.radius_tile_check(gmap, new_xy, self.radius) then
+        if not Map.radius_tile_check(gmap, new_xy, self.radius) then
             self.xy = new_xy
         else
             new_xy[1], new_xy[2] = self.x+dx, self.y
-            if not GameMap.radius_tile_check(gmap, new_xy, self.radius) then self.xy = new_xy
+            if not Map.radius_tile_check(gmap, new_xy, self.radius) then self.xy = new_xy
             else
                 new_xy[1], new_xy[2] = self.x, self.y+dy
-                if not GameMap.radius_tile_check(gmap, new_xy, self.radius) then self.xy = new_xy end
+                if not Map.radius_tile_check(gmap, new_xy, self.radius) then self.xy = new_xy end
             end
         end
     end
@@ -150,10 +150,10 @@ for i=1,10 do
 end
 
 while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
-    GameMap.map_step {map=gmap}
+    Map.map_step {map=gmap}
     cgroup:step()
     Display.draw_start()
-    GameMap.map_draw {map=gmap}
+    Map.map_draw {map=gmap}
     if last_click then
         local xy = {math.floor(last_click[1]/32)*32+16, math.floor(last_click[2]/32)*32+16}
         Display.draw_circle(with_alpha(COL_RED, .5), xy, 8)

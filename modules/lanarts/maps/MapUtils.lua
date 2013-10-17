@@ -1,8 +1,8 @@
 local DungeonFeatures = import "@objects.DungeonFeatures"
 
 local GameObject = import "core.GameObject"
-local MapGen = import "core.SourceMap"
-local GameMap = import "core.Map"
+local SourceMap = import "core.SourceMap"
+local Map = import "core.Map"
 
 local M = {} -- Submodule
 
@@ -11,10 +11,10 @@ function M.from_tile_xy(xy)
 end
 
 function M.random_square(map, area, --[[Optional]] selector, --[[Optional]] operator, --[[Optional]] max_attempts) 
-    return MapGen.find_random_square { 
+    return SourceMap.find_random_square { 
         map = map, area = area, 
-        selector = selector or { matches_none = {MapGen.FLAG_SOLID, MapGen.FLAG_HAS_OBJECT} },
-        operator = operator or { add = MapGen.FLAG_HAS_OBJECT },
+        selector = selector or { matches_none = {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT} },
+        operator = operator or { add = SourceMap.FLAG_HAS_OBJECT },
         max_attempts = max_attempts
     }
 end
@@ -110,10 +110,10 @@ function M.random_portal(map, area, sprite, callback, --[[Optional]] frame)
 end
 
 function M.map_create(label, size, content, --[[Optional]] flags)
-    return MapGen.map_create { 
+    return SourceMap.map_create { 
     	label = label, 
     	size = size, 
-    	flags = flags or MapGen.FLAG_SOLID, 
+    	flags = flags or SourceMap.FLAG_SOLID, 
     	content = content,
     	instances = {} 
     }
@@ -121,23 +121,23 @@ end
 
 function M.game_map_create(map, wandering_enabled) 
     if wandering_enabled == nil then wandering_enabled = false end
-    return GameMap.create { map = map, label = map.label, instances = map.instances, wandering_enabled = wandering_enabled }
+    return Map.create { map = map, label = map.label, instances = map.instances, wandering_enabled = wandering_enabled }
 end
 
 function M.area_template_apply(map, area, filename, legend)
-    local area_temp = MapGen.area_template_create {data_file = filename, legend = legend}
+    local area_temp = SourceMap.area_template_create {data_file = filename, legend = legend}
     area_temp:apply{ map = map, area = area }
 end
 
 function M.area_template_to_map(label, filename, padding, legend)
-	local area_temp = MapGen.area_template_create {data_file = filename, legend = legend}
+	local area_temp = SourceMap.area_template_create {data_file = filename, legend = legend}
 
     local orient = random_choice {
-        MapGen.ORIENT_DEFAULT, MapGen.ORIENT_FLIP_X, MapGen.ORIENT_FLIP_Y,
-        MapGen.ORIENT_TURN_90, MapGen.ORIENT_TURN_180, MapGen.ORIENT_TURN_270
+        SourceMap.ORIENT_DEFAULT, SourceMap.ORIENT_FLIP_X, SourceMap.ORIENT_FLIP_Y,
+        SourceMap.ORIENT_TURN_90, SourceMap.ORIENT_TURN_180, SourceMap.ORIENT_TURN_270
     }
     local size = vector_add(area_temp.size, {padding*2,padding*2})
-    if orient == MapGen.ORIENT_TURN_90 or orient == MapGen.ORIENT_TURN_270 then
+    if orient == SourceMap.ORIENT_TURN_90 or orient == SourceMap.ORIENT_TURN_270 then
         size[1], size[2] = size[2], size[1]
     end
 

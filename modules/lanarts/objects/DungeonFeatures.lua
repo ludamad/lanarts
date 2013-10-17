@@ -1,5 +1,5 @@
 local GameObject = import "core.GameObject"
-local GameMap = import "core.Map"
+local Map = import "core.Map"
 local Display = import "core.Display"
 
 local ObjectUtils = import ".ObjectUtils"
@@ -32,10 +32,10 @@ local Decoration = ObjectUtils.type_create(Base)
 M.Decoration = Decoration
 
 function Decoration:on_step()
-    if self.sprite or GameMap.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
+    if self.sprite or Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
         return -- Need to be able to scale to many deactivated instances
     end 
-    if GameMap.object_visible(self) then
+    if Map.object_visible(self) then
         self.sprite = self.real_sprite
     end
 end
@@ -55,7 +55,7 @@ M.Door = Door
 local DOOR_OPEN_TIMEOUT = 128
 
 function Door:on_step()
-    if GameMap.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
+    if Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
         return -- Need to be able to scale to many deactivated instances
     end 
 
@@ -65,7 +65,7 @@ function Door:on_step()
     end
 
     local is_open = false
-    local collisions = GameMap.rectangle_collision_check(self.map, self.area, self)
+    local collisions = Map.rectangle_collision_check(self.map, self.area, self)
     for object in values(collisions) do
         if object.team then -- TODO proper combat object detection
             is_open = true
@@ -79,12 +79,12 @@ function Door:on_step()
 
     if is_open ~= self.was_open then
         local tile_xy = ObjectUtils.tile_xy(self, true)
-        GameMap.tile_set_solid(self.map, tile_xy, not is_open)
-        GameMap.tile_set_seethrough(self.map, tile_xy, is_open)
+        Map.tile_set_solid(self.map, tile_xy, not is_open)
+        Map.tile_set_seethrough(self.map, tile_xy, is_open)
     end
 
     local real_sprite = is_open and self.open_sprite or self.closed_sprite
-    if self.sprite ~= real_sprite and GameMap.object_visible(self) then
+    if self.sprite ~= real_sprite and Map.object_visible(self) then
         self.sprite = real_sprite
     end
 
@@ -94,8 +94,8 @@ end
 function Door:on_init()
     local tile_xy = ObjectUtils.tile_xy(self, true)
     self.was_open = false
-    GameMap.tile_set_solid(self.map, ObjectUtils.tile_xy(self, true), true)
-    GameMap.tile_set_seethrough(self.map, tile_xy, false)
+    Map.tile_set_solid(self.map, ObjectUtils.tile_xy(self, true), true)
+    Map.tile_set_seethrough(self.map, tile_xy, false)
 
     local whalf = self.open_sprite.width / 2 + self.padding
     local hhalf = self.open_sprite.height / 2 + self.padding

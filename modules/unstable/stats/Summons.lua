@@ -1,6 +1,6 @@
 local ActionProjectileObject = import "@objects.ActionProjectileObject"
 local Actions = import "@Actions"
-local GameMap = import "core.Map"
+local Map = import "core.Map"
 local Apts = import "@stats.AptitudeTypes"
 
 local M = nilprotect {} -- Submodule
@@ -14,7 +14,7 @@ end
 
 function M.get_summoned_objects(obj)
     local ret = {}
-    for o in GameMap.objects(obj.map) do
+    for o in Map.objects(obj.map) do
         if o.summoner == obj then
             table.insert(ret, o)
         end

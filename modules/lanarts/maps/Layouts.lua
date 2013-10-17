@@ -1,4 +1,4 @@
-local MapGen = import "core.SourceMap"
+local SourceMap = import "core.SourceMap"
 local MapUtils = import ".MapUtils"
 
 local M = nilprotect {} -- Submodule
@@ -21,7 +21,7 @@ function M.brute_tunnel(map, region1, region2, args)
     local interval_length = args.interval_length or 4 
     local line_width = args.line_width or 4
     local line = find_intersecting_line(map, region1, region2)
-    MapGen.line_apply {
+    SourceMap.line_apply {
         map = map,
         line_width = line_width,
         from_xy = line[1], to_xy = line[2],

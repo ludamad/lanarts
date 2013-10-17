@@ -1,5 +1,5 @@
-local MapGen = import "core.SourceMap"
-local GameMap = import "core.Map"
+local SourceMap = import "core.SourceMap"
+local Map = import "core.Map"
 local GameObject = import "core.GameObject"
 local World = import "core.World"
 local Display = import "core.Display"
@@ -55,7 +55,7 @@ end
 local TEMPLE_DEPTH = 2
 
 local function temple_level_base_apply(map, tileset, area)
-    MapGen.random_placement_apply { map = map, area = area,
+    SourceMap.random_placement_apply { map = map, area = area,
         child_operator = dungeons.room_carve_operator(tileset.wall, tileset.floor),
         size_range = {12,15}, amount_of_placements_range = {10,15},
         create_subgroup = false
@@ -104,19 +104,19 @@ local function temple_level_create(label, floor, sequences, tileset, enemy_candi
     return map_id
 end
 
-local FLAG_PLAYERSPAWN = MapGen.FLAG_CUSTOM1
+local FLAG_PLAYERSPAWN = SourceMap.FLAG_CUSTOM1
 
 local function find_player_positions(map, --[[Optional]] flags) 
     local positions = {}
     local map_area = bbox_create({0,0},map.size)
     for i=1,World.player_amount do
         local sqr = MapUtils.random_square(map, map_area, 
-            --[[Selector]] { matches_all = flags, matches_none = {MapGen.FLAG_SOLID, MapGen.FLAG_HAS_OBJECT} },
+            --[[Selector]] { matches_all = flags, matches_none = {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT} },
             --[[Operator]] nil, 
             --[[Max attempts]] 10000
         )
         if not sqr then error("Could not find player spawn position for player " .. i .. "!") end
-        positions[i] = {(sqr[1]+.5) * GameMap.TILE_SIZE, (sqr[2]+.5) * GameMap.TILE_SIZE}
+        positions[i] = {(sqr[1]+.5) * Map.TILE_SIZE, (sqr[2]+.5) * Map.TILE_SIZE}
     end
     return positions
 end
@@ -158,7 +158,7 @@ local function old_dungeon_placement_function(MapSeq, tileset, levels)
     end
 end
 
-local NOT_SOLID_QUERY = {matches_none = MapGen.FLAG_SOLID}
+local NOT_SOLID_QUERY = {matches_none = SourceMap.FLAG_SOLID}
 local function try_copy_unsolid(map, xy1, xy2) 
     if map:square_query(xy2, NOT_SOLID_QUERY) then
         map:set(xy1, map:get(xy2))
@@ -202,9 +202,9 @@ end
 local function find_clear_patch(map, area)
     while true do
         local xy = MapUtils.random_square(map, area)
-        local no_solid = MapGen.rectangle_query { 
+        local no_solid = SourceMap.rectangle_query { 
             map=map, area = {xy[1]-1,xy[2]-1,xy[1]+1,xy[2]+1},
-            fill_selector = {matches_none=MapGen.FLAG_SOLID}
+            fill_selector = {matches_none=SourceMap.FLAG_SOLID}
         }
         if no_solid then
             return xy
@@ -232,9 +232,9 @@ local function place_content(map, --[[Optional]] dont_spawn_content)
                     return temple_level_create("Temple", 1, temple_sequences, TileSets.temple, {"Skeleton", "Dark Centaur"})
             end)
 
-            MapGen.rectangle_apply {
+            SourceMap.rectangle_apply {
                 map=map, area = {xy[1]-1,xy[2]-1,xy[1]+2,xy[2]+2}, 
-                fill_operator = {matches_none = MapGen.FLAG_SOLID, content=TileSets.temple.floor}
+                fill_operator = {matches_none = SourceMap.FLAG_SOLID, content=TileSets.temple.floor}
             }
 
             xy = MapUtils.random_square(map, area)
@@ -246,29 +246,29 @@ local function place_content(map, --[[Optional]] dont_spawn_content)
                     return temple_level_create("Mines", 1, dirthole_sequences, TileSets.pebble, {"Golem", "Zombie"})
             end)
 
-            MapGen.rectangle_apply {
+            SourceMap.rectangle_apply {
                 map=map, area = {xy[1]-1,xy[2]-1,xy[1]+2,xy[2]+2}, 
-                fill_operator = {matches_none = MapGen.FLAG_SOLID, content=TileSets.pebble.floor}
+                fill_operator = {matches_none = SourceMap.FLAG_SOLID, content=TileSets.pebble.floor}
             }
         end
 
         local xy = MapUtils.random_square(map, area)
-        MapGen.rectangle_apply {
+        SourceMap.rectangle_apply {
             map=map, area = {xy[1]-1,xy[2]-1,xy[1]+2,xy[2]+2}, 
-            fill_operator = {matches_none = MapGen.FLAG_SOLID, content=TileSets.pebble.floor}
+            fill_operator = {matches_none = SourceMap.FLAG_SOLID, content=TileSets.pebble.floor}
         }
         old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {1,5})(map, xy)
         xy = MapUtils.random_square(map, area)
         old_dungeon_placement_function(OldMapSeq2, TileSets.snake, {6,10})(map, xy)
         for dxy in values{{1,0}, {-1,0}, {0,1}, {0,-1}} do
             local nxy = vector_add(xy, dxy)
-            if map:square_query(nxy, {matches_none = MapGen.FLAG_SOLID}) then
+            if map:square_query(nxy, {matches_none = SourceMap.FLAG_SOLID}) then
                 MapUtils.spawn_decoration(map, M._warning_skull, nxy)
             end
         end
-        MapGen.rectangle_apply {
+        SourceMap.rectangle_apply {
             map=map, area = {xy[1]-1,xy[2]-1,xy[1]+2,xy[2]+2}, 
-            fill_operator = {matches_none = MapGen.FLAG_SOLID, content=TileSets.snake.floor}
+            fill_operator = {matches_none = SourceMap.FLAG_SOLID, content=TileSets.snake.floor}
         }
         for i=1,15 do
             if chance(.4) then 
@@ -292,7 +292,7 @@ local function place_content(map, --[[Optional]] dont_spawn_content)
     end
     for i=1,10 do
         local xy = find_clear_patch(map, area)
-        map:square_apply(xy, {add = MapGen.FLAG_SOLID})
+        map:square_apply(xy, {add = SourceMap.FLAG_SOLID})
         MapUtils.spawn_decoration(map, M._anvil, xy)
     end
     local map_id = MapUtils.game_map_create(map)
@@ -345,24 +345,24 @@ local function generate_area(map, area)
     local keep_position = random_choice{true, false}
     for i=1,random(20,50) do
         local xy = random_pos(area)
-        MapGen.polygon_apply {
+        SourceMap.polygon_apply {
             map = map, area = bounds,
-            operator = { remove = MapGen.FLAG_SOLID, add = MapGen.FLAG_SEETHROUGH, content = tileset.floor },
+            operator = { remove = SourceMap.FLAG_SOLID, add = SourceMap.FLAG_SEETHROUGH, content = tileset.floor },
             points = ShapeUtils.random_polygon(area, xy, {4, random(5,20)}, random(5,12)) 
         }
         table.insert(line_positions, xy)
 
         xy = keep_position and xy or random_pos(area)
-        MapGen.polygon_apply {
+        SourceMap.polygon_apply {
             map = map, area = bounds,
-            operator = { matches_all = MapGen.FLAG_SOLID, remove = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.wall },
+            operator = { matches_all = SourceMap.FLAG_SOLID, remove = SourceMap.FLAG_SEETHROUGH, content = TileSets.pebble.wall },
             points = ShapeUtils.random_polygon(area, xy, {4, random(5,15)}, random(5,12)) 
         }
 
         xy = keep_position and xy or random_pos(area)
-        MapGen.polygon_apply {
+        SourceMap.polygon_apply {
             map = map, area = bounds,
-            operator = { matches_none = MapGen.FLAG_SOLID, content = TileSets.snake.floor_alt },
+            operator = { matches_none = SourceMap.FLAG_SOLID, content = TileSets.snake.floor_alt },
             points = ShapeUtils.random_polygon(area, xy, {4, 5}, 8) 
         }
     end
@@ -374,11 +374,11 @@ local function generate_area(map, area)
         sort_positions_by_relative_distance(line_positions)
     end
     for i=1,#line_positions do
-        MapGen.line_apply {
+        SourceMap.line_apply {
             map = map, area = bounds,
             operator = { 
-                remove = MapGen.FLAG_SOLID, 
-                add = MapGen.FLAG_SEETHROUGH, content = random_choice{tileset.floor, tileset.floor_alt1, tileset.floor_alt2}
+                remove = SourceMap.FLAG_SOLID, 
+                add = SourceMap.FLAG_SEETHROUGH, content = random_choice{tileset.floor, tileset.floor_alt1, tileset.floor_alt2}
             },
             line_width = random(3,9),
             from_xy = line_positions[i], to_xy = line_positions[(i%#line_positions)+1 ]
@@ -390,9 +390,9 @@ local function generate_area(map, area)
     for i=1,NUM_RAND_LINES do
         local xy = MapUtils.random_square(map, area)
         local content = random_choice{tileset.wall, TileSets.pebble.wall, TileSets.snake.wall}
-        local add, remove = {MapGen.FLAG_SOLID}, MapGen.FLAG_SEETHROUGH
+        local add, remove = {SourceMap.FLAG_SOLID}, SourceMap.FLAG_SEETHROUGH
         if content == tileset.wall then
-            table.insert(add, MapGen.FLAG_SEETHROUGH)
+            table.insert(add, SourceMap.FLAG_SEETHROUGH)
             remove = nil
         end
 
@@ -403,15 +403,15 @@ local function generate_area(map, area)
         local line_width = random(1,2)
         -- First check for solid
         local step = vector_scale(dir, 3)
-        local no_solid = MapGen.line_query {
+        local no_solid = SourceMap.line_query {
             map=map,
-            selector={matches_none=MapGen.FLAG_SOLID}, 
+            selector={matches_none=SourceMap.FLAG_SOLID}, 
             line_width = line_width + 2, 
             from_xy = vector_subtract(xy, step), to_xy = vector_add(to_xy, step)
         }
         -- If none, then cut line
         if no_solid then
-            MapGen.line_apply {
+            SourceMap.line_apply {
                 map = map, area = bounds,
                 operator = {add=add, remove=remove, content=content},
                 line_width = line_width,
@@ -439,8 +439,8 @@ function M.overworld_create_helper(--[[Optional]] dont_spawn_content)
     local tileset = TileSets.grass
 
     local w,h = 200,200
-    local map = MapUtils.map_create("Overworld", {w,h}, tileset.wall, {MapGen.FLAG_SOLID, MapGen.FLAG_SEETHROUGH})
-    --local nodes = get_leafs(MapGen.bsp_split { split_depth = 2, map = map, minimum_node_size = {w/6, h/6}, area = {50,50,250,250} })
+    local map = MapUtils.map_create("Overworld", {w,h}, tileset.wall, {SourceMap.FLAG_SOLID, SourceMap.FLAG_SEETHROUGH})
+    --local nodes = get_leafs(SourceMap.bsp_split { split_depth = 2, map = map, minimum_node_size = {w/6, h/6}, area = {50,50,250,250} })
    -- for i=1,#nodes do
     --    generate_area(map, nodes[i].area)
     --end
@@ -448,9 +448,9 @@ function M.overworld_create_helper(--[[Optional]] dont_spawn_content)
 --    for i=1,#nodes do
 --        Layouts.brute_tunnel(map, nodes[i].area, nodes[i%#nodes+1].area, {
 --                operator = {
---                    matches_all=MapGen.FLAG_SOLID,
---                    add=MapGen.FLAG_SEETHROUGH, 
---                    remove=MapGen.FLAG_SOLID, 
+--                    matches_all=SourceMap.FLAG_SOLID,
+--                    add=SourceMap.FLAG_SEETHROUGH, 
+--                    remove=SourceMap.FLAG_SOLID, 
 --                    content=random_choice{tileset.floor, tileset.floor_alt1, tileset.floor_alt2}
 --                }
 --            }

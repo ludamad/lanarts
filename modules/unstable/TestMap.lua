@@ -3,7 +3,7 @@ local AnsiCol = import "core.terminal.AnsiColors"
 local GameState = import "core.GameState"
 local Keys = import "core.Keyboard"
 local Simulation = import ".Simulation"
-local SimulationMap = import ".SimulationMap"
+local GameMap = import "@maps.GameMap"
 local Newregion = import "lanarts.maps.Newregion"
 
 local M = nilprotect {} -- Submodule
@@ -22,17 +22,17 @@ function M.main(cmd_args)
     __initialize_internal_graphics()
 
     local map, gmap = Newregion.overworld_create_helper(--[[Empty]] true)
-    local SM = SimulationMap.create(map, gmap)
+    local GM = GameMap.create(map, gmap)
     local race, class = Simulation.choose_player_stats(cmd_args)
-    local player = SM:add_player("Tester", race, class)
-    for i=1,15 do SM:add_monster("Gnome Skeleton") end
+    local player = GM:add_player("Tester", race, class)
+    for i=1,15 do GM:add_monster("Gnome Skeleton") end
 
     Display.view_snap(player.xy)
     while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
         Display.view_snap(player.xy)
-        SM:step()
+        GM:step()
         Display.draw_start()
-        SM:draw()
+        GM:draw()
         Display.draw_finish()
         GameState.wait(10)
     end

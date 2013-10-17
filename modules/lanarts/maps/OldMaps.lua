@@ -3,7 +3,7 @@ local Display = import "core.Display"
 local item_utils = import ".ItemUtils"
 local dungeons = import ".Dungeons"
 local map_utils = import ".MapUtils"
-local MapGen = import "core.SourceMap"
+local SourceMap = import "core.SourceMap"
 local World = import "core.World"
 
 local M = nilprotect {} -- Submodule
@@ -360,14 +360,14 @@ local function generate_statues(map)
         local area = random_choice(areas)
         local sqr = map_utils.random_square(map, area)
         if not sqr then return end
-        local query = MapGen.rectangle_query {
+        local query = SourceMap.rectangle_query {
             map = map,
             -- nearby 3x3 box
             area = bbox_create( {sqr[1]-1, sqr[2]-1}, {3, 3}),
-            fill_selector = {matches_none = MapGen.FLAG_SOLID}
+            fill_selector = {matches_none = SourceMap.FLAG_SOLID}
         } 
         if query then
-            map:square_apply(sqr, {add = MapGen.FLAG_SOLID, remove = MapGen.FLAG_SEETHROUGH})
+            map:square_apply(sqr, {add = SourceMap.FLAG_SOLID, remove = SourceMap.FLAG_SEETHROUGH})
             map_utils.spawn_decoration(map, M.statue, sqr, random(0,17))
             i = i + 1
             tries = 0
@@ -393,7 +393,7 @@ local function generate_doors(map)
     local areas = leaf_group_areas(map)
     for area in values(areas) do
         if chance(0.05) then
-            local selector = {matches_none = MapGen.FLAG_SOLID}
+            local selector = {matches_none = SourceMap.FLAG_SOLID}
             local x1,y1,x2,y2 = unpack(area)
             x1, y1 = x1-1, y1-1
             for y=y1,y2 do
@@ -430,7 +430,7 @@ local function generate_tunnels(map, tunnels, tileset)
 end
 
 local function map_gen_apply(map, placements, wall, floor, size, padding)
-    MapGen.random_placement_apply { map = map, area = get_inner_area(map),
+    SourceMap.random_placement_apply { map = map, area = get_inner_area(map),
         child_operator = dungeons.room_carve_operator(wall, floor, padding or 1),
         size_range = size, amount_of_placements_range = placements,
         create_subgroup = false
@@ -458,8 +458,8 @@ end
 
 local function generate_from_template(label, template, tileset)
     return map_utils.area_template_to_map(label, template, --[[padding]] 4, { 
-           ['x'] = { add = MapGen.FLAG_SOLID, content = tileset.wall }, 
-           ['.'] = { add = MapGen.FLAG_SEETHROUGH, content = chance(.5) and tileset.floor_alt or tileset.floor }
+           ['x'] = { add = SourceMap.FLAG_SOLID, content = tileset.wall }, 
+           ['.'] = { add = SourceMap.FLAG_SEETHROUGH, content = chance(.5) and tileset.floor_alt or tileset.floor }
     })
 end
 

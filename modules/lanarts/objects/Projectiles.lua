@@ -1,5 +1,5 @@
 local GameObject = import "core.GameObject"
-local GameMap = import "core.Map"
+local Map = import "core.Map"
 local ObjectUtils = import ".ObjectUtils"
 
 local M = {} -- Submodule
@@ -12,12 +12,12 @@ local Base = ObjectUtils.type_create()
 M.ProjectileBase = Base
 
 local function projectile_wrapper_on_step(self)
-    local tile_xy = GameMap.object_tile_check(self)
+    local tile_xy = Map.object_tile_check(self)
     if tile_xy then
         ObjectUtils.object_callback(self, "on_tile_collide", assert(tile_xy))
     end
 
-    local collisions = GameMap.object_collision_check(self)
+    local collisions = Map.object_collision_check(self)
     for obj in values(collisions) do
         if self.destroyed then return end
         ObjectUtils.object_callback(self, "on_object_collide", assert(obj))

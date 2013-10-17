@@ -1,13 +1,13 @@
 local Display = import "core.Display"
 
 local GameObject = import "core.GameObject"
-local GameMap = import "core.Map"
+local Map = import "core.Map"
 local Relations = import ".Relations"
 
 local M = nilprotect {} -- Submodule
 
 function M.draw_if_seen(obj, sprite, --[[Optional]] alpha, --[[Optional]] frame, --[[Optional]] direction)
-    if GameMap.object_visible(obj) then 
+    if Map.object_visible(obj) then 
         M.screen_draw(sprite, obj.xy, alpha, frame, direction)
     end
 end
@@ -54,7 +54,7 @@ end
 
 function M.find_closest_hostile(self)
     local min_dist,min_obj = math.huge,nil
-    for obj in GameMap.objects(self.map) do
+    for obj in Map.objects(self.map) do
         if obj.team and Relations.is_hostile(self, obj) then
             local dist = vector_distance(obj.xy, self.xy)
             if dist < min_dist then 
@@ -71,7 +71,7 @@ end
 
 function M.find_free_position(self, dir)
     local dx,dy = unpack(dir)
-    local check, new_xy, R = GameMap.radius_tile_check, {}, self.radius
+    local check, new_xy, R = Map.radius_tile_check, {}, self.radius
 
     new_xy[1], new_xy[2] = self.x+dx, self.y+dy
     if not check(self.map, new_xy, R) then return new_xy end

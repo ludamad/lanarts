@@ -1,6 +1,6 @@
 -- Represents an object that takes actions and 
 
-local GameMap = import "core.Map"
+local Map = import "core.Map"
 local StatContext = import "@StatContext"
 local ExperienceCalculation = import "@stats.ExperienceCalculation"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
@@ -89,7 +89,7 @@ local function drawf(O)
 end
 
 function CombatObject:on_draw()
-    if GameMap.object_visible(self) then 
+    if Map.object_visible(self) then 
         local options = {
             sprite = self.sprite, xy = self.xy, direction = self.direction or 0,
             alpha = self.alpha or 1, frame = self.frame, color = self.color or COL_WHITE

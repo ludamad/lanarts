@@ -1,4 +1,4 @@
-local GameMap = import "core.Map"
+local Map = import "core.Map"
 local PathFinding = import "core.PathFinding"
 
 local M = nilprotect {} -- Submodule
@@ -10,14 +10,14 @@ function M.radius_and_line_tile_check(map, radius, from_xy, to_xy)
     local reach = {radius, 0}
 
     -- Circle checks at the ends of the line
-    if GameMap.radius_tile_check(map, from_xy, radius) then return true end
-    if GameMap.radius_tile_check(map, to_xy, radius) then return true end
+    if Map.radius_tile_check(map, from_xy, radius) then return true end
+    if Map.radius_tile_check(map, to_xy, radius) then return true end
 
     -- Two lines from either sides of the 'end circles'
     for reach in values{{radius,0}, {0, radius}} do
-        if GameMap.line_tile_check(map, vsub(from_xy,reach), vsub(to_xy,reach)) then
+        if Map.line_tile_check(map, vsub(from_xy,reach), vsub(to_xy,reach)) then
             return true
-        elseif GameMap.line_tile_check(map, vadd(from_xy,reach), vadd(to_xy,reach)) then
+        elseif Map.line_tile_check(map, vadd(from_xy,reach), vadd(to_xy,reach)) then
             return true
         end
     end

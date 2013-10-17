@@ -1,5 +1,5 @@
-local MapGen = import "core.SourceMap"
-local GameMap = import "core.Map"
+local SourceMap = import "core.SourceMap"
+local Map = import "core.Map"
 local GameObject = import "core.GameObject"
 local World = import "core.World"
 
@@ -52,7 +52,7 @@ end
 local TEMPLE_DEPTH = 2
 
 local function temple_level_base_apply(map, tileset, area)
-    MapGen.random_placement_apply { map = map, area = area,
+    SourceMap.random_placement_apply { map = map, area = area,
         child_operator = dungeons.room_carve_operator(tileset.wall, tileset.floor),
         size_range = {12,15}, amount_of_placements_range = {10,15},
         create_subgroup = false
@@ -101,19 +101,19 @@ local function temple_level_create(label, floor, sequences, tileset, enemy_candi
     return map_id
 end
 
-local FLAG_PLAYERSPAWN = MapGen.FLAG_CUSTOM1
+local FLAG_PLAYERSPAWN = SourceMap.FLAG_CUSTOM1
 
 local function find_player_positions(map, --[[Optional]] flags) 
     local positions = {}
     local map_area = bbox_create({0,0},map.size)
     for i=1,World.player_amount do
         local sqr = MapUtils.random_square(map, map_area, 
-            --[[Selector]] { matches_all = flags, matches_none = {MapGen.FLAG_SOLID, MapGen.FLAG_HAS_OBJECT} },
+            --[[Selector]] { matches_all = flags, matches_none = {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT} },
             --[[Operator]] nil, 
             --[[Max attempts]] 10000
         )
         if not sqr then error("Could not find player spawn position for player " .. i .. "!") end
-        positions[i] = {(sqr[1]+.5) * GameMap.TILE_SIZE, (sqr[2]+.5) * GameMap.TILE_SIZE}
+        positions[i] = {(sqr[1]+.5) * Map.TILE_SIZE, (sqr[2]+.5) * Map.TILE_SIZE}
     end
     return positions
 end
@@ -155,7 +155,7 @@ local function old_dungeon_placement_function(MapSeq, tileset, levels)
     end
 end
 
-local NOT_SOLID_QUERY = {matches_none = MapGen.FLAG_SOLID}
+local NOT_SOLID_QUERY = {matches_none = SourceMap.FLAG_SOLID}
 local function try_copy_unsolid(map, xy1, xy2) 
     if map:square_query(xy2, NOT_SOLID_QUERY) then
         map:set(xy1, map:get(xy2))
@@ -197,25 +197,25 @@ function M.overworld_create()
     -- These squares take the form of a square next to them, after the initial map generation is done
     local undecided_squares = {}
 
-    local UNDECIDED_FLAG, UNDECIDED_TILE = MapGen.FLAG_SOLID, tileset.wall
+    local UNDECIDED_FLAG, UNDECIDED_TILE = SourceMap.FLAG_SOLID, tileset.wall
     local map = MapUtils.area_template_to_map("Overworld", 
     		--[[file path]] path_resolve "region1.txt", 
     		--[[padding]] 4, {
     	   --Player spawn candidate square
-           [':'] = { add = {MapGen.FLAG_SEETHROUGH, FLAG_PLAYERSPAWN}, content = tileset.floor } ,
+           [':'] = { add = {SourceMap.FLAG_SEETHROUGH, FLAG_PLAYERSPAWN}, content = tileset.floor } ,
     	   --Walls
-           ['x'] = { add = {MapGen.FLAG_SEETHROUGH, MapGen.FLAG_SOLID}, content = tileset.wall }, 
-           ['W'] = { add = MapGen.FLAG_SOLID, content = tileset.wall_alt }, 
-           ['P'] = { add = MapGen.FLAG_SOLID, content = TileSets.pebble.wall }, 
+           ['x'] = { add = {SourceMap.FLAG_SEETHROUGH, SourceMap.FLAG_SOLID}, content = tileset.wall }, 
+           ['W'] = { add = SourceMap.FLAG_SOLID, content = tileset.wall_alt }, 
+           ['P'] = { add = SourceMap.FLAG_SOLID, content = TileSets.pebble.wall }, 
            --Floors
-           ['s'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.floor},
-           ['.'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor },
-           ['b'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.dirt },
-           [','] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor_alt1 },
-           ['`'] = { add = MapGen.FLAG_SEETHROUGH, content = tileset.floor_alt2 },
-           ['p'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor }, 
-           ['h'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor_alt }, 
-           ['t'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.temple.floor }, 
+           ['s'] = { add = SourceMap.FLAG_SEETHROUGH, content = TileSets.snake.floor},
+           ['.'] = { add = SourceMap.FLAG_SEETHROUGH, content = tileset.floor },
+           ['b'] = { add = SourceMap.FLAG_SEETHROUGH, content = tileset.dirt },
+           [','] = { add = SourceMap.FLAG_SEETHROUGH, content = tileset.floor_alt1 },
+           ['`'] = { add = SourceMap.FLAG_SEETHROUGH, content = tileset.floor_alt2 },
+           ['p'] = { add = SourceMap.FLAG_SEETHROUGH, content = TileSets.pebble.floor }, 
+           ['h'] = { add = SourceMap.FLAG_SEETHROUGH, content = TileSets.pebble.floor_alt }, 
+           ['t'] = { add = SourceMap.FLAG_SEETHROUGH, content = TileSets.temple.floor }, 
            ['T'] = { add = UNDECIDED_FLAG, content = UNDECIDED_TILE,
                on_placement = function(map, xy)
                     local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 11))
@@ -229,11 +229,11 @@ function M.overworld_create()
                end},
 
            --Entrance to Dungeon 1: easier monsters
-           ['D'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor,
+           ['D'] = { add = SourceMap.FLAG_SEETHROUGH, content = TileSets.pebble.floor,
                on_placement = old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {1,5}) },
 
            --Entrance to Dungeon 2: harder monsters
-           ['X'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.snake.floor,
+           ['X'] = { add = SourceMap.FLAG_SEETHROUGH, content = TileSets.snake.floor,
                on_placement = old_dungeon_placement_function(OldMapSeq2, TileSets.snake, {6,10}) },
            -- Overworld features
            -- Anvil
@@ -257,7 +257,7 @@ function M.overworld_create()
                         table.insert(undecided_squares, xy)
            			end },
            --Item candidate square
-           ['i'] = { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor, 
+           ['i'] = { add = SourceMap.FLAG_SEETHROUGH, content = TileSets.pebble.floor, 
                     on_placement = function(map, xy)
                         if chance(.4) then 
                             local item = ItemUtils.item_generate(ItemGroups.enchanted_items)
@@ -293,7 +293,7 @@ function M.overworld_create()
                         table.insert(undecided_squares, xy)
                     end },
            --Entrance to 'Mines': a connecting mini-dungeon
-           ['G'] =  { add = MapGen.FLAG_SEETHROUGH, content = TileSets.pebble.floor,
+           ['G'] =  { add = SourceMap.FLAG_SEETHROUGH, content = TileSets.pebble.floor,
                on_placement = function(map, xy)
                     local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(0, 2))
                     local seq_len = #dirthole_sequences
