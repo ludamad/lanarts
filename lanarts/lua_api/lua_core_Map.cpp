@@ -35,7 +35,7 @@ static level_id mapid(LuaField map_obj) {
 	return map_obj["_id"].to_int();
 }
 
-static GameMapState* mapstate(LuaStackValue map_obj, bool defaulted = false) {
+GameMapState* mapstate(LuaStackValue map_obj, bool defaulted = false) {
 	GameState* gs = lua_api::gamestate(map_obj);
 	level_id id;
 	if (defaulted && map_obj.isnil()) {
@@ -329,7 +329,7 @@ static int gmap_object_collision_check(lua_State* L) {
 
 static std::vector<GameInst*> gmap_rectangle_collision_check(LuaStackValue map_obj, BBox area, LuaStackValue tester /* Can be empty */) {
 	GameState* gs = lua_api::gamestate(map_obj);
-	GameMapState* map = gs->get_level(map_obj.to_int());
+	GameMapState* map = mapstate(map_obj);
 
 	return map->game_inst_set().object_rectangle_test(area, tester.isnil() ? NULL : tester.as<GameInst*>());
 }

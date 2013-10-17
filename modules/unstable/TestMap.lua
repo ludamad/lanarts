@@ -34,7 +34,7 @@ function M.main(cmd_args)
         Display.draw_start()
         GM:draw()
         Display.draw_finish()
-        GameState.wait(10)
+        GameState.wait(1)
     end
 end
 

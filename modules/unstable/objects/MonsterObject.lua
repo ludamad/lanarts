@@ -1,5 +1,6 @@
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local GameObject = import "core.GameObject"
+local Display = import "core.Display"
 local Animations = import "lanarts.objects.Animations"
 local Attacks = import "@Attacks"
 local CombatObject = import ".CombatObject"
@@ -36,6 +37,14 @@ function MonsterObject:on_death(attacker_obj)
 
     if self.on_die then self:on_die() end
     GameObject.destroy(self)
+end
+
+local shadow = Display.image_load(path_resolve "sprites/minor-shadow.png")
+
+function MonsterObject:on_predraw()
+    if Map.object_visible(self) then
+        ObjectUtils.screen_draw(shadow, self.xy)
+    end
 end
 
 function MonsterObject.create(args)

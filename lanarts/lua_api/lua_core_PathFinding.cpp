@@ -18,11 +18,12 @@
 #include "gamestate/GameState.h"
 #include "gamestate/GameMapState.h"
 
+
 typedef smartptr<AStarPath> AStarPathPtr;
 static int astar_calculate_path(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	AStarPathPtr astar = luawrap::get<AStarPathPtr>(L, 1);
-	level_id gmap = luawrap::get<int>(L, 2);
+	level_id gmap = LuaStackValue(L, 2)["_id"].to_int();
 	Pos from_xy = luawrap::get<Pos>(L, 3);
 	Pos to_xy = luawrap::get<Pos>(L, 4);
 	bool clear = lua_gettop(L) >= 5 ? lua_toboolean(L, 5) : true;

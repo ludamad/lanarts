@@ -406,7 +406,7 @@ function M.main(cmd_args)
         ['x'] =  { add = SourceMap.FLAG_SOLID, content = TileSets.pebble.wall }
     })
     local map = Map.create { map = source_map }
-    local GM = GameMap.create(map, map)
+    local GM = GameMap.create(source_map, map)
     local race, class = M.choose_player_stats(cmd_args)
     local player = GM:add_player("Tester", race, class)
     player.io_action_handler = do_nothing

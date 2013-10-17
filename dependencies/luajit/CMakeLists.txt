@@ -95,15 +95,15 @@ endif ()
 
 ## LIBRARY DETECTION
 # Optional libraries
-find_package ( Readline )
-if ( READLINE_FOUND )
-  option ( LUA_USE_READLINE "Use readline in the Lua CLI." ON )
-endif ()
+#find_package ( Readline )
+#if ( READLINE_FOUND )
+#  option ( LUA_USE_READLINE "Use readline in the Lua CLI." ON )
+#endif ()
 
-find_package ( Curses )
-if ( CURSES_FOUND )
-  option ( LUA_USE_CURSES "Use curses in the Lua CLI." ON )
-endif ()
+#find_package ( Curses )
+#if ( CURSES_FOUND )
+#  option ( LUA_USE_CURSES "Use curses in the Lua CLI." ON )
+#endif ()
 
 # Setup needed variables and libraries
 if ( LUA_USE_POSIX )

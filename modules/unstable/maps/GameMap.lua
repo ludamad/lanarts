@@ -61,10 +61,10 @@ function GameMap:step()
     for _, obj in ipairs(objects) do
         if obj.on_prestep then obj:on_prestep() end
     end
-    for _, obj in ipairs(objects) do
-        obj:on_step()
-    end
     self.collision_group:step()
+--    for _, obj in ipairs(objects) do
+--        obj:on_step()
+--    end
     Map.map_step({map = self.map})
 end
 
@@ -77,7 +77,6 @@ function GameMap:draw()
     for _, obj in ipairs(objects) do
         obj:on_draw()
     end
-    Map.instances_draw(self.map)
     Map.tiles_postdraw(self.map)
 end
 

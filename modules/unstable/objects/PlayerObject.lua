@@ -1,6 +1,8 @@
 local CombatObject = import ".CombatObject"
 local Attacks = import "@Attacks"
+local Display = import "core.Display"
 local Relations = import "lanarts.objects.Relations"
+local Map = import "core.Map"
 local PlayerIOActions = import ".PlayerIOActions"
 local PlayerIOResolution = import ".PlayerIOResolution"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
@@ -61,6 +63,15 @@ function PlayerObject:gain_xp(xp)
         self:_autospend_skill_points()
     end
 end
+
+local shadow = Display.image_load(path_resolve "sprites/shadow.png")
+
+function PlayerObject:on_predraw()
+    if Map.object_visible(self) then
+        ObjectUtils.screen_draw(shadow, self.xy)
+    end
+end
+
 function PlayerObject:on_step()
 --    self.base.on_step(self)
     StatContext.on_step(self._context) -- TEMP
