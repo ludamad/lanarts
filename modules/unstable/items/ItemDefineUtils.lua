@@ -6,6 +6,7 @@ local StatContext = import "@StatContext"
 local Actions = import "@Actions"
 local ActionUtils = import "@stats.ActionUtils"
 local Attacks = import "@Attacks"
+local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local ItemTraits = import ".ItemTraits"
 local Proficiency = import "@Proficiency"
 local ContentUtils = import "@stats.ContentUtils"
@@ -43,7 +44,7 @@ end
 -- Filters melee, magic, ranged. Useful for determining identify skills, which should not be affected by these aptitudes.
 function M.filter_main_aptitudes(apts)
     local new_apts = {}
-    for value in values(apts) do
+    for value in values(apts or {}) do
         if value ~= Apts.MELEE and value ~= Apts.MAGIC and value ~= Apts.RANGED then
             table.insert(new_apts, value)
         end
@@ -61,7 +62,7 @@ local function add_default_types(t, args, difficulty, --[[Optional]] types)
 end
 
 local function derive_on_draw(name)
-    return ContentUtils.derive_on_draw(_ROOT_FOLDER .. "/unstable/items/sprites/held_sprites/" .. name, --[[Absolute paths]] true)
+    return ContentUtils.derive_on_draw(_ROOT_FOLDER .. "/unstable/items/sprites/mini_sprites/" .. name, --[[Absolute paths]] true)
 end
 
 -- Draw functions for held weapons:
@@ -75,8 +76,21 @@ local default_on_draw = {
 }
 
 local function find_default_on_draw(apts)
-    for _, apt in ipairs(apts) do
+    for _, apt in ipairs(apts or _EMPTY_TABLE) do
         if default_on_draw[apt] then return default_on_draw[apt] end
+    end
+end
+
+local function default_on_draw(self, stats, drawf, options, ...)
+    local args = self.on_draw_args or _EMPTY_TABLE
+    if args.new_color then options.color = args.new_color end
+
+    StatContext.on_draw_call_collapse(stats, drawf, options, ...)
+    if self.mini_sprite then 
+        ObjectUtils.screen_draw(
+            self.mini_sprite, options.xy, args.alpha, 
+            args.frame, args.direction, args.color
+        )
     end
 end
 
@@ -96,7 +110,17 @@ local function type_define(args, type, --[[Optional]] on_init, --[[Optional]] no
 
     if args.on_draw then
         args.on_draw = ContentUtils.derive_on_draw(args.on_draw)
-    elseif args.aptitude_types then
+    else
+        local rel_path = args.mini_sprite or ("sprites/mini_sprites/" .. ContentUtils.canonical_sprite_name(args.name or args.lookup_key))
+        local abs_path = ContentUtils.path_resolve_for_definition(rel_path)
+        if args.mini_sprite or file_exists(abs_path) then
+            if not args.mini_sprite then abs_path = abs_path .. '%32x32' end -- Support multiple choices
+            args.mini_sprite = ContentUtils.resolve_sprite(abs_path, --[[Absolute]] true, --[[Prefer 'animation']] true)
+            args.on_draw = default_on_draw
+        end
+    end
+
+    if not args.on_draw then
         args.on_draw = find_default_on_draw(args.aptitude_types) or nil
     end
 
@@ -222,6 +246,10 @@ function M.resolve_armour_bonuses(self)
     local b = self.bonus or 0
     self.unidentified_name = self.unidentified_name or self.type.name
     self.name =  bonus_str1(b) .. ' ' .. self.type.name
+    if self.mini_sprite then
+        self.on_draw_args = self.on_draw_args or {}
+        self.on_draw_args.frame = random(0, self.mini_sprite.duration)
+    end
 
     local difficulty = (self.bonus ^ 1.5) + random(-1,3) + (self.difficulty or 0)
     init_identify_requirements(self, {Apts.ARMOUR}, random_round(difficulty))

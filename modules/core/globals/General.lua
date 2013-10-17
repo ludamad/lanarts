@@ -18,6 +18,7 @@ end
 --- Does nothing. 
 --@usage dummy_object = { step = do_nothing, draw = do_nothing }
 function do_nothing() end
+_EMPTY_TABLE = {}
 
 --- Wraps a function around a memoizing weak table.
 -- Function results will be stored until they are no longer referenced.

@@ -47,14 +47,23 @@ function M.derive_on_draw(args, --[[Optional]] absolute_paths)
     end
 end
 
+function M.canonical_sprite_name(str)
+    return str:gsub(' ', '_'):lower() .. ".png"
+end
+
 -- Derive sprite from name
 function M.derive_sprite(name)
-    local path = M.path_resolve_for_definition('sprites/')  .. name:gsub(' ', '_'):lower() .. ".png"
+    local path = M.path_resolve_for_definition('sprites/')  .. M.canonical_sprite_name(name)
     return image_cached_load(path)
 end
 
 function M.resolve_sprite(args, --[[Optional]] absolute_paths, --[[Optional]] use_animation)
-    local sprite = args.sprite or M.derive_sprite(args.lookup_key or args.name)
+    local sprite
+    if type(args) == "string" then
+        sprite = args
+    else
+        sprite = args.sprite or M.derive_sprite(args.lookup_key or args.name)
+    end
     if type(sprite) == "string" then
         if not absolute_paths then
             sprite = M.path_resolve_for_definition(sprite)

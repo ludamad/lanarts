@@ -19,6 +19,16 @@ body_armour_define {
 }
 
 body_armour_define {
+    name = "Robe",
+    description = "A robe.",
+    sprite = {}, -- TODO
+
+    gold_worth = 15, difficulty = 0,
+
+    [Apts.MELEE] = {0,0,2,0}
+}
+
+body_armour_define {
     name = "Studded Leather Armour",
     description = "The armour is made of fine, studded leather.",
     sprite = {}, -- TODO
@@ -96,6 +106,26 @@ headgear_define {
     gold_worth = 15, difficulty = 1,
 
     [Apts.MELEE] = {0,0,1,0}
+}
+
+headgear_define {
+    name = "Wizard's Hat",
+    description = "An optimized thinking cap.",
+    sprite = {}, -- TODO
+
+    gold_worth = 35, difficulty = 2,
+
+    [Apts.MAGIC] = {1,0,0,0}
+}
+
+headgear_define {
+    name = "Horned Helmet",
+    description = "A helmet with horns. It provides pretty good protection to the head.",
+    sprite = {}, -- TODO
+
+    gold_worth = 55, difficulty = 2,
+
+    [Apts.MELEE] = {0,0,2,0}
 }
 
 --------------------------------------------------------------------------------

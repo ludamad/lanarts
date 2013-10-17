@@ -21,7 +21,11 @@ local MAGE_NAMES_FOR_SKILL = {
 class_define {
     lookup_key = "Mage",
     description = "A magical master of ${magic_skill}.",
-    items = {"Mana Potion"},
+    items = {
+        "Mana Potion",
+        {type="Robe", bonus=1, equipped=true},
+        {type="Wizard's Hat", bonus=0, equipped=true}
+    },
 
     -- Takes 'weapon_skill', 'skill'
     on_create = function(class, args)
@@ -50,7 +54,12 @@ class_define {
 class_define {
     name = "Knight",
     description = "A disciplined, heavily armoured warrior.",
-    items = {"Health Potion", "Hand Axe"},
+    items = { 
+        "Health Potion", 
+        "Hand Axe",
+        {type="Chainshirt", bonus=1, equipped=true},
+        {type="Horned Helmet", bonus=1, equipped=true}
+    },
     spells = {"Berserk"},
 
     -- Takes 'weapon_skill'
@@ -76,7 +85,12 @@ class_define {
 class_define {
     name = "Archer",
     description = "A master of ranged combat. Fires swiftly from afar.",
-    items = {{type="Short Bow", equipped=true}, {type="Arrow", amount=400, equipped = true}},
+    items = {
+        {type="Leather Armour", bonus=0, equipped=true}, 
+        {type="Leather Cap", bonus=0, equipped=true}, 
+        {type="Short Bow", equipped=true}, 
+        {type="Arrow", amount=400, equipped=true}
+    },
     spells = {"Magic Arrow", "Berserk", "Minor Missile"},
 
     skills = {
