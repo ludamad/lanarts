@@ -5,7 +5,7 @@ if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/luajit)
     set(USE_LUAJIT 1)
 endif ()
 
-set(CMAKE_BUILD_TYPE RELEASE)
+set(CMAKE_BUILD_TYPE DEBUG)
 add_definitions(-DNDEBUG)
 
 

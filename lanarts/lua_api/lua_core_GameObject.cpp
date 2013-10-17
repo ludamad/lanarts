@@ -94,6 +94,12 @@ static int lapi_gameinst_freeref(lua_State* L) {
 	return 0;
 }
 
+static int lapi_gameinst_map(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	gs->game_world().push_level_object(luawrap::get<GameInst*>(L, 1)->current_floor);
+	return 1;
+}
+
 static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(GameInst*);
 
@@ -105,7 +111,12 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	LUAWRAP_METHOD(methods, draw, OBJ->draw(lua_api::gamestate(L)));
 	LUAWRAP_METHOD(methods, init,
 			GameState* gs = lua_api::gamestate(L);
-			level_id map = lua_gettop(L) <= 0 ? gs->game_world().get_current_level_id() : lua_tointeger(L, 1);
+			level_id map;
+			if (lua_gettop(L) <= 0) {
+				map = gs->game_world().get_current_level_id();
+			} else {
+				map = luawrap::get<LuaValue>(L, 1)["_id"].to_int();
+			}
 			gs->add_instance(map, OBJ);
 	);
 
@@ -118,7 +129,7 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	luawrap::bind_getter(getters["depth"], &GameInst::depth);
 	luawrap::bind_getter(getters["radius"], &GameInst::radius);
 	luawrap::bind_getter(getters["target_radius"], &GameInst::target_radius);
-	luawrap::bind_getter(getters["map"], &GameInst::current_floor);
+	getters["map"].bind_function(lapi_gameinst_map);
 	LUAWRAP_GETTER(meta, __tostring, typeid(*OBJ).name());
 
 	// Use table as fallback for getting values
@@ -394,7 +405,7 @@ static GameInst* initialize_object(GameState* gs, GameInst* inst, LuaStackValue 
 			}
 			id = gs->game_world().get_current_level_id();
 		} else {
-			id = args["map"].to_int();
+			id = args["map"]["_id"].to_int();
 		}
 		gs->add_instance(id, inst);
 	}

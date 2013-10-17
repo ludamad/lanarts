@@ -22,11 +22,10 @@
 #include "GameWorld.h"
 #include "ScoreBoard.h"
 
-
-
 GameWorld::GameWorld(GameState* gs) :
 		gs(gs),
 		next_room_id(-1) {
+	lua_level_states = LuaValue::newtable(gs->luastate());
 	midstep = false;
 	lvl = NULL;
 }
@@ -262,4 +261,16 @@ void GameWorld::connect_entrance_to_exit(int roomid1, int roomid2) {
 		l2->exits[i].exitsqr = l1->entrances[i].entrancesqr;
 		l1->entrances[i].exitsqr = l2->exits[i].entrancesqr;
 	}
+}
+
+void GameWorld::push_level_object(level_id id) {
+	this->lua_level_states[id].push();
+}
+
+void GameWorld::pop_level_object(level_id id) {
+	this->lua_level_states[id].pop();
+}
+
+void GameWorld::spawn_players(GeneratedRoom& genlevel, void** player_instances,
+		size_t nplayers) {
 }

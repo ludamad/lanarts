@@ -85,7 +85,7 @@ static int world_local_player(lua_State* L) {
 
 static void world_players_spawn(LuaStackValue level_id, const std::vector<Pos>& positions) {
 	GameState* gs = lua_api::gamestate(level_id);
-	GameMapState* map = gs->game_world().get_level(level_id.to_int());
+	GameMapState* map = gs->game_world().get_level(level_id["_id"].to_int());
 	gs->game_world().spawn_players(map, positions);
 }
 

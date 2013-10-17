@@ -11,7 +11,7 @@
 #include <vector>
 #include <cstdlib>
 
-#include <luawrap/luawrap.h>
+#include <luawrap/LuaValue.h>
 
 #include <ldungeon_gen/Map.h>
 
@@ -55,6 +55,9 @@ public:
 	EnemiesSeen& enemies_seen() {
 		return _enemies_seen;
 	}
+
+	void push_level_object(level_id id);
+	void pop_level_object(level_id id);
 
 	int number_of_levels() {
 		return level_states.size();

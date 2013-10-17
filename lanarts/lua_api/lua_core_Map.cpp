@@ -10,8 +10,7 @@
 
 #include <lua.hpp>
 #include <luawrap/luawrap.h>
-#include <luawrap/functions.h>
-#include <luawrap/types.h>
+#include <luawrap/luameta.h>
 
 #include "gamestate/GameState.h"
 #include "objects/enemy/EnemyInst.h"
@@ -27,16 +26,52 @@
 
 #include "lua_api/lua_api.h"
 
-/*static int gmap_base_metatable(LuaStackValue args) {
+//
+//tiles().pre_draw(gs, reveal_all);
+//// Become current level
+//GameMapState* previous_level = gs->get_level();
+//gs->set_level(this);
+//
+//std::vector<GameInst*> safe_copy = game_inst_set().to_vector();
+//for (size_t i = 0; i < safe_copy.size(); i++) {
+//	safe_copy[i]->draw(gs);
+//}
+//
+//monster_controller().post_draw(gs);
+//if (!reveal_all) {
+//	tiles().post_draw(gs);
+//}
+//
+//gs->set_level(previous_level);
+//
+//perf_timer_end(FUNCNAME);
+
+static level_id mapid(LuaField map_obj) {
+	return map_obj["_id"].to_int();
+}
+
+static GameMapState* mapstate(LuaStackValue map_obj, bool defaulted = false) {
+	GameState* gs = lua_api::gamestate(map_obj);
+	level_id id;
+	if (defaulted && map_obj.isnil()) {
+		id = gs->get_level_id();
+	} else {
+		id = map_obj["_id"].to_int();
+	}
+	return gs->game_world().get_level(id);
+}
+
+static void gmap_destroy(LuaStackValue map_obj) {
+	GameState* gs = lua_api::gamestate(map_obj);
+	lua_pushnil(map_obj.luastate());
+	gs->game_world().pop_level_object(mapid(map_obj));
+}
+
+static void gmap_init(LuaStackValue map_obj, LuaStackValue args) {
 	using namespace luawrap;
 	using namespace ldungeon_gen;
 
-}*/
-static int gmap_create(LuaStackValue args) {
-	using namespace luawrap;
-	using namespace ldungeon_gen;
-
-	GameState* gs = lua_api::gamestate(args);
+	GameState* gs = lua_api::gamestate(map_obj);
 	MapPtr map = args["map"].as<MapPtr>();
 	GameMapState* game_map = gs->game_world().map_create(map->size(),
 			defaulted(args["wandering_enabled"], true));
@@ -65,15 +100,41 @@ static int gmap_create(LuaStackValue args) {
 		}
 	}
 
-	return game_map->id();
+	map_obj["_id"] = game_map->id();
+	map_obj.push();
+	gs->game_world().pop_level_object(game_map->id());
 }
 
+static int gmap_create(lua_State* L) {
+	lua_newtable(L);
+	gmap_init(LuaStackValue(L, -1), LuaStackValue(L, 1));
+	return 1;
+}
+
+LuaValue lua_mapmetatable(lua_State* L) {
+	LuaValue meta = luameta_new(L, "Map");
+	LuaValue methods = luameta_constants(meta);
+
+	methods["init"].bind_function(gmap_init);
+	methods["destroy"].bind_function(gmap_destroy);
+
+	return meta;
+}
+
+static int gmap_maptype(lua_State* L) {
+	lua_newtable(L);
+	luameta_push(L, lua_mapmetatable);
+	lua_setfield(L, -2, "parent");
+	luawrap::globals(L)["newtype"].push();
+	lua_call(L, 1, 1);
+	return 1;
+}
 
 // level functions
 
-static GameInst* gmap_lookup(LuaStackValue current_map, obj_id object) {
-	GameState* gs = lua_api::gamestate(current_map);
-	GameMapState* map = gs->game_world().get_level(current_map.to_int());
+static GameInst* gmap_lookup(LuaStackValue map_obj, obj_id object) {
+	GameState* gs = lua_api::gamestate(map_obj);
+	GameMapState* map = mapstate(map_obj);
 	return map->game_inst_set().get_instance(object);
 }
 
@@ -84,8 +145,7 @@ static T stack_defaulted(lua_State* L, int narg, const T& default_value) {
 
 static int gmap_objects_list(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
-	int map_id = stack_defaulted(L, 1, gs->get_level_id());
-	GameInstSet& insts = gs->get_level(map_id)->game_inst_set();
+	GameInstSet& insts = mapstate(LuaStackValue(L, 1), true)->game_inst_set();
 	luawrap::push(L, insts.to_vector());
 	return 1;
 }
@@ -96,40 +156,34 @@ static int gmap_objects(lua_State* L) {
 	lua_call(L, 1, 1);
 	return 1;
 }
-//
-//static GameMapState* mapstate(LuaStackValue current_map) {
-//	current_map.push();
-//	lua_getfield(L, -1, "_id");
-//
-//}
 
-static bool gmap_tile_is_solid(LuaStackValue current_map, Pos xy) {
-	GameState* gs = lua_api::gamestate(current_map);
-	GameMapState* map = gs->game_world().get_level(current_map.to_int());
+static bool gmap_tile_is_solid(LuaStackValue map_obj, Pos xy) {
+	GameState* gs = lua_api::gamestate(map_obj);
+	GameMapState* map = mapstate(map_obj);
 	return map->tiles().is_solid(xy);
 }
 
-static bool gmap_tile_is_seethrough(LuaStackValue current_map, Pos xy) {
-	GameState* gs = lua_api::gamestate(current_map);
-	GameMapState* map = gs->game_world().get_level(current_map.to_int());
+static bool gmap_tile_is_seethrough(LuaStackValue map_obj, Pos xy) {
+	GameState* gs = lua_api::gamestate(map_obj);
+	GameMapState* map = mapstate(map_obj);
 	return map->tiles().is_seethrough(xy);
 }
 
-static void gmap_tile_set_solid(LuaStackValue current_map, Pos xy, bool solidity) {
-	GameState* gs = lua_api::gamestate(current_map);
-	GameMapState* map = gs->game_world().get_level(current_map.to_int());
+static void gmap_tile_set_solid(LuaStackValue map_obj, Pos xy, bool solidity) {
+	GameState* gs = lua_api::gamestate(map_obj);
+	GameMapState* map = mapstate(map_obj);
 	map->tiles().set_solid(xy, solidity);
 }
 
-static void gmap_tile_set_seethrough(LuaStackValue current_map, Pos xy, bool solidity) {
-	GameState* gs = lua_api::gamestate(current_map);
-	GameMapState* map = gs->game_world().get_level(current_map.to_int());
+static void gmap_tile_set_seethrough(LuaStackValue map_obj, Pos xy, bool solidity) {
+	GameState* gs = lua_api::gamestate(map_obj);
+	GameMapState* map = mapstate(map_obj);
 	map->tiles().set_seethrough(xy, solidity);
 }
 
-static bool gmap_tile_was_seen(LuaStackValue current_map, Pos xy) {
-	GameState* gs = lua_api::gamestate(current_map);
-	GameMapState* map = gs->game_world().get_level(current_map.to_int());
+static bool gmap_tile_was_seen(LuaStackValue map_obj, Pos xy) {
+	GameState* gs = lua_api::gamestate(map_obj);
+	GameMapState* map = mapstate(map_obj);
 	return map->tiles().was_seen(xy);
 }
 
@@ -182,7 +236,6 @@ static int gmap_monsters(lua_State* L) {
 
 static int gmap_distance_to_player(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
-	int map_id = lua_tointeger(L, 1);
 	Pos xy = luawrap::get<Pos>(L, 2);
 	std::vector<PlayerDataEntry>& entries = gs->player_data().all_players();
 	int max_dist = -1;
@@ -258,9 +311,9 @@ static int gmap_object_collision_check(lua_State* L) {
 	return 1;
 }
 
-static std::vector<GameInst*> gmap_rectangle_collision_check(LuaStackValue current_map, BBox area, LuaStackValue tester /* Can be empty */) {
-	GameState* gs = lua_api::gamestate(current_map);
-	GameMapState* map = gs->get_level(current_map.to_int());
+static std::vector<GameInst*> gmap_rectangle_collision_check(LuaStackValue map_obj, BBox area, LuaStackValue tester /* Can be empty */) {
+	GameState* gs = lua_api::gamestate(map_obj);
+	GameMapState* map = gs->get_level(map_obj.to_int());
 
 	return map->game_inst_set().object_rectangle_test(area, tester.isnil() ? NULL : tester.as<GameInst*>());
 }
@@ -285,8 +338,7 @@ static int gmap_object_tile_check(lua_State* L) {
 
 static int gmap_radius_tile_check(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
-	int map_id = stack_defaulted(L, 1, gs->get_level_id());
-	GameTiles& tiles = gs->get_level(map_id)->tiles();
+	GameTiles& tiles = mapstate(LuaStackValue(L, 1), true)->tiles();
 	Pos pos = luawrap::get<Pos>(L, 2);
 	int radius = lua_tointeger(L, 3);
 
@@ -300,11 +352,11 @@ static int gmap_radius_tile_check(lua_State* L) {
 	return 1;
 }
 
-static LuaStackValue gmap_line_tile_check(LuaStackValue current_map, Pos from_xy, Pos to_xy) {
-	lua_State* L = current_map.luastate();
+static LuaStackValue gmap_line_tile_check(LuaStackValue map_obj, Pos from_xy, Pos to_xy) {
+	lua_State* L = map_obj.luastate();
 	GameState* gs = lua_api::gamestate(L);
 	GameMapState* prev_map = gs->get_level();
-	gs->set_level(gs->game_world().get_level(current_map.to_int()));
+	gs->set_level(mapstate(map_obj));
 
 	Pos hit_pos;
 	bool collided = gs->tile_line_test(from_xy, to_xy, true, -1, &hit_pos);
@@ -332,27 +384,23 @@ static bool gmap_radius_place_free(const LuaStackValue& radius,
 }
 
 
-static void gmap_transfer(LuaStackValue inst, level_id map, Pos xy) {
+static void gmap_transfer(LuaStackValue inst, LuaStackValue map_obj, Pos xy) {
 	GameState* gs = lua_api::gamestate(inst);
 	level_id current_id = gs->game_world().get_current_level_id();
-	gs->game_world().level_move(inst.as<GameInst*>()->id, xy.x, xy.y, current_id, map);
+	gs->game_world().level_move(inst.as<GameInst*>()->id, xy.x, xy.y, current_id, mapid(map_obj));
 }
 
 static void gmap_map_step(LuaStackValue table) {
 	GameState* gs = lua_api::gamestate(table);
-	level_id map_id = table["map"].to_int();
+	level_id map_id = mapid(table["map"]);
 	gs->game_world().get_level(map_id)->step(gs);
 }
 
 static void gmap_map_draw(LuaStackValue table) {
 	GameState* gs = lua_api::gamestate(table);
-	level_id map_id = table["map"].to_int();
+	level_id map_id = mapid(table["map"]);
 	bool reveal_all = luawrap::defaulted(table["reveal_all"], false);
 	gs->game_world().get_level(map_id)->draw(gs, reveal_all);
-}
-
-static int gmap_maptype(lua_State* L) {
-	luawrap::globals(L);
 }
 
 namespace lua_api {
@@ -399,5 +447,6 @@ namespace lua_api {
 
 		gmap["place_free"].bind_function(gmap_place_free);
 		gmap["radius_place_free"].bind_function(gmap_radius_place_free);
+		gmap["maptype"].bind_function(gmap_maptype);
 	}
 }
