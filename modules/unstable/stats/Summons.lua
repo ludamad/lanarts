@@ -1,6 +1,6 @@
 local ActionProjectileObject = import "@objects.ActionProjectileObject"
 local Actions = import "@Actions"
-local GameMap = import "core.GameMap"
+local GameMap = import "core.Map"
 local Apts = import "@stats.AptitudeTypes"
 
 local M = nilprotect {} -- Submodule

@@ -1,6 +1,6 @@
 local EventLog = import "core.ui.EventLog"
 local GameObject = import "core.GameObject"
-local Map = import "core.GameMap"
+local Map = import "core.Map"
 local Projectiles = import "@objects.Projectiles"
 local ObjectUtils = import "@objects.ObjectUtils"
 

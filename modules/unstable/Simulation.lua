@@ -20,7 +20,7 @@ local ActionUtils = import "@stats.ActionUtils"
 local ItemTraits = import "@items.ItemTraits"
 local Identification = import "@stats.Identification"
 
-local GameMap = import "core.GameMap"
+local GameMap = import "core.Map"
 local GameObject = import "core.GameObject"
 local GameState = import "core.GameState"
 local PlayerObject = import "@objects.PlayerObject"
@@ -351,6 +351,7 @@ local function add_fight(name, amount, times)
     table.insert_all(fights, {dup({[name] = amount}, times)})
 end
 
+add_fight("Gnome Skeleton", 1, 1)
 add_fight("Cloud Elemental", 1, 1)
 add_fight("Giant Rat", 1, 5)
 add_fight("Giant Rat", 2, 5)
@@ -396,7 +397,7 @@ function M.main(cmd_args)
     __initialize_internal_graphics()
 
     local Display = import "core.Display"
-    local MapGen = import "core.MapGeneration"
+    local MapGen = import "core.SourceMap"
     local MapUtils = import "lanarts.maps.MapUtils"
     local TileSets = import "lanarts.tiles.Tilesets"
 

@@ -1,4 +1,4 @@
-local GameMap = import "core.GameMap"
+local GameMap = import "core.Map"
 local PathFinding = import "core.PathFinding"
 
 local M = nilprotect {} -- Submodule

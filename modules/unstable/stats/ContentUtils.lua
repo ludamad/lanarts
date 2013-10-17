@@ -53,14 +53,19 @@ function M.derive_sprite(name)
     return image_cached_load(path)
 end
 
-function M.resolve_sprite(args, --[[Optional]] absolute_paths)
+function M.resolve_sprite(args, --[[Optional]] absolute_paths, --[[Optional]] use_animation)
     local sprite = args.sprite or M.derive_sprite(args.lookup_key or args.name)
     if type(sprite) == "string" then
         if not absolute_paths then
             sprite = M.path_resolve_for_definition(sprite)
         end
         if sprite:find("%(") or sprite:find("%%") then
-            return Display.directional_create(Display.images_load(sprite), 1.0)
+            local subimages = Display.images_load(sprite)
+            if use_animation then
+                return Display.animation_create(subimages, 1.0)
+            else
+                return Display.directional_create(subimages, 1.0)
+            end
         else
             return Display.image_load(sprite)
         end

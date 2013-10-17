@@ -1,7 +1,7 @@
-local GameMap = import "core.GameMap"
+local GameMap = import "core.Map"
 local GameState = import "core.GameState"
 local MonsterType = import "@MonsterType"
-local MapGen = import "core.MapGeneration"
+local MapGen = import "core.SourceMap"
 local Display = import "core.Display"
 
 local PlayerObject = import "@objects.PlayerObject"

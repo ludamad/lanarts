@@ -1,7 +1,7 @@
-local MapGen = import "core.MapGeneration"
-local GameMap = import "core.GameMap"
+local MapGen = import "core.SourceMap"
+local GameMap = import "core.Map"
 local GameObject = import "core.GameObject"
-local World = import "core.GameWorld"
+local World = import "core.World"
 local Display = import "core.Display"
 
 local TileSets = import "@tiles.Tilesets"

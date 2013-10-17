@@ -8,6 +8,7 @@ endif ()
 set(CMAKE_BUILD_TYPE RELEASE)
 add_definitions(-DNDEBUG)
 
+
 ## Compiler flags
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions("-mfpmath=sse -msse2 -ffp-contract=on")

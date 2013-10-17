@@ -91,11 +91,11 @@ static void world_players_spawn(LuaStackValue level_id, const std::vector<Pos>& 
 
 namespace lua_api {
 	void register_lua_core_GameWorld(lua_State* L) {
-		LuaValue world = register_lua_submodule(L, "core.GameWorld");
+		LuaValue world = register_lua_submodule(L, "core.World");
 		luawrap::install_userdata_type<PlayerDataProxy,
 				PlayerDataProxy::metatable>();
 
-		LuaValue metatable = luameta_new(L, "GameWorld");
+		LuaValue metatable = luameta_new(L, "World");
 		LuaValue getters = luameta_getters(metatable);
 		LuaValue functions = luameta_constants(metatable);
 

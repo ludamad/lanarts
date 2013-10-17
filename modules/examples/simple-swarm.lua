@@ -7,8 +7,8 @@ Display.initialize("Lanarts Example", {640,640}, --[[Not fullscreen]] false)
 local Keys = import "core.Keyboard"
 local Mouse = import "core.Mouse"
 local GameObject = import "core.GameObject"
-local GameMap = import "core.GameMap"
-local MapGen = import "core.MapGeneration"
+local GameMap = import "core.Map"
+local MapGen = import "core.SourceMap"
 local ColAvoid = import "core.CollisionAvoidance"
 local PathFinding = import "core.PathFinding"
 

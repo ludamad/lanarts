@@ -11,6 +11,8 @@
 #include <vector>
 #include <cstdlib>
 
+#include <luawrap/luawrap.h>
+
 #include <ldungeon_gen/Map.h>
 
 #include "objects/TeamRelations.h"
@@ -75,6 +77,7 @@ private:
 
 	GameMapState* lvl;
 	GameState* gs;
+	LuaValue lua_level_states;
 	std::vector<GameMapState*> level_states;
 };
 

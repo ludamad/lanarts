@@ -1,5 +1,5 @@
 local GameObject = import "core.GameObject"
-local GameMap = import "core.GameMap"
+local GameMap = import "core.Map"
 local ObjectUtils = import ".ObjectUtils"
 
 local M = {} -- Submodule

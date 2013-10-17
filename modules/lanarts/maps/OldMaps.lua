@@ -3,8 +3,8 @@ local Display = import "core.Display"
 local item_utils = import ".ItemUtils"
 local dungeons = import ".Dungeons"
 local map_utils = import ".MapUtils"
-local MapGen = import "core.MapGeneration"
-local World = import "core.GameWorld"
+local MapGen = import "core.SourceMap"
+local World = import "core.World"
 
 local M = nilprotect {} -- Submodule
 

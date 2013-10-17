@@ -35,6 +35,12 @@ M.stat_mod_functions = {
         local context = StatContext.stat_context_create(stats)
         StatContext.add_defensive_aptitudes(context, Apts.WATER, -3, --[[Permanent]] true)
     end,
+    UNDEAD = function(stats)
+        local context = StatContext.stat_context_create(stats)
+        StatContext.add_defensive_aptitudes(context, Apts.POISON, 20, --[[Permanent]] true)
+        StatContext.add_all_aptitudes(context, Apts.DARK, 2, --[[Permanent]] true)
+        StatContext.add_all_aptitudes(context, Apts.LIGHT, -2, --[[Permanent]] true)
+    end,
     HUMANOID = do_nothing,
 }
 
@@ -57,7 +63,7 @@ function M.monster_define(t)
     local context = StatContext.stat_context_create(stats)
 
     t.team = t.team or Relations.TEAM_MONSTER_ROOT
-    t.sprite = t.sprite or ContentUtils.derive_sprite(t.name)
+    t.sprite = ContentUtils.resolve_sprite(t, --[[Absolute paths]] false, --[[Assume animation]] true)
     t.traits = t.traits or {}
     if t.damage then
         t.aptitude_types = t.aptitude_types or {Apts.MELEE}

@@ -35,6 +35,8 @@ include_directories(
 	"${SRC}/sound-lib/include"
 	${DEPS}/UnitTest++ 
 	"${DEPS}/yaml-cpp/include"
+	"${DEPS}/physfs/src"
+	"${DEPS}/physfs/extras"
 	${lua_includes} 
 	${DEPS} # for rvo2 & luasocket
 	)
@@ -88,7 +90,7 @@ file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
     lanarts_defines.cpp
 
-	main.cpp
+    main.cpp
 )
 
 file(GLOB lanarts_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
@@ -108,6 +110,7 @@ set (libraries
 	lanarts_net
 	yaml-cpp
 	RVO
+        physfs-static
     libxmi
 	${SDLIMAGE_LIBRARY}
 	${OPENGL_gl_LIBRARY}

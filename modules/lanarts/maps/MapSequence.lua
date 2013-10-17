@@ -1,7 +1,7 @@
 --- Represents a linear group of maps, such as a deepening dungeon
 
 local PortalSet = import ".PortalSet"
-local GameMap = import "core.GameMap"
+local GameMap = import "core.Map"
 local MapSequence = newtype()
 
 function MapSequence:init(--[[Optional]] args)

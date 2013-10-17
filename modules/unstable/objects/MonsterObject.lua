@@ -4,7 +4,7 @@ local Animations = import "lanarts.objects.Animations"
 local Attacks = import "@Attacks"
 local CombatObject = import ".CombatObject"
 local MonsterType = import "@MonsterType"
-local GameMap = import "core.GameMap"
+local GameMap = import "core.Map"
 local PlayerObject = import ".PlayerObject"
 local ExperienceCalculation = import "@stats.ExperienceCalculation"
 local LogUtils = import "lanarts.LogUtils"
@@ -36,12 +36,6 @@ function MonsterObject:on_death(attacker_obj)
 
     if self.on_die then self:on_die() end
     GameObject.destroy(self)
-end
-
-function MonsterObject:on_draw()
-    local hostile = ObjectUtils.find_closest_hostile(self)
-    local check = GameMap.line_tile_check(self.map, self.xy, hostile.xy)
-    ObjectUtils.screen_draw(self.sprite, self.xy)
 end
 
 function MonsterObject.create(args)

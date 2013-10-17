@@ -1,5 +1,5 @@
 local EventLog = import "core.ui.EventLog"
-local Map = import "core.GameMap"
+local Map = import "core.Map"
 
 function poison_statmod(effect, obj, old, new)
 	new.defence = math.max(0, new.defence - 3)

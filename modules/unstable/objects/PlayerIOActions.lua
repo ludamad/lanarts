@@ -1,4 +1,4 @@
-local GameMap = import "core.GameMap"
+local GameMap = import "core.Map"
 local Actions = import "@Actions"
 local SUtils = import "@serialization.SerializationUtils"
 

@@ -19,6 +19,9 @@ struct GLImage {
 	GLImage() {
 		texture = 0;
 	}
+	GLImage(SDL_RWops* rw_ops) {
+
+	}
 	GLImage(const std::string& filename) {
 		texture = 0;
 		initialize(filename);

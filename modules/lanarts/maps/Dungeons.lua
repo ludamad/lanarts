@@ -1,4 +1,4 @@
-local MapGen = import "core.MapGeneration"
+local MapGen = import "core.SourceMap"
 local GameObject = import "core.GameObject"
 
 local TileSets = import "@tiles.Tilesets"

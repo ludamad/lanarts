@@ -25,7 +25,7 @@ function M.main(cmd_args)
     local SM = SimulationMap.create(map, gmap)
     local race, class = Simulation.choose_player_stats(cmd_args)
     local player = SM:add_player("Tester", race, class)
-    local monster = SM:add_monster("Giant Rat")
+    for i=1,15 do SM:add_monster("Gnome Skeleton") end
 
     Display.view_snap(player.xy)
     while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
@@ -34,7 +34,7 @@ function M.main(cmd_args)
         Display.draw_start()
         SM:draw()
         Display.draw_finish()
-        GameState.wait(5)
+        GameState.wait(10)
     end
 end
 

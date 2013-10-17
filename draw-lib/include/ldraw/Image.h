@@ -20,6 +20,7 @@
 
 struct GLImage;
 struct lua_State;
+struct SDL_RWops;
 
 #include <cstdio>
 
@@ -30,7 +31,8 @@ public:
 	using DrawableBase::draw;
 
 	Image();
-
+	Image(SDL_RWops* memreader, const BBoxF& draw_region = BBoxF(),
+			bool rotates = false);
 	Image(const std::string& filename, const BBoxF& draw_region = BBoxF(),
 			bool rotates = false) {
 		initialize(filename, draw_region, rotates);

@@ -1,6 +1,6 @@
-local GameMap = import "core.GameMap"
+local GameMap = import "core.Map"
 local GameObject = import "core.GameObject"
-local MapGen = import "core.MapGeneration"
+local MapGen = import "core.SourceMap"
 local Display = import "core.Display"
 
 local function gmap_create(size, --[[Optional]] solid_tiles)

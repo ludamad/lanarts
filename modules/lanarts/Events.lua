@@ -4,7 +4,7 @@ local DeathScreen = import "@menus.DeathScreen"
 local PlayerFunctions = import "@Players"
 local Relations = import "@objects.Relations"
 local Network = import "core.Network"
-local World = import "core.GameWorld"
+local World = import "core.World"
 
 local M = {} -- Submodule
 

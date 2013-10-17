@@ -4,7 +4,7 @@ local InstanceGroup = import "core.ui.InstanceGroup"
 local InstanceBox = import "core.ui.InstanceBox"
 local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
-local World = import "core.GameWorld"
+local World = import "core.World"
 
 local text_button_params = {
     font = font_cached_load(settings.menu_font, 20),

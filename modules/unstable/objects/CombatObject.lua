@@ -1,6 +1,6 @@
 -- Represents an object that takes actions and 
 
-local GameMap = import "core.GameMap"
+local GameMap = import "core.Map"
 local StatContext = import "@StatContext"
 local ExperienceCalculation = import "@stats.ExperienceCalculation"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
@@ -24,6 +24,7 @@ function CombatObject.create(args)
     args.type = args.type or CombatObject
     args.derived_stats = table.deep_clone(args.base_stats)
 
+    args.frame = 0
     args.traits = args.traits or {}
     table.insert(args.traits, CombatObject.COMBAT_TRAIT)
 
@@ -77,6 +78,7 @@ end
 function CombatObject:on_step()
     StatUtils.stat_context_on_step(self._context)
     self._stats_need_calculate = true
+    self.frame = self.frame + 0.1
 
     self:use_resolved_action()
 end
@@ -90,7 +92,7 @@ function CombatObject:on_draw()
     if GameMap.object_visible(self) then 
         local options = {
             sprite = self.sprite, xy = self.xy, direction = self.direction or 0,
-            alpha = self.alpha or 1, frame = self.frame or 0, color = self.color or COL_WHITE
+            alpha = self.alpha or 1, frame = self.frame, color = self.color or COL_WHITE
         }
         StatContext.on_draw(self:stat_context(), drawf, options)
     end

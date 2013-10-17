@@ -1,4 +1,4 @@
-local GameMap = import "core.GameMap"
+local GameMap = import "core.Map"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local PathUtils = import ".PathUtils"
 

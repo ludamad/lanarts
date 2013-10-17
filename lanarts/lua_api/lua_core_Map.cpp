@@ -27,6 +27,11 @@
 
 #include "lua_api/lua_api.h"
 
+/*static int gmap_base_metatable(LuaStackValue args) {
+	using namespace luawrap;
+	using namespace ldungeon_gen;
+
+}*/
 static int gmap_create(LuaStackValue args) {
 	using namespace luawrap;
 	using namespace ldungeon_gen;
@@ -91,6 +96,12 @@ static int gmap_objects(lua_State* L) {
 	lua_call(L, 1, 1);
 	return 1;
 }
+//
+//static GameMapState* mapstate(LuaStackValue current_map) {
+//	current_map.push();
+//	lua_getfield(L, -1, "_id");
+//
+//}
 
 static bool gmap_tile_is_solid(LuaStackValue current_map, Pos xy) {
 	GameState* gs = lua_api::gamestate(current_map);
@@ -340,9 +351,13 @@ static void gmap_map_draw(LuaStackValue table) {
 	gs->game_world().get_level(map_id)->draw(gs, reveal_all);
 }
 
+static int gmap_maptype(lua_State* L) {
+	luawrap::globals(L);
+}
+
 namespace lua_api {
 	void register_lua_core_GameMap(lua_State* L) {
-		LuaValue gmap = register_lua_submodule(L, "core.GameMap");
+		LuaValue gmap = register_lua_submodule(L, "core.Map");
 		gmap["create"].bind_function(gmap_create);
 		gmap["transfer"].bind_function(gmap_transfer);
 		gmap["TILE_SIZE"] = TILE_SIZE;
