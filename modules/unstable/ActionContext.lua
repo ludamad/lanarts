@@ -1,12 +1,15 @@
 -- Convenient framework for dealing with actions with respect to the context they were used in.
 
+local StatContext = import "@StatContext"
 local Actions = import ".Actions"
+local ItemTraits = import "@items.ItemTraits"
 
 local M = nilprotect {} -- Submodule
 
 M.DIRECT_ACTION = "DIRECT_ACTION"
 M.PROJECTILE_ACTION = "PROJECTILE_ACTION"
 
+-- Create an empty action context
 function M.action_context_create(action, --[[Optional]] user, --[[Optional]] source, --[[Optional]] type)
     return { 
         base = action, derived = table.deep_clone(action), 
@@ -16,9 +19,12 @@ function M.action_context_create(action, --[[Optional]] user, --[[Optional]] sou
     }
 end
 
-function M.on_action(user, action_context, target)
-    user.derived.inventory:perform("on_action", user, action_context, target)
-    user.derived.hooks:perform("on_action", user, action_context, target)
+function M.action_context_copy_base_to_derived(action_context)
+    Actions.copy_action(action_context.base, action_context.derived)
+end
+
+function M.on_action(action_context, target)
+    StatContext.on_event("on_action", action_context.user, action_context, target)
 end
 
 function M.can_use_action(action_context, target)
@@ -26,7 +32,34 @@ function M.can_use_action(action_context, target)
 end
 
 function M.use_action(action_context, target, --[[Optional]] ignore_death)
-    return Actions.use_action(action_context.user, action_context.derived, target, action_context.source, ignore_death)
+    local res = Actions.use_action(action_context.user, action_context.derived, target, action_context.source, ignore_death)
+    if Actions.is_target_stat_context(target) then
+        StatContext.on_event("on_hostile_action", target, action_context)
+    end
+    return res
+end
+
+function M.spell_context(action_context, spell)
+    local weapon = weapon or StatContext.get_equipped_item(user, ItemTraits.WEAPON)
+    local action, source = self.unarmed_action, self.race or self -- Default
+    if weapon then
+        local modifier = StatContext.calculate_proficiency_modifier(self._context, weapon)
+        source = weapon
+        action = ProficiencyPenalties.apply_attack_modifier(weapon.action_wield, modifier)
+    end
+    return ActionContext.action_context_create(action, self:stat_context(), source)
+end
+
+function M.weapon_context(user, --[[Optional]] weapon)
+    local obj = user.obj
+    weapon = weapon or StatContext.get_equipped_item(user, ItemTraits.WEAPON)
+    if not weapon then return obj:unarmed_action_context() end
+    if weapon then
+        local modifier = StatContext.calculate_proficiency_modifier(self._context, weapon)
+        source = weapon
+        action = ProficiencyPenalties.apply_attack_modifier(weapon.action_wield, modifier)
+    end
+    return ActionContext.action_context_create(action, self:stat_context(), source)
 end
 
 -- Lookup all effects of a certain type.

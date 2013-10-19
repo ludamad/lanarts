@@ -101,8 +101,13 @@ function M.on_calculate(context)
     context.derived.hooks:on_calculate(context)
 end
 
+function M.on_event(event, context, ...)
+    context.derived.inventory:on_event(event, context, ...)
+    context.derived.hooks:on_event(event, context, ...)
+end
+
 function M.on_death(context, attacker)
-    context.derived.hooks:perform("on_death", context, attacker)
+    context.derived.hooks:on_event("on_death", context, attacker)
     context.obj:on_death(attacker.obj)
 end
 
@@ -229,11 +234,12 @@ end
 
 --- Change all aptitude of a certain type, defaults to temporary. 
 function M.add_all_aptitudes(context, type, amounts, --[[Optional, default false]] permanent)
+    local eff,dam,res,def
     if _G.type(amounts) == "number" then
-        -- Resolve if number
-        amounts = {dup(amounts,4)}
+        eff,dam,res,def = amounts,amounts,amounts,amounts
+    else
+        eff,dam,res,def = amounts[1],amounts[2],amounts[3],amounts[4]
     end
-    local eff,dam,res,def = unpack(amounts)
     M.add_effectiveness(context, type, eff or 0, permanent)
     M.add_damage(context, type, dam or 0, permanent)
     M.add_resistance(context, type, res or 0, permanent)

@@ -1,6 +1,8 @@
 -- Actions consist of a 'target_type', 'prerequisites' list, and 'effects' list.
 -- They are the main building blocks of spells, items, etc
 
+local assert, table, type, ipairs, getmetatable = assert, table, type, ipairs, getmetatable -- Cache for small performance boost
+
 local StatContext = import "@StatContext"
 
 local M = nilprotect {} -- Submodule
@@ -19,6 +21,14 @@ M.TARGET_TYPES = {
 -- Expose target types:
 for v in values(M.TARGET_TYPES) do
     M[v] = v
+end
+
+function M.is_target_position(target)
+    return not getmetatable(target) and (#target == 2)
+end
+
+function M.is_target_stat_context(target)
+    return getmetatable(target) and target.obj
 end
 
 function M.can_use_action(user, action, target, --[[Optional]] action_source)
@@ -47,11 +57,19 @@ function M.use_action(user, action, target, --[[Optional]] action_source, --[[Op
 
     if not ignore_death and type(target) == "table" and target.obj then
         if target.base.hp <= 0 then
-           StatContext.on_death(target, user)
+            StatContext.on_death(target, user)
         end
     end
 
     return ret
+end
+
+function M.copy_action(action, copy)
+    copy.on_prerequisite, copy.on_use = action.on_prerequisite, action.on_use
+    copy.effects = copy.effects or {}
+    copy.prerequisites = copy.prerequisites or {} 
+    table.deep_array_copy(action.effects, copy.effects)
+    table.deep_array_copy(action.prerequisites, copy.prerequisites)
 end
 
 -- Lookup all effects of a certain type.

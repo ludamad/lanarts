@@ -4,6 +4,8 @@ if not __LUAJIT then
     return
 end
 
+local setmetatable, tostring, rawset = setmetatable, tostring, rawset
+
 function profile(f)
     require("jit.p").start("vF9")
     local ret = {f()}
@@ -17,59 +19,6 @@ function values(table)
         local val = table[idx]
         idx = idx + 1
         return val
-    end
-end
-
-local function metacopy(t1, t2)
-    local meta = getmetatable(t1)
-    if meta then
-        local copy = meta.__copy
-        if copy then
-            copy(t1, t2)
-            return true
-        end
-    end
-    return false
-end
-
-function table.copy(t1, t2, invoke_meta)
-    if invoke_meta == nil then invoke_meta = true end
-    setmetatable(t2, getmetatable(t1))
-    if invoke_meta and metacopy(t1, t2) then
-        return
-    end
-
-    for k,_ in pairs(t2) do
-        t2[k] = nil
-    end
-    for k,v in pairs(t1) do
-        t2[k] = v
-    end
-end
-
-function table.deep_copy(t1, t2, invoke_meta)
-    if invoke_meta == nil then invoke_meta = true end
-    setmetatable(t2, getmetatable(t1))
-    if invoke_meta and metacopy(t1, t2) then
-        return
-    end
-
-    for k,_ in pairs(t2) do
-        if rawget(t1, k) == nil then
-            t2[k] = nil
-        end
-    end
-    for k,v in pairs(t1) do
-        if type(v) == "table" then
-            local old_val = rawget(t2, k)
-            if old_val then
-                table.deep_copy(v, old_val)
-            else
-                t2[k] = table.deep_clone(v)
-            end
-        else
-            t2[k] = v
-        end
     end
 end
 

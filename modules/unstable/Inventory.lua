@@ -103,7 +103,7 @@ function Inventory:on_step(stats)
     end
 end
 
-function Inventory:perform(method_name, ...)
+function Inventory:on_event(method_name, ...)
     for _, item in ipairs(self.items)  do
         if item.equipped then
             local method = item[method_name]

@@ -7,6 +7,8 @@ require_path_add(_ROOT_FOLDER .. '/?.lua')
 
 require("core.Main")
 
+sound_volume = 0 -- Mute the game
+
 local function attach_debugger()
     local DBG_PATH, DBG_MODULE = "/usr/share/lua/5.1/", "debugger"
     local DBG_FILE = DBG_PATH .. DBG_MODULE .. ".lua"
@@ -28,6 +30,7 @@ local function main(args)
     if table.contains(args, "--debug") then attach_debugger() end
     if table.contains(args, "--nofilter") then Errors.filter_patterns = {} end
     if table.contains(args, "--context") then Errors.context = 2 end
+    if table.contains(args, "--sound") then sound_volume = 1.0 end
 
     local all_tests, cpp_tests, lua_tests = (args[1] == "--tests"), (args[1] == "--cpp-tests"), (args[1] == "--lua-tests")
 

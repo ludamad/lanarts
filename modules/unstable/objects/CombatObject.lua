@@ -39,6 +39,7 @@ function CombatObject:on_init()
     -- Internal only property. Provides a stat context of unknown validity.
     self._context = StatContext.stat_context_create(self.base_stats, self.derived_stats, self)
     self._stats_need_calculate = false -- Mark as valid stat context
+    self._unarmed_action_context = ActionContext.action_context_create(self.unarmed_action, self._context, self.race or self)
     self.action_resolver:on_object_init(self)
 end
 
@@ -73,6 +74,11 @@ end
 
 function CombatObject:use_resolved_action()
     self.action_resolver:use_resolved_action(self)
+end
+
+function CombatObject:unarmed_action_context()
+    ActionContext.action_context_copy_base_to_derived(self._unarmed_action_context)
+    return self._unarmed_action_context
 end
 
 function CombatObject:on_step()

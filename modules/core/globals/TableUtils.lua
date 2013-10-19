@@ -1,3 +1,72 @@
+-- Cache for small performance boost
+local type, select, setmetatable, getmetatable, rawget, pairs, ipairs, table = type, select, setmetatable, getmetatable, rawget, pairs, ipairs, table
+
+function table.merge(t1, t2)
+    for k,v in pairs(t2) do t1[k] = v end
+end
+
+local function metacopy(t1, t2)
+    local meta = getmetatable(t1)
+    if meta then
+        local copy = meta.__copy
+        if copy then
+            copy(t1, t2)
+            return true
+        end
+    end
+    return false
+end
+
+-- Copies 'plain-old arrays' deeply.
+function table.deep_array_copy(t1, t2)
+    for i=1,#t1 do 
+        t2[i] = t1[i] end
+    for i=#t2,#t1-1,-1 do -- Reverse for-loop to remove any excess
+        t2[i] = nil
+    end
+end
+
+function table.copy(t1, t2, invoke_meta)
+    if invoke_meta == nil then invoke_meta = true end
+    setmetatable(t2, getmetatable(t1))
+    if invoke_meta and metacopy(t1, t2) then
+        return
+    end
+
+    for k,_ in pairs(t2) do
+        t2[k] = nil
+    end
+    for k,v in pairs(t1) do
+        t2[k] = v
+    end
+end
+
+function table.deep_copy(t1, t2, invoke_meta)
+    if invoke_meta == nil then invoke_meta = true end
+    setmetatable(t2, getmetatable(t1))
+    if invoke_meta and metacopy(t1, t2) then
+        return
+    end
+
+    for k,_ in pairs(t2) do
+        if rawget(t1, k) == nil then
+            t2[k] = nil
+        end
+    end
+    for k,v in pairs(t1) do
+        if type(v) == "table" then
+            local old_val = rawget(t2, k)
+            if old_val then
+                table.deep_copy(v, old_val)
+            else
+                t2[k] = table.deep_clone(v)
+            end
+        else
+            t2[k] = v
+        end
+    end
+end
+
 function table.clone(t)
     local meta = getmetatable(t)
     if meta then
@@ -111,8 +180,8 @@ function table.remove_occurrences(t, val)
 end
 
 function table.insert_all(t1, t2)
-    for v in values(t2) do
-        t1[#t1 + 1] = v
+    for _, v in ipairs(t2) do
+        table.insert(t1, v)
     end
 end
 

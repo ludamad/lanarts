@@ -23,145 +23,6 @@
 
 #include <lcommon/math_util.h>
 
-static int lapi_table_merge(lua_State* L) {
-	lua_pushnil(L);
-
-	while (lua_next(L, 2)) {
-		lua_pushvalue(L, -2); // key
-		lua_pushvalue(L, -2); // value
-		lua_settable(L, 1);
-
-		lua_pop(L, 1);
-		// pop value
-	}
-	lua_pop(L, 1);
-	return 0;
-}
-// Delete different keys
-static int lapi_table_remove_nonexisting(lua_State* L) {
-	lua_pushnil(L);
-	while (lua_next(L, 2)) {
-		lua_pushvalue(L, -2); // key
-		lua_pushvalue(L, -1); // key
-		lua_rawget(L, 1);
-		if (lua_isnil(L, -1)) {
-			// Set entry to nil, not in other table.
-			lua_rawset(L, 2);
-		} else {
-			lua_pop(L, 2);
-		}
-		lua_pop(L, 1); // pop value
-	}
-	lua_pop(L, 1);
-	return 0;
-}
-
-static bool metacopy(lua_State* L, bool use_meta) {
-	// Ensure same meta-table, call __copy metamethod if exists
-	if (lua_getmetatable(L, 1)) {
-		lua_pushvalue(L, -1);
-		lua_setmetatable(L, 2);
-
-		// Call __copy metamethod if not nil, skipping the rest of the copying.
-		lua_getfield(L, -1, "__copy");
-		if (use_meta && !lua_isnil(L, -1)) {
-			lua_pushvalue(L, 1);
-			lua_pushvalue(L, 2);
-			lua_call(L, 2, 0);
-			return true;
-		}
-		lua_pop(L, 2);
-	}
-	return false;
-}
-
-static int lapi_table_copy(lua_State* L) {
-	if (lua_gettop(L) < 2) {
-		luaL_error(L, "table.deep_copy takes 2 arguments, got %d", lua_gettop(L));
-	}
-	for (int i = 1; i <= 2; i++) {
-		if (!lua_istable(L, 1)) {
-			luaL_error(L, "table.deep_copy argument %d not a table", i);
-		}
-	}
-
-	// Copy metatable and check for __copy
-	bool use_meta = (lua_gettop(L) < 3 || lua_toboolean(L, 3));
-	if (metacopy(L, use_meta)) {
-		return 0;
-	}
-
-	lua_pushnil(L);
-
-	while (lua_next(L, 1)) {
-		lua_pushvalue(L, -2); // key
-		lua_pushvalue(L, -2); // value
-		lua_settable(L, 2);
-
-		lua_pop(L, 1);
-		// pop value
-	}
-
-	// Note, calling this directly works only because the arguments are in the same order!
-	lapi_table_remove_nonexisting(L);
-	return 0;
-}
-
-// Works with plain-data tables and not-too-special tables.
-static int lapi_table_deep_copy(lua_State* L) {
-	if (lua_gettop(L) < 2) {
-		luaL_error(L, "table.deep_copy takes 2 arguments, got %d", lua_gettop(L));
-	}
-	for (int i = 1; i <= 2; i++) {
-		if (!lua_istable(L, 1)) {
-			luaL_error(L, "table.deep_copy argument %d not a table", i);
-		}
-	}
-
-	// Copy metatable and check for __copy
-	bool use_meta = (lua_gettop(L) < 3 || lua_toboolean(L, 3));
-	if (metacopy(L, use_meta)) {
-		return 0; // Return, if we have a __copy metamethod
-	}
-
-	// Deep copy over members
-	lua_pushnil(L);
-	while (lua_next(L, 1)) {
-		lua_pushvalue(L, -2); // key
-		LuaStackValue key(L, -1);
-		lua_pushvalue(L, -2); // value
-		LuaStackValue value(L, -1);
-
-		key.push();
-		// Figure out new value
-		if (lua_istable(L, value.index())) {
-			// Recursive deep copy case
-			/* Resolve value to copy to */ {
-				key.push();
-				lua_rawget(L, 2); // push current value
-				// Copy into if table, else make new table
-				if (!lua_istable(L, -1)) {
-					lua_pop(L, 1);
-					lua_newtable(L);
-				}
-			}
-			lua_pushcfunction(L, lapi_table_deep_copy);
-			value.push();
-			lua_pushvalue(L, -3); // Push value to copy to
-			lua_call(L, 2, 0);
-		} else {
-			// Shallow copy case
-			value.push();
-		}
-		lua_rawset(L, 2);
-
-		lua_pop(L, 1); // pop value
-	}
-	// Note, calling this directly works only because the arguments are in the same order!
-	lapi_table_remove_nonexisting(L);
-	return 0;
-}
-
 static int lapi_values_aux(lua_State* L) {
 	long idx = (long) lua_touserdata(L, lua_upvalueindex(2));
 	long len = (long) lua_touserdata(L, lua_upvalueindex(3));
@@ -665,7 +526,6 @@ namespace lua_api {
 		luawrap::ensure_table(luawrap::globals(L)["_INTERNAL_LOADERS"]);
 		globals["values"].bind_function(l_itervalues);
 		globals["_LOADED"] = luawrap::ensure_table(registry["_LOADED"]);
-		globals["direction"].bind_function(compute_direction);
 		globals["newtype"].bind_function(lapi_newtype);
 		globals["toaddress"].bind_function(lapi_toaddress);
 		globals["rand_range"].bind_function(lapi_rand_range);
@@ -680,12 +540,6 @@ namespace lua_api {
 		globals["virtual_path_create_relative"].bind_function(lapi_virtual_path_create_relative);
 		globals["require_path_add"].bind_function(lapi_require_path_add);
 		globals["path_resolve"].bind_function(lapi_path_resolve);
-
-		LuaValue table = luawrap::ensure_table(globals["table"]);
-		table["merge"].bind_function(lapi_table_merge);
-		table["copy"].bind_function(lapi_table_copy);
-		table["deep_copy"].bind_function(lapi_table_deep_copy);
-		table["remove_nonexisting"].bind_function(lapi_table_remove_nonexisting);
 
 		LuaValue string_table = luawrap::ensure_table(globals["string"]);
 		string_table["split"].bind_function(lapi_string_split);

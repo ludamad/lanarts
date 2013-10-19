@@ -58,13 +58,13 @@ function HookSet:values()
     return values(self.hooks)
 end
 
-function HookSet:on_step(...)
+function HookSet:on_step(context)
     self:merge_new_hooks()
     -- Perform the hook step event, filtering finished hooks.
     local new_len, i = 0, 1
     for i=1,#self.hooks do
         local hook = self.hooks[i]
-        if hook.on_step and hook:on_step(...) then
+        if hook.on_step and hook:on_step(context) then
            -- Perform compacting
            self.hooks[new_len] = hook
         else
@@ -77,7 +77,7 @@ function HookSet:on_step(...)
     end
 end
 
-function HookSet:perform(method_name, ...)
+function HookSet:on_event(method_name, ...)
     self:merge_new_hooks()
     for _, hook in ipairs(self.hooks) do
         local method = hook[method_name]
