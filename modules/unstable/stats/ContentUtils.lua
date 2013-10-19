@@ -2,6 +2,7 @@ local Display = import "core.Display"
 
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local Apts = import "@stats.AptitudeTypes"
+local SpriteUtils = import "@sprites.SpriteUtils"
 local SpellsKnown = import "@SpellsKnown"
 local StatContext = import "@StatContext"
 local SpellType = import "@SpellType"
@@ -57,6 +58,14 @@ function M.derive_sprite(name)
     return image_cached_load(path)
 end
 
+local function resolve_directional(subimages, --[[Can be nil]] weights)
+    if weights then
+        return SpriteUtils.weighted_directional_create(subimages, weights, math.pi/2)
+    else
+        return Display.directional_create(subimages, math.pi/2)
+    end
+end
+
 function M.resolve_sprite(args, --[[Optional]] absolute_paths, --[[Optional]] use_animation)
     local sprite
     if type(args) == "string" then
@@ -64,21 +73,38 @@ function M.resolve_sprite(args, --[[Optional]] absolute_paths, --[[Optional]] us
     else
         sprite = args.sprite or M.derive_sprite(args.lookup_key or args.name)
     end
+
     if type(sprite) == "string" then
         if not absolute_paths then
             sprite = M.path_resolve_for_definition(sprite)
         end
+        -- If there is a special pattern, return immediately.
         if sprite:find("%(") or sprite:find("%%") then
+            assert(not args.sprite_size, "Explicit sprite size cannot be set with image pattern!")
             local subimages = Display.images_load(sprite)
             if use_animation then
                 return Display.animation_create(subimages, 1.0)
             else
-                return Display.directional_create(subimages, 1.0)
+                return resolve_directional(subimages, args.sprite_direction_weights)
             end
         else
-            return Display.image_load(sprite)
+            sprite = Display.image_load(sprite)
         end
     end
+
+    -- Finally, check if we are a directional/animation combined image.
+    -- This is indicated by an explicit sprite_size.
+    local ssize = args.sprite_size
+    if ssize then
+        local rows = Display.image_split(sprite, {sprite.size[1], ssize[2]})
+        local directions = {}
+        for row in values(rows) do
+            local anim = Display.animation_create(Display.image_split(row, ssize), 0.25)
+            table.insert(directions, anim)
+        end
+        sprite = resolve_directional(directions, args.sprite_direction_weights)
+    end
+
     return sprite
 end
 

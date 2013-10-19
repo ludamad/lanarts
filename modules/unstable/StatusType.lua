@@ -6,9 +6,11 @@ local HookSet = import "@HookSet"
 local TimeLimitedBase = {
     init = function(self, stats, time_left)
         self.time_left = time_left
+        self.total_duration = time_left
     end,
     on_update = function(self, stats, time_left)
         self.time_left = math.max(self.time_left, time_left)
+        self.total_duration = math.max(self.total_duration, time_left)
     end,
     on_step = function(self, stats)
         self.time_left = self.time_left - 1

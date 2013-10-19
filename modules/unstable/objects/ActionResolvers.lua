@@ -1,6 +1,7 @@
 local Map = import "core.Map"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local PathUtils = import ".PathUtils"
+local ActionContext = import "@ActionContext"
 
 local M = nilprotect {} -- Submodule
 
@@ -9,19 +10,18 @@ M.ActionResolverBase = Base
 
 function Base:init(cgroup)
 	self.cgroup = cgroup -- Collision avoidance group
---    assert(self.resolve_action)
 	self:_reset()
 end
 
 function Base:_reset()
 	self.preferred_velocity = {0, 0}
 	-- Use false as a 'safe' nil-value
-	self.action, self.target, self.source = false, false, false
+	self.action, self.target = false, false
 	self.close_to_wall = false
 end
 
-function Base:_set_action(action, target, source)
-    self.action, self.target, self.source = (action or false), (target or false), (source or false)
+function Base:_set_action(action, target)
+    self.action, self.target = (action or false), (target or false)
 end
 
 -- CollisionAvoidance expects 'radius, speed, xy, preferred_velocity' members.
@@ -51,15 +51,17 @@ end
 
 -- Assumes a cgroup:step() between on_prestep and use_resolved_action 
 function Base:use_resolved_action(obj)
+    -- Do action before moving, invalidates less actions
+    if self.action and ActionContext.can_use_action(self.action, self.target or nil) then
+        ActionContext.use_action(self.action, self.target or nil)
+    end
+
     local close_to_wall = Map.radius_tile_check(obj.map, obj.xy, obj.radius + 10)
     if close_to_wall then
         local new_xy = ObjectUtils.find_free_position(obj, self.preferred_velocity)
         obj.xy = new_xy or obj.xy
     else
         self:_copy_from_colavoid(obj)
-    end
-    if self.action then
-        obj:use_action(self.action, self.target or nil, self.source or nil)
     end
 
 end
@@ -83,12 +85,11 @@ function AI:resolve_action(obj)
     if not hostile then return nil end -- No target
     
     local S,H = obj:stat_context(), hostile:stat_context()
-    local weapon_action, source = obj:weapon_action()
+    local action_context = obj:weapon_action_context()
 
-    if obj:can_use_action(weapon_action, H, source) then
-        self.action = weapon_action
+    if ActionContext.can_use_action(action_context, H) then
+        self.action = action_context
         self.target = H
-        self.source = source 
     end
 
     local dx,dy = unpack(vector_subtract(hostile.xy, obj.xy))
@@ -98,6 +99,8 @@ function AI:resolve_action(obj)
         self.preferred_velocity[1] = math.sign_of(dx) * xspeed
         self.preferred_velocity[2] = math.sign_of(dy) * yspeed
     end
+    -- For drawing purposes:
+    obj.direction = vector_to_direction(self.preferred_velocity)
 end
 
 return M

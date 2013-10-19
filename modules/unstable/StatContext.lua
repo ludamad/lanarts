@@ -30,14 +30,6 @@ function M.add_spell(stats, ...)
     stats.base.spells:add_spell(...)
 end
 
-function M.can_use_spell(stats, ...)
-    return stats.base.spells:can_use_spell(stats, ...)
-end
-
-function M.use_spell(stats, ...)
-    return stats.base.spells:use_spell(stats, ...)
-end
-
 function M.add_item(stats, ...)
     return stats.base.inventory:add_item(...)
 end

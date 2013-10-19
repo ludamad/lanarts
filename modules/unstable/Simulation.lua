@@ -1,6 +1,7 @@
 local StatContext = import "@StatContext"
 local AttackResolution = import "@AttackResolution"
 local Attacks = import "@Attacks"
+local ActionContext = import "@ActionContext"
 local Actions = import "@Actions"
 local Stats = import "@Stats"
 local AnsiCol = import "core.terminal.AnsiColors"
@@ -69,12 +70,13 @@ local function perform_spell(player, monster)
 
     local spell = choice2spell[M.choose_option(unpack(choices))]
     if not spell then return false end
-    local ok, problem = StatContext.can_use_spell(player, spell, monster.obj.xy)
-    if not ok then 
+    local action = player.obj:spell_action_context(spell)
+    local ok, problem = ActionContext.can_use_action(action, monster.obj.xy)
+    if not ok then
         print(problem)
         return false
     end    
-    StatContext.use_spell(player, spell, monster.obj.xy)
+    ActionContext.use_action(action, monster.obj.xy)
     return true
 end
 
@@ -240,18 +242,18 @@ local function query_player(player)
     if not monster_obj then return false end
     if not Map.object_visible(monster_obj) then return false end
     local monster = monster_obj:stat_context()
-    local weapon_action, source = player.obj:weapon_action()
+    local weapon_action = player.obj:weapon_action_context()
     if not can_continue(player) then return false end
     local moved = false
     while not moved do
         AnsiCol.println("Frame: " .. frame, AnsiCol.YELLOW, AnsiCol.BOLD)
         print(StatUtils.stats_to_string(player.derived, --[[Color]] true, --[[New lines]] true, player.base.name .. ", the Adventurer"))
-        print(StatUtils.attack_to_string(ActionUtils.find_attack(weapon_action, true), --[[Color]] true))    
+        print(StatUtils.attack_to_string(ActionUtils.find_attack(weapon_action.derived, true), --[[Color]] true))    
         local action = M.choose_option("Attack", "Spell", "Item", "Wait")
         if action == "Attack" then
-            local ok, problem = player.obj:can_use_action(weapon_action, monster, source) 
+            local ok, problem = ActionContext.can_use_action(weapon_action, monster) 
             if ok then
-                player.obj:use_action(weapon_action, monster, source) 
+                ActionContext.use_action(weapon_action, monster) 
                 moved = true
             else
                 print(problem)

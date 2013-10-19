@@ -67,6 +67,10 @@ function vector_magnitude(v)
     return math.sqrt(sum)
 end
 
+function vector_to_direction(v)
+    return math.atan2(v[2], v[1])
+end
+
 function vector_normalize(v, --[[Optional]] magnitude)
     magnitude = magnitude or 1
     return vector_scale(v, magnitude/vector_magnitude(v))

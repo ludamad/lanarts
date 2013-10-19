@@ -44,7 +44,7 @@ end
 -- A component that starts by displaying a loading animation until 'replace' is called
 local function loading_box_create(size)
     local obj = InstanceBox.create( {size=size} )
-    local loading_animation = animation_create( image_split(image_cached_load "modules/lanarts/menus/loading_64x64.png", {64, 64}), 0.1 )
+    local loading_animation = Display.animation_create( Display.image_split(image_cached_load "modules/lanarts/menus/loading_64x64.png", {64, 64}), 0.1 )
     local contents = Sprite.create(loading_animation, {color=with_alpha(COL_WHITE, 0.25)} )
     obj:add_instance(contents, Display.CENTER_TOP, {0,50})
     -- Called when component has loaded

@@ -3,8 +3,7 @@ local Attacks = import "@Attacks"
 local Display = import "core.Display"
 local Relations = import "lanarts.objects.Relations"
 local Map = import "core.Map"
-local PlayerIOActions = import ".PlayerIOActions"
-local PlayerIOResolution = import ".PlayerIOResolution"
+local PlayerActionResolver = import ".PlayerActionResolver"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local SkillType = import "@SkillType"
 local RaceType = import "@RaceType"
@@ -72,25 +71,11 @@ function PlayerObject:on_predraw()
     end
 end
 
-function PlayerObject:on_step()
---    self.base.on_step(self)
-    StatContext.on_step(self._context) -- TEMP
-    self._stats_need_calculate = true -- TEMP2
-
-    table.clear(self.queued_io_actions)
-    self:io_action_handler(self.queued_io_actions)
-    for io_action in values(self.queued_io_actions) do
-        PlayerIOActions.use_io_action(self, unpack(io_action))
-    end
-end
-
 function PlayerObject.create(args)
     args.sprite = resolve_sprite(args.race)
-    args.action_resolver = ActionResolvers.ActionResolverBase.create(args.collision_group)
-    args.queued_io_actions = {}
+    args.action_resolver = PlayerActionResolver.create(args.collision_group)
     args.preferences = player_preferences(args.preferences or {})
-    args.io_action_handler = args.io_action_handler or PlayerIOResolution.default_io_action_resolver
-    assert(args.race and args.class and args.name and args.io_action_handler)
+    assert(args.race and args.class and args.name)
     args.team = args.team or Relations.TEAM_PLAYER_DEFAULT
     -- Set up type signature
     args.type = args.type or PlayerObject

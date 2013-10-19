@@ -2,8 +2,10 @@
 -- various functions needed.
 
 _ROOT_FOLDER = "modules"
+-- For bootstrapping purposes. We normally only use 'import'.
+require_path_add(_ROOT_FOLDER .. '/?.lua')
 
-dofile(_ROOT_FOLDER .. "/core/Main.lua")
+require("core.Main")
 
 local function attach_debugger()
     local DBG_PATH, DBG_MODULE = "/usr/share/lua/5.1/", "debugger"
@@ -21,12 +23,11 @@ end
 -- @return whether we are performing a full game initialization, or performing some testing task
 local function main(args)
     local Display = import "core.Display"
+    local Errors = import "core.globals.Errors"
 
-    import "core.Main"
-
-    if table.contains(args, "--debug") then
-        attach_debugger()
-    end
+    if table.contains(args, "--debug") then attach_debugger() end
+    if table.contains(args, "--nofilter") then Errors.filter_patterns = {} end
+    if table.contains(args, "--context") then Errors.context = 2 end
 
     local all_tests, cpp_tests, lua_tests = (args[1] == "--tests"), (args[1] == "--cpp-tests"), (args[1] == "--lua-tests")
 

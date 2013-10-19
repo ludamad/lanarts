@@ -60,7 +60,7 @@ end
 
 function LinearBase.create(args)
     assert(args.velocity and args.radius)
-    args.direction = math.atan2(args.velocity[2], args.velocity[1]) + math.pi/4
+    args.direction = vector_to_direction(args.velocity)
     args.range_left = args.range_left or 250
     return LinearBase.base_create(args)
 end

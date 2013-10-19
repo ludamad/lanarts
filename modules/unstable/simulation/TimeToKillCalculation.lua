@@ -35,6 +35,15 @@ local function action_remove_distance_prereq(A)
     Actions.reset_prerequisite(A, StatPrereqs.DistancePrereq)
 end
 
+local function action_remove_sound(A)
+    local custom_effects = Actions.get_all_effects(A, ActionUtils.CustomEffect)
+    for custom_effect in values(custom_effects) do
+        if rawget(custom_effect, "sound") then -- TODO: Ad hoc check for sounds, for now.
+            table.remove_occurrences(A.effects, custom_effect)
+        end
+    end
+end
+
 local function action_collapse_nested(A, effect_type)
     local effect = Actions.reset_effect(A, effect_type) -- Grab and remove
     if effect then
@@ -47,6 +56,7 @@ local function mock_action(A)
     action_collapse_nested(copy, ProjectileEffect)
     action_collapse_nested(copy, RangedWeaponActions.AmmoFireEffect)
     action_remove_distance_prereq(copy)
+    action_remove_sound(copy)
     return copy
 end
 

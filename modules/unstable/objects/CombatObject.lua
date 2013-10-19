@@ -98,41 +98,59 @@ function CombatObject:on_draw()
     end
 end
 
-function CombatObject:weapon_action()
-    local weapon = StatContext.get_equipped_item(self._context, ItemTraits.WEAPON)
+function CombatObject:weapon_action_context(--[[Optional]] weapon)
+    local weapon = weapon or StatContext.get_equipped_item(self._context, ItemTraits.WEAPON)
+    local action, source = self.unarmed_action, self.race or self -- Default
     if weapon then
         local modifier = StatContext.calculate_proficiency_modifier(self._context, weapon)
-        return ProficiencyPenalties.apply_attack_modifier(weapon.action_wield, modifier), weapon
+        source = weapon
+        action = ProficiencyPenalties.apply_attack_modifier(weapon.action_wield, modifier)
     end
-    return self.unarmed_action, self.race or self -- Default
-end
-
-function CombatObject:weapon_action_context()
-    local action, source = self:weapon_action()
     return ActionContext.action_context_create(action, self:stat_context(), source)
 end
- 
+
+function CombatObject:spell_action_context(spell)
+    return ActionContext.action_context_create(spell.action_use, self:stat_context(), spell)
+end
+
+function CombatObject:speed()
+    return self:stat_context().derived.movement_speed
+end
+
 function CombatObject.is_combat_object(obj)
     return table.contains(obj.traits, CombatObject.COMBAT_TRAIT)
 end
 
-function CombatObject:use_action(action, target, source)
-    assert(self:can_use_action(action, target, source))
-    assert(target)
-    assert(source)
-    Actions.use_action(self:stat_context(), action, target, source)
-end
+local status_type_define = (import "@stats.StatusTypeUtils").status_type_define
+-- EXHAUSTION
+local Hurt = status_type_define {
+    name = "Hurt",
+    time_limited = true,
+    hurt_alpha_value = function()
+        local t_left, t_durr = self.time_left, self.total_duration
+        if t_left < t_durr /2 then
+            return t_left / t_durr / 2 * 0.7 + 0.3
+        else
+            return (t_durr - t_left) / 10 * 0.7 + 0.3
+        end
+    end,
+    on_draw = function(self, stats, drawf, options, ...)
+        local r,g,b,a = unpack(options.color or COL_WHITE)
+        local s = 1 - self:hurt_alpha_value()
+        options.color = {r, g * s, b * s, a}
+        StatContext.on_draw_call_collapse(stats, drawf, options, ...)
+    end,
+    init = function(self, stats, ...)
+        self.base.init(self, stats, ...)
+    end
+}
 
-function CombatObject:can_use_action(action, target, source)
-    assert(target)
-    assert(source)
-    return Actions.can_use_action(self:stat_context(), action, target, source)
-end
-
-function CombatObject:on_hostile_action(enemy, action, source)
+local HURT_COOLDOWN_DURATION = 30
+function CombatObject:on_hostile_action(action_context)
+    local action = action_context.derived
     local atk = Actions.get_effect(action, Attacks.AttackEffect)
     if atk then
-        
+        StatContext.update_status(self:stat_context(), Hurt, HURT_COOLDOWN_DURATION)
     end
 end
 

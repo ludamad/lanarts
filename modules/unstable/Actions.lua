@@ -34,7 +34,6 @@ function M.can_use_action(user, action, target, --[[Optional]] action_source)
 end
 
 function M.use_action(user, action, target, --[[Optional]] action_source, --[[Optional]] ignore_death)
-    assert(M.can_use_action(user, action, target, action_source))
     local ret
     if action.on_use then
         local res = action.on_use(action_source, user, target)

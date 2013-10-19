@@ -25,14 +25,4 @@ function SpellsKnown:values()
     return values(self.spells)
 end
 
--- Returns message on failure
-function SpellsKnown:can_use_spell(stats, spell_slot, target)
-    return Actions.can_use_action(stats, spell_slot.action_use, target, spell_slot)
-end
-
-function SpellsKnown:use_spell(stats, spell_slot, target)
-    assert(self:can_use_spell(stats, spell_slot, target))
-    Actions.use_action(stats, spell_slot.action_use, target, spell_slot)
-end
-
 return SpellsKnown

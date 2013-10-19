@@ -4,7 +4,10 @@ local monster_define = Mons.monster_define
 
 monster_define {
     name = "Gnome Skeleton",
-    sprite = "sprites/gnome_skeleton.png%32x32",
+
+    sprite_size = {24, 24},
+    sprite_direction_weights = {80, 100, 80, 100}, -- Make side directions span larger angle
+
     monster_kind = Mons.UNDEAD,
     description = ".",
 

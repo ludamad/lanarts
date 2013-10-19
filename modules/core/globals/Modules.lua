@@ -5,10 +5,12 @@
 -- Name caches
 local mname_table = {}
 
-function virtual_path(idx, --[[Optional]] drop_filename)
-    idx = (idx or 1) + 1
-    local src = debug.getinfo(idx, "S").source
+function real_path_to_virtual(src,  --[[Optional]] drop_filename)
     return virtual_path_create_relative(src, _ROOT_FOLDER, drop_filename)
+end
+
+function virtual_path(idx, --[[Optional]] drop_filename)
+    return real_path_to_virtual(debug.getinfo((idx or 1) + 1, "S").source, drop_filename)
 end
 
 function virtual_path_to_real(vpath)
@@ -31,22 +33,39 @@ end
 
 local function import_file(vpath)
     local rpath = virtual_path_to_real(vpath) .. '.lua'
-    local loaded, err = loadfile(rpath)
-    if loaded then
-        local entries = { loaded(vpath) }
+    -- Note, '__loadfile' appears in debug traces and thus the name choice should be clear
+    local _load, err = loadfile(rpath)
+    if _load then
+        local entries = { _load(vpath) }
         return entries
     else
-        error("Error while importing " .. rpath .. ":\n\t" .. err)
-        return nil
+        if err:find("No such file or directory") then
+            error("No such module " .. vpath .. " (file " .. rpath .. " does not exist)")
+        else
+            error(err)
+        end
     end
 end
 
 _import_resolvers = { import_file, --[[Engine defined]] import_internal }
 
 _ILLEGAL_RECURSION_SENTINEL = {} 
--- Begin with the root main module loaded
-_IMPORTED = { main={} }
-function import(vpath, --[[Optional]] mname)
+-- Protect against double-loading the main booting path.
+_IMPORTED = {
+    ["Main"]={}, ["core.Main"]={}, ["core.globals.Modules"]={} 
+}
+
+local default_import_args = {
+    -- Override implicit module name
+    module_name = nil,
+    -- Only check if already loaded
+    cache_check_only = false
+}
+
+function import(vpath, --[[Optional]] args)
+    args = args or default_import_args
+    local mname, cache_check_only = args.module_name, args.cache_check_only
+ 
     local first_chr = vpath:sub(1,1)
     local vpath_rest = vpath:sub(2, #vpath)
     if first_chr == '@' then
@@ -60,9 +79,11 @@ function import(vpath, --[[Optional]] mname)
 
     local module = _IMPORTED[vpath] or _LOADED[vpath]
     if module == _ILLEGAL_RECURSION_SENTINEL then
-        error("import detected import recursion from '" .. vpath .. "' being loaded from '" .. (mname or '') .. "'")
+        error("'import' detected import recursion from '" .. vpath .. "' being loaded from '" .. (mname or '') .. "'")
     elseif module then 
         return unpack(module)
+    elseif cache_check_only then
+        return nil
     end
 
     -- Protect against import circles
@@ -81,6 +102,9 @@ function import(vpath, --[[Optional]] mname)
     error("import was not able to find a loader for '" .. vpath .. "', loaded from '" .. mname .. "'")
 end
 
+local weak_args = {cache_check_only = true}
+function import_weak(vpath) return import(vpath, weak_args) end
+
 -- Utility for finding submodules of a given vpath
 function find_submodules(vpath, --[[Optional]] recursive, --[[Optional]] pattern)
     local ret, root = {}, virtual_path_to_real(vpath) 
@@ -98,3 +122,5 @@ function import_all(subpackage, --[[Optional]] pattern, --[[Optional]] recursive
         end
     end
 end
+
+Errors = import ".Errors"
