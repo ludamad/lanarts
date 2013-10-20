@@ -110,7 +110,7 @@ set (libraries
 	lanarts_net
 	yaml-cpp
 	RVO
-        physfs-static
+        #physfs-static
     libxmi
 	${SDLIMAGE_LIBRARY}
 	${OPENGL_gl_LIBRARY}

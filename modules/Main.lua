@@ -1,6 +1,6 @@
 -- Entry point to lanarts. Ensures correct initialization order of the 
 -- various functions needed.
-
+print("HELLO")
 _ROOT_FOLDER = "modules"
 -- For bootstrapping purposes. We normally only use 'import'.
 require_path_add(_ROOT_FOLDER .. '/?.lua')

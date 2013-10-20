@@ -78,12 +78,19 @@ local io_events = {
     {
         triggers = {'H'}, callback = resolve_action,
         action = function(obj) return obj:weapon_action_context() end
-    }, 
+    },
     {triggers = {'w', Keys.UP}, callback = resolve_movement, dy = -1},
     {triggers = {'s', Keys.DOWN}, callback = resolve_movement, dy = 1},
     {triggers = {'a', Keys.LEFT}, callback = resolve_movement, dx = -1},
     {triggers = {'d', Keys.RIGHT}, callback = resolve_movement, dx = 1}
 }
+
+for i,key in ipairs {'y', 'u', 'i', 'o', 'p'} do
+    table.insert(io_events, {
+        triggers = {key}, callback = resolve_action,
+        action = function(obj) return obj:spell_action_context(obj, obj.base_stats.spells.spells[i]) end
+    })
+end
 
 local function trigger_matches(io_event)
     for _, trigger in ipairs(io_event.triggers) do

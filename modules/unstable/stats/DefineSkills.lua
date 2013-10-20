@@ -79,9 +79,9 @@ local function skill_define(args)
     local keys = table.key_list(args.aptitudes)
     if #keys == 1 then 
         local k = keys[1]
-        args.on_calculate = args.default_on_calculate or specialized_on_calculate(k, args.aptitudes[k])
+        args.on_calculate = args.on_calculate or specialized_on_calculate(k, args.aptitudes[k])
     else
-        args.on_calculate = args.on_calculate or on_calculate
+        args.on_calculate = args.on_calculate or default_on_calculate
     end
     args.on_spend_skill_points = args.on_spend_skill_points or on_spend_skill_points
     args.on_create = args.on_create or on_create

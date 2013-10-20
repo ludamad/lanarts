@@ -5,7 +5,6 @@ include_directories(".")
 
 set( libxmi_src
     config.h
-    drawing.c
     extern.h
     mi_alloc.c
     mi_api.c
