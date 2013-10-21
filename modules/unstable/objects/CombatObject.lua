@@ -39,6 +39,7 @@ function CombatObject:on_init()
     -- Internal only property. Provides a stat context of unknown validity.
     self._context = StatContext.stat_context_create(self.base_stats, self.derived_stats, self)
     self._stats_need_calculate = false -- Mark as valid stat context
+    self._stats_need_on_step = false
     self._unarmed_action_context = ActionContext.action_context_create(self.unarmed_action, self._context, self.race or self)
     self.action_resolver:on_object_init(self)
 end
@@ -54,6 +55,10 @@ end
 -- Only way to get a StatContext.
 -- This provides some guarantee of correctness.
 function CombatObject:stat_context()
+    if self._stats_need_on_step then
+        StatContext.on_calculate(self._context)
+        self._stats_need_on_step = false
+    end
     if self._stats_need_calculate then
         StatContext.on_calculate(self._context)
         self._stats_need_calculate = false
@@ -82,11 +87,18 @@ function CombatObject:unarmed_action_context()
 end
 
 function CombatObject:on_step()
-    StatUtils.stat_context_on_step(self._context)
+    perf.timing_begin("CombatObject.on_step")
+    if not self.deactivated then
+        StatUtils.stat_context_on_step(self._context)
+    end
+    self._stats_need_onstep = (not self.deactivated)
     self._stats_need_calculate = true
-    self.frame = self.frame + 0.1
-
+    local xprev, yprev = self.x,self.y
     self:use_resolved_action()
+    if self.x ~= xprev or self.y ~= yprev then
+        self.frame = self.frame + 1
+    end
+    perf.timing_end("CombatObject.on_step")
 end
 
 -- Paramater for on_draw

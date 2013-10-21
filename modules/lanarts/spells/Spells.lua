@@ -141,12 +141,12 @@ local PowerStrike = {
 local function ChargeCallback(effect, caster)
     local num = 0
     for mon in Map.monsters() do
-        if distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 35 then
+        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 35 then
             num = num + 1
             caster:melee(mon)
             local chance = math.max(25, 100 - num * 20)
             if rand_range(0, 100) < chance then -- decreasing chance of knockback
-                mon:add_effect("Thrown", 45 + 2 * caster.stats.level).angle = direction({caster.x, caster.y}, {mon.x, mon.y})
+                mon:add_effect("Thrown", 45 + 2 * caster.stats.level).angle = vector_direction({caster.x, caster.y}, {mon.x, mon.y})
                 if caster:is_local_player() then
                     EventLog.add("The " .. mon.name .." is thrown back!", {200,200,255})
                 end
@@ -166,7 +166,7 @@ end
 
 function PowerStrike.prereq_func(caster)
     for mon in Map.monsters() do
-        if distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 40 then
+        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 40 then
             return true
         end
     end

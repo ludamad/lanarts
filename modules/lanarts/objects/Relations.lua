@@ -90,8 +90,11 @@ end
 -- Argument order does not matter
 
 function M.get_relationship(obj1, obj2)
+    perf.timing_begin("Relations.get_relationship")
     assert(obj1.team and obj2.team) -- All combat objects have a team
-    return M.team_get_relationship(obj1.team, obj2.team)
+    local relationship = M.team_get_relationship(obj1.team, obj2.team)
+    perf.timing_end("Relations.get_relationship")
+    return relationship
 end
 
 function M.is_hostile(obj1, obj2)

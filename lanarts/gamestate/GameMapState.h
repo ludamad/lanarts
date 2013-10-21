@@ -85,7 +85,7 @@ public:
 	void serialize(GameState* gs, SerializeBuffer& serializer);
 	void deserialize(GameState* gs, SerializeBuffer& serializer);
 
-	void step(GameState* gs);
+	void step(GameState* gs, bool simulate_monsters = true);
 	void draw(GameState* gs, bool reveal_all = false);
 
 	std::string& label() {

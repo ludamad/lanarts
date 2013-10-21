@@ -20,6 +20,9 @@ function GameMap:init(source_map, map)
     self.collision_group = ColAvoid.collision_group_create()
     self.monsters = {}
     self.players = {}
+    self.map.players = self.players
+    self.map.monsters = self.monsters
+    self.map.combat_objects = {}
 end
 
 function GameMap:add_player(name, race, class)
@@ -39,6 +42,7 @@ function GameMap:add_player(name, race, class)
         fill_operator = {add = SourceMap.FLAG_HAS_OBJECT}
     }
     table.insert(self.players, player_object)
+    table.insert(self.map.combat_objects, player_object)
     return player_object
 end
 
@@ -52,6 +56,7 @@ function GameMap:add_monster(monster)
         map = self.map
     }
     table.insert(self.monsters, monster_object)
+    table.insert(self.map.combat_objects, monster_object)
     return monster_object
 end
 
@@ -59,13 +64,17 @@ function GameMap:step()
     local objects = Map.objects_list(self.map)
     Display.view_follow(self.players[1].xy)
     for _, obj in ipairs(objects) do
-        if obj.on_prestep then obj:on_prestep() end
+        if obj.on_prestep then
+            perf.timing_begin("obj.on_prestep") 
+            obj:on_prestep()
+            perf.timing_end("obj.on_prestep")
+        end
     end
     self.collision_group:step()
 --    for _, obj in ipairs(objects) do
 --        obj:on_step()
 --    end
-    Map.map_step({map = self.map})
+    Map.map_step({map = self.map, simulate_monsters = false})
 end
 
 function GameMap:draw()

@@ -1,13 +1,11 @@
 -- Entry point to lanarts. Ensures correct initialization order of the 
 -- various functions needed.
-print("HELLO")
+
 _ROOT_FOLDER = "modules"
 -- For bootstrapping purposes. We normally only use 'import'.
 require_path_add(_ROOT_FOLDER .. '/?.lua')
 
 require("core.Main")
-
-sound_volume = 0 -- Mute the game
 
 local function attach_debugger()
     local DBG_PATH, DBG_MODULE = "/usr/share/lua/5.1/", "debugger"
@@ -82,4 +80,10 @@ local function main(args)
     return true -- Continue lanarts initialization
 end
 
-return main
+return function(args)
+    local ret 
+    profile(function() 
+        ret = main(args)
+    end)
+    return ret
+end

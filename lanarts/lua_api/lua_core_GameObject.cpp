@@ -39,37 +39,32 @@ static int lapi_gameinst_stats(lua_State* L) {
 
 /* Use a per-instance lua table as a fallback */
 static int lapi_gameinst_getter_fallback(lua_State* L) {
-	LuaValue& variables = luawrap::get<GameInst*>(L, 1)->lua_variables;
-	if (variables.empty()) {
-		lua_pushnil(L);
-	} else {
-		variables.push();
-		lua_pushvalue(L, 2); // On stack: [object table, key]
-		lua_gettable(L, -2);
-	}
-	/* Still nil ? Try to access in 'self.type'. */
-	if (lua_isnil(L, -1)) {
-		/* Get type table */
-		lua_pop(L, 1); // Pop nil
-		variables.push();
-		lua_pushliteral(L, "type");
-		lua_rawget(L, -2);
-		lua_replace(L, -2); // On stack: [type table]
+//	LuaValue& variables = luawrap::get<GameInst*>(L, 1)->lua_variables;
+//	if (variables.empty()) {
+//		lua_pushnil(L);
+//	} else {
+//		variables.push();
+//		lua_pushvalue(L, 2); // On stack: [object table, key]
+//		lua_rawget(L, -2);
+//	}
+	/* Try to access in 'self.type'. */
+	/* Get type table */
+	lua_pushliteral(L, "type");
+	lua_rawget(L, 1);
 
-		LuaStackValue table(L, -1);
-		if (!table.isnil()) {
-			// First, try the __index method.
-			lua_getfield(L, table.index(), "__index");
-			if (!lua_isnil(L, -1)) {
-				lua_pushvalue(L, 1);
-				lua_pushvalue(L, 2);
-				lua_call(L, 2, 1); // On stack [type table, value]
-			}
-			if (lua_isnil(L, -1)) {
-				lua_pop(L, 1); // pop nil
-				lua_pushvalue(L, 2); // On stack: [type table, key]
-				lua_gettable(L, table.index()); // On stack [type table, value]
-			}
+	LuaStackValue table(L, -1);
+	if (!lua_isnil(L, -1)) {
+		// First, try the __index method.
+		lua_getfield(L, table.index(), "__index");
+		if (!lua_isnil(L, -1)) {
+			lua_pushvalue(L, 1);
+			lua_pushvalue(L, 2);
+			lua_call(L, 2, 1); // On stack [type table, value]
+		}
+		if (lua_isnil(L, -1)) {
+			lua_pop(L, 1); // pop nil
+			lua_pushvalue(L, 2); // On stack: [type table, key]
+			lua_gettable(L, table.index()); // On stack [type table, value]
 		}
 	}
 	return 1;
@@ -77,15 +72,9 @@ static int lapi_gameinst_getter_fallback(lua_State* L) {
 
 /* Use a per-instance lua table as a fallback */
 static int lapi_gameinst_setter_fallback(lua_State* L) {
-	LuaValue& variables = luawrap::get<GameInst*>(L, 1)->lua_variables;
-	if (variables.empty()) {
-		variables.init(L);
-		variables.newtable();
-	}
-	variables.push();
 	lua_pushvalue(L, 2);
 	lua_pushvalue(L, 3);
-	lua_settable(L, -3);
+	lua_rawset(L, 1);
 	return 1;
 }
 
@@ -110,20 +99,24 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	LUAWRAP_METHOD(methods, step, OBJ->step(lua_api::gamestate(L)));
 	LUAWRAP_METHOD(methods, draw, OBJ->draw(lua_api::gamestate(L)));
 	LUAWRAP_METHOD(methods, init,
-			GameState* gs = lua_api::gamestate(L);
-			level_id map;
-			if (lua_gettop(L) <= 0) {
-				map = gs->game_world().get_current_level_id();
-			} else {
-				map = luawrap::get<LuaValue>(L, 1)["_id"].to_int();
-			}
-			gs->add_instance(map, OBJ);
+		GameState* gs = lua_api::gamestate(L);
+		level_id map;
+		if (lua_gettop(L) <= 0) {
+			map = gs->game_world().get_current_level_id();
+		} else {
+			map = luawrap::get<LuaValue>(L, 1)["_id"].to_int();
+		}
+		gs->add_instance(map, OBJ);
 	);
 
 	LuaValue getters = luameta_getters(meta);
 	LUAWRAP_GETTER(getters, xy, OBJ->pos());
+	LUAWRAP_GETTER(getters, xy_previous, Pos(OBJ->last_x, OBJ->last_y));
 	luawrap::bind_getter(getters["x"], &GameInst::x);
 	luawrap::bind_getter(getters["y"], &GameInst::y);
+	luawrap::bind_getter(getters["__table"], &GameInst::lua_variables);
+	luawrap::bind_getter(getters["x_previous"], &GameInst::last_x);
+	luawrap::bind_getter(getters["y_previous"], &GameInst::last_y);
 	luawrap::bind_getter(getters["destroyed"], &GameInst::destroyed);
 	luawrap::bind_getter(getters["id"], &GameInst::id);
 	luawrap::bind_getter(getters["depth"], &GameInst::depth);
@@ -277,13 +270,14 @@ static void create_and_push_gameinst_cache(lua_State* L) {
 // Functions required for luawrap
 namespace GameInstWrap {
 	GameInst* get(lua_State* L, int idx) {
-		return *(GameInst**) lua_touserdata(L, idx);
+		// Allow for any object to be passed, if it defines __objectref
+		lua_getfield(L, idx, "__objectref");
+		GameInst** udata = (GameInst**) lua_touserdata(L, -1);
+		lua_pop(L, 1);
+		return *udata;
 	}
 
 	bool check(lua_State* L, int idx) {
-		if (!lua_isuserdata(L, idx)) {
-			return false;
-		}
 		lua_getmetatable(L, idx);
 		if (lua_isnil(L, -1)) {
 			return false;
@@ -293,43 +287,57 @@ namespace GameInstWrap {
 		lua_pop(L, 2);
 		return isgameinst;
 	}
+
+	int serialize(lua_State* L);
+	int deserialize(lua_State* L);
+	static LuaValue ref_metatable(lua_State* L) {
+		LuaValue meta = luameta_new(L, "GameInstRef");
+		meta["__persist"].bind_function(serialize);
+		return meta;
+	}
+
+	void push_ref(lua_State* L, GameInst* inst) {
+		GameInst** lua_inst = (GameInst**) lua_newuserdata(L, sizeof(GameInst*));
+		*lua_inst = inst;
+		luameta_push(L, &ref_metatable);
+		lua_setmetatable(L, -2);
+		GameInst::retain_reference(inst);
+	}
+	int deserialize(lua_State* L) {
+		GameState* gs = lua_api::gamestate(L);
+		int id = lua_tointeger(L, 1);
+		int current_floor = lua_tointeger(L, 2);
+		GameInst* inst = gs->get_level(current_floor)->game_inst_set().get_instance(id);
+		push_ref(L, inst);
+		return 1;
+	}
+	int serialize(lua_State* L) {
+		GameInst** udata = (GameInst**) lua_touserdata(L, -1);
+		luawrap::globals(L)["__GAMEINST_DESERIALIZE"].push();
+		printf("onaddi: %X\n", lua_topointer(L, -1));
+		lua_pushinteger(L, (*udata)->id);
+		lua_pushinteger(L, (*udata)->current_floor);
+		return 3;
+	}
+
 	void push(lua_State* L, GameInst* inst) {
 		if (inst == NULL) {
 			lua_pushnil(L);
 			return;
 		}
-
-		int prev_top = lua_gettop(L);
-		lua_pushvalue(L, LUA_REGISTRYINDEX);
-		int reg_idx = lua_gettop(L);
-		lua_pushlightuserdata(L, (void*)&create_and_push_gameinst_cache);
-		lua_rawget(L, reg_idx);
-		if (lua_isnil(L, -1)) {
-			lua_pop(L, 1);
-			create_and_push_gameinst_cache(L);
+		LuaValue& lua_vars = inst->lua_variables;
+		if (lua_vars.empty()) {
+			lua_vars = LuaValue::newtable(L);
 		}
-		int cache_idx = lua_gettop(L);
-
-		lua_pushlightuserdata(L, inst);
-		lua_rawget(L, cache_idx);
-		if (lua_isnil(L, -1)) {
-			lua_pop(L, 1);
-			GameInst** lua_inst = (GameInst**) lua_newuserdata(L, sizeof(GameInst*));
-
-			// Cache the object
-			lua_pushlightuserdata(L, inst);
-			lua_pushvalue(L, -2);
-			lua_rawset(L, cache_idx);
-			*lua_inst = inst;
-
-			// Set up its metatable
+		lua_vars.push();
+		if (!lua_getmetatable(L, -1)) {
 			lua_gameinst_push_metatable(L, inst);
 			lua_setmetatable(L, -2);
-			GameInst::retain_reference(inst);
+			push_ref(L, inst);
+			lua_vars["__objectref"].pop();
+		} else {
+			lua_pop(L, 1);
 		}
-
-		lua_replace(L, prev_top + 1);
-		lua_settop(L, prev_top + 1);
 	}
 }
 
@@ -528,6 +536,23 @@ static void object_destroy(LuaStackValue inst) {
 }
 
 namespace lua_api {
+	// Ensures important objects are reached during serialization:
+	static void ensure_reachability(LuaValue globals, LuaValue submodule) {
+		lua_State* L = submodule.luastate();
+		luameta_push(L, &lua_playerinst_metatable);
+		submodule["__PLAYER_META"].pop();
+		luameta_push(L, &lua_enemyinst_metatable);
+		submodule["__ENEMY_META"].pop();
+		luameta_push(L, &lua_combatgameinst_metatable);
+		submodule["__COMBATOBJECT_META"].pop();
+		luameta_push(L, &lua_gameinst_base_metatable);
+		submodule["__GAMEINST_META"].pop();
+		luameta_push(L, &GameInstWrap::ref_metatable);
+		submodule["__REF_META"].pop();
+		globals["__GAMEINST_SERIALIZE"].bind_function(GameInstWrap::serialize);
+		globals["__GAMEINST_DESERIALIZE"].bind_function(GameInstWrap::deserialize);
+		printf("ereachi: %X\n", lua_topointer(L, -1));
+	}
 	void register_lua_core_GameObject(lua_State* L) {
 		luawrap::install_type<GameInst*, GameInstWrap::push, GameInstWrap::get, GameInstWrap::check>();
 		luawrap::install_dynamic_casted_type<CombatGameInst*, GameInst*>();
@@ -550,5 +575,6 @@ namespace lua_api {
 		submodule["DOOR_CLOSED"] = (int)FeatureInst::DOOR_CLOSED;
 		submodule["PORTAL"] = (int)FeatureInst::PORTAL;
 		submodule["OTHER"] = (int)FeatureInst::OTHER;
+		ensure_reachability(globals, submodule);
 	}
 }

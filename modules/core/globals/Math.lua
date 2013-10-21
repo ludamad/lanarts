@@ -71,6 +71,10 @@ function vector_to_direction(v)
     return math.atan2(v[2], v[1])
 end
 
+function vector_direction(v1,v2)
+    return math.atan2(v2[2] - v1[2], v2[1] - v1[1])
+end
+
 function vector_normalize(v, --[[Optional]] magnitude)
     magnitude = magnitude or 1
     return vector_scale(v, magnitude/vector_magnitude(v))

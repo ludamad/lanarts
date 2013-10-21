@@ -51,7 +51,7 @@ function M.default_ammunition_on_fire(self, user, weapon, action, target)
         )
     end
     ProjectileEffect.create {
-        sprite=self.sprite, 
+        sprite=self.projectile_sprite,
         radius=self.radius, 
         speed=self.speed, 
         action = action

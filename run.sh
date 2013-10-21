@@ -24,4 +24,9 @@ if ! build ; then
 fi
 
 # Run lanarts
-../lanarts_build/lanarts/lanarts $args
+if [[ "$args" == *"--gdb"* ]] ; then
+    args="${args/--gdb/}"    
+    gdb --args ../lanarts_build/lanarts/lanarts $args
+else
+    ../lanarts_build/lanarts/lanarts $args
+fi

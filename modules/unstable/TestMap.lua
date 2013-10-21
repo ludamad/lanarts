@@ -5,6 +5,8 @@ local Keys = import "core.Keyboard"
 local Simulation = import ".Simulation"
 local GameMap = import "@maps.GameMap"
 local Newregion = import "lanarts.maps.Newregion"
+local StatContext = import "@StatContext"
+local GameInterface = import "@ui.GameInterface"
 
 local M = nilprotect {} -- Submodule
 
@@ -25,17 +27,31 @@ function M.main(cmd_args)
     local GM = GameMap.create(map, gmap)
     local race, class = Simulation.choose_player_stats(cmd_args)
     local player = GM:add_player("Tester", race, class)
-    for i=1,15 do GM:add_monster("Gnome Skeleton") end
+    player:stat_context().base.hp = 1000
+    player:stat_context().base.max_hp = 1000
+    player:stat_context().derived.hp = 1000
+    player:stat_context().derived.max_hp = 1000
 
+    for i=1,15 do GM:add_monster("Gnome Skeleton") end
+    for i=1,5 do GM:add_monster("Cloud Elemental") end
+
+    local interface = GameInterface.create(Display.display_size, player)
     Display.view_snap(player.xy)
     while GameState.input_capture() and not Keys.key_pressed(Keys.ESCAPE) do
+        perf.timing_begin("**Step**")
         Display.view_snap(player.xy)
         GM:step()
+        perf.timing_end("**Step**")
+        perf.timing_begin("**Draw**")
         Display.draw_start()
         GM:draw()
+        interface:draw()
         Display.draw_finish()
-        GameState.wait(1)
+        perf.timing_end("**Draw**")
     end
+    perf.timing_print()
+    print( "Step time: " .. string.format("%f", perf.get_timing("**Step**")) )
+    print( "Draw time: " .. string.format("%f", perf.get_timing("**Draw**")) )
 end
 
 return M

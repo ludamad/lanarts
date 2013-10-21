@@ -42,16 +42,17 @@ function InstanceGroup:instances(xy)
 
     local adjusted_xy = {} -- shared array for performance
 
-    local iter = values(self._instances)
+    local arr,idx = self._instances,1
 
     -- Iterate the values in a fairly future-proof way, via a helper closure
     return function() 
-        local val = iter()
+        local val = arr[idx]
 
         if val == nil then
             return nil 
         end
-        
+
+        idx = idx + 1
         local obj, obj_xy = unpack(val)
         
         adjusted_xy[1] = obj_xy[1] + xy[1]
@@ -84,7 +85,7 @@ end
 function InstanceGroup:draw(xy)
     local draw_xy = {} -- shared array for performance
 
-    for instance in values(self._instances) do
+    for _, instance in ipairs(self._instances) do
         local obj, obj_xy = unpack(instance)
 
         draw_xy[1] = obj_xy[1] + xy[1]

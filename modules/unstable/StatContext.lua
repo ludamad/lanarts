@@ -88,8 +88,8 @@ end
 
 function M.on_draw(context, drawf, options)
     local funcs = {}
-    context.derived.inventory:get_on_draw_methods(funcs)
     context.derived.hooks:get_on_draw_methods(funcs)
+    context.derived.inventory:get_on_draw_methods(funcs)
     M.on_draw_call_collapse(context, drawf, options, unpack(funcs))
 end
 

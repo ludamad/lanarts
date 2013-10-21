@@ -90,9 +90,11 @@ static const char* buf_read(lua_State *L, mar_Buffer* buf, size_t *len) {
 }
 
 static inline bool buf_write_if_seen(lua_State* L, SerializeBuffer& buf, int table_idx) {
+//	printf("0x%lX %s\n", lua_topointer(L, -1), lua_typename(L, lua_type(L, -1)));
 	lua_pushvalue(L, -1);
 	lua_rawget(L, table_idx);
 	bool was_seen = !lua_isnil(L, -1);
+	printf("0x%lX %s\n", lua_topointer(L, -2), was_seen ? "was seen" : "wasn't seen");
 	if (was_seen) {
 		if (lua_isnumber(L, -1)) {
 			buf.write_byte(MAR_TREF);
@@ -128,13 +130,21 @@ static inline bool buf_try_persist_hook(lua_State *L, SerializeBuffer& buf, size
 		// Save the amount of returned values
 		buf.write_int(lua_gettop(L) - stacksize);
 		// Encode all the returned values
-		for (int i = stacksize + 1; i <= lua_gettop(L); i++) {
+		int stack_top = lua_gettop(L);
+		for (int i = stacksize + 1; i <= stack_top; i++) {
 			mar_encode_value(L, buf, i, idx);
 		}
 		// pop if persisted
 		lua_settop(L, stacksize - 1);
 	}
 	return false;
+}
+
+static void pretty_print(LuaField field) {
+	lua_State* L = field.luastate();
+	luawrap::globals(L)["pretty_print"].push();
+	field.push();
+	lua_call(L, 1, 0);
 }
 
 void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) {
@@ -159,6 +169,7 @@ void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) 
 		break;
 	}
 	case LUA_TTABLE: {
+		pretty_print(LuaStackValue(L, -1));
 		lua_pushvalue(L, -1);
 		if (!buf_write_if_seen(L, buf, SEEN_IDX)
 				&& !buf_try_persist_hook(L, buf, idx)) {
@@ -249,6 +260,7 @@ void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) 
 static int mar_encode_table(lua_State *L, SerializeBuffer& buf, size_t *idx) {
 	lua_pushnil(L);
 	while (lua_next(L, -2) != 0) {
+		printf("encoding %s\n", lua_tostring(L, -2));
 		mar_encode_value(L, buf, -2, idx);
 		mar_encode_value(L, buf, -1, idx);
 		lua_pop(L, 1);
@@ -320,6 +332,7 @@ static void store_object(LuaField key, LuaField value, LuaField str2obj_table, L
 	obj2str_table.push();
 	value.push();// Push value
 	key.push();// Push string
+//	printf("%s: 0x%lX, type=%s\n",lua_tostring(L, -1), lua_topointer(L, -2), lua_typename(L, lua_type(L, -2)));
 	lua_rawset(L, -3);
 	lua_pop(L, 1);
 

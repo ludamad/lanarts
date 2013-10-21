@@ -9,6 +9,7 @@
 #include "draw/TileEntry.h"
 
 #include "gamestate/GameState.h"
+#include "gamestate/GameMapState.h"
 
 #include "gamestate/GameTiles.h"
 #include "AStarPath.h"
@@ -32,37 +33,28 @@ static inline int heurestic_distance(const Pos& s, const Pos& e) {
 	int h_diagonal = min(abs(s.x - e.x), abs(s.y - e.y));
 	int h_straight = (abs(s.x - e.x) + abs(s.y - e.y));
 	return 114 * h_diagonal + 100 * (h_straight - 2 * h_diagonal);
-	/*	int dx = (s.x - e.x)*100;
-	 int dy = (s.y - e.y)*100;
-	 return sqrt(dx*dx+dy*dy);*/
 }
 
-void AStarPath::initialize(GameState* gs) {
+void AStarPath::initialize(GameState* gs, BBox world_region, bool imperfect_knowledge) {
 	perf_timer_begin(FUNCNAME);
-	if (!nodes) {
-		w = gs->width() / TILE_SIZE;
-		h = gs->height() / TILE_SIZE;
-		nodes = new AStarNode[w * h];
-		for (int y = 0; y < h; y++) {
-			for (int x = 0; x < w; x++) {
-				nodes[y * w + x].solid = gs->tiles().is_solid(Pos(x, y));
-			}
+	BoolGridRef grid = gs->tiles().solidity_map();
+	nodes.resize(world_region.size());
+	int width = world_region.width();
+	if (imperfect_knowledge) {
+		BoolGridRef seen = gs->tiles().previously_seen_map();
+		FOR_EACH_BBOX_XY(world_region, xy) {
+			AStarNode& node = nodes[xy - world_region.left_top()];
+			node.openset = false;
+			node.closedset = false;
+			node.previous = NULL;
+			node.solid = ((*seen)[xy] && (*grid)[xy]);
 		}
 	}
-	for (int y = 0; y < h; y++) {
-		for (int x = 0; x < w; x++) {
-			nodes[y * w + x].openset = false;
-			nodes[y * w + x].closedset = false;
-			nodes[y * w + x].previous = NULL;
-			nodes[y * w + x].solid = gs->tiles().is_solid(Pos(x, y));
-		}
-	}
-
 	perf_timer_end(FUNCNAME);
 }
 
 bool AStarPath::can_cross(const Pos& s, const Pos& e) {
-	return !at(Pos(s.x, e.y))->solid && !at(Pos(e.x, s.y))->solid;
+	return !nodes[Pos(s.x, e.y)].solid && !nodes[Pos(e.x, s.y)].solid;
 }
 
 static std::vector<AStarNode*>::iterator find_heap_position(
@@ -72,22 +64,33 @@ static std::vector<AStarNode*>::iterator find_heap_position(
 		if (*it == node) {
 			return it;
 		}
-	}LANARTS_ASSERT(false);
+	}
+	LANARTS_ASSERT(false);
 	return heap.end();
 }
 
 /*Used to make sure all interpolated directions are possible*/
-std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, Pos s, Pos e, bool clear_results) {
+std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, Pos s, Pos e, BBox world_region, bool imperfect_knowledge, bool clear_results) {
 	perf_timer_begin(FUNCNAME);
+	// Ensure within bounds:
+	world_region.x1 /= TILE_SIZE, world_region.y1 /= TILE_SIZE;
+	world_region.x2 /= TILE_SIZE, world_region.y2 /= TILE_SIZE;
+	world_region = world_region.resized_within(
+		BBox( Pos(), gs->get_level()->tiles().size() )
+	);
 	if (clear_results) {
-		initialize(gs);
+		initialize(gs, world_region, imperfect_knowledge);
 	}
+	AStarNode* start_node = &nodes.raw_get(0);
+	// Adjust the coordinates to be within our region
+	s -= world_region.left_top(), e -= world_region.left_top();
 
 	AStarOrderNodes orderfunc;
 	std::vector<AStarNode*> heap;
 
-	AStarNode* start = at(s);
+	AStarNode* start = &nodes[s];
 
+	int w = world_region.width(), h = world_region.height();
 	start->g_score = 0;
 	start->h_score = heurestic_distance(s, e);
 	start->f_score = start->h_score;
@@ -107,8 +110,8 @@ std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, Pos s, Pos e, bo
 		gheap<>::pop_heap(heap.begin(), heap.end(), orderfunc);
 		heap.pop_back();
 
-		int x = (node - nodes) % w;
-		int y = (node - nodes) / w;
+		int x = (node - start_node) % w;
+		int y = (node - start_node) / w;
 
 		for (int yy = y - 1; yy <= y + 1; yy++) {
 			if (yy < 0 || yy >= h)
@@ -117,7 +120,7 @@ std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, Pos s, Pos e, bo
 				if (xx < 0 || xx >= w)
 					continue;
 
-				AStarNode* neighbour = at(Pos(xx, yy));
+				AStarNode* neighbour = &nodes[Pos(xx, yy)];
 				if (neighbour->closedset)
 					continue;
 				if (!can_cross(Pos(x, y), Pos(xx, yy)))
@@ -149,13 +152,13 @@ std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, Pos s, Pos e, bo
 		}
 	}
 	std::vector<Pos> positions;
-	AStarNode* traverse = at(e);
+	AStarNode* traverse = &nodes[e];
 	while (traverse) {
-		int x = (traverse - nodes) % w;
-		int y = (traverse - nodes) / w;
+		int x = (traverse - start_node) % w;
+		int y = (traverse - start_node) / w;
 		traverse = traverse->previous;
 		Pos p(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2);
-		positions.push_back(p);
+		positions.push_back(p + world_region.left_top().scaled(TILE_SIZE));
 	}
 	reverse(positions.begin(), positions.end());
 	perf_timer_end(FUNCNAME);

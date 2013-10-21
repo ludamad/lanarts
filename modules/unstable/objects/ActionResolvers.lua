@@ -1,6 +1,5 @@
 local Map = import "core.Map"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
-local PathUtils = import ".PathUtils"
 local ActionContext = import "@ActionContext"
 
 local M = nilprotect {} -- Submodule
@@ -81,6 +80,14 @@ function AI:init(cgroup)
 end
 
 function AI:resolve_action(obj)
+--    print("STARTIN")
+--    profile(function()
+--        for i=1,10000 do
+--            obj.hostile_something = ObjectUtils.find_closest_hostile(obj)
+--        end
+--    end)
+--    print("ENMDO")
+--    io.read "*l"
     local hostile = ObjectUtils.find_closest_hostile(obj)
     if not hostile then return nil end -- No target
     

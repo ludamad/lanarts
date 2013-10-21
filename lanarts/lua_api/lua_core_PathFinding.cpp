@@ -24,13 +24,16 @@ static int astar_calculate_path(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	AStarPathPtr astar = luawrap::get<AStarPathPtr>(L, 1);
 	level_id gmap = LuaStackValue(L, 2)["_id"].to_int();
+	GameMapState* new_level = gs->get_level(gmap);
 	Pos from_xy = luawrap::get<Pos>(L, 3);
 	Pos to_xy = luawrap::get<Pos>(L, 4);
-	bool clear = lua_gettop(L) >= 5 ? lua_toboolean(L, 5) : true;
+	BBox world_region = luawrap::get_defaulted(L, 5, BBox(Pos(), new_level->tiles().size()));
+	bool imperfect_knowledge = luawrap::get_defaulted(L, 6, false);
+	bool clear = luawrap::get_defaulted(L, 7, true);
 
 	GameMapState* previous_level = gs->get_level();
-	gs->set_level(gs->game_world().get_level(gmap));
-	luawrap::push(L, astar->calculate_AStar_path(gs, from_xy, to_xy, clear));
+	gs->set_level(new_level);
+	luawrap::push(L, astar->calculate_AStar_path(gs, from_xy, to_xy, world_region, imperfect_knowledge, clear));
 	gs->set_level(previous_level);
 
 	return 1;

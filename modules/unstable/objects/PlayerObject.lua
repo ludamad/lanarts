@@ -34,7 +34,8 @@ end
 local function resolve_sprite(race)
     local dir = path_resolve("sprites/"..race.name:lower())
     local results = io.directory_search(dir, "*.png", true)
-    return image_cached_load(random_choice(results))
+    local anim_speed = race.animation_speed or 0.05
+    return Display.animation_create(Display.images_load(random_choice(results) .. '%32x32'), anim_speed)
 end
 
 function PlayerObject:on_death()

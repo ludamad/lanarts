@@ -45,10 +45,12 @@ GameMapState* GameMapState::clone() const {
 }
 
 static void update_player_fields_of_view(GameState* gs) {
+	perf_timer_begin(FUNCNAME);
 	std::vector<PlayerInst*> players = gs->players_in_level();
 	for (int i = 0; i < players.size(); i++) {
 		players[i]->update_field_of_view(gs);
 	}
+	perf_timer_end(FUNCNAME);
 }
 
 void GameMapState::serialize(GameState* gs, SerializeBuffer& serializer) {
@@ -96,7 +98,7 @@ obj_id GameMapState::add_instance(GameState* gs, GameInst* inst) {
 	return id;
 }
 
-void GameMapState::step(GameState* gs) {
+void GameMapState::step(GameState* gs, bool simulate_monsters) {
 	const int STEPS_TO_SIMULATE = 1000;
 
 	bool game_has_players = !gs->player_data().all_players().empty();
@@ -114,7 +116,9 @@ void GameMapState::step(GameState* gs) {
 	gs->set_level(this);
 
 	update_player_fields_of_view(gs);
-	monster_controller().pre_step(gs);
+	if (simulate_monsters) {
+		monster_controller().pre_step(gs);
+	}
 	game_inst_set().step(gs);
 	tiles().step(gs);
 	_steps_left--;

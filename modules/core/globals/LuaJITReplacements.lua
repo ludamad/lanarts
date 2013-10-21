@@ -7,7 +7,7 @@ end
 local setmetatable, tostring, rawset = setmetatable, tostring, rawset
 
 function profile(f)
-    require("jit.p").start("vF9")
+    require("jit.p").start("vFL")
     local ret = {f()}
     require("jit.p").stop()
     return unpack(ret)

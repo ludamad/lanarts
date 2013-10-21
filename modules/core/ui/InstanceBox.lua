@@ -60,6 +60,11 @@ function InstanceBox:add_instance(obj, origin, --[[Optional]] offset)
     self._instances:add_instance( obj, xy )
 end
 
+function InstanceBox:readd_instance(obj, origin, --[[Optional]] offset)
+    self:remove(obj)
+    self:add_instance(obj, origin, offset)
+end
+
 --- Whether the mouse is within the InstanceBox.
 function InstanceBox:mouse_over(xy)
     return mouse_over(xy, self.size)

@@ -70,8 +70,8 @@ function Inventory:get_equipped_items(equipment_type)
     return items
 end
 
-function Inventory:get_equipped_item(...)
-    local items = self:get_equipped_items(...)
+function Inventory:get_equipped_item(equipment_type)
+    local items = self:get_equipped_items(equipment_type)
     assert(#items <= 1)
     return items[1]
 end

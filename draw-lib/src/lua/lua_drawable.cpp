@@ -139,14 +139,17 @@ void lua_pushdrawable(lua_State* L, const Drawable& drawable) {
 		drawable_base_push_metatable(L);
 	}
 
-	static Drawable directional_create(const std::vector<Drawable>& directions,
-			float angle_offset) {
-		return Drawable(new DirectionalDrawable(directions, angle_offset));
+	typedef std::vector<Drawable> DrawList;
+	static int directional_create(lua_State* L) {
+		DirectionalDrawable* dir = new DirectionalDrawable(luawrap::get<DrawList>(L, 1), luawrap::get_defaulted(L, 2, 0));
+		luawrap::push(L, Drawable(dir));
+		return 1;
 	}
 
-	static Drawable animation_create(const std::vector<Drawable>& frames,
-			float animation_speed) {
-		return Drawable(new Animation(frames, animation_speed));
+	static int animation_create(lua_State* L) {
+		Animation* anim = new Animation(luawrap::get<DrawList>(L, 1), luawrap::get_defaulted(L, 2, 1.0f));
+		luawrap::push(L, Drawable(anim));
+		return 1;
 	}
 
 	void lua_pushluadrawable(lua_State* L, const LuaDrawable& image) {

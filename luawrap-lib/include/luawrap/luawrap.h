@@ -77,6 +77,14 @@ namespace luawrap {
 	}
 
 	template<typename T>
+	inline typename _private::PushGetCheckWrap<T>::RetType get_defaulted(lua_State* L,
+			int idx, const T& default_value) {
+		if (lua_gettop(L) < idx) {
+			return default_value;
+		}
+		return get<T>(L, idx);
+	}
+	template<typename T>
 	inline typename _private::PushGetCheckWrap<T>::RetType get_unchecked(lua_State* L,
 			int idx) {
 		return _private::PushGetCheckWrap<T>::get(L, idx);

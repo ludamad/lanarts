@@ -22,6 +22,7 @@ function M.races_define(args)
     action.sound = {"Swing1", "Swing2", "Swing3"}
     args.unarmed_action = ActionUtils.derive_action(action, ActionUtils.ALL_ACTION_COMPONENTS, --[[Cleanup]] true)
     -- Create based off embedded stats, aptitudes & spells
+    args.movement_speed = 4
     local stat_template = ContentUtils.resolve_embedded_stats(args, --[[Resolve skill costs]] true)
     function args.on_create(name)
         local stats = Stats.stats_create(stat_template, --[[Add skills]] true)

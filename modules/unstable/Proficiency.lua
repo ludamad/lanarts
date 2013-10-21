@@ -1,3 +1,4 @@
+local type, math, table = type, math, table -- Cache
 local StatMultiplierUtils = import "@StatMultiplierUtils"
 
 local M = nilprotect {} -- Submodule
@@ -19,7 +20,8 @@ end
 
 function M.resolve_proficiency_requirements(proficiencies, stats)
     local failure_total, requirement_total = 0,0
-    for p in values(proficiencies) do
+    for i=1,#proficiencies do
+        local p = proficiencies[i]
         local prof = M.calculate_proficiency(p.multipliers, stats)
         requirement_total = requirement_total + p.requirement
         failure_total = failure_total + math.max(0, p.requirement - prof)

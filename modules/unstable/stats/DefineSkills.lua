@@ -152,7 +152,7 @@ skill_define {
     aptitudes = {Apts.WILLPOWER, {1.0, dup(0,3)}},
     on_calculate = function(self, user)
         default_on_calculate(self, user)
-        user.derived.max_hp = user.derived.max_mp + self.level * 20
+        user.derived.max_mp = user.derived.max_mp + self.level * 20
     end
 }
 

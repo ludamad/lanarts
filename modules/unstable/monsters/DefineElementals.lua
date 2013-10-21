@@ -6,6 +6,9 @@ monster_define {
     name = "Cloud Elemental",
     monster_race = Mons.AIR_ELEMENTAL,
     description = ".",
+
+    sprite_size = {32, 32},
+    
     appear_message = "A cloud elemental floats onto the scene.",
     defeat_message = "The cloud elemental dissolves.",
 
@@ -21,6 +24,6 @@ monster_define {
         sprite = "sprites/storm_bolt.png",
         aptitude_types = {Apts.AIR, Apts.MAGIC, Apts.FORCE},
         effectiveness = 1, damage = 10,
-        speed = 4, delay = 0.1
+        speed = 4, delay = 1
     }
 }

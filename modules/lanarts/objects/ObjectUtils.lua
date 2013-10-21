@@ -53,15 +53,18 @@ function M.object_callback(object, methodname, ...)
 end
 
 function M.find_closest_hostile(self)
+    perf.timing_begin("find_closest_hostile")
+    local x,y = self.x,self.y
     local min_dist,min_obj = math.huge,nil
-    for obj in Map.objects(self.map) do
-        if obj.team and Relations.is_hostile(self, obj) then
-            local dist = vector_distance(obj.xy, self.xy)
+    for _, obj in ipairs(self.map.combat_objects) do
+        if Relations.is_hostile(self, obj) then
+            local dist = math.max(math.abs(obj.x-x), math.abs(obj.y-y))
             if dist < min_dist then 
                 min_dist,min_obj = dist,obj
             end
         end
     end
+    perf.timing_end("find_closest_hostile")
     return min_obj
 end
 

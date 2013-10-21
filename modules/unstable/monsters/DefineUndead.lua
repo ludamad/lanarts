@@ -12,7 +12,7 @@ monster_define {
     description = ".",
 
     challenge_rating = 1,
-    radius = 5,
+    radius = 12,
 
     movement_speed = 1,
     hp = 30, hp_regen = 0.00, 

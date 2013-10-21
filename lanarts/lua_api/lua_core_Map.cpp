@@ -48,24 +48,26 @@ GameMapState* mapstate(LuaStackValue map_obj, bool defaulted = false) {
 
 // TODO: This is a stopgap measure until we achieve true separation of maps.
 #define LEVEL_WRAPPED(method_body) \
-	GameState* gs = lua_api::gamestate(L); \
 	/* Become current level */ \
 	GameMapState* previous_level = gs->get_level(); \
-	GameMapState* new_level = mapstate(LuaStackValue(L, 1)); \
 	gs->set_level(new_level); \
 	method_body ; \
 	/* Return to previous level */ \
 	gs->set_level(previous_level)
 
 static int gmap_tiles_predraw(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	GameMapState* new_level = mapstate(LuaStackValue(L, 1));
+	bool reveal_all = stack_defaulted(L, 2, true);
 	LEVEL_WRAPPED(
-		bool reveal_all = stack_defaulted(L, 2, true);
 		gs->tiles().pre_draw(gs, reveal_all);
 	);
 	return 0;
 }
 
 static int gmap_tiles_postdraw(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	GameMapState* new_level = mapstate(LuaStackValue(L, 1));
 	LEVEL_WRAPPED(
 		gs->tiles().post_draw(gs);
 	);
@@ -73,12 +75,14 @@ static int gmap_tiles_postdraw(lua_State* L) {
 }
 
 static int gmap_instances_draw(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+	GameMapState* new_level = mapstate(LuaStackValue(L, 1));
 	LEVEL_WRAPPED(
 		std::vector<GameInst*> safe_copy = new_level->game_inst_set().to_vector();
-		for (size_t i = 0; i < safe_copy.size(); i++) {
-			safe_copy[i]->draw(gs);
-		}
 	);
+	for (size_t i = 0; i < safe_copy.size(); i++) {
+		safe_copy[i]->draw(gs);
+	}
 	return 0;
 }
 
@@ -337,13 +341,16 @@ static std::vector<GameInst*> gmap_rectangle_collision_check(LuaStackValue map_o
 static int gmap_object_tile_check(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	GameInst* inst = luawrap::get<GameInst*>(L, 1);
+	GameMapState* new_level = gs->get_level(inst->current_floor);
 	Pos pos = inst->ipos();
 	if (lua_gettop(L) >= 2) {
 		pos = luawrap::get<Pos>(L, 2);
 	}
 
 	Pos hit_pos;
-	bool collided = gs->tile_radius_test(pos.x, pos.y, inst->radius, true, -1, &hit_pos);
+	LEVEL_WRAPPED(
+		bool collided = gs->tile_radius_test(pos.x, pos.y, inst->radius, true, -1, &hit_pos);
+	);
 	if (!collided) {
 		lua_pushnil(L);
 	} else {
@@ -409,7 +416,8 @@ static void gmap_transfer(LuaStackValue inst, LuaStackValue map_obj, Pos xy) {
 static void gmap_map_step(LuaStackValue table) {
 	GameState* gs = lua_api::gamestate(table);
 	level_id map_id = mapid(table["map"]);
-	gs->game_world().get_level(map_id)->step(gs);
+	bool simulate_monsters = luawrap::defaulted(table, "simulate_monsters", true);
+	gs->game_world().get_level(map_id)->step(gs, simulate_monsters);
 }
 
 static void gmap_map_draw(LuaStackValue table) {

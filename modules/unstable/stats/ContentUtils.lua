@@ -34,17 +34,19 @@ end
 
 function M.derive_on_draw(args, --[[Optional]] absolute_paths)
     if type(args) == "function" then return args end
+    if type(args.on_draw) == "function" then return args.on_draw end
+    local D = args.on_draw
     if type(args) == "string" or getmetatable(args) then -- Is it not a plain table?
-        args = { sprite = args }
+        D = { sprite = args }
     end
-    if type(args.sprite) == "string" then 
-        args.sprite = M.resolve_sprite(args, absolute_paths)
+    if type(D.sprite) == "string" then 
+        D.sprite = M.resolve_sprite(args, absolute_paths)
     end
 
     return function(self, stats, drawf, options, ...)
         if args.new_color then options.color = args.new_color end
         StatContext.on_draw_call_collapse(stats, drawf, options, ...)
-        ObjectUtils.screen_draw(args.sprite, options.xy, args.alpha, args.frame, args.direction, args.color)
+        ObjectUtils.screen_draw(D.sprite, options.xy, args.alpha, args.frame, args.direction, args.color)
     end
 end
 
@@ -83,7 +85,7 @@ function M.resolve_sprite(args, --[[Optional]] absolute_paths, --[[Optional]] us
             assert(not args.sprite_size, "Explicit sprite size cannot be set with image pattern!")
             local subimages = Display.images_load(sprite)
             if use_animation then
-                return Display.animation_create(subimages, 1.0)
+                return Display.animation_create(subimages)
             else
                 return resolve_directional(subimages, args.sprite_direction_weights)
             end
@@ -99,7 +101,7 @@ function M.resolve_sprite(args, --[[Optional]] absolute_paths, --[[Optional]] us
         local rows = Display.image_split(sprite, {sprite.size[1], ssize[2]})
         local directions = {}
         for row in values(rows) do
-            local anim = Display.animation_create(Display.image_split(row, ssize), 0.25)
+            local anim = Display.animation_create(Display.image_split(row, ssize), args.animation_speed or 0.025)
             table.insert(directions, anim)
         end
         sprite = resolve_directional(directions, args.sprite_direction_weights)

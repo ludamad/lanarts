@@ -1,5 +1,3 @@
--- The item sprite is 'auto-calculated' from the sprite name.
-
 local ItemType = import "@ItemType"
 local Apts = import "@stats.AptitudeTypes"
 local StatContext = import "@StatContext"
@@ -289,6 +287,7 @@ local DEFAULT_PROJECTILE_RADIUS = 8
 function M.ammunition_define(args)
     args.radius = args.radius or DEFAULT_PROJECTILE_RADIUS
     args.on_fire = args.on_fire or RangedWeaponActions.default_ammunition_on_fire
+    args.projectile_sprite = ContentUtils.resolve_sprite(args.projectile_sprite)
     return type_define(args, ItemTraits.AMMUNITION, M.resolve_weapon_name)
 end
 

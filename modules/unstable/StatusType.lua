@@ -63,7 +63,7 @@ function StatusType.update_hook(hooks, status_type, ...)
         hook = status_type.create(...)
         hooks:add_hook(hook)
     else
-        hook:update(...)
+        hook:on_update(...)
     end
     return hook
 end

@@ -6,7 +6,9 @@
 #ifndef ASTAR_PATHFIND_H_
 #define ASTAR_PATHFIND_H_
 
+#include "lanarts_defines.h"
 #include "objects/GameInst.h"
+#include <lcommon/Grid.h>
 #include <vector>
 
 struct AStarNode {
@@ -19,26 +21,19 @@ struct AStarNode {
 
 class AStarPath {
 public:
-	AStarPath(){
-		nodes = NULL;
-		w = 0, h = 0;
-	}
-
-	~AStarPath(){
-		delete[] nodes;
-	}
 	//outputs in real-world waypoints
-	std::vector<Pos> calculate_AStar_path(GameState* gs, Pos s, Pos e, bool clear_results = true);
+	std::vector<Pos> calculate_AStar_path(GameState* gs, Pos s, Pos e,
+			BBox world_region, bool imperfect_knowledge = false, bool clear_results = true);
 
-private:
-	void initialize(GameState* gs);
-	AStarNode* at(Pos xy){
-		return &nodes[xy.y*w+xy.x];
+	static BBox surrounding_region(Pos s, Pos e, Size padding) {
+		int sx = std::min(s.x, e.x), sy = std::min(s.y, e.y);
+		int ex = std::max(s.x, e.x), ey = std::max(s.y, e.y);
+		return BBox(Pos(sx - padding.w / 2, sy - padding.h / 2), Size(ex - sx, ey - sy) + padding);
 	}
-	AStarNode* nodes;
+private:
+	void initialize(GameState* gs, BBox world_region, bool imperfect_knowledge);
 	bool can_cross(const Pos& s, const Pos& e);
-	int w, h;
-
+	Grid<AStarNode> nodes;
 };
 
 void draw_path(GameState* gs, std::vector<Pos>& path);

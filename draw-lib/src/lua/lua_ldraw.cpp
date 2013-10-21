@@ -22,6 +22,13 @@
 
 #include "lua_ldraw.h"
 
+static int lua_draw_rectangle_outline(lua_State* L) {
+	using namespace ldraw;
+	using namespace luawrap;
+	draw_rectangle_outline(get<Colour>(L, 1), get<BBox>(L, 2), get_defaulted(L, 3, 1.0f));
+	return 0;
+}
+
 namespace ldraw {
 
 void lua_register_ldraw(lua_State* L, const LuaValue& module, bool register_lcommon) {
@@ -34,7 +41,7 @@ void lua_register_ldraw(lua_State* L, const LuaValue& module, bool register_lcom
 	module["draw_rectangle"].bind_function(draw_rectangle);
 	module["draw_circle"].bind_function(draw_circle);
 	module["draw_circle_outline"].bind_function(draw_circle_outline);
-	module["draw_rectangle_outline"].bind_function(draw_rectangle_outline);
+	module["draw_rectangle_outline"].bind_function(lua_draw_rectangle_outline);
 	module["draw_line"].bind_function(draw_line);
 
 	lua_register_font(L, module);

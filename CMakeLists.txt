@@ -6,8 +6,7 @@ if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/luajit)
 endif ()
 
 set(CMAKE_BUILD_TYPE DEBUG)
-add_definitions(-DNDEBUG)
-
+#add_definitions(-DNDEBUG)
 
 ## Compiler flags
 if(CMAKE_COMPILER_IS_GNUCXX)

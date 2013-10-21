@@ -40,7 +40,6 @@ status_type_define {
        self.extensions = 0
        LogUtils.event_log_player(stats.obj, "$You enter{s} a powerful rage!", {200,200,255})
     end,
-    sprite = Display.image_load(path_resolve "sprites/berserk.png"),
     on_draw = { sprite = "berserk.png", new_color = COL_PALE_RED },
     on_calculate = function(self, stats)
         local D = stats.derived

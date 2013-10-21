@@ -66,6 +66,10 @@ struct BBox {
 #define FOR_EACH_BBOX(bbox, x, y) \
 	for (int y = (bbox).y1; y < (bbox).y2; y++)\
 		for (int x = (bbox).x1; x < (bbox).x2; x++)
+#define FOR_EACH_BBOX_XY(bbox, xy) \
+	Pos xy ; \
+	for (xy.y = (bbox).y1; xy.y < (bbox).y2; xy.y++)\
+		for (xy.x = (bbox).x1; xy.x < (bbox).x2; xy.x++)
 
 //Float versions of above structures
 
