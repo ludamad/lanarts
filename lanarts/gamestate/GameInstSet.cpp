@@ -137,6 +137,7 @@ void GameInstSet::__remove_instance(InstanceState* state) {
 void GameInstSet::remove_instance(GameInst* inst) {
 	if (inst->destroyed)
 		return;
+	printf("Removing instance %d level %d\n", inst->id, inst->current_floor);
 	inst->destroyed = true;
 	InstanceState* state = tset_find<GameInstSetFunctions>(inst->id,
 			&unit_set[0], unit_capacity);
@@ -151,6 +152,7 @@ void GameInstSet::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write_int(size());
 	serializer.write_int(next_id);
 	DepthMap::const_iterator it = depthlist_map.end();
+	std::vector<GameInst*> instances;
 	for (int ind = 0; it != depthlist_map.begin();) {
 		--it;
 		InstanceState* state = it->second.start_of_list;
@@ -159,11 +161,16 @@ void GameInstSet::serialize(GameState* gs, SerializeBuffer& serializer) {
 			serializer.write_int(get_inst_type(inst));
 			serializer.write_int(inst->id);
 			inst->serialize(gs, serializer);
+			instances.push_back(inst);
+			printf("Serializing (id=%d, level=%d type=%d)\n", inst->id, inst->current_floor, get_inst_type(inst));
 //			if (gs->game_settings().network_debug_mode) {
 				serializer.write_int(inst->integrity_hash());
 //			}
 			state = state->next_same_depth;
 		}
+	}
+	for (int i = 0; i < instances.size(); i++) {
+		instances[i]->serialize_lua(gs, serializer);
 	}
 }
 
@@ -186,6 +193,7 @@ void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read_int(amnt);
 	serializer.read_int(next_id);
 
+	std::vector<GameInst*> instances;
 	for (int i = 0; i < amnt; i++) {
 		InstType type;
 		int id;
@@ -200,10 +208,11 @@ void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
 			inst->last_y = inst->y;
 			inst->id = id;
 			add_instance(inst, inst->id);
-
+			instances.push_back(inst);
 		} else {
 			safe_deserialize(inst, gs, serializer);
 		}
+		printf("Deserializing (id=%d, level=%d)\n", inst->id, inst->current_floor);
 //		if (gs->game_settings().network_debug_mode) {
 		bool seq = serializer_equals_read(serializer, inst->integrity_hash());
 		if (!seq) {
@@ -211,6 +220,9 @@ void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
 			abort();
 		}
 //		}
+	}
+	for (int i = 0; i < instances.size(); i++) {
+		instances[i]->deserialize_lua(gs, serializer);
 	}
 }
 

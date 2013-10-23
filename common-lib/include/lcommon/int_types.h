@@ -1,18 +1,21 @@
-/*
- * int_types.h:
+/* int_types.h:
  *  Aliases for types of specific bit-sizes.
  */
 
 #ifndef LCOMMON_INT_TYPES_H_
 #define LCOMMON_INT_TYPES_H_
 
-typedef signed char int8;
-typedef unsigned char uint8;
-typedef short int16;
-typedef unsigned short uint16;
-typedef int int32;
-typedef unsigned int uint32;
-typedef long long int64;
-typedef unsigned long long uint64;
+#ifdef __GNUC__
+#include <inttypes.h>
+#else
+typedef signed char int8_t;
+typedef unsigned char uint8_t;
+typedef short int16_t;
+typedef unsigned short uint16_t;
+typedef int int32_t;
+typedef unsigned int uint32_t;
+typedef long long int64_t;
+typedef unsigned long long uint64_t;
+#endif
 
 #endif /* LCOMMON_INT_TYPES_H_ */

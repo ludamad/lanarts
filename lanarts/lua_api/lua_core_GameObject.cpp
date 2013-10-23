@@ -5,6 +5,7 @@
 
 #include <lua.hpp>
 #include <stdexcept>
+#include <typeinfo>
 
 #include <lua_api/lua_api.h>
 
@@ -308,13 +309,13 @@ namespace GameInstWrap {
 		int id = lua_tointeger(L, 1);
 		int current_floor = lua_tointeger(L, 2);
 		GameInst* inst = gs->get_level(current_floor)->game_inst_set().get_instance(id);
+//		printf("Got instance=0x%lX, %s\n", inst, typeid(*inst).name());
 		push_ref(L, inst);
 		return 1;
 	}
 	int serialize(lua_State* L) {
-		GameInst** udata = (GameInst**) lua_touserdata(L, -1);
+		GameInst** udata = (GameInst**) lua_touserdata(L, 1);
 		luawrap::globals(L)["__GAMEINST_DESERIALIZE"].push();
-		printf("onaddi: %X\n", lua_topointer(L, -1));
 		lua_pushinteger(L, (*udata)->id);
 		lua_pushinteger(L, (*udata)->current_floor);
 		return 3;
@@ -551,7 +552,7 @@ namespace lua_api {
 		submodule["__REF_META"].pop();
 		globals["__GAMEINST_SERIALIZE"].bind_function(GameInstWrap::serialize);
 		globals["__GAMEINST_DESERIALIZE"].bind_function(GameInstWrap::deserialize);
-		printf("ereachi: %X\n", lua_topointer(L, -1));
+		submodule["__GAMEINST_DESERIALIZE"] = globals["__GAMEINST_DESERIALIZE"];
 	}
 	void register_lua_core_GameObject(lua_State* L) {
 		luawrap::install_type<GameInst*, GameInstWrap::push, GameInstWrap::get, GameInstWrap::check>();

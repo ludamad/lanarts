@@ -20,33 +20,33 @@ class SerializeBuffer;
 
 namespace ldungeon_gen {
 
-	const uint16 FLAG_SOLID = 1 << 0;
-	const uint16 FLAG_PERIMETER = 1 << 1;
-	const uint16 FLAG_TUNNEL = 1 << 2;
-	const uint16 FLAG_HAS_OBJECT = 1 << 3;
-	const uint16 FLAG_NEAR_PORTAL = 1 << 4;
-	const uint16 FLAG_SEETHROUGH = 1 << 5;
+	const uint16_t FLAG_SOLID = 1 << 0;
+	const uint16_t FLAG_PERIMETER = 1 << 1;
+	const uint16_t FLAG_TUNNEL = 1 << 2;
+	const uint16_t FLAG_HAS_OBJECT = 1 << 3;
+	const uint16_t FLAG_NEAR_PORTAL = 1 << 4;
+	const uint16_t FLAG_SEETHROUGH = 1 << 5;
 	/* For future use */
-	const uint16 FLAG_RESERVED1 = 1 << 6;
-	const uint16 FLAG_RESERVED2 = 1 << 7;
+	const uint16_t FLAG_RESERVED1 = 1 << 6;
+	const uint16_t FLAG_RESERVED2 = 1 << 7;
 
 	/* Identifies squares to act on based on their fields.
 	 */
 	struct Selector {
-		uint16 must_be_on_bits;
-		uint16 must_be_off_bits;
-		uint16 must_be_content;
+		uint16_t must_be_on_bits;
+		uint16_t must_be_off_bits;
+		uint16_t must_be_content;
 		bool use_must_be_content;
 
-		Selector(uint16 must_be_on_bits, uint16 must_be_off_bits,
-				uint16 must_be_content) :
+		Selector(uint16_t must_be_on_bits, uint16_t must_be_off_bits,
+				uint16_t must_be_content) :
 						must_be_on_bits(must_be_on_bits),
 						must_be_off_bits(must_be_off_bits),
 						must_be_content(must_be_content),
 						use_must_be_content(true) {
 		}
 
-		Selector(uint16 must_be_on_bits = 0, uint16 must_be_off_bits = 0) :
+		Selector(uint16_t must_be_on_bits = 0, uint16_t must_be_off_bits = 0) :
 						must_be_on_bits(must_be_on_bits),
 						must_be_off_bits(must_be_off_bits),
 						must_be_content(0),
@@ -65,14 +65,14 @@ namespace ldungeon_gen {
 	 * The 'most obvious' use case is clearing out an area.
 	 */
 	struct Operator {
-		uint16 turn_on_bits;
-		uint16 turn_off_bits;
-		uint16 flip_bits;
-		uint16 content_value;
+		uint16_t turn_on_bits;
+		uint16_t turn_off_bits;
+		uint16_t flip_bits;
+		uint16_t content_value;
 		bool use_content_value;
 
-		Operator(uint16 turn_on_bits, uint16 turn_off_bits, uint16 flip_bits,
-				uint16 content_value) :
+		Operator(uint16_t turn_on_bits, uint16_t turn_off_bits, uint16_t flip_bits,
+				uint16_t content_value) :
 						turn_on_bits(turn_on_bits),
 						turn_off_bits(turn_off_bits),
 						flip_bits(flip_bits),
@@ -80,7 +80,7 @@ namespace ldungeon_gen {
 						use_content_value(true) {
 		}
 
-		Operator(uint16 turn_on_bits = 0, uint16 turn_off_bits = 0, uint16 flip_bits = 0) :
+		Operator(uint16_t turn_on_bits = 0, uint16_t turn_off_bits = 0, uint16_t flip_bits = 0) :
 						turn_on_bits(turn_on_bits),
 						turn_off_bits(turn_off_bits),
 						flip_bits(flip_bits),
@@ -113,13 +113,13 @@ namespace ldungeon_gen {
 	struct Square {
 		/* Bits 8 through 16 are used for 'user-defined flags.
 		 * These are labeled in the lua-side. */
-		uint16 flags;
+		uint16_t flags;
 		/* Content number, based on flags */
-		uint16 content;
+		uint16_t content;
 		/* Group this square belongs to */
-		uint16 group;
+		uint16_t group;
 
-		Square(uint16 flags = 0, uint16 content = 0, uint16 group = 0) :
+		Square(uint16_t flags = 0, uint16_t content = 0, uint16_t group = 0) :
 						flags(flags),
 						content(content),
 						group(group) {
@@ -146,7 +146,7 @@ namespace ldungeon_gen {
 				apply(oper.oper);
 			}
 		}
-		bool matches_flags(uint16 flags) const {
+		bool matches_flags(uint16_t flags) const {
 			return this->flags & flags;
 		}
 	};

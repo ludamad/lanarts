@@ -39,6 +39,51 @@ class SerializeBuffer;
 struct lua_State;
 class LuaValue;
 
+struct LuaSerializeContext {
+	lua_State* L;
+	SerializeBuffer* buffer;
+	// Lua values that control the serialization.
+	// Note, these indices will not 'survive' a lua stack call barrier.
+	int obj_to_index, index_to_obj, index_failure_function;
+	// Passed to each serialization function
+	int context_object;
+	size_t next_index;
+
+	LuaSerializeContext(lua_State* L, SerializeBuffer* buffer,
+			int obj_to_index, int index_to_obj,
+			int index_failure_function,
+			int context_object) {
+		this->L = L;
+		this->buffer = buffer;
+		this->next_index = 0;
+		this->obj_to_index = obj_to_index;
+		this->index_to_obj = index_to_obj;
+		this->index_failure_function = index_failure_function;
+		this->context_object = context_object;
+	}
+
+	// Captures the top 4 indices, without popping them.
+	// Note, these indices will not 'survive' a lua stack call barrier.
+	LuaSerializeContext reference_top4(lua_State* L, SerializeBuffer* buffer) {
+		int top = lua_gettop(L);
+		return LuaSerializeContext(L, buffer, top - 3, top - 2, top - 1, top);
+	}
+
+	// Encode a value from the stack.
+	void encode(int idx);
+	// Decode and push a Lua value.
+	void decode();
+private:
+	void store_reference(int idx);
+	// Encodes the object key on succcess
+	bool test_has_reference(int idx);
+	// Encodes using an object method on success
+	bool test_has_metamethod(int idx);
+	void encode_table(int idx);
+	void encode_string(int idx);
+	void encode_function(int idx);
+};
+
 void lua_serialize(SerializeBuffer& serializer, lua_State* L, int nargs);
 void lua_deserialize(SerializeBuffer& serializer, lua_State* L, int nargs);
 

@@ -111,7 +111,7 @@ void ScoreBoard::read_entries(std::vector<ScoreBoardEntry>& entries) const {
 		// TODO: Be more graceful
 		printf(
 				"WARNING: Incompatible high score list was detected. The list may be overridden.\n");
-		printf("Internal error: '%'s'\n", sbe.what());
+		printf("Internal error: '%s'\n", sbe.what());
 		entries.clear(); // Don't show corrupted entries
 	}
 

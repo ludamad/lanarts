@@ -40,6 +40,7 @@ local function import_file(vpath)
         return entries
     else
         if err:find("No such file or directory") then
+        print(rpath)
             error("No such module " .. vpath .. " (file " .. rpath .. " does not exist)")
         else
             error(err)

@@ -72,6 +72,7 @@ void FeatureInst::step(GameState* gs) {
 }
 
 void FeatureInst::init(GameState* gs) {
+	GameInst::init(gs);
 	if (feature == DOOR_CLOSED || solid) {
 		Pos tile_xy(x / TILE_SIZE, y / TILE_SIZE);
 		gs->tiles().set_solid(tile_xy, true);

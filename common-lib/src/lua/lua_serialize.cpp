@@ -94,7 +94,7 @@ static inline bool buf_write_if_seen(lua_State* L, SerializeBuffer& buf, int tab
 	lua_pushvalue(L, -1);
 	lua_rawget(L, table_idx);
 	bool was_seen = !lua_isnil(L, -1);
-	printf("0x%lX %s\n", lua_topointer(L, -2), was_seen ? "was seen" : "wasn't seen");
+//	printf("0x%lX %s\n", lua_topointer(L, -2), was_seen ? "was seen" : "wasn't seen");
 	if (was_seen) {
 		if (lua_isnumber(L, -1)) {
 			buf.write_byte(MAR_TREF);
@@ -103,6 +103,7 @@ static inline bool buf_write_if_seen(lua_State* L, SerializeBuffer& buf, int tab
 		} else {
 			size_t str_len;
 			const char* str = lua_tolstring(L, -1, &str_len);
+			printf("Test: '%s', %d chars\n", str, (int)str_len);
 			buf.write_byte(MAR_TREF_STR);
 			buf.write_int(str_len);
 			buf.write_raw(str, str_len);
@@ -134,8 +135,12 @@ static inline bool buf_try_persist_hook(lua_State *L, SerializeBuffer& buf, size
 		for (int i = stacksize + 1; i <= stack_top; i++) {
 			mar_encode_value(L, buf, i, idx);
 		}
-		// pop if persisted
-		lua_settop(L, stacksize - 1);
+		lua_settop(L, stacksize);
+//		lua_pushvalue(L, -1);
+//		lua_pushinteger(L, (*idx)++);
+//		lua_rawset(L, SEEN_IDX);
+		lua_pop(L, 1); // pop value
+		return true;
 	}
 	return false;
 }
@@ -169,7 +174,7 @@ void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) 
 		break;
 	}
 	case LUA_TTABLE: {
-		pretty_print(LuaStackValue(L, -1));
+//		pretty_print(LuaStackValue(L, -1));
 		lua_pushvalue(L, -1);
 		if (!buf_write_if_seen(L, buf, SEEN_IDX)
 				&& !buf_try_persist_hook(L, buf, idx)) {
@@ -209,7 +214,6 @@ void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) 
 				luaL_error(L, "attempt to persist a C function '%s'", ar.name);
 			}
 			lua_pushvalue(L, -1);
-//			printf("Serializing type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
 			lua_pushinteger(L, (*idx)++);
 			lua_rawset(L, SEEN_IDX);
 
@@ -260,7 +264,6 @@ void mar_encode_value(lua_State *L, SerializeBuffer& buf, int val, size_t *idx) 
 static int mar_encode_table(lua_State *L, SerializeBuffer& buf, size_t *idx) {
 	lua_pushnil(L);
 	while (lua_next(L, -2) != 0) {
-		printf("encoding %s\n", lua_tostring(L, -2));
 		mar_encode_value(L, buf, -2, idx);
 		mar_encode_value(L, buf, -1, idx);
 		lua_pop(L, 1);
@@ -283,9 +286,8 @@ static void mar_handle_persist_closure(lua_State* L, const char *buf, size_t len
 	}
 	// First argument is function, so persistargs-1 arguments are passed
 	lua_call(L, persistargs - 1, 1);
-	lua_pushvalue(L, -1);
-//	printf("Type %d = %s\n", *idx, lua_typename(L, lua_type(L, -1)));
-	lua_rawseti(L, SEEN_IDX, (*idx)++);
+//	lua_pushvalue(L, -1);
+//	lua_rawseti(L, SEEN_IDX, (*idx)++);
 }
 
 void lua_store_submodule_refs(LuaField submodule, const char* name, LuaField str2obj_table, LuaField obj2str_table, bool recurse = true);
@@ -429,7 +431,8 @@ static bool decode_ref(lua_State* L, const char *buf, size_t len, const char **p
 
 			lua_rawget(L, SEEN_IDX);
 			if (lua_isnil(L, -1)) {
-				throw std::runtime_error(format("Could not find matching value for key '%s' in deserialization.", lua_tostring(L, -1)));
+				printf("'%s'\n", lua_tostring(L,-2));
+				throw std::runtime_error(format("Could not find matching value for key '%s' in deserialization.", lua_tostring(L, -2)));
 			}
 		}
 		lua_replace(L, -2);
@@ -441,6 +444,7 @@ static bool decode_ref(lua_State* L, const char *buf, size_t len, const char **p
 
 void mar_decode_value(lua_State* L, const char *buf, size_t len, const char **p,
 		size_t *idx) {
+	int old_stack_top = lua_gettop(L);
 	size_t l;
 	char val_type = **p;
 	mar_incr_ptr(MAR_CHR);
@@ -542,17 +546,38 @@ void mar_decode_value(lua_State* L, const char *buf, size_t len, const char **p,
 		break;
 	}
 	fflush(stdout);
+	LCOMMON_ASSERT(old_stack_top + 1 == lua_gettop(L));
 }
+
+#define MAR_LOG_DECODE
+
+#ifdef MAR_LOG_DECODE
+int tabs = 0;
+#endif
 
 static int mar_decode_table(lua_State *L, const char* buf, size_t len,
 		size_t *idx) {
 	const char* p;
 	p = buf;
+#ifdef MAR_LOG_DECODE
+	tabs++;
+#endif
 	while (p - buf < len) {
 		mar_decode_value(L, buf, len, &p, idx);
+#ifdef MAR_LOG_DECODE
+		if (lua_type(L, -1) == LUA_TSTRING) {
+			for (int t = 0; t < tabs; t++) {
+				putchar('\t');
+			}
+			printf("Decoding '%s'\n", lua_tostring(L, -1));
+		}
+#endif
 		mar_decode_value(L, buf, len, &p, idx);
 		lua_settable(L, -3);
 	}
+#ifdef MAR_LOG_DECODE
+	tabs--;
+#endif
 	return 1;
 }
 

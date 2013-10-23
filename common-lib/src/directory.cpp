@@ -109,7 +109,6 @@ static bool matches_wildcard(const char* pattern, const char* str) {
 	return (*str_ptr == 0);
 }
 
-
 static void search_directory(FilenameList& results, const char* path, const char* name_pattern, bool recursive) {
 	DirListing listing = list_directory(path);
 	for (int i = 0; i < listing.size(); i++) {

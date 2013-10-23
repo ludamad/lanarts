@@ -296,16 +296,16 @@ local function place_content(map, --[[Optional]] dont_spawn_content)
         MapUtils.spawn_decoration(map, M._anvil, xy)
     end
     local map_id = MapUtils.game_map_create(map)
-    if not dont_spawn_content then
-        OldMapSeq1:slot_resolve(1, map_id)
-        OldMapSeq2:slot_resolve(1, map_id)
-        for MapSeq in values(temple_sequences) do
-            MapSeq:slot_resolve(1, map_id)
-        end
-        for MapSeq in values(dirthole_sequences) do
-            MapSeq:slot_resolve(1, map_id)
-        end
-    end
+--    if not dont_spawn_content then
+--        OldMapSeq1:slot_resolve(1, map_id)
+--        OldMapSeq2:slot_resolve(1, map_id)
+--        for MapSeq in values(temple_sequences) do
+--            MapSeq:slot_resolve(1, map_id)
+--        end
+--        for MapSeq in values(dirthole_sequences) do
+--            MapSeq:slot_resolve(1, map_id)
+--        end
+--    end
 
     return map_id
 end

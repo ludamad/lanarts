@@ -19,6 +19,7 @@ LuaValue lua_serializebuffermetatable(lua_State* L) {
 	LUAWRAP_METHOD(methods, write, lua_serialize(OBJ, L, lua_gettop(L) - 1));
 	LUAWRAP_METHOD(methods, read, lua_deserialize(OBJ, L, lua_gettop(L) - 1));
 	LUAWRAP_METHOD(methods, write_int, OBJ.write_int(lua_tointeger(L, 2)));
+	LUAWRAP_METHOD(methods, write_double, OBJ.write(lua_tonumber(L, 2)));
 	LUAWRAP_METHOD(methods, write_raw,
 			size_t size;
 			const char* str = lua_tolstring(L, 2, &size);
@@ -27,6 +28,7 @@ LuaValue lua_serializebuffermetatable(lua_State* L) {
 	LUAWRAP_METHOD(methods, move_read_position, OBJ.move_read_position(lua_tointeger(L, 2)));
 
 	LUAWRAP_GETTER(methods, read_int, OBJ.read_int());
+	LUAWRAP_GETTER(methods, read_double, OBJ.read_int());
 	LUAWRAP_METHOD(methods, read_raw,
 			int size = lua_tointeger(L, 2);
 			char* buf = (char*)malloc(size);

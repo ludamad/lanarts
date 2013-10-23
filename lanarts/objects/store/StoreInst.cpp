@@ -52,6 +52,7 @@ void StoreInst::copy_to(GameInst* inst) const {
 }
 
 void StoreInst::init(GameState* gs) {
+	GameInst::init(gs);
 	sidebar_display.init(this, gs->game_hud().sidebar_content_area());
 }
 

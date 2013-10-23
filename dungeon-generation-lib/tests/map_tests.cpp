@@ -67,7 +67,7 @@ TEST(square_selector_matches) {
 }
 
 TEST(map_rectangle_fill) {
-	const uint16 TEST_CONTENT = 5;
+	const uint16_t TEST_CONTENT = 5;
 
 	MapPtr map(new Map(Size(10, 10), Square(FLAG_SOLID)));
 
