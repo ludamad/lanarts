@@ -9,7 +9,6 @@
 #include <luawrap/members.h>
 #include <luawrap/types.h>
 
-#include <lcommon/lua_serialize.h>
 #include <lcommon/directory.h>
 
 #include <lsound/lua_lsound.h>

@@ -6,7 +6,7 @@
 #include <luawrap/luawrap.h>
 #include <luawrap/macros.h>
 
-#include "lua_serialize.h"
+#include "luaserialize.h"
 #include "SerializeBuffer.h"
 
 LuaValue lua_serializebuffermetatable(lua_State* L) {
@@ -16,8 +16,8 @@ LuaValue lua_serializebuffermetatable(lua_State* L) {
 	LuaValue methods = luameta_constants(meta);
 	LuaValue getters = luameta_getters(meta);
 
-	LUAWRAP_METHOD(methods, write, lua_serialize(OBJ, L, lua_gettop(L) - 1));
-	LUAWRAP_METHOD(methods, read, lua_deserialize(OBJ, L, lua_gettop(L) - 1));
+//	LUAWRAP_METHOD(methods, write, lua_serialize(OBJ, L, lua_gettop(L) - 1));
+//	LUAWRAP_METHOD(methods, read, lua_deserialize(OBJ, L, lua_gettop(L) - 1));
 	LUAWRAP_METHOD(methods, write_int, OBJ.write_int(lua_tointeger(L, 2)));
 	LUAWRAP_METHOD(methods, write_double, OBJ.write(lua_tonumber(L, 2)));
 	LUAWRAP_METHOD(methods, write_raw,

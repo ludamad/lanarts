@@ -77,7 +77,7 @@ void Inventory::deserialize(SerializeBuffer& serializer) {
 	items.resize(size);
 	for (int i = 0; i < items.size(); i++) {
 		items[i].item.deserialize(serializer);
-		serializer.read_byte(items[i].equipped);
+		items[i].equipped = serializer.read_byte();
 	}
 }
 

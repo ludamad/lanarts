@@ -77,7 +77,6 @@ inline void serialize_buffer_error(const std::string& msg) {
 #define LSERIALIZE_CHECK(check) \
 	if (!(check)) { serialize_buffer_error( format( "SerializeBuffer line %d: %s", __LINE__, #check) ); }
 
-
 class SerializeBuffer {
 public:
 	enum IOType {
@@ -89,14 +88,20 @@ public:
 	SerializeBuffer();
 	SerializeBuffer(FILE* file, IOType type, bool close_file = false);
 
-	// Low level read/writes:
-	void read_raw(char* bytes, size_t n) {
+	// Low level fetch, guaranteed to be in buffer:
+	char* fetch_raw(size_t n) {
 		if (_buffer.size() - _read_position < n) {
 			fill();
 		}
 		LSERIALIZE_CHECK(_buffer.size() >= n + _read_position);
-		memcpy(bytes, &_buffer[_read_position], n);
+		char* ref = &_buffer[_read_position];
 		_read_position += n;
+		return ref;
+	}
+
+	// Low level read/writes:
+	void read_raw(char* bytes, size_t n) {
+		memcpy(bytes, fetch_raw(n), n);
 	}
 
 	void write_raw(const char* bytes, size_t n) {
@@ -130,16 +135,21 @@ public:
 	void write_byte(int i) {
 		write((char)i);
 	}
-	template<class T>
-	void read_byte(T& i) {
+
+	char read_byte() {
 		char byte;
 		read(byte);
-		i = byte;
+		return byte;
 	}
 
 	void write(const std::string& str) {
 		write((int)str.size());
 		write_raw(str.c_str(), str.size());
+	}
+	void write_str(const char* str) {
+		int len = (int)strlen(str);
+		write(len);
+		write_raw(str, len);
 	}
 	void read(std::vector<bool>::reference ref) {
 		// For vector<bool>! Blah.
@@ -155,6 +165,12 @@ public:
 		if (size > 0) {
 			read_raw(&str[0], size);
 		}
+	}
+
+	std::string read_str() {
+		std::string str;
+		read(str);
+		return str;
 	}
 
 	// Will endian-swap any values of 2, 4, 8 byte-length.
@@ -184,7 +200,7 @@ public:
 			uint32_t val = be32toh(*(uint32_t*)&t);
 			write_raw((const char*)&val, sizeof(T));
 		} else if (sizeof(T) == 8) {
-			uint64_t val = be64toh(*(uint32_t*)&t);
+			uint64_t val = be64toh(*(uint64_t*)&t);
 			write_raw((const char*)&val, sizeof(T));
 		} else {
 			write_raw((const char*)&t, sizeof(T));

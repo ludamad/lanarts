@@ -19,6 +19,7 @@ file(GLOB lcommon_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     include/common/* 
 )
 
+
 add_library( lcommon
              STATIC
              ${lcommon_src} )

@@ -66,7 +66,8 @@ GameState::GameState(const GameSettings& settings, lua_State* L) :
 			BBox(0, 0, settings.view_width - GAME_SIDEBAR_WIDTH, settings.view_height)),
 		_view(0, 0, settings.view_width - GAME_SIDEBAR_WIDTH, settings.view_height),
 		world(this),
-		repeat_actions_counter(0) {
+		repeat_actions_counter(0),
+		config(L) {
 
 	is_dragging_view = false;
 

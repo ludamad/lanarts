@@ -14,6 +14,7 @@
 
 #include <lcommon/smartptr.h>
 #include <lcommon/mtwist.h>
+#include <lcommon/luaserialize.h>
 
 #include <ldraw/Font.h>
 
@@ -248,6 +249,10 @@ public:
 	void restart();
 
 	CollisionAvoidance& collision_avoidance();
+
+	LuaSerializeConfig& luaserialize_config() {
+		return config;
+	}
 private:
 	int handle_event(SDL_Event* event, bool trigger_event_handling = true);
 
@@ -272,6 +277,8 @@ private:
 
 	//XXX: This repeats the last action N times, a more elegant solution is needed
 	int repeat_actions_counter;
+
+	LuaSerializeConfig config;
 };
 
 #endif /* GAMESTATE_H_ */

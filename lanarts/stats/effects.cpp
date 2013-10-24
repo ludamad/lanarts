@@ -4,7 +4,7 @@
 
 #include <lcommon/geometry.h>
 #include <lcommon/SerializeBuffer.h>
-#include <lcommon/lua_serialize.h>
+#include <lcommon/luaserialize.h>
 
 #include "data/lua_game_data.h"
 #include "gamestate/GameState.h"
@@ -197,21 +197,23 @@ LuaValue EffectStats::add(GameState* gs, CombatGameInst* inst, effect_id effect,
 }
 
 void EffectStats::serialize(GameState* gs, SerializeBuffer& serializer) {
+	LuaSerializeConfig& config = gs->luaserialize_config();
 	lua_State* L = gs->luastate();
 
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		serializer.write_int(effects[i].effectid);
-		lua_serialize(serializer, L, effects[i].state);
+		config.encode(serializer, effects[i].state);
 		serializer.write_int(effects[i].t_remaining);
 	}
 }
 
 void EffectStats::deserialize(GameState* gs, SerializeBuffer& serializer) {
+	LuaSerializeConfig& config = gs->luaserialize_config();
 	lua_State* L = gs->luastate();
 
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		serializer.read_int(effects[i].effectid);
-		lua_deserialize(serializer, L, effects[i].state);
+		config.decode(serializer, effects[i].state);
 		if (!effects[i].state.empty()) {
 			lua_init_metatable(L, effects[i].state, effects[i].effectid);
 		}

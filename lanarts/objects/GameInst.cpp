@@ -11,7 +11,7 @@
 #include <luawrap/luawrap.h>
 
 #include <lcommon/SerializeBuffer.h>
-#include <lcommon/lua_serialize.h>
+#include <lcommon/luaserialize.h>
 
 #include "draw/draw_sprite.h"
 
@@ -111,7 +111,8 @@ void GameInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 
 // Must be done after the normal serialization to allow for referring to the object.
 void GameInst::serialize_lua(GameState* gs, SerializeBuffer& serializer) {
-	lua_serialize(serializer, gs->luastate(), lua_variables);
+	LuaSerializeConfig& conf = gs->luaserialize_config();
+	conf.encode(serializer, lua_variables);
 }
 
 void GameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
@@ -122,7 +123,8 @@ void GameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 
 // Must be done after the normal serialization to allow for referring to the object.
 void GameInst::deserialize_lua(GameState* gs, SerializeBuffer& serializer) {
-	lua_deserialize(serializer, gs->luastate(), lua_variables);
+	LuaSerializeConfig& conf = gs->luaserialize_config();
+	conf.decode(serializer, lua_variables);
 }
 
 void GameInst::copy_to(GameInst *inst) const {

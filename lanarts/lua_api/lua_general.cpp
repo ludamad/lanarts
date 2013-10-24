@@ -13,7 +13,6 @@
 
 #include <luawrap/luawrap.h>
 #include <lcommon/directory.h>
-#include <lcommon/lua_serialize.h>
 
 #include <lcommon/lua_utils.h>
 
@@ -460,7 +459,7 @@ static LuaValue lapi_import_internal(LuaStackValue importstring) {
 }
 
 static LuaStackValue lapi_always_serialize(LuaStackValue value) {
-	lua_register_serialization_mutable(value);
+//	lua_register_serialization_mutable(value);
 	return value;
 }
 
@@ -553,7 +552,7 @@ namespace lua_api {
 		LuaValue global_data(L);
 		global_data.newtable();
 		lua_api::register_lua_submodule(L, "core.GlobalData", global_data);
-		lua_register_serialization_mutable(global_data);
+//		lua_register_serialization_mutable(global_data);
 
 		LuaValue serialization = lua_api::register_lua_submodule(L, "core.Serialization");
 		serialization["always_serialize"].bind_function(lapi_always_serialize);
