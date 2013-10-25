@@ -7,7 +7,7 @@ function poison_statmod(effect, obj, old, new)
 	new.speed = new.speed * 1.66
 end
 
-function poison_init(effect, obj)
+function poison_map_init(effect, obj)
 	effect.steps = 0
 end
 

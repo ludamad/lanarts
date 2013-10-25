@@ -145,8 +145,8 @@ function Inventory.item_slot_create(args)
     args.equipped = args.equipped or false
     setmetatable(args, SlotUtils.METATABLE)
 
-    if type.on_init then
-       type.on_init(args)
+    if type.on_map_init then
+       type.on_map_init(args)
     end
     return args
 end

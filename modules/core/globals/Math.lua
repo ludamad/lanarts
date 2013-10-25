@@ -1,5 +1,19 @@
 -- Functions that perform mathematical manipulations or checks
 
+local assert, type, getmetatable, pairs = assert, type, getmetatable, pairs
+local floor, sqrt, atan2 = math.floor, math.sqrt, math.atan2
+local max, min = math.max, math.min
+
+function math.round(n) -- Simplest possible. Caveat: Rounds -.5 to 0.
+    return floor(n + .5)
+end
+
+function math.sign_of(v)
+    if v > 0 then return 1 end
+    if v == 0 then return 0 end
+    return -1
+end
+
 --- Given two numeric arrays of the same length, returns a new array with each of the elements multiplied together
 function vector_multiply(v1, v2)
     local length = # v1
@@ -33,7 +47,7 @@ function vector_scale(v1, scale, --[[Optional]] floor_result)
     for i = 1,#v1 do 
         local result = v1[i] * scale
         if floor_result then
-            result = math.floor(result)
+            result = floor(result)
         end
         ret[i] = result
     end
@@ -48,7 +62,7 @@ function vector_distance(v1,v2)
     for i = 1,length do 
         sum = sum + (v2[i] - v1[i]) ^ 2 
     end
-    return math.sqrt(sum)
+    return sqrt(sum)
 end
 
 function vector_sum(v)
@@ -62,17 +76,17 @@ end
 function vector_magnitude(v)
     local sum = 0
     for i = 1,#v do
-        sum = sum + v[i]^2
+        sum = sum + v[i] * v[i]
     end
-    return math.sqrt(sum)
+    return sqrt(sum)
 end
 
 function vector_to_direction(v)
-    return math.atan2(v[2], v[1])
+    return atan2(v[2], v[1])
 end
 
 function vector_direction(v1,v2)
-    return math.atan2(v2[2] - v1[2], v2[1] - v1[1])
+    return atan2(v2[2] - v1[2], v2[1] - v1[1])
 end
 
 function vector_normalize(v, --[[Optional]] magnitude)
@@ -103,8 +117,8 @@ function table.dot_product(t1, t2)
     return sum
 end
 
-vector_max = vector_apply(math.max)
-vector_min = vector_apply(math.min)
+vector_max = vector_apply(max)
+vector_min = vector_apply(min)
 
 --- Given two numeric arrays of the same length, returns a new array with the elements interpolated.
 -- The resulting values are in between the original values.
@@ -113,7 +127,7 @@ vector_min = vector_apply(math.min)
 -- @param percentage the amount to go towards v2. 0 results in v1, 1 results in v2, anything else is in-between.
 function vector_interpolate(v1, v2, percentage)
     local length = # v1
-    percentage = math.max( math.min(percentage, 1.0), 0.0)
+    percentage = max(min(percentage, 1.0), 0.0)
 
     assert(length == #v2, "vector_interpolate(): Vector lengths do not match!")
 
@@ -128,7 +142,7 @@ end
 
 --- Given two numeric arrays of the same length, returns a new array with the elements of the first array divided by the elements of the second.
 function vector_divide(v1, v2)
-    local length = # v1
+    local length = #v1
 
     assert(length == #v2, "vector_divide(): Vector lengths do not match!")
 
@@ -139,7 +153,7 @@ function vector_divide(v1, v2)
 end
 
 function random_round(num)
-    local f = math.floor(num)
+    local f = floor(num)
     if randomf(0,1) < (num-f) then
         return f + 1
     else
@@ -163,7 +177,7 @@ end
 --- Returns whether 'origin' represents a valid origin. 
 -- A valid origin is a pair of numbers between 0 and 1, representing placement on a rectangle, eg Display.LEFT_TOP is {0,0}.
 function origin_valid(origin)
-    local rx, ry = unpack(origin)
+    local rx, ry = origin[1], origin[2]
     return rx >= 0 and rx <= 1 and ry >= 0 and ry <= 1
 end
 
@@ -177,10 +191,4 @@ end
 
 function is_position(xy_candidate)
     return type(xy_candidate) == "table" and not getmetatable(xy_candidate) and #xy_candidate == 2
-end
-
-function math.sign_of(v)
-    if v > 0 then return 1 end
-    if v == 0 then return 0 end
-    return -1
 end

@@ -11,12 +11,11 @@ local ExperienceCalculation = import "@stats.ExperienceCalculation"
 local LogUtils = import "lanarts.LogUtils"
 local ActionResolvers = import ".ActionResolvers"
 
-local MonsterObject = ObjectUtils.type_create(CombatObject)
+local MonsterObject = GameObject.type_create(CombatObject)
+local rawget = rawget
 -- Ensure that the monster's type is looked up in resolution
 function MonsterObject:__index(k)
-    if k == "monster_type" then return nil end -- Don't recurse
-    local monster_type = self["monster_type"]
-    return monster_type and monster_type[k]
+    return rawget(rawget(self, "monster_type"), k)
 end
 
 MonsterObject.MONSTER_TRAIT = "MONSTER_TRAIT"
@@ -65,36 +64,22 @@ function MonsterObject:on_predraw()
     end
 end
 
-local MonsterObjectMeta = {__isgameinst = true}
-
-local rawget = rawget
-function MonsterObjectMeta:__index(k)
-    local val = rawget(rawget(self, "monster_type"), k)
-    if val ~= nil then return val end
-    return self.__objectref[k]
-end
-
 -- Used internally by the lua bindings to know how to decode our custom object type
-function MonsterObject.create(args)
-    assert(args.monster_type and not args.type)
+function MonsterObject:init(args)
+    local mtype = assert(args.monster_type) -- Resolve monster_type
+    if type(mtype) == "string" then mtype = MonsterType.lookup(mtype) end
+
+    args.radius = args.radius or mtype.radius
+    args.base_stats = table.deep_clone(mtype.base_stats)
     args.action_resolver = ActionResolvers.AIActionResolver.create(args.collision_group)
-    if type(args.monster_type) == "string" then
-        args.monster_type = MonsterType.lookup(args.monster_type)
-    end
-    args.radius = args.radius or args.monster_type.radius
-    args.base_stats = table.deep_clone(args.monster_type.base_stats)
-    args.unarmed_action = args.monster_type.unarmed_action
+
+    MonsterObject.parent_init(self, args)
+
+    self.monster_type = mtype
+    self.unarmed_action = mtype.unarmed_action
 
     -- Set up type signature
-    args.traits = args.traits or {}
-    table.insert(args.traits, MonsterObject.MONSTER_TRAIT)
-
-    local monster = MonsterObject.base_create(args)
---    local lua_vars = monster.__table
---    lua_vars.__objectref = monster
-    -- Role inversion:
---    return setmetatable(monster, MonsterObjectMeta)
-    return monster
+    table.insert(self.traits, MonsterObject.MONSTER_TRAIT)
 end
 
 function MonsterObject.is_monster(obj)

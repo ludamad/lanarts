@@ -22,6 +22,7 @@ M = {
     error_replacements = {
         {"modules/core/globals/Modules%.lua:%d+: ", ""},
         {LUAMODULE_PATTERN, function(s) return M.resolve_color("WHITE", s) end},
+--        {"'[_%w]+'", function(s) return M.resolve_color("WHITE", s) end},
         {'%d+', function(s) return M.resolve_color("WHITE", s) end},
         {LUAFILE_PATTERN, function(s) return M.resolve_color("WHITE", s) end}
     },

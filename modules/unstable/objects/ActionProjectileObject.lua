@@ -6,7 +6,7 @@ local LogUtils = import "lanarts.LogUtils"
 local GameObject = import "core.GameObject"
 local Actions = import "@Actions"
 
-local ActionProjectileObject = ObjectUtils.type_create(Projectiles.LinearProjectileBase)
+local ActionProjectileObject = GameObject.type_create(Projectiles.LinearProjectileBase)
 
 function ActionProjectileObject:on_object_collide(other)
     local user = assert(self.stats.obj)
@@ -32,11 +32,12 @@ function ActionProjectileObject:on_deinit()
     Animations.fadeout_create { sprite = self.sprite, duration = ANIMATION_FADEOUT_DURATION, direction = self.direction, xy = self.xy }
 end
 
-function ActionProjectileObject.create(args)
-    assert(args.velocity and args.sprite and args.stats and args.action)
-
+function ActionProjectileObject:init(args)
     args.radius = args.radius or args.sprite.width / 2
-    return ActionProjectileObject.base_create(args)
+    ActionProjectileObject.parent_init(self, args)
+    self.sprite = args.sprite
+    self.stats = args.stats
+    self.action = args.action
 end
 
 return ActionProjectileObject

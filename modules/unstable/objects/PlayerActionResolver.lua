@@ -60,7 +60,7 @@ local io_events = {
                 ammo.sprite:draw(ammo_xy)
                 ammo_xy[1], ammo_xy[2] = ammo_xy[1] + 3, ammo_xy[2] + 3
                 self._options.color = COL_WHITE 
-                Fonts.small:draw(self._options, ammo_xy, self.amount)
+                Fonts.small:draw(self._options, ammo_xy, self.amount or 1)
             end
         end,
         post_draw = function(self, obj, xy)

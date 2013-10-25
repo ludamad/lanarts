@@ -8,61 +8,55 @@ M.PROJECTILE_TRAIT = "PROJECTILE_TRAIT"
 
 -- PROJECTILE BASE CLASS
 
-local Base = ObjectUtils.type_create()
-M.ProjectileBase = Base
+M.ProjectileBase = GameObject.type_create()
+local Base = M.ProjectileBase
 
-local function projectile_wrapper_on_step(self)
+Base.on_tile_collide, Base.on_object_collide = do_nothing, do_nothing
+Base.on_draw = do_nothing
+
+function Base:on_step(self)
+    -- Tile checks:
     local tile_xy = Map.object_tile_check(self)
-    if tile_xy then
-        ObjectUtils.object_callback(self, "on_tile_collide", assert(tile_xy))
-    end
-
+    if tile_xy then self:on_tile_collide(tile_xy) end
+    -- Object collision checks:
     local collisions = Map.object_collision_check(self)
-    for obj in values(collisions) do
+    for _, obj in ipairs(collisions) do
         if self.destroyed then return end
-        ObjectUtils.object_callback(self, "on_object_collide", assert(obj))
+        self:on_object_collide(obj)
     end
-
-    if self.destroyed then return end
-    self:_on_step()
+    return (not self.destroyed)
 end
 
--- Manditory arguments:
--- xy, radius, on_step, on_draw, on_tile_collide, on_object_collide, do_init
--- Everything else is extra.
-function Base.create(args)
-    args.traits = args.traits or {}
-    table.insert(args.traits, M.PROJECTILE_TRAIT)
-    -- Wrap supplied on_step
-    args._on_step = args.on_step or args.type.on_step
-    -- Make sure our on_step is called
-    args.on_step = projectile_wrapper_on_step
-
-    return Base.base_create(args)
+function Base:init(args)
+    Base.parent_init(self, args)
+    self.traits = args.traits or {}
+    table.insert(self.traits, M.PROJECTILE_TRAIT)
 end
 
 -- LINEAR PROJECTILE
 
-local LinearBase = ObjectUtils.type_create(Base)
-M.LinearProjectileBase = LinearBase
+M.LinearProjectileBase = GameObject.type_create(Base)
+local LinearBase = M.LinearProjectileBase
 
 LinearBase.on_tile_collide = GameObject.destroy
 
 function LinearBase:on_step()
+    if not LinearBase.parent_on_step(self) then return end
     if self.range_left <= 0 then
         GameObject.destroy(self)
+        return
     end
-    local vx, vy = unpack(self.velocity)
+    local vx, vy = self.velocity[1],self.velocity[2]
     self.x = self.x + vx
     self.y = self.y + vy
     self.range_left = self.range_left - math.sqrt(vx*vx+vy*vy)
 end
 
-function LinearBase.create(args)
-    assert(args.velocity and args.radius)
-    args.direction = vector_to_direction(args.velocity)
-    args.range_left = args.range_left or 250
-    return LinearBase.base_create(args)
+function LinearBase:init(args)
+    self.parent_init(self, args)
+    self.velocity, self.radius = assert(args.velocity), assert(args.radius)
+    self.direction = vector_to_direction(args.velocity)
+    self.range_left = self.range_left or 250
 end
 
 -- HELPER FUNCTIONS

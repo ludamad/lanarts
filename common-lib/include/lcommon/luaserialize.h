@@ -1,41 +1,7 @@
-/*
- * Adapted from lmarshal.h:
- * A Lua library for serializing and deserializing Lua values
- * Richard Hundt <richardhundt@gmail.com>
- *
- * License: MIT
- *
- * Copyright (c) 2010 Richard Hundt
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following
- * conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
- */
-
-#ifndef LCOMMON_LUA_SERIALIZE_H_
-#define LCOMMON_LUA_SERIALIZE_H_
+#ifndef LCOMMON_LUASERIALIZE_H_
+#define LCOMMON_LUASERIALIZE_H_
 
 #include <luawrap/LuaValue.h>
-
-// TODO: Its amazing that the global object naming even works but
-// there is some mess to clean after my vicious hacking
 
 class SerializeBuffer;
 struct lua_State;
@@ -54,11 +20,12 @@ struct LuaSerializeContext {
 	LuaSerializeContext(lua_State* L, SerializeBuffer* buffer,
 			int obj_to_index, int index_to_obj,
 			int index_failure_function,
-			int context_object) {
+			int context_object,
+			size_t next_encode_index = 1, size_t next_decode_index = 1) {
 		this->L = L;
 		this->buffer = buffer;
-		this->next_decode_index = lua_objlen(L, this->index_to_obj) + 1;
-		this->next_encode_index = lua_objlen(L, this->obj_to_index) + 1;
+		this->next_encode_index = next_encode_index;
+		this->next_decode_index = next_decode_index;
 		this->obj_to_index = obj_to_index;
 		this->index_to_obj = index_to_obj;
 		this->index_failure_function = index_failure_function;
@@ -100,7 +67,9 @@ private:
 	void encode_table(int idx);
 	void encode_function(int idx);
 
-	void decode_table();
+	void store_object(int idx);
+
+	void decode_table(int idx);
 	void decode_function();
 	void decode_string();
 	void decode_ref_name();
@@ -118,14 +87,20 @@ struct LuaSerializeConfig {
 	lua_State* L;
 	LuaValue obj_to_index, index_to_obj;
 	LuaValue index_failure_function, context_object;
+	size_t next_encode_index, next_decode_index;
 	LuaSerializeConfig(lua_State* L) {
 		this->L = L;
 		obj_to_index = LuaValue::newtable(L);
 		index_to_obj = LuaValue::newtable(L);
 		index_failure_function.init(L);
 		context_object = LuaValue::newtable(L);
+		next_encode_index = 1, next_decode_index = 1;
 	}
 	LuaSerializeContext push4(SerializeBuffer& serializer);
+	void sync_indices(LuaSerializeContext& context) {
+		next_decode_index = context.next_decode_index;
+		next_encode_index = context.next_encode_index;
+	}
 	void encode(SerializeBuffer& serializer, int idx);
 	void decode(SerializeBuffer& serializer);
 	void encode(SerializeBuffer& serializer, const LuaValue& value);
@@ -135,4 +110,4 @@ struct LuaSerializeConfig {
 void luaserialize_encode(lua_State* L, SerializeBuffer& serializer, const LuaValue& value);
 void luaserialize_decode(lua_State* L, SerializeBuffer& serializer, LuaValue& value);
 
-#endif /* LCOMMON_LUA_SERIALIZE_H_ */
+#endif /* LCOMMON_LUASERIALIZE_H_ */

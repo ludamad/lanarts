@@ -24,7 +24,7 @@ local schema = {
     -- Takes an approximate character-level appropriateness
     on_variation = S.FUNCTION_OR_NIL,
 
-    on_init = S.FUNCTION_OR_NIL,
+    on_map_init = S.FUNCTION_OR_NIL,
     -- For equipment (all require item to be equippable and already equipped)
     on_step = S.FUNCTION_OR_NIL,
     on_evoke = S.FUNCTION_OR_NIL,

@@ -6,6 +6,7 @@
 
 #include <typeinfo>
 
+#include <luawrap/luawrap.h>
 #include "draw/TileEntry.h"
 
 #include "objects/enemy/EnemyInst.h"

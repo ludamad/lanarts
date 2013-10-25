@@ -57,7 +57,7 @@ function M.find_closest_hostile(self)
     local x,y = self.x,self.y
     local min_dist,min_obj = math.huge,nil
     for _, obj in ipairs(self.map.combat_objects) do
-        if Relations.is_hostile(self, obj) then
+        if not obj.destroyed and Relations.is_hostile(self, obj) then
             local dist = math.max(math.abs(obj.x-x), math.abs(obj.y-y))
             if dist < min_dist then 
                 min_dist,min_obj = dist,obj

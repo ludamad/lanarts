@@ -84,6 +84,8 @@ function GameMap:draw()
         if obj.on_predraw then obj:on_predraw() end
     end
     for _, obj in ipairs(objects) do
+        print(obj)
+        pretty(objects.traits)
         obj:on_draw()
     end
     Map.tiles_postdraw(self.map)

@@ -14,7 +14,7 @@ local function aptitude_bonus_ring_define(args)
         StatContext.add_all_aptitudes(stats, args.aptitude, self.real_bonus or self.bonus) -- real_bonus can be a full 4-vector, while bonus must be a number
     end
 
-    function args.on_init(self)
+    function args.on_map_init(self)
         local P = Proficiency
         assert(self.bonus)
         for k in values{"identify_requirements", "proficiency_requirements"} do

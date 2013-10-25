@@ -12,7 +12,7 @@ local GameObject = import "core.GameObject"
 local LogUtils = import "lanarts.LogUtils"
 local ActionResolvers = import ".ActionResolvers"
 
-local PlayerObject = ObjectUtils.type_create(CombatObject)
+local PlayerObject = GameObject.type_create(CombatObject)
 PlayerObject.PLAYER_TRAIT = "PLAYER_TRAIT"
 
 local function player_preferences(args)
@@ -25,7 +25,7 @@ function PlayerObject.player_stats_create(race, --[[Can-be-nil]] class, name)
     local stats = RaceType.resolve(race).on_create(name)
     if class then
         local context = StatContext.stat_context_create(stats)
-        class:on_init(context)
+        class:on_map_init(context)
     end
 
     return stats
@@ -51,8 +51,8 @@ function PlayerObject:_autospend_skill_points()
     end
 end
 
-function PlayerObject:on_init()
-    self.base.on_init(self)
+function PlayerObject:on_map_init()
+    self.base.on_map_init(self)
 end
 
 function PlayerObject:gain_xp(xp)
@@ -72,11 +72,17 @@ function PlayerObject:on_predraw()
     end
 end
 
-function PlayerObject.create(args)
-    args.sprite = resolve_sprite(args.race)
+function PlayerObject:init(args)
+    args.base_init = GameObject.PlayerObject.init
+    args.base_stats = PlayerObject.player_stats_create(args.race, args.class, args.name)
+    args.unarmed_action = args.race.unarmed_action
     args.action_resolver = PlayerActionResolver.create(args.collision_group)
-    args.preferences = player_preferences(args.preferences or {})
-    assert(args.race and args.class and args.name)
+
+    PlayerObject.parent_init(self, args)
+    self.race = args.race
+    self.sprite = resolve_sprite(self.race)
+    self.action_resolver = PlayerActionResolver.create(args.collision_group)
+    self.preferences = player_preferences(args.preferences or {})
     args.team = args.team or Relations.TEAM_PLAYER_DEFAULT
     -- Set up type signature
     args.type = args.type or PlayerObject
@@ -87,10 +93,6 @@ function PlayerObject.create(args)
     args.base_stats = PlayerObject.player_stats_create(args.race, args.class, args.name)
 
     -- Create pseudo-objects
-    args.unarmed_action = args.unarmed_action or args.race.unarmed_action 
-    args.base_create = GameObject.player_create
-
-    return PlayerObject.base_create(args)
 end
 
 function PlayerObject.is_player(obj)

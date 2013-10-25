@@ -13,14 +13,13 @@ M.FEATURE_DEPTH = 100
 local DEACTIVATION_DISTANCE = 768
 
 -- Base
-local Base = ObjectUtils.type_create()
-M.FeatureBase = Base
-
-function Base.create(args)
-    args.traits = args.trait or {M.FEATURE_TRAIT}
-    return Base.base_create(args)
+M.FeatureBase = GameObject.type_create()
+local Base = M.FeatureBase
+function Base:init(args)
+    Base.parent_init(self, args.xy, args.radius or 15, args.solid, args.depth or M.FEATURE_DEPTH)
+    self.traits = self.traits or {}
+    table.insert(self.traits, M.FEATURE_TRAIT)
 end 
-
 function Base:on_draw()
     if self.sprite and Display.object_within_view(self) then
         ObjectUtils.screen_draw(self.sprite, self.xy, self.alpha, self.frame)
@@ -28,9 +27,8 @@ function Base:on_draw()
 end
 
 -- Decoration
-local Decoration = ObjectUtils.type_create(Base)
-M.Decoration = Decoration
-
+M.Decoration = GameObject.type_create(Base)
+local Decoration = M.Decoration
 function Decoration:on_step()
     if self.sprite or Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
         return -- Need to be able to scale to many deactivated instances
@@ -39,21 +37,17 @@ function Decoration:on_step()
         self.sprite = self.real_sprite
     end
 end
-
-function Decoration.create(args)
-    assert(args.sprite)
-    args.real_sprite = args.sprite
-    args.sprite = nil
-    args.depth = args.depth or M.FEATURE_DEPTH
-    args.frame = args.frame or 0
-    return Decoration.base_create(args)
+function Decoration:init(args)
+    Decoration.base_init(self, args)
+    self.real_sprite = assert(args.sprite)
+    self.depth = args.depth or M.FEATURE_DEPTH
+    self.frame = args.frame or 0
 end
 
 -- Door
-local Door = ObjectUtils.type_create(Base)
-M.Door = Door
+M.Door = GameObject.type_create(Base)
+local Door = M.Door
 local DOOR_OPEN_TIMEOUT = 128
-
 function Door:on_step()
     if Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
         return -- Need to be able to scale to many deactivated instances
@@ -90,8 +84,7 @@ function Door:on_step()
 
     self.was_open = is_open
 end
-
-function Door:on_init()
+function Door:on_map_init()
     local tile_xy = ObjectUtils.tile_xy(self, true)
     self.was_open = false
     Map.tile_set_solid(self.map, ObjectUtils.tile_xy(self, true), true)
@@ -107,14 +100,12 @@ function Door:on_init()
 
     self.open_timeout = 0
 end
-
-function Door.create(args)
-    args.open_sprite = args.open_sprite or M._door_open
-    args.closed_sprite = args.closed_sprite or M._door_closed
-    args.depth = args.depth or M.FEATURE_DEPTH
-    args.padding = 4
-    args.type = Door
-    return Door.base.create(args)
+function Door:init(args)
+    Door.parent_init(self, args)
+    self.open_sprite = args.open_sprite or M._door_open
+    self.closed_sprite = args.closed_sprite or M._door_closed
+    self.depth = args.depth or M.FEATURE_DEPTH
+    self.padding = 4
 end
 
 return M

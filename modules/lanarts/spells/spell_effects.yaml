@@ -8,7 +8,7 @@ effects:
     effected_colour: [100, 255, 100]
     can_use_rest: no
     stat_func: poison_statmod
-    init_func: poison_init
+    init_func: poison_map_init
     step_func: poison_step
 
   - name: Berserk

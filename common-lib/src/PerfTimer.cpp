@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cmath>
 #include <algorithm>
+#include <vector>
 #include "PerfTimer.h"
 
 void MethodPerfProfile::begin_timer() {
@@ -35,17 +36,28 @@ void PerfTimer::end(const char* method) {
 	perf_map[method].end_timer();
 }
 
+struct PProfile {
+	std::string func_name;
+	MethodPerfProfile profile;
+	bool operator<(const PProfile& pp) const {
+		return profile.total_microseconds > pp.profile.total_microseconds;
+	}
+};
+
 void PerfTimer::print_results() {
 	printf("**** START PERFORMANCE STATS ****\n");
-	std::map<std::string, MethodPerfProfile> sorted_perf_map;
+	std::vector<PProfile> sorted_perfs;
 	MethodPerfProfileMap::iterator prof_iter = perf_map.begin();
 	for (; prof_iter != perf_map.end(); ++prof_iter) {
-		sorted_perf_map[prof_iter->first] = prof_iter->second;
+		PProfile profile;
+		profile.func_name = prof_iter->first;
+		profile.profile = prof_iter->second;
+		sorted_perfs.push_back(profile);
 	}
+	std::sort(sorted_perfs.begin(), sorted_perfs.end());
 
-	std::map<std::string, MethodPerfProfile>::iterator sorted_iter = sorted_perf_map.begin();
-	for (; sorted_iter != sorted_perf_map.end(); ++sorted_iter) {
-		MethodPerfProfile& mpp = sorted_iter->second;
+	for (int i = 0; i < sorted_perfs.size(); i++) {
+		MethodPerfProfile& mpp = sorted_perfs[i].profile;
 		float total = mpp.total_microseconds / 1000.0f;
 		float max = mpp.max_microseconds / 1000.0f;
 		float avg = total / mpp.total_calls;
@@ -56,7 +68,7 @@ void PerfTimer::print_results() {
 				"\tCALLS\t %d"
 				"\n\tSTDDEV +-%.4fms, +-%.2f%%"
 				"\tMAX %.4fms\n",
-				sorted_iter->first.c_str(), avg,
+				sorted_perfs[i].func_name.c_str(), avg,
 				total,
 				mpp.total_calls,
 				stddev, stddev_percentage,

@@ -65,7 +65,7 @@ function M.default_class_on_level_gain(self, stats)
     StatContext.permanent_add(stats, {hp=HP_GAIN, max_hp=HP_GAIN, mp=MP_GAIN, max_mp=MP_GAIN})
 end
 
-function M.default_class_on_init(self, stats)
+function M.default_class_on_map_init(self, stats)
     self:on_spend_skill_points(stats, ExperienceCalculation.SKILL_POINT_START_AMOUNT)
     if self.items then
         for item in values(self.items) do 
@@ -96,7 +96,7 @@ function M.class_define(class_type)
     class_type.on_spend_skill_points = class_type.on_spend_skill_points or M.default_spend_skill_points
     class_type.on_create = class_type.on_create or default_class_create_closure(class_type)
     class_type.on_level_gain = class_type.on_level_gain or M.default_class_on_level_gain 
-    class_type.on_init = class_type.on_init or M.default_class_on_init
+    class_type.on_map_init = class_type.on_map_init or M.default_class_on_map_init
     for k,v in pairs(class_type.skills) do 
         assert(SkillType.lookup(k), k .. " is not a skill!") 
     end

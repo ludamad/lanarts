@@ -38,6 +38,9 @@ static int lapi_gameinst_stats(lua_State* L) {
 	return 1;
 }
 
+static int object_init(lua_State* L);
+static void player_init(LuaStackValue obj, LuaStackValue args);
+
 /* Use a per-instance lua table as a fallback */
 static int lapi_gameinst_getter_fallback(lua_State* L) {
 //	LuaValue& variables = luawrap::get<GameInst*>(L, 1)->lua_variables;
@@ -97,6 +100,9 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	meta["__isgameinst"] = true;
 
 	LuaValue methods = luameta_constants(meta);
+	meta["init"].bind_function(object_init);
+	methods["init"] = meta["init"];
+
 	LUAWRAP_METHOD(methods, step, OBJ->step(lua_api::gamestate(L)));
 	LUAWRAP_METHOD(methods, draw, OBJ->draw(lua_api::gamestate(L)));
 	LUAWRAP_METHOD(methods, init,
@@ -220,6 +226,9 @@ static LuaValue lua_enemyinst_metatable(lua_State* L) {
 static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(PlayerInst*);
 	LuaValue meta = lua_combatgameinst_metatable(L);
+	LuaValue methods = luameta_constants(meta);
+	meta["init"].bind_function(player_init);
+	methods["init"] = meta["init"];
 
 	LuaValue getters = luameta_getters(meta);
 	LUAWRAP_GETTER(getters, name, OBJ->player_entry(lua_api::gamestate(L)).player_name);
@@ -229,7 +238,6 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(getters, deaths, OBJ->score_stats().deaths);
 	LUAWRAP_GETTER(getters, spells, OBJ->stats().spells.spell_id_list());
 
-	LuaValue methods = luameta_constants(meta);
 	LUAWRAP_GETTER(methods, is_local_player, OBJ->is_local_player());
 	LUAWRAP_METHOD(methods, reset_rest_cooldown, OBJ->cooldowns().reset_rest_cooldown(REST_COOLDOWN));
 
@@ -322,12 +330,18 @@ namespace GameInstWrap {
 		GameInst::retain_reference(inst);
 	}
 
+	void make_object_ref(LuaField table, GameInst* inst) {
+		push_ref(table.luastate(), inst);
+		table["__objectref"].pop();
+		inst->lua_variables = table;
+	}
+
 	void push(lua_State* L, GameInst* inst) {
 		if (inst == NULL) {
 			lua_pushnil(L);
 			return;
 		}
-		LuaValue& lua_vars = inst->lua_variables;
+		LuaValue lua_vars = inst->lua_variables;
 		if (lua_vars.empty()) {
 			lua_vars = LuaValue::newtable(L);
 		}
@@ -335,8 +349,7 @@ namespace GameInstWrap {
 		if (!lua_getmetatable(L, -1)) {
 			lua_gameinst_push_metatable(L, inst);
 			lua_setmetatable(L, -2);
-			push_ref(L, inst);
-			lua_vars["__objectref"].pop();
+			make_object_ref(lua_vars, inst);
 		} else {
 			lua_pop(L, 1);
 		}
@@ -401,7 +414,9 @@ static GameInst* copy_over_arguments(GameInst* inst, LuaStackValue args, exclusi
 }
 
 static GameInst* initialize_object(GameState* gs, GameInst* inst, LuaStackValue args, exclusionf exclusions) {
-	copy_over_arguments(inst, args, exclusions);
+	if (args["__nocopy"].isnil()) {
+		copy_over_arguments(inst, args, exclusions);
+	}
 
 	if (!args["radius"].isnil()) {
 		inst->target_radius = args["radius"].to_int();
@@ -452,6 +467,17 @@ static GameInst* object_create(LuaStackValue args) {
 	return initialize_object(lua_api::gamestate(args), inst, args, &base_object_exclusions);
 }
 
+static int object_init(lua_State* L) {
+	LuaStackValue obj(L, 1);
+	Pos xy = luawrap::get<Pos>(L, 2);
+	bool radius = luawrap::get_defaulted(L, 3, TILE_SIZE / 2 - 1);
+	bool solid = luawrap::get_defaulted(L, 4, false);
+	int depth = luawrap::get_defaulted(L, 5, 0);
+
+	GameInstWrap::make_object_ref(obj, new GameInst(xy.x, xy.y, radius, solid, depth));
+	return 0;
+}
+
 static GameInst* player_create(LuaStackValue args) {
 	using namespace luawrap;
 	GameState* gs = lua_api::gamestate(args);
@@ -459,6 +485,11 @@ static GameInst* player_create(LuaStackValue args) {
 	GameInst* inst = new PlayerInst(CombatStats(), -1, xy.x, xy.y);
 	gs->player_data().register_player(args["name"].to_str(), (PlayerInst*)inst, -1, -1);
 	return initialize_object(gs, inst, args, &base_object_exclusions);
+}
+
+static void player_init(LuaStackValue obj, LuaStackValue args) {
+	args["__nocopy"] = true;
+	GameInstWrap::make_object_ref(obj, player_create(args));
 }
 
 static GameInst* feature_create(LuaStackValue args) {
@@ -542,13 +573,13 @@ namespace lua_api {
 	static void ensure_reachability(LuaValue globals, LuaValue submodule) {
 		lua_State* L = submodule.luastate();
 		luameta_push(L, &lua_playerinst_metatable);
-		submodule["PLAYER_META"].pop();
+		submodule["PlayerType"].pop();
 		luameta_push(L, &lua_enemyinst_metatable);
-		submodule["ENEMY_META"].pop();
+		submodule["EnemyType"].pop();
 		luameta_push(L, &lua_combatgameinst_metatable);
-		submodule["COMBATOBJECT_META"].pop();
+		submodule["CombatType"].pop();
 		luameta_push(L, &lua_gameinst_base_metatable);
-		submodule["GAMEINST_META"].pop();
+		submodule["Base"].pop();
 		luameta_push(L, &GameInstWrap::ref_metatable);
 		submodule["REF_META"].pop();
 	}

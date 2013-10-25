@@ -14,7 +14,7 @@ local function aptitude_bonus_ring_define(args)
         
     end
 
-    function args:on_init()
+    function args:on_map_init()
         local P = Proficiency
         assert(self.bonus)
         for k in values{"identify_requirements", "proficiency_requirements"} do

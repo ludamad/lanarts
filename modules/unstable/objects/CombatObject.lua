@@ -5,6 +5,7 @@ local StatContext = import "@StatContext"
 local ExperienceCalculation = import "@stats.ExperienceCalculation"
 local ObjectUtils = import "lanarts.objects.ObjectUtils"
 local ItemTraits = import "@items.ItemTraits"
+local GameObject = import "core.GameObject"
 local ProficiencyPenalties = import "@stats.ProficiencyPenalties"
 local AttackResolution = import "@AttackResolution"
 local LogUtils = import "lanarts.LogUtils"
@@ -13,34 +14,29 @@ local ActionContext = import "@ActionContext"
 local Attacks = import "@Attacks"
 local StatUtils = import "@stats.StatUtils"
 
-local CombatObject = ObjectUtils.type_create()
+local assert, tdeep_clone, tinsert = assert, table.deep_clone, table.insert 
 
-CombatObject.COMBAT_TRAIT = "COMBAT_TRAIT"
+local CombatObject = GameObject.type_create()
 
-function CombatObject.create(args)
-    assert(args.base_stats and args.action_resolver)
-    args.solid = args.solid or true
-    -- Set up type signature
-    args.type = args.type or CombatObject
-    args.derived_stats = table.deep_clone(args.base_stats)
+function CombatObject:init(args, base_init, base_stats, unarmed_action)
+    self.solid, self.frame = true, 0
 
-    args.frame = 0
-    args.traits = args.traits or {}
-    table.insert(args.traits, CombatObject.COMBAT_TRAIT)
+    -- Stat and attack paramaters
+    self.base_stats = assert(args.base_stats)
+    self.derived_stats = tdeep_clone(self.base_stats)
+    self.unarmed_action = args.unarmed_action
+    self.action_resolver = args.action_resolver
 
-    local ret = args.base_create and args.base_create(args) or CombatObject.base_create( args)
-    assert(ret.derived_stats == args.derived_stats)
-    StatUtils.stat_context_on_step(ret._context)
-    StatContext.on_calculate(ret._context)
-    return ret
+    -- Create stat context and attack context
+    self._unarmed_action_context = ActionContext.action_context_create(self.unarmed_action, self._context, self.race or self)
+    self._context = StatContext.stat_context_create(self.base_stats, self.derived_stats, self)
+    self._stats_need_calculate, self._stats_need_on_step = true, true
+
+    if args.base_init then args.base_init(self, args)
+    else CombatObject.parent_init(self, args) end
 end
 
-function CombatObject:on_init()
-    -- Internal only property. Provides a stat context of unknown validity.
-    self._context = StatContext.stat_context_create(self.base_stats, self.derived_stats, self)
-    self._stats_need_calculate = false -- Mark as valid stat context
-    self._stats_need_on_step = false
-    self._unarmed_action_context = ActionContext.action_context_create(self.unarmed_action, self._context, self.race or self)
+function CombatObject:on_map_init()
     self.action_resolver:on_object_init(self)
 end
 
@@ -144,7 +140,7 @@ local status_type_define = (import "@stats.StatusTypeUtils").status_type_define
 local Hurt = status_type_define {
     name = "Hurt",
     time_limited = true,
-    hurt_alpha_value = function()
+    hurt_alpha_value = function(self)
         local t_left, t_durr = self.time_left, self.total_duration
         if t_left < t_durr /2 then
             return t_left / t_durr / 2 * 0.7 + 0.3

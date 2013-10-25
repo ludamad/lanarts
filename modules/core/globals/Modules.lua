@@ -40,15 +40,17 @@ local function import_file(vpath)
         return entries
     else
         if err:find("No such file or directory") then
-        print(rpath)
-            error("No such module " .. vpath .. " (file " .. rpath .. " does not exist)")
-        else
-            error(err)
+            err = ("File " .. rpath .. " does not exist")
         end
+        return nil, "'import_file': " .. err
     end
 end
 
-_import_resolvers = { import_file, --[[Engine defined]] import_internal }
+function import_internal(vpath)
+    return assert(LEngine.import_internal_raw(vpath)[1], "Internal import failed for '" .. vpath .. "'.")
+end
+
+_import_resolvers = { import_file, --[[Engine defined]] LEngine.import_internal_raw }
 
 _ILLEGAL_RECURSION_SENTINEL = {} 
 -- Protect against double-loading the main booting path.
@@ -91,16 +93,20 @@ function import(vpath, --[[Optional]] args)
     _IMPORTED[vpath] = _ILLEGAL_RECURSION_SENTINEL
     _LOADED[vpath] = _ILLEGAL_RECURSION_SENTINEL
 
+    local errors = {}
     -- Step from most recently added import resolver to least
-    for i=#_import_resolvers,1,-1 do
-        local resolution = _import_resolvers[i](vpath)
+    for _, resolver in ipairs(_import_resolvers) do
+        local resolution, err = resolver(vpath)
         if resolution then 
             _IMPORTED[vpath] = resolution
             _LOADED[vpath] = resolution -- Set the require cache for some try at compatibility
             return unpack(resolution)
+        else
+            table.insert(errors, err)
         end
     end
-    error("import was not able to find a loader for '" .. vpath .. "', loaded from '" .. mname .. "'")
+    local main_err = "\n'import': Failed to load module '" .. vpath .. "'"
+    error(table.concat(errors, '\n') .. main_err)
 end
 
 local weak_args = {cache_check_only = true}

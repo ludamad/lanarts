@@ -4,7 +4,8 @@ if not __LUAJIT then
     return
 end
 
-local setmetatable, tostring, rawset = setmetatable, tostring, rawset
+local setmetatable, tostring, rawset, error = setmetatable, tostring, rawset, error
+local do_nothing = do_nothing
 
 function profile(f)
     require("jit.p").start("vFL")
@@ -32,6 +33,8 @@ function newtype(args)
         type.init(val, ...)
         return val
     end
+
+    type.parent_init = parent and parent.init or do_nothing
 
     function type:__index(k)
         local getter = get[k]

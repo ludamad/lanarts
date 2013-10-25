@@ -440,7 +440,7 @@ static bool lapi_chance(LuaStackValue val) {
 	return gs->rng().rand(RangeF(0, 1)) < val.to_num();
 }
 
-static LuaValue lapi_import_internal(LuaStackValue importstring) {
+static LuaValue lengine_import_internal_raw(LuaStackValue importstring) {
 	lua_State* L = importstring.luastate();
 	LuaValue module = luawrap::globals(L)["_INTERNAL_IMPORTED"][importstring.to_str()];
 	if (module.isnil()) {
@@ -456,11 +456,6 @@ static LuaValue lapi_import_internal(LuaStackValue importstring) {
 	ret_table.newtable();
 	ret_table[1] = module;
 	return ret_table;
-}
-
-static LuaStackValue lapi_always_serialize(LuaStackValue value) {
-//	lua_register_serialization_mutable(value);
-	return value;
 }
 
 namespace lua_api {
@@ -535,7 +530,9 @@ namespace lua_api {
 
 		globals["__read_eval_print"].bind_function(read_eval_print);
 
-		globals["import_internal"].bind_function(lapi_import_internal);
+		LuaValue lengine = luawrap::ensure_table(globals["LEngine"]);
+		lengine["import_internal_raw"].bind_function(lengine_import_internal_raw);
+
 		globals["virtual_path_create_relative"].bind_function(lapi_virtual_path_create_relative);
 		globals["require_path_add"].bind_function(lapi_require_path_add);
 		globals["path_resolve"].bind_function(lapi_path_resolve);
@@ -545,12 +542,7 @@ namespace lua_api {
 		string_table["join"].bind_function(lapi_string_join);
 		string_table["pack"].bind_function(str_pack);
 
-		LuaValue math = luawrap::ensure_table(globals["math"]);
-		math["round"].bind_function(round);
-
 		// Represents global, mutable data. Only module that is not serialized 'as a constant'.
-		LuaValue global_data(L);
-		global_data.newtable();
-		lua_api::register_lua_submodule(L, "core.GlobalData", global_data);
+		lua_api::register_lua_submodule(L, "core.GlobalData", LuaValue::newtable(L));
 	}
 }

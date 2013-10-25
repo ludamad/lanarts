@@ -92,7 +92,7 @@ local function default_on_draw(self, stats, drawf, options, ...)
     end
 end
 
-local function type_define(args, type, --[[Optional]] on_init, --[[Optional]] not_equipment)
+local function type_define(args, type, --[[Optional]] on_map_init, --[[Optional]] not_equipment)
     args.base_equip_bonuses = args.base_equip_bonuses or {}
     args.base_equip_bonuses.aptitudes = ContentUtils.resolve_aptitude_bonuses(args, args.base_equip_bonuses.aptitudes)
 
@@ -151,7 +151,7 @@ local function type_define(args, type, --[[Optional]] on_init, --[[Optional]] no
     end
     assert(args.action_use)
     args.stackable = args.stackable or (ItemTraits.equipment_slot_capacities[type] == nil)
-    args.on_init = args.on_init or on_init
+    args.on_map_init = args.on_map_init or on_map_init
 
     assert(_G.type(args.proficiency_requirements) == 'table')
     return ItemType.define(args)
@@ -293,12 +293,12 @@ end
 
 function M.potion_define(args)
     assert(args.on_use)
-    return type_define(args, ItemTraits.POTION, --[[on_init]] nil, --[[not equipment?]] true)
+    return type_define(args, ItemTraits.POTION, --[[on_map_init]] nil, --[[not equipment?]] true)
 end
 
 function M.scroll_define(args)
     assert(args.on_use)
-    return type_define(args, ItemTraits.SCROLL, --[[on_init]] nil, --[[not equipment?]] true)
+    return type_define(args, ItemTraits.SCROLL, --[[on_map_init]] nil, --[[not equipment?]] true)
 end
 
 return M
