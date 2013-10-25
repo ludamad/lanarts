@@ -130,6 +130,7 @@ static void gmap_init(LuaStackValue map_obj, LuaStackValue args) {
 	gs->game_world().pop_level_object(game_map->id());
 }
 
+
 static int gmap_create(lua_State* L) {
 	lua_newtable(L);
 	gmap_init(LuaStackValue(L, -1), LuaStackValue(L, 1));

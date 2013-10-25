@@ -41,7 +41,6 @@ function MapSequence:forward_portal_add(idx, portal, key, create_map_function)
     portal.on_player_interact = function(portal, user)
     
         self:slot_resolve(idx + 1, self:_get_map_id(idx+1) or create_map_function(portal, user))
-        create_map_function = nil -- Serialization optimization
         print ("Transferring using portal '" .. (idx + 1) .. "', square = " .. pretty_tostring(forward_portals:get_end(key)))
         Map.transfer(user, self:_get_map_id(idx+1), forward_portals:get_end(key))
     end

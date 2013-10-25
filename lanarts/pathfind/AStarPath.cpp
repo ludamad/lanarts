@@ -49,6 +49,14 @@ void AStarPath::initialize(GameState* gs, BBox world_region, bool imperfect_know
 			node.previous = NULL;
 			node.solid = ((*seen)[xy] && (*grid)[xy]);
 		}
+	} else {
+		FOR_EACH_BBOX_XY(world_region, xy) {
+			AStarNode& node = nodes[xy - world_region.left_top()];
+			node.openset = false;
+			node.closedset = false;
+			node.previous = NULL;
+			node.solid = (*grid)[xy];
+		}
 	}
 	perf_timer_end(FUNCNAME);
 }
@@ -72,9 +80,6 @@ static std::vector<AStarNode*>::iterator find_heap_position(
 /*Used to make sure all interpolated directions are possible*/
 std::vector<Pos> AStarPath::calculate_AStar_path(GameState* gs, Pos s, Pos e, BBox world_region, bool imperfect_knowledge, bool clear_results) {
 	perf_timer_begin(FUNCNAME);
-	// Ensure within bounds:
-	world_region.x1 /= TILE_SIZE, world_region.y1 /= TILE_SIZE;
-	world_region.x2 /= TILE_SIZE, world_region.y2 /= TILE_SIZE;
 	world_region = world_region.resized_within(
 		BBox( Pos(), gs->get_level()->tiles().size() )
 	);

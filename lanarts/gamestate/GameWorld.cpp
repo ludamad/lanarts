@@ -264,6 +264,12 @@ void GameWorld::connect_entrance_to_exit(int roomid1, int roomid2) {
 }
 
 void GameWorld::push_level_object(level_id id) {
+	lua_State* L = gs->luastate();
+	if (this->lua_level_states[id].isnil()) {
+		lua_newtable(L);
+		LuaStackValue(L, -1)["_id"] = id;
+		pop_level_object(id);
+	}
 	this->lua_level_states[id].push();
 }
 

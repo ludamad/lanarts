@@ -438,13 +438,13 @@ end
 function M.overworld_create_helper(--[[Optional]] dont_spawn_content)
     local tileset = TileSets.grass
 
-    local w,h = 200,200
+    local w,h = 100,100
     local map = MapUtils.map_create("Overworld", {w,h}, tileset.wall, {SourceMap.FLAG_SOLID, SourceMap.FLAG_SEETHROUGH})
     --local nodes = get_leafs(SourceMap.bsp_split { split_depth = 2, map = map, minimum_node_size = {w/6, h/6}, area = {50,50,250,250} })
    -- for i=1,#nodes do
     --    generate_area(map, nodes[i].area)
     --end
-    generate_area(map, {25,25,175,175}) 
+    generate_area(map, {25,25,75,75}) 
 --    for i=1,#nodes do
 --        Layouts.brute_tunnel(map, nodes[i].area, nodes[i%#nodes+1].area, {
 --                operator = {
