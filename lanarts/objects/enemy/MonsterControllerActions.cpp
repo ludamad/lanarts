@@ -319,7 +319,7 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	}
 
 	Pos exy = Pos(ex, ey);
-	eb.path = astarcontext.calculate_AStar_path(gs, exy, target, AStarPath::surrounding_region(exy, target, Size(96, 96)));
+	eb.path = astarcontext.calculate_AStar_path(gs, exy, target, AStarPath::surrounding_region(exy.divided(32), target.divided(32), Size(3, 3)));
 	if (eb.path.size() <= 1) {
 		return;
 	}
