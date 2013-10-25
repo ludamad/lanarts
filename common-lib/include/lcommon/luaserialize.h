@@ -103,6 +103,7 @@ private:
 	void decode_table();
 	void decode_function();
 	void decode_string();
+	void decode_ref_name();
 	void decode_ref_metamethod();
 };
 
@@ -121,7 +122,7 @@ struct LuaSerializeConfig {
 		this->L = L;
 		obj_to_index = LuaValue::newtable(L);
 		index_to_obj = LuaValue::newtable(L);
-		index_failure_function = LuaValue::newtable(L);
+		index_failure_function.init(L);
 		context_object = LuaValue::newtable(L);
 	}
 	LuaSerializeContext push4(SerializeBuffer& serializer);
@@ -133,7 +134,5 @@ struct LuaSerializeConfig {
 
 void luaserialize_encode(lua_State* L, SerializeBuffer& serializer, const LuaValue& value);
 void luaserialize_decode(lua_State* L, SerializeBuffer& serializer, LuaValue& value);
-
-void lua_clear_serialization_state(lua_State* L);
 
 #endif /* LCOMMON_LUA_SERIALIZE_H_ */

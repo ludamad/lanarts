@@ -148,6 +148,7 @@ namespace lua_api {
 	void register_lua_core_PathFinding(lua_State* L);
 	void register_lua_core_Keyboard(lua_State* L);
 	void register_lua_core_Mouse(lua_State* L);
+	void register_lua_core_Serialization(lua_State* L);
 
 	static int lua_lanarts_panic(lua_State* L) {
 		luawrap::errorfunc(L);
@@ -193,6 +194,7 @@ namespace lua_api {
 		register_lua_core_PathFinding(L);
 		register_lua_core_Keyboard(L);
 		register_lua_core_Mouse(L);
+		register_lua_core_Serialization(L);
 	}
 
 	void luacall_post_draw(lua_State* L) {

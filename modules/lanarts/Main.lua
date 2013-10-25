@@ -75,3 +75,22 @@ function Engine.first_map_create(...)
     local map_id = region1.overworld_create(...)
 	return map_id
 end
+
+function Engine.pre_serialize()
+    local SerializationUtils = import "core.SerializationUtils"
+    local timer = timer_create()
+    SerializationUtils.name_global_data()
+    SerializationUtils.install_import_fallback()
+    print("Naming globals took " .. timer:get_milliseconds() .. "ms.")
+end
+
+function Engine.post_serialize()
+
+end
+
+-- Same steps:
+Engine.pre_deserialize = Engine.pre_serialize
+
+function Engine.post_deserialize()
+
+end

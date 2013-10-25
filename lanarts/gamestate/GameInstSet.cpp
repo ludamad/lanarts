@@ -162,7 +162,6 @@ void GameInstSet::serialize(GameState* gs, SerializeBuffer& serializer) {
 			serializer.write_int(inst->id);
 			inst->serialize(gs, serializer);
 			instances.push_back(inst);
-			printf("Serializing (id=%d, level=%d type=%d)\n", inst->id, inst->current_floor, get_inst_type(inst));
 //			if (gs->game_settings().network_debug_mode) {
 				serializer.write_int(inst->integrity_hash());
 //			}
@@ -212,7 +211,6 @@ void GameInstSet::deserialize(GameState* gs, SerializeBuffer& serializer) {
 		} else {
 			safe_deserialize(inst, gs, serializer);
 		}
-		printf("Deserializing (id=%d, level=%d)\n", inst->id, inst->current_floor);
 //		if (gs->game_settings().network_debug_mode) {
 		bool seq = serializer_equals_read(serializer, inst->integrity_hash());
 		if (!seq) {

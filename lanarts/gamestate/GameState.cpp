@@ -191,10 +191,16 @@ void GameState::serialize(SerializeBuffer& serializer) {
 	serializer.write(mtwist); // Save RNG state
 	serializer.write_int(_game_timestamp);
 
+	luawrap::globals(L)["Engine"]["pre_serialize"].push();
+	luawrap::call<void>(L);
+
 	serializer.write_int(this->frame_n);
 	world.serialize(serializer);
 
 	player_data().serialize(this, serializer);
+	luawrap::globals(L)["Engine"]["post_serialize"].push();
+	luawrap::call<void>(L);
+
 	serializer.flush();
 }
 
@@ -204,6 +210,9 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	serializer.read(mtwist); // Load RNG state
 	serializer.read_int(_game_timestamp);
 
+	luawrap::globals(L)["Engine"]["pre_deserialize"].push();
+	luawrap::call<void>(L);
+
 	serializer.read_int(this->frame_n);
 	world.deserialize(serializer);
 	player_data().deserialize(this, serializer);
@@ -212,6 +221,8 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	_view.sharp_center_on(local_player()->ipos());
 
 	settings.class_type = local_player()->class_stats().classid;
+	luawrap::globals(L)["Engine"]["post_deserialize"].push();
+	luawrap::call<void>(L);
 }
 
 obj_id GameState::add_instance(level_id level, GameInst* inst) {

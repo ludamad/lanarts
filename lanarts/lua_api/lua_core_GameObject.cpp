@@ -289,11 +289,28 @@ namespace GameInstWrap {
 		return isgameinst;
 	}
 
-	int serialize(lua_State* L);
-	int deserialize(lua_State* L);
+	void push_ref(lua_State* L, GameInst* inst);
+
+	static int __save(lua_State* L) {
+		GameInst** udata = (GameInst**) lua_touserdata(L, 1);
+		LANARTS_ASSERT((*udata)->id != 0);
+		lua_pushinteger(L, (*udata)->id);
+		lua_pushinteger(L, (*udata)->current_floor);
+		return 2;
+	}
+	static int __load(lua_State* L) {
+		GameState* gs = lua_api::gamestate(L);
+		int id = luaL_checkinteger(L, 2);
+		int current_floor = luaL_checkinteger(L, 3);
+		GameInst* inst = gs->get_level(current_floor)->game_inst_set().get_instance(id);
+		push_ref(L, inst);
+		return 1;
+	}
+
 	static LuaValue ref_metatable(lua_State* L) {
 		LuaValue meta = luameta_new(L, "GameInstRef");
-		meta["__persist"].bind_function(serialize);
+		meta["__save"].bind_function(__save);
+		meta["__load"].bind_function(__load);
 		return meta;
 	}
 
@@ -303,22 +320,6 @@ namespace GameInstWrap {
 		luameta_push(L, &ref_metatable);
 		lua_setmetatable(L, -2);
 		GameInst::retain_reference(inst);
-	}
-	int deserialize(lua_State* L) {
-		GameState* gs = lua_api::gamestate(L);
-		int id = lua_tointeger(L, 1);
-		int current_floor = lua_tointeger(L, 2);
-		GameInst* inst = gs->get_level(current_floor)->game_inst_set().get_instance(id);
-//		printf("Got instance=0x%lX, %s\n", inst, typeid(*inst).name());
-		push_ref(L, inst);
-		return 1;
-	}
-	int serialize(lua_State* L) {
-		GameInst** udata = (GameInst**) lua_touserdata(L, 1);
-		luawrap::globals(L)["__GAMEINST_DESERIALIZE"].push();
-		lua_pushinteger(L, (*udata)->id);
-		lua_pushinteger(L, (*udata)->current_floor);
-		return 3;
 	}
 
 	void push(lua_State* L, GameInst* inst) {
@@ -541,18 +542,15 @@ namespace lua_api {
 	static void ensure_reachability(LuaValue globals, LuaValue submodule) {
 		lua_State* L = submodule.luastate();
 		luameta_push(L, &lua_playerinst_metatable);
-		submodule["__PLAYER_META"].pop();
+		submodule["PLAYER_META"].pop();
 		luameta_push(L, &lua_enemyinst_metatable);
-		submodule["__ENEMY_META"].pop();
+		submodule["ENEMY_META"].pop();
 		luameta_push(L, &lua_combatgameinst_metatable);
-		submodule["__COMBATOBJECT_META"].pop();
+		submodule["COMBATOBJECT_META"].pop();
 		luameta_push(L, &lua_gameinst_base_metatable);
-		submodule["__GAMEINST_META"].pop();
+		submodule["GAMEINST_META"].pop();
 		luameta_push(L, &GameInstWrap::ref_metatable);
-		submodule["__REF_META"].pop();
-		globals["__GAMEINST_SERIALIZE"].bind_function(GameInstWrap::serialize);
-		globals["__GAMEINST_DESERIALIZE"].bind_function(GameInstWrap::deserialize);
-		submodule["__GAMEINST_DESERIALIZE"] = globals["__GAMEINST_DESERIALIZE"];
+		submodule["REF_META"].pop();
 	}
 	void register_lua_core_GameObject(lua_State* L) {
 		luawrap::install_type<GameInst*, GameInstWrap::push, GameInstWrap::get, GameInstWrap::check>();
