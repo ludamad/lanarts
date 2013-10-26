@@ -18,9 +18,11 @@ return {
         player.traits = {PLAYER_TRAIT}
     end,
     is_player = function(player)
-        return table.contains(player.traits, PLAYER_TRAIT)
+        local PlayerObject = import "unstable.objects.PlayerObject"
+        if player.traits then table.contains(player.traits, PLAYER_TRAIT) end
+        return PlayerObject.is_instance(player)
     end,
     is_local_player = function(player)
-        return table.contains(player.traits, PLAYER_TRAIT) and player:is_local_player()
+        return player.is_local_player and player:is_local_player()
     end
 }

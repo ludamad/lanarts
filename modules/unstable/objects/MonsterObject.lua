@@ -10,20 +10,32 @@ local PlayerObject = import ".PlayerObject"
 local ExperienceCalculation = import "@stats.ExperienceCalculation"
 local LogUtils = import "lanarts.LogUtils"
 local ActionResolvers = import ".ActionResolvers"
+local Relations = import "lanarts.objects.Relations"
+
+local rawget, type = rawget, type
+
+local ar_create = ActionResolvers.AIActionResolver.create
 
 local MonsterObject = GameObject.type_create(CombatObject)
-local rawget = rawget
--- Ensure that the monster's type is looked up in resolution
-function MonsterObject:__index(k)
-    return rawget(rawget(self, "monster_type"), k)
+function MonsterObject:init(xy, collision_group, monster_type, --[[Optional]] team)
+    self.monster_type = MonsterType.resolve(monster_type)
+
+    MonsterObject.parent_init(self, xy, self.monster_type.radius, 
+        table.deep_clone(self.monster_type.base_stats), -- Base stats 
+        team or Relations.TEAM_MONSTER_ROOT, -- Team
+        self.monster_type.unarmed_action, -- Unarmed action
+        ar_create(collision_group) -- Action resolver
+    )
 end
 
-MonsterObject.MONSTER_TRAIT = "MONSTER_TRAIT"
-
--- Monster object methods:
-
-function MonsterObject:on_deinit()
-    table.clear(self)
+local GOIndex = GameObject.Base.__index
+-- Ensure that the monster's type is looked up in resolution
+function MonsterObject:__index(k)
+    local v = rawget(MonsterObject, k)
+    if v ~= nil then return v end
+    v = rawget(rawget(self, "monster_type"), k)
+    if v ~= nil then return v end
+    return GOIndex(self, k)
 end
 
 function MonsterObject:on_death(attacker_obj)
@@ -47,7 +59,6 @@ local shadow = Display.image_load(path_resolve "sprites/minor-shadow.png")
 
 local DIST_THRESHOLD = 900
 function MonsterObject:on_step()
-    assert(self.team)
     self.deactivated = true
     for _, p in ipairs(self.map.players) do
         if math.abs(p.x - self.x) < DIST_THRESHOLD and math.abs(p.y - self.y) < DIST_THRESHOLD then
@@ -55,35 +66,13 @@ function MonsterObject:on_step()
             break
         end
     end
-    CombatObject.on_step(self)
+    MonsterObject.parent_on_step(self)
 end
 
 function MonsterObject:on_predraw()
     if Map.object_visible(self) then
         ObjectUtils.screen_draw(shadow, self.xy)
     end
-end
-
--- Used internally by the lua bindings to know how to decode our custom object type
-function MonsterObject:init(args)
-    local mtype = assert(args.monster_type) -- Resolve monster_type
-    if type(mtype) == "string" then mtype = MonsterType.lookup(mtype) end
-
-    args.radius = args.radius or mtype.radius
-    args.base_stats = table.deep_clone(mtype.base_stats)
-    args.action_resolver = ActionResolvers.AIActionResolver.create(args.collision_group)
-
-    MonsterObject.parent_init(self, args)
-
-    self.monster_type = mtype
-    self.unarmed_action = mtype.unarmed_action
-
-    -- Set up type signature
-    table.insert(self.traits, MonsterObject.MONSTER_TRAIT)
-end
-
-function MonsterObject.is_monster(obj)
-    return table.contains(obj.traits, MonsterObject.MONSTER_TRAIT)
 end
 
 return MonsterObject

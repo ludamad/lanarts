@@ -1,23 +1,31 @@
 -- Extension to internal 'core.GameObject'
 local M = import_internal "core.GameObject"
 
-local assert, do_nothing, tmerge, setmetatable = assert, do_nothing, table.merge, setmetatable
+local assert, do_nothing, tmerge, setmetatable, rawget = assert, do_nothing, table.merge, setmetatable, rawget
 local getmetatable = getmetatable
 
-function M.is_type(obj, T)
-    return getmetatable(obj).parents[T]
-end
 
 function M.type_create(base)
     base = base or M.Base
     local T = {}
+    tmerge(T, base)
+
+    function T.is_instance(obj, T)
+        return (getmetatable(obj).parents[T] ~= nil)
+    end
+
     function T.create(...)
         local val = setmetatable({}, T)
         T.init(val, ...)
         return val
     end
 
-    tmerge(T, base)
+    local base_index = base.__index
+    function T:__index(k)
+        local v = rawget(T, k)
+        if v ~= nil then return v end
+        return base_index(self, k)
+    end
 
     T.parent_init = assert(base.init, "Base object type does not define 'init'!")
     T.parent_on_step = base.on_step or do_nothing

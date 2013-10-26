@@ -38,7 +38,7 @@ function Decoration:on_step()
     end
 end
 function Decoration:init(args)
-    Decoration.base_init(self, args)
+    Decoration.parent_init(self, args)
     self.real_sprite = assert(args.sprite)
     self.depth = args.depth or M.FEATURE_DEPTH
     self.frame = args.frame or 0

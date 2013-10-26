@@ -14,26 +14,30 @@ local ActionContext = import "@ActionContext"
 local Attacks = import "@Attacks"
 local StatUtils = import "@stats.StatUtils"
 
-local assert, tdeep_clone, tinsert = assert, table.deep_clone, table.insert 
+local assert, tdeep_clone, tinsert, rawget = assert, table.deep_clone, table.insert, rawget 
+local getmetatable = getmetatable
 
 local CombatObject = GameObject.type_create()
 
-function CombatObject:init(args, base_init, base_stats, unarmed_action)
+function CombatObject:partial_init(base_stats, team, unarmed_action, action_resolver)
     self.solid, self.frame = true, 0
 
+    self.team = assert(team)
     -- Stat and attack paramaters
-    self.base_stats = assert(args.base_stats)
-    self.derived_stats = tdeep_clone(self.base_stats)
-    self.unarmed_action = args.unarmed_action
-    self.action_resolver = args.action_resolver
+    self.base_stats = assert(base_stats)
+    self.derived_stats = tdeep_clone(base_stats)
+    self.unarmed_action = unarmed_action
+    self.action_resolver = action_resolver
 
     -- Create stat context and attack context
     self._unarmed_action_context = ActionContext.action_context_create(self.unarmed_action, self._context, self.race or self)
     self._context = StatContext.stat_context_create(self.base_stats, self.derived_stats, self)
     self._stats_need_calculate, self._stats_need_on_step = true, true
+end
 
-    if args.base_init then args.base_init(self, args)
-    else CombatObject.parent_init(self, args) end
+function CombatObject:init(xy, radius, ...)
+    self:partial_init(...)
+    CombatObject.parent_init(self, xy, radius)
 end
 
 function CombatObject:on_map_init()
@@ -52,7 +56,7 @@ end
 -- This provides some guarantee of correctness.
 function CombatObject:stat_context()
     if self._stats_need_on_step then
-        StatContext.on_calculate(self._context)
+        StatContext.on_step(self._context)
         self._stats_need_on_step = false
     end
     if self._stats_need_calculate then

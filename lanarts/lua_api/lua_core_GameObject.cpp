@@ -39,7 +39,7 @@ static int lapi_gameinst_stats(lua_State* L) {
 }
 
 static int object_init(lua_State* L);
-static void player_init(LuaStackValue obj, LuaStackValue args);
+static void player_init(LuaStackValue obj, Pos xy, std::string name);
 
 /* Use a per-instance lua table as a fallback */
 static int lapi_gameinst_getter_fallback(lua_State* L) {
@@ -105,16 +105,6 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 
 	LUAWRAP_METHOD(methods, step, OBJ->step(lua_api::gamestate(L)));
 	LUAWRAP_METHOD(methods, draw, OBJ->draw(lua_api::gamestate(L)));
-	LUAWRAP_METHOD(methods, init,
-		GameState* gs = lua_api::gamestate(L);
-		level_id map;
-		if (lua_gettop(L) <= 0) {
-			map = gs->game_world().get_current_level_id();
-		} else {
-			map = luawrap::get<LuaValue>(L, 1)["_id"].to_int();
-		}
-		gs->add_instance(map, OBJ);
-	);
 
 	LuaValue getters = luameta_getters(meta);
 	LUAWRAP_GETTER(getters, xy, OBJ->pos());
@@ -470,7 +460,7 @@ static GameInst* object_create(LuaStackValue args) {
 static int object_init(lua_State* L) {
 	LuaStackValue obj(L, 1);
 	Pos xy = luawrap::get<Pos>(L, 2);
-	bool radius = luawrap::get_defaulted(L, 3, TILE_SIZE / 2 - 1);
+	int radius = luawrap::get_defaulted(L, 3, TILE_SIZE / 2 - 1);
 	bool solid = luawrap::get_defaulted(L, 4, false);
 	int depth = luawrap::get_defaulted(L, 5, 0);
 
@@ -487,9 +477,11 @@ static GameInst* player_create(LuaStackValue args) {
 	return initialize_object(gs, inst, args, &base_object_exclusions);
 }
 
-static void player_init(LuaStackValue obj, LuaStackValue args) {
-	args["__nocopy"] = true;
-	GameInstWrap::make_object_ref(obj, player_create(args));
+static void player_init(LuaStackValue obj, Pos xy, std::string name) {
+	GameState* gs = lua_api::gamestate(obj);
+	PlayerInst* inst = new PlayerInst(CombatStats(), -1, xy.x, xy.y);
+	GameInstWrap::make_object_ref(obj, inst);
+	gs->player_data().register_player(name, inst, -1, -1);
 }
 
 static GameInst* feature_create(LuaStackValue args) {

@@ -12,13 +12,40 @@ local GameObject = import "core.GameObject"
 local LogUtils = import "lanarts.LogUtils"
 local ActionResolvers = import ".ActionResolvers"
 
-local PlayerObject = GameObject.type_create(CombatObject)
-PlayerObject.PLAYER_TRAIT = "PLAYER_TRAIT"
+local rawget = rawget
 
 local function player_preferences(args)
-    return nilprotect {
-        manual_skill_point_spending = args.manual_skill_point_spending or false 
-    }
+    return nilprotect { manual_skill_point_spending = false }
+end
+
+local function resolve_sprite(race)
+    local dir = path_resolve("sprites/"..race.name:lower())
+    local results = io.directory_search(dir, "*.png", true)
+    local anim_speed = race.animation_speed or 0.05
+    return Display.animation_create(Display.images_load(random_choice(results) .. '%32x32'), anim_speed)
+end
+
+local PlayerObject = GameObject.type_create(CombatObject)
+
+function PlayerObject:init(xy, collision_group, name, race, class)
+    CombatObject.partial_init(self,
+        PlayerObject.player_stats_create(race, class, name), -- Base stats
+        Relations.TEAM_PLAYER_DEFAULT, -- Team
+        race.unarmed_action, -- Unarmed action
+        PlayerActionResolver.create(collision_group) -- Action resolver
+    )
+    GameObject.PlayerType.init(self, xy, name)
+
+    self.race, self.class = race, class
+    self.sprite = resolve_sprite(race)
+    self.preferences = player_preferences()
+end
+
+local PIndex = GameObject.PlayerType.__index
+function PlayerObject:__index(k)
+    local v = rawget(PlayerObject, k)
+    if v ~= nil then return v end
+    return PIndex(self, k)
 end
 
 function PlayerObject.player_stats_create(race, --[[Can-be-nil]] class, name)
@@ -31,17 +58,7 @@ function PlayerObject.player_stats_create(race, --[[Can-be-nil]] class, name)
     return stats
 end
 
-local function resolve_sprite(race)
-    local dir = path_resolve("sprites/"..race.name:lower())
-    local results = io.directory_search(dir, "*.png", true)
-    local anim_speed = race.animation_speed or 0.05
-    return Display.animation_create(Display.images_load(random_choice(results) .. '%32x32'), anim_speed)
-end
-
-function PlayerObject:on_death()
-    print("YOU DIED")
-    os.exit()
-end
+function PlayerObject:on_death() print("YOU DIED") ; os.exit() end
 
 function PlayerObject:_autospend_skill_points()
     local B = self.base_stats
@@ -49,10 +66,6 @@ function PlayerObject:_autospend_skill_points()
         self.class:on_spend_skill_points(self:stat_context(), B.skill_points, --[[Log]] true)
         B.skill_points = 0
     end
-end
-
-function PlayerObject:on_map_init()
-    self.base.on_map_init(self)
 end
 
 function PlayerObject:gain_xp(xp)
@@ -70,33 +83,6 @@ function PlayerObject:on_predraw()
     if Map.object_visible(self) then
         ObjectUtils.screen_draw(shadow, self.xy)
     end
-end
-
-function PlayerObject:init(args)
-    args.base_init = GameObject.PlayerObject.init
-    args.base_stats = PlayerObject.player_stats_create(args.race, args.class, args.name)
-    args.unarmed_action = args.race.unarmed_action
-    args.action_resolver = PlayerActionResolver.create(args.collision_group)
-
-    PlayerObject.parent_init(self, args)
-    self.race = args.race
-    self.sprite = resolve_sprite(self.race)
-    self.action_resolver = PlayerActionResolver.create(args.collision_group)
-    self.preferences = player_preferences(args.preferences or {})
-    args.team = args.team or Relations.TEAM_PLAYER_DEFAULT
-    -- Set up type signature
-    args.type = args.type or PlayerObject
-    args.traits = args.traits or {}
-    table.insert(args.traits, PlayerObject.PLAYER_TRAIT)
-
-    -- CombatObject configuration
-    args.base_stats = PlayerObject.player_stats_create(args.race, args.class, args.name)
-
-    -- Create pseudo-objects
-end
-
-function PlayerObject.is_player(obj)
-    return table.contains(obj.traits, PlayerObject.PLAYER_TRAIT)
 end
 
 function PlayerObject:is_local_player() 

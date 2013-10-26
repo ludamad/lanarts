@@ -129,6 +129,6 @@ function M.traceback(--[[Optional]] str)
 end
 
 AnsiColors = import "core.terminal.AnsiColors"
-debug.traceback = M.traceback
+--debug.traceback = M.traceback
 
 return M

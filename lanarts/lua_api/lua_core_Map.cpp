@@ -208,12 +208,13 @@ static bool gmap_tile_was_seen(LuaStackValue map_obj, Pos xy) {
 	return map->tiles().was_seen(xy);
 }
 
-static void gmap_add_instance(LuaStackValue gameinst) {
+static void gmap_add_object(LuaStackValue map_obj, LuaStackValue gameinst) {
+	GameState* gs = lua_api::gamestate(map_obj);
 	GameInst* inst = gameinst.as<GameInst*>();
 	if (inst->current_floor != -1) {
 		luawrap::error("Attempt to add game instance that was already added!");
 	}
-	lua_api::gamestate(gameinst)->add_instance(inst);
+	gs->add_instance(map_obj["_id"].to_int(), inst);
 }
 
 static int gmap_monsters_list(lua_State* L) {
@@ -451,7 +452,7 @@ namespace lua_api {
 		gmap["tiles_postdraw"].bind_function(gmap_tiles_postdraw);
 		gmap["instances_draw"].bind_function(gmap_instances_draw);
 
-		gmap["add_instance"].bind_function(gmap_add_instance);
+		gmap["add_object"].bind_function(gmap_add_object);
 		gmap["instance"].bind_function(gmap_instance);
 
 		gmap["monsters_list"].bind_function(gmap_monsters_list);

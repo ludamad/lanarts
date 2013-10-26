@@ -27,16 +27,8 @@ end
 
 function GameMap:add_player(name, race, class)
     local xy = MapUtils.random_square(self.source_map)
-    local player_object = PlayerObject.create {
-        name = name,
-        race = race,
-        class = class,
-        collision_group = self.collision_group,
-        xy = MapUtils.from_tile_xy(xy),
-        is_local_player = function() return true end,
-        do_init = true,
-        map = self.map
-    }
+    local player_object = PlayerObject.create(MapUtils.from_tile_xy(xy), self.collision_group, name, race, class)
+    Map.add_object(self.map, player_object)
     SourceMap.rectangle_apply {
         map=self.source_map, area = {xy[1]-3,xy[2]-3,xy[1]+3,xy[2]+3},
         fill_operator = {add = SourceMap.FLAG_HAS_OBJECT}
@@ -48,13 +40,8 @@ end
 
 function GameMap:add_monster(monster)
     local tile_xy = MapUtils.random_square(self.source_map)
-    local monster_object = MonsterObject.create {
-        monster_type = monster,
-        xy = MapUtils.from_tile_xy(tile_xy),
-        collision_group = self.collision_group,
-        do_init = true,
-        map = self.map
-    }
+    local monster_object = MonsterObject.create(MapUtils.from_tile_xy(tile_xy), self.collision_group, monster)
+    Map.add_object(self.map, monster_object)
     table.insert(self.monsters, monster_object)
     table.insert(self.map.combat_objects, monster_object)
     return monster_object
@@ -84,8 +71,6 @@ function GameMap:draw()
         if obj.on_predraw then obj:on_predraw() end
     end
     for _, obj in ipairs(objects) do
-        print(obj)
-        pretty(objects.traits)
         obj:on_draw()
     end
     Map.tiles_postdraw(self.map)

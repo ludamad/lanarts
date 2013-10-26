@@ -53,8 +53,8 @@ function LinearBase:on_step()
 end
 
 function LinearBase:init(args)
-    self.parent_init(self, args)
-    self.velocity, self.radius = assert(args.velocity), assert(args.radius)
+    LinearBase.parent_init(self, args.xy, args.radius, args.depth)
+    self.velocity = assert(args.velocity)
     self.direction = vector_to_direction(args.velocity)
     self.range_left = self.range_left or 250
 end

@@ -83,6 +83,7 @@ void GameInst::init(GameState* gs) {
 
 void GameInst::deinit(GameState* gs) {
 	try_callback("on_deinit");
+	lua_variables.clear();
 	id = 0;
 	current_floor = -1;
 }

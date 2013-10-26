@@ -137,7 +137,6 @@ void GameInstSet::__remove_instance(InstanceState* state) {
 void GameInstSet::remove_instance(GameInst* inst) {
 	if (inst->destroyed)
 		return;
-	printf("Removing instance %d level %d\n", inst->id, inst->current_floor);
 	inst->destroyed = true;
 	InstanceState* state = tset_find<GameInstSetFunctions>(inst->id,
 			&unit_set[0], unit_capacity);
