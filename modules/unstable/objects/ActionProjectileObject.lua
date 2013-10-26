@@ -4,14 +4,24 @@ local Animations = import "lanarts.objects.Animations"
 local Relations = import "lanarts.objects.Relations"
 local LogUtils = import "lanarts.LogUtils"
 local GameObject = import "core.GameObject"
+local Map = import "core.Map"
 local Actions = import "@Actions"
 
 local ActionProjectileObject = GameObject.type_create(Projectiles.LinearProjectileBase)
 
+function ActionProjectileObject:init(args)
+    args.radius = args.radius or args.sprite.width / 2
+    ActionProjectileObject.parent_init(self, args)
+    self.sprite = args.sprite
+    self.stats = args.stats
+    self.action = args.action
+    Map.add_object(args.map, self)
+end
+
 function ActionProjectileObject:on_object_collide(other)
     local user = assert(self.stats.obj)
     if other ~= user then
-        if Relations.is_hostile(user, other) then
+        if other.team and Relations.is_hostile(user, other) then
             -- No prereq for attack projectile!
             self:apply_action(other)
             GameObject.destroy(self)
@@ -32,12 +42,5 @@ function ActionProjectileObject:on_deinit()
     Animations.fadeout_create { sprite = self.sprite, duration = ANIMATION_FADEOUT_DURATION, direction = self.direction, xy = self.xy }
 end
 
-function ActionProjectileObject:init(args)
-    args.radius = args.radius or args.sprite.width / 2
-    ActionProjectileObject.parent_init(self, args)
-    self.sprite = args.sprite
-    self.stats = args.stats
-    self.action = args.action
-end
 
 return ActionProjectileObject

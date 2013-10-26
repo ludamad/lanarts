@@ -54,7 +54,7 @@ local function default_on_appear_message(self)
 end
 
 local function default_on_die_message(self)
-    EventLog.add(self.type.defeat_message, self.defeat_color or {255,255,255})
+    EventLog.add(self.defeat_message, self.defeat_color or {255,255,255})
 end
 
 local DEFAULT_MELEE_RANGE = 10

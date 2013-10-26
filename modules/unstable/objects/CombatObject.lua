@@ -37,7 +37,7 @@ end
 
 function CombatObject:init(xy, radius, ...)
     self:partial_init(...)
-    CombatObject.parent_init(self, xy, radius)
+    CombatObject.parent_init(self, xy, radius, true)
 end
 
 function CombatObject:on_map_init()

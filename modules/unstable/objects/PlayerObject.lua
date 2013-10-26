@@ -70,7 +70,7 @@ end
 
 function PlayerObject:gain_xp(xp)
     LogUtils.event_log_resolved(self, ("<The >$You gain{s} %dXP!"):format(xp), COL_YELLOW)
-    self.base.gain_xp(self, xp)
+    CombatObject.gain_xp(self, xp)
     local P = self.preferences 
     if not P.manual_skill_point_spending then
         self:_autospend_skill_points()

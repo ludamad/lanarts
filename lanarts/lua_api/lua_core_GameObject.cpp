@@ -460,7 +460,7 @@ static GameInst* object_create(LuaStackValue args) {
 static int object_init(lua_State* L) {
 	LuaStackValue obj(L, 1);
 	Pos xy = luawrap::get<Pos>(L, 2);
-	int radius = luawrap::get_defaulted(L, 3, TILE_SIZE / 2 - 1);
+	double radius = luawrap::get_defaulted(L, 3, TILE_SIZE / 2.0 - 1.0);
 	bool solid = luawrap::get_defaulted(L, 4, false);
 	int depth = luawrap::get_defaulted(L, 5, 0);
 

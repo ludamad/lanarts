@@ -4,17 +4,13 @@ local ObjectUtils = import ".ObjectUtils"
 
 local M = {} -- Submodule
 
-M.PROJECTILE_TRAIT = "PROJECTILE_TRAIT"
-
 -- PROJECTILE BASE CLASS
 
 M.ProjectileBase = GameObject.type_create()
 local Base = M.ProjectileBase
-
 Base.on_tile_collide, Base.on_object_collide = do_nothing, do_nothing
 Base.on_draw = do_nothing
-
-function Base:on_step(self)
+function Base:on_step()
     -- Tile checks:
     local tile_xy = Map.object_tile_check(self)
     if tile_xy then self:on_tile_collide(tile_xy) end
@@ -27,16 +23,17 @@ function Base:on_step(self)
     return (not self.destroyed)
 end
 
-function Base:init(args)
-    Base.parent_init(self, args)
-    self.traits = args.traits or {}
-    table.insert(self.traits, M.PROJECTILE_TRAIT)
-end
-
--- LINEAR PROJECTILE
+-- LINEAR PROJECTILE BASE CLASS
 
 M.LinearProjectileBase = GameObject.type_create(Base)
 local LinearBase = M.LinearProjectileBase
+
+function LinearBase:init(args)
+    LinearBase.parent_init(self, args.xy, args.radius, true, args.depth)
+    self.velocity = assert(args.velocity)
+    self.direction = vector_to_direction(args.velocity)
+    self.range_left = self.range_left or 250
+end
 
 LinearBase.on_tile_collide = GameObject.destroy
 
@@ -50,19 +47,6 @@ function LinearBase:on_step()
     self.x = self.x + vx
     self.y = self.y + vy
     self.range_left = self.range_left - math.sqrt(vx*vx+vy*vy)
-end
-
-function LinearBase:init(args)
-    LinearBase.parent_init(self, args.xy, args.radius, args.depth)
-    self.velocity = assert(args.velocity)
-    self.direction = vector_to_direction(args.velocity)
-    self.range_left = self.range_left or 250
-end
-
--- HELPER FUNCTIONS
-
-function M.is_projectile(object)
-    return table.contains(object.traits, M.PROJECTILE_TRAIT)
 end
 
 return M

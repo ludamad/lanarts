@@ -4,9 +4,9 @@ local assert, type, getmetatable, pairs = assert, type, getmetatable, pairs
 local floor, sqrt, atan2 = math.floor, math.sqrt, math.atan2
 local max, min = math.max, math.min
 
-function math.round(n) -- Simplest possible. Caveat: Rounds -.5 to 0.
-    return floor(n + .5)
-end
+--function math.round(n) -- Simplest possible. Caveat: Rounds -.5 to 0.
+--    return floor(n + .5)
+--end
 
 function math.sign_of(v)
     if v > 0 then return 1 end

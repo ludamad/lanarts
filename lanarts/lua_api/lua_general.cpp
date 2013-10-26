@@ -537,6 +537,8 @@ namespace lua_api {
 		globals["require_path_add"].bind_function(lapi_require_path_add);
 		globals["path_resolve"].bind_function(lapi_path_resolve);
 
+		LuaValue math_table = luawrap::ensure_table(globals["math"]);
+                math_table["round"].bind_function(round);
 		LuaValue string_table = luawrap::ensure_table(globals["string"]);
 		string_table["split"].bind_function(lapi_string_split);
 		string_table["join"].bind_function(lapi_string_join);
