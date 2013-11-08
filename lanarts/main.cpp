@@ -195,8 +195,6 @@ static void run_engine(int argc, char** argv) {
 	lanarts_system_quit();
 
 	delete gs;
-
-	printf("Lanarts shut down cleanly\n");
 }
 
 /* Must take (int, char**) to play nice with SDL */

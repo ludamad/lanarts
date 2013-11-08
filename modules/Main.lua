@@ -56,10 +56,11 @@ local function main(args)
         local TM = import "unstable.TestMap"
         TM.main(args)
         return false
-    elseif args[1] == "--example" then
-        import ("examples." .. args[2])
+    elseif args[1] == "--import" then
+        import(args[2])
         return false
-    elseif args[1] == "--repl" then
+    elseif args[1] == "--lua" then
+        if args[2] then dofile(args[2]) end
         local finished = false
         function _G.start_lanarts()
             -- Continue lanarts initialization 
@@ -82,8 +83,8 @@ end
 
 return function(args)
     local ret 
-    profile(function() 
+--    profile(function() 
         ret = main(args)
-    end)
+--    end)
     return ret
 end
