@@ -3,6 +3,8 @@
 -- Global data is a special submodule, its members are always serialized
 local GlobalData = import "core.GlobalData"
 
+append = table.insert -- Convenient alias
+
 -- Data is defined on a per-submodule basis
 function data_load(key, default, --[[Optional]] vpath)
     -- Make a safe & (almost) guaranteed unique key 

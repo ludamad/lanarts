@@ -28,7 +28,7 @@ TestCases = setmetatable({}, {
 assert = lunit.assert
 
 local tests = {}
-for test in values(find_submodules("tests", true)) do
+for test in values(find_submodules("core.tests", true)) do
     if not table.contains(EXEMPT, test) then
         table.insert(tests, test)
     end
