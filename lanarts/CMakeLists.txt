@@ -106,16 +106,17 @@ set (libraries
 	lsound
 	${lua_libraries}
 	luasocket
+        luayaml
 	luawrap
 	lanarts_net
 	yaml-cpp
 	RVO
         #physfs-static
-    libxmi
+        libxmi
 	${SDLIMAGE_LIBRARY}
 	${OPENGL_gl_LIBRARY}
 	${SDLMIXER_LIBRARY}
-    enet
+        enet
 	${SDL_LIBRARY}
 	${SDLMAIN_LIBRARY}
 	${FREETYPE_LIBRARIES}

@@ -22,12 +22,15 @@
 extern "C" {
 #include "luasocket/luasocket.h"
 #include "luasocket/mime.h"
+// From dependency lua-yaml:
+int luayaml_module(lua_State *L);
 }
 
 #include "lua_api.h"
 
 // NB: the -address- of this key is used, not the actual string.
 static char GAMESTATE_KEY[] = "";
+
 
 namespace lua_api {
 
@@ -121,7 +124,6 @@ namespace lua_api {
 		return gs;
 	}
 
-
 	// Convenience function that performs above on captured lua state
 	GameState* gamestate(const LuaStackValue& val) {
 		return gamestate(val.luastate());
@@ -133,6 +135,11 @@ namespace lua_api {
 		lua_api::register_lua_submodule_loader(L, "core.socket.core", LuaValue::pop_value(L));
 		lua_pushcfunction(L, luaopen_mime_core);
 		lua_api::register_lua_submodule_loader(L, "core.mime.core", LuaValue::pop_value(L));
+		lua_pushcfunction(L, luaopen_mime_core);
+		lua_api::register_lua_submodule_loader(L, "core.mime.core", LuaValue::pop_value(L));
+		lua_pushcfunction(L, luayaml_module);
+		lua_call(L, 0, 1);
+		lua_api::register_lua_submodule(L, "core.yaml", LuaValue::pop_value(L));
 
 		lua_register_lcommon(L);
 		preload["socket.core"].bind_function(luaopen_socket_core);

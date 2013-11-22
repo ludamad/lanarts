@@ -13,19 +13,24 @@ function Field:index_body(slot)
     return ('k == "%s" then return rawget(self, %d)'):format(self.name, slot)
 end
 function Field:typecheck_body(val)
+    if not self.type.typecheck then return nil end
     return self.type.typecheck:interpolate { self = val}
 end
 function Field:newindex_body(slot)
-    return ('k == "%s" then assert(%s,k) ; %s'):format(self.name, self:typecheck_body("v"), self:assign_body(slot, "v"))
+    local typecheck = self:typecheck_body("v") 
+    local typecheck_str = typecheck and 'assert('..typecheck..',k) ; ' or ' '
+    return ('k == "%s" then %s%s'):format(self.name, typecheck_str, self:assign_body(slot, "v"))
 end
 
 local TypeBuilder = newtype()
-function TypeBuilder:init(fields)
-    self.fields = fields
+function TypeBuilder:init(source, fields)
+    self.source, self.fields = source, fields
 end
 
 local function callstring(str) 
-print(str)
+    for i, s in ipairs(str:split("\n")) do
+        print(i, s)
+    end
     local func_loader, err = loadstring(str)
     if err then error(err) end
     return func_loader()
@@ -43,10 +48,26 @@ function TypeBuilder:index_compile()
         local start = (i == 1 and "if " or "elseif ") 
         append(parts, FOUR_SPACE .. start .. field:index_body(i))
     end
+    append(parts, FOUR_SPACE .. 'elseif rawget(TYPETABLE, k) then return rawget(TYPETABLE, k)')
+    append(parts, FOUR_SPACE .. 'else error(("No such key \'%s\'"):format(k)) end')
     return ("\n"):join {
         "function(self, k)", 
         ("\n"):join(parts), 
-        FOUR_SPACE .. 'else error(("No such key \'%s\'"):format(k)) end',
+        "end"
+    }
+end
+
+function TypeBuilder:tostring_compile()
+    local parts = {"local parts = {}"}
+    for i,field in ipairs(self.fields) do
+        append(parts, FOUR_SPACE .. ("parts[#parts+1] = '%s' .. '=' .. tostring(self[%d])"):format(
+            field.name, i
+        ))
+    end
+    append(parts, FOUR_SPACE .. "return '[' .. (' '):join(parts) .. ']'")
+    return ("\n"):join {
+        "function(self)", 
+        ("\n"):join(parts), 
         "end"
     }
 end
@@ -88,13 +109,14 @@ function TypeBuilder:compile()
     local mt = {}
     mt.__index, mt.create = self:index_compile(), self:create_compile()
     local parts = {
-        "local rawget,rawset,setmetatable=rawget,rawset,setmetatable", -- Performance 
-        "local METATABLE = {}"
+        "local rawget,rawset,setmetatable,getmetatable=rawget,rawset,setmetatable,getmetatable", -- Performance 
+        "local TYPETABLE = {} ; local METATABLE = {}"
     }
     append(parts, "METATABLE.__index = " .. self:index_compile())
     append(parts, "METATABLE.__newindex = " .. self:newindex_compile())
-    append(parts, "METATABLE.create = " .. self:create_compile())
-    append(parts, "return METATABLE")
+    append(parts, "METATABLE.__tostring = " .. self:tostring_compile())
+    append(parts, "TYPETABLE.create = " .. self:create_compile())
+    append(parts, "return TYPETABLE")
     local callable = ("\n"):join(parts)
     return callstring(callable)
 end
@@ -108,6 +130,7 @@ function M.type_parse(str)
             local parts = line:split(":")
             local names = parts[1]:split(",")
             local typename = parts[2]:trim()
+            if typename == "*" then typename = "any" end
             local type = assert(Types[typename], "Invalid type: " .. typename)
             for name in values(names) do
                 name = name:trim()
@@ -118,7 +141,7 @@ function M.type_parse(str)
             error("Unexpected line " .. i .. " in type_parse: '" .. line .. "'")
         end
     end
-    return TypeBuilder.create(fields)
+    return TypeBuilder.create(str, fields)
 end
 
 return M

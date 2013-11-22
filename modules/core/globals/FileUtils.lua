@@ -25,8 +25,16 @@ function music_optional_load(file)
     return snd_optional_load(file, Sound.music_load)
 end
 
-
 --- Returns a dummy object if the file doesn't exist
 function sound_optional_load(file) 
     return snd_optional_load(file, Sound.sound_load)
+end
+
+function file_as_string(name)
+    local f = io.open(name,"r")
+    if f == nil then return nil end
+    local contents = f:read("*all")
+    pretty(contents)
+    f:close()
+    return contents
 end

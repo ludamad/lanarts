@@ -51,6 +51,9 @@ local function main(args)
         local M = import "unstable.menus.Menus"
         M.start_menu_show()
         return false   
+    elseif args[1] == "--dungenerate" then
+        import "dungenerate.Main"
+        return false
     elseif args[1] == "--testmap" then
         Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
         local TM = import "unstable.TestMap"

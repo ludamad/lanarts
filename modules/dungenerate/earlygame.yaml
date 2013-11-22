@@ -1,0 +1,25 @@
+- class Cursed:
+  - pass
+  
+- Short Sword of Falling: !BladeWeapon
+  - traits: Base(-2,-2), Diseased
+  - Creation(Forest): { traits: Base(++1,++1) }
+
+- class Mega: 
+  - hp: ++50,60
+  - main_prefix: Mega # Would be overridgen eg by Chaos, the mega attribute would be a bit hidden
+  #- Chance(0.1%): {traits: Chaos} # For example!
+
+- Giant Rat: !AnimalNPC
+  - hp: ++50-60
+  - Chance(5%): {traits: Mega}
+
+- class Base(r, p):
+  - on_attack: {resist: ++r, power: ++p}
+
+- class GodHaver:
+  - has religion: string
+
+- class DemonNPC: !NPC
+  - traits: MonsterLike, GodHaver
+ 
