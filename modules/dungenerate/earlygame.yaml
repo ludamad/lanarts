@@ -14,7 +14,8 @@
   - hp: ++50-60
   - Chance(5%): {traits: Mega}
 
-- class Base(r, p):
+- class Base:
+  - has power: int
   - on_attack: {resist: ++r, power: ++p}
 
 - class GodHaver:

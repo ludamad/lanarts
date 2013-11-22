@@ -1,10 +1,10 @@
 import ".General" -- For 'append'
 
-local Builders = import "@codegen.Builders"
+local TypeCompiler = import "@codegen.TypeCompiler"
 
 local M = nilprotect {} -- Submodule
 
+local C = TypeCompiler.create()
 function typedef(definition_string)
-    local builder = Builders.type_parse(definition_string)
-    return builder:compile()
+    return C:compile(definition_string)
 end

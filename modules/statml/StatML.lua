@@ -13,7 +13,6 @@ local function parse_class_candidate(context, line, fields)
     local class_name = line:match("^class%s+([%w_]+)")
     if not class_name then return false end
     local class = StatMLClass.create(class_name)
-    
 end
 
 return M

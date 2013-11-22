@@ -1,38 +1,34 @@
-----local Types = import "@Types"
---
---local function parse_type_list()
---
---end
---
-
-local Builders = import "@codegen.Builders"
+local TypeCompiler = import "@codegen.TypeCompiler"
+local TypeSchema = import "@codegen.TypeSchema"
 local Types = import "@codegen.Types"
 
+local C = TypeCompiler.create()
+
 function TestCases.type_type_builder()
-    local t = Builders.type_parse [[
+    local S = TypeSchema.create [[
         a, b : int
         c, d : float
     ]]
     local expected = {a=Types.int,b=Types.int,c=Types.float,d=Types.float}
-    for field in values(t.fields) do
+    for field in values(S.fields) do
         assert(field.name and field.type and (field.is_ref ~= nil))
         assert(expected[field.name] == field.type)
     end
     -- Test __index
-    local index_func = Builders.callstring('return ' .. t:index_compile())
+    local index_func = loadstring('return ' .. C:index_compile(S))()
     for i, k in ipairs {"a", "b", "c", "d"} do
         local data = {1, 2, 3, 4}
         assert(index_func(data, k) == data[i])
     end
     -- Test __newindex
-    local newindex_func = Builders.callstring('return ' .. t:newindex_compile())
+    local newindex_func = loadstring('return ' .. C:newindex_compile(S))()
     for i, k in ipairs {"a", "b", "c", "d"} do
         local data = {}
         newindex_func(data, k, i)
         assert(data[i] == i)
     end
     -- Test create
-    local meta = t:compile()
+    local meta = C:compile(S)
     local val = meta.create(1,2,3,4)
     for i, k in ipairs {"a", "b", "c", "d"} do
         assert(val[k] == rawget(val, i))
