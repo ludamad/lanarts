@@ -1,6 +1,8 @@
 local Tmpl = import "@codegen.Templates"
 local Types = import "@codegen.FieldTypes"
 
+local function make_slice(data) return {data, 0} end
+
 function TestCases.type_type_builder()
     local BTypes = Types.builtin_types
     local T = Tmpl.type_parse [[
@@ -15,20 +17,20 @@ function TestCases.type_type_builder()
     local index_func = Tmpl.callstring('return ' .. Tmpl.metamethods.__index(T))
     for i, k in ipairs {"a", "b", "c", "d"} do
         local data = {1, 2, 3, 4}
-        assert(index_func(data, k) == data[i])
+        assert(index_func(make_slice(data), k) == data[i])
     end
     -- Test __newindex
     local newindex_func = Tmpl.callstring('return ' .. Tmpl.metamethods.__newindex(T))
     for i, k in ipairs {"a", "b", "c", "d"} do
         local data = {}
-        newindex_func(data, k, i)
+        newindex_func(make_slice(data), k, i)
         assert(data[i] == i)
     end
     -- Test create
     local meta = Tmpl.compile_type(T)
     local val = meta.create(1,2,3,4)
     for i, k in ipairs {"a", "b", "c", "d"} do
-        assert(val[k] == rawget(val, i))
+        assert(val[k] == val[1][i])
     end
     local val = meta.create(0,0,0,0)
     for i, k in ipairs {"a", "b", "c", "d"} do
@@ -66,4 +68,14 @@ function TestCases.test_can_define_methods()
     end
     t:some_method()
     assert(calledMethod)
+end
+
+function TestCases.test_embedded_type()
+    local N = {}
+    typedef(N) "Foo" [[
+        foo : int
+    ]]
+    typedef(N) "Bar" [[
+        Foo
+    ]]
 end

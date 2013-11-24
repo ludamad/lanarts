@@ -17,7 +17,7 @@ local function typedef_aux(...) local namespaces = {...} ; return function (...)
 end end
 
 function typedef(...)
-    if #{...} == 1 then
+    if #{...} == 1 and type(...) == "string" then
         return typedef_aux()(false)(...) -- Simple type 
     else return typedef_aux(...) end
 end

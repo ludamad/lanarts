@@ -3,9 +3,11 @@ local M = nilprotect {} -- Submodule
 -- Custom types inherit from this type.
 -- Defines things that work for most types.
 local BaseType = newtype() ; M.BaseType = BaseType
-function BaseType:emit_field_assign(S, k, O) 
-    return ("assert(%s, 'Incorrect type.') ; rawset(%s, %s, %s)"):format(
-        self:emit_typecheck(O), S, k, O
+function BaseType:emit_field_assign(S, kroot, O)
+    local typecheck = self:emit_typecheck(O) 
+    local assert = typecheck and ("assert(%s, 'Incorrect type.') ; "):format(typecheck) or ""
+    return ("%srawset(%s, %s, %s)"):format(
+        assert, S, "pos+" .. kroot, O
     )
 end
 function BaseType:emit_field_init(S, kroot, args)
@@ -13,6 +15,7 @@ function BaseType:emit_field_init(S, kroot, args)
     return self:emit_field_assign(S, kroot, args[1])
 end
 function BaseType:emit_tostring(S) return ("tostring(%s)"):format(S) end
+function BaseType:emit_typecheck(S) return nil end
 
 M.builtin_types = {}
 
