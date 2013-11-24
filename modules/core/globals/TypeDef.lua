@@ -4,8 +4,13 @@ local Templates = import "@codegen.Templates"
 
 local M = nilprotect {} -- Submodule
 
-local function typedef_aux(...) local namespaces = {...} ; return function (...)
+local function assert_all_tables(...) 
+    for t in values{...} do assert(type(t) == "table", "Misplaced type name in typedef!") end
+end
+
+local function typedef_aux(...) local namespaces = {...} ; assert_all_tables(...) ; return function (...)
     if type(...) == "table" then
+        assert_all_tables(...)
         table.insert_all(namespaces, {...}) ;  return typedef_aux(unpack(namespaces))
     end ; local name = ...; assert(#{...} == 1)
     return function(definition)

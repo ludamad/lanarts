@@ -22,7 +22,7 @@ function M.metamethods.__index(T)
     B:add(SLICE_UNPACK)
     B:add("print('here with pos =',pos)")
     local prefix = "if"
-    for field in T:all_fields() do
+    for field in T:all_aliases() do
         B:add(prefix .. " k == '%s' then return rawget(data, pos+%d)", field.name, field.offset)
         prefix = "elseif"
     end
@@ -35,7 +35,7 @@ function M.metamethods.__tostring(T)
     local B = MethodBuilder.create(T, "self")
     B:add("local parts = {}")
     B:add("parts[#parts+1] = 'type %s:'", T.name or "<anon>")
-    for field in T:root_fields() do
+    for field in T:all_fields() do
         B:add("parts[#parts+1] = ' %s = ' .. %s", field.name, field.type:emit_tostring("self." .. field.name))
     end
     B:add("return '[' .. table.concat(parts) .. ']'")
@@ -45,7 +45,7 @@ function M.metamethods.__newindex(T)
     local B = MethodBuilder.create(T, "self", "k", "v")
     B:add(SLICE_UNPACK)
     local prefix = "if"
-    for field in T:all_fields() do
+    for field in T:all_aliases() do
         B:add(prefix .. " k == '%s' then ", field.name)
         B:append(field.type:emit_field_assign("data", field.offset, "v"))
         prefix = "elseif"
@@ -56,7 +56,7 @@ end
 
 function M.methods.create(T)
     local args, assigns, inits = {}, {}, {} 
-    for field in T:root_fields() do
+    for field in T:all_fields() do
         if field.initializers then append(inits, field)
         else append(assigns, field) ; append(args, "in_" .. field.name) end
     end
@@ -117,7 +117,7 @@ function M.compile_type(T)
         end
     end
     local type = M.callstring('return function(%s)\n------------\n%s\nend', 
-        ('\n'):join(constant_names), ("\n"):join(parts)
+        (','):join(constant_names), ("\n"):join(parts)
     )(unpack(constant_vals))
     T.__metatable = type.__metatable
     type.__structinfo = T
