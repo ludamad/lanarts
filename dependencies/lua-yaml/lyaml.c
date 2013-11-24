@@ -152,7 +152,7 @@ static void load_map(struct lua_yaml_loader *loader) {
    // XXX: Patched in for Lanarts
    tag = (char*)loader->event.data.scalar.tag;
    if (tag != NULL) {
-      lua_pushstring(loader->L, tag);
+      lua_pushstring(loader->L, tag+1 /*avoid '!'*/);
       lua_setfield(loader->L, -2, "__tag");
    }
 
@@ -187,7 +187,7 @@ static void load_sequence(struct lua_yaml_loader *loader) {
    // XXX: Patched in for Lanarts
    tag = (char*)loader->event.data.scalar.tag;
    if (tag != NULL) {
-      lua_pushstring(loader->L, tag);
+      lua_pushstring(loader->L, tag+1 /*avoid '!'*/);
       lua_setfield(loader->L, -2, "__tag");
    }
    if (loader->sequencemt_index != 0) {

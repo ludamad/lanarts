@@ -1,34 +1,31 @@
-local TypeCompiler = import "@codegen.TypeCompiler"
-local TypeSchema = import "@codegen.TypeSchema"
-local Types = import "@codegen.Types"
-
-local C = TypeCompiler.create()
+local Tmpl = import "@codegen.Templates"
+local Types = import "@codegen.FieldTypes"
 
 function TestCases.type_type_builder()
-    local S = TypeSchema.create [[
+    local BTypes = Types.builtin_types
+    local T = Tmpl.type_parse [[
         a, b : int
         c, d : float
     ]]
-    local expected = {a=Types.int,b=Types.int,c=Types.float,d=Types.float}
-    for field in values(S.fields) do
-        assert(field.name and field.type and (field.is_ref ~= nil))
-        assert(expected[field.name] == field.type)
+    local expected = {a=BTypes.int,b=BTypes.int,c=BTypes.float,d=BTypes.float}
+    for field in values(T.fields) do
+        assert(field.name and field.type and expected[field.name] == field.type)
     end
     -- Test __index
-    local index_func = loadstring('return ' .. C:index_compile(S))()
+    local index_func = Tmpl.callstring('return ' .. Tmpl.metamethods.__index(T))
     for i, k in ipairs {"a", "b", "c", "d"} do
         local data = {1, 2, 3, 4}
         assert(index_func(data, k) == data[i])
     end
     -- Test __newindex
-    local newindex_func = loadstring('return ' .. C:newindex_compile(S))()
+    local newindex_func = Tmpl.callstring('return ' .. Tmpl.metamethods.__newindex(T))
     for i, k in ipairs {"a", "b", "c", "d"} do
         local data = {}
         newindex_func(data, k, i)
         assert(data[i] == i)
     end
     -- Test create
-    local meta = C:compile(S)
+    local meta = Tmpl.compile_type(T)
     local val = meta.create(1,2,3,4)
     for i, k in ipairs {"a", "b", "c", "d"} do
         assert(val[k] == rawget(val, i))
@@ -56,4 +53,17 @@ function TestCases.test_typedef()
     end))
     p.x, p.y = 2, 1
     assert(p.x == 2 and p.y == 1)
+end
+
+function TestCases.test_can_define_methods()
+    local t = typedef [[
+        dummy : int
+    ]]
+    local calledMethod = false
+    local val = t.create(1)
+    function t:some_method()
+        calledMethod = true
+    end
+    t:some_method()
+    assert(calledMethod)
 end

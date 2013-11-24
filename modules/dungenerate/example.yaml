@@ -1,0 +1,9 @@
+- GodHaver: !Trait
+  god: string
+
+- DemonNPC: !NPC
+  traits: GodHaver
+  Do: god = choose("Belzebub", "")
+  HP: 100 to 150
+
+ 
