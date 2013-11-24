@@ -1,12 +1,19 @@
+local AnsiColors = import "core.terminal.AnsiColors"
+
 local MethodBuilder = import ".MethodBuilder"
 local StructType = import ".StructType"
 
 local M = nilprotect {} -- Submodule
 
+local AC = AnsiColors
+local function hilight(s)
+    return s:gsub("local", function(p) return AC.WHITE(p) end)
+end
+
 function M.callstring(str, ...)
     if ... then str = str:format(...) end 
     for i, s in ipairs(str:split("\n")) do
-        print(i, s)
+        print( AC.WHITE(i .. ')') .. hilight(s))
     end
     local func_loader, err = loadstring(str)
     if err then error(err) end
