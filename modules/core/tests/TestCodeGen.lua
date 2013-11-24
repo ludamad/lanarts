@@ -78,4 +78,8 @@ function TestCases.test_embedded_type()
     typedef(N) "Bar" [[
         Foo
     ]]
+    assert(N.Foo.create(4).foo == 4)
+    local b = N.Bar.create(N.Foo.create(4))
+    assert(b.Foo.foo == 4)
+    assert(b.foo == 4)
 end

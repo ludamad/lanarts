@@ -7,10 +7,14 @@ function MethodBuilder:init(typeinfo, ...)
 	self.indent = 1
 end
 
+function MethodBuilder:append(line)
+    if type(line) == "table" then self:add(line)
+    else local P = self.parts ; P[#P] = P[#P] .. line end
+end
 function MethodBuilder:add(line, ...)
     if type(line) == "table" then
         -- Actually a list of strings
-        for real_line in values(lines) do
+        for real_line in values(line) do
             self:add(real_line, ...)
         end
     else
