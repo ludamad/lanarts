@@ -1,0 +1,41 @@
+ - 
+ 
+ - TimeLimited: !Class
+   var: duration:int
+   var: steps:int(0, on_step(+= 1))
+
+ - Berserk: !StatusEffect(TimeLimited)
+   var: 
+   on_start:
+     - log "$You enter{s} a powerful rage!" {200,200,255}
+   status_sprite: berserk.png {PALE_RED}
+   on_step:
+   on_kill: 
+    on_draw = { sprite = "berserk.png", new_color = COL_PALE_RED },
+    on_calculate = function(self, stats)
+        local D = stats.derived
+
+        -- Stat bonuses
+        StatContext.add_damage(stats, Apts.MELEE, 2)
+        StatContext.add_defence(stats, Apts.MELEE, 4 + D.level)
+
+        -- Speed bonsues
+        D.movement_speed = D.movement_speed + 1
+        StatContext.add_effectiveness(stats, Apts.MELEE_SPEED, 7)
+
+        CooldownTypes.reset_rest_cooldown(stats)
+    end,
+    on_kill = function(self, stats)
+        -- Extend the berserking
+        local time_bonus = self.extensions < 5 and 20 or 5
+        if self.extensions == 0 then time_bonus = 30 end
+        self:add_duration(time_bonus)
+        self.extensions = self.extensions + 1
+        LogUtils.debug_log(stats.obj.name," berserking time extends by ", time_bonus)
+        LogUtils.event_log_resolved(stats.obj, "<The >{$You's}[Your] rage grows ...", {200,200,255})
+    end,
+    on_deregister = function(self, stats)
+       local B = stats.base
+       StatusType.update_hook(B.hooks, Exhausted, stats, BERSERK_EXHAUSTION_DURATION)
+    end
+   

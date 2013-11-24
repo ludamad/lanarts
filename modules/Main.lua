@@ -37,7 +37,8 @@ local function main(args)
         Display.initialize("Tests", {settings.view_width, settings.view_height}, settings.fullscreen)
 
         local failures = (cpp_tests or all_tests) and _lanarts_unit_tests() or 0
-        local passed = (lua_tests or all_tests) and import "tests.Main" or true
+        local ltests = import "core.TestRunner"
+        local passed = (lua_tests or all_tests) and ltests.main(args) or true
         -- Return exit code so ctest will notice the failure
         if failures > 0 or not passed then os.exit(2) end
         return false

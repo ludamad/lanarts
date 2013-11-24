@@ -36,6 +36,7 @@ local function istype(t) return "type(${self}) == '" .. t .. "'" end
 for k, v in pairs {
     float = {istype("number"), "0"}, 
     double = {istype("number"), "0"}, 
+    string = {istype("string"), "''"}, 
     int = {istype("number") .. " and (${self}%1==0)", "0"}, 
     list = {istype("table") .. " and not getmetatable(${self})", "{}"},
     map = {istype("table") .. " and not getmetatable(${self}) and #(${self}) == 0", "{}"},

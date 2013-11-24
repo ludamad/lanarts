@@ -31,6 +31,16 @@ function M.metamethods.__index(T)
     return B:emit()
 end
 
+function M.metamethods.__tostring(T)
+    local B = MethodBuilder.create(T, "self")
+    B:add("local parts = {}")
+    B:add("parts[#parts+1] = 'type %s:'", T.name or "<anon>")
+    for field in T:root_fields() do
+        B:add("parts[#parts+1] = ' %s = ' .. %s", field.name, field.type:emit_tostring("self." .. field.name))
+    end
+    B:add("return '[' .. table.concat(parts) .. ']'")
+    return B:emit()
+end
 function M.metamethods.__newindex(T)
     local B = MethodBuilder.create(T, "self", "k", "v")
     B:add(SLICE_UNPACK)

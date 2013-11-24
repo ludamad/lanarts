@@ -74,12 +74,16 @@ function TestCases.test_embedded_type()
     local N = {}
     typedef(N) "Foo" [[
         foo : int
+        bar : string
     ]]
     typedef(N) "Bar" [[
         Foo
     ]]
-    assert(N.Foo.create(4).foo == 4)
-    local b = N.Bar.create(N.Foo.create(4))
+    local b = N.Bar.create(N.Foo.create(4, 'test'))
     assert(b.Foo.foo == 4)
+    assert(b.Foo.bar == 'test')
     assert(b.foo == 4)
+    assert(b.bar == 'test')
+    print(b)
+    print(b.Foo)
 end

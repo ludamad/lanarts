@@ -28,6 +28,11 @@ function StructType:_add_component(name, typename, is_root, is_embedded, initial
 end
 
 function StructType:define_field(name, typename, is_root, is_embedded)
+    if is_root then
+        for root in self:root_fields() do
+            assert(root.name ~= name, "Name '" .. name .. "' already used in struct!")
+        end
+    end
     self:_add_component(name, typename, is_root, is_embedded)
     local type = self:lookup_type(typename)
     assert(not (is_embedded and not getmetatable(type) == StructType), "Cannot embed primitive type!")
