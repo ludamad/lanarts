@@ -45,7 +45,6 @@ function TestCases.test_typedef()
         x, y : int
     ]]
     local p = t.create(1,2)
-    print(p)
     assert(p.x == 1 and p.y == 2)
     assert(not pcall(function()
         p.x = 1.1 -- Should error!
@@ -84,6 +83,4 @@ function TestCases.test_embedded_type()
     assert(b.Foo.bar == 'test')
     assert(b.foo == 4)
     assert(b.bar == 'test')
-    print(b)
-    print(b.Foo)
 end

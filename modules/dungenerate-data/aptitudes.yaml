@@ -1,0 +1,88 @@
+# TRAINABLE APTITUDES
+#Main combat proficiencies
+ - Melee: !Aptitude
+   uses: Eff Dam Res Def 
+ - Ranged: !Aptitude
+   uses: Eff Dam Res Def 
+ - Magic: !Aptitude
+   uses: Eff Dam Res Def 
+
+#Weapon types
+ - Piercing: !Aptitude
+   uses: Eff Dam Res Def 
+ - Slashing: !Aptitude
+   uses: Eff Dam Res Def 
+ - Blunt: !Aptitude
+   uses: Eff Dam Res Def 
+
+#Spell types
+ - Enchantments: !Aptitude
+   uses: Eff Dam Res Def 
+ - Curses: !Aptitude
+   uses: Eff Dam Res Def 
+ - FORCE: !Aptitude
+   uses: Eff Dam Res Def 
+ - SUMMONING: !Aptitude
+   uses: Eff     
+
+#Misc proficiencies
+ - ARMOUR: !Aptitude
+   uses: Eff             #Ability to use armour
+ - WILLPOWER: !Aptitude
+   uses: Eff             #Ability to resist spell effects
+ - FORTITUDE: !Aptitude
+   uses: Eff             #Ability to resist physical abilities (stun, sleep etc)
+ - SELF_MASTERY: !Aptitude
+   uses: Eff             #Ability to perform maneuvers
+ - MAGIC_ITEMS: !Aptitude
+   uses: Eff             #Ability to use magic items
+
+#Major 'elements'
+ - Dark: !Aptitude
+   uses: Eff Dam Res Def 
+ - Light: !Aptitude
+   uses: Eff Dam Res Def 
+ - Fire: !Aptitude
+   uses: Eff Dam Res Def 
+ - Water: !Aptitude
+   uses: Eff Dam Res Def 
+
+#Minor elements
+ - Earth: !Aptitude
+   uses: Eff Dam Res Def 
+ - Air: !Aptitude
+   uses: Eff Dam Res Def 
+
+#NON-TRAINABLE APTITUDES
+ - Chaos: !Aptitude
+   uses: Eff     Res    
+ - Poison: !Aptitude
+   uses: Eff     Res    
+
+#Alternate weapon categories
+ - Blade: !Aptitude
+   uses: Eff Dam Res Def 
+ - Axe: !Aptitude
+   uses: Eff Dam Res Def 
+ - Mace: !Aptitude
+   uses: Eff Dam Res Def 
+ - Bows: !Aptitude
+   uses: Eff Dam Res Def 
+ - Polearm: !Aptitude
+   uses: Eff Dam Res Def 
+ - Staff: !Aptitude
+   uses: Eff Dam Res Def 
+
+#Misc proficiencies
+ - WEAPON_IDENTIFICATION: !Aptitude
+   uses: Eff     
+ - WEAPON_PROFICIENCY: !Aptitude
+   uses: Eff     
+ - MAGIC_SPEED: !Aptitude
+   uses: Eff     
+ - MELEE_SPEED: !Aptitude
+   uses: Eff     
+ - RANGED_SPEED: !Aptitude
+   uses: Eff     
+ - MOVEMENT_SPEED: !Aptitude
+   uses: Eff     

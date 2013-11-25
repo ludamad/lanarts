@@ -53,7 +53,8 @@ local function main(args)
         M.start_menu_show()
         return false   
     elseif args[1] == "--dungenerate" then
-        import "dungenerate.Main"
+        local Main = import "dungenerate.Main"
+        Main.main(args)
         return false
     elseif args[1] == "--testmap" then
         Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)

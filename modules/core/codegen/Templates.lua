@@ -7,14 +7,21 @@ local M = nilprotect {} -- Submodule
 
 local AC = AnsiColors
 local function hilight(s)
-    return s:gsub("local", function(p) return AC.WHITE(p) end)
+    for k in values {"local", "elseif", "else", "return", "function", "end", "rawget", "rawset"} do
+        for pattern in values {"$", "[%s%(]"} do
+            s = s:gsub(k..pattern, function(p1) 
+                return p1:gsub(k, function(p2) return AC.WHITE(p2) end) 
+            end)
+        end
+    end ; return s
 end
 
 function M.callstring(str, ...)
     if ... then str = str:format(...) end 
-    for i, s in ipairs(str:split("\n")) do
-        print( AC.WHITE(i .. ')') .. hilight(s))
-    end
+--    for i, s in ipairs(str:split("\n")) do
+--        local lineno = ("%3d) "):format(i)
+--        print( AC.WHITE(lineno) .. hilight(s))
+--    end
     local func_loader, err = loadstring(str)
     if err then error(err) end
     return func_loader()
@@ -27,7 +34,6 @@ local SLICE_UNPACK = "local data,pos = rawget(self,1),rawget(self,2)"
 function M.metamethods.__index(T)
     local B = MethodBuilder.create(T, "self", "k")
     B:add(SLICE_UNPACK)
-    B:add("print('here with pos =',pos)")
     local prefix = "if"
     for field in T:all_aliases() do
         B:add(prefix .. " k == '%s' then return rawget(data, pos+%d)", field.name, field.offset)
@@ -39,13 +45,23 @@ function M.metamethods.__index(T)
 end
 
 function M.metamethods.__tostring(T)
-    local B = MethodBuilder.create(T, "self")
-    B:add("local parts = {}")
-    B:add("parts[#parts+1] = 'type %s:'", T.name or "<anon>")
+    local B = MethodBuilder.create(T, "self", "indent")
+    B:add("local parts = {':%s'}", T.name or "<anon>")
+    B:add("local function add(s) for i=1,indent do s='  '..s end ; append(parts, s) end")
+    B:add("indent = indent or 0")
+    local leafs,roots = {},{}
     for field in T:all_fields() do
-        B:add("parts[#parts+1] = ' %s = ' .. %s", field.name, field.type:emit_tostring("self." .. field.name))
+        if field.is_leaf then 
+            local piece = ("'%s ' .. %s"):format(field.name, field.type:emit_tostring("self." .. field.name))
+            append(leafs, piece)
+        else
+            local piece = ("add('%s ' .. self.%s:__tostring(indent+1))"):format(field.name, field.name)
+            append(roots, piece)
+        end
     end
-    B:add("return '[' .. table.concat(parts) .. ']'")
+    if #leafs > 0 then B:add("add(%s)", (".. ', '.."):join(leafs)) end
+    B:add(roots)
+    B:add("return ('\\n'):join(parts)")
     return B:emit()
 end
 function M.metamethods.__newindex(T)
@@ -76,7 +92,6 @@ function M.methods.create(T)
     for i, f in ipairs(inits) do
         B:add(f.type:emit_field_copy("data", f.offset, inits.initializers))
     end
-    B:add("print('data=',data[2])")
     B:add("return self")
     return B:emit()
 end
@@ -109,6 +124,7 @@ function M.compile_type(T)
     for k, v in pairs(M.metamethods) do
         local method = v(T)
         append(parts, "METATABLE." .. k .. " = " .. method)
+        append(parts, "TYPETABLE." .. k .. " = METATABLE." .. k)
     end
     for k, v in pairs(M.methods) do
         local method = v(T)
@@ -118,10 +134,9 @@ function M.compile_type(T)
     local callable = ("\n"):join(parts)
 
     local constant_names, constant_vals = {}, {}
-    for field in T:all_fields() do
-        if getmetatable(field.type) == StructType then
-            append(constant_names, field.typename) ; append(constant_vals, field.type.__metatable)
-        end
+    for field in T:all_nonleafs() do
+        append(constant_names, 'meta_'..field.typename)
+        append(constant_vals, field.type.__metatable)
     end
     local type = M.callstring('return function(%s)\n------------\n%s\nend', 
         (','):join(constant_names), ("\n"):join(parts)

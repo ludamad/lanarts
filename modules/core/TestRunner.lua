@@ -24,7 +24,7 @@ function M.main(args)
     assert = lunit.assert
 
     local tests = {}
-    for module in values {"core", "dungenerate"} do
+    for module in values {"core", "dungenerate", "statml"} do
         if args[2] == nil or args[2] == module then 
             for test in values(find_submodules(module .. ".tests", true)) do 
                 append(tests, test)

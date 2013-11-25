@@ -147,14 +147,10 @@ static void handle_anchor(struct lua_yaml_loader *loader) {
 }
 
 static void load_map(struct lua_yaml_loader *loader) {
+   int i, map;
    char* tag;
    lua_newtable(loader->L);
-   // XXX: Patched in for Lanarts
-   tag = (char*)loader->event.data.scalar.tag;
-   if (tag != NULL) {
-      lua_pushstring(loader->L, tag+1 /*avoid '!'*/);
-      lua_setfield(loader->L, -2, "__tag");
-   }
+   map = lua_gettop(loader->L);
 
    if (loader->mapmt_index != 0) {
       lua_pushvalue(loader->L, loader->mapmt_index);
@@ -162,19 +158,36 @@ static void load_map(struct lua_yaml_loader *loader) {
    }
 
    handle_anchor(loader);
-   while (1) {
-      int r;
+   for (i=1;;i++) {
+      int r, key, val;
       /* load key */
       if (load_node(loader) == 0 || loader->error)
          return;
+      key = lua_gettop(loader->L);
 
       /* load value */
       r = load_node(loader);
       if (loader->error)
          return;
+      if (i == 1) {
+         // XXX: Patched in for Lanarts
+         tag = (char*)loader->event.data.scalar.tag;
+         if (tag != NULL) {
+            lua_pushstring(loader->L, tag+1 /*avoid '!'*/);
+            lua_setfield(loader->L, map, "__tag");
+         }
+      }
+      val = lua_gettop(loader->L);
       if (r != 1)
          RETURN_ERRMSG(loader, "unanticipated END event");
-      lua_rawset(loader->L, -3);
+      // Even if its a map, we want a list of fields (Lanarts-specific!)
+      lua_newtable(loader->L); // Create {_,_}
+      lua_pushvalue(loader->L, key);
+      lua_rawseti(loader->L, -2, 1); // Set {key,_}
+      lua_pushvalue(loader->L, val);
+      lua_rawseti(loader->L, -2, 2); // Set {_,val}
+      lua_rawseti(loader->L, map, i); // Place into map[i]
+      lua_pop(loader->L, 2); // Pop key, val
    }
 }
 

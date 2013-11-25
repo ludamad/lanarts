@@ -61,9 +61,10 @@ function StructType:parse_line(line)
     end
 end
 
-local function filter(iter, k)
+local function filter(iter, k, --[[Optional]] invert)
     local ret = {} ; for v in iter do
-        if v[k] then append(ret, v) end 
+        if not invert and v[k] then append(ret, v) 
+        elseif invert and not v[k] then append(ret, v) end
     end ; return values(ret)
 end
 
@@ -82,12 +83,13 @@ function StructType:all_subfields()
     local subfields = {} ; self:_all_subfields(subfields, 0, true) ; return values(subfields)
 end
 function StructType:all_leafs(subfields, offset) return filter(self:all_subfields(), "is_leaf") end
+function StructType:all_nonleafs(subfields, offset) return filter(self:all_subfields(), "is_leaf", --[[invert]] true) end
 function StructType:all_aliases() return filter(self:all_subfields(), "has_alias") end
 
 function StructType:_preinit(defs, corrections)
     for f in self:all_subfields() do
         if f.type.children > 0 then 
-            append(defs, ("setmetatable({%s}, %s)"):format("false, " .. f.offset, f.typename))
+            append(defs, ("setmetatable({%s}, meta_%s)"):format("false, " .. f.offset, f.typename))
             append(corrections, ("rawget(data, %s)[1] = data"):format(f.offset))
         else append(defs, f.type:emit_default()) end
     end

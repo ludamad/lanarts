@@ -6,7 +6,7 @@ local BaseType = newtype() ; M.BaseType = BaseType
 function BaseType:emit_field_assign(S, kroot, O, --[[Optional]] ellide_typecheck)
     local typecheck = self:emit_typecheck(O)
     ellide_typecheck = ellide_typecheck or (typecheck == nil)
-    local assert = ellide_typecheck and "" or ("assert(%s, 'Incorrect type.') ; "):format(typecheck)
+    local assert = ellide_typecheck and "" or ("assert(%s, 'Incorrect type (failed %s).') ; "):format(typecheck, typecheck:gsub("'",'"'))
     return ("%srawset(%s, %s, %s)"):format(
         assert, S, "pos+" .. kroot, O
     )
@@ -37,10 +37,12 @@ for k, v in pairs {
     float = {istype("number"), "0"}, 
     double = {istype("number"), "0"}, 
     string = {istype("string"), "''"}, 
+    bool = {istype("boolean"), "false"}, 
     int = {istype("number") .. " and (${self}%1==0)", "0"}, 
     list = {istype("table") .. " and not getmetatable(${self})", "{}"},
     map = {istype("table") .. " and not getmetatable(${self}) and #(${self}) == 0", "{}"},
     object = {istype("table") .. " and getmetatable(${self})", "nil"},
+    ["function"] = {istype("function"), "do_nothing"},
     any = {nil, "nil"}
 } do
     M.builtin_types[k] = PrimitiveType.create(unpack(v))
