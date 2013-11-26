@@ -3,11 +3,11 @@
   on_parse: # Not necessary to understand for simple modifications
     BoolSet(uses): {Eff: uses_eff, Dam: uses_dam, Res: uses_res, Def: uses_def}
 
-#- AptVec: !object
-#  var(float): Eff Dam Res Def
-#
-#- AptitudeSet: !object
-#  var(Aptitude): ${ids "Aptitude"}
+- AptVec: !object
+  var(float): Eff Dam Res Def
+
+- AptitudeSet: !object
+  var(Aptitude): ${ids Aptitude}
 #
 #- Stats: !object
 #  embed: AptitudeSet

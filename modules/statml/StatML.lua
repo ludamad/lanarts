@@ -28,11 +28,21 @@ local StatMLContext = typedef [[
 local _context = StatMLContext.create({}, {}, {})
 local _parsers,_parsed,_unparsed=_context.parsers,_context.parsed,_context.unparsed
 
+-- Copy builtin into parsers
+for k,v in pairs(builtin) do _parsers[k] = v end
+
 local function parse_all(tag, nodes)
     local parser = assert(_parsers[tag], "No parser defined for '" .. tag .. "'!")
     for _,n in ipairs(nodes) do
-        local result = assert(parser(n), "Parser did not return result object!")
-        _parsed[tag]:add(n.id, result)
+        if rawget(builtin,tag) ~= nil then
+            -- Resolve builtin tags somewhat specially
+           local r = builtin[tag](n)
+           if r then _parsed[tag]:add(n.id, r) end
+        else
+            -- User-defined tag
+            local result = assert(parser(n), "Parser did not return result object!")
+            _parsed[tag]:add(n.id, result)
+        end
     end 
 end
 
@@ -54,15 +64,9 @@ end
 
 local function load(raw, file)
     local tag = prepare_node(raw, file)
-    -- Resolve builtin tags right away
-    if rawget(builtin,tag) ~= nil then
-       local r = builtin[tag](raw)
-       if r then _parsed[tag]:add(raw.id, r) end
-    else
-        -- Resolve other tags on demand, add to list of unparsed
-        local list = _unparsed[tag] or {}
-        _unparsed[tag] = list ; append(list, raw)
-    end
+    -- Resolve tags on demand, add to list of unparsed
+    local list = _unparsed[tag] or {}
+    _unparsed[tag] = list ; append(list, raw)
 end
 
 function M.load_file(file)
@@ -81,12 +85,10 @@ end
 function M.id_list(tag)
     assert(_parsers[tag], "No parser associated with '"..tag.."'!")
     assert(_unparsed[tag], "Attempt to take id list of '"..tag.."', but no elements were found.")
-    parse_all(tag, _unparsed[tag])
-    table.clear(_unparsed[tag])
     local ids, oset = {}, _parsed[tag]
-    for _, r in ipairs(oset.list) do
-        append(ids, oset.reverse_map[r])
-    end ; return ids
+    for _, r in ipairs(oset.list) do append(ids, oset.reverse_map[r]) end
+    for _, node in ipairs(_unparsed[tag]) do append(ids, node.id) end
+    return ids
 end
 
 function M.define_parser(parserdefs)

@@ -10,20 +10,19 @@ function M.trait()
     lazy_import()
 end
 
-local function preprocess(str)
-    str:gsub("($b{})", function(str)
+local preproc_onearg = {
+    ids = function(tag) return (" "):join(StatML.id_list(tag)) end
+}
+
+local function preprocess(data)
+    if type(data) ~= "string" then return data end
+    return data:gsub("($%b{})", function(str)
+        print "HERE"
         local macro = str:sub(3, -2)
-        local func = loadstring("return " .. macro)
-        setfenv(macro, {
-            ids = StatML.id_list
-        })
-        local result = func()
-        if type(result) == "table" and not getmetatable(result) then 
-            result = (" "):join(result)
-        end
-        return tostring(result)
+        local func_name, arg, rest = unpack(Util.str_part_list(macro))
+        assert(not rest, "Too many arguments!")
+        return preproc_onearg[func_name](arg)
     end)
-    return str
 end 
 
 local root_parametric = {
@@ -51,6 +50,7 @@ local function extract_parametric(node, funcs, ...)
     assert(type(node) == "table")
     for label,func in pairs(funcs) do
         for param,data in Util.extract_parametric(node, label) do
+            param = preprocess(param) ; data = preprocess(data)
             func(node, param, data, ...)
         end
     end
@@ -58,6 +58,7 @@ end
 local function extract_simple(node, funcs)
     for label,func in pairs(funcs) do
         local val = Util.extract(node, label)
+        val = preprocess(val)
         if val then func(node, val) end
     end
 end
@@ -76,7 +77,8 @@ function M.object(metanode)
     lazy_import()
     local definition,handlers = {},{}
     extract_parametric(metanode, root_parametric, definition)
-    extract_parametric(Util.extract(metanode, "on_parse"), on_parse_parametric, handlers)
+    local on_parse = Util.extract(metanode, "on_parse")
+    if on_parse then extract_parametric(on_parse, on_parse_parametric, handlers) end
     Util.assert_empty(metanode)
     local object_type = typedef(_classes) (metanode.id)(
         ("\n"):join(definition)
