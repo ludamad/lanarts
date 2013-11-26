@@ -70,9 +70,11 @@ local function load(raw, file)
 end
 
 function M.load_file(file)
-    print("PARSING " .. file)
-    print("----------------------------")
     local nodes = yaml.load(file_as_string(file))
+    if not nodes then -- File had no content
+        print("StatML: Warning, '" .. file .. "' had no content.")
+        return
+    end
     for _,raw in ipairs(nodes) do load(raw, file) end
 end
 

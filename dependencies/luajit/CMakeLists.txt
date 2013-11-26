@@ -10,7 +10,7 @@ project ( luajit C ASM)
 cmake_minimum_required ( VERSION 2.8 )
 include ( cmake/dist.cmake )
 
-add_definitions(-fno-sanitize=address)
+#add_definitions(-fno-sanitize=address)
 
 ## CONFIGURATION
 # Default configuration (we assume POSIX by default)

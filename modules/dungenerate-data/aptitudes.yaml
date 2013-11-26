@@ -1,105 +1,105 @@
-- Aptitude: !object
-  var(bool): uses_eff uses_dam uses_res uses_def
-  on_parse: # Not necessary to understand for simple modifications
-    BoolSet(uses): {Eff: uses_eff, Dam: uses_dam, Res: uses_res, Def: uses_def}
-
-- AptVec: !object
-  var(float): Eff Dam Res Def
-
-- AptitudeSet: !object
-  var(Aptitude): ${ids Aptitude}
+#- Aptitude: !object
+#  var(bool): uses_eff uses_dam uses_res uses_def
+#  on_parse: # Not necessary to understand for simple modifications
+#    BoolSet(uses): {Eff: uses_eff, Dam: uses_dam, Res: uses_res, Def: uses_def}
+#
+#- AptVec: !object
+#  var(float): Eff Dam Res Def
+#
+#- AptitudeSet: !object
+#  var(Aptitude): ${ids Aptitude}
 #
 #- Stats: !object
-#  embed: AptitudeSet
+#  var(AptitudeSet): aptitudes
 #
 #- StatContext: !object
 #  var(Stats): base derived
-
-# TRAINABLE APTITUDES
-#Main combat proficiencies
-- Melee: !Aptitude
-  uses: Eff Dam Res Def 
-- Ranged: !Aptitude
-  uses: Eff Dam Res Def 
-- Magic: !Aptitude
-  uses: Eff Dam Res Def 
-
-#Weapon types
-- Piercing: !Aptitude
-  uses: Eff Dam Res Def 
-- Slashing: !Aptitude
-  uses: Eff Dam Res Def 
-- Blunt: !Aptitude
-  uses: Eff Dam Res Def 
-
-#Spell types
-- Enchantments: !Aptitude
-  uses: Eff Dam Res Def 
-- Curses: !Aptitude
-  uses: Eff Dam Res Def 
-- Force: !Aptitude
-  uses: Eff Dam Res Def 
-- Summoning: !Aptitude
-  uses: Eff     
-
-#Misc proficiencies
-- Armour: !Aptitude
-  uses: Eff             #Ability to use armour
-- Willpower: !Aptitude
-  uses: Eff             #Ability to resist spell effects
-- Fortitude: !Aptitude
-  uses: Eff             #Ability to resist physical abilities (stun, sleep etc)
-- Self-Mastery: !Aptitude
-  uses: Eff             #Ability to perform maneuvers
-- MagicItems: !Aptitude
-  uses: Eff             #Ability to use magic items
-
-#Major 'elements'
-- Dark: !Aptitude
-  uses: Eff Dam Res Def 
-- Light: !Aptitude
-  uses: Eff Dam Res Def 
-- Fire: !Aptitude
-  uses: Eff Dam Res Def 
-- Water: !Aptitude
-  uses: Eff Dam Res Def 
-
-#Minor elements
-- Earth: !Aptitude
-  uses: Eff Dam Res Def 
-- Air: !Aptitude
-  uses: Eff Dam Res Def 
-
-#NON-TRAINABLE APTITUDES
-- Chaos: !Aptitude
-  uses: Eff     Res    
-- Poison: !Aptitude
-  uses: Eff     Res    
-
-#Alternate weapon categories
-- Blade: !Aptitude
-  uses: Eff Dam Res Def 
-- Axe: !Aptitude
-  uses: Eff Dam Res Def 
-- Mace: !Aptitude
-  uses: Eff Dam Res Def 
-- Bows: !Aptitude
-  uses: Eff Dam Res Def 
-- Polearm: !Aptitude
-  uses: Eff Dam Res Def 
-- Staff: !Aptitude
-  uses: Eff Dam Res Def 
-
-#Misc proficiencies
-- WeaponIdentification: !Aptitude
-  uses: Eff     
-- WeaponProficiency: !Aptitude
-  uses: Eff     
-- MagicSpeed: !Aptitude
-  uses: Eff     
-- MeleeSpeed: !Aptitude
-  uses: Eff     
-- RangedSpeed: !Aptitude
-  uses: Eff     
-- MovementSpeed: !Aptitude
-  uses: Eff     
+#
+## TRAINABLE APTITUDES
+##Main combat proficiencies
+#- Melee: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Ranged: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Magic: !Aptitude
+#  uses: Eff Dam Res Def 
+#
+##Weapon types
+#- Piercing: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Slashing: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Blunt: !Aptitude
+#  uses: Eff Dam Res Def 
+#
+##Spell types
+#- Enchantments: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Curses: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Force: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Summoning: !Aptitude
+#  uses: Eff     
+#
+##Misc proficiencies
+#- Armour: !Aptitude
+#  uses: Eff             #Ability to use armour
+#- Willpower: !Aptitude
+#  uses: Eff             #Ability to resist spell effects
+#- Fortitude: !Aptitude
+#  uses: Eff             #Ability to resist physical abilities (stun, sleep etc)
+#- Self-Mastery: !Aptitude
+#  uses: Eff             #Ability to perform maneuvers
+#- MagicItems: !Aptitude
+#  uses: Eff             #Ability to use magic items
+#
+##Major 'elements'
+#- Dark: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Light: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Fire: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Water: !Aptitude
+#  uses: Eff Dam Res Def 
+#
+##Minor elements
+#- Earth: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Air: !Aptitude
+#  uses: Eff Dam Res Def 
+#
+##NON-TRAINABLE APTITUDES
+#- Chaos: !Aptitude
+#  uses: Eff     Res    
+#- Poison: !Aptitude
+#  uses: Eff     Res    
+#
+##Alternate weapon categories
+#- Blade: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Axe: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Mace: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Bows: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Polearm: !Aptitude
+#  uses: Eff Dam Res Def 
+#- Staff: !Aptitude
+#  uses: Eff Dam Res Def 
+#
+##Misc proficiencies
+#- WeaponIdentification: !Aptitude
+#  uses: Eff     
+#- WeaponProficiency: !Aptitude
+#  uses: Eff     
+#- MagicSpeed: !Aptitude
+#  uses: Eff     
+#- MeleeSpeed: !Aptitude
+#  uses: Eff     
+#- RangedSpeed: !Aptitude
+#  uses: Eff     
+#- MovementSpeed: !Aptitude
+#  uses: Eff     

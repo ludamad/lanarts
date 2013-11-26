@@ -14,6 +14,7 @@ if not __LUAJIT then
     return
 end
 
+--- XXX: Seemingly hit a LuaJIT bug that causes segfaults with the 'fwd' optimization.
 (require 'jit.opt').start('-fwd')
 
 require("table.clear")

@@ -1,0 +1,14 @@
+- Person: !object
+  var(string): ip
+
+- PersonSummary: !object
+  var(string): names
+
+- Adam: !Person
+  ip: 192.168.0.1
+
+- NotAdam: !Person
+  ip: 192.168.0.1
+
+- Summary: !PersonSummary
+  names: ${ids Person}

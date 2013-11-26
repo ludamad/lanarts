@@ -26,7 +26,6 @@ function M.main(args)
     StatML.load_directory("modules/"..DATA_MODULE)
 --    resolve_dependent_parsers()
     StatML.parse_all()
-    print "DONE"
 end
 
 return M

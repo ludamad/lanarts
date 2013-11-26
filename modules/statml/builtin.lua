@@ -66,6 +66,7 @@ local function extract_required_fields(node, object_type)
     local args = {} ; for f in struct:all_required_fields() do
         local val = Util.extract(node, f.name)
         if val == nil then error("Object '" .. node.id .. "' requires field '"..f.name.."'!") end
+        val = preprocess(val)
         append(args, val)
     end ; return args
 end
