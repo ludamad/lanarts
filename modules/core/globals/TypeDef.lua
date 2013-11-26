@@ -12,7 +12,7 @@ local function typedef_aux(...) local namespaces = {...} ; assert_all_tables(...
     if type(...) == "table" then
         assert_all_tables(...)
         table.insert_all(namespaces, {...}) ;  return typedef_aux(unpack(namespaces))
-    end ; local name = ...; assert(#{...} == 1)
+    end ; local name = ...; assert(#{...} == 1, "Incorrect name field.")
     return function(definition)
         local T = Templates.type_parse(definition, namespaces, name)
         local type = Templates.compile_type(T)

@@ -1,114 +1,106 @@
 local yaml = import "core.yaml"
+-- Defines builtin handlers !object, !trait, and !class:
+local builtin = import "@builtin"
+local Util = import "@StatMLUtil"
 
 local M = nilprotect {} -- Submodule
 
-local StatMLNode = newtype()
-function StatMLNode:init(id, tag) self.id = id ; self.__tag = tag end
-function StatMLNode:remove(k)
-    local val = rawget(self,k) ; if val == nil then
-        error("Error: Expected manditory key '" .. k .. "' when parsing '" .. self.__tag .. "'.")
-    end ; self[k] = nil ; return val
-end
-function StatMLNode:check_empty()
-    self:remove("__tag") ; self:remove("id") -- Make sure they do not conflict with the check
-    local parts = nil ; for k,v in pairs(self) do parts = parts or {}
-        append(parts, "Error: Unknown/unused key '" .. k .. "' when parsing '" .. self.__tag .. "'.")
-    end ; if parts then error(("\n"):join(parts)) end
-end
-
 local ObjectSet = typedef [[
     list :list
-    map :map
+    map, reverse_map :map
 ]]
 
 function ObjectSet:add(id, r)
     assert(not self.map[id])
     append(self.list, r)
-    self.map[id] = r 
+    self.map[id] = r ; self.reverse_map[r] = id 
+    print("Adding " .. id .. ' ' .. tostring(r))
 end
 
 local Parser = typedef [[
     preprocess_func, parse_func :function
 ]]
-function Parser:parse(raw)
-    local id = raw[1][1] -- the key in the first key-value pair
-    local node = StatMLNode.create(id, raw.__tag)
-    self.preprocess_func(raw, node)
-    local parsed = self.parse_func(node)
-    node:check_empty()
-    return id, parsed
-end
 
 local StatMLContext = typedef [[
-    parsers, resolved, unresolved :map
+    parsers, parsed, unparsed :map
 ]]
 
 local _context = StatMLContext.create({}, {}, {})
-local _parsers,_resolved,_unresolved=_context.parsers,_context.resolved,_context.unresolved
+local _parsers,_parsed,_unparsed=_context.parsers,_context.parsed,_context.unparsed
 
-local function parse_raw(raw)
-    local tag = assert(raw.__tag, "Root-level node without type/tag!")
-    local parser = _parsers[tag]
-    if parser then
-        local id, r = parser:parse(raw)
-        _resolved[tag]:add(id, r)
+local function parse_all(tag, nodes)
+    local parser = assert(_parsers[tag], "No parser defined for '" .. tag .. "'!")
+    for _,n in ipairs(nodes) do
+        local result = assert(parser(n), "Parser did not return result object!")
+        _parsed[tag]:add(n.id, result)
+    end 
+end
+
+local function prepare_node(raw, file)
+    raw.__file = file
+    if raw.__type == "map" then
+        if not raw.__tag and raw[1] then
+            local first = raw[1]
+            local id,tag=first[1],first[2].__tag
+            raw.id,raw.__tag=id,tag
+            table.remove(raw, 1)
+        end
+        Util.node_assert(raw.__tag, raw, "Root-level node without type/tag!")
+        return raw.__tag
+    elseif raw.__type == "list" then
+        assert("Not expecting root list yet.")
+    end ; assert(false)
+end
+
+local function load(raw, file)
+    local tag = prepare_node(raw, file)
+    -- Resolve builtin tags right away
+    if rawget(builtin,tag) ~= nil then
+       local r = builtin[tag](raw)
+       if r then _parsed[tag]:add(raw.id, r) end
     else
-        local unres = _unresolved[tag] or {}
-        _unresolved[tag] = unres
-        append(unres, raw)
+        -- Resolve other tags on demand, add to list of unparsed
+        local list = _unparsed[tag] or {}
+        _unparsed[tag] = list ; append(list, raw)
     end
 end
 
-function M.parse_file(file)
+function M.load_file(file)
     print("PARSING " .. file)
-    print("--------------------------------------------------------------------------------")
+    print("----------------------------")
     local nodes = yaml.load(file_as_string(file))
-    for i,raw in ipairs(nodes) do
-        parse_raw(raw)
-    end
+    for _,raw in ipairs(nodes) do load(raw, file) end
 end
 
-function M.parse_all(directory, --[[Optional]] extension)
+function M.load_directory(directory, --[[Optional]] extension)
     extension = extension or "yaml"
     local files = io.directory_search(directory, "*." .. extension, --[[recursive]] true)
-    for _,file in ipairs(files) do M.parse_file(file) end
+    for _,file in ipairs(files) do M.load_file(file) end
 end
 
-function M.define_parser(tag, preproc, func)
-    assert(not _parsers[tag], "Parser already defined for '" .. tag .. "'!")
-    assert(not _resolved[tag], "Object set already exists for '" .. tag .. "'!")
-    _parsers[tag] = Parser.create(preproc, func)
-    _resolved[tag] = ObjectSet.create({},{})
-    for i,raw in ipairs(_unresolved[tag] or {}) do parse_raw(raw) end
-    _unresolved[tag] = nil
+function M.id_list(tag)
+    assert(_parsers[tag], "No parser associated with '"..tag.."'!")
+    assert(_unparsed[tag], "Attempt to take id list of '"..tag.."', but no elements were found.")
+    parse_all(tag, _unparsed[tag])
+    table.clear(_unparsed[tag])
+    local ids, oset = {}, _parsed[tag]
+    for _, r in ipairs(oset.list) do
+        append(ids, oset.reverse_map[r])
+    end ; return ids
 end
 
-local function as_map(raw, node) 
-    for i=2,#raw do
-        local k,v=raw[i][1],raw[i][2]
-        assert(rawget(node,k) == nil, "Key '"..k.."' already specified!") -- TODO better errors
-        node[k] = v
-    end
-end
-
-function M.define_map_parse(parserdefs)
+function M.define_parser(parserdefs)
     for tag,func in pairs(parserdefs) do
-        M.define_parser(tag, as_map, func)
+        assert(not _parsers[tag], "Parser already defined for '" .. tag .. "'!")
+        assert(not _parsed[tag], "Object set already exists for '" .. tag .. "'!")
+        _parsers[tag] = func
+        _parsed[tag] = ObjectSet.create({},{},{})
     end
 end
 
-function M.assert_finished()
-    for k, v in pairs(_unresolved) do
-        assert(#v == 0, "Fatal: Finished parsing, but did not parse '!"..k.."' nodes!") 
-    end
+function M.parse_all()
+    for tag,list in pairs(_unparsed) do parse_all(tag, list) end
+    table.clear(_unparsed)
 end
-
---local function parse_class_candidate(context, line, fields)
---    -- Returns false if was not a class description.
---    local class_name = line:match("^class%s+([%w_]+)")
---    if not class_name then return false end
---    local class = StatMLClass.create(class_name)
---end
-
 
 return M 

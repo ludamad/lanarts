@@ -18,10 +18,10 @@ end
 
 function M.callstring(str, ...)
     if ... then str = str:format(...) end 
---    for i, s in ipairs(str:split("\n")) do
---        local lineno = ("%3d) "):format(i)
---        print( AC.WHITE(lineno) .. hilight(s))
---    end
+    for i, s in ipairs(str:split("\n")) do
+        local lineno = ("%3d) "):format(i)
+        print( AC.WHITE(lineno) .. hilight(s))
+    end
     local func_loader, err = loadstring(str)
     if err then error(err) end
     return func_loader()
@@ -81,7 +81,7 @@ function M.methods.create(T)
     local args, assigns, inits = {}, {}, {} 
     for field in T:all_fields() do
         if field.initializers then append(inits, field)
-        else append(assigns, field) ; append(args, "in_" .. field.name) end
+        else append(assigns, field) ; append(args, "in_" .. field.name:gsub("-", "_d_")) end
     end
     local B = MethodBuilder.create(T, unpack(args))
     B:add("local self")
@@ -100,10 +100,12 @@ function M.emit_global_cache(...) -- For performance, cache common globals
     return "local " .. (","):join {...} .. "=" .. (","):join {...}    
 end
 
-local function resolve_namespaces(namespace) 
-    local ret = {} ; for namespace in values(namespace) do
+local function resolve_namespaces(namespaces) 
+    local ret = {} ; for namespace in values(namespaces) do
         for k, v in pairs(namespace) do 
-            if rawget(v, "__structinfo") then ret[k] = v.__structinfo end
+            if type(v) == "table" and rawget(v, "__structinfo") then 
+                ret[k] = v.__structinfo 
+            end
         end
     end ; return ret
 end
@@ -116,6 +118,7 @@ function M.type_parse(definition, --[[Optional]] namespaces, --[[Optional]] name
 end
 
 function M.compile_type(T)
+    assert(#T.fields > 0, "Cannot define a struct with no fields! " .. (T.name and '('..T.name..')' or ''))
     local parts = {
         M.emit_global_cache("rawget","rawset","setmetatable","getmetatable"),
         "local TYPETABLE = {} ; local METATABLE = {}",
@@ -135,8 +138,11 @@ function M.compile_type(T)
 
     local constant_names, constant_vals = {}, {}
     for field in T:all_nonleafs() do
-        append(constant_names, 'meta_'..field.typename)
-        append(constant_vals, field.type.__metatable)
+        local var_name = 'meta_'..field.typename
+        if not table.contains(constant_names, var_name) then
+            append(constant_names, var_name)
+            append(constant_vals, field.type.__metatable)
+        end
     end
     local type = M.callstring('return function(%s)\n------------\n%s\nend', 
         (','):join(constant_names), ("\n"):join(parts)

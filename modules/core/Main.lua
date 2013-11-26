@@ -15,4 +15,4 @@ local modules_submodule = globals_subpackage .. ".Modules"
 require(modules_submodule)
 
 import "@globals.Errors" -- Get better error reporting as soon as possible
-import_all(globals_subpackage, "*", true)
+import_all(globals_subpackage, true)

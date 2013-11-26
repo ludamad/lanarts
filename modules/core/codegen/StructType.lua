@@ -43,18 +43,19 @@ function StructType:parse_field_spec(line)
     local parts = line:split(":")
     local typename = parts[#parts]:trim()
     local is_embedded = (#parts == 1) 
+
     local names = (is_embedded and {typename} or parts[1]:split(","))
     for name in values(names) do
         name = name:trim()
-        assert(name:match("^[%w_]+$"), "'" .. name .. "' is not a valid name.")
-        self:define_field(name, typename, true, is_embedded)
+        assert(name:match("^[%w_%-]+$"), "'" .. name .. "' is not a valid name.")
+        self:define_field(name, typename, is_embedded)
     end
 end
 
 function StructType:parse_line(line)
-    if line:match("^%s*[%w_]+%s*$") then
+    if line:match("^%s*[%w_%-]+%s*$") then
         self:parse_field_spec(line) -- Embedded field
-    elseif line:match("^%s*[%w_,%s]+:%s*[%w_]+%s*$") then
+    elseif line:match("^%s*[%w_%-,%s]+:%s*[%w_]+%s*$") then
         self:parse_field_spec(line) -- Normal field
     elseif not line:match("^%s*$") then
         error("Unexpected line '" .. line .. "'.")
@@ -85,6 +86,9 @@ end
 function StructType:all_leafs(subfields, offset) return filter(self:all_subfields(), "is_leaf") end
 function StructType:all_nonleafs(subfields, offset) return filter(self:all_subfields(), "is_leaf", --[[invert]] true) end
 function StructType:all_aliases() return filter(self:all_subfields(), "has_alias") end
+function StructType:all_required_fields() 
+    return filter(self:all_subfields(), "initializers", --[[inverse]] true) 
+end
 
 function StructType:_preinit(defs, corrections)
     for f in self:all_subfields() do
@@ -99,9 +103,10 @@ function StructType:emit_preinit(slice)
     local defs, corrections = {}, {}
     self:_preinit(defs, corrections)
     return ("local data,pos = {%s},0\n%s = setmetatable({data,pos}, %s)\n%s"):format(
-        (","):join(defs), slice, "METATABLE", ("\n"):join(corrections)
+        (",\n"):join(defs), slice, "METATABLE", ("\n"):join(corrections)
     ):split("\n")
 end
+
 
 function StructType:emit_field_init(S, kroot, args)
     local parts = {"rawset(%s, pos + %d, "}
@@ -110,16 +115,49 @@ function StructType:emit_field_init(S, kroot, args)
         append(parts, field.type:emit_init(S, offset))
     end ; return parts
 end
+local AssignBatcher = newtype()
+function AssignBatcher:init(kroot)
+    self.kroot = kroot
+    self.offset = false ; self.batches = 0 ; self.dx = false
+end
+function AssignBatcher:add(parts, f)
+    if not self.offset then 
+        self.offset = f.offset ; self.batches = 1 ; return
+    end
+    if not self.dx then self.dx = f.offset - self.offset
+    else
+        local dist = f.offset - self.offset - (self.batches-1) * self.dx
+        if self.dx ~= dist then
+            self:emit(parts) ; self:add(parts, f) ; return
+        end
+    end
+
+    self.batches = self.batches + 1
+end
+function AssignBatcher:emit(parts)
+    if not self.offset then return end
+    local i_start, i_end = self.offset, self.offset+self.batches*self.dx
+    if self.batches <= 3 then
+        for i=i_start,i_end,self.dx do
+            append(parts, ("  rawset(data, pos+%d, rawget(odata, opos+%d))"):format(
+                self.kroot + i, i
+            ))
+        end
+    else
+        append(parts, ("  for i=%d,%d%s do rawset(data, pos+%d+i, rawget(odata, opos+i)) end"):format(
+            i_start,i_end, (self.dx == 1) and '' or ','..self.dx, self.kroot
+        ))
+    end 
+    self:init(self.kroot)
+end
+
 function StructType:emit_field_assign(S, kroot, O)
     local parts = {("do local odata, opos = rawget(%s,1),rawget(%s,2) --<%s:emit_field_assign>"):format(O, O, self.name)}
+    local batcher = AssignBatcher.create(kroot)
     for f in self:all_leafs() do
-        local assign = f.type:emit_field_assign(
-            "data",  kroot + f.offset, 
-            ("rawget(odata, opos+%s)"):format(f.offset), 
-            --[[ellide typecheck]] true
-        )
-        append(parts, '    ' .. assign)
+        batcher:add(parts, f)
     end
+    batcher:emit(parts)
     append(parts, "end")
     return parts
 end

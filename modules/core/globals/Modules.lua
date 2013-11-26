@@ -113,21 +113,24 @@ local weak_args = {cache_check_only = true}
 function import_weak(vpath) return import(vpath, weak_args) end
 
 -- Utility for finding submodules of a given vpath
-function find_submodules(vpath, --[[Optional]] recursive, --[[Optional]] pattern)
-    local ret, root = {}, virtual_path_to_real(vpath) 
+function find_submodules(vpath, --[[Optional]] recursive, --[[Optional]] pattern, --[[Optional]] filter)
+    if type(filter) == "string" then
+        local pattern = filter
+        filter = function(c) return c:match(pattern) end
+    end
+    local ret, root = {}, virtual_path_to_real(vpath)
     for file in values(io.directory_search(root, (pattern or "*") .. ".lua", recursive or false)) do
-        table.insert(ret, virtual_path_create_relative(file, _ROOT_FOLDER))
+        local c = virtual_path_create_relative(file, _ROOT_FOLDER)
+        if not filter or filter(c) then
+            table.insert(ret, c)
+        end        
     end
     return ret
 end
 
-function import_all(subpackage, --[[Optional]] pattern, --[[Optional]] recursive, --[[Optional]] filter)
-    local content = find_submodules(subpackage, recursive or false, pattern or "*")
-    for c in values(content) do
-        if not filter or filter(c) then
-            import(c)
-        end
-    end
+function import_all(subpackage, --[[Optional]] recursive, --[[Optional]] pattern,  --[[Optional]] filter)
+    local content = find_submodules(subpackage, recursive or false, pattern or "*", filter)
+    for c in values(content) do import(c) end
 end
 
 Errors = import ".Errors"
