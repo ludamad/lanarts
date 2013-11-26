@@ -11,6 +11,8 @@ set(CMAKE_BUILD_TYPE DEBUG)
 ## Compiler flags
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions("-mfpmath=sse -msse2 -ffp-contract=on")
+    add_definitions(-Wuninitialized -fsanitize=address)
+    SET (CMAKE_EXE_LINKER_FLAGS -fsanitize=address)
 endif()
 
 if(WIN32)

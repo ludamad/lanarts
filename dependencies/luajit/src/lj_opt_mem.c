@@ -9,6 +9,7 @@
 #define lj_opt_mem_c
 #define LUA_CORE
 
+#include <stdio.h>
 #include "lj_obj.h"
 
 #if LJ_HASJIT
@@ -17,6 +18,7 @@
 #include "lj_ir.h"
 #include "lj_jit.h"
 #include "lj_iropt.h"
+#include "lj_ircall.h"
 
 /* Some local macros to save typing. Undef'd at the end. */
 #define IR(ref)		(&J->cur.ir[(ref)])
@@ -255,7 +257,15 @@ TRef LJ_FASTCALL lj_opt_fwd_hload(jit_State *J)
     return ref;
   return EMITFOLD;
 }
-
+//
+//void dump_stack(lua_State* L) {
+//	lua_getglobal(L, "debug");
+//	lua_getfield(L, -1, "traceback");
+//	lua_call(L, 0, 1);
+//	printf("Traceback\n%s\n", lua_tostring(L, -1));
+//	lua_pop(L, 2);
+//
+//}
 /* HREFK forwarding. */
 TRef LJ_FASTCALL lj_opt_fwd_hrefk(jit_State *J)
 {
@@ -274,8 +284,9 @@ TRef LJ_FASTCALL lj_opt_fwd_hrefk(jit_State *J)
     ref = newref->prev;
   }
   /* No conflicting NEWREF: key location unchanged for HREFK of TDUP. */
-  if (IR(tab)->o == IR_TDUP)
+  if (IR(tab)->o == IR_TDUP) {
     fins->t.irt &= ~IRT_GUARD;  /* Drop HREFK guard. */
+  }
 docse:
   return CSEFOLD;
 }
@@ -308,7 +319,7 @@ int LJ_FASTCALL lj_opt_fwd_href_nokey(jit_State *J)
   return 1;  /* No conflict. Can fold to niltv. */
 }
 
-/* Check whether there's no aliasing NEWREF for the left operand. */
+/* Check whether there's no aliasing NEWREF/table.clear for the left operand. */
 int LJ_FASTCALL lj_opt_fwd_tptr(jit_State *J, IRRef lim)
 {
   IRRef ta = fins->op1;
@@ -318,6 +329,14 @@ int LJ_FASTCALL lj_opt_fwd_tptr(jit_State *J, IRRef lim)
     if (ta == newref->op1 || aa_table(J, ta, newref->op1) != ALIAS_NO)
       return 0;  /* Conflict. */
     ref = newref->prev;
+  }
+  ref = J->chain[IR_CALLS];
+  while (ref > lim) {
+    IRIns *calls = IR(ref);
+    if (calls->op2 == IRCALL_lj_tab_clear &&
+	(ta == calls->op1 || aa_table(J, ta, calls->op1) != ALIAS_NO))
+      return 0;  /* Conflict. */
+    ref = calls->prev;
   }
   return 1;  /* No conflict. Can safely FOLD/CSE. */
 }
@@ -618,16 +637,17 @@ static AliasRet aa_xref(jit_State *J, IRIns *refa, IRIns *xa, IRIns *xb)
     basea = IR(refa->op1);
     ofsa = (LJ_64 && irk->o == IR_KINT64) ? (ptrdiff_t)ir_k64(irk)->u64 :
 					    (ptrdiff_t)irk->i;
-    if (basea == refb && ofsa != 0)
-      return ALIAS_NO;  /* base+-ofs vs. base. */
   }
   if (refb->o == IR_ADD && irref_isk(refb->op2)) {
     IRIns *irk = IR(refb->op2);
     baseb = IR(refb->op1);
     ofsb = (LJ_64 && irk->o == IR_KINT64) ? (ptrdiff_t)ir_k64(irk)->u64 :
 					    (ptrdiff_t)irk->i;
-    if (refa == baseb && ofsb != 0)
-      return ALIAS_NO;  /* base vs. base+-ofs. */
+  }
+  /* Treat constified pointers like base vs. base+offset. */
+  if (basea->o == IR_KPTR && baseb->o == IR_KPTR) {
+    ofsb += (char *)ir_kptr(baseb) - (char *)ir_kptr(basea);
+    baseb = basea;
   }
   /* This implements (very) strict aliasing rules.
   ** Different types do NOT alias, except for differences in signedness.

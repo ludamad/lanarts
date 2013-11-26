@@ -31,7 +31,6 @@ int luayaml_module(lua_State *L);
 // NB: the -address- of this key is used, not the actual string.
 static char GAMESTATE_KEY[] = "";
 
-
 namespace lua_api {
 
 	void luacall_game_won(lua_State* L) {

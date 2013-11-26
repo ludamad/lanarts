@@ -17,7 +17,6 @@ local preproc_onearg = {
 local function preprocess(data)
     if type(data) ~= "string" then return data end
     return data:gsub("($%b{})", function(str)
-        print "HERE"
         local macro = str:sub(3, -2)
         local func_name, arg, rest = unpack(Util.str_part_list(macro))
         assert(not rest, "Too many arguments!")

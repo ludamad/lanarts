@@ -493,6 +493,7 @@ static void gc_finalize(lua_State *L)
     setcdataV(L, &tmp, gco2cd(o));
     tv = lj_tab_set(L, ctype_ctsG(g)->finalizer, &tmp);
     if (!tvisnil(tv)) {
+      g->gc.nocdatafin = 0;
       copyTV(L, &tmp, tv);
       setnilV(tv);  /* Clear entry in finalizer table. */
       gc_call_finalizer(g, L, &tmp, o);
@@ -629,6 +630,9 @@ static size_t gc_onestep(lua_State *L)
 	lj_str_resize(L, g->strmask >> 1);  /* Shrink string table. */
       if (gcref(g->gc.mmudata)) {  /* Need any finalizations? */
 	g->gc.state = GCSfinalize;
+#if LJ_HASFFI
+	g->gc.nocdatafin = 1;
+#endif
       } else {  /* Otherwise skip this phase to help the JIT. */
 	g->gc.state = GCSpause;  /* End of GC cycle. */
 	g->gc.debt = 0;
@@ -647,6 +651,9 @@ static size_t gc_onestep(lua_State *L)
 	g->gc.estimate -= GCFINALIZECOST;
       return GCFINALIZECOST;
     }
+#if LJ_HASFFI
+    if (!g->gc.nocdatafin) lj_tab_rehash(L, ctype_ctsG(g)->finalizer);
+#endif
     g->gc.state = GCSpause;  /* End of GC cycle. */
     g->gc.debt = 0;
     return 0;
@@ -666,7 +673,8 @@ int LJ_FASTCALL lj_gc_step(lua_State *L)
   lim = (GCSTEPSIZE/100) * g->gc.stepmul;
   if (lim == 0)
     lim = LJ_MAX_MEM;
-  g->gc.debt += g->gc.total - g->gc.threshold;
+  if (g->gc.total > g->gc.threshold)
+    g->gc.debt += g->gc.total - g->gc.threshold;
   do {
     lim -= (MSize)gc_onestep(L);
     if (g->gc.state == GCSpause) {
@@ -677,12 +685,14 @@ int LJ_FASTCALL lj_gc_step(lua_State *L)
   } while ((int32_t)lim > 0);
   if (g->gc.debt < GCSTEPSIZE) {
     g->gc.threshold = g->gc.total + GCSTEPSIZE;
+    g->vmstate = ostate;
+    return -1;
   } else {
     g->gc.debt -= GCSTEPSIZE;
     g->gc.threshold = g->gc.total;
+    g->vmstate = ostate;
+    return 0;
   }
-  g->vmstate = ostate;
-  return 0;
 }
 
 /* Ditto, but fix the stack top first. */

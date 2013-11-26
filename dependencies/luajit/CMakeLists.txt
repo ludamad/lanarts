@@ -10,6 +10,8 @@ project ( luajit C ASM)
 cmake_minimum_required ( VERSION 2.8 )
 include ( cmake/dist.cmake )
 
+add_definitions(-fno-sanitize=address)
+
 ## CONFIGURATION
 # Default configuration (we assume POSIX by default)
 set ( LUA_PATH "LUA_PATH" CACHE STRING "Environment variable to use as package.path." )

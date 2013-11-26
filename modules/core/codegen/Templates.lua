@@ -18,10 +18,10 @@ end
 
 function M.callstring(str, ...)
     if ... then str = str:format(...) end 
-    for i, s in ipairs(str:split("\n")) do
-        local lineno = ("%3d) "):format(i)
-        print( AC.WHITE(lineno) .. hilight(s))
-    end
+--    for i, s in ipairs(str:split("\n")) do
+--        local lineno = ("%3d) "):format(i)
+--        print( AC.WHITE(lineno) .. hilight(s))
+--    end
     local func_loader, err = loadstring(str)
     if err then error(err) end
     return func_loader()

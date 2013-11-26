@@ -204,6 +204,17 @@ GCtab * LJ_FASTCALL lj_tab_dup(lua_State *L, const GCtab *kt)
   return t;
 }
 
+/* Clear a table. */
+void LJ_FASTCALL lj_tab_clear(GCtab *t)
+{
+  clearapart(t);
+  if (t->hmask > 0) {
+    Node *node = noderef(t->node);
+    setmref(node->freetop, &node[t->hmask+1]);
+    clearhpart(t);
+  }
+}
+
 /* Free a table. */
 void LJ_FASTCALL lj_tab_free(global_State *g, GCtab *t)
 {
@@ -356,6 +367,13 @@ static void rehashtab(lua_State *L, GCtab *t, cTValue *ek)
   total -= na;
   resizetab(L, t, asize, hsize2hbits(total));
 }
+
+#if LJ_HASFFI
+void lj_tab_rehash(lua_State *L, GCtab *t)
+{
+  rehashtab(L, t, niltv(L));
+}
+#endif
 
 void lj_tab_reasize(lua_State *L, GCtab *t, uint32_t nasize)
 {

@@ -11,7 +11,7 @@ set( SRC ..)
 set( DEPS ../dependencies)
 set( BUILTDEPS ${CMAKE_BINARY_DIR}/dependencies )
 
-add_definitions( -std=c++98 )
+add_definitions( -std=c++98 -fsanitize=address )
 
 if (${USE_LUAJIT})
     set( lua_includes ${DEPS}/luajit/src )

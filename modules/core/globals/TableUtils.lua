@@ -139,15 +139,6 @@ function table.pop_first(t)
     return val
 end
 
-function table.clear(t)
-    for i=#t,1 do
-        t[i] = nil
-    end
-    for k,v in pairs(t) do
-        t[k] = nil
-    end
-end
-
 function table.pop_last(t)
     local val = t[#t]
     t[#t] = nil

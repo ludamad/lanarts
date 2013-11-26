@@ -647,7 +647,7 @@ void lj_debug_dumpstack(lua_State *L, SBuf *sb, const char *fmt, int depth)
 #endif
 
 /* Number of frames for the leading and trailing part of a traceback. */
-#define TRACEBACK_LEVELS1	25
+#define TRACEBACK_LEVELS1	12
 #define TRACEBACK_LEVELS2	10
 
 LUALIB_API void luaL_traceback (lua_State *L, lua_State *L1, const char *msg,

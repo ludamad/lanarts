@@ -24,8 +24,9 @@ end
 function M.main(args)
     import_all(MODULE, true, nil, not_test_submodule)
     StatML.load_directory("modules/"..DATA_MODULE)
-    resolve_dependent_parsers()
+--    resolve_dependent_parsers()
     StatML.parse_all()
+    print "DONE"
 end
 
 return M
