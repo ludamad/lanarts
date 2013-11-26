@@ -1,14 +1,11 @@
-- Person: !object
-  var(string): ip
+- Aptitude: !object
+  var(float): Eff Dam Res Def
 
-- PersonSummary: !object
-  var(string): names
+- AptitudeSet: !object
+  var(Aptitude): ${ids Aptitude}
 
-- Adam: !Person
-  ip: 192.168.0.1
-
-- NotAdam: !Person
-  ip: 192.168.0.1
-
-- Summary: !PersonSummary
-  names: ${ids Person}
+- Toughness: !Aptitude
+  Eff: 0
+  Res: 0
+  Dam: 0
+  Def: 0

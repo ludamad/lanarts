@@ -29,15 +29,16 @@ local _context = StatMLContext.create({}, {}, {})
 local _parsers,_parsed,_unparsed=_context.parsers,_context.parsed,_context.unparsed
 
 -- Copy builtin into parsers
-for k,v in pairs(builtin) do _parsers[k] = v end
+for k,v in pairs(builtin) do _parsers[k] = v ; _parsed[k] = ObjectSet.create({},{},{}) end
 
 local function parse_all(tag, nodes)
     local parser = assert(_parsers[tag], "No parser defined for '" .. tag .. "'!")
     for _,n in ipairs(nodes) do
         if rawget(builtin,tag) ~= nil then
             -- Resolve builtin tags somewhat specially
+           local id = n.id
            local r = builtin[tag](n)
-           if r then _parsed[tag]:add(n.id, r) end
+           if r then _parsed[tag]:add(id, r) end
         else
             -- User-defined tag
             local result = assert(parser(n), "Parser did not return result object!")

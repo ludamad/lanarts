@@ -73,6 +73,17 @@ end
 
 local _classes = {}
 
+function M.instance(node)
+    lazy_import()
+    local inst = {}
+    for k,v in Util.iter_all(node) do
+        inst[preprocess(k)] = preprocess(v)
+    end
+    Util.extract_all(node)
+    pretty("addding instance: ", inst)
+    return inst
+end
+
 function M.object(metanode)
     lazy_import()
     local definition,handlers = {},{}

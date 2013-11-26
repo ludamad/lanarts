@@ -58,6 +58,7 @@ function M.index_map(node)
     local map = {} ; for k,_,idx in M.iter_all(node) do map[k] = idx end ; return map
 end
 
+function M.extract_all(node) for i=#node,1,-1 do node[i] = nil end end
 function M.extract(node, label)
     local value, value_idx = nil,nil
     for k,v,idx in M.iter_all(node) do
