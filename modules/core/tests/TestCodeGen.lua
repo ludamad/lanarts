@@ -105,6 +105,7 @@ function TestCases.test_extended_type()
     typedef(N) "Parent" [[
         a, b : int
     ]]
+    function N.Parent:some_sum(num) return self.a + self.b + num end
     typedef(N) "Child" [[
         extend Parent
     ]]
@@ -112,4 +113,5 @@ function TestCases.test_extended_type()
     local obj = N.Child.create(1,2)
     assert(obj.a == 1)
     assert(obj.b == 2)
+    assert(obj:some_sum(3) == 1+2+3)
 end
