@@ -1,11 +1,3 @@
-
-- Giant Rat: !AnimalNPC
-  stats: HP 15 Speed 2 XP 5
-  attack: Eff 1 Dam 10 Delay 1.0
-  appear_message: A hostile large rat approaches!
-  defeat_message: Blood splatters as the large rat is destroyed.
-  
----
 #Enemy Markup
 enemies:
   - name: Giant Rat

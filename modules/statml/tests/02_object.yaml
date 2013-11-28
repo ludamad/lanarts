@@ -1,0 +1,8 @@
+- Foo: !object
+  var(float): field
+
+- foo: !Foo
+  field: 3.14
+
+- Asserts: !instance
+  field_test: ${foo.field == 3.14}

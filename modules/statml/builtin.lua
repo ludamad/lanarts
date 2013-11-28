@@ -10,17 +10,29 @@ function M.trait()
     lazy_import()
 end
 
-local preproc_onearg = {
+local preproc = setmetatable({},{
+    __index = function(_, k)
+    end
+})
+
+
     ids = function(tag) return (" "):join(StatML.id_list(tag)) end
 }
+
+local function callstring(str, ...)
+    if ... then str = str:format(...) end 
+    local func_loader, err = loadstring(str)
+    if err then error(err) end
+    setfenv(func_loader, preproc)
+    return func_loader()
+end
 
 local function preprocess(data)
     if type(data) ~= "string" then return data end
     return data:gsub("($%b{})", function(str)
         local macro = str:sub(3, -2)
         local func_name, arg, rest = unpack(Util.str_part_list(macro))
-        assert(not rest, "Too many arguments!")
-        return preproc_onearg[func_name](arg)
+        return callstring(macro)
     end)
 end 
 

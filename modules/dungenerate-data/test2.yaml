@@ -1,11 +1,6 @@
-- Aptitude: !object
-  var(float): Eff Dam Res Def
+- Weapon: !object
+  var(float): bonus_res bonus_dam
+  event(create):
+    bonus_res
 
-- AptitudeSet: !object
-  var(Aptitude): ${ids Aptitude}
-
-- Toughness: !Aptitude
-  Eff: 0
-  Res: 0
-  Dam: 0
-  Def: 0
+  

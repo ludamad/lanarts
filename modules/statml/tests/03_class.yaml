@@ -1,0 +1,17 @@
+#- Item: !class
+#  var(string): description
+#
+#- Weapon: !Item
+#  var(float): damage
+#
+#- Armour: !Item
+#  var(float): defence
+#
+#- Short Sword: !Weapon
+#  damage: 0
+#
+#- Plate Mail: !Armour
+#  defence: 0
+
+- Asserts: !instance
+  watup: true

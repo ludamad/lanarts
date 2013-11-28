@@ -3,6 +3,9 @@ local yaml = import "core.yaml"
 local builtin = import "@builtin"
 local Util = import "@StatMLUtil"
 
+-- This module uses global variables heavily, 'M.reset' resets them
+local _context,_parsers,_parsed,_unparsed,_all_parsed, _all_unparsed -- Uninitialized until M.reset below!
+
 local M = nilprotect {} -- Submodule
 
 local ObjectSet = typedef [[
@@ -13,23 +16,25 @@ local ObjectSet = typedef [[
 function ObjectSet:add(id, r)
     assert(not self.map[id])
     append(self.list, r)
+    _all_parsed[id] = r
     self.map[id] = r ; self.reverse_map[r] = id 
     print("Adding " .. id .. ' ' .. tostring(r))
 end
 
-local Parser = typedef [[
-    preprocess_func, parse_func :function
-]]
-
 local StatMLContext = typedef [[
-    parsers, parsed, unparsed :map
+    parsers, parsed, unparsed, all_parsed, all_unparsed :map
 ]]
 
-local _context = StatMLContext.create({}, {}, {})
-local _parsers,_parsed,_unparsed=_context.parsers,_context.parsed,_context.unparsed
+function M.reset()
+    _context = StatMLContext.create({}, {}, {})
+    _parsers,_parsed,_unparsed=_context.parsers,_context.parsed,_context.unparsed
+    _all_parsed,_all_unparsed=_context._all_parsed,_context,_all_unparsed
+    -- Copy builtin into parsers
+    for k,v in pairs(builtin) do _parsers[k] = v ; _parsed[k] = ObjectSet.create({},{},{}) end
+    M.instances = _parsed["instance"].map
+end
 
--- Copy builtin into parsers
-for k,v in pairs(builtin) do _parsers[k] = v ; _parsed[k] = ObjectSet.create({},{},{}) end
+M.reset() -- Initialize above variables.
 
 local function parse_all(tag, nodes)
     local parser = assert(_parsers[tag], "No parser defined for '" .. tag .. "'!")
@@ -68,6 +73,8 @@ local function load(raw, file)
     -- Resolve tags on demand, add to list of unparsed
     local list = _unparsed[tag] or {}
     _unparsed[tag] = list ; append(list, raw)
+    if _all_unparsed[raw.id] then error("Node '" .. raw.id .. "' already exists!") end
+    _all_unparsed[raw.id] = tag
 end
 
 function M.load_file(file)
@@ -103,9 +110,14 @@ function M.define_parser(parserdefs)
     end
 end
 
+function M.lookup(tag, id) 
+    return _parsed[tag].map[id]
+end
+
 function M.parse_all()
     for tag,list in pairs(_unparsed) do parse_all(tag, list) end
     table.clear(_unparsed)
+    table.clear(_all_unparsed)
 end
 
 return M 
