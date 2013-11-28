@@ -1,7 +1,12 @@
 -- StatML internal module for deriving parsers based on !object, !trait, and !class specifications.
 
-local StatML -- Lazily imported
-local function lazy_import() StatML = StatML or import "@StatML" end
+local StatML, preprocess -- Lazily imported
+local function lazy_import() 
+    StatML = StatML or import "@StatML"
+    if preprocess == nil then
+        preprocess = (import "@preprocessor").preprocess
+    end
+end
 local Util = import "@StatMLUtil"
 
 local M = nilprotect {} -- Submodule
@@ -10,38 +15,13 @@ function M.trait()
     lazy_import()
 end
 
-local preproc = setmetatable({},{
-    __index = function(_, k)
-    end
-})
-
-
-    ids = function(tag) return (" "):join(StatML.id_list(tag)) end
-}
-
-local function callstring(str, ...)
-    if ... then str = str:format(...) end 
-    local func_loader, err = loadstring(str)
-    if err then error(err) end
-    setfenv(func_loader, preproc)
-    return func_loader()
-end
-
-local function preprocess(data)
-    if type(data) ~= "string" then return data end
-    return data:gsub("($%b{})", function(str)
-        local macro = str:sub(3, -2)
-        local func_name, arg, rest = unpack(Util.str_part_list(macro))
-        return callstring(macro)
-    end)
-end 
-
 local root_parametric = {
     var = function(metanode, type, names, definition)
         local comma_sep = (", "):join(Util.str_part_list(names))
         append(definition, ("%s : %s"):format(comma_sep, type))
     end
 }
+
 local on_parse_parametric = {
     BoolSet = function(metanode, input_field, elems, handlers)
         local elem_map = Util.as_map(elems)
@@ -92,7 +72,6 @@ function M.instance(node)
         inst[preprocess(k)] = preprocess(v)
     end
     Util.extract_all(node)
-    pretty("addding instance: ", inst)
     return inst
 end
 
@@ -113,6 +92,7 @@ function M.object(metanode)
             return object_type.create(unpack(args))
         end
     }
+    return object_type
 end
 
 function M.class()

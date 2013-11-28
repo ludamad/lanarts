@@ -16,8 +16,7 @@ local function hilight(s)
     end ; return s
 end
 
-function M.callstring(str, ...)
-    if ... then str = str:format(...) end 
+function M.callstring(str)
     for i, s in ipairs(str:split("\n")) do
         local lineno = ("%3d) "):format(i)
         print( AC.WHITE(lineno) .. hilight(s))
@@ -80,7 +79,7 @@ end
 function M.methods.create(T)
     local args, assigns, inits = {}, {}, {} 
     for field in T:all_fields() do
-        if field.initializers then append(inits, field)
+        if field.initializer then append(inits, field)
         else append(assigns, field) ; append(args, "in_" .. field.name:gsub("-", "_d_")) end
     end
     local B = MethodBuilder.create(T, unpack(args))
@@ -89,9 +88,9 @@ function M.methods.create(T)
     for i, f in ipairs(assigns) do
         B:add(f.type:emit_field_assign("data", f.offset, args[i]))
     end
-    for i, f in ipairs(inits) do
-        B:add(f.type:emit_field_copy("data", f.offset, inits.initializers))
-    end
+--    for i, f in ipairs(inits) do
+--        B:add(f.type:emit_field_assign("data", f.offset, inits.initializer))
+--    end
     B:add("return self")
     return B:emit()
 end
@@ -144,8 +143,10 @@ function M.compile_type(T)
             append(constant_vals, field.type.__metatable)
         end
     end
-    local type = M.callstring('return function(%s)\n------------\n%s\nend', 
-        (','):join(constant_names), ("\n"):join(parts)
+    local type = M.callstring(
+        ('return function(%s)\n------------\n%s\nend'):format( 
+            (','):join(constant_names), ("\n"):join(parts)
+        )
     )(unpack(constant_vals))
     T.__metatable = type.__metatable
     type.__structinfo = T

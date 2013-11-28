@@ -1,6 +1,6 @@
 local yaml = import "core.yaml"
 -- Defines builtin handlers !object, !trait, and !class:
-local builtin = import "@builtin"
+local builtintags = import "@builtintags"
 local Util = import "@StatMLUtil"
 
 -- This module uses global variables heavily, 'M.reset' resets them
@@ -16,9 +16,7 @@ local ObjectSet = typedef [[
 function ObjectSet:add(id, r)
     assert(not self.map[id])
     append(self.list, r)
-    _all_parsed[id] = r
     self.map[id] = r ; self.reverse_map[r] = id 
-    print("Adding " .. id .. ' ' .. tostring(r))
 end
 
 local StatMLContext = typedef [[
@@ -26,30 +24,46 @@ local StatMLContext = typedef [[
 ]]
 
 function M.reset()
-    _context = StatMLContext.create({}, {}, {})
+    _context = StatMLContext.create({}, {}, {}, {}, {})
     _parsers,_parsed,_unparsed=_context.parsers,_context.parsed,_context.unparsed
-    _all_parsed,_all_unparsed=_context._all_parsed,_context,_all_unparsed
+    _all_parsed,_all_unparsed=_context.all_parsed,_context.all_unparsed
     -- Copy builtin into parsers
-    for k,v in pairs(builtin) do _parsers[k] = v ; _parsed[k] = ObjectSet.create({},{},{}) end
+    for k,v in pairs(builtintags) do _parsers[k] = v ; _parsed[k] = ObjectSet.create({},{},{}) end
     M.instances = _parsed["instance"].map
 end
 
 M.reset() -- Initialize above variables.
 
-local function parse_all(tag, nodes)
-    local parser = assert(_parsers[tag], "No parser defined for '" .. tag .. "'!")
-    for _,n in ipairs(nodes) do
-        if rawget(builtin,tag) ~= nil then
-            -- Resolve builtin tags somewhat specially
-           local id = n.id
-           local r = builtin[tag](n)
-           if r then _parsed[tag]:add(id, r) end
-        else
-            -- User-defined tag
-            local result = assert(parser(n), "Parser did not return result object!")
-            _parsed[tag]:add(n.id, result)
-        end
-    end 
+-- Implementation routine that does not remove from unparsed list:
+local function _parse(node)
+    local tag,id = node.__tag,node.id
+    local parser = _parsers[tag] or rawget(builtintags, tag)
+    if not parser then error("No parser defined for '" .. tag .. "'!") end
+
+   local result = assert(parser(node), "Parser did not return result object!")
+    _parsed[tag]:add(id, result) ; _all_parsed[id] = result
+end
+
+function M.resolve_node(id)
+    local node = _all_unparsed[id]
+    if node then
+        assert(not _all_parsed[id])
+        _all_unparsed[id] = nil
+        table.remove_occurrences(_unparsed[node.__tag], node) 
+        _parse(node)
+    end
+    return _all_parsed[id]
+end
+
+local function parse_all_for_tag(tag)
+    local list = _unparsed[tag]
+    for _, node in ipairs(list) do _parse(node) end
+    table.clear(list) 
+end
+
+function M.parse_all()
+    for tag,_ in pairs(_unparsed) do parse_all_for_tag(tag) end
+    table.clear(_all_unparsed)
 end
 
 local function prepare_node(raw, file)
@@ -74,7 +88,7 @@ local function load(raw, file)
     local list = _unparsed[tag] or {}
     _unparsed[tag] = list ; append(list, raw)
     if _all_unparsed[raw.id] then error("Node '" .. raw.id .. "' already exists!") end
-    _all_unparsed[raw.id] = tag
+    _all_unparsed[raw.id] = raw
 end
 
 function M.load_file(file)
@@ -112,12 +126,6 @@ end
 
 function M.lookup(tag, id) 
     return _parsed[tag].map[id]
-end
-
-function M.parse_all()
-    for tag,list in pairs(_unparsed) do parse_all(tag, list) end
-    table.clear(_unparsed)
-    table.clear(_all_unparsed)
 end
 
 return M 

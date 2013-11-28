@@ -1,13 +1,15 @@
+local structparse = import ".structparse"
+
 local FieldTypes = import ".FieldTypes"
 
 local Field = newtype()
 
-function Field:init(name, type, typename, offset, is_embedded, initializers)
+function Field:init(name, type, typename, offset, is_embedded, initializer)
     self.name = name -- Same as type name for embedded member
     self.type, self.typename = type, typename
     self.offset = offset -- The offset to the object representation of this member, eg a slice object
 	self.is_embedded = is_embedded
-	self.initializers = initializers or false -- If false, passed as argument to create
+	self.initializer = initializer or false -- If false, passed as argument to create
 	self.is_leaf = (self.type.children == 0)
 	self.has_alias = true
 end
@@ -22,11 +24,13 @@ function StructType:init(--[[Optional]] namespace, --[[Optional]] name)
 	self.children = 0
 end
 
-function StructType:define_field(name, typename, is_embedded)
+StructType.parse_line = structparse.parse_line
+
+function StructType:define_field(name, typename, is_embedded, initializer)
     assert(not self.name_to_field[name], "Name '" .. name .. "' already used in type!")
     local type = self:lookup_type(typename)
     assert(not (is_embedded and not getmetatable(type) == StructType), "Cannot embed primitive type!")
-    local field = Field.create(name, type, typename, self.children + 1, is_embedded)
+    local field = Field.create(name, type, typename, self.children + 1, is_embedded, initializer)
     self.name_to_field[name] = field ; append(self.fields, field)
     self.children = self.children + type.children + 1
 end
@@ -37,29 +41,6 @@ function StructType:lookup_type(typename)
     if type then return type end
     if not self.namespace[typename] then error("No type with name '" .. typename .. "'." ) end
     return self.namespace[typename]
-end
-
-function StructType:parse_field_spec(line)
-    local parts = line:split(":")
-    local typename = parts[#parts]:trim()
-    local is_embedded = (#parts == 1) 
-
-    local names = (is_embedded and {typename} or parts[1]:split(","))
-    for name in values(names) do
-        name = name:trim()
-        assert(name:match("^[%w_%-]+$"), "'" .. name .. "' is not a valid name.")
-        self:define_field(name, typename, is_embedded)
-    end
-end
-
-function StructType:parse_line(line)
-    if line:match("^%s*[%w_%-]+%s*$") then
-        self:parse_field_spec(line) -- Embedded field
-    elseif line:match("^%s*[%w_%-,%s]+:%s*[%w_]+%s*$") then
-        self:parse_field_spec(line) -- Normal field
-    elseif not line:match("^%s*$") then
-        error("Unexpected line '" .. line .. "'.")
-    end
 end
 
 local function filter(iter, k, --[[Optional]] invert)
@@ -87,7 +68,7 @@ function StructType:all_leafs(subfields, offset) return filter(self:all_subfield
 function StructType:all_nonleafs(subfields, offset) return filter(self:all_subfields(), "is_leaf", --[[invert]] true) end
 function StructType:all_aliases() return filter(self:all_subfields(), "has_alias") end
 function StructType:all_required_fields() 
-    return filter(self:all_subfields(), "initializers", --[[inverse]] true) 
+    return filter(self:all_subfields(), "initializer", --[[inverse]] true) 
 end
 
 function StructType:_preinit(defs, corrections)

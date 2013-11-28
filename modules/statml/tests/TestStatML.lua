@@ -1,5 +1,7 @@
 local StatML = import "@StatML"
 
+print "HI"
+
 local files = io.directory_search(path_resolve "", "*.yaml", --[[recursive]] true)
 for _,file in ipairs(files) do
     local testname = file:match("(%d%d_%w*%.yaml)")

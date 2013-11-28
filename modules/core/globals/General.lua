@@ -3,6 +3,8 @@
 -- Global data is a special submodule, its members are always serialized
 local GlobalData = import "core.GlobalData"
 
+local print,error,assert=print,error,assert -- Performance
+
 append = table.insert -- Convenient alias
 
 -- Data is defined on a per-submodule basis
@@ -97,6 +99,13 @@ function pretty_tostring(val, --[[Optional]] tabs, --[[Optional]] packed, --[[Op
 
     return table.concat(parts)
 end
+
+-- Like C printf, but always prints new line
+function printf(fmt, ...) print(fmt:format(...)) end
+function errorf(fmt, ...) error(fmt:format(...)) end
+function assertf(cond, fmt, ...) return assert(cond, fmt:format(...)) end
+-- Convenient handle for very useful function:
+fmt = string.format
 
 function pretty_tostring_compact(v)
     return pretty_tostring(v, nil, true)

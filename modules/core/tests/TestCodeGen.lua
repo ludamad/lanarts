@@ -84,3 +84,13 @@ function TestCases.test_embedded_type()
     assert(b.foo == 4)
     assert(b.bar == 'test')
 end
+
+function TestCases.test_initialized_type()
+    local InitTester = typedef [[
+        test1, test2 : int(0)
+    ]]
+
+    local obj = InitTester.create()
+    assert(obj.test1 == 0)
+    assert(obj.test2 == 0)
+end
