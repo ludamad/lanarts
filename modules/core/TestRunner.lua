@@ -12,12 +12,14 @@ function M.main(args)
         end
         return testcases[name]
     end
-    
+    local test_filter = args[3] or ".*"
     -- Magic test table, uses module name to add lunit test-case
     TestCases = setmetatable({}, {
         -- A bit of a hack, but suffices for now
         __newindex = function(__unused, key, val)
-            get_lunit_testcase(virtual_path(2))[key] = val
+            if key:match(test_filter) then
+                get_lunit_testcase(virtual_path(2))[key] = val
+            end
         end
     })
 

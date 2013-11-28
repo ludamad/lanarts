@@ -126,6 +126,12 @@ function table.value_key_invert(t)
     return ret
 end
 
+-- Trick to get internal 'next' function
+local tablefirst,_ = pairs({})
+function table.is_empty(t)
+    return #t==0 and not tablefirst(t)
+end
+
 function table.pop_first(t)
     local len = #t
     if len == 0 then 

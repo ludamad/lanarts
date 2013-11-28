@@ -2,18 +2,6 @@ local structparse = import ".structparse"
 
 local FieldTypes = import ".FieldTypes"
 
-local Field = newtype()
-
-function Field:init(name, type, typename, offset, is_embedded, initializer)
-    self.name = name -- Same as type name for embedded member
-    self.type, self.typename = type, typename
-    self.offset = offset -- The offset to the object representation of this member, eg a slice object
-	self.is_embedded = is_embedded
-	self.initializer = initializer or false -- If false, passed as argument to create
-	self.is_leaf = (self.type.children == 0)
-	self.has_alias = true
-end
-
 local StructType = newtype { parent = FieldTypes.BaseType }
 
 function StructType:init(--[[Optional]] namespace, --[[Optional]] name)
@@ -25,15 +13,7 @@ function StructType:init(--[[Optional]] namespace, --[[Optional]] name)
 end
 
 StructType.parse_line = structparse.parse_line
-
-function StructType:define_field(name, typename, is_embedded, initializer)
-    assert(not self.name_to_field[name], "Name '" .. name .. "' already used in type!")
-    local type = self:lookup_type(typename)
-    assert(not (is_embedded and not getmetatable(type) == StructType), "Cannot embed primitive type!")
-    local field = Field.create(name, type, typename, self.children + 1, is_embedded, initializer)
-    self.name_to_field[name] = field ; append(self.fields, field)
-    self.children = self.children + type.children + 1
-end
+StructType.define_field = structparse.define_field
 
 function StructType:lookup_type(typename)
     if typename == "*" then return FieldTypes.builtin_types.any end

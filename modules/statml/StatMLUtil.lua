@@ -31,16 +31,16 @@ function M.iter_all(node)
     end
 end
 
-function M.node_assert(condition, node, error_str)
+function M.node_assert(condition, node, error_str, ...)
     if not condition then
         if node.__file then
-            error(("%s (file '%s:%d:%d')"):format(error_str, node.__file, node.__line, node.__column))
+            error(("%s (%s:%d:%d)"):format(fmt(error_str,...), node.__file, node.__line, node.__column))
         else
-            error(("%s (line %d column %d)"):format(error_str, node.__line, node.__column))
+            error(("%s (line %d column %d)"):format(fmt(error_str,...), node.__line, node.__column))
         end
     end
 end
-function M.node_error(node, error_str) M.node_assert(false, node, error_str) end
+function M.node_error(node, error_str, ...) M.node_assert(false, node, error_str, ...) end
 
 function M.str_part_list(str) 
     local list = {} ; for p in M.str_parts(str) do 

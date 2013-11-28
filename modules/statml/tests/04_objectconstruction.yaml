@@ -1,0 +1,16 @@
+- Foo: !object
+  var(int): bar baz
+
+- foo1: !Foo [1,2]
+- foo2: !Foo {baz: 2, bar: 1}
+
+- Holder: !object
+  embed(Foo): foo
+
+- Asserts: !instance
+  # Test foo1 == [1,2]
+  _: ${foo1.bar == 1} 
+  _: ${foo1.baz == 2} 
+  # Test foo2 == [1,2]
+  _: ${foo2.bar == 1} 
+  _: ${foo2.baz == 2}

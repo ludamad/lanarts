@@ -1,6 +1,7 @@
 local yaml = import "core.yaml"
 -- Defines builtin handlers !object, !trait, and !class:
 local builtintags = import "@builtintags"
+local nodeops = import "@nodeops"
 local Util = import "@StatMLUtil"
 
 -- This module uses global variables heavily, 'M.reset' resets them
@@ -9,8 +10,8 @@ local _context,_parsers,_parsed,_unparsed,_all_parsed, _all_unparsed -- Uninitia
 local M = nilprotect {} -- Submodule
 
 local ObjectSet = typedef [[
-    list :list
-    map, reverse_map :map
+    list :list({})
+    map, reverse_map :map ({})
 ]]
 
 function ObjectSet:add(id, r)
@@ -69,24 +70,8 @@ function M.parse_all()
     table.clear(_all_unparsed)
 end
 
-local function prepare_node(raw, file)
-    raw.__file = file
-    if raw.__type == "map" then
-        if not raw.__tag and raw[1] then
-            local first = raw[1]
-            local id,tag=first[1],first[2].__tag
-            raw.id,raw.__tag=id,tag
-            table.remove(raw, 1)
-        end
-        Util.node_assert(raw.__tag, raw, "Root-level node without type/tag!")
-        return raw.__tag
-    elseif raw.__type == "list" then
-        assert("Not expecting root list yet.")
-    end ; assert(false)
-end
-
 local function load(raw, file)
-    local tag = prepare_node(raw, file)
+    local tag = nodeops.convert_raw_to_statml_node(raw, file)
     -- Resolve tags on demand, add to list of unparsed
     local list = _unparsed[tag] or {}
     _unparsed[tag] = list ; append(list, raw)

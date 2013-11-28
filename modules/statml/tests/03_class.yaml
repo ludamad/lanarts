@@ -13,9 +13,10 @@
 
 # Intentionally tricky placement
 - Asserts: !instance
-  weapon: ${PlateMail.defence == 1}
-  armour: ${ShortSword.damage == 1}
+  _: ${PlateMail.defence == 1}
+  _: ${ShortSword.damage == 1}
 
 - PlateMail: !Armour
   description: ""
   defence: 1
+  

@@ -1,4 +1,7 @@
-local StatML = import "@StatML"
+local StatML -- Lazily imported
+local function lazy_import() 
+    StatML = StatML or import "@StatML"
+end
 
 local M = nilprotect {} -- Submodule
 
@@ -37,6 +40,7 @@ local PREPROC_LINE_MATCHER = "^%s*".. PREPROC_MATCHER .. "%s*$"
 local function macro_strip(str) return str:sub(3, -2) end
 
 function M.preprocess(data)
+    lazy_import()
     if type(data) ~= "string" 
         -- TODO: Go into tables and preprocess fields
         then return data

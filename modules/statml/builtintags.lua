@@ -1,8 +1,9 @@
 -- StatML internal module for deriving parsers based on !object, !trait, and !class specifications.
 
-local StatML, preprocess -- Lazily imported
+local StatML, preprocess, nodeops -- Lazily imported
 local function lazy_import() 
     StatML = StatML or import "@StatML"
+    nodeops = nodeops or import "@nodeops"
     if preprocess == nil then
         preprocess = (import "@preprocessor").preprocess
     end
@@ -19,6 +20,10 @@ local root_parametric = {
     var = function(metanode, type, names, definition)
         local comma_sep = (", "):join(Util.str_part_list(names))
         append(definition, ("%s : %s"):format(comma_sep, type))
+    end,
+    embed = function(metanode, type, names, definition)
+        local comma_sep = (", "):join(Util.str_part_list(names))
+        append(definition, ("%s as %s"):format(comma_sep, type))
     end
 }
 
@@ -53,15 +58,6 @@ local function extract_simple(node, funcs)
         if val then func(node, val) end
     end
 end
-local function extract_required_fields(node, object_type)
-    local struct = assert(object_type.__structinfo, "Logic error")
-    local args = {} ; for f in struct:all_required_fields() do
-        local val = Util.extract(node, f.name)
-        if val == nil then error("Object '" .. node.id .. "' requires field '"..f.name.."'!") end
-        val = preprocess(val)
-        append(args, val)
-    end ; return args
-end
 
 local _classes = {}
 
@@ -90,7 +86,7 @@ local function object_resolve(metanode, definition, handlers)
     StatML.define_parser {
         [metanode.id] = function(node)
             extract_simple(node, handlers)
-            local args = extract_required_fields(node, object_type)
+            local args = nodeops.find_field_values(node, object_type)
             return object_type.create(unpack(args))
         end
     }
