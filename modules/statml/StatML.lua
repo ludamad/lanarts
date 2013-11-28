@@ -20,11 +20,11 @@ function ObjectSet:add(id, r)
 end
 
 local StatMLContext = typedef [[
-    parsers, parsed, unparsed, all_parsed, all_unparsed :map
+    parsers, parsed, unparsed, all_parsed, all_unparsed :map({})
 ]]
 
 function M.reset()
-    _context = StatMLContext.create({}, {}, {}, {}, {})
+    _context = StatMLContext.create()
     _parsers,_parsed,_unparsed=_context.parsers,_context.parsed,_context.unparsed
     _all_parsed,_all_unparsed=_context.all_parsed,_context.all_unparsed
     -- Copy builtin into parsers
@@ -37,11 +37,14 @@ M.reset() -- Initialize above variables.
 -- Implementation routine that does not remove from unparsed list:
 local function _parse(node)
     local tag,id = node.__tag,node.id
+    if _all_unparsed[tag] then M.resolve_node(tag) end
     local parser = _parsers[tag] or rawget(builtintags, tag)
-    if not parser then error("No parser defined for '" .. tag .. "'!") end
+    if not parser then
+        error("No parser defined for '" .. tag .. "'!")
+    end
 
    local result = assert(parser(node), "Parser did not return result object!")
-    _parsed[tag]:add(id, result) ; _all_parsed[id] = result
+    _parsed[tag]:add(id, result) ; _all_parsed[id] = result ; _all_unparsed[id] = nil
 end
 
 function M.resolve_node(id)

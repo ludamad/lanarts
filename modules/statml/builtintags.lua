@@ -75,13 +75,15 @@ function M.instance(node)
     return inst
 end
 
-function M.object(metanode)
-    lazy_import()
-    local definition,handlers = {},{}
+local function definition_collect(metanode, definition, handlers)
     extract_parametric(metanode, root_parametric, definition)
     local on_parse = Util.extract(metanode, "on_parse")
     if on_parse then extract_parametric(on_parse, on_parse_parametric, handlers) end
     Util.assert_empty(metanode)
+end
+
+local function object_resolve(metanode, definition, handlers)
+    definition_collect(metanode,definition,handlers)
     local object_type = typedef(_classes) (metanode.id)(
         ("\n"):join(definition)
     )
@@ -95,8 +97,22 @@ function M.object(metanode)
     return object_type
 end
 
-function M.class()
+function M.object(metanode)
     lazy_import()
+    return object_resolve(metanode, {}, {})
+end
+
+function M.class(metanode)
+    lazy_import()
+    local definition, handlers = {}, {}
+    definition_collect(metanode, definition, handlers)
+    StatML.define_parser {
+        [metanode.id] = function(node)
+            pretty(node)
+            return object_resolve(node, table.clone(definition), table.clone(handlers))
+        end
+    }
+    return metanode
 end
 
 return M

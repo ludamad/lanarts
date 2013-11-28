@@ -75,14 +75,19 @@ function TestCases.test_embedded_type()
         foo : int
         bar : string
     ]]
-    typedef(N) "Bar" [[
+    typedef(N) "Bar1" [[
         Foo
     ]]
-    local b = N.Bar.create(N.Foo.create(4, 'test'))
-    assert(b.Foo.foo == 4)
-    assert(b.Foo.bar == 'test')
-    assert(b.foo == 4)
-    assert(b.bar == 'test')
+    typedef(N) "Bar2" [[
+        Foo as f
+    ]]
+    for k,T in pairs {Foo=N.Bar1, f=N.Bar2} do
+        local b = T.create(N.Foo.create(4, 'test'))
+        assert(b[k].foo == 4)
+        assert(b[k].bar == 'test')
+        assert(b.foo == 4)
+        assert(b.bar == 'test')
+    end
 end
 
 function TestCases.test_initialized_type()
