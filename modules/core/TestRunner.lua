@@ -4,13 +4,13 @@ function M.main(args)
     import '@lunit'
     local testcases = {}
     
-    local function get_lunit_testcase(name)
+    local function get_testlist(name)
         if not testcases[name] then 
-            local fake_module = { _NAME = name }
+            local fake_module = { _NAME = name, tests = {} }
             lunit.testcase(fake_module)
             testcases[name] = fake_module
         end
-        return testcases[name]
+        return testcases[name].tests
     end
     local test_filter = args[3] or ".*"
     -- Magic test table, uses module name to add lunit test-case
@@ -18,7 +18,8 @@ function M.main(args)
         -- A bit of a hack, but suffices for now
         __newindex = function(__unused, key, val)
             if key:match(test_filter) then
-                get_lunit_testcase(virtual_path(2))[key] = val
+                local test_list = get_testlist(virtual_path(2))
+                append(test_list, {key, val})
             end
         end
     })

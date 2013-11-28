@@ -41,17 +41,17 @@ local function macro_strip(str) return str:sub(3, -2) end
 
 function M.preprocess(data)
     lazy_import()
-    if type(data) ~= "string" 
+    if type(data) == "string" then 
         -- TODO: Go into tables and preprocess fields
-        then return data
+        local linematch = data:match(PREPROC_LINE_MATCHER)
+        if linematch then 
+            data = macro_call(macro_strip(linematch), --[[Allow non-string]] true) 
+        else
+            data = data:gsub(PREPROC_MATCHER, 
+                function(str) return macro_call(macro_strip(str)) end)
+        end
     end
-    local linematch = data:match(PREPROC_LINE_MATCHER)
-    if linematch then 
-        return macro_call(macro_strip(linematch), --[[Allow non-string]] true) 
-    end
-    return data:gsub(PREPROC_MATCHER, function(str)
-        return macro_call(macro_strip(str))
-    end)
+    return data
 end
 
 return M

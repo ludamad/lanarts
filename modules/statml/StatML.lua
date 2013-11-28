@@ -35,6 +35,11 @@ end
 
 M.reset() -- Initialize above variables.
 
+-- 'Make public' functions from builtintags:
+table.merge(M, {
+    object_parsedef=builtintags.object_parsedef, class_parsedef=builtintags.class_parsedef
+})
+
 -- Implementation routine that does not remove from unparsed list:
 local function _parse(node)
     local tag,id = node.__tag,node.id
@@ -58,6 +63,8 @@ function M.resolve_node(id)
     end
     return _all_parsed[id]
 end
+
+M.get = M.resolve_node -- The less formal but more convenient handle
 
 local function parse_all_for_tag(tag)
     local list = _unparsed[tag]
@@ -92,6 +99,11 @@ function M.load_directory(directory, --[[Optional]] extension)
     extension = extension or "yaml"
     local files = io.directory_search(directory, "*." .. extension, --[[recursive]] true)
     for _,file in ipairs(files) do M.load_file(file) end
+end
+
+function M.load_and_parse_file(file)
+    M.load_file(file)
+    M.parse_all()
 end
 
 function M.id_list(tag)

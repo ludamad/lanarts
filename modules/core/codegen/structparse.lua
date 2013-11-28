@@ -28,6 +28,7 @@ do -- Restrict scope of lazy import
     end
 end
 
+
 local IDENTIFIER = "[%w_%-]+"
 local IDENTIFIER_ALL = "^"..IDENTIFIER.."$"
 
@@ -35,6 +36,16 @@ local function validate_varname(name)
     assert(name:match(IDENTIFIER_ALL), "'" .. name .. "' is not a valid name.")
 end
 
+local EXTEND = "^%s*extend%s+(" .. IDENTIFIER .. ")$"
+local function parse_extend(T, line)
+    local typename = line:match(EXTEND)
+    if typename then
+        local parent = assertf(T:lookup_type(typename), "No type named '%s'.", typename)
+        M.extend(T, parent)
+        return true
+    end
+    return false
+end
 -- Return (typename, initializer)
 local TYPESPEC = "^("..IDENTIFIER..")$"
 local TYPESPEC_WITH_INIT = "^("..IDENTIFIER..")%s*%((.*)%)$"
@@ -69,8 +80,9 @@ end
 function M.parse_line(--[[The StructType]] T, line)
     local parts = line:trimsplit(":")
     if #parts == 1 then 
-        -- We know this is an embedded type
+        -- We know this is an embedded type or an extend line
         if parts[1] ~= "" then
+            if parse_extend(T, line) then return end 
             parse_embedded(T, parts[1])
         end
     else
@@ -94,6 +106,13 @@ local function check_aliases(T, newf)
                 err(f, fmt("Derived field '%s.%s :%s'", newf.name, derived.name, derived.typename))
             end
         end
+    end
+end
+
+function M.extend(T, parent)
+    table.merge(T.typetable, parent.typetable)
+    for f in parent:all_fields() do
+        M.define_field(T, f.name, f.typename, f.is_embedded, f.initializer)
     end
 end
 

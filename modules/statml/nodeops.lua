@@ -33,8 +33,10 @@ end
 local function parse_initializer(node, struct)
     -- No initializer:
     local init = node.__initializer
-    if init == "" then return nil end
-    assert(type(init) == "table", "Initializer must be a list or map!")
+    if init.__type == "str" and init[1] == "" then 
+        return nil -- The initializer is merely a YAML artifact. 
+    end
+    assert(init.__type ~= "str", "Initializer must be a list or map!")
     local args = {}
     if init.__type == "map" then
         local map = Util.as_map(init)
@@ -57,6 +59,7 @@ function M.find_field_values(node, object_type)
     local struct = assert(object_type.__structinfo, "Logic error")
     local args = parse_initializer(node, struct)
     if args then return args end -- Fields specified compactly
+    args = {}
     for f in struct:all_required_fields() do
         local val = Util.extract(node, f.name)
         append(args, preprocess_field(node, f.name, val))

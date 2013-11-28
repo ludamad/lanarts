@@ -56,6 +56,9 @@ local function main(args)
         local Main = import "dungenerate.Main"
         Main.main(args)
         return false
+    elseif args[1] == "--demoshoot" then
+        import "examples.DemoShoot.demoshoot"
+        return false
     elseif args[1] == "--testmap" then
         Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
         local TM = import "unstable.TestMap"

@@ -78,13 +78,12 @@ local function definition_collect(metanode, definition, handlers)
     Util.assert_empty(metanode)
 end
 
-local function object_resolve(metanode, definition, handlers)
-    definition_collect(metanode,definition,handlers)
-    local object_type = typedef(_classes) (metanode.id)(
-        ("\n"):join(definition)
-    )
+function M.object_parsedef(id, definition, --[[Optional]] handlers)
+    lazy_import() ; handlers = handlers or {}
+    if type(definition) == "table" then definition = ("\n"):join(definition) end
+    local object_type = typedef(_classes)(id)(definition)
     StatML.define_parser {
-        [metanode.id] = function(node)
+        [id] = function(node)
             extract_simple(node, handlers)
             local args = nodeops.find_field_values(node, object_type)
             return object_type.create(unpack(args))
@@ -93,21 +92,35 @@ local function object_resolve(metanode, definition, handlers)
     return object_type
 end
 
+local function object_resolve(metanode, handlers, --[[Optional]] base_typename)
+    -- Add an 'extend' statement if we are extending a base class
+    local definition = (base_typename and { fmt("extend %s", base_typename) } or {})
+    definition_collect(metanode,definition,handlers)
+    return M.object_parsedef(metanode.id,definition,handlers)
+end
+
 function M.object(metanode)
     lazy_import()
-    return object_resolve(metanode, {}, {})
+    return object_resolve(metanode, {})
+end
+
+function M.class_parsedef(id, definition, --[[Optional]] handlers)
+    lazy_import() ; handlers = handlers or {}
+    if type(definition) == "table" then definition = ("\n"):join(definition) end
+    local base_type = typedef(_classes)(id)(definition)
+    StatML.define_parser {
+        [id] = function(node)
+            return object_resolve(node, table.clone(handlers), id)
+        end
+    }
+    return base_type
 end
 
 function M.class(metanode)
     lazy_import()
     local definition, handlers = {}, {}
     definition_collect(metanode, definition, handlers)
-    StatML.define_parser {
-        [metanode.id] = function(node)
-            pretty(node)
-            return object_resolve(node, table.clone(definition), table.clone(handlers))
-        end
-    }
+    M.class_parsedef(metanode.id, definition, handlers)
     return metanode
 end
 

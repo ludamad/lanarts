@@ -120,7 +120,7 @@ function M.compile_type(T)
     assert(#T.fields > 0, "Cannot define a struct with no fields! " .. (T.name and '('..T.name..')' or ''))
     local parts = {
         M.emit_global_cache("rawget","rawset","setmetatable","getmetatable"),
-        "local TYPETABLE = {} ; local METATABLE = {}",
+        "local TYPETABLE = in_TYPETABLE; local METATABLE = {}",
         "TYPETABLE.__metatable = METATABLE"
     }
     for k, v in pairs(M.metamethods) do
@@ -135,19 +135,19 @@ function M.compile_type(T)
     append(parts, "return TYPETABLE")
     local callable = ("\n"):join(parts)
 
-    local constant_names, constant_vals = {}, {}
+    local arg_names, arg_vals = {"in_TYPETABLE"}, {T.typetable}
     for field in T:all_nonleafs() do
         local var_name = 'meta_'..field.typename
-        if not table.contains(constant_names, var_name) then
-            append(constant_names, var_name)
-            append(constant_vals, field.type.__metatable)
+        if not table.contains(arg_names, var_name) then
+            append(arg_names, var_name)
+            append(arg_vals, field.type.__metatable)
         end
     end
     local type = M.callstring(
         ('return function(%s)\n------------\n%s\nend'):format( 
-            (','):join(constant_names), ("\n"):join(parts)
+            (','):join(arg_names), ("\n"):join(parts)
         )
-    )(unpack(constant_vals))
+    )(unpack(arg_vals))
     T.__metatable = type.__metatable
     type.__structinfo = T
     return type

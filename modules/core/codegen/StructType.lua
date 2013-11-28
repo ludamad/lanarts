@@ -1,4 +1,5 @@
 local structparse = import ".structparse"
+local structgen = import ".structgen"
 
 local FieldTypes = import ".FieldTypes"
 
@@ -9,9 +10,11 @@ function StructType:init(--[[Optional]] namespace, --[[Optional]] name)
     self.name = name or false 
 	self.fields = {}
 	self.name_to_field = {}
+	self.typetable = {}
 	self.children = 0
 end
 
+StructType.extend = structparse.extend
 StructType.parse_line = structparse.parse_line
 StructType.define_field = structparse.define_field
 
@@ -19,7 +22,7 @@ function StructType:lookup_type(typename)
     if typename == "*" then return FieldTypes.builtin_types.any end
     local type = FieldTypes.builtin_types[typename]
     if type then return type end
-    if not self.namespace[typename] then error("No type with name '" .. typename .. "'." ) end
+    assertf(self.namespace[typename], "No type with name '%s'.", typename)
     return self.namespace[typename]
 end
 
@@ -60,67 +63,8 @@ function StructType:_preinit(defs, corrections)
     end
 end
 
-function StructType:emit_preinit(slice)
-    local defs, corrections = {}, {}
-    self:_preinit(defs, corrections)
-    return ("local data,pos = {%s},0\n%s = setmetatable({data,pos}, %s)\n%s"):format(
-        (",\n"):join(defs), slice, "METATABLE", ("\n"):join(corrections)
-    ):split("\n")
-end
-
-
-function StructType:emit_field_init(S, kroot, args)
-    local parts = {"rawset(%s, pos + %d, "}
-    local parts = {} ; for field in values(self.fields) do
-        local offset = kroot + field.offset
-        append(parts, field.type:emit_init(S, offset))
-    end ; return parts
-end
-local AssignBatcher = newtype()
-function AssignBatcher:init(kroot)
-    self.kroot = kroot
-    self.offset = false ; self.batches = 0 ; self.dx = false
-end
-function AssignBatcher:add(parts, f)
-    if not self.offset then 
-        self.offset = f.offset ; self.batches = 1 ; return
-    end
-    if not self.dx then self.dx = f.offset - self.offset
-    else
-        local dist = f.offset - self.offset - (self.batches-1) * self.dx
-        if self.dx ~= dist then
-            self:emit(parts) ; self:add(parts, f) ; return
-        end
-    end
-
-    self.batches = self.batches + 1
-end
-function AssignBatcher:emit(parts)
-    if not self.offset then return end
-    local i_start, i_end = self.offset, self.offset+self.batches*self.dx
-    if self.batches <= 3 then
-        for i=i_start,i_end,self.dx do
-            append(parts, ("  rawset(data, pos+%d, rawget(odata, opos+%d))"):format(
-                self.kroot + i, i
-            ))
-        end
-    else
-        append(parts, ("  for i=%d,%d%s do rawset(data, pos+%d+i, rawget(odata, opos+i)) end"):format(
-            i_start,i_end, (self.dx == 1) and '' or ','..self.dx, self.kroot
-        ))
-    end 
-    self:init(self.kroot)
-end
-
-function StructType:emit_field_assign(S, kroot, O)
-    local parts = {("do local odata, opos = rawget(%s,1),rawget(%s,2) --<%s:emit_field_assign>"):format(O, O, self.name)}
-    local batcher = AssignBatcher.create(kroot)
-    for f in self:all_leafs() do
-        batcher:add(parts, f)
-    end
-    batcher:emit(parts)
-    append(parts, "end")
-    return parts
-end
+StructType.emit_preinit = structgen.emit_preinit
+StructType.emit_field_init = structgen.emit_field_init
+StructType.emit_field_assign = structgen.emit_field_assign
 
 return StructType

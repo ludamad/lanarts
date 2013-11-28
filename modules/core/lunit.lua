@@ -417,7 +417,7 @@ end
 local testcase
 do
   -- Array with all registered testcases
-  local _testcases = {}
+  lunit.testcases = {}
 
   -- Marks a module as a testcase.
   -- Applied over a module from module("xyz", lunit.testcase).
@@ -428,23 +428,8 @@ do
     --orig_assert( is_string(m._PACKAGE) )
 
     -- Register the module as a testcase
-    _testcases[m._NAME] = m
+    lunit.testcases[m._NAME] = m
     -- Ludamad: simplification, do not import test names
-  end
-
-  -- Iterator (testcasename) over all Testcases
-  function lunit.testcases()
-    -- Make a copy of testcases to prevent confusing the iterator when
-    -- new testcase are defined
-    local _testcases2 = {}
-    for k,v in pairs(_testcases) do
-        _testcases2[k] = true
-    end
-    return key_iter, _testcases2, nil
-  end
-
-  function testcase(tcname)
-    return _testcases[tcname]
   end
 end
 
@@ -485,7 +470,7 @@ end
 
 
 
-function lunit.runtest(tcname, testname)
+function lunit.runtest(tcname, testname, test)
   orig_assert( is_string(tcname) )
   orig_assert( is_string(testname) )
 
@@ -503,16 +488,8 @@ function lunit.runtest(tcname, testname)
 
   report("run", tcname, testname)
 
-  local tc          = testcase(tcname)
-  local setup       = tc[setupname(tcname)]
-  local test        = tc[testname]
-  local teardown    = tc[teardownname(tcname)]
-
-  local setup_ok    =              callit( "setup", setup )
-  local test_ok     = setup_ok and callit( "test", test )
-  local teardown_ok = setup_ok and callit( "teardown", teardown )
-
-  if setup_ok and test_ok and teardown_ok then
+  local test_ok     = callit( "test", test )
+  if test_ok then
     stats.passed = stats.passed + 1
     report("pass", tcname, testname)
   end
@@ -524,10 +501,12 @@ traceback_hide(runtest)
 function lunit.run()
   clearstats()
   report("begin")
-  for testcasename in lunit.testcases() do
+  for k,v in pairs(lunit.testcases) do
     -- Run tests in the testcases
-    for testname in lunit.tests(testcasename) do
-      runtest(testcasename, testname)
+    local tests = lunit.testcases[k].tests
+    for i,test in ipairs(tests) do
+      local name,func=test[1],test[2]
+      runtest(k, name, func)
     end
   end
   report("done")

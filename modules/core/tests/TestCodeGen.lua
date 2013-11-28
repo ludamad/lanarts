@@ -99,3 +99,17 @@ function TestCases.test_initialized_type()
     assert(obj.test1 == 0)
     assert(obj.test2 == 0)
 end
+
+function TestCases.test_extended_type()
+    local N = {}
+    typedef(N) "Parent" [[
+        a, b : int
+    ]]
+    typedef(N) "Child" [[
+        extend Parent
+    ]]
+
+    local obj = N.Child.create(1,2)
+    assert(obj.a == 1)
+    assert(obj.b == 2)
+end
