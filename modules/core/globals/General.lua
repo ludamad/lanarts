@@ -73,7 +73,8 @@ function pretty_tostring(val, --[[Optional]] tabs, --[[Optional]] packed, --[[Op
         return tabstr .. "\"" .. val .. "\""
     end
 
-    if type(val) ~= "table" then
+    local meta = getmetatable(val)
+    if type(val) ~= "table" or (meta and meta.__tostring) then
         return tabstr .. tostring(val)
     end
 

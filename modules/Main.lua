@@ -57,7 +57,8 @@ local function main(args)
         Main.main(args)
         return false
     elseif args[1] == "--demoshoot" then
-        import "examples.DemoShoot.demoshoot"
+        local DemoShoot = import "examples.DemoShoot.demoshoot"
+        DemoShoot.main(args)
         return false
     elseif args[1] == "--testmap" then
         Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)

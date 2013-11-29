@@ -82,6 +82,7 @@ function M.object_parsedef(id, definition, --[[Optional]] handlers)
     lazy_import() ; handlers = handlers or {}
     if type(definition) == "table" then definition = ("\n"):join(definition) end
     local object_type = typedef(_classes)(id)(definition)
+    print("Got definition ", definition)
     StatML.define_parser {
         [id] = function(node)
             extract_simple(node, handlers)
@@ -120,8 +121,7 @@ function M.class(metanode)
     lazy_import()
     local definition, handlers = {}, {}
     definition_collect(metanode, definition, handlers)
-    M.class_parsedef(metanode.id, definition, handlers)
-    return metanode
+    return M.class_parsedef(metanode.id, definition, handlers)
 end
 
 return M

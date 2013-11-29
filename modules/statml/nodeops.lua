@@ -24,15 +24,10 @@ function M.convert_raw_to_statml_node(raw, file)
     end ; assert(false)
 end
 
-local function preprocess_field(node, name, val)
-    Util.node_assert(val, node, "Object '%s' requires field '%s'!", node.id, name)
-    return preprocess(val)
-end
+local preprocess_field -- Forward declare
 
--- Handle the initializer, if present. Currently an alternative to fields.
-local function parse_initializer(node, struct)
-    -- No initializer:
-    local init = node.__initializer
+-- Handle an initializer, if present. 
+local function parse_initializer(node, struct, init)
     if init.__type == "str" and init[1] == "" then 
         return nil -- The initializer is merely a YAML artifact. 
     end
@@ -41,29 +36,44 @@ local function parse_initializer(node, struct)
     if init.__type == "map" then
         local map = Util.as_map(init)
         for f in struct:all_required_fields() do
-            append(args, preprocess_field(node, f.name, map[f.name])) ; map[f.name] = nil
+            append(args, preprocess_field(node, f, map[f.name])) ; map[f.name] = nil
         end
         if not table.is_empty(map) then
             Util.node_error(node, "Extra field(s) '%s' in initializer!", (", "):join(table.key_list(map))) 
         end
     else -- list
         local i = 1 ; for f in struct:all_required_fields() do
-            append(args, preprocess_field(node, f.name, init[i]))
+            append(args, preprocess_field(node, f, init[i]))
             i = i + 1
         end ; Util.node_assert(#init == i-1, node, "Extra fields in initializer!")
     end
     return args
 end
 
+function preprocess_field(node, f, val)
+    Util.node_assert(val, node, "Object '%s' requires field '%s'!", node.id, f.name)
+    val = preprocess(val)
+    if not f.is_leaf then
+        local args = parse_initializer(val, f.type, val)
+        val = f.type.typetable.create(unpack(args))
+    end
+    print(f.name, "returning", val)
+    return val
+end
+
 function M.find_field_values(node, object_type)
     local struct = assert(object_type.__structinfo, "Logic error")
-    local args = parse_initializer(node, struct)
+    local args = parse_initializer(node, struct, node.__initializer)
     if args then return args end -- Fields specified compactly
     args = {}
+    for f in struct:all_fields() do
+        print("REQUIRED", struct.name, f.name)
+    end
     for f in struct:all_required_fields() do
         local val = Util.extract(node, f.name)
-        append(args, preprocess_field(node, f.name, val))
+        append(args, preprocess_field(node, f, val))
     end
+    pretty("Done with ", args)
     return args
 end
 

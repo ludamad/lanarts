@@ -60,7 +60,7 @@ function M.metamethods.__tostring(T)
     end
     if #leafs > 0 then B:add("add(%s)", (".. ', '.."):join(leafs)) end
     B:add(roots)
-    B:add("return ('\\n'):join(parts)")
+    B:add("return '['..(' '):join(parts)..']'")
     return B:emit()
 end
 function M.metamethods.__newindex(T)
@@ -133,7 +133,7 @@ function M.compile_type(T)
         append(parts, "TYPETABLE." .. k .. " = " .. method)
     end
     append(parts, "return TYPETABLE")
-    local callable = ("\n"):join(parts)
+    local callable = (","):join(parts)
 
     local arg_names, arg_vals = {"in_TYPETABLE"}, {T.typetable}
     for field in T:all_nonleafs() do
@@ -149,7 +149,6 @@ function M.compile_type(T)
         )
     )(unpack(arg_vals))
     T.__metatable = type.__metatable
-    type.__structinfo = T
     return type
 end
 

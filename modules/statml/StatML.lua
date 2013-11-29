@@ -1,4 +1,5 @@
 local yaml = import "core.yaml"
+
 -- Defines builtin handlers !object, !trait, and !class:
 local builtintags = import "@builtintags"
 local nodeops = import "@nodeops"
@@ -64,12 +65,37 @@ function M.resolve_node(id)
     return _all_parsed[id]
 end
 
-M.get = M.resolve_node -- The less formal but more convenient handle
-
 local function parse_all_for_tag(tag)
     local list = _unparsed[tag]
     for _, node in ipairs(list) do _parse(node) end
     table.clear(list) 
+end
+
+M.get = M.resolve_node -- The less formal but more convenient handle
+
+function M.get_set(tag)
+    parse_all_for_tag(tag) ; return _parsed[tag]
+end
+
+local function add_instances_recursive(omap, tag)
+    parse_all_for_tag(tag)
+    local typeinfo = M.get(tag)
+    if not typeinfo then return end
+    local struct = typeinfo.__structinfo
+    local parentmap = M.get_set(tag)
+    for _,v in ipairs(parentmap.list) do
+        local id = parentmap.reverse_map[v]
+        omap:add(id, v)
+    end
+    for _,parent in ipairs(struct.parent_types) do
+        add_instances_recursive(omap,parent.name)
+    end
+end
+
+function M.get_instance_set(tag)
+    local omap = ObjectSet.create()
+    add_instances_recursive(omap,tag)
+    return omap
 end
 
 function M.parse_all()

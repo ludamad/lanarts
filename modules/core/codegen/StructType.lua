@@ -10,7 +10,8 @@ function StructType:init(--[[Optional]] namespace, --[[Optional]] name)
     self.name = name or false 
 	self.fields = {}
 	self.name_to_field = {}
-	self.typetable = {}
+	self.parent_types = {}
+	self.typetable = {__structinfo = self}
 	self.children = 0
 end
 
@@ -51,7 +52,7 @@ function StructType:all_leafs(subfields, offset) return filter(self:all_subfield
 function StructType:all_nonleafs(subfields, offset) return filter(self:all_subfields(), "is_leaf", --[[invert]] true) end
 function StructType:all_aliases() return filter(self:all_subfields(), "has_alias") end
 function StructType:all_required_fields() 
-    return filter(self:all_subfields(), "initializer", --[[inverse]] true) 
+    return filter(self:all_fields(), "initializer", --[[inverse]] true) 
 end
 
 function StructType:_preinit(defs, corrections)

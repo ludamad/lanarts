@@ -110,7 +110,9 @@ local function check_aliases(T, newf)
 end
 
 function M.extend(T, parent)
+    append(T.parent_types, parent)
     table.merge(T.typetable, parent.typetable)
+    T.typetable.__structinfo = T
     for f in parent:all_fields() do
         M.define_field(T, f.name, f.typename, f.is_embedded, f.initializer)
     end

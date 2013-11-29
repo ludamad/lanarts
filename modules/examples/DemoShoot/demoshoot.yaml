@@ -1,1 +1,10 @@
-- Example: !Pos [1,2]
+- Ship: !Actor
+  var(float): speed
+
+- Ship1: !Ship
+  xy: [90,90]
+  speed: 4
+
+- Ship2: !Ship
+  xy: [180,180]
+  speed: 4

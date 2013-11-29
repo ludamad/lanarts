@@ -1,21 +1,35 @@
+local M = nilprotect {} -- Submodule
+
 --------------------------------------------------------------------------------
--- StatML interaction
+-- StatML schemas
 --------------------------------------------------------------------------------
 
 local StatML = import "statml.StatML"
 
-StatML.object_parsedef("Pos", [[
+local Pos = StatML.object_parsedef("Pos", [[
     x,y :float
 ]])
 
-StatML.class_parsedef("Actor", [[
+local Actor = StatML.class_parsedef("Actor", [[
     Pos as xy
 ]])
 
-StatML.load_and_parse_file(path_resolve "demoshoot.yaml")
+local World = StatML.object_parsedef("World", [[
+    actors :list
+]])
 
-print("Example " .. tostring(StatML.get "Example"))
+function M.main()
+    StatML.load_and_parse_file(path_resolve "demoshoot.yaml")
+    local actor_set = StatML.get_instance_set "Actor"
+    pretty_print(actor_set.list)
+end
 
 --------------------------------------------------------------------------------
--- StatML interaction.
+-- Class implementations
 --------------------------------------------------------------------------------
+
+function Actor:on_draw()
+
+end
+
+return M
