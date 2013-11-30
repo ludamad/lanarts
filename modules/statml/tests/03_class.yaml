@@ -1,21 +1,15 @@
 - Item: !class
   var(string): description
 
-- Weapon: !Item
+- Weapon1: !Item
   var(float): damage
 
-- Armour: !Item
-  var(float): defence
+- Weapon2: !object
+  var(string): description
+  var(float): damage
 
-- ShortSword: !Weapon
-  description: ""
-  damage: 1
+- Sword: !Weapon1 ["Good thingy", 2]
 
-# Intentionally tricky placement
-- Asserts: !instance
-  _: ${PlateMail.defence == 1}
-  _: ${ShortSword.damage == 1}
-
-- PlateMail: !Armour
-  description: ""
-  defence: 1
+- Sword2: !Weapon1
+  description: "Hey"
+  damage: 3.14

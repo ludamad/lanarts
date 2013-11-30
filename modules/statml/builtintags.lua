@@ -82,7 +82,6 @@ function M.object_parsedef(id, definition, --[[Optional]] handlers)
     lazy_import() ; handlers = handlers or {}
     if type(definition) == "table" then definition = ("\n"):join(definition) end
     local object_type = typedef(_classes)(id)(definition)
-    print("Got definition ", definition)
     StatML.define_parser {
         [id] = function(node)
             extract_simple(node, handlers)

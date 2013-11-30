@@ -108,7 +108,7 @@ local function load(raw, file)
     -- Resolve tags on demand, add to list of unparsed
     local list = _unparsed[tag] or {}
     _unparsed[tag] = list ; append(list, raw)
-    if _all_unparsed[raw.id] then error("Node '" .. raw.id .. "' already exists!") end
+    assertf(not _all_unparsed[raw.id], "Node '%s' already exists!", raw.id)
     _all_unparsed[raw.id] = raw
 end
 
@@ -133,8 +133,8 @@ function M.load_and_parse_file(file)
 end
 
 function M.id_list(tag)
-    assert(_parsers[tag], "No parser associated with '"..tag.."'!")
-    assert(_unparsed[tag], "Attempt to take id list of '"..tag.."', but no elements were found.")
+    assertf(_parsers[tag], "No parser associated with '%s'!", tag)
+    assertf(_unparsed[tag], "Attempt to take id list of '%s', but no elements were found.", tag)
     local ids, oset = {}, _parsed[tag]
     for _, r in ipairs(oset.list) do append(ids, oset.reverse_map[r]) end
     for _, node in ipairs(_unparsed[tag]) do append(ids, node.id) end
@@ -143,10 +143,9 @@ end
 
 function M.define_parser(parserdefs)
     for tag,func in pairs(parserdefs) do
-        assert(not _parsers[tag], "Parser already defined for '" .. tag .. "'!")
-        assert(not _parsed[tag], "Object set already exists for '" .. tag .. "'!")
-        _parsers[tag] = func
-        _parsed[tag] = ObjectSet.create({},{},{})
+        assertf(not _parsers[tag], "Parser already defined for '%s'!", tag)
+        assertf(not _parsed[tag], "Object set already exists for '%s'!", tag)
+        _parsers[tag] = func ; _parsed[tag] = ObjectSet.create()
     end
 end
 

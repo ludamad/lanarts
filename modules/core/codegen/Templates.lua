@@ -43,6 +43,16 @@ function M.metamethods.__index(T)
     return B:emit()
 end
 
+function define_index(T)
+    funcdef(T) "__index(k)" [[
+        $FieldElseIf(k == FieldName)(
+            return FieldValue
+        )
+        elseif rawget(TYPE, k) then return rawget(TYPE, k)
+        else error(("No such key '%s'"):format(k)) end
+    ]]
+end
+
 function M.metamethods.__tostring(T)
     local B = MethodBuilder.create(T, "self", "indent")
     B:add("local parts = {':%s'}", T.name or "<anon>")

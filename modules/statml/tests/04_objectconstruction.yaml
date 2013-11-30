@@ -4,10 +4,18 @@
 - foo1: !Foo [1,2]
 - foo2: !Foo {baz: 2, bar: 1}
 
+- foo3: !Foo
+  bar: 2
+  baz: 1
+
 - Asserts: !instance
   # Test foo1 == [1,2]
   _: ${foo1.bar == 1} 
   _: ${foo1.baz == 2} 
   # Test foo2 == [1,2]
   _: ${foo2.bar == 1} 
-  _: ${foo2.baz == 2}
+  _: ${foo2.baz == 2} 
+  # Test foo3 == [1,2]
+  _: ${foo3.bar == 1} 
+  _: ${foo3.baz == 2}  
+
