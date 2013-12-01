@@ -1,5 +1,5 @@
-local Tmpl = import "@codegen.Templates"
-local Types = import "@codegen.FieldTypes"
+local Tmpl = import "@Templates"
+local Types = import "@FieldTypes"
 
 local function make_slice(data) return {data, 0} end
 

@@ -1,4 +1,4 @@
-local yaml = import "core.yaml"
+local yaml = import "yaml"
 
 -- Defines builtin handlers !object, !trait, and !class:
 local builtintags = import "@builtintags"

@@ -3,7 +3,7 @@
 -- Primarily for use with luasocket's socket.http & coroutines
 -- Reads in line by line
 
-local jsonlib = import "core.Json"
+local jsonlib = import "json"
 local string = _G.string
 local socket = import "socket"
 local http = import "socket.http"

@@ -1,6 +1,4 @@
-import ".General" -- For 'append'
-
-local Templates = import "@codegen.Templates"
+local Templates = import ".Templates"
 
 local M = nilprotect {} -- Submodule
 

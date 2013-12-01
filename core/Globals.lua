@@ -9,10 +9,21 @@ end
 -- Ensure undefined global variable access results in an error
 nilprotect(_G)
 
-local globals_subpackage = "core.globals"
 local modules_submodule = "ModuleSystem"
 -- Note: 'import' is not defined until ModuleSystem.lua is ran.
 require(modules_submodule)
 
+import "core.globals.FileUtils"
 import "core.globals.Errors" -- Get better error reporting as soon as possible
-import_all(globals_subpackage, true)
+
+-- Get all directories
+local modules = io.directory_subdirectories("core")
+for _,module in ipairs(modules) do
+    -- Import of they exist
+    if file_exists("core/"..module.."/Globals.lua") then
+        import(module..".Globals")
+    end
+    if file_exists("core/"..module.."/globals") then
+        import_all(module..".globals")
+    end
+end

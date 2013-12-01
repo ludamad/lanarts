@@ -207,4 +207,15 @@ function import_all(subpackage, --[[Optional]] recursive, --[[Optional]] pattern
     for c in values(content) do import(c) end
 end
 
+function import_copy(...)
+    local copy = {}
+    for i=1,select("#", ...) do
+        local module = import(select(i, ...))
+    	for k,v in pairs(module) do
+            copy[k] = v
+    	end
+    end
+    return copy
+end
+
 --Errors = import ".Errors" TODO
