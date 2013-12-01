@@ -1,0 +1,14 @@
+sprites:
+  - name: fighter
+    file: game/lanarts/classes/sprites/fighter.png
+  - name: fighter2
+    file: game/lanarts/classes/sprites/fighter2.png
+
+  - name: wizard
+    file: game/lanarts/classes/sprites/wizard.png
+  - name: wizard2
+    file: game/lanarts/classes/sprites/wizard2.png
+  
+  - name: archer
+    file: game/lanarts/classes/sprites/archer.png
+    

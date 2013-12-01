@@ -81,7 +81,7 @@ static GameState* init_gamestate() {
 
 	lua_State* L = lua_api::create_configured_luastate();
 	lua_vm_configure(L);
-	lua_api::add_search_path(L, "modules/lanarts/?.lua");
+	lua_api::add_search_path(L, "game/lanarts/?.lua");
 
 	GameSettings settings; // Initialized with defaults
 	// Load the manual settings
@@ -119,9 +119,10 @@ static void run_engine(int argc, char** argv) {
 	lua_State* L = gs->luastate();
 
 	/* Load low-level Lua bootstrapping code.
-	 * Implements the module system used by the rest of the engine.
+	 * Implements the module system used by the rest of the engine,
+	 * and other important utilities.
 	 */
-	LuaValue entry_point = luawrap::dofile(L, "modules/Main.lua");
+	LuaValue entry_point = luawrap::dofile(L, "core/Main.lua");
 
 	LuaValue engine = luawrap::globals(L)["Engine"];
 

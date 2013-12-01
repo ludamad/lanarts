@@ -1,0 +1,30 @@
+---
+sprites:
+
+  - name: orc priest
+    file: game/lanarts/enemies/humanoid/sprites/orc_priest.png
+   
+  - name: orc sorceror
+    file: game/lanarts/enemies/humanoid/sprites/orc_sorcerer.png
+    
+  - name: orc warlord
+    file: game/lanarts/enemies/humanoid/sprites/orc_warlord.png
+    
+  - name: orc high priest
+    file: game/lanarts/enemies/humanoid/sprites/orc_high_priest.png
+    
+  - name: orc warrior
+    file: game/lanarts/enemies/humanoid/sprites/orc_warrior.png
+    
+  - name: orc knight
+    file: game/lanarts/enemies/humanoid/sprites/orc_knight.png
+    
+  - name: orc wizard
+    file: game/lanarts/enemies/humanoid/sprites/orc_wizard.png
+
+  - name: nessos
+    file: game/lanarts/enemies/humanoid/sprites/nessos.png
+
+  - name: nessos arrows
+    type: directional
+    frames: game/lanarts/enemies/humanoid/sprites/nessos-arrows.png%32x32

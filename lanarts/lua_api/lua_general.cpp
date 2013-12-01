@@ -361,7 +361,6 @@ static int lapi_virtual_path_create_relative(lua_State* L) {
 	return 1; // Return relative virtual path
 }
 
-
 static int lapi_rand_range(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	int nargs = lua_gettop(L);

@@ -1,6 +1,6 @@
 /*
  * load_datafilenames.cpp:
- *  Loads data file locations from datafiles.yaml in modules/
+ *  Loads data file locations from datafiles.yaml in game/
  */
 
 #include <fstream>
@@ -19,7 +19,7 @@ DataFiles load_datafilenames(const char* filename) {
 	if (!file) {
 		fprintf(
 				stderr,
-				"Fatal error: file %s not found, ensure you are running from directory with modules/ folder\n.",
+				"Fatal error: file %s not found, ensure you are running from directory with game/ folder\n.",
 				filename);
 		exit(0);
 	}

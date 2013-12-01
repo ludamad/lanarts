@@ -1,0 +1,60 @@
+sprites: 
+  - name: leather armour
+    file: game/lanarts/items/armour/sprites/leather_armour2.png
+
+  - name: chainmail
+    file: game/lanarts/items/armour/sprites/chainmail.png
+
+  - name: robe
+    file: game/lanarts/items/armour/sprites/robe.png
+
+  - name: enchanted robe
+    file: game/lanarts/items/armour/sprites/robe2.png
+
+  - name: runed robe
+    file: game/lanarts/items/armour/sprites/robe3.png
+
+  - name: platemail
+    file: game/lanarts/items/armour/sprites/plate2.png
+
+  - name: robe of mana
+    file: game/lanarts/items/armour/sprites/robe_of_mana.png
+
+#Headgear
+  - name: iron helmet
+    file: game/lanarts/items/armour/sprites/iron_helmet.png
+
+  - name: runed helmet
+    file: game/lanarts/items/armour/sprites/runed_helmet.png
+
+  - name: wizard hat
+    file: game/lanarts/items/armour/sprites/wizard_hat2.png
+
+  - name: mars crown
+    file: game/lanarts/items/armour/sprites/mars-crown.png
+
+  - name: orcus crown
+    file: game/lanarts/items/armour/sprites/orcus-crown.png
+
+  - name: dianas crown
+    file: game/lanarts/items/armour/sprites/dianas-crown.png
+
+#Boots
+  - name: leather boots
+    file: game/lanarts/items/armour/sprites/leather_boots.png
+
+  - name: iron boots
+    file: game/lanarts/items/armour/sprites/boots_iron.png
+
+  - name: troll boots
+    file: game/lanarts/items/armour/sprites/boots4_green.png
+
+#Gloves
+  - name: leather gloves
+    file: game/lanarts/items/armour/sprites/leather_gloves.png
+
+  - name: steel gloves
+    file: game/lanarts/items/armour/sprites/steel_gloves.png
+    
+  - name: runed gloves
+    file: game/lanarts/items/armour/sprites/runed_gloves.png

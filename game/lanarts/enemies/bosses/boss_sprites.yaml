@@ -1,0 +1,14 @@
+---
+sprites:
+
+  - name: zin
+    file: game/lanarts/enemies/bosses/sprites/zin.png 
+   
+  - name: red dragon
+    file: game/lanarts/enemies/bosses/sprites/reddragon.png
+
+  - name: pisilohe
+    file: game/lanarts/enemies/bosses/sprites/pisilohe8_0.png
+
+  - name: hell warrior
+    file: game/lanarts/enemies/bosses/sprites/trog.png

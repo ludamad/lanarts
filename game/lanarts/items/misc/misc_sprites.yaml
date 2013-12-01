@@ -1,0 +1,21 @@
+sprites: 
+  - name: ambrosia
+    file: game/lanarts/items/misc/sprites/ambrosia.png
+
+  - name: amulet
+    file: game/lanarts/items/misc/sprites/amulet.png
+
+  - name: mana_potion
+    file: game/lanarts/items/misc/sprites/brilliant_blue.png
+
+  - name: stone
+    file: game/lanarts/effects/sprites/stone.png
+
+  - name: book
+    file: game/lanarts/items/misc/sprites/book.png
+
+  - name: gold
+    file: game/lanarts/items/misc/sprites/gold.png
+    
+  - name: health_potion
+    file: game/lanarts/items/misc/sprites/redpotion.png

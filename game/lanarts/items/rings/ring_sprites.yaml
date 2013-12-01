@@ -1,0 +1,21 @@
+sprites: 
+  - name: magicians ring
+    file: game/lanarts/items/rings/sprites/magicians_ring.png
+
+  - name: ring of spells
+    file: game/lanarts/items/rings/sprites/ring_of_spells.png
+
+  - name: ring of stone
+    file: game/lanarts/items/rings/sprites/ring_of_stone.png
+
+  - name: ogres ring
+    file: game/lanarts/items/rings/sprites/ogres_ring.png
+ 
+  - name: hydra ring
+    file: game/lanarts/items/rings/sprites/hydra_ring.png
+
+  - name: moonstone ring
+    file: game/lanarts/items/rings/sprites/moonstone_ring.png
+
+  - name: ring of vitality
+    file: game/lanarts/items/rings/sprites/ring_of_vitality.png

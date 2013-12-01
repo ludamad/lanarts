@@ -1,0 +1,80 @@
+--- 
+
+#Locations of markup files
+#relative to game/lanarts/
+
+equipment_files: []
+#  - items/armour/body_armour.yaml
+#  - items/armour/helmets.yaml
+#  - items/armour/boots.yaml
+#  - items/armour/gloves.yaml
+#  - items/rings/rings.yaml
+
+class_files: 
+  - classes/classes.yaml
+
+effect_files: 
+  - effects/effects.yaml
+  - spells/spell_effects.yaml
+
+enemy_files: 
+  - enemies/animals/animals.yaml
+  - enemies/bosses/bosses.yaml
+  - enemies/demonic/demonic.yaml
+  - enemies/elemental/elemental.yaml
+  - enemies/humanoid/humanoid.yaml
+  - enemies/misc/misc.yaml
+  - enemies/undead/undead.yaml
+  
+room_template_files:
+  - maps/templates/templates.yaml
+
+item_files: 
+  - items/misc/misc.yaml
+  - items/scrolls/scrolls.yaml
+  
+itemgenlist_files:
+  - items/itemgenlists.yaml
+  
+map_files: 
+  - maps/maps.yaml
+
+projectile_files: 
+  - items/projectiles.yaml
+  - enemies/enemy_projectiles.yaml
+  - spells/spell_projectiles.yaml
+  - spells/archer/projectiles.yaml
+
+spell_files: 
+  - spells/fighter_spells.yaml
+  - spells/spells.yaml
+  - spells/archer/spells.yaml
+
+sprite_files: 
+  - classes/class_sprites.yaml
+  - enemies/animals/animal_sprites.yaml
+  - enemies/bosses/boss_sprites.yaml
+  - enemies/demonic/demonic_sprites.yaml
+  - enemies/elemental/elemental_sprites.yaml
+  - enemies/humanoid/humanoid_sprites.yaml
+  - enemies/misc/misc_sprites.yaml
+  - enemies/undead/undead_sprites.yaml
+  - spells/spell_sprites.yaml
+  - items/armour/armour_sprites.yaml
+  - items/rings/ring_sprites.yaml
+  - interface/interface_sprites.yaml
+  - items/misc/misc_sprites.yaml
+  - items/scrolls/scroll_sprites.yaml
+  - features/feature_sprites.yaml
+  - effects/effect_sprites.yaml
+  - items/weapons/weapon_sprites.yaml
+
+tile_files: 
+  - tiles/tiles.yaml
+
+tileset_files: 
+  - tiles/tilesets.yaml
+
+weapon_files: 
+  - items/weapons/weapons.yaml
+  - enemies/enemy_weapons.yaml

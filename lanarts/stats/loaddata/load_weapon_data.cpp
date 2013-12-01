@@ -30,5 +30,5 @@ void load_weapon_data(lua_State* L, const FilenameList& filenames,
 
 	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["Data"]);
 	data["weapon_create"].bind_function(lapi_data_create_weapon);
-	luawrap::dofile(L, "modules/lanarts/items/weapons/Weapons.lua");
+	luawrap::dofile(L, "game/lanarts/items/weapons/Weapons.lua");
 }

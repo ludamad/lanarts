@@ -1,0 +1,64 @@
+---
+sprites: 
+  - name: fire bolt
+    type: directional
+    frames: game/lanarts/spells/sprites/fireball.png%32x32
+
+  - name: fire ball
+    file: game/lanarts/spells/sprites/fireball2.png
+
+  - name: magic bolt
+    file: game/lanarts/effects/sprites/bolt05.png
+    
+  - name: crystal spear
+    type: directional
+    frames: game/lanarts/items/weapons/sprites/projectiles/crystal/crystal_spear(0-7).png
+    
+  - name: magic arrow
+    file: game/lanarts/spells/sprites/magic_arrow.png
+
+  - name: storm bolt
+    file: game/lanarts/effects/sprites/bolt07.png
+
+  - name: blue blast
+    file: game/lanarts/effects/sprites/blueblast.png
+
+  - name: poison
+    file: game/lanarts/effects/sprites/cloud_poison2.png
+
+  - name: fire storm
+    file: game/lanarts/effects/sprites/firestorm.png
+
+  - name: magic blast
+    file: game/lanarts/spells/sprites/orb_of_destruction.png
+    
+  - name: blink
+    file: game/lanarts/spells/sprites/blink.png
+        
+  - name: large fire
+    file: game/lanarts/effects/sprites/cloud_fire2.png
+
+  - name: minor missile
+    type: directional
+    frames: game/lanarts/spells/sprites/minor_missile.png%32x32
+    
+  - name: berserk
+    file: game/lanarts/spells/sprites/berserk.png
+
+  - name: chargestrike
+    file: game/lanarts/spells/sprites/chargehand.png
+        
+  - name: berserk_effected
+    file: game/lanarts/effects/sprites/berserk.png       
+        
+  - name: exhausted_effected
+    file: game/lanarts/effects/sprites/i-slowing.png
+
+  - name: charge_effected
+    file: game/lanarts/spells/sprites/poof.gif
+
+  - name: thrown_effected
+    file: game/lanarts/spells/sprites/fleeing.png
+
+  - name: expedite
+    file: game/lanarts/spells/sprites/swiftness.png
