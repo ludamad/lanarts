@@ -4,7 +4,7 @@ local Attacks = import "@Attacks"
 local ActionContext = import "@ActionContext"
 local Actions = import "@Actions"
 local Stats = import "@Stats"
-local AnsiCol = import "core.terminal.AnsiColors"
+local AnsiCol = import "terminal.AnsiColors"
 local RaceType = import "@RaceType"
 local ItemType = import "@ItemType"
 local SkillType = import "@SkillType"
@@ -386,11 +386,12 @@ local function fight_spawn_if_over(GM)
 end
 
 function M.main(cmd_args)
+    Display.initialize("Simulation", {settings.view_width, settings.view_height}, settings.fullscreen)
     -- Load game content
     import "@DefineAll"
 
     -- Make sure EventLog.add prints to console instead
-    local EventLog = import "core.ui.EventLog"
+    local EventLog = import "ui.EventLog"
     EventLog.add = function(msg, color)
         AnsiCol.println(msg, AnsiCol.from_rgb(color or COL_WHITE))
     end

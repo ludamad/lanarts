@@ -1,4 +1,4 @@
-local InstanceBox = import "core.ui.InstanceBox"
+local InstanceBox = import "ui.InstanceBox"
 local GameState = import "core.GameState"
 local Display = import "core.Display"
 local Mouse = import "core.Mouse"

@@ -1,4 +1,7 @@
+--------------------------------------------------------------------------------
 -- Installs a better debug.traceback, with color highlighting and filtered noise.
+--------------------------------------------------------------------------------
+
 local AnsiColors -- Lazy imported
 
 local LUAFILE_PATTERN = "core/[^%.]*%.lua"
@@ -9,9 +12,9 @@ local M -- Forward declare for inner functions
 M = {
     filter_patterns = {
         -- Lines to delete starting with this line and going up
-        ["%s*core/core/globals/Errors%.lua.* in function <modules"] = 1,
-        ["%s*core/core/globals/Modules%.lua.* in function 'import'"] = 2,
-        ["%s*core/core/Main.lua"] = 1,
+        ["%s*core/ErrorReporting%.lua.* in function .*"] = 1,
+        ["%s*core/globals/Modules%.lua.* in function 'import'"] = 2,
+        ["%s*core/Main.lua"] = 1,
         ["%s*%[C%]: in function 'error'"] = 4
     },
     
@@ -29,7 +32,7 @@ M = {
     
     virtual_paths = true, 
     use_color = true,
-    context = nil
+    context = 0
 }
 
 local DOT_LINE = "--------------------------------------------------------------------------------"
@@ -97,7 +100,7 @@ local function resolve_changes(stacktrace, i)
         local path = (":"):join(parts)
         if M.virtual_paths then table.insert(converted, M.resolve_color("CYAN", path, ';2')) end
         local ret = resolve_path(path) .. ':' .. M.resolve_color("RESET",line_num, ';1')
-        if M.context and #converted == 1 then
+        if M.context > 0 and #converted == 1 then
             local lines = M.resolve_context(path, line_num, M.context)
             inserts = #lines
             -- Add context lines
@@ -128,7 +131,7 @@ function M.traceback(--[[Optional]] str)
     return resolve_replacements(str, M.error_replacements) .. '\n' .. table.concat(stacktrace, '\n')
 end
 
-AnsiColors = import "core.terminal.AnsiColors"
---debug.traceback = M.traceback
+AnsiColors = import "terminal.AnsiColors"
+debug.traceback = M.traceback
 
 return M

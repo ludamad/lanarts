@@ -1,5 +1,5 @@
 local Display = import "core.Display"
-local AnsiCol = import "core.terminal.AnsiColors"
+local AnsiCol = import "terminal.AnsiColors"
 local GameState = import "core.GameState"
 local Keys = import "core.Keyboard"
 local Simulation = import ".Simulation"
@@ -11,11 +11,13 @@ local GameInterface = import "@ui.GameInterface"
 local M = nilprotect {} -- Submodule
 
 function M.main(cmd_args)
+    Display.initialize("TestMap", {settings.view_width, settings.view_height}, settings.fullscreen)
+
     -- Load game content
     import "@DefineAll"
 
     -- Make sure EventLog.add prints to console instead
-    local EventLog = import "core.ui.EventLog"
+    local EventLog = import "ui.EventLog"
     EventLog.add = function(msg, color)
         AnsiCol.println(msg, AnsiCol.from_rgb(color or COL_WHITE))
     end

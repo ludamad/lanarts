@@ -123,7 +123,7 @@ namespace lua_api {
 	}
 
 	void register_event_log_api(lua_State* L) {
-		LuaValue event_log = register_lua_submodule(L, "core.ui.EventLog");
+		LuaValue event_log = register_lua_submodule(L, "ui.EventLog");
 		event_log["add"].bind_function(event_log_add);
 	}
 }

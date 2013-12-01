@@ -10,7 +10,7 @@ local ProjectileEffect = import "@stats.ProjectileEffect"
 local RangedWeaponActions = import "@items.RangedWeaponActions"
 local StatContext = import "@StatContext"
 local StatPrereqs = import "@StatPrereqs"
-local EventLog = import "core.ui.EventLog"
+local EventLog = import "ui.EventLog"
 local StatUtils = import "@stats.StatUtils"
 
 local M = nilprotect {} -- Submodule

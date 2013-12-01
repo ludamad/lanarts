@@ -5,7 +5,7 @@ local StatContext = import "@StatContext"
 local CodeGeneration = import "core.CodeGeneration"
 local CooldownTypes = import ".CooldownTypes"
 local ExperienceCalculation = import ".ExperienceCalculation"
-local C = import "core.terminal.AnsiColors"
+local C = import "terminal.AnsiColors"
 
 local M = nilprotect {} -- Submodule
 
@@ -85,7 +85,7 @@ function M.stats_to_string(s, --[[Optional]] use_color, --[[Optional]] use_new_l
 end
 
 function M.attack_to_string(attack, --[[Optional]] use_color)
-    local C = import "core.terminal.AnsiColors"
+    local C = import "terminal.AnsiColors"
     local function if_color(col, --[[Optional]] ...)
         if use_color then
             if (...) then

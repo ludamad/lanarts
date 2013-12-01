@@ -1,6 +1,22 @@
 local M = nilprotect {} -- Submodule
 
+
+local function handle_cpp_tests(args)
+    if not table.contains(args, "--cpp") then return end
+
+        local failures = (cpp_tests or all_tests) and _lanarts_unit_tests() or 0
+        local ltests = import "testrunner"
+        local passed = (lua_tests or all_tests) and ltests.main(args) or true
+        -- Return exit code so ctest will notice the failure
+        if failures > 0 or not passed then os.exit(2) end
+        return false
+end
+
 function M.main(args)
+    local Display = import "core.Display"
+    -- XXX: We must initialize the display context for tests to be able to load images.
+    Display.initialize("Tests", {settings.view_width, settings.view_height}, settings.fullscreen)
+
     import '@lunit'
     local testcases = {}
     

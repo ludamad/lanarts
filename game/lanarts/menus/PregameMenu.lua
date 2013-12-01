@@ -1,9 +1,9 @@
 local Display = import "core.Display"
 
-local InstanceGroup = import "core.ui.InstanceGroup"
-local InstanceBox = import "core.ui.InstanceBox"
-local Sprite = import "core.ui.Sprite"
-local TextLabel = import "core.ui.TextLabel"
+local InstanceGroup = import "ui.InstanceGroup"
+local InstanceBox = import "ui.InstanceBox"
+local Sprite = import "ui.Sprite"
+local TextLabel = import "ui.TextLabel"
 local World = import "core.World"
 
 local text_button_params = {

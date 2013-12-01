@@ -618,7 +618,7 @@ function main(argv)
     end
   end
 
-  loadrunner(runner or "core.lunit-console")
+  loadrunner(runner or "testrunner.lunit-console")
 
   if doloadonly then
     return loadonly()

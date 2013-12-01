@@ -1,4 +1,4 @@
-local EventLog = import "core.ui.EventLog"
+local EventLog = import "ui.EventLog"
 local Map = import "core.Map"
 
 function poison_statmod(effect, obj, old, new)

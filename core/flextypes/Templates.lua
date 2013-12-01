@@ -1,4 +1,4 @@
-local AnsiColors = import "core.terminal.AnsiColors"
+local AnsiColors = import "terminal.AnsiColors"
 
 local MethodBuilder = import ".MethodBuilder"
 local StructType = import ".StructType"
@@ -41,16 +41,6 @@ function M.metamethods.__index(T)
     B:add('elseif rawget(TYPETABLE, k) then return rawget(TYPETABLE, k)')
     B:add('else error(("No such key \'%s\'"):format(k)) end')
     return B:emit()
-end
-
-function define_index(T)
-    funcdef(T) "__index(k)" [[
-        $FieldElseIf(k == FieldName)(
-            return FieldValue
-        )
-        elseif rawget(TYPE, k) then return rawget(TYPE, k)
-        else error(("No such key '%s'"):format(k)) end
-    ]]
 end
 
 function M.metamethods.__tostring(T)

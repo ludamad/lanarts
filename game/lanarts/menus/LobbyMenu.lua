@@ -1,9 +1,9 @@
 local Display = import "core.Display"
 
-local InstanceBox = import "core.ui.InstanceBox"
-local InstanceLine = import "core.ui.InstanceLine"
-local Sprite = import "core.ui.Sprite"
-local TextLabel = import "core.ui.TextLabel"
+local InstanceBox = import "ui.InstanceBox"
+local InstanceLine = import "ui.InstanceLine"
+local Sprite = import "ui.Sprite"
+local TextLabel = import "ui.TextLabel"
 
 local lobby = import "networking.Lobby"
 local tasks = import "networking.Tasks"

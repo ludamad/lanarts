@@ -3,10 +3,10 @@ local InstanceGroup, TextLabel, InstanceBox, TextInputBox
 
 -- Solve circular dependence by late-loading
 local function ensure_loaded_dependencies()
-    InstanceGroup = InstanceGroup or import "@ui.InstanceGroup"
-    TextLabel = TextLabel or import "@ui.TextLabel"
-    InstanceBox = InstanceBox or import "@ui.InstanceBox"
-    TextInputBox = TextInputBox or import "@ui.TextInputBox"
+    InstanceGroup = InstanceGroup or import "ui.InstanceGroup"
+    TextLabel = TextLabel or import "ui.TextLabel"
+    InstanceBox = InstanceBox or import "ui.InstanceBox"
+    TextInputBox = TextInputBox or import "ui.TextInputBox"
 end
 
 --- Create a clickable piece of text

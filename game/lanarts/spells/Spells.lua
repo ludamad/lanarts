@@ -1,4 +1,4 @@
-local EventLog = import "core.ui.EventLog"
+local EventLog = import "ui.EventLog"
 local GameObject = import "core.GameObject"
 local Map = import "core.Map"
 local Projectiles = import "@objects.Projectiles"

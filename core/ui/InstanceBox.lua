@@ -1,6 +1,6 @@
 -- Places instances on a certain origin, an optional offset can also be specified
 
-local InstanceGroup = import "core.ui.InstanceGroup"
+local InstanceGroup = import "ui.InstanceGroup"
 
 --- A layout consisting of objects placed on a grid. 
 -- Each object can be placed with an origin, as well as an optional offset.

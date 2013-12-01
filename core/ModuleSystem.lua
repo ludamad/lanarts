@@ -1,4 +1,4 @@
-local PACKAGES = {"core", "game", "example"} -- Hardcoded for now
+_PACKAGES = {"core", "game", "example"} -- Hardcoded for now
 
 --------------------------------------------------------------------------------
 -- Path utility functions
@@ -6,7 +6,7 @@ local PACKAGES = {"core", "game", "example"} -- Hardcoded for now
 
 local function find_package(str)
     local expected = (str:sub(1,1) == "@") and 2 or 1
-    for i,package in ipairs(PACKAGES) do
+    for i,package in ipairs(_PACKAGES) do
         if str:find(package) == expected then return package end
     end
     error("Could not find package for '"..str.."'!")
@@ -33,8 +33,8 @@ local function create_submodule(vpath, rpath, ...)
     _IMPORTED[vpath] = {..., module_name = mname(vpath), real_path = rpath}
 end
 -- Protect against double-loading the main booting path:
-for _,vpath in ipairs {"Main", "core.Main", "core.globals.Modules"} do
-    create_submodule(vpath, virtual_path_to_real("modules", vpath))
+for _,vpath in ipairs {"GlobalVariableLoader", "Main", "ModuleSystem"} do
+    create_submodule(vpath, virtual_path_to_real("core", vpath))
 end
 
 local function mname(vpath) return vpath:split(".")[1] end
@@ -62,7 +62,7 @@ function find_submodules(vpath, --[[Optional]] recursive, --[[Optional]] pattern
         filter = function(c) return c:match(pattern) end
     end
     local ret = {}
-    for _, package in ipairs(PACKAGES) do
+    for _, package in ipairs(_PACKAGES) do
         local root =  virtual_path_to_real(package, vpath)
         for file in values(io.directory_search(root, (pattern or "*") .. ".lua", recursive or false)) do
             local c = virtual_path_create_relative(file, package)
@@ -106,7 +106,7 @@ end
 
 local function import_file(vpath)
     local errs = nil
-    for i,package in ipairs(PACKAGES) do 
+    for i,package in ipairs(_PACKAGES) do 
         local data, err = import_file_from_package(package, vpath)
         if data then return data end
         if err then 
@@ -129,15 +129,24 @@ _import_resolvers = { import_file, --[[Engine defined]] LEngine.import_internal_
 --------------------------------------------------------------------------------
 
 local root_imports = {}
-for _,package in ipairs(PACKAGES) do
+for _,package in ipairs(_PACKAGES) do
     root_imports[package] = {}
 end
 
--- Import a file from the current package's root (ie, does not exist in any module)
-function import_root(vpath)
-    local package = package_name(2)
-    local data, err = import_file_rpath(package .. '/' .. vpath)
-    if err then error(err) end
+-- Import a file from a package's root (ie, does not exist in any module)
+local function import_root_aux(package, vpath)
+    local cache = root_imports[package]
+    local data,err = cache[vpath],nil
+    if not data then
+        data, err = import_file_rpath(string.format("%s/%s.lua", package, vpath))
+        cache[vpath] = data
+    end
+    return data, err
+end
+
+function import_root(package, vpath)
+    local data,err = import_root_aux(package, vpath)
+    if not data then error(err) end
     return unpack(data)
 end
 
@@ -158,16 +167,24 @@ local default_import_args = {
 function import(vpath, --[[Optional]] args)
     args = args or default_import_args
     local mname, cache_check_only = args.module_name, args.cache_check_only
- 
+
     local first_chr = vpath:sub(1,1)
     local vpath_rest = vpath:sub(2, #vpath)
     if first_chr == '@' then
+        -- This is a module-local import. The name of the current module replaces '@'.
         mname = mname or module_name(2)
         vpath = mname .. '.' .. vpath_rest
     elseif first_chr == '.' then
+        -- This is a relative import. The current virtual path is used for look-up.
         local path_root = virtual_path(2, --[[Drop ending filename]] true)
         if path_root == "" then vpath = vpath_rest
         else vpath = path_root .. '.' .. vpath_rest end
+    elseif not vpath:find("%.") then 
+        -- Try to see if we are a root import within the current package. A root import does not live within a
+        -- module and cannot normally be imported from another package, except explicitly by 'import_root'. 
+        local data,__ignored_err = import_root_aux(package_name(2), vpath)
+        if data then return unpack(data) end
+        -- Otherwise, not a root import. We carry on as normal; it can also be a shortform: eg, 'foo' expands to 'foo.foo'
     end
 
     local module = _IMPORTED[vpath] or _LOADED[vpath]
@@ -207,6 +224,7 @@ function import_all(subpackage, --[[Optional]] recursive, --[[Optional]] pattern
     for c in values(content) do import(c) end
 end
 
+-- Import a mutable copy of (potentially) multiple submodules merged together.
 function import_copy(...)
     local copy = {}
     for i=1,select("#", ...) do
@@ -217,5 +235,3 @@ function import_copy(...)
     end
     return copy
 end
-
---Errors = import ".Errors" TODO

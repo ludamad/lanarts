@@ -1,9 +1,9 @@
 local Display = import "core.Display"
 
-local InstanceBox = import "core.ui.InstanceBox"
-local InstanceLine = import "core.ui.InstanceLine"
-local TextLabel = import "core.ui.TextLabel"
-local Sprite = import "core.ui.Sprite"
+local InstanceBox = import "ui.InstanceBox"
+local InstanceLine = import "ui.InstanceLine"
+local TextLabel = import "ui.TextLabel"
+local Sprite = import "ui.Sprite"
 
 local cached_screen
 local setup_callback

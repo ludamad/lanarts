@@ -1,4 +1,4 @@
-local EventLog = import "core.ui.EventLog"
+local EventLog = import "ui.EventLog"
 
 local Apts = import "@stats.AptitudeTypes"
 local StatContext = import "@StatContext"

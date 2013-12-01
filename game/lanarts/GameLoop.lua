@@ -3,7 +3,7 @@
 ]]
 
 local Display = import "core.Display"
-local EventLog = import "core.ui.EventLog"
+local EventLog = import "ui.EventLog"
 
 local GameState = import "core.GameState"
 local World = import "core.World"

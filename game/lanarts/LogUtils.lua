@@ -1,6 +1,6 @@
-local EventLog = import "core.ui.EventLog"
+local EventLog = import "ui.EventLog"
 local Players = import "@Players"
-local AnsiColors = import "core.terminal.AnsiColors"
+local AnsiColors = import "terminal.AnsiColors"
 
 local M = nilprotect {} -- Submodule
 
