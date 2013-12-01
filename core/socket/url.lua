@@ -11,7 +11,7 @@
 local base = _G
 local string = base.string
 local table = base.table
-module("core.socket.url")
+module("socket.url")
 
 -----------------------------------------------------------------------------
 -- Module version

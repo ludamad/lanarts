@@ -7,7 +7,7 @@ local TextLabel = import "core.ui.TextLabel"
 local Sprite = import "core.ui.Sprite"
 local keys = import "core.Keyboard"
 
-local winning_screen_font = "game/core/fonts/MateSC-Regular.ttf"
+local winning_screen_font = "game/fonts/MateSC-Regular.ttf"
 
 local function winning_screen_create()
     local box = InstanceBox.create( { size = Display.display_size} )

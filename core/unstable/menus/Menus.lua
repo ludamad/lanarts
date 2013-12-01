@@ -4,7 +4,7 @@ local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
 local GameState = import "core.GameState"
 local Network = import "core.Network"
-local Tasks = import "core.networking.Tasks"
+local Tasks = import "networking.Tasks"
 local Keys = import "core.Keyboard"
     
 -- START SCREEN -- 

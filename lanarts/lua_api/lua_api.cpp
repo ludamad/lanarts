@@ -131,14 +131,12 @@ namespace lua_api {
 	void register_lua_libraries(lua_State* L) {
 		LuaValue preload = luawrap::globals(L)["package"]["preload"];
 		lua_pushcfunction(L, luaopen_socket_core);
-		lua_api::register_lua_submodule_loader(L, "core.socket.core", LuaValue::pop_value(L));
+		lua_api::register_lua_submodule_loader(L, "socket.core", LuaValue::pop_value(L));
 		lua_pushcfunction(L, luaopen_mime_core);
-		lua_api::register_lua_submodule_loader(L, "core.mime.core", LuaValue::pop_value(L));
-		lua_pushcfunction(L, luaopen_mime_core);
-		lua_api::register_lua_submodule_loader(L, "core.mime.core", LuaValue::pop_value(L));
+		lua_api::register_lua_submodule_loader(L, "mime.core", LuaValue::pop_value(L));
 		lua_pushcfunction(L, luayaml_module);
 		lua_call(L, 0, 1);
-		lua_api::register_lua_submodule(L, "core.yaml", LuaValue::pop_value(L));
+		lua_api::register_lua_submodule(L, "yaml", LuaValue::pop_value(L));
 
 		lua_register_lcommon(L);
 		preload["socket.core"].bind_function(luaopen_socket_core);

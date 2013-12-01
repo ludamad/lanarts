@@ -4,6 +4,7 @@
 _ROOT_FOLDER = "core"
 -- For bootstrapping purposes. We normally only use 'import'.
 require_path_add(_ROOT_FOLDER .. '/?.lua')
+require_path_add(_ROOT_FOLDER .. '/socket/?.lua')
 
 require("Globals")
 

@@ -91,8 +91,17 @@ local function import_file_rpath(rpath, vpath)
     end
 end
 
+local function lastentry(vpath)
+    local parts = vpath:split(".")
+    return parts[#parts]
+end
+
 local function import_file_from_package(package, vpath)
-    return import_file_rpath(virtual_path_to_real(package, vpath) .. '.lua', vpath)
+    local data, err = import_file_rpath(virtual_path_to_real(package, vpath) .. '.lua', vpath, package)
+    if not data and package then
+        data = import_file_rpath(virtual_path_to_real(package, vpath .. "." .. lastentry(vpath)) .. '.lua')
+    end
+    return data, err    
 end
 
 local function import_file(vpath)
@@ -113,7 +122,6 @@ function import_internal(vpath)
 end
 
 _import_resolvers = { import_file, --[[Engine defined]] LEngine.import_internal_raw }
-
 
 --------------------------------------------------------------------------------
 -- Handle root imports. These imports always resolve to the current package

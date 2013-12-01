@@ -5,14 +5,14 @@ local InstanceLine = import "core.ui.InstanceLine"
 local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
 
-local lobby = import "core.networking.Lobby"
-local tasks = import "core.networking.Tasks"
+local lobby = import "networking.Lobby"
+local tasks = import "networking.Tasks"
 
 local game_entry_draw
 local logo_path = "game/lanarts/LANARTS.png"
 local small_font = font_cached_load(settings.font, 10)
 local large_font = font_cached_load(settings.font, 20)
-local alt_font = font_cached_load("game/core/fonts/MateSC-Regular.ttf", 14)
+local alt_font = font_cached_load("game/fonts/MateSC-Regular.ttf", 14)
 
 local SETTINGS_BOX_MAX_CHARS = 18
 local SETTINGS_BOX_SIZE = {180, 34}

@@ -5,9 +5,9 @@
 
 local jsonlib = import "core.Json"
 local string = _G.string
-local socket = import "core.Socket"
-local http = import "core.socket.Http"
-local ltn12 = import "core.Ltn12"
+local socket = import "socket"
+local http = import "socket.http"
+local ltn12 = import "socket.ltn12"
 
 local YieldingSocket = newtype()
 

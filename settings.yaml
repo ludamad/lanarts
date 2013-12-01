@@ -8,8 +8,8 @@ view_width: 700
 view_height: 500
 
 #Font settings
-font: core/core/fonts/Gudea-Regular.ttf
-menu_font: core/core/fonts/alagard_by_pix3m-d6awiwp.ttf
+font: game/fonts/Gudea-Regular.ttf
+menu_font: game/fonts/alagard_by_pix3m-d6awiwp.ttf
 
 #Performance settings
 steps_per_draw: 1 #More is almost guaranteed to make the game faster, 1 is ideal

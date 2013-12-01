@@ -13,11 +13,11 @@ local coroutine = _G.coroutine
 local string = _G.string
 local math = _G.math
 local os = _G.os
-local socket = import("core.Socket")
-local tp = import("core.socket.Tp")
-local ltn12 = import("core.Ltn12")
-local mime = import("core.Mime")
-module("core.socket.smtp")
+local socket = import("socket")
+local tp = import("@tp")
+local ltn12 = import("@ltn12")
+local mime = import("@mime")
+module("socket.smtp")
 
 -----------------------------------------------------------------------------
 -- Program constants

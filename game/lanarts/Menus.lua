@@ -12,7 +12,7 @@ local LobbyMenu = import "@menus.LobbyMenu"
 local PregameMenu = import "@menus.PregameMenu"
 local ScoresMenu = import "@menus.ScoresMenu"
 
-local Tasks = import "core.networking.Tasks"
+local Tasks = import "networking.Tasks"
 local Keys = import "core.Keyboard"
     
 -- START SCREEN -- 

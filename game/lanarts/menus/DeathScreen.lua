@@ -8,7 +8,7 @@ local Sprite = import "core.ui.Sprite"
 
 local Keys = import "core.Keyboard"
 
-local death_screen_font = "game/core/fonts/MateSC-Regular.ttf"
+local death_screen_font = "game/fonts/MateSC-Regular.ttf"
 
 local function death_screen_create()
     local box = InstanceBox.create( { size = Display.display_size} )

@@ -9,7 +9,7 @@
 -----------------------------------------------------------------------------
 local base = _G
 
-import("core.socket.core")
+import("socket.core")
 
 module("socket")
 
@@ -131,4 +131,4 @@ sourcet["default"] = sourcet["until-closed"]
 
 source = choose(sourcet)
 
-return base.getfenv()
+return base.table.clone(base.getfenv())

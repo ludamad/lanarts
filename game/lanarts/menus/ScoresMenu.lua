@@ -7,7 +7,7 @@ local Sprite = import "core.ui.Sprite"
 local TextLabel = import "core.ui.TextLabel"
 local Keys = import "core.Keyboard"
 
-local score_menu_font = "game/core/fonts/alagard_by_pix3m-d6awiwp.ttf"
+local score_menu_font = "game/fonts/alagard_by_pix3m-d6awiwp.ttf"
 
 -- This is a hack.
 -- Currently we cannot rely on the sprites being loaded, so we duplicate information from class_sprites.yaml here
@@ -49,7 +49,7 @@ end
 
 local function score_entry_draw(entry, ranking, ex, ey, ew, eh)
     -- Draw ranking
-    local ranking_font = font_cached_load("game/core/fonts/MateSC-Regular.ttf", 14)
+    local ranking_font = font_cached_load("game/fonts/MateSC-Regular.ttf", 14)
     local ranking_color = vector_interpolate(COL_YELLOW, COL_DARK_GRAY, (ranking-1) / 10)
     ranking_font:draw( 
         {color = ranking_color, origin = Display.RIGHT_CENTER}, 
@@ -72,7 +72,7 @@ local function score_entry_draw(entry, ranking, ex, ey, ew, eh)
     )
 
     -- Draw timestamp
-    draw_colored_parts(font, RIGHT_TOP, {ex + ew - 4, ey + 2},
+    draw_colored_parts(font, Display.RIGHT_TOP, {ex + ew - 4, ey + 2},
         {COL_LIGHT_GRAY,
          os.date("%Y %b %d %I:%M%p", entry.timestamp)}
     )

@@ -9,8 +9,8 @@
 -- Declare module and import dependencies
 -----------------------------------------------------------------------------
 local base = _G
-local ltn12 = import("@Ltn12")
-local mime = import("@mime.core")
+local ltn12 = import("@ltn12")
+local mime = import("mime.core")
 
 module("mime")
 

@@ -10,9 +10,9 @@
 -----------------------------------------------------------------------------
 local base = _G
 local string = _G.string
-local socket = import("core.Socket")
-local ltn12 = import("core.Ltn12")
-module("core.socket.tp")
+local socket = import("socket")
+local ltn12 = import("@ltn12")
+module("socket.tp")
 
 -----------------------------------------------------------------------------
 -- Program constants
