@@ -45,16 +45,17 @@ function AssignBatcher:add(parts, f)
 end
 function AssignBatcher:emit(parts)
     if not self.offset then return end
-    local i_start, i_end = self.offset, self.offset+self.batches*self.dx
+    local dx = self.dx or 1
+    local i_start, i_end = self.offset, self.offset+(self.batches-1)*dx
     if self.batches <= 3 then
-        for i=i_start,i_end,self.dx do
+        for i=i_start,i_end,dx do
             append(parts, ("  rawset(data, pos+%d, rawget(odata, opos+%d))"):format(
                 self.kroot + i, i
             ))
         end
     else
         append(parts, ("  for i=%d,%d%s do rawset(data, pos+%d+i, rawget(odata, opos+i)) end"):format(
-            i_start,i_end, (self.dx == 1) and '' or ','..self.dx, self.kroot
+            i_start,i_end, (dx == 1) and '' or ','..self.dx, self.kroot
         ))
     end 
     self:init(self.kroot)

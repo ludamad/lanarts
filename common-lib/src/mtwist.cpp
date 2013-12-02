@@ -175,7 +175,7 @@ double MTwist::genrand_res53(void)
 double MTwist::guassian(double average, double std_dev, int n_trials) {
     double sum = 0.0;
     for( int i = 0; i < n_trials; i++ ) {
-        sum += genrand_res53();
+        sum += genrand_real1();
     }
     sum -= ( (double)n_trials / 2.0 );
     sum = average + sum * ( std_dev / ( sqrt((double)n_trials / 12.0 )) );
