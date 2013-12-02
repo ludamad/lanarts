@@ -39,4 +39,4 @@ add_subdirectory( draw-lib )
 add_subdirectory( net-lib )
 add_subdirectory( sound-lib )
 
-add_subdirectory( lanarts )
+add_subdirectory( src )

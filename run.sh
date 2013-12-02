@@ -19,7 +19,7 @@ fi
 # Run lanarts
 if handle_flag "--gdb" || handle_flag "-g" ; then
     echo "Wrapping in GDB:" | colorify '1;35'
-    gdb -silent -ex=r --args ../lanarts_build/lanarts/lanarts $args
+    gdb -silent -ex=r --args ../lanarts_build/src/lanarts $args
 else
-    ../lanarts_build/lanarts/lanarts $args
+    ../lanarts_build/src/lanarts $args
 fi

@@ -96,6 +96,8 @@ public:
 		return float((r.max - r.min) * genrand_real1() + r.min);
 	}
 
+	double guassian(double average, double std_dev, int n_trials);
+
 	int amount_generated() const {
 		return _amount_generated;
 	}

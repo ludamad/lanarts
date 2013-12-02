@@ -41,7 +41,8 @@
    email: m-mat @ math.sci.hiroshima-u.ac.jp (remove space)
 */
 
-#include <stdio.h>
+#include <cstdio>
+#include <cmath>
 #include <ctime>
 #include "mtwist.h"
 
@@ -170,3 +171,14 @@ double MTwist::genrand_res53(void)
     unsigned int a=genrand_int32()>>5, b=genrand_int32()>>6;
     return(a*67108864.0+b)*(1.0/9007199254740992.0); 
 } 
+
+double MTwist::guassian(double average, double std_dev, int n_trials) {
+    double sum = 0.0;
+    for( int i = 0; i < n_trials; i++ ) {
+        sum += genrand_res53();
+    }
+    sum -= ( (double)n_trials / 2.0 );
+    sum = average + sum * ( std_dev / ( sqrt((double)n_trials / 12.0 )) );
+    _amount_generated++;
+    return sum;
+}
