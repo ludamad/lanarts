@@ -11,13 +11,27 @@ require("GlobalVariableLoader")
 
 local argv -- Placeholder, set in main()
 
+local LOOKS_LIKE_FLAG = "^[%-]+[^%s]+$"
+
+local function get_varparam(flag, --[[Optional]] max_params)
+    local params = {} ; for i,v in pairs(argv) do
+        if v == flag then
+            for j=i+1,i+1+max_params do
+                local param = argv[j]
+                if not param or param:match(LOOKS_LIKE_FLAG) then break end
+                append(params, param)
+            end 
+        end
+    end ; return unpack(params)
+end 
+
 local function get_param(flag) 
-    for i,v in pairs(argv) do 
+    for i,v in pairs(argv) do
         local match = v:match(flag .. ":(.*)")
         match = match or (v == flag and argv[i+1])
         if match then
             assertf(match, "Expected parameter but none given for '%s'!", flag)
-            assertf(not match:match("^%-%-[^%s]+$"), "Aborting because parameter '%s' for '%s' looks like a flag.", match, flag)
+            assertf(not match:match("^[%-]+[^%s]+$"), "Aborting because parameter '%s' for '%s' looks like a flag.", match, flag)
             return match
         end 
     end
@@ -27,17 +41,17 @@ local function has_arg(s) return table.contains(argv, s) end
 local function num_param(s) local param = get_param(s) ; return param and tonumber(param) end
 
 -- Special global table; holds command-line arguments parsing utilities.
-sysargs = {get_param=get_param, has_arg=has_arg, num_param=num_param}
+sysargs = {get_varparam=get_varparam, get_param=get_param, has_arg=has_arg, num_param=num_param}
 
 function sysargs.argv() return table.clone(argv) end
 
--- Start the beta version of dungenerate, simply 'Lanarts'
+-- Start the beta version of dungenerate, was simply named 'Lanarts'
 local function start_lanarts()
     local Display = import "core.Display"
     Display.initialize("Lanarts", {settings.view_width, settings.view_height}, settings.fullscreen)
     -- TODO: Remove any notion of 'internal graphics'. All graphics loading should be prompted by Lua.
     __initialize_internal_graphics()
-    
+
     -- Hardcoded for now!
     import "lanarts.Main"
 

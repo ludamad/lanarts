@@ -13,7 +13,7 @@ M = {
     filter_patterns = {
         -- Lines to delete starting with this line and going up
         ["%s*core/ErrorReporting%.lua.* in function .*"] = 1,
-        ["%s*core/globals/Modules%.lua.* in function 'import'"] = 2,
+        ["%s*core/ModuleSystem%.lua.* in function 'import.*'"] = 2,
         ["%s*core/Main.lua"] = 1,
         ["%s*%[C%]: in function 'error'"] = 4
     },

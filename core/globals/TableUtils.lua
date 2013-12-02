@@ -1,3 +1,5 @@
+-- TODO: If such monolithic extension of the 'table' package is to be considered kosher, we must document this fully.
+
 -- Cache for small performance boost
 local type, select, setmetatable, getmetatable, rawget, pairs, ipairs, table = type, select, setmetatable, getmetatable, rawget, pairs, ipairs, table
 
@@ -126,6 +128,14 @@ function table.value_key_invert(t)
     return ret
 end
 
+function table.filter_matches(t, pattern)
+    for i=#t,1,-1 do
+        if t[i]:match(pattern) then
+            t[i] = t[i - 1]
+        end
+    end
+end
+
 -- Trick to get internal 'next' function
 local tablefirst,_ = pairs({})
 function table.is_empty(t)
@@ -222,6 +232,13 @@ function table.scaled(t, scale)
     return ret
 end
 
+function table.slice(t, i_start, i_end)
+    local ret = {}
+    for i=i_start,i_end do
+        append(ret, t[i])
+    end
+    return ret
+end
 
 function table.add(a,b)
     for k,v in pairs(b) do

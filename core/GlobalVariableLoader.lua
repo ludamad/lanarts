@@ -19,21 +19,17 @@ nilprotect(_G)
 require "ModuleSystem"
 
 import "ErrorReporting"
-import "globals.FileUtils" -- For 'file_exists'
 
 -- Find all global definitions
-for _,package in ipairs(_PACKAGES) do
-    local modules = io.directory_subdirectories(package)
-    for _,module in ipairs(modules) do
-        if module == "globals" then
-            import_all(module)
-        else
-            if file_exists(package.."/"..module.."/Globals.lua") then
-                import(module..".Globals")
-            end
-            if file_exists(package.."/"..module.."/globals") then
-                import_all(module..".globals")
-            end
+for module,package in module_iter() do
+    if module == "globals" then
+        import_all(module)
+    else
+        if file_exists(package.."/"..module.."/Globals.lua") then
+            import(module..".Globals")
+        end
+        if file_exists(package.."/"..module.."/globals") then
+            import_all(module..".globals")
         end
     end
 end

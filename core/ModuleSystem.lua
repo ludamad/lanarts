@@ -4,6 +4,14 @@ _PACKAGES = {"core", "game", "example"} -- Hardcoded for now
 -- Path utility functions
 --------------------------------------------------------------------------------
 
+--- Return whether a file with the specified name exists.
+-- More precisely, returns whether the given file can be opened for reading.
+function file_exists(name)
+    local f = io.open(name,"r")
+    if f ~= nil then io.close(f) end
+    return f ~= nil
+end
+
 local function find_package(str)
     local expected = (str:sub(1,1) == "@") and 2 or 1
     for i,package in ipairs(_PACKAGES) do
@@ -78,16 +86,15 @@ end
 -- Import resolvers
 --------------------------------------------------------------------------------
 local function import_file_rpath(rpath, vpath)
-    -- Note, '__loadfile' appears in debug traces and thus the name choice should be clear
+    if not file_exists(rpath) then
+        return nil, ("import: File " .. rpath .. " does not exist")
+    end
     local _load, err = loadfile(rpath)
     if _load then
         local data = { _load(vpath) }
         return data
-    else
-        if err:find("No such file or directory") then
-            err = ("File " .. rpath .. " does not exist")
-        end
-        return nil, "'import_file': " .. err
+    else -- The file exists, but there was an error. Do not continue.
+        error(err)
     end
 end
 
@@ -234,4 +241,19 @@ function import_copy(...)
     	end
     end
     return copy
+end
+
+-- Iterates, returning [module, package]
+function module_iter()
+    local i,j = 1,1
+    local package,list = nil,nil
+    return function()
+        while not list or j > #list do
+            i = i+1 ; package = _PACKAGES[i-1]
+            if not package then return nil end
+            local modules = io.directory_subdirectories(package)
+            list = modules ; j = 1
+        end
+        j = j+1 ; return list[j-1], package
+    end
 end

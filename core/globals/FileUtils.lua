@@ -1,13 +1,5 @@
 local Sound = import "core.Sound"
 
---- Return whether a file with the specified name exists.
--- More precisely, returns whether the given file can be opened for reading.
-function file_exists(name)
-    local f = io.open(name,"r")
-    if f ~= nil then io.close(f) end
-    return f ~= nil
-end
-
 --- Return a dummy sound or music object if the given file does not exist.
 -- Otherwise return the result of 'loader' on the file.
 local function snd_optional_load(file, loader)  
