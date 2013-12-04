@@ -137,9 +137,10 @@ function table.filter_matches(t, pattern)
 end
 
 -- Trick to get internal 'next' function
-local tablefirst,_ = pairs({})
+local next,_ = pairs({})
+_G.next = next
 function table.is_empty(t)
-    return #t==0 and not tablefirst(t)
+    return #t==0 and not next(t)
 end
 
 function table.pop_first(t)

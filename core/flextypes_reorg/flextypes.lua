@@ -1,42 +1,19 @@
--- Defines parse_line 'method'
+local M = import_copy("@flexcore", "@flexparse", "@primitives", "@structfieldtype") -- Forward 'private' submodules
 
 local M = nilprotect {} -- Submodule
 
-local Field = newtype()
-
-function Field:init(name, type, typename, offset, is_embedded, initializer)
-    self.name = name -- Same as type name for embedded member
-    self.type, self.typename = type, typename
-    self.offset = offset -- The offset to the object representation of this member, eg a slice object
-    self.is_embedded = is_embedded
-    self.initializer = initializer or false -- If false, passed as argument to create
-    self.is_leaf = (self.type.children == 0)
-    self.has_alias = true
-end
-
-do -- Restrict scope of lazy import
-    local StructType -- Lazy imported
-    function M.define_field(T, name, typename, is_embedded, initializer)
-        StructType = StructType or import ".StructType" -- Lazy import
-
-        assert(not T.name_to_field[name], "Name '" .. name .. "' already used in type!")
-        local type = T:lookup_type(typename)
-        assert(not (is_embedded and not getmetatable(type) == StructType), "Cannot embed primitive type!")
-        local field = Field.create(name, type, typename, T.children + 1, is_embedded, initializer)
-        T.name_to_field[name] = field ; append(T.fields, field)
-        T.children = T.children + type.children + 1
-    end
-end
-
-
 local IDENTIFIER = "[%w_%-]+"
 local IDENTIFIER_ALL = "^"..IDENTIFIER.."$"
+local EXTEND = "^%s*extend%s+(" .. IDENTIFIER .. ")$"
+-- Return (typename, initializer)
+local TYPESPEC = "^("..IDENTIFIER..")$"
+local TYPESPEC_WITH_INIT = "^("..IDENTIFIER..")%s*%((.*)%)$"
+local NAMED_EMBED = "^([^%s]+)%s+as%s+([^%s]+)$"
 
 local function validate_varname(name)
-    assert(name:match(IDENTIFIER_ALL), "'" .. name .. "' is not a valid name.")
+    assertf(name:match(IDENTIFIER_ALL), "'%s' is not a valid name.", name)
 end
 
-local EXTEND = "^%s*extend%s+(" .. IDENTIFIER .. ")$"
 local function parse_extend(T, line)
     local typename = line:match(EXTEND)
     if typename then
@@ -46,9 +23,6 @@ local function parse_extend(T, line)
     end
     return false
 end
--- Return (typename, initializer)
-local TYPESPEC = "^("..IDENTIFIER..")$"
-local TYPESPEC_WITH_INIT = "^("..IDENTIFIER..")%s*%((.*)%)$"
 local function parse_typespec(typespec)
     local name, initializer = typespec:match(TYPESPEC_WITH_INIT)
     if not name then
@@ -59,7 +33,6 @@ local function parse_typespec(typespec)
     return name, initializer
 end
 
-local NAMED_EMBED = "^([^%s]+)%s+as%s+([^%s]+)$"
 local function parse_embedded(T, line)
     local typespec, name = line:match(NAMED_EMBED)
     if not typespec then typespec = line end 

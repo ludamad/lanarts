@@ -49,8 +49,6 @@ function newtype(args)
         return val
     end
 
-    type.parent_init = parent and parent.init or do_nothing
-
     function type:__index(k)
         local getter = get[k]
         if getter then return getter(self, k) end

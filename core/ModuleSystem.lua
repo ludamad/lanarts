@@ -233,7 +233,7 @@ end
 
 -- Import a mutable copy of (potentially) multiple submodules merged together.
 function import_copy(...)
-    local copy = {}
+    local copy = nilprotect {} -- Make sure nil access errors instead.
     for i=1,select("#", ...) do
         local module = import(select(i, ...))
     	for k,v in pairs(module) do

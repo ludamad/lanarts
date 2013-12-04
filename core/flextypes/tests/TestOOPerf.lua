@@ -8,6 +8,8 @@ end
 local rawget,rawset,assert,error=rawget,rawset,assert,error
 local tinsert, tdeep_clone = table.insert, table.deep_clone
 
+local test_math_func1,test_math_func2,test_math_func3 = math.sin, math.cos, math.exp
+
 local function benchmark_type(desc, T, S)
     local N = 500000
     local objects, copies = {}, {}
@@ -28,10 +30,17 @@ local function benchmark_type(desc, T, S)
     benchmark(desc .. " %sms\t" ..N.. " Object Mutation", function()
         for i=1,N,2 do
             local obj1,obj2 = objects[i],objects[i+1]
-            for j=1,2 do
-                obj1.c.v = obj2.a.v * obj2.b.v
-                obj2.a.v = obj1.c.v + obj1.b.v
-            end
+            obj1.c.v = obj2.a.v * obj2.b.v
+            obj2.a.v = obj1.c.v + obj1.b.v
+        end
+    end)
+    benchmark(desc .. " %sms\t" ..N.. " Object Mutation 2", function()
+        for i=1,N,1 do
+            local obj=objects[i]
+            local a,b,c=obj.a,obj.b,obj.c
+            a.v = test_math_func1(i)
+            b.v = test_math_func2(i)
+            c.v = test_math_func3(i)
         end
     end)
 --    if not desc:match "ffi" then 
@@ -63,8 +72,8 @@ function TestCases.OOPerf_newtype()
     benchmark_type("newtype", NT_Complex, NT_Simple)
 end
 
+local CL_Simple = { create = function(v) return {v=v} end}
 function TestCases.OOPerf_simpletable()
-    local CL_Simple = { create = function(v) return {v=v} end}
     local CL_Complex = { create = function(a, b, c) return {a=a,b=b,c=c} end}
     
     benchmark_type("simpletable", CL_Complex, CL_Simple)
@@ -88,7 +97,8 @@ function TestCases.OOPerf_unrolled_ifelsechain()
         rawset(self, idx, v)
     end
     
-    benchmark_type("Unrolled", Unrolled_Complex, Unrolled_Simple)
+    benchmark_type("Unrolled1", Unrolled_Complex, Unrolled_Simple)
+    benchmark_type("Unrolled1_with_simple", Unrolled_Complex, CL_Simple)
 end
 
 function TestCases.OOPerf_unrolled_indexmap()
@@ -104,7 +114,7 @@ end
 
 function TestCases.OOPerf_flextypes_table_based()
     local Flex = {}
-    typedef(Flex) "Simple" [[v : int]]
+    typedef(Flex) "Simple" [[v : double]]
     typedef(Flex) "Complex" [[a, b, c : Simple]]
 
     benchmark_type("Flex_warmup", Flex.Complex, Flex.Simple)
@@ -119,7 +129,7 @@ function TestCases.OOPerf_ffi()
     local ffi = require("ffi")
     
     ffi.cdef [[
-        typedef struct { int v; } FFI_Simple;
+        typedef struct { double v; } FFI_Simple;
         typedef struct { FFI_Simple a, b, c; } FFI_Complex;
     ]]
     
