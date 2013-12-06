@@ -58,7 +58,7 @@ function newtype(args)
             local idx_fun = parent.__index
             if idx_fun then return idx_fun(self, k) end
         end
-        error(("Class object '%s': Cannot read '%s', member does not exist!\n"):format(tostring(self), tostring(k)))
+        error(("Cannot read '%s', member does not exist!\n"):format(tostring(k)))
     end
 
     function type:__newindex(k, v)

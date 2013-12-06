@@ -48,14 +48,12 @@ end
 local function parse_embed(T, typename, --[[Optional]] initializer, --[[Optional]] field_name)
     local typespec, name = line:match(NAMED_EMBED)
     if not typespec then typespec = line end 
-    local typename, initializer = parse_typespec(typespec)
     if not name then name = typename end
     validate_varname(name)
     M.define_field(T, name, typename, --[[Embedded]] true, --[[May-be-null]] initializer)
 end
 
 local function parse_field_def(T, vars, typename, --[[Optional]] initializer)
-    local typename, initializer = parse_typespec(typespec)
     for name in values(vars:trimsplit(",")) do
         validate_varname(name)
         T:field_add()

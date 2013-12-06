@@ -10,18 +10,47 @@ local function handle_cpp_tests(args)
     end
 end
 
+local DOTLINE = "---------------------------------"
+
+
+local function pluralize(num, noun)
+    return num .. " " .. noun .. (num == 1 and "" or "s")
+end
+
 local function run_tests(suitelist)
     local AC = import "terminal.AnsiColors"
 
-    local test_i,fails = 1,0
+    local test_n,fails = 0,0
+    local summary = {"{bold_white:Summary:} {white:|}"}
     for suite in values(suitelist) do
         for test in values(suite) do
+            test_n = test_n + 1
             local name,f = unpack(test)
-            local ok,err = pcall(f)
-            colprintf("[BOLD_RESET|%d) %s][WHITE| for %s (in %s)]", test_i, "Pass", name, suite.name)
-            test_i = test_i + 1
+            local ok,err = xpcall(f, debug.traceback)
+            if not ok then 
+                colprintf("{bold_white:%d)} {bold_red:× FAILURE}{white: for }{bold_white:%s}{white: (in %s)}", test_n, name, suite.name)
+                print(err)
+                fails = fails + 1
+            else
+                colprintf("{bold_white:%d)} {bold_white:✓ Pass}{white: for }{bold_white:%s}{white: (in %s)}", test_n, name, suite.name)
+            end
+            append(summary, ok and "{bold_white:✓}" or "{bold_red:×}")
         end
+        append(summary, '{white:|}')
     end
+
+    colprintf("{white:%s}", DOTLINE)
+    local fails_str = pluralize(fails, "failure")
+    append(summary, fails == 0 and " {white:with no failures.}" or " {white:with }{bold_red:"..fails_str..".}")
+    colprintf(table.concat(summary))
+
+    if fails > 0 then
+        colprintf("{bold_white:Some tests have} {bold_red:failed!}\n{bold_white:%d/%d} {bold_red:tests failed.}", fails, test_n)
+    else
+        colprintf("{bold_white:Test suite has passed.\nAll %d tests have} {bold_green:passed!}", test_n)
+    end
+    colprintf("{white:%s}", DOTLINE)
+    return (fails == 0)
 end
 
 function M.main(args)

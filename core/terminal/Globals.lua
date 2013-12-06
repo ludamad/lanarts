@@ -1,21 +1,36 @@
 local AnsiColors -- Lazily imported
 
+local PARAM_SPECS = {
+    BOLD = ";1",
+    FAINT = ";2",
+    ITALIC = ";3",
+    UNDERLINE = ";4",
+    CROSS = ";9",
+}
+
+local function resolve_col_and_params(colspec)
+    -- Split comma-separated traits
+    local traits = colspec:upper():split("_")
+    local col,params = "RESET",""
+    for t in values(traits) do
+        if PARAM_SPECS[t] then params = params .. PARAM_SPECS[t] 
+        elseif t ~= '' then col = t end
+    end
+    return col,params
+end
+
 local function colorfmt_aux(sub)
-    printf("'%s'",sub)
-    local col,str = sub:match("^%[([%w_]+)|(.*)%]$")
-    if not col then return sub end
-    local mod = nil
-    local rest = col:match("^BOLD_(.*)$")
-    if rest then col = rest ; mod = AnsiColors.BOLD end
-    str = AnsiColors[col](str, mod)
-    str = str:gsub("%b[]", colorfmt_aux)
+    local colspec,str = sub:match("^%{([%w_]+):(.*)%}$")
+    if not colspec then return sub end
+    local col, params = resolve_col_and_params(colspec)
+    str = AnsiColors[col](str, params)
+    str = str:gsub("%b{}", colorfmt_aux)
     return str
 end
-function colorfmt(str)
+function colfmt(str, ...)
     AnsiColors = AnsiColors or import "@AnsiColors"
-    local str = str:gsub("%b[]", colorfmt_aux)
-    return str
+    local str = str:format(...):gsub("%b{}", colorfmt_aux) ; return str
 end
 function colprintf(str, ...)
-    return print(colorfmt(fmt(str, ...)))
+    return print(colfmt(str, ...))
 end

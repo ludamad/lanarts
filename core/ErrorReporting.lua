@@ -21,21 +21,19 @@ M = {
         [modulestart "GlobalVariableLoader%.lua:.*'__index'"] = 1,
         [modulestart "ModuleSystem%.lua:%s+:.*'import.*'"] = 2,
         [modulestart "globals/General%.lua:.*'errorf'"] = 2,
+        [modulestart "globals/LuaJITReplacements%.lua:.*'__index'"] = 2,
         [modulestart "Main.lua"] = 1,
         [modulestart "TestRunner.lua:[^']+'main'"] = 1,
         ["%s*%[C%]: in function 'error'"] = 4
     },
     
     stacktrace_replacements = {
-        {"stack traceback:", function(s) return M.resolve_color("WHITE", s) end}
+        {"stack traceback:", function(s) return M.resolve_color("WHITE", s) end},
+        {"%[C%]:.*'", function(s) return colfmt("{faint_white:%s}", s) end}
     },
     
     error_replacements = {
-        {"core/core/globals/Modules%.lua:%d+: ", ""},
-        {LUAMODULE_PATTERN, function(s) return M.resolve_color("WHITE", s) end},
---        {"'[_%w]+'", function(s) return M.resolve_color("WHITE", s) end},
-        {'%d+', function(s) return M.resolve_color("WHITE", s) end},
-        {LUAFILE_PATTERN, function(s) return M.resolve_color("WHITE", s) end}
+        {modulestart ".*%.lua:%d+:%s*", function(s) return '' end}
     },
     
     virtual_paths = true, 
@@ -54,14 +52,13 @@ function M.resolve_context(fpath, line_num, context)
     -- Find lines within [min_i, max_i]
     for line in file:lines() do
         if i == line_num then
-            table.insert(arr, M.resolve_color("WHITE", ">> " .. line, ";1"))
+            append(arr, colfmt("{bold_blue:  %3d }{bold_blue:%s}", i, line))
         elseif i >= min_i and i <= max_i then
-            table.insert(arr, M.resolve_color("YELLOW", ".. " .. line, ";2"))
+            append(arr, colfmt("{bold_blue:  %3d }{blue:%s}", i, line))
         end
         i = i + 1
     end
-    table.insert(arr, M.resolve_color("YELLOW", DOT_LINE, ";2"))
-
+--    append(arr, colfmt("{white:%s}", DOT_LINE))
     return arr
 end
 
@@ -106,20 +103,23 @@ local function resolve_changes(stacktrace, i)
         local line_num = tonumber(parts[#parts])
         parts[#parts] = nil
         local path = (":"):join(parts)
-        if M.virtual_paths then table.insert(converted, M.resolve_color("CYAN", path, ';2')) end
-        local ret = resolve_path(path) .. ':' .. M.resolve_color("RESET",line_num, ';1')
+        if M.virtual_paths then append(converted, colfmt("{faint_white:(%s)}", path)) end
+        local ret = colfmt("{white:%s:%d}", resolve_path(path), line_num)
         if M.context > 0 and #converted == 1 then
-            local lines = M.resolve_context(path, line_num, M.context)
+            local lines = M.resolve_context(path, line_num, M.context, i)
             inserts = #lines
             -- Add context lines
             for j=1,#lines do table.insert(stacktrace, j + i, lines[j]) end
         end
         return ret
     end
-    stacktrace[i] = stacktrace[i]:gsub(LUAFILE_PATTERN .. ":%d+", path_conv)
+    local s = stacktrace[i]
+    s = s:gsub('[%<%>]', '')
+    s = s:gsub(LUAFILE_PATTERN .. ":%d+", path_conv)
     if #converted > 0 then
-        stacktrace[i] = stacktrace[i] .. ' (' .. converted[1] .. ')'
+        s = s .. ' ' .. converted[1]
     end
+    stacktrace[i] = s -- Repack value
     return inserts
 end
 
@@ -132,11 +132,18 @@ function M.traceback(--[[Optional]] str)
     while i <= #stacktrace do
         i = i + 1 - resolve_deletions(stacktrace, i)
     end
+    for i=1,#stacktrace do
+        stacktrace[i] = colfmt('{bold_white:%d} %s', i, stacktrace[i]:trim())
+    end
     i = 1
     while i <= #stacktrace do
         i = i + 1 + resolve_changes(stacktrace, i)
     end
-    return resolve_replacements(str or "", M.error_replacements) .. '\n' .. table.concat(stacktrace, '\n')
+    return colfmt(
+        "{bold_red:ERROR:} {reset:%s}%s", 
+        resolve_replacements(str or "", M.error_replacements),
+        table.concat(stacktrace, '\n')
+    )
 end
 
 AnsiColors = import "terminal.AnsiColors" -- Lazy import
