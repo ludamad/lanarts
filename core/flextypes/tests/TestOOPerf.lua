@@ -11,7 +11,7 @@ local tinsert, tdeep_clone = table.insert, table.deep_clone
 local test_math_func1,test_math_func2,test_math_func3 = math.sin, math.cos, math.exp
 
 local function benchmark_type(desc, T, S)
-    local N = 500000
+    local N = 500
     local objects, copies = {}, {}
     benchmark(desc .. " %sms\t" ..N.. " Object Creations", function()
         for i=1,N do

@@ -232,12 +232,26 @@ end
 local weak_args = {cache_check_only = true}
 function import_weak(vpath) return import(vpath, weak_args) end
 
-local weak_args = {ignore_cache = true}
-function import_dofile(vpath) return import(vpath, weak_args) end
 
 function import_all(subpackage, --[[Optional]] recursive, --[[Optional]] pattern,  --[[Optional]] filter)
     local content = find_submodules(subpackage, recursive or false, pattern or "*", filter)
     for c in values(content) do import(c) end
+end
+
+function import_if_file(vpath, --[[Optional]] import_args)
+    for _, package in ipairs(_PACKAGES) do
+        local fname = virtual_path_to_real(package, vpath) .. '.lua'
+        if file_exists(fname) then
+            return import(vpath, import_args)
+        end
+    end
+    return nil
+end
+
+local dofile_args = {ignore_cache = true}
+function import_dofile(vpath) return import(vpath, dofile_args) end
+function import_dofile_if_file(vpath, --[[Optional]] import_args)
+    return import_if_file(vpath, dofile_args)
 end
 
 -- Import a mutable copy of (potentially) multiple submodules merged together.
@@ -254,7 +268,7 @@ function import_copy(...)
 end
 
 -- Iterates, returning [module, package]
-function module_iter()
+function module_package_iter()
     local i,j = 1,1
     local package,list = nil,nil
     return function()
@@ -267,3 +281,17 @@ function module_iter()
         j = j+1 ; return list[j-1], package
     end
 end
+
+-- Returns list of all unique modules.
+function module_list()
+    local ret, mmap = {}, {}
+    for m, _ in module_package_iter() do
+        if not mmap[m] then
+            append(ret, m) ; mmap[m] = true
+        end 
+    end
+    return ret
+end
+
+-- Iterate all unique modules
+function module_iter() return values(module_list()) end

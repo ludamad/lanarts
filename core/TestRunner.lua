@@ -11,14 +11,14 @@ local function handle_cpp_tests(args)
 end
 
 local function run_tests(suitelist)
-    local test_i = 1
+    local AC = import "terminal.AnsiColors"
+
+    local test_i,fails = 1,0
     for suite in values(suitelist) do
         for test in values(suite) do
             local name,f = unpack(test)
-            local ok,err = f()
-            print(ok,err)
---          1) ERROR for test_typedef (in test_typedef)
-
+            local ok,err = pcall(f)
+            colprintf("[BOLD_RESET|%d) %s][WHITE| for %s (in %s)]", test_i, "Pass", name, suite.name)
             test_i = test_i + 1
         end
     end
@@ -36,7 +36,7 @@ function M.main(args)
 
     local function ensure_suite(name)
         if not suitemap[name] then -- Previously unseen suite 
-            suitemap[name] = {} ; append(suitelist, suitemap[name])
+            suitemap[name] = {name=name} ; append(suitelist, suitemap[name])
         end
         return suitemap[name]
     end
@@ -51,14 +51,12 @@ function M.main(args)
         end
     })
 
-    -- Run 'dofile' on all identified tests:
-    for module,package in module_iter() do
+    -- Run 'import_dofile' on all identified tests:
+    for module in module_iter() do
         if module:match(module_filter) then
-            local root_test_file = (package..'/'..module..'/_Tests.lua')
-            if file_exists(root_test_file) then dofile(root_test_file) end
+            import_dofile_if_file(module ..'._Tests')
             for test in values(find_submodules(module .. ".tests", true)) do 
-                local rpath = virtual_path_to_real(package, test)
-                dofile(rpath)
+                import_dofile(test)
             end
         end
     end

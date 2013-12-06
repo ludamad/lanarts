@@ -25,7 +25,7 @@ require "ModuleSystem"
 import "ErrorReporting"
 
 -- Find all global definitions
-for module,package in module_iter() do
+for module,package in module_package_iter() do
     if module == "globals" then
         import_all(module)
     else
