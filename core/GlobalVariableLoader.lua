@@ -15,6 +15,10 @@ end
 -- Ensure undefined global variable access results in an error
 nilprotect(_G)
 
+setmetatable(_G, {__index = function(self, k)
+    error( ("Global variable '%s' does not exist!"):format(k) )
+end})
+
 -- Note: 'import' is not defined until ModuleSystem.lua is ran.
 require "ModuleSystem"
 

@@ -7,14 +7,22 @@ local AnsiColors -- Lazy imported
 local LUAFILE_PATTERN = "core/[^%.]*%.lua"
 local LUAMODULE_PATTERN = "[%.%w_]+%.%u%w*"
 
+local function modulestart(s)
+    -- Search for space, followed by any root package name.
+    return ("%s*%w+/" .. s)
+end
+
 -- Configuration
 local M -- Forward declare for inner functions
 M = {
     filter_patterns = {
         -- Lines to delete starting with this line and going up
-        ["%s*core/ErrorReporting%.lua.* in function .*"] = 1,
-        ["%s*core/ModuleSystem%.lua.* in function 'import.*'"] = 2,
-        ["%s*core/Main.lua"] = 1,
+        [modulestart "ErrorReporting%.lua"] = 1,
+        [modulestart "GlobalVariableLoader%.lua:.*'__index'"] = 1,
+        [modulestart "ModuleSystem%.lua:%s+:.*'import.*'"] = 2,
+        [modulestart "globals/General%.lua:.*'errorf'"] = 2,
+        [modulestart "Main.lua"] = 1,
+        [modulestart "TestRunner.lua:[^']+'main'"] = 1,
         ["%s*%[C%]: in function 'error'"] = 4
     },
     
@@ -128,10 +136,10 @@ function M.traceback(--[[Optional]] str)
     while i <= #stacktrace do
         i = i + 1 + resolve_changes(stacktrace, i)
     end
-    return resolve_replacements(str, M.error_replacements) .. '\n' .. table.concat(stacktrace, '\n')
+    return resolve_replacements(str or "", M.error_replacements) .. '\n' .. table.concat(stacktrace, '\n')
 end
 
-AnsiColors = import "terminal.AnsiColors"
+AnsiColors = import "terminal.AnsiColors" -- Lazy import
 debug.traceback = M.traceback
 
 return M

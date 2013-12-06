@@ -168,12 +168,13 @@ local default_import_args = {
     module_name = nil,
     -- Only check if already loaded
     cache_check_only = false,
-    root_load = false
+    root_load = false,
+    ignore_cache = false
 }
 
 function import(vpath, --[[Optional]] args)
     args = args or default_import_args
-    local mname, cache_check_only = args.module_name, args.cache_check_only
+    local mname, cache_check_only, ignore_cache = args.module_name, args.cache_check_only, args.ignore_cache
 
     local first_chr = vpath:sub(1,1)
     local vpath_rest = vpath:sub(2, #vpath)
@@ -194,26 +195,31 @@ function import(vpath, --[[Optional]] args)
         -- Otherwise, not a root import. We carry on as normal; it can also be a shortform: eg, 'foo' expands to 'foo.foo'
     end
 
-    local module = _IMPORTED[vpath] or _LOADED[vpath]
-    if module == _ILLEGAL_RECURSION_SENTINEL then
-        error("'import' detected import recursion from '" .. vpath .. "' being loaded from '" .. (mname or '') .. "'")
-    elseif module then 
-        return unpack(module)
-    elseif cache_check_only then
-        return nil
-    end
+    if not ignore_cache then
+        -- Test cache
+        local module = _IMPORTED[vpath] or _LOADED[vpath]
+        if module == _ILLEGAL_RECURSION_SENTINEL then
+            error("'import' detected import recursion from '" .. vpath .. "' being loaded from '" .. (mname or '') .. "'")
+        elseif module then 
+            return unpack(module)
+        elseif cache_check_only then
+            return nil
+        end
 
-    -- Protect against import circles
-    _IMPORTED[vpath] = _ILLEGAL_RECURSION_SENTINEL
-    _LOADED[vpath] = _ILLEGAL_RECURSION_SENTINEL
+        -- Protect against import circles
+        _IMPORTED[vpath] = _ILLEGAL_RECURSION_SENTINEL
+        _LOADED[vpath] = _ILLEGAL_RECURSION_SENTINEL
+    end
 
     local errors = {}
     -- Step from most recently added import resolver to least
     for _, resolver in ipairs(_import_resolvers) do
         local resolution, err = resolver(vpath)
-        if resolution then 
-            _IMPORTED[vpath] = resolution
-            _LOADED[vpath] = resolution -- Set the require cache for some try at compatibility
+        if resolution then
+            if not ignore_cache then 
+                _IMPORTED[vpath] = resolution
+                _LOADED[vpath] = resolution -- Set the require cache for some try at compatibility
+            end
             return unpack(resolution)
         else
             table.insert(errors, err)
@@ -226,6 +232,9 @@ end
 local weak_args = {cache_check_only = true}
 function import_weak(vpath) return import(vpath, weak_args) end
 
+local weak_args = {ignore_cache = true}
+function import_dofile(vpath) return import(vpath, weak_args) end
+
 function import_all(subpackage, --[[Optional]] recursive, --[[Optional]] pattern,  --[[Optional]] filter)
     local content = find_submodules(subpackage, recursive or false, pattern or "*", filter)
     for c in values(content) do import(c) end
@@ -233,9 +242,10 @@ end
 
 -- Import a mutable copy of (potentially) multiple submodules merged together.
 function import_copy(...)
+    local import_args = {module_name = module_name(2)}
     local copy = nilprotect {} -- Make sure nil access errors instead.
     for i=1,select("#", ...) do
-        local module = import(select(i, ...))
+        local module = import(select(i, ...), import_args)
     	for k,v in pairs(module) do
             copy[k] = v
     	end

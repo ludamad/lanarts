@@ -76,7 +76,7 @@ local function main(_argv)
 
     -- Execution modes
     local function exec(vpath) import(vpath).main(argv) ; return false end
-    if has_arg "--tests" then return exec "testrunner" end
+    if has_arg "--tests" then return exec "TestRunner" end
     if has_arg "--testmap" then return exec "unstable.TestMap" end
     if has_arg "--simulation" then return exec "unstable.Simulation" end
     if has_arg "--dungenerate" then return exec "dungenerate.Main" end

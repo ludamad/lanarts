@@ -6,6 +6,10 @@ local GlobalData = import "core.GlobalData"
 local print,error,assert=print,error,assert -- Performance
 
 append = table.insert -- Convenient alias
+local tinsert = table.insert
+function appendf(t, s, ...)
+    return tinsert(t, s:format(...))
+end
 
 -- Data is defined on a per-submodule basis
 function data_load(key, default, --[[Optional]] vpath)
