@@ -29,7 +29,7 @@ local function colorfmt_aux(sub)
 end
 function colfmt(str, ...)
     AnsiColors = AnsiColors or import "@AnsiColors"
-    local str = str:format(...):gsub("%b{}", colorfmt_aux) ; return str
+    local str = str:gsub("%b{}", colorfmt_aux):format(...) ; return str
 end
 function colprintf(str, ...)
     return print(colfmt(str, ...))

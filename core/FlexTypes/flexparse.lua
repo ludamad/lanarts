@@ -57,6 +57,7 @@ local function parse_field_def(T, vars, typename, --[[Optional]] initializer)
     for name in values(vars:trimsplit(",")) do
         validate_varname(name)
         T:field_add()
+        T:
         M.define_field(T, name, typename, --[[Not embedded]] false, --[[May-be-null]] initializer)
     end
 end

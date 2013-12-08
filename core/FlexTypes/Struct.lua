@@ -15,7 +15,7 @@ function Struct:alias_add(name, kind, offset)
 	self._aliases[name] = {kind, offset}
 end
 
-function Struct:field_add(f) append(self.objects, f) end
+function Struct:field_add(f) append(self.fields, f) end
 function Struct:subfield_add(f) append(self.subfields, f) end
 function Struct:metadata_add(f) append(self.metadata, f) end
 

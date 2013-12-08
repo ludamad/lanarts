@@ -12,6 +12,8 @@ local function modulestart(s)
     return ("%s*%w+/" .. s)
 end
 
+local FILE_LINE_MATCHER = modulestart("%s*[^%.]+%.lua:%d+:%s*")
+
 -- Configuration
 local M -- Forward declare for inner functions
 M = {
@@ -19,7 +21,7 @@ M = {
         -- Lines to delete starting with this line and going up
         [modulestart "ErrorReporting%.lua"] = 1,
         [modulestart "GlobalVariableLoader%.lua:.*'__index'"] = 1,
-        [modulestart "ModuleSystem%.lua:%s+:.*'import.*'"] = 2,
+        [modulestart "ModuleSystem%.lua:.*'import.*'"] = 1,
         [modulestart "globals/General%.lua:.*'errorf'"] = 2,
         [modulestart "globals/LuaJITReplacements%.lua:.*'__index'"] = 2,
         [modulestart "Main.lua"] = 1,
@@ -33,13 +35,19 @@ M = {
     },
     
     error_replacements = {
-        {modulestart ".*%.lua:%d+:%s*", function(s) return '' end}
+--    "^%s*[^%.]+%.lua:%d+:%s*",
+        {'^'.. FILE_LINE_MATCHER, function(s) return '' end},
+        {'('..FILE_LINE_MATCHER..')(.*)', function(s1,s2) return colfmt("{bold_white:%s}{white:%s}", s1,s2) end}
     },
     
     virtual_paths = true, 
     use_color = true,
     context = 0
 }
+
+local function numformat(n)
+    return "%3d"
+end
 
 local DOT_LINE = "--------------------------------------------------------------------------------"
 function M.resolve_context(fpath, line_num, context)
@@ -52,9 +60,9 @@ function M.resolve_context(fpath, line_num, context)
     -- Find lines within [min_i, max_i]
     for line in file:lines() do
         if i == line_num then
-            append(arr, colfmt("{bold_blue:  %3d }{bold_blue:%s}", i, line))
+            append(arr, colfmt("{blue:  *** }{blue:%s}", line))
         elseif i >= min_i and i <= max_i then
-            append(arr, colfmt("{bold_blue:  %3d }{blue:%s}", i, line))
+            append(arr, colfmt("{blue:  %3d }{blue:%s}", i, line))
         end
         i = i + 1
     end
@@ -133,15 +141,15 @@ function M.traceback(--[[Optional]] str)
         i = i + 1 - resolve_deletions(stacktrace, i)
     end
     for i=1,#stacktrace do
-        stacktrace[i] = colfmt('{bold_white:%d} %s', i, stacktrace[i]:trim())
+        stacktrace[i] = colfmt('{red:%d} %s', i, stacktrace[i]:trim())
     end
     i = 1
     while i <= #stacktrace do
         i = i + 1 + resolve_changes(stacktrace, i)
     end
     return colfmt(
-        "{bold_red:ERROR:} {reset:%s}%s", 
-        resolve_replacements(str or "", M.error_replacements),
+        "{bold_red:An error occurred:}\n{bold_white:@} {reset:%s}\n%s", 
+        resolve_replacements(str or "", M.error_replacements):trim(),
         table.concat(stacktrace, '\n')
     )
 end
