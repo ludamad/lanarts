@@ -15,11 +15,11 @@ add_definitions( -std=c++98)
 
 if (${USE_LUAJIT})
     set( lua_includes ${DEPS}/luajit/src )
-    set( lua_libraries luajit )
 else()
     set( lua_includes ${DEPS}/lua  )
-    set( lua_libraries lua )
 endif()
+
+set( lua_libraries lua )
 
 include_directories(
 	"."

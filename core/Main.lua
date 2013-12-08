@@ -72,7 +72,7 @@ local function main(_argv)
     local ErrorReporting = import "ErrorReporting"
     if has_arg "--nofilter" then ErrorReporting.filter_patterns = {} end
     -- Number of lines of code context, requires source. 
-    ErrorReporting.context = (num_param "-C" or num_param "--context" or 2)
+    ErrorReporting.context = (num_param "-C" or num_param "--context" or 4)
 
     -- Execution modes
     local function exec(vpath) import(vpath).main(argv) ; return false end
@@ -87,7 +87,8 @@ local function main(_argv)
         -- Optionally, run a Lua file given a normal (ie, not virtual) path
         -- Then drop into a Lua REPL session. The user can exit with 'start_lanarts()'
         local file = (get_param "--lua")
-        if file then dofile(file) end
+        local ok, err = pcall(dofile, file)
+        if err then print(err) end
         local finished = false ; function _G.start_lanarts() finished = true end
         while not finished do __read_eval_print() end
     end

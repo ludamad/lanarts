@@ -309,10 +309,10 @@ set ( LJCORE_C
     src/lj_record.c
 )
 
-add_library ( luajit STATIC ${LJCORE_C} ${DEPS} )
-target_link_libraries ( luajit ${LIBS} )
-set_target_properties ( luajit PROPERTIES OUTPUT_NAME luajit CLEAN_DIRECT_OUTPUT 1 )
+add_library ( lua STATIC ${LJCORE_C} ${DEPS} )
+target_link_libraries ( lua ${LIBS} )
+set_target_properties ( lua PROPERTIES OUTPUT_NAME luajit CLEAN_DIRECT_OUTPUT 1 )
 
 ## LuaJIT Executable
 add_executable ( luajitrepl src/luajit.c )
-target_link_libraries ( luajitrepl luajit )
+target_link_libraries ( luajitrepl lua )

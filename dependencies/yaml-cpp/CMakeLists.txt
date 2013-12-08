@@ -84,11 +84,7 @@ include_directories(${YAML_CPP_SOURCE_DIR}/src)
 ###
 ### General compilation settings
 ###
-if(BUILD_SHARED_LIBS)
-	set(LABEL_SUFFIX "shared")
-else()
-	set(LABEL_SUFFIX "static")
-endif()
+set(LABEL_SUFFIX "static")
 
 if(APPLE)
 	if(APPLE_UNIVERSAL_BIN)

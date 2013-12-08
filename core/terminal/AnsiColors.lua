@@ -7,7 +7,7 @@ local AnsiColor = newtype()
 
 local function val2string(value, --[[Optional]] sgr_params)
     sgr_params = sgr_params or ""
-    return string.char(27) .. '[' .. tostring(value) .. sgr_params .. 'm'
+    return '\27[' .. tostring(value) .. sgr_params .. 'm'
 end
 
 function AnsiColor:init(value)

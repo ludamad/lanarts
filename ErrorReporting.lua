@@ -4,8 +4,7 @@
 
 local AnsiColors -- Lazy imported
 
-local LUAFILE_PATTERN = "%w+/[^%.]*%.lua"
-local ROOTFILE_PATTERN = "%w+%.lua"
+local LUAFILE_PATTERN = "core/[^%.]*%.lua"
 local LUAMODULE_PATTERN = "[%.%w_]+%.%u%w*"
 
 local function modulestart(s)
@@ -23,7 +22,7 @@ M = {
         [modulestart "ErrorReporting%.lua"] = 1,
         [modulestart "GlobalVariableLoader%.lua:.*'__index'"] = 1,
         [modulestart "ModuleSystem%.lua:.*'import.*'"] = 1,
-        [modulestart "Globals%.lua:.*'errorf'"] = 2,
+        [modulestart "globals/General%.lua:.*'errorf'"] = 2,
         [modulestart "globals/LuaJITReplacements%.lua:.*'__index'"] = 2,
         [modulestart "Main.lua"] = 1,
         [modulestart "TestRunner.lua:[^']+'main'"] = 1,
@@ -61,7 +60,7 @@ function M.resolve_context(fpath, line_num, context)
     -- Find lines within [min_i, max_i]
     for line in file:lines() do
         if i == line_num then
-            append(arr, colfmt("{bold_blue:  %3d }{bold_blue:%s}", i, line))
+            append(arr, colfmt("{blue:  *** }{blue:%s}", line))
         elseif i >= min_i and i <= max_i then
             append(arr, colfmt("{blue:  %3d }{blue:%s}", i, line))
         end
@@ -78,7 +77,6 @@ function M.resolve_color(col, str, params)
 end
 local function resolve_path(path)
     if not M.virtual_paths then return path end
-    if path:match(ROOTFILE_PATTERN) then return path end 
     return real_path_to_virtual(path)
 end 
 
@@ -107,14 +105,16 @@ local function resolve_changes(stacktrace, i)
 
     local inserts = 0
     local converted = {}
-    local function path_conv(path, line)
+    local function path_conv(path_and_line)
         -- A hack to remove cases with ) at the end
-        if M.virtual_paths then 
-        	append(converted, colfmt("{faint_white:(%s:%s)}", path, line))
-		end
-        local ret = colfmt("{white:%s:%s}", resolve_path(path), line)
+        local parts = path_and_line:split(":")
+        local line_num = tonumber(parts[#parts])
+        parts[#parts] = nil
+        local path = (":"):join(parts)
+        if M.virtual_paths then append(converted, colfmt("{faint_white:(%s)}", path)) end
+        local ret = colfmt("{white:%s:%d}", resolve_path(path), line_num)
         if M.context > 0 and #converted == 1 then
-            local lines = M.resolve_context(path, tonumber(line), M.context, i)
+            local lines = M.resolve_context(path, line_num, M.context, i)
             inserts = #lines
             -- Add context lines
             for j=1,#lines do table.insert(stacktrace, j + i, lines[j]) end
@@ -123,8 +123,7 @@ local function resolve_changes(stacktrace, i)
     end
     local s = stacktrace[i]
     s = s:gsub('[%<%>]', '')
-    s = s:gsub('('..LUAFILE_PATTERN .. "):(%d+)", path_conv)
-    s = s:gsub('('..ROOTFILE_PATTERN .. "):(%d+)", path_conv)
+    s = s:gsub(LUAFILE_PATTERN .. ":%d+", path_conv)
     if #converted > 0 then
         s = s .. ' ' .. converted[1]
     end

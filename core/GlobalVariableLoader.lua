@@ -22,6 +22,7 @@ end})
 -- Note: 'import' is not defined until ModuleSystem.lua is ran.
 require "ModuleSystem"
 
+import "Globals"
 import "ErrorReporting"
 
 -- Find all global definitions

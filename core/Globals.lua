@@ -1,4 +1,17 @@
--- Utility code that can apply to lua programming in general.
+--- General convenience global functions.
+-- IE, utility code that was decided makes Lua programming in general easier.
+-- 
+-- Additional (potentially more domain-specific) global functins are define in the 
+-- 'globals' module in this package, as well as the 'globals' folder within a module, 
+-- or its Globals.lua submodule.
+
+--- Does nothing. 
+--@usage dummy_object = { step = do_nothing, draw = do_nothing }
+function do_nothing() end
+_EMPTY_TABLE = {}
+
+-- Enable references to coloured prints through-out bootstrap code:
+import "terminal.Globals"
 
 -- Global data is a special submodule, its members are always serialized
 local GlobalData = import "core.GlobalData"
@@ -22,11 +35,6 @@ function data_load(key, default, --[[Optional]] vpath)
     end
     return val
 end
-
---- Does nothing. 
---@usage dummy_object = { step = do_nothing, draw = do_nothing }
-function do_nothing() end
-_EMPTY_TABLE = {}
 
 --- Wraps a function around a memoizing weak table.
 -- Function results will be stored until they are no longer referenced.
