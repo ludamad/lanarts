@@ -438,25 +438,24 @@ end
 function M.overworld_create_helper(--[[Optional]] dont_spawn_content)
     local tileset = TileSets.grass
 
-    local w,h = 100,100
+    local w,h = 300,300
     local map = MapUtils.map_create("Overworld", {w,h}, tileset.wall, {SourceMap.FLAG_SOLID, SourceMap.FLAG_SEETHROUGH})
-    --local nodes = get_leafs(SourceMap.bsp_split { split_depth = 2, map = map, minimum_node_size = {w/6, h/6}, area = {50,50,250,250} })
-   -- for i=1,#nodes do
-    --    generate_area(map, nodes[i].area)
-    --end
-    generate_area(map, {25,25,75,75}) 
---    for i=1,#nodes do
---        Layouts.brute_tunnel(map, nodes[i].area, nodes[i%#nodes+1].area, {
---                operator = {
---                    matches_all=SourceMap.FLAG_SOLID,
---                    add=SourceMap.FLAG_SEETHROUGH, 
---                    remove=SourceMap.FLAG_SOLID, 
---                    content=random_choice{tileset.floor, tileset.floor_alt1, tileset.floor_alt2}
---                }
---            }
---        )
---    end
-
+    local nodes = get_leafs(SourceMap.bsp_split { split_depth = 2, map = map, minimum_node_size = {w/6, h/6}, area = {50,50,250,250} })
+    for i=1,#nodes do
+        generate_area(map, nodes[i].area)
+    end
+    generate_area(map, {25,25,275,275}) 
+    for i=1,#nodes do
+        Layouts.brute_tunnel(map, nodes[i].area, nodes[i%#nodes+1].area, {
+                operator = {
+                    matches_all=SourceMap.FLAG_SOLID,
+                    add=SourceMap.FLAG_SEETHROUGH, 
+                    remove=SourceMap.FLAG_SOLID, 
+                    content=random_choice{tileset.floor, tileset.floor_alt1, tileset.floor_alt2}
+                }
+            }
+        )
+    end
 
 --   OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 40)
 

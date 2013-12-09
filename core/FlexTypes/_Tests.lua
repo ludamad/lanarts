@@ -17,8 +17,5 @@ local Struct = import "@Struct"
 --end
 
 function TestCases.test_typedef()
-    local S = Struct.create()
-    Flex.parse_def(S, "x, y : int")
-    local T = Flex.compile_type(S)
-    local p = T.create(1,2)
+    typedef2 [[x, y : int]]
 end

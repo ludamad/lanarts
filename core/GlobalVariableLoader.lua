@@ -23,6 +23,7 @@ end})
 require "ModuleSystem"
 
 import "Globals"
+import "Logging"
 import "ErrorReporting"
 
 -- Find all global definitions

@@ -108,7 +108,6 @@ local function resolve_changes(stacktrace, i)
     local inserts = 0
     local converted = {}
     local function path_conv(path, line)
-        -- A hack to remove cases with ) at the end
         if M.virtual_paths then 
         	append(converted, colfmt("{faint_white:(%s:%s)}", path, line))
 		end

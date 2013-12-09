@@ -31,24 +31,4 @@ function M.field_type_create()
 	return newtype {parent = FieldBase}
 end
 
-local CodeGenContext = newtype()
-
-function CodeGenContext:init(--[[struct]] T) self.type = T ; self.upvalues = {} end
-function CodeGenContext:upvalue_add(k, v)
-    if self.upvalues[k] ~= v then
-        assertf(self.upvalues[k] == nil, "Conflicting value for injected upvalue '%s'!", k)
-        self.upvalues[k] = v
-    end
-end
-function CodeGenContext:inject(func_s)
-    local fields = table.key_list(self.upvalues)
-    return ("function(%s)\n%s\nend"):format((","):join(fields), func_s)
-end
-function CodeGenContext:inject_and_load(func_s)
-    local upvals = table.value_list(self.upvalues)
-    return M.callstring(self:inject(func_s)) (unpack(upvals))
-end
-
-M.codegen_context_create = CodeGenContext.create
-
 return M

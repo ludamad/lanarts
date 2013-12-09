@@ -8,8 +8,8 @@ local Struct = import "@Struct"
 -- Main interface: a type-component parsing routine.
 -- A type definition is a simple series of these.
 --------------------------------------------------------------------------------
-local function call_on_match(T, f, ...)
-    if ... then f(T, ...) ; return true end ; return false
+local function call_on_match(C, f, ...)
+    if ... then f(C, ...) ; return true end ; return false
 end
 local subroutines -- Defined below.
 function M.parse_def(--[[Struct]] T, def, --[[Optional]] linenum)
@@ -42,23 +42,22 @@ end
 --------------------------------------------------------------------------------
 -- Parsing subroutines
 --------------------------------------------------------------------------------
-local function parse_extend(T, typename)
+local function parse_extend(C, typename)
     print("parse_extend", typename)
 end
-local function parse_embed(T, typename, --[[Optional]] initializer, --[[Optional]] field_name)
+local function parse_embed(C, typename, --[[Optional]] initializer, --[[Optional]] field_name)
     local typespec, name = line:match(NAMED_EMBED)
     if not typespec then typespec = line end 
     if not name then name = typename end
     validate_varname(name)
-    M.define_field(T, name, typename, --[[Embedded]] true, --[[May-be-null]] initializer)
+    M.define_field(C, name, typename, --[[Embedded]] true, --[[May-be-null]] initializer)
 end
 
-local function parse_field_def(T, vars, typename, --[[Optional]] initializer)
+local function parse_field_def(C, vars, typename, --[[Optional]] initializer)
     for name in values(vars:trimsplit(",")) do
         validate_varname(name)
-        T:field_add()
-        T:
-        M.define_field(T, name, typename, --[[Not embedded]] false, --[[May-be-null]] initializer)
+        C.type:field_add()
+        M.define_field(C, name, typename, --[[Not embedded]] false, --[[May-be-null]] initializer)
     end
 end
 --`1  Define subroutines and the patterns that trigger them:
