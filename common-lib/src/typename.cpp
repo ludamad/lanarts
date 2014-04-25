@@ -16,6 +16,7 @@ std::string cpp_demangle_type_name(const char* name) {
 		return name;
 	}
 	std::string newname(demangled);
+        free(demangled);
 	return newname;
 }
 
