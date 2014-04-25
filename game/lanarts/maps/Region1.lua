@@ -1,5 +1,6 @@
 local SourceMap = import "core.SourceMap"
 local Map = import "core.Map"
+local Display = import "core.Display"
 local GameObject = import "core.GameObject"
 local World = import "core.World"
 

@@ -70,7 +70,7 @@ function Engine.event_occurred(...)
 end
 
 function Engine.first_map_create(...)
-    local region1 = import "@maps.Newregion"
+    local region1 = import "@maps.Region1"
 
     local map_id = region1.overworld_create(...)
 	return map_id
