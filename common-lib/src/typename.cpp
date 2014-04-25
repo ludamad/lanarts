@@ -4,6 +4,7 @@
  */
 
 #include "typename.h"
+#include <cstdlib>
 
 #ifdef __GNUC__
 #include <cxxabi.h>
@@ -16,7 +17,7 @@ std::string cpp_demangle_type_name(const char* name) {
 		return name;
 	}
 	std::string newname(demangled);
-        free(demangled);
+        free((void*)demangled);
 	return newname;
 }
 
