@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 2.8 )
 PROJECT(project_lanarts_dungeon_gen)
 
-set( DEPS ../dependencies)
+set( DEPS ../../dependencies)
 
 FIND_PACKAGE(SDL REQUIRED)
 
@@ -9,8 +9,8 @@ add_definitions( -std=c++98 )
 
 include_directories(
 	include/ldungeon_gen
-	../dependencies/lua
-	../dependencies/libxmi
+        ${DEPS}/lua
+        ${DEPS}/libxmi
 	../common-lib/include
 	../draw-lib/include
 	../luawrap-lib/include

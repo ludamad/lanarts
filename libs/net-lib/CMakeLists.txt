@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lanarts_net)
 
-set( DEPS ../dependencies)
+set( DEPS ../../dependencies)
 
 FIND_PACKAGE(SDL REQUIRED)
 

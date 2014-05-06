@@ -1,11 +1,7 @@
 cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_luawrap)
 
-#set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
-#add_definitions(-DNDEBUG)
-
-set( DEPS ../dependencies)
+set( DEPS ../../dependencies)
 
 add_definitions( -std=c++98 )
 

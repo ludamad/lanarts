@@ -8,7 +8,7 @@ FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
 set( SRC ../)
-set( DEPS ../dependencies)
+set( DEPS ../../dependencies)
 
 add_definitions( -std=c++98 )
 

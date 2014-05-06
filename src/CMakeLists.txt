@@ -7,7 +7,7 @@ FIND_PACKAGE(SDL_mixer REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
 include(FindFreetype)
 
-set( SRC ..)
+set( LIBS ../libs)
 set( DEPS ../dependencies)
 set( BUILTDEPS ${CMAKE_BINARY_DIR}/dependencies )
 
@@ -22,24 +22,24 @@ endif()
 set( lua_libraries lua )
 
 include_directories(
-	"."
-	${SDL_INCLUDE_DIR} 
-	${SDLIMAGE_INCLUDE_DIR}
-	${OpenGL_INCLUDE_DIRS} 		
-	${FREETYPE_INCLUDE_DIRS}
-	"${SRC}/common-lib/include"
-	"${SRC}/draw-lib/include"
-	"${SRC}/dungeon-generation-lib/include"
-	${SRC} # for net
-	"${SRC}/luawrap-lib/include"
-	"${SRC}/sound-lib/include"
-	${DEPS}/UnitTest++ 
-	"${DEPS}/yaml-cpp/include"
-	"${DEPS}/physfs/src"
-	"${DEPS}/physfs/extras"
-	${lua_includes} 
-	${DEPS} # for rvo2 & luasocket
-	)
+    "."
+    ${SDL_INCLUDE_DIR} 
+    ${SDLIMAGE_INCLUDE_DIR}
+    ${OpenGL_INCLUDE_DIRS} 		
+    ${FREETYPE_INCLUDE_DIRS}
+    "${LIBS}/common-lib/include"
+    "${LIBS}/draw-lib/include"
+    "${LIBS}/dungeon-generation-lib/include"
+    ${LIBS} # for net
+    "${LIBS}/luawrap-lib/include"
+    "${LIBS}/sound-lib/include"
+    ${DEPS}/UnitTest++ 
+    "${DEPS}/yaml-cpp/include"
+    "${DEPS}/physfs/src"
+    "${DEPS}/physfs/extras"
+    ${lua_includes} 
+    ${DEPS} # for rvo2 & luasocket
+)
 
 file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
     include/* 
@@ -71,7 +71,6 @@ file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     lua_api/*
  
     menu/*
- 
     net/*
 
     objects/*

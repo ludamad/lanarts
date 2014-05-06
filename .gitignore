@@ -2,6 +2,7 @@ CMakeFiles/*
 logs/*
 replays/*
 saves/
+resources/saves
 CMakeCache.txt
 Makefile
 saved_settings.yaml
@@ -16,3 +17,4 @@ CMakeLists.txt.orig
 *.score
 stdout.txt
 stderr.txt
+build/
