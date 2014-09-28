@@ -163,8 +163,7 @@ static BBox find_portion(Pos center, Size desired_size, Size world_size) {
 void Minimap::draw(GameState* gs) {
 	perf_timer_begin(FUNCNAME);
 
-	int ptw = power_of_two_round(MINIMAP_DIM_MAX), pth = power_of_two_round(
-			MINIMAP_DIM_MAX);
+	int ptw = power_of_two_round(MINIMAP_DIM_MAX), pth = power_of_two_round(MINIMAP_DIM_MAX);
 	if (!minimap_arr) {
 		minimap_arr = new char[ptw * pth * 4];
 	}

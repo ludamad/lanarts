@@ -22,7 +22,7 @@ effects:
     finish_func: 
       function (effect, obj) 
         obj:add_effect("Exhausted", effect.exhausted_duration) 
-        if obj:is_local_player() then 
+        if obj.is_local_player and obj:is_local_player() then 
           local EventLog = import "ui.EventLog";
           EventLog.add("You are now exhausted...", {255,200,200}) 
         end
@@ -37,7 +37,7 @@ effects:
     finish_func: 
       function (effect, obj) 
         local EventLog = import "ui.EventLog";
-        if obj:is_local_player() then 
+        if obj.is_local_player and obj:is_local_player() then 
           EventLog.add("You are no longer exhausted.", {200,200,255}) 
         end
       end
@@ -50,7 +50,7 @@ effects:
     finish_func: 
       function (effect, obj) 
         local EventLog = import "ui.EventLog";
-        if obj:is_local_player() then 
+        if obj.is_local_player and obj:is_local_player() then 
           EventLog.add("You are no longer expedited.", {255,200,200}) 
         end
       end
