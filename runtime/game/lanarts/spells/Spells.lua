@@ -15,7 +15,7 @@ Data.spell_create {
     description = "A low cost, fast bolt of energy. Hits a single target. The bolt can bounce off walls safely.",
     projectile = "Minor Missile",
     mp_cost = 4,
-    cooldown = 15
+    cooldown = 35
 }
 
 -- FIRE BOLT
