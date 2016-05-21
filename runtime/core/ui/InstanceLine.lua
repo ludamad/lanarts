@@ -23,7 +23,7 @@ function InstanceLine:init(params)
     self._instances = InstanceGroup.create()
 
     self.position = {0, 0}
-    self.size =  params.force_size or {0, 0}
+    self.size = params.force_size or {0, 0}
 
     self.dx = params.dx
     self.dy = --[[Optional]] params.dy or 0

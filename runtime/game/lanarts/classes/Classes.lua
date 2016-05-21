@@ -2,10 +2,10 @@ Data.class_create {
     name = "Mage",
     sprites = {"wizard", "wizard2"},
     available_spells = {
-      { spell = "Fire Bolt",
-        level_needed = 1 }, 
       { spell = "Minor Missile",
     	level_needed = 1 },
+      { spell = "Fire Bolt",
+        level_needed = 1 }, 
       { spell = "Magic Blast",
         level_needed = 3 }
     },
@@ -45,7 +45,7 @@ Data.class_create {
       { spell = "Berserk",
         level_needed = 1 },
       { spell = "Power Strike",
-        level_needed = 3 }
+        level_needed = 1 }
     },
     start_stats = {
         movespeed = 4,
@@ -58,7 +58,7 @@ Data.class_create {
         willpower = 3,
         magic = 2,
         equipment = {
-          weapon = "Dagger",
+          weapon = "Short Sword",
           gold = 0,
           inventory = {
              {item = "Stone", amount = 10} 
@@ -81,34 +81,32 @@ Data.class_create {
     name = "Archer",
     sprites = {"archer"},
     available_spells = {
-      { spell = "Expedite",
-        level_needed = 1 },
       { spell = "Magic Arrow",
-        level_needed = 2 },
-      { spell = "Poison Cloud",
-        level_needed = 3 } 
+        level_needed = 1 },
+      { spell = "Expedite",
+        level_needed = 2 }
     },
     start_stats = {
         movespeed = 4,
-        hp = 85,
+        hp = 50,
         mp = 70,
-        hpregen = 0.05,
+        hpregen = 0.03,
         mpregen = 0.05,
-        strength = 5,
+        strength = 4,
         defence = 4,
         willpower = 4,
         magic = 4,
         equipment = {
           weapon = "Short Bow",
           gold = 0,
-          projectile = { item = "Arrow", amount = 40 },
+          projectile = { item = "Arrow", amount = 60 },
           inventory = {
              {item = "Dagger"} 
           }
         }
     },
     gain_per_level = {
-        hp = 15,
+        hp = 10,
         mp = 20,
         hpregen = 0.010,
         mpregen = 0.010,

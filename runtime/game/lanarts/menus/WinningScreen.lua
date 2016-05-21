@@ -1,6 +1,6 @@
 local Display = import "core.Display"
 local GameState = import "core.GameState"
-
+local Keys = import "core.Keyboard"
 local InstanceBox = import "ui.InstanceBox"
 local InstanceLine = import "ui.InstanceLine"
 local TextLabel = import "ui.TextLabel"

@@ -1,17 +1,17 @@
-local Display = import "core.Display"
-local AnsiCol = import "terminal.AnsiColors"
-local GameState = import "core.GameState"
-local Keys = import "core.Keyboard"
-local Simulation = import ".Simulation"
-local GameMap = import "@maps.GameMap"
-local Newregion = import "lanarts.maps.Newregion"
-local StatContext = import "@StatContext"
-local GameInterface = import "@ui.GameInterface"
 
 local M = nilprotect {} -- Submodule
 
 function M.main(cmd_args)
+    local Display = import "core.Display"
     Display.initialize("TestMap", {settings.view_width, settings.view_height}, settings.fullscreen)
+    local AnsiCol = import "terminal.AnsiColors"
+    local GameState = import "core.GameState"
+    local Keys = import "core.Keyboard"
+    local Simulation = import ".Simulation"
+    local GameMap = import "@maps.GameMap"
+    local Newregion = import "lanarts.maps.Newregion"
+    local StatContext = import "@StatContext"
+    local GameInterface = import "@ui.GameInterface"
 
     -- Load game content
     import "@DefineAll"
@@ -50,7 +50,7 @@ function M.main(cmd_args)
         interface:draw()
         Display.draw_finish()
         perf.timing_end("**Draw**")
-        GameState.wait(10)
+--        GameState.wait(10)
     end
     perf.timing_print()
     print( "Step time: " .. string.format("%f", perf.get_timing("**Step**")) )

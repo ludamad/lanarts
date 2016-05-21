@@ -15,7 +15,7 @@ Data.spell_create {
     description = "A low cost, fast bolt of energy. Hits a single target. The bolt can bounce off walls safely.",
     projectile = "Minor Missile",
     mp_cost = 4,
-    cooldown = 35
+    cooldown = 15
 }
 
 -- FIRE BOLT
@@ -103,8 +103,8 @@ local MagicArrow = {
     description = "Allows you to create an arrow of pure energy, requires a bow. Does well against strudy opponents.",
     spr_spell = "magic arrow",
     projectile = "Magic Arrow",
-    mp_cost = 20,
-    cooldown = 45,
+    mp_cost = 15,
+    cooldown = 25,
     resist_modifier = 0.5
 }
 
@@ -130,27 +130,29 @@ Data.spell_create {
 local PowerStrike = {
     name = "Power Strike",
     description = "A powerful charged strike. Deals stunning blows to all surrounding enemies, knocking them back.",
-    can_cast_with_held_key = false,
+    can_cast_with_held_key = true,
     spr_spell = "chargestrike",
-    can_cast_with_cooldown = true,
+    can_cast_with_cooldown = false,
     mp_cost = 40,
     cooldown = 30,
-    fallback_to_melee = false,
+    fallback_to_melee = true,
 }
 
 local function ChargeCallback(effect, caster)
     local num = 0
-    for mon in Map.monsters() do
-        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 35 then
+    for mon in values(Map.monsters_list() or {}) do
+        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 30 + caster.stats.strength then
             num = num + 1
             caster:melee(mon)
-            local chance = math.max(25, 100 - num * 20)
-            if rand_range(0, 100) < chance then -- decreasing chance of knockback
-                mon:add_effect("Thrown", 45 + 2 * caster.stats.level).angle = vector_direction({caster.x, caster.y}, {mon.x, mon.y})
+            --            local chance = math.max(25, 100 - num * 20)
+            --if rand_range(0, 100) < chance then -- decreasing chance of knockback
+            local str_diff = math.max(0, caster.stats.strength - mon.stats.strength)
+                thrown = mon:add_effect("Thrown", 10 + 10 * str_diff)
+                thrown.angle = vector_direction({caster.x, caster.y}, {mon.x, mon.y})
                 if caster:is_local_player() then
                     EventLog.add("The " .. mon.name .." is thrown back!", {200,200,255})
                 end
-            end
+            --end
         end
     end
 end
@@ -165,8 +167,8 @@ function PowerStrike.action_func(caster)
 end
 
 function PowerStrike.prereq_func(caster)
-    for mon in Map.monsters() do
-        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 40 then
+    for mon in values(Map.monsters_list() or {}) do
+        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 30 then
             return true
         end
     end

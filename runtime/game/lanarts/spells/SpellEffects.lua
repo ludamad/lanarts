@@ -58,9 +58,10 @@ function berserk_effect.init(effect, obj)
 end
 
 function berserk_effect.stat(effect, obj, old, new)	
-	new.strength = new.strength + 2 
-	new.defence = new.defence + 4 + obj.stats.level
-	new.melee_cooldown_multiplier = new.melee_cooldown_multiplier / 1.35
+	new.strength = new.strength + obj.stats.level
+	new.defence = math.max(0, new.defence + 5)
+	new.willpower = math.max(0, new.willpower + 5)
+	new.melee_cooldown_multiplier = new.melee_cooldown_multiplier / 2.0
 	new.speed = new.speed + 1
 	obj:reset_rest_cooldown()
 end
@@ -71,7 +72,8 @@ exhausted_effect = {}
 
 function exhausted_effect.stat(effect, obj, old, new)
 	new.speed = new.speed / 2
-	new.defence = new.defence - 3
+	new.defence = math.max(0, new.defence - 3)
+	new.willpower = math.max(0, new.willpower - 3)
 	new.cooldown_mult = new.cooldown_mult * 1.25
 	obj:reset_rest_cooldown()
 end
@@ -81,7 +83,8 @@ end
 charge_effect = {}
 
 function charge_effect.stat(effect, obj, old, new)
-	new.defence = new.defence + 4 + obj.stats.level
+	new.defence = new.defence + 5
+        new.strength = new.strength + 2
 	new.speed = 0
 end
 
@@ -97,7 +100,7 @@ function thrown_effect.init(effect, obj)
 	effect.steps = 0
 end
 
-local THROW_DURATION = 9
+local THROW_DURATION = 15
 
 function thrown_effect.step(effect, obj) 
 

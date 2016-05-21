@@ -227,6 +227,7 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(getters, deepest_floor, OBJ->score_stats().deepest_floor);
 	LUAWRAP_GETTER(getters, deaths, OBJ->score_stats().deaths);
 	LUAWRAP_GETTER(getters, spells, OBJ->stats().spells.spell_id_list());
+	LUAWRAP_METHOD(methods, melee, luawrap::push(L, OBJ->melee_attack(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2), OBJ->equipment().weapon(), true)) );
 
 	LUAWRAP_GETTER(methods, is_local_player, OBJ->is_local_player());
 	LUAWRAP_METHOD(methods, reset_rest_cooldown, OBJ->cooldowns().reset_rest_cooldown(REST_COOLDOWN));

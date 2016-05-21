@@ -1,4 +1,4 @@
--- Provides routines for essentially writine a struct to a SerializationBuffer
+-- Provides routines for essentially writing a struct to a SerializationBuffer
 local M = nilprotect {} -- Submodule
 
 -- Serialization types
