@@ -28,11 +28,17 @@ endif()
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     if ($ENV{BUILD_SANITIZE})
         SET (CMAKE_EXE_LINKER_FLAGS
-            -fsanitize=address 
+            "-fsanitize=address"
+        )
+        SET (CMAKE_EXE_LINKER_FLAGS
+            "-fsanitize=undefined"
         )
         add_definitions(
-           -fsanitize=address 
+          "-fsanitize=address"  
         )
+        add_definitions(
+          "-fsanitize=undefined"  
+          )
     endif()
 else()
     add_definitions(-DNDEBUG)

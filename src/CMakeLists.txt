@@ -117,7 +117,7 @@ set (libraries
 	${SDLMIXER_LIBRARY}
         enet
 	${SDL_LIBRARY}
-	${SDLMAIN_LIBRARY}
+        #	${SDLMAIN_LIBRARY}
 	${FREETYPE_LIBRARIES}
         UnitTest++
 )
