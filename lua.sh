@@ -1,1 +1,1 @@
-./run.sh ./run.sh -f --lua $@
+./run.sh -f --lua $@

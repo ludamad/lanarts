@@ -30,9 +30,9 @@ end
 M.Decoration = GameObject.type_create(Base)
 local Decoration = M.Decoration
 function Decoration:on_step()
-    if self.sprite or Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
-        return -- Need to be able to scale to many deactivated instances
-    end 
+--    if self.sprite or Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
+--        return -- Need to be able to scale to many deactivated instances
+--    end 
     if Map.object_visible(self) then
         self.sprite = self.real_sprite
     end
@@ -49,9 +49,9 @@ M.Door = GameObject.type_create(Base)
 local Door = M.Door
 local DOOR_OPEN_TIMEOUT = 128
 function Door:on_step()
-    if Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
-        return -- Need to be able to scale to many deactivated instances
-    end 
+--    if Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
+--        return -- Need to be able to scale to many deactivated instances
+--    end 
 
     if self.open_timeout > 0 then
         self.open_timeout = self.open_timeout - 1

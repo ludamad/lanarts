@@ -26,7 +26,6 @@ FeatureInst::FeatureInst(const Pos& pos, feature_t feature, bool solid,
 		sprite_id spriteid, int depth, int sprite_frame) :
 		GameInst(pos.x, pos.y, RADIUS, solid, depth), feature(feature), last_seen_spr(
 				-1), spriteid(spriteid), sprite_frame(sprite_frame) {
-
 }
 
 FeatureInst::~FeatureInst() {
@@ -35,15 +34,13 @@ FeatureInst::~FeatureInst() {
 void FeatureInst::draw(GameState* gs) {
 	Colour drawcolour = COL_WHITE;
 	if (last_seen_spr > -1) {
-		SpriteEntry& spr_entry = game_sprite_data.at(last_seen_spr);
 		res::sprite(last_seen_spr).draw(
 				ldraw::DrawOptions().origin(ldraw::CENTER).frame(sprite_frame).colour(
 						drawcolour), on_screen(gs, ipos()));
-	}
+        }
 }
 
 void FeatureInst::step(GameState* gs) {
-
 	if (gs->object_visible_test(this)) {
 		sprite_id spr = spriteid;
 		if (feature == DOOR_CLOSED) {
@@ -55,7 +52,6 @@ void FeatureInst::step(GameState* gs) {
 	}
 
 	Pos tile_xy(x / TILE_SIZE, y / TILE_SIZE);
-
 	if (gs->object_radius_test(x, y, TILE_SIZE)) {
 		if (feature == DOOR_CLOSED) {
 			gs->tiles().set_solid(tile_xy, false);
@@ -133,4 +129,3 @@ void FeatureInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read_int(spriteid);
 	serializer.read_int(sprite_frame);
 }
-

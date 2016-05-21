@@ -130,7 +130,6 @@ EnemyEntry& EnemyInst::etype() {
 void EnemyInst::init(GameState* gs) {
 	CombatGameInst::init(gs);
 	MonsterController& mc = gs->monster_controller();
-//	collision_simulation_id() = coll_avoid.add_object(e);
 	mc.register_enemy(this);
 
 	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
@@ -190,7 +189,6 @@ void EnemyInst::step(GameState* gs) {
 	}
 }
 void EnemyInst::draw(GameState* gs) {
-
 	GameView& view = gs->view();
 	ldraw::Drawable& spr = res::sprite(etype().enemy_sprite);
 
