@@ -60,8 +60,8 @@ end
 function berserk_effect.stat(effect, obj, old, new)	
 	new.strength = new.strength + obj.stats.level
 	new.defence = math.max(0, new.defence + 5)
-	new.willpower = math.max(0, new.willpower + 5)
-	new.melee_cooldown_multiplier = new.melee_cooldown_multiplier / 2.0
+	new.willpower = math.max(0, new.willpower)
+	new.melee_cooldown_multiplier = new.melee_cooldown_multiplier / 1.6
 	new.speed = new.speed + 1
 	obj:reset_rest_cooldown()
 end

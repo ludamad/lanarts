@@ -58,7 +58,7 @@ Data.class_create {
         willpower = 3,
         magic = 2,
         equipment = {
-          weapon = "Short Sword",
+          weapon = "Dagger",
           gold = 0,
           inventory = {
              {item = "Stone", amount = 10} 
@@ -88,7 +88,7 @@ Data.class_create {
     },
     start_stats = {
         movespeed = 4,
-        hp = 50,
+        hp = 90,
         mp = 70,
         hpregen = 0.03,
         mpregen = 0.05,
