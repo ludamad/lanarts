@@ -3,7 +3,7 @@
  *  Exercises the shape drawing methods
  */
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <GL/glu.h>
 
 #include <lua.hpp>
@@ -30,8 +30,8 @@
 #include "Font.h"
 
 static bool handle_event(SDL_Event* event) {
-	SDLKey keycode = event->key.keysym.sym;
-	SDLMod keymod = event->key.keysym.mod;
+	SDL_Keycode keycode = event->key.keysym.sym;
+	SDL_Keymod keymod = (SDL_Keymod) event->key.keysym.mod;
 
 	switch (event->type) {
 	case SDL_MOUSEBUTTONDOWN: {

@@ -99,7 +99,7 @@ public:
 	float vx, vy;
 	float rx, ry;
 protected:
-	bool is_resting;
+	bool is_resting = false;
 	sprite_id sprite;
 	simul_id simulation_id;
 	obj_id current_target;

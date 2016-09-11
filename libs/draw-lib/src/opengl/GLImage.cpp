@@ -6,11 +6,11 @@
 #include <lcommon/math_util.h>
 #include <lcommon/fatal_error.h>
 
-#include <SDL_opengl.h>
+#include <SDL2/SDL_opengl.h>
 
 //Surpress some multiple definition warnings:
 #undef GL_GLEXT_VERSION
-#include <SDL_image.h>
+#include <SDL2/SDL_image.h>
 #include <GL/glu.h>
 
 #include "ldraw_assert.h"
@@ -49,11 +49,8 @@ static GLuint SDL_GL_LoadTexture(SDL_Surface *surface, GLfloat *texcoord) {
 	}
 
 	/* Save the alpha blending attributes */
-	saved_flags = surface->flags & (SDL_SRCALPHA | SDL_RLEACCELOK);
-	saved_alpha = surface->format->alpha;
-	if ((saved_flags & SDL_SRCALPHA) == SDL_SRCALPHA) {
-		SDL_SetAlpha(surface, 0, 0);
-	}
+	SDL_GetSurfaceAlphaMod(surface, &saved_alpha);
+	SDL_SetSurfaceAlphaMod(surface, 0);
 
 	/* Copy the surface into the GL texture image */
 	area.x = 0;
@@ -63,9 +60,7 @@ static GLuint SDL_GL_LoadTexture(SDL_Surface *surface, GLfloat *texcoord) {
 	SDL_BlitSurface(surface, &area, image, &area);
 
 	/* Restore the alpha blending attributes */
-	if ((saved_flags & SDL_SRCALPHA) == SDL_SRCALPHA) {
-		SDL_SetAlpha(surface, saved_flags, saved_alpha);
-	}
+    SDL_SetSurfaceAlphaMod(surface, saved_alpha);
 
 	/* Create an OpenGL texture for the image */
 	glGenTextures(1, &texture);

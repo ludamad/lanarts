@@ -100,7 +100,7 @@ Data.weapon_create {
 
     resist_modifier = 1.1,
 
-    damage = {base = {5, 10}, strength = 1.25},
+    damage = {base = {7, 12}, strength = 1.25},
     power = {base = {2, 5}, strength = 0.5},
 
     cooldown = 55,
@@ -119,7 +119,7 @@ Data.weapon_create {
 
     resist_modifier = 1.1,
 
-    damage = {strength = 1.1, magic = 0.2, base = {4, 8}},
+    damage = {strength = 1.1, magic = 0.2, base = {5, 9}},
     power = {base = 1, strength = 0.2},
 
     cooldown = 42,
@@ -148,8 +148,8 @@ Data.weapon_create {
 
     resist_modifier = 1.4,
 
-    damage = {base = {8, 12}, strength = 1.4},
-    power = {base = 6, strength = 0.25},
+    damage = {base = {9, 13}, strength = 1.4},
+    power = {base = 6, strength = 0.3},
 
     cooldown = 65,
 
@@ -234,7 +234,7 @@ Data.weapon_create {
 
 Data.weapon_create {
     name = "Mars Bow",
-    description = "A bow begotten of Mars blessing.",
+    description = "A bow begotten of Mars' blessing.",
     type = "bows",
 
     shop_cost = {205, 245},

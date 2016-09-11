@@ -3,9 +3,9 @@
  *  Control display options, and set indicate that you are done drawing.
  */
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #undef GL_GLEXT_VERSION
-#include <SDL_opengl.h>
+#include <SDL2/SDL_opengl.h>
 #include <GL/glu.h>
 
 #include <lcommon/geometry.h>
@@ -37,9 +37,10 @@ static void gl_set_drawing_area(int x, int y, int w, int h) {
 	glLoadIdentity();
 }
 
+static SDL_Window* MAIN_WINDOW = NULL;
+
 // Set up sane 2D drawing defaults
 static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullscreen) {
-
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
 		return;
@@ -50,23 +51,20 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
-	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 0);
 
-	int bpp = SDL_GetVideoInfo()->vfmt->BitsPerPixel;
+	MAIN_WINDOW = SDL_CreateWindow(
+	    window_name,
+        SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED,
+        w, h,
+        (fullscreen ? SDL_WINDOW_FULLSCREEN : 0) | SDL_WINDOW_OPENGL
+    );
 
-	/* Set the flags we want to use for setting the video mode */
-	Uint32 video_flags = SDL_OPENGL | SDL_DOUBLEBUF;
-	if (fullscreen)
-		video_flags |= SDL_FULLSCREEN;
-
-	if (SDL_SetVideoMode(w, h, bpp, video_flags) == NULL) {
+	if (MAIN_WINDOW == NULL) {
 		fprintf(stderr, "Couldn't set GL mode: %s\n", SDL_GetError());
 		SDL_Quit();
 		exit(1);
 	}
-
-	/* Set the window manager title bar */
-	SDL_WM_SetCaption(window_name, window_name);
 
 	glDisable(GL_TEXTURE_2D);
 
@@ -78,27 +76,7 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
 }
 
 static void gl_set_fullscreen(bool fullscreen) {
-	Uint32 video_flags = SDL_OPENGL | SDL_DOUBLEBUF;
-	if (fullscreen) {
-		video_flags |= SDL_FULLSCREEN;
-	}
-
-	const SDL_VideoInfo* vid_info = SDL_GetVideoInfo();
-	int w = vid_info->current_w, h = vid_info->current_h;
-	int bpp;
-
-	/*detect the display depth */
-	if (vid_info->vfmt->BitsPerPixel <= 8) {
-		bpp = 8;
-	} else {
-		bpp = 16; /* More doesn't seem to work */
-	}
-
-	if (SDL_SetVideoMode(w, h, bpp, video_flags) == NULL) {
-		fprintf(stderr, "Couldn't set GL mode: %s\n", SDL_GetError());
-		SDL_Quit();
-		exit(1);
-	}
+    SDL_SetWindowFullscreen(MAIN_WINDOW, fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
 }
 
 void ldraw::display_initialize(const char* window_name,
@@ -117,8 +95,7 @@ void ldraw::display_set_drawing_region(const BBoxF & bbox) {
 }
 
 bool ldraw::display_is_fullscreen() {
-	const SDL_Surface* surface = SDL_GetVideoSurface();
-	return (surface->flags & SDL_FULLSCREEN);
+    return (SDL_GetWindowFlags(MAIN_WINDOW) & SDL_WINDOW_FULLSCREEN) != 0;
 }
 
 void ldraw::display_draw_start() {
@@ -127,12 +104,17 @@ void ldraw::display_draw_start() {
 }
 void ldraw::display_draw_finish() {
 	perf_timer_begin("SDL_GL_SwapBuffers");
-	SDL_GL_SwapBuffers();
+	SDL_GL_SwapWindow(MAIN_WINDOW);
 	perf_timer_end("SDL_GL_SwapBuffers");
 }
 
 Size ldraw::display_size() {
-	const SDL_Surface* surface = SDL_GetVideoSurface();
-	return Size(surface->w, surface->h);
+    SDL_DisplayMode dm;
+    if (SDL_GetWindowDisplayMode(MAIN_WINDOW, &dm)) {
+        fprintf(stderr, "Couldn't get window display mode: %s\n", SDL_GetError());
+        SDL_Quit();
+        exit(1);
+    }
+	return Size(dm.w, dm.h);
 }
 

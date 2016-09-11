@@ -1,17 +1,17 @@
 cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lanarts)
 
-FIND_PACKAGE(SDL REQUIRED)
-FIND_PACKAGE(SDL_image REQUIRED)
-FIND_PACKAGE(SDL_mixer REQUIRED)
-FIND_PACKAGE(OpenGL REQUIRED)
+FIND_LIBRARY(SDL2 REQUIRED)
+FIND_LIBRARY(SDL2_image REQUIRED)
+FIND_LIBRARY(SDL2_mixer REQUIRED)
+FIND_LIBRARY(OpenGL REQUIRED)
 include(FindFreetype)
 
 set( LIBS ../libs)
 set( DEPS ../dependencies)
 set( BUILTDEPS ${CMAKE_BINARY_DIR}/dependencies )
 
-add_definitions( -std=c++98)
+add_definitions( -std=c++11)
 
 if (${USE_LUAJIT})
     set( lua_includes ${DEPS}/luajit/src )
