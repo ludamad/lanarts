@@ -15,43 +15,44 @@ cmake_minimum_required(VERSION 2.8.7)
 
 project(libvorbis)
 
-set(libvorbis_dir ${dependencies_libvorbis_distr_dir})
-
 if(WIN32)
   add_definitions(-D_USE_MATH_DEFINES)
 endif()
 
 # Include libogg header files.
-include_directories(${dependencies_libogg_distr_dir}/include)
+include_directories(../libogg-1.3.1/lib/include)
 
 # Include libvorbis header files.
-include_directories(${libvorbis_dir}/include)
-include_directories(${libvorbis_dir}/lib)
+include_directories(include)
+include_directories(lib)
 
 set(libvorbis_SRCS
-    ${libvorbis_dir}/lib/analysis.c
-    ${libvorbis_dir}/lib/bitrate.c
-    ${libvorbis_dir}/lib/block.c
-    ${libvorbis_dir}/lib/codebook.c
-    ${libvorbis_dir}/lib/envelope.c
-    ${libvorbis_dir}/lib/floor0.c
-    ${libvorbis_dir}/lib/floor1.c
-    ${libvorbis_dir}/lib/info.c
-    ${libvorbis_dir}/lib/lookup.c
-    ${libvorbis_dir}/lib/lpc.c
-    ${libvorbis_dir}/lib/lsp.c
-    ${libvorbis_dir}/lib/mapping0.c
-    ${libvorbis_dir}/lib/mdct.c
-    ${libvorbis_dir}/lib/psy.c
-    ${libvorbis_dir}/lib/registry.c
-    ${libvorbis_dir}/lib/res0.c
-    ${libvorbis_dir}/lib/sharedbook.c
-    ${libvorbis_dir}/lib/smallft.c
-    ${libvorbis_dir}/lib/synthesis.c
-    ${libvorbis_dir}/lib/vorbisenc.c
-    ${libvorbis_dir}/lib/vorbisfile.c
-    ${libvorbis_dir}/lib/window.c)
+    ./lib/info.c
+    ./lib/codebook.c
+    ./lib/registry.c
+    ./lib/mdct.c
+    ./lib/res0.c
+    ./lib/mapping0.c
+    ./lib/envelope.c
+    ./lib/window.c
+    ./lib/synthesis.c
+    ./lib/psy.c
+    ./lib/lpc.c
+    ./lib/vorbisenc.c
+    ./lib/lookup.c
+    ./lib/analysis.c
+    ./lib/floor1.c
+    ./lib/floor0.c
+    ./lib/lsp.c
+    ./lib/barkmel.c
+    ./lib/tone.c
+    ./lib/block.c
+    ./lib/smallft.c
+    ./lib/vorbisfile.c
+    ./lib/bitrate.c
+    ./lib/sharedbook.c
+)
     # ${libvorbis_dir}/lib/tone.c
 
-add_library(libvorbis ${libvorbis_SRCS})
+add_library(libvorbis STATIC ${libvorbis_SRCS})
 

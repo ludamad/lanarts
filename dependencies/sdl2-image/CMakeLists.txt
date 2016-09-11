@@ -27,6 +27,7 @@ ADD_LIBRARY (
     IMG_xxx.c
 )
 
+ADD_DEPENDENCIES(SDL2-image SDL2-static)
 TARGET_LINK_LIBRARIES(
     SDL2-image
     png
