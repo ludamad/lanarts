@@ -6,20 +6,18 @@
 #ifndef PACKETQUEUE_H_
 #define PACKETQUEUE_H_
 
+#include <mutex>
+#include <condition_variable>
 #include <deque>
-#include <SDL/SDL_mutex.h>
 #include <enet/enet.h>
 
 class PacketQueue {
 public:
-	PacketQueue();
-	~PacketQueue();
-
 	ENetPacket* wait_for_packet(int timeout);
 	void queue_packet(ENetPacket* packet);
 private:
-	SDL_mutex* _queue_lock;
-	SDL_cond* _has_packets;
+        std::mutex _queue_lock;
+        std::condition_variable _has_packets;
 	std::deque<ENetPacket*> _packets;
 };
 

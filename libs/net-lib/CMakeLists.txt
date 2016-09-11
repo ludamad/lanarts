@@ -5,7 +5,7 @@ set( DEPS ../../dependencies)
 
 FIND_PACKAGE(SDL REQUIRED)
 
-add_definitions( -std=c++98 )
+add_definitions( -std=c++11 )
 
 include_directories(
 	${SDL_INCLUDE_DIR} 
@@ -14,8 +14,6 @@ include_directories(
 	../luawrap-lib/include
 	${DEPS}/UnitTest++ 
 )
-
-add_definitions( -std=c++98 )
 
 aux_source_directory( "impl/" lanarts_net_src)
 aux_source_directory( "tests/" lanarts_net_tests_src)

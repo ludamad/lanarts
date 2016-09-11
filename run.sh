@@ -132,7 +132,7 @@ function run_lanarts(){
         echo "Wrapping in GDB:" | colorify '1;35'
         gdb -silent -ex=r --args ../build/src/lanarts $args
     else
-        ../build/src/lanarts $args
+        exec ../build/src/lanarts $args
     fi
     cd ..
 }

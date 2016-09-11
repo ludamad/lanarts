@@ -54,5 +54,5 @@ set(libvorbis_SRCS
 )
     # ${libvorbis_dir}/lib/tone.c
 
-add_library(libvorbis STATIC ${libvorbis_SRCS})
+add_library(vorbis STATIC ${libvorbis_SRCS})
 

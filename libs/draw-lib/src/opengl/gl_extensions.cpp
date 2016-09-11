@@ -81,7 +81,7 @@ static bool glx_check_extension(const std::string& extension) {
 }
 
 // Attempts to enable/disable vsync, returns false if it is unable to do so
-bool gl_set_vsync(bool state) {
+bool gl_set_vsync(bool state) {return true;
 	typedef void (*swap_intervalf)(int);
 	swap_intervalf swapinterval;
     if (glx_check_extension("GLX_MESA_swap_control")) {

@@ -15,6 +15,9 @@
 
 #include "opengl/gl_extensions.h"
 
+static SDL_Window* MAIN_WINDOW = NULL;
+static SDL_Renderer* MAIN_RENDERER = NULL;
+
 static void gl_set_drawing_area(int x, int y, int w, int h) {
 	glViewport(x, y, w, h);
 
@@ -37,7 +40,6 @@ static void gl_set_drawing_area(int x, int y, int w, int h) {
 	glLoadIdentity();
 }
 
-static SDL_Window* MAIN_WINDOW = NULL;
 
 // Set up sane 2D drawing defaults
 static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullscreen) {
@@ -65,6 +67,12 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
 		SDL_Quit();
 		exit(1);
 	}
+
+    /* To get SDL_Texture support, we need to setup a renderer, which
+       will take care of setting up OpenGL. Ideally we should check
+       SDL_GetRenderDriverInfo() for name "opengl*", to avoid a
+       software or d3d renderer.  We can't use our own context. */
+    MAIN_RENDERER = SDL_CreateRenderer(MAIN_WINDOW, -1, SDL_RENDERER_ACCELERATED);
 
 	glDisable(GL_TEXTURE_2D);
 

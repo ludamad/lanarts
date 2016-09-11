@@ -8,8 +8,8 @@
 
 #include <vector>
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_mutex.h>
+#include <SDL_thread.h>
+#include <mutex>
 #include <enet/enet.h>
 
 #include "../NetConnection.h"
@@ -36,7 +36,7 @@ struct ServerConnectionData {
 	ConnectionList connections;
 	/* Lock to ensure the main & polling thread don't send packets at once
 	 * This is needed because enet's sending mechanism is not thread-safe */
-	SDL_mutex* packet_send_mutex;
+        std::mutex packet_send_mutex;
 };
 
 class ServerConnection: public NetConnection {

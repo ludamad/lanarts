@@ -115,12 +115,12 @@ set (libraries
 	${OPENGL_gl_LIBRARY}
 	${SDLMIXER_LIBRARY}
         enet
-        SDL2-static
-        SDL2-image
-        SDL2-mixer
         #	${SDLMAIN_LIBRARY}
 	${FREETYPE_LIBRARIES}
         UnitTest++
+        SDL2-image
+        SDL2-mixer
+        SDL2-static
 )
 
 target_link_libraries( lanarts 

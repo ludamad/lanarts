@@ -1,5 +1,5 @@
 #ifndef DATAFILENAMES_H_
-#define DATAFILENAMESH_
+#define DATAFILENAMES_H_
 
 #include "FilenameList.h"//For FilenameList
 /*Specifies locations of various data files*/
