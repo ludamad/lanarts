@@ -2,8 +2,6 @@ cmake_minimum_required( VERSION 2.6 )
 
 PROJECT(project_ldraw)
 
-FIND_PACKAGE(SDL2 REQUIRED)
-FIND_LIBRARY(SDL2_image REQUIRED)
 FIND_LIBRARY(OpenGL REQUIRED)
 include(FindFreetype)
 
@@ -18,8 +16,8 @@ include_directories(
 	"${SRC}/luawrap-lib/include"
 	${DEPS}/UnitTest++
 	${DEPS}/lua
-	${SDL2_INCLUDE_DIR} 
-	${SDL2IMAGE_INCLUDE_DIR} 
+	"${DEPS}/sdl2/include"
+	"${DEPS}/sdl2-image"
 	${OpenGL_INCLUDE_DIRS} 		
 	${FREETYPE_INCLUDE_DIRS} 
 )
@@ -44,12 +42,12 @@ add_library( ldraw
 
          message(STATUS ${SDL2_LIBRARY})
 set(LINKEDDEPS
-	${SDL2IMAGE_LIBRARY}
-	${SDL2_LIBRARY}
 	ldraw
 	luawrap
 	lcommon
 	lua
+        SDL2-static
+        SDL2-image
 	${OPENGL_gl_LIBRARY}
 	${FREETYPE_LIBRARIES}
 )

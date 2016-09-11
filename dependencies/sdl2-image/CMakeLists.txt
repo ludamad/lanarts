@@ -6,8 +6,9 @@ ADD_DEFINITIONS (
     -DLOAD_PNG
 )
 
+INCLUDE_DIRECTORIES(../sdl2/include)
 ADD_LIBRARY (
-    SDL2_image
+    SDL2-image
 
     IMG.c
     IMG_bmp.c
@@ -27,6 +28,6 @@ ADD_LIBRARY (
 )
 
 TARGET_LINK_LIBRARIES(
-    SDL2_image
+    SDL2-image
     png
 )

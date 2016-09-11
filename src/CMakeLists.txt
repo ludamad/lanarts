@@ -112,11 +112,12 @@ set (libraries
 	RVO
         #physfs-static
         libxmi
-	${SDLIMAGE_LIBRARY}
 	${OPENGL_gl_LIBRARY}
 	${SDLMIXER_LIBRARY}
         enet
-	${SDL_LIBRARY}
+        SDL2-static
+        SDL2-image
+        SDL2-mixer
         #	${SDLMAIN_LIBRARY}
 	${FREETYPE_LIBRARIES}
         UnitTest++

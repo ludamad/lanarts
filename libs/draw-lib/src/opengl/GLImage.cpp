@@ -6,11 +6,11 @@
 #include <lcommon/math_util.h>
 #include <lcommon/fatal_error.h>
 
-#include <SDL2/SDL_opengl.h>
+#include <SDL_opengl.h>
 
 //Surpress some multiple definition warnings:
 #undef GL_GLEXT_VERSION
-#include <SDL2/SDL_image.h>
+#include <SDL_image.h>
 #include <GL/glu.h>
 
 #include "ldraw_assert.h"
