@@ -1,1 +1,1 @@
-sudo yum install SDL-static SDL_image SDL_image-devel SDL_mixer-devel freetype-devel gcc-c++ cmake
+sudo yum install freetype-devel gcc-c++ cmake libXext-devel mesa-libGL-devel 

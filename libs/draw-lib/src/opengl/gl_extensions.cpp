@@ -8,8 +8,6 @@
 
 #include <string>
 
-#include <GL/glu.h>
-
 #include "gl_extensions.h"
 
 static bool query_ext_string(const std::string& extension,

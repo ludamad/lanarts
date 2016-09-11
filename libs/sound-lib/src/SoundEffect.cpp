@@ -3,7 +3,7 @@
  *  Represents a sound effect, multiple can be played at a time.
  */
 
-#include <SDL/SDL_mixer.h>
+#include <SDL_mixer.h>
 
 #include "SoundEffect.h"
 #include "Sound.h"

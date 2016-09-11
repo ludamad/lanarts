@@ -1,14 +1,13 @@
 cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lcommon)
 
-FIND_PACKAGE(SDL REQUIRED)
-
 set( SRC "..")
 set( DEPS ../../dependencies)
-include_directories(${SDL_INCLUDE_DIR}
+include_directories(
 	include/lcommon/
 	${DEPS}/UnitTest++ 
 	${DEPS}/lua 
+	${DEPS}/sdl2/include
 	"${SRC}/luawrap-lib/include"
 )
 add_definitions( -std=c++98 )

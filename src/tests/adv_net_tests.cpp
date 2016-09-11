@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 
-#include <SDL/SDL_thread.h>
+#include <SDL_thread.h>
 
 #include <lua.hpp>
 

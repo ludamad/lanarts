@@ -3,8 +3,6 @@ PROJECT(project_lanarts_dungeon_gen)
 
 set( DEPS ../../dependencies)
 
-FIND_PACKAGE(SDL REQUIRED)
-
 add_definitions( -std=c++98 )
 
 include_directories(

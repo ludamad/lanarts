@@ -11,7 +11,6 @@
 //Surpress some multiple definition warnings:
 #undef GL_GLEXT_VERSION
 #include <SDL_image.h>
-#include <GL/glu.h>
 
 #include "ldraw_assert.h"
 

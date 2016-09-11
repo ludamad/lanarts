@@ -5,7 +5,7 @@
 
 #include <vector>
 
-#include <SDL/SDL_thread.h>
+#include <SDL_thread.h>
 
 #include <lcommon/Timer.h>
 
@@ -176,7 +176,7 @@ void ServerConnection::initialize_connection() {
 		__lnet_throw_connection_error(
 				"An error occurred while trying to create an ENet server host.\n");
 	}
-	_polling_thread = SDL_CreateThread(server_poll_thread, _data);
+	_polling_thread = SDL_CreateThread(server_poll_thread, "server-poll-thread", _data);
 	if (!_polling_thread) {
 		__lnet_throw_connection_error(
 				"An error occurred while trying to create the server connection polling thread.\n");

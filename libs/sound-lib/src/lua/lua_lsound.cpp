@@ -3,7 +3,7 @@
  *  Bindings for the lsound component
  */
 
-#include <SDL/SDL_mixer.h>
+#include <SDL_mixer.h>
 
 #include <luawrap/luameta.h>
 #include <luawrap/types.h>

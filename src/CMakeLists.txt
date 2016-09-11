@@ -1,9 +1,6 @@
 cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lanarts)
 
-FIND_LIBRARY(SDL2 REQUIRED)
-FIND_LIBRARY(SDL2_image REQUIRED)
-FIND_LIBRARY(SDL2_mixer REQUIRED)
 FIND_LIBRARY(OpenGL REQUIRED)
 include(FindFreetype)
 
@@ -11,7 +8,7 @@ set( LIBS ../libs)
 set( DEPS ../dependencies)
 set( BUILTDEPS ${CMAKE_BINARY_DIR}/dependencies )
 
-add_definitions( -std=c++11)
+add_definitions( -std=c++11 -Wno-deprecated-declarations)
 
 if (${USE_LUAJIT})
     set( lua_includes ${DEPS}/luajit/src )
@@ -23,8 +20,8 @@ set( lua_libraries lua )
 
 include_directories(
     "."
-    ${SDL_INCLUDE_DIR} 
-    ${SDLIMAGE_INCLUDE_DIR}
+    "${DEPS}/sdl2/include"
+    "${DEPS}/sdl2-image/"
     ${OpenGL_INCLUDE_DIRS} 		
     ${FREETYPE_INCLUDE_DIRS}
     "${LIBS}/common-lib/include"
@@ -113,9 +110,7 @@ set (libraries
         #physfs-static
         libxmi
 	${OPENGL_gl_LIBRARY}
-	${SDLMIXER_LIBRARY}
         enet
-        #	${SDLMAIN_LIBRARY}
 	${FREETYPE_LIBRARIES}
         UnitTest++
         SDL2-image

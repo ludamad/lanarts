@@ -3,7 +3,7 @@
  *  Represents a piece of music, only one piece of music can be playing at a time.
  */
 
-#include <SDL/SDL_mixer.h>
+#include <SDL_mixer.h>
 
 #include "Music.h"
 #include "Sound.h"

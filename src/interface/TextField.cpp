@@ -29,7 +29,7 @@ void TextField::clear() {
 	clear_keystate();
 }
 
-static char keycode_to_char(SDLKey keycode, SDLMod keymod) {
+static char keycode_to_char(SDL_Keycode keycode, SDL_Keymod keymod) {
 	const char DIGIT_SYMBOLS[] = { ')', '!', '@', '#', '$', '%', '^', '&', '*',
 			'(' };
 	const char MISC_SYMBOLS[][2] = { { '`', '~' }, { ',', '<' }, { '.', '>' }, {
@@ -49,7 +49,7 @@ static char keycode_to_char(SDLKey keycode, SDLMod keymod) {
 	}
 	return keycode;
 }
-static bool is_typeable_keycode(SDLKey keycode) {
+static bool is_typeable_keycode(SDL_Keycode keycode) {
 	return (keycode >= SDLK_SPACE && keycode <= SDLK_z);
 }
 
@@ -82,7 +82,7 @@ void TextField::_reset_repeat_cooldown(int cooldownms) {
 
 /*Returns whether has handled event*/
 void TextField::step() {
-	if (!_has_repeat_cooldown() && _current_key != SDLK_FIRST) {
+	if (!_has_repeat_cooldown() && _current_key != SDLK_UNKNOWN) {
 		/*Handle keys being held down*/
 		if (is_typeable_keycode(_current_key)) {
 			if (_text.size() < _max_length) {
@@ -97,14 +97,14 @@ void TextField::step() {
 }
 
 bool TextField::handle_event(SDL_Event* event) {
-	SDLKey keycode = event->key.keysym.sym;
-	SDLMod keymod = event->key.keysym.mod;
+	SDL_Keycode keycode = event->key.keysym.sym;
+	SDL_Keymod keymod = SDL_Keymod(event->key.keysym.mod);
 	_current_mod = keymod;
 	switch (event->type) {
 	case SDL_KEYUP: {
 		/*Since the key-up isnt truly an action, we respond but pretend we didn't handle it*/
 		if (_current_key == keycode) {
-			_current_key = SDLK_FIRST;
+			_current_key = SDLK_UNKNOWN;
 		}
 		break;
 	}

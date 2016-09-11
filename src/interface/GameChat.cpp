@@ -169,8 +169,8 @@ bool GameChat::handle_event(GameState* gs, SDL_Event *event) {
 	int chat_w = view_w, chat_h = 100;
 	int chat_x = 0, chat_y = 0; //h - chat_h - TILE_SIZE;
 
-	SDLKey keycode = event->key.keysym.sym;
-	SDLMod keymod = event->key.keysym.mod;
+	SDL_Keycode keycode = event->key.keysym.sym;
+	SDL_Keymod keymod = SDL_Keymod(event->key.keysym.mod);
 
 	bool did_typing = false;
 	if (is_typing) {

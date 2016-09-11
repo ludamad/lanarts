@@ -516,6 +516,9 @@ namespace lua_api {
 
 	int read_eval_print(lua_State *L);
 
+        static double round(double x) {
+            return ::round(x);
+        }
 	void register_general_api(lua_State* L) {
 		LuaValue globals = luawrap::globals(L);
 		LuaValue registry = luawrap::registry(L);

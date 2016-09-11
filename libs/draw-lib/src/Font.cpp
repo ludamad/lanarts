@@ -2,8 +2,6 @@
 #include <stdexcept>
 #include <vector>
 
-#include <GL/glu.h>
-
 #include <ft2build.h>
 #include <freetype/freetype.h>
 #include <freetype/ftglyph.h>

@@ -8,7 +8,6 @@
 
 #include <cstdlib>
 #include <SDL_opengl.h>
-#include <GL/glu.h>
 
 #include <lcommon/geometry.h>
 #include <ldraw/Colour.h>

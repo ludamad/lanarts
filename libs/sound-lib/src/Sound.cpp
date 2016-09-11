@@ -3,7 +3,7 @@
  *  A smart reference to a sound file.
  */
 
-#include <SDL/SDL_mixer.h>
+#include <SDL_mixer.h>
 #include <Sound.h>
 #include <SoundBase.h>
 

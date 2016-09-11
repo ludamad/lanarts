@@ -3,8 +3,7 @@
  *  Exercises the shape drawing methods
  */
 
-#include <SDL2/SDL.h>
-#include <GL/glu.h>
+#include <SDL.h>
 
 #include <lua.hpp>
 

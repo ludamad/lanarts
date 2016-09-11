@@ -1,6 +1,6 @@
 // Simple tests for utility classes
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include <lcommon/unittest.h>
 #include "../impl/PacketQueue.h"
 
@@ -16,7 +16,7 @@ static int writer_thread(void* _queue) {
 TEST(packet_queue) {
 	PacketQueue queue;
 	/* Ensure we get sequential packets */
-	SDL_CreateThread(writer_thread, &queue);
+	SDL_CreateThread(writer_thread, "packet-queue-thread", &queue);
 	for (int i = 0; i < 1000; i++) {
 		ENetPacket* pseudo_packet = queue.wait_for_packet(-1);
 		CHECK_EQUAL(i, (long)pseudo_packet);

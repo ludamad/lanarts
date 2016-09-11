@@ -67,6 +67,7 @@ if(YAML_CPP_BUILD_CONTRIB)
 else()
 	add_definitions(-DYAML_CPP_NO_CONTRIB)
 endif()
+add_definitions(-Wno-deprecated-declarations)
 
 if(VERBOSE)
 	message(STATUS "sources: ${sources}")

@@ -40,8 +40,8 @@ private:
 
 	bool _has_repeat_cooldown();
 	void _reset_repeat_cooldown(int cooldownms);
-	SDLKey _current_key;
-	SDLMod _current_mod;
+	SDL_Keycode _current_key;
+	SDL_Keymod _current_mod;
 
 	std::string _text;
 	int _max_length;

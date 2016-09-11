@@ -7,7 +7,8 @@
 #define IOCONTROLLER_H_
 
 #include <vector>
-#include <SDL/SDL.h>
+#include <unordered_map>
+#include <SDL.h>
 
 #include "lanarts_defines.h"
 
@@ -56,18 +57,18 @@ struct IOEventTrigger {
 
 	IOEvent event;
 	trigger_t trigger;
-	SDLKey trigger_key;
-	SDLMod mod_required;
-	SDLMod mod_rejected;
+	SDL_Keycode trigger_key;
+	SDL_Keymod mod_required;
+	SDL_Keymod mod_rejected;
 	// Does holding the key always trigger this event ?
 	bool trigger_continuously;
 
-	bool should_trigger(IOEventTrigger::trigger_t trigger, SDLKey trigger_key,
-			SDLMod mod, bool holding_key);
+	bool should_trigger(IOEventTrigger::trigger_t trigger, SDL_Keycode trigger_key,
+			SDL_Keymod mod, bool holding_key);
 
 	IOEventTrigger(const IOEvent& event, trigger_t trigger = NONE,
-			SDLKey trigger_key = SDLK_UNKNOWN, SDLMod mod_required = KMOD_NONE,
-			SDLMod mod_rejected = KMOD_NONE, bool trigger_continuously = false) :
+			SDL_Keycode trigger_key = SDLK_UNKNOWN, SDL_Keymod mod_required = KMOD_NONE,
+			SDL_Keymod mod_rejected = KMOD_NONE, bool trigger_continuously = false) :
 			event(event), trigger(trigger), trigger_key(trigger_key), mod_required(
 					mod_required), mod_rejected(mod_rejected), trigger_continuously(
 					trigger_continuously) {
@@ -83,9 +84,9 @@ struct IOState {
 				event(event), triggered_already(triggered_already) {
 		}
 	};
-	char key_down_states[SDLK_LAST];
-	char key_press_states[SDLK_LAST];
-	SDLMod keymod;
+        std::unordered_map<SDL_Keycode, bool> key_down_states;
+        std::unordered_map<SDL_Keycode, bool> key_press_states;
+	SDL_Keymod keymod;
 	int mousex, mousey;
 	bool mouse_leftdown, mouse_rightdown;
 	bool mouse_leftclick, mouse_rightclick;
@@ -122,8 +123,8 @@ public:
 	int mouse_x();
 	int mouse_y();
 
-	int key_down_state(int keyval);
-	int key_press_state(int keyval);
+        bool key_down_state(int keyval);
+	bool key_press_state(int keyval);
 
 	std::vector<SDL_Event>& get_events();
 
@@ -137,8 +138,8 @@ public:
 	bool user_has_exit() const;
 
 private:
-	void __trigger_events(IOEventTrigger::trigger_t trigger, SDLKey trigger_key,
-			SDLMod mod, bool holding_key);
+	void __trigger_events(IOEventTrigger::trigger_t trigger, SDL_Keycode trigger_key,
+			SDL_Keymod mod, bool holding_key);
 	IOState iostate;
 
 	std::vector<spell_id> spells_bound;

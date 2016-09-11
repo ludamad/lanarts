@@ -3,10 +3,9 @@
  *  Control display options, and set indicate that you are done drawing.
  */
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #undef GL_GLEXT_VERSION
-#include <SDL2/SDL_opengl.h>
-#include <GL/glu.h>
+#include <SDL_opengl.h>
 
 #include <lcommon/geometry.h>
 #include <lcommon/perf_timer.h>

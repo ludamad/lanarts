@@ -4,6 +4,7 @@ PROJECT(SDL2_image)
 ADD_DEFINITIONS (
     -Wno-attributes
     -DLOAD_PNG
+    -DLOAD_BMP
 )
 
 INCLUDE_DIRECTORIES(../sdl2/include)

@@ -1,17 +1,14 @@
 cmake_minimum_required( VERSION 2.6 )
 PROJECT(project_lsound)
 
-FIND_PACKAGE(SDL REQUIRED)
-FIND_PACKAGE(SDL_mixer REQUIRED)
-
-set( LIBS ../../dependencies)
+set( DEPS ../../dependencies)
 set( SRC ..)
 
 include_directories(
     "include/lsound"
-    ${SDL_INCLUDE_DIR} 
-    ${SDLMIXER_INCLUDE_DIR} 
-    ${LIBS}/lua
+    "${DEPS}/lua"
+    "${DEPS}/sdl2/include"
+    "${DEPS}/sdl2-mixer"
     "${SRC}/luawrap-lib/include"
     "${SRC}/common-lib/include"
 )
@@ -36,8 +33,8 @@ set(LINKEDLIBS
 	luawrap
 	lcommon
 	lua
-	${SDL_LIBRARY}
-	${SDLMIXER_LIBRARY}
+        SDL2-static
+        SDL2-mixer
 )
 
 #add_executable( lsound_tests main.cpp)
