@@ -55,7 +55,7 @@ sprites:
     file: game/lanarts/effects/sprites/i-slowing.png
 
   - name: charge_effected
-    file: game/lanarts/spells/sprites/poof.gif
+    file: game/lanarts/spells/sprites/poof.png
 
   - name: thrown_effected
     file: game/lanarts/spells/sprites/fleeing.png
