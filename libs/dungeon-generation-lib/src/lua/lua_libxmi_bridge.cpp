@@ -90,6 +90,39 @@ static inline bool apply_operation_to_lines(ldungeon_gen::Map& map, /*bounds*/ B
 	return true;
 }
 
+// Define operators that traverse our custom map format using LibXMI's structures
+static inline void collect_matches_to_lines(ldungeon_gen::Map& map, /*bounds*/ BBox B,
+		std::vector<Pos>& matches, ldungeon_gen::Selector selector,
+		int n, const miPoint *ppt, const unsigned int *pwidth, Pos offset) {
+
+	/* if source doesn't overlap with destination drawable, do nothing */
+	if (ppt[0].y + offset.y >= B.y2 || ppt[n - 1].y + offset.y < B.y1) {
+		return;
+	}
+
+	for (int i = 0; i < n; i++) {
+		int y = ppt[i].y + offset.x;
+		if (y >= B.y2) {
+			return;
+		}
+		if (y >= B.y1) {
+			int xstart = ppt[i].x + offset.x;
+			int xend = xstart + (int) pwidth[i] - 1;
+
+			int xstart_clip = std::max(xstart, B.x1);
+			int xend_clip = std::min(xend, B.x2 - 1);
+
+			// Selector
+			for (int x = xstart_clip; x <= xend_clip; x++) {
+				if (map[Pos(x, y)].matches(selector)) {
+					matches.push_back(Pos(x,y));
+				}
+			}
+		}
+	}
+}
+
+
 static void apply_operators_to_painted_set(const miPaintedSet *paintedSet,
 		ldungeon_gen::Map& map, const OperatorTable& operator_table, BBox B, Pos offset) {
 	for (int i = 0; i < paintedSet->ngroups; i++) {
@@ -122,6 +155,22 @@ static bool apply_selectors_to_painted_set(const miPaintedSet *paintedSet,
 		}
 	}
 	return true;
+}
+
+static std::vector<Pos> collect_matches_in_painted_set(const miPaintedSet *paintedSet,
+		ldungeon_gen::Map& map, const SelectorTable& selector_table, BBox B, Pos offset) {
+	std::vector<Pos> matches;
+	for (int i = 0; i < paintedSet->ngroups; i++) {
+		SpanGroup* group = paintedSet->groups[i];
+		Spans* spans = &group->group[0];
+		if (spans->count > 0) {
+			LDUNGEON_ASSERT(group->pixel >= 1 && group->pixel <= selector_table.size());
+			collect_matches_to_lines(map, B,
+					matches, selector_table[group->pixel - 1],
+					spans->count, spans->points, spans->widths, offset);
+		}
+	}
+	return matches;
 }
 
 static miGC* init_gc() {
@@ -213,9 +262,25 @@ namespace ldungeon_gen {
 		Pos start = args["from_xy"].as<Pos>();
 		Pos end = args["to_xy"].as<Pos>();
 		miPoint arr[] = { { start.x, start.y }, { end.x, end.y } };
-
 		miDrawLines(ps.set, ps.gc, MI_COORD_MODE_ORIGIN, sizeof(arr)/sizeof(miPoint), arr);
 	}
+
+	// libxmi expects 1/64th degree format; converts radians to this.
+	static double RAD_FACTOR = 57.2957795 * 64;
+	static double rad_to_degree64ths(double rad) {
+	    return rad * RAD_FACTOR;
+	}
+    static void arcf(LuaStackValue args, PaintedSetWrapper& ps) {
+        int x = args["x"].to_int(), y = args["y"].to_int();
+        int w = args["width"].to_int(), h = args["height"].to_int();
+        double ang1 = args["angle1"].to_num(), ang2 = args["angle2"].to_num();
+
+
+        x -= w/2, y -= h/2;
+
+        miArc arc = {x, y, w, h, rad_to_degree64ths(ang1), rad_to_degree64ths(ang2)};
+        miDrawArcs(ps.set, ps.gc, 1, &arc);
+    }
 
 	static void configure(LuaStackValue args, PaintedSetWrapper& ps) {
 		int line_width = luawrap::defaulted(args["line_width"], 1);
@@ -258,6 +323,24 @@ namespace ldungeon_gen {
 		return apply_selectors_to_painted_set(ps.set, *map, selectors, area, offset);
 	}
 
+	static std::vector<Pos> generic_match(LuaStackValue args, applyf func) {
+		lua_State* L = args.luastate();
+		MapPtr map = args["map"].as<MapPtr>();
+
+		PaintedSetWrapper ps;
+		ps.set_pixel_fill(1);
+
+		configure(args, ps);
+		func(args, ps);
+
+		Selector selector = lua_selector_get(args["selector"]);
+		SelectorTable selectors(1);
+		selectors[0] = selector;
+		Pos offset = luawrap::defaulted(args["xy"], Pos());
+		BBox area = luawrap::defaulted(args["area"], BBox(Pos(), map->size()));
+		return collect_matches_in_painted_set(ps.set, *map, selectors, area, offset);
+	}
+
 	static void generic_render(LuaStackValue args, applyf func) {
 		lua_State* L = args.luastate();
 		PaintedSetWrapperPtr ps  = args["shape_set"].as<PaintedSetWrapperPtr>();
@@ -273,9 +356,28 @@ namespace ldungeon_gen {
 		generic_apply(args, linef);
 	}
 
+	static std::vector<Pos> line_match(LuaStackValue args) {
+		return generic_match(args, linef);
+	}
+
+	static std::vector<Pos> arc_match(LuaStackValue args) {
+		generic_match(args, arcf);
+	}
+	static void arc_apply(LuaStackValue args) {
+	    generic_apply(args, arcf);
+	}
+
 	static void polygon_render(LuaStackValue args) {
 		generic_render(args, polygonf);
 	}
+
+    static void arc_query(LuaStackValue args) {
+        generic_query(args, arcf);
+    }
+
+    static void arc_render(LuaStackValue args) {
+        generic_render(args, arcf);
+    }
 
 	static void line_render(LuaStackValue args) {
 		generic_render(args, linef);
@@ -323,11 +425,16 @@ namespace ldungeon_gen {
 		submodule["shape_set_create"].bind_function(shape_set_create);
 		submodule["shape_set_apply"].bind_function(shape_set_apply);
 
-		submodule["polygon_apply"].bind_function(polygon_apply);
+        submodule["polygon_apply"].bind_function(polygon_apply);
 		submodule["polygon_render"].bind_function(polygon_render);
 		submodule["polygon_query"].bind_function(polygon_query);
 		submodule["line_apply"].bind_function(line_apply);
 		submodule["line_render"].bind_function(line_render);
 		submodule["line_query"].bind_function(line_query);
+		submodule["line_match"].bind_function(line_match);
+		submodule["arc_apply"].bind_function(arc_apply);
+		submodule["arc_render"].bind_function(arc_render);
+		submodule["arc_query"].bind_function(arc_query);
+		submodule["arc_match"].bind_function(arc_match);
 	}
 }

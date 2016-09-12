@@ -182,7 +182,7 @@ public:
 		return true;
 	}
 };
-
+/*
 #include <ldraw/display.h>
 #include <ldraw/Colour.h>
 #include <ldraw/colour_constants.h>
@@ -226,7 +226,7 @@ static void render_bsp(bool first) {
 		}
 		printf("\n");
 	}
-}
+}*/
 
 //TEST(libtcod_sanity_test) {
 //printf("Hello, world!\n");

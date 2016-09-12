@@ -4,6 +4,7 @@
  */
 
 #include <lcommon/strformat.h>
+#include <vector>
 
 #include <luawrap/luawrap.h>
 #include <luawrap/members.h>
@@ -13,6 +14,7 @@
 #include "map_fill.h"
 #include "tunnelgen.h"
 #include "map_check.h"
+#include "map_misc_ops.h"
 
 #include "lua_ldungeon_impl.h"
 
@@ -192,6 +194,11 @@ namespace ldungeon_gen {
 		return 1;
 	}
 
+    static int lua_map_clear(lua_State* L) {
+        MapPtr map = luawrap::get<MapPtr>(L, 1);
+        map->clear();
+        return 0;
+    }
 	LuaValue lua_mapmetatable(lua_State* L) {
 		LUAWRAP_SET_TYPE(MapPtr&);
 
@@ -210,10 +217,11 @@ namespace ldungeon_gen {
 
 		getters["groups"].bind_function(lua_map_group_list);
 
+		methods["clear"].bind_function(lua_map_clear);
+
 		LUAWRAP_GETTER(getters, size, OBJ->size());
-		LUAWRAP_METHOD(methods, get, lua_square_push(L, (*OBJ)[luawrap::get<Pos>(L, 2)]));
-		LUAWRAP_METHOD(methods, set, (*OBJ)[luawrap::get<Pos>(L, 2)] =
-				lua_square_get(LuaStackValue(L, 3)));
+		LUAWRAP_METHOD(methods, get, lua_square_push(L, (*OBJ)[luawrap::get<Pos>(L, 2) - Pos(1,1)]));
+		LUAWRAP_METHOD(methods, set, (*OBJ)[luawrap::get<Pos>(L, 2) - Pos(1,1)] = lua_square_get(LuaStackValue(L, 3)));
 		LUAWRAP_METHOD(methods, square_apply, (*OBJ)[luawrap::get<Pos>(L, 2)].apply(lua_operator_get(LuaStackValue(L, 3))));
 		LUAWRAP_GETTER(methods, square_query, (*OBJ)[luawrap::get<Pos>(L, 2)].matches(lua_selector_get(LuaStackValue(L, 3))));
 
@@ -331,7 +339,7 @@ namespace ldungeon_gen {
 		MapPtr map = args["map"].as<MapPtr>();
 		BBox area = luawrap::defaulted(args["area"], BBox(Pos(0,0), map->size()));
 		Pos xy;
-		bool found = find_random_square(ldungeon_get_rng(L), map,
+		bool found = find_random_square(*args["rng"].as<MTwist*>(), map,
 				area, lua_selector_get(args["selector"]), xy,
 				luawrap::defaulted(args["max_attempts"],
 						RANDOM_MATCH_MAX_ATTEMPTS));
@@ -345,6 +353,53 @@ namespace ldungeon_gen {
 		}
 		return 1;
 	}
+	/* Retrieve data into a preallocated Lua table */
+    static int lget_row_flags(lua_State* L) {
+        MapPtr map = luawrap::get<MapPtr>(L, 1);
+        // Note, Lua indexing corrections are applied
+        int x1 = luaL_checkinteger(L, 3) - 1;
+        int x2 = luaL_checkinteger(L, 4);
+        int y = luaL_checkinteger(L, 5) - 1;
+        // What to use outside of map bounds?
+        double fill = luaL_checknumber(L, 6);
+        int w = map->width(), h = map->height();
+        Pos pos(x1, y);
+        int i = 1;
+        for (; pos.x < x2; pos.x++) {
+            if (pos.y < 0 || pos.y >= h || pos.x < 0 || pos.x >= w) {
+                lua_pushnumber(L, fill);
+            } else {
+                lua_pushnumber(L, (*map)[pos].flags);
+            }
+            lua_rawseti(L, 2, i);
+            i++;
+        }
+        return 0;
+    }
+    /* Retrieve data into a preallocated Lua table */
+    static int lget_row_content(lua_State* L) {
+        MapPtr map = luawrap::get<MapPtr>(L, 1);
+        // Note, Lua indexing corrections are applied
+        int x1 = luaL_checkinteger(L, 3) - 1;
+        int x2 = luaL_checkinteger(L, 4);
+        int y = luaL_checkinteger(L, 5) - 1;
+        // What to use outside of map bounds?
+        double fill = luaL_checknumber(L, 6);
+        int w = map->width(), h = map->height();
+        Pos pos(x1, y);
+        int i = 1;
+        for (; pos.x < x2; pos.x++) {
+            if (pos.y < 0 || pos.y >= h || pos.x < 0 || pos.x >= w) {
+                lua_pushnumber(L, fill);
+            } else {
+                lua_pushnumber(L, (*map)[pos].content);
+            }
+            lua_rawseti(L, 2, i);
+            i++;
+        }
+        return 0;
+    }
+
 	/*****************************************************************************
 	 *                     Area operator helpers                                 *
 	 *****************************************************************************/
@@ -388,6 +443,21 @@ namespace ldungeon_gen {
 		lua_pushcclosure(L, oper_aux, 1);
 
 		return LuaStackValue(L, -1);
+	}
+
+	static std::vector<Pos> rectangle_match(LuaStackValue args) {
+		using namespace luawrap;
+		LuaStackValue oper = rectangle_operator(args);
+		Selector selector = lua_selector_get(args["selector"]);
+		MapPtr map = args["map"].as<MapPtr>();
+		BBox area = defaulted(args["area"], BBox(Pos(), map->size()));
+		std::vector<Pos> matches;
+		FOR_EACH_BBOX(area, x, y) {
+			if ((*map)[Pos(x,y)].matches(selector)) {
+				matches.push_back(Pos(x,y));
+			}
+		}
+		return matches;
 	}
 
 	static bool rectangle_apply(LuaStackValue args) {
@@ -448,13 +518,26 @@ namespace ldungeon_gen {
 		return area_oper;
 	}
 
+
+    static void lerode_diagonal_pairs(LuaStackValue args) {
+        using namespace luawrap;
+        lua_State* L = args.luastate();
+
+        MapPtr map = args["map"].as<MapPtr>();
+        //Get RNG setup for map generation
+        MTwist* mtwist = args["rng"].as<MTwist*>();
+
+        Selector selector = lua_selector_get(args["selector"]);
+        BBox area = luawrap::defaulted(args["area"], BBox(Pos(), map->size()));
+        erode_diagonal_pairs(*map, *mtwist, area, selector);
+    }
+
 	static LuaStackValue tunnel_operator(LuaStackValue args) {
 		using namespace luawrap;
 		lua_State* L = args.luastate();
 
 		//Get RNG setup for map generation
-		luawrap::registry(L)["MapGenRNG"].push();
-		MTwist* mtwist = (MTwist*) lua_touserdata(L, -1);
+		MTwist* mtwist = args["rng"].as<MTwist*>();
 
 		LuaValue vs = args["validity_selector"];
 		Selector vfill_selector =
@@ -497,6 +580,25 @@ namespace ldungeon_gen {
 		return LuaStackValue(L, -1);
 	}
 
+    static void __submap_apply(LuaStackValue args) {
+        MapPtr map = args["map"].as<MapPtr>();
+        MapPtr submap = args["submap"].as<MapPtr>();
+        Pos xy(args["x"].to_int(), args["y"].to_int());
+        BBox area = luawrap::defaulted(args["submap_area"], BBox(Pos(), submap->size()));
+        Selector selector = lua_selector_get(args["selector"]);
+        Selector submap_selector = lua_selector_get(args["submap_selector"]);
+        submap_apply(map, submap, xy, area, selector, submap_selector);
+    }
+
+    static void __perimeter_apply(LuaStackValue args) {
+        MapPtr map = args["map"].as<MapPtr>();
+        BBox area = luawrap::defaulted(args["area"], BBox(Pos(), map->size()));
+        ConditionalOperator oper = lua_conditional_operator_get(args["operator"]);
+        Selector candidate = lua_selector_get(args["candidate_selector"]);
+        Selector criteria = lua_selector_get(args["inner_selector"]);
+        perimeter_apply(map, area, candidate, criteria, oper);
+    }
+
 	static bool tunnel_apply(LuaStackValue args) {
 		using namespace luawrap;
 		LuaStackValue oper = tunnel_operator(args);
@@ -514,8 +616,7 @@ namespace ldungeon_gen {
 		lua_State* L = args.luastate();
 
 		//Get RNG setup for map generation
-		luawrap::registry(L)["MapGenRNG"].push();
-		MTwist* mtwist = (MTwist*) lua_touserdata(L, -1);
+        MTwist* mtwist = args["rng"].as<MTwist*>();
 		bool create_subgroup = defaulted(args["create_subgroup"], true);
 
 		Range size_range = args["size_range"].as<Range>();
@@ -556,6 +657,8 @@ namespace ldungeon_gen {
 		submodule["tunnel_operator"].bind_function(tunnel_operator);
 		submodule["rectangle_apply"].bind_function(rectangle_apply);
 		submodule["tunnel_apply"].bind_function(tunnel_apply);
+		submodule["submap_apply"].bind_function(__submap_apply);
+		submodule["perimeter_apply"].bind_function(__perimeter_apply);
 
 		submodule["random_placement_operator"].bind_function(
 				random_placement_operator);
@@ -564,24 +667,24 @@ namespace ldungeon_gen {
 				random_placement_apply);
 
 		submodule["rectangle_query"].bind_function(rectangle_query_apply);
+		submodule["rectangle_match"].bind_function(rectangle_match);
 		submodule["rectangle_criteria"].bind_function(rectangle_query);
 		submodule["find_random_square"].bind_function(lfind_random_square);
+        submodule["get_row_flags"].bind_function(lget_row_flags);
+        submodule["get_row_content"].bind_function(lget_row_content);
+        submodule["erode_diagonal_pairs"].bind_function(lerode_diagonal_pairs);
 
 		LUAWRAP_SET_TYPE(LuaStackValue);
 		LUAWRAP_GETTER(submodule, random_place,
-				random_place(OBJ["area"].as<BBox>(), ldungeon_get_rng(L), luawrap::defaulted(OBJ["size"], Size())));
+				random_place(OBJ["area"].as<BBox>(), *OBJ["rng"].as<MTwist*>(), luawrap::defaulted(OBJ["size"], Size())));
 	}
 
-	void lua_register_map(const LuaValue& submodule, MTwist* mtwist) {
+	void lua_register_map(const LuaValue& submodule) {
 		lua_State* L = submodule.luastate();
 
 		luawrap::install_userdata_type<MapPtr, lua_mapmetatable>();
 		luawrap::install_userdata_type<AreaOperatorPtr, lua_opermetatable>();
 		luawrap::install_userdata_type<AreaQueryPtr, lua_querymetatable>();
-
-		/* TODO: Find a better way to deal with this static variable hack. */
-		lua_pushlightuserdata(L, (void*) mtwist);
-		luawrap::registry(L)["MapGenRNG"].pop();
 
 		lua_register_bsp(submodule);
 		lua_register_placement_functions(submodule);
@@ -593,7 +696,9 @@ namespace ldungeon_gen {
 		submodule["FLAG_HAS_OBJECT"] = FLAG_HAS_OBJECT;
 		submodule["FLAG_NEAR_PORTAL"] = FLAG_NEAR_PORTAL;
 		submodule["FLAG_PERIMETER"] = FLAG_PERIMETER;
-		submodule["FLAG_SEETHROUGH"] = FLAG_SEETHROUGH;
+        submodule["FLAG_SEETHROUGH"] = FLAG_SEETHROUGH;
+        submodule["FLAG_RESERVED1"] = FLAG_RESERVED1;
+        submodule["FLAG_RESERVED2"] = FLAG_RESERVED2;
 		submodule["FLAGS_ALL"] = (int)-1;
 		for (int i = 1; i <= 8; i++) {
 			std::string str = format("FLAG_CUSTOM%d", i);

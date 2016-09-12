@@ -138,6 +138,7 @@ namespace ldungeon_gen {
 			/* Do not finish tunnelling in the middle of a turn */
 			if (cntxt->turn_state != NO_TURN)
 				return false;
+			printf("TUNNELED!\n");
 			return true;
 		}
 
@@ -280,6 +281,10 @@ namespace ldungeon_gen {
 			nogen_tries++;
 
 			for (int i = 0; i < map->groups.size(); i++) {
+			    Group& group = map->groups[i];
+			    if (!group.child_group_ids.empty()) {
+			        continue;
+			    }
 				if (genpaths[i] >= totalpaths[i])
 					continue;
 				bool generated = false;
@@ -292,8 +297,14 @@ namespace ldungeon_gen {
 						TunnelFillSettings filler(fill_oper, padding, perimeter_oper, genwidth, path_len, 0.05);
 						TunnelGenImpl tg(*map, randomizer, checker, filler);
 
-						generate_entrance(map->groups[i].group_area, randomizer,
+//						FOR_EACH_BBOX(group.group_area, xx, yy) {
+//						    (*map)[Pos(xx,yy)].flags |= FLAG_RESERVED1;
+//						}
+						generate_entrance(group.group_area, randomizer,
 								std::min(genwidth, 2), p, axis, positive);
+						if (!rect.contains(p)) {
+						    goto label_give_up_on_group;
+						}
 
 						int val = positive ? +1 : -1;
 						int dx = axis ? 0 : val, dy = axis ? val : 0;
@@ -309,6 +320,7 @@ namespace ldungeon_gen {
 						}
 					}
 				}
+				label_give_up_on_group:;
 			}
 		}
 
@@ -340,9 +352,9 @@ namespace ldungeon_gen {
 			cntxt = &tsc[tunnel_depth];
 
 			//We must leave room to initialize the next tunnel depth
-			bool valid =
-					tunnel_depth < filler.max_length - 1
-							&& (tsc[tunnel_depth].attempt_number > 0
+			bool max_length_hit = tunnel_depth >= filler.max_length - 1;
+			bool valid = !max_length_hit
+							&& (cntxt->attempt_number > 0
 									|| validate_slice(prev_content, cntxt,
 											tunnel_depth));
 			if (valid && cntxt->attempt_number <= 0) {

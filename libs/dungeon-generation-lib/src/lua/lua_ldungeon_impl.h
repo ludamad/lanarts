@@ -14,8 +14,6 @@ class LuaValue;
 class MTwist;
 
 namespace ldungeon_gen {
-	MTwist& ldungeon_get_rng(lua_State* L);
-
 	Selector lua_selector_get(LuaField args);
 	Selector lua_selector_optional_get(LuaField args);
 

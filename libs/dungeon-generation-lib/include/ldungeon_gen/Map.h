@@ -188,6 +188,11 @@ namespace ldungeon_gen {
 
 		void serialize(SerializeBuffer& serializer) const;
 		void deserialize(SerializeBuffer& serializer);
+		void clear() {
+		    resize(Size(0,0));
+		    groups.clear();
+		    luafields.clear();
+		}
 	};
 
 	typedef smartptr<Map> MapPtr;

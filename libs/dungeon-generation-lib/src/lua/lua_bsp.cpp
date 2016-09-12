@@ -25,7 +25,7 @@ namespace ldungeon_gen {
 		using namespace luawrap;
 		lua_State* L = args.luastate();
 
-		BSPApplyOperator oper(ldungeon_get_rng(L),
+		BSPApplyOperator oper(*args["rng"].as<MTwist*>(),
 				area_operator_get(args["child_operator"]),
 				defaulted(args["minimum_node_size"], Size()),
 				defaulted(args["randomize_size"], true),
@@ -94,7 +94,7 @@ namespace ldungeon_gen {
 
 		TCODBsp* bsp = new TCODBsp(rect.x1, rect.y1, rect.width(), rect.height());
 
-		bsp->splitRecursive(ldungeon_get_rng(L), split_depth, node_size.w, node_size.h, max_hratio, max_vratio);
+		bsp->splitRecursive(*args["rng"].as<MTwist*>(), split_depth, node_size.w, node_size.h, max_hratio, max_vratio);
 
 		// create the dungeon from the bsp
 		lua_newtable(L); // reconstruction table

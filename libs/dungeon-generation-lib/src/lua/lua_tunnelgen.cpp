@@ -54,7 +54,7 @@ namespace ldungeon_gen {
 	static bool lua_tunnel_generate(LuaStackValue args) {
 		lua_State* L = args.luastate();
 
-		return tunnel_generate(args["map"].as<MapPtr>(), ldungeon_get_rng(L),
+		return tunnel_generate(args["map"].as<MapPtr>(), *args["rng"].as<MTwist*>(),
 				args["top_left_xy"].as<Pos>(), args["direction"].as<Pos>(),
 				tunnelcheck_get(args), tunnelfill_get(args));
 	}

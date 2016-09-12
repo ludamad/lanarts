@@ -132,6 +132,45 @@ namespace ldungeon_gen {
 		return true;
 	}
 
+    void perimeter_apply(MapPtr map, BBox area, Selector candidate, Selector criteria, ConditionalOperator oper) {
+        FOR_EACH_BBOX(area, x, y) {
+            Square& sqr = (*map)[Pos(x,y)];
+            if (sqr.matches(candidate)) {
+                bool is_perim = false;
+#define CASE(body) is_perim = is_perim || (body)
+#define CHECK(xx, yy) (*map)[Pos(xx,yy)].matches(criteria)
+                bool xhi = (x > area.x1), xlo = (x+1 < area.x2);
+                bool yhi = (y > area.y1), ylo = (y+1 < area.y2);
+                // Check the current horizontal line
+                CASE(xhi &&         CHECK(x-1,y));
+                // No need to check x,y
+                CASE(xlo &&         CHECK(x+1,y));
+                // Check above this
+                CASE(xhi && yhi &&  CHECK(x-1,y-1));
+                CASE(       yhi &&  CHECK(x,  y-1));
+                CASE(xlo && yhi &&  CHECK(x+1,y-1));
+                // Check below this
+                CASE(xhi && ylo &&  CHECK(x-1,y+1));
+                CASE(       ylo &&  CHECK(x,  y+1));
+                CASE(xlo && ylo &&  CHECK(x+1,y+1));
+                if (is_perim) {
+                    sqr.apply(oper);
+                }
+            }
+        }
+    }
+
+    void submap_apply(MapPtr map, MapPtr submap, Pos map_pos, BBox submap_region, Selector filter, Selector submap_filter) {
+        FOR_EACH_BBOX(submap_region, x, y) {
+            Pos mxy = map_pos + Pos(x, y);
+            Square& dest = (*map)[mxy];
+            Square& src = (*submap)[Pos(x,y)];
+            if (dest.matches(filter) && src.matches(submap_filter)) {
+                dest = src;
+            }
+        }
+    }
+
     BBox random_place(BBox area, MTwist& randomizer, Size size) {
             int rx = randomizer.rand(area.x1, area.x2 - size.w);
             int ry = randomizer.rand(area.y1, area.y2 - size.h);
@@ -175,4 +214,5 @@ namespace ldungeon_gen {
         NoMoreRooms:
         return true;
     }
+
 }
