@@ -3,6 +3,7 @@ local DungeonFeatures = import "@objects.DungeonFeatures"
 local GameObject = import "core.GameObject"
 local SourceMap = import "core.SourceMap"
 local Map = import "core.Map"
+local mtwist = require "mtwist"
 
 local M = {} -- Submodule
 
@@ -12,7 +13,7 @@ end
 
 function M.random_square(map, area, --[[Optional]] selector, --[[Optional]] operator, --[[Optional]] max_attempts) 
     return SourceMap.find_random_square { 
-        map = map, area = area, 
+        rng = map.rng, map = map, area = area, 
         selector = selector or { matches_none = {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT} },
         operator = operator or { add = SourceMap.FLAG_HAS_OBJECT },
         max_attempts = max_attempts
@@ -111,6 +112,7 @@ end
 
 function M.map_create(label, size, content, --[[Optional]] flags)
     return SourceMap.map_create { 
+        rng = mtwist.create(random(0, 2 ^ 31)),
     	label = label, 
     	size = size, 
     	flags = flags or SourceMap.FLAG_SOLID, 

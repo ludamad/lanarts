@@ -174,7 +174,7 @@ namespace lua_api {
 		register_general_api(L);
 
 		LuaValue map_gen = register_lua_submodule(L, "core.SourceMap");
-		ldungeon_gen::lua_register_ldungeon(map_gen, &gs->rng(), false);
+		ldungeon_gen::lua_register_ldungeon(map_gen, false);
 
 		lua_atpanic(L, lua_lanarts_panic);
 
