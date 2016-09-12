@@ -116,12 +116,7 @@ void ldraw::display_draw_finish() {
 }
 
 Size ldraw::display_size() {
-    SDL_DisplayMode dm;
-    if (SDL_GetWindowDisplayMode(MAIN_WINDOW, &dm)) {
-        fprintf(stderr, "Couldn't get window display mode: %s\n", SDL_GetError());
-        SDL_Quit();
-        exit(1);
-    }
-	return Size(dm.w, dm.h);
+    int w = 0, h = 0;
+    SDL_GetWindowSize(MAIN_WINDOW, &w, &h);
+    return Size(w, h);
 }
-
