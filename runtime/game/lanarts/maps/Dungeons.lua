@@ -26,6 +26,7 @@ end
 function M.simple_tunnels(map, width_range, tunnels_per_room, wall_tile, floor_tile, --[[Optional]] area, --[[Optional]] padding) 
     area = area or bbox_create({0,0}, map.size)
     local oper = SourceMap.tunnel_operator {
+        rng = map.rng,
         validity_selector = { 
             fill_selector = { matches_all = SourceMap.FLAG_SOLID, matches_none = SourceMap.FLAG_TUNNEL },
             perimeter_selector = { matches_all = SourceMap.FLAG_SOLID, matches_none = SourceMap.FLAG_TUNNEL }
@@ -50,6 +51,7 @@ end
 
 function M.simple_random_placement_operator(map, tileset) 
     return SourceMap.random_placement_operator {
+        rng = map.rng,
         child_operator = M.room_carve_operator(tileset.wall, tileset.floor),
         size_range = chance(.5) and {12,15} or {5,8}, amount_of_placements_range = {3,4},
         create_subgroup = false
@@ -58,6 +60,7 @@ end
 
 function M.simple_bsp_operator(map, tileset) 
     return SourceMap.bsp_operator {
+        rng = map.rng,
         child_operator = function (map, group, bbox) 
             return M.simple_random_placement_operator(map, tileset)(map, group,bbox)
         end,

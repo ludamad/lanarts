@@ -430,7 +430,7 @@ local function generate_tunnels(map, tunnels, tileset)
 end
 
 local function map_gen_apply(map, placements, wall, floor, size, padding)
-    SourceMap.random_placement_apply { map = map, area = get_inner_area(map),
+    SourceMap.random_placement_apply { rng = map.rng, map = map, area = get_inner_area(map),
         child_operator = dungeons.room_carve_operator(wall, floor, padding or 1),
         size_range = size, amount_of_placements_range = placements,
         create_subgroup = false

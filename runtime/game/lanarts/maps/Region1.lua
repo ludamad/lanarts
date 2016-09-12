@@ -53,7 +53,7 @@ end
 local TEMPLE_DEPTH = 2
 
 local function temple_level_base_apply(map, tileset, area)
-    SourceMap.random_placement_apply { map = map, area = area,
+    SourceMap.random_placement_apply { rng = map.rng, map = map, area = area,
         child_operator = dungeons.room_carve_operator(tileset.wall, tileset.floor),
         size_range = {12,15}, amount_of_placements_range = {10,15},
         create_subgroup = false

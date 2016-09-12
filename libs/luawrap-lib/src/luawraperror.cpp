@@ -3,6 +3,7 @@
  *  Error functions used on conversion failure and lua runtime failure.
  */
 
+#include <cassert>
 #include <lua.hpp>
 
 #include <luawrap/luawrap.h>
@@ -53,6 +54,7 @@ namespace luawrap {
 		if (!object_path.empty()) {
 			error_msg += " at " + object_path;
 		}
+                assert(false);
 		return error_msg + ", expected a " + type + " but got " + object_repr;
 	}
 }
