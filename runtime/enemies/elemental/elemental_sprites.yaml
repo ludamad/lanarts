@@ -1,0 +1,17 @@
+---
+sprites: 
+
+  - name: storm elemental
+    file: enemies/elemental/sprites/storm_elemental.png
+
+  - name: hell storm
+    file: enemies/elemental/sprites/hell_storm.png
+
+  - name: cloud elemental
+    file: enemies/elemental/sprites/cloud_elemental.png
+
+  - name: water elemental
+    file: enemies/elemental/sprites/waterelemental.png
+
+  - name: hell forged
+    file: enemies/elemental/sprites/hellforged.png

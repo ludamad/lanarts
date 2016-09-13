@@ -1,0 +1,27 @@
+sprites:
+  - name: none
+    file: effects/sprites/none.png
+    
+  - name: resting
+    file: effects/sprites/resting.png
+
+  - name: haste
+    file: effects/sprites/haste.png
+
+  - name: blood
+    file: effects/sprites/blood.png
+    
+  - name: green blood
+    file: effects/sprites/blood_green.png
+
+  - name: purple blood
+    file: effects/sprites/blood_purple.png
+    
+  - name: small skeleton
+    file: effects/sprites/skeleton1.png
+
+  - name: haste effected
+    file: effects/sprites/i-speed.png
+
+  - name: fire cloud
+    file: effects/sprites/fire-cloud.png

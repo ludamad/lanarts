@@ -1,0 +1,14 @@
+---
+sprites:
+
+  - name: exec
+    file: enemies/undead/sprites/exec.png
+
+  - name: skeleton
+    file: enemies/undead/sprites/skeleton.png
+    
+  - name: skeleton fighter
+    file: enemies/undead/sprites/skelefighter.png
+    
+  - name: zombie
+    file: enemies/undead/sprites/zombie.png

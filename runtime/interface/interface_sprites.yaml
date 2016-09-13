@@ -1,0 +1,58 @@
+sprites:
+  - name: logo
+    file: interface/sprites/lanarts_logo.png
+    
+  - name: inventory_icon
+    file: interface/sprites/items.png
+    
+  - name: equipment_icon
+    file: interface/sprites/equipment.png
+    
+  - name: spells_icon
+    file: interface/sprites/magic.png
+    
+  - name: config_icon
+    file: interface/sprites/config.png
+    
+  - name: enemies_icon
+    file: interface/sprites/enemies.png
+    
+  - name: stats_icon
+    file: interface/sprites/stats.png
+    
+  - name: left_arrow
+    file: interface/sprites/left_arrow.png
+    
+  - name: right_arrow
+    file: interface/sprites/right_arrow.png
+        
+  - name: archer_icon
+    file: interface/sprites/class_icons/archer.png
+    
+  - name: druid_icon
+    file: interface/sprites/class_icons/druid.png
+    
+  - name: fighter_icon
+    file: interface/sprites/class_icons/fighter.png
+    
+  - name: wizard_icon
+    file: interface/sprites/class_icons/wizard.png
+    
+  - name: speed setting icon
+    file: interface/sprites/config/speed_setting.png
+    
+  - name: hardcore setting icon
+    file: interface/sprites/config/hardcore_setting.png
+    
+  - name: respawn setting icon
+    file: interface/sprites/config/respawn_setting.png
+    
+    #network settings
+  - name: client setting icon
+    file: interface/sprites/config/client_icon.png
+    
+  - name: server setting icon
+    file: interface/sprites/config/server_icon.png
+    
+  - name: single player setting icon
+    file: interface/sprites/config/single_player_icon.png

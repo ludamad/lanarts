@@ -1,0 +1,163 @@
+#Enemy Markup
+enemies:
+  - name: Giant Rat
+    sprite: giant rat
+    death_sprite: blood
+    radius: 14
+    xpaward: 5
+    description: A giant, aggressive vermin.
+    appear_message: A hostile large rat approaches!
+    defeat_message: Blood splatters as the large rat is destroyed.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 15
+        hpregen: 0.03
+        movespeed: 2
+        #base stats:
+        strength: 10
+        defence: 5
+        willpower: 5
+              
+  - name: Giant Bat
+    sprite: giant bat
+    death_sprite: blood
+    radius: 12
+    xpaward: 8
+    appear_message: A hungry giant bat surveys the scene.
+    defeat_message: The giant bat has died.
+    stats:
+        attacks: [ {weapon: Fast Melee} ]
+        hp: 18
+        hpregen: 0.03
+        movespeed: 3
+        strength: 10
+        defence: 5
+        willpower: 5
+        
+  - name: Giant Spider
+    sprite: giant spider
+    death_sprite: blood
+    radius: 14
+    xpaward: 10
+    appear_message: A giant spider crawls towards you
+    defeat_message: The giant spider has been squashed.
+    stats:
+        attacks: [ {weapon: Fast Melee} ]
+        hp: 15
+        hpregen: 0.04
+        movespeed: 4
+        strength: 12
+        defence: 4
+        willpower: 10
+       
+  - name: Hound
+    sprite: hound
+    death_sprite: blood
+    radius: 14
+    xpaward: 10
+    appear_message: A hungry, feral hound notices you.
+    defeat_message: The hound yelps as it is pulverized.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 25
+        hpregen: 0.03
+        movespeed: 2.5
+        strength: 12
+        defence: 5
+        willpower: 5
+       
+  - name: Hydra
+    sprite: hydra
+    death_sprite: dead hydra
+    radius: 17
+    xpaward: 30
+    appear_message: A hydra appears!
+    defeat_message: The hydra is vanquished.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 100
+        hpregen: 0.05
+        movespeed: 3.0
+        strength: 20
+        defence: 20
+        willpower: 15
+
+  - name: Sheep
+    sprite: sheep
+    death_sprite: blood
+    radius: 14
+    xpaward: 10
+    appear_message: A hostile sheep approaches!
+    defeat_message: The sheep recieves a fatal blow.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 20
+        hpregen: 0.03
+        movespeed: 2
+        strength: 10
+        defence: 5
+        willpower: 5
+
+  - name: Giant Frog
+    sprite: giant frog
+    death_sprite: green blood
+    radius: 14
+    xpaward: 10
+    appear_message: A giant frog hops onto the scene.
+    defeat_message: The giant frog dies!
+    stats:
+        attacks: [ {weapon: Slow Melee} ]
+        hp: 25
+        hpregen: 0.01
+        movespeed: 3
+        strength: 12
+        defence: 5
+        willpower: 5
+          
+  - name: Chicken
+    sprite: chicken
+    death_sprite: blood
+    radius: 10
+    xpaward: 10
+    appear_message: A hostile chicken appears!
+    defeat_message: The chicken may as well be fried.
+    stats:
+        attacks: [ {weapon: Fast Melee} ]
+        hp: 25
+        hpregen: 0.04
+        movespeed: 3
+        strength: 15
+        defence: 7
+        willpower: 7
+
+  - name: Horse
+    sprite: horse
+    death_sprite: blood
+    radius: 12
+    xpaward: 15
+    appear_message: A horse comes at full gallop!
+    defeat_message: The horse is beaten.
+    stats:
+        attacks: [ {weapon: Basic Melee} ]
+        hp: 35
+        hpregen: 0.02
+        movespeed: 5
+        strength: 25
+        defence: 15
+        willpower: 15
+     
+  - name: Super Chicken
+    sprite: super_chicken
+    death_sprite: green blood
+    radius: 14
+    xpaward: 25
+    appear_message: An unnaturally glowing chicken appears!
+    defeat_message: The glowing chicken recieves a final blow.
+    stats:
+        attacks: [ {weapon: Fast Melee} ]
+        hp: 40
+        hpregen: 0.08
+        movespeed: 4
+        strength: 25
+        defence: 10
+        willpower: 10

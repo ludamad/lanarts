@@ -1,0 +1,14 @@
+sprites:
+  - name: fighter
+    file: classes/sprites/fighter.png
+  - name: fighter2
+    file: classes/sprites/fighter2.png
+
+  - name: wizard
+    file: classes/sprites/wizard.png
+  - name: wizard2
+    file: classes/sprites/wizard2.png
+  
+  - name: archer
+    file: classes/sprites/archer.png
+    

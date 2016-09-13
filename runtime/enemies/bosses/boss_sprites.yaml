@@ -1,0 +1,14 @@
+---
+sprites:
+
+  - name: zin
+    file: enemies/bosses/sprites/zin.png 
+   
+  - name: red dragon
+    file: enemies/bosses/sprites/reddragon.png
+
+  - name: pisilohe
+    file: enemies/bosses/sprites/pisilohe8_0.png
+
+  - name: hell warrior
+    file: enemies/bosses/sprites/trog.png

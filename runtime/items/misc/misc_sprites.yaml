@@ -1,0 +1,21 @@
+sprites: 
+  - name: ambrosia
+    file: items/misc/sprites/ambrosia.png
+
+  - name: amulet
+    file: items/misc/sprites/amulet.png
+
+  - name: mana_potion
+    file: items/misc/sprites/brilliant_blue.png
+
+  - name: stone
+    file: effects/sprites/stone.png
+
+  - name: book
+    file: items/misc/sprites/book.png
+
+  - name: gold
+    file: items/misc/sprites/gold.png
+    
+  - name: health_potion
+    file: items/misc/sprites/redpotion.png

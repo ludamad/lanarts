@@ -1,0 +1,51 @@
+---
+sprites:
+  - name: giant rat
+    file: enemies/animals/sprites/giant_rat.png
+
+  - name: hound
+    file: enemies/animals/sprites/hound.png
+
+  - name: horse
+    file: enemies/animals/sprites/horse.png
+
+  - name: sheep
+    file: enemies/animals/sprites/sheep.png
+
+  - name: porcupine
+    file: enemies/animals/sprites/porcupine.png
+
+  - name: giant frog
+    file: enemies/animals/sprites/giant_frog.png
+
+  - name: chicken
+    file: enemies/animals/sprites/chicken.png
+
+  - name: goliath beetle
+    file: enemies/animals/sprites/goliath_beetle.png
+
+  - name: hound
+    file: enemies/animals/sprites/hound.png
+
+  - name: lava fish
+    file: enemies/animals/sprites/lava_fish.png
+
+  - name: porcupine
+    file: enemies/animals/sprites/porcupine.png
+
+  - name: super_chicken
+    file: enemies/animals/sprites/superchicken.png
+
+  - name: giant bat
+    file: enemies/animals/sprites/bat.png
+
+  - name: giant spider
+    file: enemies/animals/sprites/spider.png
+
+  - name: hydra
+    type: animation
+    frames: enemies/animals/sprites/hydra.png%32x48
+
+  - name: dead hydra
+    file: enemies/animals/sprites/deadhydra.png
+

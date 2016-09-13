@@ -1,0 +1,64 @@
+---
+sprites: 
+  - name: fire bolt
+    type: directional
+    frames: spells/sprites/fireball.png%32x32
+
+  - name: fire ball
+    file: spells/sprites/fireball2.png
+
+  - name: magic bolt
+    file: effects/sprites/bolt05.png
+    
+  - name: crystal spear
+    type: directional
+    frames: items/weapons/sprites/projectiles/crystal/crystal_spear(0-7).png
+    
+  - name: magic arrow
+    file: spells/sprites/magic_arrow.png
+
+  - name: storm bolt
+    file: effects/sprites/bolt07.png
+
+  - name: blue blast
+    file: effects/sprites/blueblast.png
+
+  - name: poison
+    file: effects/sprites/cloud_poison2.png
+
+  - name: fire storm
+    file: effects/sprites/firestorm.png
+
+  - name: magic blast
+    file: spells/sprites/orb_of_destruction.png
+    
+  - name: blink
+    file: spells/sprites/blink.png
+        
+  - name: large fire
+    file: effects/sprites/cloud_fire2.png
+
+  - name: minor missile
+    type: directional
+    frames: spells/sprites/minor_missile.png%32x32
+    
+  - name: berserk
+    file: spells/sprites/berserk.png
+
+  - name: chargestrike
+    file: spells/sprites/chargehand.png
+        
+  - name: berserk_effected
+    file: effects/sprites/berserk.png       
+        
+  - name: exhausted_effected
+    file: effects/sprites/i-slowing.png
+
+  - name: charge_effected
+    file: spells/sprites/poof.png
+
+  - name: thrown_effected
+    file: spells/sprites/fleeing.png
+
+  - name: expedite
+    file: spells/sprites/swiftness.png

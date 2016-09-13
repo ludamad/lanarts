@@ -1,0 +1,11 @@
+---
+sprites:
+
+  - name: imp
+    file: enemies/demonic/sprites/cute_imp.png
+    
+  - name: hell hog
+    file: enemies/demonic/sprites/hell_hog.png
+
+  - name: unseen horror
+    file: enemies/demonic/sprites/unseen_horror.png
