@@ -23,6 +23,7 @@ add_library( lcommon
              STATIC
              ${lcommon_src} )
 
+add_dependencies(lcommon bfd)
 
 AUX_SOURCE_DIRECTORY(tests lcommon_tests) 
 

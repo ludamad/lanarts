@@ -99,7 +99,7 @@ namespace lua_api {
 		// configure_lua_packages:
 		LuaValue package = luawrap::globals(L)["package"];
 		package["loadlib"].set_nil(); // Remove until library loading plan is made
-		package["path"] = "./?.lua";
+		package["path"] = "?.lua";
 
 		LuaSpecialValue globals = luawrap::globals(L);
 		globals["dofile"].bind_function(safe_dofile);

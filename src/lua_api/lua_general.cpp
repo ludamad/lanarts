@@ -4,6 +4,10 @@
  */
 
 #include <cstring>
+#include <vector>
+#include <algorithm>
+
+#include <backward.hpp>
 
 #include <lua.hpp>
 
@@ -308,8 +312,12 @@ static int lapi_path_resolve(lua_State* L) {
 	current.resize(std::max(0, i + 1));
 
 	const char* cptr = current.c_str();
+	cptr = (*cptr == '@' ? cptr + 1 : cptr);
+	if (!*cptr) {
+	    cptr = ".";
+	}
 	// '@' indicates a file path when used in debug info, remove this character if present
-	lua_pushfstring(L, "%s/%s", *cptr == '@' ? cptr + 1 : cptr, lua_tostring(L, 1));
+	lua_pushfstring(L, "%s/%s", cptr, lua_tostring(L, 1));
 	return 1;
 }
 
@@ -469,13 +477,11 @@ namespace lua_api {
 
 	void register_lua_submodule(lua_State* L, const char* vpath,
 			LuaValue module) {
-		LuaValue imported = luawrap::ensure_table(luawrap::globals(L)["_INTERNAL_IMPORTED"]);
-		imported[vpath] = module;
+		luawrap::globals(L)["package"]["loaded"][vpath] = module;
 	}
 
 	void register_lua_submodule_loader(lua_State* L, const char* vpath, LuaValue loader) {
-		LuaValue loaders = luawrap::ensure_table(luawrap::globals(L)["_INTERNAL_LOADERS"]);
-		loaders[vpath] = loader;
+		luawrap::globals(L)["package"]["preload"][vpath] = loader;
 	}
 
 	void pretty_print(LuaField field) {
@@ -485,8 +491,9 @@ namespace lua_api {
 		lua_call(L, 1, 0);
 	}
 
+        // TODO rename require
 	LuaValue import(lua_State* L, const char* virtual_path) {
-		luawrap::globals(L)["import"].push();
+		luawrap::globals(L)["require"].push();
 		lua_pushstring(L, virtual_path);
 		lua_call(L, 1, 1);
 		return LuaValue::pop_value(L);
@@ -514,6 +521,24 @@ namespace lua_api {
 		return 1;
 	}
 
+        std::vector<std::string> lapi_cpp_traceback() {
+            // Use our hacked copy of the 'backward' library:
+                using namespace backward;
+                StackTrace st; st.load_here(255);
+                Printer p;
+                std::vector<std::string> traceback = p.print(st);
+                // Filter the top of the traceback that includes this function:
+                while (!traceback.empty()) {
+                    std::string back = traceback.back();
+                    traceback.pop_back();
+                    if (back.find("StackTrace st; st.load_here(255);") != std::string::npos) {
+                        break;
+                    }
+                }
+                std::reverse(traceback.begin(), traceback.end());
+                return traceback;
+        }
+
 	int read_eval_print(lua_State *L);
 
         static double round(double x) {
@@ -535,6 +560,7 @@ namespace lua_api {
 		globals["random_gaussian"].bind_function(lapi_random_gaussian);
 		globals["random_subregion"].bind_function(lapi_random_subregion);
 		globals["chance"].bind_function(lapi_chance);
+		globals["cpp_traceback"].bind_function(lapi_cpp_traceback);
 
 		globals["__read_eval_print"].bind_function(read_eval_print);
 

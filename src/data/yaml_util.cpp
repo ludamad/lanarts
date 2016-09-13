@@ -135,10 +135,8 @@ void load_data_impl_template(const FilenameList& filenames,
 
 	perf_timer_begin(FUNCNAME);
 
-	FilenameList::const_iterator it = filenames.begin();
-	for (; it != filenames.end(); ++it) {
-		std::string fname = "game/lanarts/" + *it;
-		fstream file(fname.c_str(), fstream::in | fstream::binary);
+        for (const string& fname : filenames) {
+		fstream file(fname, fstream::in | fstream::binary);
 
 		if (!file) {
 			fprintf(stderr,
@@ -165,7 +163,7 @@ void load_data_impl_template(const FilenameList& filenames,
 				fflush(stdout);
 			}
 		} else {
-			fprintf(stderr, "Resource file %s does not exist!\n", it->c_str());
+			fprintf(stderr, "Resource file %s does not exist!\n", fname.c_str());
 			fflush(stderr);
 		}
 	}

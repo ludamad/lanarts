@@ -21,7 +21,8 @@ set( lua_libraries lua )
 include_directories(
     "."
     "${DEPS}/sdl2/include"
-    "${DEPS}/sdl2-image/"
+    "${DEPS}/sdl2-image"
+    "${DEPS}/backward-cpp"
     ${OpenGL_INCLUDE_DIRS} 		
     ${FREETYPE_INCLUDE_DIRS}
     "${LIBS}/common-lib/include"
@@ -116,6 +117,8 @@ set (libraries
         SDL2-image
         SDL2-mixer
         SDL2-static
+        backward_object
+        bfd
 )
 
 target_link_libraries( lanarts 

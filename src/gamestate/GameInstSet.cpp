@@ -10,9 +10,11 @@
 #include <cstring>
 #include <cstdio>
 #include <typeinfo>
+#include <iostream>
 
 #include <lcommon/SerializeBuffer.h>
 #include <lcommon/math_util.h>
+#include <lcommon/typename.h>
 
 #include "objects/AnimatedInst.h"
 #include "objects/InstTypeEnum.h"
@@ -168,6 +170,7 @@ void GameInstSet::serialize(GameState* gs, SerializeBuffer& serializer) {
 		}
 	}
 	for (int i = 0; i < instances.size(); i++) {
+            std::cout << cpp_type_name(instances[i]) << std::endl;
 		instances[i]->serialize_lua(gs, serializer);
 	}
 }

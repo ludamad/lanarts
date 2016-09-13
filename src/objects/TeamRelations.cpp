@@ -23,7 +23,7 @@ static bool object_relations_callback(CombatGameInst* inst1, CombatGameInst* ins
 	}
 
 	luawrap::globals(L)["import"].push();
-	lua_pushstring(L, "lanarts.objects.relations");
+	lua_pushstring(L, "objects.relations");
 	lua_call(L, 1, 1); // Get module
 
 	lua_getfield(L, -1, func_name); // Get function
