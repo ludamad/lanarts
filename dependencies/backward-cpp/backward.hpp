@@ -1724,12 +1724,12 @@ public:
             _istty = true;
 	}
 
-	void set_color(Color::type ccode, std::string& out) {
+	void set_color(Color::type ccode, std::string& out, const char* modifier = "") {
 		if (!_istty) return;
 
 		// I assume that the terminal can handle basic colors. Seriously I
 		// don't want to deal with all the termcap shit.
-                out += format("\033[%im", static_cast<int>(ccode));
+                out += format("\033[%i%sm", static_cast<int>(ccode), modifier);
                 last_string = &out;
 		_reset = (ccode != Color::reset);
 	}
@@ -1761,7 +1761,7 @@ class Colorize {
 public:
 	Colorize() {}
 	void init() {}
-	void set_color(Color::type, std::string& out) {}
+	void set_color(Color::type, std::string& out, const char* modifier = "") {}
 };
 
 #endif // BACKWARD_SYSTEM_LINUX
@@ -1836,7 +1836,7 @@ private:
 				= trace.inliners[inliner_idx-1];
 			print_source_loc(" | ", inliner_loc);
 			if (snippet) {
-				print_snippet("    | ", inliner_loc,
+				print_snippet(" | ", inliner_loc,
 						colorize, Color::purple, 5);
 			}
 			already_indented = false;
@@ -1849,7 +1849,7 @@ private:
 			}
 			print_source_loc("   ", trace.source, trace.addr);
 			if (snippet) {
-				print_snippet("      ", trace.source,
+				print_snippet("   ", trace.source,
 						colorize, Color::yellow, 7);
 			}
 		}
@@ -1869,21 +1869,23 @@ private:
 		for (lines_t::const_iterator it = lines.begin();
 				it != lines.end(); ++it) {
 			if (it-> first == source_loc.line) {
-				colorize.set_color(color_code, stack_output.back());
-				output(format("%s>", indent));
+				colorize.set_color(color_code, stack_output.back(), ";1");
+				output(format("%s ", indent));
 			} else {
+				colorize.set_color(color_code, stack_output.back(), ";2");
 				output(format("%s ", indent));
 			}
 			output(format("%4u: %s\n", it->first, it->second.c_str()));
-			if (it-> first == source_loc.line) {
-				colorize.set_color(Color::reset, stack_output.back());
-			}
+                        colorize.set_color(Color::reset, stack_output.back(), ";0");
 		}
 	}
 
 	void print_source_loc(const char* indent,
 			const ResolvedTrace::SourceLoc& source_loc,
 			void* addr=0) {
+                Colorize colorize;
+                colorize.init();
+		colorize.set_color((Color::type)37, stack_output.back(), ";2");
 		output(format("%sSource \"%s\", line %i, in %s",
 				indent, source_loc.filename.c_str(), (int)source_loc.line,
 				source_loc.function.c_str()));
