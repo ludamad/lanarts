@@ -3,7 +3,7 @@ projectiles:
   - name: Fire Bolt
     weapon_class: magic
     damage_type: {magic: 1.0}
-    damage: { base: [2,4], magic: 1.05 }
+    damage: { base: [3,5], magic: 1.05 }
     power: { base: 1, magic: 0.2 }
     range: 300
     speed: 7

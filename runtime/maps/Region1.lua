@@ -160,6 +160,7 @@ local NOT_SOLID_QUERY = {matches_none = SourceMap.FLAG_SOLID}
 local function try_copy_unsolid(map, xy1, xy2) 
     if map:square_query(xy2, NOT_SOLID_QUERY) then
         map:set(xy1, map:get(xy2))
+        assert(map:square_query(xy1, NOT_SOLID_QUERY), "Square should not be solid after try_copy_unsolid!")
         return true
     end
     return false

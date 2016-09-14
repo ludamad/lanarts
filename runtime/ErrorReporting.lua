@@ -196,25 +196,20 @@ local function combine_cpp_traceback_with_lua(lua_stacktrace)
         return lua_stacktrace
     end
     local next_cpp_section = 1
-    local last_was_cpp_section = false
     append(lua_stacktrace, "[C]") -- Hack to get the bottom of the trace to resolve as the setup CPP calls
     for lua_part in values(lua_stacktrace) do
         -- Expand out the other-wise mysterious "[C]" sections:
-        if lua_part:find("%[C%]") then
-            if not last_was_cpp_section then
-                local cpp_section = cpp_sections[next_cpp_section]
-                if cpp_section ~= nil then
-                    for cpp_part in values(cpp_section) do
-                        append(combined, cpp_part)
-                    end
-                    next_cpp_section = next_cpp_section + 1
+        if lua_part:find("%[C%]") and not lua_part:find("%[C%]: ?") and not lua_part:find("'assert'") then
+            local cpp_section = cpp_sections[next_cpp_section]
+            if cpp_section ~= nil then
+                for cpp_part in values(cpp_section) do
+                    append(combined, cpp_part)
                 end
+                next_cpp_section = next_cpp_section + 1
             end
-            last_was_cpp_section = true
         else
             -- Copy the lua parts interleaved with the expanded "[C]" sections: 
             append(combined, lua_part)
-            last_was_cpp_section = false
         end
     end
     return combined
@@ -224,6 +219,7 @@ local debug_traceback = debug.traceback -- Stash & wrap the current debug.traceb
 -- Improve the traceback in various ways, including adding color and reducing noise:
 function M.traceback(--[[Optional]] str)
     local traceback = debug_traceback()
+    print(traceback)
     local stacktrace = traceback:split('\n')
     local i = 1
     while i <= #stacktrace do

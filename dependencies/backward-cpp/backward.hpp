@@ -1830,7 +1830,7 @@ private:
 				inliner_idx > 0; --inliner_idx) {
                         stack_output.push_back("");
 			if (!already_indented) {
-				output("   ");
+				output(" ");
 			}
 			const ResolvedTrace::SourceLoc& inliner_loc
 				= trace.inliners[inliner_idx-1];
@@ -1845,11 +1845,11 @@ private:
 		if (trace.source.filename.size()) {
                         stack_output.push_back("");
 			if (!already_indented) {
-				output("   ");
+				output(" ");
 			}
-			print_source_loc("   ", trace.source, trace.addr);
+			print_source_loc(" ", trace.source, trace.addr);
 			if (snippet) {
-				print_snippet("   ", trace.source,
+				print_snippet(" ", trace.source,
 						colorize, Color::yellow, 7);
 			}
 		}

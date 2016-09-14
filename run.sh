@@ -109,7 +109,7 @@ function build_lanarts(){
     if handle_flag "--clean" ; then
         make clean
     fi
-    make -j$((cores+1))
+    make -j$((cores+1)) lanarts
     cd ..
 }
 
@@ -130,7 +130,7 @@ function run_lanarts(){
     cd runtime
     if handle_flag "--gdb" || handle_flag "-g" ; then
         echo "Wrapping in GDB:" | colorify '1;35'
-        gdb -silent -ex=r --args ../build/src/lanarts $args
+        gdb -silent -ex=r -ex="break lua_error" --args ../build/src/lanarts $args
     else
         exec ../build/src/lanarts $args
     fi

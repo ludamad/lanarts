@@ -440,7 +440,6 @@ function M.overworld_create_helper(--[[Optional]] dont_spawn_content)
 
     local w,h = 300,300
     local map = MapUtils.map_create("Overworld", {w,h}, tileset.wall, {SourceMap.FLAG_SOLID, SourceMap.FLAG_SEETHROUGH})
-    print 'wuut'
     local nodes = get_leafs(SourceMap.bsp_split { split_depth = 2, map = map, minimum_node_size = {w/6, h/6}, area = {50,50,250,250} })
     for i=1,#nodes do
         generate_area(map, nodes[i].area)
@@ -465,7 +464,6 @@ function M.overworld_create_helper(--[[Optional]] dont_spawn_content)
 end
 
 function M.overworld_create(--[[Optional]] dont_spawn_content)
-    print "WAWDWADA"
     local map, map_id = M.overworld_create_helper(dont_spawn_content)
     World.players_spawn(map_id, find_player_positions(map))
     return map_id

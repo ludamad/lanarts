@@ -220,8 +220,8 @@ namespace ldungeon_gen {
 		methods["clear"].bind_function(lua_map_clear);
 
 		LUAWRAP_GETTER(getters, size, OBJ->size());
-		LUAWRAP_METHOD(methods, get, lua_square_push(L, (*OBJ)[luawrap::get<Pos>(L, 2) - Pos(1,1)]));
-		LUAWRAP_METHOD(methods, set, (*OBJ)[luawrap::get<Pos>(L, 2) - Pos(1,1)] = lua_square_get(LuaStackValue(L, 3)));
+		LUAWRAP_METHOD(methods, get, lua_square_push(L, (*OBJ)[luawrap::get<Pos>(L, 2)]));
+		LUAWRAP_METHOD(methods, set, (*OBJ)[luawrap::get<Pos>(L, 2)] = lua_square_get(LuaStackValue(L, 3)));
 		LUAWRAP_METHOD(methods, square_apply, (*OBJ)[luawrap::get<Pos>(L, 2)].apply(lua_operator_get(LuaStackValue(L, 3))));
 		LUAWRAP_GETTER(methods, square_query, (*OBJ)[luawrap::get<Pos>(L, 2)].matches(lua_selector_get(LuaStackValue(L, 3))));
 

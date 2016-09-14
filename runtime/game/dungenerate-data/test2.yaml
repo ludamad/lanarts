@@ -1,6 +1,0 @@
-- Weapon: !object
-  var(float): bonus_res bonus_dam
-  event(create):
-    bonus_res
-
-  

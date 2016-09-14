@@ -27,6 +27,7 @@ require "Logging"
 require "ErrorReporting"
 
 print "Read other globals"
+
 require "globals.Debug"
 require "globals.Deprecated"
 require "globals.Draw"
