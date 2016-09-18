@@ -548,10 +548,7 @@ namespace lua_api {
 		LuaValue globals = luawrap::globals(L);
 		LuaValue registry = luawrap::registry(L);
 
-		luawrap::ensure_table(luawrap::globals(L)["_INTERNAL_IMPORTED"]);
-		luawrap::ensure_table(luawrap::globals(L)["_INTERNAL_LOADERS"]);
 		globals["values"].bind_function(l_itervalues);
-		globals["_LOADED"] = luawrap::ensure_table(registry["_LOADED"]);
 		globals["newtype"].bind_function(lapi_newtype);
 		globals["toaddress"].bind_function(lapi_toaddress);
 		globals["rand_range"].bind_function(lapi_rand_range);

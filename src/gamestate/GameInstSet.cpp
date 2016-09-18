@@ -170,7 +170,6 @@ void GameInstSet::serialize(GameState* gs, SerializeBuffer& serializer) {
 		}
 	}
 	for (int i = 0; i < instances.size(); i++) {
-            std::cout << cpp_type_name(instances[i]) << std::endl;
 		instances[i]->serialize_lua(gs, serializer);
 	}
 }

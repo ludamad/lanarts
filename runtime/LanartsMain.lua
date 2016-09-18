@@ -80,8 +80,8 @@ end
 function Engine.pre_serialize()
     local SerializationUtils = require "SerializationUtils"
     local timer = timer_create()
-    --SerializationUtils.name_global_data()
-    --SerializationUtils.install_require_fallback()
+    SerializationUtils.name_global_data()
+    SerializationUtils.install_require_fallback()
     print("Naming globals took " .. timer:get_milliseconds() .. "ms.")
 end
 

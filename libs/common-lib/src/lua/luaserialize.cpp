@@ -91,6 +91,7 @@ void LuaSerializeContext::store_ref_id(int idx) {
 
 // Writes [LS_FUNCTION, <number of upvalues>, <upvalue encodings>]
 void LuaSerializeContext::encode_function(int idx) {
+        printf("ENCODING FUNC %d\n", next_encode_index);
 	lua_pushvalue(L, idx); // push function
 
 	lua_Debug ar;
@@ -307,13 +308,15 @@ void LuaSerializeContext::decode_function() {
 	int function_size = buffer->read_int();
 	_Str str(buffer->fetch_raw(function_size), function_size);
 	lua_load(L, lua_serialize_buffer_reader, &str, "<decoded function>");
+	int func_id = lua_gettop(L);
 
-	store_object(-1);
+	store_object(func_id);
+        printf("DECODING FUNC %d\n", next_decode_index);
 
 	size_t nups = buffer->read_int();
 	for (int i = 1; i <= nups; i++) {
 		decode();
-		const char* name = lua_setupvalue(L, -2, i);
+		const char* name = lua_setupvalue(L, func_id, i);
 		if (!name) {
 			luaL_error(L, "Unable to find upvalue, exitting...");
 			return;
@@ -399,24 +402,24 @@ void LuaSerializeContext::decode_ref_metamethod() {
 
 void luaserialize_encode(lua_State* L, SerializeBuffer& serializer, int idx) {
 	lua_pushvalue(L, idx);
-	LuaSerializeContext context = LuaSerializeContext::push3(L, &serializer);
+	LuaSerializeContext context = LuaSerializeContext::push3(L, &serializer, 1, 1);
 	context.encode(-2);
 	lua_pop(L, 4);
 }
 void luaserialize_decode(lua_State* L, SerializeBuffer& serializer) {
-	LuaSerializeContext context = LuaSerializeContext::push3(L, &serializer);
+	LuaSerializeContext context = LuaSerializeContext::push3(L, &serializer, 1, 1);
 	context.decode();
 	lua_replace(L, -3); // Replace first pushed value
 	lua_pop(L, 2);
 }
 
 void luaserialize_encode(lua_State* L, SerializeBuffer& serializer, const LuaValue& value) {
-	LuaSerializeContext context = LuaSerializeContext::push3(L, &serializer);
+	LuaSerializeContext context = LuaSerializeContext::push3(L, &serializer, 1, 1);
 	context.encode(value);
 	lua_pop(L, 3);
 }
 void luaserialize_decode(lua_State* L, SerializeBuffer& serializer, LuaValue& value) {
-	LuaSerializeContext context = LuaSerializeContext::push3(L, &serializer);
+	LuaSerializeContext context = LuaSerializeContext::push3(L, &serializer, 1, 1);
 	context.decode(value);
 	lua_pop(L, 3);
 }
@@ -426,7 +429,7 @@ LuaSerializeContext LuaSerializeConfig::push4(SerializeBuffer& serializer) {
 	this->index_to_obj.push();
 	this->index_failure_function.push();
 	this->context_object.push();
-	return LuaSerializeContext::ref_top4(L, &serializer);
+	return LuaSerializeContext::ref_top4(L, &serializer, this->next_encode_index, this->next_decode_index);
 }
 
 void LuaSerializeConfig::encode(SerializeBuffer& serializer, int idx) {
@@ -461,4 +464,33 @@ void LuaSerializeConfig::decode(SerializeBuffer& serializer, LuaValue& value) {
 	context.decode(value);
 	sync_indices(context);
 	lua_pop(L, 4);
+}
+
+static void lua_table_clear(lua_State* L, int table_idx) {
+    int old_top = lua_gettop(L);
+    lua_pushvalue(L, table_idx); // Push for setting into table
+    table_idx = lua_gettop(L);
+    lua_pushnil(L);
+    while (lua_next(L, -2) != 0) {
+        lua_pushvalue(L, -2); // Get key
+        lua_pushnil(L); // Push nil to delete the key with
+        lua_rawset(L, table_idx);
+        lua_pop(L, 1);
+    }
+    lua_pop(L, 1); // Pop extra table copy.
+    assert(old_top == lua_gettop(L));
+}
+
+void LuaSerializeConfig::reset() {
+     // Clear all our tables, while making sure the references held by
+     // our lua state remain valid:
+     obj_to_index.push();
+     lua_table_clear(L, -1);
+     lua_pop(L, 1);
+     index_to_obj.push();
+     lua_table_clear(L, -1);
+     lua_pop(L, 1);
+     context_object.push();
+     lua_table_clear(L, -1);
+     lua_pop(L, 1);
 }

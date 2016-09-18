@@ -186,14 +186,19 @@ bool GameState::level_has_player() {
 }
 
 void GameState::serialize(SerializeBuffer& serializer) {
+	LuaSerializeConfig& conf = luaserialize_config();
+        // Reset the serialization config:
+        conf.reset();
+	luawrap::globals(L)["Engine"]["pre_serialize"].push();
+	luawrap::call<void>(L);
+
 	settings.serialize_gameplay_settings(serializer);
 
 	serializer.write(mtwist); // Save RNG state
 	serializer.write_int(_game_timestamp);
 
-	luawrap::globals(L)["Engine"]["pre_serialize"].push();
-	luawrap::call<void>(L);
-
+        conf.encode(serializer, 
+            luawrap::globals(L)["package"]["loaded"]["core.GlobalData"]);
 	serializer.write_int(this->frame_n);
 	world.serialize(serializer);
 
@@ -205,13 +210,20 @@ void GameState::serialize(SerializeBuffer& serializer) {
 }
 
 void GameState::deserialize(SerializeBuffer& serializer) {
+	LuaSerializeConfig& conf = luaserialize_config();
+        // Reset the serialization config:
+        conf.reset();
+	luawrap::globals(L)["Engine"]["pre_deserialize"].push();
+	luawrap::call<void>(L);
+
 	settings.deserialize_gameplay_settings(serializer);
 
 	serializer.read(mtwist); // Load RNG state
 	serializer.read_int(_game_timestamp);
 
-	luawrap::globals(L)["Engine"]["pre_deserialize"].push();
-	luawrap::call<void>(L);
+        LuaValue global_data;
+        conf.decode(serializer, global_data);
+        luawrap::globals(L)["package"]["loaded"]["core.GlobalData"] = global_data;
 
 	serializer.read_int(this->frame_n);
 	world.deserialize(serializer);

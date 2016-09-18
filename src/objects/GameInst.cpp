@@ -63,7 +63,7 @@ bool GameInst::try_callback(const char* callback) {
 		luawrap::push(L, this);
 		lua_call(L, 1, 0);
 		called = true;
-	}
+        }
 	lua_settop(L, string_idx - 1);
 	return called;
 }
@@ -114,6 +114,11 @@ void GameInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 void GameInst::serialize_lua(GameState* gs, SerializeBuffer& serializer) {
 	LuaSerializeConfig& conf = gs->luaserialize_config();
 	conf.encode(serializer, lua_variables);
+        if (!lua_variables.empty()) {
+            serializer.write_int(lua_variables["type"].isnil());
+        } else {
+            serializer.write_int(0);
+        }
 }
 
 void GameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
@@ -126,6 +131,10 @@ void GameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 void GameInst::deserialize_lua(GameState* gs, SerializeBuffer& serializer) {
 	LuaSerializeConfig& conf = gs->luaserialize_config();
 	conf.decode(serializer, lua_variables);
+        int is_nil = serializer.read_int();
+        if (!lua_variables.empty()) {
+            LANARTS_ASSERT(is_nil == lua_variables["type"].isnil());
+        }
 }
 
 void GameInst::copy_to(GameInst *inst) const {

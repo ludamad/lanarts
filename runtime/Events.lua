@@ -33,8 +33,7 @@ function events.MonsterDeath(monster)
                             ["Sheep"]=Sounds.death_sheep ,
                             ["Giant Frog"]=Sounds.death_frog ,
                             ["Green Slime"]=Sounds.death_slime ,
-                            ["Red Slime"]=Sounds.death_slime                           
-                        }
+                            ["Red Slime"]=Sounds.death_slime }
     if monstersounds[monster.name] ~= nil then
         monstersounds[monster.name]:play()
     end
