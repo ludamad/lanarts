@@ -92,6 +92,7 @@ GameMapState* GameWorld::map_create(const Size& size, bool wandering_enabled) {
 	int levelid = level_states.size();
 	GameMapState* map = new GameMapState(levelid, Size(size.w * TILE_SIZE, size.h * TILE_SIZE), wandering_enabled);
 	level_states.push_back(map);
+        _should_sync_states = true;
 	return map;
 }
 

@@ -325,7 +325,7 @@ bool GameState::step() {
 		connection.check_integrity(this);
 	}
 
-	connection.poll_messages();
+        connection.poll_messages();
 
 	hud.step(this);
 	if (!world.step()) {
@@ -333,7 +333,7 @@ bool GameState::step() {
 	}
 
 	frame_n++;
-	return true;
+        return true;
 }
 
 int GameState::key_down_state(int keyval) {

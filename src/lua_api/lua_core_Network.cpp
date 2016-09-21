@@ -21,6 +21,12 @@ static int net_sync_message_consume(lua_State* L) {
 	return 0;
 }
 
+static int should_send_sync_message(lua_State* L) {
+	GameState* gs = lua_api::gamestate(L);
+        lua_pushboolean(L, gs->game_world().should_sync_states() && gs->player_data().get_local_player_idx() == 1);
+	return 1;
+}
+
 static int net_sync_message_send(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	gs->net_connection().consume_sync_messages(gs);
@@ -44,6 +50,7 @@ namespace lua_api {
 
 		module["sync_message_consume"].bind_function(net_sync_message_consume);
 		module["sync_message_send"].bind_function(net_sync_message_send);
+		module["should_send_sync_message"].bind_function(should_send_sync_message);
 		module["connections_poll"].bind_function(net_connections_poll);
 	}
 }

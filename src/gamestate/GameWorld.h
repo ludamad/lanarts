@@ -66,6 +66,10 @@ public:
 	void connect_entrance_to_exit(int roomid1, int roomid2);
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
+        
+        bool should_sync_states() {
+            return _should_sync_states;
+        }
 
 	void spawn_players(GameMapState* map, const std::vector<Pos>& positions);
 private:
@@ -81,6 +85,7 @@ private:
 	GameMapState* lvl;
 	GameState* gs;
 	LuaValue lua_level_states;
+        bool _should_sync_states = false;
 	std::vector<GameMapState*> level_states;
 };
 
