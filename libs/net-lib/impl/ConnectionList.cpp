@@ -6,21 +6,25 @@
 #include "ConnectionList.h"
 
 ConnectionList::ConnectionList() {
+	_list_lock = SDL_CreateMutex();
 }
 
 ConnectionList::~ConnectionList() {
+	SDL_DestroyMutex(_list_lock);
 }
 
 int ConnectionList::add(ENetPeer* peer) {
-        std::unique_lock<std::mutex> lock(_list_lock);
+	SDL_LockMutex(_list_lock);
 	int idx = _peers.size();
 	_peers.push_back(peer);
+	SDL_UnlockMutex(_list_lock);
 	return idx;
 }
 
 std::vector<ENetPeer*> ConnectionList::get() {
-        std::unique_lock<std::mutex> lock(_list_lock);
+	SDL_LockMutex(_list_lock);
 	std::vector<ENetPeer*> copy = _peers;
+	SDL_UnlockMutex(_list_lock);
 	return copy;
 }
 
@@ -29,9 +33,10 @@ std::vector<ENetPeer*>& ConnectionList::unsafe_get() {
 }
 //
 //void ConnectionList::clear() {
-//      std::unique_lock<std::mutex> lock(_list_lock);
+//	SDL_LockMutex(_list_lock);
 //	for (int i = 0; i < _peers.size(); i++) {
 //		enet_peer_reset(_peers[i]);
 //	}
 //	_peers.clear();
+//	SDL_UnlockMutex(_list_lock);
 //}

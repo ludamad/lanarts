@@ -3,22 +3,27 @@
  *  A thread-safe packet queue.
  */
 
-#include <mutex>
-#include <chrono>
-
 #include "PacketQueue.h"
+
+PacketQueue::PacketQueue() {
+	_queue_lock = SDL_CreateMutex();
+	_has_packets = SDL_CreateCond();
+}
+
+PacketQueue::~PacketQueue() {
+	SDL_DestroyMutex(_queue_lock);
+	SDL_DestroyCond(_has_packets);
+}
 
 ENetPacket* PacketQueue::wait_for_packet(int timeout) {
 	ENetPacket* packet = NULL;
-        std::unique_lock<std::mutex> lock(_queue_lock);
-
+	SDL_LockMutex(_queue_lock);
 
 	if (_packets.empty()) {
-		if (timeout <= 0) {
-                    _has_packets.wait(lock);
+		if (timeout < 0) {
+			SDL_CondWait(_has_packets, _queue_lock);
 		} else {
-                    auto now = std::chrono::system_clock::now();
-                    _has_packets.wait_until(lock, now + std::chrono::milliseconds(timeout));
+			SDL_CondWaitTimeout(_has_packets, _queue_lock, timeout);
 		}
 	}
 
@@ -27,11 +32,13 @@ ENetPacket* PacketQueue::wait_for_packet(int timeout) {
 		_packets.pop_front();
 	}
 
+	SDL_UnlockMutex(_queue_lock);
 	return packet;
 }
 
 void PacketQueue::queue_packet(ENetPacket* packet) {
-        std::unique_lock<std::mutex> lock(_queue_lock);
-        _has_packets.notify_all();
+	SDL_LockMutex(_queue_lock);
+	SDL_CondSignal(_has_packets);
 	_packets.push_back(packet);
+	SDL_UnlockMutex(_queue_lock);
 }

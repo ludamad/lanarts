@@ -24,7 +24,7 @@ bool MultiframeActionQueue::has_actions_for_frame(int frame) {
 
 void MultiframeActionQueue::queue_actions_for_frame(const ActionQueue & actions,
 		int frame) {
-	LANARTS_ASSERT(!has_actions_for_frame(frame));
+	//LANARTS_ASSERT(!has_actions_for_frame(frame));
 	queue[frame] = actions;
 }
 

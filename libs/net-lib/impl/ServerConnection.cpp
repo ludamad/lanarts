@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <SDL_thread.h>
+#include <SDL_mutex.h>
 
 #include <lcommon/Timer.h>
 
@@ -17,10 +18,10 @@
 
 const int SERVER_POLL_TIME = 200; /* 200 milliseconds */
 
-static void server_send_packet(std::mutex& mutex, ENetHost* server,
+static void server_send_packet(SDL_mutex* mutex, ENetHost* server,
 		const std::vector<ENetPeer*>& peers, PacketBuffer& packet,
 		receiver_t receiver, int originator) {
-        std::unique_lock<std::mutex> lock(mutex);
+	SDL_LockMutex(mutex);
 	std::string msg(&packet.at(HEADER_SIZE), packet.size() - HEADER_SIZE);
 	if (receiver == NetConnection::ALL_RECEIVERS) {
 		if (originator == 0) {
@@ -37,16 +38,19 @@ static void server_send_packet(std::mutex& mutex, ENetHost* server,
 		send_packet(peers[receiver - 1], packet);
 		enet_host_flush(server);
 	}
+	SDL_UnlockMutex(mutex);
 }
 
 ServerConnectionData::ServerConnectionData() :
 				destroyed(false),
 				server_socket(NULL),
 				disconnect(false) {
+	packet_send_mutex = SDL_CreateMutex();
 }
 
 ServerConnectionData::~ServerConnectionData() {
 	enet_host_destroy(server_socket);
+	SDL_DestroyMutex(packet_send_mutex);
 }
 
 // Wraps enet_host_service in a thread-safe manner
@@ -55,11 +59,9 @@ static int thread_safe_host_service(ServerConnectionData* server_data, ENetHost*
 		ENetEvent* event, int timeout) {
 	Timer timer;
 	while (!server_data->destroyed) {
-                int event_status;
-                {
-                    std::unique_lock<std::mutex> lock(server_data->packet_send_mutex);
-                    event_status = enet_host_service(host, event, 0);
-                }
+		SDL_LockMutex(server_data->packet_send_mutex);
+		int event_status = enet_host_service(host, event, 0);
+		SDL_UnlockMutex(server_data->packet_send_mutex);
 		if (event_status < 0) {
 			server_data->disconnect = true;
 		}
@@ -176,7 +178,7 @@ void ServerConnection::initialize_connection() {
 		__lnet_throw_connection_error(
 				"An error occurred while trying to create an ENet server host.\n");
 	}
-	_polling_thread = SDL_CreateThread(server_poll_thread, "server-poll-thread", _data);
+	_polling_thread = SDL_CreateThread(server_poll_thread, "server-polling-thread", _data);
 	if (!_polling_thread) {
 		__lnet_throw_connection_error(
 				"An error occurred while trying to create the server connection polling thread.\n");

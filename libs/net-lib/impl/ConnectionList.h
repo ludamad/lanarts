@@ -7,7 +7,7 @@
 #define CONNECTIONLIST_H_
 
 #include <vector>
-#include <mutex>
+#include <SDL_mutex.h>
 #include <enet/enet.h>
 
 class ConnectionList {
@@ -20,7 +20,7 @@ public:
 	/* If there is only one writer thread, it is OK for it to read it without a lock*/
 	std::vector<ENetPeer*>& unsafe_get();
 private:
-        std::mutex _list_lock;
+	SDL_mutex* _list_lock;
 	std::vector<ENetPeer*> _peers;
 };
 
