@@ -67,7 +67,7 @@ public:
 	void serialize(SerializeBuffer& serializer);
 	void deserialize(SerializeBuffer& serializer);
         
-        bool should_sync_states() {
+        bool& should_sync_states() {
             return _should_sync_states;
         }
 
