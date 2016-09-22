@@ -43,6 +43,7 @@ end
 
 function MapSequence:forward_portal_add(idx, portal, key, create_map_function)
     self:_slots_ensure(idx + 1)
+    self:slot_resolve(idx + 1, self:_get_map_id(idx+1) or create_map_function(portal))
     local forward_portals = self.maps[idx].forward_portals
     forward_portals:set_start(key, portal.xy)
     local on_player_interact_args = {self, idx, create_map_function, forward_portals, key}
