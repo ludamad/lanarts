@@ -45,10 +45,12 @@ local function connect_map(args)
             MapSeq:backward_portal_resolve(seq_idx, portal, i)
         end
     end
+    local t = {}
     for i=1,args.forward_portals do
         local portal = MapUtils.random_portal(map, map_area, args.sprite_down, nil, args.sprite_down_index)
-        MapSeq:forward_portal_add(seq_idx, portal, i, args.next_floor_callback)
+        append(t, MapSeq:forward_portal_add(seq_idx, portal, i, args.next_floor_callback))
     end
+    for c in values(t) do c() end
 end
 
 -- Overworld to template map sequence (from overworld to deeper in the temple)

@@ -43,10 +43,12 @@ local function connect_map(args)
             MapSeq:backward_portal_resolve(seq_idx, portal, i)
         end
     end
+    local t = {}
     for i=1,args.forward_portals do
         local portal = MapUtils.random_portal(map, map_area, args.sprite_down, nil, args.sprite_down_index)
-        MapSeq:forward_portal_add(seq_idx, portal, i, args.next_floor_callback)
+        append(t, MapSeq:forward_portal_add(seq_idx, portal, i, args.next_floor_callback))
     end
+    for c in values(t) do c() end
 end
 
 -- Overworld to template map sequence (from overworld to deeper in the temple)
@@ -150,9 +152,10 @@ end
 local function old_dungeon_placement_function(MapSeq, tileset, levels)
     return function(map, xy)
         local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 12))
-        MapSeq:forward_portal_add(1, portal, 1, function() 
+        local c = MapSeq:forward_portal_add(1, portal, 1, function() 
             return old_map_generate(MapSeq, tileset, levels[1]-1, levels[2]-levels[1]+1) 
         end)
+        c()
     end
 end
 
@@ -199,6 +202,7 @@ function M.overworld_create()
     -- These squares take the form of a square next to them, after the initial map generation is done
     local undecided_squares = {}
 
+    local portals = {}
     local UNDECIDED_FLAG, UNDECIDED_TILE = SourceMap.FLAG_SOLID, tileset.wall
     local map = MapUtils.area_template_to_map("Overworld", 
     		--[[file path]] path_resolve "region1.txt", 
@@ -223,10 +227,11 @@ function M.overworld_create()
                     local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 11))
                     local seq_len = #temple_sequences
                     temple_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
-                    temple_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
+                    local c = temple_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
                         function() 
                             return temple_level_create("Temple", 1, temple_sequences, TileSets.temple, {"Skeleton", "Dark Centaur"})
                     end)
+                    table.insert(portals, c)
                     table.insert(undecided_squares, xy)
                end},
 
@@ -300,10 +305,11 @@ function M.overworld_create()
                     local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(0, 2))
                     local seq_len = #dirthole_sequences
                     dirthole_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
-                    dirthole_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
+                    local c = dirthole_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
                         function()
                             return temple_level_create("Mines", 1, dirthole_sequences, TileSets.pebble, {"Golem", "Zombie"})
                     end)
+                    table.insert(portals, c)
                end}
     })
 
@@ -325,6 +331,7 @@ function M.overworld_create()
     end
 
     World.players_spawn(map_id, find_player_positions(map, FLAG_PLAYERSPAWN))
+    for p in values(portals) do p() end
     return map_id
 end
 return M
