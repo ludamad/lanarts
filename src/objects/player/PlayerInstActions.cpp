@@ -597,8 +597,11 @@ void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
 		return;
 	}
 
-	cooldowns().reset_stopaction_timeout(50);
 	FeatureInst* portal = find_usable_portal(gs, this);
+        if (portal == NULL) {
+            return;
+        }
+	cooldowns().reset_stopaction_timeout(50);
 	portal->player_interact(gs, this);
 	reset_rest_cooldown();
 

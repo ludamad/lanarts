@@ -1,0 +1,32 @@
+fov/impl/permissive-fov.cc:    activeFields.back().shallow.far = offsetT(state->extent.x, 0);
+fov/impl/permissive-fov.cc:    activeFields.back().steep.far = offsetT(0, state->extent.y);
+fov/impl/permissive-fov.cc:    if (state->quadrant.x == 1 && state->quadrant.y == 1)
+fov/impl/permissive-fov.cc:    int maxI = state->extent.x + state->extent.y;
+fov/impl/permissive-fov.cc:      int startJ = max(0, i - state->extent.x);
+fov/impl/permissive-fov.cc:      int maxJ = min(i, state->extent.y);
+fov/impl/permissive-fov.cc:    offsetT adjustedPos(pos.x*state->quadrant.x + state->source.x,
+fov/impl/permissive-fov.cc:                        pos.y*state->quadrant.y + state->source.y);
+fov/impl/permissive-fov.cc:    bool result = state->isBlocked(adjustedPos.x, adjustedPos.y,
+fov/impl/permissive-fov.cc:                                   state->context) == 1;
+fov/impl/permissive-fov.cc:    if ((state->quadrant.x * state->quadrant.y == 1
+fov/impl/permissive-fov.cc:        || (state->quadrant.x * state->quadrant.y == -1
+fov/impl/permissive-fov.cc:        || doesPermissiveVisit(state->mask, pos.x*state->quadrant.x,
+fov/impl/permissive-fov.cc:                               pos.y*state->quadrant.y) == 0)
+fov/impl/permissive-fov.cc:      state->visit(adjustedPos.x, adjustedPos.y, state->context);
+lua_api/lua_effectivestats.cpp:	EffectiveStats* stats = state->get_stats(L);
+lua_api/lua_effectivestats.cpp:	EffectiveStats* stats = state->get_stats(L);
+lua_api/lua_combatstats.cpp:	CombatStats* stats = state->get_stats(L);
+lua_api/lua_combatstats.cpp:	CombatStats* stats = state->get_stats(L);
+gamestate/GameInstSet.cpp:	GameInst* inst = state->inst;
+gamestate/GameInstSet.cpp:	state->inst = GAMEINST_TOMBSTONE;
+gamestate/GameInstSet.cpp:			GameInst* inst = state->inst;
+gamestate/GameInstSet.cpp:			state = state->next_same_depth;
+gamestate/GameInstSet.cpp:			ret[ind++] = state->inst;
+gamestate/GameInstSet.cpp:			if (state->inst->depth > draw_depth_check) {
+gamestate/GameInstSet.cpp:						state->inst->id, state->inst->depth, draw_depth_check);
+gamestate/GameInstSet.cpp:			draw_depth_check = state->inst->depth;
+gamestate/GameInstSet.cpp:			state = state->next_same_depth;
+gamestate/GameInstSet.cpp:			GameInst* inst = state->inst;
+gamestate/GameInstSet.cpp:			state = state->next_same_depth;
+gamestate/GameInstSet.cpp:		GameInst* oinst = state->inst;
+gamestate/GameInstSet.cpp:	GameInst* inst = state->inst;
