@@ -334,7 +334,7 @@ local function generate_enemies(map, enemies)
     else
         min, max = enemies.amount, enemies.amount
     end
-    local amounts = {min * (0.8 + World.player_amount * 0.2), max * (0.8 + World.player_amount * 0.2)}
+    local amounts = {min * (1.0 + (World.player_amount - 1)/2), max * (1.0 + (World.player_amount - 1) / 2)}
     local amount = math.round(randomf(amounts))
     M.generate_from_enemy_entries(map, enemies.generated, amount)
 end
