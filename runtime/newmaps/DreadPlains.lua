@@ -1,8 +1,11 @@
+local TileSets = require "tiles.Tilesets"
 local item_groups = require "maps.ItemGroups"
+
+local Map = require "core.Map"
 local Display = require "core.Display"
 local item_utils = require "maps.ItemUtils"
 local dungeons = require "maps.Dungeons"
-local map_utils = require "maps.MapUtils"
+local MapUtils = require "maps.MapUtils"
 local SourceMap = require "core.SourceMap"
 local World = require "core.World"
 
@@ -292,10 +295,6 @@ local function generate_items(map, items)
     end
 end
 
-local function size_multiplier() 
-    return 1 + random(3, 10) * 0.03 * (World.player_amount - 1)
-end
-
 function M.enemy_generate(chances)
     local total_chance = 0
     for entry in values(chances) do
@@ -316,7 +315,7 @@ function M.generate_from_enemy_entries(map, chances, amount)
         total_chance = total_chance + (entry.chance or 0)
         local spawns = range_resolve(entry.guaranteed_spawns or 0)
         for i=1,spawns do 
-            map_utils.random_enemy(map, entry.enemy)
+            MapUtils.random_enemy(map, entry.enemy)
         end
     end
     for i=1,amount do
@@ -324,7 +323,7 @@ function M.generate_from_enemy_entries(map, chances, amount)
         for entry in values(chances) do
             rand = rand - (entry.chance or 0)
             if rand <= 0 then 
-                map_utils.random_enemy(map, entry.enemy)
+                MapUtils.random_enemy(map, entry.enemy)
                 break
             end
         end
@@ -362,7 +361,7 @@ local function generate_statues(map, --[[Optional]] amount)
     local tries, MAX_TRIES = 1, 10
     while i < amount do
         local area = random_choice(areas)
-        local sqr = map_utils.random_square(map, area)
+        local sqr = MapUtils.random_square(map, area)
         if not sqr then return end
         local query = SourceMap.rectangle_query {
             map = map,
@@ -372,7 +371,7 @@ local function generate_statues(map, --[[Optional]] amount)
         } 
         if query then
             map:square_apply(sqr, {add = SourceMap.FLAG_SOLID, remove = SourceMap.FLAG_SEETHROUGH})
-            map_utils.spawn_decoration(map, M.statue, sqr, random(0,17))
+            MapUtils.spawn_decoration(map, M.statue, sqr, random(0,17))
             i = i + 1
             tries = 0
         end
@@ -389,7 +388,7 @@ local function generate_stores(map)
         for i=1,random(5,10) do
             table.insert(items, item_utils.item_generate(chance(.5) and item_groups.basic_items or item_groups.enchanted_items, true))
         end
-        map_utils.random_store(map, items)
+        MapUtils.random_store(map, items)
     end
 end
 
@@ -405,7 +404,7 @@ local function generate_doors(map)
                     if x == x1 or x == x2 or y == y1 or y == y2 then
                         local sqr = {x,y}
                         if map:square_query(sqr, selector) then
-                            map_utils.spawn_door(map, sqr)
+                            MapUtils.spawn_door(map, sqr)
                         end
                     end
                 end
@@ -449,11 +448,8 @@ local function generate_rooms(map, rooms, tileset)
     local amounts = range_resolve(rooms.amount)
     local alt_amount = math.random(math.floor(amounts*0.10), math.ceil(amounts*0.50))
     amounts = amounts - alt_amount
-    -- Compensate for extra players
-    local size_mult = size_multiplier()
-    local size = map_call(math.ceil, {rooms.size[1] * size_mult, rooms.size[2] * size_mult})
     -- Compensate for padding
-    size = {size[1] + rooms.padding*2, size[2] + rooms.padding*2}
+    local size = {rooms.size[1] + rooms.padding*2, rooms.size[2] + rooms.padding*2}
     map_gen_apply(map, {alt_amount, alt_amount}, tileset.wall, tileset.floor_alt, size, rooms.padding)
     map_gen_apply(map, {amounts, amounts}, tileset.wall, tileset.floor , size, rooms.padding)
 end
@@ -464,7 +460,7 @@ local function generate_layout(map, layout, tileset)
 end
 
 local function generate_from_template(label, template, tileset)
-    return map_utils.area_template_to_map(label, template, --[[padding]] 4, { 
+    return MapUtils.area_template_to_map(label, template, --[[padding]] 4, { 
            ['x'] = { add = SourceMap.FLAG_SOLID, content = tileset.wall }, 
            ['.'] = { add = SourceMap.FLAG_SEETHROUGH, content = chance(.5) and tileset.floor_alt or tileset.floor }
     })
@@ -477,9 +473,7 @@ function M.create_map(label, floor, tileset)
     if entry.layout then
         local layout = random_choice(entry.layout)
         local size = map_call(range_resolve, layout.size)
-        local size_mult = size_multiplier()
-        size = {math.ceil(size[1] * size_mult), math.ceil(size[2] * size_mult)}
-        map = map_utils.map_create(label, size, tileset.wall)
+        map = MapUtils.map_create(label, size, tileset.wall)
         generate_layout(map, layout, tileset)
     else 
         local template = random_choice(entry.templates)
@@ -491,5 +485,26 @@ end
 
 M.last_floor = #map_layouts
 
+local function find_player_positions(map, --[[Optional]] flags) 
+    local positions = {}
+    local map_area = bbox_create({0,0},map.size)
+    for i=1,World.player_amount do
+        local sqr = MapUtils.random_square(map, map_area, 
+            --[[Selector]] { matches_all = flags, matches_none = {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT} },
+            --[[Operator]] nil, 
+            --[[Max attempts]] 10000
+        )
+        if not sqr then error("Could not find player spawn position for player " .. i .. "!") end
+        positions[i] = {(sqr[1]+.5) * Map.TILE_SIZE, (sqr[2]+.5) * Map.TILE_SIZE}
+    end
+    return positions
+end
+
+function M.overworld_create()   
+    local map = M.create_map("Dungeon 1", 1, TileSets.grass)
+    local map_id = MapUtils.game_map_create(map, true)
+    World.players_spawn(map_id, find_player_positions(map))
+    return map_id
+end
 -- Submodule
 return M
