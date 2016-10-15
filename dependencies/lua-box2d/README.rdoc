@@ -1,0 +1,19 @@
+== Box2D Lua bindings for Lubyk
+
+website for Box2D: http://www.box2d.org
+website for lubyk: http://lubyk.org
+forum: http://forum.lubyk.org
+
+== Box2D
+
+version: Version 2.1
+
+Box2D is a 2D physics engine for games.
+
+For help with Box2D, please visit http://www.box2d.org. There is a forum there where you may post your questions.
+
+For help with lubyk and Box2D, please visit http://forum.lubyk.org.
+
+== Changes with official Box2D
+
+This version has a new joint "b2BiFrictionJoint".

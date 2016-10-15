@@ -1,0 +1,22 @@
+lua:
+  attributes:
+    data:
+      set: |
+        if (self->data) {
+          free(self->data);
+          self->usedMalloc = false;
+        }
+        if (!lua_isnil(L, 3)) {
+          size_t len;
+          const char *data = luaL_checklstring(L, 3, &len);
+          self->data = (char*)malloc(sizeof(char) * len);
+          memcpy(self->data, data, len);
+          self->usedMalloc = true;
+        }
+      get: |
+        if (self->data) {
+          lua_pushlstring(L, self->data, self->size);
+          return 1;
+        } else {
+          return 0;
+        }
