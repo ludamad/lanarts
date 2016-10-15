@@ -21,7 +21,7 @@
 
 #include "../../SDL_internal.h"
 
-#if SDL_VIDEO_DRIVER_WAYLAND && SDL_VIDEO_OPENGL_EGL
+#if _SDL_VIDEO_DRIVER_WAYLAND && SDL_VIDEO_OPENGL_EGL
 
 #include "../SDL_sysvideo.h"
 #include "../../events/SDL_windowevents_c.h"
@@ -68,7 +68,7 @@ static const struct wl_shell_surface_listener shell_surface_listener = {
     handle_popup_done
 };
 
-#ifdef SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
+#ifdef _SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
 static void
 handle_onscreen_visibility(void *data,
         struct qt_extended_surface *qt_extended_surface, int32_t visible)
@@ -94,7 +94,7 @@ static const struct qt_extended_surface_listener extended_surface_listener = {
     handle_set_generic_property,
     handle_close,
 };
-#endif /* SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */
+#endif /* _SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */
 
 SDL_bool
 Wayland_GetWindowWMInfo(_THIS, SDL_Window * window, SDL_SysWMinfo * info)
@@ -178,12 +178,12 @@ int Wayland_CreateWindow(_THIS, SDL_Window *window)
     wl_surface_set_user_data(data->surface, data);
     data->shell_surface = wl_shell_get_shell_surface(c->shell,
                                                      data->surface);
-#ifdef SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH    
+#ifdef _SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH    
     if (c->surface_extension) {
         data->extended_surface = qt_surface_extension_get_extended_surface(
                 c->surface_extension, data->surface);
     }
-#endif /* SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */
+#endif /* _SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */
 
     data->egl_window = WAYLAND_wl_egl_window_create(data->surface,
                                             window->w, window->h);
@@ -201,13 +201,13 @@ int Wayland_CreateWindow(_THIS, SDL_Window *window)
                                       &shell_surface_listener, data);
     }
 
-#ifdef SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
+#ifdef _SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
     if (data->extended_surface) {
         qt_extended_surface_set_user_data(data->extended_surface, data);
         qt_extended_surface_add_listener(data->extended_surface,
                                          &extended_surface_listener, data);
     }
-#endif /* SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */
+#endif /* _SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */
 
     region = wl_compositor_create_region(c->compositor);
     wl_region_add(region, 0, 0, window->w, window->h);
@@ -245,10 +245,10 @@ void Wayland_DestroyWindow(_THIS, SDL_Window *window)
         if (wind->shell_surface)
             wl_shell_surface_destroy(wind->shell_surface);
 
-#ifdef SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
+#ifdef _SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
         if (wind->extended_surface)
             qt_extended_surface_destroy(wind->extended_surface);
-#endif /* SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */
+#endif /* _SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */
         wl_surface_destroy(wind->surface);
 
         SDL_free(wind);
@@ -257,6 +257,6 @@ void Wayland_DestroyWindow(_THIS, SDL_Window *window)
     window->driverdata = NULL;
 }
 
-#endif /* SDL_VIDEO_DRIVER_WAYLAND && SDL_VIDEO_OPENGL_EGL */
+#endif /* _SDL_VIDEO_DRIVER_WAYLAND && SDL_VIDEO_OPENGL_EGL */
 
 /* vi: set ts=4 sw=4 expandtab: */

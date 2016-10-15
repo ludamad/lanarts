@@ -292,6 +292,10 @@ local function generate_items(map, items)
     end
 end
 
+local function size_multiplier() 
+    return 1 + random(3, 10) * 0.03 * (World.player_amount)
+end
+
 function M.enemy_generate(chances)
     local total_chance = 0
     for entry in values(chances) do
@@ -334,7 +338,7 @@ local function generate_enemies(map, enemies)
     else
         min, max = enemies.amount, enemies.amount
     end
-    local amounts = {min * (1.0 + (World.player_amount - 1)/2), max * (1.0 + (World.player_amount - 1) / 2)}
+    local amounts = {min * (1.0 + (World.player_amount)/2), max * (1.0 + (World.player_amount) / 2)}
     local amount = math.round(randomf(amounts))
     M.generate_from_enemy_entries(map, enemies.generated, amount)
 end
@@ -351,9 +355,9 @@ end
 
 M.statue = Display.animation_create(Display.images_load "features/sprites/statues/statue(0-17).png", 1.0)
 
-local function generate_statues(map)
+local function generate_statues(map, --[[Optional]] amount)
     local areas = leaf_group_areas(map)
-    local amount = random(5,10)
+    amount = amount or random(5,10)
     local i = 0
     local tries, MAX_TRIES = 1, 10
     while i < amount do
@@ -445,8 +449,11 @@ local function generate_rooms(map, rooms, tileset)
     local amounts = range_resolve(rooms.amount)
     local alt_amount = math.random(math.floor(amounts*0.10), math.ceil(amounts*0.50))
     amounts = amounts - alt_amount
+    -- Compensate for extra players
+    local size_mult = size_multiplier()
+    local size = map_call(math.ceil, {rooms.size[1] * size_mult, rooms.size[2] * size_mult})
     -- Compensate for padding
-    local size = {rooms.size[1] + rooms.padding*2, rooms.size[2] + rooms.padding*2}
+    size = {size[1] + rooms.padding*2, size[2] + rooms.padding*2}
     map_gen_apply(map, {alt_amount, alt_amount}, tileset.wall, tileset.floor_alt, size, rooms.padding)
     map_gen_apply(map, {amounts, amounts}, tileset.wall, tileset.floor , size, rooms.padding)
 end
@@ -470,6 +477,8 @@ function M.create_map(label, floor, tileset)
     if entry.layout then
         local layout = random_choice(entry.layout)
         local size = map_call(range_resolve, layout.size)
+        local size_mult = size_multiplier()
+        size = {math.ceil(size[1] * size_mult), math.ceil(size[2] * size_mult)}
         map = map_utils.map_create(label, size, tileset.wall)
         generate_layout(map, layout, tileset)
     else 

@@ -23,7 +23,7 @@
 
 #include "../../SDL_internal.h"
 
-#ifdef SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
+#ifdef _SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
 
 #include "SDL_log.h"
 #include "SDL_waylandtouch.h"
@@ -182,7 +182,7 @@ WL_EXPORT const struct wl_interface qt_windowmanager_interface = {
 
 /* wayland-qt-surface-extension.c BEGINS */
 extern const struct wl_interface qt_extended_surface_interface;
-#ifndef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC
+#ifndef _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC
 extern const struct wl_interface wl_surface_interface;
 #endif
 
@@ -190,7 +190,7 @@ static const struct wl_interface *qt_surface_extension_types[] = {
     NULL,
     NULL,
     &qt_extended_surface_interface,
-#ifdef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC
+#ifdef _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC
     /* FIXME: Set this dynamically to (*WAYLAND_wl_surface_interface) ? 
      * The value comes from auto generated code and does 
      * not appear to actually be used anywhere
@@ -262,4 +262,4 @@ Wayland_touch_destroy(SDL_VideoData *data)
     }
 }
 
-#endif /* SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */
+#endif /* _SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */

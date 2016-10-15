@@ -20,7 +20,7 @@
 */
 #include "../../SDL_internal.h"
 
-#if SDL_VIDEO_DRIVER_WAYLAND
+#if _SDL_VIDEO_DRIVER_WAYLAND
 
 #define DEBUG_DYNAMIC_WAYLAND 0
 
@@ -30,7 +30,7 @@
 #include "SDL_log.h"
 #endif
 
-#ifdef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC
+#ifdef _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC
 
 #include "SDL_name.h"
 #include "SDL_loadso.h"
@@ -41,24 +41,24 @@ typedef struct
     const char *libname;
 } waylanddynlib;
 
-#ifndef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC
-#define SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC NULL
+#ifndef _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC
+#define _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC NULL
 #endif
-#ifndef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_EGL
-#define SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_EGL NULL
+#ifndef _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_EGL
+#define _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_EGL NULL
 #endif
-#ifndef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_CURSOR
-#define SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_CURSOR NULL
+#ifndef _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_CURSOR
+#define _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_CURSOR NULL
 #endif
-#ifndef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_XKBCOMMON
-#define SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_XKBCOMMON NULL
+#ifndef _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_XKBCOMMON
+#define _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_XKBCOMMON NULL
 #endif
 
 static waylanddynlib waylandlibs[] = {
-    {NULL, SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC},
-    {NULL, SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_EGL},
-    {NULL, SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_CURSOR},
-    {NULL, SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_XKBCOMMON}
+    {NULL, _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC},
+    {NULL, _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_EGL},
+    {NULL, _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_CURSOR},
+    {NULL, _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_XKBCOMMON}
 };
 
 static void *
@@ -87,7 +87,7 @@ WAYLAND_GetSym(const char *fnname, int *pHasModule)
     return fn;
 }
 
-#endif /* SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC */
+#endif /* _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC */
 
 /* Define all the function pointers and wrappers... */
 #define SDL_WAYLAND_MODULE(modname) int SDL_WAYLAND_HAVE_##modname = 0;
@@ -106,7 +106,7 @@ SDL_WAYLAND_UnloadSymbols(void)
     /* Don't actually unload if more than one module is using the libs... */
     if (wayland_load_refcount > 0) {
         if (--wayland_load_refcount == 0) {
-#ifdef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC            
+#ifdef _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC            
             int i;
 #endif
             
@@ -120,7 +120,7 @@ SDL_WAYLAND_UnloadSymbols(void)
 #undef SDL_WAYLAND_INTERFACE
 
 
-#ifdef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC
+#ifdef _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC
             for (i = 0; i < SDL_TABLESIZE(waylandlibs); i++) {
                 if (waylandlibs[i].lib != NULL) {
                     SDL_UnloadObject(waylandlibs[i].lib);
@@ -140,7 +140,7 @@ SDL_WAYLAND_LoadSymbols(void)
 
     /* deal with multiple modules (dga, wayland, etc) needing these symbols... */
     if (wayland_load_refcount++ == 0) {
-#ifdef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC
+#ifdef _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC
         int i;
         int *thismod = NULL;
         for (i = 0; i < SDL_TABLESIZE(waylandlibs); i++) {
@@ -190,6 +190,6 @@ SDL_WAYLAND_LoadSymbols(void)
     return rc;
 }
 
-#endif /* SDL_VIDEO_DRIVER_WAYLAND */
+#endif /* _SDL_VIDEO_DRIVER_WAYLAND */
 
 /* vi: set ts=4 sw=4 expandtab: */

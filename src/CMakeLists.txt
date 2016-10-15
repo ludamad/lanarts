@@ -99,6 +99,7 @@ add_executable( lanarts ${lanarts_src} ${lanarts_tests})
 set (libraries 
 	ldraw
 	lcommon
+        lua_box2d
 	lanarts_dungeon_gen
 	lsound
 	${lua_libraries}

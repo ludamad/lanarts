@@ -21,7 +21,7 @@
 
 #include "../../SDL_internal.h"
 
-#if SDL_VIDEO_DRIVER_WAYLAND
+#if _SDL_VIDEO_DRIVER_WAYLAND
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -400,4 +400,4 @@ Wayland_FiniMouse(void)
     mouse->WarpMouse = NULL;
     mouse->SetRelativeMouseMode = NULL;
 }
-#endif  /* SDL_VIDEO_DRIVER_WAYLAND */
+#endif  /* _SDL_VIDEO_DRIVER_WAYLAND */

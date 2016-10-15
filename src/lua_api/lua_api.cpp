@@ -28,6 +28,9 @@ int luayaml_module(lua_State *L);
 
 #include "lua_api.h"
 
+// Box2D bindings:
+extern "C" int luaopen_b2_vendor(lua_State* L);
+
 // NB: the -address- of this key is used, not the actual string.
 static char GAMESTATE_KEY[] = "";
 
@@ -130,6 +133,8 @@ namespace lua_api {
 
 	void register_lua_libraries(lua_State* L) {
 		LuaValue preload = luawrap::globals(L)["package"]["preload"];
+		lua_pushcfunction(L, luaopen_b2_vendor);
+		lua_api::register_lua_submodule_loader(L, "b2", LuaValue::pop_value(L));
 		lua_pushcfunction(L, luaopen_socket_core);
 		lua_api::register_lua_submodule_loader(L, "socket.core", LuaValue::pop_value(L));
 		lua_pushcfunction(L, luaopen_mime_core);

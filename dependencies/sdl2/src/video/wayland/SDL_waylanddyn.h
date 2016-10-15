@@ -62,7 +62,7 @@ void SDL_WAYLAND_UnloadSymbols(void);
 }
 #endif
 
-#ifdef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC
+#ifdef _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC
 
 #ifdef _WAYLAND_CLIENT_H
 #error Do not include wayland-client ahead of SDL_waylanddyn.h in dynamic loading mode
@@ -94,7 +94,7 @@ void SDL_WAYLAND_UnloadSymbols(void);
 #define wl_shell_interface (*WAYLAND_wl_shell_interface)
 #define wl_shm_interface (*WAYLAND_wl_shm_interface)
 
-#endif /* SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC */
+#endif /* _SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC */
 
 #include "wayland-client.h"
 #include "wayland-egl.h"

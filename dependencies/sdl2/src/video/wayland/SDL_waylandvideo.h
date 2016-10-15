@@ -30,11 +30,11 @@
 struct xkb_context;
 struct SDL_WaylandInput;
 
-#ifdef SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
+#ifdef _SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
 struct SDL_WaylandTouch;
 struct qt_surface_extension;
 struct qt_windowmanager;
-#endif /* SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */
+#endif /* _SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */
 
 typedef struct {
     struct wl_display *display;
@@ -53,11 +53,11 @@ typedef struct {
     struct xkb_context *xkb_context;
     struct SDL_WaylandInput *input;
 
-#ifdef SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
+#ifdef _SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
     struct SDL_WaylandTouch *touch;
     struct qt_surface_extension *surface_extension;
     struct qt_windowmanager *windowmanager;
-#endif /* SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */
+#endif /* _SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH */
 } SDL_VideoData;
 
 #endif /* _SDL_waylandvideo_h */

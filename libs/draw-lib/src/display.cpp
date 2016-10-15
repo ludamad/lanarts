@@ -55,10 +55,10 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
 
 	MAIN_WINDOW = SDL_CreateWindow(
 	    window_name,
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
-        w, h,
-        (fullscreen ? SDL_WINDOW_FULLSCREEN : 0) | SDL_WINDOW_OPENGL
+        0,
+        0,
+        1920, 1080,
+         SDL_WINDOW_MAXIMIZED | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS
     );
 
 	if (MAIN_WINDOW == NULL) {
@@ -67,11 +67,11 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
 		exit(1);
 	}
 
-    /* To get SDL_Texture support, we need to setup a renderer, which
-       will take care of setting up OpenGL. Ideally we should check
-       SDL_GetRenderDriverInfo() for name "opengl*", to avoid a
-       software or d3d renderer.  We can't use our own context. */
-    MAIN_RENDERER = SDL_CreateRenderer(MAIN_WINDOW, -1, SDL_RENDERER_ACCELERATED);
+        /* To get SDL_Texture support, we need to setup a renderer, which
+           will take care of setting up OpenGL. Ideally we should check
+           SDL_GetRenderDriverInfo() for name "opengl*", to avoid a
+           software or d3d renderer.  We can't use our own context. */
+        MAIN_RENDERER = SDL_CreateRenderer(MAIN_WINDOW, -1, SDL_RENDERER_ACCELERATED);
 
 	glDisable(GL_TEXTURE_2D);
 
@@ -83,7 +83,13 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
 }
 
 static void gl_set_fullscreen(bool fullscreen) {
-    SDL_SetWindowFullscreen(MAIN_WINDOW, fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
+    Uint32 flags = SDL_GetWindowFlags(MAIN_WINDOW); 
+    if (fullscreen) {
+        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    } else {
+        flags &= ~SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
+    SDL_SetWindowFullscreen(MAIN_WINDOW, flags);
 }
 
 void ldraw::display_initialize(const char* window_name,
@@ -102,7 +108,7 @@ void ldraw::display_set_drawing_region(const BBoxF & bbox) {
 }
 
 bool ldraw::display_is_fullscreen() {
-    return (SDL_GetWindowFlags(MAIN_WINDOW) & SDL_WINDOW_FULLSCREEN) != 0;
+    return (SDL_GetWindowFlags(MAIN_WINDOW) & SDL_WINDOW_FULLSCREEN_DESKTOP) != 0;
 }
 
 void ldraw::display_draw_start() {

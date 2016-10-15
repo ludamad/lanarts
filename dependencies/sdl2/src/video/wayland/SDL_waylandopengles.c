@@ -20,7 +20,7 @@
 */
 #include "../../SDL_internal.h"
 
-#if SDL_VIDEO_DRIVER_WAYLAND && SDL_VIDEO_OPENGL_EGL
+#if _SDL_VIDEO_DRIVER_WAYLAND && SDL_VIDEO_OPENGL_EGL
 
 #include "SDL_waylandvideo.h"
 #include "SDL_waylandopengles.h"
@@ -86,6 +86,6 @@ Wayland_GLES_DeleteContext(_THIS, SDL_GLContext context)
     WAYLAND_wl_display_flush( ((SDL_VideoData*)_this->driverdata)->display );
 }
 
-#endif /* SDL_VIDEO_DRIVER_WAYLAND && SDL_VIDEO_OPENGL_EGL */
+#endif /* _SDL_VIDEO_DRIVER_WAYLAND && SDL_VIDEO_OPENGL_EGL */
 
 /* vi: set ts=4 sw=4 expandtab: */
