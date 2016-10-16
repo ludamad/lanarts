@@ -477,7 +477,7 @@ function M.create_map(label, floor, tileset)
     if entry.layout then
         local layout = random_choice(entry.layout)
         local size = map_call(range_resolve, layout.size)
-        local size_mult = size_multiplier()
+        local size_mult = (size_multiplier() + 1) / 2
         size = {math.ceil(size[1] * size_mult), math.ceil(size[2] * size_mult)}
         map = map_utils.map_create(label, size, tileset.wall)
         generate_layout(map, layout, tileset)
