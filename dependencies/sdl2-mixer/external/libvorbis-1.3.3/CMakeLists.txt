@@ -51,6 +51,9 @@ set(libvorbis_SRCS
     ./lib/vorbisfile.c
     ./lib/bitrate.c
     ./lib/sharedbook.c
+    ../libogg-1.3.1/src/bitwise.c
+    ../libogg-1.3.1/src/framing.c
+
 )
     # ${libvorbis_dir}/lib/tone.c
 
