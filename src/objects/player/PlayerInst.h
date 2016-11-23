@@ -44,13 +44,11 @@ struct PlayerDataEntry;
 class PlayerInst: public CombatGameInst {
 public:
     enum {
-        RADIUS = 10, DEPTH = 75, LINEOFSIGHT = 7
+        RADIUS = 10, DEPTH = 75
     };
     PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y,
             bool local = true);
-    PlayerInst() :
-            fieldofview(LINEOFSIGHT), local(false) {
-    }
+    PlayerInst() {}
 
     virtual ~PlayerInst();
     virtual void init(GameState* gs);
@@ -131,7 +129,9 @@ public:
     bool melee_attack(GameState* gs, CombatGameInst* inst,
                     const Item& weapon, bool ignore_cooldowns);
 private:
-
+    ///////////////////////////
+    // ** Private methods ** //
+    ///////////////////////////
     void enqueue_io_movement_actions(GameState* gs, int& dx, int& dy);
     bool enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee);
     bool enqueue_io_spell_and_attack_actions(GameState* gs, float dx, float dy);
@@ -154,9 +154,12 @@ private:
     void reposition_item(GameState* gs, const GameAction& action);
     void purchase_from_store(GameState* gs, const GameAction& action);
 
+    ///////////////////
+    // ** Members ** //
+    ///////////////////
     PlayerScoreStats _score_stats;
 
-    bool actions_set_for_turn;
+    bool actions_set_for_turn= false;
     ActionQueue queued_actions;
     FloodFillPaths _path_to_player;
     fov fieldofview;
@@ -167,9 +170,9 @@ private:
     std::string last_chosen_weaponclass;
 
     // NB: local to spell select is assumed to be a POD region by serialize/deserialize
-    bool local, moving;
-    int autouse_mana_potion_try_count;
-    int previous_spellselect, spellselect;
+    bool local = false, moving = false;
+    int autouse_mana_potion_try_count = 0;
+    int previous_spellselect = 0, spellselect = 0;
 };
 
 bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position);

@@ -116,20 +116,19 @@ static void run_engine(int argc, char** argv) {
 	label_StartOver:
 
 	GameState* gs = init_gamestate();
-	lua_State* L = gs->luastate();
 
 	/* Load low-level Lua bootstrapping code.
 	 * Implements the module system used by the rest of the engine,
 	 * and other important utilities.
 	 */
-	LuaValue entry_point = luawrap::dofile(L, "Main.lua");
+	LuaValue entry_point = luawrap::dofile(gs->luastate(), "Main.lua");
 
-	LuaValue engine = luawrap::globals(L)["Engine"];
+	LuaValue engine = luawrap::globals(gs->luastate())["Engine"];
 
 	bool did_exit, should_continue;
 
 	entry_point.push();
-	should_continue = luawrap::call<bool>(L,
+	should_continue = luawrap::call<bool>(gs->luastate(),
 			std::vector<std::string>(argv + 1, argv + argc));
 	if (!should_continue) {
 		/* User has quit! */
@@ -137,7 +136,7 @@ static void run_engine(int argc, char** argv) {
 	}
 
 	engine["menu_start"].push();
-	did_exit = !luawrap::call<bool>(L);
+	did_exit = !luawrap::call<bool>(gs->luastate());
 	save_settings_data(gs->game_settings(), "saves/saved_settings.yaml"); // Save settings from menu
 	if (did_exit) {
 		/* User has quit! */
@@ -147,12 +146,12 @@ static void run_engine(int argc, char** argv) {
 	gs->start_connection();
 
 	engine["resources_load"].push();
-	luawrap::call<void>(L);
+	luawrap::call<void>(gs->luastate());
 
 	try {
-		init_game_data(gs->game_settings(), L);
+		init_game_data(gs->game_settings(), gs->luastate());
 		engine["resources_post_load"].push();
-		luawrap::call<void>(L);
+		luawrap::call<void>(gs->luastate());
 	} catch (const std::exception& err) {
 		fprintf(stderr, "%s\n", err.what());
 		fflush(stderr);
@@ -161,7 +160,7 @@ static void run_engine(int argc, char** argv) {
 
 	if (gs->game_settings().conntype == GameSettings::SERVER) {
 		engine["pregame_menu_start"].push();
-		bool did_exit = !luawrap::call<bool>(L);
+		bool did_exit = !luawrap::call<bool>(gs->luastate());
 
 		if (did_exit) { /* User has quit! */
 			goto label_Quit;
@@ -171,7 +170,7 @@ static void run_engine(int argc, char** argv) {
 	if (gs->start_game()) {
 		try {
 			engine["game_start"].push();
-			luawrap::call<void>(L);
+			luawrap::call<void>(gs->luastate());
 		} catch (const LNetConnectionError& err) {
 			fprintf(stderr, "The game must end due to a connection termination:%s\n",
 					err.what());

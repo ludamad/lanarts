@@ -191,7 +191,7 @@ end
 
 M._warning_skull = Display.image_load "features/sprites/warning.png"
 M._anvil = Display.image_load "features/sprites/anvil.png"
-
+local OVERWORLD_VISION_RADIUS = 10
 function M.overworld_create()   
     local tileset = TileSets.grass
     local OldMapSeq1 = MapSequence.create {preallocate = 1}
@@ -320,18 +320,19 @@ function M.overworld_create()
 
     OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 40)
 
-    local map_id = MapUtils.game_map_create(map)
-    OldMapSeq1:slot_resolve(1, map_id)
-    OldMapSeq2:slot_resolve(1, map_id)
+    local game_map = MapUtils.game_map_create(map)
+    OldMapSeq1:slot_resolve(1, game_map)
+    OldMapSeq2:slot_resolve(1, game_map)
     for MapSeq in values(temple_sequences) do
-        MapSeq:slot_resolve(1, map_id)
+        MapSeq:slot_resolve(1, game_map)
     end
     for MapSeq in values(dirthole_sequences) do
-        MapSeq:slot_resolve(1, map_id)
+        MapSeq:slot_resolve(1, game_map)
     end
 
-    World.players_spawn(map_id, find_player_positions(map, FLAG_PLAYERSPAWN))
+    World.players_spawn(game_map, find_player_positions(map, FLAG_PLAYERSPAWN))
     for p in values(portals) do p() end
-    return map_id
+    Map.set_vision_radius(game_map, OVERWORLD_VISION_RADIUS)
+    return game_map
 end
 return M

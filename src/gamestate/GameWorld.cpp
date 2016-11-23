@@ -180,7 +180,7 @@ bool GameWorld::step() {
 	midstep = false;
 	if (next_room_id == -2) {
 		gs->restart();
-		next_room_id = 0;
+		next_room_id = -1;
 	}
 	if (next_room_id != -1) {
 		set_current_level(next_room_id);

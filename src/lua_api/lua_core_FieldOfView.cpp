@@ -29,8 +29,9 @@ static int fov_update(lua_State* L) {
 	bool clear = lua_gettop(L) >= 5 ? lua_toboolean(L, 5) : true;
 
 	GameMapState* previous_level = gs->get_level();
-	gs->set_level(gs->game_world().get_level(gmap));
-	fov->calculate(gs, xy.x / TILE_SIZE, xy.y / TILE_SIZE);
+        GameMapState* current_level = gs->game_world().get_level(gmap);
+	gs->set_level(current_level);
+	fov->calculate(gs, current_level->vision_radius(), xy.x / TILE_SIZE, xy.y / TILE_SIZE);
 	gs->set_level(previous_level);
 
 	return 0;

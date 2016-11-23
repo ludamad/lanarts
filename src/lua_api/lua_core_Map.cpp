@@ -320,6 +320,14 @@ static int gmap_object_solid_check(lua_State* L) {
     return 1;
 }
 
+static int gmap_set_vision_radius(LuaStackValue map_obj, int vision_radius) {
+    GameState* gs = lua_api::gamestate(map_obj);
+    level_id map_id = mapid(map_obj);
+    LANARTS_ASSERT(vision_radius > 0 && vision_radius <= 10);
+    gs->game_world().get_level(map_id)->vision_radius() = vision_radius;
+    return 0;
+}
+
 const int MAX_RET = 16;
 
 static int gmap_object_collision_check(lua_State* L) {
@@ -478,6 +486,7 @@ namespace lua_api {
         gmap["line_tile_check"].bind_function(gmap_line_tile_check);
 
         gmap["object_solid_check"].bind_function(gmap_object_solid_check);
+        gmap["set_vision_radius"].bind_function(gmap_set_vision_radius);
 
         gmap["place_free"].bind_function(gmap_place_free);
         gmap["radius_place_free"].bind_function(gmap_radius_place_free);

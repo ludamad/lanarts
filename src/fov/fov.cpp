@@ -23,20 +23,21 @@ fov::fov(int radius) :
 	sight_mask = new char[diameter * diameter];
 }
 
-void fov::calculate(GameState* gs, int ptx, int pty) {
+void fov::calculate(GameState* gs, int subradius, int ptx, int pty) {
 	perf_timer_begin(FUNCNAME);
+        LANARTS_ASSERT(subradius <= radius);
 
 	this->has_been_calculated = true;
 	this->gs = gs;
 	this->ptx = ptx, this->pty = pty;
 	this->sx = ptx - radius, this->sy = pty - radius;
 
-	float radius_squared = (radius-.5) * (radius-.5);
+	float subradius_squared = (subradius-.5) * (subradius-.5);
 
 	for (int y = -radius; y <= radius; y++) {
 		for (int x = -radius; x <= radius; x++) {
 
-			if (x * x + y * y < radius_squared) {
+			if (x * x + y * y < subradius_squared) {
 				m.set(x, y);
 			} else {
 				m.clear(x, y);

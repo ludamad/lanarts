@@ -115,6 +115,9 @@ public:
 				|| object_radius_test(obj, objs, obj_cap, f, x, y, radius);
 	}
 
+        int& vision_radius() {
+            return _vision_radius;
+        }
 public:
 	std::vector<GameRoomPortal> exits, entrances;
 private:
@@ -128,6 +131,7 @@ private:
 	CollisionAvoidance _collision_avoidance;
 	/* Used to store dynamic drawable information */
 	LuaDrawableQueue _drawable_queue;
+        int _vision_radius = 7;
 
 	bool _is_simulation;
 };
