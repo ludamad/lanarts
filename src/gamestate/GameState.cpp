@@ -161,10 +161,6 @@ bool GameState::start_game() {
 
 void GameState::set_level(GameMapState* lvl) {
 	world.set_current_level(lvl);
-	if (lvl != NULL) {
-		_view.world_width = lvl->width();
-		_view.world_height = lvl->height();
-	}
 }
 
 /*Handle new characters and exit signals*/

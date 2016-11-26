@@ -9,28 +9,27 @@
 #include "GameView.h"
 
 static const int VIEW_SUBW = 100, VIEW_SUBH = 100;
-static const int VIEW_SPEED = 8;
 
 
 bool GameView::out_of_view_center(int px, int py) {
 	int dx = px - x, dy = py - y;
 	return (abs(dx) > width / 2 || abs(dy) > height / 2);
 }
-void GameView::move_towards(int px, int py) {
+void GameView::move_towards(int px, int py, int view_speed) {
 	int dx = px - x, dy = py - y;
 	if (abs(dx) > VIEW_SUBW / 2) {
 		if (px > x) {
-			x = std::min(px - VIEW_SUBW / 2, x + VIEW_SPEED);
+			x = std::min(px - VIEW_SUBW / 2, x + view_speed);
 		} else {
-			x = std::max(px + VIEW_SUBW / 2, x - VIEW_SPEED);
+			x = std::max(px + VIEW_SUBW / 2, x - view_speed);
 		}
 		x = std::max(0, std::min(world_width - width, x));
 	}
 	if (abs(dy) > VIEW_SUBH / 2) {
 		if (py > y) {
-			y = std::min(py - VIEW_SUBH / 2, y + VIEW_SPEED);
+			y = std::min(py - VIEW_SUBH / 2, y + view_speed);
 		} else {
-			y = std::max(py + VIEW_SUBH / 2, y - VIEW_SPEED);
+			y = std::max(py + VIEW_SUBH / 2, y - view_speed);
 		}
 		y = std::max(0, std::min(world_height - height, y));
 	}
@@ -63,6 +62,15 @@ void GameView::sharp_center_on(int px, int py) {
 
 	x = px - width / 2;
 	y = py - height / 2;
+        x = std::max(0, std::min(world_width - width, x));
+	y = std::max(0, std::min(world_height - height, y));
+}
+
+void GameView::sharp_move(int dx, int dy) {
+        x += dx;
+        y += dy;
+        x = std::max(0, std::min(world_width - width, x));
+	y = std::max(0, std::min(world_height - height, y));
 }
 
 // Helper functions

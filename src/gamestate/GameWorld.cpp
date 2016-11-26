@@ -18,6 +18,8 @@
 
 #include <lcommon/math_util.h>
 
+#include "lanarts_defines.h"
+
 #include "GameMapState.h"
 #include "GameState.h"
 #include "GameWorld.h"
@@ -142,6 +144,14 @@ GameMapState* GameWorld::get_level(level_id id) {
 	return level_states.at(id);
 }
 
+void GameWorld::set_current_level(GameMapState* level) {
+    lvl = level;
+    if (lvl != NULL) {
+            gs->view().world_width = lvl->width();
+            gs->view().world_height = lvl->height();
+    }
+}
+
 bool GameWorld::pre_step() {
 	if (!gs->update_iostate())
 		return false;
@@ -155,7 +165,7 @@ bool GameWorld::pre_step() {
 	PlayerData& pd = gs->player_data();
 	pd.local_player()->enqueue_io_actions(gs);
 
-	gs->set_level(current_level);
+	set_current_level(current_level);
 	midstep = false;
 	return true;
 }
@@ -182,11 +192,19 @@ bool GameWorld::step() {
 		gs->restart();
 		next_room_id = -1;
 	}
-	if (next_room_id != -1) {
-		set_current_level(next_room_id);
-		gs->view().sharp_center_on(gs->local_player()->ipos());
-		next_room_id = -1;
-	}
+        if (gs->local_player()->current_floor != get_current_level_id()) {
+                current_level = get_level(gs->local_player()->current_floor);
+		set_current_level(current_level);
+                // Ensure the view is up to date before view operations:
+                LANARTS_ASSERT(current_level->width() == gs->view().world_width && current_level->height() == gs->view().world_height);
+                Pos diff = (gs->local_player()->ipos() - last_player_pos);
+                gs->view().sharp_move(diff);
+                // Ensure that the view is centered. Having the view move after due to being at the edge of a level is jarring:
+                for (int i = 0; i< 100;i++) {
+                    gs->view().center_on(gs->local_player()->ipos(), 10);
+                }
+        }
+        last_player_pos = gs->local_player()->ipos();
 
 	return true;
 }
@@ -230,7 +248,7 @@ void GameWorld::set_current_level(int roomid) {
 	if (midstep)
 		set_current_level_lazy(roomid);
 	else
-		gs->set_level(get_level(roomid));
+		set_current_level(get_level(roomid));
 }
 void GameWorld::set_current_level_lazy(int roomid) {
 	next_room_id = roomid;

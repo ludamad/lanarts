@@ -15,6 +15,8 @@ install_doc ( lpeg.html re.html lpeg-128.gif )
 install_data ( HISTORY )
 install_test ( test.lua )
 
+include_directories( ../lua )
+
 # for tests
 file ( WRITE "${CMAKE_CURRENT_BINARY_DIR}/strict.lua" "" )
 add_lua_module ( strict ${CMAKE_CURRENT_BINARY_DIR}/strict.lua )

@@ -46,9 +46,7 @@ public:
 	GameMapState* get_current_level() {
 		return lvl;
 	}
-	void set_current_level(GameMapState* level) {
-		lvl = level;
-	}
+	void set_current_level(GameMapState* level);
 	PlayerData& player_data() {
 		return _player_data;
 	}
@@ -87,6 +85,7 @@ private:
 	LuaValue lua_level_states;
         bool _should_sync_states = false;
 	std::vector<GameMapState*> level_states;
+        Pos last_player_pos = {0,0};
 };
 
 #endif /* GAMEWORLD_H_ */

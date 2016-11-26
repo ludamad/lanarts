@@ -8,12 +8,10 @@ import map_place_object, ellipse_points,
     ring_region_delta_func, default_region_delta_func, spread_region_delta_func
     random_region_add, subregion_minimum_spanning_tree, region_minimum_spanning_tree
     Tile, tile_operator
-        from require "@generate_util"
+        from require "generate_util"
 
-import MapUtils
-
-import print_map, make_tunnel_oper, make_rectangle_criteria, make_rectangle_oper
-    from require "@map_util"
+import make_tunnel_oper, make_rectangle_criteria, make_rectangle_oper
+    from require "maps.MapUtils"
 
 import TileMap from require "core"
 

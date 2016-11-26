@@ -107,6 +107,7 @@ set (libraries
         luayaml
 	luawrap
 	lanarts_net
+        lpeg
 	yaml-cpp
 	RVO
         #physfs-static

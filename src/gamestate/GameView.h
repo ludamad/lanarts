@@ -9,6 +9,9 @@
 #include <lcommon/geometry.h>
 
 struct GameView {
+        enum {
+            VIEW_SPEED = 10
+        };
 	int x, y, width, height, world_width, world_height;
 
 	GameView(int x = 0, int y = 0, int width = 0, int height = 0, int world_width = 0,
@@ -23,21 +26,26 @@ struct GameView {
 	bool within_view(const BBox& bbox) {
 		return within_view(bbox.x1, bbox.y1, bbox.width(), bbox.height());
 	}
-	void move_towards(int px, int py);
-	void move_towards(const Pos& p) {
-		move_towards(p.x, p.y);
+	void move_towards(int px, int py, int view_speed = VIEW_SPEED);
+	void move_towards(const Pos& p, int view_speed = VIEW_SPEED) {
+		move_towards(p.x, p.y, view_speed);
 	}
 
-	void center_on(int px, int py) {
-		move_towards(px - width / 2, py - height / 2);
+	void center_on(int px, int py, int view_speed = VIEW_SPEED) {
+		move_towards(px - width / 2, py - height / 2, view_speed);
 	}
-	void center_on(const Pos& p) {
+	void center_on(const Pos& p, int view_speed = VIEW_SPEED) {
 		center_on(p.x, p.y);
 	}
 
 	void sharp_center_on(int px, int py);
 	void sharp_center_on(const Pos& p) {
 		sharp_center_on(p.x, p.y);
+	}
+
+	void sharp_move(int dx, int dy);
+	void sharp_move(const Pos& p) {
+		sharp_move(p.x, p.y);
 	}
 	void move_delta(int dx, int dy) {
 		move_towards(x + dx, y + dy);

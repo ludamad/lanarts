@@ -30,6 +30,7 @@ add_library( lanarts_dungeon_gen
 add_executable( lanarts_dungeon_gen_tests
              ${lanarts_dungeon_gen_tests_src})
 
+add_definitions( -O2 )
 
 target_link_libraries(
 	lanarts_dungeon_gen_tests

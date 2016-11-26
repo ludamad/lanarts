@@ -33,6 +33,11 @@
 #include "lua_api/lua_yaml.h"
 #include "lua_api/lua_api.h"
 
+extern "C" {
+// From dependency lpeg:
+int luaopen_lpeg(lua_State* L);
+}
+
 // This is a stop-gap measure to allow Lua all-or-nothing control over internal graphic initialization.
 // Long-term we must move eg fonts completely to Lua.
 static int __initialize_internal_graphics(lua_State* L) {
@@ -82,6 +87,7 @@ static GameState* init_gamestate() {
 	lua_State* L = lua_api::create_configured_luastate();
 	lua_vm_configure(L);
 	lua_api::add_search_path(L, "?.lua");
+        luaopen_lpeg(L);
 
 	GameSettings settings; // Initialized with defaults
 	// Load the manual settings
