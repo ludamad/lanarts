@@ -138,7 +138,6 @@ namespace ldungeon_gen {
 			/* Do not finish tunnelling in the middle of a turn */
 			if (cntxt->turn_state != NO_TURN)
 				return false;
-			printf("TUNNELED!\n");
 			return true;
 		}
 

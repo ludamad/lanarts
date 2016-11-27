@@ -53,7 +53,7 @@ wrap_env = function(debug, fn)
   end
   return setfenv(fn, setmetatable({ }, {
     __index = function(self, name)
-      local value = env[name]
+      local value = rawget(env, name)
       if value ~= nil then
         return value
       end

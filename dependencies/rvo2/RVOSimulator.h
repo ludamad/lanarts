@@ -218,6 +218,9 @@ namespace RVO
                     float timeHorizonObst, float radius, float maxSpeed,
                     const Vector2& velocity = Vector2());
 
+    // Hacked in for Lanarts
+    void changeAgentNo(size_t agentNo, size_t newAgentNo);
+
     /*!
      *  @brief      Removes an agent from the simulation.
      *  @param      agentNo         The number of the agent to be

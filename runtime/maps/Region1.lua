@@ -48,7 +48,9 @@ local function connect_map(args)
         local portal = MapUtils.random_portal(map, map_area, args.sprite_down, nil, args.sprite_down_index)
         append(t, MapSeq:forward_portal_add(seq_idx, portal, i, args.next_floor_callback))
     end
-    for c in values(t) do c() end
+    if World.player_amount > 1 then
+        for c in values(t) do c() end
+    end
 end
 
 -- Overworld to template map sequence (from overworld to deeper in the temple)
@@ -121,7 +123,7 @@ local function find_player_positions(map, --[[Optional]] flags)
     return positions
 end
 
-local function generate_store(map, xy)
+function M.generate_store(map, xy)
     local items = {}
     for i=1,random(5,10) do
         table.insert(items, ItemUtils.item_generate(chance(.5) and ItemGroups.basic_items or ItemGroups.enchanted_items, true))
@@ -149,13 +151,15 @@ local function old_map_generate(MapSeq, tileset, offset, max_floor, floor)
     return MapSeq:slot_resolve(seq_idx, MapUtils.game_map_create(map, true))
 end
 
-local function old_dungeon_placement_function(MapSeq, tileset, levels)
+function M.old_dungeon_placement_function(MapSeq, tileset, levels)
     return function(map, xy)
         local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 12))
         local c = MapSeq:forward_portal_add(1, portal, 1, function() 
             return old_map_generate(MapSeq, tileset, levels[1]-1, levels[2]-levels[1]+1) 
         end)
-        c()
+        if World.player_amount > 1 then
+            c()
+        end
     end
 end
 
@@ -237,11 +241,11 @@ function M.overworld_create()
 
            --Entrance to Dungeon 1: easier monsters
            ['D'] = { add = SourceMap.FLAG_SEETHROUGH, content = TileSets.pebble.floor,
-               on_placement = old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {1,5}) },
+               on_placement = M.old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {1,5}) },
 
            --Entrance to Dungeon 2: harder monsters
            ['X'] = { add = SourceMap.FLAG_SEETHROUGH, content = TileSets.snake.floor,
-               on_placement = old_dungeon_placement_function(OldMapSeq2, TileSets.snake, {6,10}) },
+               on_placement = M.old_dungeon_placement_function(OldMapSeq2, TileSets.snake, {6,10}) },
            -- Overworld features
            -- Anvil
            ['<'] = { add = UNDECIDED_FLAG, content = UNDECIDED_TILE, 
@@ -259,7 +263,7 @@ function M.overworld_create()
            ['S'] = { add = UNDECIDED_FLAG, content = UNDECIDED_TILE, 
            			on_placement = function(map, xy) 
            				if chance(.4) then 
-           					generate_store(map, xy)
+           					M.generate_store(map, xy)
            				end
                         table.insert(undecided_squares, xy)
            			end },

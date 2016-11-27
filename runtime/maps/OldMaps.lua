@@ -310,13 +310,13 @@ function M.enemy_generate(chances)
     end
 end
 
-function M.generate_from_enemy_entries(map, chances, amount)
+function M.generate_from_enemy_entries(map, chances, amount, --[[Optional]] area, --[[Optional]] selector)
     local total_chance = 0
     for entry in values(chances) do
         total_chance = total_chance + (entry.chance or 0)
         local spawns = range_resolve(entry.guaranteed_spawns or 0)
         for i=1,spawns do 
-            map_utils.random_enemy(map, entry.enemy)
+            map_utils.random_enemy(map, entry.enemy, area, selector)
         end
     end
     for i=1,amount do
@@ -324,7 +324,7 @@ function M.generate_from_enemy_entries(map, chances, amount)
         for entry in values(chances) do
             rand = rand - (entry.chance or 0)
             if rand <= 0 then 
-                map_utils.random_enemy(map, entry.enemy)
+                map_utils.random_enemy(map, entry.enemy, area, selector)
                 break
             end
         end

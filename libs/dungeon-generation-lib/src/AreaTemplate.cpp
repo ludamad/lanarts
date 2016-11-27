@@ -63,19 +63,19 @@ namespace ldungeon_gen {
 		/* Push arguments only once, the moment we find our lua_State */
 		lua_State* L = NULL;
 
-		/* Area of map to apply to: */
 		if (create_subgroup) {
 			Size adjustedsize = (orientation == ORIENT_TURN_90 || orientation == ORIENT_TURN_270) ? Size(h,w) : Size(w,h);
 			BBox rect(xy, adjustedsize);
 			map->make_group(rect, parent_group_id);
 		}
+                /* Area of map to apply to: */
 		BBox grid_rect(Pos(), _grid->size());
 		FOR_EACH_BBOX(grid_rect, x, y) {
 			Pos sqr = xy + reorient(Pos(x,y), Size(w,h), orientation);
 			char chr = (*_grid)[Pos(x,y)];
 			Glyph glyph = _legend[chr];
 
-			(*map)[sqr].apply(glyph.oper);
+			(*map)[sqr].apply(glyph.oper.oper);
 
 			/* Apply lua function */
 			if (!glyph.value.empty() && !glyph.value.isnil()) {
@@ -97,5 +97,26 @@ namespace ldungeon_gen {
 			lua_pop(L, 2);
 		}
 	}
+
+	bool AreaTemplate::matches(MapPtr map, group_t parent_group_id,
+			const Pos& xy, Orientation orientation) {
+		int w = _grid->width(), h = _grid->height();
+                /* Area of map to apply to: */
+		BBox grid_rect(Pos(), _grid->size());
+		FOR_EACH_BBOX(grid_rect, x, y) {
+			Pos sqr = xy + reorient(Pos(x,y), Size(w,h), orientation);
+                        if (sqr.x < 0 || sqr.x >= map->width() || sqr.y < 0 || sqr.y >= map->height()) {
+                            return false;
+                        }
+			char chr = (*_grid)[Pos(x,y)];
+			Glyph glyph = _legend[chr];
+
+			if (!(*map)[sqr].matches(glyph.oper.selector)) {
+                            return false;
+                        }
+		}
+                return true;
+	}
+
 
 }

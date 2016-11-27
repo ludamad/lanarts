@@ -34,6 +34,13 @@ static int random(lua_State* L) {
     return 1;
 }
 
+static int random_choice(lua_State* L) {
+    LuaStackValue mtwist(L, 1);
+    LuaStackValue choices(L, 2);
+    int index = mtwist.as<MTwist*>()->rand(choices.objlen());
+    choices[index].push();
+    return 1;
+}
 
 static int randomf(lua_State* L) {
     int n_args = lua_gettop(L);
@@ -73,12 +80,18 @@ static int amount_generated(MTwist* mtwist) {
     return mtwist->amount_generated();
 }
 
+static bool chance(MTwist* mtwist, double prob) {
+    return mtwist->randf() > prob;
+}
+
 LuaValue lua_mtwistmetatable(lua_State* L) {
 	LuaValue meta = luameta_new(L, "MTwist");
 	LuaValue methods = luameta_constants(meta);
 
 	methods["random"].bind_function(random);
+	methods["random_choice"].bind_function(random_choice);
 	methods["randomf"].bind_function(randomf);
+	methods["chance"].bind_function(chance);
 	methods["random_round"].bind_function(random_round);
 	methods["guassian"].bind_function(guassian);
 	methods["amount_generated"].bind_function(amount_generated);

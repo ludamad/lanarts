@@ -3,7 +3,7 @@ PROJECT(project_lanarts_dungeon_gen)
 
 set( DEPS ../../dependencies)
 
-add_definitions( -std=c++98 )
+add_definitions( -std=c++11 )
 
 include_directories(
 	include/ldungeon_gen
@@ -29,8 +29,6 @@ add_library( lanarts_dungeon_gen
 
 add_executable( lanarts_dungeon_gen_tests
              ${lanarts_dungeon_gen_tests_src})
-
-add_definitions( -O2 )
 
 target_link_libraries(
 	lanarts_dungeon_gen_tests

@@ -49,6 +49,8 @@ namespace ldungeon_gen {
 		void apply(MapPtr map, group_t parent_group_id, const Pos& xy,
 				Orientation orientation, bool create_subgroup = true);
 
+		bool matches(MapPtr map, group_t parent_group_id, const Pos& xy, Orientation orientation);
+
 		Size size() const {
 			return _grid->size();
 		}

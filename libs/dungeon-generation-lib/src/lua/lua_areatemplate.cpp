@@ -135,37 +135,36 @@ namespace ldungeon_gen {
 		using namespace luawrap;
 		Orientation orientation = (Orientation)defaulted(args["orientation"], (int)ORIENT_DEFAULT);
 		bool create_subgroup = defaulted(args["create_subgroup"], true);
-		int group = defaulted(args["group"], ROOT_GROUP_ID);
+		int group = defaulted(args["parent_group_id"], ROOT_GROUP_ID);
 		Pos top_left_xy = defaulted(args["top_left_xy"], Pos());
 
 		temp->apply(args["map"].as<MapPtr>(), group, top_left_xy, orientation, create_subgroup);
 	}
 
+	static bool area_template_matches(AreaTemplatePtr temp, LuaStackValue args) {
+		using namespace luawrap;
+		Orientation orientation = (Orientation)defaulted(args["orientation"], (int)ORIENT_DEFAULT);
+		int group = defaulted(args["parent_group_id"], ROOT_GROUP_ID);
+		Pos top_left_xy = defaulted(args["top_left_xy"], Pos());
+
+		return temp->matches(args["map"].as<MapPtr>(), group, top_left_xy, orientation);
+	}
+
 	LuaValue lua_areatemplatemetatable(lua_State* L) {
 		LUAWRAP_SET_TYPE(AreaTemplatePtr);
 
-		LuaValue meta = luameta_new(L, "MapGen.AreaTemplate");
+		LuaValue meta = luameta_new(L, "SourceMap.AreaTemplate");
 		LuaValue methods = luameta_constants(meta);
 		LuaValue getters = luameta_getters(meta);
 		methods["apply"].bind_function(area_template_apply);
+		methods["matches"].bind_function(area_template_matches);
 
 		LUAWRAP_GETTER(getters, size, OBJ->size());
 
 		return meta;
 	}
 
-	static bool lua_area_template_apply(LuaStackValue args) {
-		using namespace luawrap;
-		LuaStackValue oper = area_template_create(args);
-		bool applied = area_operator_get(oper)->apply(
-				args["map"].as<MapPtr>(),
-				defaulted(args["parent_group_id"], ROOT_GROUP_ID),
-				args["area"].as<BBox>()
-		);
-		return applied;
-	}
-
-	void lua_register_areatemplate(const LuaValue& module) {
+        void lua_register_areatemplate(const LuaValue& module) {
 		luawrap::install_userdata_type<AreaTemplatePtr,
 				lua_areatemplatemetatable>();
 		module["ORIENT_DEFAULT"] = (int)ORIENT_DEFAULT;
@@ -174,7 +173,6 @@ namespace ldungeon_gen {
 		module["ORIENT_TURN_90"] = (int)ORIENT_TURN_90;
 		module["ORIENT_TURN_180"] = (int)ORIENT_TURN_180;
 		module["ORIENT_TURN_270"] = (int)ORIENT_TURN_270;
-		module["area_template_apply"].bind_function(lua_area_template_apply);
 		module["area_template_create"].bind_function(area_template_create);
 	}
 }

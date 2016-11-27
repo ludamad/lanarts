@@ -6,7 +6,7 @@ require_path_add('dependencies/?.lua')
 require_path_add('dependencies/socket/?.lua')
 
 require("GlobalVariableSetup")
-
+require("moonscript.base").insert_loader()
 local argv -- Placeholder, set in main()
 
 local LOOKS_LIKE_FLAG = "^[%-]+[^%s]+$"

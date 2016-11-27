@@ -204,7 +204,13 @@ return Transformer({
           local _continue_0 = false
           repeat
             local name = names[_index_0]
-            if not (name[2]:match("^%u")) then
+            local str_name
+            if ntype(name) == "ref" then
+              str_name = name[2]
+            else
+              str_name = name
+            end
+            if not (str_name:match("^%u")) then
               _continue_0 = true
               break
             end
@@ -342,7 +348,7 @@ return Transformer({
     end
   end,
   update = function(self, node)
-    local _, name, op, exp = unpack(node)
+    local name, op, exp = unpack(node, 2)
     local op_final = op:match("^(.+)=$")
     if not op_final then
       error("Unknown op: " .. op)
@@ -360,8 +366,8 @@ return Transformer({
       exp
     })
   end,
-  require = function(self, node)
-    local _, names, source = unpack(node)
+  import = function(self, node)
+    local names, source = unpack(node, 2)
     local table_values
     do
       local _accum_0 = { }
@@ -402,7 +408,7 @@ return Transformer({
     }
   end,
   comprehension = function(self, node, action)
-    local _, exp, clauses = unpack(node)
+    local exp, clauses = unpack(node, 2)
     action = action or function(exp)
       return {
         exp
@@ -478,21 +484,39 @@ return Transformer({
     return wrapped
   end,
   unless = function(self, node)
-    return {
-      "if",
-      {
-        "not",
+    local clause = node[2]
+    if ntype(clause) == "assign" then
+      if destructure.has_destructure(clause[2]) then
+        error("destructure not allowed in unless assignment")
+      end
+      return build["do"]({
+        clause,
         {
-          "parens",
-          node[2]
+          "if",
+          {
+            "not",
+            clause[2][1]
+          },
+          unpack(node, 3)
         }
-      },
-      unpack(node, 3)
-    }
+      })
+    else
+      return {
+        "if",
+        {
+          "not",
+          {
+            "parens",
+            clause
+          }
+        },
+        unpack(node, 3)
+      }
+    end
   end,
   ["if"] = function(self, node, ret)
     if ntype(node[2]) == "assign" then
-      local _, assign, body = unpack(node)
+      local assign, body = unpack(node, 2)
       if destructure.has_destructure(assign[2]) then
         local name = NameProxy("des")
         body = {
@@ -694,7 +718,7 @@ return Transformer({
     node.body = with_continue_listener(node.body)
   end,
   switch = function(self, node, ret)
-    local _, exp, conds = unpack(node)
+    local exp, conds = unpack(node, 2)
     local exp_name = NameProxy("exp")
     local convert_cond
     convert_cond = function(cond)

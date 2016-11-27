@@ -5,6 +5,7 @@
 
 #include "map_misc_ops.h"
 
+#include <vector>
 
 //
 //local function floodStackScanline(x,y,grid,stack)
@@ -44,6 +45,49 @@
 
 
 namespace ldungeon_gen {
+    // Used for outright rejecting maps, as a pragmatic step:
+    bool area_fully_connected(Map& map, BBox area, Selector unfilled, Operator mark, Selector marked) {
+        // Find first unfilled element:
+        Pos seed {-1, -1};
+        FOR_EACH_BBOX(area, x, y) {
+            if (map[Pos(x,y)].matches(unfilled)) {
+                seed = Pos(x, y);
+                break;
+            }
+        }
+        if (seed.x == -1 && seed.y == -1) {
+            return true; // Fully filled area is fully connected, technically.
+        }
+
+        std::vector<Pos> queue {seed};
+        map[seed].apply(mark);
+        while (!queue.empty()) {
+            Pos curr = queue.back();
+            queue.pop_back();
+            auto queue_pos = [&](Pos next) {
+                if (next.x < area.x1 || next.y < area.y1 || next.x >= area.x2 || next.y >= area.y2) {
+                    return;
+                }
+                if (map[next].matches(marked)) {
+                    return;
+                }
+                map[next].apply(mark);
+                queue.push_back(next);
+            };
+            int x = curr.x, y = curr.y;
+            queue_pos(Pos(x-1, y));
+            queue_pos(Pos(x, y-1));
+            queue_pos(Pos(x, y+1));
+            queue_pos(Pos(x+1, y));
+        }
+
+        FOR_EACH_BBOX(area, x, y) {
+            if (!map[Pos(x,y)].matches(marked)) {
+                return false;
+            }
+        }
+        return true;
+    }
     void erode_diagonal_pairs(Map& map, MTwist& rng, BBox area, Selector candidate) {
         area.y2--; // Don't consider last row, guarantees we can query row below us.
         FOR_EACH_BBOX(area, x, y) {

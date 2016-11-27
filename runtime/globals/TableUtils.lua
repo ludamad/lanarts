@@ -5,6 +5,7 @@ local type, select, setmetatable, getmetatable, rawget, pairs, ipairs, table = t
 
 function table.merge(t1, t2)
     for k,v in pairs(t2) do t1[k] = v end
+    return t1
 end
 
 local function metacopy(t1, t2)

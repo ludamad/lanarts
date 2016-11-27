@@ -519,6 +519,16 @@ namespace ldungeon_gen {
 	}
 
 
+    static bool larea_fully_connected(LuaStackValue args) {
+        using namespace luawrap;
+        MapPtr map = args["map"].as<MapPtr>();
+        Selector unfilled = lua_selector_get(args["unfilled_selector"]);
+        Operator mark = lua_operator_get(args["mark_operator"]);
+        Selector marked = lua_selector_get(args["marked_selector"]);
+        BBox area = defaulted(args["area"], BBox(Pos(), map->size()));
+        return area_fully_connected(*map, area, unfilled, mark, marked);
+    }
+
     static void lerode_diagonal_pairs(LuaStackValue args) {
         using namespace luawrap;
         lua_State* L = args.luastate();
@@ -673,6 +683,7 @@ namespace ldungeon_gen {
         submodule["get_row_flags"].bind_function(lget_row_flags);
         submodule["get_row_content"].bind_function(lget_row_content);
         submodule["erode_diagonal_pairs"].bind_function(lerode_diagonal_pairs);
+        submodule["area_fully_connected"].bind_function(larea_fully_connected);
 
 		LUAWRAP_SET_TYPE(LuaStackValue);
 		LUAWRAP_GETTER(submodule, random_place,

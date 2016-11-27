@@ -12,6 +12,7 @@
 #include <vector>
 
 namespace ldungeon_gen {
+    bool area_fully_connected(Map& map, BBox area, Selector unfilled, Operator mark, Selector marked);
     void erode_diagonal_pairs(Map& map, MTwist& rng, BBox area, Selector candidate);
 }
 

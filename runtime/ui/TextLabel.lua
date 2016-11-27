@@ -16,7 +16,7 @@ function TextLabel:init(font, options_or_text, text)
         self.options, self.text = {}, options_or_text
     end
     self.wrapped = (self.options.max_width ~= nil)
-    self.max_width = self.options.max_width
+    self.max_width = self.options.max_width or -1
 end
 
 TextLabel.step = do_nothing

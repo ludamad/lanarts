@@ -192,7 +192,7 @@ local safe_module
 safe_module = function(name, tbl)
   return setmetatable(tbl, {
     __index = function(self, key)
-      return error("Attempted to require non-existent `" .. tostring(key) .. "` from " .. tostring(name))
+      return error("Attempted to import non-existent `" .. tostring(key) .. "` from " .. tostring(name))
     end
   })
 end

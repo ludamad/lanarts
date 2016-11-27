@@ -71,10 +71,10 @@ function Engine.event_occurred(...)
 end
 
 function Engine.first_map_create(...)
-    local region1 = require "maps.Region1"
+    local region1 = require "maps.01_Overworld"
 
-    local map_id = region1.overworld_create(...)
-	return map_id
+    local map = region1.overworld_create(...)
+    return map
 end
 
 function Engine.pre_serialize()

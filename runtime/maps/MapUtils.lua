@@ -3,6 +3,7 @@ local DungeonFeatures = require "objects.DungeonFeatures"
 local GameObject = require "core.GameObject"
 local SourceMap = require "core.SourceMap"
 local Map = require "core.Map"
+local World = require "core.World"
 local mtwist = require "mtwist"
 
 local M = {} -- Submodule
@@ -66,8 +67,8 @@ function M.random_item(map, type, amount, area)
     return M.spawn_item(map, type, amount, sqr)
 end
 
-function M.random_enemy(map, type, area) 
-    local sqr = M.random_square(map, area)
+function M.random_enemy(map, type, --[[Optional]] area, --[[Optional]] selector) 
+    local sqr = M.random_square(map, area, selector)
     if not sqr then return nil end
     return M.spawn_enemy(map, type, sqr)
 end
@@ -121,6 +122,39 @@ function M.map_create(label, size, content, --[[Optional]] flags)
     }
 end
 
+function M.pick_player_squares(map, positions) 
+    local picked = {}
+    assert(#positions > 0, "No player positions!")
+    for i=1,World.player_amount do
+        local sqr = nil
+        for j=1,100 do
+            local candidate = map.rng:random_choice(positions)
+            if not table.contains(picked, candidate) then
+                sqr = candidate
+                break
+            end
+        end
+        if not sqr then error("Could not find player spawn position for player " .. i .. "!") end
+        append(picked, sqr)
+    end
+    return picked
+end
+function M.find_player_positions(map, --[[Optional]] flags) 
+    local positions = {}
+    local map_area = bbox_create({0,0},map.size)
+    for i=1,World.player_amount do
+        local sqr = M.random_square(map, map_area, 
+            --[[Selector]] { matches_all = flags, matches_none = {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT} },
+            --[[Operator]] nil, 
+            --[[Max attempts]] 10000
+        )
+        if not sqr then error("Could not find player spawn position for player " .. i .. "!") end
+        positions[i] = {(sqr[1]+.5) * Map.TILE_SIZE, (sqr[2]+.5) * Map.TILE_SIZE}
+    end
+    return positions
+end
+
+
 function M.game_map_create(map, wandering_enabled) 
     if wandering_enabled == nil then wandering_enabled = false end
     return Map.create { map = map, label = map.label, instances = map.instances, wandering_enabled = wandering_enabled }
@@ -149,25 +183,25 @@ function M.area_template_to_map(label, filename, padding, legend)
 end
 
 function M.make_tunnel_oper(rng, floor, wall, wall_seethrough) 
-    wall_flags = {TileMap.FLAG_SOLID, TileMap.FLAG_TUNNEL, TileMap.FLAG_PERIMETER}
+    wall_flags = {SourceMap.FLAG_SOLID, SourceMap.FLAG_TUNNEL, SourceMap.FLAG_PERIMETER}
     remove_flags = {}
     if wall_seethrough then
-        append(wall_flags, TileMap.FLAG_SEETHROUGH)
+        append(wall_flags, SourceMap.FLAG_SEETHROUGH)
     else
-        append(remove_flags, TileMap.FLAG_SEETHROUGH)
+        append(remove_flags, SourceMap.FLAG_SEETHROUGH)
     end
-    return TileMap.tunnel_operator {
+    return SourceMap.tunnel_operator {
         validity_selector = { 
-            fill_selector = { matches_all = TileMap.FLAG_SOLID, matches_none = TileMap.FLAG_TUNNEL },
-            perimeter_selector = { matches_all = TileMap.FLAG_SOLID, matches_none = TileMap.FLAG_TUNNEL }
+            fill_selector = { matches_all = SourceMap.FLAG_SOLID, matches_none = SourceMap.FLAG_TUNNEL },
+            perimeter_selector = { matches_all = SourceMap.FLAG_SOLID, matches_none = SourceMap.FLAG_TUNNEL }
         },
 
         completion_selector = {
-            fill_selector = { matches_none = {TileMap.FLAG_SOLID, TileMap.FLAG_PERIMETER, TileMap.FLAG_TUNNEL} },
-            perimeter_selector = { matches_none = TileMap.FLAG_SOLID } 
+            fill_selector = { matches_none = {SourceMap.FLAG_SOLID, SourceMap.FLAG_PERIMETER, SourceMap.FLAG_TUNNEL} },
+            perimeter_selector = { matches_none = SourceMap.FLAG_SOLID } 
         },
-        fill_operator = { add = {TileMap.FLAG_SEETHROUGH, TileMap.FLAG_TUNNEL}, remove = TileMap.FLAG_SOLID, content = floor},
-        perimeter_operator = { matches_all = TileMap.FLAG_SOLID, add = wall_flags, remove = remove_flags, content = wall},
+        fill_operator = { add = {SourceMap.FLAG_SEETHROUGH, SourceMap.FLAG_TUNNEL}, remove = SourceMap.FLAG_SOLID, content = floor},
+        perimeter_operator = { matches_all = SourceMap.FLAG_SOLID, add = wall_flags, remove = remove_flags, content = wall},
 
         rng = rng,
         perimeter_width = 1,
@@ -177,25 +211,25 @@ function M.make_tunnel_oper(rng, floor, wall, wall_seethrough)
 end
 
 function M.make_rectangle_criteria()
-        return TileMap.rectangle_criteria { 
-                fill_selector = { matches_all = TileMap.FLAG_SOLID, matches_none = TileMap.FLAG_PERIMETER }, 
+        return SourceMap.rectangle_criteria { 
+                fill_selector = { matches_all = SourceMap.FLAG_SOLID, matches_none = SourceMap.FLAG_PERIMETER }, 
                 perimeter_width = 1, 
-                perimeter_selector = { matches_all = TileMap.FLAG_SOLID }
+                perimeter_selector = { matches_all = SourceMap.FLAG_SOLID }
         }
 end
 
 function M.make_rectangle_oper(floor, wall, wall_seethrough, --[[Optional]] area_query)
-    wall_flags = {TileMap.FLAG_SOLID}
-    remove_wall_flags = {TileMap.FLAG_SEETHROUGH}
+    wall_flags = {SourceMap.FLAG_SOLID}
+    remove_wall_flags = {SourceMap.FLAG_SEETHROUGH}
     if wall_seethrough then
-        append(wall_flags, TileMap.FLAG_SEETHROUGH)
+        append(wall_flags, SourceMap.FLAG_SEETHROUGH)
         remove_wall_flags = {}
     end
-    return TileMap.rectangle_operator { 
+    return SourceMap.rectangle_operator { 
         area_query = area_query,
         perimeter_width = 1,
-       fill_operator = { add = {TileMap.FLAG_CUSTOM5, TileMap.FLAG_SEETHROUGH}, remove = {TileMap.FLAG_SOLID}, content = floor},
-        perimeter_operator = { add = {TileMap.FLAG_PERIMETER}, remove = remove_wall_flags, content = wall },
+       fill_operator = { add = {SourceMap.FLAG_CUSTOM5, SourceMap.FLAG_SEETHROUGH}, remove = {SourceMap.FLAG_SOLID}, content = floor},
+        perimeter_operator = { add = {SourceMap.FLAG_PERIMETER}, remove = remove_wall_flags, content = wall },
     }
 end
 
