@@ -33,29 +33,30 @@ make_legend = (legend) ->
         }
     }, legend
 
-M.pebble_ridge_dungeon = (args) -> {
+M.ridge_dungeon = (args) -> {
     legend: make_legend {
         'p': {
             add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_ITEM_SPAWN}
-            content: TileSets.pebble.floor
+            content: args.tileset.floor
             on_placement: (map, xy) ->
                 print "ON PLACEMENT"
                 {x, y} = xy
-                append map.player_candidate_squares, {x*32+16, y*32+16}
+                if args.player_spawn_area
+                    append map.player_candidate_squares, {x*32+16, y*32+16}
         }
         'D': {
             add: SourceMap.FLAG_SEETHROUGH
-            content: TileSets.pebble.floor
+            content: args.tileset.floor
             on_placement: args.dungeon_placer
         }
         'W': {
             add: SourceMap.FLAG_SOLID
-            content: TileSets.grass.wall_alt
+            content: args.tileset.wall_alt
             matches_all: SourceMap.FLAG_SOLID
         }
         'w': {
             add: SourceMap.FLAG_SOLID
-            content: TileSets.grass.wall_alt
+            content: args.tileset.wall_alt
         }
     }
     data: [=[
@@ -225,28 +226,80 @@ WWWWcccccecccBceccccWWWWWWWWWaaaaaWWWWWWWWWWW
 -- - gold_placer
 -- - enemy_placer
 -- - store_placer
--- - rng TODO
+-- - item_placer
+-- - rng 
 M.shop_vault = (args) -> {
     legend: make_legend {
-        '!': {remove: {}, on_placement: args.store_placer, matches_none: SourceMap.FLAG_SOLID}
-        '*': {remove: {}, on_placement: args.gold_placer, matches_none: SourceMap.FLAG_SOLID}
-        'e': {remove: {}, on_placement: args.enemy_placer, matches_none: SourceMap.FLAG_SOLID}
+        '!': {add: SourceMap.FLAG_SEETHROUGH, content: TileSets.snake.floor, on_placement: args.store_placer, matches_none: SourceMap.FLAG_SOLID}
+        '*': {add: SourceMap.FLAG_SEETHROUGH, content: TileSets.snake.floor, on_placement: args.gold_placer, matches_none: SourceMap.FLAG_SOLID}
+        'i': {add: SourceMap.FLAG_SEETHROUGH, content: TileSets.snake.floor, on_placement: args.item_placer, matches_none: SourceMap.FLAG_SOLID}
+        'e': {add: SourceMap.FLAG_SEETHROUGH, content: TileSets.snake.floor, on_placement: args.enemy_placer, matches_none: SourceMap.FLAG_SOLID}
+        'p': {add: SourceMap.FLAG_SEETHROUGH, content: TileSets.snake.floor, matches_none: SourceMap.FLAG_SOLID}
         'd': {
-            remove: {}
+            add: SourceMap.FLAG_SOLID
+            content: TileSets.snake.wall_alt
             on_placement: (map, xy) ->
-                 -- nil is passed for the default open sprite
-                MapUtils.spawn_door(map, xy, nil, M._rune_door_closed)
-            matches_none: SourceMap.FLAG_SOLID
+                MapUtils.spawn_door(map, xy)
         }
-        'x': {add: SourceMap.FLAG_SOLID, content: TileSets.grass.wall_alt}
+        'x': {add: SourceMap.FLAG_SOLID, content: TileSets.snake.wall_alt}
     }
-    data: [=[....++++++
+    data: random_choice {[=[....++++++
 ..++xxxx++
 ++xxx!ex+.
 +xxe**ex+.
-+x++++xx+.
++xppppxx+.
 +xddxxx++.
+++++++++..]=],
+        [=[..++++++++
+.+xxxxxx++
+++xppppx+.
++xxpiipx+.
++xpppppx+.
++xddxxxx+.
++++++++++.]=],
+        [=[..++++++++
+.+xxxxxx++
+++xppppx+.
++xxppppx+.
++xppp!px+.
++xddxxxx+.
++++++++++.]=],
+        [=[..++++++++
+.+xxxxx+++
+++xpppxx+.
++xxpxppx+.
++xppxp!x+.
++xddxxxx+.
++++++++++.]=],
+        [=[..++++++++
+..++xxxx++
+++xxxpex+.
++xxeppex+.
++xppppxx+.
++xddxxx++.
+++++++++..]=],
+        [=[..++++++++
+.+xxxxxx++
+++xpppex+.
++xxpeepx+.
++xpppppx+.
++xddxxxx+.
++++++++++.]=],
+        [=[..++++++++
+.+xxxxxx++
+++xpeppx+.
++xxpeepx+.
++xpppppx+.
++xddxxxx+.
++++++++++.]=],
+        [=[..++++++++
+.+xxxxx+++
+++xpppxx+.
++xxpxpex+.
++xppxpex+.
++xddxxxx+.
 +++++++++.]=]
+    }
 }
 
 

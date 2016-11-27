@@ -271,8 +271,7 @@ generate_subareas = (map, rng, regions) ->
     for region in *regions
         -- Unbox the region:
         for {:x,:y,:w,:h} in *region.subregions
-            if rng\random(3) == 0
-                filter_random_third(x,y,x+w,y+h)
+            filter_random_third(x,y,x+w,y+h)
     for {x1,y1,x2,y2} in *map.rectangle_rooms
         -- Account for there already being a perimeter -- don't want to remove tunnels too far, get weird artifacts.
         filter_random_third(x1+1,y1+1,x2-1,y2-1)
@@ -308,7 +307,11 @@ overworld_spawns = (map) ->
         --     if not sqr
         --         break
         --     Region1.generate_store(map, sqr)
-        OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 5, area, {matches_none: {SourceMap.FLAG_SOLID, FLAG_NO_ENEMY_SPAWN}})
+        if conf.is_overworld
+            OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 10, area, {matches_none: {SourceMap.FLAG_SOLID, FLAG_NO_ENEMY_SPAWN}})
+            OldMaps.generate_from_enemy_entries(map, OldMaps.medium_enemies, 5, area, {matches_none: {SourceMap.FLAG_SOLID, FLAG_NO_ENEMY_SPAWN}})
+        else
+            OldMaps.generate_from_enemy_entries(map, OldMaps.medium_enemies, 15, area, {matches_none: {SourceMap.FLAG_SOLID, FLAG_NO_ENEMY_SPAWN}})
 
 overworld_features = (map) ->
     {mw, mh} = map.size
@@ -350,21 +353,40 @@ overworld_features = (map) ->
        return false
     OldMapSeq1 = MapSequence.create {preallocate: 1}
     OldMapSeq2 = MapSequence.create {preallocate: 1}
+    OldMapSeq3 = MapSequence.create {preallocate: 1}
+    OldMapSeq4 = MapSequence.create {preallocate: 1}
 
     ------------------------- 
     -- Place easy dungeon: --
-    place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {1,5})
-    vault = SourceMap.area_template_create(Vaults.pebble_ridge_dungeon {dungeon_placer: place_dungeon})
+
+    place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq1, TileSets.pebble, {1,2})
+    vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, player_spawn_area: true, tileset: TileSets.pebble})
     if not place_feature(vault, (r) -> r.conf.is_overworld)
         return nil
     ------------------------- 
+
+    -----------------------------
+    -- Place medium dungeon 1: --
+    place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq2, TileSets.temple, {11,12})
+    vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.temple})
+    if not place_feature(vault, (r) -> r.conf.is_overworld)
+        return nil
+    -----------------------------
+
+    -----------------------------
+    -- Place medium dungeon 2: --
+    place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq3, TileSets.crystal, {3,5})
+    vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.crystal})
+    if not place_feature(vault, (r) -> not r.conf.is_overworld)
+        return nil
+    -----------------------------
 
     ------------------------- 
     -- Place hard dungeon: --
     enemy_placer = (map, xy) ->
         enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
         MapUtils.spawn_enemy(map, enemy, xy)
-    place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq2, TileSets.snake, {6,10})
+    place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq4, TileSets.snake, {6,10})
     vault = SourceMap.area_template_create(Vaults.skull_surrounded_dungeon {dungeon_placer: place_dungeon, :enemy_placer})
     if not place_feature(vault, (r) -> not r.conf.is_overworld)
         return nil
@@ -372,15 +394,18 @@ overworld_features = (map) ->
 
     ------------------------- 
     -- Place shop_vaults:  --
-    for i=1,2
+    for i=1,map.rng\random(2,4)
         enemy_placer = (map, xy) ->
             enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
             MapUtils.spawn_enemy(map, enemy, xy)
         store_placer = (map, xy) ->
             Region1.generate_store(map, xy)
+        item_placer = (map, xy) ->
+            item = ItemUtils.item_generate(ItemGroups.basic_items)
+            MapUtils.spawn_item(map, item.type, item.amount, xy)
         gold_placer = (map, xy) ->
             MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-        vault = SourceMap.area_template_create(Vaults.shop_vault {:enemy_placer, :gold_placer, :store_placer})
+        vault = SourceMap.area_template_create(Vaults.shop_vault {rng: map.rng, item_placer, :enemy_placer, :gold_placer, :store_placer})
         if not place_feature(vault, (r) -> true)
             return nil
     ------------------------- 
@@ -408,6 +433,8 @@ overworld_features = (map) ->
     return (game_map) ->
         OldMapSeq1\slot_resolve(1, game_map)
         OldMapSeq2\slot_resolve(1, game_map)
+        OldMapSeq3\slot_resolve(1, game_map)
+        OldMapSeq4\slot_resolve(1, game_map)
 
 overworld_try_create = (rng) ->
     rng = rng or require("mtwist").create(random(0, 2 ^ 31))

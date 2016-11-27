@@ -131,9 +131,16 @@ function M.generate_store(map, xy)
     MapUtils.spawn_store(map, items, xy)
 end
 
-local function old_map_generate(MapSeq, tileset, offset, max_floor, floor)
+local function old_map_generate(MapSeq, tileset, offset, max_floor, floor, --[[Optional]] callback)
     floor = floor or 1
-    local map = OldMaps.create_map("Dungeon "..floor, floor + offset, tileset)
+    local map = nil
+    for i=1,100 do
+        map = OldMaps.create_map("Dungeon "..floor, floor + offset, tileset)
+        if not callback or callback(floor, map) then
+            break
+        end
+        print("Dungeon rejected ("..i..")!")
+    end
     local last_floor = (floor >= max_floor)
     local seq_idx = MapSeq:slot_create()
     connect_map {
@@ -145,17 +152,17 @@ local function old_map_generate(MapSeq, tileset, offset, max_floor, floor)
         sprite_down = "stair_kinds", sprite_down_index = stair_kinds_index(4, 9),
         forward_portals = last_floor and 0 or 3,
         next_floor_callback = function() 
-            return old_map_generate(MapSeq, tileset, offset, max_floor, floor + 1)
+            return old_map_generate(MapSeq, tileset, offset, max_floor, floor + 1, callback)
         end
     }
     return MapSeq:slot_resolve(seq_idx, MapUtils.game_map_create(map, true))
 end
 
-function M.old_dungeon_placement_function(MapSeq, tileset, levels)
+function M.old_dungeon_placement_function(MapSeq, tileset, levels, --[[Optional]] callback)
     return function(map, xy)
         local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 12))
         local c = MapSeq:forward_portal_add(1, portal, 1, function() 
-            return old_map_generate(MapSeq, tileset, levels[1]-1, levels[2]-levels[1]+1) 
+            return old_map_generate(MapSeq, tileset, levels[1]-1, levels[2]-levels[1]+1, callback) 
         end)
         if World.player_amount > 1 then
             c()

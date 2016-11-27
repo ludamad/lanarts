@@ -20,14 +20,14 @@ M.medium_animals = {
   {enemy = "Hound",             chance = 100                                            }
 }
 
-local easy_enemies = {
+M.easy_enemies = {
   {enemy = "Giant Rat",         chance = 100, group_chance = 33, group_size = 3           },
   {enemy = "Skeleton",          chance = 100                                            },
   {enemy = "Chicken",           chance = 100                                            },
   {enemy = "Cloud Elemental",   chance = 100, group_chance = 33, group_size = 2           }
 }
 
-local medium_enemies = {
+M.medium_enemies = {
   {enemy = "Skeleton",          chance = 50                                              },
   {enemy = "Storm Elemental",   chance = 66,  group_chance = 33, group_size = 2           },
   {enemy = "Chicken",           chance = 50                                             },
@@ -35,7 +35,7 @@ local medium_enemies = {
   {enemy = "Dark Centaur",      chance = 10                                             }
 }
   
-local hard_enemies = {
+M.hard_enemies = {
  {enemy = "Storm Elemental",   chance = 20,    group_chance = 100, group_size = 3          },
  {enemy = "Hell Storm",        chance = 5,   group_chance = 33, group_size = 2           },
  {enemy = "Super Chicken",     chance = 100                                             },
@@ -181,23 +181,40 @@ local map_layouts = {
       }
     }
   },
+
   -- Level 2
-  { layout = tiny_layouts,
+  { layout = {small_layout1},
     content = {
-      items = { amount = 4,  group = item_groups.basic_items },
+      items = { amount = 6,  group = item_groups.basic_items   },
       enemies = {
         wandering = false,
-        amount = 12,
+        amount = 10,
         generated = {
           {enemy = "Giant Rat",         chance = 100  },
           {enemy = "Giant Bat",         chance = 100 },
           {enemy = "Hound",         chance = 100 },
-          {enemy = "Cloud Elemental",   chance = 50 },
-          {enemy = "Giant Spider",   chance = 50 }
+          {enemy = "Cloud Elemental",   guaranteed_spawns = 2 }
         }
-      }  
+      }
     }
   },
+  -- -- Level 2
+  -- { layout = tiny_layouts,
+  --   content = {
+  --     items = { amount = 4,  group = item_groups.basic_items },
+  --     enemies = {
+  --       wandering = false,
+  --       amount = 12,
+  --       generated = {
+  --         {enemy = "Giant Rat",         chance = 100  },
+  --         {enemy = "Giant Bat",         chance = 100 },
+  --         {enemy = "Hound",         chance = 100 },
+  --         {enemy = "Cloud Elemental",   chance = 50 },
+  --         {enemy = "Giant Spider",   chance = 50 }
+  --       }
+  --     }  
+  --   }
+  -- },
   -- Level 3
   { layout = small_layouts,
     content = {
@@ -214,7 +231,7 @@ local map_layouts = {
       items = { amount = 8,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
       enemies = {
         amount = {12,15},
-        generated = medium_enemies
+        generated = M.medium_enemies
       }
     }
   },
@@ -224,7 +241,7 @@ local map_layouts = {
       items = { amount = 4,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
       enemies = {
         amount = 6,
-        generated = tconcat(medium_enemies, {{enemy = "Hell Warrior", guaranteed_spawns = 1}})
+        generated = tconcat(M.medium_enemies, {{enemy = "Hell Warrior", guaranteed_spawns = 1}})
       }
     }
   },
@@ -234,7 +251,7 @@ local map_layouts = {
       items = { amount = 8, group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
       enemies = {
         amount = {14,16},
-        generated = tconcat(medium_enemies, {{enemy = "Orc Warrior", guaranteed_spawns = {0,1}}})
+        generated = tconcat(M.medium_enemies, {{enemy = "Orc Warrior", guaranteed_spawns = {0,1}}})
       }
     }
   },
@@ -244,7 +261,7 @@ local map_layouts = {
       items = { amount = 8, group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
       enemies = {
         amount = {18,22},
-        generated = tconcat(hard_enemies, {{enemy = "Orc Warrior", guaranteed_spawns = {0,1}}})
+        generated = tconcat(M.hard_enemies, {{enemy = "Orc Warrior", guaranteed_spawns = {0,1}}})
       }
     }
   },
@@ -254,7 +271,7 @@ local map_layouts = {
       items = { amount = 10, group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
       enemies = {
         amount = 22,
-        generated = hard_enemies
+        generated = M.hard_enemies
       }
     }
   
@@ -278,7 +295,31 @@ local map_layouts = {
         generated = tconcat(M.harder_enemies, {{enemy = "Zin", guaranteed_spawns = 1}})
       }
     }
-  }
+  },
+  -- EASIER LEVELS, TODO REORGANIZE
+  -- Level 11
+  { layout = tiny_layouts,
+    content = {
+      items = { amount = 3,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
+      enemies = {
+        wandering = false,
+        amount = 7,
+        generated = M.medium_enemies 
+      }
+    }
+  },
+
+  -- Level 12
+  { layout = {small_layout1},
+    content = {
+      items = { amount = 6,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
+      enemies = {
+        wandering = true,
+        amount = 10,
+        generated = M.medium_enemies
+    }
+    }
+  },
 }
 
 local function range_resolve(r)
