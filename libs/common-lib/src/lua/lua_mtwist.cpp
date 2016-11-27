@@ -81,7 +81,7 @@ static int amount_generated(MTwist* mtwist) {
 }
 
 static bool chance(MTwist* mtwist, double prob) {
-    return mtwist->randf() > prob;
+    return mtwist->genrand_real2() < prob;
 }
 
 LuaValue lua_mtwistmetatable(lua_State* L) {

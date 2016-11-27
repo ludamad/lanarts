@@ -102,6 +102,8 @@ public:
 		return _amount_generated;
 	}
 
+	/* generates a random number on [0,1)-real-interval */
+	double genrand_real2(void);
 private:
 	enum {
 		N = 624
@@ -120,8 +122,6 @@ private:
 	/* generates a random number on [0,1]-real-interval */
 	double genrand_real1(void);
 
-	/* generates a random number on [0,1)-real-interval */
-	double genrand_real2(void);
 
 	/* generates a random number on (0,1)-real-interval */
 	double genrand_real3(void);

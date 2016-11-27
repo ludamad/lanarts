@@ -197,10 +197,10 @@ random_ellipse_in_ellipse = (rng, w,h, xo, yo, wo, ho) ->
     cxo, cyo = xo+wo/2, yo+ho/2
     x = math.cos(ang) * dist * (wo/2 - w/2) + cxo - w/2
     y = math.sin(ang) * dist * (ho/2 - h/2) + cyo - h/2
-    assert x >= xo - 0.1
-    assert y >= yo - 0.1
-    assert x + w <= (xo + wo)+0.1
-    assert y + h <= (yo + ho)+0.1
+    -- assert x >= xo - 0.1
+    -- assert y >= yo - 0.1
+    -- assert x + w <= (xo + wo)+0.1
+    -- assert y + h <= (yo + ho)+0.1
     return x, y, w, h
 
 region_intersects = (x,y,w,h, R) ->

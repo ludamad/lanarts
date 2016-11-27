@@ -18,6 +18,7 @@ M.FLAG_NO_ENEMY_SPAWN = SourceMap.FLAG_CUSTOM6
 M.FLAG_NO_ITEM_SPAWN = SourceMap.FLAG_CUSTOM7
 
 M._warning_skull = Display.image_load "features/sprites/warning.png"
+M._rune_door_closed = Display.image_load "spr_doors/runed_door.png"
 M._anvil = Display.image_load "features/sprites/anvil.png"
 
 -- Common definitions:
@@ -95,7 +96,8 @@ M.skull_surrounded_dungeon = (args) -> {
             add: SourceMap.FLAG_SEETHROUGH
             content: TileSets.snake.floor
             on_placement: (map, xy) ->
-                MapUtils.spawn_door(map, xy)
+                 -- nil is passed for the default open sprite
+                MapUtils.spawn_door(map, xy, nil, M._rune_door_closed)
         }
         'w': {
             add: SourceMap.FLAG_SOLID
@@ -130,7 +132,7 @@ M.anvil_encounter = (args) -> {
             add: SourceMap.FLAG_SEETHROUGH
             content: TileSets.pebble.floor_alt
         }
-        'e': {
+        'B': {
             add: {SourceMap.FLAG_SEETHROUGH}
             content: TileSets.pebble.floor_alt
             on_placement: args.boss_placer
@@ -164,7 +166,8 @@ M.anvil_encounter = (args) -> {
             add: SourceMap.FLAG_SEETHROUGH
             content: TileSets.snake.floor
             on_placement: (map, xy) ->
-                MapUtils.spawn_door(map, xy)
+                 -- nil is passed for the default open sprite
+                MapUtils.spawn_door(map, xy, nil, M._rune_door_closed)
         }
         'w': {
             add: SourceMap.FLAG_SOLID
@@ -199,23 +202,51 @@ M.anvil_encounter = (args) -> {
 ....WWWWWaaa<aaaabbbbbaaaaaaaaaaaaaaaaWWWW...
 ...WWWWaaaaaaaaaaabbbaaaEEaaaaaaaaaaaWWWWW...
 ..WWWWaaaaabbbbaaaaaaaaaaaa<aaaaaaaWWWWW.....
-.WWWWaaaaabbb*bbaaaaaaaaaaaaaaaaaWWWWWW......
+.WWWWaaaaabbbbbbaaaaaaaaaaaaaaaaaWWWWWW......
 .WWWaa<aaaaabbbaaaaaaaaaaaaWWWWWWWWWWWW......
 WWWWaaaaaaaaaaaaaaaaaWWWWWWWWWWWWWWbWWWWW....
 WWWWWWWWaaaaaaaaaaaaadaaaaaaaaadaabbbWWWWWW..
 WWWWWWWWWWWWWWWWWWWaadaaaaaaaaadaaabbbbWWWWW.
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWaaaabbbbbWWWW
 WWcicccccccccccccWWWWWWWWWWWaaaaaaEaaabbbbbWW
-WWccccccccccc*cccccccWWWWWWWaaEaaaaaaaabbbbWW
-WWcccccccceccccciccccWWWWWWaaaaaaaaaaaaabbbWW
-WWccccccccccccccccccccdwaaaaaaaaaaEaaaaaabbWW
-WWcc*ccciccBccccccecccdwaaaaaaaaaaaaaaaaaabWW
-WWicecccccccccccccccc*dwaaaaaaaaaaaaaaaWWWWWW
-WWWWccccceccccceccccWWWWWWWWWaaaaaWWWWWWWWWWW
+WWccccceccicc*cccccccWWWWWWWaaEaaaaaaaabbbbWW
+WWcccecccceccccciccccWWWWWWaaaaaaaaaaaaabbbWW
+WWcccccccccccc*cccccccdsaaaaaaaaaaEaaaaaabbWW
+WWcc*ccciccBcccBccecccdsaaaaaaaaaaaaaaaaaabWW
+WWicecccccccceccccccc*dsaaaaaaaaaaaaaaaWWWWWW
+WWWWcccccecccBceccccWWWWWWWWWaaaaaWWWWWWWWWWW
 ..WWWWccccc*cccecccWWWWWWWWWWWWWWWWWWWWWW....
 ....WWWWccccccccccWWW........................
 ......WWWWWWWWWWWWWW.........................
 ........WWWWWWWWWWW..........................]=]
+}
+
+-- args:
+-- - gold_placer
+-- - enemy_placer
+-- - store_placer
+-- - rng TODO
+M.shop_vault = (args) -> {
+    legend: make_legend {
+        '!': {remove: {}, on_placement: args.store_placer, matches_none: SourceMap.FLAG_SOLID}
+        '*': {remove: {}, on_placement: args.gold_placer, matches_none: SourceMap.FLAG_SOLID}
+        'e': {remove: {}, on_placement: args.enemy_placer, matches_none: SourceMap.FLAG_SOLID}
+        'd': {
+            remove: {}
+            on_placement: (map, xy) ->
+                 -- nil is passed for the default open sprite
+                MapUtils.spawn_door(map, xy, nil, M._rune_door_closed)
+            matches_none: SourceMap.FLAG_SOLID
+        }
+        'x': {add: SourceMap.FLAG_SOLID, content: TileSets.grass.wall_alt}
+    }
+    data: [=[....++++++
+..++xxxx++
+++xxx!ex+.
++xxe**ex+.
++x++++xx+.
++xddxxx++.
++++++++++.]=]
 }
 
 

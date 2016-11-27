@@ -45,12 +45,13 @@ create_dungeon_scheme = (tileset) -> {
 
 OVERWORLD_TILESET = create_overworld_scheme(TileSets.grass)
 
-OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE = 150, 150
+OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE = 160, 160
+SHELL = 10
 OVERWORLD_CONF = (rng) -> {
     map_label: "Plain Valley"
     is_overworld: true
-    size: if rng\random(0,2) == 0 then {55, 45} else {55, 45} 
-    number_regions: rng\random(15,20)
+    size: if rng\random(0,2) == 0 then {85, 65} else {85, 65} 
+    number_regions: rng\random(35,40)
     floor1: OVERWORLD_TILESET.floor1 
     floor2: OVERWORLD_TILESET.floor2
     wall1: OVERWORLD_TILESET.wall1
@@ -63,7 +64,7 @@ OVERWORLD_CONF = (rng) -> {
     connect_line_width: () -> rng\random(2,6)
     region_delta_func: ring_region_delta_func
     room_radius: () ->
-        r = 4
+        r = 5
         bound = rng\random(1,10)
         for j=1,rng\random(0,bound) do r += rng\randomf(0, 1)
         return r
@@ -169,14 +170,15 @@ connect_edges = (map, rng, conf, area, edges) ->
 make_rect_points = (x1,y1,x2,y2) ->
     return {{x1, y2}, {x2, y2}, {x2, y1}, {x1, y1}}
 
-generate_area = (map, rng, conf, outer) ->
+generate_area = (map, rng, conf, outer, padding) ->
     size = conf.size
     R = RVORegionPlacer.create {outer.points}-- {make_rect_points outer.x, outer.y, outer.x+outer.w,outer.x}
 
     for i=1,conf.number_regions
         -- Make radius of the circle:
         r, n_points, angle = conf.room_radius(),rng\random(3,10) ,rng\randomf(0, math.pi)
-        r = random_region_add rng, r*2,r*2, n_points, conf.region_delta_func(map, rng, outer), angle, R, outer\bbox(), true
+        {x1, y1, x2, y2} = outer\bbox()
+        r = random_region_add rng, r*2,r*2, n_points, conf.region_delta_func(map, rng, outer), angle, R, {x1 + padding, y1 + padding, x2 - padding, y2 - padding}, true
         if r then outer\add(r)
 
     R\steps(conf.rvo_iterations)
@@ -208,7 +210,7 @@ generate_subareas = (map, rng, regions) ->
     conf = OVERWORLD_CONF(rng)
     -- Generate the polygonal rooms, connected with lines & arcs
     for region in *regions
-        generate_area map, rng, region.conf, region
+        generate_area map, rng, region.conf, region, SHELL
 
     edges = subregion_minimum_spanning_tree(regions, () -> rng\random(12) + rng\random(12))
     connect_edges map, rng, conf, nil, edges
@@ -306,47 +308,46 @@ overworld_spawns = (map) ->
         --     if not sqr
         --         break
         --     Region1.generate_store(map, sqr)
-        OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 10, area, {matches_none: {SourceMap.FLAG_SOLID, FLAG_NO_ENEMY_SPAWN}})
+        OldMaps.generate_from_enemy_entries(map, OldMaps.medium_animals, 5, area, {matches_none: {SourceMap.FLAG_SOLID, FLAG_NO_ENEMY_SPAWN}})
 
 overworld_features = (map) ->
     {mw, mh} = map.size
     place_feature = (template, region_filter) ->
-        -- Generate a dungeon entrace vault in the first overworld component:
-        for r in *map.regions
-            if not region_filter(r)
-                continue
-            -- Function to try a single placement, returns success:
-            attempt_placement = (template) ->
-                orient = map.rng\random_choice {
-                    SourceMap.ORIENT_DEFAULT, SourceMap.ORIENT_FLIP_X, SourceMap.ORIENT_FLIP_Y,
-                    SourceMap.ORIENT_TURN_90, SourceMap.ORIENT_TURN_180, SourceMap.ORIENT_TURN_270
-                }
-                {w, h} = template.size
-                -- Account for rotation in size:
-                if orient == SourceMap.ORIENT_TURN_90 or orient == SourceMap.ORIENT_TURN_180
-                    w, h = h, w
-                {x1, y1, x2, y2} = r\bbox()
-                -- Expand just outside the bounds of the region:
-                x1, y1, x2, y2 = (x1 - w), (y1 - h), (x2 + w), (y2 + h)
-                -- Ensure we are within the bounds of the world map:
-                x1, y1, x2, y2 = math.max(x1, 0), math.max(y1, 0), math.min(x2, mw - w), math.min(y2, mh - h)
-                top_left_xy = MapUtils.random_square(map, {x1, y1, x2, y2})
-                apply_args = {:map, :top_left_xy, orientation: orient }
-                if template\matches(apply_args)
-                    template\apply(apply_args)
-                    return true
-                return false
-            -- Function to try placement n times, returns success:
-            attempt_placement_n_times = (template, n) ->
-                for i=1,n
-                    if attempt_placement(template)
-                        return true
-                return false
-            -- Try to create the template object using our placement routines:
-            if attempt_placement_n_times(template, 100)
-                -- Exit, as we have handled the first overworld component
-                return true
-            return false
+       -- Function to try a single placement, returns success:
+       attempt_placement = (template) ->
+           orient = map.rng\random_choice {
+               SourceMap.ORIENT_DEFAULT, SourceMap.ORIENT_FLIP_X, SourceMap.ORIENT_FLIP_Y,
+               SourceMap.ORIENT_TURN_90, SourceMap.ORIENT_TURN_180, SourceMap.ORIENT_TURN_270
+           }
+           for r in *map.regions
+               if not region_filter(r)
+                   continue
+               {w, h} = template.size
+               -- Account for rotation in size:
+               if orient == SourceMap.ORIENT_TURN_90 or orient == SourceMap.ORIENT_TURN_180
+                   w, h = h, w
+               {x1, y1, x2, y2} = r\bbox()
+               -- Expand just outside the bounds of the region:
+               x1, y1, x2, y2 = (x1 - w), (y1 - h), (x2 + w), (y2 + h)
+               -- Ensure we are within the bounds of the world map:
+               x1, y1, x2, y2 = math.max(x1, 0), math.max(y1, 0), math.min(x2, mw - w), math.min(y2, mh - h)
+               top_left_xy = MapUtils.random_square(map, {x1, y1, x2, y2})
+               apply_args = {:map, :top_left_xy, orientation: orient }
+               if template\matches(apply_args)
+                   template\apply(apply_args)
+                   return true
+           return false
+       -- Function to try placement n times, returns success:
+       attempt_placement_n_times = (template, n) ->
+           for i=1,n
+               if attempt_placement(template)
+                   return true
+           return false
+       -- Try to create the template object using our placement routines:
+       if attempt_placement_n_times(template, 100)
+           -- Exit, as we have handled the first overworld component
+           return true
+       return false
     OldMapSeq1 = MapSequence.create {preallocate: 1}
     OldMapSeq2 = MapSequence.create {preallocate: 1}
 
@@ -369,6 +370,22 @@ overworld_features = (map) ->
         return nil
     ------------------------- 
 
+    ------------------------- 
+    -- Place shop_vaults:  --
+    for i=1,2
+        enemy_placer = (map, xy) ->
+            enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
+            MapUtils.spawn_enemy(map, enemy, xy)
+        store_placer = (map, xy) ->
+            Region1.generate_store(map, xy)
+        gold_placer = (map, xy) ->
+            MapUtils.spawn_item(map, "Gold", random(2,10), xy)
+        vault = SourceMap.area_template_create(Vaults.shop_vault {:enemy_placer, :gold_placer, :store_placer})
+        if not place_feature(vault, (r) -> true)
+            return nil
+    ------------------------- 
+
+
     -------------------------------
     -- Place centaur challenge   --
     enemy_placer = (map, xy) ->
@@ -377,13 +394,12 @@ overworld_features = (map) ->
     boss_placer = (map, xy) ->
         MapUtils.spawn_enemy(map, "Dark Centaur", xy)
     item_placer = (map, xy) ->
-        if map.rng\chance(.4) 
-            item = ItemUtils.item_generate(ItemGroups.enchanted_items)
-            MapUtils.spawn_item(map, item.type, item.amount, xy)
+        item = ItemUtils.item_generate(ItemGroups.enchanted_items)
+        MapUtils.spawn_item(map, item.type, item.amount, xy)
     gold_placer = (map, xy) ->
-        if map.rng\chance(.4) 
+        if map.rng\chance(.7) 
             MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-    vault = SourceMap.area_template_create(Vaults.anvil_encounter {dungeon_placer: place_dungeon, :enemy_placer, :item_placer, :gold_placer})
+    vault = SourceMap.area_template_create(Vaults.anvil_encounter {:enemy_placer, :boss_placer, :item_placer, :gold_placer})
     if not place_feature(vault, (r) -> true)
         return nil
     -------------------------------
@@ -421,7 +437,7 @@ overworld_try_create = (rng) ->
         player_candidate_squares: {}
     }
 
-    for subconf in *{DUNGEON_CONF(rng), OVERWORLD_CONF(rng)} --, OVERWORLD_CONF(rng), OVERWORLD_CONF(rng)}
+    for subconf in *{DUNGEON_CONF(rng), OVERWORLD_CONF(rng)}
         {w,h} = subconf.size
         -- Takes region parameters, region placer, and region outer ellipse bounds:
         r = random_region_add rng, w, h, 20, spread_region_delta_func(map, rng, outer), 0,
@@ -462,12 +478,12 @@ overworld_try_create = (rng) ->
     return game_map
 
 overworld_create = () ->
-    for i=1,100
+    for i=1,1000
         map = overworld_try_create()
         if map
             return map
-        print "** MAP GENERATION ATTEMPT FAILED, RETRYING **"
-    error("Could not generate a viable overworld in 100 tries!")
+        print "** MAP GENERATION ATTEMPT " .. i .. " FAILED, RETRYING **"
+    error("Could not generate a viable overworld in 1000 tries!")
 
 return {
     :overworld_create, :generate_game_map
