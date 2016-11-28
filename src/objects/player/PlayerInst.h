@@ -90,9 +90,7 @@ public:
         stats().cooldowns.reset_rest_cooldown(cooldown);
     }
 
-    money_t& gold() {
-        return equipment().money;
-    }
+    money_t& gold(GameState* gs);
 
     const PlayerScoreStats& score_stats() const {
         return _score_stats;

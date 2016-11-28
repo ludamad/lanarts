@@ -85,7 +85,7 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 	p2.y += y_interval;
 
 	gs->font().drawf(COL_WHITE, p1, "%s", gs->get_level()->label().c_str());
-	gs->font().drawf(COL_GOLD, p2, "Gold %d", player_inst->gold());
+	gs->font().drawf(COL_GOLD, p2, "Gold %d", player_inst->gold(gs));
 
 	p1.y += y_interval;
 	p2.y += y_interval;

@@ -62,14 +62,19 @@ function Door:on_step()
 
     local needs_key = (self.required_key ~= false)
     local is_open = false
-    local collisions = Map.rectangle_collision_check(self.map, self.area, self)
-    for object in values(collisions) do
-        if not needs_key and object.team then -- TODO proper combat object detection
-            is_open = true
-            break
-        elseif needs_key and object.class_name and GlobalData.keys_picked_up[self.required_key] then -- TODO proper player object detection
-            is_open = true
-            break
+    local collisions = Map.rectangle_collision_check(self.map, self.unpadded_area, self)
+    if #collisions > 0 then
+        is_open = true
+    else 
+        local collisions = Map.rectangle_collision_check(self.map, self.area, self)
+        for object in values(collisions) do
+            if not needs_key and object.team then -- TODO proper combat object detection
+                is_open = true
+                break
+            elseif needs_key and object.class_name and GlobalData.keys_picked_up[self.required_key] then -- TODO proper player object detection
+                is_open = true
+                break
+            end
         end
     end
 
@@ -104,6 +109,10 @@ function Door:on_map_init()
         self.x + whalf, self.y + hhalf
     }
 
+    self.unpadded_area = {
+        self.x - whalf + self.padding, self.y - hhalf + self.padding,
+        self.x + whalf - self.padding, self.y + hhalf - self.padding
+    }
     self.open_timeout = 0
 end
 function Door:init(args)

@@ -49,8 +49,46 @@ Data.weapon_create {
     cooldown = 40,
 
     range = 7
-
 }
+
+Data.weapon_create {
+    name = "Devious Staff",
+    description = "A staff that strikes with magic energy.",
+    type = "staves",
+
+    shop_cost = {75, 105},
+
+    spr_item = "staff",
+
+    damage = {strength = 0.6, magic = 0.6, base = {5, 9}},
+    power = {base = 1, strength = 0.2},
+    stat_bonuses = { magic = 1 },
+
+    cooldown = 40,
+
+    range = 7
+}
+
+Data.weapon_create {
+    name = "Gallanthor's Crutch",
+    description = "The epic staff of crippled archmage",
+    type = "staves",
+
+    shop_cost = {125, 155},
+
+    spr_item = "epic staff",
+
+    damage = {strength = 0.6, magic = 0.6, base = {5, 9}},
+    power = {base = 1, strength = 0.2},
+    stat_bonuses = { magic = 1 },
+    spell_cooldown_multiplier = 0.9,
+
+    cooldown = 40,
+
+    range = 7
+}
+
+
 
 Data.weapon_create {
     name = "Samurai Sabre",
@@ -86,12 +124,12 @@ Data.weapon_create {
 
     cooldown = 60,
 
-    range = 10
+    range = 7
 }
 
 Data.weapon_create {
     name = "Mace",
-    description = "An large, strong mace.",
+    description = "A large, strong mace.",
     type = "axes and maces",
 
     shop_cost = {35, 50},
@@ -101,7 +139,7 @@ Data.weapon_create {
     resist_modifier = 1.1,
 
     damage = {base = {7, 12}, strength = 1.25},
-    power = {base = {2, 5}, strength = 0.5},
+    power = {base = {2, 5}, strength = 0.35},
 
     cooldown = 55,
 

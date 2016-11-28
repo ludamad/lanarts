@@ -126,15 +126,8 @@ function M.pick_player_squares(map, positions)
     local picked = {}
     assert(#positions > 0, "No player positions!")
     for i=1,World.player_amount do
-        local sqr = nil
-        for j=1,100 do
-            local candidate = map.rng:random_choice(positions)
-            if not table.contains(picked, candidate) then
-                sqr = candidate
-                break
-            end
-        end
-        if not sqr then error("Could not find player spawn position for player " .. i .. "!") end
+        local sqr = map.rng:random_choice(positions)
+        table.remove_occurrences(positions, sqr)
         append(picked, sqr)
     end
     return picked

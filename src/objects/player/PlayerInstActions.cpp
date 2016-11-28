@@ -329,7 +329,7 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
         if (item_do_lua_pickup(gs->luastate(), type.item_entry(), this, amnt)) {
                 // Do nothing, as commanded by Lua
         } else if (type.id == get_item_by_name("Gold")) {
-		gold() += amnt;
+		gold(gs) += amnt;
 	} else {
 		itemslot_t slot = inventory().add(type);
 		if (slot == -1) {
@@ -386,9 +386,9 @@ void PlayerInst::purchase_from_store(GameState* gs, const GameAction& action) {
 	LANARTS_ASSERT(dynamic_cast<StoreInst*>(gs->get_instance(action.use_id)));
 	StoreInventory& inv = store->inventory();
 	StoreItemSlot& slot = inv.get(action.use_id2);
-	if (gold() >= slot.cost) {
+	if (gold(gs) >= slot.cost) {
 		inventory().add(slot.item);
-		gold() -= slot.cost;
+		gold(gs) -= slot.cost;
 		slot.item.clear();
 	}
 }

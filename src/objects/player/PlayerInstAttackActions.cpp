@@ -648,8 +648,11 @@ bool PlayerInst::melee_attack(GameState* gs, CombatGameInst* e,
         signal_killed_enemy();
 
         char buffstr[32];
-        int amnt = round(
-                double(((EnemyInst*)e)->xpworth()) / pc.all_players().size());
+        double xpworth = ((EnemyInst*)e)->xpworth();
+        double n_killed = (pc.n_enemy_killed(((EnemyInst*) e)->enemy_type()) - 1) / pc.all_players().size();
+        xpworth *= pow(0.8, n_killed);
+        int amnt = round(xpworth / pc.all_players().size());
+
         players_gain_xp(gs, amnt);
         snprintf(buffstr, 32, "%d XP", amnt);
         gs->add_instance(

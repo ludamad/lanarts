@@ -80,11 +80,14 @@ M.enchanted_items = {
     , { item = "Moonstone Ring",     chance = 1                      }
     , { item = "Ogre's Ring",        chance = 1                      }
     , { item = "Hydra Ring",         chance = 1                      }
+    , { item = "Gallanthor's Ring",         chance = 1               }
     -- Boots
     , { item = "Iron Boots",         chance = 1                      }
     -- Gloves
     , { item = "Steel Gloves",       chance = 1                      }
     , { item = "Runed Gloves",       chance = 1                      }
+    , { item = "Devious Staff",                 chance = 1           }
+    , { item = "Gallanthor's Crutch",                 chance = 1     }
 }
 
 return M

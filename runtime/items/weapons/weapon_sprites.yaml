@@ -38,6 +38,11 @@ sprites:
   - name: mars bow
     file: items/weapons/sprites/ranged/mars_bow.png
 
+  - name: epic staff
+    file: spr_weapons/epic_staff.png
+  - name: staff
+    file: spr_weapons/staff.png
+
   - name: big stone
     file: effects/sprites/big_stone.png
 

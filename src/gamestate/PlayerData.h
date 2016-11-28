@@ -66,9 +66,22 @@ public:
 	void serialize(GameState* gs, SerializeBuffer& serializer);
 	void deserialize(GameState* gs, SerializeBuffer& serializer);
 
+        int& n_enemy_killed(int type) {
+            if (type >= _kill_amounts.size()) {
+                _kill_amounts.resize(type + 1, 0);
+            }
+            return _kill_amounts.at(type);
+        }
+        money_t& money() {
+            return _money;
+        }
 private:
+        // Gold pool for all players:
+        money_t _money = 0;
 	int _local_player_idx;
 	std::vector<PlayerDataEntry> _players;
+        // Tracks player kills:
+	std::vector<int> _kill_amounts;
 };
 
 int player_get_playernumber(GameState* gs, PlayerInst* p);

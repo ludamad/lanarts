@@ -120,7 +120,7 @@ bool EnemyInst::damage(GameState* gs, int dmg) {
 	eb.damage_was_taken();
 	enemy_regen_cooloff += dmg;
 
-	return CombatGameInst::damage(gs, dmg);
+        return CombatGameInst::damage(gs, dmg);
 }
 
 EnemyEntry& EnemyInst::etype() {
@@ -240,6 +240,7 @@ void EnemyInst::die(GameState *gs) {
 	if (!destroyed) {
 		lua_api::event_monster_death(gs->luastate(), this);
 
+                gs->player_data().n_enemy_killed(enemytype)++;
 		AnimatedInst* anim = new AnimatedInst(ipos(), etype().enemy_sprite, 20);
 		anim->frame(0);
 		gs->add_instance(anim);

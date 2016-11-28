@@ -71,6 +71,19 @@ Data.equipment_create {
 }
 
 Data.equipment_create {
+    name = "Gallanthor's Ring",
+    description = "The ring of an old archmage.",
+    type = "ring",
+
+    shop_cost = { 115, 145 },
+
+    spell_cooldown_multiplier = 0.9,
+    spr_item = "gallanthors ring",
+
+    stat_bonuses = { magic = 1, willpower = -1 }
+}
+
+Data.equipment_create {
     name = "Magician's Ring",
     description = "A glowing ring that grants the user magical power, at the cost of magical defences.",
     type = "ring",

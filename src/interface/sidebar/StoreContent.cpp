@@ -48,7 +48,7 @@ static void draw_store_inventory_slot(GameState* gs, StoreItemSlot& itemslot,
 static void draw_item_cost(GameState* gs, const BBox& bbox, int cost) {
 	PlayerInst* player = gs->local_player();
 	Colour col = COL_PALE_GREEN;
-	if (player->gold() < cost) {
+	if (player->gold(gs) < cost) {
 		col = COL_PALE_RED;
 	}
 
@@ -134,7 +134,7 @@ bool StoreContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 
 		int slot = get_itemslotn(inv, bbox, mx, my);
 		if (slot >= 0 && slot < INVENTORY_SIZE && !inv.get(slot).empty()) {
-			if (p->gold() >= inv.get(slot).cost) {
+			if (p->gold(gs) >= inv.get(slot).cost) {
 				queued_actions.push_back(
 						game_action(gs, p, GameAction::PURCHASE_FROM_STORE,
 								store_object->id, NONE, NONE, slot));

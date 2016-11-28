@@ -39,12 +39,10 @@ bool EquipmentStats::use_ammo(int amnt) {
 
 void EquipmentStats::serialize(SerializeBuffer& serializer) {
 	inventory.serialize(serializer);
-	serializer.write_int(money);
 }
 
 void EquipmentStats::deserialize(SerializeBuffer& serializer) {
 	inventory.deserialize(serializer);
-	serializer.read_int(money);
 }
 
 bool EquipmentStats::has_weapon() {
@@ -111,7 +109,6 @@ EquipmentStats parse_equipment(const LuaField& value) {
 		Item item = parse_as_item(value, "weapon");
 		ret.inventory.add(item, true);
 	}
-	ret.money = luawrap::defaulted(value["gold"], 0);
 
 	if (value.has("projectile")) {
 		Item item = parse_as_item(value["projectile"]);

@@ -66,6 +66,10 @@ void PlayerInst::init(GameState* gs) {
 PlayerInst::~PlayerInst() {
 }
 
+money_t& PlayerInst::gold(GameState* gs) {
+        return gs->player_data().money();
+}
+
 void PlayerInst::update_field_of_view(GameState* gs) {
 	int sx = last_x / TILE_SIZE;
 	int sy = last_y / TILE_SIZE;

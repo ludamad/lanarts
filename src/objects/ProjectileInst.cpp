@@ -175,9 +175,12 @@ void ProjectileInst::step(GameState* gs) {
 				PlayerData& pc = gs->player_data();
 				p->signal_killed_enemy();
 
-				int amnt = round(
-						double(victim->xpworth()) / pc.all_players().size());
-				players_gain_xp(gs, amnt);
+                                double xpworth = victim->xpworth();
+                                double n_killed = (pc.n_enemy_killed(victim->enemy_type()) - 1) / pc.all_players().size();
+                                xpworth *= pow(0.8, n_killed);
+                                int amnt = round(xpworth / pc.all_players().size());
+
+                                players_gain_xp(gs, amnt);
 
 				snprintf(buffstr, 32, "%d XP", amnt);
 				gs->add_instance(

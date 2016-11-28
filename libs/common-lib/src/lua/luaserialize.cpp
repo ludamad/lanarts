@@ -38,7 +38,7 @@ void LuaSerializeContext::encode_table(int idx) {
 	lua_pushnil(L);
 	while (lua_next(L, -2) != 0) {
 		if (lua_type(L, -2) == LUA_TSTRING) {
-			printf("ENCODING '%s' as '%s'\n", lua_tostring(L, -2), lua_typename(L, lua_type(L, -1)));
+			//printf("ENCODING '%s' as '%s'\n", lua_tostring(L, -2), lua_typename(L, lua_type(L, -1)));
 		}
 		encode(-2);
 		encode(-1);
@@ -82,7 +82,7 @@ static int lua_serialize_buffer_writer(lua_State* L, const void* data, size_t le
 #define DEBUG_SERIALIZATION
 
 void LuaSerializeContext::store_ref_id(int idx) {
-	printf("STORING %d AS %s\n", (int)next_encode_index, lua_typename(L, lua_type(L, idx)));
+	//printf("STORING %d AS %s\n", (int)next_encode_index, lua_typename(L, lua_type(L, idx)));
 	LCOMMON_ASSERT(!lua_isnil(L, idx));
 	lua_pushvalue(L, idx);
 	lua_pushinteger(L, next_encode_index++);
@@ -91,7 +91,7 @@ void LuaSerializeContext::store_ref_id(int idx) {
 
 // Writes [LS_FUNCTION, <number of upvalues>, <upvalue encodings>]
 void LuaSerializeContext::encode_function(int idx) {
-        printf("ENCODING FUNC %d\n", next_encode_index);
+        //printf("ENCODING FUNC %d\n", next_encode_index);
 	lua_pushvalue(L, idx); // push function
 
 	lua_Debug ar;
@@ -278,7 +278,7 @@ void LuaSerializeContext::decode_table(int idx) {
 	while ((type = buffer->read_byte()) != LS_TABLE_END_SENTINEL) {
 		_decode(type);
 		if (lua_type(L, -1) == LUA_TSTRING) {
-			printf("DECODING '%s'\n", lua_tostring(L, -1));
+			//printf("DECODING '%s'\n", lua_tostring(L, -1));
 		}
 		decode();
 		lua_rawset(L, -3);
@@ -311,7 +311,7 @@ void LuaSerializeContext::decode_function() {
 	int func_id = lua_gettop(L);
 
 	store_object(func_id);
-        printf("DECODING FUNC %d\n", next_decode_index);
+        //printf("DECODING FUNC %d\n", next_decode_index);
 
 	size_t nups = buffer->read_int();
 	for (int i = 1; i <= nups; i++) {
@@ -377,7 +377,7 @@ void LuaSerializeContext::decode_ref_name() {
 }
 
 void LuaSerializeContext::store_object(int idx) {
-	printf("LOADING %d AS %s\n", (int)next_decode_index, lua_typename(L, lua_type(L, idx)));
+	//printf("LOADING %d AS %s\n", (int)next_decode_index, lua_typename(L, lua_type(L, idx)));
 	lua_pushvalue(L, idx);
 	lua_rawseti(L, this->index_to_obj, next_decode_index++);
 }

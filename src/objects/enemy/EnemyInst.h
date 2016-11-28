@@ -39,14 +39,17 @@ public:
 
 	EnemyBehaviour& behaviour() { return eb; }
 	EnemyEntry& etype();
+	int enemy_type() {
+            return enemytype;
+        }
 	int xpworth(){
 		return xpgain;
 	}
 
 private:
 	bool seen;
-	int enemytype;
 	EnemyBehaviour eb;
+        int enemytype;
 	int enemy_regen_cooloff;
 	int xpgain;
 };

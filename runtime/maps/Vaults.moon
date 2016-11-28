@@ -366,15 +366,65 @@ M.tunnel = (args) -> {
             content: TileSets.snake.wall
         }
     }
-    data: [=[
-.....wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.
-..wwwwccccccccccc*ccccccccccccccccccccccccccc*ccccccccccccww
-wwwcccccccccccccccccccccccccccciccceccccccccccccccccccccccd+
-+dccccceccccccc*ccccccccccccccccccccccccccccecccccccccccccd+
-+dccccccccccccccccccccccccccccccccccccccccccccccccccccccccww
-wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.
+    data: random_choice {[=[
+.....wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.
+.wwwwwwccccccccccc*cccccccccccccccc*cccccccccccw.
++dccccceccccccc*cccccccccccccccccecccccccccccccd+
++dcccccccccccccccccccccccccccccccccccccccccccccd+
+.wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.
 ]=]
+        [=[
+.....wwwwwww......
+.wwwwwwccccw......
++dcccccecccw......
+.wwwwwwwcccw......
+.....wwwccwwwwwww.
+......wwccccccccd+
+......wwwwwwwwwww.
+]=]
+    }
 }
+
+M.stone_henge = (args) -> {
+    legend: table.merge M.anvil_encounter(args).legend, {
+        'w': {
+            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            content: TileSets.snake.wall
+        }
+        'p': {add: UNSOLID_ADD, content: TileSets.snake.floor, matches_none: SourceMap.FLAG_SOLID}
+        'P': {add: UNSOLID_ADD, content: TileSets.grass.floor_alt2, matches_none: SourceMap.FLAG_SOLID}
+        'i': {add: UNSOLID_ADD, content: TileSets.grass.floor_alt2, on_placement: args.item_placer, matches_none: SourceMap.FLAG_SOLID}
+    }
+    data: random_choice {[=[
+.w..w..
+wwppww.
+.pppp+.
+.pppp+.
+wwppww.
+.w..w..
+]=]
+        [=[
+ww.w.ww.
+wPPwPPw.
+.PPPPP+.
+wwPiPww.
+.PPPPP+.
+wPPwPPw.
+ww.w.ww.
+]=]
+        [=[
+.w...w..
+wwPPPww.
+.PPPPP+.
+.PPiPP+.
+.PPPPP+.
+wwPPPww.
+.w...w..
+]=]
+    }
+}
+
 
 M.cavern = (args) -> {
     legend: table.merge M.anvil_encounter(args).legend, {
@@ -472,7 +522,14 @@ M.small_random_vault = (args) -> {
 +xxpxpex+.
 +xppxpex+.
 +xddxxxx+.
-+++++++++.]=]
++++++++++.]=],
+        [=[
+.xxxxxx...
+xxipppxxxx
+xpepipexxx
+xxppppeexx
+.xddxppxxx
+.x++xxxxxx]=]
     }
 }
 

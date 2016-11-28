@@ -12,6 +12,9 @@ M.grass = Data.tileset_create {
 --    wall_alt = { images = Display.images_load (path_resolve "wall_overworld_wall.png%32x32") }
     wall_alt = { images = Display.images_load (path_resolve "dngn_wall/snake/snake(0-9).png") }
 }
+if math.random() > 0.6 then
+    M.grass.floor, M.grass.floor_alt1 = M.grass.floor_alt1, M.grass.floor
+end
 
 M.pebble = Data.tileset_create {
 	floor = { images = Display.images_load (path_resolve "dngn_floor/pebblebrown/pebble_brown(0-8).png") },

@@ -17,5 +17,9 @@ sprites:
   - name: moonstone ring
     file: items/rings/sprites/moonstone_ring.png
 
+  - name: gallanthors ring
+    file: items/rings/sprites/gallanthors_ring.png
+
+
   - name: ring of vitality
     file: items/rings/sprites/ring_of_vitality.png

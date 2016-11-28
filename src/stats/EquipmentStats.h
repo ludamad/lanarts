@@ -14,9 +14,6 @@
 
 class EquipmentStats {
 public:
-	EquipmentStats() :
-			money(0) {
-	}
 	bool valid_to_use(const Item& item);
 
 	void equip(itemslot_t slot);
@@ -48,7 +45,6 @@ public:
 	Equipment armour() const;
 
 	Inventory inventory;
-	money_t money;
 };
 
 EquipmentStats parse_equipment(const LuaField& value);
