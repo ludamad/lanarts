@@ -68,7 +68,7 @@ namespace ldungeon_gen {
                 if (next.x < area.x1 || next.y < area.y1 || next.x >= area.x2 || next.y >= area.y2) {
                     return;
                 }
-                if (map[next].matches(marked)) {
+                if (map[next].matches(marked) || !map[next].matches(unfilled)) {
                     return;
                 }
                 map[next].apply(mark);
@@ -82,7 +82,7 @@ namespace ldungeon_gen {
         }
 
         FOR_EACH_BBOX(area, x, y) {
-            if (!map[Pos(x,y)].matches(marked)) {
+            if (map[Pos(x,y)].matches(unfilled) && !map[Pos(x,y)].matches(marked)) {
                 return false;
             }
         }

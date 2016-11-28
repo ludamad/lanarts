@@ -201,7 +201,6 @@ M.Dungeon1 = {
 }
 
 M.Dungeon2 = {
-  -- Level 1
   { layout = tiny_layouts,
     content = {
       items = { amount = 3,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
@@ -213,7 +212,22 @@ M.Dungeon2 = {
     }
   },
 
-  -- Level 2
+  { layout = tiny_layouts,
+    content = {
+      items = { amount = 3,  group = item_groups.basic_items   },
+      enemies = {
+        wandering = false,
+        amount = 7,
+        generated = {
+          {enemy = "Giant Rat",         chance = 100  },
+          {enemy = "Giant Bat",         chance = 100 },
+          {enemy = "Hound",         chance = 100 },
+          {enemy = "Cloud Elemental",   guaranteed_spawns = 2 }
+        }
+      }
+    }
+  },
+
   { layout = {small_layout1},
     content = {
       items = { amount = 6,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
@@ -518,10 +532,10 @@ function M.create_map(dungeon, floor)
     -- TODO consolidate what is actually expected of maps.
     -- For now, just fake one region for 01_Overworld.moon
     map.regions = { {conf = {}, bbox = function(self) return {0,0, map.size[1], map.size[2]} end}}
-    generate_content(map, entry.content, tileset)
     if dungeon.on_generate and not dungeon.on_generate(map, floor) then
         return nil
     end
+    generate_content(map, entry.content, tileset)
     return map
 end
 

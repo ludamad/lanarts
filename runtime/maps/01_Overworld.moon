@@ -6,6 +6,7 @@ import map_place_object, ellipse_points,
     LEVEL_PADDING, Region, RVORegionPlacer, 
     random_rect_in_rect, random_ellipse_in_ellipse, 
     ring_region_delta_func, default_region_delta_func, spread_region_delta_func,
+    center_region_delta_func, 
     random_region_add, subregion_minimum_spanning_tree, region_minimum_spanning_tree,
     Tile, tile_operator from require "maps.GenerateUtils"
 
@@ -45,8 +46,8 @@ create_dungeon_scheme = (tileset) -> {
 
 OVERWORLD_TILESET = create_overworld_scheme(TileSets.grass)
 
-OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE = 160, 160
-SHELL = 10
+OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE = 300, 300
+SHELL = 50
 OVERWORLD_CONF = (rng) -> {
     map_label: "Plain Valley"
     is_overworld: true
@@ -471,23 +472,42 @@ overworld_features = (map) ->
             return nil
     ------------------------- 
 
+    ---------------------------------
+    -- Place big vaults            --
+    for template in *{Vaults.big_encounter1, Vaults.big_encounter2}
+        enemy_placer = (map, xy) ->
+            enemy = OldMaps.enemy_generate(OldMaps.medium_enemies)
+            MapUtils.spawn_enemy(map, enemy, xy)
+        item_placer = (map, xy) ->
+            item = ItemUtils.item_generate(ItemGroups.basic_items)
+            MapUtils.spawn_item(map, item.type, item.amount, xy)
+        gold_placer = (map, xy) ->
+            if map.rng\chance(.7) 
+                MapUtils.spawn_item(map, "Gold", random(2,10), xy)
+        door_placer = (map, xy) ->
+            -- nil is passed for the default open sprite
+            MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, 'Dandelite Key')
+        vault = SourceMap.area_template_create(template {:enemy_placer, :item_placer, :gold_placer, :door_placer})
+        if not place_feature(map, vault, (r) -> true)
+            return nil
+    ---------------------------------
 
     ---------------------------------
-    -- Place centaur challenge   --
+    -- Place centaur challenge     --
     enemy_placer = (map, xy) ->
-        enemy = OldMaps.enemy_generate(OldMaps.harder_enemies)
+        enemy = OldMaps.enemy_generate(OldMaps.medium_enemies)
         MapUtils.spawn_enemy(map, enemy, xy)
     boss_placer = (map, xy) ->
         MapUtils.spawn_enemy(map, "Dark Centaur", xy)
     item_placer = (map, xy) ->
-        item = ItemUtils.item_generate(ItemGroups.enchanted_items)
+        item = ItemUtils.item_generate(ItemGroups.basic_items)
         MapUtils.spawn_item(map, item.type, item.amount, xy)
     gold_placer = (map, xy) ->
         if map.rng\chance(.7) 
             MapUtils.spawn_item(map, "Gold", random(2,10), xy)
     door_placer = (map, xy) ->
         -- nil is passed for the default open sprite
-        MapUtils.spawn_door(map, xy, nil, Vaults._door_key3, "Burgundite Key")
+        MapUtils.spawn_door(map, xy, nil, Vaults._rune_door_closed)
     vault = SourceMap.area_template_create(Vaults.anvil_encounter {:enemy_placer, :boss_placer, :item_placer, :gold_placer, :door_placer})
     if not place_feature(map, vault, (r) -> true)
         return nil
@@ -528,17 +548,18 @@ overworld_try_create = (rng) ->
         player_candidate_squares: {}
     }
 
-    for subconf in *{DUNGEON_CONF(rng), OVERWORLD_CONF(rng)}
+    for subconf in *{DUNGEON_CONF(rng), OVERWORLD_CONF(rng), OVERWORLD_CONF(rng), OVERWORLD_CONF(rng)}
         {w,h} = subconf.size
         -- Takes region parameters, region placer, and region outer ellipse bounds:
-        r = random_region_add rng, w, h, 20, spread_region_delta_func(map, rng, outer), 0,
+        r = random_region_add rng, w, h, 20, center_region_delta_func(map, rng, outer), 0,
             major_regions, outer\bbox()
         if r == nil
             return nil
-        r.max_speed = 10
+        r.max_speed = 100
         r.conf = subconf
  
     -- No rvo for now
+    major_regions\steps(150)
 
     -- Apply the regions:
     for r in *major_regions.regions
