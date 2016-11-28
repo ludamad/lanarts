@@ -1,6 +1,58 @@
+local GlobalData = require "core.GlobalData"
+
+GlobalData.keys_picked_up = {}
+
 Data.item_create {
     name = "Gold", -- An entry named gold must exist, it is handled specially
     spr_item = "gold"
+}
+
+Data.item_create {
+    name = "Azurite Key",
+    type = "key",
+    description = "Now that you have picked up this key, you can open Azurite doors.",
+    use_message = "Now that you have picked up this key, you can open Azurite doors.",
+    spr_item = "key1",
+    pickup_func = function(self, user)
+        GlobalData.keys_picked_up[self.name] = true 
+        pretty("KEYS: ", GlobalData.keys_picked_up)
+    end,
+    prereq_func = function (self, user)
+        return false
+    end,
+    stackable = false
+}
+
+Data.item_create {
+    name = "Dandelite Key",
+    description = "Now that you have picked up this key, you can open Dandelite doors.",
+    type = "key",
+    use_message = "Now that you have picked up this key, you can open Dandelite doors.",
+    spr_item = "key2",
+    pickup_func = function(self, user)
+        GlobalData.keys_picked_up[self.name] = true 
+        pretty("KEYS: ", GlobalData.keys_picked_up)
+    end,
+    prereq_func = function (self, user)
+        return false
+    end,
+    stackable = false
+}
+
+Data.item_create {
+    name = "Burgundite Key",
+    description = "Now that you have picked up this key, you can open Burgundite doors.",
+    type = "key",
+    use_message = "Now that you have picked up this key, you can open Burgundite doors.",
+    spr_item = "key3",
+    pickup_func = function(self, user)
+        GlobalData.keys_picked_up[self.name] = true 
+        pretty("KEYS: ", GlobalData.keys_picked_up)
+    end,
+    prereq_func = function (self, user)
+        return false
+    end,
+    stackable = false
 }
 
 Data.item_create {

@@ -131,17 +131,17 @@ function M.generate_store(map, xy)
     MapUtils.spawn_store(map, items, xy)
 end
 
-local function old_map_generate(MapSeq, tileset, offset, max_floor, floor, --[[Optional]] callback)
+local function old_map_generate(MapSeq, dungeon, floor)
     floor = floor or 1
     local map = nil
     for i=1,100 do
-        map = OldMaps.create_map("Dungeon "..floor, floor + offset, tileset)
-        if not callback or callback(floor, map) then
+        map = OldMaps.create_map(dungeon, floor)
+        if map ~= nil then
             break
         end
         print("Dungeon rejected ("..i..")!")
     end
-    local last_floor = (floor >= max_floor)
+    local last_floor = (floor >= #dungeon.templates)
     local seq_idx = MapSeq:slot_create()
     connect_map {
         map = map, 
@@ -152,17 +152,21 @@ local function old_map_generate(MapSeq, tileset, offset, max_floor, floor, --[[O
         sprite_down = "stair_kinds", sprite_down_index = stair_kinds_index(4, 9),
         forward_portals = last_floor and 0 or 3,
         next_floor_callback = function() 
-            return old_map_generate(MapSeq, tileset, offset, max_floor, floor + 1, callback)
+            return old_map_generate(MapSeq, dungeon, floor + 1)
         end
     }
     return MapSeq:slot_resolve(seq_idx, MapUtils.game_map_create(map, true))
 end
 
-function M.old_dungeon_placement_function(MapSeq, tileset, levels, --[[Optional]] callback)
+-- dungeon requires:
+-- - label
+-- - templates (from OldMaps.lua, eg OldMaps.Dungeon1)
+-- - tileset (from TileSets.lua, eg TileSets.snakes)
+function M.old_dungeon_placement_function(MapSeq, dungeon)
     return function(map, xy)
         local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 12))
         local c = MapSeq:forward_portal_add(1, portal, 1, function() 
-            return old_map_generate(MapSeq, tileset, levels[1]-1, levels[2]-levels[1]+1, callback) 
+            return old_map_generate(MapSeq, dungeon, 1) 
         end)
         if World.player_amount > 1 then
             c()

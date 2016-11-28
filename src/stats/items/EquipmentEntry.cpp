@@ -40,6 +40,8 @@ const char* EquipmentEntry::entry_type() {
 		return "Ring";
 	case EquipmentEntry::WEAPON:
 		return "Weapon";
+	case EquipmentEntry::KEY:
+		return "Key";
 	case EquipmentEntry::AMMO: {
 		ProjectileEntry* pentry = dynamic_cast<ProjectileEntry*>(this);
 		if (pentry->is_standalone()) {
@@ -59,6 +61,8 @@ static EquipmentEntry::equip_type name2type(const char* name) {
 		return EquipmentEntry::BODY_ARMOUR;
 	} else if (strcmp(name, "ring") == 0) {
 		return EquipmentEntry::RING;
+	} else if (strcmp(name, "key") == 0) {
+		return EquipmentEntry::KEY;
 	} else if (strcmp(name, "boots") == 0) {
 		return EquipmentEntry::BOOTS;
 	} else if (strcmp(name, "helmet") == 0) {

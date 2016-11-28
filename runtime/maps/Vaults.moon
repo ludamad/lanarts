@@ -16,50 +16,92 @@ M.FLAG_OVERWORLD = SourceMap.FLAG_CUSTOM4
 M.FLAG_ROOM = SourceMap.FLAG_CUSTOM5
 M.FLAG_NO_ENEMY_SPAWN = SourceMap.FLAG_CUSTOM6
 M.FLAG_NO_ITEM_SPAWN = SourceMap.FLAG_CUSTOM7
+M.FLAG_NO_VAULT_SPAWN = SourceMap.FLAG_CUSTOM8
 
 M._warning_skull = Display.image_load "features/sprites/warning.png"
 M._rune_door_closed = Display.image_load "spr_doors/runed_door.png"
+M._door_key1 = Display.image_load "spr_keys/door01.png"
+M._door_key2 = Display.image_load "spr_keys/door02.png"
+M._door_key3 = Display.image_load "spr_keys/door03.png"
 M._anvil = Display.image_load "features/sprites/anvil.png"
 
 -- Common definitions:
-make_legend = (legend) ->
+make_legend = (args, legend) ->
+    args.tileset or= {}
     return table.merge {
         '.': { -- '.' means 'any tile'
             remove: {}
         }
         '+': {  -- '.' means 'walkable tile'
             remove: {}
-            matches_none: SourceMap.FLAG_SOLID
+            matches_none: {M.FLAG_NO_VAULT_SPAWN, SourceMap.FLAG_SOLID}
         }
-    }, legend
-
-M.ridge_dungeon = (args) -> {
-    legend: make_legend {
+        '*': {
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            content: args.tileset.floor
+            on_placement: args.gold_placer
+        }
+        'd': {
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            content: args.tileset.floor
+            on_placement: args.door_placer
+        }
         'p': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_ITEM_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_ITEM_SPAWN, M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
             content: args.tileset.floor
             on_placement: (map, xy) ->
-                print "ON PLACEMENT"
                 {x, y} = xy
                 if args.player_spawn_area
                     append map.player_candidate_squares, {x*32+16, y*32+16}
         }
+
+    }, legend
+
+M.ridge_dungeon = (args) -> {
+    legend: make_legend args, {
+        'p': {
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_ITEM_SPAWN}
+            content: args.tileset.floor
+            on_placement: (map, xy) ->
+                {x, y} = xy
+                if args.player_spawn_area
+                    append map.player_candidate_squares, {x*32+16, y*32+16}
+        }
+
         'D': {
-            add: SourceMap.FLAG_SEETHROUGH
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
             content: args.tileset.floor
             on_placement: args.dungeon_placer
         }
         'W': {
-            add: SourceMap.FLAG_SOLID
+            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}
             content: args.tileset.wall_alt
             matches_all: SourceMap.FLAG_SOLID
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
         'w': {
-            add: SourceMap.FLAG_SOLID
+            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}
             content: args.tileset.wall_alt
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
     }
-    data: [=[
+    data: random_choice {
+        [=[
+....+++.......
+...wdddw......
+..wwpppwww....
+.wwppppppwwww.
+.wppppppppppw.
+.wpppDppppppw.
+.wppppppppppw.
+.wwwWWWWWwwww.
+..............
+]=],
+        --Ridge dungeon:
+        [=[
 ..........++++..
 .......ppppppp..
 ...WWWpppppppp..
@@ -67,42 +109,49 @@ M.ridge_dungeon = (args) -> {
 .WWpppppppWWW...
 .WWpppppWWW.....
 .WppppWWW.......
+.WWWWWWW........
+]=]
+    }
+}
+
+
+M.sealed_dungeon = (args) -> table.merge M.ridge_dungeon(args), {
+    data: [=[
+.....wwwwwww....
+...WWWpppppdppp+
+.WWWpppppppdppp+
+.WWpppppppWW....
+.WW***WWWWW.....
+.Wp*D*WWW.......
 .WWWWWWW........]=]
 }
 
 M.skull_surrounded_dungeon = (args) -> {
-    legend: make_legend {
+    legend: make_legend args, {
         's': {
             add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN}
-            content: TileSets.snake.floor
+            content: args.tileset.floor
             on_placement: (map, xy) ->
                 MapUtils.spawn_decoration(map, M._warning_skull, xy, 0, false)
         }
         'e': {
             add: {SourceMap.FLAG_SEETHROUGH}
-            content: TileSets.snake.floor
+            content: args.tileset.floor
             on_placement: args.enemy_placer
         }
         'D': {
             add: SourceMap.FLAG_SEETHROUGH
-            content: TileSets.snake.floor
+            content: args.tileset.floor
             on_placement: args.dungeon_placer
         }
         'W': {
             add: SourceMap.FLAG_SOLID
-            content: TileSets.snake.wall
+            content: args.tileset.wall
             matches_all: SourceMap.FLAG_SOLID
-        }
-        'd': {
-            add: SourceMap.FLAG_SEETHROUGH
-            content: TileSets.snake.floor
-            on_placement: (map, xy) ->
-                 -- nil is passed for the default open sprite
-                MapUtils.spawn_door(map, xy, nil, M._rune_door_closed)
         }
         'w': {
             add: SourceMap.FLAG_SOLID
-            content: TileSets.snake.wall_alt
+            content: args.tileset.wall_alt
         }
     }
     data: [=[.....WWW.
@@ -120,7 +169,7 @@ M.skull_surrounded_dungeon = (args) -> {
 -- - item_placer
 -- - gold_placer
 M.anvil_encounter = (args) -> {
-    legend: make_legend {
+    legend: make_legend args, {
         'a': {
             add: {SourceMap.FLAG_SEETHROUGH}
             content: TileSets.snake.floor
@@ -159,20 +208,20 @@ M.anvil_encounter = (args) -> {
             on_placement: args.item_placer
         }
         'W': {
-            add: SourceMap.FLAG_SOLID
+            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}
             content: TileSets.snake.wall
             matches_all: SourceMap.FLAG_SOLID
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
         'd': {
             add: SourceMap.FLAG_SEETHROUGH
             content: TileSets.snake.floor
-            on_placement: (map, xy) ->
-                 -- nil is passed for the default open sprite
-                MapUtils.spawn_door(map, xy, nil, M._rune_door_closed)
+            on_placement: args.door_placer
         }
         'w': {
-            add: SourceMap.FLAG_SOLID
+            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}
             content: TileSets.snake.wall_alt
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
         '<': {
            add: SourceMap.FLAG_SOLID
@@ -188,16 +237,16 @@ M.anvil_encounter = (args) -> {
         }
     }
     data: [=[................................++...........
-...............................WddW..........
-...............................WssW..........
-...............................WssW..........
-...............................WssW..........
-.............................WWWddWWWWW......
-..........................WWWWWWaaaaWWWW.....
-.......................WWWWWWWWaaaaaaWWWW....
-................WWWWWWWWWWWWaaaaaaaaaaWWW....
-...........WWWWWWWWWWWWWWaaaaaaaaaaaaaaWW....
-.........WWWWWWWWWaaaaaaaaaaabbbbbaaaaaWW....
+...............................wddw..........
+...............................wssw..........
+...............................wssw..........
+...............................wssw..........
+.............................wwwddwwwww......
+..........................wwwwwwaaaawwww.....
+.......................wwwwwwwwaaaaaawwww....
+................wwwwwwwwwwwwaaaaaaaaaawww....
+...........wwwwwwwwwwwwwwaaaaaaaaaaaaaaww....
+.........wwwwwwwwwaaaaaaaaaaabbbbbaaaaaww....
 .......WWWWWWaaaaaaaaaaaaaabbbbbbbbaaaaWWW...
 .....WWWWWWaaaaaaabbbaaaEEaaabbbbaaaaaaWWW...
 ....WWWWWaaa<aaaabbbbbaaaaaaaaaaaaaaaaWWWW...
@@ -228,20 +277,20 @@ WWWWcccccecccBceccccWWWWWWWWWaaaaaWWWWWWWWWWW
 -- - store_placer
 -- - item_placer
 -- - rng 
-M.shop_vault = (args) -> {
-    legend: make_legend {
-        '!': {add: SourceMap.FLAG_SEETHROUGH, content: TileSets.snake.floor, on_placement: args.store_placer, matches_none: SourceMap.FLAG_SOLID}
-        '*': {add: SourceMap.FLAG_SEETHROUGH, content: TileSets.snake.floor, on_placement: args.gold_placer, matches_none: SourceMap.FLAG_SOLID}
-        'i': {add: SourceMap.FLAG_SEETHROUGH, content: TileSets.snake.floor, on_placement: args.item_placer, matches_none: SourceMap.FLAG_SOLID}
-        'e': {add: SourceMap.FLAG_SEETHROUGH, content: TileSets.snake.floor, on_placement: args.enemy_placer, matches_none: SourceMap.FLAG_SOLID}
-        'p': {add: SourceMap.FLAG_SEETHROUGH, content: TileSets.snake.floor, matches_none: SourceMap.FLAG_SOLID}
+M.small_random_vault = (args) -> {
+    legend: make_legend args, {
+        '!': {add: SourceMap.FLAG_SEETHROUGH, content: args.tileset.floor, on_placement: args.store_placer, matches_none: SourceMap.FLAG_SOLID}
+        '*': {add: SourceMap.FLAG_SEETHROUGH, content: args.tileset.floor, on_placement: args.gold_placer, matches_none: SourceMap.FLAG_SOLID}
+        'i': {add: SourceMap.FLAG_SEETHROUGH, content: args.tileset.floor, on_placement: args.item_placer, matches_none: SourceMap.FLAG_SOLID}
+        'e': {add: SourceMap.FLAG_SEETHROUGH, content: args.tileset.floor, on_placement: args.enemy_placer, matches_none: SourceMap.FLAG_SOLID}
+        'p': {add: SourceMap.FLAG_SEETHROUGH, content: args.tileset.floor, matches_none: SourceMap.FLAG_SOLID}
         'd': {
             add: SourceMap.FLAG_SOLID
-            content: TileSets.snake.wall_alt
+            content: args.tileset.floor_alt
             on_placement: (map, xy) ->
                 MapUtils.spawn_door(map, xy)
         }
-        'x': {add: SourceMap.FLAG_SOLID, content: TileSets.snake.wall_alt}
+        'x': {add: SourceMap.FLAG_SOLID, content: args.tileset.wall_alt}
     }
     data: random_choice {[=[....++++++
 ..++xxxx++
@@ -302,5 +351,17 @@ M.shop_vault = (args) -> {
     }
 }
 
+M.small_item_vault = (args) -> table.merge M.small_random_vault(args), {
+    data: random_choice {[=[++++++
++xxxx+
++xipd+
++xxxx+
+++++++]=],[=[+++++
++xxx+
++xid+
++xxx+
++++++]=]
+    }
+}
 
 return M

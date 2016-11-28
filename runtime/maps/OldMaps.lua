@@ -164,7 +164,7 @@ local function tconcat(t1, t2)
     return t
 end
 
-local map_layouts = {
+M.Dungeon1 = {
   -- Level 1
   { layout = tiny_layouts,
     content = {
@@ -198,24 +198,35 @@ local map_layouts = {
       }
     }
   },
-  -- -- Level 2
-  -- { layout = tiny_layouts,
-  --   content = {
-  --     items = { amount = 4,  group = item_groups.basic_items },
-  --     enemies = {
-  --       wandering = false,
-  --       amount = 12,
-  --       generated = {
-  --         {enemy = "Giant Rat",         chance = 100  },
-  --         {enemy = "Giant Bat",         chance = 100 },
-  --         {enemy = "Hound",         chance = 100 },
-  --         {enemy = "Cloud Elemental",   chance = 50 },
-  --         {enemy = "Giant Spider",   chance = 50 }
-  --       }
-  --     }  
-  --   }
-  -- },
-  -- Level 3
+}
+
+M.Dungeon2 = {
+  -- Level 1
+  { layout = tiny_layouts,
+    content = {
+      items = { amount = 3,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
+      enemies = {
+        wandering = false,
+        amount = 7,
+        generated = M.medium_enemies 
+      }
+    }
+  },
+
+  -- Level 2
+  { layout = {small_layout1},
+    content = {
+      items = { amount = 6,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
+      enemies = {
+        wandering = true,
+        amount = 10,
+        generated = M.medium_enemies
+    }
+    }
+  }
+}
+
+M.Dungeon3 = {
   { layout = small_layouts,
     content = {
       items = { amount = 5,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
@@ -225,7 +236,6 @@ local map_layouts = {
       }
     }
   },
-  -- Level 4
   { layout = small_layouts,
     content = {
       items = { amount = 8,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
@@ -235,7 +245,6 @@ local map_layouts = {
       }
     }
   },
-  -- Level 5
   { templates = {path_resolve "dungeon1room1a.txt", path_resolve "dungeon1room1b.txt", path_resolve "dungeon1room1c.txt"},
     content = {
       items = { amount = 4,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
@@ -244,7 +253,9 @@ local map_layouts = {
         generated = tconcat(M.medium_enemies, {{enemy = "Hell Warrior", guaranteed_spawns = 1}})
       }
     }
-  },
+  }
+}
+M.Dungeon4 = {
   -- Level 6
   { layout = {small_layout1},
     content = {
@@ -295,31 +306,7 @@ local map_layouts = {
         generated = tconcat(M.harder_enemies, {{enemy = "Zin", guaranteed_spawns = 1}})
       }
     }
-  },
-  -- EASIER LEVELS, TODO REORGANIZE
-  -- Level 11
-  { layout = tiny_layouts,
-    content = {
-      items = { amount = 3,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
-      enemies = {
-        wandering = false,
-        amount = 7,
-        generated = M.medium_enemies 
-      }
-    }
-  },
-
-  -- Level 12
-  { layout = {small_layout1},
-    content = {
-      items = { amount = 6,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
-      enemies = {
-        wandering = true,
-        amount = 10,
-        generated = M.medium_enemies
-    }
-    }
-  },
+  }
 }
 
 local function range_resolve(r)
@@ -511,8 +498,10 @@ local function generate_from_template(label, template, tileset)
     })
 end
 
-function M.create_map(label, floor, tileset)
-    local entry = map_layouts[floor]
+function M.create_map(dungeon, floor)
+    local label = dungeon.label .. " " .. floor
+    local entry = dungeon.templates[floor]
+    local tileset = dungeon.tileset
     -- Resolve room width & height ranges by applying range_resolve
     local map
     if entry.layout then
@@ -526,11 +515,15 @@ function M.create_map(label, floor, tileset)
         local template = random_choice(entry.templates)
         map = generate_from_template(label, template, tileset)
     end
+    -- TODO consolidate what is actually expected of maps.
+    -- For now, just fake one region for 01_Overworld.moon
+    map.regions = { {conf = {}, bbox = function(self) return {0,0, map.size[1], map.size[2]} end}}
     generate_content(map, entry.content, tileset)
+    if dungeon.on_generate and not dungeon.on_generate(map, floor) then
+        return nil
+    end
     return map
 end
-
-M.last_floor = #map_layouts
 
 -- Submodule
 return M

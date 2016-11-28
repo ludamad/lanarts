@@ -73,8 +73,8 @@ function M.random_enemy(map, type, --[[Optional]] area, --[[Optional]] selector)
     return M.spawn_enemy(map, type, sqr)
 end
 
-function M.spawn_door(map, sqr, --[[Optional]] open_sprite, --[[Optional]] closed_sprite)
-    local object = DungeonFeatures.Door.create { do_init = false, xy = M.from_tile_xy(sqr), open_sprite = open_sprite, closed_sprite = closed_sprite }
+function M.spawn_door(map, sqr, --[[Optional]] open_sprite, --[[Optional]] closed_sprite, --[[Optional]] required_key)
+    local object = DungeonFeatures.Door.create { do_init = false, xy = M.from_tile_xy(sqr), open_sprite = open_sprite, closed_sprite = closed_sprite, required_key = required_key }
     table.insert(map.instances, object)
     return object
 end

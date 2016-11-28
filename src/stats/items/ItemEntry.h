@@ -53,7 +53,8 @@ public:
 	LuaLazyValue& inventory_use_prereq_func() {
 		return use_action.prereq_func;
 	}
-	const std::string& inventory_use_message() {
+
+        const std::string& inventory_use_message() {
 		return use_action.success_message;
 	}
 	const std::string& inventory_use_fail_message() {
@@ -65,6 +66,7 @@ public:
 	// Cost when appearing in shops, if (0,0) will not appear in shops.
 	Range shop_cost;
 	LuaAction use_action;
+	LuaValue pickup_call;
 	sprite_id item_sprite;
 	bool stackable;
 };

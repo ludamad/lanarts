@@ -74,6 +74,7 @@ void ItemEntry::parse_lua_table(const LuaValue& table) {
 			std::string());
 	use_action.failure_message = set_if_nil(table, "cant_use_message",
 			std::string());
+        pickup_call = table["pickup_func"];
 
 	if (!table["action_func"].isnil()) {
 		use_action.action_func = LuaLazyValue(table["action_func"]);

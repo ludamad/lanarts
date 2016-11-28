@@ -19,3 +19,10 @@ sprites:
     
   - name: health_potion
     file: items/misc/sprites/redpotion.png
+
+  - name: key1
+    file: spr_keys/key01.png
+  - name: key2
+    file: spr_keys/key02.png
+  - name: key3
+    file: spr_keys/key03.png

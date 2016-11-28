@@ -4,6 +4,7 @@ local Display = require "core.Display"
 
 local ObjectUtils = require "objects.ObjectUtils"
 local LuaGameObject = require "objects.LuaGameObject"
+local GlobalData = require "core.GlobalData"
 
 local M = nilprotect {} -- Submodule
 
@@ -59,10 +60,14 @@ function Door:on_step()
         return
     end
 
+    local needs_key = (self.required_key ~= false)
     local is_open = false
     local collisions = Map.rectangle_collision_check(self.map, self.area, self)
     for object in values(collisions) do
-        if object.team then -- TODO proper combat object detection
+        if not needs_key and object.team then -- TODO proper combat object detection
+            is_open = true
+            break
+        elseif needs_key and object.class_name and GlobalData.keys_picked_up[self.required_key] then -- TODO proper player object detection
             is_open = true
             break
         end
@@ -107,6 +112,7 @@ function Door:init(args)
     self.closed_sprite = args.closed_sprite or M._door_closed
     self.depth = args.depth or M.FEATURE_DEPTH
     self.padding = 4
+    self.required_key = args.required_key or false
 end
 
 return M

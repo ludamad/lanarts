@@ -1,6 +1,6 @@
 local GameObject = require "core.GameObject"
 
-local assert, do_nothing, tmerge, setmetatable, rawget = assert, do_nothing, table.merge, setmetatable, rawget
+local assert, do_nothing, tmerge, setmetatable, rawget = assert, do_nothing, table.merge_into, setmetatable, rawget
 local getmetatable = getmetatable
 
 local M = {}

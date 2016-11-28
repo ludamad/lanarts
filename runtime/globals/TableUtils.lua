@@ -4,8 +4,14 @@
 local type, select, setmetatable, getmetatable, rawget, pairs, ipairs, table = type, select, setmetatable, getmetatable, rawget, pairs, ipairs, table
 
 function table.merge(t1, t2)
+    local ret = {}
+    for k,v in pairs(t1) do ret[k] = v end
+    for k,v in pairs(t2) do ret[k] = v end
+    return ret
+end
+
+function table.merge_into(t1, t2)
     for k,v in pairs(t2) do t1[k] = v end
-    return t1
 end
 
 local function metacopy(t1, t2)
