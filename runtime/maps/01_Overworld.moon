@@ -550,12 +550,13 @@ overworld_features = (map) ->
         vault = SourceMap.area_template_create(Vaults.anvil_encounter {:enemy_placer, :boss_placer, :item_placer, :gold_placer, :door_placer})
         if not place_feature(map, vault, (r) -> true)
             return true
-    if place_centaur_challenge() then return nil
+    --if place_centaur_challenge() then return nil
     ---------------------------------
 
     ---------------------------------
     place_tunnel = () ->
-        for template in *{Vaults.cavern, Vaults.tunnel, Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge}
+        --for template in *{Vaults.cavern, Vaults.tunnel, Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge}
+        for template in *{Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge}
             enemy_placer = (map, xy) ->
                 enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
                 MapUtils.spawn_enemy(map, enemy, xy)
@@ -571,8 +572,8 @@ overworld_features = (map) ->
                 MapUtils.spawn_door(map, xy)
             vault = SourceMap.area_template_create(template {:enemy_placer, :store_placer, :item_placer, :gold_placer, :door_placer})
             if not place_feature(map, vault, (r) -> r.conf.is_overworld)
-                continue -- Dont reject
-                -- return true
+                -- Dont reject
+                return false
     if place_tunnel() then return nil
     ---------------------------------
 
