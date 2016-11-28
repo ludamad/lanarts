@@ -76,10 +76,10 @@ OVERWORLD_CONF = (rng) -> {
 
 DUNGEON_CONF = (rng) -> 
     -- Brown layout or blue layout?
-    tileset = TileSets.crystal
+    tileset = TileSets.pebble
     C = create_dungeon_scheme(tileset)
     -- Rectangle-heavy or polygon-heavy?
-    switch rng\random(3)
+    switch 1 -- rng\random(3)
         when 0
             -- Few, big, rooms?
             C.number_regions = rng\random(5,10)
@@ -91,7 +91,7 @@ DUNGEON_CONF = (rng) ->
             C.rect_room_size_range = {10,15}
         when 1
             -- Mix?
-            C.number_regions = rng\random(5,20)
+            C.number_regions = rng\random(15,20)
             C.room_radius = () ->
                 r = 2
                 for j=1,rng\random(0,10) do r += rng\randomf(0, 1)
@@ -110,7 +110,7 @@ DUNGEON_CONF = (rng) ->
 
     return table.merge C, {
         map_label: "A Dungeon"
-        size: if rng\random(0,2) == 0 then {55, 45} else {45, 55} 
+        size: {65,65} 
         rvo_iterations: 20
         n_stairs_down: 3
         n_stairs_up: 0
@@ -315,44 +315,43 @@ overworld_spawns = (map) ->
         else
             OldMaps.generate_from_enemy_entries(map, OldMaps.medium_enemies, 15, area, {matches_none: {SourceMap.FLAG_SOLID, FLAG_NO_ENEMY_SPAWN}})
 
-overworld_features = (map) ->
-    {mw, mh} = map.size
-    place_feature = (map, template, region_filter) ->
-       -- Function to try a single placement, returns success:
-       attempt_placement = (template) ->
-           orient = map.rng\random_choice {
-               SourceMap.ORIENT_DEFAULT, SourceMap.ORIENT_FLIP_X, SourceMap.ORIENT_FLIP_Y,
-               SourceMap.ORIENT_TURN_90, SourceMap.ORIENT_TURN_180, SourceMap.ORIENT_TURN_270
-           }
-           for r in *map.regions
-               if not region_filter(r)
-                   continue
-               {w, h} = template.size
-               -- Account for rotation in size:
-               if orient == SourceMap.ORIENT_TURN_90 or orient == SourceMap.ORIENT_TURN_180
-                   w, h = h, w
-               {x1, y1, x2, y2} = r\bbox()
-               -- Expand just outside the bounds of the region:
-               x1, y1, x2, y2 = (x1 - w), (y1 - h), (x2 + w), (y2 + h)
-               -- Ensure we are within the bounds of the world map:
-               x1, y1, x2, y2 = math.max(x1, 0), math.max(y1, 0), math.min(x2, map.size[1] - w), math.min(y2, map.size[2] - h)
-               top_left_xy = MapUtils.random_square(map, {x1, y1, x2, y2})
-               apply_args = {:map, :top_left_xy, orientation: orient }
-               if template\matches(apply_args)
-                   template\apply(apply_args)
-                   return true
-           return false
-       -- Function to try placement n times, returns success:
-       attempt_placement_n_times = (template, n) ->
-           for i=1,n
-               if attempt_placement(template)
-                   return true
-           return false
-       -- Try to create the template object using our placement routines:
-       if attempt_placement_n_times(template, 100)
-           -- Exit, as we have handled the first overworld component
-           return true
+place_feature = (map, template, region_filter) ->
+   -- Function to try a single placement, returns success:
+   attempt_placement = (template) ->
+       orient = map.rng\random_choice {
+           SourceMap.ORIENT_DEFAULT, SourceMap.ORIENT_FLIP_X, SourceMap.ORIENT_FLIP_Y,
+           SourceMap.ORIENT_TURN_90, SourceMap.ORIENT_TURN_180, SourceMap.ORIENT_TURN_270
+       }
+       for r in *map.regions
+           if not region_filter(r)
+               continue
+           {w, h} = template.size
+           -- Account for rotation in size:
+           if orient == SourceMap.ORIENT_TURN_90 or orient == SourceMap.ORIENT_TURN_180
+               w, h = h, w
+           {x1, y1, x2, y2} = r\bbox()
+           -- Expand just outside the bounds of the region:
+           x1, y1, x2, y2 = (x1 - w), (y1 - h), (x2 + w), (y2 + h)
+           -- Ensure we are within the bounds of the world map:
+           x1, y1, x2, y2 = math.max(x1, 0), math.max(y1, 0), math.min(x2, map.size[1] - w), math.min(y2, map.size[2] - h)
+           top_left_xy = MapUtils.random_square(map, {x1, y1, x2, y2})
+           apply_args = {:map, :top_left_xy, orientation: orient }
+           if template\matches(apply_args)
+               template\apply(apply_args)
+               return true
        return false
+   -- Function to try placement n times, returns success:
+   attempt_placement_n_times = (template, n) ->
+       for i=1,n
+           if attempt_placement(template)
+               return true
+       return false
+   -- Try to create the template object using our placement routines:
+   if attempt_placement_n_times(template, 100)
+       -- Exit, as we have handled the first overworld component
+       return true
+   return false
+overworld_features = (map) ->
     OldMapSeq1 = MapSequence.create {preallocate: 1}
     OldMapSeq2 = MapSequence.create {preallocate: 1}
     OldMapSeq3 = MapSequence.create {preallocate: 1}
@@ -360,124 +359,185 @@ overworld_features = (map) ->
 
     ------------------------- 
     -- Place easy dungeon: --
-    local templates 
-    templates = OldMaps.Dungeon1
-    on_generate_dungeon = (map, floor) ->
-        if floor == #templates
-            ------------------------- 
-            -- Place key vault     --
-            item_placer = (map, xy) -> MapUtils.spawn_item(map, "Azurite Key", 1, xy)
-            tileset = TileSets.temple
-            vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
-            if not place_feature(map, vault, (r) -> true)
-                return nil
-            ------------------------- 
-        return true
-    door_placer = (map, xy) ->
-        -- nil is passed for the default open sprite
-        MapUtils.spawn_door(map, xy)
-    dungeon = {label: 'Hideaway', tileset: TileSets.pebble, :templates, on_generate: on_generate_dungeon}
-    place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq1, dungeon)
-    vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, :door_placer, player_spawn_area: true, tileset: TileSets.pebble})
-    if not place_feature(map, vault, (r) -> r.conf.is_overworld)
-        return nil
+    place_easy = () ->
+        local templates 
+        templates = OldMaps.Dungeon1
+        on_generate_dungeon = (map, floor) ->
+            if floor == #templates
+                ------------------------- 
+                -- Place key vault     --
+                item_placer = (map, xy) -> MapUtils.spawn_item(map, "Azurite Key", 1, xy)
+                tileset = TileSets.temple
+                vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
+                if not place_feature(map, vault, (r) -> true)
+                    return nil
+                ------------------------- 
+            return true
+        door_placer = (map, xy) ->
+            -- nil is passed for the default open sprite
+            MapUtils.spawn_door(map, xy)
+        dungeon = {label: 'Hideaway', tileset: TileSets.pebble, :templates, on_generate: on_generate_dungeon}
+        place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq1, dungeon)
+        vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, :door_placer, player_spawn_area: true, tileset: TileSets.pebble})
+        if not place_feature(map, vault, (r) -> r.conf.is_overworld)
+            return true
+    if place_easy() then return nil
     ------------------------- 
 
     -----------------------------
     -- Place medium dungeon 1: --
-    local templates 
-    templates = OldMaps.Dungeon2
-    on_generate_dungeon = (map, floor) ->
-        if floor == #templates
-            ------------------------- 
-            -- Place key vault     --
-            item_placer = (map, xy) -> MapUtils.spawn_item(map, "Dandelite Key", 1, xy)
-            tileset = TileSets.crystal
-            vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
-            if not place_feature(map, vault, (r) -> true)
-                return nil
-            ------------------------- 
-        return true
-    dungeon = {label: 'Temple', tileset: TileSets.temple, :templates, on_generate: on_generate_dungeon}
-    gold_placer = (map, xy) ->
-        MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-    door_placer = (map, xy) ->
-        -- nil is passed for the default open sprite
-        MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
-    place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq2, dungeon)
-    vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.temple, :door_placer, :gold_placer})
-    if not place_feature(map, vault, (r) -> r.conf.is_overworld)
-        return nil
+    place_medium1 = () ->
+        local templates 
+        templates = OldMaps.Dungeon2
+        on_generate_dungeon = (map, floor) ->
+            if floor == #templates
+                ------------------------- 
+                -- Place key vault     --
+                item_placer = (map, xy) -> MapUtils.spawn_item(map, "Dandelite Key", 1, xy)
+                tileset = TileSets.crystal
+                vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
+                if not place_feature(map, vault, (r) -> true)
+                    return nil
+                ------------------------- 
+            return true
+        dungeon = {label: 'Temple', tileset: TileSets.temple, :templates, on_generate: on_generate_dungeon}
+        gold_placer = (map, xy) ->
+            MapUtils.spawn_item(map, "Gold", random(2,10), xy)
+        door_placer = (map, xy) ->
+            -- nil is passed for the default open sprite
+            MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
+        place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq2, dungeon)
+        vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.temple, :door_placer, :gold_placer})
+        if not place_feature(map, vault, (r) -> r.conf.is_overworld)
+            return true
+    if place_medium1() then return nil
     -----------------------------
 
     -----------------------------
     -- Place medium dungeon 2: --
-    local templates 
-    templates = OldMaps.Dungeon3
-    on_generate_dungeon = (map, floor) ->
-        if floor == #templates
-            ------------------------- 
-            -- Place key vault     --
-            item_placer = (map, xy) -> MapUtils.spawn_item(map, "Burgundite Key", 1, xy)
-            tileset = TileSets.crystal
-            vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
-            if not place_feature(map, vault, (r) -> true)
-                return nil
-            ------------------------- 
-        return true
-    gold_placer = (map, xy) ->
-        MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-    dungeon = {label: 'Crystal Mines', tileset: TileSets.crystal, :templates, on_generate: on_generate_dungeon}
-    door_placer = (map, xy) ->
-        -- nil is passed for the default open sprite
-        MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
-    place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq3, dungeon)
-    vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.crystal, :door_placer, :gold_placer})
-    if not place_feature(map, vault, (r) -> not r.conf.is_overworld)
-        return nil
+    place_medium2 = () ->
+        local templates 
+        templates = OldMaps.Dungeon3
+        on_generate_dungeon = (map, floor) ->
+            if floor == #templates
+                ------------------------- 
+                -- Place key vault     --
+                item_placer = (map, xy) -> MapUtils.spawn_item(map, "Burgundite Key", 1, xy)
+                tileset = TileSets.crystal
+                vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
+                if not place_feature(map, vault, (r) -> true)
+                    return nil
+                ------------------------- 
+            return true
+        gold_placer = (map, xy) ->
+            MapUtils.spawn_item(map, "Gold", random(2,10), xy)
+        dungeon = {label: 'Crystal Mines', tileset: TileSets.crystal, :templates, on_generate: on_generate_dungeon}
+        door_placer = (map, xy) ->
+            -- nil is passed for the default open sprite
+            MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
+        place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq3, dungeon)
+        vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.crystal, :door_placer, :gold_placer})
+        if not place_feature(map, vault, (r) -> not r.conf.is_overworld)
+            return true
+    if place_medium2() then return nil
     -----------------------------
 
     ------------------------- 
     -- Place hard dungeon: --
-    tileset = TileSets.snake
-    dungeon = {label: 'Zin\'s Palace', :tileset, templates: OldMaps.Dungeon4}
-    door_placer = (map, xy) ->
-        -- nil is passed for the default open sprite
-        MapUtils.spawn_door(map, xy, nil, Vaults._door_key3, "Burgundite Key")
-    enemy_placer = (map, xy) ->
-        enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
-        MapUtils.spawn_enemy(map, enemy, xy)
-    place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq4, dungeon)
-    vault = SourceMap.area_template_create(Vaults.skull_surrounded_dungeon {dungeon_placer: place_dungeon, :enemy_placer, :door_placer, :tileset})
-    if not place_feature(map, vault, (r) -> not r.conf.is_overworld)
-        return nil
+    place_hard = () ->
+        tileset = TileSets.snake
+        dungeon = {label: 'Zin\'s Palace', :tileset, templates: OldMaps.Dungeon4}
+        door_placer = (map, xy) ->
+            -- nil is passed for the default open sprite
+            MapUtils.spawn_door(map, xy, nil, Vaults._door_key3, "Burgundite Key")
+        enemy_placer = (map, xy) ->
+            enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
+            MapUtils.spawn_enemy(map, enemy, xy)
+        place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq4, dungeon)
+        vault = SourceMap.area_template_create(Vaults.skull_surrounded_dungeon {dungeon_placer: place_dungeon, :enemy_placer, :door_placer, :tileset})
+        if not place_feature(map, vault, (r) -> not r.conf.is_overworld)
+            return true
+    if place_hard() then return nil
     ------------------------- 
 
     ------------------------- 
     -- Place small_random_vaults:  --
-    for i=1,map.rng\random(2,4)
-        enemy_placer = (map, xy) ->
-            enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
-            MapUtils.spawn_enemy(map, enemy, xy)
-        store_placer = (map, xy) ->
-            Region1.generate_store(map, xy)
-        item_placer = (map, xy) ->
-            item = ItemUtils.item_generate(ItemGroups.basic_items)
-            MapUtils.spawn_item(map, item.type, item.amount, xy)
-        gold_placer = (map, xy) ->
-            MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-        tileset = TileSets.snake
-        vault = SourceMap.area_template_create(Vaults.small_random_vault {rng: map.rng, item_placer, :enemy_placer, :gold_placer, :store_placer, :tileset, :door_placer, :tileset})
-        if not place_feature(map, vault, (r) -> true)
-            return nil
+    place_small_vaults = () ->
+        for i=1,map.rng\random(2,4)
+            enemy_placer = (map, xy) ->
+                enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
+                MapUtils.spawn_enemy(map, enemy, xy)
+            door_placer = (map, xy) ->
+                -- nil is passed for the default open sprite
+                MapUtils.spawn_door(map, xy, nil, xy)
+            store_placer = (map, xy) ->
+                Region1.generate_store(map, xy)
+            item_placer = (map, xy) ->
+                item = ItemUtils.item_generate(ItemGroups.basic_items)
+                MapUtils.spawn_item(map, item.type, item.amount, xy)
+            gold_placer = (map, xy) ->
+                MapUtils.spawn_item(map, "Gold", random(2,10), xy)
+            tileset = TileSets.snake
+            vault = SourceMap.area_template_create(Vaults.small_random_vault {rng: map.rng, item_placer, :enemy_placer, :gold_placer, :store_placer, :tileset, :door_placer, :tileset})
+            if not place_feature(map, vault, (r) -> true)
+                return true
+    if place_small_vaults() then return nil
     ------------------------- 
 
     ---------------------------------
     -- Place big vaults            --
-    for template in *{Vaults.big_encounter1, Vaults.big_encounter2}
+    place_big_vaults = () ->
+        for template in *{Vaults.big_encounter1, Vaults.big_encounter2}
+            enemy_placer = (map, xy) ->
+                enemy = OldMaps.enemy_generate(OldMaps.medium_enemies)
+                MapUtils.spawn_enemy(map, enemy, xy)
+            item_placer = (map, xy) ->
+                item = ItemUtils.item_generate(ItemGroups.basic_items)
+                MapUtils.spawn_item(map, item.type, item.amount, xy)
+            gold_placer = (map, xy) ->
+                if map.rng\chance(.7) 
+                    MapUtils.spawn_item(map, "Gold", random(2,10), xy)
+            door_placer = (map, xy) ->
+                -- nil is passed for the default open sprite
+                MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, 'Dandelite Key')
+            vault = SourceMap.area_template_create(template {:enemy_placer, :item_placer, :gold_placer, :door_placer})
+            if not place_feature(map, vault, (r) -> true)
+                return true
+    if place_big_vaults() then return nil
+    ---------------------------------
+
+    ---------------------------------
+    -- Place big vaults            --
+    place_tunnel = () ->
+        for template in *{Vaults.cavern, Vaults.tunnel}
+            enemy_placer = (map, xy) ->
+                enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
+                MapUtils.spawn_enemy(map, enemy, xy)
+            store_placer = (map, xy) ->
+                Region1.generate_store(map, xy)
+            item_placer = (map, xy) ->
+                item = ItemUtils.item_generate(ItemGroups.basic_items)
+                MapUtils.spawn_item(map, item.type, item.amount, xy)
+            gold_placer = (map, xy) ->
+                MapUtils.spawn_item(map, "Gold", random(2,10), xy)
+            door_placer = (map, xy) ->
+                -- nil is passed for the default open sprite
+                MapUtils.spawn_door(map, xy)
+            vault = SourceMap.area_template_create(template {:enemy_placer, :store_placer, :item_placer, :gold_placer, :door_placer})
+            if not place_feature(map, vault, (r) -> true)
+                return true
+    if place_tunnel() then return nil
+    ---------------------------------
+
+
+    ---------------------------------
+    -- Place centaur challenge     --
+    place_centaur_challenge = () ->
         enemy_placer = (map, xy) ->
             enemy = OldMaps.enemy_generate(OldMaps.medium_enemies)
             MapUtils.spawn_enemy(map, enemy, xy)
+        boss_placer = (map, xy) ->
+            MapUtils.spawn_enemy(map, "Dark Centaur", xy)
         item_placer = (map, xy) ->
             item = ItemUtils.item_generate(ItemGroups.basic_items)
             MapUtils.spawn_item(map, item.type, item.amount, xy)
@@ -486,31 +546,11 @@ overworld_features = (map) ->
                 MapUtils.spawn_item(map, "Gold", random(2,10), xy)
         door_placer = (map, xy) ->
             -- nil is passed for the default open sprite
-            MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, 'Dandelite Key')
-        vault = SourceMap.area_template_create(template {:enemy_placer, :item_placer, :gold_placer, :door_placer})
+            MapUtils.spawn_door(map, xy, nil, Vaults._rune_door_closed)
+        vault = SourceMap.area_template_create(Vaults.anvil_encounter {:enemy_placer, :boss_placer, :item_placer, :gold_placer, :door_placer})
         if not place_feature(map, vault, (r) -> true)
-            return nil
-    ---------------------------------
-
-    ---------------------------------
-    -- Place centaur challenge     --
-    enemy_placer = (map, xy) ->
-        enemy = OldMaps.enemy_generate(OldMaps.medium_enemies)
-        MapUtils.spawn_enemy(map, enemy, xy)
-    boss_placer = (map, xy) ->
-        MapUtils.spawn_enemy(map, "Dark Centaur", xy)
-    item_placer = (map, xy) ->
-        item = ItemUtils.item_generate(ItemGroups.basic_items)
-        MapUtils.spawn_item(map, item.type, item.amount, xy)
-    gold_placer = (map, xy) ->
-        if map.rng\chance(.7) 
-            MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-    door_placer = (map, xy) ->
-        -- nil is passed for the default open sprite
-        MapUtils.spawn_door(map, xy, nil, Vaults._rune_door_closed)
-    vault = SourceMap.area_template_create(Vaults.anvil_encounter {:enemy_placer, :boss_placer, :item_placer, :gold_placer, :door_placer})
-    if not place_feature(map, vault, (r) -> true)
-        return nil
+            return true
+    if place_centaur_challenge() then return nil
     ---------------------------------
 
     -- Return the post-creation callback:
@@ -555,11 +595,11 @@ overworld_try_create = (rng) ->
             major_regions, outer\bbox()
         if r == nil
             return nil
-        r.max_speed = 100
+        r.max_speed = 32
         r.conf = subconf
  
     -- No rvo for now
-    major_regions\steps(150)
+    major_regions\steps(1500)
 
     -- Apply the regions:
     for r in *major_regions.regions

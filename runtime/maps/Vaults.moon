@@ -26,9 +26,11 @@ M._door_key3 = Display.image_load "spr_keys/door03.png"
 M._anvil = Display.image_load "features/sprites/anvil.png"
 
 -- Common definitions:
+UNSOLID_ADD = {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
 make_legend = (args, legend) ->
     args.tileset or= {}
     return table.merge {
+        '!': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.store_placer, matches_none: SourceMap.FLAG_SOLID}
         '.': { -- '.' means 'any tile'
             remove: {}
         }
@@ -172,41 +174,49 @@ M.skull_surrounded_dungeon = (args) -> {
 M.anvil_encounter = (args) -> {
     legend: make_legend args, {
         'a': {
-            add: {SourceMap.FLAG_SEETHROUGH}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
             content: TileSets.snake.floor
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
         'b': {
-            add: SourceMap.FLAG_SEETHROUGH
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
             content: TileSets.snake.floor_alt
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
         'c': {
-            add: SourceMap.FLAG_SEETHROUGH
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
             content: TileSets.pebble.floor_alt
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
         'B': {
-            add: {SourceMap.FLAG_SEETHROUGH}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
             content: TileSets.pebble.floor_alt
             on_placement: args.boss_placer
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
         'e': {
-            add: {SourceMap.FLAG_SEETHROUGH}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
             content: TileSets.pebble.floor_alt
             on_placement: args.enemy_placer
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
         'E': {
-            add: {SourceMap.FLAG_SEETHROUGH}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
             content: TileSets.snake.floor
             on_placement: args.enemy_placer
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
         '*': {
-            add: {SourceMap.FLAG_SEETHROUGH}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
             content: TileSets.pebble.floor_alt
             on_placement: args.gold_placer
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
         'i': {
-            add: {SourceMap.FLAG_SEETHROUGH}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
             content: TileSets.pebble.floor_alt
             on_placement: args.item_placer
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
         'W': {
             add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}
@@ -219,6 +229,7 @@ M.anvil_encounter = (args) -> {
             remove: SourceMap.FLAG_SOLID
             content: TileSets.snake.floor
             on_placement: args.door_placer
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
         'w': {
             add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}
@@ -226,16 +237,18 @@ M.anvil_encounter = (args) -> {
             matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
         '<': {
-           add: SourceMap.FLAG_SOLID
+           add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}
            content: TileSets.snake.floor
            on_placement: (map, xy) ->
                 MapUtils.spawn_decoration(map, M._anvil, xy)
+           matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
         's': {
             add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN}
             content: TileSets.snake.floor
             on_placement: (map, xy) ->
                 MapUtils.spawn_decoration(map, M._warning_skull, xy, 0, false)
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
         }
     }
     data: [=[................................++...........
@@ -308,26 +321,6 @@ M.big_encounter1 = (args) -> {
 .................................wwwwwwaaawwwwwwww.........................................................
 .................................wwwwwwdddwwwwwwww.........................................................
 .................................wwwwww+++wwwwwwww.........................................................]=]
--- .................................wwwwwwaaaaaaaaaawwwwwwww..................................................]=]
--- .............WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWweewWWWWWWWWWWWW................................................
--- ......WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWddddWWWWWWWWWWWW................................................
--- ....WWWWWWWWWWWbbbbbbbbbbbbbbbbbbbbbbbbbbiwwwwwwbbbbbbbbbbW................................................
--- .WWWWWWWbbbbbbbbbebbbbbebbbbbbbbbbbbbbbbbbbbbbbbbbbbebbbbbb................................................
--- WWWWWWbbbbbbbbbbbbbbbbbbbb*bbbbbbbbbebbbbbbbbbbbbbbbbbbbbbb................................................
--- WWWbbbbbbbebbbbbbbbbbbbbbbbbbbbbbbbbbibbbbbbbbbbbbbbbbbbbbb................................................
--- WWbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbeebb................................................
--- WWbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb................................................
--- WWWWbbbbbbbbbbbbbbWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWbbbbb................................................
--- WWWWWWbbbbbbbbb.WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWbbb................................................
--- ..WWWWWWaaaaaaaaWWW.......................WWWWWWWWWWWWWWWWb................................................
--- ....WWWWWaaaaaaWWW....................................WWWWW................................................
--- ......WWWWaaaaaWW.......................................WWW................................................
--- ........WWWaaaWWW.........................................W................................................
--- ........WWWaaaWWW..........................................................................................
--- .........WWdddWW...........................................................................................
--- .........WW...WW...........................................................................................
--- ...........................................................................................................
--- ]=]
 }
 
 M.big_encounter2 = (args) -> {
@@ -363,6 +356,46 @@ wwwwwwbbbbbbbbbbwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwbbbw
 .........ww+++ww............................................
 ]=]
 }
+
+
+M.tunnel = (args) -> {
+    legend: table.merge M.anvil_encounter(args).legend, {
+        'w': {
+            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            content: TileSets.snake.wall
+        }
+    }
+    data: [=[
+.....wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.
+..wwwwccccccccccc*ccccccccccccccccccccccccccc*ccccccccccccww
+wwwcccccccccccccccccccccccccccciccceccccccccccccccccccccccd+
++dccccceccccccc*ccccccccccccccccccccccccccccecccccccccccccd+
++dccccccccccccccccccccccccccccccccccccccccccccccccccccccccww
+wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.
+]=]
+}
+
+M.cavern = (args) -> {
+    legend: table.merge M.anvil_encounter(args).legend, {
+        'w': {
+            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            content: TileSets.snake.wall
+        }
+    }
+    data: [=[
+..........wwwwwwwww.......
+.....wwwwwwaaaaaawwwwww...
+..wwwwaaaaaaaaaaaaaaaawww.
+wwwaaaaaaaa!aaaaaaaaaaaaww
+waaaaaaaaaaaaaaaaaaaaaaww.
+wwwaaaaaaaaaaaaaaaaaaaww..
+wwwwwwwwwww....++.........
+]=]
+}
+
+
 -- args:
 -- - gold_placer
 -- - enemy_placer
@@ -371,19 +404,18 @@ wwwwwwbbbbbbbbbbwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwbbbw
 -- - rng 
 M.small_random_vault = (args) -> {
     legend: make_legend args, {
-        '!': {add: SourceMap.FLAG_SEETHROUGH, content: args.tileset.floor, on_placement: args.store_placer, matches_none: SourceMap.FLAG_SOLID}
-        '*': {add: SourceMap.FLAG_SEETHROUGH, content: args.tileset.floor, on_placement: args.gold_placer, matches_none: SourceMap.FLAG_SOLID}
-        'i': {add: SourceMap.FLAG_SEETHROUGH, content: args.tileset.floor, on_placement: args.item_placer, matches_none: SourceMap.FLAG_SOLID}
-        'e': {add: SourceMap.FLAG_SEETHROUGH, content: args.tileset.floor, on_placement: args.enemy_placer, matches_none: SourceMap.FLAG_SOLID}
-        'p': {add: SourceMap.FLAG_SEETHROUGH, content: args.tileset.floor, matches_none: SourceMap.FLAG_SOLID}
+        '*': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.gold_placer, matches_none: SourceMap.FLAG_SOLID}
+        'i': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.item_placer, matches_none: SourceMap.FLAG_SOLID}
+        'e': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.enemy_placer, matches_none: SourceMap.FLAG_SOLID}
+        'p': {add: UNSOLID_ADD, content: args.tileset.floor, matches_none: SourceMap.FLAG_SOLID}
         'd': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
+            add: UNSOLID_ADD 
             remove: SourceMap.FLAG_SOLID
             content: args.tileset.floor_alt
             on_placement: (map, xy) ->
                 MapUtils.spawn_door(map, xy)
         }
-        'x': {add: SourceMap.FLAG_SOLID, content: args.tileset.wall_alt}
+        'x': {add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}, content: args.tileset.wall_alt}
     }
     data: random_choice {[=[....++++++
 ..++xxxx++

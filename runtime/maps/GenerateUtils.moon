@@ -173,7 +173,7 @@ RVORegionPlacer = newtype {
         for region in *@regions
             cx, cy = region\center()
             vx, vy = region\velocity_func()
-            r = math.max(region.w,region.h) -- Be conservative with the radius
+            r = math.min(region.w,region.h) / 2-- Be conservative with the radius
             @rvo\update_instance(region.id, cx, cy, math.ceil(r), region.max_speed, vx, vy)
         @rvo\step()
         for region in *@regions
@@ -248,7 +248,7 @@ spread_region_delta_func = (map, rng, outer) ->
 
 center_region_delta_func = (map, rng, outer) ->
     center_x, center_y = outer\center()
-    return () => math.sign_of(center_x - @x)*32, math.sign_of(center_y - @y)*32
+    return () => math.sign_of(center_x - @x)*100, math.sign_of(center_y - @y)*100
 
 default_region_delta_func = (map, rng, outer) ->
     center_x, center_y = outer\center()

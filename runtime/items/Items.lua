@@ -46,6 +46,7 @@ Data.item_create {
     use_message = "Now that you have picked up this key, you can open Burgundite doors.",
     spr_item = "key3",
     pickup_func = function(self, user)
+        local GlobalData = require "core.GlobalData"
         GlobalData.keys_picked_up[self.name] = true 
         pretty("KEYS: ", GlobalData.keys_picked_up)
     end,
