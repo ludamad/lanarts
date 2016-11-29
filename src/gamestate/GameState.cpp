@@ -267,6 +267,7 @@ void GameState::restart() {
 	if (game_world().number_of_levels() > 0) {
 		game_world().reset(0);
 	}
+        player_data().reset();
 	luawrap::globals(L)["Engine"]["first_map_create"].push();
 	int levelid = luawrap::call<LuaValue>(L)["_id"].to_int();
 	set_level(game_world().get_level(levelid));

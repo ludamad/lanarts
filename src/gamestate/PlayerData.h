@@ -75,6 +75,10 @@ public:
         money_t& money() {
             return _money;
         }
+        void reset() {
+            _money = 0;
+            _kill_amounts.resize(0);
+        }
 private:
         // Gold pool for all players:
         money_t _money = 0;

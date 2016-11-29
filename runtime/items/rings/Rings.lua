@@ -19,7 +19,7 @@ Data.equipment_create {
 
     spr_item = "ogres ring",
 
-    stat_bonuses = { defence = -1, strength = 2 }
+    stat_bonuses = { defence = -1, strength = 2, hp = 10 }
 }
 
 Data.equipment_create {
@@ -80,7 +80,7 @@ Data.equipment_create {
     spell_cooldown_multiplier = 0.9,
     spr_item = "gallanthors ring",
 
-    stat_bonuses = { magic = 1, willpower = -1 }
+    stat_bonuses = { magic = 1, willpower = -1, mp = 10 }
 }
 
 Data.equipment_create {
@@ -92,6 +92,6 @@ Data.equipment_create {
 
     spr_item = "magicians ring",
 
-    stat_bonuses = { magic = 2, willpower = -1 }
+    stat_bonuses = { magic = 2, willpower = -1, mp = 10}
 }
 

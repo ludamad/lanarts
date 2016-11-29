@@ -61,10 +61,18 @@ bool has_ranged_attack(EnemyInst* e) {
 bool potentially_randomize_movement(GameState* gs, EnemyInst* e) {
 	EnemyRandomization& er = e->behaviour().randomization;
 
-	if (!has_ranged_attack(e)) {
-		//Only enable this behaviour for ranged enemies for now
+	if (!has_ranged_attack(e) && gs->get_level()->label() != "Plain Valley") {
+		//Only enable this behaviour for ranged enemies for now, unless in overworld
 		return false;
 	}
+        if (!has_ranged_attack(e) && e->effective_stats().movespeed <= 3) {
+                // Want it on fast melee units only
+                return false;
+        }
+        if (e->effective_stats().movespeed <= 1.5) {
+                // Dont want it on really slow units
+                return false;
+        }
 
 	bool randomized = false;
 	if (er.should_randomize_movement()) {
@@ -73,7 +81,7 @@ bool potentially_randomize_movement(GameState* gs, EnemyInst* e) {
 		}
 		if (!randomized && gs->rng().rand(32) == 0
 				&& choose_random_direction(gs, e, er.vx, er.vy)) {
-			er.random_walk_timer = gs->rng().rand(TILE_SIZE, TILE_SIZE * 2);
+			er.random_walk_timer = gs->rng().rand(TILE_SIZE, TILE_SIZE * 8) / e->effective_stats().movespeed;
 			randomized = true;
 		}
 		if (randomized) {

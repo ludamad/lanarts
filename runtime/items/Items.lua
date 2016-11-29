@@ -75,6 +75,20 @@ Data.item_create {
 }
 
 Data.item_create {
+    name = "Scroll of Experience",
+    description = "Bestows the user with a vision, leading to increased experience.",
+    use_message = "Experience is bestowed upon you!",
+
+    shop_cost = {55,105},
+
+    spr_item = "scroll_exp",
+
+    action_func = function(self, user)
+        user.stats.xp = user.stats.xp + 50
+    end
+}
+
+Data.item_create {
     name = "Defence Scroll",
     description = "A mantra of unnatural modification, it bestows the user with a permanent, albeit small, increase to defence.",
     use_message = "Defence is bestowed upon you!",
@@ -130,7 +144,7 @@ Data.item_create  {
     spr_item = "scroll_haste",
 
     action_func = function(self, user)
-        user:add_effect(effects.Haste.name, 400)
+        user:add_effect(effects.Haste.name, 800)
     end
 }
 

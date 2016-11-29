@@ -26,14 +26,22 @@ M.easy_enemies = {
   {enemy = "Chicken",           chance = 100                                            },
   {enemy = "Cloud Elemental",   chance = 100, group_chance = 33, group_size = 2           }
 }
+  
+M.fast_enemies = {
+ {enemy = "Giant Spider",      chance = 100,   group_chance = 100, group_size = 3       },
+ {enemy = "Ciribot",           chance = 35                                              },
+-- {enemy = "Dark Centaur",      chance = 30                                              },
+  {enemy = "Chicken",           chance = 100                                            }
+}
 
-M.medium_enemies = {
+
+M.medium_enemies = table.merge(M.medium_animals, {
   {enemy = "Skeleton",          chance = 50                                              },
   {enemy = "Storm Elemental",   chance = 66,  group_chance = 33, group_size = 2           },
   {enemy = "Chicken",           chance = 50                                             },
-  {enemy = "Unseen Horror",     chance = 5                                             },
-  {enemy = "Dark Centaur",      chance = 10                                             }
-}
+--  {enemy = "Unseen Horror",     chance = 5                                             },
+--  {enemy = "Dark Centaur",      chance = 10                                             }
+})
   
 M.hard_enemies = {
  {enemy = "Storm Elemental",   chance = 20,    group_chance = 100, group_size = 3          },
@@ -353,12 +361,13 @@ function M.enemy_generate(chances)
 end
 
 function M.generate_from_enemy_entries(map, chances, amount, --[[Optional]] area, --[[Optional]] selector)
+    local ret = {}
     local total_chance = 0
     for entry in values(chances) do
         total_chance = total_chance + (entry.chance or 0)
         local spawns = range_resolve(entry.guaranteed_spawns or 0)
         for i=1,spawns do 
-            map_utils.random_enemy(map, entry.enemy, area, selector)
+            append(ret, map_utils.random_enemy(map, entry.enemy, area, selector))
         end
     end
     for i=1,amount do
@@ -366,11 +375,12 @@ function M.generate_from_enemy_entries(map, chances, amount, --[[Optional]] area
         for entry in values(chances) do
             rand = rand - (entry.chance or 0)
             if rand <= 0 then 
-                map_utils.random_enemy(map, entry.enemy, area, selector)
+                append(ret, map_utils.random_enemy(map, entry.enemy, area, selector))
                 break
             end
         end
     end
+    return ret
 end
 
 local function generate_enemies(map, enemies)

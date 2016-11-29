@@ -11,7 +11,7 @@ class SerializeBuffer;
 
 struct EnemyRandomization {
 	enum {
-		SUCCESSFUL_HIT_MAXTIME = 200, DAMAGE_TAKEN_TIMETHRESHOLD = 200
+		SUCCESSFUL_HIT_MAXTIME = 75, DAMAGE_TAKEN_TIMETHRESHOLD = 200
 	};
 	EnemyRandomization() :
 			successful_hit_timer(0), damage_taken_timer(0), random_walk_timer(

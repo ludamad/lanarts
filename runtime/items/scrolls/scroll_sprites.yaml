@@ -2,6 +2,9 @@ sprites:
   - name: scroll_haste
     file: items/scrolls/sprites/scroll_haste.png
 
+  - name: scroll_exp
+    file: items/scrolls/sprites/scroll_exp.png
+
   - name: scroll_strength
     file: items/scrolls/sprites/scroll_str.png
 

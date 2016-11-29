@@ -31,10 +31,10 @@ Data.class_create {
         mp = 20,
         hpregen = 0.007,
         mpregen = 0.010,
-        magic = 2,
+        magic = 1,
         strength = 1,
         defence = 1,
-        willpower = 2
+        willpower = 1
     }
 }
 
@@ -71,8 +71,8 @@ Data.class_create {
         hpregen = 0.010,
         mpregen = 0.007,
         magic = 1,
-        strength = 2,
-        defence = 2,
+        strength = 1,
+        defence = 1,
         willpower = 1
     }
 }
@@ -107,12 +107,12 @@ Data.class_create {
     },
     gain_per_level = {
         hp = 10,
-        mp = 20,
-        hpregen = 0.010,
+        mp = 15,
+        hpregen = 0.011,
         mpregen = 0.010,
-        magic = 2,
+        magic = 1,
         strength = 1,
         defence = 1,
-        willpower = 2
+        willpower = 1
     }
 }

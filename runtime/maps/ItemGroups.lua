@@ -15,10 +15,6 @@ M.basic_items = {
     , { item = "Mace",               chance = 5                      }
     -- Scrolls
     , { item = "Haste Scroll",       chance = 7                      }
-    , { item = "Strength Scroll",    chance = 2                      }
-    , { item = "Magic Scroll",       chance = 2                      }
-    , { item = "Defence Scroll",     chance = 2                      }
-    , { item = "Will Scroll",        chance = 2                      }
     -- Potions
     , { item = "Health Potion",      chance = 10                     }
     , { item = "Mana Potion",        chance = 10                     }
@@ -88,6 +84,12 @@ M.enchanted_items = {
     , { item = "Runed Gloves",       chance = 1                      }
     , { item = "Devious Staff",                 chance = 1           }
     , { item = "Gallanthor's Crutch",                 chance = 1     }
+    -- Permanent enchantments
+    , { item = "Strength Scroll",    chance = 1                      }
+    , { item = "Magic Scroll",       chance = 1                      }
+    , { item = "Defence Scroll",     chance = 1                      }
+    , { item = "Will Scroll",        chance = 1                      }
+    , { item = "Scroll of Experience",        chance = 1             }
 }
 
 return M
