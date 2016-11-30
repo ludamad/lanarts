@@ -557,7 +557,7 @@ overworld_features = (map) ->
             return true
         gold_placer = (map, xy) ->
             MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-        dungeon = {label: 'Crystal Mines', tileset: TileSets.snake, :templates, on_generate: on_generate_dungeon}
+        dungeon = {label: "Gragh's Lair", tileset: TileSets.snake, :templates, on_generate: on_generate_dungeon}
         door_placer = (map, xy) ->
             -- nil is passed for the default open sprite
             MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
