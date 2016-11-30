@@ -63,7 +63,7 @@ function Door:on_step()
     local needs_key = (self.required_key ~= false)
     local is_open = false
     local collisions = Map.rectangle_collision_check(self.map, self.unpadded_area, self)
-    if #collisions > 0 then
+    if #collisions > 0 and (not needs_key or GlobalData.keys_picked_up[self.required_key]) then
         is_open = true
     else 
         local collisions = Map.rectangle_collision_check(self.map, self.area, self)

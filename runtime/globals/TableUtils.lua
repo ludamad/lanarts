@@ -36,6 +36,7 @@ function table.deep_array_copy(t1, t2)
 end
 
 function table.copy(t1, t2, invoke_meta)
+    assert(t1 ~= t2, "Tables should not be equal!")
     if invoke_meta == nil then invoke_meta = true end
     setmetatable(t2, getmetatable(t1))
     if invoke_meta and metacopy(t1, t2) then
