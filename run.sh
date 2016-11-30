@@ -130,7 +130,7 @@ function run_lanarts(){
     cd runtime
     if handle_flag "--gdb" || handle_flag "-g" ; then
         echo "Wrapping in GDB:" | colorify '1;35'
-        gdb -silent -ex=r -ex="break lua_error" --args ../build/src/lanarts $args
+        gdb -silent -ex=r -ex="break lua_error" -ex="catch throw" --args ../build/src/lanarts $args
     else
         exec ../build/src/lanarts $args
     fi

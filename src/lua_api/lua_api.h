@@ -29,7 +29,7 @@ namespace lua_api {
 	/* Add a path for searching with the 'require' function. */
 	void add_search_path(lua_State* L, const char* path);
 	/* Use serach path to load a module if it has not yet been loaded. */
-	void require(lua_State* L, const char* path);
+	void require(lua_State* L, const char* path, bool keep_return = false);
 
 	/* Creates a lua state with a custom global metatable.
 	 * All further registration assumes the lua state was created with this function. */

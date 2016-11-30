@@ -374,8 +374,7 @@ safe_portal_spawner = (tileset) -> (map, map_area, sprite, callback, frame) ->
     vault = SourceMap.area_template_create(Vaults.small_item_vault_multiway {rng: map.rng, item_placer: portal_placer, :tileset})
     -- TODO allow passing areas to use map_area, not critical for now
     if not place_feature(map, vault, (r) -> true)
-        return nil
-        --return MapUtils.random_portal(map, map_area, sprite, callback, frame)
+        return MapUtils.random_portal(map, map_area, sprite, callback, frame)
     assert(portal_holder[1])
     return portal_holder[1]
 
@@ -401,7 +400,6 @@ overworld_features = (map) ->
     for i=1,4
         if place_outdoor_ridges() then return nil
     ------------------------- 
-
 
     ------------------------- 
     -- Place easy dungeon: --
@@ -565,7 +563,7 @@ overworld_features = (map) ->
             MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
         place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq3, dungeon)
         vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.snake, :door_placer, :gold_placer})
-        if not place_feature(map, vault, (r) -> r.conf.is_overworld)
+        if not place_feature(map, vault, (r) -> not r.conf.is_overworld)
             return true
     if place_medium2() then return nil
     -----------------------------
@@ -583,7 +581,7 @@ overworld_features = (map) ->
             MapUtils.spawn_enemy(map, enemy, xy)
         place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq4, dungeon)
         vault = SourceMap.area_template_create(Vaults.skull_surrounded_dungeon {dungeon_placer: place_dungeon, :enemy_placer, :door_placer, :tileset})
-        if not place_feature(map, vault, (r) -> r.conf.is_overworld)
+        if not place_feature(map, vault, (r) -> not r.conf.is_overworld)
             return true
     if place_hard() then return nil
     ------------------------- 
@@ -755,10 +753,12 @@ overworld_try_create = (rng) ->
         marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
     }
         return nil
+    player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
+    if not player_spawn_points
+        return nil
 
     game_map = generate_game_map(map)
     post_creation_callback(game_map)
-    player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
     World.players_spawn(game_map, player_spawn_points)
     Map.set_vision_radius(game_map, OVERWORLD_VISION_RADIUS)
     return game_map

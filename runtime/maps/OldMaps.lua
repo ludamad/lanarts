@@ -235,7 +235,7 @@ M.Dungeon2 = {
         wandering = false,
         amount = 7,
         generated = {
-          {enemy = "Spider",   chance = 100 },
+          {enemy = "Giant Spider",   chance = 100 },
           {enemy = "Cloud Elemental",   chance = 100 }
         }
       }

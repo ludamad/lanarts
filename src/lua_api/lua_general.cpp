@@ -576,6 +576,9 @@ namespace lua_api {
 		string_table["pack"].bind_function(str_pack);
 
 		// Represents global, mutable data. Only module that is not serialized 'as a constant'.
-		lua_api::register_lua_submodule(L, "core.GlobalData", LuaValue::newtable(L));
+                lua_api::import(L, "InitialGlobalData").push();
+                // Get the initial global data object:
+                lua_call(L, 0, 1);
+		luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].pop();
 	}
 }

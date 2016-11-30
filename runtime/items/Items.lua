@@ -1,6 +1,6 @@
 local GlobalData = require "core.GlobalData"
 
-GlobalData.keys_picked_up = {}
+assert(GlobalData.keys_picked_up)
 
 Data.item_create {
     name = "Gold", -- An entry named gold must exist, it is handled specially

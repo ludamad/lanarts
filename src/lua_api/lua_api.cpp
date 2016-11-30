@@ -78,10 +78,10 @@ namespace lua_api {
 		lua_pop(L, 1);
 	}
 
-	void require(lua_State* L, const char* path) {
+	void require(lua_State* L, const char* path, bool keep_return) {
 		lua_getglobal(L, "require");
 		lua_pushstring(L, path);
-		lua_call(L, 1, 0);
+		lua_call(L, 1, keep_return ? 1 : 0);
 	}
 
 

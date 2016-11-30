@@ -205,12 +205,16 @@ static void run_engine(int argc, char** argv) {
 
 /* Must take (int, char**) to play nice with SDL */
 int main(int argc, char** argv) {
+#if NDEBUG
 	try {
+#endif
 		run_engine(argc, argv);
+#if NDEBUG
 	} catch (const std::exception& err) {
 		fprintf(stderr, "%s\n", err.what());
 		fflush(stderr);
 	}
+#endif
 
 	return 0;
 }

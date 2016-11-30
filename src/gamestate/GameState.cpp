@@ -219,7 +219,11 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 
         LuaValue global_data;
         conf.decode(serializer, global_data);
-        luawrap::globals(L)["package"]["loaded"]["core.GlobalData"] = global_data;
+
+        luawrap::globals(L)["table"]["copy"].push();
+        global_data.push();
+        luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].push();
+        lua_call(L, 2, 0);
 
 	serializer.read_int(this->frame_n);
 	world.deserialize(serializer);
@@ -270,6 +274,13 @@ void GameState::restart() {
         player_data().reset();
 	luawrap::globals(L)["Engine"]["first_map_create"].push();
 	int levelid = luawrap::call<LuaValue>(L)["_id"].to_int();
+        luawrap::globals(L)["table"]["copy"].push();
+        lua_api::import(L, "InitialGlobalData").push();
+        // Get the initial global data:
+        lua_call(L, 0, 1);
+        luawrap::globals(L)["package"]["loaded"]["core.GlobalData"].push();
+        // Perform the copy:
+        lua_call(L, 2, 0);
 	set_level(game_world().get_level(levelid));
 //		set_level(game_world().get_level(0, true));
 

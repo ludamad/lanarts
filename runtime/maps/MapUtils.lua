@@ -134,6 +134,9 @@ function M.pick_player_squares(map, positions)
         table.remove_occurrences(positions, sqr)
         append(picked, sqr)
     end
+    if #picked < World.player_amount then
+        return nil
+    end
     return picked
 end
 function M.find_player_positions(map, --[[Optional]] flags) 

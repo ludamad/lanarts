@@ -262,6 +262,8 @@ private:
 	GameSettings settings;
 	lua_State* L;
 	int frame_n;
+        // Used for restarting purposes, the initial value held by core.GlobalData, decided by runtime/InitialGlobalData.lua:
+        LuaValue initial_global_data;
 	GameStateInitData init_data;
 
 	GameNetConnection connection;

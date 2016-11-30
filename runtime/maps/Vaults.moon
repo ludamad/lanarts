@@ -516,10 +516,10 @@ wwwwwwwwwww....++.........
 -- - rng 
 M.small_random_vault = (args) -> {
     legend: make_legend args, {
-        '*': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.gold_placer, matches_none: UNSOLID_ADD}
-        'i': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.item_placer, matches_none: UNSOLID_ADD}
-        'e': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.enemy_placer, matches_none: UNSOLID_ADD}
-        'p': {add: UNSOLID_ADD, content: args.tileset.floor, matches_none: UNSOLID_ADD}
+        '*': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.gold_placer, matches_none: M.FLAG_HAS_VAULT}
+        'i': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.item_placer, matches_none: M.FLAG_HAS_VAULT}
+        'e': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.enemy_placer, matches_none: M.FLAG_HAS_VAULT}
+        'p': {add: UNSOLID_ADD, content: args.tileset.floor, matches_none: M.FLAG_HAS_VAULT}
         'd': {
             add: UNSOLID_ADD 
             remove: SourceMap.FLAG_SOLID
@@ -611,11 +611,11 @@ M.small_item_vault = (args) -> table.merge M.small_random_vault(args), {
 M.small_item_vault_multiway = (args) -> table.merge M.small_random_vault(args), {
     data: random_choice {
 [=[
-..+..
-.xdx.
++++++
++xdx+
 +did+
-.xdx.
-..+..]=]
++xdx+
++++++]=]
     }
 }
 
