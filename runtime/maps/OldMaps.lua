@@ -10,21 +10,24 @@ local M = nilprotect {} -- Submodule
 
 local easy_animals = {
   {enemy = "Giant Rat",         chance = 100,  group_chance = 33, group_size = 2          },
-  {enemy = "Giant Bat",         chance = 100                                            }
+  {enemy = "Giant Bat",         chance = 100                                            },
+  {enemy = "Adder",         chance = 100                                            }
 }
 
 M.medium_animals = {
   {enemy = "Giant Rat",         chance = 100, group_chance = 33, group_size = 3           },
   {enemy = "Giant Bat",         chance = 100, group_chance = 33, group_size = 3           },
   {enemy = "Giant Spider",      chance = 100,                                           },
-  {enemy = "Hound",             chance = 100                                            }
+  {enemy = "Hound",             chance = 100                                            },
+  {enemy = "Adder",         chance = 100                                            }
 }
 
 M.easy_enemies = {
   {enemy = "Giant Rat",         chance = 100, group_chance = 33, group_size = 3           },
   {enemy = "Skeleton",          chance = 100                                            },
   {enemy = "Chicken",           chance = 100                                            },
-  {enemy = "Cloud Elemental",   chance = 100, group_chance = 33, group_size = 2           }
+  {enemy = "Cloud Elemental",   chance = 100, group_chance = 33, group_size = 2           },
+  {enemy = "Adder",         chance = 25                                            }
 }
   
 M.fast_enemies = {
@@ -153,17 +156,21 @@ local large_layout3 = {
 }
 
 local tiny_layouts = {tiny_layout1, tiny_layout2, tiny_layout3}   
+M.tiny_layouts = tiny_layouts
 local small_layouts = {
   small_layout1, small_layout2, small_layout3, small_layout4, small_layout5
 }
+M.small_layouts = small_layouts
 
 local medium_layouts = {
   medium_layout1, medium_layout2
 }
+M.medium_layouts = medium_layouts
 
 local large_layouts = {
   large_layout1, large_layout2, large_layout3
 }
+M.large_layouts = large_layouts
 
 local function tconcat(t1, t2)
     local t = {}
@@ -180,6 +187,7 @@ M.Dungeon1 = {
       enemies = {
         wandering = false,
         amount = 7,
+
         generated = {
           {enemy = "Giant Rat",         chance = 100  },
           {enemy = "Giant Bat",         chance = 100 },
@@ -227,10 +235,8 @@ M.Dungeon2 = {
         wandering = false,
         amount = 7,
         generated = {
-          {enemy = "Giant Rat",         chance = 100  },
-          {enemy = "Giant Bat",         chance = 100 },
-          {enemy = "Hound",         chance = 100 },
-          {enemy = "Cloud Elemental",   guaranteed_spawns = 2 }
+          {enemy = "Spider",   chance = 100 },
+          {enemy = "Cloud Elemental",   chance = 100 }
         }
       }
     }
@@ -284,7 +290,7 @@ M.Dungeon4 = {
       items = { amount = 8, group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
       enemies = {
         amount = {14,16},
-        generated = tconcat(M.medium_enemies, {{enemy = "Orc Warrior", guaranteed_spawns = {0,1}}})
+        generated = M.medium_enemies
       }
     }
   },
@@ -294,7 +300,7 @@ M.Dungeon4 = {
       items = { amount = 8, group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
       enemies = {
         amount = {18,22},
-        generated = tconcat(M.hard_enemies, {{enemy = "Orc Warrior", guaranteed_spawns = {0,1}}})
+        generated = M.hard_enemies,
       }
     }
   },
@@ -392,7 +398,8 @@ local function generate_enemies(map, enemies)
     end
     local amounts = {min * (1.0 + (World.player_amount - 1)/2), max * (1.0 + (World.player_amount - 1) / 2)}
     local amount = math.round(randomf(amounts))
-    M.generate_from_enemy_entries(map, enemies.generated, amount)
+    local Vaults = require "maps.Vaults"
+    M.generate_from_enemy_entries(map, enemies.generated, amount, nil, {matches_none =  {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT}})
 end
 
 local function leaf_group_areas(map)
@@ -412,6 +419,7 @@ local function generate_statues(map, --[[Optional]] amount)
     amount = amount or random(5,10)
     local i = 0
     local tries, MAX_TRIES = 1, 10
+    local Vaults = require "maps.Vaults"
     while i < amount do
         local area = random_choice(areas)
         local sqr = map_utils.random_square(map, area)
@@ -420,7 +428,7 @@ local function generate_statues(map, --[[Optional]] amount)
             map = map,
             -- nearby 3x3 box
             area = bbox_create( {sqr[1]-1, sqr[2]-1}, {3, 3}),
-            fill_selector = {matches_none = SourceMap.FLAG_SOLID}
+            fill_selector = {matches_none = {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT}}
         } 
         if query then
             map:square_apply(sqr, {add = SourceMap.FLAG_SOLID, remove = SourceMap.FLAG_SEETHROUGH})
@@ -446,10 +454,11 @@ local function generate_stores(map)
 end
 
 local function generate_doors(map) 
+    local Vaults = require "maps.Vaults"
     local areas = leaf_group_areas(map)
     for area in values(areas) do
         if chance(0.05) then
-            local selector = {matches_none = SourceMap.FLAG_SOLID}
+            local selector = {matches_none = {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT}}
             local x1,y1,x2,y2 = unpack(area)
             x1, y1 = x1-1, y1-1
             for y=y1,y2 do

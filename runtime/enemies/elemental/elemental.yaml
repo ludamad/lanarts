@@ -20,7 +20,7 @@ enemies:
   - name: Storm Elemental
     sprite: storm elemental
     radius: 14
-    xpaward: 20
+    xpaward: 15
     appear_message: A storm elemental floats onto the scene.
     defeat_message: The storm elemental dissolves.
     stats:

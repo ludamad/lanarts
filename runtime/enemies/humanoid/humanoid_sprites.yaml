@@ -3,6 +3,9 @@ sprites:
 
   - name: orc priest
     file: enemies/humanoid/sprites/orc_priest.png
+
+  - name: ogre mage
+    file: enemies/humanoid/sprites/ogre_mage.png
    
   - name: orc sorceror
     file: enemies/humanoid/sprites/orc_sorcerer.png

@@ -180,7 +180,7 @@ void MonsterController::pre_step(GameState* gs) {
 void MonsterController::update_velocity(GameState* gs, EnemyInst* e) {
 	float movespeed = e->effective_stats().movespeed;
 
-	if (e->cooldowns().is_hurting()) {
+	if (e->cooldowns().is_hurting() && e->etype().name != "Ogre Mage") {
 		e->vx /= 2, e->vy /= 2;
 		movespeed /= 2;
 	}

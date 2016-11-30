@@ -24,6 +24,7 @@ local M = {} -- Submodule
 local function stair_kinds_index(x, y)
     return y*6+x -- stair_kinds.png has rows of 6
 end
+M.stair_kinds_index = stair_kinds_index
 
 -- Helps with connecting the overworld to the dungeons
 local function connect_map(args)
@@ -31,26 +32,44 @@ local function connect_map(args)
     local seq_idx = args.sequence_index
     local MapSeq = args.map_sequence
     local map_area = bbox_create({0,0}, map.size)
+    local back_portals = {}
+    local forward_portals = {}
+
+    for i=1,MapSeq:number_of_backward_portals(seq_idx) do
+        local portal
+        if seq_idx == 2 then
+            portal = (args.spawn_portal or MapUtils.random_portal)(map, map_area, args.sprite_out or args.sprite_up, nil, args.sprite_out_index or args.sprite_up_index)
+        else
+            portal = (args.spawn_portal or MapUtils.random_portal)(map, map_area, args.sprite_up, nil, args.sprite_up_index)
+        end
+        if not portal then
+            return nil
+        end
+        append(back_portals, portal)
+    end
+
+    for i=1,args.forward_portals do
+        local portal = MapUtils.random_portal(map, map_area, args.sprite_down, nil, args.sprite_down_index)
+        if not portal then
+            return nil
+        end
+        append(forward_portals, portal)
+    end
+
     for i=1,MapSeq:number_of_backward_portals(seq_idx) do
         local iterations = args.backward_portal_multiple or 1
         for iter=1,iterations do
-            local portal
-            if seq_idx == 2 then
-                portal = MapUtils.random_portal(map, map_area, args.sprite_out or args.sprite_up, nil, args.sprite_out_index or args.sprite_up_index)
-            else
-                portal = MapUtils.random_portal(map, map_area, args.sprite_up, nil, args.sprite_up_index)
-            end
-            MapSeq:backward_portal_resolve(seq_idx, portal, i)
+            MapSeq:backward_portal_resolve(seq_idx, back_portals[i], i)
         end
     end
     local t = {}
     for i=1,args.forward_portals do
-        local portal = MapUtils.random_portal(map, map_area, args.sprite_down, nil, args.sprite_down_index)
-        append(t, MapSeq:forward_portal_add(seq_idx, portal, i, args.next_floor_callback))
+        append(t, MapSeq:forward_portal_add(seq_idx, forward_portals[i], i, args.next_floor_callback))
     end
     if World.player_amount > 1 then
         for c in values(t) do c() end
     end
+    return true
 end
 
 -- Overworld to template map sequence (from overworld to deeper in the temple)
@@ -99,11 +118,11 @@ local function temple_level_create(label, floor, sequences, tileset, enemy_candi
         end
     end
 
-    local map_id = MapUtils.game_map_create(map, true)
+    local game_map = MapUtils.game_map_create(map, true)
     for i=1,#sequences do
         sequences[i]:slot_resolve(sequence_ids[i], map_id)
     end
-    return map_id
+    return game_map
 end
 
 local FLAG_PLAYERSPAWN = SourceMap.FLAG_CUSTOM1
@@ -131,9 +150,34 @@ function M.generate_store(map, xy)
     MapUtils.spawn_store(map, items, xy)
 end
 
-local function old_map_generate(MapSeq, dungeon, floor)
+local old_map_generate
+local function try_old_map_generate(MapSeq, seq_idx, dungeon, floor)
     floor = floor or 1
     local map = nil
+    local wrapped_on_generate = dungeon.on_generate
+    local last_floor = (floor >= #dungeon.templates)
+    dungeon.on_generate = function(map, floor)
+        if wrapped_on_generate and not wrapped_on_generate(map, floor) then
+            return nil
+        end
+        if not connect_map {
+            map = map,
+            spawn_portal = dungeon.spawn_portal, 
+            backward_portal_multiple = (floor == 1) and 3 or 1,
+            map_sequence = MapSeq, sequence_index = seq_idx,
+            sprite_up =  "stair_kinds", sprite_up_index = stair_kinds_index(5, 9),
+            sprite_out =  "stair_kinds", sprite_out_index = dungeon.sprite_out or 0,
+            sprite_down = "stair_kinds", sprite_down_index = stair_kinds_index(4, 9),
+            forward_portals = last_floor and 0 or 3,
+            next_floor_callback = function() 
+                dungeon.on_generate = wrapped_on_generate
+                return old_map_generate(MapSeq, dungeon, floor + 1)
+            end
+        } then
+            return nil
+        end
+        return true
+    end
     for i=1,100 do
         map = OldMaps.create_map(dungeon, floor)
         if map ~= nil then
@@ -141,23 +185,25 @@ local function old_map_generate(MapSeq, dungeon, floor)
         end
         print("Dungeon rejected ("..i..")!")
     end
-    local last_floor = (floor >= #dungeon.templates)
-    local seq_idx = MapSeq:slot_create()
-    connect_map {
-        map = map, 
-        backward_portal_multiple = (floor == 1) and 3 or 1,
-        map_sequence = MapSeq, sequence_index = seq_idx,
-        sprite_up =  "stair_kinds", sprite_up_index = stair_kinds_index(5, 9),
-        sprite_out =  "stair_kinds", sprite_out_index = 0,
-        sprite_down = "stair_kinds", sprite_down_index = stair_kinds_index(4, 9),
-        forward_portals = last_floor and 0 or 3,
-        next_floor_callback = function() 
-            return old_map_generate(MapSeq, dungeon, floor + 1)
-        end
-    }
-    return MapSeq:slot_resolve(seq_idx, MapUtils.game_map_create(map, true))
+    return map
 end
 
+function old_map_generate(MapSeq, dungeon, floor)
+    local seq_idx = MapSeq:slot_create()
+    for i=1,200 do
+        local map = try_old_map_generate(MapSeq, seq_idx, dungeon, floor) 
+        if map then
+            local game_map = MapUtils.game_map_create(map, true)
+            if dungeon.post_generate then
+                dungeon.post_generate(game_map)
+            end
+            MapSeq:slot_resolve(seq_idx, game_map)
+            return game_map
+        end
+        print("FAILED TO GENERATE VALID MAP in old_map_generate " .. i .. " retrying...")
+    end
+    assert("Tried really hard and couldnt make an important dungeon. Huh? Contact a dev")
+end
 -- dungeon requires:
 -- - label
 -- - templates (from OldMaps.lua, eg OldMaps.Dungeon1)

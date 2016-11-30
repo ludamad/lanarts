@@ -16,17 +16,19 @@ M.FLAG_OVERWORLD = SourceMap.FLAG_CUSTOM4
 M.FLAG_ROOM = SourceMap.FLAG_CUSTOM5
 M.FLAG_NO_ENEMY_SPAWN = SourceMap.FLAG_CUSTOM6
 M.FLAG_NO_ITEM_SPAWN = SourceMap.FLAG_CUSTOM7
-M.FLAG_NO_VAULT_SPAWN = SourceMap.FLAG_CUSTOM8
+-- TODO investigate whether we want this to simply be HAS_OBJECT:
+M.FLAG_HAS_VAULT = SourceMap.FLAG_CUSTOM8 -- SourceMap.FLAG_HAS_OBJECT -- SourceMap.FLAG_CUSTOM8
 
 M._warning_skull = Display.image_load "features/sprites/warning.png"
 M._rune_door_closed = Display.image_load "spr_doors/runed_door.png"
+M._closed_door_crypt = Display.image_load "spr_doors/closed_door_crypt.png"
 M._door_key1 = Display.image_load "spr_keys/door01.png"
 M._door_key2 = Display.image_load "spr_keys/door02.png"
 M._door_key3 = Display.image_load "spr_keys/door03.png"
 M._anvil = Display.image_load "features/sprites/anvil.png"
 
 -- Common definitions:
-UNSOLID_ADD = {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
+UNSOLID_ADD = {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
 make_legend = (args, legend) ->
     args.tileset or= {}
     return table.merge {
@@ -36,24 +38,24 @@ make_legend = (args, legend) ->
         }
         '+': {  -- '+' means 'walkable tile'
             remove: {}
-            matches_none: {M.FLAG_NO_VAULT_SPAWN, SourceMap.FLAG_SOLID}
+            matches_none: {M.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}
         }
         '*': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
+            matches_none: {M.FLAG_HAS_VAULT}
             content: args.tileset.floor
             on_placement: args.gold_placer
         }
         'd': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
+            matches_none: {M.FLAG_HAS_VAULT}
             content: args.tileset.floor
             on_placement: args.door_placer
             remove: SourceMap.FLAG_SOLID
         }
         'p': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_ITEM_SPAWN, M.FLAG_NO_VAULT_SPAWN}
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_ITEM_SPAWN, M.FLAG_HAS_VAULT}
+            matches_none: {M.FLAG_HAS_VAULT}
             content: args.tileset.floor
             on_placement: (map, xy) ->
                 {x, y} = xy
@@ -66,7 +68,7 @@ make_legend = (args, legend) ->
 M.ridge_dungeon = (args) -> {
     legend: make_legend args, {
         'p': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_ITEM_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_ITEM_SPAWN, M.FLAG_HAS_VAULT}
             content: args.tileset.floor
             on_placement: (map, xy) ->
                 {x, y} = xy
@@ -75,20 +77,20 @@ M.ridge_dungeon = (args) -> {
         }
 
         'D': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
             content: args.tileset.floor
             on_placement: args.dungeon_placer
         }
         'W': {
-            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}
             content: args.tileset.wall_alt
             matches_all: SourceMap.FLAG_SOLID
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
         'w': {
-            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}
             content: args.tileset.wall_alt
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
     }
     data: random_choice {
@@ -204,81 +206,81 @@ M.skull_surrounded_dungeon = (args) -> {
 M.anvil_encounter = (args) -> {
     legend: make_legend args, {
         'a': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
             content: TileSets.snake.floor
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
         'b': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
             content: TileSets.snake.floor_alt
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
         'c': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
             content: TileSets.pebble.floor_alt
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
         'B': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
             content: TileSets.pebble.floor_alt
             on_placement: args.boss_placer
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
         'e': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
             content: TileSets.pebble.floor_alt
             on_placement: args.enemy_placer
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
         'E': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
             content: TileSets.snake.floor
             on_placement: args.enemy_placer
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
         '*': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
             content: TileSets.pebble.floor_alt
             on_placement: args.gold_placer
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
         'i': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
             content: TileSets.pebble.floor_alt
             on_placement: args.item_placer
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
         'W': {
-            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}
             content: TileSets.snake.wall
             matches_all: SourceMap.FLAG_SOLID
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
         'd': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
             remove: SourceMap.FLAG_SOLID
             content: TileSets.snake.floor
             on_placement: args.door_placer
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
         'w': {
-            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}
             content: TileSets.snake.wall_alt
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
         '<': {
-           add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}
+           add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}
            content: TileSets.snake.floor
            on_placement: (map, xy) ->
                 MapUtils.spawn_decoration(map, M._anvil, xy)
-           matches_none: {M.FLAG_NO_VAULT_SPAWN}
+           matches_none: {M.FLAG_HAS_VAULT}
         }
         's': {
             add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN}
             content: TileSets.snake.floor
             on_placement: (map, xy) ->
                 MapUtils.spawn_decoration(map, M._warning_skull, xy, 0, false)
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
     }
     data: [=[................................++...........
@@ -323,10 +325,10 @@ M.big_encounter1 = (args) -> {
             content: TileSets.pebble.wall
         }
         'W': {
-            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}
             content: TileSets.pebble.wall
             matches_all: SourceMap.FLAG_SOLID
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
     }
     data: [=[
@@ -360,10 +362,10 @@ M.big_encounter2 = (args) -> {
             content: TileSets.pebble.wall
         }
         'W': {
-            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}
             content: TileSets.pebble.wall
             matches_all: SourceMap.FLAG_SOLID
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            matches_none: {M.FLAG_HAS_VAULT}
         }
     }
     data: [=[
@@ -391,13 +393,13 @@ wwwwwwbbbbbbbbbbwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwbbbw
 M.tunnel = (args) -> {
     legend: table.merge M.anvil_encounter(args).legend, {
         'w': {
-            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_VAULT_SPAWN}
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_HAS_VAULT}
+            matches_none: {M.FLAG_HAS_VAULT}
             content: TileSets.snake.wall
         }
         'G': {
             remove: {}
-            matches_none: {M.FLAG_NO_VAULT_SPAWN, SourceMap.FLAG_SOLID}
+            matches_none: {M.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}
             matches_content: TileSets.pebble.floor
         }
     }
@@ -425,8 +427,8 @@ Gdcccccecccw.....................................
 M.stone_henge = (args) -> {
     legend: table.merge M.anvil_encounter(args).legend, {
         'w': {
-            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_VAULT_SPAWN}
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_HAS_VAULT}
+            matches_none: {M.FLAG_HAS_VAULT}
             content: TileSets.snake.wall
         }
         'p': {add: UNSOLID_ADD, content: TileSets.snake.floor, matches_none: SourceMap.FLAG_SOLID}
@@ -489,8 +491,8 @@ wwPPPww.
 M.cavern = (args) -> {
     legend: table.merge M.anvil_encounter(args).legend, {
         'w': {
-            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_VAULT_SPAWN}
-            matches_none: {M.FLAG_NO_VAULT_SPAWN}
+            add: {SourceMap.FLAG_SOLID, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_HAS_VAULT}
+            matches_none: {M.FLAG_HAS_VAULT}
             content: TileSets.snake.wall
         }
     }
@@ -514,10 +516,10 @@ wwwwwwwwwww....++.........
 -- - rng 
 M.small_random_vault = (args) -> {
     legend: make_legend args, {
-        '*': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.gold_placer, matches_none: SourceMap.FLAG_SOLID}
-        'i': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.item_placer, matches_none: SourceMap.FLAG_SOLID}
-        'e': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.enemy_placer, matches_none: SourceMap.FLAG_SOLID}
-        'p': {add: UNSOLID_ADD, content: args.tileset.floor, matches_none: SourceMap.FLAG_SOLID}
+        '*': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.gold_placer, matches_none: UNSOLID_ADD}
+        'i': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.item_placer, matches_none: UNSOLID_ADD}
+        'e': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.enemy_placer, matches_none: UNSOLID_ADD}
+        'p': {add: UNSOLID_ADD, content: args.tileset.floor, matches_none: UNSOLID_ADD}
         'd': {
             add: UNSOLID_ADD 
             remove: SourceMap.FLAG_SOLID
@@ -525,7 +527,7 @@ M.small_random_vault = (args) -> {
             on_placement: (map, xy) ->
                 MapUtils.spawn_door(map, xy)
         }
-        'x': {add: {SourceMap.FLAG_SOLID, M.FLAG_NO_VAULT_SPAWN}, content: args.tileset.wall_alt}
+        'x': {add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}, content: args.tileset.wall_alt, matches_none: M.FLAG_HAS_VAULT}
     }
     data: random_choice {[=[....++++++
 ..++xxxx++
@@ -605,5 +607,17 @@ M.small_item_vault = (args) -> table.merge M.small_random_vault(args), {
 +++++]=]
     }
 }
+
+M.small_item_vault_multiway = (args) -> table.merge M.small_random_vault(args), {
+    data: random_choice {
+[=[
+..+..
+.xdx.
++did+
+.xdx.
+..+..]=]
+    }
+}
+
 
 return M

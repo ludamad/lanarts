@@ -12,6 +12,7 @@
 
 #include "draw/SpriteEntry.h"
 #include "gamestate/GameState.h"
+#include "objects/enemy/EnemyInst.h"
 
 #include "stats/items/ProjectileEntry.h"
 #include "stats/items/WeaponEntry.h"
@@ -208,12 +209,16 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
             AttackStats(weapon, projectile));
 
     Pos p(inst->x, inst->y);
-    p.x += gs->rng().rand(-12, +13);
-    p.y += gs->rng().rand(-12, +13);
-
-    if (gs->tile_radius_test(p.x, p.y, 10)) {
-        p.x = inst->x;
-        p.y = inst->y;
+    if (dynamic_cast<EnemyInst*>(this) && dynamic_cast<EnemyInst*>(this)->etype().name == "Ogre Mage") {
+        p.x += gs->rng().rand(-199, +200);
+        p.y += gs->rng().rand(-199, +200);
+    } else {
+        p.x += gs->rng().rand(-12, +13);
+        p.y += gs->rng().rand(-12, +13);
+        if (gs->tile_radius_test(p.x, p.y, 10)) {
+            p.x = inst->x;
+            p.y = inst->y;
+        }
     }
 
     event_log(

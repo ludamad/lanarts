@@ -113,7 +113,23 @@ enemies:
         strength: 12
         defence: 5
         willpower: 5
-          
+           
+  - name: Adder
+    sprite: adder
+    death_sprite: blood
+    radius: 9
+    xpaward: 10
+    appear_message: An adder slithers onto the scene! 
+    defeat_message: The adder is dead. 
+    stats:
+        attacks: [ {weapon: Fast Melee} ]
+        hp: 25
+        hpregen: 0.04
+        movespeed: 4
+        strength: 15
+        defence: 0
+        willpower: 0
+         
   - name: Chicken
     sprite: chicken
     death_sprite: blood
@@ -150,7 +166,7 @@ enemies:
     sprite: super_chicken
     death_sprite: green blood
     radius: 14
-    xpaward: 25
+    xpaward: 20
     appear_message: An unnaturally glowing chicken appears!
     defeat_message: The glowing chicken recieves a final blow.
     stats:

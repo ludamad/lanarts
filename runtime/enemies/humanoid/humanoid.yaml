@@ -13,23 +13,40 @@ enemies:
 #    
 #  - name: Orc High Priest
 #    sprite: orc high priest
-    
+     
+  - name: Ogre Mage
+    appear_message: A terrifying ogre mage!
+    defeat_message: You have slain the ogre mage!
+    sprite: ogre mage
+    death_sprite: blood
+    radius: 12
+    xpaward: 50
+    stats:
+        attacks: [{ projectile: Large Fire Ball} ]
+        hp: 80
+        hpregen: 0.1
+        movespeed: 2.5
+        strength: 8
+        magic: 25
+        defence: 5
+        willpower: 15
+
   - name: Orc Warrior
     sprite: orc knight
     death_sprite: blood
     radius: 12
-    xpaward: 50
+    xpaward: 30
     appear_message: You see an orc warrior!
     defeat_message: The orc warrior dies.
     init_func: enemy_berserker_init 
     step_func: enemy_berserker_step
     stats:
         attacks: [ {weapon: Fast Melee} ]
-        hp: 100
+        hp: 80
         hpregen: 0.02
-        movespeed: 4
-        strength: 35
-        defence: 12
+        movespeed: 3.4
+        strength: 20
+        defence: 8
         willpower: 6
 
   - name: Dark Centaur

@@ -13,6 +13,8 @@ function M.from_tile_xy(xy)
 end
 
 function M.random_square(map, area, --[[Optional]] selector, --[[Optional]] operator, --[[Optional]] max_attempts) 
+    assert(map)
+    assert(not area or #area > 0)
     return SourceMap.find_random_square { 
         rng = map.rng, map = map, area = area, 
         selector = selector or { matches_none = {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT} },
@@ -106,7 +108,9 @@ function M.spawn_portal(map, sqr, sprite, --[[Optional]] callback, --[[Optional]
 end
 
 function M.random_portal(map, area, sprite, callback, --[[Optional]] frame) 
-    local sqr = M.random_square(map, area)
+    local Vaults = require "maps.Vaults"
+    local sqr = M.random_square(map, area,
+            --[[Selector]] {matches_none = {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT} })
     if not sqr then return nil end
     return M.spawn_portal(map, sqr, sprite, callback, frame)
 end

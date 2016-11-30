@@ -61,27 +61,28 @@ bool has_ranged_attack(EnemyInst* e) {
 bool potentially_randomize_movement(GameState* gs, EnemyInst* e) {
 	EnemyRandomization& er = e->behaviour().randomization;
 
-	if (!has_ranged_attack(e) && gs->get_level()->label() != "Plain Valley") {
+        bool should_randomize_movement = er.should_randomize_movement();
+        if (e->etype().name == "Adder" || e->etype().name == "Ogre Mage") {
+                should_randomize_movement = true; // Always random
+        } else if (!has_ranged_attack(e) && gs->get_level()->label() != "Plain Valley") {
 		//Only enable this behaviour for ranged enemies for now, unless in overworld
-		return false;
-	}
-        if (!has_ranged_attack(e) && e->effective_stats().movespeed <= 3) {
+                should_randomize_movement = false;
+	} else if (!has_ranged_attack(e) && e->effective_stats().movespeed <= 3) {
                 // Want it on fast melee units only
-                return false;
-        }
-        if (e->effective_stats().movespeed <= 1.5) {
+                should_randomize_movement = false;
+        } else if (e->effective_stats().movespeed <= 1.5) {
                 // Dont want it on really slow units
-                return false;
+                should_randomize_movement = false;
         }
 
 	bool randomized = false;
-	if (er.should_randomize_movement()) {
+	if (should_randomize_movement) {
 		if (er.has_random_goal()) {
 			randomized = true;
 		}
 		if (!randomized && gs->rng().rand(32) == 0
 				&& choose_random_direction(gs, e, er.vx, er.vy)) {
-			er.random_walk_timer = gs->rng().rand(TILE_SIZE, TILE_SIZE * 8) / e->effective_stats().movespeed;
+			er.random_walk_timer = gs->rng().rand(TILE_SIZE, TILE_SIZE * 4) / e->effective_stats().movespeed;
 			randomized = true;
 		}
 		if (randomized) {

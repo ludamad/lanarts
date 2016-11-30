@@ -71,7 +71,7 @@ function Door:on_step()
             if not needs_key and object.team then -- TODO proper combat object detection
                 is_open = true
                 break
-            elseif needs_key and object.class_name and GlobalData.keys_picked_up[self.required_key] then -- TODO proper player object detection
+            elseif needs_key and object.class_name and (GlobalData.keys_picked_up[self.required_key] or settings.invincible) then -- TODO proper player object detection
                 is_open = true
                 break
             end
