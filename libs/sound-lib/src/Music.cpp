@@ -38,7 +38,9 @@ namespace lsound {
 	void Music::play() const {
 		if (_music) {
 			Mix_PlayMusic(_music.get(), 0);
-		}
+		} else {
+                    printf("Music Error %s\n",Mix_GetError());
+                }
 	}
 	void Music::clear() {
 		_music = smartptr<Mix_Music>();
@@ -51,7 +53,9 @@ namespace lsound {
 	void Music::loop() const {
 		if (_music) {
 			Mix_PlayMusic(_music.get(), -1);
-		}
+		} else {
+                        printf("Music Error %s\n",Mix_GetError());
+                }
 	}
 
 	Sound load_music(const std::string& filename) {

@@ -36,7 +36,9 @@ namespace lsound {
 	void SoundEffect::play() const {
 		if (_soundeffect) {
 			Mix_PlayChannel(-1, _soundeffect.get(), 0);
-		}
+		} else {
+                        printf("Music Error %s\n",Mix_GetError());
+                }
 	}
 	void SoundEffect::clear() {
 		_soundeffect = smartptr<Mix_Chunk>();
@@ -49,7 +51,9 @@ namespace lsound {
 	void SoundEffect::loop() const {
 		if (_soundeffect) {
 			Mix_PlayChannel(-1, _soundeffect.get(), -1);
-		}
+		} else {
+                        printf("Music Error %s\n",Mix_GetError());
+                }
 	}
 
 	Sound load_sound(const std::string& filename) {
