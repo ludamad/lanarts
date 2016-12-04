@@ -663,7 +663,7 @@ overworld_features = (map) ->
                 -- Dont reject
                 continue
                 -- return true
-    if place_tunnel() then return nil
+    -- if place_tunnel() then return nil
     ---------------------------------
 
     -- Return the post-creation callback:
