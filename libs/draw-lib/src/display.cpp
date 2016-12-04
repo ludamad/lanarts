@@ -15,9 +15,12 @@
 #include "opengl/gl_extensions.h"
 
 static SDL_Window* MAIN_WINDOW = NULL;
+static Size RENDER_SIZE; 
 static SDL_Renderer* MAIN_RENDERER = NULL;
 
-static void gl_set_drawing_area(int x, int y, int w, int h) {
+static void gl_set_drawing_area(int x, int y, int wa, int ha) {
+	int w = 0, h = 0;
+        SDL_GetWindowSize(MAIN_WINDOW, &w, &h);
 	glViewport(x, y, w, h);
 
 	//Set projection
@@ -33,7 +36,7 @@ static void gl_set_drawing_area(int x, int y, int w, int h) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//Set up the coordinate system 0 -> w, 0 -> h
-	glOrtho(0.0, (GLdouble)w, (GLdouble)h, 0.0, 0.0, 1.0);
+	glOrtho(0.0, (GLdouble)RENDER_SIZE.w, (GLdouble)RENDER_SIZE.h, 0.0, 0.0, 1.0);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -58,8 +61,8 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
         0,
         0,
         w, h,
-   //     SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP
-        SDL_WINDOW_MAXIMIZED | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS
+    //    SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN
+        SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0)
     );
 
 	if (MAIN_WINDOW == NULL) {
@@ -96,6 +99,7 @@ static void gl_set_fullscreen(bool fullscreen) {
 void ldraw::display_initialize(const char* window_name,
 		const Size& draw_area_size, bool fullscreen) {
 	//TODO: Allow passing video flags, esp. SDL_NOFRAME
+	RENDER_SIZE=draw_area_size;
 	gl_sdl_initialize(window_name, draw_area_size.w, draw_area_size.h,
 			fullscreen);
 }
@@ -109,7 +113,7 @@ void ldraw::display_set_drawing_region(const BBoxF & bbox) {
 }
 
 bool ldraw::display_is_fullscreen() {
-    return (SDL_GetWindowFlags(MAIN_WINDOW) & SDL_WINDOW_FULLSCREEN_DESKTOP) != 0;
+    return (SDL_GetWindowFlags(MAIN_WINDOW) & (SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_FULLSCREEN)) != 0;
 }
 
 void ldraw::display_draw_start() {
@@ -123,7 +127,5 @@ void ldraw::display_draw_finish() {
 }
 
 Size ldraw::display_size() {
-    int w = 0, h = 0;
-    SDL_GetWindowSize(MAIN_WINDOW, &w, &h);
-    return Size(w, h);
+    return RENDER_SIZE;
 }
