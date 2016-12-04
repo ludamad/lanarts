@@ -228,6 +228,35 @@ namespace ldungeon_gen {
 		return meta;
 	}
 
+	static std::string map_dump(MapPtr map) {
+                std::string dump;
+                for (int y = 0; y < map->height(); y++) { 
+                    std::string line;
+                    for (int x = 0; x < map->width(); x++) { 
+                        int content = ((*map)[Pos(x,y)].content % 90);
+                        line += char(' ' + content);
+                    }
+                    dump += line;
+                    dump += '\n';
+		}
+                return dump;
+	}
+
+	static bool maps_equal(MapPtr map1, MapPtr map2) {
+		using namespace luawrap;
+                if (map1->size() != map2->size()) {
+                    return false;
+                }
+                BBox area {{0,0}, map1->size()};
+		FOR_EACH_BBOX(area, x, y) {
+			if ((*map1)[Pos(x,y)].content != (*map2)[Pos(x,y)].content) {
+				return false;
+			}
+		}
+                return true;
+	}
+
+
 	static MapPtr map_create(LuaStackValue args) {
 		using namespace luawrap;
 		MapPtr ptr(
@@ -716,6 +745,8 @@ namespace ldungeon_gen {
 			submodule[str] = FLAG_RESERVED2 << i;
 		}
 
+		submodule["maps_equal"].bind_function(maps_equal);
+		submodule["map_dump"].bind_function(map_dump);
 		submodule["flags_list"].bind_function(flags_list);
 		submodule["flags_match"].bind_function(flags_match);
 		submodule["flags_combine"].bind_function(flags_combine);

@@ -411,6 +411,12 @@ static int lapi_random(lua_State* L) {
 	return 1;
 }
 
+static void lapi_random_seed(LuaStackValue seed) {
+	GameState* gs = lua_api::gamestate(seed.luastate());
+        gs->rng().init_genrand(seed.as<int>());
+}
+
+
 static double lapi_random_gaussian(LuaStackValue average, double std_dev) {
     GameState* gs = lua_api::gamestate(average);
     return gs->rng().guassian(average.to_num(), std_dev, /*n_trials*/ 10);
@@ -553,6 +559,7 @@ namespace lua_api {
 		globals["toaddress"].bind_function(lapi_toaddress);
 		globals["rand_range"].bind_function(lapi_rand_range);
 		globals["random"].bind_function(lapi_random);
+		globals["random_seed"].bind_function(lapi_random_seed);
 		globals["randomf"].bind_function(lapi_randomf);
 		globals["random_gaussian"].bind_function(lapi_random_gaussian);
 		globals["random_subregion"].bind_function(lapi_random_subregion);

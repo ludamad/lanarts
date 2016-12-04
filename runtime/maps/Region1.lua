@@ -66,9 +66,9 @@ local function connect_map(args)
     for i=1,args.forward_portals do
         append(t, MapSeq:forward_portal_add(seq_idx, forward_portals[i], i, args.next_floor_callback))
     end
-    if World.player_amount > 1 then
-        for c in values(t) do c() end
-    end
+    --if World.player_amount > 1 then
+    --    for c in values(t) do c() end
+    --end
     return true
 end
 
@@ -214,9 +214,9 @@ function M.old_dungeon_placement_function(MapSeq, dungeon)
         local c = MapSeq:forward_portal_add(1, portal, 1, function() 
             return old_map_generate(MapSeq, dungeon, 1) 
         end)
-        if World.player_amount > 1 then
-            c()
-        end
+        --if World.player_amount > 1 then
+        --    c()
+        --end
     end
 end
 

@@ -102,6 +102,17 @@ function exit_menu(exit_game)
 end
 
 function setup_start_menu()
+    if os.getenv("LANARTS_CLIENT") then
+	settings.connection_type = Network.CLIENT
+        settings.class_type = 0
+        exit_menu()
+        return
+    elseif os.getenv("LANARTS_SERVER") then
+	settings.connection_type = Network.SERVER
+        settings.class_type = 1
+        exit_menu()
+        return
+    end
     menu_state.menu = InstanceBox.create( { size = Display.display_size } )
 
     menu_state.back = function() 
@@ -190,6 +201,10 @@ local function menu_loop(should_poll)
 
         if should_poll then
             Network.connections_poll()
+        end
+
+        if not menu_state.menu then -- because we have moved on 
+            return not menu_state.exit_game
         end
 
         menu_state.menu:step( {0, 0} )

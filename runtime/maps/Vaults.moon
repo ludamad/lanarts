@@ -404,13 +404,13 @@ M.tunnel = (args) -> {
         }
     }
     data: random_choice {
---[=[
---.....wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.
---.wwwwwwccccccccccc*cccccccccccccccc*cccccccccccw.
---+dccccceccccccc*cccccccccccccccccecccccccccccccd+
---+dcccccccccccccccccccccccccccccccccccccccccccccd+
---.wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.
---]=]
+[=[
+.....wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.
+.wwwwwwccccccccccc*cccccccccccccccc*cccccccccccw.
++dccccceccccccc*cccccccccccccccccecccccccccccccd+
++dcccccccccccccccccccccccccccccccccccccccccccccd+
+.wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.
+]=]
         [=[
 .....wwwwwww.....................................
 .wwwwwwccccw.....................................
@@ -527,83 +527,83 @@ M.small_random_vault = (args) -> {
             on_placement: (map, xy) ->
                 MapUtils.spawn_door(map, xy)
         }
-        'x': {add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}, content: args.tileset.wall_alt, matches_none: M.FLAG_HAS_VAULT}
+        'w': {add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}, content: args.tileset.wall_alt, matches_none: M.FLAG_HAS_VAULT}
     }
     data: random_choice {[=[....++++++
-..++xxxx++
-++xxx!ex+.
-+xxe**ex+.
-+xppppxx+.
-+xddxxx++.
+..++wwww++
+++www!ew+.
++wwe**ew+.
++wppppww+.
++wddwww++.
 ++++++++..]=],
         [=[..++++++++
-.+xxxxxx++
-++xppppx+.
-+xxpiipx+.
-+xpppppx+.
-+xddxxxx+.
+.+wwwwww++
+++wppppw+.
++wwpiipw+.
++wpppppw+.
++wddwwww+.
 +++++++++.]=],
         [=[..++++++++
-.+xxxxxx++
-++xppppx+.
-+xxppppx+.
-+xppp!px+.
-+xddxxxx+.
+.+wwwwww++
+++wppppw+.
++wwppppw+.
++wppp!pw+.
++wddwwww+.
 +++++++++.]=],
         [=[..++++++++
-.+xxxxx+++
-++xpppxx+.
-+xxpxppx+.
-+xppxp!x+.
-+xddxxxx+.
+.+wwwww+++
+++wpppww+.
++wwpwppw+.
++wppwp!w+.
++wddwwww+.
 +++++++++.]=],
         [=[..++++++++
-..++xxxx++
-++xxxpex+.
-+xxeppex+.
-+xppppxx+.
-+xddxxx++.
+..++wwww++
+++wwwpew+.
++wweppew+.
++wppppww+.
++wddwww++.
 ++++++++..]=],
         [=[..++++++++
-.+xxxxxx++
-++xpppex+.
-+xxpeepx+.
-+xpppppx+.
-+xddxxxx+.
+.+wwwwww++
+++wpppew+.
++wwpeepw+.
++wpppppw+.
++wddwwww+.
 +++++++++.]=],
         [=[..++++++++
-.+xxxxxx++
-++xpeppx+.
-+xxpeepx+.
-+xpppppx+.
-+xddxxxx+.
+.+wwwwww++
+++wpeppw+.
++wwpeepw+.
++wpppppw+.
++wddwwww+.
 +++++++++.]=],
         [=[..++++++++
-.+xxxxx+++
-++xpppxx+.
-+xxpxpex+.
-+xppxpex+.
-+xddxxxx+.
+.+wwwww+++
+++wpppww+.
++wwpwpew+.
++wppwpew+.
++wddwwww+.
 +++++++++.]=],
         [=[
-.xxxxxx...
-xxipppxxxx
-xpepipexxx
-xxppppeexx
-.xddxppxxx
-.x++xxxxxx]=]
+.wwwwww...
+wwipppwwww
+wpepipewww
+wwppppeeww
+.wddwppwww
+.w++wwwwww]=]
     }
 }
 
 M.small_item_vault = (args) -> table.merge M.small_random_vault(args), {
     data: random_choice {[=[++++++
-+xxxx+
-+xipd+
-+xxxx+
++wwww+
++wipd+
++wwww+
 ++++++]=],[=[+++++
-+xxx+
-+xid+
-+xxx+
++www+
++wid+
++www+
 +++++]=]
     }
 }
@@ -612,12 +612,43 @@ M.small_item_vault_multiway = (args) -> table.merge M.small_random_vault(args), 
     data: random_choice {
 [=[
 +++++
-+xdx+
++wdw+
 +did+
-+xdx+
++wdw+
 +++++]=]
     }
 }
 
+M.dungeon_tunnel = (args) -> table.merge M.small_random_vault(args), {
+    data: random_choice {
+        [=[
+...wwwwwwwwwwwww......
+.wwwpppppppppppwwwwww.
++dpppepepepepppdppppw.
+.wwppppppppppppwwwwpd+
+..wwpppppppppppw..www.
+...wwwwwwwwwwwww......
+]=]
+        [=[
+..........+.....
+...wwwwwwwdwwwww
+.wwwpppppppppppw
+.wpppepepepepppw
+.wwppppppppppppw
+..wwpppppppppppw
+...wwwwwwwdwwwww
+..........+.....
+]=]
+        [=[
+...wwwwwwwwwwwww......
+.wwwpppppppppppwwwwww.
+.wpppepepepepppdppppw.
+.wwppppppppppppwwwwpd+
+..wwpppppppppppw..www.
+...wwwwwwwdwwwww......
+..........+...........
+]=]
+    }
+}
 
 return M

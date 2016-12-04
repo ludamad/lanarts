@@ -54,7 +54,7 @@ M.hard_enemies = {
  {enemy = "Ciribot",           chance = 75                                              },
  {enemy = "Golem",             guaranteed_spawns = 1                                    },
  {enemy = "Dark Centaur",      chance = 30                                              },
- {enemy = "Unseen Horror",     chance = 10,   group_chance = 33, group_size = 2           }
+-- {enemy = "Unseen Horror",     chance = 10,   group_chance = 33, group_size = 2           }
 }
 
 M.harder_enemies = {
@@ -65,7 +65,8 @@ M.harder_enemies = {
   {enemy = "Golem",             guaranteed_spawns = 1, group_chance = 100, group_size = 2 },
   {enemy = "Jester",            chance = 20                                             },
   {enemy = "Hydra",             chance = 20                                             },
-  {enemy = "Unseen Horror",     chance = 10,  group_chance = 33, group_size = 2           }
+  {enemy = "Ogre Mage",         chance = 10, group_chance = 33, group_size = 2          }
+--  {enemy = "Unseen Horror",     chance = 10,  group_chance = 33, group_size = 2           }
 }
 
 local test_layout = {

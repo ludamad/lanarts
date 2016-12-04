@@ -7,6 +7,7 @@ require_path_add('dependencies/socket/?.lua')
 
 require("GlobalVariableSetup")
 require("moonscript.base").insert_loader()
+
 local argv -- Placeholder, set in main()
 
 local LOOKS_LIKE_FLAG = "^[%-]+[^%s]+$"
@@ -61,6 +62,7 @@ end
 -- @return whether we are performing a full game initialization, or if have finished our task.
 local function main(_argv)
     argv = _argv
+
     -- Misc options
     if has_arg "--sound" then sound_volume = 1.0 end
     if has_arg "--debug" then debug.attach_debugger() end

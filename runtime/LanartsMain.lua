@@ -42,6 +42,7 @@ end
 
 function Engine.game_start(...)
     local game_loop = require "GameLoop"
+    require("maps.01_Overworld").test_determinism()
 
     return game_loop.run_loop(...)
 end

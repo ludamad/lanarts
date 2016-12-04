@@ -18,7 +18,7 @@ local PLAYER_COLORS = {
     COL_PALE_GREEN, COL_PALE_BLUE, COL_LIGHT_GRAY 
 }
 
-local function pregame_joined_players_list_create()
+local function pregame_joined_players_list_create(--[[For autostarting network tests:]] on_start_click)
     local font = font_cached_load(settings.menu_font, 20)
     local group = InstanceGroup.create()
     group.size = {200, 400} -- For placement algorithms
@@ -28,7 +28,14 @@ local function pregame_joined_players_list_create()
         {100, 30}
     )
 
-    local pregame_list = { step = do_nothing }
+    local pregame_list = { 
+        step = function() 
+            -- For autostarting network tests:
+            if tonumber(os.getenv("LANARTS_PLAYERS")) and tonumber(os.getenv("LANARTS_PLAYERS")) <= #World.players then
+                on_start_click()
+            end
+        end
+    }
 
     function pregame_list:draw(xy)
         local font = font_cached_load(settings.font, 10)
@@ -69,7 +76,7 @@ local function pregame_menu_create(on_start_click)
     )
 
     menu:add_instance(
-        pregame_joined_players_list_create(), 
+        pregame_joined_players_list_create(--[[For autostarting network tests:]] on_start_click), 
         Display.CENTER_TOP,
         {0, 10 + logo.size[2]}
     )

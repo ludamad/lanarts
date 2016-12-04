@@ -57,8 +57,9 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
 	    window_name,
         0,
         0,
-        1920, 1080,
-         SDL_WINDOW_MAXIMIZED | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS
+        w, h,
+   //     SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP
+        SDL_WINDOW_MAXIMIZED | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS
     );
 
 	if (MAIN_WINDOW == NULL) {

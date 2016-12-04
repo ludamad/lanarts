@@ -253,7 +253,8 @@ static void post_sync(GameState* gs) {
 
 void net_send_state_and_sync(GameNetConnection& net, GameState* gs) {
     if (gs->game_settings().network_debug_mode) {
-        net.check_integrity(gs);
+        // net.check_integrity(gs);
+        return;
     }
     printf("Sent sync on frame %d\n", gs->frame());
     SerializeBuffer& sb = net.grab_buffer(GameNetConnection::PACKET_FORCE_SYNC);

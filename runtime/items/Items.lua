@@ -15,7 +15,6 @@ Data.item_create {
     spr_item = "key1",
     pickup_func = function(self, user)
         GlobalData.keys_picked_up[self.name] = true 
-        pretty("KEYS: ", GlobalData.keys_picked_up)
     end,
     prereq_func = function (self, user)
         return false
@@ -31,7 +30,6 @@ Data.item_create {
     spr_item = "key2",
     pickup_func = function(self, user)
         GlobalData.keys_picked_up[self.name] = true 
-        pretty("KEYS: ", GlobalData.keys_picked_up)
     end,
     prereq_func = function (self, user)
         return false
@@ -48,7 +46,6 @@ Data.item_create {
     pickup_func = function(self, user)
         local GlobalData = require "core.GlobalData"
         GlobalData.keys_picked_up[self.name] = true 
-        pretty("KEYS: ", GlobalData.keys_picked_up)
     end,
     prereq_func = function (self, user)
         return false
@@ -84,7 +81,7 @@ Data.item_create {
     spr_item = "scroll_exp",
 
     action_func = function(self, user)
-        user.stats.xp = user.stats.xp + 50
+        user:gain_xp(100)
     end
 }
 

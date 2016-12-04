@@ -405,29 +405,10 @@ overworld_features = (map) ->
     -- Place easy dungeon: --
     place_easy = () ->
         inner_encounter_template = {
-           -- {
-           --     layout: OldMaps.tiny_layouts
-           --     content: {
-           --         items: {amount: 3, group: ItemGroups.basic_items} 
-           --         enemies: {
-           --             wandering: false
-           --             amount: 7
-           --             generated: {
-           --               {enemy: "Ogre Mage",         chance: 10000},
-           --               {enemy: "Orc Warrior",         chance: 10000},
-           --               {enemy: "Giant Rat",         chance: 100},
-           --               {enemy: "Giant Bat",         chance: 100},
-           --               {enemy: "Adder",             chance: 100},
-           --               {enemy: "Hound",             chance: 100},
-           --               {enemy: "Cloud Elemental",   guaranteed_spawns: 2 }
-           --             }
-           --         }
-           --     }
-           -- }
            {
-                layout: {{size: {40,40}, rooms: {padding:0,amount:40,size:{3,7}},tunnels:{padding:0, width:{1,3},per_room: 5}}}
+                layout: {{size: {60,40}, rooms: {padding:0,amount:40,size:{3,7}},tunnels:{padding:0, width:{1,3},per_room: 5}}}
                 content: {
-                    items: {amount: 8, group: ItemGroups.basic_items} 
+                    items: {amount: 12, group: ItemGroups.basic_items} 
                     enemies: {
                         wandering: true
                         amount: 0
@@ -476,7 +457,6 @@ overworld_features = (map) ->
                 dungeon = {label: 'Ogre Lair', tileset: TileSets.snake, templates: inner_encounter_template, on_generate: on_generate_dungeon, :spawn_portal, sprite_out: Region1.stair_kinds_index(5, 7)}
                 gold_placer = (map, xy) ->
                     MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-                    return nil
                 door_placer = (map, xy) ->
                     -- nil is passed for the default open sprite
                     MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, 'Azurite Key')
@@ -484,6 +464,9 @@ overworld_features = (map) ->
                 vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.snake, :door_placer, :gold_placer})
                 if not place_feature(map, vault, (r) -> true)
                     return nil
+                --vault = SourceMap.area_template_create(Vaults.dungeon_tunnel {tileset: TileSets.snake, :door_placer, :gold_placer})
+                --if not place_feature(map, vault, (r) -> true)
+                --    return nil
                 ------------------------- 
             ---- Ensure connectivity because we messed with dungeon features:
             --if not SourceMap.area_fully_connected {
@@ -679,8 +662,8 @@ overworld_features = (map) ->
             if not place_feature(map, vault, (r) -> r.conf.is_overworld)
                 -- Dont reject
                 continue
-                --return false
-    --if place_tunnel() then return nil
+                -- return true
+    if place_tunnel() then return nil
     ---------------------------------
 
     -- Return the post-creation callback:
@@ -690,6 +673,90 @@ overworld_features = (map) ->
         OldMapSeq3\slot_resolve(1, game_map)
         OldMapSeq4\slot_resolve(1, game_map)
 
+test_determinism = () ->
+    do return
+    create_test_map = (rng) ->
+        conf = OVERWORLD_CONF(rng)
+        {PW,PH} = LEVEL_PADDING
+        mw,mh = nil,nil
+        if rng\random(0,2) == 1
+            mw, mh = OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE
+        else 
+            mw, mh = OVERWORLD_DIM_MORE, OVERWORLD_DIM_LESS
+        outer = Region.create(1+PW,1+PH,mw-PW,mh-PH)
+        -- Generate regions in a large area, crop them later
+        rect = {{1+PW, 1+PH}, {mw-PW, 1+PH}, {mw-PW, mh-PH}, {1+PW, mh-PH}}
+        rect2 = {{1+PW, mh-PH}, {mw-PW, mh-PH}, {mw-PW, 1+PH}, {1+PW, 1+PH}}
+        major_regions = RVORegionPlacer.create {rect2}
+        map = SourceMap.map_create { 
+            rng: rng
+            size: {mw, mh}
+            content: conf.wall1.id
+            flags: {SourceMap.FLAG_SOLID, SourceMap.FLAG_SEETHROUGH}
+            map_label: conf.map_label,
+            instances: {}
+            door_locations: {}
+            rectangle_rooms: {}
+            wandering_enabled: true
+            -- For the overworld, created by dungeon features we add later:
+            player_candidate_squares: {}
+        }
+
+        for subconf in *{DUNGEON_CONF(rng), OVERWORLD_CONF(rng)} --, OVERWORLD_CONF(rng)}
+            {w,h} = subconf.size
+            -- Takes region parameters, region placer, and region outer ellipse bounds:
+            r = random_region_add rng, w, h, 20, center_region_delta_func(map, rng, outer), 0,
+                major_regions, outer\bbox()
+            --if r == nil
+            --    return nil
+            r.max_speed = 32
+            r.conf = subconf
+     
+        -- No rvo for now
+        major_regions\steps(1500)
+
+        -- Apply the regions:
+        for r in *major_regions.regions
+            r._points = false
+            r\apply {:map, operator: (tile_operator r.conf.wall1)}
+
+        generate_subareas(map, rng, major_regions.regions)
+        map.regions = major_regions.regions
+        
+        post_creation_callback = overworld_features(map)
+        --if not post_creation_callback
+        --    return nil
+        generate_door_candidates(map, rng, major_regions.regions)
+        overworld_spawns(map)
+
+        -- Reject levels that are not fully connected:
+        --if not SourceMap.area_fully_connected {
+        --    :map, 
+        --    unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
+        --    mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
+        --    marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
+        --}
+        --    return nil
+        return map
+    
+    create_test_maps = (seed) ->
+        rng = require("mtwist").create(seed)
+        random_seed(seed)
+        return for i=1,100 
+            print "Creating map #{seed} : #{i}"
+            create_test_map(rng) -- List in moonscript
+    for i=1,10
+        file = io.open("test_maps/map-set #{i}", "w")
+        print "Comparing with seed #{i}"
+        maps = create_test_maps(i)
+        for j=1,100
+            file\write(SourceMap.map_dump(maps[i]))
+        file\close()
+--        maps1, maps2 = create_test_maps(i), create_test_maps(i)
+--        for j=1,100
+--            print "Comparing with seed #{i} : #{j}"
+--            assert SourceMap.maps_equal(maps1[j], maps2[j])
+--
 overworld_try_create = (rng) ->
     rng = rng or require("mtwist").create(random(0, 2 ^ 31))
     conf = OVERWORLD_CONF(rng)
@@ -753,6 +820,7 @@ overworld_try_create = (rng) ->
         marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
     }
         return nil
+    -- player_spawn_points = for i=1,2 do MapUtils.random_square(map, {0,0,map.size[1],map.size[2]}, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
     player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
     if not player_spawn_points
         return nil
@@ -772,5 +840,5 @@ overworld_create = () ->
     error("Could not generate a viable overworld in 1000 tries!")
 
 return {
-    :overworld_create, :generate_game_map
+    :overworld_create, :generate_game_map, :test_determinism
 }
