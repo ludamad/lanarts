@@ -30,7 +30,9 @@ namespace lsound {
 		clear();
 		if (mm) {
 			_music = smartptr<Mix_Music>(mm, __freemusic_callback);
-		}
+		} else {
+                    printf("Music Error %s\n",Mix_GetError());
+                }
 	}
 
 	void Music::play() const {

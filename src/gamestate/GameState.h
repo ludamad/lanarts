@@ -33,6 +33,8 @@
 #include "IOController.h"
 #include "PlayerData.h"
 
+#include <lsound/lsound.h>
+
 struct lua_State;
 class GameMapState;
 class GameTiles;
@@ -253,6 +255,7 @@ public:
 	LuaSerializeConfig& luaserialize_config() {
 		return config;
 	}
+
 private:
 	int handle_event(SDL_Event* event, bool trigger_event_handling = true);
 
@@ -282,5 +285,7 @@ private:
 
 	LuaSerializeConfig config;
 };
+
+void play(const char* sound_path);
 
 #endif /* GAMESTATE_H_ */

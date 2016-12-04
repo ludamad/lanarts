@@ -157,6 +157,11 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
 
     int damage = damage_formula(atkstats, inst->effective_stats());
 
+    if (!dynamic_cast<PlayerInst*>(this)) {
+        if (gs->local_player()->current_floor == current_floor) {
+            play("sound/slash.ogg");
+        }
+    }
     if (dynamic_cast<PlayerInst*>(this) || !gs->game_settings().invincible) {
         isdead = inst->damage(gs, damage);
     }

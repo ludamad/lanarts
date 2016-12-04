@@ -10,6 +10,7 @@ include_directories(
     "${DEPS}/sdl2/include"
     "${DEPS}/sdl2-mixer"
     "${SRC}/luawrap-lib/include"
+    "${SRC}/draw-lib/include"
     "${SRC}/common-lib/include"
 )
 
@@ -30,6 +31,7 @@ aux_source_directory(tests lsound_testsrc)
 
 set(LINKEDLIBS
 	lsound
+        ldraw
 	luawrap
 	lcommon
 	lua
@@ -37,9 +39,9 @@ set(LINKEDLIBS
         SDL2-mixer
 )
 
-#add_executable( lsound_tests main.cpp)
+add_executable( lsound_tests main.cpp)
 
-#target_link_libraries(lsound_tests ${LINKEDLIBS})
+target_link_libraries(lsound_tests ${LINKEDLIBS})
 
 # Enable tests
 #enable_testing()

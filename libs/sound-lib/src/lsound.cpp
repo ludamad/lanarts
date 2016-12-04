@@ -14,9 +14,9 @@ namespace lsound {
 		/* We're going to be requesting certain things from our audio
 		 device, so we set them up beforehand */
 		int audio_rate = 22050;
-		Uint16 audio_format = AUDIO_S16; /* 16-bit stereo */
+		Uint16 audio_format = MIX_DEFAULT_FORMAT; /* 16-bit stereo */
 		int audio_channels = 2;
-		int audio_buffers = 4096;
+		int audio_buffers = 256;
 
 		SDL_Init(SDL_INIT_AUDIO);
 
@@ -24,11 +24,16 @@ namespace lsound {
 		 as its parameters the audio format we'd /like/ to have. */
 		int mixcode = Mix_OpenAudio(audio_rate, audio_format, audio_channels,
 				audio_buffers);
-		if (mixcode) {
+                if (mixcode == -1) {
+                        printf("Unable to open audio: %s\n", SDL_GetError());
 			return mixcode;
 		}
-
-		Mix_AllocateChannels(nchannels);
+		mixcode = Mix_AllocateChannels(nchannels);
+                if( mixcode < 0 )
+                {
+                    printf("Unable to allocate mixing channels: %s\n", SDL_GetError());
+                    return mixcode;
+                }
 
 		return 0;
 	}

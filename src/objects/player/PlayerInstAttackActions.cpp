@@ -37,6 +37,12 @@
 
 #include "PlayerInst.h"
 
+static lsound::Sound attack_sound;
+void play(lsound::Sound& sound, const char* path);
+
+// equip.ogg  item.ogg  LICENSE_death_hiss    LICENSE_death_slime   LICENSE_death_yelp  minor_missile.ogg  player_hurt.ogg  slash.ogg
+// gold.ogg   LICENSE   LICENSE_death_player  LICENSE_death_squeak  melee.ogg           overworld.ogg      see_monster.ogg
+//
 static void get_visible_monsters(GameState* gs,
         std::vector<GameInst*>& visible_monsters, PlayerInst* p = NULL) {
     const std::vector<obj_id>& mids = gs->monster_controller().monster_ids();
@@ -642,6 +648,9 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 
 bool PlayerInst::melee_attack(GameState* gs, CombatGameInst* e,
         const Item& weapon, bool ignore_cooldowns) {
+    if (gs->local_player()->current_floor == current_floor) {
+        play(attack_sound, "sound/melee.ogg");
+    }
     // Killed ? 
     if (CombatGameInst::melee_attack(gs, e, weapon, ignore_cooldowns) && dynamic_cast<EnemyInst*>(e)) {
         PlayerData& pc = gs->player_data();

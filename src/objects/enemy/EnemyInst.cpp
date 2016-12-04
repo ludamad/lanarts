@@ -185,6 +185,9 @@ void EnemyInst::step(GameState* gs) {
 	if (!seen && gs->object_visible_test(this, gs->local_player())) {
 		seen = true;
 		gs->enemies_seen().mark_as_seen(enemytype);
+                if (gs->local_player()->current_floor == current_floor) {
+                    play("sound/see_monster.ogg");
+                }
 		show_appear_message(gs->game_chat(), etype());
 	}
 }

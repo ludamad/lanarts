@@ -32,6 +32,9 @@
 #include "ProjectileInst.h"
 #include "collision_filters.h"
 
+static lsound::Sound minor_missile_sound;
+void play(lsound::Sound& sound, const char* path);
+
 ProjectileInst::~ProjectileInst() {
 }
 
@@ -170,6 +173,9 @@ void ProjectileInst::step(GameState* gs) {
 							25, PosF(rx, ry), PosF(), AnimatedInst::DEPTH,
 							buffstr));
 
+                        if (gs->local_player()->current_floor == dynamic_cast<PlayerInst*>(origin)->current_floor) {
+                            play(minor_missile_sound, "sound/minor_missile.ogg");
+                        }
 			if (victim->damage(gs, damage)) {
 				PlayerInst* p = (PlayerInst*) origin;
 				PlayerData& pc = gs->player_data();

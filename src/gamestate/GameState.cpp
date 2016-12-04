@@ -272,7 +272,13 @@ void GameState::renew_game_timestamp() {
 	_game_timestamp = systime;
 }
 
+static lsound::Sound bg_music;
+
 void GameState::restart() {
+        if (bg_music.empty()) {
+            bg_music = lsound::load_music("sound/overworld.ogg");
+        } 
+        bg_music.loop();
 	if (game_world().number_of_levels() > 0) {
 		game_world().reset(0);
 	}
@@ -593,3 +599,17 @@ level_id GameState::get_level_id() {
 	}
 	return get_level()->id();
 }
+
+static std::map<const char*, lsound::Sound> SOUND_MAP;
+
+void play(lsound::Sound& sound, const char* path) {
+        if (sound.empty()) {
+            sound = lsound::load_sound(path);
+        } 
+        sound.play();
+}
+
+void play(const char* sound_path) {
+    play(SOUND_MAP[sound_path], sound_path);
+}
+

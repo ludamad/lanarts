@@ -230,7 +230,7 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_METHOD(methods, melee, luawrap::push(L, OBJ->melee_attack(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2), OBJ->equipment().weapon(), true)) );
 
 	LUAWRAP_GETTER(methods, is_local_player, OBJ->is_local_player());
-	LUAWRAP_METHOD(methods, gain_xp, OBJ->gain_xp(lua_api::gamestate(L), luawrap::get<int>(L, 1)));
+	LUAWRAP_METHOD(methods, gain_xp, OBJ->gain_xp(lua_api::gamestate(L), luawrap::get<int>(L, 2)));
 	LUAWRAP_METHOD(methods, reset_rest_cooldown, OBJ->cooldowns().reset_rest_cooldown(REST_COOLDOWN));
 
 	return meta;

@@ -12,6 +12,7 @@ include_directories(../sdl2/include)
 set(SDLMIXER_LIBRARIES "")
 
 add_definitions(-DMID_MUSIC)
+add_definitions(-DWAV_MUSIC)
 add_definitions(-DUSE_TIMIDITY_MIDI)
 include_directories("${SDLMIXER_SOURCE_DIR}/timidity")
 set(SDLMIXER_TIMIDITY_SRC
@@ -32,9 +33,9 @@ set(SDLMIXER_TIMIDITY_SRC
 
 list(APPEND SDLMIXER_ADDITIONAL_SRC ${SDLMIXER_TIMIDITY_SRC})
 add_definitions(-DOGG_MUSIC)
-if (NOT TARGET OGG)
+#if (NOT TARGET OGG)
         add_subdirectory(external/libogg-1.3.1)
-endif()
+#endif()
 include_directories(external/libogg-1.3.1/include)
 
 add_subdirectory(external/libvorbis-1.3.3)

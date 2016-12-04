@@ -101,7 +101,7 @@ static GameState* init_gamestate() {
 	}
 	load_settings_data(settings, "saves/saved_settings.yaml"); // Override with remembered settings
 
-	if (SDL_Init(0) < 0) {
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		exit(0);
 	}
 

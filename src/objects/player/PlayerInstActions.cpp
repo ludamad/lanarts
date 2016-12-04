@@ -312,7 +312,6 @@ static bool item_do_lua_pickup(lua_State* L, ItemEntry& type, GameInst* user, in
         return false;
 }
 
-
 void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 	const int PICKUP_RATE = 5;
 	GameInst* inst = gs->get_instance(action.use_id);
@@ -330,6 +329,9 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
                 // Do nothing, as commanded by Lua
         } else if (type.id == get_item_by_name("Gold")) {
 		gold(gs) += amnt;
+                if (gs->local_player() == this) {
+                    play("sound/gold.ogg");
+                }
 	} else {
 		itemslot_t slot = inventory().add(type);
 		if (slot == -1) {
@@ -338,6 +340,9 @@ void PlayerInst::pickup_item(GameState* gs, const GameAction& action) {
 				this->last_chosen_weaponclass)) {
 			projectile_smart_equip(inventory(), slot);
 		}
+                if (gs->local_player() == this) {
+                    play("sound/item.ogg");
+                }
 	}
 
 	if (!inventory_full) {
