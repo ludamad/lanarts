@@ -623,6 +623,9 @@ void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
         if (portal == NULL) {
             return;
         }
+        if (gs->local_player()->current_floor == current_floor) {
+            play("sound/stairs.ogg");
+        }
 	cooldowns().reset_stopaction_timeout(50);
 	portal->player_interact(gs, this);
 	reset_rest_cooldown();

@@ -21,6 +21,7 @@
 #include <lcommon/lua_utils.h>
 
 #include "gamestate/GameState.h"
+#include "objects/player/PlayerInst.h"
 
 #include "lua_api.h"
 
@@ -527,6 +528,12 @@ namespace lua_api {
 		return 1;
 	}
 
+        void play_sound(LuaStackValue sound) {
+            if (lua_api::gamestate(sound)->get_level_id() == lua_api::gamestate(sound)->local_player()->current_floor) {
+                play(sound.as<const char*>());
+            }
+        }
+
         std::vector<std::string> lapi_cpp_traceback() {
             // Use our hacked copy of the 'backward' library:
                 using namespace backward;
@@ -559,6 +566,7 @@ namespace lua_api {
 		globals["toaddress"].bind_function(lapi_toaddress);
 		globals["rand_range"].bind_function(lapi_rand_range);
 		globals["random"].bind_function(lapi_random);
+		globals["play_sound"].bind_function(play_sound);
 		globals["random_seed"].bind_function(lapi_random_seed);
 		globals["randomf"].bind_function(lapi_randomf);
 		globals["random_gaussian"].bind_function(lapi_random_gaussian);

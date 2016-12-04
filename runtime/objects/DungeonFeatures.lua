@@ -84,6 +84,9 @@ function Door:on_step()
 
     if is_open ~= self.was_open then
         local tile_xy = ObjectUtils.tile_xy(self, true)
+        if is_open then
+            play_sound "sound/door.ogg"
+        end
         Map.tile_set_solid(self.map, tile_xy, not is_open)
         Map.tile_set_seethrough(self.map, tile_xy, is_open)
     end
