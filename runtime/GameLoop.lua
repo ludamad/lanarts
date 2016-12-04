@@ -125,7 +125,7 @@ function M.run_loop()
             break
         end
 
-        if Keys.key_pressed(Keys.F5) or Network.should_send_sync_message() then
+        if Keys.key_pressed(Keys.F5) then -- or Network.should_send_sync_message() then
             GameState.input_capture(true) -- reset input
             Network.sync_message_send()
         end
