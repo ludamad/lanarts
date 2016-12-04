@@ -433,24 +433,26 @@ M.stone_henge = (args) -> {
         }
         'p': {add: UNSOLID_ADD, content: TileSets.snake.floor, matches_none: SourceMap.FLAG_SOLID}
         'P': {add: UNSOLID_ADD, content: TileSets.grass.floor_alt2, matches_none: SourceMap.FLAG_SOLID}
+        's': {add: UNSOLID_ADD, content: TileSets.snake.floor, matches_none: SourceMap.FLAG_SOLID, on_placement: args.store_placer}
+        'S': {add: UNSOLID_ADD, content: TileSets.grass.floor_alt2, matches_none: SourceMap.FLAG_SOLID, on_placement: args.store_placer}
         'i': {add: UNSOLID_ADD, content: TileSets.grass.floor_alt2, on_placement: args.item_placer, matches_none: SourceMap.FLAG_SOLID}
     }
     data: random_choice {[=[
 .w..w..
 wwppww.
-.pppp+.
-.pppp+.
+.pssp+.
+.pssp+.
 wwppww.
 .w..w..
 ]=]
       [=[
 ..PPPPPPPPPPPP...
 .PPPPPPPPPPPPPP..
-.PPPPPPPPPPPPPPP.
+.PPPSPPPPPPSPPPP.
 .PPPPPPPPPPPPPPP.
 .PPPPPPPPPPPPPPP.
 PPPPPPPPPPPPPPPP.
-PPPPPPPPPPPPPPPP.
+PPPPSPPPPPPSPPPP.
 PPPPPPPPPPPPPPPP.
 PPPPPPPPPPPPPPP..
 .PPPPPPPPPPPPP...
@@ -458,29 +460,29 @@ PPPPPPPPPPPPPPP..
         [=[
 +PPPPPPPPP+
 PPwwPwPwwPP
-PPwPPwPPwPP
+PPwSPwPSwPP
 PPPPPPPPPPP
 PPwwPiPwwPP
 PPPPPPPPPPP
-PPwPPwPPwPP
+PPwSPwPSwPP
 PPwwPwPwwPP
 +PPPPPPPPP+
 ]=]
         [=[
 ww.w.ww.
-wPPwPPw.
+wSPwPSw.
 .PPPPP+.
 wwPiPww.
 .PPPPP+.
-wPPwPPw.
+wSPwPSw.
 ww.w.ww.
 ]=]
         [=[
 .w...w..
 wwPPPww.
-.PPPPP+.
+.PSPSP+.
 .PPiPP+.
-.PPPPP+.
+.PSPSP+.
 wwPPPww.
 .w...w..
 ]=]
@@ -496,7 +498,7 @@ M.cavern = (args) -> {
             content: TileSets.snake.wall
         }
     }
-    data: [=[
+    data: random_choice {[=[
 ..........wwwwwwwww.......
 .....wwwwwwaaaaaawwwwww...
 ..wwwwaaaaaaaaaaaaaaaawww.
@@ -505,6 +507,22 @@ waaaaaaaaaaaaaaaaaaaaaaww.
 wwwaaaaaaaaaaaaaaaaaaaww..
 wwwwwwwwwww....++.........
 ]=]
+    [=[
+.....wwwwwww.......
+.....waaaawwwwww...
+..wwwwaaaaaaaaaww..
+wwwaaaaa!aaaaaaaw..
+wwwaaaaaaaaaaaaww..
+wwwwww..++.........
+]=]
+    [=[
+.....wwwwwwwww.......
+.....waaaaaawwwwww...
+..wwwwaaaaaaaaaaawww.
+wwwaaa!aaaaaaaaaaaaww
+wwwaaaaaaaaaaaaaaww..
+wwwwww....++.........
+]=]}
 }
 
 
@@ -515,6 +533,83 @@ wwwwwwwwwww....++.........
 -- - item_placer
 -- - rng 
 M.small_random_vault = (args) -> {
+    legend: make_legend table.merge(args, {store_placer: random_choice {do_nothing, args.store_placer}}) , {
+        '*': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: random_choice {do_nothing, args.gold_placer}, matches_none: M.FLAG_HAS_VAULT}
+        'i': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: random_choice {do_nothing, args.item_placer}, matches_none: M.FLAG_HAS_VAULT}
+        'e': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: random_choice {do_nothing, args.enemy_placer}, matches_none: M.FLAG_HAS_VAULT}
+        'p': {add: UNSOLID_ADD, content: args.tileset.floor, matches_none: M.FLAG_HAS_VAULT}
+        'd': {
+            add: UNSOLID_ADD 
+            remove: SourceMap.FLAG_SOLID
+            content: args.tileset.floor_alt
+            on_placement: (map, xy) ->
+                MapUtils.spawn_door(map, xy)
+        }
+        'w': {add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}, content: args.tileset.wall_alt, matches_none: M.FLAG_HAS_VAULT}
+    }
+    data: random_choice {[=[
+...++++++
+..++wwww+
+++www!ew+
++wwe**ew+
++wppppww+
++wddwww++
+++++++++.]=],
+        [=[
+..+++++++.
+.+wwwwww+.
+++wepp!w+.
++wwpiipw+.
++wppeppw+.
++wddwwww+.
++++++++++.]=],
+        [=[
+..+++++++
+.+wwwwww+
+++wppeew+
++wwppppw+
++wppp!pw+
++wddwwww+
++++++++++]=],
+        [=[
+..++++++.
+.+wwwww++
+++wpppwe+
++wwpwpp*+
++wppwp!e+
++wddwwww+
++++++++++
+]=],
+        [=[
+.+++++++.
+.+wwwww++
+++wpppww+
++wwpwe*w+
++wppwe!w+
++wddwwww+
++++++++++]=],
+        [=[
+.+++++++.
+.+wwwww++
+++wpeeww+
++wwpwe!w+
++wppwppw+
++wddwddw+
++++++++++
+]=],
+        [=[
+.+++++++.
+.+wwwww++
+++wpeeww+
++dwpwe!d+
++di*wppd+
++wwwwwww+
++++++++++
+]=]
+    }
+}
+
+M.small_item_vault = (args) -> {
     legend: make_legend args, {
         '*': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.gold_placer, matches_none: M.FLAG_HAS_VAULT}
         'i': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: args.item_placer, matches_none: M.FLAG_HAS_VAULT}
@@ -529,73 +624,6 @@ M.small_random_vault = (args) -> {
         }
         'w': {add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}, content: args.tileset.wall_alt, matches_none: M.FLAG_HAS_VAULT}
     }
-    data: random_choice {[=[....++++++
-..++wwww++
-++www!ew+.
-+wwe**ew+.
-+wppppww+.
-+wddwww++.
-++++++++..]=],
-        [=[..++++++++
-.+wwwwww++
-++wppppw+.
-+wwpiipw+.
-+wpppppw+.
-+wddwwww+.
-+++++++++.]=],
-        [=[..++++++++
-.+wwwwww++
-++wppppw+.
-+wwppppw+.
-+wppp!pw+.
-+wddwwww+.
-+++++++++.]=],
-        [=[..++++++++
-.+wwwww+++
-++wpppww+.
-+wwpwppw+.
-+wppwp!w+.
-+wddwwww+.
-+++++++++.]=],
-        [=[..++++++++
-..++wwww++
-++wwwpew+.
-+wweppew+.
-+wppppww+.
-+wddwww++.
-++++++++..]=],
-        [=[..++++++++
-.+wwwwww++
-++wpppew+.
-+wwpeepw+.
-+wpppppw+.
-+wddwwww+.
-+++++++++.]=],
-        [=[..++++++++
-.+wwwwww++
-++wpeppw+.
-+wwpeepw+.
-+wpppppw+.
-+wddwwww+.
-+++++++++.]=],
-        [=[..++++++++
-.+wwwww+++
-++wpppww+.
-+wwpwpew+.
-+wppwpew+.
-+wddwwww+.
-+++++++++.]=],
-        [=[
-.wwwwww...
-wwipppwwww
-wpepipewww
-wwppppeeww
-.wddwppwww
-.w++wwwwww]=]
-    }
-}
-
-M.small_item_vault = (args) -> table.merge M.small_random_vault(args), {
     data: random_choice {[=[++++++
 +wwww+
 +wipd+
@@ -608,7 +636,7 @@ M.small_item_vault = (args) -> table.merge M.small_random_vault(args), {
     }
 }
 
-M.small_item_vault_multiway = (args) -> table.merge M.small_random_vault(args), {
+M.small_item_vault_multiway = (args) -> table.merge M.small_item_vault(args), {
     data: random_choice {
 [=[
 +++++
@@ -619,7 +647,7 @@ M.small_item_vault_multiway = (args) -> table.merge M.small_random_vault(args), 
     }
 }
 
-M.dungeon_tunnel = (args) -> table.merge M.small_random_vault(args), {
+M.dungeon_tunnel = (args) -> table.merge M.small_item_vault(args), {
     data: random_choice {
         [=[
 ...wwwwwwwwwwwww......

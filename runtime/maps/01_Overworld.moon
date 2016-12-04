@@ -643,13 +643,17 @@ overworld_features = (map) ->
 
     ---------------------------------
     place_tunnel = () ->
-        for template in *{Vaults.cavern, Vaults.tunnel, Vaults.stone_henge}--, Vaults.stone_henge, Vaults.stone_henge}
+        i = 0
+        for template in *{Vaults.cavern, Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge}--, Vaults.stone_henge, Vaults.stone_henge}
+            i += 1
         --for template in *{Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge, Vaults.stone_henge}
             enemy_placer = (map, xy) ->
                 enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
                 MapUtils.spawn_enemy(map, enemy, xy)
             store_placer = (map, xy) ->
                 Region1.generate_store(map, xy)
+            if i ~= 1 and i ~= 4
+                store_placer = do_nothing
             item_placer = (map, xy) ->
                 item = ItemUtils.item_generate(ItemGroups.basic_items)
                 MapUtils.spawn_item(map, item.type, item.amount, xy)
@@ -663,7 +667,7 @@ overworld_features = (map) ->
                 -- Dont reject
                 continue
                 -- return true
-    -- if place_tunnel() then return nil
+    if place_tunnel() then return nil
     ---------------------------------
 
     -- Return the post-creation callback:
