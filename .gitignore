@@ -10,6 +10,7 @@ CMakeLists.txt.orig
 *.gch
 *.save
 *.exe
+runtime/settings.yaml
 *.zip
 *.swp
 *.score

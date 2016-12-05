@@ -287,5 +287,6 @@ private:
 };
 
 void play(const char* sound_path);
+void loop(const char* sound_path);
 
 #endif /* GAMESTATE_H_ */

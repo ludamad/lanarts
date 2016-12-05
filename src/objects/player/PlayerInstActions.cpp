@@ -650,6 +650,11 @@ void PlayerInst::use_dngn_portal(GameState* gs, const GameAction& action) {
 			format("%s to %s%s", subject_and_verb.c_str(),
 					label_has_digit ? "" : "the ", map_label.c_str()),
 			is_local_player() ? COL_WHITE : COL_YELLOW);
+        if (map_label == "Plain Valley") {
+            loop("sound/overworld.ogg");
+        } else {
+            loop("sound/dungeon.ogg");
+        }
 }
 
 void PlayerInst::gain_xp(GameState* gs, int xp) {

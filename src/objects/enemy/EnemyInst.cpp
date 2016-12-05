@@ -253,6 +253,7 @@ void EnemyInst::die(GameState *gs) {
 		anim->frame(0);
 		gs->add_instance(anim);
 		gs->remove_instance(this);
+                play("sound/paind.ogg");
 
 	        MTwist& mt = gs->rng();
                 if (should_respawn) {

@@ -16,7 +16,7 @@ namespace lsound {
 		int audio_rate = 22050;
 		Uint16 audio_format = MIX_DEFAULT_FORMAT; /* 16-bit stereo */
 		int audio_channels = 2;
-		int audio_buffers = 256;
+		int audio_buffers = 512;
 
 		SDL_Init(SDL_INIT_AUDIO);
 
