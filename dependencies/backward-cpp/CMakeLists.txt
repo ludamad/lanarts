@@ -39,9 +39,9 @@ endif()
 ###############################################################################
 
 
-CHECK_INCLUDE_FILES (bfd.h HAVE_BFD_H)
 add_definitions(-std=c++11)
-if (HAVE_BFD_H) 
-    add_definitions(BACKWARD_HAS_BFD=1)
+CHECK_INCLUDE_FILES (bfd.h HAVE_BFD_H)
+if (NOT HAVE_BFD_H) 
+    add_definitions(-DBACKWARD_SYSTEM_UNKNOWN=1)
 endif()
 add_library(backward_object backward.cpp)

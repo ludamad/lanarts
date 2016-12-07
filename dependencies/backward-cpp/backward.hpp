@@ -1662,16 +1662,6 @@ private:
 
 /*************** PRINTER ***************/
 
-#ifdef BACKWARD_SYSTEM_LINUX
-
-namespace Color {
-	enum type {
-		yellow = 33,
-		purple = 35,
-		reset  = 39
-	};
-} // namespace Color
-
 // Note that because va_copy is not portable, this must be able to fail.
 // It is thus 'part' of the solution. The resulting string should not be used if it fails.
 // Correct usage:
@@ -1713,6 +1703,16 @@ static std::string format(const char *fmt, ...) {
 	return str;
 }
 
+
+#ifdef BACKWARD_SYSTEM_LINUX
+
+namespace Color {
+	enum type {
+		yellow = 33,
+		purple = 35,
+		reset  = 39
+	};
+} // namespace Color
 
 class Colorize {
 public:
