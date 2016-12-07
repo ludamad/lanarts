@@ -120,7 +120,6 @@
 //    - apt-get install libdw-dev
 //    - g++/clang++ -ldw ...
 //
-#define BACKWARD_HAS_BFD 1
 //  - With libbfd, you get a fair amount of details:
 //    - object filename
 //    - function name
