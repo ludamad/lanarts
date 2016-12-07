@@ -1,6 +1,48 @@
 
 local M = {} -- Submodule
 
+M.store_items = {
+    { item = "Arrow",              chance = 15,  amount = {5,20}  }
+    , { item = "Silver Arrow",       chance = 10,  amount = {2,6}   }
+    , { item = "Stone",              chance = 15,  amount = {3,15}  }
+    -- Scrolls
+    , { item = "Haste Scroll",       chance = 7                      }
+    -- Potions
+    , { item = "Health Potion",      chance = 10                     }
+    , { item = "Mana Potion",        chance = 10                     }
+    -- Rings
+    , { item = "Ring of Spells",     chance = 3                      }
+    , { item = "Ring of Vitality",   chance = 3                      }
+    , { item = "Ring of Stone",      chance = 3                      }
+    -- Helmets
+    , { item = "Runed Helmet",       chance = 1                      }
+    , { item = "Crown of Mars",      chance = 1                      }
+    , { item = "Crown of Orcus",     chance = 1                      }
+    , { item = "Diana's Diadem",     chance = 1                      }
+    -- Rings
+    , { item = "Magician's Ring",    chance = 1                      }
+    , { item = "Moonstone Ring",     chance = 1                      }
+    , { item = "Ogre's Ring",        chance = 1                      }
+    , { item = "Hydra Ring",         chance = 1                      }
+    , { item = "Gallanthor's Ring",         chance = 1               }
+    -- Bows
+    , { item = "Mars Bow",           chance = 1                      }
+    -- Boots
+    , { item = "Iron Boots",         chance = 1                      }
+    -- Gloves
+    , { item = "Steel Gloves",       chance = 1                      }
+    , { item = "Runed Gloves",       chance = 1                      }
+    -- Saves
+    , { item = "Devious Staff",                 chance = 1           }
+    , { item = "Gallanthor's Crutch",                 chance = 1     }
+    -- Permanent enchantments
+    , { item = "Strength Scroll",    chance = 1                      }
+    , { item = "Magic Scroll",       chance = 1                      }
+    , { item = "Defence Scroll",     chance = 1                      }
+    , { item = "Will Scroll",        chance = 1                      }
+    , { item = "Scroll of Experience",        chance = 1             }
+}
+
 M.basic_items = {
     { item = "Gold",                 chance = 125, amount = {5,15}  }
     -- Projectiles
@@ -26,8 +68,7 @@ M.basic_items = {
     , { item = "Wizard's Hat",       chance = 4                      }
     -- Rings
     , { item = "Ring of Spells",     chance = 3                      }
-    , { item = "Ring of Vitality",   chance = 3      
-                    }
+    , { item = "Ring of Vitality",   chance = 3                      }
     , { item = "Ring of Stone",      chance = 3                      }
     -- Boots
     , { item = "Leather Boots",      chance = 5                      }
@@ -82,6 +123,7 @@ M.enchanted_items = {
     -- Gloves
     , { item = "Steel Gloves",       chance = 1                      }
     , { item = "Runed Gloves",       chance = 1                      }
+    -- Saves
     , { item = "Devious Staff",                 chance = 1           }
     , { item = "Gallanthor's Crutch",                 chance = 1     }
     -- Permanent enchantments

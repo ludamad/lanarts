@@ -63,7 +63,7 @@ Data.equipment_create {
     description = "A ring that causes thickening of the skin.",
     type = "ring",
 
-    shop_cost = { 35, 55 },
+    shop_cost = { 55, 75 },
 
     spr_item = "ring of stone",
 

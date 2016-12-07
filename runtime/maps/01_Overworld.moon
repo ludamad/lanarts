@@ -654,6 +654,11 @@ overworld_features = (map) ->
                 Region1.generate_store(map, xy)
             if i ~= 1 and i ~= 4
                 store_placer = do_nothing
+            -- TODO evaluate if I want the 4 stores:
+            if i == 4
+                store_placer = (map, xy) ->
+                    MapUtils.spawn_item(map, "Gold", random(2,10), xy)
+
             item_placer = (map, xy) ->
                 item = ItemUtils.item_generate(ItemGroups.basic_items)
                 MapUtils.spawn_item(map, item.type, item.amount, xy)

@@ -53,10 +53,10 @@ Data.class_create {
         mp = 50,
         hpregen = 0.065,
         mpregen = 0.051,
-        strength = 8,
-        defence = 8,
+        strength = 7,
+        defence = 7,
         willpower = 4,
-        magic = 3,
+        magic = 4,
         equipment = {
           weapon = "Dagger",
           gold = 0,
