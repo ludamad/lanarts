@@ -95,6 +95,12 @@ file(GLOB lanarts_tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_executable( lanarts ${lanarts_src} ${lanarts_tests})
+CHECK_INCLUDE_FILE( bfd.h HAS_BFD ) 
+if ( HAS_BFD) 
+    set( BACKTRADE_DEP bfd ) 
+else()
+    set( BACKTRADE_DEP "" ) 
+endif()
 
 set (libraries 
 	ldraw
@@ -120,7 +126,7 @@ set (libraries
         SDL2-mixer
         SDL2-static
         backward_object
-        bfd
+        ${BACKTRADE_DEP}
 )
 
 target_link_libraries( lanarts 
