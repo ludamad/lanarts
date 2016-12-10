@@ -11,6 +11,7 @@ CMakeLists.txt.orig
 *.save
 *.exe
 runtime/settings.yaml
+runtime/compiled/Resources.lua
 *.zip
 *.swp
 *.score

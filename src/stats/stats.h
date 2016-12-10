@@ -23,18 +23,13 @@ class LuaField;
 
 /* Core combat stats*/
 struct CoreStats {
-	int hp, max_hp;
-	int mp, max_mp;
-	int strength, defence, magic, willpower;
-	float hpregen, mpregen;
+	int hp = 0, max_hp = 0;
+	int mp = 0, max_mp = 0;
+	int strength = 0, defence = 0, magic = 0, willpower = 0;
+	float hpregen = 0, mpregen = 0;
 	// Values < 0
-	float hp_regened, mp_regened;
-
-	CoreStats() :
-			hp(0), max_hp(0), mp(0), max_mp(0), strength(0), defence(0), magic(
-					0), willpower(0), hpregen(0), mpregen(0), hp_regened(0), mp_regened(
-					0) {
-	}
+	float hp_regened = 0, mp_regened = 0;
+        float spell_velocity_multiplier = 1.0;
 
 	void step(const CoreStats& effective_stats, float hp_regen_mod = 1, float mp_regen_mod = 1);
 

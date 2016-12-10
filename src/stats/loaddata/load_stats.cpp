@@ -73,6 +73,7 @@ CoreStats parse_core_stats(const YAML::Node& n) {
 	core.mp = core.max_hp;
 
 	core.strength = parse_defaulted(n, "strength", 0);
+	core.spell_velocity_multiplier = parse_defaulted(n, "spell_velocity_multiplier", 1.0);
 	core.defence = parse_defaulted(n, "defence", 0);
 
 	core.magic = parse_defaulted(n, "magic", 0);

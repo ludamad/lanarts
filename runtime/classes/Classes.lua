@@ -22,7 +22,9 @@ Data.class_create {
         equipment = {
           gold = 0,
           inventory = {
-             {item = "Mana Potion"} 
+             {item = "Mana Potion"},
+             {item = "Ring of Spells"},
+             {item = "Gallanthor's Ring"} 
           }
         }
     },

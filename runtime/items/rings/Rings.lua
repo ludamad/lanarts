@@ -1,13 +1,13 @@
 Data.equipment_create {
     name = "Ring of Spells",
-    description = "A ring bound with magical energies, giving the user increased mana reserves.",
+    description = "A ring bound with magical energies, giving the user increased mana reserves and making spell projectiles move faster.",
     type = "ring",
 
     shop_cost = { 35, 55 },
 
     spr_item = "ring of spells",
 
-    stat_bonuses = { mp = 15 }
+    stat_bonuses = { mp = 15, spell_velocity_multiplier = 1.2 }
 }
 
 Data.equipment_create {

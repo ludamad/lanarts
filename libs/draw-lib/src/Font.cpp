@@ -19,7 +19,7 @@
 #include "Font.h"
 #include "ldraw_assert.h"
 
-#include "opengl/GLImage.h"
+#include "GLImage.h"
 
 namespace ldraw {
 

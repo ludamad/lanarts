@@ -9,6 +9,7 @@
 #include <lcommon/strformat.h>
 
 #include "lua_api/lua_yaml.h"
+#include "lua_api/lua_api.h"
 
 #include "draw/parse_drawable.h"
 
@@ -27,7 +28,7 @@ static FilenameList parse_imgfilelist(const YAML::Node& node) {
 	FilenameList filenames;
 
 	if (is_seq) {
-		std::string tilefile = parse_str(node["file"]);
+		string tilefile = parse_str(node["file"]);
 		std::string ext = parse_str(node["extension"]);
 		for (int i = 0; i < seq; i++) {
 			filenames.push_back(
@@ -43,7 +44,7 @@ void load_tile_callbackf(const YAML::Node& node, lua_State* L,
 		LuaValue* value) {
 	TileEntry entry;
 	entry.name = parse_str(node["name"]);
-	entry.images = parse_image_list(node["files"]);
+        entry.images = parse_image_list(node["files"]);
 
 	game_tile_data.push_back(entry);
 }
@@ -70,6 +71,18 @@ void load_sprite_callbackf(const YAML::Node& node, lua_State* L,
 
 	(*value)[entry.name] = entry.sprite;
 }
+
+/*
+ * Load the resources compiled by runtime/compile_images.py.
+ */
+static void load_compiled_resources(lua_State* L) {
+    LuaValue resources = lua_api::import(L, "compiled.Resources");
+    for (string id : resources["resource_id_list"].as<vector<string>>()) {
+        SpriteEntry entry { id, resources[id].as<ldraw::Drawable>(), type_from_str(""), Colour() };
+        game_sprite_data.push_back(entry);
+    }
+}
+
 LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue lsprites = luawrap::ensure_table(luawrap::globals(L)["sprites"]);
 
@@ -78,6 +91,7 @@ LuaValue load_sprite_data(lua_State* L, const FilenameList& filenames) {
 	load_data_impl_template(filenames, "sprites", load_sprite_callbackf, L,
 			&lsprites);
 
+	load_compiled_resources(L);
 	return lsprites;
 }
 

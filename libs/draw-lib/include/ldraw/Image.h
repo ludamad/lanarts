@@ -15,6 +15,7 @@
 
 #include "DrawOptions.h"
 #include "DrawableBase.h"
+#include "GLImage.h"
 
 #include "ldraw_assert.h"
 
@@ -70,6 +71,7 @@ public:
 	}
 
 	void draw(const DrawOptions& options, const PosF& pos) const;
+	void batch_draw(const PosF& pos) const;
 	void initialize(const std::string& filename, const BBoxF& draw_region =
 			BBoxF(), bool rotates = false);
 	void initialize(const Size& size, const BBoxF& draw_region = BBoxF(),
@@ -78,7 +80,6 @@ public:
 	void from_bytes(const Size& size, char* data);
 
 	virtual void push_metatable(lua_State* L) const;
-
 private:
 	bool _rotates;
 	smartptr<GLImage> _image;

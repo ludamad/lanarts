@@ -9,7 +9,7 @@ sprites:
     file: items/misc/sprites/brilliant_blue.png
 
   - name: stone
-    file: effects/sprites/stone.png
+    file: effects/sprites/stone0.png
 
   - name: book
     file: items/misc/sprites/book.png

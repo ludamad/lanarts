@@ -228,3 +228,64 @@ void GLImage::draw(const ldraw::DrawOptions& options, const PosF& pos) {
 			draw_region.scaled(texw / width, texh / height),
 			quad.translated(pos));
 }
+
+
+struct BatchDrawer {
+    bool mid_draw = false;
+    GLuint last_texture = (GLuint)-1;
+
+    void start_draw(GLuint texture) {
+        if (last_texture != texture) {
+            end_draw();
+            last_texture = texture;
+            glBindTexture(GL_TEXTURE_2D, texture);
+            glBegin(GL_QUADS);
+            glColor4ub(255, 255, 255, 255);
+            mid_draw = true;
+        }
+    }
+    void start_batch() {
+        glEnable(GL_TEXTURE_2D);
+    }
+    void end_batch() {
+        end_draw();
+        glDisable(GL_TEXTURE_2D);
+    }
+private:
+    void end_draw() {
+        if (mid_draw) {
+            glEnd();
+            mid_draw = false;
+        }
+    }
+};
+
+static BatchDrawer batch_drawer;
+
+void GLImage::start_batch_draw() {
+    batch_drawer = BatchDrawer();
+    batch_drawer.start_batch();
+}
+
+void GLImage::batch_draw(const BBoxF& bbox, const PosF& pos) {
+    QuadF imgbox = QuadF({0,0,32,32}, 0).translated(pos);
+    auto texbox = bbox.scaled(texw / width, texh / height);
+    batch_drawer.start_draw(texture);
+
+    //Draw our four points, clockwise.
+    glTexCoord2f(texbox.x1, texbox.y1);
+    glVertex(imgbox.pos[0]);
+
+    glTexCoord2f(texbox.x2, texbox.y1);
+    glVertex(imgbox.pos[1]);
+
+    glTexCoord2f(texbox.x2, texbox.y2);
+    glVertex(imgbox.pos[2]);
+
+    glTexCoord2f(texbox.x1, texbox.y2);
+    glVertex(imgbox.pos[3]);
+}
+
+void GLImage::end_batch_draw() {
+    batch_drawer.end_batch();
+}

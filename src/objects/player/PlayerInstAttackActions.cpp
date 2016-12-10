@@ -255,10 +255,11 @@ static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
     ProjectileEntry& pentry = projectile.projectile_entry();
     bool wallbounce = pentry.can_wall_bounce;
     int nbounces = pentry.number_of_target_bounces;
+    float speed = pentry.speed * p->effective_stats().core.spell_velocity_multiplier;
 
     GameInst* pinst = new ProjectileInst(projectile,
             p->effective_atk_stats(mt, projectile_attack), p->id,
-            Pos(p->x, p->y), target, pentry.speed, pentry.range(), NONE,
+            Pos(p->x, p->y), target, speed, pentry.range(), NONE,
             wallbounce, nbounces);
     gs->add_instance(pinst);
 }

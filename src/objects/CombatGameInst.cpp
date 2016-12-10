@@ -338,6 +338,8 @@ static void combine_stat_hash(unsigned int& hash, CombatStats& stats) {
     combine_hash(hash, core.hpregen, core.mpregen);
     combine_hash(hash, (unsigned int&) core.hp_regened,
             (unsigned int&) core.mp_regened);
+    combine_hash(hash, (unsigned int&) core.hp_regened,
+            (unsigned int&) core.spell_velocity_multiplier);
 
     combine_hash(hash, cstats.xp, cstats.classid);
     for (int i = 0; i < inventory.max_size(); i++) {

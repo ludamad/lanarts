@@ -12,7 +12,7 @@
 #include "DrawOptions.h"
 
 #include "Image.h"
-#include "opengl/GLImage.h"
+#include "GLImage.h"
 
 static BBoxF fullimagebounds(const smartptr<GLImage>& image) {
 	return BBoxF(0, 0, image->width, image->height);
@@ -52,6 +52,10 @@ void Image::initialize(const Size& size, const BBoxF& draw_region,
 		_draw_region = draw_region;
 	}
 	_rotates = rotates;
+}
+
+void Image::batch_draw(const PosF& pos) const {
+    _image->batch_draw(_draw_region, pos);
 }
 
 void Image::draw(const DrawOptions& options, const PosF& pos) const {

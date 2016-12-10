@@ -78,6 +78,7 @@ void CoreStats::apply_as_bonus(const CoreStats& bonus_stats) {
 	defence += bonus_stats.defence;
 	magic += bonus_stats.magic;
 	willpower += bonus_stats.willpower;
+	spell_velocity_multiplier *= bonus_stats.spell_velocity_multiplier;
 
 	hpregen += bonus_stats.hpregen;
 	mpregen += bonus_stats.mpregen;
@@ -155,6 +156,8 @@ CoreStats parse_core_stats(const LuaField& value, bool required) {
 	if (!required && value.isnil()) {
 		return core;
 	}
+	core.spell_velocity_multiplier = defaulted(value, "spell_velocity_multiplier", 1.0);
+
 	core.max_mp = defaulted(value, "mp", 0);
 	core.max_hp = defaulted(value, "hp", 0);
 
