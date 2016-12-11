@@ -448,7 +448,14 @@ local function generate_stores(map)
     if chance(0.25) then
         local items = {}
         for i=1,random(5,10) do
-            table.insert(items, item_utils.item_generate(chance(.5) and item_groups.basic_items or item_groups.enchanted_items, true))
+            local randart_power_level = 1
+            if randomf() <= 0.3 then
+                randart_power_level = randart_power_level + 1
+            end
+            if randomf() <= 0.3 then
+                randart_power_level = randart_power_level + 1
+            end
+            table.insert(items, item_utils.item_generate(chance(.5) and item_groups.basic_items or item_groups.enchanted_items, true), randart_power_level)
         end
         map_utils.random_store(map, items)
     end
