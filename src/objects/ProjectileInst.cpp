@@ -109,7 +109,6 @@ void ProjectileInst::step(GameState* gs) {
 	lua_State* L = gs->luastate();
 
 	Pos tile_hit;
-        printf("SPEED = %f\n", sqrt(vx*vx+vy*vy));
 
 	int newx = (int) round(rx + vx); //update based on rounding of true float
 	int newy = (int) round(ry + vy);
