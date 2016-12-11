@@ -17,13 +17,18 @@ local function shop_cost(entry)
     return items[entry.item].shop_cost
 end
 
+local RANDART_CHANCE = 100
 function M.item_generate(group, only_with_shop_cost, --[[Optional]] randart_power_level)
-    -- -- For now, a fixed 1 in 100 chance of being a randart
-    -- if randart_power_level ~= nil then
-    --     if randomf() <= 0.01 then
-    --         return {type = random_choice(Randarts.RANDARTS[randart_power_level]), amount = 1}
-    --     end
-    -- end
+    -- For now, a fixed 1 in 100 chance of being a randart
+    if true then -- randart_power_level ~= nil then
+        if randomf() <= RANDART_CHANCE / 100 then
+            randart_power_level = 1
+            while randomf() < 0.01 and randart_power_level < 3 do
+                randart_power_level = randart_power_level + 1
+            end
+            return {type = random_choice(Randarts.RANDARTS[randart_power_level]), amount = 1}
+        end
+    end
     local total_chance = 0
     for entry in values(group) do
         if not only_with_shop_cost or shop_cost(entry) then

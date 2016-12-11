@@ -31,7 +31,7 @@ Data.equipment_create {
 
     spr_item = "hydra ring",
 
-    stat_bonuses = { hpregen = 0.01666 }
+    stat_bonuses = { hpregen = 0.0333333 }
 }
 
 Data.equipment_create {
@@ -43,7 +43,7 @@ Data.equipment_create {
 
     spr_item = "moonstone ring",
 
-    stat_bonuses = { mpregen = 0.01666 }
+    stat_bonuses = { mpregen = 0.0333333 }
 }
 
 Data.equipment_create {
@@ -96,4 +96,5 @@ Data.equipment_create {
 }
 
 -- Start the game with 1000 'randarts' -- for now, preconfigured item generations.
-require("items.Randarts").define_randarts()
+require("items.Randarts").define_equipment_randarts()
+

@@ -169,6 +169,8 @@ void PlayerInst::shift_autotarget(GameState* gs) {
 void PlayerInst::step(GameState* gs) {
 	perf_timer_begin(FUNCNAME);
 	_path_to_player.fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
+        //if (cooldowns().action_cooldown > 0) 
+        //printf("MELEE COOLDOWN %d\n", cooldowns().action_cooldown);
 
 	GameInst* target_inst = gs->get_instance(current_target);
 	bool visible = target_inst != NULL

@@ -33,7 +33,6 @@ void parse_item_entry(lua_State* L, const YAML::Node& n, ItemEntry& entry) {
 	entry.item_sprite = parse_sprite_number(n, "spr_item");
 
 	entry.stackable = parse_optional(n, "stackable", true);
-	parse_optional(n, "shop_cost", Range());
 }
 
 static LuaValue* item_table;

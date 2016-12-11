@@ -60,7 +60,10 @@ additive_stat_bonus = (attr, range) -> (rng, data) ->
 additive_armour_bonus = (attr, range) -> (rng, data) ->
     bonus = rng\random(range[1], range[2] + 1)
     data[attr] or= {base: 0}
-    data[attr] = {base: data[attr].base + bonus}
+    if type(data[attr].base) == "number"
+        data[attr].base = {data[attr].base, data[attr].base}
+    {b1, b2} = data[attr].base
+    data[attr] = {base: {b1 + bonus, b2 + bonus}}
 
 mult_stat_bonus = (attr, range) -> (rng, data) ->
     mult = rng\randomf(range[1], range[2])
@@ -129,6 +132,8 @@ define_randart = (rng, base, images) ->
         }
         spr_item: rng\random_choice(images)
     }
+    -- Make sure we don't see this as a randart-derivable item:
+    data.randart_sprites = nil
     data.stat_bonuses or= {}
     n_enchants = power_level * 2
     while n_enchants > 0 
@@ -141,7 +146,7 @@ define_randart = (rng, base, images) ->
         else
             rng\random_choice(MINOR_ENCHANTS)(rng, data)
             n_enchants -= 1
-    Data.equipment_create(data)
+    return data
 
 -- Define several randart rings:
 define_ring_randarts = (rng) ->
@@ -152,15 +157,9 @@ define_ring_randarts = (rng) ->
             type: "ring"
             shop_cost: {0, 0}
         }
-        define_randart(rng, base, images)
+        Data.equipment_create(define_randart(rng, base, images))
 
 define_equipment_randarts = (rng) ->
-    for item in *items
-        if item.randart_sprites ~= nil
-            for i=1,20
-                define_randart(rng, item, item.randart_sprites)
-
-define_randarts = () ->
     -- RNG object just for generating randarts
     -- ATM the following MUST be a deterministic process, because of limitations
     -- in the Lanarts engine. Once we move to a better serialization library
@@ -168,6 +167,25 @@ define_randarts = () ->
     -- and not in a phase beforehand.
     rng = require("mtwist").create(HARDCODED_RANDARTS_SEED)
     define_ring_randarts(rng)
-    define_equipment_randarts(rng)
+    for item in *items
+        -- Judge whether its equipment by a cooldown not being present
+        if item.randart_sprites ~= nil and item.cooldown == nil
+            for i=1,20
+                Data.equipment_create(define_randart(rng, item, item.randart_sprites))
 
-return {:define_randarts, :RANDARTS, :MAX_POWER_LEVEL}
+define_weapon_randarts = () ->
+    -- RNG object just for generating randarts
+    -- ATM the following MUST be a deterministic process, because of limitations
+    -- in the Lanarts engine. Once we move to a better serialization library
+    -- and have a more flexible object system we can move this into the code proper
+    -- and not in a phase beforehand.
+    rng = require("mtwist").create(HARDCODED_RANDARTS_SEED)
+    for name, item in pairs(items)
+        -- Judge whether its a weapon by a cooldown being present
+        if item.randart_sprites ~= nil and item.cooldown ~= nil
+            for i=1,20
+                print(i)
+                template = define_randart(rng, item, item.randart_sprites)
+                Data.weapon_create(template)
+
+return {:RANDARTS, :MAX_POWER_LEVEL, :define_equipment_randarts, :define_weapon_randarts}

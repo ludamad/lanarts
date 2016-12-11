@@ -426,7 +426,7 @@ static double lapi_random_gaussian(LuaStackValue average, double std_dev) {
 static int lapi_randomf(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	int nargs = lua_gettop(L);
-	double min = 0, max = 0;
+	double min = 0, max = 1.0;
 	if (nargs == 1) {
 		// array[1]
 		lua_rawgeti(L, 1, 1);
@@ -440,7 +440,7 @@ static int lapi_randomf(lua_State* L) {
 		max = lua_tonumber(L, 2);
 	}
 
-	lua_pushnumber(L, gs->rng().rand(RangeF(min, max)));
+	lua_pushnumber(L, gs->rng().randf() * (max - min) + min);
 	return 1;
 }
 

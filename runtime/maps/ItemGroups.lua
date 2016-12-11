@@ -98,6 +98,9 @@ M.enchanted_items = {
     -- Melee Weapons
     , { item = "Samurai Sabre",      chance = 1                      }
     , { item = "Magic Sword",        chance = 2                      }
+    , { item = "Triple Sword",        chance = 1                      }
+    , { item = "Battle Axe",        chance = 1                      }
+    , { item = "Iron Scimitar",        chance = 1                      }
     -- Potions
     , { item = "Health Potion",      chance = 10                     }
     , { item = "Mana Potion",        chance = 10                     }

@@ -222,8 +222,12 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 	lua_spells = load_spell_data(L, dfiles.spell_files);
 	update_loading_screen(L, 30, "Loading Weapons");
 
+        // Ensure we have access to the items table for purposes of equipment definition: 
+	globals["items"] = lua_items;
 	load_weapon_data(L, dfiles.weapon_files, &lua_items);
 	update_loading_screen(L, 40, "Loading Equipment");
+
+	// TODO clean this up
 
 	load_equipment_data(L, dfiles.equipment_files, &lua_items);
 	update_loading_screen(L, 50, "Loading Enemies");
@@ -237,12 +241,6 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 	lua_classes = load_class_data(L, FilenameList());
 	update_loading_screen(L, 100, "Complete!");
 
-	// TODO clean this up
-
-	globals["enemies"] = lua_enemies;
-	globals["effects"] = lua_effects;
-	globals["items"] = lua_items;
-	globals["projectiles"] = lua_projectiles;
 	LuaValue weapons = luawrap::ensure_table(globals["weapons"]);
 	int ind = 0;
 	for (int i = 0; i < game_item_data.size(); i++) {
@@ -275,6 +273,9 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 			consumables[entry.name] = lua_items[entry.name];
 		}
 	}
+	globals["enemies"] = lua_enemies;
+	globals["effects"] = lua_effects;
+	globals["projectiles"] = lua_projectiles;
 	globals["spells"] = lua_spells;
 	globals["classes"] = lua_classes;
 

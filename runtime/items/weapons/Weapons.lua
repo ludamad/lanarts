@@ -20,7 +20,9 @@ Data.weapon_create {
     description = "A short, swift, pointy blade.",
     type = "short blades",
 
+    shop_cost = {0,0},
     spr_item = "dagger",
+    randart_sprites = {"spr_weapons.randart_dagger1", "spr_weapons.randart_dagger2"},
 
     resist_modifier = 0.875,
 
@@ -41,7 +43,7 @@ Data.weapon_create {
     shop_cost = {20, 35},
 
     spr_item = "short sword",
-
+    randart_sprites = {"spr_weapons.randart_short_sword1", "spr_weapons.randart_short_sword2"},
 
     damage = {base = {4, 8}, strength = 1.1},
     power = {base = 1, strength = 0.2},
@@ -89,7 +91,6 @@ Data.weapon_create {
 }
 
 
-
 Data.weapon_create {
     name = "Samurai Sabre",
     description = "A swift blade once owned by a powerful warrior.",
@@ -135,6 +136,7 @@ Data.weapon_create {
     shop_cost = {35, 50},
 
     spr_item = "mace",
+    randart_sprites = {"spr_weapons.randart_mace1", "spr_weapons.randart_mace2", "spr_weapons.randart_mace3"},
 
     resist_modifier = 1.1,
 
@@ -173,6 +175,26 @@ Data.weapon_create {
         end
     end
       
+}
+
+Data.weapon_create {
+    name = "Triple Sword",
+    description = "A very slow huge sword of great power.",
+    type = "axes and maces",
+
+    shop_cost = {125, 165},
+
+    spr_item = "spr_weapons.triple_sword",
+    randart_sprites = {"spr_weapons.randart_triple_sword1", "spr_weapons.randart_triple_sword2"},
+
+    resist_modifier = 1.5,
+
+    damage = {base = {10, 15}, strength = 1.6},
+    power = {base = 12, strength = 1.0},
+
+    cooldown = 85,
+
+    range = 7
 }
 
 Data.weapon_create {
@@ -373,3 +395,7 @@ Data.weapon_create {
 }
 
 -- END MONSTER ATTACK TYPES --
+
+-- Start the game with 1000 'randarts' -- for now, preconfigured item generations.
+require("items.Randarts").define_weapon_randarts()
+
