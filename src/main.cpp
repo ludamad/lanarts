@@ -2,6 +2,7 @@
 #include <vector>
 #include <stdexcept>
 #include <ctime>
+#include <csignal>
 
 #include <lcommon/fatal_error.h>
 #include <lcommon/unittest.h>
@@ -204,8 +205,15 @@ static void run_engine(int argc, char** argv) {
 	delete gs;
 }
 
+/* Handle Ctrl+C */
+static void handleSIGINT(int signal) {
+  lanarts_system_quit();
+  exit(0);
+}
+
 /* Must take (int, char**) to play nice with SDL */
 int main(int argc, char** argv) {
+  std::signal(SIGINT, handleSIGINT);
 #if NDEBUG
 	try {
 #endif
