@@ -185,6 +185,7 @@ Data.weapon_create {
     shop_cost = {125, 165},
 
     spr_item = "spr_weapons.triple_sword",
+    randart_weight = 5,
     randart_sprites = {"spr_weapons.randart_triple_sword1", "spr_weapons.randart_triple_sword2"},
 
     resist_modifier = 1.5,
@@ -264,6 +265,7 @@ Data.weapon_create {
     spr_item = "bow1",
 
     uses_projectile = true,
+    randart_sprites = {"spr_weapons.randart_shortbow"},
 
     damage = {base = {3, 6}, strength = 1.15},
     power = {base = 3, strength = 0.2},

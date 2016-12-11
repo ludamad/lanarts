@@ -6,6 +6,7 @@ Data.equipment_create {
     shop_cost = { 15, 25 },
 
     spr_item = "iron helmet",
+    randart_sprites = {"spr_armour.randart_helmet"},
 
     spell_cooldown_multiplier = 1.05,
 
@@ -37,6 +38,7 @@ Data.equipment_create {
     shop_cost = { 15, 25 },
 
     spr_item = "wizard hat",
+    randart_sprites = {"spr_armour.randart_hat"},
 
     magic_reduction = { base = 1 }
 

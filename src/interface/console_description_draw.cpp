@@ -182,11 +182,15 @@ static void draw_bonus(GameState* gs, DescriptionBoxHelper& dbh,
 }
 static void draw_statmult(GameState* gs, DescriptionBoxHelper& dbh,
 		const char* name, CoreStatMultiplier& mult, CoreStats& core,
-		const Colour& prefixcol = COL_GREEN, const Colour& valuecol =
-				COL_PALE_GREEN, bool optional = true) {
+		Colour prefixcol = COL_GREEN, Colour valuecol = COL_PALE_GREEN, 
+                bool optional = true) {
 	if (!optional || !mult.is_empty()) {
-		dbh.draw_prefix(gs, prefixcol, "%s", name);
 		Range value_range = mult.calculate_range(core);
+                if (value_range.min < 0) {
+                    prefixcol = COL_LIGHT_RED;
+                    valuecol = COL_PALE_RED;
+                }
+		dbh.draw_prefix(gs, prefixcol, "%s", name);
 		if (value_range.min == value_range.max) {
 			dbh.draw_value(gs, valuecol, "%d", value_range.min);
 		} else {

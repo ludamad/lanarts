@@ -2,6 +2,7 @@
 
 local map_utils = require "maps.MapUtils"
 local Randarts = require "items.Randarts"
+local GlobalData = require "core.GlobalData"
 
 local M = {} -- Submodule
 
@@ -23,10 +24,19 @@ function M.item_generate(group, only_with_shop_cost, --[[Optional]] randart_powe
     if true then -- randart_power_level ~= nil then
         if randomf() <= RANDART_CHANCE / 100 then
             randart_power_level = 1
-            while randomf() < 0.01 and randart_power_level < 3 do
+            while randomf() < 0.05 and randart_power_level < 3 do
                 randart_power_level = randart_power_level + 1
             end
-            return {type = random_choice(Randarts.RANDARTS[randart_power_level]), amount = 1}
+            local choice = nil
+            while true do
+                choice = random_choice(Randarts.RANDARTS[randart_power_level])
+                --if not GlobalData.randarts_generated[choice] then
+                --    GlobalData.randarts_generated[choice] = true
+                --    break
+                --end
+                break -- TODO reconsider randart generation
+            end
+            return {type = choice, amount = 1}
         end
     end
     local total_chance = 0

@@ -6,6 +6,7 @@ Data.equipment_create {
     shop_cost = { 15, 25 },
 
     spr_item = "leather boots",
+    randart_sprites = {"spr_armour.randart_leather_boots"},
 
     resistance = { base = 1 }
 }

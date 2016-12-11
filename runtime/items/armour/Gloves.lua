@@ -18,6 +18,7 @@ Data.equipment_create {
     shop_cost = { 55, 75 },
 
     spr_item = "steel gloves",
+    randart_sprites = {"spr_armour.randart_glove1", "spr_armour.randart_glove2", "spr_armour.randart_glove3", "spr_armour.randart_glove4"},
 
     reduction = { base = 1 },
     resistance = { base = 1 }

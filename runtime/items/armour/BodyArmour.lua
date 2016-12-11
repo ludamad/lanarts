@@ -35,6 +35,7 @@ Data.equipment_create {
     description = "A strong, heavy armour.",
     type = "armour",
 
+    randart_sprite = {"spr_armour.randart_plate"},
     shop_cost = {95,105},
 
     spr_item = "platemail",
@@ -53,6 +54,7 @@ Data.equipment_create {
     type = "armour",
 
     shop_cost = {10,20},
+    randart_sprites = {"spr_armour.randart_robe1", "spr_armour.randart_robe2"},
 
     spr_item = "robe",
 
