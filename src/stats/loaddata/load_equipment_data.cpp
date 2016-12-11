@@ -31,8 +31,6 @@ void parse_equipment_entry(lua_State* L, const YAML::Node& n, EquipmentEntry& en
 		entry.type = EquipmentEntry::HEADGEAR;
 	} else if (type == "gloves") {
 		entry.type = EquipmentEntry::GLOVES;
-	} else if (type == "key") {
-		entry.type = EquipmentEntry::KEY;
 	} else {
 		LANARTS_ASSERT(type.empty());
 	}

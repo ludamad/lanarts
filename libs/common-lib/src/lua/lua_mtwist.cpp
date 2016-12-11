@@ -38,7 +38,7 @@ static int random_choice(lua_State* L) {
     LuaStackValue mtwist(L, 1);
     LuaStackValue choices(L, 2);
     int index = mtwist.as<MTwist*>()->rand(choices.objlen());
-    choices[index].push();
+    choices[index + 1].push();
     return 1;
 }
 

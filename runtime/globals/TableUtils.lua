@@ -136,6 +136,17 @@ function table.value_key_invert(t)
     return ret
 end
 
+function table.filter(t, f)
+    local ret = {}
+    for i=1,#t do
+        if f(t[i]) then
+            ret[#ret + 1] =  t[i]
+        end
+    end
+    return ret
+end
+
+
 function table.filter_matches(t, pattern)
     for i=#t,1,-1 do
         if t[i]:match(pattern) then

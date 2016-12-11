@@ -5,14 +5,6 @@ import os
 import sys
 from collections import OrderedDict, defaultdict
 
-class Sprite:
-    def __init__(self, name, parts, type):
-        self.name = name
-        self.parts = parts
-        self.type = type
-    def output_reconstruction(self):
-        pass
-
 #os.system("convert -crop 32x32 image.png temporary.png")
 print "local Display = require 'core.Display'"
 print "local M = nilprotect {}"
@@ -31,8 +23,9 @@ for spr_folder in SPR_FOLDERS:
             print "Error, clashing file names " + used_ids[id] + " and " + filename + ". Must have different base names."
             sys.exit(1)
         used_ids[id] = True
-        resources.append(spr_folder + "." + id)
-        print "M['" + spr_folder + "." + id + "'] = Display.image_load '" + filename + "'"
+        full_id = spr_folder.replace('/', '.') + "." + id
+        resources.append(full_id)
+        print "M['" + full_id + "'] = Display.image_load '" + filename + "'"
     print ""
 resources.sort()
 

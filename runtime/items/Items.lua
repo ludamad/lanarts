@@ -172,3 +172,4 @@ Data.item_create {
         user.stats.magic = user.stats.magic + 1
     end
 }
+

@@ -15,7 +15,7 @@
 class EquipmentEntry: public ItemEntry {
 public:
 	enum equip_type {
-		NONE, WEAPON, AMMO, BODY_ARMOUR, RING, BOOTS, GLOVES, HEADGEAR, KEY
+		NONE, WEAPON, AMMO, BODY_ARMOUR, RING, BOOTS, GLOVES, HEADGEAR
 	};
 	EquipmentEntry(equip_type type = NONE) :
 			type(type) {
