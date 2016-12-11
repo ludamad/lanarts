@@ -2,8 +2,7 @@
 local M = {} -- Submodule
 
 M.store_items = {
-    { item = require("items.Randarts").RANDARTS[1],              chance = 15000000}
-    , { item = "Arrow",              chance = 15,  amount = {5,20}  }
+    { item = "Arrow",              chance = 15,  amount = {5,20}  }
     , { item = "Silver Arrow",       chance = 10,  amount = {2,6}   }
     , { item = "Stone",              chance = 15,  amount = {3,15}  }
     -- Scrolls
