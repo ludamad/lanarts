@@ -110,7 +110,7 @@ function build_lanarts(){
         make clean
     fi
     make -j$((cores+1)) lanarts
-    cd ../runtime && python compile_images.py > compiled/Resources.lua
+    cd ../runtime && python2 compile_images.py > compiled/Resources.lua
     cd ..
 }
 
