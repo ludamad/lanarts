@@ -18,7 +18,7 @@ local function shop_cost(entry)
     return items[entry.item].shop_cost
 end
 
-local RANDART_CHANCE = 100
+local RANDART_CHANCE = 1
 function M.item_generate(group, only_with_shop_cost, --[[Optional]] randart_power_level)
     -- For now, a fixed 1 in 100 chance of being a randart
     if true then -- randart_power_level ~= nil then

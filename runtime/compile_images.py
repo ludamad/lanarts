@@ -9,7 +9,7 @@ from collections import OrderedDict, defaultdict
 print "local Display = require 'core.Display'"
 print "local M = nilprotect {}"
 
-SPR_FOLDERS = ["spr_doors", "spr_keys", "spr_rings", "spr_rings/randarts", "spr_weapons"]
+SPR_FOLDERS = ["spr_doors", "spr_keys", "spr_rings", "spr_rings/randarts", "spr_weapons", "spr_armour"]
 used_ids = defaultdict(lambda: None)
 resources = []
 for spr_folder in SPR_FOLDERS:

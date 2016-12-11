@@ -103,10 +103,10 @@ MINOR_ENCHANTS = {
     additive_stat_bonus("defence", {1, 1})
     additive_stat_bonus("willpower", {1, 1})
     additive_stat_bonus("magic", {1, 1})
-    additive_core_bonus("reduction", {1, 1})
-    additive_core_bonus("resistance", {1, 1})
-    additive_core_bonus("magic_reduction", {1, 1})
-    additive_core_bonus("magic_resistance", {1, 1})
+    additive_core_bonus("reduction", {1, 2})
+    additive_core_bonus("resistance", {1, 2})
+    additive_core_bonus("magic_reduction", {1, 2})
+    additive_core_bonus("magic_resistance", {1, 2})
 }
 
 -- Minor debuffs:
@@ -125,8 +125,8 @@ MAJOR_ENCHANTS = {
 -- Major debuffs:
 MINOR_DEBUFFS = {
     mult_stat_bonus("spell_velocity_multiplier", {0.8, 0.9})
-    additive_stat_bonus("mp", {-25, -5})
-    additive_stat_bonus("hp", {-25, -5})
+    additive_stat_bonus("mp", {-20, -5})
+    additive_stat_bonus("hp", {-20, -5})
     additive_stat_bonus("hpregen", {-0.06, -0.02})
     additive_stat_bonus("mpregen", {-0.06, -0.02})
     additive_stat_bonus("strength", {-3, -1})
@@ -195,6 +195,8 @@ apply_enchantment = (rng, data) ->
         else
             additive_core_bonus("reduction", {enchantment, enchantment})(rng, data)
             additive_core_bonus("resistance", {enchantment, enchantment})(rng, data)
+        for i=1,2
+            data.shop_cost[i] += math.floor((enchantment ^ 1.5) * 50)
 
 -- Define several randart rings:
 define_ring_randarts = (rng) ->
@@ -215,10 +217,10 @@ define_equipment_randarts = (rng) ->
     -- and not in a phase beforehand.
     rng = require("mtwist").create(HARDCODED_RANDARTS_SEED)
     define_ring_randarts(rng)
-    for item in *items
+    for name, item in pairs(items)
         -- Judge whether its equipment by a cooldown not being present
         if item.randart_sprites ~= nil and item.cooldown == nil
-            for i=1,(item.randart_weight or 50) * 2
+            for i=1,(item.randart_weight or 20) * 2
                 Data.equipment_create(define_randart(rng, item, item.randart_sprites, apply_enchantment))
 
 define_weapon_randarts = () ->
