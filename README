@@ -22,7 +22,8 @@ To build and run, do:
   ./run.sh
  from the lanarts source folder.
 
-If developing on Windows, create the desired project files (eg by picking 
+If developing on Windows, create the desired project files (eg by picking them from CMake GUI), build, and run the executable from the 'runtime' folder in source.
+NOTE: Currently you will need to run compile_images.py before running. This is done automatically in run.sh but must be done separately during Windows development.
 
 USING ECLIPSE:
 For Linux/Mac. For Windows, you can use the CMake GUI. Go to folder where you want eclipse project files:
