@@ -131,11 +131,11 @@ local PowerStrike = {
     spr_spell = "chargestrike",
     can_cast_with_cooldown = false,
     mp_cost = 40,
-    cooldown = 30,
+    cooldown = 0, -- Uses cooldown of weapon
     fallback_to_melee = true,
 }
 
-local function ChargeCallback(effect, caster)
+local function ChargeCallback(_, caster)
     local num = 0
     for mon in values(Map.monsters_list() or {}) do
         if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 30 + caster.stats.strength then
@@ -155,15 +155,20 @@ local function ChargeCallback(effect, caster)
 end
 
 function PowerStrike.action_func(caster)
+    caster:apply_melee_cooldown()
     if caster:is_local_player() then
         EventLog.add("You strike wildly in all directions!", {200,200,255})
     elseif caster.name == "Your ally" then
         EventLog.add(caster.name .. " strikes wildly in all directions!", {200,200,255})
     end
+
     caster:add_effect("Charge", 8).callback = ChargeCallback
 end
 
 function PowerStrike.prereq_func(caster)
+    if caster:has_ranged_weapon() then
+        return false
+    end
     for mon in values(Map.monsters_list() or {}) do
         if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + 30 then
             return true

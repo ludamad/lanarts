@@ -552,37 +552,17 @@ void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
 }
 void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 	perf_timer_begin(FUNCNAME);
-	int dx = action.action_x;
-	int dy = action.action_y;
 
+        // Get the effective move speed:
 	float mag = effective_stats().movespeed;
 
-	float ddx = dx * mag;
-	float ddy = dy * mag;
+        // Get the move direction:
+	int dx = action.action_x, dy = action.action_y;
+        // Multiply by the move speed to get the displacement. 
+        // Note that players technically move faster when moving diagonally.
+	float ddx = dx * mag, ddy = dy * mag;
 
-	EnemyInst* target = NULL;
-//Enemy hitting test for melee
-	gs->object_radius_test(this, (GameInst**)&target, 1, &enemy_colfilter,
-			x + ddx * 2, y + ddy * 2);
-
-//Smaller radius enemy pushing test, can intercept enemy radius but not too far
-	EnemyInst* alreadyhitting[5] = { 0, 0, 0, 0, 0 };
-	gs->object_radius_test(this, (GameInst**)alreadyhitting, 5,
-			&enemy_colfilter, x, y, radius);
-	bool already = false;
-	for (int i = 0; i < 5; i++) {
-		if (alreadyhitting[i]) {
-			if (ddx < 0 == ((alreadyhitting[i]->x - x + ddx * 2) < 0)) {
-				ddx = 0;
-			}
-			if (ddy < 0 == ((alreadyhitting[i]->y - y + ddy * 2) < 0)) {
-				ddy = 0;
-			}
-			already = true;
-		}
-	}
-
-	Pos newpos(round(rx + ddx), round(ry + ddy));
+        Pos newpos(round(rx + ddx), round(ry + ddy));
 
 	if (!gs->tile_radius_test(newpos.x, newpos.y, radius)) {
 		vx = ddx;
@@ -605,6 +585,28 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 		}
 
 	}
+
+        //Smaller radius enemy pushing test, can intercept enemy radius but not too far
+	EnemyInst* alreadyhitting[5] = { NULL, NULL, NULL, NULL, NULL };
+	gs->object_radius_test(this, (GameInst**)alreadyhitting, 5,
+			&enemy_colfilter, x, y, radius);
+	bool reduce_vx = false, reduce_vy = false;
+	for (int i = 0; i < 5; i++) {
+		if (alreadyhitting[i]) {
+			if (vx < 0 == ((alreadyhitting[i]->x - x + vx * 2) < 0)) {
+				reduce_vx = true;
+			}
+			if (vy < 0 == ((alreadyhitting[i]->y - y + vy * 2) < 0)) {
+				reduce_vy = true;
+			}
+		}
+	}
+        if (reduce_vx) {
+            vx *= 0.5;
+        }
+        if (reduce_vy) {
+            vy *= 0.5;
+        }
 
 	event_log("Player id: %d using move for turn %d, vx=%f, vy=%f\n", id, gs->frame(), vx, vy);
 	perf_timer_end(FUNCNAME);

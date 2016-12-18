@@ -213,6 +213,17 @@ static LuaValue lua_enemyinst_metatable(lua_State* L) {
 	return meta;
 }
 
+static void apply_melee_cooldown(PlayerInst* player) {
+    auto estats = player->effective_stats();
+    //if (player->equipment().has_projectile()) {
+    //    cooldown_mult = estats.cooldown_modifiers.ranged_cooldown_multiplier;
+    //} else {
+    float cooldown_mult = estats.cooldown_modifiers.melee_cooldown_multiplier;
+    int cooldown = player->weapon().weapon_entry().cooldown();
+    //}
+    player->cooldowns().reset_action_cooldown(cooldown * cooldown_mult);
+}
+
 static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(PlayerInst*);
 	LuaValue meta = lua_combatgameinst_metatable(L);
@@ -228,10 +239,13 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(getters, deaths, OBJ->score_stats().deaths);
 	LUAWRAP_GETTER(getters, spells, OBJ->stats().spells.spell_id_list());
 	LUAWRAP_METHOD(methods, melee, luawrap::push(L, OBJ->melee_attack(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2), OBJ->equipment().weapon(), true)) );
-
+    
+	LUAWRAP_GETTER(methods, has_melee_weapon, !OBJ->weapon().weapon_entry().uses_projectile);
+	LUAWRAP_GETTER(methods, has_ranged_weapon, OBJ->weapon().weapon_entry().uses_projectile);
 	LUAWRAP_GETTER(methods, is_local_player, OBJ->is_local_player());
 	LUAWRAP_METHOD(methods, gain_xp, OBJ->gain_xp(lua_api::gamestate(L), luawrap::get<int>(L, 2)));
 	LUAWRAP_METHOD(methods, reset_rest_cooldown, OBJ->cooldowns().reset_rest_cooldown(REST_COOLDOWN));
+	methods["apply_melee_cooldown"].bind_function(apply_melee_cooldown);
 
 	return meta;
 }

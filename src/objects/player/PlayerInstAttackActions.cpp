@@ -572,33 +572,21 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
         Projectile projectile = equipment().projectile();
         ProjectileEntry& pentry = projectile.projectile_entry();
         item_id item = get_item_by_name(pentry.name.c_str());
-        int weaprange = std::max(wentry.range(), pentry.range());
-        Weapon w = weapon();
-        if (w.weapon_entry().weapon_class != pentry.weapon_class) {
-            w = Weapon(); // Do not take into account weapon if it mismatches the projectile
-        }
 
-        AttackStats weaponattack(w);
+        int weaprange = pentry.range();
+        float movespeed = pentry.speed;
+        cooldown = pentry.cooldown();
+        AttackStats weaponattack {Weapon()};
+
+        if (wentry.weapon_class == pentry.weapon_class) {
+            // Take into account weapon (only) if it matches the projectile class
+            weaprange = wentry.range();
+            cooldown = wentry.cooldown();
+            weaponattack = {weapon()};
+        }
 
         bool wallbounce = false;
         int nbounces = 0;
-        float movespeed = pentry.speed;
-
-        cooldown = std::max(wentry.cooldown(), pentry.cooldown());
-
-        //XXX: Horrible Archer hack REMOVE THIS LATER
-        if (class_stats().class_entry().name == "Archer"
-                && pentry.weapon_class == "bows") {
-            int xplevel = class_stats().xplevel;
-            if (xplevel >= 3) {
-                cooldown *= 0.8;
-            } else {
-                cooldown *= 0.9;
-            }
-            if (xplevel >= 2) {
-                nbounces = 2;
-            }
-        }//XXX: Horrible archer hack end
 
         GameInst* bullet = new ProjectileInst(projectile,
                 effective_atk_stats(mt, weaponattack), id, start, actpos,
