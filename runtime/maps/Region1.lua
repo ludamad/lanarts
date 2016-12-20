@@ -212,7 +212,11 @@ function M.old_dungeon_placement_function(MapSeq, dungeon)
     return function(map, xy)
         local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 12))
         local c = MapSeq:forward_portal_add(1, portal, 1, function() 
-            return old_map_generate(MapSeq, dungeon, 1) 
+            local game_map = old_map_generate(MapSeq, dungeon, 1) 
+            if dungeon.on_placement then
+                dungeon.on_placement(game_map)
+            end
+            return game_map
         end)
         if World.player_amount > 1 then
             c()

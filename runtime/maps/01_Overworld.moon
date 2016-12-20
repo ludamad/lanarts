@@ -384,6 +384,7 @@ overworld_features = (map) ->
     OldMapSeq2 = MapSequence.create {preallocate: 1}
     OldMapSeq3 = MapSequence.create {preallocate: 1}
     OldMapSeq4 = MapSequence.create {preallocate: 1}
+    post_poned = {}
 
     ------------------------- 
     -- Place ridges: --
@@ -481,9 +482,8 @@ overworld_features = (map) ->
         door_placer = (map, xy) ->
             -- nil is passed for the default open sprite
             MapUtils.spawn_door(map, xy)
-        post_generate = (game_map) ->
-            OldMapSeq1b\slot_resolve(1, game_map)
-        dungeon = {label: 'Hideaway', tileset: TileSets.pebble, :templates, on_generate: on_generate_dungeon, :post_generate}
+        on_placement = (map) -> OldMapSeq1b\slot_resolve(1, map)
+        dungeon = {label: 'Hideaway', tileset: TileSets.pebble, :templates, on_generate: on_generate_dungeon, :on_placement}
         place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq1, dungeon)
         vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, :door_placer, player_spawn_area: true, tileset: TileSets.pebble})
         if not place_feature(map, vault, (r) -> r.conf.is_overworld)
@@ -681,6 +681,8 @@ overworld_features = (map) ->
         OldMapSeq2\slot_resolve(1, game_map)
         OldMapSeq3\slot_resolve(1, game_map)
         OldMapSeq4\slot_resolve(1, game_map)
+        for f in *post_poned
+            f(game_map)
 
 test_determinism = () ->
     do return
@@ -814,7 +816,7 @@ overworld_try_create = (rng) ->
 
     generate_subareas(map, rng, major_regions.regions)
     map.regions = major_regions.regions
-    
+ 
     post_creation_callback = overworld_features(map)
     if not post_creation_callback
         return nil
