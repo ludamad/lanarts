@@ -22,7 +22,7 @@ class ProjectileInst: public GameInst {
 public:
 	ProjectileInst(const Item& projectile,
 			const EffectiveAttackStats& atkstats, obj_id origin_id, const Pos& start,
-			const Pos& target, float speed, int range, obj_id sole_target = 0, bool bounce = false, int hits = 1);
+			const Pos& target, float speed, int range, obj_id sole_target = 0, bool bounce = false, int hits = 1, bool pass_through = false);
 	~ProjectileInst();
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs);
@@ -50,10 +50,12 @@ private:
 	/* Range left before projectile is destroyed */
 	int range_left;
 
+	int frame = 0;
 	/*TODO: move to lua*/
 	bool bounce;
 	int hits;
 	float damage_mult;
+	bool pass_through;
 };
 
 #endif /* PROJECTILEINST_H_ */

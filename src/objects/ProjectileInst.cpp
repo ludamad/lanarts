@@ -49,7 +49,7 @@ void ProjectileInst::draw(GameState* gs) {
 	if (!gs->object_visible_test(this))
 		return;
 
-	draw_sprite(view, sprite(), xx, yy, vx, vy, 0);
+	draw_sprite(view, sprite(), xx, yy, vx, vy, frame);
 }
 
 void ProjectileInst::deinit(GameState* gs) {
@@ -72,7 +72,7 @@ void ProjectileInst::copy_to(GameInst* inst) const {
 ProjectileInst::ProjectileInst(const Item& projectile,
 		const EffectiveAttackStats& atkstats, obj_id origin_id,
 		const Pos& start, const Pos& target, float speed, int range,
-		obj_id sole_target, bool bounce, int hits) :
+		obj_id sole_target, bool bounce, int hits, bool pass_through) :
 				GameInst(start.x, start.y, projectile.projectile_entry().radius,
 						false, DEPTH),
 				rx(start.x),
@@ -85,7 +85,8 @@ ProjectileInst::ProjectileInst(const Item& projectile,
 				range_left(range),
 				bounce(bounce),
 				hits(hits),
-				damage_mult(1.0f) {
+				damage_mult(1.0f),
+				pass_through(pass_through) {
 	direction_towards(start, target, vx, vy, speed);
 }
 
@@ -110,6 +111,7 @@ void ProjectileInst::step(GameState* gs) {
 
 	Pos tile_hit;
 
+	frame++;
 	int newx = (int) round(rx + vx); //update based on rounding of true float
 	int newy = (int) round(ry + vy);
 	bool collides = gs->tile_radius_test(newx, newy, radius, true, -1,
@@ -254,7 +256,7 @@ void ProjectileInst::step(GameState* gs) {
 				}
 			}
 		}
-		if (hits == 0 || sole_target == 0) {
+		if ((hits == 0 || sole_target == 0) && !pass_through) {
 			gs->add_instance(
 					new AnimatedInst(ipos(), sprite(), 15, PosF(),
 							PosF(vx, vy)));

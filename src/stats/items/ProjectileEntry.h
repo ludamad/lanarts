@@ -66,6 +66,7 @@ public:
 	//XXX: remove these and put into lua
 	int number_of_target_bounces;
 	bool can_wall_bounce;
+	bool can_pass_through = false;
 };
 
 projectile_id get_projectile_by_name(const char* name);

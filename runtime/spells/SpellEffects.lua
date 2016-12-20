@@ -2,21 +2,28 @@ local EventLog = require "ui.EventLog"
 local Map = require "core.Map"
 
 function poison_statmod(effect, obj, old, new)
-	new.defence = math.max(0, new.defence - 3)
+	new.defence = math.max(0, new.defence - 5)
 	new.willpower = math.max(0, new.willpower - 3)
-	new.speed = new.speed * 1.66
+--	new.speed = new.speed * 1.66
+        new.speed = new.speed / 2
 end
 
 function poison_map_init(effect, obj)
 	effect.steps = 0
 end
 
+local BASE_ATTACK_RATE = 45
+local function poison_attack_modifier(effect, poison_mult)
+    return effect.poison_rate / BASE_ATTACK_RATE * poison_mult
+end
 function poison_step(effect, obj)
 	if effect.steps < effect.poison_rate then
 		effect.steps = effect.steps + 1
 	else
 		effect.steps = 0
-		obj:damage(effect.damage,effect.power, effect.magic_percentage, 0.5)
+                -- Offset the stat mod above:
+                local mod = poison_attack_modifier(effect, 0.5)
+		obj:damage(effect.damage, effect.power, effect.magic_percentage, mod)
 	end
 end
 

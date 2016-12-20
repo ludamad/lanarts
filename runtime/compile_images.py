@@ -9,7 +9,7 @@ from collections import OrderedDict, defaultdict
 print "local Display = require 'core.Display'"
 print "local M = nilprotect {}"
 
-SPR_FOLDERS = ["spr_doors", "spr_keys", "spr_rings", "spr_rings/randarts", "spr_weapons", "spr_armour"]
+SPR_FOLDERS = ["spr_doors", "spr_keys", "spr_rings", "spr_rings/randarts", "spr_weapons", "spr_armour", "spr_effects"]
 used_ids = defaultdict(lambda: None)
 resources = []
 for spr_folder in SPR_FOLDERS:
@@ -25,7 +25,11 @@ for spr_folder in SPR_FOLDERS:
         used_ids[id] = True
         full_id = spr_folder.replace('/', '.') + "." + id
         resources.append(full_id)
-        print "M['" + full_id + "'] = Display.image_load '" + filename + "'"
+        if len(filename.split(".")) > 2:
+            dims = filename.split(".")[1]
+            print "M['" + full_id + "'] = Display.animation_create(Display.images_load '" + filename + "%" + dims +"', 0.1)"
+        else:
+            print "M['" + full_id + "'] = Display.image_load '" + filename + "'"
     print ""
 resources.sort()
 

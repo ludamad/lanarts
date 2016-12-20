@@ -161,6 +161,7 @@ define_randart = (rng, base, images, enchanter) ->
     data.randart_sprites = nil
     data.stat_bonuses or= {}
     n_enchants = power_level * 2
+    rng\random_choice(MINOR_DEBUFFS)(rng, data)
     -- Have less on weapons:
     if data.cooldown
         n_enchants /= 2

@@ -247,21 +247,39 @@ static bool lua_spell_check_prereq(GameState* gs, PlayerInst* p,
     return passes;
 }
 
+const float PI = 3.141592f;
+
 static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
         SpellEntry& spl_entry, const Projectile& projectile,
         const Pos& target) {
     MTwist& mt = gs->rng();
     AttackStats projectile_attack(Weapon(), projectile);
     ProjectileEntry& pentry = projectile.projectile_entry();
-    bool wallbounce = pentry.can_wall_bounce;
+    bool wallbounce = pentry.can_wall_bounce, passthrough = pentry.can_pass_through;
     int nbounces = pentry.number_of_target_bounces;
     float speed = pentry.speed * p->effective_stats().core.spell_velocity_multiplier;
 
-    GameInst* pinst = new ProjectileInst(projectile,
-            p->effective_atk_stats(mt, projectile_attack), p->id,
-            Pos(p->x, p->y), target, speed, pentry.range(), NONE,
-            wallbounce, nbounces);
-    gs->add_instance(pinst);
+    if (spl_entry.name == "Mephitize") {
+        float vx = 0, vy = 0;
+        direction_towards(Pos {p->x, p->y}, target, vx, vy, 10000);
+
+        for (int i = 0; i < 16; i++) {
+            float angle = PI / 8 * i;
+            Pos new_target {p->x + cos(angle) * vx - sin(angle) * vy, p->y + cos(angle) * vy + sin(angle) * vx};
+            GameInst* pinst = new ProjectileInst(projectile,
+                    p->effective_atk_stats(mt, projectile_attack), p->id,
+                    Pos(p->x, p->y), new_target, speed, pentry.range(), NONE,
+                    wallbounce, nbounces, passthrough);
+            gs->add_instance(pinst);
+        }
+
+    } else {
+        GameInst* pinst = new ProjectileInst(projectile,
+                p->effective_atk_stats(mt, projectile_attack), p->id,
+                Pos(p->x, p->y), target, speed, pentry.range(), NONE,
+                wallbounce, nbounces, passthrough);
+        gs->add_instance(pinst);
+    }
 }
 
 static void player_use_spell(GameState* gs, PlayerInst* p,

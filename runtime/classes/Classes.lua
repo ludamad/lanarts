@@ -4,6 +4,8 @@ Data.class_create {
     available_spells = {
       { spell = "Minor Missile",
     	level_needed = 1 },
+      { spell = "Mephitize",
+        level_needed = 1 },
       { spell = "Magic Blast",
         level_needed = 1 },
       { spell = "Fire Bolt",

@@ -3,8 +3,8 @@ local Display = require "core.Display"
 local M = {} -- Submodule
 
 M.grass = Data.tileset_create {
-    floor = { images = Display.images_load (path_resolve "floor_overworld_grass1.png%32x32") },
-    floor_alt1 = { images = Display.images_load (path_resolve "floor_overworld_grass2.png%32x32") },
+    floor = { images = Display.images_load (path_resolve "floor_overworld_grass2.png%32x32") },
+    floor_alt1 = { images = Display.images_load (path_resolve "floor_overworld_grass1.png%32x32") },
     floor_alt2 = { images = Display.images_load (path_resolve "floor_overworld_grass3.png%32x32") },
     wall = { images = Display.images_load (path_resolve "wall_overworld_trees.png%32x32")},
     dirt = { images = Display.images_load (path_resolve "outside_floor/sandrockfloor/floor_sand_rock(0-3).png")},
@@ -12,9 +12,6 @@ M.grass = Data.tileset_create {
 --    wall_alt = { images = Display.images_load (path_resolve "wall_overworld_wall.png%32x32") }
     wall_alt = { images = Display.images_load (path_resolve "dngn_wall/snake/snake(0-9).png") }
 }
-if math.random() > 0.6 then
-    M.grass.floor, M.grass.floor_alt1 = M.grass.floor_alt1, M.grass.floor
-end
 
 M.pebble = Data.tileset_create {
 	floor = { images = Display.images_load (path_resolve "dngn_floor/pebblebrown/pebble_brown(0-8).png") },

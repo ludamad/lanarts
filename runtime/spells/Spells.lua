@@ -29,11 +29,11 @@ Data.spell_create {
 -- POISON CLOUD
 
 Data.spell_create {
-    name = "Poison Cloud",
-    spr_spell = "poison",
-    description = "A poisonous cloud that causes damage over time.",
-    projectile = "Poison Cloud",
-    mp_cost = 25,
+    name = "Mephitize",
+    spr_spell = "spr_effects.cloud",
+    description = "A noxious debilitating ring of clouds that cause damage as well as reduced defenses and speed over time.",
+    projectile = "Mephitize",
+    mp_cost = 20,
     cooldown = 60
 }
 
