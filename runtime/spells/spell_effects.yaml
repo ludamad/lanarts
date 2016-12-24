@@ -4,7 +4,7 @@
     
 effects:
   - name: Poison
-    poison_rate: 28
+    poison_rate: 10
     effected_colour: [100, 255, 100]
     can_use_rest: no
     stat_func: poison_statmod

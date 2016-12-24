@@ -146,8 +146,8 @@ static int lapi_combatgameinst_damage(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
 	EffectiveAttackStats attack;
 	int nargs = lua_gettop(L);
-	attack.damage = round(lua_tointeger(L, 2));
-	attack.power = round(lua_tointeger(L, 3));
+	attack.damage = round(lua_tonumber(L, 2));
+	attack.power = round(lua_tonumber(L, 3));
 	attack.magic_percentage = nargs >= 4 ? lua_tonumber(L, 4) : 1.0f;
 	attack.resist_modifier = nargs >= 5 ? lua_tonumber(L, 5) : 1.0f;
 

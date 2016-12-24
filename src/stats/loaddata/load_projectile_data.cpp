@@ -33,6 +33,7 @@ void parse_projectile_entry(lua_State* L, const YAML::Node& n, ProjectileEntry& 
 			"number_of_target_bounces", 0);
     entry.can_wall_bounce = parse_optional(n, "can_wall_bounce", false);
     entry.can_pass_through = parse_optional(n, "can_pass_through", false);
+    entry.deals_special_damage = parse_optional(n, "deals_special_damage", false);
 	entry.radius = parse_optional(n, "radius", 5);
 	entry.type = EquipmentEntry::AMMO;
 }

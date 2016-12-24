@@ -165,39 +165,40 @@ void ProjectileInst::step(GameState* gs) {
 			int damage = damage_formula(atkstats, victim->effective_stats());
 			damage *= damage_mult;
 
-			char buffstr[32];
-			snprintf(buffstr, 32, "%d", damage);
-			float rx = vx / speed * .5;
-			float ry = vy / speed * .5;
-			gs->add_instance(
-					new AnimatedInst(
-							Pos(victim->x - 5 + rx * 5, victim->y + ry * 5), -1,
-							25, PosF(rx, ry), PosF(), AnimatedInst::DEPTH,
-							buffstr));
-
                         if (gs->local_player()->current_floor == dynamic_cast<PlayerInst*>(origin)->current_floor) {
                             play(minor_missile_sound, "sound/minor_missile.ogg");
                         }
-			if (victim->damage(gs, damage)) {
-				PlayerInst* p = (PlayerInst*) origin;
-				PlayerData& pc = gs->player_data();
-				p->signal_killed_enemy();
+                        if (!projectile.projectile_entry().deals_special_damage) {
+                            char buffstr[32];
+                            snprintf(buffstr, 32, "%d", damage);
+                            float rx = vx / speed * .5;
+                            float ry = vy / speed * .5;
+                            gs->add_instance(
+                                            new AnimatedInst(
+                                                            Pos(victim->x - 5 + rx * 5, victim->y + ry * 5), -1,
+                                                            25, PosF(rx, ry), PosF(), AnimatedInst::DEPTH,
+                                                            buffstr));
+                            if (victim->damage(gs, damage)) {
+                                    PlayerInst* p = (PlayerInst*) origin;
+                                    PlayerData& pc = gs->player_data();
+                                    p->signal_killed_enemy();
 
-                                double xpworth = victim->xpworth();
-                                double n_killed = (pc.n_enemy_killed(victim->enemy_type()) - 1) / pc.all_players().size();
-                                xpworth *= pow(0.8, n_killed);
-                                if (n_killed > 15) {
-                                    xpworth = 0;
-                                }
-                                int amnt = round(xpworth / pc.all_players().size());
+                                    double xpworth = victim->xpworth();
+                                    double n_killed = (pc.n_enemy_killed(victim->enemy_type()) - 1) / pc.all_players().size();
+                                    xpworth *= pow(0.8, n_killed);
+                                    if (n_killed > 15) {
+                                        xpworth = 0;
+                                    }
+                                    int amnt = round(xpworth / pc.all_players().size());
 
-                                players_gain_xp(gs, amnt);
+                                    players_gain_xp(gs, amnt);
 
-				snprintf(buffstr, 32, "%d XP", amnt);
-				gs->add_instance(
-						new AnimatedInst(victim->ipos(), -1, 25, PosF(), PosF(),
-								AnimatedInst::DEPTH, buffstr, COL_GOLD));
-			}
+                                    snprintf(buffstr, 32, "%d XP", amnt);
+                                    gs->add_instance(
+                                                    new AnimatedInst(victim->ipos(), -1, 25, PosF(), PosF(),
+                                                                    AnimatedInst::DEPTH, buffstr, COL_GOLD));
+                            }
+                        }
 		}
 	} else {
 		gs->object_radius_test(this, &colobj, 1, &player_colfilter);
@@ -214,20 +215,22 @@ void ProjectileInst::step(GameState* gs) {
 					projectile.projectile_entry().action_func().get(L),
 					atkstats, this, victim);
 
-			int damage = damage_formula(atkstats, victim->effective_stats());
-			damage *= damage_mult;
+                        if (!projectile.projectile_entry().deals_special_damage) {
+                            int damage = damage_formula(atkstats, victim->effective_stats());
+                            damage *= damage_mult;
 
-			if (!gs->game_settings().invincible)
-				victim->damage(gs, damage);
-			char dmgstr[32];
-			snprintf(dmgstr, 32, "%d", damage);
-			float rx = vx / speed * .5;
-			float ry = vy / speed * .5;
-			gs->add_instance(
-					new AnimatedInst(
-							Pos(colobj->x - 5 + rx * 5, colobj->y + ry * 5), -1,
-							25, PosF(rx, ry), PosF(), AnimatedInst::DEPTH,
-							dmgstr));
+                            if (!gs->game_settings().invincible)
+                                    victim->damage(gs, damage);
+                            char dmgstr[32];
+                            snprintf(dmgstr, 32, "%d", damage);
+                            float rx = vx / speed * .5;
+                            float ry = vy / speed * .5;
+                            gs->add_instance(
+                                            new AnimatedInst(
+                                                            Pos(colobj->x - 5 + rx * 5, colobj->y + ry * 5), -1,
+                                                            25, PosF(rx, ry), PosF(), AnimatedInst::DEPTH,
+                                                            dmgstr));
+                        }
 		}
 	}
 	if (colobj || range_left <= 0) {

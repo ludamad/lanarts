@@ -179,19 +179,25 @@ static void lua_init_effect(lua_State* L, LuaValue& value, effect_id effect) {
 LuaValue EffectStats::add(GameState* gs, CombatGameInst* inst, effect_id effect,
 		int length) {
 	lua_State* L = gs->luastate();
-	for (int i = 0; i < EFFECTS_MAX; i++) {
-		Effect& e = effects[i];
-		if (e.t_remaining == 0 || e.effectid == effect) {
-			e.effectid = effect;
-			e.t_remaining = std::max(e.t_remaining, length);
-			lua_init_effect(L, e.state, effect);
+        for (auto& e : effects) {
+	    if (e.effectid == effect && e.t_remaining > 0) {
+                // Renew an existing effect slot:
+	        e.t_remaining = std::max(e.t_remaining, length);
+                return e.state;
+            }
+        }
+        for (auto& e : effects) {
+	    if (e.t_remaining == 0) {
+                // Init inside an empty effect slot:
+		e.effectid = effect;
+                lua_init_effect(L, e.state, effect);
+	        e.t_remaining = length;
+                e.state["time_left"] = e.t_remaining;
 
-			e.state["time_left"] = e.t_remaining;
-
-			EffectEntry& eentry = game_effect_data.at(e.effectid);
-			lua_effect_func_callback(L, eentry.init_func.get(L), e, inst);
-			return e.state;
-		}
+                EffectEntry& eentry = game_effect_data.at(e.effectid);
+                lua_effect_func_callback(L, eentry.init_func.get(L), e, inst);
+                return e.state;
+            }
 	}
 	return LuaValue();
 }

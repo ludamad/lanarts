@@ -37,13 +37,14 @@ projectiles:
   - name: Mephitize
     weapon_class: magic
     damage_type: { magic: 1.0}
-    damage: { base: 1, magic: .2 }
+    damage: { base: 5, magic: 1.0 }
     power: { base: 1, magic: 0.2 }
     range: 300
     speed: 2
     spr_item: none
     spr_attack: spr_effects.cloud
     can_pass_through: yes
+    deals_special_damage: yes # Necessary with can_pass_through
     on_hit_func: 
       function(projectile, target, atkstats) 
         local effect = target:add_effect(effects.Poison.name, 200, atkstats) 

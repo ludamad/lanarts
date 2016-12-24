@@ -20,6 +20,7 @@
 const int POWER_MULTIPLE_INTERVAL = 50;
 
 static float damage_multiplier(float power, float resistance) {
+    return 1.0;
 	float powdiff = power - resistance;
 	float intervals = powdiff / POWER_MULTIPLE_INTERVAL;
 	if (intervals < 0) {

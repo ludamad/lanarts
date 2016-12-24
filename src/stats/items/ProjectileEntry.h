@@ -65,6 +65,7 @@ public:
 	int radius, drop_chance, speed;
 	//XXX: remove these and put into lua
 	int number_of_target_bounces;
+	bool deals_special_damage = false;
 	bool can_wall_bounce;
 	bool can_pass_through = false;
 };

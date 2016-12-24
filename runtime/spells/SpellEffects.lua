@@ -5,7 +5,7 @@ function poison_statmod(effect, obj, old, new)
 	new.defence = math.max(0, new.defence - 5)
 	new.willpower = math.max(0, new.willpower - 3)
 --	new.speed = new.speed * 1.66
-        new.speed = new.speed / 2
+--        new.speed = new.speed / 2
 end
 
 function poison_map_init(effect, obj)
@@ -22,8 +22,8 @@ function poison_step(effect, obj)
 	else
 		effect.steps = 0
                 -- Offset the stat mod above:
-                local mod = poison_attack_modifier(effect, 0.5)
-		obj:damage(effect.damage, effect.power, effect.magic_percentage, mod)
+                local mod = poison_attack_modifier(effect, 1.0)
+		obj:damage(effect.damage, effect.power, effect.magic_percentage, 5.0)
 	end
 end
 

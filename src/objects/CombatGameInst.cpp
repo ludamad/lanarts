@@ -33,14 +33,7 @@ bool CombatGameInst::damage(GameState* gs, int dmg) {
 
     event_log("CombatGameInst::damage: id %d took %d dmg\n", id, dmg);
 
-    if (core_stats().hurt(dmg)) {
-        die(gs);
-        return true;
-    }
-    cooldowns().reset_hurt_cooldown(HURT_COOLDOWN);
-    return false;
-}
-bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
+damage(GameState* gs, const EffectiveAttackStats& attack) {
     event_log("CombatGameInst::damage: id %d getting hit by {cooldown = %d, "
             "damage=%d, power=%d, magic_percentage=%f, resist_modifier=%f, physical_percentage=%f}",
             id, attack.cooldown, attack.damage, attack.power,
