@@ -7,6 +7,7 @@ import map_place_object, ellipse_points,
     random_rect_in_rect, random_ellipse_in_ellipse, 
     ring_region_delta_func, default_region_delta_func, spread_region_delta_func,
     center_region_delta_func, 
+    towards_region_delta_func, 
     random_region_add, subregion_minimum_spanning_tree, region_minimum_spanning_tree,
     Tile, tile_operator from require "maps.GenerateUtils"
 
@@ -50,6 +51,29 @@ OVERWORLD_TILESET = create_overworld_scheme(TileSets.grass)
 
 OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE = 300, 300
 SHELL = 50
+
+SMALL_OVERWORLD_CONF = (rng) -> {
+    map_label: "Plain Valley"
+    is_small_overworld: true
+    size: {30, 30}
+    number_regions: 1
+    floor1: OVERWORLD_TILESET.floor2 
+    floor2: OVERWORLD_TILESET.floor1
+    wall1: OVERWORLD_TILESET.wall1
+    wall2: OVERWORLD_TILESET.wall2
+    rect_room_num_range: {0,0}
+    rect_room_size_range: {10,15}
+    rvo_iterations: 150
+    n_stairs_down: 0
+    n_stairs_up: 0
+    connect_line_width: () -> rng\random(2,6)
+    region_delta_func: ring_region_delta_func
+    room_radius: () ->
+        return 30
+    -- Dungeon objects/features
+    monster_weights: () -> {["Giant Rat"]: 0, ["Chicken"]: 0, ["Cloud Elemental"]: 1, ["Turtle"]: 8, ["Spriggan"]: 2}
+    n_statues: 4
+}
 OVERWORLD_CONF = (rng) -> {
     map_label: "Plain Valley"
     is_overworld: true
@@ -173,7 +197,7 @@ connect_edges = (map, rng, conf, area, edges) ->
 make_rect_points = (x1,y1,x2,y2) ->
     return {{x1, y2}, {x2, y2}, {x2, y1}, {x1, y1}}
 
-generate_area = (map, rng, conf, outer, padding) ->
+generate_area = (map, rng, conf, outer, padding, starting_edges = {}) ->
     size = conf.size
     R = RVORegionPlacer.create {outer.points}-- {make_rect_points outer.x, outer.y, outer.x+outer.w,outer.x}
 
@@ -199,6 +223,8 @@ generate_area = (map, rng, conf, outer, padding) ->
             if op1 == p1 and op2 == p2 or op2 == p1 and op1 == p2
                 return
         append edges, {p1, p2}
+    for {p1, p2} in *starting_edges 
+        add_edge_if_unique(p1, p2)
 
     -- Append all < threshold in distance
     for i=1,#R.regions
@@ -209,11 +235,11 @@ generate_area = (map, rng, conf, outer, padding) ->
                 add_edge_if_unique p1, p2
     connect_edges map, rng, conf, outer\bbox(), edges
 
-generate_subareas = (map, rng, regions) ->
+generate_subareas = (map, rng, regions, starting_edges = {}) ->
     conf = OVERWORLD_CONF(rng)
     -- Generate the polygonal rooms, connected with lines & arcs
     for region in *regions
-        generate_area map, rng, region.conf, region, SHELL
+        generate_area map, rng, region.conf, region, SHELL, starting_edges
 
     edges = subregion_minimum_spanning_tree(regions, () -> rng\random(12) + rng\random(12))
     connect_edges map, rng, conf, nil, edges
@@ -245,7 +271,7 @@ generate_door_candidates = (map, rng, regions) ->
         operator: {add: FLAG_INNER_PERIMETER}
     }
     for region in *regions
-        if region.conf.is_overworld
+        if region.conf.is_overworld or region.conf.is_small_overworld
             for subregion in *region.subregions
                 region\apply {:map
                     operator: {remove: SourceMap.FLAG_TUNNEL}
@@ -306,7 +332,7 @@ overworld_spawns = (map) ->
                 break
             map\square_apply(sqr, {add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT}, remove: SourceMap.FLAG_SEETHROUGH})
             MapUtils.spawn_decoration(map, OldMaps.statue, sqr, random(0,17))
-        for i=1,10
+        for i=1,10 do
             sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
             if not sqr
                 break
@@ -434,9 +460,22 @@ overworld_features = (map) ->
                         item = ItemUtils.item_generate ItemGroups.basic_items, 1 --Randart power level
                         MapUtils.spawn_item(map, item.type, item.amount, xy)
                     tileset = TileSets.pebble
+
                     vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
                     if not place_feature(map, vault, (r) -> true)
                         return nil
+
+                area = {0,0,map.size[1],map.size[2]}
+                for i=1,4
+                    sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
+                    if not sqr
+                        return nil
+                    Region1.generate_store(map, sqr)
+
+                sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
+                if not sqr
+                    return nil
+                MapUtils.spawn_enemy(map, "Red Dragon", sqr)
                 ------------------------- 
 
             else if floor == 1
@@ -444,8 +483,7 @@ overworld_features = (map) ->
                 -- Place inner dungeon vault     --
                 on_generate_dungeon = (map, floor) ->
                     ---------------------------------------------------------- 
-                    -- Place vaults, along with some troll 1-gold vaults --
-                    for item in *{"Scroll of Experience", "Gold", "Gold"} 
+                    for item in *{"Scroll of Experience", "Scroll of Experience", "Scroll of Experience"} 
                         item_placer = (map, xy) -> MapUtils.spawn_item(map, item, 1, xy)
                         tileset = TileSets.snake
                         vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
@@ -485,11 +523,23 @@ overworld_features = (map) ->
         on_placement = (map) -> OldMapSeq1b\slot_resolve(1, map)
         dungeon = {label: 'Hideaway', tileset: TileSets.pebble, :templates, on_generate: on_generate_dungeon, :on_placement}
         place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq1, dungeon)
-        vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, :door_placer, player_spawn_area: true, tileset: TileSets.pebble})
+        vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, :door_placer, tileset: TileSets.pebble})
         if not place_feature(map, vault, (r) -> r.conf.is_overworld)
             return true
     if place_easy() then return nil
     ------------------------- 
+
+    -----------------------------
+    -- Place player spawn area: --
+    --place_player_spawn_area = () ->
+    --    door_placer = (map, xy) ->
+    --        -- nil is passed for the default open sprite
+    --        MapUtils.spawn_door(map, xy)
+    --    vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: do_nothing, :door_placer, player_spawn_area: true, tileset: TileSets.pebble}, door_match_content: OVERWORLD_TILESET.floor2)
+    --    if not place_feature(map, vault, (r) -> r.conf.is_overworld)
+    --        return true
+    --if place_player_spawn_area() then return nil
+    -------------------------------
 
     -----------------------------
     -- Place medium dungeon 1: --
@@ -499,9 +549,9 @@ overworld_features = (map) ->
         on_generate_dungeon = (map, floor) ->
             if floor == #templates
                 ---------------------------------------------------------- 
-                -- Place key vault, along with some troll 1-gold vaults --
+                -- Place key vault, along with some gold vaults --
                 for item in *{"Azurite Key", "Gold", "Gold"} 
-                    item_placer = (map, xy) -> MapUtils.spawn_item(map, item, 1, xy)
+                    item_placer = (map, xy) -> MapUtils.spawn_item(map, item, (if item == "Gold" then 10 else 1), xy)
                     tileset = TileSets.snake
                     vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})
                     if not place_feature(map, vault, (r) -> true)
@@ -517,7 +567,7 @@ overworld_features = (map) ->
             -- nil is passed for the default open sprite
             MapUtils.spawn_door(map, xy, nil, Vaults._closed_door_crypt)
         place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq2, dungeon)
-        vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.temple, :door_placer, :gold_placer})
+        vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.temple, :door_placer, :gold_placer, player_spawn_area: true})
         if not place_feature(map, vault, (r) -> r.conf.is_overworld)
             return true
     if place_medium1() then return nil
@@ -713,18 +763,25 @@ test_determinism = () ->
             player_candidate_squares: {}
         }
 
-        for subconf in *{DUNGEON_CONF(rng), OVERWORLD_CONF(rng)} --, OVERWORLD_CONF(rng)}
+        local overworld_region
+        for subconf in *{DUNGEON_CONF(rng), OVERWORLD_CONF(rng)}--, SMALL_OVERWORLD_CONF(rng)}
             {w,h} = subconf.size
             -- Takes region parameters, region placer, and region outer ellipse bounds:
             r = random_region_add rng, w, h, 20, center_region_delta_func(map, rng, outer), 0,
                 major_regions, outer\bbox()
+            if subconf.is_overworld
+                overworld_region = r
             --if r == nil
             --    return nil
             r.max_speed = 32
             r.conf = subconf
+            delta_func = center_region_delta_func(map, rng, outer)
+        --for i in *{1,3}
+        --    major_regions.regions[i].velocity_func = towards_region_delta_func(map, rng, major_regions[2])
+        --major_regions.regions[2].velocity_func = towards_region_delta_func(map, rng, major_regions[3])
      
         -- No rvo for now
-        major_regions\steps(1500)
+        major_regions\steps(150)
 
         -- Apply the regions:
         for r in *major_regions.regions
@@ -796,16 +853,19 @@ overworld_try_create = (rng) ->
         player_candidate_squares: {}
     }
 
-    for subconf in *{DUNGEON_CONF(rng), OVERWORLD_CONF(rng)} --, OVERWORLD_CONF(rng)}
+    for subconf in *{DUNGEON_CONF(rng), OVERWORLD_CONF(rng)}--, SMALL_OVERWORLD_CONF(rng)}
         {w,h} = subconf.size
         -- Takes region parameters, region placer, and region outer ellipse bounds:
         r = random_region_add rng, w, h, 20, center_region_delta_func(map, rng, outer), 0,
             major_regions, outer\bbox()
         if r == nil
             return nil
-        r.max_speed = 32
+        r.max_speed = 8
         r.conf = subconf
- 
+    --for i in *{1,3}
+    --    major_regions.regions[i].velocity_func = towards_region_delta_func(map, rng, major_regions.regions[2])
+    --major_regions.regions[2].velocity_func = towards_region_delta_func(map, rng, major_regions.regions[3])
+    starting_edges = {}
     -- No rvo for now
     major_regions\steps(1500)
 
@@ -814,7 +874,7 @@ overworld_try_create = (rng) ->
         r._points = false
         r\apply {:map, operator: (tile_operator r.conf.wall1)}
 
-    generate_subareas(map, rng, major_regions.regions)
+    generate_subareas(map, rng, major_regions.regions, starting_edges)
     map.regions = major_regions.regions
  
     post_creation_callback = overworld_features(map)

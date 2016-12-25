@@ -43,7 +43,7 @@ public:
 	}
 
 	int sell_cost() {
-	    return std::max(1, shop_cost.min / 2);
+	    return std::max(1, shop_cost.min / 8);
 	}
 	enum id_type {
 		ALWAYS_KNOWN, POTION, SCROLL

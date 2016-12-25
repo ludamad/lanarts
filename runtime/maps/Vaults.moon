@@ -67,6 +67,11 @@ make_legend = (args, legend) ->
 
 M.ridge_dungeon = (args) -> {
     legend: make_legend args, {
+        '+': {  -- '+' means 'walkable tile'
+            remove: {}
+            matches_none: {M.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}
+            matches_content: args.door_match_content
+        }
         'p': {
             add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_ITEM_SPAWN, M.FLAG_HAS_VAULT}
             content: args.tileset.floor

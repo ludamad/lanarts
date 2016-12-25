@@ -445,11 +445,11 @@ local function generate_statues(map, --[[Optional]] amount)
 end
 
 local function generate_stores(map)
-    if chance(0.25) then
+    if chance(0) then -- TODO Temporarily disabled as shops are tested only in specific vaults
         local items = {}
         for i=1,random(5,10) do
             local randart_power_level = 1
-            table.insert(items, item_utils.item_generate(chance(.5) and item_groups.basic_items or item_groups.enchanted_items, true, randart_power_level))
+            table.insert(items, item_groups.store_items, true, randart_power_level)
         end
         map_utils.random_store(map, items)
     end

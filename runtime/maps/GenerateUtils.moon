@@ -246,6 +246,9 @@ spread_region_delta_func = (map, rng, outer) ->
     return () => rng\randomf(-2,2), rng\randomf(-2,2)
         -- math.sign_of(@x - center_x)*2, math.sign_of(@y - center_y)*2
 
+towards_region_delta_func = (map, rng, region) ->
+    return () => math.sign_of(region.x - @x)*100, math.sign_of(region.y - @y)*100
+
 center_region_delta_func = (map, rng, outer) ->
     center_x, center_y = outer\center()
     return () => math.sign_of(center_x - @x)*100, math.sign_of(center_y - @y)*100
@@ -276,6 +279,7 @@ return {
     :subregion_minimum_spanning_tree, :region_minimum_spanning_tree, 
     :spread_region_delta_func
     :center_region_delta_func
+    :towards_region_delta_func
     :random_rect_in_rect, :random_ellipse_in_ellipse, :Tile, :tile_operator
     :region_intersects, :random_region_add 
     :default_region_delta_func
