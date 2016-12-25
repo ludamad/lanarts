@@ -19,14 +19,31 @@
 
 #include "InventoryContent.h"
 
+//Draw in bottom-right of slot
+static void draw_slot_cost(GameState* gs, money_t cost, int x, int y) {
+    using namespace ldraw;
+    gs->font().drawf(DrawOptions(COL_PALE_YELLOW).origin(CENTER_BOTTOM),
+            Pos(x + TILE_SIZE / 2, y + TILE_SIZE - 2), "+%d", cost);
+}
+
+
 static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot, int x,
 		int y) {
 	if (itemslot.amount() > 0) {
 		ItemEntry& ientry = itemslot.item_entry();
-		ientry.item_image().draw(Pos(x,y));
-		if (ientry.stackable) {
+		ldraw::DrawOptions options;
+        if (gs->io_controller().ctrl_held()) {
+            options.draw_colour.a *= 0.5; // 50% opacity
+        }
+		ientry.item_image().draw(options, Pos(x,y));
+
+        if (ientry.stackable) {
 			gs->font().drawf(COL_WHITE, Pos(x+1, y+1), "%d", itemslot.amount());
 		}
+
+        if (gs->io_controller().ctrl_held()) {
+            draw_slot_cost(gs, itemslot.item_entry().sell_cost() * itemslot.amount(), x, y);
+        }
 	}
 }
 
@@ -115,11 +132,11 @@ bool InventoryContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 
 	/* Use an item */
 	if (gs->mouse_left_click() && within_inventory) {
-
 		int slot = get_itemslotn(inv, bbox, mx, my);
+		auto action_type = gs->io_controller().ctrl_held() ? GameAction::SELL_ITEM : GameAction::USE_ITEM;
 		if (slot >= 0 && slot < INVENTORY_SIZE && inv.get(slot).amount() > 0) {
 			queued_actions.push_back(
-					game_action(gs, p, GameAction::USE_ITEM, slot, p->x, p->y));
+					game_action(gs, p, action_type, slot, p->x, p->y));
 			return true;
 		}
 	}
@@ -139,7 +156,7 @@ bool InventoryContent::handle_io(GameState* gs, ActionQueue& queued_actions) {
 
 		if (slot == -1 || slot == slot_selected) {
 			queued_actions.push_back(
-					game_action(gs, p, GameAction::DROP_ITEM, slot_selected));
+					game_action(gs, p, GameAction::DROP_ITEM, slot_selected, 0,0, gs->io_controller().shift_held()));
 		} else {
 			queued_actions.push_back(
 					game_action(gs, p, GameAction::REPOSITION_ITEM,

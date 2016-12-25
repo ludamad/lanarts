@@ -74,10 +74,10 @@ struct ItemSlot {
 	bool operator==(const ItemSlot& itemslot) const {
 		return item == itemslot.item && equipped == itemslot.equipped;
 	}
-private:
 	void deequip() {
 		equipped = false;
 	}
+private:
 	bool equipped;
 };
 

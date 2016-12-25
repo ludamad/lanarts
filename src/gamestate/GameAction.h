@@ -20,6 +20,7 @@ struct GameAction {
 		USE_REST,
 		USE_PORTAL,
 		USE_ITEM,
+		SELL_ITEM,
 		USE_WEAPON,
 		PICKUP_ITEM,
 		DROP_ITEM,

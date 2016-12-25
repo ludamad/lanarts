@@ -90,11 +90,11 @@ static void bind_key_events(std::vector<IOEventTrigger>& bindings,
 }
 IOController::IOController() {
 	//XXX: For now we hardcode the specific actions
-	SDL_Keymod item_mod = SDL_Keymod(KMOD_LSHIFT | KMOD_RSHIFT);
+	SDL_Keymod item_mod = SDL_Keymod(KMOD_LCTRL | KMOD_RCTRL);
 
 	// Spell choice
 	bind_key_events(event_bindings, "yuiop", IOEvent::ACTIVATE_SPELL_N,
-			KMOD_NONE, item_mod/*rejected*/, true);
+			KMOD_NONE, KMOD_NONE, true);
 //	bind_key_events(event_bindings, "12345", IOEvent::ACTIVATE_SPELL_N,
 //			KMOD_NONE, item_mod/*rejected*/, true);
 
@@ -102,7 +102,10 @@ IOController::IOController() {
 //	bind_key_events(event_bindings, "yuiop67890", IOEvent::USE_ITEM_N, item_mod,
 //			KMOD_NONE, false);
 	bind_key_events(event_bindings, "1234567890", IOEvent::USE_ITEM_N,
-			KMOD_NONE, KMOD_NONE, false);
+			KMOD_NONE, item_mod/*rejected*/, false);
+	bind_key_events(event_bindings, "1234567890", IOEvent::SELL_ITEM_N,
+	        item_mod/*requisite*/, KMOD_NONE, false);
+
 
 	/*Scroll spell up*/
 	{
@@ -222,17 +225,13 @@ int IOController::mouse_y() {
 
 int IOController::handle_event(SDL_Event* event) {
 	int done = 0;
-	iostate.keymod = SDL_Keymod(event->key.keysym.mod);
 	iostate.sdl_events.push_back(*event);
 	SDL_Keycode key = event->key.keysym.sym;
-	bool shift_held = (iostate.keymod & KMOD_LSHIFT)
-			|| (iostate.keymod & KMOD_RSHIFT);
-	bool ctrl_held = (iostate.keymod & KMOD_LCTRL)
-			|| (iostate.keymod & KMOD_RCTRL);
 
 	switch (event->type) {
 	case SDL_KEYDOWN: {
-		if (shift_held && key == SDLK_ESCAPE) {
+	    iostate.keymod = SDL_Keymod(event->key.keysym.mod);
+		if (shift_held() && key == SDLK_ESCAPE) {
 			done = 1;
 		}
 		iostate.key_down_states[key] = true;
@@ -240,10 +239,12 @@ int IOController::handle_event(SDL_Event* event) {
 		break;
 	}
 	case SDL_KEYUP: {
+	    iostate.keymod = SDL_Keymod(event->key.keysym.mod);
 		iostate.key_down_states[key] = false;
 		break;
 	}
 	case SDL_MOUSEBUTTONDOWN: {
+	    iostate.keymod = SDL_Keymod(event->key.keysym.mod);
 		if (event->button.button == SDL_BUTTON_LEFT) {
 			iostate.mouse_leftdown = true;
 			iostate.mouse_leftclick = true;
@@ -265,6 +266,7 @@ int IOController::handle_event(SDL_Event* event) {
                 break;
         }
 	case SDL_MOUSEBUTTONUP: {
+	    iostate.keymod = SDL_Keymod(event->key.keysym.mod);
 		if (event->button.button == SDL_BUTTON_LEFT) {
 			iostate.mouse_leftdown = false;
 			iostate.mouse_leftrelease = true;
@@ -383,3 +385,12 @@ bool IOController::query_event(IOEvent::event_t event,
 	return false;
 }
 
+bool IOController::ctrl_held() {
+    return key_down_state(SDLK_LCTRL) || key_down_state(SDLK_RCTRL);
+//    return (iostate.keymod & KMOD_LCTRL) || (iostate.keymod & KMOD_RCTRL);
+}
+
+bool IOController::shift_held() {
+    return key_down_state(SDLK_LSHIFT) || key_down_state(SDLK_RSHIFT);
+//    return (iostate.keymod & KMOD_LSHIFT) || (iostate.keymod & KMOD_RSHIFT);
+}

@@ -9,6 +9,7 @@
 #define ITEMENTRY_H_
 
 #include <vector>
+#include <algorithm>
 #include <string>
 
 #include "lanarts_defines.h"
@@ -41,6 +42,9 @@ public:
 		return item_sprite;
 	}
 
+	int sell_cost() {
+	    return std::max(1, shop_cost.min / 2);
+	}
 	enum id_type {
 		ALWAYS_KNOWN, POTION, SCROLL
 	};

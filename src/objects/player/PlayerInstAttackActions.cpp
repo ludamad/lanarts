@@ -608,6 +608,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
 
         if (class_stats().class_entry().name != "Archer" && wentry.weapon_class == "bows") {
             weaprange = TILE_SIZE * 2.3;
+            cooldown *= 1.5;
         }
         GameInst* bullet = new ProjectileInst(projectile,
                 effective_atk_stats(mt, weaponattack), id, start, actpos,

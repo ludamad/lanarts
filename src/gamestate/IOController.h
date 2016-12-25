@@ -19,7 +19,8 @@ struct BBox;
 struct IOEvent {
 	/* Events with _N at the end require a number for disambiguation */
 	enum event_t {
-		USE_ITEM_N,
+        USE_ITEM_N,
+        SELL_ITEM_N,
 		AUTOTARGET_CURRENT_ACTION,
 		ACTIVATE_SPELL_N,
 		USE_WEAPON,
@@ -84,8 +85,8 @@ struct IOState {
 				event(event), triggered_already(triggered_already) {
 		}
 	};
-        std::unordered_map<SDL_Keycode, bool> key_down_states;
-        std::unordered_map<SDL_Keycode, bool> key_press_states;
+    std::unordered_map<SDL_Keycode, bool> key_down_states;
+    std::unordered_map<SDL_Keycode, bool> key_press_states;
 	SDL_Keymod keymod;
 	int mousex, mousey;
 	bool mouse_leftdown, mouse_rightdown;
@@ -111,6 +112,8 @@ public:
 
 	void bind_item(spell_id spell);
 	void unbind_item(spell_id spell);
+	bool ctrl_held();
+    bool shift_held();
 	bool mouse_left_click();
 	bool mouse_right_click();
 	bool mouse_left_down();

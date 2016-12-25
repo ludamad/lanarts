@@ -95,11 +95,11 @@ Data.class_create {
         hpregen = 4 / 60, -- Per 60 frames
         mpregen = 3 / 60, -- Per 60 frames
         strength = 7,
-        defence = 7,
-        willpower = 4,
+        defence = 4,
+        willpower = 7,
         magic = 4,
         equipment = {
-          weapon = "Long Bow",
+          weapon = "Short Bow",
           gold = 0,
           inventory = {
              {item = "Arrow", amount = 50} 

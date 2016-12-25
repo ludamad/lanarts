@@ -120,15 +120,18 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 	bool used_item = false;
 
 //Item use
+	IOEvent::event_t item_events[] = {IOEvent::USE_ITEM_N, IOEvent::SELL_ITEM_N};
 	for (int i = 0; i < 9 && !used_item; i++) {
-		if (io.query_event(IOEvent(IOEvent::USE_ITEM_N, i))) {
-			if (inventory().get(i).amount() > 0) {
-				item_used = true;
-				queued_actions.push_back(
-						GameAction(id, GameAction::USE_ITEM, frame, level, i,
-								p.x, p.y));
-			}
-		}
+	    for (auto& event : item_events) {
+            if (io.query_event(IOEvent(event, i))) {
+                if (inventory().get(i).amount() > 0) {
+                    item_used = true;
+                    GameAction::action_t action_type = (event == IOEvent::USE_ITEM_N ? GameAction::USE_ITEM : GameAction::SELL_ITEM);
+                    queued_actions.push_back(
+                            GameAction(id, action_type, frame, level, i, p.x, p.y));
+                }
+            }
+	    }
 	}
 	if (!used_item && gs->game_settings().autouse_health_potions
 			&& core_stats().hp < AUTOUSE_HEALTH_POTION_THRESHOLD) {
@@ -157,9 +160,10 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 		bool wieldable_projectile = projectile_should_autowield(equipment(),
 				item, this->last_chosen_weaponclass);
 
-		bool pickup_io = gs->key_down_state(SDLK_LSHIFT)
-				|| gs->key_down_state(SDLK_RSHIFT);
+//		bool pickup_io = gs->key_down_state(SDLK_LSHIFT)
+//				|| gs->key_down_state(SDLK_RSHIFT);
 
+		bool pickup_io = false; // No dedicated pickup key for now
 		if (do_stopaction || wieldable_projectile || pickup_io || autopickup)
 			queued_actions.push_back(
 					GameAction(id, GameAction::PICKUP_ITEM, frame, level,
@@ -369,14 +373,20 @@ void PlayerInst::perform_queued_actions(GameState* gs) {
 
 void PlayerInst::drop_item(GameState* gs, const GameAction& action) {
 	ItemSlot& itemslot = inventory().get(action.use_id);
+	// use_id2 == 0 means drop all, use_id2 == 1 means drop half
+	LANARTS_ASSERT(action.use_id2 == 0 || action.use_id2 == 1);
 	int dropx = round_to_multiple(x, TILE_SIZE, true), dropy =
 			round_to_multiple(y, TILE_SIZE, true);
-	int amnt = itemslot.amount();
+	Item dropped_item = itemslot.item;
+	if (action.use_id2 == 1) {
+	    dropped_item.amount = std::max(1, dropped_item.amount / 2);
+	}
 	bool already_item_here = gs->object_radius_test(dropx, dropy,
 			ItemInst::RADIUS, item_colfilter);
 	if (!already_item_here) {
-		gs->add_instance(new ItemInst(itemslot.item, Pos(dropx, dropy), id));
-		itemslot.clear();
+		gs->add_instance(new ItemInst(dropped_item, Pos(dropx, dropy), id));
+		itemslot.deequip();
+		itemslot.remove_copies(dropped_item.amount);
 	}
 	if (this->local) {
 		gs->game_hud().reset_slot_selected();
@@ -423,8 +433,10 @@ void PlayerInst::perform_action(GameState* gs, const GameAction& action) {
 		return use_rest(gs, action);
 	case GameAction::USE_PORTAL:
 		return use_dngn_portal(gs, action);
-	case GameAction::USE_ITEM:
-		return use_item(gs, action);
+    case GameAction::USE_ITEM:
+        return use_item(gs, action);
+    case GameAction::SELL_ITEM:
+        return sell_item(gs, action);
 	case GameAction::PICKUP_ITEM:
 		return pickup_item(gs, action);
 	case GameAction::DROP_ITEM:
@@ -472,6 +484,7 @@ static void item_do_lua_action(lua_State* L, ItemEntry& type, GameInst* user,
 	lua_pushnumber(L, amnt);
 	lua_call(L, 5, 0);
 }
+
 
 void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 	if (!effective_stats().allowed_actions.can_use_items) {
@@ -535,6 +548,29 @@ void PlayerInst::use_item(GameState* gs, const GameAction& action) {
 		}
 	}
 }
+
+void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
+    if (!effective_stats().allowed_actions.can_use_items) {
+        return;
+    }
+    itemslot_t slot = action.use_id;
+    ItemSlot& itemslot = inventory().get(slot);
+    Item& item = itemslot.item;
+    ItemEntry& type = itemslot.item_entry();
+
+    if (item.amount > 0 && !itemslot.is_equipped()) {
+        int sell_amount = std::min(item.amount, 5);
+        int gold_gained = type.sell_cost() * sell_amount;
+        auto message = format("Transaction: %s x %d for %d GP.", type.name.c_str(), sell_amount, gold_gained);
+        item.remove_copies(sell_amount);
+        gs->game_chat().add_message(message, COL_PALE_YELLOW);
+        gs->local_player()->gold(gs) += gold_gained;
+        play("sound/gold.ogg");
+    } else {
+        gs->game_chat().add_message("Cannot sell currently equipped items!", COL_RED);
+    }
+}
+
 void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
 	if (!effective_stats().allowed_actions.can_use_rest) {
 		return;

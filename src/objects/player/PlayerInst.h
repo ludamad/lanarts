@@ -143,6 +143,7 @@ private:
     void use_spell(GameState* gs, const GameAction& action);
     void use_rest(GameState* gs, const GameAction& action);
     void use_item(GameState* gs, const GameAction& action);
+    void sell_item(GameState* gs, const GameAction& action);
 
     //Either finds new target or shifts target
     void shift_autotarget(GameState* gs);
