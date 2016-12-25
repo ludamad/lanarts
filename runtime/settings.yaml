@@ -16,7 +16,7 @@ free_memory_while_idle: no
 
 #Debug settings
 network_debug_mode: no
-invincible: yes #Feel like exploring ? -> yes
+invincible: no #Feel like exploring ? -> yes
 draw_diagnostics: no
-verbose_output: yes
+verbose_output: no
 keep_event_log: no

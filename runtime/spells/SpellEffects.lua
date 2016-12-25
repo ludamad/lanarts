@@ -67,9 +67,11 @@ end
 function berserk_effect.stat(effect, obj, old, new)	
 	new.strength = new.strength + obj.stats.level
 	new.defence = math.max(0, new.defence + 5)
-	new.willpower = math.max(0, new.willpower)
+	new.willpower = math.max(0, new.willpower + 5)
 	new.melee_cooldown_multiplier = new.melee_cooldown_multiplier / 1.6
-	new.speed = new.speed + 1
+        if new.speed < 6 then
+            new.speed = math.max(new.speed * 1.25, 6)
+        end
 	obj:reset_rest_cooldown()
 end
 
@@ -90,7 +92,8 @@ end
 charge_effect = {}
 
 function charge_effect.stat(effect, obj, old, new)
-	new.defence = new.defence + 5
+-- Is this necessary?
+--	new.defence = new.defence + 5
         new.strength = new.strength + 2
 	new.speed = 0
 end
@@ -140,5 +143,8 @@ end
 expedited_effect = {}
 
 function expedited_effect.stat(effect, obj, old, new)
-	new.speed = new.speed + 2
+    if new.speed < 6 then
+	new.speed = math.max(new.speed * 1.25, 6)
+    end
+    new.ranged_cooldown_modifier = new.ranged_cooldown_modifier / 1.33
 end

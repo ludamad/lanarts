@@ -4,7 +4,8 @@ local M = {} -- Submodule
 M.store_items = {
     { item = "Arrow",              chance = 15,  amount = {5,20}  }
     , { item = "Silver Arrow",       chance = 10,  amount = {2,6}   }
-    , { item = "Stone",              chance = 15,  amount = {3,15}  }
+--  Ludamad: Remove stones for now. Part of: Try to reduce the projectile actions for non-archer a lot.
+--    , { item = "Stone",              chance = 15,  amount = {3,15}  }
     -- Scrolls
     , { item = "Haste Scroll",       chance = 7                      }
     -- Potions
@@ -48,8 +49,10 @@ M.basic_items = {
     -- Projectiles
     , { item = "Arrow",              chance = 15,  amount = {5,20}  }
     , { item = "Silver Arrow",       chance = 10,  amount = {2,6}   }
-    , { item = "Stone",              chance = 15,  amount = {3,15}  }
+--  Ludamad: Remove stones for now. Part of: Try to reduce the projectile actions for non-archer a lot.
+--    , { item = "Stone",              chance = 15,  amount = {3,15}  }
     -- Ranged Weapons
+--  Ludamad: Remove non-artifact bows as attainable items for now. Part of: Try to reduce the projectile actions for non-archer a lot.
     , { item = "Short Bow",          chance = 10                     }
     -- Melee Weapons
     , { item = "Dagger",             chance = 10                     }
@@ -77,9 +80,10 @@ M.basic_items = {
 }
 
 M.enchanted_items = {
-    { item = "Stone",              chance = 5,  amount = {3,15}  }
+--  Ludamad: Remove stones for now. Part of: Try to reduce the projectile actions for non-archer a lot.
+--    { item = "Stone",              chance = 5,  amount = {3,15}  }
     -- Melee Weapons
-    , { item = "Mace",               chance = 3                      }
+    { item = "Mace",               chance = 3                      }
     -- Body Armour
     , { item = "Leather Armour",     chance = 3                      }
     , { item = "Robe",               chance = 3                      }
@@ -93,6 +97,7 @@ M.enchanted_items = {
     , { item = "Silver Arrow",       chance = 3,  amount = {2,8}   }
     -- TODO REMOVE ABOVE REDUNDANCIES^
     -- Ranged Weapons
+    -- Ludamad: Remove non-artifact bows as attainable items for now. Part of: Try to reduce the projectile actions for non-archer a lot.
     , { item = "Long Bow",           chance = 2                      }
     , { item = "Mars Bow",           chance = 1                      }
     -- Melee Weapons

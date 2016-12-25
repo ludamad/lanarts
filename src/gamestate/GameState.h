@@ -87,6 +87,10 @@ public:
 
 	/* Instance retrieval and removal functions */
 	GameInst* get_instance(obj_id id);
+	template <typename T>
+    T* get_instance(obj_id id) {
+	    return dynamic_cast<T*>(get_instance(id));
+	}
 	GameInst* get_instance(level_id level, obj_id id);
 	obj_id add_instance(GameInst* inst);
 	obj_id add_instance(level_id level, GameInst* inst);

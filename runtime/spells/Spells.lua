@@ -42,7 +42,7 @@ Data.spell_create {
 local Berserk = {
     name = "Berserk",
     spr_spell = "berserk",
-    description = "Allows you to strike powerful blows for a limited duration, afterwards you are slower and vulnerable.",
+    description = "Initiate frenzy, gaining +5 defence & willpower, +Level strength, +60% melee speed, +25% move speed. Lasts longer as you kill enemies. Afterwards, become exhausted with -3 defence & willpower, -25% action speed, -50% move speed",
     mp_cost = 40,
     cooldown = 30,
     can_cast_with_held_key = false,
@@ -187,7 +187,7 @@ Data.spell_create(PowerStrike)
 
 local Expedite = {
     name = "Expedite",
-    description = "Run faster for a short duration.",
+    description = "Run 25% faster for a short duration, with 33% faster rate of fire.",
     can_cast_with_held_key = false,
     spr_spell = "expedite",
     can_cast_with_cooldown = true,

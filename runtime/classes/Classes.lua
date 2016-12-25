@@ -4,8 +4,8 @@ Data.class_create {
     available_spells = {
       { spell = "Minor Missile",
     	level_needed = 1 },
-      { spell = "Mephitize",
-        level_needed = 1 },
+--      { spell = "Mephitize",
+--        level_needed = 1 },
       { spell = "Magic Blast",
         level_needed = 1 },
       { spell = "Fire Bolt",
@@ -15,8 +15,8 @@ Data.class_create {
         movespeed = 4,
         hp = 100,
         mp = 120,
-        hpregen = 0.040,
-        mpregen = 0.076,
+        hpregen = 2 / 60, -- Per 60 frames
+        mpregen = 4 / 60, -- Per 60 frames 
         strength = 4,
         defence = 4,
         willpower = 7,
@@ -31,8 +31,8 @@ Data.class_create {
     gain_per_level = {
         hp = 15,
         mp = 20,
-        hpregen = 0.007,
-        mpregen = 0.010,
+        hpregen = 0.5 / 60, -- Per 60 frames
+        mpregen = 0.65 / 60, -- Per 60 frames
         magic = 1,
         strength = 1,
         defence = 1,
@@ -53,25 +53,25 @@ Data.class_create {
         movespeed = 4,
         hp = 135,
         mp = 50,
-        hpregen = 0.065,
-        mpregen = 0.051,
+        hpregen = 4 / 60, -- Per 60 frames
+        mpregen = 3 / 60, -- Per 60 frames
         strength = 7,
         defence = 7,
         willpower = 4,
         magic = 4,
         equipment = {
-          weapon = "Dagger",
+          weapon = "Short Sword",
           gold = 0,
           inventory = {
-             {item = "Stone", amount = 10} 
+             {item = "Health Potion", amount = 1} 
           }
         }
     },
     gain_per_level = {
         hp = 25,
         mp = 10,
-        hpregen = 0.010,
-        mpregen = 0.007,
+        hpregen = 0.65 / 60, -- Per 60 frames
+        mpregen = 0.5 / 60, -- Per 60 frames
         magic = 1,
         strength = 1,
         defence = 1,
@@ -90,28 +90,27 @@ Data.class_create {
     },
     start_stats = {
         movespeed = 4,
-        hp = 100,
+        hp = 115,
         mp = 85,
-        hpregen = 0.041,
-        mpregen = 0.06,
-        strength = 6,
-        defence = 5,
-        willpower = 6,
-        magic = 5,
+        hpregen = 4 / 60, -- Per 60 frames
+        mpregen = 3 / 60, -- Per 60 frames
+        strength = 7,
+        defence = 7,
+        willpower = 4,
+        magic = 4,
         equipment = {
-          weapon = "Short Bow",
+          weapon = "Long Bow",
           gold = 0,
-          projectile = { item = "Arrow", amount = 60 },
           inventory = {
-             {item = "Dagger"} 
+             {item = "Arrow", amount = 50} 
           }
         }
     },
     gain_per_level = {
-        hp = 10,
-        mp = 15,
-        hpregen = 0.011,
-        mpregen = 0.010,
+        hp = 25,
+        mp = 10,
+        hpregen = 0.65 / 60, -- Per 60 frames
+        mpregen = 0.5 / 60, -- Per 60 frames
         magic = 1,
         strength = 1,
         defence = 1,

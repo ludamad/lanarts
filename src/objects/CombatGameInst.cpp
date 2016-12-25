@@ -19,6 +19,7 @@
 
 #include "stats/effect_data.h"
 #include "stats/stat_formulas.h"
+#include "stats/ClassEntry.h"
 
 #include <lcommon/math_util.h>
 
@@ -30,10 +31,17 @@
 
 const int HURT_COOLDOWN = 30;
 bool CombatGameInst::damage(GameState* gs, int dmg) {
-
     event_log("CombatGameInst::damage: id %d took %d dmg\n", id, dmg);
 
-damage(GameState* gs, const EffectiveAttackStats& attack) {
+    if (core_stats().hurt(dmg)) {
+        die(gs);
+        return true;
+    }
+    cooldowns().reset_hurt_cooldown(HURT_COOLDOWN);
+    return false;
+}
+
+bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
     event_log("CombatGameInst::damage: id %d getting hit by {cooldown = %d, "
             "damage=%d, power=%d, magic_percentage=%f, resist_modifier=%f, physical_percentage=%f}",
             id, attack.cooldown, attack.damage, attack.power,
@@ -223,8 +231,9 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
             "CombatGameInst::projectile_attack id=%d created projectile at %d, %d\n",
             id, p.x, p.y);
 
+    int range = pentry.range();
     GameInst* bullet = new ProjectileInst(projectile, atkstats, id, Pos(x, y),
-            p, pentry.speed, pentry.range());
+            p, pentry.speed, range);
     gs->add_instance(bullet);
     cooldowns().reset_action_cooldown(
             pentry.cooldown()
