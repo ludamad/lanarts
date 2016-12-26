@@ -303,12 +303,12 @@ static void draw_attack_description_overlay(GameState* gs,
 
 	if (attack.range >= 15) {
 		dbh.draw_prefix(gs, COL_PALE_YELLOW, "Range: ");
-                if (p->class_stats().class_entry().name != "Archer" && p->weapon().weapon_entry().weapon_class == "bows") {
-		    dbh.draw_value(gs, COL_PALE_RED, "Poor (Unproficient)");
-                } else {
+//                if (p->class_stats().class_entry().name != "Archer" && p->weapon().weapon_entry().weapon_class == "bows") {
+//		    dbh.draw_value(gs, COL_PALE_RED, "Poor (Unproficient)");
+//                } else {
                     dbh.draw_value(gs, COL_PALE_GREEN, "%s",
 				range_description(attack.range));
-                }
+//                }
 	}
 	draw_value(gs, dbh, "Cooldown: ", attack.cooldown, COL_PALE_YELLOW,
 			COL_PALE_RED);

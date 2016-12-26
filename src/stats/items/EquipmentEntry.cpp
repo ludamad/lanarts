@@ -32,8 +32,14 @@ const char* EquipmentEntry::entry_type() {
 		return "Armour";
 	case EquipmentEntry::BOOTS:
 		return "Boots";
-	case EquipmentEntry::HEADGEAR:
-		return "Headgear";
+    case EquipmentEntry::HEADGEAR:
+        return "Headgear";
+    case EquipmentEntry::AMULET:
+        return "Amulet";
+    case EquipmentEntry::LEGWEAR:
+        return "Legwear";
+    case EquipmentEntry::BELT:
+        return "Belt";
 	case EquipmentEntry::GLOVES:
 		return "Gloves";
 	case EquipmentEntry::RING:
@@ -65,6 +71,10 @@ static EquipmentEntry::equip_type name2type(const char* name) {
         return EquipmentEntry::HEADGEAR;
     } else if (strcmp(name, "amulet") == 0) {
         return EquipmentEntry::AMULET;
+    } else if (strcmp(name, "belt") == 0) {
+        return EquipmentEntry::BELT;
+    } else if (strcmp(name, "legwear") == 0) {
+        return EquipmentEntry::LEGWEAR;
 	} else if (strcmp(name, "gloves") == 0) {
 		return EquipmentEntry::GLOVES;
 	} else {

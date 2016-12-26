@@ -17,6 +17,9 @@ M.store_items = {
     , { item = "Amulet of Trepidation", chance = 1 }
     , { item = "Amulet of Mephitization", chance = 1 }
     , { item = "Amulet of Regeneration", chance = 1 }
+    , { item = "Amulet of Fire", chance = 1 }
+    , { item = "Amulet of Greater Fire", chance = 1 }
+    , { item = "Amulet of Protection", chance = 1 }
     -- Rings
     , { item = "Ring of Spells",     chance = 1                      }
     , { item = "Ring of Vitality",   chance = 1                      }
@@ -32,10 +35,17 @@ M.store_items = {
     , { item = "Ogre's Ring",        chance = 1                      }
     , { item = "Hydra Ring",         chance = 1                      }
     , { item = "Gallanthor's Ring",         chance = 1               }
+    -- Belts
+    , { item = "Belt of Protection",      chance = 1                      }
+    , { item = "Belt of Slaying",        chance = 1                      }
+    -- Legwear
+    , { item = "Platelegs",      chance = 1                      }
+    , { item = "Magic Skirt",        chance = 1                      }
     -- Bows
     , { item = "Mars Bow",           chance = 1                      }
     -- Boots
     , { item = "Iron Boots",         chance = 1                      }
+    , { item = "Troll Boots",         chance = 1                      }
     -- Gloves
     , { item = "Steel Gloves",       chance = 1                      }
     , { item = "Runed Gloves",       chance = 1                      }
@@ -80,6 +90,13 @@ M.basic_items = {
     , { item = "Ring of Stone",      chance = 1                      }
     -- Boots
     , { item = "Leather Boots",      chance = 4                      }
+    , { item = "Iron Boots",        chance = 1                      }
+    -- Belts
+    , { item = "Belt of Protection",      chance = 1                      }
+    , { item = "Belt of Slaying",        chance = 1                      }
+    -- Legwear
+    , { item = "Platelegs",      chance = 1                      }
+    , { item = "Magic Skirt",        chance = 1                      }
     -- Gloves
     , { item = "Leather Gloves",     chance = 4                      }
     -- Amulets
@@ -88,6 +105,9 @@ M.basic_items = {
     , { item = "Amulet of Trepidation", chance = 1 }
     , { item = "Amulet of Mephitization", chance = 1 }
     , { item = "Amulet of Regeneration", chance = 1 }
+    , { item = "Amulet of Fire", chance = 1 }
+    , { item = "Amulet of Greater Fire", chance = 1 }
+    , { item = "Amulet of Protection", chance = 1 }
 }
 
 M.enchanted_items = {
@@ -128,6 +148,12 @@ M.enchanted_items = {
     , { item = "Magician's Robe",    chance = 2                      }
     , { item = "Runed Robe",         chance = 1                      }
     , { item = "Robe of Mana",         chance = 1                      }
+    -- Belts
+    , { item = "Belt of Protection",      chance = 1                      }
+    , { item = "Belt of Slaying",        chance = 1                      }
+    -- Legwear
+    , { item = "Platelegs",      chance = 1                      }
+    , { item = "Magic Skirt",        chance = 1                      }
     -- Helmets
     , { item = "Runed Helmet",       chance = 1                      }
     , { item = "Crown of Mars",      chance = 1                      }
@@ -141,6 +167,7 @@ M.enchanted_items = {
     , { item = "Gallanthor's Ring",         chance = 1               }
     -- Boots
     , { item = "Iron Boots",         chance = 1                      }
+    , { item = "Troll Boots",         chance = 1                      }
     -- Gloves
     , { item = "Steel Gloves",       chance = 1                      }
     , { item = "Runed Gloves",       chance = 1                      }
@@ -159,6 +186,9 @@ M.enchanted_items = {
     , { item = "Amulet of Trepidation", chance = 1 }
     , { item = "Amulet of Mephitization", chance = 1 }
     , { item = "Amulet of Regeneration", chance = 1 }
+    , { item = "Amulet of Fire", chance = 1 }
+    , { item = "Amulet of Greater Fire", chance = 1 }
+    , { item = "Amulet of Protection", chance = 1 }
 }
 
 return M

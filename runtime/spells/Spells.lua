@@ -20,6 +20,17 @@ Data.spell_create {
 -- FIRE BOLT
 
 Data.spell_create {
+    name = "Fireball",
+    spr_spell = "fire ball",
+    description = "A great, strong bolt of fire. Hits a single target.",
+    projectile = "Fireball",
+    mp_cost = 30,
+    cooldown = 35
+}
+
+-- FIRE BOLT
+
+Data.spell_create {
     name = "Fire Bolt",
     spr_spell = "fire bolt",
     description = "A fast bolt of fire. Hits a single target.",
@@ -46,8 +57,8 @@ Data.spell_create {
     spr_spell = "spr_spells.cause_fear",
     description = "An insidious apparition that instills the fear of death in enemies it hits.",
     projectile = "Trepidize",
-    mp_cost = 50,
-    cooldown = 60
+    mp_cost = 40,
+    cooldown = 35
 }
 
 -- REGENERATION
@@ -236,7 +247,7 @@ local FearStrike = {
     can_cast_with_held_key = true,
     spr_spell = "spr_spells.fear_strike",
     can_cast_with_cooldown = false,
-    mp_cost = 25,
+    mp_cost = 40,
     cooldown = 0, -- Uses cooldown of weapon
     fallback_to_melee = true,
 }

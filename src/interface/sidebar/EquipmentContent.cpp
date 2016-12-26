@@ -77,7 +77,9 @@ const SlotAndDefault slot_data[] = { SlotAndDefault(EquipmentEntry::AMMO,
 		"No Armour"), SlotAndDefault(EquipmentEntry::BOOTS, "No Boots"),
 		SlotAndDefault(EquipmentEntry::GLOVES, "No Gloves"), SlotAndDefault(
 				EquipmentEntry::HEADGEAR, "No Headgear"),
-				SlotAndDefault(EquipmentEntry::AMULET, "No Amulet")};
+                SlotAndDefault(EquipmentEntry::AMULET, "No Amulet"),
+                SlotAndDefault(EquipmentEntry::BELT, "No Belt"),
+                SlotAndDefault(EquipmentEntry::LEGWEAR, "No Legwear")};
 
 const size_t slot_data_n = sizeof(slot_data) / sizeof(SlotAndDefault);
 

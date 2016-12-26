@@ -1,6 +1,6 @@
-local item_groups = require "maps.ItemGroups"
+local ItemGroups = require "maps.ItemGroups"
 local Display = require "core.Display"
-local item_utils = require "maps.ItemUtils"
+local ItemUtils = require "maps.ItemUtils"
 local dungeons = require "maps.Dungeons"
 local map_utils = require "maps.MapUtils"
 local SourceMap = require "core.SourceMap"
@@ -184,7 +184,7 @@ M.Dungeon1 = {
   -- Level 1
   { layout = tiny_layouts,
     content = {
-      items = { amount = 3,  group = item_groups.basic_items   },
+      items = { amount = 3,  group = ItemGroups.basic_items   },
       enemies = {
         wandering = false,
         amount = 7,
@@ -202,7 +202,7 @@ M.Dungeon1 = {
   -- Level 2
   { layout = {small_layout1},
     content = {
-      items = { amount = 6,  group = item_groups.basic_items   },
+      items = { amount = 6,  group = ItemGroups.basic_items   },
       enemies = {
         wandering = false,
         amount = 10,
@@ -220,7 +220,7 @@ M.Dungeon1 = {
 M.Dungeon2 = {
   { layout = tiny_layouts,
     content = {
-      items = { amount = 3,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
+      items = { amount = 3,  group = tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
       enemies = {
         wandering = false,
         amount = 7,
@@ -231,7 +231,7 @@ M.Dungeon2 = {
 
   { layout = tiny_layouts,
     content = {
-      items = { amount = 3,  group = item_groups.basic_items   },
+      items = { amount = 3,  group = ItemGroups.basic_items   },
       enemies = {
         wandering = false,
         amount = 7,
@@ -245,7 +245,7 @@ M.Dungeon2 = {
 
   { layout = {small_layout1},
     content = {
-      items = { amount = 6,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
+      items = { amount = 6,  group = tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
       enemies = {
         wandering = true,
         amount = 10,
@@ -258,7 +258,7 @@ M.Dungeon2 = {
 M.Dungeon3 = {
   { layout = small_layouts,
     content = {
-      items = { amount = 5,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
+      items = { amount = 5,  group = tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
       enemies = {
         amount = {10,14},
         generated = M.medium_animals 
@@ -267,7 +267,7 @@ M.Dungeon3 = {
   },
   { layout = small_layouts,
     content = {
-      items = { amount = 8,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
+      items = { amount = 8,  group = tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
       enemies = {
         amount = {12,15},
         generated = M.medium_enemies
@@ -276,7 +276,7 @@ M.Dungeon3 = {
   },
   { templates = {path_resolve "dungeon1room1a.txt", path_resolve "dungeon1room1b.txt", path_resolve "dungeon1room1c.txt"},
     content = {
-      items = { amount = 4,  group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
+      items = { amount = 4,  group = tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
       enemies = {
         amount = 6,
         generated = tconcat(M.medium_enemies, {{enemy = "Hell Warrior", guaranteed_spawns = 1}})
@@ -288,7 +288,7 @@ M.Dungeon4 = {
   -- Level 6
   { layout = {small_layout1},
     content = {
-      items = { amount = 8, group = tconcat(item_groups.basic_items, item_groups.enchanted_items)   },
+      items = { amount = 8, group = tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
       enemies = {
         amount = {14,16},
         generated = M.medium_enemies
@@ -298,7 +298,7 @@ M.Dungeon4 = {
   -- Level 7
   { layout = medium_layouts,
     content = {
-      items = { amount = 10, group = item_groups.enchanted_items   },
+      items = { amount = 10, group = ItemGroups.enchanted_items   },
       enemies = {
         amount = {18,22},
         generated = M.hard_enemies,
@@ -308,7 +308,7 @@ M.Dungeon4 = {
   -- Level 8
   { layout = large_layouts,
     content = {
-      items = { amount = 10, group = item_groups.enchanted_items   },
+      items = { amount = 10, group = ItemGroups.enchanted_items   },
       enemies = {
         amount = 22,
         generated = M.hard_enemies
@@ -319,7 +319,7 @@ M.Dungeon4 = {
   -- Level 9
   { layout = large_layouts,
     content = {
-      items = { amount = 12,  group = item_groups.enchanted_items   },
+      items = { amount = 12,  group = ItemGroups.enchanted_items   },
       enemies = {
         amount = 25,
         generated = M.harder_enemies
@@ -329,7 +329,7 @@ M.Dungeon4 = {
   -- Level 10
   { layout = large_layouts,
     content = {
-      items = { amount = 12,  group = item_groups.enchanted_items   },
+      items = { amount = 12,  group = ItemGroups.enchanted_items   },
       enemies = {
         amount = 30,
         generated = tconcat(M.harder_enemies, {{enemy = "Zin", guaranteed_spawns = 1}, {enemy = "Hell Forged", guaranteed_spawns = 1}})
@@ -345,7 +345,7 @@ end
 
 local function generate_items(map, items)
     for i=1,range_resolve(items.amount) do
-        item_utils.item_object_generate(map, items.group)
+        ItemUtils.item_object_generate(map, items.group)
     end
 end
 
@@ -445,11 +445,11 @@ local function generate_statues(map, --[[Optional]] amount)
 end
 
 local function generate_stores(map)
-    if chance(0) then -- TODO Temporarily disabled as shops are tested only in specific vaults
+    if chance(0.25) then 
         local items = {}
         for i=1,random(5,10) do
-            local randart_power_level = 1
-            table.insert(items, item_groups.store_items, true, randart_power_level)
+            local power_level, randart_chance = 1, 5
+            table.insert(items, ItemUtils.item_generate(ItemGroups.store_items, true, power_level, randart_chance))
         end
         map_utils.random_store(map, items)
     end

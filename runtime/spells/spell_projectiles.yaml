@@ -10,6 +10,17 @@ projectiles:
     spr_item: none
     spr_attack: fire bolt
 
+  - name: Fireball
+    weapon_class: magic
+    damage_type: {magic: 1.0}
+    damage: { base: [10,25], magic: 2 }
+    power: { base: 10, magic: 0.3 }
+    resist_modifier: 1
+    range: 300
+    speed: 5
+    spr_item: none
+    spr_attack: fire ball
+
   - name: Magic Blast
     weapon_class: magic
     damage_type: { magic: 1.0}

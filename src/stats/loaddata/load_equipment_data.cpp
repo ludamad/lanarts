@@ -31,6 +31,10 @@ void parse_equipment_entry(lua_State* L, const YAML::Node& n, EquipmentEntry& en
         entry.type = EquipmentEntry::HEADGEAR;
     } else if (type == "amulet") {
         entry.type = EquipmentEntry::AMULET;
+    } else if (type == "belt") {
+        entry.type = EquipmentEntry::BELT;
+    } else if (type == "legwear") {
+        entry.type = EquipmentEntry::LEGWEAR;
 	} else if (type == "gloves") {
 		entry.type = EquipmentEntry::GLOVES;
 	} else {
@@ -74,7 +78,9 @@ void load_equipment_data(lua_State* L, const FilenameList& filenames,
 	luawrap::dofile(L, "items/BodyArmour.lua");
 	luawrap::dofile(L, "items/Boots.lua");
 	luawrap::dofile(L, "items/Gloves.lua");
-	luawrap::dofile(L, "items/Helmets.lua");
+    luawrap::dofile(L, "items/Helmets.lua");
+    luawrap::dofile(L, "items/Belts.lua");
+    luawrap::dofile(L, "items/Legwear.lua");
 	luawrap::dofile(L, "items/Amulets.lua");
 	luawrap::dofile(L, "items/Rings.lua");
 }

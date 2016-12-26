@@ -58,3 +58,36 @@ Data.equipment_create {
     spells_granted = {"Regeneration"},
 }
 
+Data.equipment_create {
+    name = "Amulet of Greater Fire",
+    description = "Grants the user the spell 'Fireball'.",
+    type = "amulet",
+
+    shop_cost = { 120, 140 },
+
+    spr_item = "spr_amulets.greaterfireball",
+    spells_granted = {"Fireball"},
+}
+
+Data.equipment_create {
+    name = "Amulet of Fire",
+    description = "Grants the user the spell 'Fire Bolt'.",
+    type = "amulet",
+
+    shop_cost = { 120, 140 },
+
+    spr_item = "spr_amulets.fireball",
+    spells_granted = {"Fire Bolt"},
+}
+
+Data.equipment_create {
+    name = "Amulet of Protection",
+    description = "Grants the user increased defences against magical attacks.",
+    type = "amulet",
+
+    shop_cost = { 120, 140 },
+
+    stat_bonuses = { willpower = 2 },
+    spr_item = "spr_amulets.protect",
+}
+
