@@ -27,8 +27,10 @@ void parse_equipment_entry(lua_State* L, const YAML::Node& n, EquipmentEntry& en
 		entry.type = EquipmentEntry::RING;
 	} else if (type == "boots") {
 		entry.type = EquipmentEntry::BOOTS;
-	} else if (type == "helmet") {
-		entry.type = EquipmentEntry::HEADGEAR;
+    } else if (type == "helmet") {
+        entry.type = EquipmentEntry::HEADGEAR;
+    } else if (type == "amulet") {
+        entry.type = EquipmentEntry::AMULET;
 	} else if (type == "gloves") {
 		entry.type = EquipmentEntry::GLOVES;
 	} else {
@@ -69,9 +71,10 @@ void load_equipment_data(lua_State* L, const FilenameList& filenames,
 
 	LuaValue data = luawrap::ensure_table(luawrap::globals(L)["Data"]);
 	data["equipment_create"].bind_function(lapi_data_create_equipment);
-	luawrap::dofile(L, "items/armour/BodyArmour.lua");
-	luawrap::dofile(L, "items/armour/Boots.lua");
-	luawrap::dofile(L, "items/armour/Gloves.lua");
-	luawrap::dofile(L, "items/armour/Helmets.lua");
-	luawrap::dofile(L, "items/rings/Rings.lua");
+	luawrap::dofile(L, "items/BodyArmour.lua");
+	luawrap::dofile(L, "items/Boots.lua");
+	luawrap::dofile(L, "items/Gloves.lua");
+	luawrap::dofile(L, "items/Helmets.lua");
+	luawrap::dofile(L, "items/Amulets.lua");
+	luawrap::dofile(L, "items/Rings.lua");
 }

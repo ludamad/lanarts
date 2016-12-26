@@ -622,6 +622,9 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 
 	}
 
+    if (vx != 0 || vy != 0) {
+        _last_moved_direction = PosF(vx, vy);
+    }
         //Smaller radius enemy pushing test, can intercept enemy radius but not too far
 	EnemyInst* alreadyhitting[5] = { NULL, NULL, NULL, NULL, NULL };
 	gs->object_radius_test(this, (GameInst**)alreadyhitting, 5,
@@ -643,7 +646,6 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
         if (reduce_vy) {
             vy *= 0.5;
         }
-
 	event_log("Player id: %d using move for turn %d, vx=%f, vy=%f\n", id, gs->frame(), vx, vy);
 	perf_timer_end(FUNCNAME);
 }

@@ -16,6 +16,7 @@
 
 #include "stats/items/ProjectileEntry.h"
 #include "stats/items/WeaponEntry.h"
+#include "stats/effect_data.h"
 
 #include <lcommon/math_util.h>
 
@@ -195,7 +196,9 @@ void MonsterController::set_monster_headings(GameState* gs,
 		WeaponEntry& wentry = attack.weapon_entry();
 		bool hasproj = attack.projectile.id != NO_ITEM;
 
-		if (pdist < e->target_radius + p->target_radius) {
+		// Part of: Implement a bunch of new status effects.
+        bool has_fear = (e->effects().get(get_effect_by_name("Fear")));
+		if (pdist < e->target_radius + p->target_radius && !has_fear) {
 			e->vx = 0, e->vy = 0;
 		}
 
@@ -205,7 +208,9 @@ void MonsterController::set_monster_headings(GameState* gs,
 			if (hasproj) {
 				mindist = attack.projectile_entry().range();
 			}
-			if (!attack.is_ranged()) {
+			if (has_fear) {
+			    // Don't stop moving near if have fear.
+			} else if (!attack.is_ranged()) {
 				e->vx = 0, e->vy = 0;
 			} else {
 				int close = 40;

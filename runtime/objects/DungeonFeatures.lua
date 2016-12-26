@@ -50,6 +50,9 @@ end
 M.Door = LuaGameObject.type_create(Base)
 local Door = M.Door
 local DOOR_OPEN_TIMEOUT = 128
+local function is_solid(obj) 
+    return obj.solid
+end
 function Door:on_step()
 --    if Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
 --        return -- Need to be able to scale to many deactivated instances
@@ -63,6 +66,7 @@ function Door:on_step()
     local needs_key = (self.required_key ~= false)
     local is_open = false
     local collisions = Map.rectangle_collision_check(self.map, self.unpadded_area, self)
+    collisions = table.filter(collisions, is_solid) 
     if #collisions > 0 and (not needs_key or GlobalData.keys_picked_up[self.required_key]) then
         is_open = true
     else 

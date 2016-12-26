@@ -13,7 +13,7 @@
 
 #include "gamestate/GameLogger.h"
 #include "items/WeaponEntry.h"
-
+#include "SpellEntry.h"
 #include "ClassEntry.h"
 
 #include "combat_stats.h"
@@ -204,4 +204,14 @@ CooldownModifiers parse_cooldown_modifiers(const LuaField& value) {
 	cm.spell_cooldown_multiplier = defaulted(value, "spell_cooldown_multiplier",
 			1.0f);
 	return cm;
+}
+
+SpellsKnown parse_spells_known(const LuaField& value) {
+    using namespace luawrap;
+    SpellsKnown ret;
+    auto spells = defaulted(value, std::vector<std::string>());
+    for (auto& spell : spells) {
+        ret.add_spell(res::spell_id(spell));
+    }
+    return ret;
 }

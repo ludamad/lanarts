@@ -15,7 +15,7 @@
 class EquipmentEntry: public ItemEntry {
 public:
 	enum equip_type {
-		NONE, WEAPON, AMMO, BODY_ARMOUR, RING, BOOTS, GLOVES, HEADGEAR
+		NONE, WEAPON, AMMO, BODY_ARMOUR, RING, BOOTS, GLOVES, HEADGEAR, AMULET
 	};
 	EquipmentEntry(equip_type type = NONE) :
 			type(type) {
@@ -65,6 +65,7 @@ public:
 	CooldownModifiers cooldown_modifiers;
 	// Status effects from wearing this armour
 	StatusEffectModifiers effect_modifiers;
+	SpellsKnown spells_granted;
 };
 
 equipment_id get_equipment_by_name(const char* name);

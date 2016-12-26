@@ -118,6 +118,7 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	luawrap::bind_getter(getters["id"], &GameInst::id);
 	luawrap::bind_getter(getters["depth"], &GameInst::depth);
 	luawrap::bind_getter(getters["radius"], &GameInst::radius);
+	luawrap::bind_getter(getters["solid"], &GameInst::solid);
 	luawrap::bind_getter(getters["target_radius"], &GameInst::target_radius);
 	getters["map"].bind_function(lapi_gameinst_map);
 	LUAWRAP_GETTER(meta, __tostring, typeid(*OBJ).name());
@@ -184,6 +185,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	getters["stats"].bind_function(lapi_gameinst_stats);
 
 	LuaValue methods = luameta_constants(meta);
+    LUAWRAP_GETTER(getters, weapon_range, OBJ->equipment().weapon().weapon_entry().range());
 	LUAWRAP_METHOD(methods, heal_fully, OBJ->stats().core.heal_fully());
 	LUAWRAP_METHOD(methods, direct_damage, OBJ->damage(lua_api::gamestate(L), lua_tointeger(L, 2)));
 	LUAWRAP_METHOD(methods, melee, luawrap::push(L, OBJ->melee_attack(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2), OBJ->equipment().weapon(), true)) );
@@ -237,7 +239,8 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(getters, kills, OBJ->score_stats().kills);
 	LUAWRAP_GETTER(getters, deepest_floor, OBJ->score_stats().deepest_floor);
 	LUAWRAP_GETTER(getters, deaths, OBJ->score_stats().deaths);
-	LUAWRAP_GETTER(getters, spells, OBJ->stats().spells.spell_id_list());
+    LUAWRAP_GETTER(getters, spells, OBJ->stats().spells.spell_id_list());
+    LUAWRAP_GETTER(getters, last_moved_direction, OBJ->last_moved_direction());
 	LUAWRAP_METHOD(methods, melee, luawrap::push(L, OBJ->melee_attack(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2), OBJ->equipment().weapon(), true)) );
     
 	LUAWRAP_GETTER(methods, has_melee_weapon, !OBJ->weapon().weapon_entry().uses_projectile);
@@ -576,6 +579,14 @@ static void object_destroy(LuaStackValue inst) {
 	lua_api::gamestate(inst)->remove_instance(inst.as<GameInst*>());
 }
 
+static void object_add(LuaStackValue inst) {
+    auto* gs = lua_api::gamestate(inst);
+    if (!gs->get_level()) {
+        throw std::runtime_error("Attempt to initialize object with no active levels! Try using with do_init = false");
+    }
+    gs->add_instance(inst.as<GameInst*>());
+}
+
 namespace lua_api {
 	// Ensures important objects are reached during serialization:
 	static void ensure_reachability(LuaValue globals, LuaValue submodule) {
@@ -608,6 +619,7 @@ namespace lua_api {
 		submodule["store_create"].bind_function(store_create);
 		submodule["player_create"].bind_function(player_create);
 		submodule["destroy"].bind_function(object_destroy);
+		submodule["add_to_level"].bind_function(object_add);
 
 		submodule["DOOR_OPEN"] = (int)FeatureInst::DOOR_OPEN;
 		submodule["DOOR_CLOSED"] = (int)FeatureInst::DOOR_CLOSED;

@@ -139,7 +139,7 @@ static int new_rvo_world(lua_State* L) {
 }
 
 namespace lua_api {
-    void register_lua_core_CollisionAvoidance(lua_State* L) {
+    void register_lua_core_RVOWorld(lua_State* L) {
             LuaValue module = register_lua_submodule(L, "core.RVOWorld");
             luawrap::install_userdata_type<RVOSimulator, &lua_rvoworldmetatable>();
             module["create"].bind_function(new_rvo_world);

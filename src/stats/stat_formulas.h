@@ -14,7 +14,7 @@ struct EffectiveStats;
 class CombatGameInst;
 class GameState;
 
-int damage_formula(const EffectiveAttackStats& attacker,
+float damage_formula(const EffectiveAttackStats& attacker,
 		const EffectiveStats& defender);
 
 EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst, const CombatStats& stats);

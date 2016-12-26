@@ -185,7 +185,7 @@ void ProjectileInst::step(GameState* gs) {
 
                                     double xpworth = victim->xpworth();
                                     double n_killed = (pc.n_enemy_killed(victim->enemy_type()) - 1) / pc.all_players().size();
-                                    xpworth *= pow(0.8, n_killed);
+                                    xpworth *= pow(0.9, n_killed);
                                     if (n_killed > 15) {
                                         xpworth = 0;
                                     }

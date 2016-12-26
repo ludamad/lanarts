@@ -18,6 +18,7 @@
 #include "gamestate/PlayerData.h"
 
 #include "stats/items/WeaponEntry.h"
+#include "stats/effect_data.h"
 
 #include <lcommon/math_util.h>
 
@@ -138,11 +139,14 @@ void MonsterController::pre_step(GameState* gs) {
 			e->target() = NONE;
 		}
 
-		if (eb.current_action == EnemyBehaviour::CHASING_PLAYER)
+		// Part of: Implement status effects.
+		bool forced_wander = (e->effects().get(get_effect_by_name("Dazed")));
+
+		if (eb.current_action == EnemyBehaviour::CHASING_PLAYER && !forced_wander)
 			eois.push_back(
 					EnemyOfInterest(e, closest_player_index,
 							inst_distance(e, players[closest_player_index])));
-		else if (eb.current_action == EnemyBehaviour::INACTIVE)
+		else if (eb.current_action == EnemyBehaviour::INACTIVE || forced_wander)
 			monster_wandering(gs, e);
 		else
 			//if (eb.current_action == EnemyBehaviour::FOLLOWING_PATH)
@@ -180,14 +184,29 @@ void MonsterController::pre_step(GameState* gs) {
 void MonsterController::update_velocity(GameState* gs, EnemyInst* e) {
 	float movespeed = e->effective_stats().movespeed;
 
-	if (e->cooldowns().is_hurting() && e->etype().name != "Ogre Mage") {
-		e->vx /= 2, e->vy /= 2;
-		movespeed /= 2;
+	bool has_fear = (e->effects().get(get_effect_by_name("Fear")));
+	if (e->cooldowns().is_hurting()) {
+        // Ogre mages in specific don't slow movement, and neither do fleeing enemies:
+	    if (e->etype().name == "Ogre Mage" || has_fear) {
+        // Hell forged's move faster, dissuading kiting:
+	    } else if (e->etype().name == "Hell Forged") {
+	        e->vx *= 2, e->vy *= 2;
+	        movespeed *= 2;
+	    } else {
+            e->vx /= 2, e->vy /= 2;
+            movespeed /= 2;
+        }
+	}
+
+	// Fear forces enemies to move backwards:
+	if (has_fear) {
+	    e->vx *= -1, e->vy *= -1;
 	}
 
 	CollisionAvoidance& coll_avoid = gs->collision_avoidance();
 	coll_avoid.set_preferred_velocity(e->collision_simulation_id(), e->vx,
 			e->vy);
+	coll_avoid.set_maxspeed(e->collision_simulation_id(), movespeed);
 }
 void MonsterController::update_position(GameState* gs, EnemyInst* e) {
 	CollisionAvoidance& coll_avoid = gs->collision_avoidance();

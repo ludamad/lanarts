@@ -48,7 +48,11 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
             attack.magic_percentage, attack.resist_modifier,
             attack.physical_percentage());
 
-    int dmg = damage_formula(attack, effective_stats());
+    float fdmg = damage_formula(attack, effective_stats());
+    if (fdmg < 1 && gs->rng().randf() < fdmg) {
+        fdmg = 1;
+    }
+    int dmg = fdmg;
 
     if (gs->game_settings().verbose_output) {
         char buff[100];
@@ -59,13 +63,13 @@ bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
 
     }
 
-    event_log(
-            "CombatGameInst::damage id=%d, attack: [dmg %d pow %d mag %d%%] -> Damage: %d",
-            id, attack.damage, attack.power, int(attack.magic_percentage * 100),
-            dmg);
+//    event_log(
+//            "CombatGameInst::damage id=%d, attack: [dmg %d pow %d mag %d%%] -> Damage: %d",
+//            id, attack.damage, attack.power, int(attack.magic_percentage * 100),
+//            dmg);
 
     gs->add_instance(
-            new AnimatedInst(Pos(), -1, 25, PosF(), PosF(), AnimatedInst::DEPTH,
+            new AnimatedInst(ipos(), -1, 25, PosF(-1,-1), PosF(), AnimatedInst::DEPTH,
                     format("%d", dmg), Colour(255, 148, 120)));
 
     return damage(gs, dmg);
@@ -163,6 +167,8 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
             play("sound/slash.ogg");
         }
     }
+
+    // Don't damage players during invincibility:
     if (dynamic_cast<PlayerInst*>(this) || !gs->game_settings().invincible) {
         isdead = inst->damage(gs, damage);
     }
@@ -319,7 +325,7 @@ void CombatGameInst::update_position(float newx, float newy) {
 }
 
 SpellsKnown& CombatGameInst::spells_known() {
-    return stats().spells;
+    return effective_stats().spells;
 }
 static void combine_hash(unsigned int& hash, unsigned int val1, unsigned val2) {
     hash ^= (hash >> 11) * val1;

@@ -1,6 +1,8 @@
 local EventLog = require "ui.EventLog"
 local GameObject = require "core.GameObject"
 local Map = require "core.Map"
+local Bresenham = require "core.Bresenham"
+local SpellObjects = require "objects.SpellObjects"
 
 local M = nilprotect {} -- Submodule
 
@@ -30,20 +32,63 @@ Data.spell_create {
 
 Data.spell_create {
     name = "Mephitize",
-    spr_spell = "spr_effects.cloud",
+    spr_spell = "spr_spells.cloud",
     description = "A noxious debilitating ring of clouds that cause damage as well as reduced defenses and speed over time.",
     projectile = "Mephitize",
-    mp_cost = 20,
+    mp_cost = 30,
+    cooldown = 35
+}
+
+-- FEAR CLOUD
+
+Data.spell_create {
+    name = "Trepidize",
+    spr_spell = "spr_spells.cause_fear",
+    description = "An insidious apparition that instills the fear of death in enemies it hits.",
+    projectile = "Trepidize",
+    mp_cost = 50,
     cooldown = 60
 }
+
+-- REGENERATION
+
+local Regeneration = {
+    name = "Regeneration",
+    spr_spell = "spr_spells.regeneration",
+    description = "Regenerate health 20x for two seconds.",
+    mp_cost = 35,
+    cooldown = 40,
+    can_cast_with_held_key = false,
+    fallback_to_melee = false
+}
+
+function Regeneration.prereq_func(caster)
+    return not caster:has_effect("Regeneration") and not caster:has_effect("Exhausted")
+end
+
+function Regeneration.autotarget_func(caster)
+    return caster.x, caster.y
+end
+
+function Regeneration.action_func(caster, x, y)
+    caster:add_effect("Regeneration", 60 * 2)
+    if caster:is_local_player() then
+        EventLog.add("You start to regenerate quickly!", {200,200,255})
+    else
+        EventLog.add(caster.name .. " starts to regenerate quickly!", {200,200,255})
+    end
+end
+
+Data.spell_create(Regeneration)
+
 
 -- BERSERK
 
 local Berserk = {
     name = "Berserk",
     spr_spell = "berserk",
-    description = "Initiate frenzy, gaining +5 defence & willpower, +Level strength, +60% melee speed, +25% move speed. Lasts longer as you kill enemies. Afterwards, become exhausted with -3 defence & willpower, -25% action speed, -50% move speed",
-    mp_cost = 40,
+    description = "Initiate frenzy, gaining +2 defence, +5 willpower, +{Level} strength, +60% melee speed, +25% move speed. Killing enemies grants you longer frenzy, and heals 20HP per kill. Afterwards, become exhausted with -3 defence, -3 willpower, -25% action speed, -50% move speed.",
+    mp_cost = 50,
     cooldown = 30,
     can_cast_with_held_key = false,
     fallback_to_melee = false
@@ -183,6 +228,60 @@ end
 
 Data.spell_create(PowerStrike)
 
+-- FEAR STRIKE --
+
+local FearStrike = {
+    name = "Fear Strike",
+    description = "Strike an enemy, magically instilling the fear of death within them.",
+    can_cast_with_held_key = true,
+    spr_spell = "spr_spells.fear_strike",
+    can_cast_with_cooldown = false,
+    mp_cost = 25,
+    cooldown = 0, -- Uses cooldown of weapon
+    fallback_to_melee = true,
+}
+
+function FearStrike.action_func(caster, x, y)
+    caster:apply_melee_cooldown()
+    local num = 0
+    local closest_mon, least_dist = nil, math.huge
+    for mon in values(Map.monsters_list() or {}) do
+        local dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
+        if dist < mon.target_radius + caster.target_radius + caster.weapon_range + 8 and least_dist > dist then
+            least_dist = dist
+            closest_mon = mon
+        end
+    end
+    if not closest_mon then
+        return
+    end
+    caster:melee(closest_mon)
+    closest_mon:add_effect("Fear", 100)
+    if caster:is_local_player() then
+        EventLog.add("You strike into the soul of your enemy!", {200,200,255})
+    elseif caster.name == "Your ally" then
+        EventLog.add(caster.name .. " strikes into the soul of their enemy!", {200,200,255})
+    end
+end
+
+function FearStrike.prereq_func(caster)
+    if caster:has_ranged_weapon() then
+        return false
+    end
+    for mon in values(Map.monsters_list() or {}) do
+        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + caster.weapon_range + 8 then
+            return true
+        end
+    end
+    return false
+end
+
+function FearStrike.autotarget_func(caster)
+    return caster.x, caster.y
+end
+
+Data.spell_create(FearStrike)
+
 -- EXPEDITE --
 
 local Expedite = {
@@ -190,7 +289,7 @@ local Expedite = {
     description = "Run 25% faster for a short duration, with 33% faster rate of fire.",
     can_cast_with_held_key = false,
     spr_spell = "expedite",
-    can_cast_with_cooldown = true,
+    can_cast_with_cooldown = false,
     mp_cost = 25,
     cooldown = 30,
     fallback_to_melee = false,
@@ -214,5 +313,54 @@ function Expedite.action_func(caster, x, y)
 end
 
 Data.spell_create(Expedite)
+
+-- Wallanthor --
+
+local Wallanthor = {
+    name = "Wallanthor",
+    description = "Creates a temporary wall of pure energy in a line.",
+    can_cast_with_held_key = false,
+    spr_spell = "spr_spells.spell-wall",
+    can_cast_with_cooldown = false,
+    mp_cost = 10,
+    cooldown = 35,
+    fallback_to_melee = false,
+}
+
+function Wallanthor.prereq_func(caster)
+    return true
+end
+
+function Wallanthor.autotarget_func(caster)
+    local dx, dy = unpack(caster.last_moved_direction)
+    return caster.x + dx * 32, caster.y + dy * 32
+end
+
+function Wallanthor.action_func(caster, x, y)
+    if caster:is_local_player() then
+        EventLog.add("You create a wall of pure energy!", {200,200,255})
+    else 
+        EventLog.add(caster.name .. " creates a wall of pure energy!", {200,200,255})
+    end
+
+    local dx, dy = x - caster.x, y - caster.y
+    local mag = math.sqrt(dx*dx+dy*dy)
+    dx, dy = dx / mag, dy / mag
+    local start = {math.floor(caster.x / 32), math.floor(caster.y / 32)}
+    local finish = {math.floor(caster.x / 32 + dx * 7), math.floor(caster.y / 32 + dy * 7)}
+    local points = Bresenham.line_evaluate(start, finish)
+    for i=1,#points do
+        for j=1,2 do
+            points[i][j] = points[i][j] * 32 + 16
+        end
+    end
+    local tx, ty = math.round((caster.x+dx*24) / 32) * 32 + 16, math.round((caster.y+dy*24) / 32) * 32 + 16
+    for i=2,#points do
+        local obj = SpellObjects.SpellWall.create { points = points, point_index = i }
+        GameObject.add_to_level(obj)
+    end
+end
+
+Data.spell_create(Wallanthor)
 
 return M

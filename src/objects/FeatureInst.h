@@ -36,14 +36,15 @@ public:
 	feature_t feature_type() const {
 		return feature;
 	}
-        bool has_been_seen() const {
-            return (last_seen_spr > -1);
-        }
+    bool has_been_seen() const {
+        return (last_seen_spr > -1);
+    }
 private:
 	feature_t feature;
 	sprite_id last_seen_spr;
 	sprite_id spriteid;
 	int sprite_frame;
+	bool used_yet = false;
 };
 
 static bool feature_exists_near(GameState* gs, const Pos& p);

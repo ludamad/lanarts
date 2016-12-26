@@ -259,12 +259,13 @@ static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
     int nbounces = pentry.number_of_target_bounces;
     float speed = pentry.speed * p->effective_stats().core.spell_velocity_multiplier;
 
-    if (spl_entry.name == "Mephitize") {
+    if (spl_entry.name == "Mephitize" || spl_entry.name == "Trepidize") {
         float vx = 0, vy = 0;
         direction_towards(Pos {p->x, p->y}, target, vx, vy, 10000);
+        int directions = (spl_entry.name == "Trepidize" ? 4 : 16);
 
-        for (int i = 0; i < 16; i++) {
-            float angle = PI / 8 * i;
+        for (int i = 0; i < directions; i++) {
+            float angle = PI / directions * 2 * i;
             Pos new_target {p->x + cos(angle) * vx - sin(angle) * vy, p->y + cos(angle) * vy + sin(angle) * vx};
             GameInst* pinst = new ProjectileInst(projectile,
                     p->effective_atk_stats(mt, projectile_attack), p->id,
@@ -670,7 +671,7 @@ bool PlayerInst::melee_attack(GameState* gs, CombatGameInst* e,
         char buffstr[32];
         double xpworth = ((EnemyInst*)e)->xpworth();
         double n_killed = (pc.n_enemy_killed(((EnemyInst*) e)->enemy_type()) - 1) / pc.all_players().size();
-        xpworth *= pow(0.8, n_killed);
+        xpworth *= pow(0.9, n_killed);
         if (n_killed > 15) {
             xpworth = 0;
         }

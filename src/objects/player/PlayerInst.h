@@ -126,6 +126,9 @@ public:
 
     bool melee_attack(GameState* gs, CombatGameInst* inst,
                     const Item& weapon, bool ignore_cooldowns);
+    PosF& last_moved_direction() {
+        return _last_moved_direction;
+    }
 private:
     ///////////////////////////
     // ** Private methods ** //
@@ -171,6 +174,7 @@ private:
     // NB: local to spell select is assumed to be a POD region by serialize/deserialize
     bool local = false, moving = false;
     int autouse_mana_potion_try_count = 0;
+    PosF _last_moved_direction = {0, -1}; // Never 0,0
     int previous_spellselect = 0, spellselect = 0;
 };
 

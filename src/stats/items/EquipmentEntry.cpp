@@ -61,8 +61,10 @@ static EquipmentEntry::equip_type name2type(const char* name) {
 		return EquipmentEntry::RING;
 	} else if (strcmp(name, "boots") == 0) {
 		return EquipmentEntry::BOOTS;
-	} else if (strcmp(name, "helmet") == 0) {
-		return EquipmentEntry::HEADGEAR;
+    } else if (strcmp(name, "helmet") == 0) {
+        return EquipmentEntry::HEADGEAR;
+    } else if (strcmp(name, "amulet") == 0) {
+        return EquipmentEntry::AMULET;
 	} else if (strcmp(name, "gloves") == 0) {
 		return EquipmentEntry::GLOVES;
 	} else {
@@ -80,4 +82,5 @@ void EquipmentEntry::parse_lua_table(const LuaValue& table) {
 	use_action = LuaAction(LuaValue());
 	stat_modifiers = parse_stat_modifiers(table);
 	cooldown_modifiers = parse_cooldown_modifiers(table);
+	spells_granted = parse_spells_known(table["spells_granted"]);
 }

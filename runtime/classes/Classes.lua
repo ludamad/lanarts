@@ -4,12 +4,14 @@ Data.class_create {
     available_spells = {
       { spell = "Minor Missile",
     	level_needed = 1 },
---      { spell = "Mephitize",
---        level_needed = 1 },
       { spell = "Magic Blast",
-        level_needed = 1 },
+        level_needed = 2 },
       { spell = "Fire Bolt",
-        level_needed = 2 } 
+        level_needed = 1 },
+      { spell = "Mephitize",
+        level_needed = 3 },
+      { spell = "Wallanthor",
+        level_needed = 4 },
     },
     start_stats = {
         movespeed = 4,
@@ -35,7 +37,7 @@ Data.class_create {
         mpregen = 0.65 / 60, -- Per 60 frames
         magic = 1,
         strength = 1,
-        defence = 1,
+  --      defence = 1,
         willpower = 1
     }
 }
@@ -47,23 +49,28 @@ Data.class_create {
       { spell = "Berserk",
         level_needed = 1 },
       { spell = "Power Strike",
-        level_needed = 1 }
+        level_needed = 2 },
     },
     start_stats = {
         movespeed = 4,
         hp = 135,
         mp = 50,
         hpregen = 4 / 60, -- Per 60 frames
-        mpregen = 3 / 60, -- Per 60 frames
+        mpregen = 2 / 60, -- Per 60 frames
         strength = 7,
         defence = 7,
         willpower = 4,
         magic = 4,
         equipment = {
-          weapon = "Short Sword",
+          weapon = "Dagger",
           gold = 0,
           inventory = {
-             {item = "Health Potion", amount = 1} 
+             {item = "Health Potion", amount = 1},
+             -- For testing spell amulets:
+             --{item = "Amulet of the Wall", amount = 1},
+             --{item = "Amulet of Fear", amount = 1}, 
+             --{item = "Amulet of Trepidation", amount = 1},
+             --{item = "Amulet of Regeneration", amount = 1},
           }
         }
     },
@@ -72,7 +79,7 @@ Data.class_create {
         mp = 10,
         hpregen = 0.65 / 60, -- Per 60 frames
         mpregen = 0.5 / 60, -- Per 60 frames
-        magic = 1,
+ --       magic = 1,
         strength = 1,
         defence = 1,
         willpower = 1
@@ -93,7 +100,7 @@ Data.class_create {
         hp = 115,
         mp = 85,
         hpregen = 4 / 60, -- Per 60 frames
-        mpregen = 3 / 60, -- Per 60 frames
+        mpregen = 2 / 60, -- Per 60 frames
         strength = 7,
         defence = 4,
         willpower = 7,
@@ -114,6 +121,6 @@ Data.class_create {
         magic = 1,
         strength = 1,
         defence = 1,
-        willpower = 1
+--        willpower = 1
     }
 }

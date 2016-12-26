@@ -11,5 +11,6 @@ class GameInst;
 bool item_colfilter(GameInst* self, GameInst* other);
 bool enemy_colfilter(GameInst* self, GameInst* other);
 bool player_colfilter(GameInst* self, GameInst* other);
+bool feature_colfilter(GameInst* self, GameInst* other);
 
 #endif /* COLLISION_FILTERS_H_ */

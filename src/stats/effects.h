@@ -8,7 +8,7 @@
 
 #include "AllowedActions.h"
 
-const int EFFECTS_MAX = 40;
+const int EFFECTS_MAX = 8;
 
 struct CombatStats;
 struct EffectiveStats;

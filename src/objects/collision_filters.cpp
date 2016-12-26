@@ -4,6 +4,7 @@
  */
 
 #include "enemy/EnemyInst.h"
+#include "FeatureInst.h"
 #include "player/PlayerInst.h"
 #include "GameInst.h"
 #include "ItemInst.h"
@@ -19,4 +20,8 @@ bool enemy_colfilter(GameInst* self, GameInst* other) {
 
 bool player_colfilter(GameInst* self, GameInst* other) {
 	return dynamic_cast<PlayerInst*>(other) != NULL;
+}
+
+bool feature_colfilter(GameInst* self, GameInst* other) {
+    return dynamic_cast<FeatureInst*>(other) != NULL;
 }

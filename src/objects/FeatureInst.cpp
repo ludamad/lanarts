@@ -13,11 +13,13 @@
 #include "draw/SpriteEntry.h"
 
 #include "gamestate/GameState.h"
+#include "gamestate/GameMapState.h"
 #include "gamestate/GameTiles.h"
 
 #include "stats/items/ItemEntry.h"
 
 #include <lcommon/math_util.h>
+#include "player/PlayerInst.h"
 #include "FeatureInst.h"
 
 #include "collision_filters.h"
@@ -34,10 +36,14 @@ FeatureInst::~FeatureInst() {
 void FeatureInst::draw(GameState* gs) {
 	Colour drawcolour = COL_WHITE;
 	if (last_seen_spr > -1) {
-		res::sprite(last_seen_spr).draw(
-				ldraw::DrawOptions().origin(ldraw::CENTER).frame(sprite_frame).colour(
-						drawcolour), on_screen(gs, ipos()));
-        }
+	    res::sprite(last_seen_spr).draw(
+            ldraw::DrawOptions().origin(ldraw::CENTER).frame(sprite_frame).colour(
+                    drawcolour), on_screen(gs, ipos()));
+	    if (!used_yet) {
+	        res::sprite("spr_effects.new_stair").draw(
+	            ldraw::DrawOptions().origin(ldraw::CENTER), on_screen(gs, ipos()));
+	    }
+    }
 }
 
 void FeatureInst::step(GameState* gs) {
@@ -91,6 +97,7 @@ void FeatureInst::deinit(GameState *gs) {
 void FeatureInst::player_interact(GameState* gs, GameInst* inst) {
 	lua_State* L = gs->luastate();
 	lua_lookup(L, "on_player_interact");
+	used_yet = true;
 	if (lua_isnil(L, -1)) {
 		lua_pop(L, 1);
 		return;
@@ -98,6 +105,12 @@ void FeatureInst::player_interact(GameState* gs, GameInst* inst) {
 	luawrap::push(L, (GameInst*)this);
 	luawrap::push(L, inst);
 	lua_call(L, 2, 0);
+	GameInst* post_inst = NULL;
+	PlayerInst* p = gs->local_player();
+	inst->get_map(gs)->object_radius_test(p, &post_inst, 1, feature_colfilter, p->x, p->y, p->radius);
+	if (post_inst) {
+	    dynamic_cast<FeatureInst*>(post_inst)->used_yet = true;
+	}
 }
 
 void FeatureInst::copy_to(GameInst* inst) const {
@@ -119,7 +132,8 @@ void FeatureInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write_int(feature);
 	serializer.write_int(last_seen_spr);
 	serializer.write_int(spriteid);
-	serializer.write_int(sprite_frame);
+    serializer.write_int(sprite_frame);
+    serializer.write_int(used_yet);
 }
 
 void FeatureInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
@@ -127,5 +141,6 @@ void FeatureInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read_int(feature);
 	serializer.read_int(last_seen_spr);
 	serializer.read_int(spriteid);
-	serializer.read_int(sprite_frame);
+    serializer.read_int(sprite_frame);
+    serializer.read_int(used_yet);
 }

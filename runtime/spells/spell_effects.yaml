@@ -4,12 +4,13 @@
     
 effects:
   - name: Poison
-    poison_rate: 10
+    poison_rate: 35
     effected_colour: [100, 255, 100]
     can_use_rest: no
     stat_func: poison_statmod
     init_func: poison_map_init
     step_func: poison_step
+    effected_sprite: spr_effects.poison
 
   - name: Berserk
     exhausted_duration: 275
@@ -71,6 +72,47 @@ effects:
     init_func: thrown_effect.init
     step_func: thrown_effect.step
     stat_func: thrown_effect.stat
-    effected_sprite: thrown_effected
+    effected_sprite: spr_effects.pain_mirror
     effected_colour: [200,200,200] #RGB
     fade_out: 5
+
+# TODO: Asleep enemies dont attack or move until woke
+#  - name: Asleep
+#    effected_sprite: spr_effects.sleeping
+#    fade_out: 5
+
+  - name: Dazed
+    effected_sprite: spr_effects.may_stab_brand
+    fade_out: 5
+    # Effect in CPP
+
+  - name: Slowed
+    effected_sprite: spr_effects.slowed
+    fade_out: 5
+    stat_func: 
+      function(effect, obj, old, new)    
+        new.melee_cooldown_multiplier = new.melee_cooldown_multiplier * 2
+        new.ranged_cooldown_multiplier = new.ranged_cooldown_multiplier * 2
+        new.spell_cooldown_multiplier = new.spell_cooldown_multiplier * 2
+        new.speed = new.speed / 2
+      end
+
+  - name: Regeneration
+    effected_sprite: spr_effects.new_stair
+    effected_colour: [200,255,200] #RGB
+    # Rest of effect in CPP code
+    stat_func: 
+      function(effect, obj, old, new)    
+        new.hpregen = new.hpregen * 20
+      end
+    fade_out: 55
+
+  - name: Fear
+    effected_sprite: spr_effects.fleeing
+    effected_colour: [200,255,200] #RGB
+    # Rest of effect in CPP code
+    stat_func: 
+      function(effect, obj, old, new)    
+        new.speed = new.speed * 1.25
+      end
+    fade_out: 55

@@ -145,7 +145,9 @@ end
 function M.generate_store(map, xy)
     local items = {}
     for i=1,random(5,10) do
-        table.insert(items, ItemUtils.item_generate(ItemGroups.store_items, true))
+        local power_level = 1 + random(0, 2)
+        local randart_chance = 5 -- Of 100
+        table.insert(items, ItemUtils.item_generate(ItemGroups.store_items, true, power_level, randart_chance))
     end
     MapUtils.spawn_store(map, items, xy)
 end

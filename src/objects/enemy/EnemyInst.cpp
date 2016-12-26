@@ -173,8 +173,12 @@ void EnemyInst::step(GameState* gs) {
 
 	CombatGameInst::step(gs);
 
-	// Absorb health regen if recently damaged
-	int hp_gain = stats().core.hp - hp_before;
+    // Regenerate much quicker if the player left the level:
+	if (!gs->player_data().level_has_player(gs->get_level_id())) {
+	    core_stats().heal_hp(effective_stats().core.hpregen * 7, effective_stats().core.max_hp);
+	}
+    // Absorb health regen if recently damaged
+	int hp_gain = std::max(0, stats().core.hp - hp_before);
 	int hp_cooloff = std::min(enemy_regen_cooloff, hp_gain);
 	enemy_regen_cooloff -= hp_cooloff;
 	stats().core.hp -= hp_cooloff;

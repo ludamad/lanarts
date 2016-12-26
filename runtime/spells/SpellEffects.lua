@@ -23,17 +23,19 @@ function poison_step(effect, obj)
 		effect.steps = 0
                 -- Offset the stat mod above:
                 local mod = poison_attack_modifier(effect, 1.0)
-		obj:damage(effect.damage, effect.power, effect.magic_percentage, 5.0)
+		obj:damage(effect.damage * mod, effect.power, effect.magic_percentage, mod)
 	end
 end
 
 local function berserk_extension(effect) 
-	if effect.extensions < 1 then
-		return 30
-	elseif effect.extensions < 5 then
-		return 20
-	end
-	return 5
+    return 60 -- Roughly 1 second per kill
+        --do return 50 end -- TODO evaluate
+	--if effect.extensions < 1 then
+	--	return 30
+	--elseif effect.extensions < 5 then
+	--	return 20
+	--end
+	--return 5
 end
 
 
@@ -53,6 +55,7 @@ function berserk_effect.step(effect, obj)
 			EventLog.add("Killed Enemy, berserk time_left = " .. effect.time_left)
 		end
 		killdiff = killdiff -1
+                obj:heal_hp(20)
 		effect.extensions = effect.extensions + 1
 	end
 
@@ -66,7 +69,7 @@ end
 
 function berserk_effect.stat(effect, obj, old, new)	
 	new.strength = new.strength + obj.stats.level
-	new.defence = math.max(0, new.defence + 5)
+	new.defence = math.max(0, new.defence + 2)
 	new.willpower = math.max(0, new.willpower + 5)
 	new.melee_cooldown_multiplier = new.melee_cooldown_multiplier / 1.6
         if new.speed < 6 then

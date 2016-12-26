@@ -15,6 +15,7 @@
 #include "lanarts_defines.h"
 
 #include "AllowedActions.h"
+#include "stats/SpellsKnown.h"
 
 struct AttackStats;
 struct ClassEntry;
@@ -126,12 +127,14 @@ struct CooldownModifiers {
 };
 
 CooldownModifiers parse_cooldown_modifiers(const LuaField& value);
+SpellsKnown parse_spells_known(const LuaField& value);
 
 /* Core & derived stats after stat & item properties */
 struct EffectiveStats {
 	CoreStats core;
 	CooldownModifiers cooldown_modifiers;
 	DerivedStats physical, magic;
+	SpellsKnown spells;
 	float cooldown_mult, movespeed;
 	AllowedActions allowed_actions;
 	EffectiveStats() :

@@ -2,19 +2,25 @@
 local M = {} -- Submodule
 
 M.store_items = {
-    { item = "Arrow",              chance = 15,  amount = {5,20}  }
-    , { item = "Silver Arrow",       chance = 10,  amount = {2,6}   }
+    { item = "Arrow",              chance = 8,  amount = {5,20}  }
+    , { item = "Silver Arrow",       chance = 8,  amount = {2,6}   }
 --  Ludamad: Remove stones for now. Part of: Try to reduce the projectile actions for non-archer a lot.
 --    , { item = "Stone",              chance = 15,  amount = {3,15}  }
     -- Scrolls
-    , { item = "Haste Scroll",       chance = 7                      }
+    , { item = "Haste Scroll",       chance = 2                      }
     -- Potions
-    , { item = "Health Potion",      chance = 10                     }
-    , { item = "Mana Potion",        chance = 10                     }
+    , { item = "Health Potion",      chance = 4                     }
+    , { item = "Mana Potion",        chance = 4                     }
+    -- Amulets
+    , { item = "Amulet of the Wall", chance = 1 }
+    , { item = "Amulet of Fear", chance = 1 }
+    , { item = "Amulet of Trepidation", chance = 1 }
+    , { item = "Amulet of Mephitization", chance = 1 }
+    , { item = "Amulet of Regeneration", chance = 1 }
     -- Rings
-    , { item = "Ring of Spells",     chance = 3                      }
-    , { item = "Ring of Vitality",   chance = 3                      }
-    , { item = "Ring of Stone",      chance = 3                      }
+    , { item = "Ring of Spells",     chance = 1                      }
+    , { item = "Ring of Vitality",   chance = 1                      }
+    , { item = "Ring of Stone",      chance = 1                      }
     -- Helmets
     , { item = "Runed Helmet",       chance = 1                      }
     , { item = "Crown of Mars",      chance = 1                      }
@@ -45,24 +51,23 @@ M.store_items = {
 }
 
 M.basic_items = {
-    { item = "Gold",                 chance = 125, amount = {5,15}  }
+    { item = "Gold",                 chance = 100, amount = {5,15}  }
     -- Projectiles
     , { item = "Arrow",              chance = 15,  amount = {5,20}  }
     , { item = "Silver Arrow",       chance = 10,  amount = {2,6}   }
 --  Ludamad: Remove stones for now. Part of: Try to reduce the projectile actions for non-archer a lot.
 --    , { item = "Stone",              chance = 15,  amount = {3,15}  }
     -- Ranged Weapons
---  Ludamad: Remove non-artifact bows as attainable items for now. Part of: Try to reduce the projectile actions for non-archer a lot.
-    , { item = "Short Bow",          chance = 10                     }
+    , { item = "Short Bow",          chance = 4                     }
     -- Melee Weapons
-    , { item = "Dagger",             chance = 10                     }
-    , { item = "Short Sword",        chance = 10                     }
-    , { item = "Mace",               chance = 5                      }
+    , { item = "Dagger",             chance = 4                     }
+    , { item = "Short Sword",        chance = 4                     }
+    , { item = "Mace",               chance = 4                      }
     -- Scrolls
-    , { item = "Haste Scroll",       chance = 7                      }
+    , { item = "Haste Scroll",       chance = 2                      }
     -- Potions
-    , { item = "Health Potion",      chance = 10                     }
-    , { item = "Mana Potion",        chance = 10                     }
+    , { item = "Health Potion",      chance = 8                     }
+    , { item = "Mana Potion",        chance = 8                     }
     -- Body Armour
     , { item = "Leather Armour",     chance = 4                      }
     , { item = "Robe",               chance = 4                      }
@@ -70,20 +75,27 @@ M.basic_items = {
     , { item = "Iron Helmet",        chance = 4                      }
     , { item = "Wizard's Hat",       chance = 4                      }
     -- Rings
-    , { item = "Ring of Spells",     chance = 3                      }
-    , { item = "Ring of Vitality",   chance = 3                      }
-    , { item = "Ring of Stone",      chance = 3                      }
+    , { item = "Ring of Spells",     chance = 1                      }
+    , { item = "Ring of Vitality",   chance = 1                      }
+    , { item = "Ring of Stone",      chance = 1                      }
     -- Boots
-    , { item = "Leather Boots",      chance = 5                      }
+    , { item = "Leather Boots",      chance = 4                      }
     -- Gloves
-    , { item = "Leather Gloves",     chance = 5                      }
+    , { item = "Leather Gloves",     chance = 4                      }
+    -- Amulets
+    , { item = "Amulet of the Wall", chance = 1 }
+    , { item = "Amulet of Fear", chance = 1 }
+    , { item = "Amulet of Trepidation", chance = 1 }
+    , { item = "Amulet of Mephitization", chance = 1 }
+    , { item = "Amulet of Regeneration", chance = 1 }
 }
 
 M.enchanted_items = {
+    { item = "Gold",                 chance = 85, amount = {15,45}  }
 --  Ludamad: Remove stones for now. Part of: Try to reduce the projectile actions for non-archer a lot.
 --    { item = "Stone",              chance = 5,  amount = {3,15}  }
     -- Melee Weapons
-    { item = "Mace",               chance = 3                      }
+    , { item = "Mace",               chance = 3                      }
     -- Body Armour
     , { item = "Leather Armour",     chance = 3                      }
     , { item = "Robe",               chance = 3                      }
@@ -91,10 +103,11 @@ M.enchanted_items = {
     , { item = "Iron Helmet",        chance = 3                      }
     , { item = "Wizard's Hat",       chance = 3                      }
     -- Boot
-    , { item = "Leather Boots",      chance = 3                      }
+    , { item = "Leather Boots",      chance = 1                      }
     -- Gloves
-    , { item = "Leather Gloves",     chance = 3                      }
-    , { item = "Silver Arrow",       chance = 3,  amount = {2,8}   }
+    , { item = "Leather Gloves",     chance = 1                      }
+    , { item = "Arrow",              chance = 4,  amount = {5,20}  }
+    , { item = "Silver Arrow",       chance = 4,  amount = {2,8}   }
     -- TODO REMOVE ABOVE REDUNDANCIES^
     -- Ranged Weapons
     -- Ludamad: Remove non-artifact bows as attainable items for now. Part of: Try to reduce the projectile actions for non-archer a lot.
@@ -102,13 +115,13 @@ M.enchanted_items = {
     , { item = "Mars Bow",           chance = 1                      }
     -- Melee Weapons
     , { item = "Samurai Sabre",      chance = 1                      }
-    , { item = "Magic Sword",        chance = 2                      }
+    , { item = "Magic Sword",        chance = 1                      }
     , { item = "Triple Sword",        chance = 1                      }
     , { item = "Battle Axe",        chance = 1                      }
     , { item = "Iron Scimitar",        chance = 1                      }
     -- Potions
-    , { item = "Health Potion",      chance = 10                     }
-    , { item = "Mana Potion",        chance = 10                     }
+    , { item = "Health Potion",      chance = 4                     }
+    , { item = "Mana Potion",        chance = 4                     }
     -- Body Armour
     , { item = "Chainmail",          chance = 2                      }
     , { item = "Platemail",          chance = 1                      }
@@ -140,6 +153,12 @@ M.enchanted_items = {
     , { item = "Defence Scroll",     chance = 1                      }
     , { item = "Will Scroll",        chance = 1                      }
     , { item = "Scroll of Experience",        chance = 1             }
+    -- Amulets
+    , { item = "Amulet of the Wall", chance = 1 }
+    , { item = "Amulet of Fear", chance = 1 }
+    , { item = "Amulet of Trepidation", chance = 1 }
+    , { item = "Amulet of Mephitization", chance = 1 }
+    , { item = "Amulet of Regeneration", chance = 1 }
 }
 
 return M

@@ -58,9 +58,9 @@ enemies:
     stats:
         attacks: [ {projectile: Slow Fire Bolt} ]
         movespeed: 3
-        hp: 150
+        hp: 75
         hpregen: 0.01
         strength: 35
         magic: 35
-        defence: 15
-        willpower: 12
+        defence: 8
+        willpower: 10

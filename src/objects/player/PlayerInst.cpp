@@ -239,7 +239,8 @@ void PlayerInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 	CombatGameInst::serialize(gs, serializer);
 	serializer.write(_score_stats);
 	serializer.write(actions_set_for_turn);
-	serializer.write(last_chosen_weaponclass);
+    serializer.write(last_chosen_weaponclass);
+    serializer.write(_last_moved_direction);
 //	serializer.write_container(queued_actions);
 
 	SERIALIZE_POD_REGION(serializer, this, local, spellselect);
@@ -250,6 +251,7 @@ void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read(_score_stats);
 	serializer.read(actions_set_for_turn);
 	serializer.read(last_chosen_weaponclass);
+    serializer.read(_last_moved_direction);
 //	serializer.read_container(queued_actions);
 	queued_actions.clear();
 	_path_to_player.initialize(gs->tiles().solidity_map());

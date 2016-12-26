@@ -54,7 +54,7 @@ static int magic_damage_formula(const EffectiveAttackStats& attacker,
 	return basic_damage_formula(attacker, defender.magic);
 }
 
-int damage_formula(const EffectiveAttackStats& attacker,
+float damage_formula(const EffectiveAttackStats& attacker,
 		const EffectiveStats& defender) {
 	float mdmg = magic_damage_formula(attacker, defender);
 	float pdmg = physical_damage_formula(attacker, defender);
@@ -91,6 +91,10 @@ static void factor_in_equipment_derived_stats(MTwist& mt,
 	effective.physical.reduction += entry.damage_reduction().calculate(mt,
 			core);
 	effective.magic.reduction += entry.magic_reduction().calculate(mt, core);
+
+	for (int i = 0; i < entry.spells_granted.amount(); i++) {
+	    effective.spells.add_spell(entry.spells_granted.get(i));
+	}
 }
 
 static void factor_in_equipment_stats(MTwist& mt, EffectiveStats& effective,
@@ -123,6 +127,7 @@ EffectiveStats effective_stats(GameState* gs, CombatGameInst* inst,
 	ret.core = stats.core;
 	ret.movespeed = stats.movespeed;
 	ret.allowed_actions = stats.effects.allowed_actions(gs);
+	ret.spells = stats.spells;
 	stats.effects.process(gs, inst, ret);
 	factor_in_equipment_stats(gs->rng(), ret, stats.equipment);
 	derive_secondary_stats(gs->rng(), ret);

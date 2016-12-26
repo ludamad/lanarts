@@ -153,7 +153,8 @@ namespace lua_api {
 	void register_lua_core_GameMap(lua_State* L);
 	void register_lua_core_GameState(lua_State* L);
 	void register_lua_core_GameWorld(lua_State* L);
-	void register_lua_core_CollisionAvoidance(lua_State* L);
+	void register_lua_core_RVOWorld(lua_State* L);
+	void register_lua_core_Bresenham(lua_State* L);
 	void register_lua_core_PathFinding(lua_State* L);
 	void register_lua_core_Keyboard(lua_State* L);
 	void register_lua_core_Mouse(lua_State* L);
@@ -199,7 +200,8 @@ namespace lua_api {
 		register_lua_core_GameMap(L);
 		register_lua_core_GameState(L);
 		register_lua_core_GameWorld(L);
-		register_lua_core_CollisionAvoidance(L);
+		register_lua_core_RVOWorld(L);
+		register_lua_core_Bresenham(L);
 		register_lua_core_PathFinding(L);
 		register_lua_core_Keyboard(L);
 		register_lua_core_Mouse(L);

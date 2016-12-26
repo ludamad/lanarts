@@ -19,10 +19,11 @@ local function shop_cost(entry)
 end
 
 local RANDART_CHANCE = 1
-function M.item_generate(group, only_with_shop_cost, --[[Optional]] randart_power_level)
+function M.item_generate(group, only_with_shop_cost, --[[Optional]] randart_power_level, --[[Optional]] randart_chance)
+    randart_chance = randart_chance or RANDART_CHANCE
     -- For now, a fixed 1 in 100 chance of being a randart
     if true then -- randart_power_level ~= nil then
-        if randomf() <= RANDART_CHANCE / 100 then
+        if randomf() <= randart_chance / 100 then
             randart_power_level = 1
             while randomf() < 0.05 and randart_power_level < 3 do
                 randart_power_level = randart_power_level + 1
