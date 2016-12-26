@@ -559,7 +559,7 @@ void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
     ItemEntry& type = itemslot.item_entry();
 
     if (item.amount > 0 && !itemslot.is_equipped()) {
-        int sell_amount = std::min(item.amount, 5);
+        int sell_amount = std::min(item.amount, 1); // TODO consider higher than 1 sell amounts
         int gold_gained = type.sell_cost() * sell_amount;
         auto message = format("Transaction: %s x %d for %d GP.", type.name.c_str(), sell_amount, gold_gained);
         item.remove_copies(sell_amount);
