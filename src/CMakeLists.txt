@@ -103,6 +103,7 @@ else()
 endif()
 
 set (libraries 
+#        mingw32
 	ldraw
 	lcommon
         lua_box2d
@@ -110,21 +111,27 @@ set (libraries
 	lsound
 	${lua_libraries}
 	luasocket
+	yaml-cpp
         luayaml
 	luawrap
 	lanarts_net
         lpeg
-	yaml-cpp
+        enet
+#        ws2_32
+#        mingw32
+#        winmm
 	RVO
         #physfs-static
         libxmi
 	${OPENGL_gl_LIBRARY}
-        enet
 	${FREETYPE_LIBRARIES}
         UnitTest++
         SDL2-image
         SDL2-mixer
         SDL2-static
+#        /usr/i686-w64-mingw32/sys-root/mingw/lib/libSDL2_mixer.dll.a
+#        /usr/i686-w64-mingw32/sys-root/mingw/lib/libSDL2_image.dll.a
+#        /usr/i686-w64-mingw32/sys-root/mingw/lib/libSDL2.dll.a
         backward_object
         ${BACKTRADE_DEP}
 )

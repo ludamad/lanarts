@@ -188,17 +188,10 @@ M.Dungeon1 = {
       enemies = {
         wandering = false,
         amount = 7,
-
-        generated = {
-          {enemy = "Giant Rat",         chance = 100  },
-          {enemy = "Giant Bat",         chance = 100 },
-          {enemy = "Hound",         chance = 100 },
-          {enemy = "Cloud Elemental",   guaranteed_spawns = 2 },
-        }
+        generated = M.medium_enemies 
       }
     }
   },
-
   -- Level 2
   { layout = {small_layout1},
     content = {
@@ -218,9 +211,26 @@ M.Dungeon1 = {
 }
 
 M.Dungeon2 = {
+  -- Level 1
   { layout = tiny_layouts,
     content = {
-      items = { amount = 3,  group = tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
+      items = { amount = 3,  group = ItemGroups.basic_items   },
+      enemies = {
+        wandering = false,
+        amount = 7,
+
+        generated = {
+          {enemy = "Giant Rat",         chance = 100  },
+          {enemy = "Giant Bat",         chance = 100 },
+          {enemy = "Hound",         chance = 100 },
+          {enemy = "Cloud Elemental",   guaranteed_spawns = 2 },
+        }
+      }
+    }
+  },
+  { layout = tiny_layouts,
+    content = {
+      items = { amount = 3,  group = ItemGroups.basic_items },
       enemies = {
         wandering = false,
         amount = 7,
@@ -245,7 +255,7 @@ M.Dungeon2 = {
 
   { layout = {small_layout1},
     content = {
-      items = { amount = 6,  group = tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
+      items = { amount = 6,  group = ItemGroups.basic_items },
       enemies = {
         wandering = true,
         amount = 10,
@@ -258,7 +268,7 @@ M.Dungeon2 = {
 M.Dungeon3 = {
   { layout = small_layouts,
     content = {
-      items = { amount = 5,  group = tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
+      items = { amount = 5,  group = ItemGroups.basic_items   },
       enemies = {
         amount = {10,14},
         generated = M.medium_animals 
@@ -350,7 +360,8 @@ local function generate_items(map, items)
 end
 
 local function size_multiplier() 
-    return 1 + random(3, 10) * 0.03 * (World.player_amount - 1)
+    return 1 -- For now, don't make bigger levels. Pixel lock is no longer a thing.
+--    return 1 + random(3, 10) * 0.03 * (World.player_amount - 1)
 end
 
 function M.enemy_generate(chances)

@@ -85,9 +85,11 @@ M.basic_items = {
     , { item = "Iron Helmet",        chance = 4                      }
     , { item = "Wizard's Hat",       chance = 4                      }
     -- Rings
-    , { item = "Ring of Spells",     chance = 1                      }
-    , { item = "Ring of Vitality",   chance = 1                      }
-    , { item = "Ring of Stone",      chance = 1                      }
+    , { chance = 2 
+        , { item = "Ring of Spells",     chance = 1                      }
+        , { item = "Ring of Vitality",   chance = 1                      }
+        , { item = "Ring of Stone",      chance = 1                      }
+    }
     -- Boots
     , { item = "Leather Boots",      chance = 4                      }
     , { item = "Iron Boots",        chance = 1                      }
@@ -100,14 +102,16 @@ M.basic_items = {
     -- Gloves
     , { item = "Leather Gloves",     chance = 4                      }
     -- Amulets
-    , { item = "Amulet of the Wall", chance = 1 }
-    , { item = "Amulet of Fear", chance = 1 }
-    , { item = "Amulet of Trepidation", chance = 1 }
-    , { item = "Amulet of Mephitization", chance = 1 }
-    , { item = "Amulet of Regeneration", chance = 1 }
-    , { item = "Amulet of Fire", chance = 1 }
-    , { item = "Amulet of Greater Fire", chance = 1 }
-    , { item = "Amulet of Protection", chance = 1 }
+    , { chance = 2 
+        , { item = "Amulet of the Wall", chance = 1 }
+        , { item = "Amulet of Fear", chance = 1 }
+        , { item = "Amulet of Trepidation", chance = 1 }
+        , { item = "Amulet of Mephitization", chance = 1 }
+        , { item = "Amulet of Regeneration", chance = 1 }
+        , { item = "Amulet of Fire", chance = 1 }
+        , { item = "Amulet of Greater Fire", chance = 1 }
+        , { item = "Amulet of Protection", chance = 1 }
+    }
 }
 
 M.enchanted_items = {
