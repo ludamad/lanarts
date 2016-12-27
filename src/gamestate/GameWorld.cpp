@@ -94,7 +94,7 @@ GameMapState* GameWorld::map_create(const Size& size, bool wandering_enabled) {
 	int levelid = level_states.size();
 	GameMapState* map = new GameMapState(levelid, Size(size.w * TILE_SIZE, size.h * TILE_SIZE), wandering_enabled);
 	level_states.push_back(map);
-        _should_sync_states = true;
+        // _should_sync_states = true;
 	return map;
 }
 
@@ -271,7 +271,7 @@ void GameWorld::reset(int keep) {
 	for (int i = 0; i < delete_list.size(); i++) {
 		delete delete_list[i];
 	}
-        _should_sync_states = true;
+        // _should_sync_states = true;
 }
 
 void GameWorld::connect_entrance_to_exit(int roomid1, int roomid2) {

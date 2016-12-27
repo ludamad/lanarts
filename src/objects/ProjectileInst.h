@@ -38,14 +38,13 @@ private:
 	static bool bullet_target_hit2(GameInst* self, GameInst* other);
 
 	float rx, ry, vx, vy, speed;
+	/* Stats at time of projectile creation */
+	EffectiveAttackStats atkstats;
 	/* Origin object, and optional exclusive target*/
 	obj_id origin_id, sole_target;
 
 	/* Projectile used */
 	Item projectile;
-
-	/* Stats at time of projectile creation */
-	EffectiveAttackStats atkstats;
 
 	/* Range left before projectile is destroyed */
 	int range_left;
@@ -56,6 +55,8 @@ private:
 	int hits;
 	float damage_mult;
 	bool pass_through;
+
+
 };
 
 #endif /* PROJECTILEINST_H_ */

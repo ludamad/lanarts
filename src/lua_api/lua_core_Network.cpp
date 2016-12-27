@@ -23,8 +23,8 @@ static int net_sync_message_consume(lua_State* L) {
 
 static int should_send_sync_message(lua_State* L) {
 	GameState* gs = lua_api::gamestate(L);
-        // lua_pushboolean(L, gs->game_world().should_sync_states() && gs->player_data().get_local_player_idx() == 1);
-        lua_pushboolean(L, false);
+        lua_pushboolean(L, gs->game_world().should_sync_states() && gs->player_data().get_local_player_idx() == 1);
+        // lua_pushboolean(L, false);
         gs->game_world().should_sync_states() = false;
 	return 1;
 }

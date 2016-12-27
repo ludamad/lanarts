@@ -55,7 +55,8 @@ float monster_difficulty_multiplier(GameState* gs, EnemyEntry& etype) {
 	if (etype.unique) {
 		return 1 + mult / 2; // Can reasonably expect all players to be part of a boss fight
 	}
-	return 1 + mult / 3;
+        // For now try with static enemies:
+	return 1  // + mult / 3;
 }
 
 EnemyInst::EnemyInst(int enemytype, int x, int y) :
