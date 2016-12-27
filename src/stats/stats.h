@@ -14,6 +14,7 @@
 
 #include "lanarts_defines.h"
 
+#include <lcommon/SerializeBuffer.h>
 #include "AllowedActions.h"
 #include "stats/SpellsKnown.h"
 
@@ -134,15 +135,23 @@ struct EffectiveStats {
 	CoreStats core;
 	CooldownModifiers cooldown_modifiers;
 	DerivedStats physical, magic;
-	SpellsKnown spells;
 	float cooldown_mult, movespeed;
 	AllowedActions allowed_actions;
+    SpellsKnown spells;
 	EffectiveStats() :
 			cooldown_mult(1.0f), movespeed(0.0f) {
 	}
 
 	EffectiveAttackStats with_attack(MTwist& mt,
 			const AttackStats& attack) const;
+    void deserialize(SerializeBuffer& serializer) {
+        DESERIALIZE_POD_REGION(serializer, this, core, allowed_actions);
+        spells.serialize(serializer);
+    }
+	void serialize(SerializeBuffer& serializer) {
+        SERIALIZE_POD_REGION(serializer, this, core, allowed_actions);
+        spells.deserialize(serializer);
+	}
 };
 
 /* Cooldown, eg count before a certain action can be done again*/

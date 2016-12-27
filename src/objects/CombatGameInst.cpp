@@ -368,14 +368,14 @@ void CombatGameInst::serialize(GameState* gs, SerializeBuffer& serializer) {
     GameInst::serialize(gs, serializer);
     SERIALIZE_POD_REGION(serializer, this, vx, current_target);
     base_stats.serialize(gs, serializer);
-    serializer.write(estats);
+    estats.serialize(serializer);
 }
 
 void CombatGameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
     GameInst::deserialize(gs, serializer);
     DESERIALIZE_POD_REGION(serializer, this, vx, current_target);
     base_stats.deserialize(gs, serializer);
-    serializer.read(estats);
+    estats.deserialize(serializer);
 }
 
 ClassStats& CombatGameInst::class_stats() {
