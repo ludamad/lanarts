@@ -38,6 +38,9 @@ public:
 	bool autopickup_held() {
 		return pickup_by_dropper;
 	}
+	void set_as_seen() {
+	    was_seen = true;
+	}
 
 	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
 	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);

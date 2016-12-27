@@ -440,8 +440,8 @@ overworld_features = (map) ->
                         wandering: true
                         amount: 0
                         generated: {
-                          {enemy: "Ogre Mage",         guaranteed_spawns: 5}
-                          {enemy: "Orc Warrior",       guaranteed_spawns: 5}
+                          {enemy: "Ogre Mage",         guaranteed_spawns: 3}
+                          {enemy: "Orc Warrior",       guaranteed_spawns: 3}
                           {enemy: "Adder",             guaranteed_spawns: 5}
                         }
                     }

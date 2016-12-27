@@ -12,10 +12,11 @@
 #include "GameState.h"
 #include "GameLogger.h"
 
-GameMapState::GameMapState(int levelid, const Size& size,
+GameMapState::GameMapState(int levelid, ldungeon_gen::MapPtr source_map, const Size& size,
 		bool wandering_flag, bool is_simulation) :
 		_levelid(levelid),
 		_steps_left(0),
+		_source_map(source_map),
 		_size(size),
 		_tiles(Size(size.w / TILE_SIZE, size.h / TILE_SIZE)),
 		_inst_set(size.w, size.h),
@@ -39,7 +40,7 @@ void GameMapState::copy_to(GameMapState & room) const {
 }
 
 GameMapState* GameMapState::clone() const {
-	GameMapState* state = new GameMapState(_levelid, _size, _is_simulation);
+	GameMapState* state = new GameMapState(_levelid, ldungeon_gen::MapPtr(),_size, _is_simulation);
 	copy_to(*state);
 	return state;
 }
@@ -56,6 +57,7 @@ static void update_player_fields_of_view(GameState* gs) {
 void GameMapState::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write_container(exits);
 	serializer.write_container(entrances);
+    _source_map->serialize(serializer);
 	serializer.write(_label);
 	serializer.write(_levelid);
 	serializer.write(_steps_left);
@@ -70,6 +72,8 @@ void GameMapState::serialize(GameState* gs, SerializeBuffer& serializer) {
 void GameMapState::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read_container(exits);
 	serializer.read_container(entrances);
+	_source_map = ldungeon_gen::MapPtr(new ldungeon_gen::Map());
+	_source_map->deserialize(serializer);
 	serializer.read(_label);
 	serializer.read(_levelid);
 	serializer.read(_steps_left);

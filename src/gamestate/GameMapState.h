@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <lcommon/geometry.h>
+#include <ldungeon_gen/Map.h>
 
 #include "collision_avoidance/CollisionAvoidance.h"
 #include "objects/enemy/MonsterController.h"
@@ -35,7 +36,7 @@ struct GameRoomPortal {
 
 class GameMapState {
 public:
-	GameMapState(level_id levelid, const Size& size,
+	GameMapState(level_id levelid, ldungeon_gen::MapPtr source_map, const Size& size,
 			bool wandering_flag = true, bool is_simulation = false);
 	~GameMapState();
 
@@ -114,6 +115,9 @@ public:
 		return tile_radius_test(lx, ly, radius == -1 ? obj->radius : radius)
 				|| object_radius_test(obj, objs, obj_cap, f, x, y, radius);
 	}
+	ldungeon_gen::MapPtr source_map() {
+	    return _source_map;
+	}
 
         int& vision_radius() {
             return _vision_radius;
@@ -127,6 +131,7 @@ private:
 	Size _size;
 	GameTiles _tiles;
 	GameInstSet _inst_set;
+	ldungeon_gen::MapPtr _source_map;
 	MonsterController _monster_controller;
 	CollisionAvoidance _collision_avoidance;
 	/* Used to store dynamic drawable information */

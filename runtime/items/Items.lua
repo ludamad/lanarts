@@ -1,4 +1,5 @@
 local GlobalData = require "core.GlobalData"
+local MiscSpellAndItemEffects = require "core.MiscSpellAndItemEffects"
 
 assert(GlobalData.keys_picked_up)
 
@@ -170,6 +171,21 @@ Data.item_create {
 
     action_func = function(self, user)
         user.stats.magic = user.stats.magic + 1
+    end
+}
+
+Data.item_create {
+    name = "Magic Map",
+    use_message = "You gain knowledge of your surroundings!",
+    description = "A magic map that reveals the current level.",
+
+    shop_cost = {55,105},
+
+    spr_item = "spr_scrolls.magic-map",
+
+    action_func = function(self, user)
+        MiscSpellAndItemEffects.magic_map_effect(user)
+        EventLog.add("The map is revealed!", {255,255,255})
     end
 }
 

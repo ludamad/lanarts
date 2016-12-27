@@ -31,6 +31,10 @@ public:
 	virtual void copy_to(GameInst* inst) const;
 	virtual StoreInst* clone() const;
 
+	void set_as_seen() {
+	    last_seen_spr = spriteid;
+	}
+
 	virtual void serialize(GameState* gs, SerializeBuffer& serializer);
 	virtual void deserialize(GameState* gs, SerializeBuffer& serializer);
 private:

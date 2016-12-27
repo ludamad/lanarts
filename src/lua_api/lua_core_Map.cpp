@@ -98,7 +98,7 @@ static void gmap_init(LuaStackValue map_obj, LuaStackValue args) {
 
     GameState* gs = lua_api::gamestate(map_obj);
     MapPtr map = args["map"].as<MapPtr>();
-    GameMapState* game_map = gs->game_world().map_create(map->size(),
+    GameMapState* game_map = gs->game_world().map_create(map->size(), map,
             defaulted(args["wandering_enabled"], true));
 
     game_map->label() = defaulted(args["label"], std::string("Somewhere"));

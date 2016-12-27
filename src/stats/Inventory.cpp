@@ -81,6 +81,39 @@ void Inventory::deserialize(SerializeBuffer& serializer) {
 	}
 }
 
+static int number_of_equip_slots(const Inventory& inv, int type) {
+    int max_slots = 1;
+    if (type == EquipmentEntry::RING) {
+        max_slots += 1;
+        itemslot_t amulet_slot = inv.get_equipped(EquipmentEntry::AMULET);
+        if (amulet_slot != -1) {
+            if (inv.get(amulet_slot).item.equipment_entry().name == "Amulet of Ringholding") {
+                max_slots += 1;
+            }
+        }
+    }
+    return max_slots;
+}
+
+// Only applies to rings for now, as our only variable-slot item:
+void Inventory::__dequip_overfilled_slots() {
+    int max_slots = number_of_equip_slots(*this, EquipmentEntry::RING);
+    int type = EquipmentEntry::RING;
+    itemslot_t last_slot = -1;
+    int nslots = 0;
+    for (;;) {
+            itemslot_t current_slot = get_equipped(type, last_slot);
+            if (current_slot == -1) {
+                    break;
+            } else {
+                    last_slot = current_slot;
+                    if (++nslots > max_slots) {
+                        get(last_slot).equipped = false;
+                    }
+            }
+    }
+}
+
 void Inventory::__dequip_projectile_if_invalid() {
 	itemslot_t slot = get_equipped(EquipmentEntry::AMMO);
 	if (slot != -1) {
@@ -94,7 +127,8 @@ void Inventory::__dequip_projectile_if_invalid() {
 void Inventory::equip(itemslot_t i) {
 	ItemSlot& slot = get(i);
 	EquipmentEntry& eentry = slot.item.equipment_entry();
-	int max_slots = eentry.number_of_equip_slots(), nslots = 0;
+	int max_slots = number_of_equip_slots(*this, eentry.type);
+        int nslots = 0;
 
 	itemslot_t last_slot = -1;
 	for (;;) {
@@ -113,6 +147,7 @@ void Inventory::equip(itemslot_t i) {
 		get(last_slot).equipped = false;
 	}
 	slot.equipped = true;
+        __dequip_overfilled_slots();
 	__dequip_projectile_if_invalid();
 }
 // Returns NULL if nothing equipped
@@ -121,6 +156,7 @@ void Inventory::deequip_type(int type) {
 	itemslot_t slot = get_equipped(type);
 	if (slot != -1) {
 		get(slot).deequip();
+                __dequip_overfilled_slots();
 		__dequip_projectile_if_invalid();
 	}
 }
@@ -128,6 +164,7 @@ void Inventory::deequip_type(int type) {
 void Inventory::deequip(itemslot_t i) {
 	ItemSlot& slot = get(i);
 	slot.deequip();
+	__dequip_overfilled_slots();
 	__dequip_projectile_if_invalid();
 }
 

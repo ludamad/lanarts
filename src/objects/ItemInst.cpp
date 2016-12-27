@@ -58,8 +58,6 @@ void ItemInst::draw(GameState* gs) {
 	if (!was_seen && !gs->object_visible_test(this))
 		return;
 
-	was_seen = true;
-
 	Pos p = round_to_multiple(ipos(), TILE_SIZE);
 
 	ldraw::draw_rectangle_outline(COL_WHITE.alpha(45),

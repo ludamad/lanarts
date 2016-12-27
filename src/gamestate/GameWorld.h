@@ -40,7 +40,7 @@ public:
 	void set_current_level(int roomid);
 	void set_current_level_lazy(int roomid);
 
-	GameMapState* map_create(const Size& size, bool wandering_enabled = true);
+	GameMapState* map_create(const Size& size, ldungeon_gen::MapPtr source_map, bool wandering_enabled = true);
 
 	void reset(int keep = 0);
 	GameMapState* get_current_level() {

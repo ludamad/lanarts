@@ -116,6 +116,7 @@ public:
 	itemslot_t get_equipped(int type, itemslot_t last_slot = -1) const;
 private:
 	void __dequip_projectile_if_invalid();
+	void __dequip_overfilled_slots();
 	std::vector<ItemSlot> items;
 };
 

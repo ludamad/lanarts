@@ -80,7 +80,7 @@ void GameWorld::deserialize(SerializeBuffer& serializer) {
 		Size size;
 		serializer.read(size);
 		if (level_states[i] == NULL) {
-			level_states[i] = new GameMapState(i, size, false, false);
+			level_states[i] = new GameMapState(i, ldungeon_gen::MapPtr(), size, false, false);
 		}
 		gs->set_level(level_states[i]);
 		level_states[i]->deserialize(gs, serializer);
@@ -90,9 +90,9 @@ void GameWorld::deserialize(SerializeBuffer& serializer) {
 	midstep = false;
 }
 
-GameMapState* GameWorld::map_create(const Size& size, bool wandering_enabled) {
+GameMapState* GameWorld::map_create(const Size& size, ldungeon_gen::MapPtr source_map, bool wandering_enabled) {
 	int levelid = level_states.size();
-	GameMapState* map = new GameMapState(levelid, Size(size.w * TILE_SIZE, size.h * TILE_SIZE), wandering_enabled);
+	GameMapState* map = new GameMapState(levelid, source_map, Size(size.w * TILE_SIZE, size.h * TILE_SIZE), wandering_enabled);
 	level_states.push_back(map);
         // _should_sync_states = true;
 	return map;

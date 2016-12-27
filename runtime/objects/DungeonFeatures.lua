@@ -37,6 +37,8 @@ function Decoration:on_step()
 --    end 
     if Map.object_visible(self) then
         self.sprite = self.real_sprite
+    elseif not self.sprite and Map.tile_was_seen(self.map, {math.floor(self.x / 32), math.floor(self.y / 32)}) then
+        self.sprite = self.real_sprite
     end
 end
 function Decoration:init(args)

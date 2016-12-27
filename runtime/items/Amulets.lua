@@ -124,3 +124,13 @@ Data.equipment_create {
     spells_granted = {"Pain"}
 }
 
+Data.equipment_create {
+    name = "Amulet of Ringholding",
+    description = "Grants user ability to wear an additional ring.",
+    type = "amulet",
+
+    shop_cost = { 120, 140 },
+
+    spr_item = "spr_amulets.urand_bloodlust",
+}
+
