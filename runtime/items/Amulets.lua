@@ -103,6 +103,17 @@ Data.equipment_create {
 }
 
 Data.equipment_create {
+    name = "Amulet of Great Pain",
+    description = "Grants the user the spell 'Greater Pain'.",
+    type = "amulet",
+
+    shop_cost = { 120, 140 },
+
+    spr_item = "spr_amulets.greaterpain",
+    spells_granted = {"Greater Pain"}
+}
+
+Data.equipment_create {
     name = "Amulet of Pain",
     description = "Grants the user the spell 'Pain'.",
     type = "amulet",

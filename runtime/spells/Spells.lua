@@ -243,21 +243,21 @@ Data.spell_create(PowerStrike)
 
 local Pain = {
     name = "Pain",
-    description = "Instantly damage a nearby enemy.",
+    description = "Instantly damage a nearby enemy, but hurt yourself in the process.",
     can_cast_with_held_key = true,
-    spr_spell = "spr_spells.fear_strike",
+    spr_spell = "spr_spells.pain",
     can_cast_with_cooldown = false,
-    mp_cost = 40,
-    cooldown = 35, -- Uses cooldown of weapon
+    mp_cost = 20,
+    cooldown = 55, -- Uses cooldown of weapon
     fallback_to_melee = true,
-    range = 80
+    range = 60
 }
 
 function Pain.action_func(caster, x, y, target)
     local num = 0
-    local eff_range = (mon.target_radius + caster.target_radius + caster.weapon_range + Pain.range)
-    if not target or vector_distance({mon.x, mon.y}, {caster.x, caster.y}) > eff_range then
-        local least_dist = nil, math.huge
+    local eff_range = target and (target.target_radius + caster.target_radius + caster.weapon_range + Pain.range)
+    if not target or vector_distance({target.x, target.y}, {caster.x, caster.y}) > eff_range then
+        local least_dist = math.huge
         for mon in values(Map.monsters_list() or {}) do
             local dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
             if dist < eff_range and least_dist > dist then
@@ -270,7 +270,10 @@ function Pain.action_func(caster, x, y, target)
         return
     end
     local stats = caster:effective_stats()
-    obj:damage(10 + caster.stats.magic, 2 + caster.stats.magic * 0.2, effect.magic_percentage, mod)
+    target:damage(random(4,15) + caster.stats.magic, random(2,5) + caster.stats.magic * 0.2, --[[Magic percentage]] 1.0, 1.0)
+    caster:direct_damage(10)
+    target:add_effect("Pained", 50)
+    caster:add_effect("Pained", 50)
     if caster:is_local_player() then
         EventLog.add("You attack your enemy's life force directly!", {200,200,255})
     else
@@ -279,7 +282,7 @@ function Pain.action_func(caster, x, y, target)
 end
 
 function Pain.prereq_func(caster)
-    if caster:has_ranged_weapon() then
+    if caster.stats.hp < 10 then
         return false
     end
     for mon in values(Map.monsters_list() or {}) do
@@ -296,6 +299,54 @@ end
 
 Data.spell_create(Pain)
 
+-- GREATER PAIN --
+
+local GreaterPain = {
+    name = "Greater Pain",
+    description = "Instantly damage all nearby enemies, but hurting yourself in the process.",
+    can_cast_with_held_key = true,
+    spr_spell = "spr_spells.greaterpain",
+    can_cast_with_cooldown = false,
+    mp_cost = 50,
+    cooldown = 75, -- Uses cooldown of weapon
+    fallback_to_melee = true,
+    range = 60
+}
+
+function GreaterPain.action_func(caster, x, y, target)
+    local stats = caster:effective_stats()
+    local eff_range = target and (target.target_radius + caster.target_radius + caster.weapon_range + Pain.range)
+    for mon in values(Map.monsters_list() or {}) do
+        local dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
+        if dist < eff_range then
+            mon:damage(random(4,15) * 2 + caster.stats.magic * 2, random(6,10) + caster.stats.magic * 0.2, --[[Magic percentage]] 1.0, 2.0)
+            mon:add_effect("Pained", 50)
+        end
+    end
+    caster:direct_damage(25)
+    caster:add_effect("Pained", 50)
+    if caster:is_local_player() then
+        EventLog.add("You attack nearby enemies life force directly!", {200,200,255})
+    else
+        EventLog.add(caster.name .. " attacks nearby enemies life force directly!", {200,200,255})
+    end
+end
+
+function GreaterPain.prereq_func(caster)
+    if caster.stats.hp < 25 then
+        return false
+    end
+    for mon in values(Map.monsters_list() or {}) do
+        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + caster.weapon_range + Pain.range then
+            return true
+        end
+    end
+    return false
+end
+
+GreaterPain.autotarget_func = Pain.autotarget_func
+
+Data.spell_create(GreaterPain)
 
 -- FEAR STRIKE --
 
@@ -303,7 +354,7 @@ local FearStrike = {
     name = "Fear Strike",
     description = "Strike an enemy, magically instilling the fear of death within them.",
     can_cast_with_held_key = true,
-    spr_spell = "spr_spells.pain",
+    spr_spell = "spr_spells.fear_strike",
     can_cast_with_cooldown = false,
     mp_cost = 40,
     cooldown = 0, -- Uses cooldown of weapon

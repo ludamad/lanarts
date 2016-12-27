@@ -139,9 +139,9 @@ MINOR_ENCHANTS = {
     additive_core_bonus("magic_reduction", {1, 2})
     additive_core_bonus("magic_resistance", {1, 2})
     additive_core_bonus("magic_resistance", {1, 2})
-    mult_core_bonus("magic_cooldown_multiplier", {0.9, 0.95})
-    mult_core_bonus("melee_cooldown_multiplier", {0.9, 0.95})
-    mult_core_bonus("ranged_cooldown_multiplier", {0.9, 0.95})
+    mult_core_bonus("magic_cooldown_multiplier", {0.85, 0.9})
+    mult_core_bonus("melee_cooldown_multiplier", {0.85, 0.9})
+    mult_core_bonus("ranged_cooldown_multiplier", {0.85, 0.9})
 }
 
 -- Minor debuffs:
@@ -172,6 +172,9 @@ MINOR_DEBUFFS = {
     additive_core_bonus("resistance", {-3, -1})
     additive_core_bonus("magic_reduction", {-3, -1})
     additive_core_bonus("magic_resistance", {-3, -1})
+    mult_core_bonus("magic_cooldown_multiplier", {1.10, 1.20})
+    mult_core_bonus("melee_cooldown_multiplier", {1.1, 1.2})
+    mult_core_bonus("ranged_cooldown_multiplier", {1.1, 1.2})
 }
 
 NAMES_USED = {}

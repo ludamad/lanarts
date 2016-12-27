@@ -27,19 +27,21 @@ Data.class_create {
           gold = 0,
           inventory = {
              {item = "Mana Potion"},
-             -- For testing legwear:
-             --{item = "Platelegs", amount = 1},
-             --{item = "Magic Skirt", amount = 1},
-             ---- For testing belts:
-             --{item = "Belt of Slaying", amount = 1},
-             --{item = "Belt of Protection", amount = 1},
-             ---- For testing spell amulets:
-             --{item = "Amulet of Fear", amount = 1}, 
-             --{item = "Amulet of Trepidation", amount = 1},
-             --{item = "Amulet of Regeneration", amount = 1},
-             --{item = "Amulet of Fire", amount = 1},
-             --{item = "Amulet of Greater Fire", amount = 1},
-             --{item = "Amulet of Protection", amount = 1},
+             --For testing legwear:
+             {item = "Platelegs", amount = 1},
+             {item = "Magic Skirt", amount = 1},
+             -- For testing belts:
+             {item = "Belt of Slaying", amount = 1},
+             {item = "Belt of Protection", amount = 1},
+             -- For testing spell amulets:
+             {item = "Amulet of Fear", amount = 1}, 
+             {item = "Amulet of Trepidation", amount = 1},
+             {item = "Amulet of Regeneration", amount = 1},
+             {item = "Amulet of Fire", amount = 1},
+             {item = "Amulet of Greater Fire", amount = 1},
+             {item = "Amulet of Protection", amount = 1},
+             {item = "Amulet of Pain", amount = 1},
+             {item = "Amulet of Great Pain", amount = 1},
           }
         }
     },

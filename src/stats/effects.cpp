@@ -96,7 +96,11 @@ void EffectStats::process(GameState* gs, CombatGameInst* inst,
 
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining > 0) {
-			game_effect_data.at(effects[i].effectid).stat_func.get(L).push();
+			auto& stat_func = game_effect_data.at(effects[i].effectid).stat_func;
+                        if (stat_func.empty()) {
+                            continue;
+                        }
+                        stat_func.get(L).push();
 			if (!effects[i].state.empty()) {
 				effects[i].state.push();
 				luawrap::push(L, inst);
