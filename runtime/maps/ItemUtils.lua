@@ -23,16 +23,28 @@ local function nested_chance(group, attribute)
         return group
     end
     local total_chance = 0 
-    for _,entry in ipairs(group) do
-        total_chance = total_chance + entry.chance
-    end
-    local rand_x = randomf(0, total_chance)
-    for _,entry in ipairs(group) do
-        rand_x = rand_x - entry.chance
-        if rand_x <= 0 then
-            return nested_chance(entry, attribute)
+    for i=1,#group do
+        if group[i] ~= nil then
+            if not group[i].chance then
+                pretty(group[i])
+            end
+            total_chance = total_chance + group[i].chance
         end
     end
+    if total_chance == 0 then
+        pretty(group)
+    end
+    assert(total_chance ~= 0)
+    local rand_x = random(0, total_chance)
+    for i=1,#group do
+        if group[i] ~= nil then
+            rand_x = rand_x - group[i].chance
+            if rand_x <= 0 then
+                return nested_chance(group[i], attribute)
+            end
+        end
+    end
+    pretty(group)
     return nil
 end
 
@@ -41,7 +53,7 @@ function M.item_generate(group, only_with_shop_cost, --[[Optional]] randart_powe
     randart_chance = randart_chance or RANDART_CHANCE
     -- For now, a fixed 1 in 100 chance of being a randart
     if true then -- randart_power_level ~= nil then
-        if randomf() <= randart_chance / 100 then
+        if true then -- randomf() <= randart_chance / 100 then
             randart_power_level = randart_power_level or 1
             while randomf() < 0.05 and randart_power_level < 3 do
                 randart_power_level = randart_power_level + 1

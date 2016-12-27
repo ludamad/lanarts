@@ -212,6 +212,13 @@ function table.insert_all(t1, t2)
     end
 end
 
+function table.tconcat(t1, t2)
+    local t = {}
+    for v in values(t1) do t[#t+1] = v end
+    for v in values(t2) do t[#t+1] = v end
+    return t
+end
+
 --- Adds values from src to dest, copying them if initially nil
 function table.defaulted_addition(src, dest)
     for k,v in pairs(src) do

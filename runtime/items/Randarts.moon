@@ -71,6 +71,32 @@ get_name_and_description = (rng, artifact, power_level) ->
     }
     return "#{artifact} of #{person[1]}'s #{trait}", person[2] .. " " .. power_adjective
 
+add_random_spell = () -> (rng, data) ->
+    if data.spells_granted
+        return -- For now, dont have double spell items.
+    data.spells_granted or= {}
+    spell = random_choice {
+        "Minor Missile",
+        "Fireball",
+        "Fire Bolt",
+        "Mephitize",
+        "Trepidize",
+        "Regeneration",
+        "Berserk",
+        "Blink",
+        "Magic Arrow",
+        "Magic Blast",
+        "Power Strike",
+        "Pain",
+        "Fear Strike",
+        "Expedite",
+        "Wallanthor",
+    }
+    if table.contains(data.spells_granted, spell) 
+        return
+    data.description ..= " Grants the user the ability to use '#{spell}'"
+    append data.spells_granted, spell
+
 additive_stat_bonus = (attr, range) -> (rng, data) ->
     local bonus
     if math.floor(range[1]) ~= range[1] 
@@ -87,6 +113,10 @@ additive_core_bonus = (attr, range) -> (rng, data) ->
     {b1, b2} = initial.base
     data[attr] = table.merge (data[attr] or {}), {base: {b1 + bonus, b2 + bonus}}
 
+mult_core_bonus = (attr, range) -> (rng, data) ->
+    mult = rng\randomf(range[1], range[2])
+    data[attr] = (data[attr] or 1) * mult
+
 mult_stat_bonus = (attr, range) -> (rng, data) ->
     mult = rng\randomf(range[1], range[2])
     data.stat_bonuses[attr] = (data.stat_bonuses[attr] or 1) * mult
@@ -95,18 +125,23 @@ local MINOR_ENCHANTS, MAJOR_ENCHANTS, MINOR_DEBUFFS, MAJOR_DEBUFFS
 -- Minor enchantments:
 MINOR_ENCHANTS = {
     mult_stat_bonus("spell_velocity_multiplier", {1.10, 1.25})
+    add_random_spell()
     additive_stat_bonus("mp", {10, 35})
     additive_stat_bonus("hp", {10, 35})
     additive_stat_bonus("hpregen", {0.02, 0.03})
     additive_stat_bonus("mpregen", {0.02, 0.03})
-    additive_stat_bonus("strength", {1, 1})
-    additive_stat_bonus("defence", {1, 1})
-    additive_stat_bonus("willpower", {1, 1})
-    additive_stat_bonus("magic", {1, 1})
+    additive_stat_bonus("strength", {1, 2})
+    additive_stat_bonus("defence", {1, 2})
+    additive_stat_bonus("willpower", {1, 2})
+    additive_stat_bonus("magic", {1, 2})
     additive_core_bonus("reduction", {1, 2})
     additive_core_bonus("resistance", {1, 2})
     additive_core_bonus("magic_reduction", {1, 2})
     additive_core_bonus("magic_resistance", {1, 2})
+    additive_core_bonus("magic_resistance", {1, 2})
+    mult_core_bonus("magic_cooldown_multiplier", {0.9, 0.95})
+    mult_core_bonus("melee_cooldown_multiplier", {0.9, 0.95})
+    mult_core_bonus("ranged_cooldown_multiplier", {0.9, 0.95})
 }
 
 -- Minor debuffs:
@@ -115,7 +150,7 @@ MAJOR_ENCHANTS = {
     (rng, data) ->
         while true
             f = rng\random_choice(MINOR_ENCHANTS)
-            if f == MINOR_ENCHANTS[1]
+            if f == MINOR_ENCHANTS[1] or f == MINOR_ENCHANTS[2]
                 continue
             f(rng, data)
             f(rng, data)
@@ -127,8 +162,8 @@ MINOR_DEBUFFS = {
     mult_stat_bonus("spell_velocity_multiplier", {0.8, 0.9})
     additive_stat_bonus("mp", {-20, -5})
     additive_stat_bonus("hp", {-20, -5})
-    additive_stat_bonus("hpregen", {-0.06, -0.02})
-    additive_stat_bonus("mpregen", {-0.06, -0.02})
+    additive_stat_bonus("hpregen", {-0.03, -0.01})
+    additive_stat_bonus("mpregen", {-0.03, -0.01})
     additive_stat_bonus("strength", {-3, -1})
     additive_stat_bonus("defence", {-3, -1})
     additive_stat_bonus("willpower", {-3, -1})
@@ -162,14 +197,14 @@ define_randart = (rng, base, images, enchanter) ->
     data.stat_bonuses or= {}
     n_enchants = power_level * 2
     rng\random_choice(MINOR_DEBUFFS)(rng, data)
-    -- Have less on weapons:
-    if data.cooldown
-        n_enchants /= 2
     while n_enchants > 0 
-        if rng\random(8) == 0
+        if rng\random(4) == 0
+            rng\random_choice(MAJOR_ENCHANTS)(rng, data)
+            n_enchants -= 1
+        elseif rng\random(4) == 0
             rng\random_choice(MAJOR_ENCHANTS)(rng, data)
             rng\random_choice(MINOR_DEBUFFS)(rng, data)
-        elseif rng\random(5) == 0
+        elseif rng\random(8) == 0
             rng\random_choice(MINOR_ENCHANTS)(rng, data)
             rng\random_choice(MINOR_DEBUFFS)(rng, data)
             n_enchants += 1
@@ -199,6 +234,17 @@ apply_enchantment = (rng, data) ->
         for i=1,2
             data.shop_cost[i] += math.floor((enchantment ^ 1.5) * 50)
 
+-- Define several randart amulets:
+define_amulet_randarts = (rng) ->
+    images = get_resource_names("spr_amulets.randarts")
+    for i=1,50
+        base = {
+            name: "Amulet"
+            type: "amulet"
+            shop_cost: {0, 0}
+        }
+        Data.equipment_create(define_randart(rng, base, images))
+
 -- Define several randart rings:
 define_ring_randarts = (rng) ->
     images = get_resource_names("spr_rings.randarts")
@@ -210,6 +256,30 @@ define_ring_randarts = (rng) ->
         }
         Data.equipment_create(define_randart(rng, base, images))
 
+-- Define several randart belts:
+define_belt_randarts = (rng) ->
+    images = get_resource_names("spr_belts.randarts")
+    for i=1,50
+        base = {
+            name: "Belt"
+            type: "belt"
+            shop_cost: {0, 0}
+        }
+        Data.equipment_create(define_randart(rng, base, images))
+
+-- Define several randart legwear:
+define_legwear_randarts = (rng) ->
+    images = get_resource_names("spr_legwear.randarts")
+    for i=1,50
+        base = {
+            name: "Pants"
+            type: "legwear"
+            shop_cost: {0, 0}
+        }
+        Data.equipment_create(define_randart(rng, base, images))
+
+
+
 define_equipment_randarts = (rng) ->
     -- RNG object just for generating randarts
     -- ATM the following MUST be a deterministic process, because of limitations
@@ -218,6 +288,9 @@ define_equipment_randarts = (rng) ->
     -- and not in a phase beforehand.
     rng = require("mtwist").create(HARDCODED_RANDARTS_SEED)
     define_ring_randarts(rng)
+    define_belt_randarts(rng)
+    define_legwear_randarts(rng)
+    define_amulet_randarts(rng)
     for name, item in pairs(items)
         -- Judge whether its equipment by a cooldown not being present
         if item.randart_sprites ~= nil and item.cooldown == nil

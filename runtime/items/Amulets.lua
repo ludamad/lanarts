@@ -91,3 +91,25 @@ Data.equipment_create {
     spr_item = "spr_amulets.protect",
 }
 
+Data.equipment_create {
+    name = "Amulet of the Berserker",
+    description = "Grants the user the ability to 'Berserk'.",
+    type = "amulet",
+
+    shop_cost = { 120, 140 },
+
+    spr_item = "spr_amulets.berserk",
+    spells_granted = {"Berserk"}
+}
+
+Data.equipment_create {
+    name = "Amulet of Pain",
+    description = "Grants the user the spell 'Pain'.",
+    type = "amulet",
+
+    shop_cost = { 120, 140 },
+
+    spr_item = "spr_amulets.pain",
+    spells_granted = {"Pain"}
+}
+

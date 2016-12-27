@@ -226,7 +226,8 @@ static void player_use_luacallback_spell(GameState* gs, PlayerInst* p,
     luawrap::push(L, p);
     lua_pushnumber(L, target.x);
     lua_pushnumber(L, target.y);
-    lua_call(L, 3, 0);
+    luawrap::push(L, gs->get_instance(p->target()));
+    lua_call(L, 4, 0);
 }
 
 static bool lua_spell_check_prereq(GameState* gs, PlayerInst* p,

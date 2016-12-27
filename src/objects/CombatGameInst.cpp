@@ -96,7 +96,12 @@ CombatStats& CombatGameInst::stats() {
 
 EffectiveAttackStats CombatGameInst::effective_atk_stats(MTwist& mt,
         const AttackStats& attack) {
-    return effective_stats().with_attack(mt, attack);
+    EffectiveAttackStats eff = effective_stats().with_attack(mt, attack);
+    // ITEM IMPL DETAIL
+    if (attack.weapon_entry().name == "Magic Sword" && effective_stats().core.mp > 20) {
+        eff.damage *= 1.25;
+    }
+    return eff;
 }
 
 EffectiveStats& CombatGameInst::effective_stats() {

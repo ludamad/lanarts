@@ -38,6 +38,11 @@ static int lapi_gameinst_stats(lua_State* L) {
 	return 1;
 }
 
+static int lapi_gameinst_effectivestats(lua_State* L) {
+    lua_push_effectivestats(L, luawrap::get<GameInst*>(L, 1));
+    return 1;
+}
+
 static int object_init(lua_State* L);
 static void player_init(LuaStackValue obj, Pos xy, std::string name);
 
@@ -185,17 +190,18 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	getters["stats"].bind_function(lapi_gameinst_stats);
 
 	LuaValue methods = luameta_constants(meta);
+    methods["effective_stats"].bind_function(lapi_gameinst_effectivestats);
     LUAWRAP_GETTER(getters, weapon_range, OBJ->equipment().weapon().weapon_entry().range());
 	LUAWRAP_METHOD(methods, heal_fully, OBJ->stats().core.heal_fully());
 	LUAWRAP_METHOD(methods, direct_damage, OBJ->damage(lua_api::gamestate(L), lua_tointeger(L, 2)));
 	LUAWRAP_METHOD(methods, melee, luawrap::push(L, OBJ->melee_attack(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2), OBJ->equipment().weapon(), true)) );
 
-	methods["damage"].bind_function(lapi_combatgameinst_damage);
+    methods["damage"].bind_function(lapi_combatgameinst_damage);
 	methods["heal_hp"].bind_function(lapi_combatgameinst_heal_hp);
 	methods["heal_mp"].bind_function(lapi_combatgameinst_heal_mp);
 
 	LUAWRAP_METHOD(methods, add_effect, OBJ->effects().add(lua_api::gamestate(L), OBJ, effect_from_lua(L, 2), lua_tointeger(L, 3)).push() );
-	LUAWRAP_GETTER(methods, has_effect, OBJ->effects().get(effect_from_lua(L, 2)) != NULL);
+    LUAWRAP_GETTER(methods, has_effect, OBJ->effects().get(effect_from_lua(L, 2)) != NULL);
 
 	methods["reset_rest_cooldown"].bind_function(lapi_do_nothing);
 

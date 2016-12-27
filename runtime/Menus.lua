@@ -107,6 +107,18 @@ function setup_start_menu()
         settings.class_type = 0
         exit_menu()
         return
+    elseif os.getenv("LANARTS_FIGHTER") then
+        settings.class_type = 0
+        exit_menu()
+        return
+    elseif os.getenv("LANARTS_ARCHER") then
+        settings.class_type = 2
+        exit_menu()
+        return
+    elseif os.getenv("LANARTS_MAGE") then
+        settings.class_type = 1
+        exit_menu()
+        return
     elseif os.getenv("LANARTS_SERVER") then
 	settings.connection_type = Network.SERVER
         settings.class_type = 1

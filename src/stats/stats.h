@@ -144,14 +144,14 @@ struct EffectiveStats {
 
 	EffectiveAttackStats with_attack(MTwist& mt,
 			const AttackStats& attack) const;
-    void deserialize(SerializeBuffer& serializer) {
-        DESERIALIZE_POD_REGION(serializer, this, core, allowed_actions);
+    void serialize(SerializeBuffer& serializer) {
+        SERIALIZE_POD_REGION(serializer, this, core, allowed_actions);
         spells.serialize(serializer);
     }
-	void serialize(SerializeBuffer& serializer) {
-        SERIALIZE_POD_REGION(serializer, this, core, allowed_actions);
+    void deserialize(SerializeBuffer& serializer) {
+        DESERIALIZE_POD_REGION(serializer, this, core, allowed_actions);
         spells.deserialize(serializer);
-	}
+    }
 };
 
 /* Cooldown, eg count before a certain action can be done again*/

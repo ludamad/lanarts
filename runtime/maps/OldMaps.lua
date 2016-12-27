@@ -173,13 +173,6 @@ local large_layouts = {
 }
 M.large_layouts = large_layouts
 
-local function tconcat(t1, t2)
-    local t = {}
-    for v in values(t1) do t[#t+1] = v end
-    for v in values(t2) do t[#t+1] = v end
-    return t
-end
-
 M.Dungeon1 = {
   -- Level 1
   { layout = tiny_layouts,
@@ -212,22 +205,6 @@ M.Dungeon1 = {
 
 M.Dungeon2 = {
   -- Level 1
-  { layout = tiny_layouts,
-    content = {
-      items = { amount = 3,  group = ItemGroups.basic_items   },
-      enemies = {
-        wandering = false,
-        amount = 7,
-
-        generated = {
-          {enemy = "Giant Rat",         chance = 100  },
-          {enemy = "Giant Bat",         chance = 100 },
-          {enemy = "Hound",         chance = 100 },
-          {enemy = "Cloud Elemental",   guaranteed_spawns = 2 },
-        }
-      }
-    }
-  },
   { layout = tiny_layouts,
     content = {
       items = { amount = 3,  group = ItemGroups.basic_items },
@@ -277,7 +254,7 @@ M.Dungeon3 = {
   },
   { layout = small_layouts,
     content = {
-      items = { amount = 8,  group = tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
+      items = { amount = 8,  group = ItemGroups.basic_items   },
       enemies = {
         amount = {12,15},
         generated = M.medium_enemies
@@ -286,10 +263,10 @@ M.Dungeon3 = {
   },
   { templates = {path_resolve "dungeon1room1a.txt", path_resolve "dungeon1room1b.txt", path_resolve "dungeon1room1c.txt"},
     content = {
-      items = { amount = 4,  group = tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
+      items = { amount = 4,  group = ItemGroups.basic_items   },
       enemies = {
         amount = 6,
-        generated = tconcat(M.medium_enemies, {{enemy = "Hell Warrior", guaranteed_spawns = 1}})
+        generated = table.tconcat(M.medium_enemies, {{enemy = "Hell Warrior", guaranteed_spawns = 1}})
       }
     }
   }
@@ -298,7 +275,7 @@ M.Dungeon4 = {
   -- Level 6
   { layout = {small_layout1},
     content = {
-      items = { amount = 8, group = tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
+      items = { amount = 8, group = table.tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
       enemies = {
         amount = {14,16},
         generated = M.medium_enemies
@@ -342,7 +319,7 @@ M.Dungeon4 = {
       items = { amount = 12,  group = ItemGroups.enchanted_items   },
       enemies = {
         amount = 30,
-        generated = tconcat(M.harder_enemies, {{enemy = "Zin", guaranteed_spawns = 1}, {enemy = "Hell Forged", guaranteed_spawns = 1}})
+        generated = table.tconcat(M.harder_enemies, {{enemy = "Zin", guaranteed_spawns = 1}, {enemy = "Hell Forged", guaranteed_spawns = 1}})
       }
     }
   }
@@ -354,7 +331,8 @@ local function range_resolve(r)
 end
 
 local function generate_items(map, items)
-    for i=1,range_resolve(items.amount) do
+    local n_items = random_round(range_resolve(items.amount))
+    for i=1,n_items do
         ItemUtils.item_object_generate(map, items.group)
     end
 end
@@ -408,7 +386,8 @@ local function generate_enemies(map, enemies)
     else
         min, max = enemies.amount, enemies.amount
     end
-    local amounts = {min * (1.0 + (World.player_amount - 1)/2), max * (1.0 + (World.player_amount - 1) / 2)}
+    local multiplayer_bonus = (World.player_amount - 1) / 3
+    local amounts = {min * (1.0 + multiplayer_bonus), max * (1.0 + multiplayer_bonus)}
     local amount = math.round(randomf(amounts))
     local Vaults = require "maps.Vaults"
     M.generate_from_enemy_entries(map, enemies.generated, amount, nil, {matches_none =  {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT}})

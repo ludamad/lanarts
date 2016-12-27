@@ -145,6 +145,25 @@ end
 
 expedited_effect = {}
 
+function expedited_effect.step(effect, obj)
+	local killdiff = obj.kills - effect.kill_tracker
+
+	while killdiff > 0 do
+		if obj:is_local_player() then
+			EventLog.add("Your sap the opponent's life force.", {200,200,255})
+		end
+		killdiff = killdiff -1
+                obj:heal_mp(20 + obj.stats.level * 5)
+	end
+
+	effect.kill_tracker = obj.kills
+end
+
+function expedited_effect.init(effect, obj) 
+	effect.kill_tracker = obj.kills 
+end
+
+
 function expedited_effect.stat(effect, obj, old, new)
     if new.speed < 6 then
 	new.speed = math.max(new.speed * 1.25, 6)

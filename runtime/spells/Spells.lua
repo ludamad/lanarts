@@ -98,7 +98,7 @@ Data.spell_create(Regeneration)
 local Berserk = {
     name = "Berserk",
     spr_spell = "berserk",
-    description = "Initiate frenzy, gaining +2 defence, +5 willpower, +{Level} strength, +60% melee speed, +25% move speed. Killing enemies grants you longer frenzy, and heals 20HP per kill. Afterwards, become exhausted with -3 defence, -3 willpower, -25% action speed, -50% move speed.",
+    description = "Initiate frenzy, gaining +2 defence, +5 willpower, +{Level} strength, +60% melee speed, +25% move speed. Killing enemies grants you longer frenzy, and heals a bit every kill. Afterwards, become exhausted with -3 defence, -3 willpower, -25% action speed, -50% move speed.",
     mp_cost = 50,
     cooldown = 30,
     can_cast_with_held_key = false,
@@ -239,13 +239,71 @@ end
 
 Data.spell_create(PowerStrike)
 
+-- PAIN --
+
+local Pain = {
+    name = "Pain",
+    description = "Instantly damage a nearby enemy.",
+    can_cast_with_held_key = true,
+    spr_spell = "spr_spells.fear_strike",
+    can_cast_with_cooldown = false,
+    mp_cost = 40,
+    cooldown = 35, -- Uses cooldown of weapon
+    fallback_to_melee = true,
+    range = 80
+}
+
+function Pain.action_func(caster, x, y, target)
+    local num = 0
+    local eff_range = (mon.target_radius + caster.target_radius + caster.weapon_range + Pain.range)
+    if not target or vector_distance({mon.x, mon.y}, {caster.x, caster.y}) > eff_range then
+        local least_dist = nil, math.huge
+        for mon in values(Map.monsters_list() or {}) do
+            local dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
+            if dist < eff_range and least_dist > dist then
+                least_dist = dist
+                target = mon
+            end
+        end
+    end
+    if not target then
+        return
+    end
+    local stats = caster:effective_stats()
+    obj:damage(10 + caster.stats.magic, 2 + caster.stats.magic * 0.2, effect.magic_percentage, mod)
+    if caster:is_local_player() then
+        EventLog.add("You attack your enemy's life force directly!", {200,200,255})
+    else
+        EventLog.add(caster.name .. " attacks their enemy's life force directly!", {200,200,255})
+    end
+end
+
+function Pain.prereq_func(caster)
+    if caster:has_ranged_weapon() then
+        return false
+    end
+    for mon in values(Map.monsters_list() or {}) do
+        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + caster.weapon_range + Pain.range then
+            return true
+        end
+    end
+    return false
+end
+
+function Pain.autotarget_func(caster)
+    return caster.x, caster.y
+end
+
+Data.spell_create(Pain)
+
+
 -- FEAR STRIKE --
 
 local FearStrike = {
     name = "Fear Strike",
     description = "Strike an enemy, magically instilling the fear of death within them.",
     can_cast_with_held_key = true,
-    spr_spell = "spr_spells.fear_strike",
+    spr_spell = "spr_spells.pain",
     can_cast_with_cooldown = false,
     mp_cost = 40,
     cooldown = 0, -- Uses cooldown of weapon
@@ -297,11 +355,11 @@ Data.spell_create(FearStrike)
 
 local Expedite = {
     name = "Expedite",
-    description = "Run 25% faster for a short duration, with 33% faster rate of fire.",
+    description = "Run 25% faster for a short duration, with 33% faster rate of fire. Heal MP every usage.",
     can_cast_with_held_key = false,
     spr_spell = "expedite",
     can_cast_with_cooldown = false,
-    mp_cost = 25,
+    mp_cost = 40,
     cooldown = 30,
     fallback_to_melee = false,
 }
@@ -333,8 +391,8 @@ local Wallanthor = {
     can_cast_with_held_key = false,
     spr_spell = "spr_spells.spell-wall",
     can_cast_with_cooldown = false,
-    mp_cost = 10,
-    cooldown = 35,
+    mp_cost = 30,
+    cooldown = 45,
     fallback_to_melee = false,
 }
 

@@ -160,17 +160,16 @@ Data.weapon_create {
     resist_modifier = 1.1,
 
     damage = {strength = 1.1, magic = 0.2, base = {5, 9}},
-    power = {base = 1, strength = 0.2},
+    power = {base = 1, strength = 0.2, magic = 0.2},
 
     cooldown = 42,
 
     range = 7,
 
+    -- Damage bonus implemented in C++, here is the MP cost:
     on_hit_func = function(user, target) 
-        local mpcost = rand_range(4,6)
+        local mpcost = 20
         if user.stats.mp >= mpcost then
-       	    -- Essentially 1/4th extra damage:
-            target:damage(user.stats.strength / 4 + rand_range(1,2), user.stats.strength / 5 + 1, 0.0, 0.25)
             user.stats.mp = user.stats.mp - mpcost
         end
     end
@@ -255,6 +254,9 @@ Data.weapon_create {
     range = 5
 }
 
+--------------------------
+-- BEGIN RANGED WEAPONS --
+--------------------------
 Data.weapon_create {
     name = "Short Bow",
     description = "A handy small bow.",
@@ -285,6 +287,7 @@ Data.weapon_create {
     spr_item = "long bow",
 
     uses_projectile = true,
+    randart_sprites = {"spr_weapons.urand_krishna", "spr_weapons.longbow3"},
 
     damage = {base = {5, 9}, strength = 1.2},
     power = {base = 5, strength = 0.25},
@@ -293,6 +296,46 @@ Data.weapon_create {
 
     range = 300
 }
+
+Data.weapon_create {
+    name = "Mars Bow",
+    description = "A bow begotten of Mars' blessing.",
+    type = "bows",
+
+    shop_cost = {205, 245},
+
+    spr_item = "spr_weapons.urand_storm_bow",
+
+    uses_projectile = true,
+
+    damage = {base = {6, 10}, strength = 1.2},
+    power = {base = 6, strength = 0.25},
+
+    cooldown = 55,
+
+    range = 300
+}
+
+Data.weapon_create {
+    name = "The Piercer",
+    description = "An artifact bow of great power. Lowers HP and MP.",
+    type = "bows",
+
+    shop_cost = {305, 445},
+
+    spr_item = "spr_weapons.urand_piercer",
+
+    uses_projectile = true,
+
+    damage = {base = {7, 11}, strength = 1.2},
+    power = {base = 7, strength = 0.25},
+
+    cooldown = 45,
+    stat_bonuses = {mp = -30, hp = -30, strength = 2, magic = 2, defence = 1, willpower = 1},
+
+    range = 300
+}
+
 
 Data.weapon_create {
     name = "Mars Bow",

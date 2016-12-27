@@ -22,10 +22,20 @@ Data.equipment_create {
 
     spr_item = "spr_belts.slaying",
 
-    reduction = { base = 1 },
-    resistance = { base = 1 },
-    magic_reduction = { base = 1 },
-    magic_resistance = { base = 1 }
+    stat_bonuses = {strength = 2}
 }
+
+Data.equipment_create {
+    name = "Warped Belt",
+    description = "A belt that decreases your HP and MP reserves significantly, but provides significant magical power.",
+    type = "belt",
+
+    shop_cost = { 200, 250 },
+
+    spr_item = "spr_belts.warped",
+
+    stat_bonuses = {magic = 5, mp = -40, hp = -50}
+}
+
 
 
