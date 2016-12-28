@@ -100,7 +100,7 @@ void EquipmentEntry::parse_lua_table(const LuaValue& table) {
 	stat_modifiers = parse_stat_modifiers(table);
 	cooldown_modifiers = parse_cooldown_modifiers(table);
 	spells_granted = parse_spells_known(table["spells_granted"]);
-        auto effects_granted = defaulted(table["effects_granted"], vector<string>());
+        auto effects_granted = luawrap::defaulted(table["effects_granted"], vector<string>());
 	for (string& str : effects_granted) {
 	    effect_modifiers.status_effects.push_back( get_effect_by_name(str.c_str()) );
 	}
