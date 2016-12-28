@@ -46,10 +46,11 @@ Data.spell_create {
 Data.spell_create {
     name = "Mephitize",
     spr_spell = "spr_spells.cloud",
-    description = "A noxious debilitating ring of clouds that cause damage as well as reduced defenses and speed over time.",
+    description = "An epically debilitating ring of clouds that cause damage as well as reduced defenses and speed over time.",
     projectile = "Mephitize",
-    mp_cost = 30,
-    cooldown = 35
+    mp_cost = 20,
+    cooldown = 35,
+    spell_cooldown = 2400
 }
 
 -- FEAR CLOUD
@@ -59,8 +60,9 @@ Data.spell_create {
     spr_spell = "spr_spells.cause_fear",
     description = "An insidious apparition that instills the fear of death in enemies it hits.",
     projectile = "Trepidize",
-    mp_cost = 40,
-    cooldown = 35
+    mp_cost = 0,
+    cooldown = 35,
+    spell_cooldown = 2400
 }
 
 -- REGENERATION
@@ -69,10 +71,11 @@ local Regeneration = {
     name = "Regeneration",
     spr_spell = "spr_spells.regeneration",
     description = "Regenerate health 20x for two seconds.",
-    mp_cost = 35,
+    mp_cost = 15,
     cooldown = 40,
     can_cast_with_held_key = false,
-    fallback_to_melee = false
+    fallback_to_melee = false,
+    spell_cooldown = 400
 }
 
 function Regeneration.prereq_func(caster)
@@ -250,7 +253,7 @@ local Pain = {
     spr_spell = "spr_spells.pain",
     can_cast_with_cooldown = false,
     mp_cost = 20,
-    cooldown = 55, -- Uses cooldown of weapon
+    cooldown = 55,
     fallback_to_melee = true,
     range = 60
 }
@@ -309,14 +312,15 @@ local HealAura = {
     spr_spell = "spr_amulets.healing",
     can_cast_with_cooldown = false,
     mp_cost = 25,
-    cooldown = 45,
+    cooldown = 25,
+    spell_cooldown = 800,
     fallback_to_melee = false,
     range = 80
 }
 
 function HealAura.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
-    caster:add_effect("Healing Aura", 800).range = HealAura.range
+    caster:add_effect("Healing Aura", 100).range = HealAura.range
     if caster:is_local_player() then
         EventLog.add("You release a healing radiance!", {200,200,255})
     else
@@ -346,8 +350,9 @@ local Luminos = {
     can_cast_with_held_key = false,
     spr_spell = "spr_amulets.light",
     can_cast_with_cooldown = false,
-    mp_cost = 25,
+    mp_cost = 0,
     cooldown = 25,
+    spell_cooldown = 100,
     fallback_to_melee = false,
     range = 80
 }
@@ -384,15 +389,16 @@ local GreaterPain = {
     can_cast_with_held_key = true,
     spr_spell = "spr_spells.greaterpain",
     can_cast_with_cooldown = false,
-    mp_cost = 40,
-    cooldown = 75, -- Uses cooldown of weapon
+    mp_cost = 20,
+    cooldown = 25,
+    spell_cooldown = 800,
     fallback_to_melee = true,
     range = 60
 }
 
 function GreaterPain.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
-    caster:direct_damage(25)
+    caster:direct_damage(40)
     caster:add_effect("Pained", 50)
     caster:add_effect("Pain Aura", 100).range = GreaterPain.range
     if caster:is_local_player() then
@@ -403,7 +409,7 @@ function GreaterPain.action_func(caster, x, y, target)
 end
 
 function GreaterPain.prereq_func(caster)
-    if caster.stats.hp < 25 then
+    if caster.stats.hp < 45 then
         return false
     end
     for mon in values(Map.monsters_list() or {}) do
@@ -426,8 +432,9 @@ local FearStrike = {
     can_cast_with_held_key = true,
     spr_spell = "spr_spells.fear_strike",
     can_cast_with_cooldown = false,
-    mp_cost = 40,
+    mp_cost = 5,
     cooldown = 0, -- Uses cooldown of weapon
+    spell_cooldown = 100,
     fallback_to_melee = true,
 }
 
@@ -476,12 +483,13 @@ Data.spell_create(FearStrike)
 
 local Expedite = {
     name = "Expedite",
-    description = "Run 25% faster for a short duration, with 33% faster rate of fire. Heal MP every usage.",
+    description = "Run 25% faster for a short duration, with 33% faster rate of fire. Heal MP every kill.",
     can_cast_with_held_key = false,
     spr_spell = "expedite",
     can_cast_with_cooldown = false,
-    mp_cost = 40,
+    mp_cost = 10,
     cooldown = 30,
+    spell_cooldown = 800,
     fallback_to_melee = false,
 }
 
@@ -494,7 +502,7 @@ function Expedite.autotarget_func(caster)
 end
 
 function Expedite.action_func(caster, x, y)
-    caster:add_effect("Expedited", 300)
+    caster:add_effect("Expedited", 500)
     if caster:is_local_player() then
         EventLog.add("You feel expedient!", {200,200,255})
     elseif caster.name == "Your ally" then
@@ -512,8 +520,9 @@ local CallSpikes = {
     can_cast_with_held_key = false,
     spr_spell = "spr_spells.arrow",
     can_cast_with_cooldown = false,
-    mp_cost = 30,
+    mp_cost = 40,
     cooldown = 45,
+    spell_cooldown = 2400,
     fallback_to_melee = true,
 }
 
@@ -529,6 +538,7 @@ function CallSpikes.autotarget_func(caster)
 end
 
 function CallSpikes.action_func(caster, x, y)
+    play_sound("sounds/slash.ogg")
     if caster:is_local_player() then
         EventLog.add("You create spikes!", {200,200,255})
     else 
@@ -548,7 +558,7 @@ function CallSpikes.action_func(caster, x, y)
     end
     local tx, ty = math.round((caster.x+dx*24) / 32) * 32 + 16, math.round((caster.y+dy*24) / 32) * 32 + 16
     for i=2,#points do
-        local obj = SpellObjects.SpellSpikes.create { points = points, point_index = i, caster = caster}
+        local obj = SpellObjects.SpellSpikes.create { points = points, point_index = i, caster = caster, duration = 800}
         GameObject.add_to_level(obj)
     end
 end
@@ -563,8 +573,9 @@ local Wallanthor = {
     can_cast_with_held_key = false,
     spr_spell = "spr_spells.spell-wall",
     can_cast_with_cooldown = false,
-    mp_cost = 30,
-    cooldown = 45,
+    mp_cost = 10,
+    cooldown = 25,
+    spell_cooldown = 100,
     fallback_to_melee = false,
 }
 

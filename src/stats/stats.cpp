@@ -107,7 +107,7 @@ EffectiveAttackStats EffectiveStats::with_attack(MTwist& mt,
 	return ret;
 }
 
-void CooldownStats::step() {
+void CooldownStats::step(bool is_resting) {
 	if (--action_cooldown < 0)
 		action_cooldown = 0;
 	if (--rest_cooldown < 0)
@@ -118,6 +118,10 @@ void CooldownStats::step() {
 		hurt_cooldown = 0;
 	if (--stopaction_timeout < 0)
 		stopaction_timeout = 0;
+	int cooldown_rate = is_resting ? 8 : 1;
+	for (auto& spell : spell_cooldowns) {
+	    spell.second = std::max(0, spell.second - cooldown_rate);
+	}
 }
 
 void CooldownStats::reset_action_cooldown(int cooldown) {
@@ -214,4 +218,24 @@ SpellsKnown parse_spells_known(const LuaField& value) {
         ret.add_spell(res::spell_id(spell));
     }
     return ret;
+}
+
+void CooldownStats::serialize(GameState* gs, SerializeBuffer& serializer) {
+    SERIALIZE_POD_REGION(serializer, this, action_cooldown, stopaction_timeout);
+    serializer.write_int(0x700DBABE);
+    serializer.write_int(spell_cooldowns.size());
+    for (auto& pair : spell_cooldowns) {
+        serializer.write_int(pair.first);
+        serializer.write_int(pair.second);
+    }
+    serializer.write_int(0x700DBABE);
+}
+void CooldownStats::deserialize(GameState* gs, SerializeBuffer& serializer) {
+    DESERIALIZE_POD_REGION(serializer, this, action_cooldown, stopaction_timeout);
+    spell_cooldowns.clear();
+    LANARTS_ASSERT(serializer.read_int() == 0x700DBABE);
+    for (int i = 0; i < serializer.read_int(); i++) {
+        spell_cooldowns[serializer.read_int()] = serializer.read_int();
+    }
+    LANARTS_ASSERT(serializer.read_int() == 0x700DBABE);
 }

@@ -8,8 +8,8 @@ SpellObjects = require "objects.SpellObjects"
 Data.spell_create {
     name: "Ice Form"
     spr_spell: "spr_spells.iceform"
-    description: "A very powerful ability for safe exploration. Initiates Ice Form, preventing attacks and spells, lowering speed drastically, but providing near immunity for 10 seconds." 
-    mp_cost: 10
+    description: "Initiates Ice Form, a powerful ability for safe dungeoneering, preventing attacks and spells, and lowering speed drastically, but providing near immunity for 10 seconds." 
+    mp_cost: 40
     cooldown: 100
     can_cast_with_held_key: false
     fallback_to_melee: false
@@ -37,7 +37,6 @@ Data.effect_create {
         new.willpower += 20
         new.reduction += 20
         new.magic_reduction += 20
-        new.mp, new.max_mp = 1,1
         new.speed /= 2
     fade_out: 55
 }
@@ -54,11 +53,8 @@ AuraBase = {
         assert @range ~= nil, "'range' must be assigned to Aura effects."
     draw: (inner_col, outer_col, x, y) =>
         @n_steps += 1
-        min = math.min(@n_ramp, math.max(@n_steps, math.abs(@n_steps - @time_left)))
-        alpha = (min / @n_ramp) * 2
-        if alpha > 1.0
-            -- Wrap around the alpha:
-            alpha = 1 - (alpha - 1) 
+        min = math.min(@n_ramp, if @n_steps > @total_time / 2 then math.abs(@n_steps - @total_time) else @n_steps)
+        alpha = (min / @n_ramp)
         alpha = math.max(0.2, math.min(alpha, 1))
         alpha *= @max_alpha
         xy = Display.to_screen_xy {x, y}
@@ -102,7 +98,7 @@ Data.effect_create {
     effected_sprite: "spr_spells.cause_fear"
     init_func: (caster) =>
         AuraBase.init(@, caster)
-        @max_alpha = 0.9
+        @max_alpha = 0.4
     step_func: (caster) =>
         AuraBase.step(@, caster)
         for mon in *(Map.monsters_list() or {})
@@ -131,7 +127,7 @@ Data.effect_create {
     fade_out: 100
     init_func: (caster) =>
         AuraBase.init(@, caster)
-        @max_alpha = 0.9
+        @max_alpha = 0.4
     step_func: (caster) =>
         AuraBase.step(@, caster)
         for p in *(Map.players_list() or {})
@@ -166,6 +162,7 @@ Data.effect_create {
 Data.effect_create {
     name: "Pain Aura"
     category: "Aura"
+    effected_sprite: "spr_spells.greaterpain"
     fade_out: 100
     init_func: (caster) =>
         AuraBase.init(@, caster)

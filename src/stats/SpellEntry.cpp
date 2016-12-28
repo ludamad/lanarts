@@ -20,7 +20,8 @@ void SpellEntry::parse_lua_table(const LuaValue& table) {
 
 	sprite = res::sprite_id(table["spr_spell"].to_str());
 
-	cooldown = table["cooldown"].to_num();
+    cooldown = table["cooldown"].to_num();
+    spell_cooldown = defaulted(table, "spell_cooldown", 0);
 	mp_cost = table["mp_cost"].to_num();
 
 	if (!table["projectile"].isnil()) {

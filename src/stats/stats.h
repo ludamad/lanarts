@@ -11,6 +11,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <map>
 
 #include "lanarts_defines.h"
 
@@ -22,6 +23,7 @@ struct AttackStats;
 struct ClassEntry;
 class MTwist;
 class LuaField;
+struct GameState;
 
 /* Core combat stats*/
 struct CoreStats {
@@ -156,18 +158,14 @@ struct EffectiveStats {
 
 /* Cooldown, eg count before a certain action can be done again*/
 struct CooldownStats {
-	int action_cooldown;
-	int pickup_cooldown;
-	int rest_cooldown;
-	int hurt_cooldown;
-	int stopaction_timeout;
+	int action_cooldown = 0;
+	int pickup_cooldown = 0;
+	int rest_cooldown = 0;
+	int hurt_cooldown = 0;
+	int stopaction_timeout = 0;
+	std::map<spell_id, int> spell_cooldowns;
 
-	CooldownStats() :
-			action_cooldown(0), pickup_cooldown(0), rest_cooldown(0), hurt_cooldown(
-					0), stopaction_timeout(0) {
-	}
-
-	void step();
+	void step(bool is_resting);
 
 	bool can_rest() {
 		return rest_cooldown <= 0;
@@ -184,6 +182,9 @@ struct CooldownStats {
 	bool can_do_stopaction() {
 		return stopaction_timeout <= 0;
 	}
+
+        void serialize(GameState* gs, SerializeBuffer& serializer);
+        void deserialize(GameState* gs, SerializeBuffer& serializer);
 
 	void reset_action_cooldown(int cooldown);
 	void reset_pickup_cooldown(int cooldown);

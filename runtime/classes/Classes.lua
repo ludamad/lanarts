@@ -132,7 +132,9 @@ Data.class_create {
       { spell = "Magic Arrow",
         level_needed = 1 },
       { spell = "Expedite",
-        level_needed = 2 }
+        level_needed = 1 },
+      { spell = "Call Spikes",
+        level_needed = 2 },
     },
     start_stats = {
         movespeed = 4,

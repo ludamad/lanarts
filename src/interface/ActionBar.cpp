@@ -200,7 +200,17 @@ static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 		spell_id spell = spells.get(i);
 		SpellEntry& spl_entry = res::spell(spell);
 		SpriteEntry& spr_entry = game_sprite_data.at(spl_entry.sprite);
-		res::sprite(spl_entry.sprite).draw(Pos(sx + i * TILE_SIZE, sy));
+		ldraw::DrawOptions options;
+		int cooldown = player->cooldowns().spell_cooldowns[spl_entry.id];
+		if (spl_entry.spell_cooldown) {
+		    int waited = spl_entry.spell_cooldown - cooldown;
+	        options.draw_colour.a = 255 * waited / spl_entry.spell_cooldown;
+		}
+		res::sprite(spl_entry.sprite).draw(options, Pos(sx + i * TILE_SIZE, sy));
+		if (cooldown > 0) {
+            options.draw_colour.a = 255 - options.draw_colour.a;
+	        res::sprite("spr_spells.sloading").draw(options, Pos(sx + i * TILE_SIZE, sy));
+		}
 	}
 
 	for (int x = sx, spellidx = 0; x < bounds.x2; x += TILE_SIZE, spellidx++) {

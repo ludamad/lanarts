@@ -18,18 +18,14 @@
 #include "items/items.h"
 
 struct SpellEntry: public ResourceEntryBase {
-	sprite_id sprite;
-	int mp_cost, cooldown;
+	sprite_id sprite = NONE;
+	int mp_cost = 0, cooldown = 0, spell_cooldown = 0;
 	LuaLazyValue action_func; // Immediate action
 	LuaLazyValue autotarget_func; // Auto-target func
 	LuaLazyValue prereq_func; // Pre-req to casting
 	Projectile projectile; // Projectile used, if any
-	bool can_cast_with_cooldown, can_cast_with_held_key, fallback_to_melee;
+	bool can_cast_with_cooldown = false, can_cast_with_held_key = false, fallback_to_melee = false;
 
-	SpellEntry() :
-			sprite(-1), mp_cost(0), cooldown(0), can_cast_with_cooldown(false), can_cast_with_held_key(
-					false), fallback_to_melee(false) {
-	}
 	virtual const char* entry_type() {
 		return "Spell";
 	}

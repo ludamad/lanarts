@@ -7,7 +7,7 @@ local Sprite = require "ui.Sprite"
 local World = require "core.World"
 
 local function action_bar_hints_create()
-    local hint_text = {'H', ' ', 'Y', 'U', 'I', 'O', 'P'}
+    local hint_text = {'H', ' ', 'Y', 'U', 'I', 'O', 'P', 'J', 'K', 'L'}
     local options = {origin = Display.CENTER_TOP}
 
     local hints = { size = {32 * #hint_text, 32}, step = do_nothing }

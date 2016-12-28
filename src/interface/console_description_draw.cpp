@@ -356,7 +356,7 @@ void draw_console_spell_description(GameState* gs, SpellEntry& entry) {
 	if (!entry.projectile.empty()) {
 		draw_projectile_description_overlay(gs, dbh, entry.projectile);
 	}
-	draw_value(gs, dbh, "Cooldown: ", entry.cooldown, COL_PALE_YELLOW,
+	draw_value(gs, dbh, "Cooldown: ", std::max(entry.cooldown, entry.spell_cooldown), COL_PALE_YELLOW,
 			COL_PALE_RED);
 }
 

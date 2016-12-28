@@ -14,6 +14,8 @@
 #include "ClassEntry.h"
 #include "combat_stats.h"
 
+#include "objects/CombatGameInst.h"
+
 #include "items/items.h"
 
 #include "stat_formulas.h"
@@ -30,7 +32,7 @@ void CombatStats::step(GameState* gs, CombatGameInst* inst,
 		const EffectiveStats& effective_stats) {
 
 	core.step(effective_stats.core);
-	cooldowns.step();
+	cooldowns.step(inst->is_resting);
 	effects.step(gs, inst);
 }
 

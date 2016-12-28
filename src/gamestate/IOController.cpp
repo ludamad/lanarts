@@ -93,7 +93,7 @@ IOController::IOController() {
 	SDL_Keymod item_mod = SDL_Keymod(KMOD_LCTRL | KMOD_RCTRL);
 
 	// Spell choice
-	bind_key_events(event_bindings, "yuiop", IOEvent::ACTIVATE_SPELL_N,
+	bind_key_events(event_bindings, "yuiopjkl", IOEvent::ACTIVATE_SPELL_N,
 			KMOD_NONE, KMOD_NONE, true);
 //	bind_key_events(event_bindings, "12345", IOEvent::ACTIVATE_SPELL_N,
 //			KMOD_NONE, item_mod/*rejected*/, true);

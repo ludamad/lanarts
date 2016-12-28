@@ -98,8 +98,8 @@ public:
 public:
 	float vx, vy;
 	float rx, ry;
-protected:
 	bool is_resting = false;
+protected:
 	sprite_id sprite;
 	simul_id simulation_id;
 	obj_id current_target;

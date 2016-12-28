@@ -293,6 +293,8 @@ static void player_use_spell(GameState* gs, PlayerInst* p,
             p->effective_stats().cooldown_modifiers.spell_cooldown_multiplier;
     p->cooldowns().reset_action_cooldown(
             spl_entry.cooldown * spell_cooldown_mult);
+    // Set global cooldown for spell:
+    p->cooldowns().spell_cooldowns[spl_entry.id] = std::max(int(spl_entry.spell_cooldown * spell_cooldown_mult), p->cooldowns().spell_cooldowns[spl_entry.id]);
     if (spl_entry.uses_projectile()) {
         player_use_projectile_spell(gs, p, spl_entry, spl_entry.projectile,
                 target);
@@ -699,6 +701,9 @@ void PlayerInst::use_spell(GameState* gs, const GameAction& action) {
     spell_id spell = spells_known().get(action.use_id);
     SpellEntry& spl_entry = res::spell(spell);
 
+    if (cooldowns().spell_cooldowns[spell] > 0) {
+        return;
+    }
     if (spl_entry.mp_cost > core_stats().mp
             || (!spl_entry.can_cast_with_cooldown && !cooldowns().can_doaction())) {
         return;

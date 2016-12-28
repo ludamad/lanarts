@@ -22,7 +22,7 @@ function poison_step(effect, obj)
 	else
 		effect.steps = 0
                 -- Offset the stat mod above:
-                local mod = poison_attack_modifier(effect, 1.0)
+                local mod = poison_attack_modifier(effect, 0.7)
 		obj:damage(effect.damage * mod, effect.power, effect.magic_percentage, mod)
 	end
 end
