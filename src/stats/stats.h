@@ -183,8 +183,8 @@ struct CooldownStats {
 		return stopaction_timeout <= 0;
 	}
 
-        void serialize(GameState* gs, SerializeBuffer& serializer);
-        void deserialize(GameState* gs, SerializeBuffer& serializer);
+    void serialize(GameState* gs, SerializeBuffer& serializer);
+    void deserialize(GameState* gs, SerializeBuffer& serializer);
 
 	void reset_action_cooldown(int cooldown);
 	void reset_pickup_cooldown(int cooldown);

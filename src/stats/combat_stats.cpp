@@ -206,7 +206,7 @@ float AttackStats::atk_resist_modifier() const {
 
 void CombatStats::serialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.write(core);
-	serializer.write(cooldowns);
+	cooldowns.serialize(gs, serializer);
 	serializer.write(class_stats);
 	equipment.serialize(serializer);
 	effects.serialize(gs, serializer);
@@ -221,7 +221,7 @@ void CombatStats::serialize(GameState* gs, SerializeBuffer& serializer) {
 
 void CombatStats::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	serializer.read(core);
-	serializer.read(cooldowns);
+    cooldowns.deserialize(gs, serializer);
 	serializer.read(class_stats);
 	equipment.deserialize(serializer);
 	effects.deserialize(gs, serializer);

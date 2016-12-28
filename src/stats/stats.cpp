@@ -221,21 +221,24 @@ SpellsKnown parse_spells_known(const LuaField& value) {
 }
 
 void CooldownStats::serialize(GameState* gs, SerializeBuffer& serializer) {
+    serializer.write_int(0x800DBABE);
     SERIALIZE_POD_REGION(serializer, this, action_cooldown, stopaction_timeout);
-    serializer.write_int(0x700DBABE);
+//    serializer.write_int(0x700DBABE);
     serializer.write_int(spell_cooldowns.size());
     for (auto& pair : spell_cooldowns) {
         serializer.write_int(pair.first);
         serializer.write_int(pair.second);
     }
-    serializer.write_int(0x700DBABE);
+//    serializer.write_int(0x700DBABE);
 }
 void CooldownStats::deserialize(GameState* gs, SerializeBuffer& serializer) {
+    LANARTS_ASSERT(serializer.read_int() == 0x800DBABE);
     DESERIALIZE_POD_REGION(serializer, this, action_cooldown, stopaction_timeout);
     spell_cooldowns.clear();
-    LANARTS_ASSERT(serializer.read_int() == 0x700DBABE);
-    for (int i = 0; i < serializer.read_int(); i++) {
+//    LANARTS_ASSERT(serializer.read_int() == 0x700DBABE);
+    int size = serializer.read_int();
+    for (int i = 0; i < size; i++) {
         spell_cooldowns[serializer.read_int()] = serializer.read_int();
     }
-    LANARTS_ASSERT(serializer.read_int() == 0x700DBABE);
+//    LANARTS_ASSERT(serializer.read_int() == 0x700DBABE);
 }
