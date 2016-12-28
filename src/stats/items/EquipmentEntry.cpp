@@ -9,6 +9,7 @@
 #include "stats/effect_data.h"
 #include "ProjectileEntry.h"
 #include <vector>
+#include <string>
 
 using namespace std;
 
