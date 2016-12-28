@@ -81,36 +81,67 @@ void Inventory::deserialize(SerializeBuffer& serializer) {
 	}
 }
 
+static EquipmentEntry::equip_type SPECIAL_SLOTS[] = {EquipmentEntry::RING, EquipmentEntry::AMULET, EquipmentEntry::BODY_ARMOUR};
+
+
+static bool have_equipped(const Inventory& inv, const std::string& name) {
+    for (auto& slot : inv.raw_slots()) {
+        if (!slot.is_equipped()) {
+            continue;
+        }
+        if (slot.item.equipment_entry().name == name) {
+            return true;
+        }
+    }
+    return false;
+}
+
 static int number_of_equip_slots(const Inventory& inv, int type) {
     int max_slots = 1;
     if (type == EquipmentEntry::RING) {
         max_slots += 1;
-        itemslot_t amulet_slot = inv.get_equipped(EquipmentEntry::AMULET);
-        if (amulet_slot != -1) {
-            if (inv.get(amulet_slot).item.equipment_entry().name == "Amulet of Ringholding") {
-                max_slots += 1;
-            }
+        if (have_equipped(inv, "Ring of Ethereal Armour")) {
+            max_slots = 1;
+        } else if (have_equipped(inv, "Amulet of Ringholding")) {
+            max_slots += 1;
+        }
+    } else if (type == EquipmentEntry::AMULET) {
+        if (have_equipped(inv, "Amulet of Greed")) {
+            max_slots += 2;
+        }
+    } else if (type == EquipmentEntry::BODY_ARMOUR) {
+        if (have_equipped(inv, "Ring of Ethereal Armour")) {
+            max_slots += 1;
         }
     }
+
     return max_slots;
 }
 
-// Only applies to rings for now, as our only variable-slot item:
 void Inventory::__dequip_overfilled_slots() {
-    int max_slots = number_of_equip_slots(*this, EquipmentEntry::RING);
-    int type = EquipmentEntry::RING;
-    itemslot_t last_slot = -1;
-    int nslots = 0;
-    for (;;) {
-            itemslot_t current_slot = get_equipped(type, last_slot);
-            if (current_slot == -1) {
-                    break;
-            } else {
-                    last_slot = current_slot;
-                    if (++nslots > max_slots) {
-                        get(last_slot).equipped = false;
+    // Account for chains of Amulet of Greed's and ring interactions and such:
+    while (true) {
+        bool did_something = false;
+        for (auto type : SPECIAL_SLOTS) {
+            int max_slots = number_of_equip_slots(*this, type);
+            itemslot_t last_slot = -1;
+            int nslots = 0;
+            for (;;) {
+                    itemslot_t current_slot = get_equipped(type, last_slot);
+                    if (current_slot == -1) {
+                            break;
+                    } else {
+                            last_slot = current_slot;
+                            if (++nslots > max_slots) {
+                                get(last_slot).equipped = false;
+                                did_something = true;
+                            }
                     }
             }
+        }
+        if (!did_something) {
+            return;
+        }
     }
 }
 
@@ -140,14 +171,11 @@ void Inventory::equip(itemslot_t i) {
 			last_slot = current_slot;
 		}
 	}
-	// We should never have more equip slots than those available
-	LANARTS_ASSERT(nslots <= max_slots);
-
 	if (nslots >= max_slots) {
 		get(last_slot).equipped = false;
 	}
 	slot.equipped = true;
-        __dequip_overfilled_slots();
+	__dequip_overfilled_slots();
 	__dequip_projectile_if_invalid();
 }
 // Returns NULL if nothing equipped

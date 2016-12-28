@@ -11,6 +11,18 @@ Data.equipment_create {
     --stat_bonuses = { mp = -25}
 }
 
+Data.equipment_create {
+    name = "Amulet of Greed",
+    description = "Grants the user the ability to wear two additional amulets.",
+    type = "amulet",
+
+    shop_cost = { 220, 440 },
+
+    spr_item = "spr_amulets.greed",
+    -- Implemented in C++
+}
+
+
 -- name = "Amulet of Festivity",
 Data.equipment_create {
     name = "Amulet of Fear",

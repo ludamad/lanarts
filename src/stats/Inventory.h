@@ -117,6 +117,10 @@ public:
 	std::vector<ItemSlot>& raw_slots() {
 	    return items;
 	}
+    // For performance of iteration
+    const std::vector<ItemSlot>& raw_slots() const {
+        return items;
+    }
 	itemslot_t get_equipped(int type, itemslot_t last_slot = -1) const;
 private:
 	void __dequip_projectile_if_invalid();

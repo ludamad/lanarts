@@ -11,6 +11,29 @@ Data.equipment_create {
 }
 
 Data.equipment_create {
+    name = "Ring of Ethereal Armour",
+    description = "You may only have this ring equipped, of all your rings. You may equip an additional piece of body armour.",
+    type = "ring",
+
+    shop_cost = { 225, 405 },
+
+    spr_item = "spr_rings.ethereal",
+}
+
+Data.equipment_create {
+    name = "Ring of Vampirism",
+    description = "A ring that passively sucks the life of those you physically strike.",
+    type = "ring",
+
+    shop_cost = { 95, 125 },
+
+    spr_item = "spr_rings.vampirism",
+
+    effects_granted = {"VampiricWeapon"}
+}
+
+
+Data.equipment_create {
     name = "Ogre's Ring",
     description = "A large ring that grants the user brutish force, at the cost of physical defences.",
     type = "ring",

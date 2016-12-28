@@ -12,35 +12,38 @@ _filter = (group) ->
 -- Rings
 rings = (chance, args) -> _filter{
     :chance
-    args.ignore_strong or { item: "Magician's Ring",    chance: 2                      }
-    args.ignore_strong or { item: "Moonstone Ring",     chance: 2                      }
-    args.ignore_strong or { item: "Ogre's Ring",        chance: 2                      }
-    args.ignore_strong or { item: "Hydra Ring",         chance: 2                      }
-    args.ignore_strong or{  item: "Gallanthor's Ring",  chance: 1                      }
-    { item: "Ring of Spells",     chance: 2                      }
-    { item: "Ring of Vitality",   chance: 2                      }
-    { item: "Ring of Stone",      chance: 1                      }
---    { item: RANDART("Ring"),      chance: 1                      }
+    args.ignore_medium or { item: "Magician's Ring",    chance: 8                      }
+    args.ignore_medium or { item: "Moonstone Ring",     chance: 8                      }
+    args.ignore_medium or { item: "Ogre's Ring",        chance: 8                      }
+    args.ignore_medium or { item: "Hydra Ring",         chance: 8                      }
+    args.ignore_medium or{  item: "Gallanthor's Ring",  chance: 4                      }
+    args.ignore_strong or{  item: "Ring of Ethereal Armour",  chance: 1                      }
+    args.ignore_strong or{  item: "Ring of Vampirism",  chance: 1                      }
+    { item: "Ring of Spells",     chance: 8                      }
+    { item: "Ring of Vitality",   chance: 8                      }
+    { item: "Ring of Stone",      chance: 4                      }
+--    { item: RANDART("Ring"),      chance: 4                      }
 }
 
 -- Amulets
 amulets = (chance, args) -> { 
     :chance
-    { item: "Amulet of the Wall", chance: 1 }
-    { item: "Amulet of Fear", chance: 1 }
-    { item: "Amulet of Ringholding", chance: 1 }
-    { item: "Amulet of Trepidation", chance: 1 }
-    { item: "Amulet of Mephitization", chance: 1 }
-    { item: "Amulet of Regeneration", chance: 1 }
-    { item: "Amulet of Fire", chance: 1 }
-    { item: "Amulet of Greater Fire", chance: 1 }
-    { item: "Amulet of Protection", chance: 1 }
-    { item: "Amulet of the Berserker", chance: 1 }
-    { item: "Amulet of Pain", chance: 1 }
-    { item: "Amulet of Great Pain", chance: 1 }
-    { item: "Amulet of Ringholding", chance: 1 }
-    { item: "Amulet of Ice Form", chance: 1 }
-    { item: "Amulet of Light", chance: 1 }
+    { item: "Amulet of the Wall", chance: 4 }
+    { item: "Amulet of Fear", chance: 4 }
+    { item: "Amulet of Ringholding", chance: 4 }
+    { item: "Amulet of Trepidation", chance: 4 }
+    { item: "Amulet of Mephitization", chance: 4 }
+    { item: "Amulet of Greed", chance: 1 }
+    { item: "Amulet of Regeneration", chance: 4 }
+    { item: "Amulet of Fire", chance: 4 }
+    { item: "Amulet of Greater Fire", chance: 4 }
+    { item: "Amulet of Protection", chance: 4 }
+    { item: "Amulet of the Berserker", chance: 4 }
+    { item: "Amulet of Pain", chance: 4 }
+    { item: "Amulet of Great Pain", chance: 4 }
+    { item: "Amulet of Ringholding", chance: 4 }
+    { item: "Amulet of Ice Form", chance: 4 }
+    { item: "Amulet of Light", chance: 4 }
 --    { item: RANDART("Amulet"),      chance: 1 }
 }
 

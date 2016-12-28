@@ -164,6 +164,15 @@ Data.effect_create {
 -- TODO separate into ItemEffects.moon
 
 Data.effect_create {
+    name: "VampiricWeapon"
+    on_melee_func: (attacker, defender, damage, will_die, attack_stats) =>
+        if attacker\is_local_player() 
+            EventLog.add("You steal the enemy's life!", {200,200,255})
+        attacker\heal_hp(damage / 10)
+}
+
+
+Data.effect_create {
     name: "PoisonedWeapon"
     on_melee_func: (attacker, defender, damage, will_die, attack_stats) =>
         if defender\has_effect("Poison")
