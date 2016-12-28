@@ -215,14 +215,12 @@ define_randart = (rng, base, images, enchanter) ->
             rng\random_choice(MINOR_ENCHANTS)(rng, data)
         n_enchants -= 1
     if enchanter
-       enchanter(rng, data)
+       enchanter(rng, data, power_level)
     table.insert(RANDARTS[power_level], data.name)
     return data
 
-apply_enchantment = (rng, data) ->
-    enchantment = if data.cooldown then 1 else 0
-    while enchantment < 3 and rng\randomf() < (if data.cooldown then 0.2 else 0.1)
-        enchantment += 1
+apply_enchantment = (rng, data, enchantment) ->
+    enchantment = if data.cooldown then enchantment * 2 else 0
     if enchantment > 0
         data.name = "+#{enchantment} #{data.name}"
         if data.cooldown

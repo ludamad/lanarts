@@ -116,6 +116,35 @@ Data.effect_create {
 }
 
 Data.effect_create {
+    name: "Healing"
+    category: "Aura"
+    effected_sprite: "spr_amulets.healing"
+    fade_out: 25
+    step_func: (obj) =>
+        obj\heal_hp(20 / 60)
+}
+
+Data.effect_create {
+    name: "Healing Aura"
+    category: "Aura"
+    effected_sprite: "spr_amulets.healing"
+    fade_out: 100
+    init_func: (caster) =>
+        AuraBase.init(@, caster)
+        @max_alpha = 0.9
+    step_func: (caster) =>
+        AuraBase.step(@, caster)
+        for p in *(Map.players_list() or {})
+            if p\has_effect("Healing")
+                continue
+            dist = vector_distance({p.x, p.y}, {caster.x, caster.y})
+            if dist < @range
+                p\add_effect("Healing", 200)
+    draw_func: (caster, top_left_x, top_left_y) =>
+        AuraBase.draw(@, COL_GRAY, COL_WHITE, caster.x, caster.y)
+}
+
+Data.effect_create {
     name: "Daze Aura"
     category: "Aura"
     effected_sprite: "spr_amulets.light"

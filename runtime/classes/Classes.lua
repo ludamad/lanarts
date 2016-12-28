@@ -20,6 +20,7 @@ local TEST_INVENTORY = os.getenv("LANARTS_TESTITEMS") and {
      --{item = "Amulet of Ringholding", amount = 1},
      { item = "Amulet of Mephitization", amount = 1 },
      { item = "Amulet of Greed", amount = 1 },
+     { item = "Amulet of Healing", amount = 1 },
      {item = "Amulet of Great Pain", amount = 1},
      {item = "Amulet of Ice Form", amount = 1},
      {item = "Amulet of Light", amount = 1},

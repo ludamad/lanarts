@@ -36,6 +36,18 @@ Data.equipment_create {
 }
 
 Data.equipment_create {
+    name = "Amulet of Healing",
+    description = "Grants the user the ability to cast 'Healing Aura'.",
+    type = "amulet",
+
+    shop_cost = { 120, 140 },
+
+    spr_item = "spr_amulets.healing",
+    spells_granted = {"Healing Aura"},
+}
+
+
+Data.equipment_create {
     name = "Amulet of Trepidation",
     description = "Grants the user the spell 'Trepidize'.",
     type = "amulet",

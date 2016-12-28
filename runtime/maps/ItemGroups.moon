@@ -32,6 +32,7 @@ amulets = (chance, args) -> {
     { item: "Amulet of Fear", chance: 4 }
     { item: "Amulet of Ringholding", chance: 4 }
     { item: "Amulet of Trepidation", chance: 4 }
+    { item: "Amulet of Healing", chance: 4 }
     { item: "Amulet of Mephitization", chance: 4 }
     { item: "Amulet of Greed", chance: 1 }
     { item: "Amulet of Regeneration", chance: 4 }

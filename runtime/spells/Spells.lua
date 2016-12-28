@@ -300,6 +300,44 @@ end
 
 Data.spell_create(Pain)
 
+-- HEAL AURA --
+
+local HealAura = {
+    name = "Healing Aura",
+    description = "Greatly boosts the healing of nearby allies.",
+    can_cast_with_held_key = false,
+    spr_spell = "spr_amulets.healing",
+    can_cast_with_cooldown = false,
+    mp_cost = 25,
+    cooldown = 45,
+    fallback_to_melee = false,
+    range = 80
+}
+
+function HealAura.action_func(caster, x, y, target)
+    local stats = caster:effective_stats()
+    caster:add_effect("Healing Aura", 800).range = HealAura.range
+    if caster:is_local_player() then
+        EventLog.add("You release a healing radiance!", {200,200,255})
+    else
+        EventLog.add(caster.name .. " releases a healing radiance!", {200,200,255})
+    end
+end
+
+function HealAura.prereq_func(caster)
+    for mon in values(Map.players_list() or {}) do
+        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + HealAura.range then
+            return true
+        end
+    end
+    EventLog.add("No allies in sight!", COL_PALE_RED)
+    return false
+end
+
+HealAura.autotarget_func = Pain.autotarget_func
+
+Data.spell_create(HealAura)
+
 -- DAZE AURA --
 
 local Luminos = {
@@ -309,8 +347,8 @@ local Luminos = {
     spr_spell = "spr_amulets.light",
     can_cast_with_cooldown = false,
     mp_cost = 25,
-    cooldown = 25, -- Uses cooldown of weapon
-    fallback_to_melee = true,
+    cooldown = 25,
+    fallback_to_melee = false,
     range = 80
 }
 
