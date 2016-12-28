@@ -24,6 +24,18 @@ Data.equipment_create {
 }
 
 Data.equipment_create {
+    name = "Spiked Belt",
+    description = "Your can cast 'Call Spikes'.",
+    type = "belt",
+
+    shop_cost = { 200, 250 },
+
+    spr_item = "spr_belts.spike",
+
+    spells_granted = {"Call Spikes"}
+}
+
+Data.equipment_create {
     name = "Dank Belt",
     description = "Your melee attacks have a 25% chance of poisoning targets.",
     type = "belt",

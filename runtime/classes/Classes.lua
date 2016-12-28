@@ -9,9 +9,10 @@ local TEST_INVENTORY = os.getenv("LANARTS_TESTITEMS") and {
      {item = "Belt of Slaying", amount = 1},
      {item = "Dank Belt", amount = 1},
      {item = "Belt of Protection", amount = 1},
+     {item = "Spiked Belt", amount = 1},
      -- For testing spell amulets:
      --{item = "Amulet of Fear", amount = 1}, 
-     --{item = "Amulet of Trepidation", amount = 1},
+     {item = "Amulet of Trepidation", amount = 1},
      --{item = "Amulet of Regeneration", amount = 1},
      --{item = "Amulet of Fire", amount = 1},
      --{item = "Amulet of Greater Fire", amount = 1},

@@ -191,19 +191,21 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	getters["stats"].bind_function(lapi_gameinst_stats);
 
 	LuaValue methods = luameta_constants(meta);
+    methods["is_combat_object"] = true;
     methods["effective_stats"].bind_function(lapi_gameinst_effectivestats);
     LUAWRAP_GETTER(getters, weapon_range, OBJ->equipment().weapon().weapon_entry().range());
+
 	LUAWRAP_METHOD(methods, heal_fully, OBJ->stats().core.heal_fully());
 	LUAWRAP_METHOD(methods, direct_damage, OBJ->damage(lua_api::gamestate(L), lua_tointeger(L, 2)));
 	LUAWRAP_METHOD(methods, melee, luawrap::push(L, OBJ->melee_attack(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2), OBJ->equipment().weapon(), true)) );
 
     methods["damage"].bind_function(lapi_combatgameinst_damage);
 	methods["heal_hp"].bind_function(lapi_combatgameinst_heal_hp);
-	methods["heal_mp"].bind_function(lapi_combatgameinst_heal_mp);
+    methods["heal_mp"].bind_function(lapi_combatgameinst_heal_mp);
 
 	LUAWRAP_METHOD(methods, add_effect, OBJ->effects().add(lua_api::gamestate(L), OBJ, effect_from_lua(L, 2), lua_tointeger(L, 3)).push() );
     LUAWRAP_GETTER(methods, has_effect, OBJ->effects().get(effect_from_lua(L, 2)) != NULL);
-    LUAWRAP_GETTER(methods, has_effect_category, OBJ->effects().has_category(luawrap::get<const char*>(L, 2)) != NULL);
+    LUAWRAP_GETTER(methods, has_effect_category, OBJ->effects().has_category(luawrap::get<const char*>(L, 2)));
 
 	methods["reset_rest_cooldown"].bind_function(lapi_do_nothing);
 
@@ -217,7 +219,8 @@ static LuaValue lua_enemyinst_metatable(lua_State* L) {
 	LuaValue methods = luameta_constants(meta), getters = luameta_getters(meta), setters = luameta_setters(meta);
 
 	LUAWRAP_GETTER(getters, name, OBJ->etype().name);
-	LUAWRAP_GETTER(getters, unique, OBJ->etype().unique);
+    LUAWRAP_GETTER(getters, unique, OBJ->etype().unique);
+    LUAWRAP_GETTER(getters, is_enemy, true);
 	LUAWRAP_GETTER(getters, kills, 0);
 
 	return meta;
@@ -242,9 +245,11 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	methods["init"] = meta["init"];
 
 	LuaValue getters = luameta_getters(meta);
+    LUAWRAP_GETTER(getters, is_enemy, false);
 	LUAWRAP_GETTER(getters, name, OBJ->player_entry(lua_api::gamestate(L)).player_name);
 	LUAWRAP_GETTER(getters, class_name, OBJ->class_stats().class_entry().name);
-	LUAWRAP_GETTER(getters, kills, OBJ->score_stats().kills);
+    LUAWRAP_GETTER(getters, kills, OBJ->score_stats().kills);
+    LUAWRAP_GETTER(getters, target, lua_api::gamestate(L)->get_instance(OBJ->target()));
 	LUAWRAP_GETTER(getters, deepest_floor, OBJ->score_stats().deepest_floor);
 	LUAWRAP_GETTER(getters, deaths, OBJ->score_stats().deaths);
     LUAWRAP_GETTER(getters, spells, OBJ->stats().spells.spell_id_list());

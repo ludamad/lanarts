@@ -96,6 +96,7 @@ belts = (chance) -> {
     { item: "Belt of Protection",      chance: 10                      }
     { item: "Belt of Slaying",        chance: 10                      }
     { item: "Warped Belt",        chance: 1                      }
+    { item: "Spiked Belt",        chance: 10                      }
     { item: "Dank Belt",        chance: 1                      }
 }
 

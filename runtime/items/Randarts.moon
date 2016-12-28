@@ -71,6 +71,21 @@ get_name_and_description = (rng, artifact, power_level) ->
     }
     return "#{artifact} of #{person[1]}'s #{trait}", person[2] .. " " .. power_adjective
 
+add_random_effect = () -> (rng, data) ->
+    if data.effects_granted
+        return -- For now, dont have double effects.
+    data.effects_granted or= {}
+    effect = random_choice {
+        "VampiricWeapon"
+        "ConfusingWeapon"
+        "PoisonedWeapon"
+        "FearWeapon"
+    }
+    if table.contains(data.effects_granted, effect) 
+        return
+    data.description ..= " Grants the user the buff '#{effect}'."
+    append data.effects_granted, effect
+
 add_random_spell = () -> (rng, data) ->
     if data.spells_granted
         return -- For now, dont have double spell items.
@@ -88,9 +103,14 @@ add_random_spell = () -> (rng, data) ->
         "Magic Blast",
         "Power Strike",
         "Pain",
+        "Greater Pain",
         "Fear Strike",
         "Expedite",
         "Wallanthor",
+        "Call Spikes",
+        "Luminos",
+        "Healing Aura",
+        "Ice Form",
     }
     if table.contains(data.spells_granted, spell) 
         return
@@ -126,6 +146,7 @@ local MINOR_ENCHANTS, MAJOR_ENCHANTS, MINOR_DEBUFFS, MAJOR_DEBUFFS
 MINOR_ENCHANTS = {
     mult_stat_bonus("spell_velocity_multiplier", {1.10, 1.25})
     add_random_spell()
+    add_random_effect()
     additive_stat_bonus("mp", {10, 35})
     additive_stat_bonus("hp", {10, 35})
     additive_stat_bonus("hpregen", {0.02, 0.03})

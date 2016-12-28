@@ -504,6 +504,57 @@ end
 
 Data.spell_create(Expedite)
 
+-- CallSpikes --
+
+local CallSpikes = {
+    name = "Call Spikes",
+    description = "Calls forth spikes.",
+    can_cast_with_held_key = false,
+    spr_spell = "spr_spells.arrow",
+    can_cast_with_cooldown = false,
+    mp_cost = 30,
+    cooldown = 45,
+    fallback_to_melee = true,
+}
+
+function CallSpikes.prereq_func(caster)
+    return true
+end
+
+function CallSpikes.autotarget_func(caster)
+    if caster.target then
+        return caster.target.x, caster.target.y
+    end
+    return nil
+end
+
+function CallSpikes.action_func(caster, x, y)
+    if caster:is_local_player() then
+        EventLog.add("You create spikes!", {200,200,255})
+    else 
+        EventLog.add(caster.name .. " creates spikes!", {200,200,255})
+    end
+
+    local dx, dy = x - caster.x, y - caster.y
+    local mag = math.sqrt(dx*dx+dy*dy)
+    dx, dy = dx / mag, dy / mag
+    local start = {math.floor(caster.x / 32), math.floor(caster.y / 32)}
+    local finish = {math.floor(caster.x / 32 + dx * 7), math.floor(caster.y / 32 + dy * 7)}
+    local points = Bresenham.line_evaluate(start, finish)
+    for i=1,#points do
+        for j=1,2 do
+            points[i][j] = points[i][j] * 32 + 16
+        end
+    end
+    local tx, ty = math.round((caster.x+dx*24) / 32) * 32 + 16, math.round((caster.y+dy*24) / 32) * 32 + 16
+    for i=2,#points do
+        local obj = SpellObjects.SpellSpikes.create { points = points, point_index = i, caster = caster}
+        GameObject.add_to_level(obj)
+    end
+end
+
+Data.spell_create(CallSpikes)
+
 -- Wallanthor --
 
 local Wallanthor = {
