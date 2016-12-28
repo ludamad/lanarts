@@ -2,6 +2,7 @@ EventLog = require "ui.EventLog"
 GameObject = require "core.GameObject"
 Map = require "core.Map"
 Bresenham = require "core.Bresenham"
+Display = require "core.Display"
 SpellObjects = require "objects.SpellObjects"
 
 Data.spell_create {
@@ -39,4 +40,156 @@ Data.effect_create {
         new.mp, new.max_mp = 1,1
         new.speed /= 2
     fade_out: 55
+}
+
+-- Methods for implementing Aura's.
+-- No extension mechanism, just called explicitly.
+AuraBase = {
+    init: () =>
+        @n_steps = 0
+        @total_time = @time_left
+        @max_alpha = 0.15
+        @n_ramp = 25
+    step: () =>
+        assert @range ~= nil, "'range' must be assigned to Aura effects."
+    draw: (inner_col, outer_col, x, y) =>
+        @n_steps += 1
+        min = math.min(@n_ramp, math.max(@n_steps, math.abs(@n_steps - @time_left)))
+        alpha = (min / @n_ramp) * 2
+        if alpha > 1.0
+            -- Wrap around the alpha:
+            alpha = 1 - (alpha - 1) 
+        alpha = math.max(0.2, math.min(alpha, 1))
+        alpha *= @max_alpha
+        xy = Display.to_screen_xy {x, y}
+        Display.draw_circle(with_alpha(inner_col, alpha), xy, @range)
+        Display.draw_circle_outline(with_alpha(outer_col, alpha), xy, @range, 2)
+}
+
+-- TODO
+-- Data.effect_create Aura {
+--     name: "Health Aura"
+--     category: "Aura"
+--     init_func: (caster) =>
+--         AuraBase.init(@, caster)
+--         @hp_gain = 2
+--     step_func: (caster) =>
+--         AuraBase.step(@, caster)
+--         for mon in *(Map.monsters_list() or {})
+--             if mon\has_effect("Healed")
+--                 continue
+--             eff_range = mon.target_radius + caster.target_radius + @range
+--             dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
+--             if dist < eff_range
+--                 mon\add_effect("Pained", 50)
+--                 if mon\damage(random(4,15) * 2 + caster.stats.magic * 2, random(6,10) + caster.stats.magic * 0.2, 1.0, 2.0)
+--                     {:stats} = caster
+--                     stats.mp = math.min(stats.max_mp, stats.mp + @mp_gain)
+--                     -- Summon zombies by probability!?
+--                     if caster\is_local_player() 
+--                         EventLog.add("You drain the enemy's life force as MP!", {200,200,255})
+--                     else
+--                         EventLog.add(caster.name .. " drains the enemy's life force as MP!", {200,200,255})
+--     draw_func: (caster, top_left_x, top_left_y) =>
+--         Aura.draw(@, COL_PALE_RED, COL_RED, caster.x, caster.y)
+-- }
+
+Data.effect_create {
+    name: "Fear Aura"
+    category: "Aura"
+    effected_colour: {200, 200, 255}
+    fade_out: 100
+    effected_sprite: "spr_spells.cause_fear"
+    init_func: (caster) =>
+        AuraBase.init(@, caster)
+        @max_alpha = 0.9
+    step_func: (caster) =>
+        AuraBase.step(@, caster)
+        for mon in *(Map.monsters_list() or {})
+            if mon\has_effect("Fear")
+                continue
+            dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
+            if dist < @range
+                mon\add_effect("Fear", 300)
+    draw_func: (caster, top_left_x, top_left_y) =>
+        AuraBase.draw(@, COL_GRAY, COL_BLACK, caster.x, caster.y)
+}
+
+Data.effect_create {
+    name: "Daze Aura"
+    category: "Aura"
+    effected_sprite: "spr_amulets.light"
+    fade_out: 100
+    init_func: (caster) =>
+        AuraBase.init(@, caster)
+    step_func: (caster) =>
+        AuraBase.step(@, caster)
+        for mon in *(Map.monsters_list() or {})
+            if mon\has_effect("Dazed")
+                continue
+            dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
+            if dist < @range
+                mon\add_effect("Dazed", 200)
+    draw_func: (caster, top_left_x, top_left_y) =>
+        AuraBase.draw(@, COL_PALE_YELLOW, COL_YELLOW, caster.x, caster.y)
+}
+
+Data.effect_create {
+    name: "Pain Aura"
+    category: "Aura"
+    fade_out: 100
+    init_func: (caster) =>
+        AuraBase.init(@, caster)
+        @mp_gain = 10
+    step_func: (caster) =>
+        AuraBase.step(@, caster)
+        for mon in *(Map.monsters_list() or {})
+            if mon\has_effect("Pained")
+                continue
+            dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
+            if dist < @range
+                mon\add_effect("Pained", 50)
+                if mon\damage(random(4,15) * 2 + caster.stats.magic * 2, random(6,10) + caster.stats.magic * 0.2, 1.0, 2.0)
+                    {:stats} = caster
+                    stats.mp = math.min(stats.max_mp, stats.mp + @mp_gain)
+                    -- Summon zombies by probability!?
+                    if caster\is_local_player() 
+                        EventLog.add("You drain the enemy's life force as MP!", {200,200,255})
+                    else
+                        EventLog.add(caster.name .. " drains the enemy's life force as MP!", {200,200,255})
+    draw_func: (caster, top_left_x, top_left_y) =>
+        AuraBase.draw(@, COL_PALE_RED, COL_RED, caster.x, caster.y)
+}
+
+-- TODO separate into ItemEffects.moon
+
+Data.effect_create {
+    name: "PoisonedWeapon"
+    on_melee_func: (attacker, defender, damage, will_die, attack_stats) =>
+        if defender\has_effect("Poison")
+            return
+        if chance(.25)
+            eff = defender\add_effect("Poison", 100)
+            eff.poison_rate = 25
+            eff.damage = attack_stats.damage
+            eff.power = attack_stats.power
+            eff.magic_percentage = attack_stats.magic_percentage
+}
+
+Data.effect_create {
+    name: "FearWeapon"
+    on_melee_func: (attacker, defender, damage, will_die, attack_stats) =>
+        if defender\has_effect("Fear")
+            return
+        if chance(.1)
+            eff = defender\add_effect("Fear", 100)
+}
+
+Data.effect_create {
+    name: "ConfusingWeapon"
+    on_melee_func: (attacker, defender, damage, will_die, attack_stats) =>
+        if defender\has_effect("Dazed")
+            return
+        if chance(.1)
+            eff = defender\add_effect("Dazed", 100)
 }

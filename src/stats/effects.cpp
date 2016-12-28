@@ -48,7 +48,7 @@ Colour EffectStats::effected_colour() {
 	return Colour(r / 256, g / 256, b / 256, a / 256);
 }
 
-void EffectStats::draw_effect_sprites(GameState* gs, const Pos& p) {
+void EffectStats::draw_effect_sprites(GameState* gs, CombatGameInst* inst, const Pos& p) {
 	GameView& view = gs->view();
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining > 0) {
@@ -57,6 +57,15 @@ void EffectStats::draw_effect_sprites(GameState* gs, const Pos& p) {
 				Colour drawcolour(255, 255, 255, 255 * draw_alpha(effects[i]));
 				draw_sprite(view, eentry.effected_sprite, p.x, p.y,
 						drawcolour);
+			}
+			lua_State* L = gs->luastate();
+			if (!eentry.draw_func.get(L).empty() && !eentry.draw_func.get(L).isnil()) {
+			    eentry.draw_func.get(L).push();
+			    effects[i].state.push();
+                luawrap::push(L, inst);
+                luawrap::push(L, p.x);
+                luawrap::push(L, p.y);
+                lua_call(L, 4, 0);
 			}
 		}
 	}
@@ -118,19 +127,41 @@ void EffectStats::process(GameState* gs, CombatGameInst* inst,
 }
 
 static void lua_effect_func_callback(lua_State* L, LuaValue& value,
-		Effect& effect, CombatGameInst* inst) {
+		LuaValue& state, CombatGameInst* inst, const char* name = NULL) {
 	if (value.empty() || value.isnil()) {
 		return;
 	}
 
 	value.push();
-	effect.state.push();
+	state.push();
+	if (name != NULL) {
+	    lua_pushstring(L, name);
+	}
 	luawrap::push(L, inst);
-	lua_call(L, 2, 0);
+	lua_call(L, 2 + (name != NULL), 0);
 }
 
 void EffectStats::step(GameState* gs, CombatGameInst* inst) {
 	lua_State* L = gs->luastate();
+	auto& items = inst->inventory();
+	// Factor in equipment that gives effects:
+	for (auto& item : items.raw_slots()) {
+	    if (item.is_equipped()) {
+	        EquipmentEntry& entry = item.equipment_entry();
+	        for (effect_id id : entry.effect_modifiers.status_effects) {
+	             Effect* eff = get(id);
+	             if (eff == NULL) {
+	                 // Create a sticky effect, t_remaining = 1 after
+	                 LuaValue state = add(gs, inst, id, 2);
+	                 lua_effect_func_callback(L, game_effect_data.at(id).on_equip_func, state, inst, entry.name.c_str());
+	             } else {
+	                 // Make sure the effect is sticky, t_remaining = 1 after
+	                 eff->t_remaining = 2;
+	             }
+	        }
+	    }
+	}
+	// Step for every effect in the game:
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		Effect& e = effects[i];
 		if (e.t_remaining > 0) {
@@ -139,11 +170,11 @@ void EffectStats::step(GameState* gs, CombatGameInst* inst) {
 			EffectEntry& eentry = game_effect_data.at(e.effectid);
 
 			e.state["time_left"] = e.t_remaining;
-			lua_effect_func_callback(L, eentry.step_func.get(L), e, inst);
+			lua_effect_func_callback(L, eentry.step_func.get(L), e.state, inst);
 			e.t_remaining = e.state["time_left"].to_int();
 
 			if (e.t_remaining == 0) {
-				lua_effect_func_callback(L, eentry.finish_func.get(L), e, inst);
+				lua_effect_func_callback(L, eentry.finish_func.get(L), e.state, inst);
 			}
 		}
 	}
@@ -159,6 +190,17 @@ Effect* EffectStats::get(int effect) {
 	return NULL;
 }
 
+bool EffectStats::has_category(const char* category) {
+    for (int i = 0; i < EFFECTS_MAX; i++) {
+        if (effects[i].t_remaining <= 0) {
+            continue;
+        }
+        if ((game_effect_data[effects[i].effectid].category == category)) {
+            return true;
+        }
+    }
+    return false;
+}
 static void lua_init_metatable(lua_State* L, LuaValue& value,
 		effect_id effect) {
 	value.push();
@@ -199,7 +241,7 @@ LuaValue EffectStats::add(GameState* gs, CombatGameInst* inst, effect_id effect,
                 e.state["time_left"] = e.t_remaining;
 
                 EffectEntry& eentry = game_effect_data.at(e.effectid);
-                lua_effect_func_callback(L, eentry.init_func.get(L), e, inst);
+                lua_effect_func_callback(L, eentry.init_func.get(L), e.state, inst);
                 return e.state;
             }
 	}

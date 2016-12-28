@@ -82,7 +82,7 @@ M.ridge_dungeon = (args) -> {
         }
 
         'D': {
-            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT, M.FLAG_HAS_OBJECT}
             content: args.tileset.floor
             on_placement: args.dungeon_placer
         }
@@ -180,7 +180,7 @@ M.skull_surrounded_dungeon = (args) -> {
             on_placement: args.enemy_placer
         }
         'D': {
-            add: SourceMap.FLAG_SEETHROUGH
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT, M.FLAG_HAS_OBJECT}
             content: args.tileset.floor
             on_placement: args.dungeon_placer
         }
@@ -544,7 +544,7 @@ M.small_random_vault = (args) -> {
         'e': {add: UNSOLID_ADD, content: args.tileset.floor, on_placement: random_choice {do_nothing, args.enemy_placer}, matches_none: M.FLAG_HAS_VAULT}
         'p': {add: UNSOLID_ADD, content: args.tileset.floor, matches_none: M.FLAG_HAS_VAULT}
         'd': {
-            add: UNSOLID_ADD 
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT, SourceMap.FLAG_HAS_OBJECT}
             remove: SourceMap.FLAG_SOLID
             content: args.tileset.floor_alt
             on_placement: (map, xy) ->

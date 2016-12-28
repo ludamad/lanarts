@@ -20,7 +20,19 @@ Data.equipment_create {
 
     spr_item = "spr_belts.slaying",
 
-    stat_bonuses = {strength = 2}
+    stat_bonuses = {strength = 1}
+}
+
+Data.equipment_create {
+    name = "Dank Belt",
+    description = "Your melee attacks have a 25% chance of poisoning targets.",
+    type = "belt",
+
+    shop_cost = { 200, 250 },
+
+    spr_item = "spr_belts.poison",
+
+    effects_granted = {"PoisonedWeapon"}
 }
 
 Data.equipment_create {
@@ -32,7 +44,7 @@ Data.equipment_create {
 
     spr_item = "spr_belts.warped",
 
-    stat_bonuses = {magic = 5, mp = -40, hp = -50}
+    stat_bonuses = {magic = 3, mp = -40, hp = -50}
 }
 
 

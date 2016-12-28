@@ -113,6 +113,10 @@ public:
 	void deequip(itemslot_t i);
 	void deequip_type(int type);
 
+	// For performance of iteration
+	std::vector<ItemSlot>& raw_slots() {
+	    return items;
+	}
 	itemslot_t get_equipped(int type, itemslot_t last_slot = -1) const;
 private:
 	void __dequip_projectile_if_invalid();

@@ -217,6 +217,12 @@ static void gmap_add_object(LuaStackValue map_obj, LuaStackValue gameinst) {
     gs->add_instance(map_obj["_id"].to_int(), inst);
 }
 
+static int gmap_players_list(lua_State* L) {
+    GameState* gs = lua_api::gamestate(L);
+    luawrap::push(L, gs->players_in_level());
+    return 1;
+}
+
 static int gmap_monsters_list(lua_State* L) {
     GameState* gs = lua_api::gamestate(L);
     const std::vector<obj_id>& mons = gs->monster_controller().monster_ids();
@@ -468,6 +474,7 @@ namespace lua_api {
         gmap["instance"].bind_function(gmap_instance);
 
         gmap["monsters_list"].bind_function(gmap_monsters_list);
+        gmap["players_list"].bind_function(gmap_players_list);
         gmap["monsters_seen"].bind_function(gmap_monsters_seen);
         gmap["monsters"].bind_function(gmap_monsters);
 

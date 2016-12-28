@@ -16,7 +16,7 @@ using namespace std;
 void parse_equipment_entry(lua_State* L, const YAML::Node& n, EquipmentEntry& entry) {
 	parse_item_entry(L, n, entry);
 	entry.stackable = false;
-//	entry.effect_modifiers; TODO
+
 	entry.use_action = LuaAction(LuaValue());
 	entry.stat_modifiers = parse_stat_modifiers(n);
 	entry.cooldown_modifiers = parse_cooldown_modifiers(n);

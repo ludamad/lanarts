@@ -37,8 +37,18 @@ static EffectEntry parse_effect(const LuaStackValue& table) {
     lua_State* L = table.luastate();
     EffectEntry entry;
     entry.name = table["name"].to_str();
+    entry.category = defaulted(table, "category", std::string());
     entry.init_func.initialize(table["init_func"]);
+    entry.draw_func.initialize(table["draw_func"]);
     entry.stat_func.initialize(table["stat_func"]);
+
+    // Configurability options for equipment / spell granted effects:
+    entry.on_melee_func = table["on_melee_func"];
+    entry.on_equip_func = table["on_equip_func"];
+    entry.on_identify_func = table["on_identify_func"];
+    entry.on_uncurse_func = table["on_uncurse_func"];
+    entry.on_gain_spell_func = table["on_gain_spell_func"];
+
     entry.finish_func.initialize(table["finish_func"]);
     entry.attack_stat_func.initialize(table["attack_stat_func"]);
     entry.step_func.initialize(table["step_func"]);
@@ -52,9 +62,11 @@ static EffectEntry parse_effect(const LuaStackValue& table) {
             true);
 
     entry.effected_colour = defaulted(table, "effected_colour", Colour());
-    entry.effected_sprite = res::sprite_id(table["effected_sprite"].to_str());
+    if (!table["effected_sprite"].isnil()) {
+        entry.effected_sprite = res::sprite_id(table["effected_sprite"].to_str());
+    }
     entry.additive_duration = defaulted(table, "additive_duration", false);
-    entry.fade_out = defaulted(table, "fade_out", 100);
+    entry.fade_out = defaulted(table, "fade_out", 5);
     entry.init(L);
     return entry;
 }

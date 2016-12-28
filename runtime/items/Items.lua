@@ -73,6 +73,20 @@ Data.item_create {
 }
 
 Data.item_create {
+    name = "Scroll of Fear",
+    description = "Bestows the user with a terrible apparition, scaring away all enemies.",
+    use_message = "You appear frightful!",
+
+    shop_cost = {55,105},
+
+    spr_item = "spr_scrolls.fear",
+
+    action_func = function(self, user)
+        user:add_effect("Fear Aura", 800).range = 120
+    end
+}
+
+Data.item_create {
     name = "Scroll of Experience",
     description = "Bestows the user with a vision, leading to increased experience.",
     use_message = "Experience is bestowed upon you!",

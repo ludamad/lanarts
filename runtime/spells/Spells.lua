@@ -272,7 +272,6 @@ function Pain.action_func(caster, x, y, target)
         return
     end
     local stats = caster:effective_stats()
-    target:damage(random(4,15) + caster.stats.magic, random(2,5) + caster.stats.magic * 0.2, --[[Magic percentage]] 1.0, 1.0)
     caster:direct_damage(10)
     target:add_effect("Pained", 50)
     caster:add_effect("Pained", 50)
@@ -301,11 +300,49 @@ end
 
 Data.spell_create(Pain)
 
+-- DAZE AURA --
+
+local Luminos = {
+    name = "Luminos",
+    description = "Dazes nearby enemies.",
+    can_cast_with_held_key = false,
+    spr_spell = "spr_amulets.light",
+    can_cast_with_cooldown = false,
+    mp_cost = 25,
+    cooldown = 25, -- Uses cooldown of weapon
+    fallback_to_melee = true,
+    range = 80
+}
+
+function Luminos.action_func(caster, x, y, target)
+    local stats = caster:effective_stats()
+    caster:add_effect("Daze Aura", 200).range = Luminos.range
+    if caster:is_local_player() then
+        EventLog.add("You daze nearby enemies!", {200,200,255})
+    else
+        EventLog.add(caster.name .. " dazes nearby enemies!", {200,200,255})
+    end
+end
+
+function Luminos.prereq_func(caster)
+    for mon in values(Map.monsters_list() or {}) do
+        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + Luminos.range then
+            return true
+        end
+    end
+    return false
+end
+
+Luminos.autotarget_func = Pain.autotarget_func
+
+Data.spell_create(Luminos)
+
+
 -- GREATER PAIN --
 
 local GreaterPain = {
     name = "Greater Pain",
-    description = "Instantly damage all nearby enemies, but hurting yourself in the process.",
+    description = "Instantly damage all nearby enemies, but hurting yourself in the process. Gains MP back per kill.",
     can_cast_with_held_key = true,
     spr_spell = "spr_spells.greaterpain",
     can_cast_with_cooldown = false,
@@ -317,16 +354,9 @@ local GreaterPain = {
 
 function GreaterPain.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
-    local eff_range = target and (target.target_radius + caster.target_radius + caster.weapon_range + Pain.range)
-    for mon in values(Map.monsters_list() or {}) do
-        local dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
-        if dist < eff_range then
-            mon:damage(random(4,15) * 2 + caster.stats.magic * 2, random(6,10) + caster.stats.magic * 0.2, --[[Magic percentage]] 1.0, 2.0)
-            mon:add_effect("Pained", 50)
-        end
-    end
     caster:direct_damage(25)
     caster:add_effect("Pained", 50)
+    caster:add_effect("Pain Aura", 100).range = GreaterPain.range
     if caster:is_local_player() then
         EventLog.add("You attack nearby enemies life force directly!", {200,200,255})
     else
@@ -339,7 +369,7 @@ function GreaterPain.prereq_func(caster)
         return false
     end
     for mon in values(Map.monsters_list() or {}) do
-        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + caster.target_radius + caster.weapon_range + Pain.range then
+        if vector_distance({mon.x, mon.y}, {caster.x, caster.y}) < mon.target_radius + Pain.range then
             return true
         end
     end

@@ -92,9 +92,11 @@ static void factor_in_equipment_derived_stats(MTwist& mt,
 			core);
 	effective.magic.reduction += entry.magic_reduction().calculate(mt, core);
 
+	// Factor in spells granted from equipment:
 	for (int i = 0; i < entry.spells_granted.amount(); i++) {
 	    effective.spells.add_spell(entry.spells_granted.get(i));
 	}
+	// Factor in effects granted from equipment:
 }
 
 static void factor_in_equipment_stats(MTwist& mt, EffectiveStats& effective,

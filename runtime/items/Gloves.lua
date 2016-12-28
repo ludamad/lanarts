@@ -20,7 +20,32 @@ Data.equipment_create {
     spr_item = "steel gloves",
     randart_sprites = {"spr_armour.randart_glove1", "spr_armour.randart_glove2", "spr_armour.randart_glove3", "spr_armour.randart_glove4"},
 
+    reduction = {base = 1},
     resistance = { base = 1 }
+}
+
+Data.equipment_create {
+    name = "Gloves of Confusion",
+    description = "Grants 10% chance of confusing enemies on hit, sending them wandering.",
+    type = "gloves",
+
+    shop_cost = { 95, 125 },
+
+    spr_item = "spr_armour.gloves_confusion",
+    randart_sprites = {"spr_armour.gloves_confusion_randart"},
+    effects_granted = {"ConfusingWeapon"}
+}
+
+Data.equipment_create {
+    name = "Gloves of Fear",
+    description = "Grants 10% chance of striking fear into enemies.",
+    type = "gloves",
+
+    shop_cost = { 95, 125 },
+
+    spr_item = "spr_armour.gloves_fear",
+    randart_sprites = {"spr_armour.gloves_fear_randart"},
+    effects_granted = {"FearWeapon"}
 }
 
 Data.equipment_create {

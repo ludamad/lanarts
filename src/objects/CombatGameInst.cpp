@@ -3,6 +3,8 @@
  *  Represents an instance that is affected by combat, ie enemies and players
  */
 
+#include <luawrap/luawrap.h>
+
 #include <ldraw/DrawOptions.h>
 
 #include <lcommon/SerializeBuffer.h>
@@ -132,7 +134,7 @@ void CombatGameInst::draw(GameState *gs, float frame) {
     int sx = x - spr.width() / 2, sy = y - spr.height() / 2;
     draw_sprite(view, sprite, sx, sy, vx, vy, frame, draw_colour);
 
-    effects().draw_effect_sprites(gs, Pos(sx, sy));
+    effects().draw_effect_sprites(gs, this, Pos(sx, sy));
 
     if (is_resting) {
         res::sprite("resting").draw(ldraw::DrawOptions(ldraw::CENTER),
@@ -170,6 +172,24 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
     if (!dynamic_cast<PlayerInst*>(this)) {
         if (gs->local_player()->current_floor == current_floor) {
             play("sound/slash.ogg");
+        }
+    }
+
+    for (Effect& e : effects().effects) {
+        if (e.t_remaining == 0) {
+            continue;
+        }
+        auto& entry = game_effect_data[e.effectid];
+        if (!entry.on_melee_func.empty() && !entry.on_melee_func.isnil()) {
+            entry.on_melee_func.push();
+            lua_State* L = gs->luastate();
+            luawrap::push(L, e.state);
+            luawrap::push(L, this);
+            luawrap::push(L, inst);
+            luawrap::push(L, damage);
+            luawrap::push(L, isdead);
+            lua_push_effectiveattackstats(L, atkstats);
+            lua_call(L, 6, 0);
         }
     }
 

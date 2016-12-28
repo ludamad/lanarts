@@ -40,6 +40,7 @@ amulets = (chance, args) -> {
     { item: "Amulet of Great Pain", chance: 1 }
     { item: "Amulet of Ringholding", chance: 1 }
     { item: "Amulet of Ice Form", chance: 1 }
+    { item: "Amulet of Light", chance: 1 }
 --    { item: RANDART("Amulet"),      chance: 1 }
 }
 
@@ -59,6 +60,7 @@ consumables = (chance) -> {
         { item: "Mana Potion",        chance: 8                     }
         { item: "Stone",              chance: 4,  amount: {3,15}  }
         { item: "Magic Map",         chance: 1                      }
+        { item: "Scroll of Fear",         chance: 1                      }
     }
 
     -- Permanent enchantments
@@ -90,6 +92,7 @@ belts = (chance) -> {
     { item: "Belt of Protection",      chance: 10                      }
     { item: "Belt of Slaying",        chance: 10                      }
     { item: "Warped Belt",        chance: 1                      }
+    { item: "Dank Belt",        chance: 1                      }
 }
 
 -- Legwear
@@ -175,6 +178,8 @@ gloves = (chance, args) -> _filter {
             chance: 5
             -- Bows
             { item: "Runed Gloves",           chance: 90                      }
+            { item: "Gloves of Fear",           chance: 10                      }
+            { item: "Gloves of Confusion",           chance: 10                      }
         }
     }
 --    args.ignore_randarts or { item: RANDART("Gloves"), chance: 1}

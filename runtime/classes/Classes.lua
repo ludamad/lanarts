@@ -5,6 +5,7 @@ local TEST_INVENTORY = os.getenv("LANARTS_TESTITEMS") and {
      {item = "Magic Skirt", amount = 1},
      -- For testing belts:
      {item = "Belt of Slaying", amount = 1},
+     {item = "Dank Belt", amount = 1},
      {item = "Belt of Protection", amount = 1},
      -- For testing spell amulets:
      {item = "Amulet of Fear", amount = 1}, 
@@ -17,10 +18,14 @@ local TEST_INVENTORY = os.getenv("LANARTS_TESTITEMS") and {
      {item = "Amulet of Ringholding", amount = 1},
      {item = "Amulet of Great Pain", amount = 1},
      {item = "Amulet of Ice Form", amount = 1},
+     {item = "Amulet of Light", amount = 1},
      {item = "Ring of Spells", amount = 1},
      {item = "Ring of Stone", amount = 1},
+     {item = "Gloves of Confusion", amount = 1},
+     {item = "Gloves of Fear", amount = 1},
      {item = "Gallanthor's Ring", amount = 1},
      {item = "Magic Map", amount = 1},
+     {item = "Scroll of Fear", amount = 10},
 } or {}
 
 Data.class_create {

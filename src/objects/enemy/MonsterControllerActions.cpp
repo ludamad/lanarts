@@ -303,7 +303,10 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	EnemyBehaviour& eb = e->behaviour();
 	e->vx = 0, e->vy = 0;
 
-	if (!monsters_wandering_flag) {
+        // Part of: Implement status effects.
+    bool forced_wander = (e->effects().get(get_effect_by_name("Dazed")));
+
+	if (!forced_wander && !monsters_wandering_flag) {
 		return;
 	}
 

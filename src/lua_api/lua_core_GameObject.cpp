@@ -157,8 +157,9 @@ static int lapi_combatgameinst_damage(lua_State* L) {
 	attack.magic_percentage = nargs >= 4 ? lua_tonumber(L, 4) : 1.0f;
 	attack.resist_modifier = nargs >= 5 ? lua_tonumber(L, 5) : 1.0f;
 
-	luawrap::get<CombatGameInst*>(L, 1)->damage(lua_api::gamestate(L), attack);
-	return 0;
+	bool died = (luawrap::get<CombatGameInst*>(L, 1)->damage(lua_api::gamestate(L), attack));
+	lua_pushboolean(L, died);
+	return 1;
 }
 
 static void lapi_combatgameinst_heal_hp(CombatGameInst* inst, int hp) {
@@ -202,6 +203,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 
 	LUAWRAP_METHOD(methods, add_effect, OBJ->effects().add(lua_api::gamestate(L), OBJ, effect_from_lua(L, 2), lua_tointeger(L, 3)).push() );
     LUAWRAP_GETTER(methods, has_effect, OBJ->effects().get(effect_from_lua(L, 2)) != NULL);
+    LUAWRAP_GETTER(methods, has_effect_category, OBJ->effects().has_category(luawrap::get<const char*>(L, 2)) != NULL);
 
 	methods["reset_rest_cooldown"].bind_function(lapi_do_nothing);
 

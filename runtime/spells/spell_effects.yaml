@@ -6,6 +6,7 @@ effects:
   - name: Poison
     poison_rate: 35
     effected_colour: [100, 255, 100]
+    fade_out: 4
     can_use_rest: no
     stat_func: poison_statmod
     init_func: poison_map_init
@@ -82,7 +83,7 @@ effects:
 #    fade_out: 5
 
   - name: Pained
-    effected_sprite: spr_effects.demon_pentagram5
+    effected_sprite: spr_spells.pain
     effected_colour: [100,100,100] #RGB
     fade_out: 15
     # Effect in CPP

@@ -19,23 +19,19 @@ class SerializeBuffer;
 struct Pos;
 
 struct Effect {
-	effect_id effectid;
+	effect_id effectid = -1;
 	LuaValue state;
-	int t_remaining;
+	int t_remaining = 0;
 };
 
 struct EffectStats {
-	EffectStats() {
-		for (int i = 0; i < EFFECTS_MAX; i++) {
-			effects[i].t_remaining = 0;
-		}
-	}
 	bool has_active_effect() const;
 	LuaValue add(GameState* gs, CombatGameInst* inst, effect_id effect,
 			int length);
-	Effect* get(effect_id effect);
+    Effect* get(effect_id effect);
+    bool has_category(const char* category);
 	void step(GameState* gs, CombatGameInst* inst);
-	void draw_effect_sprites(GameState* gs, const Pos& p);
+	void draw_effect_sprites(GameState* gs, CombatGameInst* inst, const Pos& p);
 	bool can_rest();
 	Colour effected_colour();
 

@@ -19,6 +19,7 @@ using namespace std;
 EffectEntry parse_effect(lua_State* L, const YAML::Node& n) {
 	EffectEntry entry;
 	entry.name = parse_str(n["name"]);
+	entry.category = parse_defaulted(n, "category", std::string());
 	entry.init_func = parse_luaexpr(L, n, "init_func");
 	entry.finish_func = parse_luaexpr(L, n, "finish_func");
 	entry.stat_func = parse_luaexpr(L, n, "stat_func");

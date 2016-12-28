@@ -125,6 +125,17 @@ Data.equipment_create {
 }
 
 Data.equipment_create {
+    name = "Amulet of Light",
+    description = "Grants the user the spell 'Luminos'.",
+    type = "amulet",
+
+    shop_cost = { 120, 140 },
+
+    spr_item = "spr_amulets.light",
+    spells_granted = {"Luminos"}
+}
+
+Data.equipment_create {
     name = "Amulet of Pain",
     description = "Grants the user the spell 'Pain'.",
     type = "amulet",

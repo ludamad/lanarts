@@ -6,7 +6,11 @@
 #include <cstring>
 
 #include "EquipmentEntry.h"
+#include "stats/effect_data.h"
 #include "ProjectileEntry.h"
+#include <vector>
+
+using namespace std;
 
 equipment_id get_equipment_by_name(const char* name) {
 	if (strcmp(name, "Nothing") == 0) {
@@ -93,4 +97,8 @@ void EquipmentEntry::parse_lua_table(const LuaValue& table) {
 	stat_modifiers = parse_stat_modifiers(table);
 	cooldown_modifiers = parse_cooldown_modifiers(table);
 	spells_granted = parse_spells_known(table["spells_granted"]);
+	vector<string> effects_granted = table["effects_granted"].as<vector<string>>();
+	for (string& str : effects_granted) {
+	    effect_modifiers.status_effects.push_back( get_effect_by_name(str.c_str()) );
+	}
 }
