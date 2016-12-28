@@ -548,9 +548,9 @@ overworld_features = (map) ->
         templates = OldMaps.Dungeon2
         on_generate_dungeon = (map, floor) ->
             if floor == #templates
-                ---------------------------------------------------------- 
-                -- Place key vault, along with some gold vaults --
-                for item in *{"Azurite Key", "Gold", "Gold"} 
+                ---------------------------------------------------------------------
+                -- Place key vault, along with a gold vault and an ice form amulet --
+                for item in *{"Azurite Key", "Gold", "Amulet of Ice Form"} 
                     item_placer = (map, xy) -> MapUtils.spawn_item(map, item, (if item == "Gold" then 10 else 1), xy)
                     tileset = TileSets.snake
                     vault = SourceMap.area_template_create(Vaults.small_item_vault {rng: map.rng, :item_placer, :tileset})

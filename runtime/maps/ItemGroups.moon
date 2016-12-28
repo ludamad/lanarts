@@ -24,7 +24,7 @@ rings = (chance, args) -> _filter{
 }
 
 -- Amulets
-amulets = (chance) -> { 
+amulets = (chance, args) -> { 
     :chance
     { item: "Amulet of the Wall", chance: 1 }
     { item: "Amulet of Fear", chance: 1 }
@@ -39,6 +39,7 @@ amulets = (chance) -> {
     { item: "Amulet of Pain", chance: 1 }
     { item: "Amulet of Great Pain", chance: 1 }
     { item: "Amulet of Ringholding", chance: 1 }
+    { item: "Amulet of Ice Form", chance: 1 }
 --    { item: RANDART("Amulet"),      chance: 1 }
 }
 
@@ -47,8 +48,8 @@ consumables = (chance) -> {
     :chance
     {
         chance: 95
-        { item: "Arrow",              chance: 4,  amount: {5,10}  }
-        { item: "Silver Arrow",       chance: 2,  amount: {2,6}   }
+        { item: "Arrow",              chance: 5,  amount: {5,10}  }
+        { item: "Silver Arrow",       chance: 4,  amount: {2,6}   }
     --  Ludamad: Remove stones for now. Part of: Try to reduce the projectile actions for non-archer a lot.
     --    { item: "Stone",              chance: 15,  amount: {3,15}  }
         -- Scrolls
@@ -216,6 +217,7 @@ M.store_items = {
     belts(2, ignore_weak: true)
     legwear(2, ignore_weak: true)
     boots(1, ignore_weak: true)
+    amulets(2, ignore_weak: true)
     bows(5, ignore_weak: true)
     gloves(5, ignore_weak: true)
     weapons(8, {ignore_weak: true, ignore_medium: true})
@@ -229,6 +231,7 @@ M.enchanted_items = {
     helmets(3, ignore_weak: true)
     armour(5, ignore_weak: true)
     belts(1, ignore_weak: true)
+    amulets(2, ignore_weak: true)
     legwear(5, ignore_weak: true)
     boots(1, ignore_weak: true)
     bows(5, ignore_weak: true)
@@ -242,13 +245,14 @@ M.basic_items = {
     rings(2, ignore_strong: true)
     helmets(3, ignore_strong: true)
     armour(12, ignore_strong: true)
+    amulets(2, ignore_weak: true)
     belts(1, ignore_strong: true)
     legwear(2, ignore_strong: true)
     boots(1, ignore_strong: true)
     bows(5, ignore_strong: true)
     gloves(5, ignore_strong: true)
     weapons(12, ignore_strong: true)
-    M.enchanted_items -- Chance of being moved up a category. See enchanted_items for the weight.
+    -- M.enchanted_items -- Chance of being moved up a category. See enchanted_items for the weight.
 }
 
 return M

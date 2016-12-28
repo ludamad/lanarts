@@ -179,7 +179,7 @@ Data.item_create {
     use_message = "You gain knowledge of your surroundings!",
     description = "A magic map that reveals the current level.",
 
-    shop_cost = {55,105},
+    shop_cost = {25,35},
 
     spr_item = "spr_scrolls.magic-map",
 

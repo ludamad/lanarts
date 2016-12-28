@@ -21,7 +21,8 @@ public:
 	LuaValue& get(lua_State* L);
 
 	// Ensure value is initialized
-	void initialize(lua_State* L);
+    void initialize(lua_State* L);
+    void initialize(const LuaValue& value);
 	bool empty() const;
 
 	bool is_initialized() const;

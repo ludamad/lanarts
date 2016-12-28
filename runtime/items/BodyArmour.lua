@@ -9,7 +9,7 @@ Data.equipment_create {
 
     spell_cooldown_multiplier = 1.1,
 
-    reduction = {base = 1},
+    --reduction = {base = 1},
     resistance = {base = 2}
 }
 
@@ -26,8 +26,8 @@ Data.equipment_create {
 
     ranged_cooldown_multiplier = 1.15,
 
-    reduction = {base = 2},
-    resistance = {base = 3}
+    reduction = {base = 1},
+    resistance = {base = 2}
 }
 
 Data.equipment_create {
@@ -44,8 +44,8 @@ Data.equipment_create {
 
     ranged_cooldown_multiplier = 1.35,
 
-    reduction = {base = 3},
-    resistance = {base = 4}
+    reduction = {base = 2},
+    resistance = {base = 3}
 }
 
 Data.equipment_create {
@@ -58,10 +58,10 @@ Data.equipment_create {
 
     spr_item = "robe",
 
-    reduction = {base = 1},
+    --reduction = {base = 1},
     magic_reduction = {base = 1},
 
-    resistance = {base = 1},
+    --resistance = {base = 1},
     magic_resistance = {base = 1}
 }
 
@@ -75,7 +75,7 @@ Data.equipment_create {
     spr_item = "enchanted robe",
 
     reduction = {base = 1},
-    magic_reduction = {base = 2},
+    magic_reduction = {base = 1},
 
     resistance = {base = 1},
     magic_resistance = {base = 1},
@@ -95,7 +95,7 @@ Data.equipment_create {
     reduction = {base = 1},
     magic_reduction = {base = 2},
 
-    resistance = {base = 2},
+    resistance = {base = 1},
     magic_resistance = {base = 2},
 
     stat_bonuses = {defence = 1, magic = 1}

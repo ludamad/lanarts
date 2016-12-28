@@ -7,9 +7,7 @@ Data.equipment_create {
 
     spr_item = "spr_belts.protection",
 
-    reduction = { base = 1 },
     resistance = { base = 1 },
-    magic_reduction = { base = 1 },
     magic_resistance = { base = 1 }
 }
 

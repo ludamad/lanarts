@@ -60,6 +60,8 @@ public:
 		return weapon_class == "unarmed" || weapon_class == "magic";
 	}
 
+    virtual void parse_lua_table(const LuaValue& table);
+
 	std::string weapon_class;
 	Attack attack;
 	int radius, drop_chance, speed;

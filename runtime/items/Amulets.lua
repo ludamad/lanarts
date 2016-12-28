@@ -114,6 +114,17 @@ Data.equipment_create {
 }
 
 Data.equipment_create {
+    name = "Amulet of Ice Form",
+    description = "Grants the user the spell 'Ice Form'.",
+    type = "amulet",
+
+    shop_cost = { 200, 250 },
+
+    spr_item = "spr_amulets.iceform",
+    spells_granted = {"Ice Form"}
+}
+
+Data.equipment_create {
     name = "Amulet of Pain",
     description = "Grants the user the spell 'Pain'.",
     type = "amulet",

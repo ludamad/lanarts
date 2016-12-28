@@ -4,7 +4,9 @@ local Map = require "core.Map"
 local Bresenham = require "core.Bresenham"
 local SpellObjects = require "objects.SpellObjects"
 
-local M = nilprotect {} -- Submodule
+-- New spells coded in more convenient syntax:
+-- TODO figure out long term plan
+require("spells.Spells2")
 
 -- MINOR MISSILE
 
@@ -106,7 +108,7 @@ local Berserk = {
 }
 
 function Berserk.prereq_func(caster)
-    return not caster:has_effect("Berserk") and not caster:has_effect("Exhausted")
+    return not caster:has_effect("Berserk") and not caster:has_effect("Exhausted") and not caster:has_effect("Ice Form")
 end
 
 function Berserk.autotarget_func(caster)
@@ -156,8 +158,8 @@ local MagicArrow = {
     description = "Allows you to create an arrow of pure energy, requires a bow. Does well against strudy opponents.",
     spr_spell = "magic arrow",
     projectile = "Magic Arrow",
-    mp_cost = 15,
-    cooldown = 25,
+    mp_cost = 20,
+    cooldown = 30,
     resist_modifier = 0.5
 }
 
@@ -424,7 +426,7 @@ function Expedite.autotarget_func(caster)
 end
 
 function Expedite.action_func(caster, x, y)
-    caster:add_effect("Expedited", 150)
+    caster:add_effect("Expedited", 300)
     if caster:is_local_player() then
         EventLog.add("You feel expedient!", {200,200,255})
     elseif caster.name == "Your ally" then
@@ -482,5 +484,3 @@ function Wallanthor.action_func(caster, x, y)
 end
 
 Data.spell_create(Wallanthor)
-
-return M

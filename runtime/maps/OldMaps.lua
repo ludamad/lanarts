@@ -274,6 +274,7 @@ M.Dungeon3 = {
 M.Dungeon4 = {
   -- Level 6
   { layout = {small_layout1},
+    dont_scale_enemies = true,
     content = {
       items = { amount = 8, group = table.tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
       enemies = {
@@ -284,6 +285,7 @@ M.Dungeon4 = {
   },
   -- Level 7
   { layout = medium_layouts,
+    dont_scale_enemies = true,
     content = {
       items = { amount = 10, group = ItemGroups.enchanted_items   },
       enemies = {
@@ -294,6 +296,7 @@ M.Dungeon4 = {
   },
   -- Level 8
   { layout = large_layouts,
+    dont_scale_enemies = true,
     content = {
       items = { amount = 10, group = ItemGroups.enchanted_items   },
       enemies = {
@@ -305,6 +308,7 @@ M.Dungeon4 = {
   },
   -- Level 9
   { layout = large_layouts,
+    dont_scale_enemies = true,
     content = {
       items = { amount = 12,  group = ItemGroups.enchanted_items   },
       enemies = {
@@ -315,6 +319,7 @@ M.Dungeon4 = {
   },
   -- Level 10
   { layout = large_layouts,
+    dont_scale_enemies = true,
     content = {
       items = { amount = 12,  group = ItemGroups.enchanted_items   },
       enemies = {
@@ -337,7 +342,7 @@ local function generate_items(map, items)
     end
 end
 
-local function size_multiplier() 
+local function size_multiplier(map) 
     return 1 -- For now, don't make bigger levels. Pixel lock is no longer a thing.
 --    return 1 + random(3, 10) * 0.03 * (World.player_amount - 1)
 end
@@ -387,6 +392,9 @@ local function generate_enemies(map, enemies)
         min, max = enemies.amount, enemies.amount
     end
     local multiplayer_bonus = (World.player_amount - 1) / 3
+    if map.template.dont_scale_enemies then
+        multiplayer_bonus = 1 -- Dont generate more enemies in the final area
+    end
     local amounts = {min * (1.0 + multiplayer_bonus), max * (1.0 + multiplayer_bonus)}
     local amount = math.round(randomf(amounts))
     local Vaults = require "maps.Vaults"
@@ -536,9 +544,11 @@ function M.create_map(dungeon, floor)
         size = {math.ceil(size[1] * size_mult), math.ceil(size[2] * size_mult)}
         map = map_utils.map_create(label, size, tileset.wall)
         generate_layout(map, layout, tileset)
+        map.template = entry
     else 
         local template = random_choice(entry.templates)
         map = generate_from_template(label, template, tileset)
+        map.template = entry
     end
     -- TODO consolidate what is actually expected of maps.
     -- For now, just fake one region for 01_Overworld.moon

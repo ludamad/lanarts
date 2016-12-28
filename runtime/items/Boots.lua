@@ -20,7 +20,6 @@ Data.equipment_create {
 
     spr_item = "iron boots",
 
-    reduction = { base = 1 },
     resistance = { base = 2 }
 }
 
@@ -33,7 +32,7 @@ Data.equipment_create {
 
     spr_item = "spr_boots.boots_iron2",
 
-    reduction = { base = 2 },
+    reduction = { base = 1 },
     resistance = { base = 2 }
 }
 
@@ -46,14 +45,14 @@ Data.equipment_create {
 
     spr_item = "spr_boots.boots4_green",
 
-    reduction = { base = 3 },
-    resistance = { base = 3 },
+    reduction = { base = 2 },
+    resistance = { base = 2 },
     stat_bonuses = { hpregen = 1 / 60, movespeed = -0.5, strength = 1},
 }
 
 Data.equipment_create {
     name = "Jack Boots",
-    description = "Beast skin boots that increases the user's lifeforce..",
+    description = "Beast skin boots that increases the user's lifeforce.",
     type = "boots",
 
     shop_cost = { 120, 200 },
@@ -61,7 +60,7 @@ Data.equipment_create {
     spr_item = "spr_boots.boots2_jackboots",
 
     reduction = { base = 1 },
-    resistance = { base = 2 },
+    resistance = { base = 1 },
     stat_bonuses = { hp = 30 }
 }
 Data.equipment_create {
@@ -73,7 +72,7 @@ Data.equipment_create {
 
     spr_item = "spr_boots.boots3_stripe",
 
-    reduction = { base = 2 },
-    resistance = { base = 2 },
+    reduction = { base = 1 },
+    resistance = { base = 1 },
     spells_granted = {"Expedite"}
 }

@@ -60,14 +60,14 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Ring of Stone",
-    description = "A ring that causes thickening of the skin.",
+    description = "A ring that causes thickening of the skin but reduced life.",
     type = "ring",
 
     shop_cost = { 55, 75 },
 
     spr_item = "ring of stone",
 
-    stat_bonuses = { defence = 2 }
+    stat_bonuses = { defence = 2, hp = -10 }
 }
 
 Data.equipment_create {

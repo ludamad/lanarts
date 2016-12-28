@@ -1,6 +1,6 @@
 Data.equipment_create {
     name = "Platelegs",
-    description = "Strongly protecting legwear that interferes with ranged combat.",
+    description = "Protecting legwear that interferes with ranged and magical combat.",
     type = "legwear",
 
     shop_cost = { 50, 70 },
@@ -11,8 +11,8 @@ Data.equipment_create {
 
     ranged_cooldown_multiplier = 1.35,
 
-    reduction = {base = 2},
-    resistance = {base = 2}
+    reduction = {base = 1},
+    resistance = {base = 1}
 }
 
 Data.equipment_create {

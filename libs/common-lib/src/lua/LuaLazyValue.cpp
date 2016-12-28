@@ -35,6 +35,11 @@ bool LuaLazyValue::empty() const {
 	return _expression.empty() && _value.empty();
 }
 
+void LuaLazyValue::initialize(const LuaValue& value) {
+    _expression = std::string();
+    _value = value;
+}
+
 bool LuaLazyValue::is_initialized() const {
 	return !_value.empty();
 }

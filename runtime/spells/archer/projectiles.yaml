@@ -3,8 +3,8 @@ projectiles:
   - name: Magic Arrow
     weapon_class: magic
     damage_type: {magic: 1.0}
-    damage: { base: [3,7], magic: 0.6, strength: 0.6 }
-    power: { base: 4, magic: 0.25, strength: 0.25 }
+    damage: { base: [3,7], magic: 0.5, strength: 0.5 }
+    power: { base: 4, strength: 0.2 }
     range: 150
     speed: 9
     spr_item: none

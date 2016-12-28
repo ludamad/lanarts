@@ -20,7 +20,6 @@ Data.equipment_create {
     spr_item = "steel gloves",
     randart_sprites = {"spr_armour.randart_glove1", "spr_armour.randart_glove2", "spr_armour.randart_glove3", "spr_armour.randart_glove4"},
 
-    reduction = { base = 1 },
     resistance = { base = 1 }
 }
 
@@ -33,7 +32,6 @@ Data.equipment_create {
 
     spr_item = "runed gloves",
 
-    reduction = { base = 1 },
     resistance = { base = 1 },
     magic_resistance = { base = 1 },
 

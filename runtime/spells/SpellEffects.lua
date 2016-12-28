@@ -166,7 +166,7 @@ end
 
 function expedited_effect.stat(effect, obj, old, new)
     if new.speed < 6 then
-	new.speed = math.max(new.speed * 1.25, 6)
+	new.speed = math.max(new.speed * 1.5, 6)
     end
-    new.ranged_cooldown_modifier = new.ranged_cooldown_modifier / 1.33
+    new.ranged_cooldown_multiplier = new.ranged_cooldown_multiplier / 1.33
 end

@@ -16,6 +16,7 @@ local TEST_INVENTORY = os.getenv("LANARTS_TESTITEMS") and {
      {item = "Amulet of Pain", amount = 1},
      {item = "Amulet of Ringholding", amount = 1},
      {item = "Amulet of Great Pain", amount = 1},
+     {item = "Amulet of Ice Form", amount = 1},
      {item = "Ring of Spells", amount = 1},
      {item = "Ring of Stone", amount = 1},
      {item = "Gallanthor's Ring", amount = 1},
@@ -33,9 +34,7 @@ Data.class_create {
       { spell = "Fire Bolt",
         level_needed = 1 },
       { spell = "Mephitize",
-        level_needed = 3 },
-      { spell = "Wallanthor",
-        level_needed = 4 },
+        level_needed = 3 }
     },
     start_stats = {
         movespeed = 4,
@@ -128,15 +127,16 @@ Data.class_create {
         mp = 85,
         hpregen = 4 / 60, -- Per 60 frames
         mpregen = 2 / 60, -- Per 60 frames
-        strength = 7,
+        strength = 5,
         defence = 4,
         willpower = 7,
-        magic = 4,
+        magic = 6,
         equipment = {
           weapon = "Short Bow",
           gold = 0,
           inventory = {
-             {item = "Arrow", amount = 50} 
+             {item = "Arrow", amount = 50, equip = true},
+             {item = "Health Potion", amount = 1},
           }
         }
     },

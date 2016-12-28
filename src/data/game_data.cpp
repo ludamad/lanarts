@@ -219,6 +219,9 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 			lua_items);
 	update_loading_screen(L, 20, "Loading Spells");
 
+	// Effects MUST be before spells, as effects are also loaded in spells currently
+	// TODO move effects completely to Lua
+    lua_effects = load_effect_data(L, dfiles.effect_files);
 	lua_spells = load_spell_data(L, dfiles.spell_files);
 	update_loading_screen(L, 30, "Loading Weapons");
 
@@ -233,7 +236,6 @@ void init_game_data(GameSettings& settings, lua_State* L) {
 	update_loading_screen(L, 50, "Loading Enemies");
 	// --- ITEM DATA ---
 
-	lua_effects = load_effect_data(L, dfiles.effect_files);
 	lua_enemies = load_enemy_data(L, dfiles.enemy_files);
 	update_loading_screen(L, 60, "Loading Item Generation Templates");
 
