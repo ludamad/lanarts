@@ -57,6 +57,7 @@ void ItemInst::draw(GameState* gs) {
 		return;
 	if (!was_seen && !gs->object_visible_test(this))
 		return;
+        was_seen = true;
 
 	Pos p = round_to_multiple(ipos(), TILE_SIZE);
 
