@@ -53,6 +53,7 @@ projectiles:
     resist_modifier: 1
     range: 300
     speed: 2
+    cooldown: 105
     spr_item: none
     spr_attack: spr_spells.cloud
     #can_pass_through: yes

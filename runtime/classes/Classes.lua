@@ -36,6 +36,23 @@ local TEST_INVENTORY = os.getenv("LANARTS_TESTITEMS") and {
      {item = "Scroll of Fear", amount = 10},
 } or {}
 
+function possibly_apply_levelling(data)
+    if os.getenv("LANARTS_LEVEL") then
+        local level = tonumber(os.getenv("LANARTS_LEVEL"))
+        for i=2,level do
+            for k,v in pairs(data.gain_per_level) do
+                data.start_stats[k] = data.start_stats[k] + v
+            end
+        end
+    end
+    return data
+end
+
+local old_class_create = Data.class_create
+Data.class_create = function(data)
+    return old_class_create(possibly_apply_levelling(data))
+end
+
 Data.class_create {
     name = "Mage",
     sprites = {"wizard", "wizard2"},
@@ -166,3 +183,4 @@ Data.class_create {
 --        willpower = 1
     }
 }
+

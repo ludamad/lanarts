@@ -5,9 +5,10 @@ local getmetatable = getmetatable
 
 local M = {}
 
-function M.type_create(base)
-    base = base or GameObject.Base
-    local T = {}
+function M.type_create(T)
+    T = T or {}
+    base = T.base or GameObject.Base
+    T.base = nil
     tmerge(T, base)
 
     function T.is_instance(obj, T)

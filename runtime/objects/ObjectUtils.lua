@@ -26,10 +26,11 @@ function M.screen_draw(sprite, xy, --[[Optional]] alpha, --[[Optional]] frame, -
     )
 end
 
-function M.type_create(--[[Optional]] base_type)
-    local type = {}
-    if base_type then table.copy(base_type, type) end
-    type.base = base_type
+function M.type_create(type)
+    type = type or {}
+    local base = type.base
+    if base then table.copy(type.base, type) end
+    type.base = base
 
     function type.base_create(args)
         args.type = args.type or type

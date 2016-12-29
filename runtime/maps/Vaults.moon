@@ -155,16 +155,6 @@ M.ridge_dungeon = (args) -> {
 }
 
 
-M.crypt_dungeon = (args) -> table.merge M.ridge_dungeon(args), {
-    data: [=[
-....+....
-..wwdww..
-.wwpppww.
-.wppDpww.
-.wwwwwww.]=]
-}
-
-
 M.sealed_dungeon = (args) -> table.merge M.ridge_dungeon(args), {
     data: [=[
 .....wwwwwww....
@@ -183,6 +173,9 @@ M.skull_surrounded_dungeon = (args) -> {
             content: args.tileset.floor
             on_placement: (map, xy) ->
                 MapUtils.spawn_decoration(map, M._warning_skull, xy, 0, false)
+                if args.player_spawn_area
+                    {x, y} = xy
+                    append map.player_candidate_squares, {x*32+16, y*32+16}
         }
         'e': {
             add: {SourceMap.FLAG_SEETHROUGH}
@@ -212,6 +205,19 @@ M.skull_surrounded_dungeon = (args) -> {
 ++..wwswW
 .....WWW.]=]
 }
+
+M.crypt_dungeon = (args) -> table.merge M.skull_surrounded_dungeon(args), {
+    data: [=[
+..+++..
+.wdddw.
+.wsssw.
+wwdddww
+wsssssw
+wDsDsDw
+wwsssww
+.wwwww.]=]
+}
+
 
 -- args:
 -- - boss_placer
@@ -634,10 +640,15 @@ M.small_item_vault = (args) -> {
             add: UNSOLID_ADD 
             remove: SourceMap.FLAG_SOLID
             content: args.tileset.floor_alt
-            on_placement: (map, xy) ->
-                MapUtils.spawn_door(map, xy)
+            on_placement: args.door_placer
         }
         'w': {add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}, content: args.tileset.wall_alt, matches_none: M.FLAG_HAS_VAULT}
+        'W': {
+            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}
+            content: args.tileset.wall_alt
+            matches_all: SourceMap.FLAG_SOLID
+            matches_none: {M.FLAG_HAS_VAULT}
+        }
     }
     data: random_choice {[=[++++++
 +wwww+
@@ -651,6 +662,33 @@ M.small_item_vault = (args) -> {
     }
 }
 
+M.crypt_encounter_vault = (args) -> table.merge M.small_item_vault(args), {
+    data: random_choice {
+[=[
+.www.......
+wwpwwwwwww.
+Wieeepdppd+
+Wieeepdppd+
+wwppppwwww.
+.wwwwww....]=]
+[=[
+wwwwwww.
+Wppppww.
+Wieepd+.
+Wieepd+.
+Wppppww.
+wwwwwww.]=]
+[=[
+wwwwwww.
+WpppppW.
+Wieeepd+
+Wieeepd+
+WpppppW.
+wwwwwww.]=]
+    }
+}
+
+
 M.small_item_vault_multiway = (args) -> table.merge M.small_item_vault(args), {
     data: random_choice {
 [=[
@@ -662,14 +700,31 @@ M.small_item_vault_multiway = (args) -> table.merge M.small_item_vault(args), {
     }
 }
 
-M.small_item_vault_multiitem = (args) -> table.merge M.small_item_vault(args), {
+M.crypt_entrance_vault = (args) -> table.merge M.small_item_vault(args), {
     data: random_choice {
+[=[
++++++++...
++wdwww++..
++dpppww+++
++dpp*pwww+
++dppipppd+
++dppppppd+
++wdwwwwww+
+++++++++++]=]
+[=[
++++++++++
++wdwwwww+
++dpp*ppd+
++dpppppd+
++dppippd+
++wdwwwww+
++++++++++]=]
 [=[
 ++++++++++
 +wdwwwwww+
 +dppppppd+
-+dpppippd+
-+dppipipd+
++d*pppppd+
++dppipppd+
 +dppppppd+
 +wdwwwwww+
 ++++++++++]=]

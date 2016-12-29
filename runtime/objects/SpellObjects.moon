@@ -99,4 +99,24 @@ M.SpellSpikes.on_draw = () =>
         alpha = math.max(0, math.min(alpha, 1))
         ObjectUtils.screen_draw(@sprite, @xy, alpha)
 
+with M.SummonAbility = LuaGameObject.type_create()
+    .init = (args) =>
+        {:monster, :caster, :xy, :duration} = args
+        M.SummonAbility.parent_init(@, xy, 16, true, SPELL_WALL_DEPTH)
+        @duration = duration
+        @caster = caster
+        @n_steps = 0
+        @monster = monster
+    .on_step = () =>
+        @n_steps += 1
+        if @n_steps >= SPELL_WALL_DURATION
+            GameObject.destroy(@)
+            mon = GameObject.enemy_create {type: @monster, xy: @xy}
+            @caster.summoned[mon] = true
+    .on_draw = () =>
+        if Map.object_visible(@)
+            alpha = @n_steps / @duration
+            sprite = monster_sprite @monster
+            ObjectUtils.screen_draw(sprite, @xy, alpha, nil, nil, COL_GRAY)
+
 return M

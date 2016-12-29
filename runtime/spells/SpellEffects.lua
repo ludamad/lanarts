@@ -5,7 +5,9 @@ function poison_statmod(effect, obj, old, new)
 	new.defence = math.max(0, new.defence - 5)
 	new.willpower = math.max(0, new.willpower - 3)
 --	new.speed = new.speed * 1.66
---        new.speed = new.speed / 2
+        if not obj.is_enemy then
+            new.speed = new.speed / 2
+        end
 end
 
 function poison_map_init(effect, obj)

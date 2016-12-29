@@ -263,9 +263,24 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
             id, p.x, p.y);
 
     int range = pentry.range();
-    GameInst* bullet = new ProjectileInst(projectile, atkstats, id, Pos(x, y),
+
+    if (pentry.name == "Mephitize" || pentry.name == "Trepidize") {
+          float vx = 0, vy = 0;
+          direction_towards(Pos {x, y}, p, vx, vy, 10000);
+          int directions = (pentry.name == "Trepidize" ? 4 : 16);
+
+          for (int i = 0; i < directions; i++) {
+              const float PI =3.141592;
+              float angle = PI / directions * 2 * i;
+              Pos new_target {x + cos(angle) * vx - sin(angle) * vy, y + cos(angle) * vy + sin(angle) * vx};
+              GameInst* pinst = new ProjectileInst(projectile, atkstats, id, ipos(), new_target, pentry.speed, pentry.range(), NONE);
+              gs->add_instance(pinst);
+          }
+      } else {
+          GameInst* bullet = new ProjectileInst(projectile, atkstats, id, Pos(x, y),
             p, pentry.speed, range);
-    gs->add_instance(bullet);
+          gs->add_instance(bullet);
+    }
     cooldowns().reset_action_cooldown(
             pentry.cooldown()
                     * estats.cooldown_modifiers.ranged_cooldown_multiplier);

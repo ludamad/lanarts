@@ -147,42 +147,37 @@ MINOR_ENCHANTS = {
     mult_stat_bonus("spell_velocity_multiplier", {1.10, 1.25})
     add_random_spell()
     add_random_effect()
-    additive_stat_bonus("mp", {10, 35})
-    additive_stat_bonus("hp", {10, 35})
+    additive_stat_bonus("mp", {10, 25})
+    additive_stat_bonus("hp", {10, 25})
     additive_stat_bonus("hpregen", {0.02, 0.03})
     additive_stat_bonus("mpregen", {0.02, 0.03})
     additive_stat_bonus("strength", {1, 2})
     additive_stat_bonus("defence", {1, 2})
     additive_stat_bonus("willpower", {1, 2})
     additive_stat_bonus("magic", {1, 2})
-    additive_core_bonus("reduction", {1, 2})
-    additive_core_bonus("resistance", {1, 2})
-    additive_core_bonus("magic_reduction", {1, 2})
-    additive_core_bonus("magic_resistance", {1, 2})
-    additive_core_bonus("magic_resistance", {1, 2})
-    mult_core_bonus("magic_cooldown_multiplier", {0.85, 0.9})
-    mult_core_bonus("melee_cooldown_multiplier", {0.85, 0.9})
-    mult_core_bonus("ranged_cooldown_multiplier", {0.85, 0.9})
+    additive_core_bonus("reduction", {1, 3})
+    additive_core_bonus("resistance", {1, 3})
+    additive_core_bonus("magic_reduction", {1, 3})
+    additive_core_bonus("magic_resistance", {1, 3})
+    mult_core_bonus("magic_cooldown_multiplier", {0.89, 0.95})
+    mult_core_bonus("melee_cooldown_multiplier", {0.89, 0.95})
+    mult_core_bonus("ranged_cooldown_multiplier", {0.89, 0.95})
 }
 
 -- Minor debuffs:
 -- Major enchantments:
 MAJOR_ENCHANTS = {
-    (rng, data) ->
-        while true
+    (rng, data) -> -- TODO
+        for i=1,2
             f = rng\random_choice(MINOR_ENCHANTS)
-            if f == MINOR_ENCHANTS[1] or f == MINOR_ENCHANTS[2]
-                continue
             f(rng, data)
-            f(rng, data)
-            break
 }
 
 -- Major debuffs:
 MINOR_DEBUFFS = {
     mult_stat_bonus("spell_velocity_multiplier", {0.8, 0.9})
-    additive_stat_bonus("mp", {-20, -5})
-    additive_stat_bonus("hp", {-20, -5})
+    additive_stat_bonus("mp", {-20, -15})
+    additive_stat_bonus("hp", {-20, -15})
     additive_stat_bonus("hpregen", {-0.03, -0.01})
     additive_stat_bonus("mpregen", {-0.03, -0.01})
     additive_stat_bonus("strength", {-3, -1})

@@ -75,7 +75,9 @@ bool EffectStats::can_rest() {
 	for (int i = 0; i < EFFECTS_MAX; i++) {
 		if (effects[i].t_remaining > 0) {
 			EffectEntry& eentry = game_effect_data.at(effects[i].effectid);
-			return false;
+			if (!eentry.allowed_actions.can_use_rest) {
+	            return false;
+			}
 		}
 	}
 	return true;
@@ -141,6 +143,20 @@ static void lua_effect_func_callback(lua_State* L, LuaValue& value,
 	lua_call(L, 2 + (name != NULL), 0);
 }
 
+void EffectStats::ensure_effects_active(GameState* gs, CombatGameInst* inst, const std::vector<effect_id>& effects, const char* name) {
+    for (effect_id id : effects) {
+         Effect* eff = get(id);
+         if (eff == NULL) {
+             // Create a sticky effect, t_remaining = 1 after
+             LuaValue state = add(gs, inst, id, 2);
+             lua_effect_func_callback(gs->luastate(), game_effect_data.at(id).on_equip_func, state, inst, name);
+         } else {
+             // Make sure the effect is sticky, t_remaining = 1 after
+             eff->t_remaining = 2;
+         }
+    }
+}
+
 void EffectStats::step(GameState* gs, CombatGameInst* inst) {
 	lua_State* L = gs->luastate();
 	auto& items = inst->inventory();
@@ -148,17 +164,7 @@ void EffectStats::step(GameState* gs, CombatGameInst* inst) {
 	for (auto& item : items.raw_slots()) {
 	    if (item.is_equipped()) {
 	        EquipmentEntry& entry = item.equipment_entry();
-	        for (effect_id id : entry.effect_modifiers.status_effects) {
-	             Effect* eff = get(id);
-	             if (eff == NULL) {
-	                 // Create a sticky effect, t_remaining = 1 after
-	                 LuaValue state = add(gs, inst, id, 2);
-	                 lua_effect_func_callback(L, game_effect_data.at(id).on_equip_func, state, inst, entry.name.c_str());
-	             } else {
-	                 // Make sure the effect is sticky, t_remaining = 1 after
-	                 eff->t_remaining = 2;
-	             }
-	        }
+	        ensure_effects_active(gs, inst, entry.effect_modifiers.status_effects, entry.name.c_str());
 	    }
 	}
 	// Step for every effect in the game:

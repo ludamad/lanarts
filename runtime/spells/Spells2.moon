@@ -5,6 +5,18 @@ Bresenham = require "core.Bresenham"
 Display = require "core.Display"
 SpellObjects = require "objects.SpellObjects"
 
+ally_list = (inst) ->
+    if not inst.is_enemy
+        return Map.players_list() or {}
+    else
+        return Map.monsters_list() or {}
+
+enemy_list = (inst) ->
+    if inst.is_enemy
+        return Map.players_list() or {}
+    else
+        return Map.monsters_list() or {}
+
 Data.spell_create {
     name: "Ice Form"
     spr_spell: "spr_spells.iceform"
@@ -62,33 +74,20 @@ AuraBase = {
         Display.draw_circle_outline(with_alpha(outer_col, alpha), xy, @range, 2)
 }
 
--- TODO
--- Data.effect_create Aura {
---     name: "Health Aura"
---     category: "Aura"
---     init_func: (caster) =>
---         AuraBase.init(@, caster)
---         @hp_gain = 2
---     step_func: (caster) =>
---         AuraBase.step(@, caster)
---         for mon in *(Map.monsters_list() or {})
---             if mon\has_effect("Healed")
---                 continue
---             eff_range = mon.target_radius + caster.target_radius + @range
---             dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
---             if dist < eff_range
---                 mon\add_effect("Pained", 50)
---                 if mon\damage(random(4,15) * 2 + caster.stats.magic * 2, random(6,10) + caster.stats.magic * 0.2, 1.0, 2.0)
---                     {:stats} = caster
---                     stats.mp = math.min(stats.max_mp, stats.mp + @mp_gain)
---                     -- Summon zombies by probability!?
---                     if caster\is_local_player() 
---                         EventLog.add("You drain the enemy's life force as MP!", {200,200,255})
---                     else
---                         EventLog.add(caster.name .. " drains the enemy's life force as MP!", {200,200,255})
---     draw_func: (caster, top_left_x, top_left_y) =>
---         Aura.draw(@, COL_PALE_RED, COL_RED, caster.x, caster.y)
--- }
+-- Effects:
+
+Data.effect_create {
+    name: "SummoningMummy"
+    category: "Summon"
+    effected_colour: {200, 200, 255}
+    fade_out: 10
+    effected_sprite: "spr_enemies.spr_mummy"
+    stat_func: (effect, obj, old, new) ->
+        new.speed = 0
+    init_func: (caster) =>
+        ability = SpellObjects.SummonAbility.create {monster: "Mummy", :caster, xy: {caster.x, caster.y}, duration: @time_left}
+        GameObject.add_to_level(ability)
+}
 
 Data.effect_create {
     name: "Fear Aura"
@@ -101,7 +100,7 @@ Data.effect_create {
         @max_alpha = 0.4
     step_func: (caster) =>
         AuraBase.step(@, caster)
-        for mon in *(Map.monsters_list() or {})
+        for mon in *(enemy_list caster)
             if mon\has_effect("Fear")
                 continue
             dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
@@ -130,12 +129,12 @@ Data.effect_create {
         @max_alpha = 0.4
     step_func: (caster) =>
         AuraBase.step(@, caster)
-        for p in *(Map.players_list() or {})
-            if p\has_effect("Healing")
+        for ally in *ally_list(caster)
+            if ally\has_effect("Healing")
                 continue
-            dist = vector_distance({p.x, p.y}, {caster.x, caster.y})
+            dist = vector_distance({ally.x, ally.y}, {caster.x, caster.y})
             if dist < @range
-                p\add_effect("Healing", 200)
+                ally\add_effect("Healing", 200)
     draw_func: (caster, top_left_x, top_left_y) =>
         AuraBase.draw(@, COL_GRAY, COL_WHITE, caster.x, caster.y)
 }
@@ -149,7 +148,7 @@ Data.effect_create {
         AuraBase.init(@, caster)
     step_func: (caster) =>
         AuraBase.step(@, caster)
-        for mon in *(Map.monsters_list() or {})
+        for mon in *(enemy_list caster)
             if mon\has_effect("Dazed")
                 continue
             dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
@@ -167,23 +166,31 @@ Data.effect_create {
     init_func: (caster) =>
         AuraBase.init(@, caster)
         @mp_gain = 10
+        if caster.is_enemy
+            @range = 90
     step_func: (caster) =>
         AuraBase.step(@, caster)
-        for mon in *(Map.monsters_list() or {})
+        if caster.is_enemy and not Map.object_visible(caster)
+            return
+        for mon in *(enemy_list caster)
             if mon\has_effect("Pained")
                 continue
             dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
             if dist < @range
                 mon\add_effect("Pained", 50)
+                caster\add_effect("Pained", 50)
                 if mon\damage(random(4,15) * 2 + caster.stats.magic * 2, random(6,10) + caster.stats.magic * 0.2, 1.0, 2.0)
                     {:stats} = caster
                     stats.mp = math.min(stats.max_mp, stats.mp + @mp_gain)
                     -- Summon zombies by probability!?
-                    if caster\is_local_player() 
+                    if not caster.is_enemy and caster\is_local_player() 
                         EventLog.add("You drain the enemy's life force as MP!", {200,200,255})
-                    else
+                    elseif not caster.is_enemy
                         EventLog.add(caster.name .. " drains the enemy's life force as MP!", {200,200,255})
     draw_func: (caster, top_left_x, top_left_y) =>
+        @max_alpha = 0.35
+        if not caster.is_enemy and not caster\has_effect "Pained"
+            @max_alpha /= 2
         AuraBase.draw(@, COL_PALE_RED, COL_RED, caster.x, caster.y)
 }
 
@@ -197,6 +204,12 @@ Data.effect_create {
         attacker\heal_hp(damage / 10)
 }
 
+
+Data.effect_create {
+    name: "EnemyHyperProjectile"
+    stat_func: (effect, obj, old, new) ->
+        new.ranged_cooldown_multiplier *= 0.1
+}
 
 Data.effect_create {
     name: "PoisonedWeapon"

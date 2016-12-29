@@ -22,6 +22,7 @@
 
 #include "gamestate/GameState.h"
 #include "objects/player/PlayerInst.h"
+#include "objects/enemy/EnemyInst.h"
 
 #include "lua_api.h"
 
@@ -455,8 +456,16 @@ static BBox lapi_random_subregion(LuaStackValue lbox, Size size) {
 }
 
 static bool lapi_chance(LuaStackValue val) {
-	GameState* gs = lua_api::gamestate(val);
-	return gs->rng().rand(RangeF(0, 1)) < val.to_num();
+    GameState* gs = lua_api::gamestate(val);
+    return gs->rng().rand(RangeF(0, 1)) < val.to_num();
+}
+
+
+static ldraw::Drawable lapi_tosprite(const char* name) {
+    return res::sprite(name);
+}
+static ldraw::Drawable lapi_monster_sprite(const char* name) {
+    return res::sprite(game_enemy_data.at(get_enemy_by_name(name)).enemy_sprite);
 }
 
 static LuaValue lengine_import_internal_raw(LuaStackValue importstring) {
@@ -572,6 +581,8 @@ namespace lua_api {
 		globals["random_gaussian"].bind_function(lapi_random_gaussian);
 		globals["random_subregion"].bind_function(lapi_random_subregion);
 		globals["chance"].bind_function(lapi_chance);
+        globals["tosprite"].bind_function(lapi_tosprite);
+        globals["monster_sprite"].bind_function(lapi_monster_sprite);
 		globals["cpp_traceback"].bind_function(lapi_cpp_traceback);
 
 		globals["__read_eval_print"].bind_function(read_eval_print);

@@ -1,5 +1,6 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
+#include <luawrap/luawrap.h>
 
 #include "data/game_data.h"
 
@@ -46,6 +47,48 @@ void load_enemy_callbackf(const YAML::Node& node, lua_State* L,
 	(*value)[entry.name] = node;
 }
 
+
+static EnemyEntry parse_enemy_type(const LuaStackValue& table) {
+    using namespace luawrap;
+    lua_State* L = table.luastate();
+    EnemyEntry entry;
+
+    entry.name = table["name"].to_str();
+    entry.description = defaulted(table, "description", std::string());
+
+    entry.appear_msg = defaulted(table, "appear_message", std::string());
+    entry.defeat_msg = defaulted(table, "defeat_message", std::string());
+
+    if (!table["sprite"].isnil()) {
+        entry.enemy_sprite = res::sprite_id(table["sprite"].to_str());
+    }
+    if (!table["death_sprite"].isnil()) {
+        entry.death_sprite = res::sprite_id(table["death_sprite"].to_str());
+    }
+    entry.radius = defaulted(table, "radius", 12);
+    entry.xpaward = table["xpaward"].to_num();
+
+    entry.basestats = parse_combat_stats(table["stats"]);
+    entry.unique = defaulted(table, "unique", false);
+
+    entry.init_event.initialize(table["init_func"]);
+    entry.step_event.initialize(table["step_func"]);
+    entry.draw_event.initialize(table["draw_func"]);
+
+    auto effects_granted = luawrap::defaulted(table["effects_active"], vector<string>());
+    entry.effect_modifiers.status_effects.clear();
+    for (string& str : effects_granted) {
+         entry.effect_modifiers.status_effects.push_back( get_effect_by_name(str.c_str()) );
+    }
+
+    return entry;
+}
+
+static void lapi_data_create_enemy(const LuaStackValue& table) {
+    game_enemy_data.push_back(parse_enemy_type(table));
+}
+
+
 LuaValue load_enemy_data(lua_State* L, const FilenameList& filenames) {
 	LuaValue ret(L);
 	ret.newtable();
@@ -53,6 +96,10 @@ LuaValue load_enemy_data(lua_State* L, const FilenameList& filenames) {
 	game_enemy_data.clear();
 	load_data_impl_template(filenames, "enemies", load_enemy_callbackf, L,
 			&ret);
+
+    LuaValue data = luawrap::ensure_table(luawrap::globals(L)["Data"]);
+    data["enemy_create"].bind_function(lapi_data_create_enemy);
+    luawrap::dofile(L, "enemies/LoadEnemies.lua");
 
 	return ret;
 }

@@ -9,7 +9,7 @@ from collections import OrderedDict, defaultdict
 print "local Display = require 'core.Display'"
 print "local M = nilprotect {}"
 
-SPR_FOLDERS = ["spr_doors", "spr_keys", "spr_rings", "spr_rings", "spr_weapons", "spr_armour", "spr_effects", "spr_spells", "spr_amulets", "spr_belts", "spr_legwear", "spr_boots", "spr_scrolls", "spr_gates"]
+SPR_FOLDERS = ["spr_doors", "spr_keys", "spr_rings", "spr_rings", "spr_weapons", "spr_armour", "spr_effects", "spr_spells", "spr_amulets", "spr_belts", "spr_legwear", "spr_boots", "spr_scrolls", "spr_gates", "spr_enemies", "spr_enemies/undead"]
 for spr in SPR_FOLDERS:
     try:
         os.lstat(spr + "/randarts")

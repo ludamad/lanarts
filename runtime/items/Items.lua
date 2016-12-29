@@ -1,5 +1,6 @@
 local GlobalData = require "core.GlobalData"
 local MiscSpellAndItemEffects = require "core.MiscSpellAndItemEffects"
+local EventLog = require "ui.EventLog"
 
 assert(GlobalData.keys_picked_up)
 

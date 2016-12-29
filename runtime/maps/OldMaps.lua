@@ -14,6 +14,18 @@ local easy_animals = {
   {enemy = "Adder",         chance = 100                                            }
 }
 
+M.weak_undead = {
+  {enemy = "Skeleton",          chance = 100                                            },
+}
+
+M.strong_undead = {
+  {enemy = "Gaseous Ghost",          chance = 100                                            },
+  {enemy = "Mummoner",          chance = 100                                            },
+}
+M.epic_undead = {
+  {enemy = "Crypt Keeper",          chance = 100                                            },
+}
+
 M.medium_animals = {
   {enemy = "Giant Rat",         chance = 100, group_chance = 33, group_size = 3           },
   {enemy = "Giant Bat",         chance = 100, group_chance = 33, group_size = 3           },

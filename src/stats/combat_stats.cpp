@@ -266,7 +266,9 @@ CombatStats parse_combat_stats(const LuaField& value) {
 	ret.class_stats.xplevel = defaulted(value, "xplevel", 1);
 
 	if (value.has("attacks")) {
-		ret.attacks.push_back(parse_attack_stats(value));
+	    for (int i = 0; i < value["attacks"].objlen(); i++) {
+	        ret.attacks.push_back(parse_attack_stats(value["attacks"][i+1]));
+	    }
 	}
 
 	return ret;

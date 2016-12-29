@@ -25,8 +25,10 @@ struct EnemyEntry: public ResourceEntryBase {
 	sprite_id enemy_sprite, death_sprite;
 	CombatStats basestats;
 	bool unique;
+	std::vector<effect_id> active_effects;
 
 	LuaLazyValue init_event, step_event, draw_event;
+	StatusEffectModifiers effect_modifiers;
 
 	EnemyEntry() :
 			radius(15), xpaward(0), enemy_sprite(-1), death_sprite(-1), unique(

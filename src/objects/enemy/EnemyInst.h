@@ -42,7 +42,7 @@ public:
 	int enemy_type() {
             return enemytype;
         }
-	int xpworth(){
+	int& xpworth(){
 		return xpgain;
 	}
 

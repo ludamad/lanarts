@@ -123,7 +123,7 @@ static LuaValue lua_gameinst_base_metatable(lua_State* L) {
 	luawrap::bind_getter(getters["id"], &GameInst::id);
 	luawrap::bind_getter(getters["depth"], &GameInst::depth);
 	luawrap::bind_getter(getters["radius"], &GameInst::radius);
-	luawrap::bind_getter(getters["solid"], &GameInst::solid);
+    luawrap::bind_getter(getters["solid"], &GameInst::solid);
 	luawrap::bind_getter(getters["target_radius"], &GameInst::target_radius);
 	getters["map"].bind_function(lapi_gameinst_map);
 	LUAWRAP_GETTER(meta, __tostring, typeid(*OBJ).name());
@@ -222,7 +222,9 @@ static LuaValue lua_enemyinst_metatable(lua_State* L) {
     LUAWRAP_GETTER(getters, unique, OBJ->etype().unique);
     LUAWRAP_GETTER(getters, is_enemy, true);
 	LUAWRAP_GETTER(getters, kills, 0);
-
+	LUAWRAP_GETTER(getters, sprite, game_sprite_data[OBJ->get_sprite()].sprite);
+    LUAWRAP_GETTER(getters, xpworth, OBJ->xpworth());
+    LUAWRAP_SETTER(setters, xpworth, double, OBJ->xpworth() = VAL);
 	return meta;
 }
 

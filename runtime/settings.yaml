@@ -3,7 +3,7 @@ username: User
 lobby_server_url: http://putterson.homedns.org:8080
 
 #Window settings
-fullscreen: no
+fullscreen: yes
 view_width: 960
 view_height: 540
 #Font settings

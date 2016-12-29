@@ -133,6 +133,7 @@ namespace ldungeon_gen {
 	}
 
     void perimeter_apply(MapPtr map, BBox area, Selector candidate, Selector criteria, ConditionalOperator oper) {
+        area = area.resized_within({1,1, map->width() - 1, map->height() - 1});
         FOR_EACH_BBOX(area, x, y) {
             Square& sqr = (*map)[Pos(x,y)];
             if (sqr.matches(candidate)) {

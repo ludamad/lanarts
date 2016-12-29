@@ -23,13 +23,15 @@ function Base:init(args)
     table.insert(self.traits, M.FEATURE_TRAIT)
 end 
 function Base:on_draw()
-    if self.sprite and Display.object_within_view(self) then
-        ObjectUtils.screen_draw(self.sprite, self.xy, self.alpha, self.frame)
+    if Display.object_within_view(self) then
+        if self.sprite then
+            ObjectUtils.screen_draw(self.sprite, self.xy, self.alpha, self.frame)
+        end
     end
 end
 
 -- Decoration
-M.Decoration = LuaGameObject.type_create(Base)
+M.Decoration = LuaGameObject.type_create({base = Base})
 local Decoration = M.Decoration
 function Decoration:on_step()
 --    if self.sprite or Map.distance_to_player(self.map, self.xy) >= DEACTIVATION_DISTANCE then
@@ -37,7 +39,8 @@ function Decoration:on_step()
 --    end 
     if Map.object_visible(self) then
         self.sprite = self.real_sprite
-    elseif not self.sprite and Map.tile_was_seen(self.map, {math.floor(self.x / 32), math.floor(self.y / 32)}) then
+    end
+    if not self.sprite and Display.object_within_view(self) and Map.tile_was_seen(self.map, ObjectUtils.tile_xy(self, true)) then
         self.sprite = self.real_sprite
     end
 end
@@ -49,7 +52,7 @@ function Decoration:init(args)
 end
 
 -- Door
-M.Door = LuaGameObject.type_create(Base)
+M.Door = LuaGameObject.type_create({base = Base})
 local Door = M.Door
 local DOOR_OPEN_TIMEOUT = 128
 local function is_solid(obj) 
@@ -103,7 +106,9 @@ function Door:on_step()
     if self.sprite ~= real_sprite and Map.object_visible(self) then
         self.sprite = real_sprite
     end
-
+    if not self.sprite and Display.object_within_view(self) and Map.tile_was_seen(self.map, ObjectUtils.tile_xy(self, true)) then
+        self.sprite = self.closed_sprite
+    end
     self.was_open = is_open
 end
 function Door:on_map_init()

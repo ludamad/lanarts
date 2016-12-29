@@ -172,6 +172,7 @@ void EnemyInst::step(GameState* gs) {
 // XXX: Make the monster health absorbing way less hackish and more general
 	int hp_before = stats().core.hp;
 
+    effects().ensure_effects_active(gs, this, etype().effect_modifiers.status_effects, etype().name.c_str());
 	CombatGameInst::step(gs);
 
     // Regenerate much quicker if the player left the level:
