@@ -75,7 +75,7 @@ local Regeneration = {
     cooldown = 40,
     can_cast_with_held_key = false,
     fallback_to_melee = false,
-    spell_cooldown = 400
+    spell_cooldown = 2400
 }
 
 function Regeneration.prereq_func(caster)
