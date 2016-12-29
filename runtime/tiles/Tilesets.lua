@@ -19,6 +19,21 @@ M.pebble = Data.tileset_create {
 	wall = { images = Display.images_load (path_resolve "dngn_wall/brickdark/brick_dark.png%32x32")}
 }
 
+M.crypt = Data.tileset_create {
+	floor = { images = Display.images_load ("spr_tile_floors/crypt.png%32x32") },
+	floor_alt = { images = Display.images_load ("spr_tile_floors/grey_dirt.png%32x32") },
+	wall = { images = Display.images_load ("spr_tile_walls/catacombs.png%32x32") },
+	wall_alt = { images = Display.images_load ("spr_tile_walls/vault_stone.png%32x32") },
+}
+
+M.hell = Data.tileset_create {
+	floor = { images = Display.images_load ("spr_tile_floors/demonic_red.png%32x32") },
+	floor_alt = { images = Display.images_load ("spr_tile_floors/floor_nerves.png%32x32") },
+	floor_alt2 = { images = Display.images_load ("spr_tile_floors/crypt.png%32x32") },
+	wall = { images = Display.images_load ("spr_tile_walls/volcanic_wall.png%32x32") },
+	wall_alt = { images = Display.images_load ("spr_tile_walls/vault_stone.png%32x32") },
+}
+
 M.temple = Data.tileset_create {
     floor = { images = Display.images_load (path_resolve "dngn_floor/crystal/crystal_floor(0-5).png") },
     floor_alt = { images = Display.images_load (path_resolve "dngn_floor/mesh/mesh(0-3).png") },

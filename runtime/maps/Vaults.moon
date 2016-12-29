@@ -155,6 +155,16 @@ M.ridge_dungeon = (args) -> {
 }
 
 
+M.crypt_dungeon = (args) -> table.merge M.ridge_dungeon(args), {
+    data: [=[
+....+....
+..wwdww..
+.wwpppww.
+.wppDpww.
+.wwwwwww.]=]
+}
+
+
 M.sealed_dungeon = (args) -> table.merge M.ridge_dungeon(args), {
     data: [=[
 .....wwwwwww....
@@ -652,6 +662,19 @@ M.small_item_vault_multiway = (args) -> table.merge M.small_item_vault(args), {
     }
 }
 
+M.small_item_vault_multiitem = (args) -> table.merge M.small_item_vault(args), {
+    data: random_choice {
+[=[
+++++++++++
++wdwwwwww+
++dppppppd+
++dpppippd+
++dppipipd+
++dppppppd+
++wdwwwwww+
+++++++++++]=]
+    }
+}
 M.dungeon_tunnel = (args) -> table.merge M.small_item_vault(args), {
     data: random_choice {
         [=[
