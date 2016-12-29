@@ -49,7 +49,7 @@ function berserk_effect.step(effect, obj)
 	local killdiff = obj.kills - effect.kill_tracker
 
 	while killdiff > 0 do
-		effect.time_left = effect.time_left + berserk_extension(effect)
+		effect.time_left = math.min(effect.max_time * 1.5, effect.time_left + berserk_extension(effect))
 		if obj:is_local_player() then
 			EventLog.add("Your rage grows ...", {200,200,255})
 		end
@@ -66,6 +66,7 @@ end
 
 function berserk_effect.init(effect, obj) 
 	effect.kill_tracker = obj.kills 
+        effect.max_time = effect.time_left
 	effect.extensions = 0
 end
 
