@@ -79,11 +79,10 @@ AuraBase = {
 Data.effect_create {
     name: "SummoningMummy"
     category: "Summon"
-    effected_colour: {200, 200, 255}
+    effected_colour: COL_PALE_RED
     fade_out: 10
-    effected_sprite: "spr_enemies.spr_mummy"
     stat_func: (effect, obj, old, new) ->
-        new.speed = 0
+        new.speed *= 2
     init_func: (caster) =>
         ability = SpellObjects.SummonAbility.create {monster: "Mummy", :caster, xy: {caster.x, caster.y}, duration: @time_left}
         GameObject.add_to_level(ability)

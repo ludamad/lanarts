@@ -107,12 +107,28 @@ with M.SummonAbility = LuaGameObject.type_create()
         @caster = caster
         @n_steps = 0
         @monster = monster
+    .on_map_init = () =>
+        -- Move to somewhere randomly nearby, but in sight:
+        for i=1,100
+            {x,y} = @xy
+            x += random(-64, 64)
+            y += random(-64, 64)
+            if not Map.radius_visible {x, y}, 1
+                continue
+            collisions = Map.rectangle_collision_check(@map, {x - 16, y - 16, x+16, y+16}, @)
+            collisions = table.filter(collisions, () => @solid)
+            if #collisions > 0
+                continue
+            if Map.object_tile_check(@, {x,y})
+                continue
+            @xy = {x, y}
+            break
     .on_step = () =>
         @n_steps += 1
         if @n_steps >= SPELL_WALL_DURATION
             GameObject.destroy(@)
             mon = GameObject.enemy_create {type: @monster, xy: @xy}
-            @caster.summoned[mon] = true
+            @caster.summoned[mon] = 1
     .on_draw = () =>
         if Map.object_visible(@)
             alpha = @n_steps / @duration

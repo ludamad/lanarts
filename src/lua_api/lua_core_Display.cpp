@@ -54,6 +54,12 @@ static int to_screen_xy(lua_State* L) {
 	return 1;
 }
 
+static int point_within_view(lua_State* L) {
+	GameView& view = lua_api::gamestate(L)->view();
+	lua_pushboolean(L, circle_rectangle_test(luawrap::get<Pos>(L, 1), 1, view.region_covered()));
+	return 1;
+}
+
 static int object_within_view(lua_State* L) {
 	GameView& view = lua_api::gamestate(L)->view();
 	GameInst* inst = luawrap::get<GameInst*>(L, 1);
@@ -102,6 +108,7 @@ namespace lua_api {
 		vals["draw_start"].bind_function(ldraw::display_draw_start);
 		vals["draw_finish"].bind_function(ldraw::display_draw_finish);
 		vals["object_within_view"].bind_function(object_within_view);
+		vals["point_within_view"].bind_function(point_within_view);
 		vals["to_screen_xy"].bind_function(to_screen_xy);
 	}
 

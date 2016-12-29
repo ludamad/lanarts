@@ -19,11 +19,12 @@ M.weak_undead = {
 }
 
 M.strong_undead = {
-  {enemy = "Gaseous Ghost",          chance = 100                                            },
+  {enemy = "Gaseous Ghost",          chance = 25                                            },
   {enemy = "Mummoner",          chance = 100                                            },
+  {enemy = "Crypt Keeper",          chance = 25                                            },
+  {enemy = "Mummy",          guaranteed_spawns = 65                                           },
 }
 M.epic_undead = {
-  {enemy = "Crypt Keeper",          chance = 100                                            },
 }
 
 M.medium_animals = {

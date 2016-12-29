@@ -203,7 +203,8 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	methods["heal_hp"].bind_function(lapi_combatgameinst_heal_hp);
     methods["heal_mp"].bind_function(lapi_combatgameinst_heal_mp);
 
-	LUAWRAP_METHOD(methods, add_effect, OBJ->effects().add(lua_api::gamestate(L), OBJ, effect_from_lua(L, 2), lua_tointeger(L, 3)).push() );
+    LUAWRAP_METHOD(methods, add_effect, OBJ->effects().add(lua_api::gamestate(L), OBJ, effect_from_lua(L, 2), lua_tointeger(L, 3)).push() );
+    LUAWRAP_METHOD(methods, die, OBJ->die(lua_api::gamestate(L)));
     LUAWRAP_GETTER(methods, has_effect, OBJ->effects().get(effect_from_lua(L, 2)) != NULL);
     LUAWRAP_GETTER(methods, has_effect_category, OBJ->effects().has_category(luawrap::get<const char*>(L, 2)));
 
