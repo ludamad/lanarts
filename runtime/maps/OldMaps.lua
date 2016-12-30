@@ -24,7 +24,14 @@ M.strong_undead = {
   {enemy = "Crypt Keeper",          chance = 25                                            },
   {enemy = "Mummy",          guaranteed_spawns = 65                                           },
 }
-M.epic_undead = {
+M.weak_hell = {
+}
+M.strong_hell = {
+  {enemy = "Hell Storm",        chance = 20,  group_chance = 33, group_size = 3           },
+     {enemy = "Dark Centaur",      chance = 30                                              },
+    {enemy = "Hell Forged", chance = 20},
+  {enemy = "Executioner",          guaranteed_spawns = 10                                           },
+  {enemy = "Hell Warrior",          guaranteed_spawns = 2                                           },
 }
 
 M.medium_animals = {
@@ -256,7 +263,7 @@ M.Dungeon2 = {
 }
 
 M.Dungeon3 = {
-  { layout = small_layouts,
+  { layout = large_layouts,
     content = {
       items = { amount = 5,  group = ItemGroups.basic_items   },
       enemies = {

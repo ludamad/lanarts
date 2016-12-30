@@ -31,7 +31,7 @@ M.hell = Data.tileset_create {
 	floor_alt = { images = Display.images_load ("spr_tile_floors/floor_nerves.png%32x32") },
 	floor_alt2 = { images = Display.images_load ("spr_tile_floors/crypt.png%32x32") },
 	wall = { images = Display.images_load ("spr_tile_walls/volcanic_wall.png%32x32") },
-	wall_alt = { images = Display.images_load ("spr_tile_walls/vault_stone.png%32x32") },
+	wall_alt = { images = Display.images_load ("spr_tile_walls/spider.png%32x32") },
 }
 
 M.temple = Data.tileset_create {

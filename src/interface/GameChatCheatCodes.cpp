@@ -5,6 +5,7 @@
 
 #include <lua.hpp>
 
+#include <luawrap/luawrap.h>
 #include "gamestate/GameState.h"
 
 #include <lcommon/math_util.h>
@@ -139,6 +140,8 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 			Colour(120, 120, 255));
 			return true;
 		}
+		luawrap::push(gs->luastate(), gs->local_player());
+		luawrap::globals(gs->luastate())["player"].pop();
 
 		bool iserr = (lua_pcall(L, 0, LUA_MULTRET, 0) != 0);
 

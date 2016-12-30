@@ -262,7 +262,7 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(methods, has_melee_weapon, !OBJ->weapon().weapon_entry().uses_projectile);
 	LUAWRAP_GETTER(methods, has_ranged_weapon, OBJ->weapon().weapon_entry().uses_projectile);
 	LUAWRAP_GETTER(methods, is_local_player, OBJ->is_local_player());
-	LUAWRAP_METHOD(methods, gain_xp, OBJ->gain_xp(lua_api::gamestate(L), luawrap::get<int>(L, 2)));
+	LUAWRAP_METHOD(methods, gain_xp, players_gain_xp(lua_api::gamestate(L), luawrap::get<int>(L, 2)));
 	LUAWRAP_METHOD(methods, reset_rest_cooldown, OBJ->cooldowns().reset_rest_cooldown(REST_COOLDOWN));
 	methods["apply_melee_cooldown"].bind_function(apply_melee_cooldown);
 

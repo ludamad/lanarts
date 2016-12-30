@@ -77,6 +77,34 @@ AuraBase = {
 -- Effects:
 
 Data.effect_create {
+    name: "HealthGainOnKill"
+    category: "EquipEffect"
+    init_func: (caster) =>
+        @kill_tracker = caster.kills
+    step_func: (caster) =>
+        while caster.kills > @kill_tracker
+            if caster\is_local_player()
+                EventLog.add("You regain health for killing!", COL_PALE_BLUE)
+                caster\heal_hp(5 + caster.stats.level)
+            @kill_tracker += 1
+}
+
+
+Data.effect_create {
+    name: "ManaGainOnKill"
+    category: "EquipEffect"
+    init_func: (caster) =>
+        @kill_tracker = caster.kills
+    step_func: (caster) =>
+        while caster.kills > @kill_tracker
+            if caster\is_local_player()
+                EventLog.add("You regain mana for killing!", COL_PALE_BLUE)
+                caster\heal_mp(5 + caster.stats.level)
+            @kill_tracker += 1
+}
+
+
+Data.effect_create {
     name: "SummoningMummy"
     category: "Summon"
     effected_colour: COL_PALE_RED

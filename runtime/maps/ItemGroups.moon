@@ -19,6 +19,7 @@ rings = (chance, args) -> _filter{
     args.ignore_medium or{  item: "Gallanthor's Ring",  chance: 4                      }
     args.ignore_strong or{  item: "Ring of Ethereal Armour",  chance: 1                      }
     args.ignore_strong or{  item: "Ring of Vampirism",  chance: 1                      }
+    args.ignore_strong or{  item: "Wizard's Ring",  chance: 4                      }
     { item: "Ring of Spells",     chance: 8                      }
     { item: "Ring of Vitality",   chance: 8                      }
     { item: "Ring of Stone",      chance: 4                      }
@@ -91,13 +92,14 @@ helmets = (chance, args) -> _filter{
 }
 
 -- Belts
-belts = (chance) -> { 
+belts = (chance, args) -> _filter { 
     :chance
     { item: "Belt of Protection",      chance: 10                      }
     { item: "Belt of Slaying",        chance: 10                      }
-    { item: "Warped Belt",        chance: 1                      }
+    args.ignore_strong or { item: "Lifesteal Belt",        chance: 2                      }
+    args.ignore_strong or { item: "Warped Belt",        chance: 1                      }
     { item: "Spiked Belt",        chance: 10                      }
-    { item: "Dank Belt",        chance: 1                      }
+    args.ignore_medium or { item: "Dank Belt",        chance: 2                      }
 }
 
 -- Legwear
@@ -201,7 +203,7 @@ weapons = (chance, args) -> _filter {
         } 
         args.ignore_medium or {
             chance: 20
-            { item: "Devious Staff",                 chance: 1           }
+            { item: "Wizard's Staff",                 chance: 1           }
             { item: "Mace",                          chance: 1           }
         }
         args.ignore_strong or {

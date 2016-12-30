@@ -46,6 +46,12 @@ make_legend = (args, legend) ->
             content: args.tileset.floor
             on_placement: args.gold_placer
         }
+        'X': {
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN}
+            content: args.tileset.floor
+            on_placement: (map, xy) ->
+                MapUtils.spawn_item(map, "Scroll of Experience", 1, xy)
+        }
         'd': {
             add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_HAS_VAULT}
             matches_none: {M.FLAG_HAS_VAULT}
@@ -72,7 +78,7 @@ M.ridge_dungeon = (args) -> {
             matches_none: {M.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}
             matches_content: args.door_match_content
         }
-        'p': {
+        'f': {
             add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_ITEM_SPAWN, M.FLAG_HAS_VAULT}
             content: args.tileset.floor
             on_placement: (map, xy) ->
@@ -86,9 +92,15 @@ M.ridge_dungeon = (args) -> {
             content: args.tileset.floor
             on_placement: args.dungeon_placer
         }
-        'W': {
+        '1': {
             add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}
             content: args.tileset.wall_alt
+            matches_all: SourceMap.FLAG_SOLID
+            matches_none: {M.FLAG_HAS_VAULT}
+        }
+        '2': {
+            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}
+            content: args.tileset.wall
             matches_all: SourceMap.FLAG_SOLID
             matches_none: {M.FLAG_HAS_VAULT}
         }
@@ -107,19 +119,19 @@ M.ridge_dungeon = (args) -> {
 .wppppppppppw.
 .wpppDppppppw.
 .wppppppppppw.
-.wwwWWWWWwwww.
+.www11111wwww.
 ..............
 ]=],
         --Ridge dungeon:
         [=[
 ..........++++..
 .......ppppppp..
-...WWWpppppppp..
-.WWWpppDppppW...
-.WWpppppppWWW...
-.WWpppppWWW.....
-.WppppWWW.......
-.WWWWWWW........
+...111pppppppp..
+.111pppDpppp1...
+.11ppppppp111...
+.11ppppp111.....
+.1pppp111.......
+.1111111........
 ]=]
         [=[
 .........++.....
@@ -139,7 +151,7 @@ M.ridge_dungeon = (args) -> {
 .wwpppppppww....
 .wwpppppwww.....
 .wppppwww.......
-.wwWWwww........
+.ww11www........
 ]=]
         [=[
 ................
@@ -148,7 +160,7 @@ M.ridge_dungeon = (args) -> {
 .wwwpppDppw.....
 .wwpppppppw.....
 .wwpppppwww.....
-.+ppppwwW.......
+.+ppppww1.......
 .+wwwwww........
 ]=]
     }
@@ -156,14 +168,54 @@ M.ridge_dungeon = (args) -> {
 
 
 M.sealed_dungeon = (args) -> table.merge M.ridge_dungeon(args), {
-    data: [=[
+    data: random_choice {
+[=[
 .....wwwwwww....
-...WWWpppppdppp+
-.WWWpppppppdppp+
-.WWpppppppWW....
-.WW***WWWWW.....
-.Wp*D*WWW.......
-.WWWWWWW........]=]
+...111fffffdfff+
+.111fffffffdfff+
+.11fffffff11....
+.11***11111.....
+.1f*D*111.......
+.1111111........]=]
+[[
+...wwwwww...
+..wwfffww...
+..wfffffw...
+..wfffffdff+
+..wfffffdff+
+wwwffffww...
+wffffffw....
+1fDfffww....
+11ffwww.....
+.111w.......
+]]
+[=[
+......w++w..
+......wffw..
+.....wwddww.
+...wwwffffww
+.wwwffffffww
+.wwfffffffww
+.ww***wwwww.
+.wf*D*www...
+.wwwwwww....]=]
+[[
+...wwwww....
+..wwfffdff+.
+.wwffffdff+.
+.wfDfffwww..
+.wwffwww....
+..wwww......
+]]
+[=[
+.......wwwwwww
+.....wwwfffffw
+...wwwffffffww
+...wwfffffffww
++ffdf***f1111.
++ffdf*D*ff1...
+...www11111...]=]
+}
 }
 
 M.skull_surrounded_dungeon = (args) -> {
@@ -187,9 +239,14 @@ M.skull_surrounded_dungeon = (args) -> {
             content: args.tileset.floor
             on_placement: args.dungeon_placer
         }
-        'W': {
-            add: SourceMap.FLAG_SOLID
+        '1': {
+            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT, M.FLAG_HAS_OBJECT}
             content: args.tileset.wall
+            matches_all: SourceMap.FLAG_SOLID
+        }
+        '2': {
+            add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT, M.FLAG_HAS_OBJECT}
+            content: args.tileset.wall_alt
             matches_all: SourceMap.FLAG_SOLID
         }
         'w': {
@@ -197,14 +254,31 @@ M.skull_surrounded_dungeon = (args) -> {
             content: args.tileset.wall_alt
         }
     }
-    data: [=[.....WWW.
-++..wwswW
-+wwwwsesW
-+dssdeDeW
-+wwwwsesW
-++..wwswW
-.....WWW.]=]
+    data: [=[.....111.
+++..wwsw1
++wwwwses1
++dssdeDe1
++wwwwses1
+++..wwsw1
+.....111.]=]
 }
+
+M.hell_dungeon = (args) -> table.merge M.skull_surrounded_dungeon(args), {
+    data: [=[
+..+++..
+.wdddw.
+.wsssw.
+.wdddw.
+.wsssw.
+.wdddw.
+.weeew.
+wwdddww
+2eeeee2
+2DeDeD2
+22eee22
+.22222.]=]
+}
+
 
 M.crypt_dungeon = (args) -> table.merge M.skull_surrounded_dungeon(args), {
     data: [=[
@@ -271,7 +345,7 @@ M.anvil_encounter = (args) -> {
             on_placement: args.item_placer
             matches_none: {M.FLAG_HAS_VAULT}
         }
-        'W': {
+        '1': {
             add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}
             content: TileSets.snake.wall
             matches_all: SourceMap.FLAG_SOLID
@@ -315,28 +389,28 @@ M.anvil_encounter = (args) -> {
 ................wwwwwwwwwwwwaaaaaaaaaawww....
 ...........wwwwwwwwwwwwwwaaaaaaaaaaaaaaww....
 .........wwwwwwwwwaaaaaaaaaaabbbbbaaaaaww....
-.......WWWWWWaaaaaaaaaaaaaabbbbbbbbaaaaWWW...
-.....WWWWWWaaaaaaabbbaaaEEaaabbbbaaaaaaWWW...
-....WWWWWaaa<aaaabbbbbaaaaaaaaaaaaaaaaWWWW...
-...WWWWaaaaaaaaaaabbbaaaEEaaaaaaaaaaaWWWWW...
-..WWWWaaaaabbbbaaaaaaaaaaaa<aaaaaaaWWWWW.....
-.WWWWaaaaabbbbbbaaaaaaaaaaaaaaaaaWWWWWW......
-.WWWaa<aaaaabbbaaaaaaaaaaaaWWWWWWWWWWWW......
-WWWWaaaaaaaaaaaaaaaaaWWWWWWWWWWWWWWbWWWWW....
-WWWWWWWWaaaaaaaaaaaaadaaaaaaaaadaabbbWWWWWW..
-WWWWWWWWWWWWWWWWWWWaadaaaaaaaaadaaabbbbWWWWW.
-WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWaaaabbbbbWWWW
-WWcicccccccccccccWWWWWWWWWWWaaaaaaEaaabbbbbWW
-WWccccceccicc*cccccccWWWWWWWaaEaaaaaaaabbbbWW
-WWcccecccceccccciccccWWWWWWaaaaaaaaaaaaabbbWW
-WWcccccccccccc*cccccccdsaaaaaaaaaaEaaaaaabbWW
-WWcc*ccciccBcccBccecccdsaaaaaaaaaaaaaaaaaabWW
-WWicecccccccceccccccc*dsaaaaaaaaaaaaaaaWWWWWW
-WWWWcccccecccBceccccWWWWWWWWWaaaaaWWWWWWWWWWW
-..WWWWccccc*cccecccWWWWWWWWWWWWWWWWWWWWWW....
-....WWWWccccccccccWWW........................
-......WWWWWWWWWWWWWW.........................
-........WWWWWWWWWWW..........................]=]
+.......111111aaaaaaaaaaaaaabbbbbbbbaaaa111...
+.....111111aaaaaaabbbaaaEEaaabbbbaaaaaa111...
+....11111aaa<aaaabbbbbaaaaaaaaaaaaaaaa1111...
+...1111aaaaaaaaaaabbbaaaEEaaaaaaaaaaa11111...
+..1111aaaaabbbbaaaaaaaaaaaa<aaaaaaa11111.....
+.1111aaaaabbbbbbaaaaaaaaaaaaaaaaa111111......
+.111aa<aaaaabbbaaaaaaaaaaaa111111111111......
+1111aaaaaaaaaaaaaaaa111111111111111b11111....
+11111111aaaaaaaaaaaasdaaaaaaaaadaabbb111111..
+1111111111111111111asdaaaaaaaaadaaabbbb11111.
+11111111111111111111111111111111aaaabbbbb1111
+11ciccccccccccccc11111111111aaaaaaEaaabbbbb11
+11ccccceccicc*ccccccc1111111aaEaaaaaaaabbbb11
+11ccceccccecccccicccc111111aaaaaaaaaaaaabbb11
+11cccccXcccccc*cccccccdssaaaaaBaaaEaaaaaabb11
+11cc*ccciccBcccBccecccdssaaaaaaaaaaaaBaaaab11
+11icecccccccceccccccc*dssaaaaaaaaaaaaaa111111
+1111cccXcecccBcecccc111111111aaaaa11111111111
+..1111ccccc*ccceccc1111111111111111111111....
+....1111cccccccccc111........................
+......11111111111111.........................
+........11111111111..........................]=]
 }
 
 M.big_encounter1 = (args) -> {
@@ -345,7 +419,7 @@ M.big_encounter1 = (args) -> {
             add: {SourceMap.FLAG_SOLID, M.FLAG_NO_ENEMY_SPAWN}
             content: TileSets.pebble.wall
         }
-        'W': {
+        '1': {
             add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}
             content: TileSets.pebble.wall
             matches_all: SourceMap.FLAG_SOLID
@@ -382,7 +456,7 @@ M.big_encounter2 = (args) -> {
             add: {SourceMap.FLAG_SOLID, M.FLAG_NO_ENEMY_SPAWN}
             content: TileSets.pebble.wall
         }
-        'W': {
+        '1': {
             add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}
             content: TileSets.pebble.wall
             matches_all: SourceMap.FLAG_SOLID
@@ -643,7 +717,7 @@ M.small_item_vault = (args) -> {
             on_placement: args.door_placer
         }
         'w': {add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}, content: args.tileset.wall_alt, matches_none: M.FLAG_HAS_VAULT}
-        'W': {
+        '1': {
             add: {SourceMap.FLAG_SOLID, M.FLAG_HAS_VAULT}
             content: args.tileset.wall_alt
             matches_all: SourceMap.FLAG_SOLID
@@ -667,23 +741,23 @@ M.crypt_encounter_vault = (args) -> table.merge M.small_item_vault(args), {
 [=[
 .www.......
 wwpwwwwwww.
-Wieeepdppd+
-Wieeepdppd+
+1ieeepdppd+
+1ieeepdppd+
 wwppppwwww.
 .wwwwww....]=]
 [=[
 wwwwwww.
-Wppppww.
-Wieepd+.
-Wieepd+.
-Wppppww.
+1ppppww.
+1ieepd+.
+1ieepd+.
+1ppppww.
 wwwwwww.]=]
 [=[
 wwwwwww.
-WpppppW.
-Wieeepd+
-Wieeepd+
-WpppppW.
+1ppppp1.
+1ieeepd+
+1ieeepd+
+1ppppp1.
 wwwwwww.]=]
     }
 }
@@ -700,6 +774,36 @@ M.small_item_vault_multiway = (args) -> table.merge M.small_item_vault(args), {
     }
 }
 
+M.hell_entrance_vault = (args) -> table.merge M.small_item_vault(args), {
+    data: random_choice {
+[=[
++++++++...
++wpwww++..
++ppppww+++
++ppp*pwww+
++pppipppd+
++pppppppd+
++wdwwwwww+
+++++++++++]=]
+[=[
++++++++++
++wpwwwww+
++dpp*ppp+
++dpppppp+
++dppippp+
++wdwwwww+
++++++++++]=]
+[=[
+++++++++++
++wdwwwwww+
++pppppppd+
++p*pppppd+
++pppipppd+
++pppppppd+
++wpwwwwww+
+++++++++++]=]
+    }
+}
 M.crypt_entrance_vault = (args) -> table.merge M.small_item_vault(args), {
     data: random_choice {
 [=[

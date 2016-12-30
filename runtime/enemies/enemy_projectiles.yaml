@@ -1,7 +1,7 @@
 ---
 projectiles:
   - name: Dark Arrows
-    weapon_class: magic
+    weapon_class: bows
     damage_type: {physical: 1.0}
     damage: { strength: 1.0 }    # 100% physical
     power:  { strength: 0.2 }   

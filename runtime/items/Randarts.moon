@@ -203,7 +203,7 @@ define_randart = (rng, base, images, enchanter) ->
         if not NAMES_USED[name] 
             NAMES_USED[name] = true
             break
-    data = table.merge base, {
+    data = table.merge table.deep_clone(base), {
         :name, :description
         shop_cost: {
             base.shop_cost[1] + 100 * power_level * power_level, 
@@ -213,9 +213,9 @@ define_randart = (rng, base, images, enchanter) ->
     }
     -- Make sure we don't see this as a randart-derivable item:
     data.randart_sprites = nil
+    data.randart_weight = 0
     data.stat_bonuses or= {}
     n_enchants = power_level * 2
-    rng\random_choice(MINOR_DEBUFFS)(rng, data)
     while n_enchants > 0 
         if rng\random(4) == 0
             rng\random_choice(MAJOR_ENCHANTS)(rng, data)
@@ -237,6 +237,7 @@ define_randart = (rng, base, images, enchanter) ->
 
 apply_enchantment = (rng, data, enchantment) ->
     enchantment = if data.cooldown then enchantment * 2 else 0
+    do return
     if enchantment > 0
         data.name = "+#{enchantment} #{data.name}"
         if data.cooldown
@@ -308,11 +309,14 @@ define_equipment_randarts = (rng) ->
     define_belt_randarts(rng)
     define_legwear_randarts(rng)
     define_amulet_randarts(rng)
+    candidates = {}
     for name, item in pairs(items)
         -- Judge whether its equipment by a cooldown not being present
         if item.randart_sprites ~= nil and item.cooldown == nil
-            for i=1,(item.randart_weight or 20) * 2
-                Data.equipment_create(define_randart(rng, item, item.randart_sprites, apply_enchantment))
+            append candidates, item
+    for item in *candidates
+        for i=1,(item.randart_weight or 20) * 2
+            Data.equipment_create(define_randart(rng, item, item.randart_sprites, apply_enchantment))
 
 define_weapon_randarts = () ->
     table.clear(NAMES_USED)
@@ -325,11 +329,14 @@ define_weapon_randarts = () ->
     -- and have a more flexible object system we can move this into the code proper
     -- and not in a phase beforehand.
     rng = require("mtwist").create(HARDCODED_RANDARTS_SEED)
+    candidates = {}
     for name, item in pairs(items)
         -- Judge whether its a weapon by a cooldown being present
         if item.randart_sprites ~= nil and item.cooldown ~= nil
-            for i=1,(item.randart_weight or 20) * 2
-                template = define_randart(rng, item, item.randart_sprites, apply_enchantment)
-                Data.weapon_create(template)
+            append candidates, item
+    for item in *candidates
+        for i=1,(item.randart_weight or 20) * 2
+            template = define_randart(rng, item, item.randart_sprites, apply_enchantment)
+            Data.weapon_create(template)
 
 return {:RANDARTS, :MAX_POWER_LEVEL, :define_equipment_randarts, :define_weapon_randarts}

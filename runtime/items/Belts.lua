@@ -48,6 +48,17 @@ Data.equipment_create {
 }
 
 Data.equipment_create {
+    name = "Lifesteal Belt",
+    description = "A belt that grants extra health on every kill.",
+    type = "belt",
+
+    shop_cost = { 200, 250 },
+
+    spr_item = "spr_belts.life-belt",
+    effects_granted = {"HealthGainOnKill"}
+}
+
+Data.equipment_create {
     name = "Warped Belt",
     description = "A belt that decreases your HP and MP reserves significantly, but provides significant magical power.",
     type = "belt",

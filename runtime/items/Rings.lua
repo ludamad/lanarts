@@ -21,6 +21,17 @@ Data.equipment_create {
 }
 
 Data.equipment_create {
+    name = "Wizard's Ring",
+    description = "A ring that enables the user to regain mana on every kill.",
+    type = "ring",
+
+    shop_cost = { 155, 205 },
+
+    spr_item = "spr_rings.wizardsring",
+    effects_granted = {"ManaGainOnKill"}
+}
+
+Data.equipment_create {
     name = "Ring of Vampirism",
     description = "A ring that passively sucks the life of those you physically strike.",
     type = "ring",

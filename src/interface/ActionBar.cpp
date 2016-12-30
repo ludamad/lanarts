@@ -208,7 +208,7 @@ static void draw_player_spell_actionbar(GameState* gs, PlayerInst* player,
 		}
 		res::sprite(spl_entry.sprite).draw(options, Pos(sx + i * TILE_SIZE, sy));
 		if (cooldown > 0) {
-            options.draw_colour.a = 255 - options.draw_colour.a;
+            options.draw_colour.a = 255 - options.draw_colour.a / 2;
 	        res::sprite("spr_spells.sloading").draw(options, Pos(sx + i * TILE_SIZE, sy));
 		}
 	}

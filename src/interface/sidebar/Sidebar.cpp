@@ -60,6 +60,8 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 		int x, int y, int width) {
 	ClassStats& class_stats = player_inst->class_stats();
 	CoreStats& core = player_inst->effective_stats().core;
+	DerivedStats& physical = player_inst->effective_stats().physical;
+	DerivedStats& magical = player_inst->effective_stats().magic;
 
 	int x_interval = width / 2;
 	int y_interval = 15;
@@ -96,8 +98,14 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 	p1.y += y_interval;
 	p2.y += y_interval;
 
-	gs->font().drawf(COL_MUTED_GREEN, p1, "Defence %d", core.defence);
-	gs->font().drawf(COL_MUTED_GREEN, p2, "Will %d", core.willpower);
+	gs->font().drawf(COL_PALE_YELLOW, p1, "Defence %d", core.defence);
+	gs->font().drawf(COL_PALE_BLUE, p2, "Will %d", core.willpower);
+
+	p1.y += y_interval;
+	p2.y += y_interval;
+
+	gs->font().drawf(COL_PALE_YELLOW, p1, "PR %+d/%+2.f", physical.reduction, physical.resistance);
+	gs->font().drawf(COL_PALE_BLUE, p2, "MR %+d/%+2.f", magical.reduction, magical.resistance);
 
 	p1.y += y_interval;
 	p2.y += y_interval;
