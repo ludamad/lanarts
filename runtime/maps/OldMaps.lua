@@ -208,24 +208,24 @@ M.Dungeon1 = {
     content = {
       items = { amount = 3,  group = ItemGroups.basic_items   },
       enemies = {
-        wandering = false,
+        wandering = true,
         amount = 7,
-        generated = M.medium_enemies 
+        generated = table.tconcat(M.medium_enemies, {{enemy = "Mouther", guaranteed_spawns = 2}})
       }
     }
   },
   -- Level 2
   { layout = {small_layout1},
     content = {
-      items = { amount = 6,  group = ItemGroups.basic_items   },
+      items = { amount = 6,  group = ItemGroups.enchanted_items   },
       enemies = {
         wandering = false,
         amount = 10,
         generated = {
-          {enemy = "Giant Rat",         chance = 100  },
-          {enemy = "Giant Bat",         chance = 100 },
           {enemy = "Hound",         chance = 100 },
+          {enemy = "Elephant",         guaranteed_spawns = 2 },
           {enemy = "Cloud Elemental",   guaranteed_spawns = 2 },
+          {enemy = "Mouther",   chance = 100 },
         }
       }
     }
@@ -397,6 +397,9 @@ function M.generate_from_enemy_entries(map, chances, amount, --[[Optional]] area
     for entry in values(chances) do
         total_chance = total_chance + (entry.chance or 0)
         local spawns = range_resolve(entry.guaranteed_spawns or 0)
+        if spawns > 1 then
+            spawns = math.floor(spawns * M.enemy_bonus())
+        end
         for i=1,spawns do 
             append(ret, map_utils.random_enemy(map, entry.enemy, area, selector))
         end

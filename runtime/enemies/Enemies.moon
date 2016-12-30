@@ -4,6 +4,19 @@ export enemy_berserker_init
 export enemy_berserker_step
 
 Map = require "core.Map"
+EventLog = require "ui.EventLog"
+
+ally_list = (inst) ->
+    if not inst.is_enemy
+        return Map.players_list() or {}
+    else
+        return Map.monsters_list() or {}
+
+enemy_list = (inst) ->
+    if inst.is_enemy
+        return Map.players_list() or {}
+    else
+        return Map.monsters_list() or {}
 
 enemy_init = (enemy) -> nil
 
@@ -142,7 +155,7 @@ Data.enemy_create {
     sprite: "spr_enemies.animals.black_mamba"
     death_sprite: "blood"
     radius: 10
-    xpaward: 20
+    xpaward: 10
     appear_message: "A poisonous black mamba slithers onto the scene!"
     defeat_message: "The black mamba is dead."
     stats: {
@@ -161,7 +174,7 @@ Data.enemy_create {
     name: "Mouther" 
     sprite: "spr_enemies.animals.tyrant_leech"
     radius: 11
-    xpaward: 25
+    xpaward: 15
     appear_message: "You hear a mouther start screeching!"
     defeat_message: "The mouther has been shut."
     stats: {
@@ -181,4 +194,70 @@ Data.enemy_create {
     effects_active: {"PoisonedWeapon"}
 }
 
+
+-- enemy_charge = (caster) ->
+--     for target in *enemy_list(caster)
+--         if vector_distance({target.x, target.y}, {caster.x, caster.y}) < target.target_radius + caster.target_radius + 30
+--             str_diff = math.max(0, caster.stats.strength - target.stats.strength)
+--             thrown = target\add_effect("Thrown", 10)
+--             thrown.angle = vector_direction({caster.x, caster.y}, {target.x, target.y})
+--             if not caster.is_enemy and caster\is_local_player() 
+--                 EventLog.add("The " .. target.name .." is thrown back!", {200,200,255})
+--             elseif not target.is_enemy and target\is_local_player()
+--                 EventLog.add("You are thrown back!", {200,200,255})
+
+Data.effect_create {
+    name: "Charging"
+    stat_func: (mon, old, new) =>
+        new.speed *= 2
+        new.melee_cooldown_multiplier *= 0.25
+        new.hpregen *= 2
+    effected_sprite: "spr_effects.i-loudness"
+    effected_colour: {255,0,0}
+    fade_out: 15
+    init_func: (mon) =>
+        @n_steps = 0
+        play_sound "sound/wavy.ogg"
+    step_func: () =>
+        @n_steps += 1
+        if @n_steps > 60
+            play_sound "sound/wavy.ogg"
+            @n_steps = 0
+    on_melee_func: (mon, defender, damage, attack_stats) =>
+        thrown = defender\add_effect("Thrown", 10)
+        thrown.angle = vector_direction({mon.x, mon.y}, {defender.x, defender.y})
+        if not mon.is_enemy and mon\is_local_player() 
+            EventLog.add("The " .. defender.name .." is thrown back!", {200,200,255})
+        elseif not defender.is_enemy and defender\is_local_player()
+            EventLog.add("You are thrown back!", {200,200,255})
+        -- mon\remove_effect("Charging")
+}
+
+Data.effect_create {
+    name: "Enraging"
+    on_damage_func: (mon, dmg) =>
+        mon\add_effect("Charging", 400)
+        return dmg
+}
+
+Data.enemy_create {
+    name: "Elephant"
+    sprite: "spr_enemies.animals.elephant"
+    death_sprite: "blood"
+    radius: 15
+    xpaward: 50
+    appear_message: "A loud elephant!"
+    defeat_message: "The elephant is dead."
+    stats: {
+        attacks: {{weapon: "Slow Melee"}}
+        hp: 70
+        hpregen: 0.05
+        movespeed: 2
+        strength: 35
+        defence: 8
+        willpower: 8
+    }
+    effects_active: {"Enraging"}
+}
+ 
 

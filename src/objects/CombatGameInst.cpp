@@ -35,10 +35,30 @@ const int HURT_COOLDOWN = 30;
 bool CombatGameInst::damage(GameState* gs, int dmg) {
     event_log("CombatGameInst::damage: id %d took %d dmg\n", id, dmg);
 
+    for (Effect& e : effects().effects) {
+        if (e.t_remaining == 0) {
+            continue;
+        }
+        auto& entry = game_effect_data[e.effectid];
+        if (!entry.on_damage_func.empty() && !entry.on_damage_func.isnil()) {
+            entry.on_damage_func.push();
+            lua_State* L = gs->luastate();
+            luawrap::push(L, e.state);
+            luawrap::push(L, this);
+            luawrap::push(L, dmg);
+            lua_call(L, 3, 1);
+            if (!lua_isnil(L, -1)) {
+                dmg = lua_tonumber(L, -1);
+            }
+            lua_pop(L, 1);
+        }
+    }
+
     if (core_stats().hurt(dmg)) {
         die(gs);
         return true;
     }
+
     cooldowns().reset_hurt_cooldown(HURT_COOLDOWN);
     return false;
 }
@@ -187,9 +207,12 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
             luawrap::push(L, this);
             luawrap::push(L, inst);
             luawrap::push(L, damage);
-            luawrap::push(L, isdead);
             lua_push_effectiveattackstats(L, atkstats);
-            lua_call(L, 6, 0);
+            lua_call(L, 5, 1);
+            if (!lua_isnil(L, -1)) {
+                damage = lua_tonumber(L, -1);
+            }
+            lua_pop(L, 1);
         }
     }
 

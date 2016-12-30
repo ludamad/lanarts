@@ -46,6 +46,27 @@ M.crystal = {
     wall = Data.tile_create { images = Display.images_load(path_resolve "dngn_wall/crystal/crystal_wall(0-13).png") }
 }
 
+M.hive = Data.tileset_create {
+    floor = { images = Display.images_load "spr_tile_floors/acidic_floor.png%32x32"},
+    floor_alt = { images = Display.images_load (path_resolve "dngn_floor/snake/snake-a(0-3).png") },
+    wall = { images = Display.images_load "spr_tile_walls/beehives.png%32x32" },
+    wall_alt = { images = Display.images_load "spr_tile_walls/lair.png%32x32" }
+}
+
+M.orc = Data.tileset_create {
+    floor = { images = Display.images_load "spr_tile_floors/orc.png%32x32" },
+    floor_alt = { images = Display.images_load "spr_tile_floors/swamp.png%32x32" },
+    wall = { images = Display.images_load "spr_tile_walls/orc.png%32x32" },
+    wall_alt = { images = Display.images_load (path_resolve "dngn_wall/snake/snake(0-9).png") }
+}
+
+M.lair = Data.tileset_create {
+    floor = { images = Display.images_load "spr_tile_floors/lair.png%32x32" },
+    floor_alt = { images = Display.images_load (path_resolve "dngn_floor/snake/snake-a(0-3).png") },
+    wall = { images = Display.images_load "spr_tile_walls/lair.png%32x32" },
+    wall_alt = { images = Display.images_load (path_resolve "dngn_wall/snake/snake(0-9).png") }
+}
+
 M.snake = Data.tileset_create {
     floor = { images = Display.images_load (path_resolve "dngn_floor/snake/snake-d(0-3).png") },
     floor_alt = { images = Display.images_load (path_resolve "dngn_floor/snake/snake-a(0-3).png") },

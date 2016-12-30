@@ -37,7 +37,7 @@ DEFAULT_DUNGEON_VISION_RADIUS = 7
 
 M = nilprotect {}
 
-create_dungeon_scheme = (tileset) -> {
+M.create_dungeon_scheme = (tileset) -> {
     :tileset
     floor1: Tile.create(tileset.floor, false, true, {}, {FLAG_OVERWORLD})
     floor2: Tile.create(tileset.floor_alt, false, true, {}, {FLAG_OVERWORLD}) 
@@ -45,14 +45,14 @@ create_dungeon_scheme = (tileset) -> {
     wall2: Tile.create(tileset.wall_alt, true, false, {}, {FLAG_OVERWORLD})
 }
 
-dungeon_defaults = (rng) -> {
+M.dungeon_defaults = (rng) -> {
     rvo_iterations: 20
     connect_line_width: () -> 2 + (if rng\random(5) == 4 then 1 else 0)
     region_delta_func: default_region_delta_func
     n_statues: 0
 }
 
-place_feature = (map, template, region_filter = ()->true) ->
+M.place_feature = (map, template, region_filter = ()->true) ->
    -- Function to try a single placement, returns success:
    attempt_placement = (template) ->
        orient = map.rng\random_choice {
@@ -90,7 +90,7 @@ place_feature = (map, template, region_filter = ()->true) ->
    return false
 
 M._runed_door_sprite = tosprite("spr_doors.runed_door")
-dungeon_template = (data) -> table.merge {
+M.make_dungeon_template = (data) -> table.merge {
     outer_conf: data.subtemplates[1]
     shell: 10
     default_wall: Tile.create(data.tileset.wall, true, true, {})
@@ -146,7 +146,7 @@ dungeon_template = (data) -> table.merge {
         for i =1,@_n_encounter_vaults()
             conf = table.merge(default_config, {rng: map.rng})
             vault = SourceMap.area_template_create(@_encounter_vault() conf)
-            if not place_feature(map, vault)
+            if not M.place_feature(map, vault)
                 return nil
         return true
     on_create_game_map: (game_map) =>
@@ -157,57 +157,6 @@ dungeon_template = (data) -> table.merge {
             World.players_spawn(game_map, @_player_spawn_points)
         @connector.post_connect(game_map)
 }, data
-
-M.N_SNAKE_FLOORS = 2
-snake_pit_floor_plans = (rng) ->
-    tileset = TileSets.snake
-    raw_plans = {
-        [1]: {
-            wandering_enabled: false
-            size: {25, 25}
-            n_subareas: 3
-            n_items: 4
-            n_enemies: 0
-            n_encounter_vaults: 0
-            enemy_entries: {
-                {enemy: "Adder", guaranteed_spawns: 5}
-                {enemy: "Black Mamba", guaranteed_spawns: 1}
-                {enemy: "Mouther", guaranteed_spawns: 1}
-                {enemy: "Adder", chance: 100}
-                {enemy: "Black Mamba", chance: 25}
-            }
-            item_groups: {{ItemGroups.basic_items, 4}}
-            number_regions: 2
-            room_radius: () -> 7
-            rect_room_num_range: {0, 0}
-            rect_room_size_range: {1, 1}
-            n_statues: 4
-        }
-        [2]: {
-            wandering_enabled: false
-            size: {45, 45}
-            n_subareas: 3
-            n_items: 7
-            n_enemies: 0
-            n_encounter_vaults: 1
-            enemy_entries: {
-                {enemy: "Adder", guaranteed_spawns: 8}
-                {enemy: "Black Mamba", guaranteed_spawns: 3}
-                {enemy: "Mouther", guaranteed_spawns: 3}
-                {enemy: "Adder", chance: 100}
-                {enemy: "Black Mamba", chance: 25}
-            }
-            item_groups: {{ItemGroups.basic_items, 8}}
-            number_regions: 2
-            room_radius: () -> 7
-            rect_room_num_range: {0, 0}
-            rect_room_size_range: {1, 1}
-            n_statues: 4
-        }
-    }
-    return for i, raw in ipairs raw_plans
-        base = table.merge dungeon_defaults(rng), create_dungeon_scheme(tileset)
-        table.merge(base, raw)
 
 M.make_connector = (types) ->
     placed_portals = {}
@@ -273,94 +222,5 @@ M.make_linear_dungeon = (args) ->
         }
     }
     return make_dungeon(1)
-
-M.SnakePit = (rng, floor, connector) -> 
-    n_stairs_up = connector.n_portals("up")
-    plan = snake_pit_floor_plans(rng)[floor]
-    subtemplates = for i=1,plan.n_subareas
-        snake_pit_floor_plans(rng)[floor]
-    return dungeon_template {
-        map_label: "Snake Pit " .. floor
-        tileset: TileSets.snake
-        :subtemplates
-        :connector
-        w: plan.size[1] * 2.5 + 10
-        h: plan.size[2] * 2.5 + 10
-        arc_chance: 1.0 -- Always use arcs in snake pit
-        _enemy_entries: () =>
-            return plan.enemy_entries
-        _n_enemies: () =>
-            return math.ceil(plan.n_enemies * OldMaps.enemy_bonus())
-        _n_encounter_vaults: () =>
-            return plan.n_encounter_vaults
-        _encounter_vault: () =>
-            return Vaults.crypt_encounter_vault
-        _item_groups: () =>
-            return plan.item_groups
-        _create_stairs_down: (map) =>
-            area = {0,0,map.size[1],map.size[2]}
-            for i =1,connector.n_portals("down")
-                if not connector.random_portal("down", map, area)
-                    return nil
-            return true
-        _default_vault_config: (args = {}) =>
-            config = @_base_vault_config(args)
-            n_items_placed = 0
-            config.item_placer = (map, xy) ->
-                local item
-                if floor == M.N_SNAKE_FLOORS and n_items_placed == 0
-                    item = {type: "Azurite Key", amount: 1}
-                else
-                    item = ItemUtils.item_generate ItemGroups.enchanted_items, false, 1 --Randart power level
-                MapUtils.spawn_item(map, item.type, item.amount, xy)
-                n_items_placed += 1
-            return config
-        _create_stairs_up: (map) =>
-            base_conf = @_default_vault_config()
-            for i =1,connector.n_portals("up")
-                up_stairs_placer = (map, xy) ->
-                    connector.spawn_portal("up", map, xy)
-                conf = table.merge base_conf, {rng: map.rng, item_placer: up_stairs_placer}
-                vault = SourceMap.area_template_create(Vaults.crypt_entrance_vault conf)
-                if not place_feature(map, vault)
-                    return nil
-            if connector.n_portals("up") == 0 -- Player spawn
-                for i =1,1
-                    player_placer = (map, xy) ->
-                        {x, y} = xy
-                        append map.player_candidate_squares, {x * 32 + 16, y * 32 + 16}
-                    conf = table.merge base_conf, {rng: map.rng, item_placer: player_placer}
-                    vault = SourceMap.area_template_create(Vaults.crypt_entrance_vault conf)
-                    if not place_feature(map, vault, (r) -> true)
-                        return nil
-            return true
-        on_create_source_map: (map) =>
-            if not @_create_stairs_up(map)
-                print("ABORT: stairs up")
-                return nil
-            if not @_create_stairs_down(map)
-                print("ABORT: stairs down")
-                return nil
-            if not @_create_encounter_rooms(map)
-                print("ABORT: stairs encounter")
-                return nil
-            if not @_spawn_statues(map)
-                print("ABORT: statues")
-                return nil
-            if not @_spawn_items(map)
-                print("ABORT: items")
-                return nil
-            if not @_spawn_enemies(map)
-                print("ABORT: enemies")
-                return nil
-            NewMaps.generate_door_candidates(map, rng, map.regions)
-            if #map.player_candidate_squares > 0
-                @_player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
-                if not @_player_spawn_points
-                    print("ABORT: player spawns")
-                    return nil
-            @connector.post_generate(map)
-            return true
-    }
 
 return M

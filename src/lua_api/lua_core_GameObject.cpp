@@ -180,6 +180,14 @@ static int lapi_do_nothing(lua_State *L) {
     return 0;
 }
 
+static void lapi_combatgameinst_remove_effect(CombatGameInst* inst, const char* name) {
+    auto* eff = inst->effects().get(get_effect_by_name(name));
+    if (!eff) {
+        return;
+    }
+    eff->t_remaining = 1; // Let finish functions trigger
+}
+
 static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(CombatGameInst*);
 
@@ -202,6 +210,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
     methods["damage"].bind_function(lapi_combatgameinst_damage);
 	methods["heal_hp"].bind_function(lapi_combatgameinst_heal_hp);
     methods["heal_mp"].bind_function(lapi_combatgameinst_heal_mp);
+    methods["remove_effect"].bind_function( lapi_combatgameinst_remove_effect);
 
     LUAWRAP_METHOD(methods, add_effect, OBJ->effects().add(lua_api::gamestate(L), OBJ, effect_from_lua(L, 2), lua_tointeger(L, 3)).push() );
     LUAWRAP_METHOD(methods, die, OBJ->die(lua_api::gamestate(L)));

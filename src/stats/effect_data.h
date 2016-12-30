@@ -18,9 +18,9 @@ struct EffectEntry {
 	std::string name, category;
 	LuaLazyValue stat_func, draw_func, attack_stat_func, init_func, finish_func, step_func;
 	// TODO Move rest to lua only ^
-    LuaValue on_melee_func;
+        LuaValue on_melee_func, on_damage_func;
 	// Equipment effect callbacks. Can be used to associate with equipment granting this.
-	LuaValue on_equip_func, on_identify_func, on_uncurse_func;
+	LuaValue on_equip_func, on_identify_func, on_uncurse_func; // TODO for latter two
 	// Spell effect callbacks. Can be used to associate with spells granting this.
 	LuaValue on_gain_spell_func;
 

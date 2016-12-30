@@ -558,10 +558,12 @@ overworld_features = (map) ->
     place_medium1b = () ->
         tileset = TileSets.snake
         MapSeq = MapSequence.create {preallocate: 1}
-        snake_pit_create = () ->
+        snake_pit_create = (offset = 1) ->
+            SnakePit = require("maps.SnakePit")
             return NewDungeons.make_linear_dungeon {
                 :MapSeq
-                dungeon_template: NewDungeons.SnakePit
+                :offset
+                dungeon_template: SnakePit.TEMPLATE
                 on_generate: (floor) ->
                     assert(floor)
                     print "on_generate", floor
@@ -570,9 +572,9 @@ overworld_features = (map) ->
                 sprite_down: (floor) ->
                     return "spr_gates.enter"
                 portals_up: (floor) ->
-                    return if floor == 1 then 1 else 3
+                    return if floor == 1 then 0 else 3
                 portals_down: (floor) ->
-                    return if floor == NewDungeons.N_SNAKE_FLOORS then 0 else 3
+                    return if floor == SnakePit.N_FLOORS then 0 else 3
             }
         door_placer = (map, xy) ->
             MapUtils.spawn_door(map, xy)
@@ -751,6 +753,26 @@ overworld_features = (map) ->
             f(game_map)
 
 overworld_create = () ->
+    --MapSeq = MapSequence.create()
+    --snake_pit_create = (offset = 1) ->
+    --    dungeon = require("maps.BeastLair")
+    --    return NewDungeons.make_linear_dungeon {
+    --        :MapSeq
+    --        :offset
+    --        dungeon_template: dungeon.TEMPLATE
+    --        on_generate: (floor) ->
+    --            assert(floor)
+    --            print "on_generate", floor
+    --        sprite_up: (floor) ->
+    --            return if floor == 1 then "spr_gates.exit_lair" else "spr_gates.return"
+    --        sprite_down: (floor) ->
+    --            return "spr_gates.enter"
+    --        portals_up: (floor) ->
+    --            return if floor == 1 then 0 else 3
+    --        portals_down: (floor) ->
+    --            return if floor == dungeon.N_FLOORS then 0 else 3
+    --    }
+    --do return snake_pit_create(0)
     NewMaps.map_create (rng) -> {
         map_label: "Plain Valley"
         subtemplates: {DUNGEON_CONF(rng), OVERWORLD_CONF(rng)}

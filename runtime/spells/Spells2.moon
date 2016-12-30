@@ -226,10 +226,11 @@ Data.effect_create {
 
 Data.effect_create {
     name: "VampiricWeapon"
-    on_melee_func: (attacker, defender, damage, will_die, attack_stats) =>
+    on_melee_func: (attacker, defender, damage, attack_stats) =>
         if attacker\is_local_player() 
             EventLog.add("You steal the enemy's life!", {200,200,255})
         attacker\heal_hp(damage / 10)
+        return damage
 }
 
 
@@ -241,7 +242,7 @@ Data.effect_create {
 
 Data.effect_create {
     name: "PoisonedWeapon"
-    on_melee_func: (attacker, defender, damage, will_die, attack_stats) =>
+    on_melee_func: (attacker, defender, damage, attack_stats) =>
         if defender\has_effect("Poison")
             return
         if chance(.25)
@@ -250,22 +251,25 @@ Data.effect_create {
             eff.damage = attack_stats.damage
             eff.power = attack_stats.power
             eff.magic_percentage = attack_stats.magic_percentage
+        return damage
 }
 
 Data.effect_create {
     name: "FearWeapon"
-    on_melee_func: (attacker, defender, damage, will_die, attack_stats) =>
+    on_melee_func: (attacker, defender, damage, attack_stats) =>
         if defender\has_effect("Fear")
             return
         if chance(.1)
             eff = defender\add_effect("Fear", 100)
+        return damage
 }
 
 Data.effect_create {
     name: "ConfusingWeapon"
-    on_melee_func: (attacker, defender, damage, will_die, attack_stats) =>
+    on_melee_func: (attacker, defender, damage, attack_stats) =>
         if defender\has_effect("Dazed")
             return
         if chance(.1)
             eff = defender\add_effect("Dazed", 400)
+        return damage
 }
