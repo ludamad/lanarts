@@ -143,15 +143,15 @@ Data.class_create {
 }
 
 Data.class_create {
-    name = "Archer",
+    name = "Ranger",
     sprites = {"archer"},
     available_spells = {
       { spell = "Magic Arrow",
         level_needed = 1 },
       { spell = "Expedite",
-        level_needed = 1 },
-      { spell = "Call Spikes",
         level_needed = 2 },
+      { spell = "Call Spikes",
+        level_needed = 3 },
     },
     start_stats = {
         movespeed = 4,
@@ -159,15 +159,15 @@ Data.class_create {
         mp = 85,
         hpregen = 4 / 60, -- Per 60 frames
         mpregen = 2 / 60, -- Per 60 frames
-        strength = 5,
+        strength = 4,
         defence = 4,
         willpower = 7,
-        magic = 6,
+        magic = 7,
         equipment = {
           weapon = "Short Bow",
+          projectile = {item = "Arrow", amount = 50},
           gold = 0,
           inventory = {
-             {item = "Arrow", amount = 50, equip = true},
              {item = "Health Potion", amount = 1},
           }
         }
@@ -179,8 +179,8 @@ Data.class_create {
         mpregen = 0.5 / 60, -- Per 60 frames
         magic = 1,
         strength = 1,
-        defence = 1,
---        willpower = 1
+--        defence = 1,
+        willpower = 1
     }
 }
 

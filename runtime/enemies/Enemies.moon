@@ -147,7 +147,7 @@ Data.enemy_create {
     defeat_message: "The black mamba is dead."
     stats: {
         attacks: {{weapon: "Fast Melee"}}
-        hp: 60
+        hp: 40
         hpregen: 0.04
         movespeed: 3.5
         strength: 15

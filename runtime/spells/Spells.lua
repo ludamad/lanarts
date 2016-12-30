@@ -192,6 +192,7 @@ local PowerStrike = {
     spr_spell = "chargestrike",
     can_cast_with_cooldown = false,
     mp_cost = 40,
+    spell_cooldown = 200,
     cooldown = 0, -- Uses cooldown of weapon
     fallback_to_melee = true,
 }
@@ -487,7 +488,7 @@ local Expedite = {
     can_cast_with_held_key = false,
     spr_spell = "expedite",
     can_cast_with_cooldown = false,
-    mp_cost = 10,
+    mp_cost = 0,
     cooldown = 30,
     spell_cooldown = 800,
     fallback_to_melee = false,

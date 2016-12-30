@@ -578,6 +578,15 @@ void PlayerInst::use_rest(GameState* gs, const GameAction& action) {
 	CoreStats& ecore = effective_stats().core;
 	int emax_hp = ecore.max_hp, emax_mp = ecore.max_mp;
 	bool atfull = core_stats().hp >= emax_hp && core_stats().mp >= emax_mp;
+        if (atfull) {
+            // Since spell cooldowns: Keep resting if a spell cooldown is active.
+            for (auto& e : cooldowns().spell_cooldowns) {
+                if (e.second > 0) {
+                    atfull = false;
+                    break;
+                }
+            }
+        }
 	if (cooldowns().can_rest() && !atfull && effects().can_rest()) {
 		core_stats().heal_hp(ecore.hpregen * 8, emax_hp);
 		core_stats().heal_mp(ecore.mpregen * 8, emax_mp);

@@ -90,7 +90,7 @@ place_feature = (map, template, region_filter = ()->true) ->
    return false
 
 M._runed_door_sprite = tosprite("spr_doors.runed_door")
-dungeon_template = (data) -> table.merge data, {
+dungeon_template = (data) -> table.merge {
     outer_conf: data.subtemplates[1]
     shell: 10
     default_wall: Tile.create(data.tileset.wall, true, true, {})
@@ -111,7 +111,7 @@ dungeon_template = (data) -> table.merge data, {
         store_placer = (map, xy) ->
             Region1.generate_store(map, xy)
         item_placer = (map, xy) ->
-            item = ItemUtils.item_generate ItemGroups.enchanted_items, 1 --Randart power level
+            item = ItemUtils.item_generate ItemGroups.enchanted_items, false, 1 --Randart power level
             MapUtils.spawn_item(map, item.type, item.amount, xy)
         return  {:enemy_placer, :door_placer, :store_placer, :item_placer, tileset: @tileset}
     _default_vault_config: (args = {}) =>
@@ -128,7 +128,7 @@ dungeon_template = (data) -> table.merge data, {
                 if not sqr
                     break
                 map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
-                item = ItemUtils.item_generate group[1], 1 --Randart power level
+                item = ItemUtils.item_generate group[1], false, 1 --Randart power level
                 MapUtils.spawn_item(map, item.type, item.amount, sqr) 
         return true
     _spawn_statues: (map) =>
@@ -156,7 +156,7 @@ dungeon_template = (data) -> table.merge data, {
         if @_player_spawn_points
             World.players_spawn(game_map, @_player_spawn_points)
         @connector.post_connect(game_map)
-}
+}, data
 
 M.N_SNAKE_FLOORS = 2
 snake_pit_floor_plans = (rng) ->
@@ -168,11 +168,11 @@ snake_pit_floor_plans = (rng) ->
             n_subareas: 3
             n_items: 4
             n_enemies: 0
-            n_encounter_vaults: 1
+            n_encounter_vaults: 0
             enemy_entries: {
-                {enemy: "Adder", guaranteed_spawns: 8}
-                {enemy: "Black Mamba", guaranteed_spawns: 3}
-                {enemy: "Mouther", guaranteed_spawns: 3}
+                {enemy: "Adder", guaranteed_spawns: 5}
+                {enemy: "Black Mamba", guaranteed_spawns: 1}
+                {enemy: "Mouther", guaranteed_spawns: 1}
                 {enemy: "Adder", chance: 100}
                 {enemy: "Black Mamba", chance: 25}
             }
@@ -191,9 +191,9 @@ snake_pit_floor_plans = (rng) ->
             n_enemies: 0
             n_encounter_vaults: 1
             enemy_entries: {
-                {enemy: "Adder", guaranteed_spawns: 10}
-                {enemy: "Black Mamba", guaranteed_spawns: 5}
-                {enemy: "Mouther", guaranteed_spawns: 5}
+                {enemy: "Adder", guaranteed_spawns: 8}
+                {enemy: "Black Mamba", guaranteed_spawns: 3}
+                {enemy: "Mouther", guaranteed_spawns: 3}
                 {enemy: "Adder", chance: 100}
                 {enemy: "Black Mamba", chance: 25}
             }
@@ -304,16 +304,17 @@ M.SnakePit = (rng, floor, connector) ->
                     return nil
             return true
         _default_vault_config: (args = {}) =>
-            do return @_base_vault_config(args)
-            n_items_placed = 1
-            item_placer = (map, xy) ->
-                if floor == 3 and n_items_placed == 0
-                    item = "Azurite Key"
+            config = @_base_vault_config(args)
+            n_items_placed = 0
+            config.item_placer = (map, xy) ->
+                local item
+                if floor == M.N_SNAKE_FLOORS and n_items_placed == 0
+                    item = {type: "Azurite Key", amount: 1}
                 else
-                    item = ItemUtils.item_generate ItemGroups.enchanted_items, 1 --Randart power level
+                    item = ItemUtils.item_generate ItemGroups.enchanted_items, false, 1 --Randart power level
                 MapUtils.spawn_item(map, item.type, item.amount, xy)
                 n_items_placed += 1
-            return @_base_vault_config(args)
+            return config
         _create_stairs_up: (map) =>
             base_conf = @_default_vault_config()
             for i =1,connector.n_portals("up")

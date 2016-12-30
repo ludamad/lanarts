@@ -52,24 +52,21 @@ local RANDART_CHANCE = 2
 local LANARTS_ONLY_RANDARTS = (os.getenv("LANARTS_RANDARTS") ~= nil)
 function M.item_generate(group, only_with_shop_cost, --[[Optional]] randart_power_level, --[[Optional]] randart_chance)
     randart_chance = randart_chance or RANDART_CHANCE
-    -- For now, a fixed 1 in 100 chance of being a randart
-    if true then -- randart_power_level ~= nil then
-        if LANARTS_ONLY_RANDARTS or randomf() <= randart_chance / 100 then
-            randart_power_level = randart_power_level or 1
-            while randomf() < 0.2 and randart_power_level < 3 do
-                randart_power_level = randart_power_level + 1
-            end
-            local choice = nil
-            while true do
-                choice = random_choice(Randarts.RANDARTS[randart_power_level])
-                --if not GlobalData.randarts_generated[choice] then
-                --    GlobalData.randarts_generated[choice] = true
-                --    break
-                --end
-                break -- TODO reconsider randart generation
-            end
-            return {type = choice, amount = 1}
+    randart_power_level = randart_power_level or 1
+    if LANARTS_ONLY_RANDARTS or randomf() <= randart_chance / 100 then
+        while randomf() < 0.2 and randart_power_level < 3 do
+            randart_power_level = randart_power_level + 1
         end
+        local choice = nil
+        while true do
+            choice = random_choice(Randarts.RANDARTS[randart_power_level])
+            --if not GlobalData.randarts_generated[choice] then
+            --    GlobalData.randarts_generated[choice] = true
+            --    break
+            --end
+            break -- TODO reconsider randart generation
+        end
+        return {type = choice, amount = 1}
     end
     local entry = nested_chance(group, "item")
     if not entry then

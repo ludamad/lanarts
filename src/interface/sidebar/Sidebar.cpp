@@ -72,15 +72,15 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 //	y += y_interval;
 
 	Pos p1(x, y), p2(x + x_interval, y);
-
-	gs->font().drawf(COL_WHITE, Pos(x, y), "Kills %d",
+	gs->font().drawf(COL_PALE_RED, Pos(x, y), "Kills %d",
 			player_inst->score_stats().kills);
 
 	if (gs->game_settings().regen_on_death) {
 		gs->font().drawf(COL_PALE_RED, Pos(x + x_interval, y), "Deaths %d",
 				player_inst->score_stats().deaths);
 	} else {
-		gs->font().draw(COL_PALE_BLUE, Pos(x + x_interval, y), "Hardcore");
+		//gs->font().draw(COL_PALE_BLUE, Pos(x + x_interval, y), "Hardcore");
+		gs->font().drawf(COL_PALE_YELLOW, Pos(x + x_interval, y), "Level %d", class_stats.xplevel);
 	}
 
 	p1.y += y_interval;
@@ -92,8 +92,8 @@ static void draw_player_base_stats(GameState* gs, PlayerInst* player_inst,
 	p1.y += y_interval;
 	p2.y += y_interval;
 
-	gs->font().drawf(COL_MUTED_GREEN, p1, "Strength %d", core.strength);
-	gs->font().drawf(COL_MUTED_GREEN, p2, "Magic %d", core.magic);
+	gs->font().drawf(COL_PALE_YELLOW, p1, "Strength %d", core.strength);
+	gs->font().drawf(COL_PALE_BLUE, p2, "Magic %d", core.magic);
 
 	p1.y += y_interval;
 	p2.y += y_interval;

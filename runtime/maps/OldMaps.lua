@@ -548,7 +548,7 @@ local function generate_rooms(map, rooms, tileset)
     local size = map_call(math.ceil, {rooms.size[1] * size_mult, rooms.size[2] * size_mult})
     -- Compensate for padding
     size = {size[1] + rooms.padding*2, size[2] + rooms.padding*2}
-    map_gen_apply(map, {alt_amount, alt_amount}, tileset.wall, tileset.floor_alt, tileset.floorsize, rooms.padding)
+    map_gen_apply(map, {alt_amount, alt_amount}, tileset.wall, tileset.floor_alt, tileset.floor, size, rooms.padding)
     map_gen_apply(map, {amounts, amounts}, tileset.wall, tileset.floor, tileset.floor_alt, size, rooms.padding)
 end
 

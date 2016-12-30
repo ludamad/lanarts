@@ -270,7 +270,7 @@ local function class_choice_buttons_create()
     local buttons = { 
         { "Mage", sprite_base .. "wizard.png"},
         { "Fighter", sprite_base .. "fighter.png"},
-        { "Archer", sprite_base .. "archer.png"}
+        { "Ranger", sprite_base .. "archer.png"}
     }
 
     local button_size = { 96, 96 + y_padding + font.height }

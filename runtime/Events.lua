@@ -13,7 +13,7 @@ local events = {}
 events.PlayerInit = PlayerFunctions.player_init
 
 function events.PlayerDeath(player)
-    local classtable = {Mage=Sounds.death_mage, Fighter=Sounds.death_fighter, Archer=Sounds.death_archer}
+    local classtable = {Mage=Sounds.death_mage, Fighter=Sounds.death_fighter, Ranger=Sounds.death_archer}
     classtable[player.class_name]:play()
     if #World.players == 1 then
         DeathScreen.show()

@@ -610,7 +610,7 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
         bool wallbounce = false;
         int nbounces = 0;
 
-        if (class_stats().class_entry().name != "Archer" && wentry.weapon_class == "bows") {
+        if (class_stats().class_entry().name != "Ranger" && wentry.weapon_class == "bows") {
 //            weaprange = TILE_SIZE * 2.3;
             cooldown *= 1.5;
         }

@@ -151,7 +151,7 @@ overworld_spawns = (map) ->
             if not sqr
                 break
             map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
-            item = ItemUtils.item_generate ItemGroups.basic_items, 1 --Randart power level
+            item = ItemUtils.item_generate ItemGroups.basic_items
             MapUtils.spawn_item(map, item.type, item.amount, sqr) 
         -- for i=1,conf.n_shops
         --     sqr = MapUtils.random_square(map, area, {matches_none: {SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
@@ -253,7 +253,7 @@ hell_create = (MapSeq, seq_idx, number_entrances = 1) ->
                     if not sqr
                         break
                     map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
-                    item = ItemUtils.item_generate group[1], 1 --Randart power level
+                    item = ItemUtils.item_generate group[1]
                     MapUtils.spawn_item(map, item.type, item.amount, sqr) 
             -- 8 randarts:
             for i=1,8 do
@@ -261,7 +261,7 @@ hell_create = (MapSeq, seq_idx, number_entrances = 1) ->
                 if not sqr
                     break
                 map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
-                item = ItemUtils.item_generate ItemGroups.enchanted_items, 1, 100 --Randart power level and chance
+                item = ItemUtils.item_generate ItemGroups.enchanted_items, false, 1, 100 --Randart power level and chance
                 MapUtils.spawn_item(map, item.type, item.amount, sqr) 
             return true
         on_create_source_map: (map) =>
@@ -301,7 +301,7 @@ crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
             store_placer = (map, xy) ->
                 Region1.generate_store(map, xy)
             item_placer = (map, xy) ->
-                item = ItemUtils.item_generate ItemGroups.enchanted_items, 1 --Randart power level
+                item = ItemUtils.item_generate ItemGroups.enchanted_items
                 MapUtils.spawn_item(map, item.type, item.amount, xy)
             for i =1,10
                 up_stairs_placer = (map, xy) ->
@@ -356,7 +356,7 @@ crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
                     if not sqr
                         break
                     map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
-                    item = ItemUtils.item_generate group[1], 1 --Randart power level
+                    item = ItemUtils.item_generate group[1]
                     MapUtils.spawn_item(map, item.type, item.amount, sqr) 
             return true
         on_create_source_map: (map) =>
@@ -393,7 +393,7 @@ overworld_features = (map) ->
             -- nil is passed for the default open sprite
             MapUtils.spawn_door(map, xy)
         item_placer = (map, xy) ->
-            item = ItemUtils.item_generate ItemGroups.basic_items, 1 --Randart power level
+            item = ItemUtils.item_generate ItemGroups.basic_items
             MapUtils.spawn_item(map, item.type, item.amount, xy)
         vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: item_placer, :door_placer, tileset: TileSets.pebble})
         if not place_feature(map, vault, (r) -> r.conf.is_overworld)
@@ -431,7 +431,7 @@ overworld_features = (map) ->
                 -- Place key vault     --
                 for i=1,2 
                     item_placer = (map, xy) ->
-                        item = ItemUtils.item_generate ItemGroups.basic_items, 1 --Randart power level
+                        item = ItemUtils.item_generate ItemGroups.basic_items
                         MapUtils.spawn_item(map, item.type, item.amount, xy)
                     tileset = TileSets.pebble
 
@@ -651,7 +651,7 @@ overworld_features = (map) ->
                 if map.rng.chance(.1) 
                     MapUtils.spawn_item(map, "Scroll of Experience", 1, xy)
                 else
-                    item = ItemUtils.item_generate ItemGroups.basic_items, 1 --Randart power level
+                    item = ItemUtils.item_generate ItemGroups.basic_items
                     MapUtils.spawn_item(map, item.type, item.amount, xy)
             gold_placer = (map, xy) ->
                 MapUtils.spawn_item(map, "Gold", random(2,10), xy)
@@ -670,7 +670,7 @@ overworld_features = (map) ->
                 enemy = OldMaps.enemy_generate(OldMaps.medium_enemies)
                 MapUtils.spawn_enemy(map, enemy, xy)
             item_placer = (map, xy) ->
-                item = ItemUtils.item_generate ItemGroups.basic_items, 1 --Randart power level
+                item = ItemUtils.item_generate ItemGroups.basic_items
                 MapUtils.spawn_item(map, item.type, item.amount, xy)
             gold_placer = (map, xy) ->
                 if map.rng\chance(.7) 
@@ -693,7 +693,7 @@ overworld_features = (map) ->
         boss_placer = (map, xy) ->
             MapUtils.spawn_enemy(map, "Dark Centaur", xy)
         item_placer = (map, xy) ->
-            item = ItemUtils.item_generate ItemGroups.basic_items, 1 --Randart power level
+            item = ItemUtils.item_generate ItemGroups.basic_items
             MapUtils.spawn_item(map, item.type, item.amount, xy)
         gold_placer = (map, xy) ->
             if map.rng\chance(.7) 
@@ -726,7 +726,7 @@ overworld_features = (map) ->
                     MapUtils.spawn_item(map, "Gold", random(2,10), xy)
 
             item_placer = (map, xy) ->
-                item = ItemUtils.item_generate ItemGroups.basic_items, 1 --Randart power level
+                item = ItemUtils.item_generate ItemGroups.basic_items
                 MapUtils.spawn_item(map, item.type, item.amount, xy)
             gold_placer = (map, xy) ->
                 MapUtils.spawn_item(map, "Gold", random(2,10), xy)
