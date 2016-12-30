@@ -73,10 +73,13 @@ connect_edges = (map, rng, conf, area, edges) ->
             tile = conf.floor2
             append flags, FLAG_ALTERNATE
         fapply = nil 
-        if rng\random(4) < 2 
-            fapply = p1.line_connect 
-        else 
+        --if rng\random(4) < 2 
+         --   fapply = p1.line_connect 
+        --else 
+        if chance(map.arc_chance)
             fapply = p1.arc_connect
+        else
+            fapply = p1.line_connect
         fapply p1, {
             :map, :area, target: p2, :line_width
             operator: (tile_operator tile, {matches_none: FLAG_ALTERNATE, matches_all: SourceMap.FLAG_SOLID, add: flags})
@@ -211,6 +214,7 @@ map_try_create = (template_f) ->
         flags: {SourceMap.FLAG_SOLID, if template.seethrough then SourceMap.FLAG_SEETHROUGH else 0}
         map_label: template.map_label,
         instances: {}
+        arc_chance: template.arc_chance or 0
         door_locations: {}
         rectangle_rooms: {}
         wandering_enabled: template.wandering_enabled
@@ -218,9 +222,10 @@ map_try_create = (template_f) ->
         player_candidate_squares: {}
     }
 
-    for subconf in *template.subtemplates
+    for subconf in *assert(template.subtemplates, "Must have subtemplates!")
         {w,h} = subconf.size
         -- Takes region parameters, region placer, and region outer ellipse bounds:
+        assert(w and h, "Subconf must have size")
         r = random_region_add rng, w, h, 20, center_region_delta_func(map, rng, outer), 0,
             major_regions, outer\bbox()
         if r == nil
@@ -243,13 +248,13 @@ map_try_create = (template_f) ->
         return nil
 
     -- Reject levels that are not fully connected:
-    --if not SourceMap.area_fully_connected {
-    --    :map, 
-    --    unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
-    --    mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
-    --    marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
-    --}
-    --    return nil
+    if not SourceMap.area_fully_connected {
+        :map, 
+        unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
+        mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
+        marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
+    }
+        return nil
 
     game_map = generate_game_map(map)
     template\on_create_game_map(game_map)

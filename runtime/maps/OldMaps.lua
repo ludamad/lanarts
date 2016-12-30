@@ -65,6 +65,15 @@ M.medium_enemies = table.merge(M.medium_animals, {
 --  {enemy = "Unseen Horror",     chance = 5                                             },
 --  {enemy = "Dark Centaur",      chance = 10                                             }
 })
+ 
+M.mediumhard_enemies = table.merge(M.medium_animals, {
+  {enemy = "Skeleton",          chance = 50                                              },
+  {enemy = "Storm Elemental",   chance = 66,  group_chance = 33, group_size = 2           },
+  {enemy = "Chicken",           chance = 50                                             },
+--  {enemy = "Unseen Horror",     chance = 5                                             },
+  {enemy = "Dark Centaur",      chance = 10                                             },
+  {enemy = "Ciribot",           chance = 75                                              },
+})
   
 M.hard_enemies = {
  {enemy = "Storm Elemental",   chance = 20,    group_chance = 100, group_size = 3          },
@@ -268,7 +277,7 @@ M.Dungeon3 = {
       items = { amount = 5,  group = ItemGroups.basic_items   },
       enemies = {
         amount = {10,14},
-        generated = M.medium_animals 
+        generated = M.mediumhard_enemies
       }
     }
   },
@@ -283,9 +292,9 @@ M.Dungeon3 = {
   },
   { templates = {path_resolve "dungeon1room1a.txt", path_resolve "dungeon1room1b.txt", path_resolve "dungeon1room1c.txt"},
     content = {
-      items = { amount = 4,  group = ItemGroups.basic_items   },
+      items = { amount = 4,  group = ItemGroups.enchanted_items   },
       enemies = {
-        amount = 6,
+        amount = 12,
         generated = table.tconcat(M.medium_enemies, {{enemy = "Hell Warrior", guaranteed_spawns = 1}})
       }
     }
@@ -366,6 +375,7 @@ local function size_multiplier(map)
     return 1 -- For now, don't make bigger levels. Pixel lock is no longer a thing.
 --    return 1 + random(3, 10) * 0.03 * (World.player_amount - 1)
 end
+M.size_multiplier = size_multiplier
 
 function M.enemy_generate(chances)
     local total_chance = 0
@@ -403,6 +413,9 @@ function M.generate_from_enemy_entries(map, chances, amount, --[[Optional]] area
     end
     return ret
 end
+function M.enemy_bonus()
+    return (World.player_amount - 1) / 2
+end
 
 local function generate_enemies(map, enemies)
     local min, max
@@ -411,7 +424,7 @@ local function generate_enemies(map, enemies)
     else
         min, max = enemies.amount, enemies.amount
     end
-    local multiplayer_bonus = (World.player_amount - 1) / 3
+    local multiplayer_bonus = M.enemy_bonus()
     if map.template.dont_scale_enemies then
         multiplayer_bonus = 1 -- Dont generate more enemies in the final area
     end
@@ -514,7 +527,7 @@ local function generate_tunnels(map, tunnels, tileset)
     dungeons.simple_tunnels(map, tunnels.width, per_room_range, tileset.wall, tileset.floor_tunnel or tileset.floor_alt, get_inner_area(map), tunnels.padding)
 end
 
-local function map_gen_apply(map, placements, wall, floor, size, padding)
+local function map_gen_apply(map, placements, wall, floor, __unused_alternate, size, padding)
     SourceMap.random_placement_apply { rng = map.rng, map = map, area = get_inner_area(map),
         child_operator = dungeons.room_carve_operator(wall, floor, padding or 1),
         size_range = size, amount_of_placements_range = placements,
@@ -535,8 +548,8 @@ local function generate_rooms(map, rooms, tileset)
     local size = map_call(math.ceil, {rooms.size[1] * size_mult, rooms.size[2] * size_mult})
     -- Compensate for padding
     size = {size[1] + rooms.padding*2, size[2] + rooms.padding*2}
-    map_gen_apply(map, {alt_amount, alt_amount}, tileset.wall, tileset.floor_alt, size, rooms.padding)
-    map_gen_apply(map, {amounts, amounts}, tileset.wall, tileset.floor , size, rooms.padding)
+    map_gen_apply(map, {alt_amount, alt_amount}, tileset.wall, tileset.floor_alt, tileset.floorsize, rooms.padding)
+    map_gen_apply(map, {amounts, amounts}, tileset.wall, tileset.floor, tileset.floor_alt, size, rooms.padding)
 end
 
 local function generate_layout(map, layout, tileset)

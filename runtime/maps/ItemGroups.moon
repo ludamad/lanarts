@@ -50,7 +50,7 @@ amulets = (chance, args) -> {
 }
 
 -- Consumables
-consumables = (chance) -> { 
+consumables = (chance, args) -> _filter { 
     :chance
     {
         chance: 95
@@ -69,7 +69,7 @@ consumables = (chance) -> {
     }
 
     -- Permanent enchantments
-    { 
+    args.ignore_strong and { 
         chance: 5
         { item: "Strength Scroll",    chance: 1                      }
         { item: "Magic Scroll",       chance: 1                      }

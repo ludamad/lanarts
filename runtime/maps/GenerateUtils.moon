@@ -75,7 +75,7 @@ Region = newtype {
         cx, cy = @center()
         ocx, ocy = args.target\center()
         w, h = math.abs(cx - ocx) - 1, math.abs(cy - ocy) - 1
-        if w < 2 or h < 2 or w > 15 or h > 15
+        if w < 2 or h < 2 -- or w > 35 or h > 35
             return false
         -- Set up the ellipse section for our connection:
         args.width, args.height = w*2, h*2
@@ -83,6 +83,7 @@ Region = newtype {
         a1 = math.atan2((args.y - cy) / h , (args.x - cx)/w)
         a2 = math.atan2((args.y - ocy) / h, (args.x - ocx)/w)
         args.angle1, args.angle2 = a1 + math.pi/2, (a2 - a1)
+        return true
     arc_connect: (args) =>
         if not @_arc_adjust_params(args)
             return @line_connect(args)
@@ -210,6 +211,7 @@ region_intersects = (x,y,w,h, R) ->
     return false
 
 random_region_add = (rng, w, h, n_points, velocity_func, angle, R, bbox, ignore_intersect = false) ->
+    assert(w and h, "Must have size")
     for tries=1,MAX_TRIES
         {PW,PH} = LEVEL_PADDING
         {x1, y1, x2, y2} = bbox
