@@ -32,6 +32,7 @@ static bool query_ext_string(const std::string& extension,
 #if (defined (WIN32) || defined (_WIN32))
 
 #define WIN32_LEAN_AND_MEAN 1
+#include <GL/gl.h>
 #include <windows.h>
 #include "wglext.h"
 

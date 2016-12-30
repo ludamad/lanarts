@@ -211,6 +211,9 @@ static void handleSIGINT(int signal) {
   exit(0);
 }
 
+#ifdef main
+# undef main
+#endif /* main */
 /* Must take (int, char**) to play nice with SDL */
 int main(int argc, char** argv) {
   std::signal(SIGINT, handleSIGINT);

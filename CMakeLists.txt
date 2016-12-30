@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 2.6)
 if ($ENV{BUILD_OPTIMIZE})
     message("Building release... no debug symbols will be available.")
     set(CMAKE_BUILD_TYPE Release)
+    add_definitions(-g)
 else()
     message("Building debug... performance will not be optimal.")
     set(CMAKE_BUILD_TYPE Debug)
@@ -28,10 +29,7 @@ endif()
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     if ($ENV{BUILD_SANITIZE})
         SET (CMAKE_EXE_LINKER_FLAGS
-            "-fsanitize=address"
-        )
-        SET (CMAKE_EXE_LINKER_FLAGS
-            "-fsanitize=undefined"
+            "-fsanitize=address -fsanitize=undefined"
         )
         add_definitions(
           "-fsanitize=address"  
