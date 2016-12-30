@@ -526,9 +526,9 @@ overworld_features = (map) ->
     if place_crypt() then return nil
     -----------------------------
 
-    -----------------------------
-    -- Place medium dungeon 1: --
-    place_medium1 = () ->
+    ----------------------------------------
+    -- Place medium dungeon 1, variant A: --
+    place_medium1a = () ->
         local templates 
         templates = OldMaps.Dungeon2
         on_generate_dungeon = (map, floor) ->
@@ -555,7 +555,38 @@ overworld_features = (map) ->
         vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.temple, :door_placer, :gold_placer, player_spawn_area: true})
         if not place_feature(map, vault, (r) -> r.conf.is_overworld)
             return true
-    if place_medium1() then return nil
+    place_medium1b = () ->
+        tileset = TileSets.snake
+        MapSeq = MapSequence.create {preallocate: 1}
+        snake_pit_create = () ->
+            return NewDungeons.make_linear_dungeon {
+                :MapSeq
+                dungeon_template: NewDungeons.SnakePit
+                on_generate: (floor) ->
+                    assert(floor)
+                    print "on_generate", floor
+                sprite_up: (floor) ->
+                    return if floor == 1 then "spr_gates.exit_lair" else "spr_gates.return"
+                sprite_down: (floor) ->
+                    return "spr_gates.enter"
+                portals_up: (floor) ->
+                    return if floor == 1 then 1 else 3
+                portals_down: (floor) ->
+                    return if floor == NewDungeons.N_SNAKE_FLOORS then 0 else 3
+            }
+        door_placer = (map, xy) ->
+            MapUtils.spawn_door(map, xy)
+        next_dungeon = {1}
+        place_dungeon = (map, xy) ->
+            portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
+            MapSeq\forward_portal_add 1, portal, next_dungeon[1], snake_pit_create
+            next_dungeon[1] += 1
+        vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, :tileset, :door_placer, player_spawn_area: true})
+        if not place_feature(map, vault, (r) -> r.conf.is_overworld)
+            return true
+        append post_poned, (game_map) ->
+            MapSeq\slot_resolve(1, game_map)
+    if map.rng\random_choice({place_medium1a, place_medium1b})() then return nil
     -----------------------------
 
     -----------------------------
@@ -720,72 +751,33 @@ overworld_features = (map) ->
             f(game_map)
 
 overworld_create = () ->
-    MapSeq = MapSequence.create()
---    local make_connector
---    make_dungeon = (floor) ->
---        dungeon = NewMaps.map_create (rng) -> 
---            NewDungeons.SnakePit(rng, floor, make_connector(floor))
---        MapSeq\slot_resolve(floor, dungeon)
---        return dungeon
---    make_connector = (floor) -> NewDungeons.make_connector {
---        up: {
---            n_portals: if floor == 1 then 0 else 3
---            sprite: "spr_gates.return"
---            connect: (portals) ->
---                for i=1,#portals
---                    MapSeq\backward_portal_resolve(floor, portals[i], i)
---        }
---        down: {
---            n_portals: if floor == NewDungeons.N_SNAKE_FLOORS then 0 else 3
---            sprite: "spr_gates.enter"
---            connect: (portals) ->
---                for i=1,#portals
---                    MapSeq\forward_portal_add(floor, portals[i], i, () -> make_dungeon(floor + 1))
---        }
---    }
-    return NewDungeons.make_linear_dungeon {
-        :MapSeq
-        offset: 0
-        dungeon_template: NewDungeons.SnakePit
-        on_generate: (floor) ->
-            assert(floor)
-            print "on_generate", floor
-        sprite_up: (floor) ->
-            return if floor == 1 then "spr_gates.exit_lair" else "spr_gates.return"
-        sprite_down: (floor) ->
-            return "spr_gates.enter"
-        portals_up: (floor) ->
-            return if floor == 1 then 0 else 3
-        portals_down: (floor) ->
-            return if floor == NewDungeons.N_SNAKE_FLOORS then 0 else 3
+    NewMaps.map_create (rng) -> {
+        map_label: "Plain Valley"
+        subtemplates: {DUNGEON_CONF(rng), OVERWORLD_CONF(rng)}
+        w: OVERWORLD_DIM_LESS, h: OVERWORLD_DIM_MORE
+        seethrough: true
+        outer_conf: OVERWORLD_CONF(rng)
+        shell: 50
+        default_wall: Tile.create(TileSets.grass.wall, true, true, {FLAG_OVERWORLD})
+        post_poned: {}
+        wandering_enabled: true
+        on_create_source_map: (map) =>
+            post_creation_callback = overworld_features(map)
+            if not post_creation_callback
+                return nil
+            append @post_poned, post_creation_callback
+            NewMaps.generate_door_candidates(map, rng, map.regions)
+            overworld_spawns(map)
+            @player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
+            if not @player_spawn_points
+                return nil
+            return true
+        on_create_game_map: (game_map) =>
+            for f in *@post_poned
+                f(game_map)
+            World.players_spawn(game_map, @player_spawn_points)
+            Map.set_vision_radius(game_map, OVERWORLD_VISION_RADIUS)
     }
-    --NewMaps.map_create (rng) -> {
-    --    map_label: "Plain Valley"
-    --    subtemplates: {DUNGEON_CONF(rng), OVERWORLD_CONF(rng)}
-    --    w: OVERWORLD_DIM_LESS, h: OVERWORLD_DIM_MORE
-    --    seethrough: true
-    --    outer_conf: OVERWORLD_CONF(rng)
-    --    shell: 50
-    --    default_wall: Tile.create(TileSets.grass.wall, true, true, {FLAG_OVERWORLD})
-    --    post_poned: {}
-    --    wandering_enabled: true
-    --    on_create_source_map: (map) =>
-    --        post_creation_callback = overworld_features(map)
-    --        if not post_creation_callback
-    --            return nil
-    --        append @post_poned, post_creation_callback
-    --        NewMaps.generate_door_candidates(map, rng, map.regions)
-    --        overworld_spawns(map)
-    --        @player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
-    --        if not @player_spawn_points
-    --            return nil
-    --        return true
-    --    on_create_game_map: (game_map) =>
-    --        for f in *@post_poned
-    --            f(game_map)
-    --        World.players_spawn(game_map, @player_spawn_points)
-    --        Map.set_vision_radius(game_map, OVERWORLD_VISION_RADIUS)
-    --}
 
 return {
     :overworld_create

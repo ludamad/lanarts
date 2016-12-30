@@ -23,6 +23,7 @@ Data.spell_create {
     description: "Initiates Ice Form, a powerful ability for safe dungeoneering, preventing attacks and spells, and lowering speed drastically, but providing near immunity for 10 seconds." 
     mp_cost: 40
     cooldown: 100
+    spell_cooldown: 1600
     can_cast_with_held_key: false
     fallback_to_melee: false
     action_func: (caster, x, y) ->

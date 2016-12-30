@@ -134,3 +134,51 @@ Data.enemy_create {
             else 
                 @n_steps += 1
 }
+
+-- SNAKE PIT ENEMIES
+
+Data.enemy_create {
+    name: "Black Mamba"
+    sprite: "spr_enemies.animals.black_mamba"
+    death_sprite: "blood"
+    radius: 10
+    xpaward: 20
+    appear_message: "A poisonous black mamba slithers onto the scene!"
+    defeat_message: "The black mamba is dead."
+    stats: {
+        attacks: {{weapon: "Fast Melee"}}
+        hp: 60
+        hpregen: 0.04
+        movespeed: 3.5
+        strength: 15
+        defence: 0
+        willpower: 5
+    }
+    effects_active: {"PoisonedWeapon"}
+}
+ 
+Data.enemy_create {
+    name: "Mouther" 
+    sprite: "spr_enemies.animals.tyrant_leech"
+    radius: 11
+    xpaward: 25
+    appear_message: "You hear a mouther start screeching!"
+    defeat_message: "The mouther has been shut."
+    stats: {
+        attacks: {
+            {weapon: "Basic Melee"}
+            {projectile: "Mephitize"}
+        }
+        hp: 40
+        hpregen: 0.03
+        movespeed: 1
+        -- base stats:
+        strength: 5
+        defence: 0
+        magic: 2
+        willpower: 0
+    }
+    effects_active: {"PoisonedWeapon"}
+}
+
+

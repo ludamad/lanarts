@@ -136,7 +136,7 @@ function Door:init(args)
     self.open_sprite = args.open_sprite or M._door_open
     self.closed_sprite = args.closed_sprite or M._door_closed
     self.depth = args.depth or M.FEATURE_DEPTH
-    self.padding = 4
+    self.padding = 6
     self.required_key = args.required_key or false
 end
 

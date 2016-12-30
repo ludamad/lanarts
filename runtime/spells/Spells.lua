@@ -119,7 +119,7 @@ function Berserk.autotarget_func(caster)
 end
 
 function Berserk.action_func(caster, x, y)
-    caster:add_effect("Berserk", 250)
+    caster:add_effect("Berserk", 170)
     if caster:is_local_player() then
         EventLog.add("You enter a powerful rage!", {200,200,255})
     elseif caster.name == "Your ally" then

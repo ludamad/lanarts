@@ -101,7 +101,7 @@ dungeon_template = (data) -> table.merge data, {
     _post_poned: {}
     _vision_radius: DEFAULT_DUNGEON_VISION_RADIUS
     _player_spawn_points: nil
-    _default_vault_config: (args = {}) =>
+    _base_vault_config: (args = {}) =>
         enemy_placer = (map, xy) ->
             enemy = OldMaps.enemy_generate(@_enemy_entries())
             MapUtils.spawn_enemy(map, enemy, xy)
@@ -114,6 +114,8 @@ dungeon_template = (data) -> table.merge data, {
             item = ItemUtils.item_generate ItemGroups.enchanted_items, 1 --Randart power level
             MapUtils.spawn_item(map, item.type, item.amount, xy)
         return  {:enemy_placer, :door_placer, :store_placer, :item_placer, tileset: @tileset}
+    _default_vault_config: (args = {}) =>
+        return @_base_vault_config(args)
     _spawn_enemies: (map) =>
         area = {0,0,map.size[1],map.size[2]}
         OldMaps.generate_from_enemy_entries(map, @_enemy_entries(), @_n_enemies(), area, {matches_none: {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT, FLAG_NO_ENEMY_SPAWN}})
@@ -156,7 +158,7 @@ dungeon_template = (data) -> table.merge data, {
         @connector.post_connect(game_map)
 }
 
-M.N_SNAKE_FLOORS = 3
+M.N_SNAKE_FLOORS = 2
 snake_pit_floor_plans = (rng) ->
     tileset = TileSets.snake
     raw_plans = {
@@ -166,9 +168,11 @@ snake_pit_floor_plans = (rng) ->
             n_subareas: 3
             n_items: 4
             n_enemies: 0
+            n_encounter_vaults: 1
             enemy_entries: {
-                {enemy: "Adder", guaranteed_spawns: 4}
-                {enemy: "Black Mamba", guaranteed_spawns: 1}
+                {enemy: "Adder", guaranteed_spawns: 8}
+                {enemy: "Black Mamba", guaranteed_spawns: 3}
+                {enemy: "Mouther", guaranteed_spawns: 3}
                 {enemy: "Adder", chance: 100}
                 {enemy: "Black Mamba", chance: 25}
             }
@@ -181,36 +185,19 @@ snake_pit_floor_plans = (rng) ->
         }
         [2]: {
             wandering_enabled: false
-            size: {25, 25}
+            size: {45, 45}
             n_subareas: 3
-            n_items: 4
+            n_items: 7
             n_enemies: 0
+            n_encounter_vaults: 1
             enemy_entries: {
-                {enemy: "Adder", guaranteed_spawns: 4}
-                {enemy: "Black Mamba", guaranteed_spawns: 1}
+                {enemy: "Adder", guaranteed_spawns: 10}
+                {enemy: "Black Mamba", guaranteed_spawns: 5}
+                {enemy: "Mouther", guaranteed_spawns: 5}
                 {enemy: "Adder", chance: 100}
                 {enemy: "Black Mamba", chance: 25}
             }
-            item_groups: {{ItemGroups.basic_items, 4}}
-            number_regions: 2
-            room_radius: () -> 7
-            rect_room_num_range: {0, 0}
-            rect_room_size_range: {1, 1}
-            n_statues: 4
-        }
-        [3]: {
-            wandering_enabled: false
-            size: {25, 25}
-            n_subareas: 3
-            n_items: 4
-            n_enemies: 0
-            enemy_entries: {
-                {enemy: "Adder", guaranteed_spawns: 4}
-                {enemy: "Black Mamba", guaranteed_spawns: 1}
-                {enemy: "Adder", chance: 100}
-                {enemy: "Black Mamba", chance: 25}
-            }
-            item_groups: {{ItemGroups.basic_items, 4}}
+            item_groups: {{ItemGroups.basic_items, 8}}
             number_regions: 2
             room_radius: () -> 7
             rect_room_num_range: {0, 0}
@@ -220,11 +207,12 @@ snake_pit_floor_plans = (rng) ->
     }
     return for i, raw in ipairs raw_plans
         base = table.merge dungeon_defaults(rng), create_dungeon_scheme(tileset)
-        base.map_label = "Snake Pit " .. i
         table.merge(base, raw)
 
 M.make_connector = (types) ->
     placed_portals = {}
+    on_generate = types.on_generate
+    types.on_generate = nil
     for k,type in pairs(types)
         assert(type.n_portals and type.sprite and type.connect, "Malformed connector type!")
         placed_portals[k] = {} -- list
@@ -245,8 +233,8 @@ M.make_connector = (types) ->
                 append placed_portals[type], portal
             return portal
         post_generate: (map) ->
-            if types.on_generate
-                types.on_generate(map)
+            if on_generate
+                on_generate(map)
         post_connect: (game_map) ->
             for k, type in pairs(types)
                 assert(placed_portals[k], "No portals for " .. k .. "!")
@@ -264,7 +252,7 @@ M.make_linear_dungeon = (args) ->
     make_dungeon = (floor) ->
         dungeon = NewMaps.map_create (rng) -> 
             args.dungeon_template(rng, floor, make_connector(floor))
-        MapSeq\slot_resolve(floor, dungeon)
+        MapSeq\slot_resolve(floor + offset, dungeon)
         return dungeon
     make_connector = (floor) -> M.make_connector {
         on_generate: (map) -> 
@@ -292,7 +280,7 @@ M.SnakePit = (rng, floor, connector) ->
     subtemplates = for i=1,plan.n_subareas
         snake_pit_floor_plans(rng)[floor]
     return dungeon_template {
-        map_label: "Snake Pits"
+        map_label: "Snake Pit " .. floor
         tileset: TileSets.snake
         :subtemplates
         :connector
@@ -304,7 +292,7 @@ M.SnakePit = (rng, floor, connector) ->
         _n_enemies: () =>
             return math.ceil(plan.n_enemies * OldMaps.enemy_bonus())
         _n_encounter_vaults: () =>
-            return 1
+            return plan.n_encounter_vaults
         _encounter_vault: () =>
             return Vaults.crypt_encounter_vault
         _item_groups: () =>
@@ -315,6 +303,17 @@ M.SnakePit = (rng, floor, connector) ->
                 if not connector.random_portal("down", map, area)
                     return nil
             return true
+        _default_vault_config: (args = {}) =>
+            do return @_base_vault_config(args)
+            n_items_placed = 1
+            item_placer = (map, xy) ->
+                if floor == 3 and n_items_placed == 0
+                    item = "Azurite Key"
+                else
+                    item = ItemUtils.item_generate ItemGroups.enchanted_items, 1 --Randart power level
+                MapUtils.spawn_item(map, item.type, item.amount, xy)
+                n_items_placed += 1
+            return @_base_vault_config(args)
         _create_stairs_up: (map) =>
             base_conf = @_default_vault_config()
             for i =1,connector.n_portals("up")
@@ -336,22 +335,28 @@ M.SnakePit = (rng, floor, connector) ->
             return true
         on_create_source_map: (map) =>
             if not @_create_stairs_up(map)
+                print("ABORT: stairs up")
                 return nil
             if not @_create_stairs_down(map)
+                print("ABORT: stairs down")
                 return nil
             if not @_create_encounter_rooms(map)
+                print("ABORT: stairs encounter")
                 return nil
             if not @_spawn_statues(map)
+                print("ABORT: statues")
                 return nil
             if not @_spawn_items(map)
+                print("ABORT: items")
                 return nil
             if not @_spawn_enemies(map)
+                print("ABORT: enemies")
                 return nil
             NewMaps.generate_door_candidates(map, rng, map.regions)
             if #map.player_candidate_squares > 0
                 @_player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
-                pretty @_player_spawn_points
                 if not @_player_spawn_points
+                    print("ABORT: player spawns")
                     return nil
             @connector.post_generate(map)
             return true

@@ -1,0 +1,11 @@
+Serialization:
+    - Serialize GameInstSet more truly?
+        - Can serialize / deserialize pointers as offsets .... No
+            - serialize / deserialize the objects in place there??
+                - it is the one true 'owner'
+    - Move to in-stock SDL2 on use of switch
+
+Testing:
+    - Serialization test
+    - Bring back network test
+    - Replay test:

@@ -229,6 +229,7 @@ map_try_create = (template_f) ->
         r = random_region_add rng, w, h, 20, center_region_delta_func(map, rng, outer), 0,
             major_regions, outer\bbox()
         if r == nil
+            print("ABORT: region could not be added")
             return nil
         r.max_speed = 8
         r.conf = subconf
@@ -245,6 +246,7 @@ map_try_create = (template_f) ->
     map.regions = major_regions.regions
  
     if not template\on_create_source_map(map)
+        print("ABORT: on_create_source_map")
         return nil
 
     -- Reject levels that are not fully connected:
@@ -254,6 +256,7 @@ map_try_create = (template_f) ->
         mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
         marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
     }
+        print("ABORT: connection check failed")
         return nil
 
     game_map = generate_game_map(map)

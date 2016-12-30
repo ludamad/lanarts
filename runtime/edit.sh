@@ -1,0 +1,2 @@
+cd ..
+exec ./edit.sh $@
