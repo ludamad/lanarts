@@ -90,7 +90,7 @@ M.SpellSpikes.on_step = () =>
                 continue
             @collided[col.id] = @n_steps
             eff = @caster\effective_stats()
-            col\damage(eff.magic, 2 + eff.magic * 0.2, 0, 1)
+            col\damage(eff.magic / 2, 2 + eff.magic * 0.2, 0, 1)
 
 M.SpellSpikes.on_draw = () =>
     if Display.object_within_view(@) 

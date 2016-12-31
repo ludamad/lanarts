@@ -484,13 +484,13 @@ Data.spell_create(FearStrike)
 
 local Expedite = {
     name = "Expedite",
-    description = "Run 25% faster for a short duration, with 33% faster rate of fire. Heal MP every kill.",
+    description = "Run 25% faster for a short duration, with 50% faster rate of fire.",
     can_cast_with_held_key = false,
     spr_spell = "expedite",
     can_cast_with_cooldown = false,
     mp_cost = 0,
     cooldown = 30,
-    spell_cooldown = 800,
+    spell_cooldown = 1600,
     fallback_to_melee = false,
 }
 
@@ -503,7 +503,7 @@ function Expedite.autotarget_func(caster)
 end
 
 function Expedite.action_func(caster, x, y)
-    caster:add_effect("Expedited", 500)
+    caster:add_effect("Expedited", 600)
     if caster:is_local_player() then
         EventLog.add("You feel expedient!", {200,200,255})
     elseif caster.name == "Your ally" then
