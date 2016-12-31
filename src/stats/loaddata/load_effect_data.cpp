@@ -34,6 +34,8 @@ EffectEntry parse_effect(lua_State* L, const YAML::Node& n) {
 			true);
 	entry.allowed_actions.can_use_items = parse_defaulted(n, "can_use_items",
 			true);
+	entry.allowed_actions.can_use_weapons = parse_defaulted(n, "can_use_weapons",
+			true);
 
 	entry.effected_colour = parse_defaulted(n, "effected_colour", Colour());
 	entry.effected_sprite = parse_sprite_number(n, "effected_sprite");

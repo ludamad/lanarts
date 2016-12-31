@@ -494,7 +494,7 @@ overworld_features = (map) ->
             -- nil is passed for the default open sprite
             MapUtils.spawn_door(map, xy)
         on_placement = (map) -> OldMapSeq1b\slot_resolve(1, map)
-        dungeon = {label: 'Red Dragon Lair', tileset: TileSets.pebble, :templates, on_generate: on_generate_dungeon, :on_placement}
+        dungeon = {label: 'Dragon Den', tileset: TileSets.pebble, :templates, on_generate: on_generate_dungeon, :on_placement}
         place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq1, dungeon)
         vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, :door_placer, tileset: TileSets.pebble})
         if not place_feature(map, vault, (r) -> r.conf.is_overworld)

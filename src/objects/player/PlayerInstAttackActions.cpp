@@ -571,6 +571,9 @@ static void exhaust_projectile_autoequip(PlayerInst* player,
 }
 
 void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
+    if (!effective_stats().allowed_actions.can_use_weapon) {
+        return;
+    }
     lua_State* L = gs->luastate();
 
     WeaponEntry& wentry = weapon().weapon_entry();

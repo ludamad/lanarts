@@ -94,14 +94,6 @@ struct EffectiveAttackStats {
 	}
 };
 
-/* Which actions are allowed ? */
-struct ActionsAllowed {
-	bool can_use_spell, can_use_item, can_use_weapon;
-	ActionsAllowed() :
-			can_use_spell(true), can_use_item(true), can_use_weapon(true) {
-	}
-};
-
 struct CooldownModifiers {
 	float rest_cooldown_multiplier;
 	float spell_cooldown_multiplier;

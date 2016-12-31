@@ -59,8 +59,8 @@ static EffectEntry parse_effect(const LuaStackValue& table) {
             true);
     entry.allowed_actions.can_use_spells = defaulted(table, "can_use_spells",
             true);
-    entry.allowed_actions.can_use_items = defaulted(table, "can_use_items",
-            true);
+    entry.allowed_actions.can_use_items = defaulted(table, "can_use_items", true);
+    entry.allowed_actions.can_use_weapons = defaulted(table, "can_use_weapons", true);
 
     entry.effected_colour = defaulted(table, "effected_colour", Colour());
     if (!table["effected_sprite"].isnil()) {
