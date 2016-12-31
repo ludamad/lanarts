@@ -247,7 +247,7 @@ hell_create = (MapSeq, seq_idx, number_entrances = 1) ->
             return true
         _spawn_items: (map) =>
             area = {0,0,map.size[1],map.size[2]}
-            for group in *{{ItemGroups.basic_items,20}, {ItemGroups.enchanted_items, 10}, {{item: "Scroll of Experience", chance: 100}, 5}}
+            for group in *{{ItemGroups.basic_items,20}, {ItemGroups.enchanted_items, 10}, {{item: "Scroll of Experience", chance: 100}, 2}}
                 for i=1,group[2] do
                     sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
                     if not sqr
@@ -302,7 +302,7 @@ crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
             item_placer = (map, xy) ->
                 item = ItemUtils.item_generate ItemGroups.enchanted_items
                 MapUtils.spawn_item(map, item.type, item.amount, xy)
-            for i =1,10
+            for i =1,4
                 up_stairs_placer = (map, xy) ->
                     MapSeq\backward_portal_resolve(seq_idx, portal, i)
                 vault = SourceMap.area_template_create(Vaults.crypt_encounter_vault {rng: map.rng, :enemy_placer, :door_placer, :store_placer, :item_placer,  :tileset})
@@ -323,7 +323,7 @@ crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
                 Seq\forward_portal_add 1, portal, next_dungeon[1], () -> hell_create(Seq, 2)
                 next_dungeon[1] += 1
             enemy_placer = (map, xy) ->
-                enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
+                enemy = OldMaps.enemy_generate(OldMaps.strong_undead)
                 MapUtils.spawn_enemy(map, enemy, xy)
             vault = SourceMap.area_template_create(Vaults.hell_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.hell, :door_placer, :enemy_placer, player_spawn_area: false})
             if not place_feature(map, vault, (r) -> true)
@@ -349,7 +349,7 @@ crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
             return true
         _spawn_items: (map) =>
             area = {0,0,map.size[1],map.size[2]}
-            for group in *{{ItemGroups.basic_items,20}, {ItemGroups.enchanted_items, 10}, {{item: "Scroll of Experience", chance: 100}, 5}}
+            for group in *{{ItemGroups.basic_items,20}, {ItemGroups.enchanted_items, 10}, {{item: "Scroll of Experience", chance: 100}, 2}}
                 for i=1,group[2] do
                     sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, SourceMap.FLAG_SOLID}})
                     if not sqr
@@ -408,12 +408,12 @@ overworld_features = (map) ->
            {
                 layout: {{size: {60,40}, rooms: {padding:0,amount:40,size:{3,7}},tunnels:{padding:0, width:{1,3},per_room: 5}}}
                 content: {
-                    items: {amount: 12, group: ItemGroups.basic_items} 
+                    items: {amount: 8, group: ItemGroups.enchanted_items} 
                     enemies: {
                         wandering: true
                         amount: 0
                         generated: {
-                          {enemy: "Ogre Mage",         guaranteed_spawns: 3}
+                          {enemy: "Ogre Mage",         guaranteed_spawns: 5}
                           {enemy: "Orc Warrior",       guaranteed_spawns: 3}
                           {enemy: "Adder",             guaranteed_spawns: 5}
                         }
@@ -464,7 +464,6 @@ overworld_features = (map) ->
                             return nil
                     ---------------------------------------------------------- 
                     return true
-                on_generate_dungeon = nil
                 spawn_portal = safe_portal_spawner(TileSets.snake)
                 dungeon = {label: 'Ogre Lair', tileset: TileSets.snake, templates: inner_encounter_template, on_generate: on_generate_dungeon, :spawn_portal, sprite_out: Region1.stair_kinds_index(5, 7)}
                 gold_placer = (map, xy) ->

@@ -56,11 +56,11 @@ enemies:
     appear_message: A hell-forged creature appears before you!
     defeat_message: The hell-forged is destroyed.
     stats:
-        attacks: [ {projectile: Slow Fire Bolt} ]
-        movespeed: 3
-        hp: 75
+        attacks: [ {projectile: Large Fire Ball} ]
+        movespeed: 3.5
+        hp: 125
         hpregen: 0.01
-        strength: 35
-        magic: 35
+        strength: 45
+        magic: 45
         defence: 8
         willpower: 10

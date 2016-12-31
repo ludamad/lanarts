@@ -19,19 +19,19 @@ M.weak_undead = {
 }
 
 M.strong_undead = {
-  {enemy = "Gaseous Ghost",          chance = 25                                            },
+  {enemy = "Gaseous Ghost",          chance = 25, guaranteed_spawns = 3                                            },
   {enemy = "Mummoner",          chance = 100                                            },
-  {enemy = "Crypt Keeper",          chance = 25                                            },
+  {enemy = "Crypt Keeper",          chance = 25, guaranteed_spawns = 3                                            },
   {enemy = "Mummy",          guaranteed_spawns = 65                                           },
 }
 M.weak_hell = {
 }
 M.strong_hell = {
   {enemy = "Hell Storm",        chance = 20,  group_chance = 33, group_size = 3           },
-     {enemy = "Dark Centaur",      chance = 30                                              },
+     {enemy = "Dark Centaur",      chance = 30, guaranteed_spawns = 10                                              },
     {enemy = "Hell Forged", chance = 20},
   {enemy = "Executioner",          guaranteed_spawns = 10                                           },
-  {enemy = "Hell Warrior",          guaranteed_spawns = 2                                           },
+  {enemy = "Hell Warrior",          guaranteed_spawns = 5                                           },
 }
 
 M.medium_animals = {
