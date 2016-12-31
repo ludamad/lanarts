@@ -4,6 +4,7 @@ export enemy_berserker_init
 export enemy_berserker_step
 
 Map = require "core.Map"
+ObjectUtils = require "objects.ObjectUtils"
 EventLog = require "ui.EventLog"
 
 ally_list = (inst) ->
@@ -209,34 +210,41 @@ Data.enemy_create {
 Data.effect_create {
     name: "Charging"
     stat_func: (mon, old, new) =>
-        new.speed *= 2
-        new.melee_cooldown_multiplier *= 0.25
+        new.speed *= 4
+        if @n_steps > @n_ramp
+            new.melee_cooldown_multiplier *= 0.25
         new.hpregen *= 2
     effected_sprite: "spr_effects.i-loudness"
     effected_colour: {255,0,0}
     fade_out: 15
     init_func: (mon) =>
         @n_steps = 0
-        play_sound "sound/wavy.ogg"
+        @n_ramp = 10
     step_func: () =>
-        @n_steps += 1
-        if @n_steps > 60
+        if @n_steps % 60 == 0
             play_sound "sound/wavy.ogg"
-            @n_steps = 0
+        @n_steps += 1
     on_melee_func: (mon, defender, damage, attack_stats) =>
-        thrown = defender\add_effect("Thrown", 10)
-        thrown.angle = vector_direction({mon.x, mon.y}, {defender.x, defender.y})
-        if not mon.is_enemy and mon\is_local_player() 
-            EventLog.add("The " .. defender.name .." is thrown back!", {200,200,255})
-        elseif not defender.is_enemy and defender\is_local_player()
-            EventLog.add("You are thrown back!", {200,200,255})
-        -- mon\remove_effect("Charging")
+        if @n_steps > @n_ramp
+            thrown = defender\add_effect("Thrown", 10)
+            thrown.angle = vector_direction({mon.x, mon.y}, {defender.x, defender.y})
+            if not mon.is_enemy and mon\is_local_player() 
+                EventLog.add("The " .. defender.name .." is thrown back!", {200,200,255})
+            elseif not defender.is_enemy and defender\is_local_player()
+                EventLog.add("You are thrown back!", {200,200,255})
+            -- mon\remove_effect("Charging")
 }
 
 Data.effect_create {
     name: "Enraging"
+    init_func: (mon) =>
+        @damage_tracker = 0
+        @damage_interval = mon.stats.max_hp / 3
     on_damage_func: (mon, dmg) =>
-        mon\add_effect("Charging", 400)
+        @damage_tracker += dmg
+        if @damage_tracker > @damage_interval
+            mon\add_effect("Charging", 100)
+            @damage_tracker = 0
         return dmg
 }
 
@@ -253,11 +261,13 @@ Data.enemy_create {
         hp: 70
         hpregen: 0.05
         movespeed: 2
-        strength: 35
+        strength: 15
         defence: 8
         willpower: 8
     }
     effects_active: {"Enraging"}
+    death_func: () =>
+        ObjectUtils.spawn_item_near(@, "Health Potion", 1)
 }
  
 

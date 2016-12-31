@@ -27,7 +27,7 @@ struct EnemyEntry: public ResourceEntryBase {
 	bool unique;
 	std::vector<effect_id> active_effects;
 
-	LuaLazyValue init_event, step_event, draw_event;
+	LuaLazyValue init_event, step_event, draw_event, death_event;
 	StatusEffectModifiers effect_modifiers;
 
 	EnemyEntry() :

@@ -253,6 +253,7 @@ void EnemyInst::die(GameState *gs) {
                 bool should_respawn = lua_toboolean(gs->luastate(), -1);
                 lua_pop(gs->luastate(), 1);
 
+	        lua_gameinst_callback(gs->luastate(), etype().death_event.get(gs->luastate()), this);
 		lua_api::event_monster_death(gs->luastate(), this);
                 gs->player_data().n_enemy_killed(enemytype)++;
 		AnimatedInst* anim = new AnimatedInst(ipos(), etype().enemy_sprite, 20);

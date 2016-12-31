@@ -612,6 +612,18 @@ static void object_add(LuaStackValue inst) {
     gs->add_instance(inst.as<GameInst*>());
 }
 
+static const char* get_type(GameInst* inst) {
+    if (dynamic_cast<ItemInst*>(inst)) {
+        return "item";
+    } else if (dynamic_cast<CombatGameInst*>(inst)) {
+        return "actor";
+    } else if (dynamic_cast<FeatureInst*>(inst)) {
+        return "feature";
+    } else if (dynamic_cast<StoreInst*>(inst)) {
+        return "store";
+    }
+    return "<Unknown>";
+}
 namespace lua_api {
 	// Ensures important objects are reached during serialization:
 	static void ensure_reachability(LuaValue globals, LuaValue submodule) {
@@ -642,7 +654,8 @@ namespace lua_api {
 		submodule["item_create"].bind_function(item_create);
 		submodule["animation_create"].bind_function(animation_create);
 		submodule["store_create"].bind_function(store_create);
-		submodule["player_create"].bind_function(player_create);
+        submodule["player_create"].bind_function(player_create);
+        submodule["get_type"].bind_function(get_type);
 		submodule["destroy"].bind_function(object_destroy);
 		submodule["add_to_level"].bind_function(object_add);
 

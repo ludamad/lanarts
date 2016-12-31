@@ -34,6 +34,7 @@ EnemyEntry parse_enemy_type(lua_State* L, const YAML::Node& n) {
 	entry.init_event = parse_luaexpr(L, n, "init_func");
 	entry.step_event = parse_luaexpr(L, n, "step_func");
 	entry.draw_event = parse_luaexpr(L, n, "draw_func");
+	entry.death_event = parse_luaexpr(L, n, "death_func");
 
 	return entry;
 }
@@ -74,6 +75,7 @@ static EnemyEntry parse_enemy_type(const LuaStackValue& table) {
     entry.init_event.initialize(table["init_func"]);
     entry.step_event.initialize(table["step_func"]);
     entry.draw_event.initialize(table["draw_func"]);
+    entry.death_event.initialize(table["death_func"]);
 
     auto effects_granted = luawrap::defaulted(table["effects_active"], vector<string>());
     entry.effect_modifiers.status_effects.clear();

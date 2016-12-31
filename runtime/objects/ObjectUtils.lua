@@ -89,4 +89,51 @@ function M.find_free_position(self, dir)
     return nil
 end
 
+
+local function item_filter(obj) 
+    return GameObject.get_type(obj) == 'item'
+end
+
+local function viable_item_square(obj, tx, ty)
+    if Map.tile_is_solid(obj.map, {tx, ty}) then
+        return false
+    end
+    local x, y = tx * 32 + 16, ty * 32 + 16
+    local collisions = Map.rectangle_collision_check(obj.map, {x - 16, y - 16, x+16, y+16}, obj)
+    collisions = table.filter(collisions, item_filter)
+    if #collisions > 0 then
+        return false
+    end
+    return true
+end
+
+local function spiral_iterate(f)
+    local x, y = 0, 0
+    local dx, dy = 0, -1
+    while true do
+        if f(x, y) then
+            return
+        end
+        if x == y or (x < 0 and x == -y) or (x > 0 and x == 1-y) then
+            dx, dy = -dy, dx
+        end
+        x, y = x+dx, y+dy
+    end
+end
+
+local function try_spawn_item(obj, item, amount, tx, ty)
+    if not viable_item_square(obj, tx, ty) then
+        return false
+    end
+    GameObject.item_create {type = item, amount = amount, xy = {tx*32+16, ty*32+16}, do_init = true}
+    return true
+end
+
+function M.spawn_item_near(obj, item, amount)
+    local x, y = math.floor(obj.x / 32), math.floor(obj.y / 32)
+    spiral_iterate(function(dx, dy)
+        return try_spawn_item(obj, item, amount, x + dx, y + dy)
+    end)
+end
+
 return M
