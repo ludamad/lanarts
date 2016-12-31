@@ -428,6 +428,24 @@ Data.weapon_create {
 }
 
 Data.weapon_create {
+    name = "Fast Halfmagic Melee",
+    type = "unarmed",
+
+    spr_item = "none",
+
+    resist_modifier = 0.5,
+    damage_type = {magic = 0.5, physical = 0.5},
+
+    damage = {base = {2, 5}, strength = 0.5},
+    power = {base = 0, strength = 0.2},
+
+    cooldown = 20,
+
+    range = 7
+}
+
+
+Data.weapon_create {
     name = "Fast Melee",
     type = "unarmed",
 

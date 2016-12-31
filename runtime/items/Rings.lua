@@ -96,7 +96,7 @@ Data.equipment_create {
 
     spr_item = "ring of vitality",
 
-    stat_bonuses = { hp = 15 }
+    stat_bonuses = { hp = 20 }
 }
 
 Data.equipment_create {
