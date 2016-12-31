@@ -76,7 +76,7 @@ Data.weapon_create {
     description = "The epic staff of crippled archmage",
     type = "staves",
 
-    shop_cost = {125, 155},
+    shop_cost = {125, 255},
 
     spr_item = "epic staff",
 
@@ -85,6 +85,7 @@ Data.weapon_create {
     spell_cooldown_multiplier = 0.9,
 
     cooldown = 40,
+    stat_bonus = {magic = 1},
 
     range = 7
 }

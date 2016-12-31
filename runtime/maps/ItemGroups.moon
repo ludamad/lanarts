@@ -45,7 +45,7 @@ amulets = (chance, args) -> {
     { item: "Amulet of Pain", chance: 4 }
     { item: "Amulet of Great Pain", chance: 4 }
     { item: "Amulet of Ringholding", chance: 4 }
-    { item: "Amulet of Ice Form", chance: 4 }
+--    { item: "Amulet of Ice Form", chance: 4 } -- For now, a guaranteed drop only
     { item: "Amulet of Light", chance: 4 }
 --    { item: RANDART("Amulet"),      chance: 1 }
 }

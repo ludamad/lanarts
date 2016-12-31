@@ -17,16 +17,12 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Magic Skirt",
-    description = "A magically protected skirt. Impedes physical combat.",
+    description = "A magical skirt. Grants improved magic ability.",
     type = "legwear",
 
     shop_cost = { 50, 70 },
 
     spr_item = "spr_legwear.skirt",
-
-    melee_cooldown_multiplier = 1.35,
-
-    magic_reduction = {base = 1},
-    magic_resistance = {base = 1}
+    stat_bonuses = {magic = 1},
 }
 
