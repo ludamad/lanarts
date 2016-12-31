@@ -3,6 +3,7 @@ local TEST_INVENTORY = os.getenv("LANARTS_TESTITEMS") and {
      --For testing legwear:
      {item = "Platelegs", amount = 1},
      {item = "Magic Skirt", amount = 1},
+     {item = "Gallanthor's Skirt", amount = 1},
      {item = "Leather Armour", amount = 1},
      {item = "Leather Armour", amount = 1},
      {item = "Gragh's Club", amount = 1},

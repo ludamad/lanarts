@@ -26,3 +26,15 @@ Data.equipment_create {
     stat_bonuses = {magic = 1},
 }
 
+Data.equipment_create {
+    name = "Gallanthor's Skirt",
+    description = "A magical skirt. Grants improved magic ability and the ability to cast spells faster.",
+    type = "legwear",
+
+    shop_cost = { 150, 300 },
+
+    spr_item = "spr_legwear.gallanthorskirt",
+    stat_bonuses = {magic = 1},
+    spell_cooldown_multiplier = 0.91
+}
+

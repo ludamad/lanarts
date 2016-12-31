@@ -106,8 +106,9 @@ belts = (chance, args) -> _filter {
 -- Legwear
 legwear  = (chance) -> { 
     :chance
-    { item: "Platelegs",      chance: 1                      }
-    { item: "Magic Skirt",        chance: 1                      }
+    { item: "Platelegs",      chance: 5                      }
+    { item: "Magic Skirt",        chance: 3                      }
+    { item: "Gallanthor's Skirt",        chance: 1                      }
 }
 
 bows  = (chance, args) -> _filter {
@@ -223,7 +224,7 @@ M.store_items = {
     helmets(3, ignore_weak: true)
     armour(5, ignore_weak: true)
     belts(2, ignore_weak: true)
-    legwear(2, ignore_weak: true)
+    legwear(1, ignore_weak: true)
     boots(1, ignore_weak: true)
     amulets(2, ignore_weak: true)
     bows(5, ignore_weak: true)
@@ -240,7 +241,7 @@ M.enchanted_items = {
     armour(5, ignore_weak: true)
     belts(1, ignore_weak: true)
     amulets(2, ignore_weak: true)
-    legwear(5, ignore_weak: true)
+    legwear(2, ignore_weak: true)
     boots(1, ignore_weak: true)
     bows(5, ignore_weak: true)
     gloves(3, ignore_weak: true)
@@ -255,7 +256,7 @@ M.basic_items = {
     armour(12, ignore_strong: true)
     amulets(2, ignore_weak: true)
     belts(1, ignore_strong: true)
-    legwear(2, ignore_strong: true)
+    legwear(1, ignore_strong: true)
     boots(1, ignore_strong: true)
     bows(5, ignore_strong: true)
     gloves(5, ignore_strong: true)
