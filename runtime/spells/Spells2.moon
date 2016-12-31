@@ -18,6 +18,38 @@ enemy_list = (inst) ->
         return Map.monsters_list() or {}
 
 Data.spell_create {
+    name: "Ludaze"
+    spr_spell: "spr_spells.ludaze"
+    description: "Lightly dazes all enemies in sight." 
+    mp_cost: 5
+    cooldown: 0
+    spell_cooldown: 800
+    can_cast_with_held_key: true
+    fallback_to_melee: false
+    action_func: (caster, x, y) ->
+        caster\add_effect("Ludaze", 30)
+        play_sound "sound/ludaze.ogg"
+        for mon in *(enemy_list caster)
+            if not Map.object_visible(mon)
+                continue
+            mon\add_effect("Dazed", 100)
+        if caster\is_local_player()
+            EventLog.add("You daze all enemies in sight!", {200,200,255})
+        elseif caster.name == "Your ally"
+            EventLog.add(caster.name .. " dazes all enemies in sight!", {200,200,255})
+    autotarget_func: (caster) -> caster.x, caster.y
+    prereq_func: (caster) -> 
+        if not caster\has_effect("Berserk") and not caster\has_effect("Exhausted")  and not caster\has_effect("Ice Form")
+            for mon in *(enemy_list caster)
+                if Map.object_visible(mon)
+                    return true
+            EventLog.add("No monsters in sight!", COL_PALE_RED)
+            return false
+        return false
+}
+
+
+Data.spell_create {
     name: "Ice Form"
     spr_spell: "spr_spells.iceform"
     description: "Initiates Ice Form, a powerful ability for safe dungeoneering, preventing attacks and spells, and lowering speed drastically, but providing near immunity for 10 seconds." 
@@ -38,6 +70,14 @@ Data.spell_create {
             EventLog.add("Ice Form requires perfect concentration!", {200,200,255})
             return false
         return not caster\has_effect("Berserk") and not caster\has_effect("Exhausted")  and not caster\has_effect("Ice Form")
+}
+
+Data.effect_create {
+    name: "Ludaze"
+    effected_sprite: "spr_spells.ludaze"
+    can_use_rest: false
+    effected_colour: {200, 200, 255, 200}
+    fade_out: 10
 }
 
 Data.effect_create {

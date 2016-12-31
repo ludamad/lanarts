@@ -145,8 +145,10 @@ Data.class_create {
         level_needed = 1 },
       { spell = "Expedite",
         level_needed = 2 },
-      { spell = "Call Spikes",
+      { spell = "Ludaze",
         level_needed = 3 },
+      { spell = "Call Spikes",
+        level_needed = 4 },
     },
     start_stats = {
         movespeed = 4,
