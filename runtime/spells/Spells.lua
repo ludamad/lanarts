@@ -48,9 +48,9 @@ Data.spell_create {
     spr_spell = "spr_spells.cloud",
     description = "An epically debilitating ring of clouds that cause damage as well as reduced defenses and speed over time.",
     projectile = "Mephitize",
-    mp_cost = 20,
+    mp_cost = 30,
     cooldown = 35,
-    spell_cooldown = 2400
+    spell_cooldown = 1600
 }
 
 -- FEAR CLOUD
@@ -62,7 +62,7 @@ Data.spell_create {
     projectile = "Trepidize",
     mp_cost = 0,
     cooldown = 35,
-    spell_cooldown = 2400
+    spell_cooldown = 1600
 }
 
 -- REGENERATION
@@ -75,7 +75,7 @@ local Regeneration = {
     cooldown = 40,
     can_cast_with_held_key = false,
     fallback_to_melee = false,
-    spell_cooldown = 2400
+    spell_cooldown = 1600
 }
 
 function Regeneration.prereq_func(caster)
@@ -523,7 +523,7 @@ local CallSpikes = {
     can_cast_with_cooldown = false,
     mp_cost = 40,
     cooldown = 45,
-    spell_cooldown = 2400,
+    spell_cooldown = 1600,
     fallback_to_melee = true,
 }
 

@@ -245,7 +245,7 @@ static void draw_stat_bonuses_overlay(GameState* gs, DescriptionBoxHelper& dbh,
 static void draw_cooldown_modifiers_overlay(GameState* gs,
 		DescriptionBoxHelper& dbh, CooldownModifiers& cooldown) {
 	draw_percentage_modifier(gs, dbh, 1.0f / cooldown.melee_cooldown_multiplier,
-			"Attack Rate: ");
+			"Melee Rate: ");
 	draw_percentage_modifier(gs, dbh, 1.0f / cooldown.spell_cooldown_multiplier,
 			"Casting Rate: ");
 	draw_percentage_modifier(gs, dbh,
@@ -292,7 +292,7 @@ static void draw_equipment_description_overlay(GameState* gs,
 }
 
 static void draw_attack_description_overlay(GameState* gs,
-		DescriptionBoxHelper& dbh, Attack& attack) {
+		DescriptionBoxHelper& dbh, Attack& attack, std::string weapon_class = std::string()) {
 	PlayerInst* p = gs->local_player();
 	CoreStats& core = p->effective_stats().core;
 	draw_statmult(gs, dbh, "Damage: ", attack.damage_stats(), core,
@@ -317,7 +317,7 @@ static void draw_attack_description_overlay(GameState* gs,
 //                }
 	}
         int cooldown = attack.cooldown;
-        if (p->class_stats().class_entry().name != "Ranger" && p->weapon().weapon_entry().weapon_class == "bows") {
+        if (p->class_stats().class_entry().name != "Ranger" && weapon_class == "bows") {
             cooldown *= 1.5;
         }
 	draw_value(gs, dbh, "Cooldown: ", cooldown, COL_PALE_YELLOW,
@@ -329,7 +329,7 @@ static void draw_weapon_description_overlay(GameState* gs,
 	WeaponEntry& entry = weapon.weapon_entry();
 	PlayerInst* p = gs->local_player();
 	EffectiveStats& estats = p->effective_stats();
-	draw_attack_description_overlay(gs, dbh, entry.attack);
+	draw_attack_description_overlay(gs, dbh, entry.attack, entry.weapon_class);
 	draw_equipment_description_overlay(gs, dbh, weapon);
 }
 

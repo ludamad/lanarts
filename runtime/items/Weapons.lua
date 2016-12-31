@@ -63,9 +63,8 @@ Data.weapon_create {
     spr_item = "spr_weapons.staff",
     randart_sprites = {"spr_weapons.staff_mummy"},
 
-    damage = {strength = 0.6, magic = 0.6, base = {5, 9}},
+    damage = {strength = 0.6, magic = 0.4, base = {5, 9}},
     power = {base = 1, strength = 0.2},
-    stat_bonuses = { magic = 1 },
 
     cooldown = 40,
     range = 7,
@@ -83,7 +82,6 @@ Data.weapon_create {
 
     damage = {strength = 0.6, magic = 0.6, base = {5, 9}},
     power = {base = 1, strength = 0.2},
-    stat_bonuses = { magic = 1 },
     spell_cooldown_multiplier = 0.9,
 
     cooldown = 40,
