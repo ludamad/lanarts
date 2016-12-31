@@ -67,6 +67,6 @@ Data.equipment_create {
 
     spr_item = "spr_belts.warped",
 
-    stat_bonuses = {magic = 3, mp = -40, hp = -50}
+    stat_bonuses = {magic = 4, mp = -40, hp = -50}
 }
 

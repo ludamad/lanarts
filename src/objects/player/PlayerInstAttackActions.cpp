@@ -603,8 +603,8 @@ void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
         cooldown = pentry.cooldown();
         AttackStats weaponattack {Weapon()};
 
-        if (wentry.weapon_class == pentry.weapon_class) {
-            // Take into account weapon (only) if it matches the projectile class
+        if (wentry.weapon_class == pentry.weapon_class && !pentry.is_standalone()) {
+            // Take into account weapon (only) if it matches the projectile class and projectile is not standalone
             weaprange = wentry.range();
             cooldown = wentry.cooldown();
             weaponattack = {weapon()};

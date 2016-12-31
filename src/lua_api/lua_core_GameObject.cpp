@@ -204,6 +204,7 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
     LUAWRAP_GETTER(getters, weapon_range, OBJ->equipment().weapon().weapon_entry().range());
 
 	LUAWRAP_METHOD(methods, heal_fully, OBJ->stats().core.heal_fully());
+	LUAWRAP_GETTER(getters, can_rest, OBJ->cooldowns().can_rest());
 	LUAWRAP_METHOD(methods, direct_damage, OBJ->damage(lua_api::gamestate(L), lua_tointeger(L, 2)));
 	LUAWRAP_METHOD(methods, melee, luawrap::push(L, OBJ->melee_attack(lua_api::gamestate(L), luawrap::get<CombatGameInst*>(L, 2), OBJ->equipment().weapon(), true)) );
 
@@ -654,8 +655,8 @@ namespace lua_api {
 		submodule["item_create"].bind_function(item_create);
 		submodule["animation_create"].bind_function(animation_create);
 		submodule["store_create"].bind_function(store_create);
-        submodule["player_create"].bind_function(player_create);
-        submodule["get_type"].bind_function(get_type);
+                submodule["player_create"].bind_function(player_create);
+                submodule["get_type"].bind_function(get_type);
 		submodule["destroy"].bind_function(object_destroy);
 		submodule["add_to_level"].bind_function(object_add);
 

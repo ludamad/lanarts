@@ -34,6 +34,9 @@ Data.spell_create {
             EventLog.add(caster.name .. " enters a glacial state!", {200,200,255})
     autotarget_func: (caster) -> caster.x, caster.y
     prereq_func: (caster) -> 
+        if not caster.can_rest
+            EventLog.add("Ice Form requires perfect concentration!", {200,200,255})
+            return false
         return not caster\has_effect("Berserk") and not caster\has_effect("Exhausted")  and not caster\has_effect("Ice Form")
 }
 
@@ -46,11 +49,11 @@ Data.effect_create {
     can_use_weapons: false
     effected_colour: {200, 200, 255}
     stat_func: (effect, obj, old, new) ->
-        new.defence += 20
-        new.willpower += 20
         new.reduction += 20
         new.magic_reduction += 20
-        new.speed /= 2
+        new.resistance += 20
+        new.magic_resistance += 20
+        new.speed = math.min(new.speed, 0.5)
     fade_out: 55
 }
 
