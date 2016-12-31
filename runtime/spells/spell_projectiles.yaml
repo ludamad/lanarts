@@ -13,7 +13,7 @@ projectiles:
   - name: Fireball
     weapon_class: magic
     damage_type: {magic: 1.0}
-    damage: { base: [10,25], magic: 2 }
+    damage: { base: [10,25], magic: 1.4 }
     power: { base: 10, magic: 0.3 }
     resist_modifier: 1
     range: 300
@@ -24,12 +24,12 @@ projectiles:
   - name: Magic Blast
     weapon_class: magic
     damage_type: { magic: 1.0}
-    damage: { base: [3,14], magic: 2.1 }
+    damage: { base: [5,16], magic: 1.5 }
     power: { base: 1, magic: 0.2 }
     range: 300
     speed: 4
     number_of_target_bounces: 3
-    resist_modifier: 2.0
+    resist_modifier: 1.5
     spr_item: none
     spr_attack: magic blast
 

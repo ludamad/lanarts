@@ -48,9 +48,9 @@ Data.spell_create {
     spr_spell = "spr_spells.cloud",
     description = "An epically debilitating ring of clouds that cause damage as well as reduced defenses and speed over time.",
     projectile = "Mephitize",
-    mp_cost = 30,
+    mp_cost = 20,
     cooldown = 35,
-    spell_cooldown = 1600
+    spell_cooldown = 800
 }
 
 -- FEAR CLOUD
