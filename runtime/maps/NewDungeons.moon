@@ -194,6 +194,7 @@ M.make_connector = (types) ->
 
 M.make_linear_dungeon = (args) ->
     {:MapSeq, :offset} = args
+    assert(type(offset) == "number", "offset must be number!") 
     assert(MapSeq, "Needs MapSeq")
     offset or=1
     assert(args.on_generate and args.sprite_up and args.sprite_down and args.portals_up and args.portals_down)

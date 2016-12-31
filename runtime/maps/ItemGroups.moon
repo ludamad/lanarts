@@ -64,8 +64,8 @@ consumables = (chance, args) -> _filter {
         { item: "Health Potion",      chance: 8                     }
         { item: "Mana Potion",        chance: 8                     }
         { item: "Stone",              chance: 4,  amount: {3,15}  }
-        { item: "Magic Map",         chance: 1                      }
-        { item: "Scroll of Fear",         chance: 1                      }
+        { item: "Magic Map",         chance: 2                      }
+        { item: "Scroll of Fear",         chance: 2                      }
     }
 
     -- Permanent enchantments
@@ -176,14 +176,9 @@ gloves = (chance, args) -> _filter {
             chance: 100
             { item: "Leather Gloves",      chance: 1                      }
         } 
-        args.ignore_medium or {
-            chance: 20
-            -- Bows
-            { item: "Steel Gloves",           chance: 2                      }
-        }
         args.ignore_strong or {
             chance: 5
-            -- Bows
+            { item: "Steel Gloves",           chance: 200                      }
             { item: "Runed Gloves",           chance: 90                      }
             { item: "Gloves of Fear",           chance: 10                      }
             { item: "Gloves of Confusion",           chance: 10                      }

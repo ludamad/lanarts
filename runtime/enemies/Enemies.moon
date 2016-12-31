@@ -104,6 +104,7 @@ Data.enemy_create {
     effects_active: {"PoisonedWeapon"}
 }
 
+
 Data.enemy_create {
     name: "Mummoner" 
     sprite: "spr_enemies.undead.greater_mummy"
@@ -139,11 +140,11 @@ Data.enemy_create {
             else
                 @summoned[mon] += 1
                 @n_summons += 1
-        if Map.object_visible(@) and not (@has_effect "SummoningMummy") and @n_summons < 2
+        if Map.object_visible(@) and not (@has_effect "Summoning") and @n_summons < 2
             if #Map.players_list() == 0
                 return
             if @n_steps > @summon_rate
-                @add_effect "SummoningMummy", 20
+                @add_effect("Summoning", 20).monster = "Mummy" 
                 @n_steps = 0
             else 
                 @n_steps += 1
@@ -243,6 +244,7 @@ Data.effect_create {
     on_damage_func: (mon, dmg) =>
         @damage_tracker += dmg
         if @damage_tracker > @damage_interval
+            EventLog.add((if mon.unique then "" else "The ") .. mon.name .. " gets mad!", {255,255,255})
             mon\add_effect("Charging", 100)
             @damage_tracker = 0
         return dmg
@@ -266,8 +268,99 @@ Data.enemy_create {
         willpower: 8
     }
     effects_active: {"Enraging"}
-    death_func: () =>
-        ObjectUtils.spawn_item_near(@, "Health Potion", 1)
 }
  
+Data.enemy_create {
+    name: "Red Dragon"
+    appear_message: "A frighteningly large red dragon comes into view!"
+    defeat_message: "You have slain the red dragon!"
+    sprite: "red dragon"
+    radius: 27
+    xpaward: 150
+    unique: true
+    stats: {
+        attacks: { {weapon: "Basic Melee"}, { projectile: "Large Fire Ball"} }
+        hp: 220
+        hpregen: 0.1
+        movespeed: 2.5
+        strength: 25
+        magic: 25
+        defence: 15
+        willpower: 15
+    }
+    death_func: () =>
+        ObjectUtils.spawn_item_near(@, "Red Dragonplate", 1)
+}
+
+Data.enemy_create {
+    name: "Hell Warrior"
+    appear_message: "A Hell Warrior commands you to die!"
+    defeat_message: "You have rebuked the Hell Warrior!"
+    sprite: "hell warrior"
+    radius: 24
+    xpaward: 150
+    unique: true
+    init_func: enemy_berserker_init 
+    step_func: enemy_berserker_step
+    stats: {
+        attacks: {{weapon: "Basic Melee"}}
+        hp: 200
+        hpregen: 0.125
+        movespeed: 5
+        strength: 25
+        magic: 10
+        defence: 12
+        willpower: 8
+    }
+    death_func: () =>
+        item = random_choice {"Will Scroll", "Strength Scroll", "Defence Scroll", "Magic Scroll"}
+        ObjectUtils.spawn_item_near(@, item, 1)
+    init_func: () =>
+        @n_steps = 0
+        @summon_rate = 60
+        @summoned = {}
+        @n_summons = 0
+    step_func: () =>
+        @n_summons = 0
+        for mon, time in pairs @summoned
+            if time > 600
+                mon\direct_damage(mon.stats.hp + 1)
+            if mon.destroyed
+                @summoned[mon] = nil
+            else
+                @summoned[mon] += 1
+                @n_summons += 1
+        if Map.object_visible(@) and not (@has_effect "Summoning") and @n_summons < 5
+            if #Map.players_list() == 0
+                return
+            if @n_steps > @summon_rate
+                @add_effect("Summoning", 20).monster = "Imp"
+                @n_steps = 0
+            else 
+                @n_steps += 1
+}
+
+Data.enemy_create {
+    name: "Gragh"
+    appear_message: "Gragh greets you uproariously!"
+    defeat_message: "Gragh yells goodbye!"
+    sprite: "spr_enemies.bosses.gragh"
+    radius: 20
+    xpaward: 200
+    unique: true
+    stats: {
+        attacks: {{weapon: "Basic Melee"}}
+        hp: 200
+        hpregen: 0.25
+        movespeed: 3
+        strength: 25
+        magic: 10
+        defence: 8
+        willpower: 8
+    }
+    death_func: () =>
+        item = random_choice {"Gragh's Club"}
+        ObjectUtils.spawn_item_near(@, item, 1)
+    effects_active: {"Enraging"}
+}
 

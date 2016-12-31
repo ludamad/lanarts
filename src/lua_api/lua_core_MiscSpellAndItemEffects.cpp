@@ -8,6 +8,7 @@
 
 #include "objects/player/PlayerInst.h"
 #include "objects/store/StoreInst.h"
+#include "objects/FeatureInst.h"
 #include "objects/ItemInst.h"
 #include "gamestate/GameState.h"
 
@@ -39,6 +40,10 @@ static void magic_map_effect(LuaStackValue linst) {
         ItemInst* item = dynamic_cast<ItemInst*>(inst);
         if (item) {
             item->set_as_seen();
+        }
+        FeatureInst* feature = dynamic_cast<FeatureInst*>(inst);
+        if (feature) {
+            feature->set_as_seen();
         }
         StoreInst* store = dynamic_cast<StoreInst*>(inst);
         if (store) {

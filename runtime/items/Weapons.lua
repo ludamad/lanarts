@@ -130,6 +130,27 @@ Data.weapon_create {
 }
 
 Data.weapon_create {
+    name = "Gragh's Club",
+    description = "A club owned by Gragh, embued with his life force as he died. Has a chance of knocking back enemies on hit.",
+    type = "axes and maces",
+
+    shop_cost = {350, 500},
+
+    spr_item = "spr_weapons.giant_club2",
+
+    resist_modifier = 1.1,
+
+    damage = {base = {8, 13}, strength = 1.25},
+    power = {base = {3, 6}, strength = 0.35},
+
+    cooldown = 55,
+
+    range = 7,
+    effects_granted = {"KnockbackWeapon"}
+}
+
+
+Data.weapon_create {
     name = "Mace",
     description = "A large, strong mace.",
     type = "axes and maces",

@@ -249,6 +249,10 @@ M.skull_surrounded_dungeon = (args) -> {
             content: args.tileset.wall_alt
             matches_all: SourceMap.FLAG_SOLID
         }
+        'W': {
+            add: SourceMap.FLAG_SOLID
+            content: args.tileset.wall
+        }
         'w': {
             add: SourceMap.FLAG_SOLID
             content: args.tileset.wall_alt
@@ -277,6 +281,21 @@ wwdddww
 2DeDeD2
 22eee22
 .22222.]=]
+}
+
+
+M.graghs_lair_entrance = (args) -> table.merge M.skull_surrounded_dungeon(args), {
+    data: [=[
+..+++..
+.WdddW.
+.WpppW.
+.WdddW.
+WWpppWW
+WpppppW
+WseeesW
+WDeseDW
+WWpDpWW
+.W222W.]=]
 }
 
 

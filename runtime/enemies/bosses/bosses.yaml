@@ -20,47 +20,6 @@ enemies:
         magic: 30
         defence: 20
         willpower: 20
-
-  - name: Red Dragon
-    appear_message: 
-        A frighteningly large red dragon comes into view!
-    defeat_message: 
-        You have slain the red dragon!
-    sprite: red dragon
-    radius: 27
-    xpaward: 150
-    unique: yes
-    stats:
-        attacks: [ {weapon: Basic Melee}, { projectile: Large Fire Ball} ]
-        hp: 220
-        hpregen: 0.1
-        movespeed: 2.5
-        strength: 25
-        magic: 25
-        defence: 15
-        willpower: 15
-
-  - name: Hell Warrior
-    appear_message: 
-        A Hell Warrior commands you to die!
-    defeat_message: 
-        You have rebuked the Hell Warrior!
-    sprite: hell warrior
-    radius: 16
-    xpaward: 150
-    unique: yes
-    init_func: enemy_berserker_init 
-    step_func: enemy_berserker_step
-    stats:
-        attacks: [ {weapon: Basic Melee} ]
-        hp: 200
-        hpregen: 0.125
-        movespeed: 5
-        strength: 25
-        magic: 10
-        defence: 12
-        willpower: 8
-
   - name: Pisilohe
     sprite: pisilohe
     radius: 30

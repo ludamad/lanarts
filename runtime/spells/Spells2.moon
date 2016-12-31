@@ -106,15 +106,21 @@ Data.effect_create {
 
 
 Data.effect_create {
-    name: "SummoningMummy"
+    name: "Summoning"
     category: "Summon"
     effected_colour: COL_PALE_RED
     fade_out: 10
-    stat_func: (effect, obj, old, new) ->
-        new.speed *= 2
+    --stat_func: (effect, obj, old, new) ->
+    --    new.speed *= 2
     init_func: (caster) =>
-        ability = SpellObjects.SummonAbility.create {monster: "Mummy", :caster, xy: {caster.x, caster.y}, duration: @time_left}
-        GameObject.add_to_level(ability)
+        @n_steps = 0
+        @delay = 1
+        @duration = @time_left
+    step_func: (caster) =>
+        @n_steps += 1
+        if @n_steps == @delay
+            ability = SpellObjects.SummonAbility.create {monster: @monster, :caster, xy: {caster.x, caster.y}, duration: @duration}
+            GameObject.add_to_level(ability)
 }
 
 Data.effect_create {
@@ -238,6 +244,17 @@ Data.effect_create {
     name: "EnemyHyperProjectile"
     stat_func: (effect, obj, old, new) ->
         new.ranged_cooldown_multiplier *= 0.1
+}
+
+Data.effect_create {
+    name: "KnockbackWeapon"
+    on_melee_func: (attacker, defender, damage, attack_stats) =>
+        if defender\has_effect("Thrown")
+            return
+        if chance(.1)
+            thrown = defender\add_effect("Thrown", 10)
+            thrown.angle = vector_direction({attacker.x, attacker.y}, {defender.x, defender.y})
+        return damage
 }
 
 Data.effect_create {

@@ -19,7 +19,7 @@ enemies:
         willpower: 80 
 
   - name: Imp
-    sprite: imp
+    sprite: spr_enemies.demons.crimson_imp
     death_sprite: blood
     description: A small demon that regenerates wounds unnaturally fast.
     appear_message: An imp shows himself!

@@ -46,36 +46,17 @@ floor_plans = (rng) ->
             n_subareas: 1
             n_items: 4
             n_enemies: 0
-            n_encounter_vaults: 0
+            n_encounter_vaults: 3
             enemy_entries: {
-                {enemy: "Elephant", guaranteed_spawns: 1}
-                {enemy: "Adder", chance: 100}
-                {enemy: "Black Mamba", chance: 25}
+                {enemy: "Sheep", guaranteed_spawns: 5, chance: 100}
+                {enemy: "Adder", guaranteed_spawns: 9}
+                {enemy: "Black Mamba", guaranteed_spawns: 5}
+                {enemy: "Gragh", guaranteed_spawns: 1}
+                {enemy: "Elephant", guaranteed_spawns: 4}
             }
             item_groups: {{ItemGroups.basic_items, 4}}
             number_regions: 1
-            room_radius: () -> 30
-            rect_room_num_range: {0, 0}
-            rect_room_size_range: {1, 1}
-            n_statues: 4
-        }
-        [2]: {
-            wandering_enabled: false
-            size: {45, 45}
-            n_subareas: 3
-            n_items: 7
-            n_enemies: 0
-            n_encounter_vaults: 1
-            enemy_entries: {
-                {enemy: "Adder", guaranteed_spawns: 8}
-                {enemy: "Black Mamba", guaranteed_spawns: 3}
-                {enemy: "Mouther", guaranteed_spawns: 3}
-                {enemy: "Adder", chance: 100}
-                {enemy: "Black Mamba", chance: 25}
-            }
-            item_groups: {{ItemGroups.basic_items, 8}}
-            number_regions: 2
-            room_radius: () -> 7
+            room_radius: () -> 25
             rect_room_num_range: {0, 0}
             rect_room_size_range: {1, 1}
             n_statues: 4
@@ -92,7 +73,7 @@ M.TEMPLATE  = (rng, floor, connector) ->
     subtemplates = for i=1,plan.n_subareas
         floor_plans(rng)[floor]
     return NewDungeons.make_dungeon_template {
-        map_label: "Beast Lair " .. floor
+        map_label: "Gragh's Lair"
         tileset: TileSets.lair
         :subtemplates
         :connector
@@ -114,18 +95,16 @@ M.TEMPLATE  = (rng, floor, connector) ->
                 if not connector.random_portal("down", map, area)
                     return nil
             return true
-        _default_vault_config: (args = {}) =>
-            config = @_base_vault_config(args)
-            n_items_placed = 0
-            config.item_placer = (map, xy) ->
-                local item
-                if floor == M.N_FLOORS and n_items_placed == 0
-                    item = {type: "Azurite Key", amount: 1}
-                else
-                    item = ItemUtils.item_generate ItemGroups.enchanted_items, false, 1 --Randart power level
-                MapUtils.spawn_item(map, item.type, item.amount, xy)
-                n_items_placed += 1
-            return config
+
+        ---------------------------------
+        -- Place small_random_vaults:  --
+        _place_small_vaults: (map) =>
+            for i=1,4
+                conf = table.merge {rng: map.rng}, @_default_vault_config()
+                vault = SourceMap.area_template_create(Vaults.small_random_vault(conf))
+                if not NewDungeons.place_feature(map, vault)
+                    return nil
+            return true
         _create_stairs_up: (map) =>
             base_conf = @_default_vault_config()
             for i =1,connector.n_portals("up")
@@ -154,6 +133,9 @@ M.TEMPLATE  = (rng, floor, connector) ->
                 return nil
             if not @_create_encounter_rooms(map)
                 print("ABORT: stairs encounter")
+                return nil
+            if not @_place_small_vaults(map)
+                print("ABORT: small vaults")
                 return nil
             if not @_spawn_statues(map)
                 print("ABORT: statues")

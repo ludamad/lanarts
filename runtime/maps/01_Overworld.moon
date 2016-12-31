@@ -279,7 +279,6 @@ hell_create = (MapSeq, seq_idx, number_entrances = 1) ->
             Map.set_vision_radius(game_map, 6)
     }
 
-
 crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
     tileset = TileSets.crypt
     return NewMaps.map_create (rng) -> {
@@ -495,7 +494,7 @@ overworld_features = (map) ->
             -- nil is passed for the default open sprite
             MapUtils.spawn_door(map, xy)
         on_placement = (map) -> OldMapSeq1b\slot_resolve(1, map)
-        dungeon = {label: 'Hideaway', tileset: TileSets.pebble, :templates, on_generate: on_generate_dungeon, :on_placement}
+        dungeon = {label: 'Red Dragon Lair', tileset: TileSets.pebble, :templates, on_generate: on_generate_dungeon, :on_placement}
         place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq1, dungeon)
         vault = SourceMap.area_template_create(Vaults.ridge_dungeon {dungeon_placer: place_dungeon, :door_placer, tileset: TileSets.pebble})
         if not place_feature(map, vault, (r) -> r.conf.is_overworld)
@@ -519,7 +518,7 @@ overworld_features = (map) ->
             enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
             MapUtils.spawn_enemy(map, enemy, xy)
         vault = SourceMap.area_template_create(Vaults.crypt_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.crypt, :door_placer, :enemy_placer, player_spawn_area: false})
-        if not place_feature(map, vault, (r) -> r.conf.is_overworld)
+        if not place_feature(map, vault, (r) -> not r.conf.is_overworld)
             return true
         append post_poned, (game_map) ->
             CryptSeq\slot_resolve(1, game_map)
@@ -581,7 +580,7 @@ overworld_features = (map) ->
         next_dungeon = {1}
         place_dungeon = (map, xy) ->
             portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
-            MapSeq\forward_portal_add 1, portal, next_dungeon[1], snake_pit_create
+            MapSeq\forward_portal_add 1, portal, next_dungeon[1], () -> snake_pit_create(1)
             next_dungeon[1] += 1
         vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, :tileset, :door_placer, player_spawn_area: true})
         if not place_feature(map, vault, (r) -> r.conf.is_overworld)
@@ -589,6 +588,41 @@ overworld_features = (map) ->
         append post_poned, (game_map) ->
             MapSeq\slot_resolve(1, game_map)
     if map.rng\random_choice({place_medium1a, place_medium1b})() then return nil
+    -----------------------------
+
+    -----------------------------
+    -- Gragh's lair            --
+    place_graghs_lair = () ->
+        Seq = MapSequence.create {preallocate: 1}
+        create = (offset = 1) ->
+            dungeon = require("maps.GraghsLair")
+            return NewDungeons.make_linear_dungeon {
+                MapSeq: Seq
+                :offset
+                dungeon_template: dungeon.TEMPLATE
+                on_generate: do_nothing
+                sprite_up: (floor) -> "spr_gates.exit_lair"
+                sprite_down: (floor) -> "spr_gates.enter"
+                portals_up: (floor) -> 3
+                portals_down: (floor) -> 0
+            }
+        tileset = TileSets.lair
+        door_placer = (map, xy) ->
+            MapUtils.spawn_door(map, xy, nil, Vaults._rune_door_closed, "dummykey")
+        next_dungeon = {1}
+        place_dungeon = (map, xy) ->
+            portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
+            Seq\forward_portal_add 1, portal, next_dungeon[1], () -> create(1)
+            next_dungeon[1] += 1
+        enemy_placer = (map, xy) ->
+            enemy = OldMaps.enemy_generate({{enemy: "Sheep", chance: 100}})
+            MapUtils.spawn_enemy(map, enemy, xy)
+        vault = SourceMap.area_template_create(Vaults.graghs_lair_entrance {dungeon_placer: place_dungeon, :tileset, :door_placer, :enemy_placer, player_spawn_area: false})
+        if not place_feature(map, vault, ()->true)
+            return true
+        append post_poned, (game_map) ->
+            Seq\slot_resolve(1, game_map)
+    place_graghs_lair()
     -----------------------------
 
     -----------------------------
@@ -608,7 +642,7 @@ overworld_features = (map) ->
             return true
         gold_placer = (map, xy) ->
             MapUtils.spawn_item(map, "Gold", random(2,10), xy)
-        dungeon = {label: "Gragh's Lair", tileset: TileSets.snake, :templates, on_generate: on_generate_dungeon}
+        dungeon = {label: "Outpost", tileset: TileSets.snake, :templates, on_generate: on_generate_dungeon}
         door_placer = (map, xy) ->
             -- nil is passed for the default open sprite
             MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
@@ -694,9 +728,11 @@ overworld_features = (map) ->
             MapUtils.spawn_enemy(map, enemy, xy)
         boss_placer = (map, xy) ->
             MapUtils.spawn_enemy(map, "Dark Centaur", xy)
+        n_items_placed = 0
         item_placer = (map, xy) ->
-            item = ItemUtils.item_generate ItemGroups.basic_items
+            item = ItemUtils.item_generate ItemGroups.basic_items, false, 1, (if n_items_placed == 0 then 100 else 2)
             MapUtils.spawn_item(map, item.type, item.amount, xy)
+            n_items_placed += 1
         gold_placer = (map, xy) ->
             if map.rng\chance(.7) 
                 MapUtils.spawn_item(map, "Gold", random(2,10), xy)
@@ -753,26 +789,27 @@ overworld_features = (map) ->
             f(game_map)
 
 overworld_create = () ->
-    MapSeq = MapSequence.create()
-    snake_pit_create = (offset = 1) ->
-        dungeon = require("maps.BeastLair")
-        return NewDungeons.make_linear_dungeon {
-            :MapSeq
-            :offset
-            dungeon_template: dungeon.TEMPLATE
-            on_generate: (floor) ->
-                assert(floor)
-                print "on_generate", floor
-            sprite_up: (floor) ->
-                return if floor == 1 then "spr_gates.exit_lair" else "spr_gates.return"
-            sprite_down: (floor) ->
-                return "spr_gates.enter"
-            portals_up: (floor) ->
-                return if floor == 1 then 0 else 3
-            portals_down: (floor) ->
-                return if floor == dungeon.N_FLOORS then 0 else 3
-        }
-    do return snake_pit_create(0)
+    --MapSeq = MapSequence.create {preallocate: 1}
+    --snake_pit_create = (offset = 1) ->
+    --    dungeon = require("maps.GraghsLair")
+    --    return NewDungeons.make_linear_dungeon {
+    --        :MapSeq
+    --        :offset
+    --        dungeon_template: dungeon.TEMPLATE
+    --        on_generate: (floor) ->
+    --            assert(floor)
+    --            print "on_generate", floor
+    --        sprite_up: (floor) ->
+    --            return if floor == 1 then "spr_gates.exit_lair" else "spr_gates.return"
+    --        sprite_down: (floor) ->
+    --            return "spr_gates.enter"
+    --        portals_up: (floor) ->
+    --            return 3
+    --        portals_down: (floor) ->
+    --            return 0
+    --            -- return if floor == dungeon.N_FLOORS then 0 else 3
+    --    }
+    --do return snake_pit_create(0)
     NewMaps.map_create (rng) -> {
         map_label: "Plain Valley"
         subtemplates: {DUNGEON_CONF(rng), OVERWORLD_CONF(rng)}

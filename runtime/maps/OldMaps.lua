@@ -398,7 +398,7 @@ function M.generate_from_enemy_entries(map, chances, amount, --[[Optional]] area
         total_chance = total_chance + (entry.chance or 0)
         local spawns = range_resolve(entry.guaranteed_spawns or 0)
         if spawns > 1 then
-            spawns = math.floor(spawns * M.enemy_bonus())
+            spawns = math.floor(spawns * (1+M.enemy_bonus()))
         end
         for i=1,spawns do 
             append(ret, map_utils.random_enemy(map, entry.enemy, area, selector))

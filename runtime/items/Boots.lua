@@ -33,7 +33,7 @@ Data.equipment_create {
     spr_item = "spr_boots.boots_iron2",
 
     reduction = { base = 1 },
-    resistance = { base = 2 }
+    resistance = { base = 1 }
 }
 
 Data.equipment_create {
@@ -45,8 +45,8 @@ Data.equipment_create {
 
     spr_item = "spr_boots.boots4_green",
 
-    reduction = { base = 2 },
-    resistance = { base = 2 },
+    reduction = { base = 1 },
+    resistance = { base = 1 },
     stat_bonuses = { hpregen = 1 / 60, movespeed = -0.5, strength = 1},
 }
 

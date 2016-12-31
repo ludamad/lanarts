@@ -45,7 +45,7 @@ Data.equipment_create {
     ranged_cooldown_multiplier = 1.35,
 
     reduction = {base = 2},
-    resistance = {base = 3}
+    resistance = {base = 2}
 }
 
 Data.equipment_create {
@@ -111,4 +111,23 @@ Data.equipment_create {
     spr_item = "robe of mana",
 
     stat_bonuses = {mp = 35}
+}
+
+Data.equipment_create {
+    name = "Red Dragonplate",
+    description = "A great armour crafted from dragon scales. Grants mana on every kill.",
+    type = "armour",
+
+    shop_cost = {395,605},
+
+    spr_item = "spr_armour.red_dragon_scale_mail",
+
+    spell_cooldown_multiplier = 1.05,
+    ranged_cooldown_multiplier = 1.05,
+    melee_cooldown_multiplier = 1.05,
+
+    stat_bonuses = {mp = 10, hp = 10},
+    reduction = {base = 2},
+    resistance = {base = 2},
+    effects_granted = {"ManaGainOnKill"}
 }
