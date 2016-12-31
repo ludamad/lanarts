@@ -131,7 +131,7 @@ Data.weapon_create {
 
 Data.weapon_create {
     name = "Gragh's Club",
-    description = "A club owned by Gragh, embued with his life force as he died. Has a chance of knocking back enemies on hit.",
+    description = "A club owned by Gragh, embued with his life force as he died. Has a chance of knocking back enemies on hit. Regains health on kill.",
     type = "axes and maces",
 
     shop_cost = {350, 500},
@@ -146,7 +146,7 @@ Data.weapon_create {
     cooldown = 55,
 
     range = 7,
-    effects_granted = {"KnockbackWeapon"}
+    effects_granted = {"KnockbackWeapon", "HealthGainOnKill"}
 }
 
 

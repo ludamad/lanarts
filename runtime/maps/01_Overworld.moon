@@ -556,7 +556,7 @@ overworld_features = (map) ->
             return true
     place_medium1b = () ->
         tileset = TileSets.snake
-        MapSeq = MapSequence.create {preallocate: 1}
+        MapSeq = MapSequence.create {}
         snake_pit_create = (offset = 1) ->
             SnakePit = require("maps.SnakePit")
             return NewDungeons.make_linear_dungeon {
@@ -571,7 +571,7 @@ overworld_features = (map) ->
                 sprite_down: (floor) ->
                     return "spr_gates.enter"
                 portals_up: (floor) ->
-                    return if floor == 1 then 0 else 3
+                    return if floor == 1 then 1 else 3
                 portals_down: (floor) ->
                     return if floor == SnakePit.N_FLOORS then 0 else 3
             }

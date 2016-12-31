@@ -168,8 +168,8 @@ CoreStats parse_core_stats(const LuaField& value, bool required) {
 	core.hp = core.max_hp;
 	core.mp = core.max_mp;
 
-	core.hpregen = defaulted(value, "mpregen", 0.0f);
-	core.mpregen = defaulted(value, "hpregen", 0.0f);
+	core.hpregen = defaulted(value, "hpregen", 0.0f);
+	core.mpregen = defaulted(value, "mpregen", 0.0f);
 
 	core.strength = defaulted(value, "strength", 0);
 	core.defence = defaulted(value, "defence", 0);

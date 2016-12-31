@@ -297,7 +297,7 @@ Data.enemy_create {
     appear_message: "A Hell Warrior commands you to die!"
     defeat_message: "You have rebuked the Hell Warrior!"
     sprite: "hell warrior"
-    radius: 24
+    radius: 16
     xpaward: 150
     unique: true
     init_func: enemy_berserker_init 
@@ -345,7 +345,7 @@ Data.enemy_create {
     appear_message: "Gragh greets you uproariously!"
     defeat_message: "Gragh yells goodbye!"
     sprite: "spr_enemies.bosses.gragh"
-    radius: 20
+    radius: 18
     xpaward: 200
     unique: true
     stats: {

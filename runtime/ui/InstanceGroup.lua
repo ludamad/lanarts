@@ -24,7 +24,7 @@ end
 function InstanceGroup:step(xy)
     local step_xy = {} -- shared array for performance
 
-    for instance in values(self._instances) do
+    for _, instance in ipairs(self._instances) do
         local obj, obj_xy = unpack(instance)
 
         step_xy[1] = obj_xy[1] + xy[1]

@@ -244,6 +244,13 @@ Data.effect_create {
 
 
 Data.effect_create {
+    name: "Abolishment"
+    stat_func: (effect, obj, old, new) ->
+        new.strength += math.ceil(new.magic / 3)
+        new.magic = 0
+}
+
+Data.effect_create {
     name: "EnemyHyperProjectile"
     stat_func: (effect, obj, old, new) ->
         new.ranged_cooldown_multiplier *= 0.1

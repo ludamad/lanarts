@@ -99,8 +99,8 @@ charge_effect = {}
 
 function charge_effect.stat(effect, obj, old, new)
 -- Is this necessary?
---	new.defence = new.defence + 5
-        new.strength = new.strength + 2
+	new.defence = new.defence + 5
+        new.strength = new.strength + 3
 	new.speed = 0
 end
 

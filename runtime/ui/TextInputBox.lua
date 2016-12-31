@@ -28,7 +28,7 @@ function TextInputBox:init(font, size, fieldargs, callbacks)
 
     self.blink_timer = timer_create()
 
-    self.draw = callbacks.draw or do_nothing
+    self.draw = callbacks.draw or TextInputBox.draw
     self.valid_string = callbacks.valid_string or function() return true end
     self.update = callbacks.update or do_nothing
     self.select = callbacks.select or do_nothing

@@ -402,9 +402,11 @@ bool PlayerInst::enqueue_io_spell_actions(GameState* gs, bool* fallback_to_melee
             can_target = true;
         }
 
-        if (spl_entry.mp_cost > core_stats().mp) {
+        bool not_enough_mana = (spl_entry.mp_cost > core_stats().mp);
+        bool cooldown_active = (cooldowns().spell_cooldowns[spl_entry.id] > 0);
+        if (not_enough_mana || cooldown_active) {
             if (!triggered_already && can_target) {
-                if (!enqueue_not_enough_mana_actions(gs)) {
+                if (!not_enough_mana || !enqueue_not_enough_mana_actions(gs)) {
                     *fallback_to_melee = spl_entry.fallback_to_melee;
                 }
             } else {
@@ -494,6 +496,7 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
     }
 
     if (fallback_to_melee) {
+        autotarget = true;
         weaponuse = true;
     }
 
@@ -571,7 +574,7 @@ static void exhaust_projectile_autoequip(PlayerInst* player,
 }
 
 void PlayerInst::use_weapon(GameState* gs, const GameAction& action) {
-    if (!effective_stats().allowed_actions.can_use_weapon) {
+    if (!effective_stats().allowed_actions.can_use_weapons) {
         return;
     }
     lua_State* L = gs->luastate();

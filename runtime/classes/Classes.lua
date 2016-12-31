@@ -6,6 +6,8 @@ local TEST_INVENTORY = os.getenv("LANARTS_TESTITEMS") and {
      {item = "Leather Armour", amount = 1},
      {item = "Leather Armour", amount = 1},
      {item = "Gragh's Club", amount = 1},
+     {item = "Moonstone Ring", amount = 1},
+     {item = "Abolishment Ring", amount = 1},
      -- For testing belts:
      {item = "Belt of Slaying", amount = 1},
      {item = "Dank Belt", amount = 1},

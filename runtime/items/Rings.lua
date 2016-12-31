@@ -43,6 +43,16 @@ Data.equipment_create {
     effects_granted = {"VampiricWeapon"}
 }
 
+Data.equipment_create {
+    name = "Abolishment Ring",
+    description = "Abolishes the user's magic, granting them 1 strength point for every 3 points of magic.",
+    type = "ring",
+
+    shop_cost = { 155, 205 },
+
+    spr_item = "spr_rings.abolishment",
+    effects_granted = {"Abolishment"}
+}
 
 Data.equipment_create {
     name = "Ogre's Ring",
@@ -62,10 +72,8 @@ Data.equipment_create {
     type = "ring",
 
     shop_cost = { 95, 125 },
-
+    stat_bonuses = { hpregen = 0.0333333 },
     spr_item = "hydra ring",
-
-    stat_bonuses = { hpregen = 0.0333333 }
 }
 
 Data.equipment_create {
@@ -75,9 +83,8 @@ Data.equipment_create {
 
     shop_cost = { 95, 125 },
 
+    stat_bonuses = { mpregen = 0.0333333 },
     spr_item = "moonstone ring",
-
-    stat_bonuses = { mpregen = 0.0333333 }
 }
 
 Data.equipment_create {
