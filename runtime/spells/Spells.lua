@@ -559,7 +559,7 @@ function CallSpikes.action_func(caster, x, y)
     end
     local tx, ty = math.round((caster.x+dx*24) / 32) * 32 + 16, math.round((caster.y+dy*24) / 32) * 32 + 16
     for i=2,#points do
-        local obj = SpellObjects.SpellSpikes.create { points = points, point_index = i, caster = caster, duration = 800}
+        local obj = SpellObjects.SpellSpikes.create { points = points, point_index = i, caster = caster, duration = 500}
         GameObject.add_to_level(obj)
     end
 end
