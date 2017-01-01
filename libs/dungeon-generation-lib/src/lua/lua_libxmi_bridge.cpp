@@ -278,7 +278,7 @@ namespace ldungeon_gen {
 
         x -= w/2, y -= h/2;
 
-        miArc arc = {x, y, w, h, rad_to_degree64ths(ang1), rad_to_degree64ths(ang2)};
+        miArc arc = {x, y, (unsigned int)w, (unsigned int)h, (int)rad_to_degree64ths(ang1), (int)rad_to_degree64ths(ang2)};
         miDrawArcs(ps.set, ps.gc, 1, &arc);
     }
 
