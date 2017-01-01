@@ -83,7 +83,7 @@ static void lua_vm_configure(lua_State* L) {
 }
 #endif
 
-static GameState* init_gamestate() {
+static GameState* init_gamestate(bool reinit) {
 
 	lua_State* L = lua_api::create_configured_luastate();
 	lua_vm_configure(L);
@@ -102,9 +102,11 @@ static GameState* init_gamestate() {
 	}
 	load_settings_data(settings, "saves/saved_settings.yaml"); // Override with remembered settings
 
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-                printf("SDL_Init failed: %s\n", SDL_GetError());
-		exit(1);
+	if (!reinit){
+		if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+			printf("SDL_Init failed: %s\n", SDL_GetError());
+			exit(1);
+		}
 	}
 
 	lanarts_net_init(true);
@@ -121,9 +123,10 @@ static GameState* init_gamestate() {
 }
 
 static void run_engine(int argc, char** argv) {
+	bool reinit = false;
 	label_StartOver:
-
-	GameState* gs = init_gamestate();
+	GameState* gs = init_gamestate(reinit);
+	reinit = true;
 
 	/* Load low-level Lua bootstrapping code.
 	 * Implements the module system used by the rest of the engine,
