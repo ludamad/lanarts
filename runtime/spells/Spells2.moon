@@ -20,10 +20,10 @@ enemy_list = (inst) ->
 Data.spell_create {
     name: "Ludaze"
     spr_spell: "spr_spells.ludaze"
-    description: "Lightly dazes all enemies in sight." 
-    mp_cost: 5
+    description: "Dazes and poisons all enemies in sight." 
+    mp_cost: 25
     cooldown: 0
-    spell_cooldown: 800
+    spell_cooldown: 1600
     can_cast_with_held_key: true
     fallback_to_melee: false
     action_func: (caster, x, y) ->
@@ -33,6 +33,11 @@ Data.spell_create {
             if not Map.object_visible(mon)
                 continue
             mon\add_effect("Dazed", 100)
+            eff = mon\add_effect("Poison", 100)
+            eff.poison_rate = 25
+            eff.damage = caster.stats.magic + random(3, 5)
+            eff.power = caster.stats.magic * 0.3
+            eff.magic_percentage = 1.0
         if caster\is_local_player()
             EventLog.add("You daze all enemies in sight!", {200,200,255})
         elseif caster.name == "Your ally"

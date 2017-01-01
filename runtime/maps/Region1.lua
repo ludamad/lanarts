@@ -221,7 +221,7 @@ function M.old_dungeon_placement_function(MapSeq, dungeon)
             return game_map
         end)
         if World.player_amount > 1 then
-           -- c()
+           c()
         end
     end
 end

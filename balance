@@ -2,27 +2,24 @@
     -- Every time you kill something, spawn something just out of view, appropriate for the area the player is in
     -- Spawn fast things.
 
--- Remove pixel-lock.
-    - Rework RVO?
 -- Dont have enemies spawn into vault areas.
 -- smaller levels in last dungeon
--- SHIFT DROP HALF ITEMS
--- scale overworld to # players
+    -- Maybe?
 --- Knockback maul: Hits enemies back on hit
 -- Never go bare fisted if have weapon!!
     - Go weapon if unequip arrows
     - mp/hp regen rings unpowered -- add buff + diff bonuses?
+
 RANDART PROPERTIES:
     + attack vs clouds
     + regen while resting
     + speed while damaged
     + berserk duration
-    + WINDOWED MODE NOT WINDOWED
 
 TODO:
     + spell where mage walks through enemies OBSOLETE?
     + Dance pants: Cursed, +1 speed, random walk on hit
-
-BUGS:
+    + Archer totem -- place totem, starting firing quickly towards it
+    + Mage bomb -- place bomb, it explodes
     + within_bounds() failure on ogre mage area when going back up the stairs
-
+    -- scale overworld to # players

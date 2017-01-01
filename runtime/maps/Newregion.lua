@@ -154,9 +154,10 @@ end
 local function old_dungeon_placement_function(MapSeq, tileset, levels)
     return function(map, xy)
         local portal = MapUtils.spawn_portal(map, xy, "stair_kinds", nil, stair_kinds_index(1, 12))
-        MapSeq:forward_portal_add(1, portal, 1, function() 
+        local c = MapSeq:forward_portal_add(1, portal, 1, function() 
             return old_map_generate(MapSeq, tileset, levels[1]-1, levels[2]-levels[1]+1) 
         end)
+        c()
     end
 end
 

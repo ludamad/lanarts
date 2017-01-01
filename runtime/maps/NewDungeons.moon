@@ -219,7 +219,8 @@ M.make_linear_dungeon = (args) ->
             sprite: args.sprite_down(floor)
             connect: (portals) ->
                 for i=1,#portals
-                    MapSeq\forward_portal_add(floor + offset, portals[i], i, () -> make_dungeon(floor + 1))
+                    c = MapSeq\forward_portal_add(floor + offset, portals[i], i, () -> make_dungeon(floor + 1))
+                    c()
         }
     }
     return make_dungeon(1)
