@@ -56,15 +56,18 @@ static void gl_sdl_initialize(const char* window_name, int w, int h, bool fullsc
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 
-	MAIN_WINDOW = SDL_CreateWindow(
-	    window_name,
-        0,
-        0,
-        w, h,
-    //    SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN
-        SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0)
-    );
+	if (MAIN_WINDOW == NULL){
 
+		MAIN_WINDOW = SDL_CreateWindow(
+	   		 window_name,
+        		0,
+        		0,
+        		w, h,
+    //    SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN
+        		SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0)
+	    	);
+
+	}
 	if (MAIN_WINDOW == NULL) {
 		fprintf(stderr, "Couldn't set GL mode: %s\n", SDL_GetError());
 		SDL_Quit();
