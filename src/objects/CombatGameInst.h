@@ -89,6 +89,7 @@ public:
 		return sprite;
 	}
 
+	virtual bool is_major_character() = 0;
 	simul_id& collision_simulation_id();
 
 	obj_id& target() {
@@ -96,8 +97,9 @@ public:
 	}
 //members
 public:
-	float vx, vy;
-	float rx, ry;
+	team_id team = NONE;
+	float vx = -1, vy = -1;
+	float rx = -1, ry = -1;
 	bool is_resting = false;
 protected:
 	sprite_id sprite;

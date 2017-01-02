@@ -46,10 +46,15 @@ public:
 		return xpgain;
 	}
 
+    virtual bool is_major_character() {
+        return false; // TODO Eventually have major enemies.
+        // Bosses, perhaps, might want exact pathing towards them.
+    }
+
 private:
 	bool seen;
 	EnemyBehaviour eb;
-        int enemytype;
+    int enemytype;
 	int enemy_regen_cooloff;
 	int xpgain;
 };

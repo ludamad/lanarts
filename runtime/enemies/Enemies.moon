@@ -213,7 +213,7 @@ Data.effect_create {
     stat_func: (mon, old, new) =>
         new.speed *= 4
         if @n_steps > @n_ramp
-            new.melee_cooldown_multiplier *= 0.25
+            new.melee_cooldown_multiplier *= 0.5
         new.hpregen *= 2
     effected_sprite: "spr_effects.i-loudness"
     effected_colour: {255,0,0}
@@ -241,12 +241,14 @@ Data.effect_create {
     init_func: (mon) =>
         @damage_tracker = 0
         @damage_interval = mon.stats.max_hp / 3
+        @next_hp_threshold = mon.stats.max_hp - @damage_interval
     on_damage_func: (mon, dmg) =>
         @damage_tracker += dmg
-        if @damage_tracker > @damage_interval
+        new_hp = mon.stats.hp - dmg
+        if new_hp < @next_hp_threshold
             EventLog.add((if mon.unique then "" else "The ") .. mon.name .. " gets mad!", {255,255,255})
             mon\add_effect("Charging", 100)
-            @damage_tracker = 0
+            @next_hp_threshold -= @damage_interval
         return dmg
 }
 
@@ -263,7 +265,7 @@ Data.enemy_create {
         hp: 70
         hpregen: 0.05
         movespeed: 2
-        strength: 15
+        strength: 20
         defence: 8
         willpower: 8
     }

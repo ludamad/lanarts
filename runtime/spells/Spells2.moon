@@ -23,7 +23,7 @@ Data.spell_create {
     description: "Dazes and poisons all enemies in sight." 
     mp_cost: 25
     cooldown: 0
-    spell_cooldown: 1600
+    spell_cooldown: 800
     can_cast_with_held_key: true
     fallback_to_melee: false
     action_func: (caster, x, y) ->
@@ -35,7 +35,7 @@ Data.spell_create {
             mon\add_effect("Dazed", 100)
             eff = mon\add_effect("Poison", 100)
             eff.poison_rate = 25
-            eff.damage = caster.stats.magic + random(3, 5)
+            eff.damage = caster.stats.magic / 2
             eff.power = caster.stats.magic * 0.3
             eff.magic_percentage = 1.0
         if caster\is_local_player()

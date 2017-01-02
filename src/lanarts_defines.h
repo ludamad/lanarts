@@ -32,6 +32,7 @@ const item_id NO_ITEM = -1;
 
 typedef int area_id;
 typedef int armour_id;
+typedef int team_id;
 typedef int effect_id;
 typedef int equipment_id;
 typedef int projectile_id;

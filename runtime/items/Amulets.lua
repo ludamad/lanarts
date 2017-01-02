@@ -64,7 +64,6 @@ Data.equipment_create {
     type = "amulet",
 
     shop_cost = { 120, 140 },
-    stat_bonuses = { hp = -25},
 
     spr_item = "spr_amulets.cabochon",
     spells_granted = {"Mephitize"},

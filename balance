@@ -23,3 +23,21 @@ TODO:
     + Mage bomb -- place bomb, it explodes
     + within_bounds() failure on ogre mage area when going back up the stairs
     -- scale overworld to # players
+    + send sync data for all objects in view by all players every frame
+        + have players send their set of objects in view, if ever objects are communicated that dont exist, do level-wide sync
+        + have different sync levels.
+            sync level 1:
+                no object communcation beyond player positions, level-wide sync if player positions dont match
+            sync level 2:
+                communicate object positions for any objects in view by any players on any persons copy, level-wide sync if mismatch
+                -- Also communicate character health?
+            sync level 3:
+                communicate full data about any objects in view? level-wide sync on level enter?
+    + have network communication during level loading?
+        + Tricky AF, easiest to serialize any finalized levels.
+        + Just have server generate all levels and lazily send? Long-term.
+    + Lazy CSP?
+        + Have server play normally, have clients play out of sync, use sync level 3
+        + With a separated server, this could work!
+            +Major problem tho is newly created instances. Need to have a translation layer to accomodate these instances somehow? Significant complexity.
+
