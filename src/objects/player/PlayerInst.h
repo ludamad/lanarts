@@ -73,6 +73,9 @@ public:
     //Field of view
     virtual void update_field_of_view(GameState* gs);
     virtual bool within_field_of_view(const Pos& pos);
+    virtual bool is_major_character() {
+        return true;
+    }
 
     virtual void signal_killed_enemy() {
         _score_stats.kills++;

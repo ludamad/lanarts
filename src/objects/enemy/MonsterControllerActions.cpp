@@ -163,7 +163,6 @@ void MonsterController::set_monster_headings(GameState* gs,
 	perf_timer_begin(FUNCNAME);
 
 	//Use a temporary 'GameView' object to make use of its helper methods
-	PlayerData& pc = gs->player_data();
 	std::sort(eois.begin(), eois.end());
 	for (int i = 0; i < eois.size(); i++) {
 		eois[i].e->behaviour().movement_decided = false;

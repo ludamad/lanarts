@@ -29,7 +29,8 @@ EnemyEntry parse_enemy_type(lua_State* L, const YAML::Node& n) {
 	entry.enemy_sprite = parse_sprite_number(n, "sprite");
 	entry.death_sprite = parse_sprite_number(n, "death_sprite");
 	entry.basestats = parse_combat_stats(n["stats"]);
-	entry.unique = parse_defaulted(n, "unique", false);
+    entry.unique = parse_defaulted(n, "unique", false);
+    entry.vision_radius = parse_defaulted(n, "vision_radius", 7);
 
 	entry.init_event = parse_luaexpr(L, n, "init_func");
 	entry.step_event = parse_luaexpr(L, n, "step_func");
@@ -71,6 +72,7 @@ static EnemyEntry parse_enemy_type(const LuaStackValue& table) {
 
     entry.basestats = parse_combat_stats(table["stats"]);
     entry.unique = defaulted(table, "unique", false);
+    entry.vision_radius = defaulted(table, "vision_radius", 7);
 
     entry.init_event.initialize(table["init_func"]);
     entry.step_event.initialize(table["step_func"]);

@@ -21,19 +21,16 @@
 
 struct EnemyEntry: public ResourceEntryBase {
 	std::string appear_msg, defeat_msg;
-	int radius, xpaward;
-	sprite_id enemy_sprite, death_sprite;
+	int radius = 15, xpaward = 0;
+	sprite_id enemy_sprite = -1, death_sprite = -1;
 	CombatStats basestats;
-	bool unique;
+	bool unique = false;
 	std::vector<effect_id> active_effects;
+	int vision_radius = 7; // TODO, use
 
 	LuaLazyValue init_event, step_event, draw_event, death_event;
 	StatusEffectModifiers effect_modifiers;
 
-	EnemyEntry() :
-			radius(15), xpaward(0), enemy_sprite(-1), death_sprite(-1), unique(
-					false) {
-	}
 	void init(lua_State* L) {
 		init_event.initialize(L);
 		step_event.initialize(L);

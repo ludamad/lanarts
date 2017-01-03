@@ -342,6 +342,6 @@ Data.effect_create {
         if defender\has_effect("Dazed")
             return
         if chance(.1)
-            eff = defender\add_effect("Dazed", 400)
+            eff = defender\add_effect("Dazed", 100)
         return damage
 }
