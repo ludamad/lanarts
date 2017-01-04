@@ -29,9 +29,8 @@
 #include "../ProjectileInst.h"
 #include "PlayerInst.h"
 
-PlayerInst::PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y,
-		bool local) :
-		CombatGameInst(stats, sprite, x, y, RADIUS, true, DEPTH), actions_set_for_turn(
+PlayerInst::PlayerInst(const CombatStats& stats, sprite_id sprite, Pos xy, team_id team, bool local) :
+		CombatGameInst(stats, sprite, xy, RADIUS, true, DEPTH), actions_set_for_turn(
 				false), local(local), moving(0), autouse_mana_potion_try_count(
 				0), previous_spellselect(0), spellselect(-1) {
 	last_chosen_weaponclass = "unarmed";
@@ -51,7 +50,6 @@ PlayerDataEntry& PlayerInst::player_entry(GameState* gs) const {
 }
 
 void PlayerInst::init(GameState* gs) {
-	CombatGameInst::init(gs);
 
 	_score_stats.deepest_floor = std::max(_score_stats.deepest_floor, current_floor);
 
@@ -59,8 +57,11 @@ void PlayerInst::init(GameState* gs) {
 	_path_to_player.fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
 	collision_simulation_id() = gs->collision_avoidance().add_player_object(
 			this);
+	// Must set this BEFORE calling CombatGameInst::init:
+	vision_radius = gs->get_level()->vision_radius();
 
-	lua_api::event_player_init(gs->luastate(), this);
+    CombatGameInst::init(gs);
+    lua_api::event_player_init(gs->luastate(), this);
 }
 
 PlayerInst::~PlayerInst() {
@@ -73,11 +74,11 @@ money_t& PlayerInst::gold(GameState* gs) {
 void PlayerInst::update_field_of_view(GameState* gs) {
 	int sx = last_x / TILE_SIZE;
 	int sy = last_y / TILE_SIZE;
-	field_of_view().calculate(gs, gs->game_world().get_current_level()->vision_radius(), sx, sy);
+	field_of_view->calculate(gs, gs->game_world().get_current_level()->vision_radius(), sx, sy);
 }
 
 bool PlayerInst::within_field_of_view(const Pos& pos) {
-	return fieldofview.within_fov(pos.x / TILE_SIZE, pos.y / TILE_SIZE);
+	return field_of_view->within_fov(pos.x / TILE_SIZE, pos.y / TILE_SIZE);
 }
 
 void PlayerInst::die(GameState* gs) {

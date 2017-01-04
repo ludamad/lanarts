@@ -193,9 +193,12 @@ static LuaValue lua_combatgameinst_metatable(lua_State* L) {
 
 	LuaValue meta = lua_gameinst_base_metatable(L);
 
-	LuaValue getters = luameta_getters(meta);
+    LuaValue getters = luameta_getters(meta);
+    LuaValue setters = luameta_getters(meta);
 	luawrap::bind_getter(getters["vx"], &CombatGameInst::vx);
-	luawrap::bind_getter(getters["vy"], &CombatGameInst::vy);
+    luawrap::bind_getter(getters["vy"], &CombatGameInst::vy);
+    luawrap::bind_getter(getters["vision_radius"], &CombatGameInst::vision_radius);
+    luawrap::bind_setter(setters["vision_radius"], &CombatGameInst::vision_radius);
 	getters["stats"].bind_function(lapi_gameinst_stats);
 
 	LuaValue methods = luameta_constants(meta);

@@ -22,9 +22,6 @@ PlayerInst* PlayerDataEntry::player() const {
 	return (PlayerInst*) local;
 }
 
-void PlayerData::update_fieldsofview(GameState* gs) {
-}
-
 // Used during a game reset
 void PlayerData::remove_all_players(GameState* gs) {
 	for (int i = 0; i < _players.size(); i++) {

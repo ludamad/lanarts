@@ -26,6 +26,7 @@
 #include "../GameInst.h"
 
 const int REST_COOLDOWN = 200;
+// TODO: Now used for all 'major characters', i.e, players, their allies, and bosses
 const int PLAYER_PATHING_RADIUS = 500;
 
 /* Statistics that do not affect gameplay but are kept for scoring */
@@ -46,8 +47,7 @@ public:
     enum {
         RADIUS = 10, DEPTH = 75
     };
-    PlayerInst(const CombatStats& stats, sprite_id sprite, int x, int y,
-            bool local = true);
+    PlayerInst(const CombatStats& stats, sprite_id sprite, Pos xy, team_id team, bool local);
     PlayerInst() {}
 
     virtual ~PlayerInst();
@@ -116,9 +116,6 @@ public:
         local = islocal;
     }
 
-    fov& field_of_view() {
-        return fieldofview;
-    }
     FloodFillPaths& path_to_player() {
         return _path_to_player;
     }
@@ -167,7 +164,6 @@ private:
     bool actions_set_for_turn= false;
     ActionQueue queued_actions;
     FloodFillPaths _path_to_player;
-    fov fieldofview;
 
     // Used when eg run out of projectiles.
     // We will switch to another weapon type but want to

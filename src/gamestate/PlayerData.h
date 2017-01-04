@@ -41,7 +41,6 @@ public:
 	PlayerData() :
 			_local_player_idx(0) {
 	}
-	void update_fieldsofview(GameState* gs);
 	void clear();
 	void register_player(const std::string& name, PlayerInst* player,
 			class_id classtype, int net_id = 0);

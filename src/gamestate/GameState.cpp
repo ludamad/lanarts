@@ -620,4 +620,6 @@ void loop(const char* sound_path) {
     loop(SOUND_MAP[sound_path], sound_path);
 }
 
-
+LevelTeamData& GameState::team_data() {
+    return get_level()->team_data();
+}

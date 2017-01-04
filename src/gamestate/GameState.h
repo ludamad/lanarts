@@ -44,6 +44,7 @@ class PlayerInst;
 class CollisionAvoidance;
 class MonsterController;
 class Serializer;
+class LevelTeamData;
 
 struct GameStateInitData {
 	// Other than seed, other settings are not used in single-player.
@@ -259,6 +260,7 @@ public:
 	LuaSerializeConfig& luaserialize_config() {
 		return config;
 	}
+	LevelTeamData& team_data();
 
 private:
 	int handle_event(SDL_Event* event, bool trigger_event_handling = true);

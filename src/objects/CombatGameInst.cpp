@@ -14,6 +14,7 @@
 
 #include "draw/SpriteEntry.h"
 #include "gamestate/GameState.h"
+#include "gamestate/Team.h"
 #include "objects/enemy/EnemyInst.h"
 
 #include "stats/items/ProjectileEntry.h"
@@ -322,8 +323,16 @@ bool CombatGameInst::attack(GameState* gs, CombatGameInst* inst,
 }
 
 void CombatGameInst::init(GameState* gs) {
-    GameInst::init(gs);
     estats = stats().effective_stats(gs, this);
+    gs->team_data().add_instance(gs, this);
+    // Make sure the on_map_init callback has a fully initialized object:
+    GameInst::init(gs);
+}
+
+void CombatGameInst::deinit(GameState* gs) {
+    GameInst::deinit(gs);
+    estats = stats().effective_stats(gs, this);
+    gs->team_data().remove_instance(gs, this);
 }
 
 const float ROUNDING_MULTIPLE = 256.0f;

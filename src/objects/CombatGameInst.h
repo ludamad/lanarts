@@ -10,6 +10,7 @@
 
 #include "pathfind/FloodFillPaths.h"
 #include "stats/combat_stats.h"
+#include "fov/fov.h"
 
 #include "stats/stats.h"
 
@@ -20,15 +21,13 @@ struct AttackStats;
 struct CollisionAvoidanceParameters {
 	simul_id collision_simulation_id;
 	int avoidance_radius;
-
 };
 
 class CombatGameInst: public GameInst {
 public:
-	CombatGameInst(const CombatStats& base_stats, sprite_id sprite,
-			float x, float y, float radius, bool solid =
+	CombatGameInst(const CombatStats& base_stats, sprite_id sprite, Pos xy, team_id team, float radius, bool solid =
 					true, int depth = 0) :
-			GameInst(x, y, radius, solid, depth), rx(x), ry(y), vx(0), vy(0), is_resting(
+			GameInst(xy.x, xy.y, radius, solid, depth), rx(xy.x), ry(xy.y), vx(0), vy(0), is_resting(
 					false), sprite(sprite), simulation_id(
 					-1), current_target(NONE), base_stats(base_stats) {
 	}
@@ -39,7 +38,8 @@ public:
 	}
 
 	virtual void die(GameState* gs) = 0;
-	virtual void init(GameState* gs);
+    virtual void init(GameState* gs);
+    virtual void deinit(GameState* gs);
 	virtual void step(GameState* gs);
 	virtual void draw(GameState* gs, float frame = 0);
 	virtual void update_field_of_view(GameState* gs);
@@ -89,7 +89,6 @@ public:
 		return sprite;
 	}
 
-	virtual bool is_major_character() = 0;
 	simul_id& collision_simulation_id();
 
 	obj_id& target() {
@@ -101,10 +100,12 @@ public:
 	float vx = -1, vy = -1;
 	float rx = -1, ry = -1;
 	bool is_resting = false;
+    int vision_radius = 0;
+    fov* field_of_view = NULL;
 protected:
-	sprite_id sprite;
-	simul_id simulation_id;
-	obj_id current_target;
+	sprite_id sprite = NONE;
+	simul_id simulation_id = NONE;
+	obj_id current_target = NONE;
 private:
 	CombatStats base_stats;
 	EffectiveStats estats;

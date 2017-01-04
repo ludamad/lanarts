@@ -7,10 +7,13 @@
 #ifndef TEAM_H_
 #define TEAM_H_
 
+#include <set>
 #include <lcommon/geometry.h>
 #include "lanarts_defines.h"
-#include "state/GameState.h"
+#include "GameState.h"
 #include "objects/CombatGameInst.h"
+
+class PlayerInst;
 
 // Associated with an object in the team.
 // Used to aid decisions made by hostile and ally creatures with respect to
@@ -27,15 +30,12 @@ struct _TeamMemberData {
     //   This is used for all allies of the player, although most allies do not provide the player
     //   with their full field of view.
     //   This is used to decide if a major team member sees an enemy, but other NPCs have more primitive sight code.
-    fov field_of_view;
+    fov* field_of_view = NULL;
 };
 
 struct _Team {
-    _Team();
-    ~_Team();
-
     // Identifies the team.
-    team_id id = NONE;
+    team_id id;
     // Contains all the object id's, mapped to ephermal data used for team-based decisions.
     std::map<obj_id, _TeamMemberData> members;
 };
@@ -48,7 +48,7 @@ struct _Team {
 // Allows for deciding things such as:
 //   - What's the nearest enemy/ally a certain object can see?
 //   - How to path towards a certain enemy/ally?
-class TeamData {
+class LevelTeamData {
 public:
     // Requirements: The level holding this team should be the current level of focus in GameState.
     fov* get_fov_of(GameState* gs, CombatGameInst* inst);
@@ -64,9 +64,8 @@ public:
     bool is_visible(GameState* gs, CombatGameInst* viewer, BBox area);
     bool is_visible(GameState* gs, CombatGameInst* viewer, CombatGameInst* observed);
 
-    // New API:
-    fov* get_fov_of(GameState* gs, CombatGameInst* inst);
-
+    void remove_instance(GameState* gs, CombatGameInst* inst);
+    void add_instance(GameState* gs, CombatGameInst* inst);
     template <typename Function>
     void for_all_enemies(GameState* gs, team_id id, Function&& f) {
         for (auto& team : _teams) {
@@ -98,6 +97,39 @@ private:
     _TeamMemberData* _get_member_data_of(CombatGameInst* inst);
     void _get_nearest_on_team(GameState* gs, _Team& team, CombatGameInst* inst, float* smallest_sqr_dist = NULL,
             CombatGameInst** closest_game_inst = NULL);
+};
+
+typedef std::set<CombatGameInst*> TeamLevelData;
+
+struct PlayerDataEntry2 {
+    std::string player_name;
+    MultiframeActionQueue action_queue;
+    GameInstRef player_inst;
+    class_id classtype;
+    int net_id;
+
+    PlayerInst* player() const;
+
+    PlayerDataEntry(const std::string& player_name, GameInst* player_inst,
+            class_id classtype, int net_id) :
+            player_name(player_name), player_inst(player_inst), classtype(
+                    classtype), net_id(net_id) {
+    }
+};
+
+struct Team {
+    std::vector<TeamLevelData> per_level_data;
+    std::vector<PlayerDataEntry2> player_data;
+};
+
+struct TeamData {
+    std::vector<Team> teams;
+    void add(CombatGameInst* obj) {
+        teams[obj->team][obj->current_floor].add(obj);
+    }
+    void remove(CombatGameInst* obj) {
+        teams[obj->team][obj->current_floor].remove(obj);
+    }
 };
 
 #endif

@@ -8,6 +8,7 @@
 #include <lcommon/SerializeBuffer.h>
 
 #include "GameMapState.h"
+#include "Team.h"
 
 #include "GameState.h"
 #include "GameLogger.h"
@@ -21,7 +22,8 @@ GameMapState::GameMapState(int levelid, ldungeon_gen::MapPtr source_map, const S
 		_tiles(Size(size.w / TILE_SIZE, size.h / TILE_SIZE)),
 		_inst_set(size.w, size.h),
 		_monster_controller(wandering_flag),
-		_is_simulation(is_simulation) {
+		_is_simulation(is_simulation),
+		_team_data(new LevelTeamData()) {
 }
 
 GameMapState::~GameMapState() {

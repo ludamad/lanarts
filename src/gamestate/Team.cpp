@@ -1,21 +1,12 @@
 #include <cstdlib>
 #include <limits>
-#include <objects/Team.h>
+#include "Team.h"
 
-_Team::_Team() {
-}
-
-_Team::~_Team() {
-}
-
-fov* TeamData::get_fov_of(GameState* gs, CombatGameInst* inst) {
-    if (!inst->is_major_character()) {
-        return NULL;
-    }
+fov* LevelTeamData::get_fov_of(GameState* gs, CombatGameInst* inst) {
     return _get_member_data_of(inst)->field_of_view;
 }
 
-CombatGameInst* TeamData::get_nearest_enemy(GameState* gs, CombatGameInst* inst) {
+CombatGameInst* LevelTeamData::get_nearest_enemy(GameState* gs, CombatGameInst* inst) {
     float smallest_sqr_dist = std::numeric_limits<float>::max();
     CombatGameInst* closest_game_inst = NULL;
     for (auto& team : _teams) {
@@ -27,7 +18,7 @@ CombatGameInst* TeamData::get_nearest_enemy(GameState* gs, CombatGameInst* inst)
     return dynamic_cast<CombatGameInst*>(closest_game_inst);
 }
 
-CombatGameInst* TeamData::get_nearest_ally(GameState* gs,
+CombatGameInst* LevelTeamData::get_nearest_ally(GameState* gs,
         CombatGameInst* inst) {
     float smallest_sqr_dist = std::numeric_limits<float>::max();
     CombatGameInst* closest_game_inst = NULL;
@@ -35,22 +26,21 @@ CombatGameInst* TeamData::get_nearest_ally(GameState* gs,
     return dynamic_cast<CombatGameInst*>(closest_game_inst);
 }
 
-PosF TeamData::get_direction_towards(GameState* gs, CombatGameInst* from,
+PosF LevelTeamData::get_direction_towards(GameState* gs, CombatGameInst* from,
         CombatGameInst* to, float max_speed) {
     if (to->is_major_character()) {
-
     }
 }
 
-bool TeamData::are_allies(CombatGameInst* inst1, CombatGameInst* inst2) {
+bool LevelTeamData::are_allies(CombatGameInst* inst1, CombatGameInst* inst2) {
     return inst1->team != inst2->team;
 }
 
-bool TeamData::are_enemies(CombatGameInst* inst1, CombatGameInst* inst2) {
+bool LevelTeamData::are_enemies(CombatGameInst* inst1, CombatGameInst* inst2) {
     return inst1->team != inst2->team;
 }
 
-_TeamMemberData* TeamData::_get_member_data_of(CombatGameInst* inst) {
+_TeamMemberData* LevelTeamData::_get_member_data_of(CombatGameInst* inst) {
     _Team* team = _get_team_of(inst);
     if (team) {
         return &team->members[inst->id];
@@ -59,17 +49,16 @@ _TeamMemberData* TeamData::_get_member_data_of(CombatGameInst* inst) {
     return NULL;
 }
 
-_Team* TeamData::_get_team_of(CombatGameInst* inst) {
+_Team* LevelTeamData::_get_team_of(CombatGameInst* inst) {
     for (auto& team : _teams) {
         if (inst->team == team.id) {
             return &team;
         }
     }
-    LANARTS_ASSERT(false);
     return NULL;
 }
 
-bool TeamData::are_tiles_visible(GameState* gs, CombatGameInst* viewer, BBox tile_span) {
+bool LevelTeamData::are_tiles_visible(GameState* gs, CombatGameInst* viewer, BBox tile_span) {
     fov* fov = get_fov_of(gs, viewer);
     if (!fov) {
         // For now:
@@ -87,30 +76,48 @@ static BBox to_tile_span(GameState* gs, BBox area) {
     return {minx, miny, maxx, maxy};
 }
 
-bool TeamData::is_visible(GameState* gs, CombatGameInst* viewer, BBox area) {
+bool LevelTeamData::is_visible(GameState* gs, CombatGameInst* viewer, BBox area) {
     return are_tiles_visible(gs, viewer, to_tile_span(gs, area));
 }
 
-bool TeamData::is_visible(GameState* gs, CombatGameInst* viewer,
+bool LevelTeamData::is_visible(GameState* gs, CombatGameInst* viewer,
         CombatGameInst* observed) {
     return is_visible(gs, viewer, observed->bbox());
 }
 
-void TeamData::_get_nearest_on_team(GameState* gs, _Team& team, CombatGameInst* inst, float* smallest_sqr_dist,
+void LevelTeamData::_get_nearest_on_team(GameState* gs, _Team& team, CombatGameInst* inst, float* smallest_sqr_dist,
         CombatGameInst** closest_game_inst) {
-    if (inst->team == team.id) {
-        continue;
-    }
+    GameInst* closest = *closest_game_inst;
     for (auto& entry : team.members) {
         GameInst* o = gs->get_instance(entry.first);
         LANARTS_ASSERT(dynamic_cast<CombatGameInst*>(o));
         float dx = (o->x - inst->x), dy = (o->y - inst->y);
         float sqr_dist = dx*dx + dy*dy;
-        if (sqr_dist < smallest_sqr_dist) {
-            smallest_sqr_dist = dx*dx + dy*dy;
-            closest_game_inst = o;
+        if (sqr_dist < *smallest_sqr_dist) {
+            *smallest_sqr_dist = dx*dx + dy*dy;
+            closest = o;
         }
     }
-    *closest_game_inst = dynamic_cast<CombatGameInst*>(closest_game_inst);
+    *closest_game_inst = dynamic_cast<CombatGameInst*>(closest);
 }
 
+void LevelTeamData::remove_instance(GameState* gs, CombatGameInst* inst) {
+    _Team* team = _get_team_of(inst);
+    LANARTS_ASSERT(team != NULL);
+    team->members.erase(inst->id);
+}
+
+void LevelTeamData::add_instance(GameState* gs, CombatGameInst* inst) {
+    _Team* team = _get_team_of(inst);
+    if (team == NULL) {
+        _teams.push_back({inst->team, {}});
+        team = &_teams.back();
+    }
+    auto& data = team->members[inst->id];
+    LANARTS_ASSERT(data.field_of_view == NULL);
+    if (inst->is_major_character()) {
+        data.field_of_view = new fov(inst->vision_radius);
+        data.paths_to_object.initialize(gs->tiles().solidity_map());
+        data.paths_to_object.fill_paths_in_radius(inst->ipos(), PLAYER_PATHING_RADIUS);
+    }
+}

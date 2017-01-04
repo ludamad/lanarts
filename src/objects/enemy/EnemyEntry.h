@@ -34,7 +34,8 @@ struct EnemyEntry: public ResourceEntryBase {
 	void init(lua_State* L) {
 		init_event.initialize(L);
 		step_event.initialize(L);
-		draw_event.initialize(L);
+        draw_event.initialize(L);
+        death_event.initialize(L);
 	}
 	virtual const char* entry_type() {
 		return "Enemy";

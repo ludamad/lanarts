@@ -65,6 +65,7 @@ EnemyInst::EnemyInst(int enemytype, int x, int y) :
 						__E(enemytype).radius, true, DEPTH) {
 	this->seen = false;
 	this->xpgain = __E(enemytype).xpaward;
+    this->vision_radius = __E(enemytype).vision_radius;
 	this->enemytype = enemytype;
 	this->enemy_regen_cooloff = 0;
 }
