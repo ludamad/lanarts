@@ -520,14 +520,14 @@ static GameInst* player_create(LuaStackValue args) {
 	using namespace luawrap;
 	GameState* gs = lua_api::gamestate(args);
 	Pos xy = args["xy"].as<Pos>();
-	GameInst* inst = new PlayerInst(CombatStats(), -1, xy.x, xy.y);
+	GameInst* inst = new PlayerInst(CombatStats(), -1, xy, PLAYER_TEAM, false);
 	gs->player_data().register_player(args["name"].to_str(), (PlayerInst*)inst, -1, -1);
 	return initialize_object(gs, inst, args, &base_object_exclusions);
 }
 
 static void player_init(LuaStackValue obj, Pos xy, std::string name) {
 	GameState* gs = lua_api::gamestate(obj);
-	PlayerInst* inst = new PlayerInst(CombatStats(), -1, xy.x, xy.y);
+	PlayerInst* inst = new PlayerInst(CombatStats(), -1, xy, PLAYER_TEAM, false);
 	GameInstWrap::make_object_ref(obj, inst);
 	gs->player_data().register_player(name, inst, -1, -1);
 }

@@ -15,11 +15,14 @@ struct Size {
 	int area() const;
 };
 
+struct PosF;
+
 /*Represents an integer x,y pair position*/
 struct Pos {
 	int x, y;
 	Pos();
-	explicit Pos(const Size& size);
+    explicit Pos(const Size& size);
+    explicit Pos(const PosF& pos);
 	bool operator==(const Pos& o) const;
 	bool operator!=(const Pos& o) const;
 

@@ -92,7 +92,7 @@ M.place_feature = (map, template, region_filter = ()->true) ->
 M._runed_door_sprite = tosprite("spr_doors.runed_door")
 M.make_dungeon_template = (data) -> table.merge {
     outer_conf: data.subtemplates[1]
-    shell: 10
+    shell: 40
     default_wall: Tile.create(data.tileset.wall, true, true, {})
     -- Public members:
     post_pone: (f) =>

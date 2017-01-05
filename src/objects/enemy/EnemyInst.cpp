@@ -61,7 +61,8 @@ float monster_difficulty_multiplier(GameState* gs, EnemyEntry& etype) {
 
 EnemyInst::EnemyInst(int enemytype, int x, int y) :
 				CombatGameInst(__E(enemytype).basestats,
-						__E(enemytype).enemy_sprite, x, y,
+						__E(enemytype).enemy_sprite, Pos(x, y),
+                                                MONSTER_TEAM,
 						__E(enemytype).radius, true, DEPTH) {
 	this->seen = false;
 	this->xpgain = __E(enemytype).xpaward;

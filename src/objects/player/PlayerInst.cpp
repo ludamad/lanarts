@@ -34,6 +34,7 @@ PlayerInst::PlayerInst(const CombatStats& stats, sprite_id sprite, Pos xy, team_
 				false), local(local), moving(0), autouse_mana_potion_try_count(
 				0), previous_spellselect(0), spellselect(-1) {
 	last_chosen_weaponclass = "unarmed";
+	field_of_view = new fov();
 }
 
 

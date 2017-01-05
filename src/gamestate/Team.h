@@ -10,126 +10,101 @@
 #include <set>
 #include <lcommon/geometry.h>
 #include "lanarts_defines.h"
-#include "GameState.h"
-#include "objects/CombatGameInst.h"
 
+class SerializeBuffer;
+class GameState;
+class CombatGameInst;
 class PlayerInst;
-
-// Associated with an object in the team.
-// Used to aid decisions made by hostile and ally creatures with respect to
-// the CombatGameInst this represents.
-struct _TeamMemberData {
-    // path_to_object:
-    //   Used for decisions about pathing to the object.
-    //   For major team members (players, AI controlling player-like characters, classes that summon a major companion)
-    //   this is updated every step and perfect pathing towards the object is used.
-    //   For minor team members (every other NPC) this is not used.
-    FloodFillPaths paths_to_object;
-    // field_of_view:
-    //   Used for decisions about whether one object sees another.
-    //   This is used for all allies of the player, although most allies do not provide the player
-    //   with their full field of view.
-    //   This is used to decide if a major team member sees an enemy, but other NPCs have more primitive sight code.
-    fov* field_of_view = NULL;
-};
-
-struct _Team {
-    // Identifies the team.
-    team_id id;
-    // Contains all the object id's, mapped to ephermal data used for team-based decisions.
-    std::map<obj_id, _TeamMemberData> members;
-};
 
 // TODO remember to split object_visible and object_drawwise_visible (or such) into separate concepts
 // Do not want to have game decisions based on drawing differences.
+// TODO find better home for some of these
 
+CombatGameInst* get_nearest_enemy(GameState* gs, CombatGameInst* inst);
+CombatGameInst* get_nearest_ally(GameState* gs, CombatGameInst* inst);
+//CombatGameInst* get_nearest_on_team(GameState* gs, _Team& team, CombatGameInst* inst, float* smallest_sqr_dist = NULL,
+//        CombatGameInst** closest_game_inst = NULL);
+
+// The raw direction towards an object, not accounting for collaborative motion planning (which takes this as input).
+PosF get_direction_towards(GameState* gs, CombatGameInst* from, CombatGameInst* to, float max_speed);
+
+bool are_allies(CombatGameInst* inst1, CombatGameInst* inst2);
+bool are_enemies(CombatGameInst* inst1, CombatGameInst* inst2);
+
+bool is_visible(GameState* gs, CombatGameInst* viewer, BBox area);
+bool is_visible(GameState* gs, CombatGameInst* viewer, CombatGameInst* observed);
+
+struct TeamPlayerData {
+    // The gold accumulated by players:
+    money_t gold = 0; 
+    std::vector<PlayerInst*> players;
+    void serialize(GameState* gs, SerializeBuffer& buffer);
+    void deserialize(GameState* gs, SerializeBuffer& buffer);
+};
+
+// Feature work: Allow mixed teams of EnemyInst's and PlayerInst's.
 // All the team objects for all the teams on a given level.
 // Currently, all teams are enemies to each other.
-// Allows for deciding things such as:
+// Facilitates deciding things such as:
 //   - What's the nearest enemy/ally a certain object can see?
 //   - How to path towards a certain enemy/ally?
-class LevelTeamData {
-public:
-    // Requirements: The level holding this team should be the current level of focus in GameState.
-    fov* get_fov_of(GameState* gs, CombatGameInst* inst);
-    CombatGameInst* get_nearest_enemy(GameState* gs, CombatGameInst* inst);
-    CombatGameInst* get_nearest_ally(GameState* gs, CombatGameInst* inst);
-    // The raw direction towards an object, not accounting for
-    PosF get_direction_towards(GameState* gs, CombatGameInst* from, CombatGameInst* to, float max_speed);
-
-    bool are_allies(CombatGameInst* inst1, CombatGameInst* inst2);
-    bool are_enemies(CombatGameInst* inst1, CombatGameInst* inst2);
-
-    bool are_tiles_visible(GameState* gs, CombatGameInst* viewer, BBox tile_span);
-    bool is_visible(GameState* gs, CombatGameInst* viewer, BBox area);
-    bool is_visible(GameState* gs, CombatGameInst* viewer, CombatGameInst* observed);
-
-    void remove_instance(GameState* gs, CombatGameInst* inst);
-    void add_instance(GameState* gs, CombatGameInst* inst);
-    template <typename Function>
-    void for_all_enemies(GameState* gs, team_id id, Function&& f) {
-        for (auto& team : _teams) {
-            if (id == team.id) {
-                continue;
-            }
-            _for_all_on_team(gs, team, f);
-        }
-    }
-
-    template <typename Function>
-    void for_all_on_team(GameState* gs, team_id id, Function&& f) {
-        for (auto& team : _teams) {
-            if (id != team.id) {
-                continue;
-            }
-            _for_all_on_team(gs, team, f);
-        }
-    }
-private:
-    template <typename Function>
-    void _for_all_on_team(GameState* gs, _Team& team, Function&& f) {
-        for (auto& entry : team.members) {
-            f(gs->get_instance(entry.first));
-        }
-    }
-    std::vector<_Team> _teams;
-    _Team* _get_team_of(CombatGameInst* inst);
-    _TeamMemberData* _get_member_data_of(CombatGameInst* inst);
-    void _get_nearest_on_team(GameState* gs, _Team& team, CombatGameInst* inst, float* smallest_sqr_dist = NULL,
-            CombatGameInst** closest_game_inst = NULL);
-};
-
 typedef std::set<CombatGameInst*> TeamLevelData;
-
-struct PlayerDataEntry2 {
-    std::string player_name;
-    MultiframeActionQueue action_queue;
-    GameInstRef player_inst;
-    class_id classtype;
-    int net_id;
-
-    PlayerInst* player() const;
-
-    PlayerDataEntry(const std::string& player_name, GameInst* player_inst,
-            class_id classtype, int net_id) :
-            player_name(player_name), player_inst(player_inst), classtype(
-                    classtype), net_id(net_id) {
-    }
-};
-
 struct Team {
     std::vector<TeamLevelData> per_level_data;
-    std::vector<PlayerDataEntry2> player_data;
+    // If the team has players:
+    TeamPlayerData player_data;
+    void serialize(GameState* gs, SerializeBuffer& buffer);
+    void deserialize(GameState* gs, SerializeBuffer& buffer);
 };
 
 struct TeamData {
     std::vector<Team> teams;
-    void add(CombatGameInst* obj) {
-        teams[obj->team][obj->current_floor].add(obj);
-    }
-    void remove(CombatGameInst* obj) {
-        teams[obj->team][obj->current_floor].remove(obj);
-    }
+    void _ensure(team_id team);
+    void _ensure(level_id level, team_id team);
+    void add(CombatGameInst* obj);
+    void remove(CombatGameInst* obj);
+    void serialize(GameState* gs, SerializeBuffer& buffer);
+    void deserialize(GameState* gs, SerializeBuffer& buffer);
 };
 
+// Helper functions for iterating through TeamData:
+template <typename Function>
+inline void for_all_enemies(TeamData& td, level_id level, team_id team, Function&& f) {
+    td._ensure(level, team);
+    LANARTS_ASSERT(team >= 0 && team < td.teams.size());
+    for (int i = 0; i < td.teams.size(); i++) {
+        if (i == team) {
+            continue; // Skip own team
+        }
+        LANARTS_ASSERT(level >= 0 && level < td.teams[i].per_level_data.size());
+        auto& objs = td.teams[i].per_level_data[level];
+        for (CombatGameInst* e : objs) {
+            f(e);
+        }
+    }
+}
+
+template <typename Function>
+inline void for_all_on_team(TeamData& td, level_id level, team_id team, Function&& f) {
+    td._ensure(level, team);
+    LANARTS_ASSERT(team >= 0 && team < td.teams.size());
+    auto& objs = td.teams[team].per_level_data[level];
+    for (CombatGameInst* e : objs) {
+        f(e);
+    }
+}
+
+template <typename Function>
+inline void for_players_on_team(TeamData& td, team_id team, Function&& f) {
+    td._ensure(team);
+    LANARTS_ASSERT(team >= 0 && team < td.teams.size());
+    auto& objs = td.teams[team].player_data.players;
+    for (PlayerInst* e : objs) {
+        f(e);
+    }
+}
+
+// Currently just have two teams:
+constexpr int PLAYER_TEAM = 0;
+constexpr int MONSTER_TEAM = 1;
 #endif

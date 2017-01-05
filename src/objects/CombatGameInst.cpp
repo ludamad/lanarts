@@ -32,6 +32,10 @@
 #include "CombatGameInst.h"
 #include "ProjectileInst.h"
 
+CombatGameInst::~CombatGameInst() {
+    delete field_of_view;
+}
+
 const int HURT_COOLDOWN = 30;
 bool CombatGameInst::damage(GameState* gs, int dmg) {
     event_log("CombatGameInst::damage: id %d took %d dmg\n", id, dmg);
@@ -40,7 +44,7 @@ bool CombatGameInst::damage(GameState* gs, int dmg) {
         if (e.t_remaining == 0) {
             continue;
         }
-        auto& entry = game_effect_data[e.effectid];
+        EffectEntry& entry = game_effect_data[e.effectid];
         if (!entry.on_damage_func.empty() && !entry.on_damage_func.isnil()) {
             entry.on_damage_func.push();
             lua_State* L = gs->luastate();
@@ -324,15 +328,16 @@ bool CombatGameInst::attack(GameState* gs, CombatGameInst* inst,
 
 void CombatGameInst::init(GameState* gs) {
     estats = stats().effective_stats(gs, this);
-    gs->team_data().add_instance(gs, this);
-    // Make sure the on_map_init callback has a fully initialized object:
     GameInst::init(gs);
+    // Make sure current_floor is set before adding to team:
+    gs->team_data().add(this);
 }
 
 void CombatGameInst::deinit(GameState* gs) {
+    // Remove before 'deinit' clears current_level:
+    gs->team_data().remove(this);
     GameInst::deinit(gs);
     estats = stats().effective_stats(gs, this);
-    gs->team_data().remove_instance(gs, this);
 }
 
 const float ROUNDING_MULTIPLE = 256.0f;

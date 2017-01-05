@@ -132,7 +132,7 @@ void GameWorld::spawn_players(GameMapState* map, const std::vector<Pos>& positio
 
 //		if (pde.player_inst.empty()) {
 			pde.player_inst = new PlayerInst(c.starting_stats,
-					c.sprites[spriteidx], position.x, position.y, islocal);
+					c.sprites[spriteidx], position, PLAYER_TEAM, islocal);
 //		}
 		printf("Spawning for player %d: %s\n", i,
 				islocal ? "local player" : "network player");

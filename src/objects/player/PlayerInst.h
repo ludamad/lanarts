@@ -163,6 +163,11 @@ private:
 
     bool actions_set_for_turn= false;
     ActionQueue queued_actions;
+    // _path_to_player:
+    //   Used for decisions about pathing to the object.
+    //   For player-like team members (players, AI controlling 'player' characters)
+    //   this is updated every step and perfect pathing towards the object is used.
+    //   For minor team members (every other NPC) this is not used.
     FloodFillPaths _path_to_player;
 
     // Used when eg run out of projectiles.

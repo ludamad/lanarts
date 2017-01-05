@@ -34,8 +34,7 @@ public:
 	CombatGameInst() :
 			GameInst(0, 0, 0) {
 	}
-	virtual ~CombatGameInst() {
-	}
+    virtual ~CombatGameInst();
 
 	virtual void die(GameState* gs) = 0;
     virtual void init(GameState* gs);
@@ -101,6 +100,11 @@ public:
 	float rx = -1, ry = -1;
 	bool is_resting = false;
     int vision_radius = 0;
+    // field_of_view:
+    //   Used for decisions about whether one object sees another.
+    //   This is used for all allies of the player, although most allies do not provide the player
+    //   with their full field of view.
+    //   This is used to decide if a major team member sees an enemy, but other NPCs have more primitive sight code.
     fov* field_of_view = NULL;
 protected:
 	sprite_id sprite = NONE;

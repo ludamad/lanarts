@@ -131,7 +131,7 @@ void GameTiles::step(GameState* gs) {
 
 	for (int i = 0; i < players.size(); i++) {
 		PlayerInst* player = players[i];
-		fov& f = player->field_of_view();
+		fov& f = *player->field_of_view;
 		BBox fovbox = f.tiles_covered();
 		for (int y = std::max(fovbox.y1, 0);
 				y <= std::min(fovbox.y2, size.h - 1); y++) {
@@ -169,7 +169,7 @@ void GameTiles::post_draw(GameState* gs) {
 	}
 	perf_timer_begin(FUNCNAME);
 
-	fov& mainfov = gs->local_player()->field_of_view();
+	fov& mainfov = *gs->local_player()->field_of_view;
 	char matches[sub_sqrs * sub_sqrs];
 	for (int y = region.y1; y <= region.y2; y++) {
 		for (int x = region.x1; x <= region.x2; x++) {
@@ -180,7 +180,7 @@ void GameTiles::post_draw(GameState* gs) {
 			std::vector<PlayerInst*> players = gs->players_in_level();
 
 			for (int i = 0; i < players.size(); i++) {
-				fov& f = players[i]->field_of_view();
+				fov& f = *players[i]->field_of_view;
 				f.matches(x, y, matches);
 				for (int i = 0; i < sub_sqrs * sub_sqrs; i++) {
 					if (matches[i]) {

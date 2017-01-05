@@ -204,6 +204,7 @@ void GameState::serialize(SerializeBuffer& serializer) {
 	world.serialize(serializer);
 
 	player_data().serialize(this, serializer);
+    team_data().serialize(this, serializer);
 	luawrap::globals(L)["Engine"]["post_serialize"].push();
 	luawrap::call<void>(L);
 
@@ -238,6 +239,7 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	_view.sharp_center_on(local_player()->ipos());
 
 	settings.class_type = local_player()->class_stats().classid;
+    team_data().deserialize(this, serializer);
 	luawrap::globals(L)["Engine"]["post_deserialize"].push();
 	luawrap::call<void>(L);
 }
@@ -492,8 +494,7 @@ int GameState::object_radius_test(GameInst* obj, GameInst** objs, int obj_cap,
 }
 
 static bool player_radius_visible_test(PlayerInst* player, const BBox& bbox) {
-	fov& fov = player->field_of_view();
-	return fov.within_fov(bbox);
+	return player->field_of_view->within_fov(bbox);
 }
 
 bool GameState::radius_visible_test(int x, int y, int radius,
@@ -618,8 +619,4 @@ void loop(lsound::Sound& sound, const char* path) {
 
 void loop(const char* sound_path) {
     loop(SOUND_MAP[sound_path], sound_path);
-}
-
-LevelTeamData& GameState::team_data() {
-    return get_level()->team_data();
 }

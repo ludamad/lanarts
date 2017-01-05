@@ -78,7 +78,7 @@ static void world2minimapbuffer(GameState* gs, char* buff,
 			// Check if visible by a player on this level
 			bool within_fovs = false;
 			for (int i = 0; i < players.size(); i++) {
-				fov& fov = players[i]->field_of_view();
+				fov& fov = *players[i]->field_of_view;
 				if (fov.within_fov(xy.x, xy.y)) {
 					within_fovs = true;
 					break;

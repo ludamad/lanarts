@@ -32,6 +32,7 @@
 #include "GameWorld.h"
 #include "IOController.h"
 #include "PlayerData.h"
+#include "Team.h"
 
 #include <lsound/lsound.h>
 
@@ -44,7 +45,6 @@ class PlayerInst;
 class CollisionAvoidance;
 class MonsterController;
 class Serializer;
-class LevelTeamData;
 
 struct GameStateInitData {
 	// Other than seed, other settings are not used in single-player.
@@ -260,7 +260,9 @@ public:
 	LuaSerializeConfig& luaserialize_config() {
 		return config;
 	}
-	LevelTeamData& team_data();
+	TeamData& team_data() {
+	    return _team_data;
+	}
 
 private:
 	int handle_event(SDL_Event* event, bool trigger_event_handling = true);
@@ -280,6 +282,7 @@ private:
 	GameView _view;
 	GameWorld world;
 
+	TeamData _team_data;
 	MTwist mtwist;
 	// For dragging purposes:
 	GameView previous_view;

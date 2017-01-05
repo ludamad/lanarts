@@ -22,7 +22,6 @@
 
 #include "PlayerData.h"
 
-class LevelTeamData;
 class GameState;
 class SerializeBuffer;
 
@@ -124,9 +123,6 @@ public:
         return _vision_radius;
     }
 
-    LevelTeamData& team_data() {
-        return *_team_data;
-    }
 public:
 	std::vector<GameRoomPortal> exits, entrances;
 private:
@@ -142,9 +138,6 @@ private:
 	/* Used to store dynamic drawable information */
 	LuaDrawableQueue _drawable_queue;
     int _vision_radius = 7;
-
-    // PIMPL idiom to resolve circular includes:
-    smartptr<LevelTeamData> _team_data;
 	bool _is_simulation;
 };
 

@@ -1,70 +1,49 @@
 #include <cstdlib>
+#include <lcommon/SerializeBuffer.h>
 #include <limits>
 #include "Team.h"
+#include "gamestate/GameState.h"
+#include "objects/CombatGameInst.h"
+#include "objects/player/PlayerInst.h"
 
-fov* LevelTeamData::get_fov_of(GameState* gs, CombatGameInst* inst) {
-    return _get_member_data_of(inst)->field_of_view;
-}
+static constexpr float STRIDE = 15;
+static constexpr float STRIDE_SQR = STRIDE * STRIDE;
+static constexpr float MAX_DISTANCE_NPC_AGGRO_DISTANCE = 7 * TILE_SIZE;
+static constexpr float MAX_DISTANCE_NPC_AGGRO_DISTANCE_SQR = (MAX_DISTANCE_NPC_AGGRO_DISTANCE * MAX_DISTANCE_NPC_AGGRO_DISTANCE);
 
-CombatGameInst* LevelTeamData::get_nearest_enemy(GameState* gs, CombatGameInst* inst) {
-    float smallest_sqr_dist = std::numeric_limits<float>::max();
-    CombatGameInst* closest_game_inst = NULL;
-    for (auto& team : _teams) {
-        if (inst->team == team.id) {
+
+static PosF get_direction_towards(GameState* gs, PosF pos, int obj_radius, BBox tile_span) {
+    PosF direction_total = {0,0};
+    float n_directions = 0.0f;
+    // TODO use real interpolation? Lots of twiddly code though. For now, battletest this.
+    FOR_EACH_BBOX(tile_span, tx, ty) {
+        PosF target_pos = {tx * TILE_SIZE + TILE_SIZE/2, ty * TILE_SIZE + TILE_SIZE/2};
+        PosF heading = target_pos - pos;
+        if (square_magnitude(heading) > MAX_DISTANCE_NPC_AGGRO_DISTANCE_SQR) {
             continue;
         }
-        _get_nearest_on_team(gs, team, inst, &smallest_sqr_dist, &closest_game_inst);
-    }
-    return dynamic_cast<CombatGameInst*>(closest_game_inst);
-}
-
-CombatGameInst* LevelTeamData::get_nearest_ally(GameState* gs,
-        CombatGameInst* inst) {
-    float smallest_sqr_dist = std::numeric_limits<float>::max();
-    CombatGameInst* closest_game_inst = NULL;
-    _get_nearest_on_team(gs, *_get_team_of(inst), inst, &smallest_sqr_dist, &closest_game_inst);
-    return dynamic_cast<CombatGameInst*>(closest_game_inst);
-}
-
-PosF LevelTeamData::get_direction_towards(GameState* gs, CombatGameInst* from,
-        CombatGameInst* to, float max_speed) {
-    if (to->is_major_character()) {
-    }
-}
-
-bool LevelTeamData::are_allies(CombatGameInst* inst1, CombatGameInst* inst2) {
-    return inst1->team != inst2->team;
-}
-
-bool LevelTeamData::are_enemies(CombatGameInst* inst1, CombatGameInst* inst2) {
-    return inst1->team != inst2->team;
-}
-
-_TeamMemberData* LevelTeamData::_get_member_data_of(CombatGameInst* inst) {
-    _Team* team = _get_team_of(inst);
-    if (team) {
-        return &team->members[inst->id];
-    }
-    LANARTS_ASSERT(false);
-    return NULL;
-}
-
-_Team* LevelTeamData::_get_team_of(CombatGameInst* inst) {
-    for (auto& team : _teams) {
-        if (inst->team == team.id) {
-            return &team;
+        // Get the accumulation vector:
+        normalize(heading.x, heading.y, STRIDE);
+        PosF accum = pos;
+        // Accumulate until we have reached our target, or hit a wall:
+        bool reached = true;
+        while (squared_distance(accum, target_pos) < STRIDE_SQR) {
+            if (gs->tile_radius_test(accum.x, accum.y, obj_radius)) {
+                // We hit a wall, make sure to not count this towards accumulation.
+                reached = false;
+                break;
+            }
+            accum += heading;
         }
-    }
-    return NULL;
-}
+        if (!reached) {
+            // Hit a wall:
+            continue;
+        }
+        // We have reached our target, add to our direction total:
+        direction_total += heading;
 
-bool LevelTeamData::are_tiles_visible(GameState* gs, CombatGameInst* viewer, BBox tile_span) {
-    fov* fov = get_fov_of(gs, viewer);
-    if (!fov) {
-        // For now:
-        return true;
     }
-    return fov->within_fov(tile_span);
+    return direction_total.scaled(n_directions == 0.0f ? 1.0f : 1.0f / n_directions);
 }
 
 static BBox to_tile_span(GameState* gs, BBox area) {
@@ -76,48 +55,180 @@ static BBox to_tile_span(GameState* gs, BBox area) {
     return {minx, miny, maxx, maxy};
 }
 
-bool LevelTeamData::is_visible(GameState* gs, CombatGameInst* viewer, BBox area) {
+CombatGameInst* get_nearest_enemy(GameState* gs, CombatGameInst* inst) {
+    float smallest_sqr_dist = std::numeric_limits<float>::max();
+    CombatGameInst* closest_game_inst = NULL;
+    for_all_enemies(gs->team_data(), inst->current_floor, inst->team,
+        [&](CombatGameInst* o) {
+            float dx = (o->x - inst->x), dy = (o->y - inst->y);
+            float sqr_dist = dx*dx + dy*dy;
+            if (sqr_dist < smallest_sqr_dist) {
+                smallest_sqr_dist = dx*dx + dy*dy;
+                closest_game_inst = o;
+            }
+        }
+    );
+    return dynamic_cast<CombatGameInst*>(closest_game_inst);
+}
+
+CombatGameInst* get_nearest_ally(GameState* gs, CombatGameInst* inst) {
+    float smallest_sqr_dist = std::numeric_limits<float>::max();
+    CombatGameInst* closest_game_inst = NULL;
+    for_all_on_team(gs->team_data(), inst->current_floor, inst->team,
+        [&](CombatGameInst* o) {
+            float dx = (o->x - inst->x), dy = (o->y - inst->y);
+            float sqr_dist = dx*dx + dy*dy;
+            if (sqr_dist < smallest_sqr_dist) {
+                smallest_sqr_dist = dx*dx + dy*dy;
+                closest_game_inst = o;
+            }
+        }
+    );
+    return dynamic_cast<CombatGameInst*>(closest_game_inst);
+}
+
+PosF get_direction_towards(GameState* gs, CombatGameInst* from,
+        CombatGameInst* to, float max_speed) {
+    PlayerInst* to_player = dynamic_cast<PlayerInst*>(to);
+    if (to_player != NULL) {
+        return to_player->path_to_player().interpolated_direction(from->bbox(), max_speed);
+    }
+    PosF diff = get_direction_towards(gs, from->pos(), from->radius, to_tile_span(gs, to->bbox()));
+    if (diff == PosF()) {
+        return diff;
+    }
+    normalize(diff.x, diff.y, max_speed);
+    return diff;
+}
+
+bool are_allies(CombatGameInst* inst1, CombatGameInst* inst2) {
+    return inst1->team != inst2->team;
+}
+
+bool are_enemies(CombatGameInst* inst1, CombatGameInst* inst2) {
+    return inst1->team != inst2->team;
+}
+
+static bool are_tiles_visible(GameState* gs, CombatGameInst* viewer, BBox tile_span) {
+    fov* fov = viewer->field_of_view;
+    if (!fov) {
+        // TODO think harder about this.
+        PosF dir = get_direction_towards(gs, Pos {viewer->pos().scaled(1.0f/32.0f)}, viewer->radius, tile_span);
+        bool visible = (dir != PosF());
+        return visible;
+    }
+    return fov->within_fov(tile_span);
+}
+
+bool is_visible(GameState* gs, CombatGameInst* viewer, BBox area) {
     return are_tiles_visible(gs, viewer, to_tile_span(gs, area));
 }
 
-bool LevelTeamData::is_visible(GameState* gs, CombatGameInst* viewer,
+bool is_visible(GameState* gs, CombatGameInst* viewer,
         CombatGameInst* observed) {
     return is_visible(gs, viewer, observed->bbox());
 }
 
-void LevelTeamData::_get_nearest_on_team(GameState* gs, _Team& team, CombatGameInst* inst, float* smallest_sqr_dist,
-        CombatGameInst** closest_game_inst) {
-    GameInst* closest = *closest_game_inst;
-    for (auto& entry : team.members) {
-        GameInst* o = gs->get_instance(entry.first);
-        LANARTS_ASSERT(dynamic_cast<CombatGameInst*>(o));
-        float dx = (o->x - inst->x), dy = (o->y - inst->y);
-        float sqr_dist = dx*dx + dy*dy;
-        if (sqr_dist < *smallest_sqr_dist) {
-            *smallest_sqr_dist = dx*dx + dy*dy;
-            closest = o;
+
+void TeamData::remove(CombatGameInst* obj) {
+//    _ensure(obj->current_floor, obj->team); // Should already exist
+    teams.at(obj->team).per_level_data.at(obj->current_floor).erase(obj);
+}
+
+void TeamData::add(CombatGameInst* obj) {
+    _ensure(obj->current_floor, obj->team);
+    teams.at(obj->team).per_level_data.at(obj->current_floor).insert(obj);
+}
+
+void TeamData::_ensure(level_id level, team_id team) {
+    _ensure(team);
+    if (teams[team].per_level_data.size() <= level) {
+        teams[team].per_level_data.resize(level + 1);
+    }
+}
+
+void TeamData::_ensure(team_id team) {
+    if (teams.size() <= team) {
+        teams.resize(team + 1);
+    }
+}
+
+
+// Serialization TEDIOUSNESS follows.
+// TODO move to 'cereal' and cut down on this nonsense.
+
+template <typename T>
+static void write_inst_ref(T* ref, GameState* gs,
+        SerializeBuffer& serializer) {
+    serializer.write_int(ref->id);
+    serializer.write_int(ref->current_floor);
+}
+
+template <typename T>
+static void read_inst_ref(T*& ref, GameState* gs,
+        SerializeBuffer& serializer) {
+    int id, level;
+    serializer.read_int(id);
+    serializer.read_int(level);
+    ref = dynamic_cast<T*>(gs->get_instance(level, id));
+}
+
+void TeamPlayerData::serialize(GameState* gs, SerializeBuffer& buffer) {
+    buffer.write(this->gold);
+    buffer.write_int(this->players.size());
+    for (auto* p : this->players) {
+        write_inst_ref(p, gs, buffer);
+    }
+}
+
+void TeamPlayerData::deserialize(GameState* gs, SerializeBuffer& buffer) {
+    buffer.read(this->gold);
+    int size = buffer.read_int();
+    this->players.clear();
+    this->players.resize(size);
+    for (auto*& p : this->players) {
+        read_inst_ref(p, gs, buffer);
+    }
+}
+
+void Team::serialize(GameState* gs, SerializeBuffer& buffer) {
+    buffer.write_int(this->per_level_data.size());
+    for (auto& data : this->per_level_data) {
+        buffer.write_int(data.size());
+        for (auto* inst : data) {
+            write_inst_ref(inst, gs, buffer);
         }
     }
-    *closest_game_inst = dynamic_cast<CombatGameInst*>(closest);
+    this->player_data.serialize(gs, buffer);
 }
 
-void LevelTeamData::remove_instance(GameState* gs, CombatGameInst* inst) {
-    _Team* team = _get_team_of(inst);
-    LANARTS_ASSERT(team != NULL);
-    team->members.erase(inst->id);
-}
-
-void LevelTeamData::add_instance(GameState* gs, CombatGameInst* inst) {
-    _Team* team = _get_team_of(inst);
-    if (team == NULL) {
-        _teams.push_back({inst->team, {}});
-        team = &_teams.back();
+void Team::deserialize(GameState* gs, SerializeBuffer& buffer) {
+    int size = buffer.read_int();
+    this->per_level_data.clear();
+    this->per_level_data.resize(size);
+    for (auto& data : this->per_level_data) {
+        int data_size = buffer.read_int();
+        data.clear();
+        for (int i = 0; i < data_size; i++) {
+            CombatGameInst* ref = NULL;
+            read_inst_ref(ref, gs, buffer);
+            data.insert(ref);
+        }
     }
-    auto& data = team->members[inst->id];
-    LANARTS_ASSERT(data.field_of_view == NULL);
-    if (inst->is_major_character()) {
-        data.field_of_view = new fov(inst->vision_radius);
-        data.paths_to_object.initialize(gs->tiles().solidity_map());
-        data.paths_to_object.fill_paths_in_radius(inst->ipos(), PLAYER_PATHING_RADIUS);
+    this->player_data.deserialize(gs, buffer);
+}
+
+void TeamData::serialize(GameState* gs, SerializeBuffer& buffer) {
+    buffer.write_int(this->teams.size());
+    for (auto& team : this->teams) {
+        team.serialize(gs, buffer);
+    }
+}
+
+void TeamData::deserialize(GameState* gs, SerializeBuffer& buffer) {
+    this->teams.clear();
+    this->teams.resize(buffer.read_int());
+    for (auto& team : this->teams) {
+        team.deserialize(gs, buffer);
     }
 }

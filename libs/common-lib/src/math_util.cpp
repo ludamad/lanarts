@@ -61,10 +61,19 @@ float distance_between(const Pos & a, const Pos & b) {
 	return sqrt(dx * dx + dy * dy);
 }
 
+float squared_distance(const PosF & a, const PosF & b) {
+    float dx = a.x - b.x;
+    float dy = a.y - b.y;
+    return (dx * dx + dy * dy);
+}
+
 float magnitude(float x, float y) {
 	return sqrt(x * x + y * y);
 }
 
+float square_magnitude(const PosF& xy) {
+    return (xy.x * xy.x + xy.y * xy.y);
+}
 void normalize(float& x, float& y, float mag) {
 	float curr_mag = magnitude(x, y);
 	if (curr_mag == 0.0f)

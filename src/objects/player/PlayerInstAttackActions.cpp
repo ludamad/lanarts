@@ -138,9 +138,9 @@ bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
 
     int maxdist = 0;
     for (int i = 0; i < players.size(); i++) {
-        BBox fbox = players[i]->field_of_view().tiles_covered();
+        BBox fbox = players[i]->field_of_view->tiles_covered();
         FOR_EACH_BBOX(fbox, x, y) {
-            if (players[i]->field_of_view().within_fov(x, y)) {
+            if (players[i]->field_of_view->within_fov(x, y)) {
                 Pos pos(x * TILE_SIZE + TILE_SIZE / 2,
                         y * TILE_SIZE + TILE_SIZE / 2);
 

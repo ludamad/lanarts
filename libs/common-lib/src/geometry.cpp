@@ -157,6 +157,9 @@ Pos Pos::scaled(int scale) const {
 	return Pos(x * scale, y * scale);
 }
 
+Pos::Pos(const PosF& pos) : x(int(pos.x)), y(int(pos.y)) {
+}
+
 Pos::Pos(int x, int y) :
 		x(x), y(y) {
 }

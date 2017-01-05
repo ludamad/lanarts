@@ -40,4 +40,4 @@ TODO:
         + Have server play normally, have clients play out of sync, use sync level 3
         + With a separated server, this could work!
             +Major problem tho is newly created instances. Need to have a translation layer to accomodate these instances somehow? Significant complexity.
-
+- Final boss: Pixulloch

@@ -320,7 +320,9 @@ crypt_create = (MapSeq, seq_idx, number_entrances = 1) ->
             next_dungeon = {1}
             place_dungeon = (map, xy) ->
                 portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_hell1")
-                append @post_poned, (Seq\forward_portal_add 1, portal, next_dungeon[1], () -> hell_create(Seq, 2))
+                c = (Seq\forward_portal_add 1, portal, next_dungeon[1], () -> hell_create(Seq, 2))
+                if World.player_amount > 1
+                    append @post_poned, c
                 next_dungeon[1] += 1
             enemy_placer = (map, xy) ->
                 enemy = OldMaps.enemy_generate(OldMaps.strong_undead)
@@ -511,7 +513,9 @@ overworld_features = (map) ->
         next_dungeon = {1}
         place_dungeon = (map, xy) ->
             portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_crypt")
-            append post_poned, (CryptSeq\forward_portal_add 1, portal, next_dungeon[1], () -> crypt_create(CryptSeq, 2))
+            c = (CryptSeq\forward_portal_add 1, portal, next_dungeon[1], () -> crypt_create(CryptSeq, 2))
+            if World.player_amount > 1
+                append post_poned, c 
             next_dungeon[1] += 1
         enemy_placer = (map, xy) ->
             enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
@@ -579,7 +583,9 @@ overworld_features = (map) ->
         next_dungeon = {1}
         place_dungeon = (map, xy) ->
             portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
-            append post_poned, (MapSeq\forward_portal_add 1, portal, next_dungeon[1], () -> snake_pit_create(1))
+            c = (MapSeq\forward_portal_add 1, portal, next_dungeon[1], () -> snake_pit_create(1))
+            if World.player_amount > 1
+                append post_poned, c
             next_dungeon[1] += 1
         vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, :tileset, :door_placer, player_spawn_area: true})
         if not place_feature(map, vault, (r) -> r.conf.is_overworld)
@@ -611,7 +617,9 @@ overworld_features = (map) ->
         next_dungeon = {1}
         place_dungeon = (map, xy) ->
             portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
-            append post_poned, (Seq\forward_portal_add 1, portal, next_dungeon[1], () -> create(1))
+            c = (Seq\forward_portal_add 1, portal, next_dungeon[1], () -> create(1))
+            if World.player_amount > 1
+                append post_poned, c
             next_dungeon[1] += 1
         enemy_placer = (map, xy) ->
             enemy = OldMaps.enemy_generate({{enemy: "Sheep", chance: 100}})
