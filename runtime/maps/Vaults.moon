@@ -299,6 +299,15 @@ WWpDpWW
 }
 
 
+M.hive_dungeon = (args) -> table.merge M.skull_surrounded_dungeon(args), {
+    data: [=[
+...+...
+wwdddww
+wDsDsDw
+wwwwwww]=]
+}
+
+
 M.crypt_dungeon = (args) -> table.merge M.skull_surrounded_dungeon(args), {
     data: [=[
 ..+++..
