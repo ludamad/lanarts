@@ -37,6 +37,12 @@ EnemyEntry parse_enemy_type(lua_State* L, const YAML::Node& n) {
 	entry.draw_event = parse_luaexpr(L, n, "draw_func");
 	entry.death_event = parse_luaexpr(L, n, "death_func");
 
+        auto effects_granted = parse_defaulted(n, "effects_active", vector<string>());
+        entry.effect_modifiers.status_effects.clear();
+        for (string& str : effects_granted) {
+             entry.effect_modifiers.status_effects.push_back( get_effect_by_name(str.c_str()) );
+        }
+
 	return entry;
 }
 

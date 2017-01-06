@@ -30,7 +30,7 @@
 #include "PlayerInst.h"
 
 PlayerInst::PlayerInst(const CombatStats& stats, sprite_id sprite, Pos xy, team_id team, bool local) :
-		CombatGameInst(stats, sprite, xy, RADIUS, true, DEPTH), actions_set_for_turn(
+		CombatGameInst(stats, sprite, xy, team, RADIUS, true, DEPTH), actions_set_for_turn(
 				false), local(local), moving(0), autouse_mana_potion_try_count(
 				0), previous_spellselect(0), spellselect(-1) {
 	last_chosen_weaponclass = "unarmed";
@@ -250,6 +250,8 @@ void PlayerInst::serialize(GameState* gs, SerializeBuffer& serializer) {
 
 void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
 	CombatGameInst::deserialize(gs, serializer);
+        delete field_of_view;
+	field_of_view = new fov();
 	serializer.read(_score_stats);
 	serializer.read(actions_set_for_turn);
 	serializer.read(last_chosen_weaponclass);

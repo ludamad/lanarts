@@ -2,7 +2,7 @@ local ItemGroups = require "maps.ItemGroups"
 local Display = require "core.Display"
 local ItemUtils = require "maps.ItemUtils"
 local dungeons = require "maps.Dungeons"
-local map_utils = require "maps.MapUtils"
+local MapUtils = require "maps.MapUtils"
 local SourceMap = require "core.SourceMap"
 local World = require "core.World"
 
@@ -68,11 +68,11 @@ M.medium_enemies = table.merge(M.medium_animals, {
  
 M.mediumhard_enemies = table.merge(M.medium_animals, {
   {enemy = "Skeleton",          chance = 50                                              },
-  {enemy = "Storm Elemental",   chance = 66,  group_chance = 33, group_size = 2           },
+  {enemy = "Storm Elemental",   chance = 66,  group_chance = 33, group_size = 4           },
   {enemy = "Chicken",           chance = 50                                             },
 --  {enemy = "Unseen Horror",     chance = 5                                             },
   {enemy = "Dark Centaur",      chance = 10                                             },
-  {enemy = "Ciribot",           chance = 75                                              },
+  {enemy = "Elephant",           chance = 25                                              },
 })
   
 M.hard_enemies = {
@@ -272,11 +272,11 @@ M.Dungeon2 = {
 }
 
 M.Dungeon3 = {
-  { layout = large_layouts,
+  { layout = medium_layouts,
     content = {
       items = { amount = 5,  group = ItemGroups.basic_items   },
       enemies = {
-        amount = {10,14},
+        amount = {15,19},
         generated = M.mediumhard_enemies
       }
     }
@@ -285,8 +285,8 @@ M.Dungeon3 = {
     content = {
       items = { amount = 8,  group = ItemGroups.basic_items   },
       enemies = {
-        amount = {12,15},
-        generated = M.medium_enemies
+        amount = {17,20},
+        generated = M.mediumhard_enemies
       }
     }
   },
@@ -294,8 +294,8 @@ M.Dungeon3 = {
     content = {
       items = { amount = 4,  group = ItemGroups.enchanted_items   },
       enemies = {
-        amount = 12,
-        generated = table.tconcat(M.medium_enemies, {{enemy = "Hell Warrior", guaranteed_spawns = 1}})
+        amount = 20,
+        generated = table.tconcat(M.mediumhard_enemies, {{enemy = "Hell Warrior", guaranteed_spawns = 1}})
       }
     }
   }
@@ -401,7 +401,7 @@ function M.generate_from_enemy_entries(map, chances, amount, --[[Optional]] area
             spawns = math.floor(spawns * (1+M.enemy_bonus()))
         end
         for i=1,spawns do 
-            append(ret, map_utils.random_enemy(map, entry.enemy, area, selector))
+            append(ret, MapUtils.random_enemy(map, entry.enemy, area, selector))
         end
     end
     for i=1,amount do
@@ -409,7 +409,7 @@ function M.generate_from_enemy_entries(map, chances, amount, --[[Optional]] area
         for entry in values(chances) do
             rand = rand - (entry.chance or 0)
             if rand <= 0 then 
-                append(ret, map_utils.random_enemy(map, entry.enemy, area, selector))
+                append(ret, MapUtils.random_enemy(map, entry.enemy, area, selector))
                 break
             end
         end
@@ -428,9 +428,10 @@ local function generate_enemies(map, enemies)
         min, max = enemies.amount, enemies.amount
     end
     local multiplayer_bonus = M.enemy_bonus()
-    if map.template.dont_scale_enemies then
-        multiplayer_bonus = 1 -- Dont generate more enemies in the final area
-    end
+    -- TODO: Currently do scale-everywhere
+    --if map.template.dont_scale_enemies then
+    --    multiplayer_bonus = 0 -- Dont generate more enemies in the final area
+    --end
     local amounts = {min * (1.0 + multiplayer_bonus), max * (1.0 + multiplayer_bonus)}
     local amount = math.round(randomf(amounts))
     local Vaults = require "maps.Vaults"
@@ -449,7 +450,7 @@ end
 
 M.statue = Display.animation_create(Display.images_load "features/sprites/statues/statue(0-17).png", 1.0)
 
-local function generate_statues(map, --[[Optional]] amount)
+local function generate_features(map, --[[Optional]] amount)
     local areas = leaf_group_areas(map)
     amount = amount or random(5,10)
     local i = 0
@@ -457,7 +458,7 @@ local function generate_statues(map, --[[Optional]] amount)
     local Vaults = require "maps.Vaults"
     while i < amount do
         local area = random_choice(areas)
-        local sqr = map_utils.random_square(map, area)
+        local sqr = MapUtils.random_square(map, area)
         if not sqr then return end
         local query = SourceMap.rectangle_query {
             map = map,
@@ -466,8 +467,14 @@ local function generate_statues(map, --[[Optional]] amount)
             fill_selector = {matches_none = {SourceMap.FLAG_SOLID, Vaults.FLAG_HAS_VAULT}}
         } 
         if query then
-            map:square_apply(sqr, {add = SourceMap.FLAG_SOLID, remove = SourceMap.FLAG_SEETHROUGH})
-            map_utils.spawn_decoration(map, M.statue, sqr, random(0,17))
+            if map.n_healing_squares > 0 and chance(.1) then 
+                MapUtils.spawn_healing_square(map, sqr)
+                map.n_healing_squares = map.n_healing_squares - 1
+            else
+                map:square_apply(sqr, {add = SourceMap.FLAG_SOLID, remove = SourceMap.FLAG_SEETHROUGH})
+                MapUtils.spawn_decoration(map, M.statue, sqr, random(0,17))
+            end
+
             i = i + 1
             tries = 0
         end
@@ -485,7 +492,7 @@ local function generate_stores(map)
             local power_level, randart_chance = 1, 5
             table.insert(items, ItemUtils.item_generate(ItemGroups.store_items, true, power_level, randart_chance))
         end
-        map_utils.random_store(map, items)
+        MapUtils.random_store(map, items)
     end
 end
 
@@ -502,7 +509,7 @@ local function generate_doors(map)
                     if x == x1 or x == x2 or y == y1 or y == y2 then
                         local sqr = {x,y}
                         if map:square_query(sqr, selector) then
-                            map_utils.spawn_door(map, sqr)
+                            MapUtils.spawn_door(map, sqr)
                         end
                     end
                 end
@@ -520,7 +527,7 @@ end
 local function generate_content(map, content, tileset)
     generate_items(map, content.items)
     generate_enemies(map, content.enemies)
-    generate_statues(map)
+    generate_features(map)
     generate_doors(map)
     generate_stores(map)
 end
@@ -561,7 +568,7 @@ local function generate_layout(map, layout, tileset)
 end
 
 local function generate_from_template(label, template, tileset)
-    return map_utils.area_template_to_map(label, template, --[[padding]] 4, { 
+    return MapUtils.area_template_to_map(label, template, --[[padding]] 4, { 
            ['x'] = { add = SourceMap.FLAG_SOLID, content = tileset.wall }, 
            ['.'] = { add = SourceMap.FLAG_SEETHROUGH, content = chance(.5) and tileset.floor_alt or tileset.floor }
     })
@@ -578,14 +585,14 @@ function M.create_map(dungeon, floor)
         local size = map_call(range_resolve, layout.size)
         local size_mult = (size_multiplier() + 1) / 2
         size = {math.ceil(size[1] * size_mult), math.ceil(size[2] * size_mult)}
-        map = map_utils.map_create(label, size, tileset.wall)
+        map = MapUtils.map_create(label, size, tileset.wall)
         generate_layout(map, layout, tileset)
-        map.template = entry
     else 
         local template = random_choice(entry.templates)
         map = generate_from_template(label, template, tileset)
-        map.template = entry
     end
+    map.template = entry
+    map.n_healing_squares = map.rng:randomf() < 0.2 and map.rng:random(1, 2) or 0 
     -- TODO consolidate what is actually expected of maps.
     -- For now, just fake one region for 01_Overworld.moon
     map.regions = { {conf = {}, bbox = function(self) return {0,0, map.size[1], map.size[2]} end}}

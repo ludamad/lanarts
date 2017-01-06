@@ -870,6 +870,18 @@ M.crypt_entrance_vault = (args) -> table.merge M.small_item_vault(args), {
 ++++++++++]=]
     }
 }
+M.hive_entrance_vault = (args) -> table.merge M.crypt_entrance_vault(args), {
+    data: random_choice {
+[=[
++++++++++
+++wwwww++
++wwp*pww+
++dpppppd+
++wwpipww+
+++wwdww++
++++++++++]=]
+    }
+}
 M.dungeon_tunnel = (args) -> table.merge M.small_item_vault(args), {
     data: random_choice {
         [=[

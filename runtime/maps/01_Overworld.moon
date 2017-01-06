@@ -796,27 +796,26 @@ overworld_features = (map) ->
             f(game_map)
 
 overworld_create = () ->
-    --MapSeq = MapSequence.create {preallocate: 1}
-    --snake_pit_create = (offset = 1) ->
-    --    dungeon = require("maps.GraghsLair")
-    --    return NewDungeons.make_linear_dungeon {
-    --        :MapSeq
-    --        :offset
-    --        dungeon_template: dungeon.TEMPLATE
-    --        on_generate: (floor) ->
-    --            assert(floor)
-    --            print "on_generate", floor
-    --        sprite_up: (floor) ->
-    --            return if floor == 1 then "spr_gates.exit_lair" else "spr_gates.return"
-    --        sprite_down: (floor) ->
-    --            return "spr_gates.enter"
-    --        portals_up: (floor) ->
-    --            return 3
-    --        portals_down: (floor) ->
-    --            return 0
-    --            -- return if floor == dungeon.N_FLOORS then 0 else 3
-    --    }
-    --do return snake_pit_create(0)
+    MapSeq = MapSequence.create {preallocate: 1}
+    test_create = (offset = 1) ->
+        dungeon = require("maps.Hive")
+        return NewDungeons.make_linear_dungeon {
+            :MapSeq
+            :offset
+            dungeon_template: dungeon.TEMPLATE
+            on_generate: (floor) ->
+                assert(floor)
+                print "on_generate", floor
+            sprite_up: (floor) ->
+                return if floor == 1 then "spr_gates.exit_lair" else "spr_gates.return"
+            sprite_down: (floor) ->
+                return "spr_gates.enter"
+            portals_up: (floor) ->
+                return if floor == 1 then 0 else 3
+            portals_down: (floor) ->
+                return if floor == dungeon.N_FLOORS then 0 else 3
+        }
+    do return test_create(0)
     NewMaps.map_create (rng) -> {
         map_label: "Plain Valley"
         subtemplates: {DUNGEON_CONF(rng), OVERWORLD_CONF(rng)}

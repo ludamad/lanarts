@@ -137,14 +137,14 @@ bows  = (chance, args) -> _filter {
 armour = (chance, args) -> _filter {
     :chance,
     -- Body Armour
-    args.ignore_weak or { item: "Leather Armour",     chance: 4                      }
-    args.ignore_weak or { item: "Robe",               chance: 4                      }
+    args.ignore_weak or { item: "Leather Armour",     chance: 8                      }
+    args.ignore_weak or { item: "Robe",               chance: 6                      }
 
-    args.ignore_medium or{ item: "Chainmail",          chance: 2                      }
+    args.ignore_medium or{ item: "Chainmail",          chance: 4                      }
     args.ignore_medium or { item: "Magician's Robe",    chance: 2                      }
-    args.ignore_medium or { item: "Robe of Mana",       chance: 2                      }
+    args.ignore_medium or { item: "Robe of Mana",       chance: 4                      }
 
-    args.ignore_strong or { item: "Platemail",          chance: 1                      }
+    args.ignore_strong or { item: "Platemail",          chance: 2                      }
     args.ignore_strong or { item: "Runed Robe",         chance: 1                      }
 }
 

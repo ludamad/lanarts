@@ -125,6 +125,18 @@ Data.equipment_create {
 }
 
 Data.equipment_create {
+    name = "Stara's Ring",
+    description = "Grants the user +35MP, +2 willpower, -2 defence.",
+    type = "ring",
+
+    shop_cost = { 225, 325 },
+
+    spr_item = "magicians ring",
+
+    stat_bonuses = { defence = -2, willpower = 3, mp = 35}
+}
+
+Data.equipment_create {
     name = "Magician's Ring",
     description = "A glowing ring that grants the user magical power, at the cost of magical defences.",
     type = "ring",

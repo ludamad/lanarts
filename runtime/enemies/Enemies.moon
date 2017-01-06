@@ -32,6 +32,23 @@ enemy_berserker_step = (enemy) ->
         enemy\add_effect("Berserk", 300)
         enemy.berserk_time = 500
 
+Data.effect_create {
+    name: "Enraging"
+    init_func: (mon) =>
+        @damage_tracker = 0
+        @damage_interval = mon.stats.max_hp / 3
+        @next_hp_threshold = mon.stats.max_hp - @damage_interval
+    on_damage_func: (mon, dmg) =>
+        @damage_tracker += dmg
+        new_hp = mon.stats.hp - dmg
+        if new_hp < @next_hp_threshold
+            EventLog.add((if mon.unique then "" else "The ") .. mon.name .. " gets mad!", {255,255,255})
+            mon\add_effect("Charging", 100)
+            @next_hp_threshold -= @damage_interval
+        return dmg
+}
+
+
 -- UNDEAD ENEMIES --
 
 Data.enemy_create {
@@ -56,6 +73,30 @@ Data.enemy_create {
     }
     effects_active: {"Pain Aura"}
 }
+
+Data.enemy_create {
+    name: "Mana Sapper" 
+    sprite: "spr_enemies.demons.manasapper"
+    radius: 11
+    xpaward: 25
+    appear_message: "A mana sapper comes onto the scene!"
+    defeat_message: "The mana sapper dies."
+    stats: {
+        attacks: {
+            {projectile: "Minor Missile"}
+        }
+        hp: 50
+        hpregen: 0.03
+        movespeed: 1
+        -- base stats:
+        magic: 10
+        defence: 5
+        magic: 30
+        willpower: 8
+    }
+    effects_active: {"Sap Aura"}
+}
+
 
 Data.enemy_create {
     name: "Gaseous Ghost" 
@@ -153,6 +194,70 @@ Data.enemy_create {
 -- SNAKE PIT ENEMIES
 
 Data.enemy_create {
+    name: "Queen Bee"
+    sprite: "spr_enemies.animals.queen_bee"
+    death_sprite: "green blood"
+    radius: 10
+    xpaward: 100
+    appear_message: "A queen bee appears!"
+    defeat_message: "The queen bee has buzzed its last buzz."
+    stats: {
+        attacks: {{weapon: "Fast Melee"}}
+        hp: 80
+        hpregen: 0.1
+        movespeed: 3.5
+        strength: 15
+        defence: 0
+        willpower: 5
+    }
+    effects_active: {"PoisonedWeapon", "Enraging"}
+}
+
+Data.enemy_create {
+    name: "Giant Bee"
+    sprite: "spr_enemies.animals.killer_bee"
+    death_sprite: "green blood"
+    radius: 10
+    xpaward: 25
+    appear_message: "A giant killer bee appears!"
+    defeat_message: "The giant bee has buzzed its last buzz."
+    stats: {
+        attacks: {{weapon: "Fast Melee"}}
+        hp: 40
+        hpregen: 0.1
+        movespeed: 3.5
+        strength: 15
+        defence: 0
+        willpower: 5
+    }
+    effects_active: {"PoisonedWeapon", "Spiky"}
+}
+ 
+Data.enemy_create {
+    name: "Mouther" 
+    sprite: "spr_enemies.animals.tyrant_leech"
+    radius: 11
+    xpaward: 15
+    appear_message: "You hear a mouther start screeching!"
+    defeat_message: "The mouther has been shut."
+    stats: {
+        attacks: {
+            {weapon: "Basic Melee"}
+            {projectile: "Mephitize"}
+        }
+        hp: 40
+        hpregen: 0.03
+        movespeed: 1
+        -- base stats:
+        strength: 5
+        defence: 0
+        magic: 2
+        willpower: 0
+    }
+    effects_active: {"PoisonedWeapon"}
+}
+
+Data.enemy_create {
     name: "Black Mamba"
     sprite: "spr_enemies.animals.black_mamba"
     death_sprite: "blood"
@@ -235,23 +340,6 @@ Data.effect_create {
                 EventLog.add("You are thrown back!", {200,200,255})
             -- mon\remove_effect("Charging")
 }
-
-Data.effect_create {
-    name: "Enraging"
-    init_func: (mon) =>
-        @damage_tracker = 0
-        @damage_interval = mon.stats.max_hp / 3
-        @next_hp_threshold = mon.stats.max_hp - @damage_interval
-    on_damage_func: (mon, dmg) =>
-        @damage_tracker += dmg
-        new_hp = mon.stats.hp - dmg
-        if new_hp < @next_hp_threshold
-            EventLog.add((if mon.unique then "" else "The ") .. mon.name .. " gets mad!", {255,255,255})
-            mon\add_effect("Charging", 100)
-            @next_hp_threshold -= @damage_interval
-        return dmg
-}
-
 Data.enemy_create {
     name: "Elephant"
     sprite: "spr_enemies.animals.elephant"
@@ -263,6 +351,48 @@ Data.enemy_create {
     stats: {
         attacks: {{weapon: "Slow Melee"}}
         hp: 70
+        hpregen: 0.05
+        movespeed: 2
+        strength: 20
+        defence: 8
+        willpower: 8
+    }
+    effects_active: {"Enraging"}
+}
+ 
+Data.enemy_create {
+    name: "Red Dragon"
+    appear_message: "A frighteningly large red dragon comes into view!"
+    defeat_message: "You have slain the red dragon!"
+    sprite: "red dragon"
+    radius: 27
+    xpaward: 150
+    unique: true
+    stats: {
+        attacks: { {weapon: "Basic Melee"}, { projectile: "Large Fire Ball"} }
+        hp: 220
+        hpregen: 0.1
+        movespeed: 2.5
+        strength: 25
+        magic: 25
+        defence: 15
+        willpower: 15
+    }
+    death_func: () =>
+        ObjectUtils.spawn_item_near(@, "Red Dragonplate", 1)
+}
+
+Data.enemy_create {
+    name: "Sheep"
+    sprite: "spr_enemies.animals.sheep"
+    death_sprite: "blood"
+    radius: 14
+    xpaward: 10
+    appear_message: "A hostile sheep approaches!"
+    defeat_message: "The sheep recieves a fatal blow."
+    stats: {
+        attacks: {{weapon: "Basic Melee"}}
+        hp: 20
         hpregen: 0.05
         movespeed: 2
         strength: 20
@@ -364,5 +494,34 @@ Data.enemy_create {
         item = random_choice {"Gragh's Club"}
         ObjectUtils.spawn_item_near(@, item, 1)
     effects_active: {"Enraging"}
+}
+
+Data.enemy_create {
+    name: "Stara"
+    appear_message: "Stara cackles!"
+    defeat_message: "Stara is dead!"
+    sprite: "spr_enemies.bosses.stara"
+    radius: 15
+    xpaward: 200
+    unique: true
+    stats: {
+        attacks: {{projectile: "Skullthrow"}}
+        hp: 200
+        hpregen: 0.25
+        movespeed: 3
+        strength: 25
+        magic: 10
+        defence: 8
+        willpower: 8
+    }
+    step_func: () =>
+        if @has_effect "Pain Aura"
+            @get_effect("Pain Aura").range = 40
+    death_func: () =>
+        ItemUtils = require "map.ItemUtils"
+        for i=1,2
+            item = ItemUtils.item_generate {}, false, 2, 100
+            ObjectUtils.spawn_item_near(@, item, 1)
+    effects_active: {"Pain Aura"}
 }
 

@@ -95,6 +95,7 @@ public:
 	}
 //members
 public:
+// <PURE DATA REGION see (de)serialize>
 	team_id team = NONE;
 	float vx = -1, vy = -1;
 	float rx = -1, ry = -1;
@@ -105,11 +106,13 @@ public:
     //   This is used for all allies of the player, although most allies do not provide the player
     //   with their full field of view.
     //   This is used to decide if a major team member sees an enemy, but other NPCs have more primitive sight code.
-    fov* field_of_view = NULL;
 protected:
 	sprite_id sprite = NONE;
 	simul_id simulation_id = NONE;
 	obj_id current_target = NONE;
+// </PURE DATA REGION see (de)serialize>
+public:
+    fov* field_of_view = NULL;
 private:
 	CombatStats base_stats;
 	EffectiveStats estats;

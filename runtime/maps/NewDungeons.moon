@@ -128,7 +128,7 @@ M.make_dungeon_template = (data) -> table.merge {
                 if not sqr
                     break
                 map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}})
-                item = ItemUtils.item_generate group[1], false, 1 --Randart power level
+                item = ItemUtils.item_generate group[1], false, 1, (group[3] or 2) --Randart power level and chance
                 MapUtils.spawn_item(map, item.type, item.amount, sqr) 
         return true
     _spawn_statues: (map) =>

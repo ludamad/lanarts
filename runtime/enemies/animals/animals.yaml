@@ -81,23 +81,6 @@ enemies:
         strength: 20
         defence: 20
         willpower: 15
-
-  - name: Sheep
-    sprite: sheep
-    death_sprite: blood
-    radius: 14
-    xpaward: 10
-    appear_message: A hostile sheep approaches!
-    defeat_message: The sheep recieves a fatal blow.
-    stats:
-        attacks: [ {weapon: Basic Melee} ]
-        hp: 20
-        hpregen: 0.03
-        movespeed: 2
-        strength: 10
-        defence: 5
-        willpower: 5
-
   - name: Giant Frog
     sprite: giant frog
     death_sprite: green blood

@@ -200,6 +200,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
         }
     }
 
+    // Callbacks on attacker object:
     for (Effect& e : effects().effects) {
         if (e.t_remaining == 0) {
             continue;
@@ -220,6 +221,29 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
             lua_pop(L, 1);
         }
     }
+    
+    // Callbacks on attacked object:
+    for (Effect& e : inst->effects().effects) {
+        if (e.t_remaining == 0) {
+            continue;
+        }
+        auto& entry = game_effect_data[e.effectid];
+        if (!entry.on_receive_melee_func.empty() && !entry.on_receive_melee_func.isnil()) {
+            entry.on_receive_melee_func.push();
+            lua_State* L = gs->luastate();
+            luawrap::push(L, e.state);
+            luawrap::push(L, this);
+            luawrap::push(L, inst);
+            luawrap::push(L, damage);
+            lua_push_effectiveattackstats(L, atkstats);
+            lua_call(L, 5, 1);
+            if (!lua_isnil(L, -1)) {
+                damage = lua_tonumber(L, -1);
+            }
+            lua_pop(L, 1);
+        }
+    }
+
 
     // Don't damage players during invincibility:
     if (dynamic_cast<PlayerInst*>(this) || !gs->game_settings().invincible) {
@@ -337,7 +361,6 @@ void CombatGameInst::deinit(GameState* gs) {
     // Remove before 'deinit' clears current_level:
     gs->team_data().remove(this);
     GameInst::deinit(gs);
-    estats = stats().effective_stats(gs, this);
 }
 
 const float ROUNDING_MULTIPLE = 256.0f;

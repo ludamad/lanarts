@@ -48,7 +48,9 @@ public:
         RADIUS = 10, DEPTH = 75
     };
     PlayerInst(const CombatStats& stats, sprite_id sprite, Pos xy, team_id team, bool local);
-    PlayerInst() {}
+    PlayerInst() {
+        field_of_view = NULL;
+    }
 
     virtual ~PlayerInst();
     virtual void init(GameState* gs);

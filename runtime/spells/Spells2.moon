@@ -345,3 +345,12 @@ Data.effect_create {
             eff = defender\add_effect("Dazed", 100)
         return damage
 }
+
+Data.effect_create {
+    name: "Spiky"
+    on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
+        attacker\direct_damage(damage * 0.75)
+        if defender.is_local_player and defender\is_local_player()
+            EventLog.add("You strike back with spikes!", COL_PALE_BLUE)
+        return damage
+}

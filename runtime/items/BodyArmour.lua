@@ -31,6 +31,24 @@ Data.equipment_create {
 }
 
 Data.equipment_create {
+    name = "Crystal Armour",
+    description = "A strong, heavy armour.",
+    type = "armour",
+
+    randart_sprite = {"spr_armour.randart_plate"},
+    shop_cost = {95,105},
+
+    spr_item = "platemail",
+
+    spell_cooldown_multiplier = 1.35,
+
+    ranged_cooldown_multiplier = 1.35,
+
+    reduction = {base = 2},
+    resistance = {base = 2}
+}
+
+Data.equipment_create {
     name = "Platemail",
     description = "A strong, heavy armour.",
     type = "armour",
@@ -70,7 +88,7 @@ Data.equipment_create {
     description = "An enchanted robe of protection and magical power.",
     type = "armour",
 
-    shop_cost = {45,60},
+    shop_cost = {75,90},
 
     spr_item = "enchanted robe",
 
@@ -88,7 +106,7 @@ Data.equipment_create {
     description = "A heavily enchanted robe of protection and magical power.",
     type = "armour",
 
-    shop_cost = {95,105},
+    shop_cost = {115,135},
 
     spr_item = "runed robe",
 
@@ -124,7 +142,6 @@ Data.equipment_create {
 
     spell_cooldown_multiplier = 1.05,
     ranged_cooldown_multiplier = 1.05,
-    melee_cooldown_multiplier = 1.05,
 
     stat_bonuses = {mp = 10, hp = 10},
     reduction = {base = 2},

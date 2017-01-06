@@ -239,3 +239,12 @@ function iterator_step(state)
     table.assign(state, iterator_helper(unpack(state)))
     if state[1] ~= oldf then table.clear(state) end
 end
+
+local NEXT_TO_PLAY_PAINED = 1
+function play_pained_sound()
+    play_sound("sound/pained" .. NEXT_TO_PLAY_PAINED .. ".ogg")
+    NEXT_TO_PLAY_PAINED = NEXT_TO_PLAY_PAINED + 1
+    if NEXT_TO_PLAY_PAINED > 3 then
+        NEXT_TO_PLAY_PAINED = 1
+    end
+end

@@ -65,7 +65,7 @@ Data.equipment_create {
 }
 Data.equipment_create {
     name = "Stripe Boots",
-    description = "Slick, sturdy boots that allow the user to 'Expedite', increasing ranged firing rate and movement speed.",
+    description = "Slick, sturdy boots that grant the user faster spells.",
     type = "boots",
 
     shop_cost = { 120, 200 },
@@ -74,5 +74,5 @@ Data.equipment_create {
 
     reduction = { base = 1 },
     resistance = { base = 1 },
-    spells_granted = {"Expedite"}
+    stat_bonuses = { spell_velocity_multiplier = 1.25 }
 }

@@ -25,14 +25,16 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Spiked Belt",
-    description = "Your can cast 'Call Spikes'.",
+--    description = "Your can cast 'Call Spikes'.",
+    description = "You gain +1 defence, and do 25% damage back to melee attackers.",
     type = "belt",
 
     shop_cost = { 200, 250 },
 
     spr_item = "spr_belts.spike",
 
-    spells_granted = {"Call Spikes"}
+    stat_bonuses = {defence = 1},
+    effects_granted = {"Spiky"}
 }
 
 Data.equipment_create {

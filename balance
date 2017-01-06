@@ -41,3 +41,5 @@ TODO:
         + With a separated server, this could work!
             +Major problem tho is newly created instances. Need to have a translation layer to accomodate these instances somehow? Significant complexity.
 - Final boss: Pixulloch
+    + Mana sapper enemy
+    + turret enemy

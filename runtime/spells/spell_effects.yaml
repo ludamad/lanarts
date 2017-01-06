@@ -86,7 +86,6 @@ effects:
     effected_sprite: spr_spells.pain
     effected_colour: [100,100,100] #RGB
     fade_out: 15
-    # Effect in CPP
 
   - name: Dazed
     effected_sprite: spr_effects.may_stab_brand

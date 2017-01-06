@@ -5,6 +5,7 @@ local SourceMap = require "core.SourceMap"
 local Map = require "core.Map"
 local World = require "core.World"
 local mtwist = require "mtwist"
+local HealingSquare = require("objects.HealingSquare").HealingSquare
 
 local M = {} -- Submodule
 
@@ -73,6 +74,12 @@ function M.random_enemy(map, type, --[[Optional]] area, --[[Optional]] selector)
     local sqr = M.random_square(map, area, selector)
     if not sqr then return nil end
     return M.spawn_enemy(map, type, sqr)
+end
+
+function M.spawn_healing_square(map, sqr)
+    local object = HealingSquare.create { do_init = false, xy = M.from_tile_xy(sqr) }
+    table.insert(map.instances, object)
+    return object
 end
 
 function M.spawn_door(map, sqr, --[[Optional]] open_sprite, --[[Optional]] closed_sprite, --[[Optional]] required_key)
