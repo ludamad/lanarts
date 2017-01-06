@@ -42,7 +42,7 @@ static void draw_player_inventory_slot(GameState* gs, ItemSlot& itemslot, int x,
 		}
 
         if (gs->io_controller().ctrl_held()) {
-            draw_slot_cost(gs, itemslot.item_entry().sell_cost() * itemslot.amount(), x, y);
+            draw_slot_cost(gs, itemslot.item_entry().sell_cost(), x, y);
         }
 	}
 }
