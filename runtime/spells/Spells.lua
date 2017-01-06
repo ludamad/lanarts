@@ -278,6 +278,7 @@ function Pain.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
     caster:direct_damage(10)
     target:add_effect("Pained", 50)
+    play_pained_sound()
     caster:add_effect("Pained", 50)
     if caster:is_local_player() then
         EventLog.add("You attack your enemy's life force directly!", {200,200,255})

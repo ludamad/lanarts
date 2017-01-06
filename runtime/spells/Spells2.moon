@@ -260,6 +260,7 @@ Data.effect_create {
             dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
             if dist < @range
                 mon\add_effect("Pained", 50)
+                play_pained_sound()
                 caster\add_effect("Pained", 50)
                 if mon\damage(random(4,15) * 2 + caster.stats.magic * 2, random(6,10) + caster.stats.magic * 0.2, 1.0, 2.0)
                     {:stats} = caster
