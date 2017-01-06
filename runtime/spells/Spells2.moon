@@ -241,6 +241,35 @@ Data.effect_create {
 }
 
 Data.effect_create {
+    name: "Sap Aura"
+    category: "Aura"
+    fade_out: 100
+    init_func: (caster) =>
+        AuraBase.init(@, caster)
+        if caster.is_enemy
+            @range = 90
+    step_func: (caster) =>
+        AuraBase.step(@, caster)
+        if caster.is_enemy and not Map.object_visible(caster)
+            return
+        for mon in *(enemy_list caster)
+            if mon\has_effect("Sapped")
+                continue
+            dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
+            if dist < @range
+                mon\add_effect("Sapped", 35)
+                mon.stats.mp = math.max(0, mon.stats.mp - 10)
+                if not mon.is_enemy and mon\is_local_player() 
+                    EventLog.add("Your MP is drained!", {200,200,255})
+                elseif not mon.is_enemy
+                    EventLog.add(mon.name .. "'s MP is drained!", {200,200,255})
+    draw_func: (caster, top_left_x, top_left_y) =>
+        @max_alpha = 0.35
+        AuraBase.draw(@, COL_PALE_BLUE, COL_BLUE, caster.x, caster.y)
+}
+
+
+Data.effect_create {
     name: "Pain Aura"
     category: "Aura"
     effected_sprite: "spr_spells.greaterpain"
@@ -308,7 +337,8 @@ Data.effect_create {
         if defender\has_effect("Thrown")
             return
         if chance(.1)
-            thrown = defender\add_effect("Thrown", 10)
+            print "THROWN"
+            thrown = defender\add_effect("Thrown", 20)
             thrown.angle = vector_direction({attacker.x, attacker.y}, {defender.x, defender.y})
         return damage
 }

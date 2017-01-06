@@ -518,10 +518,11 @@ Data.enemy_create {
         if @has_effect "Pain Aura"
             @get_effect("Pain Aura").range = 40
     death_func: () =>
-        ItemUtils = require "map.ItemUtils"
+        ItemUtils = require "maps.ItemUtils"
+        ItemGroups = require "maps.ItemGroups"
         for i=1,2
-            item = ItemUtils.item_generate {}, false, 2, 100
-            ObjectUtils.spawn_item_near(@, item, 1)
+            item = ItemUtils.item_generate ItemGroups.basic_items, false, 2, 100
+            ObjectUtils.spawn_item_near(@, item.type, 1)
     effects_active: {"Pain Aura"}
 }
 
