@@ -62,7 +62,7 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Amulet of Mephitization",
-    description = "Grants the user the spell 'Mephitize', and 25% chance of poison on melee attacks.",
+    description = "Grants the user the spell 'Mephitize', and 10% chance of poison on melee attacks.",
     type = "amulet",
 
     shop_cost = { 120, 140 },

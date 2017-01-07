@@ -337,7 +337,6 @@ Data.effect_create {
         if defender\has_effect("Thrown")
             return
         if chance(.1)
-            print "THROWN"
             thrown = defender\add_effect("Thrown", 20)
             thrown.angle = vector_direction({attacker.x, attacker.y}, {defender.x, defender.y})
         return damage
@@ -348,7 +347,7 @@ Data.effect_create {
     on_melee_func: (attacker, defender, damage, attack_stats) =>
         if defender\has_effect("Poison")
             return
-        if chance(.25)
+        if (if attacker.is_enemy then chance(.25) else chance(.1))
             eff = defender\add_effect("Poison", 100)
             eff.poison_rate = 25
             eff.damage = attack_stats.damage
@@ -363,7 +362,7 @@ Data.effect_create {
         if defender\has_effect("Fear")
             return
         if chance(.1)
-            eff = defender\add_effect("Fear", 100)
+            eff = defender\add_effect("Fear", 150)
         return damage
 }
 
@@ -373,7 +372,7 @@ Data.effect_create {
         if defender\has_effect("Dazed")
             return
         if chance(.1)
-            eff = defender\add_effect("Dazed", 100)
+            eff = defender\add_effect("Dazed", 70)
         return damage
 }
 
@@ -386,7 +385,7 @@ Data.effect_create {
 Data.effect_create {
     name: "Spiky"
     on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
-        attacker\direct_damage(damage * 0.75)
+        attacker\direct_damage(damage * 0.25)
         if defender.is_local_player and defender\is_local_player()
             EventLog.add("You strike back with spikes!", COL_PALE_BLUE)
         return damage

@@ -364,28 +364,6 @@ Data.enemy_create {
 }
  
 Data.enemy_create {
-    name: "Red Dragon"
-    appear_message: "A frighteningly large red dragon comes into view!"
-    defeat_message: "You have slain the red dragon!"
-    sprite: "red dragon"
-    radius: 27
-    xpaward: 150
-    unique: true
-    stats: {
-        attacks: { {weapon: "Basic Melee"}, { projectile: "Large Fire Ball"} }
-        hp: 220
-        hpregen: 0.1
-        movespeed: 2.5
-        strength: 25
-        magic: 25
-        defence: 15
-        willpower: 15
-    }
-    death_func: () =>
-        ObjectUtils.spawn_item_near(@, "Red Dragonplate", 1)
-}
-
-Data.enemy_create {
     name: "Sheep"
     sprite: "spr_enemies.animals.sheep"
     death_sprite: "blood"
@@ -418,8 +396,8 @@ Data.enemy_create {
         hp: 220
         hpregen: 0.1
         movespeed: 2.5
-        strength: 25
-        magic: 25
+        strength: 35
+        magic: 35
         defence: 15
         willpower: 15
     }

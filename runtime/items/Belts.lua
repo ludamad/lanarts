@@ -41,7 +41,7 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Dank Belt",
-    description = "Your melee attacks have a 25% chance of poisoning targets.",
+    description = "Your melee attacks have a 10% chance of poisoning targets.",
     type = "belt",
 
     shop_cost = { 200, 250 },
