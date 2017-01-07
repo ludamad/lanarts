@@ -4,6 +4,7 @@
  */
 
 #include <lcommon/geometry.h>
+#include <ldraw/display.h>
 
 #include "IOController.h"
 
@@ -290,7 +291,14 @@ int IOController::handle_event(SDL_Event* event) {
 void IOController::update_iostate(bool resetprev) {
 	iostate.clear_for_step(resetprev);
 	SDL_GetMouseState(&iostate.mousex, &iostate.mousey);
+	Size display_size = ldraw::display_size();
+	Size window_size = ldraw::window_size();
+
+    //scale the mouse position for when display_size != window_size
+	iostate.mousex = display_size.w * (iostate.mousex / (float) window_size.w);
+	iostate.mousey = display_size.h * (iostate.mousey / (float) window_size.h);
 }
+
 std::vector<SDL_Event>& IOController::get_events() {
 	return iostate.sdl_events;
 }

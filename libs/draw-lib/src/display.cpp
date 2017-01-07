@@ -15,7 +15,7 @@
 #include "opengl/gl_extensions.h"
 
 static SDL_Window* MAIN_WINDOW = NULL;
-static Size RENDER_SIZE; 
+static Size RENDER_SIZE;
 static SDL_Renderer* MAIN_RENDERER = NULL;
 
 static void gl_set_drawing_area(int x, int y, int wa, int ha) {
@@ -131,4 +131,10 @@ void ldraw::display_draw_finish() {
 
 Size ldraw::display_size() {
     return RENDER_SIZE;
+}
+
+Size ldraw::window_size() {
+    int w = 0, h = 0;
+    SDL_GetWindowSize(MAIN_WINDOW, &w, &h);
+    return Size(w,h);
 }

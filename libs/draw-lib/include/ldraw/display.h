@@ -21,6 +21,7 @@ void display_draw_finish();
 void display_draw_start();
 
 Size display_size();
+Size window_size();
 
 }
 
