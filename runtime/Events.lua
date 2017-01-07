@@ -37,7 +37,7 @@ function events.MonsterDeath(monster)
     if monstersounds[monster.name] ~= nil then
         monstersounds[monster.name]:play()
     end
-    if monster.name == "Zin" then
+    if monster.name == "Pixulloch" then
         Engine.game_won()
     end
 end

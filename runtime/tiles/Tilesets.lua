@@ -53,6 +53,14 @@ M.hive = Data.tileset_create {
     wall_alt = { images = Display.images_load "spr_tile_walls/lair.png%32x32" }
 }
 
+M.pixulloch = Data.tileset_create {
+    floor = { images = Display.images_load "spr_tile_floors/rect_gray.png%32x32" },
+    floor_alt = { images = Display.images_load "spr_tile_floors/purple_nerves.png%32x32" },
+    wall = { images = Display.images_load "spr_tile_walls/zot_blue.png%32x32" },
+    wall_alt = { images = Display.images_load "spr_tile_walls/spider.png%32x32" }
+}
+
+
 M.orc = Data.tileset_create {
     floor = { images = Display.images_load "spr_tile_floors/orc.png%32x32" },
     floor_alt = { images = Display.images_load "spr_tile_floors/swamp.png%32x32" },

@@ -31,18 +31,14 @@ Data.equipment_create {
 }
 
 Data.equipment_create {
-    name = "Crystal Armour",
-    description = "A very heavy armour. Slows down movement speed.",
+    name = "Crystalline Plate",
+    description = "An armour made of heavy but magically unburdensome crystals. Slows down movement speed considerably.",
     type = "armour",
 
     randart_sprite = {"spr_armour.crystal_plate3"},
     shop_cost = {295,305},
 
     spr_item = "spr_armour.crystal_plate2",
-
-    spell_cooldown_multiplier = 1.65,
-
-    ranged_cooldown_multiplier = 1.65,
 
     reduction = {base = 3},
     resistance = {base = 3},

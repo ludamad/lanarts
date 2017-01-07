@@ -185,8 +185,8 @@ void ProjectileInst::step(GameState* gs) {
 
                                     double xpworth = victim->xpworth();
                                     double n_killed = (pc.n_enemy_killed(victim->enemy_type()) - 1) / pc.all_players().size();
-                                    xpworth *= pow(0.9, n_killed);
-                                    if (n_killed > 15) {
+                                    xpworth *= pow(0.84, n_killed); // sum(0.84**i for i in range(25)) => ~6.17x the monsters xp value over time
+                                    if (n_killed > 25) {
                                         xpworth = 0;
                                     }
                                     int amnt = round(xpworth / pc.all_players().size());

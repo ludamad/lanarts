@@ -1,6 +1,6 @@
 Data.equipment_create {
     name = "Amulet of the Wall",
-    description = "Grants the user the spell 'Wallanthor'.",
+    description = "Grants the user the spell 'Wallanthor', and +1 defence.",
     type = "amulet",
 
     shop_cost = { 120, 140 },
@@ -8,7 +8,7 @@ Data.equipment_create {
     spr_item = "spr_amulets.blue",
     spells_granted = {"Wallanthor"},
 
-    --stat_bonuses = { mp = -25}
+    stat_bonuses = { defence = 1 }
 }
 
 Data.equipment_create {
@@ -26,13 +26,14 @@ Data.equipment_create {
 -- name = "Amulet of Festivity",
 Data.equipment_create {
     name = "Amulet of Fear",
-    description = "Grants the user the ability to instill the fear of death in enemies with a 'Fear Strike'.",
+    description = "Grants a 10% chance to scare enemies on every melee strike.",
     type = "amulet",
 
     shop_cost = { 120, 140 },
 
     spr_item = "spr_amulets.fear_strike",
-    spells_granted = {"Fear Strike"},
+    --spells_granted = {"Fear Strike"},
+    effects_granted = {"FearWeapon"}
 }
 
 Data.equipment_create {
@@ -49,30 +50,32 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Amulet of Trepidation",
-    description = "Grants the user the spell 'Trepidize'.",
+    description = "Grants the user the spell 'Trepidize', and +1 magic.",
     type = "amulet",
 
     shop_cost = { 120, 140},
 
     spr_item = "spr_amulets.skull",
     spells_granted = {"Trepidize"},
+    stat_bonuses = {magic = 1}
 }
 
 Data.equipment_create {
     name = "Amulet of Mephitization",
-    description = "Grants the user the spell 'Mephitize'.",
+    description = "Grants the user the spell 'Mephitize', and 25% chance of poison on melee attacks.",
     type = "amulet",
 
     shop_cost = { 120, 140 },
 
     spr_item = "spr_amulets.cabochon",
     spells_granted = {"Mephitize"},
+    effects_granted = {"PoisonedWeapon"}
 }
 
 Data.equipment_create {
     name = "Amulet of Regeneration",
 --    description = "Grants the user the spell 'Regeneration'.",--, but the user has -25HP.",
-    description = "The user gains +2HP/second.",--, but the user has -25HP.",
+    description = "Grants the user extra health regeneration.",--, but the user has -25HP.",
     type = "amulet",
 
     shop_cost = { 220, 340 },
@@ -85,13 +88,14 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Amulet of Greater Fire",
-    description = "Grants the user the spell 'Fireball'.",
+    description = "Grants the user the spell 'Fireball', and makes all projectile spells move faster.",
     type = "amulet",
 
     shop_cost = { 120, 140 },
 
     spr_item = "spr_amulets.greaterfireball",
     spells_granted = {"Fireball"},
+    stat_bonuses = {spell_velocity_multiplier = 1.15}
 }
 
 Data.equipment_create {
@@ -99,7 +103,7 @@ Data.equipment_create {
     description = "Grants the user the spell 'Fire Bolt'.",
     type = "amulet",
 
-    shop_cost = { 120, 140 },
+    shop_cost = { 70, 100 },
 
     spr_item = "spr_amulets.fireball",
     spells_granted = {"Fire Bolt"},
@@ -129,13 +133,14 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Amulet of Great Pain",
-    description = "Grants the user the spell 'Greater Pain'.",
+    description = "Grants the user the spell 'Greater Pain', and +1 willpower.",
     type = "amulet",
 
     shop_cost = { 120, 140 },
 
     spr_item = "spr_amulets.greaterpain",
-    spells_granted = {"Greater Pain"}
+    spells_granted = {"Greater Pain"},
+    stat_bonuses = {willpower = 1}
 }
 
 Data.equipment_create {
@@ -151,10 +156,10 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Amulet of Light",
-    description = "Grants the user the spell 'Luminos'.",
+    description = "Grants the user the potent crowd control spell 'Luminos'.",
     type = "amulet",
 
-    shop_cost = { 120, 140 },
+    shop_cost = { 320, 440 },
 
     spr_item = "spr_amulets.light",
     spells_granted = {"Luminos"}
@@ -162,18 +167,19 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Amulet of Pain",
-    description = "Grants the user the spell 'Pain'.",
+    description = "Grants the user the spell 'Pain' and +1 willpower.",
     type = "amulet",
 
     shop_cost = { 120, 140 },
 
     spr_item = "spr_amulets.pain",
-    spells_granted = {"Pain"}
+    spells_granted = {"Pain"},
+    stat_bonuses = {willpower = 1}
 }
 
 Data.equipment_create {
     name = "Amulet of Ringholding",
-    description = "Grants user ability to wear an additional ring.",
+    description = "Grants user the ability to wear an additional ring.",
     type = "amulet",
 
     shop_cost = { 120, 140 },

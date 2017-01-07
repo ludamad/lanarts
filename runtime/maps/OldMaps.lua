@@ -47,6 +47,7 @@ M.easy_enemies = {
   {enemy = "Skeleton",          chance = 100                                            },
   {enemy = "Chicken",           chance = 100                                            },
   {enemy = "Cloud Elemental",   chance = 100, group_chance = 33, group_size = 2           },
+  {enemy = "Mana Sapper",            chance = 20000000, group_size = 1                                             },
   {enemy = "Adder",         chance = 25                                            },
 }
   
@@ -87,11 +88,10 @@ M.hard_enemies = {
 
 M.harder_enemies = {
   {enemy = "Super Chicken",     chance = 50,  group_chance = 33, group_size = {2,4}       },
-  {enemy = "Ciribot",           chance = 100                                            },
-  {enemy = "Storm Elemental",   chance = 5,   group_chance = 100, group_size = 4          },
   {enemy = "Hell Storm",        chance = 20,  group_chance = 33, group_size = 3           },
   {enemy = "Golem",             guaranteed_spawns = 1, group_chance = 100, group_size = 2 },
   {enemy = "Jester",            chance = 20                                             },
+  {enemy = "Mana Sapper",            chance =5                                             },
   {enemy = "Hydra",             chance = 20                                             },
   {enemy = "Ogre Mage",         chance = 10, group_chance = 33, group_size = 2          }
 --  {enemy = "Unseen Horror",     chance = 10,  group_chance = 33, group_size = 2           }
@@ -239,7 +239,7 @@ M.Dungeon2 = {
       enemies = {
         wandering = false,
         amount = 7,
-        generated = M.medium_enemies 
+        generated = M.medium_enemies
       }
     }
   },
@@ -250,10 +250,7 @@ M.Dungeon2 = {
       enemies = {
         wandering = false,
         amount = 7,
-        generated = {
-          {enemy = "Giant Spider",   chance = 100 },
-          {enemy = "Cloud Elemental",   chance = 100 }
-        }
+        generated = M.medium_enemies
       }
     }
   },
@@ -275,7 +272,7 @@ M.Dungeon3 = {
     content = {
       items = { amount = 5,  group = ItemGroups.basic_items   },
       enemies = {
-        amount = {15,19},
+        amount = {12,14},
         generated = M.mediumhard_enemies
       }
     }
@@ -284,7 +281,7 @@ M.Dungeon3 = {
     content = {
       items = { amount = 8,  group = ItemGroups.basic_items   },
       enemies = {
-        amount = {17,20},
+        amount = {13,15},
         generated = M.mediumhard_enemies
       }
     }
@@ -293,35 +290,35 @@ M.Dungeon3 = {
     content = {
       items = { amount = 4,  group = ItemGroups.enchanted_items   },
       enemies = {
-        amount = 20,
+        amount = {13, 15},
         generated = table.tconcat(M.mediumhard_enemies, {{enemy = "Hell Warrior", guaranteed_spawns = 1}})
       }
     }
   }
 }
 M.Dungeon4 = {
-  -- Level 6
-  { layout = {small_layout1},
-    dont_scale_enemies = true,
-    content = {
-      items = { amount = 8, group = table.tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
-      enemies = {
-        amount = {14,16},
-        generated = M.medium_enemies
-      }
-    }
-  },
-  -- Level 7
-  { layout = medium_layouts,
-    dont_scale_enemies = true,
-    content = {
-      items = { amount = 10, group = ItemGroups.enchanted_items   },
-      enemies = {
-        amount = {18,22},
-        generated = M.hard_enemies,
-      }
-    }
-  },
+--  -- Level 6
+--  { layout = {small_layout1},
+--    dont_scale_enemies = true,
+--    content = {
+--      items = { amount = 8, group = table.tconcat(ItemGroups.basic_items, ItemGroups.enchanted_items)   },
+--      enemies = {
+--        amount = {14,16},
+--        generated = M.medium_enemies
+--      }
+--    }
+--  },
+--  -- Level 7
+--  { layout = medium_layouts,
+--    dont_scale_enemies = true,
+--    content = {
+--      items = { amount = 10, group = ItemGroups.enchanted_items   },
+--      enemies = {
+--        amount = {18,22},
+--        generated = M.hard_enemies,
+--      }
+--    }
+--  },
   -- Level 8
   { layout = large_layouts,
     dont_scale_enemies = true,
@@ -329,7 +326,7 @@ M.Dungeon4 = {
       items = { amount = 10, group = ItemGroups.enchanted_items   },
       enemies = {
         amount = 22,
-        generated = M.hard_enemies
+        generated = M.harder_enemies
       }
     }
   
@@ -352,7 +349,7 @@ M.Dungeon4 = {
       items = { amount = 12,  group = ItemGroups.enchanted_items   },
       enemies = {
         amount = 30,
-        generated = table.tconcat(M.harder_enemies, {{enemy = "Zin", guaranteed_spawns = 1}, {enemy = "Hell Forged", guaranteed_spawns = 1}})
+        generated = table.tconcat(M.harder_enemies, {{enemy = "Pixulloch", guaranteed_spawns = 1}, {enemy = "Hell Forged", guaranteed_spawns = 1}})
       }
     }
   }

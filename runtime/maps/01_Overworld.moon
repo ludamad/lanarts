@@ -57,34 +57,29 @@ OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE = 300, 300
 
 OVERWORLD_CONF = (rng) -> 
     type = rng\random_choice {
-        --{
-        --    number_regions: rng\random(25, 30)
-        --    region_delta_func: ring_region_delta_func
-        --    room_radius: () ->
-        --        r = 7
-        --        bound = rng\random(1,20)
-        --        for j=1,rng\random(0,bound) do r += rng\randomf(0, 1)
-        --        return r
-        --}
+        {
+            number_regions: rng\random(25, 30)
+            region_delta_func: ring_region_delta_func
+            room_radius: () ->
+                r = 7
+                bound = rng\random(1,20)
+                for j=1,rng\random(0,bound) do r += rng\randomf(0, 1)
+                return r
+        }
         {
             number_regions: 4
             arc_chance: 1
             region_delta_func: spread_region_delta_func --center_region_delta_func
             room_radius: () ->
-                r = 10
-                bound = rng\random(1,20)
-                for j=1,rng\random(0,bound) do r += rng\randomf(0, 1)
-                return r
+                return rng\random(10, 20)
         }
-        --{
-        --    number_regions: rng\random(45, 50)
-        --    region_delta_func: spread_region_delta_func
-        --    room_radius: () ->
-        --        r = 2
-        --        bound = rng\random(1,20)
-        --        for j=1,rng\random(0,bound) do r += rng\randomf(0, 1)
-        --        return r
-        --}
+        {
+            number_regions: rng\random(15, 22)
+            region_delta_func: ring_region_delta_func
+            arc_chance: 1
+            room_radius: () ->
+                return rng\random(5, 10)
+        }
     }
     return {
         map_label: "Plain Valley"
@@ -550,14 +545,14 @@ overworld_features = (map) ->
                 --if not place_feature(map, vault, (r) -> true)
                 --    return nil
                 ------------------------- 
-            ---- Ensure connectivity because we messed with dungeon features:
-            --if not SourceMap.area_fully_connected {
-            --    :map, 
-            --    unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
-            --    mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
-            --    marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
-            --}
-            --    return nil
+                -- Ensure connectivity because we messed with dungeon features:
+                if not SourceMap.area_fully_connected {
+                    :map, 
+                    unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
+                    mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
+                    marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
+                }
+                    return nil
             return true
         -------------------------------------------------
         door_placer = (map, xy) ->
@@ -747,8 +742,8 @@ overworld_features = (map) ->
                 }
                     return nil
             return true
-        tileset = TileSets.snake
-        dungeon = {label: 'Zin\'s Palace', :tileset, templates: OldMaps.Dungeon4, spawn_portal: safe_portal_spawner(tileset), on_generate: on_generate_dungeon, 
+        tileset = TileSets.pixulloch
+        dungeon = {label: 'Pixullochia', :tileset, templates: OldMaps.Dungeon4, spawn_portal: safe_portal_spawner(tileset), on_generate: on_generate_dungeon, 
             post_generate: (game_map, floor) ->
                 if floor == 1
                     HiveSeq\slot_resolve(1, game_map)
@@ -760,7 +755,7 @@ overworld_features = (map) ->
             enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
             MapUtils.spawn_enemy(map, enemy, xy)
         place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq4, dungeon)
-        vault = SourceMap.area_template_create(Vaults.skull_surrounded_dungeon {dungeon_placer: place_dungeon, :enemy_placer, :door_placer, :tileset})
+        vault = SourceMap.area_template_create(Vaults.skull_surrounded_dungeon {dungeon_placer: place_dungeon, :enemy_placer, :door_placer, :tileset, player_spawn_area: false})
         if not place_feature(map, vault, (r) -> not r.conf.is_overworld)
             return true
     if place_hard() then return nil
@@ -904,11 +899,14 @@ overworld_create = () ->
    --             return if floor == dungeon.N_FLOORS then 0 else 3
    --     }
    -- do return test_create(0)
+    local conf, schema
     NewMaps.map_create (rng) -> 
-        conf = OVERWORLD_CONF(rng)
+        conf or= OVERWORLD_CONF(rng)
+        schema or= rng\random(3)
+        dungeon_tileset = ({TileSets.snake, TileSets.lair, TileSets.pebble})[schema + 1]
         return {
             map_label: "Plain Valley"
-            subtemplates: {DUNGEON_CONF(rng), conf}
+            subtemplates: {DUNGEON_CONF(rng, dungeon_tileset, schema), conf}
             w: OVERWORLD_DIM_LESS, h: OVERWORLD_DIM_MORE
             seethrough: true
             outer_conf: conf

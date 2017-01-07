@@ -145,7 +145,7 @@ armour = (chance, args) -> _filter {
     args.ignore_medium or { item: "Robe of Mana",       chance: 4                      }
 
     args.ignore_strong or { item: "Platemail",          chance: 2                      }
-    args.ignore_strong or { item: "Crystal Armour",          chance: 1                      }
+    args.ignore_strong or { item: "Crystalline Plate",          chance: 1                      }
     args.ignore_strong or { item: "Runed Robe",         chance: 1                      }
 }
 
@@ -275,6 +275,9 @@ for i=1,Randarts.MAX_POWER_LEVEL
         amulet: {chance: 12}
         boots: {chance: 1}
         helmet: {chance: 3}
+        "short blades": {chance: 1}
+        "staves": {chance: 1}
+        "axes and maces": {chance: 1}
         armour: {chance: 5}
         bows: {chance: 5}
         gloves: {chance: 5}
@@ -283,8 +286,8 @@ for i=1,Randarts.MAX_POWER_LEVEL
         {:type} = items[name]
         if not item_table[type]
             pretty(items[name])
-            print "*** SHOULD HAVE '" .. type .. "' IN ITEM TABLE"
-            continue
+            error("*** SHOULD HAVE '" .. type .. "' IN ITEM TABLE")
+            -- continue
         append item_table[type], name
     append M.randart_items, item_table
 

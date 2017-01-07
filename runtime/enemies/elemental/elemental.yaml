@@ -62,5 +62,5 @@ enemies:
         hpregen: 0.01
         strength: 45
         magic: 45
-        defence: 8
-        willpower: 10
+        defence: 25
+        willpower: 25

@@ -18,3 +18,5 @@ runtime/compiled/Resources.lua
 stdout.txt
 stderr.txt
 build/
+build_debug/
+build_release/

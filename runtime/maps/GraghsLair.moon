@@ -39,6 +39,16 @@ M = nilprotect {} -- Module
 
 floor_plans = (rng) ->
     tileset = TileSets.lair
+    {:number_regions, :room_radius}= rng\random_choice {
+        {
+            number_regions: 5
+            room_radius: () -> rng\random(5, 10)
+        }
+        {
+            number_regions: 1
+            room_radius: () -> 25
+        }
+    }
     raw_plans = {
         [1]: {
             wandering_enabled: false
@@ -54,9 +64,9 @@ floor_plans = (rng) ->
                 {enemy: "Gragh", guaranteed_spawns: 1}
                 {enemy: "Elephant", guaranteed_spawns: 4}
             }
-            item_groups: {{ItemGroups.basic_items, 4}}
-            number_regions: 1
-            room_radius: () -> 25
+            item_groups: {{ItemGroups.enchanted_items, 4}}
+            :number_regions
+            :room_radius
             rect_room_num_range: {0, 0}
             rect_room_size_range: {1, 1}
             n_statues: 4

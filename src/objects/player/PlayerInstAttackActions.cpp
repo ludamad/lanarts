@@ -680,7 +680,7 @@ bool PlayerInst::melee_attack(GameState* gs, CombatGameInst* e,
         char buffstr[32];
         double xpworth = ((EnemyInst*)e)->xpworth();
         double n_killed = (pc.n_enemy_killed(((EnemyInst*) e)->enemy_type()) - 1) / pc.all_players().size();
-        xpworth *= pow(0.9, n_killed);
+        xpworth *= pow(0.84, n_killed); // sum(0.84**i for i in range(25)) => ~6.17x the monsters xp value over time
         if (n_killed > 25) {
             xpworth = 0;
         }

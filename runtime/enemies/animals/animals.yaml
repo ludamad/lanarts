@@ -33,13 +33,29 @@ enemies:
         strength: 10
         defence: 5
         willpower: 5
-        
-  - name: Giant Spider
-    sprite: giant spider
-    death_sprite: blood
+ 
+  - name: Tarantella
+    sprite: spr_enemies.animals.tarantella
+    death_sprite: green blood
     radius: 14
     xpaward: 10
-    appear_message: A giant spider crawls towards you
+    appear_message: A demonic tarantella crawls towards you!
+    defeat_message: The demonic tarantella has been squashed.
+    stats:
+        attacks: [ {weapon: Fast Melee} ]
+        hp: 65
+        hpregen: 0.04
+        movespeed: 4.5
+        strength: 25
+        defence: 12
+        willpower: 10
+ 
+  - name: Giant Spider
+    sprite: giant spider
+    death_sprite: green blood
+    radius: 14
+    xpaward: 10
+    appear_message: A giant spider crawls towards you!
     defeat_message: The giant spider has been squashed.
     stats:
         attacks: [ {weapon: Fast Melee} ]
