@@ -40,6 +40,7 @@ local function colfmt(str, ...)
 end
 
 local LUAFILE_PATTERN = "%w+/[^%.]*%.lua"
+local MOONFILE_PATTERN = "%w+/[^%.]*%.moon"
 local ROOTFILE_PATTERN = "%w+%.lua"
 local LUAMODULE_PATTERN = "[%.%w_]+%.%u%w*"
 
@@ -55,6 +56,7 @@ local M -- Forward declare for inner functions
 M = {
     filter_patterns = {
 --        -- Lines to delete starting with this line and going up
+        ["moon:"] = 1, -- Filter moonscript's addition to the traceback
         ["stack traceback:"] = 1,
         [".*ErrorReporting%.lua"] = 1,
 --        [modulestart "GlobalVariableLoader%.lua:.*'__index'"] = 1,
@@ -158,6 +160,7 @@ local function resolve_changes(stacktrace, i)
     local s = stacktrace[i]
     s = s:gsub('[%<%>]', '')
     s = s:gsub('('..LUAFILE_PATTERN .. "):(%d+)", path_conv)
+    s = s:gsub('('..MOONFILE_PATTERN .. "):(%d+)", path_conv)
     s = s:gsub('('..ROOTFILE_PATTERN .. "):(%d+)", path_conv)
     if #converted > 0 then
         s = s .. ' ' .. converted[1]
@@ -219,7 +222,7 @@ local debug_traceback = debug.traceback -- Stash & wrap the current debug.traceb
 -- Improve the traceback in various ways, including adding color and reducing noise:
 function M.traceback(--[[Optional]] str)
     local traceback = debug_traceback()
-    print(traceback)
+    traceback = require("moonscript.errors").rewrite_traceback(traceback, "")
     local stacktrace = traceback:split('\n')
     local i = 1
     while i <= #stacktrace do
