@@ -55,30 +55,58 @@ OVERWORLD_TILESET = create_overworld_scheme(TileSets.grass)
 
 OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE = 300, 300
 
-OVERWORLD_CONF = (rng) -> {
-    map_label: "Plain Valley"
-    is_overworld: true
-    size: if rng\random(0,2) == 0 then {85, 105} else {85, 105} 
-    number_regions: rng\random(25,30)
-    floor1: OVERWORLD_TILESET.floor1 
-    floor2: OVERWORLD_TILESET.floor2
-    wall1: OVERWORLD_TILESET.wall1
-    wall2: OVERWORLD_TILESET.wall2
-    rect_room_num_range: {0,0}
-    rect_room_size_range: {10,15}
-    rvo_iterations: 150
-    n_stairs_down: 0
-    n_stairs_up: 0
-    connect_line_width: () -> rng\random(2,6)
-    region_delta_func: ring_region_delta_func
-    room_radius: () ->
-        r = 7
-        bound = rng\random(1,20)
-        for j=1,rng\random(0,bound) do r += rng\randomf(0, 1)
-        return r
-    -- Dungeon objects/features
-    n_statues: 4
-}
+OVERWORLD_CONF = (rng) -> 
+    type = rng\random_choice {
+        --{
+        --    number_regions: rng\random(25, 30)
+        --    region_delta_func: ring_region_delta_func
+        --    room_radius: () ->
+        --        r = 7
+        --        bound = rng\random(1,20)
+        --        for j=1,rng\random(0,bound) do r += rng\randomf(0, 1)
+        --        return r
+        --}
+        {
+            number_regions: 4
+            arc_chance: 1
+            region_delta_func: spread_region_delta_func --center_region_delta_func
+            room_radius: () ->
+                r = 10
+                bound = rng\random(1,20)
+                for j=1,rng\random(0,bound) do r += rng\randomf(0, 1)
+                return r
+        }
+        --{
+        --    number_regions: rng\random(45, 50)
+        --    region_delta_func: spread_region_delta_func
+        --    room_radius: () ->
+        --        r = 2
+        --        bound = rng\random(1,20)
+        --        for j=1,rng\random(0,bound) do r += rng\randomf(0, 1)
+        --        return r
+        --}
+    }
+    return {
+        map_label: "Plain Valley"
+        is_overworld: true
+        size: if rng\random(0,2) == 0 then {85, 105} else {85, 105} 
+        number_regions: type.number_regions
+        floor1: OVERWORLD_TILESET.floor1 
+        floor2: OVERWORLD_TILESET.floor2
+        wall1: OVERWORLD_TILESET.wall1
+        wall2: OVERWORLD_TILESET.wall2
+        rect_room_num_range: {0,0}
+        rect_room_size_range: {10,15}
+        rvo_iterations: 150
+        n_stairs_down: 0
+        n_stairs_up: 0
+        connect_line_width: () -> rng\random(2,6)
+        region_delta_func: type.region_delta_func
+        arc_chance: type.arc_chance or 0
+        room_radius: type.room_radius 
+        -- Dungeon objects/features
+        n_statues: 4
+    }
 
 DUNGEON_CONF = (rng, tileset = TileSets.pebble, schema = 1) -> 
     C = create_dungeon_scheme(tileset)
@@ -301,15 +329,14 @@ M.hive_create = (MapSeq) ->
             return if floor == dungeon.N_FLOORS then 0 else 3
     }
 
-M.place_hive = (map) ->
-    MapSeq = MapSequence.create {preallocate: 1}
+M.place_hive = (map, MapSeq) ->
     door_placer = (map, xy) ->
         -- nil is passed for the default open sprite
         MapUtils.spawn_door(map, xy, nil, Vaults._door_key1, "Azurite Key")
     next_dungeon = {1}
     place_dungeon = (map, xy) ->
         portal = MapUtils.spawn_portal(map, xy, "spr_gates.enter_lair")
-        c = (MapSeq\forward_portal_add 1, portal, next_dungeon[1], hive_create)
+        c = (MapSeq\forward_portal_add 1, portal, next_dungeon[1], () -> M.hive_create(MapSeq))
         if World.player_amount > 1
             c()
         next_dungeon[1] += 1
@@ -705,13 +732,27 @@ overworld_features = (map) ->
     ------------------------- 
     -- Place hard dungeon: --
     place_hard = () ->
+        -- For Hive:
+        HiveSeq = MapSequence.create {preallocate: 1}
         on_generate_dungeon = (map, floor) ->
             if floor == 1
-                if not M.place_hive(map) 
+                if not M.place_hive(map, HiveSeq) 
+                    return nil
+                -- Ensure connectivity because we messed with dungeon features:
+                if not SourceMap.area_fully_connected {
+                    :map, 
+                    unfilled_selector: {matches_none: {SourceMap.FLAG_SOLID}}
+                    mark_operator: {add: {SourceMap.FLAG_RESERVED2}}
+                    marked_selector: {matches_all: {SourceMap.FLAG_RESERVED2}}
+                }
                     return nil
             return true
         tileset = TileSets.snake
-        dungeon = {label: 'Zin\'s Palace', :tileset, templates: OldMaps.Dungeon4, spawn_portal: safe_portal_spawner(tileset), on_generate: on_generate_dungeon}
+        dungeon = {label: 'Zin\'s Palace', :tileset, templates: OldMaps.Dungeon4, spawn_portal: safe_portal_spawner(tileset), on_generate: on_generate_dungeon, 
+            post_generate: (game_map, floor) ->
+                if floor == 1
+                    HiveSeq\slot_resolve(1, game_map)
+        }
         door_placer = (map, xy) ->
             -- nil is passed for the default open sprite
             MapUtils.spawn_door(map, xy, nil, Vaults._door_key2, "Dandelite Key")
@@ -863,33 +904,36 @@ overworld_create = () ->
    --             return if floor == dungeon.N_FLOORS then 0 else 3
    --     }
    -- do return test_create(0)
-    NewMaps.map_create (rng) -> {
-        map_label: "Plain Valley"
-        subtemplates: {DUNGEON_CONF(rng), OVERWORLD_CONF(rng)}
-        w: OVERWORLD_DIM_LESS, h: OVERWORLD_DIM_MORE
-        seethrough: true
-        outer_conf: OVERWORLD_CONF(rng)
-        shell: 50
-        default_wall: Tile.create(TileSets.grass.wall, true, true, {FLAG_OVERWORLD})
-        post_poned: {}
-        wandering_enabled: true
-        on_create_source_map: (map) =>
-            post_creation_callback = overworld_features(map)
-            if not post_creation_callback
-                return nil
-            append @post_poned, post_creation_callback
-            NewMaps.generate_door_candidates(map, rng, map.regions)
-            overworld_spawns(map)
-            @player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
-            if not @player_spawn_points
-                return nil
-            return true
-        on_create_game_map: (game_map) =>
-            for f in *@post_poned
-                f(game_map)
-            World.players_spawn(game_map, @player_spawn_points)
-            Map.set_vision_radius(game_map, OVERWORLD_VISION_RADIUS)
-    }
+    NewMaps.map_create (rng) -> 
+        conf = OVERWORLD_CONF(rng)
+        return {
+            map_label: "Plain Valley"
+            subtemplates: {DUNGEON_CONF(rng), conf}
+            w: OVERWORLD_DIM_LESS, h: OVERWORLD_DIM_MORE
+            seethrough: true
+            outer_conf: conf
+            shell: 50
+            arc_chance: conf.arc_chance
+            default_wall: Tile.create(TileSets.grass.wall, true, true, {FLAG_OVERWORLD})
+            post_poned: {}
+            wandering_enabled: true
+            on_create_source_map: (map) =>
+                post_creation_callback = overworld_features(map)
+                if not post_creation_callback
+                    return nil
+                append @post_poned, post_creation_callback
+                NewMaps.generate_door_candidates(map, rng, map.regions)
+                overworld_spawns(map)
+                @player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
+                if not @player_spawn_points
+                    return nil
+                return true
+            on_create_game_map: (game_map) =>
+                for f in *@post_poned
+                    f(game_map)
+                World.players_spawn(game_map, @player_spawn_points)
+                Map.set_vision_radius(game_map, OVERWORLD_VISION_RADIUS)
+        }
 
 return {
     :overworld_create

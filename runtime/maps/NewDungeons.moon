@@ -141,6 +141,17 @@ M.make_dungeon_template = (data) -> table.merge {
                 map\square_apply(sqr, {add: {SourceMap.FLAG_SOLID, SourceMap.FLAG_HAS_OBJECT}, remove: SourceMap.FLAG_SEETHROUGH})
                 MapUtils.spawn_decoration(map, OldMaps.statue, sqr, random(0,17))
         return true
+    _spawn_healing_squares: (map) =>
+        conf = data.subtemplates[1]
+        for i=1,conf.n_healing_squares or 0
+            region = random_choice(map.regions)
+            area = region\bbox()
+            sqr = MapUtils.random_square(map, area, {matches_none: {FLAG_INNER_PERIMETER, SourceMap.FLAG_HAS_OBJECT, Vaults.FLAG_HAS_VAULT, SourceMap.FLAG_SOLID}})
+            if not sqr
+                break
+            map\square_apply(sqr, {add: {SourceMap.FLAG_HAS_OBJECT}, remove: SourceMap.FLAG_SEETHROUGH})
+            MapUtils.spawn_healing_square(map, sqr)
+        return true
     _create_encounter_rooms: (map) =>
         default_config =  @_default_vault_config {door_sprite: M._runed_door_sprite, door_key: "dummykey"}
         for i =1,@_n_encounter_vaults()
@@ -161,8 +172,11 @@ M.make_dungeon_template = (data) -> table.merge {
 M.make_connector = (types) ->
     placed_portals = {}
     on_generate = types.on_generate
+    on_finish = types.on_generate
     types.on_generate = nil
+    types.on_finish = nil
     for k,type in pairs(types)
+        pretty(k, type)
         assert(type.n_portals and type.sprite and type.connect, "Malformed connector type!")
         placed_portals[k] = {} -- list
     return {
@@ -188,8 +202,8 @@ M.make_connector = (types) ->
             for k, type in pairs(types)
                 assert(placed_portals[k], "No portals for " .. k .. "!")
                 type.connect(placed_portals[k])
-            if types.on_finish
-                types.on_finish(game_map)
+            if on_finish
+                on_finish(game_map)
     }
 
 M.make_linear_dungeon = (args) ->
@@ -207,6 +221,9 @@ M.make_linear_dungeon = (args) ->
     make_connector = (floor) -> M.make_connector {
         on_generate: (map) -> 
             args.on_generate(map, floor)
+        on_finish: (game_map) ->
+            if args.on_finish
+                args.on_finish(game_map, floor)
         up: {
             n_portals: args.portals_up(floor) 
             sprite: args.sprite_up(floor)

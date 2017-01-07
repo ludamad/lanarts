@@ -354,7 +354,7 @@ local Luminos = {
     can_cast_with_cooldown = false,
     mp_cost = 0,
     cooldown = 25,
-    spell_cooldown = 100,
+    spell_cooldown = 1600,
     fallback_to_melee = false,
     range = 80
 }
@@ -577,7 +577,7 @@ local Wallanthor = {
     can_cast_with_cooldown = false,
     mp_cost = 10,
     cooldown = 25,
-    spell_cooldown = 100,
+    spell_cooldown = 400,
     fallback_to_melee = false,
 }
 

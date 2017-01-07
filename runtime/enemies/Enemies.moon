@@ -422,6 +422,9 @@ Data.enemy_create {
     }
     death_func: () =>
         ObjectUtils.spawn_item_near(@, "Red Dragonplate", 1)
+        -- Spawn a level 1 randart:
+        item = ItemUtils.item_generate ItemGroups.basic_items, false, 1, 100
+        ObjectUtils.spawn_item_near(@, item.type, 1)
 }
 
 Data.enemy_create {
@@ -470,6 +473,12 @@ Data.enemy_create {
                 @n_steps = 0
             else 
                 @n_steps += 1
+    death_func: () =>
+        ItemUtils = require "maps.ItemUtils"
+        ItemGroups = require "maps.ItemGroups"
+        -- Spawn a level 1 randart:
+        item = ItemUtils.item_generate ItemGroups.basic_items, false, 1, 100
+        ObjectUtils.spawn_item_near(@, item.type, 1)
 }
 
 Data.enemy_create {
@@ -491,6 +500,12 @@ Data.enemy_create {
         willpower: 8
     }
     death_func: () =>
+        ItemUtils = require "maps.ItemUtils"
+        ItemGroups = require "maps.ItemGroups"
+        -- Spawn 2 level 1 randarts:
+        for i=1,2
+            item = ItemUtils.item_generate ItemGroups.basic_items, false, 1, 100
+            ObjectUtils.spawn_item_near(@, item.type, 1)
         item = random_choice {"Gragh's Club"}
         ObjectUtils.spawn_item_near(@, item, 1)
     effects_active: {"Enraging"}
@@ -520,6 +535,7 @@ Data.enemy_create {
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
         ItemGroups = require "maps.ItemGroups"
+        -- Spawn 1 level 2 randart:
         for i=1,2
             item = ItemUtils.item_generate ItemGroups.basic_items, false, 2, 100
             ObjectUtils.spawn_item_near(@, item.type, 1)

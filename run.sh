@@ -101,10 +101,21 @@ if [[ -e /proc/cpuinfo ]] ; then
 else
     cores=4 # Guess -- may want to manually edit if above fails.
 fi
-
+# Helper for managing build directories: 
+function rm_if_link(){ [ ! -L "$1" ] || rm -f "$1"; }
 function build_lanarts(){
-    mkdir -p build
-    cd build
+    BUILD_DIR="build_debug"
+    if [ $BUILD_OPTIMIZE ] ; then
+        BUILD_DIR="build_release"
+    fi
+    rm_if_link build
+    if [ -d build ] ; then
+        echo "You have a non-symlink build directory. Lanarts has moved to symlinking 'build' to 'build_release' or 'build_debug'. Please rename the build directory to the appropriate one of those." >&2
+        exit 1
+    fi
+    mkdir -p $BUILD_DIR
+    ln -s $BUILD_DIR build 
+    cd $BUILD_DIR
     cmake .. | colorify '1;33'
     if handle_flag "--clean" ; then
         make clean

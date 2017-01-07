@@ -20,12 +20,12 @@ get_name_and_description = (rng, artifact, power_level) ->
         {"Okawaru", "A #{lower} gifted by Okawaru to an epic warrior."}
         {"Trog", "A #{lower} gifted by Trog upon the scene of 100 deaths."}
         {"Gilnug", "A #{lower} created in communion with the fight gods."}
-        {"Gragh", "A #{lower} crafted by sheer coincidence."}
-        {"Meeplod", "A #{lower} crafted by sheer coincidence."}
-        {"Nik", "A #{lower} crafted by sheer coincidence."}
-        {"Orlov", "A #{lower} crafted by sheer coincidence."}
-        {"Doogal", "A #{lower} crafted by sheer coincidence."}
-        {"Stara", "A #{lower} crafted by sheer coincidence."}
+        {"Gragh", "A #{lower} crafted with brutish determination."}
+        {"Meeplod", "A #{lower} crafted over supernaturally hot fire."}
+        {"Nik", "A #{lower} crafted by a dice roll."}
+        {"Orlov", "A #{lower} crafted by great strength."}
+        {"Doogal", "A #{lower} crafted by enchanting magic."}
+        {"Stara", "A #{lower} crafted by terrible sacrifice."}
         {"Hopkin", "A #{lower} crafted by sheer coincidence."}
         {"Denter", "A #{lower} crafted by sheer coincidence."}
         {"Lomen", "A #{lower} crafted by sheer coincidence."}

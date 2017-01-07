@@ -76,11 +76,11 @@ function Door:on_step()
         is_open = true
     else 
         local collisions = Map.rectangle_collision_check(self.map, self.area, self)
-        for object in values(collisions) do
-            if not needs_key and object.team then -- TODO proper combat object detection
+        for _, object in ipairs(collisions) do
+            if not needs_key and (object.is_enemy ~= nil) then
                 is_open = true
                 break
-            elseif needs_key and object.class_name and (GlobalData.keys_picked_up[self.required_key] or settings.invincible) then -- TODO proper player object detection
+            elseif needs_key and (object.is_enemy == false) and (GlobalData.keys_picked_up[self.required_key] or settings.invincible) then
                 is_open = true
                 break
             end

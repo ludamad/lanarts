@@ -235,7 +235,7 @@ Data.effect_create {
                 continue
             dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
             if dist < @range
-                mon\add_effect("Dazed", 200)
+                mon\add_effect("Dazed", 100)
     draw_func: (caster, top_left_x, top_left_y) =>
         AuraBase.draw(@, COL_PALE_YELLOW, COL_YELLOW, caster.x, caster.y)
 }
@@ -375,6 +375,12 @@ Data.effect_create {
         if chance(.1)
             eff = defender\add_effect("Dazed", 100)
         return damage
+}
+
+Data.effect_create {
+    name: "Encumbered"
+    stat_func: (obj, old, new) =>
+        new.speed -= 1
 }
 
 Data.effect_create {

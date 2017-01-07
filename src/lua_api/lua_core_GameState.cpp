@@ -10,6 +10,7 @@
 #include <luawrap/functions.h>
 #include <luawrap/members.h>
 #include <luawrap/types.h>
+#include <fstream>
 
 #include <SDL.h>
 
@@ -34,6 +35,11 @@ static int game_score_board_store(lua_State* L) {
 }
 
 static void game_load(LuaStackValue filename) {
+        // std::ifstream file(filename, std::ios::binary | std::ios::ate);
+        // std::streamsize size = file.tellg();
+        // file.seekg(0, std::ios::beg);
+        // std::vector<char> buffer(size);
+        // file.read(buffer.data(), size);
 	FILE* file = fopen(filename.as<const char*>(), "rb");
 	SerializeBuffer sb(file, SerializeBuffer::INPUT);
 	lua_api::gamestate(filename)->deserialize(sb);

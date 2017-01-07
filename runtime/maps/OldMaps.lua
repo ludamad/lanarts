@@ -72,7 +72,6 @@ M.mediumhard_enemies = table.merge(M.medium_animals, {
   {enemy = "Chicken",           chance = 50                                             },
 --  {enemy = "Unseen Horror",     chance = 5                                             },
   {enemy = "Dark Centaur",      chance = 10                                             },
-  {enemy = "Elephant",           chance = 25                                              },
 })
   
 M.hard_enemies = {

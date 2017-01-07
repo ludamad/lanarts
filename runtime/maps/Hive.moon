@@ -58,6 +58,7 @@ floor_plans = (rng) ->
             rect_room_num_range: {0, 0}
             rect_room_size_range: {1, 1}
             n_statues: 4
+            n_healing_squares: 1
         }
         -- [1] is repeated in [2] below
         [2]: false
@@ -80,6 +81,7 @@ floor_plans = (rng) ->
             rect_room_num_range: {0, 0}
             rect_room_size_range: {1, 1}
             n_statues: 4
+            n_healing_squares: 1
         }
     }
     raw_plans[2] = raw_plans[1]
@@ -94,7 +96,7 @@ M.TEMPLATE  = (rng, floor, connector) ->
     subtemplates = for i=1,plan.n_subareas
         floor_plans(rng)[floor]
     return NewDungeons.make_dungeon_template {
-        map_label: "Hive " .. floor
+        map_label: "Hell Hive " .. floor
         tileset: TileSets.lair
         :subtemplates
         :connector
@@ -149,9 +151,6 @@ M.TEMPLATE  = (rng, floor, connector) ->
             if not @_create_stairs_up(map)
                 print("ABORT: stairs up")
                 return nil
-            if not @_create_stairs_down(map)
-                print("ABORT: stairs down")
-                return nil
             if not @_create_encounter_rooms(map)
                 print("ABORT: stairs encounter")
                 return nil
@@ -161,11 +160,17 @@ M.TEMPLATE  = (rng, floor, connector) ->
             if not @_spawn_statues(map)
                 print("ABORT: statues")
                 return nil
+            if not @_spawn_healing_squares(map)
+                print("ABORT: healing squares")
+                return nil
             if not @_spawn_items(map)
                 print("ABORT: items")
                 return nil
             if not @_spawn_enemies(map)
                 print("ABORT: enemies")
+                return nil
+            if not @_create_stairs_down(map)
+                print("ABORT: stairs down")
                 return nil
             NewMaps.generate_door_candidates(map, rng, map.regions)
             if #map.player_candidate_squares > 0

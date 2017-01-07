@@ -14,7 +14,7 @@ M.SpellWall = LuaGameObject.type_create()
 
 SPELL_WALL_RADIUS = 15
 SPELL_WALL_DEPTH = 100
-SPELL_WALL_DURATION = 100
+SPELL_WALL_DURATION = 150
 
 M.SpellWall.try_solidify = () =>
     tile_xy = ObjectUtils.tile_xy(@, true)

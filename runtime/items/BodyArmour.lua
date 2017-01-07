@@ -32,20 +32,23 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Crystal Armour",
-    description = "A strong, heavy armour.",
+    description = "A very heavy armour. Slows down movement speed.",
     type = "armour",
 
-    randart_sprite = {"spr_armour.randart_plate"},
-    shop_cost = {95,105},
+    randart_sprite = {"spr_armour.crystal_plate3"},
+    shop_cost = {295,305},
 
-    spr_item = "platemail",
+    spr_item = "spr_armour.crystal_plate2",
 
-    spell_cooldown_multiplier = 1.35,
+    spell_cooldown_multiplier = 1.65,
 
-    ranged_cooldown_multiplier = 1.35,
+    ranged_cooldown_multiplier = 1.65,
 
-    reduction = {base = 2},
-    resistance = {base = 2}
+    reduction = {base = 3},
+    resistance = {base = 3},
+    magic_reduction = {base = 1},
+    magic_resistance = {base = 1},
+    effects_granted = {"Encumbered"}
 }
 
 Data.equipment_create {

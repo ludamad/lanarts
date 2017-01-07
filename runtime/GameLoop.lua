@@ -100,9 +100,11 @@ function M.run_loop()
     while true do 
         local single_player = (settings.connection_type == Network.NONE)
     
-        if Keys.key_pressed(Keys.F2) and single_player then 
-            GameState.resources_load()
-        end
+        -- TODO fix hotloading
+        -- Crashes with unknown effects
+        -- if Keys.key_pressed(Keys.F2) and single_player then 
+        --     GameState.resources_load()
+        -- end
     
         if Keys.key_pressed(Keys.F4) then 
             M.loop_control.game_is_paused = not M.loop_control.game_is_paused

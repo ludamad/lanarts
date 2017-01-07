@@ -71,14 +71,16 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Amulet of Regeneration",
-    description = "Grants the user the spell 'Regeneration'.",--, but the user has -25HP.",
+--    description = "Grants the user the spell 'Regeneration'.",--, but the user has -25HP.",
+    description = "The user gains +2HP/second.",--, but the user has -25HP.",
     type = "amulet",
 
-    shop_cost = { 120, 140 },
+    shop_cost = { 220, 340 },
 --    stat_bonuses = { hp = -25},
 
     spr_item = "spr_amulets.regeneration",
-    spells_granted = {"Regeneration"},
+    stat_bonuses = {hpregen = 2 / 60},
+    --spells_granted = {"Regeneration"},
 }
 
 Data.equipment_create {
@@ -108,9 +110,9 @@ Data.equipment_create {
     description = "Grants the user increased defences against magical attacks.",
     type = "amulet",
 
-    shop_cost = { 120, 140 },
+    shop_cost = { 180, 240 },
 
-    stat_bonuses = { willpower = 2 },
+    stat_bonuses = { willpower = 4 },
     spr_item = "spr_amulets.protect",
 }
 

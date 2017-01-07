@@ -33,7 +33,7 @@ struct CoreStats {
 	float hpregen = 0, mpregen = 0;
 	// Values < 0
 	float hp_regened = 0, mp_regened = 0;
-        float spell_velocity_multiplier = 1.0;
+    float spell_velocity_multiplier = 1.0;
 
 	void step(const CoreStats& effective_stats, float hp_regen_mod = 1, float mp_regen_mod = 1);
 

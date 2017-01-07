@@ -197,7 +197,7 @@ function old_map_generate(MapSeq, dungeon, floor)
         if map then
             local game_map = MapUtils.game_map_create(map, true)
             if dungeon.post_generate then
-                dungeon.post_generate(game_map)
+                dungeon.post_generate(game_map, floor)
             end
             MapSeq:slot_resolve(seq_idx, game_map)
             return game_map

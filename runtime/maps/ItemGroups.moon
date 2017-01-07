@@ -1,6 +1,6 @@
+Randarts = require "items.Randarts"
 
 M = {} -- Submodule
-M.RANDART = (type) -> nilprotect {:type}
 
 _filter = (group) -> 
     -- Remove objects dummied out with 'true':
@@ -37,7 +37,6 @@ amulets = (chance, args) -> {
     { item: "Amulet of Healing", chance: 4 }
     { item: "Amulet of Mephitization", chance: 4 }
     { item: "Amulet of Greed", chance: 1 }
-    { item: "Amulet of Regeneration", chance: 4 }
     { item: "Amulet of Fire", chance: 4 }
     { item: "Amulet of Greater Fire", chance: 4 }
     { item: "Amulet of Protection", chance: 4 }
@@ -46,7 +45,8 @@ amulets = (chance, args) -> {
     { item: "Amulet of Great Pain", chance: 4 }
     { item: "Amulet of Ringholding", chance: 4 }
 --    { item: "Amulet of Ice Form", chance: 4 } -- For now, a guaranteed drop only
-    { item: "Amulet of Light", chance: 4 }
+    args.ignore_strong or { item: "Amulet of Regeneration", chance: 1 }
+    args.ignore_strong or { item: "Amulet of Light", chance: 1 }
 --    { item: RANDART("Amulet"),      chance: 1 }
 }
 
@@ -145,6 +145,7 @@ armour = (chance, args) -> _filter {
     args.ignore_medium or { item: "Robe of Mana",       chance: 4                      }
 
     args.ignore_strong or { item: "Platemail",          chance: 2                      }
+    args.ignore_strong or { item: "Crystal Armour",          chance: 1                      }
     args.ignore_strong or { item: "Runed Robe",         chance: 1                      }
 }
 
@@ -263,5 +264,41 @@ M.basic_items = {
     weapons(12, ignore_strong: true)
     -- M.enchanted_items -- Chance of being moved up a category. See enchanted_items for the weight.
 }
+
+M.randart_items = {}
+-- For the randart levels:
+for i=1,Randarts.MAX_POWER_LEVEL
+    item_table = {
+        ring: {chance: 12}
+        legwear: {chance: 1}
+        belt: {chance: 1}
+        amulet: {chance: 12}
+        boots: {chance: 1}
+        helmet: {chance: 3}
+        armour: {chance: 5}
+        bows: {chance: 5}
+        gloves: {chance: 5}
+    }
+    for name in *Randarts.RANDARTS[i]
+        {:type} = items[name]
+        if not item_table[type]
+            pretty(items[name])
+            print "*** SHOULD HAVE '" .. type .. "' IN ITEM TABLE"
+            continue
+        append item_table[type], name
+    append M.randart_items, item_table
+
+M.pick_randart = (power_level = 1) ->
+    items = M.randart_items[power_level]
+    total_chance = 0
+    for _, entry in pairs items 
+        total_chance += entry.chance
+    num = random(0, total_chance)
+    for _, entry in pairs items
+        num -= entry.chance
+        if num <= 0
+            return random_choice(entry)
+    assert false
+
 
 return M
