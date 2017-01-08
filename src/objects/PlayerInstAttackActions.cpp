@@ -28,14 +28,14 @@
 
 #include "lanarts_defines.h"
 
-#include "../EnemyInst.h"
+#include "objects/EnemyInst.h"
 
-#include "../AnimatedInst.h"
-#include "../ItemInst.h"
-#include "../ProjectileInst.h"
-#include "../collision_filters.h"
+#include "objects/AnimatedInst.h"
+#include "objects/ItemInst.h"
+#include "objects/ProjectileInst.h"
+#include "objects/collision_filters.h"
 
-#include "PlayerInst.h"
+#include "objects/PlayerInst.h"
 
 static lsound::Sound attack_sound;
 void play(lsound::Sound& sound, const char* path);

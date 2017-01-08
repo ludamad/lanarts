@@ -22,8 +22,8 @@
 
 #include "lua_api/lua_api.h"
 
-#include "../CombatGameInst.h"
-#include "../GameInst.h"
+#include "objects/CombatGameInst.h"
+#include "objects/GameInst.h"
 
 const int REST_COOLDOWN = 200;
 // TODO: Now used for all 'major characters', i.e, players, their allies, and bosses

@@ -27,17 +27,17 @@
 #include "stats/stat_formulas.h"
 
 #include <lcommon/math_util.h>
-#include "../PlayerInst.h"
+#include "objects/PlayerInst.h"
 
-#include "../AnimatedInst.h"
+#include "objects/AnimatedInst.h"
 
-#include "../ItemInst.h"
+#include "objects/ItemInst.h"
 
-#include "../ProjectileInst.h"
-#include "../collision_filters.h"
+#include "objects/ProjectileInst.h"
+#include "objects/collision_filters.h"
 
-#include "EnemyInst.h"
-#include "EnemyEntry.h"
+#include "objects/EnemyInst.h"
+#include "objects/EnemyEntry.h"
 
 //draw depth, also determines what order objects evaluate in
 static const int DEPTH = 50;

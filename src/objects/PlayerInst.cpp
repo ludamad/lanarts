@@ -22,12 +22,12 @@
 
 #include "lua_api/lua_api.h"
 
-#include "../EnemyInst.h"
+#include "objects/EnemyInst.h"
 
-#include "../AnimatedInst.h"
-#include "../ItemInst.h"
-#include "../ProjectileInst.h"
-#include "PlayerInst.h"
+#include "objects/AnimatedInst.h"
+#include "objects/ItemInst.h"
+#include "objects/ProjectileInst.h"
+#include "objects/PlayerInst.h"
 
 PlayerInst::PlayerInst(const CombatStats& stats, sprite_id sprite, Pos xy, team_id team, bool local) :
 		CombatGameInst(stats, sprite, xy, team, RADIUS, true, DEPTH), actions_set_for_turn(

@@ -20,9 +20,9 @@
 
 #include <lcommon/math_util.h>
 
-#include "../PlayerInst.h"
+#include "objects/PlayerInst.h"
 
-#include "../collision_filters.h"
+#include "objects/collision_filters.h"
 #include "EnemyInst.h"
 #include "MonsterController.h"
 

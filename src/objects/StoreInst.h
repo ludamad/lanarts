@@ -8,7 +8,7 @@
 
 #include "interface/sidebar/StoreContent.h"
 
-#include "../GameInst.h"
+#include "objects/GameInst.h"
 
 #include "StoreInventory.h"
 

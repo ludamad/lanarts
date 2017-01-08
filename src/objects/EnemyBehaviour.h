@@ -5,7 +5,7 @@
 
 #include "lanarts_defines.h"
 
-#include "../GameInst.h"
+#include "objects/GameInst.h"
 
 class SerializeBuffer;
 

@@ -7,12 +7,12 @@
 #define ENEMYINST_H_
 
 #include "stats/stats.h"
-#include "../CombatGameInst.h"
-#include "../GameInst.h"
+#include "objects/CombatGameInst.h"
+#include "objects/GameInst.h"
 
-#include "EnemyBehaviour.h"
+#include "objects/EnemyBehaviour.h"
 
-#include "EnemyEntry.h"
+#include "objects/EnemyEntry.h"
 
 class EnemyInst : public CombatGameInst {
 public:

@@ -4,6 +4,8 @@
  *  as well as networking communication of actions
  */
 
+#include <limits>
+
 #include <lua.hpp>
 
 #include <luawrap/luawrap.h>
@@ -29,15 +31,15 @@
 
 #include "lanarts_defines.h"
 
-#include "../EnemyInst.h"
+#include "objects/EnemyInst.h"
 
-#include "../StoreInst.h"
+#include "objects/StoreInst.h"
 
-#include "../AnimatedInst.h"
-#include "../FeatureInst.h"
-#include "../ItemInst.h"
-#include "../ProjectileInst.h"
-#include "../collision_filters.h"
+#include "objects/AnimatedInst.h"
+#include "objects/FeatureInst.h"
+#include "objects/ItemInst.h"
+#include "objects/ProjectileInst.h"
+#include "objects/collision_filters.h"
 
 #include "PlayerInst.h"
 
@@ -170,6 +172,12 @@ void PlayerInst::enqueue_io_equipment_actions(GameState* gs,
 							iteminst->id));
 	}
 }
+
+static Pos follow(FloodFillPaths& paths, const Pos& from_xy) {
+        FloodFillNode* node = paths.node_at(from_xy);
+        return Pos(from_xy.x + node->dx, from_xy.y + node->dy);
+}
+
 void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
 //Arrow/wasd movement
 	if (gs->key_down_state(SDLK_UP) || gs->key_down_state(SDLK_w)) {
@@ -184,6 +192,77 @@ void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
 	if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
 		dx -= 1;
 	}
+        if (dx == 0 && dy == 0) {
+            if (gs->key_down_state(SDLK_e) && rest_cooldown() < REST_COOLDOWN - 1) {
+                Pos closest = {-1,-1};
+                float min_dist = 10000;//std::numeric_limits<float>::max();
+                bool found_item = false;
+                if (min_dist == 10000) {//std::numeric_limits<float>::max()) {
+                    FOR_EACH_BBOX(_path_to_player.location(), x, y) {
+                        auto* node = _path_to_player.node_at({x, y});
+                        if (node->solid) {
+                            continue;
+                        }
+                        float dist = node->distance;
+                        if (dist == 0 && (node->dx != 0 || node->dy != 0)) {
+                            continue;
+                        }
+                        bool near_unseen = false;
+                        for (int dy = -1; dy <= +1; dy++) {
+                            for (int dx = -1; dx <= +1; dx++) {
+                                if (!(*gs->tiles().previously_seen_map())[{x+dx,y+dy}]) {
+                                    near_unseen = true;
+                                    break;
+                                }
+                            }
+                        }
+                        bool is_item = (gs->object_radius_test(this, NULL, 0, &item_colfilter, (x*32+16), (y*32+16), 1));
+                        if (near_unseen || is_item) {
+                            if (dist != 0 && (min_dist >= dist || (is_item > found_item)) && (is_item >= found_item)) {
+                                closest = {x,y};
+                                min_dist = dist;
+                                found_item = is_item;
+                            }
+                        }
+                    }
+                }
+                if (min_dist != 10000) {//std::numeric_limits<float>::max()) {
+                    Pos iter = closest;
+                    Pos next_nearest;
+                    while (true) {
+                       Pos next = follow(_path_to_player, iter);
+                       auto* next_node = _path_to_player.node_at(next);
+                       if (next_node->distance == 0) {
+                           next_nearest = iter;
+                            break;
+                       }
+                       iter = next;
+                    }
+                    dx = (next_nearest.x * TILE_SIZE + TILE_SIZE / 2) - x;
+                    dy = (next_nearest.y * TILE_SIZE + TILE_SIZE / 2) - y;
+                    if (abs(dx) < effective_stats().movespeed) {
+                        dx = 0;
+                    }
+                    if (abs(dy) < effective_stats().movespeed) {
+                        dy = 0;
+                    }
+                    if (abs(dx) + abs(dy) < effective_stats().movespeed * 2) {
+                        dx = 0;
+                        dy = 0;
+                    }
+                    bool is_item = (gs->object_radius_test(this, NULL, 0, &item_colfilter, x, y, 1));
+                    if (is_item) {
+                        dx = 0;
+                        dy = 0;
+                    }
+                    if (dx != 0) dx /= abs(dx);
+                    if (dy != 0) dy /= abs(dy);
+                }
+            } else if (gs->key_down_state(SDLK_e)) {
+                gs->game_chat().add_message("You must be calm to explore by instinct!",
+                                Colour(255, 100, 100));
+            }
+        }
 	if (dx != 0 || dy != 0) {
 		queued_actions.push_back(
 				game_action(gs, this, GameAction::MOVE, 0, dx, dy));

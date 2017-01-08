@@ -15,8 +15,8 @@
 #include "pathfind/FloodFillPaths.h"
 #include <lcommon/SerializeBuffer.h>
 
-#include "../GameInst.h"
-#include "EnemyInst.h"
+#include "objects/GameInst.h"
+#include "objects/EnemyInst.h"
 
 struct EnemyOfInterest {
 	EnemyInst* e;

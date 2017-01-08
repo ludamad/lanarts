@@ -13,7 +13,7 @@
 
 #include "stats/items/ItemEntry.h"
 #include <lcommon/math_util.h>
-#include "../collision_filters.h"
+#include "objects/collision_filters.h"
 
 #include "StoreInst.h"
 
