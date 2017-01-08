@@ -16,6 +16,9 @@ Data.item_create {
     use_message = "Now that you have picked up this key, you can open Azurite doors.",
     spr_item = "key1",
     pickup_func = function(self, user)
+        if not GlobalData.keys_picked_up[self.name] then
+            play_sound "sound/win sound 2-1.ogg"
+        end
         GlobalData.keys_picked_up[self.name] = true 
     end,
     prereq_func = function (self, user)
@@ -32,6 +35,9 @@ Data.item_create {
     use_message = "Now that you have picked up this key, you can open Dandelite doors.",
     spr_item = "key2",
     pickup_func = function(self, user)
+        if not GlobalData.keys_picked_up[self.name] then
+            play_sound "sound/win sound 2-1.ogg"
+        end
         GlobalData.keys_picked_up[self.name] = true 
     end,
     prereq_func = function (self, user)
@@ -48,7 +54,9 @@ Data.item_create {
     use_message = "Now that you have picked up this key, you can open Burgundite doors.",
     spr_item = "key3",
     pickup_func = function(self, user)
-        local GlobalData = require "core.GlobalData"
+        if not GlobalData.keys_picked_up[self.name] then
+            play_sound "sound/win sound 2-1.ogg"
+        end
         GlobalData.keys_picked_up[self.name] = true 
     end,
     prereq_func = function (self, user)
@@ -73,7 +81,9 @@ for _, entry in ipairs {
         type = "lanart",
         spr_item = sprite,
         pickup_func = function(self, user)
-            local GlobalData = require "core.GlobalData"
+            if not GlobalData.lanarts_picked_up[self.name] then
+                play_sound "sound/win sound 2-3.ogg"
+            end
             GlobalData.lanarts_picked_up[self.name] = true 
         end,
         prereq_func = function (self, user)
@@ -186,6 +196,7 @@ Data.item_create  {
     spr_item = "scroll_haste",
 
     action_func = function(self, user)
+        play_sound "sound/haste.ogg"
         user:add_effect(effects.Haste.name, 800)
     end
 }

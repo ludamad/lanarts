@@ -11,6 +11,7 @@
 #include "items/ProjectileEntry.h"
 #include "items/WeaponEntry.h"
 
+#include "gamestate/GameState.h"
 #include "ClassEntry.h"
 #include "combat_stats.h"
 
@@ -95,6 +96,9 @@ int CombatStats::gain_xp(int amnt) {
 		class_stats.xp -= class_stats.xpneeded;
 		class_stats.xpneeded = experience_needed_formula(class_stats.xplevel);
 	}
+        if (levels_gained > 0) {
+            play("sound/Jingle_Win_Synth/Jingle_Win_Synth_02.ogg");
+        }
 	return levels_gained;
 }
 

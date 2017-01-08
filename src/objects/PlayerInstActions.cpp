@@ -512,6 +512,9 @@ void PlayerInst::reposition_item(GameState* gs, const GameAction& action) {
 	ItemSlot& itemslot2 = inventory().get(action.use_id2);
 
 	std::swap(itemslot1, itemslot2);
+        if (action.use_id != action.use_id2) {
+            play("sound/inventory_sound_effects/leather_inventory.ogg");
+        }
 	gs->game_hud().reset_slot_selected();
 }
 
@@ -665,7 +668,7 @@ void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
             item.remove_copies(sell_amount);
             gs->game_chat().add_message(message, COL_PALE_YELLOW);
             gs->local_player()->gold(gs) += gold_gained;
-            play("sound/gold.ogg");
+            play("sound/inventory_sound_effects/sellbuy.ogg");
         } else {
             gs->game_chat().add_message("Cannot sell this item!", COL_RED);
         }
@@ -703,8 +706,9 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 
         // Get the effective move speed:
 	float mag = effective_stats().movespeed;
-        if (action.use_id2) { // Did we use autoexplore?
-            mag = std::min(2.0f, mag); // Autoexplore penalty
+	LANARTS_ASSERT(action.use_id2 == 0 || action.use_id2 == 1);
+        if (action.use_id2 == 1) { // Did we use autoexplore?
+            mag = std::min(3.0f, mag); // Autoexplore penalty
         }
 
         // Get the move direction:

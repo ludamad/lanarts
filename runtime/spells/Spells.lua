@@ -121,6 +121,7 @@ end
 function Berserk.action_func(caster, x, y)
     caster:add_effect("Berserk", 170)
     if caster:is_local_player() then
+        play_sound "sound/berserk.ogg"
         EventLog.add("You enter a powerful rage!", {200,200,255})
     elseif caster.name == "Your ally" then
         EventLog.add(caster.name .. " enters a powerful rage!", {200,200,255})
