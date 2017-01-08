@@ -22,6 +22,7 @@
 #include "lanarts_defines.h"
 
 #include "PlayerData.h"
+#include "Team.h"
 
 class GameState;
 class GameMapState;
@@ -70,6 +71,9 @@ public:
         }
 
 	void spawn_players(GameMapState* map, const std::vector<Pos>& positions);
+        TeamData& team_data() {
+            return _team_data;
+        }
 private:
 	void place_player(GameMapState* map, GameInst* p);
 	void spawn_players(GeneratedRoom& genlevel, void** player_instances,
@@ -86,6 +90,7 @@ private:
         bool _should_sync_states = false;
 	std::vector<GameMapState*> level_states;
         Pos last_player_pos = {0,0};
+        TeamData _team_data;
 };
 
 #endif /* GAMEWORLD_H_ */

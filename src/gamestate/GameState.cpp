@@ -204,7 +204,6 @@ void GameState::serialize(SerializeBuffer& serializer) {
 	world.serialize(serializer);
 
 	player_data().serialize(this, serializer);
-    team_data().serialize(this, serializer);
 	luawrap::globals(L)["Engine"]["post_serialize"].push();
 	luawrap::call<void>(L);
 
@@ -239,7 +238,6 @@ void GameState::deserialize(SerializeBuffer& serializer) {
 	_view.sharp_center_on(local_player()->ipos());
 
 	settings.class_type = local_player()->class_stats().classid;
-    team_data().deserialize(this, serializer);
 	luawrap::globals(L)["Engine"]["post_deserialize"].push();
 	luawrap::call<void>(L);
 }

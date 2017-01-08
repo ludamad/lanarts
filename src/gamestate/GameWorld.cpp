@@ -62,6 +62,7 @@ void GameWorld::serialize(SerializeBuffer& serializer) {
 	}
 
 	gs->set_level(original);
+        team_data().serialize(gs, serializer);
 }
 
 void GameWorld::deserialize(SerializeBuffer& serializer) {
@@ -88,6 +89,7 @@ void GameWorld::deserialize(SerializeBuffer& serializer) {
 
 	gs->set_level(original);
 	midstep = false;
+        team_data().deserialize(gs, serializer);
 }
 
 GameMapState* GameWorld::map_create(const Size& size, ldungeon_gen::MapPtr source_map, bool wandering_enabled) {
@@ -255,22 +257,23 @@ void GameWorld::set_current_level_lazy(int roomid) {
 }
 
 void GameWorld::reset(int keep) {
-	std::vector<GameMapState*> delete_list;
 	if (midstep) {
 		next_room_id = -2;
-	} else {
-		for (int i = keep; i < level_states.size(); i++) {
-			delete_list.push_back(level_states[i]);
-		}
-		player_data().remove_all_players(gs);
-		level_states.resize(keep);
-		gs->game_hud().override_sidebar_contents(NULL);
-		gs->game_chat().clear();
-		gs->renew_game_timestamp();
+                return;
 	}
+	std::vector<GameMapState*> delete_list;
+        for (int i = keep; i < level_states.size(); i++) {
+                delete_list.push_back(level_states[i]);
+        }
+        player_data().remove_all_players(gs);
+        level_states.resize(keep);
+        gs->game_hud().override_sidebar_contents(NULL);
+        gs->game_chat().clear();
+        gs->renew_game_timestamp();
 	for (int i = 0; i < delete_list.size(); i++) {
 		delete delete_list[i];
 	}
+        _team_data = TeamData();
         // _should_sync_states = true;
 }
 

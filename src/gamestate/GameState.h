@@ -261,7 +261,7 @@ public:
 		return config;
 	}
 	TeamData& team_data() {
-	    return _team_data;
+	    return game_world().team_data();
 	}
 
 private:
@@ -282,7 +282,6 @@ private:
 	GameView _view;
 	GameWorld world;
 
-	TeamData _team_data;
 	MTwist mtwist;
 	// For dragging purposes:
 	GameView previous_view;
