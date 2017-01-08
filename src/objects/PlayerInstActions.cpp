@@ -177,6 +177,18 @@ static Pos follow(FloodFillPaths& paths, const Pos& from_xy) {
         FloodFillNode* node = paths.node_at(from_xy);
         return Pos(from_xy.x + node->dx, from_xy.y + node->dy);
 }
+// TODO find appropriate place for this function
+static bool has_visible_monster(GameState* gs, PlayerInst* p = NULL) {
+    const std::vector<obj_id>& mids = gs->monster_controller().monster_ids();
+    for (int i = 0; i < mids.size(); i++) {
+        GameInst* inst = gs->get_instance(mids[i]);
+        if (inst && gs->object_visible_test(inst, p)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
 //Arrow/wasd movement
@@ -193,7 +205,7 @@ void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
 		dx -= 1;
 	}
         if (dx == 0 && dy == 0) {
-            if (gs->key_down_state(SDLK_e) && rest_cooldown() < REST_COOLDOWN - 1) {
+            if (gs->key_down_state(SDLK_e) && !has_visible_monster(gs, this)) {
                 Pos closest = {-1,-1};
                 float min_dist = 10000;//std::numeric_limits<float>::max();
                 bool found_item = false;
@@ -259,7 +271,7 @@ void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
                     if (dy != 0) dy /= abs(dy);
                 }
             } else if (gs->key_down_state(SDLK_e)) {
-                gs->game_chat().add_message("You must be calm to explore by instinct!",
+                gs->game_chat().add_message("Deal with the enemy before exploring!",
                                 Colour(255, 100, 100));
             }
         }

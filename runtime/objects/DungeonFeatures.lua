@@ -81,7 +81,7 @@ function Door:on_step()
     local needs_lanarts = false
     local can_player_open = true
     if needs_key then
-        if self.required_key ~= GlobalData.keys_picked_up[self.required_key] then
+        if not GlobalData.keys_picked_up[self.required_key] then
             can_player_open = false
         end
     end
