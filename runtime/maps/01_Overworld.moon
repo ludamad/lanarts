@@ -599,7 +599,7 @@ overworld_features = (map) ->
         enemy_placer = (map, xy) ->
             enemy = OldMaps.enemy_generate(OldMaps.medium_animals)
             MapUtils.spawn_enemy(map, enemy, xy)
-        vault = SourceMap.area_template_create(Vaults.crypt_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.crypt, :door_placer, :enemy_placer, player_spawn_area: true})
+        vault = SourceMap.area_template_create(Vaults.crypt_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.crypt, :door_placer, :enemy_placer, player_spawn_area: false})
         if not place_feature(map, vault, (r) -> not r.conf.is_overworld)
             return true
         append post_poned, (game_map) ->
@@ -633,7 +633,7 @@ overworld_features = (map) ->
             -- nil is passed for the default open sprite
             MapUtils.spawn_door(map, xy, nil, Vaults._closed_door_crypt)
         place_dungeon = Region1.old_dungeon_placement_function(OldMapSeq2, dungeon)
-        vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.temple, :door_placer, :gold_placer, player_spawn_area: false})
+        vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, tileset: TileSets.temple, :door_placer, :gold_placer, player_spawn_area: true})
         if not place_feature(map, vault, (r) -> r.conf.is_overworld)
             return true
     place_medium1b = () ->
@@ -666,7 +666,7 @@ overworld_features = (map) ->
             if World.player_amount > 1
                 append post_poned, c
             next_dungeon[1] += 1
-        vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, :tileset, :door_placer, player_spawn_area: false})
+        vault = SourceMap.area_template_create(Vaults.sealed_dungeon {dungeon_placer: place_dungeon, :tileset, :door_placer, player_spawn_area: true})
         if not place_feature(map, vault, (r) -> r.conf.is_overworld)
             return true
         append post_poned, (game_map) ->
