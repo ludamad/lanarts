@@ -77,6 +77,30 @@ Data.spell_create {
         return not caster\has_effect("Berserk") and not caster\has_effect("Exhausted")  and not caster\has_effect("Ice Form")
 }
 
+-- TODO flip effect of fortification
+Data.effect_create {
+    name: "Fortification"
+    init_func: (caster) =>
+        @active_bonuses = {}
+        @duration = 120
+    stat_func: (obj, old, new) =>
+        for k, v in pairs @active_bonuses -- Abuse that stat_func is called every frame
+            if v == 0 
+                EventLog.add("Your defence falls back down...", COL_PALE_BLUE)
+                @active_bonuses[k] = nil
+            else 
+                new.defence += 1
+                @active_bonuses[k] -= 1
+    on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
+        if not @active_bonuses[attacker.id]
+            EventLog.add("Your defence rises due to getting hit!", COL_PALE_BLUE)
+            @active_bonuses[attacker.id] = @duration
+        elseif @active_bonuses[attacker.id] < @duration
+            @active_bonuses[attacker.id] = @duration
+        return damage
+
+}
+
 Data.effect_create {
     name: "Ludaze"
     effected_sprite: "spr_spells.ludaze"
@@ -374,6 +398,11 @@ Data.effect_create {
         if chance(.1)
             eff = defender\add_effect("Dazed", 70)
         return damage
+}
+
+Data.effect_create {
+    name: "StopOnceInRange"
+    -- For centaurs predominantly, coded in C++
 }
 
 Data.effect_create {

@@ -213,7 +213,8 @@ void MonsterController::set_monster_headings(GameState* gs,
 				e->vx = 0, e->vy = 0;
 			} else {
 				int close = 40;
-				if (e->etype().name == "Dark Centaur") { // hack for now
+                                bool stop_once_in_range = (e->effects().get(get_effect_by_name("StopOnceInRange")));
+				if (stop_once_in_range) {
 					close = 150;
 				}
 				if (pdist < std::min(mindist, close)) {

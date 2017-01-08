@@ -22,6 +22,7 @@ void parse_item_entry(lua_State* L, const YAML::Node& n, ItemEntry& entry) {
 	entry.name = parse_str(n["name"]);
 	entry.description = parse_optional(n, "description", std::string());
 	entry.shop_cost = parse_optional(n, "shop_cost", Range());
+	entry.sellable = parse_optional(n, "sellable", true);
 
 	entry.use_action.success_message = parse_optional(n, "use_message",
 			std::string());

@@ -82,6 +82,14 @@ function M.spawn_healing_square(map, sqr)
     return object
 end
 
+M.lanarts_door_sprite = tosprite("spr_doors.sealed_door")
+function M.spawn_lanarts_door(map, sqr)
+    local object = DungeonFeatures.Door.create { do_init = false, xy = M.from_tile_xy(sqr), closed_sprite = M.lanarts_door_sprite, lanarts_needed = 3}
+    table.insert(map.instances, object)
+    return object
+end
+
+
 function M.spawn_door(map, sqr, --[[Optional]] open_sprite, --[[Optional]] closed_sprite, --[[Optional]] required_key)
     local object = DungeonFeatures.Door.create { do_init = false, xy = M.from_tile_xy(sqr), open_sprite = open_sprite, closed_sprite = closed_sprite, required_key = required_key }
     table.insert(map.instances, object)

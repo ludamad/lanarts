@@ -11,6 +11,28 @@ Data.equipment_create {
     stat_bonuses = { defence = 1 }
 }
 
+-- Data.equipment_create {
+--     name = "Amulet of Protection",
+--     description = "Grants the user increased defences against magical attacks.",
+--     type = "amulet",
+-- 
+--     shop_cost = { 180, 240 },
+-- 
+--     stat_bonuses = { willpower = 4 },
+--     spr_item = "spr_amulets.protect",
+-- }
+
+Data.equipment_create {
+    name = "Amulet of Fortification",
+    description = "Grants the user Fortification: Melee hits from enemies increase defence temporarily.",
+    type = "amulet",
+
+    shop_cost = { 220, 440 },
+
+    effects_granted = {"Fortification"},
+    spr_item = "spr_amulets.protect",
+}
+
 Data.equipment_create {
     name = "Amulet of Greed",
     description = "Grants the user the ability to wear two additional amulets.",
@@ -107,17 +129,6 @@ Data.equipment_create {
 
     spr_item = "spr_amulets.fireball",
     spells_granted = {"Fire Bolt"},
-}
-
-Data.equipment_create {
-    name = "Amulet of Protection",
-    description = "Grants the user increased defences against magical attacks.",
-    type = "amulet",
-
-    shop_cost = { 180, 240 },
-
-    stat_bonuses = { willpower = 4 },
-    spr_item = "spr_amulets.protect",
 }
 
 Data.equipment_create {

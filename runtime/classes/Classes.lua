@@ -6,6 +6,9 @@ local TEST_INVENTORY = os.getenv("LANARTS_TESTITEMS") and {
      {item = "Gallanthor's Skirt", amount = 1},
      {item = "Leather Armour", amount = 1},
      {item = "Leather Armour", amount = 1},
+     {item = "Snake Lanart", amount = 1},
+     {item = "Rage Lanart", amount = 1},
+     {item = "Obliteration Lanart", amount = 1},
      {item = "Gragh's Club", amount = 1},
      {item = "Crystalline Plate", amount = 1},
      {item = "Moonstone Ring", amount = 1},
@@ -21,7 +24,7 @@ local TEST_INVENTORY = os.getenv("LANARTS_TESTITEMS") and {
      --{item = "Amulet of Regeneration", amount = 1},
      --{item = "Amulet of Fire", amount = 1},
      --{item = "Amulet of Greater Fire", amount = 1},
-     --{item = "Amulet of Protection", amount = 1},
+     {item = "Amulet of Fortification", amount = 1},
      --{item = "Amulet of Pain", amount = 1},
      --{item = "Amulet of Ringholding", amount = 1},
      { item = "Amulet of Mephitization", amount = 1 },
@@ -102,7 +105,7 @@ Data.class_create {
 
 Data.class_create {
     name = "Fighter",
-    sprites = {"fighter", "fighter2"},
+    sprites = {"fighter", "fighter2", "spr_enemies.humanoid.dwarf"},
     available_spells = {
       { spell = "Berserk",
         level_needed = 1 },
@@ -141,7 +144,7 @@ Data.class_create {
 
 Data.class_create {
     name = "Ranger",
-    sprites = {"archer"},
+    sprites = {"archer", "spr_enemies.humanoid.deep_elf_archer"},
     available_spells = {
       { spell = "Magic Arrow",
         level_needed = 1 },

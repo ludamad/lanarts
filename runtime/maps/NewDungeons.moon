@@ -172,7 +172,7 @@ M.make_dungeon_template = (data) -> table.merge {
 M.make_connector = (types) ->
     placed_portals = {}
     on_generate = types.on_generate
-    on_finish = types.on_generate
+    on_finish = types.on_finish
     types.on_generate = nil
     types.on_finish = nil
     for k,type in pairs(types)

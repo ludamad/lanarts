@@ -60,23 +60,21 @@ floor_plans = (rng) ->
             n_statues: 4
             n_healing_squares: 1
         }
-        -- [1] is repeated in [2] below
-        [2]: false
-        [3]: {
-            size: {65, 65}
+        [2]: {
+            size: {45, 45}
             n_subareas: 1
             n_enemies: 0
             n_encounter_vaults: 0
             enemy_entries: {
 --                {enemy: "Mana Sapper", guaranteed_spawns: 5, chance: 100}
-                {enemy: "Stara", guaranteed_spawns: 1}
-                {enemy: "Giant Bee", guaranteed_spawns: 12, chance: 100}
-                {enemy: "Queen Bee", guaranteed_spawns: 5, chance: 100}
+                {enemy: "Ramitawil", guaranteed_spawns: 1}
+                {enemy: "Giant Bee", guaranteed_spawns: 20, chance: 100}
+                {enemy: "Queen Bee", guaranteed_spawns: 12, chance: 100}
             }
             --- Chance = 100 => Guaranteed randart
             item_groups: {{ItemGroups.enchanted_items, 4}, {ItemGroups.enchanted_items, 2, 100}}
-            number_regions: 12
-            room_radius: () -> random(2,10)
+            number_regions: 5
+            room_radius: () -> random(7,16)
             arc_chance: 0
             rect_room_num_range: {0, 0}
             rect_room_size_range: {1, 1}
@@ -84,12 +82,11 @@ floor_plans = (rng) ->
             n_healing_squares: 1
         }
     }
-    raw_plans[2] = raw_plans[1]
     return for i, raw in ipairs raw_plans
         base = table.merge NewDungeons.dungeon_defaults(rng), NewDungeons.create_dungeon_scheme(tileset)
         table.merge(base, raw)
 
-M.N_FLOORS = 3
+M.N_FLOORS = 2
 M.TEMPLATE  = (rng, floor, connector) -> 
     n_stairs_up = connector.n_portals("up")
     plan = floor_plans(rng)[floor]
@@ -122,11 +119,12 @@ M.TEMPLATE  = (rng, floor, connector) ->
         ---------------------------------
         -- Place small_random_vaults:  --
         _place_small_vaults: (map) =>
-            for i=1,4
-                conf = table.merge {rng: map.rng}, @_default_vault_config()
-                vault = SourceMap.area_template_create(Vaults.small_random_vault(conf))
-                if not NewDungeons.place_feature(map, vault)
-                    return nil
+            if floor == 1
+                for i=1,4
+                    conf = table.merge {rng: map.rng}, @_default_vault_config()
+                    vault = SourceMap.area_template_create(Vaults.small_random_vault(conf))
+                    if not NewDungeons.place_feature(map, vault)
+                        return nil
             return true
         _create_stairs_up: (map) =>
             base_conf = @_default_vault_config()

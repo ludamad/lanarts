@@ -69,6 +69,7 @@ void ItemEntry::parse_lua_table(const LuaValue& table) {
 	using namespace luawrap;
 
 	shop_cost = defaulted(table, "shop_cost", Range());
+	sellable = defaulted(table, "sellable", true);
 
 	use_action.success_message = set_if_nil(table, "use_message",
 			std::string());

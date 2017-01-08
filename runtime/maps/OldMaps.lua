@@ -28,10 +28,11 @@ M.weak_hell = {
 }
 M.strong_hell = {
   {enemy = "Hell Storm",        chance = 20,  group_chance = 33, group_size = 3           },
-     {enemy = "Dark Centaur",      chance = 30, guaranteed_spawns = 10                                              },
+     {enemy = "Centaur Marksman",      chance = 30, guaranteed_spawns = 5                                              },
     {enemy = "Hell Forged", chance = 20},
-  {enemy = "Executioner",          guaranteed_spawns = 10                                           },
-  {enemy = "Hell Warrior",          guaranteed_spawns = 5                                           },
+  {enemy = "Executioner",          guaranteed_spawns = 8                                           },
+  {enemy = "Mana Sapper",            chance = 20, group_size = 1                                             },
+  {enemy = "Stara",          guaranteed_spawns = 1                                           },
 }
 
 M.medium_animals = {
@@ -47,14 +48,13 @@ M.easy_enemies = {
   {enemy = "Skeleton",          chance = 100                                            },
   {enemy = "Chicken",           chance = 100                                            },
   {enemy = "Cloud Elemental",   chance = 100, group_chance = 33, group_size = 2           },
-  {enemy = "Mana Sapper",            chance = 20000000, group_size = 1                                             },
   {enemy = "Adder",         chance = 25                                            },
 }
   
 M.fast_enemies = {
  {enemy = "Giant Spider",      chance = 100,   group_chance = 100, group_size = 3       },
  {enemy = "Ciribot",           chance = 35                                              },
--- {enemy = "Dark Centaur",      chance = 30                                              },
+-- {enemy = "Centaur Hunter",      chance = 30                                              },
   {enemy = "Chicken",           chance = 100                                            }
 }
 
@@ -64,7 +64,7 @@ M.medium_enemies = table.merge(M.medium_animals, {
   {enemy = "Storm Elemental",   chance = 66,  group_chance = 33, group_size = 2           },
   {enemy = "Chicken",           chance = 50                                             },
 --  {enemy = "Unseen Horror",     chance = 5                                             },
---  {enemy = "Dark Centaur",      chance = 10                                             }
+--  {enemy = "Centaur Hunter",      chance = 10                                             }
 })
  
 M.mediumhard_enemies = table.merge(M.medium_animals, {
@@ -72,7 +72,7 @@ M.mediumhard_enemies = table.merge(M.medium_animals, {
   {enemy = "Storm Elemental",   chance = 66,  group_chance = 33, group_size = 4           },
   {enemy = "Chicken",           chance = 50                                             },
 --  {enemy = "Unseen Horror",     chance = 5                                             },
-  {enemy = "Dark Centaur",      chance = 10                                             },
+  {enemy = "Centaur Hunter",      chance = 10                                             },
 })
   
 M.hard_enemies = {
@@ -82,7 +82,7 @@ M.hard_enemies = {
  {enemy = "Skeleton",            chance = 75                                              },
  {enemy = "Ciribot",           chance = 75                                              },
  {enemy = "Golem",             guaranteed_spawns = 1                                    },
- {enemy = "Dark Centaur",      chance = 30                                              },
+ {enemy = "Centaur Hunter",      chance = 30                                              },
 -- {enemy = "Unseen Horror",     chance = 10,   group_chance = 33, group_size = 2           }
 }
 

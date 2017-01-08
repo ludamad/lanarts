@@ -72,6 +72,7 @@ public:
 	LuaAction use_action;
 	LuaValue pickup_call;
 	sprite_id item_sprite;
+        bool sellable = true;
 	bool stackable;
 };
 

@@ -38,7 +38,7 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Troll Boots",
-    description = "Heavy boots that enchant the user which regenerative properties and extra strength, reduce movement speed.",
+    description = "Heavy boots that enchant the user which regenerative properties and extra strength, but significantly reduce movement speed.",
     type = "boots",
 
     shop_cost = { 120, 200 },
@@ -47,7 +47,8 @@ Data.equipment_create {
 
     reduction = { base = 1 },
     resistance = { base = 1 },
-    stat_bonuses = { hpregen = 1 / 60, movespeed = -0.5, strength = 1},
+    stat_bonuses = { hpregen = 2 / 60, strength = 1},
+    effects_granted = {"Encumbered"}
 }
 
 Data.equipment_create {
@@ -65,7 +66,7 @@ Data.equipment_create {
 }
 Data.equipment_create {
     name = "Stripe Boots",
-    description = "Slick, sturdy boots that grant the user faster spells.",
+    description = "Slick, sturdy boots that grant the user significantly faster spell volleys.",
     type = "boots",
 
     shop_cost = { 120, 200 },
@@ -74,5 +75,5 @@ Data.equipment_create {
 
     reduction = { base = 1 },
     resistance = { base = 1 },
-    stat_bonuses = { spell_velocity_multiplier = 1.25 }
+    stat_bonuses = { spell_velocity_multiplier = 1.35 }
 }

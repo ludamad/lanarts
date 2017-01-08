@@ -1,6 +1,7 @@
 local GameObject = require "core.GameObject"
 local Map = require "core.Map"
 local Display = require "core.Display"
+local EventLog = require "ui.EventLog"
 
 local ObjectUtils = require "objects.ObjectUtils"
 local LuaGameObject = require "objects.LuaGameObject"
@@ -13,6 +14,14 @@ M.FEATURE_TRAIT = "feature"
 M.FEATURE_DEPTH = 100
 
 local DEACTIVATION_DISTANCE = 768
+
+function n_lanarts_picked_up()
+    local n = 0
+    for _, _ in pairs(GlobalData.lanarts_picked_up) do
+        n = n + 1
+    end
+    return n
+end
 
 -- Base
 M.FeatureBase = LuaGameObject.type_create()
@@ -69,20 +78,40 @@ function Door:on_step()
     end
 
     local needs_key = (self.required_key ~= false)
+    local needs_lanarts = false
+    local can_player_open = true
+    if needs_key then
+        if self.required_key ~= GlobalData.keys_picked_up[self.required_key] then
+            can_player_open = false
+        end
+    end
+    if self.lanarts_needed > 0 then
+        if n_lanarts_picked_up() < self.lanarts_needed then
+            can_player_open = false
+            needs_lanarts = true
+        end
+    end
+    -- Honour invincible mode as exploration mode:
+    if settings.invincible then
+        can_player_open = true
+    end
     local is_open = false
     local collisions = Map.rectangle_collision_check(self.map, self.unpadded_area, self)
     collisions = table.filter(collisions, is_solid) 
-    if #collisions > 0 and (not needs_key or GlobalData.keys_picked_up[self.required_key]) then
+    if #collisions > 0 and can_player_open then
         is_open = true
     else 
         local collisions = Map.rectangle_collision_check(self.map, self.area, self)
         for _, object in ipairs(collisions) do
-            if not needs_key and (object.is_enemy ~= nil) then
+            if not needs_key and not needs_lanarts and (object.is_enemy ~= nil) then
                 is_open = true
                 break
-            elseif needs_key and (object.is_enemy == false) and (GlobalData.keys_picked_up[self.required_key] or settings.invincible) then
+            elseif (object.is_enemy == false) and can_player_open then
                 is_open = true
                 break
+            end
+            if object.is_enemy == false and needs_lanarts then
+                EventLog.add("You require " .. self.lanarts_needed .. " Lanarts to open these doors!", COL_RED)
             end
         end
     end
@@ -138,6 +167,7 @@ function Door:init(args)
     self.depth = args.depth or M.FEATURE_DEPTH
     self.padding = 6
     self.required_key = args.required_key or false
+    self.lanarts_needed = args.lanarts_needed or 0
 end
 
 return M

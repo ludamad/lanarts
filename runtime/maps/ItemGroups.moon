@@ -39,7 +39,7 @@ amulets = (chance, args) -> {
     { item: "Amulet of Greed", chance: 1 }
     { item: "Amulet of Fire", chance: 4 }
     { item: "Amulet of Greater Fire", chance: 4 }
-    { item: "Amulet of Protection", chance: 4 }
+    { item: "Amulet of Fortification", chance: 4 }
     { item: "Amulet of the Berserker", chance: 4 }
     { item: "Amulet of Pain", chance: 4 }
     { item: "Amulet of Great Pain", chance: 4 }
@@ -54,7 +54,7 @@ amulets = (chance, args) -> {
 consumables = (chance, args) -> _filter { 
     :chance
     {
-        chance: 95
+        chance: 99
         { item: "Arrow",              chance: 5,  amount: {5,10}  }
         { item: "Silver Arrow",       chance: 4,  amount: {2,6}   }
     --  Ludamad: Remove stones for now. Part of: Try to reduce the projectile actions for non-archer a lot.
@@ -71,12 +71,13 @@ consumables = (chance, args) -> _filter {
 
     -- Permanent enchantments
     args.ignore_strong and { 
-        chance: 5
+        chance: 1
         { item: "Strength Scroll",    chance: 1                      }
         { item: "Magic Scroll",       chance: 1                      }
         { item: "Defence Scroll",     chance: 1                      }
         { item: "Will Scroll",        chance: 1                      }
-        { item: "Scroll of Experience",        chance: 1             }
+        -- Make the above very, very rare in comparison:
+        { item: "Scroll of Experience",        chance: 96             }
     }
 }
 
@@ -95,19 +96,19 @@ helmets = (chance, args) -> _filter{
 -- Belts
 belts = (chance, args) -> _filter { 
     :chance
-    { item: "Belt of Protection",      chance: 10                      }
-    { item: "Belt of Slaying",        chance: 10                      }
-    args.ignore_strong or { item: "Lifesteal Belt",        chance: 2                      }
+    { item: "Belt of Protection",      chance: 20                      }
+    { item: "Belt of Slaying",        chance: 20                      }
+    { item: "Lifesteal Belt",        chance: 10                      }
     args.ignore_strong or { item: "Warped Belt",        chance: 1                      }
-    { item: "Spiked Belt",        chance: 10                      }
+    args.ignore_strong or { item: "Spiked Belt",        chance: 1                      }
     args.ignore_medium or { item: "Dank Belt",        chance: 2                      }
 }
 
 -- Legwear
 legwear  = (chance) -> { 
     :chance
-    { item: "Platelegs",      chance: 5                      }
-    { item: "Magic Skirt",        chance: 3                      }
+    { item: "Platelegs",      chance: 50                      }
+    { item: "Magic Skirt",        chance: 30                      }
     { item: "Gallanthor's Skirt",        chance: 1                      }
 }
 

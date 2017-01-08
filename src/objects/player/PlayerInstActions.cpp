@@ -559,13 +559,17 @@ void PlayerInst::sell_item(GameState* gs, const GameAction& action) {
     ItemEntry& type = itemslot.item_entry();
 
     if (item.amount > 0 && !itemslot.is_equipped()) {
-        int sell_amount = std::min(item.amount, 1); // TODO consider higher than 1 sell amounts
-        int gold_gained = type.sell_cost() * sell_amount;
-        auto message = format("Transaction: %s x %d for %d GP.", type.name.c_str(), sell_amount, gold_gained);
-        item.remove_copies(sell_amount);
-        gs->game_chat().add_message(message, COL_PALE_YELLOW);
-        gs->local_player()->gold(gs) += gold_gained;
-        play("sound/gold.ogg");
+        if (type.sellable) {
+            int sell_amount = 1; // std::min(item.amount, 1); // TODO consider higher than 1 sell amounts
+            int gold_gained = type.sell_cost() * sell_amount;
+            auto message = format("Transaction: %s x %d for %d GP.", type.name.c_str(), sell_amount, gold_gained);
+            item.remove_copies(sell_amount);
+            gs->game_chat().add_message(message, COL_PALE_YELLOW);
+            gs->local_player()->gold(gs) += gold_gained;
+            play("sound/gold.ogg");
+        } else {
+            gs->game_chat().add_message("Cannot sell this item!", COL_RED);
+        }
     } else {
         gs->game_chat().add_message("Cannot sell currently equipped items!", COL_RED);
     }

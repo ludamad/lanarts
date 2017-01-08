@@ -146,7 +146,7 @@ Data.enemy_create {
 }
 
 
-summoner_base = (monster, amount, rate = 60, kill_time = 250, delay = 20) -> (data) -> table.merge data, {
+summoner_base = (monster, amount, rate = 60, kill_time = 250, duration = 150) -> (data) -> table.merge data, {
     init_func: () =>
         @n_steps = 0
         @summon_rate = rate
@@ -166,7 +166,9 @@ summoner_base = (monster, amount, rate = 60, kill_time = 250, delay = 20) -> (da
             if #Map.players_list() == 0
                 return
             if @n_steps > @summon_rate
-                @add_effect("Summoning", delay).monster = monster
+                eff = @add_effect("Summoning", 20)
+                eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
+                eff.duration = duration
                 @n_steps = 0
             else 
                 @n_steps += 1
@@ -211,7 +213,7 @@ Data.enemy_create {
         movespeed: 3.5
         strength: 15
         defence: 0
-        willpower: 5
+        willpower: 12
     }
     effects_active: {"PoisonedWeapon", "Enraging"}
 }
@@ -231,9 +233,36 @@ Data.enemy_create {
         movespeed: 3.5
         strength: 15
         defence: 0
-        willpower: 5
+        willpower: 12
     }
     effects_active: {"PoisonedWeapon", "Spiky"}
+}
+ 
+Data.enemy_create summoner_base("Giant Bee", 7, 30, 400, 5) {
+    name: "Ramitawil"
+    sprite: "spr_enemies.bosses.boss_bee"
+    radius: 20
+    xpaward: 100
+    appear_message: "The demonic bee Ramitawil!"
+    defeat_message: "Ramitawil has been vanquished."
+    stats: {
+        attacks: {{weapon: "Fast Melee"}}
+        hp: 200
+        hpregen: 0.2
+        movespeed: 3.5
+        strength: 25
+        defence: 15
+        willpower: 20
+    }
+    effects_active: {"PoisonedWeapon", "Spiky", "Enraging"}
+    death_func: () =>
+        ItemUtils = require "maps.ItemUtils"
+        ItemGroups = require "maps.ItemGroups"
+        -- Spawn 3 level 1 randarts:
+        ObjectUtils.spawn_item_near(@, "Swarm Lanart", 1)
+        for i=1,3
+            item = ItemUtils.item_generate ItemGroups.basic_items, false, 1, 100
+            ObjectUtils.spawn_item_near(@, item.type, 1)
 }
  
 Data.enemy_create {
@@ -402,7 +431,10 @@ Data.enemy_create {
         willpower: 15
     }
     death_func: () =>
+        ItemUtils = require "maps.ItemUtils"
+        ItemGroups = require "maps.ItemGroups"
         ObjectUtils.spawn_item_near(@, "Red Dragonplate", 1)
+        ObjectUtils.spawn_item_near(@, "Dragon Lanart", 1)
         -- Spawn a level 1 randart:
         item = ItemUtils.item_generate ItemGroups.basic_items, false, 1, 100
         ObjectUtils.spawn_item_near(@, item.type, 1)
@@ -463,8 +495,8 @@ Data.enemy_create {
         for i=1,2
             item = ItemUtils.item_generate ItemGroups.basic_items, false, 1, 100
             ObjectUtils.spawn_item_near(@, item.type, 1)
-        item = random_choice {"Gragh's Club"}
-        ObjectUtils.spawn_item_near(@, item, 1)
+        ObjectUtils.spawn_item_near(@, "Gragh's Club", 1)
+        ObjectUtils.spawn_item_near(@, "Rage Lanart", 1)
     effects_active: {"Enraging"}
 }
 
@@ -492,6 +524,7 @@ Data.enemy_create {
     death_func: () =>
         ItemUtils = require "maps.ItemUtils"
         ItemGroups = require "maps.ItemGroups"
+        ObjectUtils.spawn_item_near(@, "Obliteration Lanart", 1)
         -- Spawn 1 level 2 randart:
         for i=1,2
             item = ItemUtils.item_generate ItemGroups.basic_items, false, 2, 100
@@ -499,7 +532,7 @@ Data.enemy_create {
     effects_active: {"Pain Aura"}
 }
 
-Data.enemy_create summoner_base("Giant Spider", 3, 25, 300, 5) {
+Data.enemy_create summoner_base({"Mouther", "Mana Sapper", "Crypt Keeper"}, 3, 100, 200, 25) {
     name: "Pixulloch"
     appear_message: "Pixulloch laughs at your feeble presence!"
     defeat_message: "Pixulloch has been defeated! Consider the game won. For now."
@@ -518,3 +551,65 @@ Data.enemy_create summoner_base("Giant Spider", 3, 25, 300, 5) {
         willpower: 20
     }
 }
+
+Data.enemy_create {
+    name: "Centaur Hunter"
+    sprite: "spr_enemies.humanoid.centaur"
+    death_sprite: "blood"
+    radius: 12
+    xpaward: 30
+    appear_message: "A centaur hunter readies his bow."
+    defeat_message: "The centaur hunter has been defeated."
+    stats: {
+        attacks: {{projectile: "Dark Arrows"}}
+        hp: 80
+        hpregen: 0.01
+        movespeed: 4
+        strength: 20
+        defence: 8
+        willpower: 8
+    }
+    effects_active: {"StopOnceInRange"}
+}
+
+Data.enemy_create {
+    name: "Centaur Marksman"
+    sprite: "spr_enemies.humanoid.centaur_warrior"
+    death_sprite: "blood"
+    radius: 12
+    xpaward: 60
+    appear_message: "A centaur marksman readies his bow."
+    defeat_message: "The centaur marksman has been defeated."
+    stats: {
+        attacks: {{projectile: "Poison Arrows"}}
+        hp: 120
+        hpregen: 0.02
+        movespeed: 4
+        strength: 40
+        defence: 16
+        willpower: 16
+    }
+    effects_active: {"StopOnceInRange"}
+}
+
+Data.enemy_create {
+    name: "Nesso"
+    sprite: "spr_enemies.humanoid.centaur_warrior"
+    death_sprite: "blood"
+    unique: true
+    radius: 12
+    xpaward: 120
+    appear_message: "Nesso readies his bow."
+    defeat_message: "Nesso has been defeated."
+    stats: {
+        attacks: {{projectile: "Rapid Poison Arrows"}}
+        hp: 200
+        hpregen: 0.02
+        movespeed: 4
+        strength: 40
+        defence: 16
+        willpower: 16
+    }
+    effects_active: {"StopOnceInRange"}
+}
+

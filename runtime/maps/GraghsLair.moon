@@ -39,10 +39,10 @@ M = nilprotect {} -- Module
 
 floor_plans = (rng) ->
     tileset = TileSets.lair
-    {:number_regions, :room_radius}= rng\random_choice {
+    {:number_regions, :room_radius} = rng\random_choice {
         {
             number_regions: 5
-            room_radius: () -> rng\random(5, 10)
+            room_radius: () -> rng\random(5, 12)
         }
         {
             number_regions: 1
@@ -52,17 +52,18 @@ floor_plans = (rng) ->
     raw_plans = {
         [1]: {
             wandering_enabled: false
-            size: {45, 45}
             n_subareas: 1
+            size: {45, 45}
             n_items: 4
             n_enemies: 0
             n_encounter_vaults: 3
             enemy_entries: {
                 {enemy: "Sheep", guaranteed_spawns: 5, chance: 100}
-                {enemy: "Adder", guaranteed_spawns: 9}
+                {enemy: "Mouther", guaranteed_spawns: 12}
                 {enemy: "Black Mamba", guaranteed_spawns: 5}
+                {enemy: "Centaur Hunter", guaranteed_spawns: 3}
                 {enemy: "Gragh", guaranteed_spawns: 1}
-                {enemy: "Elephant", guaranteed_spawns: 4}
+                {enemy: "Elephant", guaranteed_spawns: 9}
             }
             item_groups: {{ItemGroups.enchanted_items, 4}}
             :number_regions
@@ -76,7 +77,7 @@ floor_plans = (rng) ->
         base = table.merge NewDungeons.dungeon_defaults(rng), NewDungeons.create_dungeon_scheme(tileset)
         table.merge(base, raw)
 
-M.N_FLOORS = 2
+M.N_FLOORS = 1
 M.TEMPLATE  = (rng, floor, connector) -> 
     n_stairs_up = connector.n_portals("up")
     plan = floor_plans(rng)[floor]
@@ -103,16 +104,6 @@ M.TEMPLATE  = (rng, floor, connector) ->
             area = {0,0,map.size[1],map.size[2]}
             for i =1,connector.n_portals("down")
                 if not connector.random_portal("down", map, area)
-                    return nil
-            return true
-
-        ---------------------------------
-        -- Place small_random_vaults:  --
-        _place_small_vaults: (map) =>
-            for i=1,4
-                conf = table.merge {rng: map.rng}, @_default_vault_config()
-                vault = SourceMap.area_template_create(Vaults.small_random_vault(conf))
-                if not NewDungeons.place_feature(map, vault)
                     return nil
             return true
         _create_stairs_up: (map) =>
@@ -143,9 +134,6 @@ M.TEMPLATE  = (rng, floor, connector) ->
                 return nil
             if not @_create_encounter_rooms(map)
                 print("ABORT: stairs encounter")
-                return nil
-            if not @_place_small_vaults(map)
-                print("ABORT: small vaults")
                 return nil
             if not @_spawn_statues(map)
                 print("ABORT: statues")

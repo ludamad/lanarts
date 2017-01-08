@@ -125,7 +125,7 @@ with M.SummonAbility = LuaGameObject.type_create()
             break
     .on_step = () =>
         @n_steps += 1
-        if @n_steps >= SPELL_WALL_DURATION
+        if @n_steps >= @duration
             GameObject.destroy(@)
             mon = GameObject.enemy_create {type: @monster, xy: @xy}
             @caster.summoned[mon] = 1

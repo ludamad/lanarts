@@ -232,7 +232,7 @@ local function place_content(map, --[[Optional]] dont_spawn_content)
             temple_sequences[seq_len + 1] = MapSequence.create {preallocate = 1}
             temple_sequences[seq_len + 1]:forward_portal_add(1, portal, 1, 
                 function() 
-                    return temple_level_create("Temple", 1, temple_sequences, TileSets.temple, {"Skeleton", "Dark Centaur"})
+                    return temple_level_create("Temple", 1, temple_sequences, TileSets.temple, {"Skeleton", "Centaur Hunter"})
             end)
 
             SourceMap.rectangle_apply {
