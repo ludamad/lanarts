@@ -463,6 +463,7 @@ Data.enemy_create summoner_base("Imp", 5, 60, 600) {
     death_func: () =>
         item = random_choice {"Will Scroll", "Strength Scroll", "Defence Scroll", "Magic Scroll"}
         ObjectUtils.spawn_item_near(@, item, 1)
+        ObjectUtils.spawn_item_near(@, "Abyssal Lanart", 1)
         ItemUtils = require "maps.ItemUtils"
         ItemGroups = require "maps.ItemGroups"
         -- Spawn a level 1 randart:
