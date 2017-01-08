@@ -204,8 +204,10 @@ void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
 	if (gs->key_down_state(SDLK_LEFT) || gs->key_down_state(SDLK_a)) {
 		dx -= 1;
 	}
+        bool explore_used = false;
         if (dx == 0 && dy == 0) {
             if (gs->key_down_state(SDLK_e) && !has_visible_monster(gs, this)) {
+                explore_used = true;
                 Pos closest = {-1,-1};
                 float min_dist = 10000;//std::numeric_limits<float>::max();
                 bool found_item = false;
@@ -228,7 +230,9 @@ void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
                                 }
                             }
                         }
-                        bool is_item = (gs->object_radius_test(this, NULL, 0, &item_colfilter, (x*32+16), (y*32+16), 1));
+                        // Ludamad: Automatic item picking up was interesting but way too good. 
+                        // Dashing into a dungeon and quickly picking up items around should be a conscious effort by the player.
+                        bool is_item = false; // Too broken:  (gs->object_radius_test(this, NULL, 0, &item_colfilter, (x*32+16), (y*32+16), 1));
                         if (near_unseen || is_item) {
                             if (dist != 0 && (min_dist >= dist || (is_item > found_item)) && (is_item >= found_item)) {
                                 closest = {x,y};
@@ -262,13 +266,17 @@ void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
                         dx = 0;
                         dy = 0;
                     }
-                    bool is_item = (gs->object_radius_test(this, NULL, 0, &item_colfilter, x, y, 1));
-                    if (is_item) {
-                        dx = 0;
-                        dy = 0;
-                    }
+                    // Too broken:
+                    //bool is_item = (gs->object_radius_test(this, NULL, 0, &item_colfilter, x, y, 1));
+                    //if (is_item) {
+                    //    dx = 0;
+                    //    dy = 0;
+                    //}
                     if (dx != 0) dx /= abs(dx);
                     if (dy != 0) dy /= abs(dy);
+                } else {
+                    gs->game_chat().add_message("There is nothing to travel to in sight!",
+                                    Colour(255, 100, 100));
                 }
             } else if (gs->key_down_state(SDLK_e)) {
                 gs->game_chat().add_message("Deal with the enemy before exploring!",
@@ -277,7 +285,7 @@ void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
         }
 	if (dx != 0 || dy != 0) {
 		queued_actions.push_back(
-				game_action(gs, this, GameAction::MOVE, 0, dx, dy));
+				game_action(gs, this, GameAction::MOVE, 0, dx, dy, explore_used));
 		moving = true;
 	} else {
 		moving = false;
@@ -695,6 +703,9 @@ void PlayerInst::use_move(GameState* gs, const GameAction& action) {
 
         // Get the effective move speed:
 	float mag = effective_stats().movespeed;
+        if (action.use_id2) { // Did we use autoexplore?
+            mag = std::min(2.0f, mag); // Autoexplore penalty
+        }
 
         // Get the move direction:
 	int dx = action.action_x, dy = action.action_y;

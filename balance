@@ -44,3 +44,6 @@ TODO:
     + Mana sapper enemy (DONE?)
     + turret enemy
     + Make sure all is_enemy stuff gets put into a proper API
+Out there:
+    Class that cannot do any damage, just takes damage and reciprocates it. 
+    Focus on good health regen, heal spells, summons?

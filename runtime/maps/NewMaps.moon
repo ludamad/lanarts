@@ -244,7 +244,7 @@ map_try_create = (template_f) ->
 
     generate_subareas(template, map, rng, major_regions.regions, starting_edges)
     map.regions = major_regions.regions
- 
+
     if not template\on_create_source_map(map)
         print("ABORT: on_create_source_map")
         return nil

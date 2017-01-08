@@ -131,7 +131,19 @@ M.make_dungeon_template = (data) -> table.merge {
                 item = ItemUtils.item_generate group[1], false, 1, (group[3] or 2) --Randart power level and chance
                 MapUtils.spawn_item(map, item.type, item.amount, sqr) 
         return true
+    _recalculate_perimeter: (map) =>
+        -- Detect the perimeter, important for the winding-tunnel algorithm.
+        SourceMap.perimeter_apply {:map,
+            candidate_selector: {matches_all: SourceMap.FLAG_SOLID}, inner_selector: {matches_none: SourceMap.FLAG_SOLID}
+            operator: {add: SourceMap.FLAG_PERIMETER}
+        }
+        SourceMap.perimeter_apply {:map
+            candidate_selector: {matches_none: {SourceMap.FLAG_SOLID}}, 
+            inner_selector: {matches_all: {SourceMap.FLAG_PERIMETER, SourceMap.FLAG_SOLID}}
+            operator: {add: FLAG_INNER_PERIMETER}
+        }
     _spawn_statues: (map) =>
+        @_recalculate_perimeter(map)
         for region in *map.regions
             for i=1,region.conf.n_statues
                 area = region\bbox()

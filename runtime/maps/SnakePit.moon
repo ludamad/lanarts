@@ -42,21 +42,18 @@ snake_pit_floor_plans = (rng) ->
     raw_plans = {
         [1]: {
             wandering_enabled: false
-            size: {25, 25}
+            size: {30, 30}
             n_subareas: 3
-            n_items: 4
             n_enemies: 0
             n_encounter_vaults: 0
             enemy_entries: {
-                {enemy: "Adder", guaranteed_spawns: 5}
-                {enemy: "Black Mamba", guaranteed_spawns: 1}
-                {enemy: "Mouther", guaranteed_spawns: 1}
-                {enemy: "Adder", chance: 100}
-                {enemy: "Black Mamba", chance: 25}
+                {enemy: "Adder", guaranteed_spawns: 6, chance: 100}
+                {enemy: "Black Mamba", guaranteed_spawns: 2, chance: 25}
+                {enemy: "Mouther", guaranteed_spawns: 2}
             }
-            item_groups: {{ItemGroups.basic_items, 4}}
+            item_groups: {{ItemGroups.basic_items, 8}}
             number_regions: 2
-            room_radius: () -> 7
+            room_radius: () -> 11
             rect_room_num_range: {0, 0}
             rect_room_size_range: {1, 1}
             n_statues: 4
@@ -65,15 +62,12 @@ snake_pit_floor_plans = (rng) ->
             wandering_enabled: false
             size: {45, 45}
             n_subareas: 3
-            n_items: 7
             n_enemies: 0
             n_encounter_vaults: 1
             enemy_entries: {
-                {enemy: "Adder", guaranteed_spawns: 8}
-                {enemy: "Black Mamba", guaranteed_spawns: 3}
+                {enemy: "Adder", guaranteed_spawns: 8, chance: 100}
+                {enemy: "Black Mamba", guaranteed_spawns: 2, chance: 25}
                 {enemy: "Mouther", guaranteed_spawns: 3}
-                {enemy: "Adder", chance: 100}
-                {enemy: "Black Mamba", chance: 25}
             }
             item_groups: {{ItemGroups.basic_items, 8}}
             number_regions: 2
