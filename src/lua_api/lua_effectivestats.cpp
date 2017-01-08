@@ -8,8 +8,8 @@
 #include "gamestate/GameMapState.h"
 #include "gamestate/GameState.h"
 
-#include "objects/enemy/EnemyInst.h"
-#include "objects/player/PlayerInst.h"
+#include "objects/EnemyInst.h"
+#include "objects/PlayerInst.h"
 
 #include "stats/combat_stats.h"
 #include "stats/stats.h"

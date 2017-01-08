@@ -13,7 +13,7 @@
 #include "draw/draw_sprite.h"
 #include "draw/TileEntry.h"
 
-#include "objects/player/PlayerInst.h"
+#include "objects/PlayerInst.h"
 
 #include <lcommon/SerializeBuffer.h>
 #include <lcommon/math_util.h>

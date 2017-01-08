@@ -11,7 +11,7 @@
 
 #include "gamestate/GameState.h"
 
-#include "objects/player/PlayerInst.h"
+#include "objects/PlayerInst.h"
 
 #include "objects/AnimatedInst.h"
 

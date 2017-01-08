@@ -12,7 +12,7 @@
 #include <ldungeon_gen/Map.h>
 
 #include "collision_avoidance/CollisionAvoidance.h"
-#include "objects/enemy/MonsterController.h"
+#include "objects/MonsterController.h"
 #include "pathfind/WanderMap.h"
 
 #include "LuaDrawableQueue.h"

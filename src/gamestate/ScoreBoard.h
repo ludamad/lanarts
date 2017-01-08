@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "objects/player/PlayerInst.h"
+#include "objects/PlayerInst.h"
 
 class GameState;
 

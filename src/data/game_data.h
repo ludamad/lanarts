@@ -14,7 +14,7 @@
 
 #include "gamestate/GameSettings.h"
 #include "gamestate/tileset_data.h"
-#include "objects/enemy/EnemyEntry.h"
+#include "objects/EnemyEntry.h"
 
 #include "stats/items/EquipmentEntry.h"
 #include "stats/items/ProjectileEntry.h"

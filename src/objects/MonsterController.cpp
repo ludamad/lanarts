@@ -22,7 +22,7 @@
 
 #include <lcommon/math_util.h>
 
-#include "../player/PlayerInst.h"
+#include "../PlayerInst.h"
 #include "../CombatGameInstFunctions.h"
 #include "../collision_filters.h"
 

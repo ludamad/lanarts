@@ -19,7 +19,7 @@
 #include "stats/items/ItemEntry.h"
 
 #include <lcommon/math_util.h>
-#include "player/PlayerInst.h"
+#include "PlayerInst.h"
 #include "FeatureInst.h"
 
 #include "collision_filters.h"

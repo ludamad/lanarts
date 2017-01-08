@@ -27,7 +27,7 @@
 #include "stats/stat_formulas.h"
 
 #include <lcommon/math_util.h>
-#include "../player/PlayerInst.h"
+#include "../PlayerInst.h"
 
 #include "../AnimatedInst.h"
 

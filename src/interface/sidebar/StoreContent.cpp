@@ -13,9 +13,9 @@
 #include "draw/SpriteEntry.h"
 
 #include "gamestate/GameState.h"
-#include "objects/player/PlayerInst.h"
+#include "objects/PlayerInst.h"
 
-#include "objects/store/StoreInst.h"
+#include "objects/StoreInst.h"
 
 #include "stats/items/ItemEntry.h"
 #include "../console_description_draw.h"

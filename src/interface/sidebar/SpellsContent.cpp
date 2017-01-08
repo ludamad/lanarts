@@ -12,7 +12,7 @@
 
 #include "gamestate/GameState.h"
 
-#include "objects/player/PlayerInst.h"
+#include "objects/PlayerInst.h"
 
 #include "stats/SpellsKnown.h"
 #include "stats/SpellEntry.h"

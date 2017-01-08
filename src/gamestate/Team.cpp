@@ -4,7 +4,7 @@
 #include "Team.h"
 #include "gamestate/GameState.h"
 #include "objects/CombatGameInst.h"
-#include "objects/player/PlayerInst.h"
+#include "objects/PlayerInst.h"
 
 static constexpr float STRIDE = 15;
 static constexpr float STRIDE_SQR = STRIDE * STRIDE;

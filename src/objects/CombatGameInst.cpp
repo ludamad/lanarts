@@ -15,7 +15,7 @@
 #include "draw/SpriteEntry.h"
 #include "gamestate/GameState.h"
 #include "gamestate/Team.h"
-#include "objects/enemy/EnemyInst.h"
+#include "objects/EnemyInst.h"
 
 #include "stats/items/ProjectileEntry.h"
 #include "stats/items/WeaponEntry.h"
@@ -26,7 +26,7 @@
 
 #include <lcommon/math_util.h>
 
-#include "player/PlayerInst.h"
+#include "PlayerInst.h"
 
 #include "AnimatedInst.h"
 #include "CombatGameInst.h"

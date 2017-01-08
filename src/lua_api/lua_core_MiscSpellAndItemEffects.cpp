@@ -6,8 +6,8 @@
 
 #include <ldungeon_gen/map_misc_ops.h>
 
-#include "objects/player/PlayerInst.h"
-#include "objects/store/StoreInst.h"
+#include "objects/PlayerInst.h"
+#include "objects/StoreInst.h"
 #include "objects/FeatureInst.h"
 #include "objects/ItemInst.h"
 #include "gamestate/GameState.h"

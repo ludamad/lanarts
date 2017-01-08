@@ -72,10 +72,7 @@ file(GLOB lanarts_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     net/*
 
     objects/*
-    objects/enemy/*
     objects/loaddata/*
-    objects/player/*
-    objects/store/*
 
     pathfind/*
 

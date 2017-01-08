@@ -23,9 +23,9 @@
 
 #include <lcommon/math_util.h>
 
-#include "enemy/EnemyInst.h"
+#include "EnemyInst.h"
 
-#include "player/PlayerInst.h"
+#include "PlayerInst.h"
 
 #include "AnimatedInst.h"
 #include "ItemInst.h"

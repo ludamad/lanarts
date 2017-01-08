@@ -21,8 +21,8 @@
 #include <lcommon/lua_utils.h>
 
 #include "gamestate/GameState.h"
-#include "objects/player/PlayerInst.h"
-#include "objects/enemy/EnemyInst.h"
+#include "objects/PlayerInst.h"
+#include "objects/EnemyInst.h"
 
 #include "lua_api.h"
 

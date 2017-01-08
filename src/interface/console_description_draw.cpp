@@ -11,7 +11,7 @@
 #include "draw/draw_sprite.h"
 #include "draw/SpriteEntry.h"
 #include "gamestate/GameState.h"
-#include "objects/player/PlayerInst.h"
+#include "objects/PlayerInst.h"
 
 #include "stats/items/EquipmentEntry.h"
 #include "stats/items/ProjectileEntry.h"

@@ -28,7 +28,7 @@
 
 #include "lanarts_defines.h"
 
-#include "../enemy/EnemyInst.h"
+#include "../EnemyInst.h"
 
 #include "../AnimatedInst.h"
 #include "../ItemInst.h"

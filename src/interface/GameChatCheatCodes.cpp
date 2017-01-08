@@ -12,7 +12,7 @@
 
 #include "stats/items/ItemEntry.h"
 
-#include "objects/player/PlayerInst.h"
+#include "objects/PlayerInst.h"
 
 #include "lua_api/lua_api.h"
 

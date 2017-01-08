@@ -6,9 +6,9 @@
 #ifndef INSTTYPEENUM_H_
 #define INSTTYPEENUM_H_
 
-#include "enemy/EnemyInst.h"
-#include "player/PlayerInst.h"
-#include "store/StoreInst.h"
+#include "EnemyInst.h"
+#include "PlayerInst.h"
+#include "StoreInst.h"
 #include "AnimatedInst.h"
 #include "FeatureInst.h"
 #include "ItemInst.h"

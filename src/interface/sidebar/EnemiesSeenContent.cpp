@@ -11,7 +11,7 @@
 #include "draw/SpriteEntry.h"
 
 #include "gamestate/GameState.h"
-#include "objects/enemy/MonsterController.h"
+#include "objects/MonsterController.h"
 
 #include "../console_description_draw.h"
 #include "EnemiesSeenContent.h"

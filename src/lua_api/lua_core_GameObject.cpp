@@ -22,11 +22,11 @@
 
 #include "objects/GameInst.h"
 #include "objects/AnimatedInst.h"
-#include "objects/enemy/EnemyInst.h"
+#include "objects/EnemyInst.h"
 #include "objects/FeatureInst.h"
-#include "objects/store/StoreInst.h"
+#include "objects/StoreInst.h"
 #include "objects/ItemInst.h"
-#include "objects/player/PlayerInst.h"
+#include "objects/PlayerInst.h"
 #include "objects/CombatGameInst.h"
 
 #include "lua_api.h"

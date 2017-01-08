@@ -31,9 +31,9 @@
 
 #include "net/GameNetConnection.h"
 
-#include "objects/enemy/EnemyInst.h"
+#include "objects/EnemyInst.h"
 
-#include "objects/player/PlayerInst.h"
+#include "objects/PlayerInst.h"
 
 #include "objects/GameInst.h"
 

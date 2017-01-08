@@ -3,7 +3,7 @@
  *  Contains game map (level) state information
  */
 
-#include "objects/player/PlayerInst.h"
+#include "objects/PlayerInst.h"
 
 #include <lcommon/SerializeBuffer.h>
 

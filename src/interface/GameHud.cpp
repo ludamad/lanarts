@@ -13,7 +13,7 @@
 #include "draw/TileEntry.h"
 #include "gamestate/GameInstSet.h"
 #include "gamestate/GameState.h"
-#include "objects/player/PlayerInst.h"
+#include "objects/PlayerInst.h"
 
 #include "objects/GameInst.h"
 

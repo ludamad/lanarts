@@ -7,7 +7,7 @@
 
 #include "draw/colour_constants.h"
 #include "gamestate/GameState.h"
-#include "objects/player/PlayerInst.h"
+#include "objects/PlayerInst.h"
 
 #include "stats/items/ProjectileEntry.h"
 #include "stats/items/WeaponEntry.h"

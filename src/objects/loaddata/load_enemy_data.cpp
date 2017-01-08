@@ -10,7 +10,7 @@
 #include "stats/stats.h"
 #include "stats/loaddata/load_stats.h"
 
-#include "../enemy/EnemyEntry.h"
+#include "../EnemyEntry.h"
 
 using namespace std;
 

@@ -12,9 +12,9 @@
 #include "gamestate/PlayerData.h"
 
 #include <lcommon/math_util.h>
-#include "enemy/EnemyInst.h"
+#include "EnemyInst.h"
 
-#include "player/PlayerInst.h"
+#include "PlayerInst.h"
 #include "CombatGameInstFunctions.h"
 
 #include "collision_filters.h"

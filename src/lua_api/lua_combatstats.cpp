@@ -1,9 +1,9 @@
 #include "gamestate/GameMapState.h"
 #include "gamestate/GameState.h"
 
-#include "objects/enemy/EnemyInst.h"
+#include "objects/EnemyInst.h"
 
-#include "objects/player/PlayerInst.h"
+#include "objects/PlayerInst.h"
 #include "objects/GameInstRef.h"
 
 #include "stats/items/WeaponEntry.h"

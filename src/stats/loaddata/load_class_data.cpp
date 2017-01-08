@@ -16,7 +16,7 @@
 #include "data/game_data.h"
 #include "data/parse.h"
 
-#include "objects/enemy/EnemyEntry.h"
+#include "objects/EnemyEntry.h"
 
 #include "lua_api/lua_yaml.h"
 

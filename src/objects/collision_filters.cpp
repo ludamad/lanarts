@@ -3,9 +3,9 @@
  *  Defines functions that are often used in conjunction with collision detection
  */
 
-#include "enemy/EnemyInst.h"
+#include "EnemyInst.h"
 #include "FeatureInst.h"
-#include "player/PlayerInst.h"
+#include "PlayerInst.h"
 #include "GameInst.h"
 #include "ItemInst.h"
 #include "collision_filters.h"

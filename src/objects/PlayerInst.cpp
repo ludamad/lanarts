@@ -22,7 +22,7 @@
 
 #include "lua_api/lua_api.h"
 
-#include "../enemy/EnemyInst.h"
+#include "../EnemyInst.h"
 
 #include "../AnimatedInst.h"
 #include "../ItemInst.h"
