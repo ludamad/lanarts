@@ -129,6 +129,11 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 	const char* content;
 	lua_State* L = gs->luastate();
 
+        // Include local player as easily accessible object:
+        luawrap::push(gs->luastate(), gs->local_player());
+        luawrap::globals(gs->luastate())["player"].pop();
+
+        bool ran = false;
 	//Run lua command
 	if (starts_with(command, "!lua ", &content)) {
 		int prior_top = lua_gettop(L);
@@ -138,48 +143,46 @@ static bool handle_dolua(GameState* gs, const std::string& command) {
 			const char* val = lua_tostring(L, -1);
 			gs->game_chat().add_message(val, /*iserr ? Colour(255,50,50) :*/
 			Colour(120, 120, 255));
-			return true;
-		}
-		luawrap::push(gs->luastate(), gs->local_player());
-		luawrap::globals(gs->luastate())["player"].pop();
+		} else {
+                    bool iserr = (lua_pcall(L, 0, LUA_MULTRET, 0) != 0);
 
-		bool iserr = (lua_pcall(L, 0, LUA_MULTRET, 0) != 0);
+                    int current_top = lua_gettop(L);
 
-		int current_top = lua_gettop(L);
-
-		for (; prior_top < current_top; prior_top++) {
-			if (lua_isstring(L, -1)) {
-				const char* val = lua_tostring(L, -1);
-				gs->game_chat().add_message(val,
-						iserr ? Colour(255, 50, 50) : Colour(120, 120, 255));
-			}
-			lua_pop(L, 1);
-		}
-
-		return true;
+                    for (; prior_top < current_top; prior_top++) {
+                            if (lua_isstring(L, -1)) {
+                                    const char* val = lua_tostring(L, -1);
+                                    gs->game_chat().add_message(val,
+                                                    iserr ? Colour(255, 50, 50) : Colour(120, 120, 255));
+                            }
+                            lua_pop(L, 1);
+                    }
+                }
+                ran = true;
 	}
 	//Run lua file
-	if (starts_with(command, "!luafile ", &content)) {
+	if (starts_with(command, "!!", &content)) {
+                std::string filename = (std::string("debug_scripts/") + content) + ".lua";
 		int prior_top = lua_gettop(L);
-
-		int err_func = luaL_loadfile(L, content);
+		int err_func = luaL_loadfile(L, filename.c_str());
 		if (err_func) {
 			const char* val = lua_tostring(L, -1);
 			gs->game_chat().add_message(val, Colour(120, 120, 255));
 			lua_pop(L, 1);
-			return true;
-		}
-
-		bool err_call = (lua_pcall(L, 0, 0, 0) != 0);
-		if (err_call) {
-			const char* val = lua_tostring(L, -1);
-			gs->game_chat().add_message(val, Colour(120, 120, 255));
-			lua_pop(L, 1);
-		}
-		return true;
+		} else {
+                    bool err_call = (lua_pcall(L, 0, 0, 0) != 0);
+                    if (err_call) {
+                            const char* val = lua_tostring(L, -1);
+                            gs->game_chat().add_message(val, Colour(120, 120, 255));
+                            lua_pop(L, 1);
+                    }
+                }
+                ran = true;
 	}
 
-	return false;
+        // Clear local player variable:
+        lua_pushnil(L);
+        luawrap::globals(gs->luastate())["player"].pop();
+	return ran;
 }
 
 bool GameChat::handle_special_commands(GameState* gs,

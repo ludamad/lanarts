@@ -25,6 +25,7 @@ effects:
       function (effect, obj) 
         obj:add_effect("Exhausted", effect.exhausted_duration) 
         if obj.is_local_player and obj:is_local_player() then 
+          play_sound("sound/exhausted.ogg")
           local EventLog = require "ui.EventLog";
           EventLog.add("You are now exhausted...", {255,200,200}) 
         end

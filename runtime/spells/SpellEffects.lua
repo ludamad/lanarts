@@ -52,6 +52,7 @@ function berserk_effect.step(effect, obj)
 		effect.time_left = math.min(effect.max_time * 1.5, effect.time_left + berserk_extension(effect))
 		if obj:is_local_player() then
 			EventLog.add("Your rage grows ...", {200,200,255})
+                        play_sound "sound/berserk.ogg"
 		end
 		if settings.verbose_output then
 			EventLog.add("Killed Enemy, berserk time_left = " .. effect.time_left)
