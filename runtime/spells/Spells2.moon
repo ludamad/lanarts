@@ -455,13 +455,18 @@ Data.effect_create {
                 caster.summoned[mon] += 1
                 @n_summons += 1
         amount = math.max 1, math.floor(caster.stats.level / 2)
-        if Map.object_visible(caster) and not (caster\has_effect "Summoning") and @n_summons < amount 
+        visible_enemy = false
+        for obj in *Map.enemies_list(caster)
+            if Map.object_visible(obj)
+                visible_enemy = true
+                break
+        if visible_enemy and not (caster\has_effect "Summoning") and @n_summons < amount 
             if #Map.allies_list(caster) == 0
                 return
             if @n_steps > 30 + 70 / caster.stats.level
                 eff = caster\add_effect("Summoning", 20)
                 eff.monster = (if type(@monster) == "string" then @monster else random_choice(@monster))
-                eff.duration = @duration / caster.stats.level
+                eff.duration = 5 -- @duration / caster.stats.level
                 @n_steps = 0
             else 
                 @n_steps += 1
