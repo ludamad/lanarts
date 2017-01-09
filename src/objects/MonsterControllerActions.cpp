@@ -185,16 +185,9 @@ void MonsterController::set_monster_headings(GameState* gs,
 		}
 
 		if (!potentially_randomize_movement(gs, e)) {
-                    if (e->has_paths_data()) {
-                        Pos heading = e->direction_towards_enemy(gs);
-                        e->vx = heading.x;
-                        e->vy = heading.y;
-                        normalize(e->vx, e->vy, movespeed);
-                    } else {
-                        PosF heading = get_direction_towards(gs, e, p, movespeed);
-                        e->vx = heading.x;
-                        e->vy = heading.y;
-                    }
+                    PosF heading = get_direction_towards(gs, e, p, movespeed);
+                    e->vx = heading.x;
+                    e->vy = heading.y;
 		}
 
 		//Compare position to player object
@@ -314,12 +307,11 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	e->vx = 0, e->vy = 0;
 
         // Part of: Implement status effects.
-    bool forced_wander = e->team == PLAYER_TEAM || (e->effects().get(get_effect_by_name("Dazed")));
+    bool forced_wander = (e->effects().get(get_effect_by_name("Dazed")));
 
 	if (!forced_wander && !monsters_wandering_flag) {
 		return;
 	}
-
 	perf_timer_begin(FUNCNAME);
 	bool is_fullpath = false;
 	if (eb.path_cooldown > 0) {

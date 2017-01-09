@@ -256,8 +256,8 @@ local Pain = {
     can_cast_with_held_key = true,
     spr_spell = "spr_spells.pain",
     can_cast_with_cooldown = false,
-    mp_cost = 20,
-    cooldown = 35,
+    mp_cost = 10,
+    cooldown = 30,
     fallback_to_melee = true,
     range = 60
 }
@@ -279,10 +279,13 @@ function Pain.action_func(caster, x, y, target)
         return
     end
     local stats = caster:effective_stats()
-    caster:direct_damage(10)
     target:add_effect("Pained", 50)
     play_pained_sound()
-    target:damage(random(1,12) * 0.9 + stats.magic * 0.9, random(2,5) + stats.magic * 0.2, 1, 0.9)
+    if target:damage(random(1,12) * 0.9 + stats.magic * 0.9, random(2,5) + stats.magic * 0.2, 1, 0.9) then
+        caster:heal_hp(10)
+    else
+        caster:direct_damage(10)
+    end
     caster:add_effect("Pained", 50)
     if caster:is_local_player() then
         EventLog.add("You attack your enemy's life force directly!", {200,200,255})

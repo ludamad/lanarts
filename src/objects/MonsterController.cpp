@@ -137,12 +137,6 @@ void MonsterController::pre_step(GameState* gs) {
 
         // Part of: Implement status effects.
         bool forced_wander = (e->effects().get(get_effect_by_name("Dazed")));
-        if (e->has_paths_data()) {
-            Pos heading = e->direction_towards_enemy(gs);
-            if (heading == Pos(0,0)) {
-                forced_wander = true;
-            }
-        }
         if (forced_wander) {
             if (eb.current_action == EnemyBehaviour::CHASING_PLAYER) {
                 eb.current_action = EnemyBehaviour::INACTIVE;
@@ -159,15 +153,35 @@ void MonsterController::pre_step(GameState* gs) {
             }
         }
 
-		if (actor != NULL && eb.current_action == EnemyBehaviour::CHASING_PLAYER)
-			eois.push_back(
-					EnemyOfInterest(e, actor->id,
-							inst_distance(e, actor)));
-		else if (eb.current_action == EnemyBehaviour::INACTIVE)
-			monster_wandering(gs, e);
-		else
-			//if (eb.current_action == EnemyBehaviour::FOLLOWING_PATH)
-			monster_follow_path(gs, e);
+
+                // TODO break out allied monster code into its own thing:
+                e->vx = 0, e->vy = 0;
+                if (e->has_paths_data()) {
+                    Pos p = e->direction_towards_enemy(gs);
+                    e->vx = p.x, e->vy = p.y;
+                    float speed = e->effective_stats().movespeed;
+                    normalize(e->vx, e->vy, speed);
+                    if (e->vx == 0 && e->vy == 0) {
+                        Pos p = e->direction_towards_ally_player(gs);
+                        e->vx = p.x, e->vy = p.y;
+                        float speed = e->effective_stats().movespeed;
+                        normalize(e->vx, e->vy, speed);
+                    }
+                }
+                if (e->vx == 0 && e->vy == 0) {
+                    if (actor != NULL && eb.current_action == EnemyBehaviour::CHASING_PLAYER)
+                            eois.push_back(
+                                            EnemyOfInterest(e, actor->id,
+                                                            inst_distance(e, actor)));
+                    else {
+                            if (eb.current_action == EnemyBehaviour::INACTIVE) {
+                                    monster_wandering(gs, e);
+                            } else {
+                                    //if (eb.current_action == EnemyBehaviour::FOLLOWING_PATH)
+                                    monster_follow_path(gs, e);
+                            }
+                    }
+                }
 	}
 
 	set_monster_headings(gs, eois);

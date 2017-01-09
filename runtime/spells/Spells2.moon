@@ -481,7 +481,7 @@ for name in *{"Ranger", "Fighter", "Necromancer", "Mage"}
                     caster\add_effect "Summoner", 2 -- Keep effect from dying
                 else
                     eff = caster\add_effect "Summoner", 2
-                    eff.monster = "Skeleton"
+                    eff.monster = "Spectral Beast"
                     eff.duration = 30
                     eff.kill_time = 300
     }

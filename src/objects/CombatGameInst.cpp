@@ -81,8 +81,20 @@ static bool enemy_filter(GameInst* g1, GameInst* g2) {
     return c1->team != c2->team;
 }
 
+static bool friendly_player_filter(GameInst* g1, GameInst* g2) {
+    auto* c1 = dynamic_cast<CombatGameInst*>(g1);
+    if (!c1) return false;
+    auto* c2 = dynamic_cast<PlayerInst*>(g2);
+    if (!c2) return false;
+    return c1->team == c2->team;
+}
+
 Pos CombatGameInst::direction_towards_enemy(GameState* gs) {
     return direction_towards_object(gs, enemy_filter);
+}
+
+Pos CombatGameInst::direction_towards_ally_player(GameState* gs) {
+    return direction_towards_object(gs, friendly_player_filter);
 }
 
 static bool specific_inst_filter_data(GameInst* g1, GameInst* g2) {
@@ -139,7 +151,7 @@ Pos CombatGameInst::direction_towards_object(GameState* gs, col_filterf filter) 
             if (dist == 0 && (node->dx != 0 || node->dy != 0)) {
                 continue;
             }
-            bool is_item = (gs->object_radius_test(this, NULL, 0, filter, (x*32+16), (y*32+16), 1));
+            bool is_item = (gs->object_radius_test(this, NULL, 0, filter, (x*32+16), (y*32+16), 8));
             if (is_item && min_dist >= dist) {
                 closest = {x,y};
                 min_dist = dist;

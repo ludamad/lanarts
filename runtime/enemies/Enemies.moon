@@ -111,28 +111,26 @@ Data.enemy_create {
 }
 
 Data.enemy_create {
-    name: "Mummy" 
-    sprite: "spr_enemies.undead.mummy"
+    name: "Spectral Beast" 
+    sprite: "spr_enemies.undead.spectral_lizard"
     radius: 11
     xpaward: 10
-    appear_message: "A summoned mummy appears!"
-    defeat_message: "The summoned mummy is put to rest."
+    appear_message: "A spectral beast is summoned!"
+    defeat_message: "The spectre fades."
     stats: {
         attacks: {
             {weapon: "Basic Melee"}
         }
-        hp: 10
+        hp: 20
         hpregen: 0
-        movespeed: 5
+        movespeed: 4
         -- base stats:
-        strength: 15
+        strength: 1
         defence: 0
-        magic: 15
+        magic: 1
         willpower: 0
     }
-    effects_active: {"PoisonedWeapon"}
 }
-
 
 summoner_base = (monster, amount, rate = 60, kill_time = 250, duration = 150) -> (data) -> table.merge data, {
     init_func: () =>

@@ -207,7 +207,7 @@ Data.class_create {
         movespeed = 4,
         hp = 80,
         mp = 120,
-        hpregen = 2 / 60, -- Per 60 frames
+        hpregen = 1 / 60, -- Per 60 frames
         mpregen = 4 / 60, -- Per 60 frames
         strength = 4,
         defence = 4,
@@ -224,7 +224,7 @@ Data.class_create {
     gain_per_level = {
         hp = 10,
         mp = 20,
-        hpregen = 0.5 / 60, -- Per 60 frames
+        hpregen = 0.25 / 60, -- Per 60 frames
         mpregen = 0.65 / 60, -- Per 60 frames
         magic = 1,
         defence = 1,
