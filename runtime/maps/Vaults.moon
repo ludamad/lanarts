@@ -60,6 +60,14 @@ make_legend = (args, legend) ->
             on_placement: args.door_placer
             remove: SourceMap.FLAG_SOLID
         }
+        '@': {
+            add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_ITEM_SPAWN, M.FLAG_HAS_VAULT}
+            matches_none: {M.FLAG_HAS_VAULT}
+            content: args.tileset.floor
+            on_placement: (map, xy) ->
+                {x, y} = xy
+                append map.player_candidate_squares, {x*32+16, y*32+16}
+        }
         'p': {
             add: {SourceMap.FLAG_SEETHROUGH, M.FLAG_NO_ENEMY_SPAWN, M.FLAG_NO_ITEM_SPAWN, M.FLAG_HAS_VAULT}
             matches_none: {M.FLAG_HAS_VAULT}
@@ -273,6 +281,26 @@ M.skull_surrounded_dungeon = (args) -> {
 ++..wwsw1
 .....111.]=]
 }
+
+-- TEST LAYOUTS ---
+M.simple_room = (args) -> table.merge M.skull_surrounded_dungeon(args), {
+    data: [=[
+wwwwwwwwwwwwwwwwwwwwwww
+wpppppppppppppppppppppw
+wpppppppppppppppppppppw
+wpppppppppppppppppppppw
+wpppppppppppppppppppppw
+wpppppppppppppppppppppw
+wpppppppppppppppppppppw
+wppppppp@ppppppppeppppw
+wpppppppppppppppppppppw
+wpppppppppppppppppppppw
+wpppppppppppppppppppppw
+wwwwwwwwwwwwwwwwwwwwwww
+]=]
+}
+
+---
 
 M.hell_dungeon = (args) -> table.merge M.skull_surrounded_dungeon(args), {
     data: [=[

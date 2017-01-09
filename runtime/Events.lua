@@ -13,8 +13,6 @@ local events = {}
 events.PlayerInit = PlayerFunctions.player_init
 
 function events.PlayerDeath(player)
-    local classtable = {Mage=Sounds.death_mage, Fighter=Sounds.death_fighter, Ranger=Sounds.death_archer}
-    classtable[player.class_name]:play()
     if #World.players == 1 then
         DeathScreen.show()
     end
@@ -51,8 +49,10 @@ function events.PlayerEnterLevel()
 end
 
 -- Simple forwarding function
+local testcase = os.getenv("LANARTS_TESTCASE") -- If a test is active, replace normal events.
 function M.trigger_event(type, --[[Misc data]] ...)
-    local event = events[type]
+    local module = testcase and require(testcase) or nil
+    local event = (module or events)[type]
     if event then
         return event(...)
     end

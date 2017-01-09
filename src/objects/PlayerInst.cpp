@@ -21,6 +21,7 @@
 #include <lcommon/math_util.h>
 
 #include "lua_api/lua_api.h"
+#include "stats/effect_data.h"
 
 #include "objects/EnemyInst.h"
 
@@ -170,9 +171,11 @@ void PlayerInst::shift_autotarget(GameState* gs) {
 
 void PlayerInst::step(GameState* gs) {
 	perf_timer_begin(FUNCNAME);
-	_path_to_player.fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
-        //if (cooldowns().action_cooldown > 0) 
-        //printf("MELEE COOLDOWN %d\n", cooldowns().action_cooldown);
+    std::vector<int> effects_active = {get_effect_by_name(class_stats().class_entry().name.c_str())};
+    effects().ensure_effects_active(gs, this, effects_active);
+    _path_to_player.fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
+    //if (cooldowns().action_cooldown > 0)
+    //printf("MELEE COOLDOWN %d\n", cooldowns().action_cooldown);
 
 	GameInst* target_inst = gs->get_instance(current_target);
 	bool visible = target_inst != NULL

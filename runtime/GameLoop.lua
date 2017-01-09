@@ -91,7 +91,6 @@ function M.overlay_draw()
     help_overlay_draw()
 end
 
-
 function M.run_loop()
     M.loop_control.startup_function()
 

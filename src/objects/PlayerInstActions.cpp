@@ -189,6 +189,124 @@ static bool has_visible_monster(GameState* gs, PlayerInst* p = NULL) {
     return false;
 }
 
+Pos PlayerInst::direction_towards_object(GameState* gs, col_filterf filter) {
+    Pos closest = {-1,-1};
+    float min_dist = 10000;//std::numeric_limits<float>::max();
+    int dx = 0, dy = 0;
+    if (min_dist == 10000) {//std::numeric_limits<float>::max()) {
+        FOR_EACH_BBOX(_path_to_player.location(), x, y) {
+            auto* node = _path_to_player.node_at({x, y});
+            if (node->solid) {
+                continue;
+            }
+            float dist = node->distance;
+            if (dist == 0 && (node->dx != 0 || node->dy != 0)) {
+                continue;
+            }
+            // Ludamad: Automatic item picking up was interesting but way too good.
+            // Dashing into a dungeon and quickly picking up items around should be a conscious effort by the player.
+            bool is_item = (gs->object_radius_test(this, NULL, 0, filter, (x*32+16), (y*32+16), 1));
+            if (is_item && min_dist >= dist) {
+                closest = {x,y};
+                min_dist = dist;
+            }
+        }
+    }
+    if (min_dist != 10000) {//std::numeric_limits<float>::max()) {
+        Pos iter = closest;
+        Pos next_nearest;
+        while (true) {
+           Pos next = follow(_path_to_player, iter);
+           auto* next_node = _path_to_player.node_at(next);
+           if (next_node->distance == 0) {
+               next_nearest = iter;
+                break;
+           }
+           iter = next;
+        }
+        dx = (next_nearest.x * TILE_SIZE + TILE_SIZE / 2) - x;
+        dy = (next_nearest.y * TILE_SIZE + TILE_SIZE / 2) - y;
+        if (abs(dx) < effective_stats().movespeed) {
+            dx = 0;
+        }
+        if (abs(dy) < effective_stats().movespeed) {
+            dy = 0;
+        }
+        if (abs(dx) + abs(dy) < effective_stats().movespeed * 2) {
+            dx = 0;
+            dy = 0;
+        }
+        if (abs(dx) > 0) dx /= abs(dx);
+        if (abs(dy) > 0) dy /= abs(dy);
+    }
+    return {dx, dy};
+}
+
+Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
+    Pos closest = {-1,-1};
+    float min_dist = 10000;//std::numeric_limits<float>::max();
+    bool found_item = false;
+    int dx = 0, dy = 0;
+    if (min_dist == 10000) {//std::numeric_limits<float>::max()) {
+        FOR_EACH_BBOX(_path_to_player.location(), x, y) {
+            auto* node = _path_to_player.node_at({x, y});
+            if (node->solid) {
+                continue;
+            }
+            float dist = node->distance;
+            if (dist == 0 && (node->dx != 0 || node->dy != 0)) {
+                continue;
+            }
+            bool near_unseen = false;
+            for (int dy = -1; dy <= +1; dy++) {
+                for (int dx = -1; dx <= +1; dx++) {
+                    if (!(*gs->tiles().previously_seen_map())[{x+dx,y+dy}]) {
+                        near_unseen = true;
+                        break;
+                    }
+                }
+            }
+            // Ludamad: Automatic item picking up was interesting but way too good.
+            // Dashing into a dungeon and quickly picking up items around should be a conscious effort by the player.
+            bool is_item = false; // Too broken:  (gs->object_radius_test(this, NULL, 0, &item_colfilter, (x*32+16), (y*32+16), 1));
+            if (near_unseen || is_item) {
+                if (dist != 0 && (min_dist >= dist || (is_item > found_item)) && (is_item >= found_item)) {
+                    closest = {x,y};
+                    min_dist = dist;
+                    found_item = is_item;
+                }
+            }
+        }
+    }
+    if (min_dist != 10000) {//std::numeric_limits<float>::max()) {
+        Pos iter = closest;
+        Pos next_nearest;
+        while (true) {
+           Pos next = follow(_path_to_player, iter);
+           auto* next_node = _path_to_player.node_at(next);
+           if (next_node->distance == 0) {
+               next_nearest = iter;
+                break;
+           }
+           iter = next;
+        }
+        dx = (next_nearest.x * TILE_SIZE + TILE_SIZE / 2) - x;
+        dy = (next_nearest.y * TILE_SIZE + TILE_SIZE / 2) - y;
+        if (abs(dx) < effective_stats().movespeed) {
+            dx = 0;
+        }
+        if (abs(dy) < effective_stats().movespeed) {
+            dy = 0;
+        }
+        if (abs(dx) + abs(dy) < effective_stats().movespeed * 2) {
+            dx = 0;
+            dy = 0;
+        }
+        if (abs(dx) > 0) dx /= abs(dx);
+        if (abs(dy) > 0) dx /= abs(dy);
+    }
+    return {dx, dy};
+}
 
 void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
 //Arrow/wasd movement
@@ -208,72 +326,10 @@ void PlayerInst::enqueue_io_movement_actions(GameState* gs, int& dx, int& dy) {
         if (dx == 0 && dy == 0) {
             if (gs->key_down_state(SDLK_e) && !has_visible_monster(gs, this)) {
                 explore_used = true;
-                Pos closest = {-1,-1};
-                float min_dist = 10000;//std::numeric_limits<float>::max();
-                bool found_item = false;
-                if (min_dist == 10000) {//std::numeric_limits<float>::max()) {
-                    FOR_EACH_BBOX(_path_to_player.location(), x, y) {
-                        auto* node = _path_to_player.node_at({x, y});
-                        if (node->solid) {
-                            continue;
-                        }
-                        float dist = node->distance;
-                        if (dist == 0 && (node->dx != 0 || node->dy != 0)) {
-                            continue;
-                        }
-                        bool near_unseen = false;
-                        for (int dy = -1; dy <= +1; dy++) {
-                            for (int dx = -1; dx <= +1; dx++) {
-                                if (!(*gs->tiles().previously_seen_map())[{x+dx,y+dy}]) {
-                                    near_unseen = true;
-                                    break;
-                                }
-                            }
-                        }
-                        // Ludamad: Automatic item picking up was interesting but way too good. 
-                        // Dashing into a dungeon and quickly picking up items around should be a conscious effort by the player.
-                        bool is_item = false; // Too broken:  (gs->object_radius_test(this, NULL, 0, &item_colfilter, (x*32+16), (y*32+16), 1));
-                        if (near_unseen || is_item) {
-                            if (dist != 0 && (min_dist >= dist || (is_item > found_item)) && (is_item >= found_item)) {
-                                closest = {x,y};
-                                min_dist = dist;
-                                found_item = is_item;
-                            }
-                        }
-                    }
-                }
-                if (min_dist != 10000) {//std::numeric_limits<float>::max()) {
-                    Pos iter = closest;
-                    Pos next_nearest;
-                    while (true) {
-                       Pos next = follow(_path_to_player, iter);
-                       auto* next_node = _path_to_player.node_at(next);
-                       if (next_node->distance == 0) {
-                           next_nearest = iter;
-                            break;
-                       }
-                       iter = next;
-                    }
-                    dx = (next_nearest.x * TILE_SIZE + TILE_SIZE / 2) - x;
-                    dy = (next_nearest.y * TILE_SIZE + TILE_SIZE / 2) - y;
-                    if (abs(dx) < effective_stats().movespeed) {
-                        dx = 0;
-                    }
-                    if (abs(dy) < effective_stats().movespeed) {
-                        dy = 0;
-                    }
-                    if (abs(dx) + abs(dy) < effective_stats().movespeed * 2) {
-                        dx = 0;
-                        dy = 0;
-                    }
-                    // Too broken:
-                    //bool is_item = (gs->object_radius_test(this, NULL, 0, &item_colfilter, x, y, 1));
-                    //if (is_item) {
-                    //    dx = 0;
-                    //    dy = 0;
-                    //}
-                    if (dx != 0) dx /= abs(dx);
-                    if (dy != 0) dy /= abs(dy);
+                Pos towards = direction_towards_unexplored(gs);
+                if (towards != Pos{0,0}) {
+                    dx = towards.x;
+                    dy = towards.y;
                 } else {
                     gs->game_chat().add_message("There is nothing to travel to in sight!",
                                     Colour(255, 100, 100));

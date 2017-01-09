@@ -40,10 +40,18 @@ TODO:
         + Have server play normally, have clients play out of sync, use sync level 3
         + With a separated server, this could work!
             +Major problem tho is newly created instances. Need to have a translation layer to accomodate these instances somehow? Significant complexity.
-- Final boss: Pixulloch
-    + Mana sapper enemy (DONE?)
     + turret enemy
     + Make sure all is_enemy stuff gets put into a proper API
 Out there:
     Class that cannot do any damage, just takes damage and reciprocates it. 
     Focus on good health regen, heal spells, summons?
+FOR MAGE/NECROMAGE?:
+    + Slow down, do damage to all those around you, gain +2 magic / turn
+
+Necrotank:
+    + Strong aspect of hurt back enemies / turn them into zombies
+    spells: summon zombie / pain / grapple (hold everyone nearby, thresholding how much damage you can take per X steps, and damaging everyone over time)
+    
+
+
+    

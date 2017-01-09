@@ -252,6 +252,7 @@ return {
     , pregame_menu_show = function()
         setup_pregame_menu()
 
+        print "PREGAME"
         return menu_loop(--[[Poll connections]] true)
     end
 }

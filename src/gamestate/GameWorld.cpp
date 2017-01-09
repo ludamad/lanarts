@@ -154,8 +154,8 @@ void GameWorld::set_current_level(GameMapState* level) {
     }
 }
 
-bool GameWorld::pre_step() {
-	if (!gs->update_iostate())
+bool GameWorld::pre_step(bool update_iostate) {
+	if (update_iostate && !gs->update_iostate())
 		return false;
 
 	GameMapState* current_level = gs->get_level();

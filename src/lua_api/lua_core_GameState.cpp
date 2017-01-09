@@ -71,12 +71,30 @@ static int game_input_capture(lua_State* L) {
 	return 1;
 }
 
+static int game_input_clear(lua_State* L) {
+    IOController& controller = lua_api::gamestate(L)->io_controller();
+    controller.clear();
+    return 0;
+}
+
+static void game_simulate_key_press(LuaStackValue key) {
+    IOController& controller = lua_api::gamestate(key)->io_controller();
+    controller.set_key_press_state(key.to_num());
+    controller.set_key_down_state(key.to_num());
+}
+
+static int game_trigger_events(lua_State* L) {
+    IOController& controller = lua_api::gamestate(L)->io_controller();
+    GameView& view = lua_api::gamestate(L)->view();
+    controller.trigger_events(BBox(0, 0, view.width, view.height));
+    return 0;
+}
+
 static int game_input_handle(lua_State* L) {
-	bool status = lua_api::gamestate(L)->pre_step();
+	bool status = lua_api::gamestate(L)->pre_step(luawrap::get_defaulted(L, 1, true));
 	lua_pushboolean(L, status); // should quit on false
 	return 1;
 }
-
 LuaValue luaapi_settings_proxy(lua_State* L) {
 	LuaValue meta = luameta_new(L, "Settings");
 	LuaValue getters = luameta_getters(meta);
@@ -222,10 +240,14 @@ namespace lua_api {
 
 		game["step"].bind_function(game_step);
 		game["draw"].bind_function(game_draw);
-		game["wait"].bind_function(lapi_wait);
+        game["wait"].bind_function(lapi_wait);
 
 		game["input_capture"].bind_function(game_input_capture);
 		game["input_handle"].bind_function(game_input_handle);
+
+		game["_input_clear"].bind_function(game_input_clear);
+        game["_simulate_key_press"].bind_function(game_simulate_key_press);
+        game["_trigger_events"].bind_function(game_trigger_events);
 
 		game["score_board_fetch"].bind_function(score_board_fetch);
 		game["score_board_store"].bind_function(game_score_board_store);

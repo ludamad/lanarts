@@ -312,6 +312,14 @@ bool IOController::user_has_exit() const {
 	return false;
 }
 
+void IOController::set_key_down_state(int keyval) {
+    iostate.key_down_states[keyval] = true;
+}
+
+void IOController::set_key_press_state(int keyval) {
+    iostate.key_press_states[keyval] = true;
+}
+
 void IOController::__trigger_events(IOEventTrigger::trigger_t trigger,
 		SDL_Keycode trigger_key, SDL_Keymod mod, bool holding_key) {
 	for (int i = 0; i < event_bindings.size(); i++) {
@@ -401,4 +409,8 @@ bool IOController::ctrl_held() {
 bool IOController::shift_held() {
     return key_down_state(SDLK_LSHIFT) || key_down_state(SDLK_RSHIFT);
 //    return (iostate.keymod & KMOD_LSHIFT) || (iostate.keymod & KMOD_RSHIFT);
+}
+
+void IOController::clear() {
+    iostate.clear();
 }

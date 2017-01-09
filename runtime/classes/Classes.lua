@@ -186,3 +186,50 @@ Data.class_create {
     }
 }
 
+Data.class_create {
+    name = "Necromancer",
+    sprites = {"spr_enemies.humanoid.necromancer"},
+    available_spells = {
+      { spell = "Pain",
+        level_needed = 1 },
+      { spell = "Baneful Regeneration",
+        level_needed = 1 },
+      { spell = "Greater Pain",
+        level_needed = 1 },
+      -- { spell = "",
+      --   level_needed = 2 },
+      -- { spell = "Ludaze",
+      --   level_needed = 3 },
+      -- { spell = "Call Spikes",
+      --   level_needed = 4 },
+    },
+    start_stats = {
+        movespeed = 4,
+        hp = 80,
+        mp = 120,
+        hpregen = 2 / 60, -- Per 60 frames
+        mpregen = 4 / 60, -- Per 60 frames
+        strength = 4,
+        defence = 4,
+        willpower = 7,
+        magic = 7,
+        equipment = {
+          weapon = "Dagger",
+          gold = 0,
+          inventory = {
+             {item = "Mana Potion", amount = 1},
+          }
+        }
+    },
+    gain_per_level = {
+        hp = 10,
+        mp = 20,
+        hpregen = 0.5 / 60, -- Per 60 frames
+        mpregen = 0.65 / 60, -- Per 60 frames
+        magic = 1,
+        defence = 1,
+        willpower = 1
+    }
+}
+
+

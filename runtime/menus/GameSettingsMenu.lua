@@ -17,6 +17,7 @@ local TEXT_COLOR = {255, 250, 240}
 local CONFIG_MENU_SIZE = {640, 480}
 
 local SETTINGS_FONT = font_cached_load(settings.font, 10)
+local MID_SETTINGS_FONT = font_cached_load(settings.menu_font, 14)
 local BIG_SETTINGS_FONT = font_cached_load(settings.menu_font, 20)
 
 -- Adds common settings for text field functions that take size, font & max_chars
@@ -265,12 +266,13 @@ end
 local function class_choice_buttons_create()
     local sprite_base = "interface/sprites/class_icons/"
     local x_padding, y_padding = 32, 16
-    local font = BIG_SETTINGS_FONT
+    local font = MID_SETTINGS_FONT
 
     local buttons = { 
         { "Mage", sprite_base .. "wizard.png"},
         { "Fighter", sprite_base .. "fighter.png"},
-        { "Ranger", sprite_base .. "archer.png"}
+        { "Ranger", sprite_base .. "archer.png"},
+        { "Necromancer", sprite_base .. "necromancer.png"}
     }
 
     local button_size = { 96, 96 + y_padding + font.height }

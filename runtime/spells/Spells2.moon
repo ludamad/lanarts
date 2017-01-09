@@ -419,3 +419,37 @@ Data.effect_create {
             EventLog.add("You strike back with spikes!", COL_PALE_BLUE)
         return damage
 }
+
+for name in *{"Ranger", "Fighter", "Necromancer", "Mage"}
+    Data.effect_create {
+        :name
+        step_func: () =>
+            print name
+    }
+
+Data.effect_create {
+    name: "Encumbered"
+    stat_func: (obj, old, new) =>
+        new.speed -= 1
+}
+
+
+Data.spell_create {
+    name: "Baneful Regeneration",
+    spr_spell: "spr_spells.regeneration",
+    description: "Your flesh ties together quickly for 6 seconds.",
+    mp_cost: 25,
+    cooldown: 35,
+    can_cast_with_held_key: false,
+    fallback_to_melee: false,
+    spell_cooldown: 800
+    prereq_func: (caster) ->
+        return not caster\has_effect("Regeneration") and not caster\has_effect("Exhausted")
+    autotarget_func: (caster) -> caster.x, caster.y
+    action_func: (caster, x, y) ->
+        caster\add_effect("Regeneration", 60 * 6)
+        if caster\is_local_player()
+            EventLog.add("You start to regenerate quickly!", {200,200,255})
+        else
+            EventLog.add(caster.name .. " starts to regenerate quickly!", {200,200,255})
+}

@@ -330,8 +330,8 @@ bool GameState::update_iostate(bool resetprev, bool trigger_event_handling) {
 
 	return true;
 }
-bool GameState::pre_step() {
-	return world.pre_step();
+bool GameState::pre_step(bool update_iostate) {
+	return world.pre_step(update_iostate);
 }
 
 bool GameState::step() {

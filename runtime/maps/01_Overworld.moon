@@ -55,6 +55,26 @@ OVERWORLD_TILESET = create_overworld_scheme(TileSets.grass)
 
 OVERWORLD_DIM_LESS, OVERWORLD_DIM_MORE = 300, 300
 
+TEST_CONF = {
+    map_label: os.getenv("LANARTS_TESTCASE")
+    is_overworld: true
+    size: {100,100}
+    number_regions: 0
+    floor1: OVERWORLD_TILESET.floor1 
+    floor2: OVERWORLD_TILESET.floor2
+    wall1: OVERWORLD_TILESET.wall1
+    wall2: OVERWORLD_TILESET.wall2
+    rect_room_num_range: {0,0}
+    rect_room_size_range: {10,15}
+    rvo_iterations: 0
+    n_stairs_down: 0
+    n_stairs_up: 0
+    connect_line_width: () -> 1
+    region_delta_func: spread_region_delta_func
+    room_radius: 1
+    n_statues: 0
+}
+
 OVERWORLD_CONF = (rng) -> 
     type = rng\random_choice {
         {
@@ -888,6 +908,48 @@ overworld_features = (map) ->
         for f in *post_poned
             f(game_map)
 
+test_vault_create = (template) ->
+    tileset = TileSets.pebble
+    return NewMaps.map_create (rng) -> 
+        return {
+            map_label: TEST_CONF.map_label
+            subtemplates: {TEST_CONF}
+            w: TEST_CONF.size[1], h: TEST_CONF.size[2]
+            seethrough: true
+            outer_conf: TEST_CONF
+            shell: 2
+            default_wall: Tile.create(TileSets.grass.wall, true, true, {FLAG_OVERWORLD})
+            _create_vault: (map) =>
+                enemy_placer = (map, xy) ->
+                    enemy = OldMaps.enemy_generate(OldMaps.medium_enemies)
+                    MapUtils.spawn_enemy(map, enemy, xy)
+                item_placer = (map, xy) ->
+                    item = ItemUtils.item_generate ItemGroups.basic_items
+                    MapUtils.spawn_item(map, item.type, item.amount, xy)
+                gold_placer = (map, xy) ->
+                    if map.rng\chance(.7) 
+                        MapUtils.spawn_item(map, "Gold", random(2,10), xy)
+                door_placer = (map, xy) ->
+                    -- nil is passed for the default open sprite
+                    MapUtils.spawn_door(map, xy)
+                -- Should create player candidate squares:
+                vault = SourceMap.area_template_create(template {:tileset, :enemy_placer, :item_placer, :gold_placer, :door_placer})
+                if not place_feature(map, vault, (r) -> true)
+                    return nil
+                return true
+            on_create_source_map: (map) =>
+                if not @_create_vault(map)
+                    print "*** ABORT: create_vault"
+                    return nil
+                @player_spawn_points = MapUtils.pick_player_squares(map, map.player_candidate_squares)
+                if not @player_spawn_points
+                    return nil
+                return true
+            on_create_game_map: (game_map) =>
+                World.players_spawn(game_map, @player_spawn_points)
+                Map.set_vision_radius(game_map, OVERWORLD_VISION_RADIUS)
+        }
+
 overworld_create = () ->
     MapSeq = MapSequence.create {preallocate: 1}
     --test_create = (offset = 1) ->
@@ -946,4 +1008,5 @@ overworld_create = () ->
 return {
     :overworld_create
     test_determinism: () -> nil
+    :test_vault_create
 }

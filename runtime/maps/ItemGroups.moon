@@ -40,9 +40,9 @@ amulets = (chance, args) -> {
     { item: "Amulet of Fire", chance: 4 }
     { item: "Amulet of Greater Fire", chance: 4 }
     { item: "Amulet of Fortification", chance: 4 }
-    { item: "Amulet of the Berserker", chance: 4 }
-    { item: "Amulet of Pain", chance: 4 }
-    { item: "Amulet of Great Pain", chance: 4 }
+--    { item: "Amulet of the Berserker", chance: 4 }
+--    { item: "Amulet of Pain", chance: 4 }
+--    { item: "Amulet of Great Pain", chance: 4 }
     { item: "Amulet of Ringholding", chance: 4 }
 --    { item: "Amulet of Ice Form", chance: 4 } -- For now, a guaranteed drop only
     args.ignore_strong or { item: "Amulet of Regeneration", chance: 1 }

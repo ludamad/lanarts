@@ -126,8 +126,11 @@ public:
 	int mouse_x();
 	int mouse_y();
 
-        bool key_down_state(int keyval);
+	bool key_down_state(int keyval);
 	bool key_press_state(int keyval);
+
+    void set_key_down_state(int keyval);
+    void set_key_press_state(int keyval);
 
 	std::vector<SDL_Event>& get_events();
 
@@ -139,6 +142,7 @@ public:
 	bool query_event(IOEvent::event_t event, bool* triggered_already = NULL);
 
 	bool user_has_exit() const;
+	void clear();
 
 private:
 	void __trigger_events(IOEventTrigger::trigger_t trigger, SDL_Keycode trigger_key,

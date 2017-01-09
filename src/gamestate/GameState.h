@@ -78,7 +78,7 @@ public:
 
 	/* Primary events */
 	void draw(bool drawhud = true);
-	bool pre_step();
+	bool pre_step(bool update_iostate = true);
 
 	/* Return false if game should exit*/
 	bool step();

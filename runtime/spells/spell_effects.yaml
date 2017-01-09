@@ -110,7 +110,7 @@ effects:
       end
 
   - name: Regeneration
-    effected_sprite: spr_effects.new_stair
+    effected_sprite: spr_amulets.i-regeneration
     effected_colour: [200,255,200] #RGB
     # Rest of effect in CPP code
     stat_func: 

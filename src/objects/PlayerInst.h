@@ -131,6 +131,9 @@ public:
     PosF& last_moved_direction() {
         return _last_moved_direction;
     }
+
+    Pos direction_towards_unexplored(GameState* gs);
+    Pos direction_towards_object(GameState* gs, col_filterf filter);
 private:
     ///////////////////////////
     // ** Private methods ** //

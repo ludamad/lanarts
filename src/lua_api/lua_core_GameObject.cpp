@@ -255,6 +255,29 @@ static void apply_melee_cooldown(PlayerInst* player) {
     player->cooldowns().reset_action_cooldown(cooldown * cooldown_mult);
 }
 
+static Pos direction_towards_unexplored(LuaStackValue player) {
+    auto* p = player.as<PlayerInst*>();
+    return p->direction_towards_unexplored(lua_api::gamestate(player));
+}
+
+static LuaValue* ACTIVE_FILTER = NULL;
+
+static bool _lua_collision_filterf(GameInst* inst1, GameInst* inst2) {
+    lua_State * L = ACTIVE_FILTER->luastate();
+    ACTIVE_FILTER->push();
+    return luawrap::call<bool>(L, inst1, inst2);
+}
+
+static col_filterf get_lua_collision_filter(LuaValue& filter) {
+    ACTIVE_FILTER = &filter;
+    return &_lua_collision_filterf;
+}
+
+static Pos direction_towards_object(LuaStackValue player, LuaValue filter) {
+    auto* p = player.as<PlayerInst*>();
+    return p->direction_towards_object(lua_api::gamestate(player), get_lua_collision_filter(filter));
+}
+
 static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_SET_TYPE(PlayerInst*);
 	LuaValue meta = lua_combatgameinst_metatable(L);
@@ -279,7 +302,10 @@ static LuaValue lua_playerinst_metatable(lua_State* L) {
 	LUAWRAP_GETTER(methods, is_local_player, OBJ->is_local_player());
 	LUAWRAP_METHOD(methods, gain_xp, players_gain_xp(lua_api::gamestate(L), luawrap::get<int>(L, 2)));
 	LUAWRAP_METHOD(methods, reset_rest_cooldown, OBJ->cooldowns().reset_rest_cooldown(REST_COOLDOWN));
-	methods["apply_melee_cooldown"].bind_function(apply_melee_cooldown);
+
+    methods["apply_melee_cooldown"].bind_function(apply_melee_cooldown);
+    methods["direction_towards_unexplored"].bind_function(direction_towards_unexplored);
+    methods["direction_towards_object"].bind_function(direction_towards_object);
 
 	return meta;
 }

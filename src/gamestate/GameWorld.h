@@ -35,7 +35,7 @@ public:
 	~GameWorld();
 	void generate_room(GameMapState* level);
 	GameMapState* get_level(level_id id);
-	bool pre_step();
+	bool pre_step(bool update_iostate = true);
 	bool step();
 	void level_move(int id, int x, int y, int roomid1, int roomid2);
 	void set_current_level(int roomid);

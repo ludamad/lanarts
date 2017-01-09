@@ -60,6 +60,7 @@ function Decoration:init(args)
     self.frame = args.frame or 0
 end
 
+local test_mode = os.getenv("LANARTS_TESTCASE")
 -- Door
 M.Door = LuaGameObject.type_create({base = Base})
 local Door = M.Door
@@ -127,7 +128,9 @@ function Door:on_step()
         else
             --play_sound "sound/doorClose_3.ogg"
         end
-        Map.tile_set_solid(self.map, tile_xy, not is_open)
+        if not test_mode then
+            Map.tile_set_solid(self.map, tile_xy, not is_open)
+        end
         Map.tile_set_seethrough(self.map, tile_xy, is_open)
     end
 
@@ -143,7 +146,9 @@ end
 function Door:on_map_init()
     local tile_xy = ObjectUtils.tile_xy(self, true)
     self.was_open = false
-    Map.tile_set_solid(self.map, ObjectUtils.tile_xy(self, true), true)
+    if not test_mode then
+        Map.tile_set_solid(self.map, ObjectUtils.tile_xy(self, true), true)
+    end
     Map.tile_set_seethrough(self.map, tile_xy, false)
 
     local whalf = self.open_sprite.width / 2 + self.padding
