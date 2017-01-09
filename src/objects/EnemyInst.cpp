@@ -55,14 +55,13 @@ float monster_difficulty_multiplier(GameState* gs, EnemyEntry& etype) {
 	if (etype.unique) {
 		return 1 + mult / 2; // Can reasonably expect all players to be part of a boss fight
 	}
-        // For now try with static enemies:
-	return 1;  // + mult / 3;
+//         // For now try with static enemies:
+	return 1 + mult / 3;
 }
 
-EnemyInst::EnemyInst(int enemytype, int x, int y) :
+EnemyInst::EnemyInst(int enemytype, int x, int y, int team) :
 				CombatGameInst(__E(enemytype).basestats,
-						__E(enemytype).enemy_sprite, Pos(x, y),
-                                                MONSTER_TEAM,
+						__E(enemytype).enemy_sprite, Pos(x, y), team,
 						__E(enemytype).radius, true, DEPTH) {
 	this->seen = false;
 	this->xpgain = __E(enemytype).xpaward;
@@ -170,7 +169,15 @@ static void show_defeat_message(GameChat& chat, EnemyEntry& e) {
 
 void EnemyInst::step(GameState* gs) {
 	//Much of the monster implementation resides in MonsterController
+        if (has_paths_data()) {
+            paths_to_object().fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
+        }
 
+        if (field_of_view) {
+            int sx = x / TILE_SIZE;
+            int sy = y / TILE_SIZE;
+            field_of_view->calculate(gs, vision_radius, sx, sy);
+        }
 // XXX: Make the monster health absorbing way less hackish and more general
 	int hp_before = stats().core.hp;
 

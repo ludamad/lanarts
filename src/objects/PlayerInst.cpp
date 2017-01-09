@@ -55,8 +55,11 @@ void PlayerInst::init(GameState* gs) {
 
 	_score_stats.deepest_floor = std::max(_score_stats.deepest_floor, current_floor);
 
-	_path_to_player.initialize(gs->tiles().solidity_map());
-	_path_to_player.fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
+        if (!_paths_to_object) {
+            _paths_to_object = new FloodFillPaths();
+        }
+	paths_to_object().initialize(gs->tiles().solidity_map());
+	paths_to_object().fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
 	collision_simulation_id() = gs->collision_avoidance().add_player_object(
 			this);
 	// Must set this BEFORE calling CombatGameInst::init:
@@ -173,7 +176,7 @@ void PlayerInst::step(GameState* gs) {
 	perf_timer_begin(FUNCNAME);
     std::vector<int> effects_active = {get_effect_by_name(class_stats().class_entry().name.c_str())};
     effects().ensure_effects_active(gs, this, effects_active);
-    _path_to_player.fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
+    paths_to_object().fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
     //if (cooldowns().action_cooldown > 0)
     //printf("MELEE COOLDOWN %d\n", cooldowns().action_cooldown);
 
@@ -261,9 +264,9 @@ void PlayerInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
     serializer.read(_last_moved_direction);
 //	serializer.read_container(queued_actions);
 	queued_actions.clear();
-	_path_to_player.initialize(gs->tiles().solidity_map());
-	_path_to_player.fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
-	update_field_of_view(gs);
+	paths_to_object().initialize(gs->tiles().solidity_map());
+	paths_to_object().fill_paths_in_radius(ipos(), PLAYER_PATHING_RADIUS);
+	//update_field_of_view(gs);
 	DESERIALIZE_POD_REGION(serializer, this, local, spellselect);
 
 	CollisionAvoidance& coll_avoid = gs->collision_avoidance();

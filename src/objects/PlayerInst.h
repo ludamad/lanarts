@@ -118,10 +118,6 @@ public:
         local = islocal;
     }
 
-    FloodFillPaths& path_to_player() {
-        return _path_to_player;
-    }
-
     bool& actions_set() {
         return actions_set_for_turn;
     }
@@ -133,7 +129,6 @@ public:
     }
 
     Pos direction_towards_unexplored(GameState* gs);
-    Pos direction_towards_object(GameState* gs, col_filterf filter);
 private:
     ///////////////////////////
     // ** Private methods ** //
@@ -168,13 +163,6 @@ private:
 
     bool actions_set_for_turn= false;
     ActionQueue queued_actions;
-    // _path_to_player:
-    //   Used for decisions about pathing to the object.
-    //   For player-like team members (players, AI controlling 'player' characters)
-    //   this is updated every step and perfect pathing towards the object is used.
-    //   For minor team members (every other NPC) this is not used.
-    FloodFillPaths _path_to_player;
-
     // Used when eg run out of projectiles.
     // We will switch to another weapon type but want to
     // switch back the moment we pick up a projectile

@@ -2,6 +2,7 @@
 #include <lcommon/SerializeBuffer.h>
 #include <limits>
 #include "Team.h"
+#include "TeamIter.h"
 #include "gamestate/GameState.h"
 #include "objects/CombatGameInst.h"
 #include "objects/PlayerInst.h"
@@ -30,8 +31,8 @@ static PosF get_direction_towards(GameState* gs, PosF pos, int obj_radius, BBox 
         while (squared_distance(accum, target_pos) < STRIDE_SQR) {
             if (gs->tile_radius_test(accum.x, accum.y, obj_radius)) {
                 // We hit a wall, make sure to not count this towards accumulation.
-                reached = false;
-                break;
+                //reached = false;
+                //break;
             }
             accum += heading;
         }
@@ -89,9 +90,8 @@ CombatGameInst* get_nearest_ally(GameState* gs, CombatGameInst* inst) {
 
 PosF get_direction_towards(GameState* gs, CombatGameInst* from,
         CombatGameInst* to, float max_speed) {
-    PlayerInst* to_player = dynamic_cast<PlayerInst*>(to);
-    if (to_player != NULL) {
-        return to_player->path_to_player().interpolated_direction(from->bbox(), max_speed);
+    if (to->has_paths_data()) {
+        return to->paths_to_object().interpolated_direction(from->bbox(), max_speed);
     }
     PosF diff = get_direction_towards(gs, from->pos(), from->radius, to_tile_span(gs, to->bbox()));
     if (diff == PosF()) {
@@ -112,6 +112,7 @@ bool are_enemies(CombatGameInst* inst1, CombatGameInst* inst2) {
 static bool are_tiles_visible(GameState* gs, CombatGameInst* viewer, BBox tile_span) {
     fov* fov = viewer->field_of_view;
     if (!fov) {
+        return true;
         // TODO think harder about this.
         PosF dir = get_direction_towards(gs, Pos {viewer->pos().scaled(1.0f/32.0f)}, viewer->radius, tile_span);
         bool visible = (dir != PosF());
@@ -126,6 +127,8 @@ bool is_visible(GameState* gs, CombatGameInst* viewer, BBox area) {
 
 bool is_visible(GameState* gs, CombatGameInst* viewer,
         CombatGameInst* observed) {
+    if (!viewer->field_of_view && observed->field_of_view)
+        return is_visible(gs, observed, viewer);
     return is_visible(gs, viewer, observed->bbox());
 }
 

@@ -14,9 +14,10 @@
 
 #include "objects/EnemyEntry.h"
 
+constexpr int MONSTER_TEAM = 1;
 class EnemyInst : public CombatGameInst {
 public:
-	EnemyInst(int enemytype, int x, int y);
+	EnemyInst(int enemytype, int x, int y, int team = MONSTER_TEAM);
 	virtual ~EnemyInst();
 
 	virtual void init(GameState* gs);

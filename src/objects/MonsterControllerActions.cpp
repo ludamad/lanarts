@@ -108,7 +108,7 @@ static bool same_target_and_moved_colfilter(GameInst* self, GameInst* other) {
 	if (!e2) {
 		return false;
 	}
-	if (e1->behaviour().chasing_player != e2->behaviour().chasing_player) {
+	if (e1->behaviour().chasing_actor != e2->behaviour().chasing_actor) {
 		return false;
 	}
 	return (e2->behaviour().movement_decided);
@@ -170,21 +170,31 @@ void MonsterController::set_monster_headings(GameState* gs,
 	for (int i = 0; i < eois.size(); i++) {
 		EnemyInst* e = eois[i].e;
 		float movespeed = e->effective_stats().movespeed;
-		int pind = eois[i].closest_player_index;
-		PlayerInst* p = players[pind];
+		int actor_id = eois[i].actor_id;
+		CombatGameInst* p = gs->get_instance<CombatGameInst>(actor_id);
+                if (p == NULL) {
+                    continue;
+                }
 		EnemyBehaviour& eb = e->behaviour();
 
 		eb.current_action = EnemyBehaviour::CHASING_PLAYER;
 		eb.path.clear();
-		if (gs->object_visible_test(e, p, false)) {
+		if (is_visible(gs, e, p)) {
 			eb.chase_timeout = OFFSCREEN_CHASE_TIME;
-			eb.chasing_player = p->id;
+			eb.chasing_actor = p->id;
 		}
 
 		if (!potentially_randomize_movement(gs, e)) {
-			PosF heading = p->path_to_player().interpolated_direction(e->bbox(), movespeed);
-			e->vx = heading.x;
-			e->vy = heading.y;
+                    if (e->has_paths_data()) {
+                        Pos heading = e->direction_towards_enemy(gs);
+                        e->vx = heading.x;
+                        e->vy = heading.y;
+                        normalize(e->vx, e->vy, movespeed);
+                    } else {
+                        PosF heading = get_direction_towards(gs, e, p, movespeed);
+                        e->vx = heading.x;
+                        e->vy = heading.y;
+                    }
 		}
 
 		//Compare position to player object
@@ -196,7 +206,7 @@ void MonsterController::set_monster_headings(GameState* gs,
 		bool hasproj = attack.projectile.id != NO_ITEM;
 
 		// Part of: Implement a bunch of new status effects.
-        bool has_fear = (e->effects().get(get_effect_by_name("Fear")));
+                bool has_fear = (e->effects().get(get_effect_by_name("Fear")));
 		if (pdist < e->target_radius + p->target_radius && !has_fear) {
 			e->vx = 0, e->vy = 0;
 		}
@@ -304,7 +314,7 @@ void MonsterController::monster_wandering(GameState* gs, EnemyInst* e) {
 	e->vx = 0, e->vy = 0;
 
         // Part of: Implement status effects.
-    bool forced_wander = (e->effects().get(get_effect_by_name("Dazed")));
+    bool forced_wander = e->team == PLAYER_TEAM || (e->effects().get(get_effect_by_name("Dazed")));
 
 	if (!forced_wander && !monsters_wandering_flag) {
 		return;

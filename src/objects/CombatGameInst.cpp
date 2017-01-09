@@ -34,6 +34,7 @@
 
 CombatGameInst::~CombatGameInst() {
     delete field_of_view;
+    delete _paths_to_object;
 }
 
 const int HURT_COOLDOWN = 30;
@@ -67,6 +68,110 @@ bool CombatGameInst::damage(GameState* gs, int dmg) {
     cooldowns().reset_hurt_cooldown(HURT_COOLDOWN);
     return false;
 }
+
+static bool enemy_filter(GameInst* g1, GameInst* g2) {
+    auto* c1 = dynamic_cast<CombatGameInst*>(g1);
+    if (!c1) return false;
+    auto* c2 = dynamic_cast<CombatGameInst*>(g2);
+    if (!c2) return false;
+    return c1->team != c2->team;
+}
+
+Pos CombatGameInst::direction_towards_enemy(GameState* gs) {
+    return direction_towards_object(gs, enemy_filter);
+}
+
+static bool specific_inst_filter_data(GameInst* g1, GameInst* g2) {
+    static GameInst* expected = NULL;
+    if (g1 == NULL) {
+        expected = g2;
+        return false;
+    }
+    return g2 == expected;
+}
+
+static Pos follow(FloodFillPaths& paths, const Pos& from_xy) {
+        FloodFillNode* node = paths.node_at(from_xy);
+        return Pos(from_xy.x + node->dx, from_xy.y + node->dy);
+}
+// TODO find appropriate place for this function
+static bool has_visible_monster(GameState* gs, PlayerInst* p = NULL) {
+    const std::vector<obj_id>& mids = gs->monster_controller().monster_ids();
+    for (int i = 0; i < mids.size(); i++) {
+        GameInst* inst = gs->get_instance(mids[i]);
+        if (inst && gs->object_visible_test(inst, p)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+Pos CombatGameInst::direction_towards(GameState* gs, GameInst* obj) {
+    specific_inst_filter_data(NULL, obj); // Initialize global state
+    int dx = obj->x - x;
+    int dy = obj->y - y;
+    if (std::max(abs(dx),abs(dy)) < 16 + obj->target_radius + target_radius) {
+        if (abs(dx)>0) dx /= abs(dx);
+        if (abs(dy)>0) dy /= abs(dy);
+        return Pos(dx, dy);
+    }
+    return direction_towards_object(gs, specific_inst_filter_data);
+}
+
+
+Pos CombatGameInst::direction_towards_object(GameState* gs, col_filterf filter) {
+    LANARTS_ASSERT(has_paths_data());
+    Pos closest = {-1,-1};
+    float min_dist = 10000;//std::numeric_limits<float>::max();
+    int dx = 0, dy = 0;
+    if (min_dist == 10000) {//std::numeric_limits<float>::max()) {
+        FOR_EACH_BBOX(paths_to_object().location(), x, y) {
+            auto* node = paths_to_object().node_at({x, y});
+            if (node->solid) {
+                continue;
+            }
+            float dist = node->distance;
+            if (dist == 0 && (node->dx != 0 || node->dy != 0)) {
+                continue;
+            }
+            bool is_item = (gs->object_radius_test(this, NULL, 0, filter, (x*32+16), (y*32+16), 1));
+            if (is_item && min_dist >= dist) {
+                closest = {x,y};
+                min_dist = dist;
+            }
+        }
+    }
+    if (min_dist != 10000) {//std::numeric_limits<float>::max()) {
+        Pos iter = closest;
+        Pos next_nearest;
+        while (true) {
+           Pos next = follow(paths_to_object(), iter);
+           auto* next_node = paths_to_object().node_at(next);
+           if (next_node->distance == 0) {
+               next_nearest = iter;
+                break;
+           }
+           iter = next;
+        }
+        dx = (next_nearest.x * TILE_SIZE + TILE_SIZE / 2) - x;
+        dy = (next_nearest.y * TILE_SIZE + TILE_SIZE / 2) - y;
+        if (abs(dx) < effective_stats().movespeed) {
+            dx = 0;
+        }
+        if (abs(dy) < effective_stats().movespeed) {
+            dy = 0;
+        }
+        if (abs(dx) + abs(dy) < effective_stats().movespeed * 2) {
+            dx = 0;
+            dy = 0;
+        }
+        if (abs(dx) > 0) dx /= abs(dx);
+        if (abs(dy) > 0) dy /= abs(dy);
+    }
+    return {dx, dy};
+}
+
 
 bool CombatGameInst::damage(GameState* gs, const EffectiveAttackStats& attack) {
     event_log("CombatGameInst::damage: id %d getting hit by {cooldown = %d, "
@@ -253,7 +358,7 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
     char dmgstr[32];
     snprintf(dmgstr, 32, "%d", damage);
     float rx, ry;
-    direction_towards(Pos(x, y), Pos(inst->x, inst->y), rx, ry, 0.5);
+    ::direction_towards(Pos(x, y), Pos(inst->x, inst->y), rx, ry, 0.5);
     rx = round(rx * 256.0f) / 256.0f;
     ry = round(ry * 256.0f) / 256.0f;
     gs->add_instance(
@@ -318,7 +423,7 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 
     if (pentry.name == "Mephitize" || pentry.name == "Trepidize") {
           float vx = 0, vy = 0;
-          direction_towards(Pos {x, y}, p, vx, vy, 10000);
+          ::direction_towards(Pos {x, y}, p, vx, vy, 10000);
           int directions = (pentry.name == "Trepidize" ? 4 : 16);
 
           for (int i = 0; i < directions; i++) {
@@ -355,6 +460,14 @@ void CombatGameInst::init(GameState* gs) {
     GameInst::init(gs);
     // Make sure current_floor is set before adding to team:
     gs->team_data().add(this);
+
+    if (team == PLAYER_TEAM && !_paths_to_object) {
+        _paths_to_object = new FloodFillPaths();
+	paths_to_object().initialize(gs->tiles().solidity_map());
+    }
+    if (team == PLAYER_TEAM && !field_of_view) {
+        field_of_view = new fov();
+    }
 }
 
 void CombatGameInst::deinit(GameState* gs) {
@@ -476,6 +589,14 @@ void CombatGameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
     DESERIALIZE_POD_REGION(serializer, this, vx, current_target);
     base_stats.deserialize(gs, serializer);
     estats.deserialize(serializer);
+    if (team == PLAYER_TEAM) {
+        _paths_to_object = new FloodFillPaths();
+	paths_to_object().initialize(gs->tiles().solidity_map());
+        field_of_view = new fov();
+        int sx = x / TILE_SIZE;
+        int sy = y / TILE_SIZE;
+        field_of_view->calculate(gs, vision_radius, sx, sy);
+    }
 }
 
 ClassStats& CombatGameInst::class_stats() {

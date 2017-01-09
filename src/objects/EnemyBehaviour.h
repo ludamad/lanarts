@@ -66,7 +66,7 @@ struct EnemyBehaviour {
 
 	float force_x, force_y;
 	int chase_timeout;
-	obj_id chasing_player;
+	obj_id chasing_actor;
 
 	EnemyRandomization randomization;
 
@@ -75,7 +75,7 @@ struct EnemyBehaviour {
 	bool movement_decided;
 	EnemyBehaviour() :
 			current_action(INACTIVE), current_node(0), path_cooldown(0), force_x(
-					0), force_y(0), chase_timeout(0), chasing_player(0), path_start(
+					0), force_y(0), chase_timeout(0), chasing_actor(0), path_start(
 					0, 0), path_steps(0), movement_decided(false) {
 	}
 	void step() {

@@ -412,22 +412,6 @@ Data.effect_create {
 }
 
 Data.effect_create {
-    name: "Spiky"
-    on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
-        attacker\direct_damage(damage * 0.25)
-        if defender.is_local_player and defender\is_local_player()
-            EventLog.add("You strike back with spikes!", COL_PALE_BLUE)
-        return damage
-}
-
-for name in *{"Ranger", "Fighter", "Necromancer", "Mage"}
-    Data.effect_create {
-        :name
-        step_func: () =>
-            print name
-    }
-
-Data.effect_create {
     name: "Encumbered"
     stat_func: (obj, old, new) =>
         new.speed -= 1
@@ -453,3 +437,57 @@ Data.spell_create {
         else
             EventLog.add(caster.name .. " starts to regenerate quickly!", {200,200,255})
 }
+Data.effect_create {
+    name: "Spiky"
+    on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
+        attacker\direct_damage(damage * 0.25)
+        if defender.is_local_player and defender\is_local_player()
+            EventLog.add("You strike back with spikes!", COL_PALE_BLUE)
+        return damage
+}
+
+Data.effect_create {
+    name: "Summoner"
+    init_func: (caster) =>
+        @n_steps = 0
+        caster.summoned = {}
+        @n_summons = 0
+    step_func: (caster) =>
+        caster.summoned or= {}
+        @n_summons = 0
+        for mon, time in pairs caster.summoned
+            if time > @kill_time
+                mon\direct_damage(mon.stats.hp + 1)
+            if mon.destroyed
+                caster.summoned[mon] = nil
+            else
+                caster.summoned[mon] += 1
+                @n_summons += 1
+        if Map.object_visible(caster) and not (caster\has_effect "Summoning") and @n_summons < @amount
+            if #Map.players_list() == 0
+                return
+            if @n_steps > @summon_rate
+                eff = caster\add_effect("Summoning", 20)
+                eff.monster = (if type(@monster) == "string" then @monster else random_choice(@monster))
+                eff.duration = @duration
+                @n_steps = 0
+            else 
+                @n_steps += 1
+}
+
+for name in *{"Ranger", "Fighter", "Necromancer", "Mage"}
+    Data.effect_create {
+        :name
+        step_func: (caster) =>
+            if name == "Necromancer" 
+                if caster\has_effect "Summoner"
+                    caster\add_effect "Summoner", 2 -- Keep effect from dying
+                else
+                    eff = caster\add_effect "Summoner", 2
+                    eff.summon_rate = 40
+                    eff.monster = "Elephant"
+                    eff.amount = 3
+                    eff.duration = 30
+                    eff.kill_time = 600
+    }
+

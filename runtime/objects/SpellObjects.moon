@@ -127,7 +127,7 @@ with M.SummonAbility = LuaGameObject.type_create()
         @n_steps += 1
         if @n_steps >= @duration
             GameObject.destroy(@)
-            mon = GameObject.enemy_create {type: @monster, xy: @xy}
+            mon = GameObject.enemy_create {type: @monster, xy: @xy, team: (if @caster.is_enemy then 1 else 0)}
             @caster.summoned[mon] = 1
     .on_draw = () =>
         if Map.object_visible(@)

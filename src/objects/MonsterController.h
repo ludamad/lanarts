@@ -3,8 +3,8 @@
  *  Centralized location of all pathing decisions of monsters, with collision avoidance
  */
 
-#ifndef MONSTERCONTROLLER_H_
-#define MONSTERCONTROLLER_H_
+#ifndef MONSTERCONTROLLER1_H_
+#define MONSTERCONTROLLER1_H_
 
 #include <vector>
 
@@ -20,10 +20,10 @@
 
 struct EnemyOfInterest {
 	EnemyInst* e;
-	int closest_player_index;
+	int actor_id;
 	int distance;
-	EnemyOfInterest(EnemyInst* e, int player_index, int distance) :
-			e(e), closest_player_index(player_index), distance(distance) {
+	EnemyOfInterest(EnemyInst* e, int actor_id, int distance) :
+			e(e), actor_id(actor_id), distance(distance) {
 	}
 	bool operator<(const EnemyOfInterest& eoi) const {
 		return distance < eoi.distance;
@@ -70,7 +70,7 @@ private:
 	void update_position(GameState* gs, EnemyInst* e);
 	void update_velocity(GameState* gs, EnemyInst* e);
 	/*returns an index into the player_simids vector*/
-	int find_player_to_target(GameState* gs, EnemyInst* e);
+	CombatGameInst* find_actor_to_target(GameState* gs, EnemyInst* e);
 	void monster_wandering(GameState *gs, EnemyInst *e);
 	void monster_follow_path(GameState *gs, EnemyInst *e);
 	void monster_get_to_stairs(GameState *gs, EnemyInst *e);

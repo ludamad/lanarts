@@ -16,6 +16,7 @@
 #include "gamestate/GameState.h"
 
 #include "gamestate/PlayerData.h"
+#include "gamestate/TeamIter.h"
 
 #include "stats/items/WeaponEntry.h"
 #include "stats/effect_data.h"
@@ -72,7 +73,7 @@ void MonsterController::deserialize(SerializeBuffer& serializer) {
 	serializer.read(monsters_wandering_flag);
 }
 
-int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
+CombatGameInst* MonsterController::find_actor_to_target(GameState* gs, EnemyInst* e) {
 	//Use a 'GameView' object to make use of its helper methods
 	GameView view(0, 0, PLAYER_PATHING_RADIUS * 2, PLAYER_PATHING_RADIUS * 2,
 			gs->width(), gs->height());
@@ -80,29 +81,32 @@ int MonsterController::find_player_to_target(GameState* gs, EnemyInst* e) {
 	//Determine which players we are currently in view of
 	BBox ebox = e->bbox();
 	int mindistsqr = HUGE_DISTANCE;
-	int closest_player_index = -1;
-	for (int i = 0; i < players.size(); i++) {
-		PlayerInst* player = players[i];
-		bool isvisible = gs->object_visible_test(e, player, false);
-		if (isvisible)
-			((PlayerInst*)player)->rest_cooldown() = REST_COOLDOWN;
-		view.sharp_center_on(player->x, player->y);
-		bool chasing = e->behaviour().chase_timeout > 0
-				&& player->id == e->behaviour().chasing_player;
+	CombatGameInst* closest_actor = NULL;
+	for_all_enemies(gs->team_data(), e, [&](CombatGameInst* actor) {
+	    bool isvisible = is_visible(gs, e, actor);
+	    if (isvisible) {
+	        PlayerInst* p = NULL;
+	        // HACK TODO
+	        if ( (p = dynamic_cast<PlayerInst*>(actor) )) {
+	            p->rest_cooldown() = REST_COOLDOWN;
+	        }
+	    }
+	    view.sharp_center_on(actor->x, actor->y);
+            bool chasing = e->behaviour().chase_timeout > 0
+                    && actor->id == e->behaviour().chasing_actor;
+            bool forced_wander = (e->effects().get(get_effect_by_name("Dazed")));
+            if (view.within_view(ebox) && (chasing || isvisible) && !forced_wander) {
+                e->behaviour().current_action = EnemyBehaviour::CHASING_PLAYER;
 
-        bool forced_wander = (e->effects().get(get_effect_by_name("Dazed")));
-		if (view.within_view(ebox) && (chasing || isvisible) && !forced_wander) {
-			e->behaviour().current_action = EnemyBehaviour::CHASING_PLAYER;
-
-			int dx = e->x - player->x, dy = e->y - player->y;
-			int distsqr = dx * dx + dy * dy;
-			if (distsqr > 0 /*overflow check*/&& distsqr < mindistsqr) {
-				mindistsqr = distsqr;
-				closest_player_index = i;
-			}
-		}
-	}
-	return closest_player_index;
+                int dx = e->x - actor->x, dy = e->y - actor->y;
+                int distsqr = dx * dx + dy * dy;
+                if (distsqr > 0 /*overflow check*/&& distsqr < mindistsqr) {
+                    mindistsqr = distsqr;
+                    closest_actor = actor;
+                }
+            }
+	});
+	return closest_actor;
 }
 
 void MonsterController::pre_step(GameState* gs) {
@@ -129,10 +133,16 @@ void MonsterController::pre_step(GameState* gs) {
 		//Add live instances back to monster id list
 		mids.push_back(mids2[i]);
 
-		int closest_player_index = find_player_to_target(gs, e);
+		CombatGameInst* actor = find_actor_to_target(gs, e);
 
         // Part of: Implement status effects.
         bool forced_wander = (e->effects().get(get_effect_by_name("Dazed")));
+        if (e->has_paths_data()) {
+            Pos heading = e->direction_towards_enemy(gs);
+            if (heading == Pos(0,0)) {
+                forced_wander = true;
+            }
+        }
         if (forced_wander) {
             if (eb.current_action == EnemyBehaviour::CHASING_PLAYER) {
                 eb.current_action = EnemyBehaviour::INACTIVE;
@@ -142,17 +152,17 @@ void MonsterController::pre_step(GameState* gs) {
                     && e->cooldowns().is_hurting()) {
                 eb.current_action = EnemyBehaviour::CHASING_PLAYER;
             }
-            if (closest_player_index == -1
+            if (actor == NULL
                     && eb.current_action == EnemyBehaviour::CHASING_PLAYER) {
                 eb.current_action = EnemyBehaviour::INACTIVE;
                 e->target() = NONE;
             }
         }
 
-		if (eb.current_action == EnemyBehaviour::CHASING_PLAYER)
+		if (actor != NULL && eb.current_action == EnemyBehaviour::CHASING_PLAYER)
 			eois.push_back(
-					EnemyOfInterest(e, closest_player_index,
-							inst_distance(e, players[closest_player_index])));
+					EnemyOfInterest(e, actor->id,
+							inst_distance(e, actor)));
 		else if (eb.current_action == EnemyBehaviour::INACTIVE)
 			monster_wandering(gs, e);
 		else

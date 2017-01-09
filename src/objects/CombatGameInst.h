@@ -29,7 +29,7 @@ public:
 					true, int depth = 0) :
 			GameInst(xy.x, xy.y, radius, solid, depth), rx(xy.x), ry(xy.y), vx(0), vy(0), is_resting(
 					false), sprite(sprite), simulation_id(
-					-1), current_target(NONE), base_stats(base_stats) {
+					-1), current_target(NONE), base_stats(base_stats), team(team) {
 	}
 	CombatGameInst() :
 			GameInst(0, 0, 0) {
@@ -72,6 +72,9 @@ public:
 	CoreStats& core_stats();
 	ClassStats& class_stats();
 
+        Pos direction_towards(GameState* gs, GameInst* inst);
+        Pos direction_towards_enemy(GameState* gs);
+        Pos direction_towards_object(GameState* gs, col_filterf filter);
 	/* With attack data */
 	EffectiveAttackStats effective_atk_stats(MTwist& mt,
 			const AttackStats& attack);
@@ -93,6 +96,13 @@ public:
 	obj_id& target() {
 		return current_target;
 	}
+	bool has_paths_data() {
+	    return _paths_to_object != NULL;
+	}
+	FloodFillPaths& paths_to_object() {
+	    LANARTS_ASSERT(has_paths_data());
+	    return *_paths_to_object;
+	}
 //members
 public:
 // <PURE DATA REGION see (de)serialize>
@@ -101,18 +111,23 @@ public:
 	float rx = -1, ry = -1;
 	bool is_resting = false;
     int vision_radius = 0;
-    // field_of_view:
-    //   Used for decisions about whether one object sees another.
-    //   This is used for all allies of the player, although most allies do not provide the player
-    //   with their full field of view.
-    //   This is used to decide if a major team member sees an enemy, but other NPCs have more primitive sight code.
 protected:
 	sprite_id sprite = NONE;
 	simul_id simulation_id = NONE;
 	obj_id current_target = NONE;
 // </PURE DATA REGION see (de)serialize>
 public:
+    // field_of_view:
+    //   Used for decisions about whether one object sees another.
+    //   This is used for all allies of the player, although most allies do not provide the player
+    //   with their full field of view.
+    //   This is used to decide if a major team member sees an enemy, but other NPCs have more primitive sight code.
     fov* field_of_view = NULL;
+    // _paths_to_object:
+    //   Used for decisions about pathing to the object.
+    //   For player team members this is updated every step and perfect pathing towards the object is used.
+    //   For minor team members (every other NPC) this is not used.
+    FloodFillPaths* _paths_to_object = NULL;
 private:
 	CombatStats base_stats;
 	EffectiveStats estats;

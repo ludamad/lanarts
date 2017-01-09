@@ -518,8 +518,9 @@ static LuaValue misc_exclusions(lua_State* L) {
 static GameInst* enemy_create(LuaStackValue args) {
 	GameState* gs = lua_api::gamestate(args);
 	int etype = get_enemy_by_name(args["type"].to_str());
+	int team = luawrap::defaulted(args["team"], MONSTER_TEAM);
 	Pos xy = args["xy"].as<Pos>();
-	EnemyInst* inst = new EnemyInst(etype, xy.x, xy.y);
+	EnemyInst* inst = new EnemyInst(etype, xy.x, xy.y, team);
 	return initialize_object(gs, inst, args, &misc_exclusions);
 }
 
