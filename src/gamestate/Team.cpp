@@ -56,6 +56,26 @@ static BBox to_tile_span(GameState* gs, BBox area) {
     return {minx, miny, maxx, maxy};
 }
 
+CombatGameInst* get_nearest_visible_enemy(GameState* gs, CombatGameInst* inst) {
+    float smallest_sqr_dist = std::numeric_limits<float>::max();
+    CombatGameInst* closest_game_inst = NULL;
+    for_all_enemies(gs->team_data(), inst->current_floor, inst->team,
+        [&](CombatGameInst* o) {
+            if (!is_visible(gs, inst, o)) {
+                return;
+            }
+            float dx = (o->x - inst->x), dy = (o->y - inst->y);
+            float sqr_dist = dx*dx + dy*dy;
+            if (sqr_dist < smallest_sqr_dist) {
+                smallest_sqr_dist = dx*dx + dy*dy;
+                closest_game_inst = o;
+            }
+        }
+    );
+    return dynamic_cast<CombatGameInst*>(closest_game_inst);
+}
+
+
 CombatGameInst* get_nearest_enemy(GameState* gs, CombatGameInst* inst) {
     float smallest_sqr_dist = std::numeric_limits<float>::max();
     CombatGameInst* closest_game_inst = NULL;

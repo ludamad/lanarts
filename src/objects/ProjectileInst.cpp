@@ -106,6 +106,17 @@ static void lua_hit_callback(lua_State* L, LuaValue& callback,
 	}
 }
 
+static bool enemy_filter(GameInst* g1, GameInst* g2) {
+    static CombatGameInst* comparison = NULL;
+    if (g1 == NULL) {
+        comparison = dynamic_cast<CombatGameInst*>(g2);
+        return false;
+    }
+    auto* c2 = dynamic_cast<CombatGameInst*>(g2);
+    if (!c2) return false;
+    return comparison->team != c2->team;
+}
+
 void ProjectileInst::step(GameState* gs) {
 	lua_State* L = gs->luastate();
 
@@ -146,8 +157,10 @@ void ProjectileInst::step(GameState* gs) {
 	if (dynamic_cast<PlayerInst*>(origin)) {
 		if (sole_target)
 			gs->object_radius_test(this, &colobj, 1, &bullet_target_hit2);
-		else
-			gs->object_radius_test(this, &colobj, 1, &enemy_colfilter);
+		else {
+		    enemy_filter(NULL, origin);
+			gs->object_radius_test(this, &colobj, 1, &enemy_filter);
+		}
 
 		if (colobj) {
 			EnemyInst* victim = (EnemyInst*) colobj;
@@ -201,7 +214,10 @@ void ProjectileInst::step(GameState* gs) {
                         }
 		}
 	} else {
-		gs->object_radius_test(this, &colobj, 1, &player_colfilter);
+	    if (origin) {
+            enemy_filter(NULL, origin);
+            gs->object_radius_test(this, &colobj, 1, &enemy_filter);
+	    }
 		if (colobj) {
 			CombatGameInst* victim = (CombatGameInst*) colobj;
 			event_log(

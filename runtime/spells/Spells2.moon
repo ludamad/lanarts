@@ -5,18 +5,6 @@ Bresenham = require "core.Bresenham"
 Display = require "core.Display"
 SpellObjects = require "objects.SpellObjects"
 
-ally_list = (inst) ->
-    if not inst.is_enemy
-        return Map.players_list() or {}
-    else
-        return Map.monsters_list() or {}
-
-enemy_list = (inst) ->
-    if inst.is_enemy
-        return Map.players_list() or {}
-    else
-        return Map.monsters_list() or {}
-
 Data.spell_create {
     name: "Ludaze"
     spr_spell: "spr_spells.ludaze"
@@ -29,7 +17,7 @@ Data.spell_create {
     action_func: (caster, x, y) ->
         caster\add_effect("Ludaze", 30)
         play_sound "sound/ludaze.ogg"
-        for mon in *(enemy_list caster)
+        for mon in *(Map.enemies_list caster)
             if not Map.object_visible(mon)
                 continue
             mon\add_effect("Dazed", 100)
@@ -45,7 +33,7 @@ Data.spell_create {
     autotarget_func: (caster) -> caster.x, caster.y
     prereq_func: (caster) -> 
         if not caster\has_effect("Berserk") and not caster\has_effect("Exhausted")  and not caster\has_effect("Ice Form")
-            for mon in *(enemy_list caster)
+            for mon in *(Map.enemies_list caster)
                 if Map.object_visible(mon)
                     return true
             EventLog.add("No monsters in sight!", COL_PALE_RED)
@@ -206,7 +194,7 @@ Data.effect_create {
         @max_alpha = 0.4
     step_func: (caster) =>
         AuraBase.step(@, caster)
-        for mon in *(enemy_list caster)
+        for mon in *(Map.enemies_list caster)
             if mon\has_effect("Fear")
                 continue
             dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
@@ -235,7 +223,7 @@ Data.effect_create {
         @max_alpha = 0.4
     step_func: (caster) =>
         AuraBase.step(@, caster)
-        for ally in *ally_list(caster)
+        for ally in *Map.allies_list(caster)
             if ally\has_effect("Healing")
                 continue
             dist = vector_distance({ally.x, ally.y}, {caster.x, caster.y})
@@ -254,7 +242,7 @@ Data.effect_create {
         AuraBase.init(@, caster)
     step_func: (caster) =>
         AuraBase.step(@, caster)
-        for mon in *(enemy_list caster)
+        for mon in *(Map.enemies_list caster)
             if mon\has_effect("Dazed")
                 continue
             dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
@@ -276,7 +264,7 @@ Data.effect_create {
         AuraBase.step(@, caster)
         if caster.is_enemy and not Map.object_visible(caster)
             return
-        for mon in *(enemy_list caster)
+        for mon in *(Map.enemies_list caster)
             if mon\has_effect("Sapped")
                 continue
             dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
@@ -307,7 +295,7 @@ Data.effect_create {
         AuraBase.step(@, caster)
         if caster.is_enemy and not Map.object_visible(caster)
             return
-        for mon in *(enemy_list caster)
+        for mon in *(Map.enemies_list caster)
             if mon\has_effect("Pained")
                 continue
             dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
@@ -464,7 +452,7 @@ Data.effect_create {
                 caster.summoned[mon] += 1
                 @n_summons += 1
         if Map.object_visible(caster) and not (caster\has_effect "Summoning") and @n_summons < @amount
-            if #Map.players_list() == 0
+            if #Map.allies_list(caster) == 0
                 return
             if @n_steps > @summon_rate
                 eff = caster\add_effect("Summoning", 20)

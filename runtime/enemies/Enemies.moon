@@ -7,18 +7,6 @@ Map = require "core.Map"
 ObjectUtils = require "objects.ObjectUtils"
 EventLog = require "ui.EventLog"
 
-ally_list = (inst) ->
-    if not inst.is_enemy
-        return Map.players_list() or {}
-    else
-        return Map.monsters_list() or {}
-
-enemy_list = (inst) ->
-    if inst.is_enemy
-        return Map.players_list() or {}
-    else
-        return Map.monsters_list() or {}
-
 enemy_init = (enemy) -> nil
 
 enemy_step = (enemy) -> nil
@@ -152,7 +140,7 @@ summoner_base = (monster, amount, rate = 60, kill_time = 250, duration = 150) ->
         @summon_rate = rate
         @summoned = {}
         @n_summons = 0
-    step_func: () =>
+    step_func: (caster) =>
         @n_summons = 0
         for mon, time in pairs @summoned
             if time > kill_time
@@ -163,7 +151,7 @@ summoner_base = (monster, amount, rate = 60, kill_time = 250, duration = 150) ->
                 @summoned[mon] += 1
                 @n_summons += 1
         if Map.object_visible(@) and not (@has_effect "Summoning") and @n_summons < amount
-            if #Map.players_list() == 0
+            if #Map.allies_list(caster) == 0
                 return
             if @n_steps > @summon_rate
                 eff = @add_effect("Summoning", 20)
@@ -335,7 +323,7 @@ Data.enemy_create {
 
 
 -- enemy_charge = (caster) ->
---     for target in *enemy_list(caster)
+--     for target in *Map.enemies_list(caster)
 --         if vector_distance({target.x, target.y}, {caster.x, caster.y}) < target.target_radius + caster.target_radius + 30
 --             str_diff = math.max(0, caster.stats.strength - target.stats.strength)
 --             thrown = target\add_effect("Thrown", 10)

@@ -54,6 +54,15 @@ static void get_visible_monsters(GameState* gs,
     }
 }
 
+static bool enemy_filter(GameInst* g1, GameInst* g2) {
+    auto* c1 = dynamic_cast<CombatGameInst*>(g1);
+    if (!c1) return false;
+    auto* c2 = dynamic_cast<CombatGameInst*>(g2);
+    if (!c2) return false;
+    return c1->team != c2->team;
+}
+
+
 static GameInst* find_closest_from_list(GameState* gs,
         std::vector<GameInst*>& candidates, const Pos& pos,
         float* dist = NULL) {
@@ -77,12 +86,6 @@ static GameInst* find_closest_from_list(GameState* gs,
     return closest;
 }
 
-static GameInst* get_closest_monster(GameState* gs, PlayerInst* p) {
-    std::vector<GameInst*> visible_monsters;
-    get_visible_monsters(gs, visible_monsters, p);
-
-    return find_closest_from_list(gs, visible_monsters, p->ipos());
-}
 static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
         GameInst* targ, float dx, float dy) {
     WeaponEntry& wentry = p->weapon().weapon_entry();
@@ -107,7 +110,7 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
         dx *= target_range / mag, dy *= target_range / mag;
 
         /*test in our walking direction first*/
-        gs->object_radius_test(p, &inst, 1, enemy_colfilter, p->x + dx,
+        gs->object_radius_test(p, &inst, 1, enemy_filter, p->x + dx,
                 p->y + dy, p->radius);
     } else {
         target_range *= 1.25;
@@ -169,7 +172,7 @@ bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
 static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
         GameInst** enemies, int max_targets) {
     int numhit = gs->object_radius_test(p, enemies, max_targets,
-            enemy_colfilter, ax, ay, rad);
+            enemy_filter, ax, ay, rad);
     if (numhit < max_targets) {
         std::vector<GameInst*> visible_monsters;
         get_visible_monsters(gs, visible_monsters, p);
@@ -179,7 +182,7 @@ static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
 
         if (inst) {
             numhit += gs->object_radius_test(p, enemies + numhit,
-                    max_targets - numhit, enemy_colfilter, inst->x, inst->y,
+                    max_targets - numhit, enemy_filter, inst->x, inst->y,
                     rad);
         }
     }
@@ -529,7 +532,7 @@ bool PlayerInst::enqueue_io_spell_and_attack_actions(GameState* gs, float dx,
             if (!is_moving && !target && !mousetarget && spell_selected() == -1
                     && curr_target && !is_projectile) {
                 int vx, vy;
-                GameInst* closest = get_closest_monster(gs, this);
+                GameInst* closest = get_nearest_visible_enemy(gs, this);
 
                 if (closest
                         && decide_attack_movement(ipos(), closest->ipos(),

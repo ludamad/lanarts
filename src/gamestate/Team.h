@@ -21,6 +21,7 @@ class PlayerInst;
 // TODO find better home for some of these
 
 CombatGameInst* get_nearest_enemy(GameState* gs, CombatGameInst* inst);
+CombatGameInst* get_nearest_visible_enemy(GameState* gs, CombatGameInst* inst);
 CombatGameInst* get_nearest_ally(GameState* gs, CombatGameInst* inst);
 //CombatGameInst* get_nearest_on_team(GameState* gs, _Team& team, CombatGameInst* inst, float* smallest_sqr_dist = NULL,
 //        CombatGameInst** closest_game_inst = NULL);

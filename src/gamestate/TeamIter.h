@@ -35,6 +35,12 @@ inline void for_all_on_team(TeamData& td, level_id level, team_id team, Function
         f(e);
     }
 }
+// Helper functions for iterating through TeamData:
+template <typename Function>
+inline void for_all_allies(TeamData& td, CombatGameInst* inst, Function&& f) {
+    for_all_on_team(td, inst->current_floor, inst->team, f);
+}
+
 
 template <typename Function>
 inline void for_players_on_team(TeamData& td, team_id team, Function&& f) {

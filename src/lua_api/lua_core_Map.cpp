@@ -17,6 +17,7 @@
 #include "objects/PlayerInst.h"
 #include "gamestate/GameMapState.h"
 #include "gamestate/GameSettings.h"
+#include "gamestate/TeamIter.h"
 
 #include "draw/TileEntry.h"
 
@@ -237,6 +238,32 @@ static int gmap_monsters_list(lua_State* L) {
     }
     return 1;
 }
+
+static int gmap_enemies_list(lua_State* L) {
+    GameState* gs = lua_api::gamestate(L);
+    CombatGameInst* actor = luawrap::get<CombatGameInst*>(L, 1);
+    lua_newtable(L);
+    int j = 1;
+    for_all_enemies(gs->team_data(), actor, [&](CombatGameInst* actor) {
+        luawrap::push(L, actor);
+        lua_rawseti(L, -2, j++);
+    });
+    return 1;
+}
+
+static int gmap_allies_list(lua_State* L) {
+    GameState* gs = lua_api::gamestate(L);
+    CombatGameInst* actor = luawrap::get<CombatGameInst*>(L, 1);
+    lua_newtable(L);
+    int j = 1;
+    for_all_allies(gs->team_data(), actor, [&](CombatGameInst* actor) {
+        luawrap::push(L, actor);
+        lua_rawseti(L, -2, j++);
+    });
+    return 1;
+}
+
+
 
 static int gmap_monsters_seen(lua_State* L) {
     GameState* gs = lua_api::gamestate(L);
@@ -475,6 +502,8 @@ namespace lua_api {
 
         gmap["monsters_list"].bind_function(gmap_monsters_list);
         gmap["players_list"].bind_function(gmap_players_list);
+        gmap["allies_list"].bind_function(gmap_enemies_list);
+        gmap["enemies_list"].bind_function(gmap_enemies_list);
         gmap["monsters_seen"].bind_function(gmap_monsters_seen);
         gmap["monsters"].bind_function(gmap_monsters);
 

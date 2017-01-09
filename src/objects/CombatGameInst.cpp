@@ -579,14 +579,14 @@ unsigned int CombatGameInst::integrity_hash() {
 
 void CombatGameInst::serialize(GameState* gs, SerializeBuffer& serializer) {
     GameInst::serialize(gs, serializer);
-    SERIALIZE_POD_REGION(serializer, this, vx, current_target);
+    SERIALIZE_POD_REGION(serializer, this, team, current_target);
     base_stats.serialize(gs, serializer);
     estats.serialize(serializer);
 }
 
 void CombatGameInst::deserialize(GameState* gs, SerializeBuffer& serializer) {
     GameInst::deserialize(gs, serializer);
-    DESERIALIZE_POD_REGION(serializer, this, vx, current_target);
+    DESERIALIZE_POD_REGION(serializer, this, team, current_target);
     base_stats.deserialize(gs, serializer);
     estats.deserialize(serializer);
     if (team == PLAYER_TEAM) {
