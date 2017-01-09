@@ -162,7 +162,7 @@ void PlayerInst::shift_autotarget(GameState* gs) {
 		}
 		EnemyInst* e = (EnemyInst*) gs->get_instance(mids[j]);
 		bool isvisible = e != NULL && gs->object_visible_test(e, this, false);
-		if (isvisible) {
+		if (isvisible && e->team != team) {
 			current_target = e->id;
 			return;
 		}

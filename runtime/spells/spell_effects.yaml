@@ -114,8 +114,11 @@ effects:
     effected_colour: [200,255,200] #RGB
     # Rest of effect in CPP code
     stat_func: 
-      function(effect, obj, old, new)    
+      function(effect, obj, old, new)
         new.hpregen = new.hpregen * 20
+        if obj.stats.hp == new.max_hp then
+            obj:remove_effect("Regeneration")
+        end
       end
     fade_out: 55
 

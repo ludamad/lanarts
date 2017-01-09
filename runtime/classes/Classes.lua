@@ -195,7 +195,7 @@ Data.class_create {
       { spell = "Baneful Regeneration",
         level_needed = 1 },
       { spell = "Greater Pain",
-        level_needed = 1 },
+        level_needed = 2 },
       -- { spell = "",
       --   level_needed = 2 },
       -- { spell = "Ludaze",

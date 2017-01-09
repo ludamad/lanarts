@@ -409,19 +409,22 @@ Data.effect_create {
 Data.spell_create {
     name: "Baneful Regeneration",
     spr_spell: "spr_spells.regeneration",
-    description: "Your flesh ties together quickly for 6 seconds.",
+    description: "Your flesh ties together quickly.",
     mp_cost: 25,
     cooldown: 35,
     can_cast_with_held_key: false,
     fallback_to_melee: false,
-    spell_cooldown: 800
+    spell_cooldown: 400
     prereq_func: (caster) ->
+        if caster.stats.hp == caster\effective_stats().max_hp
+            return false
         return not caster\has_effect("Regeneration") and not caster\has_effect("Exhausted")
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
         caster\add_effect("Regeneration", 60 * 6)
         if caster\is_local_player()
             EventLog.add("You start to regenerate quickly!", {200,200,255})
+            play_sound "sound/Jingle_Win_Synth/Jingle_Win_Synth_00.ogg"
         else
             EventLog.add(caster.name .. " starts to regenerate quickly!", {200,200,255})
 }
@@ -438,10 +441,10 @@ Data.effect_create {
     name: "Summoner"
     init_func: (caster) =>
         @n_steps = 0
-        caster.summoned = {}
         @n_summons = 0
     step_func: (caster) =>
-        caster.summoned or= {}
+        caster.summoned or= @summoned or {}
+        @summoned or= caster.summoned
         @n_summons = 0
         for mon, time in pairs caster.summoned
             if time > @kill_time
@@ -451,13 +454,14 @@ Data.effect_create {
             else
                 caster.summoned[mon] += 1
                 @n_summons += 1
-        if Map.object_visible(caster) and not (caster\has_effect "Summoning") and @n_summons < @amount
+        amount = math.max 1, math.floor(caster.stats.level / 2)
+        if Map.object_visible(caster) and not (caster\has_effect "Summoning") and @n_summons < amount 
             if #Map.allies_list(caster) == 0
                 return
-            if @n_steps > @summon_rate
+            if @n_steps > 30 + 70 / caster.stats.level
                 eff = caster\add_effect("Summoning", 20)
                 eff.monster = (if type(@monster) == "string" then @monster else random_choice(@monster))
-                eff.duration = @duration
+                eff.duration = @duration / caster.stats.level
                 @n_steps = 0
             else 
                 @n_steps += 1
@@ -472,10 +476,8 @@ for name in *{"Ranger", "Fighter", "Necromancer", "Mage"}
                     caster\add_effect "Summoner", 2 -- Keep effect from dying
                 else
                     eff = caster\add_effect "Summoner", 2
-                    eff.summon_rate = 40
-                    eff.monster = "Elephant"
-                    eff.amount = 3
+                    eff.monster = "Skeleton"
                     eff.duration = 30
-                    eff.kill_time = 600
+                    eff.kill_time = 300
     }
 

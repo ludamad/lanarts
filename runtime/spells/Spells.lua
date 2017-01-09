@@ -269,7 +269,7 @@ function Pain.action_func(caster, x, y, target)
         local least_dist = math.huge
         for mon in values(Map.enemies_list(caster)) do
             local dist = vector_distance({mon.x, mon.y}, {caster.x, caster.y})
-            if dist < eff_range and least_dist > dist then
+            if dist and dist < eff_range and least_dist > dist then
                 least_dist = dist
                 target = mon
             end
@@ -282,7 +282,7 @@ function Pain.action_func(caster, x, y, target)
     caster:direct_damage(10)
     target:add_effect("Pained", 50)
     play_pained_sound()
-    target:damage(random(1,12) * 0.7 + stats.magic * 0.7, random(2,5) + stats.magic * 0.2, 1, 0.7)
+    target:damage(random(1,12) * 0.9 + stats.magic * 0.9, random(2,5) + stats.magic * 0.2, 1, 0.9)
     caster:add_effect("Pained", 50)
     if caster:is_local_player() then
         EventLog.add("You attack your enemy's life force directly!", {200,200,255})
@@ -397,7 +397,7 @@ local GreaterPain = {
     can_cast_with_cooldown = false,
     mp_cost = 20,
     cooldown = 25,
-    spell_cooldown = 800,
+    spell_cooldown = 100,
     fallback_to_melee = true,
     range = 60
 }
@@ -406,7 +406,7 @@ function GreaterPain.action_func(caster, x, y, target)
     local stats = caster:effective_stats()
     caster:direct_damage(40)
     caster:add_effect("Pained", 50)
-    caster:add_effect("Pain Aura", 100).range = GreaterPain.range
+    caster:add_effect("Pain Aura", 200).range = GreaterPain.range + caster.stats.level * 5
     if caster:is_local_player() then
         EventLog.add("You attack nearby enemies life force directly!", {200,200,255})
     else

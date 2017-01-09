@@ -119,13 +119,8 @@ static GameInst* get_weapon_autotarget(GameState* gs, PlayerInst* p,
     if (inst) {
         return inst;
     } else {
-        std::vector<GameInst*> visible_monsters;
-        get_visible_monsters(gs, visible_monsters, p);
-
-        float dist;
-        GameInst* inst = find_closest_from_list(gs, visible_monsters, ppos,
-                &dist);
-        if (inst && (!ismelee || dist <= target_range)) {
+        GameInst* inst = get_nearest_visible_enemy(gs, p);
+        if (inst && (!ismelee || distance_between(p->ipos(), inst->ipos()) <= target_range)) {
             return inst;
         }
     }
@@ -137,7 +132,7 @@ bool find_safest_square(PlayerInst* p, GameState* gs, Pos& position) {
 
     std::vector<PlayerInst*> players = gs->players_in_level();
     std::vector<GameInst*> visible_monsters;
-    get_visible_monsters(gs, visible_monsters);
+    // TODO
 
     int maxdist = 0;
     for (int i = 0; i < players.size(); i++) {
@@ -174,12 +169,7 @@ static int get_targets(GameState* gs, PlayerInst* p, int ax, int ay, int rad,
     int numhit = gs->object_radius_test(p, enemies, max_targets,
             enemy_filter, ax, ay, rad);
     if (numhit < max_targets) {
-        std::vector<GameInst*> visible_monsters;
-        get_visible_monsters(gs, visible_monsters, p);
-
-        GameInst* inst = find_closest_from_list(gs, visible_monsters,
-                Pos(p->x, p->y));
-
+        GameInst* inst = get_nearest_visible_enemy(gs, p);
         if (inst) {
             numhit += gs->object_radius_test(p, enemies + numhit,
                     max_targets - numhit, enemy_filter, inst->x, inst->y,
@@ -676,28 +666,7 @@ bool PlayerInst::melee_attack(GameState* gs, CombatGameInst* e,
         play(attack_sound, "sound/melee.ogg");
     }
     // Killed ? 
-    if (CombatGameInst::melee_attack(gs, e, weapon, ignore_cooldowns) && dynamic_cast<EnemyInst*>(e)) {
-        PlayerData& pc = gs->player_data();
-        signal_killed_enemy();
-
-        char buffstr[32];
-        double xpworth = ((EnemyInst*)e)->xpworth();
-        double n_killed = (pc.n_enemy_killed(((EnemyInst*) e)->enemy_type()) - 1) / pc.all_players().size();
-        xpworth *= pow(0.84, n_killed); // sum(0.84**i for i in range(25)) => ~6.17x the monsters xp value over time
-        if (n_killed > 25) {
-            xpworth = 0;
-        }
-        int amnt = round(xpworth / pc.all_players().size());
-
-        players_gain_xp(gs, amnt);
-        snprintf(buffstr, 32, "%d XP", amnt);
-        gs->add_instance(
-                new AnimatedInst(Pos(e->x - 5, e->y - 5), -1, 25,
-                        PosF(), PosF(), AnimatedInst::DEPTH, buffstr,
-                        Colour(255, 215, 11)));
-        return true;
-    }
-    return false;
+    return CombatGameInst::melee_attack(gs, e, weapon, ignore_cooldowns);
 }
 
 void PlayerInst::use_spell(GameState* gs, const GameAction& action) {

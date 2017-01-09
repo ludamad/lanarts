@@ -154,101 +154,64 @@ void ProjectileInst::step(GameState* gs) {
 	GameInst* colobj = NULL;
 	CombatGameInst* origin = (CombatGameInst*) gs->get_instance(origin_id);
 
-	if (dynamic_cast<PlayerInst*>(origin)) {
+	if (dynamic_cast<CombatGameInst*>(origin)) {
 		if (sole_target)
 			gs->object_radius_test(this, &colobj, 1, &bullet_target_hit2);
 		else {
 		    enemy_filter(NULL, origin);
 			gs->object_radius_test(this, &colobj, 1, &enemy_filter);
 		}
-
-		if (colobj) {
-			EnemyInst* victim = (EnemyInst*) colobj;
-			event_log(
-					"ProjectileInst::step id=%d from player id=%d hit enemy id=%d\n",
-					id, origin->id, colobj->id);
-			if (origin) {
-				origin->signal_attacked_successfully();
-			}
-
-			lua_hit_callback(L,
-					projectile.projectile_entry().action_func().get(L),
-					atkstats, this, victim);
-
-			int damage = damage_formula(atkstats, victim->effective_stats());
-			damage *= damage_mult;
-
-                        if (gs->local_player()->current_floor == dynamic_cast<PlayerInst*>(origin)->current_floor) {
-                            play(minor_missile_sound, "sound/minor_missile.ogg");
-                        }
-                        if (!projectile.projectile_entry().deals_special_damage) {
-                            char buffstr[32];
-                            snprintf(buffstr, 32, "%d", damage);
-                            float rx = vx / speed * .5;
-                            float ry = vy / speed * .5;
-                            gs->add_instance(
-                                            new AnimatedInst(
-                                                            Pos(victim->x - 5 + rx * 5, victim->y + ry * 5), -1,
-                                                            25, PosF(rx, ry), PosF(), AnimatedInst::DEPTH,
-                                                            buffstr));
-                            if (victim->damage(gs, damage)) {
-                                    PlayerInst* p = (PlayerInst*) origin;
-                                    PlayerData& pc = gs->player_data();
-                                    p->signal_killed_enemy();
-
-                                    double xpworth = victim->xpworth();
-                                    double n_killed = (pc.n_enemy_killed(victim->enemy_type()) - 1) / pc.all_players().size();
-                                    xpworth *= pow(0.84, n_killed); // sum(0.84**i for i in range(25)) => ~6.17x the monsters xp value over time
-                                    if (n_killed > 25) {
-                                        xpworth = 0;
-                                    }
-                                    int amnt = round(xpworth / pc.all_players().size());
-
-                                    players_gain_xp(gs, amnt);
-
-                                    snprintf(buffstr, 32, "%d XP", amnt);
-                                    gs->add_instance(
-                                                    new AnimatedInst(victim->ipos(), -1, 25, PosF(), PosF(),
-                                                                    AnimatedInst::DEPTH, buffstr, COL_GOLD));
-                            }
-                        }
-		}
-	} else {
-	    if (origin) {
-            enemy_filter(NULL, origin);
-            gs->object_radius_test(this, &colobj, 1, &enemy_filter);
-	    }
-		if (colobj) {
-			CombatGameInst* victim = (CombatGameInst*) colobj;
-			event_log(
-					"ProjectileInst::step id=%d from enemy id=%d hit player id=%d\n",
-					id, origin == NULL ? -1 : origin->id, colobj->id);
-			if (origin) {
-				origin->signal_attacked_successfully();
-			}
-
-			lua_hit_callback(L,
-					projectile.projectile_entry().action_func().get(L),
-					atkstats, this, victim);
-
-                        if (!projectile.projectile_entry().deals_special_damage) {
-                            int damage = damage_formula(atkstats, victim->effective_stats());
-                            damage *= damage_mult;
-
-                            if (!gs->game_settings().invincible)
-                                    victim->damage(gs, damage);
-                            char dmgstr[32];
-                            snprintf(dmgstr, 32, "%d", damage);
-                            float rx = vx / speed * .5;
-                            float ry = vy / speed * .5;
-                            gs->add_instance(
-                                            new AnimatedInst(
-                                                            Pos(colobj->x - 5 + rx * 5, colobj->y + ry * 5), -1,
-                                                            25, PosF(rx, ry), PosF(), AnimatedInst::DEPTH,
-                                                            dmgstr));
-                        }
-		}
 	}
+
+        if (colobj) {
+                    CombatGameInst* victim = (CombatGameInst*) colobj;
+            event_log(
+                    "ProjectileInst::step id=%d from player id=%d hit enemy id=%d\n",
+                    id, origin->id, colobj->id);
+            origin->signal_attacked_successfully();
+
+            lua_hit_callback(L,
+                    projectile.projectile_entry().action_func().get(L),
+                    atkstats, this, victim);
+
+            int damage = damage_formula(atkstats, victim->effective_stats());
+            damage *= damage_mult;
+
+            if ( dynamic_cast<PlayerInst*>(origin) && gs->local_player()->current_floor == dynamic_cast<PlayerInst*>(origin)->current_floor) {
+                play(minor_missile_sound, "sound/minor_missile.ogg");
+            }
+            if (!projectile.projectile_entry().deals_special_damage) {
+                char buffstr[32];
+                snprintf(buffstr, 32, "%d", damage);
+                float rx = vx / speed * .5;
+                float ry = vy / speed * .5;
+                gs->add_instance(
+                                new AnimatedInst(
+                                                Pos(victim->x - 5 + rx * 5, victim->y + ry * 5), -1,
+                                                25, PosF(rx, ry), PosF(), AnimatedInst::DEPTH,
+                                                buffstr));
+                if (victim->damage(gs, damage) && dynamic_cast<EnemyInst*>(victim) && dynamic_cast<EnemyInst*>(victim)->team != PLAYER_TEAM) {
+                        PlayerInst* p = (PlayerInst*) origin;
+                        PlayerData& pc = gs->player_data();
+                        p->signal_killed_enemy();
+                        double xpworth = dynamic_cast<EnemyInst*>(victim)->xpworth();
+                        double n_killed = (pc.n_enemy_killed(dynamic_cast<EnemyInst*>(victim)->enemy_type()) - 1) / pc.all_players().size();
+                        xpworth *= pow(0.84, n_killed); // sum(0.84**i for i in range(25)) => ~6.17x the monsters xp value over time
+                        if (n_killed > 25) {
+                            xpworth = 0;
+                        }
+                        int amnt = round(xpworth / pc.all_players().size());
+
+                        players_gain_xp(gs, amnt);
+
+                        snprintf(buffstr, 32, "%d XP", amnt);
+                        gs->add_instance(
+                                        new AnimatedInst(victim->ipos(), -1, 25, PosF(), PosF(),
+                                                        AnimatedInst::DEPTH, buffstr, COL_GOLD));
+                }
+            }
+        }
+
 	if (colobj || range_left <= 0) {
 		hits--;
 		if (hits >= 0 && colobj) {
@@ -259,8 +222,8 @@ void ProjectileInst::step(GameState* gs) {
 			sole_target = NONE; //Clear target
 			for (int i = 0; i < mc.monster_ids().size(); i++) {
 				obj_id mid = mc.monster_ids()[i];
-				GameInst* enemy = gs->get_instance(mid);
-				if (enemy && enemy != colobj) {
+				auto* enemy = (EnemyInst*)gs->get_instance(mid);
+				if (enemy && origin && enemy->team != origin->team && enemy != colobj) {
 
 					float abs = distance_between(Pos(x, y),
 							Pos(enemy->x, enemy->y));

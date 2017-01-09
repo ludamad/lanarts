@@ -39,6 +39,8 @@ CombatGameInst::~CombatGameInst() {
 
 const int HURT_COOLDOWN = 30;
 bool CombatGameInst::damage(GameState* gs, int dmg) {
+    auto* prev_level = gs->get_level();
+    gs->set_level(gs->get_level(current_floor));
     event_log("CombatGameInst::damage: id %d took %d dmg\n", id, dmg);
 
     for (Effect& e : effects().effects) {
@@ -62,10 +64,12 @@ bool CombatGameInst::damage(GameState* gs, int dmg) {
 
     if (core_stats().hurt(dmg)) {
         die(gs);
+        gs->set_level(prev_level);
         return true;
     }
 
     cooldowns().reset_hurt_cooldown(HURT_COOLDOWN);
+    gs->set_level(prev_level);
     return false;
 }
 
@@ -379,7 +383,27 @@ bool CombatGameInst::melee_attack(GameState* gs, CombatGameInst* inst,
     }
 
     signal_attacked_successfully();
+    if (isdead && dynamic_cast<EnemyInst*>(inst)) {
+            PlayerData& pc = gs->player_data();
+            signal_killed_enemy();
 
+            char buffstr[32];
+            double xpworth = ((EnemyInst*)inst)->xpworth();
+            double n_killed = (pc.n_enemy_killed(((EnemyInst*) inst)->enemy_type()) - 1) / pc.all_players().size();
+            xpworth *= pow(0.84, n_killed); // sum(0.84**i for i in range(25)) => ~6.17x the monsters xp value over time
+            if (n_killed > 25) {
+                xpworth = 0;
+            }
+            int amnt = round(xpworth / pc.all_players().size());
+
+            players_gain_xp(gs, amnt);
+            snprintf(buffstr, 32, "%d XP", amnt);
+            gs->add_instance(
+                    new AnimatedInst(Pos(inst->x - 5, inst->y - 5), -1, 25,
+                            PosF(), PosF(), AnimatedInst::DEPTH, buffstr,
+                            Colour(255, 215, 11)));
+            return true;
+        }
     return isdead;
 }
 

@@ -145,8 +145,8 @@ local MINOR_ENCHANTS, MAJOR_ENCHANTS, MINOR_DEBUFFS, MAJOR_DEBUFFS
 -- Minor enchantments:
 MINOR_ENCHANTS = {
     mult_stat_bonus("spell_velocity_multiplier", {1.10, 1.25})
-    add_random_spell()
-    add_random_effect()
+    --add_random_spell()
+    --add_random_effect()
     additive_stat_bonus("mp", {10, 25})
     additive_stat_bonus("hp", {10, 25})
     additive_stat_bonus("hpregen", {0.02, 0.03})

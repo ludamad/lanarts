@@ -197,7 +197,7 @@ void EnemyInst::step(GameState* gs) {
 
 	update_position();
 
-	if (!seen && gs->object_visible_test(this, gs->local_player())) {
+	if (!seen && team == MONSTER_TEAM && gs->object_visible_test(this, gs->local_player())) {
 		seen = true;
 		gs->enemies_seen().mark_as_seen(enemytype);
                 if (gs->local_player()->current_floor == current_floor) {
@@ -244,6 +244,10 @@ void EnemyInst::draw(GameState* gs) {
 		etype().draw_event.get(L).push();
 		luawrap::call<void>(L, (GameInst*) this);
 	}
+	if (team == PLAYER_TEAM) {
+        res::sprite("spr_enemies.good_neutral").draw(on_screen(gs, PosF {x-16, y-16}));
+        res::sprite("spr_amulets.i-faith").draw(on_screen(gs, PosF {x-16, y-16}));
+	}
 }
 
 EnemyInst* EnemyInst::clone() const {
@@ -269,7 +273,9 @@ void EnemyInst::die(GameState *gs) {
 		anim->frame(0);
 		gs->add_instance(anim);
 		gs->remove_instance(this);
-                play("sound/paind.ogg");
+		if (team != PLAYER_TEAM) {
+            play("sound/paind.ogg");
+		}
 
 	        MTwist& mt = gs->rng();
                 if (should_respawn) {
