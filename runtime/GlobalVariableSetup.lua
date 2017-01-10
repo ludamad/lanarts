@@ -123,6 +123,7 @@ enemies = {}
 sprites = {}
 projectiles = {}
 classes = {}
+player = {}
 
 -- TODO get rid of these:
 enemy_init = do_nothing
@@ -134,6 +135,8 @@ enemy_berserker_init = do_nothing
 setmetatable(_G, {__index = function(self, k)
     error( ("Global variable '%s' does not exist!"):format(k) )
 end, __newindex = function(self, k)
-    error( ("Not in file called by GlobalVariableSetup, cannot set global variable '%s'!"):format(k) )
+    if k ~= 'player' then  -- Hacks for engine
+        error( ("Not in file called by GlobalVariableSetup, cannot set global variable '%s'!"):format(k) )
+    end
 end})
 

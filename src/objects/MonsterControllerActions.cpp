@@ -194,10 +194,15 @@ void MonsterController::set_monster_headings(GameState* gs,
                             float speed = e->effective_stats().movespeed;
                             normalize(e->vx, e->vy, speed);
                             if (e->vx == 0 && e->vy == 0) {
-                                Pos p = e->direction_towards_ally_player(gs);
-                                e->vx = p.x, e->vy = p.y;
-                                float speed = e->effective_stats().movespeed;
-                                normalize(e->vx, e->vy, speed);
+                                GameInst* inst = get_nearest_ally(gs, e);
+                                if (inst) {
+                                    if (distance_between(e->ipos(), inst->ipos()) > TILE_SIZE * 3) {
+                                        Pos p = e->direction_towards_ally_player(gs);
+                                        e->vx = p.x, e->vy = p.y;
+                                        float speed = e->effective_stats().movespeed;
+                                        normalize(e->vx, e->vy, speed);
+                                    }
+                                }
                             }
                         }
                     } else {

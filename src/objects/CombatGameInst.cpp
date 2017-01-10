@@ -39,6 +39,9 @@ CombatGameInst::~CombatGameInst() {
 
 const int HURT_COOLDOWN = 30;
 bool CombatGameInst::damage(GameState* gs, int dmg) {
+    if (current_floor == -1) {
+        return false; // Don't die twice.
+    }
     auto* prev_level = gs->get_level();
     gs->set_level(gs->get_level(current_floor));
     event_log("CombatGameInst::damage: id %d took %d dmg\n", id, dmg);

@@ -176,10 +176,11 @@ Data.effect_create {
         @n_steps = 0
         @delay = 1
         @duration = @time_left
+        @on_summon = do_nothing
     step_func: (caster) =>
         @n_steps += 1
         if @n_steps == @delay
-            ability = SpellObjects.SummonAbility.create {monster: @monster, :caster, xy: {caster.x, caster.y}, duration: @duration}
+            ability = SpellObjects.SummonAbility.create {monster: @monster, :caster, xy: {caster.x, caster.y}, duration: @duration, on_summon: @on_summon}
             GameObject.add_to_level(ability)
 }
 
@@ -454,29 +455,13 @@ Data.effect_create {
         @summoned or= caster.summoned
         @n_summons = 0
         for mon, time in pairs caster.summoned
-            if time > @kill_time
+            if time > math.min(1600, 400 + caster\effective_stats().willpower * 50)
                 mon\direct_damage(mon.stats.hp + 1)
             if mon.destroyed
                 caster.summoned[mon] = nil
             else
                 caster.summoned[mon] += 1
                 @n_summons += 1
-        --amount = math.max 1, math.floor(caster.stats.level / 2)
-        --visible_enemy = false
-        --for obj in *Map.enemies_list(caster)
-        --    if Map.object_visible(obj)
-        --        visible_enemy = true
-        --        break
-        --if visible_enemy and not (caster\has_effect "Summoning") and @n_summons < amount 
-        --    if #Map.allies_list(caster) == 0
-        --        return
-        --    if @n_steps > 30 + 70 / caster.stats.level
-        --        eff = caster\add_effect("Summoning", 20)
-        --        eff.monster = (if type(@monster) == "string" then @monster else random_choice(@monster))
-        --        eff.duration = 5 -- @duration / caster.stats.level
-        --        @n_steps = 0
-        --    else 
-        --        @n_steps += 1
 }
 
 Data.spell_create {
@@ -507,20 +492,17 @@ Data.spell_create {
     autotarget_func: (caster) -> caster.x, caster.y
     action_func: (caster, x, y) ->
         play_sound "sound/summon.ogg"
-        --visible_enemy = false
-        --for obj in *Map.enemies_list(caster)
-        --    if Map.object_visible(obj)
-        --        visible_enemy = true
-        --{:willpower} = caster\effective_stats()
-        --monster = if willpower >= 11
-        --    "Mummy"
-        --elseif willpower >= 9
-        --    "Skeleton"
-        --else
         monster = "Spectral Beast"
         if not (caster\has_effect "Summoning")
-            caster\direct_damage(25)
+            caster\direct_damage(45)
             eff = caster\add_effect("Summoning", 20)
+            eff.on_summon = (obj) ->
+                -- obj.stats.hp += caster\effective_stats().willpower * 5
+                -- obj.stats.max_hp += caster\effective_stats().willpower * 5
+                obj.stats.strength += caster\effective_stats().willpower / 2
+                obj.stats.magic += caster\effective_stats().willpower / 2
+                obj.stats.defence += caster\effective_stats().willpower / 2
+                obj.stats.willpower += caster\effective_stats().willpower /2 
             eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
             eff.duration = 5
 }
@@ -537,7 +519,6 @@ for name in *{"Ranger", "Fighter", "Necromancer", "Mage"}
                 else
                     eff = caster\add_effect "Summoner", 2
                     eff.duration = 30
-                    eff.kill_time = 300
     on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
         if name == "Necromancer"
             if attacker\direct_damage(damage * 0.33)

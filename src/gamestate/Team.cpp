@@ -97,6 +97,9 @@ CombatGameInst* get_nearest_ally(GameState* gs, CombatGameInst* inst) {
     CombatGameInst* closest_game_inst = NULL;
     for_all_on_team(gs->team_data(), inst->current_floor, inst->team,
         [&](CombatGameInst* o) {
+            if (o == inst) {
+               return; // Dont include ourselves, we'd always be closest
+            }
             float dx = (o->x - inst->x), dy = (o->y - inst->y);
             float sqr_dist = dx*dx + dy*dy;
             if (sqr_dist < smallest_sqr_dist) {
