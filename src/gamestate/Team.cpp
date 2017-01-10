@@ -59,8 +59,7 @@ static BBox to_tile_span(GameState* gs, BBox area) {
 CombatGameInst* get_nearest_visible_enemy(GameState* gs, CombatGameInst* inst) {
     float smallest_sqr_dist = std::numeric_limits<float>::max();
     CombatGameInst* closest_game_inst = NULL;
-    for_all_enemies(gs->team_data(), inst->current_floor, inst->team,
-        [&](CombatGameInst* o) {
+    for_all_enemies(gs->team_data(), inst, [&](CombatGameInst* o) {
             if (!is_visible(gs, inst, o)) {
                 return;
             }
@@ -79,8 +78,7 @@ CombatGameInst* get_nearest_visible_enemy(GameState* gs, CombatGameInst* inst) {
 CombatGameInst* get_nearest_enemy(GameState* gs, CombatGameInst* inst) {
     float smallest_sqr_dist = std::numeric_limits<float>::max();
     CombatGameInst* closest_game_inst = NULL;
-    for_all_enemies(gs->team_data(), inst->current_floor, inst->team,
-        [&](CombatGameInst* o) {
+    for_all_enemies(gs->team_data(), inst, [&](CombatGameInst* o) {
             float dx = (o->x - inst->x), dy = (o->y - inst->y);
             float sqr_dist = dx*dx + dy*dy;
             if (sqr_dist < smallest_sqr_dist) {
@@ -95,10 +93,9 @@ CombatGameInst* get_nearest_enemy(GameState* gs, CombatGameInst* inst) {
 CombatGameInst* get_nearest_ally(GameState* gs, CombatGameInst* inst) {
     float smallest_sqr_dist = std::numeric_limits<float>::max();
     CombatGameInst* closest_game_inst = NULL;
-    for_all_on_team(gs->team_data(), inst->current_floor, inst->team,
-        [&](CombatGameInst* o) {
-            if (o == inst) {
-               return; // Dont include ourselves, we'd always be closest
+    for_all_allies(gs->team_data(), inst, [&](CombatGameInst* o) {
+            if (inst == o) {
+                return;
             }
             float dx = (o->x - inst->x), dy = (o->y - inst->y);
             float sqr_dist = dx*dx + dy*dy;

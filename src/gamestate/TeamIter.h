@@ -23,6 +23,9 @@ inline void for_all_enemies(TeamData& td, level_id level, team_id team, Function
 // Helper functions for iterating through TeamData:
 template <typename Function>
 inline void for_all_enemies(TeamData& td, CombatGameInst* inst, Function&& f) {
+    if (inst->current_floor == -1) {
+        return;
+    }
     for_all_enemies(td, inst->current_floor, inst->team, f);
 }
 
@@ -38,6 +41,9 @@ inline void for_all_on_team(TeamData& td, level_id level, team_id team, Function
 // Helper functions for iterating through TeamData:
 template <typename Function>
 inline void for_all_allies(TeamData& td, CombatGameInst* inst, Function&& f) {
+    if (inst->current_floor == -1) {
+        return;
+    }
     for_all_on_team(td, inst->current_floor, inst->team, f);
 }
 

@@ -22,7 +22,11 @@ M.loop_control = {
     startup_function = do_nothing
 }
 
+local HEADLESS = os.getenv("LANARTS_HEADLESS")
 local function game_loop_body(steponly)
+    if HEADLESS then
+        steponly = true
+    end
     perf.timing_begin("**Game Frame**")
 
     perf.timing_begin("**Sync Message**")
@@ -50,7 +54,9 @@ local function game_loop_body(steponly)
     local surplus = settings.time_per_step - timer:get_milliseconds()
 
     perf.timing_begin("**Surplus**")
-    GameState.wait(surplus)
+    if not HEADLESS then 
+        GameState.wait(surplus)
+    end
     perf.timing_end("**Surplus**")
 
     perf.timing_end("**Game Frame**")
@@ -95,6 +101,9 @@ function M.run_loop()
     M.loop_control.startup_function()
 
     GameState.input_capture()
+    if require("tests.main").testcase then
+        require("tests.main").testcase:game_start()
+    end
 
     while true do 
         local single_player = (settings.connection_type == Network.NONE)

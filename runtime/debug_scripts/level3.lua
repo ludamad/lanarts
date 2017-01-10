@@ -10,7 +10,7 @@ for i=1,12 do
 end
 
 for i=1,20 do
-    item = ItemUtils.item_generate(ItemGroups.basic_items)
+    local item = ItemUtils.item_generate(ItemGroups.basic_items)
     ObjectUtils.spawn_item_near(player, item.type, item.amount)
 end
 

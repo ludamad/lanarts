@@ -287,14 +287,14 @@ M.simple_room = (args) -> table.merge M.skull_surrounded_dungeon(args), {
     data: [=[
 wwwwwwwwwwwwwwwwwwwwwww
 wpppppppppppppppppppppw
-wpppppppppppppppppppppw
-wpppppppppppppppppppppw
-wpppppppppppppppppppppw
-wpppppppppppppppppppppw
-wpppppppppppppppppppppw
+wpppppppppppppppepppppw
+wppppppppppppppppeppppw
+wppppppppppppppppeppppw
+wpppppppppppppppppppepw
+wpppppppppppppppppppepw
 wppppppp@ppppppppeppppw
-wpppppppppppppppppppppw
-wpppppppppppppppppppppw
+wpppppppppppppppppppepw
+wpppppppppppppppepppppw
 wpppppppppppppppppppppw
 wwwwwwwwwwwwwwwwwwwwwww
 ]=]
