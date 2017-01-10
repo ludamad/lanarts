@@ -380,7 +380,16 @@ namespace GameInstWrap {
 		int id = luaL_checkinteger(L, 2);
 		int current_floor = luaL_checkinteger(L, 3);
 		GameInst* inst = gs->get_level(current_floor)->game_inst_set().get_instance(id);
-		push_ref(L, inst);
+                if (inst == NULL) {
+                    // Assume the objet has been destroyed.
+                    // TODO do this on serialization side if object->destroyed
+                    // along with its lua state?
+                    lua_newtable(L);
+                    lua_pushboolean(L, true);
+                    lua_setfield(L, -2, "destroyed");
+                } else {
+                    push_ref(L, inst);
+                }
 		return 1;
 	}
 

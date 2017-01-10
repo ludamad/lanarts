@@ -406,13 +406,13 @@ Data.spell_create(Luminos)
 
 local GreaterPain = {
     name = "Greater Pain",
-    description = "Instantly damage all nearby enemies, but hurting yourself in the process.",
+    description = "Instantly damage all nearby enemies, but hurting yourself in the process. Killing enemies brings back some health.",
     can_cast_with_held_key = true,
     spr_spell = "spr_spells.greaterpain",
     can_cast_with_cooldown = false,
     mp_cost = 20,
     cooldown = 25,
-    spell_cooldown = 100,
+    spell_cooldown = 800,
     fallback_to_melee = true,
     range = 60
 }

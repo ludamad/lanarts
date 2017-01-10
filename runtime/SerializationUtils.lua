@@ -33,6 +33,18 @@ function M.require_fallback(_context, str)
         local t =  require(mname:sub(4))
         -- print(mname, Serialization.index_object_dictionary[mname])
         M.name_subobjects(t, Serialization.index_object_dictionary, Serialization.object_index_dictionary, "_R:"..mname:sub(4))
+        -- Fall-back for when object is not named after all attempts:
+        if Serialization.index_object_dictionary[str] == nil then
+            local parts = mname:split(";")
+            local object = t
+            for i=2,#parts do
+                object = object[parts[i]]
+                if object == nil then
+                    break
+                end
+            end
+            Serialization.index_object_dictionary[str] = object
+        end
     end
     return Serialization.index_object_dictionary[str]
 end

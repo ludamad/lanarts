@@ -369,9 +369,9 @@ Data.effect_create {
                     caster\gain_xp_from(mon)
                     {:max_hp} = mon\effective_stats()
                     if caster\has_effect("AmuletGreatPain")
-                        caster\heal_hp(max_hp * 2/ 3)
+                        caster\heal_hp(max_hp * 2/ 8)
                     else
-                        caster\heal_hp(max_hp / 3)
+                        caster\heal_hp(max_hp / 8)
                     --stats.mp = math.min(stats.max_mp, stats.mp + @mp_gain)
                     ---- Summon zombies by probability!?
                     --if caster\is_local_player() 

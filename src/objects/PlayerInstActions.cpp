@@ -259,7 +259,7 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
         if (abs(dx) > 0) dx /= abs(dx);
         if (abs(dy) > 0) dy /= abs(dy);
     }
-    LAST_WAS_STOP = (dx == 0 && dy == 0);
+    LAST_WAS_STOP = (min_dist != 10000) && (dx == 0 && dy == 0);
     return {dx, dy};
 }
 

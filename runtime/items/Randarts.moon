@@ -90,7 +90,7 @@ add_random_spell = () -> (rng, data) ->
     if data.spells_granted
         return -- For now, dont have double spell items.
     data.spells_granted or= {}
-    spell = random_choice {
+    spell = rng\random_choice {
         "Minor Missile",
         "Fireball",
         "Fire Bolt",

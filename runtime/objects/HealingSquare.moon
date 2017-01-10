@@ -15,6 +15,7 @@ M.healingsqr_sprite = tosprite "spr_doors.healingsqr"
 -- Door
 M.HealingSquare = LuaGameObject.type_create({base: DungeonFeatures.FeatureBase})
 with M.HealingSquare
+    .parent_on_step = () =>
     .on_step = () =>
         collisions = Map.rectangle_collision_check(@map, @area, @)
         @stepped_on = false
