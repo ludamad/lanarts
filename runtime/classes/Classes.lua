@@ -21,6 +21,7 @@ local TEST_INVENTORY = os.getenv("LANARTS_TESTITEMS") and {
      -- For testing spell amulets:
      --{item = "Amulet of Fear", amount = 1}, 
      {item = "Amulet of Trepidation", amount = 1},
+     {item = "Amulet of the Berserker", amount = 1},
      --{item = "Amulet of Regeneration", amount = 1},
      --{item = "Amulet of Fire", amount = 1},
      --{item = "Amulet of Greater Fire", amount = 1},
@@ -31,6 +32,7 @@ local TEST_INVENTORY = os.getenv("LANARTS_TESTITEMS") and {
      { item = "Amulet of Greed", amount = 1 },
      { item = "Amulet of Healing", amount = 1 },
      {item = "Amulet of Great Pain", amount = 1},
+     {item = "Amulet of Greater Fire", amount = 1},
      {item = "Amulet of Ice Form", amount = 1},
      {item = "Amulet of Light", amount = 1},
      {item = "Ring of Spells", amount = 1},
@@ -169,9 +171,9 @@ Data.class_create {
           weapon = "Short Bow",
           projectile = {item = "Arrow", amount = 50},
           gold = 0,
-          inventory = {
+          inventory = table.tconcat({
              {item = "Health Potion", amount = 1},
-          }
+          }, TEST_INVENTORY)
         }
     },
     gain_per_level = {
@@ -218,9 +220,9 @@ Data.class_create {
         equipment = {
           weapon = "Dagger",
           gold = 0,
-          inventory = {
+          inventory = table.tconcat({
              {item = "Mana Potion", amount = 1},
-          }
+          }, TEST_INVENTORY)
         }
     },
     gain_per_level = {

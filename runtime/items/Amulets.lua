@@ -60,13 +60,13 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Amulet of Healing",
-    description = "Grants the user the ability to cast 'Healing Aura'.",
+    description = "Heals HP every time you kill an enemy.",
     type = "amulet",
 
     shop_cost = { 120, 140 },
 
     spr_item = "spr_amulets.healing",
-    spells_granted = {"Healing Aura"},
+    effects_granted = {"AmuletHealthGainOnKill"},
 }
 
 
@@ -110,47 +110,48 @@ Data.equipment_create {
 
 Data.equipment_create {
     name = "Amulet of Greater Fire",
-    description = "Grants the user the spell 'Fireball', and makes all projectile spells move faster.",
+    description = "Grants the user multidirectional Fire Bolt casts, and makes all projectile spells move faster.",
     type = "amulet",
 
     shop_cost = { 120, 140 },
 
     spr_item = "spr_amulets.greaterfireball",
-    spells_granted = {"Fireball"},
+    effects_granted = {"AmuletGreaterFire"},
+    --spells_granted = {"Fireball"},
     stat_bonuses = {spell_velocity_multiplier = 1.15}
 }
 
-Data.equipment_create {
-    name = "Amulet of Fire",
-    description = "Grants the user the spell 'Fire Bolt'.",
-    type = "amulet",
-
-    shop_cost = { 70, 100 },
-
-    spr_item = "spr_amulets.fireball",
-    spells_granted = {"Fire Bolt"},
-}
+--Data.equipment_create {
+--    name = "Amulet of Fire",
+--    description = "Grants the user the spell 'Fire Bolt'.",
+--    type = "amulet",
+--
+--    shop_cost = { 70, 100 },
+--
+--    spr_item = "spr_amulets.fireball",
+--    spells_granted = {"Fire Bolt"},
+--}
 
 Data.equipment_create {
     name = "Amulet of the Berserker",
-    description = "Grants the user the ability to 'Berserk'.",
+    description = "Berserked user has 5% chance of summoning a centaur when killing.",
     type = "amulet",
 
     shop_cost = { 120, 140 },
 
     spr_item = "spr_amulets.berserk",
-    spells_granted = {"Berserk"}
+    effects_granted = {"AmuletBerserker"}
 }
 
 Data.equipment_create {
     name = "Amulet of Great Pain",
-    description = "Grants the user the spell 'Greater Pain', and +1 willpower.",
+    description = "Grants the user double healing power from necromancy spells.",
     type = "amulet",
 
     shop_cost = { 120, 140 },
 
     spr_item = "spr_amulets.greaterpain",
-    spells_granted = {"Greater Pain"},
+    effects_granted = {"AmuletGreatPain"},
     stat_bonuses = {willpower = 1}
 }
 
@@ -176,17 +177,17 @@ Data.equipment_create {
     spells_granted = {"Luminos"}
 }
 
-Data.equipment_create {
-    name = "Amulet of Pain",
-    description = "Grants the user the spell 'Pain' and +1 willpower.",
-    type = "amulet",
-
-    shop_cost = { 120, 140 },
-
-    spr_item = "spr_amulets.pain",
-    spells_granted = {"Pain"},
-    stat_bonuses = {willpower = 1}
-}
+--Data.equipment_create {
+--    name = "Amulet of Pain",
+--    description = "Grants the user the spell 'Pain' and +1 willpower.",
+--    type = "amulet",
+--
+--    shop_cost = { 120, 140 },
+--
+--    spr_item = "spr_amulets.pain",
+--    spells_granted = {"Pain"},
+--    stat_bonuses = {willpower = 1}
+--}
 
 Data.equipment_create {
     name = "Amulet of Ringholding",

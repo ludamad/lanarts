@@ -460,10 +460,11 @@ bool CombatGameInst::projectile_attack(GameState* gs, CombatGameInst* inst,
 
     int range = pentry.range();
 
-    if (pentry.name == "Mephitize" || pentry.name == "Trepidize") {
+    bool has_greater_fire = effects().get(get_effect_by_name("AmuletGreaterFire"));
+    if (pentry.name == "Mephitize" || pentry.name == "Trepidize" || (has_greater_fire && pentry.name == "Fire Bolt")) {
           float vx = 0, vy = 0;
           ::direction_towards(Pos {x, y}, p, vx, vy, 10000);
-          int directions = (pentry.name == "Trepidize" ? 4 : 16);
+          int directions = (pentry.name == "Mephitize" ? 16 : 4);
 
           for (int i = 0; i < directions; i++) {
               const float PI =3.141592;

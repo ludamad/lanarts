@@ -75,15 +75,15 @@ add_random_effect = () -> (rng, data) ->
     if data.effects_granted
         return -- For now, dont have double effects.
     data.effects_granted or= {}
-    effect = random_choice {
-        "VampiricWeapon"
-        "ConfusingWeapon"
-        "PoisonedWeapon"
-        "FearWeapon"
+    {effect, description} = rng\random_choice {
+        {"VampiricWeapon", "You gain the power to steal life with your melee blows."}
+        {"ConfusingWeapon", "You gain the power to daze foes in melee."}
+        {"PoisonedWeapon", "You gain the power to poison foes in melee."}
+        {"PossiblySummonStormElementalOnKill", "You gain the power to summon storm elementals as you kill things."}
+        {"PossiblySummonGolemOnKill", "You gain the power to summon golems as you kill things."}
+        {"PossiblySummonCentaurOnKill", "You gain the power to summon centaurs as you kill things."}
     }
-    if table.contains(data.effects_granted, effect) 
-        return
-    data.description ..= " Grants the user the buff '#{effect}'."
+    data.description ..= " #{description}"
     append data.effects_granted, effect
 
 add_random_spell = () -> (rng, data) ->
@@ -145,8 +145,8 @@ local MINOR_ENCHANTS, MAJOR_ENCHANTS, MINOR_DEBUFFS, MAJOR_DEBUFFS
 -- Minor enchantments:
 MINOR_ENCHANTS = {
     mult_stat_bonus("spell_velocity_multiplier", {1.10, 1.25})
-    --add_random_spell()
-    --add_random_effect()
+    add_random_spell()
+    add_random_effect()
     additive_stat_bonus("mp", {10, 25})
     additive_stat_bonus("hp", {10, 25})
     additive_stat_bonus("hpregen", {0.02, 0.03})

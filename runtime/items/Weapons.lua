@@ -68,7 +68,7 @@ Data.weapon_create {
 
     cooldown = 40,
     range = 7,
-    effects_granted = {"ManaGainOnKill"}
+    effects_granted = {"WeaponManaGainOnKill"}
 }
 
 Data.weapon_create {
@@ -145,7 +145,7 @@ Data.weapon_create {
     cooldown = 55,
 
     range = 7,
-    effects_granted = {"KnockbackWeapon", "HealthGainOnKill"}
+    effects_granted = {"KnockbackWeapon", "WeaponHealthGainOnKill"}
 }
 
 

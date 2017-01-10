@@ -57,6 +57,12 @@ function berserk_effect.step(effect, obj)
 		if settings.verbose_output then
 			EventLog.add("Killed Enemy, berserk time_left = " .. effect.time_left)
 		end
+                if obj:has_effect("AmuletBerserker") and chance(0.05) then
+                    play_sound "sound/summon.ogg"
+                    local eff = obj:add_effect("Summoning", 20)
+                    eff.monster = "Centaur Hunter"
+                    eff.duration = 5
+                end
 		killdiff = killdiff -1
                 obj:heal_hp(20)
 		effect.extensions = effect.extensions + 1
@@ -137,7 +143,7 @@ function thrown_effect.step(effect, obj)
 end
 
 function thrown_effect.stat(effect, obj, old, new) 
-	local immune = effect.steps > THROW_DURATION*2 and (obj.name == "Red Dragon" or obj.name == "Zin")
+	local immune = effect.steps > THROW_DURATION*2 and (obj.name == "Red Dragon" or obj.name == "Pixulloch")
 	if not immune then
 		new.speed = 0
 		

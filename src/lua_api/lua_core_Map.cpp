@@ -502,7 +502,7 @@ namespace lua_api {
 
         gmap["monsters_list"].bind_function(gmap_monsters_list);
         gmap["players_list"].bind_function(gmap_players_list);
-        gmap["allies_list"].bind_function(gmap_enemies_list);
+        gmap["allies_list"].bind_function(gmap_allies_list);
         gmap["enemies_list"].bind_function(gmap_enemies_list);
         gmap["monsters_seen"].bind_function(gmap_monsters_seen);
         gmap["monsters"].bind_function(gmap_monsters);

@@ -253,10 +253,11 @@ static void player_use_projectile_spell(GameState* gs, PlayerInst* p,
     int nbounces = pentry.number_of_target_bounces;
     float speed = pentry.speed * p->effective_stats().core.spell_velocity_multiplier;
 
-    if (spl_entry.name == "Mephitize" || spl_entry.name == "Trepidize") {
+    bool has_greater_fire = p->effects().get(get_effect_by_name("AmuletGreaterFire"));
+    if (pentry.name == "Mephitize" || pentry.name == "Trepidize" || (has_greater_fire && pentry.name == "Fire Bolt")) {
         float vx = 0, vy = 0;
-        direction_towards(Pos {p->x, p->y}, target, vx, vy, 10000);
-        int directions = (spl_entry.name == "Trepidize" ? 4 : 16);
+        ::direction_towards(Pos {p->x, p->y}, target, vx, vy, 10000);
+        int directions = (pentry.name == "Trepidize" ? 4 : 16);
 
         for (int i = 0; i < directions; i++) {
             float angle = PI / directions * 2 * i;

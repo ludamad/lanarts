@@ -10,8 +10,22 @@
 #include "ItemInst.h"
 #include "collision_filters.h"
 
+#include "stats/items/ItemEntry.h"
+
 bool item_colfilter(GameInst* self, GameInst* other) {
 	return dynamic_cast<ItemInst*>(other) != NULL;
+}
+
+bool autopickup_colfilter(GameInst* self, GameInst* other) {
+    ItemInst* i = NULL;
+    if ( (i = dynamic_cast<ItemInst*>(other)) ) {
+        Item& item = i->item_type();
+        ItemEntry& entry = item.item_entry();
+        if (entry.stackable) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool enemy_colfilter(GameInst* self, GameInst* other) {

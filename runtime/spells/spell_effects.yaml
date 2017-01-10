@@ -115,7 +115,11 @@ effects:
     # Rest of effect in CPP code
     stat_func: 
       function(effect, obj, old, new)
-        new.hpregen = new.hpregen * 15
+        if obj:has_effect("AmuletGreatPain") then
+            new.hpregen = new.hpregen * 30
+        else
+            new.hpregen = new.hpregen * 15
+        end
         if obj.stats.hp == new.max_hp then
             obj:remove_effect("Regeneration")
         end

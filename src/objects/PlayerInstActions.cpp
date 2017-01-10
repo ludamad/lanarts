@@ -190,6 +190,7 @@ static bool has_visible_monster(GameState* gs, PlayerInst* p = NULL) {
 }
 
 Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
+    static bool LAST_WAS_STOP = false;
     Pos closest = {-1,-1};
     float min_dist = 10000;//std::numeric_limits<float>::max();
     bool found_item = false;
@@ -213,9 +214,10 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
                     }
                 }
             }
-            // Ludamad: Automatic item picking up was interesting but way too good.
-            // Dashing into a dungeon and quickly picking up items around should be a conscious effort by the player.
-            bool is_item = false; // Too broken:  (gs->object_radius_test(this, NULL, 0, &item_colfilter, (x*32+16), (y*32+16), 1));
+            // " Ludamad: Automatic item picking up was interesting but way too good.
+            //   Dashing into a dungeon and quickly picking up items around should be a conscious effort by the player."
+            // Ludamad: OK, let's try with just stackable items.
+            bool is_item = (gs->object_radius_test(this, NULL, 0, &autopickup_colfilter, (x*32+16), (y*32+16), 1));
             if (near_unseen || is_item) {
                 if (dist != 0 && (min_dist >= dist || (is_item > found_item)) && (is_item >= found_item)) {
                     closest = {x,y};
@@ -225,7 +227,12 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
             }
         }
     }
-    if (min_dist != 10000) {//std::numeric_limits<float>::max()) {
+    if (LAST_WAS_STOP) {
+        dx = gs->rng().rand(Range {-1, +1});
+        dy = gs->rng().rand(Range {-1, +1});
+    } else if (gs->object_radius_test(this, NULL, 0, &autopickup_colfilter)) {
+        dx = 0, dy = 0;
+    } else if (min_dist != 10000) {//std::numeric_limits<float>::max()) {
         Pos iter = closest;
         Pos next_nearest;
         while (true) {
@@ -252,6 +259,7 @@ Pos PlayerInst::direction_towards_unexplored(GameState* gs) {
         if (abs(dx) > 0) dx /= abs(dx);
         if (abs(dy) > 0) dy /= abs(dy);
     }
+    LAST_WAS_STOP = (dx == 0 && dy == 0);
     return {dx, dy};
 }
 

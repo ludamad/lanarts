@@ -59,7 +59,7 @@ Data.equipment_create {
     shop_cost = { 200, 250 },
 
     spr_item = "spr_belts.life-belt",
-    effects_granted = {"HealthGainOnKill"}
+    effects_granted = {"BeltHealthGainOnKill"}
 }
 
 Data.equipment_create {

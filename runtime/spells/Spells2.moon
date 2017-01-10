@@ -137,33 +137,89 @@ AuraBase = {
 
 -- Effects:
 
-Data.effect_create {
-    name: "HealthGainOnKill"
-    category: "EquipEffect"
-    init_func: (caster) =>
-        @kill_tracker = caster.kills
-    step_func: (caster) =>
-        while caster.kills > @kill_tracker
-            if caster\is_local_player()
-                EventLog.add("You regain health for killing!", COL_PALE_BLUE)
-                caster\heal_hp(5 + caster.stats.level)
-            @kill_tracker += 1
-}
+-------  START EQUIPMENT SLOT STACKED EFFECTS --------
+-- Hack because effects are not currently easily stacked otherwise:
+for equip_slot in *{"", "Amulet", "Ring", "Belt", "Weapon", "Legwear"}
+    Data.effect_create {
+        name: "#{equip_slot}HealthGainOnKill"
+        category: "EquipEffect"
+        init_func: (caster) =>
+            @kill_tracker = caster.kills
+        step_func: (caster) =>
+            while caster.kills > @kill_tracker
+                if caster\is_local_player()
+                    EventLog.add("You regain health for killing!", COL_PALE_BLUE)
+                caster\heal_hp(3 + caster.stats.level)
+                @kill_tracker += 1
+    }
+    Data.effect_create {
+        name: "#{equip_slot}ManaGainOnKill"
+        category: "EquipEffect"
+        init_func: (caster) =>
+            @kill_tracker = caster.kills
+        step_func: (caster) =>
+            while caster.kills > @kill_tracker
+                if caster\is_local_player()
+                    EventLog.add("You regain mana for killing!", COL_PALE_BLUE)
+                caster\heal_mp(3 + caster.stats.level)
+                @kill_tracker += 1
+    }
+
+    Data.effect_create {
+        name: "PossiblySummonCentaurOnKill"
+        category: "EquipEffect"
+        init_func: (caster) =>
+            @kill_tracker = caster.kills
+        step_func: (caster) =>
+            while caster.kills > @kill_tracker
+                if chance(0.01)
+                    EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
+                    play_sound "sound/summon.ogg"
+                    monster = "Centaur Hunter"
+                    if not (caster\has_effect "Summoning")
+                        eff = caster\add_effect("Summoning", 20)
+                        eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
+                        eff.duration = 5
+                @kill_tracker += 1
+    }
+
+    Data.effect_create {
+        name: "PossiblySummonStormElementalOnKill"
+        category: "EquipEffect"
+        init_func: (caster) =>
+            @kill_tracker = caster.kills
+        step_func: (caster) =>
+            while caster.kills > @kill_tracker
+                if chance(0.05)
+                    EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
+                    play_sound "sound/summon.ogg"
+                    monster = "Storm Elemental"
+                    if not (caster\has_effect "Summoning")
+                        eff = caster\add_effect("Summoning", 20)
+                        eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
+                        eff.duration = 5
+                @kill_tracker += 1
+    }
 
 
-Data.effect_create {
-    name: "ManaGainOnKill"
-    category: "EquipEffect"
-    init_func: (caster) =>
-        @kill_tracker = caster.kills
-    step_func: (caster) =>
-        while caster.kills > @kill_tracker
-            if caster\is_local_player()
-                EventLog.add("You regain mana for killing!", COL_PALE_BLUE)
-                caster\heal_mp(5 + caster.stats.level)
-            @kill_tracker += 1
-}
-
+    Data.effect_create {
+        name: "PossiblySummonGolemOnKill"
+        category: "EquipEffect"
+        init_func: (caster) =>
+            @kill_tracker = caster.kills
+        step_func: (caster) =>
+            while caster.kills > @kill_tracker
+                if chance(0.02)
+                    EventLog.add("A creature is summoned due to your graceful killing!!", COL_PALE_BLUE)
+                    play_sound "sound/summon.ogg"
+                    monster = "Golem"
+                    if not (caster\has_effect "Summoning")
+                        eff = caster\add_effect("Summoning", 20)
+                        eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
+                        eff.duration = 5
+                @kill_tracker += 1
+    }
+-------  STOP EQUIPMENT SLOT STACKED EFFECTS --------
 
 Data.effect_create {
     name: "Summoning"
@@ -177,6 +233,7 @@ Data.effect_create {
         @delay = 1
         @duration = @time_left
         @on_summon = do_nothing
+        caster.summoned or= {}
     step_func: (caster) =>
         @n_steps += 1
         if @n_steps == @delay
@@ -211,7 +268,8 @@ Data.effect_create {
     effected_sprite: "spr_amulets.healing"
     fade_out: 25
     step_func: (obj) =>
-        obj\heal_hp(20 / 60)
+        {:hpregen} = obj\effective_stats()
+        obj\heal_hp(hpregen * 20)
 }
 
 Data.effect_create {
@@ -309,6 +367,11 @@ Data.effect_create {
                 if mon\damage(random(4,15) * 2 + caster.stats.magic * 2, random(6,10) + caster.stats.magic * 0.2, 1.0, 2.0)
                     {:stats} = caster
                     caster\gain_xp_from(mon)
+                    {:max_hp} = mon\effective_stats()
+                    if caster\has_effect("AmuletGreatPain")
+                        caster\heal_hp(max_hp * 2/ 3)
+                    else
+                        caster\heal_hp(max_hp / 3)
                     --stats.mp = math.min(stats.max_mp, stats.mp + @mp_gain)
                     ---- Summon zombies by probability!?
                     --if caster\is_local_player() 
@@ -331,7 +394,7 @@ Data.effect_create {
     on_melee_func: (attacker, defender, damage, attack_stats) =>
         if attacker\is_local_player() 
             EventLog.add("You steal the enemy's life!", {200,200,255})
-        attacker\heal_hp(damage / 10)
+        attacker\heal_hp(damage / 4)
         return damage
 }
 
@@ -445,6 +508,19 @@ Data.effect_create {
         return damage
 }
 
+-- These all are implemented by checks in the code:
+Data.effect_create {
+    name: "AmuletBerserker"
+}
+
+Data.effect_create {
+    name: "AmuletGreatPain"
+}
+
+Data.effect_create {
+    name: "AmuletGreaterFire"
+}
+
 Data.effect_create {
     name: "Summoner"
     init_func: (caster) =>
@@ -455,7 +531,7 @@ Data.effect_create {
         @summoned or= caster.summoned
         @n_summons = 0
         for mon, time in pairs caster.summoned
-            if time > math.min(1600, 400 + caster\effective_stats().willpower * 50)
+            if not mon.destroyed and time > math.min(1600, 400 + caster\effective_stats().willpower * 50)
                 mon\direct_damage(mon.stats.hp + 1)
             if mon.destroyed
                 caster.summoned[mon] = nil
@@ -474,7 +550,7 @@ Data.spell_create {
     fallback_to_melee: false,
     spell_cooldown: 800
     prereq_func: (caster) ->
-        if caster.stats.hp < 40
+        if caster.stats.hp < 65
             if caster\is_local_player() 
                 EventLog.add("You do not have enough health!", {200,200,255})
             return false
@@ -512,19 +588,34 @@ mon_title = (mon) -> if mon.unique then mon.name else "the #{mon.name}"
 for name in *{"Ranger", "Fighter", "Necromancer", "Mage"}
     Data.effect_create {
         :name
+        stat_func: (obj, old, new) =>
+            if name == "Mage" and obj.stats.level == 1
+                new.spell_cooldown_multiplier *= 1.1
+            if name == "Mage" and obj.stats.level == 2
+                new.spell_cooldown_multiplier *= 1.05
+            if name == "Necromancer" or name == "Mage" or name == "Ranger"
+                new.melee_cooldown_multiplier *= 1.5
+
+        init_func: (caster) =>
+            @kill_tracker = caster.kills
         step_func: (caster) =>
-            if name == "Necromancer" 
-                if caster\has_effect "Summoner"
-                    caster\add_effect "Summoner", 2 -- Keep effect from dying
-                else
-                    eff = caster\add_effect "Summoner", 2
-                    eff.duration = 30
-    on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
-        if name == "Necromancer"
-            if attacker\direct_damage(damage * 0.33)
-                defender\gain_xp_from(attacker)
-            if defender\is_local_player()
-                EventLog.add("Your magic lashes back at #{mon_title attacker} as you are hit!", COL_PALE_BLUE)
-        return damage
+            -- Keep state for doing summons in a stateful effect:
+            if caster\has_effect "Summoner"
+                caster\add_effect "Summoner", 2 -- Keep effect from dying
+            else
+                eff = caster\add_effect "Summoner", 2
+                eff.duration = 30
+            while caster.kills > @kill_tracker
+                if caster\is_local_player()
+                    EventLog.add("You regain mana for killing!", COL_PALE_BLUE)
+                caster\heal_hp(5 + caster.stats.level)
+                @kill_tracker += 1
+        on_receive_melee_func: (attacker, defender, damage, attack_stats) =>
+            if name == "Necromancer"
+                if attacker\direct_damage(damage * 0.33)
+                    defender\gain_xp_from(attacker)
+                if defender\is_local_player()
+                    EventLog.add("Your magic lashes back at #{mon_title attacker} as you are hit!", COL_PALE_BLUE)
+            return damage
     }
 

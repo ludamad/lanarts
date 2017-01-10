@@ -132,13 +132,36 @@ Data.enemy_create {
     }
 }
 
+Data.enemy_create {
+    name: "Mummy"
+    sprite: "spr_enemies.undead.mummy"
+    radius: 11
+    xpaward: 10
+    appear_message: "A summoned mummy appears!"
+    defeat_message: "The summoned mummy is put to rest."
+    stats: {
+        attacks: {
+            {weapon: "Basic Melee"}
+        }
+        hp: 10
+        hpregen: 0
+        movespeed: 5
+        -- base stats:
+        strength: 15
+        defence: 0
+        magic: 15
+        willpower: 0
+   }
+   effects_active: {"PoisonedWeapon"}
+}
+
 summoner_base = (monster, amount, rate = 60, kill_time = 250, duration = 150) -> (data) -> table.merge data, {
     init_func: () =>
         @n_steps = 0
         @summon_rate = rate
         @summoned = {}
         @n_summons = 0
-    step_func: (caster) =>
+    step_func: () =>
         @n_summons = 0
         for mon, time in pairs @summoned
             if time > kill_time
@@ -149,7 +172,7 @@ summoner_base = (monster, amount, rate = 60, kill_time = 250, duration = 150) ->
                 @summoned[mon] += 1
                 @n_summons += 1
         if Map.object_visible(@) and not (@has_effect "Summoning") and @n_summons < amount
-            if #Map.allies_list(caster) == 0
+            if #Map.allies_list(@) == 0
                 return
             if @n_steps > @summon_rate
                 eff = @add_effect("Summoning", 20)
@@ -247,8 +270,8 @@ Data.enemy_create summoner_base("Giant Bee", 7, 30, 400, 5) {
         -- Spawn 3 level 1 randarts:
         ObjectUtils.spawn_item_near(@, "Swarm Lanart", 1)
         for i=1,3
-            item = ItemUtils.item_generate ItemGroups.basic_items, false, 1, 100
-            ObjectUtils.spawn_item_near(@, item.type, 1)
+            ObjectUtils.spawn_item_near(@, ItemGroups.pick_randart(), 1)
+        ObjectUtils.spawn_item_near(@, "Amulet of Great Pain", 1)
 }
  
 Data.enemy_create {
@@ -421,9 +444,9 @@ Data.enemy_create {
         ItemGroups = require "maps.ItemGroups"
         ObjectUtils.spawn_item_near(@, "Red Dragonplate", 1)
         ObjectUtils.spawn_item_near(@, "Dragon Lanart", 1)
+        ObjectUtils.spawn_item_near(@, "Amulet of Greater Fire", 1)
         -- Spawn a level 1 randart:
-        item = ItemUtils.item_generate ItemGroups.basic_items, false, 1, 100
-        ObjectUtils.spawn_item_near(@, item.type, 1)
+        ObjectUtils.spawn_item_near(@, ItemGroups.pick_randart(), 1)
 }
 
 Data.enemy_create summoner_base("Imp", 5, 60, 600) {
@@ -453,8 +476,7 @@ Data.enemy_create summoner_base("Imp", 5, 60, 600) {
         ItemUtils = require "maps.ItemUtils"
         ItemGroups = require "maps.ItemGroups"
         -- Spawn a level 1 randart:
-        item = ItemUtils.item_generate ItemGroups.basic_items, false, 1, 100
-        ObjectUtils.spawn_item_near(@, item.type, 1)
+        ObjectUtils.spawn_item_near(@, ItemGroups.pick_randart(), 1)
 }
 
 Data.enemy_create {
@@ -480,10 +502,10 @@ Data.enemy_create {
         ItemGroups = require "maps.ItemGroups"
         -- Spawn 2 level 1 randarts:
         for i=1,2
-            item = ItemUtils.item_generate ItemGroups.basic_items, false, 1, 100
-            ObjectUtils.spawn_item_near(@, item.type, 1)
+            ObjectUtils.spawn_item_near(@, ItemGroups.pick_randart(), 1)
         ObjectUtils.spawn_item_near(@, "Gragh's Club", 1)
         ObjectUtils.spawn_item_near(@, "Rage Lanart", 1)
+        ObjectUtils.spawn_item_near(@, "Amulet of the Berserker", 1)
     effects_active: {"Enraging"}
 }
 
@@ -514,8 +536,7 @@ Data.enemy_create {
         ObjectUtils.spawn_item_near(@, "Obliteration Lanart", 1)
         -- Spawn 1 level 2 randart:
         for i=1,2
-            item = ItemUtils.item_generate ItemGroups.basic_items, false, 2, 100
-            ObjectUtils.spawn_item_near(@, item.type, 1)
+            ObjectUtils.spawn_item_near(@, ItemGroups.pick_randart(2), 1)
     effects_active: {"Pain Aura"}
 }
 

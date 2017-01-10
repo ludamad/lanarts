@@ -207,7 +207,7 @@ local function ChargeCallback(_, caster)
             --            local chance = math.max(25, 100 - num * 20)
             --if rand_range(0, 100) < chance then -- decreasing chance of knockback
             local str_diff = math.max(0, caster.stats.strength - mon.stats.strength)
-                thrown = mon:add_effect("Thrown", 10 + 10 * str_diff)
+                local thrown = mon:add_effect("Thrown", 10 + 10 * str_diff)
                 thrown.angle = vector_direction({caster.x, caster.y}, {mon.x, mon.y})
                 if caster:is_local_player() then
                     EventLog.add("The " .. mon.name .." is thrown back!", {200,200,255})
@@ -287,7 +287,11 @@ function Pain.action_func(caster, x, y, target)
     if target:damage(random(1,12) * 0.9 + stats.magic * 0.9, random(2,5) + stats.magic * 0.2, 1, 0.9) then
         play_sound "sound/painkill.ogg"
         caster:gain_xp_from(target)
-        caster:heal_hp(target:effective_stats().max_hp / 3)
+        if caster:has_effect("AmuletGreatPain") then
+            caster:heal_hp(target:effective_stats().max_hp * 2 / 3)
+        else
+            caster:heal_hp(target:effective_stats().max_hp / 3)
+        end
     else
         caster:direct_damage(20)
     end
