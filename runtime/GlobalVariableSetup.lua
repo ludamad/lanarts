@@ -102,3 +102,18 @@ require "globals.Math"
 require "globals.StringUtils"
 require "globals.TableUtils"
 require "globals.TextComponent"
+
+print "Preload external packages that set globals before eliminating that functionality"
+
+require "json"
+require "socket"
+require "ltn12"
+require "mime"
+
+-- Now that global variable mutation has been done, protect globals even more strongly, prevent creation of new globals:
+setmetatable(_G, {__index = function(self, k)
+    error( ("Global variable '%s' does not exist!"):format(k) )
+end, __newindex = function(self, k)
+    error( ("Not in file called by GlobalVariableSetup, cannot set global variable '%s'!"):format(k) )
+end})
+

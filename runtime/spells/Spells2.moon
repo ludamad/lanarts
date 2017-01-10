@@ -285,7 +285,7 @@ Data.effect_create {
     name: "Pain Aura"
     category: "Aura"
     effected_sprite: "spr_spells.greaterpain"
-    fade_out: 100
+    fade_out: 50
     init_func: (caster) =>
         AuraBase.init(@, caster)
         @mp_gain = 10
@@ -293,6 +293,8 @@ Data.effect_create {
             @range = 90
     step_func: (caster) =>
         AuraBase.step(@, caster)
+        if @animation_only
+            return
         if caster.is_enemy and not Map.object_visible(caster)
             return
         for mon in *(Map.enemies_list caster)
@@ -314,7 +316,9 @@ Data.effect_create {
                     --    EventLog.add(caster.name .. " drains the enemy's life force as MP!", {200,200,255})
     draw_func: (caster, top_left_x, top_left_y) =>
         @max_alpha = 0.35
-        if not caster.is_enemy and not caster\has_effect "Pained"
+        if @animation_only 
+            @max_alpha /= 4
+        elseif not caster.is_enemy and not caster\has_effect "Pained"
             @max_alpha /= 2
         AuraBase.draw(@, COL_PALE_RED, COL_RED, caster.x, caster.y)
 }
@@ -415,7 +419,7 @@ Data.spell_create {
     cooldown: 35,
     can_cast_with_held_key: false,
     fallback_to_melee: false,
-    spell_cooldown: 400
+    spell_cooldown: 800
     prereq_func: (caster) ->
         if caster.stats.hp == caster\effective_stats().max_hp
             return false
@@ -425,7 +429,8 @@ Data.spell_create {
         caster\add_effect("Regeneration", 60 * 6)
         if caster\is_local_player()
             EventLog.add("You start to regenerate quickly!", {200,200,255})
-            play_sound "sound/Jingle_Win_Synth/Jingle_Win_Synth_00.ogg"
+            --play_sound "sound/Jingle_Win_Synth/Jingle_Win_Synth_00.ogg"
+            play_sound "sound/berserk.ogg"
         else
             EventLog.add(caster.name .. " starts to regenerate quickly!", {200,200,255})
 }
@@ -477,14 +482,14 @@ Data.effect_create {
 Data.spell_create {
     name: "Summon Dark Aspect",
     spr_spell: "spr_spells.summon",
-    description: "You summon a dark companion, at the cost of health. Stronger companions are summoned if the caster has high willpower.",
-    mp_cost: 10,
-    cooldown: 35,
+    description: "You summon a dark companion, at the cost of health. Multiple companions can be maintained at once only if the caster has high willpower.",
+    mp_cost: 15,
+    cooldown: 55,
     can_cast_with_held_key: false,
     fallback_to_melee: false,
-    spell_cooldown: 100
+    spell_cooldown: 800
     prereq_func: (caster) ->
-        if caster.stats.hp < 25
+        if caster.stats.hp < 40
             if caster\is_local_player() 
                 EventLog.add("You do not have enough health!", {200,200,255})
             return false
@@ -492,7 +497,7 @@ Data.spell_create {
             if caster\is_local_player() 
                 EventLog.add("You must be a necromancer to cast this spell!", {200,200,255})
             return false
-        amount = math.max 1, math.ceil(caster.stats.level / 2)
+        amount = math.max 1, math.ceil((caster\effective_stats().willpower - 7) / 2)
         {:n_summons} = caster\get_effect("Summoner")
         if n_summons >= amount
             if caster\is_local_player() 
@@ -506,15 +511,15 @@ Data.spell_create {
         --for obj in *Map.enemies_list(caster)
         --    if Map.object_visible(obj)
         --        visible_enemy = true
-        {:willpower} = caster\effective_stats()
-        monster = if willpower >= 11
-            "Mummy"
-        elseif willpower >= 9
-            "Skeleton"
-        else
-            "Spectral Beast"
+        --{:willpower} = caster\effective_stats()
+        --monster = if willpower >= 11
+        --    "Mummy"
+        --elseif willpower >= 9
+        --    "Skeleton"
+        --else
+        monster = "Spectral Beast"
         if not (caster\has_effect "Summoning")
-            caster\direct_damage(15)
+            caster\direct_damage(25)
             eff = caster\add_effect("Summoning", 20)
             eff.monster = (if type(monster) == "string" then monster else random_choice(monster))
             eff.duration = 5

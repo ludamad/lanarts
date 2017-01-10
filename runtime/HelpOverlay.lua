@@ -33,7 +33,7 @@ local function help_overlay_create()
 end
 local help_overlay = help_overlay_create()
 
-function help_overlay_toggle() 
+local function help_overlay_toggle() 
     if help_overlay then
         help_overlay = help_overlay_create()
     else
@@ -42,8 +42,10 @@ function help_overlay_toggle()
 
 end
 
-function help_overlay_draw() 
+local function help_overlay_draw() 
     if help_overlay then
         help_overlay:draw({0,0})
     end
 end
+
+return {toggle = help_overlay_toggle, draw = help_overlay_draw}

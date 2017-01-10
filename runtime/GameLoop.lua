@@ -8,7 +8,7 @@ local EventLog = require "ui.EventLog"
 local GameState = require "core.GameState"
 local World = require "core.World"
 local Map = require "core.Map"
-local help_overlay = require "HelpOverlay"
+local HelpOverlay = require "HelpOverlay"
 local Network = require "core.Network"
 local Keys = require "core.Keyboard"
 
@@ -88,7 +88,7 @@ function M.overlay_draw()
         fps_timer:start()
         fps_count = 0
     end
-    help_overlay_draw()
+    HelpOverlay.draw()
 end
 
 function M.run_loop()

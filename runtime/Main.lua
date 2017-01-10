@@ -40,7 +40,7 @@ local function has_arg(s) return table.contains(argv, s) end
 local function num_param(s) local param = get_param(s) ; return param and tonumber(param) end
 
 -- Special global table; holds command-line arguments parsing utilities.
-sysargs = {get_varparam=get_varparam, get_param=get_param, has_arg=has_arg, num_param=num_param}
+local sysargs = {get_varparam=get_varparam, get_param=get_param, has_arg=has_arg, num_param=num_param}
 
 function sysargs.argv() return table.clone(argv) end
 
@@ -64,7 +64,7 @@ local function main(_argv)
     argv = _argv
 
     -- Misc options
-    if has_arg "--sound" then sound_volume = 1.0 end
+    --if has_arg "--sound" then sound_volume = 1.0 end
     if has_arg "--debug" then debug.attach_debugger() end
 
     -- Error control options

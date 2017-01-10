@@ -1,8 +1,6 @@
 --- This is the main loading point of the game, after the bootstrap 'main'.
 -- This sets up all the engine hooks that define the Lanarts game.
 
-sound_volume = 0 -- Mute the game
-
 -- For tests:
 local interceptable_require = require
 if require("tests.main").testcase then
@@ -43,10 +41,6 @@ end
 function Engine.resources_load(...)
     print "function Engine.resources_load(...)"
     --TODO: Find a better place for these helper functions
-    function is_consumable(item)     return item.type == "consumable" end
-    function is_weapon(item)         return item.type == "weapon" end
-    function is_armour(item)         return item.type == "armour" end
-    function is_projectile(item)     return item.type == "projectile" end
 
     require "effects.Effects"
 

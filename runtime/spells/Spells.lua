@@ -70,7 +70,7 @@ Data.spell_create {
 local Regeneration = {
     name = "Regeneration",
     spr_spell = "spr_spells.regeneration",
-    description = "Regenerate health 20x for two seconds.",
+    description = "Regenerate health at 15x speed for two seconds.",
     mp_cost = 15,
     cooldown = 40,
     can_cast_with_held_key = false,
@@ -252,14 +252,14 @@ Data.spell_create(PowerStrike)
 
 local Pain = {
     name = "Pain",
-    description = "Instantly damage a nearby enemy, but hurt yourself in the process.",
+    description = "Instantly damage a nearby enemy, but hurt yourself in the process. If you kill the enemy, you gain back one third its life.",
     can_cast_with_held_key = true,
     spr_spell = "spr_spells.pain",
     can_cast_with_cooldown = false,
     mp_cost = 10,
     cooldown = 30,
     fallback_to_melee = true,
-    range = 60
+    range = 50
 }
 
 function Pain.action_func(caster, x, y, target)
@@ -280,13 +280,16 @@ function Pain.action_func(caster, x, y, target)
     end
     local stats = caster:effective_stats()
     target:add_effect("Pained", 50)
+    local aura = caster:add_effect("Pain Aura", 100)
+    aura.animation_only = true
+    aura.range = eff_range
     play_pained_sound()
     if target:damage(random(1,12) * 0.9 + stats.magic * 0.9, random(2,5) + stats.magic * 0.2, 1, 0.9) then
         play_sound "sound/painkill.ogg"
         caster:gain_xp_from(target)
-        caster:heal_hp(target:effective_stats().max_hp / 4)
+        caster:heal_hp(target:effective_stats().max_hp / 3)
     else
-        caster:direct_damage(10)
+        caster:direct_damage(20)
     end
     caster:add_effect("Pained", 50)
     if caster:is_local_player() then
@@ -297,7 +300,10 @@ function Pain.action_func(caster, x, y, target)
 end
 
 function Pain.prereq_func(caster)
-    if caster.stats.hp < 25 then
+    if caster.stats.hp < 35 then
+        if caster:is_local_player() then
+            EventLog.add("You require more health!", {200,200,255})
+        end
         return false
     end
     for mon in values(Map.enemies_list(caster)) do

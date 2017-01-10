@@ -115,7 +115,7 @@ effects:
     # Rest of effect in CPP code
     stat_func: 
       function(effect, obj, old, new)
-        new.hpregen = new.hpregen * 20
+        new.hpregen = new.hpregen * 15
         if obj.stats.hp == new.max_hp then
             obj:remove_effect("Regeneration")
         end
